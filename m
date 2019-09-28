@@ -1,117 +1,303 @@
-Content-Type: multipart/mixed; boundary="===============8563623056275264409=="
+Content-Type: multipart/mixed; boundary="===============8784100939798000212=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH v2 10/14] rtnlutil: Add IPv6 address change helpers
-Date: Fri, 27 Sep 2019 17:12:29 -0700
-Message-ID: <20190928001233.19217-10-tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2 11/14] netconfig: Add IPv6 static address
+ installation/removal
+Date: Fri, 27 Sep 2019 17:12:30 -0700
+Message-ID: <20190928001233.19217-11-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20190928001233.19217-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8563623056275264409==
+--===============8784100939798000212==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implements the IPv6 helper functions to add/delete IP addresses.
+The placeholders for DHCPv6 are placed along the way and marked
+as TODO items.
 ---
- src/rtnlutil.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++
- src/rtnlutil.h |  9 +++++++++
- 2 files changed, 72 insertions(+)
+ src/netconfig.c | 161 ++++++++++++++++++++++++++++++++++++++++++++++++++++=
+----
+ 1 file changed, 152 insertions(+), 9 deletions(-)
 
-diff --git a/src/rtnlutil.c b/src/rtnlutil.c
-index 0cee5ff5..cca83a40 100644
---- a/src/rtnlutil.c
-+++ b/src/rtnlutil.c
-@@ -469,3 +469,66 @@ uint32_t rtnl_ifaddr_ipv6_get(struct l_netlink *rtnl,
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 6f97eed5..14aac28f 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -48,6 +48,7 @@ struct netconfig {
+ 	struct l_dhcp_client *dhcp_client;
+ 	struct l_queue *ifaddr_list;
+ 	uint8_t rtm_protocol;
++	uint8_t rtm_v6_protocol;
  =
 
- 	return id;
+ 	const struct l_settings *active_settings;
+ };
+@@ -224,6 +225,59 @@ static char **netconfig_ipv4_get_dns(struct netconfig =
+*netconfig, uint8_t proto)
+ 	return NULL;
  }
-+
-+static uint32_t rtnl_ifaddr_ipv6_change(struct l_netlink *rtnl,
-+					uint16_t nlmsg_type,
-+					int ifindex, uint8_t prefix_len,
-+					const char *ip,
-+					l_netlink_command_func_t cb,
-+					void *user_data,
-+					l_netlink_destroy_func_t destroy)
+ =
+
++static struct netconfig_ifaddr *netconfig_ipv6_get_ifaddr(
++						struct netconfig *netconfig,
++						uint8_t proto)
 +{
-+	struct ifaddrmsg *rtmmsg;
-+	struct in6_addr in6_addr;
-+	void *rta_buf;
-+	size_t bufsize;
-+	uint32_t id;
++	struct netconfig_ifaddr *ifaddr;
++	char *ip;
++	char *p;
 +
-+	bufsize =3D NLMSG_ALIGN(sizeof(struct ifaddrmsg)) +
-+					RTA_SPACE(sizeof(struct in6_addr));
++	switch (proto) {
++	case RTPROT_STATIC:
++		if (!netconfig->active_settings)
++			return NULL;
 +
-+	rtmmsg =3D l_malloc(bufsize);
-+	memset(rtmmsg, 0, bufsize);
++		ip =3D l_settings_get_string(netconfig->active_settings, "IPv6",
++									"ip");
++		if (!ip)
++			return NULL;
 +
-+	rtmmsg->ifa_index =3D ifindex;
-+	rtmmsg->ifa_family =3D AF_INET6;
-+	rtmmsg->ifa_flags =3D IFA_F_PERMANENT;
-+	rtmmsg->ifa_scope =3D RT_SCOPE_UNIVERSE;
-+	rtmmsg->ifa_prefixlen =3D prefix_len;
++		ifaddr =3D l_new(struct netconfig_ifaddr, 1);
++		ifaddr->ip =3D ip;
 +
-+	rta_buf =3D (void *) rtmmsg + NLMSG_ALIGN(sizeof(struct ifaddrmsg));
++		p =3D strrchr(ifaddr->ip, '/');
++		if (!p)
++			goto no_prefix_len;
 +
-+	if (inet_pton(AF_INET6, ip, &in6_addr) < 1) {
-+		l_free(rtmmsg);
-+		return 0;
++		if (*++p =3D=3D '\0')
++			goto no_prefix_len;
++
++		ifaddr->prefix_len =3D strtoul(p, NULL, 10);
++
++		p =3D strrchr(ifaddr->ip, '/');
++		*p =3D '\0';
++
++		if (!unlikely(errno =3D=3D ERANGE || !ifaddr->prefix_len ||
++					ifaddr->prefix_len > 128))
++			goto proceed;
++
++no_prefix_len:
++		ifaddr->prefix_len =3D 128;
++proceed:
++		ifaddr->family =3D AF_INET6;
++
++		return ifaddr;
++
++	case RTPROT_DHCP:
++		/* TODO */
++
++		return NULL;
 +	}
 +
-+	rta_buf +=3D rta_add_data(rta_buf, IFA_LOCAL, &in6_addr,
-+						sizeof(struct in6_addr));
-+
-+	id =3D l_netlink_send(rtnl, nlmsg_type, 0, rtmmsg,
-+						rta_buf - (void *) rtmmsg, cb,
-+						user_data, destroy);
-+	l_free(rtmmsg);
-+
-+	return id;
++	return NULL;
 +}
 +
-+uint32_t rtnl_ifaddr_ipv6_add(struct l_netlink *rtnl, int ifindex,
-+				uint8_t prefix_len, const char *ip,
-+				l_netlink_command_func_t cb, void *user_data,
-+				l_netlink_destroy_func_t destroy)
+ static struct netconfig_ifaddr *netconfig_ifaddr_find(
+ 					const struct netconfig *netconfig,
+ 					uint8_t family, uint8_t prefix_len,
+@@ -523,6 +577,19 @@ done:
+ 	netconfig_ifaddr_destroy(ifaddr);
+ }
+ =
+
++static void netconfig_ipv6_ifaddr_add_cmd_cb(int error, uint16_t type,
++						const void *data, uint32_t len,
++						void *user_data)
 +{
-+	return rtnl_ifaddr_ipv6_change(rtnl, RTM_NEWADDR, ifindex, prefix_len,
-+						ip, cb, user_data, destroy);
++	if (error && error !=3D -EEXIST) {
++		l_error("netconfig: Failed to add IPv6 address. "
++				"Error %d: %s", error, strerror(-error));
++		return;
++	}
++
++	/* TODO Install routes and DNS */
 +}
 +
-+uint32_t rtnl_ifaddr_ipv6_delete(struct l_netlink *rtnl, int ifindex,
-+					uint8_t prefix_len, const char *ip,
-+					l_netlink_command_func_t cb,
-+					void *user_data,
-+					l_netlink_destroy_func_t destroy)
+ static void netconfig_install_address(struct netconfig *netconfig,
+ 						struct netconfig_ifaddr *ifaddr)
+ {
+@@ -542,6 +609,16 @@ static void netconfig_install_address(struct netconfig=
+ *netconfig,
+ 		l_error("netconfig: Failed to set IP %s/%u.", ifaddr->ip,
+ 							ifaddr->prefix_len);
+ 		break;
++	case AF_INET6:
++		if (rtnl_ifaddr_ipv6_add(rtnl, netconfig->ifindex,
++					ifaddr->prefix_len, ifaddr->ip,
++					netconfig_ipv6_ifaddr_add_cmd_cb,
++					netconfig, NULL))
++			return;
++
++		l_error("netconfig: Failed to set IPv6 address %s/%u.",
++					ifaddr->ip, ifaddr->prefix_len);
++		break;
+ 	default:
+ 		l_error("netconfig: Unsupported address family: %u",
+ 								ifaddr->family);
+@@ -588,6 +665,16 @@ static void netconfig_uninstall_address(struct netconf=
+ig *netconfig,
+ 		l_error("netconfig: Failed to delete IP %s/%u.",
+ 						ifaddr->ip, ifaddr->prefix_len);
+ 		break;
++	case AF_INET6:
++		if (rtnl_ifaddr_ipv6_delete(rtnl, netconfig->ifindex,
++					ifaddr->prefix_len, ifaddr->ip,
++					netconfig_ifaddr_del_cmd_cb, netconfig,
++					NULL))
++			return;
++
++		l_error("netconfig: Failed to delete IPv6 address %s/%u.",
++						ifaddr->ip, ifaddr->prefix_len);
++		break;
+ 	default:
+ 		l_error("netconfig: Unsupported address family: %u",
+ 								ifaddr->family);
+@@ -708,6 +795,51 @@ static void netconfig_ipv4_select_and_uninstall(struct=
+ netconfig *netconfig)
+ 	l_dhcp_client_stop(netconfig->dhcp_client);
+ }
+ =
+
++static void netconfig_ipv6_select_and_install(struct netconfig *netconfig)
 +{
-+	return rtnl_ifaddr_ipv6_change(rtnl, RTM_DELADDR, ifindex, prefix_len,
-+						ip, cb, user_data, destroy);
++	struct netconfig_ifaddr *ifaddr;
++
++	ifaddr =3D netconfig_ipv6_get_ifaddr(netconfig, RTPROT_STATIC);
++	if (ifaddr) {
++		netconfig->rtm_v6_protocol =3D RTPROT_STATIC;
++		netconfig_install_address(netconfig, ifaddr);
++		netconfig_ifaddr_destroy(ifaddr);
++
++		return;
++	}
++
++	/*
++	 * 	TODO
++	 *
++	 *      netconfig->rtm_v6_protocol =3D RTPROT_DHCP;
++	 *
++	 *      netconfig_ipv6_dhcp_set_mac_address(netconfig);
++	 *
++	 *	if (l_dhcp_v6_client_start(netconfig->l_dhcp_v6_client))
++	 *		return;
++	 *
++	 * 	l_error("netconfig: Failed to start DHCPv6 client for "
++	 *			"interface %u", netconfig->ifindex);
++	 */
 +}
-diff --git a/src/rtnlutil.h b/src/rtnlutil.h
-index ff1427c5..5a901234 100644
---- a/src/rtnlutil.h
-+++ b/src/rtnlutil.h
-@@ -74,3 +74,12 @@ uint32_t rtnl_ifaddr_ipv6_get(struct l_netlink *rtnl,
- 				l_netlink_command_func_t cb,
- 				void *user_data,
- 				l_netlink_destroy_func_t destroy);
-+uint32_t rtnl_ifaddr_ipv6_add(struct l_netlink *rtnl, int ifindex,
-+				uint8_t prefix_len, const char *ip,
-+				l_netlink_command_func_t cb, void *user_data,
-+				l_netlink_destroy_func_t destroy);
-+uint32_t rtnl_ifaddr_ipv6_delete(struct l_netlink *rtnl, int ifindex,
-+					uint8_t prefix_len, const char *ip,
-+					l_netlink_command_func_t cb,
-+					void *user_data,
-+					l_netlink_destroy_func_t destroy);
++
++static void netconfig_ipv6_select_and_uninstall(struct netconfig *netconfi=
+g)
++{
++	struct netconfig_ifaddr *ifaddr;
++
++	ifaddr =3D netconfig_ipv6_get_ifaddr(netconfig,
++						netconfig->rtm_v6_protocol);
++	if (ifaddr) {
++		netconfig_uninstall_address(netconfig, ifaddr);
++		netconfig_ifaddr_destroy(ifaddr);
++	}
++
++	/*
++	 * TODO
++	 * l_dhcp_v6_client_start(netconfig->l_dhcp_v6_client);
++	 */
++}
++
+ bool netconfig_configure(struct netconfig *netconfig,
+ 				const struct l_settings *active_settings,
+ 				const uint8_t *mac_address)
+@@ -719,7 +851,7 @@ bool netconfig_configure(struct netconfig *netconfig,
+ =
+
+ 	netconfig_ipv4_select_and_install(netconfig);
+ =
+
+-	/* TODO: IPv6 addressing */
++	netconfig_ipv6_select_and_install(netconfig);
+ =
+
+ 	return true;
+ }
+@@ -732,13 +864,23 @@ bool netconfig_reconfigure(struct netconfig *netconfi=
+g)
+ 		 * TODO l_dhcp_client to try to request a
+ 		 * previously used address.
+ 		 *
+-		 * return;
++		 * goto ipv6;
+ 		 */
+ 	}
+ =
+
+ 	netconfig_ipv4_select_and_install(netconfig);
+ =
+
+-	/* TODO: IPv6 addressing */
++	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP) {
++		/*
++		 *
++		 * TODO l_dhcp_v6_client to try to request a
++		 * previously used address.
++		 *
++		 * return
++		 */
++	}
++
++	netconfig_ipv6_select_and_install(netconfig);
+ =
+
+ 	return true;
+ }
+@@ -746,13 +888,13 @@ bool netconfig_reconfigure(struct netconfig *netconfi=
+g)
+ bool netconfig_reset(struct netconfig *netconfig)
+ {
+ 	netconfig_ipv4_select_and_uninstall(netconfig);
++	netconfig->rtm_protocol =3D 0;
+ =
+
+-	/* TODO: IPv6 addressing */
++	netconfig_ipv6_select_and_uninstall(netconfig);
++	netconfig->rtm_v6_protocol =3D 0;
+ =
+
+ 	resolve_remove(netconfig->ifindex);
+ =
+
+-	netconfig->rtm_protocol =3D 0;
+-
+ 	return true;
+ }
+ =
+
+@@ -789,13 +931,14 @@ void netconfig_destroy(struct netconfig *netconfig)
+ =
+
+ 	l_queue_remove(netconfig_list, netconfig);
+ =
+
+-	if (netconfig->rtm_protocol) {
++	if (netconfig->rtm_protocol)
+ 		netconfig_ipv4_select_and_uninstall(netconfig);
+ =
+
+-		/* TODO Uninstall IPv6 addresses. */
++	if (netconfig->rtm_v6_protocol)
++		netconfig_ipv6_select_and_uninstall(netconfig);
+ =
+
++	if (netconfig->rtm_protocol || netconfig->rtm_v6_protocol)
+ 		resolve_remove(netconfig->ifindex);
+-	}
+ =
+
+ 	netconfig_free(netconfig);
+ }
 -- =
 
 2.13.6
 
---===============8563623056275264409==--
+--===============8784100939798000212==--
 
