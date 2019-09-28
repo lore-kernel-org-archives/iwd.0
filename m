@@ -1,88 +1,154 @@
-Content-Type: multipart/mixed; boundary="===============3989333689222609669=="
+Content-Type: multipart/mixed; boundary="===============4877171866109279925=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH v2 04/14] station: netconfig devices based on station state
-Date: Fri, 27 Sep 2019 17:12:23 -0700
-Message-ID: <20190928001233.19217-4-tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2 05/14] netconfig: Switch to internal active network settings
+Date: Fri, 27 Sep 2019 17:12:24 -0700
+Message-ID: <20190928001233.19217-5-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20190928001233.19217-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3989333689222609669==
+--===============4877171866109279925==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+As part of the de-coupling from station object, switch all of
+the network settings inquiries to use active_settings. active_settings
+are set with netconfig_configure by the owner of netconfig object
+and removed with netconfig_reset once network disconnects.
 ---
- src/station.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ src/netconfig.c | 46 +++++++++++-----------------------------------
+ 1 file changed, 11 insertions(+), 35 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 02c5260b..0666287b 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1158,8 +1158,23 @@ static void station_enter_state(struct station *stat=
-ion,
- 				IWD_NETWORK_INTERFACE, "Connected");
- 		/* fall through */
- 	case STATION_STATE_DISCONNECTED:
-+		periodic_scan_stop(station);
-+
-+		break;
- 	case STATION_STATE_CONNECTED:
- 		periodic_scan_stop(station);
-+
-+		if (station->state =3D=3D STATION_STATE_ROAMING) {
-+			netconfig_reconfigure(station->netconfig);
-+
-+			break;
-+		}
-+
-+		netconfig_configure(station->netconfig,
-+					network_get_settings(
-+						station->connected_network),
-+					netdev_get_address(
-+							station->netdev));
- 		break;
- 	case STATION_STATE_DISCONNECTING:
- 	case STATION_STATE_ROAMING:
-@@ -1247,6 +1262,8 @@ static void station_disassociated(struct station *sta=
-tion)
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 88d2588e..4e294512 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -113,29 +113,11 @@ static struct netconfig *netconfig_find(uint32_t ifin=
+dex)
+ 	return NULL;
+ }
+ =
+
+-static struct l_settings *netconfig_get_connected_network_settings(
+-						struct netconfig *netconfig)
+-{
+-	struct station *station;
+-	const struct network *network;
+-
+-	station =3D station_find(netconfig->ifindex);
+-	if (!station)
+-		return NULL;
+-
+-	network =3D station_get_connected_network(station);
+-	if (!network)
+-		return NULL;
+-
+-	return network_get_settings(network);
+-}
+-
+ static struct netconfig_ifaddr *netconfig_ipv4_get_ifaddr(
+ 						struct netconfig *netconfig,
+ 						uint8_t proto)
  {
- 	l_debug("%u", netdev_get_ifindex(station->netdev));
+ 	const struct l_dhcp_lease *lease;
+-	const struct l_settings *settings;
+ 	struct netconfig_ifaddr *ifaddr;
+ 	struct in_addr in_addr;
+ 	char *netmask;
+@@ -143,18 +125,17 @@ static struct netconfig_ifaddr *netconfig_ipv4_get_if=
+addr(
  =
 
-+	netconfig_reset(station->netconfig);
-+
- 	station_reset_connection_state(station);
+ 	switch (proto) {
+ 	case RTPROT_STATIC:
+-		settings =3D netconfig_get_connected_network_settings(netconfig);
+-		if (!settings)
+-			return NULL;
  =
 
- 	station_enter_state(station, STATION_STATE_DISCONNECTED);
-@@ -2327,6 +2344,8 @@ static void station_disconnect_onconnect(struct stati=
-on *station,
- 		return;
- 	}
+-		ip =3D l_settings_get_string(settings, "IPv4", "ip");
++		ip =3D l_settings_get_string(netconfig->active_settings, "IPv4",
++									"ip");
+ 		if (!ip)
+ 			return NULL;
  =
 
-+	netconfig_reset(station->netconfig);
-+
- 	station_reset_connection_state(station);
+ 		ifaddr =3D l_new(struct netconfig_ifaddr, 1);
+ 		ifaddr->ip =3D ip;
  =
 
- 	station_enter_state(station, STATION_STATE_DISCONNECTING);
-@@ -2562,6 +2581,8 @@ int station_disconnect(struct station *station)
- 					station_disconnect_cb, station) < 0)
- 		return -EIO;
+-		netmask =3D l_settings_get_string(settings, "IPv4", "netmask");
++		netmask =3D l_settings_get_string(netconfig->active_settings,
++							"IPv4", "netmask");
+ 		if (netmask && inet_pton(AF_INET, netmask, &in_addr) > 0)
+ 			ifaddr->prefix_len =3D __builtin_popcountl(
+ 						L_BE32_TO_CPU(in_addr.s_addr));
+@@ -163,8 +144,9 @@ static struct netconfig_ifaddr *netconfig_ipv4_get_ifad=
+dr(
  =
 
-+	netconfig_reset(station->netconfig);
-+
- 	/*
- 	 * If the disconnect somehow fails we won't know if we're still
- 	 * connected so we may as well indicate now that we're no longer
+ 		l_free(netmask);
+ =
+
+-		ifaddr->broadcast =3D l_settings_get_string(settings, "IPv4",
+-								"broadcast");
++		ifaddr->broadcast =3D
++			l_settings_get_string(netconfig->active_settings,
++							"IPv4", "broadcast");
+ 		ifaddr->family =3D AF_INET;
+ =
+
+ 		return ifaddr;
+@@ -203,15 +185,12 @@ static struct netconfig_ifaddr *netconfig_ipv4_get_if=
+addr(
+ static char *netconfig_ipv4_get_gateway(struct netconfig *netconfig)
+ {
+ 	const struct l_dhcp_lease *lease;
+-	const struct l_settings *settings;
+ =
+
+ 	switch (netconfig->rtm_protocol) {
+ 	case RTPROT_STATIC:
+-		settings =3D netconfig_get_connected_network_settings(netconfig);
+-		if (!settings)
+-			return NULL;
+ =
+
+-		return l_settings_get_string(settings, "IPv4", "gateway");
++		return l_settings_get_string(netconfig->active_settings,
++							"IPv4", "gateway");
+ =
+
+ 	case RTPROT_DHCP:
+ 		lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
+@@ -227,15 +206,12 @@ static char *netconfig_ipv4_get_gateway(struct netcon=
+fig *netconfig)
+ static char **netconfig_ipv4_get_dns(struct netconfig *netconfig, uint8_t =
+proto)
+ {
+ 	const struct l_dhcp_lease *lease;
+-	const struct l_settings *settings;
+ =
+
+ 	switch (proto) {
+ 	case RTPROT_STATIC:
+-		settings =3D netconfig_get_connected_network_settings(netconfig);
+-		if (!settings)
+-			return NULL;
+ =
+
+-		return l_settings_get_string_list(settings, "IPv4", "dns", ' ');
++		return l_settings_get_string_list(netconfig->active_settings,
++							"IPv4", "dns", ' ');
+ =
+
+ 	case RTPROT_DHCP:
+ 		lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
 -- =
 
 2.13.6
 
---===============3989333689222609669==--
+--===============4877171866109279925==--
 
