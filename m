@@ -1,80 +1,122 @@
-Content-Type: multipart/mixed; boundary="===============5633635031949197589=="
+Content-Type: multipart/mixed; boundary="===============0797254702103460062=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH v2 06/14] rtnlutil: Add parser for IPv6 RTNL packet
-Date: Fri, 27 Sep 2019 17:12:25 -0700
-Message-ID: <20190928001233.19217-6-tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2 07/14] netconfig: Subscribe for IPv6 address changes
+Date: Fri, 27 Sep 2019 17:12:26 -0700
+Message-ID: <20190928001233.19217-7-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20190928001233.19217-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5633635031949197589==
+--===============0797254702103460062==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-At this time, we are only looking for IFA_ADDRESS attribute that
-represents the IPv6 IP address.
+The IPv6 addresses changes are maintained in ifaddr_list.
 ---
- src/rtnlutil.c | 30 ++++++++++++++++++++++++++++++
- src/rtnlutil.h |  3 +++
- 2 files changed, 33 insertions(+)
+ src/netconfig.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ 1 file changed, 74 insertions(+)
 
-diff --git a/src/rtnlutil.c b/src/rtnlutil.c
-index d20b3284..b1d6450e 100644
---- a/src/rtnlutil.c
-+++ b/src/rtnlutil.c
-@@ -418,3 +418,33 @@ uint32_t rtnl_route_ipv4_add_gateway(struct l_netlink =
-*rtnl, int ifindex,
- 				gateway, src, priority_offset, proto, cb,
- 				user_data, destroy);
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 4e294512..140de63a 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -335,6 +335,72 @@ static void netconfig_ifaddr_cmd_cb(int error, uint16_=
+t type,
+ 	netconfig_ifaddr_notify(type, data, len, user_data);
  }
-+
-+void rtnl_ifaddr_ipv6_extract(const struct ifaddrmsg *ifa, int len, char *=
-*ip)
+ =
+
++static void netconfig_ifaddr_ipv6_added(struct netconfig *netconfig,
++					const struct ifaddrmsg *ifa,
++					uint32_t len)
 +{
-+	struct in6_addr in6_addr;
-+	struct rtattr *attr;
-+	char address[128];
++	struct netconfig_ifaddr *ifaddr;
 +
-+	for (attr =3D IFA_RTA(ifa); RTA_OK(attr, len);
-+						attr =3D RTA_NEXT(attr, len)) {
-+		switch (attr->rta_type) {
-+		case IFA_ADDRESS:
-+			if (!ip)
-+				break;
++	ifaddr =3D l_new(struct netconfig_ifaddr, 1);
++	ifaddr->family =3D ifa->ifa_family;
++	ifaddr->prefix_len =3D ifa->ifa_prefixlen;
 +
-+			memcpy(&in6_addr.s6_addr, RTA_DATA(attr),
-+						sizeof(in6_addr.s6_addr));
++	rtnl_ifaddr_ipv6_extract(ifa, len, &ifaddr->ip);
 +
-+			if (!inet_ntop(AF_INET6, &in6_addr, address,
-+							INET6_ADDRSTRLEN)) {
++	l_debug("ifindex %u: ifaddr %s/%u", netconfig->ifindex, ifaddr->ip,
++							ifaddr->prefix_len);
 +
-+				l_error("rtnl: Failed to extract IPv6 address");
-+				break;
-+			}
++	l_queue_push_tail(netconfig->ifaddr_list, ifaddr);
++}
 +
-+			*ip =3D l_strdup(address);
++static void netconfig_ifaddr_ipv6_deleted(struct netconfig *netconfig,
++						const struct ifaddrmsg *ifa,
++						uint32_t len)
++{
++	struct netconfig_ifaddr *ifaddr;
++	char *ip;
 +
-+			break;
-+		}
++	rtnl_ifaddr_ipv6_extract(ifa, len, &ip);
++
++	ifaddr =3D netconfig_ifaddr_find(netconfig, ifa->ifa_family,
++							ifa->ifa_prefixlen, ip);
++
++	l_free(ip);
++
++	if (!ifaddr)
++		return;
++
++	l_debug("ifaddr %s/%u", ifaddr->ip, ifaddr->prefix_len);
++
++	l_queue_remove(netconfig->ifaddr_list, ifaddr);
++
++	netconfig_ifaddr_destroy(ifaddr);
++}
++
++static void netconfig_ifaddr_ipv6_notify(uint16_t type, const void *data,
++						uint32_t len, void *user_data)
++{
++	const struct ifaddrmsg *ifa =3D data;
++	struct netconfig *netconfig;
++	uint32_t bytes;
++
++	netconfig =3D netconfig_find(ifa->ifa_index);
++	if (!netconfig)
++		/* Ignore the interfaces which aren't managed by iwd. */
++		return;
++
++	bytes =3D len - NLMSG_ALIGN(sizeof(struct ifaddrmsg));
++
++	switch (type) {
++	case RTM_NEWADDR:
++		netconfig_ifaddr_ipv6_added(netconfig, ifa, bytes);
++		break;
++	case RTM_DELADDR:
++		netconfig_ifaddr_ipv6_deleted(netconfig, ifa, bytes);
++		break;
 +	}
 +}
-diff --git a/src/rtnlutil.h b/src/rtnlutil.h
-index b159d959..8c0a923d 100644
---- a/src/rtnlutil.h
-+++ b/src/rtnlutil.h
-@@ -67,3 +67,6 @@ uint32_t rtnl_route_ipv4_add_gateway(struct l_netlink *rt=
-nl, int ifindex,
- 					l_netlink_command_func_t cb,
- 					void *user_data,
- 					l_netlink_destroy_func_t destroy);
 +
-+void rtnl_ifaddr_ipv6_extract(const struct ifaddrmsg *ifa, int bytes,
-+								char **ip);
+ static void netconfig_route_cmd_cb(int error, uint16_t type,
+ 						const void *data, uint32_t len,
+ 						void *user_data)
+@@ -757,6 +823,14 @@ static int netconfig_init(void)
+ 		goto error;
+ 	}
+ =
+
++	r =3D l_netlink_register(rtnl, RTNLGRP_IPV6_IFADDR,
++				netconfig_ifaddr_ipv6_notify, NULL, NULL);
++	if (!r) {
++		l_error("netconfig: Failed to register for RTNL link IPv6 "
++					"address notifications.");
++		goto error;
++	}
++
+ 	if (!l_settings_get_uint(iwd_get_config(), "General",
+ 							"route_priority_offset",
+ 							&ROUTE_PRIORITY_OFFSET))
 -- =
 
 2.13.6
 
---===============5633635031949197589==--
+--===============0797254702103460062==--
 
