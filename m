@@ -1,154 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============4877171866109279925=="
+Content-Type: multipart/mixed; boundary="===============5633635031949197589=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH v2 05/14] netconfig: Switch to internal active network settings
-Date: Fri, 27 Sep 2019 17:12:24 -0700
-Message-ID: <20190928001233.19217-5-tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2 06/14] rtnlutil: Add parser for IPv6 RTNL packet
+Date: Fri, 27 Sep 2019 17:12:25 -0700
+Message-ID: <20190928001233.19217-6-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20190928001233.19217-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4877171866109279925==
+--===============5633635031949197589==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-As part of the de-coupling from station object, switch all of
-the network settings inquiries to use active_settings. active_settings
-are set with netconfig_configure by the owner of netconfig object
-and removed with netconfig_reset once network disconnects.
+At this time, we are only looking for IFA_ADDRESS attribute that
+represents the IPv6 IP address.
 ---
- src/netconfig.c | 46 +++++++++++-----------------------------------
- 1 file changed, 11 insertions(+), 35 deletions(-)
+ src/rtnlutil.c | 30 ++++++++++++++++++++++++++++++
+ src/rtnlutil.h |  3 +++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/src/netconfig.c b/src/netconfig.c
-index 88d2588e..4e294512 100644
---- a/src/netconfig.c
-+++ b/src/netconfig.c
-@@ -113,29 +113,11 @@ static struct netconfig *netconfig_find(uint32_t ifin=
-dex)
- 	return NULL;
+diff --git a/src/rtnlutil.c b/src/rtnlutil.c
+index d20b3284..b1d6450e 100644
+--- a/src/rtnlutil.c
++++ b/src/rtnlutil.c
+@@ -418,3 +418,33 @@ uint32_t rtnl_route_ipv4_add_gateway(struct l_netlink =
+*rtnl, int ifindex,
+ 				gateway, src, priority_offset, proto, cb,
+ 				user_data, destroy);
  }
- =
-
--static struct l_settings *netconfig_get_connected_network_settings(
--						struct netconfig *netconfig)
--{
--	struct station *station;
--	const struct network *network;
--
--	station =3D station_find(netconfig->ifindex);
--	if (!station)
--		return NULL;
--
--	network =3D station_get_connected_network(station);
--	if (!network)
--		return NULL;
--
--	return network_get_settings(network);
--}
--
- static struct netconfig_ifaddr *netconfig_ipv4_get_ifaddr(
- 						struct netconfig *netconfig,
- 						uint8_t proto)
- {
- 	const struct l_dhcp_lease *lease;
--	const struct l_settings *settings;
- 	struct netconfig_ifaddr *ifaddr;
- 	struct in_addr in_addr;
- 	char *netmask;
-@@ -143,18 +125,17 @@ static struct netconfig_ifaddr *netconfig_ipv4_get_if=
-addr(
- =
-
- 	switch (proto) {
- 	case RTPROT_STATIC:
--		settings =3D netconfig_get_connected_network_settings(netconfig);
--		if (!settings)
--			return NULL;
- =
-
--		ip =3D l_settings_get_string(settings, "IPv4", "ip");
-+		ip =3D l_settings_get_string(netconfig->active_settings, "IPv4",
-+									"ip");
- 		if (!ip)
- 			return NULL;
- =
-
- 		ifaddr =3D l_new(struct netconfig_ifaddr, 1);
- 		ifaddr->ip =3D ip;
- =
-
--		netmask =3D l_settings_get_string(settings, "IPv4", "netmask");
-+		netmask =3D l_settings_get_string(netconfig->active_settings,
-+							"IPv4", "netmask");
- 		if (netmask && inet_pton(AF_INET, netmask, &in_addr) > 0)
- 			ifaddr->prefix_len =3D __builtin_popcountl(
- 						L_BE32_TO_CPU(in_addr.s_addr));
-@@ -163,8 +144,9 @@ static struct netconfig_ifaddr *netconfig_ipv4_get_ifad=
-dr(
- =
-
- 		l_free(netmask);
- =
-
--		ifaddr->broadcast =3D l_settings_get_string(settings, "IPv4",
--								"broadcast");
-+		ifaddr->broadcast =3D
-+			l_settings_get_string(netconfig->active_settings,
-+							"IPv4", "broadcast");
- 		ifaddr->family =3D AF_INET;
- =
-
- 		return ifaddr;
-@@ -203,15 +185,12 @@ static struct netconfig_ifaddr *netconfig_ipv4_get_if=
-addr(
- static char *netconfig_ipv4_get_gateway(struct netconfig *netconfig)
- {
- 	const struct l_dhcp_lease *lease;
--	const struct l_settings *settings;
- =
-
- 	switch (netconfig->rtm_protocol) {
- 	case RTPROT_STATIC:
--		settings =3D netconfig_get_connected_network_settings(netconfig);
--		if (!settings)
--			return NULL;
- =
-
--		return l_settings_get_string(settings, "IPv4", "gateway");
-+		return l_settings_get_string(netconfig->active_settings,
-+							"IPv4", "gateway");
- =
-
- 	case RTPROT_DHCP:
- 		lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
-@@ -227,15 +206,12 @@ static char *netconfig_ipv4_get_gateway(struct netcon=
-fig *netconfig)
- static char **netconfig_ipv4_get_dns(struct netconfig *netconfig, uint8_t =
-proto)
- {
- 	const struct l_dhcp_lease *lease;
--	const struct l_settings *settings;
- =
-
- 	switch (proto) {
- 	case RTPROT_STATIC:
--		settings =3D netconfig_get_connected_network_settings(netconfig);
--		if (!settings)
--			return NULL;
- =
-
--		return l_settings_get_string_list(settings, "IPv4", "dns", ' ');
-+		return l_settings_get_string_list(netconfig->active_settings,
-+							"IPv4", "dns", ' ');
- =
-
- 	case RTPROT_DHCP:
- 		lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
++
++void rtnl_ifaddr_ipv6_extract(const struct ifaddrmsg *ifa, int len, char *=
+*ip)
++{
++	struct in6_addr in6_addr;
++	struct rtattr *attr;
++	char address[128];
++
++	for (attr =3D IFA_RTA(ifa); RTA_OK(attr, len);
++						attr =3D RTA_NEXT(attr, len)) {
++		switch (attr->rta_type) {
++		case IFA_ADDRESS:
++			if (!ip)
++				break;
++
++			memcpy(&in6_addr.s6_addr, RTA_DATA(attr),
++						sizeof(in6_addr.s6_addr));
++
++			if (!inet_ntop(AF_INET6, &in6_addr, address,
++							INET6_ADDRSTRLEN)) {
++
++				l_error("rtnl: Failed to extract IPv6 address");
++				break;
++			}
++
++			*ip =3D l_strdup(address);
++
++			break;
++		}
++	}
++}
+diff --git a/src/rtnlutil.h b/src/rtnlutil.h
+index b159d959..8c0a923d 100644
+--- a/src/rtnlutil.h
++++ b/src/rtnlutil.h
+@@ -67,3 +67,6 @@ uint32_t rtnl_route_ipv4_add_gateway(struct l_netlink *rt=
+nl, int ifindex,
+ 					l_netlink_command_func_t cb,
+ 					void *user_data,
+ 					l_netlink_destroy_func_t destroy);
++
++void rtnl_ifaddr_ipv6_extract(const struct ifaddrmsg *ifa, int bytes,
++								char **ip);
 -- =
 
 2.13.6
 
---===============4877171866109279925==--
+--===============5633635031949197589==--
 
