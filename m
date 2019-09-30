@@ -1,89 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============8669385628854128451=="
+Content-Type: multipart/mixed; boundary="===============4545616680179201553=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH v2 8/8] netconfig: Install IPv6 DNS
-Date: Mon, 30 Sep 2019 09:35:58 -0700
-Message-ID: <20190930163558.28123-8-tim.a.kourt@linux.intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2 1/8] netconfig: Decouple from station state
+Date: Mon, 30 Sep 2019 15:12:08 -0500
+Message-ID: <4457e580-4ad5-8530-0b4e-06c23f4306e9@gmail.com>
 In-Reply-To: <20190930163558.28123-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8669385628854128451==
+--===============4545616680179201553==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/netconfig.c | 31 ++++++++++++++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
+Hi Tim,
 
-diff --git a/src/netconfig.c b/src/netconfig.c
-index 6651b2cd..cb072462 100644
---- a/src/netconfig.c
-+++ b/src/netconfig.c
-@@ -297,6 +297,25 @@ static char *netconfig_ipv6_get_gateway(struct netconf=
-ig *netconfig)
- 	return NULL;
- }
- =
+On 9/30/19 11:35 AM, Tim Kourt wrote:
+> Instead of relying on station state changed signal, netconfig
+> introduces three new API calls to configure, re-configure and
+> reset the network configurations. The owner of netconfig object
+> is responsible for initiating the re-configuration of the device
+> depending on its state.
+> ---
+>   src/netconfig.c | 79 ++++++++++++++++++++++++++++++--------------------=
+-------
+>   src/netconfig.h |  6 +++++
+>   2 files changed, 48 insertions(+), 37 deletions(-)
+> =
 
-+static char **netconfig_ipv6_get_dns(struct netconfig *netconfig, uint8_t =
-proto)
-+{
-+	switch (proto) {
-+	case RTPROT_STATIC:
-+		if (!netconfig->active_settings)
-+			return NULL;
-+
-+		return l_settings_get_string_list(netconfig->active_settings,
-+							"IPv6", "dns", ' ');
-+
-+	case RTPROT_DHCP:
-+		/* TODO */
-+
-+		return NULL;
-+	}
-+
-+	return NULL;
-+}
-+
- static struct netconfig_ifaddr *netconfig_ifaddr_find(
- 					const struct netconfig *netconfig,
- 					uint8_t family, uint8_t prefix_len,
-@@ -628,6 +647,7 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error,=
- uint16_t type,
- 						void *user_data)
- {
- 	struct netconfig *netconfig =3D user_data;
-+	char **dns;
- =
 
- 	if (error && error !=3D -EEXIST) {
- 		l_error("netconfig: Failed to add IPv6 address. "
-@@ -641,7 +661,16 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error=
-, uint16_t type,
- 		return;
- 	}
- =
+Patches 1-3 applied, thanks.
 
--	/* TODO Install DNS */
-+	dns =3D netconfig_ipv6_get_dns(netconfig, netconfig->rtm_v6_protocol);
-+	if (!dns) {
-+		l_error("netconfig: Failed to obtain DNS addresses from %s.",
-+				netconfig->rtm_v6_protocol =3D=3D RTPROT_STATIC ?
-+				"setting file" : "DHCPv6 lease");
-+		return;
-+	}
-+
-+	resolve_add_dns(netconfig->ifindex, AF_INET6, dns);
-+	l_strv_free(dns);
- }
- =
+Regards,
+-Denis
 
- static void netconfig_install_address(struct netconfig *netconfig,
--- =
-
-2.13.6
-
---===============8669385628854128451==--
+--===============4545616680179201553==--
 
