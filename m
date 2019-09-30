@@ -1,56 +1,211 @@
-Content-Type: multipart/mixed; boundary="===============2054046496797986744=="
+Content-Type: multipart/mixed; boundary="===============8396201356227723194=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 03/15] netconfig: Decouple netconfig from station obj. for
- MAC assignment
-Date: Mon, 30 Sep 2019 11:11:27 -0500
-Message-ID: <6bf69907-a77b-9814-1e61-73c45828076b@gmail.com>
-In-Reply-To: <20190927195230.15998-3-tim.a.kourt@linux.intel.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2 1/8] netconfig: Decouple from station state
+Date: Mon, 30 Sep 2019 09:35:51 -0700
+Message-ID: <20190930163558.28123-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2054046496797986744==
+--===============8396201356227723194==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+Instead of relying on station state changed signal, netconfig
+introduces three new API calls to configure, re-configure and
+reset the network configurations. The owner of netconfig object
+is responsible for initiating the re-configuration of the device
+depending on its state.
+---
+ src/netconfig.c | 79 ++++++++++++++++++++++++++++++-----------------------=
+----
+ src/netconfig.h |  6 +++++
+ 2 files changed, 48 insertions(+), 37 deletions(-)
 
-On 9/27/19 2:52 PM, Tim Kourt wrote:
-> netconfig defines netconfig_mac_address_func_t type. This function
-> pointier can be implemented by the callers to provide the netconfig=E2=80=
-=99s
-> DHCP clients with an updated MAC address when it is about to be used.
-> This patch is decoupling netconfig from station object and foreseeing
-> the randomization of the MAC addresses in the future.
-> ---
->   src/netconfig.c | 38 +++++++++++++++++++++++++++++---------
->   src/netconfig.h |  6 +++++-
->   src/station.c   | 11 ++++++++++-
->   3 files changed, 44 insertions(+), 11 deletions(-)
->
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 2074689f..88d2588e 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -48,6 +48,8 @@ struct netconfig {
+ 	struct l_dhcp_client *dhcp_client;
+ 	struct l_queue *ifaddr_list;
+ 	uint8_t rtm_protocol;
++
++	const struct l_settings *active_settings;
+ };
+ =
 
-<snip>
+ struct netconfig_ifaddr {
+@@ -589,16 +591,10 @@ static void netconfig_ipv4_dhcp_event_handler(struct =
+l_dhcp_client *client,
+ 	}
+ }
+ =
 
-> diff --git a/src/netconfig.c b/src/netconfig.c
-> index 2074689f..b12e29fd 100644
-> --- a/src/netconfig.c
-> +++ b/src/netconfig.c
-> @@ -48,6 +48,9 @@ struct netconfig {
->   	struct l_dhcp_client *dhcp_client;
->   	struct l_queue *ifaddr_list;
->   	uint8_t rtm_protocol;
-> +
-> +	netconfig_mac_address_func_t mac_address;
-> +	void *user_data;
+-static bool netconfig_ipv4_dhcp_create(struct netconfig *netconfig,
+-							struct station *station)
++static bool netconfig_ipv4_dhcp_create(struct netconfig *netconfig)
+ {
+ 	netconfig->dhcp_client =3D l_dhcp_client_new(netconfig->ifindex);
+ =
 
-So I don't think this is necessary.  The mac address right now will be =
+-	l_dhcp_client_set_address(netconfig->dhcp_client, ARPHRD_ETHER,
+-					netdev_get_address(
+-						station_get_netdev(station)),
+-					ETH_ALEN);
+-
+ 	l_dhcp_client_set_event_handler(netconfig->dhcp_client,
+ 					netconfig_ipv4_dhcp_event_handler,
+ 					netconfig, NULL);
+@@ -654,41 +650,57 @@ static void netconfig_ipv4_select_and_uninstall(struc=
+t netconfig *netconfig)
+ 	l_dhcp_client_stop(netconfig->dhcp_client);
+ }
+ =
 
-static for the duration of netconfig's lifetime.  So providing the mac =
+-static void netconfig_station_state_changed(enum station_state state,
+-								void *userdata)
++bool netconfig_configure(struct netconfig *netconfig,
++				const struct l_settings *active_settings,
++				const uint8_t *mac_address)
+ {
+-	struct netconfig *netconfig =3D userdata;
++	netconfig->active_settings =3D active_settings;
+ =
 
-at configure time (and maybe teardown) is sufficient.
+-	l_debug("");
++	l_dhcp_client_set_address(netconfig->dhcp_client, ARPHRD_ETHER,
++							mac_address, ETH_ALEN);
+ =
 
-Regards,
--Denis
---===============2054046496797986744==--
+-	switch (state) {
+-	case STATION_STATE_CONNECTED:
+-		netconfig_ipv4_select_and_install(netconfig);
++	netconfig_ipv4_select_and_install(netconfig);
+ =
+
+-		/* TODO: IPv6 addressing */
++	/* TODO: IPv6 addressing */
+ =
+
+-		break;
+-	case STATION_STATE_DISCONNECTED:
+-		netconfig_ipv4_select_and_uninstall(netconfig);
++	return true;
++}
+ =
+
+-		/* TODO: IPv6 addressing */
++bool netconfig_reconfigure(struct netconfig *netconfig)
++{
++	if (netconfig->rtm_protocol =3D=3D RTPROT_DHCP) {
++		/*
++		 *
++		 * TODO l_dhcp_client to try to request a
++		 * previously used address.
++		 *
++		 * return;
++		 */
++	}
+ =
+
+-		resolve_remove(netconfig->ifindex);
++	netconfig_ipv4_select_and_install(netconfig);
+ =
+
+-		break;
+-	case STATION_STATE_ROAMING:
+-		break;
+-	default:
+-		return;
+-	}
++	/* TODO: IPv6 addressing */
+ =
+
+-	netconfig->station_state =3D state;
++	return true;
++}
++
++bool netconfig_reset(struct netconfig *netconfig)
++{
++	netconfig_ipv4_select_and_uninstall(netconfig);
++
++	/* TODO: IPv6 addressing */
++
++	resolve_remove(netconfig->ifindex);
++
++	netconfig->rtm_protocol =3D 0;
++
++	return true;
+ }
+ =
+
+ struct netconfig *netconfig_new(uint32_t ifindex)
+ {
+ 	struct netconfig *netconfig;
+-	struct station *station;
+ =
+
+ 	if (!netconfig_list)
+ 		return NULL;
+@@ -699,18 +711,11 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+ 	if (netconfig)
+ 		return netconfig;
+ =
+
+-	station =3D station_find(ifindex);
+-	if (!station)
+-		return NULL;
+-
+ 	netconfig =3D l_new(struct netconfig, 1);
+ 	netconfig->ifindex =3D ifindex;
+ 	netconfig->ifaddr_list =3D l_queue_new();
+ =
+
+-	netconfig_ipv4_dhcp_create(netconfig, station);
+-
+-	station_add_state_watch(station, netconfig_station_state_changed,
+-							netconfig, NULL);
++	netconfig_ipv4_dhcp_create(netconfig);
+ =
+
+ 	l_queue_push_tail(netconfig_list, netconfig);
+ =
+
+@@ -726,7 +731,7 @@ void netconfig_destroy(struct netconfig *netconfig)
+ =
+
+ 	l_queue_remove(netconfig_list, netconfig);
+ =
+
+-	if (netconfig->station_state !=3D STATION_STATE_DISCONNECTED) {
++	if (netconfig->rtm_protocol) {
+ 		netconfig_ipv4_select_and_uninstall(netconfig);
+ =
+
+ 		/* TODO Uninstall IPv6 addresses. */
+diff --git a/src/netconfig.h b/src/netconfig.h
+index fd344830..cacd384a 100644
+--- a/src/netconfig.h
++++ b/src/netconfig.h
+@@ -22,5 +22,11 @@
+ =
+
+ struct netconfig;
+ =
+
++bool netconfig_configure(struct netconfig *netconfig,
++				const struct l_settings *active_settings,
++				const uint8_t *mac_address);
++bool netconfig_reconfigure(struct netconfig *netconfig);
++bool netconfig_reset(struct netconfig *netconfig);
++
+ struct netconfig *netconfig_new(uint32_t ifindex);
+ void netconfig_destroy(struct netconfig *netconfig);
+-- =
+
+2.13.6
+
+--===============8396201356227723194==--
 
