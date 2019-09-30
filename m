@@ -1,154 +1,122 @@
-Content-Type: multipart/mixed; boundary="===============3043873057405853738=="
+Content-Type: multipart/mixed; boundary="===============7751110629082216288=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH v2 3/8] netconfig: Switch to internal active network settings
-Date: Mon, 30 Sep 2019 09:35:53 -0700
-Message-ID: <20190930163558.28123-3-tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2 4/8] netconfig: Subscribe for IPv6 address changes
+Date: Mon, 30 Sep 2019 09:35:54 -0700
+Message-ID: <20190930163558.28123-4-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20190930163558.28123-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3043873057405853738==
+--===============7751110629082216288==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-As part of the de-coupling from station object, switch all of
-the network settings inquiries to use active_settings. active_settings
-are set with netconfig_configure by the owner of netconfig object
-and removed with netconfig_reset once network disconnects.
+The IPv6 addresses changes are maintained in ifaddr_list.
 ---
- src/netconfig.c | 46 +++++++++++-----------------------------------
- 1 file changed, 11 insertions(+), 35 deletions(-)
+ src/netconfig.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ 1 file changed, 74 insertions(+)
 
 diff --git a/src/netconfig.c b/src/netconfig.c
-index 88d2588e..4e294512 100644
+index 4e294512..140de63a 100644
 --- a/src/netconfig.c
 +++ b/src/netconfig.c
-@@ -113,29 +113,11 @@ static struct netconfig *netconfig_find(uint32_t ifin=
-dex)
- 	return NULL;
+@@ -335,6 +335,72 @@ static void netconfig_ifaddr_cmd_cb(int error, uint16_=
+t type,
+ 	netconfig_ifaddr_notify(type, data, len, user_data);
  }
  =
 
--static struct l_settings *netconfig_get_connected_network_settings(
--						struct netconfig *netconfig)
--{
--	struct station *station;
--	const struct network *network;
--
--	station =3D station_find(netconfig->ifindex);
--	if (!station)
--		return NULL;
--
--	network =3D station_get_connected_network(station);
--	if (!network)
--		return NULL;
--
--	return network_get_settings(network);
--}
--
- static struct netconfig_ifaddr *netconfig_ipv4_get_ifaddr(
- 						struct netconfig *netconfig,
- 						uint8_t proto)
- {
- 	const struct l_dhcp_lease *lease;
--	const struct l_settings *settings;
- 	struct netconfig_ifaddr *ifaddr;
- 	struct in_addr in_addr;
- 	char *netmask;
-@@ -143,18 +125,17 @@ static struct netconfig_ifaddr *netconfig_ipv4_get_if=
-addr(
++static void netconfig_ifaddr_ipv6_added(struct netconfig *netconfig,
++					const struct ifaddrmsg *ifa,
++					uint32_t len)
++{
++	struct netconfig_ifaddr *ifaddr;
++
++	ifaddr =3D l_new(struct netconfig_ifaddr, 1);
++	ifaddr->family =3D ifa->ifa_family;
++	ifaddr->prefix_len =3D ifa->ifa_prefixlen;
++
++	rtnl_ifaddr_ipv6_extract(ifa, len, &ifaddr->ip);
++
++	l_debug("ifindex %u: ifaddr %s/%u", netconfig->ifindex, ifaddr->ip,
++							ifaddr->prefix_len);
++
++	l_queue_push_tail(netconfig->ifaddr_list, ifaddr);
++}
++
++static void netconfig_ifaddr_ipv6_deleted(struct netconfig *netconfig,
++						const struct ifaddrmsg *ifa,
++						uint32_t len)
++{
++	struct netconfig_ifaddr *ifaddr;
++	char *ip;
++
++	rtnl_ifaddr_ipv6_extract(ifa, len, &ip);
++
++	ifaddr =3D netconfig_ifaddr_find(netconfig, ifa->ifa_family,
++							ifa->ifa_prefixlen, ip);
++
++	l_free(ip);
++
++	if (!ifaddr)
++		return;
++
++	l_debug("ifaddr %s/%u", ifaddr->ip, ifaddr->prefix_len);
++
++	l_queue_remove(netconfig->ifaddr_list, ifaddr);
++
++	netconfig_ifaddr_destroy(ifaddr);
++}
++
++static void netconfig_ifaddr_ipv6_notify(uint16_t type, const void *data,
++						uint32_t len, void *user_data)
++{
++	const struct ifaddrmsg *ifa =3D data;
++	struct netconfig *netconfig;
++	uint32_t bytes;
++
++	netconfig =3D netconfig_find(ifa->ifa_index);
++	if (!netconfig)
++		/* Ignore the interfaces which aren't managed by iwd. */
++		return;
++
++	bytes =3D len - NLMSG_ALIGN(sizeof(struct ifaddrmsg));
++
++	switch (type) {
++	case RTM_NEWADDR:
++		netconfig_ifaddr_ipv6_added(netconfig, ifa, bytes);
++		break;
++	case RTM_DELADDR:
++		netconfig_ifaddr_ipv6_deleted(netconfig, ifa, bytes);
++		break;
++	}
++}
++
+ static void netconfig_route_cmd_cb(int error, uint16_t type,
+ 						const void *data, uint32_t len,
+ 						void *user_data)
+@@ -757,6 +823,14 @@ static int netconfig_init(void)
+ 		goto error;
+ 	}
  =
 
- 	switch (proto) {
- 	case RTPROT_STATIC:
--		settings =3D netconfig_get_connected_network_settings(netconfig);
--		if (!settings)
--			return NULL;
- =
-
--		ip =3D l_settings_get_string(settings, "IPv4", "ip");
-+		ip =3D l_settings_get_string(netconfig->active_settings, "IPv4",
-+									"ip");
- 		if (!ip)
- 			return NULL;
- =
-
- 		ifaddr =3D l_new(struct netconfig_ifaddr, 1);
- 		ifaddr->ip =3D ip;
- =
-
--		netmask =3D l_settings_get_string(settings, "IPv4", "netmask");
-+		netmask =3D l_settings_get_string(netconfig->active_settings,
-+							"IPv4", "netmask");
- 		if (netmask && inet_pton(AF_INET, netmask, &in_addr) > 0)
- 			ifaddr->prefix_len =3D __builtin_popcountl(
- 						L_BE32_TO_CPU(in_addr.s_addr));
-@@ -163,8 +144,9 @@ static struct netconfig_ifaddr *netconfig_ipv4_get_ifad=
-dr(
- =
-
- 		l_free(netmask);
- =
-
--		ifaddr->broadcast =3D l_settings_get_string(settings, "IPv4",
--								"broadcast");
-+		ifaddr->broadcast =3D
-+			l_settings_get_string(netconfig->active_settings,
-+							"IPv4", "broadcast");
- 		ifaddr->family =3D AF_INET;
- =
-
- 		return ifaddr;
-@@ -203,15 +185,12 @@ static struct netconfig_ifaddr *netconfig_ipv4_get_if=
-addr(
- static char *netconfig_ipv4_get_gateway(struct netconfig *netconfig)
- {
- 	const struct l_dhcp_lease *lease;
--	const struct l_settings *settings;
- =
-
- 	switch (netconfig->rtm_protocol) {
- 	case RTPROT_STATIC:
--		settings =3D netconfig_get_connected_network_settings(netconfig);
--		if (!settings)
--			return NULL;
- =
-
--		return l_settings_get_string(settings, "IPv4", "gateway");
-+		return l_settings_get_string(netconfig->active_settings,
-+							"IPv4", "gateway");
- =
-
- 	case RTPROT_DHCP:
- 		lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
-@@ -227,15 +206,12 @@ static char *netconfig_ipv4_get_gateway(struct netcon=
-fig *netconfig)
- static char **netconfig_ipv4_get_dns(struct netconfig *netconfig, uint8_t =
-proto)
- {
- 	const struct l_dhcp_lease *lease;
--	const struct l_settings *settings;
- =
-
- 	switch (proto) {
- 	case RTPROT_STATIC:
--		settings =3D netconfig_get_connected_network_settings(netconfig);
--		if (!settings)
--			return NULL;
- =
-
--		return l_settings_get_string_list(settings, "IPv4", "dns", ' ');
-+		return l_settings_get_string_list(netconfig->active_settings,
-+							"IPv4", "dns", ' ');
- =
-
- 	case RTPROT_DHCP:
- 		lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
++	r =3D l_netlink_register(rtnl, RTNLGRP_IPV6_IFADDR,
++				netconfig_ifaddr_ipv6_notify, NULL, NULL);
++	if (!r) {
++		l_error("netconfig: Failed to register for RTNL link IPv6 "
++					"address notifications.");
++		goto error;
++	}
++
+ 	if (!l_settings_get_uint(iwd_get_config(), "General",
+ 							"route_priority_offset",
+ 							&ROUTE_PRIORITY_OFFSET))
 -- =
 
 2.13.6
 
---===============3043873057405853738==--
+--===============7751110629082216288==--
 
