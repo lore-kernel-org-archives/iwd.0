@@ -1,115 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============5338573620341767923=="
+Content-Type: multipart/mixed; boundary="===============3914796104914217414=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH v3 5/5] netconfig: Install IPv6 DNS
-Date: Tue, 01 Oct 2019 09:31:24 -0700
-Message-ID: <20191001163124.1179-5-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20191001163124.1179-1-tim.a.kourt@linux.intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/2] eap-tls-common: update to new ELL TLS APIs
+Date: Tue, 01 Oct 2019 14:32:50 -0700
+Message-ID: <20191001213251.2536-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5338573620341767923==
+--===============3914796104914217414==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/netconfig.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++=
-++-
- 1 file changed, 55 insertions(+), 1 deletion(-)
+ src/eap-tls-common.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/src/netconfig.c b/src/netconfig.c
-index cbbe9b3a..0144aa5f 100644
---- a/src/netconfig.c
-+++ b/src/netconfig.c
-@@ -323,6 +323,50 @@ static char *netconfig_ipv6_get_gateway(struct netconf=
-ig *netconfig)
- 	return NULL;
- }
+diff --git a/src/eap-tls-common.c b/src/eap-tls-common.c
+index b069fcfd..d5b72963 100644
+--- a/src/eap-tls-common.c
++++ b/src/eap-tls-common.c
+@@ -523,6 +523,9 @@ static int eap_tls_handle_fragmented_request(struct eap=
+_state *eap,
+ static bool eap_tls_tunnel_init(struct eap_state *eap)
+ {
+ 	struct eap_tls_state *eap_tls =3D eap_get_data(eap);
++	struct l_certchain *client_cert;
++	struct l_key *client_key;
++	struct l_queue *ca_cert;
  =
 
-+static char **netconfig_ipv6_get_dns(struct netconfig *netconfig, uint8_t =
-proto)
-+{
-+	struct in6_addr in6_addr;
-+	char **dns_list;
-+	char **p;
-+
-+	switch (proto) {
-+	case RTPROT_STATIC:
-+		if (!netconfig->active_settings)
-+			return NULL;
-+
-+		p =3D dns_list =3D
-+			l_settings_get_string_list(netconfig->active_settings,
-+							"IPv6", "dns", ' ');
-+
-+		if (!dns_list || !*dns_list) {
-+			l_strv_free(dns_list);
-+
-+			return NULL;
-+		}
-+
-+		for (; *p; p++) {
-+			if (inet_pton(AF_INET6, *p, &in6_addr) =3D=3D 1)
-+				continue;
-+
-+			l_error("netconfig: Invalid IPv6 DNS address %s is "
-+				"provided in network configuration file.", *p);
-+
-+			l_strv_free(dns_list);
-+
-+			return NULL;
-+		}
-+
-+		return dns_list;
-+
-+	case RTPROT_DHCP:
-+		/* TODO */
-+
-+		return NULL;
-+	}
-+
-+	return NULL;
-+}
-+
- static bool netconfig_ifaddr_match(const void *a, const void *b)
- {
- 	const struct netconfig_ifaddr *entry =3D a;
-@@ -671,6 +715,7 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error,=
- uint16_t type,
- 						void *user_data)
- {
- 	struct netconfig *netconfig =3D user_data;
-+	char **dns;
+ 	if (eap_tls->tunnel)
+ 		return false;
+@@ -543,14 +546,20 @@ static bool eap_tls_tunnel_init(struct eap_state *eap)
+ 		l_tls_set_debug(eap_tls->tunnel, eap_tls_tunnel_debug, eap,
+ 									NULL);
  =
 
- 	if (error && error !=3D -EEXIST) {
- 		l_error("netconfig: Failed to add IPv6 address. "
-@@ -684,7 +729,16 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error=
-, uint16_t type,
- 		return;
+-	if (!l_tls_set_auth_data(eap_tls->tunnel, eap_tls->client_cert,
+-							eap_tls->client_key,
+-							eap_tls->passphrase) ||
+-			(eap_tls->ca_cert &&
+-				!l_tls_set_cacert(eap_tls->tunnel,
+-							eap_tls->ca_cert))) {
++	client_cert =3D l_pem_load_certificate_chain(eap_tls->client_cert);
++	client_key =3D l_pem_load_private_key(eap_tls->client_key,
++						eap_tls->passphrase, NULL);
++	ca_cert =3D l_pem_load_certificate_list(eap_tls->ca_cert);
++
++	if (!l_tls_set_auth_data(eap_tls->tunnel, client_cert, client_key) ||
++			(ca_cert &&
++				!l_tls_set_cacert(eap_tls->tunnel, ca_cert))) {
+ 		l_error("%s: Error loading TLS keys or certificates.",
+ 						eap_get_method_name(eap));
++		l_certchain_free(client_cert);
++		l_key_free(client_key);
++		l_queue_destroy(ca_cert,
++				(l_queue_destroy_func_t)l_certchain_free);
+ 		return false;
  	}
  =
 
--	/* TODO Install DNS */
-+	dns =3D netconfig_ipv6_get_dns(netconfig, netconfig->rtm_v6_protocol);
-+	if (!dns) {
-+		l_error("netconfig: Failed to obtain the DNS addresses from "
-+			"%s.", netconfig->rtm_v6_protocol =3D=3D RTPROT_STATIC ?
-+				"setting file" : "DHCPv6 lease");
-+		return;
-+	}
-+
-+	resolve_add_dns(netconfig->ifindex, AF_INET6, dns);
-+	l_strv_free(dns);
- }
- =
-
- static void netconfig_install_address(struct netconfig *netconfig,
 -- =
 
-2.13.6
+2.17.1
 
---===============5338573620341767923==--
+--===============3914796104914217414==--
 
