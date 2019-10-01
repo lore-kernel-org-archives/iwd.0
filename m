@@ -1,61 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============2242578858760294048=="
+Content-Type: multipart/mixed; boundary="===============0698849959831835373=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 2/2] unit: update test-eapol to new ELL APIs
-Date: Tue, 01 Oct 2019 14:38:09 -0700
-Message-ID: <20191001213809.8471-2-prestwoj@gmail.com>
-In-Reply-To: <20191001213809.8471-1-prestwoj@gmail.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH 1/2] netconfig: Don't re-install IPv4 address on re-configure
+Date: Tue, 01 Oct 2019 16:39:39 -0700
+Message-ID: <20191001233940.21969-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2242578858760294048==
+--===============0698849959831835373==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- unit/test-eapol.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ src/netconfig.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
 
-diff --git a/unit/test-eapol.c b/unit/test-eapol.c
-index c43fe278..109c93bb 100644
---- a/unit/test-eapol.c
-+++ b/unit/test-eapol.c
-@@ -2906,6 +2906,9 @@ static void eapol_sm_test_tls(struct eapol_8021x_tls_=
-test_state *s,
- 	struct eapol_key *step1, *step2, *step3, *step4;
- 	uint8_t ptk_buf[64];
- 	uint8_t *ptk;
-+	struct l_certchain *server_cert;
-+	struct l_key *server_key;
-+	struct l_queue *ca_cert;
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 4e294512..272a058f 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -645,17 +645,9 @@ bool netconfig_configure(struct netconfig *netconfig,
+ bool netconfig_reconfigure(struct netconfig *netconfig)
+ {
+ 	if (netconfig->rtm_protocol =3D=3D RTPROT_DHCP) {
+-		/*
+-		 *
+-		 * TODO l_dhcp_client to try to request a
+-		 * previously used address.
+-		 *
+-		 * return;
+-		 */
++		/* TODO l_dhcp_client sending a DHCP inform request */
+ 	}
  =
 
- 	aa =3D ap_address;
- 	spa =3D sta_address;
-@@ -2955,9 +2958,13 @@ static void eapol_sm_test_tls(struct eapol_8021x_tls=
-_test_state *s,
- 	s->tx_buf_len =3D 0;
- 	s->tx_buf_offset =3D 0;
+-	netconfig_ipv4_select_and_install(netconfig);
+-
+ 	/* TODO: IPv6 addressing */
  =
 
--	assert(l_tls_set_auth_data(s->tls, CERTDIR "cert-server.pem",
--				CERTDIR "cert-server-key-pkcs8.pem", NULL));
--	assert(l_tls_set_cacert(s->tls, CERTDIR "cert-ca.pem"));
-+	server_cert =3D l_pem_load_certificate_chain(CERTDIR "cert-server.pem");
-+	server_key =3D l_pem_load_private_key(CERTDIR "cert-server-key-pkcs8.pem",
-+						NULL, NULL);
-+	ca_cert =3D l_pem_load_certificate_list(CERTDIR "cert-ca.pem");
-+
-+	assert(l_tls_set_auth_data(s->tls, server_cert, server_key));
-+	assert(l_tls_set_cacert(s->tls, ca_cert));
- 	assert(l_tls_start(s->tls));
- =
-
- 	ths->handshake_failed =3D false;
+ 	return true;
 -- =
 
-2.17.1
+2.13.6
 
---===============2242578858760294048==--
+--===============0698849959831835373==--
 
