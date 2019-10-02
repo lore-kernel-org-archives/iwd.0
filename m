@@ -1,66 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============7195600950580765269=="
+Content-Type: multipart/mixed; boundary="===============7818124010909176199=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 2/4] netconfig: Remove IPv6 default route
-Date: Wed, 02 Oct 2019 13:39:57 -0700
-Message-ID: <20191002203959.5582-2-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 3/4] netconfig: Optimize IPv4 address deletion
+Date: Wed, 02 Oct 2019 13:39:58 -0700
+Message-ID: <20191002203959.5582-3-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20191002203959.5582-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7195600950580765269==
+--===============7818124010909176199==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The IPv6 default route needs to be explicitly revoked. Unlike in IPv4,
-there is no SRC address associated with the route and it will not be
-removed on address removal.
+Decrease the queue traversals to a single pass
 ---
- src/netconfig.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ src/netconfig.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/src/netconfig.c b/src/netconfig.c
-index 90cd6bc2..cf951245 100644
+index cf951245..2175d9be 100644
 --- a/src/netconfig.c
 +++ b/src/netconfig.c
-@@ -958,6 +958,7 @@ static void netconfig_ipv6_select_and_install(struct ne=
-tconfig *netconfig)
- static void netconfig_ipv6_select_and_uninstall(struct netconfig *netconfi=
-g)
+@@ -427,22 +427,22 @@ static void netconfig_ifaddr_deleted(struct netconfig=
+ *netconfig,
+ 					uint32_t len)
  {
  	struct netconfig_ifaddr *ifaddr;
-+	char *gateway;
+-	char *ip;
++	struct netconfig_ifaddr query;
  =
 
- 	ifaddr =3D netconfig_ipv6_get_ifaddr(netconfig,
- 						netconfig->rtm_v6_protocol);
-@@ -970,6 +971,20 @@ static void netconfig_ipv6_select_and_uninstall(struct=
- netconfig *netconfig)
- 	 * TODO
- 	 * l_dhcp_v6_client_stop(netconfig->l_dhcp_v6_client);
- 	 */
-+
-+	gateway =3D netconfig_ipv6_get_gateway(netconfig);
-+	if (!gateway)
-+		return;
-+
-+	if (!rtnl_route_ipv6_delete_gateway(rtnl, netconfig->ifindex,
-+			gateway, ROUTE_PRIORITY_OFFSET,
-+			netconfig->rtm_v6_protocol,
-+			netconfig_route_cmd_cb, NULL, NULL)) {
-+		l_error("netconfig: Failed to delete route for: %s gateway.",
-+								gateway);
-+	}
-+
-+	l_free(gateway);
+-	rtnl_ifaddr_extract(ifa, len, NULL, &ip, NULL);
++	rtnl_ifaddr_extract(ifa, len, NULL, &query.ip, NULL);
+ =
+
+-	ifaddr =3D netconfig_ifaddr_find(netconfig, ifa->ifa_family,
+-							ifa->ifa_prefixlen, ip);
++	query.family =3D ifa->ifa_family;
++	query.prefix_len =3D ifa->ifa_prefixlen;
+ =
+
+-	l_free(ip);
++	ifaddr =3D l_queue_remove_if(netconfig->ifaddr_list,
++						netconfig_ifaddr_match, &query);
++	l_free(query.ip);
+ =
+
+ 	if (!ifaddr)
+ 		return;
+ =
+
+ 	l_debug("ifaddr %s/%u", ifaddr->ip, ifaddr->prefix_len);
+ =
+
+-	l_queue_remove(netconfig->ifaddr_list, ifaddr);
+-
+ 	netconfig_ifaddr_destroy(ifaddr);
  }
  =
 
- bool netconfig_configure(struct netconfig *netconfig,
 -- =
 
 2.13.6
 
---===============7195600950580765269==--
+--===============7818124010909176199==--
 
