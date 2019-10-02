@@ -1,96 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============7696394364732390935=="
+Content-Type: multipart/mixed; boundary="===============7195600950580765269=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 1/4] rtnlutil: Add IPv6 route deletion helper
-Date: Wed, 02 Oct 2019 13:39:56 -0700
-Message-ID: <20191002203959.5582-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 2/4] netconfig: Remove IPv6 default route
+Date: Wed, 02 Oct 2019 13:39:57 -0700
+Message-ID: <20191002203959.5582-2-tim.a.kourt@linux.intel.com>
+In-Reply-To: <20191002203959.5582-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7696394364732390935==
+--===============7195600950580765269==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+The IPv6 default route needs to be explicitly revoked. Unlike in IPv4,
+there is no SRC address associated with the route and it will not be
+removed on address removal.
 ---
- src/rtnlutil.c | 31 +++++++++++++++++++++++++++++--
- src/rtnlutil.h |  7 +++++++
- 2 files changed, 36 insertions(+), 2 deletions(-)
+ src/netconfig.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/src/rtnlutil.c b/src/rtnlutil.c
-index 4090d311..f90e9dcf 100644
---- a/src/rtnlutil.c
-+++ b/src/rtnlutil.c
-@@ -533,7 +533,8 @@ uint32_t rtnl_ifaddr_ipv6_delete(struct l_netlink *rtnl=
-, int ifindex,
- 						ip, cb, user_data, destroy);
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 90cd6bc2..cf951245 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -958,6 +958,7 @@ static void netconfig_ipv6_select_and_install(struct ne=
+tconfig *netconfig)
+ static void netconfig_ipv6_select_and_uninstall(struct netconfig *netconfi=
+g)
+ {
+ 	struct netconfig_ifaddr *ifaddr;
++	char *gateway;
+ =
+
+ 	ifaddr =3D netconfig_ipv6_get_ifaddr(netconfig,
+ 						netconfig->rtm_v6_protocol);
+@@ -970,6 +971,20 @@ static void netconfig_ipv6_select_and_uninstall(struct=
+ netconfig *netconfig)
+ 	 * TODO
+ 	 * l_dhcp_v6_client_stop(netconfig->l_dhcp_v6_client);
+ 	 */
++
++	gateway =3D netconfig_ipv6_get_gateway(netconfig);
++	if (!gateway)
++		return;
++
++	if (!rtnl_route_ipv6_delete_gateway(rtnl, netconfig->ifindex,
++			gateway, ROUTE_PRIORITY_OFFSET,
++			netconfig->rtm_v6_protocol,
++			netconfig_route_cmd_cb, NULL, NULL)) {
++		l_error("netconfig: Failed to delete route for: %s gateway.",
++								gateway);
++	}
++
++	l_free(gateway);
  }
  =
 
--uint32_t rtnl_route_ipv6_add_gateway(struct l_netlink *rtnl, int ifindex,
-+static uint32_t rtnl_route_ipv6_change(struct l_netlink *rtnl,
-+					uint16_t nlmsg_type, int ifindex,
- 					const char *gateway,
- 					uint32_t priority_offset,
- 					uint8_t proto,
-@@ -581,7 +582,33 @@ uint32_t rtnl_route_ipv6_add_gateway(struct l_netlink =
-*rtnl, int ifindex,
- 						sizeof(struct in6_addr));
- 	}
- =
-
--	return l_netlink_send(rtnl, RTM_NEWROUTE, flags, rtmmsg,
-+	return l_netlink_send(rtnl, nlmsg_type, flags, rtmmsg,
- 				rta_buf - (void *) rtmmsg, cb, user_data,
- 								destroy);
- }
-+
-+uint32_t rtnl_route_ipv6_add_gateway(struct l_netlink *rtnl, int ifindex,
-+					const char *gateway,
-+					uint32_t priority_offset,
-+					uint8_t proto,
-+					l_netlink_command_func_t cb,
-+					void *user_data,
-+					l_netlink_destroy_func_t destroy)
-+{
-+	return rtnl_route_ipv6_change(rtnl, RTM_NEWROUTE, ifindex, gateway,
-+					priority_offset, proto, cb,
-+					user_data, destroy);
-+}
-+
-+uint32_t rtnl_route_ipv6_delete_gateway(struct l_netlink *rtnl, int ifinde=
-x,
-+					const char *gateway,
-+					uint32_t priority_offset,
-+					uint8_t proto,
-+					l_netlink_command_func_t cb,
-+					void *user_data,
-+					l_netlink_destroy_func_t destroy)
-+{
-+	return rtnl_route_ipv6_change(rtnl, RTM_DELROUTE, ifindex, gateway,
-+					priority_offset, proto, cb,
-+					user_data, destroy);
-+}
-diff --git a/src/rtnlutil.h b/src/rtnlutil.h
-index 6689e16e..383d562f 100644
---- a/src/rtnlutil.h
-+++ b/src/rtnlutil.h
-@@ -90,3 +90,10 @@ uint32_t rtnl_route_ipv6_add_gateway(struct l_netlink *r=
-tnl, int ifindex,
- 					l_netlink_command_func_t cb,
- 					void *user_data,
- 					l_netlink_destroy_func_t destroy);
-+uint32_t rtnl_route_ipv6_delete_gateway(struct l_netlink *rtnl, int ifinde=
-x,
-+					const char *gateway,
-+					uint32_t priority_offset,
-+					uint8_t proto,
-+					l_netlink_command_func_t cb,
-+					void *user_data,
-+					l_netlink_destroy_func_t destroy);
+ bool netconfig_configure(struct netconfig *netconfig,
 -- =
 
 2.13.6
 
---===============7696394364732390935==--
+--===============7195600950580765269==--
 
