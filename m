@@ -1,49 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============6308892281562434669=="
+Content-Type: multipart/mixed; boundary="===============4223848273424976364=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v3 1/2] eap-tls-common: update to new ELL TLS APIs
-Date: Wed, 02 Oct 2019 10:43:13 -0500
-Message-ID: <294fb92d-6673-22c5-e5a1-cc6270157938@gmail.com>
-In-Reply-To: <20191001213809.8471-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v4 1/5] netconfig: Subscribe for IPv6 address changes
+Date: Wed, 02 Oct 2019 12:03:19 -0500
+Message-ID: <26624b01-cfb1-4b54-d53c-c0fb12796250@gmail.com>
+In-Reply-To: <20191001234425.22913-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6308892281562434669==
+--===============4223848273424976364==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Tim,
 
-On 10/1/19 4:38 PM, James Prestwood wrote:
+On 10/1/19 6:44 PM, Tim Kourt wrote:
+> The IPv6 addresses changes are maintained in ifaddr_list.
 > ---
->   src/eap-tls-common.c | 20 ++++++++++++++------
->   1 file changed, 14 insertions(+), 6 deletions(-)
-> =
-
-> -v3:
->   * Fixed the ca_cert cleanup, l_certchain_free was being used rather
->     than l_cert_free.
+>   src/netconfig.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++=
++++++++
+>   1 file changed, 92 insertions(+)
 > =
 
 
-I ended up pushing my own version of this that was extra paranoid.  The =
-
-issue is that since the certificates are on disk, we can't simply assume =
-
-that they will be loaded successfully (as they might have been =
-
-inadvertently or maliciously changed between the time check_settings and =
-
-tunnel_init are called).
-
-It might actually make sense to load the keys at load_settings time or =
-
-(or even earlier) to avoid extra latency during connection setup time.
-
-Please review.
+Patch 1 & 2 applied, thanks.
 
 Regards,
 -Denis
---===============6308892281562434669==--
+
+--===============4223848273424976364==--
 
