@@ -1,55 +1,96 @@
-Content-Type: multipart/mixed; boundary="===============5738403939526236698=="
+Content-Type: multipart/mixed; boundary="===============7696394364732390935=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v4 5/5] netconfig: Install IPv6 DNS
-Date: Wed, 02 Oct 2019 12:14:29 -0500
-Message-ID: <9fc2ff3a-b0c6-fe3f-f6e8-c63cba5793aa@gmail.com>
-In-Reply-To: <20191001234425.22913-5-tim.a.kourt@linux.intel.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH 1/4] rtnlutil: Add IPv6 route deletion helper
+Date: Wed, 02 Oct 2019 13:39:56 -0700
+Message-ID: <20191002203959.5582-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5738403939526236698==
+--===============7696394364732390935==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+---
+ src/rtnlutil.c | 31 +++++++++++++++++++++++++++++--
+ src/rtnlutil.h |  7 +++++++
+ 2 files changed, 36 insertions(+), 2 deletions(-)
 
-On 10/1/19 6:44 PM, Tim Kourt wrote:
-> ---
->   src/netconfig.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++++-
->   1 file changed, 55 insertions(+), 1 deletion(-)
-> =
+diff --git a/src/rtnlutil.c b/src/rtnlutil.c
+index 4090d311..f90e9dcf 100644
+--- a/src/rtnlutil.c
++++ b/src/rtnlutil.c
+@@ -533,7 +533,8 @@ uint32_t rtnl_ifaddr_ipv6_delete(struct l_netlink *rtnl=
+, int ifindex,
+ 						ip, cb, user_data, destroy);
+ }
+ =
 
-> diff --git a/src/netconfig.c b/src/netconfig.c
-> index 129fe518..65ba5330 100644
-> --- a/src/netconfig.c
-> +++ b/src/netconfig.c
-> @@ -323,6 +323,50 @@ static char *netconfig_ipv6_get_gateway(struct netco=
-nfig *netconfig)
->   	return NULL;
->   }
->   =
+-uint32_t rtnl_route_ipv6_add_gateway(struct l_netlink *rtnl, int ifindex,
++static uint32_t rtnl_route_ipv6_change(struct l_netlink *rtnl,
++					uint16_t nlmsg_type, int ifindex,
+ 					const char *gateway,
+ 					uint32_t priority_offset,
+ 					uint8_t proto,
+@@ -581,7 +582,33 @@ uint32_t rtnl_route_ipv6_add_gateway(struct l_netlink =
+*rtnl, int ifindex,
+ 						sizeof(struct in6_addr));
+ 	}
+ =
 
-> +static char **netconfig_ipv6_get_dns(struct netconfig *netconfig, uint8_=
-t proto)
-> +{
-> +	struct in6_addr in6_addr;
-> +	char **dns_list;
-> +	char **p;
-> +
-> +	switch (proto) {
-> +	case RTPROT_STATIC:
-> +		if (!netconfig->active_settings)
-> +			return NULL;
-> +
+-	return l_netlink_send(rtnl, RTM_NEWROUTE, flags, rtmmsg,
++	return l_netlink_send(rtnl, nlmsg_type, flags, rtmmsg,
+ 				rta_buf - (void *) rtmmsg, cb, user_data,
+ 								destroy);
+ }
++
++uint32_t rtnl_route_ipv6_add_gateway(struct l_netlink *rtnl, int ifindex,
++					const char *gateway,
++					uint32_t priority_offset,
++					uint8_t proto,
++					l_netlink_command_func_t cb,
++					void *user_data,
++					l_netlink_destroy_func_t destroy)
++{
++	return rtnl_route_ipv6_change(rtnl, RTM_NEWROUTE, ifindex, gateway,
++					priority_offset, proto, cb,
++					user_data, destroy);
++}
++
++uint32_t rtnl_route_ipv6_delete_gateway(struct l_netlink *rtnl, int ifinde=
+x,
++					const char *gateway,
++					uint32_t priority_offset,
++					uint8_t proto,
++					l_netlink_command_func_t cb,
++					void *user_data,
++					l_netlink_destroy_func_t destroy)
++{
++	return rtnl_route_ipv6_change(rtnl, RTM_DELROUTE, ifindex, gateway,
++					priority_offset, proto, cb,
++					user_data, destroy);
++}
+diff --git a/src/rtnlutil.h b/src/rtnlutil.h
+index 6689e16e..383d562f 100644
+--- a/src/rtnlutil.h
++++ b/src/rtnlutil.h
+@@ -90,3 +90,10 @@ uint32_t rtnl_route_ipv6_add_gateway(struct l_netlink *r=
+tnl, int ifindex,
+ 					l_netlink_command_func_t cb,
+ 					void *user_data,
+ 					l_netlink_destroy_func_t destroy);
++uint32_t rtnl_route_ipv6_delete_gateway(struct l_netlink *rtnl, int ifinde=
+x,
++					const char *gateway,
++					uint32_t priority_offset,
++					uint8_t proto,
++					l_netlink_command_func_t cb,
++					void *user_data,
++					l_netlink_destroy_func_t destroy);
+-- =
 
-Took out this check, same reasoning as the previous commit.
+2.13.6
 
-Applied, thanks.
-
-Regards,
--Denis
---===============5738403939526236698==--
+--===============7696394364732390935==--
 
