@@ -1,55 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============6775828665144554529=="
+Content-Type: multipart/mixed; boundary="===============6928139330422915866=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] crypto: fix copy size causing overruns/crashing
-Date: Thu, 03 Oct 2019 11:47:30 -0500
-Message-ID: <b73f9abb-75ec-20a0-3051-f65abc87d2c3@gmail.com>
-In-Reply-To: <d5eab9f2eececb6530ff6d466f6484d28412c836.camel@intel.com>
+From: Will Dietz <w@wdtz.org>
+Subject: [PATCH] station: record dependency on netconfig module
+Date: Thu, 03 Oct 2019 11:50:31 -0500
+Message-ID: <20191003115031.GC13162@dtznix>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6775828665144554529==
+--===============6928139330422915866==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+The netconfig module must be initialized (netconfig_list, for example)
+before station module can be used, record this to ensure that happens.
 
-On 10/3/19 11:44 AM, Prestwood, James wrote:
-> Hi Will,
-> =
+---
+ src/station.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> On Thu, 2019-10-03 at 11:35 -0500, Will Dietz wrote:
->> num_ad is already accounted for in `sizeof(iov)`
->> as iov has size `sizeof(struct iovec) * (num_ad+1)`.
->> ---
->>   src/crypto.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/src/crypto.c b/src/crypto.c
->> index 632117d..62edd44 100644
->> --- a/src/crypto.c
->> +++ b/src/crypto.c
->> @@ -311,7 +311,7 @@ bool aes_siv_encrypt(const uint8_t *key, size_t
->> key_len, const uint8_t *in,
->>          struct iovec iov[num_ad + 1];
->>          uint8_t v[16];
->>   =
+diff --git a/src/station.c b/src/station.c
+index 0666287..eed3a7f 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3190,3 +3190,4 @@ static void station_exit(void)
+ }
+ =
 
->> -       memcpy(iov, ad, sizeof(iov) * num_ad);
->> +       memcpy(iov, ad, sizeof(struct iovec) * num_ad);
-> =
+ IWD_MODULE(station, station_init, station_exit)
++IWD_MODULE_DEPENDS(station, netconfig)
+-- =
 
-> Good catch! I'm fine with this way, but also fine with simply removing
-> * num_ad and leaving sizeof(iov) as is. Lets see what Denis prefers.
-> =
+2.23.GIT
 
+--===============6928139330422915866==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
 
-Not sure that will work since you define iov to be an array of size =
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlRSXpCQUFCQ2dBZEZpRUVHUDJWQTNxVlpm
+Y0hzWG9yNjdEcVFTU0FuUUlGQWwyV0p0Y0FDZ2tRNjdEcVFTU0EKblFLOUZ4QUFoWmtZbTc2MGN2
+VEV0bVNOZXl6ekJsbkQ5QU9abk15dG01Y3RvS0NSemYxLzZmWDlwYVU2d3BnRgoyT243YUtkTDNE
+THpoNTBVWnJTS0dvd0dFM0VjSXIxQ3ZXcXdIcTBuRWpxZmp0M0RBS0NsVlJCU1VtMGJDOWFKCjB4
+UzF2SUNBY3Y5TCtQY21ZN3VMT2FGdGF5VlNVYWt2UWY2SmFtTHg2YzBkd3l1YUlJTE5JY0pqSG1F
+UDVKcEoKOTFkRnRrL0UxRnZwRGVUK29keFd2NFVDaDJtd05ML2luQVVIcVd5by9NTjFBTEdOa0VS
+WllXeWdXcDdvZFlEdwpYWUZKdGdUZWxPSFcrK2lvUEdiQkI2UEFKL2kwQm05bDVFV2d3ajB2dHpq
+MFJQOUVKWTB6T3lWVnZvN0xMcWsvCkhRcThPdFIzRytWTTR6ZG50MHArSjdsQjQrd1lHc2tIYU5q
+QWR1VmxhV0NYK1d1amcybDBDanhkRE5UWHpsQm0KZ2JudXQ5RjE5Tk5RVjBVOXhZd0llNEFQcmxX
+alZCVWNaS1FzN2c2S01MTUIzcXR1QmdEamZwU1hwMUdwRmhweQpMc0hYWWloY1B3bFdhaUFIakZw
+V0lvWXhPOEJtNDM2ZzROdEY5MzA4VkIvQk81d1ZodU9pS3FXMzM2bXNRRkxPCmhQbHpjM0pYalpy
+bWlZTi9STndlVFhROHdjR3N6TXc5bFA3ZjJzRC9jY1MxUzRHSUcyUGZHaldhZVdSZTJNRVAKMTFh
+YmZMMVVjUVNoOUZYcTJ4N0JUbW1KTmFYOXBUamtDUWRMQ1htbEVrb3o0a1UxOE1lc3NoK0ZLTEU5
+ZUNIegp0U1V6eFExc0ZwUUgvcjUvNS9VOEJCK3Jnc0FScGlTaUZBTFpmTUdIZEMwaXNuWXkyV2c9
+Cj1HaktrCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
 
-num_ad + 1?
-
-Regards,
--Denis
---===============6775828665144554529==--
+--===============6928139330422915866==--
 
