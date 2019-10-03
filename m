@@ -1,52 +1,110 @@
-Content-Type: multipart/mixed; boundary="===============0545767335193135727=="
+Content-Type: multipart/mixed; boundary="===============4275837460423307387=="
 MIME-Version: 1.0
 From: Will Dietz <w@wdtz.org>
-Subject: [PATCH] crypto: fix copy size causing overruns/crashing
-Date: Thu, 03 Oct 2019 12:18:51 -0500
-Message-ID: <20191003171851.31807-1-w@wdtz.org>
+Subject: [PATCH] station: don't reset/(re)configure/destroy NULL netconfig's
+Date: Thu, 03 Oct 2019 12:24:09 -0500
+Message-ID: <20191003172409.590-1-w@wdtz.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0545767335193135727==
+--===============4275837460423307387==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-num_ad is already accounted for in `sizeof(iov)`
-as iov has size `sizeof(struct iovec) * (num_ad+1)`.
+Fixes crashes when `enable_network_config` is false (default).
 ---
- src/crypto.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/station.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/src/crypto.c b/src/crypto.c
-index 632117d..62edd44 100644
---- a/src/crypto.c
-+++ b/src/crypto.c
-@@ -311,7 +311,7 @@ bool aes_siv_encrypt(const uint8_t *key, size_t key_len=
-, const uint8_t *in,
- 	struct iovec iov[num_ad + 1];
- 	uint8_t v[16];
+diff --git a/src/station.c b/src/station.c
+index eed3a7f..9b3e087 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1165,16 +1165,18 @@ static void station_enter_state(struct station *sta=
+tion,
+ 		periodic_scan_stop(station);
  =
 
--	memcpy(iov, ad, sizeof(iov) * num_ad);
-+	memcpy(iov, ad, sizeof(struct iovec) * num_ad);
- 	iov[num_ad].iov_base =3D (void *)in;
- 	iov[num_ad].iov_len =3D in_len;
- 	num_ad++;
-@@ -368,7 +368,7 @@ bool aes_siv_decrypt(const uint8_t *key, size_t key_len=
-, const uint8_t *in,
- 	if (in_len < 16)
- 		return false;
+ 		if (station->state =3D=3D STATION_STATE_ROAMING) {
+-			netconfig_reconfigure(station->netconfig);
++			if (station->netconfig)
++				netconfig_reconfigure(station->netconfig);
  =
 
--	memcpy(iov, ad, sizeof(iov) * num_ad);
-+	memcpy(iov, ad, sizeof(struct iovec) * num_ad);
- 	iov[num_ad].iov_base =3D (void *)out;
- 	iov[num_ad].iov_len =3D in_len - 16;
- 	num_ad++;
+ 			break;
+ 		}
+ =
+
+-		netconfig_configure(station->netconfig,
+-					network_get_settings(
+-						station->connected_network),
+-					netdev_get_address(
+-							station->netdev));
++		if (station->netconfig)
++			netconfig_configure(station->netconfig,
++						network_get_settings(
++							station->connected_network),
++						netdev_get_address(
++								station->netdev));
+ 		break;
+ 	case STATION_STATE_DISCONNECTING:
+ 	case STATION_STATE_ROAMING:
+@@ -1262,7 +1264,8 @@ static void station_disassociated(struct station *sta=
+tion)
+ {
+ 	l_debug("%u", netdev_get_ifindex(station->netdev));
+ =
+
+-	netconfig_reset(station->netconfig);
++	if (station->netconfig)
++		netconfig_reset(station->netconfig);
+ =
+
+ 	station_reset_connection_state(station);
+ =
+
+@@ -2344,7 +2347,8 @@ static void station_disconnect_onconnect(struct stati=
+on *station,
+ 		return;
+ 	}
+ =
+
+-	netconfig_reset(station->netconfig);
++	if (station->netconfig)
++		netconfig_reset(station->netconfig);
+ =
+
+ 	station_reset_connection_state(station);
+ =
+
+@@ -2581,7 +2585,8 @@ int station_disconnect(struct station *station)
+ 					station_disconnect_cb, station) < 0)
+ 		return -EIO;
+ =
+
+-	netconfig_reset(station->netconfig);
++	if (station->netconfig)
++		netconfig_reset(station->netconfig);
+ =
+
+ 	/*
+ 	 * If the disconnect somehow fails we won't know if we're still
+@@ -3061,7 +3066,8 @@ static void station_free(struct station *station)
+ 	if (station->connected_bss)
+ 		netdev_disconnect(station->netdev, NULL, NULL);
+ =
+
+-	netconfig_destroy(station->netconfig);
++	if (station->netconfig)
++		netconfig_destroy(station->netconfig);
+ 	station->netconfig =3D NULL;
+ =
+
+ 	periodic_scan_stop(station);
 -- =
 
 2.23.0
 
---===============0545767335193135727==--
+--===============4275837460423307387==--
 
