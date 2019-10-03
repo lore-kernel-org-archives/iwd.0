@@ -1,36 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============8530475696083982651=="
+Content-Type: multipart/mixed; boundary="===============2122702290095808529=="
 MIME-Version: 1.0
-From: Will Dietz <w@wdtz.org>
-Subject: [PATCH] station: record dependency on netconfig module
-Date: Thu, 03 Oct 2019 12:25:34 -0500
-Message-ID: <20191003172534.1148-1-w@wdtz.org>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] crypto: fix copy size causing overruns/crashing
+Date: Thu, 03 Oct 2019 12:28:24 -0500
+Message-ID: <be4298eb-420d-412d-a033-16a2acd78ded@gmail.com>
+In-Reply-To: <20191003171851.31807-1-w@wdtz.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8530475696083982651==
+--===============2122702290095808529==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The netconfig module must be initialized (netconfig_list, for example)
-before station module can be used, record this to ensure that happens.
----
- src/station.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi Will,
 
-diff --git a/src/station.c b/src/station.c
-index 0666287..eed3a7f 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3190,3 +3190,4 @@ static void station_exit(void)
- }
- =
+On 10/3/19 12:18 PM, Will Dietz wrote:
+> num_ad is already accounted for in `sizeof(iov)`
+> as iov has size `sizeof(struct iovec) * (num_ad+1)`.
+> ---
+>   src/crypto.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> =
 
- IWD_MODULE(station, station_init, station_exit)
-+IWD_MODULE_DEPENDS(station, netconfig)
--- =
 
-2.23.0
+Applied, thanks.
 
---===============8530475696083982651==--
+Regards,
+-Denis
+
+--===============2122702290095808529==--
 
