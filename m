@@ -1,36 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============7569956060431169545=="
+Content-Type: multipart/mixed; boundary="===============0806304525703099978=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] build: add pem-private.h to Makefile.am
-Date: Fri, 04 Oct 2019 10:13:19 -0700
-Message-ID: <20191004171319.27132-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] build: add pem-private.h to Makefile.am
+Date: Fri, 04 Oct 2019 12:16:56 -0500
+Message-ID: <206111c4-58fa-8b7e-eb0f-e324c6806db2@gmail.com>
+In-Reply-To: <20191004171319.27132-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7569956060431169545==
+--===============0806304525703099978==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- Makefile.am | 1 +
- 1 file changed, 1 insertion(+)
+Hi James,
 
-diff --git a/Makefile.am b/Makefile.am
-index 1e489bb3..00dc899c 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -103,6 +103,7 @@ ell_sources =3D ell/private.h \
- 			ell/base64.c \
- 			ell/asn1-private.h \
- 			ell/pem.c \
-+			ell/pem-private.h \
- 			ell/tls-private.h \
- 			ell/tls.c \
- 			ell/tls-record.c \
--- =
+On 10/4/19 12:13 PM, James Prestwood wrote:
+> ---
+>   Makefile.am | 1 +
+>   1 file changed, 1 insertion(+)
+> =
 
-2.17.1
 
---===============7569956060431169545==--
+Applied, thanks.
+
+Regards,
+-Denis
+
+--===============0806304525703099978==--
 
