@@ -1,57 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============3664126510485263207=="
+Content-Type: multipart/mixed; boundary="===============3698071505009376232=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] doc: add section about regulatory.db missing
-Date: Mon, 07 Oct 2019 09:28:48 -0700
-Message-ID: <20191007162848.14158-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] doc: add section about regulatory.db missing
+Date: Mon, 07 Oct 2019 11:34:21 -0500
+Message-ID: <e9567766-9365-b09f-f7c8-6e20f92bbc1d@gmail.com>
+In-Reply-To: <20191007162848.14158-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3664126510485263207==
+--===============3698071505009376232==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-It was found that some distros do not ship with a regulatory.db file.
-This is required to run some of the autotests, and if not found on the
-system the kernel build will fail due to some of the IWD config
-options which require regulatory.db.
+Hi James,
 
-The fix is to manually download regulatory.db from git.kernel.org and
-place it in /lib/firmware.
----
- doc/test-runner.txt | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+On 10/7/19 11:28 AM, James Prestwood wrote:
+> It was found that some distros do not ship with a regulatory.db file.
+> This is required to run some of the autotests, and if not found on the
+> system the kernel build will fail due to some of the IWD config
+> options which require regulatory.db.
+> =
 
-diff --git a/doc/test-runner.txt b/doc/test-runner.txt
-index 3660381a..2f1b4fd0 100644
---- a/doc/test-runner.txt
-+++ b/doc/test-runner.txt
-@@ -69,6 +69,16 @@ After that a default kernel with the required options ca=
-n be built:
- =
+> The fix is to manually download regulatory.db from git.kernel.org and
+> place it in /lib/firmware.
+> ---
+>   doc/test-runner.txt | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+> =
 
- 	$ make -j$(nproc)
- =
 
-+Note: If your host distribution does not contain a regulatory.db you may g=
-et an
-+error similar to when building the kernel:
-+
-+No rule to make target '/lib/firmware/regulatory.db'...
-+
-+To fix this you must download the regulatory.db manually and place it in
-+/lib/firmware. This can be found here:
-+
-+https://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git
-+
- Note: To catch locking related issues the following set of kernel config
- options may be useful:
- =
+Applied, thanks.
 
--- =
+Regards,
+-Denis
 
-2.17.1
-
---===============3664126510485263207==--
+--===============3698071505009376232==--
 
