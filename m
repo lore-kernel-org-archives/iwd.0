@@ -1,60 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============6988651693849721605=="
+Content-Type: multipart/mixed; boundary="===============9066850442434710506=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2] doc: add section about regulatory.db missing
-Date: Mon, 07 Oct 2019 09:35:44 -0700
-Message-ID: <20191007163544.15041-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/3] eap-tls-common: allow embedded PEMs in settings
+Date: Mon, 07 Oct 2019 12:58:09 -0500
+Message-ID: <f5d657eb-3477-a07e-6ddb-04eb5bc8087b@gmail.com>
+In-Reply-To: <20191007161113.13435-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6988651693849721605==
+--===============9066850442434710506==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-It was found that some distros do not ship with a regulatory.db file.
-This is required to run some of the autotests, and if not found on the
-system the kernel build will fail due to some of the IWD config
-options which require regulatory.db.
+hi James,
 
-The fix is to manually download regulatory.db from git.kernel.org and
-place it in /lib/firmware.
----
- doc/test-runner.txt | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+On 10/7/19 11:11 AM, James Prestwood wrote:
+> Refactoring was required to allow for embedded certs. The existing
+> eap_tls_state object was changed to hold the cert types (l_queue,
+> l_certchain, l_key) rather than the file path, since there may not
+> actually be separate PEM files.
+> =
 
--v2:
- * Fixed missing 'this' in sentence
+> Care was taken to properly manage the memory of these objects.
+> Since the TLS object takes ownership when setting auth data or the
+> CA certs all error cases must be handled properly to free these
+> objects after they are loaded and in addition they must be set to
+> NULL so that the cleanup doesn't double free them.
+> =
 
-diff --git a/doc/test-runner.txt b/doc/test-runner.txt
-index 3660381a..ccc17f7b 100644
---- a/doc/test-runner.txt
-+++ b/doc/test-runner.txt
-@@ -69,6 +69,16 @@ After that a default kernel with the required options ca=
-n be built:
- =
+> If everything goes to plan, we load all the PEMs in settings_load,
+> provide these objects to the TLS APIs, and then NULL out the
+> pointers (TLS now owns this memory). If anything fails between
+> settings_load and l_tls_start we must free these objects.
+> =
 
- 	$ make -j$(nproc)
- =
+> A special format must be used to indicate that a PEM is embedded
+> inside the settings file. First, the l_settings format should be
+> followed for the PEM itself, e.g.
+> =
 
-+Note: If your host distribution does not contain a regulatory.db you may g=
-et an
-+error similar to this when building the kernel:
-+
-+No rule to make target '/lib/firmware/regulatory.db'...
-+
-+To fix this you must download the regulatory.db manually and place it in
-+/lib/firmware. This can be found here:
-+
-+https://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git
-+
- Note: To catch locking related issues the following set of kernel config
- options may be useful:
- =
+> [@pem(a)my_ca_cert]
+> <CA Cert data>
+> =
 
--- =
+> This PEM can then be referenced by "embed:my_ca_cert", e.g.
+> =
 
-2.17.1
+> EAP-TLS-CACert=3Dembed:my_ca_cert
+> =
 
---===============6988651693849721605==--
+> Any other value not starting with "embed:" will be treated as a file
+> path.
+> ---
+>   src/eap-tls-common.c | 259 +++++++++++++++++++++++++++++--------------
+>   1 file changed, 177 insertions(+), 82 deletions(-)
+> =
+
+
+Applied, thanks.
+
+Regards,
+-Denis
+
+--===============9066850442434710506==--
 
