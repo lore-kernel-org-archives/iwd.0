@@ -1,35 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============2929748711182327537=="
+Content-Type: multipart/mixed; boundary="===============0272817273807393212=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2] tools: ios_convert: embed certs rather than using paths
-Date: Mon, 07 Oct 2019 23:09:56 -0500
-Message-ID: <7582cebd-6381-2073-d95d-91e35ca41045@gmail.com>
-In-Reply-To: <20191007202727.3464-1-prestwoj@gmail.com>
+Subject: Re: [PATCH] auto-t: add TLS test with embedded PEMs
+Date: Mon, 07 Oct 2019 23:10:13 -0500
+Message-ID: <5919a957-8736-b92f-3ff2-ea1f97950643@gmail.com>
+In-Reply-To: <20191007195549.1653-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2929748711182327537==
+--===============0272817273807393212==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 10/7/19 3:27 PM, James Prestwood wrote:
+On 10/7/19 2:55 PM, James Prestwood wrote:
 > ---
->   tools/ios_convert.py | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
+>   .../connection_test.py                        | 77 +++++++++++++++
+>   autotests/testEAP-TLS-embedded-pems/hw.conf   |  6 ++
+>   .../ssidEAP-TLS.8021x                         | 94 +++++++++++++++++++
+>   .../ssidEAP-TLS.conf                          | 12 +++
+>   4 files changed, 189 insertions(+)
+>   create mode 100644 autotests/testEAP-TLS-embedded-pems/connection_test.=
+py
+>   create mode 100644 autotests/testEAP-TLS-embedded-pems/hw.conf
+>   create mode 100644 autotests/testEAP-TLS-embedded-pems/ssidEAP-TLS.8021x
+>   create mode 100644 autotests/testEAP-TLS-embedded-pems/ssidEAP-TLS.conf
 > =
 
-> -v2:
->   * removed extra new line after the embedded PEM
-> =
 
-
-applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============2929748711182327537==--
+--===============0272817273807393212==--
 
