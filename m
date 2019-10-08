@@ -1,39 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============0272817273807393212=="
+Content-Type: multipart/mixed; boundary="===============0504821671136987844=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] auto-t: add TLS test with embedded PEMs
-Date: Mon, 07 Oct 2019 23:10:13 -0500
-Message-ID: <5919a957-8736-b92f-3ff2-ea1f97950643@gmail.com>
-In-Reply-To: <20191007195549.1653-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] doc: fix broken link in test-runner.txt
+Date: Tue, 08 Oct 2019 08:58:27 -0700
+Message-ID: <20191008155827.17212-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0272817273807393212==
+--===============0504821671136987844==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ doc/test-runner.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 10/7/19 2:55 PM, James Prestwood wrote:
-> ---
->   .../connection_test.py                        | 77 +++++++++++++++
->   autotests/testEAP-TLS-embedded-pems/hw.conf   |  6 ++
->   .../ssidEAP-TLS.8021x                         | 94 +++++++++++++++++++
->   .../ssidEAP-TLS.conf                          | 12 +++
->   4 files changed, 189 insertions(+)
->   create mode 100644 autotests/testEAP-TLS-embedded-pems/connection_test.=
-py
->   create mode 100644 autotests/testEAP-TLS-embedded-pems/hw.conf
->   create mode 100644 autotests/testEAP-TLS-embedded-pems/ssidEAP-TLS.8021x
->   create mode 100644 autotests/testEAP-TLS-embedded-pems/ssidEAP-TLS.conf
-> =
+diff --git a/doc/test-runner.txt b/doc/test-runner.txt
+index ccc17f7b..1bc02ced 100644
+--- a/doc/test-runner.txt
++++ b/doc/test-runner.txt
+@@ -301,7 +301,7 @@ command:
+ Make sure that '-i' option is available in the list of option.
+ For more information on hostapd refer to this page:
+ =
 
+-	http://linuxwireless.org/en/users/Documentation/hostapd/
++	https://wireless.wiki.kernel.org/en/users/documentation/hostapd
+ =
 
-Applied, thanks.
+ A full set of the hostapd configurations along with explanation can be
+ found at:
+-- =
 
-Regards,
--Denis
+2.17.1
 
---===============0272817273807393212==--
+--===============0504821671136987844==--
 
