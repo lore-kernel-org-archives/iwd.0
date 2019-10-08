@@ -1,140 +1,157 @@
-Content-Type: multipart/mixed; boundary="===============0763381276095093052=="
+Content-Type: multipart/mixed; boundary="===============3935423592118698710=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 2/5] station: Move 'connected' logic out of enter state func
-Date: Tue, 08 Oct 2019 14:48:21 -0700
-Message-ID: <20191008214824.19466-2-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 3/5] netconfig: Add netconfig event notifier
+Date: Tue, 08 Oct 2019 14:48:22 -0700
+Message-ID: <20191008214824.19466-3-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20191008214824.19466-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0763381276095093052==
+--===============3935423592118698710==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Previously, station state 'connected' used to identify an interface associa=
-ted
-with AP. With the introduction of netconfig, an interface is assumed to be
-connected after the IP addresses have been assigned to it. If netconfig is
-disabled, the behavior remains unchanged.
-
-The change of station state by netconfig to 'connected' is implemented in
-the follow up patches.
+The notifier allows to subscribe for the netconfig events such as =E2=80=98=
+connected=E2=80=99.
 ---
- src/station.c | 51 +++++++++++++++++++++++++++++----------------------
- 1 file changed, 29 insertions(+), 22 deletions(-)
+ src/netconfig.c | 28 +++++++++++++++++++++-------
+ src/netconfig.h | 11 ++++++++++-
+ 2 files changed, 31 insertions(+), 8 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 72393d51..9997352e 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1162,23 +1162,6 @@ static void station_enter_state(struct station *stat=
-ion,
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 31cbeb2a..ec8d0af3 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -50,6 +50,9 @@ struct netconfig {
+ 	uint8_t rtm_v6_protocol;
  =
 
- 		break;
- 	case STATION_STATE_CONNECTED:
--		periodic_scan_stop(station);
--
--		if (!station->netconfig)
--			break;
--
--		if (station->state =3D=3D STATION_STATE_ROAMING) {
--			netconfig_reconfigure(station->netconfig);
--
--			break;
--		}
--
--		netconfig_configure(station->netconfig,
--					network_get_settings(
--						station->connected_network),
--					netdev_get_address(
--							station->netdev));
--		break;
- 	case STATION_STATE_DISCONNECTING:
- 	case STATION_STATE_ROAMING:
- 		break;
-@@ -1326,6 +1309,28 @@ static void station_roam_failed(struct station *stat=
-ion)
- 		station_roam_timeout_rearm(station, 60);
- }
+ 	const struct l_settings *active_settings;
++
++	netconfig_notify_func_t notify;
++	void *user_data;
+ };
  =
 
-+static void station_connected(struct station *station)
-+{
-+	periodic_scan_stop(station);
-+
-+	if (!station->netconfig) {
-+		station_enter_state(station, STATION_STATE_CONNECTED);
-+
+ struct netconfig_ifaddr {
+@@ -595,11 +598,18 @@ static void netconfig_route_add_cmd_cb(int error, uin=
+t16_t type,
+ 						const void *data, uint32_t len,
+ 						void *user_data)
+ {
+-	if (!error)
+-		return;
++	struct netconfig *netconfig =3D user_data;
+ =
+
+-	l_error("netconfig: Failed to add route. Error %d: %s",
++	if (error) {
++		l_error("netconfig: Failed to add route. Error %d: %s",
+ 						error, strerror(-error));
 +		return;
 +	}
 +
-+	if (station->state =3D=3D STATION_STATE_ROAMING) {
-+		netconfig_reconfigure(station->netconfig);
-+
++	if (!netconfig->notify)
 +		return;
-+	}
 +
-+	netconfig_configure(station->netconfig,
-+				network_get_settings(
-+						station->connected_network),
-+				netdev_get_address(station->netdev));
-+}
++	netconfig->notify(NETCONFIG_EVENT_CONNECTED, netconfig->user_data);
+ }
+ =
+
+ static void netconfig_route_del_cmd_cb(int error, uint16_t type,
+@@ -611,6 +621,7 @@ static void netconfig_route_del_cmd_cb(int error, uint1=
+6_t type,
+ =
+
+ 	l_error("netconfig: Failed to delete route. Error %d: %s",
+ 						error, strerror(-error));
 +
- static void station_reassociate_cb(struct netdev *netdev,
- 					enum netdev_result result,
- 					void *event_data,
-@@ -1340,9 +1345,10 @@ static void station_reassociate_cb(struct netdev *ne=
-tdev,
- =
-
- 	if (result =3D=3D NETDEV_RESULT_OK) {
- 		station_roamed(station);
--		station_enter_state(station, STATION_STATE_CONNECTED);
--	} else
-+		station_connected(station);
-+	} else {
- 		station_roam_failed(station);
-+	}
  }
  =
 
- static void station_fast_transition_cb(struct netdev *netdev,
-@@ -1359,9 +1365,10 @@ static void station_fast_transition_cb(struct netdev=
- *netdev,
+ static bool netconfig_ipv4_routes_install(struct netconfig *netconfig,
+@@ -635,7 +646,7 @@ static bool netconfig_ipv4_routes_install(struct netcon=
+fig *netconfig,
+ 						ifaddr->ip,
+ 						netconfig->rtm_protocol,
+ 						netconfig_route_add_cmd_cb,
+-						NULL, NULL)) {
++						netconfig, NULL)) {
+ 		l_error("netconfig: Failed to add subnet route.");
  =
 
- 	if (result =3D=3D NETDEV_RESULT_OK) {
- 		station_roamed(station);
--		station_enter_state(station, STATION_STATE_CONNECTED);
--	} else
-+		station_connected(station);
-+	} else {
- 		station_roam_failed(station);
-+	}
- }
+ 		return false;
+@@ -655,7 +666,7 @@ static bool netconfig_ipv4_routes_install(struct netcon=
+fig *netconfig,
+ 						ROUTE_PRIORITY_OFFSET,
+ 						netconfig->rtm_protocol,
+ 						netconfig_route_add_cmd_cb,
+-						NULL, NULL)) {
++						netconfig, NULL)) {
+ 		l_error("netconfig: Failed to add route for: %s gateway.",
+ 								gateway);
  =
 
- static void station_netdev_event(struct netdev *netdev, enum netdev_event =
-event,
-@@ -2280,7 +2287,7 @@ static void station_connect_cb(struct netdev *netdev,=
- enum netdev_result result,
- 	}
+@@ -723,7 +734,7 @@ static bool netconfig_ipv6_routes_install(struct netcon=
+fig *netconfig)
+ 						ROUTE_PRIORITY_OFFSET,
+ 						netconfig->rtm_v6_protocol,
+ 						netconfig_route_add_cmd_cb,
+-						NULL, NULL)) {
++						netconfig, NULL)) {
+ 		l_error("netconfig: Failed to add route for: %s gateway.",
+ 								gateway);
  =
 
- 	network_connected(station->connected_network);
--	station_enter_state(station, STATION_STATE_CONNECTED);
-+	station_connected(station);
- }
+@@ -1020,9 +1031,12 @@ static void netconfig_ipv6_select_and_uninstall(stru=
+ct netconfig *netconfig)
  =
 
- int __station_connect_network(struct station *station, struct network *net=
-work,
+ bool netconfig_configure(struct netconfig *netconfig,
+ 				const struct l_settings *active_settings,
+-				const uint8_t *mac_address)
++				const uint8_t *mac_address,
++				netconfig_notify_func_t notify, void *user_data)
+ {
+ 	netconfig->active_settings =3D active_settings;
++	netconfig->notify =3D notify;
++	netconfig->user_data =3D user_data;
+ =
+
+ 	l_dhcp_client_set_address(netconfig->dhcp_client, ARPHRD_ETHER,
+ 							mac_address, ETH_ALEN);
+diff --git a/src/netconfig.h b/src/netconfig.h
+index cacd384a..5a527950 100644
+--- a/src/netconfig.h
++++ b/src/netconfig.h
+@@ -22,9 +22,18 @@
+ =
+
+ struct netconfig;
+ =
+
++enum netconfig_event {
++	NETCONFIG_EVENT_CONNECTED,
++};
++
++typedef void (*netconfig_notify_func_t)(enum netconfig_event event,
++							void *user_data);
++
+ bool netconfig_configure(struct netconfig *netconfig,
+ 				const struct l_settings *active_settings,
+-				const uint8_t *mac_address);
++				const uint8_t *mac_address,
++				netconfig_notify_func_t notify,
++				void *user_data);
+ bool netconfig_reconfigure(struct netconfig *netconfig);
+ bool netconfig_reset(struct netconfig *netconfig);
+ =
+
 -- =
 
 2.13.6
 
---===============0763381276095093052==--
+--===============3935423592118698710==--
 
