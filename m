@@ -1,66 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============0340251438977568900=="
+Content-Type: multipart/mixed; boundary="===============1616251463729823156=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 4/5] station: Subscribe to netconfig event notifier
-Date: Tue, 08 Oct 2019 14:48:23 -0700
-Message-ID: <20191008214824.19466-4-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 5/5] station: Match debug output to what is seen on dbus
+Date: Tue, 08 Oct 2019 14:48:24 -0700
+Message-ID: <20191008214824.19466-5-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20191008214824.19466-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0340251438977568900==
+--===============1616251463729823156==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/station.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ src/station.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/src/station.c b/src/station.c
-index 9997352e..46f2a02e 100644
+index 46f2a02e..dc9ec7a1 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -1309,6 +1309,22 @@ static void station_roam_failed(struct station *stat=
-ion)
- 		station_roam_timeout_rearm(station, 60);
- }
+@@ -1131,16 +1131,16 @@ static void station_enter_state(struct station *sta=
+tion,
+ 	struct l_dbus *dbus =3D dbus_get_bus();
+ 	bool disconnected;
  =
 
-+static void station_netconfig_event_handler(enum netconfig_event event,
-+							void *user_data)
-+{
-+	struct station *station =3D user_data;
-+
-+	switch (event) {
-+	case NETCONFIG_EVENT_CONNECTED:
-+		station_enter_state(station, STATION_STATE_CONNECTED);
-+
-+		break;
-+	default:
-+		l_error("station: Unsupported netconfig event: %d.", event);
-+		break;
+-	l_debug("Old State: %s, new state: %s",
+-			station_state_to_string(station->state),
+-			station_state_to_string(state));
+-
+ 	disconnected =3D !station_is_busy(station);
+ =
+
+ 	if ((disconnected && state > STATION_STATE_AUTOCONNECT_FULL) ||
+-			(!disconnected && state !=3D station->state))
++			(!disconnected && state !=3D station->state)) {
+ 		l_dbus_property_changed(dbus, netdev_get_path(station->netdev),
+ 					IWD_STATION_INTERFACE, "State");
++		l_debug("Old State: %s, new state: %s",
++					station_state_to_string(station->state),
++					station_state_to_string(state));
 +	}
-+}
-+
- static void station_connected(struct station *station)
- {
- 	periodic_scan_stop(station);
-@@ -1328,7 +1344,9 @@ static void station_connected(struct station *station)
- 	netconfig_configure(station->netconfig,
- 				network_get_settings(
- 						station->connected_network),
--				netdev_get_address(station->netdev));
-+				netdev_get_address(station->netdev),
-+				station_netconfig_event_handler,
-+				station);
- }
  =
 
- static void station_reassociate_cb(struct netdev *netdev,
+ 	switch (state) {
+ 	case STATION_STATE_AUTOCONNECT_QUICK:
 -- =
 
 2.13.6
 
---===============0340251438977568900==--
+--===============1616251463729823156==--
 
