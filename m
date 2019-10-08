@@ -1,77 +1,101 @@
-Content-Type: multipart/mixed; boundary="===============1802757882678660918=="
+Content-Type: multipart/mixed; boundary="===============5136461066276899620=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH] station: Simplify and comply with coding style
-Date: Tue, 08 Oct 2019 13:18:17 -0700
-Message-ID: <20191008201817.29586-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 1/5] netconfig: Split route add/del callbacks
+Date: Tue, 08 Oct 2019 14:48:20 -0700
+Message-ID: <20191008214824.19466-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1802757882678660918==
+--===============5136461066276899620==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/station.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+ src/netconfig.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 9b3e087e..72393d51 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1164,19 +1164,20 @@ static void station_enter_state(struct station *sta=
-tion,
- 	case STATION_STATE_CONNECTED:
- 		periodic_scan_stop(station);
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 84eea7f5..31cbeb2a 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -591,14 +591,25 @@ static void netconfig_ifaddr_ipv6_cmd_cb(int error, u=
+int16_t type,
+ 	netconfig_ifaddr_ipv6_notify(type, data, len, user_data);
+ }
  =
 
-+		if (!station->netconfig)
-+			break;
+-static void netconfig_route_cmd_cb(int error, uint16_t type,
++static void netconfig_route_add_cmd_cb(int error, uint16_t type,
+ 						const void *data, uint32_t len,
+ 						void *user_data)
+ {
+ 	if (!error)
+ 		return;
+ =
+
+-	l_error("netconfig: Route command failure. Error %d: %s",
++	l_error("netconfig: Failed to add route. Error %d: %s",
++						error, strerror(-error));
++}
 +
- 		if (station->state =3D=3D STATION_STATE_ROAMING) {
--			if (station->netconfig)
--				netconfig_reconfigure(station->netconfig);
-+			netconfig_reconfigure(station->netconfig);
++static void netconfig_route_del_cmd_cb(int error, uint16_t type,
++						const void *data, uint32_t len,
++						void *user_data)
++{
++	if (!error)
++		return;
++
++	l_error("netconfig: Failed to delete route. Error %d: %s",
+ 						error, strerror(-error));
+ }
  =
 
- 			break;
- 		}
+@@ -623,7 +634,7 @@ static bool netconfig_ipv4_routes_install(struct netcon=
+fig *netconfig,
+ 						ifaddr->prefix_len, network,
+ 						ifaddr->ip,
+ 						netconfig->rtm_protocol,
+-						netconfig_route_cmd_cb,
++						netconfig_route_add_cmd_cb,
+ 						NULL, NULL)) {
+ 		l_error("netconfig: Failed to add subnet route.");
  =
 
--		if (station->netconfig)
--			netconfig_configure(station->netconfig,
--						network_get_settings(
--							station->connected_network),
--						netdev_get_address(
--								station->netdev));
-+		netconfig_configure(station->netconfig,
-+					network_get_settings(
-+						station->connected_network),
-+					netdev_get_address(
-+							station->netdev));
- 		break;
- 	case STATION_STATE_DISCONNECTING:
- 	case STATION_STATE_ROAMING:
-@@ -3066,9 +3067,10 @@ static void station_free(struct station *station)
- 	if (station->connected_bss)
- 		netdev_disconnect(station->netdev, NULL, NULL);
- =
-
--	if (station->netconfig)
-+	if (station->netconfig) {
- 		netconfig_destroy(station->netconfig);
--	station->netconfig =3D NULL;
-+		station->netconfig =3D NULL;
-+	}
- =
-
- 	periodic_scan_stop(station);
- =
-
+@@ -643,7 +654,7 @@ static bool netconfig_ipv4_routes_install(struct netcon=
+fig *netconfig,
+ 						ifaddr->ip,
+ 						ROUTE_PRIORITY_OFFSET,
+ 						netconfig->rtm_protocol,
+-						netconfig_route_cmd_cb,
++						netconfig_route_add_cmd_cb,
+ 						NULL, NULL)) {
+ 		l_error("netconfig: Failed to add route for: %s gateway.",
+ 								gateway);
+@@ -711,7 +722,7 @@ static bool netconfig_ipv6_routes_install(struct netcon=
+fig *netconfig)
+ 	if (!rtnl_route_ipv6_add_gateway(rtnl, netconfig->ifindex, gateway,
+ 						ROUTE_PRIORITY_OFFSET,
+ 						netconfig->rtm_v6_protocol,
+-						netconfig_route_cmd_cb,
++						netconfig_route_add_cmd_cb,
+ 						NULL, NULL)) {
+ 		l_error("netconfig: Failed to add route for: %s gateway.",
+ 								gateway);
+@@ -999,7 +1010,7 @@ static void netconfig_ipv6_select_and_uninstall(struct=
+ netconfig *netconfig)
+ 	if (!rtnl_route_ipv6_delete_gateway(rtnl, netconfig->ifindex,
+ 			gateway, ROUTE_PRIORITY_OFFSET,
+ 			netconfig->rtm_v6_protocol,
+-			netconfig_route_cmd_cb, NULL, NULL)) {
++			netconfig_route_del_cmd_cb, NULL, NULL)) {
+ 		l_error("netconfig: Failed to delete route for: %s gateway.",
+ 								gateway);
+ 	}
 -- =
 
 2.13.6
 
---===============1802757882678660918==--
+--===============5136461066276899620==--
 
