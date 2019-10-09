@@ -1,55 +1,128 @@
-Content-Type: multipart/mixed; boundary="===============1616251463729823156=="
+Content-Type: multipart/mixed; boundary="===============0442590819833685020=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 5/5] station: Match debug output to what is seen on dbus
-Date: Tue, 08 Oct 2019 14:48:24 -0700
-Message-ID: <20191008214824.19466-5-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20191008214824.19466-1-tim.a.kourt@linux.intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] test-runner: allow all unit tests to be run in VM
+Date: Wed, 09 Oct 2019 09:57:00 -0700
+Message-ID: <20191009165700.12739-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1616251463729823156==
+--===============0442590819833685020==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+The -U parameter only allowed for a list of unit tests to be run.
+Most of the time for sanity checking you want to run all the unit
+tests so this has been changed to take an optional argument.
+
+Now, the -U flag (by itself) will run all unit tests. Running a
+single or list of unit tests can still be achieved by:
+
+--unit-tests=3Dtest-eapol,test-crypto
 ---
- src/station.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ tools/test-runner.c | 48 ++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 37 insertions(+), 11 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 46f2a02e..dc9ec7a1 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1131,16 +1131,16 @@ static void station_enter_state(struct station *sta=
-tion,
- 	struct l_dbus *dbus =3D dbus_get_bus();
- 	bool disconnected;
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 88cc16a8..b3e509c2 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -2364,28 +2364,54 @@ exit:
  =
 
--	l_debug("Old State: %s, new state: %s",
--			station_state_to_string(station->state),
--			station_state_to_string(state));
--
- 	disconnected =3D !station_is_busy(station);
+ static void run_unit_tests(void)
+ {
+-	size_t i;
++	DIR *d;
++	struct dirent *dirent;
+ 	char *argv[2];
+-	char *unit_test_abs_path;
+-	char **unit_tests =3D l_strsplit(test_action_params, ',');
++	char *unit_test_abs_path =3D NULL;
++	char **unit_tests =3D NULL;
  =
 
- 	if ((disconnected && state > STATION_STATE_AUTOCONNECT_FULL) ||
--			(!disconnected && state !=3D station->state))
-+			(!disconnected && state !=3D station->state)) {
- 		l_dbus_property_changed(dbus, netdev_get_path(station->netdev),
- 					IWD_STATION_INTERFACE, "State");
-+		l_debug("Old State: %s, new state: %s",
-+					station_state_to_string(station->state),
-+					station_state_to_string(state));
+-	if (!unit_tests || !unit_tests[0])
+-		goto exit;
++	if (strcmp(test_action_params, "")) {
++		unit_tests =3D l_strsplit(test_action_params, ',');
++
++		if (!unit_tests || !unit_tests[0])
++			goto exit;
 +	}
  =
 
- 	switch (state) {
- 	case STATION_STATE_AUTOCONNECT_QUICK:
+ 	if (chdir(top_level_path) < 0)
+ 		goto exit;
+ =
+
+-	for (i =3D 0; unit_tests[i]; i++) {
+-		unit_test_abs_path =3D
+-			l_strdup_printf("%s%s%s", top_level_path, "/unit/",
+-								unit_tests[i]);
++	d =3D opendir("unit/");
++	if (!d)
++		goto exit;
++
++	while ((dirent =3D readdir(d)) !=3D NULL) {
++		struct stat st;
++
++		if (dirent->d_type !=3D DT_REG)
++			continue;
++
++		unit_test_abs_path =3D l_strdup_printf("%s%s%s", top_level_path,
++						"/unit/", dirent->d_name);
++
++		if (stat(unit_test_abs_path, &st) < 0)
++			goto next;
++
++		if (!(st.st_mode & S_IEXEC))
++			goto next;
++
++		if (unit_tests) {
++			if (!l_strv_contains(unit_tests, dirent->d_name))
++				goto next;
++		}
+ =
+
+ 		argv[0] =3D unit_test_abs_path;
+ 		argv[1] =3D NULL;
+ =
+
++		l_info("\n---------- Unit %s ----------", dirent->d_name);
+ 		execute_program(argv, environ, true,
+ 					check_verbosity("unit"), false);
+ =
+
++next:
+ 		l_free(unit_test_abs_path);
+ 	}
+ =
+
+@@ -2850,7 +2876,7 @@ static void usage(void)
+ =
+
+ static const struct option main_options[] =3D {
+ 	{ "auto-tests",	required_argument, NULL, 'A' },
+-	{ "unit-tests",	required_argument, NULL, 'U' },
++	{ "unit-tests",	optional_argument, NULL, 'U' },
+ 	{ "qemu",	required_argument, NULL, 'q' },
+ 	{ "kernel",	required_argument, NULL, 'k' },
+ 	{ "verbose",	required_argument, NULL, 'v' },
+@@ -2887,7 +2913,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ =
+
+-		opt =3D getopt_long(argc, argv, "A:U:q:k:v:g:Vdh", main_options,
++		opt =3D getopt_long(argc, argv, "A:q:k:v:g:UVdh", main_options,
+ 									NULL);
+ 		if (opt < 0)
+ 			break;
 -- =
 
-2.13.6
+2.17.1
 
---===============1616251463729823156==--
+--===============0442590819833685020==--
 
