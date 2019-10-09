@@ -1,30 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============5562467547927013157=="
+Content-Type: multipart/mixed; boundary="===============7829403425897107235=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] netconfig: Don't clear IPv6 addresses on shutdown
-Date: Wed, 09 Oct 2019 17:53:42 -0500
-Message-ID: <8e196056-50f5-aa7a-db7a-673c4ca21b74@gmail.com>
-In-Reply-To: <20191009224333.28884-1-tim.a.kourt@linux.intel.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH] resolve: Add IPv6 handler for systemd msg appender
+Date: Wed, 09 Oct 2019 16:28:32 -0700
+Message-ID: <20191009232832.7761-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5562467547927013157==
+--===============7829403425897107235==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+---
+ src/resolve.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-On 10/9/19 5:43 PM, Tim Kourt wrote:
-> Unlike IPv4, the IPv6 address are removed by the kernel.
-> ---
->   src/netconfig.c | 3 ---
->   1 file changed, 3 deletions(-)
+diff --git a/src/resolve.c b/src/resolve.c
+index 932c891b..b502feb8 100644
+--- a/src/resolve.c
++++ b/src/resolve.c
+@@ -97,6 +97,13 @@ static bool systemd_builder_add_dns(struct l_dbus_messag=
+e_builder *builder,
+ 		buf_size =3D 4;
+ =
 
-Applied, thanks.
+ 		break;
++	case AF_INET6:
++		if (inet_pton(AF_INET6, dns, buf) < 1)
++			return false;
++
++		buf_size =3D 16;
++
++		break;
+ 	default:
+ 		return false;
+ 	}
+-- =
 
-Regards,
--Denis
+2.13.6
 
---===============5562467547927013157==--
+--===============7829403425897107235==--
 
