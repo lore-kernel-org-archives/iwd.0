@@ -1,67 +1,127 @@
-Content-Type: multipart/mixed; boundary="===============3544613285354857419=="
+Content-Type: multipart/mixed; boundary="===============4032687133971239637=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 5/5] station: Match debug output to what is seen on dbus
-Date: Wed, 09 Oct 2019 14:37:47 -0500
-Message-ID: <54f57a44-c6b2-2412-1322-f32c1dbe13e4@gmail.com>
-In-Reply-To: <20191008214824.19466-5-tim.a.kourt@linux.intel.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2 1/3] station: Move 'connected' logic out of enter state func
+Date: Wed, 09 Oct 2019 14:53:31 -0700
+Message-ID: <20191009215333.14547-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3544613285354857419==
+--===============4032687133971239637==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+Previously, station state 'connected' used to identify an interface associa=
+ted
+with AP. With the introduction of netconfig, an interface is assumed to be
+connected after the IP addresses have been assigned to it. If netconfig is
+disabled, the behavior remains unchanged.
+---
+ src/station.c | 41 +++++++++++++++++------------------------
+ 1 file changed, 17 insertions(+), 24 deletions(-)
 
-On 10/8/19 4:48 PM, Tim Kourt wrote:
-> ---
->   src/station.c | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
-> =
+diff --git a/src/station.c b/src/station.c
+index 72393d51..af209ebb 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1158,26 +1158,9 @@ static void station_enter_state(struct station *stat=
+ion,
+ 				IWD_NETWORK_INTERFACE, "Connected");
+ 		/* fall through */
+ 	case STATION_STATE_DISCONNECTED:
+-		periodic_scan_stop(station);
+-
+-		break;
+ 	case STATION_STATE_CONNECTED:
+ 		periodic_scan_stop(station);
+ =
 
-> diff --git a/src/station.c b/src/station.c
-> index 46f2a02e..dc9ec7a1 100644
-> --- a/src/station.c
-> +++ b/src/station.c
-> @@ -1131,16 +1131,16 @@ static void station_enter_state(struct station *s=
-tation,
->   	struct l_dbus *dbus =3D dbus_get_bus();
->   	bool disconnected;
->   =
+-		if (!station->netconfig)
+-			break;
+-
+-		if (station->state =3D=3D STATION_STATE_ROAMING) {
+-			netconfig_reconfigure(station->netconfig);
+-
+-			break;
+-		}
+-
+-		netconfig_configure(station->netconfig,
+-					network_get_settings(
+-						station->connected_network),
+-					netdev_get_address(
+-							station->netdev));
+ 		break;
+ 	case STATION_STATE_DISCONNECTING:
+ 	case STATION_STATE_ROAMING:
+@@ -1302,6 +1285,11 @@ static void station_roamed(struct station *station)
+ 	station->signal_low =3D false;
+ 	station->roam_min_time.tv_sec =3D 0;
+ 	station->roam_no_orig_ap =3D false;
++
++	if (station->netconfig)
++		netconfig_reconfigure(station->netconfig);
++
++	station_enter_state(station, STATION_STATE_CONNECTED);
+ }
+ =
 
-> -	l_debug("Old State: %s, new state: %s",
-> -			station_state_to_string(station->state),
-> -			station_state_to_string(state));
-> -
->   	disconnected =3D !station_is_busy(station);
->   =
+ static void station_roam_failed(struct station *station)
+@@ -1338,10 +1326,9 @@ static void station_reassociate_cb(struct netdev *ne=
+tdev,
+ 	if (station->state !=3D STATION_STATE_ROAMING)
+ 		return;
+ =
 
->   	if ((disconnected && state > STATION_STATE_AUTOCONNECT_FULL) ||
-> -			(!disconnected && state !=3D station->state))
-> +			(!disconnected && state !=3D station->state)) {
->   		l_dbus_property_changed(dbus, netdev_get_path(station->netdev),
->   					IWD_STATION_INTERFACE, "State");
-> +		l_debug("Old State: %s, new state: %s",
-> +					station_state_to_string(station->state),
-> +					station_state_to_string(state));
-> +	}
+-	if (result =3D=3D NETDEV_RESULT_OK) {
++	if (result =3D=3D NETDEV_RESULT_OK)
+ 		station_roamed(station);
+-		station_enter_state(station, STATION_STATE_CONNECTED);
+-	} else
++	else
+ 		station_roam_failed(station);
+ }
+ =
 
-Hmm, I'm not so sure about this.  You can see the dbus signaling via =
+@@ -1357,10 +1344,9 @@ static void station_fast_transition_cb(struct netdev=
+ *netdev,
+ 	if (station->state !=3D STATION_STATE_ROAMING)
+ 		return;
+ =
 
-test/monitor-iwd.  And knowing when we enter the various autoconnect =
+-	if (result =3D=3D NETDEV_RESULT_OK) {
++	if (result =3D=3D NETDEV_RESULT_OK)
+ 		station_roamed(station);
+-		station_enter_state(station, STATION_STATE_CONNECTED);
+-	} else
++	else
+ 		station_roam_failed(station);
+ }
+ =
 
-states is useful...
+@@ -2280,7 +2266,14 @@ static void station_connect_cb(struct netdev *netdev=
+, enum netdev_result result,
+ 	}
+ =
 
->   =
+ 	network_connected(station->connected_network);
+-	station_enter_state(station, STATION_STATE_CONNECTED);
++
++	if (station->netconfig)
++		netconfig_configure(station->netconfig,
++					network_get_settings(
++						station->connected_network),
++					netdev_get_address(station->netdev));
++	else
++		station_enter_state(station, STATION_STATE_CONNECTED);
+ }
+ =
 
->   	switch (state) {
->   	case STATION_STATE_AUTOCONNECT_QUICK:
-> =
+ int __station_connect_network(struct station *station, struct network *net=
+work,
+-- =
 
+2.13.6
 
-Regards,
--Denis
---===============3544613285354857419==--
+--===============4032687133971239637==--
 
