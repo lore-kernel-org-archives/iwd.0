@@ -1,41 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============8995383738483116510=="
+Content-Type: multipart/mixed; boundary="===============4714390207805534890=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH] netconfig: Don't clear IPv6 addresses on shutdown
-Date: Wed, 09 Oct 2019 15:43:33 -0700
-Message-ID: <20191009224333.28884-1-tim.a.kourt@linux.intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2 2/3] netconfig: Add netconfig event notifier
+Date: Wed, 09 Oct 2019 17:52:57 -0500
+Message-ID: <8eee1e67-4431-00e0-6851-c2eb49153111@gmail.com>
+In-Reply-To: <20191009215333.14547-2-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8995383738483116510==
+--===============4714390207805534890==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Unlike IPv4, the IPv6 address are removed by the kernel.
----
- src/netconfig.c | 3 ---
- 1 file changed, 3 deletions(-)
+Hi Tim,
 
-diff --git a/src/netconfig.c b/src/netconfig.c
-index c48e25b1..c4785fb6 100644
---- a/src/netconfig.c
-+++ b/src/netconfig.c
-@@ -1111,9 +1111,6 @@ void netconfig_destroy(struct netconfig *netconfig)
- 	if (netconfig->rtm_protocol)
- 		netconfig_ipv4_select_and_uninstall(netconfig);
- =
+On 10/9/19 4:53 PM, Tim Kourt wrote:
+> The notifier allows to subscribe for the netconfig events such as =E2=80=
+=98connected=E2=80=99.
+> ---
+>   src/netconfig.c | 29 ++++++++++++++++++++++-------
+>   src/netconfig.h | 11 ++++++++++-
+>   2 files changed, 32 insertions(+), 8 deletions(-)
+> =
 
--	if (netconfig->rtm_v6_protocol)
--		netconfig_ipv6_select_and_uninstall(netconfig);
--
- 	if (netconfig->rtm_protocol || netconfig->rtm_v6_protocol)
- 		resolve_remove(netconfig->ifindex);
- =
 
--- =
+Patch 2 & 3 applied, thanks.
 
-2.13.6
+Regards,
+-Denis
 
---===============8995383738483116510==--
+--===============4714390207805534890==--
 
