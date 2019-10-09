@@ -1,37 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============7260510703533229484=="
+Content-Type: multipart/mixed; boundary="===============8995383738483116510=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 1/3] station: Move 'connected' logic out of enter state
- func
-Date: Wed, 09 Oct 2019 17:06:36 -0500
-Message-ID: <6ee4b7bf-2a6f-32b0-bf6b-b0a9e7091d7d@gmail.com>
-In-Reply-To: <20191009215333.14547-1-tim.a.kourt@linux.intel.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH] netconfig: Don't clear IPv6 addresses on shutdown
+Date: Wed, 09 Oct 2019 15:43:33 -0700
+Message-ID: <20191009224333.28884-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7260510703533229484==
+--===============8995383738483116510==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+Unlike IPv4, the IPv6 address are removed by the kernel.
+---
+ src/netconfig.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-On 10/9/19 4:53 PM, Tim Kourt wrote:
-> Previously, station state 'connected' used to identify an interface assoc=
-iated
-> with AP. With the introduction of netconfig, an interface is assumed to be
-> connected after the IP addresses have been assigned to it. If netconfig is
-> disabled, the behavior remains unchanged.
-> ---
->   src/station.c | 41 +++++++++++++++++------------------------
->   1 file changed, 17 insertions(+), 24 deletions(-)
-> =
+diff --git a/src/netconfig.c b/src/netconfig.c
+index c48e25b1..c4785fb6 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -1111,9 +1111,6 @@ void netconfig_destroy(struct netconfig *netconfig)
+ 	if (netconfig->rtm_protocol)
+ 		netconfig_ipv4_select_and_uninstall(netconfig);
+ =
 
+-	if (netconfig->rtm_v6_protocol)
+-		netconfig_ipv6_select_and_uninstall(netconfig);
+-
+ 	if (netconfig->rtm_protocol || netconfig->rtm_v6_protocol)
+ 		resolve_remove(netconfig->ifindex);
+ =
 
-Applied, thanks.
+-- =
 
-Regards,
--Denis
+2.13.6
 
---===============7260510703533229484==--
+--===============8995383738483116510==--
 
