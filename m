@@ -1,116 +1,111 @@
-Content-Type: multipart/mixed; boundary="===============5586529934725462786=="
+Content-Type: multipart/mixed; boundary="===============2019207058307248724=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 04/12] anqp: utilize IWD_MODULE
-Date: Fri, 11 Oct 2019 12:29:25 -0700
-Message-ID: <20191011192933.13550-4-prestwoj@gmail.com>
+Subject: [PATCH v2 05/12] manager: remove white/black list from argument
+Date: Fri, 11 Oct 2019 12:29:26 -0700
+Message-ID: <20191011192933.13550-5-prestwoj@gmail.com>
 In-Reply-To: <20191011192933.13550-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5586529934725462786==
+--===============2019207058307248724==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This converts anqp into an IWD module.
+Instead we add getters for these lists that manager_init can use.
 ---
- src/anqp.c | 12 ++++++++----
- src/anqp.h |  3 ---
- src/main.c |  2 --
- 3 files changed, 8 insertions(+), 9 deletions(-)
+ src/iwd.h     |  6 ++++--
+ src/main.c    | 12 +++++++++++-
+ src/manager.c |  5 +++--
+ 3 files changed, 18 insertions(+), 5 deletions(-)
 
-diff --git a/src/anqp.c b/src/anqp.c
-index 9f006bd6..a47530ab 100644
---- a/src/anqp.c
-+++ b/src/anqp.c
-@@ -474,11 +474,11 @@ static void anqp_mlme_notify(struct l_genl_msg *msg, =
-void *user_data)
- 	}
- }
+diff --git a/src/iwd.h b/src/iwd.h
+index 7ae7e4b4..1fa1e25a 100644
+--- a/src/iwd.h
++++ b/src/iwd.h
+@@ -30,10 +30,12 @@ struct l_genl *iwd_get_genl(void);
  =
 
--bool anqp_init(struct l_genl_family *in)
-+static int anqp_init(void)
- {
- 	struct l_genl *genl =3D iwd_get_genl();
+ void netdev_shutdown(void);
  =
 
--	nl80211 =3D in;
-+	nl80211 =3D l_genl_family_new(genl, NL80211_GENL_NAME);
+-bool manager_init(struct l_genl_family *in,
+-			const char *if_whitelist, const char *if_blacklist);
++bool manager_init(struct l_genl_family *in);
+ void manager_exit(void);
  =
 
- 	anqp_requests =3D l_queue_new();
- =
-
-@@ -492,13 +492,14 @@ bool anqp_init(struct l_genl_family *in)
- 								NULL, NULL))
- 		l_error("Registering for MLME notification failed");
- =
-
--	return true;
-+	return 0;
- }
- =
-
--void anqp_exit(void)
-+static void anqp_exit(void)
- {
- 	struct l_genl *genl =3D iwd_get_genl();
- =
-
-+	l_genl_family_free(nl80211);
- 	nl80211 =3D NULL;
- =
-
- 	l_queue_destroy(anqp_requests, anqp_destroy);
-@@ -507,3 +508,6 @@ void anqp_exit(void)
- =
-
- 	l_genl_remove_unicast_watch(genl, unicast_watch);
- }
++const char *iwd_get_iface_whitelist(void);
++const char *iwd_get_iface_blacklist(void);
 +
-+IWD_MODULE(anqp, anqp_init, anqp_exit);
-+IWD_MODULE_DEPENDS(anqp, netdev);
-diff --git a/src/anqp.h b/src/anqp.h
-index 62d097d1..998277dd 100644
---- a/src/anqp.h
-+++ b/src/anqp.h
-@@ -38,6 +38,3 @@ uint32_t anqp_request(uint32_t ifindex, const uint8_t *ad=
-dr,
- 			struct scan_bss *bss, const uint8_t *anqp, size_t len,
- 			anqp_response_func_t cb, void *user_data,
- 			anqp_destroy_func_t destroy);
--
--bool anqp_init(struct l_genl_family *in);
--void anqp_exit(void);
+ struct iwd_module_desc {
+ 	const char *name;
+ 	int (*init)(void);
 diff --git a/src/main.c b/src/main.c
-index 1acee95e..08bf38a3 100644
+index 08bf38a3..d4915412 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -155,7 +155,6 @@ static void nl80211_appeared(const struct l_genl_family=
+@@ -102,6 +102,16 @@ struct l_genl *iwd_get_genl(void)
+ 	return genl;
+ }
+ =
+
++const char *iwd_get_iface_whitelist(void)
++{
++	return interfaces;
++}
++
++const char *iwd_get_iface_blacklist(void)
++{
++	return nointerfaces;
++}
++
+ static void usage(void)
+ {
+ 	printf("iwd - Wireless daemon\n"
+@@ -154,7 +164,7 @@ static void nl80211_appeared(const struct l_genl_family=
 _info *info,
+ =
+
  	plugin_init(plugins, noplugins);
  =
 
- 	manager_init(nl80211, interfaces, nointerfaces);
--	anqp_init(nl80211);
+-	manager_init(nl80211, interfaces, nointerfaces);
++	manager_init(nl80211);
  =
 
  	if (!wiphy_init(nl80211, phys, nophys))
  		l_error("Unable to init wiphy functionality");
-@@ -492,7 +491,6 @@ int main(int argc, char *argv[])
+diff --git a/src/manager.c b/src/manager.c
+index 1a04b071..e731cf9d 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -584,14 +584,15 @@ static void manager_config_notify(struct l_genl_msg *=
+msg, void *user_data)
+ 	}
+ }
  =
 
- 	if (nl80211) {
- 		manager_exit();
--		anqp_exit();
- 		wiphy_exit();
- 		l_genl_family_free(nl80211);
- 	}
+-bool manager_init(struct l_genl_family *in,
+-			const char *if_whitelist, const char *if_blacklist)
++bool manager_init(struct l_genl_family *in)
+ {
+ 	const struct l_settings *config =3D iwd_get_config();
+ 	struct l_genl_msg *msg;
+ 	unsigned int wiphy_dump;
+ 	unsigned int interface_dump;
+ 	const char *randomize_str;
++	const char *if_whitelist =3D iwd_get_iface_whitelist();
++	const char *if_blacklist =3D iwd_get_iface_blacklist();
+ =
+
+ 	nl80211 =3D in;
+ =
+
 -- =
 
 2.17.1
 
---===============5586529934725462786==--
+--===============2019207058307248724==--
 
