@@ -1,217 +1,128 @@
-Content-Type: multipart/mixed; boundary="===============2255103859445242511=="
+Content-Type: multipart/mixed; boundary="===============4950980744305591397=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 07/11] wiphy: utilize IWD_MODULE
-Date: Fri, 11 Oct 2019 10:24:13 -0700
-Message-ID: <20191011172417.23328-7-prestwoj@gmail.com>
+Subject: [PATCH 08/11] eap: remove mtu argument from eap_init
+Date: Fri, 11 Oct 2019 10:24:14 -0700
+Message-ID: <20191011172417.23328-8-prestwoj@gmail.com>
 In-Reply-To: <20191011172417.23328-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2255103859445242511==
+--===============4950980744305591397==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This converts wiphy into an IWD module. nl80211 was completely removed
-from main.c as it is no longer passed with manager or wiphy.
+This was refactored to set the mtu via __eap_set_config rather than
+passing the MTU into eap_init. This makes eap work in a similar fashion
+as eapol (i.e. __eapol_set_config).
+
+If __eap_set_config is not used, the MTU will be set to 1020, which is
+the same as previously passing 0 to eap_init.
 ---
- src/iwd.h   |  2 ++
- src/main.c  | 25 ++++++++++++++-----------
- src/wiphy.c | 20 ++++++++++++--------
- src/wiphy.h |  4 ----
- 4 files changed, 28 insertions(+), 23 deletions(-)
+ src/eap.c  | 12 ++++++++----
+ src/eap.h  |  4 +++-
+ src/main.c |  7 ++-----
+ 3 files changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/src/iwd.h b/src/iwd.h
-index 8814c244..1b64e5a7 100644
---- a/src/iwd.h
-+++ b/src/iwd.h
-@@ -32,6 +32,8 @@ void netdev_shutdown(void);
+diff --git a/src/eap.c b/src/eap.c
+index f605f432..b0fa72cf 100644
+--- a/src/eap.c
++++ b/src/eap.c
+@@ -676,6 +676,12 @@ int eap_unregister_method(struct eap_method *method)
+ 	return -ENOENT;
+ }
  =
 
- const char *iwd_get_iface_whitelist(void);
- const char *iwd_get_iface_blacklist(void);
-+const char *iwd_get_phy_whitelist(void);
-+const char *iwd_get_phy_blacklist(void);
++void __eap_set_config(struct l_settings *config)
++{
++	if (!l_settings_get_uint(config, "EAP", "mtu", &default_mtu))
++		default_mtu =3D 1400; /* on WiFi the real MTU is around 2304 */
++}
++
+ static void __eap_method_enable(struct eap_method_desc *start,
+ 					struct eap_method_desc *stop)
+ {
+@@ -715,7 +721,7 @@ static void __eap_method_disable(struct eap_method_desc=
+ *start,
+ extern struct eap_method_desc __start___eap[];
+ extern struct eap_method_desc __stop___eap[];
  =
 
- struct iwd_module_desc {
- 	const char *name;
+-void eap_init(uint32_t mtu)
++void eap_init(void)
+ {
+ 	eap_methods =3D l_queue_new();
+ 	__eap_method_enable(__start___eap, __stop___eap);
+@@ -725,10 +731,8 @@ void eap_init(uint32_t mtu)
+ 	 * EAP is capable of functioning on lower layers that
+ 	 *        provide an EAP MTU size of 1020 octets or greater.
+ 	 */
+-	if (mtu =3D=3D 0)
++	if (default_mtu =3D=3D 0)
+ 		default_mtu =3D 1020;
+-	else
+-		default_mtu =3D mtu;
+ }
+ =
+
+ void eap_exit(void)
+diff --git a/src/eap.h b/src/eap.h
+index de939cdc..8f128304 100644
+--- a/src/eap.h
++++ b/src/eap.h
+@@ -93,5 +93,7 @@ const char *eap_get_identity(struct eap_state *eap);
+ =
+
+ void eap_rx_packet(struct eap_state *eap, const uint8_t *pkt, size_t len);
+ =
+
+-void eap_init(uint32_t default_mtu);
++void __eap_set_config(struct l_settings *config);
++
++void eap_init(void);
+ void eap_exit(void);
 diff --git a/src/main.c b/src/main.c
-index 4b114efd..9d0da143 100644
+index 9d0da143..7123f7a9 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -46,7 +46,6 @@
- #include "src/backtrace.h"
+@@ -365,7 +365,6 @@ int main(int argc, char *argv[])
+ 	struct l_dbus *dbus;
+ 	const char *config_dir;
+ 	char **config_dirs;
+-	uint32_t eap_mtu;
+ 	int i;
  =
 
- static struct l_genl *genl;
--static struct l_genl_family *nl80211;
- static struct l_settings *iwd_config;
- static struct l_timeout *timeout;
- static const char *interfaces;
-@@ -57,6 +56,7 @@ static const char *plugins;
- static const char *noplugins;
- static const char *debugopt;
- static bool terminating;
-+static bool nl80211_complete;
+ 	for (;;) {
+@@ -463,9 +462,7 @@ int main(int argc, char *argv[])
+ 	l_strv_free(config_dirs);
  =
 
- static void main_loop_quit(struct l_timeout *timeout, void *user_data)
- {
-@@ -70,7 +70,7 @@ static void iwd_shutdown(void)
- =
-
- 	terminating =3D true;
- =
-
--	if (!nl80211) {
-+	if (!nl80211_complete) {
- 		l_main_quit();
- 		return;
- 	}
-@@ -112,6 +112,16 @@ const char *iwd_get_iface_blacklist(void)
- 	return nointerfaces;
- }
- =
-
-+const char *iwd_get_phy_whitelist(void)
-+{
-+	return phys;
-+}
-+
-+const char *iwd_get_phy_blacklist(void)
-+{
-+	return nophys;
-+}
-+
- static void usage(void)
- {
- 	printf("iwd - Wireless daemon\n"
-@@ -155,15 +165,13 @@ static void nl80211_appeared(const struct l_genl_fami=
-ly_info *info,
- 							void *user_data)
- {
- 	l_debug("Found nl80211 interface");
--	nl80211 =3D l_genl_family_new(genl, NL80211_GENL_NAME);
-+
-+	nl80211_complete =3D true;
- =
-
- 	if (iwd_modules_init() < 0) {
- 		l_main_quit();
- 		return;
- 	}
+ 	__eapol_set_config(iwd_config);
 -
--	if (!wiphy_init(nl80211, phys, nophys))
--		l_error("Unable to init wiphy functionality");
- }
+-	if (!l_settings_get_uint(iwd_config, "EAP", "mtu", &eap_mtu))
+-		eap_mtu =3D 1400; /* on WiFi the real MTU is around 2304 */
++	__eap_set_config(iwd_config);
  =
 
- static void request_name_callback(struct l_dbus *dbus, bool success,
-@@ -496,11 +504,6 @@ int main(int argc, char *argv[])
+ 	exit_status =3D EXIT_FAILURE;
  =
 
- 	eap_exit();
+@@ -494,7 +491,7 @@ int main(int argc, char *argv[])
+ 	l_dbus_set_disconnect_handler(dbus, dbus_disconnected, NULL, NULL);
+ 	dbus_init(dbus);
  =
 
--	if (nl80211) {
--		wiphy_exit();
--		l_genl_family_free(nl80211);
--	}
--
- 	dbus_exit();
- 	l_dbus_destroy(dbus);
- 	storage_cleanup_dirs();
-diff --git a/src/wiphy.c b/src/wiphy.c
-index b672afd4..169631af 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -1150,12 +1150,16 @@ static void setup_wiphy_interface(struct l_dbus_int=
-erface *interface)
- 					NULL);
- }
+-	eap_init(eap_mtu);
++	eap_init();
  =
 
--bool wiphy_init(struct l_genl_family *in, const char *whitelist,
--							const char *blacklist)
-+static int wiphy_init(void)
- {
-+	struct l_genl *genl =3D iwd_get_genl();
- 	const struct l_settings *config =3D iwd_get_config();
- 	const char *s =3D l_settings_get_value(config, "General",
- 							"mac_randomize_bytes");
-+	const char *whitelist =3D iwd_get_phy_whitelist();
-+	const char *blacklist =3D iwd_get_phy_blacklist();
-+
-+	nl80211 =3D l_genl_family_new(genl, NL80211_GENL_NAME);
- =
-
- 	if (s && !strcmp(s, "nic"))
- 		mac_randomize_bytes =3D 3;
-@@ -1169,8 +1173,6 @@ bool wiphy_init(struct l_genl_family *in, const char =
-*whitelist,
- 		l_queue_destroy(wiphy_list, NULL);
- 	}
- =
-
--	nl80211 =3D in;
--
- 	wiphy_list =3D l_queue_new();
- =
-
- 	rfkill_watch_add(wiphy_rfkill_cb, NULL);
-@@ -1190,10 +1192,10 @@ bool wiphy_init(struct l_genl_family *in, const cha=
-r *whitelist,
- 	if (blacklist)
- 		blacklist_filter =3D l_strsplit(blacklist, ',');
- =
-
--	return true;
-+	return 0;
- }
- =
-
--bool wiphy_exit(void)
-+static void wiphy_exit(void)
- {
- 	l_strfreev(whitelist_filter);
- 	l_strfreev(blacklist_filter);
-@@ -1201,12 +1203,14 @@ bool wiphy_exit(void)
- 	l_queue_destroy(wiphy_list, wiphy_free);
- 	wiphy_list =3D NULL;
- =
-
-+	l_genl_family_free(nl80211);
- 	nl80211 =3D NULL;
- 	mac_randomize_bytes =3D 6;
- =
-
- 	l_dbus_unregister_interface(dbus_get_bus(), IWD_WIPHY_INTERFACE);
- =
-
- 	l_hwdb_unref(hwdb);
--
--	return true;
- }
-+
-+IWD_MODULE(wiphy, wiphy_init, wiphy_exit);
-+IWD_MODULE_DEPENDS(wiphy, rfkill);
-diff --git a/src/wiphy.h b/src/wiphy.h
-index 10cf5373..61e1caf8 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -81,7 +81,3 @@ uint32_t wiphy_state_watch_add(struct wiphy *wiphy,
- 				wiphy_state_watch_func_t func, void *user_data,
- 				wiphy_destroy_func_t destroy);
- bool wiphy_state_watch_remove(struct wiphy *wiphy, uint32_t id);
--
--bool wiphy_init(struct l_genl_family *in, const char *whitelist,
--							const char *blacklist);
--bool wiphy_exit(void);
+ 	plugin_init(plugins, noplugins);
+ 	exit_status =3D l_main_run_with_signal(signal_handler, NULL);
 -- =
 
 2.17.1
 
---===============2255103859445242511==--
+--===============4950980744305591397==--
 
