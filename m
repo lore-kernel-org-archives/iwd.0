@@ -1,126 +1,106 @@
-Content-Type: multipart/mixed; boundary="===============3294049971809999899=="
+Content-Type: multipart/mixed; boundary="===============5366849282786347933=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 10/11] unit: update wsc/eapol with new eap_init
-Date: Fri, 11 Oct 2019 10:24:16 -0700
-Message-ID: <20191011172417.23328-10-prestwoj@gmail.com>
+Subject: [PATCH 11/11] eap: utilize IWD_MODULE
+Date: Fri, 11 Oct 2019 10:24:17 -0700
+Message-ID: <20191011172417.23328-11-prestwoj@gmail.com>
 In-Reply-To: <20191011172417.23328-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3294049971809999899==
+--===============5366849282786347933==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-test-eapol was passing zero as the MTU, so this simply needed to be
-updated to remove that parameter.
-
-test-wsc was actually setting a MTU value so when building the
-settings we now add the proper value so the MTU can be set with
-__eap_set_config.
+Converts eap into an IWD module.
 ---
- unit/test-eapol.c | 4 ++--
- unit/test-wsc.c   | 8 ++++++--
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ src/eap.c  | 7 ++++++-
+ src/eap.h  | 2 +-
+ src/main.c | 4 ----
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/unit/test-eapol.c b/unit/test-eapol.c
-index 177b2577..f7099e6d 100644
---- a/unit/test-eapol.c
-+++ b/unit/test-eapol.c
-@@ -2912,7 +2912,7 @@ static void eapol_sm_test_tls(struct eapol_8021x_tls_=
-test_state *s,
- 	aa =3D ap_address;
- 	spa =3D sta_address;
+diff --git a/src/eap.c b/src/eap.c
+index b0fa72cf..23868811 100644
+--- a/src/eap.c
++++ b/src/eap.c
+@@ -33,6 +33,7 @@
+ #include "src/missing.h"
+ #include "src/eap.h"
+ #include "src/eap-private.h"
++#include "src/iwd.h"
  =
 
--	eap_init(0);
-+	eap_init();
- 	eapol_init();
- 	__handshake_set_get_nonce_func(test_nonce);
+ static uint32_t default_mtu;
+ static struct l_queue *eap_methods;
+@@ -721,7 +722,7 @@ static void __eap_method_disable(struct eap_method_desc=
+ *start,
+ extern struct eap_method_desc __start___eap[];
+ extern struct eap_method_desc __stop___eap[];
  =
 
-@@ -3375,7 +3375,7 @@ static void eapol_sm_test_eap_nak(const void *data)
- 	aa =3D ap_address;
- 	spa =3D sta_address;
+-void eap_init(void)
++int eap_init(void)
+ {
+ 	eap_methods =3D l_queue_new();
+ 	__eap_method_enable(__start___eap, __stop___eap);
+@@ -733,6 +734,8 @@ void eap_init(void)
+ 	 */
+ 	if (default_mtu =3D=3D 0)
+ 		default_mtu =3D 1020;
++
++	return 0;
+ }
  =
 
--	eap_init(0);
-+	eap_init();
- 	eapol_init();
- 	__handshake_set_get_nonce_func(test_nonce);
+ void eap_exit(void)
+@@ -740,3 +743,5 @@ void eap_exit(void)
+ 	__eap_method_disable(__start___eap, __stop___eap);
+ 	l_queue_destroy(eap_methods, NULL);
+ }
++
++IWD_MODULE(eap, eap_init, eap_exit);
+diff --git a/src/eap.h b/src/eap.h
+index 8f128304..8b2de8c9 100644
+--- a/src/eap.h
++++ b/src/eap.h
+@@ -95,5 +95,5 @@ void eap_rx_packet(struct eap_state *eap, const uint8_t *=
+pkt, size_t len);
  =
 
-diff --git a/unit/test-wsc.c b/unit/test-wsc.c
-index b1a6d786..b4814622 100644
---- a/unit/test-wsc.c
-+++ b/unit/test-wsc.c
-@@ -1989,7 +1989,7 @@ static void wsc_test_pbc_handshake(const void *data)
- 	char *hex;
- 	struct l_settings *settings;
+ void __eap_set_config(struct l_settings *config);
  =
 
--	eap_init(1400);
-+	eap_init();
- 	eapol_init();
+-void eap_init(void);
++int eap_init(void);
+ void eap_exit(void);
+diff --git a/src/main.c b/src/main.c
+index 7123f7a9..9c5ab9ac 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -491,16 +491,12 @@ int main(int argc, char *argv[])
+ 	l_dbus_set_disconnect_handler(dbus, dbus_disconnected, NULL, NULL);
+ 	dbus_init(dbus);
  =
 
- 	hs =3D test_handshake_state_new(1);
-@@ -2006,6 +2006,7 @@ static void wsc_test_pbc_handshake(const void *data)
- 	eapol_sm_set_event_func(sm, verify_credential);
+-	eap_init();
+-
+ 	plugin_init(plugins, noplugins);
+ 	exit_status =3D l_main_run_with_signal(signal_handler, NULL);
+ 	plugin_exit();
  =
 
- 	settings =3D l_settings_new();
-+	l_settings_set_uint(settings, "EAP", "mtu", 1400);
- 	l_settings_set_string(settings, "Security", "EAP-Identity",
- 					"WFA-SimpleConfig-Enrollee-1-0");
- 	l_settings_set_string(settings, "Security", "EAP-Method", "WSC");
-@@ -2039,6 +2040,7 @@ static void wsc_test_pbc_handshake(const void *data)
- 	l_settings_set_string(settings, "WSC", "IV2",
- 					"4e3a4cf088176989e148d4c10b96e8fd");
+ 	iwd_modules_exit();
  =
 
-+	__eap_set_config(settings);
- 	handshake_state_set_8021x_config(hs, settings);
- 	eapol_start(sm);
- =
-
-@@ -2097,7 +2099,7 @@ static void wsc_test_retransmission_no_fragmentation(=
-const void *data)
- 	char *hex;
- 	struct l_settings *settings;
- =
-
--	eap_init(1400);
-+	eap_init();
- 	eapol_init();
- =
-
- 	hs =3D test_handshake_state_new(1);
-@@ -2114,6 +2116,7 @@ static void wsc_test_retransmission_no_fragmentation(=
-const void *data)
- 	eapol_sm_set_event_func(sm, verify_credential);
- =
-
- 	settings =3D l_settings_new();
-+	l_settings_set_uint(settings, "EAP", "mtu", 1400);
- 	l_settings_set_string(settings, "Security", "EAP-Identity",
- 					"WFA-SimpleConfig-Enrollee-1-0");
- 	l_settings_set_string(settings, "Security", "EAP-Method", "WSC");
-@@ -2147,6 +2150,7 @@ static void wsc_test_retransmission_no_fragmentation(=
-const void *data)
- 	l_settings_set_string(settings, "WSC", "IV2",
- 					"4e3a4cf088176989e148d4c10b96e8fd");
- =
-
-+	__eap_set_config(settings);
- 	handshake_state_set_8021x_config(hs, settings);
- 	eapol_start(sm);
- =
-
+-	eap_exit();
+-
+ 	dbus_exit();
+ 	l_dbus_destroy(dbus);
+ 	storage_cleanup_dirs();
 -- =
 
 2.17.1
 
---===============3294049971809999899==--
+--===============5366849282786347933==--
 
