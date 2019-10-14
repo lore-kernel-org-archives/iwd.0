@@ -1,49 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============0763837326741469389=="
+Content-Type: multipart/mixed; boundary="===============6993047152695182961=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 01/12] main: move module init into nl80211_appeared
-Date: Fri, 11 Oct 2019 15:49:28 -0500
-Message-ID: <ebc85cc8-8d89-90ac-b6b7-05cac1372e41@gmail.com>
-In-Reply-To: <20191011192933.13550-1-prestwoj@gmail.com>
+From: Florian Klink <flokli@flokli.de>
+Subject: [PATCH] doc: fix typo systemd->system
+Date: Mon, 14 Oct 2019 23:11:57 +0200
+Message-ID: <20191014211157.26340-1-flokli@flokli.de>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0763837326741469389==
+--===============6993047152695182961==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Even though this is equal on most distros, we're not quite there yet.
+---
+ src/iwd.conf.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 10/11/19 2:29 PM, James Prestwood wrote:
-> In preparation for integrating IWD_MODULE into modules which require
-> nl80211 we move the module init into the nl80211_appeared callback.
-> This will guarentee that the nl80211 is available during module init
-> and allow modules to get their own copy of nl80211 rather than needing
-> a set function (e.g. netdev_set_nl80211).
-> =
+diff --git a/src/iwd.conf.rst b/src/iwd.conf.rst
+index 34d54df0..e70eedf1 100644
+--- a/src/iwd.conf.rst
++++ b/src/iwd.conf.rst
+@@ -21,7 +21,7 @@ SYNOPSIS
+ DESCRIPTION
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ =
 
-> Since the dbus name request callback happens before this as well any
-> dbus module can also use IWD_MODULE and simply assume the dbus object
-> is ready.
-> =
+-The /etc/iwd/main.conf file configures the systemd-wide settings for iwd(8)
++The /etc/iwd/main.conf file configures the system-wide settings for iwd(8).
+ =
 
-> plugin_init was also deferred to nl80211_appeared since some plugins
-> depend on modules being initialized.
-> ---
->   src/main.c | 12 +++++++-----
->   1 file changed, 7 insertions(+), 5 deletions(-)
-> =
+ SEE ALSO
+ =3D=3D=3D=3D=3D=3D=3D=3D
+-- =
 
-> -v2:
->   * Moved plugin_init after iwd_modules_init
-> =
+2.23.0
 
-
-All applied, thanks.
-
-Regards,
--Denis
-
---===============0763837326741469389==--
+--===============6993047152695182961==--
 
