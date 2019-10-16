@@ -1,40 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============1248789649708806464=="
+Content-Type: multipart/mixed; boundary="===============4376141321972302940=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 09/10] owe: fix potential uninitialized variable
-Date: Wed, 16 Oct 2019 15:29:52 -0700
-Message-ID: <20191016222953.513-9-prestwoj@gmail.com>
+Subject: [PATCH 10/10] sae: check return getting k_point
+Date: Wed, 16 Oct 2019 15:29:53 -0700
+Message-ID: <20191016222953.513-10-prestwoj@gmail.com>
 In-Reply-To: <20191016222953.513-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1248789649708806464==
+--===============4376141321972302940==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/owe.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/sae.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/src/owe.c b/src/owe.c
-index 9fff986f..afdd32ea 100644
---- a/src/owe.c
-+++ b/src/owe.c
-@@ -246,7 +246,7 @@ static int owe_rx_associate(struct auth_proto *ap, cons=
-t uint8_t *frame,
- 	size_t owe_dh_len =3D 0;
- 	const uint8_t *owe_dh =3D NULL;
- 	struct ie_rsn_info info;
--	bool akm_found;
-+	bool akm_found =3D false;
- 	const void *data;
+diff --git a/src/sae.c b/src/sae.c
+index 8f9425f1..232a63b9 100644
+--- a/src/sae.c
++++ b/src/sae.c
+@@ -498,6 +498,9 @@ static int sae_process_commit(struct sae_sm *sm, const =
+uint8_t *from,
  =
 
- 	mpdu =3D mpdu_validate(frame, len);
+ 	l_ecc_point_free(k_point);
+ =
+
++	if (klen < 0)
++		goto reject;
++
+ 	/* keyseed =3D H(<0>32, k) */
+ 	hmac_sha256(zero_key, 32, k, klen, keyseed, 32);
+ =
+
 -- =
 
 2.17.1
 
---===============1248789649708806464==--
+--===============4376141321972302940==--
 
