@@ -1,31 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============1865320795051078829=="
+Content-Type: multipart/mixed; boundary="===============5590538197177216614=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] scan: Address uninitialized scalars reported by coverity
-Date: Wed, 16 Oct 2019 16:35:28 -0500
-Message-ID: <d9218949-ecae-a0c5-3b7e-a76abac9b303@gmail.com>
-In-Reply-To: <20191015174019.13088-1-tim.a.kourt@linux.intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 01/10] anqp: fix potential NULL pointer dereference
+Date: Wed, 16 Oct 2019 15:29:44 -0700
+Message-ID: <20191016222953.513-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1865320795051078829==
+--===============5590538197177216614==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+---
+ src/anqp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 10/15/19 12:40 PM, Tim Kourt wrote:
-> ---
->   src/scan.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+diff --git a/src/anqp.c b/src/anqp.c
+index a47530ab..5e867656 100644
+--- a/src/anqp.c
++++ b/src/anqp.c
+@@ -287,6 +287,9 @@ uint32_t anqp_request(uint32_t ifindex, const uint8_t *=
+addr,
+ 	uint32_t duration =3D 300;
+ 	struct netdev *netdev =3D netdev_find(ifindex);
+ =
 
-I fixed this slightly differently, see commit =
++	if (!netdev)
++		return 0;
++
+ 	/*
+ 	 * TODO: Netdev dependencies will eventually be removed so we need
+ 	 * another way to figure out wiphy capabilities.
+-- =
 
-269377c92f96a7e127694fd0f659262463426edf.  Please review.
+2.17.1
 
-Regards,
--Denis
-
---===============1865320795051078829==--
+--===============5590538197177216614==--
 
