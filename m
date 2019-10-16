@@ -1,57 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============6003208005901007581=="
+Content-Type: multipart/mixed; boundary="===============0334805612710677386=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 05/10] hotspot: fix multiple potential memory leaks
-Date: Wed, 16 Oct 2019 18:18:34 -0500
-Message-ID: <f966bfa8-d847-8820-14d5-804aa6f10197@gmail.com>
-In-Reply-To: <20191016222953.513-5-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] hotspot: fix multiple potential memory leaks
+Date: Wed, 16 Oct 2019 16:18:44 -0700
+Message-ID: <20191016231844.11259-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6003208005901007581==
+--===============0334805612710677386==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ src/hotspot.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-On 10/16/19 5:29 PM, James Prestwood wrote:
-> ---
->   src/hotspot.c | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
-> =
+-v2:
+ * Just fail if HESSID doesn't parse
 
-> diff --git a/src/hotspot.c b/src/hotspot.c
-> index 20ebb2fd..1a783958 100644
-> --- a/src/hotspot.c
-> +++ b/src/hotspot.c
-> @@ -342,7 +342,11 @@ static struct hs20_config *hs20_config_new(struct l_=
-settings *settings,
->   	config =3D l_new(struct hs20_config, 1);
->   =
+diff --git a/src/hotspot.c b/src/hotspot.c
+index 20ebb2fd..e3a7a07a 100644
+--- a/src/hotspot.c
++++ b/src/hotspot.c
+@@ -342,7 +342,11 @@ static struct hs20_config *hs20_config_new(struct l_se=
+ttings *settings,
+ 	config =3D l_new(struct hs20_config, 1);
+ =
 
->   	if (hessid_str) {
-> -		util_string_to_address(hessid_str, config->hessid);
-> +		if (!util_string_to_address(hessid_str, config->hessid)) {
-> +			l_error("Invalid HESSID in settings");
-> +			memset(config->hessid, 0, 6);
+ 	if (hessid_str) {
+-		util_string_to_address(hessid_str, config->hessid);
++		if (!util_string_to_address(hessid_str, config->hessid)) {
++			l_error("Invalid HESSID in settings");
++			goto free_values;
++		}
++
+ 		l_free(hessid_str);
+ 	}
+ =
 
-Why the memset?  Also, shouldn't we fail here?  Or at the very least =
+@@ -423,6 +427,8 @@ static void hs20_dir_watch_cb(const char *filename,
+ =
 
-delay checking the presence of hessid || nai_realms || rc_str until =
+ 		l_queue_push_head(hs20_settings, config);
+ =
 
-after the parsing has been validated?
++		l_settings_free(new);
++
+ 		break;
+ 	case L_DIR_WATCH_EVENT_REMOVED:
+ 		config =3D l_queue_remove_if(hs20_settings, match_filename,
+@@ -453,6 +459,8 @@ static void hs20_dir_watch_cb(const char *filename,
+ =
 
-> +		}
-> +
->   		l_free(hessid_str);
->   	}
->   =
+ 		known_network_update(&config->super, new, connected_time);
+ =
 
++		l_settings_free(new);
++
+ 		break;
+ 	case L_DIR_WATCH_EVENT_ACCESSED:
+ 		break;
+-- =
 
-Also this seems to be unrelated to the patch description?
+2.17.1
 
-Regards,
--Denis
---===============6003208005901007581==--
+--===============0334805612710677386==--
 
