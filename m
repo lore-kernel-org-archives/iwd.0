@@ -1,31 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============4516237221586366761=="
+Content-Type: multipart/mixed; boundary="===============3023888995107363076=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v3 1/2] hotspot: fix multiple potential memory leaks
-Date: Wed, 16 Oct 2019 18:35:11 -0500
-Message-ID: <0475b353-de67-9d63-fb50-160ef7955bdf@gmail.com>
-In-Reply-To: <20191016232151.11778-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v4] hotspot: check if HESSID parses correctly
+Date: Wed, 16 Oct 2019 16:36:30 -0700
+Message-ID: <20191016233630.14291-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4516237221586366761==
+--===============3023888995107363076==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ src/hotspot.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-On 10/16/19 6:21 PM, James Prestwood wrote:
-> ---
->   src/hotspot.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> =
+diff --git a/src/hotspot.c b/src/hotspot.c
+index ad8af37c..60a2e2de 100644
+--- a/src/hotspot.c
++++ b/src/hotspot.c
+@@ -342,7 +342,12 @@ static struct hs20_config *hs20_config_new(struct l_se=
+ttings *settings,
+ 	config =3D l_new(struct hs20_config, 1);
+ =
 
+ 	if (hessid_str) {
+-		util_string_to_address(hessid_str, config->hessid);
++		if (!util_string_to_address(hessid_str, config->hessid)) {
++			l_error("Invalid HESSID in settings");
++			l_free(config);
++			goto free_values;
++		}
++
+ 		l_free(hessid_str);
+ 	}
+ =
 
-Applied, thanks.
+-- =
 
-Regards,
--Denis
+2.17.1
 
---===============4516237221586366761==--
+--===============3023888995107363076==--
 
