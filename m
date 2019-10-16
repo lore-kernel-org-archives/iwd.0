@@ -1,31 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============6242893992350261689=="
+Content-Type: multipart/mixed; boundary="===============8460954434624474128=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v4] hotspot: check if HESSID parses correctly
-Date: Wed, 16 Oct 2019 18:40:47 -0500
-Message-ID: <208f0ce4-a04f-3c48-edc0-a7b4f89e49ad@gmail.com>
-In-Reply-To: <20191016233630.14291-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/4] util: add bounds check to util_get_{domain,username}
+Date: Wed, 16 Oct 2019 16:43:01 -0700
+Message-ID: <20191016234304.14716-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6242893992350261689==
+--===============8460954434624474128==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ src/util.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 10/16/19 6:36 PM, James Prestwood wrote:
-> ---
->   src/hotspot.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
-> =
+diff --git a/src/util.c b/src/util.c
+index f787ce6b..f1860a33 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -176,7 +176,7 @@ const char *util_get_domain(const char *identity)
+ 			strncpy(domain, identity, c - identity);
+ 			return domain;
+ 		case '@':
+-			strcpy(domain, c + 1);
++			strncpy(domain, c + 1, sizeof(domain));
+ 			return domain;
+ 		default:
+ 			continue;
+@@ -197,7 +197,7 @@ const char *util_get_username(const char *identity)
+ 	for (c =3D identity; *c; c++) {
+ 		switch (*c) {
+ 		case '\\':
+-			strcpy(username, c + 1);
++			strncpy(username, c + 1, sizeof(username));
+ 			return username;
+ 		case '@':
+ 			strncpy(username, identity, c - identity);
+-- =
 
+2.17.1
 
-Applied, thanks.
-
-Regards,
--Denis
-
---===============6242893992350261689==--
+--===============8460954434624474128==--
 
