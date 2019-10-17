@@ -1,56 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============4464935356000166398=="
+Content-Type: multipart/mixed; boundary="===============7377812861829680720=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3] util: add bounds check to util_get_{domain,username}
-Date: Thu, 17 Oct 2019 09:12:12 -0700
-Message-ID: <20191017161212.22073-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v3] util: add bounds check to util_get_{domain,username}
+Date: Thu, 17 Oct 2019 11:23:28 -0500
+Message-ID: <9cc04c14-c03b-6de3-2b91-bcea9ee6001c@gmail.com>
+In-Reply-To: <20191017161212.22073-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4464935356000166398==
+--===============7377812861829680720==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Two cases were using strcpy, and the other two were using strncpy.
-Instead all cases can use l_strlcpy which guarentees NULL termination.
----
- src/util.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Hi James,
 
-diff --git a/src/util.c b/src/util.c
-index f787ce6b..a38dd380 100644
---- a/src/util.c
-+++ b/src/util.c
-@@ -173,10 +173,10 @@ const char *util_get_domain(const char *identity)
- 	for (c =3D identity; *c; c++) {
- 		switch (*c) {
- 		case '\\':
--			strncpy(domain, identity, c - identity);
-+			memcpy(domain, identity, c - identity);
- 			return domain;
- 		case '@':
--			strcpy(domain, c + 1);
-+			l_strlcpy(domain, c + 1, sizeof(domain));
- 			return domain;
- 		default:
- 			continue;
-@@ -197,10 +197,10 @@ const char *util_get_username(const char *identity)
- 	for (c =3D identity; *c; c++) {
- 		switch (*c) {
- 		case '\\':
--			strcpy(username, c + 1);
-+			l_strlcpy(username, c + 1, sizeof(username));
- 			return username;
- 		case '@':
--			strncpy(username, identity, c - identity);
-+			memcpy(username, identity, c - identity);
- 			return username;
- 		default:
- 			continue;
--- =
+On 10/17/19 11:12 AM, James Prestwood wrote:
+> Two cases were using strcpy, and the other two were using strncpy.
+> Instead all cases can use l_strlcpy which guarentees NULL termination.
+> ---
+>   src/util.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> =
 
-2.17.1
 
---===============4464935356000166398==--
+I split this up into two commits and reworked the commit descriptions a bit.
+
+Applied, thanks.
+
+Regards,
+-Denis
+
+--===============7377812861829680720==--
 
