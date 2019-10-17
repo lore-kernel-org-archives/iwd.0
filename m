@@ -1,35 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============7377812861829680720=="
+Content-Type: multipart/mixed; boundary="===============1058404962837701844=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v3] util: add bounds check to util_get_{domain,username}
-Date: Thu, 17 Oct 2019 11:23:28 -0500
-Message-ID: <9cc04c14-c03b-6de3-2b91-bcea9ee6001c@gmail.com>
-In-Reply-To: <20191017161212.22073-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] eapol: do not parse RSN for WPA1 in 1 of 4
+Date: Thu, 17 Oct 2019 16:43:16 -0700
+Message-ID: <20191017234316.4271-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7377812861829680720==
+--===============1058404962837701844==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+A recent change checked the return value of ie_parse_rsne_from_data
+inside the ptk 1/4 handler. This seemed safe, but actually caused
+the eapol unit test to fail.
 
-On 10/17/19 11:12 AM, James Prestwood wrote:
-> Two cases were using strcpy, and the other two were using strncpy.
-> Instead all cases can use l_strlcpy which guarentees NULL termination.
-> ---
->   src/util.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
-> =
+The reason was because eapol was parsing the IEs assuming they were
+an RSN, when they could be a WPA IE (WPA1 not WPA2). The WPA case
+does not end up using the rsn_info at all, so having rsn_info
+uninitialized did not pose a problem. After adding the return value
+check it was found this fails every time for WPA1.
 
+Since the rsn_info is not needed for WPA1 we can only do the RSN
+parse for WPA2 and leave rsn_info uninitialized.
+---
+ src/eapol.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-I split this up into two commits and reworked the commit descriptions a bit.
+diff --git a/src/eapol.c b/src/eapol.c
+index 6f04dbc5..349e824f 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -1106,8 +1106,11 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm =
+*sm,
+ 	pmkid =3D handshake_util_find_pmkid_kde(EAPOL_KEY_DATA(ek, sm->mic_len),
+ 					EAPOL_KEY_DATA_LEN(ek, sm->mic_len));
+ =
 
-Applied, thanks.
+-	if (ie_parse_rsne_from_data(own_ie, own_ie[1] + 2, &rsn_info) < 0)
+-		goto error_unspecified;
++	if (!sm->handshake->wpa_ie) {
++		if (ie_parse_rsne_from_data(own_ie, own_ie[1] + 2,
++						&rsn_info) < 0)
++			goto error_unspecified;
++	}
+ =
 
-Regards,
--Denis
+ 	/*
+ 	 * Require the PMKID KDE whenever we've sent a list of PMKIDs in
+-- =
 
---===============7377812861829680720==--
+2.17.1
+
+--===============1058404962837701844==--
 
