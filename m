@@ -1,135 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============5979472381061653383=="
+Content-Type: multipart/mixed; boundary="===============0727041172129059562=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <balrogg@gmail.com>
-Subject: [PATCH 09/11] wsc: Accept extra IEs in wsc_new_p2p_enrollee
-Date: Mon, 21 Oct 2019 15:55:08 +0200
-Message-ID: <20191021135510.12657-9-balrogg@gmail.com>
+Subject: [PATCH 10/11] wiphy: Add wiphy_get_max_roc_duration
+Date: Mon, 21 Oct 2019 15:55:09 +0200
+Message-ID: <20191021135510.12657-10-balrogg@gmail.com>
 In-Reply-To: <20191021135510.12657-1-balrogg@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5979472381061653383==
+--===============0727041172129059562==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
 
+Add a function to retrieve the maximum Remain On Channel listen duration
+supported by the wiphy's driver.
 ---
- src/wsc.c | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+ src/wiphy.c | 12 ++++++++++++
+ src/wiphy.h |  1 +
+ 2 files changed, 13 insertions(+)
 
-diff --git a/src/wsc.c b/src/wsc.c
-index 61683e7b..6d232139 100644
---- a/src/wsc.c
-+++ b/src/wsc.c
-@@ -440,7 +440,8 @@ static inline enum wsc_rf_band freq_to_rf_band(uint32_t=
- freq)
- 	return WSC_RF_BAND_2_4_GHZ;
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 169631af..9cb9ae66 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -66,6 +66,7 @@ struct wiphy {
+ 	uint32_t feature_flags;
+ 	uint8_t ext_features[(NUM_NL80211_EXT_FEATURES + 7) / 8];
+ 	uint8_t max_num_ssids_per_scan;
++	uint32_t max_roc_duration;
+ 	uint16_t supported_iftypes;
+ 	uint16_t supported_ciphers;
+ 	struct scan_freq_set *supported_freqs;
+@@ -355,6 +356,11 @@ uint8_t wiphy_get_max_num_ssids_per_scan(struct wiphy =
+*wiphy)
+ 	return wiphy->max_num_ssids_per_scan;
  }
  =
 
--static void wsc_connect(struct wsc *wsc)
-+static void wsc_connect(struct wsc *wsc, struct iovec *ies,
-+			unsigned int ies_num)
- {
- 	struct handshake_state *hs;
- 	struct l_settings *settings =3D l_settings_new();
-@@ -449,7 +450,7 @@ static void wsc_connect(struct wsc *wsc)
- 	struct wsc_association_request request;
- 	uint8_t *pdu;
- 	size_t pdu_len;
--	struct iovec ie_iov;
-+	struct iovec ie_iov[1 + ies_num];
- =
-
- 	wsc->target =3D NULL;
- =
-
-@@ -496,18 +497,20 @@ static void wsc_connect(struct wsc *wsc)
- 		goto error;
- 	}
- =
-
--	ie_iov.iov_base =3D ie_tlv_encapsulate_wsc_payload(pdu, pdu_len,
--							&ie_iov.iov_len);
-+	ie_iov[0].iov_base =3D ie_tlv_encapsulate_wsc_payload(pdu, pdu_len,
-+							&ie_iov[0].iov_len);
- 	l_free(pdu);
- =
-
--	if (!ie_iov.iov_base) {
-+	if (!ie_iov[0].iov_base) {
- 		r =3D -ENOMEM;
- 		goto error;
- 	}
- =
-
--	r =3D netdev_connect(wsc->netdev, bss, hs, &ie_iov, 1, wsc_netdev_event,
--				wsc_connect_cb, wsc);
--	l_free(ie_iov.iov_base);
-+	memcpy(ie_iov + 1, ies, sizeof(struct iovec) * ies_num);
++uint32_t wiphy_get_max_roc_duration(struct wiphy *wiphy)
++{
++	return wiphy->max_roc_duration;
++}
 +
-+	r =3D netdev_connect(wsc->netdev, bss, hs, ie_iov, 1 + ies_num,
-+				wsc_netdev_event, wsc_connect_cb, wsc);
-+	l_free(ie_iov[0].iov_base);
- =
-
- 	if (r < 0)
- 		goto error;
-@@ -562,7 +565,7 @@ static void station_state_watch(enum station_state stat=
-e, void *userdata)
- 	station_remove_state_watch(wsc->station, wsc->station_state_watch);
- 	wsc->station_state_watch =3D 0;
- =
-
--	wsc_connect(wsc);
-+	wsc_connect(wsc, NULL, 0);
- }
- =
-
- static void wsc_check_can_connect(struct wsc *wsc, struct scan_bss *target)
-@@ -594,7 +597,7 @@ static void wsc_check_can_connect(struct wsc *wsc, stru=
-ct scan_bss *target)
- =
-
- 	switch (station_get_state(wsc->station)) {
- 	case STATION_STATE_DISCONNECTED:
--		wsc_connect(wsc);
-+		wsc_connect(wsc, NULL, 0);
- 		return;
- 	case STATION_STATE_CONNECTING:
- 	case STATION_STATE_CONNECTED:
-@@ -1188,8 +1191,9 @@ static void wsc_netdev_watch(struct netdev *netdev,
- }
- =
-
- struct wsc *wsc_new_p2p_enrollee(struct netdev *netdev, struct scan_bss *t=
-arget,
--					char *pin, wsc_done_cb_t done_cb,
--					void *user_data)
-+					char *pin,
-+					struct iovec *ies, unsigned int ies_num,
-+					wsc_done_cb_t done_cb, void *user_data)
+ bool wiphy_supports_adhoc_rsn(struct wiphy *wiphy)
  {
- 	struct wsc *wsc;
+ 	return wiphy->support_adhoc_rsn;
+@@ -769,6 +775,12 @@ static void wiphy_parse_attributes(struct wiphy *wiphy,
  =
 
-@@ -1202,7 +1206,7 @@ struct wsc *wsc_new_p2p_enrollee(struct netdev *netde=
-v, struct scan_bss *target,
- 	wsc->done_data =3D user_data;
- 	wsc->pin =3D l_strdup(pin);
- =
-
--	wsc_connect(wsc);
-+	wsc_connect(wsc, ies, ies_num);
- =
-
- 	/*
- 	 * Wsc objects created this way are not handled in wsc_remove_interface,
+ 			parse_iftype_extended_capabilities(wiphy, &nested);
+ 			break;
++		case NL80211_ATTR_MAX_REMAIN_ON_CHANNEL_DURATION:
++			if (len !=3D 4)
++				l_warn("Invalid MAX_ROC_DURATION attribute");
++			else
++				wiphy->max_roc_duration =3D *((uint32_t *) data);
++			break;
+ 		}
+ 	}
+ }
+diff --git a/src/wiphy.h b/src/wiphy.h
+index 61e1caf8..c109f0a8 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -64,6 +64,7 @@ bool wiphy_rrm_capable(struct wiphy *wiphy);
+ bool wiphy_has_feature(struct wiphy *wiphy, uint32_t feature);
+ bool wiphy_has_ext_feature(struct wiphy *wiphy, uint32_t feature);
+ uint8_t wiphy_get_max_num_ssids_per_scan(struct wiphy *wiphy);
++uint32_t wiphy_get_max_roc_duration(struct wiphy *wiphy);
+ bool wiphy_supports_iftype(struct wiphy *wiphy, uint32_t iftype);
+ bool wiphy_supports_adhoc_rsn(struct wiphy *wiphy);
+ bool wiphy_can_offchannel_tx(struct wiphy *wiphy);
 -- =
 
 2.20.1
 
---===============5979472381061653383==--
+--===============0727041172129059562==--
 
