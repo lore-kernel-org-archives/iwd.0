@@ -1,33 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============4871823538839758951=="
+Content-Type: multipart/mixed; boundary="===============8208249000636237622=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] sae: fix incorrect length adjustment
-Date: Mon, 21 Oct 2019 17:12:19 -0500
-Message-ID: <dcd703e4-2bb5-f250-0a7e-c6a0e52a8609@gmail.com>
-In-Reply-To: <20191021215917.12691-1-prestwoj@gmail.com>
+Subject: Re: [PATCH] sae: remove unneeded NULL pointer check
+Date: Mon, 21 Oct 2019 17:15:07 -0500
+Message-ID: <6c34c98c-f4af-9928-e3de-e62ca733c851@gmail.com>
+In-Reply-To: <20191021220250.12908-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4871823538839758951==
+--===============8208249000636237622==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 10/21/19 4:59 PM, James Prestwood wrote:
-> The commit/confirm processing was incorrectly subtracting 2 from
-> the length when they should be subtracting 6. As with the other
-> similar change, the length is validated with mpdu_validate so
-> subtracting 6 will not cause an overflow.
+On 10/21/19 5:02 PM, James Prestwood wrote:
+> The frame was already validated, and mmpdu_body will never return
+> a NULL pointer.
 > ---
->   src/sae.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   src/sae.c | 5 -----
+>   1 file changed, 5 deletions(-)
+> =
+
 
 Applied, thanks.
 
 Regards,
 -Denis
 
---===============4871823538839758951==--
+--===============8208249000636237622==--
 
