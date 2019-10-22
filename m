@@ -1,43 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============8280125635597566393=="
+Content-Type: multipart/mixed; boundary="===============0972592874761206699=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] auto-t: hostapd: raise exception upon invalid config
-Date: Tue, 22 Oct 2019 09:14:00 -0700
-Message-ID: <20191022161400.7941-1-prestwoj@gmail.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH 1/7] t-runner: Fix mem leak with sim keys
+Date: Tue, 22 Oct 2019 16:13:11 -0700
+Message-ID: <20191022231317.11634-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8280125635597566393==
+--===============0972592874761206699==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the config file passed in is not found we would continue and
-eventually something else would fail. Instead immediately raise an
-exception to be more clear on what is actually failing.
+Use l_settings_get_value instead of l_settings_get_string to
+prevent unnecessary memory duplication.
 ---
- autotests/util/hostapd.py | 3 +++
- 1 file changed, 3 insertions(+)
+ tools/test-runner.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index 60750690..49047f38 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -45,6 +45,9 @@ class HostapdCLI:
-                     interface =3D intf
-                     break
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 4551c6c1..430e18e3 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -1961,8 +1961,8 @@ static void create_network_and_run_tests(void *data, =
+void *user_data)
+ 						HW_CONFIG_SETUP_TMPFS_EXTRAS,
+ 									':');
  =
 
-+        if not interface:
-+            raise Exception('config %s not found' % config)
-+
-         self.ifname =3D interface.name
-         self.socket_path =3D os.path.dirname(interface.ctrl_interface)
+-	sim_keys =3D l_settings_get_string(hw_settings, HW_CONFIG_GROUP_SETUP,
+-			"sim_keys");
++	sim_keys =3D l_settings_get_value(hw_settings, HW_CONFIG_GROUP_SETUP,
++								"sim_keys");
  =
 
+ 	if (sim_keys) {
+ 		if (!strcmp(sim_keys, "ofono")) {
 -- =
 
-2.17.1
+2.13.6
 
---===============8280125635597566393==--
+--===============0972592874761206699==--
 
