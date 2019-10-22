@@ -1,42 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============0231397497632657234=="
+Content-Type: multipart/mixed; boundary="===============4352585841148341280=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 6/7] t-runner: Check for NULL before using strcmp
-Date: Tue, 22 Oct 2019 16:13:16 -0700
-Message-ID: <20191022231317.11634-6-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 7/7] t-runner: Check for errors after opening file
+Date: Tue, 22 Oct 2019 16:13:17 -0700
+Message-ID: <20191022231317.11634-7-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20191022231317.11634-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0231397497632657234==
+--===============4352585841148341280==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- tools/test-runner.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tools/test-runner.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 0226dd15..398494e6 100644
+index 398494e6..1dfdb9af 100644
 --- a/tools/test-runner.c
 +++ b/tools/test-runner.c
-@@ -2957,9 +2957,9 @@ int main(int argc, char *argv[])
- 			break;
- 		case 'g':
- 			gdb_opt =3D optarg;
--			if (!(!strcmp(gdb_opt, "iwd") ||
--					!strcmp(gdb_opt, "hostapd") ||
--					!strcmp(gdb_opt, "hwsim"))) {
-+			if (!gdb_opt || (strcmp(gdb_opt, "iwd") &&
-+					strcmp(gdb_opt, "hostapd") &&
-+					strcmp(gdb_opt, "hwsim"))) {
- 				l_error("--gdb can only be used with iwd"
- 					", hwsim or hostapd");
- 				return EXIT_FAILURE;
+@@ -524,6 +524,9 @@ static pid_t execute_program(char *argv[], char *envp[]=
+, bool wait,
+ 							S_IRUSR | S_IWUSR);
+ 			}
+ =
+
++			if (fd =3D=3D -1)
++				exit(EXIT_FAILURE);
++
+ 			dup2(fd, 1);
+ 			dup2(fd, 2);
+ =
+
 -- =
 
 2.13.6
 
---===============0231397497632657234==--
+--===============4352585841148341280==--
 
