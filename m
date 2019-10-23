@@ -1,60 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============3759903395624357569=="
+Content-Type: multipart/mixed; boundary="===============2482304193482168986=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 7/8] client: Check family name before comparison
-Date: Wed, 23 Oct 2019 13:24:02 -0700
-Message-ID: <20191023202403.9690-7-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 8/8] ofono: Validate message parsing
+Date: Wed, 23 Oct 2019 13:24:03 -0700
+Message-ID: <20191023202403.9690-8-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20191023202403.9690-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3759903395624357569==
+--===============2482304193482168986==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- client/display.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ plugins/ofono.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/client/display.c b/client/display.c
-index 0faa0840..b22b6e90 100644
---- a/client/display.c
-+++ b/client/display.c
-@@ -180,7 +180,8 @@ void display_refresh_set_cmd(const char *family, const =
-char *entity,
- 		return;
- 	}
+diff --git a/plugins/ofono.c b/plugins/ofono.c
+index 3120ea70..b13b3fb9 100644
+--- a/plugins/ofono.c
++++ b/plugins/ofono.c
+@@ -624,7 +624,8 @@ static void interfaces_changed_cb(struct l_dbus_message=
+ *message,
+ 	struct l_dbus_message_iter value;
+ 	const char *key;
  =
 
--	if (display_refresh.family && !strcmp(display_refresh.family, family)) {
-+	if (display_refresh.family && family &&
-+				!strcmp(display_refresh.family, family)) {
- 		struct l_string *buf =3D l_string_new(128);
- 		L_AUTO_FREE_VAR(char *, args);
- 		char *prompt;
-@@ -205,10 +206,10 @@ void display_refresh_set_cmd(const char *family, cons=
-t char *entity,
+-	l_dbus_message_get_arguments(message, "sv", &key, &value);
++	if (!l_dbus_message_get_arguments(message, "sv", &key, &value))
++		return;
  =
 
- 		args =3D l_string_unwrap(buf);
+ 	if (!strcmp(key, "Interfaces"))
+ 		parse_interfaces(&value, modem);
+@@ -718,10 +719,11 @@ static void get_modems_cb(struct l_dbus_message *repl=
+y, void *user_data)
  =
 
--		prompt =3D l_strdup_printf(IWD_PROMPT"%s%s%s %s %s\n",
--					family ? : "",
--					entity ? " " : "", entity ? : "",
--					cmd->cmd ? : "", args ? : "");
-+		prompt =3D l_strdup_printf(IWD_PROMPT"%s%s%s %s %s\n", family,
-+						entity ? " " : "",
-+						entity ? : "",
-+						cmd->cmd ? : "", args ? : "");
+ 	modems =3D l_queue_new();
  =
 
- 		l_queue_push_tail(display_refresh.redo_entries, prompt);
- 		display_refresh.undo_lines++;
+-	l_dbus_message_get_arguments(reply, "a(oa{sv})", &modem_list);
+-
+-	while (l_dbus_message_iter_next_entry(&modem_list, &path, &props))
+-		parse_modem(path, &props);
++	if (l_dbus_message_get_arguments(reply, "a(oa{sv})", &modem_list)) {
++		while (l_dbus_message_iter_next_entry(&modem_list, &path,
++									&props))
++			parse_modem(path, &props);
++	}
+ =
+
+ 	/* watch for modems being added/removed */
+ 	modem_add_watch =3D l_dbus_add_signal_watch(dbus_get_bus(),
 -- =
 
 2.13.6
 
---===============3759903395624357569==--
+--===============2482304193482168986==--
 
