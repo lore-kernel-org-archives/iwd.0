@@ -1,85 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============6504580323033428579=="
+Content-Type: multipart/mixed; boundary="===============7359278987248237198=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 3/8] client: Ignore invalid agent requests
-Date: Wed, 23 Oct 2019 13:23:58 -0700
-Message-ID: <20191023202403.9690-3-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 4/8] hotspot: Fix mem leak on failed hotspot config
+Date: Wed, 23 Oct 2019 13:23:59 -0700
+Message-ID: <20191023202403.9690-4-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20191023202403.9690-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6504580323033428579==
+--===============7359278987248237198==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- client/agent.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ src/hotspot.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/client/agent.c b/client/agent.c
-index 5ed6538f..a64d71c5 100644
---- a/client/agent.c
-+++ b/client/agent.c
-@@ -112,7 +112,9 @@ static struct l_dbus_message *request_passphrase_method=
-_call(
- 					"'--"COMMAND_OPTION_PASSPHRASE"' "
- 						"command-line option.\n");
+diff --git a/src/hotspot.c b/src/hotspot.c
+index 60a2e2de..8d2bb04a 100644
+--- a/src/hotspot.c
++++ b/src/hotspot.c
+@@ -423,8 +423,10 @@ static void hs20_dir_watch_cb(const char *filename,
+ 		}
  =
 
--	l_dbus_message_get_arguments(message, "o", &path);
-+	if (!l_dbus_message_get_arguments(message, "o", &path))
-+		return NULL;
-+
- 	if (!path)
- 		return NULL;
+ 		config =3D hs20_config_new(new, full_path);
+-		if (!config)
+-			break;
++		if (!config) {
++			l_settings_free(new);
++			return;
++		}
  =
 
-@@ -153,7 +155,9 @@ static struct l_dbus_message *request_private_key_passp=
-hrase_method_call(
- 					"'--"COMMAND_OPTION_PASSPHRASE"' "
- 						"command-line option.\n");
- =
-
--	l_dbus_message_get_arguments(message, "o", &path);
-+	if (!l_dbus_message_get_arguments(message, "o", &path))
-+		return NULL;
-+
- 	if (!path)
- 		return NULL;
- =
-
-@@ -216,7 +220,9 @@ static struct l_dbus_message *request_username_and_pass=
-word_method_call(
- 					"'--"COMMAND_OPTION_PASSWORD"' "
- 						"command-line option.\n");
- =
-
--	l_dbus_message_get_arguments(message, "o", &path);
-+	if (!l_dbus_message_get_arguments(message, "o", &path))
-+		return NULL;
-+
- 	if (!path)
- 		return NULL;
- =
-
-@@ -275,7 +281,9 @@ static struct l_dbus_message *request_user_password_met=
-hod_call(
- 					"'--"COMMAND_OPTION_PASSWORD"' "
- 					"command-line option.\n");
- =
-
--	l_dbus_message_get_arguments(message, "os", &path, &username);
-+	if (!l_dbus_message_get_arguments(message, "os", &path, &username))
-+		return NULL;
-+
- 	if (!path || !username)
- 		return NULL;
+ 		l_queue_push_head(hs20_settings, config);
  =
 
 -- =
 
 2.13.6
 
---===============6504580323033428579==--
+--===============7359278987248237198==--
 
