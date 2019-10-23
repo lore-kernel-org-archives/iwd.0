@@ -1,34 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============3014404736493841660=="
+Content-Type: multipart/mixed; boundary="===============6341877999935525249=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] auto-t: hostapd: raise exception upon invalid config
-Date: Tue, 22 Oct 2019 21:58:49 -0500
-Message-ID: <f28be93d-236b-9d09-157e-863d1608d7ca@gmail.com>
-In-Reply-To: <20191022161400.7941-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] test-runner: fix double free issue on subtest queue
+Date: Wed, 23 Oct 2019 09:24:10 -0700
+Message-ID: <20191023162410.27743-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3014404736493841660==
+--===============6341877999935525249==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Coverity reported this as a leak, but the test queue is actually
+getting freed later and does not need to be freed locally in add_path
 
-On 10/22/19 11:14 AM, James Prestwood wrote:
-> If the config file passed in is not found we would continue and
-> eventually something else would fail. Instead immediately raise an
-> exception to be more clear on what is actually failing.
-> ---
->   autotests/util/hostapd.py | 3 +++
->   1 file changed, 3 insertions(+)
-> =
+This basically reverts c0863e5bc62f645f0bde144e4e906b7277866bf7
+---
+ tools/test-runner.c | 2 --
+ 1 file changed, 2 deletions(-)
 
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 1dfdb9af..d6334e83 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -1092,8 +1092,6 @@ static bool add_path(const char *path, int level, str=
+uct l_queue *config_queue)
+ 		l_queue_insert(config_queue, entry, insert_test_entry, NULL);
+ 	}
+ =
 
-Applied, thanks.
+-	l_queue_destroy(py_test_queue, l_free);
+-
+ 	closedir(dir);
+ 	return true;
+ }
+-- =
 
-Regards,
--Denis
+2.17.1
 
---===============3014404736493841660==--
+--===============6341877999935525249==--
 
