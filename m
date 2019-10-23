@@ -1,33 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============2827778606583843675=="
+Content-Type: multipart/mixed; boundary="===============3014404736493841660=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/7] t-runner: Fix mem leak with sim keys
-Date: Tue, 22 Oct 2019 21:57:59 -0500
-Message-ID: <bc4cabf7-9e18-b7a0-2c58-ecfdcc922338@gmail.com>
-In-Reply-To: <20191022231317.11634-1-tim.a.kourt@linux.intel.com>
+Subject: Re: [PATCH] auto-t: hostapd: raise exception upon invalid config
+Date: Tue, 22 Oct 2019 21:58:49 -0500
+Message-ID: <f28be93d-236b-9d09-157e-863d1608d7ca@gmail.com>
+In-Reply-To: <20191022161400.7941-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2827778606583843675==
+--===============3014404736493841660==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+Hi James,
 
-On 10/22/19 6:13 PM, Tim Kourt wrote:
-> Use l_settings_get_value instead of l_settings_get_string to
-> prevent unnecessary memory duplication.
+On 10/22/19 11:14 AM, James Prestwood wrote:
+> If the config file passed in is not found we would continue and
+> eventually something else would fail. Instead immediately raise an
+> exception to be more clear on what is actually failing.
 > ---
->   tools/test-runner.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   autotests/util/hostapd.py | 3 +++
+>   1 file changed, 3 insertions(+)
 > =
 
 
-All applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============2827778606583843675==--
+--===============3014404736493841660==--
 
