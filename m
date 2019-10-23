@@ -1,36 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============1728009649233028112=="
+Content-Type: multipart/mixed; boundary="===============0294620384151193289=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] test-runner: fix double free issue on subtest queue
-Date: Wed, 23 Oct 2019 12:29:27 -0500
-Message-ID: <6d48cf20-c3ae-7a4e-1b10-d54964efb9a8@gmail.com>
-In-Reply-To: <20191023162410.27743-1-prestwoj@gmail.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH 1/8] client: Treat invalid DBus reply same as an error
+Date: Wed, 23 Oct 2019 13:23:56 -0700
+Message-ID: <20191023202403.9690-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1728009649233028112==
+--===============0294620384151193289==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ client/dbus-proxy.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-On 10/23/19 11:24 AM, James Prestwood wrote:
-> Coverity reported this as a leak, but the test queue is actually
-> getting freed later and does not need to be freed locally in add_path
-> =
+diff --git a/client/dbus-proxy.c b/client/dbus-proxy.c
+index 3e7a7f8e..1bd90aff 100644
+--- a/client/dbus-proxy.c
++++ b/client/dbus-proxy.c
+@@ -699,7 +699,16 @@ static void get_managed_objects_callback(struct l_dbus=
+_message *message,
+ 		return;
+ 	}
+ =
 
-> This basically reverts c0863e5bc62f645f0bde144e4e906b7277866bf7
-> ---
->   tools/test-runner.c | 2 --
->   1 file changed, 2 deletions(-)
-> =
+-	l_dbus_message_get_arguments(message, "a{oa{sa{sv}}}", &objects);
++	if (!l_dbus_message_get_arguments(message, "a{oa{sa{sv}}}", &objects)) {
++		l_error("Failed to parse IWD dbus objects, quitting...\n");
++
++		if (!command_is_interactive_mode())
++			command_set_exit_status(EXIT_FAILURE);
++
++		l_main_quit();
++
++		return;
++	}
+ =
 
+ 	while (l_dbus_message_iter_next_entry(&objects, &path, &object))
+ 		proxy_interface_create(path, &object);
+-- =
 
-Applied, thanks.
+2.13.6
 
-Regards,
--Denis
-
---===============1728009649233028112==--
+--===============0294620384151193289==--
 
