@@ -1,100 +1,181 @@
-Content-Type: multipart/mixed; boundary="===============0918583750362389588=="
+Content-Type: multipart/mixed; boundary="===============2591342899016546878=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 01/11] netdev: Add a wdev_id based frame watch API
-Date: Thu, 24 Oct 2019 05:22:59 +0200
-Message-ID: <CAOq732+uiCx1VGzvs+w7PR8sgzTLkYzV-waJ-DXYFZgdxxtUqg@mail.gmail.com>
-In-Reply-To: <35fddec5-0c10-fed0-8e47-10709445f783@gmail.com>
+Subject: [PATCH 1/8] wiphy: Add wiphy_get_supported_rates
+Date: Thu, 24 Oct 2019 06:29:53 +0200
+Message-ID: <20191024043000.13687-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0918583750362389588==
+--===============2591342899016546878==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 24 Oct 2019 at 04:54, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 10/23/19 7:59 PM, Andrew Zaborowski wrote:
-> > I took a look at netdev and ap.c and we don't really have frames that
-> > we need to be unconditionally listening to.  In ap.c we only register
-> > the watches when starting the AP and in netdev some of the watches
-> > should be registered for either when we connect, when we send a
-> > Neighbor Report Request or SA Query Request.  So in the end it looks
-> > like we'll be using the separate socket per set/group everywhere.
->
-> Perhaps you're right.  Might make sense from a consistency point of view
-> anyway.  So we only implement one way and be done with it.  Do note:
-> there are frames which are protected, (SA Query family for example).  So
-> the kernel would simply never forward them to us if the management
-> encryption key is not setup.  These do not need to be part of a socket
-> set...  There may be others that fit this pattern.  So maybe we can
-> cheat for at least some of these...
+Add code to parse the supported data rates info from the wiphy dumps and
+expose it for P2P's use with a getter function.
+---
+ src/wiphy.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ src/wiphy.h |  2 ++
+ 2 files changed, 76 insertions(+), 4 deletions(-)
 
-Good point for the SA Query Request but for SA Query Responses we can
-still use a separate group because we only want to be woken up if
-we've sent the Request before.
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 9cb9ae66..12ec5d17 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -76,6 +76,7 @@ struct wiphy {
+ 	struct watchlist state_watches;
+ 	uint8_t extended_capabilities[EXT_CAP_LEN + 2]; /* max bitmap size + IE h=
+eader */
+ 	uint8_t *iftype_extended_capabilities[NUM_NL80211_IFTYPES];
++	uint8_t *supported_rates[NUM_NL80211_BANDS];
+ 	uint8_t rm_enabled_capabilities[7]; /* 5 size max + header */
+ =
 
->
-> For AP, you know more than I.  I imagine that AP only needs a single set
-> for the most part?  Can we even receive frames if AP hasn't been started
-> yet?
+ 	bool support_scheduled_scan:1;
+@@ -212,6 +213,9 @@ static void wiphy_free(void *data)
+ 	for (i =3D 0; i < NUM_NL80211_IFTYPES; i++)
+ 		l_free(wiphy->iftype_extended_capabilities[i]);
+ =
 
-True, we can't because we haven't even set a channel...
++	for (i =3D 0; i < NUM_NL80211_BANDS; i++)
++		l_free(wiphy->supported_rates[i]);
++
+ 	scan_freq_set_free(wiphy->supported_freqs);
+ 	watchlist_destroy(&wiphy->state_watches);
+ 	l_free(wiphy->model_str);
+@@ -478,6 +482,14 @@ bool wiphy_supports_iftype(struct wiphy *wiphy, uint32=
+_t iftype)
+ 	return wiphy->supported_iftypes & (1 << (iftype - 1));
+ }
+ =
 
->
-> >
-> > Even if we had frames that we cared about for the whole time a
-> > specific iftype is active, we'd still need the netdev/adhoc/ap modules
-> > to update the user_data for the callbacks everytime we switch to that
-> > iftype so it doesn't seem useful to automatically register to any
-> > frames.
->
-> Depends...  It can always fire off a callback with just the wdev/ifindex
-> and let the station/adhoc/ap module figure it out.  Yes we'd need to run
-> a find by ifindex/wdev, but that's not really a big deal in the common ca=
-se.
->
-> > So I take it you're fine with the whole group/set concept being
-> > limited to the group_id (or set_id) parameter, in the user's view,
-> > instead of the user having to issue a separate call to create or
-> > destroy a "set".  So I wouldn't add calls like frame_watch_set_new().
-> >
->
-> What I'm a bit worried about is that I'm not sure you're really winning
-> anything by trying to hide the set behind an id.  You probably end up
-> having to look up the 'set' object every time based on the id, which is
-> sort of wasteful.
++const uint8_t *wiphy_get_supported_rates(struct wiphy *wiphy, unsigned int=
+ band)
++{
++	if (band >=3D L_ARRAY_SIZE(wiphy->supported_rates))
++		return NULL;
++
++	return wiphy->supported_rates[band];
++}
++
+ uint32_t wiphy_state_watch_add(struct wiphy *wiphy,
+ 				wiphy_state_watch_func_t func,
+ 				void *user_data, wiphy_destroy_func_t destroy)
+@@ -622,20 +634,70 @@ static void parse_supported_frequencies(struct wiphy =
+*wiphy,
+ 	}
+ }
+ =
 
-Hmmm, I think we would only need a single look up when adding a new
-frame registration.  We would have the groups in an l_queue for each
-wdev (if we expect there to be few groups, or a hashmap if we expect
-many)
++static uint8_t *parse_supported_rates(struct l_genl_attr *attr)
++{
++	uint16_t type;
++	uint16_t len;
++	const void *data;
++	struct l_genl_attr nested;
++	int count =3D 0;
++	uint8_t *ret;
++
++	if (!l_genl_attr_recurse(attr, &nested))
++		return NULL;
++
++	while (l_genl_attr_next(&nested, NULL, NULL, NULL))
++		count++;
++
++	if (!l_genl_attr_recurse(attr, &nested))
++		return NULL;
++
++	ret =3D l_malloc(count + 1);
++	ret[count] =3D 0;
++
++	count =3D 0;
++
++	while (l_genl_attr_next(&nested, NULL, NULL, NULL)) {
++		struct l_genl_attr nested2;
++
++		if (!l_genl_attr_recurse(&nested, &nested2)) {
++			l_free(ret);
++			return NULL;
++		}
++
++		while (l_genl_attr_next(&nested2, &type, &len, &data)) {
++			if (type !=3D NL80211_BITRATE_ATTR_RATE || len !=3D 4)
++				continue;
++
++			/*
++			 * Convert from the 100kb/s units reported by the
++			 * kernel to the 500kb/s used in 802.11 IEs.
++			 */
++			ret[count++] =3D *(const uint32_t *) data / 5;
++		}
++	}
++
++	return ret;
++}
++
+ static void parse_supported_bands(struct wiphy *wiphy,
+ 						struct l_genl_attr *bands)
+ {
+-	uint16_t type, len;
+-	const void *data;
++	uint16_t type;
+ 	struct l_genl_attr attr;
+ =
 
->
-> Also, how would one pick IDs anyway?  You can't or shouldn't share the
-> id between different wdevs/netdevs anyway since their lifetimes are
-> distinct.   So you end up trying to have these unique gids which might
-> as well be proper objects.
+ 	l_debug("");
+ =
 
-I was thinking of the group_id being an additional argument and shared
-between wdevs/netdevs because the wdev would still be passed in the
-arguments.
+-	while (l_genl_attr_next(bands, NULL, NULL, NULL)) {
++	while (l_genl_attr_next(bands, &type, NULL, NULL)) {
++		enum nl80211_band band =3D type;
++
++		if (band !=3D NL80211_BAND_2GHZ && band !=3D NL80211_BAND_5GHZ)
++			continue;
++
+ 		if (!l_genl_attr_recurse(bands, &attr))
+ 			continue;
+ =
 
-So netdev.c would have one group per watch lifetime:
+-		while (l_genl_attr_next(&attr, &type, &len, &data)) {
++		while (l_genl_attr_next(&attr, &type, NULL, NULL)) {
+ 			struct l_genl_attr freqs;
+ =
 
-enum {
-      FRAME_GROUP_CONNECTION,
-      FRAME_GROUP_NR,
-      FRAME_GROUP_SA_QUERY,
-};
+ 			switch (type) {
+@@ -645,6 +707,14 @@ static void parse_supported_bands(struct wiphy *wiphy,
+ =
 
-> Also, the set is likely to be setup once and
-> destroyed when the interface is cleaned up (e.g. on iftype change or
-> ifdown).
+ 				parse_supported_frequencies(wiphy, &freqs);
+ 				break;
++
++			case NL80211_BAND_ATTR_RATES:
++				if (wiphy->supported_rates[band])
++					continue;
++
++				wiphy->supported_rates[band] =3D
++					parse_supported_rates(&attr);
++				break;
+ 			}
+ 		}
+ 	}
+diff --git a/src/wiphy.h b/src/wiphy.h
+index c109f0a8..a5133972 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -66,6 +66,8 @@ bool wiphy_has_ext_feature(struct wiphy *wiphy, uint32_t =
+feature);
+ uint8_t wiphy_get_max_num_ssids_per_scan(struct wiphy *wiphy);
+ uint32_t wiphy_get_max_roc_duration(struct wiphy *wiphy);
+ bool wiphy_supports_iftype(struct wiphy *wiphy, uint32_t iftype);
++const uint8_t *wiphy_get_supported_rates(struct wiphy *wiphy,
++						unsigned int band);
+ bool wiphy_supports_adhoc_rsn(struct wiphy *wiphy);
+ bool wiphy_can_offchannel_tx(struct wiphy *wiphy);
+ bool wiphy_supports_qos_set_map(struct wiphy *wiphy);
+-- =
 
-Yes but those are three additional pointers to store, for the three
-groups in netdev, also three additional create calls.
+2.20.1
 
-Best regards
---===============0918583750362389588==--
+--===============2591342899016546878==--
 
