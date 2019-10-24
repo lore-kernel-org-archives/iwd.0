@@ -1,132 +1,111 @@
-Content-Type: multipart/mixed; boundary="===============0071395916104591834=="
+Content-Type: multipart/mixed; boundary="===============5609989834207365443=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 01/11] netdev: Add a wdev_id based frame watch API
-Date: Thu, 24 Oct 2019 10:29:49 -0500
-Message-ID: <01809e6d-cd6a-1b70-a4d0-5c60b71490d5@gmail.com>
-In-Reply-To: <CAOq732+uiCx1VGzvs+w7PR8sgzTLkYzV-waJ-DXYFZgdxxtUqg@mail.gmail.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH 1/4] client: Modify error handler to return error msg
+Date: Thu, 24 Oct 2019 12:53:53 -0700
+Message-ID: <20191024195356.28206-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0071395916104591834==
+--===============5609989834207365443==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+This allows to send error back to iwd, instead of returning NULL
+and waiting for iwd to timeout on agent request.
+---
+ client/agent.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-On 10/23/19 10:22 PM, Andrew Zaborowski wrote:
-> On Thu, 24 Oct 2019 at 04:54, Denis Kenzior <denkenz@gmail.com> wrote:
->> On 10/23/19 7:59 PM, Andrew Zaborowski wrote:
->>> I took a look at netdev and ap.c and we don't really have frames that
->>> we need to be unconditionally listening to.  In ap.c we only register
->>> the watches when starting the AP and in netdev some of the watches
->>> should be registered for either when we connect, when we send a
->>> Neighbor Report Request or SA Query Request.  So in the end it looks
->>> like we'll be using the separate socket per set/group everywhere.
->>
->> Perhaps you're right.  Might make sense from a consistency point of view
->> anyway.  So we only implement one way and be done with it.  Do note:
->> there are frames which are protected, (SA Query family for example).  So
->> the kernel would simply never forward them to us if the management
->> encryption key is not setup.  These do not need to be part of a socket
->> set...  There may be others that fit this pattern.  So maybe we can
->> cheat for at least some of these...
-> =
+diff --git a/client/agent.c b/client/agent.c
+index 5ed6538f..c8da72dc 100644
+--- a/client/agent.c
++++ b/client/agent.c
+@@ -50,7 +50,16 @@ static struct pending_op {
+ 	struct l_queue *saved_input;
+ } pending_op;
+ =
 
-> Good point for the SA Query Request but for SA Query Responses we can
-> still use a separate group because we only want to be woken up if
-> we've sent the Request before.
+-static struct l_dbus_message *agent_error(const char *text)
++static struct l_dbus_message *agent_error_reply(struct l_dbus_message *mes=
+sage,
++							const char *text)
++{
++	return l_dbus_message_new_error(message,
++					IWD_AGENT_INTERFACE ".Error.Failed",
++					"Error: %s", text);
++}
++
++static struct l_dbus_message *agent_error(struct l_dbus_message *message,
++							const char *text)
+ {
+ 	display_error(text);
+ =
 
-But do you want to pay the cost?  Since we established an encryption key =
+@@ -60,7 +69,7 @@ static struct l_dbus_message *agent_error(const char *tex=
+t)
+ 		l_main_quit();
+ 	}
+ =
 
-to the AP, and a well behaved AP will send these to us only as a =
+-	return NULL;
++	return agent_error_reply(message, text);
+ }
+ =
 
-response, I don't see the point.
+ static struct l_dbus_message *release_method_call(struct l_dbus *dbus,
+@@ -108,7 +117,7 @@ static struct l_dbus_message *request_passphrase_method=
+_call(
+ 		return reply;
+ =
 
-The kernel API is not ideal.  Lets make it work, but don't go crazy ;)
+ 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
+-		return agent_error("No passphrase is provided as "
++		return agent_error(message, "No passphrase is provided as "
+ 					"'--"COMMAND_OPTION_PASSPHRASE"' "
+ 						"command-line option.\n");
+ =
 
->>
->> What I'm a bit worried about is that I'm not sure you're really winning
->> anything by trying to hide the set behind an id.  You probably end up
->> having to look up the 'set' object every time based on the id, which is
->> sort of wasteful.
-> =
+@@ -149,7 +158,7 @@ static struct l_dbus_message *request_private_key_passp=
+hrase_method_call(
+ 		return reply;
+ =
 
-> Hmmm, I think we would only need a single look up when adding a new
-> frame registration.  We would have the groups in an l_queue for each
-> wdev (if we expect there to be few groups, or a hashmap if we expect
-> many)
+ 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
+-		return agent_error("No passphrase is provided as "
++		return agent_error(message, "No passphrase is provided as "
+ 					"'--"COMMAND_OPTION_PASSPHRASE"' "
+ 						"command-line option.\n");
+ =
 
-Exactly.  So you do something like:
+@@ -211,7 +220,8 @@ static struct l_dbus_message *request_username_and_pass=
+word_method_call(
+ 		return reply;
+ =
 
-frame_watch_add(..);
-frame_watch_add(..);
+ 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
+-		return agent_error("No username or password is provided as "
++		return agent_error(message, "No username or password is "
++					"provided as "
+ 					"'--"COMMAND_OPTION_USERNAME"' or "
+ 					"'--"COMMAND_OPTION_PASSWORD"' "
+ 						"command-line option.\n");
+@@ -271,7 +281,7 @@ static struct l_dbus_message *request_user_password_met=
+hod_call(
+ 		return reply;
+ =
 
-if (ap_has_ie())
-	frame_watch_add(..);
+ 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
+-		return agent_error("No password is provided as "
++		return agent_error(message, "No password is provided as "
+ 					"'--"COMMAND_OPTION_PASSWORD"' "
+ 					"command-line option.\n");
+ =
 
-if (ap_has_another_ie())
-	frame_watch_add(..);
+-- =
 
-For each call you're looking up the group.  Instead of:
+2.13.6
 
-frame_watch_set_new();
-frame_watch_set_add(..);
-frame_watch_set_add(..);
-
-if (ap_has_ie())
-	frame_watch_set_add();
-
-frame_watch_add_set();
-
-Something like this anyway...
-
-> =
-
->>
->> Also, how would one pick IDs anyway?  You can't or shouldn't share the
->> id between different wdevs/netdevs anyway since their lifetimes are
->> distinct.   So you end up trying to have these unique gids which might
->> as well be proper objects.
-> =
-
-> I was thinking of the group_id being an additional argument and shared
-> between wdevs/netdevs because the wdev would still be passed in the
-> arguments.
-> =
-
-> So netdev.c would have one group per watch lifetime:
-> =
-
-> enum {
->        FRAME_GROUP_CONNECTION,
->        FRAME_GROUP_NR,
->        FRAME_GROUP_SA_QUERY,
-> };
-> =
-
-
-I think this will break down once we start supporting more action =
-
-frames.  These will depend on the presence of IEs in the AP, and I would =
-
-expect the number of combinations will quickly overwhelm such an approach.
-
->> Also, the set is likely to be setup once and
->> destroyed when the interface is cleaned up (e.g. on iftype change or
->> ifdown).
-> =
-
-> Yes but those are three additional pointers to store, for the three
-> groups in netdev, also three additional create calls.
-> =
-
-
-Not sure I understand this last point?
-
-Regards,
--Denis
-
---===============0071395916104591834==--
+--===============5609989834207365443==--
 
