@@ -1,72 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============6211774147303525992=="
+Content-Type: multipart/mixed; boundary="===============9009196320501229331=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH] doc: Update agent API with possible errors
-Date: Thu, 24 Oct 2019 13:02:05 -0700
-Message-ID: <20191024200205.29804-1-tim.a.kourt@linux.intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 3/4] client: Don't check for errors on agent requests
+Date: Thu, 24 Oct 2019 15:18:47 -0500
+Message-ID: <8b1c9bbb-0928-0f4a-bfe2-67942ff2109f@gmail.com>
+In-Reply-To: <20191024195356.28206-3-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6211774147303525992==
+--===============9009196320501229331==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- doc/agent-api.txt | 4 ++++
- 1 file changed, 4 insertions(+)
+Hi Tim,
 
-diff --git a/doc/agent-api.txt b/doc/agent-api.txt
-index ef80499e..5200dfb5 100644
---- a/doc/agent-api.txt
-+++ b/doc/agent-api.txt
-@@ -43,6 +43,7 @@ Methods		void Release()
- 			a network and passphrase is required.
- =
+On 10/24/19 2:53 PM, Tim Kourt wrote:
+> This assumes that iwd will never send the errors as agent requests,
+> therefore, eliminate the unnecessary checks.
+> ---
+>   client/agent.c | 12 ------------
+>   1 file changed, 12 deletions(-)
+> =
 
- 			Possible Errors: net.connman.iwd.Agent.Error.Canceled
-+					 net.connman.iwd.Agent.Error.Failed
- =
 
- 		string RequestPrivateKeyPassphrase(object network)
- =
+Applied, thanks.
 
-@@ -52,6 +53,7 @@ Methods		void Release()
- 			obtain that private key's encryption passphrase.
- =
+Regards,
+-Denis
 
- 			Possible Errors: net.connman.iwd.Agent.Error.Canceled
-+					 net.connman.iwd.Agent.Error.Failed
- =
-
- 		(string, string) RequestUserNameAndPassword(object network)
- =
-
-@@ -60,6 +62,7 @@ Methods		void Release()
- 			user name and password.
- =
-
- 			Possible Errors: net.connman.iwd.Agent.Error.Canceled
-+					 net.connman.iwd.Agent.Error.Failed
- =
-
- 		string RequestUserPassword(object network, string user)
- =
-
-@@ -69,6 +72,7 @@ Methods		void Release()
- 			in the parameter.
- =
-
- 			Possible Errors: net.connman.iwd.Agent.Error.Canceled
-+					 net.connman.iwd.Agent.Error.Failed
- =
-
- 		void Cancel(string reason)
- =
-
--- =
-
-2.13.6
-
---===============6211774147303525992==--
+--===============9009196320501229331==--
 
