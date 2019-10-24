@@ -1,103 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============5520296724185703204=="
+Content-Type: multipart/mixed; boundary="===============3288323352297974206=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 2/4] client: Respond to invalid agent requests
-Date: Thu, 24 Oct 2019 12:53:54 -0700
-Message-ID: <20191024195356.28206-2-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 3/4] client: Don't check for errors on agent requests
+Date: Thu, 24 Oct 2019 12:53:55 -0700
+Message-ID: <20191024195356.28206-3-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20191024195356.28206-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5520296724185703204==
+--===============3288323352297974206==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows to send an error back to iwd, instead of returning NULL
-and waiting for iwd to timeout on agent request.
+This assumes that iwd will never send the errors as agent requests,
+therefore, eliminate the unnecessary checks.
 ---
- client/agent.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ client/agent.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
 diff --git a/client/agent.c b/client/agent.c
-index c8da72dc..4d23e05e 100644
+index 4d23e05e..52cb85cf 100644
 --- a/client/agent.c
 +++ b/client/agent.c
-@@ -123,11 +123,11 @@ static struct l_dbus_message *request_passphrase_meth=
-od_call(
+@@ -109,9 +109,6 @@ static struct l_dbus_message *request_passphrase_method=
+_call(
+ 	struct l_dbus_message *reply;
+ 	const char *path;
  =
 
- 	l_dbus_message_get_arguments(message, "o", &path);
- 	if (!path)
+-	if (dbus_message_has_error(message))
 -		return NULL;
-+		return agent_error_reply(message, "Invalid argument");
+-
+ 	reply =3D request_passphrase_command_option(message);
+ 	if (reply)
+ 		return reply;
+@@ -150,9 +147,6 @@ static struct l_dbus_message *request_private_key_passp=
+hrase_method_call(
+ 	struct l_dbus_message *reply;
+ 	const char *path;
  =
 
- 	proxy =3D proxy_interface_find(IWD_NETWORK_INTERFACE, path);
- 	if (!proxy)
+-	if (dbus_message_has_error(message))
 -		return NULL;
-+		return agent_error_reply(message, "Invalid network object");
+-
+ 	reply =3D request_passphrase_command_option(message);
+ 	if (reply)
+ 		return reply;
+@@ -212,9 +206,6 @@ static struct l_dbus_message *request_username_and_pass=
+word_method_call(
+ 	struct l_dbus_message *reply;
+ 	const char *path;
  =
 
- 	display("Type the network passphrase for %s.\n",
- 				proxy_interface_get_identity_str(proxy));
-@@ -164,11 +164,11 @@ static struct l_dbus_message *request_private_key_pas=
-sphrase_method_call(
- =
-
- 	l_dbus_message_get_arguments(message, "o", &path);
- 	if (!path)
+-	if (dbus_message_has_error(message))
 -		return NULL;
-+		return agent_error_reply(message, "Invalid argument");
+-
+ 	reply =3D request_username_and_password_command_option(message);
+ 	if (reply)
+ 		return reply;
+@@ -273,9 +264,6 @@ static struct l_dbus_message *request_user_password_met=
+hod_call(
+ 	const char *username;
+ 	char *username_prompt;
  =
 
- 	proxy =3D proxy_interface_find(IWD_NETWORK_INTERFACE, path);
- 	if (!proxy)
+-	if (dbus_message_has_error(message))
 -		return NULL;
-+		return agent_error_reply(message, "Invalid network object");
- =
-
- 	display("Type the passphrase for the network encrypted private key for "
- 			"%s.\n", proxy_interface_get_identity_str(proxy));
-@@ -228,11 +228,11 @@ static struct l_dbus_message *request_username_and_pa=
-ssword_method_call(
- =
-
- 	l_dbus_message_get_arguments(message, "o", &path);
- 	if (!path)
--		return NULL;
-+		return agent_error_reply(message, "Invalid argument");
- =
-
- 	proxy =3D proxy_interface_find(IWD_NETWORK_INTERFACE, path);
- 	if (!proxy)
--		return NULL;
-+		return agent_error_reply(message, "Invalid network object");
- =
-
- 	display("Type the network credentials for %s.\n",
- 				proxy_interface_get_identity_str(proxy));
-@@ -287,11 +287,11 @@ static struct l_dbus_message *request_user_password_m=
-ethod_call(
- =
-
- 	l_dbus_message_get_arguments(message, "os", &path, &username);
- 	if (!path || !username)
--		return NULL;
-+		return agent_error_reply(message, "Invalid argument");
- =
-
- 	proxy =3D proxy_interface_find(IWD_NETWORK_INTERFACE, path);
- 	if (!proxy)
--		return NULL;
-+		return agent_error_reply(message, "Invalid network object");
- =
-
- 	display("Type the network password for %s.\n",
- 				proxy_interface_get_identity_str(proxy));
+-
+ 	reply =3D request_user_password_command_option(message);
+ 	if (reply)
+ 		return reply;
 -- =
 
 2.13.6
 
---===============5520296724185703204==--
+--===============3288323352297974206==--
 
