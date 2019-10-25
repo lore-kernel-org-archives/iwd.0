@@ -1,73 +1,103 @@
-Content-Type: multipart/mixed; boundary="===============6857126271612445076=="
+Content-Type: multipart/mixed; boundary="===============1518369684345446978=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 1/5] client: Consolidate cancelation replies
-Date: Fri, 25 Oct 2019 13:32:04 -0700
-Message-ID: <20191025203208.30628-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 2/5] client: Modify error handler to return cancelation msg
+Date: Fri, 25 Oct 2019 13:32:05 -0700
+Message-ID: <20191025203208.30628-2-tim.a.kourt@linux.intel.com>
+In-Reply-To: <20191025203208.30628-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6857126271612445076==
+--===============1518369684345446978==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This allows to send cancelation error back to iwd, instead of
+returning NULL and waiting for iwd to timeout on agent request.
 ---
- client/agent.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ client/agent.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/client/agent.c b/client/agent.c
-index 8af714a2..b80e5727 100644
+index b80e5727..503418a0 100644
 --- a/client/agent.c
 +++ b/client/agent.c
-@@ -50,6 +50,15 @@ static struct pending_op {
- 	struct l_queue *saved_input;
- } pending_op;
+@@ -59,7 +59,8 @@ static struct l_dbus_message *agent_reply_canceled(
+ 					"Error: %s", text);
+ }
  =
 
-+static struct l_dbus_message *agent_reply_canceled(
-+						struct l_dbus_message *message,
-+						const char *text)
-+{
-+	return l_dbus_message_new_error(message,
-+					IWD_AGENT_INTERFACE ".Error.Canceled",
-+					"Error: %s", text);
-+}
-+
- static struct l_dbus_message *agent_error(const char *text)
+-static struct l_dbus_message *agent_error(const char *text)
++static struct l_dbus_message *agent_error(struct l_dbus_message *message,
++							const char *text)
  {
  	display_error(text);
-@@ -342,9 +351,8 @@ static void process_input_username_password(const char =
-*prompt)
- 	if (l_queue_isempty(pending_op.saved_input)) {
- 		/* received username */
- 		if (!strlen(prompt)) {
--			reply =3D l_dbus_message_new_error(pending_message,
--					IWD_AGENT_INTERFACE ".Error.Canceled",
--					"Canceled by user");
-+			reply =3D agent_reply_canceled(pending_message,
-+							"Canceled by user");
- 			goto send_reply;
- 		}
  =
 
-@@ -372,9 +380,8 @@ static void process_input_passphrase(const char *prompt)
- 	struct l_dbus_message *reply;
- =
-
- 	if (!strlen(prompt)) {
--		reply =3D l_dbus_message_new_error(pending_message,
--					IWD_AGENT_INTERFACE ".Error.Canceled",
--					"Canceled by user");
-+		reply =3D agent_reply_canceled(pending_message,
-+							"Canceled by user");
- 		goto send_reply;
+@@ -69,7 +70,7 @@ static struct l_dbus_message *agent_error(const char *tex=
+t)
+ 		l_main_quit();
  	}
+ =
+
+-	return NULL;
++	return agent_reply_canceled(message, text);
+ }
+ =
+
+ static struct l_dbus_message *release_method_call(struct l_dbus *dbus,
+@@ -114,7 +115,7 @@ static struct l_dbus_message *request_passphrase_method=
+_call(
+ 		return reply;
+ =
+
+ 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
+-		return agent_error("No passphrase is provided as "
++		return agent_error(message, "No passphrase is provided as "
+ 					"'--"COMMAND_OPTION_PASSPHRASE"' "
+ 						"command-line option.\n");
+ =
+
+@@ -152,7 +153,7 @@ static struct l_dbus_message *request_private_key_passp=
+hrase_method_call(
+ 		return reply;
+ =
+
+ 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
+-		return agent_error("No passphrase is provided as "
++		return agent_error(message, "No passphrase is provided as "
+ 					"'--"COMMAND_OPTION_PASSPHRASE"' "
+ 						"command-line option.\n");
+ =
+
+@@ -211,7 +212,8 @@ static struct l_dbus_message *request_username_and_pass=
+word_method_call(
+ 		return reply;
+ =
+
+ 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
+-		return agent_error("No username or password is provided as "
++		return agent_error(message, "No username or password is "
++					"provided as "
+ 					"'--"COMMAND_OPTION_USERNAME"' or "
+ 					"'--"COMMAND_OPTION_PASSWORD"' "
+ 						"command-line option.\n");
+@@ -268,7 +270,7 @@ static struct l_dbus_message *request_user_password_met=
+hod_call(
+ 		return reply;
+ =
+
+ 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
+-		return agent_error("No password is provided as "
++		return agent_error(message, "No password is provided as "
+ 					"'--"COMMAND_OPTION_PASSWORD"' "
+ 					"command-line option.\n");
  =
 
 -- =
 
 2.13.6
 
---===============6857126271612445076==--
+--===============1518369684345446978==--
 
