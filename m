@@ -1,31 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============0448060135437677287=="
+Content-Type: multipart/mixed; boundary="===============7405865270366151804=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] manpage: add section on embedding PEMs in settings
-Date: Fri, 25 Oct 2019 11:22:52 -0500
-Message-ID: <78d213b5-3905-1f97-3051-9cc4593f5f15@gmail.com>
-In-Reply-To: <20191025161132.28367-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] network: add L_WARN for known network lookup failure
+Date: Fri, 25 Oct 2019 12:53:21 -0400
+Message-ID: <20191025165321.19718-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0448060135437677287==
+--===============7405865270366151804==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+When updating the network ranking there was a potential out of bounds
+array access. The condition was if known_network_offset returned a
+negative value, indicating the known network was not found. Since
+network->info is only set for known networks this should not ever
+happen as network->info is checked prior.
 
-On 10/25/19 11:11 AM, James Prestwood wrote:
-> ---
->   src/iwd.network.rst | 27 +++++++++++++++++++++++++++
->   1 file changed, 27 insertions(+)
-> =
+Though this is likely impossible, knownnetworks is complex enough that
+its better to just be paranoid and put an L_WARN_ON to check the
+return.
+---
+ src/network.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/src/network.c b/src/network.c
+index 3270b57c..0f29022b 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1376,6 +1376,8 @@ void network_rank_update(struct network *network, boo=
+l connected)
+ 	if (network->info->connected_time !=3D 0) {
+ 		int n =3D known_network_offset(network->info);
+ =
 
-Applied, thanks.
++		L_WARN_ON(n < 0);
++
+ 		if (n >=3D (int) L_ARRAY_SIZE(rankmod_table))
+ 			n =3D L_ARRAY_SIZE(rankmod_table) - 1;
+ =
 
-Regards,
--Denis
+-- =
 
---===============0448060135437677287==--
+2.21.0
+
+--===============7405865270366151804==--
 
