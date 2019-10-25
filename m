@@ -1,85 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============3020438110353413192=="
+Content-Type: multipart/mixed; boundary="===============1603043512912842045=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 4/5] client: Fail on requests with invalid arguments
-Date: Fri, 25 Oct 2019 13:32:07 -0700
-Message-ID: <20191025203208.30628-4-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 5/5] doc: Update agent API with possible errors
+Date: Fri, 25 Oct 2019 13:32:08 -0700
+Message-ID: <20191025203208.30628-5-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20191025203208.30628-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3020438110353413192==
+--===============1603043512912842045==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- client/agent.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ doc/agent-api.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/client/agent.c b/client/agent.c
-index 40e123d8..78499419 100644
---- a/client/agent.c
-+++ b/client/agent.c
-@@ -127,7 +127,9 @@ static struct l_dbus_message *request_passphrase_method=
-_call(
- 					"'--"COMMAND_OPTION_PASSPHRASE"' "
- 						"command-line option.\n");
+diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+index ef80499e..5200dfb5 100644
+--- a/doc/agent-api.txt
++++ b/doc/agent-api.txt
+@@ -43,6 +43,7 @@ Methods		void Release()
+ 			a network and passphrase is required.
  =
 
--	l_dbus_message_get_arguments(message, "o", &path);
-+	if (!l_dbus_message_get_arguments(message, "o", &path))
-+		return agent_reply_failed(message, "Invalid argument");
-+
- 	if (!path)
- 		return agent_reply_failed(message, "Invalid argument");
+ 			Possible Errors: net.connman.iwd.Agent.Error.Canceled
++					 net.connman.iwd.Agent.Error.Failed
  =
 
-@@ -165,7 +167,9 @@ static struct l_dbus_message *request_private_key_passp=
-hrase_method_call(
- 					"'--"COMMAND_OPTION_PASSPHRASE"' "
- 						"command-line option.\n");
+ 		string RequestPrivateKeyPassphrase(object network)
  =
 
--	l_dbus_message_get_arguments(message, "o", &path);
-+	if (!l_dbus_message_get_arguments(message, "o", &path))
-+		return agent_reply_failed(message, "Invalid argument");
-+
- 	if (!path)
- 		return agent_reply_failed(message, "Invalid argument");
+@@ -52,6 +53,7 @@ Methods		void Release()
+ 			obtain that private key's encryption passphrase.
  =
 
-@@ -226,7 +230,9 @@ static struct l_dbus_message *request_username_and_pass=
-word_method_call(
- 					"'--"COMMAND_OPTION_PASSWORD"' "
- 						"command-line option.\n");
+ 			Possible Errors: net.connman.iwd.Agent.Error.Canceled
++					 net.connman.iwd.Agent.Error.Failed
  =
 
--	l_dbus_message_get_arguments(message, "o", &path);
-+	if (!l_dbus_message_get_arguments(message, "o", &path))
-+		return agent_reply_failed(message, "Invalid argument");
-+
- 	if (!path)
- 		return agent_reply_failed(message, "Invalid argument");
+ 		(string, string) RequestUserNameAndPassword(object network)
  =
 
-@@ -282,7 +288,9 @@ static struct l_dbus_message *request_user_password_met=
-hod_call(
- 					"'--"COMMAND_OPTION_PASSWORD"' "
- 					"command-line option.\n");
+@@ -60,6 +62,7 @@ Methods		void Release()
+ 			user name and password.
  =
 
--	l_dbus_message_get_arguments(message, "os", &path, &username);
-+	if (!l_dbus_message_get_arguments(message, "os", &path, &username))
-+		return agent_reply_failed(message, "Invalid arguments");
-+
- 	if (!path || !username)
- 		return agent_reply_failed(message, "Invalid argument");
+ 			Possible Errors: net.connman.iwd.Agent.Error.Canceled
++					 net.connman.iwd.Agent.Error.Failed
+ =
+
+ 		string RequestUserPassword(object network, string user)
+ =
+
+@@ -69,6 +72,7 @@ Methods		void Release()
+ 			in the parameter.
+ =
+
+ 			Possible Errors: net.connman.iwd.Agent.Error.Canceled
++					 net.connman.iwd.Agent.Error.Failed
+ =
+
+ 		void Cancel(string reason)
  =
 
 -- =
 
 2.13.6
 
---===============3020438110353413192==--
+--===============1603043512912842045==--
 
