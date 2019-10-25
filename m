@@ -1,103 +1,120 @@
-Content-Type: multipart/mixed; boundary="===============1518369684345446978=="
+Content-Type: multipart/mixed; boundary="===============3937083986212367122=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 2/5] client: Modify error handler to return cancelation msg
-Date: Fri, 25 Oct 2019 13:32:05 -0700
-Message-ID: <20191025203208.30628-2-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 3/5] client: Respond to invalid agent requests
+Date: Fri, 25 Oct 2019 13:32:06 -0700
+Message-ID: <20191025203208.30628-3-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20191025203208.30628-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1518369684345446978==
+--===============3937083986212367122==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows to send cancelation error back to iwd, instead of
-returning NULL and waiting for iwd to timeout on agent request.
+This allows to send an error back to iwd, instead of returning NULL
+and waiting for iwd to timeout on agent request.
 ---
- client/agent.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ client/agent.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/client/agent.c b/client/agent.c
-index b80e5727..503418a0 100644
+index 503418a0..40e123d8 100644
 --- a/client/agent.c
 +++ b/client/agent.c
-@@ -59,7 +59,8 @@ static struct l_dbus_message *agent_reply_canceled(
+@@ -59,6 +59,14 @@ static struct l_dbus_message *agent_reply_canceled(
  					"Error: %s", text);
  }
  =
 
--static struct l_dbus_message *agent_error(const char *text)
-+static struct l_dbus_message *agent_error(struct l_dbus_message *message,
++static struct l_dbus_message *agent_reply_failed(struct l_dbus_message *me=
+ssage,
 +							const char *text)
++{
++	return l_dbus_message_new_error(message,
++					IWD_AGENT_INTERFACE ".Error.Failed",
++					"Error: %s", text);
++}
++
+ static struct l_dbus_message *agent_error(struct l_dbus_message *message,
+ 							const char *text)
  {
- 	display_error(text);
+@@ -121,11 +129,11 @@ static struct l_dbus_message *request_passphrase_meth=
+od_call(
  =
 
-@@ -69,7 +70,7 @@ static struct l_dbus_message *agent_error(const char *tex=
-t)
- 		l_main_quit();
- 	}
+ 	l_dbus_message_get_arguments(message, "o", &path);
+ 	if (!path)
+-		return NULL;
++		return agent_reply_failed(message, "Invalid argument");
  =
 
--	return NULL;
-+	return agent_reply_canceled(message, text);
- }
+ 	proxy =3D proxy_interface_find(IWD_NETWORK_INTERFACE, path);
+ 	if (!proxy)
+-		return NULL;
++		return agent_reply_failed(message, "Invalid network object");
  =
 
- static struct l_dbus_message *release_method_call(struct l_dbus *dbus,
-@@ -114,7 +115,7 @@ static struct l_dbus_message *request_passphrase_method=
-_call(
- 		return reply;
+ 	display("Type the network passphrase for %s.\n",
+ 				proxy_interface_get_identity_str(proxy));
+@@ -159,11 +167,11 @@ static struct l_dbus_message *request_private_key_pas=
+sphrase_method_call(
  =
 
- 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
--		return agent_error("No passphrase is provided as "
-+		return agent_error(message, "No passphrase is provided as "
- 					"'--"COMMAND_OPTION_PASSPHRASE"' "
- 						"command-line option.\n");
+ 	l_dbus_message_get_arguments(message, "o", &path);
+ 	if (!path)
+-		return NULL;
++		return agent_reply_failed(message, "Invalid argument");
  =
 
-@@ -152,7 +153,7 @@ static struct l_dbus_message *request_private_key_passp=
-hrase_method_call(
- 		return reply;
+ 	proxy =3D proxy_interface_find(IWD_NETWORK_INTERFACE, path);
+ 	if (!proxy)
+-		return NULL;
++		return agent_reply_failed(message, "Invalid network object");
  =
 
- 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
--		return agent_error("No passphrase is provided as "
-+		return agent_error(message, "No passphrase is provided as "
- 					"'--"COMMAND_OPTION_PASSPHRASE"' "
- 						"command-line option.\n");
+ 	display("Type the passphrase for the network encrypted private key for "
+ 			"%s.\n", proxy_interface_get_identity_str(proxy));
+@@ -220,11 +228,11 @@ static struct l_dbus_message *request_username_and_pa=
+ssword_method_call(
  =
 
-@@ -211,7 +212,8 @@ static struct l_dbus_message *request_username_and_pass=
-word_method_call(
- 		return reply;
+ 	l_dbus_message_get_arguments(message, "o", &path);
+ 	if (!path)
+-		return NULL;
++		return agent_reply_failed(message, "Invalid argument");
  =
 
- 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
--		return agent_error("No username or password is provided as "
-+		return agent_error(message, "No username or password is "
-+					"provided as "
- 					"'--"COMMAND_OPTION_USERNAME"' or "
- 					"'--"COMMAND_OPTION_PASSWORD"' "
- 						"command-line option.\n");
-@@ -268,7 +270,7 @@ static struct l_dbus_message *request_user_password_met=
-hod_call(
- 		return reply;
+ 	proxy =3D proxy_interface_find(IWD_NETWORK_INTERFACE, path);
+ 	if (!proxy)
+-		return NULL;
++		return agent_reply_failed(message, "Invalid network object");
  =
 
- 	if (command_option_get(COMMAND_OPTION_DONTASK, NULL))
--		return agent_error("No password is provided as "
-+		return agent_error(message, "No password is provided as "
- 					"'--"COMMAND_OPTION_PASSWORD"' "
- 					"command-line option.\n");
+ 	display("Type the network credentials for %s.\n",
+ 				proxy_interface_get_identity_str(proxy));
+@@ -276,11 +284,11 @@ static struct l_dbus_message *request_user_password_m=
+ethod_call(
  =
 
+ 	l_dbus_message_get_arguments(message, "os", &path, &username);
+ 	if (!path || !username)
+-		return NULL;
++		return agent_reply_failed(message, "Invalid argument");
+ =
+
+ 	proxy =3D proxy_interface_find(IWD_NETWORK_INTERFACE, path);
+ 	if (!proxy)
+-		return NULL;
++		return agent_reply_failed(message, "Invalid network object");
+ =
+
+ 	display("Type the network password for %s.\n",
+ 				proxy_interface_get_identity_str(proxy));
 -- =
 
 2.13.6
 
---===============1518369684345446978==--
+--===============3937083986212367122==--
 
