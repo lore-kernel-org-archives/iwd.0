@@ -1,43 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============0515702671795805832=="
+Content-Type: multipart/mixed; boundary="===============6171557039836620106=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH] client: Fix network name completion
-Date: Fri, 25 Oct 2019 10:26:07 -0700
-Message-ID: <20191025172607.10840-1-tim.a.kourt@linux.intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] network: add L_WARN for known network lookup failure
+Date: Fri, 25 Oct 2019 13:19:47 -0500
+Message-ID: <a25b9c57-eae2-bf90-273e-ae71a1518720@gmail.com>
+In-Reply-To: <20191025165321.19718-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0515702671795805832==
+--===============6171557039836620106==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Exclude the network names that are shorter then the query text
-from the autocompletion network name list.
----
- client/network.c | 3 +++
- 1 file changed, 3 insertions(+)
+Hi James,
 
-diff --git a/client/network.c b/client/network.c
-index 023a505c..b4ce3235 100644
---- a/client/network.c
-+++ b/client/network.c
-@@ -228,6 +228,9 @@ static bool match_by_partial_name(const void *a, const =
-void *b)
- 		return false;
- 	}
- =
+On 10/25/19 11:53 AM, James Prestwood wrote:
+> When updating the network ranking there was a potential out of bounds
+> array access. The condition was if known_network_offset returned a
+> negative value, indicating the known network was not found. Since
+> network->info is only set for known networks this should not ever
+> happen as network->info is checked prior.
+> =
 
-+	if (*text)
-+		return false;
-+
- 	return true;
- }
- =
+> Though this is likely impossible, knownnetworks is complex enough that
+> its better to just be paranoid and put an L_WARN_ON to check the
+> return.
+> ---
+>   src/network.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> =
 
--- =
 
-2.13.6
+Applied, thanks.
 
---===============0515702671795805832==--
+Regards,
+-Denis
+
+--===============6171557039836620106==--
 
