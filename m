@@ -1,43 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============1827159940782796755=="
+Content-Type: multipart/mixed; boundary="===============0107533863867595663=="
 MIME-Version: 1.0
-From: Will Dietz <w@wdtz.org>
-Subject: [PATCH] Don't pass NULL as src to memcpy, even when zero len.
-Date: Mon, 28 Oct 2019 14:42:01 -0500
-Message-ID: <20191028194201.12372-1-w@wdtz.org>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] auto-t: return None with get_ordered_network(s)
+Date: Mon, 28 Oct 2019 12:51:59 -0700
+Message-ID: <20191028195201.21904-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1827159940782796755==
+--===============0107533863867595663==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Skip the memcpy when len =3D 0, definitely don't ignore attempt
-to copy X bytes from NULL where X !=3D 0 :).
+If no networks are found, return None rather than an empty
+array. This is easier to check by the caller (and was assumed
+in some cases). Also add an exception to get_ordered_network
+if no network is found.
 ---
- monitor/main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ autotests/util/iwd.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/monitor/main.c b/monitor/main.c
-index 020dba86..41692cd1 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -176,7 +176,8 @@ static size_t rta_add(void *rta_buf, unsigned short typ=
-e, uint16_t len,
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 3ba5112c..35e5a693 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -376,6 +376,10 @@ class Device(IWDDBusAbstract):
+         for bus_obj in self._station.GetOrderedNetworks():
+             ordered_network =3D OrderedNetwork(bus_obj)
+             ordered_networks.append(ordered_network)
++
++        if len(ordered_networks) =3D=3D 0:
++            return None
++
+         return ordered_networks
  =
 
- 	rta->rta_len =3D rta_len;
- 	rta->rta_type =3D type;
--	memcpy(RTA_DATA(rta), data, len);
-+	if (len)
-+		memcpy(RTA_DATA(rta), data, len);
+     def get_ordered_network(self, network):
+@@ -385,6 +389,9 @@ class Device(IWDDBusAbstract):
+         '''
+         ordered_networks =3D self.get_ordered_networks()
  =
 
- 	return RTA_SPACE(len);
- }
++        if not ordered_networks:
++            raise Exception('Network %s not found' % network)
++
+         for n in ordered_networks:
+             if n.name =3D=3D network:
+                 return n
 -- =
 
-2.24.0-rc1
+2.17.1
 
---===============1827159940782796755==--
+--===============0107533863867595663==--
 
