@@ -1,105 +1,160 @@
-Content-Type: multipart/mixed; boundary="===============5745368926896668393=="
+Content-Type: multipart/mixed; boundary="===============1876511149599864206=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 15/16] wsc: Add wsc_new_p2p_enrollee
-Date: Mon, 28 Oct 2019 15:05:07 +0100
-Message-ID: <20191028140508.13518-15-andrew.zaborowski@intel.com>
+Subject: [PATCH 16/16] wsc: Accept extra IEs in wsc_new_p2p_enrollee
+Date: Mon, 28 Oct 2019 15:05:08 +0100
+Message-ID: <20191028140508.13518-16-andrew.zaborowski@intel.com>
 In-Reply-To: <20191028140508.13518-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5745368926896668393==
+--===============1876511149599864206==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Until now WSC could only be triggered by calling a DBus method and
-success and error paths would end with a reply to the DBus method.
-Instead use a wsc done callback pointer so that the WSC connection
-logic can be triggered through DBus or a C API.
-
-Export a function that adds a new entry point to start the WSC
-connection for the P2P provisioning phase.  The function doesn't have
-anything specific to P2P at this point.
 ---
- src/wsc.c | 31 +++++++++++++++++++++++++++++++
- src/wsc.h |  9 +++++++++
- 2 files changed, 40 insertions(+)
+ src/wsc.c | 30 +++++++++++++++++-------------
+ src/wsc.h |  6 ++++--
+ 2 files changed, 21 insertions(+), 15 deletions(-)
 
 diff --git a/src/wsc.c b/src/wsc.c
-index 0c241ee3..6866571a 100644
+index 6866571a..c094ac88 100644
 --- a/src/wsc.c
 +++ b/src/wsc.c
-@@ -1197,6 +1197,37 @@ static void wsc_netdev_watch(struct netdev *netdev,
- 	}
+@@ -448,7 +448,8 @@ static inline enum wsc_rf_band freq_to_rf_band(uint32_t=
+ freq)
+ 	return WSC_RF_BAND_2_4_GHZ;
  }
  =
 
-+struct wsc *wsc_new_p2p_enrollee(struct netdev *netdev, struct scan_bss *t=
-arget,
-+					char *pin, wsc_done_cb_t done_cb,
-+					void *user_data)
-+{
-+	struct wsc *wsc;
-+
-+	wsc =3D l_new(struct wsc, 1);
-+	wsc->netdev =3D netdev;
-+	wsc->target =3D target;
-+	wsc->config_method =3D pin ? WSC_CONFIGURATION_METHOD_KEYPAD :
-+		WSC_CONFIGURATION_METHOD_PUSH_BUTTON;
-+	wsc->done_cb =3D done_cb;
-+	wsc->done_data =3D user_data;
-+	wsc->pin =3D l_strdup(pin);
-+
-+	wsc_connect(wsc);
-+
-+	/*
-+	 * Wsc objects created this way are not handled in wsc_remove_interface,
-+	 * the caller is expected to watch interfaces going away and there's no
-+	 * need to handle the event in both places.
-+	 */
-+
-+	return wsc;
-+}
-+
-+void wsc_destroy(struct wsc *wsc)
-+{
-+	wsc_free(wsc);
-+}
-+
- static int wsc_init(void)
+-static void wsc_connect(struct wsc *wsc)
++static void wsc_connect(struct wsc *wsc, struct iovec *ies,
++			unsigned int ies_num)
  {
- 	l_debug("");
+ 	struct handshake_state *hs;
+ 	struct l_settings *settings =3D l_settings_new();
+@@ -457,7 +458,7 @@ static void wsc_connect(struct wsc *wsc)
+ 	struct wsc_association_request request;
+ 	uint8_t *pdu;
+ 	size_t pdu_len;
+-	struct iovec ie_iov;
++	struct iovec ie_iov[1 + ies_num];
+ =
+
+ 	wsc->target =3D NULL;
+ =
+
+@@ -503,18 +504,20 @@ static void wsc_connect(struct wsc *wsc)
+ 		goto error;
+ 	}
+ =
+
+-	ie_iov.iov_base =3D ie_tlv_encapsulate_wsc_payload(pdu, pdu_len,
+-							&ie_iov.iov_len);
++	ie_iov[0].iov_base =3D ie_tlv_encapsulate_wsc_payload(pdu, pdu_len,
++							&ie_iov[0].iov_len);
+ 	l_free(pdu);
+ =
+
+-	if (!ie_iov.iov_base) {
++	if (!ie_iov[0].iov_base) {
+ 		r =3D -ENOMEM;
+ 		goto error;
+ 	}
+ =
+
+-	r =3D netdev_connect(wsc->netdev, bss, hs, &ie_iov, 1, wsc_netdev_event,
+-				wsc_connect_cb, wsc);
+-	l_free(ie_iov.iov_base);
++	memcpy(ie_iov + 1, ies, sizeof(struct iovec) * ies_num);
++
++	r =3D netdev_connect(wsc->netdev, bss, hs, ie_iov, 1 + ies_num,
++				wsc_netdev_event, wsc_connect_cb, wsc);
++	l_free(ie_iov[0].iov_base);
+ =
+
+ 	if (r < 0)
+ 		goto error;
+@@ -572,7 +575,7 @@ static void station_state_watch(enum station_state stat=
+e, void *userdata)
+ 	station_remove_state_watch(wsc->station, wsc->station_state_watch);
+ 	wsc->station_state_watch =3D 0;
+ =
+
+-	wsc_connect(wsc);
++	wsc_connect(wsc, NULL, 0);
+ }
+ =
+
+ static void wsc_check_can_connect(struct wsc *wsc, struct scan_bss *target)
+@@ -604,7 +607,7 @@ static void wsc_check_can_connect(struct wsc *wsc, stru=
+ct scan_bss *target)
+ =
+
+ 	switch (station_get_state(wsc->station)) {
+ 	case STATION_STATE_DISCONNECTED:
+-		wsc_connect(wsc);
++		wsc_connect(wsc, NULL, 0);
+ 		return;
+ 	case STATION_STATE_CONNECTING:
+ 	case STATION_STATE_CONNECTED:
+@@ -1198,8 +1201,9 @@ static void wsc_netdev_watch(struct netdev *netdev,
+ }
+ =
+
+ struct wsc *wsc_new_p2p_enrollee(struct netdev *netdev, struct scan_bss *t=
+arget,
+-					char *pin, wsc_done_cb_t done_cb,
+-					void *user_data)
++					char *pin,
++					struct iovec *ies, unsigned int ies_num,
++					wsc_done_cb_t done_cb, void *user_data)
+ {
+ 	struct wsc *wsc;
+ =
+
+@@ -1212,7 +1216,7 @@ struct wsc *wsc_new_p2p_enrollee(struct netdev *netde=
+v, struct scan_bss *target,
+ 	wsc->done_data =3D user_data;
+ 	wsc->pin =3D l_strdup(pin);
+ =
+
+-	wsc_connect(wsc);
++	wsc_connect(wsc, ies, ies_num);
+ =
+
+ 	/*
+ 	 * Wsc objects created this way are not handled in wsc_remove_interface,
 diff --git a/src/wsc.h b/src/wsc.h
-index ada08c89..3995a647 100644
+index 3995a647..4ae1c45c 100644
 --- a/src/wsc.h
 +++ b/src/wsc.h
-@@ -20,6 +20,10 @@
-  *
-  */
+@@ -23,6 +23,7 @@
+ struct wsc;
+ struct netdev;
+ struct scan_bss;
++struct iovec;
  =
 
-+struct wsc;
-+struct netdev;
-+struct scan_bss;
-+
  struct wsc_credentials_info {
  	char ssid[33];
- 	enum security security;
-@@ -33,3 +37,8 @@ struct wsc_credentials_info {
+@@ -39,6 +40,7 @@ typedef void (*wsc_done_cb_t)(int err, struct wsc_credent=
+ials_info *creds,
+ 				unsigned int n_creds, void *user_data);
  =
 
- typedef void (*wsc_done_cb_t)(int err, struct wsc_credentials_info *creds,
- 				unsigned int n_creds, void *user_data);
-+
-+struct wsc *wsc_new_p2p_enrollee(struct netdev *netdev, struct scan_bss *t=
+ struct wsc *wsc_new_p2p_enrollee(struct netdev *netdev, struct scan_bss *t=
 arget,
-+					char *pin, wsc_done_cb_t done_cb,
-+					void *user_data);
-+void wsc_destroy(struct wsc *wsc);
+-					char *pin, wsc_done_cb_t done_cb,
+-					void *user_data);
++					char *pin,
++					struct iovec *ies, unsigned int ies_num,
++					wsc_done_cb_t done_cb, void *user_data);
+ void wsc_destroy(struct wsc *wsc);
 -- =
 
 2.20.1
 
---===============5745368926896668393==--
+--===============1876511149599864206==--
 
