@@ -1,46 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============4055466884115271186=="
+Content-Type: multipart/mixed; boundary="===============6225159576092996658=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 2/2] client: Update rl_point to last known position
-Date: Tue, 29 Oct 2019 15:33:09 -0700
-Message-ID: <20191029223309.25581-2-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20191029223309.25581-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2 1/2] client: Increase passphrase buffer to accommodate for
+ nil byte
+Date: Tue, 29 Oct 2019 16:12:34 -0700
+Message-ID: <20191029231235.7751-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4055466884115271186==
+--===============6225159576092996658==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Keep cursor's position consistent when passphrase is reaching
-its maximum by adding characters in the middle of the string
-
-This isn't practical behavior.
 ---
- client/display.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ client/display.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/client/display.c b/client/display.c
-index 74b50e2e..fc280d31 100644
+index cd17ad84..105d05cb 100644
 --- a/client/display.c
 +++ b/client/display.c
-@@ -408,7 +408,9 @@ static void mask_input(void)
- 		return;
+@@ -397,7 +397,7 @@ static void display_completion_matches(char **matches, =
+int num_matches,
  =
 
- 	if (rl_end > MAX_PASSPHRASE_LEN) {
--		rl_point =3D rl_end =3D MAX_PASSPHRASE_LEN;
-+		rl_end =3D MAX_PASSPHRASE_LEN;
-+		rl_point =3D masked_input.point;
-+
- 		goto set_mask;
- 	}
+ static struct masked_input {
+ 	bool use_mask;
+-	char passphrase[MAX_PASSPHRASE_LEN];
++	char passphrase[MAX_PASSPHRASE_LEN + 1];
+ 	uint8_t point;
+ 	uint8_t end;
+ } masked_input;
+@@ -453,7 +453,7 @@ done:
  =
 
+ static void reset_masked_input(void)
+ {
+-	memset(masked_input.passphrase, 0, MAX_PASSPHRASE_LEN);
++	memset(masked_input.passphrase, 0, MAX_PASSPHRASE_LEN + 1);
+ 	masked_input.point =3D 0;
+ 	masked_input.end =3D 0;
+ }
 -- =
 
 2.13.6
 
---===============4055466884115271186==--
+--===============6225159576092996658==--
 
