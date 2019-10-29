@@ -1,39 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============3248170432869421203=="
+Content-Type: multipart/mixed; boundary="===============6988868762469078630=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH] client: Separate command option words by dash
-Date: Tue, 29 Oct 2019 10:41:32 -0700
-Message-ID: <20191029174132.19734-1-tim.a.kourt@linux.intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] client: Separate command option words by dash
+Date: Tue, 29 Oct 2019 12:48:41 -0500
+Message-ID: <83149c29-d153-902b-a5a5-174d87946fe2@gmail.com>
+In-Reply-To: <20191029174132.19734-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3248170432869421203==
+--===============6988868762469078630==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- client/command.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Tim,
 
-diff --git a/client/command.h b/client/command.h
-index 2161c075..d906dc9b 100644
---- a/client/command.h
-+++ b/client/command.h
-@@ -23,7 +23,7 @@
- #define COMMAND_OPTION_USERNAME		"username"
- #define COMMAND_OPTION_PASSWORD		"password"
- #define COMMAND_OPTION_PASSPHRASE	"passphrase"
--#define COMMAND_OPTION_DONTASK		"dontask"
-+#define COMMAND_OPTION_DONTASK		"dont-ask"
- =
+On 10/29/19 12:41 PM, Tim Kourt wrote:
+> ---
+>   client/command.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
- typedef char *(*command_completion_func_t) (const char *text, int state);
- =
 
--- =
+Applied, thanks.
 
-2.13.6
+Regards,
+-Denis
 
---===============3248170432869421203==--
+--===============6988868762469078630==--
 
