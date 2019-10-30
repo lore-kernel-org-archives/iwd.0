@@ -1,37 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============0043532873156403966=="
+Content-Type: multipart/mixed; boundary="===============4880726911485615986=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 10/16] wsc: Replace netdev_connect_wsc with netdev_connect
- usage
-Date: Wed, 30 Oct 2019 14:36:50 -0500
-Message-ID: <86c4da8b-44c5-afb3-4d8a-a69763bf1688@gmail.com>
-In-Reply-To: <20191028140508.13518-10-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH] knownnetworks: Check result of setting getter
+Date: Wed, 30 Oct 2019 14:39:52 -0500
+Message-ID: <46046dfb-4773-713b-a9db-cd9124d03a96@gmail.com>
+In-Reply-To: <20191029233140.11777-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0043532873156403966==
+--===============4880726911485615986==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Hi Tim,
 
-On 10/28/19 9:05 AM, Andrew Zaborowski wrote:
-> netdev_connect can achieve the same effect as netdev_connect_wsc but is
-> more flexible as it allows us to supply additional association IEs.  We
-> will need this capability to make P2P connections.  This way we're also
-> moving the WSC-specific bits to wsc.c from the crowded netdev.c.
+On 10/29/19 6:31 PM, Tim Kourt wrote:
+> Set the value of 'is_hidden' if necessary.
 > ---
->   src/netdev.c |  2 +-
->   src/wsc.c    | 46 +++++++++++++++++++++++++++++++++-------------
->   2 files changed, 34 insertions(+), 14 deletions(-)
+>   src/knownnetworks.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
 > =
 
 
-Patch 10 & 12 applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============0043532873156403966==--
+--===============4880726911485615986==--
 
