@@ -1,36 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============7741253203150065552=="
+Content-Type: multipart/mixed; boundary="===============8593273828762607423=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 06/16] handshake: Convert HANDSHAKE_EVENT_FAILED data to
- int
-Date: Wed, 30 Oct 2019 14:26:45 -0500
-Message-ID: <2f4e2a44-0e81-f4e3-3b66-e15256eab6b1@gmail.com>
-In-Reply-To: <20191028140508.13518-6-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 08/16] eapol: Move the EAP events to handshake event
+ handler
+Date: Wed, 30 Oct 2019 14:27:18 -0500
+Message-ID: <0e1f7903-0198-36d1-1516-6066bfa91c5e@gmail.com>
+In-Reply-To: <20191028140508.13518-8-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7741253203150065552==
+--===============8593273828762607423==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 10/28/19 9:04 AM, Andrew Zaborowski wrote:
-> Note the uint16_t reason code is promoted to an int when using variable
-> arguments so va_arg(args, int) has to be used.
+Hi Andrew,
+
+On 10/28/19 9:05 AM, Andrew Zaborowski wrote:
+> On EAP events, call the handshake_event handler with the new event type
+> HANDSHAKE_EVENT_EAP_NOTIFY isntead of the eapol_event callback.
+> =
+
+> This allows the handler to be set before calling
+> netdev_connect/netdev_connect_wsc.  It's also in theory more type-safe
+> because we don't need the cast in netdev_connect_wsc anymore.
 > ---
->   src/ap.c      | 2 +-
->   src/eapol.c   | 2 +-
->   src/station.c | 2 +-
->   src/wsc.c     | 2 +-
->   4 files changed, 4 insertions(+), 4 deletions(-)
+>   src/eapol.c     |  6 ++----
+>   src/handshake.h |  1 +
+>   src/station.c   |  1 +
+>   src/wsc.c       | 27 +++++++++++++++++----------
+>   4 files changed, 21 insertions(+), 14 deletions(-)
 > =
 
 
-Ah, you did this part as a separate patch.  Should have looked again.
-
-I squashed patchees 5, 6, and 7 together and applied.
+Patch 8 and 9 applied, thanks.
 
 Regards,
 -Denis
---===============7741253203150065552==--
+
+
+--===============8593273828762607423==--
 
