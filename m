@@ -1,75 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============1813955887809514561=="
+Content-Type: multipart/mixed; boundary="===============7130400809225943313=="
 MIME-Version: 1.0
-From: Prestwood, James <james.prestwood@intel.com>
-Subject: Re: How to use IWD in my own application?
-Date: Fri, 01 Nov 2019 16:56:31 +0000
-Message-ID: <f89048b4b3dd4c0f393823eb0e4b282fc3bf0b46.camel@intel.com>
-In-Reply-To: <CAL47XF4fVz+81OPeH0V38YkJ_v3XCYev71zCtB138Aoyvt9_YQ@mail.gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 14/16] wsc: Refactor to separate DBus-specific code
+Date: Mon, 04 Nov 2019 11:37:54 -0600
+Message-ID: <f27e9686-6c52-0c1c-2301-9ec2960e38dc@gmail.com>
+In-Reply-To: <20191028140508.13518-14-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1813955887809514561==
+--===============7130400809225943313==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Andrew,
 
-On Fri, 2019-11-01 at 19:50 +0300, Vitold S wrote:
-Hello,
-I want to use IWD without using iwctl command line interface.
-Could you please provide way to use common Wi-FI API with shared library li=
-ke Linux common way libiwd.so for invoke in my application?
-Thanks.
-
-IWD is a standalone wireless daemon and controlled via D-Bus (this is what =
-iwctl itself uses). IWD does not expose any C APIs nor is it meant to be co=
-mpiled into a library. D-Bus is going to be your only way of controlling IW=
-D.
-
-Thanks,
-James
+On 10/28/19 9:05 AM, Andrew Zaborowski wrote:
+> Split the DBus-specific logic out of the core WSC logic.  The core
+> WSC code is the part that we can re-use for P2P and doesn't include
+> the scanning for the target BSS or the attempt to make a station mode
+> connection.
+> ---
+>   src/wsc.c | 141 ++++++++++++++++++++++++++++++++++++++----------------
+>   src/wsc.h |   3 ++
+>   2 files changed, 103 insertions(+), 41 deletions(-)
+> =
 
 
-_______________________________________________
+<snip>
 
-iwd mailing list -- iwd(a)lists.01.org<mailto:iwd@lists.01.org>
+> @@ -451,30 +470,24 @@ static void wsc_connect(struct wsc *wsc)
+>   	l_settings_set_uint(settings, "WSC", "RFBand",
+>   					freq_to_rf_band(bss->frequency));
+>   	l_settings_set_uint(settings, "WSC", "ConfigurationMethods",
+> -				WSC_CONFIGURATION_METHOD_VIRTUAL_DISPLAY_PIN |
+> -				WSC_CONFIGURATION_METHOD_VIRTUAL_PUSH_BUTTON |
+> -				WSC_CONFIGURATION_METHOD_KEYPAD);
+> +					wsc->config_method);
 
-To unsubscribe send an email to iwd-leave(a)lists.01.org<mailto:iwd-leave(a=
-)lists.01.org>
+So this is somewhat non-obvious that you're messing with the advertised =
 
+config method in this patch.  Just setting METHOD_KEYPAD (and using that =
 
---===============1813955887809514561==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+as a selector) is not flexible enough and most likely against what the =
 
-PGh0bWwgZGlyPSJsdHIiPg0KPGhlYWQ+DQo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUi
-IGNvbnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11dGYtOCI+DQo8L2hlYWQ+DQo8Ym9keSBzdHls
-ZT0idGV4dC1hbGlnbjpsZWZ0OyBkaXJlY3Rpb246bHRyOyI+DQo8ZGl2PkhpLDwvZGl2Pg0KPGRp
-dj48YnI+DQo8L2Rpdj4NCjxkaXY+T24gRnJpLCAyMDE5LTExLTAxIGF0IDE5OjUwICYjNDM7MDMw
-MCwgVml0b2xkIFMgd3JvdGU6PC9kaXY+DQo8YmxvY2txdW90ZSB0eXBlPSJjaXRlIiBzdHlsZT0i
-bWFyZ2luOjAgMCAwIC44ZXg7IGJvcmRlci1sZWZ0OjJweCAjNzI5ZmNmIHNvbGlkO3BhZGRpbmct
-bGVmdDoxZXgiPg0KPGRpdiBkaXI9Imx0ciI+DQo8ZGl2PkhlbGxvLDwvZGl2Pg0KPGRpdj5JIHdh
-bnQgdG8gdXNlIElXRCB3aXRob3V0IHVzaW5nIGl3Y3RsIGNvbW1hbmQgbGluZSBpbnRlcmZhY2Uu
-PC9kaXY+DQo8ZGl2PkNvdWxkIHlvdSBwbGVhc2UgcHJvdmlkZSB3YXkgdG8gdXNlIGNvbW1vbiBX
-aS1GSSBBUEkgd2l0aCBzaGFyZWQgbGlicmFyeSBsaWtlIExpbnV4IGNvbW1vbiB3YXkgbGliaXdk
-LnNvIGZvciBpbnZva2UgaW4gbXkgYXBwbGljYXRpb24/PGJyPg0KPC9kaXY+DQo8ZGl2PlRoYW5r
-cy48YnI+DQo8L2Rpdj4NCjwvZGl2Pg0KPC9ibG9ja3F1b3RlPg0KPGRpdj48YnI+DQo8L2Rpdj4N
-CjxkaXY+SVdEIGlzIGEgc3RhbmRhbG9uZSB3aXJlbGVzcyBkYWVtb24gYW5kIGNvbnRyb2xsZWQg
-dmlhIEQtQnVzICh0aGlzIGlzIHdoYXQgaXdjdGwgaXRzZWxmIHVzZXMpLiBJV0QgZG9lcyBub3Qg
-ZXhwb3NlIGFueSBDIEFQSXMgbm9yIGlzIGl0IG1lYW50IHRvIGJlIGNvbXBpbGVkIGludG8gYSBs
-aWJyYXJ5LiBELUJ1cyBpcyBnb2luZyB0byBiZSB5b3VyIG9ubHkgd2F5IG9mIGNvbnRyb2xsaW5n
-IElXRC48L2Rpdj4NCjxkaXY+PGJyPg0KPC9kaXY+DQo8ZGl2PlRoYW5rcyw8L2Rpdj4NCjxkaXY+
-SmFtZXM8L2Rpdj4NCjxkaXY+PGJyPg0KPC9kaXY+DQo8YmxvY2txdW90ZSB0eXBlPSJjaXRlIiBz
-dHlsZT0ibWFyZ2luOjAgMCAwIC44ZXg7IGJvcmRlci1sZWZ0OjJweCAjNzI5ZmNmIHNvbGlkO3Bh
-ZGRpbmctbGVmdDoxZXgiPg0KPHByZT5fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXzwvcHJlPg0KPHByZT5pd2QgbWFpbGluZyBsaXN0IC0tIDxhIGhyZWY9Im1h
-aWx0bzppd2RAbGlzdHMuMDEub3JnIj5pd2RAbGlzdHMuMDEub3JnPC9hPjwvcHJlPg0KPHByZT5U
-byB1bnN1YnNjcmliZSBzZW5kIGFuIGVtYWlsIHRvIDxhIGhyZWY9Im1haWx0bzppd2QtbGVhdmVA
-bGlzdHMuMDEub3JnIj5pd2QtbGVhdmVAbGlzdHMuMDEub3JnPC9hPjwvcHJlPg0KPHByZT48YnI+
-PC9wcmU+DQo8L2Jsb2NrcXVvdGU+DQo8L2JvZHk+DQo8L2h0bWw+DQo=
+WSC spec recommends anyway.  Can't we explicitly track what 'high-level' =
 
---===============1813955887809514561==--
+method type we're using? i.e. PIN vs PushButton?
+
+Otherwise, I'm mostly okay with this patch.
+
+One thing to think about though is to make wsc an explicit state =
+
+machine.  Right now wsc only registers to the station ifindex and thus =
+
+only exists if the station interface exists.
+
+How are you dealing with the fact that you need to run P2P transactions =
+
+on the P2P_CLIENT interface and what happens if there's no station =
+
+iftype registered at all?
+
+Regards,
+-Denis
+--===============7130400809225943313==--
 
