@@ -1,39 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============2103733075674766552=="
+Content-Type: multipart/mixed; boundary="===============1279683092400897920=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/5] wiphy: add beacon bits to RM Enabled Capabilities
-Date: Mon, 04 Nov 2019 16:35:34 -0600
-Message-ID: <c6e845c6-86a5-1368-7d88-a356accef9cb@gmail.com>
-In-Reply-To: <b285a0430494b28d14d44e2a2d4d1cbdba1af39d.camel@gmail.com>
+From: Khem Raj <raj.khem@gmail.com>
+Subject: [PATCH] Makefile.am: Avoid redirection of input and output files
+Date: Mon, 04 Nov 2019 17:07:05 -0800
+Message-ID: <20191105010705.2711040-1-raj.khem@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2103733075674766552==
+--===============1279683092400897920==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This can cause a build race in a highly parallelised build where a director=
+y is not yet created but
+output file is being written using redirection e.g.
 
->>> +	/* Bits: Passive (4), Active (5), and Beacon Table (6)
->>> capabilities */
->>> +	wiphy->rm_enabled_capabilities[2] =3D 0x70;
->>
->> Do you really mean to add all of these or just the Beacon table one?
-> =
+rst2man.py --strict --no-raw --no-generator --no-datestamp < ../git/monitor=
+/iwmon.rst > monitor/iwmon.1
+/bin/sh: monitor/iwmon.1: No such file or directory
+make[1]: *** [Makefile:3544: monitor/iwmon.1] Error 1
+---
+ Makefile.am | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-> Yeah this was intended. This lets us support passive and active scan
-> requests. Did you only want to allow table measurements?
-> =
+diff --git a/Makefile.am b/Makefile.am
+index 823b7d02..21dd707c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -627,7 +627,7 @@ SED_PROCESS =3D $(AM_V_GEN)$(MKDIR_P) $(dir $@) && $(SE=
+D) \
+ =
 
+ if RUN_RST2MAN
+ RST2MAN_PROCESS =3D $(AM_V_GEN)$(RST2MAN) --strict --no-raw --no-generator=
+ \
+-			--no-datestamp < $< > $@
++			--no-datestamp
+ else
+ RST2MAN_PROCESS =3D $(AM_V_GEN)test -f $@ || \
+ 		{ echo "Generated manual page $@ does not exist"; false; }
+@@ -637,13 +637,13 @@ endif
+ 	$(SED_PROCESS)
+ =
 
-Ah no, this is fine.  I now realize I mixed up Beacon Table and Beacon =
+ %.1: %.rst Makefile
+-	$(RST2MAN_PROCESS)
++	$(RST2MAN_PROCESS) $< $@
+ =
 
-Request.  So ignore this, the commit is fine.  I'll take it in the next =
+ %.5: %.rst Makefile
+-	$(RST2MAN_PROCESS)
++	$(RST2MAN_PROCESS) $< $@
+ =
 
-version.
+ %.8: %.rst Makefile
+-	$(RST2MAN_PROCESS)
++	$(RST2MAN_PROCESS) $< $@
+ =
 
-Regards,
--Denis
---===============2103733075674766552==--
+ install-data-local:
+ if !SYSTEMD_SERVICE
+-- =
+
+2.24.0
+
+--===============1279683092400897920==--
 
