@@ -1,92 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============6189283106535924397=="
+Content-Type: multipart/mixed; boundary="===============0341601652982753179=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] test-runner: refactor/fix valgrind logging issue
-Date: Tue, 05 Nov 2019 15:22:26 -0800
-Message-ID: <20191105232226.11705-1-prestwoj@gmail.com>
+Subject: [PATCH] test-runner: special case python3 verbose option
+Date: Tue, 05 Nov 2019 15:36:04 -0800
+Message-ID: <20191105233604.12933-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6189283106535924397==
+--===============0341601652982753179==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-After the logging changes verbose IWD with valgrind did not show any IWD
-output. This commit fixes this by checking the verbosity against log_name
-rather than argv[0] since log_name has a special case for valgrind/iwd.
+Historically if you wanted to see output from a python test you needed
+to specify -v pytests. This was also the case if IWD was started from
+python.
 
-The valgrind logic in start_iwd was refactored to only use the --log-fd
-option rather than using --log-file in addition to --log-fd.
+Nearly every time I run test-runner I would specify "-v iwd,pytests"
+only to get the IWD output on these specific tests.
+
+Instead we can special case 'python3' (previously 'pytests') inside
+execute_program so that turning on verbosity for 'iwd' also turns it
+on for the python tests.
 ---
- tools/test-runner.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ tools/test-runner.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 5ef9552e..a83e1252 100644
+index a83e1252..00989391 100644
 --- a/tools/test-runner.c
 +++ b/tools/test-runner.c
-@@ -564,7 +564,7 @@ static pid_t execute_program(char *argv[], char *envp[]=
-, bool wait,
- 		int fd =3D -1;
- 		L_AUTO_FREE_VAR(char *, log_file) =3D NULL;
+@@ -541,13 +541,17 @@ static pid_t execute_program(char *argv[], char *envp=
+[], bool wait,
+ 		return -1;
  =
 
--		verbose =3D check_verbosity(argv[0]);
-+		verbose =3D check_verbosity(log_name);
+ 	/*
+-	 * We have to special case this. execute_program automatically logs to
+-	 * <process>.log, which would put all iwd output into valgrind.log
+-	 * rather than iwd.log. Since we are explicitly having valgrind output
+-	 * to a log file we can assume any output from this is only IWD, and not
+-	 * valgrind.
++	 * We have a few special cases here:
++	 *
++	 * Since execute_program automatically logs to <process>.log this would
++	 * put all iwd output into valgrind.log rather than iwd.log. Since we
++	 * are explicitly having valgrind output to a log file we can assume any
++	 * output from this is only IWD, and not valgrind.
++	 *
++	 * python3 is special cased so that tests which start IWD manually can
++	 * still show IWD output when using -v iwd.
+ 	 */
+-	if (!strcmp(log_name, "valgrind"))
++	if (!strcmp(log_name, "valgrind") || !strcmp(log_name, "python3"))
+ 		log_name =3D "iwd";
  =
 
- 		/* No stdout and no logging */
- 		if (!verbose && !log)
-@@ -1493,6 +1493,7 @@ static pid_t start_iwd(const char *config_dir, struct=
- l_queue *wiphy_list,
- 	L_AUTO_FREE_VAR(char *, fd_option) =3D NULL;
- =
-
- 	if (valgrind) {
-+		L_AUTO_FREE_VAR(char *, valgrind_log);
- 		int fd;
- =
-
- 		argv[idx++] =3D "valgrind";
-@@ -1501,21 +1502,22 @@ static pid_t start_iwd(const char *config_dir, stru=
-ct l_queue *wiphy_list,
- 		/*
- 		 * Valgrind needs --log-fd if we want both stderr and stdout
- 		 */
--		if (log) {
--			L_AUTO_FREE_VAR(char *, valgrind_log);
--
-+		if (log)
- 			valgrind_log =3D l_strdup_printf("%s/%s/valgrind.log",
- 							log_dir, test_name);
--			fd =3D open(valgrind_log, O_WRONLY | O_CREAT | O_APPEND,
-+		else
-+			valgrind_log =3D l_strdup("/tmp/valgrind.log");
-+
-+		fd =3D open(valgrind_log, O_WRONLY | O_CREAT | O_APPEND,
- 					S_IRUSR | S_IWUSR);
- =
-
-+		if (log) {
- 			if (fchown(fd, log_uid, log_gid) < 0)
- 				l_error("chown failed");
-+		}
- =
-
--			fd_option =3D l_strdup_printf("--log-fd=3D%d", fd);
--			argv[idx++] =3D fd_option;
--		} else
--			argv[idx++] =3D "--log-file=3D/tmp/valgrind.log";
-+		fd_option =3D l_strdup_printf("--log-fd=3D%d", fd);
-+		argv[idx++] =3D fd_option;
- 	}
- =
-
- 	if (strcmp(gdb_opt, "iwd") =3D=3D 0) {
+ 	str =3D l_strjoinv(argv, ' ');
 -- =
 
 2.17.1
 
---===============6189283106535924397==--
+--===============0341601652982753179==--
 
