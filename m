@@ -1,76 +1,110 @@
-Content-Type: multipart/mixed; boundary="===============0437784583133030973=="
+Content-Type: multipart/mixed; boundary="===============3665843377684125608=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] Makefile.am: Avoid redirection of input and output files
-Date: Tue, 05 Nov 2019 07:11:03 +0100
-Message-ID: <F316B322-020B-4D7A-BF10-8EF7B5CB7CE2@holtmann.org>
-In-Reply-To: <20191105010705.2711040-1-raj.khem@gmail.com>
+From: Will Dietz <w@wdtz.org>
+Subject: Fwd: [PATCH 09/16] unit: Update event handler in WSC, eapol tests
+Date: Tue, 05 Nov 2019 04:35:53 -0600
+Message-ID: <CAKGWAO9pYgPuq=6JCsjBtSppH3KXD503ovskc5zyAQk9PjGgZg@mail.gmail.com>
+In-Reply-To: <20191104210207.GB15819@dtznix>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0437784583133030973==
+--===============3665843377684125608==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Khem,
+Whoops, meant to send to list, sorry!
 
-> This can cause a build race in a highly parallelised build where a direct=
-ory is not yet created but
-> output file is being written using redirection e.g.
-> =
+---------- Forwarded message ---------
+From: Will Dietz <w@wdtz.org>
+Date: Mon, Nov 4, 2019, 9:02 PM
+Subject: Re: [PATCH 09/16] unit: Update event handler in WSC, eapol tests
+To: Andrew Zaborowski <andrew.zaborowski@intel.com>
 
-> rst2man.py --strict --no-raw --no-generator --no-datestamp < ../git/monit=
-or/iwmon.rst > monitor/iwmon.1
-> /bin/sh: monitor/iwmon.1: No such file or directory
-> make[1]: *** [Makefile:3544: monitor/iwmon.1] Error 1
-> ---
-> Makefile.am | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
-> =
 
-> diff --git a/Makefile.am b/Makefile.am
-> index 823b7d02..21dd707c 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -627,7 +627,7 @@ SED_PROCESS =3D $(AM_V_GEN)$(MKDIR_P) $(dir $@) && $(=
-SED) \
-> =
+On Mon, 28 Oct 2019 15:05:01 +0100, Andrew Zaborowski <
+andrew.zaborowski@intel.com> wrote:
+>  {
+>       struct verify_data *data =3D user_data;
+> +     va_list args;
+> +
+> +     va_start(args, user_data);
+>
+>       switch (event) {
+>       case HANDSHAKE_EVENT_FAILED:
+> -             assert(l_get_u16(event_data) =3D=3D
+> -                             MMPDU_REASON_CODE_IEEE8021X_FAILED);
+> +             assert(va_arg(args, int) =3D=3D
+MMPDU_REASON_CODE_IEEE8021X_FAILED);
+>               data->eapol_failed =3D true;
+>               break;
+> +     case HANDSHAKE_EVENT_EAP_NOTIFY:
+> +     {
+> +             const struct wsc_credential *cred;
+> +
+> +             assert(va_arg(args, unsigned int) !=3D
+> +                     EAP_WSC_EVENT_CREDENTIAL_OBTAINED);
 
-> if RUN_RST2MAN
-> RST2MAN_PROCESS =3D $(AM_V_GEN)$(RST2MAN) --strict --no-raw --no-generato=
-r \
-> -			--no-datestamp < $< > $@
-> +			--no-datestamp
-> else
-> RST2MAN_PROCESS =3D $(AM_V_GEN)test -f $@ || \
-> 		{ echo "Generated manual page $@ does not exist"; false; }
+This condition appears to have been inverted accidentally :3.
+I noticed because this causes the test to (always) fail.
+Compare to the logic this replaces:
 
-so this is bad in case the else clause is used.
+> -
+> -     if (event !=3D EAP_WSC_EVENT_CREDENTIAL_OBTAINED)
+> -             assert(false);
+> -
 
-> @@ -637,13 +637,13 @@ endif
-> 	$(SED_PROCESS)
-> =
+I'm not in a position to properly submit a patch currently,
+but if there's agreement on this please go ahead and fix :).
+(flipping the '!=3D' to '=3D=3D' in the assert does the trick, etc.)
 
-> %.1: %.rst Makefile
-> -	$(RST2MAN_PROCESS)
-> +	$(RST2MAN_PROCESS) $< $@
-> =
+~Will
 
-> %.5: %.rst Makefile
-> -	$(RST2MAN_PROCESS)
-> +	$(RST2MAN_PROCESS) $< $@
-> =
+--===============3665843377684125608==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-> %.8: %.rst Makefile
-> -	$(RST2MAN_PROCESS)
-> +	$(RST2MAN_PROCESS) $< $@
+PGRpdiBkaXI9ImF1dG8iPjxkaXY+V2hvb3BzLCBtZWFudCB0byBzZW5kIHRvIGxpc3QsIHNvcnJ5
+ITxicj48YnI+PGRpdiBjbGFzcz0iZ21haWxfcXVvdGUiPjxkaXYgZGlyPSJsdHIiIGNsYXNzPSJn
+bWFpbF9hdHRyIj4tLS0tLS0tLS0tIEZvcndhcmRlZCBtZXNzYWdlIC0tLS0tLS0tLTxicj5Gcm9t
+OiA8c3Ryb25nIGNsYXNzPSJnbWFpbF9zZW5kZXJuYW1lIiBkaXI9ImF1dG8iPldpbGwgRGlldHo8
+L3N0cm9uZz4gPHNwYW4gZGlyPSJhdXRvIj4mbHQ7PGEgaHJlZj0ibWFpbHRvOndAd2R0ei5vcmci
+PndAd2R0ei5vcmc8L2E+Jmd0Ozwvc3Bhbj48YnI+RGF0ZTogTW9uLCBOb3YgNCwgMjAxOSwgOTow
+MiBQTTxicj5TdWJqZWN0OiBSZTogW1BBVENIIDA5LzE2XSB1bml0OiBVcGRhdGUgZXZlbnQgaGFu
+ZGxlciBpbiBXU0MsIGVhcG9sIHRlc3RzPGJyPlRvOiBBbmRyZXcgWmFib3Jvd3NraSAmbHQ7PGEg
+aHJlZj0ibWFpbHRvOmFuZHJldy56YWJvcm93c2tpQGludGVsLmNvbSI+YW5kcmV3LnphYm9yb3dz
+a2lAaW50ZWwuY29tPC9hPiZndDs8YnI+PC9kaXY+PGJyPjxicj5PbiBNb24sIDI4IE9jdCAyMDE5
+IDE1OjA1OjAxICswMTAwLCBBbmRyZXcgWmFib3Jvd3NraSAmbHQ7PGEgaHJlZj0ibWFpbHRvOmFu
+ZHJldy56YWJvcm93c2tpQGludGVsLmNvbSIgdGFyZ2V0PSJfYmxhbmsiIHJlbD0ibm9yZWZlcnJl
+ciI+YW5kcmV3LnphYm9yb3dza2lAaW50ZWwuY29tPC9hPiZndDsgd3JvdGU6PGJyPgomZ3Q7wqAg
+ezxicj4KJmd0O8KgIMKgIMKgIMKgc3RydWN0IHZlcmlmeV9kYXRhICpkYXRhID0gdXNlcl9kYXRh
+Ozxicj4KJmd0OyArwqAgwqAgwqB2YV9saXN0IGFyZ3M7PGJyPgomZ3Q7ICs8YnI+CiZndDsgK8Kg
+IMKgIMKgdmFfc3RhcnQoYXJncywgdXNlcl9kYXRhKTs8YnI+CiZndDvCoCA8YnI+CiZndDvCoCDC
+oCDCoCDCoHN3aXRjaCAoZXZlbnQpIHs8YnI+CiZndDvCoCDCoCDCoCDCoGNhc2UgSEFORFNIQUtF
+X0VWRU5UX0ZBSUxFRDo8YnI+CiZndDsgLcKgIMKgIMKgIMKgIMKgIMKgIMKgYXNzZXJ0KGxfZ2V0
+X3UxNihldmVudF9kYXRhKSA9PTxicj4KJmd0OyAtwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqBNTVBEVV9SRUFTT05fQ09ERV9JRUVFODAyMVhfRkFJTEVEKTs8YnI+
+CiZndDsgK8KgIMKgIMKgIMKgIMKgIMKgIMKgYXNzZXJ0KHZhX2FyZyhhcmdzLCBpbnQpID09IE1N
+UERVX1JFQVNPTl9DT0RFX0lFRUU4MDIxWF9GQUlMRUQpOzxicj4KJmd0O8KgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgZGF0YS0mZ3Q7ZWFwb2xfZmFpbGVkID0gdHJ1ZTs8YnI+CiZndDvCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoGJyZWFrOzxicj4KJmd0OyArwqAgwqAgwqBjYXNlIEhBTkRTSEFLRV9FVkVO
+VF9FQVBfTk9USUZZOjxicj4KJmd0OyArwqAgwqAgwqB7PGJyPgomZ3Q7ICvCoCDCoCDCoCDCoCDC
+oCDCoCDCoGNvbnN0IHN0cnVjdCB3c2NfY3JlZGVudGlhbCAqY3JlZDs8YnI+CiZndDsgKzxicj4K
+Jmd0OyArwqAgwqAgwqAgwqAgwqAgwqAgwqBhc3NlcnQodmFfYXJnKGFyZ3MsIHVuc2lnbmVkIGlu
+dCkgIT08YnI+CiZndDsgK8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgRUFQX1dTQ19F
+VkVOVF9DUkVERU5USUFMX09CVEFJTkVEKTs8YnI+Cjxicj4KVGhpcyBjb25kaXRpb24gYXBwZWFy
+cyB0byBoYXZlIGJlZW4gaW52ZXJ0ZWQgYWNjaWRlbnRhbGx5IDozLjxicj4KSSBub3RpY2VkIGJl
+Y2F1c2UgdGhpcyBjYXVzZXMgdGhlIHRlc3QgdG8gKGFsd2F5cykgZmFpbC48YnI+CkNvbXBhcmUg
+dG8gdGhlIGxvZ2ljIHRoaXMgcmVwbGFjZXM6PGJyPgo8YnI+CiZndDsgLTxicj4KJmd0OyAtwqAg
+wqAgwqBpZiAoZXZlbnQgIT0gRUFQX1dTQ19FVkVOVF9DUkVERU5USUFMX09CVEFJTkVEKTxicj4K
+Jmd0OyAtwqAgwqAgwqAgwqAgwqAgwqAgwqBhc3NlcnQoZmFsc2UpOzxicj4KJmd0OyAtPGJyPgo8
+YnI+CkkmIzM5O20gbm90IGluIGEgcG9zaXRpb24gdG8gcHJvcGVybHkgc3VibWl0IGEgcGF0Y2gg
+Y3VycmVudGx5LDxicj4KYnV0IGlmIHRoZXJlJiMzOTtzIGFncmVlbWVudCBvbiB0aGlzIHBsZWFz
+ZSBnbyBhaGVhZCBhbmQgZml4IDopLjxicj4KKGZsaXBwaW5nIHRoZSAmIzM5OyE9JiMzOTsgdG8g
+JiMzOTs9PSYjMzk7IGluIHRoZSBhc3NlcnQgZG9lcyB0aGUgdHJpY2ssIGV0Yy4pPGJyPgo8YnI+
+Cn5XaWxsPGJyPgo8L2Rpdj48L2Rpdj48L2Rpdj4K
 
-Is adding this to the RST2MAN_PROCESS variable not working?
-
-Regards
-
-Marcel
-
---===============0437784583133030973==--
+--===============3665843377684125608==--
 
