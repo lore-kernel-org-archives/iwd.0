@@ -1,32 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============7206951625656847657=="
+Content-Type: multipart/mixed; boundary="===============7590524617987472547=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2] wsc: Check capability before adding
- .SimpleConfiguration interface
-Date: Wed, 06 Nov 2019 17:47:10 -0600
-Message-ID: <758dde68-42a7-ac54-ffad-71ddd82d0079@gmail.com>
-In-Reply-To: <20191106235059.17825-1-tim.a.kourt@linux.intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v4 1/3] wiphy: add beacon bits to RM Enabled Capabilities
+Date: Wed, 06 Nov 2019 15:53:18 -0800
+Message-ID: <20191106235320.31525-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7206951625656847657==
+--===============7590524617987472547==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+This tells AP's that we support Passive, Active, and Table beacon
+measurements.
+---
+ src/wiphy.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On 11/6/19 5:50 PM, Tim Kourt wrote:
-> ---
->   src/wsc.c | 7 +++++++
->   1 file changed, 7 insertions(+)
-> =
+diff --git a/src/wiphy.c b/src/wiphy.c
+index ef22c0d3..eb0dfcc9 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -1037,6 +1037,8 @@ static void wiphy_setup_rm_enabled_capabilities(struc=
+t wiphy *wiphy)
+ =
 
+ 	wiphy->rm_enabled_capabilities[0] =3D IE_TYPE_RM_ENABLED_CAPABILITIES;
+ 	wiphy->rm_enabled_capabilities[1] =3D 5;
++	/* Bits: Passive (4), Active (5), and Beacon Table (6) capabilities */
++	wiphy->rm_enabled_capabilities[2] =3D 0x70;
+ =
 
-Applied, thanks.
+ 	/*
+ 	 * TODO: Support at least Link Measurement if TX_POWER_INSERTION is
+-- =
 
-Regards,
--Denis
+2.17.1
 
---===============7206951625656847657==--
+--===============7590524617987472547==--
 
