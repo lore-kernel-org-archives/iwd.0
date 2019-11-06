@@ -1,49 +1,86 @@
-Content-Type: multipart/mixed; boundary="===============6710255441415393466=="
+Content-Type: multipart/mixed; boundary="===============1254108036517474126=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 2/2] test-runner: fix logging directory name
-Date: Wed, 06 Nov 2019 13:41:55 -0800
-Message-ID: <e8afdd7b06c672ddd1f7e7af0529c3c4cbf76022.camel@gmail.com>
-In-Reply-To: <20191106213815.20555-2-prestwoj@gmail.com>
+Subject: [PATCH v2 1/2] test-runner: run iwmon if --log is used
+Date: Wed, 06 Nov 2019 13:42:48 -0800
+Message-ID: <20191106214249.21038-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6710255441415393466==
+--===============1254108036517474126==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2019-11-06 at 13:38 -0800, James Prestwood wrote:
-> localtime indexes month starting at zero so adding 1 gives us a
-> folder
-> name with the correct month.
-> ---
->  tools/test-runner.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+Now that execute_program handles logging automatically its trivial
+to add iwmon to the test and get monitor logs as well as normal
+process output.
+---
+ tools/test-runner.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-> diff --git a/tools/test-runner.c b/tools/test-runner.c
-> index 1c807aea..163f53e7 100644
-> --- a/tools/test-runner.c
-> +++ b/tools/test-runner.c
-> @@ -3184,7 +3184,7 @@ int main(int argc, char *argv[])
->  =
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 00989391..1c807aea 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -1592,6 +1592,18 @@ static void terminate_iwd(pid_t iwd_pid)
+ 	kill_process(iwd_pid);
+ }
+ =
 
->  			snprintf(log_dir, sizeof(log_dir), "%s/run-%d-
-> %d-%d-%d",
->  					optarg, timeinfo->tm_year,
-> -					timeinfo->tm_mon, timeinfo-
-> >tm_mday,
-> +					timeinfo->tm_mon + 1, timeinfo-
-> >tm_mday,
->  					getpid());
++static pid_t start_monitor(const char *test_name)
++{
++	char *argv[4];
++
++	argv[0] =3D "iwmon";
++	argv[1] =3D "--nortnl";
++	argv[2] =3D "--nowiphy";
++	argv[3] =3D NULL;
++
++	return execute_program(argv, environ, false, test_name);
++}
++
+ static bool create_tmpfs_extra_stuff(char **tmpfs_extra_stuff)
+ {
+ 	size_t i =3D 0;
+@@ -2004,6 +2016,7 @@ static void create_network_and_run_tests(void *data, =
+void *user_data)
+ 	pid_t medium_pid =3D -1;
+ 	pid_t ofono_pid =3D -1;
+ 	pid_t phonesim_pid =3D -1;
++	pid_t monitor_pid =3D -1;
+ 	char *config_dir_path;
+ 	char *iwd_config_dir;
+ 	char **tmpfs_extra_stuff =3D NULL;
+@@ -2149,6 +2162,9 @@ static void create_network_and_run_tests(void *data, =
+void *user_data)
+ 		l_queue_foreach(wiphy_list, wiphy_up, NULL);
+ 	}
+ =
 
-I just realized that the year is not really correct either. localtime
-uses years since 1900, so e.g. for 2019 you get 119. Will fix this in
-v2.
++	if (log)
++		monitor_pid =3D start_monitor(test_name);
++
+ 	if (check_verbosity("tls"))
+ 		setenv("IWD_TLS_DEBUG", "on", true);
+ =
 
->  			mkdir(log_dir, 0755);
-> =20
+@@ -2233,6 +2249,9 @@ static void create_network_and_run_tests(void *data, =
+void *user_data)
+ 		stop_phonesim(phonesim_pid);
+ 	}
+ =
 
---===============6710255441415393466==--
++	if (monitor_pid > 0)
++		kill_process(monitor_pid);
++
+ exit_hostapd:
+ 	destroy_hostapd_instances(hostapd_pids);
+ =
+
+-- =
+
+2.17.1
+
+--===============1254108036517474126==--
 
