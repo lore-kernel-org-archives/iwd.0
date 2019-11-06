@@ -1,879 +1,212 @@
-Content-Type: multipart/mixed; boundary="===============7054577763126334466=="
+Content-Type: multipart/mixed; boundary="===============0530601990842526975=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/3] rrm: add radio resource management module
-Date: Wed, 06 Nov 2019 09:57:31 -0800
-Message-ID: <20191106175732.711-2-prestwoj@gmail.com>
+Subject: [PATCH v2 3/3] auto-t: add RRM autotest
+Date: Wed, 06 Nov 2019 09:57:32 -0800
+Message-ID: <20191106175732.711-3-prestwoj@gmail.com>
 In-Reply-To: <20191106175732.711-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7054577763126334466==
+--===============0530601990842526975==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This module takes care of radio measurements which an AP can request.
-There are many types of requests, and for now only beacon requests
-are supported.
-
-IWD will filter certain types of beacon requests that are NOT
-supported:
-
- - AP channel reports. Only single channel requests will be supported
- - Autonomous measurements. Only direct requests will be supported.
-   IWD will not accept requets to trigger reports under certain
-   conditions (SNR/RSSI thresholds, etc.)
- - Timed measurements. Only immediate measurements will be performed.
-   The accuracy for timed measurements cannot be reliably guaranteed
-   due to kernel scheduling/queues.
- - Full reporting detail. The AP can request the STA return the full
-   set of IEs in a beacon. IWD does not currently save all IEs, plus
-   there is quite a bit of complexity involved as certain IEs get
-   truncated, and there are other length limitations.
-
-There are other limitations not specific to beacon requests:
-
- - IWD will support single measurement requests per report. Multiple
-   measurement request IEs can be included, but the reports will be
-   sent out separately.
-
- - IWD will limit the number of requests it responds to in a given
-   amount of time. As it stands now this is hard coded to 2 requests
-   per second maximum. This will prevent DoS attacks.
-
- - IWD will not accept any measurement requests from APs it is not
-   connected to, and will not accept any requests until connected.
+This test merely verifies hostapd receieved our measurement reports
+and verified they were valid. Hostapd does not verify the actual
+beacon report body. Really, the only way to test this is on an
+actual network which makes these requests.
 ---
- Makefile.am |   1 +
- src/rrm.c   | 786 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 787 insertions(+)
- create mode 100644 src/rrm.c
+ autotests/testRRM/connection_test.py | 114 +++++++++++++++++++++++++++
+ autotests/testRRM/hw.conf            |   8 ++
+ autotests/testRRM/ssidOther.conf     |  10 +++
+ autotests/testRRM/ssidRRM.conf       |  13 +++
+ 4 files changed, 145 insertions(+)
+ create mode 100644 autotests/testRRM/connection_test.py
+ create mode 100644 autotests/testRRM/hw.conf
+ create mode 100644 autotests/testRRM/ssidOther.conf
+ create mode 100644 autotests/testRRM/ssidRRM.conf
 
--v2:
- * Added a per-netdev 'rrm_state'. This holds values such as ifindex
-   wdev_id, connected address etc which will be used for all requests
-   on a given netdev
- * Watch station and disable/enable rrm_state depending on if we get
-   connected or disconnected.
- * Refactored rrm_request_info/rrm_beacon_req_info to avoid extra
-   allocations (using l_container_of)
- * rrm_state also holds 'pending' requests and will ignore any
-   requests made when we have an outstanding request
- * Track scan ID's and cancel if station becomes disconnected
-
-diff --git a/Makefile.am b/Makefile.am
-index 9c54cef0..13141848 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -226,6 +226,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
-h src/missing.h \
- 					src/hotspot.c \
- 					src/p2putil.h src/p2putil.c \
- 					src/module.c \
-+					src/rrm.c \
- 					$(eap_sources) \
- 					$(builtin_sources)
- =
-
-diff --git a/src/rrm.c b/src/rrm.c
+diff --git a/autotests/testRRM/connection_test.py b/autotests/testRRM/conne=
+ction_test.py
 new file mode 100644
-index 00000000..4041be59
+index 00000000..93fd6cb8
 --- /dev/null
-+++ b/src/rrm.c
-@@ -0,0 +1,786 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdint.h>
-+#include <math.h>
-+#include <linux/if_ether.h>
-+
-+#include <ell/ell.h>
-+
-+#include "src/mpdu.h"
-+#include "src/netdev.h"
-+#include "src/iwd.h"
-+#include "src/ie.h"
-+#include "src/util.h"
-+#include "src/station.h"
-+#include "src/scan.h"
-+#include "src/nl80211util.h"
-+
-+#include "linux/nl80211.h"
-+
-+/* Limit requests per second */
-+#define MAX_REQUESTS_PER_SEC		2
-+/* Microseconds between requests */
-+#define MIN_MICROS_BETWEEN_REQUESTS	(1000000 / MAX_REQUESTS_PER_SEC)
-+
-+/* 802.11-2016 Table 9-90 */
-+#define REPORT_DETAIL_NO_FIELDS_OR_ELEMS		0
-+#define REPORT_DETAIL_ALL_FIELDS_AND_ANY_REQUEST_ELEMS	1
-+#define REPORT_DETAIL_ALL_FIELDS_AND_ELEMS		2
-+
-+/* 802.11-2016 Table 9-192 */
-+#define REPORT_REJECT_LATE	(1 << 0)
-+#define REPORT_REJECT_INCAPABLE	(1 << 1)
-+#define REPORT_REJECT_REFUSED	(1 << 2)
-+
-+/* 802.11-2016 Table 9-87 */
-+enum rrm_beacon_req_mode {
-+	RRM_BEACON_REQ_MODE_PASSIVE =3D	0,
-+	RRM_BEACON_REQ_MODE_ACTIVE =3D	1,
-+	RRM_BEACON_REQ_MODE_TABLE =3D	2,
-+};
-+
-+/* 802.11-2016 Table 9-88 */
-+enum rrm_beacon_req_subelem_id {
-+	RRM_BEACON_REQ_SUBELEM_ID_SSID			=3D 0,
-+	RRM_BEACON_REQ_SUBELEM_ID_BEACON_REPORTING	=3D 1,
-+	RRM_BEACON_REQ_SUBELEM_ID_REPORTING_DETAIL	=3D 2,
-+	/* 3 - 9 reserved */
-+	RRM_BEACON_REQ_SUBELEM_ID_REQUEST		=3D 10,
-+	RRM_BEACON_REQ_SUBELEM_ID_EXT_REQUEST		=3D 11,
-+	/* 12 - 50 reserved */
-+	RRM_BEACON_REQ_SUBELEM_ID_AP_CHAN_REPORT	=3D 51,
-+	/* 52 - 162 reserved */
-+	RRM_BEACON_REQ_SUBELEM_ID_WIDE_BAND_SWITCH	=3D 163,
-+	/* 164 - 220 reserved */
-+	RRM_BEACON_REQ_SUBELEM_ID_VENDOR		=3D 221,
-+	/* 222 - 255 reserved */
-+};
-+
-+/* 802.11-2016 Annex C - dot11PHYType */
-+enum rrm_phy_type {
-+	RRM_PHY_TYPE_DSSS	=3D 2,
-+	RRM_PHY_TYPE_OFDM	=3D 4,
-+	RRM_PHY_TYPE_HRDSSS	=3D 5,
-+	RRM_PHY_TYPE_ERP	=3D 6,
-+	RRM_PHY_TYPE_HT		=3D 7,
-+	RRM_PHY_TYPE_DMG	=3D 8,
-+	RRM_PHY_TYPE_VHT	=3D 9,
-+	RRM_PHY_TYPE_TVHT	=3D 10,
-+};
-+
-+struct rrm_request_info {
-+	uint8_t dialog_token;	/* dialog token in Radio Measurement Request */
-+	uint8_t mtoken;		/* token in measurement request element */
-+	uint8_t mode;
-+	uint8_t type;		/* request type (only beacon supported) */
-+};
-+
-+struct rrm_beacon_req_info {
-+	struct rrm_request_info info;
-+	uint8_t oper_class;
-+	uint8_t channel;	/* The single channel provided in request */
-+	uint8_t bssid[6];	/* Request filtered by BSSID */
-+	char ssid[33];		/* Request filtered by SSID */
-+	bool has_ssid;
-+	uint32_t scan_id;
-+};
-+
-+/* Per-netdev state */
-+struct rrm_state {
-+	uint32_t ifindex;
-+	uint64_t wdev_id;
-+	uint8_t connected_addr[6];
-+	uint32_t connected_freq;
-+	struct rrm_request_info *pending;
-+
-+	uint64_t last_request;
-+
-+	bool enabled : 1;
-+};
-+
-+static struct l_queue *states;
-+static struct l_genl_family *nl80211;
-+static uint32_t netdev_watch;
-+
-+static void rrm_info_destroy(void *data)
-+{
-+	struct rrm_request_info *info =3D data;
-+	/* TODO: once more request types are added, check type */
-+	struct rrm_beacon_req_info *beacon =3D l_container_of(info,
-+						struct rrm_beacon_req_info,
-+						info);
-+
-+	l_free(beacon);
-+}
-+
-+static uint8_t rrm_phy_type(struct scan_bss *bss)
-+{
-+	if (bss->vht_capable)
-+		return RRM_PHY_TYPE_VHT;
-+
-+	if (bss->ht_capable)
-+		return RRM_PHY_TYPE_HT;
-+
-+	/*
-+	 * Default to 802.11g phy type. You can get quite fancy here determining
-+	 * the phy type by looking at the frequency and operator class among
-+	 * other things. Since 802.11a/b are so old, defaulting to 802.11g just
-+	 * removes a lot of complexity. Above, HT/VHT are easy as all you need
-+	 * to look for is the presence of the IE.
-+	 */
-+	return RRM_PHY_TYPE_ERP;
-+}
-+
-+static void rrm_send_response_cb(struct l_genl_msg *msg, void *user_data)
-+{
-+	int err =3D l_genl_msg_get_error(msg);
-+
-+	if (err < 0)
-+		l_error("Error sending response: %d", err);
-+}
-+
-+static bool rrm_send_response(struct rrm_state *rrm,
-+				const uint8_t *frame, size_t len)
-+{
-+	struct netdev *netdev =3D netdev_find(rrm->ifindex);
-+	const uint8_t *own_addr =3D netdev_get_address(netdev);
-+	struct l_genl_msg *msg;
-+	struct iovec iov;
-+
-+	iov.iov_base =3D (void *)frame;
-+	iov.iov_len =3D len;
-+
-+	msg =3D nl80211_build_cmd_frame(rrm->ifindex, own_addr,
-+					rrm->connected_addr,
-+					rrm->connected_freq, &iov, 1);
-+
-+	if (!l_genl_family_send(nl80211, msg, rrm_send_response_cb,
-+					NULL, NULL)) {
-+		l_genl_msg_unref(msg);
-+		l_error("Failed to send report for "MAC,
-+				MAC_STR(rrm->connected_addr));
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static void rrm_reject_measurement_request(struct rrm_state *rrm,
-+						uint8_t mode)
-+{
-+	struct rrm_request_info *info =3D rrm->pending;
-+	uint8_t frame[8];
-+
-+	frame[0] =3D 0x05; /* Category: Radio Measurement */
-+	frame[1] =3D 0x01; /* Action: Radio Measurement Report */
-+	frame[2] =3D info->dialog_token;
-+	frame[3] =3D IE_TYPE_MEASUREMENT_REQUEST;
-+	frame[4] =3D 3;
-+	frame[5] =3D info->mtoken;
-+	frame[6] =3D mode;
-+	frame[7] =3D info->type;
-+
-+	if (!rrm_send_response(rrm, frame, sizeof(frame)))
-+		l_error("failed to send rejection");
-+
-+	rrm_info_destroy(info);
-+}
-+
-+static void rrm_build_measurement_report(struct rrm_request_info *info,
-+				const void *report, size_t report_len,
-+				uint8_t *to)
-+{
-+	*to++ =3D IE_TYPE_MEASUREMENT_REPORT;
-+	*to++ =3D 3 + report_len;
-+	*to++ =3D info->mtoken;
-+	*to++ =3D 0;
-+	*to++ =3D info->type;
-+
-+	if (report)
-+		memcpy(to, report, report_len);
-+}
-+
-+/*
-+ * 802.11-2016 11.11.9.1 Beacon report
-+ *
-+ * "If the stored beacon information is based on a measurement made by
-+ *  the reporting STA, and if the actual measurement start time,
-+ *  measurement duration, and Parent TSF are available for this
-+ *  measurement, then the beacon report shall include the actual
-+ *  measurement start time, measurement duration, and Parent TSF;
-+ *  otherwise the actual measurement start time, measurement duration,
-+ *  and Parent TSF shall be set to 0. The RCPI and RSNI for that stored
-+ *  beacon measurement may be included in the beacon report; otherwise
-+ *  the beacon report shall indicate that RCPI and RSNI measurements
-+ *  are not available"
-+ *
-+ * Since accurate timing is unreliable we are setting start/duration/TSF t=
-ime to
-+ * zero for all cases (table, passive, active).
-+ */
-+static size_t build_report_for_bss(struct rrm_beacon_req_info *beacon,
-+					struct scan_bss *bss,
-+					uint8_t *to)
-+{
-+	uint8_t *start =3D to;
-+	double dbms =3D bss->signal_strength / 100;
-+
-+	*to++ =3D beacon->oper_class;
-+	*to++ =3D scan_freq_to_channel(bss->frequency, NULL);
-+	/* skip start time/duration */
-+	memset(to, 0, 10);
-+	to +=3D 10;
-+	*to++ =3D rrm_phy_type(bss);
-+
-+	/* 802.11 Table 9-154 - RCPI values */
-+	if (dbms < -109.5)
-+		*to++ =3D 0;
-+	else if (dbms >=3D -109.5 && dbms < 0)
-+		*to++ =3D (uint8_t)floor(2 * (dbms + 110));
-+	else
-+		*to++ =3D 220;
-+
-+	/* RSNI not available (could get this from GET_SURVEY) */
-+	*to++ =3D 255;
-+	memcpy(to, bss->addr, 6);
-+	to +=3D 6;
-+	/* Antenna identifier unknown */
-+	*to++ =3D 0;
-+	/* Parent TSF - zero */
-+	memset(to, 0, 4);
-+	to +=3D 4;
-+
-+	/*
-+	 * TODO: Support optional subelements
-+	 *
-+	 * (see "TODO: Support Reported Frame Body..." below)
-+	 */
-+
-+	return to - start;
-+}
-+
-+static bool bss_in_request_range(struct rrm_beacon_req_info *beacon,
-+					struct scan_bss *bss)
-+{
-+	uint8_t channel =3D scan_freq_to_channel(bss->frequency, NULL);
-+
-+	/* Must be a table measurement */
-+	if (beacon->channel =3D=3D 0 || beacon->channel =3D=3D 255)
-+		return true;
-+
-+	if (beacon->channel =3D=3D channel)
-+		return true;
-+
-+	return false;
-+}
-+
-+static bool rrm_report_beacon_results(struct rrm_state *rrm,
-+					struct l_queue *bss_list)
-+{
-+	struct rrm_beacon_req_info *beacon =3D l_container_of(rrm->pending,
-+						struct rrm_beacon_req_info,
-+						info);
-+	bool wildcard =3D util_is_broadcast_address(beacon->bssid);
-+	const struct l_queue_entry *entry;
-+	uint8_t frame[512];
-+	uint8_t *ptr =3D frame;
-+
-+	*ptr++ =3D 0x05; /* Category: Radio Measurement */
-+	*ptr++ =3D 0x01; /* Action: Radio Measurement Report */
-+	*ptr++ =3D beacon->info.dialog_token;
-+
-+	for (entry =3D l_queue_get_entries(bss_list); entry;
-+							entry =3D entry->next) {
-+		struct scan_bss *bss =3D entry->data;
-+		uint8_t report[257];
-+		size_t report_len;
-+
-+		/* If request included a specific BSSID match only this BSS */
-+		if (!wildcard && memcmp(bss->addr, beacon->bssid, 6) !=3D 0)
-+			continue;
-+
-+		/* If request was for a certain SSID, match only this SSID */
-+		if (beacon->has_ssid && strncmp(beacon->ssid,
-+							(const char *)bss->ssid,
-+							sizeof(bss->ssid)) !=3D 0)
-+			continue;
-+
-+		/*
-+		 * The kernel may have returned a cached scan, so we have to
-+		 * sort out any non-matching frequencies before building the
-+		 * report
-+		 */
-+		if (!bss_in_request_range(beacon, bss))
-+			continue;
-+
-+		report_len =3D build_report_for_bss(beacon, bss, report);
-+
-+		rrm_build_measurement_report(&beacon->info, report,
-+						report_len, ptr);
-+
-+		ptr +=3D report_len + 5;
-+	}
-+
-+	return rrm_send_response(rrm, frame, ptr - frame);
-+}
-+
-+static void rrm_handle_beacon_table(struct rrm_state *rrm,
-+					struct rrm_beacon_req_info *beacon)
-+{
-+	struct station *station =3D station_find(rrm->ifindex);
-+	struct l_queue *bss_list;
-+
-+	bss_list =3D station_get_bss_list(station);
-+	if (!bss_list) {
-+		rrm_reject_measurement_request(rrm, REPORT_REJECT_INCAPABLE);
-+		return;
-+	}
-+
-+	if (!rrm_report_beacon_results(rrm, bss_list))
-+		l_error("Error reporting beacon table results");
-+
-+	/*
-+	 * Table measurements do not require any async operations so info is
-+	 * freed here always.
-+	 */
-+	rrm_info_destroy(&beacon->info);
-+	rrm->pending =3D NULL;
-+
-+}
-+
-+static bool rrm_scan_results(int err, struct l_queue *bss_list, void *user=
-data)
-+{
-+	struct rrm_state *rrm =3D userdata;
-+
-+	l_debug("RRM scan results for %u APs", l_queue_length(bss_list));
-+
-+	rrm_report_beacon_results(rrm, bss_list);
-+	/* We aren't saving this BSS list */
-+	return false;
-+}
-+
-+static void rrm_scan_triggered(int err, void *userdata)
-+{
-+	struct rrm_state *rrm =3D userdata;
-+
-+	if (err < 0) {
-+		l_error("Could not start RRM scan");
-+		rrm_reject_measurement_request(rrm, REPORT_REJECT_INCAPABLE);
-+	}
-+}
-+
-+static void rrm_scan_destroy(void *data)
-+{
-+	struct rrm_state *rrm =3D data;
-+
-+	rrm_info_destroy(rrm->pending);
-+	rrm->pending =3D NULL;
-+}
-+
-+static void rrm_handle_beacon_scan(struct rrm_state *rrm,
-+					struct rrm_beacon_req_info *beacon,
-+					bool passive)
-+{
-+	struct scan_freq_set *freqs =3D scan_freq_set_new();
-+	struct scan_parameters params =3D { .freqs =3D freqs, .flush =3D true };
-+	enum scan_band band =3D scan_oper_class_to_band(NULL, beacon->oper_class);
-+	uint32_t freq;
-+
-+	freq =3D scan_channel_to_freq(beacon->channel, band);
-+	scan_freq_set_add(freqs, freq);
-+
-+	if (passive)
-+		beacon->scan_id =3D scan_passive(rrm->wdev_id, freqs,
-+						rrm_scan_triggered,
-+						rrm_scan_results, rrm,
-+						rrm_scan_destroy);
-+	else
-+		beacon->scan_id =3D scan_active_full(rrm->wdev_id, &params,
-+						rrm_scan_triggered,
-+						rrm_scan_results, rrm,
-+						rrm_scan_destroy);
-+
-+	scan_freq_set_free(freqs);
-+
-+	if (beacon->scan_id =3D=3D 0)
-+		rrm_info_destroy(&beacon->info);
-+}
-+
-+static bool rrm_verify_beacon_request(const uint8_t *request, size_t len)
-+{
-+	if (len < 13)
-+		return false;
-+
-+	if (request[6] !=3D RRM_BEACON_REQ_MODE_TABLE) {
-+		/*
-+		 * Rejecting any iterative measurements, only accepting explicit
-+		 * channels and operating classes except for table measurements.
-+		 */
-+		if (request[0] =3D=3D 0 || request[0] =3D=3D 255 ||
-+					request[1] =3D=3D 0 || request[1] =3D=3D 255)
-+			return false;
-+
-+		/*
-+		 * Not handling interval/duration requests. We can omit this
-+		 * check for table requests since we just return whatever we
-+		 * have cached.
-+		 */
-+		if (!util_mem_is_zero(request + 2, 4))
-+			return false;
-+	}
-+
-+	/* Check this is a valid operating class */
-+	if (!scan_oper_class_to_band(NULL, request[0]))
-+		return false;
-+
-+	return true;
-+}
-+
-+static void rrm_handle_beacon_request(struct rrm_state *rrm,
-+					uint8_t dialog_token,
-+					const uint8_t *request, size_t len)
-+{
-+	struct rrm_beacon_req_info *beacon;
-+	struct ie_tlv_iter iter;
-+	/*
-+	 * 802.11-2016 - Table 9-90
-+	 *
-+	 * "All fixed-length fields and elements (default, used when Reporting
-+	 *  Detail subelement is not included in a Beacon request)"
-+	 */
-+	uint8_t detail =3D REPORT_DETAIL_NO_FIELDS_OR_ELEMS;
-+
-+	beacon =3D l_new(struct rrm_beacon_req_info, 1);
-+
-+	beacon->info.dialog_token =3D dialog_token;
-+	beacon->info.mtoken =3D request[0];
-+	beacon->info.mode =3D request[1];
-+	beacon->info.type =3D request[2];
-+
-+	rrm->pending =3D &beacon->info;
-+	/*
-+	 * 802.11-2016 11.11.8
-+	 *
-+	 * "A STA may also refuse to enable triggered autonomous
-+	 * reporting. In this case a Measurement Report element shall be
-+	 * returned to the requesting STA with the refused bit set to 1"
-+	 *
-+	 * At least for the time being, we will not support autonomous
-+	 * reporting, so decline any request to do so.
-+	 */
-+	if (util_is_bit_set(beacon->info.mode, 1))
-+		goto reject_refused;
-+
-+	/* advance to beacon request */
-+	request +=3D 3;
-+	len -=3D 3;
-+
-+	if (!rrm_verify_beacon_request(request, len))
-+		goto reject_refused;
-+
-+	beacon->oper_class =3D request[0];
-+	beacon->channel =3D request[1];
-+	memcpy(beacon->bssid, request + 7, 6);
-+
-+	ie_tlv_iter_init(&iter, request + 13, len - 13);
-+
-+	while (ie_tlv_iter_next(&iter)) {
-+		uint8_t length =3D ie_tlv_iter_get_length(&iter);
-+		const unsigned char *data =3D ie_tlv_iter_get_data(&iter);
-+
-+		switch (ie_tlv_iter_get_tag(&iter)) {
-+		case RRM_BEACON_REQ_SUBELEM_ID_SSID:
-+			/*
-+			 * Zero length is wildcard SSID, which has the same
-+			 * effect as no SSID.
-+			 */
-+			if (length > 0 && length < 32) {
-+				memcpy(beacon->ssid, data, length);
-+				beacon->has_ssid =3D true;
-+			}
-+
-+			break;
-+		case RRM_BEACON_REQ_SUBELEM_ID_REPORTING_DETAIL:
-+			if (length !=3D 1) {
-+				l_error("Invalid length in reporting detail");
-+				goto reject_refused;
-+			}
-+
-+			detail =3D l_get_u8(data);
-+			break;
-+		case RRM_BEACON_REQ_SUBELEM_ID_BEACON_REPORTING:
-+			/*
-+			 * 802.11-2016 9.4.2.21.7
-+			 *
-+			 * "The Beacon reporting subelement is optionally
-+			 *  present in a Beacon request for repeated
-+			 *  measurements; otherwise it is not present"
-+			 *
-+			 * Since repeated measurements are not supported we can
-+			 * reject this request now.
-+			 */
-+		case RRM_BEACON_REQ_SUBELEM_ID_AP_CHAN_REPORT:
-+			/*
-+			 * Only supporting single channel requests
-+			 */
-+			goto reject_incapable;
-+		}
-+	}
-+
-+	/*
-+	 * TODO: Support Reported Frame Body of 1 and 2. This requires that all
-+	 * fixed length fields are available from the scan request. Currently
-+	 * scan.c parses out only the details we care about. There is also
-+	 * limitations on length, and some IEs are treated specially and
-+	 * truncated. This adds quite a bit of complexity. For now skip these
-+	 * types of frame body reports.
-+	 */
-+	if (detail !=3D REPORT_DETAIL_NO_FIELDS_OR_ELEMS) {
-+		l_debug("Unsupported report detail");
-+		goto reject_incapable;
-+	}
-+
-+	/* Mode */
-+	switch (request[6]) {
-+	case RRM_BEACON_REQ_MODE_PASSIVE:
-+		rrm_handle_beacon_scan(rrm, beacon, true);
-+		return;
-+	case RRM_BEACON_REQ_MODE_ACTIVE:
-+		rrm_handle_beacon_scan(rrm, beacon, false);
-+		return;
-+	case RRM_BEACON_REQ_MODE_TABLE:
-+		rrm_handle_beacon_table(rrm, beacon);
-+		return;
-+	default:
-+		l_error("Unknown beacon mode %u", request[6]);
-+		/* fall through to refused */
-+	}
-+
-+reject_refused:
-+	rrm_reject_measurement_request(rrm, REPORT_REJECT_REFUSED);
-+	return;
-+
-+reject_incapable:
-+	rrm_reject_measurement_request(rrm, REPORT_REJECT_INCAPABLE);
-+}
-+
-+static void rrm_frame_watch_cb(struct netdev *netdev,
-+				const struct mmpdu_header *mpdu,
-+				const void *body, size_t body_len,
-+				void *user_data)
-+{
-+	struct rrm_state *rrm =3D user_data;
-+	const uint8_t *request =3D body;
-+	uint8_t dialog_token;
-+	struct ie_tlv_iter iter;
-+
-+	/*
-+	 * Ignore if not connected or already have an outstanding request
-+	 */
-+	if (!rrm->enabled || rrm->pending)
-+		return;
-+
-+	if (memcmp(rrm->connected_addr, mpdu->address_2, 6))
-+		return;
-+
-+	if (body_len < 5)
-+		return;
-+
-+	if (request[0] !=3D 0x05)
-+		return;
-+
-+	if (request[1] !=3D 0x00)
-+		return;
-+
-+	/*
-+	 * We have reached our max requests per second, no point in continuing
-+	 */
-+	if (l_time_now() - rrm->last_request < MIN_MICROS_BETWEEN_REQUESTS) {
-+		l_debug("Max requests per second reached, ignoring request");
-+		return;
-+	}
-+
-+	dialog_token =3D request[2];
-+
-+	/* Update time regardless of success */
-+	rrm->last_request =3D l_time_now();
-+
-+	ie_tlv_iter_init(&iter, request + 5, body_len - 5);
-+
-+	while (ie_tlv_iter_next(&iter)) {
-+		const uint8_t *req;
-+		size_t req_len;
-+
-+		if (ie_tlv_iter_get_tag(&iter) !=3D IE_TYPE_MEASUREMENT_REQUEST)
-+			continue;
-+
-+		req =3D ie_tlv_iter_get_data(&iter);
-+		req_len =3D ie_tlv_iter_get_length(&iter);
-+
-+		if (req_len < 3)
-+			return;
-+
-+		switch (req[2]) {
-+		case 5: /* beacon */
-+			rrm_handle_beacon_request(rrm, dialog_token, req,
-+							req_len);
-+			break;
-+		default:
-+			return;
-+		}
-+	}
-+}
-+
-+static void rrm_cancel_pending(struct rrm_state *rrm)
-+{
-+	if (rrm->pending) {
-+		struct rrm_beacon_req_info *beacon;
-+
-+		beacon =3D l_container_of(rrm->pending,
-+						struct rrm_beacon_req_info,
-+						info);
-+		if (beacon->scan_id)
-+			scan_cancel(rrm->wdev_id, beacon->scan_id);
-+
-+		rrm_info_destroy(rrm->pending);
-+		rrm->pending =3D NULL;
-+	}
-+}
-+
-+static void rrm_station_watch_cb(enum station_state state, void *userdata)
-+{
-+	struct rrm_state *rrm =3D userdata;
-+	struct station *station;
-+	struct scan_bss *bss;
-+
-+	switch (state) {
-+	case STATION_STATE_CONNECTED:
-+		station =3D station_find(rrm->ifindex);
-+		bss =3D station_get_connected_bss(station);
-+
-+		rrm->enabled =3D true;
-+		memcpy(rrm->connected_addr, bss->addr, 6);
-+		rrm->connected_freq =3D bss->frequency;
-+
-+		break;
-+	case STATION_STATE_DISCONNECTED:
-+		rrm->enabled =3D false;
-+
-+		rrm_cancel_pending(rrm);
-+		break;
-+	default:
-+		return;
-+	}
-+}
-+
-+static void rrm_state_destroy(void *data)
-+{
-+	struct rrm_state *rrm =3D data;
-+
-+	if (rrm->pending)
-+		rrm_info_destroy(rrm->pending);
-+
-+	l_free(rrm);
-+}
-+
-+static void rrm_new_state(struct netdev *netdev)
-+{
-+	struct rrm_state *rrm;
-+	uint16_t frame_type =3D 0x00d0;
-+	uint8_t prefix[] =3D { 0x05, 0x00 };
-+	struct station *station;
-+
-+	rrm =3D l_new(struct rrm_state, 1);
-+
-+	rrm->last_request =3D l_time_now();
-+	rrm->ifindex =3D netdev_get_ifindex(netdev);
-+	rrm->wdev_id =3D netdev_get_wdev_id(netdev);
-+
-+	netdev_frame_watch_add(netdev, frame_type, prefix, sizeof(prefix),
-+					rrm_frame_watch_cb, rrm);
-+
-+	station =3D station_find(rrm->ifindex);
-+	station_add_state_watch(station, rrm_station_watch_cb, rrm, NULL);
-+
-+	l_queue_push_head(states, rrm);
-+}
-+
-+static bool match_ifindex(const void *a, const void *b)
-+{
-+	const struct rrm_state *rrm =3D a;
-+	uint32_t ifindex =3D L_PTR_TO_UINT(b);
-+
-+	return rrm->ifindex =3D=3D ifindex;
-+}
-+
-+static void rrm_netdev_watch(struct netdev *netdev,
-+				enum netdev_watch_event event, void *user_data)
-+{
-+	struct rrm_state *rrm;
-+	uint32_t ifindex =3D netdev_get_ifindex(netdev);
-+
-+	switch (event) {
-+	case NETDEV_WATCH_EVENT_NEW:
-+		rrm_new_state(netdev);
-+		return;
-+	case NETDEV_WATCH_EVENT_DEL:
-+		rrm =3D l_queue_find(states, match_ifindex,
-+					L_UINT_TO_PTR(ifindex));
-+		if (!rrm)
-+			return;
-+
-+		rrm_cancel_pending(rrm);
-+		return;
-+	default:
-+		break;
-+	}
-+}
-+
-+static int rrm_init(void)
-+{
-+	struct l_genl *genl =3D iwd_get_genl();
-+
-+	states =3D l_queue_new();
-+
-+	nl80211 =3D l_genl_family_new(genl, NL80211_GENL_NAME);
-+
-+	netdev_watch =3D netdev_watch_add(rrm_netdev_watch, NULL, NULL);
-+
-+	return 0;
-+}
-+
-+static void rrm_exit(void)
-+{
-+	l_genl_family_free(nl80211);
-+	nl80211 =3D NULL;
-+
-+	netdev_watch_remove(netdev_watch);
-+
-+	l_queue_destroy(states, rrm_state_destroy);
-+}
-+
-+IWD_MODULE(rrm, rrm_init, rrm_exit);
-+IWD_MODULE_DEPENDS(rrm, netdev);
++++ b/autotests/testRRM/connection_test.py
+@@ -0,0 +1,114 @@
++#!/usr/bin/python3
++
++import unittest
++import sys
++
++sys.path.append('../util')
++import iwd
++from iwd import IWD
++from iwd import PSKAgent
++from iwd import NetworkType
++from hostapd import HostapdCLI
++import testutil
++
++from time import sleep
++
++# Table beacon with wildcard BSSID
++basic_beacon =3D '51000000000002ffffffffffff020100'
++# Table beacon with wildcard BSSID and SSID filter
++beacon_with_ssid =3D '51000000000002ffffffffffff02010000077373696452524d'
++# Passive beacon with wildcard BSSID
++beacon_passive =3D '510b0000000000ffffffffffff020100'
++# Active beacon with wildcard BSSID
++beacon_active =3D '510b0000000001ffffffffffff020100'
++
++class Test(unittest.TestCase):
++
++    def test_connection_success(self):
++        hapd =3D HostapdCLI(config=3D'ssidRRM.conf')
++        wd =3D IWD()
++
++        psk_agent =3D PSKAgent("secret123")
++        wd.register_psk_agent(psk_agent)
++
++        devices =3D wd.list_devices(1)
++        device =3D devices[0]
++
++        condition =3D 'not obj.scanning'
++        wd.wait_for_object_condition(device, condition)
++
++        device.scan()
++
++        condition =3D 'not obj.scanning'
++        wd.wait_for_object_condition(device, condition)
++
++        ordered_network =3D device.get_ordered_network('ssidRRM')
++
++        self.assertEqual(ordered_network.type, NetworkType.psk)
++
++        condition =3D 'not obj.connected'
++        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
++
++        ordered_network.network_object.connect()
++
++        condition =3D 'obj.connected'
++        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
++
++        testutil.test_iface_operstate()
++        testutil.test_ifaces_connected()
++
++        hapd.wait_for_event('AP-STA-CONNECTED')
++
++        # This should return both APs
++        hapd.req_beacon(device.address, basic_beacon)
++
++        for e in ['BEACON-RESP-RX', 'BEACON-RESP-RX']:
++            event =3D hapd.wait_for_event(e)
++            if event:
++                print(event)
++
++        sleep(0.5)
++
++        # This should return just ssidRRM
++        hapd.req_beacon(device.address, beacon_with_ssid)
++        event =3D hapd.wait_for_event('BEACON-RESP-RX')
++        if event:
++            print(event)
++
++        sleep(0.5)
++
++        # This should passive scan on channel 11, returning otherSSID
++        hapd.req_beacon(device.address, beacon_passive)
++        # TODO: See if we are scanning here (scan not initiated from stati=
+on)
++
++        event =3D hapd.wait_for_event('BEACON-RESP-RX')
++        if event:
++            print(event)
++
++        sleep(0.5)
++
++        # This should active scan on channel 11, returning otherSSID
++        hapd.req_beacon(device.address, beacon_active)
++        # TODO: See if we are scanning here (scan not initiated from stati=
+on)
++
++        event =3D hapd.wait_for_event('BEACON-RESP-RX')
++        if event:
++            print(event)
++
++        device.disconnect()
++
++        condition =3D 'not obj.connected'
++        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
++
++        wd.unregister_psk_agent(psk_agent)
++
++    @classmethod
++    def setUpClass(cls):
++        pass
++
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
++
++if __name__ =3D=3D '__main__':
++    unittest.main(exit=3DTrue)
+diff --git a/autotests/testRRM/hw.conf b/autotests/testRRM/hw.conf
+new file mode 100644
+index 00000000..91c757ce
+--- /dev/null
++++ b/autotests/testRRM/hw.conf
+@@ -0,0 +1,8 @@
++[SETUP]
++num_radios=3D3
++max_test_exec_interval_sec=3D40
++reg_domain=3DUS
++
++[HOSTAPD]
++rad0=3DssidRRM.conf
++rad1=3DssidOther.conf
+diff --git a/autotests/testRRM/ssidOther.conf b/autotests/testRRM/ssidOther=
+.conf
+new file mode 100644
+index 00000000..e0f0fd40
+--- /dev/null
++++ b/autotests/testRRM/ssidOther.conf
+@@ -0,0 +1,10 @@
++ctrl_interface=3D/var/run/hostapd
++
++hw_mode=3Dg
++channel=3D11
++ssid=3DssidOther
++
++wpa=3D2
++wpa_pairwise=3DCCMP
++wpa_passphrase=3Dsecret123
++rrm_beacon_report=3D1
+diff --git a/autotests/testRRM/ssidRRM.conf b/autotests/testRRM/ssidRRM.conf
+new file mode 100644
+index 00000000..233392f9
+--- /dev/null
++++ b/autotests/testRRM/ssidRRM.conf
+@@ -0,0 +1,13 @@
++ctrl_interface=3D/var/run/hostapd
++
++hw_mode=3Da
++ssid=3DssidRRM
++
++wpa=3D2
++wpa_pairwise=3DCCMP
++wpa_passphrase=3Dsecret123
++rrm_beacon_report=3D1
++ht_capab=3D[HT40+]
++
++ieee80211n=3D1
++channel=3D36
 -- =
 
 2.17.1
 
---===============7054577763126334466==--
+--===============0530601990842526975==--
 
