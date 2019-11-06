@@ -1,56 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============5407018376509155057=="
+Content-Type: multipart/mixed; boundary="===============8075168789874903178=="
 MIME-Version: 1.0
-From: Khem Raj <raj.khem@gmail.com>
-Subject: [PATCH V2] Makefile.am: Avoid redirection of input and output files
-Date: Tue, 05 Nov 2019 18:50:32 -0800
-Message-ID: <20191106025032.1447949-1-raj.khem@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/3] wiphy: add beacon bits to RM Enabled Capabilities
+Date: Wed, 06 Nov 2019 09:57:30 -0800
+Message-ID: <20191106175732.711-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5407018376509155057==
+--===============8075168789874903178==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Ensure that directory is created before its written to
-
-This can cause a build race in a highly parallelised build where a director=
-y is not yet created but
-output file is being written using redirection e.g.
-
-rst2man.py --strict --no-raw --no-generator --no-datestamp < ../git/monitor=
-/iwmon.rst > monitor/iwmon.1
-/bin/sh: monitor/iwmon.1: No such file or directory
-make[1]: *** [Makefile:3544: monitor/iwmon.1] Error 1
-
+This tells AP's that we support Passive, Active, and Table beacon
+measurements.
 ---
-v2: create directory before emitting doc files into it
+ src/wiphy.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
- Makefile.am | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile.am b/Makefile.am
-index 823b7d02..1bd0005c 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -626,8 +626,9 @@ SED_PROCESS =3D $(AM_V_GEN)$(MKDIR_P) $(dir $@) && $(SE=
-D) \
- 		< $< > $@
+diff --git a/src/wiphy.c b/src/wiphy.c
+index ef22c0d3..eb0dfcc9 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -1037,6 +1037,8 @@ static void wiphy_setup_rm_enabled_capabilities(struc=
+t wiphy *wiphy)
  =
 
- if RUN_RST2MAN
--RST2MAN_PROCESS =3D $(AM_V_GEN)$(RST2MAN) --strict --no-raw --no-generator=
- \
--			--no-datestamp < $< > $@
-+RST2MAN_PROCESS =3D $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
-+			$(AM_V_GEN)$(RST2MAN) --strict --no-raw \
-+			--no-generator --no-datestamp $< $@
- else
- RST2MAN_PROCESS =3D $(AM_V_GEN)test -f $@ || \
- 		{ echo "Generated manual page $@ does not exist"; false; }
+ 	wiphy->rm_enabled_capabilities[0] =3D IE_TYPE_RM_ENABLED_CAPABILITIES;
+ 	wiphy->rm_enabled_capabilities[1] =3D 5;
++	/* Bits: Passive (4), Active (5), and Beacon Table (6) capabilities */
++	wiphy->rm_enabled_capabilities[2] =3D 0x70;
+ =
+
+ 	/*
+ 	 * TODO: Support at least Link Measurement if TX_POWER_INSERTION is
 -- =
 
-2.24.0
+2.17.1
 
---===============5407018376509155057==--
+--===============8075168789874903178==--
 
