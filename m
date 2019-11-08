@@ -1,48 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============4959131786939505114=="
+Content-Type: multipart/mixed; boundary="===============2843252415982386169=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH] manpage: Add route prioritization setting
-Date: Fri, 08 Nov 2019 11:37:43 -0800
-Message-ID: <20191108193743.4372-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 2/4] scan: Fix bit checking for interworking
+Date: Fri, 08 Nov 2019 17:04:00 -0500
+Message-ID: <20191108220402.10282-2-tim.a.kourt@linux.intel.com>
+In-Reply-To: <20191108220402.10282-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4959131786939505114==
+--===============2843252415982386169==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+The checker function will later be changed to match the bit setter.
 ---
- src/iwd.config.rst | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ src/scan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 56f019f6..dd04909c 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -170,6 +170,14 @@ The group ``[Network]`` contains network configuration=
- related settings.
+diff --git a/src/scan.c b/src/scan.c
+index 4bc95afe..f1317686 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -305,7 +305,7 @@ static struct l_genl_msg *scan_build_cmd(struct scan_co=
+ntext *sc,
+ 	iov[iov_elems].iov_len =3D ext_capa[1] + 2;
+ 	iov_elems++;
  =
 
-        If not specified, ``systemd`` is used as default.
- =
-
-+   * - RoutePriorityOffset
-+     - Values: uint32 value (default: **300**)
-+
-+       Configures a route priority offset used by the system to prioritize
-+       the default routes. The route with lower priority offset is preferr=
-ed.
-+
-+       If not specified, ``300`` is used as default.
-+
- Blacklist
- ---------
- =
-
+-	if (util_is_bit_set(ext_capa[3], 7)) {
++	if (util_is_bit_set(ext_capa[2 + 3], 7)) {
+ 		/* Order 12 - Interworking */
+ 		interworking[0] =3D IE_TYPE_INTERWORKING;
+ 		interworking[1] =3D 1;
 -- =
 
-2.13.6
+2.21.0
 
---===============4959131786939505114==--
+--===============2843252415982386169==--
 
