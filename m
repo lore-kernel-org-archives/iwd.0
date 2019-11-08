@@ -1,41 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============2843252415982386169=="
+Content-Type: multipart/mixed; boundary="===============1224829773120104538=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 2/4] scan: Fix bit checking for interworking
-Date: Fri, 08 Nov 2019 17:04:00 -0500
-Message-ID: <20191108220402.10282-2-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20191108220402.10282-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 1/4] scan: Improve comment
+Date: Fri, 08 Nov 2019 17:03:59 -0500
+Message-ID: <20191108220402.10282-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2843252415982386169==
+--===============1224829773120104538==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The checker function will later be changed to match the bit setter.
 ---
- src/scan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/scan.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/scan.c b/src/scan.c
-index 4bc95afe..f1317686 100644
+index f2332545..4bc95afe 100644
 --- a/src/scan.c
 +++ b/src/scan.c
-@@ -305,7 +305,7 @@ static struct l_genl_msg *scan_build_cmd(struct scan_co=
+@@ -297,8 +297,8 @@ static struct l_genl_msg *scan_build_cmd(struct scan_co=
 ntext *sc,
- 	iov[iov_elems].iov_len =3D ext_capa[1] + 2;
- 	iov_elems++;
- =
-
--	if (util_is_bit_set(ext_capa[3], 7)) {
-+	if (util_is_bit_set(ext_capa[2 + 3], 7)) {
- 		/* Order 12 - Interworking */
- 		interworking[0] =3D IE_TYPE_INTERWORKING;
- 		interworking[1] =3D 1;
+ 	ext_capa =3D wiphy_get_extended_capabilities(sc->wiphy,
+ 							NL80211_IFTYPE_STATION);
+ 	/*
+-	 * XXX: If adding IE's here ensure that ordering is not broken for
+-	 * probe requests (IEEE-2016 Table 9-33).
++	 * If adding IE's here ensure that ordering is not broken for
++	 * probe requests (IEEE Std 802.11-2016 Table 9-33).
+ 	 */
+ 	/* Order 9 - Extended Capabilities */
+ 	iov[iov_elems].iov_base =3D (void *) ext_capa;
 -- =
 
 2.21.0
 
---===============2843252415982386169==--
+--===============1224829773120104538==--
 
