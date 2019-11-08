@@ -1,91 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============7850864761578708492=="
+Content-Type: multipart/mixed; boundary="===============4959131786939505114=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: =?utf-8?q?=5BPATCH_5/5=5D_client=3A_Fail_in_non-interactive_mode_if_iwd_s?=
- =?utf-8?q?ervice_isn=E2=80=99t_running?=
-Date: Fri, 08 Nov 2019 11:32:23 -0800
-Message-ID: <20191108193223.1950-5-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20191108193223.1950-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH] manpage: Add route prioritization setting
+Date: Fri, 08 Nov 2019 11:37:43 -0800
+Message-ID: <20191108193743.4372-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7850864761578708492==
+--===============4959131786939505114==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In non-interactive mode request the managed object right away and do
-not wait for the service to appear. This way client can fail right
-away instead of endlessly waiting in non-interactive mode.
 ---
- client/dbus-proxy.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+ src/iwd.config.rst | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/client/dbus-proxy.c b/client/dbus-proxy.c
-index 37f0e75c..313cd5a6 100644
---- a/client/dbus-proxy.c
-+++ b/client/dbus-proxy.c
-@@ -740,11 +740,17 @@ static void get_managed_objects_callback(struct l_dbu=
-s_message *message,
- 	display_enable_cmd_prompt();
- }
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 56f019f6..dd04909c 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -170,6 +170,14 @@ The group ``[Network]`` contains network configuration=
+ related settings.
  =
 
--static void service_appeared_callback(struct l_dbus *dbus, void *user_data)
-+static void get_managed_objects(void)
- {
--	if (!command_is_interactive_mode())
--		goto get_objects;
-+	l_dbus_method_call(dbus, IWD_SERVICE, IWD_ROOT_PATH,
-+					L_DBUS_INTERFACE_OBJECT_MANAGER,
-+					"GetManagedObjects", NULL,
-+					get_managed_objects_callback,
-+					NULL, NULL);
-+}
+        If not specified, ``systemd`` is used as default.
  =
 
-+static void service_appeared_callback(struct l_dbus *dbus, void *user_data)
-+{
- 	l_dbus_add_signal_watch(dbus, IWD_SERVICE, IWD_ROOT_PATH,
- 					L_DBUS_INTERFACE_OBJECT_MANAGER,
- 					"InterfacesAdded", L_DBUS_MATCH_NONE,
-@@ -759,12 +765,8 @@ static void service_appeared_callback(struct l_dbus *d=
-bus, void *user_data)
- 					L_DBUS_INTERFACE_PROPERTIES,
- 					"PropertiesChanged", L_DBUS_MATCH_NONE,
- 					properties_changed_callback, NULL);
--get_objects:
--	l_dbus_method_call(dbus, IWD_SERVICE, IWD_ROOT_PATH,
--					L_DBUS_INTERFACE_OBJECT_MANAGER,
--					"GetManagedObjects", NULL,
--					get_managed_objects_callback,
--					NULL, NULL);
++   * - RoutePriorityOffset
++     - Values: uint32 value (default: **300**)
 +
-+	get_managed_objects();
- }
++       Configures a route priority offset used by the system to prioritize
++       the default routes. The route with lower priority offset is preferr=
+ed.
++
++       If not specified, ``300`` is used as default.
++
+ Blacklist
+ ---------
  =
 
- static void service_disappeared_callback(struct l_dbus *dbus,
-@@ -834,9 +836,13 @@ bool dbus_proxy_init(void)
- 	l_dbus_set_disconnect_handler(dbus, dbus_disconnect_callback, NULL,
- 									NULL);
- =
-
--	l_dbus_add_service_watch(dbus, IWD_SERVICE, service_appeared_callback,
-+	if (command_is_interactive_mode())
-+		l_dbus_add_service_watch(dbus, IWD_SERVICE,
-+						service_appeared_callback,
- 						service_disappeared_callback,
- 						NULL, NULL);
-+	else
-+		get_managed_objects();
- =
-
- 	return true;
- }
 -- =
 
 2.13.6
 
---===============7850864761578708492==--
+--===============4959131786939505114==--
 
