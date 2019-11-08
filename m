@@ -1,62 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============7666517948431991989=="
+Content-Type: multipart/mixed; boundary="===============4653500665457620285=="
 MIME-Version: 1.0
 From: Martin/Geno <geno+dev@fireorbit.de>
 Subject: [PATCH] fix doc iwd.network - correct section name is Settings
-Date: Fri, 08 Nov 2019 17:13:01 +0000
-Message-ID: <157323318139.52310.17713335515539365777@fireY0ga>
+Date: Fri, 08 Nov 2019 18:24:11 +0100
+Message-ID: <20191108172411.1929890-1-geno+dev@fireorbit.de>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7666517948431991989==
+--===============4653500665457620285==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+---
+ src/iwd.network.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---===============7666517948431991989==
-Content-Type: text/x-diff
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-fix-doc-iwd.network-correct-section-name-is-Settings.patch"
+diff --git a/src/iwd.network.rst b/src/iwd.network.rst
+index 6c882353..756addf3 100644
+--- a/src/iwd.network.rst
++++ b/src/iwd.network.rst
+@@ -92,7 +92,7 @@ following the group definition.
+ General Settings
+ ----------------
+ =
 
-RnJvbSA3OTNiNWI3NmE2YWVjMDEzMDk2MzU5ODk2NjYzZGIyYWMyMzk2MWJkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXJ0aW4vR2VubyA8Z2VubytkZXZAZmlyZW9yYml0LmRlPgpE
-YXRlOiBGcmksIDggTm92IDIwMTkgMTY6NTM6MDkgKzAxMDAKU3ViamVjdDogW1BBVENIXSBmaXgg
-ZG9jIGl3ZC5uZXR3b3JrIC0gY29ycmVjdCBzZWN0aW9uIG5hbWUgaXMgU2V0dGluZ3MKVG86IGl3
-ZEBsaXN0cy4wMS5vcmcKCi0tLQogc3JjL2l3ZC5uZXR3b3JrLnJzdCB8IDQgKystLQogMSBmaWxl
-IGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9z
-cmMvaXdkLm5ldHdvcmsucnN0IGIvc3JjL2l3ZC5uZXR3b3JrLnJzdAppbmRleCA2Yzg4MjM1My4u
-NzU2YWRkZjMgMTAwNjQ0Ci0tLSBhL3NyYy9pd2QubmV0d29yay5yc3QKKysrIGIvc3JjL2l3ZC5u
-ZXR3b3JrLnJzdApAQCAtOTIsNyArOTIsNyBAQCBmb2xsb3dpbmcgdGhlIGdyb3VwIGRlZmluaXRp
-b24uCiBHZW5lcmFsIFNldHRpbmdzCiAtLS0tLS0tLS0tLS0tLS0tCiAKLVRoZSBncm91cCBgYFtH
-ZW5lcmFsXWBgIGNvbnRhaW5zIGdlbmVyYWwgc2V0dGluZ3MuCitUaGUgZ3JvdXAgYGBbU2V0dGlu
-Z3NdYGAgY29udGFpbnMgZ2VuZXJhbCBzZXR0aW5ncy4KIAogLi4gbGlzdC10YWJsZTo6CiAgICA6
-aGVhZGVyLXJvd3M6IDAKQEAgLTI2OSw3ICsyNjksNyBAQCBPcGVuIE5ldHdvcmsgKEhpZGRlbikK
-IAogLi4gY29kZS1ibG9jazo6CiAKLSAgIFtHZW5lcmFsXQorICAgW1NldHRpbmdzXQogICAgSGlk
-ZGVuPXRydWUKIAogUHJlLVNoYXJlZCBLZXkgKFBTSykKLS0gCjIuMjQuMAoK
+-The group ``[General]`` contains general settings.
++The group ``[Settings]`` contains general settings.
+ =
 
---===============7666517948431991989==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
+ .. list-table::
+    :header-rows: 0
+@@ -269,7 +269,7 @@ Open Network (Hidden)
+ =
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlRSXpCQUFCQ0FBZEZpRUV4VTJpdkY5bVpo
-dHNia3BiblgwOGEvOWdER29GQWwzRm9od0FDZ2tRblgwOGEvOWcKREdySnF4QUF6Q2FUMzh6Zjl3
-Z25pMUNnb2pGc0Jkankvc21rTmlmdnVHVEVvMFA4UFdPekVTNUFWUzF5UDB2WApJczk5UnEzTjBN
-SHJ4OGFkMzB4WTdvU1g5bWZzUHh5ODVuQTdLc0hvaFFBdHNBT3A3bVlOVzZBd2F2cEV2L0NwCmJz
-cHZEU2R0Z21TbDA1emw1SS83c3JuTXQ3QktaY3RoWUV1MHFTV2o5NlRqV1ovT1c3RUFWYUgrQWhX
-bk9wVXYKakoxZWVyWFk3ckFHd1VlKzM1aDU2MEhUWG40Wkp3VXdaYTNpalczNlBCdVFyZG9Mdnd5
-elZNVkxpeUNXNkFWKwpmSnJPMU54TmVpT0gwUUNKSGlja1BRZlFxZVlRamVsUFhtRXVxbHBHKzE0
-ZThNSHBPbDJORStGbVhXWms0YWtUClFaSGxscFpkMzRieFJYUjllSndnenI4dkJqWGNvWDJxVE5P
-R0xLTHJFdXJjamJHUlU4MUxsUzNMVXdray9vNHIKaDlyTWxXZm5zb0FOeXZoZGVpc3hHRzlFU2ln
-Q1lNb0E0WWJTWTY1aG42K0xtT3UzVHd6WDlKcm1JbUltQ0duZQpIcmp6S3hqcXpFSnI5TklSMGhB
-UUlrZHFQOUVadzhXdXEwcDVSZ0d5b1FDTzdGZDQ4dkw5bFo2K2ZkVENkK2dyCkR5MTVZTmY1NFVa
-ZGJvbTFwdngyQm1PZ3BmMXhWQndxQjRGOGgwaDZKUE9PaURlY0s1WlN1d3ZRcHVCdzgvT2EKNzg5
-UjJMbnlQL3RJM2RpbUczTGJYWHlUczRTUVEwNUZLVVdFTUV4eUsrUzhuck50RHpUd0RlR3hJN0Z5
-MndmcQpLbjRmV0tYTGdaUVRRRU92NmtiQkxqVXVFb1d5dTl5SnNCWjBnZFJEclc3aWxTd3o3WHc9
-Cj1FeEJqCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
+ .. code-block::
+ =
 
---===============7666517948431991989==--
+-   [General]
++   [Settings]
+    Hidden=3Dtrue
+ =
+
+ Pre-Shared Key (PSK)
+-- =
+
+2.24.0
+
+--===============4653500665457620285==--
 
