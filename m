@@ -1,14 +1,15 @@
-Content-Type: multipart/mixed; boundary="===============0864534309734075131=="
+Content-Type: multipart/mixed; boundary="===============3120398025401948257=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/5] client: Add start/stop ops to agent manager proxy
-Date: Fri, 08 Nov 2019 21:21:14 -0600
-Message-ID: <38dfb913-1a4d-d814-e03d-c788543b3c45@gmail.com>
-In-Reply-To: <20191108193223.1950-2-tim.a.kourt@linux.intel.com>
+Subject: =?utf-8?q?Re=3A_=5BPATCH_5/5=5D_client=3A_Fail_in_non-interactive_mode_if?=
+ =?utf-8?q?_iwd_service_isn=E2=80=99t_running?=
+Date: Fri, 08 Nov 2019 21:22:58 -0600
+Message-ID: <be2d2661-dc3f-3419-de94-3a7eb5ac9175@gmail.com>
+In-Reply-To: <20191108193223.1950-5-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0864534309734075131==
+--===============3120398025401948257==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,127 +17,19 @@ Content-Transfer-Encoding: quoted-printable
 Hi Tim,
 
 On 11/8/19 1:32 PM, Tim Kourt wrote:
-> This guarantees that the agent gets registered only when the agent
-> manager interface is available on dbus.
+> In non-interactive mode request the managed object right away and do
+> not wait for the service to appear. This way client can fail right
+> away instead of endlessly waiting in non-interactive mode.
 > ---
->   client/agent-manager.c | 51 +++++++++++++++++++++++++++++++++++++++++++=
--------
->   1 file changed, 44 insertions(+), 7 deletions(-)
+>   client/dbus-proxy.c | 26 ++++++++++++++++----------
+>   1 file changed, 16 insertions(+), 10 deletions(-)
 > =
 
-> diff --git a/client/agent-manager.c b/client/agent-manager.c
-> index b7d4271b..fb371ea2 100644
-> --- a/client/agent-manager.c
-> +++ b/client/agent-manager.c
-> @@ -30,6 +30,7 @@
->   #include "agent.h"
->   #include "dbus-proxy.h"
->   #include "agent-manager.h"
-> +#include "command.h"
->   =
 
->   #define IWD_AGENT_MANAGER_PATH		"/net/connman/iwd"
->   =
-
-> @@ -39,6 +40,46 @@ static void check_errors_method_callback(struct l_dbus=
-_message *message,
->   	dbus_message_has_error(message);
->   }
->   =
-
-> +static bool agent_manager_start(const struct proxy_interface *proxy)
-> +{
-> +	const char *path;
-> +
-> +	if (command_needs_no_agent())
-> +		return true;
-> +
-> +	path =3D proxy_interface_get_data(proxy);
-> +	if (!path)
-> +		return false;
-> +
-> +	if (!agent_init(path))
-> +		return false;
-> +
-> +	proxy_interface_method_call(proxy, "RegisterAgent", "o",
-> +					check_errors_method_callback, path);
-> +
-> +	return true;
-> +}
-> +
-> +static void agent_manager_stop(const struct proxy_interface *proxy)
-> +{
-> +	const char *path;
-> +
-> +	if (command_needs_no_agent())
-> +		return;
-> +
-> +	if (!proxy)
-> +		return;
-> +
-> +	path =3D proxy_interface_get_data(proxy);
-> +	if (!path)
-> +		return;
-> +
-> +	proxy_interface_method_call(proxy, "UnregisterAgent", "o",
-> +					check_errors_method_callback, path);
-> +
-
-Trying to unregister the agent when the AgentManager interface goes away =
-
-is rather pointless, no?  Besides, you already have .Release that should =
-
-have been called by now and no agent should be registered anyway.
-
-> +	agent_exit(path);
-> +}
-> +
->   bool agent_manager_register_agent(void)
->   {
->   	const char *path;
-> @@ -81,25 +122,21 @@ bool agent_manager_unregister_agent(void)
->   =
-
->   static void *agent_manager_create(void)
->   {
-> -	char *path =3D l_strdup_printf("/agent/%i", getpid());
-> -
-> -	agent_init(path);
-> -
-> -	return path;
-> +	return l_strdup_printf("/agent/%i", getpid());
-
-So why do you need start/stop at all?  Can't you just do the ops as part =
-
-of the create/destroy?
-
->   }
->   =
-
->   static void agent_manager_destroy(void *data)
->   {
->   	char *path =3D data;
->   =
-
-> -	agent_exit(path);
-> -
->   	l_free(path);
->   }
->   =
-
->   static const struct proxy_interface_type_ops agent_manager_ops =3D {
->   	.create =3D agent_manager_create,
->   	.destroy =3D agent_manager_destroy,
-> +	.start =3D agent_manager_start,
-> +	.stop =3D agent_manager_stop,
->   };
->   =
-
->   static struct proxy_interface_type agent_manager_interface_type =3D {
-> =
-
+Applied, thanks.
 
 Regards,
 -Denis
---===============0864534309734075131==--
+
+--===============3120398025401948257==--
 
