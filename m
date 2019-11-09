@@ -1,71 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============3173954873317597216=="
+Content-Type: multipart/mixed; boundary="===============2111096823318305941=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Denis Kenzior <denkenz@gmail.com>
 Subject: Re: [PATCH 4/4] scan: Separate cck rates attr creation into logical
  block
-Date: Sat, 09 Nov 2019 03:06:48 +0100
-Message-ID: <6D926FBC-216A-4512-8040-B0CA569B0754@holtmann.org>
-In-Reply-To: <20191108220402.10282-4-tim.a.kourt@linux.intel.com>
+Date: Fri, 08 Nov 2019 20:40:48 -0600
+Message-ID: <e0c2fe7e-ac8e-a987-0db0-e89735f8db02@gmail.com>
+In-Reply-To: <6D926FBC-216A-4512-8040-B0CA569B0754@holtmann.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3173954873317597216==
+--===============2111096823318305941==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+Hi Marcel,
 
-> ---
-> src/scan.c | 82 ++++++++++++++++++++++++++++--------------------------
-> 1 file changed, 42 insertions(+), 40 deletions(-)
+>> +	if (L_WARN_ON(!(supported =3D wiphy_get_supported_rates(sc->wiphy,
+>> +							NL80211_BAND_2GHZ,
+>> +							&num_supported))))
+>> +		return;
 > =
 
-> diff --git a/src/scan.c b/src/scan.c
-> index a3d6e5d8..f99ad1e7 100644
-> --- a/src/scan.c
-> +++ b/src/scan.c
-> @@ -308,6 +308,45 @@ static void scan_build_attr_ie(struct l_genl_msg *ms=
-g,
-> 	l_genl_msg_append_attrv(msg, NL80211_ATTR_IE, iov, iov_elems);
-> }
+> these kind of =E2=80=9Cnested=E2=80=9D statements become really hard to r=
+ead and check if they are correct.
 > =
 
-> +static void scan_build_attr_tx_no_cck_rates(struct l_genl_msg *msg,
-> +							struct scan_context *sc)
-> +{
-> +	static const uint8_t b_rates[] =3D { 2, 4, 11, 22 };
-> +	uint8_t *scan_rates;
-> +	const uint8_t *supported;
-> +	unsigned int num_supported;
-> +	unsigned int count;
-> +	unsigned int i;
-> +
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_TX_NO_CCK_RATE, 0, NULL);
-> +
-> +	/*
-> +	 * Assume if we're sending the probe requests at OFDM bit
-> +	 * rates we don't want to advertise support for 802.11b rates.
-> +	 */
-> +	if (L_WARN_ON(!(supported =3D wiphy_get_supported_rates(sc->wiphy,
-> +							NL80211_BAND_2GHZ,
-> +							&num_supported))))
-> +		return;
+> 	supported =3D wiphy_get_supported_rates(sc->wiphy, ..);
+> 	if (L_WARN_ON(!supported))
+> 		return;
+> =
 
-these kind of =E2=80=9Cnested=E2=80=9D statements become really hard to rea=
-d and check if they are correct.
+> I realize that this code is the same as below, but lets improve readabili=
+ty as well. It is fine to submit a cleanup patch to improve readability if =
+we find such places.
 
-	supported =3D wiphy_get_supported_rates(sc->wiphy, ..);
-	if (L_WARN_ON(!supported))
-		return;
+Actually, I explicitly requested that this be the way it is.  For =
 
-I realize that this code is the same as below, but lets improve readability=
- as well. It is fine to submit a cleanup patch to improve readability if we=
- find such places.
+L_WARN_ON, I want the resultant warning to carry as much info as =
 
-Regards
+possible.  Having a message like "Warning: !supported" show up is pretty =
 
-Marcel
+pointless.  Yes it carries the line number and filename, but it still =
 
---===============3173954873317597216==--
+requires an extra step.  And things can change between different =
+
+versions of iwd, etc.
+
+So while the readability is a little worse, I think the hit is worth it =
+
+for cases where L_WARN_ON is used.
+
+Regards,
+-Denis
+--===============2111096823318305941==--
 
