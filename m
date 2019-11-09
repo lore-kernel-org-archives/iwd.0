@@ -1,51 +1,142 @@
-Content-Type: multipart/mixed; boundary="===============1590890952488229178=="
+Content-Type: multipart/mixed; boundary="===============0864534309734075131=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH 4/4] scan: Separate cck rates attr creation into logical
- block
-Date: Sat, 09 Nov 2019 04:21:35 +0100
-Message-ID: <50E8BFFC-2EF8-4E46-A7A7-C8BCE2CA7512@holtmann.org>
-In-Reply-To: <e0c2fe7e-ac8e-a987-0db0-e89735f8db02@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 2/5] client: Add start/stop ops to agent manager proxy
+Date: Fri, 08 Nov 2019 21:21:14 -0600
+Message-ID: <38dfb913-1a4d-d814-e03d-c788543b3c45@gmail.com>
+In-Reply-To: <20191108193223.1950-2-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1590890952488229178==
+--===============0864534309734075131==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi Tim,
 
->>> +	if (L_WARN_ON(!(supported =3D wiphy_get_supported_rates(sc->wiphy,
->>> +							NL80211_BAND_2GHZ,
->>> +							&num_supported))))
->>> +		return;
->> these kind of =E2=80=9Cnested=E2=80=9D statements become really hard to =
-read and check if they are correct.
->> 	supported =3D wiphy_get_supported_rates(sc->wiphy, ..);
->> 	if (L_WARN_ON(!supported))
->> 		return;
->> I realize that this code is the same as below, but lets improve readabil=
-ity as well. It is fine to submit a cleanup patch to improve readability if=
- we find such places.
+On 11/8/19 1:32 PM, Tim Kourt wrote:
+> This guarantees that the agent gets registered only when the agent
+> manager interface is available on dbus.
+> ---
+>   client/agent-manager.c | 51 +++++++++++++++++++++++++++++++++++++++++++=
+-------
+>   1 file changed, 44 insertions(+), 7 deletions(-)
 > =
 
-> Actually, I explicitly requested that this be the way it is.  For L_WARN_=
-ON, I want the resultant warning to carry as much info as possible.  Having=
- a message like "Warning: !supported" show up is pretty pointless.  Yes it =
-carries the line number and filename, but it still requires an extra step. =
- And things can change between different versions of iwd, etc.
+> diff --git a/client/agent-manager.c b/client/agent-manager.c
+> index b7d4271b..fb371ea2 100644
+> --- a/client/agent-manager.c
+> +++ b/client/agent-manager.c
+> @@ -30,6 +30,7 @@
+>   #include "agent.h"
+>   #include "dbus-proxy.h"
+>   #include "agent-manager.h"
+> +#include "command.h"
+>   =
+
+>   #define IWD_AGENT_MANAGER_PATH		"/net/connman/iwd"
+>   =
+
+> @@ -39,6 +40,46 @@ static void check_errors_method_callback(struct l_dbus=
+_message *message,
+>   	dbus_message_has_error(message);
+>   }
+>   =
+
+> +static bool agent_manager_start(const struct proxy_interface *proxy)
+> +{
+> +	const char *path;
+> +
+> +	if (command_needs_no_agent())
+> +		return true;
+> +
+> +	path =3D proxy_interface_get_data(proxy);
+> +	if (!path)
+> +		return false;
+> +
+> +	if (!agent_init(path))
+> +		return false;
+> +
+> +	proxy_interface_method_call(proxy, "RegisterAgent", "o",
+> +					check_errors_method_callback, path);
+> +
+> +	return true;
+> +}
+> +
+> +static void agent_manager_stop(const struct proxy_interface *proxy)
+> +{
+> +	const char *path;
+> +
+> +	if (command_needs_no_agent())
+> +		return;
+> +
+> +	if (!proxy)
+> +		return;
+> +
+> +	path =3D proxy_interface_get_data(proxy);
+> +	if (!path)
+> +		return;
+> +
+> +	proxy_interface_method_call(proxy, "UnregisterAgent", "o",
+> +					check_errors_method_callback, path);
+> +
+
+Trying to unregister the agent when the AgentManager interface goes away =
+
+is rather pointless, no?  Besides, you already have .Release that should =
+
+have been called by now and no agent should be registered anyway.
+
+> +	agent_exit(path);
+> +}
+> +
+>   bool agent_manager_register_agent(void)
+>   {
+>   	const char *path;
+> @@ -81,25 +122,21 @@ bool agent_manager_unregister_agent(void)
+>   =
+
+>   static void *agent_manager_create(void)
+>   {
+> -	char *path =3D l_strdup_printf("/agent/%i", getpid());
+> -
+> -	agent_init(path);
+> -
+> -	return path;
+> +	return l_strdup_printf("/agent/%i", getpid());
+
+So why do you need start/stop at all?  Can't you just do the ops as part =
+
+of the create/destroy?
+
+>   }
+>   =
+
+>   static void agent_manager_destroy(void *data)
+>   {
+>   	char *path =3D data;
+>   =
+
+> -	agent_exit(path);
+> -
+>   	l_free(path);
+>   }
+>   =
+
+>   static const struct proxy_interface_type_ops agent_manager_ops =3D {
+>   	.create =3D agent_manager_create,
+>   	.destroy =3D agent_manager_destroy,
+> +	.start =3D agent_manager_start,
+> +	.stop =3D agent_manager_stop,
+>   };
+>   =
+
+>   static struct proxy_interface_type agent_manager_interface_type =3D {
 > =
 
-> So while the readability is a little worse, I think the hit is worth it f=
-or cases where L_WARN_ON is used.
 
-ok then, fair point. Can we somehow improve these cases with a comment to e=
-ase reading and understanding the code.
-
-Regards
-
-Marcel
-
---===============1590890952488229178==--
+Regards,
+-Denis
+--===============0864534309734075131==--
 
