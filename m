@@ -1,41 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============8020266385536147576=="
+Content-Type: multipart/mixed; boundary="===============4860680879633654355=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 2/2] modules: Unload modules in reverse order from loading
-Date: Mon, 11 Nov 2019 13:34:17 +0100
-Message-ID: <20191111123417.2103-2-andrew.zaborowski@intel.com>
-In-Reply-To: <20191111123417.2103-1-andrew.zaborowski@intel.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH 1/2] peap: Adjust V0 not to close tunnel on Success of Phase2
+Date: Mon, 11 Nov 2019 15:47:14 -0800
+Message-ID: <20191111234714.27258-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8020266385536147576==
+--===============4860680879633654355==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Make sure a module A that is needed by B is not unloaded before B.
 ---
- src/module.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/eap-peap.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/module.c b/src/module.c
-index 9eb282f0..a8f82015 100644
---- a/src/module.c
-+++ b/src/module.c
-@@ -173,7 +173,7 @@ void iwd_modules_exit()
- 		return;
+diff --git a/src/eap-peap.c b/src/eap-peap.c
+index c8949ca2..16ab0319 100644
+--- a/src/eap-peap.c
++++ b/src/eap-peap.c
+@@ -182,14 +182,14 @@ static void eap_extensions_handle_request(struct eap_=
+state *eap,
  =
 
- 	for (i =3D 0; i < n_modules; i++) {
--		desc =3D modules_sorted[i];
-+		desc =3D modules_sorted[n_modules - 1 - i];
- 		if (!desc->active)
- 			continue;
+ 	eap_peap_phase2_send_response(response, sizeof(response), eap);
+ =
+
+-	eap_tls_common_tunnel_close(eap);
+-
+ 	eap_discard_success_and_failure(eap, false);
+ 	eap_tls_common_set_completed(eap);
+ =
+
+ 	if (r !=3D EAP_EXTENSIONS_RESULT_SUCCCESS) {
+ 		eap_tls_common_set_phase2_failed(eap);
+ =
+
++		eap_tls_common_tunnel_close(eap);
++
+ 		return;
+ 	}
  =
 
 -- =
 
-2.20.1
+2.13.6
 
---===============8020266385536147576==--
+--===============4860680879633654355==--
 
