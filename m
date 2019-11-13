@@ -1,40 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============6459799366304880270=="
+Content-Type: multipart/mixed; boundary="===============6160633917992184393=="
 MIME-Version: 1.0
-From: genofire <geno+dev@fireorbit.de>
-Subject: [PATCH] docs: fix mailinglist url in README
-Date: Wed, 13 Nov 2019 22:58:01 +0100
-Message-ID: <20191113215801.2272541-1-geno+dev@fireorbit.de>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/5] auto-t: add ctrl_interface to testOWE
+Date: Wed, 13 Nov 2019 14:30:28 -0800
+Message-ID: <20191113223032.5650-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6459799366304880270==
+--===============6160633917992184393==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: genofire <geno+dev@fireorbit.de>
+This is now required for any test using HostapdCLI
 ---
- README | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ autotests/testOWE/ssidGroup20.conf | 1 +
+ autotests/testOWE/ssidOWE.conf     | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/README b/README
-index f26f4cf9..fed9cf62 100644
---- a/README
-+++ b/README
-@@ -274,7 +274,7 @@ Information
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
- =
-
- Mailing list:
--	https://lists.01.org/mailman/listinfo/iwd
-+	https://lists.01.org/postorius/lists/iwd.lists.01.org/
- =
-
- IRC:
- 	irc://irc.freenode.net/#iwd
+diff --git a/autotests/testOWE/ssidGroup20.conf b/autotests/testOWE/ssidGro=
+up20.conf
+index 72f84091..afd5c0a4 100644
+--- a/autotests/testOWE/ssidGroup20.conf
++++ b/autotests/testOWE/ssidGroup20.conf
+@@ -1,3 +1,4 @@
++ctrl_interface=3D/var/run/hostapd
+ hw_mode=3Dg
+ channel=3D1
+ ssid=3DssidGroup20
+diff --git a/autotests/testOWE/ssidOWE.conf b/autotests/testOWE/ssidOWE.conf
+index b9c79d82..a0a4f26c 100644
+--- a/autotests/testOWE/ssidOWE.conf
++++ b/autotests/testOWE/ssidOWE.conf
+@@ -1,3 +1,4 @@
++ctrl_interface=3D/var/run/hostapd
+ hw_mode=3Dg
+ channel=3D1
+ ssid=3DssidOWE
 -- =
 
-2.24.0
+2.17.1
 
---===============6459799366304880270==--
+--===============6160633917992184393==--
 
