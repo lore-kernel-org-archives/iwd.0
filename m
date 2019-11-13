@@ -1,64 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============6126895379402841306=="
+Content-Type: multipart/mixed; boundary="===============1134719828823516991=="
 MIME-Version: 1.0
-From: Khem Raj <raj.khem@gmail.com>
-Subject: Re: [PATCH V2] Makefile.am: Avoid redirection of input and output
- files
-Date: Wed, 13 Nov 2019 10:49:51 -0800
-Message-ID: <55e71dfb6b1ef153ce3fc79ab101c04a5d0331d8.camel@gmail.com>
-In-Reply-To: <20191106025032.1447949-1-raj.khem@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [REQUEST] Is it possible to have PostUp exec hooks?
+Date: Wed, 13 Nov 2019 12:50:23 -0600
+Message-ID: <29a3121a-03bb-ca27-284a-2f8e0cebbada@gmail.com>
+In-Reply-To: <157360342231.491299.16435010824605457499@fireY0ga>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6126895379402841306==
+--===============1134719828823516991==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-ping
+Hi,
 
-On Tue, 2019-11-05 at 18:50 -0800, Khem Raj wrote:
-> Ensure that directory is created before its written to
+On 11/12/19 6:03 PM, genofire wrote:
+> I really like to write some small scripts to set up my 464xlat clat
+> after connecting.
 > =
 
-> This can cause a build race in a highly parallelised build where a
-> directory is not yet created but
-> output file is being written using redirection e.g.
-> =
 
-> rst2man.py --strict --no-raw --no-generator --no-datestamp <
-> ../git/monitor/iwmon.rst > monitor/iwmon.1
-> /bin/sh: monitor/iwmon.1: No such file or directory
-> make[1]: *** [Makefile:3544: monitor/iwmon.1] Error 1
-> =
+So in general it is actually not trivial support invoking arbitrary =
 
-> ---
-> v2: create directory before emitting doc files into it
-> =
+external scripts from a privileged process and do this securely.  Can be =
 
->  Makefile.am | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> =
+done, but it isn't really something we want to deal with inside iwd itself.
 
-> diff --git a/Makefile.am b/Makefile.am
-> index 823b7d02..1bd0005c 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -626,8 +626,9 @@ SED_PROCESS =3D $(AM_V_GEN)$(MKDIR_P) $(dir $@) &&
-> $(SED) \
->  		< $< > $@
->  =
+Another point against something like this is that such functionality can =
 
->  if RUN_RST2MAN
-> -RST2MAN_PROCESS =3D $(AM_V_GEN)$(RST2MAN) --strict --no-raw --no-
-> generator \
-> -			--no-datestamp < $< > $@
-> +RST2MAN_PROCESS =3D $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
-> +			$(AM_V_GEN)$(RST2MAN) --strict --no-raw \
-> +			--no-generator --no-datestamp $< $@
->  else
->  RST2MAN_PROCESS =3D $(AM_V_GEN)test -f $@ || \
->  		{ echo "Generated manual page $@ does not exist";
-> false; }
+be easily accomplished by listening to a few D-Bus signals coming from =
 
---===============6126895379402841306==--
+iwd and invoking whatever script you care about.  If someone wants to =
+
+contribute such a trivial script / daemon, we can certainly host it in =
+
+the iwd git tree.
+
+Regards,
+-Denis
+--===============1134719828823516991==--
 
