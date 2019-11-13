@@ -1,44 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============2629567377757988856=="
+Content-Type: multipart/mixed; boundary="===============7675644529823327639=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] resolve: fix runtime error if netconfig is not enabled
-Date: Wed, 13 Nov 2019 09:45:36 -0800
-Message-ID: <20191113174536.15680-1-prestwoj@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] resolve: fix runtime error if netconfig is not enabled
+Date: Wed, 13 Nov 2019 18:52:52 +0100
+Message-ID: <9C8A7533-FA63-4CF0-AC08-B97B4B926453@holtmann.org>
+In-Reply-To: <20191113174536.15680-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2629567377757988856==
+--===============7675644529823327639==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the resolve module was not enabled in the config file, IWD fails
-to start since resolve_init was returning -EINVAL. Since netconfig
-is optional, we just return successfully here.
----
- src/resolve.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/src/resolve.c b/src/resolve.c
-index 83ac3547..fea9c2bd 100644
---- a/src/resolve.c
-+++ b/src/resolve.c
-@@ -427,8 +427,9 @@ void __resolve_set_config(struct l_settings *config)
- =
+> If the resolve module was not enabled in the config file, IWD fails
+> to start since resolve_init was returning -EINVAL. Since netconfig
+> is optional, we just return successfully here.
+> ---
+> src/resolve.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
- static int resolve_init(void)
- {
-+	/* This module is not enabled in config */
- 	if (!method.ops)
--		return -EINVAL;
-+		return 0;
- =
+patch has been applied.
 
- 	if (method.ops->init)
- 		method.data =3D method.ops->init();
--- =
+Regards
 
-2.17.1
+Marcel
 
---===============2629567377757988856==--
+--===============7675644529823327639==--
 
