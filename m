@@ -1,36 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============6426414512261692973=="
+Content-Type: multipart/mixed; boundary="===============1676856266226536479=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] auto-t: fix intermittent failures in testEAP-MSCHAPV2
-Date: Thu, 14 Nov 2019 12:58:39 -0600
-Message-ID: <3f9d3847-71b1-b086-dfa1-b601a2f1c52d@gmail.com>
-In-Reply-To: <20191114184356.23993-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] station: fail if trying to scan while connecting
+Date: Thu, 14 Nov 2019 10:59:59 -0800
+Message-ID: <20191114185959.24875-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6426414512261692973==
+--===============1676856266226536479==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+If a scan is requested during the middle of a connection we should
+return busy instead of attempting the scan. The kernel ends up coming
+back with not supported in this case, which is misleading and
+difficult to debug.
+---
+ src/station.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 11/14/19 12:43 PM, James Prestwood wrote:
-> Occationally autoconnect would start which was not expected in the
-> test. This is fixed by disabling autoconnect in the provisioning files.
-> ---
->   autotests/testEAP-MSCHAPV2/ssidEAP-MSCHAPV2-1.8021x | 3 +++
->   autotests/testEAP-MSCHAPV2/ssidEAP-MSCHAPV2-2.8021x | 3 +++
->   autotests/testEAP-MSCHAPV2/ssidEAP-MSCHAPV2-3.8021x | 3 +++
->   autotests/testEAP-MSCHAPV2/ssidEAP-MSCHAPV2-4.8021x | 3 +++
->   4 files changed, 12 insertions(+)
-> =
+diff --git a/src/station.c b/src/station.c
+index 76cf20a1..0da352c3 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2751,6 +2751,9 @@ static struct l_dbus_message *station_dbus_scan(struc=
+t l_dbus *dbus,
+ 	if (station->dbus_scan_id)
+ 		return dbus_error_busy(message);
+ =
 
++	if (station->state =3D=3D STATION_STATE_CONNECTING)
++		return dbus_error_busy(message);
++
+ 	station->dbus_scan_id =3D station_scan_trigger(station, NULL,
+ 						station_dbus_scan_triggered,
+ 						new_scan_results,
+-- =
 
-Applied, thanks.
+2.17.1
 
-Regards,
--Denis
-
---===============6426414512261692973==--
+--===============1676856266226536479==--
 
