@@ -1,128 +1,160 @@
-Content-Type: multipart/mixed; boundary="===============0448441674495190603=="
+Content-Type: multipart/mixed; boundary="===============3296438715948764451=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
 Subject: Re: [RFCv3] Document P2P dbus interfaces
-Date: Fri, 15 Nov 2019 05:02:41 +0100
-Message-ID: <CAOq732+BabRdrYctt6R-0KmWNQQBLK51ZMZd62eCWHXSDs=hQw@mail.gmail.com>
-In-Reply-To: <4c084756-efee-be95-c4c2-7d3cae407fe8@gmail.com>
+Date: Thu, 14 Nov 2019 23:08:32 -0600
+Message-ID: <9f6ae587-b2c6-1113-e361-58f73f6f36a4@gmail.com>
+In-Reply-To: <CAOq732+BabRdrYctt6R-0KmWNQQBLK51ZMZd62eCWHXSDs=hQw@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0448441674495190603==
+--===============3296438715948764451==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 15 Nov 2019 at 04:27, Denis Kenzior <denkenz@gmail.com> wrote:
-> >> For now I'd ignore this and assume we can only do one role at a time.
-> >
-> > Right.  But I'm thinking if there is a whole better way of doing the
-> > service registration, i.e. per connection instead of globally.  Say
-> > your use case is you're connecting first to a TV and then to a
-> > keyboard, or simultaneously (as a GO).  There's no point advertising
-> > the WFD capabilities to the keyboard device or to anyone other than
->
-> I actually wouldn't expect this to be a good idea.  Once you start
-> advertising a set of IEs as a P2P GO, I'm not sure changing these is
-> really something that is expected, particularly when you already have a
-> peer connection established.  Changing the contents to signal some state
-> is probably OK (this is done in WSC for example).  But taking out IEs
-> entirely is a bit of a gray area.
+Hi Andrew,
 
-Right, but passing the WFD IE in the Association Request kind of
-signals that you want to establish a WFD connection and you don't want
-it for your second connection.  You can keep signalling it in your
-beacons, although once the user has closed the screencasting app, I
-wouldn't worry about just removing those IEs from the beacons even
-though you may still be connected to the hypothetical P2P keyboard.
+On 11/14/19 10:02 PM, Andrew Zaborowski wrote:
+> On Fri, 15 Nov 2019 at 04:27, Denis Kenzior <denkenz@gmail.com> wrote:
+>>>> For now I'd ignore this and assume we can only do one role at a time.
+>>>
+>>> Right.  But I'm thinking if there is a whole better way of doing the
+>>> service registration, i.e. per connection instead of globally.  Say
+>>> your use case is you're connecting first to a TV and then to a
+>>> keyboard, or simultaneously (as a GO).  There's no point advertising
+>>> the WFD capabilities to the keyboard device or to anyone other than
+>>
+>> I actually wouldn't expect this to be a good idea.  Once you start
+>> advertising a set of IEs as a P2P GO, I'm not sure changing these is
+>> really something that is expected, particularly when you already have a
+>> peer connection established.  Changing the contents to signal some state
+>> is probably OK (this is done in WSC for example).  But taking out IEs
+>> entirely is a bit of a gray area.
+> =
 
->
-> See for example:
->
-> WFD Session Availability bits:
-> 0b00: Not available for WFD Session
->
-> Or Section 5.2.1:
-> "If a WFD Device acts as a P2P Group Owner, the WFD Device shall insert
-> one or more WFD IEs after the other information elements in the Beacon
-> frames it transmits. "
->
-> I assume that at least the WFD spec wants you to twiddle the contents of
-> the IEs and not remove IEs entirely.
->
-> > the TV, once your WFD session is running and functional.  Maybe the
-> > ServiceManager is the wrong way to go and the Connect / PushButton
-> > method should receive the relevant information.
->
-> And don't you need the advertising data before you even get to the point
-> where you can invoke operations on the Peer interface?
+> Right, but passing the WFD IE in the Association Request kind of
+> signals that you want to establish a WFD connection and you don't want
+> it for your second connection.  You can keep signalling it in your
+> beacons, although once the user has closed the screencasting app, I
+> wouldn't worry about just removing those IEs from the beacons even
+> though you may still be connected to the hypothetical P2P keyboard.
+> =
 
-In theory you need to advertise it in your scan.  Like I mentioned in
-another email, I think the scans should also be explicitly triggered
-by the apps because they're expensive, so those would also need to
-know the service parameters.
 
-Maybe that's too complicated for now and we better try a global
-P2PServiceManager thing first.
+So you want two separate registrations?  A global capability and a =
 
->
-> >> Then just indicate what role we have and let the application make that
-> >> choice.  So if we're in P2P_GO mode, it can try to establish another
-> >> connection.  And if we're in P2P_CLIENT mode, tough luck.
-> >
-> > I think it would be nicer to just prefer GO automatically (maybe
-> > without forcing it), for example by having the GO Intent default to 14
-> > out of 15 and be configurable in main.conf.
-> >
->
-> Yes, sure.  What I'm saying though is that once we're connected, we
-> should indicate the topology somehow.
+per-connection "I want to use this profile" type of thing.  It sounded =
 
-I think we should just indicate that we can still attempt more
-connections, optimally without exposing the P2P roles.
+like you only wanted the latter above.
 
->
-> >> Why? The hardware is the arbiter of this in the end.
-> >
-> > Some dedicated access points have trouble serving 10 connections
-> > simultaneously on one radio channel so for our off the shelf hardware
-> > and minimal ap.c code it's going to be very difficult.
->
-> And?  Any limit you pick will end up being wrong for someone.
->
-> >>
-> >> Ah, imprecise wording here.  By single connection I mean a single
-> >> P2P_GO/P2P_CLIENT interface active at a time.  So if we're in P2P_GO
-> >> mode, we can do multiple 'connections'.  But since we're not doing
-> >> P2P_GO yet, then effectively we would only support a single active peer
-> >> today.
-> >
-> > So I assume you're Ok having the Disconnect method on the Peer
-> > interface, not on P2PDevice? So that our DBus clients are prepared to
-> > support multiple connections instead of 1?
->
-> I think these two things are somewhat orthogonal.  We can still have
-> Disconnect on the Device and not the peer.  All that would do is
-> preclude us from disconnecting individual links in P2P GO mode.  But
-> sure, I suppose it can remain on the Peer object.
->
-> >
-> > Or I wonder if we should repurpose WSC.Cancel to also disconnect a
-> > fully established connection.  There's no need for separate Cancel and
-> > Disconnect methods, but Disconnect sounds more correct.
-> >
->
-> Cancel only applies to the discovery and configuration procedure.  The
-> WSC is a separate handshake.  So having a separate disconnect method is
-> still needed once you get into the actual connection process.
+So really, I don't see the point.  If iwd understands about WFD, then it =
 
-In any case on of the two is redundant ;)  Disconnect already aborts a
-connection attempt (device discovery, group owner negotiation /
-provision discovery, provisioning or the PSK connection).
+simply wouldn't send any WFD IEs to a WFD-incapable device.
 
-Of these only the provisioning uses WSC so conceptually the WSC
-interface is not a great match.
+One can argue that the capability you propose would still be wanted in =
 
-Best regards
---===============0448441674495190603==--
+some weird situations.
+
+For example, WFD allows 'Dual mode Sink & Source' only in the Beacon and =
+
+Probe Response frames.  For Association, it needs to pick one role.
+
+Or maybe the Keyboard in your example is actually also WFD capable.. =
+
+But then the spec mysteriously says:
+
+"Depending on the availability of the WFD Device for a WFD Session, the =
+
+value for WFD Session Availability bits (B5B4) of the WFD Device =
+
+Information field of WFD Device Information subelement within the WFD IE =
+
+may change" in Section 4.5.2.1 "Usage of a WFD IE to establish P2P =
+
+connection".  So who knows what they actually mean by that?  Maybe we =
+
+can always send WFD IEs and just twiddle those bits off?
+
+I really wouldn't worry about these bizarre cases right now until you =
+
+have something that actually works.
+
+>>
+>> See for example:
+>>
+>> WFD Session Availability bits:
+>> 0b00: Not available for WFD Session
+>>
+>> Or Section 5.2.1:
+>> "If a WFD Device acts as a P2P Group Owner, the WFD Device shall insert
+>> one or more WFD IEs after the other information elements in the Beacon
+>> frames it transmits. "
+>>
+>> I assume that at least the WFD spec wants you to twiddle the contents of
+>> the IEs and not remove IEs entirely.
+>>
+>>> the TV, once your WFD session is running and functional.  Maybe the
+>>> ServiceManager is the wrong way to go and the Connect / PushButton
+>>> method should receive the relevant information.
+>>
+>> And don't you need the advertising data before you even get to the point
+>> where you can invoke operations on the Peer interface?
+> =
+
+> In theory you need to advertise it in your scan.  Like I mentioned in
+> another email, I think the scans should also be explicitly triggered
+> by the apps because they're expensive, so those would also need to
+> know the service parameters.
+
+Okay.  So you need to present those details then.
+
+>> Yes, sure.  What I'm saying though is that once we're connected, we
+>> should indicate the topology somehow.
+> =
+
+> I think we should just indicate that we can still attempt more
+> connections, optimally without exposing the P2P roles.
+
+I don't know why you'd want to hide that, but I'm fine either way.
+
+>> Cancel only applies to the discovery and configuration procedure.  The
+>> WSC is a separate handshake.  So having a separate disconnect method is
+>> still needed once you get into the actual connection process.
+> =
+
+> In any case on of the two is redundant ;)  Disconnect already aborts a
+> connection attempt (device discovery, group owner negotiation /
+> provision discovery, provisioning or the PSK connection).
+
+I think about this differently.  You have 2 phases:
+   1. Simple Configuration (WiFi Direct flavor) which involves the group =
+
+formation and wsc negotiation
+   2. Actual connection establishment
+
+I don't see why Disconnect can't just affect 2 without affecting 1.  The =
+
+operations are on different interfaces after all.
+
+> =
+
+> Of these only the provisioning uses WSC so conceptually the WSC
+> interface is not a great match.
+
+Honestly, I'm not convinced that reinventing the wheel and duplicating =
+
+the SimpleConfiguration API on the P2P Peer is any better.
+
+Even in the classic station case WSC involves device discovery as well. =
+
+So, in P2P, arguably everything up to the PSK connection establishment =
+
+can be viewed as part of WSC.
+
+It sounds like you need to send a v4 before we can go further.
+
+Regards,
+-Denis
+--===============3296438715948764451==--
 
