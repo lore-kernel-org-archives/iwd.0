@@ -1,61 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============3394745147589768269=="
+Content-Type: multipart/mixed; boundary="===============8570042789639528294=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
 Subject: Re: [RFCv3] Document P2P dbus interfaces
-Date: Fri, 15 Nov 2019 16:10:57 +0100
-Message-ID: <CAOq732JU_+kDbH0FD3AxRscBn8CUpi8Cntf7GycymCSgVJzgfg@mail.gmail.com>
-In-Reply-To: <73ee28b9-9336-f547-cf2b-1246181c9dde@gmail.com>
+Date: Fri, 15 Nov 2019 09:25:30 -0600
+Message-ID: <4fcb640d-2255-83a3-044c-b5ad92e9b6d4@gmail.com>
+In-Reply-To: <CAOq732JU_+kDbH0FD3AxRscBn8CUpi8Cntf7GycymCSgVJzgfg@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3394745147589768269==
+--===============8570042789639528294==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 15 Nov 2019 at 15:53, Denis Kenzior <denkenz@gmail.com> wrote:
-> >> I think about this differently.  You have 2 phases:
-> >>     1. Simple Configuration (WiFi Direct flavor) which involves the gr=
-oup
-> >> formation and wsc negotiation
-> >
-> > Well, it simply isn't part of WSC, but ok.
-> >
->
-> P2P in the end just took WSC and changed the discovery bits a bit.
-> Fundamentally its still WSC in the end.  But I guess depends on how you
-> think about it...
->
-> >>     2. Actual connection establishment
-> >>
-> >> I don't see why Disconnect can't just affect 2 without affecting 1.  T=
-he
-> >> operations are on different interfaces after all.
-> >
-> > We just don't need 2 methods and I already have Disconnect working
-> > this way (consistent with Station.Disconnect) so it'd mean just
-> > artificially crippling it, also adding a race where your Cancel call
-> > may work or not.
->
-> Station.Disconnect does not affect WSC state FYI.  It can't since
-> Station doesn't even know about the ongoing WSC process until after
-> station_connect_network is invoked.  So in that respect we'd be
-> completely consistent.
+Hi Andrew,
 
-What I meant is that Disconnect() can cancel your station connection
-attempt at any point, while with Peer.Disconnect() you're going to
-have to be more careful for no reason.
+>> Station.Disconnect does not affect WSC state FYI.  It can't since
+>> Station doesn't even know about the ongoing WSC process until after
+>> station_connect_network is invoked.  So in that respect we'd be
+>> completely consistent.
+> =
 
->
-> >
-> > (Tecnically provisioning and the connection are both on the P2P_CLIENT
-> > interface)
-> >
->
-> Same as Station/WSC today...
+> What I meant is that Disconnect() can cancel your station connection
+> attempt at any point, while with Peer.Disconnect() you're going to
+> have to be more careful for no reason.
 
-I was just noting they're not happening on different interfaces.
+You will have to explain that then, because I don't get it?  How is =
 
-Best regards
---===============3394745147589768269==--
+Peer.Disconnect any different?  Your 'Peer' state doesn't change to =
+
+connecting until after WSC runs.  And if we become a GO, then things =
+
+become even more funny since we can only send invites, not actually =
+
+initiate a connection.  So all these methods become somewhat irrelevant. =
+
+  In fact, I wonder if we should be removing the WSC interface when we =
+
+become the GO and adding another one for performing invitations.
+
+> I was just noting they're not happening on different interfaces.
+
+Of course.  That's because P2P_CLIENT is just a station iftype under the =
+
+hood in the kernel with some extra stuff bolted on.  But we knew that ;)
+
+Maybe what we should do is just implement the bare minimum client side =
+
+API, learn from it and assume that whatever API we come up with now will =
+
+likely not survive when we start implementing GO side.
+
+Regards,
+-Denis
+--===============8570042789639528294==--
 
