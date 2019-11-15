@@ -1,69 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============2994168584982813155=="
+Content-Type: multipart/mixed; boundary="===============2024105493774977482=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/7] scan: add scan_passive_full variant
-Date: Fri, 15 Nov 2019 10:39:20 -0800
-Message-ID: <20191115183926.1887-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/7] scan: add duration scan_parameters
+Date: Fri, 15 Nov 2019 10:39:21 -0800
+Message-ID: <20191115183926.1887-2-prestwoj@gmail.com>
+In-Reply-To: <20191115183926.1887-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2994168584982813155==
+--===============2024105493774977482==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Just like active scans, add an API for passive scans which take in
-the full scan_parameters structure.
+The kernel allows a scan duration and duration mandatory flag to be
+set in scan requests. RRM requests can contain these values so they
+have been added to scan_parameters.
+
+Scanning with drivers which do not support EXT_FEATURE_SET_SCAN_DWELL
+will not include these values in scan requests.
 ---
- src/scan.c | 10 ++++++++++
- src/scan.h |  5 +++++
+ src/scan.c | 13 +++++++++++++
+ src/scan.h |  2 ++
  2 files changed, 15 insertions(+)
 
 diff --git a/src/scan.c b/src/scan.c
-index a3d6e5d8..ad6d3ad4 100644
+index ad6d3ad4..8e50052c 100644
 --- a/src/scan.c
 +++ b/src/scan.c
-@@ -556,6 +556,16 @@ uint32_t scan_passive(uint64_t wdev_id, struct scan_fr=
-eq_set *freqs,
- 							userdata, destroy);
- }
+@@ -396,6 +396,19 @@ static struct l_genl_msg *scan_build_cmd(struct scan_c=
+ontext *sc,
+ 		l_free(scan_rates);
+ 	}
  =
 
-+uint32_t scan_passive_full(uint64_t wdev_id,
-+			const struct scan_parameters *params,
-+			scan_trigger_func_t trigger,
-+			scan_notify_func_t notify, void *userdata,
-+			scan_destroy_func_t destroy)
-+{
-+	return scan_common(wdev_id, true, params, trigger,
-+				notify, userdata, destroy);
-+}
++	if (wiphy_has_ext_feature(sc->wiphy,
++					NL80211_EXT_FEATURE_SET_SCAN_DWELL)) {
++		if (params->duration)
++			l_genl_msg_append_attr(msg,
++					NL80211_ATTR_MEASUREMENT_DURATION,
++					2, &params->duration);
 +
- uint32_t scan_active(uint64_t wdev_id, uint8_t *extra_ie, size_t extra_ie_=
-size,
- 			scan_trigger_func_t trigger,
- 			scan_notify_func_t notify, void *userdata,
++		if (params->duration_mandatory)
++			l_genl_msg_append_attr(msg,
++				NL80211_ATTR_MEASUREMENT_DURATION_MANDATORY,
++				0, NULL);
++	}
++
+ done:
+ 	return msg;
+ }
 diff --git a/src/scan.h b/src/scan.h
-index 626de80b..6c5133aa 100644
+index 6c5133aa..cbbbe21a 100644
 --- a/src/scan.h
 +++ b/src/scan.h
-@@ -102,6 +102,11 @@ static inline bool scan_bss_addr_eq(const struct scan_=
-bss *a1,
- uint32_t scan_passive(uint64_t wdev_id, struct scan_freq_set *freqs,
- 			scan_trigger_func_t trigger, scan_notify_func_t notify,
- 			void *userdata, scan_destroy_func_t destroy);
-+uint32_t scan_passive_full(uint64_t wdev_id,
-+			const struct scan_parameters *params,
-+			scan_trigger_func_t trigger,
-+			scan_notify_func_t notify, void *userdata,
-+			scan_destroy_func_t destroy);
- uint32_t scan_active(uint64_t wdev_id, uint8_t *extra_ie, size_t extra_ie_=
-size,
- 			scan_trigger_func_t trigger,
- 			scan_notify_func_t notify, void *userdata,
+@@ -81,9 +81,11 @@ struct scan_parameters {
+ 	const uint8_t *extra_ie;
+ 	size_t extra_ie_size;
+ 	struct scan_freq_set *freqs;
++	uint16_t duration;
+ 	bool flush : 1;
+ 	bool randomize_mac_addr_hint : 1;
+ 	bool no_cck_rates : 1;
++	bool duration_mandatory : 1;
+ 	const char *ssid;	/* Used for direct probe request */
+ };
+ =
+
 -- =
 
 2.17.1
 
---===============2994168584982813155==--
+--===============2024105493774977482==--
 
