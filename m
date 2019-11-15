@@ -1,59 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============4571867203686203955=="
+Content-Type: multipart/mixed; boundary="===============1844988364399071378=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 6/7] scan: parse parent TSF value in scan results
-Date: Fri, 15 Nov 2019 10:39:25 -0800
-Message-ID: <20191115183926.1887-6-prestwoj@gmail.com>
+Subject: [PATCH v2 7/7] rrm: include actual parent TSF value
+Date: Fri, 15 Nov 2019 10:39:26 -0800
+Message-ID: <20191115183926.1887-7-prestwoj@gmail.com>
 In-Reply-To: <20191115183926.1887-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4571867203686203955==
+--===============1844988364399071378==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-RRM can include this in measurement reports if present in scans
+If the scan results included a parent TSF value use it.
 ---
- src/scan.c | 6 ++++++
- src/scan.h | 1 +
- 2 files changed, 7 insertions(+)
+ src/rrm.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/src/scan.c b/src/scan.c
-index 8e50052c..e74a69c1 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -1072,6 +1072,12 @@ static struct scan_bss *scan_parse_attr_bss(struct l=
-_genl_attr *attr)
- 								&bss->p2p_size);
+diff --git a/src/rrm.c b/src/rrm.c
+index f96fe279..4c736910 100644
+--- a/src/rrm.c
++++ b/src/rrm.c
+@@ -272,8 +272,13 @@ static size_t build_report_for_bss(struct rrm_beacon_r=
+eq_info *beacon,
+ 	to +=3D 6;
+ 	/* Antenna identifier unknown */
+ 	*to++ =3D 0;
+-	/* Parent TSF - zero */
+-	memset(to, 0, 4);
++	/*
++	 * 802.11 9.4.2.22.7 Beacon report
++	 *
++	 * "The Parent TSF field contains the lower 4 octets of the measuring
++	 *  STA=E2=80=99s TSF timer value"
++	 */
++	l_put_le32((uint32_t)(bss->parent_tsf & 0xffffffff), to);
+ 	to +=3D 4;
  =
 
- 			break;
-+		case NL80211_BSS_PARENT_TSF:
-+			if (len !=3D sizeof(uint64_t))
-+				goto fail;
-+
-+			bss->parent_tsf =3D l_get_le64(data);
-+			break;
- 		}
- 	}
- =
-
-diff --git a/src/scan.h b/src/scan.h
-index cbbbe21a..8fc2aa56 100644
---- a/src/scan.h
-+++ b/src/scan.h
-@@ -67,6 +67,7 @@ struct scan_bss {
- 	uint8_t hessid[6];
- 	uint8_t *rc_ie;		/* Roaming consortium IE */
- 	uint8_t hs20_version;
-+	uint64_t parent_tsf;
- 	bool mde_present : 1;
- 	bool cc_present : 1;
- 	bool cap_rm_neighbor_report : 1;
+ 	/*
 -- =
 
 2.17.1
 
---===============4571867203686203955==--
+--===============1844988364399071378==--
 
