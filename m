@@ -1,48 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============1844988364399071378=="
+Content-Type: multipart/mixed; boundary="===============5232346584936857097=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 7/7] rrm: include actual parent TSF value
-Date: Fri, 15 Nov 2019 10:39:26 -0800
-Message-ID: <20191115183926.1887-7-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2 1/7] scan: add scan_passive_full variant
+Date: Fri, 15 Nov 2019 14:18:02 -0600
+Message-ID: <e13813d5-f3e1-83d3-fe53-b6831e80d676@gmail.com>
 In-Reply-To: <20191115183926.1887-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1844988364399071378==
+--===============5232346584936857097==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the scan results included a parent TSF value use it.
----
- src/rrm.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+Hi James,
 
-diff --git a/src/rrm.c b/src/rrm.c
-index f96fe279..4c736910 100644
---- a/src/rrm.c
-+++ b/src/rrm.c
-@@ -272,8 +272,13 @@ static size_t build_report_for_bss(struct rrm_beacon_r=
-eq_info *beacon,
- 	to +=3D 6;
- 	/* Antenna identifier unknown */
- 	*to++ =3D 0;
--	/* Parent TSF - zero */
--	memset(to, 0, 4);
-+	/*
-+	 * 802.11 9.4.2.22.7 Beacon report
-+	 *
-+	 * "The Parent TSF field contains the lower 4 octets of the measuring
-+	 *  STA=E2=80=99s TSF timer value"
-+	 */
-+	l_put_le32((uint32_t)(bss->parent_tsf & 0xffffffff), to);
- 	to +=3D 4;
- =
+On 11/15/19 12:39 PM, James Prestwood wrote:
+> Just like active scans, add an API for passive scans which take in
+> the full scan_parameters structure.
+> ---
+>   src/scan.c | 10 ++++++++++
+>   src/scan.h |  5 +++++
+>   2 files changed, 15 insertions(+)
+> =
 
- 	/*
--- =
 
-2.17.1
+Patches 1-55 applied, thanks.
 
---===============1844988364399071378==--
+Regards,
+-Denis
+--===============5232346584936857097==--
 
