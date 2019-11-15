@@ -1,57 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============8570042789639528294=="
+Content-Type: multipart/mixed; boundary="===============5435276361909254519=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [RFCv3] Document P2P dbus interfaces
-Date: Fri, 15 Nov 2019 09:25:30 -0600
-Message-ID: <4fcb640d-2255-83a3-044c-b5ad92e9b6d4@gmail.com>
-In-Reply-To: <CAOq732JU_+kDbH0FD3AxRscBn8CUpi8Cntf7GycymCSgVJzgfg@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] rrm: fix invalid IE tag when rejecting request
+Date: Fri, 15 Nov 2019 09:01:03 -0800
+Message-ID: <20191115170103.26164-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8570042789639528294==
+--===============5435276361909254519==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+The rejection report actually contained a request IE, not a report IE
+---
+ src/rrm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->> Station.Disconnect does not affect WSC state FYI.  It can't since
->> Station doesn't even know about the ongoing WSC process until after
->> station_connect_network is invoked.  So in that respect we'd be
->> completely consistent.
-> =
+diff --git a/src/rrm.c b/src/rrm.c
+index b4c5655f..e451448b 100644
+--- a/src/rrm.c
++++ b/src/rrm.c
+@@ -196,7 +196,7 @@ static void rrm_reject_measurement_request(struct rrm_s=
+tate *rrm,
+ 	frame[0] =3D 0x05; /* Category: Radio Measurement */
+ 	frame[1] =3D 0x01; /* Action: Radio Measurement Report */
+ 	frame[2] =3D info->dialog_token;
+-	frame[3] =3D IE_TYPE_MEASUREMENT_REQUEST;
++	frame[3] =3D IE_TYPE_MEASUREMENT_REPORT;
+ 	frame[4] =3D 3;
+ 	frame[5] =3D info->mtoken;
+ 	frame[6] =3D mode;
+-- =
 
-> What I meant is that Disconnect() can cancel your station connection
-> attempt at any point, while with Peer.Disconnect() you're going to
-> have to be more careful for no reason.
+2.17.1
 
-You will have to explain that then, because I don't get it?  How is =
-
-Peer.Disconnect any different?  Your 'Peer' state doesn't change to =
-
-connecting until after WSC runs.  And if we become a GO, then things =
-
-become even more funny since we can only send invites, not actually =
-
-initiate a connection.  So all these methods become somewhat irrelevant. =
-
-  In fact, I wonder if we should be removing the WSC interface when we =
-
-become the GO and adding another one for performing invitations.
-
-> I was just noting they're not happening on different interfaces.
-
-Of course.  That's because P2P_CLIENT is just a station iftype under the =
-
-hood in the kernel with some extra stuff bolted on.  But we knew that ;)
-
-Maybe what we should do is just implement the bare minimum client side =
-
-API, learn from it and assume that whatever API we come up with now will =
-
-likely not survive when we start implementing GO side.
-
-Regards,
--Denis
---===============8570042789639528294==--
+--===============5435276361909254519==--
 
