@@ -1,32 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============8824157798801662641=="
+Content-Type: multipart/mixed; boundary="===============0186832166679754039=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] rrm: fix invalid IE tag when rejecting request
-Date: Fri, 15 Nov 2019 11:03:58 -0600
-Message-ID: <00c1afd2-92f7-b8df-53aa-53efd087a995@gmail.com>
-In-Reply-To: <20191115170103.26164-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/4] scan: add scan_passive_full variant
+Date: Fri, 15 Nov 2019 10:06:05 -0800
+Message-ID: <20191115180608.31564-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8824157798801662641==
+--===============0186832166679754039==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Just like active scans, add an API for passive scans which take in
+the full scan_parameters structure.
+---
+ src/scan.c | 10 ++++++++++
+ src/scan.h |  5 +++++
+ 2 files changed, 15 insertions(+)
 
-On 11/15/19 11:01 AM, James Prestwood wrote:
-> The rejection report actually contained a request IE, not a report IE
-> ---
->   src/rrm.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+diff --git a/src/scan.c b/src/scan.c
+index a3d6e5d8..ad6d3ad4 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -556,6 +556,16 @@ uint32_t scan_passive(uint64_t wdev_id, struct scan_fr=
+eq_set *freqs,
+ 							userdata, destroy);
+ }
+ =
 
++uint32_t scan_passive_full(uint64_t wdev_id,
++			const struct scan_parameters *params,
++			scan_trigger_func_t trigger,
++			scan_notify_func_t notify, void *userdata,
++			scan_destroy_func_t destroy)
++{
++	return scan_common(wdev_id, true, params, trigger,
++				notify, userdata, destroy);
++}
++
+ uint32_t scan_active(uint64_t wdev_id, uint8_t *extra_ie, size_t extra_ie_=
+size,
+ 			scan_trigger_func_t trigger,
+ 			scan_notify_func_t notify, void *userdata,
+diff --git a/src/scan.h b/src/scan.h
+index 626de80b..6c5133aa 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -102,6 +102,11 @@ static inline bool scan_bss_addr_eq(const struct scan_=
+bss *a1,
+ uint32_t scan_passive(uint64_t wdev_id, struct scan_freq_set *freqs,
+ 			scan_trigger_func_t trigger, scan_notify_func_t notify,
+ 			void *userdata, scan_destroy_func_t destroy);
++uint32_t scan_passive_full(uint64_t wdev_id,
++			const struct scan_parameters *params,
++			scan_trigger_func_t trigger,
++			scan_notify_func_t notify, void *userdata,
++			scan_destroy_func_t destroy);
+ uint32_t scan_active(uint64_t wdev_id, uint8_t *extra_ie, size_t extra_ie_=
+size,
+ 			scan_trigger_func_t trigger,
+ 			scan_notify_func_t notify, void *userdata,
+-- =
 
-Applied, thanks.
+2.17.1
 
-Regards,
--Denis
-
---===============8824157798801662641==--
+--===============0186832166679754039==--
 
