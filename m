@@ -1,87 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============8505647758205398995=="
+Content-Type: multipart/mixed; boundary="===============5155816809379321207=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [RFCv3] Document P2P dbus interfaces
-Date: Fri, 15 Nov 2019 23:35:05 +0100
-Message-ID: <CAOq732JK2fQjz1k3oAuoRDPBXZLR1zxSQbqKFiyCKS_1e0-uWg@mail.gmail.com>
-In-Reply-To: <4fcb640d-2255-83a3-044c-b5ad92e9b6d4@gmail.com>
+From: Jeff Chua <jeff.chua.linux@gmail.com>
+Subject: iwd needs connman service?
+Date: Sat, 16 Nov 2019 09:12:32 +0800
+Message-ID: <CAAJw_Zu08nf-YvwNgcZdxUYXv70k6C1RQrk4Uis3g2Zia75JfQ@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8505647758205398995==
+--===============5155816809379321207==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Prior to Nov 09, I could connect with connman, but git pull after that
+doesn't work with connman service, and even with connman, I still can't iwd.
 
-On Fri, 15 Nov 2019 at 16:27, Denis Kenzior <denkenz@gmail.com> wrote:
-> >> Station.Disconnect does not affect WSC state FYI.  It can't since
-> >> Station doesn't even know about the ongoing WSC process until after
-> >> station_connect_network is invoked.  So in that respect we'd be
-> >> completely consistent.
-> >
-> > What I meant is that Disconnect() can cancel your station connection
-> > attempt at any point, while with Peer.Disconnect() you're going to
-> > have to be more careful for no reason.
->
-> You will have to explain that then, because I don't get it?  How is
-> Peer.Disconnect any different?  Your 'Peer' state doesn't change to
-> connecting until after WSC runs.
+Missing net.connman.iwd service ... how can I fix that?
 
-That's needlessly complicating things for the users.  From the user's
-point of view there's a device they want to connect to and use it.
-They call a single method and get a connection established, and if
-they need to interrupt the process then it's still single process.
-You could split it in any number of ways, as before WSC there's a
-bunch of other things happening, but from the user's point of view
-those are details they don't want to see.  WSC is one of 4 or 5 steps
-(you can make up more) in the P2P connection but there's no benefit
-from making the user aware of them.
+Failed to activate service 'net.connman.iwd': timed out
+(service_start_timeout=3D25000ms)]- [Failed to retrieve IWD dbus objects,
+quitting...
 
->  And if we become a GO, then things
-> become even more funny since we can only send invites, not actually
-> initiate a connection.
+Thanks.
 
-Invitation is just a technical name for a frame sequence, group
-formation is another, but it's just ways to connect to a device.  Note
-how Android shows the same Accept/Decline dialog whether you're using
-group formation or invitation. (same or similar... I thought the
-wording was the same but don't have screenshots at hand)
+My best.,
+Jeff
 
-On a similar note:
-The P2P devices I've seen don't have a physical WSC button (not
-surprising), but they don't even have a virtual button or the word
-Push Button anywhere in the user interfaces.  Take for example Android
-connecting to a wifi-display TV, neither mentions any WSC term like
-Push Button in their UIs.  The verbs are connect and accept/decline
-connection (and similar).  WSC is really just a protocol used at the
-network level and an implementation detail, as are the P2P roles.
+--===============5155816809379321207==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
->  So all these methods become somewhat irrelevant.
->   In fact, I wonder if we should be removing the WSC interface when we
-> become the GO and adding another one for performing invitations.
->
-> > I was just noting they're not happening on different interfaces.
->
-> Of course.
+PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQtZmFt
+aWx5OnZlcmRhbmEsc2Fucy1zZXJpZiI+UHJpb3IgdG8gTm92IDA5LCBJIGNvdWxkIGNvbm5lY3Qg
+d2l0aCBjb25ubWFuLCBidXQgZ2l0IHB1bGwgYWZ0ZXIgdGhhdCBkb2VzbiYjMzk7dCB3b3JrIHdp
+dGggY29ubm1hbiBzZXJ2aWNlLCBhbmQgZXZlbiB3aXRoIGNvbm5tYW4sIEkgc3RpbGwgY2FuJiMz
+OTt0IGl3ZC48L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1p
+bHk6dmVyZGFuYSxzYW5zLXNlcmlmIj48YnI+PC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVs
+dCIgc3R5bGU9ImZvbnQtZmFtaWx5OnZlcmRhbmEsc2Fucy1zZXJpZiI+TWlzc2luZyBuZXQuY29u
+bm1hbi5pd2Qgc2VydmljZSAuLi4gaG93IGNhbiBJIGZpeCB0aGF0PzwvZGl2PjxkaXYgY2xhc3M9
+ImdtYWlsX2RlZmF1bHQiIHN0eWxlPSJmb250LWZhbWlseTp2ZXJkYW5hLHNhbnMtc2VyaWYiPjxi
+cj48L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6dmVy
+ZGFuYSxzYW5zLXNlcmlmIj5GYWlsZWQgdG8gYWN0aXZhdGUgc2VydmljZSAmIzM5O25ldC5jb25u
+bWFuLml3ZCYjMzk7OiB0aW1lZCBvdXQgKHNlcnZpY2Vfc3RhcnRfdGltZW91dD0yNTAwMG1zKV0t
+IFtGYWlsZWQgdG8gcmV0cmlldmUgSVdEIGRidXMgb2JqZWN0cywgcXVpdHRpbmcuLi48L2Rpdj48
+ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6dmVyZGFuYSxzYW5z
+LXNlcmlmIj48YnI+PC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQt
+ZmFtaWx5OnZlcmRhbmEsc2Fucy1zZXJpZiI+VGhhbmtzLjxiciBjbGVhcj0iYWxsIj48L2Rpdj48
+ZGl2PjxkaXYgZGlyPSJsdHIiIGNsYXNzPSJnbWFpbF9zaWduYXR1cmUiIGRhdGEtc21hcnRtYWls
+PSJnbWFpbF9zaWduYXR1cmUiPjxicj5NeSBiZXN0Liw8YnI+SmVmZjxicj48L2Rpdj48L2Rpdj48
+L2Rpdj4K
 
-Oh so this was just a typo I was replying to I guess.
-
->  That's because P2P_CLIENT is just a station iftype under the
-> hood in the kernel with some extra stuff bolted on.  But we knew that ;)
->
-> Maybe what we should do is just implement the bare minimum client side
-> API, learn from it and assume that whatever API we come up with now will
-> likely not survive when we start implementing GO side.
-
-There really shouldn't be any difference to the user.
-
->
-> Regards,
-> -Denis
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
---===============8505647758205398995==--
+--===============5155816809379321207==--
 
