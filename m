@@ -1,56 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============5155816809379321207=="
+Content-Type: multipart/mixed; boundary="===============3487988509506483220=="
 MIME-Version: 1.0
-From: Jeff Chua <jeff.chua.linux@gmail.com>
-Subject: iwd needs connman service?
-Date: Sat, 16 Nov 2019 09:12:32 +0800
-Message-ID: <CAAJw_Zu08nf-YvwNgcZdxUYXv70k6C1RQrk4Uis3g2Zia75JfQ@mail.gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [RFCv3] Document P2P dbus interfaces
+Date: Fri, 15 Nov 2019 20:27:00 -0600
+Message-ID: <c2a1d379-3c59-eb6b-2f8d-c4bb026f3f02@gmail.com>
+In-Reply-To: <CAOq732JK2fQjz1k3oAuoRDPBXZLR1zxSQbqKFiyCKS_1e0-uWg@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5155816809379321207==
+--===============3487988509506483220==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Prior to Nov 09, I could connect with connman, but git pull after that
-doesn't work with connman service, and even with connman, I still can't iwd.
+Hi Andrew,
 
-Missing net.connman.iwd service ... how can I fix that?
+>>   And if we become a GO, then things
+>> become even more funny since we can only send invites, not actually
+>> initiate a connection.
+> =
 
-Failed to activate service 'net.connman.iwd': timed out
-(service_start_timeout=3D25000ms)]- [Failed to retrieve IWD dbus objects,
-quitting...
+> Invitation is just a technical name for a frame sequence, group
+> formation is another, but it's just ways to connect to a device.  Note
+> how Android shows the same Accept/Decline dialog whether you're using
+> group formation or invitation. (same or similar... I thought the
+> wording was the same but don't have screenshots at hand)
 
-Thanks.
+- How are you handling the case where the Peer wants us to display our =
 
-My best.,
-Jeff
+PIN?  And provision discovery in general?
+- Invitations?
+- invitation by a P2P Device (not group owner) of another P2P Device?
+- The fact that GO has a bunch of stats about its clients and you =
 
---===============5155816809379321207==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+probably want to expose that similarly to AP mode?
+- The fact that GO has to handle connections from legacy clients and =
 
-PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQtZmFt
-aWx5OnZlcmRhbmEsc2Fucy1zZXJpZiI+UHJpb3IgdG8gTm92IDA5LCBJIGNvdWxkIGNvbm5lY3Qg
-d2l0aCBjb25ubWFuLCBidXQgZ2l0IHB1bGwgYWZ0ZXIgdGhhdCBkb2VzbiYjMzk7dCB3b3JrIHdp
-dGggY29ubm1hbiBzZXJ2aWNlLCBhbmQgZXZlbiB3aXRoIGNvbm5tYW4sIEkgc3RpbGwgY2FuJiMz
-OTt0IGl3ZC48L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1p
-bHk6dmVyZGFuYSxzYW5zLXNlcmlmIj48YnI+PC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVs
-dCIgc3R5bGU9ImZvbnQtZmFtaWx5OnZlcmRhbmEsc2Fucy1zZXJpZiI+TWlzc2luZyBuZXQuY29u
-bm1hbi5pd2Qgc2VydmljZSAuLi4gaG93IGNhbiBJIGZpeCB0aGF0PzwvZGl2PjxkaXYgY2xhc3M9
-ImdtYWlsX2RlZmF1bHQiIHN0eWxlPSJmb250LWZhbWlseTp2ZXJkYW5hLHNhbnMtc2VyaWYiPjxi
-cj48L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6dmVy
-ZGFuYSxzYW5zLXNlcmlmIj5GYWlsZWQgdG8gYWN0aXZhdGUgc2VydmljZSAmIzM5O25ldC5jb25u
-bWFuLml3ZCYjMzk7OiB0aW1lZCBvdXQgKHNlcnZpY2Vfc3RhcnRfdGltZW91dD0yNTAwMG1zKV0t
-IFtGYWlsZWQgdG8gcmV0cmlldmUgSVdEIGRidXMgb2JqZWN0cywgcXVpdHRpbmcuLi48L2Rpdj48
-ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6dmVyZGFuYSxzYW5z
-LXNlcmlmIj48YnI+PC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQt
-ZmFtaWx5OnZlcmRhbmEsc2Fucy1zZXJpZiI+VGhhbmtzLjxiciBjbGVhcj0iYWxsIj48L2Rpdj48
-ZGl2PjxkaXYgZGlyPSJsdHIiIGNsYXNzPSJnbWFpbF9zaWduYXR1cmUiIGRhdGEtc21hcnRtYWls
-PSJnbWFpbF9zaWduYXR1cmUiPjxicj5NeSBiZXN0Liw8YnI+SmVmZjxicj48L2Rpdj48L2Rpdj48
-L2Rpdj4K
+thus needs to provide legacy WPS methods?
+- persistent groups, with custom or saved credentials?
 
---===============5155816809379321207==--
+To me it seems quite impractical to mix GO and client and to try and =
+
+hide these details.  I have very strong doubts you will succeed here.
+
+And I also think you're not avoiding exposing topology details.  For =
+
+example, is Peer.Disconnect resulting in a disconnection of a single =
+
+peer or group tear down?
+
+I think you really need to send a v4.  I just don't see how you're =
+
+handling many of the P2P concepts, much less P2P-GO specific ones in =
+
+this one.
+
+Regards,
+-Denis
+--===============3487988509506483220==--
 
