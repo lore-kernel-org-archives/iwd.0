@@ -1,35 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============7511505079753975200=="
+Content-Type: multipart/mixed; boundary="===============6942497579291463326=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] rrm: remove use of floating point math
-Date: Mon, 18 Nov 2019 12:52:54 -0600
-Message-ID: <61d7ec56-e2f4-71aa-50e6-5e0eb73c62d3@gmail.com>
-In-Reply-To: <20191118183554.25648-1-prestwoj@gmail.com>
+Subject: Re: iwd needs connman service?
+Date: Mon, 18 Nov 2019 12:55:04 -0600
+Message-ID: <d237df00-b930-7da6-8305-6c2d84a4179f@gmail.com>
+In-Reply-To: <CAAJw_Zu08nf-YvwNgcZdxUYXv70k6C1RQrk4Uis3g2Zia75JfQ@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7511505079753975200==
+--===============6942497579291463326==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Jeff,
 
-On 11/18/19 12:35 PM, James Prestwood wrote:
-> The RCPI value was using floating point values as per the spec. But inste=
-ad
-> we can just use the signal strength coming from the kernel in mili mdm and
-> scale the hard coded values by a factor of 100.
-> ---
->   src/rrm.c | 8 +++-----
->   1 file changed, 3 insertions(+), 5 deletions(-)
-> =
+On 11/15/19 7:12 PM, Jeff Chua wrote:
+> Prior to Nov 09, I could connect with connman, but git pull after that =
 
+> doesn't work with connman service, and even with connman, I still can't i=
+wd.
 
-Applied, thanks.
+I suspect that connman has not been updated to iwd 1.0 APIs.  So you may =
+
+be stuck with 0.23 or so until someone fixes ConnMan to use iwd 1.0+ =
+
+properly.
 
 Regards,
 -Denis
-
---===============7511505079753975200==--
+--===============6942497579291463326==--
 
