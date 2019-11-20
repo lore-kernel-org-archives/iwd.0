@@ -1,41 +1,142 @@
-Content-Type: multipart/mixed; boundary="===============5066367998947928878=="
+Content-Type: multipart/mixed; boundary="===============7645232868591658612=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/6] rrm: include actual scan start time in report
-Date: Wed, 20 Nov 2019 09:25:58 -0800
-Message-ID: <20191120172559.21029-5-prestwoj@gmail.com>
+Subject: [PATCH 6/6] rrm: add packed struct for beacon reports
+Date: Wed, 20 Nov 2019 09:25:59 -0800
+Message-ID: <20191120172559.21029-6-prestwoj@gmail.com>
 In-Reply-To: <20191120172559.21029-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5066367998947928878==
+--===============7645232868591658612==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+build_report_for_bss was refactored to use this packed structure rather
+than l_put_* APIs.
 ---
- src/rrm.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ src/rrm.c | 66 ++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 41 insertions(+), 25 deletions(-)
 
 diff --git a/src/rrm.c b/src/rrm.c
-index 2b0a22fb..a231f7e9 100644
+index a231f7e9..adf55252 100644
 --- a/src/rrm.c
 +++ b/src/rrm.c
-@@ -249,8 +249,7 @@ static size_t build_report_for_bss(struct rrm_beacon_re=
-q_info *beacon,
+@@ -121,6 +121,21 @@ struct rrm_state {
+ 	uint64_t last_request;
+ };
  =
 
- 	*to++ =3D beacon->oper_class;
- 	*to++ =3D scan_freq_to_channel(bss->frequency, NULL);
--	/* skip start time */
--	memset(to, 0, 8);
-+	l_put_le64(bss->start_time_tsf, to);
- 	to +=3D 8;
- 	l_put_le16(beacon->duration, to);
- 	to +=3D 2;
++/* 802.11, Section 9.4.2.22.7 */
++struct rrm_beacon_report {
++	uint8_t oper_class;
++	uint8_t channel;
++	__le64 scan_start_time;
++	__le16 duration;
++	uint8_t frame_info;
++	uint8_t rcpi;
++	uint8_t rsni;
++	uint8_t bssid[6];
++	uint8_t antenna_id;
++	__le32 parent_tsf;
++	uint8_t subelements[0];
++} __attribute__ ((packed));
++
+ static struct l_queue *states;
+ static struct l_genl_family *nl80211;
+ static uint32_t netdev_watch;
+@@ -224,6 +239,17 @@ static void rrm_build_measurement_report(struct rrm_re=
+quest_info *info,
+ 		memcpy(to, report, report_len);
+ }
+ =
+
++/* 802.11 Table 9-154 */
++static uint8_t mdb_to_rcpi(int32_t mdb)
++{
++	if (mdb <=3D 10950)
++		return 0;
++	else if (mdb >=3D -10950 && mdb < 0)
++		return ((uint8_t)((2 * (mdb + 11000)) / 100));
++	else
++		return 220;
++}
++
+ /*
+  * 802.11-2016 11.11.9.1 Beacon report
+  *
+@@ -245,38 +271,28 @@ static size_t build_report_for_bss(struct rrm_beacon_=
+req_info *beacon,
+ 					struct scan_bss *bss,
+ 					uint8_t *to)
+ {
+-	uint8_t *start =3D to;
+-
+-	*to++ =3D beacon->oper_class;
+-	*to++ =3D scan_freq_to_channel(bss->frequency, NULL);
+-	l_put_le64(bss->start_time_tsf, to);
+-	to +=3D 8;
+-	l_put_le16(beacon->duration, to);
+-	to +=3D 2;
+-	*to++ =3D rrm_phy_type(bss);
+-
+-	/* 802.11 Table 9-154 - RCPI values */
+-	if (bss->signal_strength < -10950)
+-		*to++ =3D 0;
+-	else if (bss->signal_strength >=3D -10950 && bss->signal_strength < 0)
+-		*to++ =3D (uint8_t)((2 * (bss->signal_strength + 11000)) / 100);
+-	else
+-		*to++ =3D 220;
++	struct rrm_beacon_report *report =3D (struct rrm_beacon_report *) to;
++
++	report->oper_class =3D beacon->oper_class;
++	report->channel =3D scan_freq_to_channel(bss->frequency, NULL);
++	report->scan_start_time =3D bss->start_time_tsf;
++	report->duration =3D beacon->duration;
++	report->frame_info =3D rrm_phy_type(bss);
++	report->rcpi =3D mdb_to_rcpi(bss->signal_strength);
+ =
+
+ 	/* RSNI not available (could get this from GET_SURVEY) */
+-	*to++ =3D 255;
+-	memcpy(to, bss->addr, 6);
+-	to +=3D 6;
+-	/* Antenna identifier unknown */
+-	*to++ =3D 0;
++	report->rsni =3D 255;
++	memcpy(report->bssid, bss->addr, 6);
++
++	report->antenna_id =3D 0;
++
+ 	/*
+ 	 * 802.11 9.4.2.22.7 Beacon report
+ 	 *
+ 	 * "The Parent TSF field contains the lower 4 octets of the measuring
+ 	 *  STA=E2=80=99s TSF timer value"
+ 	 */
+-	l_put_le32((uint32_t)(bss->parent_tsf & 0xffffffff), to);
+-	to +=3D 4;
++	report->parent_tsf =3D (uint32_t)bss->parent_tsf;
+ =
+
+ 	/*
+ 	 * TODO: Support optional subelements
+@@ -284,7 +300,7 @@ static size_t build_report_for_bss(struct rrm_beacon_re=
+q_info *beacon,
+ 	 * (see "TODO: Support Reported Frame Body..." below)
+ 	 */
+ =
+
+-	return to - start;
++	return sizeof(struct rrm_beacon_report);
+ }
+ =
+
+ static bool bss_in_request_range(struct rrm_beacon_req_info *beacon,
 -- =
 
 2.17.1
 
---===============5066367998947928878==--
+--===============7645232868591658612==--
 
