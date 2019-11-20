@@ -1,48 +1,105 @@
-Content-Type: multipart/mixed; boundary="===============3045952856203129985=="
+Content-Type: multipart/mixed; boundary="===============8107365675871303132=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/6] rrm: include actual parent TSF value
-Date: Wed, 20 Nov 2019 09:25:56 -0800
-Message-ID: <20191120172559.21029-3-prestwoj@gmail.com>
+Subject: [PATCH 4/6] scan: parse the scan start time
+Date: Wed, 20 Nov 2019 09:25:57 -0800
+Message-ID: <20191120172559.21029-4-prestwoj@gmail.com>
 In-Reply-To: <20191120172559.21029-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3045952856203129985==
+--===============8107365675871303132==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the scan results included a parent TSF value use it.
+The kernel sends NL80211_ATTR_SCAN_START_TIME_TSF with CMD_TRIGGER and
+RRM requires this value for beacon measurement reports. Since this
+value is sent with CMD_TRIGGER we have to store it in the scan_context
+and set it into the scan_bss when the scan finishes.
 ---
- src/rrm.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ src/scan.c | 13 +++++++++++++
+ src/scan.h |  1 +
+ 2 files changed, 14 insertions(+)
 
-diff --git a/src/rrm.c b/src/rrm.c
-index 73cf01f2..2b0a22fb 100644
---- a/src/rrm.c
-+++ b/src/rrm.c
-@@ -270,8 +270,13 @@ static size_t build_report_for_bss(struct rrm_beacon_r=
-eq_info *beacon,
- 	to +=3D 6;
- 	/* Antenna identifier unknown */
- 	*to++ =3D 0;
--	/* Parent TSF - zero */
--	memset(to, 0, 4);
-+	/*
-+	 * 802.11 9.4.2.22.7 Beacon report
-+	 *
-+	 * "The Parent TSF field contains the lower 4 octets of the measuring
-+	 *  STA=E2=80=99s TSF timer value"
-+	 */
-+	l_put_le32((uint32_t)(bss->parent_tsf & 0xffffffff), to);
- 	to +=3D 4;
+diff --git a/src/scan.c b/src/scan.c
+index e007ce5d..52ed102c 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -91,6 +91,9 @@ struct scan_context {
+ 	unsigned int start_cmd_id;
+ 	/* Non-zero if GET_SCAN is still running */
+ 	unsigned int get_scan_cmd_id;
++
++	/* The time the current scan was started. Reported in TRIGGER_SCAN */
++	uint64_t start_time_tsf;
+ 	/*
+ 	 * Whether the top request in the queue has triggered the current
+ 	 * scan.  May be set and cleared multiple times during a single
+@@ -1312,6 +1315,7 @@ static void get_scan_callback(struct l_genl_msg *msg,=
+ void *user_data)
+ 	}
  =
 
- 	/*
+ 	bss->time_stamp =3D results->time_stamp;
++	bss->start_time_tsf =3D sc->start_time_tsf;
+ =
+
+ 	scan_bss_compute_rank(bss);
+ 	l_queue_insert(results->bss_list, bss, scan_bss_rank_compare, NULL);
+@@ -1439,6 +1443,7 @@ static void scan_notify(struct l_genl_msg *msg, void =
+*user_data)
+ 	uint32_t wiphy_id;
+ 	struct scan_context *sc;
+ 	bool active_scan =3D false;
++	uint64_t start_time_tsf =3D 0;
+ =
+
+ 	cmd =3D l_genl_msg_get_command(msg);
+ =
+
+@@ -1461,6 +1466,12 @@ static void scan_notify(struct l_genl_msg *msg, void=
+ *user_data)
+ 		case NL80211_ATTR_SCAN_SSIDS:
+ 			active_scan =3D true;
+ 			break;
++		case NL80211_ATTR_SCAN_START_TIME_TSF:
++			if (len !=3D sizeof(uint64_t))
++				return;
++
++			start_time_tsf =3D l_get_u64(data);
++			break;
+ 		}
+ 	}
+ =
+
+@@ -1543,6 +1554,8 @@ static void scan_notify(struct l_genl_msg *msg, void =
+*user_data)
+ 		else
+ 			sc->state =3D SCAN_STATE_PASSIVE;
+ =
+
++		sc->start_time_tsf =3D start_time_tsf;
++
+ 		break;
+ =
+
+ 	case NL80211_CMD_SCAN_ABORTED:
+diff --git a/src/scan.h b/src/scan.h
+index 8fc2aa56..fcbbe285 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -67,6 +67,7 @@ struct scan_bss {
+ 	uint8_t hessid[6];
+ 	uint8_t *rc_ie;		/* Roaming consortium IE */
+ 	uint8_t hs20_version;
++	uint64_t start_time_tsf;
+ 	uint64_t parent_tsf;
+ 	bool mde_present : 1;
+ 	bool cc_present : 1;
 -- =
 
 2.17.1
 
---===============3045952856203129985==--
+--===============8107365675871303132==--
 
