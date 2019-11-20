@@ -1,44 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============3687810135454463266=="
+Content-Type: multipart/mixed; boundary="===============1536576023809311824=="
 MIME-Version: 1.0
-From: Daniel Wagner <wagi@monom.org>
-Subject: Re: iwd needs connman service?
-Date: Tue, 19 Nov 2019 20:55:36 +0100
-Message-ID: <baf56838-c87d-5c2f-ae07-324fed245e86@monom.org>
-In-Reply-To: <d237df00-b930-7da6-8305-6c2d84a4179f@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/6] monitor: print START_TIME_TSF/BSSID values
+Date: Wed, 20 Nov 2019 09:25:54 -0800
+Message-ID: <20191120172559.21029-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3687810135454463266==
+--===============1536576023809311824==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 18.11.19 19:55, Denis Kenzior wrote:
-> Hi Jeff,
-> =
+---
+ monitor/nlmon.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> On 11/15/19 7:12 PM, Jeff Chua wrote:
->> Prior to Nov 09, I could connect with connman, but git pull after that =
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 94d16979..4c0e045f 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -5578,6 +5578,10 @@ static const struct attr_entry attr_table[] =3D {
+ 			"FTM Responder" },
+ 	{ NL80211_ATTR_FTM_RESPONDER_STATS,
+ 			"FTM Responder Stats" },
++	{ NL80211_ATTR_SCAN_START_TIME_TSF,
++			"Scan Start Time", ATTR_U64 },
++	{ NL80211_ATTR_SCAN_START_TIME_TSF_BSSID,
++			"Scan Start Time BSSID", ATTR_ADDRESS },
+ 	{ }
+ };
+ =
 
->> doesn't work with connman service, and even with connman, I still =
+-- =
 
->> can't iwd.
-> =
+2.17.1
 
-> I suspect that connman has not been updated to iwd 1.0 APIs.=C2=A0 So you=
- may =
-
-> be stuck with 0.23 or so until someone fixes ConnMan to use iwd 1.0+ =
-
-> properly.
-
-Current HEAD of iwd works just fine for me with ConnMan HEAD. Denis is =
-
-right, the iwd plugin in ConnMan needs to be updated. It's my next item =
-
-on my TODO list.
-
-Thanks,
-Daniel
---===============3687810135454463266==--
+--===============1536576023809311824==--
 
