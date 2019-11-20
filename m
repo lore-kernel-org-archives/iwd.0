@@ -1,287 +1,232 @@
-Content-Type: multipart/mixed; boundary="===============0125278201380305464=="
+Content-Type: multipart/mixed; boundary="===============7496565854551527524=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/6] device: Make functions static, drop device.h
-Date: Wed, 20 Nov 2019 23:23:43 +0100
-Message-ID: <20191120222346.7881-3-andrew.zaborowski@intel.com>
+Subject: [PATCH 4/6] rtnlutil: Move rtnl_set_powered from netdev to rtnlutil
+Date: Wed, 20 Nov 2019 23:23:44 +0100
+Message-ID: <20191120222346.7881-4-andrew.zaborowski@intel.com>
 In-Reply-To: <20191120222346.7881-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0125278201380305464==
+--===============7496565854551527524==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This function fits with the other utilities in rtnlutil and netdev.c
+can slim down.
 ---
- Makefile.am   |   2 +-
- src/adhoc.c   |   1 -
- src/ap.c      |   1 -
- src/device.c  | 113 +++++++++++++++++++++++++-------------------------
- src/device.h  |  30 --------------
- src/station.c |   1 -
- 6 files changed, 57 insertions(+), 91 deletions(-)
- delete mode 100644 src/device.h
+ src/netdev.c   | 46 ++++++++++++----------------------------------
+ src/rtnlutil.c | 26 ++++++++++++++++++++++++++
+ src/rtnlutil.h |  4 ++++
+ 3 files changed, 42 insertions(+), 34 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index f58006e7..8c69d9f4 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -189,7 +189,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
-h src/missing.h \
- 					src/plugin.h src/plugin.c \
- 					src/netdev.h src/netdev.c \
- 					src/wiphy.h src/wiphy.c \
--					src/device.h src/device.c \
-+					src/device.c \
- 					src/station.h src/station.c \
- 					src/ie.h src/ie.c \
- 					src/dbus.h src/dbus.c \
-diff --git a/src/adhoc.c b/src/adhoc.c
-index a63c4669..52164a0a 100644
---- a/src/adhoc.c
-+++ b/src/adhoc.c
-@@ -30,7 +30,6 @@
- =
-
- #include "src/iwd.h"
- #include "src/module.h"
--#include "src/device.h"
- #include "src/netdev.h"
- #include "src/wiphy.h"
- #include "src/crypto.h"
-diff --git a/src/ap.c b/src/ap.c
-index 2fca6ce2..c79fe9b5 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -34,7 +34,6 @@
- #include "src/iwd.h"
- #include "src/module.h"
- #include "src/scan.h"
--#include "src/device.h"
- #include "src/netdev.h"
- #include "src/wiphy.h"
- #include "src/crypto.h"
-diff --git a/src/device.c b/src/device.c
-index 4c963bc2..20224e8f 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -38,7 +38,6 @@
- #include "src/netdev.h"
- #include "src/dbus.h"
- #include "src/station.h"
--#include "src/device.h"
- =
-
- struct device {
- 	uint32_t index;
-@@ -285,59 +284,6 @@ static void setup_device_interface(struct l_dbus_inter=
-face *interface)
- 					device_property_set_mode);
+diff --git a/src/netdev.c b/src/netdev.c
+index 3c1510b9..bdd9dc77 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -343,31 +343,6 @@ static void netdev_set_powered_destroy(void *user_data)
+ 	netdev->set_powered_user_data =3D NULL;
  }
  =
 
--static void device_netdev_notify(struct netdev *netdev,
--					enum netdev_watch_event event,
--					void *user_data)
+-static uint32_t rtnl_set_powered(int ifindex, bool powered,
+-				l_netlink_command_func_t cb, void *user_data,
+-				l_netlink_destroy_func_t destroy)
 -{
--	struct device *device;
--	struct l_dbus *dbus =3D dbus_get_bus();
--	const char *path =3D netdev_get_path(netdev);
+-	struct ifinfomsg *rtmmsg;
+-	size_t bufsize;
+-	uint32_t id;
 -
--	device =3D l_dbus_object_get_data(dbus, path, IWD_DEVICE_INTERFACE);
+-	bufsize =3D NLMSG_ALIGN(sizeof(struct ifinfomsg));
 -
--	if (!device && event !=3D NETDEV_WATCH_EVENT_NEW)
--		return;
+-	rtmmsg =3D l_malloc(bufsize);
+-	memset(rtmmsg, 0, bufsize);
 -
--	switch (event) {
--	case NETDEV_WATCH_EVENT_NEW:
--		if (L_WARN_ON(device))
--			break;
+-	rtmmsg->ifi_family =3D AF_UNSPEC;
+-	rtmmsg->ifi_index =3D ifindex;
+-	rtmmsg->ifi_change =3D IFF_UP;
+-	rtmmsg->ifi_flags =3D powered ? IFF_UP : 0;
 -
--		if (netdev_get_iftype(netdev) =3D=3D NETDEV_IFTYPE_P2P_CLIENT ||
--				netdev_get_iftype(netdev) =3D=3D
--				NETDEV_IFTYPE_P2P_GO)
--			return;
+-	id =3D l_netlink_send(rtnl, RTM_SETLINK, 0, rtmmsg, bufsize,
+-					cb, user_data, destroy);
 -
--		device_create(netdev_get_wiphy(netdev), netdev);
--		break;
--	case NETDEV_WATCH_EVENT_DEL:
--		l_dbus_unregister_object(dbus, path);
--		break;
--	case NETDEV_WATCH_EVENT_UP:
--		device->powered =3D true;
--
--		l_dbus_property_changed(dbus, path,
--					IWD_DEVICE_INTERFACE, "Powered");
--		break;
--	case NETDEV_WATCH_EVENT_DOWN:
--		device->powered =3D false;
--
--		l_dbus_property_changed(dbus, path,
--					IWD_DEVICE_INTERFACE, "Powered");
--		break;
--	case NETDEV_WATCH_EVENT_NAME_CHANGE:
--		l_dbus_property_changed(dbus, path,
--					IWD_DEVICE_INTERFACE, "Name");
--		break;
--	case NETDEV_WATCH_EVENT_ADDRESS_CHANGE:
--		l_dbus_property_changed(dbus, path,
--					IWD_DEVICE_INTERFACE, "Address");
--		break;
--	default:
--		break;
--	}
+-	l_free(rtmmsg);
+-	return id;
 -}
 -
- static void device_wiphy_state_changed_event(struct wiphy *wiphy,
- 					enum wiphy_state_watch_event event,
- 					void *user_data)
-@@ -355,7 +301,7 @@ static void device_wiphy_state_changed_event(struct wip=
-hy *wiphy,
+ int netdev_set_powered(struct netdev *netdev, bool powered,
+ 			netdev_command_cb_t callback, void *user_data,
+ 			netdev_destroy_func_t destroy)
+@@ -377,7 +352,7 @@ int netdev_set_powered(struct netdev *netdev, bool powe=
+red,
+ 		return -EBUSY;
+ =
+
+ 	netdev->set_powered_cmd_id =3D
+-		rtnl_set_powered(netdev->index, powered,
++		rtnl_set_powered(rtnl, netdev->index, powered,
+ 					netdev_set_powered_result, netdev,
+ 					netdev_set_powered_destroy);
+ 	if (!netdev->set_powered_cmd_id)
+@@ -667,7 +642,7 @@ static void netdev_shutdown_one(void *data, void *user_=
+data)
+ 	struct netdev *netdev =3D data;
+ =
+
+ 	if (netdev_get_is_up(netdev))
+-		rtnl_set_powered(netdev->index, false, NULL, NULL, NULL);
++		rtnl_set_powered(rtnl, netdev->index, false, NULL, NULL, NULL);
+ }
+ =
+
+ static bool netdev_match(const void *a, const void *b)
+@@ -3949,7 +3924,7 @@ static void netdev_set_iftype_cb(struct l_genl_msg *m=
+sg, void *user_data)
+ 		goto done;
+ =
+
+ 	netdev->set_powered_cmd_id =3D
+-			rtnl_set_powered(netdev->index, true,
++			rtnl_set_powered(rtnl, netdev->index, true,
+ 					netdev_set_iftype_up_cb, req,
+ 					netdev_set_iftype_request_destroy);
+ 	if (!netdev->set_powered_cmd_id) {
+@@ -4045,7 +4020,7 @@ int netdev_set_iftype(struct netdev *netdev, enum net=
+dev_iftype type,
+ 		l_genl_msg_unref(msg);
+ 	} else {
+ 		netdev->set_powered_cmd_id =3D
+-			rtnl_set_powered(netdev->index, false,
++			rtnl_set_powered(rtnl, netdev->index, false,
+ 					netdev_set_iftype_down_cb, req,
+ 					netdev_set_iftype_request_destroy);
+ 		if (netdev->set_powered_cmd_id)
+@@ -4276,8 +4251,8 @@ static void netdev_set_mac_cb(int error, uint16_t typ=
+e, const void *data,
+ 			strerror(-error));
+ =
+
+ 	netdev->set_powered_cmd_id =3D
+-		rtnl_set_powered(netdev->index, true, netdev_initial_up_cb,
+-					netdev, NULL);
++		rtnl_set_powered(rtnl, netdev->index, true,
++					netdev_initial_up_cb, netdev, NULL);
+ }
+ =
+
+ static void netdev_initial_down_cb(int error, uint16_t type, const void *d=
+ata,
+@@ -4308,8 +4283,8 @@ static void netdev_initial_down_cb(int error, uint16_=
+t type, const void *data,
  	}
+ =
+
+ 	netdev->set_powered_cmd_id =3D
+-		rtnl_set_powered(netdev->index, true, netdev_initial_up_cb,
+-					netdev, NULL);
++		rtnl_set_powered(rtnl, netdev->index, true,
++					netdev_initial_up_cb, netdev, NULL);
  }
  =
 
--struct device *device_create(struct wiphy *wiphy, struct netdev *netdev)
-+static struct device *device_create(struct wiphy *wiphy, struct netdev *ne=
-tdev)
- {
- 	struct device *device;
- 	struct l_dbus *dbus =3D dbus_get_bus();
-@@ -395,7 +341,7 @@ struct device *device_create(struct wiphy *wiphy, struc=
-t netdev *netdev)
- 	return device;
+ static void netdev_getlink_cb(int error, uint16_t type, const void *data,
+@@ -4367,7 +4342,8 @@ static void netdev_getlink_cb(int error, uint16_t typ=
+e, const void *data,
+ 	cb =3D powered ? netdev_initial_down_cb : netdev_initial_up_cb;
+ =
+
+ 	netdev->set_powered_cmd_id =3D
+-		rtnl_set_powered(ifi->ifi_index, !powered, cb, netdev, NULL);
++		rtnl_set_powered(rtnl, ifi->ifi_index, !powered, cb, netdev,
++					NULL);
  }
  =
 
--void device_remove(struct device *device)
-+static void device_free(struct device *device)
- {
- 	l_debug("");
+ static void netdev_frame_watch_free(struct watchlist_item *item)
+@@ -4729,6 +4705,8 @@ static void netdev_link_notify(uint16_t type, const v=
+oid *data, uint32_t len,
+ 	if (ifi->ifi_type !=3D ARPHRD_ETHER)
+ 		return;
  =
 
-@@ -407,11 +353,64 @@ void device_remove(struct device *device)
- 	l_free(device);
++	l_debug("event %u on ifindex %u", type, ifi->ifi_index);
++
+ 	bytes =3D len - NLMSG_ALIGN(sizeof(struct ifinfomsg));
+ =
+
+ 	switch (type) {
+diff --git a/src/rtnlutil.c b/src/rtnlutil.c
+index 833f7103..cd5c11a0 100644
+--- a/src/rtnlutil.c
++++ b/src/rtnlutil.c
+@@ -25,6 +25,7 @@
+ #endif
+ =
+
+ #include <sys/socket.h>
++#include <linux/if.h>
+ #include <linux/rtnetlink.h>
+ #include <arpa/inet.h>
+ =
+
+@@ -130,6 +131,31 @@ uint32_t rtnl_set_mac(struct l_netlink *rtnl, int ifin=
+dex,
+ 	return id;
  }
  =
 
-+static void device_netdev_notify(struct netdev *netdev,
-+					enum netdev_watch_event event,
-+					void *user_data)
++uint32_t rtnl_set_powered(struct l_netlink *rtnl, int ifindex, bool powere=
+d,
++				l_netlink_command_func_t cb, void *user_data,
++				l_netlink_destroy_func_t destroy)
 +{
-+	struct device *device;
-+	struct l_dbus *dbus =3D dbus_get_bus();
-+	const char *path =3D netdev_get_path(netdev);
++	struct ifinfomsg *rtmmsg;
++	size_t bufsize;
++	uint32_t id;
 +
-+	device =3D l_dbus_object_get_data(dbus, path, IWD_DEVICE_INTERFACE);
++	bufsize =3D NLMSG_ALIGN(sizeof(struct ifinfomsg));
 +
-+	if (!device && event !=3D NETDEV_WATCH_EVENT_NEW)
-+		return;
++	rtmmsg =3D l_malloc(bufsize);
++	memset(rtmmsg, 0, bufsize);
 +
-+	switch (event) {
-+	case NETDEV_WATCH_EVENT_NEW:
-+		if (L_WARN_ON(device))
-+			break;
++	rtmmsg->ifi_family =3D AF_UNSPEC;
++	rtmmsg->ifi_index =3D ifindex;
++	rtmmsg->ifi_change =3D IFF_UP;
++	rtmmsg->ifi_flags =3D powered ? IFF_UP : 0;
 +
-+		if (netdev_get_iftype(netdev) =3D=3D NETDEV_IFTYPE_P2P_CLIENT ||
-+				netdev_get_iftype(netdev) =3D=3D
-+				NETDEV_IFTYPE_P2P_GO)
-+			return;
++	id =3D l_netlink_send(rtnl, RTM_SETLINK, 0, rtmmsg, bufsize,
++					cb, user_data, destroy);
++	l_free(rtmmsg);
 +
-+		device_create(netdev_get_wiphy(netdev), netdev);
-+		break;
-+	case NETDEV_WATCH_EVENT_DEL:
-+		l_dbus_unregister_object(dbus, path);
-+		break;
-+	case NETDEV_WATCH_EVENT_UP:
-+		device->powered =3D true;
-+
-+		l_dbus_property_changed(dbus, path,
-+					IWD_DEVICE_INTERFACE, "Powered");
-+		break;
-+	case NETDEV_WATCH_EVENT_DOWN:
-+		device->powered =3D false;
-+
-+		l_dbus_property_changed(dbus, path,
-+					IWD_DEVICE_INTERFACE, "Powered");
-+		break;
-+	case NETDEV_WATCH_EVENT_NAME_CHANGE:
-+		l_dbus_property_changed(dbus, path,
-+					IWD_DEVICE_INTERFACE, "Name");
-+		break;
-+	case NETDEV_WATCH_EVENT_ADDRESS_CHANGE:
-+		l_dbus_property_changed(dbus, path,
-+					IWD_DEVICE_INTERFACE, "Address");
-+		break;
-+	default:
-+		break;
-+	}
++	return id;
 +}
 +
- static void destroy_device_interface(void *user_data)
+ void rtnl_ifaddr_extract(const struct ifaddrmsg *ifa, int bytes,
+ 				char **label, char **ip, char **broadcast)
  {
- 	struct device *device =3D user_data;
+diff --git a/src/rtnlutil.h b/src/rtnlutil.h
+index 383d562f..dc053783 100644
+--- a/src/rtnlutil.h
++++ b/src/rtnlutil.h
+@@ -32,6 +32,10 @@ uint32_t rtnl_set_mac(struct l_netlink *rtnl, int ifinde=
+x,
+ 					void *user_data,
+ 					l_netlink_destroy_func_t destroy);
  =
 
--	device_remove(device);
-+	device_free(device);
- }
- =
-
- static int device_init(void)
-diff --git a/src/device.h b/src/device.h
-deleted file mode 100644
-index 31e472be..00000000
---- a/src/device.h
-+++ /dev/null
-@@ -1,30 +0,0 @@
--/*
-- *
-- *  Wireless daemon for Linux
-- *
-- *  Copyright (C) 2013-2019  Intel Corporation. All rights reserved.
-- *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-- *
-- */
--
--#include <stdbool.h>
--
--struct wiphy;
--struct netdev;
--struct device;
--
--struct device *device_create(struct wiphy *wiphy, struct netdev *netdev);
--void device_remove(struct device *device);
-diff --git a/src/station.c b/src/station.c
-index 76cf20a1..b98aeb63 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -37,7 +37,6 @@
- #include "src/iwd.h"
- #include "src/module.h"
- #include "src/common.h"
--#include "src/device.h"
- #include "src/watchlist.h"
- #include "src/scan.h"
- #include "src/netdev.h"
++uint32_t rtnl_set_powered(struct l_netlink *rtnl, int ifindex, bool powere=
+d,
++				l_netlink_command_func_t cb, void *user_data,
++				l_netlink_destroy_func_t destroy);
++
+ void rtnl_ifaddr_extract(const struct ifaddrmsg *ifa, int bytes,
+ 				char **label, char **ip, char **broadcast);
+ uint32_t rtnl_ifaddr_get(struct l_netlink *rtnl, l_netlink_command_func_t =
+cb,
 -- =
 
 2.20.1
 
---===============0125278201380305464==--
+--===============7496565854551527524==--
 
