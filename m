@@ -1,221 +1,495 @@
-Content-Type: multipart/mixed; boundary="===============5038782378907077231=="
+Content-Type: multipart/mixed; boundary="===============7918758018291312683=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: RRM start time changes
-Date: Thu, 21 Nov 2019 12:12:10 -0800
-Message-ID: <5018f5cd53120bf19a3267d83c809f3476b4e1e9.camel@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/4] p2putil: Replace free with clear in function names
+Date: Thu, 21 Nov 2019 21:15:54 +0100
+Message-ID: <20191121201557.16506-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5038782378907077231==
+--===============7918758018291312683==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Sending as attachments due to weird non-ascii character fix
+All these functions free up the resources used by the struct but don't
+free the struct itself (allowing it to be static) so rename the
+functions to avoid confusion.
+---
+The patch probably would be easier to read without -n / -u
+---
+ src/p2putil.c | 132 +++++++++++++++++++++++++-------------------------
+ src/p2putil.h |  30 ++++++------
+ 2 files changed, 81 insertions(+), 81 deletions(-)
 
---===============5038782378907077231==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-rrm-fix-non-ascii-character-in-comment.patch"
+diff --git a/src/p2putil.c b/src/p2putil.c
+index ce53b2a2..02c02b4d 100644
+--- a/src/p2putil.c
++++ b/src/p2putil.c
+@@ -321,7 +321,7 @@ static bool extract_p2p_device_info(const uint8_t *attr=
+, size_t len,
+ 	return true;
+ }
+ =
 
-RnJvbSAwM2RhNzFmYzdjMmE3M2FjMWI2MzAwYjM2YzU1Zjk2YzcxMDU3ODIzIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
-RGF0ZTogVGh1LCAyMSBOb3YgMjAxOSAxMjowNzowMCAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggMS80
-XSBycm06IGZpeCBub24tYXNjaWkgY2hhcmFjdGVyIGluIGNvbW1lbnQKCi0tLQogc3JjL3JybS5j
-IHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpk
-aWZmIC0tZ2l0IGEvc3JjL3JybS5jIGIvc3JjL3JybS5jCmluZGV4IDJiMGEyMmZiLi5kZGY4ZTM5
-NSAxMDA2NDQKLS0tIGEvc3JjL3JybS5jCisrKyBiL3NyYy9ycm0uYwpAQCAtMjc0LDcgKzI3NCw3
-IEBAIHN0YXRpYyBzaXplX3QgYnVpbGRfcmVwb3J0X2Zvcl9ic3Moc3RydWN0IHJybV9iZWFjb25f
-cmVxX2luZm8gKmJlYWNvbiwKIAkgKiA4MDIuMTEgOS40LjIuMjIuNyBCZWFjb24gcmVwb3J0CiAJ
-ICoKIAkgKiAiVGhlIFBhcmVudCBUU0YgZmllbGQgY29udGFpbnMgdGhlIGxvd2VyIDQgb2N0ZXRz
-IG9mIHRoZSBtZWFzdXJpbmcKLQkgKiAgU1RB4oCZcyBUU0YgdGltZXIgdmFsdWUiCisJICogIFNU
-QSdzIFRTRiB0aW1lciB2YWx1ZSIKIAkgKi8KIAlsX3B1dF9sZTMyKCh1aW50MzJfdCkoYnNzLT5w
-YXJlbnRfdHNmICYgMHhmZmZmZmZmZiksIHRvKTsKIAl0byArPSA0OwotLSAKMi4xNy4xCgo=
+-static void p2p_free_client_info_descriptor(void *data)
++static void p2p_clear_client_info_descriptor(void *data)
+ {
+ 	struct p2p_client_info_descriptor *desc =3D data;
+ =
 
---===============5038782378907077231==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0002-scan-parse-the-scan-start-time.patch"
+@@ -397,7 +397,7 @@ static bool extract_p2p_group_info(const uint8_t *attr,=
+ size_t len,
+ 	return true;
+ =
 
-RnJvbSA4Nzc2NWQ5ZmM0NTJjNzJhOTExYTJkMjBlYmJmYjEyMDA0MTA5NTg3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
-RGF0ZTogVHVlLCAxOSBOb3YgMjAxOSAxNDoxMDoyMyAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggMi80
-XSBzY2FuOiBwYXJzZSB0aGUgc2NhbiBzdGFydCB0aW1lCgpUaGUga2VybmVsIHNlbmRzIE5MODAy
-MTFfQVRUUl9TQ0FOX1NUQVJUX1RJTUVfVFNGIHdpdGggQ01EX1RSSUdHRVIgYW5kClJSTSByZXF1
-aXJlcyB0aGlzIHZhbHVlIGZvciBiZWFjb24gbWVhc3VyZW1lbnQgcmVwb3J0cy4KClRoZSBzdGFy
-dCB0aW1lIGlzIHBhcnNlZCBkdXJpbmcgQ01EX1RSSUdHRVIgYW5kIHNldCBpbnRvIHRoZSBzY2Fu
-IHJlcXVlc3QuCkEgZ2V0dGVyIHdhcyBhZGRlZCB0byBvYnRhaW4gdGhpcyB0aW1lIHZhbHVlIGZv
-ciBhbiBhbHJlYWR5IHRyaWdnZXJlZApzY2FuLgoKQWZ0ZXIgbWFraW5nIHRoZSBjaGFuZ2UsIHRo
-ZSBTQ0FOX0FCT1JURUQgY2FzZSB3YXMgY2xlYW5lZCB1cCBhIGJpdCB0bwpyZW1vdmUgdGhlIGxv
-Y2FsIHNjYW5fcmVxdWVzdCB1c2FnZSBpbiBmYXZvciBvZiB0aGUgb25lIHVzZWQgZm9yIGFsbCB0
-aGUKb3RoZXIgY2FzZXMuCi0tLQogc3JjL3NjYW4uYyB8IDQxICsrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKystLS0tLS0tCiBzcmMvc2Nhbi5oIHwgIDIgKysKIDIgZmlsZXMgY2hhbmdl
-ZCwgMzYgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvc2Nh
-bi5jIGIvc3JjL3NjYW4uYwppbmRleCBlMDA3Y2U1ZC4uZTJkNzM2MDEgMTAwNjQ0Ci0tLSBhL3Ny
-Yy9zY2FuLmMKKysrIGIvc3JjL3NjYW4uYwpAQCAtNzUsNiArNzUsOCBAQCBzdHJ1Y3Qgc2Nhbl9y
-ZXF1ZXN0IHsKIAlzY2FuX2Rlc3Ryb3lfZnVuY190IGRlc3Ryb3k7CiAJYm9vbCBwYXNzaXZlOjE7
-IC8qIEFjdGl2ZSBvciBQYXNzaXZlIHNjYW4/ICovCiAJc3RydWN0IGxfcXVldWUgKmNtZHM7CisJ
-LyogVGhlIHRpbWUgdGhlIGN1cnJlbnQgc2NhbiB3YXMgc3RhcnRlZC4gUmVwb3J0ZWQgaW4gVFJJ
-R0dFUl9TQ0FOICovCisJdWludDY0X3Qgc3RhcnRfdGltZV90c2Y7CiB9OwogCiBzdHJ1Y3Qgc2Nh
-bl9jb250ZXh0IHsKQEAgLTc3OCw2ICs3ODAsMjUgQEAgYm9vbCBzY2FuX3BlcmlvZGljX3N0b3Ao
-dWludDY0X3Qgd2Rldl9pZCkKIAlyZXR1cm4gdHJ1ZTsKIH0KIAordWludDY0X3Qgc2Nhbl9nZXRf
-dHJpZ2dlcmVkX3RpbWUodWludDY0X3Qgd2Rldl9pZCwgdWludDMyX3QgaWQpCit7CisJc3RydWN0
-IHNjYW5fY29udGV4dCAqc2M7CisJc3RydWN0IHNjYW5fcmVxdWVzdCAqc3I7CisKKwlzYyA9IGxf
-cXVldWVfZmluZChzY2FuX2NvbnRleHRzLCBzY2FuX2NvbnRleHRfbWF0Y2gsICZ3ZGV2X2lkKTsK
-KwlpZiAoIXNjKQorCQlyZXR1cm4gMDsKKworCWlmICghc2MtPnRyaWdnZXJlZCkKKwkJcmV0dXJu
-IDA7CisKKwlzciA9IGxfcXVldWVfZmluZChzYy0+cmVxdWVzdHMsIHNjYW5fcmVxdWVzdF9tYXRj
-aCwgTF9VSU5UX1RPX1BUUihpZCkpOworCWlmICghc3IpCisJCXJldHVybiAwOworCisJcmV0dXJu
-IHNyLT5zdGFydF90aW1lX3RzZjsKK30KKwogc3RhdGljIHZvaWQgc2Nhbl9wZXJpb2RpY190aW1l
-b3V0KHN0cnVjdCBsX3RpbWVvdXQgKnRpbWVvdXQsIHZvaWQgKnVzZXJfZGF0YSkKIHsKIAlzdHJ1
-Y3Qgc2Nhbl9jb250ZXh0ICpzYyA9IHVzZXJfZGF0YTsKQEAgLTE0MzksNiArMTQ2MCw4IEBAIHN0
-YXRpYyB2b2lkIHNjYW5fbm90aWZ5KHN0cnVjdCBsX2dlbmxfbXNnICptc2csIHZvaWQgKnVzZXJf
-ZGF0YSkKIAl1aW50MzJfdCB3aXBoeV9pZDsKIAlzdHJ1Y3Qgc2Nhbl9jb250ZXh0ICpzYzsKIAli
-b29sIGFjdGl2ZV9zY2FuID0gZmFsc2U7CisJdWludDY0X3Qgc3RhcnRfdGltZV90c2YgPSAwOwor
-CXN0cnVjdCBzY2FuX3JlcXVlc3QgKnNyOwogCiAJY21kID0gbF9nZW5sX21zZ19nZXRfY29tbWFu
-ZChtc2cpOwogCkBAIC0xNDYxLDE1ICsxNDg0LDIyIEBAIHN0YXRpYyB2b2lkIHNjYW5fbm90aWZ5
-KHN0cnVjdCBsX2dlbmxfbXNnICptc2csIHZvaWQgKnVzZXJfZGF0YSkKIAkJY2FzZSBOTDgwMjEx
-X0FUVFJfU0NBTl9TU0lEUzoKIAkJCWFjdGl2ZV9zY2FuID0gdHJ1ZTsKIAkJCWJyZWFrOworCQlj
-YXNlIE5MODAyMTFfQVRUUl9TQ0FOX1NUQVJUX1RJTUVfVFNGOgorCQkJaWYgKGxlbiAhPSBzaXpl
-b2YodWludDY0X3QpKQorCQkJCXJldHVybjsKKworCQkJc3RhcnRfdGltZV90c2YgPSBsX2dldF91
-NjQoZGF0YSk7CisJCQlicmVhazsKIAkJfQogCX0KIAorCXNyID0gbF9xdWV1ZV9wZWVrX2hlYWQo
-c2MtPnJlcXVlc3RzKTsKKwogCXN3aXRjaCAoY21kKSB7CiAJY2FzZSBOTDgwMjExX0NNRF9ORVdf
-U0NBTl9SRVNVTFRTOgogCXsKIAkJc3RydWN0IGxfZ2VubF9tc2cgKnNjYW5fbXNnOwogCQlzdHJ1
-Y3Qgc2Nhbl9yZXN1bHRzICpyZXN1bHRzOwotCQlzdHJ1Y3Qgc2Nhbl9yZXF1ZXN0ICpzciA9IGxf
-cXVldWVfcGVla19oZWFkKHNjLT5yZXF1ZXN0cyk7CiAJCWJvb2wgc2VuZF9uZXh0ID0gZmFsc2U7
-CiAJCWJvb2wgZ2V0X3Jlc3VsdHMgPSBmYWxzZTsKIApAQCAtMTU0MywxMiArMTU3MywxMSBAQCBz
-dGF0aWMgdm9pZCBzY2FuX25vdGlmeShzdHJ1Y3QgbF9nZW5sX21zZyAqbXNnLCB2b2lkICp1c2Vy
-X2RhdGEpCiAJCWVsc2UKIAkJCXNjLT5zdGF0ZSA9IFNDQU5fU1RBVEVfUEFTU0lWRTsKIAorCQlz
-ci0+c3RhcnRfdGltZV90c2YgPSBzdGFydF90aW1lX3RzZjsKKwogCQlicmVhazsKIAogCWNhc2Ug
-Tkw4MDIxMV9DTURfU0NBTl9BQk9SVEVEOgotCXsKLQkJc3RydWN0IHNjYW5fcmVxdWVzdCAqc3Ig
-PSBsX3F1ZXVlX3BlZWtfaGVhZChzYy0+cmVxdWVzdHMpOwotCiAJCWlmIChzYy0+c3RhdGUgPT0g
-U0NBTl9TVEFURV9OT1RfUlVOTklORykKIAkJCWJyZWFrOwogCkBAIC0xNTU3LDggKzE1ODYsNyBA
-QCBzdGF0aWMgdm9pZCBzY2FuX25vdGlmeShzdHJ1Y3QgbF9nZW5sX21zZyAqbXNnLCB2b2lkICp1
-c2VyX2RhdGEpCiAJCWlmIChzYy0+dHJpZ2dlcmVkKSB7CiAJCQlzYy0+dHJpZ2dlcmVkID0gZmFs
-c2U7CiAKLQkJCXNjYW5fZmluaXNoZWQoc2MsIC1FQ0FOQ0VMRUQsIE5VTEwsCi0JCQkJCWxfcXVl
-dWVfcGVla19oZWFkKHNjLT5yZXF1ZXN0cykpOworCQkJc2Nhbl9maW5pc2hlZChzYywgLUVDQU5D
-RUxFRCwgTlVMTCwgc3IpOwogCQl9IGVsc2UgaWYgKHNyICYmICFzYy0+c3RhcnRfY21kX2lkICYm
-ICFzYy0+Z2V0X3NjYW5fY21kX2lkKSB7CiAJCQkvKgogCQkJICogSWYgdGhpcyB3YXMgYW4gZXh0
-ZXJuYWwgc2NhbiB0aGF0IGdvdCBhYm9ydGVkCkBAIC0xNTcyLDcgKzE2MDAsNiBAQCBzdGF0aWMg
-dm9pZCBzY2FuX25vdGlmeShzdHJ1Y3QgbF9nZW5sX21zZyAqbXNnLCB2b2lkICp1c2VyX2RhdGEp
-CiAKIAkJYnJlYWs7CiAJfQotCX0KIH0KIAogdWludDhfdCBzY2FuX2ZyZXFfdG9fY2hhbm5lbCh1
-aW50MzJfdCBmcmVxLCBlbnVtIHNjYW5fYmFuZCAqb3V0X2JhbmQpCmRpZmYgLS1naXQgYS9zcmMv
-c2Nhbi5oIGIvc3JjL3NjYW4uaAppbmRleCA4ZmMyYWE1Ni4uYjZjNGUxMmQgMTAwNjQ0Ci0tLSBh
-L3NyYy9zY2FuLmgKKysrIGIvc3JjL3NjYW4uaApAQCAtMTI0LDYgKzEyNCw4IEBAIHZvaWQgc2Nh
-bl9wZXJpb2RpY19zdGFydCh1aW50NjRfdCB3ZGV2X2lkLCBzY2FuX3RyaWdnZXJfZnVuY190IHRy
-aWdnZXIsCiAJCQkJc2Nhbl9ub3RpZnlfZnVuY190IGZ1bmMsIHZvaWQgKnVzZXJkYXRhKTsKIGJv
-b2wgc2Nhbl9wZXJpb2RpY19zdG9wKHVpbnQ2NF90IHdkZXZfaWQpOwogCit1aW50NjRfdCBzY2Fu
-X2dldF90cmlnZ2VyZWRfdGltZSh1aW50NjRfdCB3ZGV2X2lkLCB1aW50MzJfdCBpZCk7CisKIHZv
-aWQgc2Nhbl9ic3NfZnJlZShzdHJ1Y3Qgc2Nhbl9ic3MgKmJzcyk7CiBpbnQgc2Nhbl9ic3NfcmFu
-a19jb21wYXJlKGNvbnN0IHZvaWQgKmEsIGNvbnN0IHZvaWQgKmIsIHZvaWQgKnVzZXIpOwogCi0t
-IAoyLjE3LjEKCg==
+ error:
+-	l_queue_destroy(*out, p2p_free_client_info_descriptor);
++	l_queue_destroy(*out, p2p_clear_client_info_descriptor);
+ 	*out =3D NULL;
+ =
 
---===============5038782378907077231==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0003-rrm-include-actual-scan-start-time-in-report.patch"
+ 	return false;
+@@ -502,7 +502,7 @@ static bool extract_p2p_advertisement_id(const uint8_t =
+*attr, size_t len,
+ 	return true;
+ }
+ =
 
-RnJvbSAxZTM3YmEyMmZhNjdlNDExN2MzMWEzYWMyMTUxYWZhNGM1OWIxN2IzIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
-RGF0ZTogV2VkLCAyMCBOb3YgMjAxOSAwODo1Mjo1MyAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggMy80
-XSBycm06IGluY2x1ZGUgYWN0dWFsIHNjYW4gc3RhcnQgdGltZSBpbiByZXBvcnQKCi0tLQogc3Jj
-L3JybS5jIHwgMTEgKysrKysrKysrLS0KIDEgZmlsZSBjaGFuZ2VkLCA5IGluc2VydGlvbnMoKyks
-IDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL3JybS5jIGIvc3JjL3JybS5jCmluZGV4
-IGRkZjhlMzk1Li42NjA1NjVlYiAxMDA2NDQKLS0tIGEvc3JjL3JybS5jCisrKyBiL3NyYy9ycm0u
-YwpAQCAtMTA5LDYgKzEwOSw3IEBAIHN0cnVjdCBycm1fYmVhY29uX3JlcV9pbmZvIHsKIAljaGFy
-IHNzaWRbMzNdOwkJLyogUmVxdWVzdCBmaWx0ZXJlZCBieSBTU0lEICovCiAJYm9vbCBoYXNfc3Np
-ZDsKIAl1aW50MzJfdCBzY2FuX2lkOworCXVpbnQ2NF90IHNjYW5fc3RhcnRfdGltZTsKIH07CiAK
-IC8qIFBlci1uZXRkZXYgc3RhdGUgKi8KQEAgLTI0OSw4ICsyNTAsNyBAQCBzdGF0aWMgc2l6ZV90
-IGJ1aWxkX3JlcG9ydF9mb3JfYnNzKHN0cnVjdCBycm1fYmVhY29uX3JlcV9pbmZvICpiZWFjb24s
-CiAKIAkqdG8rKyA9IGJlYWNvbi0+b3Blcl9jbGFzczsKIAkqdG8rKyA9IHNjYW5fZnJlcV90b19j
-aGFubmVsKGJzcy0+ZnJlcXVlbmN5LCBOVUxMKTsKLQkvKiBza2lwIHN0YXJ0IHRpbWUgKi8KLQlt
-ZW1zZXQodG8sIDAsIDgpOworCWxfcHV0X2xlNjQoYmVhY29uLT5zY2FuX3N0YXJ0X3RpbWUsIHRv
-KTsKIAl0byArPSA4OwogCWxfcHV0X2xlMTYoYmVhY29uLT5kdXJhdGlvbiwgdG8pOwogCXRvICs9
-IDI7CkBAIC0zOTAsMTEgKzM5MCwxOCBAQCBzdGF0aWMgYm9vbCBycm1fc2Nhbl9yZXN1bHRzKGlu
-dCBlcnIsIHN0cnVjdCBsX3F1ZXVlICpic3NfbGlzdCwgdm9pZCAqdXNlcmRhdGEpCiBzdGF0aWMg
-dm9pZCBycm1fc2Nhbl90cmlnZ2VyZWQoaW50IGVyciwgdm9pZCAqdXNlcmRhdGEpCiB7CiAJc3Ry
-dWN0IHJybV9zdGF0ZSAqcnJtID0gdXNlcmRhdGE7CisJc3RydWN0IHJybV9iZWFjb25fcmVxX2lu
-Zm8gKmJlYWNvbiA9IGxfY29udGFpbmVyX29mKHJybS0+cGVuZGluZywKKwkJCQkJCXN0cnVjdCBy
-cm1fYmVhY29uX3JlcV9pbmZvLAorCQkJCQkJaW5mbyk7CiAKIAlpZiAoZXJyIDwgMCkgewogCQls
-X2Vycm9yKCJDb3VsZCBub3Qgc3RhcnQgUlJNIHNjYW4iKTsKIAkJcnJtX3JlamVjdF9tZWFzdXJl
-bWVudF9yZXF1ZXN0KHJybSwgUkVQT1JUX1JFSkVDVF9JTkNBUEFCTEUpOworCQlyZXR1cm47CiAJ
-fQorCisJYmVhY29uLT5zY2FuX3N0YXJ0X3RpbWUgPSBzY2FuX2dldF90cmlnZ2VyZWRfdGltZShy
-cm0tPndkZXZfaWQsCisJCQkJCQkJYmVhY29uLT5zY2FuX2lkKTsKIH0KIAogc3RhdGljIHZvaWQg
-cnJtX2hhbmRsZV9iZWFjb25fc2NhbihzdHJ1Y3QgcnJtX3N0YXRlICpycm0sCi0tIAoyLjE3LjEK
-Cg==
+-static void p2p_free_advertised_service_descriptor(void *data)
++static void p2p_clear_advertised_service_descriptor(void *data)
+ {
+ 	struct p2p_advertised_service_descriptor *desc =3D data;
+ =
 
---===============5038782378907077231==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0004-rrm-add-packed-struct-for-beacon-reports.patch"
+@@ -548,7 +548,7 @@ static bool extract_p2p_advertised_service_info(const u=
+int8_t *attr, size_t len,
+ 	return true;
+ =
 
-RnJvbSA4YzlhZWE1MjgxNjNjYjM5ZTI4M2NkMGU1NzcyNTc4ZjQzMzViNzdkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
-RGF0ZTogV2VkLCAyMCBOb3YgMjAxOSAwOToxMTowNyAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggNC80
-XSBycm06IGFkZCBwYWNrZWQgc3RydWN0IGZvciBiZWFjb24gcmVwb3J0cwoKYnVpbGRfcmVwb3J0
-X2Zvcl9ic3Mgd2FzIHJlZmFjdG9yZWQgdG8gdXNlIHRoaXMgcGFja2VkIHN0cnVjdHVyZSByYXRo
-ZXIKdGhhbiBsX3B1dF8qIEFQSXMuCi0tLQogc3JjL3JybS5jIHwgNjYgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQs
-IDQxIGluc2VydGlvbnMoKyksIDI1IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9ycm0u
-YyBiL3NyYy9ycm0uYwppbmRleCA2NjA1NjVlYi4uM2I2MDBmMDkgMTAwNjQ0Ci0tLSBhL3NyYy9y
-cm0uYworKysgYi9zcmMvcnJtLmMKQEAgLTEyMiw2ICsxMjIsMjEgQEAgc3RydWN0IHJybV9zdGF0
-ZSB7CiAJdWludDY0X3QgbGFzdF9yZXF1ZXN0OwogfTsKIAorLyogODAyLjExLCBTZWN0aW9uIDku
-NC4yLjIyLjcgKi8KK3N0cnVjdCBycm1fYmVhY29uX3JlcG9ydCB7CisJdWludDhfdCBvcGVyX2Ns
-YXNzOworCXVpbnQ4X3QgY2hhbm5lbDsKKwlfX2xlNjQgc2Nhbl9zdGFydF90aW1lOworCV9fbGUx
-NiBkdXJhdGlvbjsKKwl1aW50OF90IGZyYW1lX2luZm87CisJdWludDhfdCByY3BpOworCXVpbnQ4
-X3QgcnNuaTsKKwl1aW50OF90IGJzc2lkWzZdOworCXVpbnQ4X3QgYW50ZW5uYV9pZDsKKwlfX2xl
-MzIgcGFyZW50X3RzZjsKKwl1aW50OF90IHN1YmVsZW1lbnRzWzBdOworfSBfX2F0dHJpYnV0ZV9f
-ICgocGFja2VkKSk7CisKIHN0YXRpYyBzdHJ1Y3QgbF9xdWV1ZSAqc3RhdGVzOwogc3RhdGljIHN0
-cnVjdCBsX2dlbmxfZmFtaWx5ICpubDgwMjExOwogc3RhdGljIHVpbnQzMl90IG5ldGRldl93YXRj
-aDsKQEAgLTIyNSw2ICsyNDAsMTcgQEAgc3RhdGljIHZvaWQgcnJtX2J1aWxkX21lYXN1cmVtZW50
-X3JlcG9ydChzdHJ1Y3QgcnJtX3JlcXVlc3RfaW5mbyAqaW5mbywKIAkJbWVtY3B5KHRvLCByZXBv
-cnQsIHJlcG9ydF9sZW4pOwogfQogCisvKiA4MDIuMTEgVGFibGUgOS0xNTQgKi8KK3N0YXRpYyB1
-aW50OF90IG1kYl90b19yY3BpKGludDMyX3QgbWRiKQoreworCWlmIChtZGIgPD0gMTA5NTApCisJ
-CXJldHVybiAwOworCWVsc2UgaWYgKG1kYiA+PSAtMTA5NTAgJiYgbWRiIDwgMCkKKwkJcmV0dXJu
-ICgodWludDhfdCkoKDIgKiAobWRiICsgMTEwMDApKSAvIDEwMCkpOworCWVsc2UKKwkJcmV0dXJu
-IDIyMDsKK30KKwogLyoKICAqIDgwMi4xMS0yMDE2IDExLjExLjkuMSBCZWFjb24gcmVwb3J0CiAg
-KgpAQCAtMjQ2LDM4ICsyNzIsMjggQEAgc3RhdGljIHNpemVfdCBidWlsZF9yZXBvcnRfZm9yX2Jz
-cyhzdHJ1Y3QgcnJtX2JlYWNvbl9yZXFfaW5mbyAqYmVhY29uLAogCQkJCQlzdHJ1Y3Qgc2Nhbl9i
-c3MgKmJzcywKIAkJCQkJdWludDhfdCAqdG8pCiB7Ci0JdWludDhfdCAqc3RhcnQgPSB0bzsKLQot
-CSp0bysrID0gYmVhY29uLT5vcGVyX2NsYXNzOwotCSp0bysrID0gc2Nhbl9mcmVxX3RvX2NoYW5u
-ZWwoYnNzLT5mcmVxdWVuY3ksIE5VTEwpOwotCWxfcHV0X2xlNjQoYmVhY29uLT5zY2FuX3N0YXJ0
-X3RpbWUsIHRvKTsKLQl0byArPSA4OwotCWxfcHV0X2xlMTYoYmVhY29uLT5kdXJhdGlvbiwgdG8p
-OwotCXRvICs9IDI7Ci0JKnRvKysgPSBycm1fcGh5X3R5cGUoYnNzKTsKLQotCS8qIDgwMi4xMSBU
-YWJsZSA5LTE1NCAtIFJDUEkgdmFsdWVzICovCi0JaWYgKGJzcy0+c2lnbmFsX3N0cmVuZ3RoIDwg
-LTEwOTUwKQotCQkqdG8rKyA9IDA7Ci0JZWxzZSBpZiAoYnNzLT5zaWduYWxfc3RyZW5ndGggPj0g
-LTEwOTUwICYmIGJzcy0+c2lnbmFsX3N0cmVuZ3RoIDwgMCkKLQkJKnRvKysgPSAodWludDhfdCko
-KDIgKiAoYnNzLT5zaWduYWxfc3RyZW5ndGggKyAxMTAwMCkpIC8gMTAwKTsKLQllbHNlCi0JCSp0
-bysrID0gMjIwOworCXN0cnVjdCBycm1fYmVhY29uX3JlcG9ydCAqcmVwb3J0ID0gKHN0cnVjdCBy
-cm1fYmVhY29uX3JlcG9ydCAqKSB0bzsKKworCXJlcG9ydC0+b3Blcl9jbGFzcyA9IGJlYWNvbi0+
-b3Blcl9jbGFzczsKKwlyZXBvcnQtPmNoYW5uZWwgPSBzY2FuX2ZyZXFfdG9fY2hhbm5lbChic3Mt
-PmZyZXF1ZW5jeSwgTlVMTCk7CisJcmVwb3J0LT5zY2FuX3N0YXJ0X3RpbWUgPSBiZWFjb24tPnNj
-YW5fc3RhcnRfdGltZTsKKwlyZXBvcnQtPmR1cmF0aW9uID0gYmVhY29uLT5kdXJhdGlvbjsKKwly
-ZXBvcnQtPmZyYW1lX2luZm8gPSBycm1fcGh5X3R5cGUoYnNzKTsKKwlyZXBvcnQtPnJjcGkgPSBt
-ZGJfdG9fcmNwaShic3MtPnNpZ25hbF9zdHJlbmd0aCk7CiAKIAkvKiBSU05JIG5vdCBhdmFpbGFi
-bGUgKGNvdWxkIGdldCB0aGlzIGZyb20gR0VUX1NVUlZFWSkgKi8KLQkqdG8rKyA9IDI1NTsKLQlt
-ZW1jcHkodG8sIGJzcy0+YWRkciwgNik7Ci0JdG8gKz0gNjsKLQkvKiBBbnRlbm5hIGlkZW50aWZp
-ZXIgdW5rbm93biAqLwotCSp0bysrID0gMDsKKwlyZXBvcnQtPnJzbmkgPSAyNTU7CisJbWVtY3B5
-KHJlcG9ydC0+YnNzaWQsIGJzcy0+YWRkciwgNik7CisKKwlyZXBvcnQtPmFudGVubmFfaWQgPSAw
-OworCiAJLyoKIAkgKiA4MDIuMTEgOS40LjIuMjIuNyBCZWFjb24gcmVwb3J0CiAJICoKIAkgKiAi
-VGhlIFBhcmVudCBUU0YgZmllbGQgY29udGFpbnMgdGhlIGxvd2VyIDQgb2N0ZXRzIG9mIHRoZSBt
-ZWFzdXJpbmcKIAkgKiAgU1RBJ3MgVFNGIHRpbWVyIHZhbHVlIgogCSAqLwotCWxfcHV0X2xlMzIo
-KHVpbnQzMl90KShic3MtPnBhcmVudF90c2YgJiAweGZmZmZmZmZmKSwgdG8pOwotCXRvICs9IDQ7
-CisJcmVwb3J0LT5wYXJlbnRfdHNmID0gKHVpbnQzMl90KWJzcy0+cGFyZW50X3RzZjsKIAogCS8q
-CiAJICogVE9ETzogU3VwcG9ydCBvcHRpb25hbCBzdWJlbGVtZW50cwpAQCAtMjg1LDcgKzMwMSw3
-IEBAIHN0YXRpYyBzaXplX3QgYnVpbGRfcmVwb3J0X2Zvcl9ic3Moc3RydWN0IHJybV9iZWFjb25f
-cmVxX2luZm8gKmJlYWNvbiwKIAkgKiAoc2VlICJUT0RPOiBTdXBwb3J0IFJlcG9ydGVkIEZyYW1l
-IEJvZHkuLi4iIGJlbG93KQogCSAqLwogCi0JcmV0dXJuIHRvIC0gc3RhcnQ7CisJcmV0dXJuIHNp
-emVvZihzdHJ1Y3QgcnJtX2JlYWNvbl9yZXBvcnQpOwogfQogCiBzdGF0aWMgYm9vbCBic3NfaW5f
-cmVxdWVzdF9yYW5nZShzdHJ1Y3QgcnJtX2JlYWNvbl9yZXFfaW5mbyAqYmVhY29uLAotLSAKMi4x
-Ny4xCgo=
+ error:
+-	l_queue_destroy(*out, p2p_free_advertised_service_descriptor);
++	l_queue_destroy(*out, p2p_clear_advertised_service_descriptor);
+ 	return false;
+ }
+ =
 
---===============5038782378907077231==--
+@@ -758,7 +758,7 @@ int p2p_parse_beacon(const uint8_t *pdu, size_t len, st=
+ruct p2p_beacon *out)
+ 	if (r >=3D 0)
+ 		memcpy(out, &d, sizeof(d));
+ 	else
+-		p2p_free_beacon(&d);
++		p2p_clear_beacon(&d);
+ =
+
+ 	return r;
+ }
+@@ -784,7 +784,7 @@ int p2p_parse_probe_req(const uint8_t *pdu, size_t len,
+ 	if (r >=3D 0)
+ 		memcpy(out, &d, sizeof(d));
+ 	else
+-		p2p_free_probe_req(&d);
++		p2p_clear_probe_req(&d);
+ =
+
+ 	/*
+ 	 * The additional WSC IE attributes are already covered by
+@@ -814,7 +814,7 @@ int p2p_parse_probe_resp(const uint8_t *pdu, size_t len,
+ 	if (r >=3D 0)
+ 		memcpy(out, &d, sizeof(d));
+ 	else
+-		p2p_free_probe_resp(&d);
++		p2p_clear_probe_resp(&d);
+ =
+
+ 	return r;
+ }
+@@ -837,7 +837,7 @@ int p2p_parse_association_req(const uint8_t *pdu, size_=
+t len,
+ 	if (r >=3D 0)
+ 		memcpy(out, &d, sizeof(d));
+ 	else
+-		p2p_free_association_req(&d);
++		p2p_clear_association_req(&d);
+ =
+
+ 	return r;
+ }
+@@ -961,7 +961,7 @@ int p2p_parse_go_negotiation_req(const uint8_t *pdu, si=
+ze_t len,
+ 	return 0;
+ =
+
+ error:
+-	p2p_free_go_negotiation_req(&d);
++	p2p_clear_go_negotiation_req(&d);
+ 	return r;
+ }
+ =
+
+@@ -1020,7 +1020,7 @@ int p2p_parse_go_negotiation_resp(const uint8_t *pdu,=
+ size_t len,
+ 	return 0;
+ =
+
+ error:
+-	p2p_free_go_negotiation_resp(&d);
++	p2p_clear_go_negotiation_resp(&d);
+ 	return r;
+ }
+ =
+
+@@ -1049,7 +1049,7 @@ int p2p_parse_go_negotiation_confirmation(const uint8=
+_t *pdu, size_t len,
+ 	if (r >=3D 0)
+ 		memcpy(out, &d, sizeof(d));
+ 	else
+-		p2p_free_go_negotiation_confirmation(&d);
++		p2p_clear_go_negotiation_confirmation(&d);
+ =
+
+ 	return r;
+ }
+@@ -1101,7 +1101,7 @@ done:
+ 	if (r >=3D 0)
+ 		memcpy(out, &d, sizeof(d));
+ 	else
+-		p2p_free_invitation_req(&d);
++		p2p_clear_invitation_req(&d);
+ =
+
+ 	return r;
+ }
+@@ -1131,7 +1131,7 @@ int p2p_parse_invitation_resp(const uint8_t *pdu, siz=
+e_t len,
+ 	if (r >=3D 0)
+ 		memcpy(out, &d, sizeof(d));
+ 	else
+-		p2p_free_invitation_resp(&d);
++		p2p_clear_invitation_resp(&d);
+ =
+
+ 	return r;
+ }
+@@ -1254,7 +1254,7 @@ int p2p_parse_provision_disc_req(const uint8_t *pdu, =
+size_t len,
+ 	return 0;
+ =
+
+ error:
+-	p2p_free_provision_disc_req(&d);
++	p2p_clear_provision_disc_req(&d);
+ 	return r;
+ }
+ =
+
+@@ -1332,7 +1332,7 @@ int p2p_parse_provision_disc_resp(const uint8_t *pdu,=
+ size_t len,
+ 	return 0;
+ =
+
+ error:
+-	p2p_free_provision_disc_resp(&d);
++	p2p_clear_provision_disc_resp(&d);
+ 	return r;
+ }
+ =
+
+@@ -1353,7 +1353,7 @@ int p2p_parse_notice_of_absence(const uint8_t *pdu, s=
+ize_t len,
+ 	if (r >=3D 0)
+ 		memcpy(out, &d, sizeof(d));
+ 	else
+-		p2p_free_notice_of_absence(&d);
++		p2p_clear_notice_of_absence(&d);
+ =
+
+ 	return r;
+ }
+@@ -1379,7 +1379,7 @@ int p2p_parse_presence_req(const uint8_t *pdu, size_t=
+ len,
+ 	if (r >=3D 0)
+ 		memcpy(out, &d, sizeof(d));
+ 	else
+-		p2p_free_presence_req(&d);
++		p2p_clear_presence_req(&d);
+ =
+
+ 	return r;
+ }
+@@ -1406,7 +1406,7 @@ int p2p_parse_presence_resp(const uint8_t *pdu, size_=
+t len,
+ 	if (r >=3D 0)
+ 		memcpy(out, &d, sizeof(d));
+ 	else
+-		p2p_free_presence_resp(&d);
++		p2p_clear_presence_resp(&d);
+ =
+
+ 	return r;
+ }
+@@ -1420,132 +1420,132 @@ int p2p_parse_go_disc_req(const uint8_t *pdu, siz=
+e_t len)
+ 	return 0;
+ }
+ =
+
+-static void p2p_free_channel_list_attr(struct p2p_channel_list_attr *attr)
++static void p2p_clear_channel_list_attr(struct p2p_channel_list_attr *attr)
+ {
+ 	l_queue_destroy(attr->channel_entries, l_free);
+ 	attr->channel_entries =3D NULL;
+ }
+ =
+
+-static void p2p_free_notice_of_absence_attr(
++static void p2p_clear_notice_of_absence_attr(
+ 					struct p2p_notice_of_absence_attr *attr)
+ {
+ 	l_queue_destroy(attr->descriptors, l_free);
+ 	attr->descriptors =3D NULL;
+ }
+ =
+
+-static void p2p_free_device_info_attr(struct p2p_device_info_attr *attr)
++static void p2p_clear_device_info_attr(struct p2p_device_info_attr *attr)
+ {
+ 	l_queue_destroy(attr->secondary_device_types, l_free);
+ 	attr->secondary_device_types =3D NULL;
+ }
+ =
+
+-static void p2p_free_group_info_attr(struct l_queue **group_clients)
++static void p2p_clear_group_info_attr(struct l_queue **group_clients)
+ {
+-	l_queue_destroy(*group_clients, p2p_free_client_info_descriptor);
++	l_queue_destroy(*group_clients, p2p_clear_client_info_descriptor);
+ 	*group_clients =3D NULL;
+ }
+ =
+
+-static void p2p_free_interface_attr(struct p2p_interface_attr *attr)
++static void p2p_clear_interface_attr(struct p2p_interface_attr *attr)
+ {
+ 	l_queue_destroy(attr->interface_addrs, l_free);
+ 	attr->interface_addrs =3D NULL;
+ }
+ =
+
+-static void p2p_free_svc_hash_attr(struct l_queue **hashes)
++static void p2p_clear_svc_hash_attr(struct l_queue **hashes)
+ {
+ 	l_queue_destroy(*hashes, l_free);
+ 	*hashes =3D NULL;
+ }
+ =
+
+-static void p2p_free_advertised_service_info_attr(struct l_queue **descrip=
+tors)
++static void p2p_clear_advertised_service_info_attr(struct l_queue **descri=
+ptors)
+ {
+-	l_queue_destroy(*descriptors, p2p_free_advertised_service_descriptor);
++	l_queue_destroy(*descriptors, p2p_clear_advertised_service_descriptor);
+ 	*descriptors =3D NULL;
+ }
+ =
+
+-void p2p_free_beacon(struct p2p_beacon *data)
++void p2p_clear_beacon(struct p2p_beacon *data)
+ {
+-	p2p_free_notice_of_absence_attr(&data->notice_of_absence);
++	p2p_clear_notice_of_absence_attr(&data->notice_of_absence);
+ }
+ =
+
+-void p2p_free_probe_req(struct p2p_probe_req *data)
++void p2p_clear_probe_req(struct p2p_probe_req *data)
+ {
+-	p2p_free_device_info_attr(&data->device_info);
+-	p2p_free_svc_hash_attr(&data->service_hashes);
++	p2p_clear_device_info_attr(&data->device_info);
++	p2p_clear_svc_hash_attr(&data->service_hashes);
+ }
+ =
+
+-void p2p_free_probe_resp(struct p2p_probe_resp *data)
++void p2p_clear_probe_resp(struct p2p_probe_resp *data)
+ {
+-	p2p_free_notice_of_absence_attr(&data->notice_of_absence);
+-	p2p_free_device_info_attr(&data->device_info);
+-	p2p_free_group_info_attr(&data->group_clients);
+-	p2p_free_advertised_service_info_attr(&data->advertised_svcs);
++	p2p_clear_notice_of_absence_attr(&data->notice_of_absence);
++	p2p_clear_device_info_attr(&data->device_info);
++	p2p_clear_group_info_attr(&data->group_clients);
++	p2p_clear_advertised_service_info_attr(&data->advertised_svcs);
+ }
+ =
+
+-void p2p_free_association_req(struct p2p_association_req *data)
++void p2p_clear_association_req(struct p2p_association_req *data)
+ {
+-	p2p_free_device_info_attr(&data->device_info);
+-	p2p_free_interface_attr(&data->interface);
++	p2p_clear_device_info_attr(&data->device_info);
++	p2p_clear_interface_attr(&data->interface);
+ }
+ =
+
+-void p2p_free_association_resp(struct p2p_association_resp *data)
++void p2p_clear_association_resp(struct p2p_association_resp *data)
+ {
+ }
+ =
+
+-void p2p_free_go_negotiation_req(struct p2p_go_negotiation_req *data)
++void p2p_clear_go_negotiation_req(struct p2p_go_negotiation_req *data)
+ {
+-	p2p_free_channel_list_attr(&data->channel_list);
+-	p2p_free_device_info_attr(&data->device_info);
++	p2p_clear_channel_list_attr(&data->channel_list);
++	p2p_clear_device_info_attr(&data->device_info);
+ }
+ =
+
+-void p2p_free_go_negotiation_resp(struct p2p_go_negotiation_resp *data)
++void p2p_clear_go_negotiation_resp(struct p2p_go_negotiation_resp *data)
+ {
+-	p2p_free_channel_list_attr(&data->channel_list);
+-	p2p_free_device_info_attr(&data->device_info);
++	p2p_clear_channel_list_attr(&data->channel_list);
++	p2p_clear_device_info_attr(&data->device_info);
+ }
+ =
+
+-void p2p_free_go_negotiation_confirmation(
++void p2p_clear_go_negotiation_confirmation(
+ 				struct p2p_go_negotiation_confirmation *data)
+ {
+-	p2p_free_channel_list_attr(&data->channel_list);
++	p2p_clear_channel_list_attr(&data->channel_list);
+ }
+ =
+
+-void p2p_free_invitation_req(struct p2p_invitation_req *data)
++void p2p_clear_invitation_req(struct p2p_invitation_req *data)
+ {
+-	p2p_free_channel_list_attr(&data->channel_list);
+-	p2p_free_device_info_attr(&data->device_info);
++	p2p_clear_channel_list_attr(&data->channel_list);
++	p2p_clear_device_info_attr(&data->device_info);
+ }
+ =
+
+-void p2p_free_invitation_resp(struct p2p_invitation_resp *data)
++void p2p_clear_invitation_resp(struct p2p_invitation_resp *data)
+ {
+-	p2p_free_channel_list_attr(&data->channel_list);
++	p2p_clear_channel_list_attr(&data->channel_list);
+ }
+ =
+
+-void p2p_free_provision_disc_req(struct p2p_provision_discovery_req *data)
++void p2p_clear_provision_disc_req(struct p2p_provision_discovery_req *data)
+ {
+-	p2p_free_channel_list_attr(&data->channel_list);
+-	p2p_free_device_info_attr(&data->device_info);
++	p2p_clear_channel_list_attr(&data->channel_list);
++	p2p_clear_device_info_attr(&data->device_info);
+ }
+ =
+
+-void p2p_free_provision_disc_resp(struct p2p_provision_discovery_resp *dat=
+a)
++void p2p_clear_provision_disc_resp(struct p2p_provision_discovery_resp *da=
+ta)
+ {
+-	p2p_free_channel_list_attr(&data->channel_list);
+-	p2p_free_device_info_attr(&data->device_info);
++	p2p_clear_channel_list_attr(&data->channel_list);
++	p2p_clear_device_info_attr(&data->device_info);
+ }
+ =
+
+-void p2p_free_notice_of_absence(struct p2p_notice_of_absence *data)
++void p2p_clear_notice_of_absence(struct p2p_notice_of_absence *data)
+ {
+-	p2p_free_notice_of_absence_attr(&data->notice_of_absence);
++	p2p_clear_notice_of_absence_attr(&data->notice_of_absence);
+ }
+ =
+
+-void p2p_free_presence_req(struct p2p_presence_req *data)
++void p2p_clear_presence_req(struct p2p_presence_req *data)
+ {
+-	p2p_free_notice_of_absence_attr(&data->notice_of_absence);
++	p2p_clear_notice_of_absence_attr(&data->notice_of_absence);
+ }
+ =
+
+-void p2p_free_presence_resp(struct p2p_presence_resp *data)
++void p2p_clear_presence_resp(struct p2p_presence_resp *data)
+ {
+-	p2p_free_notice_of_absence_attr(&data->notice_of_absence);
++	p2p_clear_notice_of_absence_attr(&data->notice_of_absence);
+ }
+ =
+
+ struct p2p_attr_builder {
+diff --git a/src/p2putil.h b/src/p2putil.h
+index 681d9e33..09c72c74 100644
+--- a/src/p2putil.h
++++ b/src/p2putil.h
+@@ -462,22 +462,22 @@ int p2p_parse_presence_resp(const uint8_t *pdu, size_=
+t len,
+ 				struct p2p_presence_resp *out);
+ int p2p_parse_go_disc_req(const uint8_t *pdu, size_t len);
+ =
+
+-void p2p_free_beacon(struct p2p_beacon *data);
+-void p2p_free_probe_req(struct p2p_probe_req *data);
+-void p2p_free_probe_resp(struct p2p_probe_resp *data);
+-void p2p_free_association_req(struct p2p_association_req *data);
+-void p2p_free_association_resp(struct p2p_association_resp *data);
+-void p2p_free_go_negotiation_req(struct p2p_go_negotiation_req *data);
+-void p2p_free_go_negotiation_resp(struct p2p_go_negotiation_resp *data);
+-void p2p_free_go_negotiation_confirmation(
++void p2p_clear_beacon(struct p2p_beacon *data);
++void p2p_clear_probe_req(struct p2p_probe_req *data);
++void p2p_clear_probe_resp(struct p2p_probe_resp *data);
++void p2p_clear_association_req(struct p2p_association_req *data);
++void p2p_clear_association_resp(struct p2p_association_resp *data);
++void p2p_clear_go_negotiation_req(struct p2p_go_negotiation_req *data);
++void p2p_clear_go_negotiation_resp(struct p2p_go_negotiation_resp *data);
++void p2p_clear_go_negotiation_confirmation(
+ 				struct p2p_go_negotiation_confirmation *data);
+-void p2p_free_invitation_req(struct p2p_invitation_req *data);
+-void p2p_free_invitation_resp(struct p2p_invitation_resp *data);
+-void p2p_free_provision_disc_req(struct p2p_provision_discovery_req *data);
+-void p2p_free_provision_disc_resp(struct p2p_provision_discovery_resp *dat=
+a);
+-void p2p_free_notice_of_absence(struct p2p_notice_of_absence *data);
+-void p2p_free_presence_req(struct p2p_presence_req *data);
+-void p2p_free_presence_resp(struct p2p_presence_resp *data);
++void p2p_clear_invitation_req(struct p2p_invitation_req *data);
++void p2p_clear_invitation_resp(struct p2p_invitation_resp *data);
++void p2p_clear_provision_disc_req(struct p2p_provision_discovery_req *data=
+);
++void p2p_clear_provision_disc_resp(struct p2p_provision_discovery_resp *da=
+ta);
++void p2p_clear_notice_of_absence(struct p2p_notice_of_absence *data);
++void p2p_clear_presence_req(struct p2p_presence_req *data);
++void p2p_clear_presence_resp(struct p2p_presence_resp *data);
+ =
+
+ uint8_t *p2p_build_beacon(const struct p2p_beacon *data, size_t *out_len);
+ uint8_t *p2p_build_probe_req(const struct p2p_probe_req *data, size_t *out=
+_len);
+-- =
+
+2.20.1
+
+--===============7918758018291312683==--
 
