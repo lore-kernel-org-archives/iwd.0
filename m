@@ -1,186 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============3814435407005143572=="
+Content-Type: multipart/mixed; boundary="===============3779711763959184621=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 6/6] netdev: Replace bool randomize_mac with specific
- address
-Date: Thu, 21 Nov 2019 04:24:36 +0100
-Message-ID: <CAOq732+-pdHt9Xtq5jC6Ng4TYSfk8FdG0kXvGP4mPd+_ZsxZ+g@mail.gmail.com>
-In-Reply-To: <67caa6ed-07b8-9a60-9426-b3b14d8fba22@gmail.com>
+From: Jeff Chua <jeff.chua.linux@gmail.com>
+Subject: Re: iwd needs connman service?
+Date: Thu, 21 Nov 2019 18:06:21 +0800
+Message-ID: <CAAJw_ZvDaF6p=Pxk7QKCM6djiJwgzroDTuJZXw8rk3o1Zg3ORg@mail.gmail.com>
+In-Reply-To: <baf56838-c87d-5c2f-ae07-324fed245e86@monom.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3814435407005143572==
+--===============3779711763959184621==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+> Current HEAD of iwd works just fine for me with ConnMan HEAD. Denis is
+right, the iwd plugin in ConnMan needs to be updated. It's my next item
+on my TODO list.
 
-On Thu, 21 Nov 2019 at 03:43, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 11/20/19 4:23 PM, Andrew Zaborowski wrote:
-> > Allow netdev_create_from_genl callers to draw a random or non-random MAC
-> > and pass it in the parameter instead of a bool to tell us to generating
-> > the MAC locally.  In P2P we are generating the MAC some time before
-> > creating the netdev to pass it to the peer during negotiation.
-> > ---
-> >   src/manager.c | 22 ++++++++++++++++++----
-> >   src/netdev.c  | 44 +++++++++++++++++++++-----------------------
-> >   src/netdev.h  |  3 ++-
-> >   3 files changed, 41 insertions(+), 28 deletions(-)
-> >
->
-> <snip>
->
-> > diff --git a/src/netdev.c b/src/netdev.c
-> > index eb8a7ce8..eea7267d 100644
-> > --- a/src/netdev.c
-> > +++ b/src/netdev.c
-> > @@ -125,6 +125,7 @@ struct netdev {
-> >       int8_t cur_rssi;
-> >       struct l_timeout *rssi_poll_timeout;
-> >       uint32_t rssi_poll_cmd_id;
-> > +     uint8_t *set_mac_once;
->
-> So just nit-picking, but using uint8_t set_mac_once[6] would still use
-> less space (at least on 64-bit) and also skip mallocing/freeing 6 byte
-> array...
->
-> Set it to all zeros or something to act as a NULL value
+Can you make iwd work without connman?
 
-Ok.
+My best.,
+Jeff
 
->
-> >
-> >       uint32_t set_powered_cmd_id;
-> >       netdev_command_cb_t set_powered_cb;
-> > @@ -147,7 +148,6 @@ struct netdev {
-> >       bool ignore_connect_event : 1;
-> >       bool expect_connect_failure : 1;
-> >       bool aborting : 1;
-> > -     bool mac_randomize_once : 1;
-> >       bool events_ready : 1;
-> >   };
-> >
-> > @@ -634,6 +634,7 @@ static void netdev_free(void *data)
-> >
-> >       l_io_destroy(netdev->pae_io);
-> >
-> > +     l_free(netdev->set_mac_once);
-> >       l_free(netdev);
-> >   }
-> >
-> > @@ -4255,6 +4256,21 @@ static void netdev_set_mac_cb(int error, uint16_=
-t type, const void *data,
-> >                                       netdev_initial_up_cb, netdev, NUL=
-L);
-> >   }
-> >
-> > +static bool netdev_check_set_mac(struct netdev *netdev)
-> > +{
-> > +     if (!netdev->set_mac_once)
-> > +             return false;
-> > +
-> > +     l_debug("Setting initial address on ifindex: %d to: " MAC,
-> > +             netdev->index, MAC_STR(netdev->set_mac_once));
-> > +     netdev->set_powered_cmd_id =3D
-> > +             rtnl_set_mac(rtnl, netdev->index, netdev->set_mac_once,
-> > +                             netdev_set_mac_cb, netdev, NULL);
-> > +     l_free(netdev->set_mac_once);
-> > +     netdev->set_mac_once =3D NULL;
-> > +     return true;
-> > +}
-> > +
-> >   static void netdev_initial_down_cb(int error, uint16_t type, const vo=
-id *data,
-> >                                       uint32_t len, void *user_data)
-> >   {
-> > @@ -4270,17 +4286,8 @@ static void netdev_initial_down_cb(int error, ui=
-nt16_t type, const void *data,
-> >               return;
-> >       }
-> >
-> > -     if (netdev->mac_randomize_once) {
-> > -             uint8_t addr[ETH_ALEN];
-> > -
-> > -             wiphy_generate_random_address(netdev->wiphy, addr);
-> > -             l_debug("Setting initial random address on "
-> > -                     "ifindex: %d to: "MAC, netdev->index, MAC_STR(add=
-r));
-> > -             netdev->set_powered_cmd_id =3D
-> > -                     rtnl_set_mac(rtnl, netdev->index, addr,
-> > -                                     netdev_set_mac_cb, netdev, NULL);
-> > +     if (netdev_check_set_mac(netdev))
-> >               return;
-> > -     }
-> >
-> >       netdev->set_powered_cmd_id =3D
-> >               rtnl_set_powered(rtnl, netdev->index, true,
-> > @@ -4322,17 +4329,8 @@ static void netdev_getlink_cb(int error, uint16_=
-t type, const void *data,
-> >        */
-> >       powered =3D netdev_get_is_up(netdev);
-> >
-> > -     if (!powered && netdev->mac_randomize_once) {
-> > -             uint8_t addr[ETH_ALEN];
-> > -
-> > -             wiphy_generate_random_address(netdev->wiphy, addr);
-> > -             l_debug("Setting initial random address on "
-> > -                     "ifindex: %d to: "MAC, netdev->index, MAC_STR(add=
-r));
-> > -             netdev->set_powered_cmd_id =3D
-> > -                     rtnl_set_mac(rtnl, netdev->index, addr,
-> > -                                     netdev_set_mac_cb, netdev, NULL);
-> > +     if (!powered && netdev_check_set_mac(netdev))
-> >               return;
-> > -     }
-> >
-> >       cb =3D powered ? netdev_initial_down_cb : netdev_initial_up_cb;
-> >
-> > @@ -4507,7 +4505,7 @@ error:
-> >       return NULL;
-> >   }
-> >
-> > -struct netdev *netdev_create_from_genl(struct l_genl_msg *msg, bool ra=
-ndom_mac)
-> > +struct netdev *netdev_create_from_genl(struct l_genl_msg *msg, const u=
-int8_t set_mac[6])
-> >   {
-> >       struct l_genl_attr attr;
-> >       uint16_t type, len;
-> > @@ -4624,7 +4622,7 @@ struct netdev *netdev_create_from_genl(struct l_g=
-enl_msg *msg, bool random_mac)
-> >       memcpy(netdev->name, ifname, ifname_len);
-> >       netdev->wiphy =3D wiphy;
-> >       netdev->pae_over_nl80211 =3D pae_io =3D=3D NULL;
-> > -     netdev->mac_randomize_once =3D random_mac;
-> > +     netdev->set_mac_once =3D set_mac ? l_memdup(set_mac, 6) : NULL;
-> >
-> >       if (pae_io) {
-> >               netdev->pae_io =3D pae_io;
-> > diff --git a/src/netdev.h b/src/netdev.h
-> > index 032265f9..c5b6f139 100644
-> > --- a/src/netdev.h
-> > +++ b/src/netdev.h
-> > @@ -205,5 +205,6 @@ uint32_t netdev_station_watch_add(struct netdev *ne=
-tdev,
-> >
-> >   bool netdev_station_watch_remove(struct netdev *netdev, uint32_t id);
-> >
-> > -struct netdev *netdev_create_from_genl(struct l_genl_msg *msg, bool ra=
-ndom_mac);
-> > +struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
-> > +                                     const uint8_t addr[6]);
->
-> Nitpicking again.  This syntax is pretty useless since addr is treated
-> like a const uint8_t *.  It only serves to confuse the reader.  We
-> should not be using this form at all.
->
-> Use const uint8_t addr[static 6] instead.
 
-This seems to prohibit passing a NULL, so we'd also need to pass
-all-zero arrays from the caller.  I think I'd rather use const uint8_t
-*addr then.
+On Wed, Nov 20, 2019 at 3:55 AM Daniel Wagner <wagi@monom.org> wrote:
 
-Best regards
---===============3814435407005143572==--
+> On 18.11.19 19:55, Denis Kenzior wrote:
+> > Hi Jeff,
+> >
+> > On 11/15/19 7:12 PM, Jeff Chua wrote:
+> >> Prior to Nov 09, I could connect with connman, but git pull after that
+> >> doesn't work with connman service, and even with connman, I still
+> >> can't iwd.
+> >
+> > I suspect that connman has not been updated to iwd 1.0 APIs.  So you may
+> > be stuck with 0.23 or so until someone fixes ConnMan to use iwd 1.0+
+> > properly.
+>
+> Current HEAD of iwd works just fine for me with ConnMan HEAD. Denis is
+> right, the iwd plugin in ConnMan needs to be updated. It's my next item
+> on my TODO list.
+>
+> Thanks,
+> Daniel
+>
+
+--===============3779711763959184621==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGRpdiBkaXI9Imx0ciI+PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIg
+c3R5bGU9ImZvbnQtZmFtaWx5OnZlcmRhbmEsc2Fucy1zZXJpZiI+PGJyIGNsZWFyPSJhbGwiPjwv
+ZGl2PjxkaXY+PGRpdiBkaXI9Imx0ciIgY2xhc3M9ImdtYWlsX3NpZ25hdHVyZSIgZGF0YS1zbWFy
+dG1haWw9ImdtYWlsX3NpZ25hdHVyZSI+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6dmVyZGFuYSxz
+YW5zLXNlcmlmIiBjbGFzcz0iZ21haWxfZGVmYXVsdCI+Jmd0OyBDdXJyZW50IEhFQUQgb2YgaXdk
+IHdvcmtzIGp1c3QgZmluZSBmb3IgbWUgd2l0aCBDb25uTWFuIEhFQUQuIERlbmlzIGlzIDxicj4K
+cmlnaHQsIHRoZSBpd2QgcGx1Z2luIGluIENvbm5NYW4gbmVlZHMgdG8gYmUgdXBkYXRlZC4gSXQm
+IzM5O3MgbXkgbmV4dCBpdGVtIDxicj4Kb24gbXkgVE9ETyBsaXN0LjwvZGl2PjxkaXYgc3R5bGU9
+ImZvbnQtZmFtaWx5OnZlcmRhbmEsc2Fucy1zZXJpZiIgY2xhc3M9ImdtYWlsX2RlZmF1bHQiPjxi
+cj48L2Rpdj48ZGl2IHN0eWxlPSJmb250LWZhbWlseTp2ZXJkYW5hLHNhbnMtc2VyaWYiIGNsYXNz
+PSJnbWFpbF9kZWZhdWx0Ij5DYW4geW91IG1ha2UgaXdkIHdvcmsgd2l0aG91dCBjb25ubWFuPzxi
+cj48L2Rpdj48YnI+TXkgYmVzdC4sPGJyPkplZmY8YnI+PC9kaXY+PC9kaXY+PGJyPjwvZGl2Pjxi
+cj48ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+PGRpdiBkaXI9Imx0ciIgY2xhc3M9ImdtYWlsX2F0
+dHIiPk9uIFdlZCwgTm92IDIwLCAyMDE5IGF0IDM6NTUgQU0gRGFuaWVsIFdhZ25lciAmbHQ7PGEg
+aHJlZj0ibWFpbHRvOndhZ2lAbW9ub20ub3JnIj53YWdpQG1vbm9tLm9yZzwvYT4mZ3Q7IHdyb3Rl
+Ojxicj48L2Rpdj48YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJtYXJnaW46
+MHB4IDBweCAwcHggMC44ZXg7Ym9yZGVyLWxlZnQ6MXB4IHNvbGlkIHJnYigyMDQsMjA0LDIwNCk7
+cGFkZGluZy1sZWZ0OjFleCI+T24gMTguMTEuMTkgMTk6NTUsIERlbmlzIEtlbnppb3Igd3JvdGU6
+PGJyPgomZ3Q7IEhpIEplZmYsPGJyPgomZ3Q7IDxicj4KJmd0OyBPbiAxMS8xNS8xOSA3OjEyIFBN
+LCBKZWZmIENodWEgd3JvdGU6PGJyPgomZ3Q7Jmd0OyBQcmlvciB0byBOb3YgMDksIEkgY291bGQg
+Y29ubmVjdCB3aXRoIGNvbm5tYW4sIGJ1dCBnaXQgcHVsbCBhZnRlciB0aGF0IDxicj4KJmd0OyZn
+dDsgZG9lc24mIzM5O3Qgd29yayB3aXRoIGNvbm5tYW4gc2VydmljZSwgYW5kIGV2ZW4gd2l0aCBj
+b25ubWFuLCBJIHN0aWxsIDxicj4KJmd0OyZndDsgY2FuJiMzOTt0IGl3ZC48YnI+CiZndDsgPGJy
+PgomZ3Q7IEkgc3VzcGVjdCB0aGF0IGNvbm5tYW4gaGFzIG5vdCBiZWVuIHVwZGF0ZWQgdG8gaXdk
+IDEuMCBBUElzLsKgIFNvIHlvdSBtYXkgPGJyPgomZ3Q7IGJlIHN0dWNrIHdpdGggMC4yMyBvciBz
+byB1bnRpbCBzb21lb25lIGZpeGVzIENvbm5NYW4gdG8gdXNlIGl3ZCAxLjArIDxicj4KJmd0OyBw
+cm9wZXJseS48YnI+Cjxicj4KQ3VycmVudCBIRUFEIG9mIGl3ZCB3b3JrcyBqdXN0IGZpbmUgZm9y
+IG1lIHdpdGggQ29ubk1hbiBIRUFELiBEZW5pcyBpcyA8YnI+CnJpZ2h0LCB0aGUgaXdkIHBsdWdp
+biBpbiBDb25uTWFuIG5lZWRzIHRvIGJlIHVwZGF0ZWQuIEl0JiMzOTtzIG15IG5leHQgaXRlbSA8
+YnI+Cm9uIG15IFRPRE8gbGlzdC48YnI+Cjxicj4KVGhhbmtzLDxicj4KRGFuaWVsPGJyPgo8L2Js
+b2NrcXVvdGU+PC9kaXY+PC9kaXY+Cg==
+
+--===============3779711763959184621==--
 
