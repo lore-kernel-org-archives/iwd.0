@@ -1,142 +1,221 @@
-Content-Type: multipart/mixed; boundary="===============2190920000732168780=="
+Content-Type: multipart/mixed; boundary="===============5038782378907077231=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 4/4] rrm: add packed struct for beacon reports
-Date: Thu, 21 Nov 2019 12:09:01 -0800
-Message-ID: <20191121200901.25826-4-prestwoj@gmail.com>
-In-Reply-To: <20191121200901.25826-1-prestwoj@gmail.com>
+Subject: RRM start time changes
+Date: Thu, 21 Nov 2019 12:12:10 -0800
+Message-ID: <5018f5cd53120bf19a3267d83c809f3476b4e1e9.camel@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2190920000732168780==
+--===============5038782378907077231==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-build_report_for_bss was refactored to use this packed structure rather
-than l_put_* APIs.
----
- src/rrm.c | 66 ++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 41 insertions(+), 25 deletions(-)
+Sending as attachments due to weird non-ascii character fix
 
-diff --git a/src/rrm.c b/src/rrm.c
-index 660565eb..3b600f09 100644
---- a/src/rrm.c
-+++ b/src/rrm.c
-@@ -122,6 +122,21 @@ struct rrm_state {
- 	uint64_t last_request;
- };
- =
+--===============5038782378907077231==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-rrm-fix-non-ascii-character-in-comment.patch"
 
-+/* 802.11, Section 9.4.2.22.7 */
-+struct rrm_beacon_report {
-+	uint8_t oper_class;
-+	uint8_t channel;
-+	__le64 scan_start_time;
-+	__le16 duration;
-+	uint8_t frame_info;
-+	uint8_t rcpi;
-+	uint8_t rsni;
-+	uint8_t bssid[6];
-+	uint8_t antenna_id;
-+	__le32 parent_tsf;
-+	uint8_t subelements[0];
-+} __attribute__ ((packed));
-+
- static struct l_queue *states;
- static struct l_genl_family *nl80211;
- static uint32_t netdev_watch;
-@@ -225,6 +240,17 @@ static void rrm_build_measurement_report(struct rrm_re=
-quest_info *info,
- 		memcpy(to, report, report_len);
- }
- =
+RnJvbSAwM2RhNzFmYzdjMmE3M2FjMWI2MzAwYjM2YzU1Zjk2YzcxMDU3ODIzIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
+RGF0ZTogVGh1LCAyMSBOb3YgMjAxOSAxMjowNzowMCAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggMS80
+XSBycm06IGZpeCBub24tYXNjaWkgY2hhcmFjdGVyIGluIGNvbW1lbnQKCi0tLQogc3JjL3JybS5j
+IHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpk
+aWZmIC0tZ2l0IGEvc3JjL3JybS5jIGIvc3JjL3JybS5jCmluZGV4IDJiMGEyMmZiLi5kZGY4ZTM5
+NSAxMDA2NDQKLS0tIGEvc3JjL3JybS5jCisrKyBiL3NyYy9ycm0uYwpAQCAtMjc0LDcgKzI3NCw3
+IEBAIHN0YXRpYyBzaXplX3QgYnVpbGRfcmVwb3J0X2Zvcl9ic3Moc3RydWN0IHJybV9iZWFjb25f
+cmVxX2luZm8gKmJlYWNvbiwKIAkgKiA4MDIuMTEgOS40LjIuMjIuNyBCZWFjb24gcmVwb3J0CiAJ
+ICoKIAkgKiAiVGhlIFBhcmVudCBUU0YgZmllbGQgY29udGFpbnMgdGhlIGxvd2VyIDQgb2N0ZXRz
+IG9mIHRoZSBtZWFzdXJpbmcKLQkgKiAgU1RB4oCZcyBUU0YgdGltZXIgdmFsdWUiCisJICogIFNU
+QSdzIFRTRiB0aW1lciB2YWx1ZSIKIAkgKi8KIAlsX3B1dF9sZTMyKCh1aW50MzJfdCkoYnNzLT5w
+YXJlbnRfdHNmICYgMHhmZmZmZmZmZiksIHRvKTsKIAl0byArPSA0OwotLSAKMi4xNy4xCgo=
 
-+/* 802.11 Table 9-154 */
-+static uint8_t mdb_to_rcpi(int32_t mdb)
-+{
-+	if (mdb <=3D 10950)
-+		return 0;
-+	else if (mdb >=3D -10950 && mdb < 0)
-+		return ((uint8_t)((2 * (mdb + 11000)) / 100));
-+	else
-+		return 220;
-+}
-+
- /*
-  * 802.11-2016 11.11.9.1 Beacon report
-  *
-@@ -246,38 +272,28 @@ static size_t build_report_for_bss(struct rrm_beacon_=
-req_info *beacon,
- 					struct scan_bss *bss,
- 					uint8_t *to)
- {
--	uint8_t *start =3D to;
--
--	*to++ =3D beacon->oper_class;
--	*to++ =3D scan_freq_to_channel(bss->frequency, NULL);
--	l_put_le64(beacon->scan_start_time, to);
--	to +=3D 8;
--	l_put_le16(beacon->duration, to);
--	to +=3D 2;
--	*to++ =3D rrm_phy_type(bss);
--
--	/* 802.11 Table 9-154 - RCPI values */
--	if (bss->signal_strength < -10950)
--		*to++ =3D 0;
--	else if (bss->signal_strength >=3D -10950 && bss->signal_strength < 0)
--		*to++ =3D (uint8_t)((2 * (bss->signal_strength + 11000)) / 100);
--	else
--		*to++ =3D 220;
-+	struct rrm_beacon_report *report =3D (struct rrm_beacon_report *) to;
-+
-+	report->oper_class =3D beacon->oper_class;
-+	report->channel =3D scan_freq_to_channel(bss->frequency, NULL);
-+	report->scan_start_time =3D beacon->scan_start_time;
-+	report->duration =3D beacon->duration;
-+	report->frame_info =3D rrm_phy_type(bss);
-+	report->rcpi =3D mdb_to_rcpi(bss->signal_strength);
- =
+--===============5038782378907077231==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0002-scan-parse-the-scan-start-time.patch"
 
- 	/* RSNI not available (could get this from GET_SURVEY) */
--	*to++ =3D 255;
--	memcpy(to, bss->addr, 6);
--	to +=3D 6;
--	/* Antenna identifier unknown */
--	*to++ =3D 0;
-+	report->rsni =3D 255;
-+	memcpy(report->bssid, bss->addr, 6);
-+
-+	report->antenna_id =3D 0;
-+
- 	/*
- 	 * 802.11 9.4.2.22.7 Beacon report
- 	 *
- 	 * "The Parent TSF field contains the lower 4 octets of the measuring
- 	 *  STA's TSF timer value"
- 	 */
--	l_put_le32((uint32_t)(bss->parent_tsf & 0xffffffff), to);
--	to +=3D 4;
-+	report->parent_tsf =3D (uint32_t)bss->parent_tsf;
- =
+RnJvbSA4Nzc2NWQ5ZmM0NTJjNzJhOTExYTJkMjBlYmJmYjEyMDA0MTA5NTg3IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
+RGF0ZTogVHVlLCAxOSBOb3YgMjAxOSAxNDoxMDoyMyAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggMi80
+XSBzY2FuOiBwYXJzZSB0aGUgc2NhbiBzdGFydCB0aW1lCgpUaGUga2VybmVsIHNlbmRzIE5MODAy
+MTFfQVRUUl9TQ0FOX1NUQVJUX1RJTUVfVFNGIHdpdGggQ01EX1RSSUdHRVIgYW5kClJSTSByZXF1
+aXJlcyB0aGlzIHZhbHVlIGZvciBiZWFjb24gbWVhc3VyZW1lbnQgcmVwb3J0cy4KClRoZSBzdGFy
+dCB0aW1lIGlzIHBhcnNlZCBkdXJpbmcgQ01EX1RSSUdHRVIgYW5kIHNldCBpbnRvIHRoZSBzY2Fu
+IHJlcXVlc3QuCkEgZ2V0dGVyIHdhcyBhZGRlZCB0byBvYnRhaW4gdGhpcyB0aW1lIHZhbHVlIGZv
+ciBhbiBhbHJlYWR5IHRyaWdnZXJlZApzY2FuLgoKQWZ0ZXIgbWFraW5nIHRoZSBjaGFuZ2UsIHRo
+ZSBTQ0FOX0FCT1JURUQgY2FzZSB3YXMgY2xlYW5lZCB1cCBhIGJpdCB0bwpyZW1vdmUgdGhlIGxv
+Y2FsIHNjYW5fcmVxdWVzdCB1c2FnZSBpbiBmYXZvciBvZiB0aGUgb25lIHVzZWQgZm9yIGFsbCB0
+aGUKb3RoZXIgY2FzZXMuCi0tLQogc3JjL3NjYW4uYyB8IDQxICsrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKystLS0tLS0tCiBzcmMvc2Nhbi5oIHwgIDIgKysKIDIgZmlsZXMgY2hhbmdl
+ZCwgMzYgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvc2Nh
+bi5jIGIvc3JjL3NjYW4uYwppbmRleCBlMDA3Y2U1ZC4uZTJkNzM2MDEgMTAwNjQ0Ci0tLSBhL3Ny
+Yy9zY2FuLmMKKysrIGIvc3JjL3NjYW4uYwpAQCAtNzUsNiArNzUsOCBAQCBzdHJ1Y3Qgc2Nhbl9y
+ZXF1ZXN0IHsKIAlzY2FuX2Rlc3Ryb3lfZnVuY190IGRlc3Ryb3k7CiAJYm9vbCBwYXNzaXZlOjE7
+IC8qIEFjdGl2ZSBvciBQYXNzaXZlIHNjYW4/ICovCiAJc3RydWN0IGxfcXVldWUgKmNtZHM7CisJ
+LyogVGhlIHRpbWUgdGhlIGN1cnJlbnQgc2NhbiB3YXMgc3RhcnRlZC4gUmVwb3J0ZWQgaW4gVFJJ
+R0dFUl9TQ0FOICovCisJdWludDY0X3Qgc3RhcnRfdGltZV90c2Y7CiB9OwogCiBzdHJ1Y3Qgc2Nh
+bl9jb250ZXh0IHsKQEAgLTc3OCw2ICs3ODAsMjUgQEAgYm9vbCBzY2FuX3BlcmlvZGljX3N0b3Ao
+dWludDY0X3Qgd2Rldl9pZCkKIAlyZXR1cm4gdHJ1ZTsKIH0KIAordWludDY0X3Qgc2Nhbl9nZXRf
+dHJpZ2dlcmVkX3RpbWUodWludDY0X3Qgd2Rldl9pZCwgdWludDMyX3QgaWQpCit7CisJc3RydWN0
+IHNjYW5fY29udGV4dCAqc2M7CisJc3RydWN0IHNjYW5fcmVxdWVzdCAqc3I7CisKKwlzYyA9IGxf
+cXVldWVfZmluZChzY2FuX2NvbnRleHRzLCBzY2FuX2NvbnRleHRfbWF0Y2gsICZ3ZGV2X2lkKTsK
+KwlpZiAoIXNjKQorCQlyZXR1cm4gMDsKKworCWlmICghc2MtPnRyaWdnZXJlZCkKKwkJcmV0dXJu
+IDA7CisKKwlzciA9IGxfcXVldWVfZmluZChzYy0+cmVxdWVzdHMsIHNjYW5fcmVxdWVzdF9tYXRj
+aCwgTF9VSU5UX1RPX1BUUihpZCkpOworCWlmICghc3IpCisJCXJldHVybiAwOworCisJcmV0dXJu
+IHNyLT5zdGFydF90aW1lX3RzZjsKK30KKwogc3RhdGljIHZvaWQgc2Nhbl9wZXJpb2RpY190aW1l
+b3V0KHN0cnVjdCBsX3RpbWVvdXQgKnRpbWVvdXQsIHZvaWQgKnVzZXJfZGF0YSkKIHsKIAlzdHJ1
+Y3Qgc2Nhbl9jb250ZXh0ICpzYyA9IHVzZXJfZGF0YTsKQEAgLTE0MzksNiArMTQ2MCw4IEBAIHN0
+YXRpYyB2b2lkIHNjYW5fbm90aWZ5KHN0cnVjdCBsX2dlbmxfbXNnICptc2csIHZvaWQgKnVzZXJf
+ZGF0YSkKIAl1aW50MzJfdCB3aXBoeV9pZDsKIAlzdHJ1Y3Qgc2Nhbl9jb250ZXh0ICpzYzsKIAli
+b29sIGFjdGl2ZV9zY2FuID0gZmFsc2U7CisJdWludDY0X3Qgc3RhcnRfdGltZV90c2YgPSAwOwor
+CXN0cnVjdCBzY2FuX3JlcXVlc3QgKnNyOwogCiAJY21kID0gbF9nZW5sX21zZ19nZXRfY29tbWFu
+ZChtc2cpOwogCkBAIC0xNDYxLDE1ICsxNDg0LDIyIEBAIHN0YXRpYyB2b2lkIHNjYW5fbm90aWZ5
+KHN0cnVjdCBsX2dlbmxfbXNnICptc2csIHZvaWQgKnVzZXJfZGF0YSkKIAkJY2FzZSBOTDgwMjEx
+X0FUVFJfU0NBTl9TU0lEUzoKIAkJCWFjdGl2ZV9zY2FuID0gdHJ1ZTsKIAkJCWJyZWFrOworCQlj
+YXNlIE5MODAyMTFfQVRUUl9TQ0FOX1NUQVJUX1RJTUVfVFNGOgorCQkJaWYgKGxlbiAhPSBzaXpl
+b2YodWludDY0X3QpKQorCQkJCXJldHVybjsKKworCQkJc3RhcnRfdGltZV90c2YgPSBsX2dldF91
+NjQoZGF0YSk7CisJCQlicmVhazsKIAkJfQogCX0KIAorCXNyID0gbF9xdWV1ZV9wZWVrX2hlYWQo
+c2MtPnJlcXVlc3RzKTsKKwogCXN3aXRjaCAoY21kKSB7CiAJY2FzZSBOTDgwMjExX0NNRF9ORVdf
+U0NBTl9SRVNVTFRTOgogCXsKIAkJc3RydWN0IGxfZ2VubF9tc2cgKnNjYW5fbXNnOwogCQlzdHJ1
+Y3Qgc2Nhbl9yZXN1bHRzICpyZXN1bHRzOwotCQlzdHJ1Y3Qgc2Nhbl9yZXF1ZXN0ICpzciA9IGxf
+cXVldWVfcGVla19oZWFkKHNjLT5yZXF1ZXN0cyk7CiAJCWJvb2wgc2VuZF9uZXh0ID0gZmFsc2U7
+CiAJCWJvb2wgZ2V0X3Jlc3VsdHMgPSBmYWxzZTsKIApAQCAtMTU0MywxMiArMTU3MywxMSBAQCBz
+dGF0aWMgdm9pZCBzY2FuX25vdGlmeShzdHJ1Y3QgbF9nZW5sX21zZyAqbXNnLCB2b2lkICp1c2Vy
+X2RhdGEpCiAJCWVsc2UKIAkJCXNjLT5zdGF0ZSA9IFNDQU5fU1RBVEVfUEFTU0lWRTsKIAorCQlz
+ci0+c3RhcnRfdGltZV90c2YgPSBzdGFydF90aW1lX3RzZjsKKwogCQlicmVhazsKIAogCWNhc2Ug
+Tkw4MDIxMV9DTURfU0NBTl9BQk9SVEVEOgotCXsKLQkJc3RydWN0IHNjYW5fcmVxdWVzdCAqc3Ig
+PSBsX3F1ZXVlX3BlZWtfaGVhZChzYy0+cmVxdWVzdHMpOwotCiAJCWlmIChzYy0+c3RhdGUgPT0g
+U0NBTl9TVEFURV9OT1RfUlVOTklORykKIAkJCWJyZWFrOwogCkBAIC0xNTU3LDggKzE1ODYsNyBA
+QCBzdGF0aWMgdm9pZCBzY2FuX25vdGlmeShzdHJ1Y3QgbF9nZW5sX21zZyAqbXNnLCB2b2lkICp1
+c2VyX2RhdGEpCiAJCWlmIChzYy0+dHJpZ2dlcmVkKSB7CiAJCQlzYy0+dHJpZ2dlcmVkID0gZmFs
+c2U7CiAKLQkJCXNjYW5fZmluaXNoZWQoc2MsIC1FQ0FOQ0VMRUQsIE5VTEwsCi0JCQkJCWxfcXVl
+dWVfcGVla19oZWFkKHNjLT5yZXF1ZXN0cykpOworCQkJc2Nhbl9maW5pc2hlZChzYywgLUVDQU5D
+RUxFRCwgTlVMTCwgc3IpOwogCQl9IGVsc2UgaWYgKHNyICYmICFzYy0+c3RhcnRfY21kX2lkICYm
+ICFzYy0+Z2V0X3NjYW5fY21kX2lkKSB7CiAJCQkvKgogCQkJICogSWYgdGhpcyB3YXMgYW4gZXh0
+ZXJuYWwgc2NhbiB0aGF0IGdvdCBhYm9ydGVkCkBAIC0xNTcyLDcgKzE2MDAsNiBAQCBzdGF0aWMg
+dm9pZCBzY2FuX25vdGlmeShzdHJ1Y3QgbF9nZW5sX21zZyAqbXNnLCB2b2lkICp1c2VyX2RhdGEp
+CiAKIAkJYnJlYWs7CiAJfQotCX0KIH0KIAogdWludDhfdCBzY2FuX2ZyZXFfdG9fY2hhbm5lbCh1
+aW50MzJfdCBmcmVxLCBlbnVtIHNjYW5fYmFuZCAqb3V0X2JhbmQpCmRpZmYgLS1naXQgYS9zcmMv
+c2Nhbi5oIGIvc3JjL3NjYW4uaAppbmRleCA4ZmMyYWE1Ni4uYjZjNGUxMmQgMTAwNjQ0Ci0tLSBh
+L3NyYy9zY2FuLmgKKysrIGIvc3JjL3NjYW4uaApAQCAtMTI0LDYgKzEyNCw4IEBAIHZvaWQgc2Nh
+bl9wZXJpb2RpY19zdGFydCh1aW50NjRfdCB3ZGV2X2lkLCBzY2FuX3RyaWdnZXJfZnVuY190IHRy
+aWdnZXIsCiAJCQkJc2Nhbl9ub3RpZnlfZnVuY190IGZ1bmMsIHZvaWQgKnVzZXJkYXRhKTsKIGJv
+b2wgc2Nhbl9wZXJpb2RpY19zdG9wKHVpbnQ2NF90IHdkZXZfaWQpOwogCit1aW50NjRfdCBzY2Fu
+X2dldF90cmlnZ2VyZWRfdGltZSh1aW50NjRfdCB3ZGV2X2lkLCB1aW50MzJfdCBpZCk7CisKIHZv
+aWQgc2Nhbl9ic3NfZnJlZShzdHJ1Y3Qgc2Nhbl9ic3MgKmJzcyk7CiBpbnQgc2Nhbl9ic3NfcmFu
+a19jb21wYXJlKGNvbnN0IHZvaWQgKmEsIGNvbnN0IHZvaWQgKmIsIHZvaWQgKnVzZXIpOwogCi0t
+IAoyLjE3LjEKCg==
 
- 	/*
- 	 * TODO: Support optional subelements
-@@ -285,7 +301,7 @@ static size_t build_report_for_bss(struct rrm_beacon_re=
-q_info *beacon,
- 	 * (see "TODO: Support Reported Frame Body..." below)
- 	 */
- =
+--===============5038782378907077231==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0003-rrm-include-actual-scan-start-time-in-report.patch"
 
--	return to - start;
-+	return sizeof(struct rrm_beacon_report);
- }
- =
+RnJvbSAxZTM3YmEyMmZhNjdlNDExN2MzMWEzYWMyMTUxYWZhNGM1OWIxN2IzIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
+RGF0ZTogV2VkLCAyMCBOb3YgMjAxOSAwODo1Mjo1MyAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggMy80
+XSBycm06IGluY2x1ZGUgYWN0dWFsIHNjYW4gc3RhcnQgdGltZSBpbiByZXBvcnQKCi0tLQogc3Jj
+L3JybS5jIHwgMTEgKysrKysrKysrLS0KIDEgZmlsZSBjaGFuZ2VkLCA5IGluc2VydGlvbnMoKyks
+IDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL3JybS5jIGIvc3JjL3JybS5jCmluZGV4
+IGRkZjhlMzk1Li42NjA1NjVlYiAxMDA2NDQKLS0tIGEvc3JjL3JybS5jCisrKyBiL3NyYy9ycm0u
+YwpAQCAtMTA5LDYgKzEwOSw3IEBAIHN0cnVjdCBycm1fYmVhY29uX3JlcV9pbmZvIHsKIAljaGFy
+IHNzaWRbMzNdOwkJLyogUmVxdWVzdCBmaWx0ZXJlZCBieSBTU0lEICovCiAJYm9vbCBoYXNfc3Np
+ZDsKIAl1aW50MzJfdCBzY2FuX2lkOworCXVpbnQ2NF90IHNjYW5fc3RhcnRfdGltZTsKIH07CiAK
+IC8qIFBlci1uZXRkZXYgc3RhdGUgKi8KQEAgLTI0OSw4ICsyNTAsNyBAQCBzdGF0aWMgc2l6ZV90
+IGJ1aWxkX3JlcG9ydF9mb3JfYnNzKHN0cnVjdCBycm1fYmVhY29uX3JlcV9pbmZvICpiZWFjb24s
+CiAKIAkqdG8rKyA9IGJlYWNvbi0+b3Blcl9jbGFzczsKIAkqdG8rKyA9IHNjYW5fZnJlcV90b19j
+aGFubmVsKGJzcy0+ZnJlcXVlbmN5LCBOVUxMKTsKLQkvKiBza2lwIHN0YXJ0IHRpbWUgKi8KLQlt
+ZW1zZXQodG8sIDAsIDgpOworCWxfcHV0X2xlNjQoYmVhY29uLT5zY2FuX3N0YXJ0X3RpbWUsIHRv
+KTsKIAl0byArPSA4OwogCWxfcHV0X2xlMTYoYmVhY29uLT5kdXJhdGlvbiwgdG8pOwogCXRvICs9
+IDI7CkBAIC0zOTAsMTEgKzM5MCwxOCBAQCBzdGF0aWMgYm9vbCBycm1fc2Nhbl9yZXN1bHRzKGlu
+dCBlcnIsIHN0cnVjdCBsX3F1ZXVlICpic3NfbGlzdCwgdm9pZCAqdXNlcmRhdGEpCiBzdGF0aWMg
+dm9pZCBycm1fc2Nhbl90cmlnZ2VyZWQoaW50IGVyciwgdm9pZCAqdXNlcmRhdGEpCiB7CiAJc3Ry
+dWN0IHJybV9zdGF0ZSAqcnJtID0gdXNlcmRhdGE7CisJc3RydWN0IHJybV9iZWFjb25fcmVxX2lu
+Zm8gKmJlYWNvbiA9IGxfY29udGFpbmVyX29mKHJybS0+cGVuZGluZywKKwkJCQkJCXN0cnVjdCBy
+cm1fYmVhY29uX3JlcV9pbmZvLAorCQkJCQkJaW5mbyk7CiAKIAlpZiAoZXJyIDwgMCkgewogCQls
+X2Vycm9yKCJDb3VsZCBub3Qgc3RhcnQgUlJNIHNjYW4iKTsKIAkJcnJtX3JlamVjdF9tZWFzdXJl
+bWVudF9yZXF1ZXN0KHJybSwgUkVQT1JUX1JFSkVDVF9JTkNBUEFCTEUpOworCQlyZXR1cm47CiAJ
+fQorCisJYmVhY29uLT5zY2FuX3N0YXJ0X3RpbWUgPSBzY2FuX2dldF90cmlnZ2VyZWRfdGltZShy
+cm0tPndkZXZfaWQsCisJCQkJCQkJYmVhY29uLT5zY2FuX2lkKTsKIH0KIAogc3RhdGljIHZvaWQg
+cnJtX2hhbmRsZV9iZWFjb25fc2NhbihzdHJ1Y3QgcnJtX3N0YXRlICpycm0sCi0tIAoyLjE3LjEK
+Cg==
 
- static bool bss_in_request_range(struct rrm_beacon_req_info *beacon,
--- =
+--===============5038782378907077231==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0004-rrm-add-packed-struct-for-beacon-reports.patch"
 
-2.17.1
+RnJvbSA4YzlhZWE1MjgxNjNjYjM5ZTI4M2NkMGU1NzcyNTc4ZjQzMzViNzdkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
+RGF0ZTogV2VkLCAyMCBOb3YgMjAxOSAwOToxMTowNyAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggNC80
+XSBycm06IGFkZCBwYWNrZWQgc3RydWN0IGZvciBiZWFjb24gcmVwb3J0cwoKYnVpbGRfcmVwb3J0
+X2Zvcl9ic3Mgd2FzIHJlZmFjdG9yZWQgdG8gdXNlIHRoaXMgcGFja2VkIHN0cnVjdHVyZSByYXRo
+ZXIKdGhhbiBsX3B1dF8qIEFQSXMuCi0tLQogc3JjL3JybS5jIHwgNjYgKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQs
+IDQxIGluc2VydGlvbnMoKyksIDI1IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9ycm0u
+YyBiL3NyYy9ycm0uYwppbmRleCA2NjA1NjVlYi4uM2I2MDBmMDkgMTAwNjQ0Ci0tLSBhL3NyYy9y
+cm0uYworKysgYi9zcmMvcnJtLmMKQEAgLTEyMiw2ICsxMjIsMjEgQEAgc3RydWN0IHJybV9zdGF0
+ZSB7CiAJdWludDY0X3QgbGFzdF9yZXF1ZXN0OwogfTsKIAorLyogODAyLjExLCBTZWN0aW9uIDku
+NC4yLjIyLjcgKi8KK3N0cnVjdCBycm1fYmVhY29uX3JlcG9ydCB7CisJdWludDhfdCBvcGVyX2Ns
+YXNzOworCXVpbnQ4X3QgY2hhbm5lbDsKKwlfX2xlNjQgc2Nhbl9zdGFydF90aW1lOworCV9fbGUx
+NiBkdXJhdGlvbjsKKwl1aW50OF90IGZyYW1lX2luZm87CisJdWludDhfdCByY3BpOworCXVpbnQ4
+X3QgcnNuaTsKKwl1aW50OF90IGJzc2lkWzZdOworCXVpbnQ4X3QgYW50ZW5uYV9pZDsKKwlfX2xl
+MzIgcGFyZW50X3RzZjsKKwl1aW50OF90IHN1YmVsZW1lbnRzWzBdOworfSBfX2F0dHJpYnV0ZV9f
+ICgocGFja2VkKSk7CisKIHN0YXRpYyBzdHJ1Y3QgbF9xdWV1ZSAqc3RhdGVzOwogc3RhdGljIHN0
+cnVjdCBsX2dlbmxfZmFtaWx5ICpubDgwMjExOwogc3RhdGljIHVpbnQzMl90IG5ldGRldl93YXRj
+aDsKQEAgLTIyNSw2ICsyNDAsMTcgQEAgc3RhdGljIHZvaWQgcnJtX2J1aWxkX21lYXN1cmVtZW50
+X3JlcG9ydChzdHJ1Y3QgcnJtX3JlcXVlc3RfaW5mbyAqaW5mbywKIAkJbWVtY3B5KHRvLCByZXBv
+cnQsIHJlcG9ydF9sZW4pOwogfQogCisvKiA4MDIuMTEgVGFibGUgOS0xNTQgKi8KK3N0YXRpYyB1
+aW50OF90IG1kYl90b19yY3BpKGludDMyX3QgbWRiKQoreworCWlmIChtZGIgPD0gMTA5NTApCisJ
+CXJldHVybiAwOworCWVsc2UgaWYgKG1kYiA+PSAtMTA5NTAgJiYgbWRiIDwgMCkKKwkJcmV0dXJu
+ICgodWludDhfdCkoKDIgKiAobWRiICsgMTEwMDApKSAvIDEwMCkpOworCWVsc2UKKwkJcmV0dXJu
+IDIyMDsKK30KKwogLyoKICAqIDgwMi4xMS0yMDE2IDExLjExLjkuMSBCZWFjb24gcmVwb3J0CiAg
+KgpAQCAtMjQ2LDM4ICsyNzIsMjggQEAgc3RhdGljIHNpemVfdCBidWlsZF9yZXBvcnRfZm9yX2Jz
+cyhzdHJ1Y3QgcnJtX2JlYWNvbl9yZXFfaW5mbyAqYmVhY29uLAogCQkJCQlzdHJ1Y3Qgc2Nhbl9i
+c3MgKmJzcywKIAkJCQkJdWludDhfdCAqdG8pCiB7Ci0JdWludDhfdCAqc3RhcnQgPSB0bzsKLQot
+CSp0bysrID0gYmVhY29uLT5vcGVyX2NsYXNzOwotCSp0bysrID0gc2Nhbl9mcmVxX3RvX2NoYW5u
+ZWwoYnNzLT5mcmVxdWVuY3ksIE5VTEwpOwotCWxfcHV0X2xlNjQoYmVhY29uLT5zY2FuX3N0YXJ0
+X3RpbWUsIHRvKTsKLQl0byArPSA4OwotCWxfcHV0X2xlMTYoYmVhY29uLT5kdXJhdGlvbiwgdG8p
+OwotCXRvICs9IDI7Ci0JKnRvKysgPSBycm1fcGh5X3R5cGUoYnNzKTsKLQotCS8qIDgwMi4xMSBU
+YWJsZSA5LTE1NCAtIFJDUEkgdmFsdWVzICovCi0JaWYgKGJzcy0+c2lnbmFsX3N0cmVuZ3RoIDwg
+LTEwOTUwKQotCQkqdG8rKyA9IDA7Ci0JZWxzZSBpZiAoYnNzLT5zaWduYWxfc3RyZW5ndGggPj0g
+LTEwOTUwICYmIGJzcy0+c2lnbmFsX3N0cmVuZ3RoIDwgMCkKLQkJKnRvKysgPSAodWludDhfdCko
+KDIgKiAoYnNzLT5zaWduYWxfc3RyZW5ndGggKyAxMTAwMCkpIC8gMTAwKTsKLQllbHNlCi0JCSp0
+bysrID0gMjIwOworCXN0cnVjdCBycm1fYmVhY29uX3JlcG9ydCAqcmVwb3J0ID0gKHN0cnVjdCBy
+cm1fYmVhY29uX3JlcG9ydCAqKSB0bzsKKworCXJlcG9ydC0+b3Blcl9jbGFzcyA9IGJlYWNvbi0+
+b3Blcl9jbGFzczsKKwlyZXBvcnQtPmNoYW5uZWwgPSBzY2FuX2ZyZXFfdG9fY2hhbm5lbChic3Mt
+PmZyZXF1ZW5jeSwgTlVMTCk7CisJcmVwb3J0LT5zY2FuX3N0YXJ0X3RpbWUgPSBiZWFjb24tPnNj
+YW5fc3RhcnRfdGltZTsKKwlyZXBvcnQtPmR1cmF0aW9uID0gYmVhY29uLT5kdXJhdGlvbjsKKwly
+ZXBvcnQtPmZyYW1lX2luZm8gPSBycm1fcGh5X3R5cGUoYnNzKTsKKwlyZXBvcnQtPnJjcGkgPSBt
+ZGJfdG9fcmNwaShic3MtPnNpZ25hbF9zdHJlbmd0aCk7CiAKIAkvKiBSU05JIG5vdCBhdmFpbGFi
+bGUgKGNvdWxkIGdldCB0aGlzIGZyb20gR0VUX1NVUlZFWSkgKi8KLQkqdG8rKyA9IDI1NTsKLQlt
+ZW1jcHkodG8sIGJzcy0+YWRkciwgNik7Ci0JdG8gKz0gNjsKLQkvKiBBbnRlbm5hIGlkZW50aWZp
+ZXIgdW5rbm93biAqLwotCSp0bysrID0gMDsKKwlyZXBvcnQtPnJzbmkgPSAyNTU7CisJbWVtY3B5
+KHJlcG9ydC0+YnNzaWQsIGJzcy0+YWRkciwgNik7CisKKwlyZXBvcnQtPmFudGVubmFfaWQgPSAw
+OworCiAJLyoKIAkgKiA4MDIuMTEgOS40LjIuMjIuNyBCZWFjb24gcmVwb3J0CiAJICoKIAkgKiAi
+VGhlIFBhcmVudCBUU0YgZmllbGQgY29udGFpbnMgdGhlIGxvd2VyIDQgb2N0ZXRzIG9mIHRoZSBt
+ZWFzdXJpbmcKIAkgKiAgU1RBJ3MgVFNGIHRpbWVyIHZhbHVlIgogCSAqLwotCWxfcHV0X2xlMzIo
+KHVpbnQzMl90KShic3MtPnBhcmVudF90c2YgJiAweGZmZmZmZmZmKSwgdG8pOwotCXRvICs9IDQ7
+CisJcmVwb3J0LT5wYXJlbnRfdHNmID0gKHVpbnQzMl90KWJzcy0+cGFyZW50X3RzZjsKIAogCS8q
+CiAJICogVE9ETzogU3VwcG9ydCBvcHRpb25hbCBzdWJlbGVtZW50cwpAQCAtMjg1LDcgKzMwMSw3
+IEBAIHN0YXRpYyBzaXplX3QgYnVpbGRfcmVwb3J0X2Zvcl9ic3Moc3RydWN0IHJybV9iZWFjb25f
+cmVxX2luZm8gKmJlYWNvbiwKIAkgKiAoc2VlICJUT0RPOiBTdXBwb3J0IFJlcG9ydGVkIEZyYW1l
+IEJvZHkuLi4iIGJlbG93KQogCSAqLwogCi0JcmV0dXJuIHRvIC0gc3RhcnQ7CisJcmV0dXJuIHNp
+emVvZihzdHJ1Y3QgcnJtX2JlYWNvbl9yZXBvcnQpOwogfQogCiBzdGF0aWMgYm9vbCBic3NfaW5f
+cmVxdWVzdF9yYW5nZShzdHJ1Y3QgcnJtX2JlYWNvbl9yZXFfaW5mbyAqYmVhY29uLAotLSAKMi4x
+Ny4xCgo=
 
---===============2190920000732168780==--
+--===============5038782378907077231==--
 
