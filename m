@@ -1,142 +1,179 @@
-Content-Type: multipart/mixed; boundary="===============2339674567258607372=="
+Content-Type: multipart/mixed; boundary="===============5405529024968392657=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 3/3] rrm: add packed struct for beacon reports
-Date: Thu, 21 Nov 2019 09:28:44 -0800
-Message-ID: <20191121172844.16796-3-prestwoj@gmail.com>
-In-Reply-To: <20191121172844.16796-1-prestwoj@gmail.com>
+Subject: [PATCH v4 1/3] scan: parse the scan start time
+Date: Thu, 21 Nov 2019 10:29:03 -0800
+Message-ID: <20191121182905.20409-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2339674567258607372==
+--===============5405529024968392657==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-build_report_for_bss was refactored to use this packed structure rather
-than l_put_* APIs.
----
- src/rrm.c | 66 ++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 41 insertions(+), 25 deletions(-)
+The kernel sends NL80211_ATTR_SCAN_START_TIME_TSF with CMD_TRIGGER and
+RRM requires this value for beacon measurement reports.
 
-diff --git a/src/rrm.c b/src/rrm.c
-index ca30a7f7..4492ad13 100644
---- a/src/rrm.c
-+++ b/src/rrm.c
-@@ -122,6 +122,21 @@ struct rrm_state {
- 	uint64_t last_request;
+The start time is parsed during CMD_TRIGGER and set into the scan request.
+A getter was added to obtain this time value for an already triggered
+scan.
+
+After making the change, the SCAN_ABORTED case was cleaned up a bit to
+remove the local scan_request usage in favor of the one used for all the
+other cases.
+---
+ src/scan.c | 41 ++++++++++++++++++++++++++++++++++-------
+ src/scan.h |  2 ++
+ 2 files changed, 36 insertions(+), 7 deletions(-)
+
+-v4:
+ * Store the start time in the request, no context
+ * Move the scan request peek outside of the switch so all cases can
+   use it.
+
+diff --git a/src/scan.c b/src/scan.c
+index e007ce5d..e2d73601 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -75,6 +75,8 @@ struct scan_request {
+ 	scan_destroy_func_t destroy;
+ 	bool passive:1; /* Active or Passive scan? */
+ 	struct l_queue *cmds;
++	/* The time the current scan was started. Reported in TRIGGER_SCAN */
++	uint64_t start_time_tsf;
  };
  =
 
-+/* 802.11, Section 9.4.2.22.7 */
-+struct rrm_beacon_report {
-+	uint8_t oper_class;
-+	uint8_t channel;
-+	__le64 scan_start_time;
-+	__le16 duration;
-+	uint8_t frame_info;
-+	uint8_t rcpi;
-+	uint8_t rsni;
-+	uint8_t bssid[6];
-+	uint8_t antenna_id;
-+	__le32 parent_tsf;
-+	uint8_t subelements[0];
-+} __attribute__ ((packed));
-+
- static struct l_queue *states;
- static struct l_genl_family *nl80211;
- static uint32_t netdev_watch;
-@@ -225,6 +240,17 @@ static void rrm_build_measurement_report(struct rrm_re=
-quest_info *info,
- 		memcpy(to, report, report_len);
+ struct scan_context {
+@@ -778,6 +780,25 @@ bool scan_periodic_stop(uint64_t wdev_id)
+ 	return true;
  }
  =
 
-+/* 802.11 Table 9-154 */
-+static uint8_t mdb_to_rcpi(int32_t mdb)
++uint64_t scan_get_triggered_time(uint64_t wdev_id, uint32_t id)
 +{
-+	if (mdb <=3D 10950)
++	struct scan_context *sc;
++	struct scan_request *sr;
++
++	sc =3D l_queue_find(scan_contexts, scan_context_match, &wdev_id);
++	if (!sc)
 +		return 0;
-+	else if (mdb >=3D -10950 && mdb < 0)
-+		return ((uint8_t)((2 * (mdb + 11000)) / 100));
-+	else
-+		return 220;
++
++	if (!sc->triggered)
++		return 0;
++
++	sr =3D l_queue_find(sc->requests, scan_request_match, L_UINT_TO_PTR(id));
++	if (!sr)
++		return 0;
++
++	return sr->start_time_tsf;
 +}
 +
- /*
-  * 802.11-2016 11.11.9.1 Beacon report
-  *
-@@ -246,38 +272,28 @@ static size_t build_report_for_bss(struct rrm_beacon_=
-req_info *beacon,
- 					struct scan_bss *bss,
- 					uint8_t *to)
+ static void scan_periodic_timeout(struct l_timeout *timeout, void *user_da=
+ta)
  {
--	uint8_t *start =3D to;
+ 	struct scan_context *sc =3D user_data;
+@@ -1439,6 +1460,8 @@ static void scan_notify(struct l_genl_msg *msg, void =
+*user_data)
+ 	uint32_t wiphy_id;
+ 	struct scan_context *sc;
+ 	bool active_scan =3D false;
++	uint64_t start_time_tsf =3D 0;
++	struct scan_request *sr;
+ =
+
+ 	cmd =3D l_genl_msg_get_command(msg);
+ =
+
+@@ -1461,15 +1484,22 @@ static void scan_notify(struct l_genl_msg *msg, voi=
+d *user_data)
+ 		case NL80211_ATTR_SCAN_SSIDS:
+ 			active_scan =3D true;
+ 			break;
++		case NL80211_ATTR_SCAN_START_TIME_TSF:
++			if (len !=3D sizeof(uint64_t))
++				return;
++
++			start_time_tsf =3D l_get_u64(data);
++			break;
+ 		}
+ 	}
+ =
+
++	sr =3D l_queue_peek_head(sc->requests);
++
+ 	switch (cmd) {
+ 	case NL80211_CMD_NEW_SCAN_RESULTS:
+ 	{
+ 		struct l_genl_msg *scan_msg;
+ 		struct scan_results *results;
+-		struct scan_request *sr =3D l_queue_peek_head(sc->requests);
+ 		bool send_next =3D false;
+ 		bool get_results =3D false;
+ =
+
+@@ -1543,12 +1573,11 @@ static void scan_notify(struct l_genl_msg *msg, voi=
+d *user_data)
+ 		else
+ 			sc->state =3D SCAN_STATE_PASSIVE;
+ =
+
++		sr->start_time_tsf =3D start_time_tsf;
++
+ 		break;
+ =
+
+ 	case NL80211_CMD_SCAN_ABORTED:
+-	{
+-		struct scan_request *sr =3D l_queue_peek_head(sc->requests);
 -
--	*to++ =3D beacon->oper_class;
--	*to++ =3D scan_freq_to_channel(bss->frequency, NULL);
--	l_put_le64(beacon->scan_start_time, to);
--	to +=3D 8;
--	l_put_le16(beacon->duration, to);
--	to +=3D 2;
--	*to++ =3D rrm_phy_type(bss);
--
--	/* 802.11 Table 9-154 - RCPI values */
--	if (bss->signal_strength < -10950)
--		*to++ =3D 0;
--	else if (bss->signal_strength >=3D -10950 && bss->signal_strength < 0)
--		*to++ =3D (uint8_t)((2 * (bss->signal_strength + 11000)) / 100);
--	else
--		*to++ =3D 220;
-+	struct rrm_beacon_report *report =3D (struct rrm_beacon_report *) to;
-+
-+	report->oper_class =3D beacon->oper_class;
-+	report->channel =3D scan_freq_to_channel(bss->frequency, NULL);
-+	report->scan_start_time =3D beacon->scan_start_time;
-+	report->duration =3D beacon->duration;
-+	report->frame_info =3D rrm_phy_type(bss);
-+	report->rcpi =3D mdb_to_rcpi(bss->signal_strength);
+ 		if (sc->state =3D=3D SCAN_STATE_NOT_RUNNING)
+ 			break;
  =
 
- 	/* RSNI not available (could get this from GET_SURVEY) */
--	*to++ =3D 255;
--	memcpy(to, bss->addr, 6);
--	to +=3D 6;
--	/* Antenna identifier unknown */
--	*to++ =3D 0;
-+	report->rsni =3D 255;
-+	memcpy(report->bssid, bss->addr, 6);
-+
-+	report->antenna_id =3D 0;
-+
- 	/*
- 	 * 802.11 9.4.2.22.7 Beacon report
- 	 *
- 	 * "The Parent TSF field contains the lower 4 octets of the measuring
- 	 *  STA=E2=80=99s TSF timer value"
- 	 */
--	l_put_le32((uint32_t)(bss->parent_tsf & 0xffffffff), to);
--	to +=3D 4;
-+	report->parent_tsf =3D (uint32_t)bss->parent_tsf;
+@@ -1557,8 +1586,7 @@ static void scan_notify(struct l_genl_msg *msg, void =
+*user_data)
+ 		if (sc->triggered) {
+ 			sc->triggered =3D false;
  =
 
- 	/*
- 	 * TODO: Support optional subelements
-@@ -285,7 +301,7 @@ static size_t build_report_for_bss(struct rrm_beacon_re=
-q_info *beacon,
- 	 * (see "TODO: Support Reported Frame Body..." below)
- 	 */
+-			scan_finished(sc, -ECANCELED, NULL,
+-					l_queue_peek_head(sc->requests));
++			scan_finished(sc, -ECANCELED, NULL, sr);
+ 		} else if (sr && !sc->start_cmd_id && !sc->get_scan_cmd_id) {
+ 			/*
+ 			 * If this was an external scan that got aborted
+@@ -1572,7 +1600,6 @@ static void scan_notify(struct l_genl_msg *msg, void =
+*user_data)
  =
 
--	return to - start;
-+	return sizeof(struct rrm_beacon_report);
+ 		break;
+ 	}
+-	}
  }
  =
 
- static bool bss_in_request_range(struct rrm_beacon_req_info *beacon,
+ uint8_t scan_freq_to_channel(uint32_t freq, enum scan_band *out_band)
+diff --git a/src/scan.h b/src/scan.h
+index 8fc2aa56..b6c4e12d 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -124,6 +124,8 @@ void scan_periodic_start(uint64_t wdev_id, scan_trigger=
+_func_t trigger,
+ 				scan_notify_func_t func, void *userdata);
+ bool scan_periodic_stop(uint64_t wdev_id);
+ =
+
++uint64_t scan_get_triggered_time(uint64_t wdev_id, uint32_t id);
++
+ void scan_bss_free(struct scan_bss *bss);
+ int scan_bss_rank_compare(const void *a, const void *b, void *user);
+ =
+
 -- =
 
 2.17.1
 
---===============2339674567258607372==--
+--===============5405529024968392657==--
 
