@@ -1,93 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============5788888937821060640=="
+Content-Type: multipart/mixed; boundary="===============1094737346354015839=="
 MIME-Version: 1.0
-From: James Prestwood <james.prestwood@linux.intel.com>
-Subject: Fix several other non-ascii apostrophes
-Date: Thu, 21 Nov 2019 12:21:09 -0800
-Message-ID: <3e9ceaef7d819b0beb472894dc2260088c9671a5.camel@linux.intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v5 1/4] scan: parse the scan start time
+Date: Thu, 21 Nov 2019 13:59:18 -0600
+Message-ID: <bcdbb6de-3d05-6eb1-b3b6-2f1e5493e2b1@gmail.com>
+In-Reply-To: <20191121200901.25826-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5788888937821060640==
+--===============1094737346354015839==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi James,
+
+On 11/21/19 2:08 PM, James Prestwood wrote:
+> The kernel sends NL80211_ATTR_SCAN_START_TIME_TSF with CMD_TRIGGER and
+> RRM requires this value for beacon measurement reports.
+> =
+
+> The start time is parsed during CMD_TRIGGER and set into the scan request.
+> A getter was added to obtain this time value for an already triggered
+> scan.
+> =
+
+> After making the change, the SCAN_ABORTED case was cleaned up a bit to
+> remove the local scan_request usage in favor of the one used for all the
+> other cases.
+> ---
+>   src/scan.c | 41 ++++++++++++++++++++++++++++++++++-------
+>   src/scan.h |  2 ++
+>   2 files changed, 36 insertions(+), 7 deletions(-)
+> =
 
 
+I went ahead and took the first 3 in this series.  The last one has some =
 
---===============5788888937821060640==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-client-fix-use-of-non-ascii-apostrophe.patch"
+missing L_CPU_TO_LE* calls.
 
-RnJvbSBiMzE1NDZkODgzOGMwNzcwNjJkNTQ5ZWRhMzNmMjE3OTQ0ZTlkMTdmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
-RGF0ZTogVGh1LCAyMSBOb3YgMjAxOSAxMjoxODozMSAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggMS8z
-XSBjbGllbnQ6IGZpeCB1c2Ugb2Ygbm9uLWFzY2lpIGFwb3N0cm9waGUKCi0tLQogY2xpZW50L2Nv
-bW1hbmQuYyB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlv
-bigtKQoKZGlmZiAtLWdpdCBhL2NsaWVudC9jb21tYW5kLmMgYi9jbGllbnQvY29tbWFuZC5jCmlu
-ZGV4IDAzYTYxZGUzLi41NDQxMTg4YSAxMDA2NDQKLS0tIGEvY2xpZW50L2NvbW1hbmQuYworKysg
-Yi9jbGllbnQvY29tbWFuZC5jCkBAIC01MTYsNyArNTE2LDcgQEAgc3RhdGljIHZvaWQgbGlzdF9j
-bWRfb3B0aW9ucyh2b2lkKQogCWRpc3BsYXkoTUFSR0lOICItLSUtKnMlc1xuIiwgNDgsIENPTU1B
-TkRfT1BUSU9OX1BBU1NQSFJBU0UsCiAJCQkJCSJQcm92aWRlIHBhc3NwaHJhc2UiKTsKIAlkaXNw
-bGF5KE1BUkdJTiAiLS0lLSpzJXNcbiIsIDQ4LCBDT01NQU5EX09QVElPTl9ET05UQVNLLAotCQkJ
-CQkiRG9u4oCZdCBhc2sgZm9yIG1pc3NpbmdcbiIKKwkJCQkJIkRvbid0IGFzayBmb3IgbWlzc2lu
-Z1xuIgogCQkJCQkiXHRcdFx0XHRcdFx0ICAgIGNyZWRlbnRpYWxzIik7CiAJZGlzcGxheShNQVJH
-SU4gIi0tJS0qcyVzXG4iLCA0OCwgImhlbHAiLCAiRGlzcGxheSBoZWxwIik7CiB9Ci0tIAoyLjE3
-LjEKCg==
+Regards,
+-Denis
 
---===============5788888937821060640==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0002-eapol-fix-use-of-non-ascii-apostrophe.patch"
-
-RnJvbSA4N2NkMzlkZmMxNTVkYmI0ZjBiOTg1ZDE3ODZhZDk2YjZiY2FjZDQzIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
-RGF0ZTogVGh1LCAyMSBOb3YgMjAxOSAxMjoxOTowMSAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggMi8z
-XSBlYXBvbDogZml4IHVzZSBvZiBub24tYXNjaWkgYXBvc3Ryb3BoZQoKLS0tCiBzcmMvZWFwb2wu
-YyB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQoK
-ZGlmZiAtLWdpdCBhL3NyYy9lYXBvbC5jIGIvc3JjL2VhcG9sLmMKaW5kZXggOGRhMjI0YTUuLmZl
-MDBmYmZiIDEwMDY0NAotLS0gYS9zcmMvZWFwb2wuYworKysgYi9zcmMvZWFwb2wuYwpAQCAtMTYx
-Niw3ICsxNjE2LDcgQEAgc3RhdGljIHZvaWQgZWFwb2xfaGFuZGxlX3B0a18zX29mXzQoc3RydWN0
-IGVhcG9sX3NtICpzbSwKIAkJICogcGFpcndpc2UgY2lwaGVyIHN1aXRlIHdoaWNoIGlzIGFkdmVy
-dGlzZWQgYnkgYW4gQVAsIGJ1dAogCQkgKiB3aGljaCBwb2xpY3kgZGlzYWxsb3dzIGZvciB0aGlz
-IHBhcnRpY3VsYXIgU1RBLiBBbgogCQkgKiBBdXRoZW50aWNhdG9yIG1heSwgdGhlcmVmb3JlLCBp
-bnNlcnQgYSBzZWNvbmQgUlNORSB0bwotCQkgKiBvdmVycnVsZSB0aGUgU1RB4oCZcyBzZWxlY3Rp
-b24uIEFuIEF1dGhlbnRpY2F0b3LigJlzIFNNRSBzaGFsbAorCQkgKiBvdmVycnVsZSB0aGUgU1RB
-J3Mgc2VsZWN0aW9uLiBBbiBBdXRoZW50aWNhdG9y4oCZcyBTTUUgc2hhbGwKIAkJICogaW5zZXJ0
-IHRoZSBzZWNvbmQgUlNORSwgYWZ0ZXIgdGhlIGZpcnN0IFJTTkUsIG9ubHkgZm9yIHRoaXMKIAkJ
-ICogcHVycG9zZS4gVGhlIHBhaXJ3aXNlIGNpcGhlciBzdWl0ZSBpbiB0aGUgc2Vjb25kIFJTTkUK
-IAkJICogaW5jbHVkZWQgc2hhbGwgYmUgb25lIG9mIHRoZSBjaXBoZXJzIGFkdmVydGlzZWQgYnkg
-dGhlCi0tIAoyLjE3LjEKCg==
-
---===============5788888937821060640==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0003-wsc-fix-use-of-non-ascii-apostrophe.patch"
-
-RnJvbSA4MjA3MDg2NTczMjc0MmVkZDdhNjBlOWUzMmIzZDFhM2MzZGNiOGEzIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
-RGF0ZTogVGh1LCAyMSBOb3YgMjAxOSAxMjoxOToxNSAtMDgwMApTdWJqZWN0OiBbUEFUQ0ggMy8z
-XSB3c2M6IGZpeCB1c2Ugb2Ygbm9uLWFzY2lpIGFwb3N0cm9waGUKCi0tLQogc3JjL3dzYy5jIHwg
-MiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZm
-IC0tZ2l0IGEvc3JjL3dzYy5jIGIvc3JjL3dzYy5jCmluZGV4IGNhMTc2YTkwLi40ZTBlOGUxOSAx
-MDA2NDQKLS0tIGEvc3JjL3dzYy5jCisrKyBiL3NyYy93c2MuYwpAQCAtODMxLDcgKzgzMSw3IEBA
-IHN0YXRpYyBib29sIHBpbl9zY2FuX3Jlc3VsdHMoaW50IGVyciwgc3RydWN0IGxfcXVldWUgKmJz
-c19saXN0LCB2b2lkICp1c2VyZGF0YSkKIAkJICogY2hhbm5lbHMgYW5kIHRoZW4gb3JkZXIgUElO
-IGF0dGVtcHRzIHdpdGggcHJvc3BlY3RpdmUgQVBzCiAJCSAqIGFzIGZvbGxvd3M6CiAJCSAqIDEu
-IFdTQyAyLjAgQVAgd2l0aCB0aGUgU2VsZWN0ZWQgUmVnaXN0cmFyIGF0dHJpYnV0ZSBUUlVFCi0J
-CSAqIGFuZCB0aGUgRW5yb2xsZWXigJlzIE1BQyBhZGRyZXNzIGluIHRoZSBBdXRob3JpemVkTUFD
-cworCQkgKiBhbmQgdGhlIEVucm9sbGVlJ3MgTUFDIGFkZHJlc3MgaW4gdGhlIEF1dGhvcml6ZWRN
-QUNzCiAJCSAqIHN1Yi1lbGVtZW50IGluIEJlYWNvbnMgYW5kIFByb2JlIFJlc3BvbnNlcy4KIAkJ
-ICogMi4gV1NDIDIuMCBBUHMgd2l0aCB0aGUgU2VsZWN0ZWQgUmVnaXN0cmFyIGF0dHJpYnV0ZSBU
-UlVFCiAJCSAqIGFuZCB0aGUgd2lsZGNhcmQgTUFDIGFkZHJlc3MgaW4gdGhlIEF1dGhvcml6ZWRN
-QUNzCi0tIAoyLjE3LjEKCg==
-
---===============5788888937821060640==--
+--===============1094737346354015839==--
 
