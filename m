@@ -1,175 +1,147 @@
-Content-Type: multipart/mixed; boundary="===============7766711337738231564=="
+Content-Type: multipart/mixed; boundary="===============4358111218718817734=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 1/6] peap: Introduce PEAP state
-Date: Thu, 05 Dec 2019 13:13:49 -0800
-Message-ID: <20191205211354.19075-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 2/6] peap: Delay key installation until success of Phase 2
+Date: Thu, 05 Dec 2019 13:13:50 -0800
+Message-ID: <20191205211354.19075-2-tim.a.kourt@linux.intel.com>
+In-Reply-To: <20191205211354.19075-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7766711337738231564==
+--===============4358111218718817734==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Introduction of the state struct will allow to hold the additional
-state variables related to the implementation of PEAP.
+Previously, the key was installed once the runnel was created
+despite the outcome of the second authentication phase. Now, the
+key installation is delayed until the successful completion of
+the second authentication phase. This excludes the unnecessary
+operations in the case of a failure and key reinstallation with
+cypro-binding in use.
 ---
- src/eap-peap.c | 44 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 31 insertions(+), 13 deletions(-)
+ src/eap-peap.c | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
 
 diff --git a/src/eap-peap.c b/src/eap-peap.c
-index 16ab0319..c400ddee 100644
+index c400ddee..eb0b0c5f 100644
 --- a/src/eap-peap.c
 +++ b/src/eap-peap.c
-@@ -41,6 +41,10 @@
-  * PEAPv1: draft-josefsson-pppext-eap-tls-eap-05
-  */
+@@ -43,6 +43,8 @@
  =
 
-+struct peap_state {
-+	struct eap_state *phase2;
-+};
+ struct peap_state {
+ 	struct eap_state *phase2;
 +
++	uint8_t key[128];
+ };
+ =
+
  static void eap_peap_phase2_send_response(const uint8_t *pdu, size_t pdu_l=
 en,
- 								void *user_data)
+@@ -66,6 +68,7 @@ static void eap_peap_phase2_send_response(const uint8_t *=
+pdu, size_t pdu_len,
+ static void eap_peap_phase2_complete(enum eap_result result, void *user_da=
+ta)
  {
-@@ -116,6 +120,7 @@ static int eap_extensions_handle_result_avp(struct eap_=
-state *eap,
- 						size_t data_len,
- 						uint8_t *response)
- {
+ 	struct eap_state *eap =3D user_data;
 +	struct peap_state *peap_state;
- 	uint16_t type;
- 	uint16_t len;
- 	uint16_t result;
-@@ -143,8 +148,9 @@ static int eap_extensions_handle_result_avp(struct eap_=
-state *eap,
  =
 
- 	switch (result) {
- 	case EAP_EXTENSIONS_RESULT_SUCCCESS:
--		result =3D eap_method_is_success(
--				eap_tls_common_get_variant_data(eap)) ?
-+		peap_state =3D eap_tls_common_get_variant_data(eap);
-+
-+		result =3D eap_method_is_success(peap_state->phase2) ?
- 					EAP_EXTENSIONS_RESULT_SUCCCESS :
- 					EAP_EXTENSIONS_RESULT_FAILURE;
- 		/* fall through */
-@@ -225,6 +231,7 @@ static bool eap_peap_tunnel_handle_request(struct eap_s=
-tate *eap,
- 							const uint8_t *pkt,
- 								size_t len)
- {
-+	struct peap_state *peap_state;
- 	uint8_t id;
+ 	l_debug("result: %d", result);
  =
 
- 	if (len > 4 && pkt[4] =3D=3D EAP_TYPE_EXTENSIONS) {
-@@ -247,6 +254,8 @@ static bool eap_peap_tunnel_handle_request(struct eap_s=
-tate *eap,
- 		return true;
+@@ -94,6 +97,12 @@ static void eap_peap_phase2_complete(enum eap_result res=
+ult, void *user_data)
+ 		return;
  	}
  =
 
 +	peap_state =3D eap_tls_common_get_variant_data(eap);
 +
- 	if (eap_tls_common_get_negotiated_version(eap) =3D=3D EAP_TLS_VERSION_0) {
- 		if (len < 1)
- 			return false;
-@@ -259,32 +268,37 @@ static bool eap_peap_tunnel_handle_request(struct eap=
-_state *eap,
- 		 */
- 		eap_save_last_id(eap, &id);
- =
-
--		__eap_handle_request(eap_tls_common_get_variant_data(eap), id,
--								pkt, len);
-+		__eap_handle_request(peap_state->phase2, id, pkt, len);
- =
-
- 		return true;
- 	}
- =
-
--	eap_rx_packet(eap_tls_common_get_variant_data(eap), pkt, len);
-+	eap_rx_packet(peap_state->phase2, pkt, len);
- =
-
- 	return true;
++	eap_set_key_material(eap, peap_state->key + 0, 64, NULL, 0, NULL,
++								0, NULL, 0);
++	explicit_bzero(peap_state->key, sizeof(peap_state->key));
++
+ 	eap_method_success(eap);
  }
  =
 
--static void eap_peap_state_reset(void *phase2)
-+static void eap_peap_state_reset(void *variant_data)
+@@ -174,6 +183,7 @@ static void eap_extensions_handle_request(struct eap_st=
+ate *eap,
+ 							const uint8_t *pkt,
+ 							size_t len)
  {
--	if (!phase2)
-+	struct peap_state *peap_state =3D variant_data;
-+
-+	if (!peap_state)
- 		return;
- =
-
--	eap_reset(phase2);
-+	eap_reset(peap_state->phase2);
- }
- =
-
--static void eap_peap_state_destroy(void *phase2)
-+static void eap_peap_state_destroy(void *variant_data)
- {
--	if (!phase2)
-+	struct peap_state *peap_state =3D variant_data;
-+
-+	if (!peap_state)
- 		return;
- =
-
--	eap_reset(phase2);
--	eap_free(phase2);
-+	eap_reset(peap_state->phase2);
-+	eap_free(peap_state->phase2);
-+
-+	l_free(peap_state);
- }
- =
-
- static int eap_peap_settings_check(struct l_settings *settings,
-@@ -323,6 +337,7 @@ static bool eap_peap_settings_load(struct eap_state *ea=
-p,
- 						const char *prefix)
- {
- 	char setting_key_prefix[72];
 +	struct peap_state *peap_state;
- 	void *phase2;
- =
-
- 	phase2 =3D eap_new(eap_peap_phase2_send_response,
-@@ -343,11 +358,14 @@ static bool eap_peap_settings_load(struct eap_state *=
-eap,
- 		return false;
+ 	uint8_t response[EAP_EXTENSIONS_HEADER_LEN +
+ 					EAP_EXTENSIONS_AVP_HEADER_LEN + 2];
+ 	int r =3D eap_extensions_handle_result_avp(eap, pkt, len, response);
+@@ -199,13 +209,19 @@ static void eap_extensions_handle_request(struct eap_=
+state *eap,
+ 		return;
  	}
  =
 
-+	peap_state =3D l_new(struct peap_state, 1);
-+	peap_state->phase2 =3D phase2;
++	peap_state =3D eap_tls_common_get_variant_data(eap);
 +
- 	snprintf(setting_key_prefix, sizeof(setting_key_prefix), "%sPEAP-",
- 									prefix);
++	eap_set_key_material(eap, peap_state->key + 0, 64, NULL, 0, NULL,
++								0, NULL, 0);
++	explicit_bzero(peap_state->key, sizeof(peap_state->key));
++
+ 	eap_method_success(eap);
+ }
  =
 
- 	if (!eap_tls_common_settings_load(eap, settings, setting_key_prefix,
--							&eap_ttls_ops, phase2))
-+						&eap_ttls_ops, peap_state))
- 		return false;
+ static bool eap_peap_tunnel_ready(struct eap_state *eap,
+ 						const char *peer_identity)
+ {
+-	uint8_t msk_emsk[128];
++	struct peap_state *peap_state =3D eap_tls_common_get_variant_data(eap);
  =
 
- 	return true;
+ 	/*
+ 	* PEAPv1: draft-josefsson-pppext-eap-tls-eap-05, Section 2.1.1
+@@ -217,10 +233,7 @@ static bool eap_peap_tunnel_ready(struct eap_state *ea=
+p,
+ =
+
+ 	/* MSK, EMSK and challenge derivation */
+ 	eap_tls_common_tunnel_prf_get_bytes(eap, true, "client EAP encryption",
+-								msk_emsk, 128);
+-
+-	eap_set_key_material(eap, msk_emsk + 0, 64, NULL, 0, NULL, 0, NULL, 0);
+-	explicit_bzero(msk_emsk, sizeof(msk_emsk));
++						peap_state->key, 128);
+ =
+
+ 	eap_tls_common_send_empty_response(eap);
+ =
+
+@@ -286,6 +299,8 @@ static void eap_peap_state_reset(void *variant_data)
+ 		return;
+ =
+
+ 	eap_reset(peap_state->phase2);
++
++	explicit_bzero(peap_state->key, sizeof(peap_state->key));
+ }
+ =
+
+ static void eap_peap_state_destroy(void *variant_data)
+@@ -298,6 +313,8 @@ static void eap_peap_state_destroy(void *variant_data)
+ 	eap_reset(peap_state->phase2);
+ 	eap_free(peap_state->phase2);
+ =
+
++	explicit_bzero(peap_state->key, sizeof(peap_state->key));
++
+ 	l_free(peap_state);
+ }
+ =
+
 -- =
 
 2.13.6
 
---===============7766711337738231564==--
+--===============4358111218718817734==--
 
