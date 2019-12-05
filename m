@@ -1,121 +1,126 @@
-Content-Type: multipart/mixed; boundary="===============0220797672567899915=="
+Content-Type: multipart/mixed; boundary="===============0042293454369921820=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 6/7] wsc: Accept extra IEs in wsc_start_enrollee
-Date: Thu, 05 Dec 2019 04:22:43 +0100
-Message-ID: <20191205032244.5957-6-andrew.zaborowski@intel.com>
+Subject: [PATCH 7/7] doc: Generalize wsc-api method descriptions
+Date: Thu, 05 Dec 2019 04:22:44 +0100
+Message-ID: <20191205032244.5957-7-andrew.zaborowski@intel.com>
 In-Reply-To: <20191205032244.5957-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0220797672567899915==
+--===============0042293454369921820==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/wsc.c | 24 ++++++++++++++----------
- src/wsc.h |  3 ++-
- 2 files changed, 16 insertions(+), 11 deletions(-)
+ doc/wsc-api.txt | 42 +++++++++++++++++++++++++-----------------
+ 1 file changed, 25 insertions(+), 17 deletions(-)
 
-diff --git a/src/wsc.c b/src/wsc.c
-index 1901feb6..423d2aa8 100644
---- a/src/wsc.c
-+++ b/src/wsc.c
-@@ -447,7 +447,8 @@ static inline enum wsc_rf_band freq_to_rf_band(uint32_t=
- freq)
- 	return WSC_RF_BAND_2_4_GHZ;
- }
+diff --git a/doc/wsc-api.txt b/doc/wsc-api.txt
+index cfd34943..561824ce 100644
+--- a/doc/wsc-api.txt
++++ b/doc/wsc-api.txt
+@@ -4,21 +4,24 @@ SimpleConfiguration hierarchy
+ Service		net.connman.iwd
+ Interface	net.connman.iwd.SimpleConfiguration
+ Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}
++Object path	/net/connman/iwd/{phy0,phy1,...}/p2p_peers/{aa_bb_cc_dd_ee_ff}
  =
 
--static void wsc_connect(struct wsc *wsc)
-+static void wsc_connect(struct wsc *wsc, struct iovec *ies,
-+			unsigned int ies_num)
- {
- 	struct handshake_state *hs;
- 	struct l_settings *settings =3D l_settings_new();
-@@ -456,7 +457,7 @@ static void wsc_connect(struct wsc *wsc)
- 	struct wsc_association_request request;
- 	uint8_t *pdu;
- 	size_t pdu_len;
--	struct iovec ie_iov;
-+	struct iovec ie_iov[1 + ies_num];
+ Methods		void PushButton()
  =
 
- 	wsc->target =3D NULL;
+ 			Start WSC (formerly known as WPS, Wi-Fi Protected
+-			Setup) configuration in PushButton mode.
++			Setup) configuration in PushButton mode or trigger a
++			connection to a specific P2P peer.  The usage will
++			depend on which object this interface is found on.
  =
 
-@@ -502,18 +503,20 @@ static void wsc_connect(struct wsc *wsc)
- 		goto error;
- 	}
+-			Any connected networks on the device will be
+-			disconnected and scanning will commence to find the
+-			access point in PushButton mode.  If multiple access
+-			points are found, then a SessionOverlap error will be
+-			returned.
++			In the first use case any connected networks on the
++			device will be disconnected and scanning will commence
++			to find the access point in PushButton mode.  If
++			multiple access points are found, then a
++			SessionOverlap error will be returned.
  =
 
--	ie_iov.iov_base =3D ie_tlv_encapsulate_wsc_payload(pdu, pdu_len,
--							&ie_iov.iov_len);
-+	ie_iov[0].iov_base =3D ie_tlv_encapsulate_wsc_payload(pdu, pdu_len,
-+							&ie_iov[0].iov_len);
- 	l_free(pdu);
+ 			This method returns once the configuration has been
+-			completed and the network has been successfully
+-			connected.
++			completed and the network or the P2P peer has been
++			successfully connected.
  =
 
--	if (!ie_iov.iov_base) {
-+	if (!ie_iov[0].iov_base) {
- 		r =3D -ENOMEM;
- 		goto error;
- 	}
+ 			Possible errors:
+ 			net.connman.iwd.SimpleConfiguration.SessionOverlap
+@@ -28,6 +31,8 @@ Methods		void PushButton()
+ 			net.connman.iwd.Aborted
+ 			net.connman.iwd.Failed
+ 			net.connman.iwd.Busy
++			net.connman.iwd.InvalidArguments
++			net.connman.iwd.NotSupported
  =
 
--	r =3D netdev_connect(wsc->netdev, bss, hs, &ie_iov, 1, wsc_netdev_event,
--				wsc_connect_cb, wsc);
--	l_free(ie_iov.iov_base);
-+	memcpy(ie_iov + 1, ies, sizeof(struct iovec) * ies_num);
+ 		string GeneratePin()
+ =
+
+@@ -35,10 +40,12 @@ Methods		void PushButton()
+ 			digit suitable for use by most user interfaces.
+ =
+
+ 		void StartPin(string pin)
+-			Start WSC in PIN mode.  If iwd's WSC configuration
+-			indicates that the device does not support a display,
+-			a static PIN from the main.conf configuration file is
+-			used.  Contents of pin are ignored in this case.
 +
-+	r =3D netdev_connect(wsc->netdev, bss, hs, ie_iov, 1 + ies_num,
-+				wsc_netdev_event, wsc_connect_cb, wsc);
-+	l_free(ie_iov[0].iov_base);
++			Start WSC or connect to a specific P2P peer in PIN
++			mode.  If iwd's WSC configuration indicates that the
++			device does not support a display, a static PIN from
++			the main.conf configuration file is used.  Contents
++			of pin are ignored in this case.
  =
 
- 	if (r < 0)
- 		goto error;
-@@ -1079,7 +1082,8 @@ void wsc_destroy(struct wsc *wsc)
- }
+ 			Otherwise, the pin provided will be utilized.  This
+ 			can be an automatically generated PIN that contains a
+@@ -47,8 +54,8 @@ Methods		void PushButton()
+ 			8 digit PIN with an included check digit.
  =
 
- void wsc_start_enrollee(struct wsc *wsc, struct netdev *netdev,
--			struct scan_bss *target, const char *pin)
-+			struct scan_bss *target, const char *pin,
-+			struct iovec *ies, unsigned int ies_num)
- {
- 	wsc->netdev =3D netdev;
- 	wsc->target =3D target;
-@@ -1087,7 +1091,7 @@ void wsc_start_enrollee(struct wsc *wsc, struct netde=
-v *netdev,
- 		WSC_CONFIGURATION_METHOD_VIRTUAL_PUSH_BUTTON;
- 	wsc->pin =3D l_strdup(pin);
+ 			This method returns once the configuration has been
+-			completed and the network has been successfully
+-			connected.
++			completed and the network or the P2P peer has been
++			successfully connected.
  =
 
--	wsc_connect(wsc);
-+	wsc_connect(wsc, ies, ies_num);
- }
+ 			Possible errors:
+ 			net.connman.iwd.SimpleConfiguration.NoCredentials
+@@ -59,9 +66,10 @@ Methods		void PushButton()
+ 			net.connman.iwd.Busy
+ 			net.connman.iwd.InvalidArguments
+ 			net.connman.iwd.InvalidFormat
++			net.connman.iwd.NotSupported
  =
 
- void wsc_cancel(struct wsc *wsc, netdev_disconnect_cb_t cb)
-diff --git a/src/wsc.h b/src/wsc.h
-index e8a965f2..73ffdd33 100644
---- a/src/wsc.h
-+++ b/src/wsc.h
-@@ -47,6 +47,7 @@ struct wsc_ops {
+ 		void Cancel()
  =
 
- struct wsc *wsc_new(const struct wsc_ops *ops, void *user_data);
- void wsc_start_enrollee(struct wsc *wsc, struct netdev *netdev,
--			struct scan_bss *target, const char *pin);
-+			struct scan_bss *target, const char *pin,
-+			struct iovec *ies, unsigned int ies_num);
- void wsc_cancel(struct wsc *wsc, netdev_disconnect_cb_t cb);
- void wsc_destroy(struct wsc *wsc);
+-			Aborts any ongoing WSC operations.  If no WSC
+-			operation is ongoing, net.connman.iwd.NotAvailable is
+-			returned.
++			Aborts any ongoing WSC operations or a P2P connection.
++			If no operation is ongoing, net.connman.iwd.NotAvailable
++			is returned.
 -- =
 
 2.20.1
 
---===============0220797672567899915==--
+--===============0042293454369921820==--
 
