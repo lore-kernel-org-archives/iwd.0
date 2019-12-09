@@ -1,97 +1,160 @@
-Content-Type: multipart/mixed; boundary="===============5113803572515985381=="
+Content-Type: multipart/mixed; boundary="===============7522935522356093954=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 1/2] netconfig: Add IPv4 domain name helper and installer
-Date: Mon, 09 Dec 2019 15:28:04 -0800
-Message-ID: <20191209232805.2873-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 2/2] resolve: Add systemd-resolved domain name installer
+Date: Mon, 09 Dec 2019 15:28:05 -0800
+Message-ID: <20191209232805.2873-2-tim.a.kourt@linux.intel.com>
+In-Reply-To: <20191209232805.2873-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5113803572515985381==
+--===============7522935522356093954==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The provided domain name helper allows to override the DHCP lease
-option value with the static one from network configuration file.
 ---
- src/netconfig.c | 34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+ src/resolve.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ src/resolve.h |  1 +
+ 2 files changed, 83 insertions(+)
 
-diff --git a/src/netconfig.c b/src/netconfig.c
-index 9d32c37a..9f0127ac 100644
---- a/src/netconfig.c
-+++ b/src/netconfig.c
-@@ -251,6 +251,28 @@ static char **netconfig_ipv4_get_dns(struct netconfig =
-*netconfig, uint8_t proto)
- 	return NULL;
+diff --git a/src/resolve.c b/src/resolve.c
+index 387e0b3c..0c06d521 100644
+--- a/src/resolve.c
++++ b/src/resolve.c
+@@ -42,6 +42,8 @@ struct resolve_method_ops {
+ 	void (*exit)(void *data);
+ 	void (*add_dns)(uint32_t ifindex, uint8_t type, char **dns_list,
+ 								void *data);
++	void (*add_domain_name)(uint32_t ifindex, char *domain_name,
++								void *data);
+ 	void (*remove)(uint32_t ifindex, void *data);
+ };
+ =
+
+@@ -177,6 +179,74 @@ static void resolve_systemd_add_dns(uint32_t ifindex, =
+uint8_t type,
+ 								state, NULL);
  }
  =
 
-+static char *netconfig_ipv4_get_domain_name(struct netconfig *netconfig,
-+								uint8_t proto)
++static void systemd_link_add_domains_reply(struct l_dbus_message *message,
++								void *user_data)
 +{
-+	const struct l_dhcp_lease *lease;
-+	char *domain_name;
++	const char *name;
++	const char *text;
 +
-+	domain_name =3D l_settings_get_string(netconfig->active_settings,
-+							"IPv4", "domain_name");
-+	if (domain_name)
-+		/* Allow to override the DHCP domain name with setting entry. */
-+		return domain_name;
++	if (!l_dbus_message_is_error(message))
++		return;
 +
-+	if (proto !=3D RTPROT_DHCP)
-+		return NULL;
++	l_dbus_message_get_error(message, &name, &text);
 +
-+	lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
-+	if (!lease)
-+		return NULL;
-+
-+	return l_dhcp_lease_get_domain_name(lease);
++	l_error("resolve-systemd: Failed to modify the domain entries. %s: %s",
++								name, text);
 +}
 +
- static struct netconfig_ifaddr *netconfig_ipv6_get_ifaddr(
- 						struct netconfig *netconfig,
- 						uint8_t proto)
-@@ -685,6 +707,7 @@ static void netconfig_ipv4_ifaddr_add_cmd_cb(int error,=
- uint16_t type,
- 	struct netconfig *netconfig =3D user_data;
- 	struct netconfig_ifaddr *ifaddr;
- 	char **dns;
-+	char *domain_name;
- =
-
- 	if (error && error !=3D -EEXIST) {
- 		l_error("netconfig: Failed to add IP address. "
-@@ -709,12 +732,21 @@ static void netconfig_ipv4_ifaddr_add_cmd_cb(int erro=
-r, uint16_t type,
- 	dns =3D netconfig_ipv4_get_dns(netconfig, netconfig->rtm_protocol);
- 	if (!dns) {
- 		l_error("netconfig: Failed to obtain DNS addresses.");
--		goto done;
-+		goto domain_name;
- 	}
- =
-
- 	resolve_add_dns(netconfig->ifindex, ifaddr->family, dns);
- 	l_strv_free(dns);
- =
-
-+domain_name:
-+	domain_name =3D netconfig_ipv4_get_domain_name(netconfig,
-+						netconfig->rtm_protocol);
-+	if (!domain_name)
-+		goto done;
++static void resolve_systemd_add_domain_name(uint32_t ifindex, char *domain=
+_name,
++								void *data)
++{
++	struct systemd_state *state =3D data;
++	struct l_dbus_message_builder *builder;
++	struct l_dbus_message *message;
++	bool routing_domain;
 +
-+	resolve_add_domain_name(netconfig->ifindex, domain_name);
-+	l_free(domain_name);
++	l_debug("ifindex: %u", ifindex);
 +
- done:
- 	netconfig_ifaddr_destroy(ifaddr);
++	if (!state->is_ready) {
++		l_error("resolve-systemd: Failed to add domain name. "
++				"Is 'systemd-resolved' service running?");
++
++		return;
++	}
++
++	message =3D
++		l_dbus_message_new_method_call(dbus_get_bus(),
++					SYSTEMD_RESOLVED_SERVICE,
++					SYSTEMD_RESOLVED_MANAGER_PATH,
++					SYSTEMD_RESOLVED_MANAGER_INTERFACE,
++					"SetLinkDomains");
++
++	if (!message)
++		return;
++
++	builder =3D l_dbus_message_builder_new(message);
++	if (!builder) {
++		l_dbus_message_unref(message);
++		return;
++	}
++
++	routing_domain =3D true;
++
++	l_dbus_message_builder_append_basic(builder, 'i', &ifindex);
++
++	l_dbus_message_builder_enter_array(builder, "(sb)");
++
++	l_dbus_message_builder_enter_struct(builder, "sb");
++	l_dbus_message_builder_append_basic(builder, 's', domain_name);
++	l_dbus_message_builder_append_basic(builder, 'b', &routing_domain);
++	l_dbus_message_builder_leave_struct(builder);
++
++	l_dbus_message_builder_leave_array(builder);
++
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++
++	l_dbus_send_with_reply(dbus_get_bus(), message,
++				systemd_link_add_domains_reply, state, NULL);
++}
++
+ static void resolve_systemd_remove(uint32_t ifindex, void *data)
+ {
+ 	struct systemd_state *state =3D data;
+@@ -249,6 +319,7 @@ static const struct resolve_method_ops resolve_method_s=
+ystemd =3D {
+ 	.init =3D resolve_systemd_init,
+ 	.exit =3D resolve_systemd_exit,
+ 	.add_dns =3D resolve_systemd_add_dns,
++	.add_domain_name =3D resolve_systemd_add_domain_name,
+ 	.remove =3D resolve_systemd_remove,
+ };
+ =
+
+@@ -376,6 +447,17 @@ void resolve_add_dns(uint32_t ifindex, uint8_t type, c=
+har **dns_list)
+ 	method.ops->add_dns(ifindex, type, dns_list, method.data);
  }
+ =
+
++void resolve_add_domain_name(uint32_t ifindex, char *domain_name)
++{
++	if (!domain_name)
++		return;
++
++	if (!method.ops || !method.ops->add_dns)
++		return;
++
++	method.ops->add_domain_name(ifindex, domain_name, method.data);
++}
++
+ void resolve_remove(uint32_t ifindex)
+ {
+ 	if (!method.ops || !method.ops->remove)
+diff --git a/src/resolve.h b/src/resolve.h
+index b0335868..68aaa7d6 100644
+--- a/src/resolve.h
++++ b/src/resolve.h
+@@ -21,4 +21,5 @@
+  */
+ =
+
+ void resolve_add_dns(uint32_t ifindex, uint8_t type, char **dns_list);
++void resolve_add_domain_name(uint32_t ifindex, char *domain_name);
+ void resolve_remove(uint32_t ifindex);
 -- =
 
 2.13.6
 
---===============5113803572515985381==--
+--===============7522935522356093954==--
 
