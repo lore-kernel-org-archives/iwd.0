@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============3541092008453048298=="
+Content-Type: multipart/mixed; boundary="===============4260086773156768584=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/7] iwmon: Print WSC AuthorizedMACs extended attributes
-Date: Sun, 08 Dec 2019 21:47:46 -0600
-Message-ID: <eacf87e3-a0ef-5696-45d6-c969264661f6@gmail.com>
-In-Reply-To: <20191205032244.5957-1-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 3/7] wsc: Declare the credentials structure in wsc.h
+Date: Sun, 08 Dec 2019 21:49:51 -0600
+Message-ID: <ddd340f7-e9ee-e099-4105-8615ece41edf@gmail.com>
+In-Reply-To: <20191205032244.5957-3-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3541092008453048298==
+--===============4260086773156768584==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -17,15 +17,18 @@ Hi Andrew,
 
 On 12/4/19 9:22 PM, Andrew Zaborowski wrote:
 > ---
->   monitor/nlmon.c | 16 ++++++++++++++++
->   1 file changed, 16 insertions(+)
+>   Makefile.am |  2 +-
+>   src/wsc.c   | 12 ++----------
+>   src/wsc.h   | 32 ++++++++++++++++++++++++++++++++
+>   3 files changed, 35 insertions(+), 11 deletions(-)
+>   create mode 100644 src/wsc.h
 > =
 
 
-Patch 1 & 2 applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============3541092008453048298==--
+--===============4260086773156768584==--
 
