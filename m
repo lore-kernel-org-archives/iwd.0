@@ -1,160 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============7522935522356093954=="
+Content-Type: multipart/mixed; boundary="===============7887400308351225336=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 2/2] resolve: Add systemd-resolved domain name installer
-Date: Mon, 09 Dec 2019 15:28:05 -0800
-Message-ID: <20191209232805.2873-2-tim.a.kourt@linux.intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/2] netconfig: Add IPv4 domain name helper and installer
+Date: Mon, 09 Dec 2019 09:23:08 -0600
+Message-ID: <71c65a22-0c01-2d00-5908-c99de1dd6624@gmail.com>
 In-Reply-To: <20191209232805.2873-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7522935522356093954==
+--===============7887400308351225336==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/resolve.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++
- src/resolve.h |  1 +
- 2 files changed, 83 insertions(+)
+Hi Tim,
 
-diff --git a/src/resolve.c b/src/resolve.c
-index 387e0b3c..0c06d521 100644
---- a/src/resolve.c
-+++ b/src/resolve.c
-@@ -42,6 +42,8 @@ struct resolve_method_ops {
- 	void (*exit)(void *data);
- 	void (*add_dns)(uint32_t ifindex, uint8_t type, char **dns_list,
- 								void *data);
-+	void (*add_domain_name)(uint32_t ifindex, char *domain_name,
-+								void *data);
- 	void (*remove)(uint32_t ifindex, void *data);
- };
- =
+On 12/9/19 5:28 PM, Tim Kourt wrote:
+> The provided domain name helper allows to override the DHCP lease
+> option value with the static one from network configuration file.
+> ---
+>   src/netconfig.c | 34 +++++++++++++++++++++++++++++++++-
+>   1 file changed, 33 insertions(+), 1 deletion(-)
+> =
 
-@@ -177,6 +179,74 @@ static void resolve_systemd_add_dns(uint32_t ifindex, =
-uint8_t type,
- 								state, NULL);
- }
- =
+> diff --git a/src/netconfig.c b/src/netconfig.c
+> index 9d32c37a..9f0127ac 100644
+> --- a/src/netconfig.c
+> +++ b/src/netconfig.c
+> @@ -251,6 +251,28 @@ static char **netconfig_ipv4_get_dns(struct netconfi=
+g *netconfig, uint8_t proto)
+>   	return NULL;
+>   }
+>   =
 
-+static void systemd_link_add_domains_reply(struct l_dbus_message *message,
-+								void *user_data)
-+{
-+	const char *name;
-+	const char *text;
-+
-+	if (!l_dbus_message_is_error(message))
-+		return;
-+
-+	l_dbus_message_get_error(message, &name, &text);
-+
-+	l_error("resolve-systemd: Failed to modify the domain entries. %s: %s",
-+								name, text);
-+}
-+
-+static void resolve_systemd_add_domain_name(uint32_t ifindex, char *domain=
-_name,
-+								void *data)
-+{
-+	struct systemd_state *state =3D data;
-+	struct l_dbus_message_builder *builder;
-+	struct l_dbus_message *message;
-+	bool routing_domain;
-+
-+	l_debug("ifindex: %u", ifindex);
-+
-+	if (!state->is_ready) {
-+		l_error("resolve-systemd: Failed to add domain name. "
-+				"Is 'systemd-resolved' service running?");
-+
-+		return;
-+	}
-+
-+	message =3D
-+		l_dbus_message_new_method_call(dbus_get_bus(),
-+					SYSTEMD_RESOLVED_SERVICE,
-+					SYSTEMD_RESOLVED_MANAGER_PATH,
-+					SYSTEMD_RESOLVED_MANAGER_INTERFACE,
-+					"SetLinkDomains");
-+
-+	if (!message)
-+		return;
-+
-+	builder =3D l_dbus_message_builder_new(message);
-+	if (!builder) {
-+		l_dbus_message_unref(message);
-+		return;
-+	}
-+
-+	routing_domain =3D true;
-+
-+	l_dbus_message_builder_append_basic(builder, 'i', &ifindex);
-+
-+	l_dbus_message_builder_enter_array(builder, "(sb)");
-+
-+	l_dbus_message_builder_enter_struct(builder, "sb");
-+	l_dbus_message_builder_append_basic(builder, 's', domain_name);
-+	l_dbus_message_builder_append_basic(builder, 'b', &routing_domain);
-+	l_dbus_message_builder_leave_struct(builder);
-+
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+
-+	l_dbus_send_with_reply(dbus_get_bus(), message,
-+				systemd_link_add_domains_reply, state, NULL);
-+}
-+
- static void resolve_systemd_remove(uint32_t ifindex, void *data)
- {
- 	struct systemd_state *state =3D data;
-@@ -249,6 +319,7 @@ static const struct resolve_method_ops resolve_method_s=
-ystemd =3D {
- 	.init =3D resolve_systemd_init,
- 	.exit =3D resolve_systemd_exit,
- 	.add_dns =3D resolve_systemd_add_dns,
-+	.add_domain_name =3D resolve_systemd_add_domain_name,
- 	.remove =3D resolve_systemd_remove,
- };
- =
+> +static char *netconfig_ipv4_get_domain_name(struct netconfig *netconfig,
+> +								uint8_t proto)
+> +{
+> +	const struct l_dhcp_lease *lease;
+> +	char *domain_name;
+> +
+> +	domain_name =3D l_settings_get_string(netconfig->active_settings,
+> +							"IPv4", "domain_name");
 
-@@ -376,6 +447,17 @@ void resolve_add_dns(uint32_t ifindex, uint8_t type, c=
-har **dns_list)
- 	method.ops->add_dns(ifindex, type, dns_list, method.data);
- }
- =
+Lets use CamelCase here
 
-+void resolve_add_domain_name(uint32_t ifindex, char *domain_name)
-+{
-+	if (!domain_name)
-+		return;
-+
-+	if (!method.ops || !method.ops->add_dns)
-+		return;
-+
-+	method.ops->add_domain_name(ifindex, domain_name, method.data);
-+}
-+
- void resolve_remove(uint32_t ifindex)
- {
- 	if (!method.ops || !method.ops->remove)
-diff --git a/src/resolve.h b/src/resolve.h
-index b0335868..68aaa7d6 100644
---- a/src/resolve.h
-+++ b/src/resolve.h
-@@ -21,4 +21,5 @@
-  */
- =
+> +	if (domain_name)
+> +		/* Allow to override the DHCP domain name with setting entry. */
+> +		return domain_name;
+> +
+> +	if (proto !=3D RTPROT_DHCP)
+> +		return NULL;
+> +
+> +	lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
+> +	if (!lease)
+> +		return NULL;
+> +
+> +	return l_dhcp_lease_get_domain_name(lease);
+> +}
+> +
+>   static struct netconfig_ifaddr *netconfig_ipv6_get_ifaddr(
+>   						struct netconfig *netconfig,
+>   						uint8_t proto)
 
- void resolve_add_dns(uint32_t ifindex, uint8_t type, char **dns_list);
-+void resolve_add_domain_name(uint32_t ifindex, char *domain_name);
- void resolve_remove(uint32_t ifindex);
--- =
+Otherwise looks fine to me
 
-2.13.6
-
---===============7522935522356093954==--
+Regards,
+-Denis
+--===============7887400308351225336==--
 
