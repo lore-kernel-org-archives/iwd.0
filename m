@@ -1,160 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============7028807842989461861=="
+Content-Type: multipart/mixed; boundary="===============8201001894783118556=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH v2 2/2] resolve: Add systemd-resolved domain name installer
-Date: Tue, 10 Dec 2019 08:49:03 -0800
-Message-ID: <20191210164903.21122-2-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20191210164903.21122-1-tim.a.kourt@linux.intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: EAP-Method=PEAP and tls_reset_handshake/authentication timeout
+ results in core-dumped
+Date: Tue, 10 Dec 2019 01:29:34 -0600
+Message-ID: <3c1078d4-b64b-03a3-ef20-493527f2b35a@gmail.com>
+In-Reply-To: <20191210045124.1cbd142d@hostpad>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7028807842989461861==
+--===============8201001894783118556==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/resolve.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++
- src/resolve.h |  1 +
- 2 files changed, 83 insertions(+)
+Hi Simon,
 
-diff --git a/src/resolve.c b/src/resolve.c
-index 387e0b3c..0c06d521 100644
---- a/src/resolve.c
-+++ b/src/resolve.c
-@@ -42,6 +42,8 @@ struct resolve_method_ops {
- 	void (*exit)(void *data);
- 	void (*add_dns)(uint32_t ifindex, uint8_t type, char **dns_list,
- 								void *data);
-+	void (*add_domain_name)(uint32_t ifindex, char *domain_name,
-+								void *data);
- 	void (*remove)(uint32_t ifindex, void *data);
- };
- =
+On 12/9/19 10:51 PM, Simon Brand wrote:
+> Hello,
+> =
 
-@@ -177,6 +179,74 @@ static void resolve_systemd_add_dns(uint32_t ifindex, =
-uint8_t type,
- 								state, NULL);
- }
- =
+> I use a config with EAP-Method=3DPEAP and
+> EAP-PEAP-Phase2-Method=3DMSCHAPV2, which results in (random?) core-dump.
+> [0]
 
-+static void systemd_link_add_domains_reply(struct l_dbus_message *message,
-+								void *user_data)
-+{
-+	const char *name;
-+	const char *text;
-+
-+	if (!l_dbus_message_is_error(message))
-+		return;
-+
-+	l_dbus_message_get_error(message, &name, &text);
-+
-+	l_error("resolve-systemd: Failed to modify the domain entries. %s: %s",
-+								name, text);
-+}
-+
-+static void resolve_systemd_add_domain_name(uint32_t ifindex, char *domain=
-_name,
-+								void *data)
-+{
-+	struct systemd_state *state =3D data;
-+	struct l_dbus_message_builder *builder;
-+	struct l_dbus_message *message;
-+	bool routing_domain;
-+
-+	l_debug("ifindex: %u", ifindex);
-+
-+	if (!state->is_ready) {
-+		l_error("resolve-systemd: Failed to add domain name. "
-+				"Is 'systemd-resolved' service running?");
-+
-+		return;
-+	}
-+
-+	message =3D
-+		l_dbus_message_new_method_call(dbus_get_bus(),
-+					SYSTEMD_RESOLVED_SERVICE,
-+					SYSTEMD_RESOLVED_MANAGER_PATH,
-+					SYSTEMD_RESOLVED_MANAGER_INTERFACE,
-+					"SetLinkDomains");
-+
-+	if (!message)
-+		return;
-+
-+	builder =3D l_dbus_message_builder_new(message);
-+	if (!builder) {
-+		l_dbus_message_unref(message);
-+		return;
-+	}
-+
-+	routing_domain =3D true;
-+
-+	l_dbus_message_builder_append_basic(builder, 'i', &ifindex);
-+
-+	l_dbus_message_builder_enter_array(builder, "(sb)");
-+
-+	l_dbus_message_builder_enter_struct(builder, "sb");
-+	l_dbus_message_builder_append_basic(builder, 's', domain_name);
-+	l_dbus_message_builder_append_basic(builder, 'b', &routing_domain);
-+	l_dbus_message_builder_leave_struct(builder);
-+
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+
-+	l_dbus_send_with_reply(dbus_get_bus(), message,
-+				systemd_link_add_domains_reply, state, NULL);
-+}
-+
- static void resolve_systemd_remove(uint32_t ifindex, void *data)
- {
- 	struct systemd_state *state =3D data;
-@@ -249,6 +319,7 @@ static const struct resolve_method_ops resolve_method_s=
-ystemd =3D {
- 	.init =3D resolve_systemd_init,
- 	.exit =3D resolve_systemd_exit,
- 	.add_dns =3D resolve_systemd_add_dns,
-+	.add_domain_name =3D resolve_systemd_add_domain_name,
- 	.remove =3D resolve_systemd_remove,
- };
- =
+So from the log it appears as if you're able to authenticate and =
 
-@@ -376,6 +447,17 @@ void resolve_add_dns(uint32_t ifindex, uint8_t type, c=
-har **dns_list)
- 	method.ops->add_dns(ifindex, type, dns_list, method.data);
- }
- =
+establish a connection successfully the first time after iwd starts. =
 
-+void resolve_add_domain_name(uint32_t ifindex, char *domain_name)
-+{
-+	if (!domain_name)
-+		return;
-+
-+	if (!method.ops || !method.ops->add_dns)
-+		return;
-+
-+	method.ops->add_domain_name(ifindex, domain_name, method.data);
-+}
-+
- void resolve_remove(uint32_t ifindex)
- {
- 	if (!method.ops || !method.ops->remove)
-diff --git a/src/resolve.h b/src/resolve.h
-index b0335868..68aaa7d6 100644
---- a/src/resolve.h
-+++ b/src/resolve.h
-@@ -21,4 +21,5 @@
-  */
- =
+Right?  And the crash happens after the AP requests reauthentication.
 
- void resolve_add_dns(uint32_t ifindex, uint8_t type, char **dns_list);
-+void resolve_add_domain_name(uint32_t ifindex, char *domain_name);
- void resolve_remove(uint32_t ifindex);
--- =
+> This happens after authentication timeout or tls_reset_handshake. [1]
+> My system is an uptodate arch linux machine with iwd 1.2-1, Linux
+> 5.4.2-arch1-1, glibc 2.30-3. If you need more information I am happy to
+> provide it. There is no problem with PreSharedKey Wifis.
+> Thank you for your time and this great tool.
 
-2.13.6
+Any chance you can send us a core dump, or compile iwd with debugging =
 
---===============7028807842989461861==--
+enabled (./bootstrap-configure --enable-debug --disable-optimization if =
+
+building from git) and send us the backtrace?
+
+Also, what hardware are you running this on?
+
+Regards,
+-Denis
+--===============8201001894783118556==--
 
