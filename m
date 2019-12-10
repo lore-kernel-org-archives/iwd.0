@@ -1,122 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============5842869912473020517=="
+Content-Type: multipart/mixed; boundary="===============2845401752917947819=="
 MIME-Version: 1.0
-From: Xaver =?unknown-8bit?q?H=C3=B6rl?= <hoe.dom@gmx.de>
-Subject: [PATCH] client: Follow the xdg base directory specification
-Date: Tue, 10 Dec 2019 14:06:09 +0100
-Message-ID: <20191210130609.5gnmcbb3cxthmfwi@blumerang>
-In-Reply-To: <B4E8E87E-8EE1-4487-AEFA-59EC699A3FE9@holtmann.org>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2 1/2] netconfig: Add IPv4 domain name helper and installer
+Date: Tue, 10 Dec 2019 08:49:02 -0800
+Message-ID: <20191210164903.21122-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5842869912473020517==
+--===============2845401752917947819==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Use XDG_DATA_HOME as location for the history file.
-Also reads and migrates the history from the old location in the users
-home directory if present.
+The provided domain name helper allows to override the DHCP lease
+option value with the static one from network configuration file.
 ---
- client/display.c | 68 +++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 62 insertions(+), 6 deletions(-)
+ src/netconfig.c | 34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/client/display.c b/client/display.c
-index 10c87b2a..d1a1a7f7 100644
---- a/client/display.c
-+++ b/client/display.c
-@@ -27,6 +27,9 @@
- #define _GNU_SOURCE
- #include <stdio.h>
- #include <signal.h>
-+#include <unistd.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-
- #include <readline/history.h>
- #include <readline/readline.h>
-@@ -632,22 +635,75 @@ static void signal_handler(void *user_data)
- 		display_refresh_reset();
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 9d32c37a..e7176444 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -251,6 +251,28 @@ static char **netconfig_ipv4_get_dns(struct netconfig =
+*netconfig, uint8_t proto)
+ 	return NULL;
  }
+ =
 
-+char * get_data_dir()
++static char *netconfig_ipv4_get_domain_name(struct netconfig *netconfig,
++								uint8_t proto)
 +{
-+	const char *xdg_data_home;
-+	const char *home_path;
-+	char *data_dir;
++	const struct l_dhcp_lease *lease;
++	char *domain_name;
 +
-+	xdg_data_home =3D getenv("XDG_DATA_HOME");
-+	if (!xdg_data_home || *xdg_data_home !=3D '/') {
-+		home_path =3D getenv("HOME");
-+		if (home_path)
-+			data_dir =3D l_strdup_printf("%s/%s", home_path,
-+						".local/share/iwctl");
-+		else
-+			return NULL;
-+	} else {
-+		data_dir =3D l_strdup_printf("%s/%s", xdg_data_home,
-+							"iwctl");
-+	}
-+	return data_dir;
++	domain_name =3D l_settings_get_string(netconfig->active_settings,
++							"IPv4", "DomainName");
++	if (domain_name)
++		/* Allow to override the DHCP domain name with setting entry. */
++		return domain_name;
++
++	if (proto !=3D RTPROT_DHCP)
++		return NULL;
++
++	lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
++	if (!lease)
++		return NULL;
++
++	return l_dhcp_lease_get_domain_name(lease);
 +}
 +
-+char * get_old_history_file()
-+{
-+	const char *home_path;
-+	char *old_history_path;
-+	struct stat st;
-+	int err;
+ static struct netconfig_ifaddr *netconfig_ipv6_get_ifaddr(
+ 						struct netconfig *netconfig,
+ 						uint8_t proto)
+@@ -685,6 +707,7 @@ static void netconfig_ipv4_ifaddr_add_cmd_cb(int error,=
+ uint16_t type,
+ 	struct netconfig *netconfig =3D user_data;
+ 	struct netconfig_ifaddr *ifaddr;
+ 	char **dns;
++	char *domain_name;
+ =
+
+ 	if (error && error !=3D -EEXIST) {
+ 		l_error("netconfig: Failed to add IP address. "
+@@ -709,12 +732,21 @@ static void netconfig_ipv4_ifaddr_add_cmd_cb(int erro=
+r, uint16_t type,
+ 	dns =3D netconfig_ipv4_get_dns(netconfig, netconfig->rtm_protocol);
+ 	if (!dns) {
+ 		l_error("netconfig: Failed to obtain DNS addresses.");
+-		goto done;
++		goto domain_name;
+ 	}
+ =
+
+ 	resolve_add_dns(netconfig->ifindex, ifaddr->family, dns);
+ 	l_strv_free(dns);
+ =
+
++domain_name:
++	domain_name =3D netconfig_ipv4_get_domain_name(netconfig,
++						netconfig->rtm_protocol);
++	if (!domain_name)
++		goto done;
 +
-+	home_path =3D getenv("HOME");
-+	if (home_path) {
-+		old_history_path =3D l_strdup_printf("%s/%s", home_path,
-+						".iwctl_history");
++	resolve_add_domain_name(netconfig->ifindex, domain_name);
++	l_free(domain_name);
 +
-+		err =3D stat(old_history_path, &st);
-+		if (err || !S_ISREG(st.st_mode)) {
-+			l_free(old_history_path);
-+			return NULL;
-+		}
-+	}
-+	return old_history_path;
-+}
-+
- static char *history_path;
+ done:
+ 	netconfig_ifaddr_destroy(ifaddr);
+ }
+-- =
 
- void display_init(void)
- {
--	const char *home_path;
-+	char *data_dir;
-+	char *old_history_file;
+2.13.6
 
- 	display_refresh.redo_entries =3D l_queue_new();
-
- 	stifle_history(24);
-
--	home_path =3D getenv("HOME");
--	if (home_path)
--		history_path =3D l_strdup_printf("%s/%s", home_path,
--							".iwctl_history");
-+	data_dir =3D get_data_dir();
-+	if (data_dir) {
-+		mkdir(data_dir,0700);
-+
-+		history_path =3D l_strdup_printf("%s/%s", data_dir,
-+							"history");
-+		l_free(data_dir);
-+	}
-
--	read_history(history_path);
-+	old_history_file =3D get_old_history_file();
-+	if (old_history_file) {
-+		read_history(old_history_file);
-+		unlink(old_history_file);
-+		l_free(old_history_file);
-+	} else
-+		read_history(history_path);
-
- 	setlinebuf(stdout);
-
---
-2.24.0
---===============5842869912473020517==--
+--===============2845401752917947819==--
 
