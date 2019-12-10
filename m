@@ -1,41 +1,122 @@
-Content-Type: multipart/mixed; boundary="===============4697103565134680806=="
+Content-Type: multipart/mixed; boundary="===============5842869912473020517=="
 MIME-Version: 1.0
 From: Xaver =?unknown-8bit?q?H=C3=B6rl?= <hoe.dom@gmx.de>
-Subject: Re: Suggestion: make iwctl follow the XDG Base Directory Specification
-Date: Tue, 10 Dec 2019 14:04:20 +0100
-Message-ID: <20191210130420.snypbt3q3hgp5nak@blumerang>
+Subject: [PATCH] client: Follow the xdg base directory specification
+Date: Tue, 10 Dec 2019 14:06:09 +0100
+Message-ID: <20191210130609.5gnmcbb3cxthmfwi@blumerang>
 In-Reply-To: <B4E8E87E-8EE1-4487-AEFA-59EC699A3FE9@holtmann.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4697103565134680806==
+--===============5842869912473020517==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Sure I will give it a try. Note though that I don't usually code in C
-and have no experience contributing to this sort of stuff.
+Use XDG_DATA_HOME as location for the history file.
+Also reads and migrates the history from the old location in the users
+home directory if present.
+---
+ client/display.c | 68 +++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 62 insertions(+), 6 deletions(-)
 
-On Sat, Dec 07, 2019 at 04:47:39PM +0100, Marcel Holtmann wrote:
-> Hi,
->
-> > Currently iwctl writes its history to a file named .iwctl_history in th=
-e users home directory. The XDG Base Directory Specification tries to stand=
-ardize these kind of things (see https://specifications.freedesktop.org/bas=
-edir-spec/basedir-spec-latest.html for details). The bottom line would prob=
-ably be to:
-> > * check XDG_DATA_HOME (with fall back to .local/share/) and save the hi=
-story in an iwd subfolder of that directory
-> > * potentially read (and migrate?) .iwctl_history from the home director=
-y for compatibility purposes
->
-> I am fine with using $XDG_DATA_HOME/iwctl/history or $HOME/.local/share/i=
-wctl/history as fallback if $XDG_DATA_HOME is not provided. Care to send a =
-patch for this?
->
-> Regards
->
-> Marcel
->
---===============4697103565134680806==--
+diff --git a/client/display.c b/client/display.c
+index 10c87b2a..d1a1a7f7 100644
+--- a/client/display.c
++++ b/client/display.c
+@@ -27,6 +27,9 @@
+ #define _GNU_SOURCE
+ #include <stdio.h>
+ #include <signal.h>
++#include <unistd.h>
++#include <sys/types.h>
++#include <sys/stat.h>
+
+ #include <readline/history.h>
+ #include <readline/readline.h>
+@@ -632,22 +635,75 @@ static void signal_handler(void *user_data)
+ 		display_refresh_reset();
+ }
+
++char * get_data_dir()
++{
++	const char *xdg_data_home;
++	const char *home_path;
++	char *data_dir;
++
++	xdg_data_home =3D getenv("XDG_DATA_HOME");
++	if (!xdg_data_home || *xdg_data_home !=3D '/') {
++		home_path =3D getenv("HOME");
++		if (home_path)
++			data_dir =3D l_strdup_printf("%s/%s", home_path,
++						".local/share/iwctl");
++		else
++			return NULL;
++	} else {
++		data_dir =3D l_strdup_printf("%s/%s", xdg_data_home,
++							"iwctl");
++	}
++	return data_dir;
++}
++
++char * get_old_history_file()
++{
++	const char *home_path;
++	char *old_history_path;
++	struct stat st;
++	int err;
++
++	home_path =3D getenv("HOME");
++	if (home_path) {
++		old_history_path =3D l_strdup_printf("%s/%s", home_path,
++						".iwctl_history");
++
++		err =3D stat(old_history_path, &st);
++		if (err || !S_ISREG(st.st_mode)) {
++			l_free(old_history_path);
++			return NULL;
++		}
++	}
++	return old_history_path;
++}
++
+ static char *history_path;
+
+ void display_init(void)
+ {
+-	const char *home_path;
++	char *data_dir;
++	char *old_history_file;
+
+ 	display_refresh.redo_entries =3D l_queue_new();
+
+ 	stifle_history(24);
+
+-	home_path =3D getenv("HOME");
+-	if (home_path)
+-		history_path =3D l_strdup_printf("%s/%s", home_path,
+-							".iwctl_history");
++	data_dir =3D get_data_dir();
++	if (data_dir) {
++		mkdir(data_dir,0700);
++
++		history_path =3D l_strdup_printf("%s/%s", data_dir,
++							"history");
++		l_free(data_dir);
++	}
+
+-	read_history(history_path);
++	old_history_file =3D get_old_history_file();
++	if (old_history_file) {
++		read_history(old_history_file);
++		unlink(old_history_file);
++		l_free(old_history_file);
++	} else
++		read_history(history_path);
+
+ 	setlinebuf(stdout);
+
+--
+2.24.0
+--===============5842869912473020517==--
 
