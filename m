@@ -1,55 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============5016974730288651686=="
+Content-Type: multipart/mixed; boundary="===============6441318576513534060=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 3/6] netconfig: Use CamelCase for IPv4 DNS setting
-Date: Tue, 10 Dec 2019 15:38:34 -0800
-Message-ID: <20191210233837.1499-3-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 4/6] netconfig: Use CamelCase for IPv6 address settings
+Date: Tue, 10 Dec 2019 15:38:35 -0800
+Message-ID: <20191210233837.1499-4-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20191210233837.1499-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5016974730288651686==
+--===============6441318576513534060==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/netconfig.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ src/netconfig.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/src/netconfig.c b/src/netconfig.c
-index 0d5f9464..58a08b35 100644
+index 58a08b35..7776f6e1 100644
 --- a/src/netconfig.c
 +++ b/src/netconfig.c
-@@ -233,12 +233,18 @@ static char **netconfig_ipv4_get_dns(struct netconfig=
- *netconfig, uint8_t proto)
- 	const struct l_dhcp_lease *lease;
- 	struct in_addr in_addr;
- 	char **dns_list;
--	char **p;
+@@ -290,9 +290,13 @@ static struct netconfig_ifaddr *netconfig_ipv6_get_ifa=
+ddr(
+ 	switch (proto) {
+ 	case RTPROT_STATIC:
+ 		ip =3D l_settings_get_string(netconfig->active_settings, "IPv6",
+-									"ip");
+-		if (!ip)
+-			return NULL;
++								"Address");
++		if (!ip) {
++			ip =3D l_settings_get_string(netconfig->active_settings,
++								"IPv6", "ip");
++			if (!ip)
++				return NULL;
++		}
  =
 
--	p =3D dns_list =3D l_settings_get_string_list(netconfig->active_settings,
--							"IPv4", "dns", ' ');
-+	dns_list =3D l_settings_get_string_list(netconfig->active_settings,
-+							"IPv4", "DNS", ' ');
-+	if (!dns_list)
-+		dns_list =3D l_settings_get_string_list(
-+						netconfig->active_settings,
-+						"IPv4", "dns", ' ');
-+
- 	if (dns_list && *dns_list) {
--		for (; *p; p++) {
-+		char **p;
-+
-+		for (p =3D dns_list; *p; p++) {
- 			if (inet_pton(AF_INET, *p, &in_addr) =3D=3D 1)
- 				continue;
- =
-
+ 		ifaddr =3D l_new(struct netconfig_ifaddr, 1);
+ 		ifaddr->ip =3D ip;
 -- =
 
 2.13.6
 
---===============5016974730288651686==--
+--===============6441318576513534060==--
 
