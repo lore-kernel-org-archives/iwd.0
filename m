@@ -1,67 +1,105 @@
-Content-Type: multipart/mixed; boundary="===============8984807871919770726=="
+Content-Type: multipart/mixed; boundary="===============0659052930224135245=="
 MIME-Version: 1.0
-From: xdavidwu <xdavidwuph@gmail.com>
-Subject: [PATCH] eap-gtc: Try to auth even if request not Password
-Date: Wed, 11 Dec 2019 20:39:04 +0800
-Message-ID: <20191211123904.27413-1-xdavidwuph@gmail.com>
+From: Simon Brand <simon.brand@postadigitale.de>
+Subject: Re: EAP-Method=PEAP and tls_reset_handshake/authentication timeout
+ results in core-dumped
+Date: Wed, 11 Dec 2019 14:58:24 +0100
+Message-ID: <20191211135824.7b8b4206@hostpad>
+In-Reply-To: <20191211085102.00d158ac@hostpad>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8984807871919770726==
+--===============0659052930224135245==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There are some server implementations that send requests that are
-not "Password" but still want us send password. This commit modify
-the behavior to send a warning and still try to auth with password.
+Hello,
 
-This makes me able to auth with server in my school which sends
-"Enter Aruba Login".
+today I noticed that the same happend with a PSK WPA2 Network.
+iwd log: http://sprunge.us/7CJCtJ
+dmesg: http://sprunge.us/aeUNQa
 
-wpa_supplicant does not check if it is "Password".
----
- src/eap-gtc.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+I looked through the log and I had the same behaviour with kernel 4.19
+and also iwd 0.23.
 
-diff --git a/src/eap-gtc.c b/src/eap-gtc.c
-index 9302257e..7788d44c 100644
---- a/src/eap-gtc.c
-+++ b/src/eap-gtc.c
-@@ -56,11 +56,9 @@ static void eap_gtc_handle_request(struct eap_state *eap,
- 	size_t secret_len =3D strlen(gtc->password);
- 	uint8_t response[5 + secret_len];
- =
+Regards,
+Simon
 
--	if (len < 8)
--		goto error;
--
--	if (strncmp((const char *)pkt, "Password", 8))
--		goto error;
-+	if (len < 8 || strncmp((const char *)pkt, "Password", 8))
-+		l_warn("GTC request not understood, proceeding anyway: %.*s",
-+				(int) len, (const char *) pkt);
- =
 
- 	memcpy(response + 5, gtc->password, secret_len);
- =
+On Wed, 11 Dec 2019 09:51:02 +0100
+Simon Brand <simon.brand@postadigitale.de> wrote:
 
-@@ -69,10 +67,6 @@ static void eap_gtc_handle_request(struct eap_state *eap,
- 	eap_method_success(eap);
- =
+> Hello Denis,
+> =
 
- 	return;
--
--error:
--	l_error("invalid GTC request");
--	eap_method_error(eap);
- }
- =
+> exactly, sometimes I am able to establish a connection and use it for
+> a long time.
+> I am using Intel Corporation Wireless 8265 / 8275 (rev 78). [0]
+> Is there any authentication data stored in the core dump?
+> I will compile it with debugging enabled, but I probably wont get to
+> it the next two days.
+> =
 
- static int eap_gtc_check_settings(struct l_settings *settings,
--- =
+> Best and thanks,
+> Simon
+> =
 
-2.24.1
+> [0] http://sprunge.us/Gyjrbx
+> =
 
---===============8984807871919770726==--
+> =
+
+> On Tue, 10 Dec 2019 01:29:34 -0600
+> Denis Kenzior <denkenz@gmail.com> wrote:
+> =
+
+> > Hi Simon,
+> > =
+
+> > On 12/9/19 10:51 PM, Simon Brand wrote:  =
+
+> > > Hello,
+> > > =
+
+> > > I use a config with EAP-Method=3DPEAP and
+> > > EAP-PEAP-Phase2-Method=3DMSCHAPV2, which results in (random?)
+> > > core-dump. [0]    =
+
+> > =
+
+> > So from the log it appears as if you're able to authenticate and =
+
+> > establish a connection successfully the first time after iwd
+> > starts. Right?  And the crash happens after the AP requests
+> > reauthentication. =
+
+> > > This happens after authentication timeout or tls_reset_handshake.
+> > > [1] My system is an uptodate arch linux machine with iwd 1.2-1,
+> > > Linux 5.4.2-arch1-1, glibc 2.30-3. If you need more information I
+> > > am happy to provide it. There is no problem with PreSharedKey
+> > > Wifis. Thank you for your time and this great tool.    =
+
+> > =
+
+> > Any chance you can send us a core dump, or compile iwd with
+> > debugging enabled (./bootstrap-configure --enable-debug
+> > --disable-optimization if building from git) and send us the
+> > backtrace?
+> > =
+
+> > Also, what hardware are you running this on?
+> > =
+
+> > Regards,
+> > -Denis
+> > _______________________________________________
+> > iwd mailing list -- iwd(a)lists.01.org
+> > To unsubscribe send an email to iwd-leave(a)lists.01.org  =
+
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+
+--===============0659052930224135245==--
 
