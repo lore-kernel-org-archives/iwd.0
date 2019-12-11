@@ -1,56 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============2037867876782354904=="
+Content-Type: multipart/mixed; boundary="===============6563978180611018614=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 6/6] netconfig: Use CamelCase for IPv6 DNS setting
-Date: Tue, 10 Dec 2019 15:38:37 -0800
-Message-ID: <20191210233837.1499-6-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20191210233837.1499-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH v3 1/2] netconfig: Add IPv4 domain name helper and installer
+Date: Tue, 10 Dec 2019 16:34:53 -0800
+Message-ID: <20191211003454.16767-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2037867876782354904==
+--===============6563978180611018614==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+The provided domain name helper allows to override the DHCP lease
+option value with the static one from network configuration file.
 ---
- src/netconfig.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ src/netconfig.c | 34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
 diff --git a/src/netconfig.c b/src/netconfig.c
-index d91f4120..c7e9f934 100644
+index c7e9f934..8d493496 100644
 --- a/src/netconfig.c
 +++ b/src/netconfig.c
-@@ -382,12 +382,19 @@ static char **netconfig_ipv6_get_dns(struct netconfig=
- *netconfig, uint8_t proto)
- {
- 	struct in6_addr in6_addr;
- 	char **dns_list;
--	char **p;
+@@ -278,6 +278,28 @@ static char **netconfig_ipv4_get_dns(struct netconfig =
+*netconfig, uint8_t proto)
+ 	return NULL;
+ }
  =
 
--	p =3D dns_list =3D l_settings_get_string_list(netconfig->active_settings,
--							"IPv6", "dns", ' ');
-+	dns_list =3D l_settings_get_string_list(netconfig->active_settings,
-+							"IPv6", "DNS", ' ');
++static char *netconfig_ipv4_get_domain_name(struct netconfig *netconfig,
++								uint8_t proto)
++{
++	const struct l_dhcp_lease *lease;
++	char *domain_name;
 +
-+	if (!dns_list)
-+		dns_list =3D l_settings_get_string_list(
-+						netconfig->active_settings,
-+						"IPv6", "dns", ' ');
++	domain_name =3D l_settings_get_string(netconfig->active_settings,
++							"IPv4", "DomainName");
++	if (domain_name)
++		/* Allow to override the DHCP domain name with setting entry. */
++		return domain_name;
 +
- 	if (dns_list && *dns_list) {
--		for (; *p; p++) {
-+		char **p;
++	if (proto !=3D RTPROT_DHCP)
++		return NULL;
 +
-+		for (p =3D dns_list; *p; p++) {
- 			if (inet_pton(AF_INET6, *p, &in6_addr) =3D=3D 1)
- 				continue;
++	lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
++	if (!lease)
++		return NULL;
++
++	return l_dhcp_lease_get_domain_name(lease);
++}
++
+ static struct netconfig_ifaddr *netconfig_ipv6_get_ifaddr(
+ 						struct netconfig *netconfig,
+ 						uint8_t proto)
+@@ -727,6 +749,7 @@ static void netconfig_ipv4_ifaddr_add_cmd_cb(int error,=
+ uint16_t type,
+ 	struct netconfig *netconfig =3D user_data;
+ 	struct netconfig_ifaddr *ifaddr;
+ 	char **dns;
++	char *domain_name;
  =
 
+ 	if (error && error !=3D -EEXIST) {
+ 		l_error("netconfig: Failed to add IP address. "
+@@ -751,12 +774,21 @@ static void netconfig_ipv4_ifaddr_add_cmd_cb(int erro=
+r, uint16_t type,
+ 	dns =3D netconfig_ipv4_get_dns(netconfig, netconfig->rtm_protocol);
+ 	if (!dns) {
+ 		l_error("netconfig: Failed to obtain DNS addresses.");
+-		goto done;
++		goto domain_name;
+ 	}
+ =
+
+ 	resolve_add_dns(netconfig->ifindex, ifaddr->family, dns);
+ 	l_strv_free(dns);
+ =
+
++domain_name:
++	domain_name =3D netconfig_ipv4_get_domain_name(netconfig,
++						netconfig->rtm_protocol);
++	if (!domain_name)
++		goto done;
++
++	resolve_add_domain_name(netconfig->ifindex, domain_name);
++	l_free(domain_name);
++
+ done:
+ 	netconfig_ifaddr_destroy(ifaddr);
+ }
 -- =
 
 2.13.6
 
---===============2037867876782354904==--
+--===============6563978180611018614==--
 
