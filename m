@@ -1,50 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============6689424179037629103=="
+Content-Type: multipart/mixed; boundary="===============8867803876021448141=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] eap-gtc: Try to auth even if request not Password
-Date: Wed, 11 Dec 2019 14:57:26 -0600
-Message-ID: <66a25792-2327-b3c8-d324-e7b353abcbe1@gmail.com>
-In-Reply-To: <20191211123904.27413-1-xdavidwuph@gmail.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH 1/4] net: Add l_net_hostname_is_root
+Date: Wed, 11 Dec 2019 15:08:54 -0800
+Message-ID: <20191211230857.20606-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6689424179037629103==
+--===============8867803876021448141==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+The function identifies if the given hostname is root domain name.
+---
+ ell/net.c | 23 +++++++++++++++++++++++
+ ell/net.h |  1 +
+ 2 files changed, 24 insertions(+)
 
-On 12/11/19 6:39 AM, xdavidwu wrote:
-> There are some server implementations that send requests that are
-> not "Password" but still want us send password. This commit modify
-> the behavior to send a warning and still try to auth with password.
-> =
+diff --git a/ell/net.c b/ell/net.c
+index b5b5f9d..3b6e0dc 100644
+--- a/ell/net.c
++++ b/ell/net.c
+@@ -110,3 +110,26 @@ LIB_EXPORT char *l_net_get_name(uint32_t ifindex)
+ =
 
-> This makes me able to auth with server in my school which sends
-> "Enter Aruba Login".
-> =
+ 	return l_strdup(ifr.ifr_name);
+ }
++
++/**
++ * l_net_hostname_is_root:
++ * @hostname: Hostname to validate
++ *
++ * Identifies if the hostname given by @hostname is root domain name or
++ * not.
++ *
++ * Returns: #true if the given hostname is root and #false otherwise.
++ **/
++LIB_EXPORT bool l_net_hostname_is_root(const char *hostname)
++{
++	if (unlikely(!hostname))
++		return false;
++
++	if (!strcmp(hostname, ""))
++		return true;
++
++	if (!strcmp(hostname, "."))
++		return true;
++
++	return false;
++}
+diff --git a/ell/net.h b/ell/net.h
+index 25b1ca2..7afcf86 100644
+--- a/ell/net.h
++++ b/ell/net.h
+@@ -32,6 +32,7 @@ extern "C" {
+ =
 
-> wpa_supplicant does not check if it is "Password".
-> ---
->   src/eap-gtc.c | 12 +++---------
->   1 file changed, 3 insertions(+), 9 deletions(-)
->
+ bool l_net_get_mac_address(uint32_t ifindex, uint8_t *out_addr);
+ char *l_net_get_name(uint32_t ifindex);
++bool l_net_hostname_is_root(const char *hostname);
+ =
 
-Thanks for the patch.  Looks good.  Any chance you can resubmit with =
+ #ifdef __cplusplus
+ }
+-- =
 
-your real name as the author info so I can apply this?  While we don't =
+2.13.6
 
-use Signed-off-by, our expectation for submissions are similar to [1], =
-
-including the real name requirement.
-
-[1] =
-
-https://www.kernel.org/doc/html/latest/process/submitting-patches.html#deve=
-loper-s-certificate-of-origin-1-1
-
-Regards,
--Denis
---===============6689424179037629103==--
+--===============8867803876021448141==--
 
