@@ -1,31 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============6430968171122551746=="
+Content-Type: multipart/mixed; boundary="===============4300489984158466581=="
 MIME-Version: 1.0
-From: Simon Brand <simon.brand@postadigitale.de>
-Subject: Re: EAP-Method=PEAP and tls_reset_handshake/authentication timeout
- results in core-dumped
-Date: Thu, 12 Dec 2019 08:37:24 +0100
-Message-ID: <20191212073724.502108b9@hostpad>
-In-Reply-To: <20191211135824.7b8b4206@hostpad>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] eap-gtc: Try to auth even if request not Password
+Date: Thu, 12 Dec 2019 10:24:01 -0600
+Message-ID: <f6e3748f-944e-9c26-7638-13ec103b72ee@gmail.com>
+In-Reply-To: <20191212012301.2162-1-xdavidwuph@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6430968171122551746==
+--===============4300489984158466581==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Pinghao,
 
-I build iwd 1.2 with the mentioned options, got 4 backtraces and the
-journalctl and iwmon logs.
-I tried to reproduce with another device, but was not able to, so
-probably device related (or just easier to reproduce with this device).
+On 12/11/19 7:23 PM, Pinghao Wu wrote:
+> There are some server implementations that send requests that are
+> not "Password" but still want us send password. This commit modify
+> the behavior to send a warning and still try to auth with password.
+> =
 
-https://www.dropbox.com/s/w2xs4oggf0zognf/logs.tar.xz?dl=3D1
+> This makes me able to auth with server in my school which sends
+> "Enter Aruba Login".
+> =
 
-If I can provide anything else, please let me know.
+> wpa_supplicant does not check if it is "Password".
+> ---
+>   src/eap-gtc.c | 12 +++---------
+>   1 file changed, 3 insertions(+), 9 deletions(-)
+> =
 
-Thanks,
-Simon
---===============6430968171122551746==--
+
+Applied, thanks.
+
+Regards,
+-Denis
+
+--===============4300489984158466581==--
 
