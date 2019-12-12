@@ -1,68 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============2853366019744866235=="
+Content-Type: multipart/mixed; boundary="===============6430968171122551746=="
 MIME-Version: 1.0
-From: Pinghao Wu <xdavidwuph@gmail.com>
-Subject: [PATCH] eap-gtc: Try to auth even if request not Password
-Date: Thu, 12 Dec 2019 09:23:01 +0800
-Message-ID: <20191212012301.2162-1-xdavidwuph@gmail.com>
-In-Reply-To: <66a25792-2327-b3c8-d324-e7b353abcbe1@gmail.com>
+From: Simon Brand <simon.brand@postadigitale.de>
+Subject: Re: EAP-Method=PEAP and tls_reset_handshake/authentication timeout
+ results in core-dumped
+Date: Thu, 12 Dec 2019 08:37:24 +0100
+Message-ID: <20191212073724.502108b9@hostpad>
+In-Reply-To: <20191211135824.7b8b4206@hostpad>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2853366019744866235==
+--===============6430968171122551746==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There are some server implementations that send requests that are
-not "Password" but still want us send password. This commit modify
-the behavior to send a warning and still try to auth with password.
+Hi,
 
-This makes me able to auth with server in my school which sends
-"Enter Aruba Login".
+I build iwd 1.2 with the mentioned options, got 4 backtraces and the
+journalctl and iwmon logs.
+I tried to reproduce with another device, but was not able to, so
+probably device related (or just easier to reproduce with this device).
 
-wpa_supplicant does not check if it is "Password".
----
- src/eap-gtc.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+https://www.dropbox.com/s/w2xs4oggf0zognf/logs.tar.xz?dl=3D1
 
-diff --git a/src/eap-gtc.c b/src/eap-gtc.c
-index 9302257e..7788d44c 100644
---- a/src/eap-gtc.c
-+++ b/src/eap-gtc.c
-@@ -56,11 +56,9 @@ static void eap_gtc_handle_request(struct eap_state *eap,
- 	size_t secret_len =3D strlen(gtc->password);
- 	uint8_t response[5 + secret_len];
- =
+If I can provide anything else, please let me know.
 
--	if (len < 8)
--		goto error;
--
--	if (strncmp((const char *)pkt, "Password", 8))
--		goto error;
-+	if (len < 8 || strncmp((const char *)pkt, "Password", 8))
-+		l_warn("GTC request not understood, proceeding anyway: %.*s",
-+				(int) len, (const char *) pkt);
- =
-
- 	memcpy(response + 5, gtc->password, secret_len);
- =
-
-@@ -69,10 +67,6 @@ static void eap_gtc_handle_request(struct eap_state *eap,
- 	eap_method_success(eap);
- =
-
- 	return;
--
--error:
--	l_error("invalid GTC request");
--	eap_method_error(eap);
- }
- =
-
- static int eap_gtc_check_settings(struct l_settings *settings,
--- =
-
-2.24.1
-
---===============2853366019744866235==--
+Thanks,
+Simon
+--===============6430968171122551746==--
 
