@@ -1,41 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============4300489984158466581=="
+Content-Type: multipart/mixed; boundary="===============2022368288416761318=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] eap-gtc: Try to auth even if request not Password
-Date: Thu, 12 Dec 2019 10:24:01 -0600
-Message-ID: <f6e3748f-944e-9c26-7638-13ec103b72ee@gmail.com>
-In-Reply-To: <20191212012301.2162-1-xdavidwuph@gmail.com>
+Subject: Re: [PATCH v3 1/2] netconfig: Add IPv4 domain name helper and
+ installer
+Date: Thu, 12 Dec 2019 10:37:53 -0600
+Message-ID: <9920f844-3e15-ed81-14f6-f963aebc5bea@gmail.com>
+In-Reply-To: <20191211003454.16767-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4300489984158466581==
+--===============2022368288416761318==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pinghao,
+Hi Tim,
 
-On 12/11/19 7:23 PM, Pinghao Wu wrote:
-> There are some server implementations that send requests that are
-> not "Password" but still want us send password. This commit modify
-> the behavior to send a warning and still try to auth with password.
-> =
-
-> This makes me able to auth with server in my school which sends
-> "Enter Aruba Login".
-> =
-
-> wpa_supplicant does not check if it is "Password".
+On 12/10/19 6:34 PM, Tim Kourt wrote:
+> The provided domain name helper allows to override the DHCP lease
+> option value with the static one from network configuration file.
 > ---
->   src/eap-gtc.c | 12 +++---------
->   1 file changed, 3 insertions(+), 9 deletions(-)
+>   src/netconfig.c | 34 +++++++++++++++++++++++++++++++++-
+>   1 file changed, 33 insertions(+), 1 deletion(-)
 > =
 
 
 Applied, thanks.
 
 Regards,
--Denis
+-denis
 
---===============4300489984158466581==--
+--===============2022368288416761318==--
 
