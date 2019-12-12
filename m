@@ -1,142 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============6743455585592108816=="
+Content-Type: multipart/mixed; boundary="===============2853366019744866235=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 4/4] dhcp-lease: Add domain name option handler
-Date: Wed, 11 Dec 2019 15:08:57 -0800
-Message-ID: <20191211230857.20606-4-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20191211230857.20606-1-tim.a.kourt@linux.intel.com>
+From: Pinghao Wu <xdavidwuph@gmail.com>
+Subject: [PATCH] eap-gtc: Try to auth even if request not Password
+Date: Thu, 12 Dec 2019 09:23:01 +0800
+Message-ID: <20191212012301.2162-1-xdavidwuph@gmail.com>
+In-Reply-To: <66a25792-2327-b3c8-d324-e7b353abcbe1@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6743455585592108816==
+--===============2853366019744866235==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add parser and accessor for the domain name lease option.
-The parser validates value by disallowing embedded NUL bytes,
-non-utf8 characters, usage of root and localhost domain names.
+There are some server implementations that send requests that are
+not "Password" but still want us send password. This commit modify
+the behavior to send a warning and still try to auth with password.
+
+This makes me able to auth with server in my school which sends
+"Enter Aruba Login".
+
+wpa_supplicant does not check if it is "Password".
 ---
- ell/dhcp-lease.c   | 36 +++++++++++++++++++++++++++++++++++-
- ell/dhcp-private.h |  1 +
- ell/dhcp.h         |  1 +
- 3 files changed, 37 insertions(+), 1 deletion(-)
+ src/eap-gtc.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/ell/dhcp-lease.c b/ell/dhcp-lease.c
-index 5f801e7..8f044fb 100644
---- a/ell/dhcp-lease.c
-+++ b/ell/dhcp-lease.c
-@@ -31,6 +31,8 @@
- #include "private.h"
- #include "dhcp.h"
- #include "dhcp-private.h"
-+#include "utf8.h"
-+#include "net.h"
+diff --git a/src/eap-gtc.c b/src/eap-gtc.c
+index 9302257e..7788d44c 100644
+--- a/src/eap-gtc.c
++++ b/src/eap-gtc.c
+@@ -56,11 +56,9 @@ static void eap_gtc_handle_request(struct eap_state *eap,
+ 	size_t secret_len =3D strlen(gtc->password);
+ 	uint8_t response[5 + secret_len];
  =
 
- struct l_dhcp_lease *_dhcp_lease_new(void)
- {
-@@ -45,6 +47,8 @@ void _dhcp_lease_free(struct l_dhcp_lease *lease)
- 		return;
+-	if (len < 8)
+-		goto error;
+-
+-	if (strncmp((const char *)pkt, "Password", 8))
+-		goto error;
++	if (len < 8 || strncmp((const char *)pkt, "Password", 8))
++		l_warn("GTC request not understood, proceeding anyway: %.*s",
++				(int) len, (const char *) pkt);
  =
 
- 	l_free(lease->dns);
-+	l_free(lease->domain_name);
-+
- 	l_free(lease);
+ 	memcpy(response + 5, gtc->password, secret_len);
+ =
+
+@@ -69,10 +67,6 @@ static void eap_gtc_handle_request(struct eap_state *eap,
+ 	eap_method_success(eap);
+ =
+
+ 	return;
+-
+-error:
+-	l_error("invalid GTC request");
+-	eap_method_error(eap);
  }
  =
 
-@@ -99,6 +103,28 @@ struct l_dhcp_lease *_dhcp_lease_parse_options(struct d=
-hcp_message_iter *iter)
- 				}
- 			}
- 			break;
-+		case L_DHCP_OPTION_DOMAIN_NAME:
-+			if (l < 1 && l > 253)
-+				goto error;
-+
-+			/* Disallow embedded NUL bytes. */
-+			if (memchr(v, 0, l - 1))
-+				goto error;
-+
-+			if (!l_utf8_validate(v, l, NULL))
-+				goto error;
-+
-+			lease->domain_name =3D l_new(char, l + 1);
-+
-+			memcpy(lease->domain_name, v, l);
-+
-+			if (l_net_hostname_is_root(lease->domain_name))
-+				goto error;
-+
-+			if (l_net_hostname_is_localhost(lease->domain_name))
-+				goto error;
-+
-+			break;
- 		default:
- 			break;
- 		}
-@@ -135,7 +161,7 @@ struct l_dhcp_lease *_dhcp_lease_parse_options(struct d=
-hcp_message_iter *iter)
- =
-
- 	return lease;
- error:
--	l_free(lease);
-+	_dhcp_lease_free(lease);
- 	return NULL;
- }
- =
-
-@@ -212,6 +238,14 @@ LIB_EXPORT char **l_dhcp_lease_get_dns(const struct l_=
-dhcp_lease *lease)
- 	return dns_list;
- }
- =
-
-+LIB_EXPORT char *l_dhcp_lease_get_domain_name(const struct l_dhcp_lease *l=
-ease)
-+{
-+	if (unlikely(!lease))
-+		return NULL;
-+
-+	return l_strdup(lease->domain_name);
-+}
-+
- LIB_EXPORT uint32_t l_dhcp_lease_get_t1(const struct l_dhcp_lease *lease)
- {
- 	if (unlikely(!lease))
-diff --git a/ell/dhcp-private.h b/ell/dhcp-private.h
-index 6554fc6..a75bb8b 100644
---- a/ell/dhcp-private.h
-+++ b/ell/dhcp-private.h
-@@ -120,6 +120,7 @@ struct l_dhcp_lease {
- 	uint32_t t2;
- 	uint32_t router;
- 	uint32_t *dns;
-+	char *domain_name;
- };
- =
-
- struct l_dhcp_lease *_dhcp_lease_new(void);
-diff --git a/ell/dhcp.h b/ell/dhcp.h
-index c3a4988..b8a5b41 100644
---- a/ell/dhcp.h
-+++ b/ell/dhcp.h
-@@ -95,6 +95,7 @@ char *l_dhcp_lease_get_netmask(const struct l_dhcp_lease =
-*lease);
- char *l_dhcp_lease_get_broadcast(const struct l_dhcp_lease *lease);
- char *l_dhcp_lease_get_server_id(const struct l_dhcp_lease *lease);
- char **l_dhcp_lease_get_dns(const struct l_dhcp_lease *lease);
-+char *l_dhcp_lease_get_domain_name(const struct l_dhcp_lease *lease);
- =
-
- uint32_t l_dhcp_lease_get_t1(const struct l_dhcp_lease *lease);
- uint32_t l_dhcp_lease_get_t2(const struct l_dhcp_lease *lease);
+ static int eap_gtc_check_settings(struct l_settings *settings,
 -- =
 
-2.13.6
+2.24.1
 
---===============6743455585592108816==--
+--===============2853366019744866235==--
 
