@@ -1,44 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============3362843406500261029=="
+Content-Type: multipart/mixed; boundary="===============8952749571808990973=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 2/2] peap: Add support for Crypto-Binding in PEAPv0
-Date: Thu, 12 Dec 2019 15:14:45 -0600
-Message-ID: <d3be5c60-052c-b4b2-c492-a67e70287b28@gmail.com>
-In-Reply-To: <20191212201016.18072-2-tim.a.kourt@linux.intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] rrm: fix bad sign for calculating RCPI
+Date: Thu, 12 Dec 2019 16:04:07 -0800
+Message-ID: <20191213000407.22427-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3362843406500261029==
+--===============8952749571808990973==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+The first if case should be -10950, not 10950. Without the negative
+this first case would get hit every time since signal strength values
+are always negative.
+---
+ src/rrm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 12/12/19 2:10 PM, Tim Kourt wrote:
-> The Crypto Binding TLV is used to ensure that the EAP peer and the
-> EAP server participated in both the inner and the outer EAP
-> authentications of a PEAP authentication by cryptographically associating
-> the phase 1 and phase 2 authentications.
-> =
+diff --git a/src/rrm.c b/src/rrm.c
+index a8b265d6..a117dce3 100644
+--- a/src/rrm.c
++++ b/src/rrm.c
+@@ -243,7 +243,7 @@ static void rrm_build_measurement_report(struct rrm_req=
+uest_info *info,
+ /* 802.11 Table 9-154 */
+ static uint8_t mdb_to_rcpi(int32_t mdb)
+ {
+-	if (mdb <=3D 10950)
++	if (mdb <=3D -10950)
+ 		return 0;
+ 	else if (mdb >=3D -10950 && mdb < 0)
+ 		return (2 * (mdb + 11000)) / 100;
+-- =
 
-> The usage of Crypto-Binding in PEAPv0 is optional and is triggered by
-> the reception of the Crypto-Binding TLV from the server.
-> ---
->   src/eap-peap.c | 170 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++-
->   1 file changed, 169 insertions(+), 1 deletion(-)
-> =
+2.17.1
 
-
-I changed the -ENOENTs to -EBADMSG/-EIO since those make a bit more =
-
-sense in the context of the handler.
-
-Applied, thanks.
-
-Regards,
--Denis
-
---===============3362843406500261029==--
+--===============8952749571808990973==--
 
