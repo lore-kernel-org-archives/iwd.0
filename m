@@ -1,40 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============3650414479631985734=="
+Content-Type: multipart/mixed; boundary="===============7834621261164219687=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH] resolve: Fix check for incorrect function name
-Date: Tue, 17 Dec 2019 14:53:36 -0800
-Message-ID: <20191217225336.9500-1-tim.a.kourt@linux.intel.com>
+From: Kristian Klausen <kristian@klausen.dk>
+Subject: Issue with IWD 1.3 and connecting with PEAP
+Date: Wed, 18 Dec 2019 09:50:06 +0100
+Message-ID: <1514c8fc-0b71-d1c6-f31d-987f4748d2a0@klausen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3650414479631985734==
+--===============7834621261164219687==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/resolve.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi
 
-diff --git a/src/resolve.c b/src/resolve.c
-index 1d9bbe0a..c8cda269 100644
---- a/src/resolve.c
-+++ b/src/resolve.c
-@@ -435,7 +435,7 @@ void resolve_add_domain_name(uint32_t ifindex, const ch=
-ar *domain_name)
- 	if (!domain_name)
- 		return;
- =
+I just upgraded to IWD 1.3 and I can't connect to my school network anymore.
+The "handshake" fails with:
+iwd[581]: PEAP: Generated compound MAC and server compound MAC don't match.
+iwd[581]: 4-Way handshake failed for ifindex: 5, reason: 15
 
--	if (!method.ops || !method.ops->add_dns)
-+	if (!method.ops || !method.ops->add_domain_name)
- 		return;
- =
+I'm not sure if the school network is incorrectly configured, if that is =
 
- 	method.ops->add_domain_name(ifindex, domain_name, method.data);
--- =
+the case, it would be nice if I could disable "Crypto-Binding".
 
-2.13.6
+I use IWD with NetworkManager 1.20.8 and a IWD config similar to this:
+[Security]
+EAP-Method=3DPEAP
+EAP-Identity=3D<username>
+EAP-Password=3D<password>
+EAP-PEAP-Phase2-Method=3DMSCHAPV2
+EAP-PEAP-Phase2-Identity=3D<username>
+EAP-PEAP-Phase2-Password=3D<password>
+[Settings]
+Autoconnect=3Dtrue
 
---===============3650414479631985734==--
+
+Best regards
+Kristian Klausen
+
+
+--===============7834621261164219687==--
 
