@@ -1,226 +1,315 @@
-Content-Type: multipart/mixed; boundary="===============3145855373267195637=="
+Content-Type: multipart/mixed; boundary="===============7625483783850644855=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 1/4] netdev: Replace bool randomize_mac with specific address
-Date: Thu, 19 Dec 2019 04:50:56 +0100
-Message-ID: <20191219035059.15214-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 2/4] wsc: Refactor to separate station-specific code
+Date: Thu, 19 Dec 2019 04:50:57 +0100
+Message-ID: <20191219035059.15214-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20191219035059.15214-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3145855373267195637==
+--===============7625483783850644855==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Allow netdev_create_from_genl callers to draw a random or non-random MAC
-and pass it in the parameter instead of a bool to tell us to generating
-the MAC locally.  In P2P we are generating the MAC some time before
-creating the netdev in order to pass it to the peer during negotiation.
+Split the interface-specific logic from the core WSC logic.  The core
+WSC code is the part that we can re-use between P2P and station and
+doesn't include the D-Bus code, scanning for the target BSS or the
+attempt to make a station mode connection.
 ---
- src/manager.c | 22 ++++++++++++++++++----
- src/netdev.c  | 45 ++++++++++++++++++++++-----------------------
- src/netdev.h  |  3 ++-
- 3 files changed, 42 insertions(+), 28 deletions(-)
+ src/wsc.c | 141 ++++++++++++++++++++++++++++++++++++++----------------
+ src/wsc.h |   3 ++
+ 2 files changed, 103 insertions(+), 41 deletions(-)
 
-diff --git a/src/manager.c b/src/manager.c
-index 47874e11..4ad0f03c 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -102,6 +102,9 @@ static void wiphy_setup_state_destroy(struct wiphy_setu=
-p_state *state)
- =
-
- static bool manager_use_default(struct wiphy_setup_state *state)
- {
-+	uint8_t addr_buf[6];
-+	uint8_t *addr =3D NULL;
+diff --git a/src/wsc.c b/src/wsc.c
+index eb8489f3..222cc222 100644
+--- a/src/wsc.c
++++ b/src/wsc.c
+@@ -65,6 +65,11 @@ struct wsc {
+ 	struct wsc_credentials_info creds[3];
+ 	uint32_t n_creds;
+ 	struct l_settings *eap_settings;
++	char *pin;
 +
- 	l_debug("");
++	wsc_done_cb_t done_cb;
++	void *done_data;
++	uint16_t config_method;
  =
 
- 	if (!state->default_if_msg) {
-@@ -110,13 +113,20 @@ static bool manager_use_default(struct wiphy_setup_st=
-ate *state)
- 		return false;
- 	}
- =
-
--	netdev_create_from_genl(state->default_if_msg, randomize);
-+	if (randomize) {
-+		wiphy_generate_random_address(state->wiphy, addr_buf);
-+		addr =3D addr_buf;
-+	}
-+
-+	netdev_create_from_genl(state->default_if_msg, addr);
- 	return true;
- }
- =
-
- static void manager_new_interface_cb(struct l_genl_msg *msg, void *user_da=
-ta)
- {
- 	struct wiphy_setup_state *state =3D user_data;
-+	uint8_t addr_buf[6];
-+	uint8_t *addr =3D NULL;
- =
-
- 	l_debug("");
- =
-
-@@ -134,9 +144,13 @@ static void manager_new_interface_cb(struct l_genl_msg=
- *msg, void *user_data)
- 		return;
- 	}
- =
-
--	netdev_create_from_genl(msg, randomize &&
--					!wiphy_has_feature(state->wiphy,
--						NL80211_FEATURE_MAC_ON_CREATE));
-+	if (randomize && !wiphy_has_feature(state->wiphy,
-+					NL80211_FEATURE_MAC_ON_CREATE)) {
-+		wiphy_generate_random_address(state->wiphy, addr_buf);
-+		addr =3D addr_buf;
-+	}
-+
-+	netdev_create_from_genl(msg, addr);
- }
- =
-
- static void manager_new_interface_done(void *user_data)
-diff --git a/src/netdev.c b/src/netdev.c
-index 46c79fb0..77668151 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -125,6 +125,7 @@ struct netdev {
- 	int8_t cur_rssi;
- 	struct l_timeout *rssi_poll_timeout;
- 	uint32_t rssi_poll_cmd_id;
-+	uint8_t set_mac_once[6];
- =
-
- 	uint32_t set_powered_cmd_id;
- 	netdev_command_cb_t set_powered_cb;
-@@ -147,7 +148,6 @@ struct netdev {
- 	bool ignore_connect_event : 1;
- 	bool expect_connect_failure : 1;
- 	bool aborting : 1;
--	bool mac_randomize_once : 1;
- 	bool events_ready : 1;
+ 	bool wsc_association : 1;
  };
+@@ -153,15 +158,12 @@ static void wsc_try_credentials(struct wsc *wsc)
+ 		l_dbus_message_unref(wsc->pending);
+ 		wsc->pending =3D NULL;
  =
 
-@@ -4259,6 +4259,20 @@ static void netdev_set_mac_cb(int error, uint16_t ty=
-pe, const void *data,
- 					netdev_initial_up_cb, netdev, NULL);
+-		goto done;
++		return;
+ 	}
+ =
+
+ 	dbus_pending_reply(&wsc->pending,
+ 					wsc_error_not_reachable(wsc->pending));
+ 	station_set_autoconnect(wsc->station, true);
+-done:
+-	memset(wsc->creds, 0, sizeof(wsc->creds));
+-	wsc->n_creds =3D 0;
  }
  =
 
-+static bool netdev_check_set_mac(struct netdev *netdev)
+ static void wsc_store_credentials(struct wsc *wsc)
+@@ -217,6 +219,22 @@ static void wsc_disconnect_cb(struct netdev *netdev, b=
+ool success,
+ 	station_set_autoconnect(wsc->station, true);
+ }
+ =
+
++static void wsc_connect_cleanup(struct wsc *wsc)
 +{
-+	if (util_mem_is_zero(netdev->set_mac_once, 6))
-+		return false;
++	wsc->wsc_association =3D false;
 +
-+	l_debug("Setting initial address on ifindex: %d to: " MAC,
-+		netdev->index, MAC_STR(netdev->set_mac_once));
-+	netdev->set_powered_cmd_id =3D
-+		rtnl_set_mac(rtnl, netdev->index, netdev->set_mac_once,
-+				netdev_set_mac_cb, netdev, NULL);
-+	memset(netdev->set_mac_once, 0, 6);
-+	return true;
++	l_settings_free(wsc->eap_settings);
++	wsc->eap_settings =3D NULL;
++
++	if (wsc->pin) {
++		explicit_bzero(wsc->pin, strlen(wsc->pin));
++		l_free(wsc->pin);
++		wsc->pin =3D NULL;
++	}
++
++	wsc->target =3D NULL;
 +}
 +
- static void netdev_initial_down_cb(int error, uint16_t type, const void *d=
-ata,
- 					uint32_t len, void *user_data)
+ static void wsc_connect_cb(struct netdev *netdev, enum netdev_result resul=
+t,
+ 					void *event_data, void *user_data)
  {
-@@ -4274,17 +4288,8 @@ static void netdev_initial_down_cb(int error, uint16=
-_t type, const void *data,
+@@ -224,33 +242,34 @@ static void wsc_connect_cb(struct netdev *netdev, enu=
+m netdev_result result,
+ =
+
+ 	l_debug("%d, result: %d", netdev_get_ifindex(wsc->netdev), result);
+ =
+
+-	wsc->wsc_association =3D false;
+-
+-	l_settings_free(wsc->eap_settings);
+-	wsc->eap_settings =3D NULL;
++	wsc_connect_cleanup(wsc);
+ =
+
+ 	if (result =3D=3D NETDEV_RESULT_HANDSHAKE_FAILED && wsc->n_creds > 0) {
+-		wsc_store_credentials(wsc);
+-		wsc_try_credentials(wsc);
++		struct wsc_credentials_info creds[L_ARRAY_SIZE(wsc->creds)];
++		uint32_t n_creds =3D wsc->n_creds;
++
++		memcpy(creds, wsc->creds, sizeof(creds));
++		explicit_bzero(wsc->creds, sizeof(creds));
++		wsc->n_creds =3D 0;
++		wsc->done_cb(0, creds, n_creds, wsc->done_data);
++		explicit_bzero(creds, sizeof(creds));
  		return;
  	}
  =
 
--	if (netdev->mac_randomize_once) {
--		uint8_t addr[ETH_ALEN];
--
--		wiphy_generate_random_address(netdev->wiphy, addr);
--		l_debug("Setting initial random address on "
--			"ifindex: %d to: "MAC, netdev->index, MAC_STR(addr));
--		netdev->set_powered_cmd_id =3D
--			rtnl_set_mac(rtnl, netdev->index, addr,
--					netdev_set_mac_cb, netdev, NULL);
-+	if (netdev_check_set_mac(netdev))
+ 	switch (result) {
+ 	case NETDEV_RESULT_ABORTED:
+-		dbus_pending_reply(&wsc->pending,
+-					dbus_error_aborted(wsc->pending));
++		wsc->done_cb(-ECANCELED, NULL, 0, wsc->done_data);
  		return;
--	}
+ 	case NETDEV_RESULT_HANDSHAKE_FAILED:
+-		dbus_pending_reply(&wsc->pending,
+-					wsc_error_no_credentials(wsc->pending));
++		wsc->done_cb(-ENOKEY, NULL, 0, wsc->done_data);
+ 		break;
+ 	default:
+-		dbus_pending_reply(&wsc->pending,
+-					dbus_error_failed(wsc->pending));
++		wsc->done_cb(-EIO, NULL, 0, wsc->done_data);
+ 		break;
+ 	}
  =
 
- 	netdev->set_powered_cmd_id =3D
- 		rtnl_set_powered(rtnl, netdev->index, true,
-@@ -4326,17 +4331,8 @@ static void netdev_getlink_cb(int error, uint16_t ty=
-pe, const void *data,
- 	 */
- 	powered =3D netdev_get_is_up(netdev);
- =
-
--	if (!powered && netdev->mac_randomize_once) {
--		uint8_t addr[ETH_ALEN];
--
--		wiphy_generate_random_address(netdev->wiphy, addr);
--		l_debug("Setting initial random address on "
--			"ifindex: %d to: "MAC, netdev->index, MAC_STR(addr));
--		netdev->set_powered_cmd_id =3D
--			rtnl_set_mac(rtnl, netdev->index, addr,
--					netdev_set_mac_cb, netdev, NULL);
-+	if (!powered && netdev_check_set_mac(netdev))
- 		return;
--	}
- =
-
- 	cb =3D powered ? netdev_initial_down_cb : netdev_initial_up_cb;
- =
-
-@@ -4511,7 +4507,8 @@ error:
- 	return NULL;
+-	station_set_autoconnect(wsc->station, true);
++	if (wsc->station)
++		station_set_autoconnect(wsc->station, true);
  }
  =
 
--struct netdev *netdev_create_from_genl(struct l_genl_msg *msg, bool random=
-_mac)
-+struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
-+					const uint8_t *set_mac)
- {
- 	struct l_genl_attr attr;
- 	uint16_t type, len;
-@@ -4628,7 +4625,9 @@ struct netdev *netdev_create_from_genl(struct l_genl_=
-msg *msg, bool random_mac)
- 	memcpy(netdev->name, ifname, ifname_len);
- 	netdev->wiphy =3D wiphy;
- 	netdev->pae_over_nl80211 =3D pae_io =3D=3D NULL;
--	netdev->mac_randomize_once =3D random_mac;
+ static void wsc_credential_obtained(struct wsc *wsc,
+@@ -452,30 +471,24 @@ static void wsc_connect(struct wsc *wsc)
+ 	l_settings_set_uint(settings, "WSC", "RFBand",
+ 					freq_to_rf_band(bss->frequency));
+ 	l_settings_set_uint(settings, "WSC", "ConfigurationMethods",
+-				WSC_CONFIGURATION_METHOD_VIRTUAL_DISPLAY_PIN |
+-				WSC_CONFIGURATION_METHOD_VIRTUAL_PUSH_BUTTON |
+-				WSC_CONFIGURATION_METHOD_KEYPAD);
++					wsc->config_method);
+ 	l_settings_set_string(settings, "WSC", "PrimaryDeviceType",
+ 					"0-00000000-0");
+ 	l_settings_set_string(settings, "WSC", "EnrolleeMAC",
+ 		util_address_to_string(netdev_get_address(wsc->netdev)));
+ =
+
+-	if (!strcmp(l_dbus_message_get_member(wsc->pending), "StartPin")) {
+-		const char *pin;
+-
+-		if (l_dbus_message_get_arguments(wsc->pending, "s", &pin)) {
+-			enum wsc_device_password_id dpid;
++	if (wsc->config_method =3D=3D WSC_CONFIGURATION_METHOD_KEYPAD) {
++		enum wsc_device_password_id dpid;
+ =
+
+-			if (strlen(pin) =3D=3D 4 || wsc_pin_is_checksum_valid(pin))
+-				dpid =3D WSC_DEVICE_PASSWORD_ID_DEFAULT;
+-			else
+-				dpid =3D WSC_DEVICE_PASSWORD_ID_USER_SPECIFIED;
++		if (strlen(wsc->pin) =3D=3D 4 ||
++				wsc_pin_is_checksum_valid(wsc->pin))
++			dpid =3D WSC_DEVICE_PASSWORD_ID_DEFAULT;
++		else
++			dpid =3D WSC_DEVICE_PASSWORD_ID_USER_SPECIFIED;
+ =
+
+-			l_settings_set_uint(settings, "WSC",
+-						"DevicePasswordId", dpid);
+-			l_settings_set_string(settings, "WSC",
+-						"DevicePassword", pin);
+-		}
++		l_settings_set_uint(settings, "WSC", "DevicePasswordId", dpid);
++		l_settings_set_string(settings, "WSC", "DevicePassword",
++					wsc->pin);
+ 	}
+ =
+
+ 	handshake_state_set_event_func(hs, wsc_handshake_event, wsc);
+@@ -511,8 +524,41 @@ static void wsc_connect(struct wsc *wsc)
+ 	return;
+ error:
+ 	handshake_state_free(hs);
+-	dbus_pending_reply(&wsc->pending,
+-				dbus_error_failed(wsc->pending));
++	wsc_connect_cleanup(wsc);
++	wsc->done_cb(r, NULL, 0, wsc->done_data);
++}
 +
-+	if (set_mac)
-+		memcpy(netdev->set_mac_once, set_mac, 6);
++/* Done callback for when WSC is triggered by DBus methods */
++static void wsc_dbus_done_cb(int err, struct wsc_credentials_info *creds,
++				unsigned int n_creds, void *user_data)
++{
++	struct wsc *wsc =3D user_data;
++
++	l_debug("err=3D%i", err);
++
++	switch (err) {
++	case 0:
++		break;
++	case -ECANCELED:
++		dbus_pending_reply(&wsc->pending,
++					dbus_error_aborted(wsc->pending));
++		return;
++	case -ENOKEY:
++		dbus_pending_reply(&wsc->pending,
++					wsc_error_no_credentials(wsc->pending));
++		return;
++	case -EBUSY:
++		dbus_pending_reply(&wsc->pending,
++					dbus_error_busy(wsc->pending));
++		return;
++	default:
++		dbus_pending_reply(&wsc->pending,
++					dbus_error_failed(wsc->pending));
++		return;
++	}
++
++	wsc_store_credentials(wsc);
++	wsc_try_credentials(wsc);
+ }
  =
 
- 	if (pae_io) {
- 		netdev->pae_io =3D pae_io;
-diff --git a/src/netdev.h b/src/netdev.h
-index 032265f9..192cb4fe 100644
---- a/src/netdev.h
-+++ b/src/netdev.h
-@@ -205,5 +205,6 @@ uint32_t netdev_station_watch_add(struct netdev *netdev,
+ static void station_state_watch(enum station_state state, void *userdata)
+@@ -541,6 +587,22 @@ static void wsc_check_can_connect(struct wsc *wsc, str=
+uct scan_bss *target)
+ 	wsc->target =3D target;
+ 	station_set_autoconnect(wsc->station, false);
  =
 
- bool netdev_station_watch_remove(struct netdev *netdev, uint32_t id);
++	if (!strcmp(l_dbus_message_get_member(wsc->pending), "StartPin")) {
++		char *pin;
++
++		wsc->config_method =3D WSC_CONFIGURATION_METHOD_KEYPAD;
++
++		if (!l_dbus_message_get_arguments(wsc->pending, "s", &pin))
++			goto error;
++
++		wsc->pin =3D l_strdup(pin);
++	} else
++		wsc->config_method =3D
++			WSC_CONFIGURATION_METHOD_VIRTUAL_PUSH_BUTTON;
++
++	wsc->done_cb =3D wsc_dbus_done_cb;
++	wsc->done_data =3D wsc;
++
+ 	switch (station_get_state(wsc->station)) {
+ 	case STATION_STATE_DISCONNECTED:
+ 		wsc_connect(wsc);
+@@ -564,7 +626,7 @@ static void wsc_check_can_connect(struct wsc *wsc, stru=
+ct scan_bss *target)
+ 		break;
+ 	}
+ error:
+-	wsc->target =3D NULL;
++	wsc_connect_cleanup(wsc);
+ 	dbus_pending_reply(&wsc->pending, dbus_error_failed(wsc->pending));
+ }
  =
 
--struct netdev *netdev_create_from_genl(struct l_genl_msg *msg, bool random=
-_mac);
-+struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
-+					const uint8_t *set_mac);
- bool netdev_destroy(struct netdev *netdev);
+@@ -1074,12 +1136,12 @@ static void wsc_free(void *userdata)
+ 	struct wsc *wsc =3D userdata;
+ =
+
+ 	wsc_cancel_scan(wsc);
++	wsc_connect_cleanup(wsc);
+ =
+
+ 	if (wsc->station_state_watch) {
+ 		station_remove_state_watch(wsc->station,
+ 						wsc->station_state_watch);
+ 		wsc->station_state_watch =3D 0;
+-		wsc->target =3D NULL;
+ 	}
+ =
+
+ 	if (wsc->pending)
+@@ -1090,9 +1152,6 @@ static void wsc_free(void *userdata)
+ 		dbus_pending_reply(&wsc->pending_cancel,
+ 				dbus_error_aborted(wsc->pending_cancel));
+ =
+
+-	if (wsc->eap_settings)
+-		l_settings_free(wsc->eap_settings);
+-
+ 	l_free(wsc);
+ }
+ =
+
+diff --git a/src/wsc.h b/src/wsc.h
+index b0e6f24a..ada08c89 100644
+--- a/src/wsc.h
++++ b/src/wsc.h
+@@ -30,3 +30,6 @@ struct wsc_credentials_info {
+ 	uint8_t addr[6];
+ 	bool has_passphrase;
+ };
++
++typedef void (*wsc_done_cb_t)(int err, struct wsc_credentials_info *creds,
++				unsigned int n_creds, void *user_data);
 -- =
 
 2.20.1
 
---===============3145855373267195637==--
+--===============7625483783850644855==--
 
