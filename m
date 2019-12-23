@@ -1,102 +1,177 @@
-Content-Type: multipart/mixed; boundary="===============1992991403624464597=="
+Content-Type: multipart/mixed; boundary="===============4622476002852918240=="
 MIME-Version: 1.0
-From: Wiktor Kwapisiewicz <wiktor@metacode.biz>
-Subject: Restart of iwd.service necessary after boot
-Date: Sun, 22 Dec 2019 22:09:59 +0100
-Message-ID: <5922fd21-d5d1-12ff-faec-ba5627b809aa@metacode.biz>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: Restart of iwd.service necessary after boot
+Date: Mon, 23 Dec 2019 12:22:19 -0600
+Message-ID: <d3cc7c38-e2b7-1c64-b126-873f81a2cbcb@gmail.com>
+In-Reply-To: <5922fd21-d5d1-12ff-faec-ba5627b809aa@metacode.biz>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1992991403624464597==
+--===============4622476002852918240==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi Wiktor,
 
-I'm using iwd on ArchLinux as a systemd service with conjunction with =
+On 12/22/19 3:09 PM, Wiktor Kwapisiewicz wrote:
+> Hello,
+> =
 
-systemd-networkd and generally it works very well (iwctl live updates =
+> I'm using iwd on ArchLinux as a systemd service with conjunction with =
 
-are impressive) with a minor annoyance that the service requires restart =
+> systemd-networkd and generally it works very well (iwctl live updates =
 
-after each boot to function.
+> are impressive) with a minor annoyance that the service requires restart =
 
-This issue have been reported by others on ArchLinux site:
-https://bugs.archlinux.org/task/63912
+> after each boot to function.
+> =
 
-In the service logs the only significant line seems to be "NEW_INTERFACE =
 
-failed: Device or resource busy":
+Glad you like it!
 
-$ journalctl -u iwd
-   Starting Wireless service...
-   Wireless daemon version 1.4
-   Started Wireless service.
-   netconfig: Network configuration is disabled.
-   Wiphy: 0, Name: phy0
-          Permanent Address: 30:52:cb:84:72:ff
-          Bands: 2.4 GHz 5 GHz
-          Ciphers: CCMP TKIP BIP
-          Supported iftypes: ad-hoc station ap p2p-client p2p-go p2p-device
-   NEW_INTERFACE failed: Device or resource busy
+> This issue have been reported by others on ArchLinux site:
+> https://bugs.archlinux.org/task/63912
+> =
 
-networkctl reports "configuring" but nothing ever happens:
+> In the service logs the only significant line seems to be "NEW_INTERFACE =
 
-$ networkctl
-IDX LINK        TYPE     OPERATIONAL SETUP
-   1 lo          loopback carrier     unmanaged
-   2 wlan0       wlan     no-carrier  configuring
-   3 enp10s0u2u4 ether    no-carrier  configuring
-   4 enp9s0u1u2  ether    no-carrier  configuring
+> failed: Device or resource busy":
+> =
 
-After service restart it does complain about "unknown error" but =
+> $ journalctl -u iwd
+>  =C2=A0 Starting Wireless service...
+>  =C2=A0 Wireless daemon version 1.4
+>  =C2=A0 Started Wireless service.
+>  =C2=A0 netconfig: Network configuration is disabled.
+>  =C2=A0 Wiphy: 0, Name: phy0
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Permanent Address: 30:5=
+2:cb:84:72:ff
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bands: 2.4 GHz 5 GHz
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Ciphers: CCMP TKIP BIP
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Supported iftypes: ad-h=
+oc station ap p2p-client p2p-go p2p-device
+>  =C2=A0 NEW_INTERFACE failed: Device or resource busy
+> =
 
-everything works as normal:
 
-   Wireless daemon version 1.4
-   Started Wireless service.
-   netconfig: Network configuration is disabled.
-   Wiphy: 0, Name: phy0
-         Permanent Address: 30:52:cb:84:72:ff
-         Bands: 2.4 GHz 5 GHz
-         Ciphers: CCMP TKIP BIP
-         Supported iftypes: ad-hoc station ap p2p-client p2p-go p2p-device
-   DEL_INTERFACE failed: Unknown error 524
-   hardware_rekey not supported
+Curious how you get here without a DEL_INTERFACE also failing.  Any =
 
-And it is routable in networkctl:
+chance you can run iwmon (start it prior to iwd) and give us a trace of =
 
-$ networkctl
-IDX LINK        TYPE     OPERATIONAL SETUP
-   1 lo          loopback carrier     unmanaged
-   2 wlan0       wlan     routable    configured
-   3 enp10s0u2u4 ether    no-carrier  configuring
-   4 enp9s0u1u2  ether    no-carrier  configuring
+the output?  See [0] for details.
 
-Interestingly one of ArchLinux users [0] reported that adding sleep in =
+I'm not a systemd user, but maybe someone here can give you hints on how =
 
-"ExecStartPre" of the systemd service makes the problem disappear and =
+to accomplish this.
 
-yes, this workaround also works on my end.
+> networkctl reports "configuring" but nothing ever happens:
+> =
 
-I did not have this problem when using old wpa_supplicant. I'm using XPS =
+> $ networkctl
+> IDX LINK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TYPE=C2=A0=C2=A0=C2=A0=
+=C2=A0 OPERATIONAL SETUP
+>  =C2=A0 1 lo=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 loopba=
+ck carrier=C2=A0=C2=A0=C2=A0=C2=A0 unmanaged
+>  =C2=A0 2 wlan0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wlan=C2=A0=C2=A0=C2=
+=A0=C2=A0 no-carrier=C2=A0 configuring
+>  =C2=A0 3 enp10s0u2u4 ether=C2=A0=C2=A0=C2=A0 no-carrier=C2=A0 configuring
+>  =C2=A0 4 enp9s0u1u2=C2=A0 ether=C2=A0=C2=A0=C2=A0 no-carrier=C2=A0 confi=
+guring
+> =
 
-13 (9350, Broadcom BCM4350). I had the problem since I installed iwd and =
 
-it's still here in version 1.4
+Given the above error, this is expected.
 
-Is there a way to debug this issue further?
+> After service restart it does complain about "unknown error" but =
 
-Thank you for your help!
+> everything works as normal:
+> =
 
-Kind regards,
-Wiktor
+>  =C2=A0 Wireless daemon version 1.4
+>  =C2=A0 Started Wireless service.
+>  =C2=A0 netconfig: Network configuration is disabled.
+>  =C2=A0 Wiphy: 0, Name: phy0
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Permanent Address: 30:52:cb:8=
+4:72:ff
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bands: 2.4 GHz 5 GHz
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Ciphers: CCMP TKIP BIP
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Supported iftypes: ad-hoc sta=
+tion ap p2p-client p2p-go p2p-device
+>  =C2=A0 DEL_INTERFACE failed: Unknown error 524
 
-[0]: https://bugs.archlinux.org/task/63912#comment183316
+So this is -ENOTSUPP.  What is a little strange is that you don't get =
 
--- =
+this error at startup unless you put in a sleep as you mention below.
 
-https://metacode.biz/@wiktor
---===============1992991403624464597==--
+>  =C2=A0 hardware_rekey not supported
+> =
+
+> And it is routable in networkctl:
+> =
+
+> $ networkctl
+> IDX LINK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TYPE=C2=A0=C2=A0=C2=A0=
+=C2=A0 OPERATIONAL SETUP
+>  =C2=A0 1 lo=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 loopba=
+ck carrier=C2=A0=C2=A0=C2=A0=C2=A0 unmanaged
+>  =C2=A0 2 wlan0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wlan=C2=A0=C2=A0=C2=
+=A0=C2=A0 routable=C2=A0=C2=A0=C2=A0 configured
+>  =C2=A0 3 enp10s0u2u4 ether=C2=A0=C2=A0=C2=A0 no-carrier=C2=A0 configuring
+>  =C2=A0 4 enp9s0u1u2=C2=A0 ether=C2=A0=C2=A0=C2=A0 no-carrier=C2=A0 confi=
+guring
+> =
+
+> Interestingly one of ArchLinux users [0] reported that adding sleep in =
+
+> "ExecStartPre" of the systemd service makes the problem disappear and =
+
+> yes, this workaround also works on my end.
+> =
+
+> I did not have this problem when using old wpa_supplicant. I'm using XPS =
+
+> 13 (9350, Broadcom BCM4350). I had the problem since I installed iwd and =
+
+> it's still here in version 1.4
+
+wpa_supplicant doesn't use these operations for the most part.  As a =
+
+consequence, the kernel folks only tested them via the 'iw' command line =
+
+utility and some drivers might not even implement this properly.  See =
+
+[1] for details of what iwd does.
+
+> =
+
+> Is there a way to debug this issue further?
+> =
+
+
+For now, try this simple workaround:
+
+diff --git a/src/manager.c b/src/manager.c
+index 47874e1129b8..ac2af7889a3c 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -79,6 +79,7 @@ static const char *default_if_driver_list[] =3D {
+         "rtl87*",
+         "rtl88*",
+         "rtw_*",
++       "brcmfmac",
+
+         NULL,
+  };
+
+Or alternatively set
+UseDefaultInterface=3Dtrue in main.conf.  See man iwd.config for details.
+
+[0] https://iwd.wiki.kernel.org/debugging
+[1] https://iwd.wiki.kernel.org/interface_lifecycle
+
+Regards,
+-Denis
+--===============4622476002852918240==--
 
