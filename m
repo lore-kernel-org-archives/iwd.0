@@ -1,32 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============7315725010982302273=="
+Content-Type: multipart/mixed; boundary="===============9131749009194730787=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/5] doc: add CONFIG_DRIVER_NONE to hostapd config
-Date: Mon, 06 Jan 2020 11:20:47 -0600
-Message-ID: <d81579e7-ad96-f556-b7bf-af872aec1825@gmail.com>
-In-Reply-To: <20191230180954.12644-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/4] netdev: Replace bool randomize_mac with specific
+ address
+Date: Mon, 06 Jan 2020 11:51:02 -0600
+Message-ID: <43a3191e-1ede-a20d-0589-ee927d305665@gmail.com>
+In-Reply-To: <20191219035059.15214-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7315725010982302273==
+--===============9131749009194730787==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Andrew,
 
-On 12/30/19 12:09 PM, James Prestwood wrote:
-> This allows hostapd to be started as a standalone radius server
+On 12/18/19 9:50 PM, Andrew Zaborowski wrote:
+> Allow netdev_create_from_genl callers to draw a random or non-random MAC
+> and pass it in the parameter instead of a bool to tell us to generating
+> the MAC locally.  In P2P we are generating the MAC some time before
+> creating the netdev in order to pass it to the peer during negotiation.
 > ---
->   doc/hostapd.config | 1 +
->   1 file changed, 1 insertion(+)
+>   src/manager.c | 22 ++++++++++++++++++----
+>   src/netdev.c  | 45 ++++++++++++++++++++++-----------------------
+>   src/netdev.h  |  3 ++-
+>   3 files changed, 42 insertions(+), 28 deletions(-)
 > =
 
 
-All applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============7315725010982302273==--
+--===============9131749009194730787==--
 
