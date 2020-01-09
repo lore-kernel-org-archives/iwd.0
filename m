@@ -1,105 +1,127 @@
-Content-Type: multipart/mixed; boundary="===============4099640066173119245=="
+Content-Type: multipart/mixed; boundary="===============4568008896469088660=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/3] unit: Add a test for building M8 encrypted settings
-Date: Thu, 09 Jan 2020 20:40:19 +0100
-Message-ID: <20200109194019.8228-3-andrew.zaborowski@intel.com>
-In-Reply-To: <20200109194019.8228-1-andrew.zaborowski@intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 3/4] wsc: Refactor to make the DBus interface reusable
+Date: Thu, 09 Jan 2020 13:56:09 -0600
+Message-ID: <5dbc9e53-129a-79f6-8517-f022f41b0e16@gmail.com>
+In-Reply-To: <CAOq732JCzYDTj4rhdZx7HvKh6KPOaOj1NnAE2SOYShb=egj=-g@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4099640066173119245==
+--===============4568008896469088660==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There's are two changes to the example raw data in m8_encrypted_settings,
-one is to change the Network Index value to 1 and the other is to drop
-the Network Key Index attribute:
+Hi Andrew,
 
-Network Index     R     Deprecated =E2=80=93 use fixed value 1 for
-                        backwards compatibility.
+>> So while this works, I would think that separating the layers more
+>> explicitly would make things more elegant.  You have the EAP-WSC state
+>> machine object that takes care of the actual WSC connection:
+>>          wsc_enrollee_new
+>>          wsc_enrollee_start
+>>          wsc_enrollee_cancel
+>>          wsc_enrollee_free
+> =
 
-Network Key       O     Deprecated. Only included by WSC 1.0
-Index                   devices. Ignored by WSC 2.0 or newer
-                        devices.
----
- unit/test-wsc.c | 39 +++++++++++++++++++++++++++++----------
- 1 file changed, 29 insertions(+), 10 deletions(-)
+> Ok, this sounds good.  I'm not even sure if we need a start and a
+> cancel, or it's Ok to create and free this whole state machine as
+> needed.
 
-diff --git a/unit/test-wsc.c b/unit/test-wsc.c
-index 01420d47..983570e2 100644
---- a/unit/test-wsc.c
-+++ b/unit/test-wsc.c
-@@ -1736,17 +1736,17 @@ static void wsc_test_build_m8(const void *data)
- }
- =
+See how it looks.  We might need a cancel at least since you have a =
 
- static const unsigned char m8_encrypted_settings[] =3D {
--	0x10, 0x0e, 0x00, 0x6f, 0x10, 0x26, 0x00, 0x01, 0x00, 0x10, 0x45, 0x00,
-+	0x10, 0x0e, 0x00, 0x6a, 0x10, 0x26, 0x00, 0x01, 0x01, 0x10, 0x45, 0x00,
- 	0x07, 0x54, 0x65, 0x73, 0x74, 0x57, 0x50, 0x41, 0x10, 0x03, 0x00, 0x02,
--	0x00, 0x20, 0x10, 0x0f, 0x00, 0x02, 0x00, 0x08, 0x10, 0x28, 0x00, 0x01,
--	0x00, 0x10, 0x27, 0x00, 0x40, 0x34, 0x36, 0x30, 0x34, 0x44, 0x30, 0x31,
--	0x46, 0x46, 0x44, 0x42, 0x30, 0x42, 0x32, 0x39, 0x32, 0x45, 0x33, 0x37,
--	0x37, 0x33, 0x32, 0x44, 0x44, 0x34, 0x45, 0x31, 0x31, 0x43, 0x32, 0x34,
--	0x30, 0x31, 0x31, 0x35, 0x34, 0x32, 0x38, 0x39, 0x41, 0x30, 0x39, 0x41,
--	0x33, 0x33, 0x41, 0x44, 0x37, 0x30, 0x34, 0x31, 0x37, 0x37, 0x41, 0x42,
--	0x30, 0x44, 0x31, 0x42, 0x37, 0x35, 0x38, 0x44, 0x30, 0x10, 0x20, 0x00,
--	0x06, 0xa0, 0xa8, 0xcd, 0x1c, 0x7e, 0xc9, 0x10, 0x1e, 0x00, 0x08, 0xe8,
--	0x3b, 0x3b, 0xe7, 0x9e, 0x72, 0x06, 0x46,
-+	0x00, 0x20, 0x10, 0x0f, 0x00, 0x02, 0x00, 0x08, 0x10, 0x27, 0x00, 0x40,
-+	0x34, 0x36, 0x30, 0x34, 0x44, 0x30, 0x31, 0x46, 0x46, 0x44, 0x42, 0x30,
-+	0x42, 0x32, 0x39, 0x32, 0x45, 0x33, 0x37, 0x37, 0x33, 0x32, 0x44, 0x44,
-+	0x34, 0x45, 0x31, 0x31, 0x43, 0x32, 0x34, 0x30, 0x31, 0x31, 0x35, 0x34,
-+	0x32, 0x38, 0x39, 0x41, 0x30, 0x39, 0x41, 0x33, 0x33, 0x41, 0x44, 0x37,
-+	0x30, 0x34, 0x31, 0x37, 0x37, 0x41, 0x42, 0x30, 0x44, 0x31, 0x42, 0x37,
-+	0x35, 0x38, 0x44, 0x30, 0x10, 0x20, 0x00, 0x06, 0xa0, 0xa8, 0xcd, 0x1c,
-+	0x7e, 0xc9, 0x10, 0x1e, 0x00, 0x08, 0xe8, 0x3b, 0x3b, 0xe7, 0x9e, 0x72,
-+	0x06, 0x46,
- };
- =
+'destroy immediately' case where the device goes away due to hot-unplug. =
 
- struct wsc_credential creds_1[1] =3D {
-@@ -1831,6 +1831,22 @@ static void wsc_test_parse_m8_encrypted_settings(con=
-st void *data)
- 	assert(!memcmp(expected->authenticator, m8es.authenticator, 8));
- }
- =
+  Or cancel and try to cleanup first case.
 
-+static void wsc_test_build_m8_encrypted_settings(const void *data)
-+{
-+	const struct m8_encrypted_settings_data *test =3D data;
-+	uint8_t *out;
-+	size_t out_len;
-+
-+	out =3D wsc_build_m8_encrypted_settings(&test->expected, test->creds,
-+						test->n_creds, &out_len);
-+	assert(out);
-+
-+	assert(out_len =3D=3D test->len);
-+	assert(!memcmp(test->pdu, out, test->len));
-+
-+	l_free(out);
-+}
-+
- static const unsigned char eap_wsc_done[] =3D {
- 	0x01, 0x00, 0x00, 0x4a, 0x02, 0xab, 0x00, 0x4a, 0xfe, 0x00, 0x37, 0x2a,
- 	0x00, 0x00, 0x00, 0x01, 0x05, 0x00, 0x10, 0x4a, 0x00, 0x01, 0x10, 0x10,
-@@ -2330,6 +2346,9 @@ int main(int argc, char *argv[])
- 	l_test_add("/wsc/parse/m8 encrypted settings 1",
- 			wsc_test_parse_m8_encrypted_settings,
- 			&m8_encrypted_settings_data_1);
-+	l_test_add("/wsc/build/m8 encrypted settings 1",
-+			wsc_test_build_m8_encrypted_settings,
-+			&m8_encrypted_settings_data_1);
- =
+> =
 
- 	l_test_add("/wsc/parse/wsc_done 1", wsc_test_parse_wsc_done,
- 							&wsc_done_data_1);
--- =
+> So those functions would operate on a "struct wsc_enrollee".
 
-2.20.1
+Right.
 
---===============4099640066173119245==--
+> =
+
+>>
+>> Then you have the p2p/station layers that take care of scanning, etc.
+>> This is where your ops stuff can live.  Something like:
+>>
+>> struct wsc {
+>>          const char *(*get_path)(struct wsc *wsc);
+>>          int (*connect)(struct wsc *wsc, const char *pin,
+>>                          connect_cb_t cb, void *userdata);
+>>          int (*cancel)(struct wsc *wsc, cancel_cb_t cb, void *userdata);
+>>          void (*remove)(struct wsc *wsc);
+>> };
+> =
+
+> So this would be exposed in wsc.h I understand.  I think I'd still
+> rather call it wsc_ops.
+> =
+
+
+Can do that too.  But there might be state you can share across the =
+
+different sub-types.  Maybe the netdev for example.
+
+>>
+>> Then for p2p you can do:
+>>
+>> struct wsc_p2p {
+>>          // some members
+>>          struct wsc super;
+>> };
+>>
+>> struct wsc *wsc_p2p_new();
+> =
+
+> And this would live in p2p.c.  We have one WSC interface per peer so
+> this would really be called "struct p2p_peer_wsc_dbus" or similar and
+> in the callbacks it can use container_of() instead of needing the
+> user_data so that parameter can be dropped.
+> =
+
+
+Yep
+
+>>
+>> for station:
+>> struct wsc_station {
+>>          struct wsc super;
+>>          // some members;
+>>          struct station *station;
+>>          uint32_t station_state_watch;
+>>          ...
+>> };
+>>
+>> struct wsc *wsc_station_new();
+>>
+>> And if you want to unify the D-Bus bits, then:
+>>
+>> struct wsc_dbus {
+>>          struct wsc *wsc;
+>>          struct l_dbus_message *pending;
+>>          struct l_dbus_message *pending_cancel;
+>> };
+> =
+
+> Ok, so this would be created by a call to:
+> =
+
+> struct wsc_dbus *wsc_dbus_new(struct wsc *wsc)   (or struct wsc_ops *wsc)
+> =
+
+
+yes, something like that would be needed.  Can also do something like =
+
+wsc_dbus_object_add and let struct wsc_dbus be hidden away in wsc.c
+
+> and it would either need to be public in wsc.h or have enough
+> accessors for pending and pending_cancel.
+> =
+
+
+Reegards,
+-Denis
+--===============4568008896469088660==--
 
