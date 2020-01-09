@@ -1,160 +1,151 @@
-Content-Type: multipart/mixed; boundary="===============0192806871353700644=="
+Content-Type: multipart/mixed; boundary="===============7056606432016975024=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 3/4] wsc: Refactor to make the DBus interface reusable
-Date: Thu, 09 Jan 2020 20:35:00 +0100
-Message-ID: <CAOq732JCzYDTj4rhdZx7HvKh6KPOaOj1NnAE2SOYShb=egj=-g@mail.gmail.com>
-In-Reply-To: <aaee309d-2aca-0752-73d1-e8eadebebdd9@gmail.com>
+Subject: [PATCH 1/3] wscutil: Add wsc_build_credential
+Date: Thu, 09 Jan 2020 20:40:17 +0100
+Message-ID: <20200109194019.8228-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0192806871353700644==
+--===============7056606432016975024==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+---
+ src/wscutil.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/wscutil.h |  2 ++
+ 2 files changed, 56 insertions(+)
 
-On Thu, 9 Jan 2020 at 18:21, Denis Kenzior <denkenz@gmail.com> wrote:
-> Hi Andrew,
->
-> <snip>
->
-> >
-> > In this case wsc->pending was only part of 3. (out of the three state
-> > machines in wsc.c I mentioned) and p2p.c had it's own "pending" which
-> > is also used as a flag internally.  I guess it makes sense to change
-> > this to handle the dbus message completely in wsc.c so p2p.c doesn't
-> > have to see the actual messages.
->
-> If it was me doing it, I'd try to unify the D-Bus API handling aspects.
-> Especially since you went to the trouble of abstracting all the operation=
-s.
->
-> >
-> >>
-> >> If you want to re-invent this inside p2p, then there's really no need
-> >> for this wsc_ops abstraction.  Just have something like:
-> >>
-> >> struct wsc_dbus_object {
-> >>          bool station;
-> >>          union {
-> >>                  struct wsc_p2p *p2p;
-> >>                  struct wsc *wsc;
-> >>          }
-> >> }
-> >
-> > I don't follow.  Our entry points are the DBus method handlers, which
-> > are in wsc.c.  How will the control pass from wsc.c to p2p.c (or to
-> > the station specific CBs) without the wsc_ops?
->
-> it would just invoke the relevant function calls directly.  i.e.
->
-> wsc_p2p_push_button(p2p, msg);
-> wsc_p2p_start_pin(p2p, msg);
-> wsc_p2p_cancel(p2p, msg);
->
-> That would give you a whole lot more freedom to do whatever in p2p.
+diff --git a/src/wscutil.c b/src/wscutil.c
+index 7f0f6c77..d63e3bc7 100644
+--- a/src/wscutil.c
++++ b/src/wscutil.c
+@@ -1766,6 +1766,13 @@ static void build_association_state(struct wsc_attr_=
+builder *builder,
+ 	wsc_attr_builder_put_u16(builder, state);
+ }
+ =
 
-I think I'd rather use the ops struct defined in wsc.h than expose
-these functions in p2p.h.  A strict P2P API would look differently so
-this is shaped after WSC.  It also needs the user-data to know which
-peer to connect to.
++static void build_authentication_type(struct wsc_attr_builder *builder,
++							uint16_t auth_type)
++{
++	wsc_attr_builder_start_attr(builder, WSC_ATTR_AUTHENTICATION_TYPE);
++	wsc_attr_builder_put_u16(builder, auth_type);
++}
++
+ static void build_authentication_type_flags(struct wsc_attr_builder *build=
+er,
+ 					uint16_t auth_type_flags)
+ {
+@@ -1816,6 +1823,13 @@ static void build_device_password_id(struct wsc_attr=
+_builder *builder,
+ 	wsc_attr_builder_put_u16(builder, id);
+ }
+ =
 
->
-> >
-> > I think I did (this was a month ago) ;-)  You're right, the idea is
-> > for the user_data to be the wsc object itself because I didn't split
-> > the state into separate structs.  So in the station mode case
-> > wsc_add_interface calls wsc_new, then overwrites wsc->user_data.
->
-> Yep, I think I missed the part of you overwriting the user_data.  You
-> went through all this trouble of defining an API for setting it and then
-> turn around and backdoor it ;)
++static void build_encryption_type(struct wsc_attr_builder *builder,
++						uint16_t encryption_type)
++{
++	wsc_attr_builder_start_attr(builder, WSC_ATTR_ENCRYPTION_TYPE);
++	wsc_attr_builder_put_u16(builder, encryption_type);
++}
++
+ static void build_encryption_type_flags(struct wsc_attr_builder *builder,
+ 						uint16_t encryption_type_flags)
+ {
+@@ -1900,6 +1914,20 @@ static void build_model_number(struct wsc_attr_build=
+er *builder,
+ 	wsc_attr_builder_put_string(builder, model_number);
+ }
+ =
 
-True.  Yep, I should've added a wsc_set_userdata.
++static void build_network_index(struct wsc_attr_builder *builder,
++							uint8_t network_index)
++{
++	wsc_attr_builder_start_attr(builder, WSC_ATTR_NETWORK_INDEX);
++	wsc_attr_builder_put_u8(builder, network_index);
++}
++
++static void build_network_key(struct wsc_attr_builder *builder,
++					const uint8_t *key, size_t key_len)
++{
++	wsc_attr_builder_start_attr(builder, WSC_ATTR_NETWORK_KEY);
++	wsc_attr_builder_put_bytes(builder, key, key_len);
++}
++
+ static void build_os_version(struct wsc_attr_builder *builder,
+ 							uint32_t os_version)
+ {
+@@ -1979,6 +2007,13 @@ static void build_r_snonce2(struct wsc_attr_builder =
+*builder,
+ 	wsc_attr_builder_put_bytes(builder, nonce, 16);
+ }
+ =
 
-> That is what threw me off here and also
-> in the disconnect_cb bits above.  If user_data was meant to be set
-> externally, it would have been clearer to add wsc_set_userdata() method
-> or have the caller pass in the cb/userdata into the operation directly.
->
-> >
-> > .connect and .cancel are both being utilized, and .enrollee_done_cb is
-> > also being utilized but at a different level.  There's currently one
-> > user_data for them.
->
-> So while this works, I would think that separating the layers more
-> explicitly would make things more elegant.  You have the EAP-WSC state
-> machine object that takes care of the actual WSC connection:
->         wsc_enrollee_new
->         wsc_enrollee_start
->         wsc_enrollee_cancel
->         wsc_enrollee_free
++static void build_ssid(struct wsc_attr_builder *builder, const uint8_t *ss=
+id,
++							size_t ssid_len)
++{
++	wsc_attr_builder_start_attr(builder, WSC_ATTR_SSID);
++	wsc_attr_builder_put_bytes(builder, ssid, ssid_len);
++}
++
+ static void build_serial_number(struct wsc_attr_builder *builder,
+ 						const char *serial_number)
+ {
+@@ -2018,6 +2053,25 @@ static void build_wsc_state(struct wsc_attr_builder =
+*builder,
+ 	wsc_attr_builder_put_u8(builder, 1);				\
+ 	wsc_attr_builder_put_u8(builder, 0x20)
+ =
 
-Ok, this sounds good.  I'm not even sure if we need a start and a
-cancel, or it's Ok to create and free this whole state machine as
-needed.
++uint8_t *wsc_build_credential(const struct wsc_credential *in, size_t *out=
+_len)
++{
++	struct wsc_attr_builder *builder;
++	uint8_t *ret;
++
++	builder =3D wsc_attr_builder_new(128);
++	build_network_index(builder, 1);
++	build_ssid(builder, in->ssid, in->ssid_len);
++	build_authentication_type(builder, in->auth_type);
++	build_encryption_type(builder, in->encryption_type);
++	build_network_key(builder, in->network_key, in->network_key_len);
++	build_mac_address(builder, in->addr);
++
++	/* TODO: Append EAP attrs & Network Key Shareable inside WFA EXT */
++
++	ret =3D wsc_attr_builder_free(builder, false, out_len);
++	return ret;
++}
++
+ uint8_t *wsc_build_probe_request(const struct wsc_probe_request *probe_req=
+uest,
+ 							size_t *out_len)
+ {
+diff --git a/src/wscutil.h b/src/wscutil.h
+index 1a133f33..424725d1 100644
+--- a/src/wscutil.h
++++ b/src/wscutil.h
+@@ -602,6 +602,8 @@ int wsc_parse_wsc_nack(const uint8_t *pdu, uint32_t len=
+, struct wsc_nack *out);
+ =
 
-So those functions would operate on a "struct wsc_enrollee".
+ int wsc_parse_wsc_done(const uint8_t *pdu, uint32_t len, struct wsc_done *=
+out);
+ =
 
->
-> Then you have the p2p/station layers that take care of scanning, etc.
-> This is where your ops stuff can live.  Something like:
->
-> struct wsc {
->         const char *(*get_path)(struct wsc *wsc);
->         int (*connect)(struct wsc *wsc, const char *pin,
->                         connect_cb_t cb, void *userdata);
->         int (*cancel)(struct wsc *wsc, cancel_cb_t cb, void *userdata);
->         void (*remove)(struct wsc *wsc);
-> };
++uint8_t *wsc_build_credential(const struct wsc_credential *in, size_t *out=
+_len);
++
+ uint8_t *wsc_build_probe_request(const struct wsc_probe_request *probe_req=
+uest,
+ 				size_t *out_len);
+ uint8_t *wsc_build_association_request(
+-- =
 
-So this would be exposed in wsc.h I understand.  I think I'd still
-rather call it wsc_ops.
+2.20.1
 
->
-> Then for p2p you can do:
->
-> struct wsc_p2p {
->         // some members
->         struct wsc super;
-> };
->
-> struct wsc *wsc_p2p_new();
-
-And this would live in p2p.c.  We have one WSC interface per peer so
-this would really be called "struct p2p_peer_wsc_dbus" or similar and
-in the callbacks it can use container_of() instead of needing the
-user_data so that parameter can be dropped.
-
->
-> for station:
-> struct wsc_station {
->         struct wsc super;
->         // some members;
->         struct station *station;
->         uint32_t station_state_watch;
->         ...
-> };
->
-> struct wsc *wsc_station_new();
->
-> And if you want to unify the D-Bus bits, then:
->
-> struct wsc_dbus {
->         struct wsc *wsc;
->         struct l_dbus_message *pending;
->         struct l_dbus_message *pending_cancel;
-> };
-
-Ok, so this would be created by a call to:
-
-struct wsc_dbus *wsc_dbus_new(struct wsc *wsc)   (or struct wsc_ops *wsc)
-
-and it would either need to be public in wsc.h or have enough
-accessors for pending and pending_cancel.
-
-Best regards
---===============0192806871353700644==--
+--===============7056606432016975024==--
 
