@@ -1,118 +1,105 @@
-Content-Type: multipart/mixed; boundary="===============8170599779562360397=="
+Content-Type: multipart/mixed; boundary="===============4099640066173119245=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 2/3] wscutil: Add wsc_build_m8_encrypted_settings
-Date: Thu, 09 Jan 2020 20:40:18 +0100
-Message-ID: <20200109194019.8228-2-andrew.zaborowski@intel.com>
+Subject: [PATCH 3/3] unit: Add a test for building M8 encrypted settings
+Date: Thu, 09 Jan 2020 20:40:19 +0100
+Message-ID: <20200109194019.8228-3-andrew.zaborowski@intel.com>
 In-Reply-To: <20200109194019.8228-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8170599779562360397==
+--===============4099640066173119245==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Note it internally calls wsc_build_credential instead of the user
-having to do this.  I can convert wsc_parse_m8_encrypted_settings to do
-the same thing.
+There's are two changes to the example raw data in m8_encrypted_settings,
+one is to change the Network Index value to 1 and the other is to drop
+the Network Key Index attribute:
+
+Network Index     R     Deprecated =E2=80=93 use fixed value 1 for
+                        backwards compatibility.
+
+Network Key       O     Deprecated. Only included by WSC 1.0
+Index                   devices. Ignored by WSC 2.0 or newer
+                        devices.
 ---
- src/wscutil.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- src/wscutil.h |  4 ++++
- 2 files changed, 46 insertions(+)
+ unit/test-wsc.c | 39 +++++++++++++++++++++++++++++----------
+ 1 file changed, 29 insertions(+), 10 deletions(-)
 
-diff --git a/src/wscutil.c b/src/wscutil.c
-index d63e3bc7..99a74d1e 100644
---- a/src/wscutil.c
-+++ b/src/wscutil.c
-@@ -1928,6 +1928,13 @@ static void build_network_key(struct wsc_attr_builde=
-r *builder,
- 	wsc_attr_builder_put_bytes(builder, key, key_len);
+diff --git a/unit/test-wsc.c b/unit/test-wsc.c
+index 01420d47..983570e2 100644
+--- a/unit/test-wsc.c
++++ b/unit/test-wsc.c
+@@ -1736,17 +1736,17 @@ static void wsc_test_build_m8(const void *data)
  }
  =
 
-+static void build_new_password(struct wsc_attr_builder *builder,
-+				const uint8_t *password, size_t password_len)
-+{
-+	wsc_attr_builder_start_attr(builder, WSC_ATTR_NEW_PASSWORD);
-+	wsc_attr_builder_put_bytes(builder, password, password_len);
-+}
-+
- static void build_os_version(struct wsc_attr_builder *builder,
- 							uint32_t os_version)
- {
-@@ -2072,6 +2079,17 @@ uint8_t *wsc_build_credential(const struct wsc_crede=
-ntial *in, size_t *out_len)
- 	return ret;
+ static const unsigned char m8_encrypted_settings[] =3D {
+-	0x10, 0x0e, 0x00, 0x6f, 0x10, 0x26, 0x00, 0x01, 0x00, 0x10, 0x45, 0x00,
++	0x10, 0x0e, 0x00, 0x6a, 0x10, 0x26, 0x00, 0x01, 0x01, 0x10, 0x45, 0x00,
+ 	0x07, 0x54, 0x65, 0x73, 0x74, 0x57, 0x50, 0x41, 0x10, 0x03, 0x00, 0x02,
+-	0x00, 0x20, 0x10, 0x0f, 0x00, 0x02, 0x00, 0x08, 0x10, 0x28, 0x00, 0x01,
+-	0x00, 0x10, 0x27, 0x00, 0x40, 0x34, 0x36, 0x30, 0x34, 0x44, 0x30, 0x31,
+-	0x46, 0x46, 0x44, 0x42, 0x30, 0x42, 0x32, 0x39, 0x32, 0x45, 0x33, 0x37,
+-	0x37, 0x33, 0x32, 0x44, 0x44, 0x34, 0x45, 0x31, 0x31, 0x43, 0x32, 0x34,
+-	0x30, 0x31, 0x31, 0x35, 0x34, 0x32, 0x38, 0x39, 0x41, 0x30, 0x39, 0x41,
+-	0x33, 0x33, 0x41, 0x44, 0x37, 0x30, 0x34, 0x31, 0x37, 0x37, 0x41, 0x42,
+-	0x30, 0x44, 0x31, 0x42, 0x37, 0x35, 0x38, 0x44, 0x30, 0x10, 0x20, 0x00,
+-	0x06, 0xa0, 0xa8, 0xcd, 0x1c, 0x7e, 0xc9, 0x10, 0x1e, 0x00, 0x08, 0xe8,
+-	0x3b, 0x3b, 0xe7, 0x9e, 0x72, 0x06, 0x46,
++	0x00, 0x20, 0x10, 0x0f, 0x00, 0x02, 0x00, 0x08, 0x10, 0x27, 0x00, 0x40,
++	0x34, 0x36, 0x30, 0x34, 0x44, 0x30, 0x31, 0x46, 0x46, 0x44, 0x42, 0x30,
++	0x42, 0x32, 0x39, 0x32, 0x45, 0x33, 0x37, 0x37, 0x33, 0x32, 0x44, 0x44,
++	0x34, 0x45, 0x31, 0x31, 0x43, 0x32, 0x34, 0x30, 0x31, 0x31, 0x35, 0x34,
++	0x32, 0x38, 0x39, 0x41, 0x30, 0x39, 0x41, 0x33, 0x33, 0x41, 0x44, 0x37,
++	0x30, 0x34, 0x31, 0x37, 0x37, 0x41, 0x42, 0x30, 0x44, 0x31, 0x42, 0x37,
++	0x35, 0x38, 0x44, 0x30, 0x10, 0x20, 0x00, 0x06, 0xa0, 0xa8, 0xcd, 0x1c,
++	0x7e, 0xc9, 0x10, 0x1e, 0x00, 0x08, 0xe8, 0x3b, 0x3b, 0xe7, 0x9e, 0x72,
++	0x06, 0x46,
+ };
+ =
+
+ struct wsc_credential creds_1[1] =3D {
+@@ -1831,6 +1831,22 @@ static void wsc_test_parse_m8_encrypted_settings(con=
+st void *data)
+ 	assert(!memcmp(expected->authenticator, m8es.authenticator, 8));
  }
  =
 
-+static void build_credential(struct wsc_attr_builder *builder,
-+					const struct wsc_credential *cred)
++static void wsc_test_build_m8_encrypted_settings(const void *data)
 +{
-+	size_t data_len;
-+	uint8_t *data =3D wsc_build_credential(cred, &data_len);
++	const struct m8_encrypted_settings_data *test =3D data;
++	uint8_t *out;
++	size_t out_len;
 +
-+	wsc_attr_builder_start_attr(builder, WSC_ATTR_CREDENTIAL);
-+	wsc_attr_builder_put_bytes(builder, data, data_len);
-+	l_free(data);
++	out =3D wsc_build_m8_encrypted_settings(&test->expected, test->creds,
++						test->n_creds, &out_len);
++	assert(out);
++
++	assert(out_len =3D=3D test->len);
++	assert(!memcmp(test->pdu, out, test->len));
++
++	l_free(out);
 +}
 +
- uint8_t *wsc_build_probe_request(const struct wsc_probe_request *probe_req=
-uest,
- 							size_t *out_len)
- {
-@@ -2447,6 +2465,30 @@ done:
- 	return ret;
- }
+ static const unsigned char eap_wsc_done[] =3D {
+ 	0x01, 0x00, 0x00, 0x4a, 0x02, 0xab, 0x00, 0x4a, 0xfe, 0x00, 0x37, 0x2a,
+ 	0x00, 0x00, 0x00, 0x01, 0x05, 0x00, 0x10, 0x4a, 0x00, 0x01, 0x10, 0x10,
+@@ -2330,6 +2346,9 @@ int main(int argc, char *argv[])
+ 	l_test_add("/wsc/parse/m8 encrypted settings 1",
+ 			wsc_test_parse_m8_encrypted_settings,
+ 			&m8_encrypted_settings_data_1);
++	l_test_add("/wsc/build/m8 encrypted settings 1",
++			wsc_test_build_m8_encrypted_settings,
++			&m8_encrypted_settings_data_1);
  =
 
-+uint8_t *wsc_build_m8_encrypted_settings(
-+				const struct wsc_m8_encrypted_settings *in,
-+				const struct wsc_credential *creds,
-+				unsigned int creds_cnt, size_t *out_len)
-+{
-+	struct wsc_attr_builder *builder;
-+	unsigned int i;
-+
-+	builder =3D wsc_attr_builder_new(256);
-+
-+	for (i =3D 0; i < creds_cnt; i++)
-+		build_credential(builder, &creds[i]);
-+
-+	if (in->new_password_len) {
-+		build_new_password(builder, in->new_password,
-+					in->new_password_len);
-+		build_device_password_id(builder, in->device_password_id);
-+	}
-+
-+	build_key_wrap_authenticator(builder, in->authenticator);
-+
-+	return wsc_attr_builder_free(builder, false, out_len);
-+}
-+
- uint8_t *wsc_build_wsc_ack(const struct wsc_ack *ack, size_t *out_len)
- {
- 	struct wsc_attr_builder *builder;
-diff --git a/src/wscutil.h b/src/wscutil.h
-index 424725d1..0d06a60f 100644
---- a/src/wscutil.h
-+++ b/src/wscutil.h
-@@ -638,6 +638,10 @@ uint8_t *wsc_build_m7_encrypted_settings(
- 				size_t *out_len);
- uint8_t *wsc_build_m8(const struct wsc_m8 *m8, const uint8_t *encrypted,
- 			size_t encrypted_len, size_t *out_len);
-+uint8_t *wsc_build_m8_encrypted_settings(
-+				const struct wsc_m8_encrypted_settings *in,
-+				const struct wsc_credential *creds,
-+				unsigned int creds_cnt, size_t *out_len);
- =
-
- uint8_t *wsc_build_wsc_ack(const struct wsc_ack *ack, size_t *out_len);
- uint8_t *wsc_build_wsc_nack(const struct wsc_nack *nack, size_t *out_len);
+ 	l_test_add("/wsc/parse/wsc_done 1", wsc_test_parse_wsc_done,
+ 							&wsc_done_data_1);
 -- =
 
 2.20.1
 
---===============8170599779562360397==--
+--===============4099640066173119245==--
 
