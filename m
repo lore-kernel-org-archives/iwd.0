@@ -1,131 +1,140 @@
-Content-Type: multipart/mixed; boundary="===============0148774244636297641=="
+Content-Type: multipart/mixed; boundary="===============0298343160603560613=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/3] wsc: Accept extra IEs in wsc_enrollee_new
-Date: Mon, 13 Jan 2020 14:36:14 +0100
-Message-ID: <20200113133614.2888-1-andrew.zaborowski@intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/3] wsc: Split out enrollee state machine to own object
+Date: Mon, 13 Jan 2020 06:56:13 -0600
+Message-ID: <989bd8f8-ffff-4a2b-6946-d0bba591239e@gmail.com>
+In-Reply-To: <20200113133243.2799-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0148774244636297641==
+--===============0298343160603560613==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/wsc.c | 23 ++++++++++++++---------
- src/wsc.h |  1 +
- 2 files changed, 15 insertions(+), 9 deletions(-)
+Hi Andrew,
 
-diff --git a/src/wsc.c b/src/wsc.c
-index 74fe8aa8..56018825 100644
---- a/src/wsc.c
-+++ b/src/wsc.c
-@@ -320,7 +320,8 @@ static inline enum wsc_rf_band freq_to_rf_band(uint32_t=
- freq)
- }
- =
+On 1/13/20 7:32 AM, Andrew Zaborowski wrote:
+> Create struct wsc_enrollee which is allocated with wsc_enrollee_new,
+> taking a done callback as a parameter.  The callback is always
+> called so there's no need for a separate destroy callback.  The object
+> only lives until the done callback happens so wsc_enrollee_cancel can
+> only be used before this.
+> =
 
- static int wsc_enrollee_connect(struct wsc_enrollee *wsce, struct scan_bss=
- *bss,
--					const char *pin)
-+					const char *pin, struct iovec *ies,
-+					unsigned int ies_num)
- {
- 	struct handshake_state *hs;
- 	struct l_settings *settings =3D l_settings_new();
-@@ -328,7 +329,7 @@ static int wsc_enrollee_connect(struct wsc_enrollee *ws=
-ce, struct scan_bss *bss,
- 	struct wsc_association_request request;
- 	uint8_t *pdu;
- 	size_t pdu_len;
--	struct iovec ie_iov;
-+	struct iovec ie_iov[1 + ies_num];
- =
+> Looks like the rest of the file is much simplified thanks to this.
 
- 	hs =3D netdev_handshake_state_new(wsce->netdev);
- =
+Yes, this is looking really nice now.  Just a couple of small things:
 
-@@ -372,19 +373,22 @@ static int wsc_enrollee_connect(struct wsc_enrollee *=
-wsce, struct scan_bss *bss,
- 		goto error;
- 	}
- =
+> ---
+>   src/wsc.c | 456 ++++++++++++++++++++++++++----------------------------
+>   src/wsc.h |   8 +
+>   2 files changed, 228 insertions(+), 236 deletions(-)
+> =
 
--	ie_iov.iov_base =3D ie_tlv_encapsulate_wsc_payload(pdu, pdu_len,
--							&ie_iov.iov_len);
-+	ie_iov[0].iov_base =3D ie_tlv_encapsulate_wsc_payload(pdu, pdu_len,
-+							&ie_iov[0].iov_len);
- 	l_free(pdu);
- =
 
--	if (!ie_iov.iov_base) {
-+	if (!ie_iov[0].iov_base) {
- 		r =3D -ENOMEM;
- 		goto error;
- 	}
- =
+<snip>
 
--	r =3D netdev_connect(wsce->netdev, bss, hs, &ie_iov, 1,
-+	if (ies_num)
-+		memcpy(ie_iov + 1, ies, sizeof(struct iovec) * ies_num);
-+
-+	r =3D netdev_connect(wsce->netdev, bss, hs, ie_iov, 1 + ies_num,
- 				wsc_enrollee_netdev_event,
- 				wsc_enrollee_connect_cb, wsce);
--	l_free(ie_iov.iov_base);
-+	l_free(ie_iov[0].iov_base);
- =
+> +void wsc_enrollee_cancel(struct wsc_enrollee *wsce)
+> +{
+> +	wsce->done_cb(-ECANCELED, NULL, 0, wsce->done_data);
+> +	wsce->done_cb =3D NULL;
+> +	/* Results in a call to wsc_enrollee_free */
+> +	netdev_disconnect(wsce->netdev, NULL, NULL);
 
- 	if (r =3D=3D 0)
- 		return 0;
-@@ -397,6 +401,7 @@ error:
- struct wsc_enrollee *wsc_enrollee_new(struct netdev *netdev,
- 					struct scan_bss *target,
- 					const char *pin,
-+					struct iovec *ies, unsigned int ies_num,
- 					wsc_done_cb_t done_cb, void *user_data)
- {
- 	struct wsc_enrollee *wsce;
-@@ -406,7 +411,7 @@ struct wsc_enrollee *wsc_enrollee_new(struct netdev *ne=
-tdev,
- 	wsce->done_cb =3D done_cb;
- 	wsce->done_data =3D user_data;
- =
+Are you sure you don't want to wait for netdev_disconnect to finish =
 
--	if (wsc_enrollee_connect(wsce, target, pin) =3D=3D 0)
-+	if (wsc_enrollee_connect(wsce, target, pin, ies, ies_num) =3D=3D 0)
- 		return wsce;
- =
+prior to signaling the request as aborted & canceled?  In theory this =
 
- 	wsc_enrollee_free(wsce);
-@@ -577,7 +582,7 @@ static void wsc_connect(struct wsc_station_dbus *wsc)
- 		l_dbus_message_get_arguments(wsc->super.pending_connect, "s",
- 						&pin);
- =
+could lead to station bouncing against an -EBUSY error once =
 
--	wsc->enrollee =3D wsc_enrollee_new(wsc->netdev, wsc->target, pin,
-+	wsc->enrollee =3D wsc_enrollee_new(wsc->netdev, wsc->target, pin, NULL, 0,
- 						wsc_dbus_done_cb, wsc);
- 	if (wsc->enrollee)
- 		return;
-diff --git a/src/wsc.h b/src/wsc.h
-index 3cb7ab18..570aa7cb 100644
---- a/src/wsc.h
-+++ b/src/wsc.h
-@@ -39,6 +39,7 @@ typedef void (*wsc_done_cb_t)(int err, struct wsc_credent=
-ials_info *creds,
- struct wsc_enrollee *wsc_enrollee_new(struct netdev *netdev,
- 					struct scan_bss *target,
- 					const char *pin,
-+					struct iovec *ies, unsigned int ies_num,
- 					wsc_done_cb_t done_cb, void *user_data);
- void wsc_enrollee_cancel(struct wsc_enrollee *wsce);
- =
+station_set_autoconnect is called.
 
--- =
+> +
+> +		/*
+> +		 * TODO: Mark this network as known.  We might be getting
+> +		 * multiple credentials from WSC, so there is a possibility
+> +		 * that the network is not known and / or not in scan results.
+> +		 * In both cases, the network should be considered for
+> +		 * auto-connect.  Note, since we sync the settings, the next
+> +		 * reboot will put the network on the known list.
+> +		 */
 
-2.20.1
+This TODO comment is now likely stale and can be removed (in a separate =
 
---===============0148774244636297641==--
+commit).
+
+> +	}
+>   }
+>   =
+
+>   /* Done callback for when WSC is triggered by DBus methods */
+> @@ -541,14 +530,22 @@ static void wsc_dbus_done_cb(int err, struct wsc_cr=
+edentials_info *creds,
+>   {
+>   	struct wsc *wsc =3D user_data;
+>   =
+
+> +	wsc->enrollee =3D NULL;
+> +	wsc->target =3D NULL;
+> +
+>   	l_debug("err=3D%i", err);
+>   =
+
+> +	if (err && wsc->station)
+> +		station_set_autoconnect(wsc->station, true);
+> +
+>   	switch (err) {
+>   	case 0:
+>   		break;
+>   	case -ECANCELED:
+> -		dbus_pending_reply(&wsc->pending,
+> +		if (wsc->pending)
+> +			dbus_pending_reply(&wsc->pending,
+>   					dbus_error_aborted(wsc->pending));
+
+Hmm, why the if ()?
+
+Also, if you wait until netdev_disconnect_cb to signal done_cb with =
+
+-ECANCELED, you can reply to both the pending and cancel messages here.
+
+> +
+>   		return;
+>   	case -ENOKEY:
+>   		dbus_pending_reply(&wsc->pending,
+
+<snip>
+
+> diff --git a/src/wsc.h b/src/wsc.h
+> index ada08c89..48a3297a 100644
+> --- a/src/wsc.h
+> +++ b/src/wsc.h
+> @@ -31,5 +31,13 @@ struct wsc_credentials_info {
+>   	bool has_passphrase;
+>   };
+>   =
+
+> +struct wsc_enrollee;
+> +
+>   typedef void (*wsc_done_cb_t)(int err, struct wsc_credentials_info *cre=
+ds,
+>   				unsigned int n_creds, void *user_data);
+> +
+> +struct wsc_enrollee *wsc_enrollee_new(struct netdev *netdev,
+> +					struct scan_bss *target,
+> +					const char *pin,
+> +					wsc_done_cb_t done_cb, void *user_data);
+> +void wsc_enrollee_cancel(struct wsc_enrollee *wsce);
+> =
+
+
+You may still want an explicit wsc_enrollee_free for cases where =
+
+netdev_disconnect shouldn't be used / attempted.
+
+Regards,
+-Denis
+--===============0298343160603560613==--
 
