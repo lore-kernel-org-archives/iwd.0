@@ -1,131 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============7910112011033906411=="
+Content-Type: multipart/mixed; boundary="===============7465780542933899789=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/3] wsc: Accept extra IEs in wsc_enrollee_new
-Date: Thu, 16 Jan 2020 05:29:31 +0100
-Message-ID: <20200116042931.8849-3-andrew.zaborowski@intel.com>
-In-Reply-To: <20200116042931.8849-1-andrew.zaborowski@intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 2/4] rrm: Switch to new frame watch API
+Date: Thu, 16 Jan 2020 11:39:06 -0600
+Message-ID: <57761d83-91f5-bfed-3740-66d098429a6c@gmail.com>
+In-Reply-To: <20200116024100.18371-2-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7910112011033906411==
+--===============7465780542933899789==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/wsc.c | 23 ++++++++++++++---------
- src/wsc.h |  1 +
- 2 files changed, 15 insertions(+), 9 deletions(-)
+Hi Andrew,
 
-diff --git a/src/wsc.c b/src/wsc.c
-index 4f079977..8f367c7c 100644
---- a/src/wsc.c
-+++ b/src/wsc.c
-@@ -324,7 +324,8 @@ static inline enum wsc_rf_band freq_to_rf_band(uint32_t=
- freq)
- }
- =
+On 1/15/20 8:40 PM, Andrew Zaborowski wrote:
+> ---
+>   src/rrm.c | 16 +++++++++++-----
+>   1 file changed, 11 insertions(+), 5 deletions(-)
+> =
 
- static int wsc_enrollee_connect(struct wsc_enrollee *wsce, struct scan_bss=
- *bss,
--					const char *pin)
-+					const char *pin, struct iovec *ies,
-+					unsigned int ies_num)
- {
- 	struct handshake_state *hs;
- 	struct l_settings *settings =3D l_settings_new();
-@@ -332,7 +333,7 @@ static int wsc_enrollee_connect(struct wsc_enrollee *ws=
-ce, struct scan_bss *bss,
- 	struct wsc_association_request request;
- 	uint8_t *pdu;
- 	size_t pdu_len;
--	struct iovec ie_iov;
-+	struct iovec ie_iov[1 + ies_num];
- =
 
- 	hs =3D netdev_handshake_state_new(wsce->netdev);
- =
+<snip>
 
-@@ -376,19 +377,22 @@ static int wsc_enrollee_connect(struct wsc_enrollee *=
-wsce, struct scan_bss *bss,
- 		goto error;
- 	}
- =
+> @@ -794,6 +794,12 @@ static void rrm_netdev_watch(struct netdev *netdev,
+>   		rrm_new_state(netdev);
+>   		return;
+>   	case NETDEV_WATCH_EVENT_DEL:
+> +		/*
+> +		 * We're triggered on L80211_CMD_DEL_INTERFACE and RTM_DELLINK which
+> +		 * also cause all frame watches to be unregistered so we don't have
+> +		 * to do this here.
+> +		 */
+> +
 
--	ie_iov.iov_base =3D ie_tlv_encapsulate_wsc_payload(pdu, pdu_len,
--							&ie_iov.iov_len);
-+	ie_iov[0].iov_base =3D ie_tlv_encapsulate_wsc_payload(pdu, pdu_len,
-+							&ie_iov[0].iov_len);
- 	l_free(pdu);
- =
+I reflowed / edited this comment a bit since it was going > 80 chars.
 
--	if (!ie_iov.iov_base) {
-+	if (!ie_iov[0].iov_base) {
- 		r =3D -ENOMEM;
- 		goto error;
- 	}
- =
+>   		rrm =3D l_queue_remove_if(states, match_ifindex,
+>   						L_UINT_TO_PTR(ifindex));
+>   		if (rrm) {
+> =
 
--	r =3D netdev_connect(wsce->netdev, bss, hs, &ie_iov, 1,
-+	if (ies_num)
-+		memcpy(ie_iov + 1, ies, sizeof(struct iovec) * ies_num);
-+
-+	r =3D netdev_connect(wsce->netdev, bss, hs, ie_iov, 1 + ies_num,
- 				wsc_enrollee_netdev_event,
- 				wsc_enrollee_connect_cb, wsce);
--	l_free(ie_iov.iov_base);
-+	l_free(ie_iov[0].iov_base);
- =
 
- 	if (r =3D=3D 0)
- 		return 0;
-@@ -401,6 +405,7 @@ error:
- struct wsc_enrollee *wsc_enrollee_new(struct netdev *netdev,
- 					struct scan_bss *target,
- 					const char *pin,
-+					struct iovec *ies, unsigned int ies_num,
- 					wsc_done_cb_t done_cb, void *user_data)
- {
- 	struct wsc_enrollee *wsce;
-@@ -410,7 +415,7 @@ struct wsc_enrollee *wsc_enrollee_new(struct netdev *ne=
-tdev,
- 	wsce->done_cb =3D done_cb;
- 	wsce->done_data =3D user_data;
- =
+Patches 1-4 all applied, thanks.
 
--	if (wsc_enrollee_connect(wsce, target, pin) =3D=3D 0)
-+	if (wsc_enrollee_connect(wsce, target, pin, ies, ies_num) =3D=3D 0)
- 		return wsce;
- =
-
- 	wsc_enrollee_free(wsce);
-@@ -617,7 +622,7 @@ static void wsc_connect(struct wsc_station_dbus *wsc)
- 		l_dbus_message_get_arguments(wsc->super.pending_connect, "s",
- 						&pin);
- =
-
--	wsc->enrollee =3D wsc_enrollee_new(wsc->netdev, wsc->target, pin,
-+	wsc->enrollee =3D wsc_enrollee_new(wsc->netdev, wsc->target, pin, NULL, 0,
- 						wsc_dbus_done_cb, wsc);
- 	if (wsc->enrollee)
- 		return;
-diff --git a/src/wsc.h b/src/wsc.h
-index fdf677b6..6596bb00 100644
---- a/src/wsc.h
-+++ b/src/wsc.h
-@@ -39,6 +39,7 @@ typedef void (*wsc_done_cb_t)(int err, struct wsc_credent=
-ials_info *creds,
- struct wsc_enrollee *wsc_enrollee_new(struct netdev *netdev,
- 					struct scan_bss *target,
- 					const char *pin,
-+					struct iovec *ies, unsigned int ies_num,
- 					wsc_done_cb_t done_cb, void *user_data);
- void wsc_enrollee_cancel(struct wsc_enrollee *wsce, bool defer_cb);
- void wsc_enrollee_destroy(struct wsc_enrollee *wsce);
--- =
-
-2.20.1
-
---===============7910112011033906411==--
+Regards,
+-Denis
+--===============7465780542933899789==--
 
