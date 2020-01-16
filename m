@@ -1,184 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============8712179318923051741=="
+Content-Type: multipart/mixed; boundary="===============3882046271678260536=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/4] netdev: Switch to new frame watch API
-Date: Thu, 16 Jan 2020 03:40:59 +0100
-Message-ID: <20200116024100.18371-3-andrew.zaborowski@intel.com>
+Subject: [PATCH 2/4] rrm: Switch to new frame watch API
+Date: Thu, 16 Jan 2020 03:40:58 +0100
+Message-ID: <20200116024100.18371-2-andrew.zaborowski@intel.com>
 In-Reply-To: <20200116024100.18371-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8712179318923051741==
+--===============3882046271678260536==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/netdev.c | 68 +++++++++++++++++++++++++++-------------------------
- 1 file changed, 36 insertions(+), 32 deletions(-)
+ src/rrm.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 84ba4c7f..ff56b78f 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -61,6 +61,7 @@
- #include "src/fils.h"
- #include "src/auth-proto.h"
- #include "src/rtnlutil.h"
+diff --git a/src/rrm.c b/src/rrm.c
+index a117dce3..64d4afd3 100644
+--- a/src/rrm.c
++++ b/src/rrm.c
+@@ -39,6 +39,7 @@
+ #include "src/scan.h"
+ #include "src/nl80211util.h"
+ #include "src/wiphy.h"
 +#include "src/frame-xchg.h"
  =
 
- #ifndef ENOTSUPP
- #define ENOTSUPP 524
-@@ -2814,13 +2815,13 @@ static void netdev_ft_request_cb(struct l_genl_msg =
-*msg, void *user_data)
+ #include "linux/nl80211.h"
+ =
+
+@@ -658,10 +659,9 @@ static void rrm_station_watch_cb(enum station_state st=
+ate, void *userdata)
  	}
  }
  =
 
--static void netdev_ft_response_frame_event(struct netdev *netdev,
--					const struct mmpdu_header *hdr,
-+static void netdev_ft_response_frame_event(const struct mmpdu_header *hdr,
- 					const void *body, size_t body_len,
--					void *user_data)
-+					int rssi, void *user_data)
+-static void rrm_frame_watch_cb(struct netdev *netdev,
+-				const struct mmpdu_header *mpdu,
++static void rrm_frame_watch_cb(const struct mmpdu_header *mpdu,
+ 				const void *body, size_t body_len,
+-				void *user_data)
++				int rssi, void *user_data)
  {
- 	int ret;
- 	uint16_t status_code =3D MMPDU_STATUS_CODE_UNSPECIFIED;
-+	struct netdev *netdev =3D user_data;
+ 	struct rrm_state *rrm =3D user_data;
+ 	const uint8_t *request =3D body;
+@@ -769,8 +769,8 @@ static void rrm_new_state(struct netdev *netdev)
+ 	rrm->ifindex =3D netdev_get_ifindex(netdev);
+ 	rrm->wdev_id =3D netdev_get_wdev_id(netdev);
  =
 
- 	if (!netdev->ap || !netdev->in_ft)
- 		return;
-@@ -2841,11 +2842,12 @@ ft_error:
- 	return;
+-	netdev_frame_watch_add(netdev, frame_type, prefix, sizeof(prefix),
+-					rrm_frame_watch_cb, rrm);
++	frame_watch_add(rrm->wdev_id, 0, frame_type, prefix, sizeof(prefix),
++					rrm_frame_watch_cb, rrm, NULL);
+ =
+
+ 	l_queue_push_head(states, rrm);
  }
- =
-
--static void netdev_qos_map_frame_event(struct netdev *netdev,
--					const struct mmpdu_header *hdr,
-+static void netdev_qos_map_frame_event(const struct mmpdu_header *hdr,
- 					const void *body, size_t body_len,
--					void *user_data)
-+					int rssi, void *user_data)
- {
-+	struct netdev *netdev =3D user_data;
+@@ -794,6 +794,12 @@ static void rrm_netdev_watch(struct netdev *netdev,
+ 		rrm_new_state(netdev);
+ 		return;
+ 	case NETDEV_WATCH_EVENT_DEL:
++		/*
++		 * We're triggered on L80211_CMD_DEL_INTERFACE and RTM_DELLINK which
++		 * also cause all frame watches to be unregistered so we don't have
++		 * to do this here.
++		 */
 +
- 	/* No point telling the kernel */
- 	if (!netdev->connected)
- 		return;
-@@ -3090,11 +3092,12 @@ int netdev_neighbor_report_req(struct netdev *netde=
-v,
- 	return 0;
- }
- =
-
--static void netdev_neighbor_report_frame_event(struct netdev *netdev,
--					const struct mmpdu_header *hdr,
-+static void netdev_neighbor_report_frame_event(const struct mmpdu_header *=
-hdr,
- 					const void *body, size_t body_len,
--					void *user_data)
-+					int rssi, void *user_data)
- {
-+	struct netdev *netdev =3D user_data;
-+
- 	if (body_len < 3) {
- 		l_debug("Neighbor Report frame too short");
- 		return;
-@@ -3125,13 +3128,13 @@ static void netdev_sa_query_resp_cb(struct l_genl_m=
-sg *msg,
- 		l_debug("error sending SA Query request");
- }
- =
-
--static void netdev_sa_query_req_frame_event(struct netdev *netdev,
--		const struct mmpdu_header *hdr,
--		const void *body, size_t body_len,
--		void *user_data)
-+static void netdev_sa_query_req_frame_event(const struct mmpdu_header *hdr,
-+					const void *body, size_t body_len,
-+					int rssi, void *user_data)
- {
- 	uint8_t sa_resp[4];
- 	uint16_t transaction;
-+	struct netdev *netdev =3D user_data;
- =
-
- 	if (body_len < 4) {
- 		l_debug("SA Query request too short");
-@@ -3163,11 +3166,12 @@ static void netdev_sa_query_req_frame_event(struct =
-netdev *netdev,
- 	}
- }
- =
-
--static void netdev_sa_query_resp_frame_event(struct netdev *netdev,
--		const struct mmpdu_header *hdr,
--		const void *body, size_t body_len,
--		void *user_data)
-+static void netdev_sa_query_resp_frame_event(const struct mmpdu_header *hd=
-r,
-+					const void *body, size_t body_len,
-+					int rssi, void *user_data)
- {
-+	struct netdev *netdev =3D user_data;
-+
- 	if (body_len < 4) {
- 		l_debug("SA Query frame too short");
- 		return;
-@@ -4524,26 +4528,26 @@ struct netdev *netdev_create_from_genl(struct l_gen=
-l_msg *msg,
- 	l_free(rtmmsg);
- =
-
- 	/* Subscribe to Management -> Action -> RM -> Neighbor Report frames */
--	netdev_frame_watch_add(netdev, 0x00d0, action_neighbor_report_prefix,
--				sizeof(action_neighbor_report_prefix),
--				netdev_neighbor_report_frame_event, NULL);
-+	frame_watch_add(wdev, 0, 0x00d0, action_neighbor_report_prefix,
-+			sizeof(action_neighbor_report_prefix),
-+			netdev_neighbor_report_frame_event, netdev, NULL);
- =
-
--	netdev_frame_watch_add(netdev, 0x00d0, action_sa_query_resp_prefix,
--				sizeof(action_sa_query_resp_prefix),
--				netdev_sa_query_resp_frame_event, NULL);
-+	frame_watch_add(wdev, 0, 0x00d0, action_sa_query_resp_prefix,
-+			sizeof(action_sa_query_resp_prefix),
-+			netdev_sa_query_resp_frame_event, netdev, NULL);
- =
-
--	netdev_frame_watch_add(netdev, 0x00d0, action_sa_query_req_prefix,
--				sizeof(action_sa_query_req_prefix),
--				netdev_sa_query_req_frame_event, NULL);
-+	frame_watch_add(wdev, 0, 0x00d0, action_sa_query_req_prefix,
-+			sizeof(action_sa_query_req_prefix),
-+			netdev_sa_query_req_frame_event, netdev, NULL);
- =
-
--	netdev_frame_watch_add(netdev, 0x00d0, action_ft_response_prefix,
--				sizeof(action_ft_response_prefix),
--				netdev_ft_response_frame_event, NULL);
-+	frame_watch_add(wdev, 0, 0x00d0, action_ft_response_prefix,
-+			sizeof(action_ft_response_prefix),
-+			netdev_ft_response_frame_event, netdev, NULL);
- =
-
- 	if (wiphy_supports_qos_set_map(netdev->wiphy))
--		netdev_frame_watch_add(netdev, 0x00d0, action_qos_map_prefix,
--					sizeof(action_qos_map_prefix),
--					netdev_qos_map_frame_event, NULL);
-+		frame_watch_add(wdev, 0, 0x00d0, action_qos_map_prefix,
-+				sizeof(action_qos_map_prefix),
-+				netdev_qos_map_frame_event, netdev, NULL);
- =
-
- 	/* Set RSSI threshold for CQM notifications */
- 	if (netdev->type =3D=3D NL80211_IFTYPE_STATION)
+ 		rrm =3D l_queue_remove_if(states, match_ifindex,
+ 						L_UINT_TO_PTR(ifindex));
+ 		if (rrm) {
 -- =
 
 2.20.1
 
---===============8712179318923051741==--
+--===============3882046271678260536==--
 
