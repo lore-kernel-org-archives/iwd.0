@@ -1,135 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============8991937399986977429=="
+Content-Type: multipart/mixed; boundary="===============0747393435075530077=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/3] wsc: Split out enrollee state machine to own object
-Date: Wed, 15 Jan 2020 19:54:16 -0600
-Message-ID: <78e91025-815f-8bbc-bcb4-89a15e6b6efd@gmail.com>
-In-Reply-To: <CAOq732KZY9zWPJQ0NY5Q+2aZ32Tr2zaHejz362ra0e8zriqH6A@mail.gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/4] device: Switch to new frame watch API
+Date: Thu, 16 Jan 2020 03:40:57 +0100
+Message-ID: <20200116024100.18371-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8991937399986977429==
+--===============0747393435075530077==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+---
+ src/device.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-On 1/15/20 5:45 PM, Andrew Zaborowski wrote:
-> On Thu, 16 Jan 2020 at 00:09, Denis Kenzior <denkenz@gmail.com> wrote:
->>>> Are you sure? netdev_connect_free doesn't invoke callbacks.  It is
->>>> netdev_connect_failed and netdev_connect_ok that do.
->>>
->>> True, I misread something.
->>>
->>
->> Also note that by extension, netdev_disconnect only calls the connect_cb
->> with ABORTED.  It doesn't do anything if the connection is 'operational'.
-> =
+diff --git a/src/device.c b/src/device.c
+index 0ad1ccbf..c24d7ed1 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -37,6 +37,7 @@
+ #include "src/scan.h"
+ #include "src/netdev.h"
+ #include "src/dbus.h"
++#include "src/frame-xchg.h"
+ #include "src/station.h"
+ =
 
-> It calls netdev_connect_free, and that wipes the callback so it does
-> exactly what we need.
-> =
+ struct device {
+@@ -48,16 +49,13 @@ struct device {
+ 	bool powered : 1;		/* Current IFUP state */
+ 	bool dbus_powered : 1;		/* Last IFUP state wanted via D-Bus */
+ =
 
+-	uint32_t ap_roam_watch;
+ 	uint32_t wiphy_rfkill_watch;
+ };
+ =
 
-Yes, exactly.  But it doesn't call the event filter.  So the only reason =
+ static uint32_t netdev_watch;
+ =
 
-for station to call netdev is to have netdev perform cleanup.
+-static void device_ap_roam_frame_event(struct netdev *netdev,
+-		const struct mmpdu_header *hdr,
+-		const void *body, size_t body_len,
+-		void *user_data)
++static void device_ap_roam_frame_event(const struct mmpdu_header *hdr,
++		const void *body, size_t body_len, int rssi, void *user_data)
+ {
+ 	struct device *device =3D user_data;
+ 	struct station *station =3D station_find(device->index);
+@@ -325,9 +323,9 @@ static struct device *device_create(struct wiphy *wiphy=
+, struct netdev *netdev)
+ 	/*
+ 	 * register for AP roam transition watch
+ 	 */
+-	device->ap_roam_watch =3D netdev_frame_watch_add(netdev, 0x00d0,
++	frame_watch_add(netdev_get_wdev_id(netdev), 0, 0x00d0,
+ 			action_ap_roam_prefix, sizeof(action_ap_roam_prefix),
+-			device_ap_roam_frame_event, device);
++			device_ap_roam_frame_event, device, NULL);
+ =
 
-To state it another way, netdev is relying on one of its clients to be =
+ 	device->powered =3D netdev_get_is_up(netdev);
+ =
 
-well-behaved and remember to clean up after itself.  I think this is the =
+@@ -343,9 +341,16 @@ static void device_free(struct device *device)
+ {
+ 	l_debug("");
+ =
 
-wrong approach.  netdev already knows what it needs to do, let it clean =
+-	netdev_frame_watch_remove(device->netdev, device->ap_roam_watch);
+ 	wiphy_state_watch_remove(device->wiphy, device->wiphy_rfkill_watch);
+ =
 
-up itself.
++	/*
++	 * We're triggered on NETDEV_WATCH_EVENT_DEL or device_exit.  The former
++	 * is triggered on NL80211_CMD_DEL_INTERFACE and RTM_DELLINK which
++	 * also cause all frame watches to be unregistered so we don't have
++	 * to do this here.  device_exit is triggered under the same conditions
++	 * as frame_xchg_exit.
++	 */
++
+ 	l_free(device);
+ }
+ =
 
-The above makes sense even from a re-use point of view, i.e. centralize =
+-- =
 
-this cleanup instead of having each module depending on netdev doing it =
+2.20.1
 
-(or more likely forgetting to do it) manually.
-
->>> station and wsc_enrollee shouldn't assume whether the netdev is going
->>> away or not, based on whether station and/or wsc_enrollee are going
->>
->> They should not.  But in effect they're being told that they're being
->> removed and to clean up after themselves immediately.  No async cleanup
->> is possible.
-> =
-
-> So here you're agreeing that station_free should not be assuming that
-> the netdev is going away --> station_free *should* call some sort of
-> netdev cleanup function (netdev_disconnect or a new function that
-> doesn't send a CMD_DISCONNECT, but does call netdev_connect_free)...
-
-No.  See above.  station shouldn't care what netdev is doing.  All it =
-
-cares about is it was just informed that netdev is down and no longer in =
-
-a state where it can accept any commands.  It should clean up after =
-
-itself immediately and cease to exist.
-
-> =
-
->>
->>> away.  So rather than assume the connect callback is not getting
->>> happening anymore, they also should call a cleanup-right-away function
->>> for netdev.  Or ideally they'd just call a 'cleanup' function and it
->>> would be netdev figuring out which cleanup it needs, but if you want
->>> two separate methods I can add this.
->>
->> They should not.  netdev already knows everything it needs to clean up
->> after itself.
-> =
-
-> ...But here you're saying they shouldn't call any netdev cleanup
-> function?  Perhaps I'm misunderstanding you.
-> =
-
-
-Yes, because netdev will clean up after itself.  So we don't have to =
-
-rely on station, ap, wsc, adhoc, etc to remember to do it for netdev.
-
->> netdev should cleanup whatever stale state it has when it receives 1.
->> It *knows* what just happened, it should not be depending on every
->> client it has to do the right thing instead.
-> =
-
-> That will hardcode the assumption that the netdev is disappearing in
-> station.  If they have a "client" type relationship then station
-> should take care of cleaning up the processes it has initiated.
-> Otherwise it would need to be very well documented in the comments and
-> I bet we'll still occasionally get it wrong, the relationship just
-> becomes very complex.
-
-I don't see how you came to this conclusion :)  netdev is telling its =
-
-clients that it is either
-	1. Disappearing and ceasing to exist.
-	2. In the DOWN state where pretty much nothing works.
-
-In both cases netdev should have already cleaned up whatever pending =
-
-operations there were and there's not much for the clients to do anyway.
-
->> Curious.  For what purpose?
-> =
-
-> Same as the netdev_disconnect call makes netdev forget station's
-> connect_cb, as far as I'm reading netdev.c there's currently no place
-> where disconnect_cb is forgotten when station gets freed so we likely
-> have the same crash there.
-> =
-
-
-I see.  Makes sense.  But I'd rather have the disconnect state cleaned =
-
-up by netdev itself.
-
-Regards,
--Denis
---===============8991937399986977429==--
+--===============0747393435075530077==--
 
