@@ -1,51 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============7465780542933899789=="
+Content-Type: multipart/mixed; boundary="===============8975042541006765878=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/4] rrm: Switch to new frame watch API
-Date: Thu, 16 Jan 2020 11:39:06 -0600
-Message-ID: <57761d83-91f5-bfed-3740-66d098429a6c@gmail.com>
-In-Reply-To: <20200116024100.18371-2-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 1/3] wsc: Split out enrollee state machine to own object
+Date: Fri, 17 Jan 2020 12:51:34 -0600
+Message-ID: <c4f762d6-351f-867b-60b9-4ae578852384@gmail.com>
+In-Reply-To: <20200116042931.8849-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7465780542933899789==
+--===============8975042541006765878==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi Andrew,
 
-On 1/15/20 8:40 PM, Andrew Zaborowski wrote:
-> ---
->   src/rrm.c | 16 +++++++++++-----
->   1 file changed, 11 insertions(+), 5 deletions(-)
+On 1/15/20 10:29 PM, Andrew Zaborowski wrote:
+> Create struct wsc_enrollee which is allocated with wsc_enrollee_new,
+> taking a done callback as a parameter.  The callback is always
+> called so there's no need for a separate destroy callback.  The object
+> only lives until the done callback happens so wsc_enrollee_cancel/destroy
+> can only be used before this.
 > =
 
-
+> Looks like the rest of the file is simplified thanks to this.
+> ---
+>   src/wsc.c | 504 +++++++++++++++++++++++++++++-------------------------
+>   src/wsc.h |   9 +
+>   2 files changed, 276 insertions(+), 237 deletions(-)
+>
 <snip>
 
-> @@ -794,6 +794,12 @@ static void rrm_netdev_watch(struct netdev *netdev,
->   		rrm_new_state(netdev);
->   		return;
->   	case NETDEV_WATCH_EVENT_DEL:
-> +		/*
-> +		 * We're triggered on L80211_CMD_DEL_INTERFACE and RTM_DELLINK which
-> +		 * also cause all frame watches to be unregistered so we don't have
-> +		 * to do this here.
-> +		 */
+
+> @@ -1157,7 +1184,10 @@ static void wsc_free(void *userdata)
+>   =
+
+>   	if (wsc->pending_cancel)
+>   		dbus_pending_reply(&wsc->pending_cancel,
+> -				dbus_error_aborted(wsc->pending_cancel));
+> +				dbus_error_not_available(wsc->pending_cancel));
+
+I left this as error_aborted for now.  I'd rather not do so without a =
+
+good reason given that the API is frozen.  At the very least, lets do =
+
+this in a separate patch so it is visible / documented.    If you think =
+
+it should be not_available, please send a separate patch.
+
 > +
+> +	if (wsc->enrollee)
+> +		wsc_enrollee_destroy(wsc->enrollee);
+>   =
 
-I reflowed / edited this comment a bit since it was going > 80 chars.
+>   	l_free(wsc);
+>   }
 
->   		rrm =3D l_queue_remove_if(states, match_ifindex,
->   						L_UINT_TO_PTR(ifindex));
->   		if (rrm) {
-> =
+Otherwise, everything in this series has now been applied, thanks!  I =
 
-
-Patches 1-4 all applied, thanks.
+did push out a few tweaks on top, please review.
 
 Regards,
 -Denis
---===============7465780542933899789==--
+--===============8975042541006765878==--
 
