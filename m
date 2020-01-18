@@ -1,66 +1,91 @@
-Content-Type: multipart/mixed; boundary="===============8975042541006765878=="
+Content-Type: multipart/mixed; boundary="===============1959206718391313800=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/3] wsc: Split out enrollee state machine to own object
-Date: Fri, 17 Jan 2020 12:51:34 -0600
-Message-ID: <c4f762d6-351f-867b-60b9-4ae578852384@gmail.com>
-In-Reply-To: <20200116042931.8849-1-andrew.zaborowski@intel.com>
+From: Daniel Wagner <wagi@monom.org>
+Subject: KnownNetwork AutoConnect property changed signal
+Date: Sat, 18 Jan 2020 17:21:01 +0100
+Message-ID: <20200118162101.iuncljo23jqoxzb5@beryllium.lan>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8975042541006765878==
+--===============1959206718391313800==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Hi,
 
-On 1/15/20 10:29 PM, Andrew Zaborowski wrote:
-> Create struct wsc_enrollee which is allocated with wsc_enrollee_new,
-> taking a done callback as a parameter.  The callback is always
-> called so there's no need for a separate destroy callback.  The object
-> only lives until the done callback happens so wsc_enrollee_cancel/destroy
-> can only be used before this.
-> =
+I'm in the process of updating the iwd plugin for ConnMan. Since
+ConnMan wants to decide when to connect to a network, I decided to
+tell iwd not to auto connect to any known networks. Not sure if this
+will work but that's a different topic.
 
-> Looks like the rest of the file is simplified thanks to this.
-> ---
->   src/wsc.c | 504 +++++++++++++++++++++++++++++-------------------------
->   src/wsc.h |   9 +
->   2 files changed, 276 insertions(+), 237 deletions(-)
->
-<snip>
+Anyway, during boot up the plugin discovers the known network and for
+each network with AutoConnect set to true it will issue an set
+property call. There is also a property changed callback which does
+the same.
+
+[iwd]# known-networks "owl stretching time" show
+                       Known Network: owl stretching time
+---------------------------------------------------------------------------=
+-----
+  Settable  Property          Value
+---------------------------------------------------------------------------=
+-----
+            Name              owl stretching time
+            Hidden
+         *  AutoConnect       no
+
+[iwd]# known-networks owl stretching time set-property AutoConnect yes
 
 
-> @@ -1157,7 +1184,10 @@ static void wsc_free(void *userdata)
->   =
+I observe following:
 
->   	if (wsc->pending_cancel)
->   		dbus_pending_reply(&wsc->pending_cancel,
-> -				dbus_error_aborted(wsc->pending_cancel));
-> +				dbus_error_not_available(wsc->pending_cancel));
+connmand[27914]: plugins/iwd.c:known_network_property_change() 0x1af1450 au=
+to_connect 0
+connmand[27914]: plugins/iwd.c:known_network_property_change() 0x1af1450 au=
+to_connect 1
+connmand[27914]: plugins/iwd.c:disable_auto_connect() =
 
-I left this as error_aborted for now.  I'd rather not do so without a =
+connmand[27914]: plugins/iwd.c:known_network_property_change() 0x1af1450 au=
+to_connect 1
+connmand[27914]: plugins/iwd.c:disable_auto_connect() =
 
-good reason given that the API is frozen.  At the very least, lets do =
+connmand[27914]: plugins/iwd.c:known_network_property_change() 0x1af1450 au=
+to_connect 0
+connmand[27914]: plugins/iwd.c:known_network_property_change() 0x1af1450 au=
+to_connect 0
 
-this in a separate patch so it is visible / documented.    If you think =
+and monitor-iwd sees
 
-it should be not_available, please send a separate patch.
+{KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_psk=
+] AutoConnect =3D False
+{KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_psk=
+] LastConnectedTime =3D 2020-01-18T16:10:34Z
+{KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_psk=
+] AutoConnect =3D True
+{KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_psk=
+] AutoConnect =3D True
+{KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_psk=
+] AutoConnect =3D False
+{KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_psk=
+] AutoConnect =3D False
 
-> +
-> +	if (wsc->enrollee)
-> +		wsc_enrollee_destroy(wsc->enrollee);
->   =
 
->   	l_free(wsc);
->   }
+I am bit surprised by the number of property changed signals. I
+expected to see only 'auto_connect 1' and then a 'auto_connect 0'.
 
-Otherwise, everything in this series has now been applied, thanks!  I =
+I verified the behavior without ConnMan running:
 
-did push out a few tweaks on top, please review.
+{KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_psk=
+] AutoConnect =3D False
+{KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_psk=
+] LastConnectedTime =3D 2020-01-18T16:19:26Z
+{KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_psk=
+] AutoConnect =3D True
 
-Regards,
--Denis
---===============8975042541006765878==--
+Is this supposed to be so?
+
+Thanks,
+Daniel
+--===============1959206718391313800==--
 
