@@ -1,48 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============8516839092892922513=="
+Content-Type: multipart/mixed; boundary="===============0259763404170528764=="
 MIME-Version: 1.0
 From: Daniel Wagner <wagi@monom.org>
-Subject: Re: How to monitor signal strenght
-Date: Sat, 18 Jan 2020 18:10:54 +0100
-Message-ID: <20200118171054.vm2xfgpz66pq4ttk@beryllium.lan>
-In-Reply-To: <4e33ab87-76e3-8b51-d781-59da227e85aa@gmail.com>
+Subject: [PATCH] monitor: Add message length check to nlmon_receice
+Date: Sun, 19 Jan 2020 17:31:11 +0100
+Message-ID: <20200119163111.31753-1-wagi@monom.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8516839092892922513==
+--===============0259763404170528764==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+The NLMSG_NEXT macro calculates the next nlmsg and updates the len
+field:
 
-On Sat, Jan 18, 2020 at 11:02:27AM -0600, Denis Kenzior wrote:
-> On 1/18/20 10:50 AM, Daniel Wagner wrote:
-> > Another question pop up while updating the iwd plugin for ConnMan.
-> > =
+  #define NLMSG_NEXT(nlh,len)	 ((len) -=3D NLMSG_ALIGN((nlh)->nlmsg_len), \
+				  (struct nlmsghdr*)(((char*)(nlh)) + NLMSG_ALIGN((nlh)->nlmsg_len)))
 
-> > Currently, the plugin listens for scanning signal. Whenever iwd has
-> > finished with scanning the plugin calls GetOrderedNetworks in order to
-> > update the signal strengths. Is this still the right way to do it?
-> =
+That means nlmsg_len needs to be an multiple of NLMSG_ALIGNTO to avoid
+an underflow in len. But there are message which do not have a valid
+lenght:
 
-> Yes.
+  Breakpoint 1, nlmon_receive (io=3D0x4da210, user_data=3D0x4d4cc0) at moni=
+tor/nlmon.c:6947
+  6947                            printf("malformed packet\n");
+  (gdb) bt
+  #0  nlmon_receive (io=3D0x4da210, user_data=3D0x4d4cc0) at monitor/nlmon.=
+c:6947
+  #1  0x0000000000439a91 in io_callback (fd=3D7, events=3D1, user_data=3D0x=
+4da210) at ell/io.c:126
+  #2  0x0000000000438861 in l_main_iterate (timeout=3D-1) at ell/main.c:473
+  #3  0x0000000000438968 in l_main_run () at ell/main.c:520
+  #4  0x0000000000438c80 in l_main_run_with_signal (callback=3D0x4038e6 <si=
+gnal_handler>, user_data=3D0x0) at ell/main.c:642
+  #5  0x0000000000403cc9 in main (argc=3D3, argv=3D0x7fffffffec28) at monit=
+or/main.c:806
+  (gdb) p nlmsg->nlmsg_len
+  $5 =3D 17
 
-Cool, that means no work for me :)
+By adding an lenght check after each processed message garantees that
+we do not underflow. The downside is that as soon an invalid length is
+spotted the processing stops.
+---
+ monitor/nlmon.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-> > I see in the docs that there is a SignalLevelAgent hierarchy. I am not
-> > entirely sure if I need it or what it's the purpose of it. The docs
-> > talks about an array for thresholds and references
-> > net.connman.iwd.Device.RegisterSignalLevelAgent in device-api.txt. But
-> > there is no documentation about it.
-> =
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 6b0afef8a497..5498e9fa0f23 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -6941,6 +6941,11 @@ static bool nlmon_receive(struct l_io *io, void *use=
+r_data)
+ 			nlmon_message(nlmon, tv, tp, nlmsg);
+ 			break;
+ 		}
++
++		if (nlmsg->nlmsg_len & (NLMSG_ALIGNTO-1)) {
++			printf("malformed packet\n");
++			break;
++		}
+ 	}
+ =
 
-> Strange.  This entire hierarchy should be under doc/station-api.txt?  I
-> guess you mean there's a typo and it should be
-> net.connman.iwd.Station.RegisterSignalLevelAgent.  Fixed that now.
+ 	return true;
+-- =
 
-Ah, now I found it. Was properly confused :)
-
-Thanks,
-Daniel
---===============8516839092892922513==--
+2.24.1
+--===============0259763404170528764==--
 
