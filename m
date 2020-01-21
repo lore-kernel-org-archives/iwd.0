@@ -1,85 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============5661286595847825531=="
+Content-Type: multipart/mixed; boundary="===============1920542019371304447=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] Treewide: fix typos
-Date: Tue, 21 Jan 2020 16:08:08 -0600
-Message-ID: <2d998ce0-cf2d-2b2b-4b5e-e66b52fe5393@gmail.com>
-In-Reply-To: <20200121062138.21074-1-torstein@huseboe.net>
+Subject: Re: [PATCH] monitor: Add message length check to nlmon_receice
+Date: Tue, 21 Jan 2020 16:36:37 -0600
+Message-ID: <8648726d-dd94-84a6-4d98-7dec428aa55a@gmail.com>
+In-Reply-To: <20200119163111.31753-1-wagi@monom.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5661286595847825531==
+--===============1920542019371304447==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Torstein,
+Hi Daniel,
 
-On 1/21/20 12:21 AM, Torstein Huseb=C3=B8 wrote:
-> ---
->   autotests/util/testutil.py | 2 +-
->   doc/access-point-api.txt   | 2 +-
->   doc/adhoc-api.txt          | 2 +-
->   doc/features.txt           | 2 +-
->   doc/network-api.txt        | 2 +-
->   doc/station-api.txt        | 2 +-
->   doc/wpa-auth.txt           | 2 +-
->   monitor/nlmon.c            | 6 +++---
->   monitor/pcap.c             | 2 +-
->   plugins/sim_hardcoded.c    | 2 +-
->   src/adhoc.c                | 2 +-
->   src/anqputil.c             | 4 ++--
->   src/eap-mschapv2.c         | 2 +-
->   src/eap-pwd.c              | 2 +-
->   src/eap-sim.c              | 2 +-
->   src/eap-tls-common.c       | 2 +-
->   src/eap-wsc.c              | 2 +-
->   src/erp.c                  | 2 +-
->   src/handshake.c            | 4 ++--
->   src/hotspot.c              | 2 +-
->   src/ie.c                   | 4 ++--
->   src/manager.c              | 4 ++--
->   src/netdev.c               | 6 +++---
->   src/netdev.h               | 2 +-
->   src/network.c              | 2 +-
->   src/sae.c                  | 2 +-
->   src/scan.c                 | 2 +-
->   src/station.c              | 6 +++---
->   src/wsc.c                  | 4 ++--
->   tools/hwsim.c              | 2 +-
->   unit/test-cmac-aes.c       | 4 ++--
->   unit/test-ie.c             | 8 ++++----
->   unit/test-sae.c            | 4 ++--
->   33 files changed, 49 insertions(+), 49 deletions(-)
+On 1/19/20 10:31 AM, Daniel Wagner wrote:
+> The NLMSG_NEXT macro calculates the next nlmsg and updates the len
+> field:
+> =
+
+>    #define NLMSG_NEXT(nlh,len)	 ((len) -=3D NLMSG_ALIGN((nlh)->nlmsg_len)=
+, \
+> 				  (struct nlmsghdr*)(((char*)(nlh)) + NLMSG_ALIGN((nlh)->nlmsg_len)))
+> =
+
+> That means nlmsg_len needs to be an multiple of NLMSG_ALIGNTO to avoid
+> an underflow in len. But there are message which do not have a valid
+> lenght:
 > =
 
 
-<snip>
+hmm, do you have a pcap of such a message?
 
-Thanks for taking the time to do this.  Some of the typos were pretty =
+>    Breakpoint 1, nlmon_receive (io=3D0x4da210, user_data=3D0x4d4cc0) at m=
+onitor/nlmon.c:6947
+>    6947                            printf("malformed packet\n");
+>    (gdb) bt
+>    #0  nlmon_receive (io=3D0x4da210, user_data=3D0x4d4cc0) at monitor/nlm=
+on.c:6947
+>    #1  0x0000000000439a91 in io_callback (fd=3D7, events=3D1, user_data=
+=3D0x4da210) at ell/io.c:126
+>    #2  0x0000000000438861 in l_main_iterate (timeout=3D-1) at ell/main.c:=
+473
+>    #3  0x0000000000438968 in l_main_run () at ell/main.c:520
+>    #4  0x0000000000438c80 in l_main_run_with_signal (callback=3D0x4038e6 =
+<signal_handler>, user_data=3D0x0) at ell/main.c:642
+>    #5  0x0000000000403cc9 in main (argc=3D3, argv=3D0x7fffffffec28) at mo=
+nitor/main.c:806
+>    (gdb) p nlmsg->nlmsg_len
+>    $5 =3D 17
+> =
 
-funny :)
+> By adding an lenght check after each processed message garantees that
+> we do not underflow. The downside is that as soon an invalid length is
+> spotted the processing stops.
 
-> --- a/src/handshake.c
-> +++ b/src/handshake.c
-> @@ -145,8 +145,8 @@ static bool handshake_state_setup_own_ciphers(struct =
-handshake_state *s,
->   	s->group_management_cipher =3D info->group_management_cipher;
+Hmm, isn't NLMSG_OK already enough for this?  It checks that length is =
+
+positive and above a certain threshold?
+
+> ---
+>   monitor/nlmon.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> =
+
+> diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+> index 6b0afef8a497..5498e9fa0f23 100644
+> --- a/monitor/nlmon.c
+> +++ b/monitor/nlmon.c
+> @@ -6941,6 +6941,11 @@ static bool nlmon_receive(struct l_io *io, void *u=
+ser_data)
+>   			nlmon_message(nlmon, tv, tp, nlmsg);
+>   			break;
+>   		}
+> +
+> +		if (nlmsg->nlmsg_len & (NLMSG_ALIGNTO-1)) {
+> +			printf("malformed packet\n");
+> +			break;
+> +		}
+
+Also I'm not sure whether this really holds for messages that are =
+
+'last'.  There's no sense to check or enforce alignment in such a case/
+
+>   	}
 >   =
 
->   	/*
-> -	 * Dont set MFP for OSEN otherwise EAPoL will attempt to negotiate a
-> -	 * iGTK which is not allowe for OSEN.
-> +	 * Don't set MFP for OSEN otherwise EAPoL will attempt to negotiate a
-> +	 * iGTK which is not allow for OSEN.
+>   	return true;
+> =
 
-I amended your commit to have this become 'allowed' instead of allow and =
-
-applied the rest.
-
-Applied, thanks!
 
 Regards,
 -Denis
---===============5661286595847825531==--
+--===============1920542019371304447==--
 
