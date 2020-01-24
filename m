@@ -1,79 +1,189 @@
-Content-Type: multipart/mixed; boundary="===============5386672253905129276=="
+Content-Type: multipart/mixed; boundary="===============2581371987884772875=="
 MIME-Version: 1.0
-From: Daniel Wagner <wagi@monom.org>
-Subject: Re: [PATCH] monitor: Add message length check to nlmon_receice
-Date: Wed, 22 Jan 2020 19:41:00 +0100
-Message-ID: <20200122184100.fehnsonqagforfx7@beryllium.lan>
-In-Reply-To: <448ecb92-848c-a2b2-8aad-ebe4a1b1772e@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH v4] Document P2P dbus interfaces
+Date: Fri, 24 Jan 2020 04:40:42 +0100
+Message-ID: <20200124034042.2576-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5386672253905129276==
+--===============2581371987884772875==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 22, 2020 at 11:53:47AM -0600, Denis Kenzior wrote:
-> I still think the last message isn't *actually* aligned, but without crash
-> data I can't prove it :)  It may be that most messages are indeed aligned,
-> but the ones you're seeing this on are somehow special. Otherwise I don't
-> see how we haven't detected this crash for so long.
+Proposed minimum P2P interfaces for establishing basic connections.  The
+device discovery results in creation of Peer objects.
+---
+I removed any mentions of WFD or services for now.  I did keep the
+signal level agent as we have all the code in netdev and there's no
+reason not to make the notifications available for client-mode
+connections.  For connections where don't have the data (GO-mode until
+kernel support is there) we will not send them (obviously).
+---
+ doc/p2p-api.txt      | 97 ++++++++++++++++++++++++++++++++++++++++++++
+ doc/p2p-peer-api.txt | 45 ++++++++++++++++++++
+ 2 files changed, 142 insertions(+)
+ create mode 100644 doc/p2p-api.txt
+ create mode 100644 doc/p2p-peer-api.txt
 
-Let me help out with that :)
+diff --git a/doc/p2p-api.txt b/doc/p2p-api.txt
+new file mode 100644
+index 00000000..ecf0a521
+--- /dev/null
++++ b/doc/p2p-api.txt
+@@ -0,0 +1,97 @@
++P2P hierarchy
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Service		net.connman.iwd
++Interface	net.connman.iwd.p2p.Device [Experimental]
++Object path	/net/connman/iwd/{phy0,phy1,...}
++
++Methods		array(on) GetPeers()
++
++			Returns a list (possibly empty) of detected P2P peers.
++			Each record returned contains a tuple of the following
++			values.
++
++			object Object
++
++				The net.connman.iwd.p2p.Peer object
++				representing the peer device.
++
++			int16 SignalStrength
++
++				Peer's signal strength expressed in 100 * dBm.
++				The value is the range of 0 (strongest signal)
++				to -10000 (weakest signal.)
++
++		void RequestDiscovery()
++
++			Starts device discovery if not already happening and
++			registers the calling D-Bus client as requiring device
++			discovery.  The discovery phase will be active until
++			all registered clients have called ReleaseDiscovery()
++			or disconnected from D-Bus.
++
++			Possible errors: [service].Error.AlreadyExists
++
++		void ReleaseDiscovery()
++
++			Unregisters the calling client as requiring device
++			discovery.  Clients should do this as soon as they
++			stop displaying or otherwise using the list of
++			discovered peer devices to avoid keeping the Wi-Fi
++			adapter occupied unnecessarily.
++
++			Possible errors: [service].Error.NotAvailable
++
++		void RegisterSignalLevelAgent(object path,
++						 array(int16) levels)
++
++			Register the agent object to receive signal strength
++			level change notifications on the
++			net.connman.iwd.Station.SignalLevelAgent interface,
++			see station-api.txt.  The "levels" parameter decides
++			the thresholds in dBm that will generate a call to
++			the agent's Changed method whenever current RSSI
++			crosses any of the values.  The values must be
++			passed in descending order.  The number and distance
++			between requested threshold values is a compromise
++			between resolution and the frequency of system
++			wakeups and context-switches that are going to be
++			occuring to update the client's signal meter.  Only
++			one agent can be registered at any time.
++
++			Possible errors: [service].Error.InvalidArguments
++					 [service].Error.Failed
++					 [service].Error.AlreadyExists
++					 [service].Error.NotSupported
++
++		void UnregisterSignalLevelAgent(object path)
++
++			Unregister an existing agent.
++
++			Possible errors: [service].Error.InvalidArguments
++					 [service].Error.NotFound
++
++Properties	boolean Enabled [readwrite]
++
++			Whether local P2P device is started and ready to
++			start device discovery, become discoverable by peers
++			and connect to peers.
++
++		string Name [readwrite]
++
++			Sets local P2P device name as it is going to be
++			presented on other devices that we will connect to
++			or ones that discover us in scanning.
++
++		uint16 AvailableConnections [readonly]
++
++			Minimum number of peers the hardware is capable of
++			connecting to in the current configuration and in
++			addition to any connections already established.
++			Often 1 while idle and 0 if connected to a peer,
++			connecting, disconnecting or otherwise busy.
++
++			A non-zero number is to be interpreted as meaning
++			that the device is capable of making *at least*
++			that many new connections as the final number may
++			depend on parameters negotiated with future peers.
+diff --git a/doc/p2p-peer-api.txt b/doc/p2p-peer-api.txt
+new file mode 100644
+index 00000000..2245b2e3
+--- /dev/null
++++ b/doc/p2p-peer-api.txt
+@@ -0,0 +1,45 @@
++P2PPeer hierarchy
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Service		net.connman.iwd
++Interface	net.connman.iwd.p2p.Peer [Experimental]
++Object path	/net/connman/iwd/{phy0,phy1,...}/p2p_peers/{aa_bb_cc_dd_ee_ff}
++
++Methods		Disconnect()
++
++			If connected, disconnect from this peer.
++			Connections are established by calling methods on
++			the net.connman.iwd.SimpleConfiguration interface
++			on the same object -- see wsc-api.txt.
++
++			Possible errors: [service].Failed
++					 [service].NotConnected
++
++Properties	string Name [readonly]
++
++			P2P Peer's display name
++
++		string DeviceCategory [readonly]
++
++			The category part of the peer's declared
++			Primary Device Type.
++
++		string DeviceSubcategory [readonly, optional]
++
++			The Sub Category part of the peer's declared
++			Primary Device Type.
++
++		object Device [readonly]
++
++			The object with a net.connman.iwd.p2p.Device
++			interface that discovered this peer -- see
++			p2p-api.txt.
++
++		boolean Connected [readonly]
++
++			Whether there's currently an active connection
++			to this peer.  This property is read-only and
++			changes as a result of method calls on the
++			net.connman.iwd.SimpleConfiguration interface
++			on the same object -- see wsc-api.txt -- and
++			calls to Disconnect on this interface.
+-- =
 
-(gdb) bt full
-#0  0x000000000041ba55 in nlmon_receive (io=3D0x4da210, user_data=3D0x4d4cc=
-0) at monitor/nlmon.c:6930
-        nlmon =3D 0x4d4cc0
-        nlmsg =3D 0x800000ffd2f4
-        msg =3D {msg_name =3D 0x7fffffffe920, msg_namelen =3D 20, msg_iov =
-=3D 0x7fffffffe910, msg_iovlen =3D 1, =
+2.20.1
 
-          msg_control =3D 0x7fffffffc8c0, msg_controllen =3D 32, msg_flags =
-=3D 0}
-        sll =3D {sll_family =3D 17, sll_protocol =3D 0, sll_ifindex =3D 6, =
-sll_hatype =3D 824, sll_pkttype =3D 4 '\004', =
-
-          sll_halen =3D 0 '\000', sll_addr =3D "\000\000\000\000\000\000\00=
-0"}
-        iov =3D {iov_base =3D 0x7fffffffc8e0, iov_len =3D 8192}
-        cmsg =3D 0x0
-        copy_tv =3D {tv_sec =3D 1579718221, tv_usec =3D 657974}
-        copy_tp =3D {tp_status =3D 0, tp_len =3D 0, tp_snaplen =3D 0, tp_ma=
-c =3D 0, tp_net =3D 0, tp_vlan_tci =3D 0, =
-
-          tp_vlan_tpid =3D 0}
-        tv =3D 0x7fffffffe900
-        tp =3D 0x0
-        proto_type =3D 0
-        buf =3D "\021\000\000\000\026\000\001\003\000\000\000\000wU\000\000=
-\000\200\200\000\376\t\000\001\000\000\000\000\b\000\017\000\376\000\000\00=
-0\024\000\001\000*\002&\360\000@\000\000\000\000\000\000\027\333[\033\024\0=
-00\002", '\000' <repeats 17 times>, "\024\000\a\000\376\200\000\000\000\000=
-\000\000\342\325^\377\376\343\036\024\f\000\b\000\b\000\n\000@\000\000\000\=
-b\000\006\000\000\004\000\000\024\000\005\000\376\200\000\000\000\000\000\0=
-00\362\237\302\377\376=C2=AC\337\b\000\004\000\002\000\000\000$\000\f\000\0=
-02\000\000\000\000\316\065", '\000' <repeats 25 times>, "\005\000\024\000\0=
-01\000\000\000\024\000\006\000\377\377\377\377\377\377\377\377\375"...
-        control =3D " \000\000\000\000\000\000\000\001\000\000\000\035\000\=
-000\000M\226(^\000\000\000\000\066\n\n\000\000\000\000"
-        bytes_read =3D 17
-        nlmsg_len =3D 18446744073692771837
-        fd =3D 7
-(gdb) p iov.iov_base
-$1 =3D (void *) 0x7fffffffc8e0
-(gdb) p *(struct nlmsghdr *)iov.iov_base
-$2 =3D {nlmsg_len =3D 17, nlmsg_type =3D 22, nlmsg_flags =3D 769, nlmsg_seq=
- =3D 0, nlmsg_pid =3D 21879}
-
-> > Do you want me to send a new patch or are you going to fix it
-> > yourself? I don't mind :)
-> =
-
-> I went ahead and pushed 8b489d5df283 ("monitor: Fix crash") with your name
-> on the Reported-By.
-
-Thanks!
-Daniel
---===============5386672253905129276==--
+--===============2581371987884772875==--
 
