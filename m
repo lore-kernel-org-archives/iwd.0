@@ -1,35 +1,27 @@
-Content-Type: multipart/mixed; boundary="===============2242840770672384768=="
+Content-Type: multipart/mixed; boundary="===============0370871741309100261=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v4] Document P2P dbus interfaces
-Date: Mon, 27 Jan 2020 14:59:42 -0600
-Message-ID: <08873887-1c47-6469-cfea-a4076b8d6dcf@gmail.com>
-In-Reply-To: <20200124034042.2576-1-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 1/2] manager: Make sure all interface are processed after
+ dump
+Date: Mon, 27 Jan 2020 15:01:19 -0600
+Message-ID: <3a2c3028-99e2-8528-741f-1e528027aaa2@gmail.com>
+In-Reply-To: <20200127141646.316-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2242840770672384768==
+--===============0370871741309100261==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi Andrew,
 
-On 1/23/20 9:40 PM, Andrew Zaborowski wrote:
-> Proposed minimum P2P interfaces for establishing basic connections.  The
-> device discovery results in creation of Peer objects.
+On 1/27/20 8:16 AM, Andrew Zaborowski wrote:
+> In manager_interface_dump_done use l_queue_foreach_remove instead of
+> l_queue_remove_if to make sure we process all of the interfaces.
 > ---
-> I removed any mentions of WFD or services for now.  I did keep the
-> signal level agent as we have all the code in netdev and there's no
-> reason not to make the notifications available for client-mode
-> connections.  For connections where don't have the data (GO-mode until
-> kernel support is there) we will not send them (obviously).
-> ---
->   doc/p2p-api.txt      | 97 ++++++++++++++++++++++++++++++++++++++++++++
->   doc/p2p-peer-api.txt | 45 ++++++++++++++++++++
->   2 files changed, 142 insertions(+)
->   create mode 100644 doc/p2p-api.txt
->   create mode 100644 doc/p2p-peer-api.txt
+>   src/manager.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
 > =
 
 
@@ -38,5 +30,5 @@ Applied, thanks.
 Regards,
 -Denis
 
---===============2242840770672384768==--
+--===============0370871741309100261==--
 
