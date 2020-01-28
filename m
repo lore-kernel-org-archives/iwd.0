@@ -1,93 +1,206 @@
-Content-Type: multipart/mixed; boundary="===============1707461616810480327=="
+Content-Type: multipart/mixed; boundary="===============2918650184201107874=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/2] manager: Retry the interface setup if we get an EBUSY
-Date: Mon, 27 Jan 2020 17:27:24 -0600
-Message-ID: <9be5aac1-feb9-5c3b-2b19-e6d3972445e5@gmail.com>
-In-Reply-To: <CAOq732K6iEaVaH6cZze_B9_wfFELAe8aai4k+R_ngXP5VcvkjQ@mail.gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH] manager: Retry the interface setup if we get an EBUSY
+Date: Tue, 28 Jan 2020 19:29:35 +0100
+Message-ID: <20200128182935.3548-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1707461616810480327==
+--===============2918650184201107874==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Sometimes, at least with brcmfmac, the default interface apparently
+takes a moment to get created after the NEW_WIPHY event.  We didn't
+really consider this case in the NEW_WIPHY handler and we've got a race
+condition.  It fixes the following bug for me:
+https://bugs.archlinux.org/task/63912 -- tested by removing and
+re-modprobing the brcmfmac module rather than rebooting.
 
-On 1/27/20 5:32 PM, Andrew Zaborowski wrote:
-> Hi Denis,
-> =
+To work around this wait for the NEW_INTERFACE event and then retry the
+setup.  We still do the initial attempt directly after NEW_WIPHY to
+handle cases like wiphys with no default interfaces and pre-existing
+wiphys.
+---
+ src/manager.c | 70 ++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 50 insertions(+), 20 deletions(-)
 
-> On Mon, 27 Jan 2020 at 23:17, Denis Kenzior <denkenz@gmail.com> wrote:
->> On 1/27/20 8:16 AM, Andrew Zaborowski wrote:
->>> Sometimes, at least with brcmfmac, the default interface apparently
->>> takes a moment to get created after the NEW_WIPHY event.  We didn't
->>> really consider this case in the NEW_WIPHY handler and we've got a race
->>> condition.  It fixes the following bug for me:
->>> https://bugs.archlinux.org/task/63912 -- tested by removing and
->>> re-modprobing the brcmfmac module rather than rebooting.
->>
->> So it looks like that bug report is really several different issues
->> (probably most due to the weirdly behaving brcmfmac driver).
->>
->> Issue #1: This was seemingly related to atheros drivers not reporting
->> NEW_WIPHY at all, yet reporting NEW_INTERFACE.  At least this seemed to
->> be the case based on one log I saw.
-> =
+diff --git a/src/manager.c b/src/manager.c
+index a89bfc57..42d92c57 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -54,6 +54,7 @@ struct wiphy_setup_state {
+ 	struct wiphy *wiphy;
+ 	unsigned int pending_cmd_count;
+ 	bool aborted;
++	bool retry;
+ =
 
+ 	/*
+ 	 * Data we may need if the driver does not seem to support interface
+@@ -127,15 +128,29 @@ static void manager_new_interface_cb(struct l_genl_ms=
+g *msg, void *user_data)
+ 	struct wiphy_setup_state *state =3D user_data;
+ 	uint8_t addr_buf[6];
+ 	uint8_t *addr =3D NULL;
++	int error;
+ =
 
-Actually it occurs to me that this issue is likely #4 in disguise.
+ 	l_debug("");
+ =
 
-> Yep maybe shouldn't have linked that bug.  In any case that should be
-> easy to work around but I'm surprised nl80211 doesn't enforce the
-> consistency of these events.
+ 	if (state->aborted)
+ 		return;
+ =
 
-It sort of does, but the driver can influence things.
+-	if (l_genl_msg_get_error(msg) < 0) {
++	error =3D l_genl_msg_get_error(msg);
++	if (error < 0) {
+ 		l_error("NEW_INTERFACE failed: %s",
+ 			strerror(-l_genl_msg_get_error(msg)));
++
++		/*
++		 * If we receive an EBUSY most likely the wiphy is still
++		 * initilising, the default interface has not been created
++		 * yet and the wiphy needs some time.  Retry when we
++		 * receive a NEW_INTERFACE event.
++		 */
++		if (error =3D=3D -EBUSY) {
++			state->retry =3D true;
++			return;
++		}
++
+ 		/*
+ 		 * Nothing we can do to use this wiphy since by now we
+ 		 * will have successfully deleted any default interface
+@@ -158,7 +173,9 @@ static void manager_new_interface_done(void *user_data)
+ 	struct wiphy_setup_state *state =3D user_data;
+ =
 
->> Okay, so strictly speaking we probably don't need to issue a dump of the
->> interfaces.  It is only the wiphy dump that contains info that a
->> NEW_WIPHY event doesn't contain.  Interface dumps and NEW_INTERFACE
->> events are equivalent.
->>
->> Also, we can probably safely assume that this is a new wiphy just
->> plugged in or initialized, and it will create at most a single default
->> interface.
-> =
+ 	state->pending_cmd_count--;
+-	wiphy_setup_state_destroy(state);
++
++	if (!state->pending_cmd_count && !state->retry)
++		wiphy_setup_state_destroy(state);
+ }
+ =
 
-> You mean once we've checked state->retry is true we can safely assume
-> it's a new wiphy, right?  Then we could try deleting it, if that
+ static void manager_create_interfaces(struct wiphy_setup_state *state)
+@@ -218,18 +235,23 @@ static void manager_create_interfaces(struct wiphy_se=
+tup_state *state)
+ 	state->pending_cmd_count++;
+ }
+ =
 
-right
++static bool manager_wiphy_check_setup_done(struct wiphy_setup_state *state)
++{
++	if (state->pending_cmd_count || state->retry)
++		return false;
++
++	manager_create_interfaces(state);
++
++	return !state->pending_cmd_count && !state->retry;
++}
++
+ static void manager_setup_cmd_done(void *user_data)
+ {
+ 	struct wiphy_setup_state *state =3D user_data;
+ =
 
-> succeeds, creating our own interface and if not, setting use_default.
-> But...
-> =
+ 	state->pending_cmd_count--;
+ =
 
->>   So an interface dump is pretty useless anyhow.
-> =
+-	if (state->pending_cmd_count)
+-		return;
+-
+-	manager_create_interfaces(state);
+-
+-	if (!state->pending_cmd_count)
++	if (manager_wiphy_check_setup_done(state))
+ 		wiphy_setup_state_destroy(state);
+ }
+ =
 
-> Right, but it's easier for us to use the same code path as with the
-> initial interface dump.  It's a workaround for a specific issue on
+@@ -280,7 +302,6 @@ static void manager_get_interface_cb(struct l_genl_msg =
+*msg, void *user_data)
+ 		return;
+ 	}
+ =
 
-The contents of NEW_INTERFACE is the same as GET_INTERFACE.  So you =
+-
+ 	if (nl80211_parse_attrs(msg, NL80211_ATTR_IFINDEX, &ifindex,
+ 					NL80211_ATTR_IFNAME, &ifname,
+ 					NL80211_ATTR_UNSPEC) < 0)
+@@ -476,15 +497,10 @@ static bool manager_check_create_interfaces(void *dat=
+a, void *user_data)
+ =
 
-could simply invoke manager_get_interface_cb and =
+ 	wiphy_create_complete(state->wiphy);
+ =
 
-manager_interface_dump_done..
+-	if (state->pending_cmd_count)
+-		return false;
+-
+-	/* If we are here, then there are no interfaces for this phy */
+-	manager_create_interfaces(state);
+-
+-	if (state->pending_cmd_count)
++	if (!manager_wiphy_check_setup_done(state))
+ 		return false;
+ =
 
-> boot so I'm not sure the overhead is more important than easier to
-> read code.
++	/* If we are here, there were no interfaces for this phy */
+ 	wiphy_setup_state_free(state);
+ 	return true;
+ }
+@@ -561,6 +577,7 @@ static void manager_config_notify(struct l_genl_msg *ms=
+g, void *user_data)
+ {
+ 	uint8_t cmd;
+ 	struct netdev *netdev;
++	struct wiphy_setup_state *state;
+ =
 
-But why incur an extra round trip to the kernel if you don't have to? =
+ 	cmd =3D l_genl_msg_get_command(msg);
+ =
 
-Not to mention that genl is a queue & async, so you can get weird =
+@@ -578,11 +595,24 @@ static void manager_config_notify(struct l_genl_msg *=
+msg, void *user_data)
+ =
 
-message interleaving and your 'easier to read code' might not end up =
+ 	case NL80211_CMD_NEW_INTERFACE:
+ 		/*
+-		 * TODO: Until NEW_WIPHY contains all required information we
+-		 * are stuck always having to do a full dump. This specific
+-		 * interface must also be dumped, and this is taken care of
+-		 * in manager_new_wiphy_event.
++		 * Interfaces are normally dumped on the NEW_WIPHY events and
++		 * and we have nothing to do here.  But check if by any chance
++		 * we've queried this wiphy and it was still busy initialising,
++		 * in that case retry the setup now that an interface, likely
++		 * the initial default one, has been added.
+ 		 */
++		state =3D manager_find_pending(manager_parse_wiphy_id(msg));
++
++		if (state && state->retry) {
++			state->retry =3D false;
++			l_debug("Retrying setup of wiphy %u", state->id);
++
++			manager_get_interface_cb(msg, state);
++
++			if (manager_wiphy_check_setup_done(state))
++				wiphy_setup_state_destroy(state);
++		}
++
+ 		break;
+ =
 
-being so.
+ 	case NL80211_CMD_DEL_INTERFACE:
+-- =
 
-Regards,
--Denis
---===============1707461616810480327==--
+2.20.1
+
+--===============2918650184201107874==--
 
