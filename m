@@ -1,32 +1,26 @@
-Content-Type: multipart/mixed; boundary="===============0563319872607954283=="
+Content-Type: multipart/mixed; boundary="===============8761464438279253019=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
+From: Daniel Wagner <wagi@monom.org>
 Subject: Re: KnownNetwork AutoConnect property changed signal
-Date: Wed, 29 Jan 2020 11:04:29 -0600
-Message-ID: <823342aa-2d09-536a-af55-d875aa45908f@gmail.com>
-In-Reply-To: <20200118162101.iuncljo23jqoxzb5@beryllium.lan>
+Date: Wed, 29 Jan 2020 18:50:06 +0100
+Message-ID: <95cd980f-5012-e190-8bfb-aee011f81b3e@monom.org>
+In-Reply-To: <823342aa-2d09-536a-af55-d875aa45908f@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0563319872607954283==
+--===============8761464438279253019==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Daniel,
+Hi Denis,
 
-> {KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_p=
-sk] AutoConnect =3D False
-> {KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_p=
-sk] LastConnectedTime =3D 2020-01-18T16:19:26Z
-> {KnownNetwork} [/net/connman/iwd/6f776c2073747265746368696e672074696d65_p=
-sk] AutoConnect =3D True
-> =
+On 29.01.20 18:04, Denis Kenzior wrote:
+> FYI, this should be fixed upstream now.
 
+Excellent!
 
-FYI, this should be fixed upstream now.
-
-Regards,
--Denis
---===============0563319872607954283==--
+Many thanks,
+Daniel
+--===============8761464438279253019==--
 
