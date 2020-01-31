@@ -1,48 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============3176836087288489337=="
+Content-Type: multipart/mixed; boundary="===============4380801441764027317=="
 MIME-Version: 1.0
-From: abagnale20@protonmail.com
-Subject: Issue connecting to PEAP (eduroam)
-Date: Fri, 31 Jan 2020 11:11:51 +0000
-Message-ID: <20200131111151.2820.65195@ml01.vlan13.01.org>
+From: Kourt, Tim A <tim.a.kourt@intel.com>
+Subject: Re: Issue connecting to PEAP (eduroam)
+Date: Fri, 31 Jan 2020 17:20:07 +0000
+Message-ID: <B16985CA-6F78-4207-B44F-426032177244@intel.com>
+In-Reply-To: <20200131111151.2820.65195@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3176836087288489337==
+--===============4380801441764027317==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hello,
 
-first of all thank you very much for your efforts to develop iwd! I really =
-enjoy its speed, simplicity and minimal resources.
-I have been using it for months on several networks without problem, yet I =
-can't get my uni's eduroam to work.
+=EF=BB=BF-----Original Message-----
+From: "abagnale20(a)protonmail.com" <abagnale20@protonmail.com>
+Date: Friday, January 31, 2020 at 3:09 AM
+To: "iwd(a)lists.01.org" <iwd@lists.01.org>
+Subject: Issue connecting to PEAP (eduroam)
 
-My config:
---------------
-[Security]
-EAP-Method=3DPEAP
-EAP-Identity=3Deduroam(a)stud.uni-stuttgart.de
-EAP-PEAP-CACert=3D/etc/iwd/ca.pem
-EAP-PEAP-Phase2-Method=3DMSCHAPV2
-EAP-PEAP-Phase2-Identity=3D<username>
+    =
 
-The relevant log from /usr/lib/iwd/iwd -d:
------------------------------------------------------
-src/station.c:station_handshake_event() Handshaking
-src/netdev.c:netdev_control_port_frame_cb() 0
-src/netdev.c:netdev_unicast_notify() Unicast notification 129
-src/netdev.c:netdev_control_port_frame_event() =
+    4-Way handshake failed for ifindex: 2, reason: 15
+    =
 
-4-Way handshake failed for ifindex: 2, reason: 15
+    What is reason 15?
+The reason 15 is timeout. This is just a consequence of the failed/aborted =
+authentication that should have been in the log above these lines. The full=
+ iwd log and iwmon output can be helpful to identify the cause of the faile=
+d authentication. You may refer to https://iwd.wiki.kernel.org/debugging fo=
+r the reference on how to obtain the logs.
 
-What is reason 15?
+Regards,
+Tim
 
-The ca.pem file resides in /etc/iwd/. I copied the certificates section fro=
-m the eduroamCAT python installer script into ca.pem, if that info is of an=
-y help.
 
-Any ideas?
---===============3176836087288489337==--
+--===============4380801441764027317==--
 
