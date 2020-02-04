@@ -1,31 +1,25 @@
-Content-Type: multipart/mixed; boundary="===============0532042170452378071=="
+Content-Type: multipart/mixed; boundary="===============8234760893906203548=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: Interface not detected sometimes
-Date: Tue, 04 Feb 2020 11:06:24 -0600
-Message-ID: <2e72e05e-7a2a-6058-739e-f88c087b1b72@gmail.com>
-In-Reply-To: <20200204145818.2820.84473@ml01.vlan13.01.org>
+From: Daniel Wagner <wagi@monom.org>
+Subject: Re: AP mode crash
+Date: Tue, 04 Feb 2020 18:29:52 +0100
+Message-ID: <20200204172952.csnp6nt7izjmtvum@beryllium.lan>
+In-Reply-To: <21950f6b-7ab8-3530-d3ec-880e29590909@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0532042170452378071==
+--===============8234760893906203548==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Hector,
+> I'm guessing Andrew's patches (applied upstream) that came in a few hours
+> after this report fixed this issue?
 
-On 2/4/20 8:58 AM, hector(a)ikatu.com wrote:
-> Also the message "No default interface for wiphy 0" is displayed in the c=
-ase that doesn't work.
+I was testing with 1.4-35-g0508879e2a64 this morning. Now with
+1.4-43-gfff6c97e996e the crash is gone.
 
-Are you running brcmfmac by any chance?
-
-Anyhow, this particular issue *should* be fixed upstream by commit =
-
-55f9639ee37c ("manager: Retry the interface setup if we get an EBUSY")
-
-Regards,
--Denis
---===============0532042170452378071==--
+Thanks for fixing it!
+Daniel
+--===============8234760893906203548==--
 
