@@ -1,73 +1,601 @@
-Content-Type: multipart/mixed; boundary="===============3873155005738124312=="
+Content-Type: multipart/mixed; boundary="===============1885981850657367721=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
+From: hector@ikatu.com
 Subject: Re: Interface not detected sometimes
-Date: Wed, 05 Feb 2020 09:19:37 -0600
-Message-ID: <5bf91f75-9c0a-6d87-761a-774c87f5f69d@gmail.com>
-In-Reply-To: <20200205133515.2820.50222@ml01.vlan13.01.org>
+Date: Wed, 05 Feb 2020 19:28:36 +0000
+Message-ID: <20200205192836.2820.73709@ml01.vlan13.01.org>
+In-Reply-To: <5bf91f75-9c0a-6d87-761a-774c87f5f69d@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3873155005738124312==
+--===============1885981850657367721==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Hector,
+Denis,
 
-On 2/5/20 7:35 AM, hector(a)ikatu.com wrote:
-> Here is a log of a failed initialization where I have set "--interfaces w=
-lan0", no sleep in iwd.service, and I applied your recent commit (8530396fb=
-3179c789430264a01e506a11907f94b manager: Add brcmfmac to the blacklist), (B=
-TW I didn't set any value to the UseDefaultInterface property).
+I tried your patch and it seems like the problem is solved. I tested that t=
+he initialization works even when I get the "No default interface for wiphy=
+ 0", so the retry you added after that fixed it:
 
-Okay.  The brcmfmac commit shouldn't have any effect if you're using =
+Feb 05 19:14:19 mimx8mm systemd-udevd[303]: /lib/systemd/network/80-iwd.lin=
+k:5: Failed to parse interface name policy, ignoring: keep
+Feb 05 19:14:21 mimx8mm systemd[1]: Mounting Bind mount for /var/lib/iwd...
+Feb 05 19:14:21 mimx8mm systemd[1]: Mounted Bind mount for /var/lib/iwd.
+Feb 05 19:14:22 Paris-00100105 iwd[437]: Wireless daemon version 1.4
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/main.c:main() Using con=
+figuration directory /etc/iwd
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/storage.c:storage_creat=
+e_dirs() Using state directory /var/lib/iwd
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/main.c:nl80211_appeared=
+() Found nl80211 interface
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/module.c:iwd_modules_in=
+it()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_init() =
+Opening route netlink socket
+Feb 05 19:14:22 Paris-00100105 iwd[437]: netconfig: Network configuration i=
+s disabled.
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wsc.c:wsc_init()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/knownnetworks.c:known_n=
+etwork_frequencies_load() No known frequency file found.
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap.c:__eap_method_enab=
+le()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-wsc.c:eap_wsc_init()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-md5.c:eap_md5_init()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-tls.c:eap_tls_init()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-ttls.c:eap_ttls_ini=
+t()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-mschapv2.c:eap_msch=
+apv2_init()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-sim.c:eap_sim_init()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-aka.c:eap_aka_prime=
+_init()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-aka.c:eap_aka_init()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-peap.c:eap_peap_ini=
+t()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-gtc.c:eap_gtc_init()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/eap-pwd.c:eap_pwd_init()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_confi=
+g_notify() Notification of command New Wiphy(3)
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: Wiphy phy0 will only use the defau=
+lt interface
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:22 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_frequencies()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:parse_supported=
+_bands()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_wiphy=
+_dump_callback()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/wiphy.c:wiphy_update_fr=
+om_genl()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: Wiphy: 0, Name: phy0
+Feb 05 19:14:23 Paris-00100105 iwd[437]:         Permanent Address: 10:98:c=
+3:ff:f6:9d
+Feb 05 19:14:23 Paris-00100105 iwd[437]:         Bands: 2.4 GHz 5 GHz
+Feb 05 19:14:23 Paris-00100105 iwd[437]:         Ciphers: CCMP TKIP BIP
+Feb 05 19:14:23 Paris-00100105 iwd[437]:         Supported iftypes: ad-hoc =
+station ap p2p-client p2p-go p2p-device
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_use_d=
+efault()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: No default interface for wiphy 0
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_confi=
+g_notify() Notification of command New Interface(7)
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_confi=
+g_notify() Retrying setup of wiphy 0
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_get_i=
+nterface_cb()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_use_d=
+efault()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_create_=
+from_genl() Created interface wlan0[3 1]
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_cqm_rss=
+i_update()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 3
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 3
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_set_4ad=
+dr() netdev: 3 use_4addr: 0
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_initial=
+_up_cb() Interface 3 initialized
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/station.c:station_enter=
+_state() Old State: disconnected, new state: autoconnect_quick
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/station.c:station_enter=
+_state() Old State: disconnected, new state: autoconnect_full
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_periodic_st=
+art() Starting periodic scan for wdev 1
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 3
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 3
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_notify() Sc=
+an notification Trigger Scan(33)
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_request_tri=
+ggered()
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_request_tri=
+ggered() Passive scan triggered for wdev 1
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_periodic_tr=
+iggered() Periodic scan triggered for wdev 1
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 3
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/manager.c:manager_confi=
+g_notify() Notification of command New Interface(7)
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 4
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 4
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 4
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 3
+Feb 05 19:14:23 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 4
+Feb 05 19:14:24 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 4
+Feb 05 19:14:25 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 3
+Feb 05 19:14:25 Paris-00100105 iwd[437]: ../git/src/station.c:station_free()
+Feb 05 19:14:25 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_periodic_st=
+op() Stopping periodic scan for wdev 1
+Feb 05 19:14:25 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_cancel() Tr=
+ying to cancel scan id 1 for wdev 1
+Feb 05 19:14:25 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_cancel() Sc=
+an is at the top of the queue and triggered
+Feb 05 19:14:25 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_notify() Sc=
+an notification Scan Aborted(35)
+Feb 05 19:14:25 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 2
+Feb 05 19:14:25 Paris-00100105 iwd[437]: ../git/src/agent.c:agent_register(=
+) agent register called
+Feb 05 19:14:25 Paris-00100105 iwd[437]: ../git/src/agent.c:agent_register(=
+) agent :1.6 path /net/connman/iwd_agent
+Feb 05 19:14:27 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 2
+Feb 05 19:14:37 Paris-00100105 iwd[437]: ../git/src/netdev.c:netdev_link_no=
+tify() event 16 on ifindex 3
+Feb 05 19:14:37 Paris-00100105 iwd[437]: ../git/src/station.c:station_enter=
+_state() Old State: disconnected, new state: autoconnect_quick
+Feb 05 19:14:37 Paris-00100105 iwd[437]: ../git/src/station.c:station_enter=
+_state() Old State: disconnected, new state: autoconnect_full
+Feb 05 19:14:37 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_periodic_st=
+art() Starting periodic scan for wdev 1
+Feb 05 19:14:37 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_notify() Sc=
+an notification Trigger Scan(33)
+Feb 05 19:14:37 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_request_tri=
+ggered()
+Feb 05 19:14:37 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_request_tri=
+ggered() Passive scan triggered for wdev 1
+Feb 05 19:14:37 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_periodic_tr=
+iggered() Periodic scan triggered for wdev 1
+Feb 05 19:14:39 Paris-00100105 iwd[437]: ../git/src/scan.c:scan_notify() Sc=
+an notification New Scan Results(34)
+[...]
 
---interfaces command line option.  But it won't hurt.
-
-<snip>
-
-> Feb 05 13:24:33 Paris-00100105 iwd[429]: Wiphy: 0, Name: phy0
-> Feb 05 13:24:33 Paris-00100105 iwd[429]:         Permanent Address: 10:98=
-:c3:ff:f6:9d
-> Feb 05 13:24:33 Paris-00100105 iwd[429]:         Bands: 2.4 GHz 5 GHz
-> Feb 05 13:24:33 Paris-00100105 iwd[429]:         Ciphers: CCMP TKIP BIP
-> Feb 05 13:24:33 Paris-00100105 iwd[429]:         Supported iftypes: ad-ho=
-c station ap p2p-client p2p-go p2p-device
-> Feb 05 13:24:33 Paris-00100105 iwd[429]: ../git/src/manager.c:manager_use=
-_default()
-> Feb 05 13:24:33 Paris-00100105 iwd[429]: No default interface for wiphy 0
-> Feb 05 13:24:33 Paris-00100105 iwd[429]: ../git/src/manager.c:manager_con=
-fig_notify() Notification of command New Interface(7)
-
-Okay.  Looks like commit 55f9639ee37c ("manager: Retry the interface =
-
-setup if we get an EBUSY") didn't address the 'use default' path.  Can =
-
-you try the attach patch?
+Thank you so much!
 
 Regards,
--Denis
-
---===============3873155005738124312==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-manager-Also-set-retry-when-using-default-interfaces.patch"
-
-RnJvbSAzNjBmNjZmNzFjYjE4N2QyNzhmNGRkNzVhY2MxZjcxZTQwODZmOTc4IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEZW5pcyBLZW56aW9yIDxkZW5rZW56QGdtYWlsLmNvbT4KRGF0
-ZTogV2VkLCA1IEZlYiAyMDIwIDA5OjE0OjQ3IC0wNjAwClN1YmplY3Q6IFtQQVRDSF0gbWFuYWdl
-cjogQWxzbyBzZXQgcmV0cnkgd2hlbiB1c2luZyBkZWZhdWx0IGludGVyZmFjZXMKCi0tLQogc3Jj
-L21hbmFnZXIuYyB8IDEgKwogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspCgpkaWZmIC0t
-Z2l0IGEvc3JjL21hbmFnZXIuYyBiL3NyYy9tYW5hZ2VyLmMKaW5kZXggYTgxMGVkNzgxM2U4Li41
-Y2E1ZDYxMDEzOGYgMTAwNjQ0Ci0tLSBhL3NyYy9tYW5hZ2VyLmMKKysrIGIvc3JjL21hbmFnZXIu
-YwpAQCAtMTEyLDYgKzExMiw3IEBAIHN0YXRpYyBib29sIG1hbmFnZXJfdXNlX2RlZmF1bHQoc3Ry
-dWN0IHdpcGh5X3NldHVwX3N0YXRlICpzdGF0ZSkKIAlpZiAoIXN0YXRlLT5kZWZhdWx0X2lmX21z
-ZykgewogCQlsX2Vycm9yKCJObyBkZWZhdWx0IGludGVyZmFjZSBmb3Igd2lwaHkgJXUiLAogCQkJ
-KHVuc2lnbmVkIGludCkgc3RhdGUtPmlkKTsKKwkJc3RhdGUtPnJldHJ5ID0gdHJ1ZTsKIAkJcmV0
-dXJuIGZhbHNlOwogCX0KIAotLSAKMi4yMS4wCgo=
-
---===============3873155005738124312==--
+Hector
+--===============1885981850657367721==--
 
