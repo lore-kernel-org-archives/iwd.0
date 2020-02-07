@@ -1,40 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============8294508451660722176=="
+Content-Type: multipart/mixed; boundary="===============6137761606674655366=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2] client: Fix proxy object's dependency resolution
-Date: Fri, 07 Feb 2020 15:25:12 -0600
-Message-ID: <acc68893-fc74-d3e1-ae05-40997e2d2469@gmail.com>
-In-Reply-To: <20200207211122.24801-1-tim.a.kourt@linux.intel.com>
+From: Kourt, Tim A <tim.a.kourt@intel.com>
+Subject: Re: Connected network only shown after iwd restart
+Date: Fri, 07 Feb 2020 21:26:37 +0000
+Message-ID: <61F8B0DD-7574-4EE8-AA46-F3DE1510BF9A@intel.com>
+In-Reply-To: <875zgmfjpg.fsf@toke.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8294508451660722176==
+--===============6137761606674655366==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+Hi Toke,
 
-On 2/7/20 3:11 PM, Tim Kourt wrote:
-> Previously, the parsing of the OMs objects has been done in one pass,
-> therefore, the proxy object's dependencies may not have been parsed at the
-> time when they were looked up for the dependency assignments. Now, the
-> parsing of the OM objects is done in two passes: 1) Create proxy objects -
-> one per interface and path, 2) Populate the proxy objects with properties
-> and assign dependencies. Therefore, we are guaranteed to have the proxy
-> objects created by the time they are looked up for the dependency
-> assignments.
-> ---
->   client/dbus-proxy.c | 99 ++++++++++++++++++++++++++++++++++------------=
--------
->   1 file changed, 63 insertions(+), 36 deletions(-)
-> =
+=EF=BB=BF-----Original Message-----
+From: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
+Date: Tuesday, February 4, 2020 at 7:36 AM
+To: "iwd(a)lists.01.org" <iwd@lists.01.org>
+Subject: Connected network only shown after iwd restart
+    =
 
+    $ iwctl station wlan0 show
+                                     Station: wlan0                        =
+        =
 
-Applied, thanks.
+    -----------------------------------------------------------------------=
+---------
+      Settable  Property            Value                                  =
+        =
+
+    -----------------------------------------------------------------------=
+---------
+                Scanning            no
+                State               connected
+    =
+
+    =
+
+    =
+
+    Is this a bug, or am I doing something wrong when using iwctl?
+
+Indeed, this was a bug and it should now be fixed upstream.
+
+Thanks for the report.
 
 Regards,
--Denis
+Tim
 
---===============8294508451660722176==--
+
+
+--===============6137761606674655366==--
 
