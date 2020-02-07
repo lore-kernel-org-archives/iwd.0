@@ -1,81 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============3945499915418501366=="
+Content-Type: multipart/mixed; boundary="===============4371383444160500718=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 1/5] nl80211util: Handle NL80211_ATTR_ACK flag in parser
-Date: Fri, 07 Feb 2020 12:39:10 +0100
-Message-ID: <20200207113914.3869-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 2/5] frame-xchg: Add new groups to watch_groups list
+Date: Fri, 07 Feb 2020 12:39:11 +0100
+Message-ID: <20200207113914.3869-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20200207113914.3869-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3945499915418501366==
+--===============4371383444160500718==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If this attribute is included in the nl80211_parse_attrs parameters, set
-the corresponding bool to true if flag was present and false if not.
+I forgot to actually add new groups being created in
+frame_watch_group_get to the watch_groups queue, meaning that we'd
+re-create the group every time a new watch was added to the group.
 ---
- src/nl80211util.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ src/frame-xchg.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/src/nl80211util.c b/src/nl80211util.c
-index c4942809..fa9abc1e 100644
---- a/src/nl80211util.c
-+++ b/src/nl80211util.c
-@@ -96,6 +96,14 @@ static bool extract_uint32(const void *data, uint16_t le=
-n, void *o)
- 	return true;
+diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+index 0a6c1fc6..89b0f93e 100644
+--- a/src/frame-xchg.c
++++ b/src/frame-xchg.c
+@@ -258,16 +258,19 @@ err:
+ static struct watch_group *frame_watch_group_get(uint64_t wdev_id, uint32_=
+t id)
+ {
+ 	const struct l_queue_entry *entry;
++	struct watch_group *group;
+ =
+
+ 	for (entry =3D l_queue_get_entries(watch_groups); entry;
+ 			entry =3D entry->next) {
+-		struct watch_group *group =3D entry->data;
++		group =3D entry->data;
+ =
+
+ 		if (group->id =3D=3D id && (id =3D=3D 0 || group->wdev_id =3D=3D wdev_id=
+))
+ 			return group;
+ 	}
+ =
+
+-	return frame_watch_group_new(wdev_id, id);
++	group =3D frame_watch_group_new(wdev_id, id);
++	l_queue_push_tail(watch_groups, group);
++	return group;
  }
  =
 
-+static bool extract_flag(const void *data, uint16_t len, void *o)
-+{
-+	if (len !=3D 0)
-+		return false;
-+
-+	return true;
-+}
-+
- static attr_handler handler_for_type(enum nl80211_attrs type)
- {
- 	switch (type) {
-@@ -112,6 +120,8 @@ static attr_handler handler_for_type(enum nl80211_attrs=
- type)
- 		return extract_name;
- 	case NL80211_ATTR_MAC:
- 		return extract_mac;
-+	case NL80211_ATTR_ACK:
-+		return extract_flag;
- 	default:
- 		break;
- 	}
-@@ -124,6 +134,7 @@ struct attr_entry {
- 	void *data;
- 	attr_handler handler;
- 	bool present : 1;
-+	bool flag : 1;
- };
- =
-
- int nl80211_parse_attrs(struct l_genl_msg *msg, int tag, ...)
-@@ -190,6 +201,11 @@ int nl80211_parse_attrs(struct l_genl_msg *msg, int ta=
-g, ...)
- 	for (e =3D l_queue_get_entries(entries); e; e =3D e->next) {
- 		entry =3D e->data;
- =
-
-+		if (entry->handler =3D=3D extract_flag) {
-+			*(bool *) entry->data =3D entry->present;
-+			continue;
-+		}
-+
- 		if (entry->present)
- 			continue;
- =
-
+ static void frame_watch_register_cb(struct l_genl_msg *msg, void *user_dat=
+a)
 -- =
 
 2.20.1
 
---===============3945499915418501366==--
+--===============4371383444160500718==--
 
