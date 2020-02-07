@@ -1,150 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============9021582814738507229=="
+Content-Type: multipart/mixed; boundary="===============3945499915418501366=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH] client: Fix proxy object's dependency resolution
-Date: Thu, 06 Feb 2020 15:33:02 -0800
-Message-ID: <20200206233302.30338-1-tim.a.kourt@linux.intel.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/5] nl80211util: Handle NL80211_ATTR_ACK flag in parser
+Date: Fri, 07 Feb 2020 12:39:10 +0100
+Message-ID: <20200207113914.3869-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============9021582814738507229==
+--===============3945499915418501366==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Previously, the parsing of the OMs objects has been done in one pass,
-therefore, the proxy object's dependencies may not have been parsed at the
-time when they were looked up for the dependency assignments. Now, the
-parsing of the OM objects is done in two passes: 1) Create proxy objects -
-one per interface and path, 2) Populate the proxy objects with properties
-and assign dependencies. Therefore, we are guaranteed to have the proxy
-objects created by the time they are looked up for the dependency
-assignments.
+If this attribute is included in the nl80211_parse_attrs parameters, set
+the corresponding bool to true if flag was present and false if not.
 ---
- client/dbus-proxy.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++--=
-----
- 1 file changed, 54 insertions(+), 7 deletions(-)
+ src/nl80211util.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/client/dbus-proxy.c b/client/dbus-proxy.c
-index 0555880d..9d6f4bcb 100644
---- a/client/dbus-proxy.c
-+++ b/client/dbus-proxy.c
-@@ -511,7 +511,7 @@ static bool is_ignorable(const char *interface)
- 	return false;
+diff --git a/src/nl80211util.c b/src/nl80211util.c
+index c4942809..fa9abc1e 100644
+--- a/src/nl80211util.c
++++ b/src/nl80211util.c
+@@ -96,6 +96,14 @@ static bool extract_uint32(const void *data, uint16_t le=
+n, void *o)
+ 	return true;
  }
  =
 
--static void proxy_interface_create(const char *path,
-+static void proxy_interfaces_update_properties(const char *path,
- 					struct l_dbus_message_iter *interfaces)
- {
- 	const char *interface;
-@@ -537,23 +537,50 @@ static void proxy_interface_create(const char *path,
- 		}
- =
-
- 		proxy =3D proxy_interface_find(interface_type->interface, path);
-+		if (!proxy)
-+			continue;
++static bool extract_flag(const void *data, uint16_t len, void *o)
++{
++	if (len !=3D 0)
++		return false;
 +
-+		interface_update_properties(proxy, &properties, NULL);
-+	}
++	return true;
 +}
 +
-+static void proxy_interface_create(const char *path,
-+					struct l_dbus_message_iter *interfaces)
-+{
-+	const char *interface;
-+	struct l_dbus_message_iter properties;
-+	struct proxy_interface *proxy;
-+	struct proxy_interface_type *interface_type;
- =
-
--		if (proxy) {
--			interface_update_properties(proxy, &properties, NULL);
-+	if (!path)
-+		return;
-+
-+	while (l_dbus_message_iter_next_entry(interfaces, &interface,
-+								&properties)) {
-+		interface_type =3D l_queue_find(proxy_interface_types,
-+						interface_match_by_type_name,
-+						interface);
-+
-+		if (!interface_type) {
-+			if (!is_ignorable(interface))
-+				l_debug("Unknown DBus interface type %s",
-+								interface);
- =
-
- 			continue;
- 		}
- =
-
-+		proxy =3D proxy_interface_find(interface_type->interface, path);
-+
-+		if (proxy)
-+			continue;
-+
- 		proxy =3D l_new(struct proxy_interface, 1);
- 		proxy->path =3D l_strdup(path);
- 		proxy->type =3D interface_type;
- =
-
--		if (interface_type->ops && interface_type->ops->create) {
-+		if (interface_type->ops && interface_type->ops->create)
- 			proxy->data =3D interface_type->ops->create();
- =
-
--			interface_update_properties(proxy, &properties, NULL);
--		}
--
- 		l_queue_push_tail(proxy_interfaces, proxy);
+ static attr_handler handler_for_type(enum nl80211_attrs type)
+ {
+ 	switch (type) {
+@@ -112,6 +120,8 @@ static attr_handler handler_for_type(enum nl80211_attrs=
+ type)
+ 		return extract_name;
+ 	case NL80211_ATTR_MAC:
+ 		return extract_mac;
++	case NL80211_ATTR_ACK:
++		return extract_flag;
+ 	default:
+ 		break;
  	}
- }
-@@ -656,6 +683,12 @@ static void interfaces_added_callback(struct l_dbus_me=
-ssage *message,
- 		return;
+@@ -124,6 +134,7 @@ struct attr_entry {
+ 	void *data;
+ 	attr_handler handler;
+ 	bool present : 1;
++	bool flag : 1;
+ };
  =
 
- 	proxy_interface_create(path, &object);
-+
-+	if (!l_dbus_message_get_arguments(message, "oa{sa{sv}}", &path,
-+								&object))
-+		return;
-+
-+	proxy_interfaces_update_properties(path, &object);
- }
+ int nl80211_parse_attrs(struct l_genl_msg *msg, int tag, ...)
+@@ -190,6 +201,11 @@ int nl80211_parse_attrs(struct l_genl_msg *msg, int ta=
+g, ...)
+ 	for (e =3D l_queue_get_entries(entries); e; e =3D e->next) {
+ 		entry =3D e->data;
  =
 
- static void interfaces_removed_callback(struct l_dbus_message *message,
-@@ -716,6 +749,20 @@ static void get_managed_objects_callback(struct l_dbus=
-_message *message,
- 	while (l_dbus_message_iter_next_entry(&objects, &path, &object))
- 		proxy_interface_create(path, &object);
- =
-
-+	if (!l_dbus_message_get_arguments(message, "a{oa{sa{sv}}}", &objects)) {
-+		l_error("Failed to parse IWD dbus objects, quitting...\n");
++		if (entry->handler =3D=3D extract_flag) {
++			*(bool *) entry->data =3D entry->present;
++			continue;
++		}
 +
-+		if (!command_is_interactive_mode())
-+			command_set_exit_status(EXIT_FAILURE);
-+
-+		l_main_quit();
-+
-+		return;
-+	}
-+
-+	while (l_dbus_message_iter_next_entry(&objects, &path, &object))
-+		proxy_interfaces_update_properties(path, &object);
-+
- 	if (command_needs_no_agent())
- 		goto no_agent;
+ 		if (entry->present)
+ 			continue;
  =
 
 -- =
 
-2.13.6
+2.20.1
 
---===============9021582814738507229==--
+--===============3945499915418501366==--
 
