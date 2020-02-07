@@ -1,56 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============6137761606674655366=="
+Content-Type: multipart/mixed; boundary="===============5926023537601846544=="
 MIME-Version: 1.0
-From: Kourt, Tim A <tim.a.kourt@intel.com>
-Subject: Re: Connected network only shown after iwd restart
-Date: Fri, 07 Feb 2020 21:26:37 +0000
-Message-ID: <61F8B0DD-7574-4EE8-AA46-F3DE1510BF9A@intel.com>
-In-Reply-To: <875zgmfjpg.fsf@toke.dk>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/5] nl80211util: Handle NL80211_ATTR_ACK flag in parser
+Date: Fri, 07 Feb 2020 15:28:46 -0600
+Message-ID: <71cae561-126f-ba8d-b401-80150921b859@gmail.com>
+In-Reply-To: <20200207113914.3869-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6137761606674655366==
+--===============5926023537601846544==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Toke,
+Hi Andrew,
 
-=EF=BB=BF-----Original Message-----
-From: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
-Date: Tuesday, February 4, 2020 at 7:36 AM
-To: "iwd(a)lists.01.org" <iwd@lists.01.org>
-Subject: Connected network only shown after iwd restart
-    =
+On 2/7/20 5:39 AM, Andrew Zaborowski wrote:
+> If this attribute is included in the nl80211_parse_attrs parameters, set
+> the corresponding bool to true if flag was present and false if not.
+> ---
+>   src/nl80211util.c | 16 ++++++++++++++++
+>   1 file changed, 16 insertions(+)
+> =
 
-    $ iwctl station wlan0 show
-                                     Station: wlan0                        =
-        =
 
-    -----------------------------------------------------------------------=
----------
-      Settable  Property            Value                                  =
-        =
+<snip>
 
-    -----------------------------------------------------------------------=
----------
-                Scanning            no
-                State               connected
-    =
+> @@ -124,6 +134,7 @@ struct attr_entry {
+>   	void *data;
+>   	attr_handler handler;
+>   	bool present : 1;
+> +	bool flag : 1;
 
-    =
+You don't seem to be using this, so I squashed this bool for now.
 
-    =
+>   };
+>   =
 
-    Is this a bug, or am I doing something wrong when using iwctl?
 
-Indeed, this was a bug and it should now be fixed upstream.
-
-Thanks for the report.
+Applied, thanks.
 
 Regards,
-Tim
-
-
-
---===============6137761606674655366==--
+-Denis
+--===============5926023537601846544==--
 
