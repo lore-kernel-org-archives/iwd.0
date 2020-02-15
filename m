@@ -1,73 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============8791729238892625375=="
+Content-Type: multipart/mixed; boundary="===============3277078167265601859=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 6/6] test: Handle missing agent calls in simple-agent
-Date: Sat, 15 Feb 2020 01:17:48 +0100
-Message-ID: <20200215001748.20819-6-andrew.zaborowski@intel.com>
-In-Reply-To: <20200215001748.20819-1-andrew.zaborowski@intel.com>
+From: Daniel Wagner <wagi@monom.org>
+Subject: [PATCH 0/3] Update to ell's rntl API
+Date: Sat, 15 Feb 2020 10:48:38 +0100
+Message-ID: <20200215094841.28265-1-wagi@monom.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8791729238892625375==
+--===============3277078167265601859==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Handle RequestPrivateKeyPassphrase and RequestUserNameAndPassword
----
- test/simple-agent | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+The rtnlutil code has been moved to ell, let's use it.
 
-diff --git a/test/simple-agent b/test/simple-agent
-index 79cee021..cdfc2076 100755
---- a/test/simple-agent
-+++ b/test/simple-agent
-@@ -35,6 +35,41 @@ class Agent(dbus.service.Object):
-         print("returning (%s)" % (passphrase))
-         return passphrase
- =
+Daniel Wagner (3):
+  netdev: Use ell's rtnl APIs
+  netconfig: Use ell's rtnl API
+  rtnlutil: Remove used rtnlutil
 
-+    @dbus.service.method("net.connman.iwd.Agent",
-+                            in_signature=3D'o',
-+                            out_signature=3D's')
-+    def RequestPrivateKeyPassphrase(self, path):
-+        print("RequestPrivateKeyPassphrase (%s)" % (path))
-+
-+        print("Service credentials requested, type cancel to cancel")
-+        passphrase =3D input('Answer: ')
-+
-+        if not passphrase or passphrase =3D=3D 'cancel':
-+            raise Canceled("canceled")
-+
-+        print("returning (%s)" % (passphrase))
-+        return passphrase
-+
-+    @dbus.service.method("net.connman.iwd.Agent",
-+                            in_signature=3D'o',
-+                            out_signature=3D'ss')
-+    def RequestUserNameAndPassword(self, path):
-+        print("RequestPrivateKeyPassphrase (%s)" % (path))
-+
-+        print("Service credentials requested, type cancel to cancel")
-+        user =3D input('User name: ')
-+
-+        if not user or user =3D=3D 'cancel':
-+            raise Canceled("canceled")
-+
-+        passwd =3D input('User password: ')
-+
-+        if not passwd or passwd =3D=3D 'cancel':
-+            raise Canceled("canceled")
-+
-+        print("returning (%s, %s)" % (user, passwd))
-+        return (user, passwd)
-+
-     @dbus.service.method("net.connman.iwd.Agent",
-                             in_signature=3D's', out_signature=3D'')
-     def Cancel(self, reason):
+ Makefile.am     |   3 +-
+ src/netconfig.c |  31 ++-
+ src/netdev.c    |  22 +-
+ src/rtnlutil.c  | 640 ------------------------------------------------
+ src/rtnlutil.h  | 103 --------
+ 5 files changed, 28 insertions(+), 771 deletions(-)
+ delete mode 100644 src/rtnlutil.c
+ delete mode 100644 src/rtnlutil.h
+
 -- =
 
-2.20.1
-
---===============8791729238892625375==--
+2.25.0
+--===============3277078167265601859==--
 
