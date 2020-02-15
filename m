@@ -1,141 +1,184 @@
-Content-Type: multipart/mixed; boundary="===============7603512299177904087=="
+Content-Type: multipart/mixed; boundary="===============2439382217983742509=="
 MIME-Version: 1.0
 From: Daniel Wagner <wagi@monom.org>
-Subject: [PATCH 1/3] netdev: Use ell's rtnl APIs
-Date: Sat, 15 Feb 2020 10:48:39 +0100
-Message-ID: <20200215094841.28265-2-wagi@monom.org>
+Subject: [PATCH 2/3] netconfig: Use ell's rtnl API
+Date: Sat, 15 Feb 2020 10:48:40 +0100
+Message-ID: <20200215094841.28265-3-wagi@monom.org>
 In-Reply-To: <20200215094841.28265-1-wagi@monom.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7603512299177904087==
+--===============2439382217983742509==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/netdev.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ src/netconfig.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 1fbf3d3b89f3..f44c7ec215b4 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -341,7 +341,7 @@ int netdev_set_powered(struct netdev *netdev, bool powe=
-red,
- 		return -EBUSY;
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 327244f9b23f..e89f87f89e0c 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -502,8 +502,8 @@ static void netconfig_ifaddr_added(struct netconfig *ne=
+tconfig,
+ 	ifaddr->family =3D ifa->ifa_family;
+ 	ifaddr->prefix_len =3D ifa->ifa_prefixlen;
  =
 
- 	netdev->set_powered_cmd_id =3D
--		rtnl_set_powered(rtnl, netdev->index, powered,
-+		l_rtnl_set_powered(rtnl, netdev->index, powered,
- 					netdev_set_powered_result, netdev,
- 					netdev_set_powered_destroy);
- 	if (!netdev->set_powered_cmd_id)
-@@ -632,7 +632,8 @@ static void netdev_shutdown_one(void *data, void *user_=
-data)
- 	struct netdev *netdev =3D data;
+-	rtnl_ifaddr_extract(ifa, len, &label, &ifaddr->ip,
+-							&ifaddr->broadcast);
++	l_rtnl_ifaddr4_extract(ifa, len, &label, &ifaddr->ip,
++					&ifaddr->broadcast);
  =
 
- 	if (netdev_get_is_up(netdev))
--		rtnl_set_powered(rtnl, netdev->index, false, NULL, NULL, NULL);
-+		l_rtnl_set_powered(rtnl, netdev->index, false,
-+					NULL, NULL, NULL);
- }
+ 	l_debug("%s: ifaddr %s/%u broadcast %s", label, ifaddr->ip,
+ 					ifaddr->prefix_len, ifaddr->broadcast);
+@@ -519,7 +519,7 @@ static void netconfig_ifaddr_deleted(struct netconfig *=
+netconfig,
+ 	struct netconfig_ifaddr *ifaddr;
+ 	struct netconfig_ifaddr query;
  =
 
- static bool netdev_match(const void *a, const void *b)
-@@ -986,7 +987,7 @@ static void netdev_operstate_cb(int error, uint16_t typ=
-e,
+-	rtnl_ifaddr_extract(ifa, len, NULL, &query.ip, NULL);
++	l_rtnl_ifaddr4_extract(ifa, len, NULL, &query.ip, NULL);
  =
 
- static void netdev_connect_ok(struct netdev *netdev)
- {
--	rtnl_set_linkmode_and_operstate(rtnl, netdev->index,
-+	l_rtnl_set_linkmode_and_operstate(rtnl, netdev->index,
- 					IF_LINK_MODE_DORMANT, IF_OPER_UP,
- 					netdev_operstate_cb,
- 					L_UINT_TO_PTR(netdev->index), NULL);
-@@ -3817,7 +3818,7 @@ static void netdev_set_iftype_cb(struct l_genl_msg *m=
-sg, void *user_data)
- 		goto done;
+ 	query.family =3D ifa->ifa_family;
+ 	query.prefix_len =3D ifa->ifa_prefixlen;
+@@ -586,7 +586,7 @@ static void netconfig_ifaddr_ipv6_added(struct netconfi=
+g *netconfig,
+ 	ifaddr->family =3D ifa->ifa_family;
+ 	ifaddr->prefix_len =3D ifa->ifa_prefixlen;
  =
 
- 	netdev->set_powered_cmd_id =3D
--			rtnl_set_powered(rtnl, netdev->index, true,
-+			l_rtnl_set_powered(rtnl, netdev->index, true,
- 					netdev_set_iftype_up_cb, req,
- 					netdev_set_iftype_request_destroy);
- 	if (!netdev->set_powered_cmd_id) {
-@@ -3913,7 +3914,7 @@ int netdev_set_iftype(struct netdev *netdev, enum net=
-dev_iftype type,
- 		l_genl_msg_unref(msg);
- 	} else {
- 		netdev->set_powered_cmd_id =3D
--			rtnl_set_powered(rtnl, netdev->index, false,
-+			l_rtnl_set_powered(rtnl, netdev->index, false,
- 					netdev_set_iftype_down_cb, req,
- 					netdev_set_iftype_request_destroy);
- 		if (netdev->set_powered_cmd_id)
-@@ -4116,7 +4117,7 @@ static void netdev_initial_up_cb(int error, uint16_t =
-type, const void *data,
- 			return;
+-	rtnl_ifaddr_ipv6_extract(ifa, len, &ifaddr->ip);
++	l_rtnl_ifaddr6_extract(ifa, len, &ifaddr->ip);
+ =
+
+ 	l_debug("ifindex %u: ifaddr %s/%u", netconfig->ifindex, ifaddr->ip,
+ 							ifaddr->prefix_len);
+@@ -601,7 +601,7 @@ static void netconfig_ifaddr_ipv6_deleted(struct netcon=
+fig *netconfig,
+ 	struct netconfig_ifaddr *ifaddr;
+ 	struct netconfig_ifaddr query;
+ =
+
+-	rtnl_ifaddr_ipv6_extract(ifa, len, &query.ip);
++	l_rtnl_ifaddr6_extract(ifa, len, &query.ip);
+ =
+
+ 	query.family =3D ifa->ifa_family;
+ 	query.prefix_len =3D ifa->ifa_prefixlen;
+@@ -707,7 +707,7 @@ static bool netconfig_ipv4_routes_install(struct netcon=
+fig *netconfig,
+ 	if (!network)
+ 		return false;
+ =
+
+-	if (!rtnl_route_ipv4_add_connected(rtnl, netconfig->ifindex,
++	if (!l_rtnl_route4_add_connected(rtnl, netconfig->ifindex,
+ 						ifaddr->prefix_len, network,
+ 						ifaddr->ip,
+ 						netconfig->rtm_protocol,
+@@ -727,7 +727,7 @@ static bool netconfig_ipv4_routes_install(struct netcon=
+fig *netconfig,
+ 		return false;
  	}
  =
 
--	rtnl_set_linkmode_and_operstate(rtnl, netdev->index,
-+	l_rtnl_set_linkmode_and_operstate(rtnl, netdev->index,
- 					IF_LINK_MODE_DORMANT, IF_OPER_DOWN,
- 					netdev_operstate_cb,
- 					L_UINT_TO_PTR(netdev->index), NULL);
-@@ -4146,7 +4147,7 @@ static void netdev_set_mac_cb(int error, uint16_t typ=
-e, const void *data,
- 			strerror(-error));
+-	if (!rtnl_route_ipv4_add_gateway(rtnl, netconfig->ifindex, gateway,
++	if (!l_rtnl_route4_add_gateway(rtnl, netconfig->ifindex, gateway,
+ 						ifaddr->ip,
+ 						ROUTE_PRIORITY_OFFSET,
+ 						netconfig->rtm_protocol,
+@@ -806,7 +806,7 @@ static bool netconfig_ipv6_routes_install(struct netcon=
+fig *netconfig)
+ 		return false;
+ 	}
  =
 
- 	netdev->set_powered_cmd_id =3D
--		rtnl_set_powered(rtnl, netdev->index, true,
-+		l_rtnl_set_powered(rtnl, netdev->index, true,
- 					netdev_initial_up_cb, netdev, NULL);
- }
+-	if (!rtnl_route_ipv6_add_gateway(rtnl, netconfig->ifindex, gateway,
++	if (!l_rtnl_route6_add_gateway(rtnl, netconfig->ifindex, gateway,
+ 						ROUTE_PRIORITY_OFFSET,
+ 						netconfig->rtm_v6_protocol,
+ 						netconfig_route_add_cmd_cb,
+@@ -860,7 +860,7 @@ static void netconfig_install_address(struct netconfig =
+*netconfig,
  =
 
-@@ -4158,7 +4159,7 @@ static bool netdev_check_set_mac(struct netdev *netde=
-v)
- 	l_debug("Setting initial address on ifindex: %d to: " MAC,
- 		netdev->index, MAC_STR(netdev->set_mac_once));
- 	netdev->set_powered_cmd_id =3D
--		rtnl_set_mac(rtnl, netdev->index, netdev->set_mac_once,
-+		l_rtnl_set_mac(rtnl, netdev->index, netdev->set_mac_once,
- 				netdev_set_mac_cb, netdev, NULL);
- 	memset(netdev->set_mac_once, 0, 6);
- 	return true;
-@@ -4183,7 +4184,7 @@ static void netdev_initial_down_cb(int error, uint16_=
-t type, const void *data,
+ 	switch (ifaddr->family) {
+ 	case AF_INET:
+-		if (rtnl_ifaddr_add(rtnl, netconfig->ifindex,
++		if (l_rtnl_ifaddr4_add(rtnl, netconfig->ifindex,
+ 					ifaddr->prefix_len, ifaddr->ip,
+ 					ifaddr->broadcast,
+ 					netconfig_ipv4_ifaddr_add_cmd_cb,
+@@ -871,7 +871,7 @@ static void netconfig_install_address(struct netconfig =
+*netconfig,
+ 							ifaddr->prefix_len);
+ 		break;
+ 	case AF_INET6:
+-		if (rtnl_ifaddr_ipv6_add(rtnl, netconfig->ifindex,
++		if (l_rtnl_ifaddr6_add(rtnl, netconfig->ifindex,
+ 					ifaddr->prefix_len, ifaddr->ip,
+ 					netconfig_ipv6_ifaddr_add_cmd_cb,
+ 					netconfig, NULL))
+@@ -916,7 +916,7 @@ static void netconfig_uninstall_address(struct netconfi=
+g *netconfig,
+ =
+
+ 	switch (ifaddr->family) {
+ 	case AF_INET:
+-		if (rtnl_ifaddr_delete(rtnl, netconfig->ifindex,
++		if (l_rtnl_ifaddr4_delete(rtnl, netconfig->ifindex,
+ 					ifaddr->prefix_len, ifaddr->ip,
+ 					ifaddr->broadcast,
+ 					netconfig_ifaddr_del_cmd_cb, netconfig,
+@@ -927,7 +927,7 @@ static void netconfig_uninstall_address(struct netconfi=
+g *netconfig,
+ 						ifaddr->ip, ifaddr->prefix_len);
+ 		break;
+ 	case AF_INET6:
+-		if (rtnl_ifaddr_ipv6_delete(rtnl, netconfig->ifindex,
++		if (l_rtnl_ifaddr6_delete(rtnl, netconfig->ifindex,
+ 					ifaddr->prefix_len, ifaddr->ip,
+ 					netconfig_ifaddr_del_cmd_cb, netconfig,
+ 					NULL))
+@@ -1094,7 +1094,7 @@ static void netconfig_ipv6_select_and_uninstall(struc=
+t netconfig *netconfig)
+ 	if (!gateway)
  		return;
  =
 
- 	netdev->set_powered_cmd_id =3D
--		rtnl_set_powered(rtnl, netdev->index, true,
-+		l_rtnl_set_powered(rtnl, netdev->index, true,
- 					netdev_initial_up_cb, netdev, NULL);
- }
+-	if (!rtnl_route_ipv6_delete_gateway(rtnl, netconfig->ifindex,
++	if (!l_rtnl_route6_delete_gateway(rtnl, netconfig->ifindex,
+ 			gateway, ROUTE_PRIORITY_OFFSET,
+ 			netconfig->rtm_v6_protocol,
+ 			netconfig_route_del_cmd_cb, NULL, NULL)) {
+@@ -1233,7 +1233,7 @@ static int netconfig_init(void)
+ 		goto error;
+ 	}
  =
 
-@@ -4228,7 +4229,7 @@ static void netdev_getlink_cb(int error, uint16_t typ=
-e, const void *data,
- 	cb =3D powered ? netdev_initial_down_cb : netdev_initial_up_cb;
+-	r =3D rtnl_ifaddr_get(rtnl, netconfig_ifaddr_cmd_cb, NULL, NULL);
++	r =3D l_rtnl_ifaddr4_dump(rtnl, netconfig_ifaddr_cmd_cb, NULL, NULL);
+ 	if (!r) {
+ 		l_error("netconfig: Failed to get addresses from RTNL link.");
+ 		goto error;
+@@ -1247,7 +1247,7 @@ static int netconfig_init(void)
+ 		goto error;
+ 	}
  =
 
- 	netdev->set_powered_cmd_id =3D
--		rtnl_set_powered(rtnl, ifi->ifi_index, !powered, cb, netdev,
-+		l_rtnl_set_powered(rtnl, ifi->ifi_index, !powered, cb, netdev,
- 					NULL);
- }
- =
-
+-	r =3D rtnl_ifaddr_ipv6_get(rtnl, netconfig_ifaddr_ipv6_cmd_cb, NULL,
++	r =3D l_rtnl_ifaddr6_dump(rtnl, netconfig_ifaddr_ipv6_cmd_cb, NULL,
+ 									NULL);
+ 	if (!r) {
+ 		l_error("netconfig: Failed to get IPv6 addresses from RTNL"
 -- =
 
 2.25.0
---===============7603512299177904087==--
+--===============2439382217983742509==--
 
