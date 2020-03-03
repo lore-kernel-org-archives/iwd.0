@@ -1,47 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============5668466331652302247=="
+Content-Type: multipart/mixed; boundary="===============6832743865369213896=="
 MIME-Version: 1.0
-From: Prestwood, James <james.prestwood@intel.com>
-Subject: Re: MAC changing really needed
-Date: Tue, 03 Mar 2020 16:38:49 +0000
-Message-ID: <4c892d95bdf36bfeee97b3a47bf83187dfc1c141.camel@intel.com>
-In-Reply-To: <20200303111156.2640.7918@ml01.vlan13.01.org>
+From: pavel@noa-labs.com
+Subject: Re:MAC changing really needed
+Date: Tue, 03 Mar 2020 23:13:17 +0600
+Message-ID: <-5vb31gh7r1qw-wmihl8-tnuyrwyylwvl-tumz2bg7d9n0-yzikc3dy5vly-16u34-44ii3u-c6cu9-s2d965xxh4b5-myztxsmqnryqmzz37lf9uv6nsy1iujyd4hav787jcaxll0r-slpbulywecc6.1583255597470@email.android.com>
+In-Reply-To: <4c892d95bdf36bfeee97b3a47bf83187dfc1c141.camel@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5668466331652302247==
+--===============6832743865369213896==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
 
-On Tue, 2020-03-03 at 11:11 +0000, pavel(a)noa-labs.com wrote:
-> Hello,
-> =
+--===============6832743865369213896==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.htm"
 
-> I want to have MAC changing functionality. It's really useful. My
-> coworking uses "MAC security" for example, and I can't do anything
-> about it, and I think thousands of other people will have the same
-> situation.
-
-IWD does support randomized MAC addresses using the following config
-option:
-
-AddressRandomization=3Donce
-
-This will randomize the MAC address when IWD starts up. This is only
-when IWD starts though, and not per network/SSID.
-
-Thanks,
-James
-
-> =
-
-> Regus is a no joke coworking network... 3000+ locations after all.
-> Please implement MAC changing from the config file.
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
-
---===============5668466331652302247==--
+V2VsbCwgd2hhdCBJIG5lZWQgaXMgdG8gc2V0IG15IE1BQyBhZGRyZXNzIHRvIGEgcGFydGljdWxh
+ciB2YWx1ZSwgb25lIHVzZWQgYnkgbXkgbGFzdCBsYXB0b3AgcmVnaXN0ZXJlZCBpbiB0aGUgc3lz
+dGVtPGJyPjxicj5TZW50IGZyb20gbXkgSHVhd2VpIE1vYmlsZTxkaXYgY2xhc3M9InF1b3RlIiBz
+dHlsZT0ibGluZS1oZWlnaHQ6IDEuNSI+PGJyPjxicj4tLS0tLS0tLSBPcmlnaW5hbCBNZXNzYWdl
+IC0tLS0tLS0tPGJyPlN1YmplY3Q6IFJlOiBNQUMgY2hhbmdpbmcgcmVhbGx5IG5lZWRlZDxicj5G
+cm9tOiAiUHJlc3R3b29kLCBKYW1lcyIgPGphbWVzLnByZXN0d29vZEBpbnRlbC5jb20+PGJyPlRv
+OiBwYXZlbEBub2EtbGFicy5jb20sIml3ZEBsaXN0cy4wMS5vcmcJIiA8aXdkQGxpc3RzLjAxLm9y
+Zz48YnI+Q0M6IDxicj48YnI+PGJyIHR5cGU9ImF0dHJpYnV0aW9uIj48YmxvY2txdW90ZSBjbGFz
+cz0icXVvdGUiIHN0eWxlPSJtYXJnaW46MCAwIDAgLjhleDtib3JkZXItbGVmdDoxcHggI2NjYyBz
+b2xpZDtwYWRkaW5nLWxlZnQ6MWV4Ij5IaSw8YnI+PGJyPk9uIFR1ZSwgMjAyMC0wMy0wMyBhdCAx
+MToxMSArMDAwMCwgcGF2ZWxAbm9hLWxhYnMuY29tIHdyb3RlOjxicj4+IEhlbGxvLDxicj4+IDxi
+cj4+IEkgd2FudCB0byBoYXZlIE1BQyBjaGFuZ2luZyBmdW5jdGlvbmFsaXR5LiBJdCdzIHJlYWxs
+eSB1c2VmdWwuIE15PGJyPj4gY293b3JraW5nIHVzZXMgIk1BQyBzZWN1cml0eSIgZm9yIGV4YW1w
+bGUsIGFuZCBJIGNhbid0IGRvIGFueXRoaW5nPGJyPj4gYWJvdXQgaXQsIGFuZCBJIHRoaW5rIHRo
+b3VzYW5kcyBvZiBvdGhlciBwZW9wbGUgd2lsbCBoYXZlIHRoZSBzYW1lPGJyPj4gc2l0dWF0aW9u
+Ljxicj48YnI+SVdEIGRvZXMgc3VwcG9ydCByYW5kb21pemVkIE1BQyBhZGRyZXNzZXMgdXNpbmcg
+dGhlIGZvbGxvd2luZyBjb25maWc8YnI+b3B0aW9uOjxicj48YnI+QWRkcmVzc1JhbmRvbWl6YXRp
+b249b25jZTxicj48YnI+VGhpcyB3aWxsIHJhbmRvbWl6ZSB0aGUgTUFDIGFkZHJlc3Mgd2hlbiBJ
+V0Qgc3RhcnRzIHVwLiBUaGlzIGlzIG9ubHk8YnI+d2hlbiBJV0Qgc3RhcnRzIHRob3VnaCwgYW5k
+IG5vdCBwZXIgbmV0d29yay9TU0lELjxicj48YnI+VGhhbmtzLDxicj5KYW1lczxicj48YnI+PiA8
+YnI+PiBSZWd1cyBpcyBhIG5vIGpva2UgY293b3JraW5nIG5ldHdvcmsuLi4gMzAwMCsgbG9jYXRp
+b25zIGFmdGVyIGFsbC48YnI+PiBQbGVhc2UgaW1wbGVtZW50IE1BQyBjaGFuZ2luZyBmcm9tIHRo
+ZSBjb25maWcgZmlsZS48YnI+PiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXzxicj4+IGl3ZCBtYWlsaW5nIGxpc3QgLS0gaXdkQGxpc3RzLjAxLm9yZzxicj4+
+IFRvIHVuc3Vic2NyaWJlIHNlbmQgYW4gZW1haWwgdG8gaXdkLWxlYXZlQGxpc3RzLjAxLm9yZzxi
+cj48L2Jsb2NrcXVvdGU+PC9kaXY+
+--===============6832743865369213896==--
 
