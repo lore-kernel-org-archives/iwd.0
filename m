@@ -1,32 +1,24 @@
-Content-Type: multipart/mixed; boundary="===============2979625322262942903=="
+Content-Type: multipart/mixed; boundary="===============5198870320346356215=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/2] client: Reorder interface creation ops
-Date: Thu, 27 Feb 2020 16:31:42 -0600
-Message-ID: <df246662-5708-cb44-8cbd-1fcdd46101c4@gmail.com>
-In-Reply-To: <20200226233224.31261-1-tim.a.kourt@linux.intel.com>
+From: pavel@noa-labs.com
+Subject: MAC changing really needed
+Date: Tue, 03 Mar 2020 11:11:56 +0000
+Message-ID: <20200303111156.2640.7918@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2979625322262942903==
+--===============5198870320346356215==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+Hello,
 
-On 2/26/20 5:32 PM, Tim Kourt wrote:
-> Add the newly created proxy objects into the queue before the
-> interface specific initialization logic takes place. This way the new
-> proxy objects can be used within the initialization procedures.
-> ---
->   client/dbus-proxy.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+I want to have MAC changing functionality. It's really useful. My coworking=
+ uses "MAC security" for example, and I can't do anything about it, and I t=
+hink thousands of other people will have the same situation.
 
-Both applied, thanks.
-
-Regards,
--Denis
-
---===============2979625322262942903==--
+Regus is a no joke coworking network... 3000+ locations after all. Please i=
+mplement MAC changing from the config file.
+--===============5198870320346356215==--
 
