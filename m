@@ -1,54 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============4963500579681445033=="
+Content-Type: multipart/mixed; boundary="===============3763684345054379591=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/3] iwd: define a maximum passphrase length
-Date: Fri, 06 Mar 2020 10:34:35 -0800
-Message-ID: <20200306183437.31440-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/3] agent: enforce a maximum passphrase length
+Date: Fri, 06 Mar 2020 10:34:36 -0800
+Message-ID: <20200306183437.31440-2-prestwoj@gmail.com>
+In-Reply-To: <20200306183437.31440-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4963500579681445033==
+--===============3763684345054379591==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/iwd.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ src/agent.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-v2:
- - Renamed to IWD_MAX_PASSWORD_LEN
-
-diff --git a/src/iwd.h b/src/iwd.h
-index 22223526..426af743 100644
---- a/src/iwd.h
-+++ b/src/iwd.h
-@@ -22,6 +22,15 @@
+diff --git a/src/agent.c b/src/agent.c
+index d213f3cd..c221cbd8 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -159,6 +159,9 @@ static void passphrase_reply(struct l_dbus_message *rep=
+ly,
+ 	if (!l_dbus_message_get_arguments(reply, "s", &passphrase))
+ 		goto done;
  =
 
- #define uninitialized_var(x) x =3D x
- =
-
-+/*
-+ * Set a maximum to prevent sending too much data to the kernel when hashi=
-ng
-+ * the passphrase (or any other crypto operations involving the passphrase=
-).
-+ * This will also prevent potential stack overflows if the passphrase is p=
-ut
-+ * into EAP packets on the stack (EAP-GTC). This value is not tied to IEEE=
- or
-+ * any RFC's, just chosen to be long enough to not restrict a normal user.
-+ */
-+#define IWD_MAX_PASSWORD_LEN	2048
++	if (strlen(passphrase) > IWD_MAX_PASSWORD_LEN)
++		goto done;
 +
- struct l_genl;
- struct l_genl_family;
+ 	result =3D AGENT_RESULT_OK;
  =
 
+ done:
+@@ -181,6 +184,9 @@ static void user_name_passwd_reply(struct l_dbus_messag=
+e *reply,
+ 	if (!l_dbus_message_get_arguments(reply, "ss", &username, &passwd))
+ 		goto done;
+ =
+
++	if (strlen(passwd) > IWD_MAX_PASSWORD_LEN)
++		goto done;
++
+ 	result =3D AGENT_RESULT_OK;
+ =
+
+ done:
 -- =
 
 2.17.1
 
---===============4963500579681445033==--
+--===============3763684345054379591==--
 
