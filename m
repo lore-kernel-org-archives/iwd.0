@@ -1,53 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============3824079119331873482=="
+Content-Type: multipart/mixed; boundary="===============5461225620681875555=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/4] eap: check MTU when loading identity
-Date: Fri, 06 Mar 2020 09:48:41 -0800
-Message-ID: <20200306174843.26578-2-prestwoj@gmail.com>
+Subject: [PATCH 3/4] agent: enforce a maximum passphrase length
+Date: Fri, 06 Mar 2020 09:48:42 -0800
+Message-ID: <20200306174843.26578-3-prestwoj@gmail.com>
 In-Reply-To: <20200306174843.26578-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3824079119331873482==
+--===============5461225620681875555==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the MTU was set very low an identity could exceed the maximum.
 ---
- src/eap.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ src/agent.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/eap.c b/src/eap.c
-index 012bd58e..816b5f9a 100644
---- a/src/eap.c
-+++ b/src/eap.c
-@@ -568,10 +568,17 @@ bool eap_load_settings(struct eap_state *eap, struct =
-l_settings *settings,
- 	 * octets. Support for an NAI length of 253 octets is RECOMMENDED.
- 	 * ...
- 	 * RADIUS is unable to support NAI lengths beyond 253 octets
-+	 *
-+	 * We also need to fail if the identity is too large for the set MTU
-+	 * size minus 5 (header).
- 	 */
--	if (eap->identity && strlen(eap->identity) > 253) {
--		l_error("Identity is too long");
--		goto err;
-+	if (eap->identity) {
-+		size_t id_len =3D strlen(eap->identity);
-+
-+		if (id_len > 253 || id_len > eap->mtu - 5) {
-+			l_error("Identity is too long");
-+			goto err;
-+		}
- 	}
+diff --git a/src/agent.c b/src/agent.c
+index d213f3cd..44039a89 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -159,6 +159,9 @@ static void passphrase_reply(struct l_dbus_message *rep=
+ly,
+ 	if (!l_dbus_message_get_arguments(reply, "s", &passphrase))
+ 		goto done;
  =
 
- 	return true;
++	if (strlen(passphrase) > IWD_MAX_PASSPHRASE_LEN)
++		goto done;
++
+ 	result =3D AGENT_RESULT_OK;
+ =
+
+ done:
+@@ -181,6 +184,9 @@ static void user_name_passwd_reply(struct l_dbus_messag=
+e *reply,
+ 	if (!l_dbus_message_get_arguments(reply, "ss", &username, &passwd))
+ 		goto done;
+ =
+
++	if (strlen(passwd) > IWD_MAX_PASSPHRASE_LEN)
++		goto done;
++
+ 	result =3D AGENT_RESULT_OK;
+ =
+
+ done:
 -- =
 
 2.17.1
 
---===============3824079119331873482==--
+--===============5461225620681875555==--
 
