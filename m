@@ -1,31 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============6069490302653127317=="
+Content-Type: multipart/mixed; boundary="===============2806034357714379474=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/4] iwd: define a maximum passphrase length
-Date: Fri, 06 Mar 2020 12:20:05 -0600
-Message-ID: <026008b3-3eed-399b-ab03-dc9cafed5803@gmail.com>
-In-Reply-To: <d0d5e711d0af0dcef2c60c395b21f049d67defee.camel@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [RFC/PATCH] Install iwd and ead into $sbindir rather than
+ $libexecdir.
+Date: Fri, 06 Mar 2020 19:36:26 +0100
+Message-ID: <4B8F296A-4E34-471A-B2E2-30B5B7808431@holtmann.org>
+In-Reply-To: <20200218113427.25752-1-anton@khirnov.net>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6069490302653127317==
+--===============2806034357714379474==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Anton,
 
->> +#define IWD_MAX_PASSPHRASE_LEN	2048
-> =
+> $libexecdir is supposed to contain "internal" binaries that are not
+> supposed to be executed "from the outside", e.g. directly by users.
+> Since iwd is a normal daemon that is directly executed from the outside,
+> $sbindir is the appropriate place for it.
 
-> Tim pointed out this should really be called IWD_MAX_PASSWORD_LEN since
-> 'PASSPHRASE' implies a WPA passphrase which does have a defined maximum
-> length of 63 characters. This value is only meant for EAP method
-> passwords that have no defined maximum.
+how is iwd executed directly by a user? It is only executed as a service. I=
+t doesn=E2=80=99t belong in sbin either and the difference between sbin and=
+ bin have been removed, because they are not really exit anymore on modern =
+Linux distributions.
 
-Yes, password would be better.
+Regards
 
-Regards,
--Denis
---===============6069490302653127317==--
+Marcel
+
+--===============2806034357714379474==--
 
