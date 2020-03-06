@@ -1,63 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============3857047838909625316=="
+Content-Type: multipart/mixed; boundary="===============8922359261929204661=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 2/3] eap-gtc: limit password length to maximum
-Date: Fri, 06 Mar 2020 11:16:27 -0800
-Message-ID: <20200306191628.5461-2-prestwoj@gmail.com>
+Subject: [PATCH v3 3/3] network: enforce max EAP/pkey password length
+Date: Fri, 06 Mar 2020 11:16:28 -0800
+Message-ID: <20200306191628.5461-3-prestwoj@gmail.com>
 In-Reply-To: <20200306191628.5461-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3857047838909625316==
+--===============8922359261929204661==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The password for EAP-GTC is directly used in an EAP response. The
-response buffer is created on the stack so an overly large password
-could cause a stack overflow.
 ---
- src/eap-gtc.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ src/network.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
--v3:
- * Defined maximum locally to not depend on iwd.h
-
-diff --git a/src/eap-gtc.c b/src/eap-gtc.c
-index 7788d44c..f895ec61 100644
---- a/src/eap-gtc.c
-+++ b/src/eap-gtc.c
-@@ -32,6 +32,8 @@
- #include "src/eap.h"
- #include "src/eap-private.h"
+diff --git a/src/network.c b/src/network.c
+index fe6ba867..c08d7e72 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -892,7 +892,15 @@ static void eap_password_callback(enum agent_result re=
+sult, const char *value,
+ 	struct eap_secret_request *req =3D user_data;
  =
 
-+#define EAP_GTC_MAX_PASSWORD_LEN	2048
+ 	req->network->agent_request =3D 0;
+-	req->secret->value =3D l_strdup(value);
 +
- struct eap_gtc_state {
- 	char *password;
- };
-@@ -148,6 +150,14 @@ static bool eap_gtc_load_settings(struct eap_state *ea=
-p,
- 			return false;
++	if (value) {
++		if (strlen(value) < IWD_MAX_PASSWORD_LEN)
++			req->secret->value =3D l_strdup(value);
++		else {
++			l_error("EAP password too long");
++			result =3D AGENT_RESULT_FAILED;
++		}
++	}
+ =
+
+ 	req->callback(result, message, req);
+ }
+@@ -910,11 +918,18 @@ static void eap_user_password_callback(enum agent_res=
+ult result,
+ 		size_t len1 =3D strlen(user) + 1;
+ 		size_t len2 =3D strlen(passwd) + 1;
+ =
+
++		if (len2 > IWD_MAX_PASSWORD_LEN) {
++			l_error("EAP password too long");
++			result =3D AGENT_RESULT_FAILED;
++			goto done;
++		}
++
+ 		req->secret->value =3D l_malloc(len1 + len2);
+ 		memcpy(req->secret->value, user, len1);
+ 		memcpy(req->secret->value + len1, passwd, len2);
  	}
  =
 
-+	/*
-+	 * Limit length to prevent a stack overflow
-+	 */
-+	if (strlen(password) > EAP_GTC_MAX_PASSWORD_LEN) {
-+		l_free(password);
-+		return false;
-+	}
-+
- 	gtc =3D l_new(struct eap_gtc_state, 1);
- 	gtc->password =3D password;
++done:
+ 	req->callback(result, message, req);
+ }
  =
 
 -- =
 
 2.17.1
 
---===============3857047838909625316==--
+--===============8922359261929204661==--
 
