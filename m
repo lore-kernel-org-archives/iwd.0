@@ -1,51 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============2129424484047678307=="
+Content-Type: multipart/mixed; boundary="===============3824079119331873482=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/4] iwd: define a maximum passphrase length
-Date: Fri, 06 Mar 2020 09:48:40 -0800
-Message-ID: <20200306174843.26578-1-prestwoj@gmail.com>
+Subject: [PATCH 2/4] eap: check MTU when loading identity
+Date: Fri, 06 Mar 2020 09:48:41 -0800
+Message-ID: <20200306174843.26578-2-prestwoj@gmail.com>
+In-Reply-To: <20200306174843.26578-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2129424484047678307==
+--===============3824079119331873482==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+If the MTU was set very low an identity could exceed the maximum.
 ---
- src/iwd.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ src/eap.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/src/iwd.h b/src/iwd.h
-index 22223526..5371d8e5 100644
---- a/src/iwd.h
-+++ b/src/iwd.h
-@@ -22,6 +22,15 @@
- =
-
- #define uninitialized_var(x) x =3D x
- =
-
-+/*
-+ * Set a maximum to prevent sending too much data to the kernel when hashi=
-ng
-+ * the passphrase (or any other crypto operations involving the passphrase=
-).
-+ * This will also prevent potential stack overflows if the passphrase is p=
-ut
-+ * into EAP packets on the stack (EAP-GTC). This value is not tied to IEEE=
- or
-+ * any RFC's, just chosen to be long enough to not restrict a normal user.
-+ */
-+#define IWD_MAX_PASSPHRASE_LEN	2048
+diff --git a/src/eap.c b/src/eap.c
+index 012bd58e..816b5f9a 100644
+--- a/src/eap.c
++++ b/src/eap.c
+@@ -568,10 +568,17 @@ bool eap_load_settings(struct eap_state *eap, struct =
+l_settings *settings,
+ 	 * octets. Support for an NAI length of 253 octets is RECOMMENDED.
+ 	 * ...
+ 	 * RADIUS is unable to support NAI lengths beyond 253 octets
++	 *
++	 * We also need to fail if the identity is too large for the set MTU
++	 * size minus 5 (header).
+ 	 */
+-	if (eap->identity && strlen(eap->identity) > 253) {
+-		l_error("Identity is too long");
+-		goto err;
++	if (eap->identity) {
++		size_t id_len =3D strlen(eap->identity);
 +
- struct l_genl;
- struct l_genl_family;
++		if (id_len > 253 || id_len > eap->mtu - 5) {
++			l_error("Identity is too long");
++			goto err;
++		}
+ 	}
  =
 
+ 	return true;
 -- =
 
 2.17.1
 
---===============2129424484047678307==--
+--===============3824079119331873482==--
 
