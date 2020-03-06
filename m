@@ -1,48 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============6970628193009897593=="
+Content-Type: multipart/mixed; boundary="===============7195148051952396245=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH V2] Makefile.am: Avoid redirection of input and output
- files
-Date: Fri, 06 Mar 2020 19:33:31 +0100
-Message-ID: <6621FDBB-3301-4174-905A-511F4082039B@holtmann.org>
-In-Reply-To: <20191106025032.1447949-1-raj.khem@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 2/4] eap: check MTU when loading identity
+Date: Fri, 06 Mar 2020 12:18:27 -0600
+Message-ID: <a09e1022-ea17-2951-6050-68a3d33dad94@gmail.com>
+In-Reply-To: <20200306174843.26578-2-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6970628193009897593==
+--===============7195148051952396245==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Khem,
+Hi James,
 
-> Ensure that directory is created before its written to
-> =
-
-> This can cause a build race in a highly parallelised build where a direct=
-ory is not yet created but
-> output file is being written using redirection e.g.
-> =
-
-> rst2man.py --strict --no-raw --no-generator --no-datestamp < ../git/monit=
-or/iwmon.rst > monitor/iwmon.1
-> /bin/sh: monitor/iwmon.1: No such file or directory
-> make[1]: *** [Makefile:3544: monitor/iwmon.1] Error 1
-> =
-
+On 3/6/20 11:48 AM, James Prestwood wrote:
+> If the MTU was set very low an identity could exceed the maximum.
 > ---
-> v2: create directory before emitting doc files into it
+>   src/eap.c | 13 ++++++++++---
+>   1 file changed, 10 insertions(+), 3 deletions(-)
 > =
 
-> Makefile.am | 5 +++--
-> 1 file changed, 3 insertions(+), 2 deletions(-)
 
-sorry for looking at this so late, can you send me a version that applies t=
-o the latest HEAD.
+Applied, thanks.
 
-Regards
+Regards,
+-Denis
 
-Marcel
-
---===============6970628193009897593==--
+--===============7195148051952396245==--
 
