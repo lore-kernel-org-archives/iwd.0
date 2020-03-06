@@ -1,59 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============5954646334646903593=="
+Content-Type: multipart/mixed; boundary="===============6970628193009897593=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 1/4] iwd: define a maximum passphrase length
-Date: Fri, 06 Mar 2020 09:56:22 -0800
-Message-ID: <d0d5e711d0af0dcef2c60c395b21f049d67defee.camel@gmail.com>
-In-Reply-To: <20200306174843.26578-1-prestwoj@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH V2] Makefile.am: Avoid redirection of input and output
+ files
+Date: Fri, 06 Mar 2020 19:33:31 +0100
+Message-ID: <6621FDBB-3301-4174-905A-511F4082039B@holtmann.org>
+In-Reply-To: <20191106025032.1447949-1-raj.khem@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5954646334646903593==
+--===============6970628193009897593==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2020-03-06 at 09:48 -0800, James Prestwood wrote:
-> ---
->  src/iwd.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
+Hi Khem,
+
+> Ensure that directory is created before its written to
 > =
 
-> diff --git a/src/iwd.h b/src/iwd.h
-> index 22223526..5371d8e5 100644
-> --- a/src/iwd.h
-> +++ b/src/iwd.h
-> @@ -22,6 +22,15 @@
->  =
+> This can cause a build race in a highly parallelised build where a direct=
+ory is not yet created but
+> output file is being written using redirection e.g.
+> =
 
->  #define uninitialized_var(x) x =3D x
->  =
+> rst2man.py --strict --no-raw --no-generator --no-datestamp < ../git/monit=
+or/iwmon.rst > monitor/iwmon.1
+> /bin/sh: monitor/iwmon.1: No such file or directory
+> make[1]: *** [Makefile:3544: monitor/iwmon.1] Error 1
+> =
 
-> +/*
-> + * Set a maximum to prevent sending too much data to the kernel when
-> hashing
-> + * the passphrase (or any other crypto operations involving the
-> passphrase).
-> + * This will also prevent potential stack overflows if the
-> passphrase is put
-> + * into EAP packets on the stack (EAP-GTC). This value is not tied
-> to IEEE or
-> + * any RFC's, just chosen to be long enough to not restrict a normal
-> user.
-> + */
-> +#define IWD_MAX_PASSPHRASE_LEN	2048
+> ---
+> v2: create directory before emitting doc files into it
+> =
 
-Tim pointed out this should really be called IWD_MAX_PASSWORD_LEN since
-'PASSPHRASE' implies a WPA passphrase which does have a defined maximum
-length of 63 characters. This value is only meant for EAP method
-passwords that have no defined maximum.
+> Makefile.am | 5 +++--
+> 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Will change in v2 if everything else looks fine.
+sorry for looking at this so late, can you send me a version that applies t=
+o the latest HEAD.
 
-> +
->  struct l_genl;
->  struct l_genl_family;
-> =20
+Regards
 
---===============5954646334646903593==--
+Marcel
+
+--===============6970628193009897593==--
 
