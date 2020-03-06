@@ -1,34 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============2806034357714379474=="
+Content-Type: multipart/mixed; boundary="===============4963500579681445033=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [RFC/PATCH] Install iwd and ead into $sbindir rather than
- $libexecdir.
-Date: Fri, 06 Mar 2020 19:36:26 +0100
-Message-ID: <4B8F296A-4E34-471A-B2E2-30B5B7808431@holtmann.org>
-In-Reply-To: <20200218113427.25752-1-anton@khirnov.net>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/3] iwd: define a maximum passphrase length
+Date: Fri, 06 Mar 2020 10:34:35 -0800
+Message-ID: <20200306183437.31440-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2806034357714379474==
+--===============4963500579681445033==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Anton,
+---
+ src/iwd.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-> $libexecdir is supposed to contain "internal" binaries that are not
-> supposed to be executed "from the outside", e.g. directly by users.
-> Since iwd is a normal daemon that is directly executed from the outside,
-> $sbindir is the appropriate place for it.
+v2:
+ - Renamed to IWD_MAX_PASSWORD_LEN
 
-how is iwd executed directly by a user? It is only executed as a service. I=
-t doesn=E2=80=99t belong in sbin either and the difference between sbin and=
- bin have been removed, because they are not really exit anymore on modern =
-Linux distributions.
+diff --git a/src/iwd.h b/src/iwd.h
+index 22223526..426af743 100644
+--- a/src/iwd.h
++++ b/src/iwd.h
+@@ -22,6 +22,15 @@
+ =
 
-Regards
+ #define uninitialized_var(x) x =3D x
+ =
 
-Marcel
++/*
++ * Set a maximum to prevent sending too much data to the kernel when hashi=
+ng
++ * the passphrase (or any other crypto operations involving the passphrase=
+).
++ * This will also prevent potential stack overflows if the passphrase is p=
+ut
++ * into EAP packets on the stack (EAP-GTC). This value is not tied to IEEE=
+ or
++ * any RFC's, just chosen to be long enough to not restrict a normal user.
++ */
++#define IWD_MAX_PASSWORD_LEN	2048
++
+ struct l_genl;
+ struct l_genl_family;
+ =
 
---===============2806034357714379474==--
+-- =
+
+2.17.1
+
+--===============4963500579681445033==--
 
