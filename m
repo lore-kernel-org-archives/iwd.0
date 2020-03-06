@@ -1,72 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============8922359261929204661=="
+Content-Type: multipart/mixed; boundary="===============3819752807145688675=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 3/3] network: enforce max EAP/pkey password length
-Date: Fri, 06 Mar 2020 11:16:28 -0800
-Message-ID: <20200306191628.5461-3-prestwoj@gmail.com>
-In-Reply-To: <20200306191628.5461-1-prestwoj@gmail.com>
+From: Khem Raj <raj.khem@gmail.com>
+Subject: [PATCH V3] Makefile.am: Avoid redirection of input and output files
+Date: Fri, 06 Mar 2020 11:22:53 -0800
+Message-ID: <20200306192253.1758531-1-raj.khem@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8922359261929204661==
+--===============3819752807145688675==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Ensure that directory is created before its written to
+
+This can cause a build race in a highly parallelised build where a director=
+y is not yet created but
+output file is being written using redirection e.g.
+
+rst2man.py --strict --no-raw --no-generator --no-datestamp < ../git/monitor=
+/iwmon.rst > monitor/iwmon.1
+/bin/sh: monitor/iwmon.1: No such file or directory
+make[1]: *** [Makefile:3544: monitor/iwmon.1] Error 1
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- src/network.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+v2: create directory before emitting doc files into it
+v3: No change, rebased on master
 
-diff --git a/src/network.c b/src/network.c
-index fe6ba867..c08d7e72 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -892,7 +892,15 @@ static void eap_password_callback(enum agent_result re=
-sult, const char *value,
- 	struct eap_secret_request *req =3D user_data;
+ Makefile.am | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 9d378d3d..ac83376e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -631,8 +631,9 @@ SED_PROCESS =3D $(AM_V_GEN)$(MKDIR_P) $(dir $@) && $(SE=
+D) \
+ 		< $< > $@
  =
 
- 	req->network->agent_request =3D 0;
--	req->secret->value =3D l_strdup(value);
-+
-+	if (value) {
-+		if (strlen(value) < IWD_MAX_PASSWORD_LEN)
-+			req->secret->value =3D l_strdup(value);
-+		else {
-+			l_error("EAP password too long");
-+			result =3D AGENT_RESULT_FAILED;
-+		}
-+	}
- =
-
- 	req->callback(result, message, req);
- }
-@@ -910,11 +918,18 @@ static void eap_user_password_callback(enum agent_res=
-ult result,
- 		size_t len1 =3D strlen(user) + 1;
- 		size_t len2 =3D strlen(passwd) + 1;
- =
-
-+		if (len2 > IWD_MAX_PASSWORD_LEN) {
-+			l_error("EAP password too long");
-+			result =3D AGENT_RESULT_FAILED;
-+			goto done;
-+		}
-+
- 		req->secret->value =3D l_malloc(len1 + len2);
- 		memcpy(req->secret->value, user, len1);
- 		memcpy(req->secret->value + len1, passwd, len2);
- 	}
- =
-
-+done:
- 	req->callback(result, message, req);
- }
- =
-
+ if RUN_RST2MAN
+-RST2MAN_PROCESS =3D $(AM_V_GEN)$(RST2MAN) --strict --no-raw --no-generator=
+ \
+-			--no-datestamp $< $@
++RST2MAN_PROCESS =3D $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
++			$(AM_V_GEN)$(RST2MAN) --strict --no-raw \
++			--no-generator --no-datestamp $< $@
+ else
+ RST2MAN_PROCESS =3D $(AM_V_GEN)test -f $@ || \
+ 		{ echo "Generated manual page $@ does not exist"; false; }
 -- =
 
-2.17.1
+2.25.1
 
---===============8922359261929204661==--
+--===============3819752807145688675==--
 
