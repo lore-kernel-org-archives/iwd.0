@@ -1,60 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============0799844275251560752=="
+Content-Type: multipart/mixed; boundary="===============4471424450906664411=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: how to disable colorized/grey output from iwctl commands
-Date: Mon, 09 Mar 2020 22:47:08 -0500
-Message-ID: <5255da5d-9068-8629-e4b9-2bb74150d8d8@gmail.com>
-In-Reply-To: <CAG17S_NQbJEQdv6twFogVoZ7gc__QNQXwy48qjyHMckGPEVjaA@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] netdev: update use of l_rtnl_set_mac
+Date: Wed, 11 Mar 2020 18:52:51 -0400
+Message-ID: <20200311225251.1322818-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0799844275251560752==
+--===============4471424450906664411==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+This API was updated to take an extra boolean which will
+automatically power up the device while changing the MAC
+address. Since this is what IWD does anyways we can avoid
+the need for an intermediate callback and go right into
+netdev_initial_up_cb.
+---
+ src/netdev.c | 18 ++----------------
+ 1 file changed, 2 insertions(+), 16 deletions(-)
 
-On 3/8/20 8:35 AM, KeithG wrote:
-> I am trying to move to connman/iwd from netctl on a RPi. It currently =
+diff --git a/src/netdev.c b/src/netdev.c
+index 846f7b07..35f2d7f0 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -4137,20 +4137,6 @@ static void netdev_initial_up_cb(int error, uint16_t=
+ type, const void *data,
+ 	netdev->events_ready =3D true;
+ }
+ =
 
-> has a PHP based UI to display the info and allow connections, etc. =
+-static void netdev_set_mac_cb(int error, uint16_t type, const void *data,
+-					uint32_t len, void *user_data)
+-{
+-	struct netdev *netdev =3D user_data;
+-
+-	if (error)
+-		l_error("Error setting mac address on %d: %s", netdev->index,
+-			strerror(-error));
+-
+-	netdev->set_powered_cmd_id =3D
+-		l_rtnl_set_powered(rtnl, netdev->index, true,
+-					netdev_initial_up_cb, netdev, NULL);
+-}
+-
+ static bool netdev_check_set_mac(struct netdev *netdev)
+ {
+ 	if (util_mem_is_zero(netdev->set_mac_once, 6))
+@@ -4159,8 +4145,8 @@ static bool netdev_check_set_mac(struct netdev *netde=
+v)
+ 	l_debug("Setting initial address on ifindex: %d to: " MAC,
+ 		netdev->index, MAC_STR(netdev->set_mac_once));
+ 	netdev->set_powered_cmd_id =3D
+-		l_rtnl_set_mac(rtnl, netdev->index, netdev->set_mac_once,
+-				netdev_set_mac_cb, netdev, NULL);
++		l_rtnl_set_mac(rtnl, netdev->index, netdev->set_mac_once, true,
++				netdev_initial_up_cb, netdev, NULL);
+ 	memset(netdev->set_mac_once, 0, 6);
+ 	return true;
+ }
+-- =
 
-> Connmanctl commands=C2=A0 respond with text (no control characters, no =
+2.24.1
 
-> colorization) iwdctl responds with text with control characters. If I =
-
-
-connman client does not use special ANSI codes, iwctl does.
-
-> use this command::
-> iwctl station wlan0 get-networks
-> I get a response which looks like clear txt in my linux terminal =
-
-> connected by ssh, but it has control characters indicating which network =
-
-> is connected and the signal strength stars are all present and are =
-
-> either full brightness of grey depending on the signal. THis makes it =
-
-
-It should be quite straightforward to filter the ANSI escape sequences =
-
-out.  See https://en.wikipedia.org/wiki/ANSI_escape_code
-
-> challenging to feed this into php to be displayed in a browser... Is =
-
-> there a hidden flag to turn this off? Can this be added? If there are =
-
-> other suggestions on how to best deal with this, I am soliciting =
-
-> advice... What I get is this in php:
-
-Right now there's no flag in iwctl to turn colorization off.  Should be =
-
-straightforward to add though.  Patches are always welcome.
-
-Regards,
--Denis
---===============0799844275251560752==--
+--===============4471424450906664411==--
 
