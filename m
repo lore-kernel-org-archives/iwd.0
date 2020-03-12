@@ -1,68 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============4471424450906664411=="
+Content-Type: multipart/mixed; boundary="===============5107138444825147813=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] netdev: update use of l_rtnl_set_mac
-Date: Wed, 11 Mar 2020 18:52:51 -0400
-Message-ID: <20200311225251.1322818-1-prestwoj@gmail.com>
+From: iwd@goodbit.net
+Subject: DBus Systemd Unit Dependency
+Date: Thu, 12 Mar 2020 01:48:23 +0000
+Message-ID: <20200312014823.2753.66329@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4471424450906664411==
+--===============5107138444825147813==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This API was updated to take an extra boolean which will
-automatically power up the device while changing the MAC
-address. Since this is what IWD does anyways we can avoid
-the need for an intermediate callback and go right into
-netdev_initial_up_cb.
----
- src/netdev.c | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+My Arch linux laptop hangs 90 seconds during shutdown due to NFS client unm=
+ount timeouts.
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 846f7b07..35f2d7f0 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4137,20 +4137,6 @@ static void netdev_initial_up_cb(int error, uint16_t=
- type, const void *data,
- 	netdev->events_ready =3D true;
- }
- =
+Networking on this machine is WiFi only, controlled via iwd and systemd-net=
+workd.
+This is a day-one issue with iwd for me, and does not occur using wpa_suppl=
+icant.
 
--static void netdev_set_mac_cb(int error, uint16_t type, const void *data,
--					uint32_t len, void *user_data)
--{
--	struct netdev *netdev =3D user_data;
--
--	if (error)
--		l_error("Error setting mac address on %d: %s", netdev->index,
--			strerror(-error));
--
--	netdev->set_powered_cmd_id =3D
--		l_rtnl_set_powered(rtnl, netdev->index, true,
--					netdev_initial_up_cb, netdev, NULL);
--}
--
- static bool netdev_check_set_mac(struct netdev *netdev)
- {
- 	if (util_mem_is_zero(netdev->set_mac_once, 6))
-@@ -4159,8 +4145,8 @@ static bool netdev_check_set_mac(struct netdev *netde=
-v)
- 	l_debug("Setting initial address on ifindex: %d to: " MAC,
- 		netdev->index, MAC_STR(netdev->set_mac_once));
- 	netdev->set_powered_cmd_id =3D
--		l_rtnl_set_mac(rtnl, netdev->index, netdev->set_mac_once,
--				netdev_set_mac_cb, netdev, NULL);
-+		l_rtnl_set_mac(rtnl, netdev->index, netdev->set_mac_once, true,
-+				netdev_initial_up_cb, netdev, NULL);
- 	memset(netdev->set_mac_once, 0, 6);
- 	return true;
- }
--- =
+Digging into the logs, I see dbus being spontaneously killed prior to iwd g=
+racefully disconnecting.
+This of course causes iwd to prematurely terminate, causing my NFS unmount =
+hangs
 
-2.24.1
 
---===============4471424450906664411==--
+Mar 11 16:40:54 x360 iwd[465]: D-Bus disconnected, quitting...
+Mar 11 16:40:54 x360 iwd[465]: Removing scan context for wdev 2
+Mar 11 16:40:54 x360 systemd[1]: Stopping D-Bus System Message Bus...
+Mar 11 16:40:54 x360 kernel: wlan0: deauthenticating from c6:**:1f:**:65:**=
+ by local choice (Reason: 3=3DDEAUTH_LEAVING)
+Mar 11 16:40:54 x360 systemd[1]: dbus.service: Succeeded.
+Mar 11 16:40:54 x360 systemd[1]: Stopped D-Bus System Message Bus.
+Mar 11 16:40:54 x360 audit[1]: SERVICE_STOP pid=3D1 uid=3D0 auid=3D42949672=
+95 ses=3D4294967295 msg=3D'unit=3Ddbus comm=3D"systemd" e>
+Mar 11 16:40:54 x360 systemd[1]: Unmounting /mnt/fast...
+Mar 11 16:40:54 x360 systemd-networkd[421]: wlan0: Link DOWN
+...
+Mar 11 16:42:24 x360 systemd[1]: mnt-fast.mount: Unmounting timed out. Term=
+inating.
+Mar 11 16:42:24 x360 systemd[1]: mnt-fast.mount: Mount process exited, code=
+=3Dkilled, status=3D15/TERM
+Mar 11 16:42:24 x360 systemd[1]: mnt-fast.mount: Failed with result 'timeou=
+t'.
+
+
+The supplied iwd.service file does not specifically state dbus as a depende=
+ncy.
+(It happens to work because dbus always started very early)
+I have corrected my shutdown hang issue using the following override:
+
+
+$ cat /etc/systemd/system/iwd.service.d/override.conf
+[Unit]
+BindsTo=3Ddbus.service
+After=3Ddbus.service
+--===============5107138444825147813==--
 
