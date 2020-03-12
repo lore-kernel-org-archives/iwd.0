@@ -1,36 +1,78 @@
-Content-Type: multipart/mixed; boundary="===============7817511699341488155=="
+Content-Type: multipart/mixed; boundary="===============1072027286618709760=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] netdev: update use of l_rtnl_set_mac
-Date: Thu, 12 Mar 2020 10:47:04 -0500
-Message-ID: <9859fa53-2b51-92ab-6267-87ad845be8eb@gmail.com>
-In-Reply-To: <20200311225251.1322818-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] test-runner: fix crash if ofono is not installed
+Date: Thu, 12 Mar 2020 17:49:34 -0400
+Message-ID: <20200312214934.1396794-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7817511699341488155==
+--===============1072027286618709760==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+The goto was jumping to a label which freed the wiphy list which
+had not yet been initialized. This also fixes another similar issue
+if chdir fails (in this case tmpfs_extra_stuff would get freed
+before being allocated).
+---
+ tools/test-runner.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-On 3/11/20 5:52 PM, James Prestwood wrote:
-> This API was updated to take an extra boolean which will
-> automatically power up the device while changing the MAC
-> address. Since this is what IWD does anyways we can avoid
-> the need for an intermediate callback and go right into
-> netdev_initial_up_cb.
-> ---
->   src/netdev.c | 18 ++----------------
->   1 file changed, 2 insertions(+), 16 deletions(-)
-> =
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 34a94ed7..04c4265f 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -2075,7 +2075,7 @@ static void create_network_and_run_tests(void *data, =
+void *user_data)
+ 	if (chdir(config_dir_path) < 0) {
+ 		l_error("Failed to change to test directory: %s",
+ 							strerror(errno));
+-		goto exit_hwsim;
++		goto free_hw_settings;
+ 	}
+ =
 
+ 	tmpfs_extra_stuff =3D
+@@ -2099,7 +2099,7 @@ static void create_network_and_run_tests(void *data, =
+void *user_data)
+ =
 
-Applied, thanks.
+ 			if (!ofono_found || !phonesim_found) {
+ 				l_info("ofono or phonesim not found, skipping");
+-				goto exit_hwsim;
++				goto free_tmpfs_extra;
+ 			}
+ =
 
-Regards,
--Denis
+ 			ofono_req =3D true;
+@@ -2270,7 +2270,6 @@ exit_hostapd:
+ remove_abs_paths:
+ 	remove_absolute_path_dirs(tmpfs_extra_stuff);
+ =
 
---===============7817511699341488155==--
+-exit_hwsim:
+ 	/*
+ 	 * If running in hwsim mode, we want to completely free/destroy the
+ 	 * wiphy list since it will be re-populated on the next test. For the
+@@ -2282,8 +2281,10 @@ exit_hwsim:
+ 	else
+ 		l_queue_foreach(wiphy_list, wiphy_reset, NULL);
+ =
+
+-	l_settings_free(hw_settings);
++free_tmpfs_extra:
+ 	l_strfreev(tmpfs_extra_stuff);
++free_hw_settings:
++	l_settings_free(hw_settings);
+ }
+ =
+
+ struct stat_totals {
+-- =
+
+2.24.1
+
+--===============1072027286618709760==--
 
