@@ -1,13 +1,13 @@
-Content-Type: multipart/mixed; boundary="===============1072027286618709760=="
+Content-Type: multipart/mixed; boundary="===============3266702320653448975=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] test-runner: fix crash if ofono is not installed
-Date: Thu, 12 Mar 2020 17:49:34 -0400
-Message-ID: <20200312214934.1396794-1-prestwoj@gmail.com>
+Subject: [PATCH 1/4] test-runner: fix crash if ofono is not installed
+Date: Mon, 16 Mar 2020 12:22:39 -0700
+Message-ID: <20200316192242.15588-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1072027286618709760==
+--===============3266702320653448975==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -21,10 +21,10 @@ before being allocated).
  1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 34a94ed7..04c4265f 100644
+index 804a1038..42bd60e2 100644
 --- a/tools/test-runner.c
 +++ b/tools/test-runner.c
-@@ -2075,7 +2075,7 @@ static void create_network_and_run_tests(void *data, =
+@@ -2073,7 +2073,7 @@ static void create_network_and_run_tests(void *data, =
 void *user_data)
  	if (chdir(config_dir_path) < 0) {
  		l_error("Failed to change to test directory: %s",
@@ -35,7 +35,7 @@ void *user_data)
  =
 
  	tmpfs_extra_stuff =3D
-@@ -2099,7 +2099,7 @@ static void create_network_and_run_tests(void *data, =
+@@ -2097,7 +2097,7 @@ static void create_network_and_run_tests(void *data, =
 void *user_data)
  =
 
@@ -47,7 +47,7 @@ void *user_data)
  =
 
  			ofono_req =3D true;
-@@ -2270,7 +2270,6 @@ exit_hostapd:
+@@ -2268,7 +2268,6 @@ exit_hostapd:
  remove_abs_paths:
  	remove_absolute_path_dirs(tmpfs_extra_stuff);
  =
@@ -56,7 +56,7 @@ void *user_data)
  	/*
  	 * If running in hwsim mode, we want to completely free/destroy the
  	 * wiphy list since it will be re-populated on the next test. For the
-@@ -2282,8 +2281,10 @@ exit_hwsim:
+@@ -2280,8 +2279,10 @@ exit_hwsim:
  	else
  		l_queue_foreach(wiphy_list, wiphy_reset, NULL);
  =
@@ -72,7 +72,7 @@ void *user_data)
  struct stat_totals {
 -- =
 
-2.24.1
+2.21.1
 
---===============1072027286618709760==--
+--===============3266702320653448975==--
 
