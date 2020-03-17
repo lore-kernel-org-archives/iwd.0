@@ -1,126 +1,350 @@
-Content-Type: multipart/mixed; boundary="===============5106208866630353147=="
+Content-Type: multipart/mixed; boundary="===============8031824950342825613=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/7] wiphy: add _generate_address_from_ssid
-Date: Tue, 17 Mar 2020 10:38:51 -0700
-Message-ID: <20200317173855.19680-3-prestwoj@gmail.com>
+Subject: [PATCH 4/7] netdev: support per-network MAC addresses
+Date: Tue, 17 Mar 2020 10:38:52 -0700
+Message-ID: <20200317173855.19680-4-prestwoj@gmail.com>
 In-Reply-To: <20200317173855.19680-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5106208866630353147==
+--===============8031824950342825613==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This API is being added to support per-network MAC address
-generation. The MAC is generated based on the network SSID
-and the adapters permanent address using HMAC-SHA256. The
-SHA digest is then constrained to make it MAC address
-compliant.
+For privacy reasons its advantageous to randomize or mask
+the MAC address when connecting to networks, especially public
+networks.
 
-Generating the MAC address like this will ensure that the
-MAC remains the same each time a given SSID is connected to.
+This patch allows netdev to generate a new MAC address on a
+per-network basis. The generated MAC will remain the same when
+connecting to the same network. This allows reauthentications
+or roaming to work, and not have to fully re-connect (which would
+be required if the MAC changed on every connection).
+
+Changing the MAC requires bringing the interface down. This does
+lead to potential race conditions with respect to external
+processes. There are two potential conditions which are explained
+in a TODO comment in this patch.
 ---
- src/wiphy.c | 36 ++++++++++++++++++++++++++++++++----
- src/wiphy.h |  2 ++
- 2 files changed, 34 insertions(+), 4 deletions(-)
+ src/netdev.c | 219 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 206 insertions(+), 13 deletions(-)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index e0929c09..101e94d0 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -435,12 +435,10 @@ const uint8_t *wiphy_get_rm_enabled_capabilities(stru=
-ct wiphy *wiphy)
- 	return wiphy->rm_enabled_capabilities;
+diff --git a/src/netdev.c b/src/netdev.c
+index 7aed9da5..72bd5e11 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -109,6 +109,7 @@ struct netdev {
+ 	uint32_t set_interface_cmd_id;
+ 	uint32_t rekey_offload_cmd_id;
+ 	uint32_t qos_map_cmd_id;
++	uint32_t mac_change_cmd_id;
+ 	enum netdev_result result;
+ 	uint16_t last_code; /* reason or status, depending on result */
+ 	struct l_timeout *neighbor_report_timeout;
+@@ -146,6 +147,7 @@ struct netdev {
+ 	bool expect_connect_failure : 1;
+ 	bool aborting : 1;
+ 	bool events_ready : 1;
++	bool mac_per_ssid : 1;
+ };
+ =
+
+ struct netdev_preauth_state {
+@@ -613,6 +615,11 @@ static void netdev_free(void *data)
+ 		netdev->qos_map_cmd_id =3D 0;
+ 	}
+ =
+
++	if (netdev->mac_change_cmd_id) {
++		l_netlink_cancel(rtnl, netdev->mac_change_cmd_id);
++		netdev->mac_change_cmd_id =3D 0;
++	}
++
+ 	if (netdev->events_ready)
+ 		WATCHLIST_NOTIFY(&netdev_watches, netdev_watch_func_t,
+ 					netdev, NETDEV_WATCH_EVENT_DEL);
+@@ -2377,13 +2384,15 @@ static struct l_genl_msg *netdev_build_cmd_connect(=
+struct netdev *netdev,
+ 	return msg;
  }
  =
 
--void wiphy_generate_random_address(struct wiphy *wiphy, uint8_t addr[stati=
-c 6])
-+static void wiphy_address_constrain(struct wiphy *wiphy, uint8_t addr[stat=
-ic 6])
+-static int netdev_connect_common(struct netdev *netdev,
+-					struct l_genl_msg *cmd_connect,
+-					struct scan_bss *bss,
+-					struct handshake_state *hs,
+-					struct eapol_sm *sm,
+-					netdev_event_func_t event_filter,
+-					netdev_connect_cb_t cb, void *user_data)
++struct rtnl_data {
++	struct netdev *netdev;
++	struct l_genl_msg *cmd_connect;
++	uint8_t addr[ETH_ALEN];
++	int ref;
++};
++
++static int netdev_begin_connection(struct netdev *netdev,
++					struct l_genl_msg *cmd_connect)
  {
- 	switch (mac_randomize_bytes) {
- 	case 6:
--		l_getrandom(addr, 6);
--
- 		/* Set the locally administered bit */
- 		addr[0] |=3D 0x2;
+ 	if (cmd_connect) {
+ 		netdev->connect_cmd_id =3D l_genl_family_send(nl80211,
+@@ -2396,6 +2405,176 @@ static int netdev_connect_common(struct netdev *net=
+dev,
+ 		}
+ 	}
  =
 
-@@ -448,7 +446,6 @@ void wiphy_generate_random_address(struct wiphy *wiphy,=
- uint8_t addr[static 6])
- 		addr[0] &=3D 0xfe;
++	handshake_state_set_supplicant_address(netdev->handshake, netdev->addr);
++
++	/* set connected since the auth protocols cannot do so internally */
++	if (netdev->ap && auth_proto_start(netdev->ap))
++		netdev->connected =3D true;
++
++	return 0;
++}
++
++static void netdev_mac_change_failed(struct netdev *netdev,
++					struct rtnl_data *req, int error)
++{
++	l_error("Error setting mac address on %d: %s", netdev->index,
++			strerror(-error));
++
++	l_genl_msg_unref(req->cmd_connect);
++	netdev->mac_change_cmd_id =3D 0;
++
++	netdev_connect_failed(netdev, NETDEV_RESULT_SET_MAC_FAILED,
++					MMPDU_REASON_CODE_UNSPECIFIED);
++
++	/*
++	 * If the interface is down and we failed to up it we need to notify
++	 * any watchers since we have been skipping the notification while
++	 * mac_change_cmd_id was set.
++	 */
++	if (!netdev_get_is_up(netdev))
++		WATCHLIST_NOTIFY(&netdev_watches, netdev_watch_func_t,
++				netdev, NETDEV_WATCH_EVENT_DOWN);
++
++}
++
++static void netdev_mac_destroy(void *user_data)
++{
++	struct rtnl_data *req =3D user_data;
++
++	req->ref--;
++
++	/* still pending requests? */
++	if (req->ref)
++		return;
++
++	l_free(req);
++}
++
++static void netdev_mac_power_up_cb(int error, uint16_t type,
++					const void *data, uint32_t len,
++					void *user_data)
++{
++	struct rtnl_data *req =3D user_data;
++	struct netdev *netdev =3D req->netdev;
++
++	netdev->mac_change_cmd_id =3D 0;
++
++	if (error) {
++		l_error("Error taking interface %u up for per-network MAC "
++			"generation: %s", netdev->index, strerror(-error));
++		netdev_mac_change_failed(netdev, req, error);
++		return;
++	}
++
++	/*
++	 * Pick up where we left off in netdev_connect_commmon.
++	 */
++	if (netdev_begin_connection(netdev, req->cmd_connect) < 0) {
++		l_error("Failed to connect after changing MAC");
++		netdev_connect_failed(netdev, NETDEV_RESULT_ASSOCIATION_FAILED,
++				MMPDU_STATUS_CODE_UNSPECIFIED);
++	}
++}
++
++static void netdev_mac_power_down_cb(int error, uint16_t type,
++					const void *data, uint32_t len,
++					void *user_data)
++{
++	struct rtnl_data *req =3D user_data;
++	struct netdev *netdev =3D req->netdev;
++
++	if (error) {
++		l_error("Error taking interface %u down for per-network MAC "
++			"generation: %s", netdev->index, strerror(-error));
++		netdev_mac_change_failed(netdev, req, error);
++		return;
++	}
++
++	req->ref++;
++
++	l_debug("Setting generated address on ifindex: %d to: "MAC,
++					netdev->index, MAC_STR(req->addr));
++	netdev->mac_change_cmd_id =3D l_rtnl_set_mac(rtnl, netdev->index,
++					req->addr, true,
++					netdev_mac_power_up_cb, req,
++					netdev_mac_destroy);
++	if (!netdev->mac_change_cmd_id) {
++		req->ref--;
++		netdev_mac_change_failed(netdev, req, -EIO);
++	}
++}
++
++/*
++ * TODO: There are some potential race conditions that are being ignored. =
+There
++ *       is nothing that IWD itself can do to solve these, they require ke=
+rnel
++ *       changes:
++ *
++ * 1. A perfectly timed ifdown could be ignored. If an external process
++ *    brings down an interface just before calling this function we would =
+only
++ *    get a single newlink event since there is no state change doing a se=
+cond
++ *    ifdown (nor an error from the kernel). This newlink event would be i=
+gnored
++ *    since IWD thinks its from our own doing. This would result in IWD ch=
+anging
++ *    the MAC and bringing the interface back up which would look very str=
+ange
++ *    and unexpected to someone who just tried to ifdown an interface.
++ *
++ * 2. A perfectly timed ifup could result in a failed connection. If an ex=
+ternal
++ *    process ifup's just after IWD ifdown's but before changing the MAC t=
+his
++ *    would cause the MAC change to fail. This failure would result in a f=
+ailed
++ *    connection.
++ *
++ * Returns 0 if a MAC change procedure was started.
++ * Returns -EALREADY if the requested MAC matched our current MAC
++ * Returns -EIO if there was an IO error when powering down
++ */
++static int netdev_start_powered_mac_change(struct netdev *netdev,
++					struct scan_bss *bss,
++					struct l_genl_msg *cmd_connect)
++{
++	struct rtnl_data *req;
++	uint8_t new_addr[6];
++
++	wiphy_generate_address_from_ssid(netdev->wiphy, (const char *)bss->ssid,
++						new_addr);
++
++	/*
++	 * MAC has already been changed previously, no need to again
++	 */
++	if (!memcmp(new_addr, netdev->addr, sizeof(new_addr)))
++		return -EALREADY;
++
++	req =3D l_new(struct rtnl_data, 1);
++	req->netdev =3D netdev;
++	/* This message will need to be unreffed upon any error */
++	req->cmd_connect =3D cmd_connect;
++	req->ref++;
++	memcpy(req->addr, new_addr, sizeof(req->addr));
++
++	netdev->mac_change_cmd_id =3D l_rtnl_set_powered(rtnl, netdev->index,
++					false, netdev_mac_power_down_cb,
++					req, netdev_mac_destroy);
++
++	if (!netdev->mac_change_cmd_id) {
++		l_genl_msg_unref(req->cmd_connect);
++		l_free(req);
++		/*
++		 * If the user is requiring MAC randomization/hashing we should
++		 * not allow a connection if setting this MAC failed.
++		 */
++		netdev_mac_change_failed(netdev, req, -EIO);
++		return -EIO;
++	}
++
++	return 0;
++}
++
++static int netdev_connect_common(struct netdev *netdev,
++					struct l_genl_msg *cmd_connect,
++					struct scan_bss *bss,
++					struct handshake_state *hs,
++					struct eapol_sm *sm,
++					netdev_event_func_t event_filter,
++					netdev_connect_cb_t cb, void *user_data)
++{
+ 	netdev->event_filter =3D event_filter;
+ 	netdev->connect_cb =3D cb;
+ 	netdev->user_data =3D user_data;
+@@ -2407,17 +2586,21 @@ static int netdev_connect_common(struct netdev *net=
+dev,
+ 	netdev_rssi_level_init(netdev);
+ =
+
+ 	handshake_state_set_authenticator_address(hs, bss->addr);
+-	handshake_state_set_supplicant_address(hs, netdev->addr);
+ =
+
+ 	if (!wiphy_has_ext_feature(netdev->wiphy,
+ 					NL80211_EXT_FEATURE_CAN_REPLACE_PTK0))
+ 		handshake_state_set_no_rekey(hs, true);
+ =
+
+-	/* set connected since the auth protocols cannot do so internally */
+-	if (netdev->ap && auth_proto_start(netdev->ap))
+-		netdev->connected =3D true;
++	if (netdev->mac_per_ssid) {
++		int ret =3D netdev_start_powered_mac_change(netdev, bss,
++								cmd_connect);
++		if (ret =3D=3D 0)
++			return 0;
++		else if (ret !=3D -EALREADY)
++			return ret;
++	}
+ =
+
+-	return 0;
++	return netdev_begin_connection(netdev, cmd_connect);
+ }
+ =
+
+ int netdev_connect(struct netdev *netdev, struct scan_bss *bss,
+@@ -4071,7 +4254,14 @@ static void netdev_newlink_notify(const struct ifinf=
+omsg *ifi, int bytes)
+ =
+
+ 	new_up =3D netdev_get_is_up(netdev);
+ =
+
+-	if (old_up !=3D new_up)
++	/*
++	 * If mac_change_cmd_id is set we are in the process of changing the
++	 * MAC address and this event is a result of powering down/up. In this
++	 * case we do not want to emit a netdev DOWN/UP event as this would
++	 * cause other modules to behave as such. We do, however, want to emit
++	 * address changes so other modules get the new MAC address updated.
++	 */
++	if (old_up !=3D new_up && !netdev->mac_change_cmd_id)
+ 		WATCHLIST_NOTIFY(&netdev_watches, netdev_watch_func_t,
+ 				netdev, new_up ? NETDEV_WATCH_EVENT_UP :
+ 						NETDEV_WATCH_EVENT_DOWN);
+@@ -4342,6 +4532,9 @@ struct netdev *netdev_create_from_genl(struct l_genl_=
+msg *msg,
+ 		wiphy_generate_random_address(netdev->wiphy,
+ 						netdev->set_mac_once);
  		break;
- 	case 3:
--		l_getrandom(addr + 3, 3);
- 		memcpy(addr, wiphy->permanent_addr, 3);
++	case NETDEV_SET_MAC_NETWORK:
++		netdev->mac_per_ssid =3D true;
++		break;
+ 	default:
  		break;
  	}
-@@ -464,6 +461,37 @@ void wiphy_generate_random_address(struct wiphy *wiphy=
-, uint8_t addr[static 6])
- 		addr[5] =3D 0x01;
- }
- =
-
-+void wiphy_generate_random_address(struct wiphy *wiphy, uint8_t addr[stati=
-c 6])
-+{
-+	switch (mac_randomize_bytes) {
-+	case 6:
-+		l_getrandom(addr, 6);
-+		break;
-+	case 3:
-+		l_getrandom(addr + 3, 3);
-+		break;
-+	}
-+
-+	wiphy_address_constrain(wiphy, addr);
-+}
-+
-+void wiphy_generate_address_from_ssid(struct wiphy *wiphy, const char *ssi=
-d,
-+					uint8_t addr[static 6])
-+{
-+	switch (mac_randomize_bytes) {
-+	case 6:
-+		hmac_sha256(ssid, strlen(ssid), wiphy->permanent_addr,
-+				sizeof(wiphy->permanent_addr), addr, ETH_ALEN);
-+		break;
-+	case 3:
-+		hmac_sha256(ssid, strlen(ssid), wiphy->permanent_addr,
-+				sizeof(wiphy->permanent_addr), addr + 3, 3);
-+		break;
-+	}
-+
-+	wiphy_address_constrain(wiphy, addr);
-+}
-+
- bool wiphy_constrain_freq_set(const struct wiphy *wiphy,
- 						struct scan_freq_set *set)
- {
-diff --git a/src/wiphy.h b/src/wiphy.h
-index dff0e1bd..4d2a4e8f 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -82,6 +82,8 @@ const uint8_t *wiphy_get_extended_capabilities(struct wip=
-hy *wiphy,
- const uint8_t *wiphy_get_rm_enabled_capabilities(struct wiphy *wiphy);
- =
-
- void wiphy_generate_random_address(struct wiphy *wiphy, uint8_t addr[stati=
-c 6]);
-+void wiphy_generate_address_from_ssid(struct wiphy *wiphy, const char *ssi=
-d,
-+					uint8_t addr[static 6]);
- =
-
- uint32_t wiphy_state_watch_add(struct wiphy *wiphy,
- 				wiphy_state_watch_func_t func, void *user_data,
 -- =
 
 2.21.1
 
---===============5106208866630353147==--
+--===============8031824950342825613==--
 
