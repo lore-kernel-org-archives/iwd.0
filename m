@@ -1,42 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============7505280564233028505=="
+Content-Type: multipart/mixed; boundary="===============4737854326552203915=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/7] manager: add 'network' option to AddressRandomization
-Date: Tue, 17 Mar 2020 10:38:53 -0700
-Message-ID: <20200317173855.19680-5-prestwoj@gmail.com>
+Subject: [PATCH 6/7] station: print error message if setting MAC failed
+Date: Tue, 17 Mar 2020 10:38:54 -0700
+Message-ID: <20200317173855.19680-6-prestwoj@gmail.com>
 In-Reply-To: <20200317173855.19680-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7505280564233028505==
+--===============4737854326552203915==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-To enable per-network address randomization a new value was added to
-the AddressRandomization option. Providing a value of 'network' will
-cause the device to generate and set a new MAC address based on the
-SSID of the network being connected to.
+This is to provide a better hint to a user of exactly what went
+wrong since the error is not related to the actual connection
+attmempt, and rather some kind of kernel problem.
 ---
- src/manager.c | 2 ++
- 1 file changed, 2 insertions(+)
+ src/station.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/manager.c b/src/manager.c
-index 05f61b6f..994e70e4 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -748,6 +748,8 @@ static int manager_init(void)
- 			mac_type =3D NETDEV_SET_MAC_ONCE;
- 		else if (!strcmp(randomize_str, "disabled"))
- 			mac_type =3D NETDEV_SET_MAC_DISABLED;
-+		else if (!strcmp(randomize_str, "network"))
-+			mac_type =3D NETDEV_SET_MAC_NETWORK;
- 		else
- 			l_warn("Invalid [General].AddressRandomization"
- 				" value: %s", randomize_str);
+diff --git a/src/station.c b/src/station.c
+index 6ec7eb4b..cd93b97c 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2251,6 +2251,10 @@ static void station_connect_cb(struct netdev *netdev=
+, enum netdev_result result,
+ 			return;
+ =
+
+ 		break;
++	case NETDEV_RESULT_SET_MAC_FAILED:
++		l_error("failed to set MAC address during connection, try "
++			" turning off AddressRandomization=3Dnetwork option");
++		break;
+ 	default:
+ 		break;
+ 	}
 -- =
 
 2.21.1
 
---===============7505280564233028505==--
+--===============4737854326552203915==--
 
