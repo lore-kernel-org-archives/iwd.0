@@ -1,58 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============8503955795195987953=="
+Content-Type: multipart/mixed; boundary="===============1832381759317346538=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 01/12] doc: Fix p2p method error names
-Date: Wed, 18 Mar 2020 15:45:20 +0100
-Message-ID: <20200318144531.30613-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 02/12] cleanup: Remove extra empty lines
+Date: Wed, 18 Mar 2020 15:45:21 +0100
+Message-ID: <20200318144531.30613-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20200318144531.30613-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8503955795195987953==
+--===============1832381759317346538==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- doc/p2p-api.txt      | 2 +-
- doc/p2p-peer-api.txt | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ src/eap-mschapv2.h | 1 -
+ src/eap-pwd.c      | 1 -
+ src/ie.c           | 1 -
+ 3 files changed, 3 deletions(-)
 
-diff --git a/doc/p2p-api.txt b/doc/p2p-api.txt
-index cca0f39f..08ee8d92 100644
---- a/doc/p2p-api.txt
-+++ b/doc/p2p-api.txt
-@@ -40,7 +40,7 @@ Methods		array(on) GetPeers()
- 			discovered peer devices to avoid keeping the Wi-Fi
- 			adapter occupied unnecessarily.
+diff --git a/src/eap-mschapv2.h b/src/eap-mschapv2.h
+index 6b090969..d1f4fd53 100644
+--- a/src/eap-mschapv2.h
++++ b/src/eap-mschapv2.h
+@@ -28,7 +28,6 @@
+ #include <stdint.h>
+ #include <stdbool.h>
  =
 
--			Possible errors: [service].Error.NotAvailable
-+			Possible errors: [service].Error.NotFound
+-
+ bool mschapv2_get_asymmetric_start_key(const uint8_t master_key[static 16],
+ 				uint8_t *session_key, size_t session_len,
+ 				bool server, bool send);
+diff --git a/src/eap-pwd.c b/src/eap-pwd.c
+index 74d0997f..a77f21b9 100644
+--- a/src/eap-pwd.c
++++ b/src/eap-pwd.c
+@@ -435,7 +435,6 @@ error:
+ 	eap_method_error(eap);
+ }
  =
 
- 		void RegisterSignalLevelAgent(object path,
- 						 array(int16) levels)
-diff --git a/doc/p2p-peer-api.txt b/doc/p2p-peer-api.txt
-index 2245b2e3..f52717aa 100644
---- a/doc/p2p-peer-api.txt
-+++ b/doc/p2p-peer-api.txt
-@@ -12,8 +12,8 @@ Methods		Disconnect()
- 			the net.connman.iwd.SimpleConfiguration interface
- 			on the same object -- see wsc-api.txt.
+-
+ static void eap_pwd_handle_confirm(struct eap_state *eap,
+ 					const uint8_t *pkt, size_t len)
+ {
+diff --git a/src/ie.c b/src/ie.c
+index 9b1127ce..f120c89e 100644
+--- a/src/ie.c
++++ b/src/ie.c
+@@ -2406,7 +2406,6 @@ int ie_parse_neighbor_report(struct ie_tlv_iter *iter,
+ 	return 0;
+ }
  =
 
--			Possible errors: [service].Failed
--					 [service].NotConnected
-+			Possible errors: [service].Error.Failed
-+					 [service].Error.NotConnected
- =
-
- Properties	string Name [readonly]
- =
-
+-
+ int ie_parse_roaming_consortium(struct ie_tlv_iter *iter, size_t *num_anqp=
+_out,
+ 				const uint8_t **oi1_out, size_t *oi1_len_out,
+ 				const uint8_t **oi2_out, size_t *oi2_len_out,
 -- =
 
 2.20.1
 
---===============8503955795195987953==--
+--===============1832381759317346538==--
 
