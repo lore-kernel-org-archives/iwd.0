@@ -1,61 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============7968755565349641906=="
+Content-Type: multipart/mixed; boundary="===============4950396147247720008=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 4/4] doc: document AddressRandomization=network option
-Date: Wed, 18 Mar 2020 11:54:20 -0700
-Message-ID: <20200318185420.11432-4-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v3 1/4] wiphy: add _generate_address_from_ssid
+Date: Wed, 18 Mar 2020 13:10:54 -0500
+Message-ID: <2fcf7527-d86b-2f26-8480-f96deb403dcb@gmail.com>
 In-Reply-To: <20200318185420.11432-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7968755565349641906==
+--===============4950396147247720008==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/iwd.config.rst | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index dd04909c..96774092 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -82,7 +82,7 @@ The group ``[General]`` contains general settings.
-        this setting.
- =
+On 3/18/20 1:54 PM, James Prestwood wrote:
+> This API is being added to support per-network MAC address
+> generation. The MAC is generated based on the network SSID
+> and the adapters permanent address using HMAC-SHA256. The
+> SHA digest is then constrained to make it MAC address
+> compliant.
+> =
 
-    * - AddressRandomization
--     - Values: **disabled**, once
-+     - Values: **disabled**, once, network
- =
+> Generating the MAC address like this will ensure that the
+> MAC remains the same each time a given SSID is connected to.
+> ---
+>   src/wiphy.c | 34 ++++++++++++++++++++++++++++++----
+>   src/wiphy.h |  2 ++
+>   2 files changed, 32 insertions(+), 4 deletions(-)
+> =
 
-        If ``AddressRandomization`` is set to ``disabled``, the default ker=
-nel
-        behavior is used.  This means the kernel will assign a mac address =
-from
-@@ -94,6 +94,12 @@ The group ``[General]`` contains general settings.
-        randomized a single time when **iwd** starts or when the hardware is
-        detected for the first time (due to hotplug, etc.)
- =
 
-+       If ``AddressRandomization`` is set to ``network``, the MAC address =
-is
-+       randomized on each connection to a network. The MAC is generated ba=
-sed on
-+       the SSID and permanent address of the adapter. This allows the same=
- MAC
-+       to be generated each time connecting to a given SSID while still hi=
-ding
-+       the permanent address.
-+
-    * - AddressRandomizationRange
-      - Values: **full**, nic
- =
+All applied, thanks.
 
--- =
+Regards,
+-Denis
 
-2.21.1
-
---===============7968755565349641906==--
+--===============4950396147247720008==--
 
