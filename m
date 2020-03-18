@@ -1,61 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============6240539614872835821=="
+Content-Type: multipart/mixed; boundary="===============8503955795195987953=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/7] doc: document AddressRandomization=network option
-Date: Tue, 17 Mar 2020 10:38:55 -0700
-Message-ID: <20200317173855.19680-7-prestwoj@gmail.com>
-In-Reply-To: <20200317173855.19680-1-prestwoj@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 01/12] doc: Fix p2p method error names
+Date: Wed, 18 Mar 2020 15:45:20 +0100
+Message-ID: <20200318144531.30613-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6240539614872835821==
+--===============8503955795195987953==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/iwd.config.rst | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ doc/p2p-api.txt      | 2 +-
+ doc/p2p-peer-api.txt | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index dd04909c..96774092 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -82,7 +82,7 @@ The group ``[General]`` contains general settings.
-        this setting.
+diff --git a/doc/p2p-api.txt b/doc/p2p-api.txt
+index cca0f39f..08ee8d92 100644
+--- a/doc/p2p-api.txt
++++ b/doc/p2p-api.txt
+@@ -40,7 +40,7 @@ Methods		array(on) GetPeers()
+ 			discovered peer devices to avoid keeping the Wi-Fi
+ 			adapter occupied unnecessarily.
  =
 
-    * - AddressRandomization
--     - Values: **disabled**, once
-+     - Values: **disabled**, once, network
+-			Possible errors: [service].Error.NotAvailable
++			Possible errors: [service].Error.NotFound
  =
 
-        If ``AddressRandomization`` is set to ``disabled``, the default ker=
-nel
-        behavior is used.  This means the kernel will assign a mac address =
-from
-@@ -94,6 +94,12 @@ The group ``[General]`` contains general settings.
-        randomized a single time when **iwd** starts or when the hardware is
-        detected for the first time (due to hotplug, etc.)
+ 		void RegisterSignalLevelAgent(object path,
+ 						 array(int16) levels)
+diff --git a/doc/p2p-peer-api.txt b/doc/p2p-peer-api.txt
+index 2245b2e3..f52717aa 100644
+--- a/doc/p2p-peer-api.txt
++++ b/doc/p2p-peer-api.txt
+@@ -12,8 +12,8 @@ Methods		Disconnect()
+ 			the net.connman.iwd.SimpleConfiguration interface
+ 			on the same object -- see wsc-api.txt.
  =
 
-+       If ``AddressRandomization`` is set to ``network``, the MAC address =
-is
-+       randomized on each connection to a network. The MAC is generated ba=
-sed on
-+       the SSID and permanent address of the adapter. This allows the same=
- MAC
-+       to be generated each time connecting to a given SSID while still hi=
-ding
-+       the permanent address.
-+
-    * - AddressRandomizationRange
-      - Values: **full**, nic
+-			Possible errors: [service].Failed
+-					 [service].NotConnected
++			Possible errors: [service].Error.Failed
++					 [service].Error.NotConnected
+ =
+
+ Properties	string Name [readonly]
  =
 
 -- =
 
-2.21.1
+2.20.1
 
---===============6240539614872835821==--
+--===============8503955795195987953==--
 
