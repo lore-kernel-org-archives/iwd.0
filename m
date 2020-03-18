@@ -1,41 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============4950396147247720008=="
+Content-Type: multipart/mixed; boundary="===============3604116342883397514=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v3 1/4] wiphy: add _generate_address_from_ssid
-Date: Wed, 18 Mar 2020 13:10:54 -0500
-Message-ID: <2fcf7527-d86b-2f26-8480-f96deb403dcb@gmail.com>
-In-Reply-To: <20200318185420.11432-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 08/12] watchlist: Allow watch CBs to call watchlist_destroy
+Date: Wed, 18 Mar 2020 13:50:51 -0500
+Message-ID: <b53d2f4f-fdc5-1aac-d62c-d8a017bac4b7@gmail.com>
+In-Reply-To: <20200318144531.30613-8-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4950396147247720008==
+--===============3604116342883397514==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Andrew,
 
-On 3/18/20 1:54 PM, James Prestwood wrote:
-> This API is being added to support per-network MAC address
-> generation. The MAC is generated based on the network SSID
-> and the adapters permanent address using HMAC-SHA256. The
-> SHA digest is then constrained to make it MAC address
-> compliant.
-> =
-
-> Generating the MAC address like this will ensure that the
-> MAC remains the same each time a given SSID is connected to.
+On 3/18/20 9:45 AM, Andrew Zaborowski wrote:
+> If during WATCHLIST_NOTIFY{,_MATCHES,_NO_ARGS} one of the watch
+> notify callback triggers a call to watchlist_destroy, give up calling
+> remaining watches and destroy the watchlist without crashing.  This is
+> useful in frame-xchg.c (P2P use case) where a frame watch may trigger
+> a move to a new state after receiving a specific frame, and remove one
+> group of frame watches (including its watchlist) to create a different
+> group.
 > ---
->   src/wiphy.c | 34 ++++++++++++++++++++++++++++++----
->   src/wiphy.h |  2 ++
->   2 files changed, 32 insertions(+), 4 deletions(-)
+>   src/watchlist.c |  5 +++++
+>   src/watchlist.h | 22 ++++++++++++++++++----
+>   2 files changed, 23 insertions(+), 4 deletions(-)
 > =
 
 
-All applied, thanks.
+Patch 8, 9 and 12 applied, thanks.
 
 Regards,
 -Denis
 
---===============4950396147247720008==--
+--===============3604116342883397514==--
 
