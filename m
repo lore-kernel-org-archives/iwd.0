@@ -1,83 +1,116 @@
-Content-Type: multipart/mixed; boundary="===============1496843714964608881=="
+Content-Type: multipart/mixed; boundary="===============5834174619995456271=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 07/12] frame-xchg: Allow frame_xchg_stop calls inside frame
- callbacks
-Date: Wed, 18 Mar 2020 15:45:26 +0100
-Message-ID: <20200318144531.30613-7-andrew.zaborowski@intel.com>
+Subject: [PATCH 08/12] watchlist: Allow watch CBs to call watchlist_destroy
+Date: Wed, 18 Mar 2020 15:45:27 +0100
+Message-ID: <20200318144531.30613-8-andrew.zaborowski@intel.com>
 In-Reply-To: <20200318144531.30613-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1496843714964608881==
+--===============5834174619995456271==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Make sure a frame callback is free to call frame_xchg_stop without
-causing a crash.  Frame callback here means the one that gets
-called if our tx frame was ACKed and triggered a respone frame that
-matched one of the provided prefixes, within the given time.
-
-All in all a frame callback is allowed to call either
-frame_xchg_stop or frame_xchg_startv or neither.  Same applies to
-the final callback (called when no matching responses received).
+If during WATCHLIST_NOTIFY{,_MATCHES,_NO_ARGS} one of the watch
+notify callback triggers a call to watchlist_destroy, give up calling
+remaining watches and destroy the watchlist without crashing.  This is
+useful in frame-xchg.c (P2P use case) where a frame watch may trigger
+a move to a new state after receiving a specific frame, and remove one
+group of frame watches (including its watchlist) to create a different
+group.
 ---
- src/frame-xchg.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ src/watchlist.c |  5 +++++
+ src/watchlist.h | 22 ++++++++++++++++++----
+ 2 files changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/src/frame-xchg.c b/src/frame-xchg.c
-index 7b66cb6d..dd6d63ad 100644
---- a/src/frame-xchg.c
-+++ b/src/frame-xchg.c
-@@ -108,6 +108,7 @@ struct frame_xchg_data {
- 	unsigned int retry_interval;
- 	unsigned int resp_timeout;
- 	bool in_frame_cb : 1;
-+	bool stale : 1;
- };
+diff --git a/src/watchlist.c b/src/watchlist.c
+index 4f4d8259..a14476bd 100644
+--- a/src/watchlist.c
++++ b/src/watchlist.c
+@@ -127,6 +127,11 @@ static void __watchlist_clear(struct watchlist *watchl=
+ist)
  =
 
- struct frame_xchg_watch_data {
-@@ -725,6 +726,7 @@ static void frame_xchg_wait_cancel(struct frame_xchg_da=
-ta *fx)
- static void frame_xchg_reset(struct frame_xchg_data *fx)
+ void watchlist_destroy(struct watchlist *watchlist)
  {
- 	fx->in_frame_cb =3D false;
-+	fx->stale =3D false;
- =
-
- 	frame_xchg_wait_cancel(fx);
- =
-
-@@ -972,7 +974,7 @@ static void frame_xchg_resp_cb(const struct mmpdu_heade=
-r *mpdu,
- =
-
- 		fx->in_frame_cb =3D false;
- =
-
--		if (done) {
-+		if (done || fx->stale) {
- 			fx->cb =3D NULL;
- 			frame_xchg_done(fx, 0);
- 			return;
-@@ -1117,6 +1119,11 @@ void frame_xchg_stop(uint64_t wdev_id)
- 	if (!fx)
- 		return;
- =
-
-+	if (fx->in_frame_cb) {
-+		fx->stale =3D true;
++	if (watchlist->in_notify) {
++		watchlist->pending_destroy =3D true;
 +		return;
 +	}
 +
- 	frame_xchg_reset(fx);
- 	l_free(fx);
- }
+ 	__watchlist_clear(watchlist);
+ 	l_queue_destroy(watchlist->items, NULL);
+ 	watchlist->items =3D NULL;
+diff --git a/src/watchlist.h b/src/watchlist.h
+index cd408ac8..c3632859 100644
+--- a/src/watchlist.h
++++ b/src/watchlist.h
+@@ -38,6 +38,7 @@ struct watchlist {
+ 	struct l_queue *items;
+ 	bool in_notify : 1;
+ 	bool stale_items : 1;
++	bool pending_destroy : 1;
+ 	const struct watchlist_ops *ops;
+ };
+ =
+
+@@ -69,9 +70,13 @@ void __watchlist_prune_stale(struct watchlist *watchlist=
+);
+ 			if (item->id =3D=3D 0)				\
+ 				continue;				\
+ 			t(args, item->notify_data);			\
++			if ((watchlist)->pending_destroy)		\
++				break;					\
+ 		}							\
+ 		(watchlist)->in_notify =3D false;				\
+-		if ((watchlist)->stale_items)				\
++		if ((watchlist)->pending_destroy)			\
++			watchlist_destroy(watchlist);			\
++		else if ((watchlist)->stale_items)			\
+ 			__watchlist_prune_stale(watchlist);		\
+ 	} while	(false)							\
+ =
+
+@@ -91,9 +96,14 @@ void __watchlist_prune_stale(struct watchlist *watchlist=
+);
+ 				continue;				\
+ 									\
+ 			t(args, item->notify_data);			\
++									\
++			if ((watchlist)->pending_destroy)		\
++				break;					\
+ 		}							\
+ 		(watchlist)->in_notify =3D false;				\
+-		if ((watchlist)->stale_items)				\
++		if ((watchlist)->pending_destroy)			\
++			watchlist_destroy(watchlist);			\
++		else if ((watchlist)->stale_items)			\
+ 			__watchlist_prune_stale(watchlist);		\
+ 	} while	(false)
+ =
+
+@@ -108,9 +118,13 @@ void __watchlist_prune_stale(struct watchlist *watchli=
+st);
+ 			type t =3D item->notify;				\
+ 			if (item->id =3D=3D 0)				\
+ 				continue;				\
+-			t(item->notify_data);			\
++			t(item->notify_data);				\
++			if ((watchlist)->pending_destroy)		\
++				break;					\
+ 		}							\
+ 		(watchlist)->in_notify =3D false;				\
+-		if ((watchlist)->stale_items)				\
++		if ((watchlist)->pending_destroy)			\
++			watchlist_destroy(watchlist);			\
++		else if ((watchlist)->stale_items)			\
+ 			__watchlist_prune_stale(watchlist);		\
+ 	} while	(false)
 -- =
 
 2.20.1
 
---===============1496843714964608881==--
+--===============5834174619995456271==--
 
