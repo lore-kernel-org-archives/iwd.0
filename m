@@ -1,33 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============4119560830592936725=="
+Content-Type: multipart/mixed; boundary="===============5947621771050893642=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 04/12] frame-xchg: Actually free duplicate watches
-Date: Wed, 18 Mar 2020 15:53:53 +0000
-Message-ID: <ed6dcaaf-7a37-2378-1f7e-883dbc6b75cb@gmail.com>
-In-Reply-To: <20200318144531.30613-4-andrew.zaborowski@intel.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 03/12] frame-xchg: Handle l_io errors through disconnect
+ callback
+Date: Wed, 18 Mar 2020 17:05:28 +0100
+Message-ID: <CAOq732+5xKaqTwyO=Zx31SYpW5+r8qKhv0STGy7X3aACocSkwA@mail.gmail.com>
+In-Reply-To: <d9900749-9708-6a3c-a9b6-d32654e4f893@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4119560830592936725==
+--===============5947621771050893642==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Hi Denis,
 
-On 3/18/20 9:45 AM, Andrew Zaborowski wrote:
-> Fix a potential leak when we need to drop an existing watch because it's
-> being replaced with a new one.
-> ---
->   src/frame-xchg.c | 1 +
->   1 file changed, 1 insertion(+)
-> =
+On Wed, 18 Mar 2020 at 16:49, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 3/18/20 9:45 AM, Andrew Zaborowski wrote:
+> > @@ -234,6 +234,7 @@ static void frame_watch_group_destroy(void *data)
+> >               l_genl_remove_unicast_watch(iwd_get_genl(),
+> >                                               group->unicast_watch_id);
+> >
+> > +     l_io_set_disconnect_handler(group->io, NULL, NULL, NULL);
+>
+> This part shouldn't be necessary?  io_closed clears out the
+> disconnect_handler and disconnect_destroy callbacks...
 
+This is meant to handle cases like l_queue_destroy(watch_groups,
+frame_watch_group_destroy) where the l_io_destroy() may close the
+socket, if not already closed, and call the disconnect handler which
+would try to remove the group from watch_groups again, so we probably
+do need this.
 
-Patches 4-7 applied, thanks.
-
-Regards,
--Denis
-
---===============4119560830592936725==--
+Best regards
+--===============5947621771050893642==--
 
