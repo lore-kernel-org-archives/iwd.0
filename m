@@ -1,73 +1,110 @@
-Content-Type: multipart/mixed; boundary="===============0396893577637537861=="
+Content-Type: multipart/mixed; boundary="===============1365329721797387107=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 9/9] eap-tls: Print a hint about IWD_TLS_DEBUG on TLS errors
-Date: Thu, 19 Mar 2020 22:12:18 +0100
-Message-ID: <20200319211218.32083-9-andrew.zaborowski@intel.com>
-In-Reply-To: <20200319211218.32083-1-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/4] station: support full MAC randomization and override
+Date: Thu, 19 Mar 2020 15:02:01 -0700
+Message-ID: <20200319220204.11978-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0396893577637537861==
+--===============1365329721797387107==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This patch adds two new options to a network provisioning file:
+
+AlwaysRandomizeAddress=3D{true,false}
+
+If true, IWD will randomize the MAC address on each connection to this
+network. The address does not persists between connections, any new
+connection will result in a different MAC.
+
+AddressOverride=3D<MAC>
+
+If set, the MAC address will be set to <MAC> assuming its a valid MAC
+address.
+
+These two options should not be used together, and will only take effect
+if [General].AddressRandomization is set to 'network' in the IWD
+config file.
+
+If neither of these options are set, and [General].AddressRandomization
+is set to 'network', the default behavior remains the same; the MAC
+will be generated deterministically on a per-network basis.
 ---
- src/eap-tls-common.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ src/station.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/src/eap-tls-common.c b/src/eap-tls-common.c
-index a6125969..28febaf0 100644
---- a/src/eap-tls-common.c
-+++ b/src/eap-tls-common.c
-@@ -255,6 +255,13 @@ static void eap_tls_tunnel_ready(const char *peer_iden=
-tity, void *user_data)
- 		l_tls_close(eap_tls->tunnel);
- }
+v2:
+ * Removed check for AddressRandomization=3Dnetwork. This is checked in
+   netdev.
+
+diff --git a/src/station.c b/src/station.c
+index 36b41f64..47af726e 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -875,6 +875,10 @@ static struct handshake_state *station_handshake_setup=
+(struct station *station,
+ 	struct handshake_state *hs;
+ 	const char *ssid;
+ 	uint32_t eapol_proto_version;
++	const char *value;
++	bool full_random;
++	bool override =3D false;
++	uint8_t new_addr[ETH_ALEN];
  =
 
-+static void eap_tls_debug_hint(void)
-+{
-+	if (!getenv("IWD_TLS_DEBUG"))
-+		l_debug("set the IWD_TLS_DEBUG environment variable to see "
-+			"more information");
-+}
+ 	hs =3D netdev_handshake_state_new(station->netdev);
+ =
+
+@@ -934,6 +938,40 @@ static struct handshake_state *station_handshake_setup=
+(struct station *station,
+ 				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
+ 		hs->erp_cache =3D erp_cache_get(network_get_ssid(network));
+ =
+
++	/*
++	 * We have three possible options here:
++	 * 1. per-network MAC generation (default, no option in network config)
++	 * 2. per-network full MAC randomization
++	 * 3. per-network MAC override
++	 */
 +
- static void eap_tls_tunnel_disconnected(enum l_tls_alert_desc reason,
- 						bool remote, void *user_data)
- {
-@@ -592,6 +599,7 @@ static bool eap_tls_tunnel_init(struct eap_state *eap)
++	if (!l_settings_get_bool(settings, "Settings",
++					"AlwaysRandomizeAddress",
++					&full_random))
++		full_random =3D false;
++
++	value =3D l_settings_get_value(settings, "Settings",
++					"AddressOverride");
++	if (value)
++		override =3D true;
++
++	if (override && full_random) {
++		l_warn("Cannot use both AlwaysRandomizeAddress and "
++			"AddressOverride concurrently, defaulting to override");
++		full_random =3D false;
++	}
++
++	if (override) {
++		if (util_string_to_address(value, new_addr))
++			handshake_state_set_supplicant_address(hs, new_addr);
++		else
++			l_warn("[Network].AddressOverride is not a valid "
++				"MAC address");
++	} else if (full_random) {
++		wiphy_generate_random_address(wiphy, new_addr);
++		handshake_state_set_supplicant_address(hs, new_addr);
++	}
++
+ 	return hs;
  =
 
- 			l_error("%s: Failed to set auth data.",
- 					eap_get_method_name(eap));
-+			eap_tls_debug_hint();
- 			return false;
- 		}
- =
-
-@@ -606,6 +614,7 @@ static bool eap_tls_tunnel_init(struct eap_state *eap)
- 			eap_tls->ca_cert =3D NULL;
- 			l_error("%s: Error settings CA certificates.",
- 					eap_get_method_name(eap));
-+			eap_tls_debug_hint();
- 			return false;
- 		}
- =
-
-@@ -618,6 +627,7 @@ static bool eap_tls_tunnel_init(struct eap_state *eap)
- 	if (!l_tls_start(eap_tls->tunnel)) {
- 		l_error("%s: Failed to start the TLS client",
- 						eap_get_method_name(eap));
-+		eap_tls_debug_hint();
- 		return false;
- 	}
- =
-
+ no_psk:
 -- =
 
-2.20.1
+2.21.1
 
---===============0396893577637537861==--
+--===============1365329721797387107==--
 
