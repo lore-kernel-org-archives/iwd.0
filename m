@@ -1,50 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============2549742205235909841=="
+Content-Type: multipart/mixed; boundary="===============2264087455942208412=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/4] netdev: honor handshake->spa if set
-Date: Thu, 19 Mar 2020 15:02:02 -0700
-Message-ID: <20200319220204.11978-2-prestwoj@gmail.com>
+Subject: [PATCH v2 3/4] doc: document AlwaysRandomizeAddress and
+ AddressOverride
+Date: Thu, 19 Mar 2020 15:02:03 -0700
+Message-ID: <20200319220204.11978-3-prestwoj@gmail.com>
 In-Reply-To: <20200319220204.11978-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2549742205235909841==
+--===============2264087455942208412==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In order to support AlwaysRandomizeAddress and AddressOverride, station will
-set the desired address into the handshake object. Then, netdev checks if
-this was done and will use that address rather than generate one.
 ---
- src/netdev.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ src/iwd.network.rst | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index e1c775be..e1afeb63 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -2560,8 +2560,13 @@ static int netdev_start_powered_mac_change(struct ne=
-tdev *netdev,
- 	struct rtnl_data *req;
- 	uint8_t new_addr[6];
+diff --git a/src/iwd.network.rst b/src/iwd.network.rst
+index 6b068202..ad8781df 100644
+--- a/src/iwd.network.rst
++++ b/src/iwd.network.rst
+@@ -109,6 +109,21 @@ The group ``[Settings]`` contains general settings.
  =
 
--	wiphy_generate_address_from_ssid(netdev->wiphy, (const char *)bss->ssid,
-+	/* No address set in handshake, use per-network MAC generation */
-+	if (util_mem_is_zero(netdev->handshake->spa, ETH_ALEN))
-+		wiphy_generate_address_from_ssid(netdev->wiphy,
-+						(const char *)bss->ssid,
- 						new_addr);
-+	else
-+		memcpy(new_addr, netdev->handshake->spa, ETH_ALEN);
+        Whether the network is hidden, i.e. its SSID must be included in an
+        active scan request
++   * - AlwaysRandomizeAddress
++     - Values: true, **false**
++
++       If enabled, the MAC address will be fully randomized on each connec=
+tion.
++       This option is only used if [General].AddressRandomization is set to
++       'network'. See iwd.config. This value should not be used with
++       [Settings].AddressOverride, if both are set AddressOverride will be=
+ used.
++   * - AddressOverride
++     - MAC address string
++
++       Override the MAC address used for connecting to this network. This =
+option
++       is only used if [General].AddressRandomization is set to 'network'.=
+ See
++       iwd.config. This value should not be used with
++       [Settings].FullAddressRandomization, if noth are set AddressOverrid=
+e will
++       be used.
  =
 
- 	/*
- 	 * MAC has already been changed previously, no need to again
+ Network Authentication Settings
+ -------------------------------
 -- =
 
 2.21.1
 
---===============2549742205235909841==--
+--===============2264087455942208412==--
 
