@@ -1,41 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============0561033189207026831=="
+Content-Type: multipart/mixed; boundary="===============3193638179839480681=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [RFC 0/1] Fix DBus auth issues on Fedora
-Date: Tue, 24 Mar 2020 13:29:00 -0700
-Message-ID: <20200324202901.26984-1-prestwoj@gmail.com>
+Subject: [RFC 1/1] test-runner: allow anonymous Dbus access
+Date: Tue, 24 Mar 2020 13:29:01 -0700
+Message-ID: <20200324202901.26984-2-prestwoj@gmail.com>
+In-Reply-To: <20200324202901.26984-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0561033189207026831==
+--===============3193638179839480681==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This 'fixes' test-runner DBus auth issues on Fedora and
-maybe other system. I say 'fixes' because all its doing
-is allowing anonymous access to the bus vs finding a
-solution to the real problem. I (and I believe Andrew)
-have been carrying similar patches in order to get
-test-runner to work on Fedora.
-
-I have tried diagnosing this without any success. Since
-this is only for use in test-runner I thought a
-solution (at least temporarily) would be to allow
-anonymous access to DBus.
-
-OR maybe someone will see this and have some idea as
-to what is going on.
-
-James Prestwood (1):
-  test-runner: allow anonymous Dbus access
-
+The dbus config file doesn't play well with Fedora.
+---
  tools/test-runner.c | 2 ++
  1 file changed, 2 insertions(+)
 
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 320dea0b..1be3f640 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -665,6 +665,8 @@ static void create_dbus_system_conf(void)
+ 	fputs("<type>system</type>\n", fp);
+ 	fputs("<listen>unix:path=3D/run/dbus/system_bus_socket</listen>\n", fp);
+ 	fputs("<limit name=3D\"reply_timeout\">2147483647</limit>", fp);
++	fputs("<auth>ANONYMOUS</auth>\n", fp);
++	fputs("<allow_anonymous/>\n", fp);
+ 	fputs("<policy context=3D\"default\">\n", fp);
+ 	fputs("<allow user=3D\"*\"/>\n", fp);
+ 	fputs("<allow own=3D\"*\"/>\n", fp);
 -- =
 
 2.21.1
 
---===============0561033189207026831==--
+--===============3193638179839480681==--
 
