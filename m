@@ -1,39 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============3193638179839480681=="
+Content-Type: multipart/mixed; boundary="===============7473070462133012719=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [RFC 1/1] test-runner: allow anonymous Dbus access
-Date: Tue, 24 Mar 2020 13:29:01 -0700
-Message-ID: <20200324202901.26984-2-prestwoj@gmail.com>
-In-Reply-To: <20200324202901.26984-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/3] test-runner: make default iwd_config_dir=/tmp
+Date: Tue, 24 Mar 2020 16:32:31 -0500
+Message-ID: <d9ccbfeb-1c43-2a36-91b6-2055f9754e67@gmail.com>
+In-Reply-To: <20200324202403.26860-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3193638179839480681==
+--===============7473070462133012719==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The dbus config file doesn't play well with Fedora.
----
- tools/test-runner.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi James,
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 320dea0b..1be3f640 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -665,6 +665,8 @@ static void create_dbus_system_conf(void)
- 	fputs("<type>system</type>\n", fp);
- 	fputs("<listen>unix:path=3D/run/dbus/system_bus_socket</listen>\n", fp);
- 	fputs("<limit name=3D\"reply_timeout\">2147483647</limit>", fp);
-+	fputs("<auth>ANONYMOUS</auth>\n", fp);
-+	fputs("<allow_anonymous/>\n", fp);
- 	fputs("<policy context=3D\"default\">\n", fp);
- 	fputs("<allow user=3D\"*\"/>\n", fp);
- 	fputs("<allow own=3D\"*\"/>\n", fp);
--- =
+On 3/24/20 3:24 PM, James Prestwood wrote:
+> The configuration value of iwd_config_dir was defaulting to /etc/iwd
+> which, in the context of test-runner, is probably not the best idea.
+> The system may have a main.conf file in /etc/iwd which could cause
+> tests to fail or behave unexpectedly.
+> =
 
-2.21.1
+> In addition all tests which use iwd_config_dir set it to /tmp anyways.
+> Because of this, the new default value will be /tmp and no tests will
+> even need to bother setting this.
+> =
 
---===============3193638179839480681==--
+> The configuration value itself is not being removed because it may be
+> useful to set arbitrary paths (e.g. /etc/iwd) for example when using
+> the shell functionality.
+> ---
+>   tools/test-runner.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+
+all applied, thanks.
+
+Regards,
+-Denis
+
+--===============7473070462133012719==--
 
