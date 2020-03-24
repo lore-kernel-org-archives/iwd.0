@@ -1,40 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============8758959315919385353=="
+Content-Type: multipart/mixed; boundary="===============7443308352645552451=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] handshake: fix OWE PTK derivation
-Date: Tue, 24 Mar 2020 19:10:33 +0000
-Message-ID: <03627c20-0cdc-d4ef-6b4b-e85c1395e6a6@gmail.com>
-In-Reply-To: <20200324190757.24072-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] test-runner: make default iwd_config_dir=/tmp
+Date: Tue, 24 Mar 2020 13:24:01 -0700
+Message-ID: <20200324202403.26860-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8758959315919385353==
+--===============7443308352645552451==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+The configuration value of iwd_config_dir was defaulting to /etc/iwd
+which, in the context of test-runner, is probably not the best idea.
+The system may have a main.conf file in /etc/iwd which could cause
+tests to fail or behave unexpectedly.
 
-On 3/24/20 2:07 PM, James Prestwood wrote:
-> This bug has been in here since OWE was written, but a similar bug also
-> existed in hostapd which allowed the PTK derivation to be identical.
-> In January 2020 hostapd fixed this bug, which now makes IWD incompatible
-> when using group 20 or 21.
-> =
+In addition all tests which use iwd_config_dir set it to /tmp anyways.
+Because of this, the new default value will be /tmp and no tests will
+even need to bother setting this.
 
-> This patch fixes the bug for IWD, so now OWE should be compatible with
-> recent hostapd version. This will break compatibility with old hostapd
-> versions which still have this bug.
-> ---
->   src/handshake.c | 12 ++++++++++--
->   1 file changed, 10 insertions(+), 2 deletions(-)
-> =
+The configuration value itself is not being removed because it may be
+useful to set arbitrary paths (e.g. /etc/iwd) for example when using
+the shell functionality.
+---
+ tools/test-runner.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 1be3f640..1adb8377 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -2205,7 +2205,7 @@ static void create_network_and_run_tests(void *data, =
+void *user_data)
+ 						HW_CONFIG_GROUP_SETUP,
+ 						HW_CONFIG_SETUP_IWD_CONF_DIR);
+ 		if (!iwd_config_dir)
+-			iwd_config_dir =3D DAEMON_CONFIGDIR;
++			iwd_config_dir =3D "/tmp";
+ =
 
-Applied, thanks.
+ 		iwd_pid =3D start_iwd(iwd_config_dir, wiphy_list,
+ 				iwd_ext_options, iwd_phys, test_name);
+-- =
 
-Regards,
--Denis
+2.21.1
 
---===============8758959315919385353==--
+--===============7443308352645552451==--
 
