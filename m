@@ -1,44 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============7874829757386724886=="
+Content-Type: multipart/mixed; boundary="===============2259493951225366559=="
 MIME-Version: 1.0
-From: Rosen Penev <rosenp@gmail.com>
-Subject: [PATCH] nlmon: fix -Wformat under musl 1.2.0
-Date: Wed, 01 Apr 2020 19:16:50 -0700
-Message-ID: <20200402021650.790030-1-rosenp@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] test-runner: fix segfault running with --log non-root
+Date: Thu, 02 Apr 2020 09:48:48 -0700
+Message-ID: <20200402164848.1580-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7874829757386724886==
+--===============2259493951225366559==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-musl 1.2.0 uses 64-bit time, even under 32-bit OSes. Cast to int64_t
-and use the proper macro.
----
- monitor/nlmon.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+When running test-runner as non-root the environment variables
+SUDO_GID/SUDO_UID were unset, causing atoi to segfault. This replaces
+atoi with strtol, and checks the existance of SUDO_GID/SUDO_UID
+before trying to turn it into an integer. This patch also allows
+the uid/gid to be read from the user if running as non-root.
 
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 0aeaea31..1f269ff0 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -216,8 +216,9 @@ static void print_packet(const struct timeval *tv, char=
- ident,
- 				ts_pos +=3D n;
- 		}
+Note: running as non-root does require the users permissions to be
+setup properly. Directories and files are created when running with
+logging, so if the user running test-runner does not have these
+permissions the creation of these files will fail.
+---
+ tools/test-runner.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 1adb8377..5b37a790 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -3095,6 +3095,8 @@ int main(int argc, char *argv[])
+ 	uint8_t actions =3D 0;
+ 	struct tm *timeinfo;
+ 	time_t t;
++	char *gid;
++	char *uid;
  =
 
--		n =3D sprintf(ts_str + ts_pos, " %lu.%06lu",
--					tv->tv_sec - time_offset, tv->tv_usec);
-+		n =3D sprintf(ts_str + ts_pos, " %" PRId64 ".%06" PRId64,
-+					(int64_t)tv->tv_sec - time_offset,
-+					(int64_t)tv->tv_usec);
- 		if (n > 0) {
- 			ts_pos +=3D n;
- 			ts_len +=3D n;
+ 	l_log_set_stderr();
+ =
+
+@@ -3195,8 +3197,16 @@ int main(int argc, char *argv[])
+ 			time(&t);
+ 			timeinfo =3D localtime(&t);
+ =
+
+-			log_gid =3D atoi(getenv("SUDO_GID"));
+-			log_uid =3D atoi(getenv("SUDO_UID"));
++			gid =3D getenv("SUDO_GID");
++			uid =3D getenv("SUDO_UID");
++
++			if (!gid || !uid) {
++				log_gid =3D getgid();
++				log_uid =3D getuid();
++			} else {
++				log_gid =3D strtol(gid, NULL, 10);
++				log_uid =3D strtol(uid, NULL, 10);
++			}
+ =
+
+ 			snprintf(log_dir, sizeof(log_dir), "%s/run-%d-%d-%d-%d",
+ 					optarg, timeinfo->tm_year + 1900,
 -- =
 
-2.25.1
+2.21.1
 
---===============7874829757386724886==--
+--===============2259493951225366559==--
 
