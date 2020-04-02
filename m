@@ -1,60 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============0524533258794345534=="
+Content-Type: multipart/mixed; boundary="===============3322886427853560430=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] test-runner: create pcap when logging
-Date: Thu, 02 Apr 2020 10:01:56 -0700
-Message-ID: <20200402170156.3349-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] nlmon: fix -Wformat under musl 1.2.0
+Date: Thu, 02 Apr 2020 00:31:19 -0500
+Message-ID: <cae1b91f-178f-428c-a315-736aec831171@gmail.com>
+In-Reply-To: <20200402021650.790030-1-rosenp@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0524533258794345534==
+--===============3322886427853560430==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- tools/test-runner.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+Hi Rosen,
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 5b37a790..88bb50e1 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -1608,14 +1608,24 @@ static void terminate_iwd(pid_t iwd_pid)
- =
+On 4/1/20 9:16 PM, Rosen Penev wrote:
+> musl 1.2.0 uses 64-bit time, even under 32-bit OSes. Cast to int64_t
+> and use the proper macro.
+> ---
+>   monitor/nlmon.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
 
- static pid_t start_monitor(const char *test_name)
- {
--	char *argv[4];
-+	char *argv[6];
-+	char *write_arg;
-+	pid_t pid;
-+
-+	write_arg =3D l_strdup_printf("%s/%s/monitor.pcap", log_dir, test_name);
- =
+Applied, thanks.
 
- 	argv[0] =3D "iwmon";
- 	argv[1] =3D "--nortnl";
- 	argv[2] =3D "--nowiphy";
--	argv[3] =3D NULL;
-+	argv[3] =3D "--write";
-+	argv[4] =3D write_arg;
-+	argv[5] =3D NULL;
- =
+Regards,
+-Denis
 
--	return execute_program(argv, environ, false, test_name);
-+	pid =3D execute_program(argv, environ, false, test_name);
-+
-+	l_free(write_arg);
-+
-+	return pid;
- }
- =
-
- static bool create_tmpfs_extra_stuff(char **tmpfs_extra_stuff)
--- =
-
-2.21.1
-
---===============0524533258794345534==--
+--===============3322886427853560430==--
 
