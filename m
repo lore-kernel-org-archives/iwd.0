@@ -1,454 +1,529 @@
-Content-Type: multipart/mixed; boundary="===============2759830149102678089=="
+Content-Type: multipart/mixed; boundary="===============9124636544461270214=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 09/17] p2p: Add the WSC interface on peer DBus objects
-Date: Fri, 03 Apr 2020 18:14:22 +0200
-Message-ID: <20200403161430.14168-9-andrew.zaborowski@intel.com>
+Subject: [PATCH 12/17] p2p: Handle the Information Not Available response code
+Date: Fri, 03 Apr 2020 18:14:25 +0200
+Message-ID: <20200403161430.14168-12-andrew.zaborowski@intel.com>
 In-Reply-To: <20200403161430.14168-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2759830149102678089==
+--===============9124636544461270214==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add net.connman.iwd.SimpleConfiguration interfaces to peer objects on
-DBus and handle method calls.  Building and transmitting the actual
-action frames to start the connection sequence is done in the following
-commits.
+Handle the scenario where the peer's P2P state machine doesn't know
+whether a connection has been authorized by the user and needs some time
+to ask the user or a higher software layer whether to accept a
+connection.  In that case their GO Negotiation Response to our GO
+Negotiation Request will have the status code "Fail: Information Not
+Available" and we need to give the peer 120s to start a new GO
+Negotiation with us.  In this patch we handle the GO Negotiation
+responder side where we parse the Request frame, build and send the
+Response and finally parse the Confirmation.  The existing code so far
+only did the initiator side.
 ---
- src/p2p.c | 290 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 288 insertions(+), 2 deletions(-)
+ src/p2p.c | 382 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 376 insertions(+), 6 deletions(-)
 
 diff --git a/src/p2p.c b/src/p2p.c
-index d0e0d9ac..86d2b3a1 100644
+index ed820c09..a9e26b5d 100644
 --- a/src/p2p.c
 +++ b/src/p2p.c
-@@ -82,6 +82,12 @@ struct p2p_device {
- 	struct l_queue *discovery_users;
- 	struct l_queue *peer_list;
+@@ -90,6 +90,8 @@ struct p2p_device {
  =
 
-+	struct p2p_peer *conn_peer;
-+	uint16_t conn_config_method;
-+	char *conn_pin;
-+	uint8_t conn_addr[6];
-+	uint16_t conn_password_id;
+ 	struct l_timeout *config_timeout;
+ 	unsigned long go_config_delay;
++	struct l_timeout *go_neg_req_timeout;
++	uint8_t go_dialog_token;
+ 	uint32_t go_oper_freq;
+ 	struct p2p_group_id_attr go_group_id;
+ 	uint8_t go_interface_addr[6];
+@@ -446,6 +448,7 @@ static void p2p_connection_reset(struct p2p_device *dev)
+ 				IWD_P2P_INTERFACE, "AvailableConnections");
+ =
+
+ 	l_timeout_remove(dev->config_timeout);
++	l_timeout_remove(dev->go_neg_req_timeout);
+ =
+
+ 	frame_watch_group_remove(dev->wdev_id, FRAME_GROUP_CONNECT);
+ 	frame_xchg_stop(dev->wdev_id);
+@@ -527,6 +530,15 @@ static void p2p_peer_frame_xchg(struct p2p_peer *peer,=
+ struct iovec *tx_body,
+ 	l_free(frame);
+ }
+ =
+
++static const struct frame_xchg_prefix p2p_frame_go_neg_req =3D {
++	/* Management -> Public Action -> P2P -> GO Negotiation Request */
++	.data =3D (uint8_t []) {
++		0x04, 0x09, 0x50, 0x6f, 0x9a, 0x09,
++		P2P_ACTION_GO_NEGOTIATION_REQ
++	},
++	.len =3D 7,
++};
 +
- 	bool enabled : 1;
+ static const struct frame_xchg_prefix p2p_frame_go_neg_resp =3D {
+ 	/* Management -> Public Action -> P2P -> GO Negotiation Response */
+ 	.data =3D (uint8_t []) {
+@@ -536,6 +548,15 @@ static const struct frame_xchg_prefix p2p_frame_go_neg=
+_resp =3D {
+ 	.len =3D 7,
  };
  =
 
-@@ -332,10 +338,14 @@ static void p2p_peer_put(void *user_data)
- {
- 	struct p2p_peer *peer =3D user_data;
- =
-
-+	/* Removes both interfaces, no need to call wsc_dbus_remove_interface */
- 	l_dbus_unregister_object(dbus_get_bus(), p2p_peer_get_path(peer));
- 	p2p_peer_free(peer);
- }
- =
-
-+static void p2p_device_discovery_start(struct p2p_device *dev);
-+static void p2p_device_discovery_stop(struct p2p_device *dev);
-+
- /* TODO: convert to iovecs */
- static uint8_t *p2p_build_scan_ies(struct p2p_device *dev, uint8_t *buf,
- 					size_t buf_len, size_t *out_len)
-@@ -402,6 +412,61 @@ static uint8_t *p2p_build_scan_ies(struct p2p_device *=
-dev, uint8_t *buf,
- 	return buf;
- }
- =
-
-+static void p2p_connection_reset(struct p2p_device *dev)
-+{
-+	struct p2p_peer *peer =3D dev->conn_peer;
-+
-+	if (!peer)
-+		return;
-+
-+	/*
-+	 * conn_peer is currently not refcounted and we make sure it's always
-+	 * on the dev->peer_list so we can just drop our reference.  Since we
-+	 * may not have been scanning for a while, don't drop the peer object
-+	 * now just because it's not been seen in scan results recently, its
-+	 * age will be checked on the next scan.
-+	 */
-+	dev->conn_peer =3D NULL;
-+	dev->connections_left++;
-+
-+	if (dev->conn_pin) {
-+		explicit_bzero(dev->conn_pin, strlen(dev->conn_pin));
-+		l_free(dev->conn_pin);
-+		dev->conn_pin =3D NULL;
-+	}
-+
-+	l_dbus_property_changed(dbus_get_bus(), p2p_device_get_path(dev),
-+				IWD_P2P_INTERFACE, "AvailableConnections");
-+
-+	if (!dev->enabled || (dev->enabled && dev->start_stop_cmd_id)) {
-+		/*
-+		 * The device has been disabled in the mean time, all peers
-+		 * have been removed except this one.  Now it's safe to
-+		 * drop this peer from the scan results too.
-+		 */
-+		l_queue_destroy(dev->peer_list, p2p_peer_put);
-+		dev->peer_list =3D NULL;
-+	}
-+
-+	if (dev->enabled && !dev->start_stop_cmd_id &&
-+			!l_queue_isempty(dev->discovery_users))
-+		p2p_device_discovery_start(dev);
-+}
-+
-+static void p2p_connect_failed(struct p2p_device *dev)
-+{
-+	struct p2p_peer *peer =3D dev->conn_peer;
-+
-+	if (!peer)
-+		return;
-+
-+	if (peer->wsc.pending_connect)
-+		dbus_pending_reply(&peer->wsc.pending_connect,
-+				dbus_error_failed(peer->wsc.pending_connect));
-+
-+	p2p_connection_reset(dev);
-+}
++static const struct frame_xchg_prefix p2p_frame_go_neg_confirm =3D {
++	/* Management -> Public Action -> P2P -> GO Negotiation Confirm */
++	.data =3D (uint8_t []) {
++		0x04, 0x09, 0x50, 0x6f, 0x9a, 0x09,
++		P2P_ACTION_GO_NEGOTIATION_CONFIRM
++	},
++	.len =3D 7,
++};
 +
  static void p2p_scan_destroy(void *user_data)
  {
  	struct p2p_device *dev =3D user_data;
-@@ -409,6 +474,165 @@ static void p2p_scan_destroy(void *user_data)
- 	dev->scan_id =3D 0;
+@@ -573,6 +594,26 @@ static void p2p_config_timeout(struct l_timeout *timeo=
+ut, void *user_data)
+ 	p2p_start_client_provision(dev);
  }
  =
 
-+static void p2p_start_go_negotiation(struct p2p_device *dev)
++static void p2p_go_negotiation_resp_done(int error, void *user_data)
 +{
-+	/* TODO: start GO Negotiation */
++	struct p2p_device *dev =3D user_data;
++
++	if (error)
++		l_error("Sending the GO Negotiation Response failed: %s (%i)",
++			strerror(-error), -error);
++	else
++		l_error("No GO Negotiation Confirmation frame received");
++
++	p2p_connect_failed(dev);
 +}
 +
-+static void p2p_start_provision_discovery(struct p2p_device *dev)
++static void p2p_go_negotiation_resp_err_done(int error, void *user_data)
 +{
-+	/* TODO: start Provision Discovery */
++	if (error)
++		l_error("Sending the GO Negotiation Response failed: %s (%i)",
++			strerror(-error), -error);
 +}
 +
-+static bool p2p_peer_get_info(struct p2p_peer *peer,
-+				uint16_t *wsc_config_methods,
-+				struct p2p_capability_attr **capability)
+ /*
+  * Called by GO Negotiation Response and Confirmation receive handlers,
+  * in both cases the channel lists are required to be subsets of our
+@@ -649,6 +690,236 @@ static void p2p_device_fill_channel_list(struct p2p_d=
+evice *dev,
+ 	l_queue_push_tail(attr->channel_entries, channel_entry);
+ }
+ =
+
++static bool p2p_go_negotiation_confirm_cb(const struct mmpdu_header *mpdu,
++					const void *body, size_t body_len,
++					int rssi, struct p2p_device *dev)
 +{
-+	struct wsc_probe_request wsc_info;
++	struct p2p_go_negotiation_confirmation info;
++	int r;
++	enum scan_band band;
++	uint32_t frequency;
 +
-+	switch (peer->bss->source_frame) {
-+	case SCAN_BSS_PROBE_RESP:
-+		if (!peer->bss->p2p_probe_resp_info)
-+			return false;
++	l_debug("");
 +
-+		if (wsc_config_methods)
-+			*wsc_config_methods =3D peer->bss->p2p_probe_resp_info->
-+				device_info.wsc_config_methods;
-+
-+		*capability =3D &peer->bss->p2p_probe_resp_info->capability;
++	if (body_len < 8) {
++		l_error("GO Negotiation Confirmation frame too short");
++		p2p_connect_failed(dev);
 +		return true;
-+	case SCAN_BSS_PROBE_REQ:
-+		if (!peer->bss->p2p_probe_req_info || !peer->bss->wsc)
-+			return false;
-+
-+		if (wsc_parse_probe_request(peer->bss->wsc, peer->bss->wsc_size,
-+						&wsc_info) < 0)
-+			return false;
-+
-+		if (wsc_config_methods)
-+			*wsc_config_methods =3D wsc_info.config_methods;
-+
-+		*capability =3D &peer->bss->p2p_probe_req_info->capability;
-+		return true;
-+	case SCAN_BSS_BEACON:
-+		if (!peer->bss->p2p_beacon_info || !peer->bss->wsc)
-+			return false;
-+
-+		if (wsc_parse_probe_request(peer->bss->wsc, peer->bss->wsc_size,
-+						&wsc_info) < 0)
-+			return false;
-+
-+		if (wsc_config_methods)
-+			*wsc_config_methods =3D wsc_info.config_methods;
-+
-+		*capability =3D &peer->bss->p2p_beacon_info->capability;
-+		break;
 +	}
 +
-+	return false;
-+}
-+
-+static void p2p_peer_connect(struct p2p_peer *peer, const char *pin)
-+{
-+	struct p2p_device *dev =3D peer->dev;
-+	uint16_t wsc_config_methods;
-+	struct p2p_capability_attr *capability;
-+	struct l_dbus_message *message =3D peer->wsc.pending_connect;
-+	struct l_dbus_message *reply;
-+
-+	if (dev->conn_peer) {
-+		reply =3D dbus_error_busy(message);
-+		goto send_error;
++	r =3D p2p_parse_go_negotiation_confirmation(body + 7, body_len - 7,
++							&info);
++	if (r < 0) {
++		l_error("GO Negotiation Confirmation parse error %s (%i)",
++			strerror(-r), -r);
++		p2p_connect_failed(dev);
++		return true;
 +	}
++
++	if (info.dialog_token !=3D dev->go_dialog_token) {
++		l_error("GO Negotiation Response dialog token doesn't match");
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	if (info.status !=3D P2P_STATUS_SUCCESS) {
++		l_error("GO Negotiation Confirmation status %i", info.status);
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	if (!p2p_device_validate_channel_list(dev, &info.channel_list,
++						&info.operating_channel))
++		return true;
++
++	band =3D scan_oper_class_to_band(
++			(const uint8_t *) info.operating_channel.country,
++			info.operating_channel.oper_class);
++	frequency =3D scan_channel_to_freq(info.operating_channel.channel_num,
++						band);
++	if (!frequency) {
++		l_error("Bad operating channel in GO Negotiation Confirmation");
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	dev->go_oper_freq =3D frequency;
++	memcpy(&dev->go_group_id, &info.group_id,
++		sizeof(struct p2p_group_id_attr));
 +
 +	/*
-+	 * Step 1, check if the device indicates it supports our WSC method
-+	 * and check other flags to make sure a connection is possible.
++	 * Confirmation received.  For simplicity wait idly the maximum amount
++	 * of time indicated by the peer in the GO Negotiation Response's
++	 * Configuration Timeout attribute and start the provisioning phase.
 +	 */
-+	if (!p2p_peer_get_info(peer, &wsc_config_methods, &capability)) {
-+		reply =3D dbus_error_failed(message);
-+		goto send_error;
++	dev->config_timeout =3D l_timeout_create_ms(dev->go_config_delay,
++						p2p_config_timeout, dev,
++						p2p_config_timeout_destroy);
++	return true;
++}
++
++static void p2p_device_go_negotiation_req_cb(const struct mmpdu_header *mp=
+du,
++						const void *body,
++						size_t body_len, int rssi,
++						void *user_data)
++{
++	struct p2p_device *dev =3D user_data;
++	struct p2p_go_negotiation_req req_info;
++	struct p2p_go_negotiation_resp resp_info =3D {};
++	int r;
++	uint8_t *resp_body;
++	size_t resp_len;
++	struct iovec iov[16];
++	int iov_len =3D 0;
++	struct p2p_peer *peer;
++	enum p2p_attr_status_code status =3D P2P_STATUS_SUCCESS;
++	bool tie_breaker =3D false;
++
++	l_debug("");
++
++	/*
++	 * Check the Destination Address and the BSSID. Section 2.4.3:
++	 * "When communication is not within a P2P Group, e.g. during
++	 * [...] GO Negotiation [...], a P2P Device shall use the
++	 * P2P Device Address of the intended destination as the BSSID in
++	 * Request, or Confirmation frames and its own P2P Device Address
++	 * as the BSSID in Response frames."
++	 *
++	 * Some drivers (brcmfmac) will report the BSSID as all zeros and
++	 * some Wi-Fi Display dongles will pass their own address as the
++	 * BSSID in the GO Negotiation Request so allow all three possible
++	 * values.
++	 */
++	if (memcmp(mpdu->address_1, dev->addr, 6) ||
++			(memcmp(mpdu->address_3, dev->addr, 6) &&
++			 memcmp(mpdu->address_3, mpdu->address_2, 6) &&
++			 !util_mem_is_zero(mpdu->address_3, 6)))
++		return;
++
++	peer =3D l_queue_find(dev->peer_list, p2p_peer_match, mpdu->address_2);
++	if (!peer)
++		return;
++
++	if (body_len < 8)
++		return;
++
++	if (!dev->go_neg_req_timeout || peer !=3D dev->conn_peer) {
++		status =3D P2P_STATUS_FAIL_INFO_NOT_AVAIL;
++		goto respond;
 +	}
 +
-+	dev->conn_config_method =3D pin ? WSC_CONFIGURATION_METHOD_KEYPAD :
-+		WSC_CONFIGURATION_METHOD_PUSH_BUTTON;
-+	dev->conn_password_id =3D pin ?
-+		(strlen(pin) =3D=3D 4 || wsc_pin_is_checksum_valid(pin) ?
-+		 WSC_DEVICE_PASSWORD_ID_DEFAULT :
-+		 WSC_DEVICE_PASSWORD_ID_USER_SPECIFIED) :
-+		WSC_DEVICE_PASSWORD_ID_PUSH_BUTTON;
-+
-+	if (!(wsc_config_methods & dev->conn_config_method)) {
-+		reply =3D dbus_error_not_supported(message);
-+		goto send_error;
++	if (memcmp(mpdu->address_2, dev->conn_peer->bss->addr, 6)) {
++		status =3D P2P_STATUS_FAIL_UNABLE_TO_ACCOMMODATE_REQUEST;
++		goto respond;
 +	}
 +
-+	if (capability->device_caps & P2P_DEVICE_CAP_DEVICE_LIMIT) {
-+		reply =3D dbus_error_not_supported(message);
-+		goto send_error;
++	r =3D p2p_parse_go_negotiation_req(body + 7, body_len - 7, &req_info);
++	if (r < 0) {
++		l_error("GO Negotiation Request parse error %s (%i)",
++			strerror(-r), -r);
++		p2p_connect_failed(dev);
++		status =3D P2P_STATUS_FAIL_INVALID_PARAMS;
++		goto respond;
 +	}
 +
-+	if (capability->group_caps & P2P_GROUP_CAP_GROUP_LIMIT) {
-+		reply =3D dbus_error_not_supported(message);
-+		goto send_error;
++	if (req_info.go_intent =3D=3D 0 && !req_info.go_tie_breaker) {
++		l_error("Can't negotiate client role and GO operation not "
++			"supported");
++
++		if (peer->wsc.pending_connect) {
++			struct l_dbus_message *reply =3D
++				dbus_error_not_supported(
++						peer->wsc.pending_connect);
++
++			dbus_pending_reply(&peer->wsc.pending_connect, reply);
++		}
++
++		p2p_connect_failed(dev);
++		status =3D P2P_STATUS_FAIL_INCOMPATIBLE_PARAMS;
++		goto p2p_free;
 +	}
 +
-+	if (capability->group_caps & P2P_GROUP_CAP_GROUP_FORMATION) {
-+		reply =3D dbus_error_busy(message);
-+		goto send_error;
++	if (req_info.capability.group_caps & P2P_GROUP_CAP_PERSISTENT_GROUP) {
++		if (peer->wsc.pending_connect) {
++			struct l_dbus_message *reply =3D
++				dbus_error_not_supported(
++						peer->wsc.pending_connect);
++
++			dbus_pending_reply(&peer->wsc.pending_connect, reply);
++		}
++
++		p2p_connect_failed(dev);
++		l_error("Persistent groups not supported");
++		status =3D P2P_STATUS_FAIL_INCOMPATIBLE_PARAMS;
++		goto p2p_free;
 +	}
 +
++	if (req_info.device_password_id !=3D dev->conn_password_id) {
++		p2p_connect_failed(dev);
++		l_error("Incompatible Password ID in the GO Negotiation Req");
++		status =3D P2P_STATUS_FAIL_INCOMPATIBLE_PROVISIONING;
++		goto p2p_free;
++	}
++
++	l_timeout_remove(dev->go_neg_req_timeout);
 +	p2p_device_discovery_stop(dev);
 +
-+	/* Generate the interface address for our P2P-Client connection */
-+	wiphy_generate_random_address(dev->wiphy, dev->conn_addr);
++	dev->go_dialog_token =3D req_info.dialog_token;
++	dev->go_config_delay =3D req_info.config_timeout.go_config_timeout * 10;
++	memcpy(dev->go_interface_addr, req_info.intended_interface_addr, 6);
 +
-+	dev->conn_peer =3D peer; /* No ref counting so just set the pointer */
-+	dev->conn_pin =3D l_strdup(pin);
-+	dev->connections_left--;
-+	l_dbus_property_changed(dbus_get_bus(), p2p_device_get_path(dev),
-+				IWD_P2P_INTERFACE, "AvailableConnections");
++p2p_free:
++	tie_breaker =3D !req_info.go_tie_breaker;
++	p2p_clear_go_negotiation_req(&req_info);
 +
-+	/*
-+	 * Step 2, if peer is already a GO then send the Provision Discovery
-+	 * before doing WSC.  If it's not then do Provision Discovery
-+	 * optionally as seems to be required by some implementations, and
-+	 * start GO negotiation following that.
-+	 * TODO: Add a AlwaysUsePD config setting.
-+	 */
-+	if (dev->conn_peer->group)
-+		p2p_start_provision_discovery(dev);
-+	else
-+		p2p_start_go_negotiation(dev);
++respond:
++	/* Build and send the GO Negotiation Response */
++	resp_info.dialog_token =3D dev->go_dialog_token;
++	resp_info.status =3D status;
++	resp_info.capability.device_caps =3D dev->capability.device_caps;
++	resp_info.capability.group_caps =3D 0;	/* Reserved */
++	resp_info.go_intent =3D 0;		/* Don't want to be the GO */
++	resp_info.go_tie_breaker =3D tie_breaker;
++	resp_info.config_timeout.go_config_timeout =3D 50;	/* 500ms */
++	resp_info.config_timeout.client_config_timeout =3D 50;	/* 500ms */
 +
-+	return;
++	if (dev->conn_peer)
++		memcpy(resp_info.intended_interface_addr, dev->conn_addr, 6);
 +
-+send_error:
-+	dbus_pending_reply(&peer->wsc.pending_connect, reply);
-+}
++	p2p_device_fill_channel_list(dev, &resp_info.channel_list);
++	resp_info.device_info =3D dev->device_info;
++	resp_info.device_password_id =3D dev->conn_password_id;
 +
-+static void p2p_peer_disconnect(struct p2p_peer *peer)
-+{
-+	struct p2p_device *dev =3D peer->dev;
-+	struct l_dbus_message *message =3D peer->wsc.pending_cancel;
-+	struct l_dbus_message *reply;
++	resp_body =3D p2p_build_go_negotiation_resp(&resp_info, &resp_len);
++	p2p_clear_go_negotiation_resp(&resp_info);
 +
-+	if (dev->conn_peer !=3D peer) {
-+		reply =3D dbus_error_not_connected(message);
-+		goto send_reply;
++	if (!resp_body) {
++		p2p_connect_failed(dev);
++		return;
 +	}
 +
-+	if (peer->wsc.pending_connect)
-+		dbus_pending_reply(&peer->wsc.pending_connect,
-+				dbus_error_aborted(peer->wsc.pending_connect));
++	iov[iov_len].iov_base =3D resp_body;
++	iov[iov_len].iov_len =3D resp_len;
++	iov_len++;
 +
-+	p2p_connection_reset(dev);
-+	reply =3D l_dbus_message_new_method_return(message);
++	/* WFD and other service IEs go here */
 +
-+send_reply:
-+	dbus_pending_reply(&peer->wsc.pending_cancel, reply);
++	iov[iov_len].iov_base =3D NULL;
++
++	if (status =3D=3D P2P_STATUS_SUCCESS)
++		p2p_peer_frame_xchg(peer, iov, dev->addr, 0, 600, 0, true,
++					FRAME_GROUP_CONNECT,
++					p2p_go_negotiation_resp_done,
++					&p2p_frame_go_neg_confirm,
++					p2p_go_negotiation_confirm_cb, NULL);
++	else
++		p2p_peer_frame_xchg(peer, iov, dev->addr, 0, 0, 0, true,
++					FRAME_GROUP_CONNECT,
++					p2p_go_negotiation_resp_err_done, NULL);
++
++	l_debug("GO Negotiation Response sent with status %i", status);
 +}
 +
- #define SCAN_INTERVAL_MAX	3
- #define SCAN_INTERVAL_STEP	1
- #define CHANS_PER_SCAN_INITIAL	2
-@@ -573,6 +797,29 @@ static void p2p_device_roc_start(struct p2p_device *de=
-v)
- 		(int) dev->listen_channel, (int) duration);
+ static void p2p_go_negotiation_confirm_done(int error, void *user_data)
+ {
+ 	struct p2p_device *dev =3D user_data;
+@@ -671,6 +942,25 @@ static void p2p_go_negotiation_confirm_done(int error,=
+ void *user_data)
+ 						p2p_config_timeout_destroy);
  }
  =
 
-+static const char *p2p_peer_wsc_get_path(struct wsc_dbus *wsc)
++static void p2p_go_neg_req_timeout_destroy(void *user_data)
 +{
-+	return p2p_peer_get_path(l_container_of(wsc, struct p2p_peer, wsc));
++	struct p2p_device *dev =3D user_data;
++
++	dev->go_neg_req_timeout =3D NULL;
 +}
 +
-+static void p2p_peer_wsc_connect(struct wsc_dbus *wsc, const char *pin)
++static void p2p_go_neg_req_timeout(struct l_timeout *timeout, void *user_d=
+ata)
 +{
-+	p2p_peer_connect(l_container_of(wsc, struct p2p_peer, wsc), pin);
++	struct p2p_device *dev =3D user_data;
++
++	l_debug("");
++
++	p2p_connect_failed(dev);
++
++	if (l_queue_isempty(dev->discovery_users))
++		p2p_device_discovery_stop(dev);
 +}
 +
-+static void p2p_peer_wsc_cancel(struct wsc_dbus *wsc)
-+{
-+	p2p_peer_disconnect(l_container_of(wsc, struct p2p_peer, wsc));
-+}
+ static bool p2p_go_negotiation_resp_cb(const struct mmpdu_header *mpdu,
+ 					const void *body, size_t body_len,
+ 					int rssi, struct p2p_device *dev)
+@@ -711,6 +1001,18 @@ static bool p2p_go_negotiation_resp_cb(const struct m=
+mpdu_header *mpdu,
+ 	}
+ =
+
+ 	if (resp_info.status !=3D P2P_STATUS_SUCCESS) {
++		if (resp_info.status =3D=3D P2P_STATUS_FAIL_INFO_NOT_AVAIL) {
++			/* Give the peer 120s to restart the GO Negotiation */
++			l_error("P2P_STATUS_FAIL_INFO_NOT_AVAIL: Will wait for "
++				"a new GO Negotiation Request before declaring "
++				"failure");
++			dev->go_neg_req_timeout =3D l_timeout_create(120,
++						p2p_go_neg_req_timeout, dev,
++						p2p_go_neg_req_timeout_destroy);
++			p2p_device_discovery_start(dev);
++			return true;
++		}
 +
-+static void p2p_peer_wsc_remove(struct wsc_dbus *wsc)
-+{
+ 		l_error("GO Negotiation Response status %i", resp_info.status);
+ 		p2p_connect_failed(dev);
+ 		return true;
+@@ -1163,6 +1465,60 @@ static void p2p_device_roc_start(struct p2p_device *=
+dev)
+ 	if (duration > 1000)
+ 		duration =3D 1000;
+ =
+
 +	/*
-+	 * The WSC removal is triggered in p2p_peer_put so we call
-+	 * p2p_peer_free directly from there too.
++	 * Be on our listen channel, even if we're still in the 120s
++	 * waiting period after a locally-initiated GO Negotiation and
++	 * waiting for the peer's GO Negotiation Request.  It's not
++	 * totally clear that this is how the spec intended this
++	 * mechanism to work.  On one hand 3.1.4.1 says this:
++	 * "A P2P Device may start Group Owner Negotiation by sending a
++	 * GO Negotiation Request frame after receiving a Probe Request
++	 * frame from the target P2P Device."
++	 * and the Appendix D. scenarios also show GO Negotiation happening
++	 * on the initiator's listen channel directly after the reception
++	 * of the Probe Request from the target.  But:
++	 *  1. in 3.1.4.1 that is a MAY and doesn't exclude starting GO
++	 *     Negotiation also on the target's listen channel.
++	 *  2. not all devices use the search state so we may never
++	 *     receive a Probe Request and may end up waiting indefinitely.
++	 *  3. the time the peer spends on each channel in the scan state
++	 *     may be too short for the peer to receive the GO Negotiation
++	 *     Request after the Probe Request before moving to the next
++	 *     channel.
++	 *  4. since we know the target is going to spend some time on
++	 *     their own listen channel, using that channel should work in
++	 *     every case.
++	 *
++	 * We also have this in 3.1.4.1:
++	 * "When the P2P Devices arrive on a common channel and begin Group
++	 * Owner Negotiation, they shall stay on that channel until Group
++	 * Owner Negotiation completes."
++	 * telling us that the whole negotiation should be happening on
++	 * one channel seemingly supporting the new GO Negotiation being on
++	 * the same channel as the original failed GO Negotiation.
++	 * However the rest of the spec makes it clear they are not treated
++	 * as a single GO Negotiation:
++	 * 3.1.4.2:
++	 * "Group Owner Negotiation is a three way frame exchange"
++	 * 3.1.4.2.2:
++	 * "Group Formation ends on transmission or reception of a GO
++	 * Negotiation Response frame with the Status Code set to a value
++	 * other than Success."
++	 *
++	 * 3.1.4.1 implies frame exchanges happen on the target device's
++	 * Listen Channel, not our Listen Channel:
++	 * "Prior to beginning the Group Formation Procedure the P2P Device
++	 * shall arrive on a common channel with the target P2P Device.
++	 * The Find Phase in In-band Device Discovery or Out-of-Band Device
++	 * Discovery may be used for this purpose. In the former case, the
++	 * P2P Device only needs to scan the Listen Channel of the target
++	 * P2P Device, as opposed to all of the Social Channels."
++	 *
++	 * All in all we transmit our Negotiation Requests on the peer's
++	 * listen channel since it is bound to spend more time on that
++	 * channel than on any other channel and then we listen for a
++	 * potential GO Negotiation restart on our listen channel.
 +	 */
-+}
-+
- static bool p2p_device_peer_add(struct p2p_device *dev, struct p2p_peer *p=
-eer)
- {
- 	if (!strlen(peer->name) || !l_utf8_validate(
-@@ -601,6 +848,17 @@ static bool p2p_device_peer_add(struct p2p_device *dev=
-, struct p2p_peer *peer)
- 		return false;
- 	}
+ 	listen_freq =3D scan_channel_to_freq(dev->listen_channel,
+ 						SCAN_BAND_2_4_GHZ);
  =
 
-+	peer->wsc.get_path =3D p2p_peer_wsc_get_path;
-+	peer->wsc.connect =3D p2p_peer_wsc_connect;
-+	peer->wsc.cancel =3D p2p_peer_wsc_cancel;
-+	peer->wsc.remove =3D p2p_peer_wsc_remove;
-+
-+	if (!wsc_dbus_add_interface(&peer->wsc)) {
-+		l_dbus_unregister_object(dbus_get_bus(),
-+						p2p_peer_get_path(peer));
-+		return false;
-+	}
-+
- 	l_queue_push_tail(dev->peer_list, peer);
- =
-
- 	return true;
-@@ -608,6 +866,7 @@ static bool p2p_device_peer_add(struct p2p_device *dev,=
- struct p2p_peer *peer)
- =
-
- struct p2p_peer_move_data {
- 	struct l_queue *new_list;
-+	struct p2p_peer *conn_peer;
- 	uint64_t now;
- };
- =
-
-@@ -616,7 +875,8 @@ static bool p2p_peer_move_recent(void *data, void *user=
-_data)
- 	struct p2p_peer *peer =3D data;
- 	struct p2p_peer_move_data *move_data =3D user_data;
- =
-
--	if (move_data->now > peer->bss->time_stamp + 30 * L_USEC_PER_SEC)
-+	if (move_data->now > peer->bss->time_stamp + 30 * L_USEC_PER_SEC &&
-+			peer !=3D move_data->conn_peer)
- 		return false;	/* Old, keep on the list */
- =
-
- 	/* Recently seen or currently connected, move to the new list */
-@@ -703,6 +963,7 @@ static bool p2p_scan_notify(int err, struct l_queue *bs=
-s_list,
- 	 * dev->peer_list and unref only the remaining peers.
+@@ -1591,15 +1947,23 @@ static void p2p_device_discovery_start(struct p2p_d=
+evice *dev)
+ 	 * 3.1.2.1.1: "The Listen Channel shall be chosen at the beginning of
+ 	 * the In-band Device Discovery"
+ 	 *
+-	 * (Unless we're waiting for a GO Negotiation Request from a peer on
+-	 * a known channel)
++	 * But keep the old channel if we're still waiting for the peer to
++	 * restart the GO Negotiation because there may not be enough time
++	 * for the peer to update our Listen Channel value before the user
++	 * accepts the connection.  In that case the GO Negotiation Request
++	 * would be sent on the old channel.
  	 */
- 	move_data.new_list =3D dev->peer_list;
-+	move_data.conn_peer =3D dev->conn_peer;
- 	move_data.now =3D l_time_now();
- 	l_queue_foreach_remove(old_peer_list, p2p_peer_move_recent, &move_data);
- 	l_queue_destroy(old_peer_list, p2p_peer_put);
-@@ -1033,6 +1294,9 @@ static bool p2p_device_start_stop(struct p2p_device *=
-dev,
- 		 * Stopping the P2P device, drop all peers as we can't start
- 		 * new connections from now on.
- 		 */
-+		if (dev->conn_peer)
-+			p2p_connect_failed(dev);
-+
- 		l_queue_destroy(dev->peer_list, p2p_peer_put);
- 		dev->peer_list =3D NULL;
- 	}
-@@ -1299,6 +1563,7 @@ static void p2p_device_free(void *user_data)
- 	}
+-	dev->listen_channel =3D channels_social[l_getrandom_uint32() %
+-					L_ARRAY_SIZE(channels_social)];
+-	dev->oper_class =3D 81;
++	if (!(dev->listen_channel && dev->conn_peer)) {
++		dev->listen_channel =3D channels_social[l_getrandom_uint32() %
++						L_ARRAY_SIZE(channels_social)];
++		dev->oper_class =3D 81;
++	}
  =
 
- 	p2p_device_discovery_stop(dev);
-+	p2p_connection_reset(dev);
- 	l_dbus_unregister_object(dbus_get_bus(), p2p_device_get_path(dev));
- 	l_queue_destroy(dev->peer_list, p2p_peer_put);
- 	l_queue_destroy(dev->discovery_users, p2p_discovery_user_free);
-@@ -1491,7 +1756,7 @@ static struct l_dbus_message *p2p_device_request_disc=
-overy(struct l_dbus *dbus,
- 						p2p_device_discovery_destroy);
- 	l_queue_push_tail(dev->discovery_users, user);
+ 	frame_watch_add(dev->wdev_id, FRAME_GROUP_LISTEN, 0x0040,
+ 			(uint8_t *) "", 0, p2p_device_probe_cb, dev, NULL);
++	frame_watch_add(dev->wdev_id, FRAME_GROUP_LISTEN, 0x00d0,
++			p2p_frame_go_neg_req.data, p2p_frame_go_neg_req.len,
++			p2p_device_go_negotiation_req_cb, dev, NULL);
  =
 
--	if (first_user && dev->enabled)
-+	if (first_user && !dev->conn_peer && dev->enabled)
- 		p2p_device_discovery_start(dev);
+ 	p2p_device_scan_start(dev);
+ }
+@@ -2177,7 +2541,13 @@ static struct l_dbus_message *p2p_device_release_dis=
+covery(struct l_dbus *dbus,
+ =
+
+ 	p2p_discovery_user_free(user);
+ =
+
+-	if (l_queue_isempty(dev->discovery_users))
++	/*
++	 * If dev->conn_peer is non-NULL, we may be scanning as a way to
++	 * listen for a GO Negotiation Request from the target peer.  In
++	 * that case we don't stop the device discovery when the list
++	 * becomes empty.
++	 */
++	if (l_queue_isempty(dev->discovery_users) && !dev->conn_peer)
+ 		p2p_device_discovery_stop(dev);
  =
 
  	return l_dbus_message_new_method_return(message);
-@@ -1619,6 +1884,25 @@ static bool p2p_peer_get_connected(struct l_dbus *db=
-us,
- 	return true;
- }
- =
-
-+static struct l_dbus_message *p2p_peer_dbus_disconnect(struct l_dbus *dbus,
-+						struct l_dbus_message *message,
-+						void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
-+
-+	if (!l_dbus_message_get_arguments(message, ""))
-+		return dbus_error_invalid_args(message);
-+
-+	/*
-+	 * Save the message for both WSC.Cancel and Peer.Disconnect the
-+	 * same way.
-+	 */
-+	peer->wsc.pending_cancel =3D l_dbus_message_ref(message);
-+
-+	p2p_peer_disconnect(peer);
-+	return NULL;
-+}
-+
- static void p2p_peer_interface_setup(struct l_dbus_interface *interface)
- {
- 	l_dbus_interface_property(interface, "Name", 0, "s",
-@@ -1629,6 +1913,8 @@ static void p2p_peer_interface_setup(struct l_dbus_in=
-terface *interface)
- 					p2p_peer_get_subcategory, NULL);
- 	l_dbus_interface_property(interface, "Connected", 0, "b",
- 					p2p_peer_get_connected, NULL);
-+	l_dbus_interface_method(interface, "Disconnect", 0,
-+				p2p_peer_dbus_disconnect, "", "");
- }
- =
-
- static void p2p_unicast_notify(struct l_genl_msg *msg, void *user_data)
 -- =
 
 2.20.1
 
---===============2759830149102678089==--
+--===============9124636544461270214==--
 
