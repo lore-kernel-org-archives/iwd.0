@@ -1,252 +1,254 @@
-Content-Type: multipart/mixed; boundary="===============1239133910593803692=="
+Content-Type: multipart/mixed; boundary="===============6601765504970536464=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 10/17] p2p: Build and send the GO Negotiation Request
-Date: Fri, 03 Apr 2020 18:14:23 +0200
-Message-ID: <20200403161430.14168-10-andrew.zaborowski@intel.com>
+Subject: [PATCH 11/17] p2p: Handle GO Negotiation Response, send Confirmation
+Date: Fri, 03 Apr 2020 18:14:24 +0200
+Message-ID: <20200403161430.14168-11-andrew.zaborowski@intel.com>
 In-Reply-To: <20200403161430.14168-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1239133910593803692==
+--===============6601765504970536464==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Parse the GO Negotiation Response frame and if no errors found send the
+GO Negotiation Confirmation.  If that gets ACKed wait for the GO to set
+up the group.
 ---
- src/p2p.c | 205 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 204 insertions(+), 1 deletion(-)
+ src/p2p.c | 198 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 196 insertions(+), 2 deletions(-)
 
 diff --git a/src/p2p.c b/src/p2p.c
-index 86d2b3a1..fea689da 100644
+index fea689da..ed820c09 100644
 --- a/src/p2p.c
 +++ b/src/p2p.c
-@@ -121,6 +121,7 @@ static const int channels_scan_2_4_other[] =3D { 2, 3, =
-4, 5, 7, 8, 9, 10 };
- enum {
- 	FRAME_GROUP_DEFAULT =3D 0,
- 	FRAME_GROUP_LISTEN,
-+	FRAME_GROUP_CONNECT,
+@@ -88,6 +88,12 @@ struct p2p_device {
+ 	uint8_t conn_addr[6];
+ 	uint16_t conn_password_id;
+ =
+
++	struct l_timeout *config_timeout;
++	unsigned long go_config_delay;
++	uint32_t go_oper_freq;
++	struct p2p_group_id_attr go_group_id;
++	uint8_t go_interface_addr[6];
++
+ 	bool enabled : 1;
  };
  =
 
- struct device_type_category_info {
-@@ -438,6 +439,9 @@ static void p2p_connection_reset(struct p2p_device *dev)
+@@ -439,6 +445,8 @@ static void p2p_connection_reset(struct p2p_device *dev)
  	l_dbus_property_changed(dbus_get_bus(), p2p_device_get_path(dev),
  				IWD_P2P_INTERFACE, "AvailableConnections");
  =
 
-+	frame_watch_group_remove(dev->wdev_id, FRAME_GROUP_CONNECT);
-+	frame_xchg_stop(dev->wdev_id);
++	l_timeout_remove(dev->config_timeout);
 +
- 	if (!dev->enabled || (dev->enabled && dev->start_stop_cmd_id)) {
- 		/*
- 		 * The device has been disabled in the mean time, all peers
-@@ -467,6 +471,63 @@ static void p2p_connect_failed(struct p2p_device *dev)
- 	p2p_connection_reset(dev);
- }
+ 	frame_watch_group_remove(dev->wdev_id, FRAME_GROUP_CONNECT);
+ 	frame_xchg_stop(dev->wdev_id);
  =
 
-+static void p2p_peer_frame_xchg(struct p2p_peer *peer, struct iovec *tx_bo=
-dy,
-+				const uint8_t *bssid,
-+				unsigned int retry_interval,
-+				unsigned int resp_timeout,
-+				unsigned int retries_on_ack, bool own_channel,
-+				uint32_t group_id, frame_xchg_cb_t cb, ...)
-+{
-+	struct p2p_device *dev =3D peer->dev;
-+	struct iovec *frame;
-+	const struct iovec *iov;
-+	struct mmpdu_header *header;
-+	uint8_t header_buf[32] __attribute__ ((aligned));
-+	int iov_cnt;
-+	uint32_t freq;
-+	va_list args;
-+
-+	/* Header */
-+	memset(header_buf, 0, sizeof(header_buf));
-+	header =3D (void *) header_buf;
-+	header->fc.protocol_version =3D 0;
-+	header->fc.type =3D MPDU_TYPE_MANAGEMENT;
-+	header->fc.subtype =3D MPDU_MANAGEMENT_SUBTYPE_ACTION;
-+	/* Section 2.4.3 */
-+	memcpy(header->address_1, peer->device_addr, 6);	/* DA */
-+	memcpy(header->address_2, dev->addr, 6);		/* SA */
-+	memcpy(header->address_3, bssid, 6);			/* BSSID */
-+
-+	for (iov =3D tx_body, iov_cnt =3D 0; iov->iov_base; iov++)
-+		iov_cnt++;
-+
-+	frame =3D l_new(struct iovec, iov_cnt + 2);
-+	frame[0].iov_base =3D header_buf;
-+	frame[0].iov_len =3D (const uint8_t *) mmpdu_body(header) - header_buf;
-+	memcpy(frame + 1, tx_body, sizeof(struct iovec) * iov_cnt);
-+
-+	freq =3D own_channel ?
-+		scan_channel_to_freq(dev->listen_channel, SCAN_BAND_2_4_GHZ) :
-+		peer->bss->frequency;
-+
-+	va_start(args, cb);
-+	frame_xchg_startv(dev->wdev_id, frame, freq, retry_interval,
-+				resp_timeout, retries_on_ack, group_id,
-+				cb, dev, args);
-+	va_end(args);
-+
-+	l_free(frame);
-+}
-+
-+static const struct frame_xchg_prefix p2p_frame_go_neg_resp =3D {
-+	/* Management -> Public Action -> P2P -> GO Negotiation Response */
-+	.data =3D (uint8_t []) {
-+		0x04, 0x09, 0x50, 0x6f, 0x9a, 0x09,
-+		P2P_ACTION_GO_NEGOTIATION_RESP
-+	},
-+	.len =3D 7,
-+};
-+
- static void p2p_scan_destroy(void *user_data)
- {
- 	struct p2p_device *dev =3D user_data;
-@@ -474,9 +535,151 @@ static void p2p_scan_destroy(void *user_data)
+@@ -535,6 +543,53 @@ static void p2p_scan_destroy(void *user_data)
  	dev->scan_id =3D 0;
  }
  =
 
-+/*
-+ * It seems that sending more than about 42 channels in a frame's Channel
-+ * List attribute will baffle some devices enough that they will ignore
-+ * the frame.
-+ */
-+#define MAX_CHANNELS 40
-+
-+static void p2p_add_freq_func(uint32_t freq, void *user_data)
++static void p2p_start_client_provision(struct p2p_device *dev)
 +{
-+	struct p2p_channel_entries *channel_entry =3D user_data;
-+	uint8_t channel;
-+	enum scan_band band;
++	char bssid_str[18];
 +
-+	if (channel_entry->n_channels >=3D MAX_CHANNELS)
-+		return;
++	memcpy(bssid_str, util_address_to_string(dev->go_interface_addr), 18);
++	l_debug("freq=3D%u ssid=3D%s group_addr=3D%s bssid=3D%s", dev->go_oper_fr=
+eq,
++		dev->go_group_id.ssid,
++		util_address_to_string(dev->go_group_id.device_addr),
++		bssid_str);
 +
-+	channel =3D scan_freq_to_channel(freq, &band);
-+
-+	if (band !=3D scan_oper_class_to_band((const uint8_t *) "XX\x4",
-+						channel_entry->oper_class))
-+		return;
-+
-+	channel_entry->channels[channel_entry->n_channels++] =3D channel;
++	/* TODO: start client provisioning */
 +}
 +
-+static void p2p_device_fill_channel_list(struct p2p_device *dev,
-+					struct p2p_channel_list_attr *attr)
-+{
-+	struct p2p_channel_entries *channel_entry;
-+	unsigned int total_channels;
-+
-+	memcpy(attr->country, dev->country, 3);
-+	attr->channel_entries =3D l_queue_new();
-+
-+	channel_entry =3D l_malloc(sizeof(struct p2p_channel_entries) +
-+					MAX_CHANNELS);
-+	channel_entry->oper_class =3D 81;
-+	channel_entry->n_channels =3D 0;
-+	scan_freq_set_foreach(wiphy_get_supported_freqs(dev->wiphy),
-+				p2p_add_freq_func, channel_entry);
-+	l_queue_push_tail(attr->channel_entries, channel_entry);
-+	total_channels =3D channel_entry->n_channels;
-+
-+	if (total_channels >=3D MAX_CHANNELS)
-+		return;
-+
-+	channel_entry =3D l_malloc(sizeof(struct p2p_channel_entries) +
-+					MAX_CHANNELS);
-+	channel_entry->oper_class =3D 115;
-+	channel_entry->n_channels =3D 0;
-+	scan_freq_set_foreach(wiphy_get_supported_freqs(dev->wiphy),
-+				p2p_add_freq_func, channel_entry);
-+
-+	if (total_channels + channel_entry->n_channels > MAX_CHANNELS)
-+		channel_entry->n_channels =3D MAX_CHANNELS - total_channels;
-+
-+	l_queue_push_tail(attr->channel_entries, channel_entry);
-+}
-+
-+static bool p2p_go_negotiation_resp_cb(const struct mmpdu_header *mpdu,
-+					const void *body, size_t body_len,
-+					int rssi, struct p2p_device *dev)
-+{
-+	/* TODO: handle the GO Negotiation Response frame */
-+	return false;
-+}
-+
-+static void p2p_go_negotiation_req_done(int error, void *user_data)
++static void p2p_config_timeout_destroy(void *user_data)
 +{
 +	struct p2p_device *dev =3D user_data;
 +
-+	if (error)
-+		l_error("Sending the GO Negotiation Req failed: %s (%i)",
-+			strerror(-error), -error);
-+	else
-+		l_error("No GO Negotiation Response after Request ACKed");
-+
-+	p2p_connect_failed(dev);
++	dev->config_timeout =3D NULL;
 +}
 +
- static void p2p_start_go_negotiation(struct p2p_device *dev)
- {
--	/* TODO: start GO Negotiation */
-+	struct p2p_go_negotiation_req info =3D {};
-+	uint8_t *req_body;
-+	size_t req_len;
-+	struct iovec iov[16];
-+	int iov_len =3D 0;
-+	/*
-+	 * Devices should respond within 100ms but times of ~400ms are
-+	 * often seen instead.
-+	 *
-+	 * 3.1.4.2: "The P2P Device that sent the Group Owner Negotiation
-+	 * frame shall assume that Group Owner Negotiation failed and is
-+	 * complete if it does not receive the next frame in the exchange
-+	 * within 100 milliseconds of receiving an acknowledgement frame."
-+	 */
-+	unsigned int resp_timeout =3D 600;
++static void p2p_config_timeout(struct l_timeout *timeout, void *user_data)
++{
++	struct p2p_device *dev =3D user_data;
 +
-+	info.dialog_token =3D 1;
-+	info.capability =3D dev->capability;
-+	info.go_intent =3D 0;	/* Don't want to be the GO */
-+	info.go_tie_breaker =3D 0;
-+	info.config_timeout.go_config_timeout =3D 50;	/* 500ms */
-+	info.config_timeout.client_config_timeout =3D 50;	/* 500ms */
-+	memcpy(info.listen_channel.country, dev->country, 3);
-+	info.listen_channel.oper_class =3D dev->oper_class;
-+	info.listen_channel.channel_num =3D dev->listen_channel;
-+	memcpy(info.intended_interface_addr, dev->conn_addr, 6);
++	l_timeout_remove(dev->config_timeout);
 +
-+	/*
-+	 * In theory we support an empty set of operating channels for
-+	 * our potential group as a GO but we have to include our
-+	 * supported channels because the peer can only choose their
-+	 * own channels from our list.  Use the listen channel as the
-+	 * preferred operating channel because we have no preference.
-+	 */
-+	p2p_device_fill_channel_list(dev, &info.channel_list);
-+	memcpy(info.operating_channel.country, dev->country, 3);
-+	info.operating_channel.oper_class =3D dev->oper_class;
-+	info.operating_channel.channel_num =3D dev->listen_channel;
-+	info.device_info =3D dev->device_info;
-+	info.device_password_id =3D dev->conn_password_id;
++	/* Ready to start WSC */
++	p2p_start_client_provision(dev);
++}
 +
-+	req_body =3D p2p_build_go_negotiation_req(&info, &req_len);
-+	p2p_clear_go_negotiation_req(&info);
++/*
++ * Called by GO Negotiation Response and Confirmation receive handlers,
++ * in both cases the channel lists are required to be subsets of our
++ * own supported channels and the Operating Channel must appear in the
++ * channel list.
++ */
++static bool p2p_device_validate_channel_list(struct p2p_device *dev,
++				const struct p2p_channel_list_attr *attr,
++				const struct p2p_channel_attr *oper_channel)
++{
++	if (l_queue_isempty(attr->channel_entries))
++		return false;
 +
-+	if (!req_body) {
++	/* TODO */
++	return true;
++}
++
+ /*
+  * It seems that sending more than about 42 channels in a frame's Channel
+  * List attribute will baffle some devices enough that they will ignore
+@@ -594,12 +649,151 @@ static void p2p_device_fill_channel_list(struct p2p_=
+device *dev,
+ 	l_queue_push_tail(attr->channel_entries, channel_entry);
+ }
+ =
+
++static void p2p_go_negotiation_confirm_done(int error, void *user_data)
++{
++	struct p2p_device *dev =3D user_data;
++
++	if (error) {
++		/* TODO: we should probably ignore the missing ACK error */
++		l_error("Sending the GO Negotiation Confirm failed: %s (%i)",
++			strerror(-error), -error);
 +		p2p_connect_failed(dev);
 +		return;
 +	}
 +
-+	iov[iov_len].iov_base =3D req_body;
-+	iov[iov_len].iov_len =3D req_len;
++	/*
++	 * Frame was ACKed.  For simplicity wait idly the maximum amount of
++	 * time indicated by the peer in the GO Negotiation Response's
++	 * Configuration Timeout attribute and start the provisioning phase.
++	 */
++	dev->config_timeout =3D l_timeout_create_ms(dev->go_config_delay,
++						p2p_config_timeout, dev,
++						p2p_config_timeout_destroy);
++}
++
+ static bool p2p_go_negotiation_resp_cb(const struct mmpdu_header *mpdu,
+ 					const void *body, size_t body_len,
+ 					int rssi, struct p2p_device *dev)
+ {
+-	/* TODO: handle the GO Negotiation Response frame */
+-	return false;
++	struct p2p_go_negotiation_resp resp_info;
++	struct p2p_go_negotiation_confirmation confirm_info =3D {};
++	uint8_t *confirm_body;
++	size_t confirm_len;
++	int r;
++	struct iovec iov[16];
++	int iov_len =3D 0;
++	enum scan_band band;
++	uint32_t frequency;
++
++	l_debug("");
++
++	if (!dev->conn_peer)
++		return true;
++
++	if (body_len < 8) {
++		l_error("GO Negotiation Response frame too short");
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	r =3D p2p_parse_go_negotiation_resp(body + 7, body_len - 7, &resp_info);
++	if (r < 0) {
++		l_error("GO Negotiation Response parse error %s (%i)",
++			strerror(-r), -r);
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	if (resp_info.dialog_token !=3D 1) {
++		l_error("GO Negotiation Response dialog token doesn't match");
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	if (resp_info.status !=3D P2P_STATUS_SUCCESS) {
++		l_error("GO Negotiation Response status %i", resp_info.status);
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	/*
++	 * 3.1.4.2: "The Tie breaker bit in a GO Negotiation Response frame
++	 * shall be toggled from the corresponding GO Negotiation Request
++	 * frame."
++	 */
++	if (!resp_info.go_tie_breaker) {
++		l_error("GO Negotiation Response tie breaker value wrong");
++
++		if (resp_info.go_intent =3D=3D 0) {
++			/* Can't continue */
++			p2p_connect_failed(dev);
++			return true;
++		}
++	}
++
++	if (resp_info.capability.group_caps & P2P_GROUP_CAP_PERSISTENT_GROUP) {
++		l_error("Persistent groups not supported");
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	if (resp_info.device_password_id !=3D dev->conn_password_id) {
++		l_error("GO Negotiation Response WSC device password ID wrong");
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	if (!p2p_device_validate_channel_list(dev, &resp_info.channel_list,
++						&resp_info.operating_channel))
++		return true;
++
++	band =3D scan_oper_class_to_band(
++			(const uint8_t *) resp_info.operating_channel.country,
++			resp_info.operating_channel.oper_class);
++	frequency =3D scan_channel_to_freq(
++					resp_info.operating_channel.channel_num,
++					band);
++	if (!frequency) {
++		l_error("Bad operating channel in GO Negotiation Response");
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	dev->go_config_delay =3D resp_info.config_timeout.go_config_timeout * 10;
++	dev->go_oper_freq =3D frequency;
++	memcpy(&dev->go_group_id, &resp_info.group_id,
++		sizeof(struct p2p_group_id_attr));
++	memcpy(dev->go_interface_addr, resp_info.intended_interface_addr, 6);
++
++	/* Build and send the GO Negotiation Confirmation */
++	confirm_info.dialog_token =3D resp_info.dialog_token;
++	confirm_info.status =3D P2P_STATUS_SUCCESS;
++	confirm_info.capability.device_caps =3D 0;	/* Reserved */
++	confirm_info.capability.group_caps =3D 0;		/* Reserved */
++	confirm_info.channel_list =3D resp_info.channel_list;
++	confirm_info.operating_channel =3D resp_info.operating_channel;
++
++	confirm_body =3D p2p_build_go_negotiation_confirmation(&confirm_info,
++								&confirm_len);
++	p2p_clear_go_negotiation_resp(&resp_info);
++
++	if (!confirm_body) {
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	iov[iov_len].iov_base =3D confirm_body;
++	iov[iov_len].iov_len =3D confirm_len;
 +	iov_len++;
 +
 +	/* WFD and other service IEs go here */
@@ -254,18 +256,16 @@ dy,
 +	iov[iov_len].iov_base =3D NULL;
 +
 +	p2p_peer_frame_xchg(dev->conn_peer, iov, dev->conn_peer->device_addr,
-+				100, resp_timeout, 256, false,
-+				FRAME_GROUP_CONNECT,
-+				p2p_go_negotiation_req_done,
-+				&p2p_frame_go_neg_resp,
-+				p2p_go_negotiation_resp_cb, NULL);
++				0, 0, 0, false, FRAME_GROUP_CONNECT,
++				p2p_go_negotiation_confirm_done, NULL);
++	return true;
  }
  =
 
- static void p2p_start_provision_discovery(struct p2p_device *dev)
+ static void p2p_go_negotiation_req_done(int error, void *user_data)
 -- =
 
 2.20.1
 
---===============1239133910593803692==--
+--===============6601765504970536464==--
 
