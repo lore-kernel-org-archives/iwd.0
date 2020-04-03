@@ -1,442 +1,254 @@
-Content-Type: multipart/mixed; boundary="===============6494553422544097417=="
+Content-Type: multipart/mixed; boundary="===============6242318681877950336=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 02/17] Add minimal p2p.c and p2p.h
-Date: Fri, 03 Apr 2020 18:14:15 +0200
-Message-ID: <20200403161430.14168-2-andrew.zaborowski@intel.com>
+Subject: [PATCH 03/17] manager: Create/destroy P2P devices
+Date: Fri, 03 Apr 2020 18:14:16 +0200
+Message-ID: <20200403161430.14168-3-andrew.zaborowski@intel.com>
 In-Reply-To: <20200403161430.14168-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6494553422544097417==
+--===============6242318681877950336==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add the functions to be called by manager.c and a minimal DBus API.
+Create a P2P device interface along with the station interface when
+setting up a wiphy and handle the interface being removed.
 ---
- Makefile.am |   1 +
- src/p2p.c   | 354 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/p2p.h   |  31 +++++
- 3 files changed, 386 insertions(+)
- create mode 100644 src/p2p.c
- create mode 100644 src/p2p.h
+ src/manager.c | 122 +++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 101 insertions(+), 21 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 768685f8..0a82878e 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -224,6 +224,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
-h src/missing.h \
- 					src/netconfig.h src/netconfig.c\
- 					src/resolve.h src/resolve.c\
- 					src/hotspot.c \
-+					src/p2p.h src/p2p.c \
- 					src/p2putil.h src/p2putil.c \
- 					src/module.h src/module.c \
- 					src/rrm.c \
-diff --git a/src/p2p.c b/src/p2p.c
-new file mode 100644
-index 00000000..957482eb
---- /dev/null
-+++ b/src/p2p.c
-@@ -0,0 +1,354 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdlib.h>
-+#include <linux/rtnetlink.h>
-+#include <linux/if_ether.h>
-+#include <unistd.h>
-+#include <limits.h>
-+#include <stdio.h>
-+#include <time.h>
-+#include <errno.h>
-+
-+#include <ell/ell.h>
-+
-+#include "linux/nl80211.h"
-+
-+#include "src/iwd.h"
-+#include "src/wiphy.h"
-+#include "src/scan.h"
-+#include "src/p2putil.h"
-+#include "src/ie.h"
-+#include "src/util.h"
-+#include "src/dbus.h"
-+#include "src/netdev.h"
-+#include "src/mpdu.h"
-+#include "src/common.h"
-+#include "src/wsc.h"
-+#include "src/handshake.h"
-+#include "src/crypto.h"
-+#include "src/module.h"
-+#include "src/frame-xchg.h"
-+#include "src/nl80211util.h"
+diff --git a/src/manager.c b/src/manager.c
+index 533975d2..f351c780 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -42,6 +42,7 @@
+ #include "src/util.h"
+ #include "src/common.h"
+ #include "src/nl80211cmd.h"
 +#include "src/p2p.h"
-+
-+struct p2p_device {
-+	uint64_t wdev_id;
-+	uint8_t addr[6];
-+	struct wiphy *wiphy;
-+	unsigned int connections_left;
-+
-+	struct l_queue *peer_list;
-+};
-+
-+struct p2p_peer {
-+	struct scan_bss *bss;
-+	struct p2p_device *dev;
-+	char *name;
-+};
-+
-+static struct l_queue *p2p_device_list;
-+
-+static bool p2p_device_match(const void *a, const void *b)
-+{
-+	const struct p2p_device *dev =3D a;
-+	const uint64_t *wdev_id =3D b;
-+
-+	return dev->wdev_id =3D=3D *wdev_id;
-+}
-+
-+struct p2p_device *p2p_device_find(uint64_t wdev_id)
-+{
-+	return l_queue_find(p2p_device_list, p2p_device_match, &wdev_id);
-+}
-+
-+static const char *p2p_device_get_path(const struct p2p_device *dev)
-+{
-+	return wiphy_get_path(dev->wiphy);
-+}
-+
-+static const char *p2p_peer_get_path(const struct p2p_peer *peer)
-+{
-+	static char path[256];
-+
-+	snprintf(path, sizeof(path),
-+			"%s/p2p_peers/%02x_%02x_%02x_%02x_%02x_%02x",
-+			p2p_device_get_path(peer->dev),
-+			peer->bss->addr[0], peer->bss->addr[1],
-+			peer->bss->addr[2], peer->bss->addr[3],
-+			peer->bss->addr[4], peer->bss->addr[5]);
-+	return path;
-+}
-+
-+static void p2p_peer_free(void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
-+
-+	scan_bss_free(peer->bss);
-+	l_free(peer->name);
-+	l_free(peer);
-+}
-+
-+static void p2p_peer_put(void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
-+
-+	l_dbus_unregister_object(dbus_get_bus(), p2p_peer_get_path(peer));
-+	p2p_peer_free(peer);
-+}
-+
-+struct p2p_device *p2p_device_update_from_genl(struct l_genl_msg *msg,
-+						bool create)
-+{
-+	struct l_genl_attr attr;
-+	uint16_t type, len;
-+	const void *data;
-+	const uint8_t *ifaddr =3D NULL;
-+	const uint64_t *wdev_id =3D NULL;
-+	struct wiphy *wiphy =3D NULL;
-+	struct p2p_device *dev;
-+
-+	if (!l_genl_attr_init(&attr, msg))
-+		return NULL;
-+
-+	while (l_genl_attr_next(&attr, &type, &len, &data)) {
-+		switch (type) {
-+		case NL80211_ATTR_WDEV:
-+			if (len !=3D sizeof(uint64_t)) {
-+				l_warn("Invalid wdev index attribute");
-+				return NULL;
-+			}
-+
-+			wdev_id =3D data;
-+			break;
-+
-+		case NL80211_ATTR_WIPHY:
-+			if (len !=3D sizeof(uint32_t)) {
-+				l_warn("Invalid wiphy attribute");
-+				return NULL;
-+			}
-+
-+			wiphy =3D wiphy_find(*((uint32_t *) data));
-+			break;
-+
-+		case NL80211_ATTR_IFTYPE:
-+			if (len !=3D sizeof(uint32_t)) {
-+				l_warn("Invalid interface type attribute");
-+				return NULL;
-+			}
-+
-+			if (*((uint32_t *) data) !=3D NL80211_IFTYPE_P2P_DEVICE)
-+				return NULL;
-+
-+			break;
-+
-+		case NL80211_ATTR_MAC:
-+			if (len !=3D ETH_ALEN) {
-+				l_warn("Invalid interface address attribute");
-+				return NULL;
-+			}
-+
-+			ifaddr =3D data;
-+			break;
-+		}
-+	}
-+
-+	if (!wiphy || !wdev_id || !ifaddr) {
-+		l_warn("Unable to parse interface information");
-+		return NULL;
-+	}
-+
-+	if (create) {
-+		if (p2p_device_find(*wdev_id)) {
-+			l_debug("Duplicate p2p device %" PRIx64, *wdev_id);
-+			return NULL;
-+		}
-+	} else {
-+		dev =3D p2p_device_find(*wdev_id);
-+		if (!dev)
-+			return NULL;
-+
-+		memcpy(dev->addr, ifaddr, ETH_ALEN);
-+		return NULL;
-+	}
-+
-+	dev =3D l_new(struct p2p_device, 1);
-+	dev->wdev_id =3D *wdev_id;
-+	memcpy(dev->addr, ifaddr, ETH_ALEN);
-+	dev->wiphy =3D wiphy;
-+	dev->connections_left =3D 1;
-+
-+	l_queue_push_tail(p2p_device_list, dev);
-+
-+	l_debug("Created P2P device %" PRIx64, dev->wdev_id);
-+
-+	if (!l_dbus_object_add_interface(dbus_get_bus(),
-+						p2p_device_get_path(dev),
-+						IWD_P2P_INTERFACE, dev))
-+		l_info("Unable to add the %s interface to %s",
-+			IWD_P2P_INTERFACE, p2p_device_get_path(dev));
-+
-+	return dev;
-+}
-+
-+static void p2p_device_free(void *user_data)
-+{
-+	struct p2p_device *dev =3D user_data;
-+
-+	l_dbus_unregister_object(dbus_get_bus(), p2p_device_get_path(dev));
-+	l_queue_destroy(dev->peer_list, p2p_peer_put);
-+	l_free(dev);
-+}
-+
-+bool p2p_device_destroy(struct p2p_device *dev)
-+{
-+	if (!l_queue_remove(p2p_device_list, dev))
-+		return false;
-+
-+	p2p_device_free(dev);
-+	return true;
-+}
-+
-+static bool p2p_device_get_avail_conns(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	struct p2p_device *dev =3D user_data;
-+	uint16_t avail_conns =3D dev->connections_left;
-+
-+	l_dbus_message_builder_append_basic(builder, 'q', &avail_conns);
-+	return true;
-+}
-+
-+static struct l_dbus_message *p2p_device_get_peers(struct l_dbus *dbus,
-+						struct l_dbus_message *message,
+ =
+
+ static struct l_genl_family *nl80211 =3D NULL;
+ static char **whitelist_filter;
+@@ -125,7 +126,8 @@ static bool manager_use_default(struct wiphy_setup_stat=
+e *state)
+ 	return true;
+ }
+ =
+
+-static void manager_new_interface_cb(struct l_genl_msg *msg, void *user_da=
+ta)
++static void manager_new_station_interface_cb(struct l_genl_msg *msg,
++						void *user_data)
+ {
+ 	struct wiphy_setup_state *state =3D user_data;
+ 	uint8_t addr_buf[6];
+@@ -170,6 +172,25 @@ static void manager_new_interface_cb(struct l_genl_msg=
+ *msg, void *user_data)
+ 	netdev_create_from_genl(msg, addr);
+ }
+ =
+
++static void manager_new_p2p_interface_cb(struct l_genl_msg *msg,
 +						void *user_data)
 +{
-+	struct p2p_device *dev =3D user_data;
-+	struct l_dbus_message *reply;
-+	struct l_dbus_message_builder *builder;
-+	const struct l_queue_entry *entry;
++	struct wiphy_setup_state *state =3D user_data;
 +
-+	if (!l_dbus_message_get_arguments(message, ""))
-+		return dbus_error_invalid_args(message);
++	l_debug("");
 +
-+	reply =3D l_dbus_message_new_method_return(message);
-+	builder =3D l_dbus_message_builder_new(reply);
++	if (state->aborted)
++		return;
 +
-+	l_dbus_message_builder_enter_array(builder, "(on)");
-+
-+	for (entry =3D l_queue_get_entries(dev->peer_list); entry;
-+			entry =3D entry->next) {
-+		const struct p2p_peer *peer =3D entry->data;
-+		int16_t signal_strength =3D peer->bss->signal_strength;
-+
-+		l_dbus_message_builder_enter_struct(builder, "on");
-+		l_dbus_message_builder_append_basic(builder, 'o',
-+						p2p_peer_get_path(peer));
-+		l_dbus_message_builder_append_basic(builder, 'n',
-+							&signal_strength);
-+		l_dbus_message_builder_leave_struct(builder);
++	if (l_genl_msg_get_error(msg) < 0) {
++		l_error("NEW_INTERFACE failed for p2p-device: %s",
++			strerror(-l_genl_msg_get_error(msg)));
++		return;
 +	}
 +
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+
-+	return reply;
++	p2p_device_update_from_genl(msg, true);
 +}
 +
-+static void p2p_interface_setup(struct l_dbus_interface *interface)
-+{
-+	l_dbus_interface_property(interface, "AvailableConnections", 0, "q",
-+					p2p_device_get_avail_conns, NULL);
-+	l_dbus_interface_method(interface, "GetPeers", 0,
-+				p2p_device_get_peers, "a(on)", "", "peers");
-+}
+ static void manager_new_interface_done(void *user_data)
+ {
+ 	struct wiphy_setup_state *state =3D user_data;
+@@ -184,7 +205,7 @@ static void manager_create_interfaces(struct wiphy_setu=
+p_state *state)
+ {
+ 	struct l_genl_msg *msg;
+ 	char ifname[10];
+-	uint32_t iftype =3D NL80211_IFTYPE_STATION;
++	uint32_t iftype;
+ 	unsigned cmd_id;
+ =
+
+ 	if (state->aborted)
+@@ -192,19 +213,26 @@ static void manager_create_interfaces(struct wiphy_se=
+tup_state *state)
+ =
+
+ 	if (state->use_default) {
+ 		manager_use_default(state);
+-		return;
 +
-+static bool p2p_peer_get_name(struct l_dbus *dbus,
-+				struct l_dbus_message *message,
-+				struct l_dbus_message_builder *builder,
-+				void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
++		/*
++		 * Some drivers don't let us touch the default interface
++		 * but still allow us to create/destroy P2P interfaces, so
++		 * give it a chance.
++		 */
++		goto try_create_p2p;
+ 	}
+ =
+
+ 	/*
+ 	 * Current policy: we maintain one netdev per wiphy for station,
+ 	 * AP and Ad-Hoc modes, one optional p2p-device and zero or more
+-	 * p2p-GOs or p2p-clients.  The P2P-related interfaces will be
++	 * p2p-GOs or p2p-clients.  The P2P-client/GO interfaces will be
+ 	 * created on request.
+ 	 */
+ =
+
+ 	/* To be improved */
+ 	snprintf(ifname, sizeof(ifname), "wlan%i", (int) state->id);
+ 	l_debug("creating %s", ifname);
++	iftype =3D NL80211_IFTYPE_STATION;
+ =
+
+ 	msg =3D l_genl_msg_new(NL80211_CMD_NEW_INTERFACE);
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY, 4, &state->id);
+@@ -226,7 +254,48 @@ static void manager_create_interfaces(struct wiphy_set=
+up_state *state)
+ 	}
+ =
+
+ 	cmd_id =3D l_genl_family_send(nl80211, msg,
+-					manager_new_interface_cb, state,
++					manager_new_station_interface_cb, state,
++					manager_new_interface_done);
 +
-+	l_dbus_message_builder_append_basic(builder, 's', peer->name);
-+	return true;
-+}
++	if (!cmd_id) {
++		l_error("Error sending NEW_INTERFACE for %s", ifname);
++		return;
++	}
 +
-+static bool p2p_peer_get_connected(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	bool connected =3D false;
++	state->pending_cmd_count++;
 +
-+	l_dbus_message_builder_append_basic(builder, 'b', &connected);
-+	return true;
-+}
++try_create_p2p:
++	/*
++	 * Require the MAC on create feature so we can send our desired
++	 * interface address during GO Negotiation before actually creating
++	 * the local Client/GO interface.  Could be worked around if needed.
++	 */
++	if (!wiphy_supports_iftype(state->wiphy, NL80211_IFTYPE_P2P_DEVICE) ||
++			!wiphy_supports_iftype(state->wiphy,
++						NL80211_IFTYPE_P2P_CLIENT) ||
++			!wiphy_has_feature(state->wiphy,
++						NL80211_FEATURE_MAC_ON_CREATE))
++		return;
 +
-+static void p2p_peer_interface_setup(struct l_dbus_interface *interface)
-+{
-+	l_dbus_interface_property(interface, "Name", 0, "s",
-+					p2p_peer_get_name, NULL);
-+	l_dbus_interface_property(interface, "Connected", 0, "b",
-+					p2p_peer_get_connected, NULL);
-+}
++	/*
++	 * Use wlan%i-p2p for now.  We might want to use
++	 * <default_interface's_name>-p2p here (in case state->use_default
++	 * is true) but the risk is that we'd go over the interface name
++	 * length limit.
++	 */
++	snprintf(ifname, sizeof(ifname), "wlan%i-p2p", (int) state->id);
++	l_debug("creating %s", ifname);
++	iftype =3D NL80211_IFTYPE_P2P_DEVICE;
 +
-+static int p2p_init(void)
-+{
-+	if (!l_dbus_register_interface(dbus_get_bus(),
-+					IWD_P2P_INTERFACE,
-+					p2p_interface_setup,
-+					NULL, false))
-+		l_error("Unable to register the %s interface",
-+			IWD_P2P_INTERFACE);
++	msg =3D l_genl_msg_new(NL80211_CMD_NEW_INTERFACE);
++	l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY, 4, &state->id);
++	l_genl_msg_append_attr(msg, NL80211_ATTR_IFTYPE, 4, &iftype);
++	l_genl_msg_append_attr(msg, NL80211_ATTR_IFNAME,
++				strlen(ifname) + 1, ifname);
++	l_genl_msg_append_attr(msg, NL80211_ATTR_4ADDR, 1, "\0");
++	l_genl_msg_append_attr(msg, NL80211_ATTR_SOCKET_OWNER, 0, "");
++	cmd_id =3D l_genl_family_send(nl80211, msg,
++					manager_new_p2p_interface_cb, state,
+ 					manager_new_interface_done);
+ =
+
+ 	if (!cmd_id) {
+@@ -378,17 +447,6 @@ static struct wiphy_setup_state *manager_find_pending(=
+uint32_t id)
+ 				L_UINT_TO_PTR(id));
+ }
+ =
+
+-static uint32_t manager_parse_ifindex(struct l_genl_msg *msg)
+-{
+-	uint32_t ifindex;
+-
+-	if (nl80211_parse_attrs(msg, NL80211_ATTR_IFINDEX, &ifindex,
+-					NL80211_ATTR_UNSPEC) < 0)
+-		return -1;
+-
+-	return ifindex;
+-}
+-
+ static uint32_t manager_parse_wiphy_id(struct l_genl_msg *msg)
+ {
+ 	uint32_t wiphy;
+@@ -593,7 +651,6 @@ static int manager_wiphy_filtered_dump(uint32_t wiphy_i=
+d,
+ static void manager_config_notify(struct l_genl_msg *msg, void *user_data)
+ {
+ 	uint8_t cmd;
+-	struct netdev *netdev;
+ 	uint32_t wiphy_id;
+ 	struct wiphy_setup_state *state;
+ =
+
+@@ -692,13 +749,36 @@ static void manager_config_notify(struct l_genl_msg *=
+msg, void *user_data)
+ 		return;
+ =
+
+ 	case NL80211_CMD_DEL_INTERFACE:
+-		netdev =3D netdev_find(manager_parse_ifindex(msg));
+-		if (!netdev)
+-			return;
++	{
++		uint32_t ifindex;
 +
-+	if (!l_dbus_register_interface(dbus_get_bus(),
-+					IWD_P2P_PEER_INTERFACE,
-+					p2p_peer_interface_setup,
-+					NULL, false))
-+		l_error("Unable to register the %s interface",
-+			IWD_P2P_PEER_INTERFACE);
++		if (nl80211_parse_attrs(msg, NL80211_ATTR_IFINDEX, &ifindex,
++					NL80211_ATTR_UNSPEC) < 0) {
++			uint64_t wdev_id;
++			struct p2p_device *p2p_device;
 +
-+	p2p_device_list =3D l_queue_new();
++			if (nl80211_parse_attrs(msg, NL80211_ATTR_WDEV,
++						&wdev_id,
++						NL80211_ATTR_UNSPEC) < 0)
++				return;
 +
-+	return 0;
-+}
++			p2p_device =3D p2p_device_find(wdev_id);
++			if (!p2p_device)
++				return;
 +
-+static void p2p_exit(void)
-+{
-+	l_dbus_unregister_interface(dbus_get_bus(), IWD_P2P_INTERFACE);
-+	l_dbus_unregister_interface(dbus_get_bus(), IWD_P2P_PEER_INTERFACE);
-+	l_queue_destroy(p2p_device_list, p2p_device_free);
-+	p2p_device_list =3D NULL;
-+}
++			p2p_device_destroy(p2p_device);
++		} else {
++			struct netdev *netdev =3D netdev_find(ifindex);
 +
-+IWD_MODULE(p2p, p2p_init, p2p_exit)
-+IWD_MODULE_DEPENDS(p2p, wiphy)
-+IWD_MODULE_DEPENDS(p2p, scan)
-diff --git a/src/p2p.h b/src/p2p.h
-new file mode 100644
-index 00000000..93a8c625
---- /dev/null
-+++ b/src/p2p.h
-@@ -0,0 +1,31 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
++			if (!netdev)
++				return;
 +
-+#include <stdbool.h>
-+
-+struct l_genl_msg;
-+struct p2p_device;
-+
-+struct p2p_device *p2p_device_update_from_genl(struct l_genl_msg *msg,
-+						bool create);
-+bool p2p_device_destroy(struct p2p_device *dev);
-+struct p2p_device *p2p_device_find(uint64_t wdev_idx);
++			netdev_destroy(netdev);
++		}
+ =
+
+-		netdev_destroy(netdev);
+ 		return;
+ 	}
++	}
+ }
+ =
+
+ static int manager_init(void)
 -- =
 
 2.20.1
 
---===============6494553422544097417==--
+--===============6242318681877950336==--
 
