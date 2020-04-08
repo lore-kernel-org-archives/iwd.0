@@ -1,53 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============7879468433866194330=="
+Content-Type: multipart/mixed; boundary="===============0959869237340635470=="
 MIME-Version: 1.0
-From: Diego Santa Cruz <Diego.SantaCruz@spinetix.com>
-Subject: RE: Problems attempting to use ad-hoc mode, link state remains dormant
-Date: Wed, 08 Apr 2020 16:46:25 +0000
-Message-ID: <
- <VI1PR01MB516732A2E162CF4C56456C1B88C00@VI1PR01MB5167.eurprd01.prod.exchangelabs.com>>
-In-Reply-To: <77aeba33-e3aa-58ca-cd3e-1dd0916753dc@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: Problems attempting to use ad-hoc mode, link state remains dormant
+Date: Wed, 08 Apr 2020 11:31:32 -0500
+Message-ID: <de312981-6eb9-926b-ea71-366f219c805a@gmail.com>
+In-Reply-To: <VI1PR01MB516732A2E162CF4C56456C1B88C00@VI1PR01MB5167.eurprd01.prod.exchangelabs.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7879468433866194330==
+--===============0959869237340635470==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
-> Hi Diego,
-> =
+Hi Diego,
 
-> > However, I have another device with an Atheros QCA6174 (ath10k_pci
-> driver) and if I put it into ap mode no other station sees it (Windows la=
-ptop,
-> Linux laptop, iPhone). Do you know if there is anything special to do to =
-use ap
-> mode on these devices?
-> >
-> =
+> BTW, could you share what is the status of the wired 802.1x support? Is i=
+t something that can be relied upon?
 
-> I'm not aware of any, but admittedly we're not actively focused on AP
-> mode at the moment, so it is a 'less developed' area of the iwd codebase.
+Not sure what to say?  It works on the networks we have access to.  Are =
 
-OK, got it. I actually just tried out using hostapd instead and it works ni=
-cely with the above wireless card, I could successfully connect from my iPh=
-one (open, no auth).
+there improvements that can be made? Sure..
 
-BTW, could you share what is the status of the wired 802.1x support? Is it =
-something that can be relied upon?
- =
+The last question I can't really comment on.  This is an open source =
 
-Best,
-Diego
+project and comes with no warranties.  You'll have to perform your own =
 
--- =
+due diligence to answer that.
 
-Diego Santa Cruz, PhD
-Technology Architect
-spinetix.com
-
-
-
---===============7879468433866194330==--
+Regards,
+-Denis
+--===============0959869237340635470==--
 
