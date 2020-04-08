@@ -1,60 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============6160264293446070861=="
+Content-Type: multipart/mixed; boundary="===============6982535827500693761=="
 MIME-Version: 1.0
-From: Rosen Penev <rosenp@gmail.com>
-Subject: [PATCH] client: apply format attribute to two functions
-Date: Tue, 07 Apr 2020 20:32:43 -0700
-Message-ID: <20200408033243.587218-1-rosenp@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] client: apply format attribute to two functions
+Date: Wed, 08 Apr 2020 14:37:04 +0000
+Message-ID: <1d9fc8ec-d800-a135-083e-0a45c5029470@gmail.com>
+In-Reply-To: <20200408033243.587218-1-rosenp@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6160264293446070861==
+--===============6982535827500693761==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Clang was able to find these extra ones.
----
- client/agent.c   | 2 +-
- client/display.h | 6 ++++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+Hi Rosen,
 
-diff --git a/client/agent.c b/client/agent.c
-index b804b50d..157b61c0 100644
---- a/client/agent.c
-+++ b/client/agent.c
-@@ -303,7 +303,7 @@ static struct l_dbus_message *request_user_password_met=
-hod_call(
- =
+On 4/7/20 10:32 PM, Rosen Penev wrote:
+> Clang was able to find these extra ones.
+> ---
+>   client/agent.c   | 2 +-
+>   client/display.h | 6 ++++--
+>   2 files changed, 5 insertions(+), 3 deletions(-)
 
- 	username_prompt =3D l_strdup_printf(COLOR_BLUE PROMPT_USERNAME " "
- 						COLOR_OFF "%s\n", username);
--	display(username_prompt);
-+	display("%s", username_prompt);
- 	l_free(username_prompt);
- =
+Looks fine to me, but gcc now complains:
 
- 	display_agent_prompt(PROMPT_PASSWORD, true);
-diff --git a/client/display.h b/client/display.h
-index 2b0d8d7c..fbae0c67 100644
---- a/client/display.h
-+++ b/client/display.h
-@@ -32,8 +32,10 @@ struct command_family;
- #define CLEAR_SCREEN	"\033[2J"
- #define MARGIN		"  "
- =
+   CC       client/display.o
+client/display.c: In function =E2=80=98display_enable_cmd_prompt=E2=80=99:
+client/display.c:537:10: error: zero-length gnu_printf format string =
 
--void display(const char *format, ...);
--void display_table_header(const char *caption, const char *fmt, ...);
-+void display(const char *format, ...)
-+		__attribute__((format(printf, 1, 2)));
-+void display_table_header(const char *caption, const char *fmt, ...)
-+		__attribute__((format(printf, 2, 3)));
- void display_table_footer(void);
- void display_error(const char *error);
- void display_command_line(const char *command_family,
--- =
+[-Werror=3Dformat-zero-length]
+   537 |  display("");
+       |          ^~
 
-2.25.1
-
---===============6160264293446070861==--
+Regards,
+-Denis
+--===============6982535827500693761==--
 
