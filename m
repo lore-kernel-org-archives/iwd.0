@@ -1,40 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============0129381828215104609=="
+Content-Type: multipart/mixed; boundary="===============6216297043297665620=="
 MIME-Version: 1.0
-From: Rosen Penev <rosenp@gmail.com>
-Subject: Re: [PATCH] client: apply format attribute to two functions
-Date: Wed, 08 Apr 2020 13:54:54 -0700
-Message-ID: <CAKxU2N9mYrbrLuevvfd_0ixortm2QmzOinr1_hj5FYWV+=2peg@mail.gmail.com>
-In-Reply-To: <1d9fc8ec-d800-a135-083e-0a45c5029470@gmail.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH] client: Rewrite workaround for readline
+Date: Wed, 08 Apr 2020 16:14:07 -0700
+Message-ID: <20200408231407.11321-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0129381828215104609==
+--===============6216297043297665620==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 8, 2020 at 7:36 AM Denis Kenzior <denkenz@gmail.com> wrote:
->
-> Hi Rosen,
->
-> On 4/7/20 10:32 PM, Rosen Penev wrote:
-> > Clang was able to find these extra ones.
-> > ---
-> >   client/agent.c   | 2 +-
-> >   client/display.h | 6 ++++--
-> >   2 files changed, 5 insertions(+), 3 deletions(-)
->
-> Looks fine to me, but gcc now complains:
->
->    CC       client/display.o
-> client/display.c: In function =E2=80=98display_enable_cmd_prompt=E2=80=99:
-> client/display.c:537:10: error: zero-length gnu_printf format string
-> [-Werror=3Dformat-zero-length]
->    537 |  display("");
-What does this do anyway?
->        |          ^~
->
-> Regards,
-> -Denis
---===============0129381828215104609==--
+Instead of calling display(""), explicitly use the sequence of
+commands to force readline to properly update its internal state
+and re-display the prompt.
+---
+ client/display.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/client/display.c b/client/display.c
+index 4bcf51a2..cf74326d 100644
+--- a/client/display.c
++++ b/client/display.c
+@@ -534,7 +534,14 @@ void display_enable_cmd_prompt(void)
+ =
+
+ 	rl_set_prompt(IWD_PROMPT);
+ =
+
+-	display("");
++	/*
++	 * The following sequence of rl_* commands forces readline to properly
++	 * update its internal state and re-display the new prompt.
++	 */
++	rl_save_prompt();
++	rl_redisplay();
++	rl_restore_prompt();
++	rl_forced_update_display();
+ }
+ =
+
+ void display_disable_cmd_prompt(void)
+-- =
+
+2.13.6
+
+--===============6216297043297665620==--
 
