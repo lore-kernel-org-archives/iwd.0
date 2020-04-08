@@ -1,62 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============0627379468007016181=="
+Content-Type: multipart/mixed; boundary="===============0129381828215104609=="
 MIME-Version: 1.0
-From: Diego Santa Cruz <Diego.SantaCruz@spinetix.com>
-Subject: RE: Problems attempting to use ad-hoc mode, link state remains dormant
-Date: Wed, 08 Apr 2020 17:05:10 +0000
-Message-ID: <
- <VI1PR01MB51676B8CF2839DD752B5E99388C00@VI1PR01MB5167.eurprd01.prod.exchangelabs.com>>
-In-Reply-To: <de312981-6eb9-926b-ea71-366f219c805a@gmail.com>
+From: Rosen Penev <rosenp@gmail.com>
+Subject: Re: [PATCH] client: apply format attribute to two functions
+Date: Wed, 08 Apr 2020 13:54:54 -0700
+Message-ID: <CAKxU2N9mYrbrLuevvfd_0ixortm2QmzOinr1_hj5FYWV+=2peg@mail.gmail.com>
+In-Reply-To: <1d9fc8ec-d800-a135-083e-0a45c5029470@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0627379468007016181==
+--===============0129381828215104609==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
-> =
-
-> Hi Diego,
-> =
-
-> > BTW, could you share what is the status of the wired 802.1x support? Is=
- it
-> something that can be relied upon?
-> =
-
-> Not sure what to say?  It works on the networks we have access to.  Are
-> there improvements that can be made? Sure..
-> =
-
-> The last question I can't really comment on.  This is an open source
-> project and comes with no warranties.  You'll have to perform your own
-> due diligence to answer that.
-> =
-
-
-Thanks as I could not find much info on the status of the wired 802.1x on i=
-wd or documentation I was not sure that if it was at a "proof of concept" l=
-evel or if it was working. Given your answer I will go ahead and try it out=
- for integration into our product.
-
-I was not looking for any warranties, just your feeling about the level of =
-development. I will report any problems that I find, with patches if possib=
-le :-)
-
-Thanks for your help.
-
-Best,
-
-Diego
-
--- =
-
-Diego Santa Cruz, PhD
-Technology Architect
-spinetix.com
-
-
-
---===============0627379468007016181==--
+On Wed, Apr 8, 2020 at 7:36 AM Denis Kenzior <denkenz@gmail.com> wrote:
+>
+> Hi Rosen,
+>
+> On 4/7/20 10:32 PM, Rosen Penev wrote:
+> > Clang was able to find these extra ones.
+> > ---
+> >   client/agent.c   | 2 +-
+> >   client/display.h | 6 ++++--
+> >   2 files changed, 5 insertions(+), 3 deletions(-)
+>
+> Looks fine to me, but gcc now complains:
+>
+>    CC       client/display.o
+> client/display.c: In function =E2=80=98display_enable_cmd_prompt=E2=80=99:
+> client/display.c:537:10: error: zero-length gnu_printf format string
+> [-Werror=3Dformat-zero-length]
+>    537 |  display("");
+What does this do anyway?
+>        |          ^~
+>
+> Regards,
+> -Denis
+--===============0129381828215104609==--
 
