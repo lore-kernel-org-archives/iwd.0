@@ -1,49 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============2112157498510198807=="
+Content-Type: multipart/mixed; boundary="===============4665640886053486183=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH] client: Rephrase the wait messages
-Date: Wed, 08 Apr 2020 18:51:01 -0700
-Message-ID: <20200409015101.11398-1-tim.a.kourt@linux.intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] client: Rewrite workaround for readline
+Date: Thu, 09 Apr 2020 15:27:30 +0000
+Message-ID: <3f078749-01d0-9a4a-5132-255ab922c828@gmail.com>
+In-Reply-To: <20200408231407.11321-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2112157498510198807==
+--===============4665640886053486183==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- client/display.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Tim,
 
-diff --git a/client/display.c b/client/display.c
-index cf74326d..4a9f7be0 100644
---- a/client/display.c
-+++ b/client/display.c
-@@ -548,7 +548,7 @@ void display_disable_cmd_prompt(void)
- {
- 	display_refresh_reset();
- =
+On 4/8/20 6:14 PM, Tim Kourt wrote:
+> Instead of calling display(""), explicitly use the sequence of
+> commands to force readline to properly update its internal state
+> and re-display the prompt.
+> ---
+>   client/display.c | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
+> =
 
--	rl_set_prompt("Waiting to connect to IWD");
-+	rl_set_prompt("Waiting for IWD to start...");
- 	printf("\r");
- 	rl_on_new_line();
- 	rl_redisplay();
-@@ -685,7 +685,7 @@ void display_init(void)
- =
 
- 	rl_completer_quote_characters =3D "\"";
- 	rl_erase_empty_line =3D 1;
--	rl_callback_handler_install("Waiting for IWD to appear...",
-+	rl_callback_handler_install("Waiting for IWD to start...",
- 							readline_callback);
- =
+Applied, thanks.
 
- 	rl_redisplay();
--- =
+Regards,
+-Denis
 
-2.13.6
-
---===============2112157498510198807==--
+--===============4665640886053486183==--
 
