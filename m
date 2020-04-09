@@ -1,70 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============1372325023034379514=="
+Content-Type: multipart/mixed; boundary="===============2112157498510198807=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 3/3] main: Simplify config file search logic
-Date: Wed, 08 Apr 2020 18:44:17 -0700
-Message-ID: <20200409014417.10029-3-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20200409014417.10029-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH] client: Rephrase the wait messages
+Date: Wed, 08 Apr 2020 18:51:01 -0700
+Message-ID: <20200409015101.11398-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1372325023034379514==
+--===============2112157498510198807==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/main.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+ client/display.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/main.c b/src/main.c
-index b5ccc63b..a0384179 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -374,7 +374,6 @@ int main(int argc, char *argv[])
- 	struct l_dbus *dbus;
- 	const char *config_dir;
- 	char **config_dirs;
--	int i;
+diff --git a/client/display.c b/client/display.c
+index cf74326d..4a9f7be0 100644
+--- a/client/display.c
++++ b/client/display.c
+@@ -548,7 +548,7 @@ void display_disable_cmd_prompt(void)
+ {
+ 	display_refresh_reset();
  =
 
- 	for (;;) {
- 		int opt;
-@@ -456,18 +455,18 @@ int main(int argc, char *argv[])
- 	iwd_config =3D l_settings_new();
+-	rl_set_prompt("Waiting to connect to IWD");
++	rl_set_prompt("Waiting for IWD to start...");
+ 	printf("\r");
+ 	rl_on_new_line();
+ 	rl_redisplay();
+@@ -685,7 +685,7 @@ void display_init(void)
  =
 
- 	config_dirs =3D l_strsplit(config_dir, ':');
--	for (i =3D 0; config_dirs[i]; i++) {
--		char *path =3D l_strdup_printf("%s/%s", config_dirs[i],
--								"main.conf");
--		bool result =3D l_settings_load_from_file(iwd_config, path);
--		l_free(path);
--
--		if (result) {
--			l_info("Loaded configuration from %s/main.conf",
--							config_dirs[i]);
--			break;
--		}
-+
-+	for (; *config_dirs; config_dirs++) {
-+		L_AUTO_FREE_VAR(char *, path) =3D
-+			l_strdup_printf("%s/%s", *config_dirs, "main.conf");
-+
-+		if (!l_settings_load_from_file(iwd_config, path))
-+			continue;
-+
-+		l_info("Loaded configuration from %s", path);
-+		break;
- 	}
-+
- 	l_strv_free(config_dirs);
+ 	rl_completer_quote_characters =3D "\"";
+ 	rl_erase_empty_line =3D 1;
+-	rl_callback_handler_install("Waiting for IWD to appear...",
++	rl_callback_handler_install("Waiting for IWD to start...",
+ 							readline_callback);
  =
 
- 	__eapol_set_config(iwd_config);
+ 	rl_redisplay();
 -- =
 
 2.13.6
 
---===============1372325023034379514==--
+--===============2112157498510198807==--
 
