@@ -1,101 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============5611582399059320457=="
+Content-Type: multipart/mixed; boundary="===============1372325023034379514=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 2/3] main: Fix failure cleanup sequence
-Date: Wed, 08 Apr 2020 18:44:16 -0700
-Message-ID: <20200409014417.10029-2-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 3/3] main: Simplify config file search logic
+Date: Wed, 08 Apr 2020 18:44:17 -0700
+Message-ID: <20200409014417.10029-3-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20200409014417.10029-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5611582399059320457==
+--===============1372325023034379514==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/main.c | 24 +++++++++++++++---------
- 1 file changed, 15 insertions(+), 9 deletions(-)
+ src/main.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
 diff --git a/src/main.c b/src/main.c
-index acd72131..b5ccc63b 100644
+index b5ccc63b..a0384179 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -476,12 +476,12 @@ int main(int argc, char *argv[])
- 	exit_status =3D EXIT_FAILURE;
+@@ -374,7 +374,6 @@ int main(int argc, char *argv[])
+ 	struct l_dbus *dbus;
+ 	const char *config_dir;
+ 	char **config_dirs;
+-	int i;
  =
 
- 	if (!storage_create_dirs())
--		goto fail_dbus;
-+		goto failed_dirs;
+ 	for (;;) {
+ 		int opt;
+@@ -456,18 +455,18 @@ int main(int argc, char *argv[])
+ 	iwd_config =3D l_settings_new();
  =
 
- 	genl =3D l_genl_new();
- 	if (!genl) {
- 		l_error("Failed to open generic netlink socket");
--		goto fail_genl;
-+		goto failed_genl;
+ 	config_dirs =3D l_strsplit(config_dir, ':');
+-	for (i =3D 0; config_dirs[i]; i++) {
+-		char *path =3D l_strdup_printf("%s/%s", config_dirs[i],
+-								"main.conf");
+-		bool result =3D l_settings_load_from_file(iwd_config, path);
+-		l_free(path);
+-
+-		if (result) {
+-			l_info("Loaded configuration from %s/main.conf",
+-							config_dirs[i]);
+-			break;
+-		}
++
++	for (; *config_dirs; config_dirs++) {
++		L_AUTO_FREE_VAR(char *, path) =3D
++			l_strdup_printf("%s/%s", *config_dirs, "main.conf");
++
++		if (!l_settings_load_from_file(iwd_config, path))
++			continue;
++
++		l_info("Loaded configuration from %s", path);
++		break;
  	}
- =
-
- 	if (getenv("IWD_GENL_DEBUG"))
-@@ -490,7 +490,7 @@ int main(int argc, char *argv[])
- 	rtnl =3D l_netlink_new(NETLINK_ROUTE);
- 	if (!rtnl) {
- 		l_error("Failed to open route netlink socket");
--		goto fail_rtnl;
-+		goto failed_rtnl;
- 	}
- =
-
- 	if (getenv("IWD_RTNL_DEBUG"))
-@@ -499,7 +499,7 @@ int main(int argc, char *argv[])
- 	dbus =3D l_dbus_new_default(L_DBUS_SYSTEM_BUS);
- 	if (!dbus) {
- 		l_error("Failed to initialize D-Bus");
--		goto fail_dbus;
-+		goto failed_dbus;
- 	}
- =
-
- 	if (enable_dbus_debug)
-@@ -510,18 +510,24 @@ int main(int argc, char *argv[])
- 	dbus_init(dbus);
- =
-
- 	exit_status =3D l_main_run_with_signal(signal_handler, NULL);
 +
- 	plugin_exit();
+ 	l_strv_free(config_dirs);
  =
 
- 	iwd_modules_exit();
- =
-
- 	dbus_exit();
- 	l_dbus_destroy(dbus);
--	storage_cleanup_dirs();
--fail_dbus:
--	l_genl_unref(genl);
--fail_rtnl:
-+failed_dbus:
-+
- 	l_netlink_destroy(rtnl);
--fail_genl:
-+failed_rtnl:
-+
-+	l_genl_unref(genl);
-+failed_genl:
-+
-+	storage_cleanup_dirs();
-+failed_dirs:
-+
- 	l_settings_free(iwd_config);
- =
-
- 	l_timeout_remove(timeout);
+ 	__eapol_set_config(iwd_config);
 -- =
 
 2.13.6
 
---===============5611582399059320457==--
+--===============1372325023034379514==--
 
