@@ -1,32 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============4794967451855075428=="
+Content-Type: multipart/mixed; boundary="===============7876117983057692014=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/3] storage: Refactor dirs creation logic to cleanup on
- failure
-Date: Thu, 09 Apr 2020 15:41:32 +0000
-Message-ID: <660b7dcf-b4be-68ac-4f4c-ae65b1cce2fe@gmail.com>
-In-Reply-To: <20200409014417.10029-1-tim.a.kourt@linux.intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] auto-t: check linkmode/operstate in adhoc test (open)
+Date: Thu, 09 Apr 2020 09:19:30 -0700
+Message-ID: <20200409161930.2930-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4794967451855075428==
+--===============7876117983057692014==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tim,
+A previous patch fixed the linkmode/operstate for open AdHoc networks.
+---
+ autotests/testAdHoc/open_test.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On 4/8/20 8:44 PM, Tim Kourt wrote:
-> ---
->   src/storage.c | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
-> =
+diff --git a/autotests/testAdHoc/open_test.py b/autotests/testAdHoc/open_te=
+st.py
+index 815533bb..a3882a50 100644
+--- a/autotests/testAdHoc/open_test.py
++++ b/autotests/testAdHoc/open_test.py
+@@ -25,9 +25,9 @@ class Test(unittest.TestCase):
+         dev1.adhoc_wait_for_connected(dev2.address)
+         dev2.adhoc_wait_for_connected(dev1.address)
+ =
 
+-        #testutil.test_iface_operstate(dev1.name)
+-        #testutil.test_iface_operstate(dev2.name)
+-        #testutil.test_ifaces_connected(dev1.name, dev2.name)
++        testutil.test_iface_operstate(dev1.name)
++        testutil.test_iface_operstate(dev2.name)
++        testutil.test_ifaces_connected(dev1.name, dev2.name)
+ =
 
-All applied, thanks.
+     def test_connection_success(self):
+         wd =3D IWD(True)
+-- =
 
-Regards,
--Denis
+2.21.1
 
---===============4794967451855075428==--
+--===============7876117983057692014==--
 
