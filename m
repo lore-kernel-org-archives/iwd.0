@@ -1,32 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============1554890629007639776=="
+Content-Type: multipart/mixed; boundary="===============3025937187370694875=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] auto-t: check linkmode/operstate in adhoc test (open)
-Date: Thu, 09 Apr 2020 16:30:55 +0000
-Message-ID: <8feaa8e0-2f7a-ef03-dd39-9ecd5ae2e416@gmail.com>
-In-Reply-To: <20200409161930.2930-1-prestwoj@gmail.com>
+Subject: Re: Problems attempting to use ad-hoc mode, link state remains dormant
+Date: Thu, 09 Apr 2020 16:31:16 +0000
+Message-ID: <a838c6ae-4994-5a11-2578-19aa7240913e@gmail.com>
+In-Reply-To: <VI1PR01MB51672539A45DA230833C35A788C00@VI1PR01MB5167.eurprd01.prod.exchangelabs.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1554890629007639776==
+--===============3025937187370694875==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Diego,
 
-On 4/9/20 11:19 AM, James Prestwood wrote:
-> A previous patch fixed the linkmode/operstate for open AdHoc networks.
-> ---
->   autotests/testAdHoc/open_test.py | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+>> The tricky part is that adhoc doesn't initialize its own rtnl object, so
+>> I need to think about a good fix for this.
+>>
 > =
 
+> Thanks for the information, indeed it looked to me that there was somethi=
+ng missing but I could not really figure it out for sure from the code. I d=
+o not think I can help out there.
 
-Applied, thanks.
+This should now be fixed upstream.
 
-regards,
--denis
-
---===============1554890629007639776==--
+Regards,
+-Denis
+--===============3025937187370694875==--
 
