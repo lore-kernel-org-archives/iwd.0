@@ -1,46 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============8955337209689909258=="
+Content-Type: multipart/mixed; boundary="===============2326610953162594521=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 3/3] nlmon: make len parameter a size_t
-Date: Fri, 10 Apr 2020 14:52:43 +0000
-Message-ID: <1c4d9e87-a279-64e0-55b1-d2039dae7b0d@gmail.com>
-In-Reply-To: <20200410003831.258910-3-rosenp@gmail.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH] main: Fix freeing invalid pointer
+Date: Fri, 10 Apr 2020 11:09:42 -0700
+Message-ID: <20200410180942.14109-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8955337209689909258==
+--===============2326610953162594521==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Rosen,
+---
+ src/main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-On 4/9/20 7:38 PM, Rosen Penev wrote:
-> Fixes a sign comparison warning. Found with -Wsign-compare
-> ---
->   monitor/nlmon.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+diff --git a/src/main.c b/src/main.c
+index f8f3043d..8bcbb6a7 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -374,6 +374,7 @@ int main(int argc, char *argv[])
+ 	struct l_dbus *dbus;
+ 	const char *config_dir;
+ 	char **config_dirs;
++	int i;
+ =
 
-> diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-> index df628c2c..e54ae2e9 100644
-> --- a/monitor/nlmon.c
-> +++ b/monitor/nlmon.c
-> @@ -7171,7 +7171,7 @@ static bool nlmon_receive(struct l_io *io, void *us=
-er_data)
->   	unsigned char buf[8192];
->   	unsigned char control[32];
->   	ssize_t bytes_read;
-> -	int nlmsg_len;
-> +	size_t nlmsg_len;
+ 	for (;;) {
+ 		int opt;
+@@ -456,9 +457,9 @@ int main(int argc, char *argv[])
+ =
 
-I think a different fix is neeeded.  Please see commit 98e1d38056e7 =
+ 	config_dirs =3D l_strsplit(config_dir, ':');
+ =
 
-("monitor: Fix crash") for why this is an int.
+-	for (; *config_dirs; config_dirs++) {
++	for (i =3D 0; config_dirs[i]; i++) {
+ 		L_AUTO_FREE_VAR(char *, path) =3D
+-			l_strdup_printf("%s/%s", *config_dirs, "main.conf");
++			l_strdup_printf("%s/%s", config_dirs[i], "main.conf");
+ =
 
-Which line in particular are you seeing the sign comparison warning on?
+ 		if (!l_settings_load_from_file(iwd_config, path))
+ 			continue;
+-- =
 
-Regards,
--Denis
---===============8955337209689909258==--
+2.13.6
+
+--===============2326610953162594521==--
 
