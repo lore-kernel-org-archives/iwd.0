@@ -1,41 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============4676452169833349379=="
+Content-Type: multipart/mixed; boundary="===============3226417055022773340=="
 MIME-Version: 1.0
-From: Rosen Penev <rosenp@gmail.com>
-Subject: [PATCH 3/3] nlmon: make len parameter a size_t
-Date: Thu, 09 Apr 2020 17:38:31 -0700
-Message-ID: <20200410003831.258910-3-rosenp@gmail.com>
-In-Reply-To: <20200410003831.258910-1-rosenp@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/2] client: Rename window change signal for clarity
+Date: Fri, 10 Apr 2020 14:45:09 +0000
+Message-ID: <139586ba-7ef4-cc0e-5a0d-a7db4ba42843@gmail.com>
+In-Reply-To: <20200409225146.19811-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4676452169833349379==
+--===============3226417055022773340==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Fixes a sign comparison warning. Found with -Wsign-compare
----
- monitor/nlmon.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Tim,
 
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index df628c2c..e54ae2e9 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -7171,7 +7171,7 @@ static bool nlmon_receive(struct l_io *io, void *user=
-_data)
- 	unsigned char buf[8192];
- 	unsigned char control[32];
- 	ssize_t bytes_read;
--	int nlmsg_len;
-+	size_t nlmsg_len;
- 	int fd;
- =
+On 4/9/20 5:51 PM, Tim Kourt wrote:
+> ---
+>   client/display.c | 10 ++++++----
+>   1 file changed, 6 insertions(+), 4 deletions(-)
+> =
 
- 	fd =3D l_io_get_fd(io);
--- =
 
-2.25.1
+Both applied, thanks.
 
---===============4676452169833349379==--
+Regards,
+-Denis
+
+--===============3226417055022773340==--
 
