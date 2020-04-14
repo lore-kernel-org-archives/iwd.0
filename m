@@ -1,54 +1,115 @@
-Content-Type: multipart/mixed; boundary="===============3655100030939333106=="
+Content-Type: multipart/mixed; boundary="===============5318065141717333366=="
 MIME-Version: 1.0
-From: Fabrice Fontaine <fontaine.fabrice@gmail.com>
-Subject: [PATCH] frame-xchg.c: fix build with gcc 4.8
-Date: Sat, 11 Apr 2020 23:30:35 +0200
-Message-ID: <20200411213035.972026-1-fontaine.fabrice@gmail.com>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH 1/3] auto-t: Use proper connection status indicator
+Date: Mon, 13 Apr 2020 17:40:45 -0700
+Message-ID: <20200414004047.13678-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3655100030939333106==
+--===============5318065141717333366==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-SOL_NETLINK is used since commit
-87a198111af1ea67053895f7435fb99e3cdd2159 resulting in the following
-build failure with gcc 4.8:
-
-src/frame-xchg.c: In function 'frame_watch_group_io_read':
-src/frame-xchg.c:328:27: error: 'SOL_NETLINK' undeclared (first use in this=
- function)
-   if (cmsg->cmsg_level !=3D SOL_NETLINK)
-                           ^
-Fixes:
- - http://autobuild.buildroot.org/results/3485088b84111c271bbcfaf025aa4103c=
-6452072
-
-Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+'Connected' property of the network object is set before the connection
+attempt is made and does not indicate a connection success. Therefore,
+use device status property to identify the connection status of the device.
 ---
- src/frame-xchg.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ autotests/testHotspot/autoconnect_test.py | 30 +++++++++++++--------------=
+---
+ 1 file changed, 13 insertions(+), 17 deletions(-)
 
-diff --git a/src/frame-xchg.c b/src/frame-xchg.c
-index 50351615..4c950fd3 100644
---- a/src/frame-xchg.c
-+++ b/src/frame-xchg.c
-@@ -42,6 +42,10 @@
- #include "src/netdev.h"
- #include "src/frame-xchg.h"
+diff --git a/autotests/testHotspot/autoconnect_test.py b/autotests/testHots=
+pot/autoconnect_test.py
+index 36ba92bf..936373f1 100644
+--- a/autotests/testHotspot/autoconnect_test.py
++++ b/autotests/testHotspot/autoconnect_test.py
+@@ -40,10 +40,8 @@ class Test(unittest.TestCase):
+         # while there are hotspot networks in range. This should result in
+         # autoconnect *after* ANQP is performed
+         #
+-        condition =3D 'obj.connected'
+-        wd.wait_for_object_condition(wpa_network.network_object, condition)
+-
+-        sleep(2)
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
  =
 
-+#ifndef SOL_NETLINK
-+#define SOL_NETLINK 270
-+#endif
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected(device.name, hapd_wpa.ifname)
+@@ -53,10 +51,10 @@ class Test(unittest.TestCase):
+         #
+         os.remove("/var/lib/iwd/ssidWPA2-1.psk")
+ =
+
+-        self.assertEqual(len(wd.list_known_networks()), 1)
++        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
++        wd.wait_for_object_condition(device, condition)
+ =
+
+-        condition =3D 'not obj.connected'
+-        wd.wait_for_object_condition(wpa_network.network_object, condition)
++        self.assertEqual(len(wd.list_known_networks()), 1)
+ =
+
+         condition =3D 'obj.scanning'
+         wd.wait_for_object_condition(device, condition)
+@@ -71,10 +69,8 @@ class Test(unittest.TestCase):
+         # Since there are no other provisioned networks, we should do ANQP=
+ and
+         # autoconnect to the hotspot network.
+         #
+-        condition =3D 'obj.connected'
+-        wd.wait_for_object_condition(hotspot_network.network_object, condi=
+tion)
+-
+-        sleep(2)
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
+ =
+
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected(device.name, hapd_hotspot.ifname)
+@@ -87,8 +83,8 @@ class Test(unittest.TestCase):
+         #
+         # make sure removal of hotspot conf file resulted in disconnect
+         #
+-        condition =3D 'not obj.connected'
+-        wd.wait_for_object_condition(wpa_network.network_object, condition)
++        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
++        wd.wait_for_object_condition(device, condition)
+ =
+
+         condition =3D 'obj.scanning'
+         wd.wait_for_object_condition(device, condition)
+@@ -99,14 +95,14 @@ class Test(unittest.TestCase):
+         hotspot_network =3D device.get_ordered_network("ssidWPA2-1")
+         self.assertEqual(hotspot_network.type, NetworkType.psk)
+ =
+
+-        condition =3D 'obj.connected'
+-        wd.wait_for_object_condition(hotspot_network.network_object, condi=
+tion)
+-
+-        sleep(2)
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
+ =
+
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected(device.name, hapd_wpa.ifname)
+ =
+
++        device.disconnect()
 +
- struct watch_group {
- 	/*
- 	 * Group IDs, except 0, are per wdev for user's convenience.
+     @classmethod
+     def setUpClass(cls):
+         IWD.copy_to_hotspot('autoconnect.conf')
 -- =
 
-2.25.1
+2.13.6
 
---===============3655100030939333106==--
+--===============5318065141717333366==--
 
