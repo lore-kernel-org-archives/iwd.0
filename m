@@ -1,220 +1,138 @@
-Content-Type: multipart/mixed; boundary="===============5264587194348289987=="
+Content-Type: multipart/mixed; boundary="===============4056157778626127876=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 04/17] p2p: Add peer WSC device type properties
-Date: Fri, 17 Apr 2020 22:55:37 +0200
-Message-ID: <CAOq732JxJbN61vvJDnrOc2aUVJZb_uF5i=hY4UT3uWcPFsH_Qw@mail.gmail.com>
-In-Reply-To: <fb807c29-1ed8-2df7-c6de-7ffd2181cd83@gmail.com>
+Subject: Re: [PATCH 02/17] Add minimal p2p.c and p2p.h
+Date: Fri, 17 Apr 2020 23:01:10 +0200
+Message-ID: <CAOq732LjXXNc5Kj__qJwUAx7ZsWau4D_hTf7jnU-YiLYbSK--A@mail.gmail.com>
+In-Reply-To: <4206a9c2-f8a3-dcba-a011-e00f3312367a@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5264587194348289987==
+--===============4056157778626127876==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
-
-On Fri, 17 Apr 2020 at 21:33, Denis Kenzior <denkenz@gmail.com> wrote:
-> Hi Andrew,
->
+On Fri, 17 Apr 2020 at 17:19, Denis Kenzior <denkenz@gmail.com> wrote:
 > On 4/3/20 11:14 AM, Andrew Zaborowski wrote:
+> > Add the functions to be called by manager.c and a minimal DBus API.
 > > ---
-> >   src/p2p.c | 208 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 208 insertions(+)
+> >   Makefile.am |   1 +
+> >   src/p2p.c   | 354 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >   src/p2p.h   |  31 +++++
+> >   3 files changed, 386 insertions(+)
+> >   create mode 100644 src/p2p.c
+> >   create mode 100644 src/p2p.h
 > >
-> > diff --git a/src/p2p.c b/src/p2p.c
-> > index 957482eb..49111a98 100644
-> > --- a/src/p2p.c
-> > +++ b/src/p2p.c
-> > @@ -68,10 +68,156 @@ struct p2p_peer {
-> >       struct scan_bss *bss;
-> >       struct p2p_device *dev;
-> >       char *name;
-> > +     struct wsc_primary_device_type primary_device_type;
-> >   };
-> >
-> >   static struct l_queue *p2p_device_list;
-> >
-> > +struct device_type_category_info {
-> > +     char *category_str;
 >
-> const char?
+> <snip>
+>
+> > +#include <stdlib.h>
+> > +#include <linux/rtnetlink.h>
+> > +#include <linux/if_ether.h>
+> > +#include <unistd.h>
+> > +#include <limits.h>
+> > +#include <stdio.h>
+> > +#include <time.h>
+> > +#include <errno.h>
+>
+> So just for the future, it would be nice to introduce headers only as
+> you need them so it is a bit easier to track whether something is truly
+> required.
 
-Ok, makes sense.
+Ok, noted.
 
 >
-> > +     unsigned int subcategory_max;
-> > +     char **subcategory_str;
->
-> const char **?
-
-Same here.
-
-
->
-> > +};
 > > +
-> > +/* Wi-Fi Simple Configuration Technical Specification v2.0.5 Table 41 =
-*/
-> > +struct device_type_category_info device_type_categories[] =3D {
-> > +     [1] =3D {
-> > +             "Computer",
-> > +             10,
-> > +             (char *[]) {
-> > +                     [1] =3D "PC",
-> > +                     [2] =3D "Server",
-> > +                     [3] =3D "Media Center",
-> > +                     [4] =3D "Ultra-mobile PC",
-> > +                     [5] =3D "Notebook",
-> > +                     [6] =3D "Desktop",
-> > +                     [7] =3D "Mobile Internet Device",
-> > +                     [8] =3D "Netbook",
-> > +                     [9] =3D "Tablet",
-> > +                     [10] =3D "Ultrabook",
-> > +             },
-> > +     },
-> > +     [2] =3D {
-> > +             "Input Device",
-> > +             9,
-> > +             (char *[]) {
-> > +                     [1] =3D "Keyboard",
-> > +                     [2] =3D "Mouse",
-> > +                     [3] =3D "Joystick",
-> > +                     [4] =3D "Trackball",
-> > +                     [5] =3D "Gaming controller",
-> > +                     [6] =3D "Remote",
-> > +                     [7] =3D "Touchscreen",
-> > +                     [8] =3D "Biometric reader",
-> > +                     [9] =3D "Barcode reader",
-> > +             },
-> > +     },
-> > +     [3] =3D {
-> > +             "Printer or Scanner",
-> > +             5,
-> > +             (char *[]) {
-> > +                     [1] =3D "Printer/Print Server",
-> > +                     [2] =3D "Scanner",
-> > +                     [3] =3D "Fax",
-> > +                     [4] =3D "Copier",
-> > +                     [5] =3D "All-in-one printer, scanner, fax, copier=
-",
-> > +             },
-> > +     },
-> > +     [4] =3D {
-> > +             "Camera",
-> > +             4,
-> > +             (char *[]) {
-> > +                     [1] =3D "Digital Still Camera",
-> > +                     [2] =3D "Video Camera",
-> > +                     [3] =3D "Web Camera",
-> > +                     [4] =3D "Security Camera",
-> > +             },
-> > +     },
-> > +     [5] =3D {
-> > +             "Storage",
-> > +             1,
-> > +             (char *[]) {
-> > +                     [1] =3D "NAS",
-> > +             },
-> > +     },
-> > +     [6] =3D {
-> > +             "Network Infrastructure",
-> > +             5,
-> > +             (char *[]) {
-> > +                     [1] =3D "AP",
-> > +                     [2] =3D "Router",
-> > +                     [3] =3D "Switch",
-> > +                     [4] =3D "Gateway",
-> > +                     [5] =3D "Bridge",
-> > +             },
-> > +     },
-> > +     [7] =3D {
-> > +             "Display",
-> > +             4,
-> > +             (char *[]) {
-> > +                     [1] =3D "Television",
-> > +                     [2] =3D "Electronic Picture Frame",
-> > +                     [3] =3D "Projector",
-> > +                     [4] =3D "Monitor",
-> > +             },
-> > +     },
-> > +     [8] =3D {
-> > +             "Multimedia Device",
-> > +             6,
-> > +             (char *[]) {
-> > +                     [1] =3D "DAR",
-> > +                     [2] =3D "PVR",
-> > +                     [3] =3D "MCX",
-> > +                     [4] =3D "Set-top box",
-> > +                     [5] =3D "Media Server/Adapter/Extender",
-> > +                     [6] =3D "Portable Video Player",
-> > +             },
-> > +     },
-> > +     [9] =3D {
-> > +             "Gaming device",
-> > +             5,
-> > +             (char *[]) {
-> > +                     [1] =3D "Xbox",
-> > +                     [2] =3D "Xbox360",
-> > +                     [3] =3D "Playstation",
-> > +                     [4] =3D "Game Console/Console Adapter",
-> > +                     [5] =3D "Portable Gaming Device",
-> > +             },
-> > +     },
-> > +     [10] =3D {
-> > +             "Telephone",
-> > +             5,
-> > +             (char *[]) {
-> > +                     [1] =3D "Windows Mobile",
-> > +                     [2] =3D "Single mode phone",
-> > +                     [3] =3D "Dual mode phone",
-> > +                     [4] =3D "Single mode smartphone",
-> > +                     [5] =3D "Dual mode smartphone",
-> > +             },
-> > +     },
-> > +     [11] =3D {
-> > +             "Audio Device",
-> > +             7,
-> > +             (char *[]) {
-> > +                     [1] =3D "Audio tuner/receiver",
-> > +                     [2] =3D "Speakers",
-> > +                     [3] =3D "Portable Music Player",
-> > +                     [4] =3D "Headset",
-> > +                     [5] =3D "Headphones",
-> > +                     [6] =3D "Microphone",
-> > +                     [7] =3D "Home Theater System",
-> > +             },
-> > +     },
-> > +     [12] =3D {
-> > +             "Docking Device",
-> > +             2,
-> > +             (char *[]) {
-> > +                     [1] =3D "Computer docking station",
-> > +                     [2] =3D "Media kiosk",
-> > +             },
-> > +     },
-> > +};
+> > +#include <ell/ell.h>
 > > +
+> > +#include "linux/nl80211.h"
+> > +
+> > +#include "src/iwd.h"
+> > +#include "src/wiphy.h"
+> > +#include "src/scan.h"
+> > +#include "src/p2putil.h"
+> > +#include "src/ie.h"
+> > +#include "src/util.h"
+> > +#include "src/dbus.h"
+> > +#include "src/netdev.h"
+> > +#include "src/mpdu.h"
+> > +#include "src/common.h"
+> > +#include "src/wsc.h"
+> > +#include "src/handshake.h"
+> > +#include "src/crypto.h"
+> > +#include "src/module.h"
+> > +#include "src/frame-xchg.h"
+> > +#include "src/nl80211util.h"
+> > +#include "src/p2p.h"
 >
-> So two things I see here:
+> Same for the internal ones...
 >
-> 1. Does this belong in wscutil.c instead?
+> <snip>
+>
+> > +struct p2p_device *p2p_device_update_from_genl(struct l_genl_msg *msg,
+> > +                                             bool create)
+> > +{
+> > +     struct l_genl_attr attr;
+> > +     uint16_t type, len;
+> > +     const void *data;
+> > +     const uint8_t *ifaddr =3D NULL;
+> > +     const uint64_t *wdev_id =3D NULL;
+> > +     struct wiphy *wiphy =3D NULL;
+> > +     struct p2p_device *dev;
+> > +
+> > +     if (!l_genl_attr_init(&attr, msg))
+> > +             return NULL;
+> > +
+> > +     while (l_genl_attr_next(&attr, &type, &len, &data)) {
+> > +             switch (type) {
+> > +             case NL80211_ATTR_WDEV:
+> > +                     if (len !=3D sizeof(uint64_t)) {
+> > +                             l_warn("Invalid wdev index attribute");
+> > +                             return NULL;
+> > +                     }
+> > +
+> > +                     wdev_id =3D data;
+> > +                     break;
+> > +
+> > +             case NL80211_ATTR_WIPHY:
+> > +                     if (len !=3D sizeof(uint32_t)) {
+> > +                             l_warn("Invalid wiphy attribute");
+> > +                             return NULL;
+> > +                     }
+> > +
+> > +                     wiphy =3D wiphy_find(*((uint32_t *) data));
+> > +                     break;
+> > +
+> > +             case NL80211_ATTR_IFTYPE:
+> > +                     if (len !=3D sizeof(uint32_t)) {
+> > +                             l_warn("Invalid interface type attribute"=
+);
+> > +                             return NULL;
+> > +                     }
+> > +
+> > +                     if (*((uint32_t *) data) !=3D NL80211_IFTYPE_P2P_=
+DEVICE)
+> > +                             return NULL;
+> > +
+> > +                     break;
+> > +
+> > +             case NL80211_ATTR_MAC:
+> > +                     if (len !=3D ETH_ALEN) {
+> > +                             l_warn("Invalid interface address attribu=
+te");
+> > +                             return NULL;
+> > +                     }
+> > +
+> > +                     ifaddr =3D data;
+> > +                     break;
+> > +             }
+> > +     }
+>
+> I suspect you can change this to use nl80211util now...
 
-True, it fits better there.
-
-> 2. Your intent seems to be to expose these as D-Bus API values.  If so,
-> then this gets a bit tricky.  Our D-Bus APIs do not support translation.
->   This is by design, hence all values need to be defined in
-> doc/foo-api.txt.  The values must also be all lower case.
-
-Hmmm okay. The other option would be to export these as numeric values
-but we'd be forcing the API users to look them up in the spec,
-possibly also their translators.  I think it might be worth listing
-the values in p2p-peer-api.txt even though there are 75 strings.  Or
-could we reference "Wi-Fi Simple Configuration Technical Specification
-v2.0.5 Table 41" in the docs instead?
+I'll try to remember to do this afterwards.
 
 Best regards
---===============5264587194348289987==--
+--===============4056157778626127876==--
 
