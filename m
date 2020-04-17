@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============2290675824464528757=="
+Content-Type: multipart/mixed; boundary="===============1075108938628763858=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 05/17] p2p: Add main device settings
-Date: Fri, 17 Apr 2020 16:26:35 +0000
-Message-ID: <082c0731-e2c8-c15d-a3c3-fde507994889@gmail.com>
-In-Reply-To: <20200403161430.14168-5-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 06/17] p2p: Add device enable/disable logic
+Date: Fri, 17 Apr 2020 16:41:39 +0000
+Message-ID: <e2eebf0a-21ef-fe32-0f59-0fdeea4b47b2@gmail.com>
+In-Reply-To: <20200403161430.14168-6-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2290675824464528757==
+--===============1075108938628763858==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,299 +16,237 @@ Content-Transfer-Encoding: quoted-printable
 Hi Andrew,
 
 On 4/3/20 11:14 AM, Andrew Zaborowski wrote:
-> Read the country code (for channel operating classes), WSC configuration
-
-hmm, shouldn't we be getting this from the kernel directly and not some =
-
-config file?  What if we're roaming?
-
-> methods and the Primary Device Type from the config file and expose
-> device name as a property.
+> Implement the Enabled property on device interface.  The P2P device is
+> currently disabled on startup but automatically enabling the P2P device
+> can be considered.
 > ---
->   src/p2p.c | 189 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 189 insertions(+)
+>   src/p2p.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 136 insertions(+)
 > =
 
 > diff --git a/src/p2p.c b/src/p2p.c
-> index 49111a98..ab21239d 100644
+> index ab21239d..fa8e0e55 100644
 > --- a/src/p2p.c
 > +++ b/src/p2p.c
-> @@ -60,7 +60,10 @@ struct p2p_device {
+> @@ -58,13 +58,19 @@
+>   struct p2p_device {
+>   	uint64_t wdev_id;
 >   	uint8_t addr[6];
+> +	struct l_genl_family *nl80211;
 >   	struct wiphy *wiphy;
 >   	unsigned int connections_left;
-> +	struct p2p_capability_attr capability;
-> +	struct p2p_device_info_attr device_info;
+>   	struct p2p_capability_attr capability;
+>   	struct p2p_device_info_attr device_info;
+> +	uint32_t start_stop_cmd_id;
+> +	l_dbus_property_complete_cb_t pending_complete;
+> +	struct l_dbus_message *pending_message;
 >   =
 
-> +	uint8_t country[3];
+>   	uint8_t country[3];
 >   	struct l_queue *peer_list;
+> +
+> +	bool enabled : 1;
 >   };
 >   =
 
-> @@ -276,6 +279,9 @@ struct p2p_device *p2p_device_update_from_genl(struct=
- l_genl_msg *msg,
->   	const uint64_t *wdev_id =3D NULL;
->   	struct wiphy *wiphy =3D NULL;
->   	struct p2p_device *dev;
-> +	char hostname[HOST_NAME_MAX + 1];
-> +	char *str;
-> +	unsigned int uint_val;
+>   struct p2p_peer {
+> @@ -269,6 +275,78 @@ static void p2p_peer_put(void *user_data)
+>   	p2p_peer_free(peer);
+>   }
 >   =
 
->   	if (!l_genl_attr_init(&attr, msg))
->   		return NULL;
-> @@ -345,8 +351,148 @@ struct p2p_device *p2p_device_update_from_genl(stru=
-ct l_genl_msg *msg,
+> +static void p2p_device_enable_cb(struct l_genl_msg *msg, void *user_data)
+> +{
+> +	struct p2p_device *dev =3D user_data;
+> +	int error =3D l_genl_msg_get_error(msg);
+> +	struct l_dbus_message *message =3D dev->pending_message;
+> +
+> +	l_debug("START/STOP_P2P_DEVICE: %s (%i)", strerror(-error), -error);
+> +
+> +	if (error)
+> +		goto done;
+> +
+> +	dev->enabled =3D !dev->enabled;
+> +
+> +	if (!message)
+> +		l_dbus_property_changed(dbus_get_bus(),
+> +					p2p_device_get_path(dev),
+> +					IWD_P2P_INTERFACE, "Enabled");
+
+Whats this doing?  Shouldn't the property always be emitted?
+
+> +
+> +done:
+> +	if (message) {
+> +		dev->pending_complete(dbus_get_bus(), message,
+> +					error ? dbus_error_failed(message) :
+> +					NULL);
+> +		dev->pending_message =3D NULL;
+> +		dev->pending_complete =3D NULL;
+> +	}
+
+What this is doing is also not quite clear?  Are you going to be =
+
+invoking this outside the D-Bus path?
+
+> +}
+> +
+> +static void p2p_device_enable_destroy(void *user_data)
+> +{
+> +	struct p2p_device *dev =3D user_data;
+> +
+> +	dev->start_stop_cmd_id =3D 0;
+> +}
+> +
+> +static bool p2p_device_start_stop(struct p2p_device *dev,
+> +				l_dbus_property_complete_cb_t complete,
+> +				struct l_dbus_message *message)
+> +{
+> +	struct l_genl_msg *cmd;
+> +
+> +	if (!dev->enabled)
+> +		cmd =3D l_genl_msg_new_sized(NL80211_CMD_START_P2P_DEVICE, 16);
+> +	else
+> +		cmd =3D l_genl_msg_new_sized(NL80211_CMD_STOP_P2P_DEVICE, 16);
+> +
+> +	l_genl_msg_append_attr(cmd, NL80211_ATTR_WDEV, 8, &dev->wdev_id);
+> +
+> +	dev->start_stop_cmd_id =3D l_genl_family_send(dev->nl80211, cmd,
+> +						p2p_device_enable_cb, dev,
+> +						p2p_device_enable_destroy);
+> +	if (!dev->start_stop_cmd_id) {
+> +		l_genl_msg_unref(cmd);
+> +		complete(dbus_get_bus(), message, dbus_error_failed(message));
+> +		return true;
+> +	}
+> +
+> +	dev->pending_message =3D message;
+> +	dev->pending_complete =3D complete;
+> +
+> +	if (dev->enabled) {
+> +		/*
+> +		 * Stopping the P2P device, drop all peers as we can't start
+> +		 * new connections from now on.
+> +		 */
+> +		l_queue_destroy(dev->peer_list, p2p_peer_put);
+> +		dev->peer_list =3D NULL;
+> +	}
+> +
+> +	return true;
+> +}
+
+Note that this function always returns true...
+
+> +
+>   struct p2p_device *p2p_device_update_from_genl(struct l_genl_msg *msg,
+>   						bool create)
+>   {
+> @@ -350,6 +428,7 @@ struct p2p_device *p2p_device_update_from_genl(struct=
+ l_genl_msg *msg,
+>   	dev =3D l_new(struct p2p_device, 1);
 >   	dev->wdev_id =3D *wdev_id;
 >   	memcpy(dev->addr, ifaddr, ETH_ALEN);
+> +	dev->nl80211 =3D l_genl_family_new(iwd_get_genl(), NL80211_GENL_NAME);
 >   	dev->wiphy =3D wiphy;
-> +	gethostname(hostname, sizeof(hostname));
+>   	gethostname(hostname, sizeof(hostname));
 >   	dev->connections_left =3D 1;
+> @@ -510,8 +589,23 @@ static void p2p_device_free(void *user_data)
+>   {
+>   	struct p2p_device *dev =3D user_data;
 >   =
 
-> +	dev->country[0] =3D 'X';
-> +	dev->country[1] =3D 'X';
-> +	dev->country[2] =3D 4;	/* Table E-4 */
+> +	if (dev->pending_message) {
+> +		struct l_dbus_message *reply =3D
+> +			dbus_error_aborted(dev->pending_message);
 > +
-> +	str =3D l_settings_get_string(iwd_get_config(), "General", "CountryCode=
-");
-> +	if (str) {
-> +		if (strlen(str) !=3D 2)
-> +			l_error("[General].CountryCode must be a 2-character "
-> +				"string");
-> +		else {
-> +			dev->country[0] =3D str[0];
-> +			dev->country[1] =3D str[1];
-> +		}
-> +
-> +		l_free(str);
-> +	}
-> +
-> +	/* TODO: allow masking capability bits through a setting? */
-> +	dev->capability.device_caps =3D P2P_DEVICE_CAP_CONCURRENT_OP;
-> +	dev->capability.group_caps =3D 0;
-> +
-> +	memcpy(dev->device_info.device_addr, dev->addr, 6);
-> +
-> +	dev->device_info.wsc_config_methods =3D
-> +		WSC_CONFIGURATION_METHOD_LABEL |
+> +		if (dev->pending_complete)
 
-Do you really need this one?  I think we discussed this at some point, =
+Can this ever be NULL?  I checked and at least in this series it doesn't =
 
-and it should be okay, but just checking...
+seem to be the case...
 
-> +		WSC_CONFIGURATION_METHOD_KEYPAD |
-> +		WSC_CONFIGURATION_METHOD_VIRTUAL_PUSH_BUTTON |
-> +		WSC_CONFIGURATION_METHOD_PHYSICAL_PUSH_BUTTON |
-
-Not sure about this one as a 'default'.
-
-> +		WSC_CONFIGURATION_METHOD_P2P |
-> +		WSC_CONFIGURATION_METHOD_VIRTUAL_DISPLAY_PIN |
-> +		WSC_CONFIGURATION_METHOD_PHYSICAL_DISPLAY_PIN;
-> +	dev->device_info.primary_device_type.category =3D 1;	/* Computer */
-> +	memcpy(dev->device_info.primary_device_type.oui, microsoft_oui, 3);
-> +	dev->device_info.primary_device_type.oui_type =3D 0x04;
-> +	dev->device_info.primary_device_type.subcategory =3D 1;	/* PC */
-> +	l_strlcpy(dev->device_info.device_name, hostname,
-> +			sizeof(dev->device_info.device_name));
-> +
-
-Okay
-
-> +	/* TODO: possibly interpret a list of strings of config method names */
-> +	if (l_settings_get_uint(iwd_get_config(), "P2P",
-> +				"ConfigurationMethodMask", &uint_val)) {
-> +		if (!(dev->device_info.wsc_config_methods & uint_val))
-> +			l_error("[P2P].ConfigurationMethodMask must contain "
-> +				"at least one supported method");
-> +		else if (uint_val & ~0xffff)
-> +			l_error("[P2P].ConfigurationMethodMask should be a "
-> +				"16-bit integer");
+> +			dev->pending_complete(dbus_get_bus(),
+> +						dev->pending_message, reply);
 > +		else
-> +			dev->device_info.wsc_config_methods &=3D uint_val;
+> +			dbus_pending_reply(&dev->pending_message, reply);
+> +
+> +		dev->pending_message =3D NULL;
+> +		dev->pending_complete =3D NULL;
 > +	}
 > +
-
-Why a mask?  Why not specify these directly?
-
-> +	str =3D l_settings_get_string(iwd_get_config(), "P2P", "DeviceCategory"=
-);
-> +	if (str) {
-> +		unsigned int i;
-> +		char *endp;
-> +
-> +		i =3D strtoul(str, &endp, 0);
-> +
-> +		if (*endp =3D=3D '\0') {
-> +			if (i < 1 || i > 255) {
-> +				l_error("[P2P].DeviceCategory must be in the "
-> +					"range 1-255");
-> +				i =3D 0;
-> +			}
-> +		} else if (!strcmp(str, "Other"))
-> +			i =3D 255;
-> +		else {
-> +			for (i =3D 0; i < L_ARRAY_SIZE(device_type_categories);
-> +					i++) {
-> +				struct device_type_category_info *cat_info =3D
-> +					&device_type_categories[i];
-> +
-> +				if (!cat_info->category_str)
-> +					continue;
-> +
-> +				if (strcasecmp(str, cat_info->category_str))
-> +					continue;
-> +
-> +				break;
-> +			}
-> +
-> +			if (i =3D=3D L_ARRAY_SIZE(device_type_categories)) {
-> +				l_error("Unkown [P2P].DeviceCategory %s", str);
-> +				i =3D 0;
-> +			}
-> +		}
-> +
-> +		if (i)
-> +			dev->device_info.primary_device_type.category =3D i;
-> +	}
-> +
-> +	str =3D l_settings_get_string(iwd_get_config(), "P2P",
-> +					"DeviceSubcategory");
-> +	if (str) {
-> +		unsigned int i;
-> +		char *endp;
-> +		unsigned int category =3D
-> +			dev->device_info.primary_device_type.category;
-> +		struct device_type_category_info *cat_info =3D
-> +			&device_type_categories[category];
-> +
-> +		i =3D strtoul(str, &endp, 0);
-> +
-> +		if (*endp =3D=3D '\0') {
-> +			if (i < 1 || i > 255) {
-> +				l_error("[P2P].DeviceSubcategory must be in "
-> +					"the range 1-255");
-> +				i =3D 0;
-> +			}
-> +		} else if (!strcmp(str, "Other"))
-> +			i =3D 255;
-> +		else if (category < L_ARRAY_SIZE(device_type_categories) &&
-> +				cat_info->subcategory_max) {
-> +			for (i =3D 0; i <=3D cat_info->subcategory_max; i++) {
-> +				if (!cat_info->subcategory_str[i])
-> +					continue;
-> +
-> +				if (strcasecmp(str,
-> +						cat_info->subcategory_str[i]))
-> +					continue;
-> +
-> +				break;
-> +			}
-> +
-> +			if (i > cat_info->subcategory_max) {
-> +				l_error("Unkown [P2P].DeviceSubcategory %s",
-> +					str);
-> +				i =3D 0;
-> +			}
-> +		} else {
-> +			l_error("Only numeric [P2P].DeviceSubcategory values "
-> +				"allowed for this category");
-> +			i =3D 0;
-> +		}
-> +
-> +		if (i)
-> +			dev->device_info.primary_device_type.subcategory =3D i;
-> +	}
-
-So two things:
-
-Are you sure you want to have the user specify strings instead of the =
-
-oui / type directly?  What does BlueZ do here for example?
-
-Handling of 'Other' might need to be tweaked depending on how you =
-
-resolve comments to the previous patch.
-
-> +
->   	l_queue_push_tail(p2p_device_list, dev);
+>   	l_dbus_unregister_object(dbus_get_bus(), p2p_device_get_path(dev));
+>   	l_queue_destroy(dev->peer_list, p2p_peer_put);
+> +	l_genl_family_free(dev->nl80211); /* Cancels dev->start_stop_cmd_id */
+>   	l_free(dev);
+>   }
 >   =
 
->   	l_debug("Created P2P device %" PRIx64, dev->wdev_id);
-> @@ -378,6 +524,46 @@ bool p2p_device_destroy(struct p2p_device *dev)
+> @@ -524,6 +618,45 @@ bool p2p_device_destroy(struct p2p_device *dev)
 >   	return true;
 >   }
 >   =
 
-> +static bool p2p_device_get_name(struct l_dbus *dbus,
-> +				struct l_dbus_message *message,
-> +				struct l_dbus_message_builder *builder,
-> +				void *user_data)
+> +static bool p2p_device_get_enabled(struct l_dbus *dbus,
+> +					struct l_dbus_message *message,
+> +					struct l_dbus_message_builder *builder,
+> +					void *user_data)
 > +{
 > +	struct p2p_device *dev =3D user_data;
+> +	bool enabled =3D dev->enabled;
 > +
-> +	l_dbus_message_builder_append_basic(builder, 's',
-> +						dev->device_info.device_name);
+> +	l_dbus_message_builder_append_basic(builder, 'b', &enabled);
+> +
 > +	return true;
 > +}
 > +
-> +static struct l_dbus_message *p2p_device_set_name(struct l_dbus *dbus,
+> +static struct l_dbus_message *p2p_device_set_enabled(struct l_dbus *dbus,
 > +					struct l_dbus_message *message,
 > +					struct l_dbus_message_iter *new_value,
 > +					l_dbus_property_complete_cb_t complete,
 > +					void *user_data)
 > +{
 > +	struct p2p_device *dev =3D user_data;
-> +	const char *new_name;
+> +	bool new_enabled;
 > +
-> +	if (!l_dbus_message_iter_get_variant(new_value, "s", &new_name))
+> +	if (!l_dbus_message_iter_get_variant(new_value, "b", &new_enabled))
 > +		return dbus_error_invalid_args(message);
 > +
-> +	if (!strcmp(new_name, dev->device_info.device_name))
-> +		goto done;
+> +	if (dev->start_stop_cmd_id || dev->pending_message)
+> +		return dbus_error_busy(message);
 > +
-> +	if (strlen(new_name) > sizeof(dev->device_info.device_name) - 1)
-> +		return dbus_error_invalid_args(message);
+> +	if (dev->enabled =3D=3D new_enabled) {
+> +		complete(dbus, message, NULL);
+> +		return NULL;
+> +	}
 > +
-> +	l_strlcpy(dev->device_info.device_name, new_name,
-> +			sizeof(dev->device_info.device_name));
-> +	l_dbus_property_changed(dbus, p2p_device_get_path(dev),
-> +				IWD_P2P_INTERFACE, "Name");
+> +	if (!p2p_device_start_stop(dev, complete, message))
+> +		return dbus_error_failed(message);
 
-Hmm, our convention is to do method_return, then signal.
+This can never happen?  p2p_device_start_stop always returns true...
 
 > +
-> +done:
-> +	complete(dbus, message, NULL);
 > +	return NULL;
 > +}
 > +
->   static bool p2p_device_get_avail_conns(struct l_dbus *dbus,
->   					struct l_dbus_message *message,
->   					struct l_dbus_message_builder *builder,
-> @@ -430,6 +616,9 @@ static struct l_dbus_message *p2p_device_get_peers(st=
+>   static bool p2p_device_get_name(struct l_dbus *dbus,
+>   				struct l_dbus_message *message,
+>   				struct l_dbus_message_builder *builder,
+> @@ -616,6 +749,9 @@ static struct l_dbus_message *p2p_device_get_peers(st=
 ruct l_dbus *dbus,
 >   =
 
 >   static void p2p_interface_setup(struct l_dbus_interface *interface)
 >   {
-> +	l_dbus_interface_property(interface, "Name", 0, "s",
-> +					p2p_device_get_name,
-> +					p2p_device_set_name);
-
-you don't want to use AUTO_EMIT to make things easier on yourself?  As a =
-
-bonus, the previous comment would be fixed auto-magically.
-
->   	l_dbus_interface_property(interface, "AvailableConnections", 0, "q",
->   					p2p_device_get_avail_conns, NULL);
->   	l_dbus_interface_method(interface, "GetPeers", 0,
+> +	l_dbus_interface_property(interface, "Enabled", 0, "b",
+> +					p2p_device_get_enabled,
+> +					p2p_device_set_enabled);
+>   	l_dbus_interface_property(interface, "Name", 0, "s",
+>   					p2p_device_get_name,
+>   					p2p_device_set_name);
 > =
 
 
 Regards,
 -Denis
---===============2290675824464528757==--
+--===============1075108938628763858==--
 
