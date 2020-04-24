@@ -1,15 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============0403302479849111796=="
+Content-Type: multipart/mixed; boundary="===============7474766556344293705=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 03/19] doc: List possible P2P peer category/subcategory
- values
-Date: Fri, 24 Apr 2020 11:11:35 -0500
-Message-ID: <a24718af-c642-3d54-3a0c-6ab1cf419766@gmail.com>
-In-Reply-To: <20200423162447.15750-3-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 04/19] p2p: Add main device settings
+Date: Fri, 24 Apr 2020 11:38:25 -0500
+Message-ID: <b218ea22-4b62-9963-fccd-95b69b985ddf@gmail.com>
+In-Reply-To: <20200423162447.15750-4-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0403302479849111796==
+--===============7474766556344293705==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -17,21 +16,17 @@ Content-Transfer-Encoding: quoted-printable
 Hi Andrew,
 
 On 4/23/20 11:24 AM, Andrew Zaborowski wrote:
+> Read WSC configuration methods and the Primary Device Type from the
+> config file and expose device name as a property.
 > ---
->   doc/p2p-peer-api.txt | 86 ++++++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 84 insertions(+), 2 deletions(-)
+>   src/p2p.c | 132 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 132 insertions(+)
 > =
 
 
-Patch 2 & 3 applied.  I did...
+Patch 4 & 5 applied, thanks.
 
-> +			'computer',
-> +			'input device',
-
-Add a missing '-' here and fixed up wscutil.c to match.
-
-> +			'printer-scanner',
 Regards,
 -Denis
---===============0403302479849111796==--
+--===============7474766556344293705==--
 
