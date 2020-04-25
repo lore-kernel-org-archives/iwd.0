@@ -1,390 +1,188 @@
-Content-Type: multipart/mixed; boundary="===============1825153949768652297=="
+Content-Type: multipart/mixed; boundary="===============1271454938187494791=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 09/19] p2p: Add the Listen State
-Date: Sat, 25 Apr 2020 09:33:16 +0200
-Message-ID: <CAOq732+54rT_gSUTTnPwC956csrKbYDwNLmZqxUG4-M+uGJTJA@mail.gmail.com>
-In-Reply-To: <7c434d2b-dbc2-d252-b265-50e2f6df4611@gmail.com>
+Subject: Re: [PATCH 06/17] p2p: Add device enable/disable logic
+Date: Sat, 25 Apr 2020 10:45:08 +0200
+Message-ID: <CAOq732+QxYxMsuiGZ+N3a1fDHQNNKOWxCESCrBDFWEUGmvzR0A@mail.gmail.com>
+In-Reply-To: <e2eebf0a-21ef-fe32-0f59-0fdeea4b47b2@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1825153949768652297==
+--===============1271454938187494791==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi Denis,
+I forgot to reply to this email.
 
-On Fri, 24 Apr 2020 at 22:23, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 4/23/20 11:24 AM, Andrew Zaborowski wrote:
-> > Start a remain-on-channel cmd implementing the Listen State, after each
-> > the Scan Phase implemented as an active scan.
+On Fri, 17 Apr 2020 at 18:41, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 4/3/20 11:14 AM, Andrew Zaborowski wrote:
+> > Implement the Enabled property on device interface.  The P2P device is
+> > currently disabled on startup but automatically enabling the P2P device
+> > can be considered.
 > > ---
-> >   src/p2p.c | 371 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> >   1 file changed, 369 insertions(+), 2 deletions(-)
+> >   src/p2p.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 136 insertions(+)
 > >
 > > diff --git a/src/p2p.c b/src/p2p.c
-> > index 2955efe0..fd1ebb00 100644
+> > index ab21239d..fa8e0e55 100644
 > > --- a/src/p2p.c
 > > +++ b/src/p2p.c
-> > @@ -70,9 +70,15 @@ struct p2p_device {
-> >       uint8_t listen_country[3];
-> >       uint8_t listen_oper_class;
-> >       uint32_t listen_channel;
-> > +     unsigned int scan_interval;
-> > +     time_t next_scan_ts;
-> > +     struct l_timeout *scan_timeout;
-> >       uint32_t scan_id;
-> >       unsigned int chans_per_scan;
-> >       unsigned int scan_chan_idx;
-> > +     uint64_t roc_cookie;
-> > +     bool have_roc_cookie;
->
-> Is the roc cookie up to the driver to provide? In theory nl80211 uses
-> cfg80211_assign_cookie which can never be zero.  But if the drivers
-> don't use that, ok.
-
-Right, it seems that mac80211 also takes care to generate non-zero
-cookies, but brcmfmac doesn't, and its cookies only use 32 bits.
-
-> Do you want to use a bitfield for the
-> have_roc_cookie flag?
->
-> > +     unsigned int listen_duration;
-> >       struct l_queue *discovery_users;
-> >       struct l_queue *peer_list;
+> > @@ -58,13 +58,19 @@
+> >   struct p2p_device {
+> >       uint64_t wdev_id;
+> >       uint8_t addr[6];
+> > +     struct l_genl_family *nl80211;
+> >       struct wiphy *wiphy;
+> >       unsigned int connections_left;
+> >       struct p2p_capability_attr capability;
+> >       struct p2p_device_info_attr device_info;
+> > +     uint32_t start_stop_cmd_id;
+> > +     l_dbus_property_complete_cb_t pending_complete;
+> > +     struct l_dbus_message *pending_message;
 > >
-> > @@ -97,6 +103,7 @@ struct p2p_peer {
+> >       uint8_t country[3];
+> >       struct l_queue *peer_list;
+> > +
+> > +     bool enabled : 1;
 > >   };
 > >
-> >   static struct l_queue *p2p_device_list;
-> > +static uint32_t unicast_watch;
-> >
-> >   /*
-> >    * For now we only scan the common 2.4GHz channels, to be replaced wi=
-th
-> > @@ -105,6 +112,11 @@ static struct l_queue *p2p_device_list;
-> >   static const int channels_social[] =3D { 1, 6, 11 };
-> >   static const int channels_scan_2_4_other[] =3D { 2, 3, 4, 5, 7, 8, 9,=
- 10 };
-> >
-> > +enum {
-> > +     FRAME_GROUP_DEFAULT =3D 0,
-> > +     FRAME_GROUP_LISTEN,
-> > +};
-> > +
-> >   static bool p2p_device_match(const void *a, const void *b)
-> >   {
-> >       const struct p2p_device *dev =3D a;
-> > @@ -252,9 +264,170 @@ static void p2p_scan_destroy(void *user_data)
-> >       dev->scan_id =3D 0;
+> >   struct p2p_peer {
+> > @@ -269,6 +275,78 @@ static void p2p_peer_put(void *user_data)
+> >       p2p_peer_free(peer);
 > >   }
 > >
-> > +#define SCAN_INTERVAL_MAX    3
-> > +#define SCAN_INTERVAL_STEP   1
-> >   #define CHANS_PER_SCAN_INITIAL      2
-> >   #define CHANS_PER_SCAN              2
-> >
-> > +static bool p2p_device_scan_start(struct p2p_device *dev);
-> > +static void p2p_device_roc_start(struct p2p_device *dev);
-> > +
-> > +static void p2p_device_roc_timeout(struct l_timeout *timeout, void *us=
-er_data)
+> > +static void p2p_device_enable_cb(struct l_genl_msg *msg, void *user_da=
+ta)
 > > +{
 > > +     struct p2p_device *dev =3D user_data;
-> > +
-> > +     l_timeout_remove(dev->scan_timeout);
-> > +
-> > +     if (time(NULL) < dev->next_scan_ts) {
-> > +             /*
-> > +              * dev->scan_timeout destroy function will have been call=
-ed
-> > +              * by now so it won't overwrite the new timeout set by
-> > +              * p2p_device_roc_start.
-> > +              */
-> > +             p2p_device_roc_start(dev);
-> > +             return;
-> > +     }
-> > +
-> > +     p2p_device_scan_start(dev);
-> > +}
-> > +
-> > +static void p2p_device_roc_cancel(struct p2p_device *dev, uint64_t *co=
-okie,
-> > +                                     bool *have_cookie, bool frame_tx)
-> > +{
-> > +     struct l_genl_msg *msg;
-> > +     enum nl80211_commands cmd =3D frame_tx ? NL80211_CMD_FRAME_WAIT_C=
-ANCEL :
-> > +             NL80211_CMD_CANCEL_REMAIN_ON_CHANNEL;
-> > +
-> > +     if (!*have_cookie)
-> > +             return;
->
-> ???
->
-> Are you trying to pay 3-4 lines here to avoid paying one line in the call=
-er?
-
-Yep, I see this as a fair tradeoff but if you prefer I'll move this to
-the caller and use the bitfield.  I think you guessed I was initially
-zeroing the cookie and "have_cookie" was an afterthought.
-
->
-> > +
-> > +     l_debug("");
-> > +
-> > +     msg =3D l_genl_msg_new_sized(cmd, 32);
-> > +     l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &dev->wdev_id);
-> > +     l_genl_msg_append_attr(msg, NL80211_ATTR_COOKIE, 8, cookie);
-> > +     l_genl_family_send(dev->nl80211, msg, NULL, NULL, NULL);
-> > +
-> > +     *have_cookie =3D false;
-> > +}
-> > +
-> > +static void p2p_scan_timeout_destroy(void *user_data)
-> > +{
-> > +     struct p2p_device *dev =3D user_data;
-> > +
-> > +     dev->scan_timeout =3D NULL;
-> > +
-> > +     if (dev->nl80211) {
-> > +             /*
-> > +              * Most likely when the timer expires the ROC period
-> > +              * has finished but send a cancel command to make sure,
-> > +              * as well as handle situations like disabling P2P.
-> > +              */
-> > +             p2p_device_roc_cancel(dev, &dev->roc_cookie,
-> > +                                     &dev->have_roc_cookie, false);
-> > +     }
-> > +}
-> > +
-> > +static void p2p_device_roc_cb(struct l_genl_msg *msg, void *user_data)
-> > +{
-> > +     struct p2p_device *dev =3D user_data;
-> > +     struct l_genl_attr attr;
-> > +     uint16_t type;
-> > +     uint16_t len;
-> > +     const void *data;
 > > +     int error =3D l_genl_msg_get_error(msg);
+> > +     struct l_dbus_message *message =3D dev->pending_message;
 > > +
-> > +     l_debug("ROC: %s (%i)", strerror(-error), -error);
+> > +     l_debug("START/STOP_P2P_DEVICE: %s (%i)", strerror(-error), -erro=
+r);
 > > +
 > > +     if (error)
-> > +             return;
+> > +             goto done;
 > > +
-> > +     if (!l_genl_attr_init(&attr, msg))
-> > +             return;
+> > +     dev->enabled =3D !dev->enabled;
 > > +
-> > +     while (l_genl_attr_next(&attr, &type, &len, &data)) {
-> > +             switch (type) {
-> > +             case NL80211_ATTR_COOKIE:
-> > +                     if (len !=3D 8)
-> > +                             break;
+> > +     if (!message)
+> > +             l_dbus_property_changed(dbus_get_bus(),
+> > +                                     p2p_device_get_path(dev),
+> > +                                     IWD_P2P_INTERFACE, "Enabled");
 >
-> nl80211util supports COOKIE extraction if you want to make your life easi=
-er
+> Whats this doing?  Shouldn't the property always be emitted?
 
-Good point, I'll use that.
+Yeah, I'm not sure how this was supposed to work.
 
 >
 > > +
-> > +                     dev->roc_cookie =3D *(const uint64_t *) data;
-> > +                     dev->have_roc_cookie =3D true;
-> > +
-> > +                     if (!dev->scan_timeout)
-> > +                             p2p_device_roc_cancel(dev, &dev->roc_cook=
-ie,
-> > +                                                     &dev->have_roc_co=
-okie,
-> > +                                                     false);
->
-> So what is this doing and how would we get here?  Probably a comment is
-> a good idea here...
-
-Ok. Normally an l_genl command callback is immediate but this is a
-sanity check in case it took very long for us to get the reply and P2P
-was disabled in the meantime.
-
->
-> > +
-> > +                     break;
-> > +             }
+> > +done:
+> > +     if (message) {
+> > +             dev->pending_complete(dbus_get_bus(), message,
+> > +                                     error ? dbus_error_failed(message=
+) :
+> > +                                     NULL);
+> > +             dev->pending_message =3D NULL;
+> > +             dev->pending_complete =3D NULL;
 > > +     }
+>
+> What this is doing is also not quite clear?  Are you going to be
+> invoking this outside the D-Bus path?
+
+Initially I was automatically enabling P2P when the interface was
+created, now I removed the condition here.
+
+>
 > > +}
 > > +
->
-> <snip>
->
-> > @@ -475,11 +673,118 @@ static bool p2p_device_scan_start(struct p2p_dev=
-ice *dev)
-> >       return dev->scan_id !=3D 0;
-> >   }
-> >
-> > +static void p2p_device_probe_cb(const struct mmpdu_header *mpdu,
-> > +                             const void *body, size_t body_len,
-> > +                             int rssi, void *user_data)
+> > +static void p2p_device_enable_destroy(void *user_data)
 > > +{
 > > +     struct p2p_device *dev =3D user_data;
-> > +     struct p2p_peer *peer;
-> > +     struct p2p_probe_req p2p_info;
-> > +     struct wsc_probe_request wsc_info;
-> > +     int r;
-> > +     uint8_t *wsc_payload;
-> > +     ssize_t wsc_len;
-> > +     struct scan_bss *bss;
-> > +     struct p2p_channel_attr *channel;
-> > +     enum scan_band band;
-> > +     uint32_t frequency;
 > > +
-> > +     l_debug("");
-> > +
-> > +     if (!dev->scan_timeout && !dev->scan_id)
-> > +             return;
-> > +
-> > +     wsc_payload =3D ie_tlv_extract_wsc_payload(body, body_len, &wsc_l=
-en);
-> > +     if (!wsc_payload)       /* Not a P2P Probe Req, ignore */
-> > +             return;
-> > +
-> > +     r =3D  wsc_parse_probe_request(wsc_payload, wsc_len, &wsc_info);
-> > +     l_free(wsc_payload);
-> > +
-> > +     if (r < 0) {
-> > +             l_error("Probe Request WSC IE parse error %s (%i)",
-> > +                     strerror(-r), -r);
-> > +             return;
-> > +     }
-> > +
-> > +     r =3D p2p_parse_probe_req(body, body_len, &p2p_info);
-> > +     if (r < 0) {
-> > +             if (r =3D=3D -ENOENT)       /* Not a P2P Probe Req, ignor=
-e */
-> > +                     return;
-> > +
-> > +             l_error("Probe Request P2P IE parse error %s (%i)",
-> > +                     strerror(-r), -r);
-> > +             return;
-> > +     }
-> > +
-> > +     /*
-> > +      * We don't currently have a use case for replying to Probe Reque=
-sts
-> > +      * except when waiting for a GO Negotiation Request from our targ=
-et
-> > +      * peer.
-> > +      */
-> > +
-> > +     /*
-> > +      * The peer's listen frequency may be different from ours.
-> > +      * The Listen Channel attribute is optional but if neither
-> > +      * it nor the Operating Channel are set then we have no way
-> > +      * to contact that peer.  Ignore such peers.
-> > +      */
-> > +     if (p2p_info.listen_channel.country[0])
-> > +             channel =3D &p2p_info.listen_channel;
-> > +     else if (p2p_info.operating_channel.country[0])
-> > +             channel =3D &p2p_info.operating_channel;
-> > +     else
-> > +             goto p2p_free;
-> > +
-> > +     band =3D scan_oper_class_to_band((const uint8_t *) channel->count=
-ry,
-> > +                                     channel->oper_class);
-> > +     frequency =3D scan_channel_to_freq(channel->channel_num, band);
-> > +     if (!frequency)
-> > +             goto p2p_free;
-> > +
-> > +     bss =3D scan_bss_new_from_probe_req(mpdu, body, body_len, frequen=
-cy,
-> > +                                             rssi);
-> > +     if (!bss)
-> > +             goto p2p_free;
-> > +
-> > +     bss->time_stamp =3D l_time_now();
-> > +
-> > +     if (p2p_peer_update_existing(bss, dev->peer_list, dev->peer_list))
-> > +             goto p2p_free;
->
-> Are you leaking bss here?
-
-Good point but no, p2p_peer_update_existing returns true on success
-and it'll have saved the new bss.
-
->
-> > +
-> > +     peer =3D l_new(struct p2p_peer, 1);
-> > +     peer->dev =3D dev;
-> > +     peer->bss =3D bss;
-> > +     peer->name =3D l_strdup(wsc_info.device_name);
-> > +     peer->primary_device_type =3D wsc_info.primary_device_type;
-> > +     peer->group =3D !!(p2p_info.capability.group_caps & P2P_GROUP_CAP=
-_GO);
-> > +     /*
-> > +      * The Device Info attribute is present conditionally so we can't=
- get
-> > +      * the Device Address from there.  In theory only P2P Devices send
-> > +      * out Probe Requests, not P2P GOs, so we assume the source addre=
-ss
-> > +      * is the Device Address.
-> > +      */
-> > +     peer->device_addr =3D bss->addr;
-> > +
-> > +     if (!p2p_device_peer_add(dev, peer))
-> > +             p2p_peer_free(peer);
-> > +
-> > +     /*
-> > +      * Note: check SSID/BSSID are wildcard values if present and
-> > +      * reply with a Probe Response -- not useful in our current usage
-> > +      * scenarios but required by the spec.
->
-> Should this be a TODO?
-
-Perhaps yes.
-
->
-> > +      */
-> > +
-> > +p2p_free:
-> > +     p2p_clear_probe_req(&p2p_info);
+> > +     dev->start_stop_cmd_id =3D 0;
 > > +}
 > > +
-> >   static void p2p_device_discovery_start(struct p2p_device *dev)
-> >   {
-> > -     if (dev->scan_id)
-> > +     if (dev->scan_timeout || dev->scan_id)
-> >               return;
-> >
-> > +     dev->scan_interval =3D 1;
-> >       dev->chans_per_scan =3D CHANS_PER_SCAN_INITIAL;
-> >       dev->scan_chan_idx =3D 0;
-> >
->
-> <snip>
->
-> > @@ -1103,6 +1460,12 @@ static int p2p_init(void)
-> >               l_error("Unable to register the %s interface",
-> >                       IWD_P2P_PEER_INTERFACE);
-> >
-> > +     unicast_watch =3D l_genl_add_unicast_watch(genl, NL80211_GENL_NAM=
-E,
-> > +                                                     p2p_unicast_notif=
-y,
-> > +                                                     NULL, NULL);
-> > +     if (!unicast_watch)
-> > +             l_error("Registering for unicast notification failed");
+> > +static bool p2p_device_start_stop(struct p2p_device *dev,
+> > +                             l_dbus_property_complete_cb_t complete,
+> > +                             struct l_dbus_message *message)
+> > +{
+> > +     struct l_genl_msg *cmd;
 > > +
+> > +     if (!dev->enabled)
+> > +             cmd =3D l_genl_msg_new_sized(NL80211_CMD_START_P2P_DEVICE=
+, 16);
+> > +     else
+> > +             cmd =3D l_genl_msg_new_sized(NL80211_CMD_STOP_P2P_DEVICE,=
+ 16);
+> > +
+> > +     l_genl_msg_append_attr(cmd, NL80211_ATTR_WDEV, 8, &dev->wdev_id);
+> > +
+> > +     dev->start_stop_cmd_id =3D l_genl_family_send(dev->nl80211, cmd,
+> > +                                             p2p_device_enable_cb, dev,
+> > +                                             p2p_device_enable_destroy=
+);
+> > +     if (!dev->start_stop_cmd_id) {
+> > +             l_genl_msg_unref(cmd);
+> > +             complete(dbus_get_bus(), message, dbus_error_failed(messa=
+ge));
+> > +             return true;
+> > +     }
+> > +
+> > +     dev->pending_message =3D message;
+> > +     dev->pending_complete =3D complete;
+> > +
+> > +     if (dev->enabled) {
+> > +             /*
+> > +              * Stopping the P2P device, drop all peers as we can't st=
+art
+> > +              * new connections from now on.
+> > +              */
+> > +             l_queue_destroy(dev->peer_list, p2p_peer_put);
+> > +             dev->peer_list =3D NULL;
+> > +     }
+> > +
+> > +     return true;
+> > +}
 >
-> I'm a bit lost why this is done through the unicast watch?  In
-> nl80211_send_remain_on_chan_event(), both CMD_REMAIN_ON_CHANNEL and
-> CMD_CANCEL_REMAIN_ON_CHANNEL are multicast on the "mlme" group?  I can't
-> seem to find any instance where it would be unicast.
+> Note that this function always returns true...
 
-Oops, so I wasn't actually receiving these events and I wasn't
-updating the timeout to account for the extra time it took to start
-the ROC operation, but the difference was small enough.  I'll fix
-this.
+Right, I could have removed the return value when I removed the
+automatic enabling of P2P.
+
+>
+> > +
+> >   struct p2p_device *p2p_device_update_from_genl(struct l_genl_msg *msg,
+> >                                               bool create)
+> >   {
+> > @@ -350,6 +428,7 @@ struct p2p_device *p2p_device_update_from_genl(stru=
+ct l_genl_msg *msg,
+> >       dev =3D l_new(struct p2p_device, 1);
+> >       dev->wdev_id =3D *wdev_id;
+> >       memcpy(dev->addr, ifaddr, ETH_ALEN);
+> > +     dev->nl80211 =3D l_genl_family_new(iwd_get_genl(), NL80211_GENL_N=
+AME);
+> >       dev->wiphy =3D wiphy;
+> >       gethostname(hostname, sizeof(hostname));
+> >       dev->connections_left =3D 1;
+> > @@ -510,8 +589,23 @@ static void p2p_device_free(void *user_data)
+> >   {
+> >       struct p2p_device *dev =3D user_data;
+> >
+> > +     if (dev->pending_message) {
+> > +             struct l_dbus_message *reply =3D
+> > +                     dbus_error_aborted(dev->pending_message);
+> > +
+> > +             if (dev->pending_complete)
+>
+> Can this ever be NULL?  I checked and at least in this series it doesn't
+> seem to be the case...
+
+Right.  I think this is from when I was storing the Connect/Disconnect
+messages in pending_message.
 
 Best regards
---===============1825153949768652297==--
+--===============1271454938187494791==--
 
