@@ -1,272 +1,459 @@
-Content-Type: multipart/mixed; boundary="===============2951650310616263254=="
+Content-Type: multipart/mixed; boundary="===============6902850276074948913=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 09/11] p2p: Create the P2P-Client interface
-Date: Sat, 25 Apr 2020 11:09:32 +0200
-Message-ID: <20200425090934.22285-9-andrew.zaborowski@intel.com>
+Subject: [PATCH 10/11] p2p: WSC client provisioning and connection
+Date: Sat, 25 Apr 2020 11:09:33 +0200
+Message-ID: <20200425090934.22285-10-andrew.zaborowski@intel.com>
 In-Reply-To: <20200425090934.22285-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2951650310616263254==
+--===============6902850276074948913==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Once we've found the provisioning BSS create the P2P-Client interface
-that we're going to use for the actual provisioning and the final P2P
-connection.
+Add the final two steps of the connection setup, and corresponding
+disconnect logic:
+
+* the WSC connection to the GO to do the client provisioning,
+* the netdev_connect call to use the provisioned credentials for the
+  final WPA2 connection.
 ---
- src/p2p.c | 185 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 180 insertions(+), 5 deletions(-)
+ src/p2p.c | 319 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 316 insertions(+), 3 deletions(-)
 
 diff --git a/src/p2p.c b/src/p2p.c
-index 0e57b375..c2c12709 100644
+index c2c12709..be009505 100644
 --- a/src/p2p.c
 +++ b/src/p2p.c
-@@ -86,7 +86,11 @@ struct p2p_device {
- 	char *conn_pin;
- 	uint8_t conn_addr[6];
- 	uint16_t conn_password_id;
-+	unsigned int conn_num;
- 	struct scan_bss *conn_wsc_bss;
-+	struct netdev *conn_netdev;
-+	uint32_t conn_netdev_watch_id;
-+	uint32_t conn_new_intf_cmd_id;
+@@ -91,6 +91,7 @@ struct p2p_device {
+ 	struct netdev *conn_netdev;
+ 	uint32_t conn_netdev_watch_id;
+ 	uint32_t conn_new_intf_cmd_id;
++	struct wsc_enrollee *conn_enrollee;
  =
 
  	struct l_timeout *config_timeout;
  	unsigned long go_config_delay;
-@@ -306,6 +310,47 @@ static void p2p_connection_reset(struct p2p_device *de=
-v)
- 	l_timeout_remove(dev->config_timeout);
- 	l_timeout_remove(dev->go_neg_req_timeout);
+@@ -103,6 +104,14 @@ struct p2p_device {
  =
 
-+	if (dev->conn_new_intf_cmd_id)
-+		/*
-+		 * Note this may result in the interface being created
-+		 * and unused, we don't have its ifindex or wdev_id here
-+		 * to be able to delete it.  Could use a separate netlink
-+		 * socket for each connection or disallowing .Disconnect
-+		 * calls while this command runs.
-+		 */
-+		l_genl_family_cancel(dev->nl80211, dev->conn_new_intf_cmd_id);
-+
-+	if (dev->conn_netdev) {
-+		struct l_genl_msg *msg;
-+		uint64_t wdev_id =3D netdev_get_wdev_id(dev->conn_netdev);
-+
-+		msg =3D l_genl_msg_new(NL80211_CMD_DEL_INTERFACE);
-+		l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &wdev_id);
-+
-+		if (!l_genl_family_send(dev->nl80211, msg, NULL, NULL, NULL)) {
-+			l_genl_msg_unref(msg);
-+			l_error("Sending DEL_INTERFACE for %s failed",
-+				netdev_get_name(dev->conn_netdev));
-+		}
-+
-+		netdev_destroy(dev->conn_netdev);
-+		dev->conn_netdev =3D NULL;
-+	}
-+
+ 	bool enabled : 1;
+ 	bool have_roc_cookie : 1;
 +	/*
-+	 * Removing the netdev above makes sure that both the WSC connection
-+	 * and the final WPA2 connection (wsc.c and netdev.c) no longer need
-+	 * the bss so we can free it now -- if it wasn't freed as a result
-+	 * of wsc_enrollee_cancel or netdev_destroy triggering
-+	 * p2p_peer_provision_done in the first place.
++	 * We need to track @disconnecting because while a connect action is
++	 * always triggered by a DBus message, meaning that @pending_message
++	 * is going to be non-NULL, a disconnect may also be a result of an
++	 * error at a layer higher than netdev and may last until
++	 * netdev_disconnect, or similar, finishes.
 +	 */
-+	if (dev->conn_wsc_bss) {
-+		scan_bss_free(dev->conn_wsc_bss);
-+		dev->conn_wsc_bss =3D NULL;
-+	}
-+
-+	netdev_watch_remove(dev->conn_netdev_watch_id);
-+
- 	frame_watch_group_remove(dev->wdev_id, FRAME_GROUP_CONNECT);
- 	frame_xchg_stop(dev->wdev_id);
++	bool disconnecting : 1;
+ };
  =
 
-@@ -426,11 +471,117 @@ static const struct frame_xchg_prefix p2p_frame_pd_r=
-esp =3D {
+ struct p2p_discovery_user {
+@@ -173,6 +182,12 @@ static void p2p_discovery_user_free(void *data)
+ 	l_free(user);
+ }
+ =
+
++static inline bool p2p_peer_operational(struct p2p_peer *peer)
++{
++	return peer && peer->dev->conn_netdev && !peer->dev->conn_wsc_bss &&
++		!peer->wsc.pending_connect && !peer->dev->disconnecting;
++}
++
+ static bool p2p_peer_match(const void *a, const void *b)
+ {
+ 	const struct p2p_peer *peer =3D a;
+@@ -296,6 +311,7 @@ static void p2p_connection_reset(struct p2p_device *dev)
+ 	 * age will be checked on the next scan.
+ 	 */
+ 	dev->conn_peer =3D NULL;
++	dev->disconnecting =3D false;
+ 	dev->connections_left++;
+ =
+
+ 	if (dev->conn_pin) {
+@@ -320,6 +336,9 @@ static void p2p_connection_reset(struct p2p_device *dev)
+ 		 */
+ 		l_genl_family_cancel(dev->nl80211, dev->conn_new_intf_cmd_id);
+ =
+
++	if (dev->conn_enrollee)
++		wsc_enrollee_cancel(dev->conn_enrollee, false);
++
+ 	if (dev->conn_netdev) {
+ 		struct l_genl_msg *msg;
+ 		uint64_t wdev_id =3D netdev_get_wdev_id(dev->conn_netdev);
+@@ -471,9 +490,254 @@ static const struct frame_xchg_prefix p2p_frame_pd_re=
+sp =3D {
  	.len =3D 7,
  };
  =
 
--static void p2p_device_interface_create(struct p2p_device *dev)
-+static void p2p_provision_connect(struct p2p_device *dev)
- {
- 	/* TODO */
- }
- =
-
-+static void p2p_device_netdev_watch_destroy(void *user_data)
++static void p2p_netdev_connect_cb(struct netdev *netdev,
++					enum netdev_result result,
++					void *event_data, void *user_data)
 +{
 +	struct p2p_device *dev =3D user_data;
++	struct p2p_peer *peer =3D dev->conn_peer;
 +
-+	dev->conn_netdev_watch_id =3D 0;
++	l_debug("result: %i", result);
++
++	if (!peer->wsc.pending_connect || dev->disconnecting) {
++		/* Shouldn't happen except maybe in the ABORTED case */
++		return;
++	}
++
++	switch (result) {
++	case NETDEV_RESULT_OK:
++		dbus_pending_reply(&peer->wsc.pending_connect,
++					l_dbus_message_new_method_return(
++						peer->wsc.pending_connect));
++		l_dbus_property_changed(dbus_get_bus(),
++					p2p_peer_get_path(dev->conn_peer),
++					IWD_P2P_PEER_INTERFACE, "Connected");
++		break;
++	case NETDEV_RESULT_AUTHENTICATION_FAILED:
++	case NETDEV_RESULT_ASSOCIATION_FAILED:
++	case NETDEV_RESULT_HANDSHAKE_FAILED:
++	case NETDEV_RESULT_KEY_SETTING_FAILED:
++		/*
++		 * In the AUTHENTICATION_FAILED and ASSOCIATION_FAILED
++		 * cases there's nothing to disconnect.  In the
++		 * HANDSHAKE_FAILED and KEY_SETTINGS failed cases
++		 * netdev disconnects from the GO automatically and we are
++		 * called already from within the disconnect callback,
++		 * so we can directly free the netdev.
++		 */
++		p2p_connect_failed(dev);
++		break;
++	case NETDEV_RESULT_ABORTED:
++		/*
++		 * This case can only be triggered by netdev_disconnect so
++		 * we'll wait for its callback before freeing the netdev.
++		 * We will also have already replied to
++		 * @peer->wsc.pending_connect so we have nothing to do here.
++		 */
++		break;
++	}
 +}
 +
-+static void p2p_device_netdev_notify(struct netdev *netdev,
-+					enum netdev_watch_event event,
-+					void *user_data)
++static void p2p_netdev_event(struct netdev *netdev, enum netdev_event even=
+t,
++				void *event_data, void *user_data)
 +{
 +	struct p2p_device *dev =3D user_data;
 +
-+	if (dev->conn_netdev !=3D netdev)
-+		return;
-+
 +	switch (event) {
-+	case NETDEV_WATCH_EVENT_UP:
-+	case NETDEV_WATCH_EVENT_NEW:
-+		if (!dev->conn_wsc_bss || !netdev_get_is_up(netdev))
++	case NETDEV_EVENT_DISCONNECT_BY_AP:
++	case NETDEV_EVENT_DISCONNECT_BY_SME:
++		/*
++		 * We may get a DISCONNECT_BY_SME as a result of a
++		 * netdev_disconnect().  In that case let the callback handle
++		 * that.
++		 */
++		if (dev->disconnecting)
 +			break;
 +
-+		p2p_provision_connect(dev);
++		/* If we're not connected, .Connected is already False */
++		if (!p2p_peer_operational(dev->conn_peer)) {
++			p2p_connect_failed(dev);
++			break;
++		}
++
++		l_dbus_property_changed(dbus_get_bus(),
++					p2p_peer_get_path(dev->conn_peer),
++					IWD_P2P_PEER_INTERFACE, "Connected");
++		p2p_connection_reset(dev);
 +		break;
-+	case NETDEV_WATCH_EVENT_DEL:
-+		dev->conn_netdev =3D NULL;
-+		/* Fall through */
-+	case NETDEV_WATCH_EVENT_DOWN:
-+	case NETDEV_WATCH_EVENT_ADDRESS_CHANGE:
-+		p2p_connect_failed(dev);
++	default:
++		break;
++	};
++}
++
++static void p2p_handshake_event(struct handshake_state *hs,
++				enum handshake_event event, void *user_data,
++				...)
++{
++	va_list args;
++
++	va_start(args, user_data);
++
++	switch (event) {
++	case HANDSHAKE_EVENT_FAILED:
++		netdev_handshake_failed(hs, va_arg(args, int));
 +		break;
 +	default:
 +		break;
 +	}
++
++	va_end(args);
 +}
 +
-+static void p2p_device_new_interface_cb(struct l_genl_msg *msg,
-+					void *user_data)
++static void p2p_peer_provision_done(int err, struct wsc_credentials_info *=
+creds,
++					unsigned int n_creds, void *user_data)
 +{
-+	struct p2p_device *dev =3D user_data;
++	struct p2p_peer *peer =3D user_data;
++	struct p2p_device *dev =3D peer->dev;
++	struct scan_bss *bss =3D dev->conn_wsc_bss;
++	struct handshake_state *hs =3D NULL;
++	struct iovec ie_iov =3D {};
++	int r =3D -EOPNOTSUPP;
++	struct p2p_association_req info =3D {};
++	struct ie_rsn_info bss_info =3D {};
++	struct ie_rsn_info rsn_info =3D {};
++	uint8_t rsne_buf[256];
 +
-+	l_debug("");
++	l_debug("err=3D%i n_creds=3D%u", err, n_creds);
 +
-+	if (l_genl_msg_get_error(msg) < 0) {
-+		l_error("NEW_INTERFACE failed: %s",
-+			strerror(-l_genl_msg_get_error(msg)));
-+		p2p_connect_failed(dev);
-+		return;
++	dev->conn_wsc_bss =3D NULL;
++	dev->conn_enrollee =3D NULL;
++
++	l_timeout_remove(dev->config_timeout);
++	l_timeout_remove(dev->go_neg_req_timeout);
++
++	if (err < 0) {
++		if (err =3D=3D -ECANCELED && peer->wsc.pending_cancel) {
++			dbus_pending_reply(&peer->wsc.pending_cancel,
++				l_dbus_message_new_method_return(
++						peer->wsc.pending_cancel));
++
++			p2p_connection_reset(dev);
++		} else
++			p2p_connect_failed(dev);
++
++		goto done;
 +	}
 +
-+	/* Create the netdev so we don't have to parse the message ourselves */
-+	dev->conn_netdev =3D netdev_create_from_genl(msg, dev->conn_addr);
-+	if (!dev->conn_netdev) {
-+		p2p_connect_failed(dev);
-+		return;
++	if (strlen(creds[0].ssid) !=3D bss->ssid_len ||
++			memcmp(creds[0].ssid, bss->ssid, bss->ssid_len)) {
++		l_error("Unsupported: the SSID from the P2P peer's WSC "
++			"credentials doesn't match the SSID from the "
++			"Probe Response IEs");
++		goto not_supported;
 +	}
 +
 +	/*
-+	 * Register a watch for each connection rather than having one
-+	 * global watch.  Each connection's watch will receive events
-+	 * related to all other connections too, and will check that its
-+	 * conn_netdev !=3D netdev and exit immediately.  This is not ideal
-+	 * but it's the same complexity (n^2) as that of one global watch
-+	 * that receives all events and iterates over p2p_device_list to
-+	 * find the connection.
++	 * Apparently some implementations send the intended client's address
++	 * here (i.e. our), and some send the target BSS's (their own).
 +	 */
-+	dev->conn_netdev_watch_id =3D netdev_watch_add(p2p_device_netdev_notify,
-+					dev, p2p_device_netdev_watch_destroy);
-+}
++	if (memcmp(creds[0].addr, netdev_get_address(dev->conn_netdev), 6) &&
++			memcmp(creds[0].addr, bss->addr, 6)) {
++		char addr1[32], addr2[32];
 +
-+static void p2p_device_new_interface_destroy(void *user_data)
-+{
-+	struct p2p_device *dev =3D user_data;
++		l_strlcpy(addr1, util_address_to_string(creds[0].addr),
++				sizeof(addr1));
++		l_strlcpy(addr2, util_address_to_string(
++					netdev_get_address(dev->conn_netdev)),
++				sizeof(addr2));
++		l_error("Error: WSC credentials are not for our client "
++			"interface (%s vs. %s)", addr1, addr2);
++		goto error;
++	}
 +
-+	dev->conn_new_intf_cmd_id =3D 0;
-+}
++	if (!bss->rsne || creds[0].security !=3D SECURITY_PSK)
++		goto not_supported;
 +
-+static void p2p_device_interface_create(struct p2p_device *dev)
-+{
-+	uint32_t iftype =3D NL80211_IFTYPE_P2P_CLIENT;
-+	char ifname[32];
-+	uint32_t wiphy_id =3D dev->wdev_id >> 32;
-+	struct l_genl_msg *msg;
++	info.capability =3D dev->capability;
++	info.device_info =3D dev->device_info;
 +
-+	snprintf(ifname, sizeof(ifname), "wlan%i-p2p-cl%i",
-+			wiphy_id, dev->conn_num++);
-+	l_debug("creating %s", ifname);
++	ie_iov.iov_base =3D p2p_build_association_req(&info, &ie_iov.iov_len);
++	L_WARN_ON(!ie_iov.iov_base);
 +
-+	msg =3D l_genl_msg_new(NL80211_CMD_NEW_INTERFACE);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY, 4, &wiphy_id);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_IFTYPE, 4, &iftype);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_IFNAME,
-+				strlen(ifname) + 1, ifname);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_4ADDR, 1, "\0");
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_SOCKET_OWNER, 0, "");
++	scan_bss_get_rsn_info(bss, &bss_info);
 +
-+	dev->conn_new_intf_cmd_id =3D l_genl_family_send(dev->nl80211, msg,
-+					p2p_device_new_interface_cb, dev,
-+					p2p_device_new_interface_destroy);
-+	if (!dev->conn_new_intf_cmd_id) {
-+		l_genl_msg_unref(msg);
-+		l_error("Error sending NEW_INTERFACE for %s", ifname);
++	rsn_info.akm_suites =3D wiphy_select_akm(dev->wiphy, bss, false);
++	if (!rsn_info.akm_suites)
++		goto not_supported;
++
++	rsn_info.pairwise_ciphers =3D wiphy_select_cipher(dev->wiphy,
++						bss_info.pairwise_ciphers);
++	rsn_info.group_cipher =3D wiphy_select_cipher(dev->wiphy,
++						bss_info.group_cipher);
++	if (!rsn_info.pairwise_ciphers || !rsn_info.group_cipher)
++		goto not_supported;
++
++	rsn_info.group_management_cipher =3D wiphy_select_cipher(dev->wiphy,
++					bss_info.group_management_cipher);
++	rsn_info.mfpc =3D rsn_info.group_management_cipher !=3D 0;
++	ie_build_rsne(&rsn_info, rsne_buf);
++
++	hs =3D netdev_handshake_state_new(dev->conn_netdev);
++
++	if (!handshake_state_set_authenticator_ie(hs, bss->rsne))
++		goto not_supported;
++
++	if (!handshake_state_set_supplicant_ie(hs, rsne_buf))
++		goto not_supported;
++
++	handshake_state_set_event_func(hs, p2p_handshake_event, dev);
++	handshake_state_set_ssid(hs, bss->ssid, bss->ssid_len);
++
++	if (creds[0].has_passphrase) {
++		uint8_t psk[32];
++
++		if (crypto_psk_from_passphrase(creds[0].passphrase, bss->ssid,
++						bss->ssid_len, psk) < 0)
++			goto error;
++
++		handshake_state_set_pmk(hs, psk, 32);
++	} else
++		handshake_state_set_pmk(hs, creds[0].psk, 32);
++
++	r =3D netdev_connect(dev->conn_netdev, bss, hs, &ie_iov, 1,
++				p2p_netdev_event, p2p_netdev_connect_cb, dev);
++	if (r =3D=3D 0)
++		goto done;
++
++	l_error("netdev_connect error: %s (%i)", strerror(-err), -err);
++
++error:
++not_supported:
++	if (r < 0) {
++		if (hs)
++			handshake_state_free(hs);
++
 +		p2p_connect_failed(dev);
 +	}
++
++done:
++	l_free(ie_iov.iov_base);
++	scan_bss_free(bss);
 +}
 +
- static void p2p_scan_destroy(void *user_data)
+ static void p2p_provision_connect(struct p2p_device *dev)
  {
- 	struct p2p_device *dev =3D user_data;
-@@ -2364,6 +2515,15 @@ static void p2p_device_enable_destroy(void *user_dat=
-a)
- 	dev->start_stop_cmd_id =3D 0;
+-	/* TODO */
++	struct iovec iov;
++	struct p2p_association_req info =3D {};
++
++	/* Ready to start the provisioning */
++	info.capability =3D dev->capability;
++	info.device_info =3D dev->device_info;
++
++	iov.iov_base =3D p2p_build_association_req(&info, &iov.iov_len);
++	L_WARN_ON(!iov.iov_base);
++
++	dev->conn_enrollee =3D wsc_enrollee_new(dev->conn_netdev,
++						dev->conn_wsc_bss,
++						dev->conn_pin, &iov, 1,
++						p2p_peer_provision_done,
++						dev->conn_peer);
++	l_free(iov.iov_base);
  }
  =
 
-+static bool p2p_peer_remove_disconnected(void *peer, void *conn_peer)
+ static void p2p_device_netdev_watch_destroy(void *user_data)
+@@ -495,7 +759,8 @@ static void p2p_device_netdev_notify(struct netdev *net=
+dev,
+ 	switch (event) {
+ 	case NETDEV_WATCH_EVENT_UP:
+ 	case NETDEV_WATCH_EVENT_NEW:
+-		if (!dev->conn_wsc_bss || !netdev_get_is_up(netdev))
++		if (!dev->conn_wsc_bss || dev->conn_enrollee ||
++				!netdev_get_is_up(netdev))
+ 			break;
+ =
+
+ 		p2p_provision_connect(dev);
+@@ -1669,6 +1934,23 @@ send_error:
+ 	dbus_pending_reply(&peer->wsc.pending_connect, reply);
+ }
+ =
+
++static void p2p_peer_disconnect_cb(struct netdev *netdev, bool result,
++					void *user_data)
 +{
-+	if (peer =3D=3D conn_peer)
-+		return false;
++	struct p2p_peer *peer =3D user_data;
++	struct p2p_device *dev =3D peer->dev;
 +
-+	p2p_peer_put(peer);
-+	return true;
++	if (!peer->wsc.pending_cancel || !dev->disconnecting)
++		return;
++
++	dbus_pending_reply(&peer->wsc.pending_cancel,
++				l_dbus_message_new_method_return(
++						peer->wsc.pending_cancel));
++
++	/* Independent of the result this will just drop the whole netdev */
++	p2p_connection_reset(dev);
 +}
 +
- static void p2p_device_start_stop(struct p2p_device *dev,
- 				l_dbus_property_complete_cb_t complete,
- 				struct l_dbus_message *message)
-@@ -2395,13 +2555,28 @@ static void p2p_device_start_stop(struct p2p_device=
- *dev,
- 	if (dev->enabled) {
- 		/*
- 		 * Stopping the P2P device, drop all peers as we can't start
--		 * new connections from now on.
-+		 * new connections from now on.  Check if we have a connection
-+		 * being set up without a .conn_netdev and without
-+		 * .conn_wsc_bss -- this will mean the connection is still in
-+		 * the PD or GO Negotiation phase or inside the scan.  Those
-+		 * phases happen on the device interface so the connection
-+		 * gets immediately aborted.
- 		 */
--		if (dev->conn_peer)
-+		if (dev->conn_peer && !dev->conn_netdev && !dev->conn_wsc_bss)
- 			p2p_connect_failed(dev);
- =
-
--		l_queue_destroy(dev->peer_list, p2p_peer_put);
--		dev->peer_list =3D NULL;
-+		if (!dev->conn_peer) {
-+			l_queue_destroy(dev->peer_list, p2p_peer_put);
-+			dev->peer_list =3D NULL;
-+		} else
-+			/*
-+			 * If the connection already depends on its own
-+			 * netdev only, we can let it continue until the user
-+			 * decides to disconnect.
-+			 */
-+			l_queue_foreach_remove(dev->peer_list,
-+						p2p_peer_remove_disconnected,
-+						dev->conn_peer);
+ static void p2p_peer_disconnect(struct p2p_peer *peer)
+ {
+ 	struct p2p_device *dev =3D peer->dev;
+@@ -1680,10 +1962,35 @@ static void p2p_peer_disconnect(struct p2p_peer *pe=
+er)
+ 		goto send_reply;
  	}
- }
  =
 
++	if (dev->disconnecting) {
++		reply =3D dbus_error_busy(message);
++		goto send_reply;
++	}
++
+ 	if (peer->wsc.pending_connect)
+ 		dbus_pending_reply(&peer->wsc.pending_connect,
+ 				dbus_error_aborted(peer->wsc.pending_connect));
+ =
+
++	if (p2p_peer_operational(peer))
++		l_dbus_property_changed(dbus_get_bus(), p2p_peer_get_path(peer),
++					IWD_P2P_PEER_INTERFACE, "Connected");
++
++	dev->disconnecting =3D true;
++
++	if (dev->conn_enrollee) {
++		wsc_enrollee_cancel(dev->conn_enrollee, true);
++		return;
++	}
++
++	if (dev->conn_netdev && !dev->conn_wsc_bss) {
++		/* Note: in theory we need to add the P2P IEs here too */
++		if (netdev_disconnect(dev->conn_netdev, p2p_peer_disconnect_cb,
++					peer) =3D=3D 0)
++			return;
++
++		l_error("netdev_disconnect failed");
++	}
++
+ 	p2p_connection_reset(dev);
+ 	reply =3D l_dbus_message_new_method_return(message);
+ =
+
+@@ -1994,6 +2301,10 @@ static bool p2p_peer_update_existing(struct scan_bss=
+ *bss,
+ =
+
+ 	/*
+ 	 * We've seen this peer already, only update the scan_bss object.
++	 * We can do this even if peer =3D=3D peer->dev->conn_peer because
++	 * its .bss is not used by .conn_netdev or .conn_enrollee.
++	 * .conn_wsc_bss is used for both connections and it doesn't come
++	 * from the discovery scan results.
+ 	 * Do we need to update DBus properties?
+ 	 */
+ 	scan_bss_free(peer->bss);
+@@ -3117,7 +3428,9 @@ static bool p2p_peer_get_connected(struct l_dbus *dbu=
+s,
+ 					struct l_dbus_message_builder *builder,
+ 					void *user_data)
+ {
+-	bool connected =3D false;
++	struct p2p_peer *peer =3D user_data;
++	bool connected =3D p2p_peer_operational(peer) &&
++		peer->dev->conn_peer =3D=3D peer;
+ =
+
+ 	l_dbus_message_builder_append_basic(builder, 'b', &connected);
+ 	return true;
 -- =
 
 2.25.1
 
---===============2951650310616263254==--
+--===============6902850276074948913==--
 
