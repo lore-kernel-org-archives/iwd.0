@@ -1,236 +1,188 @@
-Content-Type: multipart/mixed; boundary="===============1292286850908709691=="
+Content-Type: multipart/mixed; boundary="===============7208181189236457292=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 06/11] p2p: Respond to Probe Reqs when waiting for GO
- negotiation
-Date: Sat, 25 Apr 2020 11:09:29 +0200
-Message-ID: <20200425090934.22285-6-andrew.zaborowski@intel.com>
+Subject: [PATCH 07/11] p2p: Add the Provision Discovery frame sequence
+Date: Sat, 25 Apr 2020 11:09:30 +0200
+Message-ID: <20200425090934.22285-7-andrew.zaborowski@intel.com>
 In-Reply-To: <20200425090934.22285-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1292286850908709691==
+--===============7208181189236457292==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Some devices (a Wi-Fi Display dongle in my case) will send us Probe
-Requests and wait for a response before they send us the GO
-Negotiation Request that we're waiting for after the peer initially
-replied with "Fail: Information Not Available" to our GO Negotiation
-attempt.  Curiously this specific device I tested would even accept
-a Probe Response with a mangled body such that the IE sequence couldn't
-be parsed.
+When connecting to an existing group, use the Provision Discovery
+Request/Response frame exchange before calling
+p2p_start_client_provision().
 ---
- src/p2p.c | 154 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 152 insertions(+), 2 deletions(-)
+ src/p2p.c | 135 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 134 insertions(+), 1 deletion(-)
 
 diff --git a/src/p2p.c b/src/p2p.c
-index dece0d29..192acf2b 100644
+index 192acf2b..e41cc4f7 100644
 --- a/src/p2p.c
 +++ b/src/p2p.c
-@@ -1672,6 +1672,131 @@ static bool p2p_device_scan_start(struct p2p_device=
- *dev)
- 	return dev->scan_id !=3D 0;
+@@ -411,6 +411,15 @@ static const struct frame_xchg_prefix p2p_frame_go_neg=
+_confirm =3D {
+ 	.len =3D 7,
+ };
+ =
+
++static const struct frame_xchg_prefix p2p_frame_pd_resp =3D {
++	/* Management -> Public Action -> P2P -> Provision Discovery Response */
++	.data =3D (uint8_t []) {
++		0x04, 0x09, 0x50, 0x6f, 0x9a, 0x09,
++		P2P_ACTION_PROVISION_DISCOVERY_RESP
++	},
++	.len =3D 7,
++};
++
+ static void p2p_scan_destroy(void *user_data)
+ {
+ 	struct p2p_device *dev =3D user_data;
+@@ -1032,9 +1041,133 @@ static void p2p_start_go_negotiation(struct p2p_dev=
+ice *dev)
+ 				p2p_go_negotiation_resp_cb, NULL);
  }
  =
 
-+static void p2p_probe_resp_done(int error, void *user_data)
++static bool p2p_provision_disc_resp_cb(const struct mmpdu_header *mpdu,
++					const void *body, size_t body_len,
++					int rssi, struct p2p_device *dev)
 +{
-+	if (error)
-+		l_error("Sending the Probe Response failed: %s (%i)",
-+			strerror(-error), -error);
++	struct p2p_provision_discovery_resp info;
++	int r;
++
++	l_debug("");
++
++	if (!dev->conn_peer)
++		return true;
++
++	if (body_len < 8) {
++		l_error("Provision Discovery Response frame too short");
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	r =3D p2p_parse_provision_disc_resp(body + 7, body_len - 7, &info);
++	if (r < 0) {
++		l_error("Provision Discovery Response parse error %s (%i)",
++			strerror(-r), -r);
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	if (info.dialog_token !=3D 2) {
++		l_error("Provision Discovery Response dialog token doesn't "
++			"match");
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	if (info.wsc_config_method !=3D dev->conn_config_method) {
++		l_error("Provision Discovery Response WSC device password ID "
++			"wrong");
++		p2p_connect_failed(dev);
++		return true;
++	}
++
++	/*
++	 * If we're not joining an existing group, continue with Group
++	 * Formation now.
++	 */
++	if (!dev->conn_peer->group) {
++		p2p_start_go_negotiation(dev);
++		return true;
++	}
++
++	/*
++	 * Indended P2P Interface address is optional, we don't have the
++	 * BSSID of the group here.
++	 *
++	 * We might want to make sure that Group Formation is false but the
++	 * Capability attribute is also optional.
++	 */
++	dev->go_oper_freq =3D dev->conn_peer->bss->frequency;
++	memset(dev->go_interface_addr, 0, 6);
++	memcpy(dev->go_group_id.device_addr, dev->conn_peer->device_addr, 6);
++	l_strlcpy(dev->go_group_id.ssid,
++			(const char *) dev->conn_peer->bss->ssid,
++			dev->conn_peer->bss->ssid_len + 1);
++
++	/* Ready to start WSC */
++	p2p_start_client_provision(dev);
++	return true;
 +}
 +
-+static void p2p_device_send_probe_resp(struct p2p_device *dev,
-+					const uint8_t *dest_addr)
++static void p2p_provision_disc_req_done(int error, void *user_data)
 +{
-+	uint8_t resp_buf[64] __attribute__ ((aligned));
-+	size_t resp_len =3D 0;
-+	struct p2p_probe_resp resp_info =3D {};
-+	uint8_t *p2p_ie;
-+	size_t p2p_ie_size;
-+	struct wsc_probe_response wsc_info =3D {};
-+	uint8_t *wsc_data;
-+	size_t wsc_data_size;
-+	uint8_t *wsc_ie;
-+	size_t wsc_ie_size;
++	struct p2p_device *dev =3D user_data;
++
++	if (error)
++		l_error("Sending the Provision Discovery Req failed: %s (%i)",
++			strerror(-error), -error);
++	else
++		l_error("No Provision Discovery Response after Request ACKed");
++
++	p2p_connect_failed(dev);
++}
++
+ static void p2p_start_provision_discovery(struct p2p_device *dev)
+ {
+-	/* TODO: start Provision Discovery */
++	struct p2p_provision_discovery_req info =3D { .status =3D -1 };
++	uint8_t *req_body;
++	size_t req_len;
 +	struct iovec iov[16];
 +	int iov_len =3D 0;
-+	/* TODO: extract some of these from wiphy features */
-+	uint16_t capability =3D IE_BSS_CAP_PRIVACY | IE_BSS_CAP_SHORT_PREAMBLE;
-+	struct mmpdu_header *header;
-+	uint32_t freq;
 +
-+	/* Header */
-+	memset(resp_buf, 0, sizeof(resp_buf));
-+	header =3D (void *) resp_buf;
-+	header->fc.protocol_version =3D 0;
-+	header->fc.type =3D MPDU_TYPE_MANAGEMENT;
-+	header->fc.subtype =3D MPDU_MANAGEMENT_SUBTYPE_PROBE_RESPONSE;
-+	memcpy(header->address_1, dest_addr, 6);	/* DA */
-+	memcpy(header->address_2, dev->addr, 6);	/* SA */
-+	memcpy(header->address_3, dev->addr, 6);	/* BSSID */
++	/* This frame is pretty simple when P2Ps isn't supported */
++	info.dialog_token =3D 2;
++	info.capability =3D dev->capability;
++	info.device_info =3D dev->device_info;
 +
-+	resp_len =3D (const uint8_t *) mmpdu_body(header) - resp_buf;
++	if (dev->conn_peer->group) {
++		memcpy(info.group_id.device_addr, dev->conn_peer->bss->addr, 6);
++		memcpy(info.group_id.ssid, dev->conn_peer->bss->ssid,
++			dev->conn_peer->bss->ssid_len);
++	}
 +
-+	resp_len +=3D 8;			/* Timestamp */
-+	resp_buf[resp_len++] =3D 0x64;	/* Beacon Interval: 100 TUs */
-+	resp_buf[resp_len++] =3D 0x00;
-+	resp_buf[resp_len++] =3D capability >> 0;
-+	resp_buf[resp_len++] =3D capability >> 8;
-+	resp_buf[resp_len++] =3D IE_TYPE_SSID;
-+	resp_buf[resp_len++] =3D 7;
-+	resp_buf[resp_len++] =3D 'D';
-+	resp_buf[resp_len++] =3D 'I';
-+	resp_buf[resp_len++] =3D 'R';
-+	resp_buf[resp_len++] =3D 'E';
-+	resp_buf[resp_len++] =3D 'C';
-+	resp_buf[resp_len++] =3D 'T';
-+	resp_buf[resp_len++] =3D '-';
-+	resp_buf[resp_len++] =3D IE_TYPE_SUPPORTED_RATES;
-+	resp_buf[resp_len++] =3D 8;
-+	resp_buf[resp_len++] =3D 0x8c;
-+	resp_buf[resp_len++] =3D 0x12;
-+	resp_buf[resp_len++] =3D 0x18;
-+	resp_buf[resp_len++] =3D 0x24;
-+	resp_buf[resp_len++] =3D 0x30;
-+	resp_buf[resp_len++] =3D 0x48;
-+	resp_buf[resp_len++] =3D 0x60;
-+	resp_buf[resp_len++] =3D 0x6c;
++	info.wsc_config_method =3D dev->conn_config_method;
 +
-+	resp_info.capability =3D dev->capability;
-+	resp_info.device_info =3D dev->device_info;
++	req_body =3D p2p_build_provision_disc_req(&info, &req_len);
++	p2p_clear_provision_disc_req(&info);
 +
-+	p2p_ie =3D p2p_build_probe_resp(&resp_info, &p2p_ie_size);
-+	if (!p2p_ie) {
-+		l_error("Can't build our Probe Response P2P IE");
++	if (!req_body) {
++		p2p_connect_failed(dev);
 +		return;
 +	}
 +
-+	wsc_info.state =3D WSC_STATE_CONFIGURED;
-+	wsc_info.response_type =3D WSC_RESPONSE_TYPE_ENROLLEE_OPEN_8021X;
-+	wsc_info.uuid_e[15] =3D 0x01;
-+	wsc_info.serial_number[0] =3D '0';
-+	wsc_info.primary_device_type =3D dev->device_info.primary_device_type;
-+	l_strlcpy(wsc_info.device_name, dev->device_info.device_name,
-+			sizeof(wsc_info.device_name));
-+	wsc_info.config_methods =3D dev->device_info.wsc_config_methods;
-+	wsc_info.rf_bands =3D 0x01;	/* 2.4GHz */
-+	wsc_info.version2 =3D true;
-+
-+	wsc_data =3D wsc_build_probe_response(&wsc_info, &wsc_data_size);
-+	if (!wsc_data) {
-+		l_free(p2p_ie);
-+		l_error("Can't build our Probe Response WSC payload");
-+		return;
-+	}
-+
-+	wsc_ie =3D ie_tlv_encapsulate_wsc_payload(wsc_data, wsc_data_size,
-+						&wsc_ie_size);
-+	l_free(wsc_data);
-+	if (!wsc_ie) {
-+		l_free(p2p_ie);
-+		l_error("Can't build our Probe Response WSC IE");
-+		return;
-+	}
-+
-+	iov[iov_len].iov_base =3D resp_buf;
-+	iov[iov_len].iov_len =3D resp_len;
-+	iov_len++;
-+
-+	iov[iov_len].iov_base =3D p2p_ie;
-+	iov[iov_len].iov_len =3D p2p_ie_size;
-+	iov_len++;
-+
-+	iov[iov_len].iov_base =3D wsc_ie;
-+	iov[iov_len].iov_len =3D wsc_ie_size;
++	iov[iov_len].iov_base =3D req_body;
++	iov[iov_len].iov_len =3D req_len;
 +	iov_len++;
 +
 +	/* WFD and other service IEs go here */
 +
 +	iov[iov_len].iov_base =3D NULL;
 +
-+	freq =3D scan_channel_to_freq(dev->listen_channel, SCAN_BAND_2_4_GHZ);
-+	frame_xchg_start(dev->wdev_id, iov, freq, 0, 0, false, 0,
-+				p2p_probe_resp_done, dev, NULL);
-+	l_debug("Probe Response tx queued");
-+
-+	l_free(p2p_ie);
-+	l_free(wsc_ie);
-+}
-+
- static void p2p_device_probe_cb(const struct mmpdu_header *mpdu,
- 				const void *body, size_t body_len,
- 				int rssi, void *user_data)
-@@ -1687,12 +1812,17 @@ static void p2p_device_probe_cb(const struct mmpdu_=
-header *mpdu,
- 	struct p2p_channel_attr *channel;
- 	enum scan_band band;
- 	uint32_t frequency;
-+	bool from_conn_peer;
++	/*
++	 * Section 3.2.3: "The Provision Discovery Request frame shall be
++	 * sent to the P2P Device Address of the P2P Group Owner"
++	 */
++	p2p_peer_frame_xchg(dev->conn_peer, iov, dev->conn_peer->device_addr,
++				200, 600, 8, false, FRAME_GROUP_CONNECT,
++				p2p_provision_disc_req_done,
++				&p2p_frame_pd_resp, p2p_provision_disc_resp_cb,
++				NULL);
+ }
  =
 
- 	l_debug("");
- =
-
- 	if (!dev->scan_timeout && !dev->scan_id)
- 		return;
- =
-
-+	from_conn_peer =3D
-+		dev->go_neg_req_timeout && dev->conn_peer &&
-+		!memcmp(mpdu->address_2, dev->conn_peer->bss->addr, 6);
-+
- 	wsc_payload =3D ie_tlv_extract_wsc_payload(body, body_len, &wsc_len);
- 	if (!wsc_payload)	/* Not a P2P Probe Req, ignore */
- 		return;
-@@ -1703,7 +1833,15 @@ static void p2p_device_probe_cb(const struct mmpdu_h=
-eader *mpdu,
- 	if (r < 0) {
- 		l_error("Probe Request WSC IE parse error %s (%i)",
- 			strerror(-r), -r);
--		return;
-+
-+		/*
-+		 * Ignore requests with erroneous WSC IEs except if they
-+		 * come from the peer we're currently connecting to as a
-+		 * workaround for implementations sending invalid Probe
-+		 * Requests.
-+		 */
-+		if (!from_conn_peer)
-+			return;
- 	}
- =
-
- 	r =3D p2p_parse_probe_req(body, body_len, &p2p_info);
-@@ -1719,8 +1857,20 @@ static void p2p_device_probe_cb(const struct mmpdu_h=
-eader *mpdu,
- 	/*
- 	 * We don't currently have a use case for replying to Probe Requests
- 	 * except when waiting for a GO Negotiation Request from our target
--	 * peer.
-+	 * peer.  Some of those peers (seemingly running ancient and/or
-+	 * hw-manufacturer-provided versions of wpa_s) will only send us GO
-+	 * Negotiation Requests each time they receive our Probe Response
-+	 * frame, even if that frame's body is unparsable.
- 	 */
-+	if (from_conn_peer) {
-+		/*
-+		 * TODO: use ap.c code to check if we match the SSID, BSSID,
-+		 * DSSS Channel etc. in the Probe Request, and to build the
-+		 * Response body.
-+		 */
-+		p2p_device_send_probe_resp(dev, mpdu->address_2);
-+		goto p2p_free;
-+	}
- =
-
- 	/*
- 	 * The peer's listen frequency may be different from ours.
+ static bool p2p_peer_get_info(struct p2p_peer *peer,
 -- =
 
 2.25.1
 
---===============1292286850908709691==--
+--===============7208181189236457292==--
 
