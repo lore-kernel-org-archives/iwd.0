@@ -1,199 +1,131 @@
-Content-Type: multipart/mixed; boundary="===============2114320013600074761=="
+Content-Type: multipart/mixed; boundary="===============0187889537231571801=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 11/11] test: Add a connect-p2p test script
-Date: Sat, 25 Apr 2020 11:09:34 +0200
-Message-ID: <20200425090934.22285-11-andrew.zaborowski@intel.com>
-In-Reply-To: <20200425090934.22285-1-andrew.zaborowski@intel.com>
+From: Diego Santa Cruz <Diego.SantaCruz@spinetix.com>
+Subject: Compatibility problems with wired 802.1x
+Date: Mon, 27 Apr 2020 09:52:53 +0000
+Message-ID: <
+ <VI1PR01MB51671669EFF00516B60B1FBE88AF0@VI1PR01MB5167.eurprd01.prod.exchangelabs.com>>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2114320013600074761==
+--===============0187889537231571801==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- test/connect-p2p | 155 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 155 insertions(+)
- create mode 100755 test/connect-p2p
+Hi,
 
-diff --git a/test/connect-p2p b/test/connect-p2p
-new file mode 100755
-index 00000000..76b242b9
---- /dev/null
-+++ b/test/connect-p2p
-@@ -0,0 +1,155 @@
-+#!/usr/bin/python3
-+
-+import sys
-+import dbus
-+import dbus.mainloop.glib
-+from gi.repository import GLib
-+import fnmatch
-+
-+if len(sys.argv) not in [1, 2]:
-+    print("Usage: %s [<name_mask>]" % (sys.argv[0],))
-+    sys.exit(1)
-+
-+name_mask =3D None
-+if len(sys.argv) >=3D 2:
-+    name_mask =3D sys.argv[1]
-+
-+DEVICE_IF =3D 'net.connman.iwd.p2p.Device'
-+PEER_IF =3D 'net.connman.iwd.p2p.Peer'
-+WSC_IF =3D 'net.connman.iwd.SimpleConfiguration'
-+
-+dbus.mainloop.glib.DBusGMainLoop(set_as_default=3DTrue)
-+
-+bus =3D dbus.SystemBus()
-+manager =3D dbus.Interface(bus.get_object('net.connman.iwd', '/'),
-+                                        'org.freedesktop.DBus.ObjectManage=
-r')
-+objects =3D manager.GetManagedObjects()
-+
-+p2p_path =3D None
-+peers =3D {}
-+connecting =3D False
-+mainloop =3D None
-+
-+for path in objects:
-+    if DEVICE_IF in objects[path] and p2p_path is None:
-+        p2p_path =3D path
-+
-+if p2p_path is None:
-+    print('No P2P interfaces')
-+    sys.exit(-1)
-+
-+values =3D objects[p2p_path][DEVICE_IF]
-+properties =3D dbus.Interface(bus.get_object('net.connman.iwd', p2p_path),
-+                                           'org.freedesktop.DBus.Propertie=
-s')
-+p2p =3D dbus.Interface(bus.get_object('net.connman.iwd', p2p_path), DEVICE=
-_IF)
-+
-+def list_peers():
-+    global peers
-+
-+    print('We have the following P2P peers')
-+    for path in peers:
-+        result =3D peers[path]
-+
-+        print('   ' + result['Name'] + ' at ' + path)
-+
-+def connect(path):
-+    global connecting, peers, mainloop
-+
-+    list_peers()
-+
-+    peer =3D dbus.Interface(bus.get_object('net.connman.iwd', path), PEER_=
-IF)
-+    peer_wsc =3D dbus.Interface(bus.get_object('net.connman.iwd', path), W=
-SC_IF)
-+    peer_props =3D peers[path]
-+
-+    print('Connecting to ' + peer_props['Name'])
-+    connecting =3D True
-+    try:
-+        peer_wsc.PushButton()
-+        print('New connection')
-+    except Exception as e:
-+        connecting =3D False
-+        print('Connection error: ' + repr(e))
-+
-+    if mainloop:
-+        mainloop.quit()
-+    else:
-+        sys.exit(0)
-+
-+def properties_changed(interface, changed, invalidated, path):
-+    global peers
-+
-+    path =3D str(path)
-+    if interface !=3D PEER_IF or path not in peers:
-+        return
-+
-+    peers[path].update(changed)
-+    for k in invalidated:
-+        del peers[path][k]
-+
-+def interfaces_added(path, interfaces):
-+    global connecting, peers
-+
-+    if PEER_IF not in interfaces:
-+        return
-+
-+    path =3D str(path)
-+    peers[path] =3D interfaces[PEER_IF]
-+    print('Added peer ' + str(peers[path]['Name']))
-+
-+    if connecting or name_mask is None or not fnmatch.fnmatch(peers[path][=
-'Name'], name_mask):
-+        return
-+
-+    connect(path)
-+
-+def interfaces_removed(path, interfaces):
-+    global peers
-+
-+    if PEER_IF not in interfaces:
-+        return
-+
-+    print('Removed peer ' + str(peers[path]['Name']))
-+    del peers[path]
-+
-+if not values['Enabled']:
-+    properties.Set(DEVICE_IF, 'Enabled', True)
-+
-+if not values['AvailableConnections']:
-+    # See if we have peers we can disconnect or where we can cancel an ong=
-oing
-+    # connection that may be in the 120s GO Negotiation timeout for exampl=
-e.
-+    # Should we have a Connecting property on the WSC interface so we can =
-know
-+    # whether a connection is in progress?
-+    for path in objects:
-+        if PEER_IF not in objects[path]:
-+            continue
-+        peer_values =3D objects[path][PEER_IF]
-+        print('Trying to disconnect from peer ' + str(peer_values['Name']))
-+        peer =3D dbus.Interface(bus.get_object('net.connman.iwd', path), P=
-EER_IF)
-+        try:
-+            peer.Disconnect()
-+        except:
-+            pass
-+
-+for path in objects:
-+    if PEER_IF in objects[path]:
-+        interfaces_added(path, objects[path])
-+
-+p2p.RequestDiscovery()
-+
-+bus.add_signal_receiver(properties_changed,
-+                        bus_name=3D"net.connman.iwd",
-+                        dbus_interface=3D"org.freedesktop.DBus.Properties",
-+                        signal_name=3D"PropertiesChanged",
-+                        path_keyword=3D"path")
-+
-+bus.add_signal_receiver(interfaces_added,
-+                        bus_name=3D"net.connman.iwd",
-+                        dbus_interface=3D"org.freedesktop.DBus.ObjectManag=
-er",
-+                        signal_name=3D"InterfacesAdded")
-+
-+bus.add_signal_receiver(interfaces_removed,
-+                        bus_name=3D"net.connman.iwd",
-+                        dbus_interface=3D"org.freedesktop.DBus.ObjectManag=
-er",
-+                        signal_name=3D"InterfacesRemoved")
-+
-+mainloop =3D GLib.MainLoop()
-+mainloop.run()
--- =
+I have been attempting to use ead do wired 802.1x authentication and I am h=
+aving problems with an HP V1910-48G switch (admittedly an old switch).
 
-2.25.1
+The problem I see is that the switch never responds to the EAPOL packets se=
+nt by ead. Investigating I saw that the protocol version in the EAPOL packe=
+ts sent by ead is set to 802.1X-2004 (2) but in the unsolicited packets the=
+ switch sends it is set to 802.1X-2001 (1).
 
---===============2114320013600074761==--
+I am new to 802.1X but I went through the specs and as I understand the swi=
+tch should respond even if it receives an EAPOL version higher that what it=
+ uses, but this switch does not.
+
+Looking through the ead sources I think the new 802.1X-2004 features are no=
+t used, so I went ahead and changed ead to send 802.1X-2001 (1) in its pack=
+ets, and voil=C3=A0 it now works!
+
+Is there any reason that the packets sent by ead use version 802.1X-2004? I=
+f not I can send a patch to change it to always use 802.1X-2001. I suspect =
+it is safer to use the older version of the standard, as switches implement=
+ing 802.1X-2004 surely work with 802.1X-2001.
+
+Also, I see ead does not manipulate the link state and mode of the interfac=
+e, I would have expected it to put the interface into dormant mode and the =
+link state changed between up and dormant depending on the authenticated st=
+ate (like iwd does for WLAN links). Is there any reason for this? I guess o=
+ne could be the support of guest or auth-fail VLANs in some switches.
+
+Best,
+
+Diego
+--
+Diego Santa Cruz, PhD
+Technology Architect
+spinetix.com
+
+
+--===============0187889537231571801==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.htm"
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD1pc28tODg1OS0xIj4KPG1ldGEgbmFtZT0iR2VuZXJh
+dG9yIiBjb250ZW50PSJNaWNyb3NvZnQgV29yZCAxNSAoZmlsdGVyZWQgbWVkaXVtKSI+CjxzdHls
+ZT48IS0tCi8qIEZvbnQgRGVmaW5pdGlvbnMgKi8KQGZvbnQtZmFjZQoJe2ZvbnQtZmFtaWx5OiJD
+YW1icmlhIE1hdGgiOwoJcGFub3NlLTE6MiA0IDUgMyA1IDQgNiAzIDIgNDt9CkBmb250LWZhY2UK
+CXtmb250LWZhbWlseTpDYWxpYnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAyIDQ7fQov
+KiBTdHlsZSBEZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNv
+Tm9ybWFsCgl7bWFyZ2luOjBjbTsKCW1hcmdpbi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZTox
+MS4wcHQ7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsc2Fucy1zZXJpZjt9CnNwYW4uRW1haWxTdHls
+ZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29uYWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OiJDYWxp
+YnJpIixzYW5zLXNlcmlmOwoJY29sb3I6d2luZG93dGV4dDt9Ci5Nc29DaHBEZWZhdWx0Cgl7bXNv
+LXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsc2Fucy1zZXJp
+Zjt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3NpemU6NjEyLjBwdCA3OTIuMHB0OwoJbWFyZ2luOjcy
+LjBwdCA3Mi4wcHQgNzIuMHB0IDcyLjBwdDt9CmRpdi5Xb3JkU2VjdGlvbjEKCXtwYWdlOldvcmRT
+ZWN0aW9uMTt9Ci0tPjwvc3R5bGU+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlZGVm
+YXVsdHMgdjpleHQ9ImVkaXQiIHNwaWRtYXg9IjEwMjYiIC8+CjwveG1sPjwhW2VuZGlmXS0tPjwh
+LS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWxheW91dCB2OmV4dD0iZWRpdCI+CjxvOmlk
+bWFwIHY6ZXh0PSJlZGl0IiBkYXRhPSIxIiAvPgo8L286c2hhcGVsYXlvdXQ+PC94bWw+PCFbZW5k
+aWZdLS0+CjwvaGVhZD4KPGJvZHkgbGFuZz0iRU4tVVMiIGxpbms9IiMwNTYzQzEiIHZsaW5rPSIj
+OTU0RjcyIj4KPGRpdiBjbGFzcz0iV29yZFNlY3Rpb24xIj4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
+SGksPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+
+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5JIGhhdmUgYmVlbiBhdHRlbXB0aW5nIHRvIHVzZSBl
+YWQgZG8gd2lyZWQgODAyLjF4IGF1dGhlbnRpY2F0aW9uIGFuZCBJIGFtIGhhdmluZyBwcm9ibGVt
+cyB3aXRoIGFuIEhQIFYxOTEwLTQ4RyBzd2l0Y2ggKGFkbWl0dGVkbHkgYW4gb2xkIHN3aXRjaCku
+PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9w
+Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5UaGUgcHJvYmxlbSBJIHNlZSBpcyB0aGF0IHRoZSBzd2l0
+Y2ggbmV2ZXIgcmVzcG9uZHMgdG8gdGhlIEVBUE9MIHBhY2tldHMgc2VudCBieSBlYWQuIEludmVz
+dGlnYXRpbmcgSSBzYXcgdGhhdCB0aGUgcHJvdG9jb2wgdmVyc2lvbiBpbiB0aGUgRUFQT0wgcGFj
+a2V0cyBzZW50IGJ5IGVhZCBpcyBzZXQgdG8gODAyLjFYLTIwMDQgKDIpIGJ1dCBpbiB0aGUgdW5z
+b2xpY2l0ZWQgcGFja2V0cyB0aGUgc3dpdGNoIHNlbmRzCiBpdCBpcyBzZXQgdG8gODAyLjFYLTIw
+MDEgKDEpLjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwv
+bzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SSBhbSBuZXcgdG8gODAyLjFYIGJ1dCBJIHdl
+bnQgdGhyb3VnaCB0aGUgc3BlY3MgYW5kIGFzIEkgdW5kZXJzdGFuZCB0aGUgc3dpdGNoIHNob3Vs
+ZCByZXNwb25kIGV2ZW4gaWYgaXQgcmVjZWl2ZXMgYW4gRUFQT0wgdmVyc2lvbiBoaWdoZXIgdGhh
+dCB3aGF0IGl0IHVzZXMsIGJ1dCB0aGlzIHN3aXRjaCBkb2VzIG5vdC48bzpwPjwvbzpwPjwvcD4K
+PHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29O
+b3JtYWwiPkxvb2tpbmcgdGhyb3VnaCB0aGUgZWFkIHNvdXJjZXMgSSB0aGluayB0aGUgbmV3IDgw
+Mi4xWC0yMDA0IGZlYXR1cmVzIGFyZSBub3QgdXNlZCwgc28gSSB3ZW50IGFoZWFkIGFuZCBjaGFu
+Z2VkIGVhZCB0byBzZW5kIDgwMi4xWC0yMDAxICgxKSBpbiBpdHMgcGFja2V0cywgYW5kIHZvaWzg
+IGl0IG5vdyB3b3JrcyE8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4m
+bmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPklzIHRoZXJlIGFueSByZWFzb24g
+dGhhdCB0aGUgcGFja2V0cyBzZW50IGJ5IGVhZCB1c2UgdmVyc2lvbiA4MDIuMVgtMjAwND8gSWYg
+bm90IEkgY2FuIHNlbmQgYSBwYXRjaCB0byBjaGFuZ2UgaXQgdG8gYWx3YXlzIHVzZSA4MDIuMVgt
+MjAwMS4gSSBzdXNwZWN0IGl0IGlzIHNhZmVyIHRvIHVzZSB0aGUgb2xkZXIgdmVyc2lvbiBvZiB0
+aGUgc3RhbmRhcmQsIGFzIHN3aXRjaGVzIGltcGxlbWVudGluZyA4MDIuMVgtMjAwNAogc3VyZWx5
+IHdvcmsgd2l0aCA4MDIuMVgtMjAwMS48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
+bCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPkFsc28sIEkgc2Vl
+IGVhZCBkb2VzIG5vdCBtYW5pcHVsYXRlIHRoZSBsaW5rIHN0YXRlIGFuZCBtb2RlIG9mIHRoZSBp
+bnRlcmZhY2UsIEkgd291bGQgaGF2ZSBleHBlY3RlZCBpdCB0byBwdXQgdGhlIGludGVyZmFjZSBp
+bnRvIGRvcm1hbnQgbW9kZSBhbmQgdGhlIGxpbmsgc3RhdGUgY2hhbmdlZCBiZXR3ZWVuIHVwIGFu
+ZCBkb3JtYW50IGRlcGVuZGluZyBvbiB0aGUgYXV0aGVudGljYXRlZCBzdGF0ZSAobGlrZSBpd2QK
+IGRvZXMgZm9yIFdMQU4gbGlua3MpLiBJcyB0aGVyZSBhbnkgcmVhc29uIGZvciB0aGlzPyBJIGd1
+ZXNzIG9uZSBjb3VsZCBiZSB0aGUgc3VwcG9ydCBvZiBndWVzdCBvciBhdXRoLWZhaWwgVkxBTnMg
+aW4gc29tZSBzd2l0Y2hlcy48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86
+cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPkJlc3QsPG86cD48L286cD48
+L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj5EaWVnbzxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHls
+ZT0ibXNvLW1hcmdpbi10b3AtYWx0OmF1dG87bXNvLW1hcmdpbi1ib3R0b20tYWx0OmF1dG8iPjxz
+cGFuIHN0eWxlPSJmb250LXNpemU6OS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7QXJpYWwmcXVvdDss
+c2Fucy1zZXJpZiI+LS0KPGJyPgo8Yj5EaWVnbyBTYW50YSBDcnV6LCBQaEQ8YnI+CjwvYj48c3Bh
+biBzdHlsZT0iY29sb3I6Z3JheSI+VGVjaG5vbG9neSBBcmNoaXRlY3Q8YnI+CnNwaW5ldGl4LmNv
+bTwvc3Bhbj48L3NwYW4+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMi4wcHQ7Zm9udC1mYW1pbHk6
+JnF1b3Q7VGltZXMgTmV3IFJvbWFuJnF1b3Q7LHNlcmlmO2NvbG9yOmdyYXkiPjxvOnA+PC9vOnA+
+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+Cjwv
+ZGl2Pgo8L2JvZHk+CjwvaHRtbD4K
+
+--===============0187889537231571801==--
 
