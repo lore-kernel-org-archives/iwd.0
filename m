@@ -1,50 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============2953661596837364441=="
+Content-Type: multipart/mixed; boundary="===============4421927998678720896=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2] netdev: fix segfault due to roaming before connected
-Date: Mon, 04 May 2020 14:30:55 -0700
-Message-ID: <20200504213055.8330-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2] netdev: fix segfault due to roaming before connected
+Date: Mon, 04 May 2020 21:53:27 +0000
+Message-ID: <59e71637-ab28-cb26-a0c5-a44c9ec70a59@gmail.com>
+In-Reply-To: <20200504213055.8330-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2953661596837364441==
+--===============4421927998678720896==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In this situation the kernel is sending a low RSSI event which netdev
-picks up, but since we set netdev->connected so early the event is
-forwarded to station before IWD has fully connected. Station then
-tries to get a neighbor report, which may fail and cause a known
-frequency scan. If this is a new network the frequency scan tries to
-get any known frequencies in network_info which will be unset and
-cause a segfault.
+Hi James,
 
-This can be avoided by only sending RSSI events when netdev->operational
-is set rather than netdev->connected.
----
- src/netdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 5/4/20 4:30 PM, James Prestwood wrote:
+> In this situation the kernel is sending a low RSSI event which netdev
+> picks up, but since we set netdev->connected so early the event is
+> forwarded to station before IWD has fully connected. Station then
+> tries to get a neighbor report, which may fail and cause a known
+> frequency scan. If this is a new network the frequency scan tries to
+> get any known frequencies in network_info which will be unset and
+> cause a segfault.
+> =
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 69f9ab85..b3c3bf73 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -678,7 +678,7 @@ static void netdev_cqm_event_rssi_threshold(struct netd=
-ev *netdev,
- {
- 	int event;
- =
+> This can be avoided by only sending RSSI events when netdev->operational
+> is set rather than netdev->connected.
+> ---
+>   src/netdev.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
--	if (!netdev->connected)
-+	if (!netdev->operational)
- 		return;
- =
+applied, thanks.
 
- 	if (rssi_event !=3D NL80211_CQM_RSSI_THRESHOLD_EVENT_LOW &&
--- =
+Regards,
+-Denis
 
-2.21.1
-
---===============2953661596837364441==--
+--===============4421927998678720896==--
 
