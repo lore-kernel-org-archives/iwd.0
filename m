@@ -1,44 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============4071344724959804892=="
+Content-Type: multipart/mixed; boundary="===============2953661596837364441=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] tools: delay hwsim sending frame
-Date: Mon, 04 May 2020 21:21:31 +0000
-Message-ID: <bfdde947-203f-0ab2-c8df-1aa0679ea883@gmail.com>
-In-Reply-To: <20200504201613.5314-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2] netdev: fix segfault due to roaming before connected
+Date: Mon, 04 May 2020 14:30:55 -0700
+Message-ID: <20200504213055.8330-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4071344724959804892==
+--===============2953661596837364441==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+In this situation the kernel is sending a low RSSI event which netdev
+picks up, but since we set netdev->connected so early the event is
+forwarded to station before IWD has fully connected. Station then
+tries to get a neighbor report, which may fail and cause a known
+frequency scan. If this is a new network the frequency scan tries to
+get any known frequencies in network_info which will be unset and
+cause a segfault.
 
-On 5/4/20 3:16 PM, James Prestwood wrote:
-> Using mac80211_hwsim can sometimes result in out of order messages
-> coming from the kernel. Since mac80211_hwsim immediately sends out
-> frames and the kernel keeps command responses in a separate queue,
-> bad scheduling can result in these messages being out of order.
-> In some cases we receive Auth/Assoc frames before the response to
-> our original CMD_CONNECT. This causes autotests to fail randomly,
-> some more often than others.
-> =
+This can be avoided by only sending RSSI events when netdev->operational
+is set rather than netdev->connected.
+---
+ src/netdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> To fix this we can introduce a small delay into hwsim. Just a 1ms
-> delay makes the random failures disappear in the tests. This delay
-> is also makes hwsim more realistic since actual hardware will always
-> introduce some kind of delay when sending or receiving frames.
-> ---
->   tools/hwsim.c | 21 +++++++++++++++++----
->   1 file changed, 17 insertions(+), 4 deletions(-)
-> =
+diff --git a/src/netdev.c b/src/netdev.c
+index 69f9ab85..b3c3bf73 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -678,7 +678,7 @@ static void netdev_cqm_event_rssi_threshold(struct netd=
+ev *netdev,
+ {
+ 	int event;
+ =
 
+-	if (!netdev->connected)
++	if (!netdev->operational)
+ 		return;
+ =
 
-Applied, thanks.
+ 	if (rssi_event !=3D NL80211_CQM_RSSI_THRESHOLD_EVENT_LOW &&
+-- =
 
-Regards,
--Denis
+2.21.1
 
---===============4071344724959804892==--
+--===============2953661596837364441==--
 
