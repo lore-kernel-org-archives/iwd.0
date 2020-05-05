@@ -1,76 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============6039378988665098466=="
+Content-Type: multipart/mixed; boundary="===============2980156468738762707=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] auto-t: change blacklist test RSSI values
-Date: Tue, 05 May 2020 09:03:18 -0700
-Message-ID: <20200505160318.26419-2-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/2] test-runner: run iwmon per-subtest
+Date: Tue, 05 May 2020 16:19:43 +0000
+Message-ID: <1ff14630-9a93-b7c9-7233-46b628bf0c0c@gmail.com>
 In-Reply-To: <20200505160318.26419-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6039378988665098466==
+--===============2980156468738762707==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-These values were meant only to force IWD's BSS preference but
-since the RSSI's were so low in some cases this caused a roam
-immediately after connecting. This patch changes the RSSI values
-to prevent a roam from happening.
----
- autotests/testBSSBlacklist/bad_pass_test.py   | 4 ++--
- autotests/testBSSBlacklist/connection_test.py | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Hi James,
 
-diff --git a/autotests/testBSSBlacklist/bad_pass_test.py b/autotests/testBS=
-SBlacklist/bad_pass_test.py
-index 3de47719..3516f3be 100644
---- a/autotests/testBSSBlacklist/bad_pass_test.py
-+++ b/autotests/testBSSBlacklist/bad_pass_test.py
-@@ -36,12 +36,12 @@ class Test(unittest.TestCase):
-         rule1 =3D hwsim.rules.create()
-         rule1.source =3D bss_radio[1].addresses[0]
-         rule1.bidirectional =3D True
--        rule1.signal =3D -8000
-+        rule1.signal =3D -3000
- =
+On 5/5/20 11:03 AM, James Prestwood wrote:
+> Previously iwmon was running per-test, which would jumble any subtests
+> together into the same log file making it hard to parse. Now create
+> a separate directory for each subtest and put the monitor log and
+> pcap there.
+> ---
+>   tools/test-runner.c | 35 ++++++++++++++++++++++++++++-------
+>   1 file changed, 28 insertions(+), 7 deletions(-)
+> =
 
-         rule2 =3D hwsim.rules.create()
-         rule2.source =3D bss_radio[2].addresses[0]
-         rule2.bidirectional =3D True
--        rule2.signal =3D -10000
-+        rule2.signal =3D -4000
- =
 
-         wd =3D IWD(True, '/tmp')
- =
+Both applied, thanks.
 
-diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/test=
-BSSBlacklist/connection_test.py
-index ee169826..917f3192 100644
---- a/autotests/testBSSBlacklist/connection_test.py
-+++ b/autotests/testBSSBlacklist/connection_test.py
-@@ -36,12 +36,12 @@ class Test(unittest.TestCase):
-         rule1 =3D hwsim.rules.create()
-         rule1.source =3D bss_radio[1].addresses[0]
-         rule1.bidirectional =3D True
--        rule1.signal =3D -8000
-+        rule1.signal =3D -3000
- =
+Regards,
+-Denis
 
-         rule2 =3D hwsim.rules.create()
-         rule2.source =3D bss_radio[2].addresses[0]
-         rule2.bidirectional =3D True
--        rule2.signal =3D -10000
-+        rule2.signal =3D -4000
- =
-
-         wd =3D IWD(True, '/tmp')
- =
-
--- =
-
-2.21.1
-
---===============6039378988665098466==--
+--===============2980156468738762707==--
 
