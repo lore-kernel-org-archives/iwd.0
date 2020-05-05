@@ -1,121 +1,76 @@
-Content-Type: multipart/mixed; boundary="===============6705711008368888061=="
+Content-Type: multipart/mixed; boundary="===============6039378988665098466=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] test-runner: run iwmon per-subtest
-Date: Tue, 05 May 2020 09:03:17 -0700
-Message-ID: <20200505160318.26419-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] auto-t: change blacklist test RSSI values
+Date: Tue, 05 May 2020 09:03:18 -0700
+Message-ID: <20200505160318.26419-2-prestwoj@gmail.com>
+In-Reply-To: <20200505160318.26419-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6705711008368888061==
+--===============6039378988665098466==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Previously iwmon was running per-test, which would jumble any subtests
-together into the same log file making it hard to parse. Now create
-a separate directory for each subtest and put the monitor log and
-pcap there.
+These values were meant only to force IWD's BSS preference but
+since the RSSI's were so low in some cases this caused a roam
+immediately after connecting. This patch changes the RSSI values
+to prevent a roam from happening.
 ---
- tools/test-runner.c | 35 ++++++++++++++++++++++++++++-------
- 1 file changed, 28 insertions(+), 7 deletions(-)
+ autotests/testBSSBlacklist/bad_pass_test.py   | 4 ++--
+ autotests/testBSSBlacklist/connection_test.py | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 88bb50e1..5874421c 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -1847,6 +1847,7 @@ static void run_py_tests(struct l_settings *hw_settin=
-gs,
- 	unsigned int max_exec_interval;
- 	char *py_test =3D NULL;
- 	struct test_stats *test_stats;
-+	pid_t monitor_pid =3D -1;
+diff --git a/autotests/testBSSBlacklist/bad_pass_test.py b/autotests/testBS=
+SBlacklist/bad_pass_test.py
+index 3de47719..3516f3be 100644
+--- a/autotests/testBSSBlacklist/bad_pass_test.py
++++ b/autotests/testBSSBlacklist/bad_pass_test.py
+@@ -36,12 +36,12 @@ class Test(unittest.TestCase):
+         rule1 =3D hwsim.rules.create()
+         rule1.source =3D bss_radio[1].addresses[0]
+         rule1.bidirectional =3D True
+-        rule1.signal =3D -8000
++        rule1.signal =3D -3000
  =
 
- 	if (!l_settings_get_uint(hw_settings, HW_CONFIG_GROUP_SETUP,
- 						HW_CONFIG_SETUP_MAX_EXEC_SEC,
-@@ -1865,6 +1866,28 @@ start_next_test:
- 	if (!py_test)
- 		return;
+         rule2 =3D hwsim.rules.create()
+         rule2.source =3D bss_radio[2].addresses[0]
+         rule2.bidirectional =3D True
+-        rule2.signal =3D -10000
++        rule2.signal =3D -4000
  =
 
-+	if (log) {
-+		char *test_path;
-+		char *ext;
-+		char *full_path;
-+
-+		test_path =3D l_strdup_printf("%s/%s", test_name, py_test);
-+		ext =3D strchr(test_path, '.');
-+		ext[0] =3D '\0';
-+
-+		full_path =3D l_strdup_printf("%s/%s", log_dir, test_path);
-+
-+		mkdir(full_path, 0755);
-+		if (chown(full_path, log_uid, log_gid) < 0)
-+			l_error("chown failed %s", full_path);
-+
-+		l_free(full_path);
-+
-+		monitor_pid =3D start_monitor(test_path);
-+
-+		l_free(test_path);
-+	}
-+
- 	argv[0] =3D "python3";
- 	argv[1] =3D py_test;
- 	argv[2] =3D NULL;
-@@ -1928,6 +1951,11 @@ start_next_test:
- 	l_free(py_test);
- 	py_test =3D NULL;
+         wd =3D IWD(True, '/tmp')
  =
 
-+	if (monitor_pid !=3D -1) {
-+		kill_process(monitor_pid);
-+		monitor_pid =3D -1;
-+	}
-+
- 	goto start_next_test;
- }
+diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/test=
+BSSBlacklist/connection_test.py
+index ee169826..917f3192 100644
+--- a/autotests/testBSSBlacklist/connection_test.py
++++ b/autotests/testBSSBlacklist/connection_test.py
+@@ -36,12 +36,12 @@ class Test(unittest.TestCase):
+         rule1 =3D hwsim.rules.create()
+         rule1.source =3D bss_radio[1].addresses[0]
+         rule1.bidirectional =3D True
+-        rule1.signal =3D -8000
++        rule1.signal =3D -3000
  =
 
-@@ -2040,7 +2068,6 @@ static void create_network_and_run_tests(void *data, =
-void *user_data)
- 	pid_t medium_pid =3D -1;
- 	pid_t ofono_pid =3D -1;
- 	pid_t phonesim_pid =3D -1;
--	pid_t monitor_pid =3D -1;
- 	char *config_dir_path;
- 	char *iwd_config_dir;
- 	char **tmpfs_extra_stuff =3D NULL;
-@@ -2186,9 +2213,6 @@ static void create_network_and_run_tests(void *data, =
-void *user_data)
- 		l_queue_foreach(wiphy_list, wiphy_up, NULL);
- 	}
+         rule2 =3D hwsim.rules.create()
+         rule2.source =3D bss_radio[2].addresses[0]
+         rule2.bidirectional =3D True
+-        rule2.signal =3D -10000
++        rule2.signal =3D -4000
  =
 
--	if (log)
--		monitor_pid =3D start_monitor(test_name);
--
- 	if (check_verbosity("tls"))
- 		setenv("IWD_TLS_DEBUG", "on", true);
- =
-
-@@ -2277,9 +2301,6 @@ static void create_network_and_run_tests(void *data, =
-void *user_data)
- 		stop_phonesim(phonesim_pid);
- 	}
- =
-
--	if (monitor_pid > 0)
--		kill_process(monitor_pid);
--
- exit_hostapd:
- 	destroy_hostapd_instances(hostapd_pids);
+         wd =3D IWD(True, '/tmp')
  =
 
 -- =
 
 2.21.1
 
---===============6705711008368888061==--
+--===============6039378988665098466==--
 
