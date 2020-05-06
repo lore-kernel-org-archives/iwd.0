@@ -1,51 +1,107 @@
-Content-Type: multipart/mixed; boundary="===============0853393429796993594=="
+Content-Type: multipart/mixed; boundary="===============6579905814837161312=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH v2] auto-t: explicitly scan in testConnectAutoconnect
-Date: Wed, 06 May 2020 19:48:09 +0200
-Message-ID: <CAOq732Jzn=X2Aw=SOneRRiBEyE_S--PgEL7pSJJn5Hemo6Co-w@mail.gmail.com>
-In-Reply-To: <20200506173948.8581-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3 1/2] auto-t: add optional scan argument to
+ get_ordered_network(s)
+Date: Wed, 06 May 2020 12:35:01 -0700
+Message-ID: <20200506193502.14443-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0853393429796993594==
+--===============6579905814837161312==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+There is a very common block of code inside many autotests
+which goes something like:
 
-On Wed, 6 May 2020 at 19:40, James Prestwood <prestwoj@gmail.com> wrote:
-> In certain cases the autoconnect portion of each subtest was connecting
-> to the network so fast that the check for obj.scanning was never successf=
-ul
-> since IWD was already connected (and in turn not scanning). Since the
-> autoconnect path will wait for the device to be connected there really is=
-n't
-> a reason to wait for any scanning conditions. The normal connect path does
-> need to wait for scanning though, and for this an explicit call to scan w=
-as
-> added to ensure the network list gets populated.
+device.scan()
+condition =3D 'obj.scanning'
+wd.wait_for_object_condition(device, condition)
+condition =3D 'not obj.scanning'
+wd.wait_for_object_condition(device, condition)
+network =3D device.get_ordered_network('an-ssid')
 
-You might want to reuse the logic in testEAP-TLS etc. where it first
-checks if the scan is needed and then does what you did here,
+When you see the same pattern in nearly all the tests this shows
+we need a helper. Basic autotests which merely check that a
+connection succeeded should not need to write the same code again
+and again. This code ends up being copy-pasted which can lead to
+bugs.
 
-        condition =3D 'not obj.scanning'
-        wd.wait_for_object_condition(device, condition)
+There is also a code pattern which attempts to get ordered
+networks, and if this fails it scans and tries again. This, while
+not optimal, does prevent unneeded scanning by first checking if
+any networks already exist.
 
-        if not device.get_ordered_networks():
-            device.scan()
-            condition =3D 'obj.scanning'
-            wd.wait_for_object_condition(device, condition)
-            condition =3D 'not obj.scanning'
-            wd.wait_for_object_condition(device, condition)
+This patch solves both the code reuse issue as well as the recovery
+if get_ordered_network(s) fails. A new optional parameter was
+added to get_ordered_network(s) which is False by default. If True
+get_ordered_network(s) will perform a scan if the initial call
+yields no networks. Tests will now be able to simply call
+get_ordered_network(s) without performing a scan before hand.
+---
+ autotests/util/iwd.py | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-        ordered_network =3D device.get_ordered_network(ssid)
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 9bbb7278..7716b766 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -360,7 +360,7 @@ class Device(IWDDBusAbstract):
+ =
 
-On the other hand when Scan() returns "Scanning" is supposed be true
-immediately or a millisecond later, so we might want to add a short
-timeout or convert this to an assert.
+         self._wait_for_async_op()
+ =
 
-Best regards
---===============0853393429796993594==--
+-    def get_ordered_networks(self):
++    def get_ordered_networks(self, scan_if_needed =3D False):
+         '''Return the list of networks found in the most recent
+            scan, sorted by their user interface importance
+            score as calculated by iwd.  If the device is
+@@ -377,17 +377,30 @@ class Device(IWDDBusAbstract):
+             ordered_network =3D OrderedNetwork(bus_obj)
+             ordered_networks.append(ordered_network)
+ =
+
+-        if len(ordered_networks) =3D=3D 0:
++        if len(ordered_networks) =3D=3D 0 and not scan_if_needed:
+             return None
+ =
+
++        iwd =3D IWD.get_instance()
++
++        self.scan()
++
++        condition =3D 'obj.scanning'
++        iwd.wait_for_object_condition(self, condition)
++        condition =3D 'not obj.scanning'
++        iwd.wait_for_object_condition(self, condition)
++
++        for bus_obj in self._station.GetOrderedNetworks():
++            ordered_network =3D OrderedNetwork(bus_obj)
++            ordered_networks.append(ordered_network)
++
+         return ordered_networks
+ =
+
+-    def get_ordered_network(self, network):
++    def get_ordered_network(self, network, scan_if_needed =3D False):
+         '''Returns a single network from ordered network call, or None if =
+the
+            network wasn't found. If the network is not found an exception =
+is
+            raised, this removes the need to extra asserts in autotests.
+         '''
+-        ordered_networks =3D self.get_ordered_networks()
++        ordered_networks =3D self.get_ordered_networks(scan_if_needed)
+ =
+
+         if not ordered_networks:
+             raise Exception('Network %s not found' % network)
+-- =
+
+2.21.1
+
+--===============6579905814837161312==--
 
