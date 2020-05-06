@@ -1,67 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============0146818813715359399=="
+Content-Type: multipart/mixed; boundary="===============0853393429796993594=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2] auto-t: explicitly scan in testConnectAutoconnect
-Date: Wed, 06 May 2020 10:39:48 -0700
-Message-ID: <20200506173948.8581-1-prestwoj@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: Re: [PATCH v2] auto-t: explicitly scan in testConnectAutoconnect
+Date: Wed, 06 May 2020 19:48:09 +0200
+Message-ID: <CAOq732Jzn=X2Aw=SOneRRiBEyE_S--PgEL7pSJJn5Hemo6Co-w@mail.gmail.com>
+In-Reply-To: <20200506173948.8581-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0146818813715359399==
+--===============0853393429796993594==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In certain cases the autoconnect portion of each subtest was connecting
-to the network so fast that the check for obj.scanning was never successful
-since IWD was already connected (and in turn not scanning). Since the
-autoconnect path will wait for the device to be connected there really isn't
-a reason to wait for any scanning conditions. The normal connect path does
-need to wait for scanning though, and for this an explicit call to scan was
-added to ensure the network list gets populated.
----
- autotests/testConnectAutoconnect/validation.py | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+Hi James,
 
-diff --git a/autotests/testConnectAutoconnect/validation.py b/autotests/tes=
-tConnectAutoconnect/validation.py
-index 43cbaf02..757a88ab 100644
---- a/autotests/testConnectAutoconnect/validation.py
-+++ b/autotests/testConnectAutoconnect/validation.py
-@@ -12,6 +12,14 @@ from iwd import NetworkType
- class TestConnectAutoConnect(unittest.TestCase):
- =
+On Wed, 6 May 2020 at 19:40, James Prestwood <prestwoj@gmail.com> wrote:
+> In certain cases the autoconnect portion of each subtest was connecting
+> to the network so fast that the check for obj.scanning was never successf=
+ul
+> since IWD was already connected (and in turn not scanning). Since the
+> autoconnect path will wait for the device to be connected there really is=
+n't
+> a reason to wait for any scanning conditions. The normal connect path does
+> need to wait for scanning though, and for this an explicit call to scan w=
+as
+> added to ensure the network list gets populated.
 
-     def check_connect(self, wd, device, ssid, throws):
-+        device.scan()
-+
-+        condition =3D 'obj.scanning'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        condition =3D 'not obj.scanning'
-+        wd.wait_for_object_condition(device, condition)
-+
-         ordered_network =3D device.get_ordered_network(ssid)
- =
+You might want to reuse the logic in testEAP-TLS etc. where it first
+checks if the scan is needed and then does what you did here,
 
-         condition =3D 'not obj.connected'
-@@ -54,12 +62,6 @@ class TestConnectAutoConnect(unittest.TestCase):
-         self.assertIsNotNone(devices)
-         device =3D devices[0]
- =
+        condition =3D 'not obj.scanning'
+        wd.wait_for_object_condition(device, condition)
 
--        condition =3D 'obj.scanning'
--        wd.wait_for_object_condition(device, condition)
--
--        condition =3D 'not obj.scanning'
--        wd.wait_for_object_condition(device, condition)
--
-         if autoconnect:
-             self.check_autoconnect(wd, device, ssid, throws)
-         else:
--- =
+        if not device.get_ordered_networks():
+            device.scan()
+            condition =3D 'obj.scanning'
+            wd.wait_for_object_condition(device, condition)
+            condition =3D 'not obj.scanning'
+            wd.wait_for_object_condition(device, condition)
 
-2.21.1
+        ordered_network =3D device.get_ordered_network(ssid)
 
---===============0146818813715359399==--
+On the other hand when Scan() returns "Scanning" is supposed be true
+immediately or a millisecond later, so we might want to add a short
+timeout or convert this to an assert.
+
+Best regards
+--===============0853393429796993594==--
 
