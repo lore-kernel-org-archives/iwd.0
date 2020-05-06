@@ -1,39 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============7479609364781308990=="
+Content-Type: multipart/mixed; boundary="===============0146818813715359399=="
 MIME-Version: 1.0
-From: Kourt, Tim A <tim.a.kourt@linux.intel.com>
-Subject: Re: [PATCH 1/2] auto-t: remove scanning wait from
- testConnectAutoconnect
-Date: Wed, 06 May 2020 10:02:12 -0700
-Message-ID: <6790b6f3-1303-6c8a-6696-c30644f0b68f@linux.intel.com>
-In-Reply-To: <CAPv5Ue65n+fHNQterpTc2GTnr9bKh_8k8OKjqd1nCuyU8h-hrg@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2] auto-t: explicitly scan in testConnectAutoconnect
+Date: Wed, 06 May 2020 10:39:48 -0700
+Message-ID: <20200506173948.8581-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7479609364781308990==
+--===============0146818813715359399==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+In certain cases the autoconnect portion of each subtest was connecting
+to the network so fast that the check for obj.scanning was never successful
+since IWD was already connected (and in turn not scanning). Since the
+autoconnect path will wait for the device to be connected there really isn't
+a reason to wait for any scanning conditions. The normal connect path does
+need to wait for scanning though, and for this an explicit call to scan was
+added to ensure the network list gets populated.
+---
+ autotests/testConnectAutoconnect/validation.py | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
->>> -        condition =3D 'obj.scanning'
->>> -        wd.wait_for_object_condition(device, condition)
->>> -
->> What if the scan has never started yet? Since iwd is started from
->> Python, it looks suspicious that it goes through the scan before it hits
->> the conditional wait a few lines down the script. Perhaps changing to
->> wd.list_devices(1) API has introduced this issue. Would it help to
->> increase the conditional wait time out so it goes into the second round
->> of scans for these certain cases?
-> I can try increasing the timeout, but I think relying on periodic
-> scans for this autotest isn't the best way to go about it. I will try
-> explicitly scanning via dbus, otherwise you are just hoping that a
-> periodic scan was started. This timing will vary slightly between
-> systems which is why I think I am hitting this.
-The purpose of this autotest and of the one with the hidden networks is =
+diff --git a/autotests/testConnectAutoconnect/validation.py b/autotests/tes=
+tConnectAutoconnect/validation.py
+index 43cbaf02..757a88ab 100644
+--- a/autotests/testConnectAutoconnect/validation.py
++++ b/autotests/testConnectAutoconnect/validation.py
+@@ -12,6 +12,14 @@ from iwd import NetworkType
+ class TestConnectAutoConnect(unittest.TestCase):
+ =
 
-to exercise auto-connection without an explicit call from Dbus =
+     def check_connect(self, wd, device, ssid, throws):
++        device.scan()
++
++        condition =3D 'obj.scanning'
++        wd.wait_for_object_condition(device, condition)
++
++        condition =3D 'not obj.scanning'
++        wd.wait_for_object_condition(device, condition)
++
+         ordered_network =3D device.get_ordered_network(ssid)
+ =
 
-(different code paths).
---===============7479609364781308990==--
+         condition =3D 'not obj.connected'
+@@ -54,12 +62,6 @@ class TestConnectAutoConnect(unittest.TestCase):
+         self.assertIsNotNone(devices)
+         device =3D devices[0]
+ =
+
+-        condition =3D 'obj.scanning'
+-        wd.wait_for_object_condition(device, condition)
+-
+-        condition =3D 'not obj.scanning'
+-        wd.wait_for_object_condition(device, condition)
+-
+         if autoconnect:
+             self.check_autoconnect(wd, device, ssid, throws)
+         else:
+-- =
+
+2.21.1
+
+--===============0146818813715359399==--
 
