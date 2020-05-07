@@ -1,48 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============5102205810570446754=="
+Content-Type: multipart/mixed; boundary="===============1104188887961296012=="
 MIME-Version: 1.0
-From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 5/5] auto-t: Remove bogus logic
-Date: Thu, 07 May 2020 12:20:23 -0700
-Message-ID: <20200507192023.11498-5-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20200507192023.11498-1-tim.a.kourt@linux.intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] netdev: don't include ATTR_IE for SAE
+Date: Thu, 07 May 2020 12:34:46 -0700
+Message-ID: <20200507193446.8975-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5102205810570446754==
+--===============1104188887961296012==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Device object has no property named 'connected'.
-client_connect has no member dev2
+The spec outlines what fields/elements can be included with different
+auth types. For SAE only a few fields are allowed. IE's are not allowed
+but were being included with CMD_AUTHENTICATE.
 ---
- autotests/testAP/failure_test.py | 7 -------
- 1 file changed, 7 deletions(-)
+ src/netdev.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/autotests/testAP/failure_test.py b/autotests/testAP/failure_te=
-st.py
-index 9944abaa..d30bccb4 100644
---- a/autotests/testAP/failure_test.py
-+++ b/autotests/testAP/failure_test.py
-@@ -22,13 +22,6 @@ class Test(unittest.TestCase):
-         psk_agent =3D PSKAgent('Password1')
-         wd.register_psk_agent(psk_agent)
+diff --git a/src/netdev.c b/src/netdev.c
+index b3c3bf73..bce6ada3 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2143,7 +2143,15 @@ static struct l_genl_msg *netdev_build_cmd_authentic=
+ate(struct netdev *netdev,
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_SSID, hs->ssid_len, hs->ssid);
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_AUTH_TYPE, 4, &auth_type);
  =
 
--        try:
--            dev2.disconnect()
--            condition =3D 'not obj.connected'
--            wd.wait_for_object_condition(dev2, condition)
--        except:
--            pass
--
-         ordered_network.network_object.connect()
+-	l_genl_msg_append_attr(msg, NL80211_ATTR_IE, hs->supplicant_ie[1] + 2,
++	/*
++	 * IEEE 802.11-2016 Table 9-36 Presents of fields in Auth frames
++	 *
++	 * For the SAE auth type no IEs are listed to be included in the
++	 * authenticate frame. Only SAE related fields should be included.
++	 */
++	if (auth_type !=3D NL80211_AUTHTYPE_SAE)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_IE,
++					hs->supplicant_ie[1] + 2,
+ 					hs->supplicant_ie);
  =
 
-         condition =3D 'obj.connected'
+ 	return msg;
 -- =
 
-2.13.6
+2.21.1
 
---===============5102205810570446754==--
+--===============1104188887961296012==--
 
