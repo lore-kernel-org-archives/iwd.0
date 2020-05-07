@@ -1,47 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============5232843956897129777=="
+Content-Type: multipart/mixed; boundary="===============8428378144534603827=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 3/5] auto-t: Return None instead of empty known net list
-Date: Thu, 07 May 2020 12:20:21 -0700
-Message-ID: <20200507192023.11498-3-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 4/5] auto-t: Use changed get_ordered_network API
+Date: Thu, 07 May 2020 12:20:22 -0700
+Message-ID: <20200507192023.11498-4-tim.a.kourt@linux.intel.com>
 In-Reply-To: <20200507192023.11498-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5232843956897129777==
+--===============8428378144534603827==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-To match the original behavior of get_ordered_networks,
-return None for the empty list of known networks after the scan
-is complete
+Rely on internal scan and wait implementation of get_ordered_network
+to obtain the known networks
 ---
- autotests/util/iwd.py | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ autotests/testAP/failure_test.py | 11 +----------
+ autotests/testAP/test.py         | 11 +----------
+ 2 files changed, 2 insertions(+), 20 deletions(-)
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index c8d11f91..b9eeb0ff 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -395,7 +395,10 @@ class Device(IWDDBusAbstract):
-             ordered_network =3D OrderedNetwork(bus_obj)
-             ordered_networks.append(ordered_network)
+diff --git a/autotests/testAP/failure_test.py b/autotests/testAP/failure_te=
+st.py
+index 2c1e14b3..9944abaa 100644
+--- a/autotests/testAP/failure_test.py
++++ b/autotests/testAP/failure_test.py
+@@ -14,17 +14,8 @@ import testutil
+ class Test(unittest.TestCase):
  =
 
--        return ordered_networks
-+        if len(ordered_networks) > 0:
-+            return ordered_networks
-+
-+        return None
+     def client_connect(self, wd, dev):
+-        condition =3D 'not obj.scanning'
+-        wd.wait_for_object_condition(dev, condition)
  =
 
-     def get_ordered_network(self, network, scan_if_needed =3D False):
-         '''Returns a single network from ordered network call, or None if =
-the
+-        if not dev.get_ordered_networks():
+-            dev.scan()
+-            condition =3D 'obj.scanning'
+-            wd.wait_for_object_condition(dev, condition)
+-            condition =3D 'not obj.scanning'
+-            wd.wait_for_object_condition(dev, condition)
+-
+-        ordered_network =3D dev.get_ordered_network('TestAP1')
++        ordered_network =3D dev.get_ordered_network('TestAP1', True)
+ =
+
+         self.assertEqual(ordered_network.type, NetworkType.psk)
+ =
+
+diff --git a/autotests/testAP/test.py b/autotests/testAP/test.py
+index 455c9916..4cacf9ad 100644
+--- a/autotests/testAP/test.py
++++ b/autotests/testAP/test.py
+@@ -14,17 +14,8 @@ import testutil
+ class Test(unittest.TestCase):
+ =
+
+     def client_connect(self, wd, dev):
+-        condition =3D 'not obj.scanning'
+-        wd.wait_for_object_condition(dev, condition)
+ =
+
+-        if not dev.get_ordered_networks():
+-            dev.scan()
+-            condition =3D 'obj.scanning'
+-            wd.wait_for_object_condition(dev, condition)
+-            condition =3D 'not obj.scanning'
+-            wd.wait_for_object_condition(dev, condition)
+-
+-        ordered_network =3D dev.get_ordered_network('TestAP1')
++        ordered_network =3D dev.get_ordered_network('TestAP1', True)
+ =
+
+         self.assertEqual(ordered_network.type, NetworkType.psk)
+ =
+
 -- =
 
 2.13.6
 
---===============5232843956897129777==--
+--===============8428378144534603827==--
 
