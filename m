@@ -1,60 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============3357989189994513366=="
+Content-Type: multipart/mixed; boundary="===============1580720255725755438=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH 1/5] auto-t: Remove unnecessary disconnect calls
-Date: Thu, 07 May 2020 12:20:19 -0700
-Message-ID: <20200507192023.11498-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH 2/5] auto-t: Rename test case to reflect its purpose
+Date: Thu, 07 May 2020 12:20:20 -0700
+Message-ID: <20200507192023.11498-2-tim.a.kourt@linux.intel.com>
+In-Reply-To: <20200507192023.11498-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3357989189994513366==
+--===============1580720255725755438==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-With the introduction of AutoConnect=3DFalse network setting the
-initial disconnect calls are no longer needed
 ---
- autotests/testAP/failure_test.py | 2 --
- autotests/testAP/test.py         | 2 --
- 2 files changed, 4 deletions(-)
+ autotests/testAP/failure_test.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/autotests/testAP/failure_test.py b/autotests/testAP/failure_te=
 st.py
-index cad7bf6e..d419c05b 100644
+index d419c05b..2c1e14b3 100644
 --- a/autotests/testAP/failure_test.py
 +++ b/autotests/testAP/failure_test.py
-@@ -58,8 +58,6 @@ class Test(unittest.TestCase):
+@@ -54,7 +54,7 @@ class Test(unittest.TestCase):
+         condition =3D 'not obj.connected'
+         wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
+ =
+
+-    def test_connection_success(self):
++    def test_connection_failure(self):
          wd =3D IWD()
  =
 
          dev1, dev2 =3D wd.list_devices(2)
--        dev1.disconnect()
--        dev2.disconnect()
- =
-
-         self.client_connect(wd, dev1)
- =
-
-diff --git a/autotests/testAP/test.py b/autotests/testAP/test.py
-index 39161981..455c9916 100644
---- a/autotests/testAP/test.py
-+++ b/autotests/testAP/test.py
-@@ -51,8 +51,6 @@ class Test(unittest.TestCase):
-         wd =3D IWD()
- =
-
-         dev1, dev2 =3D wd.list_devices(2)
--        dev1.disconnect()
--        dev2.disconnect()
- =
-
-         self.client_connect(wd, dev1)
- =
-
 -- =
 
 2.13.6
 
---===============3357989189994513366==--
+--===============1580720255725755438==--
 
