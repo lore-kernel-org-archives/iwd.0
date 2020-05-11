@@ -1,65 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============7086764712911569189=="
+Content-Type: multipart/mixed; boundary="===============3331620485801733072=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/2] fils: include RSNE in authenticate
-Date: Thu, 07 May 2020 14:50:59 -0700
-Message-ID: <20200507215059.15987-2-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2 1/2] netdev: unify ft/auth_proto authenticate builders
+Date: Mon, 11 May 2020 18:47:06 +0000
+Message-ID: <8fe57ce5-ad0b-a8cb-0424-0d92a8c7e934@gmail.com>
 In-Reply-To: <20200507215059.15987-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7086764712911569189==
+--===============3331620485801733072==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-802.11ai mandates that the RSN element is included during authentication
-for FILS. This previously was happening by chance since supplicant_ie
-was being included with CMD_AUTHENTICATE. This included more than just
-the RSNE so that was removed in an earlier commit. Now FILS builds the
-RSNE itself and includes this with CMD_AUTHENTICATE.
----
- src/fils.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Hi James,
 
-diff --git a/src/fils.c b/src/fils.c
-index 2d2a0913..acead506 100644
---- a/src/fils.c
-+++ b/src/fils.c
-@@ -91,6 +91,8 @@ static void fils_erp_tx_func(const uint8_t *eap_data, siz=
-e_t len,
- 	uint8_t data[256];
- 	uint8_t *ptr =3D data;
- 	unsigned int tlv_len;
-+	struct ie_rsn_info rsn_info;
-+	uint8_t *rsne;
- =
+On 5/7/20 4:50 PM, James Prestwood wrote:
+> build_cmd_ft_authenticate and build_cmd_authenticate were virtually
+> identical. These have been unified into a single builder.
+> =
 
- 	l_getrandom(fils->nonce, 16);
- 	l_getrandom(fils->session, 8);
-@@ -106,6 +108,15 @@ static void fils_erp_tx_func(const uint8_t *eap_data, =
-size_t len,
- =
+> We were also incorrectly including ATTR_IE to every authenticate
+> command, which violates the spec for certain protocols, This was
+> removed and any auth protocols will now add any IEs that they require.
+> ---
+>   src/netdev.c | 46 ++++++++--------------------------------------
+>   1 file changed, 8 insertions(+), 38 deletions(-)
+> =
 
- 	ie_tlv_builder_init(&builder, ptr, sizeof(data) - 4);
- =
 
-+	ie_parse_rsne_from_data(fils->hs->supplicant_ie,
-+				fils->hs->supplicant_ie[1] + 2,
-+				&rsn_info);
-+	rsne =3D alloca(256);
-+	ie_build_rsne(&rsn_info, rsne);
-+
-+	ie_tlv_builder_next(&builder, IE_TYPE_RSN);
-+	ie_tlv_builder_set_data(&builder, rsne + 2, rsne[1]);
-+
- 	ie_tlv_builder_next(&builder, IE_TYPE_FILS_NONCE);
- 	ie_tlv_builder_set_data(&builder, fils->nonce, sizeof(fils->nonce));
- =
+Both applied, thanks.
 
--- =
-
-2.21.1
-
---===============7086764712911569189==--
+Regards,
+-Denis
+--===============3331620485801733072==--
 
