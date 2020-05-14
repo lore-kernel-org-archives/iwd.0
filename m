@@ -1,13 +1,13 @@
-Content-Type: multipart/mixed; boundary="===============5490683380807968050=="
+Content-Type: multipart/mixed; boundary="===============8629142994378385008=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH] auto-t: Test Agent ops
-Date: Wed, 13 May 2020 16:20:04 -0700
-Message-ID: <20200513232004.30243-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2] auto-t: Test Agent ops
+Date: Thu, 14 May 2020 09:20:24 -0700
+Message-ID: <20200514162024.14850-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5490683380807968050==
+--===============8629142994378385008==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -17,8 +17,8 @@ Content-Transfer-Encoding: quoted-printable
 ++++
  autotests/testAgent/hw.conf       |   7 +++
  autotests/testAgent/ssid1.conf    |   7 +++
- autotests/testAgent/ssid2.conf    |   8 +++
- 4 files changed, 122 insertions(+)
+ autotests/testAgent/ssid2.conf    |   7 +++
+ 4 files changed, 121 insertions(+)
  create mode 100644 autotests/testAgent/agent_test.py
  create mode 100644 autotests/testAgent/hw.conf
  create mode 100644 autotests/testAgent/ssid1.conf
@@ -160,10 +160,10 @@ index 00000000..2416d53a
 +wpa_passphrase=3Dsecret_ssid1
 diff --git a/autotests/testAgent/ssid2.conf b/autotests/testAgent/ssid2.conf
 new file mode 100644
-index 00000000..e1555c31
+index 00000000..69b4f000
 --- /dev/null
 +++ b/autotests/testAgent/ssid2.conf
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,7 @@
 +hw_mode=3Dg
 +channel=3D1
 +ssid=3Dssid2
@@ -171,10 +171,9 @@ index 00000000..e1555c31
 +wpa=3D1
 +wpa_pairwise=3DTKIP
 +wpa_passphrase=3Dsecret_ssid2
-+
 -- =
 
 2.13.6
 
---===============5490683380807968050==--
+--===============8629142994378385008==--
 
