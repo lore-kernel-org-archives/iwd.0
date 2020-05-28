@@ -1,192 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============6472770157925710582=="
+Content-Type: multipart/mixed; boundary="===============0679314696466427882=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
 Subject: Re: [PATCH 1/2] anqp: refactor to use frame-xchg
-Date: Thu, 28 May 2020 10:01:26 -0700
-Message-ID: <9aa953f7148035150dbac69774703a763833603d.camel@gmail.com>
-In-Reply-To: <f5422c7e-fcf5-3d1f-2b26-9ff95677cae9@gmail.com>
+Date: Thu, 28 May 2020 17:40:24 +0000
+Message-ID: <8995436a-a96b-ef56-b99a-0e2ac6f8d00a@gmail.com>
+In-Reply-To: <9aa953f7148035150dbac69774703a763833603d.camel@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6472770157925710582==
+--===============0679314696466427882==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2020-05-26 at 18:39 -0500, Denis Kenzior wrote:
-> Hi James,
+Hi James,
+
+<snip>
+
+>>>    =
+
+>>> -uint32_t anqp_request(uint32_t ifindex, const uint8_t *addr,
+>>> +bool anqp_request(uint64_t wdev_id, const uint8_t *addr,
+>>
+>> See above for the likely reason why we had this return a uint32_t
+>> originally.
 > =
 
-> On 5/27/20 3:45 PM, James Prestwood wrote:
-> > The new frame-xchg module now handles a lot of what ANQP used to
-> > do. ANQP
-> > now does not need to depend on nl80211/netdev for building and
-> > sending
-> > frames. It also no longer needs any of the request lookups or frame
-> > watches because frame-xchg filters this for us. The request queue
-> > did
-> > need to remain in ANQP because station fires off ANQP requests all
-> > in
-> > a row, and frame-xchg cannot handle this. Now ANQP just sends out
-> > the
-> > first request, and queue's the rest. As the responses come in it
-> > will
-> > send out the next frame in the queue until there are no more left.
-> > =
-
-> > The anqp_request API was changed to only return a bool, as well as
-> > take the wdev_id rather than ifindex. Station was updated to remove
-> > the 'pending' member since it was not actually used, as well as fix
-> > a bug on the timeout path where the request queue would get popped
-> > twice.
-> > =
-
-> > There is somewhat of a TODO that was overlooked initially with ANQP
-> > and was realized when testing these patches. Since the network_info
-> > depends on ANQP completing there is a race condition between
-> > scanning
-> > finishing and being ready to connect to networks which require
-> > ANQP.
-> > The autoconnect case does not have this issue, but explicit Dbus
-> > connects do. In practice this may not matter since the user would
-> > have
-> > to issue a connect at just the right time, but it could still
-> > happen.
-> > This may need to be fixed in network where we see if there are any
-> > pending ANQP requests before we return NotConfigured. If there are
-> > pending requests we should wait for those, then attempt to connect.
-> > ---
-> >   src/anqp.c    | 438 +++++++++++++------------------------------
-> > -------
-> >   src/anqp.h    |   2 +-
-> >   src/station.c |  16 +-
-> >   3 files changed, 114 insertions(+), 342 deletions(-)
-> > =
-
+> I am kinda thinking this should be implemented in frame-xchg since
+> cancellation doesn't even exist at this point. Then we can just give
+> that ID directly to station and ANQP doesnt need to track it.
 > =
 
-> <snip>
+
+I'm fine either way.  You could in theory do this in anqp.c for now and =
+
+just use frame_xchg_stop for the ongoing operation.  But adding this =
+
+directly too frame-xchg would be fine as well.
+
+>> Do we currently send a single ANQP request per network?  If so, maybe
+>> we
+>> can drop this structure completely, by:
+>>
+>> 1. Adding network_get_station() getter if necessary
+>> 2. Using the network object itself as the user_data for
+>> station_anqp_response_cb
+>> 3. Maybe storing pending inside network itself?
+>>
+>> The above would also make it easier to solve the issue of the user
+>> triggering Connect just when ANQP hasn't been done yet...
 > =
 
-> > +#define ANQP_GROUP	1
-> > +
-> =
+> The tricky part is that ANQP is directly tied to the scan results, so
 
-> Maybe a question for Andrew, but can't we fix frame-xchg to run this =
+Hm, how so?
 
-> over group 0?
-> =
+> putting anything in network is difficult. We could have
+> network_set_anqp_pending (or a better name), then if that was set and
+> Connect() came in we would know to wait. But that would get ugly as
+> station would need to detect that a Connect() came in (so another flag
+> in network + getter) while waiting for ANQP and to re-issue the
+> Connect() once ANQP completed.
 
-> <snip>
-> =
+Well, can't we just check if anqp is pending for the network inside =
 
-> >   =
+network_connect() or so, and if it is, defer taking any action until =
 
-> > -static uint32_t netdev_watch;
-> =
+anqp succeeds / fails?
 
-> So how do you handle device removal while ANQP queue is running?
-> =
+If that is too complicated, then I guess we have to document that =
 
-> Right now I think the kernel ends up sending us FRAME_WAIT_CANCEL
-> for =
+.Connect shouldn't be called until KnownNetwork property has been =
 
-> all pending remain-on-channel requests if the device is removed.  So
-> it =
+signaled and make our auto tests do this as well.
 
-> would seem that we get lucky and this all works in the current =
-
-> implementation.
-> =
-
-> It doesn't look like frame-xchg does this though and depends on its
-> own =
-
-> timers...
-> =
-
-> So either station/network has to cancel any pending anqp requests,
-> or =
-
-> anqp has to somehow clean this up after itself.
-
-I think doing this in station/network is the right choice since this
-would allow us to remove the netdev dependency on ANQP.
-
-> =
-
-> <snip>
-> =
-
-> > diff --git a/src/anqp.h b/src/anqp.h
-> > index 998277dd..99af76d5 100644
-> > --- a/src/anqp.h
-> > +++ b/src/anqp.h
-> > @@ -34,7 +34,7 @@ typedef void (*anqp_response_func_t)(enum
-> > anqp_result result,
-> >   					const void *anqp, size_t len,
-> >   					void *user_data);
-> >   =
-
-> > -uint32_t anqp_request(uint32_t ifindex, const uint8_t *addr,
-> > +bool anqp_request(uint64_t wdev_id, const uint8_t *addr,
-> =
-
-> See above for the likely reason why we had this return a uint32_t =
-
-> originally.
-
-I am kinda thinking this should be implemented in frame-xchg since
-cancellation doesn't even exist at this point. Then we can just give
-that ID directly to station and ANQP doesnt need to track it.
-
-> =
-
-> >   			struct scan_bss *bss, const uint8_t *anqp,
-> > size_t len,
-> >   			anqp_response_func_t cb, void *user_data,
-> >   			anqp_destroy_func_t destroy);
-> > diff --git a/src/station.c b/src/station.c
-> > index c532319a..29f94e3b 100644
-> > --- a/src/station.c
-> > +++ b/src/station.c
-> > @@ -104,7 +104,6 @@ struct station {
-> >   struct anqp_entry {
-> >   	struct station *station;
-> >   	struct network *network;
-> > -	uint32_t pending;
-> >   };
-> =
-
-> Do we currently send a single ANQP request per network?  If so, maybe
-> we =
-
-> can drop this structure completely, by:
-> =
-
-> 1. Adding network_get_station() getter if necessary
-> 2. Using the network object itself as the user_data for =
-
-> station_anqp_response_cb
-> 3. Maybe storing pending inside network itself?
-> =
-
-> The above would also make it easier to solve the issue of the user =
-
-> triggering Connect just when ANQP hasn't been done yet...
-
-The tricky part is that ANQP is directly tied to the scan results, so
-putting anything in network is difficult. We could have
-network_set_anqp_pending (or a better name), then if that was set and
-Connect() came in we would know to wait. But that would get ugly as
-station would need to detect that a Connect() came in (so another flag
-in network + getter) while waiting for ANQP and to re-issue the
-Connect() once ANQP completed.
-
-> =
-
-> Regards,
-> -Denis
-
---===============6472770157925710582==--
+Regards,
+-Denis
+--===============0679314696466427882==--
 
