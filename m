@@ -1,122 +1,86 @@
-Content-Type: multipart/mixed; boundary="===============0607109881830665286=="
+Content-Type: multipart/mixed; boundary="===============6772208952544457179=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 1/2] anqp: refactor to use frame-xchg
-Date: Fri, 29 May 2020 09:19:35 -0700
-Message-ID: <cc0280b8867ed533e6cdcb06bbf38ea5647bdc91.camel@gmail.com>
-In-Reply-To: <8995436a-a96b-ef56-b99a-0e2ac6f8d00a@gmail.com>
+From: Erik =?unknown-8bit?q?Bot=C3=B6?= <erik.boto@gmail.com>
+Subject: Re: Scanning while in AP mode
+Date: Fri, 29 May 2020 19:26:02 +0200
+Message-ID: <CALNvYWOCafkJtUob53X0AV0MsfK62Gr_ZpmiTYJJF=khpFOkgg@mail.gmail.com>
+In-Reply-To: <166f7dab-1d55-e726-699f-86b458088ec2@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0607109881830665286==
+--===============6772208952544457179==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2020-05-26 at 19:10 -0500, Denis Kenzior wrote:
-> Hi James,
-> =
+Hi,
 
-> <snip>
-> =
+On Fri, May 29, 2020 at 5:19 PM Denis Kenzior <denkenz@gmail.com> wrote:
+>
+> Hi Erik,
+>
+> On 5/29/20 8:16 AM, Erik Bot=C3=B6 wrote:
+> > Hi,
+> >
+> > I want to scan for networks while having an active AP. From what I
+> > understand this can be achieved by using NL80211_SCAN_FLAG_AP.
+> >
+> > The documentation for it say:
+> >   * @NL80211_SCAN_FLAG_AP: force a scan even if the interface is config=
+ured
+> >   * as AP and the beaconing has already been configured. This attribute=
+ is
+> >   * dangerous because will destroy stations performance as a lot of fra=
+mes
+> >   * will be lost while scanning off-channel, therefore it must be used =
+only
+> >   * when really needed
+> >
+> > So I suppose it's not something that should be enabled by default, but
+> > it would be useful to be able to start a scan with this if explicitly
+> > requested.
+> >
+> > My use case for this is initial device setup. A new device would be
+> > configured to start up in AP-mode and a inital setup service would run
+> > that e.g. a phone could connect to and be presented with a list of
+> > found networks. Then a network can be selected and credentials setup,
+> > then the device will shut down the AP and instead connect as a client
+> > to the selected network. Like many IoT devices etc let's you do when
+> > configuring.
+>
+> So let me see if I understood correctly.  You want to have wlan0:
+>
+> 1. Switch to Device.Mode =3D ap
+> 2. Wait until 'something' connects to wlan0
+> 3. Run a scan on wlan0 and tell that 'something' what networks are seen
+> 4. 'something' configures one of the seen networks
+> 5. wlan0 Device.Mode is then switched to 'station' and it connects to
+> the network configured in 4.
 
-> > > >    =
+Yes, that's exactly what I want.
 
-> > > > -uint32_t anqp_request(uint32_t ifindex, const uint8_t *addr,
-> > > > +bool anqp_request(uint64_t wdev_id, const uint8_t *addr,
-> > > =
+>
+> And to enable this you want to add scanning functionality to the
+> AccessPoint interface and have scan.c support this SCAN_FLAG_AP flag.
+> If above is correct, then...
+>
+> >
+> > What do you think, is it something that could fit into iwd or is there
+> > some reasons to not support this?
+>
+> I don't see any reason not to.  Feel free to come up with an initial
+> proposal and we can go from there.
 
-> > > See above for the likely reason why we had this return a uint32_t
-> > > originally.
-> > =
+Great, I'll write a first attempt at a patch and we'll take it from there.
 
-> > I am kinda thinking this should be implemented in frame-xchg since
-> > cancellation doesn't even exist at this point. Then we can just
-> > give
-> > that ID directly to station and ANQP doesnt need to track it.
-> > =
+Cheers,
+Erik
 
-> =
-
-> I'm fine either way.  You could in theory do this in anqp.c for now
-> and =
-
-> just use frame_xchg_stop for the ongoing operation.  But adding this =
-
-> directly too frame-xchg would be fine as well.
-
-Ok, I put it back in (properly, with a cancel API) to ANQP. I didn't
-think about the fact that frame-xchg only handles single requests at a
-time, so there isn't a point keeping IDs for requests in frame-xchg.
-
-> =
-
-> > > Do we currently send a single ANQP request per network?  If so,
-> > > maybe
-> > > we
-> > > can drop this structure completely, by:
-> > > =
-
-> > > 1. Adding network_get_station() getter if necessary
-> > > 2. Using the network object itself as the user_data for
-> > > station_anqp_response_cb
-> > > 3. Maybe storing pending inside network itself?
-> > > =
-
-> > > The above would also make it easier to solve the issue of the
-> > > user
-> > > triggering Connect just when ANQP hasn't been done yet...
-> > =
-
-> > The tricky part is that ANQP is directly tied to the scan results,
-> > so
-> =
-
-> Hm, how so?
-> =
-
-> > putting anything in network is difficult. We could have
-> > network_set_anqp_pending (or a better name), then if that was set
-> > and
-> > Connect() came in we would know to wait. But that would get ugly as
-> > station would need to detect that a Connect() came in (so another
-> > flag
-> > in network + getter) while waiting for ANQP and to re-issue the
-> > Connect() once ANQP completed.
-> =
-
-> Well, can't we just check if anqp is pending for the network inside =
-
-> network_connect() or so, and if it is, defer taking any action until =
-
-> anqp succeeds / fails?
-
-Checking for pending is easy, defering is the hard part. We could set a
-flag in network if ANQP is pending, then if/when the network info gets
-set by station we could attempt a connect then (basically from inside
-network_set_info). But I have a feeling you wont like this, it just
-feels wrong.
-
-Then a further issue is how do we ultimately decide when to fail with
-NotConfigured if ANQP fails or there is an error? Unless we add some
-other mechanism for station to signal that ANQP failed like
-network_set_info_failed(). Again doesn't really feel right.
-
-Maybe a per-station watch for ANQP that network can subscribe to?
-Network could get notified both if ANQP is being performed and when it
-finished.
-
-> =
-
-> If that is too complicated, then I guess we have to document that =
-
-> .Connect shouldn't be called until KnownNetwork property has been =
-
-> signaled and make our auto tests do this as well.
-> =
-
+>
 > Regards,
 > -Denis
-
---===============0607109881830665286==--
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+--===============6772208952544457179==--
 
