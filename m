@@ -1,86 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============6772208952544457179=="
+Content-Type: multipart/mixed; boundary="===============4517763501164323608=="
 MIME-Version: 1.0
-From: Erik =?unknown-8bit?q?Bot=C3=B6?= <erik.boto@gmail.com>
-Subject: Re: Scanning while in AP mode
-Date: Fri, 29 May 2020 19:26:02 +0200
-Message-ID: <CALNvYWOCafkJtUob53X0AV0MsfK62Gr_ZpmiTYJJF=khpFOkgg@mail.gmail.com>
-In-Reply-To: <166f7dab-1d55-e726-699f-86b458088ec2@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/2] anqp: refactor to use frame-xchg
+Date: Fri, 29 May 2020 11:13:41 -0500
+Message-ID: <7a5c93e8-0a52-48da-36d3-80eb6cff6d38@gmail.com>
+In-Reply-To: <cc0280b8867ed533e6cdcb06bbf38ea5647bdc91.camel@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6772208952544457179==
+--===============4517763501164323608==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi James,
 
-On Fri, May 29, 2020 at 5:19 PM Denis Kenzior <denkenz@gmail.com> wrote:
->
-> Hi Erik,
->
-> On 5/29/20 8:16 AM, Erik Bot=C3=B6 wrote:
-> > Hi,
-> >
-> > I want to scan for networks while having an active AP. From what I
-> > understand this can be achieved by using NL80211_SCAN_FLAG_AP.
-> >
-> > The documentation for it say:
-> >   * @NL80211_SCAN_FLAG_AP: force a scan even if the interface is config=
-ured
-> >   * as AP and the beaconing has already been configured. This attribute=
- is
-> >   * dangerous because will destroy stations performance as a lot of fra=
-mes
-> >   * will be lost while scanning off-channel, therefore it must be used =
-only
-> >   * when really needed
-> >
-> > So I suppose it's not something that should be enabled by default, but
-> > it would be useful to be able to start a scan with this if explicitly
-> > requested.
-> >
-> > My use case for this is initial device setup. A new device would be
-> > configured to start up in AP-mode and a inital setup service would run
-> > that e.g. a phone could connect to and be presented with a list of
-> > found networks. Then a network can be selected and credentials setup,
-> > then the device will shut down the AP and instead connect as a client
-> > to the selected network. Like many IoT devices etc let's you do when
-> > configuring.
->
-> So let me see if I understood correctly.  You want to have wlan0:
->
-> 1. Switch to Device.Mode =3D ap
-> 2. Wait until 'something' connects to wlan0
-> 3. Run a scan on wlan0 and tell that 'something' what networks are seen
-> 4. 'something' configures one of the seen networks
-> 5. wlan0 Device.Mode is then switched to 'station' and it connects to
-> the network configured in 4.
+>> Well, can't we just check if anqp is pending for the network inside
+>> network_connect() or so, and if it is, defer taking any action until
+>> anqp succeeds / fails?
+> =
 
-Yes, that's exactly what I want.
+> Checking for pending is easy, defering is the hard part. We could set a
+> flag in network if ANQP is pending, then if/when the network info gets
+> set by station we could attempt a connect then (basically from inside
+> network_set_info). But I have a feeling you wont like this, it just
+> feels wrong.
 
->
-> And to enable this you want to add scanning functionality to the
-> AccessPoint interface and have scan.c support this SCAN_FLAG_AP flag.
-> If above is correct, then...
->
-> >
-> > What do you think, is it something that could fit into iwd or is there
-> > some reasons to not support this?
->
-> I don't see any reason not to.  Feel free to come up with an initial
-> proposal and we can go from there.
+Well we have to communicate between the two modules somehow.
 
-Great, I'll write a first attempt at a patch and we'll take it from there.
+> =
 
-Cheers,
-Erik
+> Then a further issue is how do we ultimately decide when to fail with
+> NotConfigured if ANQP fails or there is an error? Unless we add some
+> other mechanism for station to signal that ANQP failed like
+> network_set_info_failed(). Again doesn't really feel right.
 
->
-> Regards,
-> -Denis
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
---===============6772208952544457179==--
+So one thing we could do is to have network actually drive the anqp =
+
+queries.  Might be what we want to do anyway since we actually should be =
+
+doing multiple queries for grabbing icons, etc.  The scanning suspension =
+
+and resumption of auto-connect is the only tricky part.  Perhaps we just =
+
+have a reference count or something on the anqp request and station can =
+
+kick off autoconnect when that reaches 0.
+
+> =
+
+> Maybe a per-station watch for ANQP that network can subscribe to?
+> Network could get notified both if ANQP is being performed and when it
+> finished.
+
+Or something like this, yes.
+
+Regards,
+-Denis
+--===============4517763501164323608==--
 
