@@ -1,42 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============2856911845471052585=="
+Content-Type: multipart/mixed; boundary="===============8313053713481085252=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH] scan: don't send the same scan request twice
-Date: Sun, 31 May 2020 00:26:51 +0200
-Message-ID: <CAOq732LjDvnJ-PpLEYOrJ=Un43N0JHOE_n2Zj_Amrvob2F=FwQ@mail.gmail.com>
-In-Reply-To: <20200529135451.21290-1-alsi@bang-olufsen.dk>
+Subject: [PATCH 1/2] frame-xchg: Fix frame_watch_remove_by_handler for group 0
+Date: Sun, 31 May 2020 02:56:44 +0200
+Message-ID: <20200531005645.257055-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2856911845471052585==
+--===============8313053713481085252==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Alvin,
-(resending this to the list)
+Don't match the default group's (group_id 0) wdev_id against the
+provided wdev_id because the default group can be used on all wdevs and
+its wdev_id is 0.  Also match individual item's wdev_id in the group to
+make up for this although it normally wouldn't matter.
+---
+ src/frame-xchg.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-On Fri, 29 May 2020 at 15:57, Alvin =C5=A0ipraga <alsi@bang-olufsen.dk> w=
-rote:
->
-> If start_scan_next_request() is called while a scan request
-> (NL80211_CMD_GET_SCAN) is still running, the same scan request will be
-> sent again by mistake. Add a check in the function to avoid sending a
-> request if one is already in progress.
+diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+index 4c950fd3..44711997 100644
+--- a/src/frame-xchg.c
++++ b/src/frame-xchg.c
+@@ -661,6 +661,7 @@ bool frame_watch_wdev_remove(uint64_t wdev_id)
+ }
+ =
 
-Do you know if start_scan_next_request() was called from scan_resume
-in your case?  In all other callers we can be sure start_cmd_id is
-already 0, so scan_resume may need to have these checks added instead.
-I think it should check that !sc->start_cmd_id && !sc->triggered &&
-!sc->get_scan_cmd_id because the scan_resume() call can come in during
-any of those phases.
+ struct frame_watch_handler_check_info {
++	uint64_t wdev_id;
+ 	frame_watch_cb_t handler;
+ 	void *user_data;
+ };
+@@ -671,7 +672,8 @@ static bool frame_watch_item_remove_by_handler(void *da=
+ta, void *user_data)
+ 		l_container_of(data, struct frame_watch, super);
+ 	struct frame_watch_handler_check_info *info =3D user_data;
+ =
 
-BTW you mention NL80211_CMD_GET_SCAN above, I think you meant
-NL80211_CMD_TRIGGER_SCAN.
+-	if (watch->super.notify !=3D info->handler ||
++	if (watch->wdev_id !=3D info->wdev_id ||
++			watch->super.notify !=3D info->handler ||
+ 			watch->super.notify_data !=3D info->user_data)
+ 		return false;
+ =
 
-I also wonder if scan_common() should check sc->suspended like
-start_scan_next_request() does.
+@@ -702,9 +704,9 @@ static bool frame_watch_remove_by_handler(uint64_t wdev=
+_id, uint32_t group_id,
+ 						void *user_data)
+ {
+ 	struct watch_group_match_info group_info =3D
+-		{ wdev_id, group_id };
++		{ group_id =3D=3D 0 ? 0 : wdev_id, group_id };
+ 	struct frame_watch_handler_check_info handler_info =3D
+-		{ handler, user_data };
++		{ wdev_id, handler, user_data };
+ 	struct watch_group *group =3D l_queue_find(watch_groups,
+ 						frame_watch_group_match,
+ 						&group_info);
+-- =
 
-Best regards
---===============2856911845471052585==--
+2.25.1
+
+--===============8313053713481085252==--
 
