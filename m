@@ -1,46 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============4116669235707536026=="
+Content-Type: multipart/mixed; boundary="===============0241611250589110695=="
 MIME-Version: 1.0
 From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>
-Subject: [PATCH v2 2/2] scan: refactor scan_common to not scan while scanning
- is suspended
-Date: Mon, 01 Jun 2020 19:11:17 +0200
-Message-ID: <20200601171117.122574-2-alsi@bang-olufsen.dk>
-In-Reply-To: <20200601171117.122574-1-alsi@bang-olufsen.dk>
+Subject: [PATCH v2 1/2] scan: refactor start_next_scan_request to not send
+ duplicate requests
+Date: Mon, 01 Jun 2020 19:11:16 +0200
+Message-ID: <20200601171117.122574-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4116669235707536026==
+--===============0241611250589110695==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If scanning is suspended, have scan_common() queue its scan request
-rather than issuing it immediately. This respects the assumption that
-scans are not requested while sc->suspended is true.
+If start_scan_next_request() is called while a scan request
+(NL80211_CMD_TRIGGER_SCAN) is still running, the same scan request will
+be sent again. Add a check in the function to avoid sending a request if
+one is already in progress.
+
+This also fixes a crash that occurs if the following conditions are met:
+  - the duplicated request is the only request in the scan request
+    queue, and
+  - both scan requests fail with an error not EBUSY.
+
+In this case, the first callback to scan_request_triggered() will delete
+the request from the scan request queue. The second callback will find
+an empty queue and consequently pass a NULL scan_request pointer to
+scan_request_failed(), causing a segmentation fault.
 ---
  src/scan.c | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/src/scan.c b/src/scan.c
-index 106fa81c..e10c5447 100644
+index 718f7497..106fa81c 100644
 --- a/src/scan.c
 +++ b/src/scan.c
-@@ -546,6 +546,9 @@ static uint32_t scan_common(uint64_t wdev_id, bool pass=
-ive,
- 	if (!l_queue_isempty(sc->requests))
- 		goto done;
- =
-
-+	if (sc->suspended)
-+		goto done;
-+
+@@ -839,6 +839,9 @@ static bool start_next_scan_request(struct scan_context=
+ *sc)
  	if (sc->state !=3D SCAN_STATE_NOT_RUNNING)
- 		goto done;
+ 		return true;
  =
 
++	if (sc->start_cmd_id)
++		return true;
++
+ 	while (sr) {
+ 		if (!scan_request_send_trigger(sc, sr))
+ 			return true;
 -- =
 
 2.26.2
 
---===============4116669235707536026==--
+--===============0241611250589110695==--
 
