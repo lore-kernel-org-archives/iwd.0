@@ -1,55 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============0241611250589110695=="
+Content-Type: multipart/mixed; boundary="===============2661834289647551960=="
 MIME-Version: 1.0
 From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>
-Subject: [PATCH v2 1/2] scan: refactor start_next_scan_request to not send
- duplicate requests
-Date: Mon, 01 Jun 2020 19:11:16 +0200
-Message-ID: <20200601171117.122574-1-alsi@bang-olufsen.dk>
+Subject: Re: [PATCH] scan: don't send the same scan request twice
+Date: Mon, 01 Jun 2020 19:12:23 +0200
+Message-ID: <9741a7ac-1870-58cc-c416-9c526ecfd288@bang-olufsen.dk>
+In-Reply-To: <CAOq732LFMpVzcGGEvuXjXWgXOTRzSQPOzBoDNLNHZRNQURZpCg@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0241611250589110695==
+--===============2661834289647551960==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If start_scan_next_request() is called while a scan request
-(NL80211_CMD_TRIGGER_SCAN) is still running, the same scan request will
-be sent again. Add a check in the function to avoid sending a request if
-one is already in progress.
+On 6/1/20 3:20 PM, Andrew Zaborowski wrote> It would probably work.  The
+downside is that we're possibly
+> re-checking conditions that we already know are fulfilled, the upside
+> is possibly readability.
+> =
 
-This also fixes a crash that occurs if the following conditions are met:
-  - the duplicated request is the only request in the scan request
-    queue, and
-  - both scan requests fail with an error not EBUSY.
+> You'd then need to change the commit message to say it's refactoring
+> start_next_scan_request.
 
-In this case, the first callback to scan_request_triggered() will delete
-the request from the scan request queue. The second callback will find
-an empty queue and consequently pass a NULL scan_request pointer to
-scan_request_failed(), causing a segmentation fault.
----
- src/scan.c | 3 +++
- 1 file changed, 3 insertions(+)
+I will send a v2 patch with an updated commit message addressing your
+comments:
+ - NL80211_CMD_GET_SCAN -> NL80211_CMD_TRIGGER_SCAN
+ - mention that start_next_scan_request() is being refactored
 
-diff --git a/src/scan.c b/src/scan.c
-index 718f7497..106fa81c 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -839,6 +839,9 @@ static bool start_next_scan_request(struct scan_context=
- *sc)
- 	if (sc->state !=3D SCAN_STATE_NOT_RUNNING)
- 		return true;
- =
+>> I'm not quite sure what the reason for this is, but maybe you can commen=
+t?
+> =
 
-+	if (sc->start_cmd_id)
-+		return true;
-+
- 	while (sr) {
- 		if (!scan_request_send_trigger(sc, sr))
- 			return true;
--- =
+> The reason is that the scan_passive, scan_active, etc. entry points
+> are not assumed to call the destroy callback synchronously. When they
+> return an error it's assumed that none of the resources passed as
+> parameters were used and no callbacks happened, i.e. funcions have no
+> side effects on errors, afaik it's just a convention.
 
-2.26.2
+OK, I understand. Considering that (reasonable) convention, I guess it's
+not a good idea to have scan_common() call into
+start_next_scan_request(). Please disregard my suggestion.
 
---===============0241611250589110695==--
+Please check out the v2 patch I have posted. I also added a second patch
+to check for sc->suspended in scan_common(). You can take it as well if
+you think it's needed.
+
+Kind regards,
+Alvin
+--===============2661834289647551960==--
 
