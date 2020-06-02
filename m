@@ -1,50 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============6605891792591507883=="
+Content-Type: multipart/mixed; boundary="===============1983020998636134351=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 00/10] ANQP Refactor to use frame-xchg
-Date: Tue, 02 Jun 2020 10:30:11 -0700
-Message-ID: <20200602173021.20085-1-prestwoj@gmail.com>
+Subject: [PATCH 02/10] frame-xchg: Fix frame_watch_remove_by_handler for group
+ 0
+Date: Tue, 02 Jun 2020 10:30:13 -0700
+Message-ID: <20200602173021.20085-3-prestwoj@gmail.com>
+In-Reply-To: <20200602173021.20085-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6605891792591507883==
+--===============1983020998636134351==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I have included two of Andrews patches fixing the group zero bug
-as well.
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
 
-Andrew Zaborowski (2):
-  frame-xchg: Fix frame_watch_remove_by_handler for group 0
-  frame-xchg: Use frame_watch_group_match in frame_watch_group_get
+Don't match the default group's (group_id 0) wdev_id against the
+provided wdev_id because the default group can be used on all wdevs and
+its wdev_id is 0.  Also match individual item's wdev_id in the group to
+make up for this although it normally wouldn't matter.
+---
+ src/frame-xchg.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-James Prestwood (8):
-  frame-xchg: fix bug when starting new xchg from callback
-  anqp: refactor to use frame-xchg
-  station: add ANQP state watch API
-  network: delay connect if ANQP has not completed
-  hwsim: add new 'Delay' property to Rules
-  doc: document new 'Delay' property for hwsim Rules
-  auto-t: add 'Delay' property to hwsim python module
-  auto-t: add test for delayed ANQP response
+diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+index 71751ca4..ba8bd0f0 100644
+--- a/src/frame-xchg.c
++++ b/src/frame-xchg.c
+@@ -671,6 +671,7 @@ bool frame_watch_wdev_remove(uint64_t wdev_id)
+ }
+ =
 
- autotests/testHotspot/anqp_delay_test.py |  83 +++++
- autotests/util/hwsim.py                  |   8 +
- doc/hwsim-rules-api.txt                  |   5 +
- src/anqp.c                               | 449 +++++++----------------
- src/anqp.h                               |   3 +-
- src/frame-xchg.c                         |  62 ++--
- src/network.c                            |  58 +++
- src/station.c                            |  45 ++-
- src/station.h                            |  13 +
- tools/hwsim.c                            |  53 ++-
- 10 files changed, 414 insertions(+), 365 deletions(-)
- create mode 100644 autotests/testHotspot/anqp_delay_test.py
+ struct frame_watch_handler_check_info {
++	uint64_t wdev_id;
+ 	frame_watch_cb_t handler;
+ 	void *user_data;
+ };
+@@ -681,7 +682,8 @@ static bool frame_watch_item_remove_by_handler(void *da=
+ta, void *user_data)
+ 		l_container_of(data, struct frame_watch, super);
+ 	struct frame_watch_handler_check_info *info =3D user_data;
+ =
 
+-	if (watch->super.notify !=3D info->handler ||
++	if (watch->wdev_id !=3D info->wdev_id ||
++			watch->super.notify !=3D info->handler ||
+ 			watch->super.notify_data !=3D info->user_data)
+ 		return false;
+ =
+
+@@ -712,9 +714,9 @@ static bool frame_watch_remove_by_handler(uint64_t wdev=
+_id, uint32_t group_id,
+ 						void *user_data)
+ {
+ 	struct watch_group_match_info group_info =3D
+-		{ wdev_id, group_id };
++		{ group_id =3D=3D 0 ? 0 : wdev_id, group_id };
+ 	struct frame_watch_handler_check_info handler_info =3D
+-		{ handler, user_data };
++		{ wdev_id, handler, user_data };
+ 	struct watch_group *group =3D l_queue_find(watch_groups,
+ 						frame_watch_group_match,
+ 						&group_info);
 -- =
 
 2.21.1
 
---===============6605891792591507883==--
+--===============1983020998636134351==--
 
