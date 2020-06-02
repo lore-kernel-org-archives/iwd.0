@@ -1,165 +1,190 @@
-Content-Type: multipart/mixed; boundary="===============9199368565386873275=="
+Content-Type: multipart/mixed; boundary="===============4503131660887463486=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 06/10] network: delay connect if ANQP has not completed
-Date: Tue, 02 Jun 2020 10:30:17 -0700
-Message-ID: <20200602173021.20085-7-prestwoj@gmail.com>
+Subject: [PATCH 07/10] hwsim: add new 'Delay' property to Rules
+Date: Tue, 02 Jun 2020 10:30:18 -0700
+Message-ID: <20200602173021.20085-8-prestwoj@gmail.com>
 In-Reply-To: <20200602173021.20085-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============9199368565386873275==
+--===============4503131660887463486==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Using the new station ANQP watch network can delay the connection
-request until after ANQP has finished. Since station may be
-autoconnecting we must also add a check in network_autoconnect
-which prevents it from autoconnecting if we have a pending Connect
-request.
+This allows a matching frame to be delayed by some number of
+milliseconds.
 ---
- src/network.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+ tools/hwsim.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 48 insertions(+), 5 deletions(-)
 
-diff --git a/src/network.c b/src/network.c
-index c08d7e72..b2599c7c 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -52,6 +52,7 @@
- #include "src/util.h"
- =
-
- static uint32_t known_networks_watch;
-+static uint32_t anqp_watch;
- =
-
- struct network {
- 	char ssid[33];
-@@ -72,7 +73,10 @@ struct network {
- 	bool update_psk:1;  /* Whether PSK should be written to storage */
- 	bool ask_passphrase:1; /* Whether we should force-ask agent */
- 	bool is_hs20:1;
-+	bool anqp_pending:1;	/* Set if there is a pending ANQP request */
- 	int rank;
-+	/* Holds DBus Connect() message if it comes in before ANQP finishes */
-+	struct l_dbus_message *connect_after_anqp;
+diff --git a/tools/hwsim.c b/tools/hwsim.c
+index d066f814..3ccc936e 100644
+--- a/tools/hwsim.c
++++ b/tools/hwsim.c
+@@ -113,6 +113,7 @@ enum hwsim_tx_control_flags {
  };
  =
 
- static bool network_settings_load(struct network *network)
-@@ -521,6 +525,10 @@ int network_autoconnect(struct network *network, struc=
-t scan_bss *bss)
- 	bool is_rsn;
- 	int ret;
+ #define IEEE80211_TX_RATE_TABLE_SIZE	4
++#define HWSIM_DELAY_MIN_MS		1
  =
 
-+	/* already waiting for an ANQP response to connect */
-+	if (network->connect_after_anqp)
-+		return -EALREADY;
+ struct hwsim_rule {
+ 	unsigned int id;
+@@ -125,6 +126,7 @@ struct hwsim_rule {
+ 	uint32_t frequency;
+ 	int priority;
+ 	int signal;
++	int delay;
+ };
+ =
+
+ struct hwsim_support {
+@@ -1106,7 +1108,8 @@ static bool radio_match_addr(const struct radio_info_=
+rec *radio,
+ =
+
+ static void process_rules(const struct radio_info_rec *src_radio,
+ 				const struct radio_info_rec *dst_radio,
+-				struct hwsim_frame *frame, bool *drop)
++				struct hwsim_frame *frame, bool *drop,
++				uint32_t *delay)
+ {
+ 	const struct l_queue_entry *rule_entry;
+ =
+
+@@ -1149,6 +1152,9 @@ static void process_rules(const struct radio_info_rec=
+ *src_radio,
+ 			frame->signal =3D rule->signal / 100;
+ =
+
+ 		*drop =3D rule->drop;
 +
- 	switch (security) {
- 	case SECURITY_NONE:
- 		is_rsn =3D false;
-@@ -1102,6 +1110,11 @@ static struct l_dbus_message *network_connect_8021x(=
-struct network *network,
- 			goto error;
- 		}
- =
-
-+		if (network->connect_after_anqp) {
-+			l_dbus_message_unref(network->connect_after_anqp);
-+			network->connect_after_anqp =3D NULL;
-+		}
-+
- 		station_connect_network(station, network, bss, message);
- =
-
- 		return NULL;
-@@ -1156,6 +1169,19 @@ static struct l_dbus_message *network_connect(struct=
- l_dbus *dbus,
- 		station_connect_network(station, network, bss, message);
- 		return NULL;
- 	case SECURITY_8021X:
-+		/*
-+		 * If there is an ongoing ANQP request we must wait for that to
-+		 * finish. Save the message and wait for the ANQP watch to
-+		 * fire
-+		 */
-+		if (network->anqp_pending) {
-+			network->connect_after_anqp =3D
-+						l_dbus_message_ref(message);
-+			l_debug("Pending ANQP request, delaying connect to %s",
-+						network->ssid);
-+			return NULL;
-+		}
-+
- 		if (!network_settings_load(network))
- 			return dbus_error_not_configured(message);
- =
-
-@@ -1484,6 +1510,33 @@ static void known_networks_changed(enum known_networ=
-ks_event event,
++		if (delay)
++			*delay =3D rule->delay;
  	}
  }
  =
 
-+static void anqp_watch_changed(enum station_anqp_state state,
-+				struct network *network, void *user_data)
+@@ -1232,7 +1238,7 @@ static void hwsim_frame_unref(struct hwsim_frame *fra=
+me)
+ 			bool drop =3D false;
+ =
+
+ 			process_rules(frame->ack_radio, frame->src_radio,
+-					frame, &drop);
++					frame, &drop, NULL);
+ =
+
+ 			if (!drop)
+ 				frame->flags |=3D HWSIM_TX_STAT_ACK;
+@@ -1374,13 +1380,14 @@ static void process_frame(struct hwsim_frame *frame)
+ 	bool drop_mcast =3D false;
+ =
+
+ 	if (util_is_broadcast_address(frame->dst_ether_addr))
+-		process_rules(frame->src_radio, NULL, frame, &drop_mcast);
++		process_rules(frame->src_radio, NULL, frame, &drop_mcast, NULL);
+ =
+
+ 	for (entry =3D l_queue_get_entries(radio_info); entry;
+ 			entry =3D entry->next) {
+ 		struct radio_info_rec *radio =3D entry->data;
+ 		struct send_frame_info *send_info;
+ 		bool drop =3D drop_mcast;
++		uint32_t delay =3D HWSIM_DELAY_MIN_MS;
+ =
+
+ 		if (radio =3D=3D frame->src_radio)
+ 			continue;
+@@ -1413,7 +1420,7 @@ static void process_frame(struct hwsim_frame *frame)
+ 				continue;
+ 		}
+ =
+
+-		process_rules(frame->src_radio, radio, frame, &drop);
++		process_rules(frame->src_radio, radio, frame, &drop, &delay);
+ =
+
+ 		if (drop)
+ 			continue;
+@@ -1422,7 +1429,7 @@ static void process_frame(struct hwsim_frame *frame)
+ 		send_info->radio =3D radio;
+ 		send_info->frame =3D hwsim_frame_ref(frame);
+ =
+
+-		if (!l_timeout_create_ms(1, frame_delay_callback,
++		if (!l_timeout_create_ms(delay, frame_delay_callback,
+ 						send_info, NULL)) {
+ 			l_error("Error delaying frame, frame will be dropped");
+ 			send_frame_destroy(send_info);
+@@ -1875,6 +1882,7 @@ static struct l_dbus_message *rule_add(struct l_dbus =
+*dbus,
+ 	rule->id =3D next_rule_id++;
+ 	rule->source_any =3D true;
+ 	rule->destination_any =3D true;
++	rule->delay =3D HWSIM_DELAY_MIN_MS;
+ =
+
+ 	if (!rules)
+ 		rules =3D l_queue_new();
+@@ -2160,6 +2168,37 @@ static struct l_dbus_message *rule_property_set_drop(
+ 	return l_dbus_message_new_method_return(message);
+ }
+ =
+
++static bool rule_property_get_delay(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
 +{
-+	network->anqp_pending =3D state =3D=3D STATION_ANQP_STARTED;
++	struct hwsim_rule *rule =3D user_data;
 +
-+	if (state =3D=3D STATION_ANQP_FINISHED && network->connect_after_anqp) {
-+		struct l_dbus_message *reply;
++	l_dbus_message_builder_append_basic(builder, 'u', &rule->delay);
 +
-+		l_debug("ANQP complete, resuming connect to %s", network->ssid);
-+
-+		if (!network_settings_load(network))
-+			reply =3D dbus_error_not_configured(
-+						network->connect_after_anqp);
-+		else
-+			reply =3D network_connect_8021x(network,
-+					network_bss_select(network, true),
-+					network->connect_after_anqp);
-+
-+		if (!reply)
-+			return;
-+
-+		dbus_pending_reply(&network->connect_after_anqp, reply);
-+
-+		return;
-+	}
++	return true;
 +}
 +
- static void setup_network_interface(struct l_dbus_interface *interface)
++static struct l_dbus_message *rule_property_set_delay(
++					struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_iter *new_value,
++					l_dbus_property_complete_cb_t complete,
++					void *user_data)
++{
++	struct hwsim_rule *rule =3D user_data;
++	uint32_t val;
++
++	if (!l_dbus_message_iter_get_variant(new_value, "u", &val) ||
++				val < HWSIM_DELAY_MIN_MS)
++		return dbus_error_invalid_args(message);
++
++	rule->delay =3D val;
++
++	return l_dbus_message_new_method_return(message);
++}
++
+ static void setup_rule_interface(struct l_dbus_interface *interface)
  {
- 	l_dbus_interface_method(interface, "Connect", 0,
-@@ -1517,6 +1570,8 @@ static int network_init(void)
- 	known_networks_watch =3D
- 		known_networks_watch_add(known_networks_changed, NULL, NULL);
- =
-
-+	anqp_watch =3D station_add_anqp_watch(anqp_watch_changed, NULL, NULL);
-+
- 	return 0;
+ 	l_dbus_interface_method(interface, "Remove", 0, rule_remove, "", "");
+@@ -2192,6 +2231,10 @@ static void setup_rule_interface(struct l_dbus_inter=
+face *interface)
+ 					L_DBUS_PROPERTY_FLAG_AUTO_EMIT, "b",
+ 					rule_property_get_drop,
+ 					rule_property_set_drop);
++	l_dbus_interface_property(interface, "Delay",
++					L_DBUS_PROPERTY_FLAG_AUTO_EMIT, "u",
++					rule_property_get_delay,
++					rule_property_set_delay);
  }
  =
 
-@@ -1525,6 +1580,9 @@ static void network_exit(void)
- 	known_networks_watch_remove(known_networks_watch);
- 	known_networks_watch =3D 0;
- =
-
-+	station_remove_anqp_watch(anqp_watch);
-+	anqp_watch =3D 0;
-+
- 	l_dbus_unregister_interface(dbus_get_bus(), IWD_NETWORK_INTERFACE);
- }
- =
-
+ static void request_name_callback(struct l_dbus *dbus, bool success,
 -- =
 
 2.21.1
 
---===============9199368565386873275==--
+--===============4503131660887463486==--
 
