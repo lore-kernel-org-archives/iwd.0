@@ -1,67 +1,146 @@
-Content-Type: multipart/mixed; boundary="===============0654227994752481077=="
+Content-Type: multipart/mixed; boundary="===============1332315011078943772=="
 MIME-Version: 1.0
 From: KeithG <ys3al35l@gmail.com>
-Subject: connman integration
-Date: Wed, 03 Jun 2020 12:01:33 -0500
-Message-ID: <CAG17S_PvAatbLoaygU-fRsvCE+YDKHuDh9w9d8X54e7+Kv6Okg@mail.gmail.com>
+Subject: Cannot get ap mode to work
+Date: Wed, 03 Jun 2020 12:17:31 -0500
+Message-ID: <CAG17S_NU=nmTMUf=z5ceSEZ4ow2Cw4kfHTZ9NBZ6zvXMynNksA@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0654227994752481077==
+--===============1332315011078943772==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
- I currently use iwd with NetworkManager on a couple laptops running Arch
-Linux. I also am working on an RPI project with connman/iwd managing
-network interfaces. Currently, if we use the connman interface to scan with
-iwd, we never get a return:
-"connmanctl scan wifi" just hangs and requires a ctrlC.
-This was noted on the Arch connman page:
-https://wiki.archlinux.org/index.php/ConnMan#Error_/net/connman/technology/=
-wifi:_Not_supported
-On my rpi project, we are using nginx/php to set it all up and we use the
-'iwd station wlan0 scan' then 'connmanctl services' to select SSIDs. I
-asked on the connman list and Daniel says that connman is waiting for a 0.
+I cannot get AP mode to function on my RPIs. If I try to do it by these
+commands:
 
-Scanning is supported with iwd. connmanctl scan is probably waiting for iwd
-to respond with the scanning=3D0 signal. If iwd doesn't send out this signal
-then this will hang.
+~# iwctl adapter phy0 show
+                                 Adapter: phy0
+---------------------------------------------------------------------------=
+-----
+  Settable  Property         Value
+---------------------------------------------------------------------------=
+-----
+            Name             phy0
+         *  Powered          on
+            Vendor           Broadcom Corp.
+            Model            BCM43438 combo WLAN and Bluetooth Low Energy
+(BLE)
+            SupportedModes   ad-hoc station ap
 
-Don't know if it is a connman or an iwd 'issue', but wanted to bring it up
-here to see.
+~# iwctl device wlan0 show
+                                 Device: wlan0
+---------------------------------------------------------------------------=
+-----
+  Settable  Property            Value
+---------------------------------------------------------------------------=
+-----
+            Name                wlan0
+         *  Mode                ap
+         *  Powered             on
+            Address             b8:27:eb:52:cc:d0
+            Adapter             phy0
+
+~# iwctl ap wlan0 start "MyNet" "password"
+
+On my Windows PC, I can select the SSID "MyNet" and attempt to connect but
+every time, I get:
+"Can't connect to this network"
+From my android phone, I get a similar response: It tries to connect but
+never negotiates a connection.
+
+I have tried by running dnsmasq and then starting the iwd in AP mode (like
+I do with hostapd), but still cannot connect.
+
+Daniel on the connman list suggested I collect a log of the connection
+attempt by running the commands suggested in the README:
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/README
+I tried before and got gibberish. I just did it again (by the book) and the
+files are attached. This is on a RaspberryPi 3B+ running Arch Linux.
+
+What is going wrong and how can I fix it? My goal is to ditch
+hostapd/dnsmasq and use connman/iwd to allow the RPI to boot as an AP if it
+does not have a 'known-network' that it can find.
+
+Regards,
 
 Keith
 
---===============0654227994752481077==
+--===============1332315011078943772==
 Content-Type: text/html
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="attachment.htm"
 
-PGRpdiBkaXI9Imx0ciI+CjxkaXY+SSBjdXJyZW50bHkgdXNlIGl3ZCB3aXRoIE5ldHdvcmtNYW5h
-Z2VyIG9uIGEgY291cGxlIGxhcHRvcHMgcnVubmluZyBBcmNoIExpbnV4LiBJIGFsc28gYW0gd29y
-a2luZyBvbiBhbiBSUEkgcHJvamVjdCB3aXRoIGNvbm5tYW4vaXdkIG1hbmFnaW5nIG5ldHdvcmsg
-aW50ZXJmYWNlcy4gQ3VycmVudGx5LCBpZiB3ZSB1c2UgdGhlIGNvbm5tYW4gaW50ZXJmYWNlIHRv
-IHNjYW4gd2l0aCBpd2QsIHdlIG5ldmVyIGdldCBhIHJldHVybjo8L2Rpdj48ZGl2PiZxdW90O2Nv
-bm5tYW5jdGwgc2NhbiB3aWZpJnF1b3Q7IGp1c3QgaGFuZ3MgYW5kIHJlcXVpcmVzIGEgY3RybEMu
-PC9kaXY+PGRpdj5UaGlzIHdhcyBub3RlZCBvbiB0aGUgQXJjaCBjb25ubWFuIHBhZ2U6PC9kaXY+
-PGRpdj48YSBocmVmPSJodHRwczovL3dpa2kuYXJjaGxpbnV4Lm9yZy9pbmRleC5waHAvQ29ubk1h
-biNFcnJvcl8vbmV0L2Nvbm5tYW4vdGVjaG5vbG9neS93aWZpOl9Ob3Rfc3VwcG9ydGVkIj5odHRw
-czovL3dpa2kuYXJjaGxpbnV4Lm9yZy9pbmRleC5waHAvQ29ubk1hbiNFcnJvcl8vbmV0L2Nvbm5t
-YW4vdGVjaG5vbG9neS93aWZpOl9Ob3Rfc3VwcG9ydGVkPC9hPjwvZGl2PjxkaXY+T24gbXkgcnBp
-IHByb2plY3QsIHdlIGFyZSB1c2luZyBuZ2lueC9waHAgdG8gc2V0IGl0IGFsbCB1cCBhbmQgd2Ug
-dXNlIHRoZSAmIzM5O2l3ZCBzdGF0aW9uIHdsYW4wIHNjYW4mIzM5OyB0aGVuICYjMzk7Y29ubm1h
-bmN0bCBzZXJ2aWNlcyYjMzk7IHRvIHNlbGVjdCBTU0lEcy4gSSBhc2tlZCBvbiB0aGUgY29ubm1h
-biBsaXN0IGFuZCBEYW5pZWwgc2F5cyB0aGF0IGNvbm5tYW4gaXMgd2FpdGluZyBmb3IgYSAwLjwv
-ZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbi1sZWZ0OjQwcHgiPgpTY2Fubmlu
-ZyBpcyBzdXBwb3J0ZWQgd2l0aCBpd2QuIGNvbm5tYW5jdGwgc2NhbiBpcyBwcm9iYWJseSB3YWl0
-aW5nIGZvciBpd2Q8YnI+CnRvIHJlc3BvbmQgd2l0aCB0aGUgc2Nhbm5pbmc9MCBzaWduYWwuIElm
-IGl3ZCBkb2VzbiYjMzk7dCBzZW5kIG91dCB0aGlzIHNpZ25hbDxicj4KdGhlbiB0aGlzIHdpbGwg
-aGFuZy4gPGJyPjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+RG9uJiMzOTt0IGtub3cgaWYgaXQg
-aXMgYSBjb25ubWFuIG9yIGFuIGl3ZCAmIzM5O2lzc3VlJiMzOTssIGJ1dCB3YW50ZWQgdG8gYnJp
-bmcgaXQgdXAgaGVyZSB0byBzZWUuPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5LZWl0aDxicj48
-L2Rpdj4KCjwvZGl2Pgo=
+PGRpdiBkaXI9Imx0ciI+SSBjYW5ub3QgZ2V0IEFQIG1vZGUgdG8gZnVuY3Rpb24gb24gbXkgUlBJ
+cy4gSWYgSSB0cnkgdG8gZG8gaXQgYnkgdGhlc2UgY29tbWFuZHM6PGRpdj48YnI+fiMgaXdjdGwg
+YWRhcHRlciBwaHkwIHNob3c8YnI+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqBBZGFwdGVyOiBwaHkwPGJyPi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJy
+PsKgIFNldHRhYmxlIMKgUHJvcGVydHkgwqAgwqAgwqAgwqAgVmFsdWU8YnI+LS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS08YnI+wqAgwqAgwqAgwqAgwqAgwqAgTmFtZSDCoCDCoCDCoCDCoCDCoCDCoCBw
+aHkwPGJyPsKgIMKgIMKgIMKgIMKgKiDCoFBvd2VyZWQgwqAgwqAgwqAgwqAgwqBvbjxicj7CoCDC
+oCDCoCDCoCDCoCDCoCBWZW5kb3IgwqAgwqAgwqAgwqAgwqAgQnJvYWRjb20gQ29ycC48YnI+wqAg
+wqAgwqAgwqAgwqAgwqAgTW9kZWwgwqAgwqAgwqAgwqAgwqAgwqBCQ000MzQzOCBjb21ibyBXTEFO
+IGFuZCBCbHVldG9vdGggTG93IEVuZXJneSAoQkxFKTxicj7CoCDCoCDCoCDCoCDCoCDCoCBTdXBw
+b3J0ZWRNb2RlcyDCoCBhZC1ob2Mgc3RhdGlvbiBhcDxicj48YnI+fiMgaXdjdGwgZGV2aWNlIHds
+YW4wIHNob3c8YnI+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqBEZXZpY2U6IHdsYW4wPGJyPi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJyPsKgIFNldHRh
+YmxlIMKgUHJvcGVydHkgwqAgwqAgwqAgwqAgwqAgwqBWYWx1ZTxicj4tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLTxicj7CoCDCoCDCoCDCoCDCoCDCoCBOYW1lIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+d2xhbjA8YnI+wqAgwqAgwqAgwqAgwqAqIMKgTW9kZSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGFw
+PGJyPsKgIMKgIMKgIMKgIMKgKiDCoFBvd2VyZWQgwqAgwqAgwqAgwqAgwqAgwqAgb248YnI+wqAg
+wqAgwqAgwqAgwqAgwqAgQWRkcmVzcyDCoCDCoCDCoCDCoCDCoCDCoCBiODoyNzplYjo1MjpjYzpk
+MDxicj7CoCDCoCDCoCDCoCDCoCDCoCBBZGFwdGVyIMKgIMKgIMKgIMKgIMKgIMKgIHBoeTA8L2Rp
+dj48ZGl2Pjxicj48L2Rpdj48ZGl2Pgp+IyBpd2N0bCBhcCB3bGFuMCBzdGFydCAmcXVvdDtNeU5l
+dCZxdW90OyAmcXVvdDtwYXNzd29yZCZxdW90OwoKPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5P
+biBteSBXaW5kb3dzIFBDLCBJIGNhbiBzZWxlY3QgdGhlIFNTSUQgJnF1b3Q7TXlOZXQmcXVvdDsg
+YW5kIGF0dGVtcHQgdG8gY29ubmVjdCBidXQgZXZlcnkgdGltZSwgSSBnZXQ6PC9kaXY+PGRpdj4m
+cXVvdDtDYW4mIzM5O3QgY29ubmVjdCB0byB0aGlzIG5ldHdvcmsmcXVvdDs8L2Rpdj48ZGl2PkZy
+b20gbXkgYW5kcm9pZCBwaG9uZSwgSSBnZXQgYSBzaW1pbGFyIHJlc3BvbnNlOiBJdCB0cmllcyB0
+byBjb25uZWN0IGJ1dCBuZXZlciBuZWdvdGlhdGVzIGEgY29ubmVjdGlvbi4gPGJyPjwvZGl2Pjxk
+aXY+PGJyPjwvZGl2PjxkaXY+SSBoYXZlIHRyaWVkIGJ5IHJ1bm5pbmcgZG5zbWFzcSBhbmQgdGhl
+biBzdGFydGluZyB0aGUgaXdkIGluIEFQIG1vZGUgKGxpa2UgSSBkbyB3aXRoIGhvc3RhcGQpLCBi
+dXQgc3RpbGwgY2Fubm90IGNvbm5lY3QuIDxicj48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PkRh
+bmllbCBvbiB0aGUgY29ubm1hbiBsaXN0IHN1Z2dlc3RlZCBJIGNvbGxlY3QgYSBsb2cgb2YgdGhl
+IGNvbm5lY3Rpb24gYXR0ZW1wdCBieSBydW5uaW5nIHRoZSBjb21tYW5kcyBzdWdnZXN0ZWQgaW4g
+dGhlIFJFQURNRTo8L2Rpdj48ZGl2PjxhIGhyZWY9Imh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHVi
+L3NjbS9uZXR3b3JrL3dpcmVsZXNzL2l3ZC5naXQvdHJlZS9SRUFETUUiPmh0dHBzOi8vZ2l0Lmtl
+cm5lbC5vcmcvcHViL3NjbS9uZXR3b3JrL3dpcmVsZXNzL2l3ZC5naXQvdHJlZS9SRUFETUU8L2E+
+PC9kaXY+PGRpdj5JIHRyaWVkIGJlZm9yZSBhbmQgZ290IGdpYmJlcmlzaC4gSSBqdXN0IGRpZCBp
+dCBhZ2FpbiAoYnkgdGhlIGJvb2spIGFuZCB0aGUgZmlsZXMgYXJlIGF0dGFjaGVkLiBUaGlzIGlz
+IG9uIGEgUmFzcGJlcnJ5UGkgM0IrIHJ1bm5pbmcgQXJjaCBMaW51eC48L2Rpdj48ZGl2Pjxicj48
+L2Rpdj48ZGl2PldoYXQgaXMgZ29pbmcgd3JvbmcgYW5kIGhvdyBjYW4gSSBmaXggaXQ/IE15IGdv
+YWwgaXMgdG8gZGl0Y2ggaG9zdGFwZC9kbnNtYXNxIGFuZCB1c2UgY29ubm1hbi9pd2QgdG8gYWxs
+b3cgdGhlIFJQSSB0byBib290IGFzIGFuIEFQIGlmIGl0IGRvZXMgbm90IGhhdmUgYSAmIzM5O2tu
+b3duLW5ldHdvcmsmIzM5OyB0aGF0IGl0IGNhbiBmaW5kLjwvZGl2PjxkaXY+PGJyPjwvZGl2Pjxk
+aXY+UmVnYXJkcyw8L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PktlaXRoPGJyPjwvZGl2PjwvZGl2
+Pgo=
 
---===============0654227994752481077==--
+--===============1332315011078943772==
+Content-Type: application/octet-stream
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="trace-file.pcap"
+
+1MOyoQIABAAAAAAAAAAAAAAABAD9AAAA+9jXXjfaBgDEAAAAxAAAAAAEAzgAAAAAAAAAAAAAABC0
+AAAAFwAAAAAAAAAAAAAAEwEAAAgAAwADAAAACgAGAGDyYq5w/gAACAAuAAoAAAAEABUAfgAqAAAF
+TXlOZXQBCIKEi5YMEhgkIQIADyQyJAEoASwBMAE0ATgBPAFAAWQBaAFsAXABdAF4AXwBgAGEAYgB
+jAGQAZUBmQGdAaEBpQEwFgEAAA+sBAEAAA+sBAEAAA+sAgAAAAAyBDBIYGxGBXIAAAAAfwoEAMiA
+AUAAAAAAAAAA2ddeXesGAEQAAABEAAAAAAQDOAAAAAAAAAAAAAAAEDQAAAAXAAAAAAAAAAAAAAAU
+AQAACAADAAMAAAAKAAYAYPJirnD+AAAIAC4AAAAAAAQAFQAA2ddeousGAEQAAABEAAAAAAQDOAAA
+AAAAAAAAAAAAEDQAAAAXAAAAAAAAAAAAAAAUAQAACAADAAMAAAAKAAYAYPJirnD+AAAIAC4AAAAA
+AAQAFQA=
+--===============1332315011078943772==
+Content-Type: application/octet-stream
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="trace-pae.pcap"
+
+1MOyoQIABAAAAAAAAAAAAAAABABxAAAA
+--===============1332315011078943772==--
 
