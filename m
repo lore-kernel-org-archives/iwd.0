@@ -1,123 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============8957442049685281666=="
+Content-Type: multipart/mixed; boundary="===============8629883498273606573=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 10/10] auto-t: add test for delayed ANQP response
-Date: Tue, 02 Jun 2020 10:30:21 -0700
-Message-ID: <20200602173021.20085-11-prestwoj@gmail.com>
-In-Reply-To: <20200602173021.20085-1-prestwoj@gmail.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: Start iwd only after dbus
+Date: Wed, 03 Jun 2020 16:03:22 +0200
+Message-ID: <9bd7e278-4e48-35b3-1ffa-cd56925be439@molgen.mpg.de>
+In-Reply-To: <20200602033512.2851.79090@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8957442049685281666==
+--===============8629883498273606573==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- autotests/testHotspot/anqp_delay_test.py | 83 ++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
- create mode 100644 autotests/testHotspot/anqp_delay_test.py
 
-diff --git a/autotests/testHotspot/anqp_delay_test.py b/autotests/testHotsp=
-ot/anqp_delay_test.py
-new file mode 100644
-index 00000000..161b1a8e
---- /dev/null
-+++ b/autotests/testHotspot/anqp_delay_test.py
-@@ -0,0 +1,83 @@
-+#!/usr/bin/python3
-+
-+import unittest
-+import sys
-+import os
-+
-+sys.path.append('../util')
-+import iwd
-+from iwd import IWD
-+from iwd import PSKAgent
-+from iwd import NetworkType
-+from hostapd import HostapdCLI
-+from hwsim import Hwsim
-+import testutil
-+from time import sleep
-+
-+class Test(unittest.TestCase):
-+
-+    def test_connection_success(self):
-+        hwsim =3D Hwsim()
-+
-+        bss_radio =3D hwsim.get_radio('rad0')
-+        rule0 =3D hwsim.rules.create()
-+        rule0.source =3D bss_radio.addresses[0]
-+        rule0.bidirectional =3D True
-+        # Force the case where ANQP does not finish before Connect() comes=
- in
-+        rule0.delay =3D 100
-+
-+        wd =3D IWD(True, '/tmp')
-+
-+        hapd =3D HostapdCLI(config=3D'ssidHotspot.conf')
-+
-+        psk_agent =3D PSKAgent('abc', ('domain\\user', 'testpasswd'))
-+        wd.register_psk_agent(psk_agent)
-+
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+
-+        # We are dependent on a periodic scan here. We want to wait for th=
-is
-+        # because this is the first opportunity IWD has to do ANQP. Once A=
-NQP
-+        # has been done once the network is set up and we cannot simulate =
-the
-+        # 'Connect() before ANQP' race condition anymore.
-+        condition =3D 'obj.scanning'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        condition =3D 'not obj.scanning'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        ordered_network =3D device.get_ordered_network('Hotspot')
-+
-+        self.assertEqual(ordered_network.type, NetworkType.eap)
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        ordered_network.network_object.connect()
-+
-+        condition =3D 'obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        testutil.test_iface_operstate()
-+        testutil.test_ifaces_connected(device.name, hapd.ifname)
-+
-+        device.disconnect()
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        wd.unregister_psk_agent(psk_agent)
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        IWD.copy_to_hotspot('example.conf')
-+        conf =3D '[General]\nDisableANQP=3D0\n'
-+        os.system('echo "%s" > /tmp/main.conf' % conf)
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+        os.remove('/tmp/main.conf')
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
--- =
+Dear dapolinario,
 
-2.21.1
 
---===============8957442049685281666==--
+Am 02.06.20 um 05:35 schrieb dapolinario(a)gmail.com:
+> When iwd is not synchronized to start after dbus, NetworkManager
+> often does not identify that the service is already running and does
+> not manage the wireless interface.
+> =
+
+> I suggest adding the line "After=3Ddbus.service" in "iwd.service" in
+> the [Unit] section, so NetworkManager always identifies that iwd is
+> working.
+Did that fix that issue for you permanently?
+
+How is iwd started? By NetworkManager over D-Bus or by systemd, because =
+
+it was installed into it?
+
+There is NetworkManager issue *iwd backend gets activated but NM =
+
+considers the device unavailable* [1] about problems when iwd gets =
+
+started by NM.
+
+
+Kind regards,
+
+Paul
+
+
+[1]: =
+
+https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/101
+--===============8629883498273606573==--
 
