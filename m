@@ -1,151 +1,135 @@
-Content-Type: multipart/mixed; boundary="===============8245936784190439385=="
+Content-Type: multipart/mixed; boundary="===============3726351750403318124=="
 MIME-Version: 1.0
 From: Tim Kourt <tim.a.kourt@linux.intel.com>
-Subject: [PATCH v2 3/3] auto-t: Validate Connect after ConnectHiddenNetwork
-Date: Tue, 09 Jun 2020 18:22:21 -0700
-Message-ID: <20200610012221.19263-3-tim.a.kourt@linux.intel.com>
-In-Reply-To: <20200610012221.19263-1-tim.a.kourt@linux.intel.com>
+Subject: [PATCH] network: Change func. signature
+Date: Tue, 09 Jun 2020 18:23:56 -0700
+Message-ID: <20200610012356.19703-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8245936784190439385==
+--===============3726351750403318124==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- .../connect_after_hidden_connect_test.py           | 78 ++++++++++++++++++=
-++++
- autotests/testHiddenNetworks/hw.conf               |  3 +-
- autotests/testHiddenNetworks/ssidSomeHidden.conf   |  9 +++
- 3 files changed, 89 insertions(+), 1 deletion(-)
- create mode 100644 autotests/testHiddenNetworks/connect_after_hidden_conne=
-ct_test.py
- create mode 100644 autotests/testHiddenNetworks/ssidSomeHidden.conf
+Change signature of network_connect_new_hidden_network to take
+reference to the caller's l_dbus_message struct. This allows to
+set the caller's l_dbus_message struct to NULL after replying in
+the case of a failure.
 
-diff --git a/autotests/testHiddenNetworks/connect_after_hidden_connect_test=
-.py b/autotests/testHiddenNetworks/connect_after_hidden_connect_test.py
-new file mode 100644
-index 00000000..478f1505
---- /dev/null
-+++ b/autotests/testHiddenNetworks/connect_after_hidden_connect_test.py
-@@ -0,0 +1,78 @@
-+#!/usr/bin/python3
-+
-+import unittest
-+import sys
-+
-+sys.path.append('../util')
-+import iwd
-+from iwd import IWD
-+from iwd import PSKAgent
-+import testutil
-+import time
-+
-+class TestConnectionAfterHiddenNetwork(unittest.TestCase):
-+    '''
-+    Tries to reproduce a memory leak caused by the consecutive calls to
-+    ConnectHiddenNetwork and Connect one after another.
-+
-+    '''
-+    _ex =3D None
-+    _done =3D False
-+
-+    def _success(self):
-+        self._done =3D True
-+
-+    def _failure(self, ex):
-+        self._done =3D True
-+        self._ex =3D ex
-+
-+    def test_connection(self):
-+        wd =3D IWD(True, '/tmp')
-+
-+        psk_agent =3D PSKAgent("secret123")
-+        wd.register_psk_agent(psk_agent)
-+
-+        device =3D wd.list_devices(1)[0]
-+        ordered_network =3D device.get_ordered_network('ssidOpen',
-+                                                     scan_if_needed=3DTrue)
-+
-+        device.connect_hidden_network_async(name=3D'ssidSomeHidden',
-+                                                  reply_handler =3D self._=
-success,
-+                                                  error_handler =3D self._=
-failure)
-+
-+        ordered_network.network_object.connect()
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        condition =3D 'obj.connected_network is not None'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        testutil.test_iface_operstate(device.name)
-+        device.disconnect()
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        wd.unregister_psk_agent(psk_agent)
-+
-+        IWD.clear_storage()
-+
-+        while not self._done:
-+            time.sleep(.300)
-+
-+        if self._ex is not None:
-+            if self._ex.get_dbus_name() !=3D 'net.connman.iwd.Failed':
-+                raise self._ex
-+
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        pass
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
-diff --git a/autotests/testHiddenNetworks/hw.conf b/autotests/testHiddenNet=
-works/hw.conf
-index edd061a8..7147e4be 100644
---- a/autotests/testHiddenNetworks/hw.conf
-+++ b/autotests/testHiddenNetworks/hw.conf
-@@ -1,5 +1,5 @@
- [SETUP]
--num_radios=3D6
-+num_radios=3D7
- start_iwd=3D0
- max_test_exec_interval_sec=3D160
- tmpfs_extra_stuff=3Dmain.conf
-@@ -10,3 +10,4 @@ rad1=3DssidHiddenWPA.conf
- rad2=3DssidOverlap1.conf
- rad3=3DssidOverlap2.conf
- rad4=3DssidOpen.conf
-+rad5=3DssidSomeHidden.conf
-diff --git a/autotests/testHiddenNetworks/ssidSomeHidden.conf b/autotests/t=
-estHiddenNetworks/ssidSomeHidden.conf
-new file mode 100644
-index 00000000..42c69b3a
---- /dev/null
-+++ b/autotests/testHiddenNetworks/ssidSomeHidden.conf
-@@ -0,0 +1,9 @@
-+hw_mode=3Dg
-+channel=3D1
-+ssid=3DssidSomeHidden
-+
-+wpa=3D1
-+wpa_pairwise=3DTKIP
-+wpa_passphrase=3Dsecret123
-+
-+ignore_broadcast_ssid=3D1
+=3D=3D201=3D=3D    at 0x467C15: l_dbus_message_unref (dbus-message.c:412)
+=3D=3D201=3D=3D    by 0x412A51: station_hidden_network_scan_results (statio=
+n.c:2504)
+=3D=3D201=3D=3D    by 0x41EAEA: scan_finished (scan.c:1505)
+=3D=3D201=3D=3D    by 0x41EC10: get_scan_done (scan.c:1535)
+=3D=3D201=3D=3D    by 0x462592: destroy_request (genl.c:673)
+=3D=3D201=3D=3D    by 0x462987: process_unicast (genl.c:988)
+=3D=3D201=3D=3D    by 0x462987: received_data (genl.c:1087)
+=3D=3D201=3D=3D    by 0x45F5A2: io_callback (io.c:126)
+=3D=3D201=3D=3D    by 0x45E8FD: l_main_iterate (main.c:474)
+=3D=3D201=3D=3D    by 0x45E9BB: l_main_run (main.c:521)
+=3D=3D201=3D=3D    by 0x45EBCA: l_main_run_with_signal (main.c:643)
+=3D=3D201=3D=3D    by 0x403B15: main (main.c:512)
+---
+ src/network.c | 12 ++++++------
+ src/network.h |  2 +-
+ src/station.c |  2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/network.c b/src/network.c
+index c08d7e72..170db3e5 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1166,7 +1166,7 @@ static struct l_dbus_message *network_connect(struct =
+l_dbus *dbus,
+ }
+ =
+
+ void network_connect_new_hidden_network(struct network *network,
+-						struct l_dbus_message *message)
++						struct l_dbus_message **message)
+ {
+ 	struct station *station =3D network->station;
+ 	struct scan_bss *bss;
+@@ -1183,7 +1183,7 @@ void network_connect_new_hidden_network(struct networ=
+k *network,
+ 	bss =3D network_bss_select(network, true);
+ 	if (!bss) {
+ 		/* This should never happened for the hidden networks. */
+-		error =3D dbus_error_not_supported(message);
++		error =3D dbus_error_not_supported(*message);
+ 		goto reply_error;
+ 	}
+ =
+
+@@ -1192,13 +1192,13 @@ void network_connect_new_hidden_network(struct netw=
+ork *network,
+ =
+
+ 	switch (network_get_security(network)) {
+ 	case SECURITY_PSK:
+-		error =3D network_connect_psk(network, bss, message);
++		error =3D network_connect_psk(network, bss, *message);
+ 		break;
+ 	case SECURITY_NONE:
+-		station_connect_network(station, network, bss, message);
++		station_connect_network(station, network, bss, *message);
+ 		return;
+ 	default:
+-		error =3D dbus_error_not_supported(message);
++		error =3D dbus_error_not_supported(*message);
+ 		break;
+ 	}
+ =
+
+@@ -1208,7 +1208,7 @@ void network_connect_new_hidden_network(struct networ=
+k *network,
+ 	return;
+ =
+
+ reply_error:
+-	dbus_pending_reply(&message, error);
++	dbus_pending_reply(message, error);
+ }
+ =
+
+ void network_blacklist_add(struct network *network, struct scan_bss *bss)
+diff --git a/src/network.h b/src/network.h
+index 8e0ed636..fbb120a7 100644
+--- a/src/network.h
++++ b/src/network.h
+@@ -70,7 +70,7 @@ int network_rank_compare(const void *a, const void *b, vo=
+id *user);
+ void network_rank_update(struct network *network, bool connected);
+ =
+
+ void network_connect_new_hidden_network(struct network *network,
+-						struct l_dbus_message *message);
++					struct l_dbus_message **message);
+ =
+
+ void network_blacklist_add(struct network *network, struct scan_bss *bss);
+ =
+
+diff --git a/src/station.c b/src/station.c
+index 583016ab..87fadc3f 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2500,7 +2500,7 @@ next:
+ =
+
+ 	network =3D network_psk ? : network_open;
+ =
+
+-	network_connect_new_hidden_network(network, msg);
++	network_connect_new_hidden_network(network, &msg);
+ 	l_dbus_message_unref(msg);
+ =
+
+ 	return true;
 -- =
 
 2.13.6
 
---===============8245936784190439385==--
+--===============3726351750403318124==--
 
