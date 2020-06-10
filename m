@@ -1,93 +1,108 @@
-Content-Type: multipart/mixed; boundary="===============2339138939804505040=="
+Content-Type: multipart/mixed; boundary="===============6910558112761337175=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 1/2] scan: refactor start_next_scan_request to not send
- duplicate requests
-Date: Tue, 09 Jun 2020 15:10:50 -0500
-Message-ID: <45a9172a-3bcf-eee5-dcfd-a53bd4bd2e7e@gmail.com>
-In-Reply-To: <c5c3d21d-8145-9ddd-afc6-701aa5fa7634@bang-olufsen.dk>
+From: Tim Kourt <tim.a.kourt@linux.intel.com>
+Subject: [PATCH v2 1/3] station: Use separate msg holder for hidden connections
+Date: Tue, 09 Jun 2020 18:22:19 -0700
+Message-ID: <20200610012221.19263-1-tim.a.kourt@linux.intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2339138939804505040==
+--===============6910558112761337175==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Alvin,
+Introduce hidden_pending to keep reference to the dbus message object
+while we wait for the scan results to be returned while trying to
+connect to a hidden network. This simplifies the logic by separating it
+into two independent logical units: scanning, connecting and eliminates
+a possibility of a memory leak in the case when Network.Connect being
+initiated while Station.ConnectHiddenNetwork is in progress.
+---
+ src/station.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-> I traced the following events leading to a duplicate scan request being s=
-ent. =
+diff --git a/src/station.c b/src/station.c
+index ca6a0b8e..583016ab 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -73,6 +73,7 @@ struct station {
+ 	struct l_hashmap *networks;
+ 	struct l_queue *networks_sorted;
+ 	struct l_dbus_message *connect_pending;
++	struct l_dbus_message *hidden_pending;
+ 	struct l_dbus_message *disconnect_pending;
+ 	struct l_dbus_message *scan_pending;
+ 	struct signal_agent *signal_agent;
+@@ -2433,8 +2434,8 @@ static void station_hidden_network_scan_triggered(int=
+ err, void *user_data)
+ 	if (!err)
+ 		return;
+ =
 
-> The scenario assumes that the scan request queue is empty in the beginnin=
-g.
-> =
+-	dbus_pending_reply(&station->connect_pending,
+-				dbus_error_failed(station->connect_pending));
++	dbus_pending_reply(&station->hidden_pending,
++				dbus_error_failed(station->hidden_pending));
+ }
+ =
 
-> =
+ static bool station_hidden_network_scan_results(int err,
+@@ -2452,8 +2453,8 @@ static bool station_hidden_network_scan_results(int e=
+rr,
+ =
 
-> station_enter_state: disconnected -> autoconnect_quick
->  =C2=A0 -> station_quick_scan_trigger
->  =C2=A0=C2=A0=C2=A0 -> station_scan_trigger: notify cb =3D station_quick_=
-scan_results
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> scan_passive
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> scan_common
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> scan_request_s=
-end_trigger
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> l_queue_push_t=
-ail: scan request queue size =3D 1
-> scan_notify: quick scan triggered
-> network_connect: requested over dbus
->  =C2=A0 -> network_connect_psk
->  =C2=A0=C2=A0=C2=A0 -> station_connect_network
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> station_enter_state: autoconnect_quick=
- -> connecting
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> periodic_scan_stop
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> scan_periodic_=
-stop
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> sc=
-an_cancel
-> scan_notify: quick scan aborted
->  =C2=A0 -> scan_finished
->  =C2=A0=C2=A0=C2=A0 -> l_queue_remove: scan request queue size =3D 0
->  =C2=A0=C2=A0=C2=A0 -> station_quick_scan_results: quick scan's notify ca=
-llback
->  =C2=A0=C2=A0=C2=A0 . -> station_enter_state: connecting -> autoconnect_f=
-ull
+ 	l_debug("");
+ =
 
-Aha, so this is the real culprit.  I fixed this as well in commit =
+-	msg =3D station->connect_pending;
+-	station->connect_pending =3D NULL;
++	msg =3D station->hidden_pending;
++	station->hidden_pending =3D NULL;
+ =
 
-532f6b154e03b5fa222502098b5688a1784cc4e3.
+ 	if (err) {
+ 		dbus_pending_reply(&msg, dbus_error_failed(msg));
+@@ -2527,7 +2528,7 @@ static struct l_dbus_message *station_dbus_connect_hi=
+dden_network(
+ =
 
->  =C2=A0=C2=A0=C2=A0 .=C2=A0=C2=A0 -> scan_periodic_start
->  =C2=A0=C2=A0=C2=A0 .=C2=A0=C2=A0=C2=A0=C2=A0 -> scan_periodic_queue
->  =C2=A0=C2=A0=C2=A0 .=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> scan_{active=
-_full,passive}: idk which; doesn't matter
->  =C2=A0=C2=A0=C2=A0 .=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> =
-scan_common
->  =C2=A0=C2=A0=C2=A0 .=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 -> scan_request_send_trigger
->  =C2=A0=C2=A0=C2=A0 .=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 -> l_queue_push_tail: scan request queue size =3D 1
+ 	l_debug("");
+ =
 
-Okay, so we start a periodic scan and in scan_finished call =
+-	if (station->connect_pending || station_is_busy(station))
++	if (station->hidden_pending || station_is_busy(station))
+ 		return dbus_error_busy(message);
+ =
 
-start_next_scan_request again.
+ 	if (!l_dbus_message_get_arguments(message, "s", &ssid))
+@@ -2553,7 +2554,7 @@ static struct l_dbus_message *station_dbus_connect_hi=
+dden_network(
+ 	if (!station->hidden_network_scan_id)
+ 		return dbus_error_failed(message);
+ =
 
->  =C2=A0=C2=A0=C2=A0 -> start_next_scan_request: head of queue has already=
- been sent
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> scan_request_send_trigger: send it aga=
-in
-> =
+-	station->connect_pending =3D l_dbus_message_ref(message);
++	station->hidden_pending =3D l_dbus_message_ref(message);
+ =
 
-> =
+ 	return NULL;
+ }
+@@ -3132,6 +3133,10 @@ static void station_free(struct station *station)
+ 		dbus_pending_reply(&station->connect_pending,
+ 				dbus_error_aborted(station->connect_pending));
+ =
 
++	if (station->hidden_pending)
++		dbus_pending_reply(&station->hidden_pending,
++				dbus_error_aborted(station->hidden_pending));
++
+ 	if (station->disconnect_pending)
+ 		dbus_pending_reply(&station->disconnect_pending,
+ 			dbus_error_aborted(station->disconnect_pending));
+-- =
 
-And since we don't check that one is already going, we issue the trigger ag=
-ain. =
+2.13.6
 
-Makes sense to me now.  Much appreciated.
-
-Regards,
--Denis
---===============2339138939804505040==--
+--===============6910558112761337175==--
 
