@@ -1,125 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============6763889264521885068=="
+Content-Type: multipart/mixed; boundary="===============4424027505572326798=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 4/4] auto-t: add test for delayed ANQP response
-Date: Fri, 12 Jun 2020 12:14:14 -0700
-Message-ID: <20200612191414.13413-4-prestwoj@gmail.com>
-In-Reply-To: <20200612191414.13413-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v3 2/4] network: delay connect if ANQP has not completed
+Date: Fri, 12 Jun 2020 15:06:42 -0500
+Message-ID: <46708151-4965-a49b-963d-8500156bdb06@gmail.com>
+In-Reply-To: <20200612191414.13413-2-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6763889264521885068==
+--===============4424027505572326798==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- autotests/testHotspot/anqp_delay_test.py | 85 ++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
- create mode 100644 autotests/testHotspot/anqp_delay_test.py
+Hi James,
 
-diff --git a/autotests/testHotspot/anqp_delay_test.py b/autotests/testHotsp=
-ot/anqp_delay_test.py
-new file mode 100644
-index 00000000..431f16c1
---- /dev/null
-+++ b/autotests/testHotspot/anqp_delay_test.py
-@@ -0,0 +1,85 @@
-+#!/usr/bin/python3
-+
-+import unittest
-+import sys
-+import os
-+
-+sys.path.append('../util')
-+import iwd
-+from iwd import IWD
-+from iwd import PSKAgent
-+from iwd import NetworkType
-+from hostapd import HostapdCLI
-+from hwsim import Hwsim
-+import testutil
-+from time import sleep
-+
-+class Test(unittest.TestCase):
-+
-+    def test_connection_success(self):
-+        hwsim =3D Hwsim()
-+
-+        bss_radio =3D hwsim.get_radio('rad0')
-+        rule0 =3D hwsim.rules.create()
-+        rule0.source =3D bss_radio.addresses[0]
-+        rule0.bidirectional =3D True
-+        # Force the case where ANQP does not finish before Connect() comes=
- in
-+        rule0.delay =3D 100
-+
-+        wd =3D IWD(True, '/tmp')
-+
-+        hapd =3D HostapdCLI(config=3D'ssidHotspot.conf')
-+
-+        psk_agent =3D PSKAgent('abc', ('domain\\user', 'testpasswd'))
-+        wd.register_psk_agent(psk_agent)
-+
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+
-+        # We are dependent on a periodic scan here. We want to wait for th=
-is
-+        # because this is the first opportunity IWD has to do ANQP. Once A=
-NQP
-+        # has been done once the network is set up and we cannot simulate =
-the
-+        # 'Connect() before ANQP' race condition anymore.
-+        condition =3D 'obj.scanning'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        condition =3D 'not obj.scanning'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        ordered_network =3D device.get_ordered_network('Hotspot')
-+
-+        self.assertEqual(ordered_network.type, NetworkType.eap)
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        ordered_network.network_object.connect()
-+
-+        rule0.delay =3D 1
-+
-+        condition =3D 'obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        testutil.test_iface_operstate()
-+        testutil.test_ifaces_connected(device.name, hapd.ifname)
-+
-+        device.disconnect()
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        wd.unregister_psk_agent(psk_agent)
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        IWD.copy_to_hotspot('example.conf')
-+        conf =3D '[General]\nDisableANQP=3D0\n'
-+        os.system('echo "%s" > /tmp/main.conf' % conf)
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+        os.remove('/tmp/main.conf')
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
--- =
+On 6/12/20 2:14 PM, James Prestwood wrote:
+> Using the new station ANQP watch network can delay the connection
+> request until after ANQP has finished. Since station may be
+> autoconnecting we must also add a check in network_autoconnect
+> which prevents it from autoconnecting if we have a pending Connect
+> request.
+> ---
+>   src/network.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 66 insertions(+)
+> =
 
-2.21.1
 
---===============6763889264521885068==--
+<snip>
+
+> @@ -1102,6 +1110,9 @@ static struct l_dbus_message *network_connect_8021x=
+(struct network *network,
+>   			goto error;
+>   		}
+>   =
+
+> +		/* Unset this since we are now ready to connect */
+> +		network->connect_after_anqp =3D NULL;
+> +
+
+So I moved this NULL setting to...
+
+> +		reply =3D network_connect_8021x(network,
+> +					network_bss_select(network, true),
+> +					network->connect_after_anqp);
+> +
+> +		if (reply)
+> +			l_dbus_send(dbus_get_bus(), reply);
+> +
+> +		/*
+> +		 * Unref since network_connect_8021x will hold its own ref, but
+> +		 * don't NULL this yet because agent requests may be required,
+> +		 * and we still want this network to be in a 'pending' type of
+> +		 * state so autoconnect doesn't try and connect again.
+> +		 */
+> +		l_dbus_message_unref(network->connect_after_anqp);
+
+here, and also squashed the now unneeded comment.
+
+And applied this + rest of the series.
+
+Regards,
+-Denis
+--===============4424027505572326798==--
 
