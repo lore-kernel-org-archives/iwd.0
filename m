@@ -1,211 +1,209 @@
-Content-Type: multipart/mixed; boundary="===============6012392718407821026=="
+Content-Type: multipart/mixed; boundary="===============5796988265881147208=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 2/4] network: delay connect if ANQP has not completed
-Date: Thu, 11 Jun 2020 14:54:51 -0700
-Message-ID: <d9ea89d3f99e4b7180d3973ca1c666669e650f12.camel@gmail.com>
-In-Reply-To: <16249c41-2520-4927-abba-37484220c8dd@gmail.com>
+Subject: [PATCH v2 1/4] station: add ANQP state watch API
+Date: Fri, 12 Jun 2020 09:20:22 -0700
+Message-ID: <20200612162025.6996-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6012392718407821026==
+--===============5796988265881147208==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2020-06-11 at 16:29 -0500, Denis Kenzior wrote:
-> Hi James,
-> =
+This is to allow network to watch for ANQP activity in order to
+fix the race condition between scanning finishing and ANQP finishing.
+Without this it is possible for a DBus Connect() to come in before
+ANQP has completed and causing the network to return NotConfigured,
+when its actually in the process of obtaining all the network info.
 
-> On 6/11/20 12:26 PM, James Prestwood wrote:
-> > Using the new station ANQP watch network can delay the connection
-> > request until after ANQP has finished. Since station may be
-> > autoconnecting we must also add a check in network_autoconnect
-> > which prevents it from autoconnecting if we have a pending Connect
-> > request.
-> > ---
-> >   src/network.c | 58
-> > +++++++++++++++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 58 insertions(+)
-> > =
+The watch was made globally in station due to network not having
+a station object until each individual network is created. Adding a
+watch during network creation would result in many watchers as well
+as a lot of removal/addition as networks are found and lost.
+---
+ src/station.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ src/station.h | 13 ++++++++++++
+ 2 files changed, 67 insertions(+), 3 deletions(-)
 
-> =
+v2:
+ - Changed to notify ANQP watches after all the requests come in, not
+   as each comes in. This prevents Connect() and ANQP requests happening
+   at the same time.
 
-> <snip>
-> =
+diff --git a/src/station.c b/src/station.c
+index 87fadc3f..2514573e 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -59,6 +59,7 @@ static uint32_t netdev_watch;
+ static uint32_t mfp_setting;
+ static bool anqp_disabled;
+ static bool netconfig_enabled;
++static struct watchlist anqp_watches;
+ =
 
-> > @@ -1102,6 +1110,11 @@ static struct l_dbus_message
-> > *network_connect_8021x(struct network *network,
-> >   			goto error;
-> >   		}
-> >   =
+ struct station {
+ 	enum station_state state;
+@@ -434,6 +435,36 @@ static void network_add_foreach(struct network *networ=
+k, void *user_data)
+ 	station_add_autoconnect_bss(station, network, bss);
+ }
+ =
 
-> > +		if (network->connect_after_anqp) {
-> > +			l_dbus_message_unref(network-
-> > >connect_after_anqp);
-> > +			network->connect_after_anqp =3D NULL;
-> > +		}
-> > +
-> =
++static bool match_pending(const void *a, const void *b)
++{
++	const struct anqp_entry *entry =3D a;
++
++	return entry->pending !=3D 0;
++}
++
++static void remove_anqp(void *data)
++{
++	struct anqp_entry *entry =3D data;
++	uint64_t wdev_id =3D netdev_get_wdev_id(entry->station->netdev);
++
++	if (entry->pending)
++		anqp_cancel(wdev_id, entry->pending);
++
++	l_free(entry);
++}
++
++static bool anqp_entry_foreach(void *data, void *user_data)
++{
++	struct anqp_entry *e =3D data;
++
++	WATCHLIST_NOTIFY(&anqp_watches, station_anqp_watch_func_t,
++				STATION_ANQP_FINISHED, e->network);
++
++	remove_anqp(e);
++
++	return true;
++}
++
+ static void station_anqp_response_cb(enum anqp_result result,
+ 					const void *anqp, size_t anqp_len,
+ 					void *user_data)
+@@ -487,12 +518,15 @@ static void station_anqp_response_cb(enum anqp_result=
+ result,
+ 	l_strv_free(realms);
+ =
 
-> Hmm, what does this do?
+ request_done:
+-	l_queue_remove(station->anqp_pending, entry);
++	entry->pending =3D 0;
+ =
 
-Just cleaning up, but I refactored it like you suggested below which
-makes this not needed.
+-	/* If no more requests, resume scanning */
+-	if (!l_queue_isempty(station->anqp_pending))
++	/* Return if there are other pending requests */
++	if (l_queue_find(station->anqp_pending, match_pending, NULL))
+ 		return;
+ =
 
-> =
++	/* Notify all watchers now that every ANQP request has finished */
++	l_queue_foreach_remove(station->anqp_pending, anqp_entry_foreach, NULL);
++
+ 	l_queue_destroy(station->autoconnect_list, l_free);
+ 	station->autoconnect_list =3D l_queue_new();
+ =
 
-> >   		station_connect_network(station, network, bss,
-> > message);
-> >   =
+@@ -564,6 +598,8 @@ static bool station_start_anqp(struct station *station,=
+ struct network *network,
+ =
 
-> >   		return NULL;
-> > @@ -1156,6 +1169,19 @@ static struct l_dbus_message
-> > *network_connect(struct l_dbus *dbus,
-> >   		station_connect_network(station, network, bss,
-> > message);
-> >   		return NULL;
-> >   	case SECURITY_8021X:
-> > +		/*
-> > +		 * If there is an ongoing ANQP request we must wait for
-> > that to
-> > +		 * finish. Save the message and wait for the ANQP watch
-> > to
-> > +		 * fire
-> > +		 */
-> > +		if (network->anqp_pending) {
-> > +			network->connect_after_anqp =3D
-> > +						l_dbus_message_ref(mess
-> > age);
-> > +			l_debug("Pending ANQP request, delaying connect
-> > to %s",
-> > +						network->ssid);
-> > +			return NULL;
-> > +		}
-> > +
-> =
+ 	l_queue_push_head(station->anqp_pending, entry);
+ =
 
-> What if another request comes in during this time?  Shouldn't you
-> block the new =
++	WATCHLIST_NOTIFY(&anqp_watches, station_anqp_watch_func_t,
++				STATION_ANQP_STARTED, network);
+ 	return true;
+ }
+ =
 
-> request with an -EBUSY or something?  Otherwise you leak
-> connect_after_anqp.
+@@ -1217,6 +1253,18 @@ bool station_remove_state_watch(struct station *stat=
+ion, uint32_t id)
+ 	return watchlist_remove(&station->state_watches, id);
+ }
+ =
 
-Yep, fixed.
++uint32_t station_add_anqp_watch(station_anqp_watch_func_t func,
++				void *user_data,
++				station_destroy_func_t destroy)
++{
++	return watchlist_add(&anqp_watches, func, user_data, destroy);
++}
++
++void station_remove_anqp_watch(uint32_t id)
++{
++	watchlist_remove(&anqp_watches, id);
++}
++
+ bool station_set_autoconnect(struct station *station, bool autoconnect)
+ {
+ 	if (station->autoconnect =3D=3D autoconnect)
+@@ -3270,6 +3318,8 @@ static int station_init(void)
+ 	if (!netconfig_enabled)
+ 		l_info("station: Network configuration is disabled.");
+ =
 
-> =
++	watchlist_init(&anqp_watches, NULL);
++
+ 	return 0;
+ }
+ =
 
-> >   		if (!network_settings_load(network))
-> >   			return dbus_error_not_configured(message);
-> >   =
+@@ -3279,6 +3329,7 @@ static void station_exit(void)
+ 	netdev_watch_remove(netdev_watch);
+ 	l_queue_destroy(station_list, NULL);
+ 	station_list =3D NULL;
++	watchlist_destroy(&anqp_watches);
+ }
+ =
 
-> > @@ -1484,6 +1510,33 @@ static void known_networks_changed(enum
-> > known_networks_event event,
-> >   	}
-> >   }
-> >   =
+ IWD_MODULE(station, station_init, station_exit)
+diff --git a/src/station.h b/src/station.h
+index 4155081b..17a0f8df 100644
+--- a/src/station.h
++++ b/src/station.h
+@@ -43,8 +43,16 @@ enum station_state {
+ 	STATION_STATE_ROAMING
+ };
+ =
 
-> > +static void anqp_watch_changed(enum station_anqp_state state,
-> > +				struct network *network, void
-> > *user_data)
-> > +{
-> > +	network->anqp_pending =3D state =3D=3D STATION_ANQP_STARTED;
-> > +
-> > +	if (state =3D=3D STATION_ANQP_FINISHED && network-
-> > >connect_after_anqp) {
-> > +		struct l_dbus_message *reply;
-> > +
-> > +		l_debug("ANQP complete, resuming connect to %s",
-> > network->ssid);
-> > +
-> > +		if (!network_settings_load(network))
-> > +			reply =3D dbus_error_not_configured(
-> > +						network-
-> > >connect_after_anqp);
-> > +		else
-> > +			reply =3D network_connect_8021x(network,
-> > +					network_bss_select(network,
-> > true),
-> > +					network->connect_after_anqp);
-> > +
-> =
++enum station_anqp_state {
++	STATION_ANQP_STARTED,
++	STATION_ANQP_FINISHED,
++};
++
+ typedef void (*station_foreach_func_t)(struct station *, void *data);
+ typedef void (*station_state_watch_func_t)(enum station_state, void *userd=
+ata);
++typedef void (*station_anqp_watch_func_t)(enum station_anqp_state,
++						struct network *network,
++						void *user_data);
+ typedef void (*station_destroy_func_t)(void *userdata);
+ typedef void (*station_network_foreach_func_t)(struct network *, void *dat=
+a);
+ =
 
-> Hmm, perhaps isolate network->connect_after_anqp in here instead of
-> bleeding the =
+@@ -66,6 +74,11 @@ uint32_t station_add_state_watch(struct station *station,
+ 					station_destroy_func_t destroy);
+ bool station_remove_state_watch(struct station *station, uint32_t id);
+ =
 
-> details into network_connect_8021x?
-> =
++uint32_t station_add_anqp_watch(station_anqp_watch_func_t func,
++				void *user_data,
++				station_destroy_func_t destroy);
++void station_remove_anqp_watch(uint32_t id);
++
+ bool station_set_autoconnect(struct station *station, bool autoconnect);
+ =
 
-> Maybe something like:
-> =
+ void station_ap_directed_roam(struct station *station,
+-- =
 
-> if (!network_load_settings()) {
-> 	dbus_pending_reply(&network->connect_after_anqp,
-> 			dbus_error_not_configured());
-> 	return;
-> }
-> =
+2.21.1
 
-> reply =3D network_connect_8021x();
-> if (reply) {
-> 	struct l_dbus *dbus =3D dbus_get_bus();
-> 	l_dbus_send(dbus, reply);
-> }
-
-Yeah I like this better.
-
-> =
-
-> l_dbus_message_unref(network->connect_after_anqp);
-> network->connect_after_anqp =3D NULL;
-> =
-
-> > +		if (!reply)
-> > +			return;
-> > +
-> > +		dbus_pending_reply(&network->connect_after_anqp,
-> > reply);
-> > +
-> > +		return;
-> > +	}
-> > +}
-> > +
-> >   static void setup_network_interface(struct l_dbus_interface
-> > *interface)
-> >   {
-> >   	l_dbus_interface_method(interface, "Connect", 0,
-> > @@ -1517,6 +1570,8 @@ static int network_init(void)
-> >   	known_networks_watch =3D
-> >   		known_networks_watch_add(known_networks_changed, NULL,
-> > NULL);
-> >   =
-
-> > +	anqp_watch =3D station_add_anqp_watch(anqp_watch_changed, NULL,
-> > NULL);
-> > +
-> >   	return 0;
-> >   }
-> >   =
-
-> > @@ -1525,6 +1580,9 @@ static void network_exit(void)
-> >   	known_networks_watch_remove(known_networks_watch);
-> >   	known_networks_watch =3D 0;
-> >   =
-
-> > +	station_remove_anqp_watch(anqp_watch);
-> > +	anqp_watch =3D 0;
-> > +
-> >   	l_dbus_unregister_interface(dbus_get_bus(),
-> > IWD_NETWORK_INTERFACE);
-> >   }
-> >   =
-
-> > =
-
-> =
-
-> Regards,
-> -Denis
-
---===============6012392718407821026==--
+--===============5796988265881147208==--
 
