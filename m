@@ -1,66 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============4424027505572326798=="
+Content-Type: multipart/mixed; boundary="===============8543242804945893063=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v3 2/4] network: delay connect if ANQP has not completed
-Date: Fri, 12 Jun 2020 15:06:42 -0500
-Message-ID: <46708151-4965-a49b-963d-8500156bdb06@gmail.com>
-In-Reply-To: <20200612191414.13413-2-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] plugins: ofono: remove newline from debug print
+Date: Tue, 16 Jun 2020 09:04:21 -0700
+Message-ID: <20200616160421.13220-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4424027505572326798==
+--===============8543242804945893063==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ plugins/ofono.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 6/12/20 2:14 PM, James Prestwood wrote:
-> Using the new station ANQP watch network can delay the connection
-> request until after ANQP has finished. Since station may be
-> autoconnecting we must also add a check in network_autoconnect
-> which prevents it from autoconnecting if we have a pending Connect
-> request.
-> ---
->   src/network.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 66 insertions(+)
-> =
+diff --git a/plugins/ofono.c b/plugins/ofono.c
+index 6f2acda0..186dac71 100644
+--- a/plugins/ofono.c
++++ b/plugins/ofono.c
+@@ -427,7 +427,7 @@ static void modem_destroy(void *data)
+ 		iwd_sim_auth_remove(modem->auth);
+ 	}
+ =
 
+-	l_debug("removing modem %s\n", modem->path);
++	l_debug("removing modem %s", modem->path);
+ =
 
-<snip>
+ 	if (modem->apps_serial)
+ 		l_dbus_cancel(dbus, modem->apps_serial);
+-- =
 
-> @@ -1102,6 +1110,9 @@ static struct l_dbus_message *network_connect_8021x=
-(struct network *network,
->   			goto error;
->   		}
->   =
+2.21.1
 
-> +		/* Unset this since we are now ready to connect */
-> +		network->connect_after_anqp =3D NULL;
-> +
-
-So I moved this NULL setting to...
-
-> +		reply =3D network_connect_8021x(network,
-> +					network_bss_select(network, true),
-> +					network->connect_after_anqp);
-> +
-> +		if (reply)
-> +			l_dbus_send(dbus_get_bus(), reply);
-> +
-> +		/*
-> +		 * Unref since network_connect_8021x will hold its own ref, but
-> +		 * don't NULL this yet because agent requests may be required,
-> +		 * and we still want this network to be in a 'pending' type of
-> +		 * state so autoconnect doesn't try and connect again.
-> +		 */
-> +		l_dbus_message_unref(network->connect_after_anqp);
-
-here, and also squashed the now unneeded comment.
-
-And applied this + rest of the series.
-
-Regards,
--Denis
---===============4424027505572326798==--
+--===============8543242804945893063==--
 
