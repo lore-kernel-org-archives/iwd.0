@@ -1,69 +1,153 @@
-Content-Type: multipart/mixed; boundary="===============2205450865258895601=="
+Content-Type: multipart/mixed; boundary="===============6587329107003163266=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/1] test-runner: use WNOHANG option waiting for PID
-Date: Tue, 16 Jun 2020 09:32:29 -0700
-Message-ID: <20200616163229.14429-2-prestwoj@gmail.com>
-In-Reply-To: <20200616163229.14429-1-prestwoj@gmail.com>
+Subject: [RFC 1/6] frame-xchg: add destroy function to start() APIs
+Date: Wed, 17 Jun 2020 10:56:40 -0700
+Message-ID: <20200617175645.31197-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2205450865258895601==
+--===============6587329107003163266==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If an application has a bug and hangs on SIGTERM this causes
-test-runner to hang as well. This is obviously an issue with
-the application in question, but test-runner should have a way
-of continuing onto the next test rather than hanging.
-
-Instead we can use WNOHANG and a sleep to allow applications
-some amount of time to exit, and if they haven't use SIGKILL
-instead as well as print an error. Similar to how
-wait_for_socket works. The timeout is hard coded to 2 seconds
-(100ms sleep + 20 iterations).
+This makes things more consistent with other IWD APIs as well as
+prepares for unifying frame-xchg and scanning.
 ---
- tools/test-runner.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ src/frame-xchg.c | 36 ++++++++++++++++++++----------------
+ src/frame-xchg.h |  6 ++++--
+ 2 files changed, 24 insertions(+), 18 deletions(-)
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index f8677be5..498f3be3 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -626,14 +626,23 @@ exit:
- static void kill_process(pid_t pid)
- {
- 	int status;
-+	int i =3D 0;
- =
-
- 	l_debug("Terminate pid: %d", pid);
- =
-
- 	kill(pid, SIGTERM);
- =
-
- 	do {
--		waitpid(pid, &status, 0);
--	} while (!WIFEXITED(status) && !WIFSIGNALED(status));
-+		if (waitpid(pid, &status, WNOHANG) =3D=3D pid)
-+			return;
-+
-+		usleep(100000);
-+	} while (!WIFEXITED(status) && !WIFSIGNALED(status) && i++ < 20);
-+
-+	if (i >=3D 20) {
-+		l_error("Failed to kill process %d gracefully", pid);
-+		kill(pid, SIGKILL);
-+	}
+diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+index 7e516d0a..1473e59e 100644
+--- a/src/frame-xchg.c
++++ b/src/frame-xchg.c
+@@ -106,6 +106,7 @@ struct frame_xchg_data {
+ 	struct l_timeout *timeout;
+ 	struct l_queue *rx_watches;
+ 	frame_xchg_cb_t cb;
++	frame_xchg_destroy_func_t destroy;
+ 	void *user_data;
+ 	uint32_t group_id;
+ 	unsigned int retry_cnt;
+@@ -770,26 +771,25 @@ static void frame_xchg_reset(struct frame_xchg_data *=
+fx)
+ 					frame_xchg_resp_cb, fx);
  }
  =
 
- static bool wait_for_socket(const char *socket, useconds_t wait_time)
+-static void frame_xchg_destroy(struct frame_xchg_data *fx, int err)
++static void frame_xchg_destroy(void *user_data)
+ {
+-	if (fx->cb)
+-		fx->cb(err, fx->user_data);
++	struct frame_xchg_data *fx =3D user_data;
++
++	if (fx->destroy)
++		fx->destroy(fx->user_data);
+ =
+
+ 	frame_xchg_reset(fx);
+ 	l_free(fx);
+ }
+ =
+
+-static void frame_xchg_cancel(void *user_data)
+-{
+-	struct frame_xchg_data *fx =3D user_data;
+-
+-	frame_xchg_destroy(fx, -ECANCELED);
+-}
+-
+ static void frame_xchg_done(struct frame_xchg_data *fx, int err)
+ {
+ 	l_queue_remove(frame_xchgs, fx);
+-	frame_xchg_destroy(fx, err);
++
++	if (fx->cb)
++		fx->cb(err, fx->user_data);
++
++	frame_xchg_destroy(fx);
+ }
+ =
+
+ static void frame_xchg_timeout_destroy(void *user_data)
+@@ -1073,20 +1073,23 @@ static bool frame_xchg_match(const void *a, const v=
+oid *b)
+ void frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t freq,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+-			frame_xchg_cb_t cb, void *user_data, ...)
++			frame_xchg_cb_t cb, void *user_data,
++			frame_xchg_destroy_func_t destroy, ...)
+ {
+ 	va_list args;
+ =
+
+-	va_start(args, user_data);
++	va_start(args, destroy);
+ 	frame_xchg_startv(wdev_id, frame, freq, retry_interval, resp_timeout,
+-				retries_on_ack, group_id, cb, user_data, args);
++				retries_on_ack, group_id, cb, user_data,
++				destroy, args);
+ 	va_end(args);
+ }
+ =
+
+ void frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t fre=
+q,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+-			frame_xchg_cb_t cb, void *user_data, va_list resp_args)
++			frame_xchg_cb_t cb, void *user_data,
++			frame_xchg_destroy_func_t destroy, va_list resp_args)
+ {
+ 	struct frame_xchg_data *fx;
+ 	size_t frame_len;
+@@ -1132,6 +1135,7 @@ void frame_xchg_startv(uint64_t wdev_id, struct iovec=
+ *frame, uint32_t freq,
+ 	fx->resp_timeout =3D resp_timeout;
+ 	fx->retries_on_ack =3D retries_on_ack;
+ 	fx->cb =3D cb;
++	fx->destroy =3D destroy;
+ 	fx->user_data =3D user_data;
+ 	fx->group_id =3D group_id;
+ =
+
+@@ -1338,7 +1342,7 @@ static void frame_xchg_exit(void)
+ 	struct l_queue *xchgs =3D frame_xchgs;
+ =
+
+ 	frame_xchgs =3D NULL;
+-	l_queue_destroy(xchgs, frame_xchg_cancel);
++	l_queue_destroy(xchgs, frame_xchg_destroy);
+ =
+
+ 	watch_groups =3D NULL;
+ 	l_queue_destroy(groups, frame_watch_group_destroy);
+diff --git a/src/frame-xchg.h b/src/frame-xchg.h
+index 45b0e5fa..55a55f73 100644
+--- a/src/frame-xchg.h
++++ b/src/frame-xchg.h
+@@ -46,9 +46,11 @@ bool frame_watch_wdev_remove(uint64_t wdev_id);
+ void frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t freq,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+-			frame_xchg_cb_t cb, void *user_data, ...);
++			frame_xchg_cb_t cb, void *user_data,
++			frame_xchg_destroy_func_t destroy, ...);
+ void frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t fre=
+q,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+-			frame_xchg_cb_t cb, void *user_data, va_list resp_args);
++			frame_xchg_cb_t cb, void *user_data,
++			frame_xchg_destroy_func_t destroy, va_list resp_args);
+ void frame_xchg_stop(uint64_t wdev_id);
 -- =
 
 2.21.1
 
---===============2205450865258895601==--
+--===============6587329107003163266==--
 
