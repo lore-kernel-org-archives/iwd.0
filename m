@@ -1,55 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============7297332176957300330=="
+Content-Type: multipart/mixed; boundary="===============0339319173996638117=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] src/p2p.c: fix build with uclibc
-Date: Mon, 22 Jun 2020 10:25:27 -0500
-Message-ID: <ce70274a-5413-4c5f-8cc9-fc3cf944e949@gmail.com>
-In-Reply-To: <20200620131954.436598-1-fontaine.fabrice@gmail.com>
+Subject: Re: [PATCH] frame-xchg: fix incorrect length check
+Date: Mon, 22 Jun 2020 10:30:32 -0500
+Message-ID: <cb35fbd9-cfe2-edb6-2e6b-2d2f50d9fb3e@gmail.com>
+In-Reply-To: <20200622152516.22006-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7297332176957300330==
+--===============0339319173996638117==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Fabrice,
+Hi James,
 
-On 6/20/20 8:19 AM, Fabrice Fontaine wrote:
-> explicit_bzero is used in src/p2p.c since commit
-> 1675c765a3d66f3c626a1581a7bf514e1859b064 but src/missing.h is not
-> included, as a result build with uclibc fails on:
+On 6/22/20 10:25 AM, James Prestwood wrote:
+> frame_xchg_startv was using sizeof(mmpdu) to check the minimum length
+> for a frame. Instead mmpdu_header_len should be used since this checks
+> fc.order and returns either 24 or 28 bytes, not 28 bytes always.
 > =
 
-> /home/naourr/work/instance-0/output-1/per-package/iwd/host/opt/ext-toolch=
-ain/bin/../lib/gcc/mips64el-buildroot-linux-uclibc/5.5.0/../../../../mips64=
-el-buildroot-linux-uclibc/bin/ld: src/p2p.o: in function `p2p_connection_re=
-set':
-> p2p.c:(.text+0x2cf4): undefined reference to `explicit_bzero'
-> /home/naourr/work/instance-0/output-1/per-package/iwd/host/opt/ext-toolch=
-ain/bin/../lib/gcc/mips64el-buildroot-linux-uclibc/5.5.0/../../../../mips64=
-el-buildroot-linux-uclibc/bin/ld: p2p.c:(.text+0x2cfc): undefined reference=
- to `explicit_bzero'
-> =
-
-> Fixes:
->   - http://autobuild.buildroot.org/results/8bbf7e1d0929d0883c0c2445990f62=
-f5a1d54163
-> =
-
-> Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
-
-No signed-off-by please.  iwd doesn't use these.
-
+> This change adds the requirement that the first iovec in the array
+> must contain at least the first 2 bytes (mmpdu_fc) of the header.
+> This really shouldn't be a problem since all current users of
+> frame-xchg put the entire header (or entire frame) into the first
+> iovec in the array.
 > ---
->   src/p2p.c | 1 +
->   1 file changed, 1 insertion(+)
+>   src/frame-xchg.c | 9 +++++++--
+>   1 file changed, 7 insertions(+), 2 deletions(-)
 > =
 
 
-Applied after minor commit description modifications.
+Applied, thanks.
 
 Regards,
 -Denis
---===============7297332176957300330==--
+--===============0339319173996638117==--
 
