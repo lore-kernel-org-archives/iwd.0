@@ -1,51 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============2548014680134449412=="
+Content-Type: multipart/mixed; boundary="===============5703068330285830229=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [RFC 4/6] frame-xchg: refactor to work with offchannel module
-Date: Mon, 22 Jun 2020 13:06:15 -0700
-Message-ID: <a269cebf6371386da73ba45be2501710ef63b4e4.camel@gmail.com>
-In-Reply-To: <5ed8ec95-5175-c844-750b-1ba8b7940890@gmail.com>
+Subject: Re: [RFC 1/6] frame-xchg: add destroy function to start() APIs
+Date: Mon, 22 Jun 2020 13:06:59 -0700
+Message-ID: <e8fdae824c800d26ba8b9eaf0163a8d4a0581053.camel@gmail.com>
+In-Reply-To: <930ea483-7a96-7eba-d883-591d62b39945@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2548014680134449412==
+--===============5703068330285830229==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2020-06-22 at 15:03 -0500, Denis Kenzior wrote:
+On Mon, 2020-06-22 at 15:05 -0500, Denis Kenzior wrote:
 > Hi James,
 > =
 
-> > > > -void frame_xchg_stop(uint64_t wdev_id);
-> > > > +void frame_xchg_stop(uint64_t wdev_id, uint32_t id);
-> > > =
-
-> > > Do we even need the wdev_id here now? Also, should this be
-> > > _cancel?
-> > =
-
-> > It just made the lookup easier, but yeah we could iterate each
-> > queue in
-> > the phy list. And yeah, I could change that to _cancel.
+> On 6/17/20 12:56 PM, James Prestwood wrote:
+> > This makes things more consistent with other IWD APIs as well as
+> > prepares for unifying frame-xchg and scanning.
+> > ---
+> >   src/frame-xchg.c | 36 ++++++++++++++++++++----------------
+> >   src/frame-xchg.h |  6 ++++--
+> >   2 files changed, 24 insertions(+), 18 deletions(-)
 > > =
 
 > =
 
-> Hmm, how so? I don't even see wdev_id being used now.
+> Can we just get this commit in right away?  I think it makes sense on
+> its own, =
 
-Ah yeah not in frame-xchg now. I moved that into offchannel.c. So it
-just makes *that* lookup easier :)
+> but results in some compiler errors.
 
-But when I think about it we will generally only ever have a couple
-phy's (or just one), and barely any requests per-phy anyways so a full
-lookup isnt too expensive.
-
+Sure, I'll get it building on its own. I thought it was but apparently
+not.
 > =
 
 > Regards,
 > -Denis
 >=20
 
---===============2548014680134449412==--
+--===============5703068330285830229==--
 
