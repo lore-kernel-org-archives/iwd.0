@@ -1,60 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============1209681259819117260=="
+Content-Type: multipart/mixed; boundary="===============7297332176957300330=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] frame-xchg: fix incorrect length check
-Date: Mon, 22 Jun 2020 08:25:16 -0700
-Message-ID: <20200622152516.22006-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] src/p2p.c: fix build with uclibc
+Date: Mon, 22 Jun 2020 10:25:27 -0500
+Message-ID: <ce70274a-5413-4c5f-8cc9-fc3cf944e949@gmail.com>
+In-Reply-To: <20200620131954.436598-1-fontaine.fabrice@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1209681259819117260==
+--===============7297332176957300330==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-frame_xchg_startv was using sizeof(mmpdu) to check the minimum length
-for a frame. Instead mmpdu_header_len should be used since this checks
-fc.order and returns either 24 or 28 bytes, not 28 bytes always.
+Hi Fabrice,
 
-This change adds the requirement that the first iovec in the array
-must contain at least the first 2 bytes (mmpdu_fc) of the header.
-This really shouldn't be a problem since all current users of
-frame-xchg put the entire header (or entire frame) into the first
-iovec in the array.
----
- src/frame-xchg.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+On 6/20/20 8:19 AM, Fabrice Fontaine wrote:
+> explicit_bzero is used in src/p2p.c since commit
+> 1675c765a3d66f3c626a1581a7bf514e1859b064 but src/missing.h is not
+> included, as a result build with uclibc fails on:
+> =
 
-diff --git a/src/frame-xchg.c b/src/frame-xchg.c
-index dd60e080..3744a4c1 100644
---- a/src/frame-xchg.c
-+++ b/src/frame-xchg.c
-@@ -1090,12 +1090,17 @@ uint32_t frame_xchg_startv(uint64_t wdev_id, struct=
- iovec *frame, uint32_t freq,
- 	size_t frame_len;
- 	struct iovec *iov;
- 	uint8_t *ptr;
--	struct mmpdu_header *mpdu;
- =
+> /home/naourr/work/instance-0/output-1/per-package/iwd/host/opt/ext-toolch=
+ain/bin/../lib/gcc/mips64el-buildroot-linux-uclibc/5.5.0/../../../../mips64=
+el-buildroot-linux-uclibc/bin/ld: src/p2p.o: in function `p2p_connection_re=
+set':
+> p2p.c:(.text+0x2cf4): undefined reference to `explicit_bzero'
+> /home/naourr/work/instance-0/output-1/per-package/iwd/host/opt/ext-toolch=
+ain/bin/../lib/gcc/mips64el-buildroot-linux-uclibc/5.5.0/../../../../mips64=
+el-buildroot-linux-uclibc/bin/ld: p2p.c:(.text+0x2cfc): undefined reference=
+ to `explicit_bzero'
+> =
 
- 	for (frame_len =3D 0, iov =3D frame; iov->iov_base; iov++)
- 		frame_len +=3D iov->iov_len;
- =
+> Fixes:
+>   - http://autobuild.buildroot.org/results/8bbf7e1d0929d0883c0c2445990f62=
+f5a1d54163
+> =
 
--	if (frame_len < sizeof(*mpdu)) {
-+	/*
-+	 * This assumes that the first iovec@least contains the mmpdu_fc
-+	 * portion of the header used to calculate the minimum length.
-+	 */
-+	if (frame[0].iov_len >=3D 2 && frame_len <
-+				mmpdu_header_len((const struct mmpdu_header *)
-+				frame[0].iov_base)) {
- 		l_error("Frame too short");
- 		cb(-EMSGSIZE, user_data);
- 		return 0;
--- =
+> Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
 
-2.21.1
+No signed-off-by please.  iwd doesn't use these.
 
---===============1209681259819117260==--
+> ---
+>   src/p2p.c | 1 +
+>   1 file changed, 1 insertion(+)
+> =
+
+
+Applied after minor commit description modifications.
+
+Regards,
+-Denis
+--===============7297332176957300330==--
 
