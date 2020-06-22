@@ -1,48 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============1415910961244331616=="
+Content-Type: multipart/mixed; boundary="===============0883856559610138074=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2] test-runner: use WNOHANG option waiting for PID
-Date: Mon, 22 Jun 2020 12:03:47 -0500
-Message-ID: <fc9d7aee-c3f1-4ca8-fa16-86ffc8e45645@gmail.com>
-In-Reply-To: <20200622155050.24787-1-prestwoj@gmail.com>
+Subject: Re: [RFC 3/6] wiphy: integrate offchannel module
+Date: Mon, 22 Jun 2020 14:44:20 -0500
+Message-ID: <c21caa81-f921-baa6-aeef-2f3edfbf97c5@gmail.com>
+In-Reply-To: <20200617175645.31197-3-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1415910961244331616==
+--===============0883856559610138074==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 6/22/20 10:50 AM, James Prestwood wrote:
-> If an application has a bug and hangs on SIGTERM this causes
-> test-runner to hang as well. This is obviously an issue with
-> the application in question, but test-runner should have a way
-> of continuing onto the next test rather than hanging.
-> =
-
-> Instead we can use WNOHANG and a sleep to allow applications
-> some amount of time to exit, and if they haven't use SIGKILL
-> instead as well as print an error. Similar to how
-> wait_for_socket works. The timeout is hard coded to 2 seconds
-> (100ms sleep + 20 iterations).
+On 6/17/20 12:56 PM, James Prestwood wrote:
+> Tie wiphy creation/destruction to offchannel
 > ---
->   tools/test-runner.c | 14 ++++++++++++--
->   1 file changed, 12 insertions(+), 2 deletions(-)
+>   src/wiphy.c | 7 +++++++
+>   1 file changed, 7 insertions(+)
 > =
 
-> v2:
->   - Removed extra check for i >=3D 20 since that is always going to be
->     true if we get past the while loop
->   - Added another waitpid after SIGKILL
-> =
+> diff --git a/src/wiphy.c b/src/wiphy.c
+> index aef39549..7e58a402 100644
+> --- a/src/wiphy.c
+> +++ b/src/wiphy.c
+> @@ -53,6 +53,7 @@
+>   #include "src/watchlist.h"
+>   #include "src/nl80211util.h"
+>   #include "src/nl80211cmd.h"
+> +#include "src/offchannel.h"
+>   =
 
+>   #define EXT_CAP_LEN 10
+>   =
 
-Applied, thanks.
+> @@ -1235,6 +1236,9 @@ void wiphy_create_complete(struct wiphy *wiphy)
+>   	wiphy_get_reg_domain(wiphy);
+>   =
+
+>   	wiphy_print_basic_info(wiphy);
+> +
+> +	if (wiphy->offchannel_tx_ok)
+> +		offchan_create_from_wiphy(wiphy);
+
+Hmm, why? Isn't scanning always supported and hence you always want =
+
+offchan_create to be called?
+
+>   }
+>   =
+
+>   bool wiphy_destroy(struct wiphy *wiphy)
 
 Regards,
 -Denis
-
---===============1415910961244331616==--
+--===============0883856559610138074==--
 
