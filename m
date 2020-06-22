@@ -1,61 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============2788009897868556940=="
+Content-Type: multipart/mixed; boundary="===============8775590667694274802=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [RFC 4/6] frame-xchg: refactor to work with offchannel module
-Date: Mon, 22 Jun 2020 14:55:56 -0500
-Message-ID: <643d015a-71f2-56bd-2dc6-38afd13a533d@gmail.com>
-In-Reply-To: <20200617175645.31197-4-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: Re: [RFC 3/6] wiphy: integrate offchannel module
+Date: Mon, 22 Jun 2020 12:59:45 -0700
+Message-ID: <d22991bc74b5a8f9549496c18994ffe2ccf7939f.camel@gmail.com>
+In-Reply-To: <c21caa81-f921-baa6-aeef-2f3edfbf97c5@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2788009897868556940==
+--===============8775590667694274802==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
-
-On 6/17/20 12:56 PM, James Prestwood wrote:
-> In order to first integrate frame-xchg some refactoring needed to
-> be done. First it is useful to allow queueing frames up rather than
-> requiring the module (p2p, anqp etc) to wait for the last frame to
-> finish. This can be aided by offchannel but frame-xchg needed some
-> refactoring as well.
+On Mon, 2020-06-22 at 14:44 -0500, Denis Kenzior wrote:
+> Hi James,
 > =
 
-> First was getting rid of this fx pointer re-use. It looks like this
-> was done to save a bit of memory but things get pretty complex
-> needed to check if the pointer is stale or has been reset. Instead
-> of this we now just allocate a new pointer each frame-xchg. This
-> allows for the module to queue multiple requests as well as removes
-> the complexity of needed to check if the fx pointer is stale.
+> On 6/17/20 12:56 PM, James Prestwood wrote:
+> > Tie wiphy creation/destruction to offchannel
+> > ---
+> >   src/wiphy.c | 7 +++++++
+> >   1 file changed, 7 insertions(+)
+> > =
+
+> > diff --git a/src/wiphy.c b/src/wiphy.c
+> > index aef39549..7e58a402 100644
+> > --- a/src/wiphy.c
+> > +++ b/src/wiphy.c
+> > @@ -53,6 +53,7 @@
+> >   #include "src/watchlist.h"
+> >   #include "src/nl80211util.h"
+> >   #include "src/nl80211cmd.h"
+> > +#include "src/offchannel.h"
+> >   =
+
+> >   #define EXT_CAP_LEN 10
+> >   =
+
+> > @@ -1235,6 +1236,9 @@ void wiphy_create_complete(struct wiphy
+> > *wiphy)
+> >   	wiphy_get_reg_domain(wiphy);
+> >   =
+
+> >   	wiphy_print_basic_info(wiphy);
+> > +
+> > +	if (wiphy->offchannel_tx_ok)
+> > +		offchan_create_from_wiphy(wiphy);
 > =
 
-> Next was adding the ability to track frame-xchgs by ID. If a module
-> can queue up multiple requests it also needs to be able to cancel
-> them individually vs per-wdev. This comes free with offchannel since
-> it returns an ID which can be given directly to the caller.
+> Hmm, why? Isn't scanning always supported and hence you always want =
+
+> offchan_create to be called?
+
+Yeah, that was an oversight.
+
 > =
 
-> Then offchannel was simply piped in by adding the push/done APIs
-> as well as some minor modification to internal frame-xchg APIs for
-> destroy functionality.
-> ---
->   src/frame-xchg.c | 97 +++++++++++++++++++++---------------------------
->   src/frame-xchg.h |  6 +--
->   src/p2p.c        |  9 +++--
->   3 files changed, 51 insertions(+), 61 deletions(-)
+> >   }
+> >   =
+
+> >   bool wiphy_destroy(struct wiphy *wiphy)
 > =
 
+> Regards,
+> -Denis
 
-<snip>
-
-> -void frame_xchg_stop(uint64_t wdev_id);
-> +void frame_xchg_stop(uint64_t wdev_id, uint32_t id);
-
-Do we even need the wdev_id here now? Also, should this be _cancel?
-
-Regards,
--Denis
---===============2788009897868556940==--
+--===============8775590667694274802==--
 
