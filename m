@@ -1,35 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============6603490317888339454=="
+Content-Type: multipart/mixed; boundary="===============2434963174285452152=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [RFC 4/6] frame-xchg: refactor to work with offchannel module
-Date: Mon, 22 Jun 2020 15:03:52 -0500
-Message-ID: <5ed8ec95-5175-c844-750b-1ba8b7940890@gmail.com>
-In-Reply-To: <7cf16a2fc43591bb0355c07fed2b004a20f444a4.camel@gmail.com>
+Subject: Re: [RFC 1/6] frame-xchg: add destroy function to start() APIs
+Date: Mon, 22 Jun 2020 15:05:06 -0500
+Message-ID: <930ea483-7a96-7eba-d883-591d62b39945@gmail.com>
+In-Reply-To: <20200617175645.31197-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6603490317888339454==
+--===============2434963174285452152==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
->>> -void frame_xchg_stop(uint64_t wdev_id);
->>> +void frame_xchg_stop(uint64_t wdev_id, uint32_t id);
->>
->> Do we even need the wdev_id here now? Also, should this be _cancel?
+On 6/17/20 12:56 PM, James Prestwood wrote:
+> This makes things more consistent with other IWD APIs as well as
+> prepares for unifying frame-xchg and scanning.
+> ---
+>   src/frame-xchg.c | 36 ++++++++++++++++++++----------------
+>   src/frame-xchg.h |  6 ++++--
+>   2 files changed, 24 insertions(+), 18 deletions(-)
 > =
 
-> It just made the lookup easier, but yeah we could iterate each queue in
-> the phy list. And yeah, I could change that to _cancel.
-> =
 
+Can we just get this commit in right away?  I think it makes sense on its o=
+wn, =
 
-Hmm, how so? I don't even see wdev_id being used now.
+but results in some compiler errors.
 
 Regards,
 -Denis
 
---===============6603490317888339454==--
+--===============2434963174285452152==--
 
