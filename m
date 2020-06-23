@@ -1,132 +1,169 @@
-Content-Type: multipart/mixed; boundary="===============5616264989836613302=="
+Content-Type: multipart/mixed; boundary="===============8591802744028594514=="
 MIME-Version: 1.0
-From: Martin Tesar <martin.tesar@yourwifi.cz>
-Subject: Re: Fw: Failed to load trusted user certificate
-Date: Tue, 23 Jun 2020 11:47:29 +0000
-Message-ID: <
- <AM0PR06MB5155B6A13F7FDB4E00AA9C1A9F940@AM0PR06MB5155.eurprd06.prod.outlook.com>>
-In-Reply-To: <CAOq732L+qoOLqNRtQvVbRhipjqduh9A=bfyKw77HkgdcS9_-_Q@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] frame-xchg: add destroy function to start() APIs
+Date: Tue, 23 Jun 2020 08:42:51 -0700
+Message-ID: <20200623154251.13491-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5616264989836613302==
+--===============8591802744028594514==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+This makes things more consistent with other IWD APIs as well as
+prepares for unifying frame-xchg and scanning.
+---
+ src/frame-xchg.c | 36 ++++++++++++++++++++----------------
+ src/frame-xchg.h |  6 ++++--
+ src/p2p.c        |  2 +-
+ 3 files changed, 25 insertions(+), 19 deletions(-)
 
-in my current scenario the certificate was issued by the PKI infrastructure=
-, but I've done some research and it is available also in OpenSSL as "trust=
- settings":
-"A trusted certificate is an ordinary certificate which has several additio=
-nal pieces of information attached to it such as the permitted and prohibit=
-ed uses of the certificate and an "alias"."
+diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+index 61399561..a9c1e4c3 100644
+--- a/src/frame-xchg.c
++++ b/src/frame-xchg.c
+@@ -106,6 +106,7 @@ struct frame_xchg_data {
+ 	struct l_timeout *timeout;
+ 	struct l_queue *rx_watches;
+ 	frame_xchg_cb_t cb;
++	frame_xchg_destroy_func_t destroy;
+ 	void *user_data;
+ 	uint32_t group_id;
+ 	unsigned int retry_cnt;
+@@ -770,26 +771,25 @@ static void frame_xchg_reset(struct frame_xchg_data *=
+fx)
+ 					frame_xchg_resp_cb, fx);
+ }
+ =
 
- So, we are most likely talking about the X.509 certificate extensions as i=
-t is mentioned in the RFC 5280 (https://tools.ietf.org/html/rfc5280#section=
--4.2).
+-static void frame_xchg_destroy(struct frame_xchg_data *fx, int err)
++static void frame_xchg_destroy(void *user_data)
+ {
+-	if (fx->cb)
+-		fx->cb(err, fx->user_data);
++	struct frame_xchg_data *fx =3D user_data;
++
++	if (fx->destroy)
++		fx->destroy(fx->user_data);
+ =
 
-That's all I was able to find. Hope it helps.
+ 	frame_xchg_reset(fx);
+ 	l_free(fx);
+ }
+ =
 
-Regards
-Martin
+-static void frame_xchg_cancel(void *user_data)
+-{
+-	struct frame_xchg_data *fx =3D user_data;
+-
+-	frame_xchg_destroy(fx, -ECANCELED);
+-}
+-
+ static void frame_xchg_done(struct frame_xchg_data *fx, int err)
+ {
+ 	l_queue_remove(frame_xchgs, fx);
+-	frame_xchg_destroy(fx, err);
++
++	if (fx->cb)
++		fx->cb(err, fx->user_data);
++
++	frame_xchg_destroy(fx);
+ }
+ =
 
-________________________________
-Od: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Odesl=C3=A1no: sobota 20. =C4=8Dervna 2020 15:17
-Komu: Martin Tesar <martin.tesar@yourwifi.cz>
-Kopie: iwd(a)lists.01.org <iwd@lists.01.org>
-P=C5=99edm=C4=9Bt: Re: Fw: Failed to load trusted user certificate
+ static void frame_xchg_timeout_destroy(void *user_data)
+@@ -1073,20 +1073,23 @@ static bool frame_xchg_match(const void *a, const v=
+oid *b)
+ void frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t freq,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+-			frame_xchg_cb_t cb, void *user_data, ...)
++			frame_xchg_cb_t cb, void *user_data,
++			frame_xchg_destroy_func_t destroy, ...)
+ {
+ 	va_list args;
+ =
 
-Hi Martin,
+-	va_start(args, user_data);
++	va_start(args, destroy);
+ 	frame_xchg_startv(wdev_id, frame, freq, retry_interval, resp_timeout,
+-				retries_on_ack, group_id, cb, user_data, args);
++				retries_on_ack, group_id, cb, user_data,
++				destroy, args);
+ 	va_end(args);
+ }
+ =
 
-On Sat, 20 Jun 2020 at 14:51, Martin Tesar <martin.tesar@yourwifi.cz> wro=
-te:
-> it looks like the IWD is not able to load trusted user certificates.
-> Basically if the certificate is enclosed in
->
-> -----BEGIN TRUSTED CERTIFICATE-----
-> -----END TRUSTED CERTIFICATE-----
->
-> I'm always getting an error "Failed to load".
+ void frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t fre=
+q,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+-			frame_xchg_cb_t cb, void *user_data, va_list resp_args)
++			frame_xchg_cb_t cb, void *user_data,
++			frame_xchg_destroy_func_t destroy, va_list resp_args)
+ {
+ 	struct frame_xchg_data *fx;
+ 	size_t frame_len;
+@@ -1137,6 +1140,7 @@ void frame_xchg_startv(uint64_t wdev_id, struct iovec=
+ *frame, uint32_t freq,
+ 	fx->resp_timeout =3D resp_timeout;
+ 	fx->retries_on_ack =3D retries_on_ack;
+ 	fx->cb =3D cb;
++	fx->destroy =3D destroy;
+ 	fx->user_data =3D user_data;
+ 	fx->group_id =3D group_id;
+ =
 
-Right, we've seen this feature request somewhere recently and thought
-that it may be easy to support this format in IWD.
+@@ -1343,7 +1347,7 @@ static void frame_xchg_exit(void)
+ 	struct l_queue *xchgs =3D frame_xchgs;
+ =
 
-Do you happen to know where this format is specified?
+ 	frame_xchgs =3D NULL;
+-	l_queue_destroy(xchgs, frame_xchg_cancel);
++	l_queue_destroy(xchgs, frame_xchg_destroy);
+ =
 
-Best regards
+ 	watch_groups =3D NULL;
+ 	l_queue_destroy(groups, frame_watch_group_destroy);
+diff --git a/src/frame-xchg.h b/src/frame-xchg.h
+index 45b0e5fa..55a55f73 100644
+--- a/src/frame-xchg.h
++++ b/src/frame-xchg.h
+@@ -46,9 +46,11 @@ bool frame_watch_wdev_remove(uint64_t wdev_id);
+ void frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t freq,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+-			frame_xchg_cb_t cb, void *user_data, ...);
++			frame_xchg_cb_t cb, void *user_data,
++			frame_xchg_destroy_func_t destroy, ...);
+ void frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t fre=
+q,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+-			frame_xchg_cb_t cb, void *user_data, va_list resp_args);
++			frame_xchg_cb_t cb, void *user_data,
++			frame_xchg_destroy_func_t destroy, va_list resp_args);
+ void frame_xchg_stop(uint64_t wdev_id);
+diff --git a/src/p2p.c b/src/p2p.c
+index a759df5c..1c9cb081 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -460,7 +460,7 @@ static void p2p_peer_frame_xchg(struct p2p_peer *peer, =
+struct iovec *tx_body,
+ 	va_start(args, cb);
+ 	frame_xchg_startv(dev->wdev_id, frame, freq, retry_interval,
+ 				resp_timeout, retries_on_ack, group_id,
+-				cb, dev, args);
++				cb, dev, NULL, args);
+ 	va_end(args);
+ =
 
---===============5616264989836613302==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.htm"
+ 	l_free(frame);
+-- =
 
-PGh0bWw+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNvbnRlbnQ9InRl
-eHQvaHRtbDsgY2hhcnNldD1pc28tODg1OS0yIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIiBzdHls
-ZT0iZGlzcGxheTpub25lOyI+IFAge21hcmdpbi10b3A6MDttYXJnaW4tYm90dG9tOjA7fSA8L3N0
-eWxlPgo8L2hlYWQ+Cjxib2R5IGRpcj0ibHRyIj4KPGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IENh
-bGlicmksIEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTJwdDsgY29s
-b3I6IHJnYigwLCAwLCAwKTsiPgpIaSBBbmRyZXcsPC9kaXY+CjxkaXYgc3R5bGU9ImZvbnQtZmFt
-aWx5OiBDYWxpYnJpLCBBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDEy
-cHQ7IGNvbG9yOiByZ2IoMCwgMCwgMCk7Ij4KPGJyPgo8L2Rpdj4KPGRpdiBzdHlsZT0iZm9udC1m
-YW1pbHk6IENhbGlicmksIEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTog
-MTJwdDsgY29sb3I6IHJnYigwLCAwLCAwKTsiPgppbiBteSBjdXJyZW50IHNjZW5hcmlvIHRoZSBj
-ZXJ0aWZpY2F0ZSB3YXMgaXNzdWVkIGJ5IHRoZSBQS0kgaW5mcmFzdHJ1Y3R1cmUsIGJ1dCBJJ3Zl
-IGRvbmUgc29tZSByZXNlYXJjaCBhbmQgaXQgaXMgYXZhaWxhYmxlIGFsc28gaW4gT3BlblNTTCBh
-cyAmcXVvdDt0cnVzdCBzZXR0aW5ncyZxdW90Ozo8L2Rpdj4KPGRpdiBzdHlsZT0iZm9udC1mYW1p
-bHk6IENhbGlicmksIEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTJw
-dDsgY29sb3I6IHJnYigwLCAwLCAwKTsiPgomcXVvdDtBIHRydXN0ZWQgY2VydGlmaWNhdGUgaXMg
-YW4gb3JkaW5hcnkgY2VydGlmaWNhdGUgd2hpY2ggaGFzIHNldmVyYWwgYWRkaXRpb25hbCBwaWVj
-ZXMgb2YgaW5mb3JtYXRpb24gYXR0YWNoZWQgdG8gaXQgc3VjaCBhcyB0aGUgcGVybWl0dGVkIGFu
-ZCBwcm9oaWJpdGVkIHVzZXMgb2YgdGhlIGNlcnRpZmljYXRlIGFuZCBhbiAmcXVvdDthbGlhcyZx
-dW90Oy4mcXVvdDs8YnI+CjwvZGl2Pgo8ZGl2IHN0eWxlPSJmb250LWZhbWlseTogQ2FsaWJyaSwg
-QXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxMnB0OyBjb2xvcjogcmdi
-KDAsIDAsIDApOyI+Cjxicj4KPC9kaXY+CjxkaXYgc3R5bGU9ImZvbnQtZmFtaWx5OiBDYWxpYnJp
-LCBBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDEycHQ7IGNvbG9yOiBy
-Z2IoMCwgMCwgMCk7Ij4KJm5ic3A7U28sIHdlIGFyZSBtb3N0IGxpa2VseSB0YWxraW5nIGFib3V0
-IHRoZSBYLjUwOSBjZXJ0aWZpY2F0ZSBleHRlbnNpb25zIGFzIGl0IGlzIG1lbnRpb25lZCBpbiB0
-aGUgUkZDIDUyODAgKDxhIGhyZWY9Imh0dHBzOi8vdG9vbHMuaWV0Zi5vcmcvaHRtbC9yZmM1Mjgw
-I3NlY3Rpb24tNC4yIiBpZD0iTFBsbmszMjk4MzgiPmh0dHBzOi8vdG9vbHMuaWV0Zi5vcmcvaHRt
-bC9yZmM1MjgwI3NlY3Rpb24tNC4yPC9hPikuPC9kaXY+CjxkaXYgc3R5bGU9ImZvbnQtZmFtaWx5
-OiBDYWxpYnJpLCBBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDEycHQ7
-IGNvbG9yOiByZ2IoMCwgMCwgMCk7Ij4KPGJyPgo8L2Rpdj4KPGRpdiBzdHlsZT0iZm9udC1mYW1p
-bHk6IENhbGlicmksIEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTJw
-dDsgY29sb3I6IHJnYigwLCAwLCAwKTsiPgpUaGF0J3MgYWxsIEkgd2FzIGFibGUgdG8gZmluZC4g
-SG9wZSBpdCBoZWxwcy48L2Rpdj4KPGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IENhbGlicmksIEFy
-aWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTJwdDsgY29sb3I6IHJnYigw
-LCAwLCAwKTsiPgo8YnI+CjwvZGl2Pgo8ZGl2IHN0eWxlPSJmb250LWZhbWlseTogQ2FsaWJyaSwg
-QXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxMnB0OyBjb2xvcjogcmdi
-KDAsIDAsIDApOyI+ClJlZ2FyZHM8L2Rpdj4KPGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IENhbGli
-cmksIEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTJwdDsgY29sb3I6
-IHJnYigwLCAwLCAwKTsiPgpNYXJ0aW48L2Rpdj4KPGRpdiBpZD0iYXBwZW5kb25zZW5kIj48L2Rp
-dj4KPGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6Q2FsaWJyaSxBcmlhbCxIZWx2ZXRpY2Esc2Fucy1z
-ZXJpZjsgZm9udC1zaXplOjEycHQ7IGNvbG9yOnJnYigwLDAsMCkiPgo8YnI+CjwvZGl2Pgo8aHIg
-dGFiaW5kZXg9Ii0xIiBzdHlsZT0iZGlzcGxheTppbmxpbmUtYmxvY2s7IHdpZHRoOjk4JSI+Cjxk
-aXYgaWQ9ImRpdlJwbHlGd2RNc2ciIGRpcj0ibHRyIj48Zm9udCBmYWNlPSJDYWxpYnJpLCBzYW5z
-LXNlcmlmIiBjb2xvcj0iIzAwMDAwMCIgc3R5bGU9ImZvbnQtc2l6ZToxMXB0Ij48Yj5PZDo8L2I+
-IEFuZHJldyBaYWJvcm93c2tpICZsdDthbmRyZXcuemFib3Jvd3NraUBpbnRlbC5jb20mZ3Q7PGJy
-Pgo8Yj5PZGVzbOFubzo8L2I+IHNvYm90YSAyMC4g6GVydm5hIDIwMjAgMTU6MTc8YnI+CjxiPktv
-bXU6PC9iPiBNYXJ0aW4gVGVzYXIgJmx0O21hcnRpbi50ZXNhckB5b3Vyd2lmaS5jeiZndDs8YnI+
-CjxiPktvcGllOjwvYj4gaXdkQGxpc3RzLjAxLm9yZyAmbHQ7aXdkQGxpc3RzLjAxLm9yZyZndDs8
-YnI+CjxiPlD4ZWRt7HQ6PC9iPiBSZTogRnc6IEZhaWxlZCB0byBsb2FkIHRydXN0ZWQgdXNlciBj
-ZXJ0aWZpY2F0ZTwvZm9udD4KPGRpdj4mbmJzcDs8L2Rpdj4KPC9kaXY+CjxkaXYgY2xhc3M9IkJv
-ZHlGcmFnbWVudCI+PGZvbnQgc2l6ZT0iMiI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMXB0Ij4K
-PGRpdiBjbGFzcz0iUGxhaW5UZXh0Ij5IaSBNYXJ0aW4sPGJyPgo8YnI+Ck9uIFNhdCwgMjAgSnVu
-IDIwMjAgYXQgMTQ6NTEsIE1hcnRpbiBUZXNhciAmbHQ7bWFydGluLnRlc2FyQHlvdXJ3aWZpLmN6
-Jmd0OyB3cm90ZTo8YnI+CiZndDsgaXQgbG9va3MgbGlrZSB0aGUgSVdEIGlzIG5vdCBhYmxlIHRv
-IGxvYWQgdHJ1c3RlZCB1c2VyIGNlcnRpZmljYXRlcy48YnI+CiZndDsgQmFzaWNhbGx5IGlmIHRo
-ZSBjZXJ0aWZpY2F0ZSBpcyBlbmNsb3NlZCBpbjxicj4KJmd0Ozxicj4KJmd0OyAtLS0tLUJFR0lO
-IFRSVVNURUQgQ0VSVElGSUNBVEUtLS0tLTxicj4KJmd0OyAtLS0tLUVORCBUUlVTVEVEIENFUlRJ
-RklDQVRFLS0tLS08YnI+CiZndDs8YnI+CiZndDsgSSdtIGFsd2F5cyBnZXR0aW5nIGFuIGVycm9y
-ICZxdW90O0ZhaWxlZCB0byBsb2FkJnF1b3Q7Ljxicj4KPGJyPgpSaWdodCwgd2UndmUgc2VlbiB0
-aGlzIGZlYXR1cmUgcmVxdWVzdCBzb21ld2hlcmUgcmVjZW50bHkgYW5kIHRob3VnaHQ8YnI+CnRo
-YXQgaXQgbWF5IGJlIGVhc3kgdG8gc3VwcG9ydCB0aGlzIGZvcm1hdCBpbiBJV0QuPGJyPgo8YnI+
-CkRvIHlvdSBoYXBwZW4gdG8ga25vdyB3aGVyZSB0aGlzIGZvcm1hdCBpcyBzcGVjaWZpZWQ/PGJy
-Pgo8YnI+CkJlc3QgcmVnYXJkczxicj4KPC9kaXY+Cjwvc3Bhbj48L2ZvbnQ+PC9kaXY+CjwvYm9k
-eT4KPC9odG1sPgo=
+2.21.1
 
---===============5616264989836613302==--
+--===============8591802744028594514==--
 
