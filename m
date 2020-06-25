@@ -1,358 +1,352 @@
-Content-Type: multipart/mixed; boundary="===============2114383428122119197=="
+Content-Type: multipart/mixed; boundary="===============0286262205314273738=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 5/7] scan: refactor to use radio management module
-Date: Thu, 25 Jun 2020 11:56:43 -0700
-Message-ID: <20200625185645.30122-6-prestwoj@gmail.com>
+Subject: [PATCH v2 6/7] network: use radio management for connections
+Date: Thu, 25 Jun 2020 11:56:44 -0700
+Message-ID: <20200625185645.30122-7-prestwoj@gmail.com>
 In-Reply-To: <20200625185645.30122-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2114383428122119197==
+--===============0286262205314273738==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-To use radio management scanning mostly remained the same.
-start_next_scan_request was modified to be used as the work callback,
-as well as not start the next scan if the current one was done
-(since this is taken care of by radio management now). All calls to
-start_next_scan_request were removed, and more or less replaced with
-radio_mgmt_done.
-
-scan_{suspend,resume} were both removed since radio management
-priorities solve this for us. ANQP requests can be inserted ahead of
-scan requests, which accomplishes the same thing.
+Network was refactored to use the radio management module for
+connections. This removes the need for an ANQP watch since we can
+insert the connect work item at a lower priority than ANQP. This
+will, by nature, force the connect attempt to wait for ANQP to
+complete, ensuring that the network_info is populated.
 ---
- src/scan.c    | 104 +++++++++++++++-----------------------------------
- src/scan.h    |   3 --
- src/station.c |  16 +-------
- 3 files changed, 31 insertions(+), 92 deletions(-)
+ src/network.c | 148 ++++++++++++++++++++++++++------------------------
+ src/station.c |   6 +-
+ 2 files changed, 81 insertions(+), 73 deletions(-)
 
-diff --git a/src/scan.c b/src/scan.c
-index 83804e57..c3e201d4 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -49,6 +49,7 @@
- #include "src/p2putil.h"
- #include "src/mpdu.h"
- #include "src/scan.h"
+diff --git a/src/network.c b/src/network.c
+index 70541b59..c86d0c7b 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -50,9 +50,15 @@
+ #include "src/network.h"
+ #include "src/blacklist.h"
+ #include "src/util.h"
 +#include "src/radio_mgmt.h"
  =
 
- #define SCAN_MAX_INTERVAL 320
- #define SCAN_INIT_INTERVAL 10
-@@ -56,7 +57,8 @@
- static struct l_queue *scan_contexts;
- =
-
- static struct l_genl_family *nl80211;
--static uint32_t next_scan_request_id;
+ static uint32_t known_networks_watch;
+-static uint32_t anqp_watch;
 +
-+struct scan_context;
++struct network_connect_info {
++	uint32_t work_id;
++	struct scan_bss *bss;
++	struct l_dbus_message *message;
++};
  =
 
- struct scan_periodic {
- 	struct l_timeout *timeout;
-@@ -70,6 +72,7 @@ struct scan_periodic {
+ struct network {
+ 	char ssid[33];
+@@ -73,10 +79,8 @@ struct network {
+ 	bool update_psk:1;  /* Whether PSK should be written to storage */
+ 	bool ask_passphrase:1; /* Whether we should force-ask agent */
+ 	bool is_hs20:1;
+-	bool anqp_pending:1;	/* Set if there is a pending ANQP request */
+ 	int rank;
+-	/* Holds DBus Connect() message if it comes in before ANQP finishes */
+-	struct l_dbus_message *connect_after_anqp;
++	struct network_connect_info connect;
  };
  =
 
- struct scan_request {
-+	struct scan_context *sc;
- 	uint32_t id;
- 	scan_trigger_func_t trigger;
- 	scan_notify_func_t callback;
-@@ -106,7 +109,6 @@ struct scan_context {
- 	bool triggered:1;
- 	/* Whether any commands from current request's queue have started */
- 	bool started:1;
--	bool suspended:1;
- 	struct wiphy *wiphy;
- };
+ static bool network_settings_load(struct network *network)
+@@ -138,6 +142,7 @@ void network_connected(struct network *network)
+ 	enum security security =3D network_get_security(network);
+ 	const char *ssid =3D network_get_ssid(network);
+ 	int err;
++	struct netdev *netdev =3D station_get_netdev(network->station);
  =
 
-@@ -118,7 +120,7 @@ struct scan_results {
- 	struct scan_request *sr;
- };
+ 	if (!network->info) {
+ 		/*
+@@ -164,6 +169,8 @@ void network_connected(struct network *network)
+ 				network_secret_check_cacheable, network);
  =
 
--static bool start_next_scan_request(struct scan_context *sc);
-+static bool start_next_scan_request(void *user_data);
- static void scan_periodic_rearm(struct scan_context *sc);
- =
-
- static bool scan_context_match(const void *a, const void *b)
-@@ -159,7 +161,7 @@ static void scan_request_failed(struct scan_context *sc,
- 	else if (sr->callback)
- 		sr->callback(err, NULL, sr->userdata);
- =
-
--	scan_request_free(sr);
-+	radio_mgmt_done(sc->wdev_id, sr->id);
+ 	l_queue_clear(network->blacklist, NULL);
++
++	radio_mgmt_done(netdev_get_wdev_id(netdev), network->connect.work_id);
  }
  =
 
- static struct scan_context *scan_context_new(uint64_t wdev_id)
-@@ -180,11 +182,18 @@ static struct scan_context *scan_context_new(uint64_t=
- wdev_id)
- 	return sc;
+ void network_disconnected(struct network *network)
+@@ -516,17 +523,39 @@ static bool bss_is_sae(const struct scan_bss *bss)
+ 	return __bss_is_sae(bss, &rsn);
  }
  =
 
-+static void scan_request_cancel(void *data)
++static void network_connect_info_destroy(void *user_data)
 +{
-+	struct scan_request *sr =3D data;
++	struct network_connect_info *info =3D user_data;
 +
-+	radio_mgmt_done(sr->sc->wdev_id, sr->id);
++	if (info->message)
++		l_dbus_message_unref(info->message);
++
++	info->work_id =3D 0;
++	info->bss =3D NULL;
++	info->message =3D NULL;
 +}
 +
- static void scan_context_free(struct scan_context *sc)
++static bool network_autoconnect_ready(void *user_data)
++{
++	struct network_connect_info *info =3D user_data;
++	struct network *network =3D l_container_of(info, struct network, connect);
++
++	return __station_connect_network(network->station, network,
++						info->bss) !=3D 0;
++}
++
+ int network_autoconnect(struct network *network, struct scan_bss *bss)
  {
- 	l_debug("sc: %p", sc);
+ 	struct station *station =3D network->station;
++	struct netdev *netdev =3D station_get_netdev(network->station);
+ 	struct wiphy *wiphy =3D station_get_wiphy(station);
+ 	enum security security =3D network_get_security(network);
+ 	struct ie_rsn_info rsn;
+ 	bool is_rsn;
+ 	int ret;
  =
 
--	l_queue_destroy(sc->requests, scan_request_free);
-+	l_queue_destroy(sc->requests, scan_request_cancel);
+-	/* already waiting for an agent request, connect in progress */
+-	if (network->agent_request)
++	/* A connect is already in progress */
++	if (network->connect.work_id)
+ 		return -EALREADY;
  =
 
- 	if (sc->sp.timeout)
- 		l_timeout_remove(sc->sp.timeout);
-@@ -215,7 +224,6 @@ static void scan_request_triggered(struct l_genl_msg *m=
-sg, void *userdata)
- 		}
- =
-
- 		l_queue_remove(sc->requests, sr);
--		start_next_scan_request(sc);
- =
-
- 		scan_request_failed(sc, sr, err);
- =
-
-@@ -532,35 +540,21 @@ static uint32_t scan_common(uint64_t wdev_id, bool pa=
-ssive,
- 		return 0;
- =
-
- 	sr =3D l_new(struct scan_request, 1);
-+	sr->sc =3D sc;
- 	sr->trigger =3D trigger;
- 	sr->callback =3D notify;
- 	sr->userdata =3D userdata;
- 	sr->destroy =3D destroy;
- 	sr->passive =3D passive;
--	sr->id =3D ++next_scan_request_id;
- 	sr->cmds =3D l_queue_new();
- =
-
- 	scan_cmds_add(sr->cmds, sc, passive, params);
- =
-
--	/* Queue empty implies !sc->triggered && !sc->start_cmd_id */
--	if (!l_queue_isempty(sc->requests))
--		goto done;
--
--	if (sc->suspended)
--		goto done;
--
--	if (sc->state !=3D SCAN_STATE_NOT_RUNNING)
--		goto done;
--
--	if (!scan_request_send_trigger(sc, sr))
--		goto done;
--
--	sr->destroy =3D NULL;	/* Don't call destroy when returning error */
--	scan_request_free(sr);
--	return 0;
--done:
- 	l_queue_push_tail(sc->requests, sr);
- =
-
-+	sr->id =3D radio_mgmt_push(wdev_id, 2, start_next_scan_request, sr,
-+					scan_request_free);
-+
- 	return sr->id;
- }
- =
-
-@@ -633,6 +627,8 @@ bool scan_cancel(uint64_t wdev_id, uint32_t id)
- 			sr->destroy =3D NULL;
- 		}
- =
-
-+		radio_mgmt_done(wdev_id, sr->id);
-+
- 		return true;
+ 	switch (security) {
+@@ -588,7 +617,13 @@ int network_autoconnect(struct network *network, struc=
+t scan_bss *bss)
  	}
  =
 
-@@ -649,11 +645,11 @@ bool scan_cancel(uint64_t wdev_id, uint32_t id)
- 		sc->start_cmd_id =3D 0;
- 		l_queue_remove(sc->requests, sr);
- 		sc->started =3D false;
--		start_next_scan_request(sc);
- 	} else
- 		l_queue_remove(sc->requests, sr);
- =
-
--	scan_request_free(sr);
-+	radio_mgmt_done(wdev_id, sr->id);
+ done:
+-	return __station_connect_network(station, network, bss);
++	network->connect.bss =3D bss;
++	network->connect.work_id =3D radio_mgmt_push(netdev_get_wdev_id(netdev),
++						1, network_autoconnect_ready,
++						&network->connect,
++						network_connect_info_destroy);
 +
- 	return true;
- }
++	return 0;
  =
 
-@@ -832,34 +828,22 @@ static void scan_periodic_rearm(struct scan_context *=
-sc)
- 						scan_periodic_timeout_destroy);
- }
+ close_settings:
+ 	network_settings_close(network);
+@@ -597,6 +632,8 @@ close_settings:
  =
 
--static bool start_next_scan_request(struct scan_context *sc)
-+static bool start_next_scan_request(void *user_data)
+ void network_connect_failed(struct network *network, bool in_handshake)
  {
--	struct scan_request *sr =3D l_queue_peek_head(sc->requests);
-+	struct scan_request *sr =3D user_data;
-+	struct scan_context *sc =3D sr->sc;
++	struct netdev *netdev =3D station_get_netdev(network->station);
++
+ 	/*
+ 	 * Connection failed during the handshake phase.  If PSK try asking
+ 	 * for the passphrase once more
+@@ -610,6 +647,8 @@ void network_connect_failed(struct network *network, bo=
+ol in_handshake)
+ 	network->secrets =3D NULL;
  =
 
--	if (sc->suspended)
--		return true;
--
--	if (sc->state !=3D SCAN_STATE_NOT_RUNNING)
--		return true;
--
--	if (sc->start_cmd_id || sc->get_scan_cmd_id)
--		return true;
--
--	while (sr) {
--		if (!scan_request_send_trigger(sc, sr))
--			return true;
--
--		scan_request_failed(sc, sr, -EIO);
-+	if (!scan_request_send_trigger(sc, sr))
-+		return false;
+ 	l_queue_clear(network->blacklist, NULL);
++
++	radio_mgmt_done(netdev_get_wdev_id(netdev), network->connect.work_id);
+ }
  =
 
--		sr =3D l_queue_peek_head(sc->requests);
+ static bool hotspot_info_matches(struct network *network,
+@@ -1130,12 +1169,37 @@ error:
+ 	return reply;
+ }
+ =
+
++static bool network_connect_ready(void *user_data)
++{
++	struct network_connect_info *info =3D user_data;
++	struct network *network =3D l_container_of(info, struct network, connect);
++	struct scan_bss *bss =3D info->bss;
++	struct l_dbus_message *message =3D info->message;
++
++	switch (network_get_security(network)) {
++	case SECURITY_PSK:
++		return network_connect_psk(network, bss, message);
++	case SECURITY_NONE:
++		station_connect_network(network->station, network, bss,
++						message);
++		return NULL;
++	case SECURITY_8021X:
++		if (!network_settings_load(network))
++			return dbus_error_not_configured(message);
++
++		return network_connect_8021x(network, bss, message);
++	default:
++		return dbus_error_not_supported(message);
++	}
++}
++
+ static struct l_dbus_message *network_connect(struct l_dbus *dbus,
+ 						struct l_dbus_message *message,
+ 						void *user_data)
+ {
+ 	struct network *network =3D user_data;
+ 	struct station *station =3D network->station;
++	struct netdev *netdev =3D station_get_netdev(station);
+ 	struct scan_bss *bss;
+ =
+
+ 	l_debug("");
+@@ -1157,36 +1221,14 @@ static struct l_dbus_message *network_connect(struc=
+t l_dbus *dbus,
+ 	if (!bss)
+ 		return dbus_error_not_supported(message);
+ =
+
+-	switch (network_get_security(network)) {
+-	case SECURITY_PSK:
+-		return network_connect_psk(network, bss, message);
+-	case SECURITY_NONE:
+-		station_connect_network(station, network, bss, message);
+-		return NULL;
+-	case SECURITY_8021X:
+-		if (network->connect_after_anqp)
+-			return dbus_error_busy(message);
+-
+-		/*
+-		 * If there is an ongoing ANQP request we must wait for that to
+-		 * finish. Save the message and wait for the ANQP watch to
+-		 * fire
+-		 */
+-		if (network->anqp_pending) {
+-			network->connect_after_anqp =3D
+-						l_dbus_message_ref(message);
+-			l_debug("Pending ANQP request, delaying connect to %s",
+-						network->ssid);
+-			return NULL;
+-		}
++	network->connect.bss =3D bss;
++	network->connect.message =3D l_dbus_message_ref(message);
++	network->connect.work_id =3D radio_mgmt_push(netdev_get_wdev_id(netdev),
++						1, network_connect_ready,
++						&network->connect,
++						network_connect_info_destroy);
+ =
+
+-		if (!network_settings_load(network))
+-			return dbus_error_not_configured(message);
+-
+-		return network_connect_8021x(network, bss, message);
+-	default:
+-		return dbus_error_not_supported(message);
 -	}
-+	scan_request_failed(sc, sr, -EIO);
++	return NULL;
+ }
  =
 
- 	if (sc->sp.retry) {
- 		sc->sp.retry =3D false;
- 		scan_periodic_queue(sc);
+ void network_connect_new_hidden_network(struct network *network,
+@@ -1508,35 +1550,6 @@ static void known_networks_changed(enum known_networ=
+ks_event event,
  	}
- =
-
--	return false;
-+	return true;
  }
  =
 
- static bool scan_parse_vendor_specific(struct scan_bss *bss, const void *d=
-ata,
-@@ -1511,9 +1495,7 @@ static void scan_finished(struct scan_context *sc,
- 		 * taken care of sending the next command for a new or ongoing
- 		 * scan, or scheduling the next periodic scan.
- 		 */
--		start_next_scan_request(sc);
--
--		scan_request_free(sr);
-+		radio_mgmt_done(sc->wdev_id, sr->id);
- 	} else if (sc->sp.callback)
- 		new_owner =3D sc->sp.callback(err, bss_list, sc->sp.userdata);
- =
-
-@@ -2133,32 +2115,6 @@ bool scan_wdev_remove(uint64_t wdev_id)
- 	return true;
- }
- =
-
--bool scan_suspend(uint64_t wdev_id)
+-static void anqp_watch_changed(enum station_anqp_state state,
+-				struct network *network, void *user_data)
 -{
--	struct scan_context *sc;
+-	network->anqp_pending =3D state =3D=3D STATION_ANQP_STARTED;
 -
--	sc =3D l_queue_find(scan_contexts, scan_context_match, &wdev_id);
--	if (!sc)
--		return false;
+-	if (state =3D=3D STATION_ANQP_FINISHED && network->connect_after_anqp) {
+-		struct l_dbus_message *reply;
 -
--	sc->suspended =3D true;
+-		l_debug("ANQP complete, resuming connect to %s", network->ssid);
 -
--	return true;
+-		if (!network_settings_load(network)) {
+-			reply =3D dbus_error_not_configured(
+-						network->connect_after_anqp);
+-			dbus_pending_reply(&network->connect_after_anqp, reply);
+-			return;
+-		}
+-
+-		reply =3D network_connect_8021x(network,
+-					network_bss_select(network, true),
+-					network->connect_after_anqp);
+-
+-		if (reply)
+-			l_dbus_send(dbus_get_bus(), reply);
+-
+-		l_dbus_message_unref(network->connect_after_anqp);
+-		network->connect_after_anqp =3D NULL;
+-	}
 -}
 -
--void scan_resume(uint64_t wdev_id)
--{
--	struct scan_context *sc;
--
--	sc =3D l_queue_find(scan_contexts, scan_context_match, &wdev_id);
--	if (!sc)
--		return;
--
--	sc->suspended =3D false;
--
--	start_next_scan_request(sc);
--}
--
- static int scan_init(void)
+ static void setup_network_interface(struct l_dbus_interface *interface)
  {
- 	const struct l_settings *config =3D iwd_get_config();
-diff --git a/src/scan.h b/src/scan.h
-index aeeddf05..df0cc17c 100644
---- a/src/scan.h
-+++ b/src/scan.h
-@@ -170,6 +170,3 @@ bool scan_freq_set_isempty(const struct scan_freq_set *=
-set);
+ 	l_dbus_interface_method(interface, "Connect", 0,
+@@ -1570,8 +1583,6 @@ static int network_init(void)
+ 	known_networks_watch =3D
+ 		known_networks_watch_add(known_networks_changed, NULL, NULL);
  =
 
- bool scan_wdev_add(uint64_t wdev_id);
- bool scan_wdev_remove(uint64_t wdev_id);
+-	anqp_watch =3D station_add_anqp_watch(anqp_watch_changed, NULL, NULL);
 -
--bool scan_suspend(uint64_t wdev_id);
--void scan_resume(uint64_t wdev_id);
+ 	return 0;
+ }
+ =
+
+@@ -1580,9 +1591,6 @@ static void network_exit(void)
+ 	known_networks_watch_remove(known_networks_watch);
+ 	known_networks_watch =3D 0;
+ =
+
+-	station_remove_anqp_watch(anqp_watch);
+-	anqp_watch =3D 0;
+-
+ 	l_dbus_unregister_interface(dbus_get_bus(), IWD_NETWORK_INTERFACE);
+ }
+ =
+
 diff --git a/src/station.c b/src/station.c
-index b23fd1a0..dd9347a8 100644
+index dd9347a8..69c4ae01 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -530,8 +530,6 @@ request_done:
- 		station_network_foreach(station, network_add_foreach, station);
- 		station_autoconnect_next(station);
+@@ -183,10 +183,8 @@ static void station_autoconnect_next(struct station *s=
+tation)
+ 		r =3D network_autoconnect(entry->network, entry->bss);
+ 		l_free(entry);
+ =
+
+-		if (!r) {
+-			station_enter_state(station, STATION_STATE_CONNECTING);
++		if (!r)
+ 			return;
+-		}
  	}
--
--	scan_resume(netdev_get_wdev_id(station->netdev));
  }
  =
 
- static bool station_start_anqp(struct station *station, struct network *ne=
-twork,
-@@ -661,19 +659,7 @@ void station_set_scan_results(struct station *station,
+@@ -2377,6 +2375,8 @@ int __station_connect_network(struct station *station=
+, struct network *network,
+ 	station->connected_bss =3D bss;
+ 	station->connected_network =3D network;
  =
 
- 	l_hashmap_foreach_remove(station->networks, process_network, station);
++	station_enter_state(station, STATION_STATE_CONNECTING);
++
+ 	return 0;
+ }
  =
 
--	/*
--	 * ANQP requests are scheduled in the same manor as scans, and cannot
--	 * be done simultaneously. To avoid long queue times (waiting for a
--	 * scan to finish) its best to stop scanning, do ANQP, then resume
--	 * scanning.
--	 *
--	 * TODO: It may be possible for some hardware to actually scan and do
--	 * ANQP at the same time. Detecting this could allow us to continue
--	 * scanning.
--	 */
--	if (wait_for_anqp)
--		scan_suspend(netdev_get_wdev_id(station->netdev));
--	else if (add_to_autoconnect) {
-+	if (!wait_for_anqp && add_to_autoconnect) {
- 		station_network_foreach(station, network_add_foreach, station);
- 		station_autoconnect_next(station);
- 	}
 -- =
 
 2.21.1
 
---===============2114383428122119197==--
+--===============0286262205314273738==--
 
