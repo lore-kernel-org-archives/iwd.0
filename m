@@ -1,433 +1,353 @@
-Content-Type: multipart/mixed; boundary="===============2905721661214209905=="
+Content-Type: multipart/mixed; boundary="===============3993863139135299315=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/8] scan: refactor to use wiphy radio work queue
-Date: Thu, 02 Jul 2020 10:35:30 -0700
-Message-ID: <20200702173533.8712-5-prestwoj@gmail.com>
+Subject: [PATCH 6/8] network: use wiphy work queue for connections
+Date: Thu, 02 Jul 2020 10:35:31 -0700
+Message-ID: <20200702173533.8712-6-prestwoj@gmail.com>
 In-Reply-To: <20200702173533.8712-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2905721661214209905==
+--===============3993863139135299315==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-To use the wiphy radio work queue, scanning mostly remained the same.
-start_next_scan_request was modified to be used as the work callback,
-as well as not start the next scan if the current one was done
-(since this is taken care of by wiphy work queue now). All
-calls to start_next_scan_request were removed, and more or less
-replaced with wiphy_radio_work_done.
-
-scan_{suspend,resume} were both removed since radio management
-priorities solve this for us. ANQP requests can be inserted ahead of
-scan requests, which accomplishes the same thing.
+Network was refactored to use the wiphy work queue for
+connections. This removes the need for an ANQP watch since we can
+insert the connect work item at a lower priority than ANQP. This
+will, by nature, force the connect attempt to wait for ANQP to
+complete, ensuring that the network_info is populated.
 ---
- src/scan.c    | 130 ++++++++++++++++----------------------------------
- src/scan.h    |   3 --
- src/station.c |  16 +------
- 3 files changed, 41 insertions(+), 108 deletions(-)
+ src/network.c | 147 ++++++++++++++++++++++++++------------------------
+ src/station.c |   6 +--
+ 2 files changed, 81 insertions(+), 72 deletions(-)
 
-diff --git a/src/scan.c b/src/scan.c
-index 83804e57..123bd42b 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -56,7 +56,8 @@
- static struct l_queue *scan_contexts;
+diff --git a/src/network.c b/src/network.c
+index 70541b59..6206a022 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -52,7 +52,6 @@
+ #include "src/util.h"
  =
 
- static struct l_genl_family *nl80211;
--static uint32_t next_scan_request_id;
+ static uint32_t known_networks_watch;
+-static uint32_t anqp_watch;
+ =
+
+ struct network {
+ 	char ssid[33];
+@@ -70,13 +69,16 @@ struct network {
+ 	uint8_t hessid[6];
+ 	char **nai_realms;
+ 	uint8_t *rc_ie;
 +
-+struct scan_context;
- =
-
- struct scan_periodic {
- 	struct l_timeout *timeout;
-@@ -70,7 +71,7 @@ struct scan_periodic {
- };
- =
-
- struct scan_request {
--	uint32_t id;
-+	struct scan_context *sc;
- 	scan_trigger_func_t trigger;
- 	scan_notify_func_t callback;
- 	void *userdata;
-@@ -79,6 +80,7 @@ struct scan_request {
- 	struct l_queue *cmds;
- 	/* The time the current scan was started. Reported in TRIGGER_SCAN */
- 	uint64_t start_time_tsf;
++	/* D-Bus message and BSS saved when connecting via network_connect() */
++	struct l_dbus_message *connect_msg;
++	struct scan_bss *connect_bss;
 +	struct wiphy_radio_work_item work;
- };
- =
-
- struct scan_context {
-@@ -106,7 +108,6 @@ struct scan_context {
- 	bool triggered:1;
- 	/* Whether any commands from current request's queue have started */
- 	bool started:1;
--	bool suspended:1;
- 	struct wiphy *wiphy;
- };
- =
-
-@@ -118,7 +119,7 @@ struct scan_results {
- 	struct scan_request *sr;
- };
- =
-
--static bool start_next_scan_request(struct scan_context *sc);
-+static bool start_next_scan_request(struct wiphy_radio_work_item *item);
- static void scan_periodic_rearm(struct scan_context *sc);
- =
-
- static bool scan_context_match(const void *a, const void *b)
-@@ -134,12 +135,13 @@ static bool scan_request_match(const void *a, const v=
-oid *b)
- 	const struct scan_request *sr =3D a;
- 	uint32_t id =3D L_PTR_TO_UINT(b);
- =
-
--	return sr->id =3D=3D id;
-+	return sr->work.id =3D=3D id;
- }
- =
-
--static void scan_request_free(void *data)
-+static void scan_request_free(struct wiphy_radio_work_item *item)
- {
--	struct scan_request *sr =3D data;
-+	struct scan_request *sr =3D l_container_of(item, struct scan_request,
-+							work);
- =
-
- 	if (sr->destroy)
- 		sr->destroy(sr->userdata);
-@@ -159,12 +161,12 @@ static void scan_request_failed(struct scan_context *=
-sc,
- 	else if (sr->callback)
- 		sr->callback(err, NULL, sr->userdata);
- =
-
--	scan_request_free(sr);
-+	wiphy_radio_work_done(sc->wiphy, sr->work.id);
- }
- =
-
- static struct scan_context *scan_context_new(uint64_t wdev_id)
- {
--	struct wiphy *wiphy =3D wiphy_find(wdev_id >> 32);
-+	struct wiphy *wiphy =3D wiphy_find_by_wdev(wdev_id);
- 	struct scan_context *sc;
- =
-
- 	if (!wiphy)
-@@ -180,11 +182,18 @@ static struct scan_context *scan_context_new(uint64_t=
- wdev_id)
- 	return sc;
- }
- =
-
-+static void scan_request_cancel(void *data)
-+{
-+	struct scan_request *sr =3D data;
 +
-+	wiphy_radio_work_done(sr->sc->wiphy, sr->work.id);
+ 	bool update_psk:1;  /* Whether PSK should be written to storage */
+ 	bool ask_passphrase:1; /* Whether we should force-ask agent */
+ 	bool is_hs20:1;
+-	bool anqp_pending:1;	/* Set if there is a pending ANQP request */
+ 	int rank;
+-	/* Holds DBus Connect() message if it comes in before ANQP finishes */
+-	struct l_dbus_message *connect_after_anqp;
+ };
+ =
+
+ static bool network_settings_load(struct network *network)
+@@ -138,6 +140,7 @@ void network_connected(struct network *network)
+ 	enum security security =3D network_get_security(network);
+ 	const char *ssid =3D network_get_ssid(network);
+ 	int err;
++	struct wiphy *wiphy =3D station_get_wiphy(network->station);
+ =
+
+ 	if (!network->info) {
+ 		/*
+@@ -164,6 +167,8 @@ void network_connected(struct network *network)
+ 				network_secret_check_cacheable, network);
+ =
+
+ 	l_queue_clear(network->blacklist, NULL);
++
++	wiphy_radio_work_done(wiphy, network->work.id);
+ }
+ =
+
+ void network_disconnected(struct network *network)
+@@ -516,6 +521,30 @@ static bool bss_is_sae(const struct scan_bss *bss)
+ 	return __bss_is_sae(bss, &rsn);
+ }
+ =
+
++static void network_connect_destroy(struct wiphy_radio_work_item *item)
++{
++	struct network *network =3D l_container_of(item, struct network, work);
++
++	if (network->connect_msg)
++		l_dbus_message_unref(network->connect_msg);
++
++	network->connect_bss =3D NULL;
++	network->connect_msg =3D NULL;
 +}
 +
- static void scan_context_free(struct scan_context *sc)
- {
- 	l_debug("sc: %p", sc);
- =
-
--	l_queue_destroy(sc->requests, scan_request_free);
-+	l_queue_destroy(sc->requests, scan_request_cancel);
- =
-
- 	if (sc->sp.timeout)
- 		l_timeout_remove(sc->sp.timeout);
-@@ -215,7 +224,6 @@ static void scan_request_triggered(struct l_genl_msg *m=
-sg, void *userdata)
- 		}
- =
-
- 		l_queue_remove(sc->requests, sr);
--		start_next_scan_request(sc);
- =
-
- 		scan_request_failed(sc, sr, err);
- =
-
-@@ -517,6 +525,11 @@ static int scan_request_send_trigger(struct scan_conte=
-xt *sc,
- 	return -EIO;
- }
- =
-
-+static const struct wiphy_radio_work_item_ops work_ops =3D {
-+	.do_work =3D start_next_scan_request,
-+	.destroy =3D scan_request_free,
++static bool network_autoconnect_ready(struct wiphy_radio_work_item *item)
++{
++	struct network *network =3D l_container_of(item, struct network, work);
++
++	return __station_connect_network(network->station, network,
++						network->connect_bss) !=3D 0;
++}
++
++static const struct wiphy_radio_work_item_ops autoconnect_work_ops =3D {
++	.do_work =3D network_autoconnect_ready,
++	.destroy =3D network_connect_destroy,
 +};
 +
- static uint32_t scan_common(uint64_t wdev_id, bool passive,
- 				const struct scan_parameters *params,
- 				scan_trigger_func_t trigger,
-@@ -532,36 +545,19 @@ static uint32_t scan_common(uint64_t wdev_id, bool pa=
-ssive,
- 		return 0;
+ int network_autoconnect(struct network *network, struct scan_bss *bss)
+ {
+ 	struct station *station =3D network->station;
+@@ -525,8 +554,8 @@ int network_autoconnect(struct network *network, struct=
+ scan_bss *bss)
+ 	bool is_rsn;
+ 	int ret;
  =
 
- 	sr =3D l_new(struct scan_request, 1);
-+	sr->sc =3D sc;
- 	sr->trigger =3D trigger;
- 	sr->callback =3D notify;
- 	sr->userdata =3D userdata;
- 	sr->destroy =3D destroy;
- 	sr->passive =3D passive;
--	sr->id =3D ++next_scan_request_id;
- 	sr->cmds =3D l_queue_new();
+-	/* already waiting for an agent request, connect in progress */
+-	if (network->agent_request)
++	/* A connect is already in progress */
++	if (network->work.id)
+ 		return -EALREADY;
  =
 
- 	scan_cmds_add(sr->cmds, sc, passive, params);
- =
-
--	/* Queue empty implies !sc->triggered && !sc->start_cmd_id */
--	if (!l_queue_isempty(sc->requests))
--		goto done;
--
--	if (sc->suspended)
--		goto done;
--
--	if (sc->state !=3D SCAN_STATE_NOT_RUNNING)
--		goto done;
--
--	if (!scan_request_send_trigger(sc, sr))
--		goto done;
--
--	sr->destroy =3D NULL;	/* Don't call destroy when returning error */
--	scan_request_free(sr);
--	return 0;
--done:
- 	l_queue_push_tail(sc->requests, sr);
- =
-
--	return sr->id;
-+	return wiphy_radio_work_insert(sc->wiphy, &sr->work, 2, &work_ops);
- }
- =
-
- uint32_t scan_passive(uint64_t wdev_id, struct scan_freq_set *freqs,
-@@ -633,6 +629,8 @@ bool scan_cancel(uint64_t wdev_id, uint32_t id)
- 			sr->destroy =3D NULL;
- 		}
- =
-
-+		wiphy_radio_work_done(sc->wiphy, sr->work.id);
-+
- 		return true;
+ 	switch (security) {
+@@ -588,7 +617,12 @@ int network_autoconnect(struct network *network, struc=
+t scan_bss *bss)
  	}
  =
 
-@@ -649,11 +647,11 @@ bool scan_cancel(uint64_t wdev_id, uint32_t id)
- 		sc->start_cmd_id =3D 0;
- 		l_queue_remove(sc->requests, sr);
- 		sc->started =3D false;
--		start_next_scan_request(sc);
- 	} else
- 		l_queue_remove(sc->requests, sr);
- =
-
--	scan_request_free(sr);
-+	wiphy_radio_work_done(sc->wiphy, sr->work.id);
+ done:
+-	return __station_connect_network(station, network, bss);
++	network->connect_bss =3D bss;
 +
- 	return true;
- }
++	wiphy_radio_work_insert(wiphy, &network->work, 1,
++					&autoconnect_work_ops);
++
++	return 0;
  =
 
-@@ -832,34 +830,23 @@ static void scan_periodic_rearm(struct scan_context *=
-sc)
- 						scan_periodic_timeout_destroy);
- }
+ close_settings:
+ 	network_settings_close(network);
+@@ -597,6 +631,8 @@ close_settings:
  =
 
--static bool start_next_scan_request(struct scan_context *sc)
-+static bool start_next_scan_request(struct wiphy_radio_work_item *item)
+ void network_connect_failed(struct network *network, bool in_handshake)
  {
--	struct scan_request *sr =3D l_queue_peek_head(sc->requests);
--
--	if (sc->suspended)
--		return true;
--
--	if (sc->state !=3D SCAN_STATE_NOT_RUNNING)
--		return true;
--
--	if (sc->start_cmd_id || sc->get_scan_cmd_id)
--		return true;
-+	struct scan_request *sr =3D l_container_of(item,
-+						struct scan_request, work);
-+	struct scan_context *sc =3D sr->sc;
++	struct wiphy *wiphy =3D station_get_wiphy(network->station);
++
+ 	/*
+ 	 * Connection failed during the handshake phase.  If PSK try asking
+ 	 * for the passphrase once more
+@@ -610,6 +646,8 @@ void network_connect_failed(struct network *network, bo=
+ol in_handshake)
+ 	network->secrets =3D NULL;
  =
 
--	while (sr) {
--		if (!scan_request_send_trigger(sc, sr))
--			return true;
--
--		scan_request_failed(sc, sr, -EIO);
-+	if (!scan_request_send_trigger(sc, sr))
-+		return false;
+ 	l_queue_clear(network->blacklist, NULL);
++
++	wiphy_radio_work_done(wiphy, network->work.id);
+ }
  =
 
--		sr =3D l_queue_peek_head(sc->requests);
+ static bool hotspot_info_matches(struct network *network,
+@@ -1130,12 +1168,41 @@ error:
+ 	return reply;
+ }
+ =
+
++static bool network_connect_ready(struct wiphy_radio_work_item *item)
++{
++	struct network *network =3D l_container_of(item, struct network, work);
++	struct scan_bss *bss =3D network->connect_bss;
++	struct l_dbus_message *message =3D network->connect_msg;
++
++	switch (network_get_security(network)) {
++	case SECURITY_PSK:
++		return network_connect_psk(network, bss, message);
++	case SECURITY_NONE:
++		station_connect_network(network->station, network, bss,
++						message);
++		return NULL;
++	case SECURITY_8021X:
++		if (!network_settings_load(network))
++			return dbus_error_not_configured(message);
++
++		return network_connect_8021x(network, bss, message);
++	default:
++		return dbus_error_not_supported(message);
++	}
++}
++
++static const struct wiphy_radio_work_item_ops connect_work_ops =3D {
++	.do_work =3D network_connect_ready,
++	.destroy =3D network_connect_destroy,
++};
++
+ static struct l_dbus_message *network_connect(struct l_dbus *dbus,
+ 						struct l_dbus_message *message,
+ 						void *user_data)
+ {
+ 	struct network *network =3D user_data;
+ 	struct station *station =3D network->station;
++	struct wiphy *wiphy =3D station_get_wiphy(station);
+ 	struct scan_bss *bss;
+ =
+
+ 	l_debug("");
+@@ -1157,36 +1224,12 @@ static struct l_dbus_message *network_connect(struc=
+t l_dbus *dbus,
+ 	if (!bss)
+ 		return dbus_error_not_supported(message);
+ =
+
+-	switch (network_get_security(network)) {
+-	case SECURITY_PSK:
+-		return network_connect_psk(network, bss, message);
+-	case SECURITY_NONE:
+-		station_connect_network(station, network, bss, message);
+-		return NULL;
+-	case SECURITY_8021X:
+-		if (network->connect_after_anqp)
+-			return dbus_error_busy(message);
++	network->connect_bss =3D bss;
++	network->connect_msg =3D l_dbus_message_ref(message);
+ =
+
+-		/*
+-		 * If there is an ongoing ANQP request we must wait for that to
+-		 * finish. Save the message and wait for the ANQP watch to
+-		 * fire
+-		 */
+-		if (network->anqp_pending) {
+-			network->connect_after_anqp =3D
+-						l_dbus_message_ref(message);
+-			l_debug("Pending ANQP request, delaying connect to %s",
+-						network->ssid);
+-			return NULL;
+-		}
++	wiphy_radio_work_insert(wiphy, &network->work, 1, &connect_work_ops);
+ =
+
+-		if (!network_settings_load(network))
+-			return dbus_error_not_configured(message);
+-
+-		return network_connect_8021x(network, bss, message);
+-	default:
+-		return dbus_error_not_supported(message);
 -	}
-+	scan_request_failed(sc, sr, -EIO);
++	return NULL;
+ }
  =
 
- 	if (sc->sp.retry) {
- 		sc->sp.retry =3D false;
- 		scan_periodic_queue(sc);
+ void network_connect_new_hidden_network(struct network *network,
+@@ -1508,35 +1551,6 @@ static void known_networks_changed(enum known_networ=
+ks_event event,
  	}
- =
-
--	return false;
-+	return true;
  }
  =
 
- static bool scan_parse_vendor_specific(struct scan_bss *bss, const void *d=
-ata,
-@@ -1511,9 +1498,7 @@ static void scan_finished(struct scan_context *sc,
- 		 * taken care of sending the next command for a new or ongoing
- 		 * scan, or scheduling the next periodic scan.
- 		 */
--		start_next_scan_request(sc);
--
--		scan_request_free(sr);
-+		wiphy_radio_work_done(sc->wiphy, sr->work.id);
- 	} else if (sc->sp.callback)
- 		new_owner =3D sc->sp.callback(err, bss_list, sc->sp.userdata);
- =
-
-@@ -1679,7 +1664,7 @@ static void scan_notify(struct l_genl_msg *msg, void =
-*user_data)
- =
-
- 		/* Send the next command of a new or an ongoing request */
- 		if (send_next)
--			start_next_scan_request(sc);
-+			start_next_scan_request(&sr->work);
- =
-
- 		if (!get_results)
- 			break;
-@@ -1722,15 +1707,6 @@ static void scan_notify(struct l_genl_msg *msg, void=
- *user_data)
- 			sc->triggered =3D false;
- =
-
- 			scan_finished(sc, -ECANCELED, NULL, sr);
--		} else {
--			/*
--			 * If this was an external scan that got aborted
--			 * we may be able to now queue our own scan although
--			 * the abort could also have been triggered by the
--			 * hardware or the driver because of another activity
--			 * starting in which case we should just get an EBUSY.
--			 */
--			start_next_scan_request(sc);
- 		}
- =
-
- 		break;
-@@ -2133,32 +2109,6 @@ bool scan_wdev_remove(uint64_t wdev_id)
- 	return true;
- }
- =
-
--bool scan_suspend(uint64_t wdev_id)
+-static void anqp_watch_changed(enum station_anqp_state state,
+-				struct network *network, void *user_data)
 -{
--	struct scan_context *sc;
+-	network->anqp_pending =3D state =3D=3D STATION_ANQP_STARTED;
 -
--	sc =3D l_queue_find(scan_contexts, scan_context_match, &wdev_id);
--	if (!sc)
--		return false;
+-	if (state =3D=3D STATION_ANQP_FINISHED && network->connect_after_anqp) {
+-		struct l_dbus_message *reply;
 -
--	sc->suspended =3D true;
+-		l_debug("ANQP complete, resuming connect to %s", network->ssid);
 -
--	return true;
+-		if (!network_settings_load(network)) {
+-			reply =3D dbus_error_not_configured(
+-						network->connect_after_anqp);
+-			dbus_pending_reply(&network->connect_after_anqp, reply);
+-			return;
+-		}
+-
+-		reply =3D network_connect_8021x(network,
+-					network_bss_select(network, true),
+-					network->connect_after_anqp);
+-
+-		if (reply)
+-			l_dbus_send(dbus_get_bus(), reply);
+-
+-		l_dbus_message_unref(network->connect_after_anqp);
+-		network->connect_after_anqp =3D NULL;
+-	}
 -}
 -
--void scan_resume(uint64_t wdev_id)
--{
--	struct scan_context *sc;
--
--	sc =3D l_queue_find(scan_contexts, scan_context_match, &wdev_id);
--	if (!sc)
--		return;
--
--	sc->suspended =3D false;
--
--	start_next_scan_request(sc);
--}
--
- static int scan_init(void)
+ static void setup_network_interface(struct l_dbus_interface *interface)
  {
- 	const struct l_settings *config =3D iwd_get_config();
-diff --git a/src/scan.h b/src/scan.h
-index aeeddf05..df0cc17c 100644
---- a/src/scan.h
-+++ b/src/scan.h
-@@ -170,6 +170,3 @@ bool scan_freq_set_isempty(const struct scan_freq_set *=
-set);
+ 	l_dbus_interface_method(interface, "Connect", 0,
+@@ -1570,8 +1584,6 @@ static int network_init(void)
+ 	known_networks_watch =3D
+ 		known_networks_watch_add(known_networks_changed, NULL, NULL);
  =
 
- bool scan_wdev_add(uint64_t wdev_id);
- bool scan_wdev_remove(uint64_t wdev_id);
+-	anqp_watch =3D station_add_anqp_watch(anqp_watch_changed, NULL, NULL);
 -
--bool scan_suspend(uint64_t wdev_id);
--void scan_resume(uint64_t wdev_id);
+ 	return 0;
+ }
+ =
+
+@@ -1580,9 +1592,6 @@ static void network_exit(void)
+ 	known_networks_watch_remove(known_networks_watch);
+ 	known_networks_watch =3D 0;
+ =
+
+-	station_remove_anqp_watch(anqp_watch);
+-	anqp_watch =3D 0;
+-
+ 	l_dbus_unregister_interface(dbus_get_bus(), IWD_NETWORK_INTERFACE);
+ }
+ =
+
 diff --git a/src/station.c b/src/station.c
-index b23fd1a0..dd9347a8 100644
+index dd9347a8..69c4ae01 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -530,8 +530,6 @@ request_done:
- 		station_network_foreach(station, network_add_foreach, station);
- 		station_autoconnect_next(station);
+@@ -183,10 +183,8 @@ static void station_autoconnect_next(struct station *s=
+tation)
+ 		r =3D network_autoconnect(entry->network, entry->bss);
+ 		l_free(entry);
+ =
+
+-		if (!r) {
+-			station_enter_state(station, STATION_STATE_CONNECTING);
++		if (!r)
+ 			return;
+-		}
  	}
--
--	scan_resume(netdev_get_wdev_id(station->netdev));
  }
  =
 
- static bool station_start_anqp(struct station *station, struct network *ne=
-twork,
-@@ -661,19 +659,7 @@ void station_set_scan_results(struct station *station,
+@@ -2377,6 +2375,8 @@ int __station_connect_network(struct station *station=
+, struct network *network,
+ 	station->connected_bss =3D bss;
+ 	station->connected_network =3D network;
  =
 
- 	l_hashmap_foreach_remove(station->networks, process_network, station);
++	station_enter_state(station, STATION_STATE_CONNECTING);
++
+ 	return 0;
+ }
  =
 
--	/*
--	 * ANQP requests are scheduled in the same manor as scans, and cannot
--	 * be done simultaneously. To avoid long queue times (waiting for a
--	 * scan to finish) its best to stop scanning, do ANQP, then resume
--	 * scanning.
--	 *
--	 * TODO: It may be possible for some hardware to actually scan and do
--	 * ANQP at the same time. Detecting this could allow us to continue
--	 * scanning.
--	 */
--	if (wait_for_anqp)
--		scan_suspend(netdev_get_wdev_id(station->netdev));
--	else if (add_to_autoconnect) {
-+	if (!wait_for_anqp && add_to_autoconnect) {
- 		station_network_foreach(station, network_add_foreach, station);
- 		station_autoconnect_next(station);
- 	}
 -- =
 
 2.21.1
 
---===============2905721661214209905==--
+--===============3993863139135299315==--
 
