@@ -1,469 +1,746 @@
-Content-Type: multipart/mixed; boundary="===============6048825851412914541=="
+Content-Type: multipart/mixed; boundary="===============0514026480395868874=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/8] frame-xchg: refactor to use wiphy work queue
-Date: Thu, 02 Jul 2020 10:35:28 -0700
-Message-ID: <20200702173533.8712-3-prestwoj@gmail.com>
+Subject: [PATCH 4/8] anqp: refactor to use frame-xchg
+Date: Thu, 02 Jul 2020 10:35:29 -0700
+Message-ID: <20200702173533.8712-4-prestwoj@gmail.com>
 In-Reply-To: <20200702173533.8712-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6048825851412914541==
+--===============0514026480395868874==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In order to first integrate frame-xchg some refactoring needed to
-be done. First it is useful to allow queueing frames up rather than
-requiring the module (p2p, anqp etc) to wait for the last frame to
-finish. This can be aided by radio management but frame-xchg needed
-some refactoring as well.
+The new frame-xchg module now handles a lot of what ANQP used to do. ANQP
+now does not need to depend on nl80211/netdev for building and sending
+frames. It also no longer needs any of the request lookups, frame watches
+or to maintain a queue of requests because frame-xchg filters this for us.
 
-First was getting rid of this fx pointer re-use. It looks like this
-was done to save a bit of memory but things get pretty complex
-needed to check if the pointer is stale or has been reset. Instead
-of this we now just allocate a new pointer each frame-xchg. This
-allows for the module to queue multiple requests as well as removes
-the complexity of needed to check if the fx pointer is stale.
+From an API perspective:
+ - anqp_request() was changed to take the wdev_id rather than ifindex.
+ - anqp_cancel() was added so that station can properly clean up ANQP
+   requests if the device disappears.
 
-Next was adding the ability to track frame-xchgs by ID. If a module
-can queue up multiple requests it also needs to be able to cancel
-them individually vs per-wdev. This comes free with the wiphy work
-queue since it returns an ID which can be given directly to the
-caller.
-
-Then radio management was simply piped in by adding the
-insert/done APIs.
+During testing a bug was also fixed in station on the timeout path
+where the request queue would get popped twice.
 ---
- src/frame-xchg.c | 121 +++++++++++++++++++++++------------------------
- src/frame-xchg.h |   6 +--
- src/p2p.c        |  22 +++++++--
- 3 files changed, 81 insertions(+), 68 deletions(-)
+ src/anqp.c    | 443 +++++++++++---------------------------------------
+ src/anqp.h    |   3 +-
+ src/station.c |  19 +--
+ 3 files changed, 103 insertions(+), 362 deletions(-)
 
-diff --git a/src/frame-xchg.c b/src/frame-xchg.c
-index a9c1e4c3..1ba2d907 100644
---- a/src/frame-xchg.c
-+++ b/src/frame-xchg.c
-@@ -41,6 +41,7 @@
- #include "src/nl80211util.h"
- #include "src/netdev.h"
- #include "src/frame-xchg.h"
-+#include "src/wiphy.h"
+diff --git a/src/anqp.c b/src/anqp.c
+index 6627bd81..3b597835 100644
+--- a/src/anqp.c
++++ b/src/anqp.c
+@@ -31,105 +31,61 @@
+ #include "src/module.h"
+ #include "src/anqp.h"
+ #include "src/util.h"
+-#include "src/eap-private.h"
+ #include "src/ie.h"
+-#include "src/nl80211util.h"
+-#include "src/nl80211cmd.h"
+ #include "src/scan.h"
+-#include "src/netdev.h"
+ #include "src/iwd.h"
+ #include "src/mpdu.h"
+-#include "src/wiphy.h"
++#include "src/frame-xchg.h"
  =
 
- #ifndef SOL_NETLINK
- #define SOL_NETLINK 270
-@@ -113,8 +114,7 @@ struct frame_xchg_data {
- 	unsigned int retry_interval;
- 	unsigned int resp_timeout;
- 	unsigned int retries_on_ack;
--	bool in_frame_cb : 1;
--	bool stale : 1;
-+	struct wiphy_radio_work_item work;
+ #include "linux/nl80211.h"
+ =
+
++#define ANQP_GROUP	0
++
+ struct anqp_request {
+-	uint32_t ifindex;
++	uint64_t wdev_id;
+ 	anqp_response_func_t anqp_cb;
+ 	anqp_destroy_func_t anqp_destroy;
+ 	void *anqp_data;
+-	uint64_t anqp_cookie;
+ 	uint8_t anqp_token;
++	uint32_t frequency;
++	uint8_t *frame;
++	size_t frame_len;
++	uint32_t id;
  };
  =
 
- struct frame_xchg_watch_data {
-@@ -726,7 +726,7 @@ static bool frame_watch_remove_by_handler(uint64_t wdev=
-_id, uint32_t group_id,
- 					&handler_info) > 0;
- }
- =
-
--static void frame_xchg_tx_retry(struct frame_xchg_data *fx);
-+static bool frame_xchg_tx_retry(struct wiphy_radio_work_item *item);
- static bool frame_xchg_resp_handle(const struct mmpdu_header *mpdu,
- 					const void *body, size_t body_len,
- 					int rssi, void *user_data);
-@@ -753,9 +753,6 @@ static void frame_xchg_wait_cancel(struct frame_xchg_da=
-ta *fx)
- =
-
- static void frame_xchg_reset(struct frame_xchg_data *fx)
- {
--	fx->in_frame_cb =3D false;
--	fx->stale =3D false;
+-static struct l_genl_family *nl80211 =3D NULL;
 -
- 	frame_xchg_wait_cancel(fx);
+-static struct l_queue *anqp_requests;
+ static uint8_t anqp_token =3D 0;
  =
 
- 	if (fx->timeout)
-@@ -771,9 +768,10 @@ static void frame_xchg_reset(struct frame_xchg_data *f=
-x)
- 					frame_xchg_resp_cb, fx);
- }
- =
-
--static void frame_xchg_destroy(void *user_data)
-+static void frame_xchg_destroy(struct wiphy_radio_work_item *item)
+-static uint32_t netdev_watch;
+-static uint32_t unicast_watch;
+-
+ static void anqp_destroy(void *user_data)
  {
--	struct frame_xchg_data *fx =3D user_data;
-+	struct frame_xchg_data *fx =3D l_container_of(item,
-+						struct frame_xchg_data, work);
+ 	struct anqp_request *request =3D user_data;
  =
 
- 	if (fx->destroy)
- 		fx->destroy(fx->user_data);
-@@ -789,7 +787,7 @@ static void frame_xchg_done(struct frame_xchg_data *fx,=
- int err)
- 	if (fx->cb)
- 		fx->cb(err, fx->user_data);
+ 	if (request->anqp_destroy)
+ 		request->anqp_destroy(request->anqp_data);
+-}
+-
+-static void netdev_gas_request_cb(struct l_genl_msg *msg, void *user_data)
+-{
+-	struct anqp_request *request =3D user_data;
+-
+-	if (l_genl_msg_get_error(msg) !=3D 0)
+-		goto error;
+-
+-	if (nl80211_parse_attrs(msg, NL80211_ATTR_COOKIE, &request->anqp_cookie,
+-					NL80211_ATTR_UNSPEC) < 0)
+-		goto error;
+-
+-	return;
+-
+-error:
+-	l_debug("Error sending CMD_FRAME (%d)", l_genl_msg_get_error(msg));
+-
+-	if (request->anqp_cb)
+-		request->anqp_cb(ANQP_FAILED, NULL, 0, request->anqp_data);
+-
+-	if (request->anqp_destroy)
+-		request->anqp_destroy(request->anqp_data);
  =
 
--	frame_xchg_destroy(fx);
-+	wiphy_radio_work_done(wiphy_find_by_wdev(fx->wdev_id), fx->work.id);
++	l_free(request->frame);
+ 	l_free(request);
  }
  =
 
- static void frame_xchg_timeout_destroy(void *user_data)
-@@ -805,7 +803,7 @@ static void frame_xchg_timeout_cb(struct l_timeout *tim=
-eout,
- 	struct frame_xchg_data *fx =3D user_data;
- =
-
- 	l_timeout_remove(fx->timeout);
--	frame_xchg_tx_retry(fx);
-+	frame_xchg_tx_retry(&fx->work);
- }
- =
-
- static void frame_xchg_listen_end_cb(struct l_timeout *timeout,
-@@ -821,7 +819,7 @@ static void frame_xchg_listen_end_cb(struct l_timeout *=
-timeout,
- 	l_timeout_remove(fx->timeout);
- 	fx->retries_on_ack--;
- 	fx->retry_cnt =3D 0;
--	frame_xchg_tx_retry(fx);
-+	frame_xchg_tx_retry(&fx->work);
- }
- =
-
- static void frame_xchg_tx_status(struct frame_xchg_data *fx, bool acked)
-@@ -918,8 +916,10 @@ error:
- 	frame_xchg_done(fx, error);
- }
- =
-
--static void frame_xchg_tx_retry(struct frame_xchg_data *fx)
-+static bool frame_xchg_tx_retry(struct wiphy_radio_work_item *item)
+-static bool match_token(const void *a, const void *b)
+-{
+-	const struct anqp_request *request =3D a;
+-	const struct token_match {
+-		uint32_t ifindex;
+-		uint8_t token;
+-
+-	} *match =3D b;
+-
+-	if (request->ifindex !=3D match->ifindex)
+-		return false;
+-
+-	if (request->anqp_token !=3D match->token)
+-		return false;
+-
+-	return true;
+-}
+-
+-static void anqp_response_frame_event(uint32_t ifindex,
+-					const struct mmpdu_header *hdr,
+-					const void *body, size_t body_len)
++/*
++ * By using frame-xchg we should get called back here for any frame matchi=
+ng our
++ * prefix until the duration expires. If frame-xchg is never signalled 'do=
+ne'
++ * (returning true) we should get a timeout in anqp_frame_timeout. This is
++ * why we drop any improperly formatted frames without cleaning up the req=
+uest.
++ */
++static bool anqp_response_frame_event(const struct mmpdu_header *hdr,
++					const void *body, size_t body_len,
++					int rssi, void *user_data)
  {
-+	struct frame_xchg_data *fx =3D l_container_of(item,
-+						struct frame_xchg_data, work);
- 	struct l_genl_msg *msg;
- 	uint32_t cmd_id;
- 	uint32_t duration =3D fx->resp_timeout;
-@@ -951,13 +951,15 @@ static void frame_xchg_tx_retry(struct frame_xchg_dat=
-a *fx)
- 		l_error("Error sending frame");
- 		l_genl_msg_unref(msg);
- 		frame_xchg_done(fx, -EIO);
+-	struct anqp_request *request;
++	struct anqp_request *request =3D user_data;
+ 	const uint8_t *ptr =3D body;
+ 	uint16_t status_code;
+ 	uint16_t delay;
+ 	uint16_t qrlen;
+ 	uint8_t adv_proto_len;
+ 	uint8_t token;
+-	struct token_match {
+-		uint32_t ifindex;
+-		uint8_t token;
+-
+-	} match;
+ =
+
+ 	if (body_len < 9)
 -		return;
-+		return true;
++		return false;
+ =
+
+ 	/* Skip past category/action since this frame was prefixed matched */
+ 	ptr +=3D 2;
+@@ -138,12 +94,8 @@ static void anqp_response_frame_event(uint32_t ifindex,
+ 	/* dialog token */
+ 	token =3D *ptr++;
+ =
+
+-	match.ifindex =3D ifindex;
+-	match.token =3D token;
+-
+-	request =3D l_queue_find(anqp_requests, match_token, &match);
+-	if (!request)
+-		return;
++	if (request->anqp_token !=3D token)
++		return false;
+ =
+
+ 	status_code =3D l_get_le16(ptr);
+ 	ptr +=3D 2;
+@@ -151,7 +103,7 @@ static void anqp_response_frame_event(uint32_t ifindex,
+ =
+
+ 	if (status_code !=3D 0) {
+ 		l_error("Bad status code on GAS response %u", status_code);
+-		return;
++		return false;
  	}
  =
 
- 	fx->tx_acked =3D false;
- 	fx->have_cookie =3D false;
- 	fx->early_status =3D false;
- 	fx->retry_cnt++;
-+
-+	return false;
+ 	delay =3D l_get_le16(ptr);
+@@ -166,12 +118,12 @@ static void anqp_response_frame_event(uint32_t ifinde=
+x,
+ 	 */
+ 	if (delay !=3D 0) {
+ 		l_error("GAS comeback delay was not zero");
+-		return;
++		return false;
+ 	}
+ =
+
+ 	if (*ptr !=3D IE_TYPE_ADVERTISEMENT_PROTOCOL) {
+ 		l_error("GAS request not advertisement protocol");
+-		return;
++		return false;
+ 	}
+ =
+
+ 	ptr++;
+@@ -181,339 +133,128 @@ static void anqp_response_frame_event(uint32_t ifin=
+dex,
+ 	body_len--;
+ =
+
+ 	if (body_len < adv_proto_len)
+-		return;
++		return false;
+ =
+
+ 	ptr +=3D adv_proto_len;
+ 	body_len -=3D adv_proto_len;
+ =
+
+ 	if (body_len < 2)
+-		return;
++		return false;
+ =
+
+ 	qrlen =3D l_get_le16(ptr);
+ 	ptr +=3D 2;
+ =
+
+ 	if (body_len < qrlen)
+-		return;
+-
+-	l_queue_remove(anqp_requests, request);
++		return false;
+ =
+
+ 	l_debug("ANQP response received from "MAC, MAC_STR(hdr->address_2));
+ =
+
+ 	if (request->anqp_cb)
+-		request->anqp_cb(ANQP_SUCCESS, ptr, qrlen,
+-					request->anqp_data);
+-
+-	if (request->anqp_destroy)
+-		request->anqp_destroy(request->anqp_data);
++		request->anqp_cb(ANQP_SUCCESS, ptr, qrlen, request->anqp_data);
+ =
+
+-	l_free(request);
++	anqp_destroy(request);
+ =
+
+-	return;
++	return true;
  }
  =
 
- static bool frame_xchg_resp_handle(const struct mmpdu_header *mpdu,
-@@ -999,20 +1001,10 @@ static bool frame_xchg_resp_handle(const struct mmpd=
-u_header *mpdu,
- 		if (!fx->tx_acked)
- 			goto early_frame;
- =
-
--		fx->in_frame_cb =3D true;
- 		done =3D watch->cb(mpdu, body, body_len, rssi, fx->user_data);
- =
-
--		/*
--		 * If the callback has started a new frame exchange it will
--		 * have reset and taken over the state variables and we need
--		 * to just exit without touching anything.
--		 */
--		if (!fx->in_frame_cb)
--			return true;
--
--		fx->in_frame_cb =3D false;
--
--		if (done || fx->stale) {
-+		if (done) {
-+			/* NULL callback here since the caller is done */
- 			fx->cb =3D NULL;
- 			frame_xchg_done(fx, 0);
- 			return true;
-@@ -1070,22 +1062,29 @@ static bool frame_xchg_match(const void *a, const v=
-oid *b)
-  * @resp_timeout was 0.  @frame is an iovec array terminated by an iovec
-  * struct with NULL-iov_base.
-  */
--void frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t freq,
-+uint32_t frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t =
-freq,
- 			unsigned int retry_interval, unsigned int resp_timeout,
- 			unsigned int retries_on_ack, uint32_t group_id,
- 			frame_xchg_cb_t cb, void *user_data,
- 			frame_xchg_destroy_func_t destroy, ...)
- {
-+	uint32_t id;
- 	va_list args;
- =
-
- 	va_start(args, destroy);
--	frame_xchg_startv(wdev_id, frame, freq, retry_interval, resp_timeout,
-+	id =3D frame_xchg_startv(wdev_id, frame, freq, retry_interval, resp_timeo=
-ut,
- 				retries_on_ack, group_id, cb, user_data,
- 				destroy, args);
- 	va_end(args);
-+	return id;
- }
- =
-
--void frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t fre=
-q,
-+static const struct wiphy_radio_work_item_ops work_ops =3D {
-+	.do_work =3D frame_xchg_tx_retry,
-+	.destroy =3D frame_xchg_destroy,
+-static void netdev_gas_timeout_cb(void *user_data)
++static const struct frame_xchg_prefix anqp_frame_prefix =3D {
++	.data =3D (uint8_t []) {
++		0x04, 0x0b,
++	},
++	.len =3D 2,
 +};
 +
-+uint32_t frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t=
- freq,
- 			unsigned int retry_interval, unsigned int resp_timeout,
- 			unsigned int retries_on_ack, uint32_t group_id,
- 			frame_xchg_cb_t cb, void *user_data,
-@@ -1108,31 +1107,13 @@ void frame_xchg_startv(uint64_t wdev_id, struct iov=
-ec *frame, uint32_t freq,
- 				frame[0].iov_base)) {
- 		l_error("Frame too short");
- 		cb(-EMSGSIZE, user_data);
--		return;
-+		return 0;
- 	}
- =
-
--	fx =3D l_queue_find(frame_xchgs, frame_xchg_match, &wdev_id);
--
--	if (fx) {
--		/*
--		 * If a frame callback calls us assume it's the end of
--		 * that earlier frame exchange and the start of a new one.
--		 */
--		if (fx->in_frame_cb)
--			frame_xchg_reset(fx);
--		else {
--			l_error("Frame exchange in progress");
--			cb(-EBUSY, user_data);
--			return;
--		}
--	} else {
--		fx =3D l_new(struct frame_xchg_data, 1);
-+	fx =3D l_new(struct frame_xchg_data, 1);
- =
-
--		if (!frame_xchgs)
--			frame_xchgs =3D l_queue_new();
--
--		l_queue_push_tail(frame_xchgs, fx);
--	}
-+	if (!frame_xchgs)
-+		frame_xchgs =3D l_queue_new();
- =
-
- 	fx->wdev_id =3D wdev_id;
- 	fx->freq =3D freq;
-@@ -1177,24 +1158,35 @@ void frame_xchg_startv(uint64_t wdev_id, struct iov=
-ec *frame, uint32_t freq,
- 	}
- =
-
- 	fx->retry_cnt =3D 0;
--	frame_xchg_tx_retry(fx);
-+
-+	l_queue_push_tail(frame_xchgs, fx);
-+
-+	/*
-+	 * TODO: Assume any offchannel frames are a high priority (0). This may
-+	 * need to be re-examined in the future if other operations (e.g.
-+	 * wait on channel) are introduced.
-+	 */
-+	return wiphy_radio_work_insert(wiphy_find_by_wdev(wdev_id),
-+					&fx->work, 0, &work_ops);
-+}
-+
-+static bool frame_xchg_match_id(const void *a, const void *b)
-+{
-+	const struct frame_xchg_data *fx =3D a;
-+	const uint32_t *id =3D b;
-+
-+	return fx->work.id =3D=3D *id;
- }
- =
-
--void frame_xchg_stop(uint64_t wdev_id)
-+void frame_xchg_cancel(uint32_t id)
++static void anqp_frame_timeout(int error, void *user_data)
  {
- 	struct frame_xchg_data *fx =3D
--		l_queue_remove_if(frame_xchgs, frame_xchg_match, &wdev_id);
-+		l_queue_remove_if(frame_xchgs, frame_xchg_match_id, &id);
+ 	struct anqp_request *request =3D user_data;
++	enum anqp_result result =3D ANQP_TIMEOUT;
  =
 
- 	if (!fx)
- 		return;
- =
-
--	if (fx->in_frame_cb) {
--		fx->stale =3D true;
--		return;
--	}
--
--	frame_xchg_reset(fx);
--	l_free(fx);
-+	wiphy_radio_work_done(wiphy_find_by_wdev(fx->wdev_id), id);
- }
- =
-
- static void frame_xchg_mlme_notify(struct l_genl_msg *msg, void *user_data)
-@@ -1341,13 +1333,20 @@ error:
- 	return -EIO;
- }
- =
-
-+static void destroy_xchg_data(void *user_data)
-+{
-+	struct frame_xchg_data *fx =3D user_data;
-+
-+	frame_xchg_destroy(&fx->work);
-+}
-+
- static void frame_xchg_exit(void)
- {
- 	struct l_queue *groups =3D watch_groups;
- 	struct l_queue *xchgs =3D frame_xchgs;
- =
-
- 	frame_xchgs =3D NULL;
--	l_queue_destroy(xchgs, frame_xchg_destroy);
-+	l_queue_destroy(xchgs, destroy_xchg_data);
- =
-
- 	watch_groups =3D NULL;
- 	l_queue_destroy(groups, frame_watch_group_destroy);
-diff --git a/src/frame-xchg.h b/src/frame-xchg.h
-index 55a55f73..ba4dc61a 100644
---- a/src/frame-xchg.h
-+++ b/src/frame-xchg.h
-@@ -43,14 +43,14 @@ bool frame_watch_add(uint64_t wdev_id, uint32_t group, =
-uint16_t frame_type,
- bool frame_watch_group_remove(uint64_t wdev_id, uint32_t group);
- bool frame_watch_wdev_remove(uint64_t wdev_id);
- =
-
--void frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t freq,
-+uint32_t frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t =
-freq,
- 			unsigned int retry_interval, unsigned int resp_timeout,
- 			unsigned int retries_on_ack, uint32_t group_id,
- 			frame_xchg_cb_t cb, void *user_data,
- 			frame_xchg_destroy_func_t destroy, ...);
--void frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t fre=
-q,
-+uint32_t frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t=
- freq,
- 			unsigned int retry_interval, unsigned int resp_timeout,
- 			unsigned int retries_on_ack, uint32_t group_id,
- 			frame_xchg_cb_t cb, void *user_data,
- 			frame_xchg_destroy_func_t destroy, va_list resp_args);
--void frame_xchg_stop(uint64_t wdev_id);
-+void frame_xchg_cancel(uint32_t id);
-diff --git a/src/p2p.c b/src/p2p.c
-index 1c9cb081..b8c299a3 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -68,6 +68,7 @@ struct p2p_device {
- 	uint32_t start_stop_cmd_id;
- 	l_dbus_property_complete_cb_t pending_complete;
- 	struct l_dbus_message *pending_message;
-+	uint32_t xchg_id;
- =
-
- 	uint8_t listen_country[3];
- 	uint8_t listen_oper_class;
-@@ -383,7 +384,11 @@ static void p2p_connection_reset(struct p2p_device *de=
-v)
- 	netdev_watch_remove(dev->conn_netdev_watch_id);
- =
-
- 	frame_watch_group_remove(dev->wdev_id, FRAME_GROUP_CONNECT);
--	frame_xchg_stop(dev->wdev_id);
-+
-+	if (dev->xchg_id) {
-+		frame_xchg_cancel(dev->xchg_id);
-+		dev->xchg_id =3D 0;
+-	l_debug("GAS request timed out");
++	if (error < 0) {
++		result =3D ANQP_FAILED;
++		l_error("Sending ANQP request failed: %s (%i)",
++			strerror(-error), -error);
 +	}
  =
 
- 	if (!dev->enabled || (dev->enabled && dev->start_stop_cmd_id)) {
- 		/*
-@@ -458,9 +463,10 @@ static void p2p_peer_frame_xchg(struct p2p_peer *peer,=
- struct iovec *tx_body,
- 		peer->bss->frequency;
+ 	if (request->anqp_cb)
+-		request->anqp_cb(ANQP_TIMEOUT, NULL, 0,
+-					request->anqp_data);
++		request->anqp_cb(result, NULL, 0, request->anqp_data);
  =
 
- 	va_start(args, cb);
--	frame_xchg_startv(dev->wdev_id, frame, freq, retry_interval,
--				resp_timeout, retries_on_ack, group_id,
--				cb, dev, NULL, args);
-+
-+	dev->xchg_id =3D frame_xchg_startv(dev->wdev_id, frame, freq,
-+				retry_interval, resp_timeout, retries_on_ack,
-+				group_id, cb, dev, NULL, args);
- 	va_end(args);
+-	/* allows anqp_request to be re-entrant */
+ 	if (request->anqp_destroy)
+ 		request->anqp_destroy(request->anqp_data);
  =
 
- 	l_free(frame);
-@@ -1175,11 +1181,17 @@ static void p2p_go_negotiation_resp_done(int error,=
- void *user_data)
- 	else
- 		l_error("No GO Negotiation Confirmation frame received");
- =
-
-+	dev->xchg_id =3D 0;
-+
- 	p2p_connect_failed(dev);
+-	l_queue_remove(anqp_requests, request);
+-	l_free(request);
++	anqp_destroy(request);
  }
  =
 
- static void p2p_go_negotiation_resp_err_done(int error, void *user_data)
+-static bool match_cookie(const void *a, const void *b)
++static uint8_t *anqp_build_frame(const uint8_t *addr, struct scan_bss *bss,
++					const uint8_t *anqp, size_t len,
++					size_t *len_out)
  {
-+	struct p2p_device *dev =3D user_data;
-+
-+	dev->xchg_id =3D 0;
-+
- 	if (error)
- 		l_error("Sending the GO Negotiation Response failed: %s (%i)",
- 			strerror(-error), -error);
-@@ -1272,6 +1284,8 @@ static bool p2p_go_negotiation_confirm_cb(const struc=
-t mmpdu_header *mpdu,
+-	const struct anqp_request *request =3D a;
+-	const struct cookie_match {
+-		uint64_t cookie;
+-		uint32_t ifindex;
+-	} *match =3D b;
++	uint8_t *frame =3D l_malloc(len + 33);
++	uint8_t *ptr;
  =
 
+-	if (match->ifindex !=3D request->ifindex)
+-		return false;
++	memset(frame, 0, len + 33);
+ =
+
+-	if (match->cookie !=3D request->anqp_cookie)
+-		return false;
++	l_put_le16(0x00d0, frame + 0);
++	memcpy(frame + 4, bss->addr, 6);
++	memcpy(frame + 10, addr, 6);
++	memcpy(frame + 16, bss->addr, 6);
+ =
+
+-	return true;
+-}
++	ptr =3D frame + 24;
+ =
+
+-static void anqp_frame_wait_cancel_event(struct l_genl_msg *msg,
+-						uint32_t ifindex)
+-{
+-	uint64_t cookie;
+-	struct anqp_request *request;
+-	struct cookie_match {
+-		uint64_t cookie;
+-		uint32_t ifindex;
+-	} match;
++	*ptr++ =3D 0x04;			/* Category: Public */
++	*ptr++ =3D 0x0a;			/* Action: GAS initial Request */
++	*ptr++ =3D anqp_token++;		/* Dialog Token */
++	*ptr++ =3D IE_TYPE_ADVERTISEMENT_PROTOCOL;
++	*ptr++ =3D 2;
+ =
+
+-	l_debug("");
+-
+-	if (nl80211_parse_attrs(msg, NL80211_ATTR_COOKIE, &cookie,
+-					NL80211_ATTR_UNSPEC) < 0)
+-		return;
+-
+-	match.cookie =3D cookie;
+-	match.ifindex =3D ifindex;
++	*ptr++ =3D 0x7f;
++	*ptr++ =3D IE_ADVERTISEMENT_ANQP;
++	l_put_le16(len, ptr);
++	ptr +=3D 2;
+ =
+
+-	request =3D l_queue_find(anqp_requests, match_cookie, &match);
+-	if (!request)
+-		return;
++	memcpy(ptr, anqp, len);
++	ptr +=3D len;
+ =
+
+-	if (cookie !=3D request->anqp_cookie)
+-		return;
++	*len_out =3D ptr - frame;
+ =
+
+-	netdev_gas_timeout_cb(request);
++	return frame;
+ }
+ =
+
+-uint32_t anqp_request(uint32_t ifindex, const uint8_t *addr,
+-				struct scan_bss *bss, const uint8_t *anqp,
+-				size_t len, anqp_response_func_t cb,
+-				void *user_data, anqp_destroy_func_t destroy)
++uint32_t anqp_request(uint64_t wdev_id, const uint8_t *addr,
++			struct scan_bss *bss, const uint8_t *anqp,
++			size_t len, anqp_response_func_t cb,
++			void *user_data, anqp_destroy_func_t destroy)
+ {
+ 	struct anqp_request *request;
+-	uint8_t frame[512];
+-	struct l_genl_msg *msg;
+ 	struct iovec iov[2];
+-	uint32_t id;
+-	uint32_t duration =3D 300;
+-	struct netdev *netdev =3D netdev_find(ifindex);
+-
+-	if (!netdev)
+-		return 0;
+-
+-	/*
+-	 * TODO: Netdev dependencies will eventually be removed so we need
+-	 * another way to figure out wiphy capabilities.
+-	 */
+-	if (!wiphy_can_offchannel_tx(netdev_get_wiphy(netdev))) {
+-		l_error("ANQP failed, driver does not support offchannel TX");
+-		return 0;
+-	}
+-
+-	frame[0] =3D 0x04;		/* Category: Public */
+-	frame[1] =3D 0x0a;		/* Action: GAS initial Request */
+-	frame[2] =3D anqp_token;		/* Dialog Token */
+-	frame[3] =3D IE_TYPE_ADVERTISEMENT_PROTOCOL;
+-	frame[4] =3D 2;
+-	frame[5] =3D 0x7f;
+-	frame[6] =3D IE_ADVERTISEMENT_ANQP;
+-	l_put_le16(len, frame + 7);
+-
+-	iov[0].iov_base =3D frame;
+-	iov[0].iov_len =3D 9;
+-	iov[1].iov_base =3D (void *)anqp;
+-	iov[1].iov_len =3D len;
+ =
+
+ 	request =3D l_new(struct anqp_request, 1);
+ =
+
+-	request->ifindex =3D ifindex;
++	request->wdev_id =3D wdev_id;
++	request->frequency =3D bss->frequency;
+ 	request->anqp_cb =3D cb;
+ 	request->anqp_destroy =3D destroy;
+-	request->anqp_token =3D anqp_token++;
++	request->anqp_token =3D anqp_token;
+ 	request->anqp_data =3D user_data;
+ =
+
+-	msg =3D nl80211_build_cmd_frame(ifindex, addr, bss->addr,
+-					bss->frequency, iov, 2);
+-
+-	l_genl_msg_append_attr(msg, NL80211_ATTR_OFFCHANNEL_TX_OK, 0, "");
+-	l_genl_msg_append_attr(msg, NL80211_ATTR_DURATION, 4, &duration);
+-
+-	id =3D l_genl_family_send(nl80211, msg, netdev_gas_request_cb,
+-					request, NULL);
+-
+-	if (!id) {
+-		l_debug("Failed to send ANQP request");
+-		l_genl_msg_unref(msg);
+-		l_free(request);
+-		return 0;
+-	}
+-
+-	l_debug("ANQP request sent to "MAC, MAC_STR(bss->addr));
+-
+-	l_queue_push_head(anqp_requests, request);
+-
+-	return id;
+-}
+-
+-static void netdev_frame_cb(struct l_genl_msg *msg, void *user_data)
+-{
+-	if (l_genl_msg_get_error(msg) < 0)
+-		l_error("Could not register frame watch type %04x: %i",
+-			L_PTR_TO_UINT(user_data), l_genl_msg_get_error(msg));
+-}
+-
+-static void anqp_register_frame(uint32_t ifindex)
+-{
+-	struct l_genl_msg *msg;
+-	uint16_t frame_type =3D 0x00d0;
+-	uint8_t prefix[] =3D { 0x04, 0x0b };
+-
+-	msg =3D l_genl_msg_new_sized(NL80211_CMD_REGISTER_FRAME, 34);
+-
+-	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &ifindex);
+-	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_TYPE, 2, &frame_type);
+-	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_MATCH,
+-					sizeof(prefix), prefix);
+-
+-	l_genl_family_send(nl80211, msg, netdev_frame_cb,
+-			L_UINT_TO_PTR(frame_type), NULL);
+-}
+-
+-static void anqp_netdev_watch(struct netdev *netdev,
+-				enum netdev_watch_event event, void *user_data)
+-{
+-	switch (event) {
+-	case NETDEV_WATCH_EVENT_NEW:
+-		if (netdev_get_iftype(netdev) =3D=3D NETDEV_IFTYPE_STATION)
+-			anqp_register_frame(netdev_get_ifindex(netdev));
+-
+-		return;
+-	default:
+-		break;
+-	}
+-}
+-
+-static void anqp_unicast_notify(struct l_genl_msg *msg, void *user_data)
+-{
+-	const struct mmpdu_header *mpdu =3D NULL;
+-	const uint8_t *body;
+-	struct l_genl_attr attr;
+-	uint16_t type, len;
+-	uint16_t frame_len =3D 0;
+-	const void *data;
+-	uint8_t cmd;
+-	uint32_t ifindex =3D 0;
+-
+-	if (l_queue_isempty(anqp_requests))
+-		return;
+-
+-	cmd =3D l_genl_msg_get_command(msg);
+-	if (!cmd)
+-		return;
+-
+-	if (!l_genl_attr_init(&attr, msg))
+-		return;
+-
+-	while (l_genl_attr_next(&attr, &type, &len, &data)) {
+-		switch (type) {
+-		case NL80211_ATTR_IFINDEX:
+-			if (len !=3D sizeof(uint32_t)) {
+-				l_warn("Invalid interface index attribute");
+-				return;
+-			}
+-
+-			ifindex =3D *((uint32_t *) data);
+-
+-			break;
+-		case NL80211_ATTR_FRAME:
+-			if (mpdu)
+-				return;
+-
+-			mpdu =3D mpdu_validate(data, len);
+-			if (!mpdu)
+-				l_error("Frame didn't validate as MMPDU");
+-
+-			frame_len =3D len;
+-			break;
+-		}
+-	}
+-
+-	if (!ifindex || !mpdu)
+-		return;
+-
+-	body =3D mmpdu_body(mpdu);
+-
+-	anqp_response_frame_event(ifindex, mpdu, body,
+-				(const uint8_t *) mpdu + frame_len - body);
+-}
+-
+-static void anqp_mlme_notify(struct l_genl_msg *msg, void *user_data)
+-{
+-	struct l_genl_attr attr;
+-	uint16_t type, len;
+-	const void *data;
+-	uint8_t cmd;
+-	uint32_t ifindex =3D 0;
+-
+-	if (l_queue_isempty(anqp_requests))
+-		return;
+-
+-	cmd =3D l_genl_msg_get_command(msg);
+-
+-	l_debug("MLME notification %s(%u)", nl80211cmd_to_string(cmd), cmd);
+-
+-	if (!l_genl_attr_init(&attr, msg))
+-		return;
+-
+-	while (l_genl_attr_next(&attr, &type, &len, &data)) {
+-		switch (type) {
+-		case NL80211_ATTR_IFINDEX:
+-			if (len !=3D sizeof(uint32_t)) {
+-				l_warn("Invalid interface index attribute");
+-				return;
+-			}
+-
+-			ifindex =3D *((uint32_t *) data);
+-			break;
+-		}
+-	}
++	request->frame =3D anqp_build_frame(addr, bss, anqp, len,
++						&request->frame_len);
+ =
+
+-	if (!ifindex) {
+-		l_warn("MLME notification is missing ifindex attribute");
+-		return;
+-	}
+-
+-	switch (cmd) {
+-	case NL80211_CMD_FRAME_WAIT_CANCEL:
+-		anqp_frame_wait_cancel_event(msg, ifindex);
+-		break;
+-	}
+-}
+-
+-static int anqp_init(void)
+-{
+-	struct l_genl *genl =3D iwd_get_genl();
+-
+-	nl80211 =3D l_genl_family_new(genl, NL80211_GENL_NAME);
+-
+-	anqp_requests =3D l_queue_new();
++	iov[0].iov_base =3D request->frame;
++	iov[0].iov_len =3D request->frame_len;
++	iov[1].iov_base =3D NULL;
+ =
+
+-	netdev_watch =3D  netdev_watch_add(anqp_netdev_watch, NULL, NULL);
++	l_debug("Sending ANQP request");
+ =
+
+-	unicast_watch =3D l_genl_add_unicast_watch(genl, NL80211_GENL_NAME,
+-						anqp_unicast_notify,
+-						NULL, NULL);
++	request->id =3D frame_xchg_start(request->wdev_id, iov,
++				request->frequency, 0, 300, 0,
++				ANQP_GROUP, anqp_frame_timeout, request, NULL,
++				&anqp_frame_prefix, anqp_response_frame_event,
++				NULL);
+ =
+
+-	if (!l_genl_family_register(nl80211, "mlme", anqp_mlme_notify,
+-								NULL, NULL))
+-		l_error("Registering for MLME notification failed");
+-
+-	return 0;
++	return true;
+ }
+ =
+
+-static void anqp_exit(void)
++void anqp_cancel(uint32_t id)
+ {
+-	struct l_genl *genl =3D iwd_get_genl();
+-
+-	l_genl_family_free(nl80211);
+-	nl80211 =3D NULL;
+-
+-	l_queue_destroy(anqp_requests, anqp_destroy);
+-
+-	netdev_watch_remove(netdev_watch);
+-
+-	l_genl_remove_unicast_watch(genl, unicast_watch);
++	frame_xchg_cancel(id);
+ }
+-
+-IWD_MODULE(anqp, anqp_init, anqp_exit);
+-IWD_MODULE_DEPENDS(anqp, netdev);
+diff --git a/src/anqp.h b/src/anqp.h
+index 998277dd..4d96c9ec 100644
+--- a/src/anqp.h
++++ b/src/anqp.h
+@@ -34,7 +34,8 @@ typedef void (*anqp_response_func_t)(enum anqp_result res=
+ult,
+ 					const void *anqp, size_t len,
+ 					void *user_data);
+ =
+
+-uint32_t anqp_request(uint32_t ifindex, const uint8_t *addr,
++uint32_t anqp_request(uint64_t wdev_id, const uint8_t *addr,
+ 			struct scan_bss *bss, const uint8_t *anqp, size_t len,
+ 			anqp_response_func_t cb, void *user_data,
+ 			anqp_destroy_func_t destroy);
++void anqp_cancel(uint32_t id);
+diff --git a/src/station.c b/src/station.c
+index 80b6f07e..b23fd1a0 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -446,6 +446,9 @@ static void remove_anqp(void *data)
+ {
+ 	struct anqp_entry *entry =3D data;
+ =
+
++	if (entry->pending)
++		anqp_cancel(entry->pending);
++
+ 	l_free(entry);
+ }
+ =
+
+@@ -475,12 +478,9 @@ static void station_anqp_response_cb(enum anqp_result =
+result,
+ 	char **realms =3D NULL;
+ 	struct nai_search search;
+ =
+
+-	entry->pending =3D 0;
+-
  	l_debug("");
  =
 
-+	dev->xchg_id =3D 0;
-+
- 	if (body_len < 8) {
- 		l_error("GO Negotiation Confirmation frame too short");
- 		p2p_connect_failed(dev);
+-	if (result =3D=3D ANQP_TIMEOUT) {
+-		l_queue_remove(station->anqp_pending, entry);
++	if (result !=3D ANQP_SUCCESS) {
+ 		/* TODO: try next BSS */
+ 		goto request_done;
+ 	}
+@@ -582,11 +582,10 @@ static bool station_start_anqp(struct station *statio=
+n, struct network *network,
+ 	 * these are checked in hs20_find_settings_file.
+ 	 */
+ =
+
+-	entry->pending =3D anqp_request(netdev_get_ifindex(station->netdev),
+-					netdev_get_address(station->netdev),
+-					bss, anqp, ptr - anqp,
+-					station_anqp_response_cb,
+-					entry, l_free);
++	entry->pending =3D anqp_request(netdev_get_wdev_id(station->netdev),
++				netdev_get_address(station->netdev), bss, anqp,
++				ptr - anqp, station_anqp_response_cb,
++				entry, NULL);
+ 	if (!entry->pending) {
+ 		l_free(entry);
+ 		return false;
+@@ -3215,7 +3214,7 @@ static void station_free(struct station *station)
+ =
+
+ 	watchlist_destroy(&station->state_watches);
+ =
+
+-	l_queue_destroy(station->anqp_pending, l_free);
++	l_queue_destroy(station->anqp_pending, remove_anqp);
+ =
+
+ 	l_free(station);
+ }
 -- =
 
 2.21.1
 
---===============6048825851412914541==--
+--===============0514026480395868874==--
 
