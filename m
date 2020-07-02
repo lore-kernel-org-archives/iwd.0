@@ -1,193 +1,282 @@
-Content-Type: multipart/mixed; boundary="===============4464444465110604746=="
+Content-Type: multipart/mixed; boundary="===============8865609373583255563=="
 MIME-Version: 1.0
-From: KeithG <ys3al35l@gmail.com>
-Subject: Re: iwd core dump
-Date: Fri, 26 Jun 2020 12:02:51 -0500
-Message-ID: <CAG17S_NpWQ4nTnsj_6S1Ug5xttjgKHX47uqzKH1W4xvoxn_1SA@mail.gmail.com>
-In-Reply-To: <8b6e62da-c44c-ed0e-a200-e70e494017c4@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/8] wiphy: introduce new radio management APIs
+Date: Thu, 02 Jul 2020 10:35:26 -0700
+Message-ID: <20200702173533.8712-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4464444465110604746==
+--===============8865609373583255563==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Denis,
+These APIs will handle fairness and order in any operations which
+radios can only do sequentially (offchannel, scanning, connection etc.).
 
-I just loaded iwd 1.8. Will debug if it starts happening again.
+Both scan and frame-xchg are complex modules (especially scanning)
+which is why the radio management APIs were implemented generic enough
+where the changes to both modules will be minimal. Any module that
+requires this kind of work can push a work item into the radio
+management work queue (wiphy_radio_work_insert) and when the work
+is ready to be started radio management will call back into the module.
+Once the work is completed (and this may be some time later e.g. in
+scan results or a frame watch) the module can signal back that the
+work is finished (wiphy_radio_work_done). Wiphy will then pop the
+queue and continue with the next work item.
 
-Thanks,
+A concept of priority was added in order to allow important offchannel
+operations (e.g. ANQP) to take priority over other work items. The
+priority is an integer, where lower values are of a higher priority.
+The concept of priority cleanly solves a lot of the complexity that
+was added in order to support ANQP queries (suspending scanning and
+waiting for ANQP to finish before connecting).
 
-Keith
+Instead ANQP queries can be queued at a higher priority than scanning
+which removes the need for suspending scans. In addition we can treat
+connections as radio management work and insert them at a lower
+priority than ANQP, but higher than scanning. This forces the
+connection to wait for ANQP without having to track any state.
+---
+ src/wiphy.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/wiphy.h |  24 ++++++++++
+ 2 files changed, 148 insertions(+)
 
-On Fri, Jun 26, 2020 at 10:34 AM Denis Kenzior <denkenz@gmail.com> wrote:
+v3:
+ - Moved functionality into wiphy, since the work queues are directly
+   tied to each wiphy object anyways.
+ - Added in_cb/stale members for more flexibility in signaling a work
+   item done. Now either the callback return can be used to signal done
+   or wiphy_radio_work_done can be used while still in the work callback.
+   This allows for easier integration to existing modules where it may
+   not be easy to return the status of the work item without major
+   refactoring.
 
-> Hi Keith,
->
-> On 6/25/20 5:34 PM, KeithG wrote:
-> > This is on an Rpi B3+ runint aarch64. I have noticed that, periodically
-> I get
-> > disconnected and it doe snot reconnect. I am using connman to manage the
-> iwd
-> > connection. This is the first time I have seen the crash in the log. It
-> has been
-> > crashing and not recovering.
-> >
-> > It gets a Deauth event (I've seen this quite a bit) and usually, it will
-> not
-> > reconnect until I reboot it and my router. How can I best diagnose this?
-> >
-> > It is iwd 1.7 and connman 1.38. potentially useful excerpts from my
-> journal:
-> >
-> > Jun 17 23:26:58 rune64 kernel: Booting Linux on physical CPU
-> 0x0000000000
-> > [0x410fd034]
-> > Jun 17 23:26:58 rune64 kernel: Linux version 5.4.44-1-ARCH
-> (alarm(a)buildrune64)
-> > (gcc version 9.3.0 (GCC)) #1 SMP PREEMPT Mon Jun 22 15:13:50 CDT 2020
-> > Jun 17 23:26:58 rune64 kernel: Machine model: Raspberry Pi 3 Model B
-> Plus Rev 1.3
-> > ...
-> > Jun 17 23:26:58 rune64 kernel: raspberrypi-firmware soc:firmware:
-> Attached to
-> > firmware from 2020-06-10 17:52, variant start_cd
-> > Jun 17 23:26:58 rune64 kernel: raspberrypi-firmware soc:firmware:
-> Firmware hash
-> > is e46bba1638cca2708b31b9daf4636770ef981735
-> > ...
-> > Jun 17 23:26:59 rune64 kernel: brcmfmac: F1 signature read
-> @0x18000000=3D0x15264345
-> > Jun 17 23:26:59 rune64 kernel: brcmfmac: brcmf_fw_alloc_request: using
-> > brcm/brcmfmac43455-sdio for chip BCM4345/6
-> > Jun 17 23:26:59 rune64 kernel: usbcore: registered new interface driver
-> brcmfmac
-> > ...
-> > Jun 17 23:27:00 rune64 kernel: brcmfmac: brcmf_fw_alloc_request: using
-> > brcm/brcmfmac43455-sdio for chip BCM4345/6
-> > Jun 17 23:27:00 rune64 kernel: brcmfmac: brcmf_c_preinit_dcmds:
-> Firmware:
-> > BCM4345/6 wl0: Feb 27 2018 03:15:32 version 7.45.154 (r684107 CY) FWID
-> 01-4fbe0b04
-> > ...
-> > Jun 24 22:28:10 rune64 iwd[261]: Wireless daemon version 1.7
-> > Jun 24 22:28:10 rune64 iwd[261]: Loaded configuration from
-> /etc/iwd/main.conf
-> > Jun 24 22:28:10 rune64 systemd[1]: Started Wireless service.
-> > Jun 24 22:28:10 rune64 iwd[261]: netconfig: Network configuration is
-> disabled.
-> > Jun 24 22:28:10 rune64 iwd[261]: Wiphy: 0, Name: phy0
-> > Jun 24 22:28:10 rune64 iwd[261]:         Permanent Address:
-> b8:27:eb:52:cc:d0
-> > Jun 24 22:28:10 rune64 iwd[261]:         Bands: 2.4 GHz 5 GHz
-> > Jun 24 22:28:10 rune64 iwd[261]:         Ciphers: CCMP TKIP BIP
-> > Jun 24 22:28:10 rune64 iwd[261]:         Supported iftypes: ad-hoc
-> station ap
-> > p2p-client p2p-go p2p-device
-> > Jun 24 22:28:10 rune64 iwd[261]: Wiphy phy0 will only use the default
-> interface
-> > Jun 24 22:28:11 rune64 iwd[261]: hardware_rekey not supported
-> > Jun 25 13:40:14 rune64 iwd[261]: Received Deauthentication event,
-> reason: 2,
-> > from_ap: false
->
-> Hmm, this implies the firmware tried to roam.  Does your network have
-> multiple
-> APs in the same SSID?
->
-> Can you run iwmon and get a trace of this happening?  See
-> https://iwd.wiki.kernel.org/debugging for details.
->
-> > Jun 25 13:40:14 rune64 iwd[261]: Received error during CMD_TRIGGER_SCAN:
-> > Resource temporarily unavailable (11)
->
-> Hmm, I suspect we fixed this particular crash in iwd 1.8.  Can you try
-> that?
->
-> Regards,
-> -Denis
->
+diff --git a/src/wiphy.c b/src/wiphy.c
+index aef39549..2b95c23e 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -62,6 +62,7 @@ static char **whitelist_filter;
+ static char **blacklist_filter;
+ static int mac_randomize_bytes =3D 6;
+ static char regdom_country[2];
++static uint32_t work_ids;
+ =
 
---===============4464444465110604746==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.htm"
+ struct wiphy {
+ 	uint32_t id;
+@@ -85,6 +86,8 @@ struct wiphy {
+ 	uint8_t rm_enabled_capabilities[7]; /* 5 size max + header */
+ 	struct l_genl_family *nl80211;
+ 	char regdom_country[2];
++	/* Work queue for this radio */
++	struct l_queue *work;
+ =
 
-PGRpdiBkaXI9Imx0ciI+PGRpdj5EZW5pcyw8L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PkkganVz
-dCBsb2FkZWQgaXdkIDEuOC4gV2lsbCBkZWJ1ZyBpZiBpdCBzdGFydHMgaGFwcGVuaW5nIGFnYWlu
-LiA8YnI+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5UaGFua3MsPC9kaXY+PGRpdj48YnI+PC9k
-aXY+PGRpdj5LZWl0aDxicj48L2Rpdj48L2Rpdj48YnI+PGRpdiBjbGFzcz0iZ21haWxfcXVvdGUi
-PjxkaXYgZGlyPSJsdHIiIGNsYXNzPSJnbWFpbF9hdHRyIj5PbiBGcmksIEp1biAyNiwgMjAyMCBh
-dCAxMDozNCBBTSBEZW5pcyBLZW56aW9yICZsdDs8YSBocmVmPSJtYWlsdG86ZGVua2VuekBnbWFp
-bC5jb20iPmRlbmtlbnpAZ21haWwuY29tPC9hPiZndDsgd3JvdGU6PGJyPjwvZGl2PjxibG9ja3F1
-b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjowcHggMHB4IDBweCAwLjhleDti
-b3JkZXItbGVmdDoxcHggc29saWQgcmdiKDIwNCwyMDQsMjA0KTtwYWRkaW5nLWxlZnQ6MWV4Ij5I
-aSBLZWl0aCw8YnI+Cjxicj4KT24gNi8yNS8yMCA1OjM0IFBNLCBLZWl0aEcgd3JvdGU6PGJyPgom
-Z3Q7IFRoaXMgaXMgb24gYW4gUnBpIEIzKyBydW5pbnQgYWFyY2g2NC4gSSBoYXZlIG5vdGljZWQg
-dGhhdCwgcGVyaW9kaWNhbGx5IEkgZ2V0IDxicj4KJmd0OyBkaXNjb25uZWN0ZWQgYW5kIGl0IGRv
-ZSBzbm90IHJlY29ubmVjdC4gSSBhbSB1c2luZyBjb25ubWFuIHRvIG1hbmFnZSB0aGUgaXdkIDxi
-cj4KJmd0OyBjb25uZWN0aW9uLiBUaGlzIGlzIHRoZSBmaXJzdCB0aW1lIEkgaGF2ZSBzZWVuIHRo
-ZSBjcmFzaCBpbiB0aGUgbG9nLiBJdCBoYXMgYmVlbiA8YnI+CiZndDsgY3Jhc2hpbmcgYW5kIG5v
-dCByZWNvdmVyaW5nLjxicj4KJmd0OyA8YnI+CiZndDsgSXQgZ2V0cyBhIERlYXV0aCBldmVudCAo
-SSYjMzk7dmUgc2VlbiB0aGlzIHF1aXRlIGEgYml0KSBhbmQgdXN1YWxseSwgaXQgd2lsbCBub3Qg
-PGJyPgomZ3Q7IHJlY29ubmVjdCB1bnRpbCBJIHJlYm9vdCBpdCBhbmQgbXkgcm91dGVyLiBIb3cg
-Y2FuIEkgYmVzdCBkaWFnbm9zZSB0aGlzPzxicj4KJmd0OyA8YnI+CiZndDsgSXQgaXMgaXdkIDEu
-NyBhbmQgY29ubm1hbiAxLjM4LiBwb3RlbnRpYWxseSB1c2VmdWwgZXhjZXJwdHMgZnJvbSBteSBq
-b3VybmFsOjxicj4KJmd0OyA8YnI+CiZndDsgSnVuIDE3IDIzOjI2OjU4IHJ1bmU2NCBrZXJuZWw6
-IEJvb3RpbmcgTGludXggb24gcGh5c2ljYWwgQ1BVIDB4MDAwMDAwMDAwMCA8YnI+CiZndDsgWzB4
-NDEwZmQwMzRdPGJyPgomZ3Q7IEp1biAxNyAyMzoyNjo1OCBydW5lNjQga2VybmVsOiBMaW51eCB2
-ZXJzaW9uIDUuNC40NC0xLUFSQ0ggKGFsYXJtQGJ1aWxkcnVuZTY0KSA8YnI+CiZndDsgKGdjYyB2
-ZXJzaW9uIDkuMy4wIChHQ0MpKSAjMSBTTVAgUFJFRU1QVCBNb24gSnVuIDIyIDE1OjEzOjUwIENE
-VCAyMDIwPGJyPgomZ3Q7IEp1biAxNyAyMzoyNjo1OCBydW5lNjQga2VybmVsOiBNYWNoaW5lIG1v
-ZGVsOiBSYXNwYmVycnkgUGkgMyBNb2RlbCBCIFBsdXMgUmV2IDEuMzxicj4KJmd0OyAuLi48YnI+
-CiZndDsgSnVuIDE3IDIzOjI2OjU4IHJ1bmU2NCBrZXJuZWw6IHJhc3BiZXJyeXBpLWZpcm13YXJl
-IHNvYzpmaXJtd2FyZTogQXR0YWNoZWQgdG8gPGJyPgomZ3Q7IGZpcm13YXJlIGZyb20gMjAyMC0w
-Ni0xMCAxNzo1MiwgdmFyaWFudCBzdGFydF9jZDxicj4KJmd0OyBKdW4gMTcgMjM6MjY6NTggcnVu
-ZTY0IGtlcm5lbDogcmFzcGJlcnJ5cGktZmlybXdhcmUgc29jOmZpcm13YXJlOiBGaXJtd2FyZSBo
-YXNoIDxicj4KJmd0OyBpcyBlNDZiYmExNjM4Y2NhMjcwOGIzMWI5ZGFmNDYzNjc3MGVmOTgxNzM1
-PGJyPgomZ3Q7IC4uLjxicj4KJmd0OyBKdW4gMTcgMjM6MjY6NTkgcnVuZTY0IGtlcm5lbDogYnJj
-bWZtYWM6IEYxIHNpZ25hdHVyZSByZWFkIEAweDE4MDAwMDAwPTB4MTUyNjQzNDU8YnI+CiZndDsg
-SnVuIDE3IDIzOjI2OjU5IHJ1bmU2NCBrZXJuZWw6IGJyY21mbWFjOiBicmNtZl9md19hbGxvY19y
-ZXF1ZXN0OiB1c2luZyA8YnI+CiZndDsgYnJjbS9icmNtZm1hYzQzNDU1LXNkaW8gZm9yIGNoaXAg
-QkNNNDM0NS82PGJyPgomZ3Q7IEp1biAxNyAyMzoyNjo1OSBydW5lNjQga2VybmVsOiB1c2Jjb3Jl
-OiByZWdpc3RlcmVkIG5ldyBpbnRlcmZhY2UgZHJpdmVyIGJyY21mbWFjPGJyPgomZ3Q7IC4uLjxi
-cj4KJmd0OyBKdW4gMTcgMjM6Mjc6MDAgcnVuZTY0IGtlcm5lbDogYnJjbWZtYWM6IGJyY21mX2Z3
-X2FsbG9jX3JlcXVlc3Q6IHVzaW5nIDxicj4KJmd0OyBicmNtL2JyY21mbWFjNDM0NTUtc2RpbyBm
-b3IgY2hpcCBCQ000MzQ1LzY8YnI+CiZndDsgSnVuIDE3IDIzOjI3OjAwIHJ1bmU2NCBrZXJuZWw6
-IGJyY21mbWFjOiBicmNtZl9jX3ByZWluaXRfZGNtZHM6IEZpcm13YXJlOiA8YnI+CiZndDsgQkNN
-NDM0NS82IHdsMDogRmViIDI3IDIwMTggMDM6MTU6MzIgdmVyc2lvbiA3LjQ1LjE1NCAocjY4NDEw
-NyBDWSkgRldJRCAwMS00ZmJlMGIwNDxicj4KJmd0OyAuLi48YnI+CiZndDsgSnVuIDI0IDIyOjI4
-OjEwIHJ1bmU2NCBpd2RbMjYxXTogV2lyZWxlc3MgZGFlbW9uIHZlcnNpb24gMS43PGJyPgomZ3Q7
-IEp1biAyNCAyMjoyODoxMCBydW5lNjQgaXdkWzI2MV06IExvYWRlZCBjb25maWd1cmF0aW9uIGZy
-b20gL2V0Yy9pd2QvbWFpbi5jb25mPGJyPgomZ3Q7IEp1biAyNCAyMjoyODoxMCBydW5lNjQgc3lz
-dGVtZFsxXTogU3RhcnRlZCBXaXJlbGVzcyBzZXJ2aWNlLjxicj4KJmd0OyBKdW4gMjQgMjI6Mjg6
-MTAgcnVuZTY0IGl3ZFsyNjFdOiBuZXRjb25maWc6IE5ldHdvcmsgY29uZmlndXJhdGlvbiBpcyBk
-aXNhYmxlZC48YnI+CiZndDsgSnVuIDI0IDIyOjI4OjEwIHJ1bmU2NCBpd2RbMjYxXTogV2lwaHk6
-IDAsIE5hbWU6IHBoeTA8YnI+CiZndDsgSnVuIDI0IDIyOjI4OjEwIHJ1bmU2NCBpd2RbMjYxXTog
-wqAgwqAgwqAgwqAgUGVybWFuZW50IEFkZHJlc3M6IGI4OjI3OmViOjUyOmNjOmQwPGJyPgomZ3Q7
-IEp1biAyNCAyMjoyODoxMCBydW5lNjQgaXdkWzI2MV06IMKgIMKgIMKgIMKgIEJhbmRzOiAyLjQg
-R0h6IDUgR0h6PGJyPgomZ3Q7IEp1biAyNCAyMjoyODoxMCBydW5lNjQgaXdkWzI2MV06IMKgIMKg
-IMKgIMKgIENpcGhlcnM6IENDTVAgVEtJUCBCSVA8YnI+CiZndDsgSnVuIDI0IDIyOjI4OjEwIHJ1
-bmU2NCBpd2RbMjYxXTogwqAgwqAgwqAgwqAgU3VwcG9ydGVkIGlmdHlwZXM6IGFkLWhvYyBzdGF0
-aW9uIGFwIDxicj4KJmd0OyBwMnAtY2xpZW50IHAycC1nbyBwMnAtZGV2aWNlPGJyPgomZ3Q7IEp1
-biAyNCAyMjoyODoxMCBydW5lNjQgaXdkWzI2MV06IFdpcGh5IHBoeTAgd2lsbCBvbmx5IHVzZSB0
-aGUgZGVmYXVsdCBpbnRlcmZhY2U8YnI+CiZndDsgSnVuIDI0IDIyOjI4OjExIHJ1bmU2NCBpd2Rb
-MjYxXTogaGFyZHdhcmVfcmVrZXkgbm90IHN1cHBvcnRlZDxicj4KJmd0OyBKdW4gMjUgMTM6NDA6
-MTQgcnVuZTY0IGl3ZFsyNjFdOiBSZWNlaXZlZCBEZWF1dGhlbnRpY2F0aW9uIGV2ZW50LCByZWFz
-b246IDIsIDxicj4KJmd0OyBmcm9tX2FwOiBmYWxzZTxicj4KPGJyPgpIbW0sIHRoaXMgaW1wbGll
-cyB0aGUgZmlybXdhcmUgdHJpZWQgdG8gcm9hbS7CoCBEb2VzIHlvdXIgbmV0d29yayBoYXZlIG11
-bHRpcGxlIDxicj4KQVBzIGluIHRoZSBzYW1lIFNTSUQ/PGJyPgo8YnI+CkNhbiB5b3UgcnVuIGl3
-bW9uIGFuZCBnZXQgYSB0cmFjZSBvZiB0aGlzIGhhcHBlbmluZz/CoCBTZWUgPGJyPgo8YSBocmVm
-PSJodHRwczovL2l3ZC53aWtpLmtlcm5lbC5vcmcvZGVidWdnaW5nIiByZWw9Im5vcmVmZXJyZXIi
-IHRhcmdldD0iX2JsYW5rIj5odHRwczovL2l3ZC53aWtpLmtlcm5lbC5vcmcvZGVidWdnaW5nPC9h
-PiBmb3IgZGV0YWlscy48YnI+Cjxicj4KJmd0OyBKdW4gMjUgMTM6NDA6MTQgcnVuZTY0IGl3ZFsy
-NjFdOiBSZWNlaXZlZCBlcnJvciBkdXJpbmcgQ01EX1RSSUdHRVJfU0NBTjogPGJyPgomZ3Q7IFJl
-c291cmNlIHRlbXBvcmFyaWx5IHVuYXZhaWxhYmxlICgxMSk8YnI+Cjxicj4KSG1tLCBJIHN1c3Bl
-Y3Qgd2UgZml4ZWQgdGhpcyBwYXJ0aWN1bGFyIGNyYXNoIGluIGl3ZCAxLjguwqAgQ2FuIHlvdSB0
-cnkgdGhhdD88YnI+Cjxicj4KUmVnYXJkcyw8YnI+Ci1EZW5pczxicj4KPC9ibG9ja3F1b3RlPjwv
-ZGl2Pgo=
+ 	bool support_scheduled_scan:1;
+ 	bool support_rekey_offload:1;
+@@ -216,6 +219,14 @@ static struct wiphy *wiphy_new(uint32_t id)
+ 	return wiphy;
+ }
+ =
 
---===============4464444465110604746==--
++static void destroy_work(void *user_data)
++{
++	struct wiphy_radio_work_item *work =3D user_data;
++
++	if (work->ops && work->ops->destroy)
++		work->ops->destroy(work);
++}
++
+ static void wiphy_free(void *data)
+ {
+ 	struct wiphy *wiphy =3D data;
+@@ -235,6 +246,7 @@ static void wiphy_free(void *data)
+ 	l_free(wiphy->vendor_str);
+ 	l_free(wiphy->driver_str);
+ 	l_genl_family_free(wiphy->nl80211);
++	l_queue_destroy(wiphy->work, destroy_work);
+ 	l_free(wiphy);
+ }
+ =
+
+@@ -1072,6 +1084,8 @@ struct wiphy *wiphy_create(uint32_t wiphy_id, const c=
+har *name)
+ 	if (!wiphy_is_managed(name))
+ 		wiphy->blacklisted =3D true;
+ =
+
++	wiphy->work =3D l_queue_new();
++
+ 	return wiphy;
+ }
+ =
+
+@@ -1449,6 +1463,116 @@ static void wiphy_reg_notify(struct l_genl_msg *msg=
+, void *user_data)
+ 	}
+ }
+ =
+
++static void radio_mgmt_work_next(struct wiphy *wiphy)
++{
++	struct wiphy_radio_work_item *work;
++	bool done;
++
++	work =3D l_queue_peek_head(wiphy->work);
++	if (!work)
++		return;
++
++	work->in_cb =3D true;
++
++	done =3D work->ops->do_work(work);
++
++	work->in_cb =3D false;
++
++	if (done || work->stale) {
++		l_queue_remove(wiphy->work, work);
++
++		destroy_work(work);
++
++		radio_mgmt_work_next(wiphy);
++	}
++}
++
++static int insert_by_priority(const void *a, const void *b, void *user_dat=
+a)
++{
++	const struct wiphy_radio_work_item *new =3D a;
++	const struct wiphy_radio_work_item *work =3D b;
++	uint8_t *count =3D user_data;
++
++	/* This ensures we are not pushing before head, or any priority items */
++	if (*count =3D=3D 0 || work->priority <=3D new->priority) {
++		l_put_u8(*count + 1, count);
++		return 1;
++	}
++
++	l_debug("Inserting priority work item at index %u", *count);
++
++	return -1;
++}
++
++uint32_t wiphy_radio_work_insert(struct wiphy *wiphy,
++				struct wiphy_radio_work_item *item,
++				int priority,
++				const struct wiphy_radio_work_item_ops *ops)
++{
++	uint8_t count =3D 0;
++
++	item->priority =3D priority;
++	item->ops =3D ops;
++	item->id =3D ++work_ids;
++
++	/*
++	 * The head of the queue will always contain the current work item, so
++	 * we pass a count in to ensure we always insert after the head.
++	 */
++	l_queue_insert(wiphy->work, item, insert_by_priority, &count);
++
++	if (l_queue_length(wiphy->work) =3D=3D 1)
++		radio_mgmt_work_next(wiphy);
++
++	return item->id;
++}
++
++static bool match_id(const void *a, const void *b)
++{
++	const struct wiphy_radio_work_item *item =3D a;
++
++	if (item->id =3D=3D L_PTR_TO_UINT(b))
++		return true;
++
++	return false;
++}
++
++void wiphy_radio_work_done(struct wiphy *wiphy, uint32_t id)
++{
++	struct wiphy_radio_work_item *item;
++	bool next =3D false;
++
++	item =3D l_queue_find(wiphy->work, match_id, L_UINT_TO_PTR(id));
++	if (!item)
++		return;
++
++	/*
++	 * This was the current work item. If we are in the callback mark the
++	 * item as stale and it will get cleaned up after the callback returns,
++	 * as well as the next work item started.
++	 */
++	if (item->in_cb) {
++		item->stale =3D true;
++		return;
++	}
++
++	/*
++	 * Otherwise we are being called asynchronously and the next work item
++	 * can be started if this one was the current.
++	 */
++	if (item =3D=3D l_queue_peek_head(wiphy->work))
++		next =3D true;
++
++	l_queue_remove(wiphy->work, item);
++
++	item->id =3D 0;
++
++	destroy_work(item);
++
++	if (next)
++		radio_mgmt_work_next(wiphy);
++}
++
+ static int wiphy_init(void)
+ {
+ 	struct l_genl *genl =3D iwd_get_genl();
+diff --git a/src/wiphy.h b/src/wiphy.h
+index ed435517..2a597878 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -26,6 +26,24 @@
+ struct wiphy;
+ struct scan_bss;
+ struct scan_freq_set;
++struct wiphy_radio_work_item;
++
++typedef bool (*wiphy_radio_work_func_t)(struct wiphy_radio_work_item *item=
+);
++typedef void (*wiphy_radio_work_destroy_func_t)(
++					struct wiphy_radio_work_item *item);
++
++struct wiphy_radio_work_item_ops {
++	wiphy_radio_work_func_t do_work;
++	wiphy_radio_work_destroy_func_t destroy;
++};
++
++struct wiphy_radio_work_item {
++	uint32_t id;
++	int priority;
++	const struct wiphy_radio_work_item_ops *ops;
++	bool in_cb : 1;
++	bool stale : 1;
++};
+ =
+
+ enum wiphy_state_watch_event {
+ 	WIPHY_STATE_WATCH_EVENT_POWERED,
+@@ -90,3 +108,9 @@ uint32_t wiphy_state_watch_add(struct wiphy *wiphy,
+ 				wiphy_state_watch_func_t func, void *user_data,
+ 				wiphy_destroy_func_t destroy);
+ bool wiphy_state_watch_remove(struct wiphy *wiphy, uint32_t id);
++
++uint32_t wiphy_radio_work_insert(struct wiphy *wiphy,
++				struct wiphy_radio_work_item *item,
++				int priority,
++				const struct wiphy_radio_work_item_ops *ops);
++void wiphy_radio_work_done(struct wiphy *wiphy, uint32_t id);
+-- =
+
+2.21.1
+
+--===============8865609373583255563==--
 
