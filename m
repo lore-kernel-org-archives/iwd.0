@@ -1,274 +1,469 @@
-Content-Type: multipart/mixed; boundary="===============7181103128197331856=="
+Content-Type: multipart/mixed; boundary="===============7259441136219043080=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/6] wiphy: introduce new radio management APIs
-Date: Wed, 08 Jul 2020 10:47:34 -0700
-Message-ID: <20200708174739.14188-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/6] frame-xchg: refactor to use wiphy work queue
+Date: Wed, 08 Jul 2020 10:47:35 -0700
+Message-ID: <20200708174739.14188-2-prestwoj@gmail.com>
+In-Reply-To: <20200708174739.14188-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7181103128197331856==
+--===============7259441136219043080==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-These APIs will handle fairness and order in any operations which
-radios can only do sequentially (offchannel, scanning, connection etc.).
+In order to first integrate frame-xchg some refactoring needed to
+be done. First it is useful to allow queueing frames up rather than
+requiring the module (p2p, anqp etc) to wait for the last frame to
+finish. This can be aided by radio management but frame-xchg needed
+some refactoring as well.
 
-Both scan and frame-xchg are complex modules (especially scanning)
-which is why the radio management APIs were implemented generic enough
-where the changes to both modules will be minimal. Any module that
-requires this kind of work can push a work item into the radio
-management work queue (wiphy_radio_work_insert) and when the work
-is ready to be started radio management will call back into the module.
-Once the work is completed (and this may be some time later e.g. in
-scan results or a frame watch) the module can signal back that the
-work is finished (wiphy_radio_work_done). Wiphy will then pop the
-queue and continue with the next work item.
+First was getting rid of this fx pointer re-use. It looks like this
+was done to save a bit of memory but things get pretty complex
+needed to check if the pointer is stale or has been reset. Instead
+of this we now just allocate a new pointer each frame-xchg. This
+allows for the module to queue multiple requests as well as removes
+the complexity of needed to check if the fx pointer is stale.
 
-A concept of priority was added in order to allow important offchannel
-operations (e.g. ANQP) to take priority over other work items. The
-priority is an integer, where lower values are of a higher priority.
-The concept of priority cleanly solves a lot of the complexity that
-was added in order to support ANQP queries (suspending scanning and
-waiting for ANQP to finish before connecting).
+Next was adding the ability to track frame-xchgs by ID. If a module
+can queue up multiple requests it also needs to be able to cancel
+them individually vs per-wdev. This comes free with the wiphy work
+queue since it returns an ID which can be given directly to the
+caller.
 
-Instead ANQP queries can be queued at a higher priority than scanning
-which removes the need for suspending scans. In addition we can treat
-connections as radio management work and insert them at a lower
-priority than ANQP, but higher than scanning. This forces the
-connection to wait for ANQP without having to track any state.
+Then radio management was simply piped in by adding the
+insert/done APIs.
 ---
- src/wiphy.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/wiphy.h |  22 +++++++++++
- 2 files changed, 133 insertions(+)
+ src/frame-xchg.c | 121 +++++++++++++++++++++++------------------------
+ src/frame-xchg.h |   6 +--
+ src/p2p.c        |  22 +++++++--
+ 3 files changed, 81 insertions(+), 68 deletions(-)
 
-v2:
- - Removed in_cb/stale members. This disallows the caller from signaling
-   work done inside the work callback.
- - Cleaned up some old radio_mgmt naming
- - Remove 'count' concept when inserting work items. Instead the priority
-   of the current work item is set to INT_MIN which will ensure no other
-   work item gets inserted ahead of the current item.
-
-diff --git a/src/wiphy.c b/src/wiphy.c
-index aef39549..2e2693cf 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -32,6 +32,7 @@
- #include <fnmatch.h>
- #include <unistd.h>
- #include <string.h>
-+#include <limits.h>
+diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+index a9c1e4c3..1ba2d907 100644
+--- a/src/frame-xchg.c
++++ b/src/frame-xchg.c
+@@ -41,6 +41,7 @@
+ #include "src/nl80211util.h"
+ #include "src/netdev.h"
+ #include "src/frame-xchg.h"
++#include "src/wiphy.h"
  =
 
- #include <ell/ell.h>
+ #ifndef SOL_NETLINK
+ #define SOL_NETLINK 270
+@@ -113,8 +114,7 @@ struct frame_xchg_data {
+ 	unsigned int retry_interval;
+ 	unsigned int resp_timeout;
+ 	unsigned int retries_on_ack;
+-	bool in_frame_cb : 1;
+-	bool stale : 1;
++	struct wiphy_radio_work_item work;
+ };
  =
 
-@@ -62,6 +63,7 @@ static char **whitelist_filter;
- static char **blacklist_filter;
- static int mac_randomize_bytes =3D 6;
- static char regdom_country[2];
-+static uint32_t work_ids;
- =
-
- struct wiphy {
- 	uint32_t id;
-@@ -85,6 +87,8 @@ struct wiphy {
- 	uint8_t rm_enabled_capabilities[7]; /* 5 size max + header */
- 	struct l_genl_family *nl80211;
- 	char regdom_country[2];
-+	/* Work queue for this radio */
-+	struct l_queue *work;
- =
-
- 	bool support_scheduled_scan:1;
- 	bool support_rekey_offload:1;
-@@ -216,6 +220,14 @@ static struct wiphy *wiphy_new(uint32_t id)
- 	return wiphy;
+ struct frame_xchg_watch_data {
+@@ -726,7 +726,7 @@ static bool frame_watch_remove_by_handler(uint64_t wdev=
+_id, uint32_t group_id,
+ 					&handler_info) > 0;
  }
  =
 
-+static void destroy_work(void *user_data)
-+{
-+	struct wiphy_radio_work_item *work =3D user_data;
-+
-+	if (work->ops && work->ops->destroy)
-+		work->ops->destroy(work);
-+}
-+
- static void wiphy_free(void *data)
+-static void frame_xchg_tx_retry(struct frame_xchg_data *fx);
++static bool frame_xchg_tx_retry(struct wiphy_radio_work_item *item);
+ static bool frame_xchg_resp_handle(const struct mmpdu_header *mpdu,
+ 					const void *body, size_t body_len,
+ 					int rssi, void *user_data);
+@@ -753,9 +753,6 @@ static void frame_xchg_wait_cancel(struct frame_xchg_da=
+ta *fx)
+ =
+
+ static void frame_xchg_reset(struct frame_xchg_data *fx)
  {
- 	struct wiphy *wiphy =3D data;
-@@ -235,6 +247,7 @@ static void wiphy_free(void *data)
- 	l_free(wiphy->vendor_str);
- 	l_free(wiphy->driver_str);
- 	l_genl_family_free(wiphy->nl80211);
-+	l_queue_destroy(wiphy->work, destroy_work);
- 	l_free(wiphy);
+-	fx->in_frame_cb =3D false;
+-	fx->stale =3D false;
+-
+ 	frame_xchg_wait_cancel(fx);
+ =
+
+ 	if (fx->timeout)
+@@ -771,9 +768,10 @@ static void frame_xchg_reset(struct frame_xchg_data *f=
+x)
+ 					frame_xchg_resp_cb, fx);
  }
  =
 
-@@ -1072,6 +1085,8 @@ struct wiphy *wiphy_create(uint32_t wiphy_id, const c=
-har *name)
- 	if (!wiphy_is_managed(name))
- 		wiphy->blacklisted =3D true;
+-static void frame_xchg_destroy(void *user_data)
++static void frame_xchg_destroy(struct wiphy_radio_work_item *item)
+ {
+-	struct frame_xchg_data *fx =3D user_data;
++	struct frame_xchg_data *fx =3D l_container_of(item,
++						struct frame_xchg_data, work);
  =
 
-+	wiphy->work =3D l_queue_new();
-+
- 	return wiphy;
+ 	if (fx->destroy)
+ 		fx->destroy(fx->user_data);
+@@ -789,7 +787,7 @@ static void frame_xchg_done(struct frame_xchg_data *fx,=
+ int err)
+ 	if (fx->cb)
+ 		fx->cb(err, fx->user_data);
+ =
+
+-	frame_xchg_destroy(fx);
++	wiphy_radio_work_done(wiphy_find_by_wdev(fx->wdev_id), fx->work.id);
  }
  =
 
-@@ -1449,6 +1464,102 @@ static void wiphy_reg_notify(struct l_genl_msg *msg=
-, void *user_data)
- 	}
+ static void frame_xchg_timeout_destroy(void *user_data)
+@@ -805,7 +803,7 @@ static void frame_xchg_timeout_cb(struct l_timeout *tim=
+eout,
+ 	struct frame_xchg_data *fx =3D user_data;
+ =
+
+ 	l_timeout_remove(fx->timeout);
+-	frame_xchg_tx_retry(fx);
++	frame_xchg_tx_retry(&fx->work);
  }
  =
 
-+static void wiphy_radio_work_next(struct wiphy *wiphy)
-+{
-+	struct wiphy_radio_work_item *work;
-+	bool done;
-+
-+	work =3D l_queue_peek_head(wiphy->work);
-+	if (!work)
-+		return;
-+
-+	/*
-+	 * Ensures no other work item will get inserted before this one while
-+	 * the work is being done.
-+	 */
-+	work->priority =3D INT_MIN;
-+
-+	l_debug("Starting work item %u", work->id);
-+	done =3D work->ops->do_work(work);
-+
-+	if (done) {
-+		work->id =3D 0;
-+
-+		l_queue_remove(wiphy->work, work);
-+
-+		destroy_work(work);
-+
-+		wiphy_radio_work_next(wiphy);
-+	}
-+}
-+
-+static int insert_by_priority(const void *a, const void *b, void *user_dat=
-a)
-+{
-+	const struct wiphy_radio_work_item *new =3D a;
-+	const struct wiphy_radio_work_item *work =3D b;
-+
-+	if (work->priority <=3D new->priority)
-+		return 1;
-+
-+	return -1;
-+}
-+
-+uint32_t wiphy_radio_work_insert(struct wiphy *wiphy,
-+				struct wiphy_radio_work_item *item,
-+				int priority,
-+				const struct wiphy_radio_work_item_ops *ops)
-+{
-+	item->priority =3D priority;
-+	item->ops =3D ops;
-+	item->id =3D ++work_ids;
-+
-+	l_debug("Inserting work item %u", item->id);
-+
-+	l_queue_insert(wiphy->work, item, insert_by_priority, NULL);
-+
-+	if (l_queue_length(wiphy->work) =3D=3D 1)
-+		wiphy_radio_work_next(wiphy);
-+
-+	return item->id;
-+}
-+
-+static bool match_id(const void *a, const void *b)
-+{
-+	const struct wiphy_radio_work_item *item =3D a;
-+
-+	if (item->id =3D=3D L_PTR_TO_UINT(b))
+ static void frame_xchg_listen_end_cb(struct l_timeout *timeout,
+@@ -821,7 +819,7 @@ static void frame_xchg_listen_end_cb(struct l_timeout *=
+timeout,
+ 	l_timeout_remove(fx->timeout);
+ 	fx->retries_on_ack--;
+ 	fx->retry_cnt =3D 0;
+-	frame_xchg_tx_retry(fx);
++	frame_xchg_tx_retry(&fx->work);
+ }
+ =
+
+ static void frame_xchg_tx_status(struct frame_xchg_data *fx, bool acked)
+@@ -918,8 +916,10 @@ error:
+ 	frame_xchg_done(fx, error);
+ }
+ =
+
+-static void frame_xchg_tx_retry(struct frame_xchg_data *fx)
++static bool frame_xchg_tx_retry(struct wiphy_radio_work_item *item)
+ {
++	struct frame_xchg_data *fx =3D l_container_of(item,
++						struct frame_xchg_data, work);
+ 	struct l_genl_msg *msg;
+ 	uint32_t cmd_id;
+ 	uint32_t duration =3D fx->resp_timeout;
+@@ -951,13 +951,15 @@ static void frame_xchg_tx_retry(struct frame_xchg_dat=
+a *fx)
+ 		l_error("Error sending frame");
+ 		l_genl_msg_unref(msg);
+ 		frame_xchg_done(fx, -EIO);
+-		return;
 +		return true;
+ 	}
+ =
+
+ 	fx->tx_acked =3D false;
+ 	fx->have_cookie =3D false;
+ 	fx->early_status =3D false;
+ 	fx->retry_cnt++;
 +
 +	return false;
-+}
-+
-+void wiphy_radio_work_done(struct wiphy *wiphy, uint32_t id)
-+{
-+	struct wiphy_radio_work_item *item;
-+	bool next =3D false;
-+
-+	item =3D l_queue_find(wiphy->work, match_id, L_UINT_TO_PTR(id));
-+	if (!item)
-+		return;
-+
-+	l_debug("Work item %u done", id);
-+
-+	item->id =3D 0;
-+
-+	/*
-+	 * This is the current work item so we can continue onto the next.
-+	 */
-+	if (item =3D=3D l_queue_peek_head(wiphy->work))
-+		next =3D true;
-+
-+	l_queue_remove(wiphy->work, item);
-+
-+	destroy_work(item);
-+
-+	if (next)
-+		wiphy_radio_work_next(wiphy);
-+}
-+
- static int wiphy_init(void)
- {
- 	struct l_genl *genl =3D iwd_get_genl();
-diff --git a/src/wiphy.h b/src/wiphy.h
-index 689f868b..50c8c936 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -26,6 +26,22 @@
- struct wiphy;
- struct scan_bss;
- struct scan_freq_set;
-+struct wiphy_radio_work_item;
-+
-+typedef bool (*wiphy_radio_work_func_t)(struct wiphy_radio_work_item *item=
-);
-+typedef void (*wiphy_radio_work_destroy_func_t)(
-+					struct wiphy_radio_work_item *item);
-+
-+struct wiphy_radio_work_item_ops {
-+	wiphy_radio_work_func_t do_work;
-+	wiphy_radio_work_destroy_func_t destroy;
-+};
-+
-+struct wiphy_radio_work_item {
-+	uint32_t id;
-+	int priority;
-+	const struct wiphy_radio_work_item_ops *ops;
-+};
+ }
  =
 
- enum wiphy_state_watch_event {
- 	WIPHY_STATE_WATCH_EVENT_POWERED,
-@@ -92,3 +108,9 @@ uint32_t wiphy_state_watch_add(struct wiphy *wiphy,
- 				wiphy_state_watch_func_t func, void *user_data,
- 				wiphy_destroy_func_t destroy);
- bool wiphy_state_watch_remove(struct wiphy *wiphy, uint32_t id);
+ static bool frame_xchg_resp_handle(const struct mmpdu_header *mpdu,
+@@ -999,20 +1001,10 @@ static bool frame_xchg_resp_handle(const struct mmpd=
+u_header *mpdu,
+ 		if (!fx->tx_acked)
+ 			goto early_frame;
+ =
+
+-		fx->in_frame_cb =3D true;
+ 		done =3D watch->cb(mpdu, body, body_len, rssi, fx->user_data);
+ =
+
+-		/*
+-		 * If the callback has started a new frame exchange it will
+-		 * have reset and taken over the state variables and we need
+-		 * to just exit without touching anything.
+-		 */
+-		if (!fx->in_frame_cb)
+-			return true;
+-
+-		fx->in_frame_cb =3D false;
+-
+-		if (done || fx->stale) {
++		if (done) {
++			/* NULL callback here since the caller is done */
+ 			fx->cb =3D NULL;
+ 			frame_xchg_done(fx, 0);
+ 			return true;
+@@ -1070,22 +1062,29 @@ static bool frame_xchg_match(const void *a, const v=
+oid *b)
+  * @resp_timeout was 0.  @frame is an iovec array terminated by an iovec
+  * struct with NULL-iov_base.
+  */
+-void frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t freq,
++uint32_t frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t =
+freq,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+ 			frame_xchg_cb_t cb, void *user_data,
+ 			frame_xchg_destroy_func_t destroy, ...)
+ {
++	uint32_t id;
+ 	va_list args;
+ =
+
+ 	va_start(args, destroy);
+-	frame_xchg_startv(wdev_id, frame, freq, retry_interval, resp_timeout,
++	id =3D frame_xchg_startv(wdev_id, frame, freq, retry_interval, resp_timeo=
+ut,
+ 				retries_on_ack, group_id, cb, user_data,
+ 				destroy, args);
+ 	va_end(args);
++	return id;
+ }
+ =
+
+-void frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t fre=
+q,
++static const struct wiphy_radio_work_item_ops work_ops =3D {
++	.do_work =3D frame_xchg_tx_retry,
++	.destroy =3D frame_xchg_destroy,
++};
 +
-+uint32_t wiphy_radio_work_insert(struct wiphy *wiphy,
-+				struct wiphy_radio_work_item *item,
-+				int priority,
-+				const struct wiphy_radio_work_item_ops *ops);
-+void wiphy_radio_work_done(struct wiphy *wiphy, uint32_t id);
++uint32_t frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t=
+ freq,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+ 			frame_xchg_cb_t cb, void *user_data,
+@@ -1108,31 +1107,13 @@ void frame_xchg_startv(uint64_t wdev_id, struct iov=
+ec *frame, uint32_t freq,
+ 				frame[0].iov_base)) {
+ 		l_error("Frame too short");
+ 		cb(-EMSGSIZE, user_data);
+-		return;
++		return 0;
+ 	}
+ =
+
+-	fx =3D l_queue_find(frame_xchgs, frame_xchg_match, &wdev_id);
+-
+-	if (fx) {
+-		/*
+-		 * If a frame callback calls us assume it's the end of
+-		 * that earlier frame exchange and the start of a new one.
+-		 */
+-		if (fx->in_frame_cb)
+-			frame_xchg_reset(fx);
+-		else {
+-			l_error("Frame exchange in progress");
+-			cb(-EBUSY, user_data);
+-			return;
+-		}
+-	} else {
+-		fx =3D l_new(struct frame_xchg_data, 1);
++	fx =3D l_new(struct frame_xchg_data, 1);
+ =
+
+-		if (!frame_xchgs)
+-			frame_xchgs =3D l_queue_new();
+-
+-		l_queue_push_tail(frame_xchgs, fx);
+-	}
++	if (!frame_xchgs)
++		frame_xchgs =3D l_queue_new();
+ =
+
+ 	fx->wdev_id =3D wdev_id;
+ 	fx->freq =3D freq;
+@@ -1177,24 +1158,35 @@ void frame_xchg_startv(uint64_t wdev_id, struct iov=
+ec *frame, uint32_t freq,
+ 	}
+ =
+
+ 	fx->retry_cnt =3D 0;
+-	frame_xchg_tx_retry(fx);
++
++	l_queue_push_tail(frame_xchgs, fx);
++
++	/*
++	 * TODO: Assume any offchannel frames are a high priority (0). This may
++	 * need to be re-examined in the future if other operations (e.g.
++	 * wait on channel) are introduced.
++	 */
++	return wiphy_radio_work_insert(wiphy_find_by_wdev(wdev_id),
++					&fx->work, 0, &work_ops);
++}
++
++static bool frame_xchg_match_id(const void *a, const void *b)
++{
++	const struct frame_xchg_data *fx =3D a;
++	const uint32_t *id =3D b;
++
++	return fx->work.id =3D=3D *id;
+ }
+ =
+
+-void frame_xchg_stop(uint64_t wdev_id)
++void frame_xchg_cancel(uint32_t id)
+ {
+ 	struct frame_xchg_data *fx =3D
+-		l_queue_remove_if(frame_xchgs, frame_xchg_match, &wdev_id);
++		l_queue_remove_if(frame_xchgs, frame_xchg_match_id, &id);
+ =
+
+ 	if (!fx)
+ 		return;
+ =
+
+-	if (fx->in_frame_cb) {
+-		fx->stale =3D true;
+-		return;
+-	}
+-
+-	frame_xchg_reset(fx);
+-	l_free(fx);
++	wiphy_radio_work_done(wiphy_find_by_wdev(fx->wdev_id), id);
+ }
+ =
+
+ static void frame_xchg_mlme_notify(struct l_genl_msg *msg, void *user_data)
+@@ -1341,13 +1333,20 @@ error:
+ 	return -EIO;
+ }
+ =
+
++static void destroy_xchg_data(void *user_data)
++{
++	struct frame_xchg_data *fx =3D user_data;
++
++	frame_xchg_destroy(&fx->work);
++}
++
+ static void frame_xchg_exit(void)
+ {
+ 	struct l_queue *groups =3D watch_groups;
+ 	struct l_queue *xchgs =3D frame_xchgs;
+ =
+
+ 	frame_xchgs =3D NULL;
+-	l_queue_destroy(xchgs, frame_xchg_destroy);
++	l_queue_destroy(xchgs, destroy_xchg_data);
+ =
+
+ 	watch_groups =3D NULL;
+ 	l_queue_destroy(groups, frame_watch_group_destroy);
+diff --git a/src/frame-xchg.h b/src/frame-xchg.h
+index 55a55f73..ba4dc61a 100644
+--- a/src/frame-xchg.h
++++ b/src/frame-xchg.h
+@@ -43,14 +43,14 @@ bool frame_watch_add(uint64_t wdev_id, uint32_t group, =
+uint16_t frame_type,
+ bool frame_watch_group_remove(uint64_t wdev_id, uint32_t group);
+ bool frame_watch_wdev_remove(uint64_t wdev_id);
+ =
+
+-void frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t freq,
++uint32_t frame_xchg_start(uint64_t wdev_id, struct iovec *frame, uint32_t =
+freq,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+ 			frame_xchg_cb_t cb, void *user_data,
+ 			frame_xchg_destroy_func_t destroy, ...);
+-void frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t fre=
+q,
++uint32_t frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t=
+ freq,
+ 			unsigned int retry_interval, unsigned int resp_timeout,
+ 			unsigned int retries_on_ack, uint32_t group_id,
+ 			frame_xchg_cb_t cb, void *user_data,
+ 			frame_xchg_destroy_func_t destroy, va_list resp_args);
+-void frame_xchg_stop(uint64_t wdev_id);
++void frame_xchg_cancel(uint32_t id);
+diff --git a/src/p2p.c b/src/p2p.c
+index 1c9cb081..b8c299a3 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -68,6 +68,7 @@ struct p2p_device {
+ 	uint32_t start_stop_cmd_id;
+ 	l_dbus_property_complete_cb_t pending_complete;
+ 	struct l_dbus_message *pending_message;
++	uint32_t xchg_id;
+ =
+
+ 	uint8_t listen_country[3];
+ 	uint8_t listen_oper_class;
+@@ -383,7 +384,11 @@ static void p2p_connection_reset(struct p2p_device *de=
+v)
+ 	netdev_watch_remove(dev->conn_netdev_watch_id);
+ =
+
+ 	frame_watch_group_remove(dev->wdev_id, FRAME_GROUP_CONNECT);
+-	frame_xchg_stop(dev->wdev_id);
++
++	if (dev->xchg_id) {
++		frame_xchg_cancel(dev->xchg_id);
++		dev->xchg_id =3D 0;
++	}
+ =
+
+ 	if (!dev->enabled || (dev->enabled && dev->start_stop_cmd_id)) {
+ 		/*
+@@ -458,9 +463,10 @@ static void p2p_peer_frame_xchg(struct p2p_peer *peer,=
+ struct iovec *tx_body,
+ 		peer->bss->frequency;
+ =
+
+ 	va_start(args, cb);
+-	frame_xchg_startv(dev->wdev_id, frame, freq, retry_interval,
+-				resp_timeout, retries_on_ack, group_id,
+-				cb, dev, NULL, args);
++
++	dev->xchg_id =3D frame_xchg_startv(dev->wdev_id, frame, freq,
++				retry_interval, resp_timeout, retries_on_ack,
++				group_id, cb, dev, NULL, args);
+ 	va_end(args);
+ =
+
+ 	l_free(frame);
+@@ -1175,11 +1181,17 @@ static void p2p_go_negotiation_resp_done(int error,=
+ void *user_data)
+ 	else
+ 		l_error("No GO Negotiation Confirmation frame received");
+ =
+
++	dev->xchg_id =3D 0;
++
+ 	p2p_connect_failed(dev);
+ }
+ =
+
+ static void p2p_go_negotiation_resp_err_done(int error, void *user_data)
+ {
++	struct p2p_device *dev =3D user_data;
++
++	dev->xchg_id =3D 0;
++
+ 	if (error)
+ 		l_error("Sending the GO Negotiation Response failed: %s (%i)",
+ 			strerror(-error), -error);
+@@ -1272,6 +1284,8 @@ static bool p2p_go_negotiation_confirm_cb(const struc=
+t mmpdu_header *mpdu,
+ =
+
+ 	l_debug("");
+ =
+
++	dev->xchg_id =3D 0;
++
+ 	if (body_len < 8) {
+ 		l_error("GO Negotiation Confirmation frame too short");
+ 		p2p_connect_failed(dev);
 -- =
 
 2.21.1
 
---===============7181103128197331856==--
+--===============7259441136219043080==--
 
