@@ -1,70 +1,243 @@
-Content-Type: multipart/mixed; boundary="===============7624037977698570652=="
+Content-Type: multipart/mixed; boundary="===============0553925028469075036=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 5/6] station: cancel hidden network scan when connecting
-Date: Wed, 08 Jul 2020 10:47:38 -0700
-Message-ID: <20200708174739.14188-5-prestwoj@gmail.com>
+Subject: [PATCH v2 6/6] netdev: use wiphy radio work queue for connections
+Date: Wed, 08 Jul 2020 10:47:39 -0700
+Message-ID: <20200708174739.14188-6-prestwoj@gmail.com>
 In-Reply-To: <20200708174739.14188-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7624037977698570652==
+--===============0553925028469075036==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Before connecting to a hidden network we must scan. During this scan
-if another connection attempt comes in the expected behavior is to
-abort the original connection. Rather than waiting for the scan to
-complete, then canceling the original hidden connection we can just
-cancel the hidden scan immediately, reply to dbus, and continue with
-the new connection attempt.
+This adds connection/FT attempts to the radio work queue. This
+will ensure that connections aren't delayed or done concurrently
+with scanning.
 ---
- src/station.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ src/netdev.c | 84 +++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 64 insertions(+), 20 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index d7b319d8..35f4a96d 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2474,6 +2474,19 @@ void station_connect_network(struct station *station=
-, struct network *network,
- 	struct l_dbus *dbus =3D dbus_get_bus();
- 	int err;
+v2:
+ - This was implemented instead of having station/network deal with work
+   items. Now the actual work item is only queue'd once execution enters
+   netdev. This does still require the station ANQP watch, but it greatly
+   simplifies the potential code paths for pushing work items.
+
+diff --git a/src/netdev.c b/src/netdev.c
+index e469fb1c..dc4b2bb3 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -136,6 +136,9 @@ struct netdev {
  =
 
-+	/*
-+	 * If a hidden scan is not completed, station_is_busy would not
-+	 * indicate anything is going on so we need to cancel the scan and
-+	 * fail the connection now.
-+	 */
-+	if (station->hidden_network_scan_id) {
-+		scan_cancel(netdev_get_wdev_id(station->netdev),
-+				station->hidden_network_scan_id);
+ 	struct l_io *pae_io;  /* for drivers without EAPoL over NL80211 */
+ =
+
++	struct l_genl_msg *connect_cmd;
++	struct wiphy_radio_work_item work;
 +
-+		dbus_pending_reply(&station->hidden_pending,
-+				dbus_error_failed(station->hidden_pending));
+ 	bool connected : 1;
+ 	bool operational : 1;
+ 	bool rekey_offload_support : 1;
+@@ -485,6 +488,9 @@ static void netdev_preauth_destroy(void *data)
+ =
+
+ static void netdev_connect_free(struct netdev *netdev)
+ {
++	if (netdev->work.id)
++		wiphy_radio_work_done(netdev->wiphy, netdev->work.id);
++
+ 	if (netdev->sm) {
+ 		eapol_sm_free(netdev->sm);
+ 		netdev->sm =3D NULL;
+@@ -529,6 +535,7 @@ static void netdev_connect_free(struct netdev *netdev)
+ 	netdev->in_ft =3D false;
+ 	netdev->ignore_connect_event =3D false;
+ 	netdev->expect_connect_failure =3D false;
++	netdev->connect_cmd =3D NULL;
+ =
+
+ 	netdev_rssi_polling_update(netdev);
+ =
+
+@@ -625,12 +632,12 @@ static void netdev_free(void *data)
+ 		netdev->mac_change_cmd_id =3D 0;
+ 	}
+ =
+
++	scan_wdev_remove(netdev->wdev_id);
++
+ 	if (netdev->events_ready)
+ 		WATCHLIST_NOTIFY(&netdev_watches, netdev_watch_func_t,
+ 					netdev, NETDEV_WATCH_EVENT_DEL);
+ =
+
+-	scan_wdev_remove(netdev->wdev_id);
+-
+ 	watchlist_destroy(&netdev->station_watches);
+ =
+
+ 	l_io_destroy(netdev->pae_io);
+@@ -1019,6 +1026,8 @@ static void netdev_connect_ok(struct netdev *netdev)
+ 	}
+ =
+
+ 	netdev_rssi_polling_update(netdev);
++
++	wiphy_radio_work_done(netdev->wiphy, netdev->work.id);
+ }
+ =
+
+ static void netdev_setting_keys_failed(struct netdev_handshake_state *nhs,
+@@ -1487,6 +1496,8 @@ void netdev_handshake_failed(struct handshake_state *=
+hs, uint16_t reason_code)
+ 		if (!l_genl_family_send(nl80211, msg, NULL, NULL, NULL))
+ 			l_error("error sending DEL_STATION");
+ 	}
++
++	wiphy_radio_work_done(netdev->wiphy, netdev->work.id);
+ }
+ =
+
+ static void hardware_rekey_cb(struct l_genl_msg *msg, void *data)
+@@ -2426,25 +2437,60 @@ struct rtnl_data {
+ 	int ref;
+ };
+ =
+
+-static int netdev_begin_connection(struct netdev *netdev,
+-					struct l_genl_msg *cmd_connect)
++static bool netdev_connection_ready(struct wiphy_radio_work_item *item)
+ {
+-	if (cmd_connect) {
++	struct netdev *netdev =3D l_container_of(item, struct netdev, work);
++
++	if (netdev->connect_cmd) {
+ 		netdev->connect_cmd_id =3D l_genl_family_send(nl80211,
+-					cmd_connect, netdev_cmd_connect_cb,
+-					netdev, NULL);
++					netdev->connect_cmd,
++					netdev_cmd_connect_cb, netdev, NULL);
+ =
+
+ 		if (!netdev->connect_cmd_id) {
+-			l_genl_msg_unref(cmd_connect);
+-			return -EIO;
++			l_genl_msg_unref(netdev->connect_cmd);
++			netdev->connect_cmd =3D NULL;
++
++			netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
++				MMPDU_STATUS_CODE_UNSPECIFIED);
++			return true;
+ 		}
++
++		netdev->connect_cmd =3D NULL;
+ 	}
+ =
+
+-	handshake_state_set_supplicant_address(netdev->handshake, netdev->addr);
++	if (netdev->ap) {
++		if (!auth_proto_start(netdev->ap)) {
++			/* Restore original nonce if this was an FT attempt */
++			if (netdev->in_ft)
++				memcpy(netdev->handshake->snonce,
++						netdev->prev_snonce, 32);
++
++			netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
++						MMPDU_STATUS_CODE_UNSPECIFIED);
++			return true;
++		}
++		/*
++		 * set connected since the auth protocols cannot do
++		 * so internally
++		 */
+ =
+
+-	/* set connected since the auth protocols cannot do so internally */
+-	if (netdev->ap && auth_proto_start(netdev->ap))
+ 		netdev->connected =3D true;
 +	}
 +
- 	if (station_is_busy(station)) {
- 		station_disconnect_onconnect(station, network, bss, message);
++	return false;
++}
++
++static const struct wiphy_radio_work_item_ops connect_work_ops =3D {
++	.do_work =3D netdev_connection_ready,
++};
++
++static int netdev_begin_connection(struct netdev *netdev,
++					struct l_genl_msg *cmd_connect)
++{
++	netdev->connect_cmd =3D cmd_connect;
++
++	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
++				&connect_work_ops);
  =
 
-@@ -2525,6 +2538,8 @@ static bool station_hidden_network_scan_results(int e=
-rr,
+ 	return 0;
+ }
+@@ -2514,6 +2560,8 @@ static void netdev_mac_power_up_cb(int error, uint16_=
+t type,
+ 		return;
+ 	}
  =
 
- 	msg =3D station->hidden_pending;
- 	station->hidden_pending =3D NULL;
-+	/* Zero this now so station_connect_network knows the scan is done */
-+	station->hidden_network_scan_id =3D 0;
++	handshake_state_set_supplicant_address(netdev->handshake, netdev->addr);
++
+ 	/*
+ 	 * Pick up where we left off in netdev_connect_commmon.
+ 	 */
+@@ -2649,6 +2697,8 @@ static int netdev_connect_common(struct netdev *netde=
+v,
+ 			return ret;
+ 	}
  =
 
- 	if (err) {
- 		dbus_pending_reply(&msg, dbus_error_failed(msg));
++	handshake_state_set_supplicant_address(netdev->handshake, netdev->addr);
++
+ 	return netdev_begin_connection(netdev, cmd_connect);
+ }
+ =
+
+@@ -3092,7 +3142,6 @@ static int fast_transition(struct netdev *netdev, str=
+uct scan_bss *target_bss,
+ 				netdev_connect_cb_t cb)
+ {
+ 	struct netdev_handshake_state *nhs;
+-	int err =3D -EINVAL;
+ =
+
+ 	if (!netdev->operational)
+ 		return -ENOTCONN;
+@@ -3173,15 +3222,10 @@ static int fast_transition(struct netdev *netdev, s=
+truct scan_bss *target_bss,
+ 					netdev_ft_over_ds_tx_authenticate,
+ 					netdev_ft_tx_associate, netdev);
+ =
+
+-	if (!auth_proto_start(netdev->ap))
+-		goto restore_snonce;
++	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
++				&connect_work_ops);
+ =
+
+ 	return 0;
+-
+-restore_snonce:
+-	memcpy(netdev->handshake->snonce, netdev->prev_snonce, 32);
+-
+-	return err;
+ }
+ =
+
+ int netdev_fast_transition(struct netdev *netdev, struct scan_bss *target_=
+bss,
 -- =
 
 2.21.1
 
---===============7624037977698570652==--
+--===============0553925028469075036==--
 
