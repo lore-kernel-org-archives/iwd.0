@@ -1,239 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============1924061545361849629=="
+Content-Type: multipart/mixed; boundary="===============2513019759029681245=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 2/2] netdev: use wiphy radio work queue for connections
-Date: Fri, 10 Jul 2020 10:44:44 -0700
-Message-ID: <20200710174444.13839-2-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v5 1/2] scan: refactor to use wiphy radio work queue
+Date: Fri, 10 Jul 2020 13:36:01 -0500
+Message-ID: <a13b2f61-3806-0722-548e-65ba11dac737@gmail.com>
 In-Reply-To: <20200710174444.13839-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1924061545361849629==
+--===============2513019759029681245==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds connection/FT attempts to the radio work queue. This
-will ensure that connections aren't delayed or done concurrently
-with scanning.
----
- src/netdev.c | 86 ++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 66 insertions(+), 20 deletions(-)
+Hi James,
 
-diff --git a/src/netdev.c b/src/netdev.c
-index e469fb1c..a7f92ff8 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -136,6 +136,9 @@ struct netdev {
- =
+On 7/10/20 12:44 PM, James Prestwood wrote:
+> To use the wiphy radio work queue, scanning mostly remained the same.
+> start_next_scan_request was modified to be used as the work callback,
+> as well as not start the next scan if the current one was done
+> (since this is taken care of by wiphy work queue now). All
+> calls to start_next_scan_request were removed, and more or less
+> replaced with wiphy_radio_work_done.
+> =
 
- 	struct l_io *pae_io;  /* for drivers without EAPoL over NL80211 */
- =
+> scan_{suspend,resume} were both removed since radio management
+> priorities solve this for us. ANQP requests can be inserted ahead of
+> scan requests, which accomplishes the same thing.
+> ---
+>   src/scan.c    | 140 ++++++++++++++++++++++----------------------------
+>   src/scan.h    |   3 --
+>   src/station.c |  16 +-----
+>   3 files changed, 61 insertions(+), 98 deletions(-)
+> =
 
-+	struct l_genl_msg *connect_cmd;
-+	struct wiphy_radio_work_item work;
-+
- 	bool connected : 1;
- 	bool operational : 1;
- 	bool rekey_offload_support : 1;
-@@ -485,6 +488,9 @@ static void netdev_preauth_destroy(void *data)
- =
+> v5:
+>   - Fixed some logic errors with exernal scans and starting the next
+>     internal scan.
+> =
 
- static void netdev_connect_free(struct netdev *netdev)
- {
-+	if (netdev->work.id)
-+		wiphy_radio_work_done(netdev->wiphy, netdev->work.id);
-+
- 	if (netdev->sm) {
- 		eapol_sm_free(netdev->sm);
- 		netdev->sm =3D NULL;
-@@ -529,6 +535,7 @@ static void netdev_connect_free(struct netdev *netdev)
- 	netdev->in_ft =3D false;
- 	netdev->ignore_connect_event =3D false;
- 	netdev->expect_connect_failure =3D false;
-+	netdev->connect_cmd =3D NULL;
- =
 
- 	netdev_rssi_polling_update(netdev);
- =
+<snip>
 
-@@ -625,12 +632,12 @@ static void netdev_free(void *data)
- 		netdev->mac_change_cmd_id =3D 0;
- 	}
- =
+> @@ -1720,6 +1724,7 @@ static void scan_notify(struct l_genl_msg *msg, voi=
+d *user_data)
+>   =
 
-+	scan_wdev_remove(netdev->wdev_id);
-+
- 	if (netdev->events_ready)
- 		WATCHLIST_NOTIFY(&netdev_watches, netdev_watch_func_t,
- 					netdev, NETDEV_WATCH_EVENT_DEL);
- =
+>   		if (sc->triggered) {
+>   			sc->triggered =3D false;
+> +			sc->work_started =3D false;
+>   =
 
--	scan_wdev_remove(netdev->wdev_id);
--
- 	watchlist_destroy(&netdev->station_watches);
- =
+>   			scan_finished(sc, -ECANCELED, NULL, sr);
+>   		} else {
 
- 	l_io_destroy(netdev->pae_io);
-@@ -1019,6 +1026,9 @@ static void netdev_connect_ok(struct netdev *netdev)
- 	}
- =
+I took this chunk out (since scan_finished will reset work_started anyway) =
+and =
 
- 	netdev_rssi_polling_update(netdev);
-+
-+	if (netdev->work.id)
-+		wiphy_radio_work_done(netdev->wiphy, netdev->work.id);
- }
- =
+applied.
 
- static void netdev_setting_keys_failed(struct netdev_handshake_state *nhs,
-@@ -1487,6 +1497,9 @@ void netdev_handshake_failed(struct handshake_state *=
-hs, uint16_t reason_code)
- 		if (!l_genl_family_send(nl80211, msg, NULL, NULL, NULL))
- 			l_error("error sending DEL_STATION");
- 	}
-+
-+	if (netdev->work.id)
-+		wiphy_radio_work_done(netdev->wiphy, netdev->work.id);
- }
- =
+Regards,
+-Denis
 
- static void hardware_rekey_cb(struct l_genl_msg *msg, void *data)
-@@ -2426,25 +2439,60 @@ struct rtnl_data {
- 	int ref;
- };
- =
-
--static int netdev_begin_connection(struct netdev *netdev,
--					struct l_genl_msg *cmd_connect)
-+static bool netdev_connection_ready(struct wiphy_radio_work_item *item)
- {
--	if (cmd_connect) {
-+	struct netdev *netdev =3D l_container_of(item, struct netdev, work);
-+
-+	if (netdev->connect_cmd) {
- 		netdev->connect_cmd_id =3D l_genl_family_send(nl80211,
--					cmd_connect, netdev_cmd_connect_cb,
--					netdev, NULL);
-+					netdev->connect_cmd,
-+					netdev_cmd_connect_cb, netdev, NULL);
- =
-
- 		if (!netdev->connect_cmd_id) {
--			l_genl_msg_unref(cmd_connect);
--			return -EIO;
-+			l_genl_msg_unref(netdev->connect_cmd);
-+			netdev->connect_cmd =3D NULL;
-+
-+			netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
-+				MMPDU_STATUS_CODE_UNSPECIFIED);
-+			return true;
- 		}
-+
-+		netdev->connect_cmd =3D NULL;
- 	}
- =
-
--	handshake_state_set_supplicant_address(netdev->handshake, netdev->addr);
-+	if (netdev->ap) {
-+		if (!auth_proto_start(netdev->ap)) {
-+			/* Restore original nonce if this was an FT attempt */
-+			if (netdev->in_ft)
-+				memcpy(netdev->handshake->snonce,
-+						netdev->prev_snonce, 32);
-+
-+			netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
-+						MMPDU_STATUS_CODE_UNSPECIFIED);
-+			return true;
-+		}
-+		/*
-+		 * set connected since the auth protocols cannot do
-+		 * so internally
-+		 */
- =
-
--	/* set connected since the auth protocols cannot do so internally */
--	if (netdev->ap && auth_proto_start(netdev->ap))
- 		netdev->connected =3D true;
-+	}
-+
-+	return false;
-+}
-+
-+static const struct wiphy_radio_work_item_ops connect_work_ops =3D {
-+	.do_work =3D netdev_connection_ready,
-+};
-+
-+static int netdev_begin_connection(struct netdev *netdev,
-+					struct l_genl_msg *cmd_connect)
-+{
-+	netdev->connect_cmd =3D cmd_connect;
-+
-+	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
-+				&connect_work_ops);
- =
-
- 	return 0;
- }
-@@ -2514,6 +2562,8 @@ static void netdev_mac_power_up_cb(int error, uint16_=
-t type,
- 		return;
- 	}
- =
-
-+	handshake_state_set_supplicant_address(netdev->handshake, netdev->addr);
-+
- 	/*
- 	 * Pick up where we left off in netdev_connect_commmon.
- 	 */
-@@ -2649,6 +2699,8 @@ static int netdev_connect_common(struct netdev *netde=
-v,
- 			return ret;
- 	}
- =
-
-+	handshake_state_set_supplicant_address(netdev->handshake, netdev->addr);
-+
- 	return netdev_begin_connection(netdev, cmd_connect);
- }
- =
-
-@@ -3092,7 +3144,6 @@ static int fast_transition(struct netdev *netdev, str=
-uct scan_bss *target_bss,
- 				netdev_connect_cb_t cb)
- {
- 	struct netdev_handshake_state *nhs;
--	int err =3D -EINVAL;
- =
-
- 	if (!netdev->operational)
- 		return -ENOTCONN;
-@@ -3173,15 +3224,10 @@ static int fast_transition(struct netdev *netdev, s=
-truct scan_bss *target_bss,
- 					netdev_ft_over_ds_tx_authenticate,
- 					netdev_ft_tx_associate, netdev);
- =
-
--	if (!auth_proto_start(netdev->ap))
--		goto restore_snonce;
-+	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
-+				&connect_work_ops);
- =
-
- 	return 0;
--
--restore_snonce:
--	memcpy(netdev->handshake->snonce, netdev->prev_snonce, 32);
--
--	return err;
- }
- =
-
- int netdev_fast_transition(struct netdev *netdev, struct scan_bss *target_=
-bss,
--- =
-
-2.21.1
-
---===============1924061545361849629==--
+--===============2513019759029681245==--
 
