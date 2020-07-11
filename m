@@ -1,170 +1,223 @@
-Content-Type: multipart/mixed; boundary="===============3746645590755287732=="
+Content-Type: multipart/mixed; boundary="===============6476753685049166822=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 12/18] p2p: Add the p2p.Display interface on WFD-capable peers
-Date: Sat, 11 Jul 2020 03:00:47 +0200
-Message-ID: <20200711010053.224223-12-andrew.zaborowski@intel.com>
+Subject: [PATCH 13/18] p2p: Add WFD IEs in GO Negotiation and association
+Date: Sat, 11 Jul 2020 03:00:48 +0200
+Message-ID: <20200711010053.224223-13-andrew.zaborowski@intel.com>
 In-Reply-To: <20200711010053.224223-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3746645590755287732==
+--===============6476753685049166822==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If anyone's registered as implementing the WFD service, add the
-net.connman.iwd.p2p.Display DBus interface on peer objects that are
-WFD-capable and are available for a WFD Session.
+This patch lets us establish WFD connections by parsing, validating and
+acting on WFD IEs in received frames, and adding our own WFD IEs in the
+GO Negotiation and Association frames.  Applications should assume that
+any connection to a WFD-capable peer when we ourselves have a WFD
+service registered, are WFD connections and should handle RTSP and
+other IP-based protocols on those connections.
+
+When connecting to a WFD-capable peer and when we have a WFD service
+registered, the connection will fail if there are any conflicting or
+invalid WFD parameters during GO Negotiation.
 ---
- src/dbus.h |   1 +
- src/p2p.c  | 294 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 288 insertions(+), 7 deletions(-)
+ src/p2p.c | 213 +++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 195 insertions(+), 18 deletions(-)
 
-diff --git a/src/dbus.h b/src/dbus.h
-index 21d2943f..0a696e15 100644
---- a/src/dbus.h
-+++ b/src/dbus.h
-@@ -38,6 +38,7 @@
- #define IWD_P2P_INTERFACE "net.connman.iwd.p2p.Device"
- #define IWD_P2P_PEER_INTERFACE "net.connman.iwd.p2p.Peer"
- #define IWD_P2P_SERVICE_MANAGER_INTERFACE "net.connman.iwd.p2p.ServiceMana=
-ger"
-+#define IWD_P2P_WFD_INTERFACE "net.connman.iwd.p2p.Display"
- =
-
- #define IWD_BASE_PATH "/net/connman/iwd"
- #define IWD_AGENT_MANAGER_PATH IWD_BASE_PATH
 diff --git a/src/p2p.c b/src/p2p.c
-index 891f425f..922710a6 100644
+index 922710a6..03dc3b8b 100644
 --- a/src/p2p.c
 +++ b/src/p2p.c
-@@ -132,6 +132,7 @@ struct p2p_peer {
- 	char *name;
- 	struct wsc_primary_device_type primary_device_type;
- 	const uint8_t *device_addr;
-+	struct p2p_wfd_properties *wfd;
- 	/* Whether peer is currently a GO */
- 	bool group;
- };
-@@ -243,7 +244,10 @@ static void p2p_peer_put(void *user_data)
+@@ -97,6 +97,7 @@ struct p2p_device {
+ 	struct wsc_enrollee *conn_enrollee;
+ 	struct netconfig *conn_netconfig;
+ 	struct l_timeout *conn_dhcp_timeout;
++	struct p2p_wfd_properties *conn_own_wfd;
+ =
+
+ 	struct l_timeout *config_timeout;
+ 	unsigned long go_config_delay;
+@@ -486,6 +487,12 @@ static void p2p_connection_reset(struct p2p_device *de=
+v)
+ 		dev->peer_list =3D NULL;
+ 	}
+ =
+
++	if (dev->conn_own_wfd) {
++		l_free(dev->conn_own_wfd);
++		dev->conn_own_wfd =3D NULL;
++		p2p_own_wfd->available =3D true;
++	}
++
+ 	if (dev->enabled && !dev->start_stop_cmd_id &&
+ 			!l_queue_isempty(dev->discovery_users))
+ 		p2p_device_discovery_start(dev);
+@@ -759,12 +766,14 @@ static void p2p_peer_provision_done(int err, struct w=
+sc_credentials_info *creds,
+ 	struct p2p_device *dev =3D peer->dev;
+ 	struct scan_bss *bss =3D dev->conn_wsc_bss;
+ 	struct handshake_state *hs =3D NULL;
+-	struct iovec ie_iov =3D {};
++	struct iovec ie_iov[16];
++	int ie_num =3D 0;
+ 	int r =3D -EOPNOTSUPP;
+ 	struct p2p_association_req info =3D {};
+ 	struct ie_rsn_info bss_info =3D {};
+ 	struct ie_rsn_info rsn_info =3D {};
+ 	uint8_t rsne_buf[256];
++	uint8_t wfd_ie[32];
+ =
+
+ 	l_debug("err=3D%i n_creds=3D%u", err, n_creds);
+ =
+
+@@ -819,8 +828,17 @@ static void p2p_peer_provision_done(int err, struct ws=
+c_credentials_info *creds,
+ 	info.capability =3D dev->capability;
+ 	info.device_info =3D dev->device_info;
+ =
+
+-	ie_iov.iov_base =3D p2p_build_association_req(&info, &ie_iov.iov_len);
+-	L_WARN_ON(!ie_iov.iov_base);
++	ie_iov[0].iov_base =3D p2p_build_association_req(&info,
++							&ie_iov[0].iov_len);
++	L_WARN_ON(!ie_iov[0].iov_base);
++	ie_num =3D 1;
++
++	if (dev->conn_own_wfd) {
++		ie_iov[ie_num].iov_base =3D wfd_ie;
++		ie_iov[ie_num].iov_len =3D p2p_build_wfd_ie(dev->conn_own_wfd,
++								wfd_ie);
++		ie_num++;
++	}
+ =
+
+ 	scan_bss_get_rsn_info(bss, &bss_info);
+ =
+
+@@ -862,7 +880,7 @@ static void p2p_peer_provision_done(int err, struct wsc=
+_credentials_info *creds,
+ 	} else
+ 		handshake_state_set_pmk(hs, creds[0].psk, 32);
+ =
+
+-	r =3D netdev_connect(dev->conn_netdev, bss, hs, &ie_iov, 1,
++	r =3D netdev_connect(dev->conn_netdev, bss, hs, ie_iov, ie_num,
+ 				p2p_netdev_event, p2p_netdev_connect_cb, dev);
+ 	if (r =3D=3D 0)
+ 		goto done;
+@@ -879,28 +897,40 @@ not_supported:
+ 	}
+ =
+
+ done:
+-	l_free(ie_iov.iov_base);
++	if (ie_num)
++		l_free(ie_iov[0].iov_base);
++
+ 	scan_bss_free(bss);
+ }
+ =
+
+ static void p2p_provision_connect(struct p2p_device *dev)
  {
- 	struct p2p_peer *peer =3D user_data;
+-	struct iovec iov;
++	struct iovec iov[16];
++	int iov_num;
++	uint8_t wfd_ie[32];
+ 	struct p2p_association_req info =3D {};
  =
 
--	/* Removes both interfaces, no need to call wsc_dbus_remove_interface */
-+	/*
-+	 * Removes all interfaces with one call, no need to call
-+	 * wsc_dbus_remove_interface.
-+	 */
- 	l_dbus_unregister_object(dbus_get_bus(), p2p_peer_get_path(peer));
- 	p2p_peer_free(peer);
- }
-@@ -1355,6 +1359,109 @@ static void p2p_device_fill_channel_list(struct p2p=
-_device *dev,
- 	l_queue_push_tail(attr->channel_entries, channel_entry);
+ 	/* Ready to start the provisioning */
+ 	info.capability =3D dev->capability;
+ 	info.device_info =3D dev->device_info;
+ =
+
+-	iov.iov_base =3D p2p_build_association_req(&info, &iov.iov_len);
+-	L_WARN_ON(!iov.iov_base);
++	iov[0].iov_base =3D p2p_build_association_req(&info, &iov[0].iov_len);
++	L_WARN_ON(!iov[0].iov_base);
++	iov_num =3D 1;
++
++	if (dev->conn_own_wfd) {
++		iov[iov_num].iov_base =3D wfd_ie;
++		iov[iov_num].iov_len =3D p2p_build_wfd_ie(dev->conn_own_wfd,
++							wfd_ie);
++		iov_num++;
++	}
+ =
+
+ 	dev->conn_enrollee =3D wsc_enrollee_new(dev->conn_netdev,
+ 						dev->conn_wsc_bss,
+-						dev->conn_pin, &iov, 1,
++						dev->conn_pin, iov, iov_num,
+ 						p2p_peer_provision_done,
+ 						dev->conn_peer);
+-	l_free(iov.iov_base);
++	l_free(iov[0].iov_base);
  }
  =
 
-+static bool p2p_extract_wfd_properties(const uint8_t *ie, size_t ie_size,
-+					struct p2p_wfd_properties *out)
+ static void p2p_device_netdev_watch_destroy(void *user_data)
+@@ -1462,6 +1492,60 @@ static bool p2p_extract_wfd_properties(const uint8_t=
+ *ie, size_t ie_size,
+ 	return true;
+ }
+ =
+
++static bool p2p_device_validate_conn_wfd(struct p2p_device *dev,
++						const uint8_t *ie,
++						ssize_t ie_size)
 +{
-+	struct wfd_subelem_iter iter;
-+	const uint8_t *devinfo =3D NULL;
-+	const uint8_t *ext_caps =3D NULL;
-+	const uint8_t *r2 =3D NULL;
++	struct p2p_wfd_properties wfd;
 +
++	if (!dev->conn_own_wfd)
++		return true;
++
++	/*
++	 * WFD IEs are optional in Association Request/Response and P2P Public
++	 * Action frames for R2 devices and required for R1 devices.
++	 * Wi-Fi Display Technical Specification v2.1.0 section 5.2:
++	 * "A WFD R2 Device shall include the WFD IE in Beacon, Probe
++	 * Request/Response, Association Request/Response and P2P Public Action
++	 * frames in order to be interoperable with R1 devices. If a WFD R2
++	 * Device discovers that the peer device is also a WFD R2 Device, then
++	 * it may include the WFD IE in Association Request/Response and P2P
++	 * Public Action frames."
++	 */
 +	if (!ie)
-+		return false;
++		return dev->conn_own_wfd->r2;
 +
-+	wfd_subelem_iter_init(&iter, ie, ie_size);
-+
-+	while (wfd_subelem_iter_next(&iter)) {
-+		enum wfd_subelem_type type =3D wfd_subelem_iter_get_type(&iter);
-+		size_t len =3D wfd_subelem_iter_get_length(&iter);
-+		const uint8_t *data =3D wfd_subelem_iter_get_data(&iter);
-+
-+		switch (type) {
-+#define SUBELEM_CHECK(var, expected_len, name)		\
-+			if (len !=3D expected_len) {	\
-+				l_debug(name " length wrong in WFD IE");\
-+				return false;		\
-+			}				\
-+							\
-+			if (var) {			\
-+				l_debug("Duplicate" name " in WFD IE");\
-+				return false;		\
-+			}				\
-+							\
-+			var =3D data;
-+		case WFD_SUBELEM_WFD_DEVICE_INFORMATION:
-+			SUBELEM_CHECK(devinfo, 6, "Device Information");
-+			break;
-+		case WFD_SUBELEM_EXTENDED_CAPABILITY:
-+			SUBELEM_CHECK(ext_caps, 2, "Extended Capability");
-+			break;
-+		case WFD_SUBELEM_R2_DEVICE_INFORMATION:
-+			SUBELEM_CHECK(r2, 2, "R2 Device Information");
-+			break;
-+#undef SUBELEM_CHECK
-+		default:
-+			/* Skip unknown IEs */
-+			break;
-+		}
-+	}
-+
-+	if (devinfo) {
-+		uint16_t capability =3D l_get_be16(devinfo + 0);
-+		bool source;
-+		bool sink;
-+		uint16_t port;
-+
-+		source =3D (capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
-+			WFD_DEV_INFO_TYPE_SOURCE ||
-+			(capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
-+			WFD_DEV_INFO_TYPE_DUAL_ROLE;
-+		sink =3D (capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
-+			WFD_DEV_INFO_TYPE_PRIMARY_SINK ||
-+			(capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
-+			WFD_DEV_INFO_TYPE_DUAL_ROLE;
-+
-+		if (!source && !sink)
-+			return false;
-+
-+		port =3D l_get_be16(devinfo + 2);
-+
-+		if (source && port =3D=3D 0) {
-+			l_debug("0 port number in WFD IE Device Information");
-+			return false;
-+		}
-+
-+		memset(out, 0, sizeof(*out));
-+		out->available =3D
-+			(capability & WFD_DEV_INFO_SESSION_AVAILABILITY) =3D=3D
-+			WFD_DEV_INFO_SESSION_AVAILABLE;
-+		out->source =3D source;
-+		out->sink =3D sink;
-+		out->port =3D port;
-+		out->cp =3D capability & WFD_DEV_INFO_CONTENT_PROTECTION_SUPPORT;
-+		out->audio =3D !sink ||
-+			(capability & WFD_DEV_INFO_NO_AUDIO_AT_PRIMARY_SINK);
-+	} else {
-+		l_error("Device Information missing in WFD IE");
++	if (!p2p_extract_wfd_properties(ie, ie_size, &wfd)) {
++		l_error("Could not parse the WFD IE contents");
 +		return false;
 +	}
 +
-+	if (ext_caps && (l_get_be16(ext_caps) & 1))
-+		out->uibc =3D 1;
-+
-+	if (r2) {
-+		uint8_t role =3D l_get_be16(r2) & 3;
-+
-+		if ((out->source && role !=3D 0 && role !=3D 3) ||
-+				(out->sink && role !=3D 1 && role !=3D 3))
-+			l_debug("Invalid role in WFD R2 Device Information");
-+		else
-+			out->r2 =3D true;
++	if ((dev->conn_own_wfd->source && !wfd.sink) ||
++			(dev->conn_own_wfd->sink && !wfd.source)) {
++		l_error("Wrong role in peer's WFD IE");
++		return false;
 +	}
++
++	if (wfd.r2 !=3D dev->conn_own_wfd->r2) {
++		l_error("Wrong version in peer's WFD IE");
++		return false;
++	}
++
++	/*
++	 * Ignore the session available state because it's not 100% clear
++	 * at what point the peer switches to SESSION_NOT_AVAILABLE in its
++	 * Device Information.
++	 * But we might want to check that other bits have not changed from
++	 * what the peer reported during discovery.
++	 * Wi-Fi Display Technical Specification v2.1.0 section 4.5.2.1:
++	 * "The content of the WFD Device Information subelement should be
++	 * immutable during the period of P2P connection establishment, with
++	 * [...] exceptions [...]"
++	 */
 +
 +	return true;
 +}
@@ -172,273 +225,291 @@ _device *dev,
  static bool p2p_go_negotiation_confirm_cb(const struct mmpdu_header *mpdu,
  					const void *body, size_t body_len,
  					int rssi, struct p2p_device *dev)
-@@ -2385,6 +2492,63 @@ static void p2p_device_roc_start(struct p2p_device *=
-dev)
- 		(int) dev->listen_channel, (int) duration);
- }
+@@ -1517,6 +1601,12 @@ static bool p2p_go_negotiation_confirm_cb(const stru=
+ct mmpdu_header *mpdu,
+ 		return true;
+ 	}
  =
 
-+static void p2p_peer_update_wfd(struct p2p_peer *peer,
-+				struct p2p_wfd_properties *new_wfd)
-+{
-+	struct p2p_wfd_properties *orig_wfd =3D peer->wfd;
-+
-+	if (!orig_wfd && !new_wfd)
-+		return;
-+
-+	peer->wfd =3D new_wfd ? l_memdup(new_wfd, sizeof(*new_wfd)) : NULL;
-+
-+	if (!orig_wfd && new_wfd) {
-+		l_dbus_object_add_interface(dbus_get_bus(),
-+						p2p_peer_get_path(peer),
-+						IWD_P2P_WFD_INTERFACE, peer);
-+		return;
-+	} else if (orig_wfd && !new_wfd) {
-+		l_free(orig_wfd);
-+		l_dbus_object_remove_interface(dbus_get_bus(),
-+						p2p_peer_get_path(peer),
-+						IWD_P2P_WFD_INTERFACE);
-+		return;
++	/* Check whether WFD IE is required, validate it if present */
++	if (!p2p_device_validate_conn_wfd(dev, info.wfd, info.wfd_size)) {
++		p2p_connect_failed(dev);
++		return true;
 +	}
 +
-+	if (orig_wfd->source !=3D new_wfd->source)
-+		l_dbus_property_changed(dbus_get_bus(),
-+					p2p_peer_get_path(peer),
-+					IWD_P2P_WFD_INTERFACE, "Source");
-+
-+	if (orig_wfd->sink !=3D new_wfd->sink)
-+		l_dbus_property_changed(dbus_get_bus(),
-+					p2p_peer_get_path(peer),
-+					IWD_P2P_WFD_INTERFACE, "Sink");
-+
-+	if (orig_wfd->port !=3D new_wfd->port)
-+		l_dbus_property_changed(dbus_get_bus(),
-+					p2p_peer_get_path(peer),
-+					IWD_P2P_WFD_INTERFACE, "Port");
-+
-+	if (orig_wfd->audio !=3D new_wfd->audio)
-+		l_dbus_property_changed(dbus_get_bus(),
-+					p2p_peer_get_path(peer),
-+					IWD_P2P_WFD_INTERFACE, "HasAudio");
-+
-+	if (orig_wfd->uibc !=3D new_wfd->uibc)
-+		l_dbus_property_changed(dbus_get_bus(),
-+					p2p_peer_get_path(peer),
-+					IWD_P2P_WFD_INTERFACE, "HasUIBC");
-+
-+	if (orig_wfd->cp !=3D new_wfd->cp)
-+		l_dbus_property_changed(dbus_get_bus(),
-+					p2p_peer_get_path(peer),
-+					IWD_P2P_WFD_INTERFACE,
-+					"HasContentProtection");
-+
-+	l_free(orig_wfd);
-+}
-+
- static const char *p2p_peer_wsc_get_path(struct wsc_dbus *wsc)
- {
- 	return p2p_peer_get_path(l_container_of(wsc, struct p2p_peer, wsc));
-@@ -2410,6 +2574,8 @@ static void p2p_peer_wsc_remove(struct wsc_dbus *wsc)
+ 	dev->go_oper_freq =3D frequency;
+ 	memcpy(&dev->go_group_id, &info.group_id,
+ 		sizeof(struct p2p_group_id_attr));
+@@ -1543,6 +1633,7 @@ static void p2p_device_go_negotiation_req_cb(const st=
+ruct mmpdu_header *mpdu,
+ 	int r;
+ 	uint8_t *resp_body;
+ 	size_t resp_len;
++	uint8_t wfd_ie[32];
+ 	struct iovec iov[16];
+ 	int iov_len =3D 0;
+ 	struct p2p_peer *peer;
+@@ -1651,6 +1742,18 @@ static void p2p_device_go_negotiation_req_cb(const s=
+truct mmpdu_header *mpdu,
+ 		goto p2p_free;
+ 	}
  =
 
- static bool p2p_device_peer_add(struct p2p_device *dev, struct p2p_peer *p=
-eer)
- {
-+	struct p2p_wfd_properties wfd;
++	/* Check whether WFD IE is required, validate it if present */
++	if (!p2p_device_validate_conn_wfd(dev, req_info.wfd,
++						req_info.wfd_size)) {
++		p2p_connect_failed(dev);
 +
- 	if (!strlen(peer->name) || !l_utf8_validate(
- 					peer->name, strlen(peer->name), NULL)) {
- 		l_debug("Device name doesn't validate for bssid %s",
-@@ -2447,6 +2613,16 @@ static bool p2p_device_peer_add(struct p2p_device *d=
-ev, struct p2p_peer *peer)
- 		return false;
++		if (l_queue_isempty(dev->discovery_users))
++			p2p_device_discovery_stop(dev);
++
++		status =3D P2P_STATUS_FAIL_INCOMPATIBLE_PARAMS;
++		goto p2p_free;
++	}
++
+ 	l_timeout_remove(dev->go_neg_req_timeout);
+ 	p2p_device_discovery_stop(dev);
+ =
+
+@@ -1680,7 +1783,14 @@ respond:
+ 	resp_info.device_info =3D dev->device_info;
+ 	resp_info.device_password_id =3D dev->conn_password_id;
+ =
+
++	if (dev->conn_own_wfd) {
++		resp_info.wfd =3D wfd_ie;
++		resp_info.wfd_size =3D p2p_build_wfd_ie(dev->conn_own_wfd,
++							wfd_ie);
++	}
++
+ 	resp_body =3D p2p_build_go_negotiation_resp(&resp_info, &resp_len);
++	resp_info.wfd =3D NULL;
+ 	p2p_clear_go_negotiation_resp(&resp_info);
+ =
+
+ 	if (!resp_body) {
+@@ -1692,8 +1802,6 @@ respond:
+ 	iov[iov_len].iov_len =3D resp_len;
+ 	iov_len++;
+ =
+
+-	/* WFD and other service IEs go here */
+-
+ 	iov[iov_len].iov_base =3D NULL;
+ =
+
+ 	if (status =3D=3D P2P_STATUS_SUCCESS)
+@@ -1759,6 +1867,7 @@ static bool p2p_go_negotiation_resp_cb(const struct m=
+mpdu_header *mpdu,
+ 	struct p2p_go_negotiation_confirmation confirm_info =3D {};
+ 	uint8_t *confirm_body;
+ 	size_t confirm_len;
++	uint8_t wfd_ie[32];
+ 	int r;
+ 	struct iovec iov[16];
+ 	int iov_len =3D 0;
+@@ -1839,6 +1948,13 @@ static bool p2p_go_negotiation_resp_cb(const struct =
+mmpdu_header *mpdu,
+ 						&resp_info.operating_channel))
+ 		return true;
+ =
+
++	/* Check whether WFD IE is required, validate it if present */
++	if (!p2p_device_validate_conn_wfd(dev, resp_info.wfd,
++						resp_info.wfd_size)) {
++		p2p_connect_failed(dev);
++		return true;
++	}
++
+ 	band =3D scan_oper_class_to_band(
+ 			(const uint8_t *) resp_info.operating_channel.country,
+ 			resp_info.operating_channel.oper_class);
+@@ -1865,8 +1981,15 @@ static bool p2p_go_negotiation_resp_cb(const struct =
+mmpdu_header *mpdu,
+ 	confirm_info.channel_list =3D resp_info.channel_list;
+ 	confirm_info.operating_channel =3D resp_info.operating_channel;
+ =
+
++	if (dev->conn_own_wfd) {
++		confirm_info.wfd =3D wfd_ie;
++		confirm_info.wfd_size =3D p2p_build_wfd_ie(dev->conn_own_wfd,
++								wfd_ie);
++	}
++
+ 	confirm_body =3D p2p_build_go_negotiation_confirmation(&confirm_info,
+ 								&confirm_len);
++	confirm_info.wfd =3D NULL;
+ 	p2p_clear_go_negotiation_resp(&resp_info);
+ =
+
+ 	if (!confirm_body) {
+@@ -1878,8 +2001,6 @@ static bool p2p_go_negotiation_resp_cb(const struct m=
+mpdu_header *mpdu,
+ 	iov[iov_len].iov_len =3D confirm_len;
+ 	iov_len++;
+ =
+
+-	/* WFD and other service IEs go here */
+-
+ 	iov[iov_len].iov_base =3D NULL;
+ =
+
+ 	p2p_peer_frame_xchg(dev->conn_peer, iov, dev->conn_peer->device_addr,
+@@ -1906,6 +2027,7 @@ static void p2p_start_go_negotiation(struct p2p_devic=
+e *dev)
+ 	struct p2p_go_negotiation_req info =3D {};
+ 	uint8_t *req_body;
+ 	size_t req_len;
++	uint8_t wfd_ie[32];
+ 	struct iovec iov[16];
+ 	int iov_len =3D 0;
+ 	/*
+@@ -1944,7 +2066,13 @@ static void p2p_start_go_negotiation(struct p2p_devi=
+ce *dev)
+ 	info.device_info =3D dev->device_info;
+ 	info.device_password_id =3D dev->conn_password_id;
+ =
+
++	if (dev->conn_own_wfd) {
++		info.wfd =3D wfd_ie;
++		info.wfd_size =3D p2p_build_wfd_ie(dev->conn_own_wfd, wfd_ie);
++	}
++
+ 	req_body =3D p2p_build_go_negotiation_req(&info, &req_len);
++	info.wfd =3D NULL;
+ 	p2p_clear_go_negotiation_req(&info);
+ =
+
+ 	if (!req_body) {
+@@ -1956,8 +2084,6 @@ static void p2p_start_go_negotiation(struct p2p_devic=
+e *dev)
+ 	iov[iov_len].iov_len =3D req_len;
+ 	iov_len++;
+ =
+
+-	/* WFD and other service IEs go here */
+-
+ 	iov[iov_len].iov_base =3D NULL;
+ =
+
+ 	p2p_peer_frame_xchg(dev->conn_peer, iov, dev->conn_peer->device_addr,
+@@ -2008,6 +2134,12 @@ static bool p2p_provision_disc_resp_cb(const struct =
+mmpdu_header *mpdu,
+ 		return true;
+ 	}
+ =
+
++	/* Check whether WFD IE is required, validate it if present */
++	if (!p2p_device_validate_conn_wfd(dev, info.wfd, info.wfd_size)) {
++		p2p_connect_failed(dev);
++		return true;
++	}
++
+ 	/*
+ 	 * If we're not joining an existing group, continue with Group
+ 	 * Formation now.
+@@ -2054,6 +2186,7 @@ static void p2p_start_provision_discovery(struct p2p_=
+device *dev)
+ 	struct p2p_provision_discovery_req info =3D { .status =3D -1 };
+ 	uint8_t *req_body;
+ 	size_t req_len;
++	uint8_t wfd_ie[32];
+ 	struct iovec iov[16];
+ 	int iov_len =3D 0;
+ =
+
+@@ -2070,7 +2203,13 @@ static void p2p_start_provision_discovery(struct p2p=
+_device *dev)
+ =
+
+ 	info.wsc_config_method =3D dev->conn_config_method;
+ =
+
++	if (dev->conn_own_wfd) {
++		info.wfd =3D wfd_ie;
++		info.wfd_size =3D p2p_build_wfd_ie(dev->conn_own_wfd, wfd_ie);
++	}
++
+ 	req_body =3D p2p_build_provision_disc_req(&info, &req_len);
++	info.wfd =3D NULL;
+ 	p2p_clear_provision_disc_req(&info);
+ =
+
+ 	if (!req_body) {
+@@ -2082,8 +2221,6 @@ static void p2p_start_provision_discovery(struct p2p_=
+device *dev)
+ 	iov[iov_len].iov_len =3D req_len;
+ 	iov_len++;
+ =
+
+-	/* WFD and other service IEs go here */
+-
+ 	iov[iov_len].iov_base =3D NULL;
+ =
+
+ 	/*
+@@ -2195,6 +2332,24 @@ static void p2p_peer_connect(struct p2p_peer *peer, =
+const char *pin)
+ 		goto send_error;
  	}
  =
 
 +	/*
-+	 * We need to either only show peers that are available for a WFD
-+	 * session, or expose the availability information through a property,
-+	 * which we are not doing right now.
++	 * Check WFD role compatiblity.  At least one of the the devices
++	 * (device A) must be non-dual-role and device B must implement the
++	 * role that A does not.  peer->wfd and p2p_own_wfd have both been
++	 * validated and we know each device implements at least one role.
 +	 */
-+	if (p2p_own_wfd && p2p_extract_wfd_properties(peer->bss->wfd,
-+						peer->bss->wfd_size, &wfd) &&
-+			wfd.available)
-+		p2p_peer_update_wfd(peer, &wfd);
++	if (p2p_own_wfd && p2p_own_wfd->available && peer->wfd) {
++		if (!(
++				(!peer->wfd->source && p2p_own_wfd->source) ||
++				(!peer->wfd->sink && p2p_own_wfd->sink) ||
++				(!p2p_own_wfd->source && peer->wfd->source) ||
++				(!p2p_own_wfd->sink && peer->wfd->sink))) {
++			l_error("Incompatible WFD roles");
++			reply =3D dbus_error_not_supported(message);
++			goto send_error;
++		}
++	}
 +
- 	l_queue_push_tail(dev->peer_list, peer);
+ 	p2p_device_discovery_stop(dev);
  =
 
- 	return true;
-@@ -2477,18 +2653,20 @@ static bool p2p_peer_update_existing(struct scan_bs=
-s *bss,
- 					struct l_queue *new_list)
- {
- 	struct p2p_peer *peer;
-+	struct p2p_wfd_properties wfd;
+ 	/* Generate the interface address for our P2P-Client connection */
+@@ -2206,6 +2361,28 @@ static void p2p_peer_connect(struct p2p_peer *peer, =
+const char *pin)
+ 	l_dbus_property_changed(dbus_get_bus(), p2p_device_get_path(dev),
+ 				IWD_P2P_INTERFACE, "AvailableConnections");
  =
 
- 	peer =3D l_queue_remove_if(old_list, p2p_peer_match, bss->addr);
- 	if (!peer)
- 		return false;
- =
-
++	if (p2p_own_wfd && p2p_own_wfd->available && peer->wfd) {
++		dev->conn_own_wfd =3D l_memdup(p2p_own_wfd, sizeof(*p2p_own_wfd));
++
++		/*
++		 * From now on we'll appear as SESSION_NOT_AVAILABLE to other
++		 * peers but as SESSION_AVAILABLE to conn_peer.
++		 */
++		p2p_own_wfd->available =3D false;
++
++		/* If peer is R1, fall back to R1 as well */
++		dev->conn_own_wfd->r2 =3D p2p_own_wfd->r2 && peer->wfd->r2;
++
++		/*
++		 * If we're a dual-role device, we have to select our role
++		 * for this connection now.
++		 */
++		if (p2p_own_wfd->source && p2p_own_wfd->sink) {
++			dev->conn_own_wfd->source =3D !peer->wfd->source;
++			dev->conn_own_wfd->sink =3D !peer->wfd->sink;
++		}
++	}
++
  	/*
--	 * We've seen this peer already, only update the scan_bss object.
--	 * We can do this even if peer =3D=3D peer->dev->conn_peer because
--	 * its .bss is not used by .conn_netdev or .conn_enrollee.
--	 * .conn_wsc_bss is used for both connections and it doesn't come
--	 * from the discovery scan results.
--	 * Do we need to update DBus properties?
-+	 * We've seen this peer already, only update the scan_bss object
-+	 * and WFD state.  We can update peer->bss even if
-+	 * peer =3D=3D peer->dev->conn_peer because its .bss is not used by
-+	 * .conn_netdev or .conn_enrollee.  .conn_wsc_bss is used for
-+	 * both connections and it doesn't come from the discovery scan
-+	 * results.
-+	 * Some property changes may need to be notified here.
- 	 */
- =
-
- 	if (peer->device_addr =3D=3D peer->bss->addr)
-@@ -2500,6 +2678,13 @@ static bool p2p_peer_update_existing(struct scan_bss=
- *bss,
- 	scan_bss_free(peer->bss);
- 	peer->bss =3D bss;
- =
-
-+	if (p2p_own_wfd && p2p_extract_wfd_properties(bss->wfd, bss->wfd_size,
-+							&wfd) &&
-+			wfd.available)
-+		p2p_peer_update_wfd(peer, &wfd);
-+	else if (peer->wfd)
-+		p2p_peer_update_wfd(peer, NULL);
-+
- 	l_queue_push_tail(new_list, peer);
- 	return true;
- }
-@@ -3641,6 +3826,94 @@ static void p2p_peer_interface_setup(struct l_dbus_i=
-nterface *interface)
- 				p2p_peer_dbus_disconnect, "", "");
- }
- =
-
-+static bool p2p_peer_get_wfd_source(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
-+
-+	l_dbus_message_builder_append_basic(builder, 'b', &peer->wfd->source);
-+	return true;
-+}
-+
-+static bool p2p_peer_get_wfd_sink(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
-+
-+	l_dbus_message_builder_append_basic(builder, 'b', &peer->wfd->sink);
-+	return true;
-+}
-+
-+static bool p2p_peer_get_wfd_port(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
-+
-+	if (!peer->wfd->source)
-+		return false;
-+
-+	l_dbus_message_builder_append_basic(builder, 'q', &peer->wfd->port);
-+	return true;
-+}
-+
-+static bool p2p_peer_get_wfd_has_audio(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
-+
-+	if (!peer->wfd->sink)
-+		return false;
-+
-+	l_dbus_message_builder_append_basic(builder, 'b', &peer->wfd->audio);
-+	return true;
-+}
-+
-+static bool p2p_peer_get_wfd_has_uibc(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
-+
-+	l_dbus_message_builder_append_basic(builder, 'b', &peer->wfd->uibc);
-+	return true;
-+}
-+
-+static bool p2p_peer_get_wfd_has_cp(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
-+
-+	l_dbus_message_builder_append_basic(builder, 'b', &peer->wfd->cp);
-+	return true;
-+}
-+
-+static void p2p_wfd_interface_setup(struct l_dbus_interface *interface)
-+{
-+	l_dbus_interface_property(interface, "Source", 0, "b",
-+					p2p_peer_get_wfd_source, NULL);
-+	l_dbus_interface_property(interface, "Sink", 0, "b",
-+					p2p_peer_get_wfd_sink, NULL);
-+	l_dbus_interface_property(interface, "Port", 0, "q",
-+					p2p_peer_get_wfd_port, NULL);
-+	l_dbus_interface_property(interface, "HasAudio", 0, "b",
-+					p2p_peer_get_wfd_has_audio, NULL);
-+	l_dbus_interface_property(interface, "HasUIBC", 0, "b",
-+					p2p_peer_get_wfd_has_uibc, NULL);
-+	l_dbus_interface_property(interface, "HasContentProtection", 0, "b",
-+					p2p_peer_get_wfd_has_cp, NULL);
-+}
-+
- static void p2p_own_wfd_free(void)
- {
- 	const struct l_queue_entry *entry;
-@@ -3842,6 +4115,12 @@ static int p2p_init(void)
- 	p2p_dhcp_settings =3D l_settings_new();
- 	p2p_device_list =3D l_queue_new();
- =
-
-+	if (!l_dbus_register_interface(dbus, IWD_P2P_WFD_INTERFACE,
-+					p2p_wfd_interface_setup,
-+					NULL, false))
-+		l_error("Unable to register the %s interface",
-+			IWD_P2P_WFD_INTERFACE);
-+
- 	if (!l_dbus_register_interface(dbus, IWD_P2P_SERVICE_MANAGER_INTERFACE,
- 					p2p_svc_mgr_interface_setup,
- 					p2p_svc_mgr_destroy_cb, false))
-@@ -3861,6 +4140,7 @@ static void p2p_exit(void)
- =
-
- 	l_dbus_unregister_interface(dbus, IWD_P2P_INTERFACE);
- 	l_dbus_unregister_interface(dbus, IWD_P2P_PEER_INTERFACE);
-+	l_dbus_unregister_interface(dbus, IWD_P2P_WFD_INTERFACE);
- 	l_dbus_unregister_interface(dbus, IWD_P2P_SERVICE_MANAGER_INTERFACE);
- 	l_queue_destroy(p2p_device_list, p2p_device_free);
- 	p2p_device_list =3D NULL;
+ 	 * Step 2, if peer is already a GO then send the Provision Discovery
+ 	 * before doing WSC.  If it's not then do Provision Discovery
 -- =
 
 2.25.1
 
---===============3746645590755287732==--
+--===============6476753685049166822==--
 
