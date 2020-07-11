@@ -1,122 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============0327480252798154604=="
+Content-Type: multipart/mixed; boundary="===============6162846348198765113=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 14/18] doc: Wi-Fi Display DBus API doc
-Date: Sat, 11 Jul 2020 03:00:49 +0200
-Message-ID: <20200711010053.224223-14-andrew.zaborowski@intel.com>
+Subject: [PATCH 15/18] netconfig: Implement netconfig_get_dhcp_server_ipv4
+Date: Sat, 11 Jul 2020 03:00:50 +0200
+Message-ID: <20200711010053.224223-15-andrew.zaborowski@intel.com>
 In-Reply-To: <20200711010053.224223-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0327480252798154604==
+--===============6162846348198765113==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This uses l_dhcp_lease_get_server_id to get the IP of the server that
+offered us our current lease.  l_dhcp_lease_get_server_id returns the
+vaue of the L_DHCP_OPTION_SERVER_IDENTIFIER option, which is the address
+that any unicast DHCP frames are supposed to be sent to so it seems to
+be the best way to get the P2P group owner's IP address as a P2P-client.
 ---
- doc/p2p-service-api.txt | 89 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 89 insertions(+)
- create mode 100644 doc/p2p-service-api.txt
+ src/netconfig.c | 14 ++++++++++++++
+ src/netconfig.h |  1 +
+ 2 files changed, 15 insertions(+)
 
-diff --git a/doc/p2p-service-api.txt b/doc/p2p-service-api.txt
-new file mode 100644
-index 00000000..76ee7b58
---- /dev/null
-+++ b/doc/p2p-service-api.txt
-@@ -0,0 +1,89 @@
-+P2P Service Manager hierarchy
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 6a618e8f..701ae38b 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -1149,6 +1149,20 @@ bool netconfig_reset(struct netconfig *netconfig)
+ 	return true;
+ }
+ =
+
++char *netconfig_get_dhcp_server_ipv4(struct netconfig *netconfig)
++{
++	const struct l_dhcp_lease *lease;
 +
-+Service		net.connman.iwd
-+Interface	net.connman.iwd.p2p.ServiceManager [Experimental]
-+Object path	/net/connman/iwd
++	if (!netconfig->dhcp_client)
++		return NULL;
 +
-+Methods		void RegisterDisplayService(dict properties)
++	lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
++	if (!lease)
++		return NULL;
 +
-+			Register a Wi-Fi Display service handler.  An
-+			application can register as implementing this
-+			P2P-based service to make IWD advertise local WFD
-+			capability to peers, expose discovered peers' WFD
-+			capabilities for each DBus peer object, and
-+			validate the peer's WFD properties during a
-+			connection setup.  Once a connection is established
-+			to a peer that was available for a WFD Session the
-+			application is responsible for continuing the WFD
-+			session establishment by setting up the TCP
-+			connection, performing WFD capability exchange and
-+			negotiation, Link Content Protection setup and
-+			session start.  When the session is torn down,
-+			the application is responsible for calling the
-+			Disconnect method on the net.connman.iwd.p2p.Peer
-+			interface of the peer object.
++	return l_dhcp_lease_get_server_id(lease);
++}
 +
-+			Registering a service will have no effect on
-+			existing connections.
-+
-+			The net.connman.iwd.p2p.Display interface is
-+			going to be attached to discovered peer objects of
-+			those peers that are available for a WFD session.
-+			The properties argument to this method, who's DBus
-+			signature is a{sv}, may contain any of the
-+			properties on that interface as listed below.
-+			Note that there's currently no way to select the
-+			role for a specific connection so IWD will refuse
-+			to connect to a dual-role peer if the local WFD
-+			device is also dual-role capable.
-+
-+			Possible Errors: [service].Error.InvalidArguments
-+					 [service].Error.AlreadyExists
-+					 [service].Error.NotSupported
-+
-+		void UnregisterDisplayService()
-+
-+			Unregister a WFD service handler.
-+
-+			Possible Errors: [service].Error.InvalidArguments
-+					 [service].Error.NotFound
-+
-+
-+Display hierarchy
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Service		net.connman.iwd
-+Interface	net.connman.iwd.p2p.Display [Experimental]
-+Object path	/net/connman/iwd/{phy0,phy1,...}/p2p_peers/{aa_bb_cc_dd_ee_ff}
-+
-+Properties	boolean Source [readonly]
-+
-+			Whether the peer represented by the object is
-+			a WFD source.
-+
-+		boolean Sink [readonly]
-+
-+			Whether the peer represented by the object has
-+			a WFD sink capability.  At least one of this and
-+			'Source' should be true.
-+
-+		uint16 Port [readonly, optional]
-+
-+			WFD Session Management Control port -- a TCP port
-+			number.  Only present/allowed if Source is true.
-+
-+		boolean HasAudio [readonly, optional]
-+
-+			Whether audio rendering is supported.  Only
-+			present/allowed if Sink is true.
-+
-+		boolean HasUIBC [readonly]
-+
-+			Whether WFD Device supports UIBC or User Input
-+			Back Channel communication.
-+
-+		boolean HasContentProtection [readonly]
-+
-+			Whether WFD Device supports Content Protection
-+			using the HDCP system 2.x.
+ struct netconfig *netconfig_new(uint32_t ifindex)
+ {
+ 	struct netconfig *netconfig;
+diff --git a/src/netconfig.h b/src/netconfig.h
+index 5a527950..2c68cb1c 100644
+--- a/src/netconfig.h
++++ b/src/netconfig.h
+@@ -36,6 +36,7 @@ bool netconfig_configure(struct netconfig *netconfig,
+ 				void *user_data);
+ bool netconfig_reconfigure(struct netconfig *netconfig);
+ bool netconfig_reset(struct netconfig *netconfig);
++char *netconfig_get_dhcp_server_ipv4(struct netconfig *netconfig);
+ =
+
+ struct netconfig *netconfig_new(uint32_t ifindex);
+ void netconfig_destroy(struct netconfig *netconfig);
 -- =
 
 2.25.1
 
---===============0327480252798154604==--
+--===============6162846348198765113==--
 
