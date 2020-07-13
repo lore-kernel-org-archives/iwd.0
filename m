@@ -1,14 +1,15 @@
-Content-Type: multipart/mixed; boundary="===============4391468921671307684=="
+Content-Type: multipart/mixed; boundary="===============3353204296746015697=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 15/18] netconfig: Implement netconfig_get_dhcp_server_ipv4
-Date: Mon, 13 Jul 2020 14:53:14 -0500
-Message-ID: <530faeab-803f-5a26-90ab-a83fd9ab3d12@gmail.com>
-In-Reply-To: <20200711010053.224223-15-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 16/18] p2p: Add ConnectedInterface and ConnectedIP Peer
+ properties
+Date: Mon, 13 Jul 2020 14:54:56 -0500
+Message-ID: <87124503-c33f-00ab-2c99-3e736f6fde86@gmail.com>
+In-Reply-To: <20200711010053.224223-16-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4391468921671307684==
+--===============3353204296746015697==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,22 +17,20 @@ Content-Transfer-Encoding: quoted-printable
 Hi Andrew,
 
 On 7/10/20 8:00 PM, Andrew Zaborowski wrote:
-> This uses l_dhcp_lease_get_server_id to get the IP of the server that
-> offered us our current lease.  l_dhcp_lease_get_server_id returns the
-> vaue of the L_DHCP_OPTION_SERVER_IDENTIFIER option, which is the address
-> that any unicast DHCP frames are supposed to be sent to so it seems to
-> be the best way to get the P2P group owner's IP address as a P2P-client.
+> The are useful for P2P service implementations to know unambiguously
+> which network interface a new P2P connection is on and the peer's IPv4
+> address if they need to initiate an IP connection or validate an
+> incoming connection's address from the peer.
 > ---
->   src/netconfig.c | 14 ++++++++++++++
->   src/netconfig.h |  1 +
->   2 files changed, 15 insertions(+)
+>   src/p2p.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 60 insertions(+), 1 deletion(-)
 > =
 
 
-Applied, thanks.
+Patch 16 & 17 applied, thanks.
 
 Regards,
 -Denis
 
---===============4391468921671307684==--
+--===============3353204296746015697==--
 
