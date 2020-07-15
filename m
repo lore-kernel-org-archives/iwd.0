@@ -1,13 +1,13 @@
-Content-Type: multipart/mixed; boundary="===============4775317528215574411=="
+Content-Type: multipart/mixed; boundary="===============6297706275520278130=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v7] netdev: use wiphy radio work queue for connections
-Date: Wed, 15 Jul 2020 13:24:38 -0700
-Message-ID: <20200715202438.12123-1-prestwoj@gmail.com>
+Subject: [PATCH v8] netdev: use wiphy radio work queue for connections
+Date: Wed, 15 Jul 2020 14:29:17 -0700
+Message-ID: <20200715212917.16717-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4775317528215574411==
+--===============6297706275520278130==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,16 +16,17 @@ This adds connection/FT attempts to the radio work queue. This
 will ensure that connections aren't delayed or done concurrently
 with scanning.
 ---
- src/netdev.c  | 190 +++++++++++++++++++++++++++++++++++---------------
+ src/netdev.c  | 191 ++++++++++++++++++++++++++++++++++++--------------
  src/station.c |   8 +--
- 2 files changed, 138 insertions(+), 60 deletions(-)
+ 2 files changed, 141 insertions(+), 58 deletions(-)
 
-v7:
- - Unref/NULL netdev->connect_cmd in one place
- - Rework some logic in netdev_being_connection
+v8:
+ - Put auth-proto/normal connects back together as this prevented SAE
+   from randomizing the address
+ - Separated out ft work into its own worker function
 
 diff --git a/src/netdev.c b/src/netdev.c
-index e469fb1c..9bfbe03c 100644
+index e469fb1c..9e2690d3 100644
 --- a/src/netdev.c
 +++ b/src/netdev.c
 @@ -136,6 +136,9 @@ struct netdev {
@@ -89,7 +90,7 @@ hs, uint16_t reason_code)
  =
 
  static void hardware_rekey_cb(struct l_genl_msg *msg, void *data)
-@@ -2421,30 +2438,30 @@ static struct l_genl_msg *netdev_build_cmd_connect(=
+@@ -2421,32 +2438,48 @@ static struct l_genl_msg *netdev_build_cmd_connect(=
 struct netdev *netdev,
  =
 
@@ -106,22 +107,23 @@ struct netdev *netdev,
 +static int netdev_begin_connection(struct netdev *netdev)
  {
 -	if (cmd_connect) {
--		netdev->connect_cmd_id =3D l_genl_family_send(nl80211,
++	if (netdev->connect_cmd) {
+ 		netdev->connect_cmd_id =3D l_genl_family_send(nl80211,
 -					cmd_connect, netdev_cmd_connect_cb,
 -					netdev, NULL);
-+	netdev->connect_cmd_id =3D l_genl_family_send(nl80211,
-+					netdev->connect_cmd,
-+					netdev_cmd_connect_cb, netdev, NULL);
++						netdev->connect_cmd,
++						netdev_cmd_connect_cb, netdev,
++						NULL);
  =
 
 -		if (!netdev->connect_cmd_id) {
 -			l_genl_msg_unref(cmd_connect);
 -			return -EIO;
 -		}
-+	if (!netdev->connect_cmd_id) {
-+		netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
-+					MMPDU_STATUS_CODE_UNSPECIFIED);
-+		return -EIO;
++		if (!netdev->connect_cmd_id)
++			goto failed;
++
++		netdev->connect_cmd =3D NULL;
  	}
  =
 
@@ -135,13 +137,29 @@ struct netdev *netdev,
 
 -	/* set connected since the auth protocols cannot do so internally */
 -	if (netdev->ap && auth_proto_start(netdev->ap))
--		netdev->connected =3D true;
-+	netdev->connect_cmd =3D NULL;
++	if (netdev->ap) {
++		if (!auth_proto_start(netdev->ap))
++			goto failed;
++
++		/*
++		 * set connected since the auth protocols cannot do
++		 * so internally
++		 */
+ 		netdev->connected =3D true;
++	}
  =
 
  	return 0;
++
++failed:
++	netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
++					MMPDU_STATUS_CODE_UNSPECIFIED);
++	return -EIO;
  }
-@@ -2461,8 +2478,6 @@ static void netdev_mac_change_failed(struct netdev *n=
+ =
+
+ static void netdev_mac_change_failed(struct netdev *netdev,
+@@ -2461,8 +2494,6 @@ static void netdev_mac_change_failed(struct netdev *n=
 etdev,
  	 * mac_change_cmd_id was set.
  	 */
@@ -152,7 +170,7 @@ etdev,
  				netdev, NETDEV_WATCH_EVENT_DOWN);
  =
 
-@@ -2474,7 +2489,7 @@ static void netdev_mac_change_failed(struct netdev *n=
+@@ -2474,7 +2505,7 @@ static void netdev_mac_change_failed(struct netdev *n=
 etdev,
  		 */
  		l_info("Interface still up after failing to change the MAC, "
@@ -163,7 +181,7 @@ etdev,
  =
 
  		return;
-@@ -2517,7 +2532,7 @@ static void netdev_mac_power_up_cb(int error, uint16_=
+@@ -2517,7 +2548,7 @@ static void netdev_mac_power_up_cb(int error, uint16_=
 t type,
  	/*
  	 * Pick up where we left off in netdev_connect_commmon.
@@ -173,7 +191,7 @@ t type,
  		l_error("Failed to connect after changing MAC");
  		netdev_connect_failed(netdev, NETDEV_RESULT_ASSOCIATION_FAILED,
  				MMPDU_STATUS_CODE_UNSPECIFIED);
-@@ -2576,9 +2591,7 @@ static void netdev_mac_power_down_cb(int error, uint1=
+@@ -2576,9 +2607,7 @@ static void netdev_mac_power_down_cb(int error, uint1=
 6_t type,
   * Returns -EALREADY if the requested MAC matched our current MAC
   * Returns -EIO if there was an IO error when powering down
@@ -185,7 +203,7 @@ t type,
  {
  	struct rtnl_data *req;
  	uint8_t new_addr[6];
-@@ -2586,8 +2599,8 @@ static int netdev_start_powered_mac_change(struct net=
+@@ -2586,8 +2615,8 @@ static int netdev_start_powered_mac_change(struct net=
 dev *netdev,
  	/* No address set in handshake, use per-network MAC generation */
  	if (util_mem_is_zero(netdev->handshake->spa, ETH_ALEN))
@@ -198,7 +216,7 @@ dev *netdev,
  		memcpy(new_addr, netdev->handshake->spa, ETH_ALEN);
  =
 
-@@ -2600,7 +2613,6 @@ static int netdev_start_powered_mac_change(struct net=
+@@ -2600,7 +2629,6 @@ static int netdev_start_powered_mac_change(struct net=
 dev *netdev,
  	req =3D l_new(struct rtnl_data, 1);
  	req->netdev =3D netdev;
@@ -208,7 +226,7 @@ dev *netdev,
  	memcpy(req->addr, new_addr, sizeof(req->addr));
  =
 
-@@ -2609,7 +2621,6 @@ static int netdev_start_powered_mac_change(struct net=
+@@ -2609,7 +2637,6 @@ static int netdev_start_powered_mac_change(struct net=
 dev *netdev,
  					req, netdev_mac_destroy);
  =
@@ -219,7 +237,7 @@ dev *netdev,
  =
 
  		return -EIO;
-@@ -2618,6 +2629,66 @@ static int netdev_start_powered_mac_change(struct ne=
+@@ -2618,6 +2645,35 @@ static int netdev_start_powered_mac_change(struct ne=
 tdev *netdev,
  	return 0;
  }
@@ -255,41 +273,10 @@ m)
 +	.do_work =3D netdev_connection_work_ready,
 +};
 +
-+static bool netdev_ap_work_ready(struct wiphy_radio_work_item *item)
-+{
-+	struct netdev *netdev =3D l_container_of(item, struct netdev, work);
-+
-+	handshake_state_set_supplicant_address(netdev->handshake, netdev->addr);
-+
-+	if (!auth_proto_start(netdev->ap)) {
-+		/* Restore original nonce if this was an FT attempt */
-+		if (netdev->in_ft) {
-+			memcpy(netdev->handshake->snonce,
-+				netdev->prev_snonce, 32);
-+
-+			netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
-+						MMPDU_STATUS_CODE_UNSPECIFIED);
-+			return true;
-+		}
-+	}
-+
-+	/*
-+	 * set connected since the auth protocols cannot do
-+	 * so internally
-+	 */
-+	netdev->connected =3D true;
-+
-+	return false;
-+}
-+
-+static const struct wiphy_radio_work_item_ops ap_work_ops =3D {
-+	.do_work =3D netdev_ap_work_ready,
-+};
-+
  static int netdev_connect_common(struct netdev *netdev,
  					struct l_genl_msg *cmd_connect,
  					struct scan_bss *bss,
-@@ -2626,6 +2697,7 @@ static int netdev_connect_common(struct netdev *netde=
+@@ -2626,6 +2682,7 @@ static int netdev_connect_common(struct netdev *netde=
 v,
  					netdev_event_func_t event_filter,
  					netdev_connect_cb_t cb, void *user_data)
@@ -298,7 +285,7 @@ v,
  	netdev->event_filter =3D event_filter;
  	netdev->connect_cb =3D cb;
  	netdev->user_data =3D user_data;
-@@ -2642,14 +2714,9 @@ static int netdev_connect_common(struct netdev *netd=
+@@ -2642,14 +2699,9 @@ static int netdev_connect_common(struct netdev *netd=
 ev,
  					NL80211_EXT_FEATURE_CAN_REPLACE_PTK0))
  		handshake_state_set_no_rekey(hs, true);
@@ -313,13 +300,13 @@ ev,
 -
 -	return netdev_begin_connection(netdev, cmd_connect);
 +	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
-+				netdev->ap ? &ap_work_ops : &connect_work_ops);
++				&connect_work_ops);
 +	return 0;
  }
  =
 
  int netdev_connect(struct netdev *netdev, struct scan_bss *bss,
-@@ -2667,7 +2734,7 @@ int netdev_connect(struct netdev *netdev, struct scan=
+@@ -2667,7 +2719,7 @@ int netdev_connect(struct netdev *netdev, struct scan=
 _bss *bss,
  			netdev->type !=3D NL80211_IFTYPE_P2P_CLIENT)
  		return -ENOTSUP;
@@ -331,7 +318,7 @@ _bss *bss,
  =
 
  	switch (hs->akm_suite) {
-@@ -2709,23 +2776,36 @@ int netdev_disconnect(struct netdev *netdev,
+@@ -2709,23 +2761,36 @@ int netdev_disconnect(struct netdev *netdev,
  				netdev_disconnect_cb_t cb, void *user_data)
  {
  	struct l_genl_msg *disconnect;
@@ -376,7 +363,7 @@ _bss *bss,
 
  		netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
  					MMPDU_REASON_CODE_UNSPECIFIED);
-@@ -2733,19 +2813,23 @@ int netdev_disconnect(struct netdev *netdev,
+@@ -2733,19 +2798,23 @@ int netdev_disconnect(struct netdev *netdev,
  		netdev_connect_free(netdev);
  	}
  =
@@ -414,8 +401,35 @@ _bss *bss,
 
  	return 0;
  }
-@@ -3092,7 +3176,6 @@ static int fast_transition(struct netdev *netdev, str=
-uct scan_bss *target_bss,
+@@ -3087,12 +3156,31 @@ static void netdev_ft_over_ds_tx_authenticate(struc=
+t iovec *iov,
+ 					netdev_ft_request_cb);
+ }
+ =
+
++static bool netdev_ft_work_ready(struct wiphy_radio_work_item *item)
++{
++	struct netdev *netdev =3D l_container_of(item, struct netdev, work);
++
++	if (!auth_proto_start(netdev->ap)) {
++		/* Restore original nonce */
++		memcpy(netdev->handshake->snonce, netdev->prev_snonce, 32);
++
++		netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
++						MMPDU_STATUS_CODE_UNSPECIFIED);
++		return true;
++	}
++
++	return false;
++}
++
++static const struct wiphy_radio_work_item_ops ft_work_ops =3D {
++	.do_work =3D netdev_ft_work_ready,
++};
++
+ static int fast_transition(struct netdev *netdev, struct scan_bss *target_=
+bss,
+ 				bool over_air,
  				netdev_connect_cb_t cb)
  {
  	struct netdev_handshake_state *nhs;
@@ -424,7 +438,7 @@ uct scan_bss *target_bss,
 
  	if (!netdev->operational)
  		return -ENOTCONN;
-@@ -3173,15 +3256,10 @@ static int fast_transition(struct netdev *netdev, s=
+@@ -3173,15 +3261,10 @@ static int fast_transition(struct netdev *netdev, s=
 truct scan_bss *target_bss,
  					netdev_ft_over_ds_tx_authenticate,
  					netdev_ft_tx_associate, netdev);
@@ -433,7 +447,7 @@ truct scan_bss *target_bss,
 -	if (!auth_proto_start(netdev->ap))
 -		goto restore_snonce;
 +	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
-+				&ap_work_ops);
++				&ft_work_ops);
  =
 
  	return 0;
@@ -482,5 +496,5 @@ index 35f4a96d..0095d6c8 100644
 
 2.21.1
 
---===============4775317528215574411==--
+--===============6297706275520278130==--
 
