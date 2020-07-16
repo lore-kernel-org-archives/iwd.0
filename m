@@ -1,41 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============0885271400764395270=="
+Content-Type: multipart/mixed; boundary="===============2649791469131665646=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v8] netdev: use wiphy radio work queue for connections
-Date: Wed, 15 Jul 2020 17:12:21 -0500
-Message-ID: <9f4b0e4d-f0eb-31f2-6235-aa3b1203dd00@gmail.com>
-In-Reply-To: <20200715212917.16717-1-prestwoj@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/4] agent: Don't remove object at IWD_AGENT_MANAGER_PATH
+Date: Thu, 16 Jul 2020 02:10:15 +0200
+Message-ID: <20200716001018.311387-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0885271400764395270==
+--===============2649791469131665646==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This same object is used for the P2P service manager, let each module
+remove the interfaces it added only.
 
-On 7/15/20 4:29 PM, James Prestwood wrote:
-> This adds connection/FT attempts to the radio work queue. This
-> will ensure that connections aren't delayed or done concurrently
-> with scanning.
-> ---
->   src/netdev.c  | 191 ++++++++++++++++++++++++++++++++++++--------------
->   src/station.c |   8 +--
->   2 files changed, 141 insertions(+), 58 deletions(-)
-> =
+Reported-by: Denis Kenzior
+---
+ src/agent.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-> v8:
->   - Put auth-proto/normal connects back together as this prevented SAE
->     from randomizing the address
->   - Separated out ft work into its own worker function
-> =
+diff --git a/src/agent.c b/src/agent.c
+index d213f3cd..101eaffd 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -651,7 +651,6 @@ static void agent_exit(void)
+ {
+ 	struct l_dbus *dbus =3D dbus_get_bus();
+ =
 
+-	l_dbus_unregister_object(dbus, IWD_AGENT_MANAGER_PATH);
+ 	l_dbus_unregister_interface(dbus, IWD_AGENT_MANAGER_INTERFACE);
+ =
 
-Applied, thanks.
+ 	l_queue_destroy(agents, agent_free);
+-- =
 
-Regards,
--Denis
+2.25.1
 
---===============0885271400764395270==--
+--===============2649791469131665646==--
 
