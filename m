@@ -1,69 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============5944767964386423101=="
+Content-Type: multipart/mixed; boundary="===============6251216244973380317=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/4] frame-xchg: Fix group removal inside frame callback
-Date: Tue, 21 Jul 2020 02:45:39 +0200
-Message-ID: <20200721004540.399351-3-andrew.zaborowski@intel.com>
+Subject: [PATCH 4/4] frame-xchg: Drop the BSSID check for incoming frames
+Date: Tue, 21 Jul 2020 02:45:40 +0200
+Message-ID: <20200721004540.399351-4-andrew.zaborowski@intel.com>
 In-Reply-To: <20200721004540.399351-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5944767964386423101==
+--===============6251216244973380317==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-When a frame registered in a given group Id triggers a callback and that
-callback ends up calling frame_watch_group_remove for that group Id,
-that call will happen inside WATCHLIST_NOTIFY_MATCHES and will free the
-memory used by the watchlist.  watchlist.h has protection against the
-watchlist being "destroyed" inside WATCHLIST_NOTIFY_MATCHES, but not
-against its memory being freed -- the memory where it stores the in_notify
-and destroy_pending flags.  Free the group immediately after
-WATCHLIST_NOTIFY_MATCHES to avoid reads/writes to those flags triggering
-valgrind warnings.
+The BSSID (address_3) in response frames was being checked to be the
+same as in the request frame, or all-zeros for faulty drivers.  At least
+one Wi-Fi Display device sends a GO Negotiation Response with the BSSID
+different from its Device Address (by 1 bit) and I didn't see an easy
+way to obtain that address beforhand so we can "whitelist" it for this
+check, so just drop that check for now.
+
+ANQP didn't have this check before it started using frame-xchg so it
+shouldn't be critical.
 ---
- src/frame-xchg.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ src/frame-xchg.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
 diff --git a/src/frame-xchg.c b/src/frame-xchg.c
-index f07a4d8d..53bda4b4 100644
+index 53bda4b4..3c1fc279 100644
 --- a/src/frame-xchg.c
 +++ b/src/frame-xchg.c
-@@ -231,6 +231,10 @@ static void frame_watch_unicast_notify(struct l_genl_m=
-sg *msg, void *user_data)
- 	WATCHLIST_NOTIFY_MATCHES(&group->watches, frame_watch_match_prefix,
- 					&info, frame_watch_cb_t, mpdu,
- 					info.body, info.body_len, rssi);
-+
-+	/* Has frame_watch_group_destroy been called inside a frame CB? */
-+	if (group->watches.pending_destroy)
-+		l_free(group);
- }
+@@ -992,14 +992,11 @@ static bool frame_xchg_resp_handle(const struct mmpdu=
+_header *mpdu,
+ 		return false;
  =
 
- static void frame_watch_group_destroy(void *data)
-@@ -244,7 +248,16 @@ static void frame_watch_group_destroy(void *data)
- 	l_io_destroy(group->io);
- 	l_queue_destroy(group->write_queue,
- 			(l_queue_destroy_func_t) l_genl_msg_unref);
-+
-+	/*
-+	 * We may be inside a frame notification but even then use
-+	 * watchlist_destroy to prevent any more notifications from
-+	 * being dispatched.
-+	 */
- 	watchlist_destroy(&group->watches);
-+	if (group->watches.in_notify)
-+		return;
-+
- 	l_free(group);
- }
+ 	/*
+-	 * Is the received frame's BSSID same as the transmitted frame's
+-	 * BSSID, may have to be moved to the user callback if there are
+-	 * usages where this is false.  Some drivers (brcmfmac) can't
+-	 * report the BSSID so check for all-zeros too.
++	 * BSSID (address_3) check not practical because some Linux
++	 * drivers report all-zero values and some remote devices send
++	 * wrong addresses.  But the frame callback is free to perform
++	 * its own check.
+ 	 */
+-	if (memcmp(mpdu->address_3, fx->tx_mpdu->address_3, 6) &&
+-			!util_mem_is_zero(mpdu->address_3, 6))
+-		return false;
  =
 
+ 	for (entry =3D l_queue_get_entries(fx->rx_watches);
+ 			entry; entry =3D entry->next) {
 -- =
 
 2.25.1
 
---===============5944767964386423101==--
+--===============6251216244973380317==--
 
