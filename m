@@ -1,50 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============6329293512792077757=="
+Content-Type: multipart/mixed; boundary="===============5840079940884074804=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 1/4] frame-xchg: Don't call frame_xchg_destroy directly
-Date: Tue, 21 Jul 2020 02:45:37 +0200
-Message-ID: <20200721004540.399351-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 2/4] p2p: Update call after frame-xchg changes
+Date: Tue, 21 Jul 2020 02:45:38 +0200
+Message-ID: <20200721004540.399351-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20200721004540.399351-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6329293512792077757==
+--===============5840079940884074804==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-frame_xchg_destroy is passed as the wiphy radio work's destroy callback
-to wiphy.c.  If it's also called directly in frame_xchg_exit, there's
-going to be a use-after-free when it's called again from wiphy_exit, so
-instead use wiphy_radio_work_done which will call frame_xchg_destroy and
-forget the frame_xchg record.
 ---
- src/frame-xchg.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/p2p.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/frame-xchg.c b/src/frame-xchg.c
-index 1ba2d907..f07a4d8d 100644
---- a/src/frame-xchg.c
-+++ b/src/frame-xchg.c
-@@ -1337,7 +1337,7 @@ static void destroy_xchg_data(void *user_data)
- {
- 	struct frame_xchg_data *fx =3D user_data;
+diff --git a/src/p2p.c b/src/p2p.c
+index 92e3c65d..58027fc6 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -3186,7 +3186,7 @@ static void p2p_device_send_probe_resp(struct p2p_dev=
+ice *dev,
  =
 
--	frame_xchg_destroy(&fx->work);
-+	wiphy_radio_work_done(wiphy_find_by_wdev(fx->wdev_id), fx->work.id);
- }
+ 	freq =3D scan_channel_to_freq(dev->listen_channel, SCAN_BAND_2_4_GHZ);
+ 	frame_xchg_start(dev->wdev_id, iov, freq, 0, 0, false, 0,
+-				p2p_probe_resp_done, dev, NULL);
++				p2p_probe_resp_done, dev, NULL, NULL);
+ 	l_debug("Probe Response tx queued");
  =
 
- static void frame_xchg_exit(void)
-@@ -1359,3 +1359,4 @@ static void frame_xchg_exit(void)
- }
- =
-
- IWD_MODULE(frame_xchg, frame_xchg_init, frame_xchg_exit);
-+IWD_MODULE_DEPENDS(frame_xchg, wiphy)
+ 	l_free(p2p_ie);
 -- =
 
 2.25.1
 
---===============6329293512792077757==--
+--===============5840079940884074804==--
 
