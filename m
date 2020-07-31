@@ -1,44 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============5170593888791409423=="
+Content-Type: multipart/mixed; boundary="===============1910990233790761084=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 08/13] p2p: Use a longer DHCP timeout
-Date: Fri, 31 Jul 2020 03:31:31 +0200
-Message-ID: <20200731013136.65057-8-andrew.zaborowski@intel.com>
+Subject: [PATCH 09/13] wfd-source: Print call trace on error
+Date: Fri, 31 Jul 2020 03:31:32 +0200
+Message-ID: <20200731013136.65057-9-andrew.zaborowski@intel.com>
 In-Reply-To: <20200731013136.65057-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5170593888791409423==
+--===============1910990233790761084==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-With some devices the 10 seconds are not enough for the P2P Group Owner
-to give us an address but I think we still want to use a timeout as
-short as possible so that the user doesn't wait too long if the
-connection isn't working.
 ---
- src/p2p.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ test/wfd-source | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/src/p2p.c b/src/p2p.c
-index da98f2a7..3b38f738 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -667,7 +667,7 @@ static void p2p_start_dhcp(struct p2p_device *dev)
+diff --git a/test/wfd-source b/test/wfd-source
+index 557093a9..c9ad3c34 100755
+--- a/test/wfd-source
++++ b/test/wfd-source
+@@ -15,6 +15,7 @@ import collections
+ import collections.abc
+ import random
+ import dataclasses
++import traceback
  =
 
- 	if (!l_settings_get_uint(iwd_get_config(), "P2P", "DHCPTimeout",
- 					&dhcp_timeout_val))
--		dhcp_timeout_val =3D 10;	/* 10s default */
-+		dhcp_timeout_val =3D 20;	/* 20s default */
+ import gi
+ gi.require_version('GLib', '2.0')
+@@ -1139,8 +1140,13 @@ class WFDSource(Gtk.Window):
  =
 
- 	if (!dev->conn_netconfig) {
- 		dev->conn_netconfig =3D netconfig_new(ifindex);
+         def on_rtsp_error(excp):
+             self.disconnect_peer(dev_path, path)
++            tb =3D ''
++            try:
++                tb =3D '\n\nDebug info: ' + traceback.format_exc()
++            except:
++                pass
+             dialog =3D Gtk.MessageDialog(parent=3Dself, message_type=3DGtk=
+.MessageType.ERROR, buttons=3DGtk.ButtonsType.OK, text=3D'Negotiation faile=
+d')
+-            dialog.format_secondary_text('RTSP error when talking to ' + s=
+elf.objects[path][PEER_IF]['Name'] + ': ' + repr(excp))
++            dialog.format_secondary_text('RTSP error when talking to ' + s=
+elf.objects[path][PEER_IF]['Name'] + ': ' + repr(excp) + tb)
+             dialog.show()
+ =
+
+             def on_ok(response, *args):
 -- =
 
 2.25.1
 
---===============5170593888791409423==--
+--===============1910990233790761084==--
 
