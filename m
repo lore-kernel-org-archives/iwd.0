@@ -1,62 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============4632166990853296111=="
+Content-Type: multipart/mixed; boundary="===============0195065234530940079=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 01/13] frame-xchg: Fix potential use after free
-Date: Fri, 31 Jul 2020 03:31:24 +0200
-Message-ID: <20200731013136.65057-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 02/13] frame-xchg: Improve search for current frame in MLME
+ notify
+Date: Fri, 31 Jul 2020 03:31:25 +0200
+Message-ID: <20200731013136.65057-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20200731013136.65057-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4632166990853296111==
+--===============0195065234530940079==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Check if the frame callback has cancelled the frame_xchg before
-attempting to free it.
+Since there may now be multiple frames-xchg record for each wdev, when
+we receive the TX Status event, make sure we find the record who's radio
+work has started, as indicated by fx->retry_cnt > 0.  Otherwise we're
+relying on the ordering of the frames in the "frame_xchgs" queue and
+constant priority.
 ---
-I'm adding a frame_xchg_match_ptr here and I think I might have
-used a similar function somewhere else.  I was wondering if we
-want to add a pointer compare function in util.c or accept NULL
-as match function in l_queue_find() to mean match by data pointer.
----
- src/frame-xchg.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ src/frame-xchg.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/src/frame-xchg.c b/src/frame-xchg.c
-index 3c1fc279..dfe08f6a 100644
+index dfe08f6a..8abcc8a7 100644
 --- a/src/frame-xchg.c
 +++ b/src/frame-xchg.c
-@@ -975,6 +975,11 @@ static bool frame_xchg_tx_retry(struct wiphy_radio_wor=
-k_item *item)
- 	return false;
+@@ -1057,12 +1057,12 @@ static void frame_xchg_resp_cb(const struct mmpdu_h=
+eader *mpdu,
+ 	frame_xchg_resp_handle(mpdu, body, body_len, rssi, user_data);
  }
  =
 
-+static bool frame_xchg_match_ptr(const void *a, const void *b)
-+{
-+	return a =3D=3D b;
-+}
-+
- static bool frame_xchg_resp_handle(const struct mmpdu_header *mpdu,
- 					const void *body, size_t body_len,
- 					int rssi, void *user_data)
-@@ -1013,6 +1018,9 @@ static bool frame_xchg_resp_handle(const struct mmpdu=
-_header *mpdu,
+-static bool frame_xchg_match(const void *a, const void *b)
++static bool frame_xchg_match_running(const void *a, const void *b)
+ {
+ 	const struct frame_xchg_data *fx =3D a;
+ 	const uint64_t *wdev_id =3D b;
  =
 
- 		done =3D watch->cb(mpdu, body, body_len, rssi, fx->user_data);
+-	return fx->wdev_id =3D=3D *wdev_id;
++	return fx->retry_cnt > 0 && fx->wdev_id =3D=3D *wdev_id;
+ }
  =
 
-+		if (!l_queue_find(frame_xchgs, frame_xchg_match_ptr, fx))
-+			return true;
-+
- 		if (done) {
- 			/* NULL callback here since the caller is done */
- 			fx->cb =3D NULL;
+ /*
+@@ -1225,7 +1225,8 @@ static void frame_xchg_mlme_notify(struct l_genl_msg =
+*msg, void *user_data)
+ =
+
+ 		l_debug("Received %s", ack ? "an ACK" : "no ACK");
+ =
+
+-		fx =3D l_queue_find(frame_xchgs, frame_xchg_match, &wdev_id);
++		fx =3D l_queue_find(frame_xchgs, frame_xchg_match_running,
++					&wdev_id);
+ 		if (!fx)
+ 			return;
+ =
+
 -- =
 
 2.25.1
 
---===============4632166990853296111==--
+--===============0195065234530940079==--
 
