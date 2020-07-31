@@ -1,49 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============5583732976054553697=="
+Content-Type: multipart/mixed; boundary="===============8618310006612748168=="
 MIME-Version: 1.0
 From: Andreas Henriksson <andreas@fatal.se>
 Subject: Re: build: hook up traditional dbus activation
-Date: Fri, 31 Jul 2020 21:28:22 +0200
-Message-ID: <20200731192822.junriliz2j2nb3wl@fatal.se>
-In-Reply-To: <68660AED-EA63-4C5E-9FFD-88FA47571086@holtmann.org>
+Date: Fri, 31 Jul 2020 21:37:35 +0200
+Message-ID: <20200731193735.lqbcagqpm5he2xbj@fatal.se>
+In-Reply-To: <c697a3d6-6364-1df2-5193-b941e2199451@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5583732976054553697==
+--===============8618310006612748168==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello Marcel,
+Hello Denis Kenzior,
 
-On Fri, Jul 31, 2020 at 08:39:25PM +0200, Marcel Holtmann wrote:
+On Fri, Jul 31, 2020 at 01:52:35PM -0500, Denis Kenzior wrote:
 [...]
-> I am reluctant to go back to this since it is also not really working
-> like this. This most likely needs a two-stage setup with an Alias
-> (which we had at one point).
+> Just curious.  Can you elaborate a bit on the reasons behind the request?
+[...]
 
-Thanks for your quick reply. (And no I didn't actually test if this
-worked, just that the build generated the result I expected.)
+I (as Debian package maintainer) got a bug report with over-inflated
+severity from the Devuan people about sysvinit. Figured they probably
+need help to understand dbus activation so decided to send a patch on
+for their benefit and see what gives. The original reporter is CCed and
+can likely expand on their reasoning.
 
-With your hints about alias I looked at git history but only found
-the systemd service using an alias in the past, never the Exec=3D
-in the dbus configuration being anything else than /bin/false...
-sure you're not mixing up past memories?
-
-FWIW I was about to add that shipping the dbus configuration (and
-mangling it to remove SystemdService=3D....) even when building with
---disable-systemd-service is also left as an excercise for those with
-haptephobia.
-
-(I have no personal interest in any of this.)
-
-> And frankly the non-systemd distros can ship a modified file. We don=E2=
-=80=99t
-> have to make everybody happy.
-
-Hopefully this discussion gives enough hints for them to figure out how
-to get the dbus activation going for themselves...
+(I have no personal interest in this topic.)
 
 Regards,
 Andreas Henriksson
---===============5583732976054553697==--
+--===============8618310006612748168==--
 
