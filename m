@@ -1,81 +1,85 @@
-Content-Type: multipart/mixed; boundary="===============3681963875832079153=="
+Content-Type: multipart/mixed; boundary="===============0246031152284291170=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 12/13] wfd-source: Add stream utility buttons
-Date: Fri, 31 Jul 2020 03:31:35 +0200
-Message-ID: <20200731013136.65057-12-andrew.zaborowski@intel.com>
+Subject: [PATCH 13/13] wfd-source: Allow alternative URLs in SETUP request
+Date: Fri, 31 Jul 2020 03:31:36 +0200
+Message-ID: <20200731013136.65057-13-andrew.zaborowski@intel.com>
 In-Reply-To: <20200731013136.65057-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3681963875832079153==
+--===============0246031152284291170==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add two buttons to the UI when the stream is playing: one for forcing an
-H.264 key-frame (IDR) and one for restarting the stream in gstreamer.
+Some WFD sinks issue an RTSP SETUP request with the target
+'rtsp://<source-ip>/wfd1.0/streamid=3D0' so add that URL to the targets we
+allow for SETUP.
 ---
- test/wfd-source | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ test/wfd-source | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/test/wfd-source b/test/wfd-source
-index 261ae750..4891c70c 100755
+index 4891c70c..cb92c161 100755
 --- a/test/wfd-source
 +++ b/test/wfd-source
-@@ -588,6 +588,11 @@ class WFDRTSPServer:
-         # TODO: can we also send this event directly to the element instea=
-d of the pad?
-         sink.send_event(Gst.Event.new_custom(Gst.EventType.CUSTOM_DOWNSTRE=
-AM, s))
+@@ -17,6 +17,10 @@ import random
+ import dataclasses
+ import traceback
+ import codecs
++try:
++    import netifaces
++except:
++    pass
  =
 
-+    def reset_stream(self):
-+        if self.rtp_pipeline.get_state(timeout=3D0)[1] =3D=3D Gst.State.PL=
-AYING:
-+            self.rtp_pipeline.set_state(Gst.State.PAUSED)
-+            self.rtp_pipeline.set_state(Gst.State.PLAYING)
-+
-     def rtsp_keepalive_timeout_cb(self):
-         try:
-             self.rtsp_keepalive_timeout =3D None
-@@ -1311,6 +1316,25 @@ class WFDSource(Gtk.Window):
+ import gi
+ gi.require_version('GLib', '2.0')
+@@ -216,6 +220,7 @@ class WFDRTSPServer:
+         self.remote_params =3D {}
+         self.local_methods =3D [ 'org.wfa.wfd1.0', 'SET_PARAMETER', 'GET_P=
+ARAMETER', 'PLAY', 'SETUP', 'TEARDOWN' ]
+         self.presentation_url =3D [ 'rtsp://127.0.0.1/wfd1.0/streamid=3D0'=
+, 'none' ] # Table 88
++        self.alternative_urls =3D [ 'rtsp://localhost/wfd1.0/streamid=3D0'=
+ ]
+         self.session_stream_url =3D None
+         self.session_id =3D None
+         self.session_timeout =3D 60
+@@ -282,7 +287,11 @@ class WFDRTSPServer:
+             self.conn =3D None
  =
 
-             self.add_info_str('Peer content protection', 'yes' if self.obj=
-ects[path][WFD_IF]['HasContentProtection'] else 'no')
+     def set_local_interface(self, new_value):
+-        pass
++        try:
++            local_ip =3D netifaces.ifaddresses(new_value)[netifaces.AF_INE=
+T][0]['addr']
++            self.alternative_urls.append('rtsp://' + local_ip + '/wfd1.0/s=
+treamid=3D0')
++        except:
++            pass
  =
 
-+        if peer.rtsp is not None and peer.rtsp.ready:
-+            def force_keyframe(widget):
-+                peer.rtsp.force_keyframe()
-+                return True
-+            def reset_stream(widget):
-+                peer.rtsp.reset_stream()
-+                return True
-+            # The idea for these buttons is to make sure any parameter cha=
-nges get fully applied
-+            button1 =3D Gtk.Button()
-+            button1.set_label('Force keyframe')
-+            button1.connect('clicked', force_keyframe)
-+            button2 =3D Gtk.Button()
-+            button2.set_label('Reset stream')
-+            button2.connect('clicked', reset_stream)
-+            box =3D Gtk.Box(orientation=3DGtk.Orientation.HORIZONTAL)
-+            box.pack_start(button1, expand=3DFalse, fill=3DFalse, padding=
-=3D3)
-+            box.pack_start(button2, expand=3DFalse, fill=3DFalse, padding=
-=3D3)
-+            self.infopane.add(box)
-+
-         if self.rtsp_props is None:
-             self.rtsp_props, self.rtsp_init_values =3D WFDRTSPServer.get_i=
-nit_props()
- =
-
+     def set_remote_ip(self, new_value):
+         self.expected_remote_ip =3D new_value
+@@ -345,7 +354,7 @@ class WFDRTSPServer:
+             self.error('Missing "Require" header in OPTIONS request')
+         elif method =3D=3D 'SETUP' and 'transport' not in headers:
+             self.error('Missing "Transport" header in SETUP request')
+-        elif method =3D=3D 'SETUP' and (target not in self.presentation_ur=
+l or target =3D=3D 'none'):
++        elif method =3D=3D 'SETUP' and (target not in self.presentation_ur=
+l + self.alternative_urls or target =3D=3D 'none'):
+             self.error('Unknown target "' + target + '" in SETUP request')
+         elif method =3D=3D 'PLAY' and ('session' not in headers  or header=
+s['session'] !=3D self.session_id):
+             self.error('Missing or invalid "Session" header in PLAY reques=
+t')
 -- =
 
 2.25.1
 
---===============3681963875832079153==--
+--===============0246031152284291170==--
 
