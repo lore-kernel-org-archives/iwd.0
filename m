@@ -1,85 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============0246031152284291170=="
+Content-Type: multipart/mixed; boundary="===============1971822555844408715=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 13/13] wfd-source: Allow alternative URLs in SETUP request
-Date: Fri, 31 Jul 2020 03:31:36 +0200
-Message-ID: <20200731013136.65057-13-andrew.zaborowski@intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 01/13] frame-xchg: Fix potential use after free
+Date: Fri, 31 Jul 2020 10:40:51 -0500
+Message-ID: <608dc79b-72b1-af67-c8c5-336662340329@gmail.com>
 In-Reply-To: <20200731013136.65057-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0246031152284291170==
+--===============1971822555844408715==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Some WFD sinks issue an RTSP SETUP request with the target
-'rtsp://<source-ip>/wfd1.0/streamid=3D0' so add that URL to the targets we
-allow for SETUP.
----
- test/wfd-source | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+Hi Andrew,
 
-diff --git a/test/wfd-source b/test/wfd-source
-index 4891c70c..cb92c161 100755
---- a/test/wfd-source
-+++ b/test/wfd-source
-@@ -17,6 +17,10 @@ import random
- import dataclasses
- import traceback
- import codecs
-+try:
-+    import netifaces
-+except:
-+    pass
- =
+On 7/30/20 8:31 PM, Andrew Zaborowski wrote:
+> Check if the frame callback has cancelled the frame_xchg before
+> attempting to free it.
+> ---
+> I'm adding a frame_xchg_match_ptr here and I think I might have
+> used a similar function somewhere else.  I was wondering if we
+> want to add a pointer compare function in util.c or accept NULL
+> as match function in l_queue_find() to mean match by data pointer.
+> ---
+>   src/frame-xchg.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
+> =
 
- import gi
- gi.require_version('GLib', '2.0')
-@@ -216,6 +220,7 @@ class WFDRTSPServer:
-         self.remote_params =3D {}
-         self.local_methods =3D [ 'org.wfa.wfd1.0', 'SET_PARAMETER', 'GET_P=
-ARAMETER', 'PLAY', 'SETUP', 'TEARDOWN' ]
-         self.presentation_url =3D [ 'rtsp://127.0.0.1/wfd1.0/streamid=3D0'=
-, 'none' ] # Table 88
-+        self.alternative_urls =3D [ 'rtsp://localhost/wfd1.0/streamid=3D0'=
- ]
-         self.session_stream_url =3D None
-         self.session_id =3D None
-         self.session_timeout =3D 60
-@@ -282,7 +287,11 @@ class WFDRTSPServer:
-             self.conn =3D None
- =
 
-     def set_local_interface(self, new_value):
--        pass
-+        try:
-+            local_ip =3D netifaces.ifaddresses(new_value)[netifaces.AF_INE=
-T][0]['addr']
-+            self.alternative_urls.append('rtsp://' + local_ip + '/wfd1.0/s=
-treamid=3D0')
-+        except:
-+            pass
- =
+Patches 1-10 applied, thanks.
 
-     def set_remote_ip(self, new_value):
-         self.expected_remote_ip =3D new_value
-@@ -345,7 +354,7 @@ class WFDRTSPServer:
-             self.error('Missing "Require" header in OPTIONS request')
-         elif method =3D=3D 'SETUP' and 'transport' not in headers:
-             self.error('Missing "Transport" header in SETUP request')
--        elif method =3D=3D 'SETUP' and (target not in self.presentation_ur=
-l or target =3D=3D 'none'):
-+        elif method =3D=3D 'SETUP' and (target not in self.presentation_ur=
-l + self.alternative_urls or target =3D=3D 'none'):
-             self.error('Unknown target "' + target + '" in SETUP request')
-         elif method =3D=3D 'PLAY' and ('session' not in headers  or header=
-s['session'] !=3D self.session_id):
-             self.error('Missing or invalid "Session" header in PLAY reques=
-t')
--- =
+Patch 11-13 refuse to apply for some reason, so please rebase/resend.
 
-2.25.1
+Regards,
+-Denis
 
---===============0246031152284291170==--
+--===============1971822555844408715==--
 
