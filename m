@@ -1,39 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============3640976852593451363=="
+Content-Type: multipart/mixed; boundary="===============5583732976054553697=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
+From: Andreas Henriksson <andreas@fatal.se>
 Subject: Re: build: hook up traditional dbus activation
-Date: Fri, 31 Jul 2020 13:52:35 -0500
-Message-ID: <c697a3d6-6364-1df2-5193-b941e2199451@gmail.com>
-In-Reply-To: <20200731182407.8209-1-andreas@fatal.se>
+Date: Fri, 31 Jul 2020 21:28:22 +0200
+Message-ID: <20200731192822.junriliz2j2nb3wl@fatal.se>
+In-Reply-To: <68660AED-EA63-4C5E-9FFD-88FA47571086@holtmann.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3640976852593451363==
+--===============5583732976054553697==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andreas,
+Hello Marcel,
 
-On 7/31/20 1:24 PM, Andreas Henriksson wrote:
-> On systems using systemd dbus will use the SystemdServices=3D directive,
-> but on non-systemd systems the so called "traditional dbus activation"
-> method involves reading the Exec=3D directive. Setting that to /bin/false
-> means this service is not relevant on non-systemd systems, but
-> apparently there's an interest from users of such systems to use
-> iwd (and possibly ead). Thus hook up the expansion of the paths in the
-> Exec=3D directive of the dbus service files to allow the traditional dbus
-> activation to start respective daemon.
+On Fri, Jul 31, 2020 at 08:39:25PM +0200, Marcel Holtmann wrote:
+[...]
+> I am reluctant to go back to this since it is also not really working
+> like this. This most likely needs a two-stage setup with an Alias
+> (which we had at one point).
 
-Just curious.  Can you elaborate a bit on the reasons behind the request?
+Thanks for your quick reply. (And no I didn't actually test if this
+worked, just that the build generated the result I expected.)
 
-> =
+With your hints about alias I looked at git history but only found
+the systemd service using an alias in the past, never the Exec=3D
+in the dbus configuration being anything else than /bin/false...
+sure you're not mixing up past memories?
 
-> Signed-off-by: Andreas Henriksson <andreas@fatal.se>
+FWIW I was about to add that shipping the dbus configuration (and
+mangling it to remove SystemdService=3D....) even when building with
+--disable-systemd-service is also left as an excercise for those with
+haptephobia.
 
-We do not use SoB btw.
+(I have no personal interest in any of this.)
+
+> And frankly the non-systemd distros can ship a modified file. We don=E2=
+=80=99t
+> have to make everybody happy.
+
+Hopefully this discussion gives enough hints for them to figure out how
+to get the dbus activation going for themselves...
 
 Regards,
--Denis
---===============3640976852593451363==--
+Andreas Henriksson
+--===============5583732976054553697==--
 
