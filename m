@@ -1,43 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============4409783674220476836=="
+Content-Type: multipart/mixed; boundary="===============5170593888791409423=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 07/13] p2p: Set p2p_own_wfd->available by default
-Date: Fri, 31 Jul 2020 03:31:30 +0200
-Message-ID: <20200731013136.65057-7-andrew.zaborowski@intel.com>
+Subject: [PATCH 08/13] p2p: Use a longer DHCP timeout
+Date: Fri, 31 Jul 2020 03:31:31 +0200
+Message-ID: <20200731013136.65057-8-andrew.zaborowski@intel.com>
 In-Reply-To: <20200731013136.65057-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4409783674220476836==
+--===============5170593888791409423==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-We need to set this flag true when the WFD service is first registered
-as there's no WFD session and we're available for a new session.
+With some devices the 10 seconds are not enough for the P2P Group Owner
+to give us an address but I think we still want to use a timeout as
+short as possible so that the user doesn't wait too long if the
+connection isn't working.
 ---
- src/p2p.c | 3 +++
- 1 file changed, 3 insertions(+)
+ src/p2p.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/p2p.c b/src/p2p.c
-index 06416bd8..da98f2a7 100644
+index da98f2a7..3b38f738 100644
 --- a/src/p2p.c
 +++ b/src/p2p.c
-@@ -4327,6 +4327,9 @@ static struct l_dbus_message *p2p_wfd_register(struct=
- l_dbus *dbus,
- 	if (p2p_own_wfd)
- 		return dbus_error_already_exists(message);
+@@ -667,7 +667,7 @@ static void p2p_start_dhcp(struct p2p_device *dev)
  =
 
-+	/* Available for WFD Session by default */
-+	props.available =3D true;
-+
- 	p2p_wfd_disconnect_watch =3D l_dbus_add_disconnect_watch(dbus,
- 					l_dbus_message_get_sender(message),
- 					p2p_wfd_disconnect_watch_cb, NULL,
+ 	if (!l_settings_get_uint(iwd_get_config(), "P2P", "DHCPTimeout",
+ 					&dhcp_timeout_val))
+-		dhcp_timeout_val =3D 10;	/* 10s default */
++		dhcp_timeout_val =3D 20;	/* 20s default */
+ =
+
+ 	if (!dev->conn_netconfig) {
+ 		dev->conn_netconfig =3D netconfig_new(ifindex);
 -- =
 
 2.25.1
 
---===============4409783674220476836==--
+--===============5170593888791409423==--
 
