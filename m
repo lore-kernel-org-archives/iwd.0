@@ -1,40 +1,137 @@
-Content-Type: multipart/mixed; boundary="===============1971822555844408715=="
+Content-Type: multipart/mixed; boundary="===============3426756068535071812=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 01/13] frame-xchg: Fix potential use after free
-Date: Fri, 31 Jul 2020 10:40:51 -0500
-Message-ID: <608dc79b-72b1-af67-c8c5-336662340329@gmail.com>
-In-Reply-To: <20200731013136.65057-1-andrew.zaborowski@intel.com>
+From: Andreas Henriksson <andreas@fatal.se>
+Subject: build: hook up traditional dbus activation
+Date: Fri, 31 Jul 2020 20:24:07 +0200
+Message-ID: <20200731182407.8209-1-andreas@fatal.se>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1971822555844408715==
+--===============3426756068535071812==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On systems using systemd dbus will use the SystemdServices=3D directive,
+but on non-systemd systems the so called "traditional dbus activation"
+method involves reading the Exec=3D directive. Setting that to /bin/false
+means this service is not relevant on non-systemd systems, but
+apparently there's an interest from users of such systems to use
+iwd (and possibly ead). Thus hook up the expansion of the paths in the
+Exec=3D directive of the dbus service files to allow the traditional dbus
+activation to start respective daemon.
 
-On 7/30/20 8:31 PM, Andrew Zaborowski wrote:
-> Check if the frame callback has cancelled the frame_xchg before
-> attempting to free it.
-> ---
-> I'm adding a frame_xchg_match_ptr here and I think I might have
-> used a similar function somewhere else.  I was wondering if we
-> want to add a pointer compare function in util.c or accept NULL
-> as match function in l_queue_find() to mean match by data pointer.
-> ---
->   src/frame-xchg.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
-> =
+Signed-off-by: Andreas Henriksson <andreas@fatal.se>
+---
+ Makefile.am                      | 11 ++++++-----
+ src/net.connman.iwd.service      |  5 -----
+ src/net.connman.iwd.service.in   |  5 +++++
+ wired/net.connman.ead.service    |  5 -----
+ wired/net.connman.ead.service.in |  5 +++++
+ 5 files changed, 16 insertions(+), 15 deletions(-)
+ delete mode 100644 src/net.connman.iwd.service
+ create mode 100644 src/net.connman.iwd.service.in
+ delete mode 100644 wired/net.connman.ead.service
+ create mode 100644 wired/net.connman.ead.service.in
 
+diff --git a/Makefile.am b/Makefile.am
+index 57c694d..006d1d1 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -250,7 +250,7 @@ dist_dbus_data_DATA +=3D src/iwd-dbus.conf
+ endif
+ =
 
-Patches 1-10 applied, thanks.
+ if SYSTEMD_SERVICE
+-src_iwd_DEPENDENCIES +=3D src/iwd.service
++src_iwd_DEPENDENCIES +=3D src/iwd.service src/net.connman.iwd.service
+ =
 
-Patch 11-13 refuse to apply for some reason, so please rebase/resend.
+ systemd_unit_DATA +=3D src/iwd.service
+ dbus_bus_DATA +=3D src/net.connman.iwd.service
+@@ -328,7 +328,7 @@ dist_dbus_data_DATA +=3D wired/ead-dbus.conf
+ endif
+ =
 
-Regards,
--Denis
+ if SYSTEMD_SERVICE
+-wired_ead_DEPENDENCIES +=3D wired/ead.service
++wired_ead_DEPENDENCIES +=3D wired/ead.service wired/net.connman.ead.service
+ =
 
---===============1971822555844408715==--
+ systemd_unit_DATA +=3D wired/ead.service
+ dbus_bus_DATA +=3D wired/net.connman.ead.service
+@@ -524,8 +524,8 @@ unit_test_p2p_LDADD =3D $(ell_ldadd)
+ =
+
+ TESTS =3D $(unit_tests)
+ =
+
+-EXTRA_DIST =3D src/genbuiltin src/iwd.service.in src/net.connman.iwd.servi=
+ce \
+-			wired/ead.service.in wired/net.connman.ead.service \
++EXTRA_DIST =3D src/genbuiltin src/iwd.service.in src/net.connman.iwd.servi=
+ce.in \
++			wired/ead.service.in wired/net.connman.ead.service.in \
+ 			src/80-iwd.link src/pkcs8.conf unit/gencerts.cnf \
+ 			$(manual_pages) $(patsubst %.1,%.rst, \
+ 					$(patsubst %.5,%.rst, \
+@@ -539,7 +539,8 @@ if MAINTAINER_MODE
+ AM_CFLAGS +=3D -DHAVE_PKCS8_SUPPORT
+ endif
+ =
+
+-CLEANFILES =3D src/iwd.service wired/ead.service
++CLEANFILES =3D src/iwd.service wired/ead.service \
++	     src/net.connman.iwd.service wired/net.connman.ead.service
+ =
+
+ DISTCHECK_CONFIGURE_FLAGS =3D --disable-dbus-policy --disable-systemd-serv=
+ice \
+ 				--enable-sim-hardcoded \
+diff --git a/src/net.connman.iwd.service b/src/net.connman.iwd.service
+deleted file mode 100644
+index d8ece4c..0000000
+--- a/src/net.connman.iwd.service
++++ /dev/null
+@@ -1,5 +0,0 @@
+-[D-BUS Service]
+-Name=3Dnet.connman.iwd
+-Exec=3D/bin/false
+-User=3Droot
+-SystemdService=3Diwd.service
+diff --git a/src/net.connman.iwd.service.in b/src/net.connman.iwd.service.in
+new file mode 100644
+index 0000000..a7cb7ed
+--- /dev/null
++++ b/src/net.connman.iwd.service.in
+@@ -0,0 +1,5 @@
++[D-BUS Service]
++Name=3Dnet.connman.iwd
++Exec=3D@libexecdir@/iwd
++User=3Droot
++SystemdService=3Diwd.service
+diff --git a/wired/net.connman.ead.service b/wired/net.connman.ead.service
+deleted file mode 100644
+index 24af96b..0000000
+--- a/wired/net.connman.ead.service
++++ /dev/null
+@@ -1,5 +0,0 @@
+-[D-BUS Service]
+-Name=3Dnet.connman.ead
+-Exec=3D/bin/false
+-User=3Droot
+-SystemdService=3Dead.service
+diff --git a/wired/net.connman.ead.service.in b/wired/net.connman.ead.servi=
+ce.in
+new file mode 100644
+index 0000000..63e5011
+--- /dev/null
++++ b/wired/net.connman.ead.service.in
+@@ -0,0 +1,5 @@
++[D-BUS Service]
++Name=3Dnet.connman.ead
++Exec=3D@libexecdir@/ead
++User=3Droot
++SystemdService=3Dead.service
+--===============3426756068535071812==--
 
