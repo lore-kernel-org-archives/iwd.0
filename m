@@ -1,48 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============4783388977873810524=="
+Content-Type: multipart/mixed; boundary="===============5287989594383492913=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] crypto: incorporate C implementation of ARC4
-Date: Mon, 03 Aug 2020 16:31:08 -0500
-Message-ID: <4225d828-ac0f-c88d-c16c-5363a8bc86d9@gmail.com>
-In-Reply-To: <20200803104509.124604-1-ardb@kernel.org>
+Subject: Re: build: hook up traditional dbus activation
+Date: Mon, 03 Aug 2020 16:43:51 -0500
+Message-ID: <d19ba61c-4a1a-56b4-c6c3-650abff346b1@gmail.com>
+In-Reply-To: <uruANJg_J76J43r_UsAABIzdnz2yDgDWjMCYMHBxe7yAx-xb1uhPW744L4BxF6bYTiDmC0A8LMEFLzwvXcAd6cEi5a4NT8sgP9uhLjVgEEM=@protonmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4783388977873810524==
+--===============5287989594383492913==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Ard,
+Hi Job,
 
-On 8/3/20 5:45 AM, Ard Biesheuvel wrote:
-> Incorporate the LGPL v2.1 licensed implementation of ARC4, taken from
-> the Nettle project (https://git.lysator.liu.se/nettle/nettle.git,
-> commit 3e7a480a1e351884), and tweak it a bit so we don't have to
-> operate on a skip buffer to fast forward the stream cipher, but can
-> simply invoke it with NULL dst or src arguments to achieve the same.
-> =
+> I understand if you won't support non-systemd init systems like sysvinit.=
+ I haven't maintained daemons, but from the looks of it, maintaining suppor=
+t for multiple inits is surely hard. However users who don't use systemd as=
+ their init, like Devuan users, Gentoo users, and Debian users who replaced=
+ systemd with sysvinit/openrc would appreciate it if upstream decided to su=
+pport multiple inits. Gentoo users have a community which maintains their o=
+wn iwd init script for openrc. Devuan users however, have to workaround thi=
+s problem by converting the iwd systemd service file to a sysvinit script, =
+and update-rc.d as root. If I haven't known about this, I would still be us=
+ing wpa_supplicant by now. iwd actually made my wifi connection more reliab=
+le. When I was using wpa_supplicant, I had to reboot my system everytime th=
+e connection drops. With iwd, I only have to restart iwd and my connection =
+is back. I figured that I should contribute back to the community by adding=
+ sysvinit support.
 
-> This removes the dependency [via libell] on the OS's implementation of
-> ecb(arc4), which may be going away, and which is not usually accelerated
-> in the first place.
-> =
+I'm still a bit lost why D-Bus activation is needed?  Is sysvinit/openrc so=
+mehow =
 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-
-We don't use S-o-B tags, so I dropped this one
-
-> ---
->   src/crypto.c      | 82 ++++++++++++++++++++++++++++++-----------------
->   src/main.c        |  8 -----
->   unit/test-eapol.c |  3 +-
->   3 files changed, 53 insertions(+), 40 deletions(-)
-> =
-
-
-Applied, thanks.
+using it to start daemons?
 
 Regards,
 -Denis
---===============4783388977873810524==--
+
+--===============5287989594383492913==--
 
