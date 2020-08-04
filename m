@@ -1,89 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============6756815779266936556=="
+Content-Type: multipart/mixed; boundary="===============2351198018685808110=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 1/6] wfd-source: Fix some races on iwd name owner change
-Date: Tue, 04 Aug 2020 16:52:58 +0200
-Message-ID: <20200804145303.151878-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 2/6] wfd-source: Update the switch state using set_state
+Date: Tue, 04 Aug 2020 16:52:59 +0200
+Message-ID: <20200804145303.151878-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20200804145303.151878-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6756815779266936556==
+--===============2351198018685808110==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Subscribe to InterfacesAdded/Removed/PropertiesChanged signals before
-using GetManagedObjects.  For some reason when iwd starts after the
-client, we consistently get the managed objects list from before Adapter
-interfaces are added but we miss the subsequent InterfacesAdded
-signals, probably has to do with the GetManagedObjects and the AddMatch
-calls all being synchronous.
+The Gtk.Switch representing the p2p.Device's Enabled property should use
+the "delayed state change" logic as described in Gtk.Switch docs, i.e.
+we need to use .set_state() instead of .set_active() when we get
+confirmation of the property having changed its value in the
+PropertiesChanged handler.  The ::active property is automatically
+changed by Gtk.Switch on user input.
 
-Secondly call self.populate_devices() on init as it won't be called if
-IWD is not on the bus.
+This way the UI gives visual feedback of when the device enable/disable
+op starts and ends (or fails).
 ---
- test/wfd-source | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+ test/wfd-source | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/test/wfd-source b/test/wfd-source
-index e74d0adf..a83cd0cb 100755
+index a83cd0cb..e99ae818 100755
 --- a/test/wfd-source
 +++ b/test/wfd-source
-@@ -826,6 +826,7 @@ class WFDSource(Gtk.Window):
-         self.rtsp_port =3D 7236
-         self.devices =3D None
-         self.objects =3D {}
-+        self.populate_devices()
-         self.dbus =3D dbus.SystemBus()
-         self.dbus.watch_name_owner('net.connman.iwd', self.on_name_owner_c=
-hange)
-         self.on_name_owner_change('dummy' if self.dbus.name_has_owner('net=
-.connman.iwd') else '')
-@@ -857,17 +858,6 @@ class WFDSource(Gtk.Window):
-             return True
+@@ -1116,7 +1116,7 @@ class WFDSource(Gtk.Window):
+         dev_str =3D self.get_dev_string(path)
+         name =3D str(device.props['Name'])
+         label.set_markup(dev_str + '\n<small>' + ('Local name: ' + name + =
+'\n' if dev_str !=3D name else '') + 'State: ' + state + '</small>')
+-        switch.set_active(device.props['Enabled'])
++        switch.set_state(device.props['Enabled'])
  =
 
-         manager =3D dbus.Interface(self.dbus.get_object('net.connman.iwd',=
- '/'), 'org.freedesktop.DBus.ObjectManager')
--        self.devices =3D {}
--        self.objects =3D manager.GetManagedObjects()
--
--        for path in self.objects:
--            if DEVICE_IF in self.objects[path]:
--                self.add_dev(path)
--        for path in self.objects:
--            if PEER_IF in self.objects[path]:
--                self.add_peer(path)
--
--        self.populate_devices()
+     def update_peer_props(self, dev_path, path):
+         device =3D self.devices[dev_path]
+@@ -1560,7 +1560,6 @@ class WFDSource(Gtk.Window):
+         device =3D self.devices[path]
+         if device.props['Enabled'] =3D=3D state:
+             return
+-        device.props['Enabled'] =3D state
+         device.props_proxy.Set(DEVICE_IF, 'Enabled', state)
+         return True
  =
 
-         self.dbus.add_signal_receiver(self.on_properties_changed,
-             bus_name=3D"net.connman.iwd",
-@@ -883,6 +873,18 @@ class WFDSource(Gtk.Window):
-             dbus_interface=3D"org.freedesktop.DBus.ObjectManager",
-             signal_name=3D"InterfacesRemoved")
- =
-
-+        self.objects =3D manager.GetManagedObjects()
-+        self.devices =3D {}
-+
-+        for path in self.objects:
-+            if DEVICE_IF in self.objects[path]:
-+                self.add_dev(path)
-+        for path in self.objects:
-+            if PEER_IF in self.objects[path]:
-+                self.add_peer(path)
-+
-+        self.populate_devices()
-+
-         svc_mgr =3D dbus.Interface(self.dbus.get_object('net.connman.iwd',=
- '/net/connman/iwd'), SVC_MGR_IF)
-         svc_mgr.RegisterDisplayService({
-             'Source': True,
 -- =
 
 2.25.1
 
---===============6756815779266936556==--
+--===============2351198018685808110==--
 
