@@ -1,69 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============3840021749052490805=="
+Content-Type: multipart/mixed; boundary="===============6756815779266936556=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: build: hook up traditional dbus activation
-Date: Tue, 04 Aug 2020 07:57:28 +0200
-Message-ID: <344AF6D4-30F6-428A-9970-33B37C4DC858@holtmann.org>
-In-Reply-To: <uruANJg_J76J43r_UsAABIzdnz2yDgDWjMCYMHBxe7yAx-xb1uhPW744L4BxF6bYTiDmC0A8LMEFLzwvXcAd6cEi5a4NT8sgP9uhLjVgEEM=@protonmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/6] wfd-source: Fix some races on iwd name owner change
+Date: Tue, 04 Aug 2020 16:52:58 +0200
+Message-ID: <20200804145303.151878-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3840021749052490805==
+--===============6756815779266936556==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Job,
+Subscribe to InterfacesAdded/Removed/PropertiesChanged signals before
+using GetManagedObjects.  For some reason when iwd starts after the
+client, we consistently get the managed objects list from before Adapter
+interfaces are added but we miss the subsequent InterfacesAdded
+signals, probably has to do with the GetManagedObjects and the AddMatch
+calls all being synchronous.
 
-> Hi, I am the original reporter Andreas is talking about. I'm going to adm=
-it that I have no idea on how to use dbus activation. I only know how to st=
-art a service at boot via shell scripts.
-> =
+Secondly call self.populate_devices() on init as it won't be called if
+IWD is not on the bus.
+---
+ test/wfd-source | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
 
-> I understand if you won't support non-systemd init systems like sysvinit.=
- I haven't maintained daemons, but from the looks of it, maintaining suppor=
-t for multiple inits is surely hard. However users who don't use systemd as=
- their init, like Devuan users, Gentoo users, and Debian users who replaced=
- systemd with sysvinit/openrc would appreciate it if upstream decided to su=
-pport multiple inits. Gentoo users have a community which maintains their o=
-wn iwd init script for openrc. Devuan users however, have to workaround thi=
-s problem by converting the iwd systemd service file to a sysvinit script, =
-and update-rc.d as root. If I haven't known about this, I would still be us=
-ing wpa_supplicant by now. iwd actually made my wifi connection more reliab=
-le. When I was using wpa_supplicant, I had to reboot my system everytime th=
-e connection drops. With iwd, I only have to restart iwd and my connection =
-is back. I figured that I should contribute back to the community by adding=
- sysvinit support.
-> =
+diff --git a/test/wfd-source b/test/wfd-source
+index e74d0adf..a83cd0cb 100755
+--- a/test/wfd-source
++++ b/test/wfd-source
+@@ -826,6 +826,7 @@ class WFDSource(Gtk.Window):
+         self.rtsp_port =3D 7236
+         self.devices =3D None
+         self.objects =3D {}
++        self.populate_devices()
+         self.dbus =3D dbus.SystemBus()
+         self.dbus.watch_name_owner('net.connman.iwd', self.on_name_owner_c=
+hange)
+         self.on_name_owner_change('dummy' if self.dbus.name_has_owner('net=
+.connman.iwd') else '')
+@@ -857,17 +858,6 @@ class WFDSource(Gtk.Window):
+             return True
+ =
 
-> So whatever decision you guys make, I will respect it. As you said, we ca=
-n ship a modified version instead for non-systemd users. I am already prepa=
-ring a fork of the iwd package for Devuan users[1]. The patch is ugly, but =
-it works.
+         manager =3D dbus.Interface(self.dbus.get_object('net.connman.iwd',=
+ '/'), 'org.freedesktop.DBus.ObjectManager')
+-        self.devices =3D {}
+-        self.objects =3D manager.GetManagedObjects()
+-
+-        for path in self.objects:
+-            if DEVICE_IF in self.objects[path]:
+-                self.add_dev(path)
+-        for path in self.objects:
+-            if PEER_IF in self.objects[path]:
+-                self.add_peer(path)
+-
+-        self.populate_devices()
+ =
 
-so about 16 something years ago (long before systemd), I tried to provide i=
-nit scripts for all the distributions. It was a disaster since all of them =
-are a bit different. So I decided to not do that anymore and the distro pac=
-kage maintainers have to do that job as downstream. It makes no sense that =
-upstream carries the work of downstream anyway. It is just the wrong direct=
-ion.
+         self.dbus.add_signal_receiver(self.on_properties_changed,
+             bus_name=3D"net.connman.iwd",
+@@ -883,6 +873,18 @@ class WFDSource(Gtk.Window):
+             dbus_interface=3D"org.freedesktop.DBus.ObjectManager",
+             signal_name=3D"InterfacesRemoved")
+ =
 
-With systemd unit files there was a unified way across distribution to desc=
-ribe the daemon/service and so I started to include these. So unit files et=
-c. can stay upstream because they are common across all distribution. Any i=
-nit scripts can=E2=80=99t be accepted.
++        self.objects =3D manager.GetManagedObjects()
++        self.devices =3D {}
++
++        for path in self.objects:
++            if DEVICE_IF in self.objects[path]:
++                self.add_dev(path)
++        for path in self.objects:
++            if PEER_IF in self.objects[path]:
++                self.add_peer(path)
++
++        self.populate_devices()
++
+         svc_mgr =3D dbus.Interface(self.dbus.get_object('net.connman.iwd',=
+ '/net/connman/iwd'), SVC_MGR_IF)
+         svc_mgr.RegisterDisplayService({
+             'Source': True,
+-- =
 
-D-Bus activation for system level daemons outside of systemd is something I=
- found always a bit hackish to begin with and thus it is not something that=
- is worth while supporting. iwd is designed to be start and it can linger a=
-round until WiFi hardware is found since it is truly hotplug capable.
+2.25.1
 
-In summary, if distributions need a sysvinit or openrc integration, then it=
- is the job of the distro package maintainer to provide that.
-
-Regards
-
-Marcel
-
---===============3840021749052490805==--
+--===============6756815779266936556==--
 
