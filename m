@@ -1,56 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============1718329670430987397=="
+Content-Type: multipart/mixed; boundary="===============8499117997113785967=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 6/6] ap: Add authorized_macs parameter
-Date: Tue, 04 Aug 2020 10:44:52 -0500
-Message-ID: <a5688bc3-2712-8bd9-5a14-18adf51362f4@gmail.com>
-In-Reply-To: <20200804145303.151878-6-andrew.zaborowski@intel.com>
+From: Mathy Vanhoef <Mathy.Vanhoef@kuleuven.be>
+Subject: [PATCH] eapol: prevent key reinstallation on retransmitted Msg4/4
+Date: Wed, 12 Aug 2020 15:17:21 +0400
+Message-ID: <20200812111721.302407-1-Mathy.Vanhoef@kuleuven.be>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1718329670430987397==
+--===============8499117997113785967==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Currently an adversary can retransmit EAPOL Msg4/4 to make the AP
+reinstall the PTK. Against older Linux kernels this can subsequently
+be used to decrypt, replay, and possibly decrypt frames. See the
+KRACK attacks research at krackattacks.com for attack scenarios.
+In this case no machine-in-the-middle position is needed to trigger
+the key reinstallation.
 
-On 8/4/20 9:53 AM, Andrew Zaborowski wrote:
-> ---
->   src/ap.c | 31 ++++++++++++++++++++++++++++++-
->   src/ap.h |  1 +
->   2 files changed, 31 insertions(+), 1 deletion(-)
-> =
+Fix this by using the ptk_complete boolean to track when the 4-way
+handshake has completed (similar to its usage for clients). When
+receiving a retransmitted Msg4/4 accept this frame but do not reinstall
+the PTK.
 
+Credits to Chris M. Stone, Sam Thomas, and Tom Chothia of Birmingham
+University to help discover this issue.
+---
+ src/eapol.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-<snip>
+diff --git a/src/eapol.c b/src/eapol.c
+index b0036c10..e3581cfe 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -1462,7 +1462,6 @@ static void eapol_handle_ptk_2_of_4(struct eapol_sm *=
+sm,
+ 	memcpy(sm->handshake->snonce, ek->key_nonce,
+ 			sizeof(sm->handshake->snonce));
+ 	sm->handshake->have_snonce =3D true;
+-	sm->handshake->ptk_complete =3D true;
+ =
 
-> diff --git a/src/ap.h b/src/ap.h
-> index 2da0596f..b007b657 100644
-> --- a/src/ap.h
-> +++ b/src/ap.h
-> @@ -47,6 +47,7 @@ typedef void (*ap_stopped_func_t)(void *user_data);
->   =
+ 	sm->frame_retry =3D 0;
+ =
 
->   struct ap_state *ap_start(struct netdev *netdev, const char *ssid,
->   				const char *psk, int channel, bool no_cck_rates,
-> +				const uint8_t **authorized_macs,
->   				ap_event_func_t event_func, void *user_data);
+@@ -1782,7 +1781,15 @@ static void eapol_handle_ptk_4_of_4(struct eapol_sm =
+*sm,
+ 	l_timeout_remove(sm->timeout);
+ 	sm->timeout =3D NULL;
+ =
 
-By the way, you're pretty much at the limit of sane number of arguments her=
-e. =
+-	handshake_state_install_ptk(sm->handshake);
++	/*
++	 * If ptk_complete is set, then we are receiving Message 4 again.
++	 * This might be a retransmission, so accept but don't install
++	 * the keys again.
++	 */
++	if (!sm->handshake->ptk_complete)
++		handshake_state_install_ptk(sm->handshake);
++
++	sm->handshake->ptk_complete =3D true;
+ }
+ =
 
-If you decide to add any more, I suggest a struct ap_config object of some =
-sort =
+ static void eapol_handle_gtk_1_of_2(struct eapol_sm *sm,
+@@ -2185,6 +2192,7 @@ static void eapol_auth_key_handle(struct eapol_sm *sm,
+ 	size_t frame_len =3D 4 + L_BE16_TO_CPU(frame->header.packet_len);
+ 	const struct eapol_key *ek =3D eapol_key_validate((const void *) frame,
+ 							frame_len, sm->mic_len);
++	uint16_t key_data_len;
+ =
 
-with a nice set/get api that ap_start could take ownership of.
+ 	if (!ek)
+ 		return;
+@@ -2199,7 +2207,8 @@ static void eapol_auth_key_handle(struct eapol_sm *sm,
+ 	if (!sm->handshake->have_anonce)
+ 		return; /* Not expecting an EAPoL-Key yet */
+ =
 
->   void ap_shutdown(struct ap_state *ap, ap_stopped_func_t stopped_func,
->   			void *user_data);
-> =
+-	if (!sm->handshake->ptk_complete)
++	key_data_len =3D EAPOL_KEY_DATA_LEN(ek, sm->mic_len);
++	if (key_data_len !=3D 0)
+ 		eapol_handle_ptk_2_of_4(sm, ek);
+ 	else
+ 		eapol_handle_ptk_4_of_4(sm, ek);
+-- =
 
+2.27.0
 
-Regards,
--Denis
---===============1718329670430987397==--
+--===============8499117997113785967==--
 
