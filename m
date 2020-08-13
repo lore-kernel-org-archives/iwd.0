@@ -1,96 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============7638455709345985136=="
+Content-Type: multipart/mixed; boundary="===============2960670741356848356=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 02/16] eapol: Use the require_handshake flag for FILS
-Date: Thu, 13 Aug 2020 02:50:12 +0200
-Message-ID: <20200813005026.294950-2-andrew.zaborowski@intel.com>
+Subject: [PATCH 03/16] eapol: Don't re-build the AP RSNE in authenticator mode
+Date: Thu, 13 Aug 2020 02:50:13 +0200
+Message-ID: <20200813005026.294950-3-andrew.zaborowski@intel.com>
 In-Reply-To: <20200813005026.294950-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7638455709345985136==
+--===============2960670741356848356==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In both FT or FILS EAPoL isn't used for the initial handshake and only
-for the later re-keys.  For FT we added the
-eapol_sm_set_require_handshake mechanism to tell EAPoL to not require
-the initial handshake and we can re-use it for FILS.
+sm->handshake already contains our RSN/WPA IE so there's no need to
+rebuild it for msg 3/4, especially since we hardcode the fact that we
+only support one pairwise cipher.  If we start declaring more supported
+ciphers and need to include a second RSNE we can first parse
+sm->hs->authenticator_ie into a struct ir_rsn_info, overwrite the cipher
+and rebuild it from that struct.
+
+This way we duplicate less code and we hardcode fewer facts about the AP
+in eapol.c which also helps in adding EAP-WSC.
 ---
- src/eapol.c  | 10 ----------
- src/netdev.c | 16 +++++++++++-----
- 2 files changed, 11 insertions(+), 15 deletions(-)
+ src/eapol.c | 19 ++++---------------
+ 1 file changed, 4 insertions(+), 15 deletions(-)
 
 diff --git a/src/eapol.c b/src/eapol.c
-index b0036c10..b982e6b6 100644
+index b982e6b6..ae37f6c2 100644
 --- a/src/eapol.c
 +++ b/src/eapol.c
-@@ -2390,16 +2390,6 @@ bool eapol_start(struct eapol_sm *sm)
+@@ -1267,17 +1267,16 @@ static void eapol_send_ptk_3_of_4(struct eapol_sm *=
+sm)
+ {
+ 	uint32_t ifindex =3D sm->handshake->ifindex;
+ 	uint8_t frame_buf[512];
+-	uint8_t key_data_buf[128];
++	unsigned int rsne_len =3D sm->handshake->authenticator_ie[1] + 2;
++	uint8_t key_data_buf[128 + rsne_len];
++	int key_data_len =3D rsne_len;
+ 	struct eapol_key *ek =3D (struct eapol_key *) frame_buf;
+-	int key_data_len;
+ 	enum crypto_cipher cipher =3D ie_rsn_cipher_suite_to_cipher(
+ 				sm->handshake->pairwise_cipher);
+ 	enum crypto_cipher group_cipher =3D ie_rsn_cipher_suite_to_cipher(
+ 				sm->handshake->group_cipher);
+ 	const uint8_t *kck;
+ 	const uint8_t *kek;
+-	struct ie_rsn_info rsn;
+-	uint8_t *rsne;
  =
 
- 	sm->started =3D true;
+ 	sm->replay_counter++;
  =
 
--	/*
--	 * FILS only uses the 4-way for rekeys, so only started needs to be set,
--	 * then we wait for a rekey.
--	 */
--	if (sm->handshake->akm_suite & (IE_RSN_AKM_SUITE_FILS_SHA256 |
--			IE_RSN_AKM_SUITE_FILS_SHA384 |
--			IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384 |
--			IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256))
--		return true;
+@@ -1304,17 +1303,7 @@ static void eapol_send_ptk_3_of_4(struct eapol_sm *s=
+m)
+ 	 * Just one RSNE in Key Data as we only set one cipher in ap->ciphers
+ 	 * currently.
+ 	 */
 -
- 	if (sm->require_handshake)
- 		sm->timeout =3D l_timeout_create(eapol_4way_handshake_time,
- 				eapol_timeout, sm, NULL);
-diff --git a/src/netdev.c b/src/netdev.c
-index 9e2690d3..5d3aa862 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -2071,6 +2071,12 @@ static void netdev_associate_event(struct l_genl_msg=
- *msg,
- 	if (netdev->ap) {
- 		ret =3D auth_proto_rx_associate(netdev->ap, frame, frame_len);
- 		if (ret =3D=3D 0) {
-+			bool fils =3D !!(netdev->handshake->akm_suite &
-+					(IE_RSN_AKM_SUITE_FILS_SHA256 |
-+					 IE_RSN_AKM_SUITE_FILS_SHA384 |
-+					 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384 |
-+					 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256));
-+
- 			auth_proto_free(netdev->ap);
- 			netdev->ap =3D NULL;
+-	memset(&rsn, 0, sizeof(rsn));
+-	rsn.akm_suites =3D IE_RSN_AKM_SUITE_PSK;
+-	rsn.pairwise_ciphers =3D sm->handshake->pairwise_cipher;
+-	rsn.group_cipher =3D sm->handshake->group_cipher;
+-
+-	rsne =3D key_data_buf;
+-	if (!ie_build_rsne(&rsn, rsne))
+-		return;
+-
+-	key_data_len =3D rsne[1] + 2;
++	memcpy(key_data_buf, sm->handshake->authenticator_ie, rsne_len);
  =
 
-@@ -2081,15 +2087,15 @@ static void netdev_associate_event(struct l_genl_ms=
-g *msg,
- 			netdev->ignore_connect_event =3D false;
- =
-
- 			/*
--			 * If in FT we need to prevent the 4-way handshake from
--			 * happening, and instead just wait for rekeys
-+			 * If in FT and/or FILS we don't force an initial 4-way
-+			 * handshake and instead just keep the EAPoL state
-+			 * machine for the rekeys.
- 			 */
--			if (netdev->in_ft) {
-+			if (netdev->in_ft || fils)
- 				eapol_sm_set_require_handshake(netdev->sm,
- 								false);
--				netdev->in_ft =3D false;
--			}
- =
-
-+			netdev->in_ft =3D false;
- 			return;
- 		} else if (ret =3D=3D -EAGAIN) {
- 			/*
+ 	if (group_cipher) {
+ 		uint8_t *gtk_kde =3D key_data_buf + key_data_len;
 -- =
 
 2.25.1
 
---===============7638455709345985136==--
+--===============2960670741356848356==--
 
