@@ -1,92 +1,145 @@
-Content-Type: multipart/mixed; boundary="===============8742211871730116131=="
+Content-Type: multipart/mixed; boundary="===============0530908709778161684=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 05/16] eapol: Use eapol_sm_write in authenticator mode
-Date: Thu, 13 Aug 2020 02:50:15 +0200
-Message-ID: <20200813005026.294950-5-andrew.zaborowski@intel.com>
+Subject: [PATCH 06/16] eapol: Basic EAP support in authenticator mode
+Date: Thu, 13 Aug 2020 02:50:16 +0200
+Message-ID: <20200813005026.294950-6-andrew.zaborowski@intel.com>
 In-Reply-To: <20200813005026.294950-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8742211871730116131==
+--===============0530908709778161684==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Throughout the supplicant mode we'd use the eapol_sm_write wrapper but
-in the authenticator mode we'd call __eapol_tx_packet directly.  Adapt
-eapol_sm_write to use the right destination address and use it
-consistently.
+Handle EAPoL-EAP frames using our eap.c methods in authenticator mode
+same as we do on the supplicant side.  The user (ap.c) will only need to
+set a valid 8021x_settings in the handshake object, same as on the
+supplicant side.
 ---
- src/eapol.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ src/eapol.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 72 insertions(+), 4 deletions(-)
 
 diff --git a/src/eapol.c b/src/eapol.c
-index 38c7956e..299de13f 100644
+index 299de13f..06b8a2f6 100644
 --- a/src/eapol.c
 +++ b/src/eapol.c
-@@ -904,8 +904,11 @@ void eapol_sm_set_user_data(struct eapol_sm *sm, void =
-*user_data)
- static void eapol_sm_write(struct eapol_sm *sm, const struct eapol_frame *=
-ef,
- 				bool noencrypt)
- {
--	__eapol_tx_packet(sm->handshake->ifindex, sm->handshake->aa, ETH_P_PAE,
--				ef, noencrypt);
-+	const uint8_t *dst =3D sm->handshake->authenticator ?
-+		sm->handshake->spa : sm->handshake->aa;
+@@ -2067,6 +2067,17 @@ static void eapol_eap_complete_cb(enum eap_result re=
+sult, void *user_data)
+ 	}
+ =
+
+ 	eap_reset(sm->eap);
 +
-+	__eapol_tx_packet(sm->handshake->ifindex, dst, ETH_P_PAE, ef,
-+				noencrypt);
++	if (sm->handshake->authenticator) {
++		if (L_WARN_ON(!sm->handshake->have_pmk))
++			return;
++
++		sm->mic_len =3D eapol_get_mic_length(sm->handshake->akm_suite,
++						sm->handshake->pmk_len);
++
++		/* Kick off 4-Way Handshake */
++		eapol_ptk_1_of_4_retry(NULL, sm);
++	}
  }
  =
 
- static inline void handshake_failed(struct eapol_sm *sm, uint16_t reason_c=
-ode)
-@@ -1024,7 +1027,6 @@ static void eapol_set_key_timeout(struct eapol_sm *sm,
- /* 802.11-2016 Section 12.7.6.2 */
- static void eapol_send_ptk_1_of_4(struct eapol_sm *sm)
+ /* This respresentes the eapResults message */
+@@ -2200,7 +2211,34 @@ static void eapol_rx_auth_packet(uint16_t proto, con=
+st uint8_t *from,
  {
--	uint32_t ifindex =3D sm->handshake->ifindex;
- 	const uint8_t *aa =3D sm->handshake->aa;
- 	uint8_t frame_buf[512];
- 	struct eapol_key *ek =3D (struct eapol_key *) frame_buf;
-@@ -1062,8 +1064,7 @@ static void eapol_send_ptk_1_of_4(struct eapol_sm *sm)
- 	l_debug("STA: "MAC" retries=3D%u", MAC_STR(sm->handshake->spa),
- 			sm->frame_retry);
+ 	struct eapol_sm *sm =3D user_data;
  =
 
--	__eapol_tx_packet(ifindex, sm->handshake->spa, ETH_P_PAE,
--				(struct eapol_frame *) ek, false);
-+	eapol_sm_write(sm, (struct eapol_frame *) ek, false);
++	if (proto !=3D ETH_P_PAE || memcmp(from, sm->handshake->spa, 6))
++		return;
++
+ 	switch (frame->header.packet_type) {
++	case 0:	/* EAPOL-EAP */
++		if (!sm->eap) {
++			l_error("Authenticator received an unexpected "
++				"EAPOL-EAP frame from %s",
++				util_address_to_string(from));
++			return;
++		}
++
++		eap_rx_packet(sm->eap, frame->data,
++				L_BE16_TO_CPU(frame->header.packet_len));
++		break;
++
++	case 1:	/* EAPOL-Start */
++		/*
++		 * The supplicant might have sent an EAPoL-Start even before
++		 * we queued our EAP Identity Request, so this should happen
++		 * mostly while we wait for the EAP Identity Response or before.
++		 * It's safe to ignore this frame in either case.
++		 *
++		 * TODO: if we're already past the full handshake, send a
++		 * new msg 1/4.
++		 */
++		break;
++
+ 	case 3: /* EAPOL-Key */
+ 		eapol_auth_key_handle(sm, frame);
+ 		break;
+@@ -2341,16 +2379,46 @@ void eapol_register(struct eapol_sm *sm)
+ 			sm->protocol_version =3D sm->handshake->proto_version;
+ =
+
+ 		sm->started =3D true;
+-		/* Since AP/AdHoc only support AKM PSK we can hard code this */
+-		sm->mic_len =3D 16;
+ =
+
+-		/* kick off handshake */
+-		eapol_ptk_1_of_4_retry(NULL, sm);
++		if (sm->handshake->settings_8021x) {
++			sm->eap =3D eap_new(eapol_eap_msg_cb,
++						eapol_eap_complete_cb, sm);
++			if (!sm->eap)
++				goto eap_error;
++
++			eap_set_key_material_func(sm->eap,
++							eapol_eap_results_cb);
++			eap_set_event_func(sm->eap, eapol_eap_event_cb);
++
++			if (!eap_load_settings(sm->eap,
++						sm->handshake->settings_8021x,
++						"EAP-")) {
++				eap_free(sm->eap);
++				sm->eap =3D NULL;
++				goto eap_error;
++			}
++		} else {
++			if (L_WARN_ON(!sm->handshake->have_pmk))
++				return;
++
++			sm->mic_len =3D eapol_get_mic_length(
++						sm->handshake->akm_suite,
++						sm->handshake->pmk_len);
++
++			/* kick off handshake */
++			eapol_ptk_1_of_4_retry(NULL, sm);
++		}
+ 	} else {
+ 		sm->watch_id =3D eapol_frame_watch_add(sm->handshake->ifindex,
+ 						eapol_rx_packet, sm);
+ 		sm->protocol_version =3D sm->handshake->proto_version;
+ 	}
++
++	return;
++
++eap_error:
++	l_error("Error initializing EAP for ifindex %i",
++			(int) sm->handshake->ifindex);
  }
  =
 
- static void eapol_ptk_1_of_4_retry(struct l_timeout *timeout, void *user_d=
-ata)
-@@ -1265,7 +1266,6 @@ error_unspecified:
- /* 802.11-2016 Section 12.7.6.4 */
- static void eapol_send_ptk_3_of_4(struct eapol_sm *sm)
- {
--	uint32_t ifindex =3D sm->handshake->ifindex;
- 	uint8_t frame_buf[512];
- 	unsigned int rsne_len =3D sm->handshake->authenticator_ie[1] + 2;
- 	uint8_t key_data_buf[128 + rsne_len];
-@@ -1335,8 +1335,7 @@ static void eapol_send_ptk_3_of_4(struct eapol_sm *sm)
- 	l_debug("STA: "MAC" retries=3D%u", MAC_STR(sm->handshake->spa),
- 			sm->frame_retry);
- =
-
--	__eapol_tx_packet(ifindex, sm->handshake->spa, ETH_P_PAE,
--				(struct eapol_frame *) ek, false);
-+	eapol_sm_write(sm, (struct eapol_frame *) ek, false);
- }
- =
-
- static void eapol_ptk_3_of_4_retry(struct l_timeout *timeout,
+ bool eapol_start(struct eapol_sm *sm)
 -- =
 
 2.25.1
 
---===============8742211871730116131==--
+--===============0530908709778161684==--
 
