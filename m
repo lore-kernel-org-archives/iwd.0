@@ -1,61 +1,96 @@
-Content-Type: multipart/mixed; boundary="===============1876149281873512164=="
+Content-Type: multipart/mixed; boundary="===============7638455709345985136=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 01/16] wscutil: Handle a deprecated network key format
-Date: Thu, 13 Aug 2020 02:50:11 +0200
-Message-ID: <20200813005026.294950-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 02/16] eapol: Use the require_handshake flag for FILS
+Date: Thu, 13 Aug 2020 02:50:12 +0200
+Message-ID: <20200813005026.294950-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20200813005026.294950-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1876149281873512164==
+--===============7638455709345985136==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implement a note from the spec saying that implementations should handle
-NUL-terminated Network Keys inside credentials structures.
+In both FT or FILS EAPoL isn't used for the initial handshake and only
+for the later re-keys.  For FT we added the
+eapol_sm_set_require_handshake mechanism to tell EAPoL to not require
+the initial handshake and we can re-use it for FILS.
 ---
- src/wscutil.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ src/eapol.c  | 10 ----------
+ src/netdev.c | 16 +++++++++++-----
+ 2 files changed, 11 insertions(+), 15 deletions(-)
 
-diff --git a/src/wscutil.c b/src/wscutil.c
-index 6b445ce4..a41702e8 100644
---- a/src/wscutil.c
-+++ b/src/wscutil.c
-@@ -362,13 +362,25 @@ static bool extract_network_key(struct wsc_attr_iter =
-*iter, void *data)
- {
- 	struct iovec *network_key =3D data;
- 	unsigned int len;
-+	const uint8_t *key;
+diff --git a/src/eapol.c b/src/eapol.c
+index b0036c10..b982e6b6 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -2390,16 +2390,6 @@ bool eapol_start(struct eapol_sm *sm)
  =
 
- 	len =3D wsc_attr_iter_get_length(iter);
- 	if (len > 64)
- 		return false;
+ 	sm->started =3D true;
  =
 
-+	/*
-+	 * WSC 2.0.5, Section 12, Network Key:
-+	 * "Some existing implementations based on v1.0h null-terminate the
-+	 * passphrase value, i.e., add an extra 0x00 octet into the end of
-+	 * the value. For backwards compatibility, implementations shall be
-+	 * able to parse such a value"
-+	 */
-+	key =3D wsc_attr_iter_get_data(iter);
-+	if (len && key[len - 1] =3D=3D 0x00)
-+		len--;
+-	/*
+-	 * FILS only uses the 4-way for rekeys, so only started needs to be set,
+-	 * then we wait for a rekey.
+-	 */
+-	if (sm->handshake->akm_suite & (IE_RSN_AKM_SUITE_FILS_SHA256 |
+-			IE_RSN_AKM_SUITE_FILS_SHA384 |
+-			IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384 |
+-			IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256))
+-		return true;
+-
+ 	if (sm->require_handshake)
+ 		sm->timeout =3D l_timeout_create(eapol_4way_handshake_time,
+ 				eapol_timeout, sm, NULL);
+diff --git a/src/netdev.c b/src/netdev.c
+index 9e2690d3..5d3aa862 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2071,6 +2071,12 @@ static void netdev_associate_event(struct l_genl_msg=
+ *msg,
+ 	if (netdev->ap) {
+ 		ret =3D auth_proto_rx_associate(netdev->ap, frame, frame_len);
+ 		if (ret =3D=3D 0) {
++			bool fils =3D !!(netdev->handshake->akm_suite &
++					(IE_RSN_AKM_SUITE_FILS_SHA256 |
++					 IE_RSN_AKM_SUITE_FILS_SHA384 |
++					 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384 |
++					 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256));
 +
- 	network_key->iov_len =3D len;
--	network_key->iov_base =3D (void *) wsc_attr_iter_get_data(iter);
-+	network_key->iov_base =3D (void *) key;
+ 			auth_proto_free(netdev->ap);
+ 			netdev->ap =3D NULL;
  =
 
- 	return true;
- }
+@@ -2081,15 +2087,15 @@ static void netdev_associate_event(struct l_genl_ms=
+g *msg,
+ 			netdev->ignore_connect_event =3D false;
+ =
+
+ 			/*
+-			 * If in FT we need to prevent the 4-way handshake from
+-			 * happening, and instead just wait for rekeys
++			 * If in FT and/or FILS we don't force an initial 4-way
++			 * handshake and instead just keep the EAPoL state
++			 * machine for the rekeys.
+ 			 */
+-			if (netdev->in_ft) {
++			if (netdev->in_ft || fils)
+ 				eapol_sm_set_require_handshake(netdev->sm,
+ 								false);
+-				netdev->in_ft =3D false;
+-			}
+ =
+
++			netdev->in_ft =3D false;
+ 			return;
+ 		} else if (ret =3D=3D -EAGAIN) {
+ 			/*
 -- =
 
 2.25.1
 
---===============1876149281873512164==--
+--===============7638455709345985136==--
 
