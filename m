@@ -1,46 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============7992167032820447638=="
+Content-Type: multipart/mixed; boundary="===============4916096656395167742=="
 MIME-Version: 1.0
 From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>
-Subject: [PATCH v2 0/2] Fix the documented behaviour of GetOrderedNetworks
-Date: Fri, 14 Aug 2020 15:40:31 +0200
-Message-ID: <20200814134033.322752-1-alsi@bang-olufsen.dk>
+Subject: [PATCH v2 1/2] station: refresh ordered network list on (dis)connect
+Date: Fri, 14 Aug 2020 15:40:32 +0200
+Message-ID: <20200814134033.322752-2-alsi@bang-olufsen.dk>
+In-Reply-To: <20200814134033.322752-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7992167032820447638==
+--===============4916096656395167742==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I noticed that the Station DBus method GetOrderedNetworks() was not
-respecting the behaviour documented in doc/station-api.txt, namely that:
+Doing so ensures that the currently connected network is always at the
+beginning of the list. Previously, the list would only get updated after
+a scan.
 
-    1. If the device is currently connected to a network, that network
-       is always first on the list,
-    2. followed by any known networks that have been used at least once
-       before [...]
-
-These two patches should address the two points respectively.
-
+This fixes the documented behaviour of GetOrderedNetworks() DBus method,
+which states that the currently connected network is always at the
+beginning of the returned array.
 ---
+ src/station.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-v1 -> v2:
-    - Fix a careless naming mistake which caused the first patch not to
-      compile.
+diff --git a/src/station.c b/src/station.c
+index 42d60942..a0ec4038 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1195,6 +1195,12 @@ static void station_enter_state(struct station *stat=
+ion,
+ 					new_scan_results, station);
+ 		break;
+ 	case STATION_STATE_CONNECTING:
++		/* Refresh the ordered network list */
++		network_rank_update(station->connected_network, true);
++		l_queue_remove(station->networks_sorted, station->connected_network);
++		l_queue_insert(station->networks_sorted, station->connected_network,
++					network_rank_compare, NULL);
++
+ 		l_dbus_property_changed(dbus, netdev_get_path(station->netdev),
+ 				IWD_STATION_INTERFACE, "ConnectedNetwork");
+ 		l_dbus_property_changed(dbus,
+@@ -1295,6 +1301,12 @@ static void station_reset_connection_state(struct st=
+ation *station)
+ 	station->connected_bss =3D NULL;
+ 	station->connected_network =3D NULL;
+ =
 
-Alvin =C5=A0ipraga (2):
-  station: refresh ordered network list on (dis)connect
-  treewide: guard compare functions against signed integer overflow
-
- src/network.c |  2 +-
- src/scan.c    |  2 +-
- src/station.c | 16 ++++++++++++++--
- tools/hwsim.c |  2 +-
- 4 files changed, 17 insertions(+), 5 deletions(-)
-
++	/* Refresh the ordered network list */
++	network_rank_update(station->connected_network, false);
++	l_queue_remove(station->networks_sorted, station->connected_network);
++	l_queue_insert(station->networks_sorted, station->connected_network,
++				network_rank_compare, NULL);
++
+ 	l_dbus_property_changed(dbus, netdev_get_path(station->netdev),
+ 				IWD_STATION_INTERFACE, "ConnectedNetwork");
+ 	l_dbus_property_changed(dbus, network_get_path(network),
 -- =
 
 2.28.0
 
---===============7992167032820447638==--
+--===============4916096656395167742==--
 
