@@ -1,66 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============6759840287957516058=="
+Content-Type: multipart/mixed; boundary="===============1397576841724700563=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 0/2] Fix the documented behaviour of GetOrderedNetworks
-Date: Fri, 14 Aug 2020 10:58:59 -0500
-Message-ID: <1479f364-054e-94fa-1579-eca6ccf1d34d@gmail.com>
-In-Reply-To: <20200814134033.322752-1-alsi@bang-olufsen.dk>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 01/10] station: Don't call network_rank_update with NULL
+ network
+Date: Mon, 17 Aug 2020 12:06:38 +0200
+Message-ID: <20200817100647.338184-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6759840287957516058==
+--===============1397576841724700563==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Alvin,
+Move the update of station->networks_sorted order to before we set
+station->connected_network NULL to avoid a crash when we attempt to
+use the NULL pointer.
+---
+ src/station.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On 8/14/20 8:40 AM, Alvin =C5=A0ipraga wrote:
-> I noticed that the Station DBus method GetOrderedNetworks() was not
-> respecting the behaviour documented in doc/station-api.txt, namely that:
-> =
+diff --git a/src/station.c b/src/station.c
+index e44dc145..e53952a7 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1298,15 +1298,15 @@ static void station_reset_connection_state(struct s=
+tation *station)
+ =
 
->      1. If the device is currently connected to a network, that network
->         is always first on the list,
->      2. followed by any known networks that have been used at least once
->         before [...]
-> =
+ 	station_roam_state_clear(station);
+ =
 
-> These two patches should address the two points respectively.
-> =
+-	station->connected_bss =3D NULL;
+-	station->connected_network =3D NULL;
+-
+ 	/* Refresh the ordered network list */
+ 	network_rank_update(station->connected_network, false);
+ 	l_queue_remove(station->networks_sorted, station->connected_network);
+ 	l_queue_insert(station->networks_sorted, station->connected_network,
+ 				network_rank_compare, NULL);
+ =
 
-> ---
-> =
++	station->connected_bss =3D NULL;
++	station->connected_network =3D NULL;
++
+ 	l_dbus_property_changed(dbus, netdev_get_path(station->netdev),
+ 				IWD_STATION_INTERFACE, "ConnectedNetwork");
+ 	l_dbus_property_changed(dbus, network_get_path(network),
+-- =
 
-> v1 -> v2:
->      - Fix a careless naming mistake which caused the first patch not to
->        compile.
-> =
+2.25.1
 
-> Alvin =C5=A0ipraga (2):
->    station: refresh ordered network list on (dis)connect
->    treewide: guard compare functions against signed integer overflow
-> =
-
->   src/network.c |  2 +-
->   src/scan.c    |  2 +-
->   src/station.c | 16 ++++++++++++++--
->   tools/hwsim.c |  2 +-
->   4 files changed, 17 insertions(+), 5 deletions(-)
-> =
-
-
-Looks like the bug fixed in patch 2 has been in there since the introductio=
-n of =
-
-that method.  We must have been (un)lucky that the scan is done prior to th=
-e =
-
-connection and the results look sort of correct.
-
-Good catch and both applied.
-
-Regards,
--Denis
---===============6759840287957516058==--
+--===============1397576841724700563==--
 
