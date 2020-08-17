@@ -1,115 +1,236 @@
-Content-Type: multipart/mixed; boundary="===============4365432831107620328=="
+Content-Type: multipart/mixed; boundary="===============6765631026062486804=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 09/10] unit: Authenticator 4-way handshake error scenario
-Date: Mon, 17 Aug 2020 12:06:46 +0200
-Message-ID: <20200817100647.338184-9-andrew.zaborowski@intel.com>
+Subject: [PATCH 10/10] unit: Test a EAP-WSC-R setup in test-eapol
+Date: Mon, 17 Aug 2020 12:06:47 +0200
+Message-ID: <20200817100647.338184-10-andrew.zaborowski@intel.com>
 In-Reply-To: <20200817100647.338184-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4365432831107620328==
+--===============6765631026062486804==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- unit/test-eapol.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ Makefile.am       |   4 +-
+ unit/test-eapol.c | 166 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 169 insertions(+), 1 deletion(-)
 
+diff --git a/Makefile.am b/Makefile.am
+index e83dbeee..9bb97760 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -457,7 +457,9 @@ unit_test_eapol_SOURCES =3D unit/test-eapol.c \
+ 				src/eap-md5.c src/util.c \
+ 				src/eap-tls-common.h src/eap-tls-common.c \
+ 				src/erp.h src/erp.c \
+-				src/mschaputil.h src/mschaputil.c
++				src/mschaputil.h src/mschaputil.c \
++				src/eap-wsc.h src/eap-wsc.c \
++				src/wscutil.h src/wscutil.c
+ unit_test_eapol_LDADD =3D $(ell_ldadd)
+ unit_test_eapol_DEPENDENCIES =3D $(ell_dependencies) \
+ 				unit/cert-server.pem \
 diff --git a/unit/test-eapol.c b/unit/test-eapol.c
-index 022f9e4a..08c1085e 100644
+index 08c1085e..5ba85170 100644
 --- a/unit/test-eapol.c
 +++ b/unit/test-eapol.c
-@@ -3703,6 +3703,72 @@ static void eapol_ap_sta_handshake_test(const void *=
-data)
- 	assert(!memcmp(s.ap_tk, s.sta_tk, 16));
+@@ -37,6 +37,8 @@
+ #include "src/eap.h"
+ #include "src/eap-private.h"
+ #include "src/handshake.h"
++#include "src/wscutil.h"
++#include "src/eap-wsc.h"
+ =
+
+ /* Our nonce to use + its size */
+ static const uint8_t *snonce;
+@@ -3769,6 +3771,167 @@ static void eapol_ap_sta_handshake_bad_psk_test(con=
+st void *data)
+ 	assert(s.to_ap_msg_cnt =3D=3D 1 && s.to_sta_msg_cnt =3D=3D 1);
  }
  =
 
-+static void eapol_ap_sta_handshake_bad_psk_test(const void *data)
++struct test_wsc_success_data {
++	bool credentials_obtained;
++	bool credentials_sent;
++	bool ap_eap_failed;
++	bool sta_eap_failed;
++	struct test_ap_sta_data *s;
++};
++
++static void test_ap_sta_hs_event_ap(struct handshake_state *hs,
++				enum handshake_event event,
++				void *user_data, ...)
++{
++	struct test_wsc_success_data *data =3D user_data;
++	va_list args;
++
++	va_start(args, user_data);
++
++	switch (event) {
++	case HANDSHAKE_EVENT_EAP_NOTIFY:
++		assert(va_arg(args, unsigned int) =3D=3D
++			EAP_WSC_EVENT_CREDENTIAL_SENT);
++		assert(!data->credentials_sent);
++		assert(!data->ap_eap_failed);
++		data->credentials_sent =3D true;
++		break;
++	case HANDSHAKE_EVENT_FAILED:
++		assert(!data->ap_eap_failed);
++		data->ap_eap_failed =3D true;
++		data->s->ap_sm =3D NULL;
++		break;
++	default:
++		break;
++	}
++
++	va_end(args);
++}
++
++static void test_ap_sta_hs_event_sta(struct handshake_state *hs,
++				enum handshake_event event,
++				void *user_data, ...)
++{
++	struct test_wsc_success_data *data =3D user_data;
++	va_list args;
++
++	va_start(args, user_data);
++
++	switch (event) {
++	case HANDSHAKE_EVENT_EAP_NOTIFY:
++	{
++		unsigned int eap_event =3D va_arg(args, unsigned int);
++		const struct wsc_credential *cred;
++
++		assert(eap_event =3D=3D EAP_WSC_EVENT_CREDENTIAL_OBTAINED);
++		cred =3D va_arg(args, const struct wsc_credential *);
++		assert(cred->ssid_len =3D=3D 7 &&
++			!memcmp(cred->ssid, "thessid", 7));
++		assert(cred->auth_type =3D=3D
++			WSC_AUTHENTICATION_TYPE_WPA2_PERSONAL);
++		assert(cred->encryption_type =3D=3D WSC_ENCRYPTION_TYPE_AES_TKIP);
++		assert(cred->network_key_len =3D=3D 12 &&
++			!memcmp(cred->network_key, "secretsecret", 12));
++		assert(!memcmp(cred->addr, data->s->sta_address, 6));
++		assert(!data->credentials_obtained);
++		assert(!data->sta_eap_failed);
++		data->credentials_obtained =3D true;
++		break;
++	}
++	case HANDSHAKE_EVENT_FAILED:
++		assert(!data->sta_eap_failed);
++		data->sta_eap_failed =3D true;
++		data->s->sta_sm =3D NULL;
++		break;
++	default:
++		break;
++	}
++
++	va_end(args);
++}
++
++static void eapol_ap_sta_handshake_eap_wsc_pbc_test(const void *data)
 +{
 +	static const unsigned char ap_rsne[] =3D {
-+		0x30, 0x14, 0x01, 0x00, 0x00, 0x0f, 0xac, 0x04,
-+		0x01, 0x00, 0x00, 0x0f, 0xac, 0x04, 0x01, 0x00,
-+		0x00, 0x0f, 0xac, 0x02, 0x81, 0x00 };
-+	static const unsigned char sta_rsne[] =3D {
 +		0x30, 0x12, 0x01, 0x00, 0x00, 0x0f, 0xac, 0x04,
 +		0x01, 0x00, 0x00, 0x0f, 0xac, 0x04, 0x01, 0x00,
 +		0x00, 0x0f, 0xac, 0x02 };
-+	static const char *ssid =3D "TestWPA2PSK";
-+	static const uint8_t psk1[32] =3D {	/* secretsecret */
-+		0x6a, 0xa3, 0xf0, 0x0b, 0x68, 0xbd, 0x8b, 0x46,
-+		0x69, 0x83, 0xa5, 0x29, 0xa3, 0xfa, 0x57, 0x1c,
-+		0x6c, 0x7b, 0x72, 0x41, 0x1d, 0xce, 0x33, 0x02,
-+		0xa2, 0x2d, 0xdf, 0x77, 0xd1, 0x93, 0xdb, 0x5f };
-+	static const uint8_t psk2[32] =3D {	/* wrongpasswd */
-+		0x04, 0x86, 0x45, 0x37, 0x4c, 0x95, 0xdd, 0x1e,
-+		0x96, 0xbb, 0xdf, 0x12, 0x0a, 0x1c, 0x4c, 0x5b,
-+		0x6d, 0x22, 0xc1, 0x1c, 0xa2, 0xe0, 0x15, 0x99,
-+		0xbf, 0x82, 0x10, 0xd3, 0x59, 0x2c, 0xfb, 0x2d };
++	static const char *ssid =3D "TestWPA2EAP";
++	static const char *ap_8021x_str =3D "[Security]\n"
++		"EAP-Method=3DWSC-R\n"
++		"[WSC]\n"
++		"UUID-R=3D00112233445566778899aabbccddeeff\n"
++		"WPA2-SSID=3Dthessid\n"
++		"WPA2-Passphrase=3Dsecretsecret\n"
++		"RFBand=3D1\n"
++		"ConfigurationMethods=3D0x680\n";
++	static const char *sta_8021x_str =3D "[Security]\n"
++		"EAP-Identity=3DWFA-SimpleConfig-Enrollee-1-0\n"
++		"EAP-Method=3DWSC\n"
++		"[WSC]\n"
++		"RFBand=3D1\n"
++		"ConfigurationMethods=3D0x680\n";
++	struct l_settings *ap_8021x_settings =3D l_settings_new();
++	struct l_settings *sta_8021x_settings =3D l_settings_new();
 +	struct test_ap_sta_data s =3D {
 +		.ap_hs =3D test_ap_sta_hs_new(&s, 1),
 +		.sta_hs =3D test_ap_sta_hs_new(&s, 2),
 +		.ap_address =3D { 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
 +		.sta_address =3D { 0x02, 0x03, 0x04, 0x05, 0x06, 0x08 },
 +	};
++	struct test_wsc_success_data wsc_data =3D {
++		.s =3D &s
++	};
++	uint8_t uuid_e[16];
++	L_AUTO_FREE_VAR(char *, uuid_e_str) =3D NULL;
++
++	wsc_uuid_from_addr(s.sta_address, uuid_e);
++	uuid_e_str =3D l_util_hexstring(uuid_e, 16);
 +
 +	__handshake_set_get_nonce_func(random_nonce);
 +	__handshake_set_install_tk_func(test_ap_sta_install_tk);
 +	__handshake_set_install_gtk_func(NULL);
 +
 +	handshake_state_set_authenticator(s.ap_hs, true);
-+	handshake_state_set_event_func(s.ap_hs, test_ap_sta_hs_event, &s);
++	handshake_state_set_event_func(s.ap_hs, test_ap_sta_hs_event_ap,
++					&wsc_data);
 +	handshake_state_set_authenticator_address(s.ap_hs, s.ap_address);
 +	handshake_state_set_supplicant_address(s.ap_hs, s.sta_address);
-+	handshake_state_set_supplicant_ie(s.ap_hs, sta_rsne);
 +	handshake_state_set_authenticator_ie(s.ap_hs, ap_rsne);
 +	handshake_state_set_ssid(s.ap_hs, (void *) ssid, strlen(ssid));
-+	handshake_state_set_pmk(s.ap_hs, psk1, 32);
++	l_settings_load_from_data(ap_8021x_settings, ap_8021x_str,
++					strlen(ap_8021x_str));
++	l_settings_set_string(ap_8021x_settings, "WSC", "EnrolleeMAC",
++				util_address_to_string(s.sta_address));
++	l_settings_set_string(ap_8021x_settings, "WSC", "UUID-E", uuid_e_str);
++	handshake_state_set_8021x_config(s.ap_hs, ap_8021x_settings);
 +
 +	handshake_state_set_authenticator(s.sta_hs, false);
-+	handshake_state_set_event_func(s.sta_hs, test_ap_sta_hs_event, &s);
++	handshake_state_set_event_func(s.sta_hs, test_ap_sta_hs_event_sta,
++					&wsc_data);
 +	handshake_state_set_authenticator_address(s.sta_hs, s.ap_address);
 +	handshake_state_set_supplicant_address(s.sta_hs, s.sta_address);
-+	handshake_state_set_supplicant_ie(s.sta_hs, sta_rsne);
 +	handshake_state_set_authenticator_ie(s.sta_hs, ap_rsne);
 +	handshake_state_set_ssid(s.sta_hs, (void *) ssid, strlen(ssid));
-+	handshake_state_set_pmk(s.sta_hs, psk2, 32);
++	l_settings_load_from_data(sta_8021x_settings, sta_8021x_str,
++					strlen(sta_8021x_str));
++	l_settings_set_string(sta_8021x_settings, "WSC", "EnrolleeMAC",
++				util_address_to_string(s.sta_address));
++	handshake_state_set_8021x_config(s.sta_hs, sta_8021x_settings);
 +
 +	test_ap_sta_run(&s);
 +
 +	handshake_state_free(s.ap_hs);
 +	handshake_state_free(s.sta_hs);
 +	__handshake_set_install_tk_func(NULL);
++	l_settings_free(ap_8021x_settings);
++	l_settings_free(sta_8021x_settings);
 +
-+	/*
-+	 * There should have been 2 EAPoL-Key frame exchanged: 1/4 and
-+	 * 2/4 after which the AP will have detected wrong MIC and not
-+	 * sent any more messages with both sides waiting for the
-+	 * timeout.
-+	 */
 +	assert(!s.ap_success && !s.sta_success);
-+	assert(s.to_ap_msg_cnt =3D=3D 1 && s.to_sta_msg_cnt =3D=3D 1);
++	assert(wsc_data.sta_eap_failed && wsc_data.credentials_obtained);
++	assert(wsc_data.ap_eap_failed && wsc_data.credentials_sent);
 +}
 +
  #define IS_ENABLED(config_macro) _IS_ENABLED1(config_macro)
  #define _IS_ENABLED1(config_macro) _IS_ENABLED2(_XXXX##config_macro)
  #define _XXXX1 _YYYY,
-@@ -3845,6 +3911,8 @@ int main(int argc, char *argv[])
+@@ -3914,6 +4077,9 @@ int main(int argc, char *argv[])
+ 	l_test_add("EAPoL/Supplicant+Authenticator 4-Way Handshake Bad PSK",
+ 			&eapol_ap_sta_handshake_bad_psk_test, NULL);
  =
 
- 	l_test_add("EAPoL/Supplicant+Authenticator 4-Way Handshake",
- 			&eapol_ap_sta_handshake_test, NULL);
-+	l_test_add("EAPoL/Supplicant+Authenticator 4-Way Handshake Bad PSK",
-+			&eapol_ap_sta_handshake_bad_psk_test, NULL);
- =
-
++	l_test_add("EAPoL/Supplicant+Authenticator EAP-WSC PBC (WPA2 creds)",
++			&eapol_ap_sta_handshake_eap_wsc_pbc_test, NULL);
++
  done:
  	return l_test_run();
+ }
 -- =
 
 2.25.1
 
---===============4365432831107620328==--
+--===============6765631026062486804==--
 
