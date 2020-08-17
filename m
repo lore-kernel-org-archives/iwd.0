@@ -1,554 +1,243 @@
-Content-Type: multipart/mixed; boundary="===============5046687113584472217=="
+Content-Type: multipart/mixed; boundary="===============2357094941606974679=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 07/10] eap-wsc: Handle the M{1,3,5,7} messages
-Date: Mon, 17 Aug 2020 12:06:44 +0200
-Message-ID: <20200817100647.338184-7-andrew.zaborowski@intel.com>
+Subject: [PATCH 08/10] unit: Add an authenticator-side 4-Way Handshake test
+Date: Mon, 17 Aug 2020 12:06:45 +0200
+Message-ID: <20200817100647.338184-8-andrew.zaborowski@intel.com>
 In-Reply-To: <20200817100647.338184-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5046687113584472217==
+--===============2357094941606974679==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Parse, validate and respond to the M1, M3, M5 and M7 messages and send
-the M2, M4, M6 and M8.
+Test the eapol.c code responsible for the access point mode 4-way
+handshake with correct IEs and PSK on both sides (success scenario).
 ---
- src/eap-wsc.c | 496 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 496 insertions(+)
+ unit/test-eapol.c | 193 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 193 insertions(+)
 
-diff --git a/src/eap-wsc.c b/src/eap-wsc.c
-index 75c2d1cf..bfab9e25 100644
---- a/src/eap-wsc.c
-+++ b/src/eap-wsc.c
-@@ -958,6 +958,483 @@ clear_keys:
- 	explicit_bzero(&keys, sizeof(keys));
+diff --git a/unit/test-eapol.c b/unit/test-eapol.c
+index f6af6f06..022f9e4a 100644
+--- a/unit/test-eapol.c
++++ b/unit/test-eapol.c
+@@ -3513,6 +3513,196 @@ static void eapol_ft_handshake_test(const void *dat=
+a)
+ 	eapol_exit();
  }
  =
 
-+static void eap_wsc_r_send_m8(struct eap_state *eap,
-+				const uint8_t *m7_pdu, size_t m7_len)
++struct test_ap_sta_data {
++	struct handshake_state *ap_hs;
++	struct handshake_state *sta_hs;
++	const uint8_t ap_address[6];
++	const uint8_t sta_address[6];
++
++	uint8_t to_sta_data[1024];
++	int to_sta_data_len;
++	uint8_t ap_tk[32];
++	uint8_t sta_tk[32];
++	bool ap_success;
++	bool sta_success;
++	int to_sta_msg_cnt;
++	int to_ap_msg_cnt;
++	struct eapol_sm *ap_sm;
++	struct eapol_sm *sta_sm;
++};
++
++static int test_ap_sta_eapol_tx(uint32_t ifindex,
++					const uint8_t *dest, uint16_t proto,
++					const struct eapol_frame *ef,
++					bool noencrypt, void *user_data)
 +{
-+	struct eap_wsc_state *wsc =3D eap_get_data(eap);
-+	struct wsc_m8_encrypted_settings m8es =3D {};
-+	struct wsc_m8 m8;
-+	uint8_t *pdu;
-+	size_t pdu_len;
-+	/* At least: 2 * credential, 12 for Authenticator, 16 for IV + up to 16 p=
-ad */
-+	uint8_t encrypted[1024];
-+	size_t encrypted_len;
-+	bool r;
-+	struct wsc_credential creds[2];
-+	unsigned int creds_cnt =3D 0;
-+	unsigned int auth_types =3D
-+		wsc->m1->auth_type_flags & wsc->m2->auth_type_flags;
++	struct test_ap_sta_data *s =3D user_data;
++	size_t len =3D sizeof(struct eapol_header) +
++		L_BE16_TO_CPU(ef->header.packet_len);
 +
-+	if (auth_types & WSC_AUTHENTICATION_TYPE_OPEN)
-+		memcpy(&creds[creds_cnt++], &wsc->open_cred,
-+			sizeof(struct wsc_credential));
++	assert(ifindex =3D=3D s->ap_hs->ifindex || ifindex =3D=3D s->sta_hs->ifin=
+dex);
++	assert(proto =3D=3D ETH_P_PAE && !noencrypt);
 +
-+	if (auth_types & WSC_AUTHENTICATION_TYPE_WPA2_PERSONAL)
-+		memcpy(&creds[creds_cnt++], &wsc->wpa2_cred,
-+			sizeof(struct wsc_credential));
++	if (ifindex =3D=3D s->ap_hs->ifindex) {	/* From AP to STA */
++		assert(!memcmp(dest, s->sta_address, 6));
++		assert(len < sizeof(s->to_sta_data));
++		memcpy(s->to_sta_data, ef, len);
++		s->to_sta_data_len =3D len;
++		s->to_sta_msg_cnt++;
++		return 0;
++	}
 +
-+	pdu =3D wsc_build_m8_encrypted_settings(&m8es, creds, creds_cnt,
-+						&pdu_len);
-+	explicit_bzero(creds, creds_cnt * sizeof(struct wsc_credential));
-+	if (!pdu)
-+		return;
-+
-+	keywrap_authenticator_put(wsc, pdu, pdu_len);
-+	r =3D encrypted_settings_encrypt(wsc, wsc->iv3, pdu, pdu_len,
-+						encrypted, &encrypted_len);
-+	explicit_bzero(pdu, pdu_len);
-+	l_free(pdu);
-+
-+	if (!r)
-+		return;
-+
-+	m8.version2 =3D true;
-+	memcpy(m8.enrollee_nonce, wsc->m1->enrollee_nonce,
-+						sizeof(m8.enrollee_nonce));
-+
-+	pdu =3D wsc_build_m8(&m8, encrypted, encrypted_len, &pdu_len);
-+	if (!pdu)
-+		return;
-+
-+	authenticator_put(wsc, m7_pdu, m7_len, pdu, pdu_len);
-+	eap_wsc_send_message(eap, pdu, pdu_len);
-+	wsc->state =3D STATE_EXPECT_DONE;
++	/* From STA to AP */
++	assert(!memcmp(dest, s->ap_address, 6));
++	s->to_ap_msg_cnt++;
++	__eapol_rx_packet(1, s->sta_address, proto, (const void *) ef, len,
++				noencrypt);
++	return 0;
 +}
 +
-+static void eap_wsc_r_handle_m7(struct eap_state *eap,
-+					const uint8_t *pdu, size_t len)
++static void test_ap_sta_run(struct test_ap_sta_data *s)
 +{
-+	struct eap_wsc_state *wsc =3D eap_get_data(eap);
-+	struct wsc_m7 m7;
-+	struct iovec encrypted;
-+	uint8_t *decrypted;
-+	size_t decrypted_len;
-+	struct wsc_m7_encrypted_settings m7es;
-+	enum wsc_configuration_error error =3D WSC_CONFIGURATION_ERROR_NO_ERROR;
++	eap_init();
++	eapol_init();
++	__eapol_set_tx_packet_func(test_ap_sta_eapol_tx);
++	__eapol_set_tx_user_data(s);
 +
-+	/* Spec unclear what to do here, see comments in eap_wsc_send_nack */
-+	if (wsc_parse_m7(pdu, len, &m7, &encrypted) !=3D 0)
-+		goto send_nack;
++	s->ap_success =3D false;
++	s->sta_success =3D false;
++	s->to_sta_msg_cnt =3D 0;
++	s->to_ap_msg_cnt =3D 0;
++	s->to_sta_data_len =3D 0,
 +
-+	if (memcmp(m7.registrar_nonce, wsc->m2->registrar_nonce,
-+						sizeof(m7.registrar_nonce)))
-+		goto send_nack;
++	s->ap_sm =3D eapol_sm_new(s->ap_hs);
++	eapol_register(s->ap_sm);
 +
-+	if (!authenticator_check(wsc, pdu, len))
-+		return;
++	s->sta_sm =3D eapol_sm_new(s->sta_hs);
++	eapol_register(s->sta_sm);
 +
-+	decrypted =3D encrypted_settings_decrypt(wsc, encrypted.iov_base,
-+							encrypted.iov_len,
-+							&decrypted_len);
-+	if (!decrypted) {
-+		error =3D WSC_CONFIGURATION_ERROR_DECRYPTION_CRC_FAILURE;
-+		goto send_nack;
++	eapol_start(s->sta_sm);
++	eapol_start(s->ap_sm);
++
++	while (s->to_sta_data_len) {
++		int len =3D s->to_sta_data_len;
++		s->to_sta_data_len =3D 0;
++		__eapol_rx_packet(s->sta_hs->ifindex, s->ap_address, ETH_P_PAE,
++					s->to_sta_data, len, false);
 +	}
 +
-+	if (wsc_parse_m7_encrypted_settings(decrypted, decrypted_len, &m7es)) {
-+		error =3D WSC_CONFIGURATION_ERROR_DECRYPTION_CRC_FAILURE;
-+		goto cleanup;
-+	}
++	if (s->ap_sm)
++		eapol_sm_free(s->ap_sm);
 +
-+	if (!keywrap_authenticator_check(wsc, decrypted, decrypted_len)) {
-+		error =3D WSC_CONFIGURATION_ERROR_DECRYPTION_CRC_FAILURE;
-+		goto cleanup;
-+	}
++	if (s->sta_sm)
++		eapol_sm_free(s->sta_sm);
 +
-+	/* We have E-SNonce2, verify E-Hash2 stored in eap_wsc_r_handle_m3 */
-+	if (!x_hash_check(wsc, m7es.e_snonce2, wsc->psk2, wsc->e_hash2)) {
-+		error =3D WSC_CONFIGURATION_ERROR_DEVICE_PASSWORD_AUTH_FAILURE;
-+		goto cleanup;
-+	}
-+
-+	eap_wsc_r_send_m8(eap, pdu, len);
-+
-+cleanup:
-+	explicit_bzero(&m7es, sizeof(m7es));
-+	explicit_bzero(decrypted, decrypted_len);
-+	l_free(decrypted);
-+
-+	if (!error)
-+		return;
-+
-+send_nack:
-+	eap_wsc_send_nack(eap, error);
++	eapol_exit();
++	eap_exit();
 +}
 +
-+static void eap_wsc_r_send_m6(struct eap_state *eap,
-+				const uint8_t *m5_pdu, size_t m5_len)
++struct test_ap_sta_hs {
++	struct handshake_state super;
++	struct test_ap_sta_data *s;
++};
++
++static struct handshake_state *test_ap_sta_hs_new(struct test_ap_sta_data =
+*s,
++							uint32_t ifindex)
 +{
-+	struct eap_wsc_state *wsc =3D eap_get_data(eap);
-+	struct wsc_m6_encrypted_settings m6es;
-+	struct wsc_m6 m6;
-+	uint8_t *pdu;
-+	size_t pdu_len;
-+	/* 20 for SNonce, 12 for Authenticator, 16 for IV + up to 16 pad */
-+	uint8_t encrypted[64];
-+	size_t encrypted_len;
-+	bool r;
++	struct test_ap_sta_hs *ths =3D l_new(struct test_ap_sta_hs, 1);
 +
-+	memcpy(m6es.r_snonce2, wsc->local_snonce2, sizeof(wsc->local_snonce2));
-+	pdu =3D wsc_build_m6_encrypted_settings(&m6es, &pdu_len);
-+	explicit_bzero(m6es.r_snonce2, sizeof(wsc->local_snonce2));
-+	if (!pdu)
-+		return;
++	ths->super.ifindex =3D ifindex;
++	ths->super.free =3D (void (*)(struct handshake_state *s)) l_free;
++	ths->s =3D s;
 +
-+	keywrap_authenticator_put(wsc, pdu, pdu_len);
-+	r =3D encrypted_settings_encrypt(wsc, wsc->iv2, pdu, pdu_len,
-+						encrypted, &encrypted_len);
-+	explicit_bzero(pdu, pdu_len);
-+	l_free(pdu);
-+
-+	if (!r)
-+		return;
-+
-+	m6.version2 =3D true;
-+	memcpy(m6.enrollee_nonce, wsc->m1->enrollee_nonce,
-+						sizeof(m6.enrollee_nonce));
-+
-+	pdu =3D wsc_build_m6(&m6, encrypted, encrypted_len, &pdu_len);
-+	if (!pdu)
-+		return;
-+
-+	authenticator_put(wsc, m5_pdu, m5_len, pdu, pdu_len);
-+	eap_wsc_send_message(eap, pdu, pdu_len);
-+	wsc->state =3D STATE_EXPECT_M7;
++	return &ths->super;
 +}
 +
-+static void eap_wsc_r_handle_m5(struct eap_state *eap,
-+					const uint8_t *pdu, size_t len)
++static bool random_nonce(uint8_t nonce[])
 +{
-+	struct eap_wsc_state *wsc =3D eap_get_data(eap);
-+	struct wsc_m5 m5;
-+	struct iovec encrypted;
-+	uint8_t *decrypted;
-+	size_t decrypted_len;
-+	struct wsc_m5_encrypted_settings m5es;
-+	enum wsc_configuration_error error =3D WSC_CONFIGURATION_ERROR_NO_ERROR;
-+
-+	/* Spec unclear what to do here, see comments in eap_wsc_send_nack */
-+	if (wsc_parse_m5(pdu, len, &m5, &encrypted) !=3D 0)
-+		goto send_nack;
-+
-+	if (memcmp(m5.registrar_nonce, wsc->m2->registrar_nonce,
-+						sizeof(m5.registrar_nonce)))
-+		goto send_nack;
-+
-+	if (!authenticator_check(wsc, pdu, len))
-+		return;
-+
-+	decrypted =3D encrypted_settings_decrypt(wsc, encrypted.iov_base,
-+							encrypted.iov_len,
-+							&decrypted_len);
-+	if (!decrypted) {
-+		error =3D WSC_CONFIGURATION_ERROR_DECRYPTION_CRC_FAILURE;
-+		goto send_nack;
-+	}
-+
-+	if (wsc_parse_m5_encrypted_settings(decrypted, decrypted_len, &m5es)) {
-+		error =3D WSC_CONFIGURATION_ERROR_DECRYPTION_CRC_FAILURE;
-+		goto cleanup;
-+	}
-+
-+	if (!keywrap_authenticator_check(wsc, decrypted, decrypted_len)) {
-+		error =3D WSC_CONFIGURATION_ERROR_DECRYPTION_CRC_FAILURE;
-+		goto cleanup;
-+	}
-+
-+	/* We have E-SNonce1, verify E-Hash1 stored in eap_wsc_r_handle_m3 */
-+	if (!x_hash_check(wsc, m5es.e_snonce1, wsc->psk1, wsc->e_hash1)) {
-+		error =3D WSC_CONFIGURATION_ERROR_DEVICE_PASSWORD_AUTH_FAILURE;
-+		goto cleanup;
-+	}
-+
-+	eap_wsc_r_send_m6(eap, pdu, len);
-+
-+cleanup:
-+	explicit_bzero(&m5es, sizeof(m5es));
-+	explicit_bzero(decrypted, decrypted_len);
-+	l_free(decrypted);
-+
-+	if (!error)
-+		return;
-+
-+send_nack:
-+	eap_wsc_send_nack(eap, error);
++	return l_getrandom(nonce, 32);
 +}
 +
-+static void eap_wsc_r_send_m4(struct eap_state *eap,
-+				const uint8_t *m3_pdu, size_t m3_len)
++static void test_ap_sta_hs_event(struct handshake_state *hs,
++				enum handshake_event event,
++				void *user_data, ...)
 +{
-+	struct eap_wsc_state *wsc =3D eap_get_data(eap);
-+	struct wsc_m4_encrypted_settings m4es;
-+	struct wsc_m4 m4;
-+	uint8_t *pdu;
-+	size_t pdu_len;
-+	/* 20 for SNonce, 12 for Authenticator, 16 for IV + up to 16 pad */
-+	uint8_t encrypted[64];
-+	size_t encrypted_len;
-+	bool r;
-+	size_t len;
-+	size_t len_half1;
-+	struct iovec iov[4];
-+
-+	memcpy(m4es.r_snonce1, wsc->local_snonce1, sizeof(wsc->local_snonce1));
-+	pdu =3D wsc_build_m4_encrypted_settings(&m4es, &pdu_len);
-+	explicit_bzero(m4es.r_snonce1, sizeof(wsc->local_snonce1));
-+	if (!pdu)
-+		return;
-+
-+	keywrap_authenticator_put(wsc, pdu, pdu_len);
-+	r =3D encrypted_settings_encrypt(wsc, wsc->iv1, pdu, pdu_len,
-+						encrypted, &encrypted_len);
-+	explicit_bzero(pdu, pdu_len);
-+	l_free(pdu);
-+
-+	if (!r)
-+		return;
-+
-+	len =3D strlen(wsc->device_password);
-+
-+	/* WSC 2.0.5, Section 7.4:
-+	 * In case the UTF8 representation of the DevicePassword length is an
-+	 * odd number (N), the first half of DevicePassword will have length
-+	 * of N/2+1 and the second half of the DevicePassword will have length
-+	 * of N/2.
-+	 */
-+	len_half1 =3D (len + 1) / 2;
-+
-+	l_checksum_update(wsc->hmac_auth_key, wsc->device_password, len_half1);
-+	l_checksum_get_digest(wsc->hmac_auth_key, wsc->psk1, sizeof(wsc->psk1));
-+
-+	l_checksum_update(wsc->hmac_auth_key, wsc->device_password + len_half1,
-+					len / 2);
-+	l_checksum_get_digest(wsc->hmac_auth_key, wsc->psk2, sizeof(wsc->psk2));
-+
-+	m4.version2 =3D true;
-+	memcpy(m4.enrollee_nonce, wsc->m1->enrollee_nonce,
-+						sizeof(m4.enrollee_nonce));
-+
-+	/* WSC 2.0.5, Section 7.4:
-+	 * The Registrar creates two 128-bit secret nonces, R-S1, R-S2 and then
-+	 * computes:
-+	 * R-Hash1 =3D HMACAuthKey(R-S1 || PSK1 || PKE || PKR)
-+	 * R-Hash2 =3D HMACAuthKey(R-S2 || PSK2 || PKE || PKR)
-+	 */
-+	iov[0].iov_base =3D wsc->local_snonce1;
-+	iov[0].iov_len =3D sizeof(wsc->local_snonce1);
-+	iov[1].iov_base =3D wsc->psk1;
-+	iov[1].iov_len =3D sizeof(wsc->psk1);
-+	iov[2].iov_base =3D wsc->m1->public_key;
-+	iov[2].iov_len =3D sizeof(wsc->m1->public_key);
-+	iov[3].iov_base =3D wsc->m2->public_key;
-+	iov[3].iov_len =3D sizeof(wsc->m2->public_key);
-+	l_checksum_updatev(wsc->hmac_auth_key, iov, 4);
-+	l_checksum_get_digest(wsc->hmac_auth_key,
-+					m4.r_hash1, sizeof(m4.r_hash1));
-+
-+	iov[0].iov_base =3D wsc->local_snonce2;
-+	iov[0].iov_len =3D sizeof(wsc->local_snonce2);
-+	iov[1].iov_base =3D wsc->psk2;
-+	iov[1].iov_len =3D sizeof(wsc->psk2);
-+	l_checksum_updatev(wsc->hmac_auth_key, iov, 4);
-+	l_checksum_get_digest(wsc->hmac_auth_key,
-+					m4.r_hash2, sizeof(m4.r_hash2));
-+
-+	pdu =3D wsc_build_m4(&m4, encrypted, encrypted_len, &pdu_len);
-+	if (!pdu)
-+		return;
-+
-+	authenticator_put(wsc, m3_pdu, m3_len, pdu, pdu_len);
-+	eap_wsc_send_message(eap, pdu, pdu_len);
-+	wsc->state =3D STATE_EXPECT_M5;
++	assert(event !=3D HANDSHAKE_EVENT_FAILED);
 +}
 +
-+static void eap_wsc_r_handle_m3(struct eap_state *eap,
-+					const uint8_t *pdu, size_t len)
++static void test_ap_sta_install_tk(struct handshake_state *hs,
++					const uint8_t *tk, uint32_t cipher)
 +{
-+	struct eap_wsc_state *wsc =3D eap_get_data(eap);
-+	struct wsc_m3 m3;
++	struct test_ap_sta_hs *ths =3D
++		l_container_of(hs, struct test_ap_sta_hs, super);
++	assert(hs =3D=3D ths->s->ap_hs || hs =3D=3D ths->s->sta_hs);
++	assert(cipher =3D=3D CRYPTO_CIPHER_CCMP);
 +
-+	if (wsc_parse_m3(pdu, len, &m3) !=3D 0)
-+		goto send_nack;
-+
-+	if (memcmp(m3.registrar_nonce, wsc->m2->registrar_nonce,
-+						sizeof(m3.registrar_nonce)))
-+		goto send_nack;
-+
-+	if (!authenticator_check(wsc, pdu, len))
-+		return;
-+
-+	/* We can't verify these until we receive the E-S1/E-S2 in M5/M7 */
-+	memcpy(wsc->e_hash1, m3.e_hash1, sizeof(m3.e_hash1));
-+	memcpy(wsc->e_hash2, m3.e_hash2, sizeof(m3.e_hash2));
-+
-+	eap_wsc_r_send_m4(eap, pdu, len);
-+	return;
-+
-+send_nack:
-+	/* Spec unclear what to do here, see comments in eap_wsc_send_nack */
-+	eap_wsc_send_nack(eap, WSC_CONFIGURATION_ERROR_NO_ERROR);
++	if (hs =3D=3D ths->s->ap_hs) {
++		assert(!ths->s->ap_success);
++		memcpy(ths->s->ap_tk, tk, 16);
++		ths->s->ap_success =3D true;
++	} else {
++		assert(!ths->s->sta_success);
++		memcpy(ths->s->sta_tk, tk, 16);
++		ths->s->sta_success =3D true;
++	}
 +}
 +
-+static void eap_wsc_r_send_m2(struct eap_state *eap,
-+				const uint8_t *m1_pdu, size_t m1_len)
++static void eapol_ap_sta_handshake_test(const void *data)
 +{
-+	struct eap_wsc_state *wsc =3D eap_get_data(eap);
-+	uint8_t *pdu;
-+	size_t pdu_len;
++	static const unsigned char ap_rsne[] =3D {
++		0x30, 0x14, 0x01, 0x00, 0x00, 0x0f, 0xac, 0x04,
++		0x01, 0x00, 0x00, 0x0f, 0xac, 0x04, 0x01, 0x00,
++		0x00, 0x0f, 0xac, 0x02, 0x81, 0x00 };
++	static const unsigned char sta_rsne[] =3D {
++		0x30, 0x12, 0x01, 0x00, 0x00, 0x0f, 0xac, 0x04,
++		0x01, 0x00, 0x00, 0x0f, 0xac, 0x04, 0x01, 0x00,
++		0x00, 0x0f, 0xac, 0x02 };
++	static const char *ssid =3D "TestWPA2PSK";
++	static const uint8_t psk[32] =3D {	/* secretsecret */
++		0x6a, 0xa3, 0xf0, 0x0b, 0x68, 0xbd, 0x8b, 0x46,
++		0x69, 0x83, 0xa5, 0x29, 0xa3, 0xfa, 0x57, 0x1c,
++		0x6c, 0x7b, 0x72, 0x41, 0x1d, 0xce, 0x33, 0x02,
++		0xa2, 0x2d, 0xdf, 0x77, 0xd1, 0x93, 0xdb, 0x5f };
++	struct test_ap_sta_data s =3D {
++		.ap_hs =3D test_ap_sta_hs_new(&s, 1),
++		.sta_hs =3D test_ap_sta_hs_new(&s, 2),
++		.ap_address =3D { 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
++		.sta_address =3D { 0x02, 0x03, 0x04, 0x05, 0x06, 0x08 },
++	};
 +
-+	wsc->m2->version2 =3D true;
-+	memcpy(wsc->m2->enrollee_nonce, wsc->m1->enrollee_nonce, 16);
-+	wsc->m2->association_state =3D WSC_ASSOCIATION_STATE_NOT_ASSOCIATED;
-+	wsc->m2->configuration_error =3D WSC_CONFIGURATION_ERROR_NO_ERROR;
++	__handshake_set_get_nonce_func(random_nonce);
++	__handshake_set_install_tk_func(test_ap_sta_install_tk);
++	__handshake_set_install_gtk_func(NULL);
 +
-+	pdu =3D wsc_build_m2(wsc->m2, &pdu_len);
-+	if (!pdu)
-+		return;
++	handshake_state_set_authenticator(s.ap_hs, true);
++	handshake_state_set_event_func(s.ap_hs, test_ap_sta_hs_event, &s);
++	handshake_state_set_authenticator_address(s.ap_hs, s.ap_address);
++	handshake_state_set_supplicant_address(s.ap_hs, s.sta_address);
++	handshake_state_set_supplicant_ie(s.ap_hs, sta_rsne);
++	handshake_state_set_authenticator_ie(s.ap_hs, ap_rsne);
++	handshake_state_set_ssid(s.ap_hs, (void *) ssid, strlen(ssid));
++	handshake_state_set_pmk(s.ap_hs, psk, 32);
 +
-+	authenticator_put(wsc, m1_pdu, m1_len, pdu, pdu_len);
-+	eap_wsc_send_message(eap, pdu, pdu_len);
-+	wsc->state =3D STATE_EXPECT_M3;
++	handshake_state_set_authenticator(s.sta_hs, false);
++	handshake_state_set_event_func(s.sta_hs, test_ap_sta_hs_event, &s);
++	handshake_state_set_authenticator_address(s.sta_hs, s.ap_address);
++	handshake_state_set_supplicant_address(s.sta_hs, s.sta_address);
++	handshake_state_set_supplicant_ie(s.sta_hs, sta_rsne);
++	handshake_state_set_authenticator_ie(s.sta_hs, ap_rsne);
++	handshake_state_set_ssid(s.sta_hs, (void *) ssid, strlen(ssid));
++	handshake_state_set_pmk(s.sta_hs, psk, 32);
++
++	test_ap_sta_run(&s);
++
++	handshake_state_free(s.ap_hs);
++	handshake_state_free(s.sta_hs);
++	__handshake_set_install_tk_func(NULL);
++
++	assert(s.ap_success && s.sta_success);
++	assert(s.to_ap_msg_cnt =3D=3D 2 && s.to_sta_msg_cnt =3D=3D 2);
++	assert(!memcmp(s.ap_tk, s.sta_tk, 16));
 +}
 +
-+static void eap_wsc_r_handle_m1(struct eap_state *eap,
-+					const uint8_t *pdu, size_t len)
-+{
-+	struct eap_wsc_state *wsc =3D eap_get_data(eap);
-+	struct l_key *remote_public;
-+	uint8_t shared_secret[192] =3D { 0 };
-+	size_t shared_secret_len =3D sizeof(shared_secret);
-+	struct l_checksum *sha256;
-+	uint8_t dhkey[32];
-+	struct l_checksum *hmac_sha256;
-+	struct iovec iov[3];
-+	uint8_t kdk[32];
-+	struct wsc_session_key keys;
-+	bool r;
-+	uint8_t expected_enrollee_mac[6];
-+	uint8_t expected_uuid_e[16];
-+
-+	memcpy(expected_enrollee_mac, wsc->m1->addr, 6);
-+	memcpy(expected_uuid_e, wsc->m1->uuid_e, 16);
-+
-+	/* Spec unclear what to do here, see comments in eap_wsc_send_nack */
-+	if (wsc_parse_m1(pdu, len, wsc->m1) !=3D 0) {
-+		eap_wsc_send_nack(eap, WSC_CONFIGURATION_ERROR_NO_ERROR);
-+		return;
-+	}
-+
-+	if (memcmp(expected_enrollee_mac, wsc->m1->addr, 6) ||
-+			memcmp(expected_uuid_e, wsc->m1->uuid_e, 16)) {
-+		eap_wsc_send_nack(eap,
-+			WSC_CONFIGURATION_ERROR_MULTIPLE_PBC_SESSIONS_DETECTED);
-+		eap_method_error(eap);
-+		return;
-+	}
-+
-+	if (wsc->m1->state !=3D WSC_STATE_NOT_CONFIGURED ||
-+			!(wsc->m1->auth_type_flags &
-+				wsc->m2->auth_type_flags) ||
-+			!(wsc->m1->encryption_type_flags &
-+				wsc->m2->encryption_type_flags) ||
-+			!(wsc->m1->connection_type_flags &
-+				wsc->m2->connection_type_flags) ||
-+			!(wsc->m1->config_methods &
-+				wsc->m2->config_methods) ||
-+			!(wsc->m1->rf_bands & wsc->m2->rf_bands)) {
-+		eap_wsc_send_nack(eap, WSC_CONFIGURATION_ERROR_NO_ERROR);
-+		return;
-+	}
-+
-+	if (wsc->m1->configuration_error !=3D WSC_CONFIGURATION_ERROR_NO_ERROR ||
-+			wsc->m1->device_password_id !=3D
-+			wsc->m2->device_password_id) {
-+		eap_wsc_send_nack(eap, WSC_CONFIGURATION_ERROR_NO_ERROR);
-+		return;
-+	}
-+
-+	/* m1->request_to_enroll not checked */
-+
-+	if (!l_key_validate_dh_payload(wsc->m1->public_key,
-+					sizeof(wsc->m1->public_key),
-+					crypto_dh5_prime,
-+					crypto_dh5_prime_size))
-+		return;
-+
-+	/*
-+	 * Done validating the M1, we can now derive the keys for most of
-+	 * the rest of the registration protocol.
-+	 */
-+
-+	remote_public =3D l_key_new(L_KEY_RAW, wsc->m1->public_key,
-+						sizeof(wsc->m1->public_key));
-+	if (!remote_public)
-+		return;
-+
-+	r =3D l_key_compute_dh_secret(remote_public, wsc->private, dh5_prime,
-+					shared_secret, &shared_secret_len);
-+	l_key_free(remote_public);
-+
-+	if (!r)
-+		return;
-+
-+	sha256 =3D l_checksum_new(L_CHECKSUM_SHA256);
-+	if (!sha256)
-+		return;
-+
-+	l_checksum_update(sha256, shared_secret, shared_secret_len);
-+	explicit_bzero(shared_secret, shared_secret_len);
-+	l_checksum_get_digest(sha256, dhkey, sizeof(dhkey));
-+	l_checksum_free(sha256);
-+
-+	hmac_sha256 =3D l_checksum_new_hmac(L_CHECKSUM_SHA256,
-+							dhkey, sizeof(dhkey));
-+	explicit_bzero(dhkey, sizeof(dhkey));
-+
-+	if (!hmac_sha256)
-+		return;
-+
-+	iov[0].iov_base =3D wsc->m1->enrollee_nonce;
-+	iov[0].iov_len =3D 16;
-+	iov[1].iov_base =3D wsc->m1->addr;
-+	iov[1].iov_len =3D 6;
-+	iov[2].iov_base =3D wsc->m2->registrar_nonce;
-+	iov[2].iov_len =3D 16;
-+
-+	l_checksum_updatev(hmac_sha256, iov, 3);
-+	l_checksum_get_digest(hmac_sha256, kdk, sizeof(kdk));
-+	l_checksum_free(hmac_sha256);
-+
-+	r =3D wsc_kdf(kdk, &keys, sizeof(keys));
-+	explicit_bzero(kdk, sizeof(kdk));
-+	if (!r)
-+		return;
-+
-+	wsc->hmac_auth_key =3D l_checksum_new_hmac(L_CHECKSUM_SHA256,
-+						keys.auth_key,
-+						sizeof(keys.auth_key));
-+
-+	/*
-+	 * AuthKey is uploaded into the kernel, once we upload KeyWrapKey,
-+	 * the keys variable is no longer useful.  Make sure to wipe it
-+	 */
-+	wsc->aes_cbc_128 =3D l_cipher_new(L_CIPHER_AES_CBC, keys.keywrap_key,
-+						sizeof(keys.keywrap_key));
-+	explicit_bzero(&keys, sizeof(keys));
-+
-+	eap_wsc_r_send_m2(eap, pdu, len);
-+}
-+
- static void eap_wsc_handle_nack(struct eap_state *eap,
- 					const uint8_t *pdu, size_t len)
- {
-@@ -1134,6 +1611,7 @@ static void eap_wsc_handle_message(struct eap_state *=
-eap,
- 		return;
+ #define IS_ENABLED(config_macro) _IS_ENABLED1(config_macro)
+ #define _IS_ENABLED1(config_macro) _IS_ENABLED2(_XXXX##config_macro)
+ #define _XXXX1 _YYYY,
+@@ -3653,6 +3843,9 @@ int main(int argc, char *argv[])
+ 	l_test_add("EAPoL/FT-Using-PSK 4-Way Handshake",
+ 			&eapol_ft_handshake_test, NULL);
  =
 
- 	switch (wsc->state) {
-+	/* Enrollee state machine */
- 	case STATE_EXPECT_START:
- 		return;
- 	case STATE_EXPECT_M2:
-@@ -1151,6 +1629,24 @@ static void eap_wsc_handle_message(struct eap_state =
-*eap,
- 	case STATE_FINISHED:
- 		eap_wsc_send_nack(eap, WSC_CONFIGURATION_ERROR_NO_ERROR);
- 		return;
++	l_test_add("EAPoL/Supplicant+Authenticator 4-Way Handshake",
++			&eapol_ap_sta_handshake_test, NULL);
 +
-+	/* Registrar state machine */
-+	case STATE_EXPECT_M1:
-+		eap_wsc_r_handle_m1(eap, pkt, len);
-+		break;
-+	case STATE_EXPECT_M3:
-+		eap_wsc_r_handle_m3(eap, pkt, len);
-+		break;
-+	case STATE_EXPECT_M5:
-+		eap_wsc_r_handle_m5(eap, pkt, len);
-+		break;
-+	case STATE_EXPECT_M7:
-+		eap_wsc_r_handle_m7(eap, pkt, len);
-+		break;
-+	case STATE_EXPECT_IDENTITY:
-+	case STATE_EXPECT_DONE:
-+		eap_wsc_send_nack(eap, WSC_CONFIGURATION_ERROR_NO_ERROR);
-+		return;
- 	}
- =
-
- 	if (wsc->rx_pdu_buf) {
+ done:
+ 	return l_test_run();
+ }
 -- =
 
 2.25.1
 
---===============5046687113584472217==--
+--===============2357094941606974679==--
 
