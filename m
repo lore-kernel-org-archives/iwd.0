@@ -1,40 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============4472682300146965038=="
+Content-Type: multipart/mixed; boundary="===============0995227477426353493=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/5] wscutil: Allow 0-length attributes in wsc_attr_builder
-Date: Tue, 25 Aug 2020 16:49:46 -0500
-Message-ID: <2ac1c8f6-9ca0-c4fa-0758-344555e0017e@gmail.com>
-In-Reply-To: <20200824223426.475779-1-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 1/3] p2p: Send the right UUID-E in probe request WSC IEs
+Date: Tue, 25 Aug 2020 16:53:38 -0500
+Message-ID: <5f15a7cd-2263-143c-90ef-f994e3bc97e5@gmail.com>
+In-Reply-To: <20200825024534.484304-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4472682300146965038==
+--===============0995227477426353493==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi Andrew,
 
-On 8/24/20 5:34 PM, Andrew Zaborowski wrote:
-> wsc_attr_builder_start_attr and wsc_attr_builder_free look at
-> builder->curlen to see whether the TLV's length needs to be updated to
-> include the previous attribute.  If builder->curlen is 0
-> wsc_attr_builder_start_attr assumes there's no previous attribute and
-> starts writing at current builder->offset.  If the previous attribute
-> length was 0 curlen would stay at 0 and that attribute would get
-> overwritten with the new one.  To solve this add the 4 bytes of the T
-> and L to curlen as soon as a new attribute is started, and subtract
-> them when writing the L value.  The alternative would be to set a flag
-> to say whether an attribute was started.
+On 8/24/20 9:45 PM, Andrew Zaborowski wrote:
+> When building the scan IEs for our provisioning scans, use the UUID-E
+> based on the Interface Address, not the Device Address, as that is what
+> wsc.c will be using to in the registration protocol.
 > =
 
-> The spec explicitly allows 0-length attributes in section 12:
-> "The variable length string attributes, e.g., Device Name, are encoded
-> without null-termination, i.e., no 0x00 octets added to the end of the
-> value. If the string is empty, the attribute length is set to zero."
+> Eventually we may have to base the UUID-E on the Device Address or
+> something else that is persistent, and pass the actual UUID-E to wsc.c,
+> as the Interface Address is randomly generated on every connect attempt.
+> IIRC the UUID-E is supposed to be persistent.
 > ---
->   src/wscutil.c | 38 ++++++++++++++++++--------------------
->   1 file changed, 18 insertions(+), 20 deletions(-)
+>   src/p2p.c | 10 +++++++++-
+>   1 file changed, 9 insertions(+), 1 deletion(-)
 > =
 
 
@@ -42,5 +35,6 @@ All applied, thanks.
 
 Regards,
 -Denis
---===============4472682300146965038==--
+
+--===============0995227477426353493==--
 
