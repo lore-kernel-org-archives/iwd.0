@@ -1,56 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============6528260508846378723=="
+Content-Type: multipart/mixed; boundary="===============5598959583279602627=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 5/5] unit: Add a WSC-R PBC test with Open auth_type
-Date: Tue, 25 Aug 2020 00:34:26 +0200
-Message-ID: <20200824223426.475779-5-andrew.zaborowski@intel.com>
-In-Reply-To: <20200824223426.475779-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 1/3] p2p: Send the right UUID-E in probe request WSC IEs
+Date: Tue, 25 Aug 2020 04:45:32 +0200
+Message-ID: <20200825024534.484304-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6528260508846378723==
+--===============5598959583279602627==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+When building the scan IEs for our provisioning scans, use the UUID-E
+based on the Interface Address, not the Device Address, as that is what
+wsc.c will be using to in the registration protocol.
+
+Eventually we may have to base the UUID-E on the Device Address or
+something else that is persistent, and pass the actual UUID-E to wsc.c,
+as the Interface Address is randomly generated on every connect attempt.
+IIRC the UUID-E is supposed to be persistent.
 ---
- unit/test-wsc.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ src/p2p.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/unit/test-wsc.c b/unit/test-wsc.c
-index 0b9ec2f3..2063244c 100644
---- a/unit/test-wsc.c
-+++ b/unit/test-wsc.c
-@@ -2584,6 +2584,14 @@ struct wsc_credential wsc_r_test_wpa2_cred_psk =3D {
- 	.encryption_type =3D WSC_ENCRYPTION_TYPE_AES_TKIP,
- };
+diff --git a/src/p2p.c b/src/p2p.c
+index 3b38f738..7772080b 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -329,6 +329,7 @@ static uint8_t *p2p_build_scan_ies(struct p2p_device *d=
+ev, uint8_t *buf,
+ 	size_t wsc_ie_size;
+ 	uint8_t wfd_ie[32];
+ 	size_t wfd_ie_size;
++	const uint8_t *addr;
  =
 
-+struct wsc_credential wsc_r_test_open_cred =3D {
-+	.ssid_len =3D 7,
-+	.ssid =3D "thessid",
-+	.auth_type =3D WSC_AUTHENTICATION_TYPE_OPEN,
-+	.network_key_len =3D 0,
-+	.encryption_type =3D WSC_ENCRYPTION_TYPE_NONE,
-+};
+ 	p2p_info.capability =3D dev->capability;
+ 	memcpy(p2p_info.listen_channel.country, dev->listen_country, 3);
+@@ -350,7 +351,14 @@ static uint8_t *p2p_build_scan_ies(struct p2p_device *=
+dev, uint8_t *buf,
+ 	wsc_info.request_type =3D WSC_REQUEST_TYPE_ENROLLEE_INFO;
+ 	wsc_info.config_methods =3D dev->device_info.wsc_config_methods;
+ =
+
+-	if (!wsc_uuid_from_addr(dev->addr, wsc_info.uuid_e))
++	/*
++	 * If we're doing the provisioning scan, we need to use the same UUID-E
++	 * that we'll use in the WSC enrollee registration protocol because the
++	 * GO might validate it.
++	 */
++	addr =3D dev->conn_peer ? dev->conn_addr : dev->addr;
 +
- int main(int argc, char *argv[])
- {
- 	l_test_init(&argc, &argv);
-@@ -2703,6 +2711,9 @@ int main(int argc, char *argv[])
- 	l_test_add("/wsc-r/handshake/PBC Handshake WPA2 PSK test",
- 				wsc_r_test_pbc_handshake,
- 				&wsc_r_test_wpa2_cred_psk);
-+	l_test_add("/wsc-r/handshake/PBC Handshake Open test",
-+				wsc_r_test_pbc_handshake,
-+				&wsc_r_test_open_cred);
++	if (!wsc_uuid_from_addr(addr, wsc_info.uuid_e))
+ 		return NULL;
  =
 
- done:
- 	return l_test_run();
+ 	wsc_info.primary_device_type =3D dev->device_info.primary_device_type;
 -- =
 
 2.25.1
 
---===============6528260508846378723==--
+--===============5598959583279602627==--
 
