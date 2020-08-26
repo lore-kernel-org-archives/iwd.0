@@ -1,78 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============7557630477585049893=="
+Content-Type: multipart/mixed; boundary="===============0650434169723929060=="
 MIME-Version: 1.0
-From: Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH] crypto: af_alg - Work around empty control messages
- without MSG_MORE
-Date: Wed, 26 Aug 2020 13:56:33 +0000
-Message-ID: <CAMj1kXHCazXbeTDfcjD=rUyLVcOqrHcHqfgOnsDWt51dALfSpg@mail.gmail.com>
-In-Reply-To: <20200826132952.GA4752@gondor.apana.org.au>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
+Date: Wed, 26 Aug 2020 14:16:13 +0000
+Message-ID: <c27e5303-48d9-04a4-4e73-cfea5470f357@gmail.com>
+In-Reply-To: <20200826130010.GA3232@gondor.apana.org.au>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7557630477585049893==
+--===============0650434169723929060==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 26 Aug 2020 at 15:30, Herbert Xu <herbert@gondor.apana.org.au> wr=
-ote:
->
-> The iwd daemon uses libell which sets up the skcipher operation with
-> two separate control messages.  This is fine by itself but the first
-> control message is sent without MSG_MORE.  This means that the first
-> control message is interpreted as an empty request.
->
-> While libell should be fixed to use MSG_MORE where appropriate, this
-> patch works around the bug in the kernel so that existing binaries
-> continue to work.
->
-> We will print a warning however.
->
-> Reported-by: Caleb Jorden <caljorden@hotmail.com>
-> Fixes: f3c802a1f300 ("crypto: algif_aead - Only wake up when...")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
+Hi Herbert,
 
-Applied this onto v5.4.60, and it makes the iwd selftests pass again
+On 8/26/20 8:00 AM, Herbert Xu wrote:
+> On Wed, Aug 26, 2020 at 02:58:02PM +0200, Andrew Zaborowski wrote:
+>>
+>> Running iwd's and ell's unit tests I can see that at least the
+>> following algorithms give EINVAL errors:
+>> ecb(aes)
+>> cbc(aes)
+>> ctr(aes)
+>>
+>> The first one fails in recv() and only for some input lengths.  The
+>> latter two fail in send().  The relevant ell code starts at
+>> https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/cipher.c#n271
+>>
+>> The tests didn't get to the point where aead is used.
+> =
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-Tested-by: Ard Biesheuvel <ardb@kernel.org>
+> Yes ell needs to set MSG_MORE after sending the control message.
+> Any sendmsg(2) without a MSG_MORE will be interpreted as the end
+> of a request.
 
-> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-> index a6f581ab200c..3da21cadc326 100644
-> --- a/crypto/af_alg.c
-> +++ b/crypto/af_alg.c
-> @@ -16,6 +16,7 @@
->  #include <linux/module.h>
->  #include <linux/net.h>
->  #include <linux/rwsem.h>
-> +#include <linux/sched.h>
->  #include <linux/sched/signal.h>
->  #include <linux/security.h>
->
-> @@ -846,8 +847,14 @@ int af_alg_sendmsg(struct socket *sock, struct msghd=
-r *msg, size_t size,
->
->         lock_sock(sk);
->         if (ctx->init && (init || !ctx->more)) {
-> -               err =3D -EINVAL;
-> -               goto unlock;
-> +               if (ctx->used) {
-> +                       err =3D -EINVAL;
-> +                       goto unlock;
-> +               }
-> +
-> +               pr_info_once(
-> +                       "%s sent an empty control message without MSG_MOR=
-E.\n",
-> +                       current->comm);
->         }
->         ctx->init =3D true;
->
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---===============7557630477585049893==--
+I'm just waking up now, so I might seem dense, but for my education, can yo=
+u =
+
+tell me why we need to set MSG_MORE when we issue just a single sendmsg fol=
+lowed =
+
+immediately by recv/recvmsg? ell/iwd operates on small buffers, so we don't =
+
+really feed the kernel data in multiple send operations.  You can see this =
+in =
+
+the ell git tree link referenced in Andrew's reply.
+
+According to https://www.kernel.org/doc/html/latest/crypto/userspace-if.htm=
+l:
+
+The send system call family allows the following flag to be specified:
+
+     MSG_MORE: If this flag is set, the send system call acts like a cipher =
+
+update function where more input data is expected with a subsequent invocat=
+ion =
+
+of the send system call.
+
+So given what I said above, the documentation seems to indicate that MSG_MO=
+RE =
+
+flag should not be used in our case?
+
+Regards,
+-Denis
+
+> =
+
+> I'll work around this in the kernel though for the case where there
+> is no actual data, with a WARN_ON_ONCE.
+> =
+
+> Thanks,
+>=20
+
+--===============0650434169723929060==--
 
