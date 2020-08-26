@@ -1,153 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============4725477875727461377=="
+Content-Type: multipart/mixed; boundary="===============5799227723025539561=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 2/2] ap: Add an optional client count limit parameter
-Date: Wed, 26 Aug 2020 02:18:54 +0200
-Message-ID: <20200826001854.502627-2-andrew.zaborowski@intel.com>
-In-Reply-To: <20200826001854.502627-1-andrew.zaborowski@intel.com>
+From: caljorden@hotmail.com
+Subject: Issue with iwd + Linux 5.8.3 + WPA Enterprise
+Date: Wed, 26 Aug 2020 05:51:50 +0000
+Message-ID: <20200826055150.2753.90553@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4725477875727461377==
+--===============5799227723025539561==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add ap_config.max_stations, we'll probably want to set it to 1 for P2P
-groups but this setting is also available in Android etc. when doing
-tethering.
----
- src/ap.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/ap.h |  1 +
- 2 files changed, 65 insertions(+)
+Hello,
 
-diff --git a/src/ap.c b/src/ap.c
-index ff8ced18..bae7508f 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -86,6 +86,7 @@ struct sta_state {
- 	struct eapol_sm *sm;
- 	struct handshake_state *hs;
- 	uint32_t gtk_query_cmd_id;
-+	struct l_idle *remove_work;
- };
- =
+I wanted to note an issue that I have hit with iwd when I upgraded to the L=
+inux 5.8.3 stable kernel.  My office network uses WPA Enterprise with EAP-P=
+EAPv0 + MSCHAPv2.  When using this office network, upgrading to Linux 5.8.3=
+ caused my system to refuse to associate successfully to the network.  I ge=
+t the following in my dmesg logs:
 
- static uint32_t netdev_watch;
-@@ -134,6 +135,9 @@ static void ap_sta_free(void *data)
- 	if (sta->hs)
- 		handshake_state_free(sta->hs);
- =
+[   40.846535] wlan0: authenticate with <redacted>:60
+[   40.850570] wlan0: send auth to <redacted>:60 (try 1/3)
+[   40.854627] wlan0: authenticated
+[   40.855992] wlan0: associate with <redacted>:60 (try 1/3)
+[   40.860450] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 status=
+=3D0 aid=3D11)
+[   40.861620] wlan0: associated
+[   41.886503] wlan0: deauthenticating from <redacted>:60 by local choice (=
+Reason: 23=3DIEEE8021X_FAILED)
+[   42.360127] wlan0: authenticate with <redacted>:22
+[   42.364584] wlan0: send auth to <redacted>:22 (try 1/3)
+[   42.370821] wlan0: authenticated
+[   42.372658] wlan0: associate with <redacted>:22 (try 1/3)
+[   42.377426] wlan0: RX AssocResp from <redacted>:22 (capab=3D0x411 status=
+=3D0 aid=3D15)
+[   42.378607] wlan0: associated
+[   43.402009] wlan0: deauthenticating from <redacted>:22 by local choice (=
+Reason: 23=3DIEEE8021X_FAILED)
+[   43.875921] wlan0: authenticate with <redacted>:60
+[   43.879988] wlan0: send auth to <redacted>:60 (try 1/3)
+[   43.886244] wlan0: authenticated
+[   43.889273] wlan0: associate with <redacted>:60 (try 1/3)
+[   43.894586] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 status=
+=3D0 aid=3D11)
+[   43.896077] wlan0: associated
+[   44.918504] wlan0: deauthenticating from <redacted>:60 by local choice (=
+Reason: 23=3DIEEE8021X_FAILED)
 
-+	if (sta->remove_work)
-+		l_idle_remove(sta->remove_work);
-+
- 	l_free(sta);
- }
- =
+This continues as long as I let iwd run.
 
-@@ -421,6 +425,37 @@ static uint32_t ap_send_mgmt_frame(struct ap_state *ap,
- 	return id;
- }
- =
+I downgraded back to Linux 5.8.2, and verified that everything works as exp=
+ected.  I also tried using Linux 5.8.3 on a different system at my home, wh=
+ich uses WPA2-PSK.  It worked fine (though it uses an Atheros wireless card=
+ instead of an Intel card - but I assume that is irrelevant).
 
-+static unsigned int ap_get_sta_count(struct ap_state *ap)
-+{
-+	const struct l_queue_entry *entry;
-+	unsigned int cnt =3D 0;
-+
-+	for (entry =3D l_queue_get_entries(ap->sta_states); entry;
-+			entry =3D entry->next) {
-+		struct sta_state *sta =3D entry->data;
-+
-+		if (sta->rsna)
-+			cnt++;
-+	}
-+
-+	return cnt;
-+}
-+
-+static void ap_sta_remove_work(struct l_idle *idle, void *user_data)
-+{
-+	struct sta_state *sta =3D user_data;
-+
-+	l_idle_remove(idle);
-+	sta->remove_work =3D NULL;
-+
-+	if (!sta->hs)
-+		return;
-+
-+	netdev_handshake_failed(sta->hs, MMPDU_REASON_CODE_DISASSOC_AP_BUSY);
-+	sta->sm =3D NULL;
-+	ap_remove_sta(sta);
-+}
-+
- static void ap_handshake_event(struct handshake_state *hs,
- 		enum handshake_event event, void *user_data, ...)
- {
-@@ -430,6 +465,28 @@ static void ap_handshake_event(struct handshake_state =
-*hs,
- 	va_start(args, user_data);
- =
+I decided to try to figure out what caused the issue in the changes for Lin=
+ux 5.8.3.  I assumed that it was something that changed in the crypto inter=
+face, which limited my bisection to a very few commits.  Sure enough, I fou=
+nd that if I revert commit e91d82703ad0bc68942a7d91c1c3d993e3ad87f0 (crypto=
+: algif_aead - Only wake up when ctx->more is zero), the problem goes away =
+and I am able to associate to my WPA Enterprise network successfully, and u=
+se it.  I found that in order to revert this commit, I also first had to re=
+vert 465c03e999102bddac9b1e132266c232c5456440 (crypto: af_alg - Fix regress=
+ion on empty requests), because the two commits have coupled changes.
 
- 	switch (event) {
-+	case HANDSHAKE_EVENT_SETTING_KEYS:
-+		/*
-+		 * config->max_stations limits the number of fully connected
-+		 * STAs, i.e. the clients who have the credentials, so that
-+		 * those that don't have them can't keep the legit ones from
-+		 * connecting.  We've checked that we're below the limit when
-+		 * processing the Authentication frame, just so that we don't
-+		 * start a new handshake knowing that we can't accept another
-+		 * STA, but the definitive check is here just before
-+		 * authorizing the STA.
-+		 */
-+		if (sta->ap->config->max_stations &&
-+				ap_get_sta_count(sta->ap) >=3D
-+				sta->ap->config->max_stations) {
-+			l_debug("STA over max_stations limit being removed "
-+				"after successfull handshake");
-+			sta->remove_work =3D l_idle_create(ap_sta_remove_work,
-+								sta, NULL);
-+			return;
-+		}
-+
-+		break;
- 	case HANDSHAKE_EVENT_COMPLETE:
- 		ap_new_rsna(sta);
- 		break;
-@@ -1311,6 +1368,13 @@ static void ap_auth_cb(const struct mmpdu_header *hd=
-r, const void *body,
- 	if (sta)
- 		goto done;
- =
+I normally would have assumed that this should be sent to the kernel list, =
+but I thought I would first mention it here because of what I found in some=
+ email threads on the Linux-Crypto list about the crypto interfaces to the =
+kernel being sub-optimal and needing to be fixed.  The changes in these com=
+mits look like they are just trying to fix what could be broken interfaces,=
+ so I thought that it would make sense to see what the iwd team thinks abou=
+t the situation first.
 
-+	if (ap->config->max_stations &&
-+			ap_get_sta_count(ap) >=3D ap->config->max_stations) {
-+		l_debug("STA rejected because we're at max_station");
-+		ap_auth_reply(ap, from, MMPDU_REASON_CODE_DISASSOC_AP_BUSY);
-+		return;
-+	}
-+
- 	/*
- 	 * Per 12.3.3.2.3 with Open System the state change is immediate,
- 	 * no waiting for the response to be ACKed as with the association
-diff --git a/src/ap.h b/src/ap.h
-index 3ca9467f..ebd84864 100644
---- a/src/ap.h
-+++ b/src/ap.h
-@@ -59,6 +59,7 @@ struct ap_config {
- 	char *psk;
- 	uint8_t channel;
- 	uint8_t **authorized_macs;
-+	unsigned int max_stations;
- 	bool no_cck_rates : 1;
- };
- =
+The wireless card I was using during this testing is an Intel Wireless 3165=
+ (rev 81).  If there is any additional information I could help provide, pl=
+ease let me know.
 
--- =
+Thanks!
 
-2.25.1
-
---===============4725477875727461377==--
+Caleb Jorden
+--===============5799227723025539561==--
 
