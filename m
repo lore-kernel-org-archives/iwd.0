@@ -1,53 +1,78 @@
-Content-Type: multipart/mixed; boundary="===============8968659157148311482=="
+Content-Type: multipart/mixed; boundary="===============7557630477585049893=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
-Date: Wed, 26 Aug 2020 12:58:15 +0000
-Message-ID: <CAOq732JaP=4X9Yh_KjER5_ctQWoauxzXTZqyFP9KsLSxvVH8=w@mail.gmail.com>
-In-Reply-To: <20200826120832.GA2996@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH] crypto: af_alg - Work around empty control messages
+ without MSG_MORE
+Date: Wed, 26 Aug 2020 13:56:33 +0000
+Message-ID: <CAMj1kXHCazXbeTDfcjD=rUyLVcOqrHcHqfgOnsDWt51dALfSpg@mail.gmail.com>
+In-Reply-To: <20200826132952.GA4752@gondor.apana.org.au>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8968659157148311482==
+--===============7557630477585049893==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 26 Aug 2020 at 14:10, Herbert Xu <herbert@gondor.apana.org.au> wr=
+On Wed, 26 Aug 2020 at 15:30, Herbert Xu <herbert@gondor.apana.org.au> wr=
 ote:
-> On Wed, Aug 26, 2020 at 01:59:53PM +0200, Ard Biesheuvel wrote:
-> > On Wed, 26 Aug 2020 at 13:50, Herbert Xu <herbert@gondor.apana.org.au=
-> wrote:
-> > >
-> > > On Wed, Aug 26, 2020 at 12:40:14PM +0200, Ard Biesheuvel wrote:
-> > > >
-> > > > It would be helpful if someone could explain for the non-mac80211
-> > > > enlightened readers how iwd's EAP-PEAPv0 + MSCHAPv2 support relies =
-on
-> > > > the algif_aead socket interface, and which AEAD algorithms it uses.=
- I
-> > > > assume this is part of libell?
-> > >
-> > > I see the problem.  libell/ell/checksum.c doesn't clear the MSG_MORE
-> > > flag before doing the recv(2).
-> >
-> > But that code uses a hash not an aead, afaict.
 >
-> Good point.  In that case can we please get a strace with a -s
-> option that's big enough to capture the crypto data?
+> The iwd daemon uses libell which sets up the skcipher operation with
+> two separate control messages.  This is fine by itself but the first
+> control message is sent without MSG_MORE.  This means that the first
+> control message is interpreted as an empty request.
+>
+> While libell should be fixed to use MSG_MORE where appropriate, this
+> patch works around the bug in the kernel so that existing binaries
+> continue to work.
+>
+> We will print a warning however.
+>
+> Reported-by: Caleb Jorden <caljorden@hotmail.com>
+> Fixes: f3c802a1f300 ("crypto: algif_aead - Only wake up when...")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
 
-Running iwd's and ell's unit tests I can see that at least the
-following algorithms give EINVAL errors:
-ecb(aes)
-cbc(aes)
-ctr(aes)
+Applied this onto v5.4.60, and it makes the iwd selftests pass again
 
-The first one fails in recv() and only for some input lengths.  The
-latter two fail in send().  The relevant ell code starts at
-https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/cipher.c#n271
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Tested-by: Ard Biesheuvel <ardb@kernel.org>
 
-The tests didn't get to the point where aead is used.
-
-Best regards
---===============8968659157148311482==--
+> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+> index a6f581ab200c..3da21cadc326 100644
+> --- a/crypto/af_alg.c
+> +++ b/crypto/af_alg.c
+> @@ -16,6 +16,7 @@
+>  #include <linux/module.h>
+>  #include <linux/net.h>
+>  #include <linux/rwsem.h>
+> +#include <linux/sched.h>
+>  #include <linux/sched/signal.h>
+>  #include <linux/security.h>
+>
+> @@ -846,8 +847,14 @@ int af_alg_sendmsg(struct socket *sock, struct msghd=
+r *msg, size_t size,
+>
+>         lock_sock(sk);
+>         if (ctx->init && (init || !ctx->more)) {
+> -               err =3D -EINVAL;
+> -               goto unlock;
+> +               if (ctx->used) {
+> +                       err =3D -EINVAL;
+> +                       goto unlock;
+> +               }
+> +
+> +               pr_info_once(
+> +                       "%s sent an empty control message without MSG_MOR=
+E.\n",
+> +                       current->comm);
+>         }
+>         ctx->init =3D true;
+>
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--===============7557630477585049893==--
 
