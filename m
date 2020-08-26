@@ -1,104 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============8875227764964314596=="
+Content-Type: multipart/mixed; boundary="===============1700176769561455860=="
 MIME-Version: 1.0
 From: Ard Biesheuvel <ardb@kernel.org>
 Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
-Date: Wed, 26 Aug 2020 10:40:26 +0000
-Message-ID: <CAMj1kXEUQdmQDCDXPBNb3hRrbui=HVyDjCDoiFwDr+mDSjP43A@mail.gmail.com>
-In-Reply-To: <b34f7644-a495-4845-0a00-0aebf4b9db52@molgen.mpg.de>
+Date: Wed, 26 Aug 2020 12:00:05 +0000
+Message-ID: <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
+In-Reply-To: <20200826114952.GA2375@gondor.apana.org.au>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8875227764964314596==
+--===============1700176769561455860==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 26 Aug 2020 at 08:18, Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+On Wed, 26 Aug 2020 at 13:50, Herbert Xu <herbert@gondor.apana.org.au> wr=
+ote:
 >
->
-> Dear Caleb,
->
->
-> Thank you for the report. Linux has a no regression policy, so the
-> correct forum to report this to is the Linux kernel folks. I am adding
-> the crypto and stable folks to the receiver list.
->
-> Am 26.08.20 um 07:51 schrieb caljorden(a)hotmail.com:
->
-> > I wanted to note an issue that I have hit with iwd when I upgraded to
-> > the Linux 5.8.3 stable kernel.  My office network uses WPA Enterprise
-> > with EAP-PEAPv0 + MSCHAPv2.  When using this office network,
-> > upgrading to Linux 5.8.3 caused my system to refuse to associate
-> > successfully to the network.  I get the following in my dmesg logs:
+> On Wed, Aug 26, 2020 at 12:40:14PM +0200, Ard Biesheuvel wrote:
 > >
-> > [   40.846535] wlan0: authenticate with <redacted>:60
-> > [   40.850570] wlan0: send auth to <redacted>:60 (try 1/3)
-> > [   40.854627] wlan0: authenticated
-> > [   40.855992] wlan0: associate with <redacted>:60 (try 1/3)
-> > [   40.860450] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 st=
-atus=3D0 aid=3D11)
-> > [   40.861620] wlan0: associated
-> > [   41.886503] wlan0: deauthenticating from <redacted>:60 by local choi=
-ce (Reason: 23=3DIEEE8021X_FAILED)
-> > [   42.360127] wlan0: authenticate with <redacted>:22
-> > [   42.364584] wlan0: send auth to <redacted>:22 (try 1/3)
-> > [   42.370821] wlan0: authenticated
-> > [   42.372658] wlan0: associate with <redacted>:22 (try 1/3)
-> > [   42.377426] wlan0: RX AssocResp from <redacted>:22 (capab=3D0x411 st=
-atus=3D0 aid=3D15)
-> > [   42.378607] wlan0: associated
-> > [   43.402009] wlan0: deauthenticating from <redacted>:22 by local choi=
-ce (Reason: 23=3DIEEE8021X_FAILED)
-> > [   43.875921] wlan0: authenticate with <redacted>:60
-> > [   43.879988] wlan0: send auth to <redacted>:60 (try 1/3)
-> > [   43.886244] wlan0: authenticated
-> > [   43.889273] wlan0: associate with <redacted>:60 (try 1/3)
-> > [   43.894586] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 st=
-atus=3D0 aid=3D11)
-> > [   43.896077] wlan0: associated
-> > [   44.918504] wlan0: deauthenticating from <redacted>:60 by local choi=
-ce (Reason: 23=3DIEEE8021X_FAILED)
-> >
-> > This continues as long as I let iwd run.
-> >
-> > I downgraded back to Linux 5.8.2, and verified that everything works
-> > as expected.  I also tried using Linux 5.8.3 on a different system at
-> > my home, which uses WPA2-PSK.  It worked fine (though it uses an
-> > Atheros wireless card instead of an Intel card - but I assume that is
-> > irrelevant).
-> >
-> > I decided to try to figure out what caused the issue in the changes
-> > for Linux 5.8.3.  I assumed that it was something that changed in the
-> > crypto interface, which limited my bisection to a very few commits.
-> > Sure enough, I found that if I revert commit
-> > e91d82703ad0bc68942a7d91c1c3d993e3ad87f0 (crypto: algif_aead - Only
-> > wake up when ctx->more is zero), the problem goes away and I am able
-> > to associate to my WPA Enterprise network successfully, and use it.
-> > I found that in order to revert this commit, I also first had to
-> > revert 465c03e999102bddac9b1e132266c232c5456440 (crypto: af_alg - Fix
-> > regression on empty requests), because the two commits have coupled
-> > changes.
-> >
-> > I normally would have assumed that this should be sent to the kernel
-> > list, but I thought I would first mention it here because of what I
-> > found in some email threads on the Linux-Crypto list about the crypto
-> > interfaces to the kernel being sub-optimal and needing to be fixed.
-> > The changes in these commits look like they are just trying to fix
-> > what could be broken interfaces, so I thought that it would make
-> > sense to see what the iwd team thinks about the situation first.
-> >
-> > The wireless card I was using during this testing is an Intel
-> > Wireless 3165 (rev 81).  If there is any additional information I
-> > could help provide, please let me know.
+> > It would be helpful if someone could explain for the non-mac80211
+> > enlightened readers how iwd's EAP-PEAPv0 + MSCHAPv2 support relies on
+> > the algif_aead socket interface, and which AEAD algorithms it uses. I
+> > assume this is part of libell?
 >
-> It=E2=80=99d be great, if you verified, if the problem occurs with Linus=
-=E2=80=99 master
-> branch too.
+> I see the problem.  libell/ell/checksum.c doesn't clear the MSG_MORE
+> flag before doing the recv(2).
 >
 
-It would be helpful if someone could explain for the non-mac80211
-enlightened readers how iwd's EAP-PEAPv0 + MSCHAPv2 support relies on
-the algif_aead socket interface, and which AEAD algorithms it uses. I
-assume this is part of libell?
---===============8875227764964314596==--
+But that code uses a hash not an aead, afaict.
+
+> I was hoping nobody out there was doing this but obviously I've
+> been proven wrong.
+>
+> So what I'm going to do is to specifically allow this case of
+> a string of sendmsg(2)'s with MSG_MORE folloed by a recvmsg(2)
+> in the same thread.  I'll add a WARN_ON_ONCE so user-space can
+> eventually be fixed.
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--===============1700176769561455860==--
 
