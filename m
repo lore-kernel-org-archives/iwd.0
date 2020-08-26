@@ -1,162 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============1121970638858898091=="
+Content-Type: multipart/mixed; boundary="===============8875227764964314596=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: iwd not connecting on Raspberry Pi with Raspbian
-Date: Mon, 31 Aug 2020 08:42:41 -0500
-Message-ID: <46198816-d3fa-6fe5-c211-4ab6b1b33670@gmail.com>
-In-Reply-To: <6679878.YKXMNv7jBj@mmm>
+From: Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
+Date: Wed, 26 Aug 2020 10:40:26 +0000
+Message-ID: <CAMj1kXEUQdmQDCDXPBNb3hRrbui=HVyDjCDoiFwDr+mDSjP43A@mail.gmail.com>
+In-Reply-To: <b34f7644-a495-4845-0a00-0aebf4b9db52@molgen.mpg.de>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1121970638858898091==
+--===============8875227764964314596==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Patrick,
+On Wed, 26 Aug 2020 at 08:18, Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+>
+> Dear Caleb,
+>
+>
+> Thank you for the report. Linux has a no regression policy, so the
+> correct forum to report this to is the Linux kernel folks. I am adding
+> the crypto and stable folks to the receiver list.
+>
+> Am 26.08.20 um 07:51 schrieb caljorden(a)hotmail.com:
+>
+> > I wanted to note an issue that I have hit with iwd when I upgraded to
+> > the Linux 5.8.3 stable kernel.  My office network uses WPA Enterprise
+> > with EAP-PEAPv0 + MSCHAPv2.  When using this office network,
+> > upgrading to Linux 5.8.3 caused my system to refuse to associate
+> > successfully to the network.  I get the following in my dmesg logs:
+> >
+> > [   40.846535] wlan0: authenticate with <redacted>:60
+> > [   40.850570] wlan0: send auth to <redacted>:60 (try 1/3)
+> > [   40.854627] wlan0: authenticated
+> > [   40.855992] wlan0: associate with <redacted>:60 (try 1/3)
+> > [   40.860450] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 st=
+atus=3D0 aid=3D11)
+> > [   40.861620] wlan0: associated
+> > [   41.886503] wlan0: deauthenticating from <redacted>:60 by local choi=
+ce (Reason: 23=3DIEEE8021X_FAILED)
+> > [   42.360127] wlan0: authenticate with <redacted>:22
+> > [   42.364584] wlan0: send auth to <redacted>:22 (try 1/3)
+> > [   42.370821] wlan0: authenticated
+> > [   42.372658] wlan0: associate with <redacted>:22 (try 1/3)
+> > [   42.377426] wlan0: RX AssocResp from <redacted>:22 (capab=3D0x411 st=
+atus=3D0 aid=3D15)
+> > [   42.378607] wlan0: associated
+> > [   43.402009] wlan0: deauthenticating from <redacted>:22 by local choi=
+ce (Reason: 23=3DIEEE8021X_FAILED)
+> > [   43.875921] wlan0: authenticate with <redacted>:60
+> > [   43.879988] wlan0: send auth to <redacted>:60 (try 1/3)
+> > [   43.886244] wlan0: authenticated
+> > [   43.889273] wlan0: associate with <redacted>:60 (try 1/3)
+> > [   43.894586] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 st=
+atus=3D0 aid=3D11)
+> > [   43.896077] wlan0: associated
+> > [   44.918504] wlan0: deauthenticating from <redacted>:60 by local choi=
+ce (Reason: 23=3DIEEE8021X_FAILED)
+> >
+> > This continues as long as I let iwd run.
+> >
+> > I downgraded back to Linux 5.8.2, and verified that everything works
+> > as expected.  I also tried using Linux 5.8.3 on a different system at
+> > my home, which uses WPA2-PSK.  It worked fine (though it uses an
+> > Atheros wireless card instead of an Intel card - but I assume that is
+> > irrelevant).
+> >
+> > I decided to try to figure out what caused the issue in the changes
+> > for Linux 5.8.3.  I assumed that it was something that changed in the
+> > crypto interface, which limited my bisection to a very few commits.
+> > Sure enough, I found that if I revert commit
+> > e91d82703ad0bc68942a7d91c1c3d993e3ad87f0 (crypto: algif_aead - Only
+> > wake up when ctx->more is zero), the problem goes away and I am able
+> > to associate to my WPA Enterprise network successfully, and use it.
+> > I found that in order to revert this commit, I also first had to
+> > revert 465c03e999102bddac9b1e132266c232c5456440 (crypto: af_alg - Fix
+> > regression on empty requests), because the two commits have coupled
+> > changes.
+> >
+> > I normally would have assumed that this should be sent to the kernel
+> > list, but I thought I would first mention it here because of what I
+> > found in some email threads on the Linux-Crypto list about the crypto
+> > interfaces to the kernel being sub-optimal and needing to be fixed.
+> > The changes in these commits look like they are just trying to fix
+> > what could be broken interfaces, so I thought that it would make
+> > sense to see what the iwd team thinks about the situation first.
+> >
+> > The wireless card I was using during this testing is an Intel
+> > Wireless 3165 (rev 81).  If there is any additional information I
+> > could help provide, please let me know.
+>
+> It=E2=80=99d be great, if you verified, if the problem occurs with Linus=
+=E2=80=99 master
+> branch too.
+>
 
-On 8/30/20 8:38 AM, Patrick H=C3=A4cker wrote:
-> Hi Denis,
-> =
-
-> thanks for the answer!
-> =
-
->> This is a brcmfmac card right?  We have seen some weirdness with brcmfmac
->> where it simply refuses to perform the handshake (which is what is
->> happening in your case).  The handshake times out (reason: 15 =3D
->> MMPDU_REASON_CODE_4WAY_HANDSHAKE_TIMEOUT).
->>
->> The strange part is that it does work in other setups and it seems to be=
- a
->> combination of AP or some other weird factor that screws this up.  Have =
-you
->> tried different brcmfmac firmware versions?
-> Yes, it's a brcmfmac card. I speculate, that it had some state, which iwd=
- did
-> not expect due to booting up with wpa_supplicant and only switching to iwd
-> afterwards (it worked after I removed wpa_supplicant and rebooted).
-
-There isn't really any state for iwd to be confused by.   Once a CMD_DISCON=
-NECT =
-
-is issued, or the device brought into IF_OPER_DOWN state, the kernel / driv=
-er =
-
-should clean up any state associated with the previous connection.
-
-iwd tries to reset as much of the driver as possible at startup, by =
-
-deleting/re-creating the default interface and power-cycling the card. =
-
-Unfortunately brcmfmac doesn't support the first part either.
-
-The issue is likely that wpa_s uses handshake offload (with handshake handl=
-ed by =
-
-the firmware) and iwd does not.  This maybe leads to the firmware or driver =
-
-being confused possibly due to some missing cleanups.  But that's a kernel =
-
-driver / firmware issue, not a problem in iwd.
-
-> =
-
-> Therefore I did not try different brcmfmac firmware versions. I am probab=
-ly
-> using this firmware:
->> brcmfmac: brcmf_fw_alloc_request: using brcm/brcmfmac43455-sdio for chip
->>      BCM4345/6
->> brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4345/6 wl0: Mar 23 2020
->>      02:19:54 version 7.45.206 (r725000 CY) FWID 01-88ee44ea
-> =
-
->>>> src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
->>>> src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for
->>>>
->>>>       (global) is DE
->>
->> Seems like the kernel is switching the regulatory domain here, right aft=
-er
->> we try to connect.  I wonder if you can use iw to set this prior to
->> triggering the connection with iwd.  Does anything change?
-> Actually, the reg domain is set before to the correct value (DE in my cas=
-e, I
-> have double-checked that, when I saw the message in the logs). I am not s=
-ure
-> why it's switching.  I am on channel 13, so with an US/default reg domain=
- I
-> couldn't access the 2-GHz-Wi-Fi.
-
-Okay, we can seemingly rule that out then...
-
-> =
-
->>>> src/netdev.c:netdev_link_notify() event 16 on ifindex 3
->>>> src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
->>>> src/netdev.c:netdev_disconnect_event()
->>>> Received Deauthentication event, reason: 2, from_ap: false
->>
->> And here we see the firmware using an incorrect password somehow and
->> triggering a disconnect by itself, without iwd's input.  I think James h=
-ad
->> the exact same issue on RPI4, and we determined that the firmware/driver
->> was just borked...
-> The provided password was definitely correct, as it's provided by a file =
-and
-> working now without being changed in between. But it might be, that the
-> firmware/driver ended up with a wrong authentication somehow, although the
-> correct password was provided.
-> =
-
->>>> src/station.c:station_disconnect_event() 3
->>>> src/station.c:station_disassociated() 3
->>>> src/station.c:station_enter_state() Old State: connecting, new state:
->>>> disconnected >
->>>
->>> I could imagine, that there is still a kernel module missing, but this =
-is
->>> just guessing. Any hints how to continue debugging?
->>
->> This is a driver / firmware problem.  You say that wpa_s works correctly.
->> Can you capture iwmon traces of both wpa_s and iwd trying to connect to =
-the
->> same AP and share that with us?
-> I wanted to use iwmon already before. Unfortunately, it does not work on =
-this
-> system:
->> Wireless monitor ver 1.8
->> Failed to create monitor interface nlmon: Unknown error -95
-> There is (to me) no obvious error in its strace, but I am omitting it her=
-e, as
-> it is probably a separate issue and I=E2=80=82am not sure if anyone is in=
-terested in
-> solving that problem.
-
-You do not have nlmon (CONFIG_NLMON) compiled into the kernel or perhaps th=
-e =
-
-nlmon module is not loaded.
-
-> =
-
-> So where to go from here on? The principle issue (iwd in Raspbian) is sol=
-ved.
-> But if someone is interested to find and fix the root cause to avoid the
-> removing/rebooting procedure on the Raspberry Pi in the future, I can ass=
-ist
-> with this (although my time is limited mostly to weekends).
-> My gut feeling is, that we need to fix that issue before suggesting to ha=
-ve iwd
-> as default on a Raspberry.
-> =
-
-
-Not sure, but so far it really sounds like you need to start a thread on =
-
-linux-wireless and get brcmfmac maintainer's attention.
-
-Regards,
--Denis
---===============1121970638858898091==--
+It would be helpful if someone could explain for the non-mac80211
+enlightened readers how iwd's EAP-PEAPv0 + MSCHAPv2 support relies on
+the algif_aead socket interface, and which AEAD algorithms it uses. I
+assume this is part of libell?
+--===============8875227764964314596==--
 
