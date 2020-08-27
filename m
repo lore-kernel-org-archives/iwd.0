@@ -1,81 +1,134 @@
-Content-Type: multipart/mixed; boundary="===============0107671044770585204=="
+Content-Type: multipart/mixed; boundary="===============8634412163536268010=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 06/16] auto-t: ofono.py: fix timeout cleanup and wait for
- service
-Date: Thu, 27 Aug 2020 10:32:19 -0700
-Message-ID: <20200827173229.26466-6-prestwoj@gmail.com>
+Subject: [PATCH 07/16] auto-t: iwd.py: update to work with test-runner rewrite
+Date: Thu, 27 Aug 2020 10:32:20 -0700
+Message-ID: <20200827173229.26466-7-prestwoj@gmail.com>
 In-Reply-To: <20200827173229.26466-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0107671044770585204==
+--===============8634412163536268010==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Ofono.py was not cleaning up the timeout, nor waiting for the ofono.org
-service to come up before continuing.
+The class initializer was changed to make starting IWD on by default.
+This allows us to not have multiple places where IWD is started. You
+can still pass False which will initialize the class but not start
+IWD itself. The configuration director was also chaged to /tmp by
+default. This was done by all tests requiring main.conf anyways, so
+we might as well make it the default.
 ---
- autotests/util/ofono.py | 25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+ autotests/util/iwd.py | 48 ++++++++++++++-----------------------------
+ 1 file changed, 15 insertions(+), 33 deletions(-)
 
-diff --git a/autotests/util/ofono.py b/autotests/util/ofono.py
-index 2bc6338b..f1ed14ee 100644
---- a/autotests/util/ofono.py
-+++ b/autotests/util/ofono.py
-@@ -1,4 +1,5 @@
- import dbus
-+import time
- from gi.repository import GLib
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index ef1ea80e..37daaeef 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -15,7 +15,7 @@ import weakref
+ from abc import ABCMeta, abstractmethod
+ from enum import Enum
  =
 
- SIM_AUTH_IFACE =3D 'org.ofono.SimAuthentication'
-@@ -7,6 +8,14 @@ class Ofono(dbus.service.Object):
-     def __init__(self):
-         self._bus =3D dbus.SystemBus()
+-import wiphy
++from config import ctx
  =
 
-+        tries =3D 0
-+
-+        while not self._bus.name_has_owner('org.ofono'):
-+            if tries > 100:
-+                raise TimeoutError('Waiting for org.ofono service timed ou=
-t')
-+            tries +=3D 1
-+            time.sleep(0.1)
-+
-     def enable_modem(self, path):
-         self._modem_path =3D path
-         self._modem_iface =3D dbus.Interface(
-@@ -37,11 +46,13 @@ class Ofono(dbus.service.Object):
-             self._wait_timed_out =3D True
-             return False
+ IWD_STORAGE_DIR =3D               '/var/lib/iwd'
+ IWD_CONFIG_DIR =3D                '/etc/iwd'
+@@ -873,7 +873,10 @@ class DeviceList(collections.Mapping):
  =
 
--        timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
--        context =3D mainloop.get_context()
--        while (not self._sim_auth_up):
--            context.iteration(may_block=3DTrue)
--            if self._wait_timed_out:
--                raise TimeoutError('waiting for SimAuthentication timed ou=
-t')
-+        try:
-+            timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
-+            context =3D mainloop.get_context()
-+            while (not self._sim_auth_up):
-+                context.iteration(may_block=3DTrue)
-+                if self._wait_timed_out:
-+                    raise TimeoutError('waiting for SimAuthentication time=
-d out')
  =
 
--        GLib.source_remove(timeout)
-+        finally:
-+            GLib.source_remove(timeout)
+ class IWD(AsyncOpAbstract):
+-    ''''''
++    '''
++        Start an IWD instance. By default IWD will be started and with the
++        config directory set to /tmp.
++    '''
+     _bus =3D dbus.SystemBus()
+ =
+
+     _object_manager_if =3D None
+@@ -882,40 +885,22 @@ class IWD(AsyncOpAbstract):
+     _devices =3D None
+     _instance =3D None
+ =
+
+-    def __init__(self, start_iwd_daemon =3D False,
+-                                               iwd_config_dir =3D IWD_CONF=
+IG_DIR):
++    def __init__(self, start_iwd_daemon =3D True, iwd_config_dir =3D '/tmp=
+'):
+         global mainloop
+         mainloop =3D GLib.MainLoop()
+ =
+
+-        if start_iwd_daemon:
+-            args =3D []
+-            iwd_wiphys =3D [wname for wname, wiphy in wiphy.wiphy_map.item=
+s()
+-                          if wiphy.use =3D=3D 'iwd']
+-            whitelist =3D ','.join(iwd_wiphys)
+-
+-            if os.environ.get('IWD_TEST_VALGRIND', None) =3D=3D 'on':
+-                    args.append('valgrind')
+-                    args.append('--leak-check=3Dfull')
+-                    args.append('--log-file=3D/tmp/valgrind.log')
+-
+-            os.environ["CONFIGURATION_DIRECTORY"] =3D iwd_config_dir;
+-
+-            args.append('iwd')
+-            args.append('-p')
+-            args.append(whitelist)
+-            args.append('-d')
+-
+-            import subprocess
+-            iwd_proc =3D subprocess.Popen(args)
++        self._iwd_proc =3D None
+ =
+
+-            self._iwd_proc =3D iwd_proc
++        if start_iwd_daemon:
++            self._iwd_proc =3D ctx.start_iwd(iwd_config_dir)
+ =
+
+         tries =3D 0
+         while not self._bus.name_has_owner(IWD_SERVICE):
+-            if os.environ['IWD_TEST_TIMEOUTS'] =3D=3D 'on':
++            if ctx.args.gdb =3D=3D 'None':
+                 if tries > 100:
+                     if start_iwd_daemon:
+-                        iwd_proc.terminate()
++                        self._iwd_proc.kill()
++                        self._iwd_proc =3D None
+                     raise TimeoutError('IWD has failed to start')
+                 tries +=3D 1
+             time.sleep(0.1)
+@@ -935,12 +920,9 @@ class IWD(AsyncOpAbstract):
+         self._known_networks =3D None
+         self._devices =3D None
+ =
+
+-        self._iwd_proc.terminate()
+-        self._iwd_proc.wait()
+-
+-        self._iwd_proc =3D None
+-
+-        del os.environ["CONFIGURATION_DIRECTORY"]
++        if self._iwd_proc is not None:
++            self._iwd_proc.kill()
++            self._iwd_proc =3D None
+ =
+
+     @property
+     def _object_manager(self):
 -- =
 
 2.21.1
 
---===============0107671044770585204==--
+--===============8634412163536268010==--
 
