@@ -1,93 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============4487727536469939777=="
+Content-Type: multipart/mixed; boundary="===============2774941472826291084=="
 MIME-Version: 1.0
 From: Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [v2 PATCH] crypto: af_alg - Work around empty control messages
- without MSG_MORE
-Date: Thu, 27 Aug 2020 07:40:13 +0000
-Message-ID: <CAMj1kXGJWRXu1Mx=ObTkztTdBQusv0N8o-cH1f+KM7d7geD20w@mail.gmail.com>
-In-Reply-To: <20200827071436.GA30281@gondor.apana.org.au>
+Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
+Date: Thu, 27 Aug 2020 07:54:23 +0000
+Message-ID: <CAMj1kXFX_viiR4S8DiDrcS09o2NFQsZGmizdLc9xjrWOrhgjaA@mail.gmail.com>
+In-Reply-To: <BL0PR11MB329980406FA0A14A8EF61A07B9550@BL0PR11MB3299.namprd11.prod.outlook.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4487727536469939777==
+--===============2774941472826291084==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 27 Aug 2020 at 09:15, Herbert Xu <herbert@gondor.apana.org.au> wr=
-ote:
+On Thu, 27 Aug 2020 at 06:56, Caleb Jorden <caljorden@hotmail.com> wrote:
 >
-> On Thu, Aug 27, 2020 at 08:40:01AM +0200, Ard Biesheuvel wrote:
-> >
-> > It is part of iwd - just build that and run 'make check'
-> >
-> > With your patch applied, the occurrence of sendmsg() in
-> > operate_cipher() triggers the warn_once(), but if I add MSG_MORE
-> > there, the test hangs.
+> I can tell you all assumed this, but just by way as a quick update on the=
+ original issue:
 >
-> I see.  This is a different issue.  The original kernel change
-> was a bit too strict here and it is barfing at the fact that two
-> successive sendmsg's of the same request both contain a control
-> message.
+> I have confirmed that Herbert's patch (crypto: af_alg - Work around empty=
+ control messages without MSG_MORE) does indeed fix the original iwd 1.8 + =
+WPA Enterprise issue.
 >
-> Here's an updated patch to allow this.
+> Thank you!
 >
-> ---8<---
-> The iwd daemon uses libell which sets up the skcipher operation with
-> two separate control messages.  As the first control message is sent
-> without MSG_MORE, it is interpreted as an empty request.
->
-> While libell should be fixed to use MSG_MORE where appropriate, this
-> patch works around the bug in the kernel so that existing binaries
-> continue to work.
->
-> We will print a warning however.
->
-> A separate issue is that the new kernel code no longer allows the
-> control message to be sent twice within the same request.  This
-> restriction is obviously incompatible with what iwd was doing (first
-> setting an IV and then sending the real control message).  This
-> patch changes the kernel so that this is explicitly allowed.
->
-> Reported-by: Caleb Jorden <caljorden@hotmail.com>
-> Fixes: f3c802a1f300 ("crypto: algif_aead - Only wake up when...")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-> index a6f581ab200c..8be8bec07cdd 100644
-> --- a/crypto/af_alg.c
-> +++ b/crypto/af_alg.c
-> @@ -16,6 +16,7 @@
->  #include <linux/module.h>
->  #include <linux/net.h>
->  #include <linux/rwsem.h>
-> +#include <linux/sched.h>
->  #include <linux/sched/signal.h>
->  #include <linux/security.h>
->
-> @@ -845,9 +846,15 @@ int af_alg_sendmsg(struct socket *sock, struct msghd=
-r *msg, size_t size,
->         }
->
->         lock_sock(sk);
-> -       if (ctx->init && (init || !ctx->more)) {
-> -               err =3D -EINVAL;
-> -               goto unlock;
-> +       if (ctx->init && !ctx->more) {
-> +               if (ctx->used) {
-> +                       err =3D -EINVAL;
-> +                       goto unlock;
-> +               }
-> +
-> +               pr_info_once(
-> +                       "%s sent an empty control message without MSG_MOR=
-E.\n",
-> +                       current->comm);
->         }
->         ctx->init =3D true;
+> Caleb Jorden
 >
 
-Yep, that works.
---===============4487727536469939777==--
+Thanks for confirming.
+
+> ________________________________________
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> Sent: Thursday, August 27, 2020 3:49 AM
+> To: Ard Biesheuvel
+> Cc: Denis Kenzior; Andrew Zaborowski; Paul Menzel; Caleb Jorden; Sasha Le=
+vin; iwd(a)lists.01.org; # 3.4.x; Greg KH; LKML; David S. Miller; Linux Cry=
+pto Mailing List
+> Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
+>
+> On Wed, Aug 26, 2020 at 05:42:27PM +0200, Ard Biesheuvel wrote:
+> >
+> > I still get a failure in aes_siv_encrypt(), which does not occur with
+> > the kernel side fix applied.
+>
+> Where is this test from? I can't find it in the ell git tree.
+>
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--===============2774941472826291084==--
 
