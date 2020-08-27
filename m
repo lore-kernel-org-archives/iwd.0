@@ -1,112 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============7656148724665829352=="
+Content-Type: multipart/mixed; boundary="===============1301140781524769317=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 08/16] auto-t: iwd.py: fix multiple timeout cleanup issues
-Date: Thu, 27 Aug 2020 10:32:21 -0700
-Message-ID: <20200827173229.26466-8-prestwoj@gmail.com>
+Subject: [PATCH 09/16] auto-t: remove wiphy.py
+Date: Thu, 27 Aug 2020 10:32:22 -0700
+Message-ID: <20200827173229.26466-9-prestwoj@gmail.com>
 In-Reply-To: <20200827173229.26466-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7656148724665829352==
+--===============1301140781524769317==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There were a few more places where the GLib timeout was not being
-removed which could cause the IWD object to hang around longer than
-expected causing problems for subsequent tests.
+This is no longer needed
 ---
- autotests/util/iwd.py | 51 +++++++++++++++++++++++++------------------
- 1 file changed, 30 insertions(+), 21 deletions(-)
+ autotests/util/wiphy.py | 32 --------------------------------
+ 1 file changed, 32 deletions(-)
+ delete mode 100644 autotests/util/wiphy.py
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 37daaeef..113039b6 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -948,15 +948,18 @@ class IWD(AsyncOpAbstract):
-             self._wait_timed_out =3D True
-             return False
- =
-
--        timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
--        context =3D mainloop.get_context()
--        while not eval(condition_str):
--            context.iteration(may_block=3DTrue)
--            if self._wait_timed_out and os.environ['IWD_TEST_TIMEOUTS'] =
-=3D=3D 'on':
--                raise TimeoutError('[' + condition_str + ']'\
--                                   ' condition was not met in '\
--                                   + str(max_wait) + ' sec')
--        GLib.source_remove(timeout)
-+        try:
-+            timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
-+            context =3D mainloop.get_context()
-+            while not eval(condition_str):
-+                context.iteration(may_block=3DTrue)
-+                if self._wait_timed_out and ctx.args.gdb =3D=3D 'None':
-+                    raise TimeoutError('[' + condition_str + ']'\
-+                                       ' condition was not met in '\
-+                                       + str(max_wait) + ' sec')
-+        finally:
-+            if not self._wait_timed_out:
-+                GLib.source_remove(timeout)
- =
-
-     def wait(self, time):
-         self._wait_timed_out =3D False
-@@ -964,10 +967,14 @@ class IWD(AsyncOpAbstract):
-             self._wait_timed_out =3D True
-             return False
- =
-
--        GLib.timeout_add(int(time * 1000), wait_timeout_cb)
--        context =3D mainloop.get_context()
--        while not self._wait_timed_out:
--            context.iteration(may_block=3DTrue)
-+        try:
-+            timeout =3D GLib.timeout_add(int(time * 1000), wait_timeout_cb)
-+            context =3D mainloop.get_context()
-+            while not self._wait_timed_out:
-+                context.iteration(may_block=3DTrue)
-+        finally:
-+            if not self._wait_timed_out:
-+                GLib.source_remove(timeout)
- =
-
-     @staticmethod
-     def clear_storage():
-@@ -1013,14 +1020,16 @@ class IWD(AsyncOpAbstract):
-             self._wait_timed_out =3D True
-             return False
- =
-
--        timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
--        context =3D mainloop.get_context()
--        while len(self._devices) < wait_to_appear:
--            context.iteration(may_block=3DTrue)
--            if self._wait_timed_out:
--                raise TimeoutError('IWD has no associated devices')
+diff --git a/autotests/util/wiphy.py b/autotests/util/wiphy.py
+deleted file mode 100644
+index 3f94d87b..00000000
+--- a/autotests/util/wiphy.py
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#! /usr/bin/python3
+-import os
+-import collections
 -
--        GLib.source_remove(timeout)
-+        try:
-+            timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
-+            context =3D mainloop.get_context()
-+            while len(self._devices) < wait_to_appear:
-+                context.iteration(may_block=3DTrue)
-+                if self._wait_timed_out:
-+                    raise TimeoutError('IWD has no associated devices')
-+        finally:
-+            if not self._wait_timed_out:
-+                GLib.source_remove(timeout)
- =
-
-         return list(self._devices.values())
- =
-
+-wiphy_map =3D {}
+-
+-Wiphy =3D collections.namedtuple('Wiphy', ['name', 'use', 'interface_map'])
+-
+-Intf =3D collections.namedtuple('Intf',
+-        ['name', 'wiphy', 'ctrl_interface', 'config'])
+-
+-def parse_list():
+-    for entry in os.environ['TEST_WIPHY_LIST'].split('\n'):
+-        wname, use_str =3D entry.split('=3D', 1)
+-        use =3D use_str.split(',')
+-
+-        if wname not in wiphy_map:
+-            wiphy_map[wname] =3D Wiphy(use=3Duse[0], name=3Dwname, interfa=
+ce_map=3D{})
+-
+-        if len(use) <=3D 1:
+-            continue
+-
+-        intf =3D {}
+-        intf['name'] =3D None
+-        intf['wiphy'] =3D wiphy_map[wname]
+-        intf['ctrl_interface'] =3D None
+-        intf['config'] =3D None
+-        intf.update(dict([param.split('=3D', 1) for param in use[1:]]))
+-
+-        wiphy_map[wname].interface_map[intf['name']] =3D Intf(**intf)
+-
+-parse_list()
 -- =
 
 2.21.1
 
---===============7656148724665829352==--
+--===============1301140781524769317==--
 
