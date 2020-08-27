@@ -1,255 +1,389 @@
-Content-Type: multipart/mixed; boundary="===============8951987816275483804=="
+Content-Type: multipart/mixed; boundary="===============5764515659706970179=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 09/11] ap: WSC Probe Request processing logic
-Date: Thu, 27 Aug 2020 20:14:51 +0200
-Message-ID: <20200827181453.61823-9-andrew.zaborowski@intel.com>
+Subject: [PATCH 10/11] ap: Parse WSC PBC association request and build response
+Date: Thu, 27 Aug 2020 20:14:52 +0200
+Message-ID: <20200827181453.61823-10-andrew.zaborowski@intel.com>
 In-Reply-To: <20200827181453.61823-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8951987816275483804==
+--===============5764515659706970179==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implement the caching of WSC probe requests -- when an Enrollee later
-associates to start registration we need to have its Probe Request on
-file.  Also use this cache for PBC "Session Overlap" detection.
+Check the conditions for PBC enrollee registration when we receive the
+Association Request with WSC IE and indicate to the enrollee whether we
+accept the association using a WSC IE in the Association Response.
+After this, a NULL sta->assoc_rsne indicates that the station is not
+establishing the RSNA and is a WSC enrollee.
 ---
- src/ap.c | 155 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 155 insertions(+)
+ src/ap.c | 183 ++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 148 insertions(+), 35 deletions(-)
 
 diff --git a/src/ap.c b/src/ap.c
-index b1e57a23..df29a2fb 100644
+index df29a2fb..0876dc01 100644
 --- a/src/ap.c
 +++ b/src/ap.c
-@@ -65,6 +65,7 @@ struct ap_state {
- 	uint32_t mlme_watch;
- 	uint8_t gtk[CRYPTO_MAX_GTK_LEN];
- 	uint8_t gtk_index;
-+	struct l_queue *wsc_pbc_probes;
- 	struct l_timeout *wsc_pbc_timeout;
- 	uint16_t wsc_dpid;
- 	uint8_t wsc_uuid_r[16];
-@@ -92,6 +93,12 @@ struct sta_state {
+@@ -91,6 +91,7 @@ struct sta_state {
+ 	struct eapol_sm *sm;
+ 	struct handshake_state *hs;
  	uint32_t gtk_query_cmd_id;
++	uint8_t wsc_uuid_e[16];
  };
  =
 
-+struct ap_wsc_pbc_probe_record {
-+	uint8_t mac[6];
-+	uint8_t uuid_e[16];
-+	uint64_t timestamp;
-+};
-+
- static uint32_t netdev_watch;
- =
-
- void ap_config_free(struct ap_config *config)
-@@ -165,6 +172,8 @@ static void ap_reset(struct ap_state *ap)
- 	ap_config_free(ap->config);
- 	ap->config =3D NULL;
- =
-
-+	l_queue_destroy(ap->wsc_pbc_probes, l_free);
-+
- 	ap->started =3D false;
+ struct ap_wsc_pbc_probe_record {
+@@ -908,7 +909,7 @@ static void ap_fail_assoc_resp_cb(struct l_genl_msg *ms=
+g, void *user_data)
  }
  =
 
-@@ -645,6 +654,24 @@ error:
- 	ap_del_station(sta, MMPDU_REASON_CODE_UNSPECIFIED, true);
- }
- =
-
-+struct ap_pbc_record_expiry_data {
-+	uint64_t min_time;
-+	const uint8_t *mac;
-+};
-+
-+static bool ap_wsc_pbc_record_expire(void *data, void *user_data)
-+{
-+	struct ap_wsc_pbc_probe_record *record =3D data;
-+	const struct ap_pbc_record_expiry_data *expiry_data =3D user_data;
-+
-+	if (record->timestamp > expiry_data->min_time &&
-+			memcmp(record->mac, expiry_data->mac, 6))
-+		return false;
-+
-+	l_free(record);
-+	return true;
-+}
-+
- static struct l_genl_msg *ap_build_cmd_del_key(struct ap_state *ap)
+ static uint32_t ap_assoc_resp(struct ap_state *ap, struct sta_state *sta,
+-				const uint8_t *dest, uint16_t aid,
++				const uint8_t *dest,
+ 				enum mmpdu_reason_code status_code,
+ 				bool reassoc, l_genl_msg_func_t callback)
  {
- 	uint32_t ifindex =3D netdev_get_ifindex(ap->netdev);
-@@ -1215,6 +1242,115 @@ bad_frame:
- #define AP_WSC_PBC_MONITOR_TIME	120
- #define AP_WSC_PBC_WALK_TIME	120
+@@ -936,7 +937,7 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, stru=
+ct sta_state *sta,
+ 	resp =3D (void *) mmpdu_body(mpdu);
+ 	l_put_le16(capability, &resp->capability);
+ 	resp->status_code =3D L_CPU_TO_LE16(status_code);
+-	resp->aid =3D L_CPU_TO_LE16(aid | 0xc000);
++	resp->aid =3D sta ? L_CPU_TO_LE16(sta->aid | 0xc000) : 0;
  =
 
-+static void ap_process_wsc_probe_req(struct ap_state *ap, const uint8_t *f=
-rom,
-+					const uint8_t *wsc_data,
-+					size_t wsc_data_len)
-+{
-+	struct wsc_probe_request req;
-+	struct ap_pbc_record_expiry_data expiry_data;
-+	struct ap_wsc_pbc_probe_record *record;
-+	uint64_t now;
-+	bool empty;
-+	uint8_t first_sta_addr[6] =3D {};
-+	const struct l_queue_entry *entry;
+ 	/* Supported Rates IE */
+ 	resp->ies[ies_len++] =3D IE_TYPE_SUPPORTED_RATES;
+@@ -958,6 +959,37 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, str=
+uct sta_state *sta,
+ 	resp->ies[ies_len++] =3D count;
+ 	ies_len +=3D count;
+ =
+
++	if (sta && !sta->assoc_rsne) {
++		struct wsc_association_response wsc_resp =3D {};
++		uint8_t *wsc_data;
++		size_t wsc_data_len;
++		uint8_t *wsc_ie;
++		size_t wsc_ie_len;
 +
-+	if (wsc_parse_probe_request(wsc_data, wsc_data_len, &req) < 0)
-+		return;
++		wsc_resp.response_type =3D WSC_RESPONSE_TYPE_AP;
 +
-+	if (!(req.config_methods & WSC_CONFIGURATION_METHOD_PUSH_BUTTON))
-+		return;
-+
-+	if (req.device_password_id !=3D WSC_DEVICE_PASSWORD_ID_PUSH_BUTTON)
-+		return;
-+
-+	/* Save the address of the first enrollee record */
-+	record =3D l_queue_peek_head(ap->wsc_pbc_probes);
-+	if (record)
-+		memcpy(first_sta_addr, record->mac, 6);
-+
-+	now =3D l_time_now();
-+
-+	/*
-+	 * Expire entries older than PBC Monitor Time.  While there also drop
-+	 * older entries from the same Enrollee that sent us this new Probe
-+	 * Request.  It's unclear whether we should also match by the UUID-E.
-+	 */
-+	expiry_data.min_time =3D now - AP_WSC_PBC_MONITOR_TIME * 1000000;
-+	expiry_data.mac =3D from;
-+	l_queue_foreach_remove(ap->wsc_pbc_probes, ap_wsc_pbc_record_expire,
-+				&expiry_data);
-+
-+	empty =3D l_queue_isempty(ap->wsc_pbc_probes);
-+
-+	if (!ap->wsc_pbc_probes)
-+		ap->wsc_pbc_probes =3D l_queue_new();
-+
-+	/* Add new record */
-+	record =3D l_new(struct ap_wsc_pbc_probe_record, 1);
-+	memcpy(record->mac, from, 6);
-+	memcpy(record->uuid_e, req.uuid_e, sizeof(record->uuid_e));
-+	record->timestamp =3D now;
-+	l_queue_push_tail(ap->wsc_pbc_probes, record);
-+
-+	/*
-+	 * If queue was non-empty and we've added one more record then we
-+	 * now have seen more than one PBC enrollee during the PBC Monitor
-+	 * Time and must exit "active PBC mode" due to "session overlap".
-+	 * WSC v2.0.5 Section 11.3:
-+	 * "Within the PBC Monitor Time, if the Registrar receives PBC
-+	 * probe requests from more than one Enrollee [...] then the
-+	 * Registrar SHALL signal a "session overlap" error.  As a result,
-+	 * the Registrar shall refuse to enter active PBC mode and shall
-+	 * also refuse to perform a PBC-based Registration Protocol
-+	 * exchange [...]"
-+	 */
-+	if (empty)
-+		return;
-+
-+	if (ap->wsc_pbc_timeout) {
-+		l_debug("Exiting PBC mode due to Session Overlap");
-+		ap_wsc_exit_pbc(ap);
-+	}
-+
-+	/*
-+	 * "If the Registrar is engaged in PBC Registration Protocol
-+	 * exchange with an Enrollee and receives a Probe Request or M1
-+	 * Message from another Enrollee, then the Registrar should
-+	 * signal a "session overlap" error".
-+	 *
-+	 * For simplicity just interrupt the handshake with that enrollee.
-+	 */
-+	for (entry =3D l_queue_get_entries(ap->sta_states); entry;
-+			entry =3D entry->next) {
-+		struct sta_state *sta =3D entry->data;
-+
-+		if (!sta->associated || sta->assoc_rsne)
-+			continue;
-+
-+		/*
-+		 * Check whether this enrollee is in PBC Registration
-+		 * Protocol by comparing its mac with the first (and only)
-+		 * record we had in ap->wsc_pbc_probes.  If we had more
-+		 * than one record we wouldn't have been in
-+		 * "active PBC mode".
-+		 */
-+		if (memcmp(sta->addr, first_sta_addr, 6) ||
-+				!memcmp(sta->addr, from, 6))
-+			continue;
-+
-+		l_debug("Interrupting handshake with %s due to Session Overlap",
-+			util_address_to_string(sta->addr));
-+
-+		if (sta->hs) {
-+			netdev_handshake_failed(sta->hs,
-+					MMPDU_REASON_CODE_DISASSOC_AP_BUSY);
-+			sta->sm =3D NULL;
++		wsc_data =3D wsc_build_association_response(&wsc_resp,
++								&wsc_data_len);
++		if (!wsc_data) {
++			l_error("wsc_build_beacon error");
++			goto send_frame;
 +		}
 +
-+		ap_remove_sta(sta);
-+	}
-+}
++		wsc_ie =3D ie_tlv_encapsulate_wsc_payload(wsc_data, wsc_data_len,
++							&wsc_ie_len);
++		l_free(wsc_data);
 +
- static void ap_probe_resp_cb(struct l_genl_msg *msg, void *user_data)
++		if (!wsc_ie) {
++			l_error("ie_tlv_encapsulate_wsc_payload error");
++			goto send_frame;
++		}
++
++		memcpy(resp->ies + ies_len, wsc_ie, wsc_ie_len);
++		ies_len +=3D wsc_ie_len;
++		l_free(wsc_ie);
++	}
++
++send_frame:
+ 	return ap_send_mgmt_frame(ap, mpdu, resp->ies + ies_len - mpdu_buf,
+ 					true, callback, sta);
+ }
+@@ -1032,8 +1064,8 @@ static int ap_parse_supported_rates(struct ie_tlv_ite=
+r *iter,
+  */
+ static void ap_assoc_reassoc(struct sta_state *sta, bool reassoc,
+ 				const struct mmpdu_field_capability *capability,
+-				uint16_t listen_interval,
+-				struct ie_tlv_iter *ies)
++				uint16_t listen_interval, const uint8_t *ies,
++				size_t ies_len)
  {
- 	if (l_genl_msg_get_error(msg) < 0)
-@@ -1241,6 +1377,8 @@ static void ap_probe_req_cb(const struct mmpdu_header=
- *hdr, const void *body,
- 	const uint8_t *bssid =3D netdev_get_address(ap->netdev);
- 	bool match =3D false;
- 	uint8_t resp[512];
-+	uint8_t *wsc_data;
+ 	struct ap_state *ap =3D sta->ap;
+ 	const char *ssid =3D NULL;
+@@ -1042,6 +1074,9 @@ static void ap_assoc_reassoc(struct sta_state *sta, b=
+ool reassoc,
+ 	struct l_uintset *rates =3D NULL;
+ 	struct ie_rsn_info rsn_info;
+ 	int err;
++	struct ie_tlv_iter iter;
++	uint8_t *wsc_data =3D NULL;
 +	ssize_t wsc_data_len;
  =
 
- 	l_info("AP Probe Request from %s",
- 		util_address_to_string(hdr->address_2));
-@@ -1310,6 +1448,18 @@ static void ap_probe_req_cb(const struct mmpdu_heade=
-r *hdr, const void *body,
- 	if (!match)
+ 	if (sta->assoc_resp_cmd_id)
  		return;
+@@ -1051,16 +1086,20 @@ static void ap_assoc_reassoc(struct sta_state *sta,=
+ bool reassoc,
+ 		goto unsupported;
+ 	}
  =
 
-+	/*
-+	 * Process the WSC IE first as it may cause us to exit "active PBC
-+	 * mode" and that can be immediately reflected in our Probe Response.
-+	 */
-+	wsc_data =3D ie_tlv_extract_wsc_payload(req->ies, body_len - sizeof(*req),
-+						&wsc_data_len);
-+	if (wsc_data) {
-+		ap_process_wsc_probe_req(ap, hdr->address_2,
-+						wsc_data, wsc_data_len);
+-	while (ie_tlv_iter_next(ies))
+-		switch (ie_tlv_iter_get_tag(ies)) {
++	wsc_data =3D ie_tlv_extract_wsc_payload(ies, ies_len, &wsc_data_len);
++
++	ie_tlv_iter_init(&iter, ies, ies_len);
++
++	while (ie_tlv_iter_next(&iter))
++		switch (ie_tlv_iter_get_tag(&iter)) {
+ 		case IE_TYPE_SSID:
+-			ssid =3D (const char *) ie_tlv_iter_get_data(ies);
+-			ssid_len =3D ie_tlv_iter_get_length(ies);
++			ssid =3D (const char *) ie_tlv_iter_get_data(&iter);
++			ssid_len =3D ie_tlv_iter_get_length(&iter);
+ 			break;
+ =
+
+ 		case IE_TYPE_SUPPORTED_RATES:
+ 		case IE_TYPE_EXTENDED_SUPPORTED_RATES:
+-			if (ap_parse_supported_rates(ies, &rates) < 0) {
++			if (ap_parse_supported_rates(&iter, &rates) < 0) {
+ 				err =3D MMPDU_REASON_CODE_INVALID_IE;
+ 				goto bad_frame;
+ 			}
+@@ -1068,16 +1107,26 @@ static void ap_assoc_reassoc(struct sta_state *sta,=
+ bool reassoc,
+ 			break;
+ =
+
+ 		case IE_TYPE_RSN:
+-			if (ie_parse_rsne(ies, &rsn_info) < 0) {
++			/*
++			 * WSC v2.0.5 Section 8.2:
++			 * "Note that during the WSC association [...] the
++			 * RSN IE and the WPA IE are irrelevant and shall be
++			 * ignored by both the station and AP."
++			 */
++			if (wsc_data)
++				break;
++
++			if (ie_parse_rsne(&iter, &rsn_info) < 0) {
+ 				err =3D MMPDU_REASON_CODE_INVALID_IE;
+ 				goto bad_frame;
+ 			}
+ =
+
+-			rsn =3D (const uint8_t *) ie_tlv_iter_get_data(ies) - 2;
++			rsn =3D (const uint8_t *) ie_tlv_iter_get_data(&iter) - 2;
+ 			break;
+ 		}
+ =
+
+-	if (!rates || !ssid || !rsn || ssid_len !=3D strlen(ap->config->ssid) ||
++	if (!rates || !ssid || (!wsc_data && !rsn) ||
++			ssid_len !=3D strlen(ap->config->ssid) ||
+ 			memcmp(ssid, ap->config->ssid, ssid_len)) {
+ 		err =3D MMPDU_REASON_CODE_INVALID_IE;
+ 		goto bad_frame;
+@@ -1088,19 +1137,81 @@ static void ap_assoc_reassoc(struct sta_state *sta,=
+ bool reassoc,
+ 		goto unsupported;
+ 	}
+ =
+
+-	if (rsn_info.mfpr && rsn_info.spp_a_msdu_required) {
+-		err =3D MMPDU_REASON_CODE_UNSPECIFIED;
+-		goto unsupported;
+-	}
++	/* Is the client requesting RSNA establishment or WSC registration */
++	if (!rsn) {
++		struct wsc_association_request wsc_req;
++		struct ap_event_registration_started_data event_data;
++		struct ap_wsc_pbc_probe_record *record;
+ =
+
+-	if (!(rsn_info.pairwise_ciphers & ap->ciphers)) {
+-		err =3D MMPDU_REASON_CODE_INVALID_PAIRWISE_CIPHER;
+-		goto unsupported;
+-	}
++		if (wsc_parse_association_request(wsc_data, wsc_data_len,
++							&wsc_req) < 0) {
++			err =3D MMPDU_REASON_CODE_INVALID_IE;
++			goto bad_frame;
++		}
+ =
+
+-	if (rsn_info.akm_suites !=3D IE_RSN_AKM_SUITE_PSK) {
+-		err =3D MMPDU_REASON_CODE_INVALID_AKMP;
+-		goto unsupported;
 +		l_free(wsc_data);
-+	}
++		wsc_data =3D NULL;
 +
- 	len =3D ap_build_beacon_pr_head(ap,
- 					MPDU_MANAGEMENT_SUBTYPE_PROBE_RESPONSE,
- 					hdr->address_2, resp, sizeof(resp));
-@@ -1882,6 +2032,11 @@ bool ap_push_button(struct ap_state *ap)
- 	if (!ap->started)
- 		return false;
++		if (wsc_req.request_type !=3D
++				WSC_REQUEST_TYPE_ENROLLEE_OPEN_8021X) {
++			err =3D MMPDU_REASON_CODE_INVALID_IE;
++			goto bad_frame;
++		}
++
++		if (!ap->wsc_pbc_timeout) {
++			l_debug("WSC association from %s but we're not in "
++				"PBC mode", util_address_to_string(sta->addr));
++			err =3D MMPDU_REASON_CODE_UNSPECIFIED;
++			goto bad_frame;
++		}
++
++		if (l_queue_isempty(ap->wsc_pbc_probes)) {
++			l_debug("%s tried to register as enrollee but we "
++				"don't have their Probe Request record",
++				util_address_to_string(sta->addr));
++			err =3D MMPDU_REASON_CODE_UNSPECIFIED;
++			goto bad_frame;
++		}
++
++		/*
++		 * For PBC, the Enrollee must have sent the only PBC Probe
++		 * Request within the monitor time and walk time.
++		 */
++		record =3D l_queue_peek_head(ap->wsc_pbc_probes);
++		if (memcmp(sta->addr, record->mac, 6)) {
++			l_debug("Session overlap during %s's attempt to "
++				"register as WSC enrollee",
++				util_address_to_string(sta->addr));
++			err =3D MMPDU_REASON_CODE_UNSPECIFIED;
++			goto bad_frame;
++		}
++
++		memcpy(sta->wsc_uuid_e, record->uuid_e, 16);
++
++		event_data.mac =3D sta->addr;
++		ap->event_func(AP_EVENT_REGISTRATION_START, &event_data,
++				ap->user_data);
++
++		/*
++		 * Since we're starting the PBC Registration Protocol
++		 * we can now exit the "active PBC mode".
++		 */
++		ap_wsc_exit_pbc(ap);
++	} else {
++		if (rsn_info.mfpr && rsn_info.spp_a_msdu_required) {
++			err =3D MMPDU_REASON_CODE_UNSPECIFIED;
++			goto unsupported;
++		}
++
++		if (!(rsn_info.pairwise_ciphers & ap->ciphers)) {
++			err =3D MMPDU_REASON_CODE_INVALID_PAIRWISE_CIPHER;
++			goto unsupported;
++		}
++
++		if (rsn_info.akm_suites !=3D IE_RSN_AKM_SUITE_PSK) {
++			err =3D MMPDU_REASON_CODE_INVALID_AKMP;
++			goto unsupported;
++		}
+ 	}
  =
 
-+	if (l_queue_length(ap->wsc_pbc_probes) > 1) {
-+		l_debug("Can't start PBC mode due to Session Overlap");
-+		return false;
-+	}
+ 	/* 802.11-2016 11.3.5.3 j) */
+@@ -1130,10 +1241,12 @@ static void ap_assoc_reassoc(struct sta_state *sta,=
+ bool reassoc,
+ 	if (sta->assoc_rsne)
+ 		l_free(sta->assoc_rsne);
+ =
+
+-	sta->assoc_rsne =3D l_memdup(rsn, rsn[1] + 2);
++	if (rsn)
++		sta->assoc_rsne =3D l_memdup(rsn, rsn[1] + 2);
++	else
++		sta->assoc_rsne =3D NULL;
+ =
+
+-	sta->assoc_resp_cmd_id =3D ap_assoc_resp(ap, sta, sta->addr, sta->aid, 0,
+-						reassoc,
++	sta->assoc_resp_cmd_id =3D ap_assoc_resp(ap, sta, sta->addr, 0, reassoc,
+ 						ap_success_assoc_resp_cb);
+ 	if (!sta->assoc_resp_cmd_id)
+ 		l_error("Sending success (Re)Association Response failed");
+@@ -1162,7 +1275,9 @@ bad_frame:
+ 	if (rates)
+ 		l_uintset_free(rates);
+ =
+
+-	if (!ap_assoc_resp(ap, NULL, sta->addr, 0, err, reassoc,
++	l_free(wsc_data);
 +
- 	/*
- 	 * WSC v2.0.5 Section 11.3: "Multiple presses of the button are
- 	 * permitted.  If a PBC button on an Enrollee or Registrar is
++	if (!ap_assoc_resp(ap, sta, sta->addr, err, reassoc,
+ 				ap_fail_assoc_resp_cb))
+ 		l_error("Sending error (Re)Association Response failed");
+ }
+@@ -1176,7 +1291,6 @@ static void ap_assoc_req_cb(const struct mmpdu_header=
+ *hdr, const void *body,
+ 	const uint8_t *from =3D hdr->address_2;
+ 	const struct mmpdu_association_request *req =3D body;
+ 	const uint8_t *bssid =3D netdev_get_address(ap->netdev);
+-	struct ie_tlv_iter iter;
+ =
+
+ 	l_info("AP Association Request from %s", util_address_to_string(from));
+ =
+
+@@ -1186,7 +1300,7 @@ static void ap_assoc_req_cb(const struct mmpdu_header=
+ *hdr, const void *body,
+ =
+
+ 	sta =3D l_queue_find(ap->sta_states, ap_sta_match_addr, from);
+ 	if (!sta) {
+-		if (!ap_assoc_resp(ap, NULL, from, 0,
++		if (!ap_assoc_resp(ap, NULL, from,
+ 				MMPDU_REASON_CODE_STA_REQ_ASSOC_WITHOUT_AUTH,
+ 				false, ap_fail_assoc_resp_cb))
+ 			l_error("Sending error Association Response failed");
+@@ -1194,9 +1308,9 @@ static void ap_assoc_req_cb(const struct mmpdu_header=
+ *hdr, const void *body,
+ 		return;
+ 	}
+ =
+
+-	ie_tlv_iter_init(&iter, req->ies, body_len - sizeof(*req));
+ 	ap_assoc_reassoc(sta, false, &req->capability,
+-				L_LE16_TO_CPU(req->listen_interval), &iter);
++				L_LE16_TO_CPU(req->listen_interval),
++				req->ies, body_len - sizeof(*req));
+ }
+ =
+
+ /* 802.11-2016 9.3.3.8 */
+@@ -1208,7 +1322,6 @@ static void ap_reassoc_req_cb(const struct mmpdu_head=
+er *hdr, const void *body,
+ 	const uint8_t *from =3D hdr->address_2;
+ 	const struct mmpdu_reassociation_request *req =3D body;
+ 	const uint8_t *bssid =3D netdev_get_address(ap->netdev);
+-	struct ie_tlv_iter iter;
+ 	int err;
+ =
+
+ 	l_info("AP Reassociation Request from %s",
+@@ -1229,13 +1342,13 @@ static void ap_reassoc_req_cb(const struct mmpdu_he=
+ader *hdr, const void *body,
+ 		goto bad_frame;
+ 	}
+ =
+
+-	ie_tlv_iter_init(&iter, req->ies, body_len - sizeof(*req));
+ 	ap_assoc_reassoc(sta, true, &req->capability,
+-				L_LE16_TO_CPU(req->listen_interval), &iter);
++				L_LE16_TO_CPU(req->listen_interval),
++				req->ies, body_len - sizeof(*req));
+ 	return;
+ =
+
+ bad_frame:
+-	if (!ap_assoc_resp(ap, NULL, from, 0, err, true, ap_fail_assoc_resp_cb))
++	if (!ap_assoc_resp(ap, NULL, from, err, true, ap_fail_assoc_resp_cb))
+ 		l_error("Sending error Reassociation Response failed");
+ }
+ =
+
 -- =
 
 2.25.1
 
---===============8951987816275483804==--
+--===============5764515659706970179==--
 
