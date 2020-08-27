@@ -1,86 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============1988060541397880785=="
+Content-Type: multipart/mixed; boundary="===============2791989196639640088=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 02/11] eap: Re-send Identity Request on EAPoL-Start
-Date: Thu, 27 Aug 2020 20:14:44 +0200
-Message-ID: <20200827181453.61823-2-andrew.zaborowski@intel.com>
+Subject: [PATCH 03/11] eap-wsc: In WSC-R read UUID-E from settings
+Date: Thu, 27 Aug 2020 20:14:45 +0200
+Message-ID: <20200827181453.61823-3-andrew.zaborowski@intel.com>
 In-Reply-To: <20200827181453.61823-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1988060541397880785==
+--===============2791989196639640088==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-It looks like clients sometimes miss our unsolicited Identity Request
-and need a resend.
+The intent was to read the UUID-E from the settings rather than generate
+it from the enrollee's MAC because it needs to match the UUID-E from
+enrolee's Probe Requests, fix this.  The UUID-E supplied in the unit
+test was being ignored but the test still passed because the supplied
+UUID-E was generated the same way we generated it in eap-wsc.c.
 ---
- src/eap.c   | 12 ++++++++++--
- src/eapol.c | 12 ++++++++----
- 2 files changed, 18 insertions(+), 6 deletions(-)
+ src/eap-wsc.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/src/eap.c b/src/eap.c
-index fcc18c77..dea0c3cf 100644
---- a/src/eap.c
-+++ b/src/eap.c
-@@ -245,10 +245,18 @@ void eap_start(struct eap_state *eap)
- {
- 	uint8_t buf[5];
+diff --git a/src/eap-wsc.c b/src/eap-wsc.c
+index bfab9e25..5b87924a 100644
+--- a/src/eap-wsc.c
++++ b/src/eap-wsc.c
+@@ -1871,9 +1871,6 @@ static struct eap_wsc_state *eap_wsc_new_common(struc=
+t l_settings *settings,
+ 	if (!util_string_to_address(v, wsc->m1->addr))
+ 		goto err;
  =
 
--	L_WARN_ON(!eap->method || !eap->authenticator || eap->identity);
-+	L_WARN_ON(!eap->method || !eap->authenticator);
+-	if (!wsc_uuid_from_addr(wsc->m1->addr, wsc->m1->uuid_e))
+-		goto err;
+-
+ 	if (!l_settings_get_uint(settings, "WSC", "ConfigurationMethods", &u32))
+ 		u32 =3D WSC_CONFIGURATION_METHOD_VIRTUAL_DISPLAY_PIN;
  =
 
-+	/*
-+	 * Until we've received the Identity response we can resend the
-+	 * Identity request with a constant ID on EAPoL-Start.
-+	 */
-+	if (eap->identity)
-+		return;
+@@ -1988,6 +1985,9 @@ static bool eap_wsc_load_settings(struct eap_state *e=
+ap,
+ 						WSC_ENCRYPTION_TYPE_AES_TKIP;
+ 	wsc->m1->connection_type_flags =3D WSC_CONNECTION_TYPE_ESS;
+ =
+
++	if (!wsc_uuid_from_addr(wsc->m1->addr, wsc->m1->uuid_e))
++		goto err;
 +
-+	eap->last_id =3D 1;
- 	buf[4] =3D EAP_TYPE_IDENTITY;
--	eap_send_packet(eap, EAP_CODE_REQUEST, ++eap->last_id, buf, 5);
-+	eap_send_packet(eap, EAP_CODE_REQUEST, eap->last_id, buf, 5);
- }
+ 	if (!load_device_data(settings,
+ 				wsc->m1->manufacturer,
+ 				wsc->m1->model_name,
+@@ -2041,6 +2041,9 @@ static bool eap_wsc_r_load_settings(struct eap_state =
+*eap,
+ 	if (!wsc)
+ 		return false;
  =
 
- void __eap_handle_request(struct eap_state *eap, uint16_t id,
-diff --git a/src/eapol.c b/src/eapol.c
-index 686187c6..2d339163 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -2239,14 +2239,18 @@ static void eapol_rx_auth_packet(uint16_t proto, co=
-nst uint8_t *from,
- =
-
- 	case 1:	/* EAPOL-Start */
- 		/*
--		 * The supplicant might have sent an EAPoL-Start even before
--		 * we queued our EAP Identity Request, so this should happen
--		 * mostly while we wait for the EAP Identity Response or before.
--		 * It's safe to ignore this frame in either case.
-+		 * The supplicant may have sent an EAPoL-Start even before
-+		 * we queued our EAP Identity Request or it may have missed our
-+		 * early Identity Request and may need a retransmission.  Tell
-+		 * sm->eap so it can decide whether to send a new Identity
-+		 * Request or ignore this.
- 		 *
- 		 * TODO: if we're already past the full handshake, send a
- 		 * new msg 1/4.
- 		 */
-+		if (sm->eap)
-+			eap_start(sm->eap);
++	if (!load_hexencoded(settings, "UUID-E", wsc->m1->uuid_e, 16))
++		goto err;
 +
- 		break;
+ 	if (!load_hexencoded(settings, "UUID-R", wsc->m2->uuid_r, 16))
+ 		goto err;
  =
 
- 	case 3: /* EAPOL-Key */
 -- =
 
 2.25.1
 
---===============1988060541397880785==--
+--===============2791989196639640088==--
 
