@@ -1,89 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============3210763753810444989=="
+Content-Type: multipart/mixed; boundary="===============1114833719351586488=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 13/16] auto-t: replace hard-coded interfaces
-Date: Thu, 27 Aug 2020 10:32:26 -0700
-Message-ID: <20200827173229.26466-13-prestwoj@gmail.com>
+Subject: [PATCH 14/16] auto-t: remove device.wait_for_connected
+Date: Thu, 27 Aug 2020 10:32:27 -0700
+Message-ID: <20200827173229.26466-14-prestwoj@gmail.com>
 In-Reply-To: <20200827173229.26466-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3210763753810444989==
+--===============1114833719351586488==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-test-runner now supports interface name replacement inside hostapd
-config files. Since a given test configuration doesn't know what
-interface names there will be $ifaceN can be specified instead e.g.
-
-rsn_preauth_interfaces=3D$iface0 $iface1
-
-The $ifaceN values will be replace with actual interface names when
-the test is started.
-
-This patch also removes ctrl_interface inside the hostapd config
-files as this is no longer required.
+I had added this without realizing wait_for_object_condition
+can do this already using the device object.
 ---
- autotests/testPreauth-roam/eaptls-preauth-1.conf | 3 +--
- autotests/testPreauth-roam/eaptls-preauth-2.conf | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ autotests/testSAE/clogging_test.py |  3 ++-
+ autotests/util/iwd.py              | 25 -------------------------
+ 2 files changed, 2 insertions(+), 26 deletions(-)
 
-diff --git a/autotests/testPreauth-roam/eaptls-preauth-1.conf b/autotests/t=
-estPreauth-roam/eaptls-preauth-1.conf
-index 0c7f96a7..bc808ed7 100644
---- a/autotests/testPreauth-roam/eaptls-preauth-1.conf
-+++ b/autotests/testPreauth-roam/eaptls-preauth-1.conf
-@@ -2,7 +2,6 @@ hw_mode=3Dg
- channel=3D1
- ssid=3DTestPreauth
- utf8_ssid=3D1
--ctrl_interface=3D/var/run/hostapd
+diff --git a/autotests/testSAE/clogging_test.py b/autotests/testSAE/cloggin=
+g_test.py
+index e94e2ad6..c46c5821 100644
+--- a/autotests/testSAE/clogging_test.py
++++ b/autotests/testSAE/clogging_test.py
+@@ -48,7 +48,8 @@ class Test(unittest.TestCase):
+             wd.wait_for_object_condition(n.network_object, condition)
  =
 
- wpa=3D2
- wpa_key_mgmt=3DWPA-EAP
-@@ -24,7 +23,7 @@ radius_server_auth_port=3D1812
- nas_identifier=3Dtesteap1
+         for d in devices:
+-            d.wait_for_connected()
++            condition =3D 'obj.state =3D=3D DeviceState.connected'
++            wd.wait_for_object_condition(d, condition)
  =
 
- rsn_preauth=3D1
--rsn_preauth_interfaces=3Dwln0 wln1
-+rsn_preauth_interfaces=3D$iface0 $iface1
- disable_pmksa_caching=3D0
+         for d in devices:
+             d.disconnect()
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 113039b6..9c106b89 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -568,31 +568,6 @@ class Device(IWDDBusAbstract):
+             if self._adhoc_timed_out:
+                 raise TimeoutError("Timed out waiting for peer %s" % addr)
  =
 
- # Allow PMK cache to be shared opportunistically among configured interfac=
-es
-diff --git a/autotests/testPreauth-roam/eaptls-preauth-2.conf b/autotests/t=
-estPreauth-roam/eaptls-preauth-2.conf
-index bddcca69..6d3a18e7 100644
---- a/autotests/testPreauth-roam/eaptls-preauth-2.conf
-+++ b/autotests/testPreauth-roam/eaptls-preauth-2.conf
-@@ -2,7 +2,6 @@ hw_mode=3Dg
- channel=3D2
- ssid=3DTestPreauth
- utf8_ssid=3D1
--ctrl_interface=3D/var/run/hostapd
- =
-
- wpa=3D2
- wpa_key_mgmt=3DWPA-EAP
-@@ -20,7 +19,7 @@ auth_server_port=3D1812
- auth_server_shared_secret=3Dsecret
- =
-
- rsn_preauth=3D1
--rsn_preauth_interfaces=3Dwln0 wln1
-+rsn_preauth_interfaces=3D$iface0 $iface1
- disable_pmksa_caching=3D0
- =
-
- # Allow PMK cache to be shared opportunistically among configured interfac=
-es
+-    def wait_for_connected(self):
+-        if str(self.state) =3D=3D "connected":
+-            return
+-
+-        self._connected_success =3D False
+-        self._connected_timed_out =3D False
+-
+-        def wait_timeout_cb():
+-            self._connected_timed_out =3D True
+-            return False
+-
+-        def connected_prop_changed(iface, changed, invalid):
+-            if changed.get('State', None):
+-                if changed['State'] =3D=3D 'connected':
+-                    self._connected_success =3D True
+-
+-        self._prop_proxy.connect_to_signal('PropertiesChanged',
+-                                            connected_prop_changed)
+-        GLib.timeout_add(int(15 * 1000), wait_timeout_cb)
+-        context =3D mainloop.get_context()
+-        while not self._connected_success:
+-            context.iteration(may_block=3DTrue)
+-            if self._connected_timed_out:
+-                raise TimeoutError("Timed out waiting for connected")
+-
+     def __str__(self, prefix =3D ''):
+         return prefix + 'Device: ' + self.device_path + '\n'\
+                + prefix + '\tName:\t\t' + self.name + '\n'\
 -- =
 
 2.21.1
 
---===============3210763753810444989==--
+--===============1114833719351586488==--
 
