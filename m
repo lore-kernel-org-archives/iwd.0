@@ -1,79 +1,85 @@
-Content-Type: multipart/mixed; boundary="===============3060843561800377650=="
+Content-Type: multipart/mixed; boundary="===============6625057941309167192=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 08/11] ap: Push Button mode API and beacon changes
-Date: Thu, 27 Aug 2020 15:51:58 -0500
-Message-ID: <42d9c101-f87f-8d9a-b944-d78d4b5bb732@gmail.com>
-In-Reply-To: <CAOq732+4_ExBB1xNxvMq6=5Sa8hRcj7+ttvCNnAXjV_wgVsPUw@mail.gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 01/11] wscutil: Add wsc_build_beacon
+Date: Fri, 28 Aug 2020 01:18:22 +0200
+Message-ID: <CAOq732KP+Zub=SAcCQPOB5zBiN96eh6hON4yPQvDQt__0GG70Q@mail.gmail.com>
+In-Reply-To: <2927b86f-c1ef-82b4-efe0-ab0d8069b717@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3060843561800377650==
+--===============6625057941309167192==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Thu, 27 Aug 2020 at 21:21, Denis Kenzior <denkenz@gmail.com> wrote:
+> Hi Andrew,
+>
+> On 8/27/20 1:14 PM, Andrew Zaborowski wrote:
+> > ---
+> >   src/wscutil.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++
+> >   src/wscutil.h |  1 +
+> >   2 files changed, 60 insertions(+)
+> >
+>
+> <snip>
+>
+> > +
+> > +     /* These two "should be provided" if dual-band */
+> > +     if (beacon->rf_bands & (beacon->rf_bands - 1)) {
+>
+> I probably missed this in the earlier review, but would it be more clear =
+to
+> check rf_bands & ~WSC_RF_BAND_2_4_GHZ here instead?
 
->>> +
->>> +bool ap_push_button(struct ap_state *ap);
->>>
->>
->> So correct me if I'm wrong, but the intent here seems to be:
->>
->> Have P2P-GO start AP in PBC mode by setting authorized_macs to whatever,=
- then
->> run ap_push_button().  Then the AP has to be shut down and restarted (or=
- maybe
->> not?)  But regardless, it seems that PBC cannot be restarted with AP run=
-ning
->> after the previous PBC transaction has finished.
->>
->> This seems like an unnecessary limitation.  Why not implement PBC (and i=
-n the
->> future PIN) as a transitory state instead?  This way we could have our A=
-P (non
->> P2P-GO) mode support push buttons / PINs almost for free...
-> =
+That might be falsely triggered on a 5GHz-only AP.  I was gonna try
+something like:
 
-> So the idea was that this function corresponds to a physical button
-> press, i.e. whenever the AP UI senses button press it calls this, and
-> perhaps lights up the "WPS" LED until it receives
-> AP_EVENT_PBC_MODE_EXIT.
+  (rf_bands & 2_4_AND_5_MASK) =3D=3D 2_4_AND_5_MASK
 
-Right
+as the condition, but ended up copying this from
+wsc_build_probe_response, I can change it in both places.
+>
+> > +             if (beacon->selected_registrar)
+> > +                     build_uuid_e(builder, beacon->uuid_e);
+> > +
+> > +             build_rf_bands(builder, beacon->rf_bands);
+> > +     }
+> > +
+> > +     if (!beacon->version2)
+> > +             goto done;
+> > +
+> > +     START_WFA_VENDOR_EXTENSION();
+> > +
+> > +     if (!util_mem_is_zero(beacon->authorized_macs, 30)) {
+> > +             int count;
+> > +
+> > +             for (count =3D 1; count < 5; count++)
+> > +                     if (util_mem_is_zero(beacon->authorized_macs + co=
+unt * 6,
+> > +                                             30 - count * 6))
+> > +                             break;
+> > +
+> > +             wsc_attr_builder_put_u8(builder,
+> > +                                     WSC_WFA_EXTENSION_AUTHORIZED_MACS=
+);
+> > +             wsc_attr_builder_put_u8(builder, count * 6);
+> > +             wsc_attr_builder_put_bytes(builder, beacon->authorized_ma=
+cs,
+> > +                                             count * 6);
+> > +     }
+>
+> I'm guilty of copy-pasting as much as anyone, but could we make a utility=
+ for
+> this?  Also, wouldn't it make more sense to run util_mem_is_zero backward=
+s 6
+> bytes at a time instead of pounding the array 6 times?
 
-> =
+Oops, I didn't realize the code was doing this.  I think elsewhere we
+were assuming the first 6-zeros address in the array was the end of
+the array, maybe it's enough here as well.
 
-> So in P2P we'd first wait for the AP_EVENT_STARTED event, call this,
-> and from there we should receive REGISTRATION_START -> PBC_MODE_EXIT
-> -> REGISTRATION_SUCCESS -> STATION_ADDED without doing much, except
-> perhaps restarting a timeout on each step.  The PBC mode doesn't
-> preclude an RSN connection or multiple connections from different
-> STAs, so the client can reassociate and do the 4-Way handshake as soon
-> as it receives the credentials.
-> =
-
->>
->> So something like:
->>
->> ap_push_button(struct ap_state *ap, struct wsc_config *wsc);
-> =
-
-> What information would go in wsc_config?
-> =
-
-
-Its been a while since I looked at WSC, so I could be wrong, but wouldn't =
-
-authorized_macs belong to the wsc_config and not ap_config?
-
-I suppose you could have them in both, but it seemed strange to see it in =
-
-ap_config given you're trying to make wsc work and not configuring mac filt=
-ering.
-
-Regards,
--Denis
---===============3060843561800377650==--
+Best regards
+--===============6625057941309167192==--
 
