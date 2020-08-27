@@ -1,68 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============5252834172378819686=="
+Content-Type: multipart/mixed; boundary="===============1445360427520447367=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 01/16] hwsim: return radio ID on create
-Date: Thu, 27 Aug 2020 13:21:19 -0700
-Message-ID: <2bb9fb47fce4babfcdd41d1f3b84e20109ccc8b8.camel@gmail.com>
-In-Reply-To: <d4772e1e-cf43-0d33-4d0b-3aa8fa468fca@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 07/11] ap: Stop ongoing handshake on reassociation
+Date: Thu, 27 Aug 2020 22:40:39 +0200
+Message-ID: <CAOq732K42GNxvRw2t7yvi+=qMPshknDBHa4c17rn09Khxsb4Ag@mail.gmail.com>
+In-Reply-To: <6b5eaab9-a7fd-ca7d-1f3a-c8dab2a8263c@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5252834172378819686==
+--===============1445360427520447367==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2020-08-27 at 15:08 -0500, Denis Kenzior wrote:
-> Hi James,
-> =
+Hi Denis,
 
-> On 8/27/20 12:32 PM, James Prestwood wrote:
-> > Hwsim was relying on some internal behavior of mac80211_hwsim where
-> > new
-> > radios are created with ID's starting at zero and incremented.
-> > While
-> > this is a reasonable assumption its better to obtain the actual
-> > radio
-> > ID since mac80211_hwsim returns it in the radio creation callback.
-> > =
-
-> > Now hwsim will return the radio ID when creating radios. Negative
-> > returns
-> > are still errors, but any value >=3D 0 indicates the radio ID of the
-> > newly
-> > created radio.
-> =
-
-> Ah, now I see what you meant by exit code.  Sorry I should have
-> caught this earlier.
-> =
-
-> So the problem is that UNIX doesn't really understand negative exit
-> codes.  exit =
-
-> code of 0 is a success and anything else is a failure.
-> =
-
-> I think you will get people screaming obscenities if they try to use
-> hwsim in a =
-
-> script...
-
-Ok, makes sense. I can just track the ID internally until I get the
-dbus stuff sorted out.
-
-> =
-
+On Thu, 27 Aug 2020 at 21:15, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 8/27/20 1:14 PM, Andrew Zaborowski wrote:
+> > On a new association or re-association, in addition to forgetting a
+> > complete RSN Association, also stop the EAPoL SM to stop any ongoing
+> > handshake.
+> >
+> > Do this in a new function ap_stop_handshake that is now used in a few
+> > places that had copies of the same few lines.  I'll be adding some more
+> > lines to this function for WSC support.
 > > ---
-> >   tools/hwsim.c | 9 +++++++--
-> >   1 file changed, 7 insertions(+), 2 deletions(-)
-> > =
+> >   src/ap.c | 51 +++++++++++++++++++++++++--------------------------
+> >   1 file changed, 25 insertions(+), 26 deletions(-)
+> >
+> > diff --git a/src/ap.c b/src/ap.c
+> > index aef2e1dd..5cd2b717 100644
+> > --- a/src/ap.c
+> > +++ b/src/ap.c
+>
+> No real concerns on the first three uses, but...
+>
+> <snip>
+>
+> > @@ -938,6 +933,12 @@ static void ap_assoc_reassoc(struct sta_state *sta=
+, bool reassoc,
+> >               goto unsupported;
+> >       }
+> >
+> > +     /* 802.11-2016 11.3.5.3 j) */
+> > +     if (sta->rsna)
+> > +             ap_drop_rsna(sta);
+> > +
+> > +     ap_stop_handshake(sta);
+> > +
+>
+> ap_drop_rsna also destroys eapol_sm and the handshake object.  So perhaps=
+ you
+> need to track the authorized state to choose the right cleanup action?
 
-> =
+Ok, good catch, in fact it calls ap_stop_handshake() after this patch.
+I didn't see this because conceptually ap_drop_rsna is a transition
+from State 4 to State 3 while ap_stop_handshake sort of stops an
+ongoing transition State 4.
 
-> Regards,
-> -Denis
+I guess this will make sense:
+if (sta->rsna)
+    ap_drop_rsna(sta);
+else
+    ap_stop_handshake(sta);
 
---===============5252834172378819686==--
+Best regards
+--===============1445360427520447367==--
 
