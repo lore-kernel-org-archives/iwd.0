@@ -1,72 +1,109 @@
-Content-Type: multipart/mixed; boundary="===============7690172207491780898=="
+Content-Type: multipart/mixed; boundary="===============7029224098851946473=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 02/11] eap: Re-send Identity Request on EAPoL-Start
-Date: Thu, 27 Aug 2020 15:38:04 -0500
-Message-ID: <2dcc54ae-5179-d289-12a1-c99604d70311@gmail.com>
-In-Reply-To: <CAOq732J7_bJ9Kb-DuJbe-eyGcDiuGm-JAKRzbz3KeEoPZrGK0g@mail.gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 08/11] ap: Push Button mode API and beacon changes
+Date: Thu, 27 Aug 2020 22:57:52 +0200
+Message-ID: <CAOq732+4_ExBB1xNxvMq6=5Sa8hRcj7+ttvCNnAXjV_wgVsPUw@mail.gmail.com>
+In-Reply-To: <1c918a34-562e-06b7-1716-5ba8ab47503e@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7690172207491780898==
+--===============7029224098851946473==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Thu, 27 Aug 2020 at 21:50, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 8/27/20 1:14 PM, Andrew Zaborowski wrote:
+> > @@ -29,6 +29,9 @@ enum ap_event_type {
+> >       AP_EVENT_STOPPING,
+> >       AP_EVENT_STATION_ADDED,
+> >       AP_EVENT_STATION_REMOVED,
+> > +     AP_EVENT_REGISTRATION_START,
+> > +     AP_EVENT_REGISTRATION_SUCCESS,
+>
+> These two are not used in this patch, but ok..
+>
+> > +     AP_EVENT_PBC_MODE_EXIT,
+> >   };
+> >
+> >   struct ap_event_station_added_data {
+> > @@ -41,6 +44,14 @@ struct ap_event_station_removed_data {
+> >       enum mmpdu_reason_code reason;
+> >   };
+> >
+> > +struct ap_event_registration_started_data {
+> > +     const uint8_t *mac;
+> > +};
+> > +
+> > +struct ap_event_registration_success_data {
+> > +     const uint8_t *mac;
+> > +};
+> > +
+>
+> As above
 
-On 8/27/20 3:47 PM, Andrew Zaborowski wrote:
-> On Thu, 27 Aug 2020 at 20:55, Denis Kenzior <denkenz@gmail.com> wrote:
->> On 8/27/20 1:14 PM, Andrew Zaborowski wrote:
->>> It looks like clients sometimes miss our unsolicited Identity Request
->>> and need a resend.
->>> ---
->>>    src/eap.c   | 12 ++++++++++--
->>>    src/eapol.c | 12 ++++++++----
->>>    2 files changed, 18 insertions(+), 6 deletions(-)
->>>
->>
->> Applied.
->>
->> By the way, there are several implementations (Apple AirPort for example=
-) that
->> do not start WSC until an EAPoL-Start is sent.  I don't recall that EAPo=
-L-Start
->> behavior was specified in WSC 1.0.  I know that one of my routers that u=
-ses WSC
->> 2.0 doesn't do this and sends a RequestIdentity right away.  So that mig=
-ht
->> explain what you're seeing here.
-> =
+Right, I thought it would be easier to see the idea with the API
+defined in one patch.
 
-> So I intended to mention this separately but the spec recommends that
-> we send the EAP Identity request automatically if the enrollee is WSC
-> 2.0 and it prohibits us doing this if it's WSC 1.0.  I think there's
-> probably no harm trying it until we see it throws off some device.
+>
+> >   typedef void (*ap_event_func_t)(enum ap_event_type type, const void *=
+event_data,
+> >                               void *user_data);
+> >   typedef void (*ap_stopped_func_t)(void *user_data);
+> > @@ -51,6 +62,8 @@ struct ap_config {
+> >       uint8_t channel;
+> >       uint8_t *authorized_macs;
+> >       unsigned int authorized_macs_num;
+> > +     char *wsc_name;
+> > +     struct wsc_primary_device_type wsc_primary_device_type;
+> >       bool no_cck_rates : 1;
+> >   };
+> >
+> > @@ -64,3 +77,5 @@ void ap_free(struct ap_state *ap);
+> >
+> >   bool ap_station_disconnect(struct ap_state *ap, const uint8_t *mac,
+> >                               enum mmpdu_reason_code reason);
+> > +
+> > +bool ap_push_button(struct ap_state *ap);
+> >
+>
+> So correct me if I'm wrong, but the intent here seems to be:
+>
+> Have P2P-GO start AP in PBC mode by setting authorized_macs to whatever, =
+then
+> run ap_push_button().  Then the AP has to be shut down and restarted (or =
+maybe
+> not?)  But regardless, it seems that PBC cannot be restarted with AP runn=
+ing
+> after the previous PBC transaction has finished.
+>
+> This seems like an unnecessary limitation.  Why not implement PBC (and in=
+ the
+> future PIN) as a transitory state instead?  This way we could have our AP=
+ (non
+> P2P-GO) mode support push buttons / PINs almost for free...
 
-Okay.  So if the spec recommends this, it probably is intentional.  May be =
-a =
+So the idea was that this function corresponds to a physical button
+press, i.e. whenever the AP UI senses button press it calls this, and
+perhaps lights up the "WPS" LED until it receives
+AP_EVENT_PBC_MODE_EXIT.
 
-good idea to follow its recommendation.  Do you recall where this is stated?
+So in P2P we'd first wait for the AP_EVENT_STARTED event, call this,
+and from there we should receive REGISTRATION_START -> PBC_MODE_EXIT
+-> REGISTRATION_SUCCESS -> STATION_ADDED without doing much, except
+perhaps restarting a timeout on each step.  The PBC mode doesn't
+preclude an RSN connection or multiple connections from different
+STAs, so the client can reassociate and do the 4-Way handshake as soon
+as it receives the credentials.
 
-> =
+>
+> So something like:
+>
+> ap_push_button(struct ap_state *ap, struct wsc_config *wsc);
 
-> In my case an Android device replied to my initial Identity Request in
-> three attempts, but on one occasion it apparently missed the request,
-> sent the EAPoL-Start after a timeout and waited for a new Identity
-> Request.
-> =
+What information would go in wsc_config?
 
-
-Yeah, iwd (and I think wpa_s as well) starts a timer and sends an EAPoL-Sta=
-rt if =
-
-they don't receive the Request-Identity after some time.  But that doesn't =
-mean =
-
-others do.
-
-Regards,
--Denis
---===============7690172207491780898==--
+Best regards
+--===============7029224098851946473==--
 
