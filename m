@@ -1,85 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============6625057941309167192=="
+Content-Type: multipart/mixed; boundary="===============8507958496400223108=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 01/11] wscutil: Add wsc_build_beacon
-Date: Fri, 28 Aug 2020 01:18:22 +0200
-Message-ID: <CAOq732KP+Zub=SAcCQPOB5zBiN96eh6hON4yPQvDQt__0GG70Q@mail.gmail.com>
-In-Reply-To: <2927b86f-c1ef-82b4-efe0-ab0d8069b717@gmail.com>
+Subject: Re: [PATCH 02/11] eap: Re-send Identity Request on EAPoL-Start
+Date: Fri, 28 Aug 2020 01:24:39 +0200
+Message-ID: <CAOq732LnFsa60y9z4LWfo68N8azW1Omn-o4XHfWqemod8hkjGA@mail.gmail.com>
+In-Reply-To: <2dcc54ae-5179-d289-12a1-c99604d70311@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6625057941309167192==
+--===============8507958496400223108==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 27 Aug 2020 at 21:21, Denis Kenzior <denkenz@gmail.com> wrote:
-> Hi Andrew,
->
-> On 8/27/20 1:14 PM, Andrew Zaborowski wrote:
-> > ---
-> >   src/wscutil.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++
-> >   src/wscutil.h |  1 +
-> >   2 files changed, 60 insertions(+)
+On Thu, 27 Aug 2020 at 22:52, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 8/27/20 3:47 PM, Andrew Zaborowski wrote:
+> > On Thu, 27 Aug 2020 at 20:55, Denis Kenzior <denkenz@gmail.com> wrote:
+> >> By the way, there are several implementations (Apple AirPort for examp=
+le) that
+> >> do not start WSC until an EAPoL-Start is sent.  I don't recall that EA=
+PoL-Start
+> >> behavior was specified in WSC 1.0.  I know that one of my routers that=
+ uses WSC
+> >> 2.0 doesn't do this and sends a RequestIdentity right away.  So that m=
+ight
+> >> explain what you're seeing here.
 > >
+> > So I intended to mention this separately but the spec recommends that
+> > we send the EAP Identity request automatically if the enrollee is WSC
+> > 2.0 and it prohibits us doing this if it's WSC 1.0.  I think there's
+> > probably no harm trying it until we see it throws off some device.
 >
-> <snip>
->
-> > +
-> > +     /* These two "should be provided" if dual-band */
-> > +     if (beacon->rf_bands & (beacon->rf_bands - 1)) {
->
-> I probably missed this in the earlier review, but would it be more clear =
-to
-> check rf_bands & ~WSC_RF_BAND_2_4_GHZ here instead?
+> Okay.  So if the spec recommends this, it probably is intentional.  May b=
+e a
+> good idea to follow its recommendation.
 
-That might be falsely triggered on a 5GHz-only AP.  I was gonna try
-something like:
+Ok.
 
-  (rf_bands & 2_4_AND_5_MASK) =3D=3D 2_4_AND_5_MASK
+> Do you recall where this is stated?
 
-as the condition, but ended up copying this from
-wsc_build_probe_response, I can change it in both places.
->
-> > +             if (beacon->selected_registrar)
-> > +                     build_uuid_e(builder, beacon->uuid_e);
-> > +
-> > +             build_rf_bands(builder, beacon->rf_bands);
-> > +     }
-> > +
-> > +     if (!beacon->version2)
-> > +             goto done;
-> > +
-> > +     START_WFA_VENDOR_EXTENSION();
-> > +
-> > +     if (!util_mem_is_zero(beacon->authorized_macs, 30)) {
-> > +             int count;
-> > +
-> > +             for (count =3D 1; count < 5; count++)
-> > +                     if (util_mem_is_zero(beacon->authorized_macs + co=
-unt * 6,
-> > +                                             30 - count * 6))
-> > +                             break;
-> > +
-> > +             wsc_attr_builder_put_u8(builder,
-> > +                                     WSC_WFA_EXTENSION_AUTHORIZED_MACS=
-);
-> > +             wsc_attr_builder_put_u8(builder, count * 6);
-> > +             wsc_attr_builder_put_bytes(builder, beacon->authorized_ma=
-cs,
-> > +                                             count * 6);
-> > +     }
->
-> I'm guilty of copy-pasting as much as anyone, but could we make a utility=
- for
-> this?  Also, wouldn't it make more sense to run util_mem_is_zero backward=
-s 6
-> bytes at a time instead of pounding the array 6 times?
+In 8.2:
+"On successful association, the station will then send an EAPOL-Start
+to the AP and wait
+for EAP-Request/Identity. The AP is allowed to send
+EAP-Request/Identity to the station
+before EAPOL-Start is received if a WSC IE is included in the
+(re)association request
+and the WSC IE is version 2.0 or higher."
 
-Oops, I didn't realize the code was doing this.  I think elsewhere we
-were assuming the first 6-zeros address in the array was the end of
-the array, maybe it's enough here as well.
+Also here's the other compatibility bit I mentioned, which I'm not
+honoring for the moment:
+"Note: For backwards compatibility with version 1.0 implementations an
+AP hosting a
+WPA2-Personal network and supporting WSC would need to permit the associati=
+on
+exchange with a station intending to engage in EAP-WSC where there is
+no RSN IE or
+WPA IE in the association request frames even if there is no WSC IE
+either. The AP
+shall only permit the exchange of EAP-WSC messages with a station that
+associates in
+this manner and only after receiving the EAPOL-Start frame. The WSC IE
+may or may
+not be present in the association requests from WSC version 1.0 devices."
 
 Best regards
---===============6625057941309167192==--
+--===============8507958496400223108==--
 
