@@ -1,79 +1,107 @@
-Content-Type: multipart/mixed; boundary="===============1440357415697200646=="
+Content-Type: multipart/mixed; boundary="===============2888189755891536842=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 11/16] auto-t: fix testSAE autoconnect_test.py
-Date: Thu, 27 Aug 2020 10:32:24 -0700
-Message-ID: <20200827173229.26466-11-prestwoj@gmail.com>
+Subject: [PATCH 12/16] auto-t: skip ofono tests if ofonod isn't running
+Date: Thu, 27 Aug 2020 10:32:25 -0700
+Message-ID: <20200827173229.26466-12-prestwoj@gmail.com>
 In-Reply-To: <20200827173229.26466-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1440357415697200646==
+--===============2888189755891536842==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This test was unreliable since it was assuming a periodic scan would
-happen at just the right time. Instead since we are expecting autoconnect
-we can just wait for DeviceState.connected then after we are connected
-verify the network was correct.
 ---
- autotests/testSAE/autoconnect_test.py | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
+ autotests/testEAP-AKA-ofono/connection_test.py       | 4 ++++
+ autotests/testEAP-AKA-prime-ofono/connection_test.py | 4 ++++
+ autotests/testEAP-SIM-ofono/connection_test.py       | 4 ++++
+ 3 files changed, 12 insertions(+)
 
-diff --git a/autotests/testSAE/autoconnect_test.py b/autotests/testSAE/auto=
-connect_test.py
-index a45fd09d..2eb73b7f 100644
---- a/autotests/testSAE/autoconnect_test.py
-+++ b/autotests/testSAE/autoconnect_test.py
-@@ -23,20 +23,15 @@ class Test(unittest.TestCase):
-         devices[2].disconnect()
-         devices[3].disconnect()
+diff --git a/autotests/testEAP-AKA-ofono/connection_test.py b/autotests/tes=
+tEAP-AKA-ofono/connection_test.py
+index 94066f76..27f736f6 100644
+--- a/autotests/testEAP-AKA-ofono/connection_test.py
++++ b/autotests/testEAP-AKA-ofono/connection_test.py
+@@ -9,6 +9,7 @@ from iwd import IWD
+ from iwd import NetworkType
+ from hlrauc import AuthCenter
+ from ofono import Ofono
++from config import ctx
  =
 
--        condition =3D 'obj.scanning'
--        wd.wait_for_object_condition(device, condition)
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition, 30)
+ class Test(unittest.TestCase):
  =
 
--        condition =3D 'not obj.scanning'
-+        condition =3D 'obj.connected_network is not None'
-         wd.wait_for_object_condition(device, condition)
+@@ -56,6 +57,9 @@ class Test(unittest.TestCase):
+         auth.stop()
+     @classmethod
+     def setUpClass(cls):
++        if not ctx.is_process_running('ofonod'):
++            cls.skipTest(cls, "ofono not running")
++
+         IWD.copy_to_storage('ssidEAP-AKA.8021x')
  =
 
-         ordered_network =3D device.get_ordered_network('ssidSAE')
+     @classmethod
+diff --git a/autotests/testEAP-AKA-prime-ofono/connection_test.py b/autotes=
+ts/testEAP-AKA-prime-ofono/connection_test.py
+index 2ff99894..967ba352 100644
+--- a/autotests/testEAP-AKA-prime-ofono/connection_test.py
++++ b/autotests/testEAP-AKA-prime-ofono/connection_test.py
+@@ -9,6 +9,7 @@ from iwd import IWD
+ from iwd import NetworkType
+ from hlrauc import AuthCenter
+ from ofono import Ofono
++from config import ctx
  =
 
--        self.assertEqual(ordered_network.type, NetworkType.psk)
--
--        condition =3D 'obj.connected'
--        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
--
--        device.wait_for_connected()
-+        self.assertTrue(ordered_network.network_object.connected)
+ class Test(unittest.TestCase):
  =
 
-         device.disconnect()
+@@ -57,6 +58,9 @@ class Test(unittest.TestCase):
  =
 
-@@ -44,7 +39,7 @@ class Test(unittest.TestCase):
-         wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
+     @classmethod
+     def setUpClass(cls):
++        if not ctx.is_process_running('ofonod'):
++            cls.skipTest(cls, "ofono not running")
++
+         IWD.copy_to_storage('ssidEAP-AKA.8021x')
  =
 
-     def test_connection_success(self):
--        wd =3D IWD(True)
-+        wd =3D IWD()
+     @classmethod
+diff --git a/autotests/testEAP-SIM-ofono/connection_test.py b/autotests/tes=
+tEAP-SIM-ofono/connection_test.py
+index 95242943..de7c4b48 100644
+--- a/autotests/testEAP-SIM-ofono/connection_test.py
++++ b/autotests/testEAP-SIM-ofono/connection_test.py
+@@ -9,6 +9,7 @@ from iwd import IWD
+ from iwd import NetworkType
+ from hlrauc import AuthCenter
+ from ofono import Ofono
++from config import ctx
  =
 
-         self.validate_connection(wd)
+ class Test(unittest.TestCase):
  =
 
+@@ -57,6 +58,9 @@ class Test(unittest.TestCase):
+ =
+
+     @classmethod
+     def setUpClass(cls):
++        if not ctx.is_process_running('ofonod'):
++            cls.skipTest(cls, "ofono not running")
++
+         IWD.copy_to_storage('ssidEAP-SIM.8021x')
+ =
+
+     @classmethod
 -- =
 
 2.21.1
 
---===============1440357415697200646==--
+--===============2888189755891536842==--
 
