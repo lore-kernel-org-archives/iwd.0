@@ -1,316 +1,115 @@
-Content-Type: multipart/mixed; boundary="===============6406051373479516274=="
+Content-Type: multipart/mixed; boundary="===============1791126817926419422=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 11/11] ap: Start EAP-WSC authentication with WSC enrollees
-Date: Thu, 27 Aug 2020 20:14:53 +0200
-Message-ID: <20200827181453.61823-11-andrew.zaborowski@intel.com>
-In-Reply-To: <20200827181453.61823-1-andrew.zaborowski@intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/2] ap: Move AP parameters to a struct
+Date: Thu, 27 Aug 2020 13:04:35 -0500
+Message-ID: <3954ea56-e9c1-87d9-2054-e28072acabda@gmail.com>
+In-Reply-To: <CAOq732+kOPkPm5=dx6NbkvZufp388GeVnj4EjzadTa7E23jnEA@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6406051373479516274==
+--===============1791126817926419422==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-After association and sending the SET_STATION commands, set up the
-handshake_state and eapol_sm for EAP-WSC and start the handshake.
----
- src/ap.c | 217 ++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 176 insertions(+), 41 deletions(-)
+Hi Andrew,
 
-diff --git a/src/ap.c b/src/ap.c
-index 0876dc01..26dddfea 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -46,6 +46,7 @@
- #include "src/nl80211util.h"
- #include "src/frame-xchg.h"
- #include "src/wscutil.h"
-+#include "src/eap-wsc.h"
- #include "src/ap.h"
- =
+On 8/27/20 1:00 PM, Andrew Zaborowski wrote:
+> On Thu, 27 Aug 2020 at 19:37, Denis Kenzior <denkenz@gmail.com> wrote:
+>> Hi Andrew,
+>>
+>>>> I do wonder why you decided to make authorized_macs into a double-leve=
+l array
+>>>> instead of just a flat one...  You can always realloc if you need to g=
+row it..
+>>>
+>>> Right, I thought it's just more natural when you can access n'th
+>>> element with array[n], or you can iterate like over a list like I did
+>>> here.
+>>> And you don't need to make assumptions about the length of the array.
+>>
+>> That just seems so wasteful though?  I mean each pointer is 8 bytes on 6=
+4-bit,
+>> more than you pay for the mac address itself.  Plus god knows how much y=
+ou pay
+>> in malloc overhead.  No point being wasteful unnecessarily.
+> =
 
- struct ap_state {
-@@ -91,6 +92,8 @@ struct sta_state {
- 	struct eapol_sm *sm;
- 	struct handshake_state *hs;
- 	uint32_t gtk_query_cmd_id;
-+	struct l_idle *stop_handshake_work;
-+	struct l_settings *wsc_settings;
- 	uint8_t wsc_uuid_e[16];
- };
- =
+> In theory that makes sense, so yes, let me switch to an uint8_t array.
+> =
 
-@@ -130,6 +133,23 @@ static void ap_stop_handshake(struct sta_state *sta)
- 		handshake_state_free(sta->hs);
- 		sta->hs =3D NULL;
- 	}
-+
-+	if (sta->wsc_settings) {
-+		l_settings_free(sta->wsc_settings);
-+		sta->wsc_settings =3D NULL;
-+	}
-+
-+	if (sta->stop_handshake_work) {
-+		l_idle_remove(sta->stop_handshake_work);
-+		sta->stop_handshake_work =3D NULL;
-+	}
-+}
-+
-+static void ap_stop_handshake_work(struct l_idle *idle, void *user_data)
-+{
-+	struct sta_state *sta =3D user_data;
-+
-+	ap_stop_handshake(sta);
- }
- =
+> In practice there's going to be zero or one address and there can be
+> only one such array per netdev.
 
- static void ap_sta_free(void *data)
-@@ -561,6 +581,44 @@ static uint32_t ap_send_mgmt_frame(struct ap_state *ap,
- 	return id;
- }
- =
+Right, which is why I'd just use a single mac for now until you actually ha=
+ve a =
 
-+static void ap_start_handshake(struct sta_state *sta)
-+{
-+	struct ap_state *ap =3D sta->ap;
-+	const uint8_t *own_addr =3D netdev_get_address(ap->netdev);
-+	struct ie_rsn_info rsn;
-+	uint8_t bss_rsne[24];
-+
-+	handshake_state_set_ssid(sta->hs, (void *) ap->config->ssid,
-+					strlen(ap->config->ssid));
-+	handshake_state_set_authenticator_address(sta->hs, own_addr);
-+	handshake_state_set_supplicant_address(sta->hs, sta->addr);
-+
-+	ap_set_rsn_info(ap, &rsn);
-+	/*
-+	 * Note: This assumes the length that ap_set_rsn_info() requires. If
-+	 * ap_set_rsn_info() changes then this will need to be updated.
-+	 */
-+	ie_build_rsne(&rsn, bss_rsne);
-+	handshake_state_set_authenticator_ie(sta->hs, bss_rsne);
-+
-+	sta->sm =3D eapol_sm_new(sta->hs);
-+	if (!sta->sm) {
-+		ap_stop_handshake(sta);
-+		l_error("could not create sm object");
-+		goto error;
-+	}
-+
-+	eapol_sm_set_listen_interval(sta->sm, sta->listen_interval);
-+
-+	eapol_register(sta->sm);
-+	eapol_start(sta->sm);
-+
-+	return;
-+
-+error:
-+	ap_del_station(sta, MMPDU_REASON_CODE_UNSPECIFIED, true);
-+}
-+
- static void ap_handshake_event(struct handshake_state *hs,
- 		enum handshake_event event, void *user_data, ...)
- {
-@@ -588,53 +646,18 @@ static void ap_handshake_event(struct handshake_state=
- *hs,
- =
+use for multiple ones.  Keeps the code simple as well.
 
- static void ap_start_rsna(struct sta_state *sta, const uint8_t *gtk_rsc)
- {
--	struct ap_state *ap =3D sta->ap;
--	struct netdev *netdev =3D sta->ap->netdev;
--	const uint8_t *own_addr =3D netdev_get_address(netdev);
--	struct ie_rsn_info rsn;
--	uint8_t bss_rsne[24];
--
--	ap_set_rsn_info(ap, &rsn);
--	/*
--	 * TODO: This assumes the length that ap_set_rsn_info() requires. If
--	 * ap_set_rsn_info() changes then this will need to be updated.
--	 */
--	ie_build_rsne(&rsn, bss_rsne);
--
- 	/* this handshake setup assumes PSK network */
--	sta->hs =3D netdev_handshake_state_new(netdev);
--
--	handshake_state_set_event_func(sta->hs, ap_handshake_event, sta);
--	handshake_state_set_ssid(sta->hs, (void *) ap->config->ssid,
--					strlen(ap->config->ssid));
-+	sta->hs =3D netdev_handshake_state_new(sta->ap->netdev);
- 	handshake_state_set_authenticator(sta->hs, true);
--	handshake_state_set_authenticator_ie(sta->hs, bss_rsne);
-+	handshake_state_set_event_func(sta->hs, ap_handshake_event, sta);
- 	handshake_state_set_supplicant_ie(sta->hs, sta->assoc_rsne);
--	handshake_state_set_pmk(sta->hs, ap->pmk, 32);
--	handshake_state_set_authenticator_address(sta->hs, own_addr);
--	handshake_state_set_supplicant_address(sta->hs, sta->addr);
-+	handshake_state_set_pmk(sta->hs, sta->ap->pmk, 32);
- =
+> =
 
- 	if (gtk_rsc)
--		handshake_state_set_gtk(sta->hs, ap->gtk, ap->gtk_index,
--					gtk_rsc);
--
--	sta->sm =3D eapol_sm_new(sta->hs);
--	if (!sta->sm) {
--		handshake_state_free(sta->hs);
--		sta->hs =3D NULL;
--		l_error("could not create sm object");
--		goto error;
--	}
--
--	eapol_sm_set_listen_interval(sta->sm, sta->listen_interval);
-+		handshake_state_set_gtk(sta->hs, sta->ap->gtk,
-+					sta->ap->gtk_index, gtk_rsc);
- =
+>>
+>>>>
+>>>> I think eventually we probably want to make this a proper API.  like
+>>>> ap_config_new, ap_config_set_ssid, ap_config_set_passphrase, etc.
+>>>
+>>> Do you mean eventually, or now?  I personally would prefer l_settings
+>>> over that, once you add accessors it loses the benefit of a nice
+>>> struct that can be read and written easily.
+>>>
+>> But this can be defined inside ap.c.  So opaque only to clients of ap.c.
+> =
 
--	eapol_register(sta->sm);
--	eapol_start(sta->sm);
--
--	return;
--
--error:
--	ap_del_station(sta, MMPDU_REASON_CODE_UNSPECIFIED, true);
-+	ap_start_handshake(sta);
- }
- =
+> I still can't see a benefit though (it's more code for the ap.c
+> developer and more code for the user, possibly more bureaucracy (more
+> back and forth on the mailing list to add a parameter).  I guess it's
+> a question of preference, you may like a specific style enough that it
+> outweights that.
 
- static void ap_gtk_query_cb(struct l_genl_msg *msg, void *user_data)
-@@ -673,6 +696,105 @@ static bool ap_wsc_pbc_record_expire(void *data, void=
- *user_data)
- 	return true;
- }
- =
+I'd argue the opposite.  In the longer term you can transform the ap_config =
 
-+static void ap_stop_handshake_schedule(struct sta_state *sta)
-+{
-+	if (sta->stop_handshake_work)
-+		return;
-+
-+	sta->stop_handshake_work =3D l_idle_create(ap_stop_handshake_work,
-+							sta, NULL);
-+}
-+
-+static void ap_wsc_handshake_event(struct handshake_state *hs,
-+		enum handshake_event event, void *user_data, ...)
-+{
-+	struct sta_state *sta =3D user_data;
-+	va_list args;
-+	struct ap_event_registration_success_data event_data;
-+	struct ap_pbc_record_expiry_data expiry_data;
-+
-+	va_start(args, user_data);
-+
-+	switch (event) {
-+	case HANDSHAKE_EVENT_FAILED:
-+		sta->sm =3D NULL;
-+		ap_stop_handshake_schedule(sta);
-+		/*
-+		 * Some diagrams in WSC v2.0.5 indicate we should
-+		 * automatically deauthenticate the Enrollee.  The text
-+		 * generally indicates the Enrollee may disassociate
-+		 * meaning that we should neither deauthenticate nor
-+		 * disassociate it automatically.  Some places indicate
-+		 * that the enrollee can send a new EAPoL-Start right away
-+		 * on an unsuccessful registration, we don't implement
-+		 * this for now.  STA remains associated but not authorized
-+		 * and basically has no other option than to re-associate
-+		 * or disassociate/deauthenticate.
-+		 */
-+		break;
-+	case HANDSHAKE_EVENT_EAP_NOTIFY:
-+		if (va_arg(args, unsigned int) !=3D EAP_WSC_EVENT_CREDENTIAL_SENT)
-+			break;
-+
-+		/*
-+		 * WSC v2.0.5 Section 11.3:
-+		 * "If the Registrar successfully runs the PBC method to
-+		 * completion with an Enrollee, that Enrollee's probe requests
-+		 * are removed from the Monitor Time check the next time the
-+		 * Registrar's PBC button is pressed."
-+		 */
-+		expiry_data.min_time =3D 0;
-+		expiry_data.mac =3D sta->addr;
-+		l_queue_foreach_remove(sta->ap->wsc_pbc_probes,
-+					ap_wsc_pbc_record_expire,
-+					&expiry_data);
-+
-+		event_data.mac =3D sta->addr;
-+		sta->ap->event_func(AP_EVENT_REGISTRATION_SUCCESS, &event_data,
-+					sta->ap->user_data);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	va_end(args);
-+}
-+
-+static void ap_start_eap_wsc(struct sta_state *sta)
-+{
-+	struct ap_state *ap =3D sta->ap;
-+	L_AUTO_FREE_VAR(char *, uuid_r_str) =3D NULL;
-+	L_AUTO_FREE_VAR(char *, uuid_e_str) =3D NULL;
-+
-+	uuid_r_str =3D l_util_hexstring(ap->wsc_uuid_r, 16);
-+	uuid_e_str =3D l_util_hexstring(sta->wsc_uuid_e, 16);
-+
-+	sta->wsc_settings =3D l_settings_new();
-+	l_settings_set_string(sta->wsc_settings, "Security", "EAP-Method",
-+				"WSC-R");
-+	l_settings_set_string(sta->wsc_settings, "WSC", "EnrolleeMAC",
-+				util_address_to_string(sta->addr));
-+	l_settings_set_string(sta->wsc_settings, "WSC", "UUID-R",
-+				uuid_r_str);
-+	l_settings_set_string(sta->wsc_settings, "WSC", "UUID-E",
-+				uuid_e_str);
-+	l_settings_set_uint(sta->wsc_settings, "WSC", "RFBand",
-+				WSC_RF_BAND_2_4_GHZ);
-+	l_settings_set_uint(sta->wsc_settings, "WSC", "ConfigurationMethods",
-+				WSC_CONFIGURATION_METHOD_PUSH_BUTTON);
-+	l_settings_set_string(sta->wsc_settings, "WSC", "WPA2-SSID",
-+				ap->config->ssid);
-+	l_settings_set_string(sta->wsc_settings, "WSC", "WPA2-Passphrase",
-+				ap->config->psk);
-+
-+	sta->hs =3D netdev_handshake_state_new(ap->netdev);
-+	handshake_state_set_authenticator(sta->hs, true);
-+	handshake_state_set_event_func(sta->hs, ap_wsc_handshake_event, sta);
-+	handshake_state_set_8021x_config(sta->hs, sta->wsc_settings);
-+
-+	ap_start_handshake(sta);
-+}
-+
- static struct l_genl_msg *ap_build_cmd_del_key(struct ap_state *ap)
- {
- 	uint32_t ifindex =3D netdev_get_ifindex(ap->netdev);
-@@ -739,6 +861,19 @@ static void ap_associate_sta_cb(struct l_genl_msg *msg=
-, void *user_data)
- 		return;
- 	}
- =
+internals without affecting any clients.  Anyhow, this is not really import=
+ant =
 
-+	/*
-+	 * WSC v2.0.5 Section 8.2:
-+	 * "Therefore if a WSC IE is present in the (re)association request,
-+	 * the AP shall engage in EAP-WSC with the station and shall not
-+	 * attempt any other security handshake."
-+	 *
-+	 * So no need for group traffic, skip the GTK setup below.
-+	 */
-+	if (!sta->assoc_rsne) {
-+		ap_start_eap_wsc(sta);
-+		return;
-+	}
-+
- 	/*
- 	 * Set up the group key.  If this is our first STA then we have
- 	 * to add the new GTK to the kernel.  In theory we should be
--- =
+right now.  Feel free to proceed with the setup you have now.
 
-2.25.1
+> =
 
---===============6406051373479516274==--
+> Also l_settings is aonther option.
+
+I know, and I told you to just pick one with the warning that ap_settings w=
+ill =
+
+likely end up having a more complex API in the long term.
+
+> =
+
+>> Do you
+>> need to access the struct elsewhere?
+> =
+
+> I was thinking hypothetically a user could access config->channel
+> after ap_start to learn what channel has been selected.
+
+That seems like a candidate for ap_foo API.
+
+> =
+
+>> If so, then the whole blurb in the
+>> documentation about ap_start taking ownership isn't really true...
+> =
+
+> If your structs aren't opaque then you don't need to own the struct to
+> access it, you only need to adhere to instructions.  For example,
+> don't acccess the struct after the owner has been freed.
+
+Don't even think about it ;)  iwd is now roughly ~80kloc.  What you suggest=
+ will =
+
+break down quick at this level of complexity.
+
+Regards,
+Denis
+--===============1791126817926419422==--
 
