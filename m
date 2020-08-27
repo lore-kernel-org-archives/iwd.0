@@ -1,146 +1,203 @@
-Content-Type: multipart/mixed; boundary="===============0545863295363323561=="
+Content-Type: multipart/mixed; boundary="===============7541806402635901080=="
 MIME-Version: 1.0
-From: Caleb Jorden <caljorden@hotmail.com>
-Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
-Date: Wed, 26 Aug 2020 11:53:40 +0000
-Message-ID: <
- <BYAPR11MB330220A142626180FB9EA427B9540@BYAPR11MB3302.namprd11.prod.outlook.com>>
-In-Reply-To: <b34f7644-a495-4845-0a00-0aebf4b9db52@molgen.mpg.de>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/2] ap: Move AP parameters to a struct
+Date: Thu, 27 Aug 2020 12:02:56 -0500
+Message-ID: <d3979177-37af-db20-1e49-0ff6bc871547@gmail.com>
+In-Reply-To: <20200826001854.502627-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0545863295363323561==
+--===============7541806402635901080==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+Hi Andrew,
 
-I just tested this on Linus' master (2ac69819ba9e3d8d550bb5d2d2df74848e5568=
-12), and found that the same problem occurs at that commit as well.  Here a=
-re the error logs I saw during that testing:
-
-[   45.218808] wlan0: authenticate with <redacted>:60
-[   45.222792] wlan0: send auth to <redacted>:60 (try 1/3)
-[   45.226697] wlan0: authenticated
-[   45.229196] wlan0: associate with <redacted>:60 (try 1/3)
-[   45.233866] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 status=
-=3D0 aid=3D38)
-[   45.235387] wlan0: associated
-[   46.257036] wlan0: deauthenticating from <redacted>:60 by local choice (=
-Reason: 23=3DIEEE8021X_FAILED)
-[   46.730240] wlan0: authenticate with <redacted>:22
-[   46.734345] wlan0: send auth to <redacted>:22 (try 1/3)
-[   46.737865] wlan0: authenticated
-[   46.742639] wlan0: associate with <redacted>:22 (try 1/3)
-[   46.746504] wlan0: RX AssocResp from <redacted>:22 (capab=3D0x411 status=
-=3D0 aid=3D2)
-[   46.748151] wlan0: associated
-[   47.775960] wlan0: deauthenticating from <redacted>:22 by local choice (=
-Reason: 23=3DIEEE8021X_FAILED)
-[   48.245880] wlan0: authenticate with <redacted>:60
-[   48.249935] wlan0: send auth to <redacted>:60 (try 1/3)
-[   48.254369] wlan0: authenticated
-[   48.259110] wlan0: associate with <redacted>:60 (try 1/3)
-[   48.265055] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 status=
-=3D0 aid=3D38)
-[   48.266457] wlan0: associated
-[   49.292635] wlan0: deauthenticating from <redacted>:60 by local choice (=
-Reason: 23=3DIEEE8021X_FAILED)
+On 8/25/20 7:18 PM, Andrew Zaborowski wrote:
+> To limit the number of ap_start parameters, group basic AP config
+> parameters in the ap_config struct that is passed as a pointer and owned
+> by the ap_state.
+> ---
+>   src/ap.c | 134 +++++++++++++++++++++++++++++++------------------------
+>   src/ap.h |  23 ++++++++--
+>   2 files changed, 96 insertions(+), 61 deletions(-)
+> =
 
 
+<snip>
 
-________________________________________
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-Sent: Wednesday, August 26, 2020 11:48 AM
-To: Caleb Jorden; Herbert Xu; Sasha Levin
-Cc: iwd(a)lists.01.org; stable(a)vger.kernel.org; Greg KH; LKML; David S. M=
-iller; linux-crypto(a)vger.kernel.org
-Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
+> @@ -94,6 +90,30 @@ struct sta_state {
+>   =
+
+>   static uint32_t netdev_watch;
+>   =
+
+> +void ap_config_free(struct ap_config *config)
+> +{
+> +	if (unlikely(!config))
+> +		return;
+> +
+> +	l_free(config->ssid);
+> +
+> +	if (config->psk) {
+> +		explicit_bzero(config->psk, strlen(config->psk));
+> +		l_free(config->psk);
+> +	}
+> +
+> +	if (config->authorized_macs) {
+> +		uint8_t **mac;
+> +
+> +		for (mac =3D config->authorized_macs; *mac; mac++)
+> +			l_free(mac);
+
+Do you mean l_free(*mac) here?
+
+> +
+> +		l_free(config->authorized_macs);
+
+But really, this is probably way better written as a while loop with array =
+indexing.
+
+int i =3D 0;
+uint8_t *mac;
+while (mac =3D config->authorized_macs[i++))
+	l_free(mac);
+
+l_free(config->authorized_macs);
+
+I do wonder why you decided to make authorized_macs into a double-level arr=
+ay =
+
+instead of just a flat one...  You can always realloc if you need to grow i=
+t..
+
+> +	}
+> +
+> +	l_free(config);
+> +}
+> +
+>   static void ap_sta_free(void *data)
+>   {
+>   	struct sta_state *sta =3D data;
+
+<snip>
+
+> @@ -1247,14 +1271,14 @@ static void ap_auth_cb(const struct mmpdu_header =
+*hdr, const void *body,
+>   			memcmp(hdr->address_3, bssid, 6))
+>   		return;
+>   =
+
+> -	if (ap->authorized_macs) {
+> -		int i;
+> +	if (ap->config->authorized_macs) {
+> +		uint8_t *const *mac;
+>   =
+
+> -		for (i =3D 0; i < ap->authorized_macs_num; i++)
+> -			if (!memcmp(from, ap->authorized_macs + i * 6, 6))
+> +		for (mac =3D ap->config->authorized_macs; *mac; mac++)
+> +			if (!memcmp(from, *mac, 6))
+>   				break;
+
+Maybe consider a while loop here as well...
+
+>   =
+
+> -		if (i =3D=3D ap->authorized_macs_num) {
+> +		if (!*mac) {
+>   			ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
+>   			return;
+>   		}
+
+<snip>
+
+> @@ -1462,11 +1487,14 @@ static void ap_mlme_notify(struct l_genl_msg *msg=
+, void *user_data)
+>    * @event_func is required and must react to AP_EVENT_START_FAILED
+>    * and AP_EVENT_STOPPING by forgetting the ap_state struct, which
+>    * is going to be freed automatically.
+> - * @channel is optional.
+> + * In the @config struct only .ssid and .psk need to be non-NUL,
+> + * other fields are optional.  If @ap_start succeeds, the returned
+> + * ap_state takes ownership of @config and the caller shouldn't
+> + * free it or any of the memory pointed to by its members (they
+> + * also can't be static).  In principle there's no reason that the
+> + * caller shouldn't read/update some of the members though.
+>    */
+
+I think eventually we probably want to make this a proper API.  like =
+
+ap_config_new, ap_config_set_ssid, ap_config_set_passphrase, etc.
+
+> -struct ap_state *ap_start(struct netdev *netdev, const char *ssid,
+> -				const char *psk, int channel, bool no_cck_rates,
+> -				const uint8_t **authorized_macs,
+> +struct ap_state *ap_start(struct netdev *netdev, struct ap_config *confi=
+g,
+>   				ap_event_func_t event_func, void *user_data)
+
+But this now looks much more manageable...
+
+>   {
+>   	struct ap_state *ap;
+
+<snip>
+
+> diff --git a/src/ap.h b/src/ap.h
+> index b007b657..3ca9467f 100644
+> --- a/src/ap.h
+> +++ b/src/ap.h
+> @@ -41,13 +41,30 @@ struct ap_event_station_removed_data {
+>   	enum mmpdu_reason_code reason;
+>   };
+>   =
+
+> +struct ap_event_registration_started_data {
+> +	const uint8_t *mac;
+> +	const struct iovec *assoc_ies;
+> +};
+> +
+> +struct ap_event_registration_success_data {
+> +	const uint8_t *mac;
+> +};
+> +
+
+These don't seem to belong to this patch...
+
+>   typedef void (*ap_event_func_t)(enum ap_event_type type, const void *ev=
+ent_data,
+>   				void *user_data);
+>   typedef void (*ap_stopped_func_t)(void *user_data);
+>   =
+
+> -struct ap_state *ap_start(struct netdev *netdev, const char *ssid,
+> -				const char *psk, int channel, bool no_cck_rates,
+> -				const uint8_t **authorized_macs,
+> +struct ap_config {
+> +	char *ssid;
+> +	char *psk;
+> +	uint8_t channel;
+> +	uint8_t **authorized_macs;
+> +	bool no_cck_rates : 1;
+> +};
+> +
+
+Adding a ap_config_new and setters would allow making this structure opaque.
+
+> +void ap_config_free(struct ap_config *config);
+> +
+> +struct ap_state *ap_start(struct netdev *netdev, struct ap_config *confi=
+g,
+>   				ap_event_func_t event_func, void *user_data);
+>   void ap_shutdown(struct ap_state *ap, ap_stopped_func_t stopped_func,
+>   			void *user_data);
+> =
 
 
-Dear Caleb,
-
-
-Thank you for the report. Linux has a no regression policy, so the
-correct forum to report this to is the Linux kernel folks. I am adding
-the crypto and stable folks to the receiver list.
-
-Am 26.08.20 um 07:51 schrieb caljorden(a)hotmail.com:
-
-> I wanted to note an issue that I have hit with iwd when I upgraded to
-> the Linux 5.8.3 stable kernel.  My office network uses WPA Enterprise
-> with EAP-PEAPv0 + MSCHAPv2.  When using this office network,
-> upgrading to Linux 5.8.3 caused my system to refuse to associate
-> successfully to the network.  I get the following in my dmesg logs:
->
-> [   40.846535] wlan0: authenticate with <redacted>:60
-> [   40.850570] wlan0: send auth to <redacted>:60 (try 1/3)
-> [   40.854627] wlan0: authenticated
-> [   40.855992] wlan0: associate with <redacted>:60 (try 1/3)
-> [   40.860450] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 stat=
-us=3D0 aid=3D11)
-> [   40.861620] wlan0: associated
-> [   41.886503] wlan0: deauthenticating from <redacted>:60 by local choice=
- (Reason: 23=3DIEEE8021X_FAILED)
-> [   42.360127] wlan0: authenticate with <redacted>:22
-> [   42.364584] wlan0: send auth to <redacted>:22 (try 1/3)
-> [   42.370821] wlan0: authenticated
-> [   42.372658] wlan0: associate with <redacted>:22 (try 1/3)
-> [   42.377426] wlan0: RX AssocResp from <redacted>:22 (capab=3D0x411 stat=
-us=3D0 aid=3D15)
-> [   42.378607] wlan0: associated
-> [   43.402009] wlan0: deauthenticating from <redacted>:22 by local choice=
- (Reason: 23=3DIEEE8021X_FAILED)
-> [   43.875921] wlan0: authenticate with <redacted>:60
-> [   43.879988] wlan0: send auth to <redacted>:60 (try 1/3)
-> [   43.886244] wlan0: authenticated
-> [   43.889273] wlan0: associate with <redacted>:60 (try 1/3)
-> [   43.894586] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 stat=
-us=3D0 aid=3D11)
-> [   43.896077] wlan0: associated
-> [   44.918504] wlan0: deauthenticating from <redacted>:60 by local choice=
- (Reason: 23=3DIEEE8021X_FAILED)
->
-> This continues as long as I let iwd run.
->
-> I downgraded back to Linux 5.8.2, and verified that everything works
-> as expected.  I also tried using Linux 5.8.3 on a different system at
-> my home, which uses WPA2-PSK.  It worked fine (though it uses an
-> Atheros wireless card instead of an Intel card - but I assume that is
-> irrelevant).
->
-> I decided to try to figure out what caused the issue in the changes
-> for Linux 5.8.3.  I assumed that it was something that changed in the
-> crypto interface, which limited my bisection to a very few commits.
-> Sure enough, I found that if I revert commit
-> e91d82703ad0bc68942a7d91c1c3d993e3ad87f0 (crypto: algif_aead - Only
-> wake up when ctx->more is zero), the problem goes away and I am able
-> to associate to my WPA Enterprise network successfully, and use it.
-> I found that in order to revert this commit, I also first had to
-> revert 465c03e999102bddac9b1e132266c232c5456440 (crypto: af_alg - Fix
-> regression on empty requests), because the two commits have coupled
-> changes.
->
-> I normally would have assumed that this should be sent to the kernel
-> list, but I thought I would first mention it here because of what I
-> found in some email threads on the Linux-Crypto list about the crypto
-> interfaces to the kernel being sub-optimal and needing to be fixed.
-> The changes in these commits look like they are just trying to fix
-> what could be broken interfaces, so I thought that it would make
-> sense to see what the iwd team thinks about the situation first.
->
-> The wireless card I was using during this testing is an Intel
-> Wireless 3165 (rev 81).  If there is any additional information I
-> could help provide, please let me know.
-
-It=E2=80=99d be great, if you verified, if the problem occurs with Linus=E2=
-=80=99 master
-branch too.
-
-
-Kind regards,
-
-Paul
---===============0545863295363323561==--
+Regards,
+-Denis
+--===============7541806402635901080==--
 
