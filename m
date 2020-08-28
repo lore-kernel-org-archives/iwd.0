@@ -1,74 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============1484186927909713562=="
+Content-Type: multipart/mixed; boundary="===============8763983390206147978=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 09/15] auto-t: fix hidden network test
-Date: Fri, 28 Aug 2020 11:47:33 -0700
-Message-ID: <20200828184739.8616-10-prestwoj@gmail.com>
+Subject: [PATCH v3 10/15] auto-t: fix testSAE autoconnect_test.py
+Date: Fri, 28 Aug 2020 11:47:34 -0700
+Message-ID: <20200828184739.8616-11-prestwoj@gmail.com>
 In-Reply-To: <20200828184739.8616-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1484186927909713562==
+--===============8763983390206147978==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This test was never 100% reliable, and after the test-runner re-write
-it became extremely unreliable. The issue came down to the very common
-block of code thats present in many tests where we wait for obj.scanning
-then not obj.scanning. This is fine when a dbus scan() is explicitly
-done before, otherwise it could lead to problems. Without a dbus scan
-explicitly called we are assuming a periodic scan will happen. If it
-already happen the initial wait for obj.scanning will never return and
-time out.
-
-This probably needs to be changed in several tests, but for this specific
-case we can remove the waits completely. Since
-check_autoconnect_hidden_network has a 30 second wait on
-DeviceState.connected this will ultimately time out if anything goes
-wrong. There isn't any great reason to wait for scanning (for this test
-specifically).
-
-A minor style change was also made when initializing IWD. The values
-passed in this test are now the default, so no arguments need to be
-passed.
+This test was unreliable since it was assuming a periodic scan would
+happen at just the right time. Instead since we are expecting autoconnect
+we can just wait for DeviceState.connected then after we are connected
+verify the network was correct.
 ---
- autotests/testHiddenNetworks/validation.py | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ autotests/testSAE/autoconnect_test.py | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
 
-diff --git a/autotests/testHiddenNetworks/validation.py b/autotests/testHid=
-denNetworks/validation.py
-index 9c433623..991a5b32 100644
---- a/autotests/testHiddenNetworks/validation.py
-+++ b/autotests/testHiddenNetworks/validation.py
-@@ -50,11 +50,6 @@ class TestConnectAutoConnect(unittest.TestCase):
-         device =3D devices[0]
+diff --git a/autotests/testSAE/autoconnect_test.py b/autotests/testSAE/auto=
+connect_test.py
+index a45fd09d..2eb73b7f 100644
+--- a/autotests/testSAE/autoconnect_test.py
++++ b/autotests/testSAE/autoconnect_test.py
+@@ -23,20 +23,15 @@ class Test(unittest.TestCase):
+         devices[2].disconnect()
+         devices[3].disconnect()
  =
 
-         if autoconnect:
--            condition =3D 'obj.scanning'
--            wd.wait_for_object_condition(device, condition)
--            condition =3D 'not obj.scanning'
--            wd.wait_for_object_condition(device, condition)
--
-             self.check_autoconnect_hidden_network(wd, device, ssid, throws)
-         else:
-             if wait_periodic_scan:
-@@ -71,7 +66,6 @@ class TestConnectAutoConnect(unittest.TestCase):
+-        condition =3D 'obj.scanning'
+-        wd.wait_for_object_condition(device, condition)
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition, 30)
  =
 
-     def validate(self, ssid, autoconnect, throws =3D None, use_agent =3D F=
-alse,
-                                                     wait_periodic_scan =3D=
- False):
--        wd =3D IWD(True, '/tmp')
+-        condition =3D 'not obj.scanning'
++        condition =3D 'obj.connected_network is not None'
+         wd.wait_for_object_condition(device, condition)
+ =
+
+         ordered_network =3D device.get_ordered_network('ssidSAE')
+ =
+
+-        self.assertEqual(ordered_network.type, NetworkType.psk)
 -
+-        condition =3D 'obj.connected'
+-        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
+-
+-        device.wait_for_connected()
++        self.assertTrue(ordered_network.network_object.connected)
+ =
+
+         device.disconnect()
+ =
+
+@@ -44,7 +39,7 @@ class Test(unittest.TestCase):
+         wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
+ =
+
+     def test_connection_success(self):
+-        wd =3D IWD(True)
 +        wd =3D IWD()
-         self.validate_connection(wd, ssid, autoconnect, throws, use_agent,
-                                                         wait_periodic_scan)
+ =
+
+         self.validate_connection(wd)
+ =
+
 -- =
 
 2.21.1
 
---===============1484186927909713562==--
+--===============8763983390206147978==--
 
