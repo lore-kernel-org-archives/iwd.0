@@ -1,58 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============5217405044213977717=="
+Content-Type: multipart/mixed; boundary="===============8762716059541066915=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 04/15] auto-t: testutil.py: update to work with test-runner
- rewrite
-Date: Fri, 28 Aug 2020 11:47:28 -0700
-Message-ID: <20200828184739.8616-5-prestwoj@gmail.com>
+Subject: [PATCH v3 05/15] auto-t: ofono.py: fix timeout cleanup and wait for
+ service
+Date: Fri, 28 Aug 2020 11:47:29 -0700
+Message-ID: <20200828184739.8616-6-prestwoj@gmail.com>
 In-Reply-To: <20200828184739.8616-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5217405044213977717==
+--===============8762716059541066915==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Similar to the others, testutil.py was converted to use the global
-test context to lookup radios/interfaces rather than the wiphy_map
+Ofono.py was not cleaning up the timeout, nor waiting for the ofono.org
+service to come up before continuing.
 ---
- autotests/util/testutil.py | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ autotests/util/ofono.py | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
-diff --git a/autotests/util/testutil.py b/autotests/util/testutil.py
-index aaa4e7e1..0a94e23a 100644
---- a/autotests/util/testutil.py
-+++ b/autotests/util/testutil.py
-@@ -5,8 +5,8 @@ import fcntl
- import struct
- import select
+diff --git a/autotests/util/ofono.py b/autotests/util/ofono.py
+index 2bc6338b..f1ed14ee 100644
+--- a/autotests/util/ofono.py
++++ b/autotests/util/ofono.py
+@@ -1,4 +1,5 @@
+ import dbus
++import time
+ from gi.repository import GLib
  =
 
--import wiphy
- import iwd
-+from config import ctx
+ SIM_AUTH_IFACE =3D 'org.ofono.SimAuthentication'
+@@ -7,6 +8,14 @@ class Ofono(dbus.service.Object):
+     def __init__(self):
+         self._bus =3D dbus.SystemBus()
  =
 
- HWSIM_ETHERTYPE =3D 0x0800
- HWSIM_PACKETLEN =3D 250
-@@ -54,8 +54,9 @@ def tx(fromsock, tosock, src, dst):
- def test_connected(if0=3DNone, if1=3DNone, group=3DTrue):
-     if if0 is None or if1 is None:
-         iwd_list =3D [dev.name for dev in iwd.IWD.get_instance().list_devi=
-ces()]
--        non_iwd_list =3D [ifname for w in wiphy.wiphy_map.values()
--                for ifname in w.interface_map]
++        tries =3D 0
 +
-+        non_iwd_list =3D [rad.interface.name for rad in ctx.radios if rad.=
-interface is not None]
++        while not self._bus.name_has_owner('org.ofono'):
++            if tries > 100:
++                raise TimeoutError('Waiting for org.ofono service timed ou=
+t')
++            tries +=3D 1
++            time.sleep(0.1)
 +
-         for intf in iwd_list + non_iwd_list:
-             if if0 is None:
-                 if0 =3D intf
+     def enable_modem(self, path):
+         self._modem_path =3D path
+         self._modem_iface =3D dbus.Interface(
+@@ -37,11 +46,13 @@ class Ofono(dbus.service.Object):
+             self._wait_timed_out =3D True
+             return False
+ =
+
+-        timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
+-        context =3D mainloop.get_context()
+-        while (not self._sim_auth_up):
+-            context.iteration(may_block=3DTrue)
+-            if self._wait_timed_out:
+-                raise TimeoutError('waiting for SimAuthentication timed ou=
+t')
++        try:
++            timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
++            context =3D mainloop.get_context()
++            while (not self._sim_auth_up):
++                context.iteration(may_block=3DTrue)
++                if self._wait_timed_out:
++                    raise TimeoutError('waiting for SimAuthentication time=
+d out')
+ =
+
+-        GLib.source_remove(timeout)
++        finally:
++            GLib.source_remove(timeout)
 -- =
 
 2.21.1
 
---===============5217405044213977717==--
+--===============8762716059541066915==--
 
