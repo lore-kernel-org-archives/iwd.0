@@ -1,79 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============3047702464566579238=="
+Content-Type: multipart/mixed; boundary="===============4938378468185425136=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 10/15] auto-t: fix testSAE autoconnect_test.py
-Date: Fri, 28 Aug 2020 09:40:45 -0700
-Message-ID: <20200828164050.1456-11-prestwoj@gmail.com>
+Subject: [PATCH v2 12/15] auto-t: replace hard-coded interfaces
+Date: Fri, 28 Aug 2020 09:40:47 -0700
+Message-ID: <20200828164050.1456-13-prestwoj@gmail.com>
 In-Reply-To: <20200828164050.1456-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3047702464566579238==
+--===============4938378468185425136==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This test was unreliable since it was assuming a periodic scan would
-happen at just the right time. Instead since we are expecting autoconnect
-we can just wait for DeviceState.connected then after we are connected
-verify the network was correct.
+test-runner now supports interface name replacement inside hostapd
+config files. Since a given test configuration doesn't know what
+interface names there will be $ifaceN can be specified instead e.g.
+
+rsn_preauth_interfaces=3D$iface0 $iface1
+
+The $ifaceN values will be replace with actual interface names when
+the test is started.
+
+This patch also removes ctrl_interface inside the hostapd config
+files as this is no longer required.
 ---
- autotests/testSAE/autoconnect_test.py | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
+ autotests/testPreauth-roam/eaptls-preauth-1.conf | 3 +--
+ autotests/testPreauth-roam/eaptls-preauth-2.conf | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/autotests/testSAE/autoconnect_test.py b/autotests/testSAE/auto=
-connect_test.py
-index a45fd09d..2eb73b7f 100644
---- a/autotests/testSAE/autoconnect_test.py
-+++ b/autotests/testSAE/autoconnect_test.py
-@@ -23,20 +23,15 @@ class Test(unittest.TestCase):
-         devices[2].disconnect()
-         devices[3].disconnect()
+diff --git a/autotests/testPreauth-roam/eaptls-preauth-1.conf b/autotests/t=
+estPreauth-roam/eaptls-preauth-1.conf
+index 0c7f96a7..bc808ed7 100644
+--- a/autotests/testPreauth-roam/eaptls-preauth-1.conf
++++ b/autotests/testPreauth-roam/eaptls-preauth-1.conf
+@@ -2,7 +2,6 @@ hw_mode=3Dg
+ channel=3D1
+ ssid=3DTestPreauth
+ utf8_ssid=3D1
+-ctrl_interface=3D/var/run/hostapd
  =
 
--        condition =3D 'obj.scanning'
--        wd.wait_for_object_condition(device, condition)
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition, 30)
+ wpa=3D2
+ wpa_key_mgmt=3DWPA-EAP
+@@ -24,7 +23,7 @@ radius_server_auth_port=3D1812
+ nas_identifier=3Dtesteap1
  =
 
--        condition =3D 'not obj.scanning'
-+        condition =3D 'obj.connected_network is not None'
-         wd.wait_for_object_condition(device, condition)
+ rsn_preauth=3D1
+-rsn_preauth_interfaces=3Dwln0 wln1
++rsn_preauth_interfaces=3D$iface0 $iface1
+ disable_pmksa_caching=3D0
  =
 
-         ordered_network =3D device.get_ordered_network('ssidSAE')
+ # Allow PMK cache to be shared opportunistically among configured interfac=
+es
+diff --git a/autotests/testPreauth-roam/eaptls-preauth-2.conf b/autotests/t=
+estPreauth-roam/eaptls-preauth-2.conf
+index bddcca69..6d3a18e7 100644
+--- a/autotests/testPreauth-roam/eaptls-preauth-2.conf
++++ b/autotests/testPreauth-roam/eaptls-preauth-2.conf
+@@ -2,7 +2,6 @@ hw_mode=3Dg
+ channel=3D2
+ ssid=3DTestPreauth
+ utf8_ssid=3D1
+-ctrl_interface=3D/var/run/hostapd
  =
 
--        self.assertEqual(ordered_network.type, NetworkType.psk)
--
--        condition =3D 'obj.connected'
--        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
--
--        device.wait_for_connected()
-+        self.assertTrue(ordered_network.network_object.connected)
+ wpa=3D2
+ wpa_key_mgmt=3DWPA-EAP
+@@ -20,7 +19,7 @@ auth_server_port=3D1812
+ auth_server_shared_secret=3Dsecret
  =
 
-         device.disconnect()
+ rsn_preauth=3D1
+-rsn_preauth_interfaces=3Dwln0 wln1
++rsn_preauth_interfaces=3D$iface0 $iface1
+ disable_pmksa_caching=3D0
  =
 
-@@ -44,7 +39,7 @@ class Test(unittest.TestCase):
-         wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
- =
-
-     def test_connection_success(self):
--        wd =3D IWD(True)
-+        wd =3D IWD()
- =
-
-         self.validate_connection(wd)
- =
-
+ # Allow PMK cache to be shared opportunistically among configured interfac=
+es
 -- =
 
 2.21.1
 
---===============3047702464566579238==--
+--===============4938378468185425136==--
 
