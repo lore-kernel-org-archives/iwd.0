@@ -1,46 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============6234812341222274608=="
+Content-Type: multipart/mixed; boundary="===============3165716975328667295=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 01/11] wscutil: Add wsc_build_beacon
-Date: Thu, 27 Aug 2020 19:12:03 -0500
-Message-ID: <d3beec71-07b0-edb6-1fdc-5ab560734b12@gmail.com>
-In-Reply-To: <CAOq732KP+Zub=SAcCQPOB5zBiN96eh6hON4yPQvDQt__0GG70Q@mail.gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/8] wscutil: Use a utility for building authorized_macs
+Date: Fri, 28 Aug 2020 14:46:42 +0200
+Message-ID: <20200828124649.78677-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6234812341222274608==
+--===============3165716975328667295==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Add the wfa_build_authorized_macs function (wfa_ prefix following the
+wfa_extract_ naming) and use it in wsc_build_probe_response.  The logic
+is changed slightly to treat the first 6-zeros address in the array as
+the end of the array.
+---
+ src/wscutil.c | 32 +++++++++++++++++---------------
+ 1 file changed, 17 insertions(+), 15 deletions(-)
 
->>> +     /* These two "should be provided" if dual-band */
->>> +     if (beacon->rf_bands & (beacon->rf_bands - 1)) {
->>
->> I probably missed this in the earlier review, but would it be more clear=
- to
->> check rf_bands & ~WSC_RF_BAND_2_4_GHZ here instead?
-> =
+diff --git a/src/wscutil.c b/src/wscutil.c
+index d78a0354..f15cd215 100644
+--- a/src/wscutil.c
++++ b/src/wscutil.c
+@@ -2094,6 +2094,20 @@ static void build_wsc_state(struct wsc_attr_builder =
+*builder,
+ 	wsc_attr_builder_put_u8(builder, 1);				\
+ 	wsc_attr_builder_put_u8(builder, 0x20)
+ =
 
-> That might be falsely triggered on a 5GHz-only AP.  I was gonna try
-> something like:
-> =
++static void wfa_build_authorized_macs(struct wsc_attr_builder *builder,
++				const uint8_t authorized_macs[static 30])
++{
++	int count;
++
++	for (count =3D 1; count < 5; count++)
++		if (util_mem_is_zero(authorized_macs + count * 6, 6))
++			break;
++
++	wsc_attr_builder_put_u8(builder, WSC_WFA_EXTENSION_AUTHORIZED_MACS);
++	wsc_attr_builder_put_u8(builder, count * 6);
++	wsc_attr_builder_put_bytes(builder, authorized_macs, count * 6);
++}
++
+ uint8_t *wsc_build_credential(const struct wsc_credential *in, size_t *out=
+_len)
+ {
+ 	struct wsc_attr_builder *builder;
+@@ -2204,21 +2218,9 @@ uint8_t *wsc_build_probe_response(
+ =
 
->    (rf_bands & 2_4_AND_5_MASK) =3D=3D 2_4_AND_5_MASK
-> =
+ 	START_WFA_VENDOR_EXTENSION();
+ =
 
-> as the condition, but ended up copying this from
-> wsc_build_probe_response, I can change it in both places.
+-	if (!util_mem_is_zero(probe_response->authorized_macs, 30)) {
+-		int count;
+-
+-		for (count =3D 1; count < 5; count++)
+-			if (util_mem_is_zero(probe_response->authorized_macs +
+-						count * 6, 30 - count * 6))
+-				break;
+-
+-		wsc_attr_builder_put_u8(builder,
+-					WSC_WFA_EXTENSION_AUTHORIZED_MACS);
+-		wsc_attr_builder_put_u8(builder, count * 6);
+-		wsc_attr_builder_put_bytes(builder,
+-					probe_response->authorized_macs,
+-					count * 6);
+-	}
++	if (!util_mem_is_zero(probe_response->authorized_macs, 6))
++		wfa_build_authorized_macs(builder,
++					probe_response->authorized_macs);
+ =
 
-So whats the intent here? Only including RF bands if multiple bits are set?=
-  If =
+ 	if (probe_response->reg_config_methods) {
+ 		wsc_attr_builder_put_u8(builder,
+-- =
 
-so then
+2.25.1
 
-__builtin_popcount(rf_bands) > 1 is what you want.
-
-Regards,
--Denis
---===============6234812341222274608==--
+--===============3165716975328667295==--
 
