@@ -1,64 +1,151 @@
-Content-Type: multipart/mixed; boundary="===============4598633347323397508=="
+Content-Type: multipart/mixed; boundary="===============6286829812431055393=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/8] eapol: Handle the use_eapol_start flag on authenticator
-Date: Fri, 28 Aug 2020 14:46:44 +0200
-Message-ID: <20200828124649.78677-3-andrew.zaborowski@intel.com>
+Subject: [PATCH 4/8] ap: Stop ongoing handshake on reassociation
+Date: Fri, 28 Aug 2020 14:46:45 +0200
+Message-ID: <20200828124649.78677-4-andrew.zaborowski@intel.com>
 In-Reply-To: <20200828124649.78677-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4598633347323397508==
+--===============6286829812431055393==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Reuse this flag on the authenticator side with a slightly different
-meaning: when it's true we're forced to wait for the EAPoL-Start before
-sending the first EAPoL-EAP frame to the supplicant, such as is required
-in a WSC enrollee registration when the Association Request didn't have
-a v2.0 WSC IE.
+On a new association or re-association, in addition to forgetting a
+complete RSN Association, also stop the EAPoL SM to stop any ongoing
+handshake.
+
+Do this in a new function ap_stop_handshake that is now used in a few
+places that had copies of the same few lines.  I'll be adding some more
+lines to this function for WSC support.
 ---
- src/eapol.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ src/ap.c | 51 +++++++++++++++++++++++++--------------------------
+ 1 file changed, 25 insertions(+), 26 deletions(-)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 2d339163..977f720b 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -2417,7 +2417,7 @@ bool eapol_start(struct eapol_sm *sm)
- 		sm->timeout =3D l_timeout_create(eapol_4way_handshake_time,
- 				eapol_timeout, sm, NULL);
+diff --git a/src/ap.c b/src/ap.c
+index bc8b11e8..fa7d030a 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -106,6 +106,19 @@ void ap_config_free(struct ap_config *config)
+ 	l_free(config);
+ }
  =
 
--	if (sm->use_eapol_start) {
-+	if (!sm->handshake->authenticator && sm->use_eapol_start) {
++static void ap_stop_handshake(struct sta_state *sta)
++{
++	if (sta->sm) {
++		eapol_sm_free(sta->sm);
++		sta->sm =3D NULL;
++	}
++
++	if (sta->hs) {
++		handshake_state_free(sta->hs);
++		sta->hs =3D NULL;
++	}
++}
++
+ static void ap_sta_free(void *data)
+ {
+ 	struct sta_state *sta =3D data;
+@@ -120,11 +133,7 @@ static void ap_sta_free(void *data)
+ 	if (sta->gtk_query_cmd_id)
+ 		l_genl_family_cancel(ap->nl80211, sta->gtk_query_cmd_id);
+ =
+
+-	if (sta->sm)
+-		eapol_sm_free(sta->sm);
+-
+-	if (sta->hs)
+-		handshake_state_free(sta->hs);
++	ap_stop_handshake(sta);
+ =
+
+ 	l_free(sta);
+ }
+@@ -180,14 +189,7 @@ static void ap_del_station(struct sta_state *sta, uint=
+16_t reason,
+ 		sta->gtk_query_cmd_id =3D 0;
+ 	}
+ =
+
+-	if (sta->sm)
+-		eapol_sm_free(sta->sm);
+-
+-	if (sta->hs)
+-		handshake_state_free(sta->hs);
+-
+-	sta->hs =3D NULL;
+-	sta->sm =3D NULL;
++	ap_stop_handshake(sta);
+ =
+
+ 	if (send_event)
+ 		ap->event_func(AP_EVENT_STATION_REMOVED, &event_data,
+@@ -268,14 +270,7 @@ static void ap_drop_rsna(struct sta_state *sta)
+ 		l_error("Issuing DEL_KEY failed");
+ 	}
+ =
+
+-	if (sta->sm)
+-		eapol_sm_free(sta->sm);
+-
+-	if (sta->hs)
+-		handshake_state_free(sta->hs);
+-
+-	sta->hs =3D NULL;
+-	sta->sm =3D NULL;
++	ap_stop_handshake(sta);
+ =
+
+ 	if (ap->event_func) {
+ 		struct ap_event_station_removed_data event_data =3D {};
+@@ -938,6 +933,12 @@ static void ap_assoc_reassoc(struct sta_state *sta, bo=
+ol reassoc,
+ 		goto unsupported;
+ 	}
+ =
+
++	/* 802.11-2016 11.3.5.3 j) */
++	if (sta->rsna)
++		ap_drop_rsna(sta);
++	else if (sta->associated)
++		ap_stop_handshake(sta);
++
+ 	if (!sta->associated) {
  		/*
- 		 * We start a short timeout, if EAP packets are not received
- 		 * from AP, then we send the EAPoL-Start
-@@ -2442,9 +2442,14 @@ bool eapol_start(struct eapol_sm *sm)
- 		if (!sm->protocol_version)
- 			sm->protocol_version =3D EAPOL_PROTOCOL_VERSION_2004;
+ 		 * Everything fine so far, assign an AID, send response.
+@@ -961,10 +962,6 @@ static void ap_assoc_reassoc(struct sta_state *sta, bo=
+ol reassoc,
  =
 
--		if (sm->handshake->settings_8021x)
--			eap_start(sm->eap);
--		else {
-+		if (sm->handshake->settings_8021x) {
-+			/*
-+			 * If we're allowed to, send EAP Identity request
-+			 * immediately, otherwise wait for an EAPoL-Start.
-+			 */
-+			if (!sm->use_eapol_start)
-+				eap_start(sm->eap);
-+		} else {
- 			if (L_WARN_ON(!sm->handshake->have_pmk))
- 				return false;
+ 	sta->assoc_rsne =3D l_memdup(rsn, rsn[1] + 2);
  =
 
+-	/* 802.11-2016 11.3.5.3 j) */
+-	if (sta->rsna)
+-		ap_drop_rsna(sta);
+-
+ 	sta->assoc_resp_cmd_id =3D ap_assoc_resp(ap, sta, sta->addr, sta->aid, 0,
+ 						reassoc,
+ 						ap_success_assoc_resp_cb);
+@@ -987,8 +984,10 @@ bad_frame:
+ 	 *
+ 	 * For now, we need to drop the RSNA.
+ 	 */
+-	if (sta->associated && sta->rsna)
++	if (sta->rsna)
+ 		ap_drop_rsna(sta);
++	else if (sta->associated)
++		ap_stop_handshake(sta);
+ =
+
+ 	if (rates)
+ 		l_uintset_free(rates);
 -- =
 
 2.25.1
 
---===============4598633347323397508==--
+--===============6286829812431055393==--
 
