@@ -1,118 +1,119 @@
-Content-Type: multipart/mixed; boundary="===============3123818655655400549=="
+Content-Type: multipart/mixed; boundary="===============8685464494638666206=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] ap: Pass extra IEs between mgmt frames and user
-Date: Fri, 28 Aug 2020 11:27:12 -0500
-Message-ID: <35504e30-96d9-703d-ca49-371642de390f@gmail.com>
-In-Reply-To: <20200828152512.86105-1-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 00/15] Test Runner rewrite
+Date: Fri, 28 Aug 2020 09:40:35 -0700
+Message-ID: <20200828164050.1456-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3123818655655400549==
+--===============8685464494638666206==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+**-v2:
+ * Remove hwsim returning radio ID, and updated test-runner to track
+   ID internally.
 
-On 8/28/20 10:25 AM, Andrew Zaborowski wrote:
-> Allow passing user callbacks to add extra IEs to the AP's beacons and
-> other frames.  I considered a few ways for the user to pass this data
-> without callbacks but so far this seems to be the easiest and most
-> versatile way.  Unfortunately the config is no longer static in a way
-> that could be completely contained in an l_settings for example.
+James Prestwood (15):
+  auto-t: prepare autotests for test-runner re-write
+  auto-t: introduce pure python test-runner re-write
+  auto-t: hostapd.py: update to work with test-runner rewrite
+  auto-t: testutil.py: update to work with test-runner rewrite
+  auto-t: ofono.py: fix timeout cleanup and wait for service
+  auto-t: iwd.py: update to work with test-runner rewrite
+  auto-t: iwd.py: fix multiple timeout cleanup issues
+  auto-t: remove wiphy.py
+  auto-t: fix hidden network test
+  auto-t: fix testSAE autoconnect_test.py
+  auto-t: skip ofono tests if ofonod isn't running
+  auto-t: replace hard-coded interfaces
+  auto-t: remove device.wait_for_connected
+  tools: post test-runner rewrite cleanup
+  doc: update test runner docs
 
-So this is for WFD I take it?
+ .gitignore                                    |    1 -
+ Makefile.am                                   |    7 -
+ .../{test.py =3D> connection_test.py}           |    0
+ .../testAP/{test.py =3D> connection_test.py}    |    9 +-
+ autotests/testAP/failure_test.py              |    6 +-
+ autotests/testAPRoam/connection_test.py       |    2 -
+ .../testBSSBlacklist/all_blacklisted_test.py  |    4 -
+ autotests/testBSSBlacklist/bad_pass_test.py   |    4 -
+ autotests/testBSSBlacklist/connection_test.py |    1 -
+ .../testBSSBlacklist/temp_blacklist_test.py   |    4 -
+ .../connect_command_test.py                   |   42 +-
+ .../disconnect_by_ap_test.py                  |    4 +-
+ .../testEAP-AKA-ofono/connection_test.py      |    4 +
+ .../connection_test.py                        |    4 +
+ autotests/testEAP-AKA/connection_test.py      |    1 -
+ .../testEAP-PEAPv0-CryptoBinding/ISK_test.py  |    1 -
+ .../NoISK_test.py                             |    1 -
+ .../testEAP-PEAPv0-CryptoBinding/main.conf    |    2 -
+ autotests/testEAP-PWD/connection_test.py      |    1 -
+ .../testEAP-SIM-ofono/connection_test.py      |    4 +
+ autotests/testEAP-SIM/connection_test.py      |    1 -
+ .../connection_test.py                        |   11 +-
+ .../testEAP-TTLS-CHAP/connection_test.py      |    1 -
+ .../testEAP-TTLS-MSCHAP/connection_test.py    |    1 -
+ autotests/testEAP-TTLS-PAP/connection_test.py |    1 -
+ autotests/testEAP-WPS-Frag/wps_frag_test.py   |    4 +-
+ autotests/testEAP-WPS/four_digit_pin_test.py  |    4 +-
+ autotests/testEAP-WPS/pin_test.py             |    4 +-
+ autotests/testEAP-WPS/push_button_test.py     |    5 +-
+ autotests/testFILS/fils_256_test.py           |    1 -
+ autotests/testFILS/fils_384_test.py           |    1 -
+ .../{test.py =3D> connection_test.py}           |    2 +-
+ .../{test.py =3D> connection_test.py}           |    2 +-
+ .../{test.py =3D> connection_test.py}           |    2 +-
+ .../{test.py =3D> connection_test.py}           |    2 +-
+ .../{test.py =3D> connection_test.py}           |   18 +-
+ .../{test.py =3D> connection_test.py}           |    2 +-
+ .../{test.py =3D> connection_test.py}           |    2 +-
+ autotests/testHiddenNetworks/validation.py    |    8 +-
+ autotests/testOWE/connection_test.py          |    1 -
+ autotests/testOWE/renegotiate_test.py         |    1 -
+ .../{test.py =3D> connection_test.py}           |    2 +-
+ .../testPreauth-roam/eaptls-preauth-1.conf    |    3 +-
+ .../testPreauth-roam/eaptls-preauth-2.conf    |    3 +-
+ .../{test.py =3D> connection_test.py}           |    0
+ autotests/testSAE/autoconnect_test.py         |   15 +-
+ autotests/testSAE/clogging_test.py            |    3 +-
+ autotests/testSAE/connection_test.py          |   10 +-
+ autotests/testSAE/group_20_connection_test.py |   10 +-
+ .../testSAQuery-spoofing/connection_test.py   |    2 +-
+ autotests/testSAQuery/connection_test.py      |    2 +-
+ autotests/util/config.py                      |    6 +
+ autotests/util/hostapd.py                     |   57 +-
+ autotests/util/iwd.py                         |  124 +-
+ autotests/util/ofono.py                       |   25 +-
+ autotests/util/testutil.py                    |    7 +-
+ autotests/util/wiphy.py                       |   32 -
+ doc/test-runner.txt                           |  117 +-
+ tools/test-runner                             | 1246 +++++++
+ tools/test-runner.c                           | 3310 -----------------
+ 60 files changed, 1456 insertions(+), 3694 deletions(-)
+ rename autotests/testAP-no-support/{test.py =3D> connection_test.py} (100%)
+ rename autotests/testAP/{test.py =3D> connection_test.py} (94%)
+ delete mode 100644 autotests/testEAP-PEAPv0-CryptoBinding/main.conf
+ rename autotests/testFT-8021x-roam/{test.py =3D> connection_test.py} (99%)
+ rename autotests/testFT-FILS-SHA256/{test.py =3D> connection_test.py} (99%)
+ rename autotests/testFT-FILS-SHA384/{test.py =3D> connection_test.py} (99%)
+ rename autotests/testFT-PSK-over-DS/{test.py =3D> connection_test.py} (99%)
+ rename autotests/testFT-PSK-roam/{test.py =3D> connection_test.py} (95%)
+ rename autotests/testFT-SAE-roam/{test.py =3D> connection_test.py} (99%)
+ rename autotests/testHT-VHT/{test.py =3D> connection_test.py} (98%)
+ rename autotests/testPreauth-roam/{test.py =3D> connection_test.py} (98%)
+ rename autotests/testRSSIAgent/{test.py =3D> connection_test.py} (100%)
+ create mode 100644 autotests/util/config.py
+ delete mode 100644 autotests/util/wiphy.py
+ create mode 100755 tools/test-runner
+ delete mode 100644 tools/test-runner.c
 
-> =
+-- =
 
-> Similarly pass the string of IEs from STA association frames to the user
-> through the AP events.  I dropped ap_event_station_added_data.rsn_ie
-> because that probably would have never been very useful and the RSN IE
-> is included in the IE array in any case.
+2.21.1
 
-Okay, this seems to be a separate thing.  No objection to this part.
-
-> ---
->   src/ap.c | 59 +++++++++++++++++++++++++++++++++++++++++++++-----------
->   src/ap.h | 10 +++++++++-
->   2 files changed, 57 insertions(+), 12 deletions(-)
-> =
-
-
-
-<snip>
-
-> diff --git a/src/ap.h b/src/ap.h
-> index cb5238d1..19b72a33 100644
-> --- a/src/ap.h
-> +++ b/src/ap.h
-> @@ -22,6 +22,7 @@
->   =
-
->   struct ap_state;
->   struct iovec;
-> +enum mpdu_management_subtype;
-
-Probably also fine to just use uint16 or something
-
->   =
-
->   enum ap_event_type {
->   	AP_EVENT_START_FAILED,
-> @@ -36,7 +37,8 @@ enum ap_event_type {
->   =
-
->   struct ap_event_station_added_data {
->   	const uint8_t *mac;
-> -	const uint8_t *rsn_ie;
-> +	const uint8_t *assoc_ies;
-> +	size_t assoc_ies_len;
->   };
->   =
-
->   struct ap_event_station_removed_data {
-> @@ -46,6 +48,8 @@ struct ap_event_station_removed_data {
->   =
-
->   struct ap_event_registration_start_data {
->   	const uint8_t *mac;
-> +	const uint8_t *assoc_ies;
-> +	size_t assoc_ies_len;
->   };
->   =
-
->   struct ap_event_registration_success_data {
-> @@ -64,6 +68,10 @@ struct ap_config {
->   	unsigned int authorized_macs_num;
->   	char *wsc_name;
->   	struct wsc_primary_device_type wsc_primary_device_type;
-> +	size_t (*get_mgmt_frame_ies_len)(enum mpdu_management_subtype type,
-> +						void *user_data);
-> +	size_t (*write_mgmt_frame_ies)(enum mpdu_management_subtype type,
-> +					uint8_t *out_buf, void *user_data);
-
-We generally try to use operations carried on an object to take that object=
- as =
-
-input.  Poor-man's classes in a way.  Which also means that we generally us=
-e =
-
-container_of in these cases and a destructor needs to be defined.  Since th=
-ese =
-
-seem to operate on arbitrary user_data, maybe they belong in a separate ops =
-
-structure?
-
->   	bool no_cck_rates : 1;
->   };
->   =
-
-> =
-
-
-Regards,
--Denis
---===============3123818655655400549==--
+--===============8685464494638666206==--
 
