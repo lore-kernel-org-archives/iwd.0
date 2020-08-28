@@ -1,66 +1,74 @@
-Content-Type: multipart/mixed; boundary="===============8727146089766359789=="
+Content-Type: multipart/mixed; boundary="===============6788274638185513154=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 08/15] auto-t: remove wiphy.py
-Date: Fri, 28 Aug 2020 09:40:43 -0700
-Message-ID: <20200828164050.1456-9-prestwoj@gmail.com>
+Subject: [PATCH v2 09/15] auto-t: fix hidden network test
+Date: Fri, 28 Aug 2020 09:40:44 -0700
+Message-ID: <20200828164050.1456-10-prestwoj@gmail.com>
 In-Reply-To: <20200828164050.1456-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8727146089766359789==
+--===============6788274638185513154==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is no longer needed
----
- autotests/util/wiphy.py | 32 --------------------------------
- 1 file changed, 32 deletions(-)
- delete mode 100644 autotests/util/wiphy.py
+This test was never 100% reliable, and after the test-runner re-write
+it became extremely unreliable. The issue came down to the very common
+block of code thats present in many tests where we wait for obj.scanning
+then not obj.scanning. This is fine when a dbus scan() is explicitly
+done before, otherwise it could lead to problems. Without a dbus scan
+explicitly called we are assuming a periodic scan will happen. If it
+already happen the initial wait for obj.scanning will never return and
+time out.
 
-diff --git a/autotests/util/wiphy.py b/autotests/util/wiphy.py
-deleted file mode 100644
-index 3f94d87b..00000000
---- a/autotests/util/wiphy.py
-+++ /dev/null
-@@ -1,32 +0,0 @@
--#! /usr/bin/python3
--import os
--import collections
+This probably needs to be changed in several tests, but for this specific
+case we can remove the waits completely. Since
+check_autoconnect_hidden_network has a 30 second wait on
+DeviceState.connected this will ultimately time out if anything goes
+wrong. There isn't any great reason to wait for scanning (for this test
+specifically).
+
+A minor style change was also made when initializing IWD. The values
+passed in this test are now the default, so no arguments need to be
+passed.
+---
+ autotests/testHiddenNetworks/validation.py | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/autotests/testHiddenNetworks/validation.py b/autotests/testHid=
+denNetworks/validation.py
+index 9c433623..991a5b32 100644
+--- a/autotests/testHiddenNetworks/validation.py
++++ b/autotests/testHiddenNetworks/validation.py
+@@ -50,11 +50,6 @@ class TestConnectAutoConnect(unittest.TestCase):
+         device =3D devices[0]
+ =
+
+         if autoconnect:
+-            condition =3D 'obj.scanning'
+-            wd.wait_for_object_condition(device, condition)
+-            condition =3D 'not obj.scanning'
+-            wd.wait_for_object_condition(device, condition)
 -
--wiphy_map =3D {}
+             self.check_autoconnect_hidden_network(wd, device, ssid, throws)
+         else:
+             if wait_periodic_scan:
+@@ -71,7 +66,6 @@ class TestConnectAutoConnect(unittest.TestCase):
+ =
+
+     def validate(self, ssid, autoconnect, throws =3D None, use_agent =3D F=
+alse,
+                                                     wait_periodic_scan =3D=
+ False):
+-        wd =3D IWD(True, '/tmp')
 -
--Wiphy =3D collections.namedtuple('Wiphy', ['name', 'use', 'interface_map'])
--
--Intf =3D collections.namedtuple('Intf',
--        ['name', 'wiphy', 'ctrl_interface', 'config'])
--
--def parse_list():
--    for entry in os.environ['TEST_WIPHY_LIST'].split('\n'):
--        wname, use_str =3D entry.split('=3D', 1)
--        use =3D use_str.split(',')
--
--        if wname not in wiphy_map:
--            wiphy_map[wname] =3D Wiphy(use=3Duse[0], name=3Dwname, interfa=
-ce_map=3D{})
--
--        if len(use) <=3D 1:
--            continue
--
--        intf =3D {}
--        intf['name'] =3D None
--        intf['wiphy'] =3D wiphy_map[wname]
--        intf['ctrl_interface'] =3D None
--        intf['config'] =3D None
--        intf.update(dict([param.split('=3D', 1) for param in use[1:]]))
--
--        wiphy_map[wname].interface_map[intf['name']] =3D Intf(**intf)
--
--parse_list()
++        wd =3D IWD()
+         self.validate_connection(wd, ssid, autoconnect, throws, use_agent,
+                                                         wait_periodic_scan)
 -- =
 
 2.21.1
 
---===============8727146089766359789==--
+--===============6788274638185513154==--
 
