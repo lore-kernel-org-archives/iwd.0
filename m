@@ -1,107 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============7548745558250606532=="
+Content-Type: multipart/mixed; boundary="===============8431338130830134218=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 11/15] auto-t: skip ofono tests if ofonod isn't running
-Date: Fri, 28 Aug 2020 11:47:35 -0700
-Message-ID: <20200828184739.8616-12-prestwoj@gmail.com>
+Subject: [PATCH v3 12/15] auto-t: replace hard-coded interfaces
+Date: Fri, 28 Aug 2020 11:47:36 -0700
+Message-ID: <20200828184739.8616-13-prestwoj@gmail.com>
 In-Reply-To: <20200828184739.8616-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7548745558250606532==
+--===============8431338130830134218==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+test-runner now supports interface name replacement inside hostapd
+config files. Since a given test configuration doesn't know what
+interface names there will be $ifaceN can be specified instead e.g.
+
+rsn_preauth_interfaces=3D$iface0 $iface1
+
+The $ifaceN values will be replace with actual interface names when
+the test is started.
+
+This patch also removes ctrl_interface inside the hostapd config
+files as this is no longer required.
 ---
- autotests/testEAP-AKA-ofono/connection_test.py       | 4 ++++
- autotests/testEAP-AKA-prime-ofono/connection_test.py | 4 ++++
- autotests/testEAP-SIM-ofono/connection_test.py       | 4 ++++
- 3 files changed, 12 insertions(+)
+ autotests/testPreauth-roam/eaptls-preauth-1.conf | 3 +--
+ autotests/testPreauth-roam/eaptls-preauth-2.conf | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/autotests/testEAP-AKA-ofono/connection_test.py b/autotests/tes=
-tEAP-AKA-ofono/connection_test.py
-index 94066f76..27f736f6 100644
---- a/autotests/testEAP-AKA-ofono/connection_test.py
-+++ b/autotests/testEAP-AKA-ofono/connection_test.py
-@@ -9,6 +9,7 @@ from iwd import IWD
- from iwd import NetworkType
- from hlrauc import AuthCenter
- from ofono import Ofono
-+from config import ctx
+diff --git a/autotests/testPreauth-roam/eaptls-preauth-1.conf b/autotests/t=
+estPreauth-roam/eaptls-preauth-1.conf
+index 0c7f96a7..bc808ed7 100644
+--- a/autotests/testPreauth-roam/eaptls-preauth-1.conf
++++ b/autotests/testPreauth-roam/eaptls-preauth-1.conf
+@@ -2,7 +2,6 @@ hw_mode=3Dg
+ channel=3D1
+ ssid=3DTestPreauth
+ utf8_ssid=3D1
+-ctrl_interface=3D/var/run/hostapd
  =
 
- class Test(unittest.TestCase):
+ wpa=3D2
+ wpa_key_mgmt=3DWPA-EAP
+@@ -24,7 +23,7 @@ radius_server_auth_port=3D1812
+ nas_identifier=3Dtesteap1
  =
 
-@@ -56,6 +57,9 @@ class Test(unittest.TestCase):
-         auth.stop()
-     @classmethod
-     def setUpClass(cls):
-+        if not ctx.is_process_running('ofonod'):
-+            cls.skipTest(cls, "ofono not running")
-+
-         IWD.copy_to_storage('ssidEAP-AKA.8021x')
+ rsn_preauth=3D1
+-rsn_preauth_interfaces=3Dwln0 wln1
++rsn_preauth_interfaces=3D$iface0 $iface1
+ disable_pmksa_caching=3D0
  =
 
-     @classmethod
-diff --git a/autotests/testEAP-AKA-prime-ofono/connection_test.py b/autotes=
-ts/testEAP-AKA-prime-ofono/connection_test.py
-index 2ff99894..967ba352 100644
---- a/autotests/testEAP-AKA-prime-ofono/connection_test.py
-+++ b/autotests/testEAP-AKA-prime-ofono/connection_test.py
-@@ -9,6 +9,7 @@ from iwd import IWD
- from iwd import NetworkType
- from hlrauc import AuthCenter
- from ofono import Ofono
-+from config import ctx
+ # Allow PMK cache to be shared opportunistically among configured interfac=
+es
+diff --git a/autotests/testPreauth-roam/eaptls-preauth-2.conf b/autotests/t=
+estPreauth-roam/eaptls-preauth-2.conf
+index bddcca69..6d3a18e7 100644
+--- a/autotests/testPreauth-roam/eaptls-preauth-2.conf
++++ b/autotests/testPreauth-roam/eaptls-preauth-2.conf
+@@ -2,7 +2,6 @@ hw_mode=3Dg
+ channel=3D2
+ ssid=3DTestPreauth
+ utf8_ssid=3D1
+-ctrl_interface=3D/var/run/hostapd
  =
 
- class Test(unittest.TestCase):
+ wpa=3D2
+ wpa_key_mgmt=3DWPA-EAP
+@@ -20,7 +19,7 @@ auth_server_port=3D1812
+ auth_server_shared_secret=3Dsecret
  =
 
-@@ -57,6 +58,9 @@ class Test(unittest.TestCase):
+ rsn_preauth=3D1
+-rsn_preauth_interfaces=3Dwln0 wln1
++rsn_preauth_interfaces=3D$iface0 $iface1
+ disable_pmksa_caching=3D0
  =
 
-     @classmethod
-     def setUpClass(cls):
-+        if not ctx.is_process_running('ofonod'):
-+            cls.skipTest(cls, "ofono not running")
-+
-         IWD.copy_to_storage('ssidEAP-AKA.8021x')
- =
-
-     @classmethod
-diff --git a/autotests/testEAP-SIM-ofono/connection_test.py b/autotests/tes=
-tEAP-SIM-ofono/connection_test.py
-index 95242943..de7c4b48 100644
---- a/autotests/testEAP-SIM-ofono/connection_test.py
-+++ b/autotests/testEAP-SIM-ofono/connection_test.py
-@@ -9,6 +9,7 @@ from iwd import IWD
- from iwd import NetworkType
- from hlrauc import AuthCenter
- from ofono import Ofono
-+from config import ctx
- =
-
- class Test(unittest.TestCase):
- =
-
-@@ -57,6 +58,9 @@ class Test(unittest.TestCase):
- =
-
-     @classmethod
-     def setUpClass(cls):
-+        if not ctx.is_process_running('ofonod'):
-+            cls.skipTest(cls, "ofono not running")
-+
-         IWD.copy_to_storage('ssidEAP-SIM.8021x')
- =
-
-     @classmethod
+ # Allow PMK cache to be shared opportunistically among configured interfac=
+es
 -- =
 
 2.21.1
 
---===============7548745558250606532==--
+--===============8431338130830134218==--
 
