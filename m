@@ -1,273 +1,246 @@
-Content-Type: multipart/mixed; boundary="===============4637659203638545494=="
+Content-Type: multipart/mixed; boundary="===============2806073678519001528=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 13/17] p2p: Start a basic P2P Group after GO Negotiation
-Date: Wed, 09 Sep 2020 01:49:29 +0200
-Message-ID: <20200908234933.301439-13-andrew.zaborowski@intel.com>
+Subject: [PATCH 14/17] ap: Pass extra IEs between mgmt frames and user
+Date: Wed, 09 Sep 2020 01:49:30 +0200
+Message-ID: <20200908234933.301439-14-andrew.zaborowski@intel.com>
 In-Reply-To: <20200908234933.301439-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4637659203638545494==
+--===============2806073678519001528==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Use the ap.c API to start an AP on a P2P_GO interface after we've been
-selected as the GO in the GO Negotiation.
+Add user callbacks to add extra IEs to the AP's beacons and other
+frames.  I considered a few ways for the user to pass this data
+without callbacks but so far this seems to be the easiest and most
+versatile way.
+
+Similarly pass the string of IEs from STA association frames to the user
+through the AP events.  I dropped ap_event_station_added_data.rsn_ie
+because that probably would have not been very useful and the RSN IE
+is included in the IE array in any case.
 ---
- src/p2p.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 123 insertions(+), 13 deletions(-)
+ src/ap.c | 57 +++++++++++++++++++++++++++++++++++++++++++++-----------
+ src/ap.h | 10 +++++++++-
+ 2 files changed, 55 insertions(+), 12 deletions(-)
 
-diff --git a/src/p2p.c b/src/p2p.c
-index 8e7da6d7..db4b0750 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -55,6 +55,7 @@
- #include "src/frame-xchg.h"
- #include "src/nl80211util.h"
- #include "src/netconfig.h"
-+#include "src/ap.h"
- #include "src/p2p.h"
+diff --git a/src/ap.c b/src/ap.c
+index 3579d30f..c1e1e389 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -88,6 +88,8 @@ struct sta_state {
+ 	struct l_uintset *rates;
+ 	uint32_t assoc_resp_cmd_id;
+ 	struct ap_state *ap;
++	uint8_t *assoc_ies;
++	size_t assoc_ies_len;
+ 	uint8_t *assoc_rsne;
+ 	struct eapol_sm *sm;
+ 	struct handshake_state *hs;
+@@ -159,7 +161,7 @@ static void ap_sta_free(void *data)
+ 	struct ap_state *ap =3D sta->ap;
  =
 
- struct p2p_device {
-@@ -110,6 +111,7 @@ struct p2p_device {
- 	uint8_t conn_peer_interface_addr[6];
+ 	l_uintset_free(sta->rates);
+-	l_free(sta->assoc_rsne);
++	l_free(sta->assoc_ies);
  =
 
- 	struct p2p_group_id_attr go_group_id;
-+	struct ap_state *group;
+ 	if (sta->assoc_resp_cmd_id)
+ 		l_genl_family_cancel(ap->nl80211, sta->assoc_resp_cmd_id);
+@@ -272,7 +274,8 @@ static void ap_new_rsna(struct sta_state *sta)
+ 	if (ap->ops->handle_event) {
+ 		struct ap_event_station_added_data event_data =3D {};
+ 		event_data.mac =3D sta->addr;
+-		event_data.rsn_ie =3D sta->assoc_rsne;
++		event_data.assoc_ies =3D sta->assoc_ies;
++		event_data.assoc_ies_len =3D sta->assoc_ies_len;
+ 		ap->ops->handle_event(AP_EVENT_STATION_ADDED, &event_data,
+ 					ap->user_data);
+ 	}
+@@ -491,6 +494,12 @@ static size_t ap_build_beacon_pr_tail(struct ap_state =
+*ap, bool pr,
+ 	len +=3D wsc_ie_size;
+ 	l_free(wsc_ie);
  =
 
- 	bool enabled : 1;
- 	bool have_roc_cookie : 1;
-@@ -123,6 +125,7 @@ struct p2p_device {
- 	bool disconnecting : 1;
- 	bool is_go : 1;
- 	bool conn_go_tie_breaker : 1;
-+	bool conn_peer_added : 1;
++	if (ap->ops->write_mgmt_frame_ies)
++		len +=3D ap->ops->write_mgmt_frame_ies(
++				pr ? MPDU_MANAGEMENT_SUBTYPE_PROBE_RESPONSE :
++				MPDU_MANAGEMENT_SUBTYPE_BEACON,
++				out_buf + len, ap->user_data);
++
+ 	return len;
+ }
+ =
+
+@@ -505,7 +514,11 @@ static void ap_set_beacon_cb(struct l_genl_msg *msg, v=
+oid *user_data)
+ static void ap_update_beacon(struct ap_state *ap)
+ {
+ 	struct l_genl_msg *cmd;
+-	uint8_t head[256], tail[256];
++	size_t extra_ies_len =3D ap->ops->get_mgmt_frame_ies_len ?
++		ap->ops->get_mgmt_frame_ies_len(MPDU_MANAGEMENT_SUBTYPE_BEACON,
++						ap->user_data) : 0;
++	uint8_t head[256];
++	uint8_t tail[256 + extra_ies_len];
+ 	size_t head_len, tail_len;
+ 	uint64_t wdev_id =3D netdev_get_wdev_id(ap->netdev);
+ 	static const uint8_t bcast_addr[6] =3D {
+@@ -1059,7 +1072,11 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, s=
+truct sta_state *sta,
+ 				bool reassoc, l_genl_msg_func_t callback)
+ {
+ 	const uint8_t *addr =3D netdev_get_address(ap->netdev);
+-	uint8_t mpdu_buf[128];
++	size_t extra_ies_len =3D ap->ops->get_mgmt_frame_ies_len ?
++		ap->ops->get_mgmt_frame_ies_len(
++				MPDU_MANAGEMENT_SUBTYPE_ASSOCIATION_RESPONSE,
++				ap->user_data) : 0;
++	uint8_t mpdu_buf[128 + extra_ies_len];
+ 	struct mmpdu_header *mpdu =3D (void *) mpdu_buf;
+ 	struct mmpdu_association_response *resp;
+ 	size_t ies_len =3D 0;
+@@ -1135,6 +1152,11 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, s=
+truct sta_state *sta,
+ 		l_free(wsc_ie);
+ 	}
+ =
+
++	if (ap->ops->write_mgmt_frame_ies)
++		ies_len +=3D ap->ops->write_mgmt_frame_ies(
++				MPDU_MANAGEMENT_SUBTYPE_ASSOCIATION_RESPONSE,
++				resp->ies + ies_len, ap->user_data);
++
+ send_frame:
+ 	return ap_send_mgmt_frame(ap, mpdu, resp->ies + ies_len - mpdu_buf,
+ 					true, callback, sta);
+@@ -1336,6 +1358,8 @@ static void ap_assoc_reassoc(struct sta_state *sta, b=
+ool reassoc,
+ 		sta->wsc_v2 =3D wsc_req.version2;
+ =
+
+ 		event_data.mac =3D sta->addr;
++		event_data.assoc_ies =3D ies;
++		event_data.assoc_ies_len =3D ies_len;
+ 		ap->ops->handle_event(AP_EVENT_REGISTRATION_START, &event_data,
+ 					ap->user_data);
+ =
+
+@@ -1385,13 +1409,16 @@ static void ap_assoc_reassoc(struct sta_state *sta,=
+ bool reassoc,
+ =
+
+ 	sta->rates =3D rates;
+ =
+
+-	if (sta->assoc_rsne)
+-		l_free(sta->assoc_rsne);
++	l_free(sta->assoc_ies);
+ =
+
+-	if (rsn)
+-		sta->assoc_rsne =3D l_memdup(rsn, rsn[1] + 2);
+-	else
++	if (rsn) {
++		sta->assoc_ies =3D l_memdup(ies, ies_len);
++		sta->assoc_ies_len =3D ies_len;
++		sta->assoc_rsne =3D sta->assoc_ies + (rsn - ies);
++	} else {
++		sta->assoc_ies =3D NULL;
+ 		sta->assoc_rsne =3D NULL;
++	}
+ =
+
+ 	sta->assoc_resp_cmd_id =3D ap_assoc_resp(ap, sta, sta->addr, 0, reassoc,
+ 						ap_success_assoc_resp_cb);
+@@ -1636,7 +1663,11 @@ static void ap_probe_req_cb(const struct mmpdu_heade=
+r *hdr, const void *body,
+ 	struct ie_tlv_iter iter;
+ 	const uint8_t *bssid =3D netdev_get_address(ap->netdev);
+ 	bool match =3D false;
+-	uint8_t resp[512];
++	size_t extra_ies_len =3D ap->ops->get_mgmt_frame_ies_len ?
++		ap->ops->get_mgmt_frame_ies_len(
++					MPDU_MANAGEMENT_SUBTYPE_PROBE_RESPONSE,
++					ap->user_data) : 0;
++	uint8_t resp[512 + extra_ies_len];
+ 	uint8_t *wsc_data;
+ 	ssize_t wsc_data_len;
+ =
+
+@@ -1936,7 +1967,11 @@ static struct l_genl_msg *ap_build_cmd_start_ap(stru=
+ct ap_state *ap)
+ {
+ 	struct l_genl_msg *cmd;
+ =
+
+-	uint8_t head[256], tail[256];
++	size_t extra_ies_len =3D ap->ops->get_mgmt_frame_ies_len ?
++		ap->ops->get_mgmt_frame_ies_len(MPDU_MANAGEMENT_SUBTYPE_BEACON,
++						ap->user_data) : 0;
++	uint8_t head[256];
++	uint8_t tail[256 + extra_ies_len];
+ 	size_t head_len, tail_len;
+ =
+
+ 	uint32_t dtim_period =3D 3;
+diff --git a/src/ap.h b/src/ap.h
+index bbfecd6d..25ecc15a 100644
+--- a/src/ap.h
++++ b/src/ap.h
+@@ -22,6 +22,7 @@
+ =
+
+ struct ap_state;
+ struct iovec;
++enum mpdu_management_subtype;
+ =
+
+ enum ap_event_type {
+ 	AP_EVENT_START_FAILED,
+@@ -36,7 +37,8 @@ enum ap_event_type {
+ =
+
+ struct ap_event_station_added_data {
+ 	const uint8_t *mac;
+-	const uint8_t *rsn_ie;
++	const uint8_t *assoc_ies;
++	size_t assoc_ies_len;
  };
  =
 
- struct p2p_discovery_user {
-@@ -217,8 +220,9 @@ static void p2p_discovery_user_free(void *data)
+ struct ap_event_station_removed_data {
+@@ -46,6 +48,8 @@ struct ap_event_station_removed_data {
  =
 
- static inline bool p2p_peer_operational(struct p2p_peer *peer)
- {
--	return peer && peer->dev->conn_netdev && !peer->dev->conn_wsc_bss &&
--		!peer->wsc.pending_connect && !peer->dev->disconnecting;
-+	return peer && peer->dev->conn_netdev && !peer->dev->disconnecting &&
-+		((!peer->dev->is_go && !peer->dev->conn_wsc_bss) ||
-+		 (peer->dev->is_go && peer->dev->conn_peer_added));
- }
+ struct ap_event_registration_start_data {
+ 	const uint8_t *mac;
++	const uint8_t *assoc_ies;
++	size_t assoc_ies_len;
+ };
  =
 
- static bool p2p_peer_match(const void *a, const void *b)
-@@ -457,6 +461,14 @@ static void p2p_connection_reset(struct p2p_device *de=
-v)
- 	if (dev->conn_enrollee)
- 		wsc_enrollee_cancel(dev->conn_enrollee, false);
+ struct ap_event_registration_success_data {
+@@ -68,6 +72,10 @@ struct ap_config {
+ struct ap_ops {
+ 	void (*handle_event)(enum ap_event_type type, const void *event_data,
+ 				void *user_data);
++	size_t (*get_mgmt_frame_ies_len)(enum mpdu_management_subtype type,
++						void *user_data);
++	size_t (*write_mgmt_frame_ies)(enum mpdu_management_subtype type,
++					uint8_t *out_buf, void *user_data);
+ };
  =
 
-+	if (dev->group) {
-+		ap_free(dev->group);
-+		dev->group =3D NULL;
-+		dev->conn_peer_added =3D false;
-+	}
-+
-+	dev->capability.group_caps =3D 0;
-+
- 	if (dev->conn_netdev) {
- 		struct l_genl_msg *msg;
- 		uint64_t wdev_id =3D netdev_get_wdev_id(dev->conn_netdev);
-@@ -628,10 +640,12 @@ static void p2p_peer_connect_done(struct p2p_device *=
-dev)
- {
- 	struct p2p_peer *peer =3D dev->conn_peer;
- =
-
--	/* We can free anything potentially needed for a retry */
--	scan_bss_free(dev->conn_wsc_bss);
--	dev->conn_wsc_bss =3D NULL;
--	explicit_bzero(dev->conn_psk, 32);
-+	if (!dev->is_go) {
-+		/* We can free anything potentially needed for a retry */
-+		scan_bss_free(dev->conn_wsc_bss);
-+		dev->conn_wsc_bss =3D NULL;
-+		explicit_bzero(dev->conn_psk, 32);
-+	}
- =
-
- 	dbus_pending_reply(&peer->wsc.pending_connect,
- 				l_dbus_message_new_method_return(
-@@ -649,6 +663,98 @@ static void p2p_peer_connect_done(struct p2p_device *d=
-ev)
- 				"ConnectedIP");
- }
- =
-
-+static void p2p_group_event(enum ap_event_type type, const void *event_dat=
-a,
-+				void *user_data)
-+{
-+	struct p2p_device *dev =3D user_data;
-+
-+	l_debug("type=3D%i", type);
-+
-+	switch (type) {
-+	case AP_EVENT_START_FAILED:
-+	case AP_EVENT_STOPPING:
-+		dev->group =3D NULL;
-+		p2p_connect_failed(dev);
-+		break;
-+
-+	case AP_EVENT_STARTED:
-+		ap_push_button(dev->group);
-+		break;
-+
-+	case AP_EVENT_STATION_ADDED:
-+		dev->conn_peer_added =3D true;
-+		p2p_peer_connect_done(dev);
-+		break;
-+
-+	case AP_EVENT_STATION_REMOVED:
-+		dev->conn_peer_added =3D false;
-+		p2p_connect_failed(dev);
-+		break;
-+
-+	case AP_EVENT_REGISTRATION_START:
-+		/* Don't validate the P2P IE or WFD IE at this stage */
-+		break;
-+	case AP_EVENT_REGISTRATION_SUCCESS:
-+		dev->capability.group_caps &=3D ~P2P_GROUP_CAP_GROUP_FORMATION;
-+		break;
-+	case AP_EVENT_PBC_MODE_EXIT:
-+		break;
-+	};
-+}
-+
-+static const struct ap_ops p2p_go_ops =3D {
-+	.handle_event =3D p2p_group_event,
-+};
-+
-+static void p2p_group_start(struct p2p_device *dev)
-+{
-+	struct ap_config *config =3D l_new(struct ap_config, 1);
-+	char passphrase[20];
-+	unsigned int i;
-+
-+	/*
-+	 * Section 3.2.1: "The WPA2-Personal pass-phrase shall contain at
-+	 * least eight ASCII characters randomly selected with a uniform
-+	 * distribution from the following character set: upper case letters,
-+	 * lower case letters and numbers."
-+	 *
-+	 * However we don't currently respect the following text because
-+	 * our credentials will contain the passphrase and not the PSK.
-+	 * Section 3.2.1: "The Credentials for a P2P Group issued to a
-+	 * P2P Device shall: [...]
-+	 *  - Use a Network Key Type of 64 Hex characters."
-+	 */
-+	for (i =3D 0; i < sizeof(passphrase) - 1; i++)
-+		passphrase[i] =3D p2p_random_char();
-+
-+	passphrase[i] =3D '\0';
-+
-+	config->ssid =3D l_strdup(dev->go_group_id.ssid);
-+	config->psk =3D l_strdup(passphrase);
-+	config->channel =3D dev->listen_channel;
-+	config->wsc_name =3D l_strdup(dev->device_info.device_name);
-+	config->wsc_primary_device_type =3D dev->device_info.primary_device_type;
-+	config->no_cck_rates =3D true;
-+	/*
-+	 * Section 3.1.4.4: "It shall only allow association by the
-+	 * P2P Device that it is currently in Group Formation with."
-+	 */
-+	config->authorized_macs =3D l_memdup(dev->conn_peer_interface_addr, 6);
-+	config->authorized_macs_num =3D 1;
-+
-+	explicit_bzero(passphrase, sizeof(passphrase));
-+
-+	dev->capability.group_caps |=3D P2P_GROUP_CAP_GO;
-+	dev->capability.group_caps |=3D P2P_GROUP_CAP_GROUP_FORMATION;
-+
-+	dev->group =3D ap_start(dev->conn_netdev, config, &p2p_go_ops, dev);
-+	if (!dev->group) {
-+		ap_config_free(config);
-+		p2p_connect_failed(dev);
-+		return;
-+	}
-+}
-+
- static void p2p_netconfig_event_handler(enum netconfig_event event,
- 					void *user_data)
- {
-@@ -682,7 +788,7 @@ static void p2p_dhcp_timeout_destroy(void *user_data)
- 	dev->conn_dhcp_timeout =3D NULL;
- }
- =
-
--static void p2p_start_dhcp(struct p2p_device *dev)
-+static void p2p_start_dhcp_client(struct p2p_device *dev)
- {
- 	uint32_t ifindex =3D netdev_get_ifindex(dev->conn_netdev);
- 	unsigned int dhcp_timeout_val;
-@@ -723,7 +829,7 @@ static void p2p_netdev_connect_cb(struct netdev *netdev,
- =
-
- 	switch (result) {
- 	case NETDEV_RESULT_OK:
--		p2p_start_dhcp(dev);
-+		p2p_start_dhcp_client(dev);
- 		break;
- 	case NETDEV_RESULT_AUTHENTICATION_FAILED:
- 	case NETDEV_RESULT_ASSOCIATION_FAILED:
-@@ -1034,10 +1140,14 @@ static void p2p_device_netdev_notify(struct netdev =
-*netdev,
- 	case NETDEV_WATCH_EVENT_NEW:
- 		/* Ignore the event if we're already connecting/connected */
- 		if (dev->conn_enrollee || dev->conn_retry_count ||
--				!netdev_get_is_up(netdev))
-+				dev->group || !netdev_get_is_up(netdev))
- 			break;
- =
-
--		p2p_provision_connect(dev);
-+		if (dev->is_go)
-+			p2p_group_start(dev);
-+		else
-+			p2p_provision_connect(dev);
-+
- 		break;
- 	case NETDEV_WATCH_EVENT_DEL:
- 		dev->conn_netdev =3D NULL;
-@@ -1094,13 +1203,14 @@ static void p2p_device_new_interface_destroy(void *=
-user_data)
- =
-
- static void p2p_device_interface_create(struct p2p_device *dev)
- {
--	uint32_t iftype =3D NL80211_IFTYPE_P2P_CLIENT;
-+	uint32_t iftype =3D dev->is_go ? NL80211_IFTYPE_P2P_GO :
-+		NL80211_IFTYPE_P2P_CLIENT;
- 	char ifname[32];
- 	uint32_t wiphy_id =3D dev->wdev_id >> 32;
- 	struct l_genl_msg *msg;
- =
-
--	snprintf(ifname, sizeof(ifname), "wlan%i-p2p-cl%i",
--			wiphy_id, dev->conn_num++);
-+	snprintf(ifname, sizeof(ifname), "wlan%i-p2p-%s%i",
-+			wiphy_id, dev->is_go ? "go" : "cl", dev->conn_num++);
- 	l_debug("creating %s", ifname);
- =
-
- 	msg =3D l_genl_msg_new(NL80211_CMD_NEW_INTERFACE);
+ void ap_config_free(struct ap_config *config);
 -- =
 
 2.25.1
 
---===============4637659203638545494==--
+--===============2806073678519001528==--
 
