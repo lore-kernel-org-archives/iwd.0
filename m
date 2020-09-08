@@ -1,246 +1,467 @@
-Content-Type: multipart/mixed; boundary="===============2806073678519001528=="
+Content-Type: multipart/mixed; boundary="===============6314783057427544884=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 14/17] ap: Pass extra IEs between mgmt frames and user
-Date: Wed, 09 Sep 2020 01:49:30 +0200
-Message-ID: <20200908234933.301439-14-andrew.zaborowski@intel.com>
+Subject: [PATCH 15/17] p2p: Parse P2P IEs and WFD IEs in Association Requests
+Date: Wed, 09 Sep 2020 01:49:31 +0200
+Message-ID: <20200908234933.301439-15-andrew.zaborowski@intel.com>
 In-Reply-To: <20200908234933.301439-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2806073678519001528==
+--===============6314783057427544884==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add user callbacks to add extra IEs to the AP's beacons and other
-frames.  I considered a few ways for the user to pass this data
-without callbacks but so far this seems to be the easiest and most
-versatile way.
-
-Similarly pass the string of IEs from STA association frames to the user
-through the AP events.  I dropped ap_event_station_added_data.rsn_ie
-because that probably would have not been very useful and the RSN IE
-is included in the IE array in any case.
+Roughly validate the IEs and save some information for use in our own
+IEs. p2p_extract_wfd_properties and p2p_device_validate_conn_wfd are
+being moved unchanged to be usable in p2p_group_event without forward
+declarations and to be next to p2p_build_wfd_ie.
 ---
- src/ap.c | 57 +++++++++++++++++++++++++++++++++++++++++++++-----------
- src/ap.h | 10 +++++++++-
- 2 files changed, 55 insertions(+), 12 deletions(-)
+ src/p2p.c | 386 ++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 229 insertions(+), 157 deletions(-)
 
-diff --git a/src/ap.c b/src/ap.c
-index 3579d30f..c1e1e389 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -88,6 +88,8 @@ struct sta_state {
- 	struct l_uintset *rates;
- 	uint32_t assoc_resp_cmd_id;
- 	struct ap_state *ap;
-+	uint8_t *assoc_ies;
-+	size_t assoc_ies_len;
- 	uint8_t *assoc_rsne;
- 	struct eapol_sm *sm;
- 	struct handshake_state *hs;
-@@ -159,7 +161,7 @@ static void ap_sta_free(void *data)
- 	struct ap_state *ap =3D sta->ap;
+diff --git a/src/p2p.c b/src/p2p.c
+index db4b0750..50559bae 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -109,6 +109,8 @@ struct p2p_device {
+ 	unsigned int conn_go_scan_retry;
+ 	uint32_t conn_go_oper_freq;
+ 	uint8_t conn_peer_interface_addr[6];
++	struct p2p_capability_attr conn_client_capability;
++	struct p2p_device_info_attr conn_client_dev_info;
  =
 
- 	l_uintset_free(sta->rates);
--	l_free(sta->assoc_rsne);
-+	l_free(sta->assoc_ies);
- =
-
- 	if (sta->assoc_resp_cmd_id)
- 		l_genl_family_cancel(ap->nl80211, sta->assoc_resp_cmd_id);
-@@ -272,7 +274,8 @@ static void ap_new_rsna(struct sta_state *sta)
- 	if (ap->ops->handle_event) {
- 		struct ap_event_station_added_data event_data =3D {};
- 		event_data.mac =3D sta->addr;
--		event_data.rsn_ie =3D sta->assoc_rsne;
-+		event_data.assoc_ies =3D sta->assoc_ies;
-+		event_data.assoc_ies_len =3D sta->assoc_ies_len;
- 		ap->ops->handle_event(AP_EVENT_STATION_ADDED, &event_data,
- 					ap->user_data);
- 	}
-@@ -491,6 +494,12 @@ static size_t ap_build_beacon_pr_tail(struct ap_state =
-*ap, bool pr,
- 	len +=3D wsc_ie_size;
- 	l_free(wsc_ie);
- =
-
-+	if (ap->ops->write_mgmt_frame_ies)
-+		len +=3D ap->ops->write_mgmt_frame_ies(
-+				pr ? MPDU_MANAGEMENT_SUBTYPE_PROBE_RESPONSE :
-+				MPDU_MANAGEMENT_SUBTYPE_BEACON,
-+				out_buf + len, ap->user_data);
-+
- 	return len;
+ 	struct p2p_group_id_attr go_group_id;
+ 	struct ap_state *group;
+@@ -329,6 +331,163 @@ static size_t p2p_build_wfd_ie(const struct p2p_wfd_p=
+roperties *wfd,
+ 	return size;
  }
  =
 
-@@ -505,7 +514,11 @@ static void ap_set_beacon_cb(struct l_genl_msg *msg, v=
-oid *user_data)
- static void ap_update_beacon(struct ap_state *ap)
- {
- 	struct l_genl_msg *cmd;
--	uint8_t head[256], tail[256];
-+	size_t extra_ies_len =3D ap->ops->get_mgmt_frame_ies_len ?
-+		ap->ops->get_mgmt_frame_ies_len(MPDU_MANAGEMENT_SUBTYPE_BEACON,
-+						ap->user_data) : 0;
-+	uint8_t head[256];
-+	uint8_t tail[256 + extra_ies_len];
- 	size_t head_len, tail_len;
- 	uint64_t wdev_id =3D netdev_get_wdev_id(ap->netdev);
- 	static const uint8_t bcast_addr[6] =3D {
-@@ -1059,7 +1072,11 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, s=
-truct sta_state *sta,
- 				bool reassoc, l_genl_msg_func_t callback)
- {
- 	const uint8_t *addr =3D netdev_get_address(ap->netdev);
--	uint8_t mpdu_buf[128];
-+	size_t extra_ies_len =3D ap->ops->get_mgmt_frame_ies_len ?
-+		ap->ops->get_mgmt_frame_ies_len(
-+				MPDU_MANAGEMENT_SUBTYPE_ASSOCIATION_RESPONSE,
-+				ap->user_data) : 0;
-+	uint8_t mpdu_buf[128 + extra_ies_len];
- 	struct mmpdu_header *mpdu =3D (void *) mpdu_buf;
- 	struct mmpdu_association_response *resp;
- 	size_t ies_len =3D 0;
-@@ -1135,6 +1152,11 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, s=
-truct sta_state *sta,
- 		l_free(wsc_ie);
- 	}
- =
-
-+	if (ap->ops->write_mgmt_frame_ies)
-+		ies_len +=3D ap->ops->write_mgmt_frame_ies(
-+				MPDU_MANAGEMENT_SUBTYPE_ASSOCIATION_RESPONSE,
-+				resp->ies + ies_len, ap->user_data);
++static bool p2p_extract_wfd_properties(const uint8_t *ie, size_t ie_size,
++					struct p2p_wfd_properties *out)
++{
++	struct wfd_subelem_iter iter;
++	const uint8_t *devinfo =3D NULL;
++	const uint8_t *ext_caps =3D NULL;
++	const uint8_t *r2 =3D NULL;
 +
- send_frame:
- 	return ap_send_mgmt_frame(ap, mpdu, resp->ies + ies_len - mpdu_buf,
- 					true, callback, sta);
-@@ -1336,6 +1358,8 @@ static void ap_assoc_reassoc(struct sta_state *sta, b=
-ool reassoc,
- 		sta->wsc_v2 =3D wsc_req.version2;
- =
-
- 		event_data.mac =3D sta->addr;
-+		event_data.assoc_ies =3D ies;
-+		event_data.assoc_ies_len =3D ies_len;
- 		ap->ops->handle_event(AP_EVENT_REGISTRATION_START, &event_data,
- 					ap->user_data);
- =
-
-@@ -1385,13 +1409,16 @@ static void ap_assoc_reassoc(struct sta_state *sta,=
- bool reassoc,
- =
-
- 	sta->rates =3D rates;
- =
-
--	if (sta->assoc_rsne)
--		l_free(sta->assoc_rsne);
-+	l_free(sta->assoc_ies);
- =
-
--	if (rsn)
--		sta->assoc_rsne =3D l_memdup(rsn, rsn[1] + 2);
--	else
-+	if (rsn) {
-+		sta->assoc_ies =3D l_memdup(ies, ies_len);
-+		sta->assoc_ies_len =3D ies_len;
-+		sta->assoc_rsne =3D sta->assoc_ies + (rsn - ies);
++	if (!ie)
++		return false;
++
++	wfd_subelem_iter_init(&iter, ie, ie_size);
++
++	while (wfd_subelem_iter_next(&iter)) {
++		enum wfd_subelem_type type =3D wfd_subelem_iter_get_type(&iter);
++		size_t len =3D wfd_subelem_iter_get_length(&iter);
++		const uint8_t *data =3D wfd_subelem_iter_get_data(&iter);
++
++		switch (type) {
++#define SUBELEM_CHECK(var, expected_len, name)		\
++			if (len !=3D expected_len) {	\
++				l_debug(name " length wrong in WFD IE");\
++				return false;		\
++			}				\
++							\
++			if (var) {			\
++				l_debug("Duplicate" name " in WFD IE");\
++				return false;		\
++			}				\
++							\
++			var =3D data;
++		case WFD_SUBELEM_WFD_DEVICE_INFORMATION:
++			SUBELEM_CHECK(devinfo, 6, "Device Information");
++			break;
++		case WFD_SUBELEM_EXTENDED_CAPABILITY:
++			SUBELEM_CHECK(ext_caps, 2, "Extended Capability");
++			break;
++		case WFD_SUBELEM_R2_DEVICE_INFORMATION:
++			SUBELEM_CHECK(r2, 2, "R2 Device Information");
++			break;
++#undef SUBELEM_CHECK
++		default:
++			/* Skip unknown IEs */
++			break;
++		}
++	}
++
++	if (devinfo) {
++		uint16_t capability =3D l_get_be16(devinfo + 0);
++		bool source;
++		bool sink;
++		uint16_t port;
++
++		source =3D (capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
++			WFD_DEV_INFO_TYPE_SOURCE ||
++			(capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
++			WFD_DEV_INFO_TYPE_DUAL_ROLE;
++		sink =3D (capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
++			WFD_DEV_INFO_TYPE_PRIMARY_SINK ||
++			(capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
++			WFD_DEV_INFO_TYPE_DUAL_ROLE;
++
++		if (!source && !sink)
++			return false;
++
++		port =3D l_get_be16(devinfo + 2);
++
++		if (source && port =3D=3D 0) {
++			l_debug("0 port number in WFD IE Device Information");
++			return false;
++		}
++
++		memset(out, 0, sizeof(*out));
++		out->available =3D
++			(capability & WFD_DEV_INFO_SESSION_AVAILABILITY) =3D=3D
++			WFD_DEV_INFO_SESSION_AVAILABLE;
++		out->source =3D source;
++		out->sink =3D sink;
++		out->port =3D port;
++		out->cp =3D capability & WFD_DEV_INFO_CONTENT_PROTECTION_SUPPORT;
++		out->audio =3D !sink ||
++			!(capability & WFD_DEV_INFO_NO_AUDIO_AT_PRIMARY_SINK);
 +	} else {
-+		sta->assoc_ies =3D NULL;
- 		sta->assoc_rsne =3D NULL;
++		l_error("Device Information missing in WFD IE");
++		return false;
++	}
++
++	if (ext_caps && (l_get_be16(ext_caps) & 1))
++		out->uibc =3D 1;
++
++	if (r2) {
++		uint8_t role =3D l_get_be16(r2) & 3;
++
++		if ((out->source && role !=3D 0 && role !=3D 3) ||
++				(out->sink && role !=3D 1 && role !=3D 3))
++			l_debug("Invalid role in WFD R2 Device Information");
++		else
++			out->r2 =3D true;
++	}
++
++	return true;
++}
++
++static bool p2p_device_validate_conn_wfd(struct p2p_device *dev,
++						const uint8_t *ie,
++						ssize_t ie_size)
++{
++	struct p2p_wfd_properties wfd;
++
++	if (!dev->conn_own_wfd)
++		return true;
++
++	/*
++	 * WFD IEs are optional in Association Request/Response and P2P Public
++	 * Action frames for R2 devices and required for R1 devices.
++	 * Wi-Fi Display Technical Specification v2.1.0 section 5.2:
++	 * "A WFD R2 Device shall include the WFD IE in Beacon, Probe
++	 * Request/Response, Association Request/Response and P2P Public Action
++	 * frames in order to be interoperable with R1 devices. If a WFD R2
++	 * Device discovers that the peer device is also a WFD R2 Device, then
++	 * it may include the WFD IE in Association Request/Response and P2P
++	 * Public Action frames."
++	 */
++	if (!ie)
++		return dev->conn_own_wfd->r2;
++
++	if (!p2p_extract_wfd_properties(ie, ie_size, &wfd)) {
++		l_error("Could not parse the WFD IE contents");
++		return false;
++	}
++
++	if ((dev->conn_own_wfd->source && !wfd.sink) ||
++			(dev->conn_own_wfd->sink && !wfd.source)) {
++		l_error("Wrong role in peer's WFD IE");
++		return false;
++	}
++
++	if (wfd.r2 !=3D dev->conn_own_wfd->r2) {
++		l_error("Wrong version in peer's WFD IE");
++		return false;
++	}
++
++	/*
++	 * Ignore the session available state because it's not 100% clear
++	 * at what point the peer switches to SESSION_NOT_AVAILABLE in its
++	 * Device Information.
++	 * But we might want to check that other bits have not changed from
++	 * what the peer reported during discovery.
++	 * Wi-Fi Display Technical Specification v2.1.0 section 4.5.2.1:
++	 * "The content of the WFD Device Information subelement should be
++	 * immutable during the period of P2P connection establishment, with
++	 * [...] exceptions [...]"
++	 */
++
++	return true;
++}
++
+ /* TODO: convert to iovecs */
+ static uint8_t *p2p_build_scan_ies(struct p2p_device *dev, uint8_t *buf,
+ 					size_t buf_len, size_t *out_len)
+@@ -682,9 +841,72 @@ static void p2p_group_event(enum ap_event_type type, c=
+onst void *event_data,
+ 		break;
+ =
+
+ 	case AP_EVENT_STATION_ADDED:
++	{
++		const struct ap_event_station_added_data *data =3D event_data;
++		L_AUTO_FREE_VAR(uint8_t *, p2p_data) =3D NULL;
++		ssize_t p2p_data_len;
++		L_AUTO_FREE_VAR(uint8_t *, wfd_data) =3D NULL;
++		ssize_t wfd_data_len;
++		struct p2p_association_req req_info;
++		int r;
++
++		p2p_data =3D ie_tlv_extract_p2p_payload(data->assoc_ies,
++							data->assoc_ies_len,
++							&p2p_data_len);
++		if (!p2p_data) {
++			l_error("Missing or invalid P2P IEs: %s (%i)",
++				strerror(-p2p_data_len), (int) -p2p_data_len);
++			goto invalid_ie;
++		}
++
++		/*
++		 * We don't need to validate most of the Association Request
++		 * P2P IE contents as we already have all the information there
++		 * may be but we need to save some of the attributes because
++		 * section 3.2.3 requires that our Group Info includes
++		 * specifically the data from the association, not any of the
++		 * earlier exchanges:
++		 * "When a P2P Client associates with a P2P Group Owner, it
++		 * provides [...] the P2P Device Info attribute (see Section
++		 * 4.1.15) and the P2P Capability attribute (see Section 4.1.4)
++		 * in the P2P IE in the Association Request frame.  This
++		 * information shall be used by the P2P Group Owner for Group
++		 * Information Advertisement.
++		 */
++		r =3D p2p_parse_association_req(p2p_data, p2p_data_len,
++						&req_info);
++		if (r < 0) {
++			l_error("Can't parse P2P Association Request: %s (%i)",
++				strerror(-r), -r);
++			goto invalid_ie;
++		}
++
++		/*
++		 * Most of this duplicates the information we already have in
++		 * dev->conn_peer.
++		 */
++		dev->conn_client_capability =3D req_info.capability;
++		dev->conn_client_dev_info =3D req_info.device_info;
++		p2p_clear_association_req(&req_info);
++
++		if (dev->conn_own_wfd)
++			wfd_data =3D ie_tlv_extract_p2p_payload(data->assoc_ies,
++							data->assoc_ies_len,
++							&wfd_data_len);
++
++		if (!p2p_device_validate_conn_wfd(dev, wfd_data,
++							wfd_data_len))
++			goto invalid_ie;
++
++		/* Take the chance to update WFD attributes for Session Info */
++		if (wfd_data)
++			p2p_extract_wfd_properties(wfd_data, wfd_data_len,
++							dev->conn_peer->wfd);
++
+ 		dev->conn_peer_added =3D true;
+ 		p2p_peer_connect_done(dev);
+ 		break;
 +	}
  =
 
- 	sta->assoc_resp_cmd_id =3D ap_assoc_resp(ap, sta, sta->addr, 0, reassoc,
- 						ap_success_assoc_resp_cb);
-@@ -1636,7 +1663,11 @@ static void ap_probe_req_cb(const struct mmpdu_heade=
-r *hdr, const void *body,
- 	struct ie_tlv_iter iter;
- 	const uint8_t *bssid =3D netdev_get_address(ap->netdev);
- 	bool match =3D false;
--	uint8_t resp[512];
-+	size_t extra_ies_len =3D ap->ops->get_mgmt_frame_ies_len ?
-+		ap->ops->get_mgmt_frame_ies_len(
-+					MPDU_MANAGEMENT_SUBTYPE_PROBE_RESPONSE,
-+					ap->user_data) : 0;
-+	uint8_t resp[512 + extra_ies_len];
- 	uint8_t *wsc_data;
- 	ssize_t wsc_data_len;
+ 	case AP_EVENT_STATION_REMOVED:
+ 		dev->conn_peer_added =3D false;
+@@ -700,6 +922,13 @@ static void p2p_group_event(enum ap_event_type type, c=
+onst void *event_data,
+ 	case AP_EVENT_PBC_MODE_EXIT:
+ 		break;
+ 	};
++
++	return;
++
++invalid_ie:
++	ap_station_disconnect(dev->group, dev->conn_peer_interface_addr,
++				MMPDU_REASON_CODE_INVALID_IE);
++	p2p_connect_failed(dev);
+ }
  =
 
-@@ -1936,7 +1967,11 @@ static struct l_genl_msg *ap_build_cmd_start_ap(stru=
-ct ap_state *ap)
- {
- 	struct l_genl_msg *cmd;
+ static const struct ap_ops p2p_go_ops =3D {
+@@ -1583,163 +1812,6 @@ static void p2p_device_fill_channel_list(struct p2p=
+_device *dev,
+ 	l_queue_push_tail(attr->channel_entries, channel_entry);
+ }
  =
 
--	uint8_t head[256], tail[256];
-+	size_t extra_ies_len =3D ap->ops->get_mgmt_frame_ies_len ?
-+		ap->ops->get_mgmt_frame_ies_len(MPDU_MANAGEMENT_SUBTYPE_BEACON,
-+						ap->user_data) : 0;
-+	uint8_t head[256];
-+	uint8_t tail[256 + extra_ies_len];
- 	size_t head_len, tail_len;
- =
-
- 	uint32_t dtim_period =3D 3;
-diff --git a/src/ap.h b/src/ap.h
-index bbfecd6d..25ecc15a 100644
---- a/src/ap.h
-+++ b/src/ap.h
-@@ -22,6 +22,7 @@
- =
-
- struct ap_state;
- struct iovec;
-+enum mpdu_management_subtype;
- =
-
- enum ap_event_type {
- 	AP_EVENT_START_FAILED,
-@@ -36,7 +37,8 @@ enum ap_event_type {
- =
-
- struct ap_event_station_added_data {
- 	const uint8_t *mac;
--	const uint8_t *rsn_ie;
-+	const uint8_t *assoc_ies;
-+	size_t assoc_ies_len;
- };
- =
-
- struct ap_event_station_removed_data {
-@@ -46,6 +48,8 @@ struct ap_event_station_removed_data {
- =
-
- struct ap_event_registration_start_data {
- 	const uint8_t *mac;
-+	const uint8_t *assoc_ies;
-+	size_t assoc_ies_len;
- };
- =
-
- struct ap_event_registration_success_data {
-@@ -68,6 +72,10 @@ struct ap_config {
- struct ap_ops {
- 	void (*handle_event)(enum ap_event_type type, const void *event_data,
- 				void *user_data);
-+	size_t (*get_mgmt_frame_ies_len)(enum mpdu_management_subtype type,
-+						void *user_data);
-+	size_t (*write_mgmt_frame_ies)(enum mpdu_management_subtype type,
-+					uint8_t *out_buf, void *user_data);
- };
- =
-
- void ap_config_free(struct ap_config *config);
+-static bool p2p_extract_wfd_properties(const uint8_t *ie, size_t ie_size,
+-					struct p2p_wfd_properties *out)
+-{
+-	struct wfd_subelem_iter iter;
+-	const uint8_t *devinfo =3D NULL;
+-	const uint8_t *ext_caps =3D NULL;
+-	const uint8_t *r2 =3D NULL;
+-
+-	if (!ie)
+-		return false;
+-
+-	wfd_subelem_iter_init(&iter, ie, ie_size);
+-
+-	while (wfd_subelem_iter_next(&iter)) {
+-		enum wfd_subelem_type type =3D wfd_subelem_iter_get_type(&iter);
+-		size_t len =3D wfd_subelem_iter_get_length(&iter);
+-		const uint8_t *data =3D wfd_subelem_iter_get_data(&iter);
+-
+-		switch (type) {
+-#define SUBELEM_CHECK(var, expected_len, name)		\
+-			if (len !=3D expected_len) {	\
+-				l_debug(name " length wrong in WFD IE");\
+-				return false;		\
+-			}				\
+-							\
+-			if (var) {			\
+-				l_debug("Duplicate" name " in WFD IE");\
+-				return false;		\
+-			}				\
+-							\
+-			var =3D data;
+-		case WFD_SUBELEM_WFD_DEVICE_INFORMATION:
+-			SUBELEM_CHECK(devinfo, 6, "Device Information");
+-			break;
+-		case WFD_SUBELEM_EXTENDED_CAPABILITY:
+-			SUBELEM_CHECK(ext_caps, 2, "Extended Capability");
+-			break;
+-		case WFD_SUBELEM_R2_DEVICE_INFORMATION:
+-			SUBELEM_CHECK(r2, 2, "R2 Device Information");
+-			break;
+-#undef SUBELEM_CHECK
+-		default:
+-			/* Skip unknown IEs */
+-			break;
+-		}
+-	}
+-
+-	if (devinfo) {
+-		uint16_t capability =3D l_get_be16(devinfo + 0);
+-		bool source;
+-		bool sink;
+-		uint16_t port;
+-
+-		source =3D (capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
+-			WFD_DEV_INFO_TYPE_SOURCE ||
+-			(capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
+-			WFD_DEV_INFO_TYPE_DUAL_ROLE;
+-		sink =3D (capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
+-			WFD_DEV_INFO_TYPE_PRIMARY_SINK ||
+-			(capability & WFD_DEV_INFO_DEVICE_TYPE) =3D=3D
+-			WFD_DEV_INFO_TYPE_DUAL_ROLE;
+-
+-		if (!source && !sink)
+-			return false;
+-
+-		port =3D l_get_be16(devinfo + 2);
+-
+-		if (source && port =3D=3D 0) {
+-			l_debug("0 port number in WFD IE Device Information");
+-			return false;
+-		}
+-
+-		memset(out, 0, sizeof(*out));
+-		out->available =3D
+-			(capability & WFD_DEV_INFO_SESSION_AVAILABILITY) =3D=3D
+-			WFD_DEV_INFO_SESSION_AVAILABLE;
+-		out->source =3D source;
+-		out->sink =3D sink;
+-		out->port =3D port;
+-		out->cp =3D capability & WFD_DEV_INFO_CONTENT_PROTECTION_SUPPORT;
+-		out->audio =3D !sink ||
+-			!(capability & WFD_DEV_INFO_NO_AUDIO_AT_PRIMARY_SINK);
+-	} else {
+-		l_error("Device Information missing in WFD IE");
+-		return false;
+-	}
+-
+-	if (ext_caps && (l_get_be16(ext_caps) & 1))
+-		out->uibc =3D 1;
+-
+-	if (r2) {
+-		uint8_t role =3D l_get_be16(r2) & 3;
+-
+-		if ((out->source && role !=3D 0 && role !=3D 3) ||
+-				(out->sink && role !=3D 1 && role !=3D 3))
+-			l_debug("Invalid role in WFD R2 Device Information");
+-		else
+-			out->r2 =3D true;
+-	}
+-
+-	return true;
+-}
+-
+-static bool p2p_device_validate_conn_wfd(struct p2p_device *dev,
+-						const uint8_t *ie,
+-						ssize_t ie_size)
+-{
+-	struct p2p_wfd_properties wfd;
+-
+-	if (!dev->conn_own_wfd)
+-		return true;
+-
+-	/*
+-	 * WFD IEs are optional in Association Request/Response and P2P Public
+-	 * Action frames for R2 devices and required for R1 devices.
+-	 * Wi-Fi Display Technical Specification v2.1.0 section 5.2:
+-	 * "A WFD R2 Device shall include the WFD IE in Beacon, Probe
+-	 * Request/Response, Association Request/Response and P2P Public Action
+-	 * frames in order to be interoperable with R1 devices. If a WFD R2
+-	 * Device discovers that the peer device is also a WFD R2 Device, then
+-	 * it may include the WFD IE in Association Request/Response and P2P
+-	 * Public Action frames."
+-	 */
+-	if (!ie)
+-		return dev->conn_own_wfd->r2;
+-
+-	if (!p2p_extract_wfd_properties(ie, ie_size, &wfd)) {
+-		l_error("Could not parse the WFD IE contents");
+-		return false;
+-	}
+-
+-	if ((dev->conn_own_wfd->source && !wfd.sink) ||
+-			(dev->conn_own_wfd->sink && !wfd.source)) {
+-		l_error("Wrong role in peer's WFD IE");
+-		return false;
+-	}
+-
+-	if (wfd.r2 !=3D dev->conn_own_wfd->r2) {
+-		l_error("Wrong version in peer's WFD IE");
+-		return false;
+-	}
+-
+-	/*
+-	 * Ignore the session available state because it's not 100% clear
+-	 * at what point the peer switches to SESSION_NOT_AVAILABLE in its
+-	 * Device Information.
+-	 * But we might want to check that other bits have not changed from
+-	 * what the peer reported during discovery.
+-	 * Wi-Fi Display Technical Specification v2.1.0 section 4.5.2.1:
+-	 * "The content of the WFD Device Information subelement should be
+-	 * immutable during the period of P2P connection establishment, with
+-	 * [...] exceptions [...]"
+-	 */
+-
+-	return true;
+-}
+-
+ static bool p2p_go_negotiation_confirm_cb(const struct mmpdu_header *mpdu,
+ 					const void *body, size_t body_len,
+ 					int rssi, struct p2p_device *dev)
 -- =
 
 2.25.1
 
---===============2806073678519001528==--
+--===============6314783057427544884==--
 
