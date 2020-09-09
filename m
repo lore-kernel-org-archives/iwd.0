@@ -1,67 +1,132 @@
-Content-Type: multipart/mixed; boundary="===============2119778989860975256=="
+Content-Type: multipart/mixed; boundary="===============4516676243974772197=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: question on failed tests
-Date: Wed, 09 Sep 2020 09:32:45 -0500
-Message-ID: <907a6d62-215e-376a-34a7-e30084ad7bb4@gmail.com>
-In-Reply-To: <CAG17S_OcQNrcOXfxOidK7wst=+UAUztYxX-kND2UNKy-VR+gnA@mail.gmail.com>
+Subject: Re: [PATCH 01/17] ap: Fix iteration over ap->rates
+Date: Wed, 09 Sep 2020 10:21:23 -0500
+Message-ID: <a133e6d5-ac1b-80e7-b0b4-450b1ef8d4b7@gmail.com>
+In-Reply-To: <20200908234933.301439-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2119778989860975256==
+--===============4516676243974772197==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+Hi Andrew,
 
-On 9/9/20 9:10 AM, KeithG wrote:
-> I just built the iwd 1.9 for arch arm on armv6h, armv7h, and aarch64. The=
- aarch =
+On 9/8/20 6:49 PM, Andrew Zaborowski wrote:
+> In the for loops use a condition that works even if the uint32_t values
+> overflow since l_uintset_find_min/max() return UINT_MAX for empty sets.
 
-> 64 builds and fails 0 tests. The armv6 fails the crypto and eapol tests a=
-nd the =
+So it only returns UINT_MAX for set objects that are NULL, not empty.   How=
+ are =
 
-> armv7 fails the eapol test.
+you even passing in NULL objects that you're hitting this condition?  That =
+seems =
 
-What kernels are running on these systems?
+to be a logic error?
 
-Note that Linux Kernel 5.8.4 or so had a regression in the crypto subsystem =
+> If the condition is r <=3D l_uintset_find_max() or similar, it's always
+> true.
+> =
 
-which would result in a failure in the way iwd/ell used the AF_ALG API.  Th=
-is =
+> Make sure ap->rates is non-NULL both with and without no_cck_rates.
+> =
 
-was patched shortly after.  You can upgrade, downgrade or backport the fix =
-[1]
+> Update "count" in the for loop in ap_build_beacon_pr_head()
+> ---
+>   src/ap.c | 12 ++++++------
+>   1 file changed, 6 insertions(+), 6 deletions(-)
+> =
 
-> Which kernel configs do I need to enable so that iwd fails 0 tests on all=
- 3 =
+> diff --git a/src/ap.c b/src/ap.c
+> index 1cee185c..84d4539a 100644
+> --- a/src/ap.c
+> +++ b/src/ap.c
+> @@ -371,7 +371,7 @@ static size_t ap_build_beacon_pr_head(struct ap_state=
+ *ap,
+>   	minr =3D l_uintset_find_min(ap->rates);
+>   	maxr =3D l_uintset_find_max(ap->rates);
+>   	count =3D 0;
+> -	for (r =3D minr; r <=3D maxr && count < 8; r++)
+> +	for (r =3D minr; (int32_t) (maxr - r) >=3D 0 && count < 8; r++)
+>   		if (l_uintset_contains(ap->rates, r)) {
+>   			uint8_t flag =3D 0;
 
-> architectures?
-> I searched the kernel configs for 'eapol' and found nothing. The 'crypto'=
- search =
+Looking at this code closely I totally hate how this is done.  You are only =
 
-> revealed a lot of settings, but all looked to be either 'm'=C2=A0 or 'y'.=
- I am a bit =
+going to be calling l_uintset_contains a few million times even though you =
+know =
 
-> out of my depth, here but i'm capable of building kernels for all 3 =
+the basic rates are only 7 bits and the set cannot have more than 127 entri=
+es.
 
-> architectures. Thanks for any guidance.
+>   =
 
-This script should have all the kernel options required for crypto (3rd sec=
-tion =
+> @@ -380,10 +380,10 @@ static size_t ap_build_beacon_pr_head(struct ap_sta=
+te *ap,
+>   				flag =3D 0x80;
+>   =
 
-from the top, starting at line 12):
+>   			*rates++ =3D r | flag;
+> +			count++;
+>   		}
+>   =
 
-https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/tools/test_run=
-ner_kernel_config#n12
+> -	ie_tlv_builder_set_length(&builder, rates -
+> -					ie_tlv_builder_get_data(&builder));
+> +	ie_tlv_builder_set_length(&builder, count);
+>   =
 
-[1] =
+>   	/* DSSS Parameter Set IE for DSSS, HR, ERP and HT PHY rates */
+>   	ie_tlv_builder_next(&builder, IE_TYPE_DSSS_PARAMETER_SET);
+> @@ -983,7 +983,7 @@ static void ap_associate_sta(struct ap_state *ap, str=
+uct sta_state *sta)
+>   	minr =3D l_uintset_find_min(sta->rates);
+>   	maxr =3D l_uintset_find_max(sta->rates);
+>   =
 
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git/comm=
-it/?id=3Dc195d66a8a75c60515819b101975f38b7ec6577f
+> -	for (r =3D minr; r <=3D maxr; r++)
+> +	for (r =3D minr; (int32_t) (maxr - r) >=3D 0; r++)
+>   		if (l_uintset_contains(sta->rates, r))
+>   			rates[count++] =3D r;
+>   =
+
+> @@ -1089,7 +1089,7 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, =
+struct sta_state *sta,
+>   	minr =3D l_uintset_find_min(ap->rates);
+>   	maxr =3D l_uintset_find_max(ap->rates);
+>   	count =3D 0;
+> -	for (r =3D minr; r <=3D maxr && count < 8; r++)
+> +	for (r =3D minr; (int32_t) (maxr - r) >=3D 0 && count < 8; r++)
+>   		if (l_uintset_contains(ap->rates, r)) {
+>   			uint8_t flag =3D 0;
+>   =
+
+> @@ -2071,6 +2071,7 @@ struct ap_state *ap_start(struct netdev *netdev, st=
+ruct ap_config *config,
+>   	ap->ciphers =3D wiphy_select_cipher(wiphy, 0xffff);
+>   	ap->group_cipher =3D wiphy_select_cipher(wiphy, 0xffff);
+>   	ap->beacon_interval =3D 100;
+> +	ap->rates =3D l_uintset_new(200);
+>   =
+
+>   	/* TODO: Pick from actual supported rates */
+>   	if (config->no_cck_rates) {
+> @@ -2083,7 +2084,6 @@ struct ap_state *ap_start(struct netdev *netdev, st=
+ruct ap_config *config,
+>   		l_uintset_put(ap->rates, 96); /* 48 Mbps*/
+>   		l_uintset_put(ap->rates, 108); /* 54 Mbps*/
+>   	} else {
+> -		ap->rates =3D l_uintset_new(200);
+>   		l_uintset_put(ap->rates, 2); /* 1 Mbps*/
+>   		l_uintset_put(ap->rates, 11); /* 5.5 Mbps*/
+>   		l_uintset_put(ap->rates, 22); /* 11 Mbps*/
+> =
+
 
 Regards,
 -Denis
---===============2119778989860975256==--
+--===============4516676243974772197==--
 
