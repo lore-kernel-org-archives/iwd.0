@@ -1,100 +1,119 @@
-Content-Type: multipart/mixed; boundary="===============0116350624585620263=="
+Content-Type: multipart/mixed; boundary="===============4675727453193014726=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 01/17] ap: Fix iteration over ap->rates
-Date: Thu, 10 Sep 2020 00:21:47 +0200
-Message-ID: <CAOq732LB43FNzRyfmm5OE9BdRiZDc3jg-tJpgdhy-x3DeZFn-A@mail.gmail.com>
-In-Reply-To: <5be3f883-2c9f-f69b-af33-fdd90d8618fb@gmail.com>
+Subject: Re: [PATCH 08/17] p2putil: Add p2p_random_char
+Date: Thu, 10 Sep 2020 01:15:22 +0200
+Message-ID: <CAOq732+JfnTyx8CrDByR27BSVfYGK6XV71y6Vgb22NE5mHNFNg@mail.gmail.com>
+In-Reply-To: <b5f54c79-9e75-4c4b-c791-b1601c822fde@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0116350624585620263==
+--===============4675727453193014726==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
-
-On Wed, 9 Sep 2020 at 19:02, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 9/9/20 11:51 AM, Andrew Zaborowski wrote:
-> > On Wed, 9 Sep 2020 at 17:37, Denis Kenzior <denkenz@gmail.com> wrote:
-> >> On 9/8/20 6:49 PM, Andrew Zaborowski wrote:
-> >>> In the for loops use a condition that works even if the uint32_t valu=
-es
-> >>> overflow since l_uintset_find_min/max() return UINT_MAX for empty set=
-s.
-> >>
-> >> So it only returns UINT_MAX for set objects that are NULL, not empty.
+On Wed, 9 Sep 2020 at 21:16, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 9/8/20 6:49 PM, Andrew Zaborowski wrote:
+> > Add a utility to select random characters from the set defined in P2P
+> > v1.7 Section 3.2.1.
+> > ---
+> >   src/p2putil.c | 26 ++++++++++++++++++++++++++
+> >   src/p2putil.h |  2 ++
+> >   2 files changed, 28 insertions(+)
 > >
-> > Ah, true.  If it's empty we'll get 201 as set->max is 200.
+> > diff --git a/src/p2putil.c b/src/p2putil.c
+> > index d0f3a444..99ab4ca0 100644
+> > --- a/src/p2putil.c
+> > +++ b/src/p2putil.c
+> > @@ -2611,3 +2611,29 @@ uint8_t *p2p_build_go_disc_req(size_t *out_len)
+> >       return p2p_build_action_frame(false, P2P_ACTION_GO_DISCOVERABILIT=
+Y_REQ,
+> >                                       0, NULL, NULL, NULL, 0, out_len);
+> >   }
+> > +
+> > +/*
+> > + * Select a random char from the set defined in section 3.2.1:
+> > + *
+> > + * "Following "DIRECT-" the SSID shall contain two ASCII characters "x=
+y",
+> > + * randomly selected with a uniform distribution from the following
+> > + * character set: upper case letters, lower case letters and numbers."
+> > + *
+> > + * "The WPA2-Personal pass-phrase shall contain at least eight ASCII
+> > + * characters randomly selected with a uniform distribution from the
+> > + * following character set: upper case letters, lower case letters and
+> > + * numbers."
+> > + */
+> > +char p2p_random_char(void)
+> > +{
+> > +#define CHARSET "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "abcdefghijklmnopqrstuvwx=
+yz" \
+> > +             "0123456789"
 >
-> So why is the set 200 anyway when the max is 127? ;)
-
-I don't remember, I guess I could fix it in this same patch.
-
+> might as well make this static char[]
 >
-> >
-> >> How are
-> >> you even passing in NULL objects that you're hitting this condition?  =
-That seems
-> >> to be a logic error?
-> >
-> > It is/was, this is the other fix in this patch.
+> > +     static const int set_size =3D strlen(CHARSET);
+> > +     static const uint32_t limit =3D -(0x100000000LL % set_size);
 >
-> Okay, then the rest of it is a big hammer for no good reason.  I'd just f=
-ix the
-> logic error where ap->rates was NULL and leave the rest as is.
-
-I thought that was a very small change and since the uintset functions
-under some conditions do return UINT_MAX maybe it's the better way to
-write those loops.  But I can drop this change.
-
+> I find this written like:
 >
-> Or use l_uintset_foreach...
+> limit =3D UINT_MAX - UINTMAX % set_size
 >
-> >>> -     for (r =3D minr; r <=3D maxr && count < 8; r++)
-> >>> +     for (r =3D minr; (int32_t) (maxr - r) >=3D 0 && count < 8; r++)
-> >>>                if (l_uintset_contains(ap->rates, r)) {
-> >>>                        uint8_t flag =3D 0;
-> >>
-> >> Looking at this code closely I totally hate how this is done.  You are=
- only
-> >> going to be calling l_uintset_contains a few million times even though=
- you know
-> >> the basic rates are only 7 bits and the set cannot have more than 127 =
-entries.
-> >
-> > If the set contains rates between 2 and 22 we only make 11 calls, the
-> > loop iterates from l_uintset_find_min(ap->rates) to
-> > l_uintset_find_max(ap->rates), or am I missing something?  If the set
-> > is empty we make one call... we could replace that with an isempty()
-> > call if needed.
->
-> If the set is valid, sure.  But if the set wasn't valid you're iterating 2
-> billion times or something,
+> a bit more clear.
 
-You're iterating indefinitely.
-
-Oh ok, yes, the original code contained an overflow bug, once I
-understood it I didn't like it either ;-)  Hence the fix.
-
-> when a static 0..127 would have been enough.
-
-For an invalid set, 0..127 is still wasteful ;-)
+Ok, maybe UINT32_MAX to make it clear it's based on 32-bit input.
 
 >
-> >
-> > Granted we're iterating over values that don't correspond to standard
-> > rates, we could store indexes into the array of known rates to save
-> > some iterations.
-> >
+> > +     uint32_t index;
+> > +
+> > +     while ((index =3D l_getrandom_uint32()) >=3D limit);
 >
-> Maybe consider just using wiphy_get_supported_rates() instead.
+> So I actually wonder if this should be an ell utility.  I'm not too sure =
+I like
+> the idea of hitting getrandom in a loop.  The chances are pretty small but
+> still...  Perhaps using rand_r  with a random seed would be better.
 
-Right, but we're giving the user (of the ap.h API) some control over
-which rates to support so the plan is to eventually call it but during
-ap_start only.
+Do you mean adding something like l_getrandom_range()?
+
+However if we just use a single random seed of say 32 bits, we're
+guaranteed a non-uniform distribution, unless 1 << 32 is divisible by
+the size of the set (not the case).  I'm no expert but as far as I
+know (and googled) there's no way to get uniform distribution with a
+predefined number of random bits.
+
+The difficulty here is really only the "uniform distribution" part
+which I don't think it super important, as long as it's *nearly*
+uniform.  I'd have normally sacrificed it to avoid the loop and
+thinking of it, the way we ended up doing it in
+l_key_generate_dh_private is completely non-uniform.  However we've
+also later added l_ecc_scalar_new_random and l_ecdh_generate_key_pair
+which do loop, with a much higher probability and discard many more
+random bits in each iteration, so I didn't think you'd care.
+
+>
+> But if you want to direct code, then in theory you require only 5 bits of
+> randomness here since the set is 62 long.  You could make due with just g=
+rabbing
+> a single byte of randomness and you'd have 3 attempts at being in the ran=
+ge (low
+> 5 bits, then 6..1, 7..2)
+
+So the idea is to discard just the right-most (or left-most) bit in
+each iteration and shift the other 4, and if we run out of bits we
+draw another 8 and continue shifting, right?  This sounds reasonable.
+
+On a second thought though... if our first 5-bit number was >=3D 62, we
+went into a second iteration and reused bits 5...1, we start favouring
+some numbers and the uniform distribution goes out the window.  In
+fact, in this case the first number must have been 62 or 63... we
+shift right, we get 31 and add a new topmost bit, we can only end up
+drawing 31 from there on.
+
+We probably have to choose between looping and generating independent
+random bits each time, or doing (random % 62), which is better than
+the above idea and than what we do in l_key_generate_dh_private.
 
 Best regards
---===============0116350624585620263==--
+--===============4675727453193014726==--
 
