@@ -1,59 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============2378451467819095627=="
+Content-Type: multipart/mixed; boundary="===============8585151270317686741=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: question on failed tests
-Date: Wed, 09 Sep 2020 23:02:40 -0500
-Message-ID: <a844f551-90dd-9675-bc70-d0ae9ba3c048@gmail.com>
-In-Reply-To: <CAG17S_MekoU62j2LhNq_0wrn3Tnfa1vNPUYAkLPXHEB=nM0UQQ@mail.gmail.com>
+From: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+Subject: [PATCH] src/ap.c: fix build with uclibc
+Date: Thu, 10 Sep 2020 08:18:00 +0200
+Message-ID: <20200910061800.497914-1-fontaine.fabrice@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2378451467819095627==
+--===============8585151270317686741==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+explicit_bzero is used in src/ap.c since commit
+d55e00b31d7bccdbb2ea1cdeb0a749df77a51e47 but src/missing.h is not
+included, as a result build with uclibc fails on:
 
-> test-crypto.log:
-> test-crypto: unit/test-crypto.c:397: aes_siv_test: Assertion =
+/srv/storage/autobuild/run/instance-1/output-1/host/lib/gcc/xtensa-buildroo=
+t-linux-uclibc/9.3.0/../../../../xtensa-buildroot-linux-uclibc/bin/ld: src/=
+ap.o: in function `ap_probe_req_cb':
+ap.c:(.text+0x23d8): undefined reference to `explicit_bzero'
 
-> `aes_siv_encrypt(key, sizeof(key), plaintext, sizeof(plaintext), iov, 1, =
+Fixes:
+ - http://autobuild.buildroot.org/results/c7a0096a269bfc52bd8e23d453d36d5bf=
+b61441d
 
-> outbuf)' failed.
-> FAIL unit/test-crypto (exit status: 134)
+Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+---
+ src/ap.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Uh oh.  This is exactly the failures we were seeing on 5.8.4.  I wonder if =
-your =
+diff --git a/src/ap.c b/src/ap.c
+index c972cfcb..ac705c31 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -31,6 +31,7 @@
+ =
 
-kernel is one of the stable ones?  Maybe it has received the same regressiv=
-e =
+ #include "linux/nl80211.h"
+ =
 
-behavior (via a backported fix) that kernel 5.8.4 did.
++#include "src/missing.h"
+ #include "src/iwd.h"
+ #include "src/module.h"
+ #include "src/scan.h"
+-- =
 
-I would try applying the patch I linked to earlier from  Herbert and see if=
- it =
+2.28.0
 
-fixes things.
-
-> test-wsc.log:
-> test-wsc: unit/test-wsc.c:1993: verify_8021x: Assertion `len =3D=3D =
-
-> data->expected_len' failed.
-> FAIL unit/test-wsc (exit status: 134)
-> =
-
-> Can you give me some guidance on how to provide an strace?
-
-denkenz(a)localhost ~/iwd-master $ strace unit/test-crypto
-
-It might take a while and will produce a lots of output to stderr. Might be =
-
-better if you can comment out everything except the bits related to the =
-
-aes_siv_test...
-
-Regards,
--Denis
---===============2378451467819095627==--
+--===============8585151270317686741==--
 
