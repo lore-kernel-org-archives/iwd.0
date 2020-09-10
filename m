@@ -1,160 +1,135 @@
-Content-Type: multipart/mixed; boundary="===============1776425022189416140=="
+Content-Type: multipart/mixed; boundary="===============6802876514658266417=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 17/26] auto-t: fix SAE FT test and update
-Date: Thu, 10 Sep 2020 16:12:38 -0700
-Message-ID: <20200910231248.4995-17-prestwoj@gmail.com>
+Subject: [PATCH v5 18/26] auto-t: update testClientNonInteractive to use
+ TestContext
+Date: Thu, 10 Sep 2020 16:12:39 -0700
+Message-ID: <20200910231248.4995-18-prestwoj@gmail.com>
 In-Reply-To: <20200910231248.4995-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1776425022189416140==
+--===============6802876514658266417==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Updated testFT-SAE-roam to use the TestContext APIs as well as
-fixed the failure which was introduced after requiring stricter
-AKM logic for SAE networks. The new failure was due to the hostapd
-config not including the standard SAE AKM which is actually
-required by the spec.
+This makes any iwctl output hidden unless enabled via the verbose
+option.
 ---
- autotests/testFT-SAE-roam/connection_test.py | 22 ++++++++++++--------
- autotests/testFT-SAE-roam/ft-psk-3.conf      |  2 --
- autotests/testFT-SAE-roam/ft-sae-1.conf      |  4 +---
- autotests/testFT-SAE-roam/ft-sae-2.conf      |  4 +---
- 4 files changed, 15 insertions(+), 17 deletions(-)
+ .../connect_command_test.py                   | 26 +++++++++----------
+ 1 file changed, 12 insertions(+), 14 deletions(-)
 
-diff --git a/autotests/testFT-SAE-roam/connection_test.py b/autotests/testF=
-T-SAE-roam/connection_test.py
-index dcea148c..99f58456 100644
---- a/autotests/testFT-SAE-roam/connection_test.py
-+++ b/autotests/testFT-SAE-roam/connection_test.py
-@@ -11,9 +11,12 @@ from iwd import NetworkType
- from hwsim import Hwsim
- from hostapd import HostapdCLI
+diff --git a/autotests/testClientNonInteractive/connect_command_test.py b/a=
+utotests/testClientNonInteractive/connect_command_test.py
+index 886d7a76..a503bd24 100644
+--- a/autotests/testClientNonInteractive/connect_command_test.py
++++ b/autotests/testClientNonInteractive/connect_command_test.py
+@@ -8,6 +8,7 @@ import iwd
+ from iwd import IWD
  import testutil
+ import subprocess
 +from config import ctx
  =
 
  class Test(unittest.TestCase):
-     def test_roam_success(self):
-+        wd =3D IWD()
-+
-         hwsim =3D Hwsim()
  =
 
-         rule0 =3D hwsim.rules.create()
-@@ -28,8 +31,6 @@ class Test(unittest.TestCase):
-         rule2.source =3D self.bss_radio[2].addresses[0]
-         rule2.bidirectional =3D True
+@@ -34,11 +35,10 @@ class Test(unittest.TestCase):
  =
 
--        wd =3D IWD()
+         # Use --dontaks cmd-line option
+         with self.assertRaises(subprocess.CalledProcessError):
+-                        subprocess.check_call(['iwctl', '-d', 'station',
+-                                                 device.name, 'connect', s=
+sid])
++            ctx.start_process(['iwctl', 'd', 'station', device.name, 'conn=
+ect', ssid],  check=3DTrue)
+ =
+
+-        subprocess.check_call(['iwctl', '-P', 'passphrase',
+-                                'station', device.name, 'connect', ssid])
++        ctx.start_process(['iwctl', '-P', 'passphrase', 'station', device.=
+name, 'connect', ssid],
++                                check=3DTrue)
+ =
+
+         self.check_connection_success(ssid)
+ =
+
+@@ -47,9 +47,8 @@ class Test(unittest.TestCase):
+ =
+
+         device =3D self.wd.list_devices(1)[0]
+ =
+
+-        subprocess.check_call(['iwctl', '-u', 'user', '-p', 'password',
+-                                'station', device.name, 'connect', ssid])
 -
-         psk_agent =3D PSKAgent("EasilyGuessedPassword")
-         wd.register_psk_agent(psk_agent)
++        ctx.start_process(['iwctl', '-u', 'user', '-p', 'password', 'stati=
+on', \
++                            device.name, 'connect', ssid], check=3DTrue)
+         self.check_connection_success(ssid)
  =
 
-@@ -158,17 +159,20 @@ class Test(unittest.TestCase):
-                            hwsim.get_radio('rad1'),
-                            hwsim.get_radio('rad2') ]
+     def test_connection_with_password(self):
+@@ -57,8 +56,8 @@ class Test(unittest.TestCase):
  =
 
--        # Set interface addresses to those expected by hostapd config files
--        os.system('ifconfig "' + cls.bss_hostapd[0].ifname +
--                '" down hw ether 12:00:00:00:00:01 up')
--        os.system('ifconfig "' + cls.bss_hostapd[1].ifname +
--                '" down hw ether 12:00:00:00:00:02 up')
--        os.system('ifconfig "' + cls.bss_hostapd[2].ifname +
--                '" down hw ether 12:00:00:00:00:03 up')
-+        ctx.start_process(['ifconfig', cls.bss_hostapd[0].ifname, 'down', =
-'hw', \
-+                                'ether', '12:00:00:00:00:01', 'up'], wait=
-=3DTrue)
-+        ctx.start_process(['ifconfig', cls.bss_hostapd[1].ifname, 'down', =
-'hw', \
-+                                'ether', '12:00:00:00:00:02', 'up'], wait=
-=3DTrue)
-+        ctx.start_process(['ifconfig', cls.bss_hostapd[2].ifname, 'down', =
-'hw', \
-+                                'ether', '12:00:00:00:00:03', 'up'], wait=
-=3DTrue)
+         device =3D self.wd.list_devices(1)[0]
  =
 
-+        # Set interface addresses to those expected by hostapd config files
-         cls.bss_hostapd[0].reload()
-+        cls.bss_hostapd[0].wait_for_event("AP-ENABLED")
-         cls.bss_hostapd[1].reload()
-+        cls.bss_hostapd[1].wait_for_event("AP-ENABLED")
-         cls.bss_hostapd[2].reload()
-+        cls.bss_hostapd[2].wait_for_event("AP-ENABLED")
+-        subprocess.check_call(['iwctl', '-p', 'password',
+-                                'station', device.name, 'connect', ssid])
++        ctx.start_process(['iwctl', '-p', 'password', 'station', device.na=
+me, 'connect', ssid],
++                            check=3DTrue)
  =
 
-         # Fill in the neighbor AP tables in both BSSes.  By default each
-         # instance knows only about current BSS, even inside one hostapd
-diff --git a/autotests/testFT-SAE-roam/ft-psk-3.conf b/autotests/testFT-SAE=
--roam/ft-psk-3.conf
-index 6a2d4cad..8918cf9e 100644
---- a/autotests/testFT-SAE-roam/ft-psk-3.conf
-+++ b/autotests/testFT-SAE-roam/ft-psk-3.conf
-@@ -16,8 +16,6 @@ wpa_passphrase=3DEasilyGuessedPassword
- wpa_ptk_rekey=3D30
- wpa_group_rekey=3D80
- ieee80211w=3D2
--rsn_preauth=3D1
--rsn_preauth_interfaces=3Dlo
- disable_pmksa_caching=3D0
- # Allow PMK cache to be shared opportunistically among configured interfac=
-es
- # and BSSes (i.e., all configurations within a single hostapd process).
-diff --git a/autotests/testFT-SAE-roam/ft-sae-1.conf b/autotests/testFT-SAE=
--roam/ft-sae-1.conf
-index 6642c398..aa40494a 100644
---- a/autotests/testFT-SAE-roam/ft-sae-1.conf
-+++ b/autotests/testFT-SAE-roam/ft-sae-1.conf
-@@ -10,14 +10,12 @@ nas_identifier=3Ddummy1
- wpa=3D2
- # Can support SAE and FT-SAE (space separated list) and/or EAP at the same
- # time but we want to force FT
--wpa_key_mgmt=3DFT-SAE
-+wpa_key_mgmt=3DFT-SAE SAE
- sae_password=3DEasilyGuessedPassword|mac=3Dff:ff:ff:ff:ff:ff
- wpa_pairwise=3DCCMP
- wpa_ptk_rekey=3D30
- wpa_group_rekey=3D80
- ieee80211w=3D2
--rsn_preauth=3D1
--rsn_preauth_interfaces=3Dlo
- disable_pmksa_caching=3D0
- # Allow PMK cache to be shared opportunistically among configured interfac=
-es
- # and BSSes (i.e., all configurations within a single hostapd process).
-diff --git a/autotests/testFT-SAE-roam/ft-sae-2.conf b/autotests/testFT-SAE=
--roam/ft-sae-2.conf
-index fa841db8..5bff6c9d 100644
---- a/autotests/testFT-SAE-roam/ft-sae-2.conf
-+++ b/autotests/testFT-SAE-roam/ft-sae-2.conf
-@@ -10,14 +10,12 @@ nas_identifier=3Ddummy2
- wpa=3D2
- # Can support SAE and FT-SAE (space separated list) and/or EAP at the same
- # time but we want to force FT
--wpa_key_mgmt=3DFT-SAE
-+wpa_key_mgmt=3DFT-SAE SAE
- sae_password=3DEasilyGuessedPassword|mac=3Dff:ff:ff:ff:ff:ff
- wpa_pairwise=3DCCMP
- wpa_ptk_rekey=3D30
- wpa_group_rekey=3D80
- ieee80211w=3D2
--rsn_preauth=3D1
--rsn_preauth_interfaces=3Dlo
- disable_pmksa_caching=3D0
- # Allow PMK cache to be shared opportunistically among configured interfac=
-es
- # and BSSes (i.e., all configurations within a single hostapd process).
+         self.check_connection_success(ssid)
+ =
+
+@@ -68,8 +67,8 @@ class Test(unittest.TestCase):
+         device =3D self.wd.list_devices(1)[0]
+ =
+
+         with self.assertRaises(subprocess.CalledProcessError):
+-                subprocess.check_call(['iwctl', '-P', 'incorrect_passphras=
+e',
+-                                'station', device.name, 'connect', ssid])
++            ctx.start_process(['iwctl', '-P', 'incorrect_passphrase', 'sta=
+tion', device.name, \
++                                'connect', ssid], check=3DTrue)
+ =
+
+     def test_invalid_command_line_option(self):
+         ssid =3D 'ssidPassphrase'
+@@ -77,14 +76,13 @@ class Test(unittest.TestCase):
+         device =3D self.wd.list_devices(1)[0]
+ =
+
+         with self.assertRaises(subprocess.CalledProcessError):
+-                subprocess.check_call(['iwctl', '-z',
+-                                'station', device.name, 'connect', ssid])
++            ctx.start_process(['iwctl', '-z', 'station', device.name, 'con=
+nect', ssid], check=3DTrue)
+ =
+
+     def test_invalid_command(self):
+         device =3D self.wd.list_devices(1)[0]
+ =
+
+         with self.assertRaises(subprocess.CalledProcessError):
+-                subprocess.check_call(['iwctl', 'inexistent', 'command'])
++            ctx.start_process(['iwctl', 'inexistent', 'command'], check=3D=
+True)
+ =
+
+     @classmethod
+     def setUpClass(cls):
 -- =
 
 2.26.2
 
---===============1776425022189416140==--
+--===============6802876514658266417==--
 
