@@ -1,66 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============3586801134328050192=="
+Content-Type: multipart/mixed; boundary="===============5166473673213193788=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: question on failed tests
-Date: Wed, 09 Sep 2020 20:08:52 -0500
-Message-ID: <decb9567-4e29-1ea5-a5a0-0038b213a930@gmail.com>
-In-Reply-To: <CAG17S_OCB-S22fyvmmj2T59JX0_sYesvur_P7kOST=3kd2jAHg@mail.gmail.com>
+Subject: Re: [PATCH 08/17] p2putil: Add p2p_random_char
+Date: Wed, 09 Sep 2020 20:23:08 -0500
+Message-ID: <98c3869e-4c51-fbf6-6c6a-f24938858084@gmail.com>
+In-Reply-To: <7625e8bb-cfb0-a1e0-ddb5-d821842e0a28@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3586801134328050192==
+--===============5166473673213193788==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+Hi,
 
-No top-posting please :)
+> I'm not worried about looping here as much as us wasting resources.=C2=A0=
+ You are =
 
-On 9/9/20 7:48 PM, KeithG wrote:
-> Denis,
-> =
+> grabbing 32 bits of randomness at a time, and you only need 5.
 
-> I built the kernel and tried building it again. This time I get 2 errors =
-on armv7:
->  =C2=A0 CC =C2=A0 =C2=A0 =C2=A0 unit/test-crypto.o
->  =C2=A0 CCLD =C2=A0 =C2=A0 unit/test-crypto
-> ./build-aux/test-driver: line 107: =C2=A09846 Aborted =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (core dumped) " =
+And I'm not sure why I keep saying 5 bits.  I of course mean 6.  But hopefu=
+lly =
 
->  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0$@" > $log_file 2>&1
-> FAIL: unit/test-crypto
-> ...
->  =C2=A0 CC =C2=A0 =C2=A0 =C2=A0 unit/test-wsc.o
->  =C2=A0 CCLD =C2=A0 =C2=A0 unit/test-wsc
-> ./build-aux/test-driver: line 107: 10643 Aborted =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (core dumped) " =
-
->  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0$@" > $log_file 2>&1
-> FAIL: unit/test-wsc
-> =
-
-
-Can you provide unit/test-crypto.log and unit/test-wsc.log from these syste=
-ms?
-
-Also, can you run strace on both manually and provide logs from that?
-
-> The intel and arm stuff differs and some of the keys are not present. I d=
-o not =
-
-> know if I should brute them in there. The config I used is attached. This=
- is on =
-
-> a RaspberryPi4 running this kernel 5.4.61-2 armv7h
-
-CONFIG_KEY_DH_OPERATIONS is required for WPS/P2P support.
-
-CONFIG_PKCS8_PRIVATE_KEY_PARSER is required for EAP-TLS.
+you groked what I was saying anyway.
 
 Regards,
 -Denis
---===============3586801134328050192==--
+--===============5166473673213193788==--
 
