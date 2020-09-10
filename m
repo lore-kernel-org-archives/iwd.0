@@ -1,470 +1,160 @@
-Content-Type: multipart/mixed; boundary="===============5326073743549243264=="
+Content-Type: multipart/mixed; boundary="===============1776425022189416140=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 16/26] auto-t: Increase all test timeouts
-Date: Thu, 10 Sep 2020 16:12:37 -0700
-Message-ID: <20200910231248.4995-16-prestwoj@gmail.com>
+Subject: [PATCH v5 17/26] auto-t: fix SAE FT test and update
+Date: Thu, 10 Sep 2020 16:12:38 -0700
+Message-ID: <20200910231248.4995-17-prestwoj@gmail.com>
 In-Reply-To: <20200910231248.4995-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5326073743549243264==
+--===============1776425022189416140==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Slower systems may not be able to make some timeouts that tests
-mandated. All timeouts were increased significantly to allow tests
-to pass on slow systems.
+Updated testFT-SAE-roam to use the TestContext APIs as well as
+fixed the failure which was introduced after requiring stricter
+AKM logic for SAE networks. The new failure was due to the hostapd
+config not including the standard SAE AKM which is actually
+required by the spec.
 ---
- autotests/testAPRoam/connection_test.py           | 4 ++--
- autotests/testBSSBlacklist/connection_test.py     | 4 ++--
- autotests/testFT-8021x-roam/connection_test.py    | 8 ++++----
- autotests/testFT-FILS-SHA256/connection_test.py   | 4 ++--
- autotests/testFT-FILS-SHA384/connection_test.py   | 4 ++--
- autotests/testFT-PSK-over-DS/connection_test.py   | 4 ++--
- autotests/testFT-PSK-roam/connection_test.py      | 4 ++--
- autotests/testFT-SAE-roam/connection_test.py      | 8 ++++----
- autotests/testHiddenNetworks/validation.py        | 6 +++---
- autotests/testKnownNetworks/known_network_test.py | 4 ++--
- autotests/testPreauth-roam/connection_test.py     | 4 ++--
- autotests/testRSSIAgent/connection_test.py        | 2 +-
- autotests/testSAE/autoconnect_test.py             | 2 +-
- autotests/testScan/requested_scan_test.py         | 4 ++--
- autotests/util/iwd.py                             | 8 ++++----
- autotests/util/testutil.py                        | 2 +-
- tools/test-runner                                 | 2 +-
- 17 files changed, 37 insertions(+), 37 deletions(-)
+ autotests/testFT-SAE-roam/connection_test.py | 22 ++++++++++++--------
+ autotests/testFT-SAE-roam/ft-psk-3.conf      |  2 --
+ autotests/testFT-SAE-roam/ft-sae-1.conf      |  4 +---
+ autotests/testFT-SAE-roam/ft-sae-2.conf      |  4 +---
+ 4 files changed, 15 insertions(+), 17 deletions(-)
 
-diff --git a/autotests/testAPRoam/connection_test.py b/autotests/testAPRoam=
-/connection_test.py
-index c8c2ca9f..308bbc28 100644
---- a/autotests/testAPRoam/connection_test.py
-+++ b/autotests/testAPRoam/connection_test.py
-@@ -60,10 +60,10 @@ class Test(unittest.TestCase):
-                  (bss_radio[2].addresses[0], '8f0000005103060603000000')])
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 15)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         condition =3D 'obj.state !=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 5)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(bss_hostapd[1].list_sta())
-diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/test=
-BSSBlacklist/connection_test.py
-index 825439d4..0a51b8cb 100644
---- a/autotests/testBSSBlacklist/connection_test.py
-+++ b/autotests/testBSSBlacklist/connection_test.py
-@@ -99,10 +99,10 @@ class Test(unittest.TestCase):
-         # Now we wait... AutoConnect should take over
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.connecting'
--        wd.wait_for_object_condition(device, condition, 15)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
--        wd.wait_for_object_condition(device, condition, 15)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         # Same as before, make sure we didn't connect to the blacklisted A=
-P.
-         self.assertNotIn(device.address, bss_hostapd[0].list_sta())
-diff --git a/autotests/testFT-8021x-roam/connection_test.py b/autotests/tes=
-tFT-8021x-roam/connection_test.py
-index 65c73492..084bac64 100644
---- a/autotests/testFT-8021x-roam/connection_test.py
-+++ b/autotests/testFT-8021x-roam/connection_test.py
-@@ -75,12 +75,12 @@ class Test(unittest.TestCase):
-         rule0.signal =3D -8000
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 10)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         # Check that iwd is on BSS 1 once out of roaming state and doesn't
-         # go through 'disconnected', 'autoconnect', 'connecting' in between
-         condition =3D 'obj.state !=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 5)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(self.bss_hostapd[1].list_sta())
-@@ -151,12 +151,12 @@ class Test(unittest.TestCase):
-         rule0.drop =3D False
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 20)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         # Check that iwd is on BSS 1 once out of roaming state and doesn't
-         # go through 'disconnected', 'autoconnect', 'connecting' in between
-         condition =3D 'obj.state !=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 5)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(self.bss_hostapd[1].list_sta())
-diff --git a/autotests/testFT-FILS-SHA256/connection_test.py b/autotests/te=
-stFT-FILS-SHA256/connection_test.py
-index 16f46210..d87afce0 100644
---- a/autotests/testFT-FILS-SHA256/connection_test.py
-+++ b/autotests/testFT-FILS-SHA256/connection_test.py
-@@ -105,12 +105,12 @@ class Test(unittest.TestCase):
-         rule0.signal =3D -8000
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 10)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         # Check that iwd is on BSS 1 once out of roaming state and doesn't
-         # go through 'disconnected', 'autoconnect', 'connecting' in between
-         condition =3D 'obj.state !=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 5)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(self.bss_hostapd[1].list_sta())
-diff --git a/autotests/testFT-FILS-SHA384/connection_test.py b/autotests/te=
-stFT-FILS-SHA384/connection_test.py
-index 16f46210..d87afce0 100644
---- a/autotests/testFT-FILS-SHA384/connection_test.py
-+++ b/autotests/testFT-FILS-SHA384/connection_test.py
-@@ -105,12 +105,12 @@ class Test(unittest.TestCase):
-         rule0.signal =3D -8000
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 10)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         # Check that iwd is on BSS 1 once out of roaming state and doesn't
-         # go through 'disconnected', 'autoconnect', 'connecting' in between
-         condition =3D 'obj.state !=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 5)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(self.bss_hostapd[1].list_sta())
-diff --git a/autotests/testFT-PSK-over-DS/connection_test.py b/autotests/te=
-stFT-PSK-over-DS/connection_test.py
-index 2cfdf245..188eca63 100644
---- a/autotests/testFT-PSK-over-DS/connection_test.py
-+++ b/autotests/testFT-PSK-over-DS/connection_test.py
-@@ -81,12 +81,12 @@ class Test(unittest.TestCase):
-         rule0.signal =3D -8000
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 10)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         # Check that iwd is on BSS 1 once out of roaming state and doesn't
-         # go through 'disconnected', 'autoconnect', 'connecting' in between
-         condition =3D 'obj.state !=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 5)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(self.bss_hostapd[1].list_sta())
-diff --git a/autotests/testFT-PSK-roam/connection_test.py b/autotests/testF=
-T-PSK-roam/connection_test.py
-index f40fdf58..37dd80d0 100644
---- a/autotests/testFT-PSK-roam/connection_test.py
-+++ b/autotests/testFT-PSK-roam/connection_test.py
-@@ -83,12 +83,12 @@ class Test(unittest.TestCase):
-         rule0.signal =3D -8000
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 10)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         # Check that iwd is on BSS 1 once out of roaming state and doesn't
-         # go through 'disconnected', 'autoconnect', 'connecting' in between
-         condition =3D 'obj.state !=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 5)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(self.bss_hostapd[1].list_sta())
 diff --git a/autotests/testFT-SAE-roam/connection_test.py b/autotests/testF=
 T-SAE-roam/connection_test.py
-index 3e209560..dcea148c 100644
+index dcea148c..99f58456 100644
 --- a/autotests/testFT-SAE-roam/connection_test.py
 +++ b/autotests/testFT-SAE-roam/connection_test.py
-@@ -86,12 +86,12 @@ class Test(unittest.TestCase):
-         rule0.signal =3D -8000
+@@ -11,9 +11,12 @@ from iwd import NetworkType
+ from hwsim import Hwsim
+ from hostapd import HostapdCLI
+ import testutil
++from config import ctx
  =
 
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 10)
-+        wd.wait_for_object_condition(device, condition)
+ class Test(unittest.TestCase):
+     def test_roam_success(self):
++        wd =3D IWD()
++
+         hwsim =3D Hwsim()
  =
 
-         # Check that iwd is on BSS 1 once out of roaming state and doesn't
-         # go through 'disconnected', 'autoconnect', 'connecting' in between
-         condition =3D 'obj.state !=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 5)
-+        wd.wait_for_object_condition(device, condition)
+         rule0 =3D hwsim.rules.create()
+@@ -28,8 +31,6 @@ class Test(unittest.TestCase):
+         rule2.source =3D self.bss_radio[2].addresses[0]
+         rule2.bidirectional =3D True
  =
 
-         rule1.signal =3D -2000
+-        wd =3D IWD()
+-
+         psk_agent =3D PSKAgent("EasilyGuessedPassword")
+         wd.register_psk_agent(psk_agent)
  =
 
-@@ -112,10 +112,10 @@ class Test(unittest.TestCase):
-         rule2.signal =3D -1000
+@@ -158,17 +159,20 @@ class Test(unittest.TestCase):
+                            hwsim.get_radio('rad1'),
+                            hwsim.get_radio('rad2') ]
  =
 
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 15)
-+        wd.wait_for_object_condition(device, condition)
+-        # Set interface addresses to those expected by hostapd config files
+-        os.system('ifconfig "' + cls.bss_hostapd[0].ifname +
+-                '" down hw ether 12:00:00:00:00:01 up')
+-        os.system('ifconfig "' + cls.bss_hostapd[1].ifname +
+-                '" down hw ether 12:00:00:00:00:02 up')
+-        os.system('ifconfig "' + cls.bss_hostapd[2].ifname +
+-                '" down hw ether 12:00:00:00:00:03 up')
++        ctx.start_process(['ifconfig', cls.bss_hostapd[0].ifname, 'down', =
+'hw', \
++                                'ether', '12:00:00:00:00:01', 'up'], wait=
+=3DTrue)
++        ctx.start_process(['ifconfig', cls.bss_hostapd[1].ifname, 'down', =
+'hw', \
++                                'ether', '12:00:00:00:00:02', 'up'], wait=
+=3DTrue)
++        ctx.start_process(['ifconfig', cls.bss_hostapd[2].ifname, 'down', =
+'hw', \
++                                'ether', '12:00:00:00:00:03', 'up'], wait=
+=3DTrue)
  =
 
-         condition =3D 'obj.state !=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 5)
-+        wd.wait_for_object_condition(device, condition)
++        # Set interface addresses to those expected by hostapd config files
+         cls.bss_hostapd[0].reload()
++        cls.bss_hostapd[0].wait_for_event("AP-ENABLED")
+         cls.bss_hostapd[1].reload()
++        cls.bss_hostapd[1].wait_for_event("AP-ENABLED")
+         cls.bss_hostapd[2].reload()
++        cls.bss_hostapd[2].wait_for_event("AP-ENABLED")
  =
 
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(self.bss_hostapd[2].list_sta())
-diff --git a/autotests/testHiddenNetworks/validation.py b/autotests/testHid=
-denNetworks/validation.py
-index 780af8b3..7ff7075a 100644
---- a/autotests/testHiddenNetworks/validation.py
-+++ b/autotests/testHiddenNetworks/validation.py
-@@ -20,12 +20,12 @@ class TestConnectAutoConnect(unittest.TestCase):
-             device.connect_hidden_network(ssid)
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
--        wd.wait_for_object_condition(device, condition, 30)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-     def check_autoconnect_hidden_network(self, wd, device, ssid, throws):
-         if throws is None:
-             condition =3D 'obj.state =3D=3D DeviceState.connected'
--            wd.wait_for_object_condition(device, condition, 30)
-+            wd.wait_for_object_condition(device, condition)
- =
-
-             condition =3D 'obj.connected_network is not None'
-             wd.wait_for_object_condition(device, condition)
-@@ -37,7 +37,7 @@ class TestConnectAutoConnect(unittest.TestCase):
-             device.disconnect()
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.disconnected'
--        wd.wait_for_object_condition(device, condition, 30)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-     def validate_connection(self, wd, ssid, autoconnect, throws, use_agent,
-                                                             wait_periodic_=
-scan):
-diff --git a/autotests/testKnownNetworks/known_network_test.py b/autotests/=
-testKnownNetworks/known_network_test.py
-index b2b3d105..a94a2151 100644
---- a/autotests/testKnownNetworks/known_network_test.py
-+++ b/autotests/testKnownNetworks/known_network_test.py
-@@ -56,7 +56,7 @@ class Test(unittest.TestCase):
- =
-
-         IWD.copy_to_storage('known_networks/ssidPSK.psk')
-         condition =3D 'len(obj.list_known_networks()) =3D=3D 5'
--        wd.wait_for_object_condition(wd, condition, 1)
-+        wd.wait_for_object_condition(wd, condition)
- =
-
-         expected =3D ['ssidNew', 'ssidOpen', 'ssidPSK', 'ssidEAP-TLS',
-                     'Hotspot Network']
-@@ -65,7 +65,7 @@ class Test(unittest.TestCase):
- =
-
-         IWD.remove_from_storage('ssidPSK.psk')
-         condition =3D 'len(obj.list_known_networks()) =3D=3D 4'
--        wd.wait_for_object_condition(wd, condition, 1)
-+        wd.wait_for_object_condition(wd, condition)
- =
-
-         for net in known_networks:
-             net.forget()
-diff --git a/autotests/testPreauth-roam/connection_test.py b/autotests/test=
-Preauth-roam/connection_test.py
-index ed043c3f..839e04b0 100644
---- a/autotests/testPreauth-roam/connection_test.py
-+++ b/autotests/testPreauth-roam/connection_test.py
-@@ -91,14 +91,14 @@ class Test(unittest.TestCase):
-         rule0.signal =3D -8000
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 15)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         # TODO: verify that the PMK from preauthentication was used
- =
-
-         # Check that iwd is on BSS 1 once out of roaming state and doesn't
-         # go through 'disconnected', 'autoconnect', 'connecting' in between
-         condition =3D 'obj.state !=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, 5)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(bss_hostapd[1].list_sta())
-diff --git a/autotests/testRSSIAgent/connection_test.py b/autotests/testRSS=
-IAgent/connection_test.py
-index f8140850..ab0bc3a5 100644
---- a/autotests/testRSSIAgent/connection_test.py
-+++ b/autotests/testRSSIAgent/connection_test.py
-@@ -71,7 +71,7 @@ class Test(unittest.TestCase):
-                 rule.signal =3D centre
-                 agent.level =3D -1
-                 condition =3D 'obj.level =3D=3D ' + str(level)
--                wd.wait_for_object_condition(agent, condition, 3)
-+                wd.wait_for_object_condition(agent, condition)
- =
-
-                 self.assertTrue(agent.calls > 0)
-                 self.assertEqual(agent.device_path, device.device_path)
-diff --git a/autotests/testSAE/autoconnect_test.py b/autotests/testSAE/auto=
-connect_test.py
-index 0613d91e..48b4b6cd 100644
---- a/autotests/testSAE/autoconnect_test.py
-+++ b/autotests/testSAE/autoconnect_test.py
-@@ -24,7 +24,7 @@ class Test(unittest.TestCase):
-         devices[3].disconnect()
- =
-
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
--        wd.wait_for_object_condition(device, condition, 30)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         condition =3D 'obj.connected_network is not None'
-         wd.wait_for_object_condition(device, condition)
-diff --git a/autotests/testScan/requested_scan_test.py b/autotests/testScan=
-/requested_scan_test.py
-index 11282ce1..3858b4f5 100644
---- a/autotests/testScan/requested_scan_test.py
-+++ b/autotests/testScan/requested_scan_test.py
-@@ -36,9 +36,9 @@ class Test(unittest.TestCase):
-         device =3D devices[0]
- =
-
-         condition =3D 'obj.scanning'
--        wd.wait_for_object_condition(device, condition, 20)
-+        wd.wait_for_object_condition(device, condition)
-         condition =3D 'not obj.scanning'
--        wd.wait_for_object_condition(device, condition, 20)
-+        wd.wait_for_object_condition(device, condition)
- =
-
-         device.scan()
- =
-
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index ec5e662f..e74a6faf 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -867,8 +867,8 @@ class IWD(AsyncOpAbstract):
- =
-
-         tries =3D 0
-         while not self._bus.name_has_owner(IWD_SERVICE):
--            if ctx.args.gdb =3D=3D 'None':
--                if tries > 100:
-+            if not ctx.args.gdb:
-+                if tries > 200:
-                     if start_iwd_daemon:
-                         ctx.stop_process(self._iwd_proc)
-                         self._iwd_proc =3D None
-@@ -913,7 +913,7 @@ class IWD(AsyncOpAbstract):
-                                IWD_AGENT_MANAGER_INTERFACE)
-         return self._agent_manager_if
- =
-
--    def wait_for_object_condition(self, obj, condition_str, max_wait =3D 1=
-5):
-+    def wait_for_object_condition(self, obj, condition_str, max_wait =3D 5=
-0):
-         self._wait_timed_out =3D False
-         def wait_timeout_cb():
-             self._wait_timed_out =3D True
-@@ -982,7 +982,7 @@ class IWD(AsyncOpAbstract):
-     def remove_from_storage(file_name):
-         os.system('rm -rf ' + IWD_STORAGE_DIR + '/\'' + file_name + '\'')
- =
-
--    def list_devices(self, wait_to_appear =3D 0, max_wait =3D 15):
-+    def list_devices(self, wait_to_appear =3D 0, max_wait =3D 50):
-         if not wait_to_appear:
-             return list(self._devices.values())
- =
-
-diff --git a/autotests/util/testutil.py b/autotests/util/testutil.py
-index 0a94e23a..f9cfbf29 100644
---- a/autotests/util/testutil.py
-+++ b/autotests/util/testutil.py
-@@ -82,7 +82,7 @@ def test_connected(if0=3DNone, if1=3DNone, group=3DTrue):
-             rec.append(False)
- =
-
-         while not all(rec):
--            r, w, x =3D select.select([sock0, sock1], [], [], 1.0)
-+            r, w, x =3D select.select([sock0, sock1], [], [], 10)
-             if not r:
-                 raise Exception('timeout waiting for packets: ' + repr(rec=
-))
- =
-
-diff --git a/tools/test-runner b/tools/test-runner
-index d09f08d2..d7f831ac 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -43,7 +43,7 @@ config =3D None
- intf_id =3D 0
- rad_id =3D 0
- =
-
--TEST_MAX_TIMEOUT =3D 45
-+TEST_MAX_TIMEOUT =3D 120
- =
-
- dbus.mainloop.glib.DBusGMainLoop(set_as_default=3DTrue)
- =
-
+         # Fill in the neighbor AP tables in both BSSes.  By default each
+         # instance knows only about current BSS, even inside one hostapd
+diff --git a/autotests/testFT-SAE-roam/ft-psk-3.conf b/autotests/testFT-SAE=
+-roam/ft-psk-3.conf
+index 6a2d4cad..8918cf9e 100644
+--- a/autotests/testFT-SAE-roam/ft-psk-3.conf
++++ b/autotests/testFT-SAE-roam/ft-psk-3.conf
+@@ -16,8 +16,6 @@ wpa_passphrase=3DEasilyGuessedPassword
+ wpa_ptk_rekey=3D30
+ wpa_group_rekey=3D80
+ ieee80211w=3D2
+-rsn_preauth=3D1
+-rsn_preauth_interfaces=3Dlo
+ disable_pmksa_caching=3D0
+ # Allow PMK cache to be shared opportunistically among configured interfac=
+es
+ # and BSSes (i.e., all configurations within a single hostapd process).
+diff --git a/autotests/testFT-SAE-roam/ft-sae-1.conf b/autotests/testFT-SAE=
+-roam/ft-sae-1.conf
+index 6642c398..aa40494a 100644
+--- a/autotests/testFT-SAE-roam/ft-sae-1.conf
++++ b/autotests/testFT-SAE-roam/ft-sae-1.conf
+@@ -10,14 +10,12 @@ nas_identifier=3Ddummy1
+ wpa=3D2
+ # Can support SAE and FT-SAE (space separated list) and/or EAP at the same
+ # time but we want to force FT
+-wpa_key_mgmt=3DFT-SAE
++wpa_key_mgmt=3DFT-SAE SAE
+ sae_password=3DEasilyGuessedPassword|mac=3Dff:ff:ff:ff:ff:ff
+ wpa_pairwise=3DCCMP
+ wpa_ptk_rekey=3D30
+ wpa_group_rekey=3D80
+ ieee80211w=3D2
+-rsn_preauth=3D1
+-rsn_preauth_interfaces=3Dlo
+ disable_pmksa_caching=3D0
+ # Allow PMK cache to be shared opportunistically among configured interfac=
+es
+ # and BSSes (i.e., all configurations within a single hostapd process).
+diff --git a/autotests/testFT-SAE-roam/ft-sae-2.conf b/autotests/testFT-SAE=
+-roam/ft-sae-2.conf
+index fa841db8..5bff6c9d 100644
+--- a/autotests/testFT-SAE-roam/ft-sae-2.conf
++++ b/autotests/testFT-SAE-roam/ft-sae-2.conf
+@@ -10,14 +10,12 @@ nas_identifier=3Ddummy2
+ wpa=3D2
+ # Can support SAE and FT-SAE (space separated list) and/or EAP at the same
+ # time but we want to force FT
+-wpa_key_mgmt=3DFT-SAE
++wpa_key_mgmt=3DFT-SAE SAE
+ sae_password=3DEasilyGuessedPassword|mac=3Dff:ff:ff:ff:ff:ff
+ wpa_pairwise=3DCCMP
+ wpa_ptk_rekey=3D30
+ wpa_group_rekey=3D80
+ ieee80211w=3D2
+-rsn_preauth=3D1
+-rsn_preauth_interfaces=3Dlo
+ disable_pmksa_caching=3D0
+ # Allow PMK cache to be shared opportunistically among configured interfac=
+es
+ # and BSSes (i.e., all configurations within a single hostapd process).
 -- =
 
 2.26.2
 
---===============5326073743549243264==--
+--===============1776425022189416140==--
 
