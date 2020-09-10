@@ -1,54 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============5622262651363392962=="
+Content-Type: multipart/mixed; boundary="===============6073154831179626529=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 25/26] auto-t: fix testPreauth-roam
-Date: Thu, 10 Sep 2020 11:58:54 -0700
-Message-ID: <20200910185855.27833-25-prestwoj@gmail.com>
+Subject: [PATCH v4 26/26] auto-t: fix testFT-PSK-roam
+Date: Thu, 10 Sep 2020 11:58:55 -0700
+Message-ID: <20200910185855.27833-26-prestwoj@gmail.com>
 In-Reply-To: <20200910185855.27833-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5622262651363392962==
+--===============6073154831179626529==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Changed to wait for DeviceState instead of network object as well
-as moved hwsim rules ahead of the IWD initializer to avoid IWD
-scanning before the rules are fully in place.
+Switched around hwsim rules with the IWD initializer to avoid
+IWD periodically scanning before hwsim rules are in place. Removed
+some unneeded code during teardown.
 ---
- autotests/testPreauth-roam/connection_test.py | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ autotests/testFT-PSK-roam/connection_test.py | 39 ++++++--------------
+ autotests/testFT-PSK-roam/hw.conf            |  1 +
+ 2 files changed, 13 insertions(+), 27 deletions(-)
 
-diff --git a/autotests/testPreauth-roam/connection_test.py b/autotests/test=
-Preauth-roam/connection_test.py
-index 839e04b0..5eee3078 100644
---- a/autotests/testPreauth-roam/connection_test.py
-+++ b/autotests/testPreauth-roam/connection_test.py
-@@ -44,14 +44,14 @@ class Test(unittest.TestCase):
-         bss_hostapd[1].set_neighbor(bss_radio[0].addresses[0], 'TestPreaut=
-h',
-                 bss0_nr)
+diff --git a/autotests/testFT-PSK-roam/connection_test.py b/autotests/testF=
+T-PSK-roam/connection_test.py
+index 37dd80d0..ccbaccb8 100644
+--- a/autotests/testFT-PSK-roam/connection_test.py
++++ b/autotests/testFT-PSK-roam/connection_test.py
+@@ -24,7 +24,11 @@ class Test(unittest.TestCase):
+         rule1.source =3D self.bss_radio[1].addresses[0]
+         rule1.bidirectional =3D True
  =
 
--        wd =3D IWD()
--
--        device =3D wd.list_devices(1)[0]
--
-         # Check that iwd selects BSS 0 first
-         rule0.signal =3D -2500
-         rule1.signal =3D -3500
+-        wd =3D self.wd
++        # Check that iwd selects BSS 0 first
++        rule0.signal =3D -2000
++        rule1.signal =3D -2500
++
++        wd =3D IWD(True)
  =
 
-+        wd =3D IWD()
-+
-+        device =3D wd.list_devices(1)[0]
-+
+         psk_agent =3D PSKAgent("EasilyGuessedPassword")
+         wd.register_psk_agent(psk_agent)
+@@ -33,10 +37,6 @@ class Test(unittest.TestCase):
+         # prevent autoconnect
+         device.disconnect()
+ =
+
+-        # Check that iwd selects BSS 0 first
+-        rule0.signal =3D -2000
+-        rule1.signal =3D -2500
+-
          condition =3D 'not obj.scanning'
          wd.wait_for_object_condition(device, condition)
  =
 
-@@ -76,8 +76,8 @@ class Test(unittest.TestCase):
+@@ -61,8 +61,8 @@ class Test(unittest.TestCase):
  =
 
          ordered_network.network_object.connect()
@@ -61,11 +67,85 @@ tion)
 +        wd.wait_for_object_condition(device, condition)
  =
 
-         self.assertTrue(bss_hostapd[0].list_sta())
-         self.assertFalse(bss_hostapd[1].list_sta())
+         self.assertTrue(self.bss_hostapd[0].list_sta())
+         self.assertFalse(self.bss_hostapd[1].list_sta())
+@@ -109,7 +109,11 @@ class Test(unittest.TestCase):
+         rule1.source =3D self.bss_radio[1].addresses[0]
+         rule1.bidirectional =3D True
+ =
+
+-        wd =3D self.wd
++        # Check that iwd selects BSS 0 first
++        rule0.signal =3D -2000
++        rule1.signal =3D -2500
++
++        wd =3D IWD(True)
+ =
+
+         psk_agent =3D PSKAgent("EasilyGuessedPassword")
+         wd.register_psk_agent(psk_agent)
+@@ -118,10 +122,6 @@ class Test(unittest.TestCase):
+         # prevent autoconnect
+         device.disconnect()
+ =
+
+-        # Check that iwd selects BSS 0 first
+-        rule0.signal =3D -2000
+-        rule1.signal =3D -2500
+-
+         condition =3D 'not obj.scanning'
+         wd.wait_for_object_condition(device, condition)
+ =
+
+@@ -180,8 +180,6 @@ class Test(unittest.TestCase):
+         testutil.test_ifaces_connected(self.bss_hostapd[1].ifname, device.=
+name)
+         self.assertRaises(Exception, testutil.test_ifaces_connected,
+                           (self.bss_hostapd[0].ifname, device.name))
+-    def setUp(self):
+-        self.wd =3D IWD()
+ =
+
+     def tearDown(self):
+         os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" down')
+@@ -189,19 +187,6 @@ class Test(unittest.TestCase):
+         os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" up')
+         os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" up')
+ =
+
+-        hwsim =3D Hwsim()
+-        device =3D self.wd.list_devices(1)[0]
+-        try:
+-            device.disconnect()
+-        except:
+-            pass
+-
+-        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
+-        self.wd.wait_for_object_condition(device, condition)
+-
+-        for rule in list(hwsim.rules.keys()):
+-            del hwsim.rules[rule]
+-
+     @classmethod
+     def setUpClass(cls):
+         hwsim =3D Hwsim()
+diff --git a/autotests/testFT-PSK-roam/hw.conf b/autotests/testFT-PSK-roam/=
+hw.conf
+index d2d50863..d08534c4 100644
+--- a/autotests/testFT-PSK-roam/hw.conf
++++ b/autotests/testFT-PSK-roam/hw.conf
+@@ -3,6 +3,7 @@ num_radios=3D3
+ max_test_exec_interval_sec=3D45
+ tmpfs_extra_stuff=3Dmain.conf
+ needs_hwsim=3D1
++start_iwd=3D0
+ =
+
+ [HOSTAPD]
+ rad0=3Dft-psk-ccmp-1.conf
 -- =
 
 2.21.3
 
---===============5622262651363392962==--
+--===============6073154831179626529==--
 
