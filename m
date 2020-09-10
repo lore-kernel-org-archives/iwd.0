@@ -1,32 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============0278542906851613646=="
+Content-Type: multipart/mixed; boundary="===============0539421531858528581=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 18/26] auto-t: update testClientNonInteractive to use
- TestContext
-Date: Thu, 10 Sep 2020 11:58:47 -0700
-Message-ID: <20200910185855.27833-18-prestwoj@gmail.com>
+Subject: [PATCH v4 19/26] auto-t: update testAgent to use TestContext
+Date: Thu, 10 Sep 2020 11:58:48 -0700
+Message-ID: <20200910185855.27833-19-prestwoj@gmail.com>
 In-Reply-To: <20200910185855.27833-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0278542906851613646==
+--===============0539421531858528581==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This makes any iwctl output hidden unless enabled via the verbose
-option.
+This hides iwctl output unless verbose is specified
 ---
- .../connect_command_test.py                   | 26 +++++++++----------
- 1 file changed, 12 insertions(+), 14 deletions(-)
+ autotests/testAgent/agent_test.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/testClientNonInteractive/connect_command_test.py b/a=
-utotests/testClientNonInteractive/connect_command_test.py
-index 886d7a76..a503bd24 100644
---- a/autotests/testClientNonInteractive/connect_command_test.py
-+++ b/autotests/testClientNonInteractive/connect_command_test.py
-@@ -8,6 +8,7 @@ import iwd
- from iwd import IWD
+diff --git a/autotests/testAgent/agent_test.py b/autotests/testAgent/agent_=
+test.py
+index 80d2ce83..60465d3f 100644
+--- a/autotests/testAgent/agent_test.py
++++ b/autotests/testAgent/agent_test.py
+@@ -10,6 +10,7 @@ from iwd import PSKAgent
+ from iwd import NetworkType
  import testutil
  import subprocess
 +from config import ctx
@@ -35,101 +33,32 @@ index 886d7a76..a503bd24 100644
  class Test(unittest.TestCase):
  =
 
-@@ -34,11 +35,10 @@ class Test(unittest.TestCase):
+@@ -57,7 +58,7 @@ class Test(unittest.TestCase):
+     def test_connection_with_other_agent(self):
+         wd =3D IWD()
  =
 
-         # Use --dontaks cmd-line option
-         with self.assertRaises(subprocess.CalledProcessError):
--                        subprocess.check_call(['iwctl', '-d', 'station',
--                                                 device.name, 'connect', s=
-sid])
-+            ctx.start_process(['iwctl', 'd', 'station', device.name, 'conn=
-ect', ssid],  check=3DTrue)
+-        iwctl =3D subprocess.Popen(['iwctl', '-P', 'secret_ssid2'])
++        iwctl =3D ctx.start_process(['iwctl', '-P', 'secret_ssid2']).pid
+         # Let iwctl to start and register its agent.
+         wd.wait(2)
  =
 
--        subprocess.check_call(['iwctl', '-P', 'passphrase',
--                                'station', device.name, 'connect', ssid])
-+        ctx.start_process(['iwctl', '-P', 'passphrase', 'station', device.=
-name, 'connect', ssid],
-+                                check=3DTrue)
+@@ -72,7 +73,7 @@ class Test(unittest.TestCase):
  =
 
-         self.check_connection_success(ssid)
+         wd =3D IWD()
  =
 
-@@ -47,9 +47,8 @@ class Test(unittest.TestCase):
+-        iwctl =3D subprocess.Popen(['iwctl', '-P', 'secret_ssid2'])
++        iwctl =3D ctx.start_process(['iwctl', '-P', 'secret_ssid2']).pid
+         # Let iwctl to start and register its agent.
+         wd.wait(2)
  =
 
-         device =3D self.wd.list_devices(1)[0]
- =
-
--        subprocess.check_call(['iwctl', '-u', 'user', '-p', 'password',
--                                'station', device.name, 'connect', ssid])
--
-+        ctx.start_process(['iwctl', '-u', 'user', '-p', 'password', 'stati=
-on', \
-+                            device.name, 'connect', ssid], check=3DTrue)
-         self.check_connection_success(ssid)
- =
-
-     def test_connection_with_password(self):
-@@ -57,8 +56,8 @@ class Test(unittest.TestCase):
- =
-
-         device =3D self.wd.list_devices(1)[0]
- =
-
--        subprocess.check_call(['iwctl', '-p', 'password',
--                                'station', device.name, 'connect', ssid])
-+        ctx.start_process(['iwctl', '-p', 'password', 'station', device.na=
-me, 'connect', ssid],
-+                            check=3DTrue)
- =
-
-         self.check_connection_success(ssid)
- =
-
-@@ -68,8 +67,8 @@ class Test(unittest.TestCase):
-         device =3D self.wd.list_devices(1)[0]
- =
-
-         with self.assertRaises(subprocess.CalledProcessError):
--                subprocess.check_call(['iwctl', '-P', 'incorrect_passphras=
-e',
--                                'station', device.name, 'connect', ssid])
-+            ctx.start_process(['iwctl', '-P', 'incorrect_passphrase', 'sta=
-tion', device.name, \
-+                                'connect', ssid], check=3DTrue)
- =
-
-     def test_invalid_command_line_option(self):
-         ssid =3D 'ssidPassphrase'
-@@ -77,14 +76,13 @@ class Test(unittest.TestCase):
-         device =3D self.wd.list_devices(1)[0]
- =
-
-         with self.assertRaises(subprocess.CalledProcessError):
--                subprocess.check_call(['iwctl', '-z',
--                                'station', device.name, 'connect', ssid])
-+            ctx.start_process(['iwctl', '-z', 'station', device.name, 'con=
-nect', ssid], check=3DTrue)
- =
-
-     def test_invalid_command(self):
-         device =3D self.wd.list_devices(1)[0]
- =
-
-         with self.assertRaises(subprocess.CalledProcessError):
--                subprocess.check_call(['iwctl', 'inexistent', 'command'])
-+            ctx.start_process(['iwctl', 'inexistent', 'command'], check=3D=
-True)
- =
-
-     @classmethod
-     def setUpClass(cls):
 -- =
 
 2.21.3
 
---===============0278542906851613646==--
+--===============0539421531858528581==--
 
