@@ -1,59 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============4165088255205029911=="
+Content-Type: multipart/mixed; boundary="===============2822449082827042966=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 22/26] auto-t: fix testAPRoam
-Date: Thu, 10 Sep 2020 16:12:43 -0700
-Message-ID: <20200910231248.4995-22-prestwoj@gmail.com>
+Subject: [PATCH v5 23/26] auto-t: harden testHotspot
+Date: Thu, 10 Sep 2020 16:12:44 -0700
+Message-ID: <20200910231248.4995-23-prestwoj@gmail.com>
 In-Reply-To: <20200910231248.4995-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4165088255205029911==
+--===============2822449082827042966==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This test occationally fails due to no hwsim rules. Basically we
-were just expecting iwd to connect to one of 3 access points but
-the ranking was equal, so it chose the first in the scan list.
+This test occationally failed, and it uses the old style of waiting
+for connected on the network object instead of the device object.
 
-Now a signal strength is assigned to each AP to steer IWD into
-connecting to the expected AP.
+The hwsim rule was also moved ahead of the IWD() initializer which
+ensures that IWD doesn't scan before the rule can be set/processed.
 ---
- autotests/testAPRoam/connection_test.py | 29 +++++++++++++++++++++++--
- 1 file changed, 27 insertions(+), 2 deletions(-)
+ autotests/testHotspot/anqp_delay_test.py | 11 ++++++-----
+ autotests/testHotspot/hessid_test.py     |  4 ++--
+ autotests/testHotspot/hotspot_test.py    |  4 ++--
+ autotests/testHotspot/roaming_test.py    |  4 ++--
+ 4 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/autotests/testAPRoam/connection_test.py b/autotests/testAPRoam=
-/connection_test.py
-index 308bbc28..3f6296b7 100644
---- a/autotests/testAPRoam/connection_test.py
-+++ b/autotests/testAPRoam/connection_test.py
-@@ -24,6 +24,22 @@ class Test(unittest.TestCase):
-                        hwsim.get_radio('rad1'),
-                        hwsim.get_radio('rad2') ]
+diff --git a/autotests/testHotspot/anqp_delay_test.py b/autotests/testHotsp=
+ot/anqp_delay_test.py
+index 431f16c1..adfa57fc 100644
+--- a/autotests/testHotspot/anqp_delay_test.py
++++ b/autotests/testHotspot/anqp_delay_test.py
+@@ -23,10 +23,8 @@ class Test(unittest.TestCase):
+         rule0 =3D hwsim.rules.create()
+         rule0.source =3D bss_radio.addresses[0]
+         rule0.bidirectional =3D True
+-        # Force the case where ANQP does not finish before Connect() comes=
+ in
+-        rule0.delay =3D 100
  =
 
-+        rule0 =3D hwsim.rules.create()
-+        rule0.source =3D bss_radio[0].addresses[0]
-+        rule0.bidirectional =3D True
-+
-+        rule1 =3D hwsim.rules.create()
-+        rule1.source =3D bss_radio[1].addresses[0]
-+        rule1.bidirectional =3D True
-+
-+        rule2 =3D hwsim.rules.create()
-+        rule2.source =3D bss_radio[2].addresses[0]
-+        rule2.bidirectional =3D True
-+
-+        rule0.signal =3D -2000
-+        rule1.signal =3D -2500
-+        rule2.signal =3D -3000
-+
-         wd =3D IWD()
+-        wd =3D IWD(True, '/tmp')
++        wd =3D IWD(True)
  =
 
-         psk_agent =3D PSKAgent("secret123")
-@@ -49,8 +65,10 @@ class Test(unittest.TestCase):
+         hapd =3D HostapdCLI(config=3D'ssidHotspot.conf')
+ =
+
+@@ -53,12 +51,15 @@ class Test(unittest.TestCase):
+         condition =3D 'not obj.connected'
+         wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
+ =
+
++        # Force the case where ANQP does not finish before Connect() comes=
+ in
++        rule0.delay =3D 100
++
+         ordered_network.network_object.connect()
+ =
+
+         rule0.delay =3D 1
+ =
+
+-        condition =3D 'obj.connected'
+-        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
+ =
+
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected(device.name, hapd.ifname)
+diff --git a/autotests/testHotspot/hessid_test.py b/autotests/testHotspot/h=
+essid_test.py
+index f511fd62..d22c5d61 100644
+--- a/autotests/testHotspot/hessid_test.py
++++ b/autotests/testHotspot/hessid_test.py
+@@ -42,8 +42,8 @@ class Test(unittest.TestCase):
  =
 
          ordered_network.network_object.connect()
@@ -64,39 +87,53 @@ index 308bbc28..3f6296b7 100644
 tion)
 +        condition =3D 'obj.state =3D=3D DeviceState.connected'
 +        wd.wait_for_object_condition(device, condition)
-+
-+        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED')
  =
 
-         self.assertTrue(bss_hostapd[0].list_sta())
-         self.assertFalse(bss_hostapd[1].list_sta())
-@@ -65,6 +83,9 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state !=3D DeviceState.roaming'
-         wd.wait_for_object_condition(device, condition)
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected(device.name, hapd.ifname)
+diff --git a/autotests/testHotspot/hotspot_test.py b/autotests/testHotspot/=
+hotspot_test.py
+index 0f18fae1..4fb6b071 100644
+--- a/autotests/testHotspot/hotspot_test.py
++++ b/autotests/testHotspot/hotspot_test.py
+@@ -42,8 +42,8 @@ class Test(unittest.TestCase):
  =
 
+         ordered_network.network_object.connect()
+ =
+
+-        condition =3D 'obj.connected'
+-        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
 +        condition =3D 'obj.state =3D=3D DeviceState.connected'
 +        wd.wait_for_object_condition(device, condition)
-+
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(bss_hostapd[1].list_sta())
-         device.disconnect()
-@@ -74,6 +95,10 @@ class Test(unittest.TestCase):
  =
 
-         wd.unregister_psk_agent(psk_agent)
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected(device.name, hapd.ifname)
+diff --git a/autotests/testHotspot/roaming_test.py b/autotests/testHotspot/=
+roaming_test.py
+index a7274a82..52d89f84 100644
+--- a/autotests/testHotspot/roaming_test.py
++++ b/autotests/testHotspot/roaming_test.py
+@@ -42,8 +42,8 @@ class Test(unittest.TestCase):
  =
 
-+        rule0.remove()
-+        rule1.remove()
-+        rule2.remove()
-+
-     @classmethod
-     def setUpClass(cls):
-         pass
+         ordered_network.network_object.connect()
+ =
+
+-        condition =3D 'obj.connected'
+-        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
+ =
+
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected(device.name, hapd.ifname)
 -- =
 
 2.26.2
 
---===============4165088255205029911==--
+--===============2822449082827042966==--
 
