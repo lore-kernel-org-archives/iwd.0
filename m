@@ -1,34 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============5484900941383537661=="
+Content-Type: multipart/mixed; boundary="===============2560337414771302815=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/3] auto-t: fix set_neighbor SSID escaping
-Date: Fri, 11 Sep 2020 13:42:34 -0500
-Message-ID: <e331a626-aaf3-5413-4b7b-5b95351962e4@gmail.com>
-In-Reply-To: <20200911181130.73148-1-prestwoj@gmail.com>
+Subject: Re: [PATCH] src/ap.c: fix build with uclibc
+Date: Fri, 11 Sep 2020 13:43:40 -0500
+Message-ID: <4999cd2b-6572-6de1-dcd7-f5dc974c404b@gmail.com>
+In-Reply-To: <20200910061800.497914-1-fontaine.fabrice@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5484900941383537661==
+--===============2560337414771302815==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Fabrice,
 
-On 9/11/20 1:11 PM, James Prestwood wrote:
-> Before the re-write there was interesting escapes being used for
-> set_neighbor. Curiously now hostapd fails to set the neighbor due
-> to these escapes so they have been removed.
+On 9/10/20 1:18 AM, Fabrice Fontaine wrote:
+> explicit_bzero is used in src/ap.c since commit
+> d55e00b31d7bccdbb2ea1cdeb0a749df77a51e47 but src/missing.h is not
+> included, as a result build with uclibc fails on:
+> =
+
+> /srv/storage/autobuild/run/instance-1/output-1/host/lib/gcc/xtensa-buildr=
+oot-linux-uclibc/9.3.0/../../../../xtensa-buildroot-linux-uclibc/bin/ld: sr=
+c/ap.o: in function `ap_probe_req_cb':
+> ap.c:(.text+0x23d8): undefined reference to `explicit_bzero'
+> =
+
+> Fixes:
+>   - http://autobuild.buildroot.org/results/c7a0096a269bfc52bd8e23d453d36d=
+5bfb61441d
+> =
+
+> Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
 > ---
->   autotests/util/hostapd.py | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   src/ap.c | 1 +
+>   1 file changed, 1 insertion(+)
 > =
 
 
-All applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============5484900941383537661==--
+--===============2560337414771302815==--
 
