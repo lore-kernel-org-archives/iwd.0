@@ -1,44 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============8731879212309408686=="
+Content-Type: multipart/mixed; boundary="===============2761712300062439389=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/3] auto-t: fix set_neighbor SSID escaping
-Date: Fri, 11 Sep 2020 11:11:28 -0700
-Message-ID: <20200911181130.73148-1-prestwoj@gmail.com>
+Subject: [PATCH 2/3] auto-t: remove hwsim rules on __del__
+Date: Fri, 11 Sep 2020 11:11:29 -0700
+Message-ID: <20200911181130.73148-2-prestwoj@gmail.com>
+In-Reply-To: <20200911181130.73148-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8731879212309408686==
+--===============2761712300062439389==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Before the re-write there was interesting escapes being used for
-set_neighbor. Curiously now hostapd fails to set the neighbor due
-to these escapes so they have been removed.
+This prevents previous tests rules from carrying over into
+future tests.
 ---
- autotests/util/hostapd.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ autotests/util/hwsim.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index 3f0edd9e..7c0d8385 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -152,7 +152,7 @@ class HostapdCLI:
-         return [line for line in lines.split('\n') if line]
+diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
+index a0ddedcd..cf1ab536 100755
+--- a/autotests/util/hwsim.py
++++ b/autotests/util/hwsim.py
+@@ -240,6 +240,9 @@ class RadioList(collections.Mapping):
+     def __delitem__(self, key):
+         self._dict.pop(key).remove()
  =
 
-     def set_neighbor(self, addr, ssid, nr):
--        cmd =3D self.cmdline + ['set_neighbor', addr, 'ssid=3D\\""%s"\\"' =
-% ssid, 'nr=3D%s' % nr]
-+        cmd =3D self.cmdline + ['set_neighbor', addr, 'ssid=3D"%s"' % ssid=
-, 'nr=3D%s' % nr]
-         ctx.start_process(cmd, wait=3DTrue)
++    def values(self):
++        return self._dict.values()
++
+     def _interfaces_added_handler(self, path, interfaces):
+         self._dict[path] =3D Radio(interfaces[HWSIM_RADIO_INTERFACE])
  =
 
-     def send_bss_transition(self, device, nr_list):
+@@ -271,6 +274,10 @@ class Hwsim(iwd.AsyncOpAbstract):
+         self._rules =3D RuleSet(self, objects)
+         self._radios =3D RadioList(self, objects)
+ =
+
++    def __del__(self):
++        for rule in self._rules.values():
++            rule.remove()
++
+     @property
+     def rules(self):
+         return self._rules
 -- =
 
 2.26.2
 
---===============8731879212309408686==--
+--===============2761712300062439389==--
 
