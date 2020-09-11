@@ -1,48 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============2560337414771302815=="
+Content-Type: multipart/mixed; boundary="===============1599712259551298452=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] src/ap.c: fix build with uclibc
-Date: Fri, 11 Sep 2020 13:43:40 -0500
-Message-ID: <4999cd2b-6572-6de1-dcd7-f5dc974c404b@gmail.com>
-In-Reply-To: <20200910061800.497914-1-fontaine.fabrice@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/8] ap: Fix NULL ap->rares
+Date: Fri, 11 Sep 2020 21:50:56 +0200
+Message-ID: <20200911195103.385070-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2560337414771302815==
+--===============1599712259551298452==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Fabrice,
+Make sure ap->rates is non-NULL both with and without no_cck_rates.
+---
+ src/ap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 9/10/20 1:18 AM, Fabrice Fontaine wrote:
-> explicit_bzero is used in src/ap.c since commit
-> d55e00b31d7bccdbb2ea1cdeb0a749df77a51e47 but src/missing.h is not
-> included, as a result build with uclibc fails on:
-> =
+diff --git a/src/ap.c b/src/ap.c
+index c972cfcb..ae33b461 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -2074,6 +2074,7 @@ struct ap_state *ap_start(struct netdev *netdev, stru=
+ct ap_config *config,
+ 	ap->ciphers =3D wiphy_select_cipher(wiphy, 0xffff);
+ 	ap->group_cipher =3D wiphy_select_cipher(wiphy, 0xffff);
+ 	ap->beacon_interval =3D 100;
++	ap->rates =3D l_uintset_new(200);
+ =
 
-> /srv/storage/autobuild/run/instance-1/output-1/host/lib/gcc/xtensa-buildr=
-oot-linux-uclibc/9.3.0/../../../../xtensa-buildroot-linux-uclibc/bin/ld: sr=
-c/ap.o: in function `ap_probe_req_cb':
-> ap.c:(.text+0x23d8): undefined reference to `explicit_bzero'
-> =
+ 	/* TODO: Pick from actual supported rates */
+ 	if (config->no_cck_rates) {
+@@ -2086,7 +2087,6 @@ struct ap_state *ap_start(struct netdev *netdev, stru=
+ct ap_config *config,
+ 		l_uintset_put(ap->rates, 96); /* 48 Mbps*/
+ 		l_uintset_put(ap->rates, 108); /* 54 Mbps*/
+ 	} else {
+-		ap->rates =3D l_uintset_new(200);
+ 		l_uintset_put(ap->rates, 2); /* 1 Mbps*/
+ 		l_uintset_put(ap->rates, 11); /* 5.5 Mbps*/
+ 		l_uintset_put(ap->rates, 22); /* 11 Mbps*/
+-- =
 
-> Fixes:
->   - http://autobuild.buildroot.org/results/c7a0096a269bfc52bd8e23d453d36d=
-5bfb61441d
-> =
+2.25.1
 
-> Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
-> ---
->   src/ap.c | 1 +
->   1 file changed, 1 insertion(+)
-> =
-
-
-Applied, thanks.
-
-Regards,
--Denis
-
---===============2560337414771302815==--
+--===============1599712259551298452==--
 
