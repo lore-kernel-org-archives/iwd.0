@@ -1,346 +1,301 @@
-Content-Type: multipart/mixed; boundary="===============7319360092071461377=="
+Content-Type: multipart/mixed; boundary="===============3710151091379362292=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 5/8] p2p: Add GO-side of GO Negotiation (responder)
-Date: Fri, 11 Sep 2020 21:51:00 +0200
-Message-ID: <20200911195103.385070-5-andrew.zaborowski@intel.com>
+Subject: [PATCH 6/8] ap: Pass "ops" struct to ap_start()
+Date: Fri, 11 Sep 2020 21:51:01 +0200
+Message-ID: <20200911195103.385070-6-andrew.zaborowski@intel.com>
 In-Reply-To: <20200911195103.385070-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7319360092071461377==
+--===============3710151091379362292==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Allow the possibility of becoming the Group-owner when we parse the GO
-Negotiation Request, build GO Negotiation Response and parse the GO
-Negotiation Confirmation, i.e. if we're responding to a negotiation
-initiated by the peer after it needed to request user action.
-
-Until now the code assumed we can't become the GO or we'd report error.
+Pass the event callback function pointer in a "struct ap_ops" instead of
+as individual ap_start() argument to make adding new callbacks easier.
 ---
- src/p2p.c | 217 ++++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 169 insertions(+), 48 deletions(-)
+ src/ap.c | 65 +++++++++++++++++++++++++++++++-------------------------
+ src/ap.h |  9 +++++---
+ 2 files changed, 42 insertions(+), 32 deletions(-)
 
-diff --git a/src/p2p.c b/src/p2p.c
-index 832e1a20..ac9a8f97 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -1636,8 +1636,6 @@ static bool p2p_go_negotiation_confirm_cb(const struc=
-t mmpdu_header *mpdu,
- {
- 	struct p2p_go_negotiation_confirmation info;
- 	int r;
--	enum scan_band band;
--	uint32_t frequency;
+diff --git a/src/ap.c b/src/ap.c
+index 2a979661..19c443c3 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -52,7 +52,7 @@
+ struct ap_state {
+ 	struct netdev *netdev;
+ 	struct l_genl_family *nl80211;
+-	ap_event_func_t event_func;
++	const struct ap_ops *ops;
+ 	ap_stopped_func_t stopped_func;
+ 	void *user_data;
+ 	struct ap_config *config;
+@@ -210,7 +210,7 @@ static void ap_del_station(struct sta_state *sta, uint1=
+6_t reason,
+ 	sta->associated =3D false;
  =
 
- 	l_debug("");
+ 	if (sta->rsna) {
+-		if (ap->event_func) {
++		if (ap->ops->handle_event) {
+ 			memset(&event_data, 0, sizeof(event_data));
+ 			event_data.mac =3D sta->addr;
+ 			event_data.reason =3D reason;
+@@ -228,8 +228,8 @@ static void ap_del_station(struct sta_state *sta, uint1=
+6_t reason,
+ 	ap_stop_handshake(sta);
  =
 
-@@ -1668,40 +1666,79 @@ static bool p2p_go_negotiation_confirm_cb(const str=
-uct mmpdu_header *mpdu,
- 		return true;
- 	}
- =
-
--	if (!p2p_device_validate_channel_list(dev, &info.channel_list,
--						&info.operating_channel))
--		return true;
--
--	band =3D scan_oper_class_to_band(
--			(const uint8_t *) info.operating_channel.country,
--			info.operating_channel.oper_class);
--	frequency =3D scan_channel_to_freq(info.operating_channel.channel_num,
--						band);
--	if (!frequency) {
--		l_error("Bad operating channel in GO Negotiation Confirmation");
-+	/* Check whether WFD IE is required, validate it if present */
-+	if (!p2p_device_validate_conn_wfd(dev, info.wfd, info.wfd_size)) {
- 		p2p_connect_failed(dev);
- 		return true;
- 	}
- =
-
--	/* Check whether WFD IE is required, validate it if present */
--	if (!p2p_device_validate_conn_wfd(dev, info.wfd, info.wfd_size)) {
-+	/*
-+	 * In both scenarios the Channel List is a subset of what we previously
-+	 * sent in the GO Negotiation Response and must contain the Operating
-+	 * Channel.
-+	 */
-+	if (!p2p_device_validate_channel_list(dev, &info.channel_list,
-+						&info.operating_channel)) {
- 		p2p_connect_failed(dev);
- 		return true;
- 	}
- =
-
--	dev->conn_go_oper_freq =3D frequency;
--	memcpy(&dev->go_group_id, &info.group_id,
--		sizeof(struct p2p_group_id_attr));
--
- 	/*
--	 * Confirmation received.  For simplicity wait idly the maximum amount
--	 * of time indicated by the peer in the GO Negotiation Response's
--	 * Configuration Timeout attribute and start the provisioning phase.
-+	 * Not validating .capability.group_caps, it's either reserved
-+	 * (dev->is_go) or has to be identical to that in the GO Negotiation
-+	 * Request (!dev->is_go).
- 	 */
--	dev->conn_peer_config_timeout =3D l_timeout_create_ms(
-+
-+	if (dev->is_go) {
-+		if (memcmp(info.operating_channel.country,
-+				dev->listen_country, 3) ||
-+				info.operating_channel.oper_class !=3D
-+				dev->listen_oper_class ||
-+				info.operating_channel.channel_num !=3D
-+				dev->listen_channel) {
-+			l_error("Bad operating channel in GO Negotiation "
-+				"Confirmation");
-+			p2p_connect_failed(dev);
-+			return true;
-+		}
-+
-+		/*
-+		 * Start setting the group up right away and we'll add the
-+		 * client's Configuation Timeout to the WSC start timeout's
-+		 * value.
-+		 */
-+		p2p_device_interface_create(dev);
-+	} else {
-+		enum scan_band band =3D scan_oper_class_to_band(
-+			(const uint8_t *) info.operating_channel.country,
-+			info.operating_channel.oper_class);
-+		uint32_t frequency =3D scan_channel_to_freq(
-+					info.operating_channel.channel_num,
-+					band);
-+
-+		if (!frequency) {
-+			l_error("Bad operating channel in GO Negotiation "
-+				"Confirmation");
-+			p2p_connect_failed(dev);
-+			return true;
-+		}
-+
-+		dev->conn_go_oper_freq =3D frequency;
-+		memcpy(&dev->go_group_id, &info.group_id,
-+			sizeof(struct p2p_group_id_attr));
-+
-+		/*
-+		 * Confirmation received.  For simplicity wait idly the maximum
-+		 * amount of time indicated by the peer in the GO Negotiation
-+		 * Request's Configuration Timeout attribute and start the
-+		 * provisioning phase.
-+		 */
-+		dev->conn_peer_config_timeout =3D l_timeout_create_ms(
- 						dev->conn_config_delay,
- 						p2p_config_timeout, dev,
- 						p2p_config_timeout_destroy);
-+	}
-+
- 	return true;
+ 	if (send_event)
+-		ap->event_func(AP_EVENT_STATION_REMOVED, &event_data,
+-				ap->user_data);
++		ap->ops->handle_event(AP_EVENT_STATION_REMOVED, &event_data,
++					ap->user_data);
  }
  =
 
-@@ -1733,7 +1770,6 @@ static void p2p_device_go_negotiation_req_cb(const st=
-ruct mmpdu_header *mpdu,
- 	int iov_len =3D 0;
- 	struct p2p_peer *peer;
- 	enum p2p_attr_status_code status =3D P2P_STATUS_SUCCESS;
--	bool tie_breaker =3D false;
+ static bool ap_sta_match_addr(const void *a, const void *b)
+@@ -269,12 +269,12 @@ static void ap_new_rsna(struct sta_state *sta)
  =
 
- 	l_debug("");
+ 	sta->rsna =3D true;
  =
 
-@@ -1782,24 +1818,12 @@ static void p2p_device_go_negotiation_req_cb(const =
-struct mmpdu_header *mpdu,
- 		goto respond;
+-	if (ap->event_func) {
++	if (ap->ops->handle_event) {
+ 		struct ap_event_station_added_data event_data =3D {};
+ 		event_data.mac =3D sta->addr;
+ 		event_data.rsn_ie =3D sta->assoc_rsne;
+-		ap->event_func(AP_EVENT_STATION_ADDED, &event_data,
+-				ap->user_data);
++		ap->ops->handle_event(AP_EVENT_STATION_ADDED, &event_data,
++					ap->user_data);
+ 	}
+ }
+ =
+
+@@ -308,11 +308,11 @@ static void ap_drop_rsna(struct sta_state *sta)
+ =
+
+ 	ap_stop_handshake(sta);
+ =
+
+-	if (ap->event_func) {
++	if (ap->ops->handle_event) {
+ 		struct ap_event_station_removed_data event_data =3D {};
+ 		event_data.mac =3D sta->addr;
+-		ap->event_func(AP_EVENT_STATION_REMOVED, &event_data,
+-				ap->user_data);
++		ap->ops->handle_event(AP_EVENT_STATION_REMOVED, &event_data,
++					ap->user_data);
+ 	}
+ }
+ =
+
+@@ -543,7 +543,7 @@ static void ap_wsc_exit_pbc(struct ap_state *ap)
+ 	ap->wsc_dpid =3D 0;
+ 	ap_update_beacon(ap);
+ =
+
+-	ap->event_func(AP_EVENT_PBC_MODE_EXIT, NULL, ap->user_data);
++	ap->ops->handle_event(AP_EVENT_PBC_MODE_EXIT, NULL, ap->user_data);
+ }
+ =
+
+ static uint32_t ap_send_mgmt_frame(struct ap_state *ap,
+@@ -750,8 +750,9 @@ static void ap_wsc_handshake_event(struct handshake_sta=
+te *hs,
+ 					&expiry_data);
+ =
+
+ 		event_data.mac =3D sta->addr;
+-		sta->ap->event_func(AP_EVENT_REGISTRATION_SUCCESS, &event_data,
+-					sta->ap->user_data);
++		sta->ap->ops->handle_event(AP_EVENT_REGISTRATION_SUCCESS,
++						&event_data,
++						sta->ap->user_data);
+ 		break;
+ 	default:
+ 		break;
+@@ -1335,8 +1336,8 @@ static void ap_assoc_reassoc(struct sta_state *sta, b=
+ool reassoc,
+ 		sta->wsc_v2 =3D wsc_req.version2;
+ =
+
+ 		event_data.mac =3D sta->addr;
+-		ap->event_func(AP_EVENT_REGISTRATION_START, &event_data,
+-				ap->user_data);
++		ap->ops->handle_event(AP_EVENT_REGISTRATION_START, &event_data,
++					ap->user_data);
+ =
+
+ 		/*
+ 		 * Since we're starting the PBC Registration Protocol
+@@ -1919,7 +1920,8 @@ static void ap_start_cb(struct l_genl_msg *msg, void =
+*user_data)
+ 	if (l_genl_msg_get_error(msg) < 0) {
+ 		l_error("START_AP failed: %i", l_genl_msg_get_error(msg));
+ =
+
+-		ap->event_func(AP_EVENT_START_FAILED, NULL, ap->user_data);
++		ap->ops->handle_event(AP_EVENT_START_FAILED, NULL,
++					ap->user_data);
+ 		ap_reset(ap);
+ 		l_genl_family_free(ap->nl80211);
+ 		l_free(ap);
+@@ -1927,7 +1929,7 @@ static void ap_start_cb(struct l_genl_msg *msg, void =
+*user_data)
  	}
  =
 
--	if (req_info.go_intent =3D=3D 0 && !req_info.go_tie_breaker) {
--		l_error("Can't negotiate client role and GO operation not "
--			"supported");
--
--		if (peer->wsc.pending_connect) {
--			struct l_dbus_message *reply =3D
--				dbus_error_not_supported(
--						peer->wsc.pending_connect);
--
--			dbus_pending_reply(&peer->wsc.pending_connect, reply);
--		}
--
--		p2p_connect_failed(dev);
--		status =3D P2P_STATUS_FAIL_INCOMPATIBLE_PARAMS;
--		goto p2p_free;
--	}
-+	dev->conn_go_tie_breaker =3D !req_info.go_tie_breaker;
-+	dev->is_go =3D P2P_GO_INTENT * 2 + dev->conn_go_tie_breaker >
-+		req_info.go_intent * 2;
+ 	ap->started =3D true;
+-	ap->event_func(AP_EVENT_STARTED, NULL, ap->user_data);
++	ap->ops->handle_event(AP_EVENT_STARTED, NULL, ap->user_data);
+ }
  =
 
--	if (req_info.capability.group_caps & P2P_GROUP_CAP_PERSISTENT_GROUP) {
-+	if ((req_info.capability.group_caps & P2P_GROUP_CAP_PERSISTENT_GROUP) &&
-+			!dev->is_go) {
- 		if (peer->wsc.pending_connect) {
- 			struct l_dbus_message *reply =3D
- 				dbus_error_not_supported(
-@@ -1821,6 +1845,70 @@ static void p2p_device_go_negotiation_req_cb(const s=
-truct mmpdu_header *mpdu,
- 		goto p2p_free;
+ static struct l_genl_msg *ap_build_cmd_start_ap(struct ap_state *ap)
+@@ -2014,11 +2016,12 @@ static void ap_mlme_notify(struct l_genl_msg *msg, =
+void *user_data)
+ 			l_genl_family_cancel(ap->nl80211,
+ 						ap->start_stop_cmd_id);
+ 			ap->start_stop_cmd_id =3D 0;
+-			ap->event_func(AP_EVENT_START_FAILED, NULL,
+-					ap->user_data);
++			ap->ops->handle_event(AP_EVENT_START_FAILED, NULL,
++						ap->user_data);
+ 		} else if (ap->started) {
+ 			ap->started =3D false;
+-			ap->event_func(AP_EVENT_STOPPING, NULL, ap->user_data);
++			ap->ops->handle_event(AP_EVENT_STOPPING, NULL,
++						ap->user_data);
+ 		}
+ =
+
+ 		ap_reset(ap);
+@@ -2031,17 +2034,17 @@ static void ap_mlme_notify(struct l_genl_msg *msg, =
+void *user_data)
+ /*
+  * Start a simple independent WPA2 AP on given netdev.
+  *
+- * @event_func is required and must react to AP_EVENT_START_FAILED
+- * and AP_EVENT_STOPPING by forgetting the ap_state struct, which
+- * is going to be freed automatically.
+- * In the @config struct only .ssid and .psk need to be non-NUL,
++ * @ops.handle_event is required and must react to AP_EVENT_START_FAILED
++ * and AP_EVENT_STOPPING by forgetting the ap_state struct, which is
++ * going to be freed automatically.
++ * In the @config struct only .ssid and .psk need to be non-NULL,
+  * other fields are optional.  If @ap_start succeeds, the returned
+  * ap_state takes ownership of @config and the caller shouldn't
+  * free it or any of the memory pointed to by its members (they
+  * also can't be static).
+  */
+ struct ap_state *ap_start(struct netdev *netdev, struct ap_config *config,
+-				ap_event_func_t event_func, void *user_data)
++				const struct ap_ops *ops, void *user_data)
+ {
+ 	struct ap_state *ap;
+ 	struct wiphy *wiphy =3D netdev_get_wiphy(netdev);
+@@ -2052,7 +2055,7 @@ struct ap_state *ap_start(struct netdev *netdev, stru=
+ct ap_config *config,
+ 	ap->nl80211 =3D l_genl_family_new(iwd_get_genl(), NL80211_GENL_NAME);
+ 	ap->config =3D config;
+ 	ap->netdev =3D netdev;
+-	ap->event_func =3D event_func;
++	ap->ops =3D ops;
+ 	ap->user_data =3D user_data;
+ =
+
+ 	if (!config->channel)
+@@ -2183,7 +2186,7 @@ static struct l_genl_msg *ap_build_cmd_stop_ap(struct=
+ ap_state *ap)
+ =
+
+ /*
+  * Schedule the running @ap to be stopped and freed.  The original
+- * event_func and user_data are forgotten and a new callback can be
++ * ops and user_data are forgotten and a new callback can be
+  * provided if the caller needs to know when the interface becomes
+  * free, for example for a new ap_start call.
+  *
+@@ -2200,7 +2203,7 @@ void ap_shutdown(struct ap_state *ap, ap_stopped_func=
+_t stopped_func,
+ =
+
+ 	if (ap->started) {
+ 		ap->started =3D false;
+-		ap->event_func(AP_EVENT_STOPPING, NULL, ap->user_data);
++		ap->ops->handle_event(AP_EVENT_STOPPING, NULL, ap->user_data);
  	}
  =
 
-+	if (!p2p_device_validate_channel_list(dev, &req_info.channel_list,
-+						&req_info.operating_channel)) {
-+		p2p_connect_failed(dev);
-+		status =3D P2P_STATUS_FAIL_INCOMPATIBLE_PARAMS;
-+		goto p2p_free;
-+	}
-+
-+	if (dev->is_go) {
-+		const struct l_queue_entry *entry;
-+		const struct p2p_channel_entries *entries;
-+		int i;
-+
-+		/*
-+		 * Section 3.1.4.2.1: "The Channel List attribute shall
-+		 * indicate the channels that the P2P Device can support as
-+		 * Operating Channel of the P2P Group if it becomes P2P Group
-+		 * Owner."
-+		 * Section 3.1.4.2.2: "The channels indicated in the Channel
-+		 * List shall only include channels from the Channel List
-+		 * attribute in the GO Negotiation Request frame. [...]
-+		 * The channel indicated in the Operating Channel attribute
-+		 * shall be one of the channels in the Channel List attribute
-+		 * in the GO Negotiation Response frame."
-+		 *
-+		 * Since the sender is not becoming the GO this shouldn't
-+		 * affect us but following 3.1.4.2.2 our operating channel
-+		 * should be one of those listed in the GO Negotiation
-+		 * Response which in turn are the subset of those in the
-+		 * Request.  So effectively the list in the Request limits
-+		 * the peer's set of supported operating channels both as the
-+		 * GO and the Client.  Check that our listen channel is in
-+		 * that set.
-+		 * TODO: if it's not, look for a different channel.
-+		 */
-+		for (entry =3D l_queue_get_entries(
-+					req_info.channel_list.channel_entries);
-+				entry; entry =3D entry->next) {
-+			entries =3D entry->data;
-+
-+			if (entries->oper_class =3D=3D dev->listen_oper_class)
-+				break;
-+		}
-+
-+		if (!entry) {
-+			l_error("Our Operating Class not listed in "
-+				"the GO Negotiation Request");
-+			p2p_connect_failed(dev);
-+			status =3D P2P_STATUS_FAIL_NO_COMMON_CHANNELS;
-+			goto p2p_free;
-+		}
-+
-+		for (i =3D 0; i < entries->n_channels; i++)
-+			if (entries->channels[i] =3D=3D dev->listen_channel)
-+				break;
-+
-+		if (i =3D=3D entries->n_channels) {
-+			l_error("Our listen channel not listed in "
-+				"the GO Negotiation Request");
-+			p2p_connect_failed(dev);
-+			status =3D P2P_STATUS_FAIL_NO_COMMON_CHANNELS;
-+			goto p2p_free;
-+		}
-+	}
-+
- 	/* Check whether WFD IE is required, validate it if present */
- 	if (!p2p_device_validate_conn_wfd(dev, req_info.wfd,
- 						req_info.wfd_size)) {
-@@ -1833,29 +1921,62 @@ static void p2p_device_go_negotiation_req_cb(const =
-struct mmpdu_header *mpdu,
- 	p2p_device_discovery_stop(dev);
+ 	ap_reset(ap);
+@@ -2370,6 +2373,10 @@ static void ap_if_event_func(enum ap_event_type type=
+, const void *event_data,
+ 	}
+ }
  =
 
- 	dev->conn_go_dialog_token =3D req_info.dialog_token;
--	dev->conn_config_delay =3D req_info.config_timeout.go_config_timeout * 10;
- 	memcpy(dev->conn_peer_interface_addr, req_info.intended_interface_addr,
- 		6);
++static const struct ap_ops ap_dbus_ops =3D {
++	.handle_event =3D ap_if_event_func,
++};
++
+ static struct l_dbus_message *ap_dbus_start(struct l_dbus *dbus,
+ 		struct l_dbus_message *message, void *user_data)
+ {
+@@ -2390,7 +2397,7 @@ static struct l_dbus_message *ap_dbus_start(struct l_=
+dbus *dbus,
+ 	config->ssid =3D l_strdup(ssid);
+ 	config->psk =3D l_strdup(wpa2_psk);
  =
 
-+	if (dev->is_go && dev->conn_peer) {
-+		p2p_set_group_id(dev);
-+
-+		dev->conn_config_delay =3D
-+			req_info.config_timeout.client_config_timeout * 10;
-+	} else {
-+		dev->conn_config_delay =3D
-+			req_info.config_timeout.go_config_timeout * 10;
-+	}
-+
- p2p_free:
--	tie_breaker =3D !req_info.go_tie_breaker;
-+	dev->conn_go_tie_breaker =3D !req_info.go_tie_breaker;
- 	p2p_clear_go_negotiation_req(&req_info);
+-	ap_if->ap =3D ap_start(ap_if->netdev, config, ap_if_event_func, ap_if);
++	ap_if->ap =3D ap_start(ap_if->netdev, config, &ap_dbus_ops, ap_if);
+ 	if (!ap_if->ap) {
+ 		ap_config_free(config);
+ 		return dbus_error_invalid_args(message);
+diff --git a/src/ap.h b/src/ap.h
+index cb5238d1..bbfecd6d 100644
+--- a/src/ap.h
++++ b/src/ap.h
+@@ -52,8 +52,6 @@ struct ap_event_registration_success_data {
+ 	const uint8_t *mac;
+ };
  =
 
- respond:
- 	/* Build and send the GO Negotiation Response */
- 	resp_info.dialog_token =3D dev->conn_go_dialog_token;
- 	resp_info.status =3D status;
--	resp_info.capability.device_caps =3D dev->capability.device_caps;
--	resp_info.capability.group_caps =3D 0;	/* Reserved */
--	resp_info.go_intent =3D 0;		/* Don't want to be the GO */
--	resp_info.go_tie_breaker =3D tie_breaker;
-+
-+	if (dev->is_go && dev->conn_peer) {
-+		struct l_queue *channel_list =3D l_queue_new();
-+		struct p2p_channel_entries *channel_entries =3D
-+			l_malloc(sizeof(struct p2p_channel_entries) + 1);
-+
-+		resp_info.capability =3D dev->capability;
-+		memcpy(resp_info.operating_channel.country,
-+			dev->listen_country, 3);
-+		resp_info.operating_channel.oper_class =3D dev->listen_oper_class;
-+		resp_info.operating_channel.channel_num =3D dev->listen_channel;
-+		memcpy(&resp_info.group_id, &dev->go_group_id,
-+			sizeof(struct p2p_group_id_attr));
-+
-+		channel_entries->oper_class =3D dev->listen_oper_class;
-+		channel_entries->n_channels =3D 1;
-+		channel_entries->channels[0] =3D dev->listen_channel;
-+		l_queue_push_tail(channel_list, channel_entries);
-+
-+		memcpy(resp_info.channel_list.country, dev->listen_country, 3);
-+		resp_info.channel_list.channel_entries =3D channel_list;
-+	} else {
-+		resp_info.capability.device_caps =3D dev->capability.device_caps;
-+		resp_info.capability.group_caps =3D 0;	/* Reserved */
-+		p2p_device_fill_channel_list(dev, &resp_info.channel_list);
-+	}
-+
-+	resp_info.go_intent =3D P2P_GO_INTENT;
-+	resp_info.go_tie_breaker =3D dev->conn_go_tie_breaker;
- 	resp_info.config_timeout.go_config_timeout =3D 50;	/* 500ms */
- 	resp_info.config_timeout.client_config_timeout =3D 50;	/* 500ms */
+-typedef void (*ap_event_func_t)(enum ap_event_type type, const void *event=
+_data,
+-				void *user_data);
+ typedef void (*ap_stopped_func_t)(void *user_data);
  =
 
- 	if (dev->conn_peer)
- 		memcpy(resp_info.intended_interface_addr, dev->conn_addr, 6);
+ struct ap_config {
+@@ -67,10 +65,15 @@ struct ap_config {
+ 	bool no_cck_rates : 1;
+ };
  =
 
--	p2p_device_fill_channel_list(dev, &resp_info.channel_list);
- 	resp_info.device_info =3D dev->device_info;
- 	resp_info.device_info.wsc_config_methods =3D dev->conn_config_method;
- 	resp_info.device_password_id =3D dev->conn_password_id;
++struct ap_ops {
++	void (*handle_event)(enum ap_event_type type, const void *event_data,
++				void *user_data);
++};
++
+ void ap_config_free(struct ap_config *config);
+ =
+
+ struct ap_state *ap_start(struct netdev *netdev, struct ap_config *config,
+-				ap_event_func_t event_func, void *user_data);
++				const struct ap_ops *ops, void *user_data);
+ void ap_shutdown(struct ap_state *ap, ap_stopped_func_t stopped_func,
+ 			void *user_data);
+ void ap_free(struct ap_state *ap);
 -- =
 
 2.25.1
 
---===============7319360092071461377==--
+--===============3710151091379362292==--
 
