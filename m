@@ -1,48 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============1599712259551298452=="
+Content-Type: multipart/mixed; boundary="===============6882239813708900533=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 1/8] ap: Fix NULL ap->rares
-Date: Fri, 11 Sep 2020 21:50:56 +0200
-Message-ID: <20200911195103.385070-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 2/8] ap: Fix setting the basic rate in Supported Rates IE
+Date: Fri, 11 Sep 2020 21:50:57 +0200
+Message-ID: <20200911195103.385070-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20200911195103.385070-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1599712259551298452==
+--===============6882239813708900533==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Make sure ap->rates is non-NULL both with and without no_cck_rates.
 ---
- src/ap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/ap.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/ap.c b/src/ap.c
-index c972cfcb..ae33b461 100644
+index ae33b461..2a979661 100644
 --- a/src/ap.c
 +++ b/src/ap.c
-@@ -2074,6 +2074,7 @@ struct ap_state *ap_start(struct netdev *netdev, stru=
-ct ap_config *config,
- 	ap->ciphers =3D wiphy_select_cipher(wiphy, 0xffff);
- 	ap->group_cipher =3D wiphy_select_cipher(wiphy, 0xffff);
- 	ap->beacon_interval =3D 100;
-+	ap->rates =3D l_uintset_new(200);
+@@ -380,10 +380,10 @@ static size_t ap_build_beacon_pr_head(struct ap_state=
+ *ap,
+ 				flag =3D 0x80;
  =
 
- 	/* TODO: Pick from actual supported rates */
- 	if (config->no_cck_rates) {
-@@ -2086,7 +2087,6 @@ struct ap_state *ap_start(struct netdev *netdev, stru=
-ct ap_config *config,
- 		l_uintset_put(ap->rates, 96); /* 48 Mbps*/
- 		l_uintset_put(ap->rates, 108); /* 54 Mbps*/
- 	} else {
--		ap->rates =3D l_uintset_new(200);
- 		l_uintset_put(ap->rates, 2); /* 1 Mbps*/
- 		l_uintset_put(ap->rates, 11); /* 5.5 Mbps*/
- 		l_uintset_put(ap->rates, 22); /* 11 Mbps*/
+ 			*rates++ =3D r | flag;
++			count++;
+ 		}
+ =
+
+-	ie_tlv_builder_set_length(&builder, rates -
+-					ie_tlv_builder_get_data(&builder));
++	ie_tlv_builder_set_length(&builder, count);
+ =
+
+ 	/* DSSS Parameter Set IE for DSSS, HR, ERP and HT PHY rates */
+ 	ie_tlv_builder_next(&builder, IE_TYPE_DSSS_PARAMETER_SET);
 -- =
 
 2.25.1
 
---===============1599712259551298452==--
+--===============6882239813708900533==--
 
