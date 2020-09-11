@@ -1,162 +1,271 @@
-Content-Type: multipart/mixed; boundary="===============1723712846291208084=="
+Content-Type: multipart/mixed; boundary="===============2757901448047708350=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 7/8] ap: Support working without passphrase
-Date: Fri, 11 Sep 2020 21:51:02 +0200
-Message-ID: <20200911195103.385070-7-andrew.zaborowski@intel.com>
+Subject: [PATCH 8/8] p2p: Start a basic P2P Group after GO Negotiation
+Date: Fri, 11 Sep 2020 21:51:03 +0200
+Message-ID: <20200911195103.385070-8-andrew.zaborowski@intel.com>
 In-Reply-To: <20200911195103.385070-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1723712846291208084==
+--===============2757901448047708350==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add a "psk" setting to allow the user to pass the binary PSK directly
-instead of generating it from the passphrase and the SSID.  In that case
-we'll only send the PSK to WSC enrollees.
+Use the ap.c API to start an AP on a P2P_GO interface after we've been
+selected as the GO in the GO Negotiation.
 ---
- src/ap.c | 40 ++++++++++++++++++++++++++--------------
- src/ap.h |  3 ++-
- 2 files changed, 28 insertions(+), 15 deletions(-)
+ src/p2p.c | 135 ++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 122 insertions(+), 13 deletions(-)
 
-diff --git a/src/ap.c b/src/ap.c
-index 19c443c3..57b35b74 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -61,7 +61,6 @@ struct ap_state {
- 	enum ie_rsn_cipher_suite group_cipher;
- 	uint32_t beacon_interval;
- 	struct l_uintset *rates;
--	uint8_t pmk[32];
- 	uint32_t start_stop_cmd_id;
- 	uint32_t mlme_watch;
- 	uint8_t gtk[CRYPTO_MAX_GTK_LEN];
-@@ -113,11 +112,12 @@ void ap_config_free(struct ap_config *config)
+diff --git a/src/p2p.c b/src/p2p.c
+index ac9a8f97..cf4d4bf3 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -55,6 +55,7 @@
+ #include "src/frame-xchg.h"
+ #include "src/nl80211util.h"
+ #include "src/netconfig.h"
++#include "src/ap.h"
+ #include "src/p2p.h"
  =
 
- 	l_free(config->ssid);
+ struct p2p_device {
+@@ -110,6 +111,7 @@ struct p2p_device {
+ 	uint8_t conn_peer_interface_addr[6];
  =
 
--	if (config->psk) {
--		explicit_bzero(config->psk, strlen(config->psk));
--		l_free(config->psk);
-+	if (config->passphrase) {
-+		explicit_bzero(config->passphrase, strlen(config->passphrase));
-+		l_free(config->passphrase);
- 	}
+ 	struct p2p_group_id_attr go_group_id;
++	struct ap_state *group;
  =
 
-+	explicit_bzero(config->psk, 32);
- 	l_free(config->authorized_macs);
- 	l_free(config->wsc_name);
- 	l_free(config);
-@@ -176,8 +176,6 @@ static void ap_reset(struct ap_state *ap)
+ 	bool enabled : 1;
+ 	bool have_roc_cookie : 1;
+@@ -123,6 +125,7 @@ struct p2p_device {
+ 	bool disconnecting : 1;
+ 	bool is_go : 1;
+ 	bool conn_go_tie_breaker : 1;
++	bool conn_peer_added : 1;
+ };
+ =
+
+ struct p2p_discovery_user {
+@@ -217,8 +220,9 @@ static void p2p_discovery_user_free(void *data)
+ =
+
+ static inline bool p2p_peer_operational(struct p2p_peer *peer)
  {
- 	struct netdev *netdev =3D ap->netdev;
+-	return peer && peer->dev->conn_netdev && !peer->dev->conn_wsc_bss &&
+-		!peer->wsc.pending_connect && !peer->dev->disconnecting;
++	return peer && peer->dev->conn_netdev && !peer->dev->disconnecting &&
++		((!peer->dev->is_go && !peer->dev->conn_wsc_bss) ||
++		 (peer->dev->is_go && peer->dev->conn_peer_added));
+ }
  =
 
--	explicit_bzero(ap->pmk, sizeof(ap->pmk));
--
- 	if (ap->mlme_watch)
- 		l_genl_family_unregister(ap->nl80211, ap->mlme_watch);
+ static bool p2p_peer_match(const void *a, const void *b)
+@@ -457,6 +461,14 @@ static void p2p_connection_reset(struct p2p_device *de=
+v)
+ 	if (dev->conn_enrollee)
+ 		wsc_enrollee_cancel(dev->conn_enrollee, false);
  =
 
-@@ -651,7 +649,7 @@ static void ap_start_rsna(struct sta_state *sta, const =
-uint8_t *gtk_rsc)
- 	handshake_state_set_authenticator(sta->hs, true);
- 	handshake_state_set_event_func(sta->hs, ap_handshake_event, sta);
- 	handshake_state_set_supplicant_ie(sta->hs, sta->assoc_rsne);
--	handshake_state_set_pmk(sta->hs, sta->ap->pmk, 32);
-+	handshake_state_set_pmk(sta->hs, sta->ap->config->psk, 32);
- =
-
- 	if (gtk_rsc)
- 		handshake_state_set_gtk(sta->hs, sta->ap->gtk,
-@@ -794,8 +792,18 @@ static void ap_start_eap_wsc(struct sta_state *sta)
- 				WSC_CONFIGURATION_METHOD_PUSH_BUTTON);
- 	l_settings_set_string(sta->wsc_settings, "WSC", "WPA2-SSID",
- 				ap->config->ssid);
--	l_settings_set_string(sta->wsc_settings, "WSC", "WPA2-Passphrase",
--				ap->config->psk);
++	if (dev->group) {
++		ap_free(dev->group);
++		dev->group =3D NULL;
++		dev->conn_peer_added =3D false;
++	}
 +
-+	if (ap->config->passphrase)
-+		l_settings_set_string(sta->wsc_settings,
-+					"WSC", "WPA2-Passphrase",
-+					ap->config->passphrase);
-+	else {
-+		L_AUTO_FREE_VAR(char *, psk_str) =3D
-+			l_util_hexstring(ap->config->psk, 32);
++	dev->capability.group_caps =3D 0;
 +
-+		l_settings_set_string(sta->wsc_settings,
-+					"WSC", "WPA2-PSK", psk_str);
+ 	if (dev->conn_netdev) {
+ 		struct l_genl_msg *msg;
+ 		uint64_t wdev_id =3D netdev_get_wdev_id(dev->conn_netdev);
+@@ -628,10 +640,12 @@ static void p2p_peer_connect_done(struct p2p_device *=
+dev)
+ {
+ 	struct p2p_peer *peer =3D dev->conn_peer;
+ =
+
+-	/* We can free anything potentially needed for a retry */
+-	scan_bss_free(dev->conn_wsc_bss);
+-	dev->conn_wsc_bss =3D NULL;
+-	explicit_bzero(dev->conn_psk, 32);
++	if (!dev->is_go) {
++		/* We can free anything potentially needed for a retry */
++		scan_bss_free(dev->conn_wsc_bss);
++		dev->conn_wsc_bss =3D NULL;
++		explicit_bzero(dev->conn_psk, 32);
 +	}
  =
 
- 	sta->hs =3D netdev_handshake_state_new(ap->netdev);
- 	handshake_state_set_authenticator(sta->hs, true);
-@@ -2037,8 +2045,9 @@ static void ap_mlme_notify(struct l_genl_msg *msg, vo=
-id *user_data)
-  * @ops.handle_event is required and must react to AP_EVENT_START_FAILED
-  * and AP_EVENT_STOPPING by forgetting the ap_state struct, which is
-  * going to be freed automatically.
-- * In the @config struct only .ssid and .psk need to be non-NULL,
-- * other fields are optional.  If @ap_start succeeds, the returned
-+ * In the @config struct only .ssid and either of .passprhase and .psk
-+ * need to be present, other fields are optional.  If .psk is used
-+ * whenever .passphrase is NULL.  If @ap_start succeeds, the returned
-  * ap_state takes ownership of @config and the caller shouldn't
-  * free it or any of the memory pointed to by its members (they
-  * also can't be static).
-@@ -2097,8 +2106,11 @@ struct ap_state *ap_start(struct netdev *netdev, str=
-uct ap_config *config,
+ 	dbus_pending_reply(&peer->wsc.pending_connect,
+ 				l_dbus_message_new_method_return(
+@@ -649,6 +663,96 @@ static void p2p_peer_connect_done(struct p2p_device *d=
+ev)
+ 				"ConnectedIP");
+ }
  =
 
- 	wsc_uuid_from_addr(netdev_get_address(netdev), ap->wsc_uuid_r);
++static void p2p_group_event(enum ap_event_type type, const void *event_dat=
+a,
++				void *user_data)
++{
++	struct p2p_device *dev =3D user_data;
++
++	l_debug("type=3D%i", type);
++
++	switch (type) {
++	case AP_EVENT_START_FAILED:
++	case AP_EVENT_STOPPING:
++		dev->group =3D NULL;
++		p2p_connect_failed(dev);
++		break;
++
++	case AP_EVENT_STARTED:
++		ap_push_button(dev->group);
++		break;
++
++	case AP_EVENT_STATION_ADDED:
++		dev->conn_peer_added =3D true;
++		p2p_peer_connect_done(dev);
++		break;
++
++	case AP_EVENT_STATION_REMOVED:
++		dev->conn_peer_added =3D false;
++		p2p_connect_failed(dev);
++		break;
++
++	case AP_EVENT_REGISTRATION_START:
++		/* Don't validate the P2P IE or WFD IE at this stage */
++		break;
++	case AP_EVENT_REGISTRATION_SUCCESS:
++		dev->capability.group_caps &=3D ~P2P_GROUP_CAP_GROUP_FORMATION;
++		break;
++	case AP_EVENT_PBC_MODE_EXIT:
++		break;
++	};
++}
++
++static const struct ap_ops p2p_go_ops =3D {
++	.handle_event =3D p2p_group_event,
++};
++
++static void p2p_group_start(struct p2p_device *dev)
++{
++	struct ap_config *config =3D l_new(struct ap_config, 1);
++
++	config->ssid =3D l_strdup(dev->go_group_id.ssid);
++	config->channel =3D dev->listen_channel;
++	config->wsc_name =3D l_strdup(dev->device_info.device_name);
++	config->wsc_primary_device_type =3D dev->device_info.primary_device_type;
++	config->no_cck_rates =3D true;
++
++	/*
++	 * Section 3.2.1: "The Credentials for a P2P Group issued to a
++	 * P2P Device shall: [...]
++	 *  - Use a Network Key Type of 64 Hex characters."
++	 *
++	 * This implies we have to send the PSK and not the passphrase to
++	 * the WSC clients.  For simplicity we directly generate random
++	 * PSKs and don't currently respect the requirement to maintain
++	 * a passphrase.  We have no practical use for the passphrase and
++	 * it's a little costlier to generate for the same cryptographic
++	 * strength as the PSK.
++	 */
++	if (!l_getrandom(config->psk, 32)) {
++		l_error("l_getrandom() failed");
++		ap_config_free(config);
++		p2p_connect_failed(dev);
++		return;
++	}
++
++	/*
++	 * Section 3.1.4.4: "It shall only allow association by the
++	 * P2P Device that it is currently in Group Formation with."
++	 */
++	config->authorized_macs =3D l_memdup(dev->conn_peer_interface_addr, 6);
++	config->authorized_macs_num =3D 1;
++
++	dev->capability.group_caps |=3D P2P_GROUP_CAP_GO;
++	dev->capability.group_caps |=3D P2P_GROUP_CAP_GROUP_FORMATION;
++
++	dev->group =3D ap_start(dev->conn_netdev, config, &p2p_go_ops, dev);
++	if (!dev->group) {
++		ap_config_free(config);
++		p2p_connect_failed(dev);
++		return;
++	}
++}
++
+ static void p2p_netconfig_event_handler(enum netconfig_event event,
+ 					void *user_data)
+ {
+@@ -682,7 +786,7 @@ static void p2p_dhcp_timeout_destroy(void *user_data)
+ 	dev->conn_dhcp_timeout =3D NULL;
+ }
  =
 
--	if (crypto_psk_from_passphrase(config->psk, (uint8_t *) config->ssid,
--					strlen(config->ssid), ap->pmk) < 0)
-+	if (!config->passphrase &&
-+			crypto_psk_from_passphrase(config->passphrase,
-+						(uint8_t *) config->ssid,
-+						strlen(config->ssid),
-+						config->psk) < 0)
- 		goto error;
+-static void p2p_start_dhcp(struct p2p_device *dev)
++static void p2p_start_dhcp_client(struct p2p_device *dev)
+ {
+ 	uint32_t ifindex =3D netdev_get_ifindex(dev->conn_netdev);
+ 	unsigned int dhcp_timeout_val;
+@@ -723,7 +827,7 @@ static void p2p_netdev_connect_cb(struct netdev *netdev,
  =
 
- 	if (!frame_watch_add(wdev_id, 0, 0x0000 |
-@@ -2395,7 +2407,7 @@ static struct l_dbus_message *ap_dbus_start(struct l_=
-dbus *dbus,
+ 	switch (result) {
+ 	case NETDEV_RESULT_OK:
+-		p2p_start_dhcp(dev);
++		p2p_start_dhcp_client(dev);
+ 		break;
+ 	case NETDEV_RESULT_AUTHENTICATION_FAILED:
+ 	case NETDEV_RESULT_ASSOCIATION_FAILED:
+@@ -1034,10 +1138,14 @@ static void p2p_device_netdev_notify(struct netdev =
+*netdev,
+ 	case NETDEV_WATCH_EVENT_NEW:
+ 		/* Ignore the event if we're already connecting/connected */
+ 		if (dev->conn_enrollee || dev->conn_retry_count ||
+-				!netdev_get_is_up(netdev))
++				dev->group || !netdev_get_is_up(netdev))
+ 			break;
  =
 
- 	config =3D l_new(struct ap_config, 1);
- 	config->ssid =3D l_strdup(ssid);
--	config->psk =3D l_strdup(wpa2_psk);
-+	config->passphrase =3D l_strdup(wpa2_psk);
+-		p2p_provision_connect(dev);
++		if (dev->is_go)
++			p2p_group_start(dev);
++		else
++			p2p_provision_connect(dev);
++
+ 		break;
+ 	case NETDEV_WATCH_EVENT_DEL:
+ 		dev->conn_netdev =3D NULL;
+@@ -1094,13 +1202,14 @@ static void p2p_device_new_interface_destroy(void *=
+user_data)
  =
 
- 	ap_if->ap =3D ap_start(ap_if->netdev, config, &ap_dbus_ops, ap_if);
- 	if (!ap_if->ap) {
-diff --git a/src/ap.h b/src/ap.h
-index bbfecd6d..4232a735 100644
---- a/src/ap.h
-+++ b/src/ap.h
-@@ -56,7 +56,8 @@ typedef void (*ap_stopped_func_t)(void *user_data);
+ static void p2p_device_interface_create(struct p2p_device *dev)
+ {
+-	uint32_t iftype =3D NL80211_IFTYPE_P2P_CLIENT;
++	uint32_t iftype =3D dev->is_go ? NL80211_IFTYPE_P2P_GO :
++		NL80211_IFTYPE_P2P_CLIENT;
+ 	char ifname[32];
+ 	uint32_t wiphy_id =3D dev->wdev_id >> 32;
+ 	struct l_genl_msg *msg;
  =
 
- struct ap_config {
- 	char *ssid;
--	char *psk;
-+	char *passphrase;
-+	uint8_t psk[32];
- 	uint8_t channel;
- 	uint8_t *authorized_macs;
- 	unsigned int authorized_macs_num;
+-	snprintf(ifname, sizeof(ifname), "wlan%i-p2p-cl%i",
+-			wiphy_id, dev->conn_num++);
++	snprintf(ifname, sizeof(ifname), "wlan%i-p2p-%s%i",
++			wiphy_id, dev->is_go ? "go" : "cl", dev->conn_num++);
+ 	l_debug("creating %s", ifname);
+ =
+
+ 	msg =3D l_genl_msg_new(NL80211_CMD_NEW_INTERFACE);
 -- =
 
 2.25.1
 
---===============1723712846291208084==--
+--===============2757901448047708350==--
 
