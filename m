@@ -1,55 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============2761712300062439389=="
+Content-Type: multipart/mixed; boundary="===============8971285729670879030=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/3] auto-t: remove hwsim rules on __del__
-Date: Fri, 11 Sep 2020 11:11:29 -0700
-Message-ID: <20200911181130.73148-2-prestwoj@gmail.com>
+Subject: [PATCH 3/3] test-runner: print results even if test run is canceled
+Date: Fri, 11 Sep 2020 11:11:30 -0700
+Message-ID: <20200911181130.73148-3-prestwoj@gmail.com>
 In-Reply-To: <20200911181130.73148-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2761712300062439389==
+--===============8971285729670879030==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This prevents previous tests rules from carrying over into
-future tests.
 ---
- autotests/util/hwsim.py | 7 +++++++
- 1 file changed, 7 insertions(+)
+ tools/test-runner | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
-index a0ddedcd..cf1ab536 100755
---- a/autotests/util/hwsim.py
-+++ b/autotests/util/hwsim.py
-@@ -240,6 +240,9 @@ class RadioList(collections.Mapping):
-     def __delitem__(self, key):
-         self._dict.pop(key).remove()
+diff --git a/tools/test-runner b/tools/test-runner
+index d7f831ac..a71b9ef6 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -58,6 +58,9 @@ def exit_vm():
+ 		for p in config.ctx.processes:
+ 			print("Process %s still running!" % p.name)
  =
 
-+    def values(self):
-+        return self._dict.values()
++	if config.ctx and config.ctx.results:
++		print_results(config.ctx.results)
 +
-     def _interfaces_added_handler(self, path, interfaces):
-         self._dict[path] =3D Radio(interfaces[HWSIM_RADIO_INTERFACE])
+ 	os.sync()
  =
 
-@@ -271,6 +274,10 @@ class Hwsim(iwd.AsyncOpAbstract):
-         self._rules =3D RuleSet(self, objects)
-         self._radios =3D RadioList(self, objects)
+ 	RB_AUTOBOOT =3D 0x01234567
+@@ -985,8 +988,6 @@ def run_auto_tests(ctx, args):
+ 	if ctx.args.log:
+ 		Process(["dmesg"], ctx=3Dctx, wait=3DTrue)
  =
 
-+    def __del__(self):
-+        for rule in self._rules.values():
-+            rule.remove()
-+
-     @property
-     def rules(self):
-         return self._rules
+-	print_results(ctx.results)
+-
+ def run_unit_tests(ctx, args):
+ 	os.chdir(args.testhome + '/unit')
+ 	units =3D build_unit_list(args)
 -- =
 
 2.26.2
 
---===============2761712300062439389==--
+--===============8971285729670879030==--
 
