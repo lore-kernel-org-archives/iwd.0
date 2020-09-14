@@ -1,67 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============9126768430032286929=="
+Content-Type: multipart/mixed; boundary="===============6057507685173273288=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/6] auto-t: make AdHoc APIs behave like others
-Date: Mon, 14 Sep 2020 14:04:05 -0700
-Message-ID: <20200914210407.428918-5-prestwoj@gmail.com>
+Subject: [PATCH 5/6] auto-t: update AdHoc tests to use AdHocDevice
+Date: Mon, 14 Sep 2020 14:04:06 -0700
+Message-ID: <20200914210407.428918-6-prestwoj@gmail.com>
 In-Reply-To: <20200914210407.428918-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============9126768430032286929==
+--===============6057507685173273288==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The AdHoc functionality in iwd.py was not consistent at all with
-how all the other classes worked (my bad). Instead we can create
-a very simple AdHocDevice class which inherits all the DBus magic
-in the IWDDBusAbstract class.
 ---
- autotests/util/iwd.py | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ autotests/testAdHoc/adhoc_test.py | 18 ++++++++++++++----
+ autotests/testAdHoc/open_test.py  | 19 ++++++++++++++-----
+ 2 files changed, 28 insertions(+), 9 deletions(-)
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index e74a6faf..2713d774 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -206,6 +206,20 @@ class SignalAgent(dbus.service.Object):
-     def handle_new_level(self, path, level):
-         pass
+diff --git a/autotests/testAdHoc/adhoc_test.py b/autotests/testAdHoc/adhoc_=
+test.py
+index 119c6c7e..13c0c016 100644
+--- a/autotests/testAdHoc/adhoc_test.py
++++ b/autotests/testAdHoc/adhoc_test.py
+@@ -17,11 +17,21 @@ class Test(unittest.TestCase):
+         self.assertIsNotNone(dev1)
+         self.assertIsNotNone(dev2)
  =
 
-+class AdHocDevice(IWDDBusAbstract):
-+    '''
-+        Class represents an AdHoc device object: net.connman.iwd.AdHoc
-+    '''
-+    _iface_name =3D IWD_ADHOC_INTERFACE
-+
-+    @property
-+    def started(self):
-+        return self._properties['Started']
-+
-+    @property
-+    def connected_peers(self):
-+        return self._properties['ConnectedPeers']
-+
+-        dev1.start_adhoc("AdHocNetwork", "secret123")
+-        dev2.start_adhoc("AdHocNetwork", "secret123")
++        adhoc1 =3D dev1.start_adhoc("AdHocNetwork", "secret123")
  =
 
- class Device(IWDDBusAbstract):
-     '''
-@@ -506,6 +520,8 @@ class Device(IWDDBusAbstract):
-                                         error_handler=3Dself._failure)
-         self._wait_for_async_op()
- =
-
-+        return AdHocDevice(self.device_path)
+-        dev1.adhoc_wait_for_connected(dev2.address)
+-        dev2.adhoc_wait_for_connected(dev1.address)
++        condition =3D 'obj.started =3D=3D True'
++        wd.wait_for_object_condition(adhoc1, condition)
 +
-     def stop_adhoc(self):
-         self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
++        adhoc2 =3D dev2.start_adhoc("AdHocNetwork", "secret123")
++
++        condition =3D 'obj.started =3D=3D True'
++        wd.wait_for_object_condition(adhoc1, condition)
++
++        condition =3D '"%s" in obj.connected_peers' % dev2.address
++        wd.wait_for_object_condition(adhoc1, condition)
++
++        condition =3D '"%s" in obj.connected_peers' % dev1.address
++        wd.wait_for_object_condition(adhoc2, condition)
  =
 
+         testutil.test_iface_operstate(dev1.name)
+         testutil.test_iface_operstate(dev2.name)
+diff --git a/autotests/testAdHoc/open_test.py b/autotests/testAdHoc/open_te=
+st.py
+index a3882a50..4e0ae27f 100644
+--- a/autotests/testAdHoc/open_test.py
++++ b/autotests/testAdHoc/open_test.py
+@@ -18,12 +18,21 @@ class Test(unittest.TestCase):
+         self.assertIsNotNone(dev1)
+         self.assertIsNotNone(dev2)
+ =
+
+-        dev1.start_adhoc("AdHocNetwork")
+-        sleep(1)
+-        dev2.start_adhoc("AdHocNetwork")
++        adhoc1 =3D dev1.start_adhoc("AdHocNetwork")
+ =
+
+-        dev1.adhoc_wait_for_connected(dev2.address)
+-        dev2.adhoc_wait_for_connected(dev1.address)
++        condition =3D 'obj.started =3D=3D True'
++        wd.wait_for_object_condition(adhoc1, condition)
++
++        adhoc2 =3D dev2.start_adhoc("AdHocNetwork")
++
++        condition =3D 'obj.started =3D=3D True'
++        wd.wait_for_object_condition(adhoc1, condition)
++
++        condition =3D '"%s" in obj.connected_peers' % dev2.address
++        wd.wait_for_object_condition(adhoc1, condition)
++
++        condition =3D '"%s" in obj.connected_peers' % dev1.address
++        wd.wait_for_object_condition(adhoc2, condition)
+ =
+
+         testutil.test_iface_operstate(dev1.name)
+         testutil.test_iface_operstate(dev2.name)
 -- =
 
 2.26.2
 
---===============9126768430032286929==--
+--===============6057507685173273288==--
 
