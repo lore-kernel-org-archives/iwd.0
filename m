@@ -1,39 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============4414181755184595980=="
+Content-Type: multipart/mixed; boundary="===============8268650490867137100=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 0/6] AdHoc fixes
-Date: Mon, 14 Sep 2020 14:04:01 -0700
-Message-ID: <20200914210407.428918-1-prestwoj@gmail.com>
+Subject: [PATCH 1/6] adhoc: start both eapol SM's
+Date: Mon, 14 Sep 2020 14:04:02 -0700
+Message-ID: <20200914210407.428918-2-prestwoj@gmail.com>
+In-Reply-To: <20200914210407.428918-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4414181755184595980==
+--===============8268650490867137100==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-These should make AdHoc pass very reliably now. There is still
-the problem of the failure test. Its not really testing anything
-at this point since there is no way of knowing if EAPoL was
-successful or not via DBus.
+At some point in the past starting only one SM worked. But now it does
+not. Both SM's need to be started for EAPoL to work properly and kick
+off both sets of handshakes.
+---
+ src/adhoc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-James Prestwood (6):
-  adhoc: start both eapol SM's
-  adhoc: print handshake failure reason
-  adhoc: delay setting setting Started
-  auto-t: make AdHoc APIs behave like others
-  auto-t: update AdHoc tests to use AdHocDevice
-  auto-t: remove old AdHoc APIs
+diff --git a/src/adhoc.c b/src/adhoc.c
+index ceec2dea..3050ce27 100644
+--- a/src/adhoc.c
++++ b/src/adhoc.c
+@@ -302,6 +302,7 @@ static void adhoc_start_rsna(struct sta_state *sta, con=
+st uint8_t *gtk_rsc)
+ 	eapol_register(sta->sm_a);
+ =
 
- autotests/testAdHoc/adhoc_test.py | 18 ++++++--
- autotests/testAdHoc/open_test.py  | 19 ++++++---
- autotests/util/iwd.py             | 71 +++++++------------------------
- src/adhoc.c                       | 51 ++++++++++++++++++++--
- 4 files changed, 92 insertions(+), 67 deletions(-)
+ 	eapol_start(sta->sm);
++	eapol_start(sta->sm_a);
+ =
+
+ 	return;
+ =
 
 -- =
 
 2.26.2
 
---===============4414181755184595980==--
+--===============8268650490867137100==--
 
