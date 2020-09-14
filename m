@@ -1,35 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============0793922117106772498=="
+Content-Type: multipart/mixed; boundary="===============3239183967688299007=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/4] station: print which BSS is being connected to
-Date: Mon, 14 Sep 2020 16:03:26 -0500
-Message-ID: <7f74c94b-91cc-e50a-caa9-f1c0809153a7@gmail.com>
-In-Reply-To: <20200914210233.428835-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/6] adhoc: start both eapol SM's
+Date: Mon, 14 Sep 2020 16:27:21 -0500
+Message-ID: <76e8fadb-ce21-4c7d-9d41-598e24bb335d@gmail.com>
+In-Reply-To: <20200914210407.428918-2-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0793922117106772498==
+--===============3239183967688299007==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 9/14/20 4:02 PM, James Prestwood wrote:
-> For multi-bss networks its nice to know which BSS is being connected
-> to. The ranking can hint at it, but blacklisting or network capabilities
-> could effect which network is actually chosen. An explicit debug print
-> makes debugging much easier.
+On 9/14/20 4:04 PM, James Prestwood wrote:
+> At some point in the past starting only one SM worked. But now it does
+> not. Both SM's need to be started for EAPoL to work properly and kick
+> off both sets of handshakes.
 > ---
->   src/station.c | 2 ++
->   1 file changed, 2 insertions(+)
+>   src/adhoc.c | 1 +
+>   1 file changed, 1 insertion(+)
 > =
 
 
-All applied, thanks.
+Applied with a slight commit description change to mention the offending co=
+mmit.
 
 Regards,
 -Denis
 
---===============0793922117106772498==--
+--===============3239183967688299007==--
 
