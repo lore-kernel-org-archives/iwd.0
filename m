@@ -1,210 +1,181 @@
-Content-Type: multipart/mixed; boundary="===============3505552440151026502=="
+Content-Type: multipart/mixed; boundary="===============6289611505392954095=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 4/5] p2p: Try IP allocation during 4-Way handshake on client
-Date: Mon, 14 Sep 2020 15:51:19 +0200
-Message-ID: <20200914135120.463623-4-andrew.zaborowski@intel.com>
+Subject: [PATCH 5/5] unit: Add two EAPOL IP allocation scenarios
+Date: Mon, 14 Sep 2020 15:51:20 +0200
+Message-ID: <20200914135120.463623-5-andrew.zaborowski@intel.com>
 In-Reply-To: <20200914135120.463623-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3505552440151026502==
+--===============6289611505392954095==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/p2p.c | 60 +++++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 50 insertions(+), 10 deletions(-)
+ unit/test-eapol.c | 135 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 135 insertions(+)
 
-diff --git a/src/p2p.c b/src/p2p.c
-index cf4d4bf3..5ee887d3 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -32,6 +32,8 @@
- #include <stdio.h>
- #include <time.h>
- #include <errno.h>
-+#include <netinet/in.h>
-+#include <arpa/inet.h>
- =
-
- #include <ell/ell.h>
- =
-
-@@ -97,7 +99,9 @@ struct p2p_device {
- 	uint32_t conn_new_intf_cmd_id;
- 	struct wsc_enrollee *conn_enrollee;
- 	struct netconfig *conn_netconfig;
-+	struct l_settings *conn_netconfig_settings;
- 	struct l_timeout *conn_dhcp_timeout;
-+	char *conn_peer_ip;
- 	struct p2p_wfd_properties *conn_own_wfd;
- 	uint8_t conn_psk[32];
- 	int conn_retry_count;
-@@ -109,6 +113,7 @@ struct p2p_device {
- 	unsigned int conn_go_scan_retry;
- 	uint32_t conn_go_oper_freq;
- 	uint8_t conn_peer_interface_addr[6];
-+	struct p2p_capability_attr conn_peer_capability;
- =
-
- 	struct p2p_group_id_attr go_group_id;
- 	struct ap_state *group;
-@@ -446,6 +451,9 @@ static void p2p_connection_reset(struct p2p_device *dev)
- 	if (dev->conn_netconfig) {
- 		netconfig_destroy(dev->conn_netconfig);
- 		dev->conn_netconfig =3D NULL;
-+		l_settings_free(dev->conn_netconfig_settings);
-+		l_free(dev->conn_peer_ip);
-+		dev->conn_peer_ip =3D NULL;
- 	}
- =
-
- 	if (dev->conn_new_intf_cmd_id)
-@@ -761,6 +769,11 @@ static void p2p_netconfig_event_handler(enum netconfig=
-_event event,
- 	switch (event) {
- 	case NETCONFIG_EVENT_CONNECTED:
- 		l_timeout_remove(dev->conn_dhcp_timeout);
-+
-+		if (!dev->conn_peer_ip)
-+			dev->conn_peer_ip =3D netconfig_get_dhcp_server_ipv4(
-+							dev->conn_netconfig);
-+
- 		p2p_peer_connect_done(dev);
- 		break;
- 	default:
-@@ -786,10 +799,11 @@ static void p2p_dhcp_timeout_destroy(void *user_data)
- 	dev->conn_dhcp_timeout =3D NULL;
+diff --git a/unit/test-eapol.c b/unit/test-eapol.c
+index 08740a8e..eba249ed 100644
+--- a/unit/test-eapol.c
++++ b/unit/test-eapol.c
+@@ -3769,6 +3769,137 @@ static void eapol_ap_sta_handshake_bad_psk_test(con=
+st void *data)
+ 	assert(s.to_ap_msg_cnt =3D=3D 1 && s.to_sta_msg_cnt =3D=3D 1);
  }
  =
 
--static void p2p_start_dhcp_client(struct p2p_device *dev)
-+static void p2p_start_client_netconfig(struct p2p_device *dev)
- {
- 	uint32_t ifindex =3D netdev_get_ifindex(dev->conn_netdev);
- 	unsigned int dhcp_timeout_val;
-+	struct l_settings *settings;
- =
-
- 	if (!l_settings_get_uint(iwd_get_config(), "P2P", "DHCPTimeout",
- 					&dhcp_timeout_val))
-@@ -803,9 +817,9 @@ static void p2p_start_dhcp_client(struct p2p_device *de=
-v)
- 		}
- 	}
- =
-
--	netconfig_configure(dev->conn_netconfig, p2p_dhcp_settings,
--				dev->conn_addr, p2p_netconfig_event_handler,
--				dev);
-+	settings =3D dev->conn_netconfig_settings ?: p2p_dhcp_settings;
-+	netconfig_configure(dev->conn_netconfig, settings, dev->conn_addr,
-+				p2p_netconfig_event_handler, dev);
- 	dev->conn_dhcp_timeout =3D l_timeout_create(dhcp_timeout_val,
- 						p2p_dhcp_timeout, dev,
- 						p2p_dhcp_timeout_destroy);
-@@ -827,7 +841,7 @@ static void p2p_netdev_connect_cb(struct netdev *netdev,
- =
-
- 	switch (result) {
- 	case NETDEV_RESULT_OK:
--		p2p_start_dhcp_client(dev);
-+		p2p_start_client_netconfig(dev);
- 		break;
- 	case NETDEV_RESULT_AUTHENTICATION_FAILED:
- 	case NETDEV_RESULT_ASSOCIATION_FAILED:
-@@ -916,6 +930,13 @@ static void p2p_netdev_event(struct netdev *netdev, en=
-um netdev_event event,
- 	};
- }
- =
-
-+static const char *p2p_ip_to_string(uint32_t addr)
++static void eapol_ap_sta_handshake_ip_alloc_ok_test(const void *data)
 +{
-+	struct in_addr ia =3D { .s_addr =3D L_CPU_TO_BE32(addr) };
++	static const unsigned char ap_rsne[] =3D {
++		0x30, 0x14, 0x01, 0x00, 0x00, 0x0f, 0xac, 0x04,
++		0x01, 0x00, 0x00, 0x0f, 0xac, 0x04, 0x01, 0x00,
++		0x00, 0x0f, 0xac, 0x02, 0x81, 0x00 };
++	static const unsigned char sta_rsne[] =3D {
++		0x30, 0x12, 0x01, 0x00, 0x00, 0x0f, 0xac, 0x04,
++		0x01, 0x00, 0x00, 0x0f, 0xac, 0x04, 0x01, 0x00,
++		0x00, 0x0f, 0xac, 0x02 };
++	static const char *ssid =3D "TestWPA2PSK";
++	static const uint8_t psk[32] =3D {	/* secretsecret */
++		0x6a, 0xa3, 0xf0, 0x0b, 0x68, 0xbd, 0x8b, 0x46,
++		0x69, 0x83, 0xa5, 0x29, 0xa3, 0xfa, 0x57, 0x1c,
++		0x6c, 0x7b, 0x72, 0x41, 0x1d, 0xce, 0x33, 0x02,
++		0xa2, 0x2d, 0xdf, 0x77, 0xd1, 0x93, 0xdb, 0x5f };
++	struct test_ap_sta_data s =3D {
++		.ap_hs =3D test_ap_sta_hs_new(&s, 1),
++		.sta_hs =3D test_ap_sta_hs_new(&s, 2),
++		.ap_address =3D { 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
++		.sta_address =3D { 0x02, 0x03, 0x04, 0x05, 0x06, 0x08 },
++	};
 +
-+	return inet_ntoa(ia);
++	__handshake_set_get_nonce_func(random_nonce);
++	__handshake_set_install_tk_func(test_ap_sta_install_tk);
++	__handshake_set_install_gtk_func(NULL);
++
++	handshake_state_set_authenticator(s.ap_hs, true);
++	handshake_state_set_event_func(s.ap_hs, test_ap_sta_hs_event, &s);
++	handshake_state_set_authenticator_address(s.ap_hs, s.ap_address);
++	handshake_state_set_supplicant_address(s.ap_hs, s.sta_address);
++	handshake_state_set_supplicant_ie(s.ap_hs, sta_rsne);
++	handshake_state_set_authenticator_ie(s.ap_hs, ap_rsne);
++	handshake_state_set_ssid(s.ap_hs, (void *) ssid, strlen(ssid));
++	handshake_state_set_pmk(s.ap_hs, psk, 32);
++	s.ap_hs->support_ip_allocation =3D true;
++	s.ap_hs->client_ip_addr =3D 0x01020304;
++	s.ap_hs->subnet_mask =3D 0xffff0000;
++	s.ap_hs->go_ip_addr =3D 0x01020305;
++
++	handshake_state_set_authenticator(s.sta_hs, false);
++	handshake_state_set_event_func(s.sta_hs, test_ap_sta_hs_event, &s);
++	handshake_state_set_authenticator_address(s.sta_hs, s.ap_address);
++	handshake_state_set_supplicant_address(s.sta_hs, s.sta_address);
++	handshake_state_set_supplicant_ie(s.sta_hs, sta_rsne);
++	handshake_state_set_authenticator_ie(s.sta_hs, ap_rsne);
++	handshake_state_set_ssid(s.sta_hs, (void *) ssid, strlen(ssid));
++	handshake_state_set_pmk(s.sta_hs, psk, 32);
++	s.sta_hs->support_ip_allocation =3D true;
++
++	test_ap_sta_run(&s);
++
++	assert(s.ap_hs->support_ip_allocation);
++	assert(s.sta_hs->support_ip_allocation);
++	assert(s.sta_hs->client_ip_addr =3D=3D s.ap_hs->client_ip_addr);
++	assert(s.sta_hs->subnet_mask =3D=3D s.ap_hs->subnet_mask);
++	assert(s.sta_hs->go_ip_addr =3D=3D s.ap_hs->go_ip_addr);
++
++	handshake_state_free(s.ap_hs);
++	handshake_state_free(s.sta_hs);
++	__handshake_set_install_tk_func(NULL);
++
++	assert(s.ap_success && s.sta_success);
++	assert(s.to_ap_msg_cnt =3D=3D 2 && s.to_sta_msg_cnt =3D=3D 2);
++	assert(!memcmp(s.ap_tk, s.sta_tk, 16));
 +}
 +
- static void p2p_handshake_event(struct handshake_state *hs,
- 				enum handshake_event event, void *user_data,
- 				...)
-@@ -925,6 +946,24 @@ static void p2p_handshake_event(struct handshake_state=
- *hs,
- 	va_start(args, user_data);
- =
-
- 	switch (event) {
-+	case HANDSHAKE_EVENT_COMPLETE:
-+	{
-+		struct p2p_device *dev =3D user_data;
-+		struct l_settings *ip_config;
++static void eapol_ap_sta_handshake_ip_alloc_no_req_test(const void *data)
++{
++	static const unsigned char ap_rsne[] =3D {
++		0x30, 0x14, 0x01, 0x00, 0x00, 0x0f, 0xac, 0x04,
++		0x01, 0x00, 0x00, 0x0f, 0xac, 0x04, 0x01, 0x00,
++		0x00, 0x0f, 0xac, 0x02, 0x81, 0x00 };
++	static const unsigned char sta_rsne[] =3D {
++		0x30, 0x12, 0x01, 0x00, 0x00, 0x0f, 0xac, 0x04,
++		0x01, 0x00, 0x00, 0x0f, 0xac, 0x04, 0x01, 0x00,
++		0x00, 0x0f, 0xac, 0x02 };
++	static const char *ssid =3D "TestWPA2PSK";
++	static const uint8_t psk[32] =3D {	/* secretsecret */
++		0x6a, 0xa3, 0xf0, 0x0b, 0x68, 0xbd, 0x8b, 0x46,
++		0x69, 0x83, 0xa5, 0x29, 0xa3, 0xfa, 0x57, 0x1c,
++		0x6c, 0x7b, 0x72, 0x41, 0x1d, 0xce, 0x33, 0x02,
++		0xa2, 0x2d, 0xdf, 0x77, 0xd1, 0x93, 0xdb, 0x5f };
++	struct test_ap_sta_data s =3D {
++		.ap_hs =3D test_ap_sta_hs_new(&s, 1),
++		.sta_hs =3D test_ap_sta_hs_new(&s, 2),
++		.ap_address =3D { 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
++		.sta_address =3D { 0x02, 0x03, 0x04, 0x05, 0x06, 0x08 },
++	};
 +
-+		if (!hs->support_ip_allocation)
-+			break;
++	__handshake_set_get_nonce_func(random_nonce);
++	__handshake_set_install_tk_func(test_ap_sta_install_tk);
++	__handshake_set_install_gtk_func(NULL);
 +
-+		ip_config =3D l_settings_new();
-+		l_settings_set_string(ip_config, "IPv4", "Address",
-+					p2p_ip_to_string(hs->client_ip_addr));
-+		l_settings_set_string(ip_config, "IPv4", "Netmask",
-+					p2p_ip_to_string(hs->subnet_mask));
-+		dev->conn_netconfig_settings =3D ip_config;
-+		dev->conn_peer_ip =3D l_strdup(p2p_ip_to_string(hs->go_ip_addr));
++	handshake_state_set_authenticator(s.ap_hs, true);
++	handshake_state_set_event_func(s.ap_hs, test_ap_sta_hs_event, &s);
++	handshake_state_set_authenticator_address(s.ap_hs, s.ap_address);
++	handshake_state_set_supplicant_address(s.ap_hs, s.sta_address);
++	handshake_state_set_supplicant_ie(s.ap_hs, sta_rsne);
++	handshake_state_set_authenticator_ie(s.ap_hs, ap_rsne);
++	handshake_state_set_ssid(s.ap_hs, (void *) ssid, strlen(ssid));
++	handshake_state_set_pmk(s.ap_hs, psk, 32);
++	s.ap_hs->support_ip_allocation =3D true;
++	s.ap_hs->client_ip_addr =3D 0x01020304;
++	s.ap_hs->subnet_mask =3D 0xffff0000;
++	s.ap_hs->go_ip_addr =3D 0x01020305;
 +
-+		break;
-+	}
- 	case HANDSHAKE_EVENT_FAILED:
- 		netdev_handshake_failed(hs, va_arg(args, int));
- 		break;
-@@ -993,6 +1032,9 @@ static void p2p_try_connect_group(struct p2p_device *d=
-ev)
- 	handshake_state_set_ssid(hs, bss->ssid, bss->ssid_len);
- 	handshake_state_set_pmk(hs, dev->conn_psk, 32);
- =
-
-+	if (dev->conn_peer_capability.group_caps & P2P_GROUP_CAP_IP_ALLOCATION)
-+		hs->support_ip_allocation =3D true;
++	handshake_state_set_authenticator(s.sta_hs, false);
++	handshake_state_set_event_func(s.sta_hs, test_ap_sta_hs_event, &s);
++	handshake_state_set_authenticator_address(s.sta_hs, s.ap_address);
++	handshake_state_set_supplicant_address(s.sta_hs, s.sta_address);
++	handshake_state_set_supplicant_ie(s.sta_hs, sta_rsne);
++	handshake_state_set_authenticator_ie(s.sta_hs, ap_rsne);
++	handshake_state_set_ssid(s.sta_hs, (void *) ssid, strlen(ssid));
++	handshake_state_set_pmk(s.sta_hs, psk, 32);
++	s.ap_hs->support_ip_allocation =3D false;
 +
- 	r =3D netdev_connect(dev->conn_netdev, bss, hs, ie_iov, ie_num,
- 				p2p_netdev_event, p2p_netdev_connect_cb, dev);
- 	if (r < 0) {
-@@ -1393,6 +1435,7 @@ static bool p2p_provision_scan_notify(int err, struct=
- l_queue *bss_list,
- 		l_debug("GO found in the scan results");
++	test_ap_sta_run(&s);
++
++	assert(!s.ap_hs->support_ip_allocation);
++	assert(!s.sta_hs->support_ip_allocation);
++
++	handshake_state_free(s.ap_hs);
++	handshake_state_free(s.sta_hs);
++	__handshake_set_install_tk_func(NULL);
++
++	assert(s.ap_success && s.sta_success);
++	assert(s.to_ap_msg_cnt =3D=3D 2 && s.to_sta_msg_cnt =3D=3D 2);
++	assert(!memcmp(s.ap_tk, s.sta_tk, 16));
++}
++
+ #define IS_ENABLED(config_macro) _IS_ENABLED1(config_macro)
+ #define _IS_ENABLED1(config_macro) _IS_ENABLED2(_XXXX##config_macro)
+ #define _XXXX1 _YYYY,
+@@ -3913,6 +4044,10 @@ int main(int argc, char *argv[])
+ 			&eapol_ap_sta_handshake_test, NULL);
+ 	l_test_add("EAPoL/Supplicant+Authenticator 4-Way Handshake Bad PSK",
+ 			&eapol_ap_sta_handshake_bad_psk_test, NULL);
++	l_test_add("EAPoL/Supplicant+Authenticator IP Allocation OK",
++			&eapol_ap_sta_handshake_ip_alloc_ok_test, NULL);
++	l_test_add("EAPoL/Supplicant+Authenticator IP Allocation no request",
++			&eapol_ap_sta_handshake_ip_alloc_no_req_test, NULL);
  =
 
- 		dev->conn_wsc_bss =3D bss;
-+		dev->conn_peer_capability =3D *capability;
- 		p2p_device_interface_create(dev);
- 		l_queue_remove(bss_list, bss);
- 		l_queue_destroy(bss_list,
-@@ -4405,14 +4448,11 @@ static bool p2p_peer_get_connected_ip(struct l_dbus=
- *dbus,
- 					void *user_data)
- {
- 	struct p2p_peer *peer =3D user_data;
--	char *server_ip;
- =
-
--	if (!p2p_peer_operational(peer))
-+	if (!p2p_peer_operational(peer) || !peer->dev->conn_peer_ip)
- 		return false;
- =
-
--	server_ip =3D netconfig_get_dhcp_server_ipv4(peer->dev->conn_netconfig);
--	l_dbus_message_builder_append_basic(builder, 's', server_ip);
--	l_free(server_ip);
-+	l_dbus_message_builder_append_basic(builder, 's', peer->dev->conn_peer_ip=
-);
- 	return true;
- }
- =
-
+ done:
+ 	return l_test_run();
 -- =
 
 2.25.1
 
---===============3505552440151026502==--
+--===============6289611505392954095==--
 
