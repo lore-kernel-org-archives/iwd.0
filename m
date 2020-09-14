@@ -1,46 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============6543955607942123619=="
+Content-Type: multipart/mixed; boundary="===============1121577508818251931=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/4] auto-t: don't clear out rules from hwsim object
-Date: Mon, 14 Sep 2020 14:02:31 -0700
-Message-ID: <20200914210233.428835-2-prestwoj@gmail.com>
+Subject: [PATCH 3/4] auto-t: fix testFT-PSK-roam
+Date: Mon, 14 Sep 2020 14:02:32 -0700
+Message-ID: <20200914210233.428835-3-prestwoj@gmail.com>
 In-Reply-To: <20200914210233.428835-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6543955607942123619==
+--===============1121577508818251931==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This got added in the re-write but a __del__ method was also
-added to the Rule class as well. This caused problems if hwsim
-cleaned up since it removed the rules, which caused each rule
-to call __del__. Since the rule had already been removed there
-was no longer a DBus interface which raised an exception.
+Some cleanup code got removed by mistake which cleared out any
+hwsim rules before the next subtest. Without this the second test
+would end up getting erroneous signal strength numbers in the scan
+results causing a failure.
 ---
- autotests/util/hwsim.py | 4 ----
- 1 file changed, 4 deletions(-)
+ autotests/testFT-PSK-roam/connection_test.py | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
-index cf1ab536..4f41952f 100755
---- a/autotests/util/hwsim.py
-+++ b/autotests/util/hwsim.py
-@@ -274,10 +274,6 @@ class Hwsim(iwd.AsyncOpAbstract):
-         self._rules =3D RuleSet(self, objects)
-         self._radios =3D RadioList(self, objects)
+diff --git a/autotests/testFT-PSK-roam/connection_test.py b/autotests/testF=
+T-PSK-roam/connection_test.py
+index ccbaccb8..6ad7af4e 100644
+--- a/autotests/testFT-PSK-roam/connection_test.py
++++ b/autotests/testFT-PSK-roam/connection_test.py
+@@ -187,6 +187,11 @@ class Test(unittest.TestCase):
+         os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" up')
+         os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" up')
  =
 
--    def __del__(self):
--        for rule in self._rules.values():
--            rule.remove()
--
-     @property
-     def rules(self):
-         return self._rules
++        hwsim =3D Hwsim()
++
++        for rule in list(hwsim.rules.keys()):
++            del hwsim.rules[rule]
++
+     @classmethod
+     def setUpClass(cls):
+         hwsim =3D Hwsim()
 -- =
 
 2.26.2
 
---===============6543955607942123619==--
+--===============1121577508818251931==--
 
