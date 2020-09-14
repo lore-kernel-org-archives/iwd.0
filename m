@@ -1,95 +1,92 @@
-Content-Type: multipart/mixed; boundary="===============6057507685173273288=="
+Content-Type: multipart/mixed; boundary="===============7341262476857997439=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/6] auto-t: update AdHoc tests to use AdHocDevice
-Date: Mon, 14 Sep 2020 14:04:06 -0700
-Message-ID: <20200914210407.428918-6-prestwoj@gmail.com>
+Subject: [PATCH 6/6] auto-t: remove old AdHoc APIs
+Date: Mon, 14 Sep 2020 14:04:07 -0700
+Message-ID: <20200914210407.428918-7-prestwoj@gmail.com>
 In-Reply-To: <20200914210407.428918-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6057507685173273288==
+--===============7341262476857997439==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- autotests/testAdHoc/adhoc_test.py | 18 ++++++++++++++----
- autotests/testAdHoc/open_test.py  | 19 ++++++++++++++-----
- 2 files changed, 28 insertions(+), 9 deletions(-)
+ autotests/util/iwd.py | 55 -------------------------------------------
+ 1 file changed, 55 deletions(-)
 
-diff --git a/autotests/testAdHoc/adhoc_test.py b/autotests/testAdHoc/adhoc_=
-test.py
-index 119c6c7e..13c0c016 100644
---- a/autotests/testAdHoc/adhoc_test.py
-+++ b/autotests/testAdHoc/adhoc_test.py
-@@ -17,11 +17,21 @@ class Test(unittest.TestCase):
-         self.assertIsNotNone(dev1)
-         self.assertIsNotNone(dev2)
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 2713d774..67bb6e41 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -525,61 +525,6 @@ class Device(IWDDBusAbstract):
+     def stop_adhoc(self):
+         self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
  =
 
--        dev1.start_adhoc("AdHocNetwork", "secret123")
--        dev2.start_adhoc("AdHocNetwork", "secret123")
-+        adhoc1 =3D dev1.start_adhoc("AdHocNetwork", "secret123")
- =
-
--        dev1.adhoc_wait_for_connected(dev2.address)
--        dev2.adhoc_wait_for_connected(dev1.address)
-+        condition =3D 'obj.started =3D=3D True'
-+        wd.wait_for_object_condition(adhoc1, condition)
-+
-+        adhoc2 =3D dev2.start_adhoc("AdHocNetwork", "secret123")
-+
-+        condition =3D 'obj.started =3D=3D True'
-+        wd.wait_for_object_condition(adhoc1, condition)
-+
-+        condition =3D '"%s" in obj.connected_peers' % dev2.address
-+        wd.wait_for_object_condition(adhoc1, condition)
-+
-+        condition =3D '"%s" in obj.connected_peers' % dev1.address
-+        wd.wait_for_object_condition(adhoc2, condition)
- =
-
-         testutil.test_iface_operstate(dev1.name)
-         testutil.test_iface_operstate(dev2.name)
-diff --git a/autotests/testAdHoc/open_test.py b/autotests/testAdHoc/open_te=
-st.py
-index a3882a50..4e0ae27f 100644
---- a/autotests/testAdHoc/open_test.py
-+++ b/autotests/testAdHoc/open_test.py
-@@ -18,12 +18,21 @@ class Test(unittest.TestCase):
-         self.assertIsNotNone(dev1)
-         self.assertIsNotNone(dev2)
- =
-
--        dev1.start_adhoc("AdHocNetwork")
--        sleep(1)
--        dev2.start_adhoc("AdHocNetwork")
-+        adhoc1 =3D dev1.start_adhoc("AdHocNetwork")
- =
-
--        dev1.adhoc_wait_for_connected(dev2.address)
--        dev2.adhoc_wait_for_connected(dev1.address)
-+        condition =3D 'obj.started =3D=3D True'
-+        wd.wait_for_object_condition(adhoc1, condition)
-+
-+        adhoc2 =3D dev2.start_adhoc("AdHocNetwork")
-+
-+        condition =3D 'obj.started =3D=3D True'
-+        wd.wait_for_object_condition(adhoc1, condition)
-+
-+        condition =3D '"%s" in obj.connected_peers' % dev2.address
-+        wd.wait_for_object_condition(adhoc1, condition)
-+
-+        condition =3D '"%s" in obj.connected_peers' % dev1.address
-+        wd.wait_for_object_condition(adhoc2, condition)
- =
-
-         testutil.test_iface_operstate(dev1.name)
-         testutil.test_iface_operstate(dev2.name)
+-    def adhoc_wait_for_disconnected(self, addr):
+-        self._adhoc_prop_found =3D False
+-        self._adhoc_timed_out =3D False
+-
+-        def wait_timeout_cb():
+-            self._adhoc_timed_out =3D True
+-            return False
+-
+-        def adhoc_props_changed(iface, changed, invalid):
+-            if changed.get('ConnectedPeers', None):
+-                if addr not in changed['ConnectedPeers']:
+-                    self._adhoc_prop_found =3D True
+-
+-        self._prop_proxy.connect_to_signal('PropertiesChanged',
+-                                            adhoc_props_changed)
+-        props =3D self._prop_proxy.GetAll(IWD_ADHOC_INTERFACE)
+-        if props.get('ConnectedPeers', None):
+-            if addr not in props['ConnectedPeers']:
+-                return
+-
+-        GLib.timeout_add(int(50 * 1000), wait_timeout_cb)
+-        context =3D ctx.mainloop.get_context()
+-        while not self._adhoc_prop_found:
+-            context.iteration(may_block=3DTrue)
+-            if self._adhoc_timed_out:
+-                raise TimeoutError("Timed out waiting for peer %s" % addr)
+-
+-    def adhoc_wait_for_connected(self, addr):
+-        self._adhoc_prop_found =3D False
+-        self._adhoc_timed_out =3D False
+-
+-        def wait_timeout_cb():
+-            self._adhoc_timed_out =3D True
+-            return False
+-
+-        def adhoc_props_changed(iface, changed, invalid):
+-            if changed.get('ConnectedPeers', None):
+-                if addr in changed['ConnectedPeers']:
+-                    self._adhoc_prop_found =3D True
+-
+-        self._prop_proxy.connect_to_signal('PropertiesChanged',
+-                                            adhoc_props_changed)
+-
+-        props =3D self._prop_proxy.GetAll(IWD_ADHOC_INTERFACE)
+-        if props.get('ConnectedPeers', None):
+-            if addr in props['ConnectedPeers']:
+-                return
+-
+-        GLib.timeout_add(int(50 * 1000), wait_timeout_cb)
+-        context =3D ctx.mainloop.get_context()
+-        while not self._adhoc_prop_found:
+-            context.iteration(may_block=3DTrue)
+-            if self._adhoc_timed_out:
+-                raise TimeoutError("Timed out waiting for peer %s" % addr)
+-
+     def __str__(self, prefix =3D ''):
+         return prefix + 'Device: ' + self.device_path + '\n'\
+                + prefix + '\tName:\t\t' + self.name + '\n'\
 -- =
 
 2.26.2
 
---===============6057507685173273288==--
+--===============7341262476857997439==--
 
