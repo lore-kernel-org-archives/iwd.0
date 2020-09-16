@@ -1,300 +1,176 @@
-Content-Type: multipart/mixed; boundary="===============7157018168160293827=="
+Content-Type: multipart/mixed; boundary="===============2658340641849260428=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 1/6] ap: Pass "ops" struct to ap_start()
-Date: Wed, 16 Sep 2020 11:17:49 +0200
-Message-ID: <20200916091754.516851-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 2/6] ap: Support working without passphrase
+Date: Wed, 16 Sep 2020 11:17:50 +0200
+Message-ID: <20200916091754.516851-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20200916091754.516851-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7157018168160293827==
+--===============2658340641849260428==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Pass the event callback function pointer in a "struct ap_ops" instead of
-as individual ap_start() argument to make adding new callbacks easier.
+Add a "psk" setting to allow the user to pass the binary PSK directly
+instead of generating it from the passphrase and the SSID.  In that case
+we'll only send the PSK to WSC enrollees.
 ---
- src/ap.c | 65 +++++++++++++++++++++++++++++++-------------------------
- src/ap.h |  9 +++++---
- 2 files changed, 42 insertions(+), 32 deletions(-)
+ src/ap.c | 48 +++++++++++++++++++++++++++++-------------------
+ src/ap.h |  3 ++-
+ 2 files changed, 31 insertions(+), 20 deletions(-)
 
 diff --git a/src/ap.c b/src/ap.c
-index dfa12444..7c135150 100644
+index 7c135150..626c983b 100644
 --- a/src/ap.c
 +++ b/src/ap.c
-@@ -53,7 +53,7 @@
- struct ap_state {
- 	struct netdev *netdev;
- 	struct l_genl_family *nl80211;
--	ap_event_func_t event_func;
-+	const struct ap_ops *ops;
- 	ap_stopped_func_t stopped_func;
- 	void *user_data;
- 	struct ap_config *config;
-@@ -211,7 +211,7 @@ static void ap_del_station(struct sta_state *sta, uint1=
-6_t reason,
- 	sta->associated =3D false;
+@@ -62,7 +62,6 @@ struct ap_state {
+ 	enum ie_rsn_cipher_suite group_cipher;
+ 	uint32_t beacon_interval;
+ 	struct l_uintset *rates;
+-	uint8_t pmk[32];
+ 	uint32_t start_stop_cmd_id;
+ 	uint32_t mlme_watch;
+ 	uint8_t gtk[CRYPTO_MAX_GTK_LEN];
+@@ -114,11 +113,8 @@ void ap_config_free(struct ap_config *config)
  =
 
- 	if (sta->rsna) {
--		if (ap->event_func) {
-+		if (ap->ops->handle_event) {
- 			memset(&event_data, 0, sizeof(event_data));
- 			event_data.mac =3D sta->addr;
- 			event_data.reason =3D reason;
-@@ -229,8 +229,8 @@ static void ap_del_station(struct sta_state *sta, uint1=
-6_t reason,
- 	ap_stop_handshake(sta);
+ 	l_free(config->ssid);
  =
 
- 	if (send_event)
--		ap->event_func(AP_EVENT_STATION_REMOVED, &event_data,
--				ap->user_data);
-+		ap->ops->handle_event(AP_EVENT_STATION_REMOVED, &event_data,
-+					ap->user_data);
- }
+-	if (config->psk) {
+-		explicit_bzero(config->psk, strlen(config->psk));
+-		l_free(config->psk);
+-	}
+-
++	explicit_bzero(config->passphrase, sizeof(config->passphrase));
++	explicit_bzero(config->psk, sizeof(config->psk));
+ 	l_free(config->authorized_macs);
+ 	l_free(config->wsc_name);
+ 	l_free(config);
+@@ -177,8 +173,6 @@ static void ap_reset(struct ap_state *ap)
+ {
+ 	struct netdev *netdev =3D ap->netdev;
  =
 
- static bool ap_sta_match_addr(const void *a, const void *b)
-@@ -270,12 +270,12 @@ static void ap_new_rsna(struct sta_state *sta)
+-	explicit_bzero(ap->pmk, sizeof(ap->pmk));
+-
+ 	if (ap->mlme_watch)
+ 		l_genl_family_unregister(ap->nl80211, ap->mlme_watch);
  =
 
- 	sta->rsna =3D true;
+@@ -652,7 +646,7 @@ static void ap_start_rsna(struct sta_state *sta, const =
+uint8_t *gtk_rsc)
+ 	handshake_state_set_authenticator(sta->hs, true);
+ 	handshake_state_set_event_func(sta->hs, ap_handshake_event, sta);
+ 	handshake_state_set_supplicant_ie(sta->hs, sta->assoc_rsne);
+-	handshake_state_set_pmk(sta->hs, sta->ap->pmk, 32);
++	handshake_state_set_pmk(sta->hs, sta->ap->config->psk, 32);
  =
 
--	if (ap->event_func) {
-+	if (ap->ops->handle_event) {
- 		struct ap_event_station_added_data event_data =3D {};
- 		event_data.mac =3D sta->addr;
- 		event_data.rsn_ie =3D sta->assoc_rsne;
--		ap->event_func(AP_EVENT_STATION_ADDED, &event_data,
--				ap->user_data);
-+		ap->ops->handle_event(AP_EVENT_STATION_ADDED, &event_data,
-+					ap->user_data);
- 	}
- }
+ 	if (gtk_rsc)
+ 		handshake_state_set_gtk(sta->hs, sta->ap->gtk,
+@@ -795,8 +789,14 @@ static void ap_start_eap_wsc(struct sta_state *sta)
+ 				WSC_CONFIGURATION_METHOD_PUSH_BUTTON);
+ 	l_settings_set_string(sta->wsc_settings, "WSC", "WPA2-SSID",
+ 				ap->config->ssid);
+-	l_settings_set_string(sta->wsc_settings, "WSC", "WPA2-Passphrase",
+-				ap->config->psk);
++
++	if (ap->config->passphrase[0])
++		l_settings_set_string(sta->wsc_settings,
++					"WSC", "WPA2-Passphrase",
++					ap->config->passphrase);
++	else
++		l_settings_set_bytes(sta->wsc_settings,
++					"WSC", "WPA2-PSK", ap->config->psk, 32);
  =
 
-@@ -309,11 +309,11 @@ static void ap_drop_rsna(struct sta_state *sta)
- =
-
- 	ap_stop_handshake(sta);
- =
-
--	if (ap->event_func) {
-+	if (ap->ops->handle_event) {
- 		struct ap_event_station_removed_data event_data =3D {};
- 		event_data.mac =3D sta->addr;
--		ap->event_func(AP_EVENT_STATION_REMOVED, &event_data,
--				ap->user_data);
-+		ap->ops->handle_event(AP_EVENT_STATION_REMOVED, &event_data,
-+					ap->user_data);
- 	}
- }
- =
-
-@@ -544,7 +544,7 @@ static void ap_wsc_exit_pbc(struct ap_state *ap)
- 	ap->wsc_dpid =3D 0;
- 	ap_update_beacon(ap);
- =
-
--	ap->event_func(AP_EVENT_PBC_MODE_EXIT, NULL, ap->user_data);
-+	ap->ops->handle_event(AP_EVENT_PBC_MODE_EXIT, NULL, ap->user_data);
- }
- =
-
- static uint32_t ap_send_mgmt_frame(struct ap_state *ap,
-@@ -751,8 +751,9 @@ static void ap_wsc_handshake_event(struct handshake_sta=
-te *hs,
- 					&expiry_data);
- =
-
- 		event_data.mac =3D sta->addr;
--		sta->ap->event_func(AP_EVENT_REGISTRATION_SUCCESS, &event_data,
--					sta->ap->user_data);
-+		sta->ap->ops->handle_event(AP_EVENT_REGISTRATION_SUCCESS,
-+						&event_data,
-+						sta->ap->user_data);
- 		break;
- 	default:
- 		break;
-@@ -1336,8 +1337,8 @@ static void ap_assoc_reassoc(struct sta_state *sta, b=
-ool reassoc,
- 		sta->wsc_v2 =3D wsc_req.version2;
- =
-
- 		event_data.mac =3D sta->addr;
--		ap->event_func(AP_EVENT_REGISTRATION_START, &event_data,
--				ap->user_data);
-+		ap->ops->handle_event(AP_EVENT_REGISTRATION_START, &event_data,
-+					ap->user_data);
- =
-
- 		/*
- 		 * Since we're starting the PBC Registration Protocol
-@@ -1920,7 +1921,8 @@ static void ap_start_cb(struct l_genl_msg *msg, void =
-*user_data)
- 	if (l_genl_msg_get_error(msg) < 0) {
- 		l_error("START_AP failed: %i", l_genl_msg_get_error(msg));
- =
-
--		ap->event_func(AP_EVENT_START_FAILED, NULL, ap->user_data);
-+		ap->ops->handle_event(AP_EVENT_START_FAILED, NULL,
-+					ap->user_data);
- 		ap_reset(ap);
- 		l_genl_family_free(ap->nl80211);
- 		l_free(ap);
-@@ -1928,7 +1930,7 @@ static void ap_start_cb(struct l_genl_msg *msg, void =
-*user_data)
- 	}
- =
-
- 	ap->started =3D true;
--	ap->event_func(AP_EVENT_STARTED, NULL, ap->user_data);
-+	ap->ops->handle_event(AP_EVENT_STARTED, NULL, ap->user_data);
- }
- =
-
- static struct l_genl_msg *ap_build_cmd_start_ap(struct ap_state *ap)
-@@ -2015,11 +2017,12 @@ static void ap_mlme_notify(struct l_genl_msg *msg, =
+ 	sta->hs =3D netdev_handshake_state_new(ap->netdev);
+ 	handshake_state_set_authenticator(sta->hs, true);
+@@ -2038,11 +2038,11 @@ static void ap_mlme_notify(struct l_genl_msg *msg, =
 void *user_data)
- 			l_genl_family_cancel(ap->nl80211,
- 						ap->start_stop_cmd_id);
- 			ap->start_stop_cmd_id =3D 0;
--			ap->event_func(AP_EVENT_START_FAILED, NULL,
--					ap->user_data);
-+			ap->ops->handle_event(AP_EVENT_START_FAILED, NULL,
-+						ap->user_data);
- 		} else if (ap->started) {
- 			ap->started =3D false;
--			ap->event_func(AP_EVENT_STOPPING, NULL, ap->user_data);
-+			ap->ops->handle_event(AP_EVENT_STOPPING, NULL,
-+						ap->user_data);
- 		}
- =
-
- 		ap_reset(ap);
-@@ -2032,17 +2035,17 @@ static void ap_mlme_notify(struct l_genl_msg *msg, =
-void *user_data)
- /*
-  * Start a simple independent WPA2 AP on given netdev.
-  *
-- * @event_func is required and must react to AP_EVENT_START_FAILED
-- * and AP_EVENT_STOPPING by forgetting the ap_state struct, which
-- * is going to be freed automatically.
-- * In the @config struct only .ssid and .psk need to be non-NUL,
-+ * @ops.handle_event is required and must react to AP_EVENT_START_FAILED
-+ * and AP_EVENT_STOPPING by forgetting the ap_state struct, which is
-+ * going to be freed automatically.
-+ * In the @config struct only .ssid and .psk need to be non-NULL,
-  * other fields are optional.  If @ap_start succeeds, the returned
-  * ap_state takes ownership of @config and the caller shouldn't
-  * free it or any of the memory pointed to by its members (they
-  * also can't be static).
+  * @ops.handle_event is required and must react to AP_EVENT_START_FAILED
+  * and AP_EVENT_STOPPING by forgetting the ap_state struct, which is
+  * going to be freed automatically.
+- * In the @config struct only .ssid and .psk need to be non-NULL,
+- * other fields are optional.  If @ap_start succeeds, the returned
+- * ap_state takes ownership of @config and the caller shouldn't
+- * free it or any of the memory pointed to by its members (they
+- * also can't be static).
++ * In the @config struct the .ssid field is required and one of
++ * .passphrase and .psk must be filled in.  All other fields are optional.
++ * If @ap_start succeeds, the returned ap_state takes ownership of
++ * @config and the caller shouldn't free it or any of the memory pointed
++ * to by its members (which also can't be static).
   */
  struct ap_state *ap_start(struct netdev *netdev, struct ap_config *config,
--				ap_event_func_t event_func, void *user_data)
-+				const struct ap_ops *ops, void *user_data)
- {
- 	struct ap_state *ap;
- 	struct wiphy *wiphy =3D netdev_get_wiphy(netdev);
-@@ -2053,7 +2056,7 @@ struct ap_state *ap_start(struct netdev *netdev, stru=
-ct ap_config *config,
+ 				const struct ap_ops *ops, void *user_data)
+@@ -2052,6 +2052,13 @@ struct ap_state *ap_start(struct netdev *netdev, str=
+uct ap_config *config,
+ 	struct l_genl_msg *cmd;
+ 	uint64_t wdev_id =3D netdev_get_wdev_id(netdev);
+ =
+
++	if (L_WARN_ON(!config->ssid))
++		return NULL;
++
++	if (L_WARN_ON(!config->passphrase[0] && util_mem_is_zero(config->psk,
++							sizeof(config->psk))))
++		return NULL;
++
+ 	ap =3D l_new(struct ap_state, 1);
  	ap->nl80211 =3D l_genl_family_new(iwd_get_genl(), NL80211_GENL_NAME);
  	ap->config =3D config;
- 	ap->netdev =3D netdev;
--	ap->event_func =3D event_func;
-+	ap->ops =3D ops;
- 	ap->user_data =3D user_data;
+@@ -2098,8 +2105,11 @@ struct ap_state *ap_start(struct netdev *netdev, str=
+uct ap_config *config,
  =
 
- 	if (!config->channel)
-@@ -2184,7 +2187,7 @@ static struct l_genl_msg *ap_build_cmd_stop_ap(struct=
- ap_state *ap)
+ 	wsc_uuid_from_addr(netdev_get_address(netdev), ap->wsc_uuid_r);
  =
 
- /*
-  * Schedule the running @ap to be stopped and freed.  The original
-- * event_func and user_data are forgotten and a new callback can be
-+ * ops and user_data are forgotten and a new callback can be
-  * provided if the caller needs to know when the interface becomes
-  * free, for example for a new ap_start call.
-  *
-@@ -2201,7 +2204,7 @@ void ap_shutdown(struct ap_state *ap, ap_stopped_func=
-_t stopped_func,
+-	if (crypto_psk_from_passphrase(config->psk, (uint8_t *) config->ssid,
+-					strlen(config->ssid), ap->pmk) < 0)
++	if (config->passphrase[0] &&
++			crypto_psk_from_passphrase(config->passphrase,
++						(uint8_t *) config->ssid,
++						strlen(config->ssid),
++						config->psk) < 0)
+ 		goto error;
  =
 
- 	if (ap->started) {
- 		ap->started =3D false;
--		ap->event_func(AP_EVENT_STOPPING, NULL, ap->user_data);
-+		ap->ops->handle_event(AP_EVENT_STOPPING, NULL, ap->user_data);
- 	}
- =
-
- 	ap_reset(ap);
-@@ -2371,6 +2374,10 @@ static void ap_if_event_func(enum ap_event_type type=
-, const void *event_data,
- 	}
- }
- =
-
-+static const struct ap_ops ap_dbus_ops =3D {
-+	.handle_event =3D ap_if_event_func,
-+};
-+
- static struct l_dbus_message *ap_dbus_start(struct l_dbus *dbus,
- 		struct l_dbus_message *message, void *user_data)
- {
-@@ -2391,7 +2398,7 @@ static struct l_dbus_message *ap_dbus_start(struct l_=
+ 	if (!frame_watch_add(wdev_id, 0, 0x0000 |
+@@ -2396,7 +2406,7 @@ static struct l_dbus_message *ap_dbus_start(struct l_=
 dbus *dbus,
- 	config->ssid =3D l_strdup(ssid);
- 	config->psk =3D l_strdup(wpa2_psk);
  =
 
--	ap_if->ap =3D ap_start(ap_if->netdev, config, ap_if_event_func, ap_if);
-+	ap_if->ap =3D ap_start(ap_if->netdev, config, &ap_dbus_ops, ap_if);
+ 	config =3D l_new(struct ap_config, 1);
+ 	config->ssid =3D l_strdup(ssid);
+-	config->psk =3D l_strdup(wpa2_psk);
++	l_strlcpy(config->passphrase, wpa2_psk, sizeof(config->passphrase));
+ =
+
+ 	ap_if->ap =3D ap_start(ap_if->netdev, config, &ap_dbus_ops, ap_if);
  	if (!ap_if->ap) {
- 		ap_config_free(config);
- 		return dbus_error_invalid_args(message);
 diff --git a/src/ap.h b/src/ap.h
-index cb5238d1..bbfecd6d 100644
+index bbfecd6d..a39797aa 100644
 --- a/src/ap.h
 +++ b/src/ap.h
-@@ -52,8 +52,6 @@ struct ap_event_registration_success_data {
- 	const uint8_t *mac;
- };
- =
-
--typedef void (*ap_event_func_t)(enum ap_event_type type, const void *event=
-_data,
--				void *user_data);
- typedef void (*ap_stopped_func_t)(void *user_data);
+@@ -56,7 +56,8 @@ typedef void (*ap_stopped_func_t)(void *user_data);
  =
 
  struct ap_config {
-@@ -67,10 +65,15 @@ struct ap_config {
- 	bool no_cck_rates : 1;
- };
- =
-
-+struct ap_ops {
-+	void (*handle_event)(enum ap_event_type type, const void *event_data,
-+				void *user_data);
-+};
-+
- void ap_config_free(struct ap_config *config);
- =
-
- struct ap_state *ap_start(struct netdev *netdev, struct ap_config *config,
--				ap_event_func_t event_func, void *user_data);
-+				const struct ap_ops *ops, void *user_data);
- void ap_shutdown(struct ap_state *ap, ap_stopped_func_t stopped_func,
- 			void *user_data);
- void ap_free(struct ap_state *ap);
+ 	char *ssid;
+-	char *psk;
++	char passphrase[64];
++	uint8_t psk[32];
+ 	uint8_t channel;
+ 	uint8_t *authorized_macs;
+ 	unsigned int authorized_macs_num;
 -- =
 
 2.25.1
 
---===============7157018168160293827==--
+--===============2658340641849260428==--
 
