@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============5127264118062700967=="
+Content-Type: multipart/mixed; boundary="===============6675421093132532952=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 6/6] treewide: Use l_settings_{set,get}_bytes
-Date: Wed, 16 Sep 2020 16:56:07 -0500
-Message-ID: <97d5781e-0113-1d23-0670-e150cbd24f44@gmail.com>
-In-Reply-To: <20200916091754.516851-6-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 1/6] ap: Pass "ops" struct to ap_start()
+Date: Wed, 16 Sep 2020 17:26:12 -0500
+Message-ID: <4015cbdb-5bec-be54-b768-268d62b61eef@gmail.com>
+In-Reply-To: <20200916091754.516851-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5127264118062700967==
+--===============6675421093132532952==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,22 +16,19 @@ Content-Transfer-Encoding: quoted-printable
 Hi Andrew,
 
 On 9/16/20 4:17 AM, Andrew Zaborowski wrote:
+> Pass the event callback function pointer in a "struct ap_ops" instead of
+> as individual ap_start() argument to make adding new callbacks easier.
 > ---
->   src/ap.c           | 14 ++++----------
->   src/eap-mschapv2.c | 39 ++++++++++++---------------------------
->   src/eap-wsc.c      | 23 +++++++++--------------
->   src/hotspot.c      | 26 ++++++++++++++------------
->   src/network.c      | 30 +++++++++++++++---------------
->   src/wsc.c          | 13 ++++---------
->   unit/test-wsc.c    | 36 +++++++++++-------------------------
->   7 files changed, 69 insertions(+), 112 deletions(-)
+>   src/ap.c | 65 +++++++++++++++++++++++++++++++-------------------------
+>   src/ap.h |  9 +++++---
+>   2 files changed, 42 insertions(+), 32 deletions(-)
 > =
 
 
-Applied, thanks.
+Patches 1-5 applied, thanks.
 
 Regards,
 -Denis
 
---===============5127264118062700967==--
+--===============6675421093132532952==--
 
