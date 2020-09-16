@@ -1,74 +1,163 @@
-Content-Type: multipart/mixed; boundary="===============2506709843226342730=="
+Content-Type: multipart/mixed; boundary="===============8523149617981740650=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/7] sim_hardcoded: convert to module
-Date: Wed, 16 Sep 2020 10:08:11 -0700
-Message-ID: <20200916170814.660095-4-prestwoj@gmail.com>
+Subject: [PATCH 5/7] plugin: remove plugin source
+Date: Wed, 16 Sep 2020 10:08:12 -0700
+Message-ID: <20200916170814.660095-5-prestwoj@gmail.com>
 In-Reply-To: <20200916170814.660095-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2506709843226342730==
+--===============8523149617981740650==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The only change	(apart from IWD_MODULE)	was to check main.conf
-for SimAuthBackend=3Dhardcoded.
 ---
- src/sim_hardcoded.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ src/plugin.c | 97 ----------------------------------------------------
+ src/plugin.h | 24 -------------
+ 2 files changed, 121 deletions(-)
+ delete mode 100644 src/plugin.c
+ delete mode 100644 src/plugin.h
 
-diff --git a/src/sim_hardcoded.c b/src/sim_hardcoded.c
-index 463c39fe..cab5d4f5 100644
---- a/src/sim_hardcoded.c
-+++ b/src/sim_hardcoded.c
-@@ -27,9 +27,10 @@
- #include <errno.h>
- =
-
- #include <ell/ell.h>
+diff --git a/src/plugin.c b/src/plugin.c
+deleted file mode 100644
+index b5dc828a..00000000
+--- a/src/plugin.c
++++ /dev/null
+@@ -1,97 +0,0 @@
+-/*
+- *
+- *  Wireless daemon for Linux
+- *
+- *  Copyright (C) 2017-2019  Intel Corporation. All rights reserved.
+- *
+- *  This library is free software; you can redistribute it and/or
+- *  modify it under the terms of the GNU Lesser General Public
+- *  License as published by the Free Software Foundation; either
+- *  version 2.1 of the License, or (at your option) any later version.
+- *
+- *  This library is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- *  Lesser General Public License for more details.
+- *
+- *  You should have received a copy of the GNU Lesser General Public
+- *  License along with this library; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <fnmatch.h>
+-
+-#include <ell/ell.h>
 -#include <ell/plugin.h>
- =
-
- #include "src/simauth.h"
-+#include "src/module.h"
-+#include "src/iwd.h"
- =
-
- struct hardcoded_sim {
- 	char *identity;
-@@ -263,7 +264,15 @@ static int sim_hardcoded_init(void)
- 	const char *str;
- 	size_t len;
- 	struct l_settings *key_settings;
--	const char *config_path =3D getenv("IWD_SIM_KEYS");
-+	const char *config_path;
-+	const struct l_settings *settings =3D iwd_get_config();
-+
-+	const char *value =3D l_settings_get_value(settings, "General",
-+							"SimAuthBackend");
-+	if (!value || strcmp(value, "hardcoded"))
-+		return 0;
-+
-+	config_path =3D getenv("IWD_SIM_KEYS");
- =
-
- 	if (!config_path) {
- 		l_debug("IWD_SIM_KEYS not set in env");
-@@ -394,6 +403,5 @@ static void sim_hardcoded_exit(void)
- 	l_free(sim);
- }
- =
-
--L_PLUGIN_DEFINE(__iwd_builtin_sim_hardcoded, sim_hardcoded,
--		"Hardcoded SIM driver", "1.0", L_PLUGIN_PRIORITY_DEFAULT,
--		sim_hardcoded_init, sim_hardcoded_exit)
-+IWD_MODULE(sim_hardcoded, sim_hardcoded_init, sim_hardcoded_exit);
-+IWD_MODULE_DEPENDS(sim_hardcoded, simauth);
+-
+-#include "src/builtin.h"
+-#include "src/plugin.h"
+-
+-static bool check_plugin(struct l_plugin_desc *desc,
+-						char **include, char **exclude)
+-{
+-	char *pattern;
+-	unsigned int i;
+-
+-	if (!include)
+-		goto check_blacklist;
+-
+-	for (i =3D 0; (pattern =3D include[i]); i++) {
+-		if (fnmatch(pattern, desc->name, 0) !=3D 0)
+-			continue;
+-
+-		goto check_blacklist;
+-	}
+-
+-	l_debug("whitelist filtered plugin: %s", desc->name);
+-	return false;
+-
+-check_blacklist:
+-	if (!exclude)
+-		return true;
+-
+-	for (i =3D 0; (pattern =3D exclude[i]); i++) {
+-		if (fnmatch(pattern, desc->name, 0) =3D=3D 0) {
+-			l_debug("blacklist filtered plugin: %s", desc->name);
+-			return false;
+-		}
+-	}
+-
+-	return true;
+-}
+-
+-int plugin_init(const char *include, const char *exclude)
+-{
+-	char **inc =3D NULL;
+-	char **exc =3D NULL;
+-	int i;
+-
+-	if (include)
+-		inc =3D l_strsplit_set(include, ",");
+-
+-	if (exclude)
+-		exc =3D l_strsplit_set(exclude, ",");
+-
+-	for (i =3D 0; __iwd_builtin[i]; i++) {
+-		if (check_plugin(__iwd_builtin[i], inc, exc))
+-			l_plugin_add(__iwd_builtin[i],
+-					__iwd_builtin[i]->version);
+-	}
+-
+-	l_plugin_load(NULL, NULL, NULL);
+-
+-	l_strfreev(inc);
+-	l_strfreev(exc);
+-
+-	return 1;
+-}
+-
+-void plugin_exit(void)
+-{
+-	l_plugin_unload();
+-}
+diff --git a/src/plugin.h b/src/plugin.h
+deleted file mode 100644
+index 1c1cbc07..00000000
+--- a/src/plugin.h
++++ /dev/null
+@@ -1,24 +0,0 @@
+-/*
+- *
+- *  Wireless daemon for Linux
+- *
+- *  Copyright (C) 2017-2019  Intel Corporation. All rights reserved.
+- *
+- *  This library is free software; you can redistribute it and/or
+- *  modify it under the terms of the GNU Lesser General Public
+- *  License as published by the Free Software Foundation; either
+- *  version 2.1 of the License, or (at your option) any later version.
+- *
+- *  This library is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- *  Lesser General Public License for more details.
+- *
+- *  You should have received a copy of the GNU Lesser General Public
+- *  License along with this library; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
+- *
+- */
+-
+-int plugin_init(const char *include, const char *exclude);
+-void plugin_exit(void);
 -- =
 
 2.26.2
 
---===============2506709843226342730==--
+--===============8523149617981740650==--
 
