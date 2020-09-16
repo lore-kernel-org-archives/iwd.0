@@ -1,13 +1,13 @@
-Content-Type: multipart/mixed; boundary="===============4179317204755439731=="
+Content-Type: multipart/mixed; boundary="===============0959997772396403181=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] auto-t: add netconfig autotest
-Date: Tue, 15 Sep 2020 15:50:34 -0700
-Message-ID: <20200915225034.565047-1-prestwoj@gmail.com>
+Subject: [PATCH v2] auto-t: add netconfig autotest
+Date: Tue, 15 Sep 2020 17:00:22 -0700
+Message-ID: <20200916000022.570808-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4179317204755439731==
+--===============0959997772396403181==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -25,27 +25,31 @@ put it in there now is a) because this is the only test and b) more
 complex DHCP cases are likely to develop and may require more than this
 simplistic setup (like multiple APs/interfaces)
 ---
- autotests/testNetconfig/connection_test.py | 69 ++++++++++++++++++++++
+ autotests/testNetconfig/connection_test.py | 70 ++++++++++++++++++++++
  autotests/testNetconfig/dhcpd.conf         | 16 +++++
- autotests/testNetconfig/dhcpd.leases       |  1 +
  autotests/testNetconfig/hw.conf            |  6 ++
  autotests/testNetconfig/main.conf          |  2 +
  autotests/testNetconfig/ssidTKIP.conf      |  7 +++
- 6 files changed, 101 insertions(+)
+ 5 files changed, 101 insertions(+)
  create mode 100644 autotests/testNetconfig/connection_test.py
  create mode 100644 autotests/testNetconfig/dhcpd.conf
- create mode 100644 autotests/testNetconfig/dhcpd.leases
  create mode 100644 autotests/testNetconfig/hw.conf
  create mode 100644 autotests/testNetconfig/main.conf
  create mode 100644 autotests/testNetconfig/ssidTKIP.conf
 
+-v2:
+ * Removed dhcpd.leases. Its an empty file anyways which caused issues with=
+ applying
+   the patches. Instead we can just touch /tmp/dhcpd.leases before starting=
+ dhcpd.
+
 diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNet=
 config/connection_test.py
 new file mode 100644
-index 00000000..c5200c2b
+index 00000000..3a590aeb
 --- /dev/null
 +++ b/autotests/testNetconfig/connection_test.py
-@@ -0,0 +1,69 @@
+@@ -0,0 +1,70 @@
 +#!/usr/bin/python3
 +
 +import unittest
@@ -112,6 +116,7 @@ mple
 +        ctx.start_process(['ifconfig', 'wln0', '192.168.1.1', 'netmask', '=
 255.255.255.0'],
 +                                wait=3DTrue)
++        ctx.start_process(['touch', '/tmp/dhcpd.leases'], wait=3DTrue)
 +        ctx.start_process(['dhcpd', '-cf', '/tmp/dhcpd.conf', '-lf', '/tmp=
 /dhcpd.leases'])
 +
@@ -144,14 +149,6 @@ index 00000000..77b4da1c
 +  range 192.168.1.10 192.168.1.20;
 +  range 192.168.1.100 192.168.1.200;
 + }
-diff --git a/autotests/testNetconfig/dhcpd.leases b/autotests/testNetconfig=
-/dhcpd.leases
-new file mode 100644
-index 00000000..8b137891
---- /dev/null
-+++ b/autotests/testNetconfig/dhcpd.leases
-@@ -0,0 +1 @@
-+
 diff --git a/autotests/testNetconfig/hw.conf b/autotests/testNetconfig/hw.c=
 onf
 new file mode 100644
@@ -192,5 +189,5 @@ index 00000000..11ef15f0
 
 2.26.2
 
---===============4179317204755439731==--
+--===============0959997772396403181==--
 
