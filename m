@@ -1,271 +1,210 @@
-Content-Type: multipart/mixed; boundary="===============1962037861991684571=="
+Content-Type: multipart/mixed; boundary="===============9125300048776856207=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 4/6] p2p: Start a basic P2P Group after GO Negotiation
-Date: Wed, 16 Sep 2020 11:17:52 +0200
-Message-ID: <20200916091754.516851-4-andrew.zaborowski@intel.com>
+Subject: [PATCH 5/6] p2p: Try IP allocation during 4-Way handshake on client
+Date: Wed, 16 Sep 2020 11:17:53 +0200
+Message-ID: <20200916091754.516851-5-andrew.zaborowski@intel.com>
 In-Reply-To: <20200916091754.516851-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1962037861991684571==
+--===============9125300048776856207==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Use the ap.c API to start an AP on a P2P_GO interface after we've been
-selected as the GO in the GO Negotiation.
 ---
- src/p2p.c | 135 ++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 122 insertions(+), 13 deletions(-)
+ src/p2p.c | 60 +++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 50 insertions(+), 10 deletions(-)
 
 diff --git a/src/p2p.c b/src/p2p.c
-index ac9a8f97..cf4d4bf3 100644
+index cf4d4bf3..5ee887d3 100644
 --- a/src/p2p.c
 +++ b/src/p2p.c
-@@ -55,6 +55,7 @@
- #include "src/frame-xchg.h"
- #include "src/nl80211util.h"
- #include "src/netconfig.h"
-+#include "src/ap.h"
- #include "src/p2p.h"
+@@ -32,6 +32,8 @@
+ #include <stdio.h>
+ #include <time.h>
+ #include <errno.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
  =
 
- struct p2p_device {
-@@ -110,6 +111,7 @@ struct p2p_device {
+ #include <ell/ell.h>
+ =
+
+@@ -97,7 +99,9 @@ struct p2p_device {
+ 	uint32_t conn_new_intf_cmd_id;
+ 	struct wsc_enrollee *conn_enrollee;
+ 	struct netconfig *conn_netconfig;
++	struct l_settings *conn_netconfig_settings;
+ 	struct l_timeout *conn_dhcp_timeout;
++	char *conn_peer_ip;
+ 	struct p2p_wfd_properties *conn_own_wfd;
+ 	uint8_t conn_psk[32];
+ 	int conn_retry_count;
+@@ -109,6 +113,7 @@ struct p2p_device {
+ 	unsigned int conn_go_scan_retry;
+ 	uint32_t conn_go_oper_freq;
  	uint8_t conn_peer_interface_addr[6];
++	struct p2p_capability_attr conn_peer_capability;
  =
 
  	struct p2p_group_id_attr go_group_id;
-+	struct ap_state *group;
+ 	struct ap_state *group;
+@@ -446,6 +451,9 @@ static void p2p_connection_reset(struct p2p_device *dev)
+ 	if (dev->conn_netconfig) {
+ 		netconfig_destroy(dev->conn_netconfig);
+ 		dev->conn_netconfig =3D NULL;
++		l_settings_free(dev->conn_netconfig_settings);
++		l_free(dev->conn_peer_ip);
++		dev->conn_peer_ip =3D NULL;
+ 	}
  =
 
- 	bool enabled : 1;
- 	bool have_roc_cookie : 1;
-@@ -123,6 +125,7 @@ struct p2p_device {
- 	bool disconnecting : 1;
- 	bool is_go : 1;
- 	bool conn_go_tie_breaker : 1;
-+	bool conn_peer_added : 1;
- };
- =
-
- struct p2p_discovery_user {
-@@ -217,8 +220,9 @@ static void p2p_discovery_user_free(void *data)
- =
-
- static inline bool p2p_peer_operational(struct p2p_peer *peer)
- {
--	return peer && peer->dev->conn_netdev && !peer->dev->conn_wsc_bss &&
--		!peer->wsc.pending_connect && !peer->dev->disconnecting;
-+	return peer && peer->dev->conn_netdev && !peer->dev->disconnecting &&
-+		((!peer->dev->is_go && !peer->dev->conn_wsc_bss) ||
-+		 (peer->dev->is_go && peer->dev->conn_peer_added));
- }
- =
-
- static bool p2p_peer_match(const void *a, const void *b)
-@@ -457,6 +461,14 @@ static void p2p_connection_reset(struct p2p_device *de=
-v)
- 	if (dev->conn_enrollee)
- 		wsc_enrollee_cancel(dev->conn_enrollee, false);
- =
-
-+	if (dev->group) {
-+		ap_free(dev->group);
-+		dev->group =3D NULL;
-+		dev->conn_peer_added =3D false;
-+	}
+ 	if (dev->conn_new_intf_cmd_id)
+@@ -761,6 +769,11 @@ static void p2p_netconfig_event_handler(enum netconfig=
+_event event,
+ 	switch (event) {
+ 	case NETCONFIG_EVENT_CONNECTED:
+ 		l_timeout_remove(dev->conn_dhcp_timeout);
 +
-+	dev->capability.group_caps =3D 0;
++		if (!dev->conn_peer_ip)
++			dev->conn_peer_ip =3D netconfig_get_dhcp_server_ipv4(
++							dev->conn_netconfig);
 +
- 	if (dev->conn_netdev) {
- 		struct l_genl_msg *msg;
- 		uint64_t wdev_id =3D netdev_get_wdev_id(dev->conn_netdev);
-@@ -628,10 +640,12 @@ static void p2p_peer_connect_done(struct p2p_device *=
-dev)
- {
- 	struct p2p_peer *peer =3D dev->conn_peer;
- =
-
--	/* We can free anything potentially needed for a retry */
--	scan_bss_free(dev->conn_wsc_bss);
--	dev->conn_wsc_bss =3D NULL;
--	explicit_bzero(dev->conn_psk, 32);
-+	if (!dev->is_go) {
-+		/* We can free anything potentially needed for a retry */
-+		scan_bss_free(dev->conn_wsc_bss);
-+		dev->conn_wsc_bss =3D NULL;
-+		explicit_bzero(dev->conn_psk, 32);
-+	}
- =
-
- 	dbus_pending_reply(&peer->wsc.pending_connect,
- 				l_dbus_message_new_method_return(
-@@ -649,6 +663,96 @@ static void p2p_peer_connect_done(struct p2p_device *d=
-ev)
- 				"ConnectedIP");
- }
- =
-
-+static void p2p_group_event(enum ap_event_type type, const void *event_dat=
-a,
-+				void *user_data)
-+{
-+	struct p2p_device *dev =3D user_data;
-+
-+	l_debug("type=3D%i", type);
-+
-+	switch (type) {
-+	case AP_EVENT_START_FAILED:
-+	case AP_EVENT_STOPPING:
-+		dev->group =3D NULL;
-+		p2p_connect_failed(dev);
-+		break;
-+
-+	case AP_EVENT_STARTED:
-+		ap_push_button(dev->group);
-+		break;
-+
-+	case AP_EVENT_STATION_ADDED:
-+		dev->conn_peer_added =3D true;
-+		p2p_peer_connect_done(dev);
-+		break;
-+
-+	case AP_EVENT_STATION_REMOVED:
-+		dev->conn_peer_added =3D false;
-+		p2p_connect_failed(dev);
-+		break;
-+
-+	case AP_EVENT_REGISTRATION_START:
-+		/* Don't validate the P2P IE or WFD IE at this stage */
-+		break;
-+	case AP_EVENT_REGISTRATION_SUCCESS:
-+		dev->capability.group_caps &=3D ~P2P_GROUP_CAP_GROUP_FORMATION;
-+		break;
-+	case AP_EVENT_PBC_MODE_EXIT:
-+		break;
-+	};
-+}
-+
-+static const struct ap_ops p2p_go_ops =3D {
-+	.handle_event =3D p2p_group_event,
-+};
-+
-+static void p2p_group_start(struct p2p_device *dev)
-+{
-+	struct ap_config *config =3D l_new(struct ap_config, 1);
-+
-+	config->ssid =3D l_strdup(dev->go_group_id.ssid);
-+	config->channel =3D dev->listen_channel;
-+	config->wsc_name =3D l_strdup(dev->device_info.device_name);
-+	config->wsc_primary_device_type =3D dev->device_info.primary_device_type;
-+	config->no_cck_rates =3D true;
-+
-+	/*
-+	 * Section 3.2.1: "The Credentials for a P2P Group issued to a
-+	 * P2P Device shall: [...]
-+	 *  - Use a Network Key Type of 64 Hex characters."
-+	 *
-+	 * This implies we have to send the PSK and not the passphrase to
-+	 * the WSC clients.  For simplicity we directly generate random
-+	 * PSKs and don't currently respect the requirement to maintain
-+	 * a passphrase.  We have no practical use for the passphrase and
-+	 * it's a little costlier to generate for the same cryptographic
-+	 * strength as the PSK.
-+	 */
-+	if (!l_getrandom(config->psk, 32)) {
-+		l_error("l_getrandom() failed");
-+		ap_config_free(config);
-+		p2p_connect_failed(dev);
-+		return;
-+	}
-+
-+	/*
-+	 * Section 3.1.4.4: "It shall only allow association by the
-+	 * P2P Device that it is currently in Group Formation with."
-+	 */
-+	config->authorized_macs =3D l_memdup(dev->conn_peer_interface_addr, 6);
-+	config->authorized_macs_num =3D 1;
-+
-+	dev->capability.group_caps |=3D P2P_GROUP_CAP_GO;
-+	dev->capability.group_caps |=3D P2P_GROUP_CAP_GROUP_FORMATION;
-+
-+	dev->group =3D ap_start(dev->conn_netdev, config, &p2p_go_ops, dev);
-+	if (!dev->group) {
-+		ap_config_free(config);
-+		p2p_connect_failed(dev);
-+		return;
-+	}
-+}
-+
- static void p2p_netconfig_event_handler(enum netconfig_event event,
- 					void *user_data)
- {
-@@ -682,7 +786,7 @@ static void p2p_dhcp_timeout_destroy(void *user_data)
+ 		p2p_peer_connect_done(dev);
+ 		break;
+ 	default:
+@@ -786,10 +799,11 @@ static void p2p_dhcp_timeout_destroy(void *user_data)
  	dev->conn_dhcp_timeout =3D NULL;
  }
  =
 
--static void p2p_start_dhcp(struct p2p_device *dev)
-+static void p2p_start_dhcp_client(struct p2p_device *dev)
+-static void p2p_start_dhcp_client(struct p2p_device *dev)
++static void p2p_start_client_netconfig(struct p2p_device *dev)
  {
  	uint32_t ifindex =3D netdev_get_ifindex(dev->conn_netdev);
  	unsigned int dhcp_timeout_val;
-@@ -723,7 +827,7 @@ static void p2p_netdev_connect_cb(struct netdev *netdev,
++	struct l_settings *settings;
+ =
+
+ 	if (!l_settings_get_uint(iwd_get_config(), "P2P", "DHCPTimeout",
+ 					&dhcp_timeout_val))
+@@ -803,9 +817,9 @@ static void p2p_start_dhcp_client(struct p2p_device *de=
+v)
+ 		}
+ 	}
+ =
+
+-	netconfig_configure(dev->conn_netconfig, p2p_dhcp_settings,
+-				dev->conn_addr, p2p_netconfig_event_handler,
+-				dev);
++	settings =3D dev->conn_netconfig_settings ?: p2p_dhcp_settings;
++	netconfig_configure(dev->conn_netconfig, settings, dev->conn_addr,
++				p2p_netconfig_event_handler, dev);
+ 	dev->conn_dhcp_timeout =3D l_timeout_create(dhcp_timeout_val,
+ 						p2p_dhcp_timeout, dev,
+ 						p2p_dhcp_timeout_destroy);
+@@ -827,7 +841,7 @@ static void p2p_netdev_connect_cb(struct netdev *netdev,
  =
 
  	switch (result) {
  	case NETDEV_RESULT_OK:
--		p2p_start_dhcp(dev);
-+		p2p_start_dhcp_client(dev);
+-		p2p_start_dhcp_client(dev);
++		p2p_start_client_netconfig(dev);
  		break;
  	case NETDEV_RESULT_AUTHENTICATION_FAILED:
  	case NETDEV_RESULT_ASSOCIATION_FAILED:
-@@ -1034,10 +1138,14 @@ static void p2p_device_netdev_notify(struct netdev =
-*netdev,
- 	case NETDEV_WATCH_EVENT_NEW:
- 		/* Ignore the event if we're already connecting/connected */
- 		if (dev->conn_enrollee || dev->conn_retry_count ||
--				!netdev_get_is_up(netdev))
-+				dev->group || !netdev_get_is_up(netdev))
- 			break;
+@@ -916,6 +930,13 @@ static void p2p_netdev_event(struct netdev *netdev, en=
+um netdev_event event,
+ 	};
+ }
  =
 
--		p2p_provision_connect(dev);
-+		if (dev->is_go)
-+			p2p_group_start(dev);
-+		else
-+			p2p_provision_connect(dev);
++static const char *p2p_ip_to_string(uint32_t addr)
++{
++	struct in_addr ia =3D { .s_addr =3D L_CPU_TO_BE32(addr) };
 +
++	return inet_ntoa(ia);
++}
++
+ static void p2p_handshake_event(struct handshake_state *hs,
+ 				enum handshake_event event, void *user_data,
+ 				...)
+@@ -925,6 +946,24 @@ static void p2p_handshake_event(struct handshake_state=
+ *hs,
+ 	va_start(args, user_data);
+ =
+
+ 	switch (event) {
++	case HANDSHAKE_EVENT_COMPLETE:
++	{
++		struct p2p_device *dev =3D user_data;
++		struct l_settings *ip_config;
++
++		if (!hs->support_ip_allocation)
++			break;
++
++		ip_config =3D l_settings_new();
++		l_settings_set_string(ip_config, "IPv4", "Address",
++					p2p_ip_to_string(hs->client_ip_addr));
++		l_settings_set_string(ip_config, "IPv4", "Netmask",
++					p2p_ip_to_string(hs->subnet_mask));
++		dev->conn_netconfig_settings =3D ip_config;
++		dev->conn_peer_ip =3D l_strdup(p2p_ip_to_string(hs->go_ip_addr));
++
++		break;
++	}
+ 	case HANDSHAKE_EVENT_FAILED:
+ 		netdev_handshake_failed(hs, va_arg(args, int));
  		break;
- 	case NETDEV_WATCH_EVENT_DEL:
- 		dev->conn_netdev =3D NULL;
-@@ -1094,13 +1202,14 @@ static void p2p_device_new_interface_destroy(void *=
-user_data)
+@@ -993,6 +1032,9 @@ static void p2p_try_connect_group(struct p2p_device *d=
+ev)
+ 	handshake_state_set_ssid(hs, bss->ssid, bss->ssid_len);
+ 	handshake_state_set_pmk(hs, dev->conn_psk, 32);
  =
 
- static void p2p_device_interface_create(struct p2p_device *dev)
++	if (dev->conn_peer_capability.group_caps & P2P_GROUP_CAP_IP_ALLOCATION)
++		hs->support_ip_allocation =3D true;
++
+ 	r =3D netdev_connect(dev->conn_netdev, bss, hs, ie_iov, ie_num,
+ 				p2p_netdev_event, p2p_netdev_connect_cb, dev);
+ 	if (r < 0) {
+@@ -1393,6 +1435,7 @@ static bool p2p_provision_scan_notify(int err, struct=
+ l_queue *bss_list,
+ 		l_debug("GO found in the scan results");
+ =
+
+ 		dev->conn_wsc_bss =3D bss;
++		dev->conn_peer_capability =3D *capability;
+ 		p2p_device_interface_create(dev);
+ 		l_queue_remove(bss_list, bss);
+ 		l_queue_destroy(bss_list,
+@@ -4405,14 +4448,11 @@ static bool p2p_peer_get_connected_ip(struct l_dbus=
+ *dbus,
+ 					void *user_data)
  {
--	uint32_t iftype =3D NL80211_IFTYPE_P2P_CLIENT;
-+	uint32_t iftype =3D dev->is_go ? NL80211_IFTYPE_P2P_GO :
-+		NL80211_IFTYPE_P2P_CLIENT;
- 	char ifname[32];
- 	uint32_t wiphy_id =3D dev->wdev_id >> 32;
- 	struct l_genl_msg *msg;
+ 	struct p2p_peer *peer =3D user_data;
+-	char *server_ip;
  =
 
--	snprintf(ifname, sizeof(ifname), "wlan%i-p2p-cl%i",
--			wiphy_id, dev->conn_num++);
-+	snprintf(ifname, sizeof(ifname), "wlan%i-p2p-%s%i",
-+			wiphy_id, dev->is_go ? "go" : "cl", dev->conn_num++);
- 	l_debug("creating %s", ifname);
+-	if (!p2p_peer_operational(peer))
++	if (!p2p_peer_operational(peer) || !peer->dev->conn_peer_ip)
+ 		return false;
  =
 
- 	msg =3D l_genl_msg_new(NL80211_CMD_NEW_INTERFACE);
+-	server_ip =3D netconfig_get_dhcp_server_ipv4(peer->dev->conn_netconfig);
+-	l_dbus_message_builder_append_basic(builder, 's', server_ip);
+-	l_free(server_ip);
++	l_dbus_message_builder_append_basic(builder, 's', peer->dev->conn_peer_ip=
+);
+ 	return true;
+ }
+ =
+
 -- =
 
 2.25.1
 
---===============1962037861991684571==--
+--===============9125300048776856207==--
 
