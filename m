@@ -1,51 +1,183 @@
-Content-Type: multipart/mixed; boundary="===============5800739619757719466=="
+Content-Type: multipart/mixed; boundary="===============3874255568079419748=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/6] auto-t: allow IWDDBusAbstract to work with any service
-Date: Thu, 17 Sep 2020 14:32:44 -0700
-Message-ID: <20200917213247.788181-3-prestwoj@gmail.com>
+Subject: [PATCH 4/6] auto-t: add ead.py module
+Date: Thu, 17 Sep 2020 14:32:45 -0700
+Message-ID: <20200917213247.788181-4-prestwoj@gmail.com>
 In-Reply-To: <20200917213247.788181-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5800739619757719466==
+--===============3874255568079419748==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is somewhat of a hack, but the IWDDBusAbstract is a very
-convenient abstraction to DBus objects. The only piece that restricts
-it to IWD is the hardcoded IWD_SERVICE. Instead we can pass in a
-keyword argument which defaults to IWD_SERVICE. That way other modules
-(like EAD) can utilize this abstraction with their own service simply
-by changing that service argument.
+This module is essentially a heavily stripped down version of iwd.py
+to work with EAD. Class names were changed to match EAD but basically
+the EAD, Adapter, and AdapterList classes map 1:1 to IWD, Device, and
+DeviceList.
 ---
- autotests/util/iwd.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ autotests/util/ead.py | 141 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 141 insertions(+)
+ create mode 100644 autotests/util/ead.py
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index e812a4e4..ef843a95 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -120,9 +120,9 @@ class IWDDBusAbstract(AsyncOpAbstract):
- =
-
-     _bus =3D dbus.SystemBus()
- =
-
--    def __init__(self, object_path =3D None, properties =3D None):
-+    def __init__(self, object_path =3D None, properties =3D None, service=
-=3DIWD_SERVICE):
-         self._object_path =3D object_path
--        proxy =3D self._bus.get_object(IWD_SERVICE, self._object_path)
-+        proxy =3D self._bus.get_object(service, self._object_path)
-         self._iface =3D dbus.Interface(proxy, self._iface_name)
-         self._prop_proxy =3D dbus.Interface(proxy, DBUS_PROPERTIES)
- =
-
+diff --git a/autotests/util/ead.py b/autotests/util/ead.py
+new file mode 100644
+index 00000000..356b0b9b
+--- /dev/null
++++ b/autotests/util/ead.py
+@@ -0,0 +1,141 @@
++#!/usr/bin/python3
++
++from gi.repository import GLib
++import dbus
++import time
++import collections
++
++import iwd
++from config import ctx
++
++EAD_SERVICE =3D                   'net.connman.ead'
++EAD_ADAPTER_INTERFACE =3D         'net.connman.ead.Adapter'
++DBUS_OBJECT_MANAGER =3D           'org.freedesktop.DBus.ObjectManager'
++DBUS_PROPERTIES =3D               'org.freedesktop.DBus.Properties'
++EAD_TOP_LEVEL_PATH =3D            '/'
++
++class Adapter(iwd.IWDDBusAbstract):
++    _iface_name =3D "net.connman.ead.Adapter"
++
++    @property
++    def name(self):
++        return self._properties['Name']
++
++    @property
++    def address(self):
++        return self._properties['Address']
++
++    @property
++    def active(self):
++        return self._properties['Active']
++
++    @property
++    def connected(self):
++        return self._properties['Connected']
++
++    @property
++    def authenticated(self):
++        return self._properties['Authenticated']
++
++
++class AdapterList(collections.Mapping):
++    def __init__(self, ead):
++        self._dict =3D {}
++
++        ead._object_manager.connect_to_signal("InterfacesAdded",
++                                               self._interfaces_added_hand=
+ler)
++        ead._object_manager.connect_to_signal("InterfacesRemoved",
++                                               self._interfaces_removed_ha=
+ndler)
++
++        objects =3D ead._object_manager.GetManagedObjects()
++
++        for path in objects:
++            for interface in objects[path]:
++                if interface =3D=3D EAD_ADAPTER_INTERFACE:
++                    self._dict[path] =3D Adapter(path, objects[path][inter=
+face], service=3DEAD_SERVICE)
++
++    def __getitem__(self, key):
++        return self._dict.__getitem__(key)
++
++    def __iter__(self):
++        return self._dict.__iter__()
++
++    def __len__(self):
++        return self._dict.__len__()
++
++    def __delitem__(self, key):
++        self._dict.pop(key).remove()
++
++    def _interfaces_added_handler(self, path, interfaces):
++        if EAD_ADAPTER_INTERFACE in interfaces:
++            self._dict[path] =3D Adapter(path, interfaces[EAD_ADAPTER_INTE=
+RFACE], service=3DEAD_SERVICE)
++
++    def _interfaces_removed_handler(self, path, interfaces):
++        if EAD_ADAPTER_INTERFACE in interfaces:
++            del self._dict[path]
++
++class EAD(iwd.AsyncOpAbstract):
++    _bus =3D dbus.SystemBus()
++
++    _object_manager_if =3D None
++    _adapters =3D None
++
++    def __init__(self):
++        tries =3D 0
++        while not self._bus.name_has_owner(EAD_SERVICE):
++            if tries > 200:
++                raise TimeoutError('IWD has failed to start')
++            tries +=3D 1
++            time.sleep(0.1)
++
++        self._adapters =3D AdapterList(self)
++
++    @property
++    def _object_manager(self):
++        if self._object_manager_if is None:
++            self._object_manager_if =3D \
++                       dbus.Interface(self._bus.get_object(EAD_SERVICE,
++                                                           EAD_TOP_LEVEL_P=
+ATH),
++                                      DBUS_OBJECT_MANAGER)
++        return self._object_manager_if
++
++    def list_adapters(self, wait_to_appear =3D 0, max_wait =3D 50):
++        if not wait_to_appear:
++            return list(self._adapters.values())
++
++        self._wait_timed_out =3D False
++        def wait_timeout_cb():
++            self._wait_timed_out =3D True
++            return False
++
++        try:
++            timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
++            context =3D ctx.mainloop.get_context()
++            while len(self._adapters) < wait_to_appear:
++                context.iteration(may_block=3DTrue)
++                if self._wait_timed_out:
++                    raise TimeoutError('IWD has no associated devices')
++        finally:
++            if not self._wait_timed_out:
++                GLib.source_remove(timeout)
++
++        return list(self._adapters.values())
++
++    def wait_for_object_condition(self, obj, condition_str, max_wait =3D 5=
+0):
++        self._wait_timed_out =3D False
++        def wait_timeout_cb():
++            self._wait_timed_out =3D True
++            return False
++
++        try:
++            timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
++            context =3D ctx.mainloop.get_context()
++            while not eval(condition_str):
++                context.iteration(may_block=3DTrue)
++                if self._wait_timed_out and ctx.args.gdb =3D=3D None:
++                    raise TimeoutError('[' + condition_str + ']'\
++                                       ' condition was not met in '\
++                                       + str(max_wait) + ' sec')
++        finally:
++            if not self._wait_timed_out:
++                GLib.source_remove(timeout)
 -- =
 
 2.26.2
 
---===============5800739619757719466==--
+--===============3874255568079419748==--
 
