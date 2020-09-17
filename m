@@ -1,183 +1,107 @@
-Content-Type: multipart/mixed; boundary="===============3874255568079419748=="
+Content-Type: multipart/mixed; boundary="===============9222669873967922235=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/6] auto-t: add ead.py module
-Date: Thu, 17 Sep 2020 14:32:45 -0700
-Message-ID: <20200917213247.788181-4-prestwoj@gmail.com>
+Subject: [PATCH 5/6] test-runner: allow EAD-based autotests
+Date: Thu, 17 Sep 2020 14:32:46 -0700
+Message-ID: <20200917213247.788181-5-prestwoj@gmail.com>
 In-Reply-To: <20200917213247.788181-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3874255568079419748==
+--===============9222669873967922235==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This module is essentially a heavily stripped down version of iwd.py
-to work with EAD. Class names were changed to match EAD but basically
-the EAD, Adapter, and AdapterList classes map 1:1 to IWD, Device, and
-DeviceList.
+The virtual environment changed slightly adding two network adatpers
+which are connected to the same backend so they can communicate with
+each other (basically connected to a switch). The hostapd command
+line was modified to allow no interfaces to be passed in which lets
+us create zero radios but still specify a radius_config file.
 ---
- autotests/util/ead.py | 141 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 141 insertions(+)
- create mode 100644 autotests/util/ead.py
+ tools/test-runner | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/util/ead.py b/autotests/util/ead.py
-new file mode 100644
-index 00000000..356b0b9b
---- /dev/null
-+++ b/autotests/util/ead.py
-@@ -0,0 +1,141 @@
-+#!/usr/bin/python3
+diff --git a/tools/test-runner b/tools/test-runner
+index a320a3f0..6443af15 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -113,6 +113,7 @@ mount_table =3D [
+ 	MountInfo('tmpfs', '/dev/shm', 'mode=3D1777', MS_NOSUID|MS_NODEV|MS_STRIC=
+TATIME),
+ 	MountInfo('tmpfs', '/run', 'mode=3D0755', MS_NOSUID|MS_NODEV|MS_STRICTATI=
+ME),
+ 	MountInfo('tmpfs', '/var/lib/iwd', 'mode=3D0755', 0),
++	MountInfo('tmpfs', '/var/lib/ead', 'mode=3D0755', 0),
+ 	MountInfo('tmpfs', '/tmp', '', 0),
+ 	MountInfo('tmpfs', '/usr/share/dbus-1', 'mode=3D0755', MS_NOSUID|MS_NOEXE=
+C|MS_NODEV|MS_STRICTATIME),
+ 	MountInfo('debugfs', '/sys/kernel/debug', '', 0)
+@@ -377,6 +378,9 @@ class Hostapd:
+ =
+
+ 		print("Initializing hostapd instances")
+ =
+
++		ctx.start_process(['ip', 'link', 'set', 'eth0', 'up'], wait=3DTrue)
++		ctx.start_process(['ip', 'link', 'set', 'eth1', 'up'], wait=3DTrue)
 +
-+from gi.repository import GLib
-+import dbus
-+import time
-+import collections
+ 		self.global_ctrl_iface =3D '/var/run/hostapd/ctrl'
+ =
+
+ 		self.instances =3D [HostapdInstance(c, r) for c, r in zip(configs, radio=
+s)]
+@@ -384,7 +388,10 @@ class Hostapd:
+ 		ifaces =3D [rad.interface.name for rad in radios]
+ 		ifaces =3D ','.join(ifaces)
+ =
+
+-		args =3D ['hostapd', '-i', ifaces, '-g', self.global_ctrl_iface]
++		args =3D ['hostapd', '-g', self.global_ctrl_iface]
 +
-+import iwd
-+from config import ctx
++		if ifaces:
++			args.extend(['-i', ifaces])
+ =
+
+ 		#
+ 		# Config files should already be present in /tmp. This appends
+@@ -1034,6 +1041,7 @@ def run_tests():
+ 	os.environ['PATH'] =3D '%s/src' % args.testhome
+ 	os.environ['PATH'] +=3D ':%s/tools' % args.testhome
+ 	os.environ['PATH'] +=3D ':%s/client' % args.testhome
++	os.environ['PATH'] +=3D ':%s/wired' % args.testhome
+ 	os.environ['PATH'] +=3D ':' + args.path
+ =
+
+ 	sys.path.append(args.testhome + '/autotests/util')
+@@ -1219,7 +1227,7 @@ class Main:
+ 			'-machine', 'type=3Dq35,accel=3Dkvm:tcg',
+ 			'-nodefaults', '-no-user-config', '-monitor', 'none',
+ 			'-display', 'none', '-m', '192M', '-nographic', '-vga',
+-			'none', '-net', 'none', '-no-acpi', '-no-hpet',
++			'none', '-no-acpi', '-no-hpet',
+ 			'-no-reboot', '-fsdev',
+ 			'local,id=3Dfsdev-root,path=3D/,readonly,security_model=3Dnone,multidev=
+s=3Dremap',
+ 			'-device',
+@@ -1238,6 +1246,13 @@ class Main:
+ 			'-cpu', 'host'
+ 		]
+ =
+
++		# Add two ethernet devices for testing EAD
++		qemu_cmdline.extend([
++				'-net', 'nic,model=3Dvirtio',
++				'-net', 'nic,model=3Dvirtio',
++				'-net', 'user'
++		])
 +
-+EAD_SERVICE =3D                   'net.connman.ead'
-+EAD_ADAPTER_INTERFACE =3D         'net.connman.ead.Adapter'
-+DBUS_OBJECT_MANAGER =3D           'org.freedesktop.DBus.ObjectManager'
-+DBUS_PROPERTIES =3D               'org.freedesktop.DBus.Properties'
-+EAD_TOP_LEVEL_PATH =3D            '/'
-+
-+class Adapter(iwd.IWDDBusAbstract):
-+    _iface_name =3D "net.connman.ead.Adapter"
-+
-+    @property
-+    def name(self):
-+        return self._properties['Name']
-+
-+    @property
-+    def address(self):
-+        return self._properties['Address']
-+
-+    @property
-+    def active(self):
-+        return self._properties['Active']
-+
-+    @property
-+    def connected(self):
-+        return self._properties['Connected']
-+
-+    @property
-+    def authenticated(self):
-+        return self._properties['Authenticated']
-+
-+
-+class AdapterList(collections.Mapping):
-+    def __init__(self, ead):
-+        self._dict =3D {}
-+
-+        ead._object_manager.connect_to_signal("InterfacesAdded",
-+                                               self._interfaces_added_hand=
-ler)
-+        ead._object_manager.connect_to_signal("InterfacesRemoved",
-+                                               self._interfaces_removed_ha=
-ndler)
-+
-+        objects =3D ead._object_manager.GetManagedObjects()
-+
-+        for path in objects:
-+            for interface in objects[path]:
-+                if interface =3D=3D EAD_ADAPTER_INTERFACE:
-+                    self._dict[path] =3D Adapter(path, objects[path][inter=
-face], service=3DEAD_SERVICE)
-+
-+    def __getitem__(self, key):
-+        return self._dict.__getitem__(key)
-+
-+    def __iter__(self):
-+        return self._dict.__iter__()
-+
-+    def __len__(self):
-+        return self._dict.__len__()
-+
-+    def __delitem__(self, key):
-+        self._dict.pop(key).remove()
-+
-+    def _interfaces_added_handler(self, path, interfaces):
-+        if EAD_ADAPTER_INTERFACE in interfaces:
-+            self._dict[path] =3D Adapter(path, interfaces[EAD_ADAPTER_INTE=
-RFACE], service=3DEAD_SERVICE)
-+
-+    def _interfaces_removed_handler(self, path, interfaces):
-+        if EAD_ADAPTER_INTERFACE in interfaces:
-+            del self._dict[path]
-+
-+class EAD(iwd.AsyncOpAbstract):
-+    _bus =3D dbus.SystemBus()
-+
-+    _object_manager_if =3D None
-+    _adapters =3D None
-+
-+    def __init__(self):
-+        tries =3D 0
-+        while not self._bus.name_has_owner(EAD_SERVICE):
-+            if tries > 200:
-+                raise TimeoutError('IWD has failed to start')
-+            tries +=3D 1
-+            time.sleep(0.1)
-+
-+        self._adapters =3D AdapterList(self)
-+
-+    @property
-+    def _object_manager(self):
-+        if self._object_manager_if is None:
-+            self._object_manager_if =3D \
-+                       dbus.Interface(self._bus.get_object(EAD_SERVICE,
-+                                                           EAD_TOP_LEVEL_P=
-ATH),
-+                                      DBUS_OBJECT_MANAGER)
-+        return self._object_manager_if
-+
-+    def list_adapters(self, wait_to_appear =3D 0, max_wait =3D 50):
-+        if not wait_to_appear:
-+            return list(self._adapters.values())
-+
-+        self._wait_timed_out =3D False
-+        def wait_timeout_cb():
-+            self._wait_timed_out =3D True
-+            return False
-+
-+        try:
-+            timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
-+            context =3D ctx.mainloop.get_context()
-+            while len(self._adapters) < wait_to_appear:
-+                context.iteration(may_block=3DTrue)
-+                if self._wait_timed_out:
-+                    raise TimeoutError('IWD has no associated devices')
-+        finally:
-+            if not self._wait_timed_out:
-+                GLib.source_remove(timeout)
-+
-+        return list(self._adapters.values())
-+
-+    def wait_for_object_condition(self, obj, condition_str, max_wait =3D 5=
-0):
-+        self._wait_timed_out =3D False
-+        def wait_timeout_cb():
-+            self._wait_timed_out =3D True
-+            return False
-+
-+        try:
-+            timeout =3D GLib.timeout_add_seconds(max_wait, wait_timeout_cb)
-+            context =3D ctx.mainloop.get_context()
-+            while not eval(condition_str):
-+                context.iteration(may_block=3DTrue)
-+                if self._wait_timed_out and ctx.args.gdb =3D=3D None:
-+                    raise TimeoutError('[' + condition_str + ']'\
-+                                       ' condition was not met in '\
-+                                       + str(max_wait) + ' sec')
-+        finally:
-+            if not self._wait_timed_out:
-+                GLib.source_remove(timeout)
+ 		if usb_adapters:
+ 			for bus, addr in [s.split(',') for s in usb_adapters]:
+ 				qemu_cmdline.extend(['-usb',
 -- =
 
 2.26.2
 
---===============3874255568079419748==--
+--===============9222669873967922235==--
 
