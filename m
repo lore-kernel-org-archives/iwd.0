@@ -1,33 +1,151 @@
-Content-Type: multipart/mixed; boundary="===============7895081153875780221=="
+Content-Type: multipart/mixed; boundary="===============7612520427668981328=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/8] test-runner: Enable --p2p when creating interfaces
-Date: Tue, 29 Sep 2020 13:21:01 -0500
-Message-ID: <150a5be6-4d93-b307-449a-d132b1d86208@gmail.com>
-In-Reply-To: <20200929163717.754459-8-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] auto-t: remove requirement for /var/lib/{ead,iwd}
+Date: Tue, 29 Sep 2020 13:02:33 -0700
+Message-ID: <20200929200233.570319-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7895081153875780221==
+--===============7612520427668981328==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+The host systems configuration directories for IWD/EAD were
+being mounted in the virtual machine. This required that the
+host create these directories before hand. Instead we can
+just set up the system and IWD/EAD to use directories in /tmp
+that we create when we start the VM. This avoids the need for
+any host configuration.
+---
+ autotests/testEAD/connection_test.py | 11 ++++++++---
+ autotests/util/iwd.py                | 10 +++++-----
+ tools/test-runner                    |  6 +++---
+ 3 files changed, 16 insertions(+), 11 deletions(-)
 
-On 9/29/20 11:37 AM, Andrew Zaborowski wrote:
-> Enable p2p for the hwsim radios so that we can test P2P.  This can be
-> made optional for the tests but it seems safe to enable always.
-> ---
->   tools/test-runner | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+diff --git a/autotests/testEAD/connection_test.py b/autotests/testEAD/conne=
+ction_test.py
+index c51d7237..bdf242b6 100644
+--- a/autotests/testEAD/connection_test.py
++++ b/autotests/testEAD/connection_test.py
+@@ -2,6 +2,7 @@
+ =
 
+ import unittest
+ import sys
++import os
+ =
 
-Patches 2-4 applied, thanks.
+ sys.path.append('../util')
+ from iwd import IWD
+@@ -11,7 +12,9 @@ from ead import EAD
+ =
 
-Regards,
--Denis
+ class Test(unittest.TestCase):
+     def test_connection_success(self):
+-        ctx.start_process(['ead', '-i', 'eth1', '-d'])
++        env =3D os.environ.copy()
++        env['STATE_DIRECTORY'] =3D '/tmp/ead'
++        ctx.start_process(['ead', '-i', 'eth1', '-d'], env=3Denv)
+ =
 
---===============7895081153875780221==--
+         ead =3D EAD()
+ =
+
+@@ -25,11 +28,13 @@ class Test(unittest.TestCase):
+ =
+
+     @classmethod
+     def setUpClass(cls):
+-        IWD.copy_to_storage('default.8021x', storage_dir=3D'/var/lib/ead')
++        os.mkdir('/tmp/ead')
++
++        IWD.copy_to_storage('default.8021x', storage_dir=3D'/tmp/ead')
+ =
+
+     @classmethod
+     def tearDownClass(cls):
+-        IWD.clear_storage()
++        IWD.clear_storage(storage_dir=3D'/tmp/ead')
+ =
+
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index ef843a95..76d96289 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -17,8 +17,8 @@ from enum import Enum
+ =
+
+ from config import ctx
+ =
+
+-IWD_STORAGE_DIR =3D               '/var/lib/iwd'
+-IWD_CONFIG_DIR =3D                '/etc/iwd'
++IWD_STORAGE_DIR =3D               '/tmp/iwd'
++IWD_CONFIG_DIR =3D                '/tmp'
+ =
+
+ DBUS_OBJECT_MANAGER =3D           'org.freedesktop.DBus.ObjectManager'
+ DBUS_PROPERTIES =3D               'org.freedesktop.DBus.Properties'
+@@ -909,9 +909,9 @@ class IWD(AsyncOpAbstract):
+                 GLib.source_remove(timeout)
+ =
+
+     @staticmethod
+-    def clear_storage():
+-        os.system('rm -rf ' + IWD_STORAGE_DIR + '/*')
+-        os.system('rm -rf ' + IWD_STORAGE_DIR + '/hotspot/*')
++    def clear_storage(storage_dir=3DIWD_STORAGE_DIR):
++        os.system('rm -rf ' + storage_dir + '/*')
++        os.system('rm -rf ' + storage_dir + '/hotspot/*')
+ =
+
+     @staticmethod
+     def create_in_storage(file_name, file_content):
+diff --git a/tools/test-runner b/tools/test-runner
+index 94c10199..a63b9154 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -112,8 +112,6 @@ mount_table =3D [
+ 	MountInfo('devpts', '/dev/pts', 'mode=3D0620', MS_NOSUID|MS_NOEXEC),
+ 	MountInfo('tmpfs', '/dev/shm', 'mode=3D1777', MS_NOSUID|MS_NODEV|MS_STRIC=
+TATIME),
+ 	MountInfo('tmpfs', '/run', 'mode=3D0755', MS_NOSUID|MS_NODEV|MS_STRICTATI=
+ME),
+-	MountInfo('tmpfs', '/var/lib/iwd', 'mode=3D0755', 0),
+-	MountInfo('tmpfs', '/var/lib/ead', 'mode=3D0755', 0),
+ 	MountInfo('tmpfs', '/tmp', '', 0),
+ 	MountInfo('tmpfs', '/usr/share/dbus-1', 'mode=3D0755', MS_NOSUID|MS_NOEXE=
+C|MS_NODEV|MS_STRICTATIME),
+ 	MountInfo('debugfs', '/sys/kernel/debug', '', 0)
+@@ -571,7 +569,7 @@ class TestContext:
+ =
+
+ 		env =3D os.environ.copy()
+ 		env['CONFIGURATION_DIRECTORY'] =3D config_dir
+-		env['STATE_DIRECTORY'] =3D '/var/lib/iwd'
++		env['STATE_DIRECTORY'] =3D '/tmp/iwd'
+ =
+
+ 		pid =3D self.start_process(args, env=3Denv)
+ 		return pid
+@@ -735,6 +733,8 @@ def prepare_sandbox():
+ 	for entry in dev_table:
+ 		os.symlink(entry.target, entry.linkpath)
+ =
+
++	os.mkdir('/tmp/iwd')
++
+ 	os.setsid()
+ =
+
+ 	fcntl.ioctl(STDIN_FILENO, TIOCSTTY, 1)
+-- =
+
+2.26.2
+
+--===============7612520427668981328==--
 
