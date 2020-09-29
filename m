@@ -1,91 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============5453037527746852724=="
+Content-Type: multipart/mixed; boundary="===============2868883829129012679=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 6/6] p2p: Respond to Probe Requests when in discovery
-Date: Tue, 29 Sep 2020 18:37:09 +0200
-Message-ID: <20200929163717.754459-6-andrew.zaborowski@intel.com>
+Subject: [PATCH 1/8] test-runner: Reserve radios for wpa_supplicant
+Date: Tue, 29 Sep 2020 18:37:10 +0200
+Message-ID: <20200929163717.754459-7-andrew.zaborowski@intel.com>
 In-Reply-To: <20200929163717.754459-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5453037527746852724==
+--===============2868883829129012679==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Since our DBus API and our use cases only support initiating connections
-and not accepting incoming connections we don't really need to reply to
-Probe Requests on the P2P-Device interface.  Start doing it firstly so
-that we can test the scenario where we get discovered and pre-authorized
-to connect in an autotest (wpa_supplicant doesn't seem to have a way to
-authorize everyone, which is probably why most Wi-Fi Display dongles
-don't do it and instead reply with "Fail: Information not available" and
-then restart connection from their side) and secondly because the spec
-wants us to do it.
+Add the "wpa_supplicant_radios=3D<radio_name_list>" option in hw.conf's
+SETUP section that only reserves radios for the autotest to be able to
+start wpa_supplicant on them, i.e. prevents iwd or hostapd from being
+started on them.
 ---
- src/p2p.c | 33 +++++++++++++++++----------------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+ tools/test-runner | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/src/p2p.c b/src/p2p.c
-index 662fdb61..417ce3d6 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -3554,6 +3554,20 @@ static void p2p_device_send_probe_resp(struct p2p_de=
-vice *dev,
- 	resp_info.capability =3D dev->capability;
- 	resp_info.device_info =3D dev->device_info;
+diff --git a/tools/test-runner b/tools/test-runner
+index 6443af15..f2b75bc0 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -270,10 +270,8 @@ class Radio:
  =
 
-+	/*
-+	 * Note the SSID and resp_info.group_clients are not updated with
-+	 * our group information because we generally won't be in the
-+	 * Listen State on the P2P Device when running a group.  Otherwise
-+	 * we'd be sending two Probe Responses, one from the P2P Interface
-+	 * and another from the P2P Device.  According to this part in
-+	 * Wi-Fi P2P Technical Specification v1.7 section 3.2.2 it seems
-+	 * only the P2P Interface is supposed to be sending Probe
-+	 * Responses in that situation:
-+	 * "In all Probe Responses that it sends, a P2P Group Owner shall
-+	 * set the SSID to the SSID of the group, and shall set the SA and
-+	 * BSSID to its P2P Interface Address."
-+	 */
+ 		intf_id +=3D 1
+ =
+
+-		self.interface =3D Interface(ifname, hapd.config)
+-		# IWD does not use interfaces in test-runner so any created
+-		# interface is assumed to be used by hostapd.
+-		self.use =3D 'hostapd'
++		self.interface =3D Interface(ifname, hapd.config if hapd else None)
++		self.use =3D 'hostapd' if hapd else 'other'
+ =
+
+ 		Process(['iw', 'phy', self.name, 'interface', 'add', ifname,
+ 				'type', 'managed'], True)
+@@ -466,6 +464,7 @@ class TestContext:
+ 		self.args =3D args
+ 		self.hw_config =3D None
+ 		self.hostapd =3D None
++		self.wpas_interfaces =3D None
+ 		self.cur_radio_id =3D 0
+ 		self.cur_iface_id =3D 0
+ 		self.radios =3D []
+@@ -609,6 +608,15 @@ class TestContext:
+ =
+
+ 		self.hostapd =3D Hostapd(self, hapd_radios, hapd_configs, radius_config)
+ =
+
++	def start_wpas_interfaces(self):
++		if 'wpa_supplicant_radios' not in self.hw_config['SETUP']:
++			return
 +
- 	p2p_ie =3D p2p_build_probe_resp(&resp_info, &p2p_ie_size);
- 	if (!p2p_ie) {
- 		l_error("Can't build our Probe Response P2P IE");
-@@ -3686,23 +3700,10 @@ static void p2p_device_probe_cb(const struct mmpdu_=
-header *mpdu,
- 	}
++		setting =3D self.hw_config['SETUP']['wpa_supplicant_radios']
++		wpas_radio_names =3D [name.strip() for name in setting.split(',')]
++		wpas_radios =3D [rad for rad in self.radios if rad.name in wpas_radio_na=
+mes]
++		self.wpas_interfaces =3D [rad.create_interface(None) for rad in wpas_rad=
+ios]
++
+ 	def start_ofono(self):
+ 		sim_keys =3D self.hw_config['SETUP'].get('sim_keys', None)
+ 		if not sim_keys:
+@@ -676,6 +684,7 @@ class TestContext:
+ 	def stop_test_processes(self):
+ 		self.radios =3D []
+ 		self.hostapd =3D None
++		self.wpas_interfaces =3D None
+ 		self.iwd_extra_options =3D None
  =
 
- 	/*
--	 * We don't currently have a use case for replying to Probe Requests
--	 * except when waiting for a GO Negotiation Request from our target
--	 * peer.  Some of those peers (seemingly running ancient and/or
--	 * hw-manufacturer-provided versions of wpa_s) will only send us GO
--	 * Negotiation Requests each time they receive our Probe Response
--	 * frame, even if that frame's body is unparsable.
-+	 * TODO: use ap.c code to check if we match the SSID, BSSID, DSSS
-+	 * Channel etc. in the Probe Request, and to build the Response body.
- 	 */
--	if (from_conn_peer) {
--		/*
--		 * TODO: use ap.c code to check if we match the SSID, BSSID,
--		 * DSSS Channel etc. in the Probe Request, and to build the
--		 * Response body.
--		 */
--		p2p_device_send_probe_resp(dev, mpdu->address_2,
--						from_conn_peer);
--		goto p2p_free;
--	}
-+	p2p_device_send_probe_resp(dev, mpdu->address_2, from_conn_peer);
+ 		for p in [p for p in self.processes if p.multi_test is False]:
+@@ -870,6 +879,7 @@ def pre_test(ctx, test):
+ 	ctx.start_dbus_monitor()
+ 	ctx.start_radios()
+ 	ctx.start_hostapd()
++	ctx.start_wpas_interfaces()
+ 	ctx.start_ofono()
  =
 
- 	/*
- 	 * The peer's listen frequency may be different from ours.
+ 	if ctx.hw_config.has_option('SETUP', 'start_iwd'):
 -- =
 
 2.25.1
 
---===============5453037527746852724==--
+--===============2868883829129012679==--
 
