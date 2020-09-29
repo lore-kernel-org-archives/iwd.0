@@ -1,46 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============8967063816802272949=="
+Content-Type: multipart/mixed; boundary="===============5538800877134880722=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: Does IWD support having AP on a bridged interface?
-Date: Tue, 29 Sep 2020 09:09:44 -0500
-Message-ID: <530f079e-d94a-4a8e-9f1d-3a886bf5a046@gmail.com>
-In-Reply-To: <20200929134033.2619.97478@ml01.vlan13.01.org>
+Subject: Re: [PATCH] test-runner: add iwmon options
+Date: Tue, 29 Sep 2020 09:10:30 -0500
+Message-ID: <c1243ff4-6123-0ce0-a1b2-62fb600f67e3@gmail.com>
+In-Reply-To: <20200925205233.14909-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8967063816802272949==
+--===============5538800877134880722==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Shem,
+Hi James,
 
-On 9/29/20 8:40 AM, shemgp(a)gmail.com wrote:
-> Hello,
+On 9/25/20 3:52 PM, James Prestwood wrote:
+> This extends test-runner to also use iwmon if --log is enabled.
+> For this case the iwmon log will be found inside each test
+> log directory.
 > =
 
-> Just want to know if IWD currently, or is it planned to support, being on=
- AP mode where the interface is on a bridge?
+> A new option, --monitor <file> was added in case full logging isn't
+> desired (potentially for timing issues) but a iwmon log is needed.
+> Be aware that when --monitor is used test-runner will mount the
+> entire parent directory. test-runner itself will only write to the
+> file specified, but just know that the parent directory is available
+> as read-write inside the VM.
+> =
 
-Last time this came up was over a year ago and at the time I briefly played=
- with =
+> --log takes precedence over --monitor, meaning the iwmon log will
+> be written to <logdir>/<test>/iwmon instead of the file specified
+> with --monitor if both options are provided.
+> ---
+>   tools/test-runner | 31 ++++++++++++++++++++++++++++++-
+>   1 file changed, 30 insertions(+), 1 deletion(-)
+> =
 
-putting an iwd managed (station) interface in a bridge.  iwd didn't seem to=
- care =
 
-at all and EAPoL flowed as normal.
-
-So to answer your question, we have no plans around this as we're not aware=
- that =
-
-anything needs fixing?   Might want to give it a test?  If it doesn't work,=
- then =
-
-please share a detailed setup so that we can try and duplicate it on our en=
-d.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============8967063816802272949==--
+--===============5538800877134880722==--
 
