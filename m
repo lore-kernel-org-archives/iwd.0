@@ -1,118 +1,98 @@
-Content-Type: multipart/mixed; boundary="===============6968050329841179496=="
+Content-Type: multipart/mixed; boundary="===============0499670433238349882=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 1/6] frame-xchg: Add no-cck-rate flag only for P2P interfaces
-Date: Tue, 29 Sep 2020 18:37:04 +0200
-Message-ID: <20200929163717.754459-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 2/6] frame-xchg: Cancel NL80211_CMD_FRAME commands when
+ interrupted
+Date: Tue, 29 Sep 2020 18:37:05 +0200
+Message-ID: <20200929163717.754459-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20200929163717.754459-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6968050329841179496==
+--===============0499670433238349882==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-We want to use this flag only on the interfaces with one of the three
-P2P iftypes so set the flag automatically depending on the iftype from
-the last 'config' notification.
+The callback for the FRAME command was causing a crash in
+wiphy_radio_work_done when not cancelled when the wiphy was being
+removed from the system.  This was likely to happen if this radio work
+item was waiting for another item to finish.  When the first one was
+being cancelled due to the wiphy being removed, this one would be
+started and immediately stopped by the radio work queue.
+
+Now this crash could be fixed by dropping all frame exchange instances
+on an interface that is being removed which is easy to do, but properly
+cancelling the commands saves us the headache of analysing whether
+there's a race condition in other situations where a frame exchange is
+being aborted.
 ---
- src/frame-xchg.c | 29 ++++++++++++++++++++---------
- 1 file changed, 20 insertions(+), 9 deletions(-)
+ src/frame-xchg.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/src/frame-xchg.c b/src/frame-xchg.c
-index 2ea8504a..d26e0c54 100644
+index d26e0c54..0e3e330d 100644
 --- a/src/frame-xchg.c
 +++ b/src/frame-xchg.c
-@@ -115,6 +115,7 @@ struct frame_xchg_data {
- 	unsigned int resp_timeout;
+@@ -116,6 +116,7 @@ struct frame_xchg_data {
  	unsigned int retries_on_ack;
  	struct wiphy_radio_work_item work;
-+	bool no_cck_rates;
+ 	bool no_cck_rates;
++	unsigned int tx_cmd_id;
  };
  =
 
  struct frame_xchg_watch_data {
-@@ -951,10 +952,13 @@ static bool frame_xchg_tx_retry(struct wiphy_radio_wo=
-rk_item *item)
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &fx->wdev_id);
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY_FREQ, 4, &fx->freq);
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_OFFCHANNEL_TX_OK, 0, NULL);
--	l_genl_msg_append_attr(msg, NL80211_ATTR_TX_NO_CCK_RATE, 0, NULL);
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME,
- 				fx->tx_mpdu_len, fx->tx_mpdu);
+@@ -772,6 +773,9 @@ static void frame_xchg_reset(struct frame_xchg_data *fx)
+ 	if (fx->timeout)
+ 		l_timeout_remove(fx->timeout);
  =
 
-+	if (fx->no_cck_rates)
-+		l_genl_msg_append_attr(msg, NL80211_ATTR_TX_NO_CCK_RATE, 0,
-+					NULL);
++	if (fx->tx_cmd_id)
++		l_genl_family_cancel(nl80211, fx->tx_cmd_id);
 +
- 	if (duration)
- 		l_genl_msg_append_attr(msg, NL80211_ATTR_DURATION, 4,
- 					&duration);
-@@ -1102,6 +1106,14 @@ static const struct wiphy_radio_work_item_ops work_o=
-ps =3D {
- 	.destroy =3D frame_xchg_destroy,
- };
- =
-
-+static bool frame_xchg_wdev_match(const void *a, const void *b)
-+{
-+	const struct wdev_info *wdev =3D a;
-+	const uint64_t *id =3D b;
-+
-+	return wdev->id =3D=3D *id;
-+}
-+
- uint32_t frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t=
- freq,
- 			unsigned int retry_interval, unsigned int resp_timeout,
- 			unsigned int retries_on_ack, uint32_t group_id,
-@@ -1112,6 +1124,7 @@ uint32_t frame_xchg_startv(uint64_t wdev_id, struct i=
-ovec *frame, uint32_t freq,
- 	size_t frame_len;
- 	struct iovec *iov;
- 	uint8_t *ptr;
-+	struct wdev_info *wdev;
- =
-
- 	for (frame_len =3D 0, iov =3D frame; iov->iov_base; iov++)
- 		frame_len +=3D iov->iov_len;
-@@ -1150,6 +1163,12 @@ uint32_t frame_xchg_startv(uint64_t wdev_id, struct =
-iovec *frame, uint32_t freq,
- 	for (iov =3D frame; iov->iov_base; ptr +=3D iov->iov_len, iov++)
- 		memcpy(ptr, iov->iov_base, iov->iov_len);
- =
-
-+	wdev =3D l_queue_find(wdevs, frame_xchg_wdev_match, &wdev_id);
-+	fx->no_cck_rates =3D wdev &&
-+		(wdev->iftype =3D=3D NL80211_IFTYPE_P2P_DEVICE ||
-+		 wdev->iftype =3D=3D NL80211_IFTYPE_P2P_CLIENT ||
-+		 wdev->iftype =3D=3D NL80211_IFTYPE_P2P_GO);
-+
- 	/*
- 	 * Subscribe to the response frames now instead of in the ACK
- 	 * callback to save ourselves race condition considerations.
-@@ -1265,14 +1284,6 @@ static void frame_xchg_mlme_notify(struct l_genl_msg=
- *msg, void *user_data)
- 	}
+ 	l_free(fx->early_frame.mpdu);
+ 	fx->early_frame.mpdu =3D NULL;
+ 	l_queue_destroy(fx->rx_watches, l_free);
+@@ -930,12 +934,18 @@ error:
+ 	frame_xchg_done(fx, error);
  }
  =
 
--static bool frame_xchg_wdev_match(const void *a, const void *b)
--{
--	const struct wdev_info *wdev =3D a;
--	const uint64_t *id =3D b;
--
--	return wdev->id =3D=3D *id;
--}
--
- static void frame_xchg_config_notify(struct l_genl_msg *msg, void *user_da=
-ta)
++static void frame_xchg_tx_destroy(void *user_data)
++{
++	struct frame_xchg_data *fx =3D user_data;
++
++	fx->tx_cmd_id =3D 0;
++}
++
+ static bool frame_xchg_tx_retry(struct wiphy_radio_work_item *item)
  {
- 	uint64_t wdev_id;
+ 	struct frame_xchg_data *fx =3D l_container_of(item,
+ 						struct frame_xchg_data, work);
+ 	struct l_genl_msg *msg;
+-	uint32_t cmd_id;
+ 	uint32_t duration =3D fx->resp_timeout;
+ =
+
+ 	/*
+@@ -963,8 +973,9 @@ static bool frame_xchg_tx_retry(struct wiphy_radio_work=
+_item *item)
+ 		l_genl_msg_append_attr(msg, NL80211_ATTR_DURATION, 4,
+ 					&duration);
+ =
+
+-	cmd_id =3D l_genl_family_send(nl80211, msg, frame_xchg_tx_cb, fx, NULL);
+-	if (!cmd_id) {
++	fx->tx_cmd_id =3D l_genl_family_send(nl80211, msg, frame_xchg_tx_cb, fx,
++						frame_xchg_tx_destroy);
++	if (!fx->tx_cmd_id) {
+ 		l_error("Error sending frame");
+ 		l_genl_msg_unref(msg);
+ 		frame_xchg_done(fx, -EIO);
 -- =
 
 2.25.1
 
---===============6968050329841179496==--
+--===============0499670433238349882==--
 
