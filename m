@@ -1,290 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============8386021979635493869=="
+Content-Type: multipart/mixed; boundary="===============1753355589190214102=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 6/8] autotests: Add basic wpa_supplicant P2P python wrapper
-Date: Wed, 30 Sep 2020 08:58:35 -0700
-Message-ID: <87b24ae76e45b24d5e9439ff0519e4bd014ab115.camel@gmail.com>
-In-Reply-To: <20200929163717.754459-12-andrew.zaborowski@intel.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 1/8] test-runner: Reserve radios for wpa_supplicant
+Date: Wed, 30 Sep 2020 22:34:56 +0200
+Message-ID: <CAOq732LAePEcSV+0fTBp0YiDoUFo8MDL9sC2qX=F11azGkMvdw@mail.gmail.com>
+In-Reply-To: <c9401769e0aaa70a51e8f374c75630329fe14073.camel@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8386021979635493869==
+--===============1753355589190214102==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Wed, 30 Sep 2020 at 17:56, James Prestwood <prestwoj@gmail.com> wrote:
+> On Wed, 2020-09-30 at 01:29 +0200, Andrew Zaborowski wrote:
+> > On Tue, 29 Sep 2020 at 19:15, James Prestwood <prestwoj@gmail.com>
+> > wrote:
+> > > Instead could we just add a new group [WPA_S] or [WPA_SUPPLICANT]
+> > > and
+> > > have radN=3D<config>. This would be consistent with how hostapd
+> > > works,
+> > > and still allows you to reserve radios for wpa_supplicant. And if
+> > > we
+> > > ever require wpa_s specific options in the future we may want a
+> > > group
+> > > for it.
+> >
+> > That's doable, but with wpa_supplicant we have to specify the control
+> > socket path inside the config file, so the setting would have to be
+> > something like "radN=3D<config>,<ctrl_socket>".  I think I'd rather
+> > avoid creating separate Wpas and WpasCLI classes, we could have one
+> > class handle both things whether it's created by test-runner or by
+> > the
+> > individual test, are you ok with that?
+>
+> After looking at the wpa_s help yeah your right, when providing a
+> config file you cannot provide a control socket via the command line.
+> But I still dont see how doing radN=3D<config>,<ctrl_socket> would aid in
+> that since <ctrl_socket> would need to be in <config> anyways. Or are
+> you saying having it in both places and <ctrl_socket> is merely to tell
+> test-runner what value is already inside the config?
 
-On Tue, 2020-09-29 at 18:37 +0200, Andrew Zaborowski wrote:
-> Add the new wpas.Wpas class roughly based on hostapd.HostapdCLI but
-> only
-> adding methods for the P2P-related stuff.
-> =
+Yes, the Wpas class needs to know what value was in the config file so
+that it can connect to the right socket, so I thought of providing it
+through this setting.
 
-> Adding "wpa_supplicant" to will enable output from the wpa_supplicant
-> process to be printed and "wpa_supplicant-dbg" will make it more
-> verbose
-> ("wpa_supplicant" is not needed because it seems to be automatically
-> enabled because of the glob matching in ctx.is_verbose)
-> ---
->  autotests/util/wpas.py | 222
-> +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 222 insertions(+)
->  create mode 100644 autotests/util/wpas.py
-> =
+>
+> We could append the control socket to the config file like I did with
+> hostapd (see _rewrite_config), although I'll admit this is somewhat of
+> a hack. But this does allow you to generate a control socket on the fly
+> without the test or config file knowing about it.
 
-> diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-> new file mode 100644
-> index 00000000..e871b1b1
-> --- /dev/null
-> +++ b/autotests/util/wpas.py
-> @@ -0,0 +1,222 @@
-> +#!/usr/bin/python3
-> +import os
-> +import socket
-> +from gi.repository import GLib
-> +from config import ctx
-> +
-> +ctrl_count =3D 0
-> +mainloop =3D GLib.MainLoop()
+Oh, I didn't realize we were doing this.  It makes more sense because
+we don't duplicate the socket path information.  We could use the same
+mechanism to avoid duplicating other information like the device name
+and type in case of P2P or the SSID in case of hostapd but I wonder if
+it's easier to let the test generate the whole wpa_supplicant config
+file.
 
-I think this is gonna end causing some weird behavior. Using
-ctx.mainloop should work better. I had all kinds of strange issues due
-to test-runner and iwd.py both creating a mainloop.
-
-> +
-> +class Wpas:
-> +    def _start_wpas(self, config_path, socket_path, main_interface,
-> ifname=3DNone):
-> +        global ctrl_count
-> +
-> +        self.interface =3D main_interface
-> +        self.ifname =3D main_interface.name if ifname is None else
-> ifname
-> +        self.socket_path =3D socket_path
-> +        self.io_watch =3D None
-> +
-> +        cmd =3D ['wpa_supplicant', '-i', self.interface.name, '-c',
-> config_path]
-> +        if ctx.is_verbose('wpa_supplicant-dbg'):
-> +            cmd +=3D ['-d']
-> +
-> +        self.wpa_supplicant =3D ctx.start_process(cmd)
-> +
-> +        self.local_ctrl =3D '/tmp/wpas_' + str(os.getpid()) + '_' +
-> str(ctrl_count)
-> +        ctrl_count =3D ctrl_count + 1
-> +        self.ctrl_sock =3D socket.socket(socket.AF_UNIX,
-> socket.SOCK_DGRAM)
-> +        self.ctrl_sock.bind(self.local_ctrl)
-> +
-> +        self.remote_ctrl =3D self.socket_path + '/' + self.ifname
-> +        self.wpa_supplicant.wait_for_socket(self.remote_ctrl, 2)
-> +        self.ctrl_sock.connect(self.remote_ctrl)
-> +        self.io_watch =3D GLib.io_add_watch(self.ctrl_sock,
-> GLib.IO_IN, self._handle_data_in)
-> +
-> +        self.p2p_peers =3D {}
-> +        self.p2p_go_neg_requests =3D {}
-> +        self.p2p_clients =3D {}
-> +        self.p2p_group =3D None
-> +
-> +        self._rx_data =3D []
-> +        self._ctrl_request('ATTACH')
-> +        self.wait_for_event('OK')
-> +
-> +    def __init__(self, *args, **kwargs):
-> +        self._start_wpas(*args, **kwargs)
-> +
-> +    def wait_for_event(self, event, timeout=3D10):
-> +        global mainloop
-> +        self._wait_timed_out =3D False
-> +
-> +        def wait_timeout_cb():
-> +            self._wait_timed_out =3D True
-> +            return False
-> +
-> +        timeout =3D GLib.timeout_add_seconds(timeout, wait_timeout_cb)
-> +        context =3D mainloop.get_context()
-> +
-> +        while True:
-> +            context.iteration(may_block=3DTrue)
-> +
-> +            if event in self._rx_data:
-> +                GLib.source_remove(timeout)
-> +                return self._rx_data
-> +
-> +            if self._wait_timed_out:
-> +                raise TimeoutError('waiting for wpas event timed
-> out')
-> +
-> +    def _event_parse(self, line):
-> +        # Unescape event parameter values in '', other escaping
-> rules not implemented
-> +        key =3D None
-> +        value =3D ''
-> +        count =3D 0
-> +        quoted =3D False
-> +        event =3D {}
-> +
-> +        def handle_eow():
-> +            nonlocal key, value, count, event
-> +            if count =3D=3D 0:
-> +                if key is not None or not value:
-> +                    raise Exception('Bad event name')
-> +                key =3D 'event'
-> +            elif key is None:
-> +                if not value:
-> +                    return
-> +                key =3D 'arg' + str(count)
-> +            event[key] =3D value
-> +            key =3D None
-> +            value =3D ''
-> +            count +=3D 1
-> +
-> +        for ch in line:
-> +            if ch =3D=3D '\'':
-> +                quoted =3D not quoted
-> +            elif quoted:
-> +                value +=3D ch
-> +            elif ch =3D=3D '=3D' and key is None:
-> +                key =3D value
-> +                value =3D ''
-> +            elif ch in ' \n':
-> +                handle_eow()
-> +            else:
-> +                value +=3D ch
-> +        handle_eow()
-> +        return event
-> +
-> +    def _handle_data_in(self, sock, *args):
-> +        newdata =3D sock.recv(4096)
-> +        if len(newdata) =3D=3D 0:
-> +            raise Exception('Wpa_s control socket error')
-> +
-> +        decoded =3D newdata.decode('utf-8')
-> +        if len(decoded) >=3D 3 and decoded[0] =3D=3D '<' and decoded[2] =
-=3D=3D
-> '>':
-> +            decoded =3D decoded[3:]
-> +        while len(decoded) and decoded[-1] =3D=3D '\n':
-> +            decoded =3D decoded[:-1]
-> +
-> +        self._rx_data.append(decoded)
-> +
-> +        event =3D self._event_parse(decoded)
-> +        if event['event'] =3D=3D 'P2P-DEVICE-FOUND':
-> +            event.pop('event')
-> +            event.pop('arg1')
-> +            self.p2p_peers[event['p2p_dev_addr']] =3D event
-> +        elif event['event'] =3D=3D 'P2P-DEVICE-LOST':
-> +            del self.p2p_peers[event['p2p_dev_addr']]
-> +        elif event['event'] =3D=3D 'P2P-GO-NEG-REQUEST':
-> +            event.pop('event')
-> +            event['p2p_dev_addr'] =3D event.pop('arg1')
-> +            self.p2p_go_neg_requests[event['p2p_dev_addr']] =3D event
-> +        elif event['event'] =3D=3D 'P2P-GO-NEG-SUCCESS':
-> +            event.pop('event')
-> +            addr =3D event.pop('peer_dev')
-> +            event['success'] =3D True
-> +            event['p2p_dev_addr'] =3D addr
-> +
-> +            if addr in self.p2p_go_neg_requests:
-> +                self.p2p_go_neg_requests[addr].update(event)
-> +            else:
-> +                self.p2p_go_neg_requests[addr] =3D event
-> +        elif event['event'] =3D=3D 'AP-STA-CONNECTED':
-> +            event.pop('event')
-> +            addr =3D event.pop('arg1')
-> +            self.p2p_clients[addr] =3D event
-> +        elif event['event'] =3D=3D 'AP-STA-DISCONNECTED':
-> +            addr =3D event.pop('arg1')
-> +            del self.p2p_clients[addr]
-> +        elif event['event'] =3D=3D 'P2P-GROUP-STARTED':
-> +            event.pop('event')
-> +            event['ifname'] =3D event.pop('arg1')
-> +            self.p2p_group =3D event
-> +        elif event['event'] =3D=3D 'P2P-GROUP-REMOVED':
-> +            self.p2p_group =3D None
-> +
-> +        return True
-> +
-> +    def _ctrl_request(self, command, timeout=3D10):
-> +        if type(command) is str:
-> +            command =3D str.encode(command)
-> +
-> +        self.ctrl_sock.send(bytes(command))
-> +
-> +    # Normal find phase with listen and active scan states
-> +    def p2p_find(self):
-> +        self._rx_data =3D []
-> +        self._ctrl_request('P2P_SET disc_int 2 3 300')
-> +        self.wait_for_event('OK')
-> +        self._rx_data =3D []
-> +        self._ctrl_request('P2P_FIND type=3Dsocial')
-> +        self.wait_for_event('OK')
-> +
-> +    # Like p2p_find but uses only listen states
-> +    def p2p_listen(self):
-> +        self._rx_data =3D []
-> +        self._ctrl_request('P2P_LISTEN')
-> +        self.wait_for_event('OK')
-> +
-> +    # Stop a p2p_find or p2p_listen
-> +    def p2p_stop_find_listen(self):
-> +        self._rx_data =3D []
-> +        self._ctrl_request('P2P_STOP_FIND')
-> +        self.wait_for_event('OK')
-> +
-> +    def p2p_connect(self, peer, pin=3DNone, go_intent=3DNone):
-> +        self._rx_data =3D []
-> +        self._ctrl_request('P2P_CONNECT ' + peer['p2p_dev_addr'] + '
-> ' + ('pbc' if pin is None else pin) +
-> +                        ('' if go_intent is None else 'go_intent=3D' +
-> str(go_intent)))
-> +        self.wait_for_event('OK')
-> +
-> +    def p2p_accept_go_neg_request(self, request, pin=3DNone,
-> go_intent=3DNone):
-> +        self._rx_data =3D []
-> +        self._ctrl_request('P2P_CONNECT ' + request['p2p_dev_addr']
-> + ' ' + ('pbc' if pin is None else pin) +
-> +                        ('' if go_intent is None else 'go_intent=3D' +
-> str(go_intent)))
-> +        self.wait_for_event('OK')
-> +
-> +    # Pre-accept the next GO Negotiation Request from this peer to
-> avoid the extra Respone + Request frames
-> +    def p2p_authorize(self, peer, pin=3DNone, go_intent=3DNone):
-> +        self._rx_data =3D []
-> +        self._ctrl_request('P2P_CONNECT ' + peer['p2p_dev_addr'] + '
-> ' + ('pbc' if pin is None else pin) +
-> +                        ('' if go_intent is None else 'go_intent=3D' +
-> str(go_intent)) + ' auth')
-> +        self.wait_for_event('OK')
-> +
-> +    # Probably needed: remove references to self so that the GC can
-> call __del__ automatically
-> +    def clean_up(self):
-> +        if self.io_watch is not None:
-> +            GLib.source_remove(self.io_watch)
-> +            self.io_watch =3D None
-> +        if self.wpa_supplicant is not None:
-> +            ctx.stop_process(self.wpa_supplicant)
-> +            self.wpa_supplicant =3D None
-> +
-> +    def _stop_wpas(self):
-> +        self.clean_up()
-> +        if self.ctrl_sock:
-> +            self.ctrl_sock.close()
-> +            self.ctrl_sock =3D None
-> +        if os.path.exists(self.remote_ctrl):
-> +            os.remove(self.remote_ctrl)
-> +        if os.path.exists(self.local_ctrl):
-> +            os.remove(self.local_ctrl)
-> +
-> +    def __del__(self):
-> +        self._stop_wpas()
-
---===============8386021979635493869==--
+Best regards
+--===============1753355589190214102==--
 
