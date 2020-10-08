@@ -1,58 +1,100 @@
-Content-Type: multipart/mixed; boundary="===============3570896842349936503=="
+Content-Type: multipart/mixed; boundary="===============0175585270075886108=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/5] network: Check if network busy before new connection
-Date: Thu, 08 Oct 2020 10:49:09 +0200
-Message-ID: <20201008084911.1046485-3-andrew.zaborowski@intel.com>
+Subject: [PATCH 4/5] station: Stop autoconnect for the hidden SSID scan
+Date: Thu, 08 Oct 2020 10:49:10 +0200
+Message-ID: <20201008084911.1046485-4-andrew.zaborowski@intel.com>
 In-Reply-To: <20201008084911.1046485-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3570896842349936503==
+--===============0175585270075886108==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Check if we have an ongoing agent call before starting a new connection
-attempt and potentially overwriting network->agent_request.
 ---
- src/network.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ src/station.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/src/network.c b/src/network.c
-index 3e856aa1..388bc17a 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -1146,6 +1146,9 @@ static struct l_dbus_message *network_connect(struct =
-l_dbus *dbus,
- 		 */
- 		return l_dbus_message_new_method_return(message);
+diff --git a/src/station.c b/src/station.c
+index b70d3416..befc4e25 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2557,12 +2557,12 @@ static bool station_hidden_network_scan_results(int=
+ err,
  =
 
-+	if (network->agent_request)
-+		return dbus_error_busy(message);
+ 	if (err) {
+ 		dbus_pending_reply(&msg, dbus_error_failed(msg));
+-		return false;
++		goto error;
+ 	}
+ =
+
+ 	if (!l_dbus_message_get_arguments(msg, "s", &ssid)) {
+ 		dbus_pending_reply(&msg, dbus_error_invalid_args(msg));
+-		return false;
++		goto error;
+ 	}
+ =
+
+ 	ssid_len =3D strlen(ssid);
+@@ -2587,19 +2587,17 @@ next:
+ 		scan_bss_free(bss);
+ 	}
+ =
+
+-	l_queue_destroy(bss_list, NULL);
+-
+ 	network_psk =3D station_network_find(station, ssid, SECURITY_PSK);
+ 	network_open =3D station_network_find(station, ssid, SECURITY_NONE);
+ =
+
+ 	if (!network_psk && !network_open) {
+ 		dbus_pending_reply(&msg, dbus_error_not_found(msg));
+-		return true;
++		goto error;
+ 	}
+ =
+
+ 	if (network_psk && network_open) {
+ 		dbus_pending_reply(&msg, dbus_error_service_set_overlap(msg));
+-		return true;
++		goto error;
+ 	}
+ =
+
+ 	network =3D network_psk ? : network_open;
+@@ -2607,6 +2605,12 @@ next:
+ 	network_connect_new_hidden_network(network, &msg);
+ 	l_dbus_message_unref(msg);
+ =
+
++	l_queue_destroy(bss_list, NULL);
++	return true;
 +
- 	/*
- 	 * Select the best BSS to use at this time.  If we have to query the
- 	 * agent this may not be the final choice because BSS visibility can
-@@ -1198,6 +1201,11 @@ void network_connect_new_hidden_network(struct netwo=
-rk *network,
++error:
++	l_queue_destroy(bss_list, (l_queue_destroy_func_t) scan_bss_free);
++	station_set_autoconnect(station, true);
+ 	return true;
+ }
  =
 
- 	l_debug("");
+@@ -2659,6 +2663,7 @@ static struct l_dbus_message *station_dbus_connect_hi=
+dden_network(
+ 		return dbus_error_failed(message);
  =
 
-+	if (network->agent_request) {
-+		error =3D dbus_error_busy(*message);
-+		goto reply_error;
-+	}
-+
- 	/*
- 	 * This is not a Known Network.  If connection succeeds, either
- 	 * network_sync_psk or network_connected will save this network
+ 	station->hidden_pending =3D l_dbus_message_ref(message);
++	station_set_autoconnect(station, false);
+ =
+
+ 	return NULL;
+ }
 -- =
 
 2.25.1
 
---===============3570896842349936503==--
+--===============0175585270075886108==--
 
