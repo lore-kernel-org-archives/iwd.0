@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============0390079888184504690=="
+Content-Type: multipart/mixed; boundary="===============1898522533560452419=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 3/5] network: Check if network busy before new connection
-Date: Thu, 08 Oct 2020 10:08:46 -0500
-Message-ID: <cfcc64d2-9e76-66c0-4117-751b5985200b@gmail.com>
-In-Reply-To: <20201008084911.1046485-3-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 5/5] network: Stop autoconnect during agent request or ANQP
+Date: Thu, 08 Oct 2020 10:25:36 -0500
+Message-ID: <18d3efc4-2440-f63a-ea7f-9292769c2d76@gmail.com>
+In-Reply-To: <20201008084911.1046485-5-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0390079888184504690==
+--===============1898522533560452419==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,18 +16,22 @@ Content-Transfer-Encoding: quoted-printable
 Hi Andrew,
 
 On 10/8/20 3:49 AM, Andrew Zaborowski wrote:
-> Check if we have an ongoing agent call before starting a new connection
-> attempt and potentially overwriting network->agent_request.
-> ---
->   src/network.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
-> =
+> Stop autoconnect whenever we're saving a pending DBus message and resume
+> when we return the error response.
 
+So I don't think that we can do it this way.  The problem is that multiple =
 
-Applied, thanks.
+Network.Connects may exist in the 'Obtain secrets' stage.  So even if you p=
+ause =
+
+autoconnect for the first, the 2 .. n would still end up  pending in the =
+
+autoconnect stage...
+
+We probably need to discuss the whys of what you're trying to accomplish he=
+re...
 
 Regards,
 -Denis
-
---===============0390079888184504690==--
+--===============1898522533560452419==--
 
