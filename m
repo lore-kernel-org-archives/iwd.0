@@ -1,129 +1,224 @@
-Content-Type: multipart/mixed; boundary="===============6889542440513831881=="
+Content-Type: multipart/mixed; boundary="===============8786364598805997462=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 1/5] test-runner: Reserve radios for wpa_supplicant
-Date: Fri, 09 Oct 2020 20:08:51 +0200
-Message-ID: <20201009180855.1063394-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 2/5] autotests: Basic P2P python API
+Date: Fri, 09 Oct 2020 20:08:52 +0200
+Message-ID: <20201009180855.1063394-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20201009180855.1063394-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6889542440513831881==
+--===============8786364598805997462==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add support for a WPA_SUPPLICANT section in  hw.conf where
-'radN=3D<config_path>' lines will only reserve radios and create
-interfaces for the autotest to be able to start wpa_supplicant on them,
-i.e. this prevents iwd or hostapd from being started on them but doesn't
-start a wpa_supplicant instance by itself.
+Add a basic wrapper for the P2P-related DBus interfaces similar to the
+existing classes in iwd.py.  WFD is not included.
 ---
- tools/test-runner | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ autotests/util/iwd.py | 121 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 118 insertions(+), 3 deletions(-)
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 3b9c1854..dfad98f6 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -248,10 +248,11 @@ class Process:
- 				raise Exception("Timed out waiting for socket")
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index ef843a95..7e3676d9 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -35,6 +35,10 @@ IWD_SIGNAL_AGENT_INTERFACE =3D    'net.connman.iwd.Signa=
+lLevelAgent'
+ IWD_AP_INTERFACE =3D              'net.connman.iwd.AccessPoint'
+ IWD_ADHOC_INTERFACE =3D           'net.connman.iwd.AdHoc'
+ IWD_STATION_INTERFACE =3D         'net.connman.iwd.Station'
++IWD_P2P_INTERFACE =3D             'net.connman.iwd.p2p.Device'
++IWD_P2P_PEER_INTERFACE =3D        'net.connman.iwd.p2p.Peer'
++IWD_P2P_SERVICE_MANAGER_INTERFACE =3D 'net.connman.iwd.p2p.ServiceManager'
++IWD_P2P_WFD_INTERFACE =3D         'net.connman.iwd.p2p.Display'
  =
 
- class Interface:
--	def __init__(self, name, config):
-+	def __init__(self, name, config, radio):
- 		self.name =3D name
- 		self.ctrl_interface =3D '/var/run/hostapd/' + name
- 		self.config =3D config
-+		self.radio =3D radio
+ IWD_AGENT_MANAGER_PATH =3D        '/net/connman/iwd'
+ IWD_TOP_LEVEL_PATH =3D            '/'
+@@ -767,9 +771,107 @@ class PSKAgent(dbus.service.Object):
+         return passwd
  =
 
- 	def __del__(self):
- 		Process(['iw', 'dev', self.name, 'del'], True)
-@@ -270,17 +271,15 @@ class Radio:
- 		print("Removing radio %s" % self.name)
- 		self.interface =3D None
  =
 
--	def create_interface(self, hapd):
-+	def create_interface(self, config, use):
- 		global intf_id
- =
-
- 		ifname =3D 'wln%s' % intf_id
- =
-
- 		intf_id +=3D 1
- =
-
--		self.interface =3D Interface(ifname, hapd.config)
--		# IWD does not use interfaces in test-runner so any created
--		# interface is assumed to be used by hostapd.
--		self.use =3D 'hostapd'
-+		self.interface =3D Interface(ifname, config, self)
-+		self.use =3D use
- =
-
- 		Process(['iw', 'phy', self.name, 'interface', 'add', ifname,
- 				'type', 'managed'], True)
-@@ -358,7 +357,7 @@ class HostapdInstance:
- 		self.radio =3D radio
- 		self.config =3D config
- =
-
--		self.intf =3D radio.create_interface(self)
-+		self.intf =3D radio.create_interface(self.config, 'hostapd')
- 		self.intf.set_interface_state('up')
- =
-
- 	def __del__(self):
-@@ -473,6 +472,7 @@ class TestContext:
- 		self.args =3D args
- 		self.hw_config =3D None
- 		self.hostapd =3D None
-+		self.wpas_interfaces =3D None
- 		self.cur_radio_id =3D 0
- 		self.cur_iface_id =3D 0
- 		self.radios =3D []
-@@ -623,6 +623,14 @@ class TestContext:
- =
-
- 		self.hostapd =3D Hostapd(self, hapd_radios, hapd_configs, radius_config)
- =
-
-+	def start_wpas_interfaces(self):
-+		if 'WPA_SUPPLICANT' not in self.hw_config:
-+			return
++class P2PDevice(IWDDBusAbstract):
++    _iface_name =3D IWD_P2P_INTERFACE
 +
-+		settings =3D self.hw_config['WPA_SUPPLICANT']
-+		wpas_radios =3D [rad for rad in self.radios if rad.name in settings]
-+		self.wpas_interfaces =3D [rad.create_interface(settings[rad.name], 'wpas=
-') for rad in wpas_radios]
++    def __init__(self, *args, **kwargs):
++        self._discovery_request =3D False
++        self._peer_dict =3D {}
++        IWDDBusAbstract.__init__(self, *args, **kwargs)
 +
- 	def start_ofono(self):
- 		sim_keys =3D self.hw_config['SETUP'].get('sim_keys', None)
- 		if not sim_keys:
-@@ -690,6 +698,7 @@ class TestContext:
- 	def stop_test_processes(self):
- 		self.radios =3D []
- 		self.hostapd =3D None
-+		self.wpas_interfaces =3D None
- 		self.iwd_extra_options =3D None
++    @property
++    def name(self):
++        return str(self._properties['Name'])
++
++    @name.setter
++    def name(self, name):
++        self._prop_proxy.Set(self._iface_name, 'Name', name)
++
++    @property
++    def enabled(self):
++        return bool(self._properties['Enabled'])
++
++    @enabled.setter
++    def enabled(self, enabled):
++        self._prop_proxy.Set(self._iface_name, 'Enabled', enabled)
++
++    @property
++    def discovery_request(self):
++        return self._discovery_request
++
++    @discovery_request.setter
++    def discovery_request(self, req):
++        if self._discovery_request =3D=3D bool(req):
++            return
++
++        if bool(req):
++            self._iface.RequestDiscovery()
++        else:
++            self._iface.ReleaseDiscovery()
++
++        self._discovery_request =3D bool(req)
++
++    def get_peers(self):
++        old_dict =3D self._peer_dict
++        self._peer_dict =3D {}
++
++        for path, rssi in self._iface.GetPeers():
++            self._peer_dict[path] =3D old_dict[path] if path in old_dict e=
+lse P2PPeer(path)
++            self._peer_dict[path].rssi =3D rssi
++
++        return self._peer_dict
++
++
++class P2PPeer(IWDDBusAbstract):
++    _iface_name =3D IWD_P2P_PEER_INTERFACE
++
++    @property
++    def name(self):
++        return str(self._properties['Name'])
++
++    @property
++    def category(self):
++        return str(self._properties['DeviceCategory'])
++
++    @property
++    def subcategory(self):
++        return str(self._properties['DeviceSubcategory'])
++
++    @property
++    def connected(self):
++        return bool(self._properties['Connected'])
++
++    @property
++    def connected_interface(self):
++        return str(self._properties['ConnectedInterface'])
++
++    @property
++    def connected_ip(self):
++        return str(self._properties['ConnectedIP'])
++
++    def connect(self, wait=3DTrue, pin=3DNone):
++        if pin is None:
++            self._iface.PushButton(dbus_interface=3DIWD_WSC_INTERFACE,
++                            reply_handler=3Dself._success,
++                            error_handler=3Dself._failure)
++        else:
++            self._iface.StartPin(pin,
++                            dbus_interface=3DIWD_WSC_INTERFACE,
++                            reply_handler=3Dself._success,
++                            error_handler=3Dself._failure)
++
++        if wait:
++            self._wait_for_async_op()
++            return (self.connected_interface, self.connected_ip)
++
++    def disconnect(self):
++        self._iface.Disconnect()
++
++
+ class DeviceList(collections.Mapping):
+     def __init__(self, iwd):
+         self._dict =3D {}
++        self._p2p_dict =3D {}
  =
 
- 		for p in [p for p in self.processes if p.multi_test is False]:
-@@ -884,6 +893,7 @@ def pre_test(ctx, test):
- 	ctx.start_dbus_monitor()
- 	ctx.start_radios()
- 	ctx.start_hostapd()
-+	ctx.start_wpas_interfaces()
- 	ctx.start_ofono()
+         iwd._object_manager.connect_to_signal("InterfacesAdded",
+                                                self._interfaces_added_hand=
+ler)
+@@ -782,6 +884,8 @@ class DeviceList(collections.Mapping):
+             for interface in objects[path]:
+                 if interface =3D=3D IWD_DEVICE_INTERFACE:
+                     self._dict[path] =3D Device(path, objects[path][interf=
+ace])
++                elif interface =3D=3D IWD_P2P_INTERFACE:
++                    self._p2p_dict[path] =3D P2PDevice(path, objects[path]=
+[interface])
  =
 
- 	if ctx.args.log:
+     def __getitem__(self, key):
+         return self._dict.__getitem__(key)
+@@ -798,10 +902,18 @@ class DeviceList(collections.Mapping):
+     def _interfaces_added_handler(self, path, interfaces):
+         if IWD_DEVICE_INTERFACE in interfaces:
+             self._dict[path] =3D Device(path, interfaces[IWD_DEVICE_INTERF=
+ACE])
++        elif IWD_P2P_INTERFACE in interfaces:
++            self._p2p_dict[path] =3D P2PDevice(path, interfaces[IWD_P2P_IN=
+TERFACE])
+ =
+
+     def _interfaces_removed_handler(self, path, interfaces):
+         if IWD_DEVICE_INTERFACE in interfaces:
+             del self._dict[path]
++        elif IWD_P2P_INTERFACE in interfaces:
++            del self._p2p_dict[path]
++
++    @property
++    def p2p_dict(self):
++        return self._p2p_dict
+ =
+
+ =
+
+ class IWD(AsyncOpAbstract):
+@@ -943,9 +1055,9 @@ class IWD(AsyncOpAbstract):
+     def remove_from_storage(file_name):
+         os.system('rm -rf ' + IWD_STORAGE_DIR + '/\'' + file_name + '\'')
+ =
+
+-    def list_devices(self, wait_to_appear =3D 0, max_wait =3D 50):
++    def list_devices(self, wait_to_appear =3D 0, max_wait =3D 50, p2p =3D =
+False):
+         if not wait_to_appear:
+-            return list(self._devices.values())
++            return list(self._devices.values() if not p2p else self._devic=
+es.p2p_dict.values())
+ =
+
+         self._wait_timed_out =3D False
+         def wait_timeout_cb():
+@@ -963,7 +1075,10 @@ class IWD(AsyncOpAbstract):
+             if not self._wait_timed_out:
+                 GLib.source_remove(timeout)
+ =
+
+-        return list(self._devices.values())
++        return list(self._devices.values() if not p2p else self._devices.p=
+2p_dict.values())
++
++    def list_p2p_devices(self, *args, **kwargs):
++        return self.list_devices(*args, **kwargs, p2p=3DTrue)
+ =
+
+     def list_known_networks(self):
+         '''Returns the list of KnownNetwork objects.'''
 -- =
 
 2.25.1
 
---===============6889542440513831881==--
+--===============8786364598805997462==--
 
