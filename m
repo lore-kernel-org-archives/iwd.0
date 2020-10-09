@@ -1,129 +1,129 @@
-Content-Type: multipart/mixed; boundary="===============8518855033274650338=="
+Content-Type: multipart/mixed; boundary="===============6889542440513831881=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 2/5] station: Add current hidden network to networks_sorted
-Date: Thu, 08 Oct 2020 22:56:31 +0200
-Message-ID: <CAOq732L=YT8QiQ-6UTHjX2=Bv_Yb44AupVMV=Xbnquh0YLYZcA@mail.gmail.com>
-In-Reply-To: <01f267af-3e6b-8ed3-347d-0dbd8663db77@gmail.com>
+Subject: [PATCH 1/5] test-runner: Reserve radios for wpa_supplicant
+Date: Fri, 09 Oct 2020 20:08:51 +0200
+Message-ID: <20201009180855.1063394-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8518855033274650338==
+--===============6889542440513831881==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Add support for a WPA_SUPPLICANT section in  hw.conf where
+'radN=3D<config_path>' lines will only reserve radios and create
+interfaces for the autotest to be able to start wpa_supplicant on them,
+i.e. this prevents iwd or hostapd from being started on them but doesn't
+start a wpa_supplicant instance by itself.
+---
+ tools/test-runner | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-On Thu, 8 Oct 2020 at 17:19, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 10/8/20 3:49 AM, Andrew Zaborowski wrote:
-> > Update station->networks_sorted with new networks added inside
-> > station_hidden_network_scan_results() because we rely on
-> > station->networks being in sync with station->networks_sorted.
-> > Otherwise station_set_scan_results may crash.
->
-> Have you encountered a crash?  Or just suspect one exists?  A crash log w=
-ould be
-> nice.
+diff --git a/tools/test-runner b/tools/test-runner
+index 3b9c1854..dfad98f6 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -248,10 +248,11 @@ class Process:
+ 				raise Exception("Timed out waiting for socket")
+ =
 
-I was running under valgrind and it just reported invalid accesses but
-didn't crash that time.
+ class Interface:
+-	def __init__(self, name, config):
++	def __init__(self, name, config, radio):
+ 		self.name =3D name
+ 		self.ctrl_interface =3D '/var/run/hostapd/' + name
+ 		self.config =3D config
++		self.radio =3D radio
+ =
 
->
-> >
-> > Optimally a generic scan shouldn't happen while we're connecting to a
-> > new hidden network because the generic scan doesn't know about the
-> > hidden network's SSID and will not include the SSID in the probe request
-> > so it can at most expire the BSS we're trying to connect to.  However we
-> > can't easily tell whether we're in the middle of a Connect() or
-> > ConnectHiddenNetwork() call as mentioned in the previous commit, so we
-> > have to accept that we may trigger a new scan while waiting for secrets
->
-> Right.
->
-> > from the agent.  Thus the BSS discovered in the active scan for the
-> > hidden SSID may expire if the agent request takes too long but we this
-> > change at least we don't crash.
->
-> So looks like you're concerned about network_bss_list_clear() not being c=
-alled
-> on the temporary network we're connecting to (because
-> station_hidden_network_scan_results() never adds it to the networks_sorte=
-d list)
+ 	def __del__(self):
+ 		Process(['iw', 'dev', self.name, 'del'], True)
+@@ -270,17 +271,15 @@ class Radio:
+ 		print("Removing radio %s" % self.name)
+ 		self.interface =3D None
+ =
 
-Right, so we don't call network_bss_list_clear() on the hidden network
-but we do free the old BSS because the new bss list has the same BSS
-in it (in my case it did include the SSID, it was identical).  Next we
-try to insert the new scan_bss into the network and
-scan_bss_rank_compare() triggers an invalid access.
+-	def create_interface(self, hapd):
++	def create_interface(self, config, use):
+ 		global intf_id
+ =
 
-> and those bsses being expired by station_bss_list_remove_expired_bsses().=
-..?
-> But then the crash would likely happen in network_connect somewhere...
->
-> But actually the nastier issue is if the new scan result list contains th=
-e same
-> BSSes but in hidden form...
+ 		ifname =3D 'wln%s' % intf_id
+ =
 
-True, in that case I guess the old BSS gets freed and the network gets
-removed.  We probably need to treat it as a special case in
-station_set_scan_results.
+ 		intf_id +=3D 1
+ =
 
->
-> > ---
-> >   src/station.c | 13 +++++++++----
-> >   1 file changed, 9 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/src/station.c b/src/station.c
-> > index 6ac9e53b..b70d3416 100644
-> > --- a/src/station.c
-> > +++ b/src/station.c
-> > @@ -2572,11 +2572,16 @@ static bool station_hidden_network_scan_results=
-(int err,
-> >                                       memcmp(bss->ssid, ssid, ssid_len))
-> >                       goto next;
-> >
-> > -             if (station_add_seen_bss(station, bss)) {
-> > -                     l_queue_push_tail(station->bss_list, bss);
-> > +             network =3D station_add_seen_bss(station, bss);
-> > +             if (!network)
-> > +                     goto next;
-> >
-> > -                     continue;
-> > -             }
-> > +             l_queue_push_tail(station->bss_list, bss);
-> > +             network_rank_update(network, false);
-> > +             l_queue_remove(station->networks_sorted, network);
-> > +             l_queue_insert(station->networks_sorted, network,
-> > +                             network_rank_compare, NULL);
-> > +             continue;
->
-> This looks okay.  Not sure if we really care about showing this network a=
-s part
-> of the sorted list until we're attempting to connect, so maybe just using
-> l_hashmap_foreach(station->networks, network_bss_list_clear()) would be b=
-etter?
+-		self.interface =3D Interface(ifname, hapd.config)
+-		# IWD does not use interfaces in test-runner so any created
+-		# interface is assumed to be used by hostapd.
+-		self.use =3D 'hostapd'
++		self.interface =3D Interface(ifname, config, self)
++		self.use =3D use
+ =
 
-Inside station_set_scan_results?  That would work too, but I think it
-may be better to be consistent and report this network like other
-networks in case it confuses clients.
+ 		Process(['iw', 'phy', self.name, 'interface', 'add', ifname,
+ 				'type', 'managed'], True)
+@@ -358,7 +357,7 @@ class HostapdInstance:
+ 		self.radio =3D radio
+ 		self.config =3D config
+ =
 
->
-> But it seems to me this still doesn't solve the issue of the hidden netwo=
-rk
-> object being removed by process_network() if the scan is performed?
+-		self.intf =3D radio.create_interface(self)
++		self.intf =3D radio.create_interface(self.config, 'hostapd')
+ 		self.intf.set_interface_state('up')
+ =
 
-Right, I didn't realize the whole network would get removed.  If it
-was just the BSSes then the next time network.c tries to select a BSS
-it would just abort connection, but if the network goes away we crash.
-So I didn't bother fixing every scenario in this patchset.
+ 	def __del__(self):
+@@ -473,6 +472,7 @@ class TestContext:
+ 		self.args =3D args
+ 		self.hw_config =3D None
+ 		self.hostapd =3D None
++		self.wpas_interfaces =3D None
+ 		self.cur_radio_id =3D 0
+ 		self.cur_iface_id =3D 0
+ 		self.radios =3D []
+@@ -623,6 +623,14 @@ class TestContext:
+ =
 
-I was thinking ConnectHiddenNetwork should set connected_bss,
-connected_network from the beginning, and station_is_busy() should
-report true.  network.c and wsc.c should look at station_is_busy()
-before accepting a connection, and should also notify station that
-they have a pending Connect() / PushButton() / StartPIN().
+ 		self.hostapd =3D Hostapd(self, hapd_radios, hapd_configs, radius_config)
+ =
 
-Best regards
---===============8518855033274650338==--
++	def start_wpas_interfaces(self):
++		if 'WPA_SUPPLICANT' not in self.hw_config:
++			return
++
++		settings =3D self.hw_config['WPA_SUPPLICANT']
++		wpas_radios =3D [rad for rad in self.radios if rad.name in settings]
++		self.wpas_interfaces =3D [rad.create_interface(settings[rad.name], 'wpas=
+') for rad in wpas_radios]
++
+ 	def start_ofono(self):
+ 		sim_keys =3D self.hw_config['SETUP'].get('sim_keys', None)
+ 		if not sim_keys:
+@@ -690,6 +698,7 @@ class TestContext:
+ 	def stop_test_processes(self):
+ 		self.radios =3D []
+ 		self.hostapd =3D None
++		self.wpas_interfaces =3D None
+ 		self.iwd_extra_options =3D None
+ =
+
+ 		for p in [p for p in self.processes if p.multi_test is False]:
+@@ -884,6 +893,7 @@ def pre_test(ctx, test):
+ 	ctx.start_dbus_monitor()
+ 	ctx.start_radios()
+ 	ctx.start_hostapd()
++	ctx.start_wpas_interfaces()
+ 	ctx.start_ofono()
+ =
+
+ 	if ctx.args.log:
+-- =
+
+2.25.1
+
+--===============6889542440513831881==--
 
