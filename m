@@ -1,30 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============5025853577459147393=="
+Content-Type: multipart/mixed; boundary="===============6327978796880168369=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/2 v2] doc: Fix SignalLevelAgent interface name and
- filename pointers
-Date: Wed, 14 Oct 2020 13:03:03 -0500
-Message-ID: <4b2b063e-1154-ce28-c8fe-a5c428ec75f7@gmail.com>
-In-Reply-To: <20201014123836.1245903-1-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH] auto-t: remove requirement for /var/lib/{ead,iwd}
+Date: Wed, 14 Oct 2020 13:03:35 -0500
+Message-ID: <b5677cf1-e417-a70f-9e3b-57a45265fd9c@gmail.com>
+In-Reply-To: <20201014165557.199884-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5025853577459147393==
+--===============6327978796880168369==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Hi James,
 
-On 10/14/20 7:38 AM, Andrew Zaborowski wrote:
-> When the SignalLevelAgent doc blurb was moved to station-api.txt it
-> seems the interface was changed to Station.SignalLevelAgent in some
-> places but not in most and not in the code.  Also fix the pointers to
-> the doc file.
+On 10/14/20 11:55 AM, James Prestwood wrote:
+> The host systems configuration directories for IWD/EAD were
+> being mounted in the virtual machine. This required that the
+> host create these directories before hand. Instead we can
+> just set up the system and IWD/EAD to use directories in /tmp
+> that we create when we start the VM. This avoids the need for
+> any host configuration.
 > ---
->   doc/p2p-api.txt     |  4 ++--
->   doc/station-api.txt | 31 ++++++++++++++-----------------
->   2 files changed, 16 insertions(+), 19 deletions(-)
+>   autotests/testEAD/connection_test.py | 11 ++++++++---
+>   autotests/util/iwd.py                | 10 +++++-----
+>   tools/test-runner                    |  6 +++---
+>   3 files changed, 16 insertions(+), 11 deletions(-)
 > =
 
 
@@ -33,5 +35,5 @@ Applied, thanks.
 Regards,
 -Denis
 
---===============5025853577459147393==--
+--===============6327978796880168369==--
 
