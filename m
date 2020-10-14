@@ -1,95 +1,151 @@
-Content-Type: multipart/mixed; boundary="===============3076453889701117053=="
+Content-Type: multipart/mixed; boundary="===============0972082117748039833=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 2/2 v2] doc: Fix SignalLevelAgent interface name and filename
- pointers
-Date: Wed, 14 Oct 2020 14:38:36 +0200
-Message-ID: <20201014123836.1245903-1-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] auto-t: remove requirement for /var/lib/{ead,iwd}
+Date: Wed, 14 Oct 2020 09:55:57 -0700
+Message-ID: <20201014165557.199884-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3076453889701117053==
+--===============0972082117748039833==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-When the SignalLevelAgent doc blurb was moved to station-api.txt it
-seems the interface was changed to Station.SignalLevelAgent in some
-places but not in most and not in the code.  Also fix the pointers to
-the doc file.
+The host systems configuration directories for IWD/EAD were
+being mounted in the virtual machine. This required that the
+host create these directories before hand. Instead we can
+just set up the system and IWD/EAD to use directories in /tmp
+that we create when we start the VM. This avoids the need for
+any host configuration.
 ---
- doc/p2p-api.txt     |  4 ++--
- doc/station-api.txt | 31 ++++++++++++++-----------------
- 2 files changed, 16 insertions(+), 19 deletions(-)
+ autotests/testEAD/connection_test.py | 11 ++++++++---
+ autotests/util/iwd.py                | 10 +++++-----
+ tools/test-runner                    |  6 +++---
+ 3 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/doc/p2p-api.txt b/doc/p2p-api.txt
-index 08ee8d92..b10c51ed 100644
---- a/doc/p2p-api.txt
-+++ b/doc/p2p-api.txt
-@@ -47,8 +47,8 @@ Methods		array(on) GetPeers()
+diff --git a/autotests/testEAD/connection_test.py b/autotests/testEAD/conne=
+ction_test.py
+index c51d7237..bdf242b6 100644
+--- a/autotests/testEAD/connection_test.py
++++ b/autotests/testEAD/connection_test.py
+@@ -2,6 +2,7 @@
  =
 
- 			Register the agent object to receive signal strength
- 			level change notifications on the
--			net.connman.iwd.Station.SignalLevelAgent interface,
--			see station-api.txt.  The "levels" parameter decides
-+			net.connman.iwd.SignalLevelAgent interface, see
-+			station-api.txt.  The "levels" parameter decides
- 			the thresholds in dBm that will generate a call to
- 			the agent's Changed method whenever current RSSI
- 			crosses any of the values.  The values must be
-diff --git a/doc/station-api.txt b/doc/station-api.txt
-index b2131890..b640e18c 100644
---- a/doc/station-api.txt
-+++ b/doc/station-api.txt
-@@ -112,14 +112,13 @@ Methods		void Scan()
- 			Register the agent object to receive signal strength
- 			level change notifications on the
- 			net.connman.iwd.SignalLevelAgent interface, see
--			signal-level-agent-api.txt.  The "levels"
--			parameters decides the thresholds in dBm that will
--			generate a call to the agent's Changed
--			method whenever current RSSI crosses any of the
--			values.  The values must be passed in descending
--			order.  The number and distance between requested
--			threshold values is a compromise between resolution
--			and the frequency of system wakeups and
-+			below.  The "levels" parameters decides the
-+			thresholds in dBm that will generate a call to the
-+			agent's Changed method whenever current RSSI crosses
-+			any of the values.  The values must be passed in
-+			descending order.  The number and distance between
-+			requested threshold values is a compromise between
-+			resolution and the frequency of system wakeups and
- 			context-switches that are going to be occurring to
- 			update the client's signal meter.  Only one agent
- 			can be registered at any time.
-@@ -186,15 +185,13 @@ Methods		void Release(object device)
- 			measurement for the device's connected network
- 			changes enough to go from one level to another out
- 			of the N ranges defined by the array of (N-1)
--			threshold values passed to
--			net.connman.iwd.Station.RegisterSignalLevelAgent
--			(see device-api.txt.)  The level parameter is in
--			the range from 0 to N, 0 being the strongest
--			signal or above the first threshold value in the
--			array, and N being the weakest and below the
--			last threshold value.  For example if
--			RegisterSignalLevelAgent was called with the
--			array [-40, -50, -60], the 'level' parameter of
-+			threshold values passed to RegisterSignalLevelAgent().
-+			The level parameter is in the range from 0 to N,
-+			0 being the strongest signal or above the first
-+			threshold value in the array, and N being the
-+			weakest and below the last threshold value.  For
-+			example if RegisterSignalLevelAgent was called with
-+			the array [-40, -50, -60], the 'level' parameter of
- 			0 would mean signal is received at -40 or more dBm
- 			and 3 would mean below -60 dBm and might correspond
- 			to 1 out of 4 bars on a UI signal meter.
+ import unittest
+ import sys
++import os
+ =
+
+ sys.path.append('../util')
+ from iwd import IWD
+@@ -11,7 +12,9 @@ from ead import EAD
+ =
+
+ class Test(unittest.TestCase):
+     def test_connection_success(self):
+-        ctx.start_process(['ead', '-i', 'eth1', '-d'])
++        env =3D os.environ.copy()
++        env['STATE_DIRECTORY'] =3D '/tmp/ead'
++        ctx.start_process(['ead', '-i', 'eth1', '-d'], env=3Denv)
+ =
+
+         ead =3D EAD()
+ =
+
+@@ -25,11 +28,13 @@ class Test(unittest.TestCase):
+ =
+
+     @classmethod
+     def setUpClass(cls):
+-        IWD.copy_to_storage('default.8021x', storage_dir=3D'/var/lib/ead')
++        os.mkdir('/tmp/ead')
++
++        IWD.copy_to_storage('default.8021x', storage_dir=3D'/tmp/ead')
+ =
+
+     @classmethod
+     def tearDownClass(cls):
+-        IWD.clear_storage()
++        IWD.clear_storage(storage_dir=3D'/tmp/ead')
+ =
+
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index ef843a95..76d96289 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -17,8 +17,8 @@ from enum import Enum
+ =
+
+ from config import ctx
+ =
+
+-IWD_STORAGE_DIR =3D               '/var/lib/iwd'
+-IWD_CONFIG_DIR =3D                '/etc/iwd'
++IWD_STORAGE_DIR =3D               '/tmp/iwd'
++IWD_CONFIG_DIR =3D                '/tmp'
+ =
+
+ DBUS_OBJECT_MANAGER =3D           'org.freedesktop.DBus.ObjectManager'
+ DBUS_PROPERTIES =3D               'org.freedesktop.DBus.Properties'
+@@ -909,9 +909,9 @@ class IWD(AsyncOpAbstract):
+                 GLib.source_remove(timeout)
+ =
+
+     @staticmethod
+-    def clear_storage():
+-        os.system('rm -rf ' + IWD_STORAGE_DIR + '/*')
+-        os.system('rm -rf ' + IWD_STORAGE_DIR + '/hotspot/*')
++    def clear_storage(storage_dir=3DIWD_STORAGE_DIR):
++        os.system('rm -rf ' + storage_dir + '/*')
++        os.system('rm -rf ' + storage_dir + '/hotspot/*')
+ =
+
+     @staticmethod
+     def create_in_storage(file_name, file_content):
+diff --git a/tools/test-runner b/tools/test-runner
+index 3b9c1854..809a3905 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -112,8 +112,6 @@ mount_table =3D [
+ 	MountInfo('devpts', '/dev/pts', 'mode=3D0620', MS_NOSUID|MS_NOEXEC),
+ 	MountInfo('tmpfs', '/dev/shm', 'mode=3D1777', MS_NOSUID|MS_NODEV|MS_STRIC=
+TATIME),
+ 	MountInfo('tmpfs', '/run', 'mode=3D0755', MS_NOSUID|MS_NODEV|MS_STRICTATI=
+ME),
+-	MountInfo('tmpfs', '/var/lib/iwd', 'mode=3D0755', 0),
+-	MountInfo('tmpfs', '/var/lib/ead', 'mode=3D0755', 0),
+ 	MountInfo('tmpfs', '/tmp', '', 0),
+ 	MountInfo('tmpfs', '/usr/share/dbus-1', 'mode=3D0755', MS_NOSUID|MS_NOEXE=
+C|MS_NODEV|MS_STRICTATIME),
+ 	MountInfo('debugfs', '/sys/kernel/debug', '', 0)
+@@ -572,7 +570,7 @@ class TestContext:
+ =
+
+ 		env =3D os.environ.copy()
+ 		env['CONFIGURATION_DIRECTORY'] =3D config_dir
+-		env['STATE_DIRECTORY'] =3D '/var/lib/iwd'
++		env['STATE_DIRECTORY'] =3D '/tmp/iwd'
+ =
+
+ 		if self.is_verbose('iwd-dhcp'):
+ 			env['IWD_DHCP_DEBUG'] =3D '1'
+@@ -742,6 +740,8 @@ def prepare_sandbox():
+ 	for entry in dev_table:
+ 		os.symlink(entry.target, entry.linkpath)
+ =
+
++	os.mkdir('/tmp/iwd')
++
+ 	os.setsid()
+ =
+
+ 	fcntl.ioctl(STDIN_FILENO, TIOCSTTY, 1)
 -- =
 
-2.25.1
+2.26.2
 
---===============3076453889701117053==--
+--===============0972082117748039833==--
 
