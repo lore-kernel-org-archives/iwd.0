@@ -1,48 +1,25 @@
-Content-Type: multipart/mixed; boundary="===============0066873377292297658=="
+Content-Type: multipart/mixed; boundary="===============3082656036980332522=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
+From: Daniel Wagner <wagi@monom.org>
 Subject: Re: iwd problems on Arch Linux
-Date: Thu, 15 Oct 2020 14:58:04 -0500
-Message-ID: <00f42112-bad0-9140-9d33-f94f309fa910@gmail.com>
-In-Reply-To: <CAG17S_Ma_2HBuY=yfGi6dyc+yk=ei9hDurgVEOt02ks-=1OFXA@mail.gmail.com>
+Date: Fri, 16 Oct 2020 09:16:36 +0200
+Message-ID: <20201016071636.etikl2nmzrxeb2ri@beryllium.lan>
+In-Reply-To: <00f42112-bad0-9140-9d33-f94f309fa910@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0066873377292297658==
+--===============3082656036980332522==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+On Thu, Oct 15, 2020 at 02:58:04PM -0500, Denis Kenzior wrote:
+> As I've said before, connman is invoking Station.Disconnect which prevents
+> iwd from reconnecting autonomously.  There's really nothing we can do abo=
+ut
+> that. Any issues are likely in connman.git/plugins/iwd.c
 
-> These logs contain an SSID off/on and a reconnect event (as desired) then =
-
-> followed immediately with an SSID off/on and a no-reconnect event. I grab=
-bed the =
-
-> journal log from iwd and connman and also the pcap in case any/all may be =
-
-> useful. I was able to see content that scrolled by on the screen in the p=
-cap =
-
-> with 'iwmon -F 0x17 -r no_reconnect.pcap' (I think you mentioned this pre=
-viously).
-
-As I've said before, connman is invoking Station.Disconnect which prevents =
-iwd =
-
-from reconnecting autonomously.  There's really nothing we can do about tha=
-t. =
-
-Any issues are likely in connman.git/plugins/iwd.c
-
-Can you provide me logs of this scenario without connman (with systemd-netw=
-orkd =
-
-or iwd with EnableNetworkConfiguration=3Dtrue).  That I might be able to he=
-lp with.
-
-Regards,
--Denis
---===============0066873377292297658==--
+Does Station.Disconnect and AutoConnect=3Dfalse disable the iwd's scan
+engine? The pluning relies on getting SSIDs updates.
+--===============3082656036980332522==--
 
