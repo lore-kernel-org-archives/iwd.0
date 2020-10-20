@@ -1,56 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============1095563989736752047=="
+Content-Type: multipart/mixed; boundary="===============8947533950764043352=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 01/13] auto-t: no hostapd instance graceful failure
-Date: Tue, 20 Oct 2020 11:02:44 -0700
-Message-ID: <20201020180256.1630120-1-prestwoj@gmail.com>
+Subject: [PATCH 02/13] auto-t: add copy_to_ap utility
+Date: Tue, 20 Oct 2020 11:02:45 -0700
+Message-ID: <20201020180256.1630120-2-prestwoj@gmail.com>
+In-Reply-To: <20201020180256.1630120-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1095563989736752047==
+--===============8947533950764043352==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If a test does not need any hostapd instances but still loads
-hostapd.py for some reason we want to gracefully throw an
-exception rather than fail in some other manor.
 ---
- autotests/util/hostapd.py | 7 +++++++
- 1 file changed, 7 insertions(+)
+ autotests/util/iwd.py | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index 7c0d8385..cf82c010 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -32,6 +32,10 @@ class HostapdCLI:
-     def _init_hostapd(self, config=3DNone):
-         global ctrl_count
-         interface =3D None
-+        self.ctrl_sock =3D None
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index dc4f93a2..fb22412d 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -1027,6 +1027,7 @@ class IWD(AsyncOpAbstract):
+     def clear_storage(storage_dir=3DIWD_STORAGE_DIR):
+         os.system('rm -rf ' + storage_dir + '/*')
+         os.system('rm -rf ' + storage_dir + '/hotspot/*')
++        os.system('rm -rf ' + storage_dir + '/ap/*')
+ =
+
+     @staticmethod
+     def create_in_storage(file_name, file_content):
+@@ -1054,6 +1055,13 @@ class IWD(AsyncOpAbstract):
+ =
+
+         shutil.copy(source, IWD_STORAGE_DIR + "/hotspot")
+ =
+
++    @staticmethod
++    def copy_to_ap(source):
++        if not os.path.exists(IWD_STORAGE_DIR + "/ap"):
++            os.mkdir(IWD_STORAGE_DIR + "/ap")
 +
-+        if not ctx.hostapd:
-+            raise Exception("No hostapd instances are configured")
- =
-
-         if not config and len(ctx.hostapd.instances) > 1:
-             raise Exception('config must be provided if more than one host=
-apd instance exists')
-@@ -110,6 +114,9 @@ class HostapdCLI:
-         raise Exception('timeout waiting for control response')
- =
-
-     def _del_hostapd(self, force=3DFalse):
-+        if not self.ctrl_sock:
-+            return
++        IWD.copy_to_storage(source, IWD_STORAGE_DIR + '/ap/')
 +
-         self.ctrl_sock.close()
-         os.remove(self.local_ctrl)
- =
-
+     @staticmethod
+     def remove_from_storage(file_name):
+         os.system('rm -rf ' + IWD_STORAGE_DIR + '/\'' + file_name + '\'')
 -- =
 
 2.26.2
 
---===============1095563989736752047==--
+--===============8947533950764043352==--
 
