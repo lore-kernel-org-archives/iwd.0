@@ -1,55 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============1040459405318712645=="
+Content-Type: multipart/mixed; boundary="===============1095563989736752047=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: >=iwd-1.8: crash in dmesg at boot
-Date: Tue, 20 Oct 2020 11:42:06 -0500
-Message-ID: <1420f2a8-cbe0-6885-8c15-76f719269f2a@gmail.com>
-In-Reply-To: <d163a616006b4fc97fc7af2048b19d19068ff74e.camel@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 01/13] auto-t: no hostapd instance graceful failure
+Date: Tue, 20 Oct 2020 11:02:44 -0700
+Message-ID: <20201020180256.1630120-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1040459405318712645==
+--===============1095563989736752047==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+If a test does not need any hostapd instances but still loads
+hostapd.py for some reason we want to gracefully throw an
+exception rather than fail in some other manor.
+---
+ autotests/util/hostapd.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-> =
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 7c0d8385..cf82c010 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -32,6 +32,10 @@ class HostapdCLI:
+     def _init_hostapd(self, config=3DNone):
+         global ctrl_count
+         interface =3D None
++        self.ctrl_sock =3D None
++
++        if not ctx.hostapd:
++            raise Exception("No hostapd instances are configured")
+ =
 
-> Side note: wpa_supplicant likely doesn't have this problem since it
-> does not include ATTR_WIPHY with its GET_REG call AFAIK. Anyone know if
-> GET_REG is intended to be per-phy? Or why we are including ATTR_WIPHY?
-> =
+         if not config and len(ctx.hostapd.instances) > 1:
+             raise Exception('config must be provided if more than one host=
+apd instance exists')
+@@ -110,6 +114,9 @@ class HostapdCLI:
+         raise Exception('timeout waiting for control response')
+ =
 
+     def _del_hostapd(self, force=3DFalse):
++        if not self.ctrl_sock:
++            return
++
+         self.ctrl_sock.close()
+         os.remove(self.local_ctrl)
+ =
 
-from linux/nl80211.h:
-"
-  @NL80211_CMD_GET_REG: ask the wireless core to send us its currently set =
+-- =
 
-regulatory domain. If %NL80211_ATTR_WIPHY is specified and the device has a =
+2.26.2
 
-private regulatory domain, it will be returned. Otherwise, the global regdo=
-main =
-
-will be returned.
-
-A device will have a private regulatory domain if it uses the regulatory_hi=
-nt() =
-
-API. Even when a private regdomain is used the channel information will sti=
-ll be =
-
-mended according to further hints from the regulatory core to help with com=
-pliance.
-"
-
-So looks like wpa_s always requests the global domain, while iwd is in theo=
-ry =
-
-more correct and requests a per-wiphy one.
-
-Regards,
--Denis
---===============1040459405318712645==--
+--===============1095563989736752047==--
 
