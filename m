@@ -1,53 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============0090577778766724226=="
+Content-Type: multipart/mixed; boundary="===============1040459405318712645=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
 Subject: Re: >=iwd-1.8: crash in dmesg at boot
-Date: Tue, 20 Oct 2020 09:28:49 -0700
-Message-ID: <d163a616006b4fc97fc7af2048b19d19068ff74e.camel@gmail.com>
-In-Reply-To: <20201020161422.GD1676@host>
+Date: Tue, 20 Oct 2020 11:42:06 -0500
+Message-ID: <1420f2a8-cbe0-6885-8c15-76f719269f2a@gmail.com>
+In-Reply-To: <d163a616006b4fc97fc7af2048b19d19068ff74e.camel@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0090577778766724226==
+--===============1040459405318712645==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi James,
 
-On Tue, 2020-10-20 at 18:14 +0200, m1027(a)posteo.net wrote:
-> Hi,
 > =
 
-> I am forwarding the following issue from Gentoo linux to you here.
-> Please see: https://bugs.gentoo.org/746539
+> Side note: wpa_supplicant likely doesn't have this problem since it
+> does not include ATTR_WIPHY with its GET_REG call AFAIK. Anyone know if
+> GET_REG is intended to be per-phy? Or why we are including ATTR_WIPHY?
 > =
 
-> I hope this is the right place to continue with this issue.
-> =
 
-> This is the summary:
-> =
+from linux/nl80211.h:
+"
+  @NL80211_CMD_GET_REG: ask the wireless core to send us its currently set =
 
-> iwd-1.7 was not hit, but 1.8 and 1.9 have been hit by the issue.
-> =
+regulatory domain. If %NL80211_ATTR_WIPHY is specified and the device has a =
 
-> The kernel has been bisected down to this commit:
-> https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/?id=3Db43e=
-915b989dcbb0fa763fb7f256e30fe7426f14
-> However, it may not be the real cause, maybe only revealing the
-> issue. Still happening with linux 5.9.1.
+private regulatory domain, it will be returned. Otherwise, the global regdo=
+main =
 
-Yes since adding the call to GET_REG it appears that IWD is just
-exposing the kernel warning. I think this needs to be forwarded to
-linux-wireless.
+will be returned.
 
-Side note: wpa_supplicant likely doesn't have this problem since it
-does not include ATTR_WIPHY with its GET_REG call AFAIK. Anyone know if
-GET_REG is intended to be per-phy? Or why we are including ATTR_WIPHY?
+A device will have a private regulatory domain if it uses the regulatory_hi=
+nt() =
 
-Thanks,
-James
+API. Even when a private regdomain is used the channel information will sti=
+ll be =
 
---===============0090577778766724226==--
+mended according to further hints from the regulatory core to help with com=
+pliance.
+"
+
+So looks like wpa_s always requests the global domain, while iwd is in theo=
+ry =
+
+more correct and requests a per-wiphy one.
+
+Regards,
+-Denis
+--===============1040459405318712645==--
 
