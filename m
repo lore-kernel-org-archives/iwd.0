@@ -1,91 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============1835574889596789542=="
+Content-Type: multipart/mixed; boundary="===============7017946405205627801=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
 Subject: Re: [PATCH 12/13] ap: add support for DHCPv4 server
-Date: Tue, 20 Oct 2020 16:03:05 -0500
-Message-ID: <82799cec-7d2a-a1fb-cbbb-f58a1a509b2c@gmail.com>
-In-Reply-To: <CAOq732KJpw9Vz9t-4PFUSHiupdXPK56yjgBrVf_+ZFAfDrpXDA@mail.gmail.com>
+Date: Tue, 20 Oct 2020 23:41:37 +0200
+Message-ID: <CAOq732KCxCjXvhw7pbjC-7wZ6yv+3nzXS3B1n3ibb+ro1RncTA@mail.gmail.com>
+In-Reply-To: <82799cec-7d2a-a1fb-cbbb-f58a1a509b2c@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1835574889596789542==
+--===============7017946405205627801==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Tue, 20 Oct 2020 at 23:03, Denis Kenzior <denkenz@gmail.com> wrote:
+> >>>> I think we may need Andrew's opinion on whether these should be part
+> >>>> of
+> >>>> ap_config.  P2P might not really care about setting up these
+> >>>> variables and would
+> >>>> prefer for ap.c to just figure things out.
+> >>>
+> >>> Sure, but they aren't required anyways so p2p doesn't have to include
+> >>> them and defaults will be used (once netmask is fixed). The ap_config
+> >>> structure was just a convenient storage object for these but we could
+> >>> define something else too.
+> >>
+> >> Yes, true.  But not much sense in actually storing them long-term if t=
+hat's the
+> >> case.  Generate them / load from settings, give them to dhcp-server an=
+d forget.
+> >
+> > It does seem logical to put those settings in struct ap_config.  P2P
+> > wouldn't normally need to use them, it should be fine with the
+> > defaults although I'm thinking in the future there may be exceptions
+> > where we need to work around client's bugs (hopefully not).
+> >
+> > Note that the P2P Group Owner will need to decide on an IP for itself
+> > and the client before the 4-Way Handshake starts to implement the
+> > optional IP assignment during the handshake.
+>
+> Hmm, wouldn't it make sense for AP to figure out the setup and for P2P to=
+ just
+> use that?  Especially if we start supporting persistent groups eventually.
 
->> Well, the user has to first switch the device into AP mode or create the
->> required interface first somehow.  So before they actually hit .Start, t=
-hey have
->> a chance to configure the IP or not.  If the IP is configured, then we a=
-ssume
->> the interface is managed by someone else.  If it isn't, we take ownershi=
-p.
->>
->> I suppose we can add an explicit setting in main.conf somewhere, or in t=
-he
->> profile itself.  But I'd keep things simple for now.
-> =
+Yeah, normally P2P doesn't need to fix specific IP vaues, it can let
+AP use its defaults.
 
-> Maybe we can re-use [General].EnableNetworkConfiguration for the basic
-> on/off switch and possibly allow individual access point config files
-> to override this?
-> =
+Even with persistent groups afaik mainly the PSK is persisted, IPs can
+differ between each session.
 
-> In the case of Network Manager users, if they're interfacing with IWD
-> through NM they will currently not want DHCP as either client or
-> server, and if they use iwctl they might want DHCP everywhere.
-> =
+>
+> You do bring up a good point that we'd need a 'reserve' API of sorts on t=
+he DHCP
+> server side.  That way IP details for the handshaking client can be
+> pre-populated if IP configuration through the handshake is supported.
 
-> Also for the record, NM only sets the local IP after the AP is started.
-> =
+Usually we'll just have one client.  Even with multiple clients we can
+use disjoint ranges of IPs for DHCP and for the 4-Way handshake IP
+setup... but we could instead 'reserve' an IP for the client and offer
+it through both methods.
 
+Many standalone APs let you manually assign IPs to MACs, including IPs
+in the DHCP range, so it may be useful to have this option.
 
-Good points.  I'm fine re-using EnableNetworkConfiguration for this.
-
->>
->>>>
->>>> I think we may need Andrew's opinion on whether these should be part
->>>> of
->>>> ap_config.  P2P might not really care about setting up these
->>>> variables and would
->>>> prefer for ap.c to just figure things out.
->>>
->>> Sure, but they aren't required anyways so p2p doesn't have to include
->>> them and defaults will be used (once netmask is fixed). The ap_config
->>> structure was just a convenient storage object for these but we could
->>> define something else too.
->>
->> Yes, true.  But not much sense in actually storing them long-term if tha=
-t's the
->> case.  Generate them / load from settings, give them to dhcp-server and =
-forget.
-> =
-
-> It does seem logical to put those settings in struct ap_config.  P2P
-> wouldn't normally need to use them, it should be fine with the
-> defaults although I'm thinking in the future there may be exceptions
-> where we need to work around client's bugs (hopefully not).
-> =
-
-> Note that the P2P Group Owner will need to decide on an IP for itself
-> and the client before the 4-Way Handshake starts to implement the
-> optional IP assignment during the handshake.
-
-Hmm, wouldn't it make sense for AP to figure out the setup and for P2P to j=
-ust =
-
-use that?  Especially if we start supporting persistent groups eventually.
-
-You do bring up a good point that we'd need a 'reserve' API of sorts on the=
- DHCP =
-
-server side.  That way IP details for the handshaking client can be =
-
-pre-populated if IP configuration through the handshake is supported.
-
-Regards,
--Denis
---===============1835574889596789542==--
+Best regards
+--===============7017946405205627801==--
 
