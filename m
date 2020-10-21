@@ -1,27 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============8359249798708759392=="
+Content-Type: multipart/mixed; boundary="===============4447937921243701209=="
 MIME-Version: 1.0
-From: m1027@posteo.net
-Subject: Re: >=iwd-1.8: crash in dmesg at boot
-Date: Wed, 21 Oct 2020 12:36:08 +0200
-Message-ID: <20201021103608.GA593@host>
-In-Reply-To: <d163a616006b4fc97fc7af2048b19d19068ff74e.camel@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 0/2] Add DHCP to AP
+Date: Wed, 21 Oct 2020 11:44:25 -0700
+Message-ID: <20201021184427.1730146-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8359249798708759392==
+--===============4447937921243701209==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-prestwoj:
+Removed all the provisioning file changes for now and left just the
+minimum require for a DHCP server. All default values will be
+chosen.
 
-> I think this needs to be forwarded to linux-wireless.
+James Prestwood (2):
+  ap: add support for DHCPv4 server
+  auto-t: add AP test with DHCP server
 
-I've found a bug on kernel.org which seems to be it, and commented there.
+ autotests/testAP-DHCP/connection_test.py | 76 ++++++++++++++++++++++++
+ autotests/testAP-DHCP/failure_test.py    | 57 ++++++++++++++++++
+ autotests/testAP-DHCP/hw.conf            |  3 +
+ autotests/testAP-DHCP/main.conf          |  5 ++
+ src/ap.c                                 | 70 ++++++++++++++++++++--
+ 5 files changed, 205 insertions(+), 6 deletions(-)
+ create mode 100644 autotests/testAP-DHCP/connection_test.py
+ create mode 100644 autotests/testAP-DHCP/failure_test.py
+ create mode 100644 autotests/testAP-DHCP/hw.conf
+ create mode 100644 autotests/testAP-DHCP/main.conf
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D208599
+-- =
 
-Thank you all.
+2.26.2
 
---===============8359249798708759392==--
+--===============4447937921243701209==--
 
