@@ -1,202 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============4100620200194136262=="
+Content-Type: multipart/mixed; boundary="===============0072494379946770996=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/2] auto-t: add AP test with DHCP server
-Date: Wed, 21 Oct 2020 11:44:27 -0700
-Message-ID: <20201021184427.1730146-3-prestwoj@gmail.com>
-In-Reply-To: <20201021184427.1730146-1-prestwoj@gmail.com>
+Subject: [PATCH 1/2] test-runner: enable valgrind track origins
+Date: Wed, 21 Oct 2020 14:36:51 -0700
+Message-ID: <20201021213652.1791048-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4100620200194136262==
+--===============0072494379946770996==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This gives a more exact location to where a memory problem
+is happening. It also uses more RAM so the VM was upgraded to
+256MB from 192MB.
 ---
- autotests/testAP-DHCP/connection_test.py | 76 ++++++++++++++++++++++++
- autotests/testAP-DHCP/failure_test.py    | 57 ++++++++++++++++++
- autotests/testAP-DHCP/hw.conf            |  3 +
- autotests/testAP-DHCP/main.conf          |  5 ++
- 4 files changed, 141 insertions(+)
- create mode 100644 autotests/testAP-DHCP/connection_test.py
- create mode 100644 autotests/testAP-DHCP/failure_test.py
- create mode 100644 autotests/testAP-DHCP/hw.conf
- create mode 100644 autotests/testAP-DHCP/main.conf
+ tools/test-runner | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/autotests/testAP-DHCP/connection_test.py b/autotests/testAP-DH=
-CP/connection_test.py
-new file mode 100644
-index 00000000..7416b195
---- /dev/null
-+++ b/autotests/testAP-DHCP/connection_test.py
-@@ -0,0 +1,76 @@
-+#! /usr/bin/python3
-+
-+import unittest
-+import sys, os
-+
-+import iwd
-+from iwd import IWD
-+from iwd import PSKAgent
-+from iwd import NetworkType
-+from config import ctx
-+import testutil
-+
-+class Test(unittest.TestCase):
-+    def test_connection_success(self):
-+        wd =3D IWD(True)
-+
-+        dev1, dev2 =3D wd.list_devices(2)
-+
-+        ctx.start_process(['ifconfig', dev1.name, "192.168.1.1", "netmask",
-+                            "255.255.255.0", "up"], wait=3DTrue)
-+
-+        dev1.start_ap('TestAP2', "Password2")
-+
-+        try:
-+            condition =3D 'not obj.scanning'
-+            wd.wait_for_object_condition(dev2, condition)
-+            dev2.scan()
-+            condition =3D 'obj.scanning'
-+            wd.wait_for_object_condition(dev2, condition)
-+            condition =3D 'not obj.scanning'
-+            wd.wait_for_object_condition(dev2, condition)
-+
-+            ordered_networks =3D dev2.get_ordered_networks()
-+
-+            networks =3D { n.name: n for n in ordered_networks }
-+            self.assertEqual(networks['TestAP2'].type, NetworkType.psk)
-+
-+            psk_agent =3D PSKAgent('Password2')
-+            wd.register_psk_agent(psk_agent)
-+
-+            try:
-+                dev2.disconnect()
-+
-+                condition =3D 'not obj.connected'
-+                wd.wait_for_object_condition(dev2, condition)
-+            except:
-+                pass
-+
-+            networks['TestAP2'].network_object.connect()
-+
-+            condition =3D 'obj.state =3D=3D DeviceState.connected'
-+            wd.wait_for_object_condition(dev2, condition)
-+
-+            testutil.test_iface_operstate(dev2.name)
-+            testutil.test_ifaces_connected(dev1.name, dev2.name, group=3DF=
-alse)
-+
-+            wd.unregister_psk_agent(psk_agent)
-+
-+            dev2.disconnect()
-+
-+            condition =3D 'not obj.connected'
-+            wd.wait_for_object_condition(networks['TestAP2'].network_objec=
-t,
-+                                         condition)
-+        finally:
-+            dev1.stop_ap()
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        pass
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
-diff --git a/autotests/testAP-DHCP/failure_test.py b/autotests/testAP-DHCP/=
-failure_test.py
-new file mode 100644
-index 00000000..9aa0b39d
---- /dev/null
-+++ b/autotests/testAP-DHCP/failure_test.py
-@@ -0,0 +1,57 @@
-+#! /usr/bin/python3
-+
-+import unittest
-+import sys, os
-+
-+sys.path.append('../util')
-+import iwd
-+from iwd import IWD
-+from iwd import PSKAgent
-+from iwd import NetworkType
-+from config import ctx
-+import testutil
-+
-+class Test(unittest.TestCase):
-+    def test_connection_failure(self):
-+        wd =3D IWD(True)
-+
-+        dev1, dev2 =3D wd.list_devices(2)
-+
-+        ctx.start_process(['ifconfig', dev1.name, "192.168.1.1", "netmask",
-+                            "255.255.255.0", "up"], wait=3DTrue)
-+
-+        dev1.start_ap('TestAP2', 'Password2')
-+
-+        try:
-+            condition =3D 'not obj.scanning'
-+            wd.wait_for_object_condition(dev2, condition)
-+            dev2.scan()
-+            condition =3D 'obj.scanning'
-+            wd.wait_for_object_condition(dev2, condition)
-+            condition =3D 'not obj.scanning'
-+            wd.wait_for_object_condition(dev2, condition)
-+
-+            ordered_networks =3D dev2.get_ordered_networks()
-+            networks =3D { n.name: n for n in ordered_networks }
-+            self.assertEqual(networks['TestAP2'].type, NetworkType.psk)
-+
-+            psk_agent =3D PSKAgent('InvalidPassword')
-+            wd.register_psk_agent(psk_agent)
-+
-+            with self.assertRaises(iwd.FailedEx):
-+                networks['TestAP2'].network_object.connect()
-+
-+            wd.unregister_psk_agent(psk_agent)
-+        finally:
-+            dev1.stop_ap()
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        pass
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
-diff --git a/autotests/testAP-DHCP/hw.conf b/autotests/testAP-DHCP/hw.conf
-new file mode 100644
-index 00000000..c6553537
---- /dev/null
-+++ b/autotests/testAP-DHCP/hw.conf
-@@ -0,0 +1,3 @@
-+[SETUP]
-+num_radios=3D2
-+start_iwd=3D0
-diff --git a/autotests/testAP-DHCP/main.conf b/autotests/testAP-DHCP/main.c=
-onf
-new file mode 100644
-index 00000000..25ebe4ff
---- /dev/null
-+++ b/autotests/testAP-DHCP/main.conf
-@@ -0,0 +1,5 @@
-+[Scan]
-+DisableMacAddressRandomization=3Dtrue
-+
-+[General]
-+EnableNetworkConfiguration=3Dtrue
+diff --git a/tools/test-runner b/tools/test-runner
+index 8c06816c..10db4c78 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -557,8 +557,8 @@ class TestContext:
+ 		iwd_radios =3D ','.join([r.name for r in self.radios if r.use =3D=3D 'iw=
+d'])
+ =
+
+ 		if self.args.valgrind:
+-			args.extend(['valgrind', '--leak-check=3Dfull', '--log-file=3D%s' % \
+-					'/tmp/valgrind.log'])
++			args.extend(['valgrind', '--leak-check=3Dfull', '--track-origins=3Dyes',
++						'--log-file=3D/tmp/valgrind.log'])
+ =
+
+ 		args.extend(['iwd', '-p', iwd_radios])
+ =
+
+@@ -1265,7 +1265,7 @@ class Main:
+ 			qemu_binary,
+ 			'-machine', 'type=3Dq35,accel=3Dkvm:tcg',
+ 			'-nodefaults', '-no-user-config', '-monitor', 'none',
+-			'-display', 'none', '-m', '192M', '-nographic', '-vga',
++			'-display', 'none', '-m', '256M', '-nographic', '-vga',
+ 			'none', '-no-acpi', '-no-hpet',
+ 			'-no-reboot', '-fsdev',
+ 			'local,id=3Dfsdev-root,path=3D/,readonly,security_model=3Dnone,multidev=
+s=3Dremap',
 -- =
 
 2.26.2
 
---===============4100620200194136262==--
+--===============0072494379946770996==--
 
