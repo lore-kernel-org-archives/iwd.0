@@ -1,43 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============9181432240655962296=="
+Content-Type: multipart/mixed; boundary="===============8473823901108998957=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] test-runner: add switch for genl debugging
-Date: Wed, 21 Oct 2020 14:36:52 -0700
-Message-ID: <20201021213652.1791048-2-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/2] test-runner: enable valgrind track origins
+Date: Thu, 22 Oct 2020 09:25:27 -0500
+Message-ID: <8d90abce-addb-8452-7dba-aab7b71bb7b6@gmail.com>
 In-Reply-To: <20201021213652.1791048-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============9181432240655962296==
+--===============8473823901108998957==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Providing 'iwd-genl' in the list of verbose options will enable
-IWD_GENL_DEBUG.
----
- tools/test-runner | 3 +++
- 1 file changed, 3 insertions(+)
+Hi James,
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 10db4c78..3ae4558c 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -578,6 +578,9 @@ class TestContext:
- 		if self.is_verbose('iwd-tls'):
- 			env['IWD_TLS_DEBUG'] =3D '1'
- =
+On 10/21/20 4:36 PM, James Prestwood wrote:
+> This gives a more exact location to where a memory problem
+> is happening. It also uses more RAM so the VM was upgraded to
+> 256MB from 192MB.
+> ---
+>   tools/test-runner | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> =
 
-+		if self.is_verbose('iwd-genl'):
-+			env['IWD_GENL_DEBUG'] =3D '1'
-+
- 		pid =3D self.start_process(args, env=3Denv)
- 		return pid
- =
 
--- =
+Both applied, thanks.
 
-2.26.2
+Regards,
+-Denis
 
---===============9181432240655962296==--
+--===============8473823901108998957==--
 
