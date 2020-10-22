@@ -1,131 +1,240 @@
-Content-Type: multipart/mixed; boundary="===============5481609392352676194=="
+Content-Type: multipart/mixed; boundary="===============0151732472916051360=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH v3 2/2] auto-t: add AP test with DHCP server
-Date: Thu, 22 Oct 2020 10:14:22 -0700
-Message-ID: <db27cf65e36a07c02d51fd2ba233b0d69c9c3535.camel@gmail.com>
-In-Reply-To: <CAOq732+PLLgXL4JPOY7PdOAJamXp7bBwr=pdhod2FPm6YSAOfQ@mail.gmail.com>
+Subject: [PATCH v4 1/3] ap: add support for DHCPv4 server
+Date: Thu, 22 Oct 2020 12:15:42 -0700
+Message-ID: <20201022191544.1848338-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5481609392352676194==
+--===============0151732472916051360==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+The DHCP server can be enabled by enabling network configuration
+with [General].EnableNetworkConfiguration. For now, the default
+DHCP settings will be used. If no address is set on the interface
+a default IP and broadcast address will be used.
+---
+ src/ap.c | 120 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 113 insertions(+), 7 deletions(-)
 
-On Thu, 2020-10-22 at 19:08 +0200, Andrew Zaborowski wrote:
-> Hi James,
-> =
+diff --git a/src/ap.c b/src/ap.c
+index 3c4ae907..866cbe58 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -26,6 +26,7 @@
+ =
 
-> On Thu, 22 Oct 2020 at 18:39, James Prestwood <prestwoj@gmail.com>
-> wrote:
-> > ---
-> >  autotests/testAP-DHCP/connection_test.py | 73
-> > ++++++++++++++++++++++++
-> >  autotests/testAP-DHCP/failure_test.py    | 54 ++++++++++++++++++
-> >  autotests/testAP-DHCP/hw.conf            |  3 +
-> >  autotests/testAP-DHCP/main.conf          |  5 ++
-> =
+ #include <errno.h>
+ #include <linux/if_ether.h>
++#include <netinet/in.h>
+ =
 
-> I wonder if DHCP should simply be enabled in testAP so the two tests
-> could be merged or just sit in one directory.  I don't think we
-> benefit from testing the no-DHCP scenario.  The extra hostapd radio
-> can be ignored in this test.
+ #include <ell/ell.h>
+ =
 
-Yeah your right, this makes more sense. I can just add another test to
-testAP that includes DHCP.
+@@ -74,6 +75,9 @@ struct ap_state {
+ 	uint16_t last_aid;
+ 	struct l_queue *sta_states;
+ =
 
-> =
++	struct l_dhcp_server *server;
++	uint32_t rtnl_add_cmd;
++
+ 	bool started : 1;
+ 	bool gtk_set : 1;
+ };
+@@ -105,6 +109,7 @@ struct ap_wsc_pbc_probe_record {
+ };
+ =
 
-> >  4 files changed, 135 insertions(+)
-> >  create mode 100644 autotests/testAP-DHCP/connection_test.py
-> >  create mode 100644 autotests/testAP-DHCP/failure_test.py
-> >  create mode 100644 autotests/testAP-DHCP/hw.conf
-> >  create mode 100644 autotests/testAP-DHCP/main.conf
-> > =
+ static uint32_t netdev_watch;
++struct l_netlink *rtnl;
+ =
 
-> > v3:
-> >  * Removed setting the IP since this is now done automatically
-> > =
+ void ap_config_free(struct ap_config *config)
+ {
+@@ -181,6 +186,9 @@ static void ap_reset(struct ap_state *ap)
+ 	if (ap->start_stop_cmd_id)
+ 		l_genl_family_cancel(ap->nl80211, ap->start_stop_cmd_id);
+ =
 
-> > diff --git a/autotests/testAP-DHCP/connection_test.py
-> > b/autotests/testAP-DHCP/connection_test.py
-> > new file mode 100644
-> > index 00000000..dd4466cd
-> > --- /dev/null
-> > +++ b/autotests/testAP-DHCP/connection_test.py
-> > @@ -0,0 +1,73 @@
-> > +#! /usr/bin/python3
-> > +
-> > +import unittest
-> > +import sys, os
-> > +
-> > +import iwd
-> > +from iwd import IWD
-> > +from iwd import PSKAgent
-> > +from iwd import NetworkType
-> > +from config import ctx
-> > +import testutil
-> > +
-> > +class Test(unittest.TestCase):
-> > +    def test_connection_success(self):
-> > +        wd =3D IWD(True)
-> > +
-> > +        dev1, dev2 =3D wd.list_devices(2)
-> > +
-> > +        dev1.start_ap('TestAP2', "Password2")
-> > +
-> > +        try:
-> > +            condition =3D 'not obj.scanning'
-> > +            wd.wait_for_object_condition(dev2, condition)
-> > +            dev2.scan()
-> > +            condition =3D 'obj.scanning'
-> > +            wd.wait_for_object_condition(dev2, condition)
-> > +            condition =3D 'not obj.scanning'
-> > +            wd.wait_for_object_condition(dev2, condition)
-> > +
-> > +            ordered_networks =3D dev2.get_ordered_networks()
-> > +
-> > +            networks =3D { n.name: n for n in ordered_networks }
-> > +            self.assertEqual(networks['TestAP2'].type,
-> > NetworkType.psk)
-> > +
-> > +            psk_agent =3D PSKAgent('Password2')
-> > +            wd.register_psk_agent(psk_agent)
-> > +
-> > +            try:
-> > +                dev2.disconnect()
-> > +
-> > +                condition =3D 'not obj.connected'
-> > +                wd.wait_for_object_condition(dev2, condition)
-> > +            except:
-> > +                pass
-> > +
-> > +            networks['TestAP2'].network_object.connect()
-> > +
-> > +            condition =3D 'obj.state =3D=3D DeviceState.connected'
-> > +            wd.wait_for_object_condition(dev2, condition)
-> > +
-> > +            testutil.test_iface_operstate(dev2.name)
-> > +            testutil.test_ifaces_connected(dev1.name, dev2.name,
-> > group=3DFalse)
-> =
++	if (ap->rtnl_add_cmd)
++		l_netlink_cancel(rtnl, ap->rtnl_add_cmd);
++
+ 	l_queue_destroy(ap->sta_states, ap_sta_free);
+ =
 
-> You could also call ifconfig here to check that DHCP worked and both
-> interfaces have IPs in the same subnet.
+ 	if (ap->rates)
+@@ -192,6 +200,9 @@ static void ap_reset(struct ap_state *ap)
+ 	l_queue_destroy(ap->wsc_pbc_probes, l_free);
+ =
 
-Good point. I do plan on adding a utility (or extending testutil) for
-testing IP communication as well. But in the interim I will just sanity
-check the IPs/subnet.
+ 	ap->started =3D false;
++
++	if (ap->server)
++		l_dhcp_server_stop(ap->server);
+ }
+ =
 
-Thanks,
-James
+ static void ap_del_station(struct sta_state *sta, uint16_t reason,
+@@ -1900,25 +1911,116 @@ static void ap_deauth_cb(const struct mmpdu_header=
+ *hdr, const void *body,
+ 	ap_sta_free(sta);
+ }
+ =
 
-> =
++static void do_debug(const char *str, void *user_data)
++{
++	const char *prefix =3D user_data;
++
++	l_info("%s%s", prefix, str);
++}
++
++static void ap_start_failed(struct ap_state *ap)
++{
++	ap->ops->handle_event(AP_EVENT_START_FAILED, NULL, ap->user_data);
++	ap_reset(ap);
++	l_genl_family_free(ap->nl80211);
++	l_free(ap);
++}
++
++static void ap_finish_setup(struct ap_state *ap, bool dhcp)
++{
++	if (dhcp && !l_dhcp_server_start(ap->server)) {
++		l_error("DHCP server failed to start");
++
++		ap_start_failed(ap);
++		return;
++	}
++
++	ap->started =3D true;
++	ap->ops->handle_event(AP_EVENT_STARTED, NULL, ap->user_data);
++}
++
++static void ap_ifaddr4_added_cb(int error, uint16_t type, const void *data,
++				uint32_t len, void *user_data)
++{
++	struct ap_state *ap =3D user_data;
++
++	if (error) {
++		l_error("Failed to set IP address");
++		ap_start_failed(ap);
++		return;
++	}
++
++	ap_finish_setup(ap, true);
++}
++
+ static void ap_start_cb(struct l_genl_msg *msg, void *user_data)
+ {
+ 	struct ap_state *ap =3D user_data;
++	uint32_t ifindex =3D netdev_get_ifindex(ap->netdev);
++	const struct l_settings *settings =3D iwd_get_config();
++	bool enabled =3D false;
++	struct in_addr ia;
+ =
 
-> Best regards
+ 	ap->start_stop_cmd_id =3D 0;
+ =
 
---===============5481609392352676194==--
+ 	if (l_genl_msg_get_error(msg) < 0) {
+ 		l_error("START_AP failed: %i", l_genl_msg_get_error(msg));
+ =
+
+-		ap->ops->handle_event(AP_EVENT_START_FAILED, NULL,
+-					ap->user_data);
+-		ap_reset(ap);
+-		l_genl_family_free(ap->nl80211);
+-		l_free(ap);
++		goto failed;
++	}
++
++	/*
++	 * Reusing [General].EnableNetworkConfiguration as a switch to enable
++	 * DHCP server. If no value is found or it is false do not create a
++	 * DHCP server.
++	 */
++	if (!l_settings_get_bool(settings, "General",
++					"EnableNetworkConfiguration", &enabled))
++		goto done;
++
++	if (!enabled)
++		goto done;
++
++	ap->server =3D l_dhcp_server_new(ifindex);
++	if (!ap->server) {
++		l_error("Failed to create DHCP server on %u", ifindex);
++		goto failed;
++	}
++
++	if (getenv("IWD_DHCP_DEBUG"))
++		l_dhcp_server_set_debug(ap->server, do_debug,
++							"[DHCPv4 SERV] ", NULL);
++
++	if (!l_net_get_address(ifindex, &ia) || ia.s_addr =3D=3D 0) {
++		ap->rtnl_add_cmd =3D l_rtnl_ifaddr4_add(rtnl, ifindex, 24,
++					"192.168.1.1", "255.255.255.0",
++					ap_ifaddr4_added_cb, ap, NULL);
++
++		if (!ap->rtnl_add_cmd) {
++			l_error("Failed to add IPv4 address");
++			goto failed;
++		}
++
++		/* Finish starting AP in added callback */
+ 		return;
+ 	}
+ =
+
+-	ap->started =3D true;
+-	ap->ops->handle_event(AP_EVENT_STARTED, NULL, ap->user_data);
++	/*
++	 * TODO: Add support for provisioning files where user could configure
++	 * specific DHCP sever settings.
++	 */
++
++	if (!l_dhcp_server_start(ap->server)) {
++		l_error("DHCP server failed to start");
++		goto failed;
++	}
++
++done:
++	ap_finish_setup(ap, enabled);
++	return;
++
++failed:
++	ap_start_failed(ap);
+ }
+ =
+
+ static struct l_genl_msg *ap_build_cmd_start_ap(struct ap_state *ap)
+@@ -2255,6 +2357,8 @@ void ap_free(struct ap_state *ap)
+ {
+ 	ap_reset(ap);
+ 	l_genl_family_free(ap->nl80211);
++	if (ap->server)
++		l_dhcp_server_destroy(ap->server);
+ 	l_free(ap);
+ }
+ =
+
+@@ -2535,6 +2639,8 @@ static int ap_init(void)
+ 	l_dbus_register_interface(dbus_get_bus(), IWD_AP_INTERFACE,
+ 			ap_setup_interface, ap_destroy_interface, false);
+ =
+
++	rtnl =3D iwd_get_rtnl();
++
+ 	return 0;
+ }
+ =
+
+-- =
+
+2.26.2
+
+--===============0151732472916051360==--
 
