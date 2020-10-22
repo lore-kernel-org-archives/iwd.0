@@ -1,244 +1,199 @@
-Content-Type: multipart/mixed; boundary="===============8158711024118476521=="
+Content-Type: multipart/mixed; boundary="===============4530422305718865844=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 1/2] ap: add support for DHCPv4 server
-Date: Thu, 22 Oct 2020 09:38:56 -0700
-Message-ID: <20201022163857.1836746-1-prestwoj@gmail.com>
+Subject: [PATCH v3 2/2] auto-t: add AP test with DHCP server
+Date: Thu, 22 Oct 2020 09:38:57 -0700
+Message-ID: <20201022163857.1836746-2-prestwoj@gmail.com>
+In-Reply-To: <20201022163857.1836746-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8158711024118476521==
+--===============4530422305718865844==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The DHCP server can be enabled by enabling network configuration
-with [General].EnableNetworkConfiguration. For now, the default
-DHCP settings will be used. If no address is set on the interface
-a default IP and broadcast address will be used.
 ---
- src/ap.c | 120 +++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 113 insertions(+), 7 deletions(-)
+ autotests/testAP-DHCP/connection_test.py | 73 ++++++++++++++++++++++++
+ autotests/testAP-DHCP/failure_test.py    | 54 ++++++++++++++++++
+ autotests/testAP-DHCP/hw.conf            |  3 +
+ autotests/testAP-DHCP/main.conf          |  5 ++
+ 4 files changed, 135 insertions(+)
+ create mode 100644 autotests/testAP-DHCP/connection_test.py
+ create mode 100644 autotests/testAP-DHCP/failure_test.py
+ create mode 100644 autotests/testAP-DHCP/hw.conf
+ create mode 100644 autotests/testAP-DHCP/main.conf
 
 v3:
- * Added support to set a default IP/broadcast address if one isn't
-   already set on the interface.
+ * Removed setting the IP since this is now done automatically
 
-diff --git a/src/ap.c b/src/ap.c
-index 3c4ae907..866cbe58 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -26,6 +26,7 @@
- =
-
- #include <errno.h>
- #include <linux/if_ether.h>
-+#include <netinet/in.h>
- =
-
- #include <ell/ell.h>
- =
-
-@@ -74,6 +75,9 @@ struct ap_state {
- 	uint16_t last_aid;
- 	struct l_queue *sta_states;
- =
-
-+	struct l_dhcp_server *server;
-+	uint32_t rtnl_add_cmd;
+diff --git a/autotests/testAP-DHCP/connection_test.py b/autotests/testAP-DH=
+CP/connection_test.py
+new file mode 100644
+index 00000000..dd4466cd
+--- /dev/null
++++ b/autotests/testAP-DHCP/connection_test.py
+@@ -0,0 +1,73 @@
++#! /usr/bin/python3
 +
- 	bool started : 1;
- 	bool gtk_set : 1;
- };
-@@ -105,6 +109,7 @@ struct ap_wsc_pbc_probe_record {
- };
- =
-
- static uint32_t netdev_watch;
-+struct l_netlink *rtnl;
- =
-
- void ap_config_free(struct ap_config *config)
- {
-@@ -181,6 +186,9 @@ static void ap_reset(struct ap_state *ap)
- 	if (ap->start_stop_cmd_id)
- 		l_genl_family_cancel(ap->nl80211, ap->start_stop_cmd_id);
- =
-
-+	if (ap->rtnl_add_cmd)
-+		l_netlink_cancel(rtnl, ap->rtnl_add_cmd);
++import unittest
++import sys, os
 +
- 	l_queue_destroy(ap->sta_states, ap_sta_free);
- =
-
- 	if (ap->rates)
-@@ -192,6 +200,9 @@ static void ap_reset(struct ap_state *ap)
- 	l_queue_destroy(ap->wsc_pbc_probes, l_free);
- =
-
- 	ap->started =3D false;
++import iwd
++from iwd import IWD
++from iwd import PSKAgent
++from iwd import NetworkType
++from config import ctx
++import testutil
 +
-+	if (ap->server)
-+		l_dhcp_server_stop(ap->server);
- }
- =
-
- static void ap_del_station(struct sta_state *sta, uint16_t reason,
-@@ -1900,25 +1911,116 @@ static void ap_deauth_cb(const struct mmpdu_header=
- *hdr, const void *body,
- 	ap_sta_free(sta);
- }
- =
-
-+static void do_debug(const char *str, void *user_data)
-+{
-+	const char *prefix =3D user_data;
++class Test(unittest.TestCase):
++    def test_connection_success(self):
++        wd =3D IWD(True)
 +
-+	l_info("%s%s", prefix, str);
-+}
++        dev1, dev2 =3D wd.list_devices(2)
 +
-+static void ap_start_failed(struct ap_state *ap)
-+{
-+	ap->ops->handle_event(AP_EVENT_START_FAILED, NULL, ap->user_data);
-+	ap_reset(ap);
-+	l_genl_family_free(ap->nl80211);
-+	l_free(ap);
-+}
++        dev1.start_ap('TestAP2', "Password2")
 +
-+static void ap_finish_setup(struct ap_state *ap, bool dhcp)
-+{
-+	if (dhcp && !l_dhcp_server_start(ap->server)) {
-+		l_error("DHCP server failed to start");
++        try:
++            condition =3D 'not obj.scanning'
++            wd.wait_for_object_condition(dev2, condition)
++            dev2.scan()
++            condition =3D 'obj.scanning'
++            wd.wait_for_object_condition(dev2, condition)
++            condition =3D 'not obj.scanning'
++            wd.wait_for_object_condition(dev2, condition)
 +
-+		ap_start_failed(ap);
-+		return;
-+	}
++            ordered_networks =3D dev2.get_ordered_networks()
 +
-+	ap->started =3D true;
-+	ap->ops->handle_event(AP_EVENT_STARTED, NULL, ap->user_data);
-+}
++            networks =3D { n.name: n for n in ordered_networks }
++            self.assertEqual(networks['TestAP2'].type, NetworkType.psk)
 +
-+static void ap_ifaddr4_added_cb(int error, uint16_t type, const void *data,
-+				uint32_t len, void *user_data)
-+{
-+	struct ap_state *ap =3D user_data;
++            psk_agent =3D PSKAgent('Password2')
++            wd.register_psk_agent(psk_agent)
 +
-+	if (error) {
-+		l_error("Failed to set IP address");
-+		ap_start_failed(ap);
-+		return;
-+	}
++            try:
++                dev2.disconnect()
 +
-+	ap_finish_setup(ap, true);
-+}
++                condition =3D 'not obj.connected'
++                wd.wait_for_object_condition(dev2, condition)
++            except:
++                pass
 +
- static void ap_start_cb(struct l_genl_msg *msg, void *user_data)
- {
- 	struct ap_state *ap =3D user_data;
-+	uint32_t ifindex =3D netdev_get_ifindex(ap->netdev);
-+	const struct l_settings *settings =3D iwd_get_config();
-+	bool enabled =3D false;
-+	struct in_addr ia;
- =
-
- 	ap->start_stop_cmd_id =3D 0;
- =
-
- 	if (l_genl_msg_get_error(msg) < 0) {
- 		l_error("START_AP failed: %i", l_genl_msg_get_error(msg));
- =
-
--		ap->ops->handle_event(AP_EVENT_START_FAILED, NULL,
--					ap->user_data);
--		ap_reset(ap);
--		l_genl_family_free(ap->nl80211);
--		l_free(ap);
-+		goto failed;
-+	}
++            networks['TestAP2'].network_object.connect()
 +
-+	/*
-+	 * Reusing [General].EnableNetworkConfiguration as a switch to enable
-+	 * DHCP server. If no value is found or it is false do not create a
-+	 * DHCP server.
-+	 */
-+	if (!l_settings_get_bool(settings, "General",
-+					"EnableNetworkConfiguration", &enabled))
-+		goto done;
++            condition =3D 'obj.state =3D=3D DeviceState.connected'
++            wd.wait_for_object_condition(dev2, condition)
 +
-+	if (!enabled)
-+		goto done;
++            testutil.test_iface_operstate(dev2.name)
++            testutil.test_ifaces_connected(dev1.name, dev2.name, group=3DF=
+alse)
 +
-+	ap->server =3D l_dhcp_server_new(ifindex);
-+	if (!ap->server) {
-+		l_error("Failed to create DHCP server on %u", ifindex);
-+		goto failed;
-+	}
++            wd.unregister_psk_agent(psk_agent)
 +
-+	if (getenv("IWD_DHCP_DEBUG"))
-+		l_dhcp_server_set_debug(ap->server, do_debug,
-+							"[DHCPv4 SERV] ", NULL);
++            dev2.disconnect()
 +
-+	if (!l_net_get_address(ifindex, &ia) || ia.s_addr =3D=3D 0) {
-+		ap->rtnl_add_cmd =3D l_rtnl_ifaddr4_add(rtnl, ifindex, 24,
-+					"192.168.1.1", "255.255.255.0",
-+					ap_ifaddr4_added_cb, ap, NULL);
++            condition =3D 'not obj.connected'
++            wd.wait_for_object_condition(networks['TestAP2'].network_objec=
+t,
++                                         condition)
++        finally:
++            dev1.stop_ap()
 +
-+		if (!ap->rtnl_add_cmd) {
-+			l_error("Failed to add IPv4 address");
-+			goto failed;
-+		}
++    @classmethod
++    def setUpClass(cls):
++        pass
 +
-+		/* Finish starting AP in added callback */
- 		return;
- 	}
- =
-
--	ap->started =3D true;
--	ap->ops->handle_event(AP_EVENT_STARTED, NULL, ap->user_data);
-+	/*
-+	 * TODO: Add support for provisioning files where user could configure
-+	 * specific DHCP sever settings.
-+	 */
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
 +
-+	if (!l_dhcp_server_start(ap->server)) {
-+		l_error("DHCP server failed to start");
-+		goto failed;
-+	}
++if __name__ =3D=3D '__main__':
++    unittest.main(exit=3DTrue)
+diff --git a/autotests/testAP-DHCP/failure_test.py b/autotests/testAP-DHCP/=
+failure_test.py
+new file mode 100644
+index 00000000..0c2f4e41
+--- /dev/null
++++ b/autotests/testAP-DHCP/failure_test.py
+@@ -0,0 +1,54 @@
++#! /usr/bin/python3
 +
-+done:
-+	ap_finish_setup(ap, enabled);
-+	return;
++import unittest
++import sys, os
 +
-+failed:
-+	ap_start_failed(ap);
- }
- =
-
- static struct l_genl_msg *ap_build_cmd_start_ap(struct ap_state *ap)
-@@ -2255,6 +2357,8 @@ void ap_free(struct ap_state *ap)
- {
- 	ap_reset(ap);
- 	l_genl_family_free(ap->nl80211);
-+	if (ap->server)
-+		l_dhcp_server_destroy(ap->server);
- 	l_free(ap);
- }
- =
-
-@@ -2535,6 +2639,8 @@ static int ap_init(void)
- 	l_dbus_register_interface(dbus_get_bus(), IWD_AP_INTERFACE,
- 			ap_setup_interface, ap_destroy_interface, false);
- =
-
-+	rtnl =3D iwd_get_rtnl();
++sys.path.append('../util')
++import iwd
++from iwd import IWD
++from iwd import PSKAgent
++from iwd import NetworkType
++from config import ctx
++import testutil
 +
- 	return 0;
- }
- =
-
++class Test(unittest.TestCase):
++    def test_connection_failure(self):
++        wd =3D IWD(True)
++
++        dev1, dev2 =3D wd.list_devices(2)
++
++        dev1.start_ap('TestAP2', 'Password2')
++
++        try:
++            condition =3D 'not obj.scanning'
++            wd.wait_for_object_condition(dev2, condition)
++            dev2.scan()
++            condition =3D 'obj.scanning'
++            wd.wait_for_object_condition(dev2, condition)
++            condition =3D 'not obj.scanning'
++            wd.wait_for_object_condition(dev2, condition)
++
++            ordered_networks =3D dev2.get_ordered_networks()
++            networks =3D { n.name: n for n in ordered_networks }
++            self.assertEqual(networks['TestAP2'].type, NetworkType.psk)
++
++            psk_agent =3D PSKAgent('InvalidPassword')
++            wd.register_psk_agent(psk_agent)
++
++            with self.assertRaises(iwd.FailedEx):
++                networks['TestAP2'].network_object.connect()
++
++            wd.unregister_psk_agent(psk_agent)
++        finally:
++            dev1.stop_ap()
++
++    @classmethod
++    def setUpClass(cls):
++        pass
++
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
++
++if __name__ =3D=3D '__main__':
++    unittest.main(exit=3DTrue)
+diff --git a/autotests/testAP-DHCP/hw.conf b/autotests/testAP-DHCP/hw.conf
+new file mode 100644
+index 00000000..c6553537
+--- /dev/null
++++ b/autotests/testAP-DHCP/hw.conf
+@@ -0,0 +1,3 @@
++[SETUP]
++num_radios=3D2
++start_iwd=3D0
+diff --git a/autotests/testAP-DHCP/main.conf b/autotests/testAP-DHCP/main.c=
+onf
+new file mode 100644
+index 00000000..25ebe4ff
+--- /dev/null
++++ b/autotests/testAP-DHCP/main.conf
+@@ -0,0 +1,5 @@
++[Scan]
++DisableMacAddressRandomization=3Dtrue
++
++[General]
++EnableNetworkConfiguration=3Dtrue
 -- =
 
 2.26.2
 
---===============8158711024118476521==--
+--===============4530422305718865844==--
 
