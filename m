@@ -1,240 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============0151732472916051360=="
+Content-Type: multipart/mixed; boundary="===============0854333488690186935=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 1/3] ap: add support for DHCPv4 server
-Date: Thu, 22 Oct 2020 12:15:42 -0700
-Message-ID: <20201022191544.1848338-1-prestwoj@gmail.com>
+Subject: [PATCH v4 2/3] auto-t: testutil: add test_ip_address_match
+Date: Thu, 22 Oct 2020 12:15:43 -0700
+Message-ID: <20201022191544.1848338-2-prestwoj@gmail.com>
+In-Reply-To: <20201022191544.1848338-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0151732472916051360==
+--===============0854333488690186935==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The DHCP server can be enabled by enabling network configuration
-with [General].EnableNetworkConfiguration. For now, the default
-DHCP settings will be used. If no address is set on the interface
-a default IP and broadcast address will be used.
+Checks that the the IP address for a given interface matches
 ---
- src/ap.c | 120 +++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 113 insertions(+), 7 deletions(-)
+ autotests/util/testutil.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/src/ap.c b/src/ap.c
-index 3c4ae907..866cbe58 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -26,6 +26,7 @@
+diff --git a/autotests/util/testutil.py b/autotests/util/testutil.py
+index f9cfbf29..faa81f65 100644
+--- a/autotests/util/testutil.py
++++ b/autotests/util/testutil.py
+@@ -125,6 +125,7 @@ def test_ifaces_connected(if0=3DNone, if1=3DNone, group=
+=3DTrue):
+             raise e
  =
 
- #include <errno.h>
- #include <linux/if_ether.h>
-+#include <netinet/in.h>
+ SIOCGIFFLAGS =3D 0x8913
++SIOCGIFADDR =3D 0x8915
+ IFF_UP =3D 1 << 0
+ IFF_RUNNING =3D 1 << 6
  =
 
- #include <ell/ell.h>
- =
-
-@@ -74,6 +75,9 @@ struct ap_state {
- 	uint16_t last_aid;
- 	struct l_queue *sta_states;
- =
-
-+	struct l_dhcp_server *server;
-+	uint32_t rtnl_add_cmd;
+@@ -143,3 +144,11 @@ def test_iface_operstate(intf=3DNone):
+             raise Exception(intf + ' operstate wrong')
+     finally:
+         sock.close()
 +
- 	bool started : 1;
- 	bool gtk_set : 1;
- };
-@@ -105,6 +109,7 @@ struct ap_wsc_pbc_probe_record {
- };
- =
-
- static uint32_t netdev_watch;
-+struct l_netlink *rtnl;
- =
-
- void ap_config_free(struct ap_config *config)
- {
-@@ -181,6 +186,9 @@ static void ap_reset(struct ap_state *ap)
- 	if (ap->start_stop_cmd_id)
- 		l_genl_family_cancel(ap->nl80211, ap->start_stop_cmd_id);
- =
-
-+	if (ap->rtnl_add_cmd)
-+		l_netlink_cancel(rtnl, ap->rtnl_add_cmd);
++def test_ip_address_match(intf, ip):
++    s =3D socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
++    addr =3D fcntl.ioctl(s.fileno(), SIOCGIFADDR, struct.pack('256s', intf=
+.encode('utf-8')))
++    addr =3D socket.inet_ntoa(addr[20:24])
 +
- 	l_queue_destroy(ap->sta_states, ap_sta_free);
- =
-
- 	if (ap->rates)
-@@ -192,6 +200,9 @@ static void ap_reset(struct ap_state *ap)
- 	l_queue_destroy(ap->wsc_pbc_probes, l_free);
- =
-
- 	ap->started =3D false;
-+
-+	if (ap->server)
-+		l_dhcp_server_stop(ap->server);
- }
- =
-
- static void ap_del_station(struct sta_state *sta, uint16_t reason,
-@@ -1900,25 +1911,116 @@ static void ap_deauth_cb(const struct mmpdu_header=
- *hdr, const void *body,
- 	ap_sta_free(sta);
- }
- =
-
-+static void do_debug(const char *str, void *user_data)
-+{
-+	const char *prefix =3D user_data;
-+
-+	l_info("%s%s", prefix, str);
-+}
-+
-+static void ap_start_failed(struct ap_state *ap)
-+{
-+	ap->ops->handle_event(AP_EVENT_START_FAILED, NULL, ap->user_data);
-+	ap_reset(ap);
-+	l_genl_family_free(ap->nl80211);
-+	l_free(ap);
-+}
-+
-+static void ap_finish_setup(struct ap_state *ap, bool dhcp)
-+{
-+	if (dhcp && !l_dhcp_server_start(ap->server)) {
-+		l_error("DHCP server failed to start");
-+
-+		ap_start_failed(ap);
-+		return;
-+	}
-+
-+	ap->started =3D true;
-+	ap->ops->handle_event(AP_EVENT_STARTED, NULL, ap->user_data);
-+}
-+
-+static void ap_ifaddr4_added_cb(int error, uint16_t type, const void *data,
-+				uint32_t len, void *user_data)
-+{
-+	struct ap_state *ap =3D user_data;
-+
-+	if (error) {
-+		l_error("Failed to set IP address");
-+		ap_start_failed(ap);
-+		return;
-+	}
-+
-+	ap_finish_setup(ap, true);
-+}
-+
- static void ap_start_cb(struct l_genl_msg *msg, void *user_data)
- {
- 	struct ap_state *ap =3D user_data;
-+	uint32_t ifindex =3D netdev_get_ifindex(ap->netdev);
-+	const struct l_settings *settings =3D iwd_get_config();
-+	bool enabled =3D false;
-+	struct in_addr ia;
- =
-
- 	ap->start_stop_cmd_id =3D 0;
- =
-
- 	if (l_genl_msg_get_error(msg) < 0) {
- 		l_error("START_AP failed: %i", l_genl_msg_get_error(msg));
- =
-
--		ap->ops->handle_event(AP_EVENT_START_FAILED, NULL,
--					ap->user_data);
--		ap_reset(ap);
--		l_genl_family_free(ap->nl80211);
--		l_free(ap);
-+		goto failed;
-+	}
-+
-+	/*
-+	 * Reusing [General].EnableNetworkConfiguration as a switch to enable
-+	 * DHCP server. If no value is found or it is false do not create a
-+	 * DHCP server.
-+	 */
-+	if (!l_settings_get_bool(settings, "General",
-+					"EnableNetworkConfiguration", &enabled))
-+		goto done;
-+
-+	if (!enabled)
-+		goto done;
-+
-+	ap->server =3D l_dhcp_server_new(ifindex);
-+	if (!ap->server) {
-+		l_error("Failed to create DHCP server on %u", ifindex);
-+		goto failed;
-+	}
-+
-+	if (getenv("IWD_DHCP_DEBUG"))
-+		l_dhcp_server_set_debug(ap->server, do_debug,
-+							"[DHCPv4 SERV] ", NULL);
-+
-+	if (!l_net_get_address(ifindex, &ia) || ia.s_addr =3D=3D 0) {
-+		ap->rtnl_add_cmd =3D l_rtnl_ifaddr4_add(rtnl, ifindex, 24,
-+					"192.168.1.1", "255.255.255.0",
-+					ap_ifaddr4_added_cb, ap, NULL);
-+
-+		if (!ap->rtnl_add_cmd) {
-+			l_error("Failed to add IPv4 address");
-+			goto failed;
-+		}
-+
-+		/* Finish starting AP in added callback */
- 		return;
- 	}
- =
-
--	ap->started =3D true;
--	ap->ops->handle_event(AP_EVENT_STARTED, NULL, ap->user_data);
-+	/*
-+	 * TODO: Add support for provisioning files where user could configure
-+	 * specific DHCP sever settings.
-+	 */
-+
-+	if (!l_dhcp_server_start(ap->server)) {
-+		l_error("DHCP server failed to start");
-+		goto failed;
-+	}
-+
-+done:
-+	ap_finish_setup(ap, enabled);
-+	return;
-+
-+failed:
-+	ap_start_failed(ap);
- }
- =
-
- static struct l_genl_msg *ap_build_cmd_start_ap(struct ap_state *ap)
-@@ -2255,6 +2357,8 @@ void ap_free(struct ap_state *ap)
- {
- 	ap_reset(ap);
- 	l_genl_family_free(ap->nl80211);
-+	if (ap->server)
-+		l_dhcp_server_destroy(ap->server);
- 	l_free(ap);
- }
- =
-
-@@ -2535,6 +2639,8 @@ static int ap_init(void)
- 	l_dbus_register_interface(dbus_get_bus(), IWD_AP_INTERFACE,
- 			ap_setup_interface, ap_destroy_interface, false);
- =
-
-+	rtnl =3D iwd_get_rtnl();
-+
- 	return 0;
- }
- =
-
++    if ip !=3D addr:
++        raise Exception('IP for %s did not match %s (was %s)' % (intf, ip,=
+ addr))
 -- =
 
 2.26.2
 
---===============0151732472916051360==--
+--===============0854333488690186935==--
 
