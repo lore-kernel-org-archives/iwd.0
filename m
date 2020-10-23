@@ -1,42 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============5323028848243723798=="
+Content-Type: multipart/mixed; boundary="===============0054860502266000170=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] auto-t: wait for mode change to finish on stop_ap
-Date: Fri, 23 Oct 2020 15:18:59 -0700
-Message-ID: <20201023221900.1974722-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] auto-t: only return expected number from list_devices
+Date: Fri, 23 Oct 2020 15:19:00 -0700
+Message-ID: <20201023221900.1974722-2-prestwoj@gmail.com>
+In-Reply-To: <20201023221900.1974722-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5323028848243723798==
+--===============0054860502266000170==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+If the caller specifies the number of devices only return that many.
+Some sub-tests may only need a subset of the total number of devices
+for the test. If the number of devices expected is less than the total
+being returned, python would throw an exception.
 ---
- autotests/util/iwd.py | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ autotests/util/iwd.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 9bfc8c1a..c65dd4a2 100755
+index c65dd4a2..b557c17f 100755
 --- a/autotests/util/iwd.py
 +++ b/autotests/util/iwd.py
-@@ -481,7 +481,10 @@ class Device(IWDDBusAbstract):
-         self._wait_for_async_op()
+@@ -1085,7 +1085,7 @@ class IWD(AsyncOpAbstract):
+             if not self._wait_timed_out:
+                 GLib.source_remove(timeout)
  =
 
-     def stop_ap(self):
--        self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
-+        self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station',
-+                                reply_handler=3Dself._success,
-+                                error_handler=3Dself._failure)
-+        self._wait_for_async_op()
+-        return list(self._devices.values() if not p2p else self._devices.p=
+2p_dict.values())
++        return list(self._devices.values() if not p2p else self._devices.p=
+2p_dict.values())[:wait_to_appear]
  =
 
-     def connect_hidden_network(self, name):
-         '''Connect to a hidden network
+     def list_p2p_devices(self, *args, **kwargs):
+         return self.list_devices(*args, **kwargs, p2p=3DTrue)
 -- =
 
 2.26.2
 
---===============5323028848243723798==--
+--===============0054860502266000170==--
 
