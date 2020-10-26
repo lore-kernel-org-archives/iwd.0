@@ -1,114 +1,128 @@
-Content-Type: multipart/mixed; boundary="===============3454313059197129722=="
+Content-Type: multipart/mixed; boundary="===============8089394326937846554=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 2/6] unit: add test for util_ip_prefix_tohl
-Date: Mon, 26 Oct 2020 11:05:40 -0700
-Message-ID: <20201026180544.2130802-2-prestwoj@gmail.com>
+Subject: [PATCH v5 3/6] ap: add error out param to ap_start
+Date: Mon, 26 Oct 2020 11:05:41 -0700
+Message-ID: <20201026180544.2130802-3-prestwoj@gmail.com>
 In-Reply-To: <20201026180544.2130802-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3454313059197129722==
+--===============8089394326937846554==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This allows the caller to extract a bit more information about what
+exactly went wrong.
 ---
- unit/test-util.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+ src/ap.c  | 18 +++++++++++++++---
+ src/ap.h  |  3 ++-
+ src/p2p.c |  2 +-
+ 3 files changed, 18 insertions(+), 5 deletions(-)
 
-diff --git a/unit/test-util.c b/unit/test-util.c
-index f091f2c2..09af925e 100644
---- a/unit/test-util.c
-+++ b/unit/test-util.c
-@@ -27,6 +27,8 @@
- #include <stdio.h>
- #include <string.h>
- #include <assert.h>
-+#include <netinet/in.h>
-+#include <arpa/inet.h>
- #include <ell/ell.h>
- =
-
- #include "src/util.h"
-@@ -115,6 +117,64 @@ static void get_username_test(const void *data)
- 	assert(strcmp(test, "username") =3D=3D 0);
- }
- =
-
-+static void ip_prefix_test(const void *data)
-+{
-+	unsigned int i;
-+	char *invalid[] =3D {
-+		"192.168.0.0", /* Not prefix notation */
-+		"192.168./22", /* Incomplete notation */
-+		"192.168.0.1/255", /* Too long prefix */
-+		"192.168.0.1/0", /* Too short prefix */
-+		"192.168.0.1/16", /* Invalid prefix */
-+		"192.168.1.2.3/24", /* IP too long */
-+	};
-+
-+	struct {
-+		char *ip_prefix;
-+		uint8_t prefix;
-+		char *start;
-+		char *end;
-+		char *mask;
-+	} valid[] =3D {
-+		{"192.168.80.0/22", 22, "192.168.80.1",
-+				"192.168.83.254", "255.255.252.0"},
-+		{"192.168.128.0/20", 20, "192.168.128.1",
-+				"192.168.143.254", "255.255.240.0"},
-+		{"192.168.0.0/25", 25, "192.168.0.1",
-+				"192.168.0.126", "255.255.255.128"},
-+		{"192.168.0.0/29", 29, "192.168.0.1",
-+				"192.168.0.6", "255.255.255.248"},
-+		{"192.168.0.128/25", 25, "192.168.0.129",
-+				"192.168.0.254", "255.255.255.128"},
-+	};
-+
-+	for (i =3D 0; i < L_ARRAY_SIZE(invalid); i++)
-+		assert(!util_ip_prefix_tohl(invalid[i], NULL, NULL,
-+						NULL, NULL));
-+
-+	for (i =3D 0; i < L_ARRAY_SIZE(valid); i++) {
-+		uint8_t prefix;
-+		uint32_t start;
-+		uint32_t end;
-+		uint32_t mask;
-+		struct in_addr ia;
-+
-+		assert(util_ip_prefix_tohl(valid[i].ip_prefix,
-+						&prefix, &start, &end, &mask));
-+
-+		assert(valid[i].prefix =3D=3D prefix);
-+
-+		ia.s_addr =3D htonl(start);
-+		assert(strcmp(inet_ntoa(ia), valid[i].start) =3D=3D 0);
-+
-+		ia.s_addr =3D htonl(end);
-+		assert(strcmp(inet_ntoa(ia), valid[i].end) =3D=3D 0);
-+
-+		ia.s_addr =3D htonl(mask);
-+		assert(strcmp(inet_ntoa(ia), valid[i].mask) =3D=3D 0);
-+	}
-+}
-+
- int main(int argc, char *argv[])
+diff --git a/src/ap.c b/src/ap.c
+index 3c4ae907..b10b65ae 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -2033,12 +2033,17 @@ static void ap_mlme_notify(struct l_genl_msg *msg, =
+void *user_data)
+  * to by its members (which also can't be static).
+  */
+ struct ap_state *ap_start(struct netdev *netdev, struct ap_config *config,
+-				const struct ap_ops *ops, void *user_data)
++				const struct ap_ops *ops, int *err_out,
++				void *user_data)
  {
- 	l_test_init(&argc, &argv);
-@@ -122,6 +182,7 @@ int main(int argc, char *argv[])
- 	l_test_add("/util/ssid_to_utf8/", ssid_to_utf8, ssid_samples);
- 	l_test_add("/util/get_domain/", get_domain_test, NULL);
- 	l_test_add("/util/get_username/", get_username_test, NULL);
-+	l_test_add("/util/ip_prefix/", ip_prefix_test, NULL);
+ 	struct ap_state *ap;
+ 	struct wiphy *wiphy =3D netdev_get_wiphy(netdev);
+ 	struct l_genl_msg *cmd;
+ 	uint64_t wdev_id =3D netdev_get_wdev_id(netdev);
++	int err =3D -EINVAL;
++
++	if (err_out)
++		*err_out =3D err;
  =
 
- 	return l_test_run();
- }
+ 	if (L_WARN_ON(!config->ssid))
+ 		return NULL;
+@@ -2146,9 +2151,15 @@ struct ap_state *ap_start(struct netdev *netdev, str=
+uct ap_config *config,
+ 		goto error;
+ 	}
+ =
+
++	if (err_out)
++		*err_out =3D 0;
++
+ 	return ap;
+ =
+
+ error:
++	if (err_out)
++		*err_out =3D err;
++
+ 	ap_reset(ap);
+ 	l_genl_family_free(ap->nl80211);
+ 	l_free(ap);
+@@ -2382,6 +2393,7 @@ static struct l_dbus_message *ap_dbus_start(struct l_=
+dbus *dbus,
+ 	struct ap_if_data *ap_if =3D user_data;
+ 	const char *ssid, *wpa2_passphrase;
+ 	struct ap_config *config;
++	int err;
+ =
+
+ 	if (ap_if->ap && ap_if->ap->started)
+ 		return dbus_error_already_exists(message);
+@@ -2398,10 +2410,10 @@ static struct l_dbus_message *ap_dbus_start(struct =
+l_dbus *dbus,
+ 	l_strlcpy(config->passphrase, wpa2_passphrase,
+ 			sizeof(config->passphrase));
+ =
+
+-	ap_if->ap =3D ap_start(ap_if->netdev, config, &ap_dbus_ops, ap_if);
++	ap_if->ap =3D ap_start(ap_if->netdev, config, &ap_dbus_ops, &err, ap_if);
+ 	if (!ap_if->ap) {
+ 		ap_config_free(config);
+-		return dbus_error_invalid_args(message);
++		return dbus_error_from_errno(err, message);
+ 	}
+ =
+
+ 	ap_if->pending =3D l_dbus_message_ref(message);
+diff --git a/src/ap.h b/src/ap.h
+index a39797aa..1f2d438a 100644
+--- a/src/ap.h
++++ b/src/ap.h
+@@ -74,7 +74,8 @@ struct ap_ops {
+ void ap_config_free(struct ap_config *config);
+ =
+
+ struct ap_state *ap_start(struct netdev *netdev, struct ap_config *config,
+-				const struct ap_ops *ops, void *user_data);
++				const struct ap_ops *ops, int *err,
++				void *user_data);
+ void ap_shutdown(struct ap_state *ap, ap_stopped_func_t stopped_func,
+ 			void *user_data);
+ void ap_free(struct ap_state *ap);
+diff --git a/src/p2p.c b/src/p2p.c
+index 417ce3d6..6932033c 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -754,7 +754,7 @@ static void p2p_group_start(struct p2p_device *dev)
+ 	dev->capability.group_caps |=3D P2P_GROUP_CAP_GO;
+ 	dev->capability.group_caps |=3D P2P_GROUP_CAP_GROUP_FORMATION;
+ =
+
+-	dev->group =3D ap_start(dev->conn_netdev, config, &p2p_go_ops, dev);
++	dev->group =3D ap_start(dev->conn_netdev, config, &p2p_go_ops, NULL, dev);
+ 	if (!dev->group) {
+ 		ap_config_free(config);
+ 		p2p_connect_failed(dev);
 -- =
 
 2.26.2
 
---===============3454313059197129722==--
+--===============8089394326937846554==--
 
