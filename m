@@ -1,121 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============5156280850236474949=="
+Content-Type: multipart/mixed; boundary="===============7481144568707505483=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] unit: add test for util_ip_prefix_tohl
-Date: Mon, 26 Oct 2020 13:35:14 -0700
-Message-ID: <20201026203514.2164608-2-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/2] util: add util_ip_prefix_tohl
+Date: Mon, 26 Oct 2020 16:17:01 -0500
+Message-ID: <93c1ec58-afaa-8107-57c1-a984b904314a@gmail.com>
 In-Reply-To: <20201026203514.2164608-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5156280850236474949==
+--===============7481144568707505483==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- unit/test-util.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+Hi James,
 
- - Added a very long invalid IP string test
- - Added a valid IP string that is maximum length possible
+On 10/26/20 3:35 PM, James Prestwood wrote:
+> Parses an IP prefix notation string into prefix, start, end, and
+> netmask. All values are returned in host order.
+> ---
+>   src/util.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   src/util.h |  3 ++
+>   2 files changed, 93 insertions(+)
+> =
 
-diff --git a/unit/test-util.c b/unit/test-util.c
-index f091f2c2..c3f8c673 100644
---- a/unit/test-util.c
-+++ b/unit/test-util.c
-@@ -27,6 +27,8 @@
- #include <stdio.h>
- #include <string.h>
- #include <assert.h>
-+#include <netinet/in.h>
-+#include <arpa/inet.h>
- #include <ell/ell.h>
- =
+>   - Moved these two into their own set
+>   - Changed the loop to only iterate over the maximum IP string size (16).
+>     This prevents looping through a really long (invalid) IP string
+>   - Use l_strlcpy instead of memcpy + NULL terminate
 
- #include "src/util.h"
-@@ -115,6 +117,68 @@ static void get_username_test(const void *data)
- 	assert(strcmp(test, "username") =3D=3D 0);
- }
- =
+<snip>
 
-+static void ip_prefix_test(const void *data)
-+{
-+	unsigned int i;
-+	char *invalid[] =3D {
-+		"192.168.0.0", /* Not prefix notation */
-+		"192.168./22", /* Incomplete notation */
-+		"192.168.0.1/255", /* Too long prefix */
-+		"192.168.0.1/0", /* Too short prefix */
-+		"192.168.0.1/16", /* Invalid prefix */
-+		"192.168.1.2.3/24", /* IP too long */
-+		"192.168.111.222.333.444/20", /* IP way too long */
-+	};
-+
-+	struct {
-+		char *ip_prefix;
-+		uint8_t prefix;
-+		char *start;
-+		char *end;
-+		char *mask;
-+	} valid[] =3D {
-+		{"192.168.80.0/22", 22, "192.168.80.1",
-+				"192.168.83.254", "255.255.252.0"},
-+		{"192.168.128.0/20", 20, "192.168.128.1",
-+				"192.168.143.254", "255.255.240.0"},
-+		{"192.168.0.0/25", 25, "192.168.0.1",
-+				"192.168.0.126", "255.255.255.128"},
-+		{"192.168.0.0/29", 29, "192.168.0.1",
-+				"192.168.0.6", "255.255.255.248"},
-+		{"192.168.0.128/25", 25, "192.168.0.129",
-+				"192.168.0.254", "255.255.255.128"},
-+		/* Valid notation which is maximum length */
-+		{"192.168.111.108/30", 30, "192.168.111.109",
-+				"192.168.111.110", "255.255.255.252"},
-+	};
-+
-+	for (i =3D 0; i < L_ARRAY_SIZE(invalid); i++)
-+		assert(!util_ip_prefix_tohl(invalid[i], NULL, NULL,
-+						NULL, NULL));
-+
-+	for (i =3D 0; i < L_ARRAY_SIZE(valid); i++) {
-+		uint8_t prefix;
-+		uint32_t start;
-+		uint32_t end;
-+		uint32_t mask;
-+		struct in_addr ia;
-+
-+		assert(util_ip_prefix_tohl(valid[i].ip_prefix,
-+						&prefix, &start, &end, &mask));
-+
-+		assert(valid[i].prefix =3D=3D prefix);
-+
-+		ia.s_addr =3D htonl(start);
-+		assert(strcmp(inet_ntoa(ia), valid[i].start) =3D=3D 0);
-+
-+		ia.s_addr =3D htonl(end);
-+		assert(strcmp(inet_ntoa(ia), valid[i].end) =3D=3D 0);
-+
-+		ia.s_addr =3D htonl(mask);
-+		assert(strcmp(inet_ntoa(ia), valid[i].mask) =3D=3D 0);
-+	}
-+}
-+
- int main(int argc, char *argv[])
- {
- 	l_test_init(&argc, &argv);
-@@ -122,6 +186,7 @@ int main(int argc, char *argv[])
- 	l_test_add("/util/ssid_to_utf8/", ssid_to_utf8, ssid_samples);
- 	l_test_add("/util/get_domain/", get_domain_test, NULL);
- 	l_test_add("/util/get_username/", get_username_test, NULL);
-+	l_test_add("/util/ip_prefix/", ip_prefix_test, NULL);
- =
+> +	/*
+> +	 * Only iterate over the max length of an IP in case of invalid long
+> +	 * inputs.
+> +	 */
+> +	for (i =3D 0; i < INET_ADDRSTRLEN && ip[i] !=3D '\0'; i++) {
+> +		/* Found '/', check the next byte exists and parse prefix */
+> +		if (ip[i] =3D=3D '/' && ip[i + 1] !=3D '\0') {
+> +			prefix =3D strtol(ip + i + 1, &endp, 10);
 
- 	return l_test_run();
- }
--- =
+I changed this to strtoul and..
 
-2.26.2
+> +			if (*endp !=3D '\0')
+> +				return false;
+> +
+> +			break;
+> +		}
+> +	}
 
---===============5156280850236474949==--
+Both applied, thanks.
+
+--===============7481144568707505483==--
 
