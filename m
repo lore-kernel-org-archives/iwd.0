@@ -1,52 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============5068035886661383630=="
+Content-Type: multipart/mixed; boundary="===============0449790205938846962=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v6 1/3] ap: add support for DHCPv4 server
-Date: Tue, 27 Oct 2020 16:20:12 -0500
-Message-ID: <1cc70635-4273-ddc9-f8ea-92642ac1f475@gmail.com>
-In-Reply-To: <20201027195749.2266686-1-prestwoj@gmail.com>
+From: John Zimmermann <me@johnnynator.dev>
+Subject: [PATCH] resolve: allow setting default DNS resolver at compile time
+Date: Tue, 27 Oct 2020 22:31:06 +0100
+Message-ID: <20201027213106.30028-1-me@johnnynator.dev>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5068035886661383630==
+--===============0449790205938846962==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ configure.ac  | 15 +++++++++++++++
+ src/resolve.c |  4 ++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
 
-On 10/27/20 2:57 PM, James Prestwood wrote:
-> The DHCP server can be enabled by enabling network configuration
-> with [General].EnableNetworkConfiguration. If an IP is not set
-> on the interface before the AP is started a valid IP range must
-> also be provided under [General].APRanges in IP prefix format e.g.
-> =
+diff --git a/configure.ac b/configure.ac
+index 78db15e9..0adddd10 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -250,6 +250,21 @@ if (test "${enable_systemd_service}" !=3D "no" && test=
+ -z "${path_systemd_modloadd
+ fi
+ AC_SUBST(SYSTEMD_MODLOADDIR, [${path_systemd_modloaddir}])
+ =
 
-> [General]
-> EnableNetworkConfiguration=3Dtrue
-> APRanges=3D192.168.1.1/24
-> =
++AC_ARG_WITH(resolver, AC_HELP_STRING([--with-resolver=3D(systemd|resolvcon=
+f)],
++			[Set default DNS resolver [default=3Dsystemd]]),,
++		[with_resolver=3Dsystemd])
++
++case "x$with_resolver" in
++	"xsystemd")
++		AC_DEFINE(DEFAULT_RESOLVER, "systemd", ["Default DNS resolver"])
++	;;
++	"xresolvconf")
++		AC_DEFINE(DEFAULT_RESOLVER, "resolvconf", ["Default DNS resolver"])
++	;;
++	*) AC_MSG_ERROR([Wrong value for --with-resolver: $with_resolver])
++	;;
++esac
++
+ AC_ARG_ENABLE([external_ell], AC_HELP_STRING([--enable-external-ell],
+ 				[enable external Embedded Linux library]),
+ 					[enable_external_ell=3D${enableval}])
+diff --git a/src/resolve.c b/src/resolve.c
+index 066e4c87..8949edad 100644
+--- a/src/resolve.c
++++ b/src/resolve.c
+@@ -553,8 +553,8 @@ static int resolve_init(void)
+ 		if (method_name)
+ 			l_warn("[General].dns_resolve_method is deprecated, "
+ 				"use [Network].NameResolvingService");
+-		else /* Default to systemd-resolved service. */
+-			method_name =3D "systemd";
++		else /* Default to compile time option (default: systemd-resolved) */
++			method_name =3D DEFAULT_RESOLVER;
+ 	}
+ =
 
-> Each AP started will get assigned a new subnet within the range
-> specified by APRanges as to not conflict with other AP interfaces.
-> If there are no subnets left in the pool when an AP is started
-> it will fail with -EEXIST. Any AP's that are stopped will release
-> their subnet back into the pool to be used with other APs.
-> =
+ 	for (i =3D 0; resolve_method_ops_list[i].name; i++) {
+-- =
 
-> The DHCP IP pool will be automatically chosen by the ELL DHCP
-> implementation (+1 the AP's IP to *.254). The remaining DHCP
-> settings will be defaults chosen by ELL (DNS, lease time, etc).
-> ---
->   src/ap.c | 281 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 275 insertions(+), 6 deletions(-)
-> =
+2.29.0
 
-
-All applied, thanks.
-
-Regards,
--Denis
-
---===============5068035886661383630==--
+--===============0449790205938846962==--
 
