@@ -1,55 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============7481144568707505483=="
+Content-Type: multipart/mixed; boundary="===============3771007371672156700=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/2] util: add util_ip_prefix_tohl
-Date: Mon, 26 Oct 2020 16:17:01 -0500
-Message-ID: <93c1ec58-afaa-8107-57c1-a984b904314a@gmail.com>
-In-Reply-To: <20201026203514.2164608-1-prestwoj@gmail.com>
+From: Alvin Sipraga <ALSI@bang-olufsen.dk>
+Subject: [PATCH] monitor: print survey info results
+Date: Tue, 27 Oct 2020 12:31:25 +0000
+Message-ID: <20201027122912.345502-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7481144568707505483==
+--===============3771007371672156700==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Example output:
 
-On 10/26/20 3:35 PM, James Prestwood wrote:
-> Parses an IP prefix notation string into prefix, start, end, and
-> netmask. All values are returned in host order.
-> ---
->   src/util.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->   src/util.h |  3 ++
->   2 files changed, 93 insertions(+)
-> =
+  > Result: New Survey Results (0x33) len 76 [multi]         14.062327
+    Interface Index: 6 (0x00000006)
+    Survey Info: len 64
+        Frequency: 2472 (0x000009a8)
+        Noise dBm: -89
+        Survey Time: 100 (0x0000000000000064)
+        Busy Time: 4 (0x0000000000000004)
+        RX Time: 3 (0x0000000000000003)
+        TX Time: 0 (0x0000000000000000)
+---
+ monitor/nlmon.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
->   - Moved these two into their own set
->   - Changed the loop to only iterate over the maximum IP string size (16).
->     This prevents looping through a really long (invalid) IP string
->   - Use l_strlcpy instead of memcpy + NULL terminate
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index b4578c85..7b2fb539 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -4915,6 +4915,19 @@ static const struct attr_entry frame_types_table[] =
+=3D {
+ 	{ }
+ };
+ =
 
-<snip>
++static const struct attr_entry survey_info_table[] =3D {
++	{ NL80211_SURVEY_INFO_FREQUENCY, "Frequency", ATTR_U32 },
++	{ NL80211_SURVEY_INFO_NOISE, "Noise dBm", ATTR_S8 },
++	{ NL80211_SURVEY_INFO_IN_USE, "Channel Currently In Use", ATTR_FLAG },
++	{ NL80211_SURVEY_INFO_TIME, "Survey Time", ATTR_U64 },
++	{ NL80211_SURVEY_INFO_TIME_BUSY, "Busy Time", ATTR_U64 },
++	{ NL80211_SURVEY_INFO_TIME_EXT_BUSY, "Busy Time Extension Channel", ATTR_=
+U64 },
++	{ NL80211_SURVEY_INFO_TIME_RX, "RX Time", ATTR_U64 },
++	{ NL80211_SURVEY_INFO_TIME_TX, "TX Time", ATTR_U64 },
++	{ NL80211_SURVEY_INFO_TIME_SCAN, "Scan Time", ATTR_U64 },
++	{ }
++};
++
+ static void print_cqm_event(unsigned int level, const char *label,
+ 					const void *data, uint16_t size)
+ {
+@@ -5596,7 +5609,7 @@ static const struct attr_entry attr_table[] =3D {
+ 	{ NL80211_ATTR_4ADDR,
+ 			"4-Address", ATTR_U8 },
+ 	{ NL80211_ATTR_SURVEY_INFO,
+-			"Survey Info" },
++			"Survey Info", ATTR_NESTED, { survey_info_table } },
+ 	{ NL80211_ATTR_PMKID,
+ 			"PMKID", ATTR_BINARY },
+ 	{ NL80211_ATTR_MAX_NUM_PMKIDS,
+-- =
 
-> +	/*
-> +	 * Only iterate over the max length of an IP in case of invalid long
-> +	 * inputs.
-> +	 */
-> +	for (i =3D 0; i < INET_ADDRSTRLEN && ip[i] !=3D '\0'; i++) {
-> +		/* Found '/', check the next byte exists and parse prefix */
-> +		if (ip[i] =3D=3D '/' && ip[i + 1] !=3D '\0') {
-> +			prefix =3D strtol(ip + i + 1, &endp, 10);
-
-I changed this to strtoul and..
-
-> +			if (*endp !=3D '\0')
-> +				return false;
-> +
-> +			break;
-> +		}
-> +	}
-
-Both applied, thanks.
-
---===============7481144568707505483==--
+2.29.0
+--===============3771007371672156700==--
 
