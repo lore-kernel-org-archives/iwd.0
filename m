@@ -1,70 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============0449790205938846962=="
+Content-Type: multipart/mixed; boundary="===============5224140754500769639=="
 MIME-Version: 1.0
-From: John Zimmermann <me@johnnynator.dev>
-Subject: [PATCH] resolve: allow setting default DNS resolver at compile time
-Date: Tue, 27 Oct 2020 22:31:06 +0100
-Message-ID: <20201027213106.30028-1-me@johnnynator.dev>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] resolve: allow setting default DNS resolver at compile
+ time
+Date: Wed, 28 Oct 2020 15:38:28 -0500
+Message-ID: <54ff705b-90bd-52ae-2ffd-a393e4c3bf7a@gmail.com>
+In-Reply-To: <20201027213106.30028-1-me@johnnynator.dev>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0449790205938846962==
+--===============5224140754500769639==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- configure.ac  | 15 +++++++++++++++
- src/resolve.c |  4 ++--
- 2 files changed, 17 insertions(+), 2 deletions(-)
+Hi John,
 
-diff --git a/configure.ac b/configure.ac
-index 78db15e9..0adddd10 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -250,6 +250,21 @@ if (test "${enable_systemd_service}" !=3D "no" && test=
- -z "${path_systemd_modloadd
- fi
- AC_SUBST(SYSTEMD_MODLOADDIR, [${path_systemd_modloaddir}])
- =
+On 10/27/20 4:31 PM, John Zimmermann wrote:
+> ---
+>   configure.ac  | 15 +++++++++++++++
+>   src/resolve.c |  4 ++--
+>   2 files changed, 17 insertions(+), 2 deletions(-)
 
-+AC_ARG_WITH(resolver, AC_HELP_STRING([--with-resolver=3D(systemd|resolvcon=
-f)],
-+			[Set default DNS resolver [default=3Dsystemd]]),,
-+		[with_resolver=3Dsystemd])
-+
-+case "x$with_resolver" in
-+	"xsystemd")
-+		AC_DEFINE(DEFAULT_RESOLVER, "systemd", ["Default DNS resolver"])
-+	;;
-+	"xresolvconf")
-+		AC_DEFINE(DEFAULT_RESOLVER, "resolvconf", ["Default DNS resolver"])
-+	;;
-+	*) AC_MSG_ERROR([Wrong value for --with-resolver: $with_resolver])
-+	;;
-+esac
-+
- AC_ARG_ENABLE([external_ell], AC_HELP_STRING([--enable-external-ell],
- 				[enable external Embedded Linux library]),
- 					[enable_external_ell=3D${enableval}])
-diff --git a/src/resolve.c b/src/resolve.c
-index 066e4c87..8949edad 100644
---- a/src/resolve.c
-+++ b/src/resolve.c
-@@ -553,8 +553,8 @@ static int resolve_init(void)
- 		if (method_name)
- 			l_warn("[General].dns_resolve_method is deprecated, "
- 				"use [Network].NameResolvingService");
--		else /* Default to systemd-resolved service. */
--			method_name =3D "systemd";
-+		else /* Default to compile time option (default: systemd-resolved) */
-+			method_name =3D DEFAULT_RESOLVER;
- 	}
- =
+Could you explain the motivation behind this change?  Can't this be accompl=
+ished =
 
- 	for (i =3D 0; resolve_method_ops_list[i].name; i++) {
--- =
+easily by shipping a default main.conf?
 
-2.29.0
-
---===============0449790205938846962==--
+Regards,
+-Denis
+--===============5224140754500769639==--
 
