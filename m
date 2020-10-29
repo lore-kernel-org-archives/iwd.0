@@ -1,17 +1,19 @@
-Content-Type: multipart/mixed; boundary="===============0163306047733985492=="
+Content-Type: multipart/mixed; boundary="===============6789192724235216838=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
 Subject: Re: [PATCH] frame-xchg: fix invalid read
-Date: Thu, 29 Oct 2020 11:17:29 -0700
-Message-ID: <5cb01c7985e9b6d62a432ae5fc6a80b36d0a61ac.camel@gmail.com>
+Date: Thu, 29 Oct 2020 11:40:51 -0700
+Message-ID: <a18cbbefd1ae73487f3bb79127aa9b11d7ce5b83.camel@gmail.com>
 In-Reply-To: <CAOq732K01DA7_9iWTJAw2-x96ESj9996HZQd_8fmSKx-eWA9ww@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0163306047733985492==
+--===============6789192724235216838==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+
+Hi Andrew,
 
 On Thu, 2020-10-29 at 19:05 +0100, Andrew Zaborowski wrote:
 > Hi James!
@@ -37,43 +39,43 @@ On Thu, 2020-10-29 at 19:05 +0100, Andrew Zaborowski wrote:
 > One possibility is that we passed a wrong id to
 > l_genl_family_cancel(), can you check that it returns true?
 
-Yeah, Ill check this.
+So it looks like frame-xchg has got some order of operations backwards.
+Every single call to l_genl_family_cancel fails. And this isn't really
+surprising because in normal case we are canceling after we are already
+in the callback so there is really nothing to cancel right?
 
-> =
+Maybe you had a better idea of how to handle this but I think zero'ing
+the command ID in the callback is still the right thing to do. That way
+l_genl_family_cancel won't get called unless we are actually canceling
+a still in-flight frame.
 
-> By the way do you use the usb passthrough to trigger this?  I don't
-> think hwsim has the "early status" quirk.
+Here is with some prints added [*]:
 
-No I've just been running testAP in test-runner. It doesnt happen all
-the time but I've seen it now a few times.
-
-I also noticed another issue (could be related) where the STA isnt
-ACK'ing the probe response:
-
-AP Probe Request from 02:00:00:00:03:00
-src/wiphy.c:wiphy_radio_work_insert() Inserting work item 8
-src/wiphy.c:wiphy_radio_work_next() Starting work item 8
-src/frame-xchg.c:frame_xchg_tx_cb() err 0
+[*]src/frame-xchg.c:frame_xchg_tx_retry() Sending frame with ID 83
+src/station.c:station_netdev_event() Associating
 src/netdev.c:netdev_mlme_notify() MLME notification Frame TX Status(60)
-src/frame-xchg.c:frame_xchg_mlme_notify() Received no ACK
-src/frame-xchg.c:frame_xchg_wait_cancel() =
+src/frame-xchg.c:frame_xchg_mlme_notify() Received an ACK
+src/frame-xchg.c:frame_xchg_tx_cb() err 0
+AP Authentication frame 2 ACKed by STA
+src/wiphy.c:wiphy_radio_work_done() Work item 10 done
+[*]src/frame-xchg.c:frame_xchg_reset() Canceling ID 83
+[*]src/frame-xchg.c:frame_xchg_reset() Failed to cancel 83
 
-Frame tx retry limit reached
-AP Probe Response received no ACK
-src/wiphy.c:wiphy_radio_work_done() Work item 8 done
-
-But this doesn't always result in the invalid read, and could be
-completely unrelated. I have 'fixed' this by adding a response timeout
-to frame_xchg_start but had to go up to 200ms to get testAP to pass
-reliably. Even a 100ms timeout resulted in occational un-acked probe
-responses.
+And this is true for every single frame from what I can tell. I was
+also able to reproduce this reliably by adding 'hwsim_medium=3Dno' to
+testAP/main.conf if you care to give it a spin (with --valgrind as
+well).
 
 Thanks,
 James
 
 > =
 
+> By the way do you use the usb passthrough to trigger this?  I don't
+> think hwsim has the "early status" quirk.
+> =
+
 > Best regards
 
---===============0163306047733985492==--
+--===============6789192724235216838==--
 
