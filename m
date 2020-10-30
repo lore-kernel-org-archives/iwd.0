@@ -1,89 +1,133 @@
-Content-Type: multipart/mixed; boundary="===============2623504440693004945=="
+Content-Type: multipart/mixed; boundary="===============4209064739015528661=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH] frame-xchg: fix invalid read
-Date: Fri, 30 Oct 2020 02:49:26 +0100
-Message-ID: <CAOq732LT6Qr0mAYO4-12WocvOCRBDwWJ9myYSfYS035R-sphJg@mail.gmail.com>
-In-Reply-To: <58a34b9a-ed26-8a4a-cab2-eb374b368337@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/5] storage: add storage_network_filename_from_path
+Date: Fri, 30 Oct 2020 09:34:09 -0700
+Message-ID: <20201030163413.2446645-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2623504440693004945==
+--===============4209064739015528661==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 30 Oct 2020 at 02:36, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 10/29/20 8:16 PM, Andrew Zaborowski wrote:
-> > On Fri, 30 Oct 2020 at 02:01, Denis Kenzior <denkenz@gmail.com> wrote:
-> >>>> So it looks like frame-xchg has got some order of operations backwar=
-ds.
-> >>>> Every single call to l_genl_family_cancel fails. And this isn't real=
-ly
-> >>>> surprising because in normal case we are canceling after we are alre=
-ady
-> >>>> in the callback so there is really nothing to cancel right?
-> >>>
-> >>> Oh okay, that's why it's not cancelling the destroy callback.  I
-> >>> definitely think there should be a way to make ell forget the genl
-> >>> command at any phase including in the callback.  So I'd be in favour
-> >>> of changing l_genl_family_cancel to do this.  Denis, what do you think
-> >>> is better?
-> >>
-> >> I don't know the code path in question all that well... But what is it=
- that
-> >> you're proposing?  That l_genl_family_cancel would not call the destroy
-> >> callback?  I don't think we should do that, since the caller who provi=
-ded the
-> >> user data might not be the same as the one calling cancel.  And that w=
-ould be
-> >> different to just about every other use of the cancel method.
-> >
-> > I guess I propose that l_genl_family_cancel, when called from inside
-> > the callback:
-> > * calls the destroy function and removes any references to the genl com=
-mand,
-> > * returns true.
-> >
-> > So same as outside of the callback.  The current behaviour is to return=
- false.
->
-> That is sort of on purpose.  I mean sure, we can try to 'fix' this by not=
- taking
-> the request off the pending_list prior to calling the callback and adding=
- some
-> flags if cancel is called recursively.  But no other class provides any s=
-ort of
-> guarantees on such behavior and up until now I would have considered beha=
-vior in
-> such situations as 'undefined'.
->
-> Maybe you have a valid use case here, but I know I would never consider u=
-sing
-> _cancel this way.
->
-> >
-> >>
-> >> We can certainly try and detect whether cancel is being called on a co=
-mmand that
-> >> is already in the callback stage to prevent calling destroy twice.  Bu=
-t I would
-> >> almost say that such behavior should trigger a L_WARN_ON and the prope=
-r solution
-> >> would be to fix the logic flow.  In other words, why are you triggerin=
-g a cancel
-> >> for a command that is in the callback path?
-> >
-> > I think it's useful to have a way to ensure all references to the
-> > provided callbacks/userdata are dropped right now.
->
-> Useful how?  Wouldn't it be easier to change the logic flow to conform to=
- the
-> general API conventions instead?
+This is to allow this API to be used simply to get the file name
+without extension. AP will be storing provisioning files similarly
+to the network format but the extension will not map to existing
+security types. Some of the parsing code from
+storage_network_ssid_from_path was reused for parsing the file name
+and verification.
+---
+ src/storage.c | 40 ++++++++++++++++++++++++++++++++++------
+ src/storage.h |  1 +
+ 2 files changed, 35 insertions(+), 6 deletions(-)
 
-Ok, if that's the convention then yes.  I had assumed it was the other
-way and that's where the frame-xchg bug comes from.
+diff --git a/src/storage.c b/src/storage.c
+index 00d93933..60fb1bc3 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -287,13 +287,12 @@ char *storage_get_network_file_path(enum security typ=
+e, const char *ssid)
+ 	return path;
+ }
+ =
 
-Best regards
---===============2623504440693004945==--
+-const char *storage_network_ssid_from_path(const char *path,
+-							enum security *type)
++static bool parse_file_path(const char *path, char *buf,
++				const char **ext_offset)
+ {
+ 	const char *filename =3D strrchr(path, '/');
+ 	const char *c, *end;
+ 	char *decoded;
+-	static char buf[67];
+ =
+
+ 	if (filename)
+ 		filename++;	/* Skip the / */
+@@ -302,8 +301,8 @@ const char *storage_network_ssid_from_path(const char *=
+path,
+ =
+
+ 	end =3D strchr(filename, '.');
+ =
+
+-	if (!end || !security_from_str(end + 1, type))
+-		return NULL;
++	if (!end)
++		return false;
+ =
+
+ 	if (filename[0] !=3D '=3D') {
+ 		if (end =3D=3D filename || end - filename > 32)
+@@ -319,7 +318,7 @@ const char *storage_network_ssid_from_path(const char *=
+path,
+ 		memcpy(buf, filename, end - filename);
+ 		buf[end - filename] =3D '\0';
+ =
+
+-		return buf;
++		goto done;
+ 	}
+ =
+
+ 	if (end - filename <=3D 1 || end - filename > 65)
+@@ -342,6 +341,35 @@ const char *storage_network_ssid_from_path(const char =
+*path,
+ 	strcpy(buf, decoded);
+ 	l_free(decoded);
+ =
+
++done:
++	if (ext_offset)
++		*ext_offset =3D end;
++
++	return true;
++}
++
++const char *storage_network_filename_from_path(const char *path)
++{
++	static char buf[67];
++
++	if (!parse_file_path(path, buf, NULL))
++		return NULL;
++
++	return buf;
++}
++
++const char *storage_network_ssid_from_path(const char *path,
++							enum security *type)
++{
++	const char *end;
++	static char buf[67];
++
++	if (!parse_file_path(path, buf, &end))
++		return NULL;
++
++	if (!security_from_str(end + 1, type))
++		return NULL;
++
+ 	return buf;
+ }
+ =
+
+diff --git a/src/storage.h b/src/storage.h
+index 80b63c53..d9b17c7f 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -37,6 +37,7 @@ void storage_cleanup_dirs(void);
+ char *storage_get_path(const char *format, ...);
+ char *storage_get_hotspot_path(const char *format, ...);
+ =
+
++const char *storage_network_filename_from_path(const char *path);
+ const char *storage_network_ssid_from_path(const char *path,
+ 							enum security *type);
+ char *storage_get_network_file_path(enum security type, const char *ssid);
+-- =
+
+2.26.2
+
+--===============4209064739015528661==--
 
