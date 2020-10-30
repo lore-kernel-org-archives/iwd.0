@@ -1,133 +1,107 @@
-Content-Type: multipart/mixed; boundary="===============4209064739015528661=="
+Content-Type: multipart/mixed; boundary="===============8659677949574712388=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/5] storage: add storage_network_filename_from_path
-Date: Fri, 30 Oct 2020 09:34:09 -0700
-Message-ID: <20201030163413.2446645-1-prestwoj@gmail.com>
+Subject: [PATCH 2/5] storage: add storage_get_ap_path
+Date: Fri, 30 Oct 2020 09:34:10 -0700
+Message-ID: <20201030163413.2446645-2-prestwoj@gmail.com>
+In-Reply-To: <20201030163413.2446645-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4209064739015528661==
+--===============8659677949574712388==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is to allow this API to be used simply to get the file name
-without extension. AP will be storing provisioning files similarly
-to the network format but the extension will not map to existing
-security types. Some of the parsing code from
-storage_network_ssid_from_path was reused for parsing the file name
-and verification.
 ---
- src/storage.c | 40 ++++++++++++++++++++++++++++++++++------
+ src/storage.c | 30 ++++++++++++++++++++++++++++++
  src/storage.h |  1 +
- 2 files changed, 35 insertions(+), 6 deletions(-)
+ 2 files changed, 31 insertions(+)
 
 diff --git a/src/storage.c b/src/storage.c
-index 00d93933..60fb1bc3 100644
+index 60fb1bc3..e7ac3938 100644
 --- a/src/storage.c
 +++ b/src/storage.c
-@@ -287,13 +287,12 @@ char *storage_get_network_file_path(enum security typ=
-e, const char *ssid)
- 	return path;
- }
+@@ -50,6 +50,7 @@
  =
 
--const char *storage_network_ssid_from_path(const char *path,
--							enum security *type)
-+static bool parse_file_path(const char *path, char *buf,
-+				const char **ext_offset)
+ static char *storage_path =3D NULL;
+ static char *storage_hotspot_path =3D NULL;
++static char *storage_ap_path =3D NULL;
+ =
+
+ static int create_dirs(const char *filename)
  {
- 	const char *filename =3D strrchr(path, '/');
- 	const char *c, *end;
- 	char *decoded;
--	static char buf[67];
- =
-
- 	if (filename)
- 		filename++;	/* Skip the / */
-@@ -302,8 +301,8 @@ const char *storage_network_ssid_from_path(const char *=
-path,
- =
-
- 	end =3D strchr(filename, '.');
- =
-
--	if (!end || !security_from_str(end + 1, type))
--		return NULL;
-+	if (!end)
-+		return false;
- =
-
- 	if (filename[0] !=3D '=3D') {
- 		if (end =3D=3D filename || end - filename > 32)
-@@ -319,7 +318,7 @@ const char *storage_network_ssid_from_path(const char *=
-path,
- 		memcpy(buf, filename, end - filename);
- 		buf[end - filename] =3D '\0';
- =
-
--		return buf;
-+		goto done;
+@@ -221,6 +222,16 @@ bool storage_create_dirs(void)
+ 		return false;
  	}
  =
 
- 	if (end - filename <=3D 1 || end - filename > 65)
-@@ -342,6 +341,35 @@ const char *storage_network_ssid_from_path(const char =
-*path,
- 	strcpy(buf, decoded);
- 	l_free(decoded);
- =
-
-+done:
-+	if (ext_offset)
-+		*ext_offset =3D end;
++	storage_ap_path =3D l_strdup_printf("%s/ap/", storage_path);
 +
-+	return true;
-+}
++	if (create_dirs(storage_ap_path)) {
++		l_error("Failed to create %s", storage_ap_path);
 +
-+const char *storage_network_filename_from_path(const char *path)
-+{
-+	static char buf[67];
++		l_free(storage_path);
++		l_free(storage_hotspot_path);
++		l_free(storage_ap_path);
++	}
 +
-+	if (!parse_file_path(path, buf, NULL))
-+		return NULL;
-+
-+	return buf;
-+}
-+
-+const char *storage_network_ssid_from_path(const char *path,
-+							enum security *type)
-+{
-+	const char *end;
-+	static char buf[67];
-+
-+	if (!parse_file_path(path, buf, &end))
-+		return NULL;
-+
-+	if (!security_from_str(end + 1, type))
-+		return NULL;
-+
- 	return buf;
+ 	return true;
  }
  =
 
-diff --git a/src/storage.h b/src/storage.h
-index 80b63c53..d9b17c7f 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -37,6 +37,7 @@ void storage_cleanup_dirs(void);
- char *storage_get_path(const char *format, ...);
- char *storage_get_hotspot_path(const char *format, ...);
+@@ -228,6 +239,7 @@ void storage_cleanup_dirs(void)
+ {
+ 	l_free(storage_path);
+ 	l_free(storage_hotspot_path);
++	l_free(storage_ap_path);
+ }
  =
 
-+const char *storage_network_filename_from_path(const char *path);
+ char *storage_get_path(const char *format, ...)
+@@ -266,6 +278,24 @@ char *storage_get_hotspot_path(const char *format, ...)
+ 	return str;
+ }
+ =
+
++char *storage_get_ap_path(const char *format, ...)
++{
++	va_list args;
++	char *fmt, *str;
++
++	if (!format)
++		return l_strdup(storage_ap_path);
++
++	fmt =3D l_strdup_printf("%s/%s", storage_ap_path, format);
++
++	va_start(args, format);
++	str =3D l_strdup_vprintf(fmt, args);
++	va_end(args);
++
++	l_free(fmt);
++	return str;
++}
++
+ char *storage_get_network_file_path(enum security type, const char *ssid)
+ {
+ 	char *path;
+diff --git a/src/storage.h b/src/storage.h
+index d9b17c7f..a6076d63 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -36,6 +36,7 @@ bool storage_create_dirs(void);
+ void storage_cleanup_dirs(void);
+ char *storage_get_path(const char *format, ...);
+ char *storage_get_hotspot_path(const char *format, ...);
++char *storage_get_ap_path(const char *format, ...);
+ =
+
+ const char *storage_network_filename_from_path(const char *path);
  const char *storage_network_ssid_from_path(const char *path,
- 							enum security *type);
- char *storage_get_network_file_path(enum security type, const char *ssid);
 -- =
 
 2.26.2
 
---===============4209064739015528661==--
+--===============8659677949574712388==--
 
