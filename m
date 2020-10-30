@@ -1,100 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============3389554407683980056=="
+Content-Type: multipart/mixed; boundary="===============3821562114439886420=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
 Subject: Re: [PATCH] frame-xchg: fix invalid read
-Date: Thu, 29 Oct 2020 17:14:24 -0700
-Message-ID: <baabdc0d41700cbc4ecbd086928d9d2b3770336f.camel@gmail.com>
+Date: Thu, 29 Oct 2020 19:47:28 -0500
+Message-ID: <5dbe1ff6-d611-d9e2-d2d6-0d67cfd6b98a@gmail.com>
 In-Reply-To: <CAOq732JrWNncQJceok3mH5uCUsMRrTFocwTePdnF=2t_T5WHLw@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3389554407683980056==
+--===============3821562114439886420==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2020-10-30 at 00:33 +0100, Andrew Zaborowski wrote:
-> On Thu, 29 Oct 2020 at 19:40, James Prestwood <prestwoj@gmail.com>
-> wrote:
-> > On Thu, 2020-10-29 at 19:05 +0100, Andrew Zaborowski wrote:
-> > > frame_xchg_done() should result in l_genl_family_cancel(fx-
-> > > > tx_cmd_id)
-> > > which would call the destroy callback before 'fx' is freed so
-> > > there
-> > > should be some other reason this is happening.
-> > > =
+Hi Andrew,
 
-> > > One possibility is that we passed a wrong id to
-> > > l_genl_family_cancel(), can you check that it returns true?
-> > =
-
-> > So it looks like frame-xchg has got some order of operations
-> > backwards.
-> > Every single call to l_genl_family_cancel fails. And this isn't
-> > really
-> > surprising because in normal case we are canceling after we are
-> > already
-> > in the callback so there is really nothing to cancel right?
+>> So it looks like frame-xchg has got some order of operations backwards.
+>> Every single call to l_genl_family_cancel fails. And this isn't really
+>> surprising because in normal case we are canceling after we are already
+>> in the callback so there is really nothing to cancel right?
 > =
 
 > Oh okay, that's why it's not cancelling the destroy callback.  I
 > definitely think there should be a way to make ell forget the genl
 > command at any phase including in the callback.  So I'd be in favour
-> of changing l_genl_family_cancel to do this.  Denis, what do you
-> think
+> of changing l_genl_family_cancel to do this.  Denis, what do you think
 > is better?
-> =
 
-> > Maybe you had a better idea of how to handle this but I think
-> > zero'ing
-> > the command ID in the callback is still the right thing to do. That
-> > way
-> > l_genl_family_cancel won't get called unless we are actually
-> > canceling
-> > a still in-flight frame.
-> =
+I don't know the code path in question all that well... But what is it that =
 
-> The destroy callback would still be called though.  Or if we drop it
-> like in the patch, we'd have to manually do: fx->tx_cmd_id =3D 0 every
-> time we cancel tx_cmd_id or free nl80211.
+you're proposing?  That l_genl_family_cancel would not call the destroy =
 
-Yeah, but isn't this what we do basically everywhere in IWD?
+callback?  I don't think we should do that, since the caller who provided t=
+he =
 
-> =
+user data might not be the same as the one calling cancel.  And that would =
+be =
 
-> > Here is with some prints added [*]:
-> > =
+different to just about every other use of the cancel method.
 
-> > [*]src/frame-xchg.c:frame_xchg_tx_retry() Sending frame with ID 83
-> > src/station.c:station_netdev_event() Associating
-> > src/netdev.c:netdev_mlme_notify() MLME notification Frame TX
-> > Status(60)
-> > src/frame-xchg.c:frame_xchg_mlme_notify() Received an ACK
-> > src/frame-xchg.c:frame_xchg_tx_cb() err 0
-> > AP Authentication frame 2 ACKed by STA
-> > src/wiphy.c:wiphy_radio_work_done() Work item 10 done
-> > [*]src/frame-xchg.c:frame_xchg_reset() Canceling ID 83
-> > [*]src/frame-xchg.c:frame_xchg_reset() Failed to cancel 83
-> > =
+We can certainly try and detect whether cancel is being called on a command=
+ that =
 
-> > And this is true for every single frame from what I can tell. I was
-> > also able to reproduce this reliably by adding 'hwsim_medium=3Dno' to
-> > testAP/main.conf if you care to give it a spin (with --valgrind as
-> > well).
-> =
+is already in the callback stage to prevent calling destroy twice.  But I w=
+ould =
 
-> I wasn't able to reproduce the invalid read yet, but I do get
-> occasional failures in test_connection_success.
+almost say that such behavior should trigger a L_WARN_ON and the proper sol=
+ution =
 
-Ok, this is likely the other problem of the probe responses not being
-ACK'ed, or at least not receiving the ACK in time. Not sure the best
-route here, I'm thinking its purely a test environment issue because
-100ms+ should be plenty of time and I had to go up to 200ms for the
-test to pass reliably.
+would be to fix the logic flow.  In other words, why are you triggering a c=
+ancel =
 
-Thanks,
-James
+for a command that is in the callback path?
 
-
---===============3389554407683980056==--
+Regards,
+-Denis
+--===============3821562114439886420==--
 
