@@ -1,114 +1,125 @@
-Content-Type: multipart/mixed; boundary="===============4639961032536863687=="
+Content-Type: multipart/mixed; boundary="===============4124697540013529077=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 4/5] ap: add StartWithConfig DBus method
-Date: Fri, 30 Oct 2020 13:37:06 -0500
-Message-ID: <a15dfd36-254e-08d8-bf7c-9554b26409d8@gmail.com>
-In-Reply-To: <20201030163413.2446645-4-prestwoj@gmail.com>
+Subject: Re: [PATCH 2/5] storage: add storage_get_ap_path
+Date: Fri, 30 Oct 2020 13:41:57 -0500
+Message-ID: <aac22e4c-862a-57f5-5f28-7afad5aa9296@gmail.com>
+In-Reply-To: <20201030163413.2446645-2-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4639961032536863687==
+--===============4124697540013529077==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
-
 On 10/30/20 11:34 AM, James Prestwood wrote:
-> Users can now start an AP from settings based off a config file
-> on disk. The only argument is the SSID which will be used to
-> lookup the ap_config loaded during ap_init.
 > ---
->   src/ap.c | 41 +++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 41 insertions(+)
+>   src/storage.c | 30 ++++++++++++++++++++++++++++++
+>   src/storage.h |  1 +
+>   2 files changed, 31 insertions(+)
 > =
 
-> diff --git a/src/ap.c b/src/ap.c
-> index 956b7be9..92e8ce62 100644
-> --- a/src/ap.c
-> +++ b/src/ap.c
-> @@ -2711,6 +2711,44 @@ static struct l_dbus_message *ap_dbus_stop(struct =
-l_dbus *dbus,
->   	return NULL;
+> diff --git a/src/storage.c b/src/storage.c
+> index 60fb1bc3..e7ac3938 100644
+> --- a/src/storage.c
+> +++ b/src/storage.c
+> @@ -50,6 +50,7 @@
+>   =
+
+>   static char *storage_path =3D NULL;
+>   static char *storage_hotspot_path =3D NULL;
+> +static char *storage_ap_path =3D NULL;
+>   =
+
+>   static int create_dirs(const char *filename)
+>   {
+> @@ -221,6 +222,16 @@ bool storage_create_dirs(void)
+>   		return false;
+>   	}
+>   =
+
+> +	storage_ap_path =3D l_strdup_printf("%s/ap/", storage_path);
+> +
+> +	if (create_dirs(storage_ap_path)) {
+> +		l_error("Failed to create %s", storage_ap_path);
+> +
+> +		l_free(storage_path);
+> +		l_free(storage_hotspot_path);
+> +		l_free(storage_ap_path);
+
+This might look better using a goto instead.
+
+> +	}
+> +
+>   	return true;
 >   }
 >   =
 
-> +static bool match_ssid(const void *a, const void *data)
-> +{
-> +	const struct ap_config *config =3D a;
-> +	const char *ssid =3D data;
-> +
-> +	return !strcmp(config->ssid, ssid);
-> +}
-> +
-> +static struct l_dbus_message *ap_dbus_start_with_config(struct l_dbus *d=
-bus,
-> +						struct l_dbus_message *message,
-> +						void *user_data)
-> +{
-> +	struct ap_if_data *ap_if =3D user_data;
-> +	const char *ssid;
-> +	struct ap_config *config;
-> +	int err;
-> +
-> +	if (ap_if->ap && ap_if->ap->started)
-> +		return dbus_error_already_exists(message);
-> +
-> +	if (ap_if->ap || ap_if->pending)
-> +		return dbus_error_busy(message);
-> +
-> +	if (!l_dbus_message_get_arguments(message, "s", &ssid))
-> +		return dbus_error_invalid_args(message);
-> +
-
-You may want to check that the SSID is valid if the profile is SSID based.
-
-> +	config =3D l_queue_find(ap_configs, match_ssid, ssid);
-> +	if (!config)
-> +		return dbus_error_not_found(message);
-
-Question, why store the profiles in a list when you could simply try and lo=
-ad =
-
-the profile here?  Then you wouldn't really need to distinguish between =
-
-filesystem and non-filesystem based ap_configs.
-
-> +
-> +	ap_if->ap =3D ap_start(ap_if->netdev, config, &ap_dbus_ops, &err, ap_if=
-);
-> +	if (!ap_if->ap)
-> +		return dbus_error_from_errno(err, message);
-> +
-> +	ap_if->pending =3D l_dbus_message_ref(message);
-> +	return NULL;
-> +}
-> +
->   static bool ap_dbus_property_get_started(struct l_dbus *dbus,
->   					struct l_dbus_message *message,
->   					struct l_dbus_message_builder *builder,
-> @@ -2729,6 +2767,9 @@ static void ap_setup_interface(struct l_dbus_interf=
-ace *interface)
->   	l_dbus_interface_method(interface, "Start", 0, ap_dbus_start, "",
->   			"ss", "ssid", "wpa2_passphrase");
->   	l_dbus_interface_method(interface, "Stop", 0, ap_dbus_stop, "", "");
-> +	l_dbus_interface_method(interface, "StartWithConfig", 0,
-
-Lets try to avoid shortened words in the API.  StartWithConfiguration or =
-
-StartProfile would be better.
-
-> +					ap_dbus_start_with_config, "", "s",
-> +					"ssid");
+> @@ -228,6 +239,7 @@ void storage_cleanup_dirs(void)
+>   {
+>   	l_free(storage_path);
+>   	l_free(storage_hotspot_path);
+> +	l_free(storage_ap_path);
+>   }
 >   =
 
->   	l_dbus_interface_property(interface, "Started", 0, "b",
->   					ap_dbus_property_get_started, NULL);
+>   char *storage_get_path(const char *format, ...)
+> @@ -266,6 +278,24 @@ char *storage_get_hotspot_path(const char *format, .=
+..)
+>   	return str;
+>   }
+>   =
+
+> +char *storage_get_ap_path(const char *format, ...)
+> +{
+> +	va_list args;
+> +	char *fmt, *str;
+> +
+> +	if (!format)
+> +		return l_strdup(storage_ap_path);
+> +
+> +	fmt =3D l_strdup_printf("%s/%s", storage_ap_path, format);
+> +
+> +	va_start(args, format);
+> +	str =3D l_strdup_vprintf(fmt, args);
+> +	va_end(args);
+> +
+> +	l_free(fmt);
+> +	return str;
+> +}
+> +
+
+I think this really isn't necessary, you could use storage_get_path for thi=
+s =
+
+just as well.  Or just return storage_ap_path which is all you're using thi=
+s for.
+
+The more useful thing might be to actually obtain the AP path given an SSID=
+...
+
+>   char *storage_get_network_file_path(enum security type, const char *ssi=
+d)
+>   {
+>   	char *path;
+> diff --git a/src/storage.h b/src/storage.h
+> index d9b17c7f..a6076d63 100644
+> --- a/src/storage.h
+> +++ b/src/storage.h
+> @@ -36,6 +36,7 @@ bool storage_create_dirs(void);
+>   void storage_cleanup_dirs(void);
+>   char *storage_get_path(const char *format, ...);
+>   char *storage_get_hotspot_path(const char *format, ...);
+> +char *storage_get_ap_path(const char *format, ...);
+>   =
+
+>   const char *storage_network_filename_from_path(const char *path);
+>   const char *storage_network_ssid_from_path(const char *path,
 > =
 
 
 Regards,
 -Denis
---===============4639961032536863687==--
+--===============4124697540013529077==--
 
