@@ -1,85 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============7330833567477447610=="
+Content-Type: multipart/mixed; boundary="===============9199531780608631475=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 2/5] storage: add storage_get_ap_path
-Date: Fri, 30 Oct 2020 11:48:55 -0700
-Message-ID: <fedf9f52e015a2d323fd07b798c43a30b445e96a.camel@gmail.com>
-In-Reply-To: <aac22e4c-862a-57f5-5f28-7afad5aa9296@gmail.com>
+From: John Zimmermann <me@johnnynator.dev>
+Subject: Re: [PATCH] resolve: allow setting default DNS resolver at compile
+ time
+Date: Sun, 01 Nov 2020 22:33:42 +0100
+Message-ID: <f6c6fdb4-0609-44da-b11e-5f8da304a21d@www.fastmail.com>
+In-Reply-To: <54ff705b-90bd-52ae-2ffd-a393e4c3bf7a@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7330833567477447610==
+--===============9199531780608631475==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi Denis.
 
-> >   =
-
-> > +char *storage_get_ap_path(const char *format, ...)
-> > +{
-> > +	va_list args;
-> > +	char *fmt, *str;
-> > +
-> > +	if (!format)
-> > +		return l_strdup(storage_ap_path);
-> > +
-> > +	fmt =3D l_strdup_printf("%s/%s", storage_ap_path, format);
-> > +
-> > +	va_start(args, format);
-> > +	str =3D l_strdup_vprintf(fmt, args);
-> > +	va_end(args);
-> > +
-> > +	l_free(fmt);
-> > +	return str;
-> > +}
-> > +
+On Wed, Oct 28, 2020, at 9:38 PM, Denis Kenzior wrote:
+> Hi John,
 > =
 
-> I think this really isn't necessary, you could use storage_get_path
-> for this =
+> Could you explain the motivation behind this change?  Can't this be accom=
+plished =
 
-> just as well.  Or just return storage_ap_path which is all you're
-> using this for.
-> =
-
-> The more useful thing might be to actually obtain the AP path given
-> an SSID...
-
-Yeah I was just copying the way network/hotspot did it. But yes your
-right, its rather complex for the one or two places it would be used.
-And even getting the AP path + SSID should be easy enough:
-
-path =3D storage_get_path("ap/%s", ssid);
-
-I could also refactor hotspot to do this as well at some point.
-
-> =
-
-> >   char *storage_get_network_file_path(enum security type, const
-> > char *ssid)
-> >   {
-> >   	char *path;
-> > diff --git a/src/storage.h b/src/storage.h
-> > index d9b17c7f..a6076d63 100644
-> > --- a/src/storage.h
-> > +++ b/src/storage.h
-> > @@ -36,6 +36,7 @@ bool storage_create_dirs(void);
-> >   void storage_cleanup_dirs(void);
-> >   char *storage_get_path(const char *format, ...);
-> >   char *storage_get_hotspot_path(const char *format, ...);
-> > +char *storage_get_ap_path(const char *format, ...);
-> >   =
-
-> >   const char *storage_network_filename_from_path(const char *path);
-> >   const char *storage_network_ssid_from_path(const char *path,
-> > =
-
+> easily by shipping a default main.conf?
 > =
 
 > Regards,
 > -Denis
+> =
 
---===============7330833567477447610==--
+
+Yes in theory most of this can be achieved with a main.conf. Our problem is=
+, =
+
+that our package manager (xbps) would overwrite already exisiting main.conf=
+ files,
+since they aren't yet tracked by it.
+So patching iwd is our most reliable method that won't break any users conf=
+ig.
+
+Regards,
+John
+
+--===============9199531780608631475==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.htm"
+
+PCFET0NUWVBFIGh0bWw+PGh0bWw+PGhlYWQ+PHRpdGxlPjwvdGl0bGU+PHN0eWxlIHR5cGU9InRl
+eHQvY3NzIj5wLk1zb05vcm1hbCxwLk1zb05vU3BhY2luZ3ttYXJnaW46MH08L3N0eWxlPjwvaGVh
+ZD48Ym9keT48ZGl2PkhpIERlbmlzLjxicj48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2Pk9uIFdl
+ZCwgT2N0IDI4LCAyMDIwLCBhdCA5OjM4IFBNLCBEZW5pcyBLZW56aW9yIHdyb3RlOjxicj48L2Rp
+dj48YmxvY2txdW90ZSB0eXBlPSJjaXRlIiBpZD0icXQiIHN0eWxlPSIiPjxkaXY+SGkgSm9obiw8
+YnI+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5Db3VsZCB5b3UgZXhwbGFpbiB0aGUgbW90aXZh
+dGlvbiBiZWhpbmQgdGhpcyBjaGFuZ2U/Jm5ic3A7IENhbid0IHRoaXMgYmUgYWNjb21wbGlzaGVk
+Jm5ic3A7PGJyPjwvZGl2PjxkaXY+ZWFzaWx5IGJ5IHNoaXBwaW5nIGEgZGVmYXVsdCBtYWluLmNv
+bmY/PGJyPjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+UmVnYXJkcyw8YnI+PC9kaXY+PGRpdj4t
+RGVuaXM8YnI+PC9kaXY+PGRpdj48YnI+PC9kaXY+PC9ibG9ja3F1b3RlPjxkaXY+PGJyPjwvZGl2
+PjxkaXY+WWVzIGluIHRoZW9yeSBtb3N0IG9mIHRoaXMgY2FuIGJlIGFjaGlldmVkIHdpdGggYSBt
+YWluLmNvbmYuIE91ciBwcm9ibGVtIGlzLCA8YnI+PC9kaXY+PGRpdj50aGF0IG91ciBwYWNrYWdl
+IG1hbmFnZXIgKHhicHMpIHdvdWxkIG92ZXJ3cml0ZSBhbHJlYWR5IGV4aXNpdGluZyBtYWluLmNv
+bmYgZmlsZXMsPGJyPjwvZGl2PjxkaXY+IHNpbmNlIHRoZXkgYXJlbid0IHlldCB0cmFja2VkIGJ5
+IGl0Ljxicj48L2Rpdj48ZGl2PlNvIHBhdGNoaW5nIGl3ZCBpcyBvdXIgbW9zdCByZWxpYWJsZSBt
+ZXRob2QgdGhhdCB3b24ndCBicmVhayBhbnkgdXNlcnMgY29uZmlnLjxicj48L2Rpdj48ZGl2Pjxi
+cj48L2Rpdj48ZGl2PlJlZ2FyZHMsPGJyPjwvZGl2PjxkaXY+Sm9objxicj48L2Rpdj48L2JvZHk+
+PC9odG1sPg==
+--===============9199531780608631475==--
 
