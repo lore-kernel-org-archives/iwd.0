@@ -1,42 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============7965199454363285640=="
+Content-Type: multipart/mixed; boundary="===============5467137447929929776=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] ap: fixup incorrect return
-Date: Mon, 02 Nov 2020 12:17:52 -0800
-Message-ID: <20201102201752.2585008-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] ap: fixup incorrect return
+Date: Mon, 02 Nov 2020 14:24:15 -0600
+Message-ID: <f003c316-d56a-da48-cfde-cf67d65e7b19@gmail.com>
+In-Reply-To: <20201102201752.2585008-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7965199454363285640==
+--===============5467137447929929776==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If an RTNL address change fails -EIO should be returned, not
-false (aka "success").
----
- src/ap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi James,
 
-diff --git a/src/ap.c b/src/ap.c
-index bfa9d47e..bebd7295 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -2412,7 +2412,7 @@ static int ap_load_profile_and_dhcp(struct ap_state *=
-ap, bool *wait_dhcp)
- =
+On 11/2/20 2:17 PM, James Prestwood wrote:
+> If an RTNL address change fails -EIO should be returned, not
+> false (aka "success").
+> ---
+>   src/ap.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
- 		if (!ap->rtnl_add_cmd) {
- 			l_error("Failed to add IPv4 address");
--			return false;
-+			return -EIO;
- 		}
- =
 
- 		ap->cleanup_ip =3D true;
--- =
+Applied, thanks
 
-2.26.2
+Regards,
+-Denis
 
---===============7965199454363285640==--
+--===============5467137447929929776==--
 
