@@ -1,58 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============1394770393026190119=="
+Content-Type: multipart/mixed; boundary="===============4628660025892066504=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/3] auto-t: add support for AP StartWithConfig API
-Date: Mon, 02 Nov 2020 10:28:51 -0800
-Message-ID: <20201102182851.2580877-3-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2 1/3] ap: add StartProfile DBus method
+Date: Mon, 02 Nov 2020 13:58:29 -0600
+Message-ID: <23eb61e8-3dbc-e455-edab-fc1aee9dc594@gmail.com>
 In-Reply-To: <20201102182851.2580877-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1394770393026190119==
+--===============4628660025892066504==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If a psk is not provided to start_ap, it is assumed that the
-AP is being started with a config file.
----
- autotests/util/iwd.py | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Hi James,
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index f6ec164f..6f66e8a8 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -467,7 +467,7 @@ class Device(IWDDBusAbstract):
-                                         error_handler=3Dself._failure)
-         self._wait_for_async_op()
- =
+On 11/2/20 12:28 PM, James Prestwood wrote:
+> Users can now start an AP from settings based on a profile
+> on disk. The only argument is the SSID which will be used to
+> lookup the profile. If no profile is found a NotFound error
+> will be returned. Any invalid profiles will result in an
+> Invalid return.
+> ---
+>   src/ap.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>   src/ap.h |  3 +++
+>   2 files changed, 71 insertions(+), 2 deletions(-)
+> =
 
--    def start_ap(self, ssid, psk):
-+    def start_ap(self, ssid, psk=3DNone):
-         try:
-             self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'ap')
-         except Exception as e:
-@@ -476,8 +476,12 @@ class Device(IWDDBusAbstract):
-         self._ap_iface =3D dbus.Interface(self._bus.get_object(IWD_SERVICE,
-                                             self.device_path),
-                                             IWD_AP_INTERFACE)
--        self._ap_iface.Start(ssid, psk, reply_handler=3Dself._success,
--                                     error_handler=3Dself._failure)
-+        if psk:
-+            self._ap_iface.Start(ssid, psk, reply_handler=3Dself._success,
-+                                    error_handler=3Dself._failure)
-+        else:
-+            self._ap_iface.StartProfile(ssid, reply_handler=3Dself._succes=
-s,
-+                                    error_handler=3Dself._failure)
-         self._wait_for_async_op()
- =
+> v2:
+>   * Removed the profile loading from ap_init and squashed that into
+>     this commit.
+>   * This now loads the profiles on the fly when the dbus method is
+>     called. This avoids the need for any special ap_config handling
+>     of transient vs disk profiles.
+> =
 
-     def stop_ap(self):
--- =
 
-2.26.2
+All applied, thanks.
 
---===============1394770393026190119==--
+Regards,
+-Denis
+
+--===============4628660025892066504==--
 
