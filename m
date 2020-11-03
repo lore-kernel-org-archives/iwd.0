@@ -1,62 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============0414391142652092694=="
+Content-Type: multipart/mixed; boundary="===============2777969084923128178=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/4] auto-t: fix testNetconfig hardcoded interface
-Date: Tue, 03 Nov 2020 11:06:39 -0800
-Message-ID: <20201103190641.2736204-2-prestwoj@gmail.com>
+Subject: [PATCH 3/4] auto-t: remove /var/lib/iwd references in
+ testKnownNetworks
+Date: Tue, 03 Nov 2020 11:06:40 -0800
+Message-ID: <20201103190641.2736204-3-prestwoj@gmail.com>
 In-Reply-To: <20201103190641.2736204-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0414391142652092694==
+--===============2777969084923128178==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If running multiple tests testNetconfig would fail due to the
-hardcoded wln0 in the dhcpd.conf file. dhcpd can actually start
-by passing in the interface to the run command rather than
-inside the config file.
 ---
- autotests/testNetconfig/connection_test.py | 3 ++-
- autotests/testNetconfig/dhcpd.conf         | 1 -
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ autotests/testKnownNetworks/frequency_test.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNet=
-config/connection_test.py
-index 6818ceff..5fc7a88e 100644
---- a/autotests/testNetconfig/connection_test.py
-+++ b/autotests/testNetconfig/connection_test.py
-@@ -62,7 +62,8 @@ class Test(unittest.TestCase):
-         ctx.start_process(['ifconfig', hapd.ifname, '192.168.1.1', 'netmas=
-k', '255.255.255.0'],
-                                 wait=3DTrue)
-         ctx.start_process(['touch', '/tmp/dhcpd.leases'], wait=3DTrue)
--        ctx.start_process(['dhcpd', '-cf', '/tmp/dhcpd.conf', '-lf', '/tmp=
-/dhcpd.leases'])
-+        ctx.start_process(['dhcpd', '-cf', '/tmp/dhcpd.conf', '-lf', '/tmp=
-/dhcpd.leases',
-+                            hapd.ifname])
- =
-
-     @classmethod
-     def tearDownClass(cls):
-diff --git a/autotests/testNetconfig/dhcpd.conf b/autotests/testNetconfig/d=
-hcpd.conf
-index 77b4da1c..0c4fe9b9 100644
---- a/autotests/testNetconfig/dhcpd.conf
-+++ b/autotests/testNetconfig/dhcpd.conf
-@@ -10,7 +10,6 @@ subnet 192.168.1.0 netmask 255.255.255.0
-   option routers 192.168.1.1;
-   option subnet-mask 255.255.255.0;
-   option domain-name-servers 192.168.1.1;
--  interface wln0;
-   range 192.168.1.10 192.168.1.20;
-   range 192.168.1.100 192.168.1.200;
-  }
+diff --git a/autotests/testKnownNetworks/frequency_test.py b/autotests/test=
+KnownNetworks/frequency_test.py
+index f07074f2..9c523bb2 100644
+--- a/autotests/testKnownNetworks/frequency_test.py
++++ b/autotests/testKnownNetworks/frequency_test.py
+@@ -67,7 +67,7 @@ class Test(unittest.TestCase):
+         hs20_freqs =3D None
+         hs20_uuid =3D None
+         config =3D ConfigParser()
+-        config.read('/var/lib/iwd/.known_network.freq')
++        config.read('/tmp/iwd/.known_network.freq')
+         for s in config.sections():
+             if os.path.basename(config[s]['name']) =3D=3D 'ssidCCMP.psk':
+                 psk_freqs =3D config[s]['list']
+@@ -116,7 +116,7 @@ class Test(unittest.TestCase):
+         psk_uuid2 =3D None
+         hs20_freqs =3D None
+         config =3D ConfigParser()
+-        config.read('/var/lib/iwd/.known_network.freq')
++        config.read('/tmp/iwd/.known_network.freq')
+         for s in config.sections():
+             self.assertNotEqual(os.path.basename(config[s]['name']),
+                                     'example.conf')
 -- =
 
 2.26.2
 
---===============0414391142652092694==--
+--===============2777969084923128178==--
 
