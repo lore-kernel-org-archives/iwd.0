@@ -1,93 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============7085215391749652326=="
+Content-Type: multipart/mixed; boundary="===============5466223430568670064=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/3] station/wsc: remove beacon loss handling
-Date: Tue, 03 Nov 2020 12:51:27 -0800
-Message-ID: <20201103205129.2744888-1-prestwoj@gmail.com>
+Subject: [PATCH 2/3] netdev: remove handling of beacon loss event
+Date: Tue, 03 Nov 2020 12:51:28 -0800
+Message-ID: <20201103205129.2744888-2-prestwoj@gmail.com>
+In-Reply-To: <20201103205129.2744888-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7085215391749652326==
+--===============5466223430568670064==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Modern kernels ~5.4+ have changed the way lost beacons are
-reported and effectively make the lost beacon event useless
-because it is immediately followed by a disconnect event. This
-does now allow IWD enough time to do much of anything before
-the disconnect comes in and we are forced to fully re-connect
-to a different AP.
 ---
- src/station.c | 26 --------------------------
- src/wsc.c     |  3 ---
- 2 files changed, 29 deletions(-)
+ src/netdev.c | 14 --------------
+ src/netdev.h |  2 --
+ 2 files changed, 16 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index eb254bf6..db36b748 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2085,29 +2085,6 @@ static bool station_cannot_roam(struct station *stat=
-ion)
- 					station->state =3D=3D STATION_STATE_ROAMING;
+diff --git a/src/netdev.c b/src/netdev.c
+index 5d3aa862..3f78afbf 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -671,16 +671,6 @@ struct netdev *netdev_find(int ifindex)
+ 	return l_queue_find(netdev_list, netdev_match, L_UINT_TO_PTR(ifindex));
  }
  =
 
--static void station_lost_beacon(struct station *station)
+-static void netdev_lost_beacon(struct netdev *netdev)
 -{
--	l_debug("%u", netdev_get_ifindex(station->netdev));
--
--	if (station->state !=3D STATION_STATE_ROAMING &&
--			station->state !=3D STATION_STATE_CONNECTED)
+-	if (!netdev->connected)
 -		return;
 -
--	/*
--	 * Tell the roam mechanism to not bother requesting Neighbor Reports,
--	 * preauthenticating or performing other over-the-DS type of
--	 * authentication to target AP, even while station->connected_bss is
--	 * still non-NULL.  The current connection is in a serious condition
--	 * and we might wasting our time with those mechanisms.
--	 */
--	station->roam_no_orig_ap =3D true;
--
--	if (station_cannot_roam(station))
--		return;
--
--	station_roam_trigger_cb(NULL, station);
+-	if (netdev->event_filter)
+-		netdev->event_filter(netdev, NETDEV_EVENT_LOST_BEACON, NULL,
+-							netdev->user_data);
 -}
 -
- #define WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST	(1 << 0)
- #define WNM_REQUEST_MODE_TERMINATION_IMMINENT		(1 << 3)
- #define WNM_REQUEST_MODE_ESS_DISASSOCIATION_IMMINENT	(1 << 4)
-@@ -2235,9 +2212,6 @@ static void station_netdev_event(struct netdev *netde=
-v, enum netdev_event event,
- 	case NETDEV_EVENT_ASSOCIATING:
- 		l_debug("Associating");
- 		break;
--	case NETDEV_EVENT_LOST_BEACON:
--		station_lost_beacon(station);
--		break;
- 	case NETDEV_EVENT_DISCONNECT_BY_AP:
- 	case NETDEV_EVENT_DISCONNECT_BY_SME:
- 		station_disconnect_event(station, event_data);
-diff --git a/src/wsc.c b/src/wsc.c
-index 66ddb8bf..aec9900c 100644
---- a/src/wsc.c
-+++ b/src/wsc.c
-@@ -247,9 +247,6 @@ static void wsc_enrollee_netdev_event(struct netdev *ne=
-tdev,
- 	case NETDEV_EVENT_AUTHENTICATING:
- 	case NETDEV_EVENT_ASSOCIATING:
- 		break;
--	case NETDEV_EVENT_LOST_BEACON:
--		l_debug("Lost beacon");
--		break;
- 	case NETDEV_EVENT_DISCONNECT_BY_AP:
- 		l_debug("Disconnect by AP");
- 		wsc_enrollee_connect_cb(wsce->netdev,
+ /* Threshold RSSI for roaming to trigger, configurable in main.conf */
+ static int LOW_SIGNAL_THRESHOLD;
+ =
+
+@@ -771,10 +761,6 @@ static void netdev_cqm_event(struct l_genl_msg *msg, s=
+truct netdev *netdev)
+ =
+
+ 			while (l_genl_attr_next(&nested, &type, &len, &data)) {
+ 				switch (type) {
+-				case NL80211_ATTR_CQM_BEACON_LOSS_EVENT:
+-					netdev_lost_beacon(netdev);
+-					break;
+-
+ 				case NL80211_ATTR_CQM_RSSI_THRESHOLD_EVENT:
+ 					if (len !=3D 4)
+ 						continue;
+diff --git a/src/netdev.h b/src/netdev.h
+index 58b63fbd..65fdbaaf 100644
+--- a/src/netdev.h
++++ b/src/netdev.h
+@@ -40,7 +40,6 @@ enum netdev_result {
+ enum netdev_event {
+ 	NETDEV_EVENT_AUTHENTICATING,
+ 	NETDEV_EVENT_ASSOCIATING,
+-	NETDEV_EVENT_LOST_BEACON,
+ 	NETDEV_EVENT_DISCONNECT_BY_AP,
+ 	NETDEV_EVENT_DISCONNECT_BY_SME,
+ 	NETDEV_EVENT_RSSI_THRESHOLD_LOW,
+@@ -89,7 +88,6 @@ typedef void (*netdev_connect_cb_t)(struct netdev *netdev,
+  *
+  * NETDEV_EVENT_AUTHENTICATING - unused
+  * NETDEV_EVENT_ASSOCIATING - unused
+- * NETDEV_EVENT_LOST_BEACON - unused
+  * NETDEV_EVENT_DISCONNECT_BY_AP - MMPDU_REASON_CODE
+  * NETDEV_EVENT_DISCONNECT_BY_SME - MMPDU_REASON_CODE
+  * NETDEV_EVENT_RSSI_THRESHOLD_LOW - unused
 -- =
 
 2.26.2
 
---===============7085215391749652326==--
+--===============5466223430568670064==--
 
