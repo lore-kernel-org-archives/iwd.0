@@ -1,36 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============6423782026115378615=="
+Content-Type: multipart/mixed; boundary="===============8909710243663883751=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/4] ap: make APRanges optional
-Date: Tue, 03 Nov 2020 13:59:25 -0600
-Message-ID: <5f42c94c-e4e3-d976-e6ea-f1fbc2357327@gmail.com>
-In-Reply-To: <20201103190641.2736204-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] auto-t: remove more /var/lib/iwd references
+Date: Tue, 03 Nov 2020 12:51:14 -0800
+Message-ID: <20201103205114.2744828-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6423782026115378615==
+--===============8909710243663883751==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+The address randomization test was using a /var/lib/iwd which
+is no longer specially mounted or used for IWD storage. Instead
+use /tmp/iwd.
+---
+ autotests/testAddressRandomization/connection_test.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On 11/3/20 1:06 PM, James Prestwood wrote:
-> If EnableNetworkConfiguration was enabled ap.c required that
-> APRanges also be set. This prevents IWD from starting which
-> effects a perfectly valid station configuration. Instead if
-> APRanges is not provided IWD still allows ap_init to pass but
-> DHCP just will not be enabled.
-> ---
->   src/ap.c | 9 +++++++--
->   1 file changed, 7 insertions(+), 2 deletions(-)
-> =
+diff --git a/autotests/testAddressRandomization/connection_test.py b/autote=
+sts/testAddressRandomization/connection_test.py
+index 10d1b35b..d9806f8a 100644
+--- a/autotests/testAddressRandomization/connection_test.py
++++ b/autotests/testAddressRandomization/connection_test.py
+@@ -54,7 +54,7 @@ class Test(unittest.TestCase):
+         wd.wait_for_object_condition(device, condition)
+ =
 
+         # 1. Test per-network deterministic MAC generation
+-        os.system('cat pernetwork.psk > /var/lib/iwd/ssidCCMP.psk')
++        os.system('cat pernetwork.psk > /tmp/iwd/ssidCCMP.psk')
+         new_addr =3D self.try_connection(wd)
+         self.assertNotEqual(perm_addr, new_addr)
+         # try again to ensure the generation was deterministic
+@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
+         self.assertEqual(new_addr, new_addr2)
+ =
 
-All applied, thanks.
+         # 2. Test FullAddressRandomization
+-        os.system('cat full_random.psk > /var/lib/iwd/ssidCCMP.psk')
++        os.system('cat full_random.psk > /tmp/iwd/ssidCCMP.psk')
+         new_addr =3D self.try_connection(wd)
+         self.assertNotEqual(perm_addr, new_addr)
+         # try again to make sure the generation was random
+@@ -70,7 +70,7 @@ class Test(unittest.TestCase):
+         self.assertNotEqual(new_addr, new_addr2)
+ =
 
-Regards,
--Denis
+         # 3. Test AddressOverride
+-        os.system('cat override.psk > /var/lib/iwd/ssidCCMP.psk')
++        os.system('cat override.psk > /tmp/iwd/ssidCCMP.psk')
+         new_addr =3D self.try_connection(wd)
+         self.assertEqual(new_addr, 'e6:f6:38:a9:02:02')
+ =
 
---===============6423782026115378615==--
+-- =
+
+2.26.2
+
+--===============8909710243663883751==--
 
