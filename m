@@ -1,41 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============0635294715031279091=="
+Content-Type: multipart/mixed; boundary="===============6423782026115378615=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] test-runner: fix Radio/Interface circular reference
-Date: Tue, 03 Nov 2020 13:57:54 -0600
-Message-ID: <18af922a-3eba-dc01-0fb9-ecbe96c1481c@gmail.com>
-In-Reply-To: <20201103170306.2653870-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/4] ap: make APRanges optional
+Date: Tue, 03 Nov 2020 13:59:25 -0600
+Message-ID: <5f42c94c-e4e3-d976-e6ea-f1fbc2357327@gmail.com>
+In-Reply-To: <20201103190641.2736204-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0635294715031279091==
+--===============6423782026115378615==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 11/3/20 11:03 AM, James Prestwood wrote:
-> Code was added with commit 04487f575b6 which passes a radio object
-> to the Interface class constructor and stores it in the Interface
-> object. The radio class also stores each Interface object which
-> creates a circular reference and causes the Radio to stick around
-> long after the tests finishes.
-> =
-
-> I cannot see why the Interface needs to keep track of the Radio
-> object. None of the wpa_supplicant utilities use this so it has
-> been removed.
+On 11/3/20 1:06 PM, James Prestwood wrote:
+> If EnableNetworkConfiguration was enabled ap.c required that
+> APRanges also be set. This prevents IWD from starting which
+> effects a perfectly valid station configuration. Instead if
+> APRanges is not provided IWD still allows ap_init to pass but
+> DHCP just will not be enabled.
 > ---
->   tools/test-runner | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
+>   src/ap.c | 9 +++++++--
+>   1 file changed, 7 insertions(+), 2 deletions(-)
 > =
 
 
-Applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
 
---===============0635294715031279091==--
+--===============6423782026115378615==--
 
