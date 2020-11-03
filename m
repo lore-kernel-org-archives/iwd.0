@@ -1,64 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============5058313458665504186=="
+Content-Type: multipart/mixed; boundary="===============1407427249252139922=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] test-runner: fix Radio/Interface circular reference
-Date: Tue, 03 Nov 2020 09:03:06 -0800
-Message-ID: <20201103170306.2653870-1-prestwoj@gmail.com>
+Subject: [PATCH 1/4] ap: make APRanges optional
+Date: Tue, 03 Nov 2020 11:06:38 -0800
+Message-ID: <20201103190641.2736204-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5058313458665504186==
+--===============1407427249252139922==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Code was added with commit 04487f575b6 which passes a radio object
-to the Interface class constructor and stores it in the Interface
-object. The radio class also stores each Interface object which
-creates a circular reference and causes the Radio to stick around
-long after the tests finishes.
-
-I cannot see why the Interface needs to keep track of the Radio
-object. None of the wpa_supplicant utilities use this so it has
-been removed.
+If EnableNetworkConfiguration was enabled ap.c required that
+APRanges also be set. This prevents IWD from starting which
+effects a perfectly valid station configuration. Instead if
+APRanges is not provided IWD still allows ap_init to pass but
+DHCP just will not be enabled.
 ---
- tools/test-runner | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ src/ap.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 3ae4558c..b4840fa4 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -246,11 +246,10 @@ class Process:
- 				raise Exception("Timed out waiting for socket")
+diff --git a/src/ap.c b/src/ap.c
+index bebd7295..4d0d5686 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -3028,9 +3028,14 @@ static int ap_init(void)
  =
 
- class Interface:
--	def __init__(self, name, config, radio):
-+	def __init__(self, name, config):
- 		self.name =3D name
- 		self.ctrl_interface =3D '/var/run/hostapd/' + name
- 		self.config =3D config
--		self.radio =3D radio
+ 		ip_prefix =3D l_settings_get_string(settings, "General",
+ 							"APRanges");
++		/*
++		 * In this case its assumed the user only cares about station
++		 * netconfig so we let ap_init pass but DHCP will not be
++		 * enabled.
++		 */
+ 		if (!ip_prefix) {
+-			l_error("[General].APRanges must be set for DHCP");
+-			return -EINVAL;
++			l_warn("[General].APRanges must be set for DHCP");
++			return 0;
+ 		}
  =
 
- 	def __del__(self):
- 		Process(['iw', 'dev', self.name, 'del'], True)
-@@ -276,7 +275,7 @@ class Radio:
- =
-
- 		intf_id +=3D 1
- =
-
--		self.interface =3D Interface(ifname, config, self)
-+		self.interface =3D Interface(ifname, config)
- 		self.use =3D use
- =
-
- 		Process(['iw', 'phy', self.name, 'interface', 'add', ifname,
+ 		if (!ip_pool_create(ip_prefix))
 -- =
 
 2.26.2
 
---===============5058313458665504186==--
+--===============1407427249252139922==--
 
