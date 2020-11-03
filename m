@@ -1,33 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============5467137447929929776=="
+Content-Type: multipart/mixed; boundary="===============5058313458665504186=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] ap: fixup incorrect return
-Date: Mon, 02 Nov 2020 14:24:15 -0600
-Message-ID: <f003c316-d56a-da48-cfde-cf67d65e7b19@gmail.com>
-In-Reply-To: <20201102201752.2585008-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] test-runner: fix Radio/Interface circular reference
+Date: Tue, 03 Nov 2020 09:03:06 -0800
+Message-ID: <20201103170306.2653870-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5467137447929929776==
+--===============5058313458665504186==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Code was added with commit 04487f575b6 which passes a radio object
+to the Interface class constructor and stores it in the Interface
+object. The radio class also stores each Interface object which
+creates a circular reference and causes the Radio to stick around
+long after the tests finishes.
 
-On 11/2/20 2:17 PM, James Prestwood wrote:
-> If an RTNL address change fails -EIO should be returned, not
-> false (aka "success").
-> ---
->   src/ap.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+I cannot see why the Interface needs to keep track of the Radio
+object. None of the wpa_supplicant utilities use this so it has
+been removed.
+---
+ tools/test-runner | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
+diff --git a/tools/test-runner b/tools/test-runner
+index 3ae4558c..b4840fa4 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -246,11 +246,10 @@ class Process:
+ 				raise Exception("Timed out waiting for socket")
+ =
 
-Applied, thanks
+ class Interface:
+-	def __init__(self, name, config, radio):
++	def __init__(self, name, config):
+ 		self.name =3D name
+ 		self.ctrl_interface =3D '/var/run/hostapd/' + name
+ 		self.config =3D config
+-		self.radio =3D radio
+ =
 
-Regards,
--Denis
+ 	def __del__(self):
+ 		Process(['iw', 'dev', self.name, 'del'], True)
+@@ -276,7 +275,7 @@ class Radio:
+ =
 
---===============5467137447929929776==--
+ 		intf_id +=3D 1
+ =
+
+-		self.interface =3D Interface(ifname, config, self)
++		self.interface =3D Interface(ifname, config)
+ 		self.use =3D use
+ =
+
+ 		Process(['iw', 'phy', self.name, 'interface', 'add', ifname,
+-- =
+
+2.26.2
+
+--===============5058313458665504186==--
 
