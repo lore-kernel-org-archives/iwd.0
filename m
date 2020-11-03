@@ -1,62 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============7299225487955370984=="
+Content-Type: multipart/mixed; boundary="===============0635294715031279091=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] auto-t: fix agent path timing issue
-Date: Tue, 03 Nov 2020 11:06:41 -0800
-Message-ID: <20201103190641.2736204-4-prestwoj@gmail.com>
-In-Reply-To: <20201103190641.2736204-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] test-runner: fix Radio/Interface circular reference
+Date: Tue, 03 Nov 2020 13:57:54 -0600
+Message-ID: <18af922a-3eba-dc01-0fb9-ecbe96c1481c@gmail.com>
+In-Reply-To: <20201103170306.2653870-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7299225487955370984==
+--===============0635294715031279091==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The agent path was generated based on the current time which
-sometimes yielded duplicate paths if agents were created quickly
-after one another. Instead a simple iterator removes any chance
-of a duplicate path.
----
- autotests/util/iwd.py | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 7b08c23e..3ffd9f23 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -705,17 +705,22 @@ class OrderedNetwork(object):
-                         str(self.signal_strength)) + '\n'\
-                 '\tObject: \n' + self.network_object.__str__('\t\t')
- =
+On 11/3/20 11:03 AM, James Prestwood wrote:
+> Code was added with commit 04487f575b6 which passes a radio object
+> to the Interface class constructor and stores it in the Interface
+> object. The radio class also stores each Interface object which
+> creates a circular reference and causes the Radio to stick around
+> long after the tests finishes.
+> =
 
-+agent_count =3D 0
- =
+> I cannot see why the Interface needs to keep track of the Radio
+> object. None of the wpa_supplicant utilities use this so it has
+> been removed.
+> ---
+>   tools/test-runner | 5 ++---
+>   1 file changed, 2 insertions(+), 3 deletions(-)
+> =
 
- class PSKAgent(dbus.service.Object):
- =
 
-     def __init__(self, passphrases=3D[], users=3D[]):
-+        global agent_count
-+
-         if type(passphrases) !=3D list:
-             passphrases =3D [passphrases]
-         self.passphrases =3D passphrases
-         if type(users) !=3D list:
-             users =3D [users]
-         self.users =3D users
--        self._path =3D '/test/agent/' + str(int(round(time.time() * 1000)))
-+        self._path =3D '/test/agent/%s' % agent_count
-+
-+        agent_count +=3D 1
- =
+Applied, thanks.
 
-         dbus.service.Object.__init__(self, dbus.SystemBus(), self._path)
- =
+Regards,
+-Denis
 
--- =
-
-2.26.2
-
---===============7299225487955370984==--
+--===============0635294715031279091==--
 
