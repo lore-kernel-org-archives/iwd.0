@@ -1,26 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============8852829218767328410=="
+Content-Type: multipart/mixed; boundary="===============2538522354376112498=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/4] doc: add man pages for AP provisioning files
-Date: Wed, 04 Nov 2020 13:39:27 -0600
-Message-ID: <c757fd4c-09fc-694e-8ded-4da65c56d4d0@gmail.com>
-In-Reply-To: <20201104165227.2782516-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/3] station/wsc: remove beacon loss handling
+Date: Wed, 04 Nov 2020 13:41:21 -0600
+Message-ID: <e72bbb0e-89f3-b38f-fbda-84f558368cca@gmail.com>
+In-Reply-To: <20201103205129.2744888-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8852829218767328410==
+--===============2538522354376112498==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 11/4/20 10:52 AM, James Prestwood wrote:
+On 11/3/20 2:51 PM, James Prestwood wrote:
+> Modern kernels ~5.4+ have changed the way lost beacons are
+> reported and effectively make the lost beacon event useless
+> because it is immediately followed by a disconnect event. This
+> does now allow IWD enough time to do much of anything before
+> the disconnect comes in and we are forced to fully re-connect
+> to a different AP.
 > ---
->   Makefile.am    |  6 +++--
->   src/iwd.ap.rst | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 66 insertions(+), 2 deletions(-)
->   create mode 100644 src/iwd.ap.rst
+>   src/station.c | 26 --------------------------
+>   src/wsc.c     |  3 ---
+>   2 files changed, 29 deletions(-)
 > =
 
 
@@ -29,5 +34,5 @@ All applied, thanks.
 Regards,
 -Denis
 
---===============8852829218767328410==--
+--===============2538522354376112498==--
 
