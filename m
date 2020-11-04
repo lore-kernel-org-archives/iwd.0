@@ -1,134 +1,127 @@
-Content-Type: multipart/mixed; boundary="===============2233587237991747800=="
+Content-Type: multipart/mixed; boundary="===============2337970420379817572=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] auto-t: add profile based DHCP test
-Date: Wed, 04 Nov 2020 08:48:10 -0800
-Message-ID: <20201104164810.2777541-3-prestwoj@gmail.com>
-In-Reply-To: <20201104164810.2777541-1-prestwoj@gmail.com>
+Subject: [PATCH 1/4] doc: add man pages for AP provisioning files
+Date: Wed, 04 Nov 2020 08:52:24 -0800
+Message-ID: <20201104165227.2782516-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2233587237991747800==
+--===============2337970420379817572==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- autotests/testAP/dhcp/APConfig.ap    | 10 ++++
- autotests/testAP/dhcp_config_test.py | 79 ++++++++++++++++++++++++++++
- 2 files changed, 89 insertions(+)
- create mode 100644 autotests/testAP/dhcp/APConfig.ap
- create mode 100644 autotests/testAP/dhcp_config_test.py
+ Makefile.am    |  6 +++--
+ src/iwd.ap.rst | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 66 insertions(+), 2 deletions(-)
+ create mode 100644 src/iwd.ap.rst
 
-diff --git a/autotests/testAP/dhcp/APConfig.ap b/autotests/testAP/dhcp/APCo=
-nfig.ap
+diff --git a/Makefile.am b/Makefile.am
+index d49833b7..1f0b0d30 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -171,7 +171,8 @@ man_MANS =3D
+ endif
+ =
+
+ manual_pages =3D src/iwd.8 src/iwd.debug.7 src/iwd.config.5 src/iwd.networ=
+k.5 \
+-		client/iwctl.1 monitor/iwmon.1 wired/ead.8 tools/hwsim.1
++		src/iwd.ap.5 client/iwctl.1 monitor/iwmon.1 wired/ead.8 \
++		tools/hwsim.1
+ =
+
+ eap_sources =3D src/eap.c src/eap.h src/eap-private.h \
+ 				src/eap-md5.c \
+@@ -263,7 +264,8 @@ systemd_network_DATA +=3D src/80-iwd.link
+ endif
+ =
+
+ if MANUAL_PAGES
+-man_MANS +=3D src/iwd.8 src/iwd.debug.7 src/iwd.config.5 src/iwd.network.5
++man_MANS +=3D src/iwd.8 src/iwd.debug.7 src/iwd.config.5 src/iwd.network.5=
+ \
++		src/iwd.ap.5
+ endif
+ endif
+ =
+
+diff --git a/src/iwd.ap.rst b/src/iwd.ap.rst
 new file mode 100644
-index 00000000..4e99dbde
+index 00000000..939bf99d
 --- /dev/null
-+++ b/autotests/testAP/dhcp/APConfig.ap
-@@ -0,0 +1,10 @@
-+[Security]
-+Passphrase=3Dpassword123
++++ b/src/iwd.ap.rst
+@@ -0,0 +1,62 @@
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++ iwd.ap
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+[IPv4]
-+Address=3D192.168.1.1
-+Gateway=3D192.168.1.1
-+Netmask=3D255.255.255.0
-+DNSList=3D192.168.1.1,192.168.1.2
-+LeaseTime=3D10
-+IPRange=3D192.168.1.3,192.168.1.100
-diff --git a/autotests/testAP/dhcp_config_test.py b/autotests/testAP/dhcp_c=
-onfig_test.py
-new file mode 100644
-index 00000000..a278c3b7
---- /dev/null
-+++ b/autotests/testAP/dhcp_config_test.py
-@@ -0,0 +1,79 @@
-+#! /usr/bin/python3
++--------------------------------------
++Configuration of IWD access point
++--------------------------------------
 +
-+import unittest
-+import sys, os
++:Author: James Prestwood <prestwoj@gmail.com>
++:Copyright: 2020 Intel Corporation
++:Version: iwd
++:Date: 20 October 2020
++:Manual section: 5
++:Manual group: Linux Connectivity
 +
-+import iwd
-+from iwd import IWD
-+from iwd import PSKAgent
-+from iwd import NetworkType
-+from config import ctx
-+import testutil
++NAME
++=3D=3D=3D=3D
++iwd.ap - Access point provisioning files
 +
-+class Test(unittest.TestCase):
-+    def test_connection_success(self):
-+        # Using main.conf containing APRanges. The APConfig SSID should ov=
-erride
-+        # this range.
-+        wd =3D IWD(True, '/tmp/dhcp')
++SYNOPSIS
++=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+        dev1, dev2 =3D wd.list_devices(2)
++Description of access point provisioning files.
 +
-+        dev1.start_ap('APConfig')
++DESCRIPTION
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+        try:
-+            condition =3D 'not obj.scanning'
-+            wd.wait_for_object_condition(dev2, condition)
-+            dev2.scan()
-+            condition =3D 'obj.scanning'
-+            wd.wait_for_object_condition(dev2, condition)
-+            condition =3D 'not obj.scanning'
-+            wd.wait_for_object_condition(dev2, condition)
++An access point provisioning files define the configuration of an IWD acce=
+ss
++point. These files live in *$STATE_DIRECTORY*/ap (/var/lib/iwd/ap by defau=
+lt).
 +
-+            ordered_networks =3D dev2.get_ordered_networks()
++FILE FORMAT
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+            networks =3D { n.name: n for n in ordered_networks }
-+            self.assertEqual(networks['APConfig'].type, NetworkType.psk)
++See *iwd.network* for details on the file format.
 +
-+            psk_agent =3D PSKAgent('password123')
-+            wd.register_psk_agent(psk_agent)
++SETTINGS
++=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+            try:
-+                dev2.disconnect()
++The settings are split into several categories.  Each category has a group
++associated with it and described in separate tables below.
 +
-+                condition =3D 'not obj.connected'
-+                wd.wait_for_object_condition(dev2, condition)
-+            except:
-+                pass
++Network Authentication Settings
++-------------------------------
 +
-+            networks['APConfig'].network_object.connect()
++The group ``[Security]`` contains settings for Wi-Fi security and authenti=
+cation
++configuration.
 +
-+            condition =3D 'obj.state =3D=3D DeviceState.connected'
-+            wd.wait_for_object_condition(dev2, condition)
++.. list-table::
++   :header-rows: 0
++   :stub-columns: 0
++   :widths: 20 80
++   :align: left
 +
-+            testutil.test_iface_operstate(dev2.name)
-+            testutil.test_ifaces_connected(dev1.name, dev2.name, group=3DF=
-alse)
++   * - Passphrase
++     - 8..63 character string
 +
-+            testutil.test_ip_address_match(dev1.name, "192.168.1.1")
-+            testutil.test_ip_address_match(dev2.name, "192.168.1.3")
++       Passphrase to be used with this access point.
 +
-+            wd.unregister_psk_agent(psk_agent)
++SEE ALSO
++=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+            dev2.disconnect()
-+
-+            condition =3D 'not obj.connected'
-+            wd.wait_for_object_condition(networks['APConfig'].network_obje=
-ct,
-+                                         condition)
-+
-+        finally:
-+            dev1.stop_ap()
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        IWD.copy_to_ap('dhcp/APConfig.ap')
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
++iwd(8), iwd.network(5)
 -- =
 
 2.26.2
 
---===============2233587237991747800==--
+--===============2337970420379817572==--
 
