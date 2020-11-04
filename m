@@ -1,24 +1,26 @@
-Content-Type: multipart/mixed; boundary="===============5586682486843612775=="
+Content-Type: multipart/mixed; boundary="===============8852829218767328410=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/3] auto-t: add copy_to_ap utility
-Date: Wed, 04 Nov 2020 13:36:27 -0600
-Message-ID: <52cbbd6d-6cd0-a951-42b7-3ed73cbb381a@gmail.com>
-In-Reply-To: <20201104164810.2777541-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/4] doc: add man pages for AP provisioning files
+Date: Wed, 04 Nov 2020 13:39:27 -0600
+Message-ID: <c757fd4c-09fc-694e-8ded-4da65c56d4d0@gmail.com>
+In-Reply-To: <20201104165227.2782516-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5586682486843612775==
+--===============8852829218767328410==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 11/4/20 10:48 AM, James Prestwood wrote:
+On 11/4/20 10:52 AM, James Prestwood wrote:
 > ---
->   autotests/util/iwd.py | 8 ++++++++
->   1 file changed, 8 insertions(+)
+>   Makefile.am    |  6 +++--
+>   src/iwd.ap.rst | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 66 insertions(+), 2 deletions(-)
+>   create mode 100644 src/iwd.ap.rst
 > =
 
 
@@ -27,5 +29,5 @@ All applied, thanks.
 Regards,
 -Denis
 
---===============5586682486843612775==--
+--===============8852829218767328410==--
 
