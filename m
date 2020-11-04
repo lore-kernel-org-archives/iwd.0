@@ -1,50 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============4765413722105347050=="
+Content-Type: multipart/mixed; boundary="===============6933045038911739856=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/4] doc: document AP StartProfile
-Date: Wed, 04 Nov 2020 08:52:25 -0800
-Message-ID: <20201104165227.2782516-2-prestwoj@gmail.com>
+Subject: [PATCH 3/4] doc: add APRanges documentation
+Date: Wed, 04 Nov 2020 08:52:26 -0800
+Message-ID: <20201104165227.2782516-3-prestwoj@gmail.com>
 In-Reply-To: <20201104165227.2782516-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4765413722105347050==
+--===============6933045038911739856==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- doc/access-point-api.txt | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ src/iwd.config.rst | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/doc/access-point-api.txt b/doc/access-point-api.txt
-index 9ee06baa..9682b3c7 100644
---- a/doc/access-point-api.txt
-+++ b/doc/access-point-api.txt
-@@ -25,6 +25,18 @@ Methods		void Start(string ssid, string psk)
- 						net.connman.iwd.Failed
- 						net.connman.iwd.InvalidArguments
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 96774092..5d3cfb3a 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -67,10 +67,23 @@ The group ``[General]`` contains general settings.
+        obtain the dynamic addresses from the network through the built-in
+        DHCP client.
  =
 
-+		void StartProfile(string ssid)
++       This also enables DHCP server when in AP mode when either
++       [General].APRanges is set or an AP profile is being used.
 +
-+			Start a profile based access point. A profile must exist
-+			in IWD's AP configuration directory (/var/lib/iwd/ap/
-+			by default) of the name <ssid>.ap.
-+
-+			Possible errors:	net.connman.iwd.Busy
-+						net.connman.iwd.Failed
-+						net.connman.iwd.InvalidArguments
-+						net.connman.iwd.AlreadyExists
-+						net.connman.iwd.NotFound
-+
- Properties	boolean Started [readonly]
+        The network configuration feature is disabled by default.  See
+        ``[Network]`` settings for additional settings related to network
+        configuration.
  =
 
- 			Reflects whether an access point has been started.
++   * - APRanges
++     - Values: <IP in prefix notation>
++
++       Sets the range of IP's used for DHCP server (AP mode). The IP shoul=
+d be
++       in prefix notation e.g. aaa.bbb.ccc.ddd/xx. AP's which are started =
+in a
++       profile-less configuration will use this pool of IP's to set the AP=
+'s
++       interface address as well as default DHCP server options. Each AP w=
+ill
++       get a new subnet from the range and clients will be addressed in th=
+at
++       subnet to avoid IP conflicts if multiple AP's are started.
++
+    * - UseDefaultInterface
+      - Values: true, **false**
+ =
+
 -- =
 
 2.26.2
 
---===============4765413722105347050==--
+--===============6933045038911739856==--
 
