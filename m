@@ -1,151 +1,85 @@
-Content-Type: multipart/mixed; boundary="===============8283669537760827565=="
+Content-Type: multipart/mixed; boundary="===============4928227656160012439=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2] test-runner: add option to specify subtests to run
-Date: Thu, 05 Nov 2020 10:33:40 -0800
-Message-ID: <20201105183340.2936732-1-prestwoj@gmail.com>
+From: Jonathan Liu <net147@gmail.com>
+Subject: [PATCH] ap: Fix handshake state gtk not being set
+Date: Sun, 15 Nov 2020 01:21:45 +1100
+Message-ID: <20201114142145.661665-1-net147@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8283669537760827565==
+--===============4928227656160012439==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-You can now specify a limited list of subtests to run out of a
-full auto-test using --sub-tests,-S. This option is limited in
-that it is only meant to be used with a single autotest (since
-it doesn't make much sense otherwise).
+handshake_state_set_authenticator_ie must be called to set group_cipher
+in struct handshake_shake before handshake_set_gtk_state, otherwise
+handshake_set_gtk_state is unable to determine the key length to set
+handshake state gtk.
 
-The subtest can be specified both with or without the file
-extension.
-
-Example usage:
-
-./test-runner -A testAP -S failure_test,dhcp_test.py
-
-This will only run the two subtests and exclude any other *.py
-tests present in the test directory.
+Fixes: 4bc20a097965 ("ap: Start EAP-WSC authentication with WSC enrollees")
 ---
- tools/test-runner | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ src/ap.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-v2:
- * Fixed list split/join problems =
-
-
-diff --git a/tools/test-runner b/tools/test-runner
-index b4840fa4..97d0e32c 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -892,6 +892,18 @@ def pre_test(ctx, test):
- 		else:
- 			shutil.copy(f, '/tmp')
+diff --git a/src/ap.c b/src/ap.c
+index 4d0d5686..d9e7e404 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -702,7 +702,8 @@ static uint32_t ap_send_mgmt_frame(struct ap_state *ap,
+ 					callback, user_data, NULL, NULL);
+ }
  =
 
-+	# Prune down any subtests if needed
-+	if ctx.args.sub_tests:
-+		ctx.args.sub_tests =3D ctx.args.sub_tests.split(',')
-+		pruned =3D []
+-static void ap_start_handshake(struct sta_state *sta, bool use_eapol_start)
++static void ap_start_handshake(struct sta_state *sta, bool use_eapol_start,
++				const uint8_t *gtk_rsc)
+ {
+ 	struct ap_state *ap =3D sta->ap;
+ 	const uint8_t *own_addr =3D netdev_get_address(ap->netdev);
+@@ -722,6 +723,10 @@ static void ap_start_handshake(struct sta_state *sta, =
+bool use_eapol_start)
+ 	ie_build_rsne(&rsn, bss_rsne);
+ 	handshake_state_set_authenticator_ie(sta->hs, bss_rsne);
+ =
+
++	if (gtk_rsc)
++		handshake_state_set_gtk(sta->hs, sta->ap->gtk,
++					sta->ap->gtk_index, gtk_rsc);
 +
-+		for s in subtests:
-+			# Allow test name both with and without the extension
-+			if s in ctx.args.sub_tests or os.path.splitext(s)[0] in ctx.args.sub_te=
-sts:
-+				pruned.append(s)
-+
-+		subtests =3D pruned
-+
- 	ctx.start_dbus_monitor()
- 	ctx.start_radios()
- 	ctx.start_hostapd()
-@@ -996,6 +1008,10 @@ def run_auto_tests(ctx, args):
- 		try:
- 			copied, subtests =3D pre_test(ctx, test)
+ 	sta->sm =3D eapol_sm_new(sta->hs);
+ 	if (!sta->sm) {
+ 		ap_stop_handshake(sta);
+@@ -774,12 +779,7 @@ static void ap_start_rsna(struct sta_state *sta, const=
+ uint8_t *gtk_rsc)
+ 	handshake_state_set_event_func(sta->hs, ap_handshake_event, sta);
+ 	handshake_state_set_supplicant_ie(sta->hs, sta->assoc_rsne);
+ 	handshake_state_set_pmk(sta->hs, sta->ap->config->psk, 32);
+-
+-	if (gtk_rsc)
+-		handshake_state_set_gtk(sta->hs, sta->ap->gtk,
+-					sta->ap->gtk_index, gtk_rsc);
+-
+-	ap_start_handshake(sta, false);
++	ap_start_handshake(sta, false, gtk_rsc);
+ }
  =
 
-+			if len(subtests) < 1:
-+				dbg("No tests to run")
-+				exit()
-+
- 			rqueue =3D multiprocessing.Queue()
- 			p =3D multiprocessing.Process(target=3Dstart_test, args=3D(ctx, subtest=
-s, rqueue))
- 			p.start()
-@@ -1060,6 +1076,7 @@ def run_tests():
- 	parser.add_argument('--log-uid')
- 	parser.add_argument('--hw')
- 	parser.add_argument('--monitor')
-+	parser.add_argument('--sub_tests')
+ static void ap_gtk_query_cb(struct l_genl_msg *msg, void *user_data)
+@@ -924,7 +924,7 @@ static void ap_start_eap_wsc(struct sta_state *sta)
+ 	handshake_state_set_event_func(sta->hs, ap_wsc_handshake_event, sta);
+ 	handshake_state_set_8021x_config(sta->hs, sta->wsc_settings);
  =
 
- 	args =3D parser.parse_args(options)
+-	ap_start_handshake(sta, wait_for_eapol_start);
++	ap_start_handshake(sta, wait_for_eapol_start, NULL);
+ }
  =
 
-@@ -1128,6 +1145,9 @@ class Main:
- 				help=3D'Use physical adapters for tests (passthrough)')
- 		self.parser.add_argument('--monitor', '-m', type=3Dstr,
- 				help=3D'Enables iwmon output to file')
-+		self.parser.add_argument('--sub-tests', '-S', metavar=3D'<subtests>',
-+				type=3Dstr, nargs=3D1, help=3D'List of subtests to run',
-+				default=3DNone, dest=3D'sub_tests')
- =
-
- 		# Prevent --autotest/--unittest from being used together
- 		auto_unit_group =3D self.parser.add_mutually_exclusive_group()
-@@ -1153,10 +1173,25 @@ class Main:
- =
-
- 		self.args =3D self.parser.parse_args()
- =
-
-+		if self.args.auto_tests:
-+			self.args.auto_tests =3D self.args.auto_tests[0].split(',')
-+
-+		if self.args.sub_tests:
-+			self.args.sub_tests =3D self.args.sub_tests[0].split(',')
-+
- 		if self.args.log and self.args.unit_tests:
- 			dbg("Cannot use --log with --unit-tests")
- 			quit()
- =
-
-+		if self.args.sub_tests:
-+			if not self.args.auto_tests:
-+				dbg("--sub-tests must be used with --auto-tests")
-+				quit()
-+
-+			if len(self.args.auto_tests) > 1:
-+				dbg("--sub-tests must be used with a single auto test")
-+				quit()
-+
- 	def start(self):
- 		usb_adapters =3D None
- =
-
-@@ -1220,6 +1255,9 @@ class Main:
- 		if self.args.auto_tests:
- 			options +=3D ' --auto_tests %s' % ','.join(self.args.auto_tests)
- =
-
-+		if self.args.sub_tests:
-+			options +=3D ' --sub_tests %s' % ','.join(self.args.sub_tests)
-+
- 		if self.args.log:
- 			if os.environ.get('SUDO_GID', None) is None:
- 				print("--log can only be used as root user")
-@@ -1242,6 +1280,7 @@ class Main:
- =
-
- 		denylist =3D [
- 			'auto_tests',
-+			'sub_tests',
- 			'qemu',
- 			'kernel'
- 		]
+ static struct l_genl_msg *ap_build_cmd_del_key(struct ap_state *ap)
 -- =
 
-2.26.2
+2.29.2
 
---===============8283669537760827565==--
+--===============4928227656160012439==--
 
