@@ -1,58 +1,77 @@
-Content-Type: multipart/mixed; boundary="===============3426456442894498843=="
+Content-Type: multipart/mixed; boundary="===============6728403985986107120=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/8] auto-t: catch exceptions in post_test
-Date: Mon, 16 Nov 2020 14:25:12 -0800
-Message-ID: <20201116222514.3486808-6-prestwoj@gmail.com>
+Subject: [PATCH 7/8] auto-t: do away with -1 test results
+Date: Mon, 16 Nov 2020 14:25:13 -0800
+Message-ID: <20201116222514.3486808-7-prestwoj@gmail.com>
 In-Reply-To: <20201116222514.3486808-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3426456442894498843==
+--===============6728403985986107120==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This can result in strange test results since there was no less
+than zero checks before subtracting the total tests from failed
+tests. In case of an internal exception we can just set all values
+to zero. This will be handled specially as we do for timeout
+errors.
 ---
- tools/test-runner | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ tools/test-runner | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index 610f1702..61555b77 100755
+index 61555b77..69e7fe7e 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -945,15 +945,19 @@ def post_test(ctx, to_copy):
- 	'''
- 		Remove copied files, and stop test processes.
- 	'''
--	for f in to_copy:
--		if os.path.isdir('/tmp/' + f):
--			shutil.rmtree('/tmp/' + f)
+@@ -973,16 +973,20 @@ def print_results(results):
+ 	total_time =3D 0
+ =
+
+ 	for test, result in results.items():
+-		if result.time !=3D TEST_MAX_TIMEOUT:
++
++		if result.time =3D=3D TEST_MAX_TIMEOUT:
++			failed =3D "Timed out"
++			passed =3D "Timed out"
++		elif result.time =3D=3D 0:
++			failed =3D "Exception"
++			passed =3D "Exception"
++		else:
+ 			failed =3D result.failures + result.errors
+ 			passed =3D result.run - failed
+ =
+
+ 			total_pass +=3D passed
+ 			total_fail +=3D failed
+ 			total_skip +=3D result.skipped
 -		else:
--			os.remove('/tmp/' + f)
-+	try:
-+		for f in to_copy:
-+			if os.path.isdir('/tmp/' + f):
-+				shutil.rmtree('/tmp/' + f)
-+			else:
-+				os.remove('/tmp/' + f)
+-			failed =3D "Timed out"
+-			passed =3D "Timed out"
  =
 
--	Process(['ifconfig', 'lo', 'down'], wait=3DTrue)
-+		Process(['ifconfig', 'lo', 'down'], wait=3DTrue)
-+	except Exception as e:
-+		print("Exception thrown in post_test")
-+	finally:
-+		ctx.stop_test_processes()
+ 		total_time +=3D result.time
  =
 
--	ctx.stop_test_processes()
- 	if ctx.args.valgrind:
- 		with open('/tmp/valgrind.log', 'r') as f:
- 				dbg(f.read())
+@@ -1046,8 +1050,8 @@ def run_auto_tests(ctx, args):
+ 		except Exception as ex:
+ 			print(ex)
+ 			print("Uncaught exception thrown for %s" % test)
+-			ctx.results[os.path.basename(test)] =3D SimpleResult(run=3D-1, failures=
+=3D-1,
+-								errors=3D-1, skipped=3D-1, time=3D-1)
++			ctx.results[os.path.basename(test)] =3D SimpleResult(run=3D0, failures=
+=3D0,
++								errors=3D0, skipped=3D0, time=3D0)
+ 		finally:
+ 			post_test(ctx, copied)
+ =
+
 -- =
 
 2.26.2
 
---===============3426456442894498843==--
+--===============6728403985986107120==--
 
