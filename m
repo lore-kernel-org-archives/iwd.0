@@ -1,23 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============4364505649455811778=="
+Content-Type: multipart/mixed; boundary="===============2443422316127167474=="
 MIME-Version: 1.0
-From: Martin Stromberger <mstromberger@aon.at>
-Subject: Re: Segmentation Fault in nl80211_get_reg_do
-Date: Tue, 17 Nov 2020 17:07:40 +0000
-Message-ID: <20201117170740.2865.4443@ml01.vlan13.01.org>
-In-Reply-To: <e5258719-1d75-1c38-273d-8625e8762c89@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] auto-t: use hwsim_medium=no (testSAE/HiddenNetworks)
+Date: Tue, 17 Nov 2020 10:50:07 -0800
+Message-ID: <20201117185007.3536477-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4364505649455811778==
+--===============2443422316127167474==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
-thanks for checking the output and clarification of the real source of the =
-segmentation fault
+Both these tests create many radios which sometimes causes timing
+problems when hwsim is running. Since hwsim is not required for
+these tests we can disable it and increase test reliability.
+---
+ autotests/testHiddenNetworks/hw.conf | 3 +--
+ autotests/testSAE/hw.conf            | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-greetings
-Martin Stromberger
---===============4364505649455811778==--
+diff --git a/autotests/testHiddenNetworks/hw.conf b/autotests/testHiddenNet=
+works/hw.conf
+index 7147e4be..065e9003 100644
+--- a/autotests/testHiddenNetworks/hw.conf
++++ b/autotests/testHiddenNetworks/hw.conf
+@@ -1,8 +1,7 @@
+ [SETUP]
+ num_radios=3D7
+ start_iwd=3D0
+-max_test_exec_interval_sec=3D160
+-tmpfs_extra_stuff=3Dmain.conf
++hwsim_medium=3Dno
+ =
+
+ [HOSTAPD]
+ rad0=3DssidHiddenOpen.conf
+diff --git a/autotests/testSAE/hw.conf b/autotests/testSAE/hw.conf
+index d79aa1c7..86f42630 100644
+--- a/autotests/testSAE/hw.conf
++++ b/autotests/testSAE/hw.conf
+@@ -1,7 +1,7 @@
+ [SETUP]
+ num_radios=3D7
+ start_iwd=3D0
+-max_test_exec_interval_sec=3D45
++hwsim_medium=3Dno
+ =
+
+ [HOSTAPD]
+ rad0=3DssidSAE.conf
+-- =
+
+2.26.2
+
+--===============2443422316127167474==--
 
