@@ -1,91 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============5662688715748493807=="
+Content-Type: multipart/mixed; boundary="===============8734389564614948186=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] auto-t: add namespaces to testAP
-Date: Tue, 17 Nov 2020 12:53:04 -0800
-Message-ID: <20201117205304.3542997-4-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/4] test-runner: introduce network namespaces
+Date: Wed, 18 Nov 2020 11:01:34 -0600
+Message-ID: <17532115-dfc1-aa3a-3e7a-1d7c6c4b71e8@gmail.com>
 In-Reply-To: <20201117205304.3542997-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5662688715748493807==
+--===============8734389564614948186==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- autotests/testAP/dhcp_config_test.py | 19 +++++++++++++++----
- autotests/testAP/hw.conf             |  6 +++++-
- 2 files changed, 20 insertions(+), 5 deletions(-)
+Hi James,
 
-diff --git a/autotests/testAP/dhcp_config_test.py b/autotests/testAP/dhcp_c=
-onfig_test.py
-index a278c3b7..975cab4d 100644
---- a/autotests/testAP/dhcp_config_test.py
-+++ b/autotests/testAP/dhcp_config_test.py
-@@ -16,7 +16,15 @@ class Test(unittest.TestCase):
-         # this range.
-         wd =3D IWD(True, '/tmp/dhcp')
- =
+On 11/17/20 2:53 PM, James Prestwood wrote:
+> Our simulated environment was really only meant to test air-to-air
+> communication by using mac80211_hwsim. Protocols like DHCP use IP
+> communication which starts to fall apart when using hwsim radios.
+> Mainly unicast sockets do not work since there is no underlying
+> network infrastructure.
+> =
 
--        dev1, dev2 =3D wd.list_devices(2)
-+        ns0 =3D ctx.get_namespace('ns0')
-+
-+        wd_ns0 =3D IWD(True, '/tmp/dhcp', namespace=3Dns0)
-+
-+        dev1 =3D wd_ns0.list_devices(1)[0]
-+        dev2, dev3, dev4, dev5 =3D wd.list_devices(4)
-+        dev3.disconnect()
-+        dev4.disconnect()
-+        dev5.disconnect()
- =
+> In order to simulate a more realistic environment network namespaces
+> are introduced in this patch. This allows wireless phy's to be added
+> to a network namespace and unique IWD instances manage those phys.
+> This is done automatically when 'NameSpaces' entries are configured
+> in hw.conf:
+> =
 
-         dev1.start_ap('APConfig')
- =
+> [SETUP]
+> num_radios=3D2
+> =
 
-@@ -51,11 +59,14 @@ class Test(unittest.TestCase):
-             wd.wait_for_object_condition(dev2, condition)
- =
+> [NameSpaces]
+> ns0=3Drad1,...
+> =
 
-             testutil.test_iface_operstate(dev2.name)
--            testutil.test_ifaces_connected(dev1.name, dev2.name, group=3DF=
-alse)
--
--            testutil.test_ip_address_match(dev1.name, "192.168.1.1")
-+            #
-+            # TODO: cannot yet check the AP interface IP since its in a
-+            #       different namespace.
-+            #
-             testutil.test_ip_address_match(dev2.name, "192.168.1.3")
- =
+> This will create a namespace named ns0, and add rad1 to that
+> namespace. rad1 will not appear as a phy in what's being called the
+> 'root' namespace (the default namespace).
+> =
 
-+            testutil.test_ip_connected(('192.168.1.3', ctx), ('192.168.1.1=
-', ns0))
-+
-             wd.unregister_psk_agent(psk_agent)
- =
+> As far as a test is concerned you can create a new IWD() class and
+> pass the namespace in. This will start a new IWD instance in that
+> namespace:
+> =
 
-             dev2.disconnect()
-diff --git a/autotests/testAP/hw.conf b/autotests/testAP/hw.conf
-index bac128b2..c9c0c7ca 100644
---- a/autotests/testAP/hw.conf
-+++ b/autotests/testAP/hw.conf
-@@ -1,6 +1,10 @@
- [SETUP]
--num_radios=3D5
-+num_radios=3D6
- start_iwd=3D0
-+hwsim_medium=3Dno
- =
+> ns0 =3D ctx.get_namespace('ns0')
+> wd_ns0 =3D IWD(start_iwd=3DTrue, namespace=3Dns0)
+> =
 
- [HOSTAPD]
- rad0=3Dpsk-ccmp.conf
-+
-+[NameSpaces]
-+ns0=3Drad5
--- =
+> 'wd_ns0' can now be used to interact with IWD in that namespace, just
+> like any other IWD class object.
+> ---
+>   tools/test-runner | 298 ++++++++++++++++++++++++++++++----------------
+>   1 file changed, 196 insertions(+), 102 deletions(-)
+> =
 
-2.26.2
 
---===============5662688715748493807==--
+All applied, thanks.
+
+Regards,
+-Denis
+
+--===============8734389564614948186==--
 
