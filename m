@@ -1,38 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============6596331981672085374=="
+Content-Type: multipart/mixed; boundary="===============4912178461156923249=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] doc: Update iwd.network.5 with changes from wiki
-Date: Thu, 19 Nov 2020 14:23:05 -0600
-Message-ID: <393e8ec4-f32b-c203-477c-1544b20c0e42@gmail.com>
-In-Reply-To: <20201119203205.358679-1-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] netconfig: fix freeing invalid pointer
+Date: Mon, 23 Nov 2020 15:05:54 -0800
+Message-ID: <20201123230554.4119658-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6596331981672085374==
+--===============4912178461156923249==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+If l_rtnl_ifaddr4_extract does not set the values they would
+get freed. Instead initialize to NULL so the cleanup free is
+a no op.
+---
+ src/netconfig.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On 11/19/20 2:32 PM, Andrew Zaborowski wrote:
-> Fix the AlwaysRandomizeAddress setting name.
-> =
+diff --git a/src/netconfig.c b/src/netconfig.c
+index dcb88749..610635cd 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -441,9 +441,9 @@ static void netconfig_ifaddr_added(struct netconfig *ne=
+tconfig,
+ 					const struct ifaddrmsg *ifa,
+ 					uint32_t len)
+ {
+-	L_AUTO_FREE_VAR(char *, label);
+-	L_AUTO_FREE_VAR(char *, ip);
+-	L_AUTO_FREE_VAR(char *, broadcast);
++	L_AUTO_FREE_VAR(char *, label) =3D NULL;
++	L_AUTO_FREE_VAR(char *, ip) =3D NULL;
++	L_AUTO_FREE_VAR(char *, broadcast) =3D NULL;
+ =
 
-> Add the stricter specification of the extension syntax.
-> =
+ 	l_rtnl_ifaddr4_extract(ifa, len, &label, &ip, &broadcast);
+ 	l_debug("%s: ifaddr %s/%u broadcast %s", label,
+-- =
 
-> Clarify that GTC and MD5 can't be used as outer EAP methods with wifi.
-> ---
->   src/iwd.network.rst | 38 +++++++++++++++++++++++++++++++-------
->   1 file changed, 31 insertions(+), 7 deletions(-)
-> =
+2.26.2
 
-
-Applied, thanks.
-
-Regards,
--Denis
-
---===============6596331981672085374==--
+--===============4912178461156923249==--
 
