@@ -1,48 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============0676537344530033725=="
+Content-Type: multipart/mixed; boundary="===============8207001363468147380=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] doc: use real example for APRanges
-Date: Tue, 01 Dec 2020 16:57:44 -0800
-Message-ID: <20201202005744.276180-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] doc: use real example for APRanges
+Date: Wed, 02 Dec 2020 16:13:15 -0600
+Message-ID: <92dd1292-b330-9c11-8cd5-4a4e16176268@gmail.com>
+In-Reply-To: <20201202005744.276180-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0676537344530033725==
+--===============8207001363468147380==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The docs just specified what a IP prefix looks like, not an
-actual example. Though its not recommended to just copy paste
-blindly, its still useful to have some value in the man pages
-that actually works if someone just wants to get a DHCP server
-working.
----
- src/iwd.config.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi James,
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 37438c6c..f74e31cf 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -86,7 +86,7 @@ The group ``[General]`` contains general settings.
-      - Values: <IP in prefix notation>
- =
+On 12/1/20 6:57 PM, James Prestwood wrote:
+> The docs just specified what a IP prefix looks like, not an
+> actual example. Though its not recommended to just copy paste
+> blindly, its still useful to have some value in the man pages
+> that actually works if someone just wants to get a DHCP server
+> working.
+> ---
+>   src/iwd.config.rst | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-        Sets the range of IP's used for DHCP server (AP mode). The IP shoul=
-d be
--       in prefix notation e.g. aaa.bbb.ccc.ddd/xx. AP's which are started =
-in a
-+       in prefix notation e.g. 192.168.1.0/24. AP's which are started in a
-        profile-less configuration will use this pool of IP's to set the AP=
-'s
-        interface address as well as default DHCP server options. Each AP w=
-ill
-        get a new subnet from the range and clients will be addressed in th=
-at
--- =
 
-2.26.2
+Applied, thanks.
 
---===============0676537344530033725==--
+Regards,
+-Denis
+
+--===============8207001363468147380==--
 
