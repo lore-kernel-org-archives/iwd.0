@@ -1,44 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============3619183534623072393=="
+Content-Type: multipart/mixed; boundary="===============0676537344530033725=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] network: clear info of removed known network before
- disconnect
-Date: Tue, 01 Dec 2020 10:00:30 -0600
-Message-ID: <7f894f64-9b07-f60c-dc91-97b0ff67ca02@gmail.com>
-In-Reply-To: <20201127160444.681629-1-alsi@bang-olufsen.dk>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] doc: use real example for APRanges
+Date: Tue, 01 Dec 2020 16:57:44 -0800
+Message-ID: <20201202005744.276180-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3619183534623072393==
+--===============0676537344530033725==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Alvin,
+The docs just specified what a IP prefix looks like, not an
+actual example. Though its not recommended to just copy paste
+blindly, its still useful to have some value in the man pages
+that actually works if someone just wants to get a DHCP server
+working.
+---
+ src/iwd.config.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 11/27/20 10:04 AM, Alvin =C5=A0ipraga wrote:
-> Make sure to erase the network_info of a known network that has been
-> removed before disconnecting any stations connected to it. This fixes
-> the following warning observed when forgetting a connected network:
-> =
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 37438c6c..f74e31cf 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -86,7 +86,7 @@ The group ``[General]`` contains general settings.
+      - Values: <IP in prefix notation>
+ =
 
->    WARNING: ../git/src/network.c:network_rank_update() condition n < 0 fa=
-iled
-> =
+        Sets the range of IP's used for DHCP server (AP mode). The IP shoul=
+d be
+-       in prefix notation e.g. aaa.bbb.ccc.ddd/xx. AP's which are started =
+in a
++       in prefix notation e.g. 192.168.1.0/24. AP's which are started in a
+        profile-less configuration will use this pool of IP's to set the AP=
+'s
+        interface address as well as default DHCP server options. Each AP w=
+ill
+        get a new subnet from the range and clients will be addressed in th=
+at
+-- =
 
-> This also fixes a bug where such a forgotten network would incorrectly
-> appear as the first element in the response to GetOrderedNetworks().  By
-> clearing the network_info, network_rank_update() properly negates the
-> rank of the now-unknown network.
-> ---
->   src/network.c | 28 ++++++++++------------------
->   1 file changed, 10 insertions(+), 18 deletions(-)
-> =
+2.26.2
 
-
-Nice catch!  Applied, thanks.
-
-Regards,
--Denis
---===============3619183534623072393==--
+--===============0676537344530033725==--
 
