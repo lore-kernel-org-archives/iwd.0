@@ -1,36 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============8207001363468147380=="
+Content-Type: multipart/mixed; boundary="===============1896846625890777985=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] doc: use real example for APRanges
-Date: Wed, 02 Dec 2020 16:13:15 -0600
-Message-ID: <92dd1292-b330-9c11-8cd5-4a4e16176268@gmail.com>
-In-Reply-To: <20201202005744.276180-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/9] build: add ell/acd.{c,h} to makefile
+Date: Thu, 10 Dec 2020 09:45:17 -0800
+Message-ID: <20201210174525.874021-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8207001363468147380==
+--===============1896846625890777985==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ Makefile.am | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-On 12/1/20 6:57 PM, James Prestwood wrote:
-> The docs just specified what a IP prefix looks like, not an
-> actual example. Though its not recommended to just copy paste
-> blindly, its still useful to have some value in the man pages
-> that actually works if someone just wants to get a DHCP server
-> working.
-> ---
->   src/iwd.config.rst | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+diff --git a/Makefile.am b/Makefile.am
+index 1f0b0d30..3cd7eaa6 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -61,7 +61,8 @@ ell_headers =3D ell/util.h \
+ 			ell/time.h \
+ 			ell/path.h \
+ 			ell/icmp6.h \
+-			ell/dhcp6.h
++			ell/dhcp6.h \
++			ell/acd.h
+ =
 
+ ell_sources =3D ell/private.h \
+ 			ell/missing.h \
+@@ -138,7 +139,8 @@ ell_sources =3D ell/private.h \
+ 			ell/icmp6.c \
+ 			ell/icmp6-private.h \
+ 			ell/dhcp6-lease.c \
+-			ell/dhcp6-transport.c
++			ell/dhcp6-transport.c \
++			ell/acd.c
+ =
 
-Applied, thanks.
+ ell_libell_internal_la_SOURCES =3D $(ell_headers) $(ell_sources)
+ endif
+-- =
 
-Regards,
--Denis
+2.26.2
 
---===============8207001363468147380==--
+--===============1896846625890777985==--
 
