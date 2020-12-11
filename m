@@ -1,47 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============3346894693906752478=="
+Content-Type: multipart/mixed; boundary="===============2497012562972151273=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 1/2] netconfig: add ACD client for static configuration
-Date: Thu, 10 Dec 2020 22:20:47 +0000
-Message-ID: <f68e8699-ef76-78c8-730a-20dab69d6561@gmail.com>
-In-Reply-To: <20201210212210.880245-1-prestwoj@gmail.com>
+From: Ronan Pigott <rpigott314@gmail.com>
+Subject: [PATCH] client: ignore control sequence length in prompt
+Date: Thu, 10 Dec 2020 23:32:22 -0700
+Message-ID: <20201211063222.67764-1-rpigott@berkeley.edu>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3346894693906752478==
+--===============2497012562972151273==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+From: Ronan Pigott <rpigott@berkeley.edu>
 
-On 12/10/20 3:22 PM, James Prestwood wrote:
-> When the IP is configured to be static we can now use ACD in
-> order to check that the IP is available and not already in
-> use. If a conflict is found netconfig will be reset and no IP
-> will be set on the interface. The ACD client is left with
-> the default 'defend once' policy, and probes are not turned
-> off. This will increase connection time, but for static IP's
-> it is the best approach.
-> ---
->   src/netconfig.c | 94 +++++++++++++++++++++++++++++++++++++++----------
->   1 file changed, 76 insertions(+), 18 deletions(-)
-> =
+Readline uses the characters \001 and \002 to mark the start and end
+of zero-length character sequnces in the prompt before prompt
+expansion. Without these characters the input point can become offset
+from the visual end of the prompt when performing some actions.
+---
 
-> v2:
->   * Added netconfig_reset_v4 to allow a failed ACD attempt to
->     reset only the IPv4 data.
->   * Distinguish between CONFLICT/LOST events. For conflicts
->     no IP was ever set in the kernel, so we can just clean up
->     the rtnl address directly. For LOST events an address was
->     set, so it would need to be deleted.
-> =
+iwctl gets messed up if you press up and down once to recall and
+then dismiss the last history line. This fixes that.
 
+ client/display.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Both applied, thanks
+diff --git a/client/display.c b/client/display.c
+index b19759ea..88bc913f 100644
+--- a/client/display.c
++++ b/client/display.c
+@@ -39,7 +39,8 @@
+ #include "client/command.h"
+ #include "client/display.h"
+ =
 
-Regards,
--Denis
+-#define IWD_PROMPT COLOR_GREEN "[iwd]" COLOR_OFF "# "
++#define IWD_PROMPT \
++	"\001" COLOR_GREEN "\002" "[iwd]" "\001" COLOR_OFF "\002" "# "
+ #define LINE_LEN 81
+ =
 
---===============3346894693906752478==--
+ static struct l_signal *window_change_signal;
+-- =
+
+2.29.2
+
+--===============2497012562972151273==--
 
