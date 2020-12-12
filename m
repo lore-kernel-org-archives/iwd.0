@@ -1,120 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============5106568532138167817=="
+Content-Type: multipart/mixed; boundary="===============2589071274266069483=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 2/2] eap-tls: Don't skip a ServerDomainMask vs. CACert check
-Date: Sat, 12 Dec 2020 02:09:54 +0100
-Message-ID: <20201212010954.583418-2-andrew.zaborowski@intel.com>
-In-Reply-To: <20201212010954.583418-1-andrew.zaborowski@intel.com>
+From: KeithG <ys3al35l@gmail.com>
+Subject: iwd and NetworkManager
+Date: Sat, 12 Dec 2020 13:53:01 -0600
+Message-ID: <CAG17S_P3Ox7u-H_yQabqQsopHzDNGtnSHxH-QQrnxLPBG01Tcg@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5106568532138167817==
+--===============2589071274266069483==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The check that requires CACert if ServerDomainMask is given should
-be independent of whether a client certificate and key are set, but
-was in the part of eap_tls_common_settings_check() that only runs if
-a certificate and key are given, move it up and simplify the logic
-slightly.
----
- src/eap-tls-common.c | 42 +++++++++++++++++++++---------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+Andrew,
 
-diff --git a/src/eap-tls-common.c b/src/eap-tls-common.c
-index aa43e5a3..3d04d943 100644
---- a/src/eap-tls-common.c
-+++ b/src/eap-tls-common.c
-@@ -899,7 +899,6 @@ int eap_tls_common_settings_check(struct l_settings *se=
-ttings,
- 	char client_cert_setting[72];
- 	char client_key_setting[72];
- 	char passphrase_setting[72];
--	struct l_queue *cacerts =3D NULL;
- 	struct l_certchain *cert =3D NULL;
- 	struct l_key *priv_key =3D NULL;
- 	bool is_public;
-@@ -913,7 +912,7 @@ int eap_tls_common_settings_check(struct l_settings *se=
-ttings,
- 	struct l_key *pub_key;
- 	const char *domain_mask_str;
- =
+Wanted to post here. I recently started having issues with my Arch Linux
+install with NetworkManager and iwd 1.9 not connecting at boot or
+reconnecting after wake-up. It used to work reasonably well then recently,
+after an update, it would only reconnect if I restarted iwd or NW after
+boot. I ran across a post to the NW project that you posted and said that
+you recently addressed an issue with iwd and NW. I built the 1.10 version
+and am posting here to say that it appears to have fixed my issue. I just
+tried one reboot and it was already connected by the time the desktop
+showed. Tried a suspend resume and likewise it was showing the WiFi icon as
+connected when the login screen appeared.
 
--	L_AUTO_FREE_VAR(char *, ca_cert);
-+	L_AUTO_FREE_VAR(char *, ca_cert) =3D NULL;
- 	L_AUTO_FREE_VAR(char *, client_cert) =3D NULL;
- 	L_AUTO_FREE_VAR(char *, client_key) =3D NULL;
- 	L_AUTO_FREE_VAR(char *, passphrase) =3D NULL;
-@@ -935,12 +934,31 @@ int eap_tls_common_settings_check(struct l_settings *=
-settings,
- 	snprintf(setting_key, sizeof(setting_key), "%sCACert", prefix);
- 	ca_cert =3D l_settings_get_string(settings, "Security", setting_key);
- 	if (ca_cert) {
--		cacerts =3D eap_tls_load_ca_cert(settings, ca_cert);
-+		struct l_queue *cacerts =3D
-+			eap_tls_load_ca_cert(settings, ca_cert);
- =
+Arch still has not updated their package to 1.10, but it builds fine with
+the old PKGBUILD and installs fine as well.
 
- 		if (!cacerts) {
- 			l_error("Failed to load %s", ca_cert);
- 			return -EIO;
- 		}
-+
-+		l_queue_destroy(cacerts,
-+				(l_queue_destroy_func_t) l_cert_free);
-+	}
-+
-+	/*
-+	 * Require CACert if ServerDomainMask is present.  If the server
-+	 * certificate is not being checked against any trusted certificates
-+	 * there's no point validating its contents and we wouldn't even
-+	 * receive the subject DN from ell, because it may be freely made up.
-+	 */
-+	snprintf(setting_key, sizeof(setting_key), "%sServerDomainMask",
-+			prefix);
-+	domain_mask_str =3D l_settings_get_value(settings, "Security",
-+						setting_key);
-+	if (domain_mask_str && !ca_cert) {
-+		l_error("%s was set but no CA Certificates given", setting_key);
-+		return -EINVAL;
- 	}
- =
+Thanks!
 
- 	snprintf(client_cert_setting, sizeof(client_cert_setting),
-@@ -1132,26 +1150,8 @@ int eap_tls_common_settings_check(struct l_settings =
-*settings,
- 		goto done;
- 	}
- =
+Keith
 
--	/*
--	 * Require CACert if ServerDomainMask is present.  If the server
--	 * certificate is not being checked against any trusted certificates
--	 * there's no point validating its contents and we wouldn't even
--	 * receive the subject DN from ell, because it may be freely made up.
--	 */
--	snprintf(setting_key, sizeof(setting_key), "%sServerDomainMask",
--			prefix);
--	domain_mask_str =3D l_settings_get_value(settings, "Security",
--						setting_key);
--	if (domain_mask_str && !cacerts) {
--		l_error("%s was set but no CA Certificates given", setting_key);
--		ret =3D -EINVAL;
--		goto done;
--	}
--
- 	ret =3D 0;
- done:
--	l_queue_destroy(cacerts,
--			(l_queue_destroy_func_t) l_cert_free);
- 	l_certchain_free(cert);
- 	l_key_free(priv_key);
- =
+--===============2589071274266069483==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.htm"
 
--- =
+PGRpdiBkaXI9Imx0ciI+PGRpdj5BbmRyZXcsPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5XYW50
+ZWQgdG8gcG9zdCBoZXJlLiBJIHJlY2VudGx5IHN0YXJ0ZWQgaGF2aW5nIGlzc3VlcyB3aXRoIG15
+IEFyY2ggTGludXggaW5zdGFsbCB3aXRoIE5ldHdvcmtNYW5hZ2VyIGFuZCBpd2QgMS45IG5vdCBj
+b25uZWN0aW5nIGF0IGJvb3Qgb3IgcmVjb25uZWN0aW5nIGFmdGVyIHdha2UtdXAuIEl0IHVzZWQg
+dG8gd29yayByZWFzb25hYmx5IHdlbGwgdGhlbiByZWNlbnRseSwgYWZ0ZXIgYW4gdXBkYXRlLCBp
+dCB3b3VsZCBvbmx5IHJlY29ubmVjdCBpZiBJIHJlc3RhcnRlZCBpd2Qgb3IgTlcgYWZ0ZXIgYm9v
+dC4gSSByYW4gYWNyb3NzIGEgcG9zdCB0byB0aGUgTlcgcHJvamVjdCB0aGF0IHlvdSBwb3N0ZWQg
+YW5kIHNhaWQgdGhhdCB5b3UgcmVjZW50bHkgYWRkcmVzc2VkIGFuIGlzc3VlIHdpdGggaXdkIGFu
+ZCBOVy4gSSBidWlsdCB0aGUgMS4xMCB2ZXJzaW9uIGFuZCBhbSBwb3N0aW5nIGhlcmUgdG8gc2F5
+IHRoYXQgaXQgYXBwZWFycyB0byBoYXZlIGZpeGVkIG15IGlzc3VlLiBJIGp1c3QgdHJpZWQgb25l
+IHJlYm9vdCBhbmQgaXQgd2FzIGFscmVhZHkgY29ubmVjdGVkIGJ5IHRoZSB0aW1lIHRoZSBkZXNr
+dG9wIHNob3dlZC4gVHJpZWQgYSBzdXNwZW5kIHJlc3VtZSBhbmQgbGlrZXdpc2UgaXQgd2FzIHNo
+b3dpbmcgdGhlIFdpRmkgaWNvbiBhcyBjb25uZWN0ZWQgd2hlbiB0aGUgbG9naW4gc2NyZWVuIGFw
+cGVhcmVkLjxicj48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PkFyY2ggc3RpbGwgaGFzIG5vdCB1
+cGRhdGVkIHRoZWlyIHBhY2thZ2UgdG8gMS4xMCwgYnV0IGl0IGJ1aWxkcyBmaW5lIHdpdGggdGhl
+IG9sZCBQS0dCVUlMRCBhbmQgaW5zdGFsbHMgZmluZSBhcyB3ZWxsLiA8YnI+PC9kaXY+PGRpdj48
+YnI+PC9kaXY+PGRpdj5UaGFua3MhPGJyPjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+S2VpdGg8
+YnI+PC9kaXY+PC9kaXY+Cg==
 
-2.27.0
-
---===============5106568532138167817==--
+--===============2589071274266069483==--
 
