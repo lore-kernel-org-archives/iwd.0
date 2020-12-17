@@ -1,163 +1,266 @@
-Content-Type: multipart/mixed; boundary="===============1863153903809362288=="
+Content-Type: multipart/mixed; boundary="===============6070154703174690568=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/2] eap-tls: Make use of l_pem_load_container_file()
-Date: Wed, 16 Dec 2020 16:08:22 +0000
-Message-ID: <62699b81-6434-1017-9ea5-37ba87f65f8a@gmail.com>
-In-Reply-To: <CAOq732J4BBFpraHDa3ndxLz9Dgc3BYYWA=Os2nPoEPQ_-bUKag@mail.gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/2] station: Split DBus scans into 3 frequency subsets
+Date: Thu, 17 Dec 2020 02:28:58 +0100
+Message-ID: <20201217012859.820525-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1863153903809362288==
+--===============6070154703174690568==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+A scan normally takes about 2 seconds on my dual-band wifi adapter when
+connected.  The drivers will normally probe on each supported channel in
+some unspecified order and will have new partial results after each step
+but the kernel sends NL80211_CMD_NEW_SCAN_RESULTS only when the full
+scan request finishes, and for segmented scans we will wait for all
+segments to finish before calling back from scan_active() or
+scan_passive().
 
-On 12/16/20 9:02 AM, Andrew Zaborowski wrote:
-> [resend attempt]
+To improve user experience define our own channel order favouring the
+2.4 channels 1, 6 and 11 and probe those as an individual scan request
+so we can update most our DBus org.connman.iwd.Network objects more
+quickly, before continuing with 5GHz band channels, updating DBus
+objects again and finally the other 2.4GHz band channels.
 
-yeah, massive gmail outage seems to have affected me yesterday.  So anythin=
-g =
+The overall DBus-triggered scan on my wifi adapter takes about the same
+time but my measurements were not very strict, and were not very
+consistent with and without this change.  With the change most Network
+objects are updated after about 200ms though, meaning that I get most
+of the network updates in the nm-applet UI 200ms from opening the
+network list.  The 5GHz band channels take another 1 to 1.5s to scan and
+remaining 2.4GHz band channels another ~300ms.
 
-sent to me over the last few days had a good chance of being lost.
+Hopefully this is similar when using other drivers although I can easily
+imagine a driver that parallelizes 2.4GHz and 5GHz channel probing using
+two radios, or uses 2, 4 or another number of dual-band radios to probe
+2, 4, ... channels simultanously.  We'd then lose some of the
+performance benefit.  The faster scan results may be worth the longer
+overall scan time anyway.
+I'm also assuming that the wiphy's supported frequency list is exactly
+what was scanned when we passed no frequency list to
+NL80211_CMD_TRIGGER_SCAN and we won't get errors for passing some
+frequency that shouldn't have been scanned.
+---
+ src/station.c | 120 ++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 107 insertions(+), 13 deletions(-)
 
->>   The use o EAP-PEAP/TTLS-ClientCert is just an
->> artifact of how this was implemented originally.
-> =
+diff --git a/src/station.c b/src/station.c
+index ed3741d3..79b026b9 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -98,6 +98,10 @@ struct station {
+ 	/* Set of frequencies to scan first when attempting a roam */
+ 	struct scan_freq_set *roam_freqs;
+ =
 
-> I remember they were separate initially actually, and Tim made this
-> big push to unify them.
-> =
++	/* Frequencies split into subsets by priority */
++	struct scan_freq_set *scan_freqs_order[3];
++	unsigned int dbus_scan_subset_idx;
++
+ 	bool preparing_roam : 1;
+ 	bool roam_scan_full : 1;
+ 	bool signal_low : 1;
+@@ -2885,6 +2889,13 @@ static struct l_dbus_message *station_dbus_get_hidde=
+n_access_points(
+ 	return reply;
+ }
+ =
 
++static void station_dbus_scan_done(struct station *station)
++{
++	station->dbus_scan_id =3D 0;
++
++	station_property_set_scanning(station, false);
++}
++
+ static void station_dbus_scan_triggered(int err, void *user_data)
+ {
+ 	struct station *station =3D user_data;
+@@ -2893,25 +2904,68 @@ static void station_dbus_scan_triggered(int err, vo=
+id *user_data)
+ 	l_debug("station_scan_triggered: %i", err);
+ =
 
-The unification didn't really change the behavior.  For whatever reason =
+ 	if (err < 0) {
+-		reply =3D dbus_error_from_errno(err, station->scan_pending);
+-		dbus_pending_reply(&station->scan_pending, reply);
++		if (station->scan_pending) {
++			reply =3D dbus_error_from_errno(err,
++							station->scan_pending);
++			dbus_pending_reply(&station->scan_pending, reply);
++		}
++
++		station_dbus_scan_done(station);
+ 		return;
+ 	}
+ =
 
-PEAP/TTLS supported ClientCert, etc from the beginning.  In fact, if you lo=
-ok at =
+-	l_debug("Scan triggered for %s", netdev_get_name(station->netdev));
++	l_debug("Scan triggered for %s subset %i",
++		netdev_get_name(station->netdev),
++		station->dbus_scan_subset_idx);
+ =
 
-our unit tests and autotests, they still have artifacts like EAP-TTLS-Clien=
-tCert =
+-	reply =3D l_dbus_message_new_method_return(station->scan_pending);
+-	l_dbus_message_set_arguments(reply, "");
+-	dbus_pending_reply(&station->scan_pending, reply);
++	if (station->scan_pending) {
++		reply =3D l_dbus_message_new_method_return(station->scan_pending);
++		l_dbus_message_set_arguments(reply, "");
++		dbus_pending_reply(&station->scan_pending, reply);
++	}
+ =
 
-settings.
+ 	station_property_set_scanning(station, true);
+ }
+ =
 
->>
->> I actually really wonder about the utility of these p12 files.
-> =
+-static void station_dbus_scan_destroy(void *userdata)
++static bool station_dbus_scan_subset(struct station *station);
++
++static bool station_dbus_scan_results(int err, struct l_queue *bss_list, v=
+oid *userdata)
+ {
+ 	struct station *station =3D userdata;
++	unsigned int next_idx =3D station->dbus_scan_subset_idx + 1;
++	bool autoconnect;
++	bool last_subset;
+ =
 
-> The utility is the same as of the PEM format.  However for me
-> personally it's about supporting the popular formats (I think we're
-> sitll missing one certificate format)
+-	station->dbus_scan_id =3D 0;
++	if (err) {
++		station_dbus_scan_done(station);
++		return false;
++	}
++
++	autoconnect =3D station_is_autoconnecting(station);
++	last_subset =3D next_idx >=3D L_ARRAY_SIZE(station->scan_freqs_order) ||
++		station->scan_freqs_order[next_idx] =3D=3D NULL;
++
++	station_set_scan_results(station, bss_list, autoconnect);
++
++	station->dbus_scan_subset_idx =3D next_idx;
++
++	if (last_subset || !station_dbus_scan_subset(station))
++		station_dbus_scan_done(station);
++
++	return true;
++}
++
++static bool station_dbus_scan_subset(struct station *station)
++{
++	unsigned int idx =3D station->dbus_scan_subset_idx;
++
++	station->dbus_scan_id =3D station_scan_trigger(station,
++						station->scan_freqs_order[idx],
++						station_dbus_scan_triggered,
++						station_dbus_scan_results,
++						NULL);
++
++	return station->dbus_scan_id !=3D 0;
+ }
+ =
 
-Sure, I get that.  But I have to wonder if spending massive amounts of time =
+ static struct l_dbus_message *station_dbus_scan(struct l_dbus *dbus,
+@@ -2928,12 +2982,9 @@ static struct l_dbus_message *station_dbus_scan(stru=
+ct l_dbus *dbus,
+ 	if (station->state =3D=3D STATION_STATE_CONNECTING)
+ 		return dbus_error_busy(message);
+ =
 
-supporting something that is ultimately a dead end is a worthwhile exercise.
+-	station->dbus_scan_id =3D station_scan_trigger(station, NULL,
+-						station_dbus_scan_triggered,
+-						new_scan_results,
+-						station_dbus_scan_destroy);
++	station->dbus_scan_subset_idx =3D 0;
+ =
 
-And I take it isn't possible for NM to convert these P12 files into somethi=
-ng =
+-	if (!station->dbus_scan_id)
++	if (!station_dbus_scan_subset(station))
+ 		return dbus_error_failed(message);
+ =
 
-more sensible like a PEM + encrypted private key PEM on the fly?
+ 	station->scan_pending =3D l_dbus_message_ref(message);
+@@ -3209,6 +3260,41 @@ struct scan_bss *station_get_connected_bss(struct st=
+ation *station)
+ 	return station->connected_bss;
+ }
+ =
 
->>
->> client_key_is_container would basically indicate whether the file was a =
-p12 or
->> not.  If the p12 does not contain ca_certs, then this could be written a=
-s:
-> =
++static void station_add_one_freq(uint32_t freq, void *user_data)
++{
++	struct station *station =3D user_data;
++
++	if (freq > 3000)
++		scan_freq_set_add(station->scan_freqs_order[1], freq);
++	else if (!scan_freq_set_contains(station->scan_freqs_order[0], freq))
++		scan_freq_set_add(station->scan_freqs_order[2], freq);
++}
++
++static void station_fill_scan_freq_subsets(struct station *station)
++{
++	const struct scan_freq_set *supported =3D
++		wiphy_get_supported_freqs(station->wiphy);
++
++	/*
++	 * Scan the 2.4GHz "social channels" first, 5GHz second, if supported,
++	 * all other 2.4GHz channels last.  To be refined as needed.
++	 */
++	station->scan_freqs_order[0] =3D scan_freq_set_new();
++	scan_freq_set_add(station->scan_freqs_order[0], 2412);
++	scan_freq_set_add(station->scan_freqs_order[0], 2437);
++	scan_freq_set_add(station->scan_freqs_order[0], 2462);
++
++	station->scan_freqs_order[1] =3D scan_freq_set_new();
++	station->scan_freqs_order[2] =3D scan_freq_set_new();
++	scan_freq_set_foreach(supported, station_add_one_freq, station);
++
++	if (scan_freq_set_isempty(station->scan_freqs_order[1])) {
++		scan_freq_set_free(station->scan_freqs_order[1]);
++		station->scan_freqs_order[1] =3D station->scan_freqs_order[2];
++		station->scan_freqs_order[2] =3D NULL;
++	}
++}
++
+ static struct station *station_create(struct netdev *netdev)
+ {
+ 	struct station *station;
+@@ -3240,6 +3326,8 @@ static struct station *station_create(struct netdev *=
+netdev)
+ =
 
-> Is it sepcified by the user though?  As I said I think that's an
-> unneeded complication for all parties.
-> =
+ 	station->anqp_pending =3D l_queue_new();
+ =
 
++	station_fill_scan_freq_subsets(station);
++
+ 	return station;
+ }
+ =
 
-What is specified by the user?  If ClientKey has a P12 format and you get b=
-oth =
+@@ -3306,6 +3394,12 @@ static void station_free(struct station *station)
+ =
 
-the private key and certificate out of it, then you're done.
+ 	l_queue_destroy(station->anqp_pending, remove_anqp);
+ =
 
-I don't want users to produce files like:
++	scan_freq_set_free(station->scan_freqs_order[0]);
++	scan_freq_set_free(station->scan_freqs_order[1]);
++
++	if (station->scan_freqs_order[2])
++		scan_freq_set_free(station->scan_freqs_order[2]);
++
+ 	l_free(station);
+ }
+ =
 
-EAP-TLS-ClientKey=3D/some/path/file.p12
-EAP-TLS-ClientCert=3D/some/path/file.p12
-EAP-TLS-CACert=3D/some/path/file.p12
+-- =
 
-It should be just
-EAP-TLS-Certificates=3D/some/path/file.p12
+2.27.0
 
->>
->> Or are you talking about the P12 file itself?  Do we  event want to supp=
-ort
->> encrypted P12 files?
-> =
-
-> We only support encrypted PKCS#12 structs, I haven't seen unencrypted one=
-s.
-> =
-
-
-Ugh, another reason why openssl needs to be killed with  fire.  That just m=
-akes =
-
-no sense for a container format in the context of connecting to WiFi.
-
->>
->> Note that P12 file might have an import key that is different than the
->> ClientKeyPassword.  So how are you handling that?  Is the user providing=
- two
->> passwords somehow?
-> =
-
-> I'm handling the format that I know is in use or supported by NM, so
-> far.  I think that's what we normally want IWD.
-> =
-
-> What the spec says is that you can have an authentication password
-> different from the encryption password, or you can use public keys for
-> either the authentication or encryption, but I haven't seen files
-> using any of those features.  I haven't seen software that can produce
-> them, or NM / wpa_s support for that (neither multiple passwords nor
-> public key authentication or encryption).  We can look into that once we
-> have a use case.
-
-FYI, the P12 files produced to access our VPN are like this.  The import ke=
-y is =
-
-(by default) the FSID of the path where the certificate is and the passphra=
-se =
-
-for the private key is something else entirely.
-
-But in general, I really don't want us to be making the same mistakes as =
-
-NM/wpa_s.  So if there are multiple passwords, we probably should support t=
-hat.
-
-> =
-
-> Best regards
-> =
-
-> * Specifically you don't always know what is inside a PKCS#12
-> container depending on how it's structured.  With openssl you know
-> when a private key is present because it would not encrypt the
-> Shrouded PKCS8 Key Bag type, and it would encrypt everything else as
-> one opaque safe bag type.
-> =
-
-
-Can openssl be abused to encrypt with an empty password or something?  That=
- way =
-
-we can still decode the public certchain and have the original encrypted pr=
-ivate =
-
-key..
-
-It really sounds to me like .p12 is an awful choice for our use...
-
-Regards,
--Denis
-
---===============1863153903809362288==--
+--===============6070154703174690568==--
 
