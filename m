@@ -1,48 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============3834906465693636295=="
+Content-Type: multipart/mixed; boundary="===============8503945104262402217=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 05/11] auto-t: update hwsim radio create to use dictionary
-Date: Thu, 17 Dec 2020 11:36:05 -0800
-Message-ID: <20201217193611.1177006-5-prestwoj@gmail.com>
+Subject: [PATCH 06/11] test-runner: add wait_for_dbus_service
+Date: Thu, 17 Dec 2020 11:36:06 -0800
+Message-ID: <20201217193611.1177006-6-prestwoj@gmail.com>
 In-Reply-To: <20201217193611.1177006-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3834906465693636295==
+--===============8503945104262402217==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Common API to wait for a DBus service to appear on the bus
 ---
- autotests/util/hwsim.py | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ tools/test-runner | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
-index b0e6a089..9ad8ce09 100755
---- a/autotests/util/hwsim.py
-+++ b/autotests/util/hwsim.py
-@@ -249,8 +249,15 @@ class RadioList(collections.Mapping):
-     def _interfaces_removed_handler(self, path, interfaces):
-         del _dict[path]
+diff --git a/tools/test-runner b/tools/test-runner
+index bc580a41..d16c8885 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -616,6 +616,15 @@ class Namespace:
  =
 
--    def create(self, name=3D'', p2p_device=3DFalse):
--        path =3D self._radio_manager.CreateRadio(name, p2p_device)
-+    def create(self, name=3DNone, p2p_device=3DFalse):
-+        args =3D dbus.Dictionary({
-+            'P2P': p2p_device,
-+        }, signature=3D'sv')
+ 		return False
+ =
+
++	def wait_for_dbus_service(self, service):
++		tries =3D 0
 +
-+        if name:
-+            args['Name'] =3D name
++		while not self._bus.name_has_owner(service):
++			if tries > 200:
++				raise TimeoutError('DBus service %s did not appear', service)
++			tries +=3D 1
++			sleep(0.1)
 +
-+        path =3D self._radio_manager.CreateRadio(args)
-         obj =3D Radio(path)
-         self._dict[path] =3D obj
-         return obj
+ 	def __str__(self):
+ 		ret =3D 'Namespace: %s\n' % self.name
+ 		ret +=3D 'Processes:\n'
 -- =
 
 2.26.2
 
---===============3834906465693636295==--
+--===============8503945104262402217==--
 
