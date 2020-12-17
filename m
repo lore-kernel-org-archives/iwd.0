@@ -1,201 +1,160 @@
-Content-Type: multipart/mixed; boundary="===============7196530350459366367=="
+Content-Type: multipart/mixed; boundary="===============9138956847112530582=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 2/2] station: Don't expire BSSes between freq subset scans
-Date: Thu, 17 Dec 2020 02:28:59 +0100
-Message-ID: <20201217012859.820525-2-andrew.zaborowski@intel.com>
-In-Reply-To: <20201217012859.820525-1-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 1/2] eap-tls: Make use of l_pem_load_container_file()
+Date: Thu, 17 Dec 2020 10:18:52 +0100
+Message-ID: <CAOq732L12a-KSUS-inAn0wCgHLNTWFrUmaUHs+SE_Gz20=kSOQ@mail.gmail.com>
+In-Reply-To: <62699b81-6434-1017-9ea5-37ba87f65f8a@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7196530350459366367==
+--===============9138956847112530582==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add a parameter to station_set_scan_results to allow skipping the
-removal of old BSSes.  In the DBus-triggered scan only expire BSSes
-after having gone through the full supported frequency set.
+On Wed, 16 Dec 2020 at 17:08, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 12/16/20 9:02 AM, Andrew Zaborowski wrote:
+> >> I actually really wonder about the utility of these p12 files.
+> >
+> > The utility is the same as of the PEM format.  However for me
+> > personally it's about supporting the popular formats (I think we're
+> > sitll missing one certificate format)
+>
+> Sure, I get that.  But I have to wonder if spending massive amounts of ti=
+me
+> supporting something that is ultimately a dead end is a worthwhile exerci=
+se.
 
-It should be safe to pass partial scan results to
-station_set_scan_results() when not expiring BSSes so using this new
-parameter I guess we could also call it for roam scan results.
----
- src/station.c | 31 ++++++++++++++++++++++---------
- src/station.h |  2 +-
- src/wsc.c     |  4 ++--
- 3 files changed, 25 insertions(+), 12 deletions(-)
+Why is it different than .pem, .crt, .key, .p7b, etc.?
 
-diff --git a/src/station.c b/src/station.c
-index 79b026b9..1e3706af 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -610,7 +610,8 @@ static bool station_start_anqp(struct station *station,=
- struct network *network,
-  */
- void station_set_scan_results(struct station *station,
- 						struct l_queue *new_bss_list,
--						bool add_to_autoconnect)
-+						bool add_to_autoconnect,
-+						bool expire)
- {
- 	const struct l_queue_entry *bss_entry;
- 	struct network *network;
-@@ -624,7 +625,8 @@ void station_set_scan_results(struct station *station,
- 	l_queue_destroy(station->autoconnect_list, l_free);
- 	station->autoconnect_list =3D l_queue_new();
- =
+>
+> And I take it isn't possible for NM to convert these P12 files into somet=
+hing
+> more sensible like a PEM + encrypted private key PEM on the fly?
 
--	station_bss_list_remove_expired_bsses(station);
-+	if (expire)
-+		station_bss_list_remove_expired_bsses(station);
- =
+Without the password, no.  I still don't see the reason to force IWD's
+clients and/or users to do this when we can have ell seemlessly
+autodetect the formats and clients like IWD (or https implementations)
+can forget about it, I'm not sure why we're having this conversation.
 
- 	for (bss_entry =3D l_queue_get_entries(station->bss_list); bss_entry;
- 						bss_entry =3D bss_entry->next) {
-@@ -1022,7 +1024,7 @@ static bool new_scan_results(int err, struct l_queue =
-*bss_list, void *userdata)
- 		return false;
- =
+>
+> >>
+> >> client_key_is_container would basically indicate whether the file was =
+a p12 or
+> >> not.  If the p12 does not contain ca_certs, then this could be written=
+ as:
+> >
+> > Is it sepcified by the user though?  As I said I think that's an
+> > unneeded complication for all parties.
+> >
+>
+> What is specified by the user?
 
- 	autoconnect =3D station_is_autoconnecting(station);
--	station_set_scan_results(station, bss_list, autoconnect);
-+	station_set_scan_results(station, bss_list, autoconnect, true);
- =
+client_key_is_container, does it come from a boolean setting? Or do
+you want ell to have a function that reads the file and detects the
+format, separate from the function that loads the file?
 
- 	return true;
- }
-@@ -1088,7 +1090,7 @@ static bool station_quick_scan_results(int err, struc=
-t l_queue *bss_list,
- 		goto done;
- =
+> If ClientKey has a P12 format and you get both
+> the private key and certificate out of it, then you're done.
 
- 	autoconnect =3D station_is_autoconnecting(station);
--	station_set_scan_results(station, bss_list, autoconnect);
-+	station_set_scan_results(station, bss_list, autoconnect, true);
- =
+That's exactly what calling l_pem_load_container_file() does, so the
+clients don't have to worry about the 10 different file types.
 
- done:
- 	if (station->state =3D=3D STATION_STATE_AUTOCONNECT_QUICK)
-@@ -2889,10 +2891,21 @@ static struct l_dbus_message *station_dbus_get_hidd=
-en_access_points(
- 	return reply;
- }
- =
+>
+> I don't want users to produce files like:
+>
+> EAP-TLS-ClientKey=3D/some/path/file.p12
+> EAP-TLS-ClientCert=3D/some/path/file.p12
+> EAP-TLS-CACert=3D/some/path/file.p12
+>
+> It should be just
+> EAP-TLS-Certificates=3D/some/path/file.p12
 
--static void station_dbus_scan_done(struct station *station)
-+static void station_dbus_scan_done(struct station *station, bool expired)
- {
- 	station->dbus_scan_id =3D 0;
- =
+I looked around a little for an indication that a .p12 file is ever
+used to store the user keypair (for client authentication) *and* the
+trusted CA set (for server authentication) but I can't find it, I
+don't believe this exists.  I also believe if some implementer wanted
+to support this -- it would be only for EAP, not other .p12 use cases
+(like https, .apk signing, etc.), so they'd go all the way and create
+a new format to store the full EAP configuration (Identity etc.) and
+certificates + keys in one file rather than use .p12.  If you've seen
+something like this please re-check the details, I think you're
+talking about something different than .p12.
 
-+	if (!expired) {
-+		/*
-+		 * We haven't dropped old BSS records from bss_list during
-+		 * this scan yet so do it now.  Call station_set_scan_results
-+		 * with an empty new BSS list to do this.  Not the cheapest
-+		 * but this should only happen when station_dbus_scan_done is
-+		 * called early, i.e. due to an error.
-+		 */
-+		station_set_scan_results(station, l_queue_new(), false, true);
-+	}
-+
- 	station_property_set_scanning(station, false);
- }
- =
+So you can't do either of the above, it's going to be something like:
+> EAP-TLS-ClientCert=3D/some/path/file1.p12
+> EAP-TLS-CACert=3D/some/path/file2.p12
 
-@@ -2910,7 +2923,7 @@ static void station_dbus_scan_triggered(int err, void=
- *user_data)
- 			dbus_pending_reply(&station->scan_pending, reply);
- 		}
- =
+>
+> >>
+> >> Or are you talking about the P12 file itself?  Do we  event want to su=
+pport
+> >> encrypted P12 files?
+> >
+> > We only support encrypted PKCS#12 structs, I haven't seen unencrypted o=
+nes.
+> >
+>
+> Ugh, another reason why openssl needs to be killed with  fire.  That just=
+ makes
+> no sense for a container format in the context of connecting to WiFi.
+>
+> >>
+> >> Note that P12 file might have an import key that is different than the
+> >> ClientKeyPassword.  So how are you handling that?  Is the user providi=
+ng two
+> >> passwords somehow?
+> >
+> > I'm handling the format that I know is in use or supported by NM, so
+> > far.  I think that's what we normally want IWD.
+> >
+> > What the spec says is that you can have an authentication password
+> > different from the encryption password, or you can use public keys for
+> > either the authentication or encryption, but I haven't seen files
+> > using any of those features.  I haven't seen software that can produce
+> > them, or NM / wpa_s support for that (neither multiple passwords nor
+> > public key authentication or encryption).  We can look into that once we
+> > have a use case.
+>
+> FYI, the P12 files produced to access our VPN are like this.  The import =
+key is
+> (by default) the FSID of the path where the certificate is and the passph=
+rase
+> for the private key is something else entirely.
 
--		station_dbus_scan_done(station);
-+		station_dbus_scan_done(station, false);
- 		return;
- 	}
- =
+I'm looking at some scripts and that's not the case, I don't know if
+you mean the same scripts, let me reply privately.
 
-@@ -2937,7 +2950,7 @@ static bool station_dbus_scan_results(int err, struct=
- l_queue *bss_list, void *u
- 	bool last_subset;
- =
+>
+> But in general, I really don't want us to be making the same mistakes as
+> NM/wpa_s.  So if there are multiple passwords, we probably should support=
+ that.
+>
+> >
+> > Best regards
+> >
+> > * Specifically you don't always know what is inside a PKCS#12
+> > container depending on how it's structured.  With openssl you know
+> > when a private key is present because it would not encrypt the
+> > Shrouded PKCS8 Key Bag type, and it would encrypt everything else as
+> > one opaque safe bag type.
+> >
+>
+> Can openssl be abused to encrypt with an empty password or something?  Th=
+at way
+> we can still decode the public certchain and have the original encrypted =
+private
+> key..
 
- 	if (err) {
--		station_dbus_scan_done(station);
-+		station_dbus_scan_done(station, false);
- 		return false;
- 	}
- =
+It can encrypt with an empty password, yes, but I don't see what you
+can use this for.
 
-@@ -2945,12 +2958,12 @@ static bool station_dbus_scan_results(int err, stru=
-ct l_queue *bss_list, void *u
- 	last_subset =3D next_idx >=3D L_ARRAY_SIZE(station->scan_freqs_order) ||
- 		station->scan_freqs_order[next_idx] =3D=3D NULL;
- =
+>
+> It really sounds to me like .p12 is an awful choice for our use...
 
--	station_set_scan_results(station, bss_list, autoconnect);
-+	station_set_scan_results(station, bss_list, autoconnect, last_subset);
- =
+It's like the other formats each with its quirks.
 
- 	station->dbus_scan_subset_idx =3D next_idx;
- =
-
- 	if (last_subset || !station_dbus_scan_subset(station))
--		station_dbus_scan_done(station);
-+		station_dbus_scan_done(station, last_subset);
- =
-
- 	return true;
- }
-diff --git a/src/station.h b/src/station.h
-index 17a0f8df..c4fd505b 100644
---- a/src/station.h
-+++ b/src/station.h
-@@ -65,7 +65,7 @@ struct network *station_network_find(struct station *stat=
-ion, const char *ssid,
- 					enum security security);
- =
-
- void station_set_scan_results(struct station *station, struct l_queue *bss=
-_list,
--				bool add_to_autoconnect);
-+				bool add_to_autoconnect, bool expire);
- =
-
- enum station_state station_get_state(struct station *station);
- uint32_t station_add_state_watch(struct station *station,
-diff --git a/src/wsc.c b/src/wsc.c
-index aec9900c..5ba63a64 100644
---- a/src/wsc.c
-+++ b/src/wsc.c
-@@ -787,7 +787,7 @@ static bool push_button_scan_results(int err, struct l_=
-queue *bss_list,
- 	}
- =
-
- 	wsc_cancel_scan(wsc);
--	station_set_scan_results(wsc->station, bss_list, false);
-+	station_set_scan_results(wsc->station, bss_list, false, true);
- =
-
- 	l_debug("Found AP to connect to: %s",
- 			util_address_to_string(target->addr));
-@@ -931,7 +931,7 @@ static bool pin_scan_results(int err, struct l_queue *b=
-ss_list, void *userdata)
- 	}
- =
-
- 	wsc_cancel_scan(wsc);
--	station_set_scan_results(wsc->station, bss_list, false);
-+	station_set_scan_results(wsc->station, bss_list, false, true);
- =
-
- 	l_debug("Found AP to connect to: %s",
- 			util_address_to_string(target->addr));
--- =
-
-2.27.0
-
---===============7196530350459366367==--
+Best regards
+--===============9138956847112530582==--
 
