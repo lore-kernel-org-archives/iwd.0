@@ -1,53 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============5575390077113500998=="
+Content-Type: multipart/mixed; boundary="===============5616826236863713770=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] configure.ac: fix static build with readline
-Date: Thu, 17 Dec 2020 20:30:57 -0600
-Message-ID: <979b198b-e6a1-3f97-2f94-83cf52237130@gmail.com>
-In-Reply-To: <20201216070255.142413-1-fontaine.fabrice@gmail.com>
+From: Carlo Abelli <carlo@abelli.me>
+Subject: [PATCH] doc: move EnableIPv6 under Network
+Date: Fri, 18 Dec 2020 15:38:35 +0000
+Message-ID: <JeV4Wk3SvSFU71O5N8M4n_9Zevtn3449VpZsEB05_kCXcFkbQUdW8w6Or5_vmIfqte6aiYRCyhaCzWyEsG9ZS0OPoTZ_ceXbYMceT8x0WL0=@abelli.me>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5575390077113500998==
+--===============5616826236863713770==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Fabrice,
+The EnableIPv6 option is incorrectly documented under General but should
+be documented under Network instead.
+---
+ src/iwd.config.rst | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-On 12/16/20 1:02 AM, Fabrice Fontaine wrote:
-> Retrieve the dependencies of readline through pkg-config (and fallback
-> to -lreadline) to avoid the following build failure:
-> =
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index f74e31cf..365494a4 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -74,14 +74,6 @@ The group ``[General]`` contains general settings.
+        ``[Network]`` settings for additional settings related to network
+        configuration.
 
-> /nvme/rc-buildroot-test/scripts/instance-0/output-1/host/opt/ext-toolchai=
-n/bin/../lib/gcc/x86_64-buildroot-linux-uclibc/8.3.0/../../../../x86_64-bui=
-ldroot-linux-uclibc/bin/ld: /nvme/rc-buildroot-test/scripts/instance-0/outp=
-ut-1/host/bin/../x86_64-buildroot-linux-uclibc/sysroot/usr/lib/libreadline.=
-a(display.o): in function `cr':
-> display.c:(.text+0x1ab): undefined reference to `tputs'
-> =
+-   * - EnableIPv6
+-     - Values: true, **false**
+-
+-       Sets the global default that tells **iwd** whether it should config=
+ure
+-       IPv6 addresses and routes (either provided via static settings,
+-       Router Advertisements or DHCPv6 protocol).  This setting is disabled
+-       by default.  This setting can also be overriden on a per-network ba=
+sis.
+-
+    * - APRanges
+      - Values: <IP in prefix notation>
 
-> Fixes:
->   - http://autobuild.buildroot.org/results/8fb1341f2f5094c346456b43b4fc04=
-996c2e1485
-> =
+@@ -186,6 +178,14 @@ The group ``[Network]`` contains network configuration=
+ related settings.
+    :widths: 20 80
+    :align: left
 
-> Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
++   * - EnableIPv6
++     - Values: true, **false**
++
++       Sets the global default that tells **iwd** whether it should config=
+ure
++       IPv6 addresses and routes (either provided via static settings,
++       Router Advertisements or DHCPv6 protocol).  This setting is disabled
++       by default.  This setting can also be overriden on a per-network ba=
+sis.
++
+    * - NameResolvingService
+      - Values: resolvconf, **systemd**
 
-We do not use Signed-off-by, so I dropped this, and...
-
-> ---
->   Makefile.am  | 4 ++--
->   configure.ac | 3 +++
->   2 files changed, 5 insertions(+), 2 deletions(-)
-> =
+--
+2.29.2
 
 
-Applied, thanks.
-
-Regards,
--Denis
-
---===============5575390077113500998==--
+--===============5616826236863713770==--
 
