@@ -1,45 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============2757597117424153048=="
+Content-Type: multipart/mixed; boundary="===============3499016385237034755=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH] netdev: fix asymmetry in handshake events
-Date: Tue, 05 Jan 2021 09:06:33 -0800
-Message-ID: <3f9bb79a81beb41099c3ed099f00701e329d22f9.camel@gmail.com>
-In-Reply-To: <1433a640-3dba-432e-2382-54839851b3d4@gmail.com>
+Subject: [RFC 0/1] Diagnostic Interface
+Date: Wed, 06 Jan 2021 12:23:54 -0800
+Message-ID: <20210106202355.103284-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2757597117424153048==
+--===============3499016385237034755==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+This interface would expose details are may be too low level for a
+general purpose application, like a connection manager. Some of these
+details are useful though and these will go into this new diagnostic
+interface. This interface is also going to be very useful in the
+autotesting framework.
 
-> Wouldn't this cause us to issue another Disconnect?  Sort of useless
-> to do that =
+The GetDiagnostics() method is somewhat mapped to GET_STATION in
+nl80211. Some of these values are too volatile to express as properties
+as they change frequently so an application may get them at the time
+they are needed.
 
-> if we know we're disconnected already.  The kernel just told us.
-> =
+The additional properties would be purely for autotesting/debugging.
 
-Yes, your right.
+James Prestwood (1):
+  diagnostic: DBus interface definition
 
-> Perhaps this should be treated as another handshake event.  Like =
+ doc/diagnostics.txt | 51 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+ create mode 100644 doc/diagnostics.txt
 
-> HANDSHAKE_EVENT_ABORTED.
+-- =
 
-Well basically I wanted this symmetry for the diagnostic interface, for
-purposes of timing auth/assoc/handshake etc. as well as obtaining the
-status/reason code. This was a quick hack but there were unforseen
-consequences.
+2.26.2
 
-I was planning on this eventually but instead maybe I could just make
-the netdev result events subscribeable with a watchlist. This would get
-me the auth/assoc timings, status/reason code, as well as handle this
-case as station already does without the need for a special purpose
-event.
-
-Thanks,
-James
-
---===============2757597117424153048==--
+--===============3499016385237034755==--
 
