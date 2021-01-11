@@ -1,41 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============1803804010620248138=="
+Content-Type: multipart/mixed; boundary="===============0965372321906946684=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/8] netdev: add netdev_get_station
-Date: Mon, 11 Jan 2021 15:08:43 -0600
-Message-ID: <456b84ee-ab05-6a82-10a5-b00d20adedf7@gmail.com>
-In-Reply-To: <0e4dd87f7c34ec5ffc5e7a3e04d3ce726bb98719.camel@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/7] dbus: add helper for appending a dictionary
+Date: Mon, 11 Jan 2021 13:34:56 -0800
+Message-ID: <20210111213502.551370-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1803804010620248138==
+--===============0965372321906946684==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Arrays of dictionaries are quite common, and for basic
+types this API makes things much more convenient by
+putting all the enter/append/leave calls in one place.
+---
+ src/dbus.c | 24 ++++++++++++++++++++++++
+ src/dbus.h |  3 +++
+ 2 files changed, 27 insertions(+)
 
->>> +int netdev_get_station(struct netdev *netdev, const uint8_t *mac,
->>
->> Do you want to add a convenience method to grab the current
->> station?  The mac
->> parameter is for cases where you might have multiple ones, like AP.
-> =
+diff --git a/src/dbus.c b/src/dbus.c
+index ceede5c8..d6bfc52d 100644
+--- a/src/dbus.c
++++ b/src/dbus.c
+@@ -202,6 +202,30 @@ void dbus_pending_reply(struct l_dbus_message **msg,
+ 	*msg =3D NULL;
+ }
+ =
 
-> I could, although its not too bad just passing in handshake->aa... But
-> if you want a current station API and a separate one for AP I don't
-> mind either way.
-> =
++/*
++ * Convenience helper for appending a dictionary "{sv}". This only works w=
+hen
++ * the variant is a basic type.
++ */
++bool dbus_append_dict_basic(struct l_dbus_message_builder *builder,
++				const char *name, const char *type,
++				const void *data)
++{
++	if (!l_dbus_message_builder_enter_dict(builder, "sv"))
++		return false;
++	if (!l_dbus_message_builder_append_basic(builder, 's', name))
++		return false;
++	if (!l_dbus_message_builder_enter_variant(builder, type))
++		return false;
++	if (!l_dbus_message_builder_append_basic(builder, type[0], data))
++		return false;
++	if (!l_dbus_message_builder_leave_variant(builder))
++		return false;
++	if (!l_dbus_message_builder_leave_dict(builder))
++		return false;
++
++	return true;
++}
++
+ struct l_dbus *dbus_get_bus(void)
+ {
+ 	return g_dbus;
+diff --git a/src/dbus.h b/src/dbus.h
+index 3e2018d8..3a055482 100644
+--- a/src/dbus.h
++++ b/src/dbus.h
+@@ -51,6 +51,9 @@ struct l_dbus *dbus_get_bus(void);
+ =
 
+ void dbus_pending_reply(struct l_dbus_message **msg,
+ 				struct l_dbus_message *reply);
++bool dbus_append_dict_basic(struct l_dbus_message_builder *builder,
++				const char *name, const char *type,
++				const void *data);
+ =
 
-I was just thinking that you probably can keep this method and just add a =
+ const char *dbus_iftype_to_string(unsigned int iftype);
+ =
 
-wrapper (netdev_get_current_station or something) that would just call =
+-- =
 
-netdev_get_station appropriately.  But I'm fine either way.
+2.26.2
 
-Regards,
--Denis
-
---===============1803804010620248138==--
+--===============0965372321906946684==--
 
