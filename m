@@ -1,70 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============8770205218794500219=="
+Content-Type: multipart/mixed; boundary="===============6381642846294203017=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 6/8] test: add a script for GetDiagnostics
-Date: Tue, 12 Jan 2021 09:17:21 -0800
-Message-ID: <20210112171723.3025-6-prestwoj@gmail.com>
+Subject: [PATCH v3 7/8] netdev: update RSSI polling to use station info parser
+Date: Tue, 12 Jan 2021 09:17:22 -0800
+Message-ID: <20210112171723.3025-7-prestwoj@gmail.com>
 In-Reply-To: <20210112171723.3025-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8770205218794500219==
+--===============6381642846294203017==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- test/get-diagnostics | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
- create mode 100755 test/get-diagnostics
+ src/netdev.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/test/get-diagnostics b/test/get-diagnostics
-new file mode 100755
-index 00000000..c508c58c
---- /dev/null
-+++ b/test/get-diagnostics
-@@ -0,0 +1,37 @@
-+#!/usr/bin/python3
+diff --git a/src/netdev.c b/src/netdev.c
+index 0618c579..a5e21cb0 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -480,6 +480,7 @@ static void netdev_rssi_poll_cb(struct l_genl_msg *msg,=
+ void *user_data)
+ 	uint16_t type, len;
+ 	const void *data;
+ 	bool found;
++	struct netdev_station_info info;
+ 	uint8_t prev_rssi_level_idx =3D netdev->cur_rssi_level_idx;
+ =
+
+ 	netdev->rssi_poll_cmd_id =3D 0;
+@@ -492,29 +493,21 @@ static void netdev_rssi_poll_cb(struct l_genl_msg *ms=
+g, void *user_data)
+ 		if (type !=3D NL80211_ATTR_STA_INFO)
+ 			continue;
+ =
+
+-		found =3D true;
+-		break;
+-	}
+-
+-	if (!found || !l_genl_attr_recurse(&attr, &nested))
+-		goto done;
+-
+-	found =3D false;
+-	while (l_genl_attr_next(&nested, &type, &len, &data)) {
+-		if (type !=3D NL80211_STA_INFO_SIGNAL_AVG)
+-			continue;
++		if (!l_genl_attr_recurse(&attr, &nested))
++			goto done;
+ =
+
+-		if (len !=3D 1)
+-			continue;
++		if (!netdev_parse_sta_info(&nested, &info))
++			goto done;
+ =
+
+ 		found =3D true;
+-		netdev->cur_rssi =3D *(const int8_t *) data;
+ 		break;
+ 	}
+ =
+
+-	if (!found)
++	if (!found || !info.have_cur_rssi)
+ 		goto done;
+ =
+
++	netdev->cur_rssi =3D info.cur_rssi;
 +
-+import sys
-+import dbus
-+
-+# Map dict keys to units. Units can be a function/lambda which should retu=
-rn the
-+# entire value with units as a string.
-+unit_map =3D {
-+    "ConnectedBss" : None,
-+    "RSSI" : "dBm",
-+    "RxBitrate" : lambda k : str(100 * int(k)) + ' Kbps',
-+    "RxMCS" : lambda i : str(int(i)),
-+    "TxBitrate" : lambda k : str(100 * int(k)) + ' Kbps',
-+    "TxMCS" : lambda i : str(int(i)),
-+    "ExpectedThroughput" : "Kbps"
-+}
-+
-+if (len(sys.argv) !=3D 2):
-+    print("Usage: %s <device>" % (sys.argv[0]))
-+    sys.exit(1)
-+
-+bus =3D dbus.SystemBus()
-+device =3D dbus.Interface(bus.get_object("net.connman.iwd", sys.argv[1]),
-+                                    "net.connman.iwd.StationDiagnostic")
-+diagnostics =3D device.GetDiagnostics()
-+
-+for key, value in diagnostics.items():
-+    if key in unit_map:
-+        units =3D unit_map[key]
-+        if units is None:
-+            units =3D ''
-+        elif callable(units):
-+            value =3D units(value)
-+            units =3D ''
-+
-+        print('%s : %s %s' % (key, value, units))
-+
+ 	/*
+ 	 * Note we don't have to handle LOW_SIGNAL_THRESHOLD here.  The
+ 	 * CQM single threshold RSSI monitoring should work even if the
 -- =
 
 2.26.2
 
---===============8770205218794500219==--
+--===============6381642846294203017==--
 
