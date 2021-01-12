@@ -1,82 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============6381642846294203017=="
+Content-Type: multipart/mixed; boundary="===============3304001294984054987=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 7/8] netdev: update RSSI polling to use station info parser
-Date: Tue, 12 Jan 2021 09:17:22 -0800
-Message-ID: <20210112171723.3025-7-prestwoj@gmail.com>
+Subject: [PATCH v3 8/8] doc: update diagnostics with [optional] tags
+Date: Tue, 12 Jan 2021 09:17:23 -0800
+Message-ID: <20210112171723.3025-8-prestwoj@gmail.com>
 In-Reply-To: <20210112171723.3025-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6381642846294203017==
+--===============3304001294984054987==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Some elements, though unlikely, are not required to be included
+with the GET_STATION call that GetDiagnostics relies on. mac80211
+based drivers include most of these, but other drivers may not.
+To be on the safe side all properties except ConnectedBss are now
+optional and may not be included.
 ---
- src/netdev.c | 23 ++++++++---------------
- 1 file changed, 8 insertions(+), 15 deletions(-)
+ doc/diagnostics.txt | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 0618c579..a5e21cb0 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -480,6 +480,7 @@ static void netdev_rssi_poll_cb(struct l_genl_msg *msg,=
- void *user_data)
- 	uint16_t type, len;
- 	const void *data;
- 	bool found;
-+	struct netdev_station_info info;
- 	uint8_t prev_rssi_level_idx =3D netdev->cur_rssi_level_idx;
+diff --git a/doc/diagnostics.txt b/doc/diagnostics.txt
+index c6d2aef0..f94ef6f8 100644
+--- a/doc/diagnostics.txt
++++ b/doc/diagnostics.txt
+@@ -21,15 +21,15 @@ Methods		dict GetDiagnostics()
  =
 
- 	netdev->rssi_poll_cmd_id =3D 0;
-@@ -492,29 +493,21 @@ static void netdev_rssi_poll_cb(struct l_genl_msg *ms=
-g, void *user_data)
- 		if (type !=3D NL80211_ATTR_STA_INFO)
- 			continue;
+ 			ConnectedBss - MAC address of currently connected BSS.
  =
 
--		found =3D true;
--		break;
--	}
--
--	if (!found || !l_genl_attr_recurse(&attr, &nested))
--		goto done;
--
--	found =3D false;
--	while (l_genl_attr_next(&nested, &type, &len, &data)) {
--		if (type !=3D NL80211_STA_INFO_SIGNAL_AVG)
--			continue;
-+		if (!l_genl_attr_recurse(&attr, &nested))
-+			goto done;
+-			RSSI -	The RSSI of the currently connected BSS.
++			RSSI [optional] - The RSSI of the currently connected BSS.
  =
 
--		if (len !=3D 1)
--			continue;
-+		if (!netdev_parse_sta_info(&nested, &info))
-+			goto done;
+-			RxRate - Receive rate in 100kbit/s
++			RxRate [optional] - Receive rate in 100kbit/s
  =
 
- 		found =3D true;
--		netdev->cur_rssi =3D *(const int8_t *) data;
- 		break;
- 	}
+-			RxMCS - Receiving MCS index
++			RxMCS [optional] - Receiving MCS index
  =
 
--	if (!found)
-+	if (!found || !info.have_cur_rssi)
- 		goto done;
+-			TxRate - Transmission rate in 100kbit/s
++			TxRate [optional] - Transmission rate in 100kbit/s
  =
 
-+	netdev->cur_rssi =3D info.cur_rssi;
-+
- 	/*
- 	 * Note we don't have to handle LOW_SIGNAL_THRESHOLD here.  The
- 	 * CQM single threshold RSSI monitoring should work even if the
+-			TxMCS - Transmitting MCS index
++			TxMCS [optional] - Transmitting MCS index
+ =
+
+ 			Possible errors: net.connman.iwd.Busy
+ 					 net.connman.iwd.Failed
 -- =
 
 2.26.2
 
---===============6381642846294203017==--
+--===============3304001294984054987==--
 
