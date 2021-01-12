@@ -1,62 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============3304001294984054987=="
+Content-Type: multipart/mixed; boundary="===============9175710938675867958=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 8/8] doc: update diagnostics with [optional] tags
-Date: Tue, 12 Jan 2021 09:17:23 -0800
-Message-ID: <20210112171723.3025-8-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v3 1/8] dbus: add helper for appending a dictionary
+Date: Tue, 12 Jan 2021 13:40:22 -0600
+Message-ID: <951814c9-dfcb-7f62-57d2-41135d494c1f@gmail.com>
 In-Reply-To: <20210112171723.3025-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3304001294984054987==
+--===============9175710938675867958==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Some elements, though unlikely, are not required to be included
-with the GET_STATION call that GetDiagnostics relies on. mac80211
-based drivers include most of these, but other drivers may not.
-To be on the safe side all properties except ConnectedBss are now
-optional and may not be included.
----
- doc/diagnostics.txt | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Hi James,
 
-diff --git a/doc/diagnostics.txt b/doc/diagnostics.txt
-index c6d2aef0..f94ef6f8 100644
---- a/doc/diagnostics.txt
-+++ b/doc/diagnostics.txt
-@@ -21,15 +21,15 @@ Methods		dict GetDiagnostics()
- =
+On 1/12/21 11:17 AM, James Prestwood wrote:
+> Arrays of dictionaries are quite common, and for basic
+> types this API makes things much more convenient by
+> putting all the enter/append/leave calls in one place.
+> ---
+>   src/dbus.c | 26 ++++++++++++++++++++++++++
+>   src/dbus.h |  3 +++
+>   2 files changed, 29 insertions(+)
+> =
 
- 			ConnectedBss - MAC address of currently connected BSS.
- =
 
--			RSSI -	The RSSI of the currently connected BSS.
-+			RSSI [optional] - The RSSI of the currently connected BSS.
- =
+Applied, thanks.
 
--			RxRate - Receive rate in 100kbit/s
-+			RxRate [optional] - Receive rate in 100kbit/s
- =
+Regards,
+-Denis
 
--			RxMCS - Receiving MCS index
-+			RxMCS [optional] - Receiving MCS index
- =
-
--			TxRate - Transmission rate in 100kbit/s
-+			TxRate [optional] - Transmission rate in 100kbit/s
- =
-
--			TxMCS - Transmitting MCS index
-+			TxMCS [optional] - Transmitting MCS index
- =
-
- 			Possible errors: net.connman.iwd.Busy
- 					 net.connman.iwd.Failed
--- =
-
-2.26.2
-
---===============3304001294984054987==--
+--===============9175710938675867958==--
 
