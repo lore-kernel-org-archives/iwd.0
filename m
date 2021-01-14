@@ -1,40 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============8807584362610164381=="
+Content-Type: multipart/mixed; boundary="===============0700843471218411893=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 4/5] test: update get-diagnostics with RateTypes
-Date: Thu, 14 Jan 2021 10:58:32 -0800
-Message-ID: <20210114185833.76477-4-prestwoj@gmail.com>
+Subject: [PATCH v4 5/5] doc: add RateType's on diagnostic interface
+Date: Thu, 14 Jan 2021 10:58:33 -0800
+Message-ID: <20210114185833.76477-5-prestwoj@gmail.com>
 In-Reply-To: <20210114185833.76477-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8807584362610164381==
+--===============0700843471218411893==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- test/get-diagnostics | 2 ++
- 1 file changed, 2 insertions(+)
+ doc/diagnostics.txt | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/test/get-diagnostics b/test/get-diagnostics
-index 7cb777b3..6596955a 100755
---- a/test/get-diagnostics
-+++ b/test/get-diagnostics
-@@ -8,8 +8,10 @@ import dbus
- unit_map =3D {
-     "ConnectedBss" : None,
-     "RSSI" : "dBm",
-+    "RxRateType" : None,
-     "RxBitrate" : lambda k : str(100 * int(k)) + ' Kbps',
-     "RxMCS" : lambda i : str(int(i)),
-+    "TxRateType" : None,
-     "TxBitrate" : lambda k : str(100 * int(k)) + ' Kbps',
-     "TxMCS" : lambda i : str(int(i)),
-     "ExpectedThroughput" : "Kbps"
+diff --git a/doc/diagnostics.txt b/doc/diagnostics.txt
+index f94ef6f8..630af503 100644
+--- a/doc/diagnostics.txt
++++ b/doc/diagnostics.txt
+@@ -23,10 +23,19 @@ Methods		dict GetDiagnostics()
+ =
+
+ 			RSSI [optional] - The RSSI of the currently connected BSS.
+ =
+
++			RxRateType -	The phy technology being use (Legacy, 802.11n,
++					802.11ac or 802.11ax). The MCS values (not
++					present in Legacy case) have a different
++					meaning depending on RateType, e.g. 802.11n
++					will use HT MCS values, 802.11ac use VHT etc.
++
+ 			RxRate [optional] - Receive rate in 100kbit/s
+ =
+
+ 			RxMCS [optional] - Receiving MCS index
+ =
+
++			TxRateType -	Same meaning as RxRateType, just for
++					transmission.
++
+ 			TxRate [optional] - Transmission rate in 100kbit/s
+ =
+
+ 			TxMCS [optional] - Transmitting MCS index
 -- =
 
 2.26.2
 
---===============8807584362610164381==--
+--===============0700843471218411893==--
 
