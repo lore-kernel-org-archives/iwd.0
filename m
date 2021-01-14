@@ -1,54 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============0700843471218411893=="
+Content-Type: multipart/mixed; boundary="===============7549076044732759404=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 5/5] doc: add RateType's on diagnostic interface
-Date: Thu, 14 Jan 2021 10:58:33 -0800
-Message-ID: <20210114185833.76477-5-prestwoj@gmail.com>
-In-Reply-To: <20210114185833.76477-1-prestwoj@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: Re: iwd in AP mode: no HT capabilities
+Date: Thu, 14 Jan 2021 20:07:37 +0100
+Message-ID: <CAOq732Lnuh208DMc9Bxz8_KgrAqjio4v1mgi8s2CRCa=Wr9LaQ@mail.gmail.com>
+In-Reply-To: <20210114185358.2879.1670@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0700843471218411893==
+--===============7549076044732759404==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- doc/diagnostics.txt | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Hi Georg,
 
-diff --git a/doc/diagnostics.txt b/doc/diagnostics.txt
-index f94ef6f8..630af503 100644
---- a/doc/diagnostics.txt
-+++ b/doc/diagnostics.txt
-@@ -23,10 +23,19 @@ Methods		dict GetDiagnostics()
- =
+On Thu, 14 Jan 2021 at 19:54, <georgmueller@gmx.net> wrote:
+> I tried to switch from wpa_supplicant to iwd to start an access point.
+>
+> When looking at the scan results from another machine, I see that when us=
+ing iwd, the device sends no HT capabilities and only supports 11MBit/s.
 
- 			RSSI [optional] - The RSSI of the currently connected BSS.
- =
+This is a missing feature in IWD at this time, the AP mode is still
+very basic and only reports a few hardcoded bitrates.  AP beacon
+changes are blocked by an ongoing development in ell for the moment.
 
-+			RxRateType -	The phy technology being use (Legacy, 802.11n,
-+					802.11ac or 802.11ax). The MCS values (not
-+					present in Legacy case) have a different
-+					meaning depending on RateType, e.g. 802.11n
-+					will use HT MCS values, 802.11ac use VHT etc.
-+
- 			RxRate [optional] - Receive rate in 100kbit/s
- =
-
- 			RxMCS [optional] - Receiving MCS index
- =
-
-+			TxRateType -	Same meaning as RxRateType, just for
-+					transmission.
-+
- 			TxRate [optional] - Transmission rate in 100kbit/s
- =
-
- 			TxMCS [optional] - Transmitting MCS index
--- =
-
-2.26.2
-
---===============0700843471218411893==--
+Best regards
+--===============7549076044732759404==--
 
