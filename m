@@ -1,98 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============3704416670234209440=="
+Content-Type: multipart/mixed; boundary="===============0552499937743515583=="
 MIME-Version: 1.0
-From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Subject: CQM RSSI notification in station_roamed()
-Date: Tue, 19 Jan 2021 10:30:15 +0000
-Message-ID: <8794f161-2852-2056-80cd-172263426028@bang-olufsen.dk>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/2] client: add diagnostic interface definition
+Date: Tue, 19 Jan 2021 09:13:49 -0800
+Message-ID: <20210119171350.389733-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3704416670234209440==
+--===============0552499937743515583==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+---
+ client/dbus-proxy.h | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-I have been working on CQM RSSI notification support for the brcmfmac =
+diff --git a/client/dbus-proxy.h b/client/dbus-proxy.h
+index a3304848..9c5c57e5 100644
+--- a/client/dbus-proxy.h
++++ b/client/dbus-proxy.h
+@@ -24,15 +24,16 @@
+ =
 
-driver so that roaming can be properly offloaded to iwd. I want to ask =
+ struct proxy_interface;
+ =
 
-about this particular behaviour in iwd's station code:
+-#define IWD_ADAPTER_INTERFACE          "net.connman.iwd.Adapter"
+-#define IWD_ACCESS_POINT_INTERFACE     "net.connman.iwd.AccessPoint"
+-#define IWD_AD_HOC_INTERFACE           "net.connman.iwd.AdHoc"
+-#define IWD_AGENT_MANAGER_INTERFACE    "net.connman.iwd.AgentManager"
+-#define IWD_DEVICE_INTERFACE           "net.connman.iwd.Device"
+-#define IWD_KNOWN_NETWORK_INTREFACE    "net.connman.iwd.KnownNetwork"
+-#define IWD_NETWORK_INTERFACE          "net.connman.iwd.Network"
+-#define IWD_WSC_INTERFACE              "net.connman.iwd.SimpleConfiguratio=
+n"
+-#define IWD_STATION_INTERFACE          "net.connman.iwd.Station"
++#define IWD_ADAPTER_INTERFACE            "net.connman.iwd.Adapter"
++#define IWD_ACCESS_POINT_INTERFACE       "net.connman.iwd.AccessPoint"
++#define IWD_AD_HOC_INTERFACE             "net.connman.iwd.AdHoc"
++#define IWD_AGENT_MANAGER_INTERFACE      "net.connman.iwd.AgentManager"
++#define IWD_DEVICE_INTERFACE             "net.connman.iwd.Device"
++#define IWD_KNOWN_NETWORK_INTREFACE      "net.connman.iwd.KnownNetwork"
++#define IWD_NETWORK_INTERFACE            "net.connman.iwd.Network"
++#define IWD_WSC_INTERFACE                "net.connman.iwd.SimpleConfigurat=
+ion"
++#define IWD_STATION_INTERFACE            "net.connman.iwd.Station"
++#define IWD_STATION_DIAGNOSTIC_INTERFACE "net.connman.iwd.StationDiagnosti=
+c"
+ =
 
-     static void station_roamed(struct station *station)
-     {
-         /*
-          * New signal high/low notification should occur on the next
-          * beacon from new AP.
-          */
-         station->signal_low =3D false;
-         station->roam_min_time.tv_sec =3D 0;
-         station->roam_no_orig_ap =3D false;
-         station->roam_scan_full =3D false;
+ typedef bool (*proxy_property_match_func_t) (const void *a, const void *b);
+ =
 
-         ...
-     }
+-- =
 
-When I look at the kernel API, this doesn't seem quite right to me. At =
+2.26.2
 
-least, there doesn't seem to be any onus on the driver to repeat itself. =
-
-This led me to experience the following scenario during my testing:
-
-     - station is connected to a BSS
-     - driver notifies RSSI LOW
-     - iwd roams to a new BSS
-     - RSSI happens to remain LOW
-     - driver doesn't notify RSSI LOW, because it never went HIGH
-
-This leads to us getting stuck with a low RSSI, even though iwd should =
-
-probably try roaming again because it was never informed that the RSSI =
-
-went HIGH. In practice, it means that we might sooner disconnect =
-
-entirely rather than roam to better BSS.
-
-Would it not be more prudent to continue assuming that signal_low =3D=3D =
-
-true, and schedule another roam in station_roamed() to cover for this =
-
-scenario? Something like what is already done in station_roam_failed():
-
-     static void station_roam_failed(struct station *station)
-     {
-         ...
-
-     delayed_retry:
-         /*
-          * If we're still connected to the old BSS, only clear =
-
-preparing_roam
-          * and reattempt in 60 seconds if signal level is still low at that
-          * time.
-          */
-         station->preparing_roam =3D false;
-         station->roam_scan_full =3D false;
-         station->ap_directed_roaming =3D false;
-
-         if (station->signal_low)
-             station_roam_timeout_rearm(station, 60);
-     }
-
-If you like the suggestion then I can prepare a patch. But perhaps I =
-
-have misunderstood the requirements of the CQM RSSI notification API in =
-
-the kernel, and it should indeed always send a notification upon =
-
-association to a new BSS, even if that happens to be redundant (e.g. LOW =
-
-followed by LOW). In any case I would be happy to have some =
-
-clarification on this.
-
-Kind regards,
-Alvin
---===============3704416670234209440==--
+--===============0552499937743515583==--
 
