@@ -1,13 +1,13 @@
-Content-Type: multipart/mixed; boundary="===============0552499937743515583=="
+Content-Type: multipart/mixed; boundary="===============6191060499683667446=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
 Subject: [PATCH 1/2] client: add diagnostic interface definition
-Date: Tue, 19 Jan 2021 09:13:49 -0800
-Message-ID: <20210119171350.389733-1-prestwoj@gmail.com>
+Date: Tue, 19 Jan 2021 09:14:44 -0800
+Message-ID: <20210119171445.389944-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0552499937743515583==
+--===============6191060499683667446==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -57,5 +57,5 @@ c"
 
 2.26.2
 
---===============0552499937743515583==--
+--===============6191060499683667446==--
 
