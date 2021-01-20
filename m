@@ -1,40 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============4144195109979464665=="
+Content-Type: multipart/mixed; boundary="===============5710867091572238116=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 8/8] test: add StationDiagnostic interface to monitor-iwd
-Date: Wed, 20 Jan 2021 10:30:36 -0800
-Message-ID: <20210120183036.477287-8-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/8] doc: document AccessPointDiagnostic interface
+Date: Wed, 20 Jan 2021 14:00:50 -0600
+Message-ID: <df3e52f3-afdd-6376-5129-35bd877e54b1@gmail.com>
 In-Reply-To: <20210120183036.477287-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4144195109979464665==
+--===============5710867091572238116==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- test/monitor-iwd | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/test/monitor-iwd b/test/monitor-iwd
-index 707b0c39..df043bc3 100755
---- a/test/monitor-iwd
-+++ b/test/monitor-iwd
-@@ -66,7 +66,8 @@ relevant_ifaces =3D [ "net.connman.iwd.Device",
-                     "net.connman.iwd.AgentManager",
-                     "net.connman.iwd.KnownNetwork",
-                     "net.connman.iwd.Station",
--                    "net.connman.iwd.AccessPointDiagnostic"]
-+                    "net.connman.iwd.AccessPointDiagnostic",
-+                    "net.connman.iwd.StationDiagnostic"]
- =
+On 1/20/21 12:30 PM, James Prestwood wrote:
+> ---
+>   doc/access-point-diagnostics.txt | 36 ++++++++++++++++++++++++++++++++
+>   1 file changed, 36 insertions(+)
+>   create mode 100644 doc/access-point-diagnostics.txt
+> =
 
- def interfaces_added(path, interfaces):
-     for iface, props in interfaces.items():
--- =
 
-2.26.2
+<snip>
 
---===============4144195109979464665==--
+> +
+> +Methods		dict[] GetDiagnostics()
+> +
+
+For historical reasons the preferred syntax for this is array{dict}, so I m=
+ade =
+
+this changed and applied, thanks!
+
+Regards,
+-Denis
+
+--===============5710867091572238116==--
 
