@@ -1,34 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============8501259639262576378=="
+Content-Type: multipart/mixed; boundary="===============4621471510652713395=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] station: remove unused roam_no_orig_ap state variable
-Date: Wed, 20 Jan 2021 11:14:51 -0600
-Message-ID: <cad511c8-e5a5-14ee-8b50-b931dc08a63a@gmail.com>
-In-Reply-To: <20210120160654.2998911-1-alsi@bang-olufsen.dk>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/8] doc: document AccessPointDiagnostic interface
+Date: Wed, 20 Jan 2021 10:30:29 -0800
+Message-ID: <20210120183036.477287-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8501259639262576378==
+--===============4621471510652713395==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Alvin,
+---
+ doc/access-point-diagnostics.txt | 36 ++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+ create mode 100644 doc/access-point-diagnostics.txt
 
-On 1/20/21 10:06 AM, Alvin =C5=A0ipraga wrote:
-> Since commit 836beb1276d1bc77889462ae514f0c5b708a38d7 removed beacon
-> loss handling, the roam_no_orig_ap variable has no use and is always set
-> to false. This commit removes it.
-> ---
->   src/station.c | 6 +-----
->   1 file changed, 1 insertion(+), 5 deletions(-)
-> =
+diff --git a/doc/access-point-diagnostics.txt b/doc/access-point-diagnostic=
+s.txt
+new file mode 100644
+index 00000000..d28dd6a9
+--- /dev/null
++++ b/doc/access-point-diagnostics.txt
+@@ -0,0 +1,36 @@
++Access Point diagnostic hierarchy [experimental]
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
++
++Service		net.connman.iwd
++Interface	net.connman.iwd.AccessPointDiagnostic
++Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}
++
++Methods		dict[] GetDiagnostics()
++
++			Get all diagnostic information for this access points
++			connected clients. This will return an array of
++			dictionaries, each corresponding to an individual
++			client. Below is a list of possible diagnostic
++			dictionary values:
++
++			Address - The station's MAC address
++
++			RSSI [optional] - The RSSI of the currently connected BSS.
++
++			RxMode [optional] -	The phy technology being used
++						(802.11n, 802.11ac or 802.11ax).
++
++			RxRate [optional] - Receive rate in 100kbit/s
++
++			RxMCS [optional] - Receiving MCS index
++
++			TxMode [optional] -	Same meaning as RxMode, just for
++						transmission.
++
++			TxRate [optional] - Transmission rate in 100kbit/s
++
++			TxMCS [optional] - Transmitting MCS index
++
++			Possible errors: net.connman.iwd.Failed
++					 net.connman.iwd.NotConnected
++					 net.connman.iwd.NotFound
+-- =
 
+2.26.2
 
-Applied, thanks!
-
-Regards,
--Denis
-
---===============8501259639262576378==--
+--===============4621471510652713395==--
 
