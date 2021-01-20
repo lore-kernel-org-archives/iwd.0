@@ -1,69 +1,88 @@
-Content-Type: multipart/mixed; boundary="===============4621471510652713395=="
+Content-Type: multipart/mixed; boundary="===============6125103584464104368=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/8] doc: document AccessPointDiagnostic interface
-Date: Wed, 20 Jan 2021 10:30:29 -0800
-Message-ID: <20210120183036.477287-1-prestwoj@gmail.com>
+Subject: [PATCH 2/8] netdev: add netdev_get_all_stations
+Date: Wed, 20 Jan 2021 10:30:30 -0800
+Message-ID: <20210120183036.477287-2-prestwoj@gmail.com>
+In-Reply-To: <20210120183036.477287-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4621471510652713395==
+--===============6125103584464104368==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This is a nl80211 dump version of netdev_get_station aimed at
+AP mode. This will dump all stations, parse into
+netdev_station_info structs, and call the callback for each
+individual station found. Once the dump is completed the destroy
+callback is called.
 ---
- doc/access-point-diagnostics.txt | 36 ++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
- create mode 100644 doc/access-point-diagnostics.txt
+ src/netdev.c | 26 ++++++++++++++++++++++++++
+ src/netdev.h |  2 ++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/doc/access-point-diagnostics.txt b/doc/access-point-diagnostic=
-s.txt
-new file mode 100644
-index 00000000..d28dd6a9
---- /dev/null
-+++ b/doc/access-point-diagnostics.txt
-@@ -0,0 +1,36 @@
-+Access Point diagnostic hierarchy [experimental]
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
+diff --git a/src/netdev.c b/src/netdev.c
+index 0fc0600a..e3ce270a 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -4240,6 +4240,32 @@ int netdev_get_current_station(struct netdev *netdev,
+ 					user_data, destroy);
+ }
+ =
+
++int netdev_get_all_stations(struct netdev *netdev, netdev_get_station_cb_t=
+ cb,
++				void *user_data, netdev_destroy_func_t destroy)
++{
++	struct l_genl_msg *msg;
 +
-+Service		net.connman.iwd
-+Interface	net.connman.iwd.AccessPointDiagnostic
-+Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}
++	if (netdev->get_station_cmd_id)
++		return -EBUSY;
 +
-+Methods		dict[] GetDiagnostics()
++	msg =3D l_genl_msg_new_sized(NL80211_CMD_GET_STATION, 64);
++	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &netdev->index);
 +
-+			Get all diagnostic information for this access points
-+			connected clients. This will return an array of
-+			dictionaries, each corresponding to an individual
-+			client. Below is a list of possible diagnostic
-+			dictionary values:
++	netdev->get_station_cmd_id =3D l_genl_family_dump(nl80211, msg,
++						netdev_get_station_cb, netdev,
++						netdev_get_station_destroy);
++	if (!netdev->get_station_cmd_id) {
++		l_genl_msg_unref(msg);
++		return -EIO;
++	}
 +
-+			Address - The station's MAC address
++	netdev->get_station_cb =3D cb;
++	netdev->get_station_data =3D user_data;
++	netdev->get_station_destroy =3D destroy;
 +
-+			RSSI [optional] - The RSSI of the currently connected BSS.
++	return 0;
++}
 +
-+			RxMode [optional] -	The phy technology being used
-+						(802.11n, 802.11ac or 802.11ax).
-+
-+			RxRate [optional] - Receive rate in 100kbit/s
-+
-+			RxMCS [optional] - Receiving MCS index
-+
-+			TxMode [optional] -	Same meaning as RxMode, just for
-+						transmission.
-+
-+			TxRate [optional] - Transmission rate in 100kbit/s
-+
-+			TxMCS [optional] - Transmitting MCS index
-+
-+			Possible errors: net.connman.iwd.Failed
-+					 net.connman.iwd.NotConnected
-+					 net.connman.iwd.NotFound
+ static int netdev_cqm_rssi_update(struct netdev *netdev)
+ {
+ 	struct l_genl_msg *msg;
+diff --git a/src/netdev.h b/src/netdev.h
+index 074dc61f..e7a1c060 100644
+--- a/src/netdev.h
++++ b/src/netdev.h
+@@ -211,6 +211,8 @@ int netdev_get_station(struct netdev *netdev, const uin=
+t8_t *mac,
+ int netdev_get_current_station(struct netdev *netdev,
+ 			netdev_get_station_cb_t cb, void *user_data,
+ 			netdev_destroy_func_t destroy);
++int netdev_get_all_stations(struct netdev *netdev, netdev_get_station_cb_t=
+ cb,
++				void *user_data, netdev_destroy_func_t destroy);
+ =
+
+ void netdev_handshake_failed(struct handshake_state *hs, uint16_t reason_c=
+ode);
+ =
+
 -- =
 
 2.26.2
 
---===============4621471510652713395==--
+--===============6125103584464104368==--
 
