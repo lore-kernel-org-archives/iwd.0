@@ -1,123 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============6709724849501337216=="
+Content-Type: multipart/mixed; boundary="===============2951799941861087568=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
 Subject: Re: [PATCH v2 4/5] client: implement "ap <wlan> show"
-Date: Thu, 21 Jan 2021 13:59:28 -0600
-Message-ID: <68674134-27f7-6b16-a059-50d3ddce4a73@gmail.com>
-In-Reply-To: <20210121181113.572092-4-prestwoj@gmail.com>
+Date: Thu, 21 Jan 2021 12:05:18 -0800
+Message-ID: <81c30f2b251963fca4f2eda59c2a48f89d254457.camel@gmail.com>
+In-Reply-To: <68674134-27f7-6b16-a059-50d3ddce4a73@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6709724849501337216==
+--===============2951799941861087568==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi,
 
-On 1/21/21 12:11 PM, James Prestwood wrote:
-> This command uses GetDiagnostics to show a list of connected
-> clients and some information about them. The information
-> contained for each connected station nearly maps 1:1 with the
-> station diagnostics information shown in "station <wlan> show"
-> apart from "ConnectedBss" which is now "Address".
-> ---
->   client/ap.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 73 insertions(+)
+> > +static void display_bitrate_100kbps(struct l_dbus_message_iter
+> > *variant,
+> > +				const char *key, const char *margin,
+> > +				int name_column_width, int
+> > value_column_width)
+> > +{
+> > +	uint32_t rate;
+> > +
+> > +	l_dbus_message_iter_get_variant(variant, "u", &rate);
+> > +
+> > +	display("%s%-*s%-*u Kbit/s\n", margin, name_column_width, key,
+> > +			value_column_width, rate * 100);
+> > +}
 > =
 
-> diff --git a/client/ap.c b/client/ap.c
-> index a6a2681b..6e2e96c4 100644
-> --- a/client/ap.c
-> +++ b/client/ap.c
-> @@ -189,6 +189,76 @@ static enum cmd_status cmd_stop(const char *device_n=
-ame, char **argv, int argc)
->   	return CMD_STATUS_TRIGGERED;
->   }
->   =
+> You don't want this in display.[ch] somewhere?
 
-> +static struct proxy_interface_type ap_diagnostic_interface_type =3D {
-> +	.interface =3D IWD_AP_DIAGNOSTIC_INTERFACE,
-> +};
-> +
-> +static void display_bitrate_100kbps(struct l_dbus_message_iter *variant,
-> +				const char *key, const char *margin,
-> +				int name_column_width, int value_column_width)
-> +{
-> +	uint32_t rate;
-> +
-> +	l_dbus_message_iter_get_variant(variant, "u", &rate);
-> +
-> +	display("%s%-*s%-*u Kbit/s\n", margin, name_column_width, key,
-> +			value_column_width, rate * 100);
-> +}
+I could do that. Its the same for station/ap. The reason I put it here
+is because its not really a generalized display API since its so unique
+to this specific value. But I'm fine either way, I'll put it in
+display.c/h so we don't have it duplicated.
 
-You don't want this in display.[ch] somewhere?
+> =
 
-> +
-> +static const struct display_dict_mapping diagnostic_mapping[] =3D {
-> +	{ "Address", 's', NULL },
-> +	{ "RxMode", 's', NULL },
-> +	{ "TxMode", 's', NULL },
-> +	{ "RxBitrate", 0, display_bitrate_100kbps },
-> +	{ "TxBitrate", 0, display_bitrate_100kbps },
-> +	{ "ExpectedThroughput", 'u', "Kbit/s" },
-> +	{ "RSSI", 'n', "dBm" },
-> +	{ "RxMCS", 'y', NULL },
-> +	{ "TxMCS", 'y', NULL},
-> +	{ NULL }
-> +};
-> +
-> +static void ap_get_diagnostics_callback(struct l_dbus_message *message,
-> +					void *user_data)
-> +{
-> +	struct l_dbus_message_iter array;
-> +	struct l_dbus_message_iter iter;
-> +	uint16_t idx =3D 0;
-> +	char client_num[15];
-> +
-> +	if (dbus_message_has_error(message))
-> +		return;
+> > +
+> > +static const struct display_dict_mapping diagnostic_mapping[] =3D {
+> > +	{ "Address", 's', NULL },
+> > +	{ "RxMode", 's', NULL },
+> > +	{ "TxMode", 's', NULL },
+> > +	{ "RxBitrate", 0, display_bitrate_100kbps },
+> > +	{ "TxBitrate", 0, display_bitrate_100kbps },
+> > +	{ "ExpectedThroughput", 'u', "Kbit/s" },
+> > +	{ "RSSI", 'n', "dBm" },
+> > +	{ "RxMCS", 'y', NULL },
+> > +	{ "TxMCS", 'y', NULL},
+> > +	{ NULL }
+> > +};
+> > +
+> > +static void ap_get_diagnostics_callback(struct l_dbus_message
+> > *message,
+> > +					void *user_data)
+> > +{
+> > +	struct l_dbus_message_iter array;
+> > +	struct l_dbus_message_iter iter;
+> > +	uint16_t idx =3D 0;
+> > +	char client_num[15];
+> > +
+> > +	if (dbus_message_has_error(message))
+> > +		return;
+> =
 
-Does this need to print something as well?
+> Does this need to print something as well?
 
-> +
-> +	if (!l_dbus_message_get_arguments(message, "aa{sv}", &array)) {
-> +		display("Failed to parse GetDiagnostics message");
-> +		return;
-> +	}
-> +
-> +	while (l_dbus_message_iter_next_entry(&array, &iter)) {
-> +		sprintf(client_num, "Client %u", idx++);
-> +		display_table_header(client_num, "%-*s%-*s",
-> +					20, "Property", 20, "Value");
-> +		display_dictionary(&iter, diagnostic_mapping, "", 20, 20);
-> +		display_table_footer();
-> +	}
-> +}
-> +
-> +static enum cmd_status cmd_show(const char *device_name, char **argv, in=
-t argc)
-> +{
-> +	const struct proxy_interface *ap_diagnostic =3D
-> +		device_proxy_find(device_name, IWD_AP_DIAGNOSTIC_INTERFACE);
-> +
-> +	if (!ap_diagnostic) {
-> +		display("No ap on device: '%s'\n", device_name);
-> +		return CMD_STATUS_INVALID_VALUE;
-> +	}
-> +
-> +	proxy_interface_method_call(ap_diagnostic, "GetDiagnostics", "",
-> +					ap_get_diagnostics_callback);
-> +
-> +	return CMD_STATUS_TRIGGERED;
-> +}
-> +
->   static const struct command ap_commands[] =3D {
->   	{ NULL, "list", NULL, cmd_list, "List devices in AP mode", true },
->   	{ "<wlan>", "start", "<\"network name\"> <passphrase>", cmd_start,
+That function does more than just check (though you wouldn't guess it
+from the name). It ends up converting the error into a string and
+printing it.
 
-Regards,
--Denis
---===============6709724849501337216==--
+Thanks,
+James
+
+--===============2951799941861087568==--
 
