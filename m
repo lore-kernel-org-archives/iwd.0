@@ -1,87 +1,144 @@
-Content-Type: multipart/mixed; boundary="===============3025704664974720012=="
+Content-Type: multipart/mixed; boundary="===============6633999792331161786=="
 MIME-Version: 1.0
-From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Subject: Re: CQM RSSI notification in station_roamed()
-Date: Thu, 21 Jan 2021 15:13:24 +0000
-Message-ID: <8e963559-960f-1739-83e6-8b3c9a4e2ddb@bang-olufsen.dk>
-In-Reply-To: <CAOq732L2CDDeX1Gae_nQbEGu8Adb1OsAZnNJg5quRTjKZvituA@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/5] station: commonize the building of diagnostic dict
+Date: Thu, 21 Jan 2021 10:11:09 -0800
+Message-ID: <20210121181113.572092-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3025704664974720012==
+--===============6633999792331161786==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+AP mode will use the same structure for its diagnostic interface
+and mostly the same dictionary keys. Apart from ConnectedBss and
+Address being different, the remainder are the same so the
+netdev_station_info to DBus dictionary conversion has been made
+common so both station and AP can use it to build its diagnostic
+dictionaries.
+---
+ src/station.c | 71 ++++++++++++++++++++++++++++++---------------------
+ src/station.h |  3 +++
+ 2 files changed, 45 insertions(+), 29 deletions(-)
 
-On 1/21/21 12:46 AM, Andrew Zaborowski wrote:
-> Hi,
-> =
+v2:
+ * Generalized the dictionary building so both station and AP could
+   use it.
 
-> On Tue, 19 Jan 2021 at 11:30, Alvin =C5=A0ipraga <ALSI@bang-olufsen.dk>=
- wrote:
->> I have been working on CQM RSSI notification support for the brcmfmac
->> driver so that roaming can be properly offloaded to iwd. I want to ask
->> about this particular behaviour in iwd's station code:
->>
->>       static void station_roamed(struct station *station)
->>       {
->>           /*
->>            * New signal high/low notification should occur on the next
->>            * beacon from new AP.
->>            */
->>           station->signal_low =3D false;
->>           station->roam_min_time.tv_sec =3D 0;
->>           station->roam_no_orig_ap =3D false;
->>           station->roam_scan_full =3D false;
->>
->>           ...
->>       }
->>
->> When I look at the kernel API, this doesn't seem quite right to me. At
->> least, there doesn't seem to be any onus on the driver to repeat itself.
-> =
+diff --git a/src/station.c b/src/station.c
+index c65fc0cc..3582ea24 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3448,36 +3448,16 @@ static void station_setup_interface(struct l_dbus_i=
+nterface *interface)
+ 					station_property_get_state, NULL);
+ }
+ =
 
-> Right, apparently there isn't.  I imagine a lot of the things we and
-> wpa_supplicant rely on is not explicitly documented in
-> include/net/cfg80211.h but the drivers do them perhaps to match
-> mac80211.  I guess I assumed this was also the case here.  mac80211
-> sets the IEEE80211_STA_RESET_SIGNAL_AVE flag in
-> ieee80211_set_associated() which causes the beacon handler to always
-> emit an RSSI event on the next run.
-> =
+-static void station_destroy_interface(void *user_data)
+-{
+-	struct station *station =3D user_data;
+-
+-	station_free(station);
+-}
+-
+-static void station_get_diagnostic_cb(const struct netdev_station_info *in=
+fo,
+-					void *user_data)
++/*
++ * Appends values from netdev_station_info into a DBus dictionary. This as=
+sumes
++ * the DBus dictionary array has already been 'entered', and expects the
++ * caller to 'leave' once called. This does not append the station address
++ * since the dictionary key name may be different depending on the caller.
++ */
++bool station_info_to_dict(const struct netdev_station_info *info,
++				struct l_dbus_message_builder *builder)
+ {
+-	struct station *station =3D user_data;
+-	struct l_dbus_message *reply;
+-	struct l_dbus_message_builder *builder;
+-	int16_t rssi;
+-
+-	if (!info) {
+-		reply =3D dbus_error_aborted(station->get_station_pending);
+-		goto done;
+-	}
+-
+-	reply =3D l_dbus_message_new_method_return(station->get_station_pending);
+-
+-	rssi =3D (int16_t)info->cur_rssi;
+-
+-	builder =3D l_dbus_message_builder_new(reply);
+-
+-	l_dbus_message_builder_enter_array(builder, "{sv}");
+-
+-	dbus_append_dict_basic(builder, "ConnectedBss", 's',
+-					util_address_to_string(info->addr));
++	int16_t rssi =3D (int16_t)info->cur_rssi;
+ =
 
->> This led me to experience the following scenario during my testing:
->>
->>       - station is connected to a BSS
->>       - driver notifies RSSI LOW
->>       - iwd roams to a new BSS
->>       - RSSI happens to remain LOW
->>       - driver doesn't notify RSSI LOW, because it never went HIGH
->>
->> This leads to us getting stuck with a low RSSI, even though iwd should
->> probably try roaming again because it was never informed that the RSSI
->> went HIGH. In practice, it means that we might sooner disconnect
->> entirely rather than roam to better BSS.
->>
->> Would it not be more prudent to continue assuming that signal_low =3D=3D
->> true, and schedule another roam in station_roamed() to cover for this
->> scenario?
-> =
+ 	if (info->have_cur_rssi)
+ 		dbus_append_dict_basic(builder, "RSSI", 'n', &rssi);
+@@ -3544,6 +3524,39 @@ static void station_get_diagnostic_cb(const struct n=
+etdev_station_info *info,
+ 		dbus_append_dict_basic(builder, "ExpectedThroughput", 'u',
+ 					&info->expected_throughput);
+ =
 
-> Yes, this is probably the right fix.
-> =
++	return true;
++}
++
++static void station_destroy_interface(void *user_data)
++{
++	struct station *station =3D user_data;
++
++	station_free(station);
++}
++
++static void station_get_diagnostic_cb(const struct netdev_station_info *in=
+fo,
++					void *user_data)
++{
++	struct station *station =3D user_data;
++	struct l_dbus_message *reply;
++	struct l_dbus_message_builder *builder;
++
++	if (!info) {
++		reply =3D dbus_error_aborted(station->get_station_pending);
++		goto done;
++	}
++
++	reply =3D l_dbus_message_new_method_return(station->get_station_pending);
++
++	builder =3D l_dbus_message_builder_new(reply);
++
++	l_dbus_message_builder_enter_array(builder, "{sv}");
++
++	dbus_append_dict_basic(builder, "ConnectedBss", 's',
++					util_address_to_string(info->addr));
++
++	station_info_to_dict(info, builder);
++
+ 	l_dbus_message_builder_leave_array(builder);
+ 	l_dbus_message_builder_finalize(builder);
+ 	l_dbus_message_builder_destroy(builder);
+diff --git a/src/station.h b/src/station.h
+index c4fd505b..f6b46bd1 100644
+--- a/src/station.h
++++ b/src/station.h
+@@ -100,3 +100,6 @@ void station_network_foreach(struct station *station,
+ 				void *user_data);
+ struct l_queue *station_get_bss_list(struct station *station);
+ struct scan_bss *station_get_connected_bss(struct station *station);
++
++bool station_info_to_dict(const struct netdev_station_info *info,
++				struct l_dbus_message_builder *builder);
+-- =
 
-> We do want some delay before the next roam attempt because if we've
-> just scanned and roamed to the best BSS in the scan results there's
-> probably no point scanning again immediately.
+2.26.2
 
-OK, thanks for the clarification. I will prepare a patch and send it to =
-
-the mailing list - probably tomorrow.
-
-Kind regards,
-Alvin
---===============3025704664974720012==--
+--===============6633999792331161786==--
 
