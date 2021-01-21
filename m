@@ -1,79 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============2951799941861087568=="
+Content-Type: multipart/mixed; boundary="===============5914007111498639803=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH v2 4/5] client: implement "ap <wlan> show"
-Date: Thu, 21 Jan 2021 12:05:18 -0800
-Message-ID: <81c30f2b251963fca4f2eda59c2a48f89d254457.camel@gmail.com>
-In-Reply-To: <68674134-27f7-6b16-a059-50d3ddce4a73@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2 1/5] station: commonize the building of diagnostic dict
+Date: Thu, 21 Jan 2021 14:08:17 -0600
+Message-ID: <ea1a986d-a37c-f7d9-8ebd-45793a9213c1@gmail.com>
+In-Reply-To: <20210121181113.572092-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2951799941861087568==
+--===============5914007111498639803==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi James,
 
-> > +static void display_bitrate_100kbps(struct l_dbus_message_iter
-> > *variant,
-> > +				const char *key, const char *margin,
-> > +				int name_column_width, int
-> > value_column_width)
-> > +{
-> > +	uint32_t rate;
-> > +
-> > +	l_dbus_message_iter_get_variant(variant, "u", &rate);
-> > +
-> > +	display("%s%-*s%-*u Kbit/s\n", margin, name_column_width, key,
-> > +			value_column_width, rate * 100);
-> > +}
+On 1/21/21 12:11 PM, James Prestwood wrote:
+> AP mode will use the same structure for its diagnostic interface
+> and mostly the same dictionary keys. Apart from ConnectedBss and
+> Address being different, the remainder are the same so the
+> netdev_station_info to DBus dictionary conversion has been made
+> common so both station and AP can use it to build its diagnostic
+> dictionaries.
+> ---
+>   src/station.c | 71 ++++++++++++++++++++++++++++++---------------------
+>   src/station.h |  3 +++
+>   2 files changed, 45 insertions(+), 29 deletions(-)
 > =
 
-> You don't want this in display.[ch] somewhere?
-
-I could do that. Its the same for station/ap. The reason I put it here
-is because its not really a generalized display API since its so unique
-to this specific value. But I'm fine either way, I'll put it in
-display.c/h so we don't have it duplicated.
-
+> v2:
+>   * Generalized the dictionary building so both station and AP could
+>     use it.
 > =
 
-> > +
-> > +static const struct display_dict_mapping diagnostic_mapping[] =3D {
-> > +	{ "Address", 's', NULL },
-> > +	{ "RxMode", 's', NULL },
-> > +	{ "TxMode", 's', NULL },
-> > +	{ "RxBitrate", 0, display_bitrate_100kbps },
-> > +	{ "TxBitrate", 0, display_bitrate_100kbps },
-> > +	{ "ExpectedThroughput", 'u', "Kbit/s" },
-> > +	{ "RSSI", 'n', "dBm" },
-> > +	{ "RxMCS", 'y', NULL },
-> > +	{ "TxMCS", 'y', NULL},
-> > +	{ NULL }
-> > +};
-> > +
-> > +static void ap_get_diagnostics_callback(struct l_dbus_message
-> > *message,
-> > +					void *user_data)
-> > +{
-> > +	struct l_dbus_message_iter array;
-> > +	struct l_dbus_message_iter iter;
-> > +	uint16_t idx =3D 0;
-> > +	char client_num[15];
-> > +
-> > +	if (dbus_message_has_error(message))
-> > +		return;
+
+<snip>
+
+> +
+> +bool station_info_to_dict(const struct netdev_station_info *info,
+> +				struct l_dbus_message_builder *builder);
 > =
 
-> Does this need to print something as well?
 
-That function does more than just check (though you wouldn't guess it
-from the name). It ends up converting the error into a string and
-printing it.
+This doesn't feel right to have ap (and possibly p2p, adhoc, etc) depend on =
 
-Thanks,
-James
+station for this.  Can we move the netdev_station_info structure definition=
+ to =
 
---===============2951799941861087568==--
+src/common.h or maybe diagnostic.h (diagnostic_station_info?) or so and add=
+ this =
+
+to diagnostic.[ch] instead?
+
+Regards,
+-Denis
+--===============5914007111498639803==--
 
