@@ -1,82 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============1526579961820062096=="
+Content-Type: multipart/mixed; boundary="===============1260547855423932575=="
 MIME-Version: 1.0
 From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Subject: [PATCH 2/3] station: add RoamRetryInterval setting
-Date: Fri, 22 Jan 2021 13:37:01 +0000
-Message-ID: <20210122133659.577139-2-alsi@bang-olufsen.dk>
-In-Reply-To: <20210122133659.577139-1-alsi@bang-olufsen.dk>
+Subject: [PATCH] build: add After=network-pre.target to service files
+Date: Fri, 22 Jan 2021 13:56:00 +0000
+Message-ID: <20210122135558.588248-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1526579961820062096==
+--===============1260547855423932575==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+systemd specifies a special passive target unit 'network-pre.target'
+which may be pulled in by services that want to run before any network
+interface is brought up or configured. Correspondingly, network
+management services such as iwd and ead should specify
+After=3Dnetwork-pre.target to ensure a proper ordering with respect to
+this special target.
+
+For more information, see systemd.special(7) and [1].
+
+[1] https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/
 ---
- src/station.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ src/iwd.service.in   | 1 +
+ wired/ead.service.in | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/src/station.c b/src/station.c
-index 2e886a73..558ecf9a 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -29,6 +29,7 @@
- #include <errno.h>
- #include <time.h>
- #include <sys/time.h>
-+#include <limits.h>
- #include <linux/if_ether.h>
+diff --git a/src/iwd.service.in b/src/iwd.service.in
+index 77819eaf..96e4abac 100644
+--- a/src/iwd.service.in
++++ b/src/iwd.service.in
+@@ -1,5 +1,6 @@
+ [Unit]
+ Description=3DWireless service
++After=3Dnetwork-pre.target
+ Before=3Dnetwork.target
+ Wants=3Dnetwork.target
  =
 
- #include <ell/ell.h>
-@@ -57,6 +58,7 @@
- static struct l_queue *station_list;
- static uint32_t netdev_watch;
- static uint32_t mfp_setting;
-+static uint32_t roam_retry_interval;
- static bool anqp_disabled;
- static bool netconfig_enabled;
- static struct watchlist anqp_watches;
-@@ -1369,7 +1371,7 @@ static void station_roamed(struct station *station)
- 	 * remain low. A subsequent high signal notification will cancel it.
- 	 */
- 	if (station->signal_low)
--		station_roam_timeout_rearm(station, 60);
-+		station_roam_timeout_rearm(station, roam_retry_interval);
+diff --git a/wired/ead.service.in b/wired/ead.service.in
+index 387fdb68..6403c9e4 100644
+--- a/wired/ead.service.in
++++ b/wired/ead.service.in
+@@ -1,5 +1,6 @@
+ [Unit]
+ Description=3DEthernet service
++After=3Dnetwork-pre.target
+ Before=3Dnetwork.target
+ Wants=3Dnetwork.target
  =
 
- 	if (station->netconfig)
- 		netconfig_reconfigure(station->netconfig);
-@@ -1416,7 +1418,7 @@ delayed_retry:
- 	station->ap_directed_roaming =3D false;
- =
-
- 	if (station->signal_low)
--		station_roam_timeout_rearm(station, 60);
-+		station_roam_timeout_rearm(station, roam_retry_interval);
- }
- =
-
- static void station_netconfig_event_handler(enum netconfig_event event,
-@@ -3646,6 +3648,14 @@ static int station_init(void)
- 		mfp_setting =3D 1;
- 	}
- =
-
-+	if (!l_settings_get_uint(iwd_get_config(), "General",
-+				"RoamRetryInterval",
-+				&roam_retry_interval))
-+		roam_retry_interval =3D 60;
-+
-+	if (roam_retry_interval > INT_MAX)
-+		roam_retry_interval =3D INT_MAX;
-+
- 	if (!l_settings_get_bool(iwd_get_config(), "General", "DisableANQP",
- 				&anqp_disabled))
- 		anqp_disabled =3D true;
 -- =
 
 2.29.2
---===============1526579961820062096==--
+--===============1260547855423932575==--
 
