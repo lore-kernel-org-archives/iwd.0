@@ -1,106 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============8917759965301093004=="
+Content-Type: multipart/mixed; boundary="===============2816674891410801064=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 7/7] client: update station to use diagnostic_display
-Date: Fri, 22 Jan 2021 10:14:34 -0800
-Message-ID: <20210122181434.644707-7-prestwoj@gmail.com>
-In-Reply-To: <20210122181434.644707-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/3] station: retry roaming unless notified of a high RSSI
+Date: Fri, 22 Jan 2021 13:50:38 -0600
+Message-ID: <83dfa7f3-d433-6278-82a4-a55952ddc727@gmail.com>
+In-Reply-To: <20210122133659.577139-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8917759965301093004==
+--===============2816674891410801064==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- client/station.c | 50 ++----------------------------------------------
- 1 file changed, 2 insertions(+), 48 deletions(-)
+Hi Alvin,
 
-diff --git a/client/station.c b/client/station.c
-index 93b1a4da..0bda604c 100644
---- a/client/station.c
-+++ b/client/station.c
-@@ -31,6 +31,7 @@
- #include "client/device.h"
- #include "client/network.h"
- #include "client/display.h"
-+#include "client/diagnostic.h"
- =
+On 1/22/21 7:37 AM, Alvin =C5=A0ipraga wrote:
+> Following a successful roaming sequence, schedule another attempt unless
+> the driver has sent a high RSSI notification. This makes the behaviour
+> analogous to a failed roaming attempt where we remained connected to the
+> same BSS.
+> =
 
- struct station {
- 	bool scanning;
-@@ -597,8 +598,6 @@ static void get_diagnostics_callback(struct l_dbus_mess=
-age *message,
- 					void *user_data)
- {
- 	struct l_dbus_message_iter iter;
--	struct l_dbus_message_iter variant;
--	const char *key;
- =
+> This makes iwd compatible with wireless drivers which do not necessarily
+> send out a duplicate low RSSI notification upon reassociation. Without
+> this change, iwd risks getting indefinitely stuck to a BSS with low
+> signal strength, even though a better BSS might later become available.
+> =
 
- 	if (dbus_message_has_error(message))
- 		return;
-@@ -608,52 +607,7 @@ static void get_diagnostics_callback(struct l_dbus_mes=
-sage *message,
- 		goto done;
- 	}
- =
+> In the case of a high RSSI notification, the minimum roam time will also
+> be reset to zero. This preserves the original behaviour in the case
+> where a high RSSI notification is processed after station_roamed().
+> Doing so also gives a chance for faster roaming action in the following
+> example scenario:
+> =
 
--	while (l_dbus_message_iter_next_entry(&iter, &key, &variant)) {
--		const char *s_value;
--		uint32_t u_value;
--		int16_t i_value;
--		uint8_t y_value;
--
--		if (!strcmp(key, "ConnectedBss") || !strcmp(key, "RxMode") ||
--				!strcmp(key, "TxMode")) {
--			/* String variants with no special handling */
--
--			l_dbus_message_iter_get_variant(&variant, "s",
--							&s_value);
--
--			display("%s%*s  %-*s%-*s\n", MARGIN, 8, "", 20,
--				key, 47, s_value);
--		} else if (!strcmp(key, "RxBitrate") ||
--				!strcmp(key, "TxBitrate")) {
--			/* Bitrates expressed in 100Kbit/s */
--
--			l_dbus_message_iter_get_variant(&variant, "u",
--							&u_value);
--			display("%s%*s  %-*s%u Kbit/s\n", MARGIN, 8, "", 20,
--				key, u_value * 100);
--		} else if (!strcmp(key, "ExpectedThroughput")) {
--			/* ExpectedThroughput expressed in Kbit/s */
--
--			l_dbus_message_iter_get_variant(&variant, "u",
--							&u_value);
--			display("%s%*s  %-*s%u Kbit/s\n", MARGIN, 8, "", 20,
--				key, u_value);
--		} else if (!strcmp(key, "RSSI")) {
--			/* RSSI expressed in dBm */
--
--			l_dbus_message_iter_get_variant(&variant, "n",
--							&i_value);
--			display("%s%*s  %-*s%i dBm\n", MARGIN, 8, "", 20,
--				key, i_value);
--		} else if (!strcmp(key, "RxMCS") || !strcmp(key, "TxMCS")) {
--			/* MCS index's are single byte integers */
--
--			l_dbus_message_iter_get_variant(&variant, "y",
--							&y_value);
--			display("%s%*s  %-*s%u\n", MARGIN, 8, "", 20,
--				key, y_value);
--		}
--	}
-+	diagnostic_display(&iter, "            ", 20, 20);
- =
+>      1. RSSI LOW
+>      2. schedule roam in 5 seconds
+>          (5 seconds pass)
+>      3. try roaming
+>      4. roaming fails, same BSS
+>      5. schedule roam in 60 seconds
+>          (20 seconds pass)
+>      6. RSSI HIGH
+>      7. cancel scheduled roam
+>          (20 seconds pass)
+>      8. RSSI LOW
+>      9. schedule roam in 5 seconds or 20 seconds?
+> =
 
- done:
- 	/* Finish the table started by cmd_show */
--- =
+> By resetting the minimum roam time, we can avoid waiting 20 seconds when
+> the station may have moved considerably. And since the high/low RSSI
+> notifications are configured with a hysteresis, we should still be
+> protected against too frequent spurious roaming attempts.
+> ---
+>   src/station.c | 12 +++++++-----
+>   1 file changed, 7 insertions(+), 5 deletions(-)
+> =
 
-2.26.2
 
---===============8917759965301093004==--
+All applied, thanks!
+
+Any chance you would be willing (or at least attempt) to add an auto test f=
+or =
+
+some of the above scenarios?
+
+Regards,
+-Denis
+--===============2816674891410801064==--
 
