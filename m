@@ -1,106 +1,178 @@
-Content-Type: multipart/mixed; boundary="===============4432587472071450080=="
+Content-Type: multipart/mixed; boundary="===============4799178016006324820=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 7/8] client: update station to use diagnostic_display
-Date: Fri, 22 Jan 2021 12:38:48 -0800
-Message-ID: <20210122203849.679952-7-prestwoj@gmail.com>
+Subject: [PATCH v4 8/8] client: remove display_dictionary
+Date: Fri, 22 Jan 2021 12:38:49 -0800
+Message-ID: <20210122203849.679952-8-prestwoj@gmail.com>
 In-Reply-To: <20210122203849.679952-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4432587472071450080==
+--===============4799178016006324820==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This has been replaced by diagnostic_display
 ---
- client/station.c | 50 ++----------------------------------------------
- 1 file changed, 2 insertions(+), 48 deletions(-)
+ client/display.c | 94 ------------------------------------------------
+ client/display.h | 22 ------------
+ 2 files changed, 116 deletions(-)
 
-diff --git a/client/station.c b/client/station.c
-index 93b1a4da..0bda604c 100644
---- a/client/station.c
-+++ b/client/station.c
-@@ -31,6 +31,7 @@
- #include "client/device.h"
- #include "client/network.h"
- #include "client/display.h"
-+#include "client/diagnostic.h"
+diff --git a/client/display.c b/client/display.c
+index d7baaac2..88bc913f 100644
+--- a/client/display.c
++++ b/client/display.c
+@@ -393,100 +393,6 @@ void display_command_line(const char *command_family,
+ 	l_free(cmd_line);
+ }
  =
 
- struct station {
- 	bool scanning;
-@@ -597,8 +598,6 @@ static void get_diagnostics_callback(struct l_dbus_mess=
-age *message,
- 					void *user_data)
- {
- 	struct l_dbus_message_iter iter;
+-static const struct display_dict_mapping *find_mapping(const char *key,
+-				const struct display_dict_mapping *mapping)
+-{
+-	int idx =3D 0;
+-
+-	while (mapping[idx].key) {
+-		if (!strcmp(mapping[idx].key, key))
+-			return &mapping[idx];
+-
+-		idx++;
+-	}
+-
+-	return NULL;
+-}
+-
+-void display_dictionary(struct l_dbus_message_iter *dict,
+-			const struct display_dict_mapping *mapping,
+-			const char *margin, int name_column_width,
+-			int value_column_width)
+-{
 -	struct l_dbus_message_iter variant;
 -	const char *key;
- =
-
- 	if (dbus_message_has_error(message))
- 		return;
-@@ -608,52 +607,7 @@ static void get_diagnostics_callback(struct l_dbus_mes=
-sage *message,
- 		goto done;
- 	}
- =
-
--	while (l_dbus_message_iter_next_entry(&iter, &key, &variant)) {
+-	const struct display_dict_mapping *map;
+-	display_dict_custom_func_t custom;
+-	char display_text[160];
+-
+-	while (l_dbus_message_iter_next_entry(dict, &key, &variant)) {
 -		const char *s_value;
 -		uint32_t u_value;
--		int16_t i_value;
+-		int16_t n_value;
 -		uint8_t y_value;
 -
--		if (!strcmp(key, "ConnectedBss") || !strcmp(key, "RxMode") ||
--				!strcmp(key, "TxMode")) {
--			/* String variants with no special handling */
+-		map =3D find_mapping(key, mapping);
+-		if (!map)
+-			continue;
 -
+-		switch (map->type) {
+-		case 0:
+-			if (!map->units)
+-				continue;
+-
+-			custom =3D (display_dict_custom_func_t)map->units;
+-
+-			custom(&variant, key, margin, name_column_width,
+-					value_column_width);
+-
+-			/* custom should handle any units, so continue */
+-			continue;
+-
+-		case 's':
 -			l_dbus_message_iter_get_variant(&variant, "s",
 -							&s_value);
+-			sprintf(display_text, "%s%-*s%-*s", margin,
+-					name_column_width, key,
+-					value_column_width, s_value);
+-			break;
 -
--			display("%s%*s  %-*s%-*s\n", MARGIN, 8, "", 20,
--				key, 47, s_value);
--		} else if (!strcmp(key, "RxBitrate") ||
--				!strcmp(key, "TxBitrate")) {
--			/* Bitrates expressed in 100Kbit/s */
--
+-		case 'u':
 -			l_dbus_message_iter_get_variant(&variant, "u",
 -							&u_value);
--			display("%s%*s  %-*s%u Kbit/s\n", MARGIN, 8, "", 20,
--				key, u_value * 100);
--		} else if (!strcmp(key, "ExpectedThroughput")) {
--			/* ExpectedThroughput expressed in Kbit/s */
+-			sprintf(display_text, "%s%-*s%-*u", margin,
+-						name_column_width, key,
+-						value_column_width, u_value);
+-			break;
 -
--			l_dbus_message_iter_get_variant(&variant, "u",
--							&u_value);
--			display("%s%*s  %-*s%u Kbit/s\n", MARGIN, 8, "", 20,
--				key, u_value);
--		} else if (!strcmp(key, "RSSI")) {
--			/* RSSI expressed in dBm */
--
+-		case 'n':
 -			l_dbus_message_iter_get_variant(&variant, "n",
--							&i_value);
--			display("%s%*s  %-*s%i dBm\n", MARGIN, 8, "", 20,
--				key, i_value);
--		} else if (!strcmp(key, "RxMCS") || !strcmp(key, "TxMCS")) {
--			/* MCS index's are single byte integers */
+-							&n_value);
+-			sprintf(display_text, "%s%-*s%-*i", margin,
+-						name_column_width, key,
+-						value_column_width, n_value);
+-			break;
 -
+-		case 'y':
 -			l_dbus_message_iter_get_variant(&variant, "y",
 -							&y_value);
--			display("%s%*s  %-*s%u\n", MARGIN, 8, "", 20,
--				key, y_value);
+-			sprintf(display_text, "%s%-*s%-*u", margin,
+-						name_column_width, key,
+-						value_column_width, y_value);
+-			break;
+-
+-		default:
+-			display("type %c not handled", map->type);
+-			continue;
 -		}
+-
+-		if (map->units)
+-			display("%s %s\n", display_text,
+-					(const char *)map->units);
+-		else
+-			display("%s\n", display_text);
 -	}
-+	diagnostic_display(&iter, "            ", 20, 20);
+-}
+-
+ static void display_completion_matches(char **matches, int num_matches,
+ 								int max_length)
+ {
+diff --git a/client/display.h b/client/display.h
+index 78b486f5..b5df944a 100644
+--- a/client/display.h
++++ b/client/display.h
+@@ -22,24 +22,6 @@
  =
 
- done:
- 	/* Finish the table started by cmd_show */
+ struct command;
+ struct command_family;
+-struct l_dbus_message_iter;
+-
+-typedef void (*display_dict_custom_func_t)(struct l_dbus_message_iter *var=
+iant,
+-				const char *key, const char *margin,
+-				int name_column_width, int value_column_width);
+-
+-/*
+- * Maps dictionary keys to types/units. 'type' should be a valid DBus type=
+, or
+- * zero for displaying in a custom fashion. When the display needs to be
+- * customized 'units' should point to a custom display function of the form
+- * display_dict_custom_func_t which should display the entire value as well
+- * as any units required.
+- */
+-struct display_dict_mapping {
+-	const char *key;
+-	char type;
+-	void *units;
+-};
+ =
+
+ #define COLOR_BOLDGRAY	"\x1B[1;30m"
+ #define COLOR_GRAY	"\x1b[37m"
+@@ -59,10 +41,6 @@ void display_table_footer(void);
+ void display_error(const char *error);
+ void display_command_line(const char *command_family,
+ 						const struct command *cmd);
+-void display_dictionary(struct l_dbus_message_iter *dict,
+-			const struct display_dict_mapping *mapping,
+-			const char *margin,
+-			int name_column_width, int value_column_width);
+ =
+
+ void display_refresh_timeout_set(void);
+ void display_refresh_reset(void);
 -- =
 
 2.26.2
 
---===============4432587472071450080==--
+--===============4799178016006324820==--
 
