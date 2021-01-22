@@ -1,167 +1,267 @@
-Content-Type: multipart/mixed; boundary="===============7668866534812943025=="
+Content-Type: multipart/mixed; boundary="===============6180979808093337769=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 4/8] ap: add AP diagnostic interface
-Date: Fri, 22 Jan 2021 12:38:45 -0800
-Message-ID: <20210122203849.679952-4-prestwoj@gmail.com>
+Subject: [PATCH v4 5/8] client: implement diagnostic module
+Date: Fri, 22 Jan 2021 12:38:46 -0800
+Message-ID: <20210122203849.679952-5-prestwoj@gmail.com>
 In-Reply-To: <20210122203849.679952-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7668866534812943025==
+--===============6180979808093337769==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds a new AccessPointDiagnostic interface. This interface
-provides similar low level functionality as StationDiagnostic, but
-for when IWD is in AP mode. This uses netdev_get_all_stations
-which will dump all stations, parse, and return each station in
-an individual callback. Once the dump is complete the destroy is
-called and all data is packaged as an array of dictionaries.
+For now this module serves as a helper for printing diagnostic
+dictionary values. The new API (diagnostic_display) takes a
+Dbus iterator which has been entered into a dictionary and
+prints out each key and value. A mapping struct was defined
+which maps keys to types and units. For simple cases the mapping
+will consist of a dbus type character and a units string,
+e.g. dBm, Kbit/s etc. For more complex printing which requires
+processing the value the 'units' void* cant be set to a
+function which can be custom written to handle the value.
 ---
- src/ap.c | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 91 insertions(+)
+ Makefile.am         |   3 +-
+ client/diagnostic.c | 166 ++++++++++++++++++++++++++++++++++++++++++++
+ client/diagnostic.h |  26 +++++++
+ 3 files changed, 194 insertions(+), 1 deletion(-)
+ create mode 100644 client/diagnostic.c
+ create mode 100644 client/diagnostic.h
 
-diff --git a/src/ap.c b/src/ap.c
-index d9e7e404..cef28327 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -52,6 +52,7 @@
- #include "src/eap-wsc.h"
- #include "src/ap.h"
- #include "src/storage.h"
-+#include "src/diagnostic.h"
+v4:
+ * Renamed some structs to avoid duplicate naming with existing
+   display.h, as well as keep naming conventions consistent with
+   this file.
+
+diff --git a/Makefile.am b/Makefile.am
+index a0701c97..0cbadb09 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -286,7 +286,8 @@ client_iwctl_SOURCES =3D client/main.c \
+ 			client/known-networks.c \
+ 			client/network.h client/network.c \
+ 			client/properties.h client/properties.c \
+-			client/wsc.c client/station.c
++			client/wsc.c client/station.c \
++			client/diagnostic.c client/diagnostic.h
+ client_iwctl_LDADD =3D $(ell_ldadd) $(READLINE_LIBS)
  =
 
- struct ap_state {
- 	struct netdev *netdev;
-@@ -2963,6 +2964,89 @@ static void ap_destroy_interface(void *user_data)
- 	l_free(ap_if);
- }
- =
-
-+struct diagnostic_data {
-+	struct l_dbus_message *pending;
-+	struct l_dbus_message_builder *builder;
+ if MANUAL_PAGES
+diff --git a/client/diagnostic.c b/client/diagnostic.c
+new file mode 100644
+index 00000000..339a7da1
+--- /dev/null
++++ b/client/diagnostic.c
+@@ -0,0 +1,166 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++
++#include <ell/ell.h>
++
++#include "client/diagnostic.h"
++#include "client/display.h"
++
++typedef void (*display_dict_custom_func_t)(struct l_dbus_message_iter *var=
+iant,
++				const char *key, const char *margin,
++				int name_column_width, int value_column_width);
++
++/*
++ * Maps dictionary keys to types/units. 'type' should be a valid DBus type=
+, or
++ * zero for displaying in a custom fashion. When the display needs to be
++ * customized 'units' should point to a custom display function of the form
++ * display_dict_custom_func_t which should display the entire value as well
++ * as any units required.
++ */
++struct diagnostic_dict_mapping {
++	const char *key;
++	char type;
++	const char *units;
++	display_dict_custom_func_t custom;
 +};
 +
-+static void ap_get_station_cb(const struct diagnostic_station_info *info,
-+				void *user_data)
++static const struct diagnostic_dict_mapping *find_mapping(const char *key,
++				const struct diagnostic_dict_mapping *mapping)
 +{
-+	struct diagnostic_data *data =3D user_data;
++	int idx =3D 0;
 +
-+	/* First station info */
-+	if (!data->builder) {
-+		struct l_dbus_message *reply =3D
-+				l_dbus_message_new_method_return(data->pending);
++	while (mapping[idx].key) {
++		if (!strcmp(mapping[idx].key, key))
++			return &mapping[idx];
 +
-+		data->builder =3D l_dbus_message_builder_new(reply);
-+
-+		l_dbus_message_builder_enter_array(data->builder, "a{sv}");
-+	}
-+
-+	l_dbus_message_builder_enter_array(data->builder, "{sv}");
-+	dbus_append_dict_basic(data->builder, "Address", 's',
-+					util_address_to_string(info->addr));
-+
-+	diagnostic_info_to_dict(info, data->builder);
-+
-+	l_dbus_message_builder_leave_array(data->builder);
-+}
-+
-+static void ap_get_station_destroy(void *user_data)
-+{
-+	struct diagnostic_data *data =3D user_data;
-+	struct l_dbus_message *reply;
-+
-+	if (!data->builder) {
-+		reply =3D l_dbus_message_new_method_return(data->pending);
-+
-+		data->builder =3D l_dbus_message_builder_new(reply);
-+
-+		l_dbus_message_builder_enter_array(data->builder, "a{sv}");
-+	}
-+
-+	l_dbus_message_builder_leave_array(data->builder);
-+	reply =3D l_dbus_message_builder_finalize(data->builder);
-+	l_dbus_message_builder_destroy(data->builder);
-+
-+	dbus_pending_reply(&data->pending, reply);
-+
-+	l_free(data);
-+}
-+
-+static struct l_dbus_message *ap_dbus_get_diagnostics(struct l_dbus *dbus,
-+		struct l_dbus_message *message, void *user_data)
-+{
-+	struct ap_if_data *ap_if =3D user_data;
-+	struct diagnostic_data *data;
-+	int ret;
-+
-+	data =3D l_new(struct diagnostic_data, 1);
-+	data->pending =3D l_dbus_message_ref(message);
-+
-+	ret =3D netdev_get_all_stations(ap_if->ap->netdev, ap_get_station_cb,
-+					data, ap_get_station_destroy);
-+
-+	if (ret < 0) {
-+		l_dbus_message_unref(data->pending);
-+		l_free(data);
-+		return dbus_error_from_errno(ret, message);
++		idx++;
 +	}
 +
 +	return NULL;
 +}
 +
-+static void ap_setup_diagnostic_interface(struct l_dbus_interface *interfa=
-ce)
++static void display_bitrate_100kbps(struct l_dbus_message_iter *variant,
++				const char *key, const char *margin,
++				int name_column_width, int value_column_width)
 +{
-+	l_dbus_interface_method(interface, "GetDiagnostics", 0,
-+				ap_dbus_get_diagnostics, "aa{sv}", "", "diagnostic");
++	uint32_t rate;
++
++	l_dbus_message_iter_get_variant(variant, "u", &rate);
++
++	display("%s%-*s%-*u Kbit/s\n", margin, name_column_width, key,
++			value_column_width, rate * 100);
 +}
 +
-+static void ap_diagnostic_interface_destroy(void *user_data)
-+{
-+}
++static const struct diagnostic_dict_mapping diagnostic_mapping[] =3D {
++	{ "Address", 's' },
++	{ "ConnectedBss", 's' },
++	{ "RxMode", 's' },
++	{ "TxMode", 's' },
++	{ "RxBitrate", 0, NULL, display_bitrate_100kbps },
++	{ "TxBitrate", 0, NULL, display_bitrate_100kbps },
++	{ "ExpectedThroughput", 'u', "Kbit/s" },
++	{ "RSSI", 'n', "dBm" },
++	{ "RxMCS", 'y' },
++	{ "TxMCS", 'y' },
++	{ NULL }
++};
 +
- static void ap_add_interface(struct netdev *netdev)
- {
- 	struct ap_if_data *ap_if;
-@@ -2978,12 +3062,16 @@ static void ap_add_interface(struct netdev *netdev)
- 	/* setup ap dbus interface */
- 	l_dbus_object_add_interface(dbus_get_bus(),
- 			netdev_get_path(netdev), IWD_AP_INTERFACE, ap_if);
-+	l_dbus_object_add_interface(dbus_get_bus(), netdev_get_path(netdev),
-+			IWD_AP_DIAGNOSTIC_INTERFACE, ap_if);
- }
- =
-
- static void ap_remove_interface(struct netdev *netdev)
- {
- 	l_dbus_object_remove_interface(dbus_get_bus(),
- 			netdev_get_path(netdev), IWD_AP_INTERFACE);
-+	l_dbus_object_remove_interface(dbus_get_bus(), netdev_get_path(netdev),
-+			IWD_AP_DIAGNOSTIC_INTERFACE);
- }
- =
-
- static void ap_netdev_watch(struct netdev *netdev,
-@@ -3014,6 +3102,9 @@ static int ap_init(void)
- =
-
- 	l_dbus_register_interface(dbus_get_bus(), IWD_AP_INTERFACE,
- 			ap_setup_interface, ap_destroy_interface, false);
-+	l_dbus_register_interface(dbus_get_bus(), IWD_AP_DIAGNOSTIC_INTERFACE,
-+			ap_setup_diagnostic_interface,
-+			ap_diagnostic_interface_destroy, false);
- =
-
- 	/*
- 	 * Reusing [General].EnableNetworkConfiguration as a switch to enable
++void diagnostic_display(struct l_dbus_message_iter *dict,
++			const char *margin, int name_column_width,
++			int value_column_width)
++{
++	struct l_dbus_message_iter variant;
++	const char *key;
++	const struct diagnostic_dict_mapping *map;
++	char display_text[160];
++
++	while (l_dbus_message_iter_next_entry(dict, &key, &variant)) {
++		const char *s_value;
++		uint32_t u_value;
++		int16_t n_value;
++		uint8_t y_value;
++
++		map =3D find_mapping(key, diagnostic_mapping);
++		if (!map)
++			continue;
++
++		switch (map->type) {
++		case 0:
++			if (!map->custom)
++				continue;
++
++			map->custom(&variant, key, margin, name_column_width,
++					value_column_width);
++
++			/* custom should handle any units, so continue */
++			continue;
++
++		case 's':
++			l_dbus_message_iter_get_variant(&variant, "s",
++							&s_value);
++			sprintf(display_text, "%s%-*s%-*s", margin,
++					name_column_width, key,
++					value_column_width, s_value);
++			break;
++
++		case 'u':
++			l_dbus_message_iter_get_variant(&variant, "u",
++							&u_value);
++			sprintf(display_text, "%s%-*s%-*u", margin,
++						name_column_width, key,
++						value_column_width, u_value);
++			break;
++
++		case 'n':
++			l_dbus_message_iter_get_variant(&variant, "n",
++							&n_value);
++			sprintf(display_text, "%s%-*s%-*i", margin,
++						name_column_width, key,
++						value_column_width, n_value);
++			break;
++
++		case 'y':
++			l_dbus_message_iter_get_variant(&variant, "y",
++							&y_value);
++			sprintf(display_text, "%s%-*s%-*u", margin,
++						name_column_width, key,
++						value_column_width, y_value);
++			break;
++
++		default:
++			display("type %c not handled", map->type);
++			continue;
++		}
++
++		if (map->units)
++			display("%s %s\n", display_text,
++					(const char *)map->units);
++		else
++			display("%s\n", display_text);
++	}
++}
+diff --git a/client/diagnostic.h b/client/diagnostic.h
+new file mode 100644
+index 00000000..004bbe85
+--- /dev/null
++++ b/client/diagnostic.h
+@@ -0,0 +1,26 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++struct l_dbus_message_iter;
++
++void diagnostic_display(struct l_dbus_message_iter *dict, const char *marg=
+in,
++			int name_column_width, int value_column_width);
 -- =
 
 2.26.2
 
---===============7668866534812943025==--
+--===============6180979808093337769==--
 
