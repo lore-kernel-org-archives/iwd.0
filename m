@@ -1,124 +1,167 @@
-Content-Type: multipart/mixed; boundary="===============7852829363643543395=="
+Content-Type: multipart/mixed; boundary="===============3986182648606627832=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 3/7] station: refactor to use diagnostic_info_to_dict
-Date: Fri, 22 Jan 2021 10:14:30 -0800
-Message-ID: <20210122181434.644707-3-prestwoj@gmail.com>
+Subject: [PATCH v3 4/7] ap: add AP diagnostic interface
+Date: Fri, 22 Jan 2021 10:14:31 -0800
+Message-ID: <20210122181434.644707-4-prestwoj@gmail.com>
 In-Reply-To: <20210122181434.644707-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7852829363643543395==
+--===============3986182648606627832==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This adds a new AccessPointDiagnostic interface. This interface
+provides similar low level functionality as StationDiagnostic, but
+for when IWD is in AP mode. This uses netdev_get_all_stations
+which will dump all stations, parse, and return each station in
+an individual callback. Once the dump is complete the destroy is
+called and all data is packaged as an array of dictionaries.
 ---
- src/station.c | 68 +--------------------------------------------------
- 1 file changed, 1 insertion(+), 67 deletions(-)
+ src/ap.c | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 91 insertions(+)
 
-diff --git a/src/station.c b/src/station.c
-index 41f19b09..c71d8e6c 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3463,7 +3463,6 @@ static void station_get_diagnostic_cb(
- 	struct station *station =3D user_data;
- 	struct l_dbus_message *reply;
- 	struct l_dbus_message_builder *builder;
--	int16_t rssi;
+diff --git a/src/ap.c b/src/ap.c
+index d9e7e404..cef28327 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -52,6 +52,7 @@
+ #include "src/eap-wsc.h"
+ #include "src/ap.h"
+ #include "src/storage.h"
++#include "src/diagnostic.h"
  =
 
- 	if (!info) {
- 		reply =3D dbus_error_aborted(station->get_station_pending);
-@@ -3472,8 +3471,6 @@ static void station_get_diagnostic_cb(
+ struct ap_state {
+ 	struct netdev *netdev;
+@@ -2963,6 +2964,89 @@ static void ap_destroy_interface(void *user_data)
+ 	l_free(ap_if);
+ }
  =
 
- 	reply =3D l_dbus_message_new_method_return(station->get_station_pending);
++struct diagnostic_data {
++	struct l_dbus_message *pending;
++	struct l_dbus_message_builder *builder;
++};
++
++static void ap_get_station_cb(const struct diagnostic_station_info *info,
++				void *user_data)
++{
++	struct diagnostic_data *data =3D user_data;
++
++	/* First station info */
++	if (!data->builder) {
++		struct l_dbus_message *reply =3D
++				l_dbus_message_new_method_return(data->pending);
++
++		data->builder =3D l_dbus_message_builder_new(reply);
++
++		l_dbus_message_builder_enter_array(data->builder, "a{sv}");
++	}
++
++	l_dbus_message_builder_enter_array(data->builder, "{sv}");
++	dbus_append_dict_basic(data->builder, "Address", 's',
++					util_address_to_string(info->addr));
++
++	diagnostic_info_to_dict(info, data->builder);
++
++	l_dbus_message_builder_leave_array(data->builder);
++}
++
++static void ap_get_station_destroy(void *user_data)
++{
++	struct diagnostic_data *data =3D user_data;
++	struct l_dbus_message *reply;
++
++	if (!data->builder) {
++		reply =3D l_dbus_message_new_method_return(data->pending);
++
++		data->builder =3D l_dbus_message_builder_new(reply);
++
++		l_dbus_message_builder_enter_array(data->builder, "a{sv}");
++	}
++
++	l_dbus_message_builder_leave_array(data->builder);
++	reply =3D l_dbus_message_builder_finalize(data->builder);
++	l_dbus_message_builder_destroy(data->builder);
++
++	dbus_pending_reply(&data->pending, reply);
++
++	l_free(data);
++}
++
++static struct l_dbus_message *ap_dbus_get_diagnostics(struct l_dbus *dbus,
++		struct l_dbus_message *message, void *user_data)
++{
++	struct ap_if_data *ap_if =3D user_data;
++	struct diagnostic_data *data;
++	int ret;
++
++	data =3D l_new(struct diagnostic_data, 1);
++	data->pending =3D l_dbus_message_ref(message);
++
++	ret =3D netdev_get_all_stations(ap_if->ap->netdev, ap_get_station_cb,
++					data, ap_get_station_destroy);
++
++	if (ret < 0) {
++		l_dbus_message_unref(data->pending);
++		l_free(data);
++		return dbus_error_from_errno(ret, message);
++	}
++
++	return NULL;
++}
++
++static void ap_setup_diagnostic_interface(struct l_dbus_interface *interfa=
+ce)
++{
++	l_dbus_interface_method(interface, "GetDiagnostics", 0,
++				ap_dbus_get_diagnostics, "aa{sv}", "", "diagnostic");
++}
++
++static void ap_diagnostic_interface_destroy(void *user_data)
++{
++}
++
+ static void ap_add_interface(struct netdev *netdev)
+ {
+ 	struct ap_if_data *ap_if;
+@@ -2978,12 +3062,16 @@ static void ap_add_interface(struct netdev *netdev)
+ 	/* setup ap dbus interface */
+ 	l_dbus_object_add_interface(dbus_get_bus(),
+ 			netdev_get_path(netdev), IWD_AP_INTERFACE, ap_if);
++	l_dbus_object_add_interface(dbus_get_bus(), netdev_get_path(netdev),
++			IWD_AP_DIAGNOSTIC_INTERFACE, ap_if);
+ }
  =
 
--	rssi =3D (int16_t)info->cur_rssi;
--
- 	builder =3D l_dbus_message_builder_new(reply);
+ static void ap_remove_interface(struct netdev *netdev)
+ {
+ 	l_dbus_object_remove_interface(dbus_get_bus(),
+ 			netdev_get_path(netdev), IWD_AP_INTERFACE);
++	l_dbus_object_remove_interface(dbus_get_bus(), netdev_get_path(netdev),
++			IWD_AP_DIAGNOSTIC_INTERFACE);
+ }
  =
 
- 	l_dbus_message_builder_enter_array(builder, "{sv}");
-@@ -3481,70 +3478,7 @@ static void station_get_diagnostic_cb(
- 	dbus_append_dict_basic(builder, "ConnectedBss", 's',
- 					util_address_to_string(info->addr));
+ static void ap_netdev_watch(struct netdev *netdev,
+@@ -3014,6 +3102,9 @@ static int ap_init(void)
  =
 
--	if (info->have_cur_rssi)
--		dbus_append_dict_basic(builder, "RSSI", 'n', &rssi);
--
--	if (info->have_rx_mcs) {
--		switch (info->rx_mcs_type) {
--		case NETDEV_MCS_TYPE_HT:
--			dbus_append_dict_basic(builder, "RxMode", 's',
--						"802.11n");
--			dbus_append_dict_basic(builder, "RxMCS", 'y',
--						&info->rx_mcs);
--			break;
--		case NETDEV_MCS_TYPE_VHT:
--			dbus_append_dict_basic(builder, "RxMode", 's',
--						"802.11ac");
--			dbus_append_dict_basic(builder, "RxMCS", 'y',
--						&info->rx_mcs);
--			break;
--		case NETDEV_MCS_TYPE_HE:
--			dbus_append_dict_basic(builder, "RxMode", 's',
--						"802.11ax");
--			dbus_append_dict_basic(builder, "RxMCS", 'y',
--						&info->rx_mcs);
--			break;
--		default:
--			break;
--		}
--	}
--
--	if (info->have_tx_mcs) {
--		switch (info->tx_mcs_type) {
--		case NETDEV_MCS_TYPE_HT:
--			dbus_append_dict_basic(builder, "TxMode", 's',
--						"802.11n");
--			dbus_append_dict_basic(builder, "TxMCS", 'y',
--						&info->tx_mcs);
--			break;
--		case NETDEV_MCS_TYPE_VHT:
--			dbus_append_dict_basic(builder, "TxMode", 's',
--						"802.11ac");
--			dbus_append_dict_basic(builder, "TxMCS", 'y',
--						&info->tx_mcs);
--			break;
--		case NETDEV_MCS_TYPE_HE:
--			dbus_append_dict_basic(builder, "TxMode", 's',
--						"802.11ax");
--			dbus_append_dict_basic(builder, "TxMCS", 'y',
--						&info->tx_mcs);
--			break;
--		default:
--			break;
--		}
--	}
--
--	if (info->have_tx_bitrate)
--		dbus_append_dict_basic(builder, "TxBitrate", 'u',
--					&info->tx_bitrate);
--
--	if (info->have_rx_bitrate)
--		dbus_append_dict_basic(builder, "RxBitrate", 'u',
--					&info->rx_bitrate);
--
--	if (info->have_expected_throughput)
--		dbus_append_dict_basic(builder, "ExpectedThroughput", 'u',
--					&info->expected_throughput);
-+	diagnostic_info_to_dict(info, builder);
+ 	l_dbus_register_interface(dbus_get_bus(), IWD_AP_INTERFACE,
+ 			ap_setup_interface, ap_destroy_interface, false);
++	l_dbus_register_interface(dbus_get_bus(), IWD_AP_DIAGNOSTIC_INTERFACE,
++			ap_setup_diagnostic_interface,
++			ap_diagnostic_interface_destroy, false);
  =
 
- 	l_dbus_message_builder_leave_array(builder);
- 	l_dbus_message_builder_finalize(builder);
+ 	/*
+ 	 * Reusing [General].EnableNetworkConfiguration as a switch to enable
 -- =
 
 2.26.2
 
---===============7852829363643543395==--
+--===============3986182648606627832==--
 
