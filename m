@@ -1,59 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============8233187612208332086=="
+Content-Type: multipart/mixed; boundary="===============8092385176733661296=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 6/7] doc: Specify the DNS format as string lists
-Date: Mon, 25 Jan 2021 18:56:16 +0100
-Message-ID: <20210125175617.2417412-6-andrew.zaborowski@intel.com>
+Subject: [PATCH 7/7] netconfig: Set more correct buffer length
+Date: Mon, 25 Jan 2021 18:56:17 +0100
+Message-ID: <20210125175617.2417412-7-andrew.zaborowski@intel.com>
 In-Reply-To: <20210125175617.2417412-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8233187612208332086==
+--===============8092385176733661296==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Use INET_ADDRSTRLEN as the IPv4 address buffer size to avoid confusion.
 ---
- src/iwd.network.rst | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ src/netconfig.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/iwd.network.rst b/src/iwd.network.rst
-index c0548052..083b2103 100644
---- a/src/iwd.network.rst
-+++ b/src/iwd.network.rst
-@@ -301,9 +301,9 @@ network configuration with the static addresses.
-        The IPv4 address of the gateway (router). This field is `required` =
-for
-        the static configuration.
-    * - DNS
--     - IPv4 address string
-+     - IPv4 address string list, space delimited
+diff --git a/src/netconfig.c b/src/netconfig.c
+index e7a6a402..cf092b78 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -608,7 +608,7 @@ static bool netconfig_ipv4_routes_install(struct netcon=
+fig *netconfig)
+ 	L_AUTO_FREE_VAR(char *, gateway) =3D NULL;
+ 	struct in_addr in_addr;
+ 	char *network;
+-	char ip[INET6_ADDRSTRLEN];
++	char ip[INET_ADDRSTRLEN];
+ 	unsigned int prefix_len =3D
+ 		l_rtnl_address_get_prefix_length(netconfig->v4_address);
  =
 
--       The IPv4 address of the Domain Name System (DNS). This field is
-+       The IPv4 address(es) of the Domain Name System (DNS). This field is
-        `optional`. DNS setting can be used to override the DNS entries rec=
-eived
-        from the DHCP server.
-    * - Netmask
-@@ -352,9 +352,9 @@ network configuration.
-        The IPv6 address of the gateway (router). This field is `required` =
-for
-        the static configuration.
-    * - DNS
--     - IPv6 address string
-+     - IPv6 address string list, space delimited
- =
-
--       The IPv6 address of the Domain Name System (DNS). This field is
-+       The IPv6 address(es) of the Domain Name System (DNS). This field is
-        `optional`. DNS setting can be used to override the DNS entries rec=
-eived
-        from the DHCPv6 server or via Router Advertisements.
-    * - DomainName
 -- =
 
 2.27.0
 
---===============8233187612208332086==--
+--===============8092385176733661296==--
 
