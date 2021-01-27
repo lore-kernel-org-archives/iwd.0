@@ -1,63 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============4166681237180985160=="
+Content-Type: multipart/mixed; boundary="===============8662679801746561763=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2] station: cancel quick scans on Connect()
-Date: Tue, 26 Jan 2021 14:45:34 -0600
-Message-ID: <a46be466-dd81-a508-8e62-f319e8faf56b@gmail.com>
-In-Reply-To: <20210126195735.880657-1-prestwoj@gmail.com>
+From: KeithG <ys3al35l@gmail.com>
+Subject: iwd 1.11 does not run on armv6
+Date: Wed, 27 Jan 2021 00:54:19 -0600
+Message-ID: <CAG17S_PFA04=YujYMtkpB1CzXB+tvjcqPuvtAhEqyMwqa8AfRQ@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4166681237180985160==
+--===============8662679801746561763==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This is on Arch Arm on an RPi. 1.10 ran fine. 1.11 was just pushed out and
+now it does not run and we get this in the log:
+iwd[1770]: /usr/lib/iwd/iwd: symbol lookup error: /usr/lib/iwd/iwd:
+undefined symbol: l_acd_set_debug, version ELL_0.10
+in the log. Any ideas on how we can fix it? Is it a kernel flag that is
+somehow different between armv7 and armv6 versus aarch64?
 
-On 1/26/21 1:57 PM, James Prestwood wrote:
-> At some point the non-interactive client tests began failing.
-> This was due to a bug in station where it would transition from
-> 'connected' to 'autoconnect' due to a failed scan request. This
-> happened because a quick scan got scheduled during an ongoing
-> scan, then a Connect() gets issued. The work queue treats the
-> Connect as a priority so it delays the quick scan until after the
-> connection succeeds. This results in a failed quick scan which
-> IWD does not expect to happen when in a 'connected' state. This
-> failed scan actually triggers a state transition which then
-> gets IWD into a strange state where its connected from the
-> kernel point of view but does not think it is:
-> =
+Keith
 
-> src/station.c:station_connect_cb() 13, result: 0
-> src/station.c:station_enter_state() Old State: connecting, new state: con=
-nected
-> src/wiphy.c:wiphy_radio_work_done() Work item 6 done
-> src/wiphy.c:wiphy_radio_work_next() Starting work item 5
-> src/station.c:station_quick_scan_triggered() Quick scan trigger failed: -=
-95
-> src/station.c:station_enter_state() Old State: connected, new state: auto=
-connect_full
-> =
+--===============8662679801746561763==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.htm"
 
-> To fix this IWD should simply cancel any pending quick scans
-> if/when a Connect() call comes in.
-> ---
->   src/station.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> =
+PGRpdiBkaXI9Imx0ciI+PGRpdj5UaGlzIGlzIG9uIEFyY2ggQXJtIG9uIGFuIFJQaS4gMS4xMCBy
+YW4gZmluZS4gMS4xMSB3YXMganVzdCBwdXNoZWQgb3V0IGFuZCBub3cgaXQgZG9lcyBub3QgcnVu
+IGFuZCB3ZSBnZXQgdGhpcyBpbiB0aGUgbG9nOjwvZGl2PjxkaXY+aXdkWzE3NzBdOiAvdXNyL2xp
+Yi9pd2QvaXdkOiBzeW1ib2wgbG9va3VwIGVycm9yOiAvdXNyL2xpYi9pd2QvaXdkOiB1bmRlZmlu
+ZWQgc3ltYm9sOiBsX2FjZF9zZXRfZGVidWcsIHZlcnNpb24gRUxMXzAuMTA8L2Rpdj48ZGl2Pmlu
+IHRoZSBsb2cuIEFueSBpZGVhcyBvbiBob3cgd2UgY2FuIGZpeCBpdD8gSXMgaXQgYSBrZXJuZWwg
+ZmxhZyB0aGF0IGlzIHNvbWVob3cgZGlmZmVyZW50IGJldHdlZW4gYXJtdjcgYW5kIGFybXY2IHZl
+cnN1cyBhYXJjaDY0PzwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+S2VpdGg8YnI+PC9kaXY+PC9k
+aXY+Cg==
 
-> v2:
->   * Rather than handle inside the triggered callback we can
->     just cancel the scan when the connection is attempted.
->     This prevents unneeded kernel round trips as well.
-> =
-
-
-Applied, thanks.
-
-Regards,
--Denis
-
---===============4166681237180985160==--
+--===============8662679801746561763==--
 
