@@ -1,58 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============0026096627846337199=="
+Content-Type: multipart/mixed; boundary="===============5752638185935989009=="
 MIME-Version: 1.0
-From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Subject: [PATCH 5/5] doc: update test-runner invocation documentation
-Date: Wed, 27 Jan 2021 10:05:04 +0000
-Message-ID: <20210127100457.341757-5-alsi@bang-olufsen.dk>
-In-Reply-To: <20210127100457.341757-1-alsi@bang-olufsen.dk>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH] eap-tls: Use the right variable in settings check
+Date: Wed, 27 Jan 2021 15:02:25 +0100
+Message-ID: <20210127140225.2476214-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0026096627846337199==
+--===============5752638185935989009==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The test-runner no longer recognizes -t to specify an autotest. Instead
-it uses -A.
 ---
- doc/test-runner.txt | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/eap-tls.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/doc/test-runner.txt b/doc/test-runner.txt
-index c5f29324..89a7c44c 100644
---- a/doc/test-runner.txt
-+++ b/doc/test-runner.txt
-@@ -137,16 +137,16 @@ tests shipped with IWD:
- 	$ sudo ./test-runner
- =
-
- One can specify a particular set of test configurations to be executed by =
-using
--'-t <dir1,dir2>' parameter. An absolute path is necessary for the test
-+'-A <dir1,dir2>' parameter. An absolute path is necessary for the test
- configuration directories outside of <iwd>/autotests.
- =
-
- The command line may look as follows:
- =
-
--	$ sudo ./test-runner -t test1,test3,/home/test4
-+	$ sudo ./test-runner -A test1,test3,/home/test4
- =
-
- Glob matching is also supported when specifying a test list:
- =
-
--	$ sudo ./test-runner -t testWPA*
-+	$ sudo ./test-runner -A testWPA*
- =
-
- =
-
- Creating Test Configurations
+diff --git a/src/eap-tls.c b/src/eap-tls.c
+index ac7650dc..b20a1b39 100644
+--- a/src/eap-tls.c
++++ b/src/eap-tls.c
+@@ -174,7 +174,7 @@ static int eap_tls_settings_check(struct l_settings *se=
+ttings,
+ 	 * Check whether the combination of settings that are present/missing
+ 	 * makes sense before validating each setting.
+ 	 */
+-	if (bundle_value && (priv_key_value || client_cert)) {
++	if (bundle_value && (priv_key_value || client_cert_value)) {
+ 		l_error("Either %s or %s/%s can be used, not both",
+ 			bundle_setting, priv_key_setting, client_cert_setting);
+ 		ret =3D -EEXIST;
+@@ -184,7 +184,7 @@ static int eap_tls_settings_check(struct l_settings *se=
+ttings,
+ 			priv_key_setting, client_cert_setting);
+ 		ret =3D -ENOENT;
+ 		goto done;
+-	} else if (!priv_key_value && client_cert) {
++	} else if (!priv_key_value && client_cert_value) {
+ 		l_error("%s present but no client private key (%s)",
+ 			client_cert_setting, priv_key_setting);
+ 		ret =3D -ENOENT;
 -- =
 
-2.29.2
---===============0026096627846337199==--
+2.27.0
+
+--===============5752638185935989009==--
 
