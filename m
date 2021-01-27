@@ -1,58 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============4912694480715548631=="
+Content-Type: multipart/mixed; boundary="===============0580618958268107011=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 2/5] auto-t: throw exception if hostapd can't send BSS
- transition req
-Date: Wed, 27 Jan 2021 09:28:13 -0800
-Message-ID: <facf98c54e76d319681eb842441368dd48bc7475.camel@gmail.com>
-In-Reply-To: <20210127100457.341757-2-alsi@bang-olufsen.dk>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/5] auto-t: add test for roaming retry timing
+Date: Wed, 27 Jan 2021 13:19:04 -0600
+Message-ID: <fa98593e-a8b6-3151-61a7-eb1252df50ea@gmail.com>
+In-Reply-To: <20210127100457.341757-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4912694480715548631==
+--===============0580618958268107011==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi Alvin,
 
-On Wed, 2021-01-27 at 10:05 +0000, Alvin =C5=A0ipraga wrote:
-> The testAPRoam autotest was silently failing on my machine until I
-> realized that my distribution hostapd (Arch Linux) is not built with
-> CONFIG_WNM_AP=3Dy. Indeed, it is also disabled by default in upstream
-> hostapd. This resulted in the send_bss_transition() function of
-> hostapd.py silently failing. With this change, throw an exception in
-> case the BSS_TM_REQ command does not succeed to hopefully save others
-> the time of debugging this problem.
-> ---
->  autotests/util/hostapd.py | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+On 1/27/21 4:05 AM, Alvin =C5=A0ipraga wrote:
+> From: Alvin =C5=A0ipraga <alvin@pqrs.dk>
 > =
 
-> diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-> index 019d23ba..8e0b3766 100644
-> --- a/autotests/util/hostapd.py
-> +++ b/autotests/util/hostapd.py
-> @@ -184,7 +184,10 @@ class HostapdCLI:
->                          (addr, bss_info, op_class, chan_num,
-> phy_num)]
->              pref +=3D 1
->  =
+> Recent changes make iwd more eager to retry roaming if it has detected a
+> high RSSI since the last attempt. Add an autotest to verify this
+> behaviour.
+> ---
+>   autotests/testRoamRetry/fast_retry_test.py | 145 +++++++++++++++++++++
+>   autotests/testRoamRetry/hw.conf            |   7 +
+>   autotests/testRoamRetry/ssid1.conf         |  11 ++
+>   autotests/testRoamRetry/ssid2.conf         |  11 ++
+>   4 files changed, 174 insertions(+)
+>   create mode 100644 autotests/testRoamRetry/fast_retry_test.py
+>   create mode 100644 autotests/testRoamRetry/hw.conf
+>   create mode 100644 autotests/testRoamRetry/ssid1.conf
+>   create mode 100644 autotests/testRoamRetry/ssid2.conf
+> =
 
-> -        ctx.start_process(cmd, wait=3DTrue)
-> +        proc =3D ctx.start_process(cmd, wait=3DTrue)
 
-Good catch on this. Within the last day I fixed a logging/verbose issue
-with test-runner which this patch would be affected by. My
-fix/workaround is to explicitly tell start_process if there is output
-being requested with 'need_out=3DTrue'. I've got other ideas in the
-works, but for now this is how its got to be done. This should work for
-you:
+I went ahead and applied this after running dos2unix to fix the weird Windo=
+ws =
 
-proc =3D ctx.start_process(cmd, wait=3DTrue, need_out=3DTrue)
+style line endings.
 
-Thanks,
-James
+Regards,
+-Denis
 
---===============4912694480715548631==--
+--===============0580618958268107011==--
 
