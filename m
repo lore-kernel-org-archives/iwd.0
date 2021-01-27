@@ -1,35 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============3308220333930597257=="
+Content-Type: multipart/mixed; boundary="===============0885720310611816723=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 3/5] doc: update kernel configuration instructions for KVM
- guests
-Date: Wed, 27 Jan 2021 13:20:54 -0600
-Message-ID: <24193180-4210-553e-d1fa-09fa9ef6035d@gmail.com>
-In-Reply-To: <20210127100457.341757-3-alsi@bang-olufsen.dk>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: Re: [PATCH 1/5] auto-t: add test for roaming retry timing
+Date: Wed, 27 Jan 2021 11:21:41 -0800
+Message-ID: <ce82111dbd937b9b0bd11945f8486a5d582ef8e1.camel@gmail.com>
+In-Reply-To: <20210127100457.341757-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3308220333930597257==
+--===============0885720310611816723==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi Alvin,
 
-On 1/27/21 4:05 AM, Alvin =C5=A0ipraga wrote:
-> The kvmguest shorthand was removed after the release of Linux 5.10. It
-> was just shorthand for kvm_guest.config anyway, so update the
-> test-runner documentation accordingly.
-> ---
->   doc/test-runner.txt | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> =
+Looks like this already got applied as I was writing but...
+
+<snip>
+
+> diff --git a/autotests/testRoamRetry/hw.conf
+> b/autotests/testRoamRetry/hw.conf
+> new file mode 100644
+> index 00000000..5dbe97b4
+> --- /dev/null
+> +++ b/autotests/testRoamRetry/hw.conf
+> @@ -0,0 +1,7 @@
+> +[SETUP]
+> +num_radios=3D3
+> +needs_hwsim=3D1
+
+'needs_hwsim' is no longer required (yes, I know lots of tests still
+have this). test-runner assumes hwsim is being used unless
+'hwsim_medium=3Dno' is found. I need to take some time and remove this
+along with several other stale options. Ill remove this for you since
+it was already applied.
+
+Thanks,
+James
 
 
-Patches 3-5 applied, thanks.
-
-Regards,
--Denis
-
---===============3308220333930597257==--
+--===============0885720310611816723==--
 
