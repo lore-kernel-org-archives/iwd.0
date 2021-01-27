@@ -1,14 +1,15 @@
-Content-Type: multipart/mixed; boundary="===============0580618958268107011=="
+Content-Type: multipart/mixed; boundary="===============3308220333930597257=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/5] auto-t: add test for roaming retry timing
-Date: Wed, 27 Jan 2021 13:19:04 -0600
-Message-ID: <fa98593e-a8b6-3151-61a7-eb1252df50ea@gmail.com>
-In-Reply-To: <20210127100457.341757-1-alsi@bang-olufsen.dk>
+Subject: Re: [PATCH 3/5] doc: update kernel configuration instructions for KVM
+ guests
+Date: Wed, 27 Jan 2021 13:20:54 -0600
+Message-ID: <24193180-4210-553e-d1fa-09fa9ef6035d@gmail.com>
+In-Reply-To: <20210127100457.341757-3-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0580618958268107011==
+--===============3308220333930597257==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,32 +17,19 @@ Content-Transfer-Encoding: quoted-printable
 Hi Alvin,
 
 On 1/27/21 4:05 AM, Alvin =C5=A0ipraga wrote:
-> From: Alvin =C5=A0ipraga <alvin@pqrs.dk>
-> =
-
-> Recent changes make iwd more eager to retry roaming if it has detected a
-> high RSSI since the last attempt. Add an autotest to verify this
-> behaviour.
+> The kvmguest shorthand was removed after the release of Linux 5.10. It
+> was just shorthand for kvm_guest.config anyway, so update the
+> test-runner documentation accordingly.
 > ---
->   autotests/testRoamRetry/fast_retry_test.py | 145 +++++++++++++++++++++
->   autotests/testRoamRetry/hw.conf            |   7 +
->   autotests/testRoamRetry/ssid1.conf         |  11 ++
->   autotests/testRoamRetry/ssid2.conf         |  11 ++
->   4 files changed, 174 insertions(+)
->   create mode 100644 autotests/testRoamRetry/fast_retry_test.py
->   create mode 100644 autotests/testRoamRetry/hw.conf
->   create mode 100644 autotests/testRoamRetry/ssid1.conf
->   create mode 100644 autotests/testRoamRetry/ssid2.conf
+>   doc/test-runner.txt | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > =
 
 
-I went ahead and applied this after running dos2unix to fix the weird Windo=
-ws =
-
-style line endings.
+Patches 3-5 applied, thanks.
 
 Regards,
 -Denis
 
---===============0580618958268107011==--
+--===============3308220333930597257==--
 
