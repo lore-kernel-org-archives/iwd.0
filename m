@@ -1,62 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============4415278849752181508=="
+Content-Type: multipart/mixed; boundary="===============2253912549105029871=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] ap: allow no group traffic on GET_KEY error
-Date: Thu, 28 Jan 2021 10:33:52 -0800
-Message-ID: <20210128183352.1004552-2-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/2] ap: handle NEW_STATION for fullmac cards
+Date: Thu, 28 Jan 2021 13:28:42 -0600
+Message-ID: <75afcdf4-c44e-7d17-03f1-376f78a43dea@gmail.com>
 In-Reply-To: <20210128183352.1004552-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4415278849752181508==
+--===============2253912549105029871==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Some fullmac cards were found to be buggy with getting the GTK
-where it returns a BIP key for the GTK index, even after creating
-a GTK with NEW_KEY explicitly. In an effort to get these cards
-semi-working we can treat this just as a warning and continue with
-the handshake without a GTK set which disables group traffic. A
-warning is printed in this case so the user is not completely in
-the dark.
----
- src/ap.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+Hi James,
 
-diff --git a/src/ap.c b/src/ap.c
-index c781ade4..5768233b 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -790,10 +790,18 @@ static void ap_gtk_query_cb(struct l_genl_msg *msg, v=
-oid *user_data)
- =
+On 1/28/21 12:33 PM, James Prestwood wrote:
+> Since fullmac cards handle auth/assoc in firmware IWD must
+> react differently while in AP mode just as it does in station.
+> For fullmac cards a NEW_STATION event is emitted post association
+> and from here the 4-way handshake can begin. In this NEW_STATION
+> handler a new sta_state is created and the needed members are
+> set in order to inject us back into the normal code execution
+> for softmac post association (i.e. creating group keys and
+> starting the 4-way handshake). From here everything works the
+> same as softmac.
+> ---
+>   src/ap.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 111 insertions(+)
+> =
 
- 	sta->gtk_query_cmd_id =3D 0;
- =
 
--	gtk_rsc =3D nl80211_parse_get_key_seq(msg);
--	if (!gtk_rsc)
-+	if (l_genl_msg_get_error(msg) < 0)
- 		goto error;
- =
+Applied, thanks.
 
-+	gtk_rsc =3D nl80211_parse_get_key_seq(msg);
-+	if (!gtk_rsc) {
-+		/* Try allowing connection with no group traffic */
-+		l_warn("Failed to get GTK. This may be a driver/FW issue, "
-+			"disabling group traffic");
-+		ap_start_rsna(sta, NULL);
-+		return;
-+	}
-+
- 	ap_start_rsna(sta, gtk_rsc);
- 	return;
- =
+Regards,
+-Denis
 
--- =
-
-2.26.2
-
---===============4415278849752181508==--
+--===============2253912549105029871==--
 
