@@ -1,175 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============7924927185156268929=="
+Content-Type: multipart/mixed; boundary="===============5720274890842701075=="
 MIME-Version: 1.0
-From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Subject: [PATCH v2 2/2] auto-t: add test for stopping periodic roam retries
-Date: Thu, 28 Jan 2021 13:24:31 +0000
-Message-ID: <20210128132428.1402427-2-alsi@bang-olufsen.dk>
-In-Reply-To: <20210128132428.1402427-1-alsi@bang-olufsen.dk>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/5] auto-t: add test for roaming retry timing
+Date: Thu, 28 Jan 2021 09:17:25 -0600
+Message-ID: <562a3df9-dae0-6786-d531-f64e5cc9ee7c@gmail.com>
+In-Reply-To: <b5982ad0-edba-81c2-c79c-f9803dd3450e@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7924927185156268929==
+--===============5720274890842701075==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- autotests/testRoamRetry/stop_retry_test.py | 134 +++++++++++++++++++++
- 1 file changed, 134 insertions(+)
- create mode 100644 autotests/testRoamRetry/stop_retry_test.py
+Hi Alvin,
 
-diff --git a/autotests/testRoamRetry/stop_retry_test.py b/autotests/testRoa=
-mRetry/stop_retry_test.py
-new file mode 100644
-index 00000000..bbe6e2a1
---- /dev/null
-+++ b/autotests/testRoamRetry/stop_retry_test.py
-@@ -0,0 +1,134 @@
-+#!/usr/bin/python3
-+
-+import unittest
-+import sys
-+
-+sys.path.append('../util')
-+import iwd
-+from iwd import IWD
-+from iwd import PSKAgent
-+from iwd import NetworkType
-+
-+import testutil
-+
-+from hostapd import HostapdCLI
-+from hwsim import Hwsim
-+
-+class Test(unittest.TestCase):
-+    # Test that we do not periodically retry roaming if the transision loo=
-ks
-+    # like this: LOW [roam] [new bss] HIGH.
-+    def test_stop_retry(self):
-+        hwsim =3D Hwsim()
-+
-+        bss_hostapd =3D [ HostapdCLI(config=3D'ssid1.conf'),
-+                        HostapdCLI(config=3D'ssid2.conf') ]
-+        bss_radio =3D  [ hwsim.get_radio('rad0'),
-+                       hwsim.get_radio('rad1') ]
-+
-+        rule0 =3D hwsim.rules.create()
-+        rule0.source =3D bss_radio[0].addresses[0]
-+        rule0.bidirectional =3D True
-+
-+        rule1 =3D hwsim.rules.create()
-+        rule1.source =3D bss_radio[1].addresses[0]
-+        rule1.bidirectional =3D True
-+
-+        # Fill in the neighbor AP tables in both BSSes.  By default each
-+        # instance knows only about current BSS, even inside one hostapd
-+        # process.
-+        # Roaming still works without the neighbor AP table but neighbor
-+        # reports have to be disabled in the .conf files
-+        bss0_nr =3D ''.join(bss_radio[0].addresses[0].split(':')) + \
-+                '8f0000005101060603000000'
-+        bss1_nr =3D ''.join(bss_radio[1].addresses[0].split(':')) + \
-+                '8f0000005102060603000000'
-+
-+        bss_hostapd[0].set_neighbor(bss_radio[1].addresses[0], 'TestRoamRe=
-try',
-+                bss1_nr)
-+        bss_hostapd[1].set_neighbor(bss_radio[0].addresses[0], 'TestRoamRe=
-try',
-+                bss0_nr)
-+
-+        # Start in the vicinity of BSS 0, check that iwd connects to BSS 0
-+        rule0.signal =3D -2000
-+        rule1.signal =3D -5000
-+
-+        wd =3D IWD()
-+
-+        psk_agent =3D PSKAgent("secret123")
-+        wd.register_psk_agent(psk_agent)
-+
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+
-+        condition =3D 'not obj.scanning'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        device.scan()
-+
-+        condition =3D 'not obj.scanning'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        ordered_network =3D device.get_ordered_network('TestRoamRetry')
-+
-+        self.assertEqual(ordered_network.type, NetworkType.psk)
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        ordered_network.network_object.connect()
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        self.assertTrue(bss_hostapd[0].list_sta())
-+        self.assertFalse(bss_hostapd[1].list_sta())
-+
-+        wd.wait(5)
-+
-+        # Now push the signal below the RSSI threshold and check that iwd
-+        # connects to BSS 1
-+        rule0.signal =3D -8000
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.roaming'
-+        wd.wait_for_object_condition(device, condition, max_wait=3D10)
-+
-+        # Check that iwd is on BSS 1 once out of roaming state and doesn't
-+        # go through 'disconnected', 'autoconnect', 'connecting' in between
-+        condition =3D 'obj.state !=3D DeviceState.roaming'
-+        wd.wait_for_object_condition(device, condition, max_wait=3D5)
-+
-+        self.assertEqual(device.state, iwd.DeviceState.connected)
-+        self.assertTrue(bss_hostapd[1].list_sta())
-+
-+        wd.wait(5)
-+
-+        # Now make sure that we don't roam anymore. In order to catch this=
- via
-+        # DeviceState, a suitable roaming target needs to be available. So=
- jack
-+        # up the RSSI of BSS 0 again. The retry interval is 60 seconds, so=
- we
-+        # should have roamed within that timeframe.
-+        rule0.signal =3D -2000
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.roaming'
-+        self.assertRaises(TimeoutError, wd.wait_for_object_condition, devi=
-ce,
-+                          condition, max_wait=3D60)
-+
-+        device.disconnect()
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        wd.unregister_psk_agent(psk_agent)
-+
-+        rule0.remove()
-+        rule1.remove()
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        pass
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
--- =
+On 1/28/21 3:31 AM, Alvin =C5=A0ipraga wrote:
+> Hi Denis,
+> =
 
-2.29.2
---===============7924927185156268929==--
+> On 1/27/21 8:19 PM, Denis Kenzior wrote:
+>> Hi Alvin,
+>>
+>> On 1/27/21 4:05 AM, Alvin =C5=A0ipraga wrote:
+>>> From: Alvin =C5=A0ipraga <alvin@pqrs.dk>
+>>>
+>>> Recent changes make iwd more eager to retry roaming if it has detected a
+>>> high RSSI since the last attempt. Add an autotest to verify this
+>>> behaviour.
+>>> ---
+>>>  =C2=A0 autotests/testRoamRetry/fast_retry_test.py | 145 ++++++++++++++=
++++++++
+>>>  =C2=A0 autotests/testRoamRetry/hw.conf=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 7 +
+>>>  =C2=A0 autotests/testRoamRetry/ssid1.conf=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 11 ++
+>>>  =C2=A0 autotests/testRoamRetry/ssid2.conf=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 11 ++
+>>>  =C2=A0 4 files changed, 174 insertions(+)
+>>>  =C2=A0 create mode 100644 autotests/testRoamRetry/fast_retry_test.py
+>>>  =C2=A0 create mode 100644 autotests/testRoamRetry/hw.conf
+>>>  =C2=A0 create mode 100644 autotests/testRoamRetry/ssid1.conf
+>>>  =C2=A0 create mode 100644 autotests/testRoamRetry/ssid2.conf
+>>>
+>>
+>> I went ahead and applied this after running dos2unix to fix the weird
+>> Windows style line endings.
+> =
+
+> Hmm, that's strange. Was it just for this patch? I prepared the initial
+> commit on a separate machine, but I would be surprised about Windows
+
+Yes, just for that patch.  The others were fine.  These were all new files;=
+ were =
+
+they somehow treated differently?
+
+> line endings. Just wondering if my outgoing mail is getting modified or
+> if my setup is busted in some other way. Could not detect anything wrong
+> on my end though...
+
+Could be the mail server is mangling them.  Doesn't explain why the rest wa=
+s =
+
+fine though.
+
+Regards,
+-Denis
+--===============5720274890842701075==--
 
