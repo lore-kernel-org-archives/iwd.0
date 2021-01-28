@@ -1,68 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============2923815922648733881=="
+Content-Type: multipart/mixed; boundary="===============7393951024789506492=="
 MIME-Version: 1.0
 From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Subject: Re: [PATCH 2/5] auto-t: throw exception if hostapd can't send BSS
- transition req
-Date: Thu, 28 Jan 2021 09:28:29 +0000
-Message-ID: <41bbf3dc-9986-8418-b93c-e7955dacdca4@bang-olufsen.dk>
-In-Reply-To: <facf98c54e76d319681eb842441368dd48bc7475.camel@gmail.com>
+Subject: Re: [PATCH 1/5] auto-t: add test for roaming retry timing
+Date: Thu, 28 Jan 2021 09:31:21 +0000
+Message-ID: <b5982ad0-edba-81c2-c79c-f9803dd3450e@bang-olufsen.dk>
+In-Reply-To: <fa98593e-a8b6-3151-61a7-eb1252df50ea@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2923815922648733881==
+--===============7393951024789506492==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Denis,
 
-On 1/27/21 6:28 PM, James Prestwood wrote:
+On 1/27/21 8:19 PM, Denis Kenzior wrote:
 > Hi Alvin,
 > =
 
-> On Wed, 2021-01-27 at 10:05 +0000, Alvin =C5=A0ipraga wrote:
->> The testAPRoam autotest was silently failing on my machine until I
->> realized that my distribution hostapd (Arch Linux) is not built with
->> CONFIG_WNM_AP=3Dy. Indeed, it is also disabled by default in upstream
->> hostapd. This resulted in the send_bss_transition() function of
->> hostapd.py silently failing. With this change, throw an exception in
->> case the BSS_TM_REQ command does not succeed to hopefully save others
->> the time of debugging this problem.
->> ---
->>   autotests/util/hostapd.py | 5 ++++-
->>   1 file changed, 4 insertions(+), 1 deletion(-)
+> On 1/27/21 4:05 AM, Alvin =C5=A0ipraga wrote:
+>> From: Alvin =C5=A0ipraga <alvin@pqrs.dk>
 >>
->> diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
->> index 019d23ba..8e0b3766 100644
->> --- a/autotests/util/hostapd.py
->> +++ b/autotests/util/hostapd.py
->> @@ -184,7 +184,10 @@ class HostapdCLI:
->>                           (addr, bss_info, op_class, chan_num,
->> phy_num)]
->>               pref +=3D 1
->>   =
-
->> -        ctx.start_process(cmd, wait=3DTrue)
->> +        proc =3D ctx.start_process(cmd, wait=3DTrue)
+>> Recent changes make iwd more eager to retry roaming if it has detected a
+>> high RSSI since the last attempt. Add an autotest to verify this
+>> behaviour.
+>> ---
+>> =C2=A0 autotests/testRoamRetry/fast_retry_test.py | 145 ++++++++++++++++=
++++++
+>> =C2=A0 autotests/testRoamRetry/hw.conf=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 7 +
+>> =C2=A0 autotests/testRoamRetry/ssid1.conf=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0 11 ++
+>> =C2=A0 autotests/testRoamRetry/ssid2.conf=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0 11 ++
+>> =C2=A0 4 files changed, 174 insertions(+)
+>> =C2=A0 create mode 100644 autotests/testRoamRetry/fast_retry_test.py
+>> =C2=A0 create mode 100644 autotests/testRoamRetry/hw.conf
+>> =C2=A0 create mode 100644 autotests/testRoamRetry/ssid1.conf
+>> =C2=A0 create mode 100644 autotests/testRoamRetry/ssid2.conf
+>>
 > =
 
-> Good catch on this. Within the last day I fixed a logging/verbose issue
-> with test-runner which this patch would be affected by. My
-> fix/workaround is to explicitly tell start_process if there is output
-> being requested with 'need_out=3DTrue'. I've got other ideas in the
-> works, but for now this is how its got to be done. This should work for
-> you:
-> =
+> I went ahead and applied this after running dos2unix to fix the weird =
 
-> proc =3D ctx.start_process(cmd, wait=3DTrue, need_out=3DTrue)
+> Windows style line endings.
 
-Thanks. I actually fixed the same issue of --log not working with =
+Hmm, that's strange. Was it just for this patch? I prepared the initial =
 
-hostapd_cli, but your solution was more generic so I dropped the patch =
+commit on a separate machine, but I would be surprised about Windows =
 
-when sending. Forgot to modify this accordingly though. Sent a v2 patch now.
+line endings. Just wondering if my outgoing mail is getting modified or =
+
+if my setup is busted in some other way. Could not detect anything wrong =
+
+on my end though...
 
 Kind regards,
 Alvin
---===============2923815922648733881==--
+--===============7393951024789506492==--
 
