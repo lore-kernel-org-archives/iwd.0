@@ -1,13 +1,13 @@
-Content-Type: multipart/mixed; boundary="===============1272453592523386527=="
+Content-Type: multipart/mixed; boundary="===============6332981876896231128=="
 MIME-Version: 1.0
 From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Subject: [PATCH] netdev: preserve cur_rssi_low across reassociation
-Date: Thu, 28 Jan 2021 12:21:11 +0000
-Message-ID: <20210128122105.1364365-1-alsi@bang-olufsen.dk>
+Subject: [PATCH v2 1/2] netdev: preserve cur_rssi_low across reassociation
+Date: Thu, 28 Jan 2021 13:24:30 +0000
+Message-ID: <20210128132428.1402427-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1272453592523386527==
+--===============6332981876896231128==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -33,6 +33,9 @@ reassociation. This change makes netdev follow the same new logic as
 station, i.e. assume the same signal state (LOW/HIGH) until told
 otherwise by the driver.
 ---
+v1 -> v2:
+- No changes to this patch, but added an autotest to the patch series to
+  validate the fix
  src/netdev.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
@@ -62,5 +65,5 @@ v,
 -- =
 
 2.29.2
---===============1272453592523386527==--
+--===============6332981876896231128==--
 
