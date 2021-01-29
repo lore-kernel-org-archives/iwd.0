@@ -1,43 +1,28 @@
-Content-Type: multipart/mixed; boundary="===============5902628447526833641=="
+Content-Type: multipart/mixed; boundary="===============8555337528230747960=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v4] knownnetworks: sanitize known_network.freq on load
-Date: Fri, 29 Jan 2021 17:49:21 -0600
-Message-ID: <4bcbe596-91fb-544e-dd4a-2ef60fd0e942@gmail.com>
-In-Reply-To: <20210129234726.132679-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v3] auto-t: add test for stopping periodic roam retries
+Date: Fri, 29 Jan 2021 17:56:17 -0600
+Message-ID: <8081b2ed-fd1a-6992-6b40-2b190a1cb8bb@gmail.com>
+In-Reply-To: <20210129120613.2162754-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5902628447526833641==
+--===============8555337528230747960==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Alvin,
 
-On 1/29/21 5:47 PM, James Prestwood wrote:
-> An invalid known_network.freq file containing several UUID
-> groups which have the same 'name' key results in memory leaks
-> in IWD. This is because the file is loaded and the group's
-> are iterated without detecting duplicates. This leads to the
-> same network_info's known_frequencies being set/overridden
-> multiple times.
-> =
-
-> To fix this we just check if the network_info already has a
-> UUID set. If so remove the stale entry.
-> =
-
-> There may be other old, invalid, or stale entries from previous
-> versions of IWD, or a user misconfiguring the file. These will
-> now also be removed during load.
+On 1/29/21 6:06 AM, Alvin =C5=A0ipraga wrote:
 > ---
->   src/knownnetworks.c | 25 +++++++++++++++++--------
->   1 file changed, 17 insertions(+), 8 deletions(-)
-> =
-
-> v4:
->   * Fixed a few memory leak issues
+> v2 -> v3:
+> - Removed unnecessary waits
+> ---
+>   autotests/testRoamRetry/stop_retry_test.py | 131 +++++++++++++++++++++
+>   1 file changed, 131 insertions(+)
+>   create mode 100644 autotests/testRoamRetry/stop_retry_test.py
 > =
 
 
@@ -46,5 +31,5 @@ Applied, thanks.
 Regards,
 -Denis
 
---===============5902628447526833641==--
+--===============8555337528230747960==--
 
