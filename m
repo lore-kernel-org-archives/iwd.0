@@ -1,32 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============4751350324406212990=="
+Content-Type: multipart/mixed; boundary="===============5468691507735203668=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/2] ap: rename ap_parse_ie to be more descriptive
-Date: Fri, 29 Jan 2021 13:16:34 -0600
-Message-ID: <f7712d7a-0e03-70ee-2fc8-73a0f043a725@gmail.com>
-In-Reply-To: <20210129184725.90862-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] ap: fix off by one error
+Date: Fri, 29 Jan 2021 12:59:50 -0800
+Message-ID: <20210129205950.106936-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4751350324406212990==
+--===============5468691507735203668==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+The RSN element was not being allocated properly which caused
+an invalid read in some cases.
+---
+ src/ap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 1/29/21 12:47 PM, James Prestwood wrote:
-> This is only used for NEW_STATION parsing so name appropriately
-> ---
->   src/ap.c | 8 +++++---
->   1 file changed, 5 insertions(+), 3 deletions(-)
-> =
+diff --git a/src/ap.c b/src/ap.c
+index e695a67e..ce639907 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -2212,7 +2212,7 @@ static bool ap_parse_new_station_ies(const void *data=
+, uint16_t len,
+ 				goto parse_error;
+ =
 
+ 			rsn =3D l_memdup(ie_tlv_iter_get_data(&iter) - 2,
+-					ie_tlv_iter_get_length(&iter) + 1);
++					ie_tlv_iter_get_length(&iter) + 2);
+ 			break;
+ 		case IE_TYPE_EXTENDED_SUPPORTED_RATES:
+ 			if (ap_parse_supported_rates(&iter, &rates) < 0)
+-- =
 
-Both applied, thanks.
+2.26.2
 
-Regards,
--Denis
-
---===============4751350324406212990==--
+--===============5468691507735203668==--
 
