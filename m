@@ -1,72 +1,96 @@
-Content-Type: multipart/mixed; boundary="===============0155969483472285629=="
+Content-Type: multipart/mixed; boundary="===============3249628291058671422=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 5/5] unit: Use hs_override_pairwise_cipher in eapol
- authenticator tests
-Date: Sat, 30 Jan 2021 00:27:40 +0100
-Message-ID: <20210129232740.27393-5-andrew.zaborowski@intel.com>
-In-Reply-To: <20210129232740.27393-1-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3] knownnetworks: sanitize known_network.freq on load
+Date: Fri, 29 Jan 2021 15:31:30 -0800
+Message-ID: <20210129233130.130728-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0155969483472285629==
+--===============3249628291058671422==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+An invalid known_network.freq file containing several UUID
+groups which have the same 'name' key results in memory leaks
+in IWD. This is because the file is loaded and the group's
+are iterated without detecting duplicates. This leads to the
+same network_info's known_frequencies being set/overridden
+multiple times.
+
+To fix this we just check if the network_info already has a
+UUID set. If so remove the stale entry.
+
+There may be other old, invalid, or stale entries from previous
+versions of IWD, or a user misconfiguring the file. These will
+now also be removed during load.
 ---
- unit/test-eapol.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ src/knownnetworks.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/unit/test-eapol.c b/unit/test-eapol.c
-index eba249ed..6032fc5b 100644
---- a/unit/test-eapol.c
-+++ b/unit/test-eapol.c
-@@ -3682,6 +3682,8 @@ static void eapol_ap_sta_handshake_test(const void *d=
-ata)
- 	handshake_state_set_authenticator_ie(s.ap_hs, ap_rsne);
- 	handshake_state_set_ssid(s.ap_hs, (void *) ssid, strlen(ssid));
- 	handshake_state_set_pmk(s.ap_hs, psk, 32);
-+	handshake_state_override_pairwise_cipher(s.ap_hs,
-+						IE_RSN_CIPHER_SUITE_CCMP);
+v3:
+ * Forgot to send 'v2' on last patch
+ * Added removal of ALL invalid entries rather than only
+   network duplicates.
+
+diff --git a/src/knownnetworks.c b/src/knownnetworks.c
+index 53cfc30f..a61d31e7 100644
+--- a/src/knownnetworks.c
++++ b/src/knownnetworks.c
+@@ -910,29 +910,36 @@ static int known_network_frequencies_load(void)
+ 		const char *path =3D l_settings_get_value(known_freqs, groups[i],
+ 							"name");
+ 		if (!path)
+-			continue;
++			goto invalid_entry;
  =
 
- 	handshake_state_set_authenticator(s.sta_hs, false);
- 	handshake_state_set_event_func(s.sta_hs, test_ap_sta_hs_event, &s);
-@@ -3743,6 +3745,8 @@ static void eapol_ap_sta_handshake_bad_psk_test(const=
- void *data)
- 	handshake_state_set_authenticator_ie(s.ap_hs, ap_rsne);
- 	handshake_state_set_ssid(s.ap_hs, (void *) ssid, strlen(ssid));
- 	handshake_state_set_pmk(s.ap_hs, psk1, 32);
-+	handshake_state_override_pairwise_cipher(s.ap_hs,
-+						IE_RSN_CIPHER_SUITE_CCMP);
+ 		info =3D find_network_info_from_path(path);
+ 		if (!info)
+-			continue;
++			goto invalid_entry;
++
++		if (info->has_uuid)
++			goto invalid_entry;
  =
 
- 	handshake_state_set_authenticator(s.sta_hs, false);
- 	handshake_state_set_event_func(s.sta_hs, test_ap_sta_hs_event, &s);
-@@ -3804,6 +3808,8 @@ static void eapol_ap_sta_handshake_ip_alloc_ok_test(c=
-onst void *data)
- 	handshake_state_set_authenticator_ie(s.ap_hs, ap_rsne);
- 	handshake_state_set_ssid(s.ap_hs, (void *) ssid, strlen(ssid));
- 	handshake_state_set_pmk(s.ap_hs, psk, 32);
-+	handshake_state_override_pairwise_cipher(s.ap_hs,
-+						IE_RSN_CIPHER_SUITE_CCMP);
- 	s.ap_hs->support_ip_allocation =3D true;
- 	s.ap_hs->client_ip_addr =3D 0x01020304;
- 	s.ap_hs->subnet_mask =3D 0xffff0000;
-@@ -3871,6 +3877,8 @@ static void eapol_ap_sta_handshake_ip_alloc_no_req_te=
-st(const void *data)
- 	handshake_state_set_authenticator_ie(s.ap_hs, ap_rsne);
- 	handshake_state_set_ssid(s.ap_hs, (void *) ssid, strlen(ssid));
- 	handshake_state_set_pmk(s.ap_hs, psk, 32);
-+	handshake_state_override_pairwise_cipher(s.ap_hs,
-+						IE_RSN_CIPHER_SUITE_CCMP);
- 	s.ap_hs->support_ip_allocation =3D true;
- 	s.ap_hs->client_ip_addr =3D 0x01020304;
- 	s.ap_hs->subnet_mask =3D 0xffff0000;
+ 		freq_list =3D l_settings_get_string(known_freqs, groups[i],
+ 							"list");
+ 		if (!freq_list)
+-			continue;
++			goto invalid_entry;
+ =
+
+ 		known_frequencies =3D known_frequencies_from_string(freq_list);
+ 		if (!known_frequencies)
+-			goto next;
++			goto invalid_entry;
+ =
+
+ 		if (!l_uuid_from_string(groups[i], uuid))
+-			goto next;
++			goto invalid_entry;
+ =
+
+ 		network_info_set_uuid(info, uuid);
+ 		info->known_frequencies =3D known_frequencies;
+ =
+
+-next:
+ 		l_free(freq_list);
++
++		continue;
++
++invalid_entry:
++		l_settings_remove_group(known_freqs, groups[i]);
+ 	}
+ =
+
+ 	l_strv_free(groups);
 -- =
 
-2.20.1
+2.26.2
 
---===============0155969483472285629==--
+--===============3249628291058671422==--
 
