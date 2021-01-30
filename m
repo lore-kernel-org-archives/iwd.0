@@ -1,14 +1,15 @@
-Content-Type: multipart/mixed; boundary="===============6308924553218657268=="
+Content-Type: multipart/mixed; boundary="===============1242921298114361391=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/5] ap: Fix cleanup on ap_parse_new_station_ies errors
-Date: Fri, 29 Jan 2021 20:11:24 -0600
-Message-ID: <1dddf52f-579a-eed7-9754-c12fc2afee83@gmail.com>
-In-Reply-To: <20210129232740.27393-2-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 3/5] eapol: Remove assumption of single cipher in
+ authenticator IE
+Date: Fri, 29 Jan 2021 20:28:21 -0600
+Message-ID: <25c34b3b-edf3-49de-8ed2-071ed03c878f@gmail.com>
+In-Reply-To: <20210129232740.27393-3-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6308924553218657268==
+--===============1242921298114361391==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,46 +17,34 @@ Content-Transfer-Encoding: quoted-printable
 Hi Andrew,
 
 On 1/29/21 5:27 PM, Andrew Zaborowski wrote:
+> Allow the user of the eapol_sm & handshake_state APIs to have multiple
+> pairwise ciphers listed in the authenticator IE.  This comes at the cost
+> of requiring the user to call handshake_state_override_pairwise_cipher
+> to select the cipher when setting up the handshake state.
+
+That's unfortunate.  Why would we want to override pairwise_ciphers selecte=
+d by =
+
+the STA?  I mean we can maybe do this for testing, but in the general case? =
+
+Furthermore, why would the override API be _required_?
+
+What precludes us from advertising an RSNE with multiple pairwise ciphers a=
+nd =
+
+then honoring the single pairwise_cipher that the STA chose?
+
 > ---
->   src/ap.c | 25 ++++++++++++++++---------
->   1 file changed, 16 insertions(+), 9 deletions(-)
+>   src/adhoc.c     |  1 +
+>   src/ap.c        |  2 ++
+>   src/eapol.c     | 20 +++++++++++++++-----
+>   src/handshake.c | 25 +++++++++++++++----------
+>   src/handshake.h |  2 ++
+>   5 files changed, 35 insertions(+), 15 deletions(-)
 > =
 
-> diff --git a/src/ap.c b/src/ap.c
-> index c4715696..1e028122 100644
-> --- a/src/ap.c
-> +++ b/src/ap.c
-> @@ -2211,14 +2211,15 @@ static bool ap_parse_new_station_ies(const void *=
-data, uint16_t len,
->   	while (ie_tlv_iter_next(&iter)) {
->   		switch (ie_tlv_iter_get_tag(&iter)) {
->   		case IE_TYPE_RSN:
-> -			if (ie_parse_rsne(&iter, NULL) < 0)
-> +			if (rsn || ie_parse_rsne(&iter, NULL) < 0)
-
-This may be going beyond being simply paranoid since the kernel is giving t=
-hese =
-
-messages to us, but ok...
-
->   				goto parse_error;
->   =
-
->   			rsn =3D l_memdup(ie_tlv_iter_get_data(&iter) - 2,
->   					ie_tlv_iter_get_length(&iter) + 2);
->   			break;
->   		case IE_TYPE_EXTENDED_SUPPORTED_RATES:
-> -			if (ap_parse_supported_rates(&iter, &rates) < 0)
-> +			if (rates || ap_parse_supported_rates(&iter, &rates) <
-> +					0)
->   				goto parse_error;
->   =
-
->   			break;
-
-Applied, thanks.
 
 Regards,
 -Denis
---===============6308924553218657268==--
+--===============1242921298114361391==--
 
