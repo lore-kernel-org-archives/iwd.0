@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============6021691519660581462=="
+Content-Type: multipart/mixed; boundary="===============6308924553218657268=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/5] ap: Set the group cipher when sending START_AP
-Date: Fri, 29 Jan 2021 20:06:04 -0600
-Message-ID: <46b52786-6a3d-b673-ba15-2df61c3c7a00@gmail.com>
-In-Reply-To: <20210129232740.27393-1-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 2/5] ap: Fix cleanup on ap_parse_new_station_ies errors
+Date: Fri, 29 Jan 2021 20:11:24 -0600
+Message-ID: <1dddf52f-579a-eed7-9754-c12fc2afee83@gmail.com>
+In-Reply-To: <20210129232740.27393-2-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6021691519660581462==
+--===============6308924553218657268==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,32 +16,46 @@ Content-Transfer-Encoding: quoted-printable
 Hi Andrew,
 
 On 1/29/21 5:27 PM, Andrew Zaborowski wrote:
-> Seems this overlooked because an initial version of ap.c didn't have
-> group traffic support.  This doesn't fix some brcmfmac problems where it
-> silently overrides the group cipher in the beacon frames though.
-
-That last sentence might require  more explanation?
-
 > ---
->   src/ap.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
+>   src/ap.c | 25 ++++++++++++++++---------
+>   1 file changed, 16 insertions(+), 9 deletions(-)
 > =
 
+> diff --git a/src/ap.c b/src/ap.c
+> index c4715696..1e028122 100644
+> --- a/src/ap.c
+> +++ b/src/ap.c
+> @@ -2211,14 +2211,15 @@ static bool ap_parse_new_station_ies(const void *=
+data, uint16_t len,
+>   	while (ie_tlv_iter_next(&iter)) {
+>   		switch (ie_tlv_iter_get_tag(&iter)) {
+>   		case IE_TYPE_RSN:
+> -			if (ie_parse_rsne(&iter, NULL) < 0)
+> +			if (rsn || ie_parse_rsne(&iter, NULL) < 0)
 
-This patch is broken though:
+This may be going beyond being simply paranoid since the kernel is giving t=
+hese =
 
-src/ap.c: In function =E2=80=98ap_build_cmd_start_ap=E2=80=99:
-src/ap.c:2151:6: error: =E2=80=98nl_ciphers=E2=80=99 undeclared (first use =
-in this function); =
+messages to us, but ok...
 
-did you mean =E2=80=98l_cipher=E2=80=99?
-  2151 |     &nl_ciphers);
-       |      ^~~~~~~~~~
-       |      l_cipher
-src/ap.c:2151:6: note: each undeclared identifier is reported only once for=
- each
+>   				goto parse_error;
+>   =
+
+>   			rsn =3D l_memdup(ie_tlv_iter_get_data(&iter) - 2,
+>   					ie_tlv_iter_get_length(&iter) + 2);
+>   			break;
+>   		case IE_TYPE_EXTENDED_SUPPORTED_RATES:
+> -			if (ap_parse_supported_rates(&iter, &rates) < 0)
+> +			if (rates || ap_parse_supported_rates(&iter, &rates) <
+> +					0)
+>   				goto parse_error;
+>   =
+
+>   			break;
+
+Applied, thanks.
 
 Regards,
 -Denis
---===============6021691519660581462==--
+--===============6308924553218657268==--
 
