@@ -1,41 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============3849510038979856342=="
+Content-Type: multipart/mixed; boundary="===============8176332826797794694=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/5] ap: return error from GetDiagnostics if not started
-Date: Mon, 01 Feb 2021 14:05:14 -0800
-Message-ID: <20210201220518.36975-1-prestwoj@gmail.com>
+Subject: [PATCH 2/5] client: ap: handle NotFound on diagnostic interface
+Date: Mon, 01 Feb 2021 14:05:15 -0800
+Message-ID: <20210201220518.36975-2-prestwoj@gmail.com>
+In-Reply-To: <20210201220518.36975-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3849510038979856342==
+--===============8176332826797794694==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This can happen when 'ap <wlan> show' is used on an AP interface
+which has not been started. This isn't an error per-se so it
+should be handled and print nothing rather than print an error.
 ---
- src/ap.c | 3 +++
- 1 file changed, 3 insertions(+)
+ client/ap.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/src/ap.c b/src/ap.c
-index 37dd05b9..fddf0255 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -3200,6 +3200,9 @@ static struct l_dbus_message *ap_dbus_get_diagnostics=
-(struct l_dbus *dbus,
- 	struct diagnostic_data *data;
- 	int ret;
+diff --git a/client/ap.c b/client/ap.c
+index 7130bb9a..9a7f8642 100644
+--- a/client/ap.c
++++ b/client/ap.c
+@@ -201,9 +201,18 @@ static void ap_get_diagnostics_callback(struct l_dbus_=
+message *message,
+ 	struct l_dbus_message_iter iter;
+ 	uint16_t idx =3D 0;
+ 	char client_num[15];
++	const char *name;
++	const char *text;
  =
 
-+	if (!ap_if->ap)
-+		return dbus_error_not_found(message);
+-	if (dbus_message_has_error(message))
++	if (l_dbus_message_get_error(message, &name, &text)) {
++		if (!strcmp(name, "net.connman.iwd.NotFound")) {
++			display_table_footer();
++			return;
++		}
 +
- 	data =3D l_new(struct diagnostic_data, 1);
- 	data->pending =3D l_dbus_message_ref(message);
++		display_error(text);
+ 		return;
++	}
  =
 
+ 	if (!l_dbus_message_get_arguments(message, "aa{sv}", &array)) {
+ 		display("Failed to parse GetDiagnostics message");
 -- =
 
 2.26.2
 
---===============3849510038979856342==--
+--===============8176332826797794694==--
 
