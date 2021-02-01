@@ -1,33 +1,77 @@
-Content-Type: multipart/mixed; boundary="===============3714415267874387784=="
+Content-Type: multipart/mixed; boundary="===============0901866792226135094=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/2] ap: Set the group cipher when sending START_AP
-Date: Mon, 01 Feb 2021 10:07:31 -0600
-Message-ID: <ac0d2919-6f29-14d0-9e13-8cf7ca04cb02@gmail.com>
-In-Reply-To: <20210201134042.45494-1-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] client: add support for AP StartProfile
+Date: Mon, 01 Feb 2021 09:17:17 -0800
+Message-ID: <20210201171717.7215-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3714415267874387784==
+--===============0901866792226135094==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+StartProfile was added to the AP interface but the required
+command was never added to iwctl. This command requires a
+profile exists in <configuration dir>/ap/. The syntax is as
+follows:
 
-On 2/1/21 7:40 AM, Andrew Zaborowski wrote:
-> Seems this was overlooked because an initial version of ap.c didn't have
-> group traffic support.
-> ---
->   src/ap.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> =
+ap <wlanX> start-profile <profile_name>
+---
+ client/ap.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
+diff --git a/client/ap.c b/client/ap.c
+index 81baa3fc..7130bb9a 100644
+--- a/client/ap.c
++++ b/client/ap.c
+@@ -235,11 +235,40 @@ static enum cmd_status cmd_show(const char *device_na=
+me, char **argv, int argc)
+ 	return CMD_STATUS_TRIGGERED;
+ }
+ =
 
-Both applied, thanks.
++static enum cmd_status cmd_start_profile(const char *device_name,
++						char **argv, int argc)
++{
++	const struct proxy_interface *ap_i;
++
++	if (argc < 1)
++		return CMD_STATUS_INVALID_ARGS;
++
++	if (strlen(argv[0]) > 32) {
++		display("Network name cannot exceed 32 characters.\n");
++
++		return CMD_STATUS_INVALID_VALUE;
++	}
++
++	ap_i =3D device_proxy_find(device_name, IWD_ACCESS_POINT_INTERFACE);
++	if (!ap_i) {
++		display("No ap on device: '%s'\n", device_name);
++		return CMD_STATUS_INVALID_VALUE;
++	}
++
++	proxy_interface_method_call(ap_i, "StartProfile", "s",
++						check_errors_method_callback,
++						argv[0]);
++
++	return CMD_STATUS_TRIGGERED;
++}
++
+ static const struct command ap_commands[] =3D {
+ 	{ NULL, "list", NULL, cmd_list, "List devices in AP mode", true },
+ 	{ "<wlan>", "start", "<\"network name\"> <passphrase>", cmd_start,
+ 		"Start an access point\n\t\t\t\t\t\t    called \"network "
+ 		"name\" with\n\t\t\t\t\t\t    a passphrase" },
++	{ "<wlan>", "start-profile", "<\"network name\">", cmd_start_profile,
++		"Start an access point based on a disk profile" },
+ 	{ "<wlan>", "stop", NULL,   cmd_stop, "Stop a started access\n"
+ 		"\t\t\t\t\t\t    point" },
+ 	{ "<wlan", "show", NULL, cmd_show, "Show AP info", false },
+-- =
 
-Regards,
--Denis
+2.26.2
 
---===============3714415267874387784==--
+--===============0901866792226135094==--
 
