@@ -1,41 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============7430216413803256841=="
+Content-Type: multipart/mixed; boundary="===============7661145429482373959=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/3] station: add Frequency to diagnostics dictionary
-Date: Wed, 03 Feb 2021 09:20:44 -0800
-Message-ID: <20210203172045.180677-2-prestwoj@gmail.com>
+Subject: [PATCH 3/3] client: add Frequency to station show
+Date: Wed, 03 Feb 2021 09:20:45 -0800
+Message-ID: <20210203172045.180677-3-prestwoj@gmail.com>
 In-Reply-To: <20210203172045.180677-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7430216413803256841==
+--===============7661145429482373959==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/station.c | 2 ++
- 1 file changed, 2 insertions(+)
+ client/diagnostic.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/station.c b/src/station.c
-index aee90c23..df7140c0 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3557,6 +3557,8 @@ static void station_get_diagnostic_cb(
- =
-
- 	dbus_append_dict_basic(builder, "ConnectedBss", 's',
- 					util_address_to_string(info->addr));
-+	dbus_append_dict_basic(builder, "Frequency", 'u',
-+				&station->connected_bss->frequency);
- =
-
- 	diagnostic_info_to_dict(info, builder);
+diff --git a/client/diagnostic.c b/client/diagnostic.c
+index 9d6b599d..c94178d6 100644
+--- a/client/diagnostic.c
++++ b/client/diagnostic.c
+@@ -87,6 +87,7 @@ static const struct diagnostic_dict_mapping diagnostic_ma=
+pping[] =3D {
+ 	{ "RSSI", 'n', "dBm" },
+ 	{ "RxMCS", 'y' },
+ 	{ "TxMCS", 'y' },
++	{ "Frequency", 'u' },
+ 	{ NULL }
+ };
  =
 
 -- =
 
 2.26.2
 
---===============7430216413803256841==--
+--===============7661145429482373959==--
 
