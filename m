@@ -1,36 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============5958275001897677215=="
+Content-Type: multipart/mixed; boundary="===============4436982083645813501=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/2] station: only add diagnostic interface when connected
-Date: Wed, 03 Feb 2021 13:38:35 -0600
-Message-ID: <9f92939a-d73a-b751-4889-a66362f314d0@gmail.com>
-In-Reply-To: <20210203190705.184958-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] auto-t: testFT-PSK-roam wait for connected
+Date: Wed, 03 Feb 2021 13:00:58 -0800
+Message-ID: <20210203210058.188314-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5958275001897677215==
+--===============4436982083645813501==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Rather than assert its better to wait for a connected
+state.
+---
+ autotests/testFT-PSK-roam/connection_test.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On 2/3/21 1:07 PM, James Prestwood wrote:
-> The diagnostic interface returns an error anyways if station is
-> not connected so it makes more sense to only bring the interface
-> up when its actually usable. This also removes the interface
-> when station disconnects, which was never done before (the
-> interface stayed up indefinitely due to a forgotten remove call).
-> ---
->   src/station.c | 23 ++++++++++++-----------
->   1 file changed, 12 insertions(+), 11 deletions(-)
-> =
+diff --git a/autotests/testFT-PSK-roam/connection_test.py b/autotests/testF=
+T-PSK-roam/connection_test.py
+index 8e69fcd5..a7acf495 100644
+--- a/autotests/testFT-PSK-roam/connection_test.py
++++ b/autotests/testFT-PSK-roam/connection_test.py
+@@ -90,7 +90,8 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state !=3D DeviceState.roaming'
+         wd.wait_for_object_condition(device, condition)
+ =
 
+-        self.assertEqual(device.state, iwd.DeviceState.connected)
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
+         self.assertTrue(self.bss_hostapd[1].list_sta())
+ =
 
-Both applied, thanks.
+         testutil.test_iface_operstate(device.name)
+-- =
 
-Regards,
--Denis
+2.26.2
 
---===============5958275001897677215==--
+--===============4436982083645813501==--
 
