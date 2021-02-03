@@ -1,40 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============1564083842900196463=="
+Content-Type: multipart/mixed; boundary="===============7430216413803256841=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/3] doc: add Frequency to station diagnostics
-Date: Wed, 03 Feb 2021 09:20:43 -0800
-Message-ID: <20210203172045.180677-1-prestwoj@gmail.com>
+Subject: [PATCH 2/3] station: add Frequency to diagnostics dictionary
+Date: Wed, 03 Feb 2021 09:20:44 -0800
+Message-ID: <20210203172045.180677-2-prestwoj@gmail.com>
+In-Reply-To: <20210203172045.180677-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1564083842900196463==
+--===============7430216413803256841==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- doc/station-diagnostic-api.txt | 2 ++
+ src/station.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/doc/station-diagnostic-api.txt b/doc/station-diagnostic-api.txt
-index 78f08ac1..af82229b 100644
---- a/doc/station-diagnostic-api.txt
-+++ b/doc/station-diagnostic-api.txt
-@@ -21,6 +21,8 @@ Methods		dict GetDiagnostics()
+diff --git a/src/station.c b/src/station.c
+index aee90c23..df7140c0 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3557,6 +3557,8 @@ static void station_get_diagnostic_cb(
  =
 
- 			ConnectedBss - MAC address of currently connected BSS.
+ 	dbus_append_dict_basic(builder, "ConnectedBss", 's',
+ 					util_address_to_string(info->addr));
++	dbus_append_dict_basic(builder, "Frequency", 'u',
++				&station->connected_bss->frequency);
  =
 
-+			Frequency - Frequency of currently connected BSS.
-+
- 			RSSI [optional] - The RSSI of the currently connected BSS.
+ 	diagnostic_info_to_dict(info, builder);
  =
 
- 			RxMode [optional] -	The phy technology being used
 -- =
 
 2.26.2
 
---===============1564083842900196463==--
+--===============7430216413803256841==--
 
