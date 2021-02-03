@@ -1,86 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============3266081565585759470=="
+Content-Type: multipart/mixed; boundary="===============0506013862302194328=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] station: only add diagnostic interface when connected
-Date: Wed, 03 Feb 2021 11:07:04 -0800
-Message-ID: <20210203190705.184958-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] client: update to work with diagnostic changes
+Date: Wed, 03 Feb 2021 11:07:05 -0800
+Message-ID: <20210203190705.184958-2-prestwoj@gmail.com>
+In-Reply-To: <20210203190705.184958-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3266081565585759470==
+--===============0506013862302194328==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The diagnostic interface returns an error anyways if station is
-not connected so it makes more sense to only bring the interface
-up when its actually usable. This also removes the interface
-when station disconnects, which was never done before (the
-interface stayed up indefinitely due to a forgotten remove call).
+The diagnostic interface will now only come up when station is
+connected. This avoids the need for display station to return
+a 'connected' out parameter. We can instead just see that
+the diagnostic interface doesn't exist.
 ---
- src/station.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ client/station.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index df7140c0..c108f0e9 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1217,11 +1217,21 @@ static void station_enter_state(struct station *sta=
-tion,
- 		l_dbus_property_changed(dbus,
- 				network_get_path(station->connected_network),
- 				IWD_NETWORK_INTERFACE, "Connected");
--		/* fall through */
-+
-+		periodic_scan_stop(station);
-+		break;
- 	case STATION_STATE_DISCONNECTED:
-+		l_dbus_object_remove_interface(dbus_get_bus(),
-+					netdev_get_path(station->netdev),
-+					IWD_STATION_DIAGNOSTIC_INTERFACE);
-+		periodic_scan_stop(station);
-+		break;
- 	case STATION_STATE_CONNECTED:
-+		l_dbus_object_add_interface(dbus,
-+					netdev_get_path(station->netdev),
-+					IWD_STATION_DIAGNOSTIC_INTERFACE,
-+					station);
- 		periodic_scan_stop(station);
+diff --git a/client/station.c b/client/station.c
+index 0bda604c..c2e7a12b 100644
+--- a/client/station.c
++++ b/client/station.c
+@@ -142,8 +142,7 @@ static void check_errors_method_callback(struct l_dbus_=
+message *message,
+ }
+ =
+
+ static void display_station(const char *device_name,
+-					const struct proxy_interface *proxy,
+-					bool *connected)
++					const struct proxy_interface *proxy)
+ {
+ 	const struct station *station =3D proxy_interface_get_data(proxy);
+ 	char *caption =3D l_strdup_printf("%s: %s", "Station", device_name);
+@@ -155,12 +154,13 @@ static void display_station(const char *device_name,
+ 		display("%s%*s  %-*s%-*s\n", MARGIN, 8, "", 20,
+ 				"Connected network", 47,
+ 				network_get_name(station->connected_network));
+-		*connected =3D true;
++		/*
++		 * If connected the diagnostic interface is presumably up so
++		 * don't add the table footer just yet.
++		 */
+ 		return;
+ 	}
+ =
+
+-	*connected =3D false;
 -
- 		break;
- 	case STATION_STATE_DISCONNECTING:
- 	case STATION_STATE_ROAMING:
-@@ -3411,9 +3421,6 @@ static struct station *station_create(struct netdev *=
-netdev)
+ 	display_table_footer();
+ }
  =
 
- 	l_dbus_object_add_interface(dbus, netdev_get_path(netdev),
- 					IWD_STATION_INTERFACE, station);
--	l_dbus_object_add_interface(dbus, netdev_get_path(netdev),
--					IWD_STATION_DIAGNOSTIC_INTERFACE,
--					station);
+@@ -623,20 +623,19 @@ static enum cmd_status cmd_show(const char *device_na=
+me,
+ 	const struct proxy_interface *diagnostic =3D
+ 					device_proxy_find(device_name,
+ 					IWD_STATION_DIAGNOSTIC_INTERFACE);
+-	bool connected;
  =
 
- 	if (netconfig_enabled)
- 		station->netconfig =3D netconfig_new(netdev_get_ifindex(netdev));
-@@ -3588,12 +3595,6 @@ static struct l_dbus_message *station_get_diagnostic=
-s(struct l_dbus *dbus,
- 	struct station *station =3D user_data;
- 	int ret;
+ 	if (!station) {
+ 		display("No station on device: '%s'\n", device_name);
+ 		return CMD_STATUS_INVALID_VALUE;
+ 	}
  =
 
--	/*
--	 * At this time all values depend on a connected state.
--	 */
--	if (station->state !=3D STATION_STATE_CONNECTED)
--		return dbus_error_not_connected(message);
--
- 	ret =3D netdev_get_current_station(station->netdev,
- 				station_get_diagnostic_cb, station,
- 				station_get_diagnostic_destroy);
+-	display_station(device_name, station, &connected);
++	display_station(device_name, station);
+ =
+
+ 	/*
+-	 * No need to query additional diagnostic information if not connected,
+-	 * or IWD has no diagnostic interface.
++	 * No need to query additional diagnostic information if IWD has
++	 * no diagnostic interface.
+ 	 */
+-	if (!connected || !diagnostic) {
++	if (!diagnostic) {
+ 		display_table_footer();
+ 		display_refresh_reset();
+ 		return CMD_STATUS_DONE;
 -- =
 
 2.26.2
 
---===============3266081565585759470==--
+--===============0506013862302194328==--
 
