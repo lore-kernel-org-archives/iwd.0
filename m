@@ -1,39 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============7661145429482373959=="
+Content-Type: multipart/mixed; boundary="===============1740750492854406303=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] client: add Frequency to station show
-Date: Wed, 03 Feb 2021 09:20:45 -0800
-Message-ID: <20210203172045.180677-3-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/3] doc: add Frequency to station diagnostics
+Date: Wed, 03 Feb 2021 12:55:22 -0600
+Message-ID: <85774af3-1f3c-d5c8-8e33-23b949d99e49@gmail.com>
 In-Reply-To: <20210203172045.180677-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7661145429482373959==
+--===============1740750492854406303==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- client/diagnostic.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi James,
 
-diff --git a/client/diagnostic.c b/client/diagnostic.c
-index 9d6b599d..c94178d6 100644
---- a/client/diagnostic.c
-+++ b/client/diagnostic.c
-@@ -87,6 +87,7 @@ static const struct diagnostic_dict_mapping diagnostic_ma=
-pping[] =3D {
- 	{ "RSSI", 'n', "dBm" },
- 	{ "RxMCS", 'y' },
- 	{ "TxMCS", 'y' },
-+	{ "Frequency", 'u' },
- 	{ NULL }
- };
- =
+On 2/3/21 11:20 AM, James Prestwood wrote:
+> ---
+>   doc/station-diagnostic-api.txt | 2 ++
+>   1 file changed, 2 insertions(+)
+> =
 
--- =
 
-2.26.2
+All applied, thanks.
 
---===============7661145429482373959==--
+Regards,
+-Denis
+
+--===============1740750492854406303==--
 
