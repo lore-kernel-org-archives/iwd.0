@@ -1,38 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============3476310918987658635=="
+Content-Type: multipart/mixed; boundary="===============1564083842900196463=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 1/4] ap: add Name property
-Date: Tue, 02 Feb 2021 15:55:30 -0600
-Message-ID: <095f8008-0262-40a9-daf5-dad13fb4076a@gmail.com>
-In-Reply-To: <20210201235217.46602-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] doc: add Frequency to station diagnostics
+Date: Wed, 03 Feb 2021 09:20:43 -0800
+Message-ID: <20210203172045.180677-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3476310918987658635==
+--===============1564083842900196463==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ doc/station-diagnostic-api.txt | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On 2/1/21 5:52 PM, James Prestwood wrote:
-> Its useful being able to refer to the network Name/SSID once
-> an AP is started. For example opening an iwctl session with an
-> already started AP provides no way of obtaining the SSID.
-> ---
->   src/ap.c | 24 ++++++++++++++++++++++++
->   1 file changed, 24 insertions(+)
-> =
+diff --git a/doc/station-diagnostic-api.txt b/doc/station-diagnostic-api.txt
+index 78f08ac1..af82229b 100644
+--- a/doc/station-diagnostic-api.txt
++++ b/doc/station-diagnostic-api.txt
+@@ -21,6 +21,8 @@ Methods		dict GetDiagnostics()
+ =
 
-> v2:
->   * changed 'SSID' to 'Name'
-> =
+ 			ConnectedBss - MAC address of currently connected BSS.
+ =
 
++			Frequency - Frequency of currently connected BSS.
++
+ 			RSSI [optional] - The RSSI of the currently connected BSS.
+ =
 
-All applied, thanks.
+ 			RxMode [optional] -	The phy technology being used
+-- =
 
-Regards,
--Denis
+2.26.2
 
---===============3476310918987658635==--
+--===============1564083842900196463==--
 
