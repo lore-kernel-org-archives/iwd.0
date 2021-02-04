@@ -1,61 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============3392865164284710197=="
+Content-Type: multipart/mixed; boundary="===============0740358379756361635=="
 MIME-Version: 1.0
-From: Mauro Condarelli <mc5686@mclink.it>
-Subject: [PATCH] Fix missing `#include "missing.h"`.
-Date: Thu, 04 Feb 2021 10:29:37 +0100
-Message-ID: <20210204092937.1726283-1-mc5686@mclink.it>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] Fix missing `#include "missing.h"`.
+Date: Thu, 04 Feb 2021 09:15:53 -0600
+Message-ID: <36c1ae16-ff42-76a1-e46d-d1633deefeb9@gmail.com>
+In-Reply-To: <20210204092937.1726283-1-mc5686@mclink.it>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3392865164284710197==
+--===============0740358379756361635==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If explicit_bzero() is not available (e.g.: with uClibc) build fails
-because of:
+Hi Mauro,
 
-ell/cert.c: In function =E2=80=98cert_key_from_pkcs8_encrypted_private_key_=
-info=E2=80=99:
-ell/cert.c:665:2: warning: implicit declaration of function =E2=80=98explic=
-it_bzero=E2=80=99 [-Wimplicit-function-declaration]
-  665 |  explicit_bzero(decrypted, data_len);
-      |  ^~~~~~~~~~~~~~
+Patches against ell should go to ell(a)lists.01.org.  But since this is suc=
+h a =
 
-in spite of correct detection:
+trivial one, I'll take care of it.
 
-checking for explicit_bzero... no
+On 2/4/21 3:29 AM, Mauro Condarelli wrote:
+> If explicit_bzero() is not available (e.g.: with uClibc) build fails
+> because of:
+> =
 
-and:
+> ell/cert.c: In function =E2=80=98cert_key_from_pkcs8_encrypted_private_ke=
+y_info=E2=80=99:
+> ell/cert.c:665:2: warning: implicit declaration of function =E2=80=98expl=
+icit_bzero=E2=80=99 [-Wimplicit-function-declaration]
+>    665 |  explicit_bzero(decrypted, data_len);
+>        |  ^~~~~~~~~~~~~~
+> =
 
-...
-/* Define to 1 if you have the `explicit_bzero' function. */
-/* #undef HAVE_EXPLICIT_BZERO */
-...
+> in spite of correct detection:
+> =
 
-Fix is adding `#include "missing.h"` as it is done in simila files.
+> checking for explicit_bzero... no
+> =
 
-Signed-off-by: Mauro Condarelli <mc5686@mclink.it>
----
- ell/cert.c | 1 +
- 1 file changed, 1 insertion(+)
+> and:
+> =
 
-diff --git a/ell/cert.c b/ell/cert.c
-index c26051f..b54c7b1 100644
---- a/ell/cert.c
-+++ b/ell/cert.c
-@@ -33,6 +33,7 @@
- #include "pem-private.h"
- #include "cert.h"
- #include "cert-private.h"
-+#include "missing.h"
- =
+> ...
+> /* Define to 1 if you have the `explicit_bzero' function. */
+> /* #undef HAVE_EXPLICIT_BZERO */
+> ...
+> =
 
- #define X509_CERTIFICATE_POS			0
- #define   X509_TBSCERTIFICATE_POS		  0
--- =
+> Fix is adding `#include "missing.h"` as it is done in simila files.
+> =
 
-2.25.1
+> Signed-off-by: Mauro Condarelli <mc5686@mclink.it>
 
---===============3392865164284710197==--
+We don't use the Signed-off-by tags in ell or iwd, so feel free to drop the=
+se.
+
+> ---
+>   ell/cert.c | 1 +
+>   1 file changed, 1 insertion(+)
+> =
+
+
+Applied with a slight tweak to the commit description.
+
+Regards,
+-Denis
+--===============0740358379756361635==--
 
