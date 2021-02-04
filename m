@@ -1,88 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============7503131939186961864=="
+Content-Type: multipart/mixed; boundary="===============4543977371142348211=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/3] station: move scan cancelation to
- __station_connect_network
-Date: Thu, 04 Feb 2021 15:03:17 -0800
-Message-ID: <20210204230319.237085-1-prestwoj@gmail.com>
+Subject: [PATCH 2/3] station: do not flush scan results
+Date: Thu, 04 Feb 2021 15:03:18 -0800
+Message-ID: <20210204230319.237085-2-prestwoj@gmail.com>
+In-Reply-To: <20210204230319.237085-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7503131939186961864==
+--===============4543977371142348211==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This handles connect-on-disconnect, as well as retrying other BSS's
-on failures rather than only explicit Connect() calls.
+This causes issuse with CMD_AUTHENTICATE based protocols as
+flushing removes the BSS's from the kernel which CMD_AUTHENTICATE
+cannot handle as CMD_CONNECT does.
 ---
- src/station.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+ src/station.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/station.c b/src/station.c
-index 8c1e97d6..06c4d75e 100644
+index 06c4d75e..1f59e270 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -2497,6 +2497,25 @@ int __station_connect_network(struct station *statio=
-n, struct network *network,
- 	struct handshake_state *hs;
- 	int r;
+@@ -1095,7 +1095,7 @@ static uint32_t station_scan_trigger(struct station *=
+station,
+ 	struct scan_parameters params;
  =
 
-+	/*
-+	 * If a hidden scan is not completed, station_is_busy would not
-+	 * indicate anything is going on so we need to cancel the scan and
-+	 * fail the connection now.
-+	 */
-+	if (station->hidden_network_scan_id) {
-+		scan_cancel(netdev_get_wdev_id(station->netdev),
-+				station->hidden_network_scan_id);
-+
-+		dbus_pending_reply(&station->hidden_pending,
-+				dbus_error_failed(station->hidden_pending));
-+	}
-+
-+	if (station->quick_scan_id) {
-+		scan_cancel(netdev_get_wdev_id(station->netdev),
-+				station->quick_scan_id);
-+		station->quick_scan_id =3D 0;
-+	}
-+
- 	hs =3D station_handshake_setup(station, network, bss);
- 	if (!hs)
- 		return -ENOTSUP;
-@@ -2576,25 +2595,6 @@ void station_connect_network(struct station *station=
-, struct network *network,
- 	struct l_dbus *dbus =3D dbus_get_bus();
- 	int err;
+ 	memset(&params, 0, sizeof(params));
+-	params.flush =3D true;
++	params.flush =3D false;
+ 	params.freqs =3D freqs;
  =
 
--	/*
--	 * If a hidden scan is not completed, station_is_busy would not
--	 * indicate anything is going on so we need to cancel the scan and
--	 * fail the connection now.
--	 */
--	if (station->hidden_network_scan_id) {
--		scan_cancel(netdev_get_wdev_id(station->netdev),
--				station->hidden_network_scan_id);
--
--		dbus_pending_reply(&station->hidden_pending,
--				dbus_error_failed(station->hidden_pending));
--	}
--
--	if (station->quick_scan_id) {
--		scan_cancel(netdev_get_wdev_id(station->netdev),
--				station->quick_scan_id);
--		station->quick_scan_id =3D 0;
--	}
--
- 	if (station_is_busy(station)) {
- 		station_disconnect_onconnect(station, network, bss, message);
- =
-
+ 	if (wiphy_can_randomize_mac_addr(station->wiphy) ||
 -- =
 
 2.26.2
 
---===============7503131939186961864==--
+--===============4543977371142348211==--
 
