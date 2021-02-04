@@ -1,43 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============4436982083645813501=="
+Content-Type: multipart/mixed; boundary="===============2835057518351403084=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] auto-t: testFT-PSK-roam wait for connected
-Date: Wed, 03 Feb 2021 13:00:58 -0800
-Message-ID: <20210203210058.188314-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] auto-t: testFT-PSK-roam wait for connected
+Date: Wed, 03 Feb 2021 20:06:31 -0600
+Message-ID: <7dc5d49d-9ff3-f02e-cc97-bb8f726c13fd@gmail.com>
+In-Reply-To: <20210203210058.188314-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4436982083645813501==
+--===============2835057518351403084==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Rather than assert its better to wait for a connected
-state.
----
- autotests/testFT-PSK-roam/connection_test.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/autotests/testFT-PSK-roam/connection_test.py b/autotests/testF=
-T-PSK-roam/connection_test.py
-index 8e69fcd5..a7acf495 100644
---- a/autotests/testFT-PSK-roam/connection_test.py
-+++ b/autotests/testFT-PSK-roam/connection_test.py
-@@ -90,7 +90,8 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state !=3D DeviceState.roaming'
-         wd.wait_for_object_condition(device, condition)
- =
+On 2/3/21 3:00 PM, James Prestwood wrote:
+> Rather than assert its better to wait for a connected
+> state.
+> ---
+>   autotests/testFT-PSK-roam/connection_test.py | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> =
 
--        self.assertEqual(device.state, iwd.DeviceState.connected)
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-         self.assertTrue(self.bss_hostapd[1].list_sta())
- =
 
-         testutil.test_iface_operstate(device.name)
--- =
+Applied, thanks.
 
-2.26.2
+Regards,
+-Denis
 
---===============4436982083645813501==--
+--===============2835057518351403084==--
 
