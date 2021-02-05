@@ -1,15 +1,15 @@
-Content-Type: multipart/mixed; boundary="===============0570765275539579041=="
+Content-Type: multipart/mixed; boundary="===============5018943039069503914=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/2] auto-t: fix wait_for_object_condition to work with any
+Subject: [PATCH v3 2/2] auto-t: fix wait_for_object_condition to work with any
  object
-Date: Thu, 04 Feb 2021 15:53:54 -0800
-Message-ID: <20210204235354.240547-2-prestwoj@gmail.com>
-In-Reply-To: <20210204235354.240547-1-prestwoj@gmail.com>
+Date: Thu, 04 Feb 2021 16:06:03 -0800
+Message-ID: <20210205000603.241826-2-prestwoj@gmail.com>
+In-Reply-To: <20210205000603.241826-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0570765275539579041==
+--===============5018943039069503914==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -68,5 +68,5 @@ index 4fa26517..6b153ea7 100755
 
 2.26.2
 
---===============0570765275539579041==--
+--===============5018943039069503914==--
 
