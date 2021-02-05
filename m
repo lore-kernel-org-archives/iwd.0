@@ -1,69 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============0227517207552646089=="
+Content-Type: multipart/mixed; boundary="===============6430611328400578093=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/3] auto-t: make spoof_frame more robust
-Date: Fri, 05 Feb 2021 10:09:10 -0800
-Message-ID: <20210205180911.320809-2-prestwoj@gmail.com>
+Subject: [PATCH 3/3] auto-t: fix SAQuery-spoofing test
+Date: Fri, 05 Feb 2021 10:09:11 -0800
+Message-ID: <20210205180911.320809-3-prestwoj@gmail.com>
 In-Reply-To: <20210205180911.320809-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0227517207552646089==
+--===============6430611328400578093==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Sometimes scan results can come in with a MAC address which
-should be in the first index of addrs[] (42:xx:xx:xx:xx:xx).
-This causes a failure to lookup the radio path.
+This test occationally failed due to a badly timed DBus scan
+triggering right when hwsim tried sending out the spoofed frame.
+This caused mac80211_hwsim to reject CMD_FRAME when the timing
+was just right.
 
-There was also a failure path added if the radio cannot be
-found rather than rely on DBus to fail with a None path.
-
-The arguments to SendFrame were also changed to use the
-ByteArray DBus type rather than python's internal bytearray.
-This shouldn't have any effect, but its more consistent with
-how DBus arguments should be used.
+Rather than always starting a DBus scan we can rely on periodic
+scans and only DBus scan if there are no networks in IWD's list.
+A scanning check was also added prior to sending out the frame
+and if true we wait for not scanning. This is more paranoia than
+anything.
 ---
- autotests/util/hwsim.py | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ .../testSAQuery-spoofing/connection_test.py      | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
-index 9aa14cbc..ad4bec1f 100755
---- a/autotests/util/hwsim.py
-+++ b/autotests/util/hwsim.py
-@@ -330,15 +330,19 @@ class Hwsim(iwd.AsyncOpAbstract):
-             obj =3D objects[path]
-             for interface in obj:
-                 if interface =3D=3D HWSIM_INTERFACE_INTERFACE:
--                    if obj[interface]['Address'] =3D=3D radio.addresses[0]:
-+                    if obj[interface]['Address'] =3D=3D radio.addresses[0]=
- or \
-+                                    obj[interface]['Address'] =3D=3D radio=
-.addresses[1]:
-                         radio_path =3D path
-                         break
+diff --git a/autotests/testSAQuery-spoofing/connection_test.py b/autotests/=
+testSAQuery-spoofing/connection_test.py
+index 7ad96d4f..a1e84de6 100644
+--- a/autotests/testSAQuery-spoofing/connection_test.py
++++ b/autotests/testSAQuery-spoofing/connection_test.py
+@@ -32,12 +32,7 @@ class Test(unittest.TestCase):
+         condition =3D 'not obj.scanning'
+         wd.wait_for_object_condition(device, condition)
  =
 
-+        if not radio_path:
-+            raise Exception("Could not find radio %s" % radio.path)
-+
-         iface =3D dbus.Interface(self._bus.get_object(HWSIM_SERVICE, radio=
-_path),
-                 HWSIM_INTERFACE_INTERFACE)
+-        device.scan()
+-
+-        condition =3D 'not obj.scanning'
+-        wd.wait_for_object_condition(device, condition)
+-
+-        ordered_network =3D device.get_ordered_network('ssidCCMP')
++        ordered_network =3D device.get_ordered_network('ssidCCMP', scan_if=
+_needed=3DTrue)
  =
 
--        iface.SendFrame(bytearray.fromhex(station.replace(':', '')),
--                        freq, -30, bytearray.fromhex(frame))
-+        iface.SendFrame(dbus.ByteArray.fromhex(station.replace(':', '')),
-+                        freq, -30, dbus.ByteArray.fromhex(frame))
+         self.assertEqual(ordered_network.type, NetworkType.psk)
  =
 
-     def get_radio(self, name):
-         for path in self.radios:
+@@ -49,9 +44,12 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+ =
+
+-        # TODO: for some reason hostapd does not respond to SA query if do=
+ne
+-        #       too soon after connection.
+-        sleep(1)
++        # Ensure IWD is not scanning. This causes problems with mac80211_h=
+wsim
++        # where CMD_FRAME will fail during a scan. This is due to the fram=
+e not
++        # having the same frequency as the radio (since hwsim is off-chann=
+el)
++        if device.scanning:
++            condition =3D 'not obj.scanning'
++            wd.wait_for_object_condition(device, condition)
+ =
+
+         # Spoof a disassociate frame. This will kick off SA Query procedur=
+e.
+         hwsim.spoof_disassociate(radio, hostapd.get_freq(), device.address)
 -- =
 
 2.26.2
 
---===============0227517207552646089==--
+--===============6430611328400578093==--
 
