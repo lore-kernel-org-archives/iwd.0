@@ -1,76 +1,77 @@
-Content-Type: multipart/mixed; boundary="===============7828630939676735305=="
+Content-Type: multipart/mixed; boundary="===============5816533944758392895=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 2/2] auto-t: update roaming tests with
- wait_for_object_change
-Date: Mon, 08 Feb 2021 08:54:20 -0800
-Message-ID: <efc65d1a14c860e3504a18a9e45690ee4bbbc21f.camel@gmail.com>
-In-Reply-To: <CAOq732KAxX9GfhVN8j0bVB1PTyeCxrpB8mfaCcsvvFQn3ZyoMQ@mail.gmail.com>
+Subject: [PATCH] test-runner: clean up dbus path file properly
+Date: Mon, 08 Feb 2021 09:53:59 -0800
+Message-ID: <20210208175359.573258-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7828630939676735305==
+--===============5816533944758392895==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2021-02-08 at 14:16 +0100, Andrew Zaborowski wrote:
-> On Sat, 6 Feb 2021 at 00:59, James Prestwood <prestwoj@gmail.com>
-> wrote:
-> > On Sat, 2021-02-06 at 00:50 +0100, Andrew Zaborowski wrote:
-> > > Hi James,
-> > > =
+Dbus should be started as a multi-test process from the
+TestContext, which leaves the dbus address file around for
+the full test run. For Namespaces dbus-daemon should be
+closed when the Namespace closes.
+---
+ tools/test-runner | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-> > > On Fri, 5 Feb 2021 at 20:06, James Prestwood <prestwoj@gmail.com>
-> > > wrote:
-> > > > Every single roaming test had one of two problems with watching
-> > > > the
-> > > > state change between roaming --> connected. Either the test
-> > > > used
-> > > > wait_for_object_condition to wait for 'connected' which could
-> > > > allow
-> > > > other states in between. Or it simply used an assert. The
-> > > > assert
-> > > > wouldn't allow other state changes, but at the cost of
-> > > > potentially
-> > > > failing due to IWD not having made it to the 'connected' state
-> > > > yet.
-> > > =
+diff --git a/tools/test-runner b/tools/test-runner
+index d50d3abd..965b0a57 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -474,6 +474,7 @@ class Namespace:
+ 	dbus_address =3D None
+ 	processes =3D []
+ 	radios =3D []
++	dbus_pid =3D None
+ =
 
-> > > Can you give an example of a sequence of states?  I can't see a
-> > > scenario where there would be a difference between the state
-> > > before
-> > > ce5e1e1933dbb11c503702ca0ee7a3d0f142ff4b and after this patch.
-> > =
+ 	def __init__(self, args, name, radios):
+ 		self.name =3D name
+@@ -484,7 +485,7 @@ class Namespace:
+ 		for r in radios:
+ 			Process(['iw', 'phy', r.name, 'set', 'netns', 'name', name], wait=3DTru=
+e)
+ =
 
-> > Commit ce5e1e1 was a mistake, although some FT tests already did
-> > this.
-> > As the comments state in most FT tests we want to make sure IWD
-> > doesnt
-> > fully disconnect e.g. because roaming failed. Using
-> > wait_for_object_condition allows any state in between so we don't
-> > want
-> > that, and a simple assert may not allow enough time for IWD to
-> > fully
-> > roam.
-> =
+-		self.start_dbus(multi_test=3DFalse)
++		self.dbus_pid =3D self.start_dbus(multi_test=3DFalse)
+ =
 
-> Can this really happen, since the assert follows a
-> wd.wait_for_object_condition(device, 'obj.state !=3D
-> DeviceState.roaming')?
+ 	def reset(self):
+ 		self.radios =3D []
+@@ -497,7 +498,8 @@ class Namespace:
+ 			print("Killing process %s" % p.name)
+ 			self.stop_process(p)
+ =
 
-Yeah your right. I'm not sure what I was seeing then with that assert
-failing. Probably another unrelated issue with the tests I guess. Well
-its merged now... I do think having this API is more explicit and cuts
-down slightly on the code. I think if I included a wait for the initial
-condition too we could also avoid waiting for 'connected' before which
-would make this connected->roaming check be a single API call.
+-		os.remove(self.dbus_address.split('=3D')[1])
++		if self.dbus_pid and not self.dbus_pid.multi_test:
++			os.remove(self.dbus_address.split('=3D')[1])
+ =
 
-Anyways, thanks for pointing that out.
+ 	def __del__(self):
+ 		print("Removing namespace %s" % self.name)
+@@ -1119,7 +1121,7 @@ def print_results(results):
+ def run_auto_tests(ctx, args):
+ 	tests =3D build_test_list(args)
+ =
 
-> =
+-	ctx.start_dbus()
++	ctx.start_dbus(multi_test=3DTrue)
+ 	ctx.start_haveged()
+ =
 
-> Best regards
+ 	# Copy autotests/misc/{certs,secrets,phonesim} so any test can refer to t=
+hem
+-- =
 
---===============7828630939676735305==--
+2.26.2
+
+--===============5816533944758392895==--
 
