@@ -1,33 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============7278950714725122461=="
+Content-Type: multipart/mixed; boundary="===============0048865919681346216=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2] adhoc: fix missing call to va_end
-Date: Mon, 08 Feb 2021 15:17:00 -0600
-Message-ID: <b5a3237a-5b59-d622-4c7e-f1e5c7649b80@gmail.com>
-In-Reply-To: <20210208210725.611632-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] eap: warn on too small of buffer
+Date: Mon, 08 Feb 2021 13:18:10 -0800
+Message-ID: <20210208211812.612391-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7278950714725122461==
+--===============0048865919681346216==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+In practice a caller will know the contents of their buffer,
+but just in case it would be nice to print a warning. This
+may not satisfy static analysis, but at least with this the
+developer will be informed what they are doing is wrong.
+---
+ src/eap.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 2/8/21 3:07 PM, James Prestwood wrote:
-> Since only one switch case uses this, va_start/end were just
-> moved into that case specifically.
-> ---
->   src/adhoc.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> =
+diff --git a/src/eap.c b/src/eap.c
+index dea0c3cf..39c950a2 100644
+--- a/src/eap.c
++++ b/src/eap.c
+@@ -167,6 +167,9 @@ static void eap_send_response(struct eap_state *eap, en=
+um eap_type type,
+ 	buf[4] =3D type;
+ =
 
+ 	if (type =3D=3D EAP_TYPE_EXPANDED) {
++		if (L_WARN_ON(len < 12))
++			return;
++
+ 		memcpy(buf + 5, eap->method->vendor_id, 3);
+ 		l_put_be32(eap->method->vendor_type, buf + 8);
+ 	}
+-- =
 
-Applied, thanks.
+2.26.2
 
-Regards,
--Denis
-
---===============7278950714725122461==--
+--===============0048865919681346216==--
 
