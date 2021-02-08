@@ -1,57 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============3161322531352435576=="
+Content-Type: multipart/mixed; boundary="===============7239638381073999133=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/5] ap: massage code to make static analysis happy
-Date: Mon, 08 Feb 2021 12:19:58 -0800
-Message-ID: <20210208201958.607049-5-prestwoj@gmail.com>
-In-Reply-To: <20210208201958.607049-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 3/5] adhoc: fix missing call to va_end
+Date: Mon, 08 Feb 2021 14:25:42 -0600
+Message-ID: <54f82db6-b574-0856-af7c-a209c7de7be9@gmail.com>
+In-Reply-To: <20210208201958.607049-3-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3161322531352435576==
+--===============7239638381073999133==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There is no functional change here but checking the return
-value makes static analysis much happier. Checking the
-return and setting the default inside the if clause is also
-consistent with how IWD does it many other places.
----
- src/ap.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Hi James,
 
-diff --git a/src/ap.c b/src/ap.c
-index 162b456b..407a2596 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -3305,7 +3305,7 @@ static void ap_netdev_watch(struct netdev *netdev,
- static int ap_init(void)
- {
- 	const struct l_settings *settings =3D iwd_get_config();
--	bool dhcp_enable =3D false;
-+	bool dhcp_enable;
- =
+On 2/8/21 2:19 PM, James Prestwood wrote:
+> ---
+>   src/adhoc.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> =
 
- 	netdev_watch =3D netdev_watch_add(ap_netdev_watch, NULL, NULL);
- =
+> diff --git a/src/adhoc.c b/src/adhoc.c
+> index 7f9ce765..1263d00a 100644
+> --- a/src/adhoc.c
+> +++ b/src/adhoc.c
+> @@ -228,6 +228,8 @@ static void adhoc_handshake_event(struct handshake_st=
+ate *hs,
+>   	default:
+>   		break;
+>   	}
+> +
+> +	va_end(args);
 
-@@ -3320,8 +3320,9 @@ static int ap_init(void)
- 	 * DHCP server. If no value is found or it is false do not create a
- 	 * DHCP server.
- 	 */
--	l_settings_get_bool(settings, "General", "EnableNetworkConfiguration",
--				&dhcp_enable);
-+	if (!l_settings_get_bool(settings, "General",
-+				"EnableNetworkConfiguration", &dhcp_enable))
-+		dhcp_enable =3D false;
- =
+I don't think this  is correct since there are multiple returns from this =
 
- 	if (dhcp_enable) {
- 		L_AUTO_FREE_VAR(char *, ip_prefix);
--- =
+function.  Perhaps the va_start should be moved to the error cases where it=
+ is used.
 
-2.26.2
+>   }
+>   =
 
---===============3161322531352435576==--
+>   static struct eapol_sm *adhoc_new_sm(struct sta_state *sta, bool authen=
+ticator,
+> =
+
+
+Regards,
+-Denis
+--===============7239638381073999133==--
 
