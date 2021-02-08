@@ -1,33 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============5938784625352853793=="
+Content-Type: multipart/mixed; boundary="===============6318770564834845632=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] diagnostics: check dbus variant parsing
-Date: Mon, 08 Feb 2021 13:56:42 -0600
-Message-ID: <a0e61371-f7a3-b812-e52d-ec630c4b14ee@gmail.com>
-In-Reply-To: <20210208195229.603430-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/5] display: use l_strlcpy to avoid potential overflow
+Date: Mon, 08 Feb 2021 12:19:54 -0800
+Message-ID: <20210208201958.607049-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5938784625352853793==
+--===============6318770564834845632==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+If 'entry' exceeds the length of 'line' we could overflow. Instead
+use l_strlcpy and pass in the remaining amount of data left in
+the buffer.
+---
+ client/display.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 2/8/21 1:52 PM, James Prestwood wrote:
-> If the diagnostics dictionary is invalid print an
-> error and do not continue parsing.
-> ---
->   client/diagnostic.c | 43 ++++++++++++++++++++++++++++++-------------
->   1 file changed, 30 insertions(+), 13 deletions(-)
-> =
+diff --git a/client/display.c b/client/display.c
+index 88bc913f..961ad419 100644
+--- a/client/display.c
++++ b/client/display.c
+@@ -419,7 +419,7 @@ static void display_completion_matches(char **matches, =
+int num_matches,
+ 		}
+ =
 
+ 		entry =3D l_strdup_printf("%-*s ", max_length, matches[index]);
+-		strcpy(&line[line_used], entry);
++		l_strlcpy(&line[line_used], entry, sizeof(line) - line_used);
+ 		l_free(entry);
+ =
 
-Applied, thanks.
+ 		line_used +=3D max_length + 1;
+-- =
 
-Regards,
--Denis
+2.26.2
 
---===============5938784625352853793==--
+--===============6318770564834845632==--
 
