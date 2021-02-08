@@ -1,34 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============3075654205231395846=="
+Content-Type: multipart/mixed; boundary="===============6014732146546864262=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/5] display: use l_strlcpy to avoid potential overflow
-Date: Mon, 08 Feb 2021 14:26:11 -0600
-Message-ID: <8ac30a3a-9c94-e99f-cfa4-c68763e3b435@gmail.com>
-In-Reply-To: <20210208201958.607049-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2] adhoc: fix missing call to va_end
+Date: Mon, 08 Feb 2021 13:07:25 -0800
+Message-ID: <20210208210725.611632-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3075654205231395846==
+--===============6014732146546864262==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Since only one switch case uses this, va_start/end were just
+moved into that case specifically.
+---
+ src/adhoc.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-On 2/8/21 2:19 PM, James Prestwood wrote:
-> If 'entry' exceeds the length of 'line' we could overflow. Instead
-> use l_strlcpy and pass in the remaining amount of data left in
-> the buffer.
-> ---
->   client/display.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+diff --git a/src/adhoc.c b/src/adhoc.c
+index 7f9ce765..506e596a 100644
+--- a/src/adhoc.c
++++ b/src/adhoc.c
+@@ -186,14 +186,15 @@ static void adhoc_handshake_event(struct handshake_st=
+ate *hs,
+ 	struct adhoc_state *adhoc =3D sta->adhoc;
+ 	va_list args;
+ =
 
+-	va_start(args, user_data);
+-
+ 	switch (event) {
+ 	case HANDSHAKE_EVENT_FAILED:
++		va_start(args, user_data);
++
+ 		l_error("handshake failed with STA "MAC" (%d)",
+ 						MAC_STR(sta->addr),
+ 						va_arg(args, int));
+ =
 
-Patches 1,2,4,5 applied, thanks.
++		va_end(args);
+ 		/*
+ 		 * eapol frees the state machines upon handshake failure. Since
+ 		 * this is only a failure on one of the handshakes we need to
+-- =
 
-Regards,
--Denis
+2.26.2
 
---===============3075654205231395846==--
+--===============6014732146546864262==--
 
