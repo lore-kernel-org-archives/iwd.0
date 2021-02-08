@@ -1,42 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============1147981786445609098=="
+Content-Type: multipart/mixed; boundary="===============8770905648682549424=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2] network: free psk on error
-Date: Mon, 08 Feb 2021 14:09:11 -0800
-Message-ID: <20210208220911.616583-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2] network: free psk on error
+Date: Mon, 08 Feb 2021 16:10:40 -0600
+Message-ID: <ca1f13cb-79ff-6b1b-297b-738e081ac368@gmail.com>
+In-Reply-To: <20210208220911.616583-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1147981786445609098==
+--===============8770905648682549424==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/network.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi James,
 
-v2:
- * Free psk in all cases as its never used past this point
+On 2/8/21 4:09 PM, James Prestwood wrote:
+> ---
+>   src/network.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> =
 
-diff --git a/src/network.c b/src/network.c
-index 7cae413f..5a8d93ee 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -399,6 +399,8 @@ static int network_load_psk(struct network *network, bo=
-ol need_passphrase)
- 			return 0;
- 		}
- =
+> v2:
+>   * Free psk in all cases as its never used past this point
+> =
 
-+		l_free(psk);
-+
- 		path =3D storage_get_network_file_path(security, ssid);
- 		l_error("%s: invalid PreSharedKey format", path);
- 		l_free(path);
--- =
 
-2.26.2
+Applied, thanks.
 
---===============1147981786445609098==--
+Regards,
+-Denis
+--===============8770905648682549424==--
 
