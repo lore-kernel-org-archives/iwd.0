@@ -1,33 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============0617851875961499760=="
+Content-Type: multipart/mixed; boundary="===============9057989233642015689=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] unit: test-sae: zero out frame buffers
-Date: Mon, 08 Feb 2021 16:25:48 -0600
-Message-ID: <99f6e054-e21c-ad94-127b-94971de86ff8@gmail.com>
-In-Reply-To: <20210208222314.618508-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] client: remove warning on mkdir return
+Date: Tue, 09 Feb 2021 12:29:41 -0800
+Message-ID: <20210209202941.755413-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0617851875961499760==
+--===============9057989233642015689==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This reverts a previous commit which breaks iwctl. The
+check was added to satisfy static analysis but it ended
+up preventing iwctl from starting. In this case mkdir
+can fail (e.g. if the directory already exists).
+---
+ client/display.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-On 2/8/21 4:23 PM, James Prestwood wrote:
-> Not all the authenticate frame elements are set and were assumed
-> to be zero. Since alloca does not memset data it needs to be
-> done explicitly.
-> ---
->   unit/test-sae.c | 1 +
->   1 file changed, 1 insertion(+)
-> =
+diff --git a/client/display.c b/client/display.c
+index 4b9ee8f0..961ad419 100644
+--- a/client/display.c
++++ b/client/display.c
+@@ -681,7 +681,6 @@ void display_init(void)
+ {
+ 	const char *data_home;
+ 	char *data_path;
+-	int ret;
+ =
 
+ 	display_refresh.redo_entries =3D l_queue_new();
+ =
 
-Applied, thanks.
+@@ -702,12 +701,7 @@ void display_init(void)
+ 	}
+ =
 
-Regards,
--Denis
---===============0617851875961499760==--
+ 	if (data_path) {
+-		ret =3D mkdir(data_path, 0700);
+-		/* Not much can be done since display isn't even initialized */
+-		if (L_WARN_ON(ret < 0)) {
+-			l_free(data_path);
+-			return;
+-		}
++		mkdir(data_path, 0700);
+ =
+
+ 		history_path =3D l_strdup_printf("%s/history", data_path);
+ 		read_history(history_path);
+-- =
+
+2.26.2
+
+--===============9057989233642015689==--
 
