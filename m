@@ -1,73 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============9183340768913823986=="
+Content-Type: multipart/mixed; boundary="===============0019063998045994873=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] src: configure systemd-resolved's MulticastDNS= setting
-Date: Thu, 11 Feb 2021 14:45:26 -0600
-Message-ID: <2ce451ab-0dd3-e386-391e-bc3afd8be9f8@gmail.com>
-In-Reply-To: <1f997b5df5730f363e52fde58d08c50bade87899.camel@gmail.com>
+Subject: Re: [PATCH v2] src: configure systemd-resolved's MulticastDNS= setting
+Date: Thu, 11 Feb 2021 14:48:37 -0600
+Message-ID: <518cc141-be71-f209-53cb-850c4caf7923@gmail.com>
+In-Reply-To: <20210211181141.HsvTv%ephemient@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============9183340768913823986==
+--===============0019063998045994873==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Daniel,
-
->> Is there a default?  If so, it should be in bold.  What happens if
->> this setting
->> is omitted?
-> =
-
-> If the setting is omitted, we don't touch the default value. Which
-
-Ok, so there's no default that iwd should pick.
-
-> appears to be false, but somebody could patch systemd-resolved to
-> change that, so I wasn't sure if that should be documented here. I'll
-> add that though.
-
-So instead we may want to mention that if this setting is omitted, the =
-
-systemd-networkd default is used.
-
->>> +	mdns =3D l_settings_get_string(active_settings, "Network",
->>> "MulticastDNS");
->>
->> This can return NULL if no MulticastDNS setting is found.  What
->> happens then?
-> =
-
-> Nothing happens, there's a null check in resolve_set_mdns().
+On 2/11/21 12:11 PM, Daniel Lin wrote:
+> When using iwd.conf:[General].EnableNetworkConfiguration=3Dtrue, it is not
+> possible to configure systemd.network:[Network].MulticastDNS=3D as
+> systemd-networkd considers the link to be unmanaged. This patch allows
+> iwd to configure that setting on systemd-resolved directly.
+> ---
+>   src/iwd.config.rst |  7 +++++
+>   src/netconfig.c    |  6 ++++
+>   src/resolve.c      | 70 ++++++++++++++++++++++++++++++----------------
+>   src/resolve.h      |  1 +
+>   4 files changed, 60 insertions(+), 24 deletions(-)
 > =
 
 
-k, makes sense.   I somehow missed that originally.
+LGTM, only nitpick is..
 
->>> @@ -40,6 +40,7 @@
->>>    struct resolve_ops {
->>>    	void (*set_dns)(struct resolve *resolve, char **dns_list);
->>>    	void (*set_domains)(struct resolve *resolve, char
->>> **domain_list);
->>> +	void (*set_mdns)(struct resolve *resolve, char *mdns);
->>
->> should probably be const char *mdns
-> =
+> diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+> index 0064dfd2..d430909a 100644
+> --- a/src/iwd.config.rst
+> +++ b/src/iwd.config.rst
+> @@ -212,6 +212,13 @@ The group ``[Network]`` contains network configurati=
+on related settings.
+>   =
 
-> OK. Shouldn't the nearby `char **` parameters be `const char *const *`
-> too, then?
-> =
+>          If not specified, ``300`` is used as default.
+>   =
 
+> +   * - MulticastDNS
+> +     - Values: true, **false**, resolve
 
-Possibly.  I think we resisted using the const variation since not many old=
- C =
+As discussed in the v1 reply, we should not indicate a default and mention =
+that =
 
-hacks like to use such syntax.  So we kept using 'char **'.
+this setting isn't set at all if omitted.
 
-For passing simple C-strings we like to be const-correct though.
+> +
+> +       Configures multicast DNS. See ``man 5 systemd.network`` for detai=
+ls.
+> +
+> +       Only applies when ``NameResolvingService=3Dsystemd``.
+> +
+>   Blacklist
+>   ---------
+>   =
+
 
 Regards,
 -Denis
---===============9183340768913823986==--
+
+--===============0019063998045994873==--
 
