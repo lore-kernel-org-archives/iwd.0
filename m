@@ -1,43 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============0635122793779154989=="
+Content-Type: multipart/mixed; boundary="===============0303886028114562274=="
 MIME-Version: 1.0
 From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Subject: [PATCH 4/4] doc: describe InitialPeriodicScanInterval setting
-Date: Fri, 12 Feb 2021 15:41:14 +0000
-Message-ID: <20210212154102.25255-4-alsi@bang-olufsen.dk>
-In-Reply-To: <20210212154102.25255-1-alsi@bang-olufsen.dk>
+Subject: [PATCH 1/4] scan: add MaximumPeriodicScanInterval setting
+Date: Fri, 12 Feb 2021 15:41:13 +0000
+Message-ID: <20210212154102.25255-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0635122793779154989==
+--===============0303886028114562274==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/iwd.config.rst | 5 +++++
- 1 file changed, 5 insertions(+)
+ src/scan.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index b5cfe9e7..478bd616 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -294,6 +294,11 @@ No modification from defaults is normally required.
-        disconnected.  The behavior of the user-initiated scans isn't affec=
-ted.
-        The periodic scan is enabled by default.
+diff --git a/src/scan.c b/src/scan.c
+index 3c28eb7d..a4469f0e 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -50,9 +50,12 @@
+ #include "src/mpdu.h"
+ #include "src/scan.h"
  =
 
-+   * - InitialPeriodicScanInterval
-+     - Values: unsigned int value in seconds (default: **10**)
+-#define SCAN_MAX_INTERVAL 320
+ #define SCAN_INIT_INTERVAL 10
+ =
+
++/* User configurable options */
++static double RANK_5G_FACTOR;
++static uint32_t SCAN_MAX_INTERVAL;
 +
-+       The initial periodic scan interval upon disconnect.
+ static struct l_queue *scan_contexts;
+ =
+
+ static struct l_genl_family *nl80211;
+@@ -1313,9 +1316,6 @@ static struct scan_bss *scan_parse_result(struct l_ge=
+nl_msg *msg,
+ 	return bss;
+ }
+ =
+
+-/* User configurable options */
+-static double RANK_5G_FACTOR;
+-
+ static void scan_bss_compute_rank(struct scan_bss *bss)
+ {
+ 	static const double RANK_RSNE_FACTOR =3D 1.2;
+@@ -2215,6 +2215,13 @@ static int scan_init(void)
+ 					&RANK_5G_FACTOR))
+ 		RANK_5G_FACTOR =3D 1.0;
+ =
+
++	if (!l_settings_get_uint(config, "Scan", "MaximumPeriodicScanInterval",
++					&SCAN_MAX_INTERVAL))
++		SCAN_MAX_INTERVAL =3D 300;
 +
-    * - MaximumPeriodicScanInterval
-      - Values: unsigned int value in seconds (default: **300**)
++	if (SCAN_MAX_INTERVAL > UINT16_MAX)
++		SCAN_MAX_INTERVAL =3D UINT16_MAX;
++
+ 	return 0;
+ }
  =
 
 -- =
 
 2.30.0
---===============0635122793779154989==--
+--===============0303886028114562274==--
 
