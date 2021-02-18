@@ -1,31 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============8685909815001013246=="
+Content-Type: multipart/mixed; boundary="===============1949012365560084438=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/2] ap: Drop an outdated TODO comment
-Date: Thu, 18 Feb 2021 14:00:47 -0600
-Message-ID: <8f9a8405-9fee-5941-bccc-268d0d6ce47c@gmail.com>
-In-Reply-To: <20210218195515.503170-2-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/7] test-runner: start dmesg process with start_process
+Date: Thu, 18 Feb 2021 12:19:27 -0800
+Message-ID: <20210218201933.1406654-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8685909815001013246==
+--===============1949012365560084438==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+This avoids the need to pass in the context explicitly.
+---
+ tools/test-runner | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 2/18/21 1:55 PM, Andrew Zaborowski wrote:
-> ---
->   src/ap.c | 5 -----
->   1 file changed, 5 deletions(-)
-> =
+diff --git a/tools/test-runner b/tools/test-runner
+index 965b0a57..70694e47 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -1178,7 +1178,7 @@ def run_auto_tests(ctx, args):
+ =
 
+ 	# Write out kernel log
+ 	if ctx.args.log:
+-		Process(["dmesg"], ctx=3Dctx, wait=3DTrue)
++		ctx.start_process(["dmesg"], wait=3DTrue)
+ =
 
-Applied, thanks.
+ def run_unit_tests(ctx, args):
+ 	os.chdir(args.testhome + '/unit')
+-- =
 
-Regards,
--Denis
+2.26.2
 
---===============8685909815001013246==--
+--===============1949012365560084438==--
 
