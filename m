@@ -1,56 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============6841566662399292953=="
+Content-Type: multipart/mixed; boundary="===============3341909793661560746=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/7] test-runner: add __str__ method to Process
-Date: Thu, 18 Feb 2021 12:19:32 -0800
-Message-ID: <20210218201933.1406654-6-prestwoj@gmail.com>
+Subject: [PATCH 7/7] test-runner: fix start_dbus and clean up config
+Date: Thu, 18 Feb 2021 12:19:33 -0800
+Message-ID: <20210218201933.1406654-7-prestwoj@gmail.com>
 In-Reply-To: <20210218201933.1406654-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6841566662399292953==
+--===============3341909793661560746==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Printing out processes was done manually but instead we can
-make Process printing extendable by adding its own __str__
-method. This now will print if the process is a multi-test
-process as well.
+start_dbus was not returning the Process class which was
+expected by the caller. This resulted in the config not
+being cleaned up.
 ---
- tools/test-runner | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tools/test-runner | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index f898ae1e..c9f624d4 100755
+index c9f624d4..662931b1 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -310,6 +310,11 @@ class Process:
- 			if waited > wait:
- 				raise Exception("Timed out waiting for socket")
+@@ -553,7 +553,7 @@ class Namespace:
+ 			self.stop_process(p)
  =
 
-+	def __str__(self):
-+		ret =3D str(self.args) + ' multi_test=3D%s' % str(self.multi_test)
-+		ret +=3D '\n'
-+		return ret
+ 		if self.dbus_pid and not self.dbus_pid.multi_test:
+-			os.remove(self.dbus_address.split('=3D')[1])
++			os.remove(self.dbus_cfg)
+ =
+
+ 	def __del__(self):
+ 		print("Removing namespace %s" % self.name)
+@@ -598,21 +598,23 @@ class Namespace:
+ 		global dbus_count
+ =
+
+ 		self.dbus_address =3D 'unix:path=3D/tmp/dbus%d' % dbus_count
+-		dbus_cfg =3D '/tmp/dbus%d.conf' % dbus_count
++		self.dbus_cfg =3D '/tmp/dbus%d.conf' % dbus_count
+ 		dbus_count +=3D 1
+ =
+
+-		with open(dbus_cfg, 'w+') as f:
++		with open(self.dbus_cfg, 'w+') as f:
+ 			f.write(dbus_config)
+ 			f.write('<listen>%s</listen>\n' % self.dbus_address)
+ 			f.write('</busconfig>\n')
+ =
+
+-		p =3D self.start_process(['dbus-daemon', '--config-file=3D%s' % dbus_cfg=
+],
++		p =3D self.start_process(['dbus-daemon', '--config-file=3D%s' % self.dbu=
+s_cfg],
+ 					wait=3DFalse, multi_test=3Dmulti_test)
+ =
+
+ 		p.wait_for_socket(self.dbus_address.split('=3D')[1], wait=3D5)
+ =
+
+ 		self._bus =3D dbus.bus.BusConnection(address_or_type=3Dself.dbus_address)
+ =
+
++		return p
 +
- class Interface:
- 	def __init__(self, name, config):
- 		self.name =3D name
-@@ -678,7 +683,7 @@ class Namespace:
- 		ret =3D 'Namespace: %s\n' % self.name
- 		ret +=3D 'Processes:\n'
- 		for p in self.processes:
--			ret +=3D '\t%s\n' % str(p.args)
-+			ret +=3D '\t%s' % str(p)
- =
-
- 		ret +=3D 'Radios:\n'
- 		if len(self.radios) > 0:
+ 	def start_iwd(self, config_dir =3D '/tmp', storage_dir =3D '/tmp/iwd'):
+ 		args =3D []
+ 		iwd_radios =3D ','.join([r.name for r in self.radios if r.use =3D=3D 'iw=
+d'])
 -- =
 
 2.26.2
 
---===============6841566662399292953==--
+--===============3341909793661560746==--
 
