@@ -1,66 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============5423716755806246391=="
+Content-Type: multipart/mixed; boundary="===============6841566662399292953=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/7] test-runner: use unique name for namespace output files
-Date: Thu, 18 Feb 2021 12:19:31 -0800
-Message-ID: <20210218201933.1406654-5-prestwoj@gmail.com>
+Subject: [PATCH 6/7] test-runner: add __str__ method to Process
+Date: Thu, 18 Feb 2021 12:19:32 -0800
+Message-ID: <20210218201933.1406654-6-prestwoj@gmail.com>
 In-Reply-To: <20210218201933.1406654-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5423716755806246391==
+--===============6841566662399292953==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Output files in namespaces were not handled differently and would
-end up overwriting/duplicating files from the root namespace. These
-are now named /tmp/<process>-<namespace>-out.
+Printing out processes was done manually but instead we can
+make Process printing extendable by adding its own __str__
+method. This now will print if the process is a multi-test
+process as well.
 ---
- tools/test-runner | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ tools/test-runner | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index 0649109b..f898ae1e 100755
+index f898ae1e..c9f624d4 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -172,6 +172,11 @@ class Process:
- 		self.write_fds =3D []
- 		self.io_watch =3D None
+@@ -310,6 +310,11 @@ class Process:
+ 			if waited > wait:
+ 				raise Exception("Timed out waiting for socket")
  =
 
-+		if not namespace:
-+			self.output_name =3D '/tmp/%s-out' % self.name
-+		else:
-+			self.output_name =3D '/tmp/%s-%s-out' % (self.name, namespace)
++	def __str__(self):
++		ret =3D str(self.args) + ' multi_test=3D%s' % str(self.multi_test)
++		ret +=3D '\n'
++		return ret
 +
- 		if namespace:
- 			self.args =3D ['ip', 'netns', 'exec', namespace]
- 			self.args.extend(args)
-@@ -181,7 +186,7 @@ class Process:
- 		# (/tmp/<name>-out). If any verbose options are required this file
- 		# will get an IO watch and write out any bytes to the needed FDs.
- 		#
--		self.stdout =3D open('/tmp/%s-out' % self.name, 'a+')
-+		self.stdout =3D open(self.output_name, 'a+')
- 		self.io_position =3D self.stdout.tell()
+ class Interface:
+ 	def __init__(self, name, config):
+ 		self.name =3D name
+@@ -678,7 +683,7 @@ class Namespace:
+ 		ret =3D 'Namespace: %s\n' % self.name
+ 		ret +=3D 'Processes:\n'
+ 		for p in self.processes:
+-			ret +=3D '\t%s\n' % str(p.args)
++			ret +=3D '\t%s' % str(p)
  =
 
- 		if ctx:
-@@ -285,6 +290,8 @@ class Process:
- 			for f in self.write_fds:
- 				f.close()
- =
-
-+		os.remove(self.output_name)
-+
- 	def kill(self, force=3DFalse):
- 		print("Killing process %s" % self.args)
- =
-
+ 		ret +=3D 'Radios:\n'
+ 		if len(self.radios) > 0:
 -- =
 
 2.26.2
 
---===============5423716755806246391==--
+--===============6841566662399292953==--
 
