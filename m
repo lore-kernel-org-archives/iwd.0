@@ -1,45 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============7471802659733337269=="
+Content-Type: multipart/mixed; boundary="===============7355631036440066070=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 03/17] auto-t: testutil.py: pass wait into ping
-Date: Thu, 25 Feb 2021 14:00:52 -0800
-Message-ID: <20210225220106.1728411-3-prestwoj@gmail.com>
+Subject: [PATCH 04/17] auto-t: testNetconfig stop dhcpd correctly
+Date: Thu, 25 Feb 2021 14:00:53 -0800
+Message-ID: <20210225220106.1728411-4-prestwoj@gmail.com>
 In-Reply-To: <20210225220106.1728411-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7471802659733337269==
+--===============7355631036440066070==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This will wait for the process and cleanup ping-out file
+Use stop_process instead of kill as this removes the process
+from the test context.
 ---
- autotests/util/testutil.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ autotests/testNetconfig/connection_test.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/util/testutil.py b/autotests/util/testutil.py
-index f50223b1..c649b387 100644
---- a/autotests/util/testutil.py
-+++ b/autotests/util/testutil.py
-@@ -164,7 +164,7 @@ def test_ip_connected(tup0, tup1):
-     ip1, ns1 =3D tup1
+diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNet=
+config/connection_test.py
+index caab090c..fad0e82b 100644
+--- a/autotests/testNetconfig/connection_test.py
++++ b/autotests/testNetconfig/connection_test.py
+@@ -70,8 +70,9 @@ class Test(unittest.TestCase):
+     @classmethod
+     def tearDownClass(cls):
+         IWD.clear_storage()
+-        cls.dhcpd_pid.kill()
+-        os.system('rm -rf /tmp/dhcpd.leases')
++        ctx.stop_process(cls.dhcpd_pid)
++        cls.dhcpd_pid =3D None
++        os.remove('/tmp/dhcpd.leases')
  =
 
-     try:
--        ns0.start_process(['ping', '-c', '5', '-i', '0.2', ip1], check=3DT=
-rue)
--        ns1.start_process(['ping', '-c', '5', '-i', '0.2', ip0], check=3DT=
-rue)
-+        ns0.start_process(['ping', '-c', '5', '-i', '0.2', ip1], wait=3DTr=
-ue, check=3DTrue)
-+        ns1.start_process(['ping', '-c', '5', '-i', '0.2', ip0], wait=3DTr=
-ue, check=3DTrue)
-     except:
-         raise Exception('Could not ping between %s and %s' % (ip0, ip1))
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
 -- =
 
 2.26.2
 
---===============7471802659733337269==--
+--===============7355631036440066070==--
 
