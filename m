@@ -1,134 +1,77 @@
-Content-Type: multipart/mixed; boundary="===============7033692939312247254=="
+Content-Type: multipart/mixed; boundary="===============7942471648089060028=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 13/17] test-runner: move process cleanup into kill()
-Date: Thu, 25 Feb 2021 14:01:02 -0800
-Message-ID: <20210225220106.1728411-13-prestwoj@gmail.com>
+Subject: [PATCH 14/17] test-runner: fix Namespace class ref problems
+Date: Thu, 25 Feb 2021 14:01:03 -0800
+Message-ID: <20210225220106.1728411-14-prestwoj@gmail.com>
 In-Reply-To: <20210225220106.1728411-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7033692939312247254==
+--===============7942471648089060028==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This moves all the de-init code into kill(), which fixes a few
-reference issues causing processes to hang around longer than
-desired. If the process terminates on its own and/or the last
-reference is lost __del__ will kill the process and clean up.
+The Namespace class was never being removed when tests finished.
+This is fixed by unreffing the hwsim internal _radio object which
+both cleans up the radio and allows the Namespace to be removed.
 ---
- tools/test-runner | 48 +++++++++++++++++++++++++++++++----------------
- 1 file changed, 32 insertions(+), 16 deletions(-)
+ tools/test-runner | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index 80bdae30..ae02578e 100755
+index ae02578e..19272774 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -161,6 +161,7 @@ class Process:
- 	'''
- 	def __init__(self, args, wait=3DFalse, env=3DNone, ctx=3DNone, check=3DFa=
-lse,
- 				outfile=3DNone, namespace=3DNone, need_out=3DFalse, cleanup=3DNone):
-+		self.killed =3D False
+@@ -565,11 +565,9 @@ class Hostapd:
+ dbus_count =3D 0
+ =
+
+ class Namespace:
+-	dbus_address =3D None
+-	processes =3D []
+-	radios =3D []
+-
+ 	def __init__(self, args, name, radios):
++		self.dbus_address =3D None
++		self.processes =3D []
+ 		self.name =3D name
+ 		self.radios =3D radios
  		self.args =3D args
- 		self.wait =3D wait
- 		self.name =3D args[0]
-@@ -238,6 +239,7 @@ class Process:
- 			return
+@@ -581,9 +579,13 @@ class Namespace:
+ 		self.start_dbus()
  =
 
- 		self.pid.wait()
-+		self.killed =3D True
+ 	def reset(self):
+-		self.radios =3D []
+ 		self._bus =3D None
  =
 
- 		self.stdout.seek(self.io_position)
- 		self.out =3D self.stdout.read()
-@@ -282,34 +284,49 @@ class Process:
++		for r in self.radios:
++			r._radio =3D None
++
++		self.radios =3D []
++
+ 		if self.name =3D=3D "root":
+ 			self._bus =3D dbus.bus.BusConnection(address_or_type=3Dself.dbus_addres=
+s)
+ =
+
+@@ -595,7 +597,6 @@ class Namespace:
  =
 
  	def __del__(self):
- 		print("Del process %s" % self.args)
--		self.stdout.close()
+ 		print("Removing namespace %s" % self.name)
+-		self.reset()
  =
 
--		if self.io_watch:
--			GLib.source_remove(self.io_watch)
-+		if not self.killed:
-+			self.kill()
+ 		Process(['ip', 'netns', 'del', self.name], wait=3DTrue)
  =
 
--		for f in self.write_fds:
--			f.close()
--
--		try:
--			os.remove(self.output_name)
--		except:
--			pass
--
--		if self.cleanup:
--			self.cleanup()
-+		os.remove(self.output_name)
- =
-
- 	def kill(self, force=3DFalse):
- 		print("Killing process %s" % self.args)
- =
-
-+		if self.killed:
-+			return
-+
- 		if force:
--			os.kill(self.pid.pid, signal.SIGKILL)
--		else:
- 			self.pid.kill()
-+		else:
-+			self.pid.terminate()
- =
-
- 		self.pid.wait(timeout=3D15)
- 		self.pid =3D None
-+
-+		if self.ctx and self in self.ctx.processes:
-+			self.ctx.processes.remove(self)
-+
-+		self.ctx =3D None
-+
-+		for f in self.write_fds:
-+			f.close()
-+
- 		self.write_fds =3D []
- =
-
-+		if self.io_watch:
-+			GLib.source_remove(self.io_watch)
-+			self.io_watch =3D None
-+
-+		if self.cleanup:
-+			self.cleanup()
-+
-+		self.cleanup =3D None
-+
-+		self.stdout.close()
-+
-+		self.killed =3D True
-+
- 	def wait_for_socket(self, socket, wait):
- 		waited =3D 0
- 		while not os.path.exists(socket):
-@@ -607,7 +624,6 @@ class Namespace:
- =
-
- 	def stop_process(self, p, force=3DFalse):
- 		p.kill(force)
--		self.processes.remove(p)
- =
-
- 	def is_process_running(self, process):
- 		for p in self.processes:
 -- =
 
 2.26.2
 
---===============7033692939312247254==--
+--===============7942471648089060028==--
 
