@@ -1,120 +1,113 @@
-Content-Type: multipart/mixed; boundary="===============5296952688605077982=="
+Content-Type: multipart/mixed; boundary="===============7474596802538814507=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: quick connect path may never update the frequency cache
-Date: Mon, 22 Feb 2021 14:17:08 -0600
-Message-ID: <97f06d73-6462-c52e-e812-27432bd89f50@gmail.com>
-In-Reply-To: <20210222195757.2871.25651@ml01.vlan13.01.org>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/7] ap: Don't use L_AUTO_FREE_VAR with l_settings
+Date: Thu, 25 Feb 2021 22:27:19 +0100
+Message-ID: <20210225212725.656746-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5296952688605077982==
+--===============7474596802538814507==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jolan,
+L_AUTO_FREE_VAR only causes l_free to be called on the variable that is
+freed and may leak the rest of the l_settings object's memory.
+---
+ src/ap.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-On 2/22/21 1:57 PM, iwd(a)jolan.org wrote:
-> Hi,
-> =
+diff --git a/src/ap.c b/src/ap.c
+index fd1a9a6b..f7b1cf9f 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -2544,8 +2544,8 @@ static int ap_load_profile_and_dhcp(struct ap_state *=
+ap, bool *wait_dhcp)
+ {
+ 	uint32_t ifindex =3D netdev_get_ifindex(ap->netdev);
+ 	char *passphrase;
+-	L_AUTO_FREE_VAR(struct l_settings *, settings) =3D NULL;
+-	int err;
++	struct l_settings *settings =3D NULL;
++	int err =3D -EINVAL;
+ =
 
-> I was deploying some new access points and reconfigured all the 5GHz chan=
-nels on the old access points to spread out the spectrum usage.  When I res=
-tarted my iwd-using computers, I noticed they all came up on 2.4GHz instead=
- of 5GHz. I quickly realized that this is because the quick path is reducin=
-g the scan to only the known frequencies in the cache.  I left iwd running =
-and figured it would eventually find the old APs on their new frequencies b=
-ut it never did.  Looking through the code, I see why this is.  The quick c=
-onnect/roam path will only do a full scan if it can't connect at all, so it=
- will happily stay associated at lower bandwidth indefinitely.
+ 	/* No profile or DHCP settings */
+ 	if (!ap->config->profile && !pool.used)
+@@ -2555,7 +2555,7 @@ static int ap_load_profile_and_dhcp(struct ap_state *=
+ap, bool *wait_dhcp)
+ 		settings =3D l_settings_new();
+ =
 
-Yes, you're correct.  iwd tries pretty hard not to scan, unless asked to, s=
-o we =
+ 		if (!l_settings_load_from_file(settings, ap->config->profile))
+-			return -EINVAL;
++			goto cleanup;
+ =
 
-can certainly end up in the situation you describe.  However, there are sev=
-eral =
+ 		passphrase =3D l_settings_get_string(settings, "Security",
+ 							"Passphrase");
+@@ -2564,7 +2564,7 @@ static int ap_load_profile_and_dhcp(struct ap_state *=
+ap, bool *wait_dhcp)
+ 				l_error("[Security].Passphrase must not exceed "
+ 						"63 characters");
+ 				l_free(passphrase);
+-				return -EINVAL;
++				goto cleanup;
+ 			}
+ =
 
-paths out of this condition which normally happen:
+ 			strcpy(ap->config->passphrase, passphrase);
+@@ -2573,7 +2573,8 @@ static int ap_load_profile_and_dhcp(struct ap_state *=
+ap, bool *wait_dhcp)
+ =
 
-- A user requests a full scan via D-Bus, which should update the cache.
-- A failed roam or quick scan that fails to find any candidates will trigge=
-r a =
+ 		if (!l_settings_has_group(settings, "IPv4")) {
+ 			*wait_dhcp =3D false;
+-			return 0;
++			err =3D 0;
++			goto cleanup;
+ 		}
+ 	}
+ =
 
-full frequency scan
-- If Neighbor Reports are supported, then any neighbor frequencies will als=
-o get =
+@@ -2587,21 +2588,22 @@ static int ap_load_profile_and_dhcp(struct ap_state=
+ *ap, bool *wait_dhcp)
+ =
 
-added.  iwd will ask for a neighbor report shortly after connecting.  APs c=
-an =
+ 		if (!ap->rtnl_add_cmd) {
+ 			l_error("Failed to add IPv4 address");
+-			return -EIO;
++			err =3D -EIO;
++			goto cleanup;
+ 		}
+ =
 
-also send these unsolicited.
-- If band steering is supported on the AP, AP can ask iwd to move to anothe=
-r =
+ 		ap->cleanup_ip =3D true;
+ =
 
-channel.
+ 		*wait_dhcp =3D true;
+-
+-		return 0;
++		err =3D 0;
+ 	/* Selected address already set, continue normally */
+ 	} else if (err =3D=3D -EALREADY) {
+ 		*wait_dhcp =3D false;
+-
+-		return 0;
++		err =3D 0;
+ 	}
+ =
 
-> =
++cleanup:
++	l_settings_free(settings);
+ 	return err;
+ }
+ =
 
-> I can think of some other situations where this behavior may not be desir=
-ed:
-> =
+-- =
 
-> - AP is using a DFS channel, AP detects radar and falls over to a non-DFS=
- channel
-> - a new frequency is deployed (Wi-FI 6E)
-> =
+2.27.0
 
-> I tried to find a quick, easy way to forcibly full scan and cache but the=
-re really wasn't good place to do so except on start up so I've resorted to=
- deleting the cache on boot-up until I've finalized WLAN configuration.
-
-Somewhat of a large hammer, but fair enough.
-
-> =
-
-> I haven't been following iwd development much until now so maybe this has=
- already been discussed. Perhaps the cache needs to be a little less naive =
-and take other factors into account like cache creation time, the BSS/frequ=
-ency of the last connection, or perhaps all BSS/frequencies so a quick scan=
- result could be checked to see how complete it is compared to the fully ca=
-ched BSS/frequency list and fall back to a full scan if the current network=
- topology varies greatly from the cached result.
-> =
-
-
-Agreed.  I definitely think there's room for improvement here.  The devil i=
-s in =
-
-the details though, so concrete proposals / ideas are definitely welcome.
-
-Do note that running a full scan would defeat the purpose of getting connec=
-ted =
-
-quickly, which is what quick_scan state does.  We value getting connected f=
-aster =
-
-over picking the 'optimal' bss in hopes that the network will steer us to t=
-he =
-
-right AP if iwd's initial choice is wrong.  Admittedly, many networks aren'=
-t =
-
-that smart yet.
-
-One thing we could explore is to be more aggressive in roaming if new BSSes=
- in =
-
-the ESS are detected.  Right now we are conservative and only do this if th=
-e =
-
-signal is getting low.
-
-> Thank you for your work on iwd and your time/consideration,
-> =
-
-
-Regards,
--Denis
---===============5296952688605077982==--
+--===============7474596802538814507==--
 
