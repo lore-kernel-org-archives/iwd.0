@@ -1,66 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============7869628278963465649=="
+Content-Type: multipart/mixed; boundary="===============3975792963771485343=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 10/17] test-runner: add better Hostapd cleanup
-Date: Thu, 25 Feb 2021 14:00:59 -0800
-Message-ID: <20210225220106.1728411-10-prestwoj@gmail.com>
+Subject: [PATCH 11/17] test-runner: use cleanup() for start_dbus
+Date: Thu, 25 Feb 2021 14:01:00 -0800
+Message-ID: <20210225220106.1728411-11-prestwoj@gmail.com>
 In-Reply-To: <20210225220106.1728411-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7869628278963465649==
+--===============3975792963771485343==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There were a few issues with the cleanup of Hostapd. First the
-process was only being killed, which did not actually remove
-the process from the list.
-
-In addition, with EAP-SIM/AKA tests, hostapd created sim_db
-unix socket files which it does not clean up.
+Use a cleanup routine to remove the dbus_address/dbus_cfg files
 ---
- tools/test-runner | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ tools/test-runner | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index 62c4bd75..f6d7784d 100755
+index f6d7784d..fccb6233 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -449,6 +449,8 @@ class Hostapd:
- 		process since hostapd can be started with multiple config files.
- 	'''
- 	def __init__(self, ctx, radios, configs, radius):
-+		self.ctx =3D ctx
-+
- 		if len(configs) !=3D len(radios):
- 			raise Exception("Config (%d) and radio (%d) list length not equal" % \
- 						(len(configs), len(radios)))
-@@ -531,7 +533,17 @@ class Hostapd:
- 			dbg("Failed to remove %s" % self.global_ctrl_iface)
+@@ -615,7 +615,15 @@ class Namespace:
+ 				return True
+ 		return False
  =
 
- 		self.instances =3D None
--		self.process.kill()
+-	def start_dbus(self, multi_test=3DTrue):
++	def _cleanup_dbus(self):
++		try:
++			os.remove(self.dbus_address.split('=3D')[1])
++		except:
++			pass
 +
-+		# Hostapd may have already been stopped
-+		if self.process:
-+			self.ctx.stop_process(self.process)
++		os.remove(self.dbus_cfg)
 +
-+		self.ctx =3D None
-+
-+		# Hostapd creates simdb sockets for EAP-SIM/AKA tests but does not
-+		# clean them up.
-+		for f in glob("/tmp/eap_sim_db*"):
-+			os.remove(f)
++	def start_dbus(self):
+ 		global dbus_count
  =
 
- dbus_count =3D 0
+ 		self.dbus_address =3D 'unix:path=3D/tmp/dbus%d' % dbus_count
+@@ -628,7 +636,7 @@ class Namespace:
+ 			f.write('</busconfig>\n')
+ =
+
+ 		p =3D self.start_process(['dbus-daemon', '--config-file=3D%s' % self.dbu=
+s_cfg],
+-					wait=3DFalse)
++					wait=3DFalse, cleanup=3Dself._cleanup_dbus)
+ =
+
+ 		p.wait_for_socket(self.dbus_address.split('=3D')[1], wait=3D5)
  =
 
 -- =
 
 2.26.2
 
---===============7869628278963465649==--
+--===============3975792963771485343==--
 
