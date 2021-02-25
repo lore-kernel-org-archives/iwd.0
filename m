@@ -1,50 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============4003276903308754402=="
+Content-Type: multipart/mixed; boundary="===============7869628278963465649=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 09/17] test-runner: allow radio remove failure
-Date: Thu, 25 Feb 2021 14:00:58 -0800
-Message-ID: <20210225220106.1728411-9-prestwoj@gmail.com>
+Subject: [PATCH 10/17] test-runner: add better Hostapd cleanup
+Date: Thu, 25 Feb 2021 14:00:59 -0800
+Message-ID: <20210225220106.1728411-10-prestwoj@gmail.com>
 In-Reply-To: <20210225220106.1728411-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4003276903308754402==
+--===============7869628278963465649==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is somewhat of an open issue/TODO but for now this avoids
-the exception caused by trying to remove a radio that has been
-moved to a namespace. Once a radio is moved hwsim loses that phy
-and can no longer interact with it. This causes the Destroy()
-method call to fail.
+There were a few issues with the cleanup of Hostapd. First the
+process was only being killed, which did not actually remove
+the process from the list.
+
+In addition, with EAP-SIM/AKA tests, hostapd created sim_db
+unix socket files which it does not clean up.
 ---
- tools/test-runner | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tools/test-runner | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index 2fb7a613..62c4bd75 100755
+index 62c4bd75..f6d7784d 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -395,7 +395,12 @@ class VirtualRadio(Radio):
- 	def __del__(self):
- 		super().__del__()
- =
-
--		self._radio.remove()
-+		# If the radio was moved into a namespace this will fail
-+		try:
-+			self._radio.remove()
-+		except:
-+			pass
+@@ -449,6 +449,8 @@ class Hostapd:
+ 		process since hostapd can be started with multiple config files.
+ 	'''
+ 	def __init__(self, ctx, radios, configs, radius):
++		self.ctx =3D ctx
 +
- 		self._radio =3D None
+ 		if len(configs) !=3D len(radios):
+ 			raise Exception("Config (%d) and radio (%d) list length not equal" % \
+ 						(len(configs), len(radios)))
+@@ -531,7 +533,17 @@ class Hostapd:
+ 			dbg("Failed to remove %s" % self.global_ctrl_iface)
  =
 
- 	def __str__(self):
+ 		self.instances =3D None
+-		self.process.kill()
++
++		# Hostapd may have already been stopped
++		if self.process:
++			self.ctx.stop_process(self.process)
++
++		self.ctx =3D None
++
++		# Hostapd creates simdb sockets for EAP-SIM/AKA tests but does not
++		# clean them up.
++		for f in glob("/tmp/eap_sim_db*"):
++			os.remove(f)
+ =
+
+ dbus_count =3D 0
+ =
+
 -- =
 
 2.26.2
 
---===============4003276903308754402==--
+--===============7869628278963465649==--
 
