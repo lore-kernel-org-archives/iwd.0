@@ -1,43 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============7837224176892448913=="
+Content-Type: multipart/mixed; boundary="===============2566322557733639763=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 17/17] test-runner: stop/warn on processes running after test
-Date: Thu, 25 Feb 2021 14:01:06 -0800
-Message-ID: <20210225220106.1728411-17-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 01/17] auto-t: testEAD: stop ead when test finishes
+Date: Fri, 26 Feb 2021 10:10:20 -0600
+Message-ID: <270e3f12-eae4-9ba5-7d32-74f1a0802916@gmail.com>
 In-Reply-To: <20210225220106.1728411-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7837224176892448913==
+--===============2566322557733639763==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This gives the dev some inidication their test did not clean up
-correctly and running processes remain.
----
- tools/test-runner | 4 ++++
- 1 file changed, 4 insertions(+)
+Hi James,
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 7c1498d0..eab0f0ab 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -56,6 +56,10 @@ def exit_vm():
- 	if config:
- 		for p in config.ctx.processes:
- 			print("Process %s still running!" % p.name)
-+			p.kill()
-+			p =3D None
-+
-+		config.ctx.processes =3D []
- =
+On 2/25/21 4:00 PM, James Prestwood wrote:
+> ---
+>   autotests/testEAD/connection_test.py | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
 
- 	if config.ctx and config.ctx.results:
- 		print_results(config.ctx.results)
--- =
+All applied, thanks.
 
-2.26.2
+Regards,
+-Denis
 
---===============7837224176892448913==--
+--===============2566322557733639763==--
 
