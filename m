@@ -1,61 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============1081774504745843016=="
+Content-Type: multipart/mixed; boundary="===============4687622207742607065=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 5/7] ap: Refactor IP address selection
-Date: Fri, 26 Feb 2021 15:31:25 -0600
-Message-ID: <277c64ec-936f-ad70-61f4-43b14c40365d@gmail.com>
-In-Reply-To: <CAOq732KTCr49vNTF+yDrRF5gt17VNDjZS37DUn8mZuC5gs6-bQ@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] test-runner: fix duplicate process output
+Date: Mon, 01 Mar 2021 15:41:33 -0800
+Message-ID: <20210301234133.1966359-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1081774504745843016==
+--===============4687622207742607065==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Process output was being duplicated when -v was used. This was
+due to both stderr and stdout being appended to the write_fd list
+as well as stderr being set to stdout in the Popen call.
 
->>>>
->>>> Also, have you tested what happens to the old address/netmask?  What s=
-hould happen?
->>>
->>> We should be overwriting it (we use NLM_F_CREATE | NLM_F_REPLACE) but
->>> that doesn't seem to be happening, I confirmed this in test-runner
->>> now.  This patch is not changing that part of the code though, I'll
->>> try to debug this separately.
->>
->> Existing logic fails / doesn't do dhcp if we have an address set though,=
- but
->> fair enough.
-> =
+To fix this only stdout should be appended to the write_fd list,
+but then there comes a problem with closing the streams. stdout
+cannot be closed, so instead it is special cased. A new
+verbose boolean was added to Process which, if True, will
+cause any output to be written to stdout explicitly.
+---
+ tools/test-runner | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-> I believe existing logic takes the address from the interface and uses
-> that for DHCP (this is documented to have lower priority than
-> [IPv4].Address in the profile but higher than [General].APRanges) so
-> I'm just keeping that logic.
+diff --git a/tools/test-runner b/tools/test-runner
+index eab0f0ab..6e8966f4 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -174,6 +174,7 @@ class Process:
+ 		self.write_fds =3D []
+ 		self.io_watch =3D None
+ 		self.cleanup =3D cleanup
++		self.verbose =3D False
+ =
 
-Ah yes, you're correct.  My bad.
+ 		if not namespace:
+ 			self.output_name =3D '/tmp/%s-out' % self.name
+@@ -195,8 +196,7 @@ class Process:
+ 		if ctx:
+ 			# Verbose requested, add stdout/stderr to write FD list
+ 			if self.name in ctx.args.verbose:
+-				self.write_fds.append(sys.__stdout__)
+-				self.write_fds.append(sys.__stderr__)
++				self.verbose =3D True
+ =
 
-> =
+ 			# Add output file to FD list
+ 			if outfile:
+@@ -234,7 +234,7 @@ class Process:
+ 				self.io_watch =3D GLib.io_add_watch(self.stdout, GLib.IO_IN,
+ 								self.io_callback)
+ =
 
-> I've been looking at this for a moment now and it seems if we're
-> setting the addresses using RTNL we have to query all existing
-> addresses and remove them one by one, there's no "flush" or "replace"
+-		self.pid =3D subprocess.Popen(self.args, stdout=3Dself.stdout, stderr=3D=
+subprocess.STDOUT,
++		self.pid =3D subprocess.Popen(self.args, stdout=3Dself.stdout, stderr=3D=
+self.stdout,
+ 						env=3Denv, cwd=3Dos.getcwd())
+ =
 
-In theory there is the NLM_F_REPLACE flag.  Haven't played with it.
+ 		print("Starting process {}".format(self.pid.args))
+@@ -261,6 +261,9 @@ class Process:
+ =
 
-> message type, only "new" and "del".  However we could use the
-> SIOCSIFADDR ioctl same as we're using SIOCGIFADDR for querying the IP
-> now.
-> =
+ 			self.write_fds =3D []
+ =
 
++		if self.verbose:
++			sys.__stdout__.write(self.out)
++
+ 		print("%s returned %d" % (args[0], self.ret))
+ 		if check and self.ret !=3D 0:
+ 			raise subprocess.CalledProcessError(returncode=3Dself.ret, cmd=3Dself.a=
+rgs)
+@@ -284,6 +287,9 @@ class Process:
+ 		for f in self.write_fds:
+ 			f.write(data)
+ =
 
-The ioctl is a little limiting.  I suppose for our purposes it would work, =
-but =
++		if self.verbose:
++			sys.__stdout__.write(self.out)
++
+ 		return True
+ =
 
-I'd rather use l_rtnl*.
+ 	def __del__(self):
+-- =
 
-Regards,
--Denis
---===============1081774504745843016==--
+2.26.2
+
+--===============4687622207742607065==--
 
