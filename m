@@ -1,80 +1,279 @@
-Content-Type: multipart/mixed; boundary="===============8149595904462789587=="
+Content-Type: multipart/mixed; boundary="===============7757728780665593623=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 4/5] autotests: Update APRanges usage in testAP
-Date: Tue, 02 Mar 2021 13:08:12 +0100
-Message-ID: <20210302120813.757731-4-andrew.zaborowski@intel.com>
+Subject: [PATCH 5/5] doc: Update AP settings in iwd.ap and iwd.config(5)
+Date: Tue, 02 Mar 2021 13:08:13 +0100
+Message-ID: <20210302120813.757731-5-andrew.zaborowski@intel.com>
 In-Reply-To: <20210302120813.757731-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8149595904462789587==
+--===============7757728780665593623==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-[General].APRange is now [IPv4].APAddressPool and the netmask is changed
-from 23 to 27 bits to make the test correctly assert that only two
-default-sized subnets are allowed by IWD simultaneously (default has
-changed from 24 to 28 bits)
+Update the AP-mode address logic documentation, change some of the
+wording and add some references.
 ---
- autotests/testAP/dhcp/main.conf |  4 +++-
- autotests/testAP/dhcp_test.py   | 12 +++++++++---
- 2 files changed, 12 insertions(+), 4 deletions(-)
+ src/iwd.ap.rst     | 69 +++++++++++++++++++++++++++++-----------------
+ src/iwd.config.rst | 31 +++++++++++++--------
+ 2 files changed, 63 insertions(+), 37 deletions(-)
 
-diff --git a/autotests/testAP/dhcp/main.conf b/autotests/testAP/dhcp/main.c=
-onf
-index 667de23c..62ae782d 100644
---- a/autotests/testAP/dhcp/main.conf
-+++ b/autotests/testAP/dhcp/main.conf
-@@ -3,4 +3,6 @@ DisableMacAddressRandomization=3Dtrue
+diff --git a/src/iwd.ap.rst b/src/iwd.ap.rst
+index 52312855..e2ec01e6 100644
+--- a/src/iwd.ap.rst
++++ b/src/iwd.ap.rst
+@@ -3,7 +3,7 @@
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
  =
 
- [General]
- EnableNetworkConfiguration=3Dtrue
--APRanges=3D192.168.80.0/23
+ --------------------------------------
+-Configuration of IWD access point
++Configuration of IWD access points
+ --------------------------------------
+ =
+
+ :Author: James Prestwood <prestwoj@gmail.com>
+@@ -25,19 +25,21 @@ Description of access point provisioning files.
+ DESCRIPTION
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ =
+
+-An access point provisioning files define the configuration of an IWD acce=
+ss
++An access point provisioning file defines the configuration of an IWD acce=
+ss
+ point. These files live in *$STATE_DIRECTORY*/ap (/var/lib/iwd/ap by defau=
+lt).
++They are read when the `net.connman.iwd.AccessPoint.StartProfile(ssid)` DB=
+us
++method is used.
+ =
+
+ FILE FORMAT
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ =
+
+-See *iwd.network* for details on the file format.
++See *iwd.network* for details on the settings file syntax.
+ =
+
+ SETTINGS
+ =3D=3D=3D=3D=3D=3D=3D=3D
+ =
+
+ The settings are split into several categories.  Each category has a group
+-associated with it and described in separate tables below.
++associated with it and is described in the corresponding table below.
+ =
+
+ Network Authentication Settings
+ -------------------------------
+@@ -54,13 +56,15 @@ configuration.
+    * - Passphrase
+      - 8..63 character string
+ =
+
+-       Passphrase to be used with this access point.
++       WPA PSK Passphrase to be used with this access point.
+ =
+
+-DHCP Server Settings
+---------------------
++IPv4 Network Configuration
++--------------------------
+ =
+
+-The group ``[IPv4]`` contains settings for IWD's built in DHCP server. All
+-settings are optional.
++The group ``[IPv4]`` contains settings for IWD's built-in DHCP server. All
++settings are optional.  They're used if network configuration was enabled =
+as
++described in ``iwd.config(5)``.  Omitting the ``[IPv4]`` group disables
++network configuration and the DHCP server for this access point.
+ =
+
+ .. list-table::
+    :header-rows: 0
+@@ -68,41 +72,56 @@ settings are optional.
+    :widths: 20 80
+ =
+
+    * - Address
+-     - IP Address of AP
+-
+-       Optional address for the DHCP server/access point. If provided this
+-       address will be set on the AP interface and any other DHCP server o=
+ptions
+-       will be derived from this address, unless they are overriden inside=
+ the
+-       AP profile. If [IPv4].Address is not provided and no IP address is =
+set
+-       on the interface prior to calling StartProfile the IP pool will be =
+used.
++     - Local IP address or a comma-separated list of prefix-notation addre=
+sses
 +
-+[IPv4]
-+APAddressPool=3D192.168.80.0/27
-diff --git a/autotests/testAP/dhcp_test.py b/autotests/testAP/dhcp_test.py
-index bf52fb28..e69c4465 100644
---- a/autotests/testAP/dhcp_test.py
-+++ b/autotests/testAP/dhcp_test.py
-@@ -58,8 +58,14 @@ class Test(unittest.TestCase):
-             testutil.test_iface_operstate(dev2.name)
-             testutil.test_ifaces_connected(dev1.name, dev2.name, group=3DF=
-alse)
++       Optional local address pool for the access point and the DHCP serve=
+r.
++       If a single address is provided this address will be set on the AP
++       interface and any other DHCP server options will be derived from it,
++       unless they are overriden by other settings.  If a list of addresse=
+s and
++       prefix lengths is given (in the `<IP>/<prefix-len>` format), a sing=
+le
++       subnet address will be selected from the available space each time =
+this
++       profile is started.  The subnet size will still be based on the
++       ``[IPv4].Netmask`` setting.  If ``[IPv4].Address`` is not provided =
+and
++       no IP address is set on the interface prior to calling `StartProfil=
+e`
++       the value of the main.conf ``[IPv4].APAddressPool`` setting will be
++       inherited, which in turn defaults to 192.168.0.0/16.
++
++       For example, if ``[IPv4].Netmask`` is set the 255.255.255.0 and this
++       setting, or the global ``APAddressPool`` fallback, is set to
++       ``192.168.0.0/16, 10.0.0.0/22``, IWD will select one of the 256 sub=
+nets
++       with addresses in the 192.168.<0-255>.0/24 range or one of the 4 su=
+bnets
++       with addresses in the 10.0.<0-3>.0/24 range, allowing 270 possible
++       subnets.  Defining an address pool larger than the subnet may be
++       desired if other interfaces on the system use dynamically assigned
++       addresses giving IWD a chance to avoid conflicts.
  =
 
--            testutil.test_ip_address_match(dev1.name, "192.168.80.1")
--            testutil.test_ip_address_match(dev2.name, "192.168.80.2")
-+            try:
-+                testutil.test_ip_address_match(dev1.name, "192.168.80.1")
-+                testutil.test_ip_address_match(dev2.name, "192.168.80.2")
-+                ip =3D "192.168.80.1"
-+            except:
-+                testutil.test_ip_address_match(dev1.name, "192.168.80.17")
-+                testutil.test_ip_address_match(dev2.name, "192.168.80.18")
-+                ip =3D "192.168.80.17"
+    * - Gateway
+      - IP Address of gateway
  =
 
-             wd.unregister_psk_agent(psk_agent)
+-       IP address of gateway. This will inherit from [IPv4].Address if not
+-       provided.
++       IP address of the gateway to be advertised by DHCP. This will fall =
+back
++       to the local IP address if not provided.
  =
 
-@@ -76,7 +82,7 @@ class Test(unittest.TestCase):
-             # got initially.
-             dev4.start_ap('TestAP4', 'Password4')
+    * - Netmask
+-     - Netmask of DHCP server
++     - Local netmask of the AP
  =
 
--            testutil.test_ip_address_match(dev4.name, "192.168.80.1")
-+            testutil.test_ip_address_match(dev4.name, ip)
+-       This will be generated from [IPv4].Address if not provided.
++       Defaults to a 28-bit netmask if not provided.
  =
 
-         finally:
-             dev1.stop_ap()
+    * - DNSList
+-     - List of DNS servers
++     - List of DNS servers as a comma-separated IP address list
+ =
+
+        A list of DNS servers which will be advertised by the DHCP server. =
+If
+        not provided no DNS servers will be sent by the DHCP server.
+ =
+
+    * - LeaseTime
+-     - Time limit for DHCP leases
++     - Time limit for DHCP leases in seconds
+ =
+
+        Override the default lease time.
+ =
+
+    * - IPRange
+-     - Range of IPs to use for the DHCP server
++     - Range of IPs given as two addresses separated by a comma
+ =
+
+-       If not provided a default range will be chosen which is the DHCP se=
+rver
+-       address + 1 to 254.
++       From and to addresses of the range assigned to clients through DHCP.
++       If not provided the range from local address + 1 to .254 will be us=
+ed.
+ =
+
+ SEE ALSO
+ =3D=3D=3D=3D=3D=3D=3D=3D
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 478bd616..e3dc2827 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -67,23 +67,13 @@ The group ``[General]`` contains general settings.
+        obtain the dynamic addresses from the network through the built-in
+        DHCP client.
+ =
+
+-       This also enables DHCP server when in AP mode when either
+-       [General].APRanges is set or an AP profile is being used.
++       This also enables network configuration and the DHCP server when in=
+ AP
++       mode and the AP profile being activated does does not override it.
+ =
+
+        The network configuration feature is disabled by default.  See
+        ``[Network]`` settings for additional settings related to network
+        configuration.
+ =
+
+-   * - APRanges
+-     - Values: <IP in prefix notation>
+-
+-       Sets the range of IP's used for DHCP server (AP mode). The IP shoul=
+d be
+-       in prefix notation e.g. 192.168.1.0/24. AP's which are started in a
+-       profile-less configuration will use this pool of IP's to set the AP=
+'s
+-       interface address as well as default DHCP server options. Each AP w=
+ill
+-       get a new subnet from the range and clients will be addressed in th=
+at
+-       subnet to avoid IP conflicts if multiple AP's are started.
+-
+    * - UseDefaultInterface
+      - Values: true, **false**
+ =
+
+@@ -312,6 +302,23 @@ No modification from defaults is normally required.
+        prevent **iwd** from roaming properly, but can be useful for networ=
+ks
+        operating under extremely low rssi levels where roaming isn't possi=
+ble.
+ =
+
++IPv4
++----
++
++The group ``[IPv4]`` contains settings related to IPv4 address configurati=
+on.
++
++   * - APAddressPool
++     - Values: comma-separated list of prefix-notation IPv4 address strings
++
++       Defines the space of IPs used for the Access Point-mode subnet addr=
+esses
++       and the DHCP server.  Defaults to 192.168.0.0/16.  The prefix length
++       decides the size of the pool from which an address is selected but =
+the
++       actual subnet size (netmask) is based on the AP profile being activ=
+ated
++       and defaults to 28 bits.  The AP profile's ``[IPv4].Address`` setti=
+ng
++       overrides the global value set here.  Setting a too small address s=
+pace
++       will limit the number of access points that can be running
++       simultaneously on different interfaces.
++
+ SEE ALSO
+ =3D=3D=3D=3D=3D=3D=3D=3D
+ =
+
 -- =
 
 2.27.0
 
---===============8149595904462789587==--
+--===============7757728780665593623==--
 
