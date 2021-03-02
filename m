@@ -1,279 +1,106 @@
-Content-Type: multipart/mixed; boundary="===============7757728780665593623=="
+Content-Type: multipart/mixed; boundary="===============7675300106645870005=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 5/5] doc: Update AP settings in iwd.ap and iwd.config(5)
-Date: Tue, 02 Mar 2021 13:08:13 +0100
-Message-ID: <20210302120813.757731-5-andrew.zaborowski@intel.com>
-In-Reply-To: <20210302120813.757731-1-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: Re: [PATCH] test-runner: fix duplicate process output
+Date: Tue, 02 Mar 2021 08:25:49 -0800
+Message-ID: <6dbaef93a68004a9db2c9705b00a9512f06a6e6c.camel@gmail.com>
+In-Reply-To: <20210301234133.1966359-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7757728780665593623==
+--===============7675300106645870005==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Update the AP-mode address logic documentation, change some of the
-wording and add some references.
----
- src/iwd.ap.rst     | 69 +++++++++++++++++++++++++++++-----------------
- src/iwd.config.rst | 31 +++++++++++++--------
- 2 files changed, 63 insertions(+), 37 deletions(-)
+There seems to be an issue with this patch that Andrew found, please
+wait for v2.
 
-diff --git a/src/iwd.ap.rst b/src/iwd.ap.rst
-index 52312855..e2ec01e6 100644
---- a/src/iwd.ap.rst
-+++ b/src/iwd.ap.rst
-@@ -3,7 +3,7 @@
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
- =
+Thanks,
+James
 
- --------------------------------------
--Configuration of IWD access point
-+Configuration of IWD access points
- --------------------------------------
- =
+On Mon, 2021-03-01 at 15:41 -0800, James Prestwood wrote:
+> Process output was being duplicated when -v was used. This was
+> due to both stderr and stdout being appended to the write_fd list
+> as well as stderr being set to stdout in the Popen call.
+> =
 
- :Author: James Prestwood <prestwoj@gmail.com>
-@@ -25,19 +25,21 @@ Description of access point provisioning files.
- DESCRIPTION
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
- =
+> To fix this only stdout should be appended to the write_fd list,
+> but then there comes a problem with closing the streams. stdout
+> cannot be closed, so instead it is special cased. A new
+> verbose boolean was added to Process which, if True, will
+> cause any output to be written to stdout explicitly.
+> ---
+>  tools/test-runner | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> =
 
--An access point provisioning files define the configuration of an IWD acce=
-ss
-+An access point provisioning file defines the configuration of an IWD acce=
-ss
- point. These files live in *$STATE_DIRECTORY*/ap (/var/lib/iwd/ap by defau=
-lt).
-+They are read when the `net.connman.iwd.AccessPoint.StartProfile(ssid)` DB=
-us
-+method is used.
- =
+> diff --git a/tools/test-runner b/tools/test-runner
+> index eab0f0ab..6e8966f4 100755
+> --- a/tools/test-runner
+> +++ b/tools/test-runner
+> @@ -174,6 +174,7 @@ class Process:
+>  		self.write_fds =3D []
+>  		self.io_watch =3D None
+>  		self.cleanup =3D cleanup
+> +		self.verbose =3D False
+>  =
 
- FILE FORMAT
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
- =
+>  		if not namespace:
+>  			self.output_name =3D '/tmp/%s-out' % self.name
+> @@ -195,8 +196,7 @@ class Process:
+>  		if ctx:
+>  			# Verbose requested, add stdout/stderr to write
+> FD list
+>  			if self.name in ctx.args.verbose:
+> -				self.write_fds.append(sys.__stdout__)
+> -				self.write_fds.append(sys.__stderr__)
+> +				self.verbose =3D True
+>  =
 
--See *iwd.network* for details on the file format.
-+See *iwd.network* for details on the settings file syntax.
- =
+>  			# Add output file to FD list
+>  			if outfile:
+> @@ -234,7 +234,7 @@ class Process:
+>  				self.io_watch =3D
+> GLib.io_add_watch(self.stdout, GLib.IO_IN,
+>  								self.io
+> _callback)
+>  =
 
- SETTINGS
- =3D=3D=3D=3D=3D=3D=3D=3D
- =
+> -		self.pid =3D subprocess.Popen(self.args,
+> stdout=3Dself.stdout, stderr=3Dsubprocess.STDOUT,
+> +		self.pid =3D subprocess.Popen(self.args,
+> stdout=3Dself.stdout, stderr=3Dself.stdout,
+>  						env=3Denv,
+> cwd=3Dos.getcwd())
+>  =
 
- The settings are split into several categories.  Each category has a group
--associated with it and described in separate tables below.
-+associated with it and is described in the corresponding table below.
- =
+>  		print("Starting process {}".format(self.pid.args))
+> @@ -261,6 +261,9 @@ class Process:
+>  =
 
- Network Authentication Settings
- -------------------------------
-@@ -54,13 +56,15 @@ configuration.
-    * - Passphrase
-      - 8..63 character string
- =
+>  			self.write_fds =3D []
+>  =
 
--       Passphrase to be used with this access point.
-+       WPA PSK Passphrase to be used with this access point.
- =
+> +		if self.verbose:
+> +			sys.__stdout__.write(self.out)
+> +
+>  		print("%s returned %d" % (args[0], self.ret))
+>  		if check and self.ret !=3D 0:
+>  			raise
+> subprocess.CalledProcessError(returncode=3Dself.ret, cmd=3Dself.args)
+> @@ -284,6 +287,9 @@ class Process:
+>  		for f in self.write_fds:
+>  			f.write(data)
+>  =
 
--DHCP Server Settings
----------------------
-+IPv4 Network Configuration
-+--------------------------
- =
+> +		if self.verbose:
+> +			sys.__stdout__.write(self.out)
+> +
+>  		return True
+>  =
 
--The group ``[IPv4]`` contains settings for IWD's built in DHCP server. All
--settings are optional.
-+The group ``[IPv4]`` contains settings for IWD's built-in DHCP server. All
-+settings are optional.  They're used if network configuration was enabled =
-as
-+described in ``iwd.config(5)``.  Omitting the ``[IPv4]`` group disables
-+network configuration and the DHCP server for this access point.
- =
+>  	def __del__(self):
 
- .. list-table::
-    :header-rows: 0
-@@ -68,41 +72,56 @@ settings are optional.
-    :widths: 20 80
- =
-
-    * - Address
--     - IP Address of AP
--
--       Optional address for the DHCP server/access point. If provided this
--       address will be set on the AP interface and any other DHCP server o=
-ptions
--       will be derived from this address, unless they are overriden inside=
- the
--       AP profile. If [IPv4].Address is not provided and no IP address is =
-set
--       on the interface prior to calling StartProfile the IP pool will be =
-used.
-+     - Local IP address or a comma-separated list of prefix-notation addre=
-sses
-+
-+       Optional local address pool for the access point and the DHCP serve=
-r.
-+       If a single address is provided this address will be set on the AP
-+       interface and any other DHCP server options will be derived from it,
-+       unless they are overriden by other settings.  If a list of addresse=
-s and
-+       prefix lengths is given (in the `<IP>/<prefix-len>` format), a sing=
-le
-+       subnet address will be selected from the available space each time =
-this
-+       profile is started.  The subnet size will still be based on the
-+       ``[IPv4].Netmask`` setting.  If ``[IPv4].Address`` is not provided =
-and
-+       no IP address is set on the interface prior to calling `StartProfil=
-e`
-+       the value of the main.conf ``[IPv4].APAddressPool`` setting will be
-+       inherited, which in turn defaults to 192.168.0.0/16.
-+
-+       For example, if ``[IPv4].Netmask`` is set the 255.255.255.0 and this
-+       setting, or the global ``APAddressPool`` fallback, is set to
-+       ``192.168.0.0/16, 10.0.0.0/22``, IWD will select one of the 256 sub=
-nets
-+       with addresses in the 192.168.<0-255>.0/24 range or one of the 4 su=
-bnets
-+       with addresses in the 10.0.<0-3>.0/24 range, allowing 270 possible
-+       subnets.  Defining an address pool larger than the subnet may be
-+       desired if other interfaces on the system use dynamically assigned
-+       addresses giving IWD a chance to avoid conflicts.
- =
-
-    * - Gateway
-      - IP Address of gateway
- =
-
--       IP address of gateway. This will inherit from [IPv4].Address if not
--       provided.
-+       IP address of the gateway to be advertised by DHCP. This will fall =
-back
-+       to the local IP address if not provided.
- =
-
-    * - Netmask
--     - Netmask of DHCP server
-+     - Local netmask of the AP
- =
-
--       This will be generated from [IPv4].Address if not provided.
-+       Defaults to a 28-bit netmask if not provided.
- =
-
-    * - DNSList
--     - List of DNS servers
-+     - List of DNS servers as a comma-separated IP address list
- =
-
-        A list of DNS servers which will be advertised by the DHCP server. =
-If
-        not provided no DNS servers will be sent by the DHCP server.
- =
-
-    * - LeaseTime
--     - Time limit for DHCP leases
-+     - Time limit for DHCP leases in seconds
- =
-
-        Override the default lease time.
- =
-
-    * - IPRange
--     - Range of IPs to use for the DHCP server
-+     - Range of IPs given as two addresses separated by a comma
- =
-
--       If not provided a default range will be chosen which is the DHCP se=
-rver
--       address + 1 to 254.
-+       From and to addresses of the range assigned to clients through DHCP.
-+       If not provided the range from local address + 1 to .254 will be us=
-ed.
- =
-
- SEE ALSO
- =3D=3D=3D=3D=3D=3D=3D=3D
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 478bd616..e3dc2827 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -67,23 +67,13 @@ The group ``[General]`` contains general settings.
-        obtain the dynamic addresses from the network through the built-in
-        DHCP client.
- =
-
--       This also enables DHCP server when in AP mode when either
--       [General].APRanges is set or an AP profile is being used.
-+       This also enables network configuration and the DHCP server when in=
- AP
-+       mode and the AP profile being activated does does not override it.
- =
-
-        The network configuration feature is disabled by default.  See
-        ``[Network]`` settings for additional settings related to network
-        configuration.
- =
-
--   * - APRanges
--     - Values: <IP in prefix notation>
--
--       Sets the range of IP's used for DHCP server (AP mode). The IP shoul=
-d be
--       in prefix notation e.g. 192.168.1.0/24. AP's which are started in a
--       profile-less configuration will use this pool of IP's to set the AP=
-'s
--       interface address as well as default DHCP server options. Each AP w=
-ill
--       get a new subnet from the range and clients will be addressed in th=
-at
--       subnet to avoid IP conflicts if multiple AP's are started.
--
-    * - UseDefaultInterface
-      - Values: true, **false**
- =
-
-@@ -312,6 +302,23 @@ No modification from defaults is normally required.
-        prevent **iwd** from roaming properly, but can be useful for networ=
-ks
-        operating under extremely low rssi levels where roaming isn't possi=
-ble.
- =
-
-+IPv4
-+----
-+
-+The group ``[IPv4]`` contains settings related to IPv4 address configurati=
-on.
-+
-+   * - APAddressPool
-+     - Values: comma-separated list of prefix-notation IPv4 address strings
-+
-+       Defines the space of IPs used for the Access Point-mode subnet addr=
-esses
-+       and the DHCP server.  Defaults to 192.168.0.0/16.  The prefix length
-+       decides the size of the pool from which an address is selected but =
-the
-+       actual subnet size (netmask) is based on the AP profile being activ=
-ated
-+       and defaults to 28 bits.  The AP profile's ``[IPv4].Address`` setti=
-ng
-+       overrides the global value set here.  Setting a too small address s=
-pace
-+       will limit the number of access points that can be running
-+       simultaneously on different interfaces.
-+
- SEE ALSO
- =3D=3D=3D=3D=3D=3D=3D=3D
- =
-
--- =
-
-2.27.0
-
---===============7757728780665593623==--
+--===============7675300106645870005==--
 
