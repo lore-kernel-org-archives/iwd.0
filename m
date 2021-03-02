@@ -1,105 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============5855981461713924653=="
+Content-Type: multipart/mixed; boundary="===============3267915969671953304=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2] test-runner: fix duplicate process output
-Date: Tue, 02 Mar 2021 08:30:29 -0800
-Message-ID: <20210302163029.1980263-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2] test-runner: fix duplicate process output
+Date: Tue, 02 Mar 2021 10:38:08 -0600
+Message-ID: <dd6c67e6-ae27-efd3-eabc-0b5d47c859c3@gmail.com>
+In-Reply-To: <20210302163029.1980263-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5855981461713924653==
+--===============3267915969671953304==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Process output was being duplicated when -v was used. This was
-due to both stderr and stdout being appended to the write_fd list
-as well as stderr being set to stdout in the Popen call.
+Hi James,
 
-To fix this only stdout should be appended to the write_fd list,
-but then there comes a problem with closing the streams. stdout
-cannot be closed, so instead it is special cased. A new
-verbose boolean was added to Process which, if True, will
-cause any output to be written to stdout explicitly.
----
- tools/test-runner | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+On 3/2/21 10:30 AM, James Prestwood wrote:
+> Process output was being duplicated when -v was used. This was
+> due to both stderr and stdout being appended to the write_fd list
+> as well as stderr being set to stdout in the Popen call.
+> =
 
-v2:
- * Added check for self.verbose so long running
-   processes get an IO watch and can actually
-   print to the console with -v.
+> To fix this only stdout should be appended to the write_fd list,
+> but then there comes a problem with closing the streams. stdout
+> cannot be closed, so instead it is special cased. A new
+> verbose boolean was added to Process which, if True, will
+> cause any output to be written to stdout explicitly.
+> ---
+>   tools/test-runner | 14 ++++++++++----
+>   1 file changed, 10 insertions(+), 4 deletions(-)
+> =
 
-diff --git a/tools/test-runner b/tools/test-runner
-index eab0f0ab..a0c4022e 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -174,6 +174,7 @@ class Process:
- 		self.write_fds =3D []
- 		self.io_watch =3D None
- 		self.cleanup =3D cleanup
-+		self.verbose =3D False
- =
+> v2:
+>   * Added check for self.verbose so long running
+>     processes get an IO watch and can actually
+>     print to the console with -v.
+> =
 
- 		if not namespace:
- 			self.output_name =3D '/tmp/%s-out' % self.name
-@@ -195,8 +196,7 @@ class Process:
- 		if ctx:
- 			# Verbose requested, add stdout/stderr to write FD list
- 			if self.name in ctx.args.verbose:
--				self.write_fds.append(sys.__stdout__)
--				self.write_fds.append(sys.__stderr__)
-+				self.verbose =3D True
- =
 
- 			# Add output file to FD list
- 			if outfile:
-@@ -230,11 +230,11 @@ class Process:
- 			# the process is being waited for, the log/outfile bits
- 			# will be handled after the process exists.
- 			#
--			if self.write_fds !=3D [] and not wait and not check:
-+			if self.write_fds !=3D [] and not wait and not check or self.verbose:
- 				self.io_watch =3D GLib.io_add_watch(self.stdout, GLib.IO_IN,
- 								self.io_callback)
- =
+Applied, thanks.
 
--		self.pid =3D subprocess.Popen(self.args, stdout=3Dself.stdout, stderr=3D=
-subprocess.STDOUT,
-+		self.pid =3D subprocess.Popen(self.args, stdout=3Dself.stdout, stderr=3D=
-self.stdout,
- 						env=3Denv, cwd=3Dos.getcwd())
- =
+Regards,
+-Denis
 
- 		print("Starting process {}".format(self.pid.args))
-@@ -261,6 +261,9 @@ class Process:
- =
-
- 			self.write_fds =3D []
- =
-
-+		if self.verbose:
-+			sys.__stdout__.write(self.out)
-+
- 		print("%s returned %d" % (args[0], self.ret))
- 		if check and self.ret !=3D 0:
- 			raise subprocess.CalledProcessError(returncode=3Dself.ret, cmd=3Dself.a=
-rgs)
-@@ -284,6 +287,9 @@ class Process:
- 		for f in self.write_fds:
- 			f.write(data)
- =
-
-+		if self.verbose:
-+			sys.__stdout__.write(data)
-+
- 		return True
- =
-
- 	def __del__(self):
--- =
-
-2.26.2
-
---===============5855981461713924653==--
+--===============3267915969671953304==--
 
