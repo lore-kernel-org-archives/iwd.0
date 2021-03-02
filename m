@@ -1,57 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============5754881965820920110=="
+Content-Type: multipart/mixed; boundary="===============8149595904462789587=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/5] ap: Move the DHCP server freeing to ap_reset
-Date: Tue, 02 Mar 2021 13:08:11 +0100
-Message-ID: <20210302120813.757731-3-andrew.zaborowski@intel.com>
+Subject: [PATCH 4/5] autotests: Update APRanges usage in testAP
+Date: Tue, 02 Mar 2021 13:08:12 +0100
+Message-ID: <20210302120813.757731-4-andrew.zaborowski@intel.com>
 In-Reply-To: <20210302120813.757731-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5754881965820920110==
+--===============8149595904462789587==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Some callers of ap_reset(ap)/l_free(ap) would not call
-l_dhcp_server_destroy() causing some likely leaks.  It's easier to call
-it directly from inside ap_reset().
+[General].APRange is now [IPv4].APAddressPool and the netmask is changed
+from 23 to 27 bits to make the test correctly assert that only two
+default-sized subnets are allowed by IWD simultaneously (default has
+changed from 24 to 28 bits)
 ---
- src/ap.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ autotests/testAP/dhcp/main.conf |  4 +++-
+ autotests/testAP/dhcp_test.py   | 12 +++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/src/ap.c b/src/ap.c
-index c5e6c43e..5425823a 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -250,8 +250,10 @@ static void ap_reset(struct ap_state *ap)
- 	if (ap->own_ip)
- 		l_free(ap->own_ip);
+diff --git a/autotests/testAP/dhcp/main.conf b/autotests/testAP/dhcp/main.c=
+onf
+index 667de23c..62ae782d 100644
+--- a/autotests/testAP/dhcp/main.conf
++++ b/autotests/testAP/dhcp/main.conf
+@@ -3,4 +3,6 @@ DisableMacAddressRandomization=3Dtrue
  =
 
--	if (ap->server)
--		l_dhcp_server_stop(ap->server);
-+	if (ap->server) {
-+		l_dhcp_server_destroy(ap->server);
-+		ap->server =3D NULL;
-+	}
+ [General]
+ EnableNetworkConfiguration=3Dtrue
+-APRanges=3D192.168.80.0/23
++
++[IPv4]
++APAddressPool=3D192.168.80.0/27
+diff --git a/autotests/testAP/dhcp_test.py b/autotests/testAP/dhcp_test.py
+index bf52fb28..e69c4465 100644
+--- a/autotests/testAP/dhcp_test.py
++++ b/autotests/testAP/dhcp_test.py
+@@ -58,8 +58,14 @@ class Test(unittest.TestCase):
+             testutil.test_iface_operstate(dev2.name)
+             testutil.test_ifaces_connected(dev1.name, dev2.name, group=3DF=
+alse)
  =
 
- 	if (ap->profile) {
- 		l_settings_free(ap->profile);
-@@ -3075,8 +3077,6 @@ void ap_free(struct ap_state *ap)
- {
- 	ap_reset(ap);
- 	l_genl_family_free(ap->nl80211);
--	if (ap->server)
--		l_dhcp_server_destroy(ap->server);
- 	l_free(ap);
- }
+-            testutil.test_ip_address_match(dev1.name, "192.168.80.1")
+-            testutil.test_ip_address_match(dev2.name, "192.168.80.2")
++            try:
++                testutil.test_ip_address_match(dev1.name, "192.168.80.1")
++                testutil.test_ip_address_match(dev2.name, "192.168.80.2")
++                ip =3D "192.168.80.1"
++            except:
++                testutil.test_ip_address_match(dev1.name, "192.168.80.17")
++                testutil.test_ip_address_match(dev2.name, "192.168.80.18")
++                ip =3D "192.168.80.17"
  =
 
+             wd.unregister_psk_agent(psk_agent)
+ =
+
+@@ -76,7 +82,7 @@ class Test(unittest.TestCase):
+             # got initially.
+             dev4.start_ap('TestAP4', 'Password4')
+ =
+
+-            testutil.test_ip_address_match(dev4.name, "192.168.80.1")
++            testutil.test_ip_address_match(dev4.name, ip)
+ =
+
+         finally:
+             dev1.stop_ap()
 -- =
 
 2.27.0
 
---===============5754881965820920110==--
+--===============8149595904462789587==--
 
