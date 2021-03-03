@@ -1,39 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============0026843059136580024=="
+Content-Type: multipart/mixed; boundary="===============8793297455112389620=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/4] handshake: add offload member
-Date: Wed, 03 Mar 2021 09:47:28 -0800
-Message-ID: <20210303174730.6738-2-prestwoj@gmail.com>
+Subject: [PATCH 3/4] station: set handshake offload if supported
+Date: Wed, 03 Mar 2021 09:47:29 -0800
+Message-ID: <20210303174730.6738-3-prestwoj@gmail.com>
 In-Reply-To: <20210303174730.6738-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0026843059136580024==
+--===============8793297455112389620==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This flag indicates the handshake is being offloaded to the
-kernel/driver.
+When setting up the handshake check if wiphy supports handshake
+offload for PSK networks (not including SAE, for now).
 ---
- src/handshake.h | 1 +
- 1 file changed, 1 insertion(+)
+ src/station.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/src/handshake.h b/src/handshake.h
-index b738efd9..0468cbd1 100644
---- a/src/handshake.h
-+++ b/src/handshake.h
-@@ -116,6 +116,7 @@ struct handshake_state {
- 	bool wait_for_gtk : 1;
- 	bool no_rekey : 1;
- 	bool support_fils : 1;
-+	bool offload_psk : 1;
- 	uint8_t ssid[32];
- 	size_t ssid_len;
- 	char *passphrase;
+diff --git a/src/station.c b/src/station.c
+index 6496be10..93701e7f 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -986,6 +986,8 @@ static struct handshake_state *station_handshake_setup(=
+struct station *station,
+ 				goto no_psk;
+ =
+
+ 			handshake_state_set_pmk(hs, psk, 32);
++
++			hs->offload_psk =3D wiphy_can_offload(wiphy, bss);
+ 		}
+ 	} else if (security =3D=3D SECURITY_8021X)
+ 		handshake_state_set_8021x_config(hs,
 -- =
 
 2.26.2
 
---===============0026843059136580024==--
+--===============8793297455112389620==--
 
