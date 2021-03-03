@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============5874230975139286597=="
+Content-Type: multipart/mixed; boundary="===============3279219537747512789=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/4] handshake: add offload member
-Date: Wed, 03 Mar 2021 14:42:28 -0600
-Message-ID: <96920ea6-732e-cca3-1009-bf4a0a37d909@gmail.com>
-In-Reply-To: <20210303174730.6738-2-prestwoj@gmail.com>
+Subject: Re: [PATCH 3/4] station: set handshake offload if supported
+Date: Wed, 03 Mar 2021 14:50:07 -0600
+Message-ID: <c256b015-080c-a8ad-be18-625aa29a3ca0@gmail.com>
+In-Reply-To: <20210303174730.6738-3-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5874230975139286597==
+--===============3279219537747512789==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,32 +16,45 @@ Content-Transfer-Encoding: quoted-printable
 Hi James,
 
 On 3/3/21 11:47 AM, James Prestwood wrote:
-> This flag indicates the handshake is being offloaded to the
-> kernel/driver.
+> When setting up the handshake check if wiphy supports handshake
+> offload for PSK networks (not including SAE, for now).
 > ---
->   src/handshake.h | 1 +
->   1 file changed, 1 insertion(+)
+>   src/station.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > =
 
-> diff --git a/src/handshake.h b/src/handshake.h
-> index b738efd9..0468cbd1 100644
-> --- a/src/handshake.h
-> +++ b/src/handshake.h
-> @@ -116,6 +116,7 @@ struct handshake_state {
->   	bool wait_for_gtk : 1;
->   	bool no_rekey : 1;
->   	bool support_fils : 1;
-> +	bool offload_psk : 1;
+> diff --git a/src/station.c b/src/station.c
+> index 6496be10..93701e7f 100644
+> --- a/src/station.c
+> +++ b/src/station.c
+> @@ -986,6 +986,8 @@ static struct handshake_state *station_handshake_setu=
+p(struct station *station,
+>   				goto no_psk;
+>   =
 
-Maybe offloaded_4way would be a more future-proof name?
+>   			handshake_state_set_pmk(hs, psk, 32);
+> +
+> +			hs->offload_psk =3D wiphy_can_offload(wiphy, bss);
 
->   	uint8_t ssid[32];
->   	size_t ssid_len;
->   	char *passphrase;
+I actually wonder whether we need to put some of the logic from =
+
+wiphy_can_offload into wiphy_select_akm instead?  Maybe the offload bit can=
+ be =
+
+an extra out parameter?
+
+I suspect we need to implement the logic for offloaded SAE to really know w=
+hat =
+
+will look best.
+
+>   		}
+>   	} else if (security =3D=3D SECURITY_8021X)
+>   		handshake_state_set_8021x_config(hs,
 > =
 
 
 Regards,
 -Denis
---===============5874230975139286597==--
+--===============3279219537747512789==--
 
