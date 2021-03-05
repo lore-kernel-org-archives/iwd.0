@@ -1,39 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============5832748583662206373=="
+Content-Type: multipart/mixed; boundary="===============3953404312142448980=="
 MIME-Version: 1.0
-From: Jonathan Liu <net147@gmail.com>
-Subject: [PATCH] client: add missing bracket for "ap <wlan> show"
-Date: Fri, 05 Mar 2021 22:51:25 +1100
-Message-ID: <20210305115125.678039-1-net147@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] client: add missing bracket for "ap <wlan> show"
+Date: Fri, 05 Mar 2021 08:52:48 -0600
+Message-ID: <4058ac99-5281-5069-f9ec-37002160ef96@gmail.com>
+In-Reply-To: <20210305115125.678039-1-net147@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5832748583662206373==
+--===============3953404312142448980==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Fixes: 9659c936cd1f ("client: implement "ap <wlan> show"")
----
- client/ap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Jonathan,
 
-diff --git a/client/ap.c b/client/ap.c
-index b0386c60..0f14e9b8 100644
---- a/client/ap.c
-+++ b/client/ap.c
-@@ -310,7 +310,7 @@ static const struct command ap_commands[] =3D {
- 		"Start an access point based on a disk profile" },
- 	{ "<wlan>", "stop", NULL,   cmd_stop, "Stop a started access\n"
- 		"\t\t\t\t\t\t    point" },
--	{ "<wlan", "show", NULL, cmd_show, "Show AP info", false },
-+	{ "<wlan>", "show", NULL, cmd_show, "Show AP info", false },
- 	{ }
- };
- =
+On 3/5/21 5:51 AM, Jonathan Liu wrote:
+> Fixes: 9659c936cd1f ("client: implement "ap <wlan> show"")
+> ---
+>   client/ap.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
--- =
+Applied, thanks.
 
-2.30.1
-
---===============5832748583662206373==--
+Regards,
+-Denis
+--===============3953404312142448980==--
 
