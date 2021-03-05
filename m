@@ -1,30 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============0119245757601743481=="
+Content-Type: multipart/mixed; boundary="===============7456222382927438050=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 02/10] ap: Add missing ap_config_free() in error path
-Date: Fri, 05 Mar 2021 16:21:59 -0600
-Message-ID: <b649dc0b-3c0d-ff4e-9501-4672003097d0@gmail.com>
-In-Reply-To: <20210305150936.868546-2-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 04/10] ap: Add subnet address selection logic
+Date: Fri, 05 Mar 2021 16:35:51 -0600
+Message-ID: <175612f5-354f-a076-d601-a2590125aba4@gmail.com>
+In-Reply-To: <20210305150936.868546-4-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0119245757601743481==
+--===============7456222382927438050==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi Andrew,
 
-On 3/5/21 9:09 AM, Andrew Zaborowski wrote:
-> ---
->   src/ap.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> =
+> +		/*
+> +		 * Ignore the subnet(s) set on the target interface, we'll be
+> +		 * overwriting it if everything goes well.
+> +		 */
+> +		if (rec->ifindex =3D=3D ifindex)
+> +			continue;
 
+Ok, I'm a bit confused here.  I thought we're adding on to the address list=
+, not =
 
-Applied, thanks.
+flushing the addresses?  So shouldn't any addresses set on the target inter=
+face =
+
+still be taken into account as 'used'?
 
 Regards,
 -Denis
---===============0119245757601743481==--
+--===============7456222382927438050==--
 
