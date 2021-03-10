@@ -1,64 +1,131 @@
-Content-Type: multipart/mixed; boundary="===============0745235919856613983=="
+Content-Type: multipart/mixed; boundary="===============4667729186109041655=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 1/6] ap: Make ap_update_beacon public
-Date: Wed, 10 Mar 2021 23:06:30 +0100
-Message-ID: <20210310220635.944104-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 2/6] ap: Pass frame IEs from clients to the ap_state user
+Date: Wed, 10 Mar 2021 23:06:31 +0100
+Message-ID: <20210310220635.944104-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20210310220635.944104-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0745235919856613983==
+--===============4667729186109041655==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Let users call ap_update_beacon when a value has changed which should be
-reflected in the beacon IEs.
+Pass the string IEs from the incoming STA association frames to
+the user in the AP event data.  I drop
+ap_event_station_added_data.rsn_ie because that probably wasn't
+going to ever be useful and the RSN IE is included in the .assoc_ies
+array in any case.
 ---
- src/ap.c | 5 ++++-
- src/ap.h | 1 +
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ src/ap.c | 22 +++++++++++++++-------
+ src/ap.h |  5 ++++-
+ 2 files changed, 19 insertions(+), 8 deletions(-)
 
 diff --git a/src/ap.c b/src/ap.c
-index 5a86527f..6ab0c0fd 100644
+index 6ab0c0fd..eeab3408 100644
 --- a/src/ap.c
 +++ b/src/ap.c
-@@ -641,7 +641,7 @@ static void ap_set_beacon_cb(struct l_genl_msg *msg, vo=
-id *user_data)
- 		l_error("SET_BEACON failed: %s (%i)", strerror(-error), -error);
- }
+@@ -99,6 +99,8 @@ struct sta_state {
+ 	struct l_uintset *rates;
+ 	uint32_t assoc_resp_cmd_id;
+ 	struct ap_state *ap;
++	uint8_t *assoc_ies;
++	size_t assoc_ies_len;
+ 	uint8_t *assoc_rsne;
+ 	struct eapol_sm *sm;
+ 	struct handshake_state *hs;
+@@ -279,7 +281,7 @@ static void ap_sta_free(void *data)
+ 	struct ap_state *ap =3D sta->ap;
  =
 
--static void ap_update_beacon(struct ap_state *ap)
-+void ap_update_beacon(struct ap_state *ap)
- {
- 	struct l_genl_msg *cmd;
- 	uint8_t head[256], tail[256];
-@@ -651,6 +651,9 @@ static void ap_update_beacon(struct ap_state *ap)
- 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff
- 	};
+ 	l_uintset_free(sta->rates);
+-	l_free(sta->assoc_rsne);
++	l_free(sta->assoc_ies);
  =
 
-+	if (L_WARN_ON(!ap->started))
-+		return;
-+
- 	head_len =3D ap_build_beacon_pr_head(ap, MPDU_MANAGEMENT_SUBTYPE_BEACON,
- 						bcast_addr, head, sizeof(head));
- 	tail_len =3D ap_build_beacon_pr_tail(ap, false, tail);
+ 	if (sta->assoc_resp_cmd_id)
+ 		l_genl_family_cancel(ap->nl80211, sta->assoc_resp_cmd_id);
+@@ -411,7 +413,8 @@ static void ap_new_rsna(struct sta_state *sta)
+ 	if (ap->ops->handle_event) {
+ 		struct ap_event_station_added_data event_data =3D {};
+ 		event_data.mac =3D sta->addr;
+-		event_data.rsn_ie =3D sta->assoc_rsne;
++		event_data.assoc_ies =3D sta->assoc_ies;
++		event_data.assoc_ies_len =3D sta->assoc_ies_len;
+ 		ap->ops->handle_event(AP_EVENT_STATION_ADDED, &event_data,
+ 					ap->user_data);
+ 	}
+@@ -1474,6 +1477,8 @@ static void ap_assoc_reassoc(struct sta_state *sta, b=
+ool reassoc,
+ 		sta->wsc_v2 =3D wsc_req.version2;
+ =
+
+ 		event_data.mac =3D sta->addr;
++		event_data.assoc_ies =3D ies;
++		event_data.assoc_ies_len =3D ies_len;
+ 		ap->ops->handle_event(AP_EVENT_REGISTRATION_START, &event_data,
+ 					ap->user_data);
+ =
+
+@@ -1524,13 +1529,16 @@ static void ap_assoc_reassoc(struct sta_state *sta,=
+ bool reassoc,
+ =
+
+ 	sta->rates =3D rates;
+ =
+
+-	if (sta->assoc_rsne)
+-		l_free(sta->assoc_rsne);
++	l_free(sta->assoc_ies);
+ =
+
+-	if (rsn)
+-		sta->assoc_rsne =3D l_memdup(rsn, rsn[1] + 2);
+-	else
++	if (rsn) {
++		sta->assoc_ies =3D l_memdup(ies, ies_len);
++		sta->assoc_ies_len =3D ies_len;
++		sta->assoc_rsne =3D sta->assoc_ies + (rsn - ies);
++	} else {
++		sta->assoc_ies =3D NULL;
+ 		sta->assoc_rsne =3D NULL;
++	}
+ =
+
+ 	sta->assoc_resp_cmd_id =3D ap_assoc_resp(ap, sta, sta->addr, 0, reassoc,
+ 						ap_success_assoc_resp_cb);
 diff --git a/src/ap.h b/src/ap.h
-index dc57a0bb..6199bcbe 100644
+index 6199bcbe..0bdbf0bb 100644
 --- a/src/ap.h
 +++ b/src/ap.h
-@@ -87,3 +87,4 @@ bool ap_station_disconnect(struct ap_state *ap, const uin=
-t8_t *mac,
- 				enum mmpdu_reason_code reason);
+@@ -36,7 +36,8 @@ enum ap_event_type {
  =
 
- bool ap_push_button(struct ap_state *ap);
-+void ap_update_beacon(struct ap_state *ap);
+ struct ap_event_station_added_data {
+ 	const uint8_t *mac;
+-	const uint8_t *rsn_ie;
++	const uint8_t *assoc_ies;
++	size_t assoc_ies_len;
+ };
+ =
+
+ struct ap_event_station_removed_data {
+@@ -46,6 +47,8 @@ struct ap_event_station_removed_data {
+ =
+
+ struct ap_event_registration_start_data {
+ 	const uint8_t *mac;
++	const uint8_t *assoc_ies;
++	size_t assoc_ies_len;
+ };
+ =
+
+ struct ap_event_registration_success_data {
 -- =
 
 2.27.0
 
---===============0745235919856613983==--
+--===============4667729186109041655==--
 
