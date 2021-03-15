@@ -1,51 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============6666855021706264269=="
+Content-Type: multipart/mixed; boundary="===============5065023147118754293=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 4/4] station: disable roaming logic for auto-roaming cards
-Date: Mon, 15 Mar 2021 10:29:31 -0700
-Message-ID: <20210315172931.173107-4-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2 1/4] scan: add scan_get_firmware_scan
+Date: Mon, 15 Mar 2021 13:34:57 -0500
+Message-ID: <a45dd4ed-0f3a-dc14-c9a9-0ca72df60828@gmail.com>
 In-Reply-To: <20210315172931.173107-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6666855021706264269==
+--===============5065023147118754293==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the hardware roams automatically we want to be sure to not
-react to CQM events and attempt to roam/disconnect on our own.
+On 3/15/21 12:29 PM, James Prestwood wrote:
+> Adds support for getting firmware scan results from the kernel.
+> This is intended to be used after the firmware roamed automatically
+> and the scan result is require for handshake initialization.
+> =
 
-Note: this is only important for very new kernels where CQM
-events were recently added to brcmfmac.
----
- src/station.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> The scan 'request' is competely separate from the normal scan
+> queue, though scan_results, scan_request, and the scan_context
+> are all used for consistency and code reuse.
+> ---
+>   src/scan.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   src/scan.h |  3 +++
+>   2 files changed, 79 insertions(+)
+> =
 
-diff --git a/src/station.c b/src/station.c
-index 1a829fae..033e82b3 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2170,6 +2170,14 @@ static bool station_cannot_roam(struct station *stat=
-ion)
- 	const struct l_settings *config =3D iwd_get_config();
- 	bool disabled;
- =
+> v2:
+>   * It was found GET_SCAN could be used to grab actual scan
+>     results rather than trying to gather up sparse info from
+>     GET_STATION/GET_INTERFACE. This also allows reuse of existing
+>     scan parsing code.
+> =
 
-+	/*
-+	 * Disable roaming with hardware that can roam automatically. Note this
-+	 * is now required for recent kernels which have CQM event support on
-+	 * this type of hardware (e.g. brcmfmac).
-+	 */
-+	if (wiphy_supports_fw_roam(station->wiphy))
-+		return true;
-+
- 	if (!l_settings_get_bool(config, "Scan", "DisableRoamingScan",
- 								&disabled))
- 		disabled =3D false;
--- =
 
-2.26.2
+I went ahead and applied all 4 with the following minor tweaks:
 
---===============6666855021706264269==--
+- In patch 1, I moved the code down in the file in order to get rid of the =
+
+forward-declaration.
+- In patch 3, I renamed the function to 'wiphy_supports_firmware_roam' sinc=
+e =
+
+'fw' is not a common contraction.
+- Patch 4 was modified with the naming from patch 3 tweak.
+
+Regards,
+-Denis
+
+--===============5065023147118754293==--
 
