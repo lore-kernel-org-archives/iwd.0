@@ -1,36 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============2281122476023077806=="
+Content-Type: multipart/mixed; boundary="===============2627846191518074799=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/3] network: add network_bss_update
-Date: Mon, 15 Mar 2021 15:33:44 -0500
-Message-ID: <a4746d0d-9f12-8ba0-03e8-c3dff467b1e8@gmail.com>
-In-Reply-To: <20210315191529.186554-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/4] doc: document new AverageRSSI diagnostics key
+Date: Tue, 16 Mar 2021 08:38:33 -0700
+Message-ID: <20210316153836.218175-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2281122476023077806==
+--===============2627846191518074799==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ doc/station-diagnostic-api.txt | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On 3/15/21 2:15 PM, James Prestwood wrote:
-> This will swap out a scan_bss object with a duplicate that may
-> exist in a networks bss_list. The duplicate will be removed by
-> since the object is owned by station it is assumed that it will
-> be freed elsewhere.
-> ---
->   src/network.c | 21 +++++++++++++++++++++
->   src/network.h |  1 +
->   2 files changed, 22 insertions(+)
-> =
+diff --git a/doc/station-diagnostic-api.txt b/doc/station-diagnostic-api.txt
+index af82229b..b5a73b5d 100644
+--- a/doc/station-diagnostic-api.txt
++++ b/doc/station-diagnostic-api.txt
+@@ -25,6 +25,8 @@ Methods		dict GetDiagnostics()
+ =
 
+ 			RSSI [optional] - The RSSI of the currently connected BSS.
+ =
 
-All applied, thanks.
++			AverageRSSI [optional] - Average RSSI of currently connected BSS.
++
+ 			RxMode [optional] -	The phy technology being used
+ 						(802.11n, 802.11ac or 802.11ax).
+ =
 
-Regards,
--Denis
+-- =
 
---===============2281122476023077806==--
+2.26.2
+
+--===============2627846191518074799==--
 
