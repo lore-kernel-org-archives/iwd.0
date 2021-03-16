@@ -1,38 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============4707456861020981568=="
+Content-Type: multipart/mixed; boundary="===============1048333527808278296=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] client: add AverageRSSI to list of diagnostic values
-Date: Tue, 16 Mar 2021 08:38:36 -0700
-Message-ID: <20210316153836.218175-4-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/4] doc: document new AverageRSSI diagnostics key
+Date: Tue, 16 Mar 2021 11:26:46 -0500
+Message-ID: <1f9de350-be20-0796-d06b-378d97510ed7@gmail.com>
 In-Reply-To: <20210316153836.218175-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4707456861020981568==
+--===============1048333527808278296==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- client/diagnostic.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi James,
 
-diff --git a/client/diagnostic.c b/client/diagnostic.c
-index 153598ed..58c646d7 100644
---- a/client/diagnostic.c
-+++ b/client/diagnostic.c
-@@ -88,6 +88,7 @@ static const struct diagnostic_dict_mapping diagnostic_ma=
-pping[] =3D {
- 	{ "TxBitrate", 0, NULL, display_bitrate_100kbps },
- 	{ "ExpectedThroughput", 'u', "Kbit/s" },
- 	{ "RSSI", 'n', "dBm" },
-+	{ "AverageRSSI", 'n', "dBm" },
- 	{ "RxMCS", 'y' },
- 	{ "TxMCS", 'y' },
- 	{ "Frequency", 'u' },
--- =
+On 3/16/21 10:38 AM, James Prestwood wrote:
+> ---
+>   doc/station-diagnostic-api.txt | 2 ++
+>   1 file changed, 2 insertions(+)
+> =
 
-2.26.2
 
---===============4707456861020981568==--
+All applied, thanks.
+
+Regards,
+-Denis
+
+--===============1048333527808278296==--
 
