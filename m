@@ -1,55 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============6117053648105867548=="
+Content-Type: multipart/mixed; boundary="===============0755145397268752072=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/6] wiphy: add getter for 'supports_cmds_auth_assoc'
-Date: Thu, 18 Mar 2021 10:20:34 -0700
-Message-ID: <20210318172039.278896-1-prestwoj@gmail.com>
+Subject: [PATCH 2/6] wiphy: check SAE offload in wiphy_select_akm
+Date: Thu, 18 Mar 2021 10:20:35 -0700
+Message-ID: <20210318172039.278896-2-prestwoj@gmail.com>
+In-Reply-To: <20210318172039.278896-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6117053648105867548==
+--===============0755145397268752072==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This allows an SAE AKM to be selected if the hardware does not
+support SAE in userspace, but does support SAE offload.
 ---
- src/wiphy.c | 5 +++++
- src/wiphy.h | 1 +
- 2 files changed, 6 insertions(+)
+ src/wiphy.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
 diff --git a/src/wiphy.c b/src/wiphy.c
-index 82e3ca87..e230b273 100644
+index e230b273..9aac830f 100644
 --- a/src/wiphy.c
 +++ b/src/wiphy.c
-@@ -404,6 +404,11 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct sca=
-n_bss *bss)
- 	return true;
- }
+@@ -189,17 +189,15 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *=
+wiphy,
+ 			}
  =
 
-+bool wiphy_supports_cmds_auth_assoc(struct wiphy *wiphy)
-+{
-+	return wiphy->support_cmds_auth_assoc;
-+}
-+
- bool wiphy_has_feature(struct wiphy *wiphy, uint32_t feature)
- {
- 	return wiphy->feature_flags & feature;
-diff --git a/src/wiphy.h b/src/wiphy.h
-index 1fd71f0d..6c91220c 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -79,6 +79,7 @@ uint32_t wiphy_get_supported_bands(struct wiphy *wiphy);
- const struct scan_freq_set *wiphy_get_supported_freqs(
- 						const struct wiphy *wiphy);
- bool wiphy_can_connect(struct wiphy *wiphy, struct scan_bss *bss);
-+bool wiphy_supports_cmds_auth_assoc(struct wiphy *wiphy);
- bool wiphy_can_randomize_mac_addr(struct wiphy *wiphy);
- bool wiphy_rrm_capable(struct wiphy *wiphy);
- bool wiphy_has_feature(struct wiphy *wiphy, uint32_t feature);
+ 			/*
+-			 * TODO: Only SoftMAC (mac80211) drivers are currently
+-			 * capable of SAE since it requires ability to send
+-			 * Authenticate and Associate frames (which is given by
+-			 * support_cmds_auth_assoc).  FullMAC drivers require
+-			 * SAE offload which we do not support nor supported
+-			 * in any upstream driver as of this time.
++			 * If the hardware does not support SAE in userspace
++			 * (NL80211_FEATURE_SAE), has no Auth/Assoc support,
++			 * nor has SAE offload support downgrade to WPA2.
+ 			 */
+-			if (!wiphy_has_feature(wiphy, NL80211_FEATURE_SAE) ||
+-					!wiphy->support_cmds_auth_assoc) {
+-				l_debug("No HW WPA3 support, trying WPA2");
+-				goto wpa2_personal;
++			if (!wiphy_has_feature(wiphy, NL80211_FEATURE_SAE)) {
++				if (!wiphy_has_ext_feature(wiphy,
++					NL80211_EXT_FEATURE_SAE_OFFLOAD) &&
++						!wiphy->support_cmds_auth_assoc)
++					goto wpa2_personal;
+ 			}
+ =
+
+ 			if (info.akm_suites &
 -- =
 
 2.26.2
 
---===============6117053648105867548==--
+--===============0755145397268752072==--
 
