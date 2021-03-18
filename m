@@ -1,60 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============0755145397268752072=="
+Content-Type: multipart/mixed; boundary="===============9197977061016264188=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/6] wiphy: check SAE offload in wiphy_select_akm
-Date: Thu, 18 Mar 2021 10:20:35 -0700
-Message-ID: <20210318172039.278896-2-prestwoj@gmail.com>
+Subject: [PATCH 3/6] wiphy: check SAE offload in wiphy_can_connect
+Date: Thu, 18 Mar 2021 10:20:36 -0700
+Message-ID: <20210318172039.278896-3-prestwoj@gmail.com>
 In-Reply-To: <20210318172039.278896-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0755145397268752072==
+--===============9197977061016264188==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows an SAE AKM to be selected if the hardware does not
-support SAE in userspace, but does support SAE offload.
+This allows this wiphy_can_connect to pass for an SAE BSS
+if the hardware does not support user space SAE, but does
+support SAE offload.
 ---
- src/wiphy.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ src/wiphy.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
 diff --git a/src/wiphy.c b/src/wiphy.c
-index e230b273..9aac830f 100644
+index 9aac830f..6533cc7e 100644
 --- a/src/wiphy.c
 +++ b/src/wiphy.c
-@@ -189,17 +189,15 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *=
-wiphy,
- 			}
- =
-
+@@ -376,15 +376,18 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct sc=
+an_bss *bss)
+ 		case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
  			/*
--			 * TODO: Only SoftMAC (mac80211) drivers are currently
--			 * capable of SAE since it requires ability to send
--			 * Authenticate and Associate frames (which is given by
--			 * support_cmds_auth_assoc).  FullMAC drivers require
--			 * SAE offload which we do not support nor supported
--			 * in any upstream driver as of this time.
-+			 * If the hardware does not support SAE in userspace
-+			 * (NL80211_FEATURE_SAE), has no Auth/Assoc support,
-+			 * nor has SAE offload support downgrade to WPA2.
+ 			 * if the AP ONLY supports SAE/WPA3, then we can only
+-			 * connect if the wiphy feature is supported. Otherwise
+-			 * the AP may list SAE as one of the AKM's but also
+-			 * support PSK (hybrid). In this case we still want to
+-			 * allow a connection even if SAE is not supported.
++			 * connect if the wiphy either supports userspace SAE or
++			 * SAE offload. Otherwise the AP may list SAE as one of
++			 * the AKM's but also support PSK (hybrid). In this case
++			 * we still want to allow a connection even if SAE is
++			 * not supported.
  			 */
 -			if (!wiphy_has_feature(wiphy, NL80211_FEATURE_SAE) ||
--					!wiphy->support_cmds_auth_assoc) {
--				l_debug("No HW WPA3 support, trying WPA2");
--				goto wpa2_personal;
 +			if (!wiphy_has_feature(wiphy, NL80211_FEATURE_SAE)) {
 +				if (!wiphy_has_ext_feature(wiphy,
 +					NL80211_EXT_FEATURE_SAE_OFFLOAD) &&
-+						!wiphy->support_cmds_auth_assoc)
-+					goto wpa2_personal;
- 			}
- =
-
- 			if (info.akm_suites &
+ 						!wiphy->support_cmds_auth_assoc)
+-				return false;
+-
++					return false;
++			}
+ 			break;
+ 		case IE_RSN_AKM_SUITE_OWE:
+ 		case IE_RSN_AKM_SUITE_FILS_SHA256:
 -- =
 
 2.26.2
 
---===============0755145397268752072==--
+--===============9197977061016264188==--
 
