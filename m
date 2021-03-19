@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============7654258378770400570=="
+Content-Type: multipart/mixed; boundary="===============0424993274381789961=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/6] wiphy: check SAE offload in wiphy_select_akm
-Date: Fri, 19 Mar 2021 10:11:54 -0500
-Message-ID: <1490e337-8627-ebaa-c559-2175ee0ae1ca@gmail.com>
-In-Reply-To: <20210318172039.278896-2-prestwoj@gmail.com>
+Subject: Re: [PATCH 5/6] netdev: add SAE offload support
+Date: Fri, 19 Mar 2021 10:15:44 -0500
+Message-ID: <6395b7de-4bd5-a1b5-f0b7-78447f2cd320@gmail.com>
+In-Reply-To: <20210318172039.278896-5-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7654258378770400570==
+--===============0424993274381789961==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,97 +16,65 @@ Content-Transfer-Encoding: quoted-printable
 Hi James,
 
 On 3/18/21 12:20 PM, James Prestwood wrote:
-> This allows an SAE AKM to be selected if the hardware does not
-> support SAE in userspace, but does support SAE offload.
+> SAE offload support requires some minor tweaks to CMD_CONNECT
+> as well as special checks once the connect event comes in. Since
+> at this point we are fully connected.
 > ---
->   src/wiphy.c | 18 ++++++++----------
->   1 file changed, 8 insertions(+), 10 deletions(-)
+>   src/netdev.c | 31 ++++++++++++++++++++++++++++---
+>   1 file changed, 28 insertions(+), 3 deletions(-)
 > =
 
-> diff --git a/src/wiphy.c b/src/wiphy.c
-> index e230b273..9aac830f 100644
-> --- a/src/wiphy.c
-> +++ b/src/wiphy.c
-> @@ -189,17 +189,15 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy=
- *wiphy,
->   			}
+> diff --git a/src/netdev.c b/src/netdev.c
+> index 66a781bc..f4b44b31 100644
+> --- a/src/netdev.c
+> +++ b/src/netdev.c
+> @@ -1979,6 +1979,13 @@ process_resp_ies:
+>   			netdev_send_qos_map_set(netdev, qos_set, qos_len);
+>   	}
 >   =
 
->   			/*
-> -			 * TODO: Only SoftMAC (mac80211) drivers are currently
-> -			 * capable of SAE since it requires ability to send
-> -			 * Authenticate and Associate frames (which is given by
-> -			 * support_cmds_auth_assoc).  FullMAC drivers require
-> -			 * SAE offload which we do not support nor supported
-> -			 * in any upstream driver as of this time.
-> +			 * If the hardware does not support SAE in userspace
-> +			 * (NL80211_FEATURE_SAE), has no Auth/Assoc support,
-> +			 * nor has SAE offload support downgrade to WPA2.
+> +	/*
+> +	 * A successful connect event using offload means IWD is fully
+> +	 * connected and completed the 4-way handshake
+> +	 */
+> +	if (netdev->handshake->offload)
+> +		goto done;
+> +
 
-So linux/nl80211.h states:
-"
-  * @NL80211_FEATURE_SAE: This driver supports simultaneous authentication =
-of
-  *      equals (SAE) with user space SME (NL80211_CMD_AUTHENTICATE) in sta=
-tion
-  *      mode
-"
+So we only offload SAE connections, right?  Otherwise for 802.1X + HS offlo=
+ad =
 
-However, there's at least one upstream driver (qtnfmac) that supports SAE =
+this may be incorrect...
 
-through CMD_EXTERNAL_AUTH and sets NL80211_FEATURE_SAE as well.
+>   	if (netdev->sm) {
+>   		/*
+>   		 * Let station know about the roam so a state change can occur.
 
->   			 */
-> -			if (!wiphy_has_feature(wiphy, NL80211_FEATURE_SAE) ||
-> -					!wiphy->support_cmds_auth_assoc) {
+<snip>
 
-The original code here seems to cover the above case...
-
-> -				l_debug("No HW WPA3 support, trying WPA2");
-> -				goto wpa2_personal;
-> +			if (!wiphy_has_feature(wiphy, NL80211_FEATURE_SAE)) {
-
-And this looks like it would allow qtnfmac through...
-
-> +				if (!wiphy_has_ext_feature(wiphy,
-> +					NL80211_EXT_FEATURE_SAE_OFFLOAD) &&
-> +						!wiphy->support_cmds_auth_assoc)
-> +					goto wpa2_personal;
-
-Perhaps all this mess needs to be moved into a separate function with all t=
-hese =
-
-details explained.
-
-To me it looks like there's 3 paths:
-
-1. SoftMac case:
-	FEATURE_SAE &&
-		wiphy_supports_cmds_auth_assoc =3D=3D true
-
-2. Non-Offloaded case via CMD_EXTERNAL_AUTH
-	FEATURE_SAE &&
-		wiphy_supports_cmds_auth_assoc =3D=3D false
-
-3. Offloaded case:
-	!FEATURE_SAE &&
-		FEATURE_EXT_SAE_OFFLOAD &&
-		wiphy_supports_cmds_auth_assoc =3D=3D false
-
-And then maybe in the case of brcmfmac it supports case 2 without setting =
-
-FEATURE_SAE.
-
-Total mess as there seems to be no way to check for external auth support.
-
->   			}
+> @@ -2618,6 +2628,15 @@ static struct l_genl_msg *netdev_build_cmd_connect=
+(struct netdev *netdev,
+>   						bss->ssid_len, bss->ssid);
+>   	l_genl_msg_append_attr(msg, NL80211_ATTR_AUTH_TYPE, 4, &auth_type);
 >   =
 
->   			if (info.akm_suites &
-> =
+> +	if (hs->offload) {
+> +		l_genl_msg_append_attr(msg, NL80211_ATTR_EXTERNAL_AUTH_SUPPORT,
+> +					0, NULL);
+> +
 
+Hmm, this part looks suspicious?  See my reply to patch 2?
+
+> +		if (IE_AKM_IS_SAE(hs->akm_suite))
+> +			l_genl_msg_append_attr(msg, NL80211_ATTR_SAE_PASSWORD,
+> +					strlen(hs->passphrase), hs->passphrase);
+> +	}
+> +
+>   	if (prev_bssid)
+>   		l_genl_msg_append_attr(msg, NL80211_ATTR_PREV_BSSID, ETH_ALEN,
+>   						prev_bssid);
 
 Regards,
 -Denis
---===============7654258378770400570==--
+--===============0424993274381789961==--
 
