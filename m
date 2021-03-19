@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============5236011646461603462=="
+Content-Type: multipart/mixed; boundary="===============0703108748652210481=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
 Subject: Re: [PATCH 5/6] netdev: add SAE offload support
-Date: Fri, 19 Mar 2021 08:51:11 -0700
-Message-ID: <5f3f459e5f71fb1244c7ae7d24531309843a6e08.camel@gmail.com>
+Date: Fri, 19 Mar 2021 09:33:04 -0700
+Message-ID: <74ef3a343ebd0dcaae122b767bd56a88b5b79efd.camel@gmail.com>
 In-Reply-To: <6395b7de-4bd5-a1b5-f0b7-78447f2cd320@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5236011646461603462==
+--===============0703108748652210481==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -49,6 +49,21 @@ On Fri, 2021-03-19 at 10:15 -0500, Denis Kenzior wrote:
 > offload =
 
 > this may be incorrect...
+
+Yes, but this should only get set if we are actually doing offloading,
+which we don't yet support for 1x/PSK. I havent dove into this yet, but
+what would the procedure be here for 1x offloading (theoretically)?
+
+Now in light of CMD_EXTERNAL_AUTH the code below in a previous patch
+needs to change to account for this:
+
+if (!wiphy_supports_cmds_auth_assoc(wiphy))
+	hs->offload =3D true;
+
+But as far as this check goes I don't see an issue unless you think
+8021x offload has more handling that needs to be done. I'm not exactly
+sure how much of 1x is offloaded (auth/assoc?, EAP?, 4-way? all?)
+
 > =
 
 > >   	if (netdev->sm) {
@@ -76,12 +91,6 @@ On Fri, 2021-03-19 at 10:15 -0500, Denis Kenzior wrote:
 > =
 
 > Hmm, this part looks suspicious?  See my reply to patch 2?
-
-Yeah I misread the docs, as well as followed how wpa_s does it (which
-includes this) but its not needed. With respect to your other comments
-I think I'll punt on EXTERNAL_AUTH for now since I have no way of
-testing it and only one driver actually uses it.
-
 > =
 
 > > +		if (IE_AKM_IS_SAE(hs->akm_suite))
@@ -100,5 +109,5 @@ testing it and only one driver actually uses it.
 > Regards,
 > -Denis
 
---===============5236011646461603462==--
+--===============0703108748652210481==--
 
