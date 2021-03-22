@@ -1,90 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============4351263803344865310=="
+Content-Type: multipart/mixed; boundary="===============5265610658831014801=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: Can't connect to 8021x network
-Date: Mon, 22 Mar 2021 10:07:41 -0500
-Message-ID: <844ba110-17cd-2e23-9a0c-5558a8f59796@gmail.com>
-In-Reply-To: <875z1jwgjx.fsf@wavexx.thregr.org>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/6] wiphy: add getter for 'supports_cmds_auth_assoc'
+Date: Mon, 22 Mar 2021 09:01:51 -0700
+Message-ID: <20210322160156.392256-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4351263803344865310==
+--===============5265610658831014801==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Yuri,
+---
+ src/wiphy.c | 5 +++++
+ src/wiphy.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-On 3/22/21 6:51 AM, Yuri D'Elia wrote:
-> Hi everyone.
-> =
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 82e3ca87..e230b273 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -404,6 +404,11 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct sca=
+n_bss *bss)
+ 	return true;
+ }
+ =
 
-> Recently my organization upgraded our APs to some Cisco C9115AXI-E from
-> some older 3500I (also Cisco).
-> =
++bool wiphy_supports_cmds_auth_assoc(struct wiphy *wiphy)
++{
++	return wiphy->support_cmds_auth_assoc;
++}
++
+ bool wiphy_has_feature(struct wiphy *wiphy, uint32_t feature)
+ {
+ 	return wiphy->feature_flags & feature;
+diff --git a/src/wiphy.h b/src/wiphy.h
+index 1fd71f0d..6c91220c 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -79,6 +79,7 @@ uint32_t wiphy_get_supported_bands(struct wiphy *wiphy);
+ const struct scan_freq_set *wiphy_get_supported_freqs(
+ 						const struct wiphy *wiphy);
+ bool wiphy_can_connect(struct wiphy *wiphy, struct scan_bss *bss);
++bool wiphy_supports_cmds_auth_assoc(struct wiphy *wiphy);
+ bool wiphy_can_randomize_mac_addr(struct wiphy *wiphy);
+ bool wiphy_rrm_capable(struct wiphy *wiphy);
+ bool wiphy_has_feature(struct wiphy *wiphy, uint32_t feature);
+-- =
 
-> iwd used to be able to connect, but not anymore. I can still connect
-> through wpa_supplicant, so I suspect an issue with iwd.
-> =
+2.26.2
 
-> Configuration for the 8021x network is unchanged and as follows:
-> =
-
-> [Security]
-> EAP-Method=3DPEAP
-> EAP-Identity=3Da(a)b.c
-> EAP-PEAP-Phase2-Method=3DMSCHAPV2
-> EAP-PEAP-Phase2-Identity=3Da(a)b.c
-> EAP-PEAP-Phase2-Password=3Dxyz
-> =
-
-
-Looks good.  But you're not validating the certificate, which is probably n=
-ot =
-
-great for security...
-
-> When connecting with IWD_TLS_DEBUG=3D1 iwd -d, I normally see this just
-> after association:
-
-Hmm, I would have actually expected a lot more output with IWD_TLS_DEBUG be=
-ing =
-
-enabled, but maybe it is not getting far enough.
-
-<snip>
-
-> src/station.c:station_handshake_event() Handshaking
-> src/netdev.c:netdev_mlme_notify() MLME notification Unknown(139)
-> src/netdev.c:netdev_unicast_notify() Unicast notification 129
-> src/netdev.c:netdev_control_port_frame_event()
-> 4-Way handshake failed for ifindex: 17, reason: 15
-
-So AP sends us the first packet, but we time out some time later.  Can you =
-do =
-
-two things:
-
-1. Add the following to /etc/iwd/main.conf
-[EAPoL]
-MaxHandshakeTime=3D15
-
-See if the handshake proceeds further.  The default timeout is 5 seconds, s=
-o if =
-
-the AP or RADIUS server is extremely slow things might time out.  However, =
-this =
-
-is probably unlikely.
-
-2. Send us or me privately an iwmon pcap trace of the first packet that the=
- AP =
-
-sends.  Maybe it has something unexpected.  See [1].
-
-Regards,
--Denis
-
-[1] https://iwd.wiki.kernel.org/debugging
---===============4351263803344865310==--
+--===============5265610658831014801==--
 
