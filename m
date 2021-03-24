@@ -1,94 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============1241665108922634338=="
+Content-Type: multipart/mixed; boundary="===============0331842811238129811=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/4] ie: add ie_akm_suite_to_string
-Date: Wed, 24 Mar 2021 15:25:57 -0700
-Message-ID: <20210324222559.577225-2-prestwoj@gmail.com>
+Subject: [PATCH 3/4] station: add AKMSuite to GetDiagnostics
+Date: Wed, 24 Mar 2021 15:25:58 -0700
+Message-ID: <20210324222559.577225-3-prestwoj@gmail.com>
 In-Reply-To: <20210324222559.577225-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1241665108922634338==
+--===============0331842811238129811==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Converts ie_rsn_akm_suite values into strings
 ---
- src/ie.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- src/ie.h |  2 ++
- 2 files changed, 48 insertions(+)
+ src/station.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/src/ie.c b/src/ie.c
-index 46f7496e..b265b811 100644
---- a/src/ie.c
-+++ b/src/ie.c
-@@ -2636,3 +2636,49 @@ int ie_build_hs20_indication(uint8_t version, uint8_=
-t *to)
+diff --git a/src/station.c b/src/station.c
+index 8049fd85..2289ab39 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3629,6 +3629,7 @@ static void station_get_diagnostic_cb(
+ 	struct station *station =3D user_data;
+ 	struct l_dbus_message *reply;
+ 	struct l_dbus_message_builder *builder;
++	struct handshake_state *hs =3D netdev_get_handshake(station->netdev);
  =
 
- 	return 0;
- }
-+
-+const char *ie_akm_suite_to_string(enum ie_rsn_akm_suite akm)
-+{
-+	switch (akm) {
-+	case IE_RSN_AKM_SUITE_8021X:
-+		return "802.1x";
-+	case IE_RSN_AKM_SUITE_PSK:
-+		return "PSK";
-+	case IE_RSN_AKM_SUITE_FT_OVER_8021X:
-+		return "FT-802.1x";
-+	case IE_RSN_AKM_SUITE_FT_USING_PSK:
-+		return "FT-PSK";
-+	case IE_RSN_AKM_SUITE_8021X_SHA256:
-+		return "802.1x-SHA256";
-+	case IE_RSN_AKM_SUITE_PSK_SHA256:
-+		return "PSK-SHA256";
-+	case IE_RSN_AKM_SUITE_TDLS:
-+		return "TDLS";
-+	case IE_RSN_AKM_SUITE_SAE_SHA256:
-+		return "SAE";
-+	case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
-+		return "FT-SAE";
-+	case IE_RSN_AKM_SUITE_AP_PEER_KEY_SHA256:
-+		return "AP-PEER-KEY";
-+	case IE_RSN_AKM_SUITE_8021X_SUITE_B_SHA256:
-+		return "802.1x-Suite-B";
-+	case IE_RSN_AKM_SUITE_8021X_SUITE_B_SHA384:
-+		return "802.1x-Suite-B-SHA384";
-+	case IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384:
-+		return "FT-802.1x-SHA384";
-+	case IE_RSN_AKM_SUITE_OWE:
-+		return "OWE";
-+	case IE_RSN_AKM_SUITE_FILS_SHA256:
-+		return "FILS-SHA256";
-+	case IE_RSN_AKM_SUITE_FILS_SHA384:
-+		return "FILS-SHA256";
-+	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
-+		return "FT-FILS-SHA256";
-+	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
-+		return "FT-FILS-SHA384";
-+	case IE_RSN_AKM_SUITE_OSEN:
-+		return "OSEN";
-+	}
-+
-+	return NULL;
-+}
-diff --git a/src/ie.h b/src/ie.h
-index 995f0e4f..bed88de9 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -528,3 +528,5 @@ int ie_parse_hs20_indication_from_data(const uint8_t *d=
-ata, size_t len,
- 					uint8_t *version, uint16_t *pps_mo_id,
- 					uint8_t *domain_id);
- int ie_build_hs20_indication(uint8_t version, uint8_t *to);
-+
-+const char *ie_akm_suite_to_string(enum ie_rsn_akm_suite suite);
+ 	if (!info) {
+ 		reply =3D dbus_error_aborted(station->get_station_pending);
+@@ -3645,6 +3646,8 @@ static void station_get_diagnostic_cb(
+ 					util_address_to_string(info->addr));
+ 	dbus_append_dict_basic(builder, "Frequency", 'u',
+ 				&station->connected_bss->frequency);
++	dbus_append_dict_basic(builder, "AKMSuite", 's',
++				ie_akm_suite_to_string(hs->akm_suite));
+ =
+
+ 	diagnostic_info_to_dict(info, builder);
+ =
+
 -- =
 
 2.26.2
 
---===============1241665108922634338==--
+--===============0331842811238129811==--
 
