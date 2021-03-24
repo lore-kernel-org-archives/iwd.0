@@ -1,128 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============5830296326507025843=="
+Content-Type: multipart/mixed; boundary="===============7475163303181730308=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] monitor: print out extended feature name
-Date: Wed, 24 Mar 2021 11:58:02 -0700
-Message-ID: <20210324185802.559799-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] monitor: print out extended feature name
+Date: Wed, 24 Mar 2021 14:38:54 -0500
+Message-ID: <72848ac7-9315-3dc1-42af-c026b5573b0f@gmail.com>
+In-Reply-To: <20210324185802.559799-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5830296326507025843==
+--===============7475163303181730308==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This prints out the NL80211_* enum name for extended features
-rather than a hex string.
----
- monitor/nlmon.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 81 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 5b0cad89..78e0ed8b 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -5415,6 +5415,85 @@ static void print_eapol(unsigned int level, const ch=
-ar *label,
- 	print_hexdump(level + 1, data, size);
- }
- =
+On 3/24/21 1:58 PM, James Prestwood wrote:
+> This prints out the NL80211_* enum name for extended features
+> rather than a hex string.
+> ---
+>   monitor/nlmon.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 81 insertions(+), 1 deletion(-)
+> =
 
-+#define EXT_ENTRY(a) #a
-+
-+static const char *ext_feature_map[] =3D {
-+	EXT_ENTRY(NL80211_EXT_FEATURE_VHT_IBSS),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_RRM),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_MU_MIMO_AIR_SNIFFER),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_SCAN_START_TIME),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_BSS_PARENT_TSF),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_SET_SCAN_DWELL),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_BEACON_RATE_LEGACY),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_BEACON_RATE_HT),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_BEACON_RATE_VHT),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_FILS_STA),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_MGMT_TX_RANDOM_TA),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_MGMT_TX_RANDOM_TA_CONNECTED),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_SCHED_SCAN_RELATIVE_RSSI),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_CQM_RSSI_LIST),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_FILS_SK_OFFLOAD),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_1X),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_FILS_MAX_CHANNEL_TIME),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_ACCEPT_BCAST_PROBE_RESP),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_OCE_PROBE_REQ_HIGH_TX_RATE),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_OCE_PROBE_REQ_DEFERRAL_SUPPRESSION),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_MFP_OPTIONAL),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_LOW_SPAN_SCAN),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_LOW_POWER_SCAN),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_HIGH_ACCURACY_SCAN),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_DFS_OFFLOAD),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_CONTROL_PORT_OVER_NL80211),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_ACK_SIGNAL_SUPPORT),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_TXQS),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_SCAN_RANDOM_SN),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_SCAN_MIN_PREQ_CONTENT),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_CAN_REPLACE_PTK0),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_ENABLE_FTM_RESPONDER),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_AIRTIME_FAIRNESS),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_AP_PMKSA_CACHING),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_SCHED_SCAN_BAND_SPECIFIC_RSSI_THOLD),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_EXT_KEY_ID),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_STA_TX_PWR),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_SAE_OFFLOAD),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_VLAN_OFFLOAD),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_AQL),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_BEACON_PROTECTION),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_CONTROL_PORT_NO_PREAUTH),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_PROTECTED_TWT),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_DEL_IBSS_STA),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_MULTICAST_REGISTRATIONS),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_BEACON_PROTECTION_CLIENT),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_SCAN_FREQ_KHZ),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_CONTROL_PORT_OVER_NL80211_TX_STATUS),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_OPERATING_CHANNEL_VALIDATION),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_4WAY_HANDSHAKE_AP_PSK),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_SAE_OFFLOAD_AP),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_FILS_DISCOVERY),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_UNSOL_BCAST_PROBE_RESP),
-+	EXT_ENTRY(NL80211_EXT_FEATURE_BEACON_RATE_HE),
-+};
-+
-+static void print_ext_features(unsigned int level, const char *label,
-+					const void *data, uint16_t size)
-+{
-+	int i;
-+	uint16_t bits;
-+
-+	if (L_ARRAY_SIZE(ext_feature_map) < size * 8)
-+		bits =3D L_ARRAY_SIZE(ext_feature_map);
-+	else
-+		bits =3D size * 8;
-+
-+	print_attr(level, "Extended Features:");
-+
-+	for (i =3D 0; i < bits; i++) {
-+		if (test_bit(data, i))
-+			print_attr(level + 1, "%s", ext_feature_map[i]);
-+	}
-+}
-+
- /*
-  * Control Port sends a EAPoL frame inside ATTR_FRAME and not a management
-  * frame.  So a separate table with all the possible attributes is provided
-@@ -5911,7 +5990,8 @@ static const struct attr_entry attr_table[] =3D {
- 	{ NL80211_ATTR_USE_RRM,
- 			"Use RRM", ATTR_FLAG },
- 	{ NL80211_ATTR_EXT_FEATURES,
--			"Extended Features" },
-+			"Extended Features", ATTR_CUSTOM,
-+			{ .function =3D print_ext_features} },
- 	{ NL80211_ATTR_FILS_KEK,
- 			"FILS KEK" },
- 	{ NL80211_ATTR_FILS_NONCES,
--- =
 
-2.26.2
+Applied, thanks.
 
---===============5830296326507025843==--
+Regards,
+-Denis
+
+--===============7475163303181730308==--
 
