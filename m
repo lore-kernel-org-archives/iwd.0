@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============7877002666619377828=="
+Content-Type: multipart/mixed; boundary="===============2922903148055256959=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 1/4] doc: document AKMSuite diagnostic value
-Date: Thu, 25 Mar 2021 10:45:47 -0500
-Message-ID: <8e331aff-72fc-bf9b-b4b9-4a8eb8ab2323@gmail.com>
-In-Reply-To: <20210324230538.583325-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v2 2/4] ie: add ie_akm_suite_to_string
+Date: Thu, 25 Mar 2021 10:47:48 -0500
+Message-ID: <683a4052-1db6-447b-4d36-ed928a86e66e@gmail.com>
+In-Reply-To: <20210324230538.583325-2-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7877002666619377828==
+--===============2922903148055256959==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,50 +16,66 @@ Content-Transfer-Encoding: quoted-printable
 Hi James,
 
 On 3/24/21 6:05 PM, James Prestwood wrote:
+> Converts ie_rsn_akm_suite values into strings
 > ---
->   doc/station-diagnostic-api.txt | 2 ++
->   1 file changed, 2 insertions(+)
+>   src/ie.c | 33 +++++++++++++++++++++++++++++++++
+>   src/ie.h |  2 ++
+>   2 files changed, 35 insertions(+)
 > =
 
-> diff --git a/doc/station-diagnostic-api.txt b/doc/station-diagnostic-api.=
-txt
-> index b5a73b5d..6470fa56 100644
-> --- a/doc/station-diagnostic-api.txt
-> +++ b/doc/station-diagnostic-api.txt
-> @@ -23,6 +23,8 @@ Methods		dict GetDiagnostics()
+> diff --git a/src/ie.c b/src/ie.c
+> index 46f7496e..80c6e5e4 100644
+> --- a/src/ie.c
+> +++ b/src/ie.c
+> @@ -2636,3 +2636,36 @@ int ie_build_hs20_indication(uint8_t version, uint=
+8_t *to)
 >   =
 
->   			Frequency - Frequency of currently connected BSS.
->   =
-
-> +			AKMSuite - The chosen AKM for the current connection.
+>   	return 0;
+>   }
 > +
+> +const char *ie_akm_suite_to_string(enum ie_rsn_akm_suite akm)
+> +{
+> +	switch (akm) {
+> +	case IE_RSN_AKM_SUITE_8021X:
 
-This doesn't feel right somehow.  I would expect AKMSuite to be something l=
-ike: =
+How are you distinguishing between WPA1 and WPA2?
 
-'00-0F0AC:9 FT over SAE' or something to that effect.  Similar to how iwmon=
- does it.
+> +	case IE_RSN_AKM_SUITE_8021X_SHA256:
+> +		return "WPA2-Enterprise";
+> +	case IE_RSN_AKM_SUITE_PSK:
+> +	case IE_RSN_AKM_SUITE_PSK_SHA256:
+> +		return "WPA2-Personal";
+> +	case IE_RSN_AKM_SUITE_FT_OVER_8021X:
+> +	case IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384:
+> +		return "WPA2-Enterprise + FT";
+> +	case IE_RSN_AKM_SUITE_FT_USING_PSK:
+> +		return "WPA2-Personal + FT";
+> +	case IE_RSN_AKM_SUITE_SAE_SHA256:
+> +		return "WPA3-Personal";
+> +	case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
+> +		return "WPA3-Personal + FT";
+> +	case IE_RSN_AKM_SUITE_OWE:
+> +		return "OWE";
+> +	case IE_RSN_AKM_SUITE_FILS_SHA256:
+> +	case IE_RSN_AKM_SUITE_FILS_SHA384:
+> +		return "FILS";
+> +	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
+> +	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
+> +		return "FILS + FT";
+> +	case IE_RSN_AKM_SUITE_OSEN:
+> +		return "OSEN";
+> +	default:
+> +		return NULL;
+> +	}
+> +}
 
-Since we're going for something more human-palatable, how about just naming=
- this =
+Also, for reasons mentioned in patch 1, I'd rather keep this specific to th=
+e =
 
-'Security' instead.  With possible values being:
-
-WPA-Personal, WPA2-Personal, WPA3-Personal, WPA2-Enterprise, OWE.  With may=
-be '+ =
-
-FT', '+ FILS' or 'FT/FILS' suffixes and whatever others we feel are importa=
-nt.
-
->   			RSSI [optional] - The RSSI of the currently connected BSS.
->   =
-
->   			AverageRSSI [optional] - Average RSSI of currently connected BSS.
-> =
-
+diagnostics interface.  So this probably belongs in diagnostics.c ?
 
 Regards,
 -Denis
---===============7877002666619377828==--
+--===============2922903148055256959==--
 
