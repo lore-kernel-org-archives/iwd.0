@@ -1,70 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============3035551866934914822=="
+Content-Type: multipart/mixed; boundary="===============7877002666619377828=="
 MIME-Version: 1.0
-From: KeithG <ys3al35l@gmail.com>
-Subject: Broadcom reconnect problems
-Date: Wed, 24 Mar 2021 18:16:15 -0500
-Message-ID: <CAG17S_MtQZB+v-BO0Fr2joXYLZD9cYphePa0OAaLrVNjPY_GtA@mail.gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2 1/4] doc: document AKMSuite diagnostic value
+Date: Thu, 25 Mar 2021 10:45:47 -0500
+Message-ID: <8e331aff-72fc-bf9b-b4b9-4a8eb8ab2323@gmail.com>
+In-Reply-To: <20210324230538.583325-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3035551866934914822==
+--===============7877002666619377828==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I have been having problems getting my broadcom based cards to
-reconnect when the disconnect is caused from the router side. It used
-to be a problem with NetworkManager as well as connman, but something
-recently happened with NM and now it reconnects in this scenario. When
-I have connman managing and a broadcom card, any disconnect from the
-router side will not reconnect.
+Hi James,
 
-I have 3 machines that I contrast. 1 x86 laptop with an intel card, 1
-laptop with a brcmsmac card and 1 (a bunch) of raspberry pis with
-brcmfmac cards. All will connect at boot time correctly. and the
-laptops reconnect at resume correctly as well.
+On 3/24/21 6:05 PM, James Prestwood wrote:
+> ---
+>   doc/station-diagnostic-api.txt | 2 ++
+>   1 file changed, 2 insertions(+)
+> =
 
-On the 2 laptops when NetworkManager is controlling things (Intel and
-brsmac with the iwd backend) and I disconnect it from the router end,
-they reconnect fine. When connman is controlling it, only the laptop
-with the intel card will reconnect. When I run the test on the laptop
-with the connman managing the brcmsmac card, all it does is this:
+> diff --git a/doc/station-diagnostic-api.txt b/doc/station-diagnostic-api.=
+txt
+> index b5a73b5d..6470fa56 100644
+> --- a/doc/station-diagnostic-api.txt
+> +++ b/doc/station-diagnostic-api.txt
+> @@ -23,6 +23,8 @@ Methods		dict GetDiagnostics()
+>   =
 
-$ ./monitor-iwd
-{Station} [/net/connman/iwd/0/7] State =3D disconnected
-{Network} [/net/connman/iwd/0/7/73706733_psk] Connected =3D False
-{Station} [/net/connman/iwd/0/7] Scanning =3D True
-{Station} [/net/connman/iwd/0/7] State =3D connecting
-{Station} [/net/connman/iwd/0/7] ConnectedNetwork =3D
-/net/connman/iwd/0/7/73706733_psk
-{Network} [/net/connman/iwd/0/7/73706733_psk] Connected =3D True
-{Station} [/net/connman/iwd/0/7] State =3D disconnected
-{Network} [/net/connman/iwd/0/7/73706733_psk] Connected =3D False
-{Removed net.connman.iwd.Network}
-[/net/connman/iwd/0/7/53756c6c6976616e2046616d696c79_psk]
-{Removed net.connman.iwd.Network}
-[/net/connman/iwd/0/7/415454385a7334464b33_psk]
-{Removed net.connman.iwd.Network} [/net/connman/iwd/0/7/73706732_psk]
-{Removed net.connman.iwd.Network} [/net/connman/iwd/0/7/4e4554474541523633_=
-psk]
-{Removed net.connman.iwd.Network}
-[/net/connman/iwd/0/7/436f6e6e656374696e672e2e2e_psk]
-{Removed net.connman.iwd.Network}
-[/net/connman/iwd/0/7/4d4f544f524f4c412d4645304431_psk]
-{Removed net.connman.iwd.Network}
-[/net/connman/iwd/0/7/41545470666b766e4378_psk]
-{Added net.connman.iwd.Network} [/net/connman/iwd/0/7/4e4554474541523332_ps=
-k]
-      Name =3D NETGEAR32
-      Connected =3D False
-      Device =3D /net/connman/iwd/0/7
-      Type =3D psk
-{Station} [/net/connman/iwd/0/7] Scanning =3D False
+>   			Frequency - Frequency of currently connected BSS.
+>   =
 
-Then it stops and nothing more happens. The output from monitor-iwd
-looks very similar on the RPis running the brcmfmac card. It
-disconnects but then never seems to re-scan and reconnect.
+> +			AKMSuite - The chosen AKM for the current connection.
+> +
 
-Keith
---===============3035551866934914822==--
+This doesn't feel right somehow.  I would expect AKMSuite to be something l=
+ike: =
+
+'00-0F0AC:9 FT over SAE' or something to that effect.  Similar to how iwmon=
+ does it.
+
+Since we're going for something more human-palatable, how about just naming=
+ this =
+
+'Security' instead.  With possible values being:
+
+WPA-Personal, WPA2-Personal, WPA3-Personal, WPA2-Enterprise, OWE.  With may=
+be '+ =
+
+FT', '+ FILS' or 'FT/FILS' suffixes and whatever others we feel are importa=
+nt.
+
+>   			RSSI [optional] - The RSSI of the currently connected BSS.
+>   =
+
+>   			AverageRSSI [optional] - Average RSSI of currently connected BSS.
+> =
+
+
+Regards,
+-Denis
+--===============7877002666619377828==--
 
