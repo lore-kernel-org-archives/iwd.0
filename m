@@ -1,93 +1,150 @@
-Content-Type: multipart/mixed; boundary="===============2362283007768880007=="
+Content-Type: multipart/mixed; boundary="===============7417375345778089329=="
 MIME-Version: 1.0
-From: Mauro Condarelli <mc5686@mclink.it>
-Subject: Re: iwctl force autoconnect
-Date: Mon, 29 Mar 2021 18:29:06 +0200
-Message-ID: <0faae04d-6658-55d8-2d10-20da4e043917@mclink.it>
-In-Reply-To: <7558fe82-2fc7-d448-8eb3-374fb642d1d9@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [issue] Can't connect to a WPA2-Enterprise network: 4-way
+ handshake timeout
+Date: Mon, 29 Mar 2021 11:30:03 -0500
+Message-ID: <79680adc-7d8a-dfd1-744e-97cfe8c13f85@gmail.com>
+In-Reply-To: <YF+4Fg7HwTjVyxhi@cello>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2362283007768880007==
+--===============7417375345778089329==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi Arseny,
 
-Il 29/03/2021 18:12, Denis Kenzior ha scritto:
-> Hi Yuri,
->
-> On 3/26/21 4:28 PM, Yuri D'Elia wrote:
->> Is it possible to force iwd to connect to a known network without
->> explicitly giving a network name? That is, to force attempting to
->> autoconnect?
->>
->> Currently "station <net> connect" requires a ssid. It would be nice if
->> that would be made optional, causing iwd to go through the automatic
->> connect logic.
->>
->> I assumed that issuing a "station <net> scan" *would* attempt to
->> autoconnect if a known network is seen and we're currently disconnected,
->> but it's not always the case. If we disconnected from a known network
->> due to AP disappearing and reappearing sometime later, "scan" will the
->> network, but connection is still performed after some longer timeout.
->
-> So in theory this should always be happening.=C2=A0 Once iwd is in =
+On 3/28/21 6:05 AM, Arseny Maslennikov wrote:
+> Hi everyone!
+> =
 
-> 'autoconnect' state (starting state, or when we lose a connection) =
+> I'm running iwd 1.12 on Debian sid, package version 1.12-1.
+> I'm trying to connect to a WPA2-Enterprise network with the following
+> network config file produced by NetworkManager, to no avail:
+> =
 
-> then any scan results triggered (either internal scanning logic or =
+> [Security]
+> EAP-Method=3DPEAP
+> EAP-Identity=3D
 
-> scans triggered via dbus/iwctl) should then be considered for =
+So an empty Identity frequently causes some EAP servers to get confused.  I=
+n =
 
-> autoconnect purposes.=C2=A0 You say that 'it's not always the case'. So =
+theory the outer identity is completely optional, but quite often it is req=
+uired =
 
-> this works for you sometimes and not other times?=C2=A0 Can you capture =
+in practice (probably due to a mis-configured RADIUS server).  Try setting =
+it to =
 
-> some logs for us?=C2=A0 Also, are you running any other network managers =
-on =
+anonymous(a)your.org or using your Phase2 identity.
 
-> top of iwd or just iwd standalone?
+> EAP-PEAP-Phase2-Method=3DMSCHAPV2
+> EAP-PEAP-Phase2-Identity=3D<redacted>
+> =
 
-I am guessing he needs to re-enter 'autoconnect' state after an explicit =
+> The password is stored by NM and provided to iwd on-demand.
+> The connection fails due to 4-way handshake timeout. Setting the timeout
+> period to 15 seconds in /etc/iwd/main.conf does not help, so it doesn't
+> look like the APs are that slow.
 
-disconnect.
+Right, what seems to be happening from the log you provided is that the AP =
+sends =
 
-Use case for this would be to disconnect from the currently connected =
+EAP/RequestIdentity and we reply with an empty one.  It sends an EAP/Fail a=
+nd =
 
-net and try to connect to some other, if available.
+re-tries the EAP/RequestIdentity again.  So try what I outlined above first=
+ and =
 
-What would be command sequence for this?
+see if you get further.
 
->
->>
->> I want to bind an action to force a scan+connect without having to wait,
->> and without having to hardcode a network name. When I'm moving a laptop
->> between offices and go through some blind spots (elevator) I end-up in a
->> situation where I'm disconnected, and I want to force a connection right
->> away.
->
-> We set some very conservative scan timeouts, perhaps you can play with =
+> =
 
-> more aggressive settings to see if iwd's autoconnect logic will work =
+> If I turn the iwd NM backend off and use wpa_supplicant instead, the
+> connection succeeds and I'm able to use the network properly. Various
+> Windows, Mac, iOS, Android clients work without issue as well.
+> =
 
-> in your case? See 'man 5 iwd.config', InitialPeriodicScanInterval and =
+> Here follows a log excerpt of wpa_supplicant successfully connecting to
+> the same network:
+> =
 
-> MaximumPeriodicScanInterval.
->
-> I think our default for MaximumPeriodicScanInterval is way too high =
+> Dec 04 12:25:39 cello wpa_supplicant[981]: wlan0: Reject scan trigger sin=
+ce one is already pending
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: SME: Trying to authenti=
+cate with 00:25:84:0e:99:de (SSID=3D'BMK_WIFI' freq=3D5200 MHz)
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: Trying to associate wit=
+h 00:25:84:0e:99:de (SSID=3D'BMK_WIFI' freq=3D5200 MHz)
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: Associated with 00:25:8=
+4:0e:99:de
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: CTRL-EVENT-SUBNET-STATU=
+S-UPDATE status=3D0
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: CTRL-EVENT-EAP-STARTED =
+EAP authentication started
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: CTRL-EVENT-EAP-PROPOSED=
+-METHOD vendor=3D0 method=3D25
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: CTRL-EVENT-EAP-METHOD E=
+AP vendor 0 method 25 (PEAP) selected
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: CTRL-EVENT-EAP-PEER-CER=
+T depth=3D0 subject=3D'/CN=3Dplat.redacted.cs.msu.su' hash=3Dad02acd8a22829=
+f4a987495194bfbcfa0cb21f6a75eab12746d4c48fbf1e2dfd
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: CTRL-EVENT-EAP-PEER-ALT=
+ depth=3D0 DNS:plat.redacted.cs.msu.su
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: CTRL-EVENT-EAP-PEER-CER=
+T depth=3D0 subject=3D'/CN=3Dplat.redacted.cs.msu.su' hash=3Dad02acd8a22829=
+f4a987495194bfbcfa0cb21f6a75eab12746d4c48fbf1e2dfd
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: CTRL-EVENT-EAP-PEER-ALT=
+ depth=3D0 DNS:plat.redacted.cs.msu.su
+> Dec 04 12:25:41 cello wpa_supplicant[981]: EAP-MSCHAPV2: Authentication s=
+ucceeded
+> Dec 04 12:25:41 cello wpa_supplicant[981]: EAP-TLV: TLV Result - Success =
+- EAP-TLV/Phase2 Completed
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: CTRL-EVENT-EAP-SUCCESS =
+EAP authentication completed successfully
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: WPA: CCMP is used, but =
+EAPOL-Key descriptor version (3) is not 2
+> Dec 04 12:25:41 cello wpa_supplicant[981]: wlan0: WPA: Interoperability w=
+orkaround: allow incorrect (should have been HMAC-SHA1), but stronger (is A=
+ES-128-CMAC), descriptor version to be used
+> =
 
-> actually.
->
-> Regards,
-> -Denis
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
->
-Regards
+> Maybe that "Interoperability workaround" they do is a clue?
 
-Mauro
+Ah we're not even getting this far in the authentication process yet.  This =
 
---===============2362283007768880007==--
+seems related to the 4-way handshake which happens after the EAP transactio=
+n has =
+
+succeeded.  So lets take it one step at a time.
+
+> =
+
+> If it's really a problem with the network, I have no way to explain it
+> to our wifi admins =E2=80=94 they do not recognise the problem and recomm=
+end
+> to use wpa_supplicant, which works.
+> =
+
+> Could this be fixed in iwd? I'm willing to help as much as I can, but
+> I'm a WiFi noob and don't really know anything about 802.11i outside
+> what's described in doc/wpa-auth.txt.
+> =
+
+> I'm also attaching the output of `iwmon --nortnl' launched prior to
+> connection.
+> =
+
+> Sorry if this has been discussed before, searches on the list for the
+> words "EAPoL" and "key descriptor version" give nothing.
+> =
+
+> Thanks in advance!
+> =
+
+
+Regards,
+-Denis
+--===============7417375345778089329==--
 
