@@ -1,39 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============7063952974286169780=="
+Content-Type: multipart/mixed; boundary="===============4362705905258729522=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 4/4] client: add Security key to diagnostics
-Date: Mon, 29 Mar 2021 10:33:10 -0700
-Message-ID: <20210329173310.706671-4-prestwoj@gmail.com>
-In-Reply-To: <20210329173310.706671-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: iwctl force autoconnect
+Date: Mon, 29 Mar 2021 13:11:19 -0500
+Message-ID: <63c707d6-ee4b-f334-3a97-ce26162f3227@gmail.com>
+In-Reply-To: <f5fa26ae-90b5-2e88-1931-512dac405f11@mclink.it>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7063952974286169780==
+--===============4362705905258729522==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- client/diagnostic.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi Mauro,
 
-diff --git a/client/diagnostic.c b/client/diagnostic.c
-index 58c646d7..9e255918 100644
---- a/client/diagnostic.c
-+++ b/client/diagnostic.c
-@@ -92,6 +92,7 @@ static const struct diagnostic_dict_mapping diagnostic_ma=
-pping[] =3D {
- 	{ "RxMCS", 'y' },
- 	{ "TxMCS", 'y' },
- 	{ "Frequency", 'u' },
-+	{ "Security", 's' },
- 	{ NULL }
- };
- =
+>> So while connected, it should just be 'station wlan0 connect <some other=
+ network>'.=C2=A0 iwd will gracefully switch networks=C2=A0 (disconnect fro=
+m old + connect to new) for you.
+> That is not exactly what I asked.
+> This is for use case "I want to connect to a specific network".
+> =
 
--- =
+> I asked for the "negated": "please connect to *any* net=C2=A0 *but* the c=
+urrent one".
+> =
 
-2.26.2
 
---===============7063952974286169780==--
+That is not a usecase we support and I'm not sure I understand why that wou=
+ld =
+
+even be wanted.  Patches are always welcome of course.
+
+> There are also cases where you want to temporarily disconnect and later r=
+econnect to the same or other net, without necessarily having preferences.
+
+That is what rfkill is for.
+
+> =
+
+> This would be particularly useful for "unattended servers" where there's =
+nobody to actually chose.
+> =
+
+> I think a "enter autoconnect state" command could be useful, at the very =
+least for testing/fallback.
+
+Perhaps.  We've been contemplating doing this and are quite open to the ide=
+a. =
+
+But no one has yet formulated a concrete and compelling use case for us to =
+do so.
+
+Regards,
+-Denis
+--===============4362705905258729522==--
 
