@@ -1,84 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============8825643882100457456=="
+Content-Type: multipart/mixed; boundary="===============9022249293867878174=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] wiphy: fix wiphy_can_connect AKM checks
-Date: Tue, 30 Mar 2021 10:31:13 -0700
-Message-ID: <20210330173113.737510-1-prestwoj@gmail.com>
+Subject: [PATCH v2 1/7] wiphy: add offload out parameter to
+ wiphy_can_connect_sae
+Date: Tue, 30 Mar 2021 11:48:02 -0700
+Message-ID: <20210330184808.744574-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8825643882100457456==
+--===============9022249293867878174==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This was changed in commit 6e8b7652 to remove the IE_AKM_IS_SAE
-and instead use a switch statement. This is was incorrect since
-the akm_suites is actually a bitmask which could contain multiple
-AKM suites (hence the plural name). Instead a few macros were
-added which check the bitmask rather than the entire value.
+This will be set if the SAE connection requires offloading to
+work.
 ---
- src/wiphy.c | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+ src/wiphy.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/src/wiphy.c b/src/wiphy.c
-index 676f236c..57c97367 100644
+index 676f236c..35872577 100644
 --- a/src/wiphy.c
 +++ b/src/wiphy.c
-@@ -388,6 +388,21 @@ const struct scan_freq_set *wiphy_get_supported_freqs(
- 	return wiphy->supported_freqs;
+@@ -126,7 +126,7 @@ enum ie_rsn_cipher_suite wiphy_select_cipher(struct wip=
+hy *wiphy, uint16_t mask)
+ 	return 0;
  }
  =
 
-+#define AKM_IS_AUTH_ASSOC(akm)				\
-+(							\
-+	akm & (IE_RSN_AKM_SUITE_OWE |			\
-+		IE_RSN_AKM_SUITE_FILS_SHA256 |		\
-+		IE_RSN_AKM_SUITE_FILS_SHA384 |		\
-+		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 |	\
-+		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384)	\
-+)
-+
-+#define AKM_IS_SAE(akm)					\
-+(							\
-+	akm & (IE_RSN_AKM_SUITE_SAE_SHA256 |		\
-+		IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256)	\
-+)
-+
- bool wiphy_can_connect(struct wiphy *wiphy, struct scan_bss *bss)
+-static bool wiphy_can_connect_sae(struct wiphy *wiphy)
++static bool wiphy_can_connect_sae(struct wiphy *wiphy, bool *offload)
  {
- 	struct ie_rsn_info rsn_info;
-@@ -407,23 +422,12 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct sc=
-an_bss *bss)
- 					rsn_info.group_management_cipher))
- 			return false;
+ 	/*
+ 	 * SAE support in the kernel is a complete mess in that there are 3
+@@ -153,8 +153,11 @@ static bool wiphy_can_connect_sae(struct wiphy *wiphy)
  =
 
--
--		switch (rsn_info.akm_suites) {
--		case IE_RSN_AKM_SUITE_SAE_SHA256:
--		case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
-+		if (AKM_IS_SAE(rsn_info.akm_suites)) {
- 			if (!wiphy_can_connect_sae(wiphy))
- 				return false;
--
--			break;
--		case IE_RSN_AKM_SUITE_OWE:
--		case IE_RSN_AKM_SUITE_FILS_SHA256:
--		case IE_RSN_AKM_SUITE_FILS_SHA384:
--		case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
--		case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
-+		} else if (AKM_IS_AUTH_ASSOC(rsn_info.akm_suites)) {
- 			if (!wiphy->support_cmds_auth_assoc)
- 				return false;
--
--			break;
- 		}
- 	} else if (r !=3D -ENOENT)
+ 	if (wiphy_has_feature(wiphy, NL80211_FEATURE_SAE)) {
+ 		/* Case (1) */
+-		if (wiphy->support_cmds_auth_assoc)
++		if (wiphy->support_cmds_auth_assoc) {
++			if (offload)
++				*offload =3D false;
+ 			return true;
++		}
+ =
+
+ 		/*
+ 		 * Case (3)
+@@ -165,8 +168,12 @@ static bool wiphy_can_connect_sae(struct wiphy *wiphy)
+ 	} else {
+ 		/* Case (2) */
+ 		if (wiphy_has_ext_feature(wiphy,
+-					NL80211_EXT_FEATURE_SAE_OFFLOAD))
++					NL80211_EXT_FEATURE_SAE_OFFLOAD)) {
++			if (offload)
++				*offload =3D true;
++
+ 			return true;
++		}
+ =
+
  		return false;
+ 	}
+@@ -234,7 +241,7 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wi=
+phy,
+ 				goto wpa2_personal;
+ 			}
+ =
+
+-			if (!wiphy_can_connect_sae(wiphy))
++			if (!wiphy_can_connect_sae(wiphy, NULL))
+ 				goto wpa2_personal;
+ =
+
+ 			if (info.akm_suites &
+@@ -411,7 +418,7 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct scan=
+_bss *bss)
+ 		switch (rsn_info.akm_suites) {
+ 		case IE_RSN_AKM_SUITE_SAE_SHA256:
+ 		case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
+-			if (!wiphy_can_connect_sae(wiphy))
++			if (!wiphy_can_connect_sae(wiphy, NULL))
+ 				return false;
+ =
+
+ 			break;
 -- =
 
 2.26.2
 
---===============8825643882100457456==--
+--===============9022249293867878174==--
 
