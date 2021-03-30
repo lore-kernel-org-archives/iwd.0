@@ -1,175 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============7947070627830346744=="
+Content-Type: multipart/mixed; boundary="===============8183038966521070460=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 4/7] netdev: allow PSK offload for FT AKMs
-Date: Tue, 30 Mar 2021 14:09:18 -0700
-Message-ID: <20210330210921.750967-4-prestwoj@gmail.com>
+Subject: [PATCH v3 5/7] station: set handshake->offload if required
+Date: Tue, 30 Mar 2021 14:09:19 -0700
+Message-ID: <20210330210921.750967-5-prestwoj@gmail.com>
 In-Reply-To: <20210330210921.750967-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7947070627830346744==
+--===============8183038966521070460==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the handshake has offloading set, use ATTR_PMK (for WPA2)
-which enables PSK offloading.
-
-The CMD_ROAM event path was also modified to take into account
-handshake offloading. If the handshake is offloaded we still
-must issue GET_SCAN, but not start eapol since the firmware
-takes care of this.
+If the selected AKM requires offloading set the flag in the
+handshake as such. This also removes the need for
+wiphy_support_cmds_auth_assoc.
 ---
- src/netdev.c | 56 +++++++++++++++++++++++++++++++---------------------
- 1 file changed, 34 insertions(+), 22 deletions(-)
+ src/station.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
 v3:
- * Changed around some logic deciding whether to start eapol, and
-   how CMD_ROAM is handled.
- * Moved EVENT_SETTING_KEYS into a CMD_CONNECT path only. No need
-   to do this for CMD_ROAM.
+ * Moved this logic into station_build_handshake_rsn
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 914f6479..cb0f6829 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -1212,11 +1212,6 @@ static void netdev_connect_ok(struct netdev *netdev)
- 		netdev->fw_roam_bss =3D NULL;
- 	}
+diff --git a/src/station.c b/src/station.c
+index 0329d990..e161421b 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -802,6 +802,7 @@ static int station_build_handshake_rsn(struct handshake=
+_state *hs,
+ 	enum security security =3D network_get_security(network);
+ 	bool add_mde =3D false;
+ 	bool fils_hint =3D false;
++	bool offload =3D false;
  =
 
--	/* Allow station to sync the PSK to disk */
--	if (netdev->handshake && netdev->handshake->offload)
--		handshake_event(netdev->handshake,
--				HANDSHAKE_EVENT_SETTING_KEYS);
--
- 	if (netdev->connect_cb) {
- 		netdev->connect_cb(netdev, NETDEV_RESULT_OK, NULL,
- 					netdev->user_data);
-@@ -1985,26 +1980,25 @@ process_resp_ies:
- 	}
+ 	struct ie_rsn_info bss_info;
+ 	uint8_t rsne_buf[256];
+@@ -824,7 +825,12 @@ static int station_build_handshake_rsn(struct handshak=
+e_state *hs,
+ 	if (security =3D=3D SECURITY_8021X && hs->support_fils)
+ 		fils_hint =3D station_has_erp_identity(network);
+ =
+
+-	info.akm_suites =3D wiphy_select_akm(wiphy, bss, fils_hint, NULL);
++	info.akm_suites =3D wiphy_select_akm(wiphy, bss, fils_hint, &offload);
++
++	hs->offload =3D offload;
++
++	if (hs->offload)
++		l_debug("Connection will offload 4-way handshake to firmware");
  =
 
  	/*
--	 * TODO: Only SAE/WPA3-personal offload is supported. In this case IWD
--	 * is 'done'. In the case of 8021x offload EAP still needs to take
--	 * place, so this must be updated accordingly when that is implemented.
-+	 * Let station know about the roam so a state change can occur.
- 	 */
--	if (netdev->handshake->offload)
--		goto done;
+ 	 * Special case for OWE. With OWE we still need to build up the
+@@ -981,16 +987,6 @@ static struct handshake_state *station_handshake_setup=
+(struct station *station,
+ 				goto no_psk;
+ =
+
+ 			handshake_state_set_passphrase(hs, passphrase);
 -
--	if (netdev->sm) {
--		/*
--		 * Let station know about the roam so a state change can occur.
--		 */
--		if (cmd =3D=3D NL80211_CMD_ROAM) {
--			if (netdev->event_filter)
--				netdev->event_filter(netdev,
-+	if (cmd =3D=3D NL80211_CMD_ROAM) {
-+		if (netdev->event_filter)
-+			netdev->event_filter(netdev,
- 						NETDEV_EVENT_ROAMING,
- 						NULL, netdev->user_data);
--			/* EAPoL started after GET_SCAN */
-+		/* EAPoL started after GET_SCAN */
-+		if (!netdev->handshake->offload)
- 			return;
--		}
+-			/*
+-			 * TODO: This check isn't strictly correct since
+-			 * some drivers may support EXTERNAL_AUTH but since
+-			 * wiphy_can_connect takes this into account IWD should
+-			 * have already rejected the connection if this was the
+-			 * case.
+-			 */
+-			if (!wiphy_supports_cmds_auth_assoc(wiphy))
+-				hs->offload =3D true;
+ 		} else {
+ 			const uint8_t *psk =3D network_get_psk(network);
  =
 
-+		/*
-+		 * TODO: Only WPA2/WPA3-personal offload is supported. In this
-+		 * case IWD is 'done'. In the case of 8021x offload EAP still
-+		 * needs to take place, so this must be updated accordingly when
-+		 * that is implemented.
-+		 */
-+		goto done;
-+	} else if (netdev->sm) {
- 		/*
- 		 * Start processing EAPoL frames now that the state machine
- 		 * has all the input data even in FT mode.
-@@ -2015,6 +2009,11 @@ process_resp_ies:
- 		return;
- 	}
- =
-
-+	/* Allow station to sync the PSK to disk */
-+	if (netdev->handshake && netdev->handshake->offload)
-+		handshake_event(netdev->handshake,
-+				HANDSHAKE_EVENT_SETTING_KEYS);
-+
- done:
- 	netdev_connect_ok(netdev);
- =
-
-@@ -2641,6 +2640,8 @@ static struct l_genl_msg *netdev_build_cmd_connect(st=
-ruct netdev *netdev,
- 		if (IE_AKM_IS_SAE(hs->akm_suite))
- 			l_genl_msg_append_attr(msg, NL80211_ATTR_SAE_PASSWORD,
- 					strlen(hs->passphrase), hs->passphrase);
-+		else
-+			l_genl_msg_append_attr(msg, NL80211_ATTR_PMK, 32, hs->pmk);
- 	}
- =
-
- 	if (prev_bssid)
-@@ -4000,7 +4001,7 @@ static bool netdev_get_fw_scan_cb(int err, struct l_q=
-ueue *bss_list,
- 	 * In this case we should just ignore this and allow the disconnect
- 	 * logic to continue.
- 	 */
--	if (!netdev->sm)
-+	if (!netdev->handshake->offload && !netdev->sm)
- 		return false;
- =
-
- 	if (err < 0) {
-@@ -4028,6 +4029,11 @@ static bool netdev_get_fw_scan_cb(int err, struct l_=
-queue *bss_list,
- =
-
- 	handshake_state_set_authenticator_ie(netdev->handshake, bss->rsne);
- =
-
-+	if (netdev->handshake->offload) {
-+		netdev_connect_ok(netdev);
-+		return false;
-+	}
-+
- 	eapol_start(netdev->sm);
- =
-
- 	return false;
-@@ -4063,14 +4069,20 @@ static bool netdev_roam_event(struct l_genl_msg *ms=
-g, struct netdev *netdev)
- 		goto failed;
- 	}
- =
-
-+	/* Handshake completed in firmware, just get the roamed BSS */
-+	if (netdev->handshake->offload)
-+		goto get_fw_scan;
-+
- 	/* Reset handshake state */
- 	nhs->complete =3D false;
- 	nhs->ptk_installed =3D false;
- 	nhs->gtk_installed =3D true;
- 	nhs->igtk_installed =3D true;
--	handshake_state_set_authenticator_address(netdev->handshake, mac);
- 	netdev->handshake->ptk_complete =3D false;
- =
-
-+get_fw_scan:
-+	handshake_state_set_authenticator_address(netdev->handshake, mac);
-+
- 	if (!scan_get_firmware_scan(netdev->wdev_id, netdev_get_fw_scan_cb,
- 					netdev, NULL))
- 		goto failed;
 -- =
 
 2.26.2
 
---===============7947070627830346744==--
+--===============8183038966521070460==--
 
