@@ -1,79 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============8093567904820930564=="
+Content-Type: multipart/mixed; boundary="===============6998661873293621992=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 6/7] doc: document new [General].4WayOffload
-Date: Tue, 30 Mar 2021 15:49:19 -0500
-Message-ID: <7e89ecfe-3485-ecac-6e1f-e5a865ed2c9d@gmail.com>
-In-Reply-To: <20210330184808.744574-6-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3 1/7] Fixes: 6e8b7652788ac (add check for CMD_AUTH/CMD_ASSOC
+ support)
+Date: Tue, 30 Mar 2021 14:09:15 -0700
+Message-ID: <20210330210921.750967-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8093567904820930564==
+--===============6998661873293621992==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Commit 6e8b76527 added a switch statement for AKM suites which
+was not correct as this is a bitmask and may contain multiple
+values. Intead we can rely on wiphy_select_akm which is a more
+robust check anyways.
+---
+ src/wiphy.c | 19 +------------------
+ 1 file changed, 1 insertion(+), 18 deletions(-)
 
-On 3/30/21 1:48 PM, James Prestwood wrote:
-> This option will allow the 4-way handshake to be offloaded to
-> firmware if it supports it.
-> ---
->   src/iwd.config.rst | 14 ++++++++++++++
->   1 file changed, 14 insertions(+)
-> =
+v3:
+ * Return the result of wiphy_select_akm
+ * Pass false for fils_hint parameter
 
-> diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-> index 478bd616..e2060312 100644
-> --- a/src/iwd.config.rst
-> +++ b/src/iwd.config.rst
-> @@ -174,6 +174,20 @@ The group ``[General]`` contains general settings.
->          off by default.  If you want to easily utilize Hotspot 2.0 netwo=
-rks,
->          then setting ``DisableANQP`` to ``false`` is recommended.
->   =
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 676f236c..ab57a2d2 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -407,24 +407,7 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct sca=
+n_bss *bss)
+ 					rsn_info.group_management_cipher))
+ 			return false;
+ =
 
-> +   * - 4WayOffload
-> +     - Values: **false**, true
-> +
-> +       Enables the use of 4-way handshake offloading. Some drivers can o=
-ffload
-> +       the 4-way handshake to firmware which is needed for protocols whi=
-ch
-> +       act on Authenticate/Associate frames such as Fast Transition. This
-> +       option is turned off by default as it is not widely tested.
+-
+-		switch (rsn_info.akm_suites) {
+-		case IE_RSN_AKM_SUITE_SAE_SHA256:
+-		case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
+-			if (!wiphy_can_connect_sae(wiphy))
+-				return false;
+-
+-			break;
+-		case IE_RSN_AKM_SUITE_OWE:
+-		case IE_RSN_AKM_SUITE_FILS_SHA256:
+-		case IE_RSN_AKM_SUITE_FILS_SHA384:
+-		case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
+-		case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
+-			if (!wiphy->support_cmds_auth_assoc)
+-				return false;
+-
+-			break;
+-		}
++		return wiphy_select_akm(wiphy, bss, false);
+ 	} else if (r !=3D -ENOENT)
+ 		return false;
+ =
 
-Well, this isn't really true.  Handshake offload is just that, not needing =
-to =
+-- =
 
-perform it in userspace.  You can in theory have a SoftMac driver with hand=
-shake =
+2.26.2
 
-offloading capabilities for example.
-
-FT is a bit orthogonal and really depends on whether the firmware can roam =
-by =
-
-itself...
-
-> +
-> +       Note: There seems to be a bug in the brcmfmac driver/firmware whe=
-re once
-> +       offloading is enabled (by turning on this option) it cannot be tu=
-rned
-> +       off in the firmware without a hard reboot (or some means of resta=
-rting
-> +       the firmware).
-> +
-> +
->   Network
->   ---------
->   =
-
-> =
-
-
-Regards,
--Denis
---===============8093567904820930564==--
+--===============6998661873293621992==--
 
