@@ -1,47 +1,94 @@
-Content-Type: multipart/mixed; boundary="===============0238054939026567724=="
+Content-Type: multipart/mixed; boundary="===============1945305558865626397=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 1/3] netdev: better handle associate timeouts with
- auth_protos
-Date: Mon, 29 Mar 2021 15:50:04 -0500
-Message-ID: <e6e82c44-d424-fc4a-c13f-9b047f3bfe5e@gmail.com>
-In-Reply-To: <20210329204351.718429-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/7] wiphy: add offload out parameter to wiphy_can_connect_sae
+Date: Tue, 30 Mar 2021 09:13:01 -0700
+Message-ID: <20210330161307.732965-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0238054939026567724==
+--===============1945305558865626397==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This will be set if the SAE connection requires offloading to
+work.
+---
+ src/wiphy.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-On 3/29/21 3:43 PM, James Prestwood wrote:
-> Any auth proto which did not implement the assoc_timeout handler
-> could end up getting 'stuck' forever if there was an associate
-> timeout. This is because in the event of an associate timeout IWD
-> only sets a few flags and relies on the connect event to actually
-> handle the failure. The problem is a connect event never comes
-> if the failure was a timeout.
-> =
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 676f236c..35872577 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -126,7 +126,7 @@ enum ie_rsn_cipher_suite wiphy_select_cipher(struct wip=
+hy *wiphy, uint16_t mask)
+ 	return 0;
+ }
+ =
 
-> To fix this we can explicitly fail the connection if the auth
-> proto has not implemented assoc_timeout or if it returns false.
-> ---
->   src/netdev.c | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
-> =
+-static bool wiphy_can_connect_sae(struct wiphy *wiphy)
++static bool wiphy_can_connect_sae(struct wiphy *wiphy, bool *offload)
+ {
+ 	/*
+ 	 * SAE support in the kernel is a complete mess in that there are 3
+@@ -153,8 +153,11 @@ static bool wiphy_can_connect_sae(struct wiphy *wiphy)
+ =
 
-> v2:
->   * Moved the failure into the actual timeout case as the
->     connect event *does* come unless there was a timeout
-> =
+ 	if (wiphy_has_feature(wiphy, NL80211_FEATURE_SAE)) {
+ 		/* Case (1) */
+-		if (wiphy->support_cmds_auth_assoc)
++		if (wiphy->support_cmds_auth_assoc) {
++			if (offload)
++				*offload =3D false;
+ 			return true;
++		}
+ =
 
+ 		/*
+ 		 * Case (3)
+@@ -165,8 +168,12 @@ static bool wiphy_can_connect_sae(struct wiphy *wiphy)
+ 	} else {
+ 		/* Case (2) */
+ 		if (wiphy_has_ext_feature(wiphy,
+-					NL80211_EXT_FEATURE_SAE_OFFLOAD))
++					NL80211_EXT_FEATURE_SAE_OFFLOAD)) {
++			if (offload)
++				*offload =3D true;
++
+ 			return true;
++		}
+ =
 
-Applied, thanks.
+ 		return false;
+ 	}
+@@ -234,7 +241,7 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wi=
+phy,
+ 				goto wpa2_personal;
+ 			}
+ =
 
-Regards,
--Denis
+-			if (!wiphy_can_connect_sae(wiphy))
++			if (!wiphy_can_connect_sae(wiphy, NULL))
+ 				goto wpa2_personal;
+ =
 
---===============0238054939026567724==--
+ 			if (info.akm_suites &
+@@ -411,7 +418,7 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct scan=
+_bss *bss)
+ 		switch (rsn_info.akm_suites) {
+ 		case IE_RSN_AKM_SUITE_SAE_SHA256:
+ 		case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
+-			if (!wiphy_can_connect_sae(wiphy))
++			if (!wiphy_can_connect_sae(wiphy, NULL))
+ 				return false;
+ =
+
+ 			break;
+-- =
+
+2.26.2
+
+--===============1945305558865626397==--
 
