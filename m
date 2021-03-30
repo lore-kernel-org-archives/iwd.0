@@ -1,202 +1,175 @@
-Content-Type: multipart/mixed; boundary="===============4864815621369980701=="
+Content-Type: multipart/mixed; boundary="===============7947070627830346744=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 3/7] wiphy: allow FT AKM to be used if Auth/Assoc is not
- supported
-Date: Tue, 30 Mar 2021 14:09:17 -0700
-Message-ID: <20210330210921.750967-3-prestwoj@gmail.com>
+Subject: [PATCH v3 4/7] netdev: allow PSK offload for FT AKMs
+Date: Tue, 30 Mar 2021 14:09:18 -0700
+Message-ID: <20210330210921.750967-4-prestwoj@gmail.com>
 In-Reply-To: <20210330210921.750967-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4864815621369980701==
+--===============7947070627830346744==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Until now FT was only supported via Auth/Assoc commands which barred
-any fullmac cards from using FT AKMs. With PSK offload support these
-cards can do FT but only when offloading is used. This situation
-is checked now by wiphy_select_akm and a boolean is returned as an
-out parameter indicating if offloading is needed.
+If the handshake has offloading set, use ATTR_PMK (for WPA2)
+which enables PSK offloading.
 
-A new option [General].4WayOffload was added which is required to
-enable this functionality. This was done mainly because it is
-unknown how stable firmware offloading is from card to card.
-
-Note: Enabling offload has one strange side effect which could
-cause users problems when experimenting with this option. Once
-offload is enabled the firmware no longer forwards eapol frames
-for subsequent connections, even if offload is no longer being
-used. Once enabled a user must restart the firmware (e.g. via
-rebooting the machine) if they want to turn off the option.
+The CMD_ROAM event path was also modified to take into account
+handshake offloading. If the handshake is offloaded we still
+must issue GET_SCAN, but not start eapol since the firmware
+takes care of this.
 ---
- src/p2p.c     |  2 +-
- src/station.c |  2 +-
- src/wiphy.c   | 50 ++++++++++++++++++++++++++++++++++++++++++--------
- src/wiphy.h   |  3 ++-
- 4 files changed, 46 insertions(+), 11 deletions(-)
+ src/netdev.c | 56 +++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 34 insertions(+), 22 deletions(-)
 
-diff --git a/src/p2p.c b/src/p2p.c
-index e3130e21..7ee753a2 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -1475,7 +1475,7 @@ static void p2p_try_connect_group(struct p2p_device *=
-dev)
+v3:
+ * Changed around some logic deciding whether to start eapol, and
+   how CMD_ROAM is handled.
+ * Moved EVENT_SETTING_KEYS into a CMD_CONNECT path only. No need
+   to do this for CMD_ROAM.
+
+diff --git a/src/netdev.c b/src/netdev.c
+index 914f6479..cb0f6829 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1212,11 +1212,6 @@ static void netdev_connect_ok(struct netdev *netdev)
+ 		netdev->fw_roam_bss =3D NULL;
+ 	}
  =
 
- 	scan_bss_get_rsn_info(bss, &bss_info);
- =
-
--	rsn_info.akm_suites =3D wiphy_select_akm(dev->wiphy, bss, false);
-+	rsn_info.akm_suites =3D wiphy_select_akm(dev->wiphy, bss, false, NULL);
- 	if (!rsn_info.akm_suites)
- 		goto not_supported;
- =
-
-diff --git a/src/station.c b/src/station.c
-index cf4dd2e7..0329d990 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -824,7 +824,7 @@ static int station_build_handshake_rsn(struct handshake=
-_state *hs,
- 	if (security =3D=3D SECURITY_8021X && hs->support_fils)
- 		fils_hint =3D station_has_erp_identity(network);
- =
-
--	info.akm_suites =3D wiphy_select_akm(wiphy, bss, fils_hint);
-+	info.akm_suites =3D wiphy_select_akm(wiphy, bss, fils_hint, NULL);
+-	/* Allow station to sync the PSK to disk */
+-	if (netdev->handshake && netdev->handshake->offload)
+-		handshake_event(netdev->handshake,
+-				HANDSHAKE_EVENT_SETTING_KEYS);
+-
+ 	if (netdev->connect_cb) {
+ 		netdev->connect_cb(netdev, NETDEV_RESULT_OK, NULL,
+ 					netdev->user_data);
+@@ -1985,26 +1980,25 @@ process_resp_ies:
+ 	}
  =
 
  	/*
- 	 * Special case for OWE. With OWE we still need to build up the
-diff --git a/src/wiphy.c b/src/wiphy.c
-index cf8c7c56..b6b82933 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -181,16 +181,24 @@ static bool wiphy_can_connect_sae(struct wiphy *wiphy=
-, bool *offload)
+-	 * TODO: Only SAE/WPA3-personal offload is supported. In this case IWD
+-	 * is 'done'. In the case of 8021x offload EAP still needs to take
+-	 * place, so this must be updated accordingly when that is implemented.
++	 * Let station know about the roam so a state change can occur.
+ 	 */
+-	if (netdev->handshake->offload)
+-		goto done;
+-
+-	if (netdev->sm) {
+-		/*
+-		 * Let station know about the roam so a state change can occur.
+-		 */
+-		if (cmd =3D=3D NL80211_CMD_ROAM) {
+-			if (netdev->event_filter)
+-				netdev->event_filter(netdev,
++	if (cmd =3D=3D NL80211_CMD_ROAM) {
++		if (netdev->event_filter)
++			netdev->event_filter(netdev,
+ 						NETDEV_EVENT_ROAMING,
+ 						NULL, netdev->user_data);
+-			/* EAPoL started after GET_SCAN */
++		/* EAPoL started after GET_SCAN */
++		if (!netdev->handshake->offload)
+ 			return;
+-		}
  =
 
- enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wiphy,
- 					struct scan_bss *bss,
--					bool fils_capable_hint)
-+					bool fils_capable_hint,
-+					bool *offload)
- {
- 	struct ie_rsn_info info;
- 	enum security security;
-+	bool offload_on;
-+	bool offload_needed;
-+	const struct l_settings *settings =3D iwd_get_config();
- =
-
- 	memset(&info, 0, sizeof(info));
- 	scan_bss_get_rsn_info(bss, &info);
- =
-
- 	security =3D security_determine(bss->capability, &info);
- =
-
-+	if (!l_settings_get_bool(settings, "General", "4WayOffload",
-+					&offload_on))
-+		offload_on =3D false;
-+
- 	/*
- 	 * If FT is available, use FT authentication to keep the door open
- 	 * for fast transitions.  Otherwise use SHA256 version if present.
-@@ -241,22 +249,48 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *=
-wiphy,
- 				goto wpa2_personal;
- 			}
- =
-
--			if (!wiphy_can_connect_sae(wiphy, NULL))
-+			if (!wiphy_can_connect_sae(wiphy, &offload_needed))
-+				goto wpa2_personal;
-+
-+			if (offload_needed && !offload_on)
- 				goto wpa2_personal;
- =
-
- 			if (info.akm_suites &
--					IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256)
-+					IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256) {
-+				if (offload)
-+					*offload =3D offload_needed;
-+
- 				return IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256;
-+			}
-+
-+			if (info.akm_suites & IE_RSN_AKM_SUITE_SAE_SHA256) {
-+				if (offload)
-+					*offload =3D offload_needed;
- =
-
--			if (info.akm_suites & IE_RSN_AKM_SUITE_SAE_SHA256)
- 				return IE_RSN_AKM_SUITE_SAE_SHA256;
-+			}
- 		}
- =
-
- wpa2_personal:
 +		/*
-+		 * Allow FT if either Auth/Assoc is supported OR if the card
-+		 * supports PSK offload. Without Auth/Assoc, PSK offload is the
-+		 * only mechanism to allow FT on these cards.
++		 * TODO: Only WPA2/WPA3-personal offload is supported. In this
++		 * case IWD is 'done'. In the case of 8021x offload EAP still
++		 * needs to take place, so this must be updated accordingly when
++		 * that is implemented.
 +		 */
- 		if ((info.akm_suites & IE_RSN_AKM_SUITE_FT_USING_PSK) &&
--				bss->rsne && bss->mde_present &&
--				wiphy->support_cmds_auth_assoc)
--			return IE_RSN_AKM_SUITE_FT_USING_PSK;
-+					bss->rsne && bss->mde_present) {
-+			if (wiphy->support_cmds_auth_assoc)
-+				return IE_RSN_AKM_SUITE_FT_USING_PSK;
-+
-+			if (wiphy_has_ext_feature(wiphy,
-+				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK) &&
-+					offload_on) {
-+				if (offload)
-+					*offload =3D true;
-+
-+				return IE_RSN_AKM_SUITE_FT_USING_PSK;
-+			}
-+		}
++		goto done;
++	} else if (netdev->sm) {
+ 		/*
+ 		 * Start processing EAPoL frames now that the state machine
+ 		 * has all the input data even in FT mode.
+@@ -2015,6 +2009,11 @@ process_resp_ies:
+ 		return;
+ 	}
  =
 
- 		if (info.akm_suites & IE_RSN_AKM_SUITE_PSK_SHA256)
- 			return IE_RSN_AKM_SUITE_PSK_SHA256;
-@@ -414,7 +448,7 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct scan=
-_bss *bss)
- 					rsn_info.group_management_cipher))
- 			return false;
++	/* Allow station to sync the PSK to disk */
++	if (netdev->handshake && netdev->handshake->offload)
++		handshake_event(netdev->handshake,
++				HANDSHAKE_EVENT_SETTING_KEYS);
++
+ done:
+ 	netdev_connect_ok(netdev);
  =
 
--		return wiphy_select_akm(wiphy, bss, false);
-+		return wiphy_select_akm(wiphy, bss, false, NULL);
- 	} else if (r !=3D -ENOENT)
+@@ -2641,6 +2640,8 @@ static struct l_genl_msg *netdev_build_cmd_connect(st=
+ruct netdev *netdev,
+ 		if (IE_AKM_IS_SAE(hs->akm_suite))
+ 			l_genl_msg_append_attr(msg, NL80211_ATTR_SAE_PASSWORD,
+ 					strlen(hs->passphrase), hs->passphrase);
++		else
++			l_genl_msg_append_attr(msg, NL80211_ATTR_PMK, 32, hs->pmk);
+ 	}
+ =
+
+ 	if (prev_bssid)
+@@ -4000,7 +4001,7 @@ static bool netdev_get_fw_scan_cb(int err, struct l_q=
+ueue *bss_list,
+ 	 * In this case we should just ignore this and allow the disconnect
+ 	 * logic to continue.
+ 	 */
+-	if (!netdev->sm)
++	if (!netdev->handshake->offload && !netdev->sm)
  		return false;
  =
 
-diff --git a/src/wiphy.h b/src/wiphy.h
-index 6c91220c..7ac1df95 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -57,7 +57,8 @@ enum ie_rsn_cipher_suite wiphy_select_cipher(struct wiphy=
- *wiphy,
- 							uint16_t mask);
- enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wiphy,
- 					struct scan_bss *bss,
--					bool fils_capable_hint);
-+					bool fils_capable_hint,
-+					bool *offload);
+ 	if (err < 0) {
+@@ -4028,6 +4029,11 @@ static bool netdev_get_fw_scan_cb(int err, struct l_=
+queue *bss_list,
  =
 
- struct wiphy *wiphy_find(int wiphy_id);
- #define wiphy_find_by_wdev(w) wiphy_find(w >> 32)
+ 	handshake_state_set_authenticator_ie(netdev->handshake, bss->rsne);
+ =
+
++	if (netdev->handshake->offload) {
++		netdev_connect_ok(netdev);
++		return false;
++	}
++
+ 	eapol_start(netdev->sm);
+ =
+
+ 	return false;
+@@ -4063,14 +4069,20 @@ static bool netdev_roam_event(struct l_genl_msg *ms=
+g, struct netdev *netdev)
+ 		goto failed;
+ 	}
+ =
+
++	/* Handshake completed in firmware, just get the roamed BSS */
++	if (netdev->handshake->offload)
++		goto get_fw_scan;
++
+ 	/* Reset handshake state */
+ 	nhs->complete =3D false;
+ 	nhs->ptk_installed =3D false;
+ 	nhs->gtk_installed =3D true;
+ 	nhs->igtk_installed =3D true;
+-	handshake_state_set_authenticator_address(netdev->handshake, mac);
+ 	netdev->handshake->ptk_complete =3D false;
+ =
+
++get_fw_scan:
++	handshake_state_set_authenticator_address(netdev->handshake, mac);
++
+ 	if (!scan_get_firmware_scan(netdev->wdev_id, netdev_get_fw_scan_cb,
+ 					netdev, NULL))
+ 		goto failed;
 -- =
 
 2.26.2
 
---===============4864815621369980701==--
+--===============7947070627830346744==--
 
