@@ -1,79 +1,99 @@
-Content-Type: multipart/mixed; boundary="===============6564373162774314600=="
+Content-Type: multipart/mixed; boundary="===============2767264251776389231=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/7] wiphy: check offload in wiphy_can_connect
-Date: Tue, 30 Mar 2021 09:13:04 -0700
-Message-ID: <20210330161307.732965-4-prestwoj@gmail.com>
+Subject: [PATCH 5/7] netdev: allow PSK offload for FT AKMs
+Date: Tue, 30 Mar 2021 09:13:05 -0700
+Message-ID: <20210330161307.732965-5-prestwoj@gmail.com>
 In-Reply-To: <20210330161307.732965-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6564373162774314600==
+--===============2767264251776389231==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This will check if offload is supported and enabled by the user.
-A new case was added for FT just in case the AP sets only an FT
-AKM.
+If the handshake has offloading set, use ATTR_PMK (for WPA2)
+which enables PSK offloading.
+
+The CMD_ROAM event path was also modified to take into account
+handshake offloading. If the handshake is offloaded we still
+must issue GET_SCAN, but not start eapol since the firmware
+takes care of this.
 ---
- src/wiphy.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ src/netdev.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 395bf74d..b64d2b74 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -420,6 +420,9 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct scan=
-_bss *bss)
- {
- 	struct ie_rsn_info rsn_info;
- 	int r;
-+	bool offload_needed;
-+	bool offload_on;
-+	const struct l_settings *settings =3D iwd_get_config();
+diff --git a/src/netdev.c b/src/netdev.c
+index 914f6479..67a92e79 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2641,6 +2641,8 @@ static struct l_genl_msg *netdev_build_cmd_connect(st=
+ruct netdev *netdev,
+ 		if (IE_AKM_IS_SAE(hs->akm_suite))
+ 			l_genl_msg_append_attr(msg, NL80211_ATTR_SAE_PASSWORD,
+ 					strlen(hs->passphrase), hs->passphrase);
++		else
++			l_genl_msg_append_attr(msg, NL80211_ATTR_PMK, 32, hs->pmk);
+ 	}
  =
 
- 	memset(&rsn_info, 0, sizeof(rsn_info));
- 	r =3D scan_bss_get_rsn_info(bss, &rsn_info);
-@@ -435,11 +438,29 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct sc=
-an_bss *bss)
- 					rsn_info.group_management_cipher))
- 			return false;
+ 	if (prev_bssid)
+@@ -4000,7 +4002,7 @@ static bool netdev_get_fw_scan_cb(int err, struct l_q=
+ueue *bss_list,
+ 	 * In this case we should just ignore this and allow the disconnect
+ 	 * logic to continue.
+ 	 */
+-	if (!netdev->sm)
++	if (!netdev->handshake->offload && !netdev->sm)
+ 		return false;
  =
 
-+		if (!l_settings_get_bool(settings, "General", "4WayOffload",
-+						&offload_on))
-+			offload_on =3D false;
+ 	if (err < 0) {
+@@ -4028,6 +4030,11 @@ static bool netdev_get_fw_scan_cb(int err, struct l_=
+queue *bss_list,
  =
 
- 		switch (rsn_info.akm_suites) {
- 		case IE_RSN_AKM_SUITE_SAE_SHA256:
- 		case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
--			if (!wiphy_can_connect_sae(wiphy, NULL))
-+			if (!wiphy_can_connect_sae(wiphy, &offload_needed))
-+				return false;
-+
-+			if (offload_needed && !offload_on)
-+				return false;
-+
-+			break;
-+		case IE_RSN_AKM_SUITE_FT_USING_PSK:
-+			if (wiphy->support_cmds_auth_assoc)
-+				return true;
-+
-+			if (!wiphy_has_ext_feature(wiphy,
-+				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK))
-+				return false;
-+
-+			if (!offload_on)
- 				return false;
+ 	handshake_state_set_authenticator_ie(netdev->handshake, bss->rsne);
  =
 
- 			break;
++	if (netdev->handshake->offload) {
++		netdev_connect_ok(netdev);
++		return false;
++	}
++
+ 	eapol_start(netdev->sm);
+ =
+
+ 	return false;
+@@ -4063,14 +4070,20 @@ static bool netdev_roam_event(struct l_genl_msg *ms=
+g, struct netdev *netdev)
+ 		goto failed;
+ 	}
+ =
+
++	/* Handshake completed in firmware, just get the roamed BSS */
++	if (netdev->handshake->offload)
++		goto get_fw_scan;
++
+ 	/* Reset handshake state */
+ 	nhs->complete =3D false;
+ 	nhs->ptk_installed =3D false;
+ 	nhs->gtk_installed =3D true;
+ 	nhs->igtk_installed =3D true;
+-	handshake_state_set_authenticator_address(netdev->handshake, mac);
+ 	netdev->handshake->ptk_complete =3D false;
+ =
+
++get_fw_scan:
++	handshake_state_set_authenticator_address(netdev->handshake, mac);
++
+ 	if (!scan_get_firmware_scan(netdev->wdev_id, netdev_get_fw_scan_cb,
+ 					netdev, NULL))
+ 		goto failed;
 -- =
 
 2.26.2
 
---===============6564373162774314600==--
+--===============2767264251776389231==--
 
