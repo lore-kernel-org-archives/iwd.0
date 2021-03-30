@@ -1,112 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============7051630801645675360=="
+Content-Type: multipart/mixed; boundary="===============6564373162774314600=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/7] wiphy: allow FT AKM to be used if Auth/Assoc is not
- supported
-Date: Tue, 30 Mar 2021 09:13:03 -0700
-Message-ID: <20210330161307.732965-3-prestwoj@gmail.com>
+Subject: [PATCH 4/7] wiphy: check offload in wiphy_can_connect
+Date: Tue, 30 Mar 2021 09:13:04 -0700
+Message-ID: <20210330161307.732965-4-prestwoj@gmail.com>
 In-Reply-To: <20210330161307.732965-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7051630801645675360==
+--===============6564373162774314600==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Until now FT was only supported via Auth/Assoc commands which barred
-any fullmac cards from using FT AKMs. With PSK offload support these
-cards can do FT but only when offloading is used. This situation
-is checked now which allows the FT AKM to be selected.
-
-A new option [General].4WayOffload was added which is required to
-enable this functionality. This was done mainly because it is
-unknown how stable firmware offloading is from card to card.
-
-Note: Enabling offload has one strange side effect which could
-cause users problems when experimenting with this option. Once
-offload is enabled the firmware no longer forwards eapol frames
-for subsequent connections, even if offload is no longer being
-used. Once enabled a user must restart the firmware (e.g. via
-rebooting the machine) if they want to turn off the option.
+This will check if offload is supported and enabled by the user.
+A new case was added for FT just in case the AP sets only an FT
+AKM.
 ---
- src/wiphy.c | 29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
+ src/wiphy.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/src/wiphy.c b/src/wiphy.c
-index d40c90ba..395bf74d 100644
+index 395bf74d..b64d2b74 100644
 --- a/src/wiphy.c
 +++ b/src/wiphy.c
-@@ -185,12 +185,19 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *=
-wiphy,
+@@ -420,6 +420,9 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct scan=
+_bss *bss)
  {
- 	struct ie_rsn_info info;
- 	enum security security;
-+	bool offload_on;
+ 	struct ie_rsn_info rsn_info;
+ 	int r;
 +	bool offload_needed;
++	bool offload_on;
 +	const struct l_settings *settings =3D iwd_get_config();
  =
 
- 	memset(&info, 0, sizeof(info));
- 	scan_bss_get_rsn_info(bss, &info);
+ 	memset(&rsn_info, 0, sizeof(rsn_info));
+ 	r =3D scan_bss_get_rsn_info(bss, &rsn_info);
+@@ -435,11 +438,29 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct sc=
+an_bss *bss)
+ 					rsn_info.group_management_cipher))
+ 			return false;
  =
 
- 	security =3D security_determine(bss->capability, &info);
++		if (!l_settings_get_bool(settings, "General", "4WayOffload",
++						&offload_on))
++			offload_on =3D false;
  =
 
-+	if (!l_settings_get_bool(settings, "General", "4WayOffload",
-+					&offload_on))
-+		offload_on =3D false;
-+
- 	/*
- 	 * If FT is available, use FT authentication to keep the door open
- 	 * for fast transitions.  Otherwise use SHA256 version if present.
-@@ -241,7 +248,10 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *w=
-iphy,
- 				goto wpa2_personal;
- 			}
- =
-
+ 		switch (rsn_info.akm_suites) {
+ 		case IE_RSN_AKM_SUITE_SAE_SHA256:
+ 		case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
 -			if (!wiphy_can_connect_sae(wiphy, NULL))
 +			if (!wiphy_can_connect_sae(wiphy, &offload_needed))
-+				goto wpa2_personal;
++				return false;
 +
 +			if (offload_needed && !offload_on)
- 				goto wpa2_personal;
- =
-
- 			if (info.akm_suites &
-@@ -253,10 +263,21 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *=
-wiphy,
- 		}
- =
-
- wpa2_personal:
-+		/*
-+		 * Allow FT if either Auth/Assoc is supported OR if the card
-+		 * supports PSK offload. Without Auth/Assoc, PSK offload is the
-+		 * only mechanism to allow FT on these cards.
-+		 */
- 		if ((info.akm_suites & IE_RSN_AKM_SUITE_FT_USING_PSK) &&
--				bss->rsne && bss->mde_present &&
--				wiphy->support_cmds_auth_assoc)
--			return IE_RSN_AKM_SUITE_FT_USING_PSK;
-+					bss->rsne && bss->mde_present) {
-+			if (wiphy->support_cmds_auth_assoc)
-+				return IE_RSN_AKM_SUITE_FT_USING_PSK;
++				return false;
 +
-+			if (wiphy_has_ext_feature(wiphy,
-+				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK) &&
-+					offload_on)
-+				return IE_RSN_AKM_SUITE_FT_USING_PSK;
-+		}
++			break;
++		case IE_RSN_AKM_SUITE_FT_USING_PSK:
++			if (wiphy->support_cmds_auth_assoc)
++				return true;
++
++			if (!wiphy_has_ext_feature(wiphy,
++				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK))
++				return false;
++
++			if (!offload_on)
+ 				return false;
  =
 
- 		if (info.akm_suites & IE_RSN_AKM_SUITE_PSK_SHA256)
- 			return IE_RSN_AKM_SUITE_PSK_SHA256;
+ 			break;
 -- =
 
 2.26.2
 
---===============7051630801645675360==--
+--===============6564373162774314600==--
 
