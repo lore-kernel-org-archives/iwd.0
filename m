@@ -1,58 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============6970234338414357611=="
+Content-Type: multipart/mixed; boundary="===============8825643882100457456=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/7] doc: document new [General].4WayOffload
-Date: Tue, 30 Mar 2021 09:13:07 -0700
-Message-ID: <20210330161307.732965-7-prestwoj@gmail.com>
-In-Reply-To: <20210330161307.732965-1-prestwoj@gmail.com>
+Subject: [PATCH] wiphy: fix wiphy_can_connect AKM checks
+Date: Tue, 30 Mar 2021 10:31:13 -0700
+Message-ID: <20210330173113.737510-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6970234338414357611==
+--===============8825643882100457456==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This option will allow the 4-way handshake to be offloaded to
-firmware if it supports it.
+This was changed in commit 6e8b7652 to remove the IE_AKM_IS_SAE
+and instead use a switch statement. This is was incorrect since
+the akm_suites is actually a bitmask which could contain multiple
+AKM suites (hence the plural name). Instead a few macros were
+added which check the bitmask rather than the entire value.
 ---
- src/iwd.config.rst | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ src/wiphy.c | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 478bd616..e2060312 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -174,6 +174,20 @@ The group ``[General]`` contains general settings.
-        off by default.  If you want to easily utilize Hotspot 2.0 networks,
-        then setting ``DisableANQP`` to ``false`` is recommended.
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 676f236c..57c97367 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -388,6 +388,21 @@ const struct scan_freq_set *wiphy_get_supported_freqs(
+ 	return wiphy->supported_freqs;
+ }
  =
 
-+   * - 4WayOffload
-+     - Values: **false**, true
++#define AKM_IS_AUTH_ASSOC(akm)				\
++(							\
++	akm & (IE_RSN_AKM_SUITE_OWE |			\
++		IE_RSN_AKM_SUITE_FILS_SHA256 |		\
++		IE_RSN_AKM_SUITE_FILS_SHA384 |		\
++		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 |	\
++		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384)	\
++)
 +
-+       Enables the use of 4-way handshake offloading. Some drivers can off=
-load
-+       the 4-way handshake to firmware which is needed for protocols which
-+       act on Authenticate/Associate frames such as Fast Transition. This
-+       option is turned off by default as it is not widely tested.
++#define AKM_IS_SAE(akm)					\
++(							\
++	akm & (IE_RSN_AKM_SUITE_SAE_SHA256 |		\
++		IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256)	\
++)
 +
-+       Note: There seems to be a bug in the brcmfmac driver/firmware where=
- once
-+       offloading is enabled (by turning on this option) it cannot be turn=
-ed
-+       off in the firmware without a hard reboot (or some means of restart=
-ing
-+       the firmware).
-+
-+
- Network
- ---------
+ bool wiphy_can_connect(struct wiphy *wiphy, struct scan_bss *bss)
+ {
+ 	struct ie_rsn_info rsn_info;
+@@ -407,23 +422,12 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct sc=
+an_bss *bss)
+ 					rsn_info.group_management_cipher))
+ 			return false;
  =
 
+-
+-		switch (rsn_info.akm_suites) {
+-		case IE_RSN_AKM_SUITE_SAE_SHA256:
+-		case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
++		if (AKM_IS_SAE(rsn_info.akm_suites)) {
+ 			if (!wiphy_can_connect_sae(wiphy))
+ 				return false;
+-
+-			break;
+-		case IE_RSN_AKM_SUITE_OWE:
+-		case IE_RSN_AKM_SUITE_FILS_SHA256:
+-		case IE_RSN_AKM_SUITE_FILS_SHA384:
+-		case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
+-		case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
++		} else if (AKM_IS_AUTH_ASSOC(rsn_info.akm_suites)) {
+ 			if (!wiphy->support_cmds_auth_assoc)
+ 				return false;
+-
+-			break;
+ 		}
+ 	} else if (r !=3D -ENOENT)
+ 		return false;
 -- =
 
 2.26.2
 
---===============6970234338414357611==--
+--===============8825643882100457456==--
 
