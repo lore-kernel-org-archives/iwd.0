@@ -1,58 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============3305678549132832889=="
+Content-Type: multipart/mixed; boundary="===============7123704117216602197=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 6/7] doc: document new [General].4WayOffload
-Date: Tue, 30 Mar 2021 11:48:07 -0700
-Message-ID: <20210330184808.744574-6-prestwoj@gmail.com>
+Subject: [PATCH v2 7/7] wiphy: remove wiphy_supports_cmds_auth_assoc
+Date: Tue, 30 Mar 2021 11:48:08 -0700
+Message-ID: <20210330184808.744574-7-prestwoj@gmail.com>
 In-Reply-To: <20210330184808.744574-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3305678549132832889==
+--===============7123704117216602197==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This option will allow the 4-way handshake to be offloaded to
-firmware if it supports it.
+This is no longer needed.
 ---
- src/iwd.config.rst | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ src/wiphy.c | 5 -----
+ src/wiphy.h | 1 -
+ 2 files changed, 6 deletions(-)
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 478bd616..e2060312 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -174,6 +174,20 @@ The group ``[General]`` contains general settings.
-        off by default.  If you want to easily utilize Hotspot 2.0 networks,
-        then setting ``DisableANQP`` to ``false`` is recommended.
+diff --git a/src/wiphy.c b/src/wiphy.c
+index b95f3d67..10b9c1f9 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -462,11 +462,6 @@ bool wiphy_can_connect(struct wiphy *wiphy, struct sca=
+n_bss *bss)
+ 	return true;
+ }
  =
 
-+   * - 4WayOffload
-+     - Values: **false**, true
-+
-+       Enables the use of 4-way handshake offloading. Some drivers can off=
-load
-+       the 4-way handshake to firmware which is needed for protocols which
-+       act on Authenticate/Associate frames such as Fast Transition. This
-+       option is turned off by default as it is not widely tested.
-+
-+       Note: There seems to be a bug in the brcmfmac driver/firmware where=
- once
-+       offloading is enabled (by turning on this option) it cannot be turn=
-ed
-+       off in the firmware without a hard reboot (or some means of restart=
-ing
-+       the firmware).
-+
-+
- Network
- ---------
- =
-
+-bool wiphy_supports_cmds_auth_assoc(struct wiphy *wiphy)
+-{
+-	return wiphy->support_cmds_auth_assoc;
+-}
+-
+ bool wiphy_has_feature(struct wiphy *wiphy, uint32_t feature)
+ {
+ 	return wiphy->feature_flags & feature;
+diff --git a/src/wiphy.h b/src/wiphy.h
+index 7ac1df95..c83cd15a 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -80,7 +80,6 @@ uint32_t wiphy_get_supported_bands(struct wiphy *wiphy);
+ const struct scan_freq_set *wiphy_get_supported_freqs(
+ 						const struct wiphy *wiphy);
+ bool wiphy_can_connect(struct wiphy *wiphy, struct scan_bss *bss);
+-bool wiphy_supports_cmds_auth_assoc(struct wiphy *wiphy);
+ bool wiphy_can_randomize_mac_addr(struct wiphy *wiphy);
+ bool wiphy_rrm_capable(struct wiphy *wiphy);
+ bool wiphy_has_feature(struct wiphy *wiphy, uint32_t feature);
 -- =
 
 2.26.2
 
---===============3305678549132832889==--
+--===============7123704117216602197==--
 
