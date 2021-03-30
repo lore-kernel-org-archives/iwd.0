@@ -1,99 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============2767264251776389231=="
+Content-Type: multipart/mixed; boundary="===============1106203382897016928=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/7] netdev: allow PSK offload for FT AKMs
-Date: Tue, 30 Mar 2021 09:13:05 -0700
-Message-ID: <20210330161307.732965-5-prestwoj@gmail.com>
+Subject: [PATCH 6/7] station: set handshake->offload with wiphy_needs_offload
+Date: Tue, 30 Mar 2021 09:13:06 -0700
+Message-ID: <20210330161307.732965-6-prestwoj@gmail.com>
 In-Reply-To: <20210330161307.732965-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2767264251776389231==
+--===============1106203382897016928==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the handshake has offloading set, use ATTR_PMK (for WPA2)
-which enables PSK offloading.
-
-The CMD_ROAM event path was also modified to take into account
-handshake offloading. If the handshake is offloaded we still
-must issue GET_SCAN, but not start eapol since the firmware
-takes care of this.
+This will handle both SAE offloading and PSK offloading in one
+API call.
 ---
- src/netdev.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ src/station.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 914f6479..67a92e79 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -2641,6 +2641,8 @@ static struct l_genl_msg *netdev_build_cmd_connect(st=
-ruct netdev *netdev,
- 		if (IE_AKM_IS_SAE(hs->akm_suite))
- 			l_genl_msg_append_attr(msg, NL80211_ATTR_SAE_PASSWORD,
- 					strlen(hs->passphrase), hs->passphrase);
-+		else
-+			l_genl_msg_append_attr(msg, NL80211_ATTR_PMK, 32, hs->pmk);
- 	}
+diff --git a/src/station.c b/src/station.c
+index cf4dd2e7..ef186c8b 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -981,16 +981,6 @@ static struct handshake_state *station_handshake_setup=
+(struct station *station,
+ 				goto no_psk;
  =
 
- 	if (prev_bssid)
-@@ -4000,7 +4002,7 @@ static bool netdev_get_fw_scan_cb(int err, struct l_q=
-ueue *bss_list,
- 	 * In this case we should just ignore this and allow the disconnect
- 	 * logic to continue.
- 	 */
--	if (!netdev->sm)
-+	if (!netdev->handshake->offload && !netdev->sm)
- 		return false;
+ 			handshake_state_set_passphrase(hs, passphrase);
+-
+-			/*
+-			 * TODO: This check isn't strictly correct since
+-			 * some drivers may support EXTERNAL_AUTH but since
+-			 * wiphy_can_connect takes this into account IWD should
+-			 * have already rejected the connection if this was the
+-			 * case.
+-			 */
+-			if (!wiphy_supports_cmds_auth_assoc(wiphy))
+-				hs->offload =3D true;
+ 		} else {
+ 			const uint8_t *psk =3D network_get_psk(network);
  =
 
- 	if (err < 0) {
-@@ -4028,6 +4030,11 @@ static bool netdev_get_fw_scan_cb(int err, struct l_=
-queue *bss_list,
+@@ -999,6 +989,17 @@ static struct handshake_state *station_handshake_setup=
+(struct station *station,
  =
 
- 	handshake_state_set_authenticator_ie(netdev->handshake, bss->rsne);
- =
-
-+	if (netdev->handshake->offload) {
-+		netdev_connect_ok(netdev);
-+		return false;
-+	}
+ 			handshake_state_set_pmk(hs, psk, 32);
+ 		}
 +
- 	eapol_start(netdev->sm);
- =
-
- 	return false;
-@@ -4063,14 +4070,20 @@ static bool netdev_roam_event(struct l_genl_msg *ms=
-g, struct netdev *netdev)
- 		goto failed;
- 	}
- =
-
-+	/* Handshake completed in firmware, just get the roamed BSS */
-+	if (netdev->handshake->offload)
-+		goto get_fw_scan;
++		/*
++		 * wiphy_can_connect/select_akm should have already sorted out
++		 * if both the card supports offload AND the user has enabled
++		 * it.
++		 */
++		hs->offload =3D wiphy_needs_offload(wiphy, hs->akm_suite);
 +
- 	/* Reset handshake state */
- 	nhs->complete =3D false;
- 	nhs->ptk_installed =3D false;
- 	nhs->gtk_installed =3D true;
- 	nhs->igtk_installed =3D true;
--	handshake_state_set_authenticator_address(netdev->handshake, mac);
- 	netdev->handshake->ptk_complete =3D false;
- =
-
-+get_fw_scan:
-+	handshake_state_set_authenticator_address(netdev->handshake, mac);
++		if (hs->offload)
++			l_debug("Offloading connection to firmware");
 +
- 	if (!scan_get_firmware_scan(netdev->wdev_id, netdev_get_fw_scan_cb,
- 					netdev, NULL))
- 		goto failed;
+ 	} else if (security =3D=3D SECURITY_8021X)
+ 		handshake_state_set_8021x_config(hs,
+ 					network_get_settings(network));
 -- =
 
 2.26.2
 
---===============2767264251776389231==--
+--===============1106203382897016928==--
 
