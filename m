@@ -1,33 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============2548210720391742089=="
+Content-Type: multipart/mixed; boundary="===============3249744569861057445=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/6] netdev: move request IE parsing into function
-Date: Fri, 02 Apr 2021 13:09:34 -0500
-Message-ID: <65ead5b6-e79f-0c3a-472b-7f1b93ffe185@gmail.com>
-In-Reply-To: <20210402171118.915230-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v5 1/2] wiphy: allow FT AKM to be used if Auth/Assoc is not
+ supported
+Date: Fri, 02 Apr 2021 13:42:26 -0700
+Message-ID: <20210402204227.931444-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2548210720391742089==
+--===============3249744569861057445==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Until now FT was only supported via Auth/Assoc commands which barred
+any fullmac cards from using FT AKMs. With PSK offload support these
+cards can do FT but only when offloading is used.
+---
+ src/wiphy.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-On 4/2/21 12:11 PM, James Prestwood wrote:
-> Moves the parsing of NL80211_ATTR_REQ_IE into its own parsing
-> function for use elsewhere.
-> ---
->   src/netdev.c | 62 ++++++++++++++++++++++++++++++----------------------
->   1 file changed, 36 insertions(+), 26 deletions(-)
-> =
+v5 (forgot to tag v4 on previous set):
+ * Offloading is assumed if the driver supports it
 
+diff --git a/src/wiphy.c b/src/wiphy.c
+index ab57a2d2..d5f6f876 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -246,10 +246,18 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *=
+wiphy,
+ 		}
+ =
 
-Patch 1 & 2 applied, thanks.
+ wpa2_personal:
++		/*
++		 * Allow FT if either Auth/Assoc is supported OR if the card
++		 * supports PSK offload. Without Auth/Assoc, PSK offload is the
++		 * only mechanism to allow FT on these cards.
++		 */
+ 		if ((info.akm_suites & IE_RSN_AKM_SUITE_FT_USING_PSK) &&
+-				bss->rsne && bss->mde_present &&
+-				wiphy->support_cmds_auth_assoc)
+-			return IE_RSN_AKM_SUITE_FT_USING_PSK;
++					bss->rsne && bss->mde_present) {
++			if (wiphy->support_cmds_auth_assoc ||
++				wiphy_has_ext_feature(wiphy,
++				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK))
++				return IE_RSN_AKM_SUITE_FT_USING_PSK;
++		}
+ =
 
-Regards,
--Denis
+ 		if (info.akm_suites & IE_RSN_AKM_SUITE_PSK_SHA256)
+ 			return IE_RSN_AKM_SUITE_PSK_SHA256;
+-- =
 
---===============2548210720391742089==--
+2.26.2
+
+--===============3249744569861057445==--
 
