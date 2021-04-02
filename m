@@ -1,81 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============1005818312643022772=="
+Content-Type: multipart/mixed; boundary="===============4783357346792866351=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v6 2/4] netdev: fix CMD_ROAM for open networks
-Date: Fri, 02 Apr 2021 15:06:15 -0700
-Message-ID: <20210402220617.937790-2-prestwoj@gmail.com>
+Subject: [PATCH v6 3/4] wiphy: allow FT AKM to be used if Auth/Assoc is not
+ supported
+Date: Fri, 02 Apr 2021 15:06:16 -0700
+Message-ID: <20210402220617.937790-3-prestwoj@gmail.com>
 In-Reply-To: <20210402220617.937790-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1005818312643022772==
+--===============4783357346792866351==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In the FW scan callback eapol was being stared unconditionally which
-isn't correct as roaming on open networks is possible. Instead check
-that a SM exists just like is done in netdev_connect_event.
+Until now FT was only supported via Auth/Assoc commands which barred
+any fullmac cards from using FT AKMs. With PSK offload support these
+cards can do FT but only when offloading is used.
 ---
- src/netdev.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ src/wiphy.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index db7f6bbc..fe29de8f 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4107,9 +4107,7 @@ static bool netdev_get_fw_scan_cb(int err, struct l_q=
-ueue *bss_list,
+v6:
+ * Check both PSK offload and fw roam support before choosing FT
+
+diff --git a/src/wiphy.c b/src/wiphy.c
+index ab57a2d2..9cf0e07c 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -178,6 +178,8 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wi=
+phy,
+ {
+ 	struct ie_rsn_info info;
+ 	enum security security;
++	bool psk_offload =3D wiphy_has_ext_feature(wiphy,
++				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK);
  =
 
- 	if (err < 0) {
- 		l_error("Failed to get scan after roam (%d)", err);
--		netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
--					MMPDU_REASON_CODE_UNSPECIFIED);
--		return false;
-+		goto failed;
- 	}
+ 	memset(&info, 0, sizeof(info));
+ 	scan_bss_get_rsn_info(bss, &info);
+@@ -246,10 +248,17 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *=
+wiphy,
+ 		}
  =
 
- 	/*
-@@ -4121,17 +4119,23 @@ static bool netdev_get_fw_scan_cb(int err, struct l=
-_queue *bss_list,
+ wpa2_personal:
++		/*
++		 * Allow FT if either Auth/Assoc is supported OR if the card
++		 * supports PSK offload. Without Auth/Assoc, PSK offload is the
++		 * only mechanism to allow FT on these cards.
++		 */
+ 		if ((info.akm_suites & IE_RSN_AKM_SUITE_FT_USING_PSK) &&
+-				bss->rsne && bss->mde_present &&
+-				wiphy->support_cmds_auth_assoc)
+-			return IE_RSN_AKM_SUITE_FT_USING_PSK;
++					bss->rsne && bss->mde_present) {
++			if (wiphy->support_cmds_auth_assoc ||
++					(psk_offload && wiphy->support_fw_roam))
++				return IE_RSN_AKM_SUITE_FT_USING_PSK;
++		}
  =
 
- 	if (!bss) {
- 		l_error("Roam target BSS not found in scan results");
--		netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
--					MMPDU_REASON_CODE_UNSPECIFIED);
--		return false;
-+		goto failed;
- 	}
- =
-
- 	netdev->fw_roam_bss =3D bss;
- =
-
- 	handshake_state_set_authenticator_ie(netdev->handshake, bss->rsne);
- =
-
--	eapol_start(netdev->sm);
-+	if (netdev->sm) {
-+		if (!eapol_start(netdev->sm))
-+			goto failed;
-+	}
-+
-+	return false;
- =
-
-+failed:
-+	netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
-+					MMPDU_REASON_CODE_UNSPECIFIED);
- 	return false;
- }
- =
-
+ 		if (info.akm_suites & IE_RSN_AKM_SUITE_PSK_SHA256)
+ 			return IE_RSN_AKM_SUITE_PSK_SHA256;
 -- =
 
 2.26.2
 
---===============1005818312643022772==--
+--===============4783357346792866351==--
 
