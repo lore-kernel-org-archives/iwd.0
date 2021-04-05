@@ -1,36 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============2012012060632238334=="
+Content-Type: multipart/mixed; boundary="===============6066672407007817566=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v6 1/4] netdev: better handle disconnect after FW scan
-Date: Fri, 02 Apr 2021 17:26:30 -0500
-Message-ID: <84bf4a3d-4f8e-7a84-f0cf-8523c6f97b67@gmail.com>
-In-Reply-To: <20210402220617.937790-1-prestwoj@gmail.com>
+From: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+Subject: Build broken with --enable-external-ell since version 1.13
+Date: Mon, 05 Apr 2021 15:00:39 +0200
+Message-ID: <CAPi7W80quBbG-Vimp_tMOSJqVXtz=bwRZ6i8ksnFDuRrY37T9g@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2012012060632238334==
+--===============6066672407007817566==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Dear all,
 
-On 4/2/21 5:06 PM, James Prestwood wrote:
-> This should have been updated along with the connect and roam
-> event separation. Since netdev_connect_event is not being
-> re-used for CMD_ROAM the comment did not make sense anymore.
-> Still, there needs to be a check to ensure we were not disconnected
-> while waiting for GET_SCAN to come back.
-> ---
->   src/netdev.c | 8 +++-----
->   1 file changed, 3 insertions(+), 5 deletions(-)
-> =
+Build is broken with --enable-external-ell since version 1.13 and commit
+ed05585063f2e6d8f2fcd5f008b861062ac7a429:
 
+make[1]: Entering directory '/home/fabrice/buildroot/output/build/iwd-1.13'
+  GEN      ell/shared
+/bin/bash: line 5: ell/shared: No such file or directory
 
-All applied, thanks.
+Moreover, ell/useful.h is a private header of ELL so it shouldn't be
+used by iwd.
 
-Regards,
--Denis
+Best Regards,
 
---===============2012012060632238334==--
+Fabrice
+--===============6066672407007817566==--
 
