@@ -1,54 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============7907664951681098759=="
+Content-Type: multipart/mixed; boundary="===============8661512348368055654=="
 MIME-Version: 1.0
-From: Khem Raj <raj.khem@gmail.com>
-Subject: [PATCH] Use abs_top_srcdir in place of abs_srcdir
-Date: Mon, 05 Apr 2021 14:33:44 -0700
-Message-ID: <20210405213344.3477582-1-raj.khem@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2 1/2] wiphy: add wiphy_radio_work_is_running
+Date: Mon, 05 Apr 2021 16:48:11 -0500
+Message-ID: <6354229b-ba1a-1bcf-7e1a-e13bce169e8c@gmail.com>
+In-Reply-To: <20210405212650.1042486-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7907664951681098759==
+--===============8661512348368055654==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-this makes it build when build dir is outside of sources dir
----
- Makefile.am | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Hi James,
 
-diff --git a/Makefile.am b/Makefile.am
-index 644f3556..e3f79901 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -625,9 +625,10 @@ unit/tls-settings.8021x: unit/cert-ca.pem unit/cert-cl=
-ient.pem unit/cert-client-
- BUILT_SOURCES =3D $(ell_built_sources) src/builtin.h
- =
+On 4/5/21 4:26 PM, James Prestwood wrote:
+> This provides a way to know if a work item is actually running
+> vs only been queued and waiting to run.
+> ---
+>   src/wiphy.c | 7 +++++++
+>   src/wiphy.h | 1 +
+>   2 files changed, 8 insertions(+)
+> =
 
- ell/shared: Makefile
-+	$(AM_V_at)$(MKDIR_P) ell
- 	$(AM_V_GEN)for f in $(ell_shared) ; do \
- 		if [ ! -f $$f ] ; then \
--			$(LN_S) -t ell -f $(abs_srcdir)/../ell/$$f ; \
-+			$(LN_S) -t ell -f $(abs_top_srcdir)/ell/$$f ; \
- 		fi \
- 	done > $@
- =
 
-@@ -635,7 +636,7 @@ ell/internal: Makefile
- 	$(AM_V_at)$(MKDIR_P) ell
- 	$(AM_V_GEN)for f in $(ell_headers) $(ell_sources) ; do \
- 		if [ ! -f $$f ] ; then \
--			$(LN_S) -t ell -f $(abs_srcdir)/../ell/$$f ; \
-+			$(LN_S) -t ell -f $(abs_top_srcdir)/ell/$$f ; \
- 		fi \
- 	done > $@
- =
+<snip>
 
--- =
+>   }
+>   =
 
-2.31.1
+> +bool wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id)
+> +{
+> +	struct wiphy_radio_work_item *item =3D l_queue_peek_head(wiphy->work);
+> +
+> +	return item->id =3D=3D id;
 
---===============7907664951681098759==--
+Can item be null?
+
+> +}
+> +
+
+Regards,
+-Denis
+--===============8661512348368055654==--
 
