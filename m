@@ -1,147 +1,158 @@
-Content-Type: multipart/mixed; boundary="===============1225539161653227214=="
+Content-Type: multipart/mixed; boundary="===============4538799145904671164=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [RFC 1/1] client: fix double password prompt
-Date: Thu, 08 Apr 2021 11:02:42 -0700
-Message-ID: <20210408180242.1200268-2-prestwoj@gmail.com>
-In-Reply-To: <20210408180242.1200268-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] agent: call back even if agent disconnects
+Date: Thu, 08 Apr 2021 13:33:15 -0500
+Message-ID: <5ee8b55d-0e2f-2c73-cebf-2c01329a67d4@gmail.com>
+In-Reply-To: <20210408165130.1191226-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1225539161653227214==
+--===============4538799145904671164==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-For username/password prompts the password portion was appearing
-on screen twice:
+Hi James,
 
-Username: myuser(a)example.com
-Password: Password:
+On 4/8/21 11:51 AM, James Prestwood wrote:
+> It was found that if the user cancels/disconnects the agent prior to
+> entering credentials, IWD would get stuck and could no longer accept
+> any connect calls with the error "Operation already in progress".
+> For example exiting iwctl in the Password prompt would cause this:
+> =
 
-This appears to be caused by the call to rl_redisplay() in cases
-where there was a previous prompt ("Username" in this case). This
-patch adds a flag to disply_agent_prompt which avoids this call
-if that flag is set.
----
- client/agent.c   | 10 +++++-----
- client/display.c |  6 ++++--
- client/display.h |  2 +-
- 3 files changed, 10 insertions(+), 8 deletions(-)
+> iwctl
+> $ station wlan0 connect myssid
+> $ Password: <Ctrl-C>
+> =
 
-diff --git a/client/agent.c b/client/agent.c
-index 037ae785..398c42a1 100644
---- a/client/agent.c
-+++ b/client/agent.c
-@@ -139,7 +139,7 @@ static struct l_dbus_message *request_passphrase_method=
-_call(
- =
 
- 	display("Type the network passphrase for %s.\n",
- 				proxy_interface_get_identity_str(proxy));
--	display_agent_prompt(PROMPT_PASSPHRASE, true);
-+	display_agent_prompt(PROMPT_PASSPHRASE, true, true);
- =
+Curious.  I could have swore I tested this case before, but maybe my memory=
+ is =
 
- 	pending_op.type =3D AGENT_OP_TYPE_PASSPHRASE;
- 	pending_op.last_label =3D PROMPT_PASSPHRASE;
-@@ -179,7 +179,7 @@ static struct l_dbus_message *request_private_key_passp=
-hrase_method_call(
- =
+faulty.
 
- 	display("Type the passphrase for the network encrypted private key for "
- 			"%s.\n", proxy_interface_get_identity_str(proxy));
--	display_agent_prompt(PROMPT_PASSPHRASE, true);
-+	display_agent_prompt(PROMPT_PASSPHRASE, true, true);
- =
+So the funny thing is that DBus is supposed to generate a NoReply error if =
+the =
 
- 	pending_op.type =3D AGENT_OP_TYPE_PASSPHRASE;
- 	pending_op.last_label =3D PROMPT_PASSPHRASE;
-@@ -242,7 +242,7 @@ static struct l_dbus_message *request_username_and_pass=
-word_method_call(
- =
+client drops off the bus (which it does), in addition to the NameOwnerChang=
+ed =
 
- 	display("Type the network credentials for %s.\n",
- 				proxy_interface_get_identity_str(proxy));
--	display_agent_prompt(PROMPT_USERNAME, false);
-+	display_agent_prompt(PROMPT_USERNAME, false, true);
- =
+signal.  But somehow the signal arrives first.
 
- 	pending_op.type =3D AGENT_OP_TYPE_UNAME_PASSWORD;
- 	pending_op.last_label =3D PROMPT_USERNAME;
-@@ -306,7 +306,7 @@ static struct l_dbus_message *request_user_password_met=
-hod_call(
- 	display("%s", username_prompt);
- 	l_free(username_prompt);
- =
+I wonder if we can defer the agent destruction until the reply arrives.
 
--	display_agent_prompt(PROMPT_PASSWORD, true);
-+	display_agent_prompt(PROMPT_PASSWORD, true, true);
- =
+> This was due to the agent never calling the network callback in the
+> case of an agent disconnect. Network would wait indefinitely for the
+> credentials, and disallow any future connect attempts.
+> =
 
- 	pending_op.type =3D AGENT_OP_TYPE_PASSWORD;
- 	pending_op.last_label =3D PROMPT_PASSWORD;
-@@ -379,7 +379,7 @@ static void process_input_username_password(const char =
-*prompt)
- 		/* received username */
- 		l_queue_push_tail(pending_op.saved_input, l_strdup(prompt));
- =
+> To fix this agent_request_free was modified to call the user callback
+> in order to signal the disconnect to network. Network can then fail
+> the connection and allow other connection requests.
+> ---
+>   src/agent.c | 36 +++++++++++++++++++++++++++++++++---
+>   1 file changed, 33 insertions(+), 3 deletions(-)
+> =
 
--		display_agent_prompt(PROMPT_PASSWORD, true);
-+		display_agent_prompt(PROMPT_PASSWORD, true, false);
- 		pending_op.last_label =3D PROMPT_PASSWORD;
- =
+> diff --git a/src/agent.c b/src/agent.c
+> index 101eaffd..3725ea95 100644
+> --- a/src/agent.c
+> +++ b/src/agent.c
+> @@ -132,12 +132,36 @@ static void send_cancel_request(void *user_data, in=
+t reason)
+>   static void agent_request_free(void *user_data)
+>   {
+>   	struct agent_request *request =3D user_data;
+> +	agent_request_passphrase_func_t passphrase_cb;
+> +	agent_request_user_name_passwd_func_t user_pass_cb;
+>   =
 
- 		return;
-diff --git a/client/display.c b/client/display.c
-index 07cb7bda..e13e3b4a 100644
---- a/client/display.c
-+++ b/client/display.c
-@@ -590,7 +590,7 @@ void display_disable_cmd_prompt(void)
- 	rl_redisplay();
- }
- =
+>   	l_dbus_message_unref(request->message);
+>   =
 
--void display_agent_prompt(const char *label, bool mask_input)
-+void display_agent_prompt(const char *label, bool mask_input, bool redispl=
-ay)
- {
- 	char *prompt;
- =
+>   	if (request->trigger)
+> -		dbus_pending_reply(&request->trigger,
+> -					dbus_error_aborted(request->trigger));
+> +		l_dbus_message_unref(request->trigger);
+> +
+> +	/*
+> +	 * If we have not yet called back the agent was disconnected prior to
+> +	 * the user fully entering credentials.
+> +	 */
+> +	if (request->user_callback) {
+> +		switch (request->type) {
+> +		case AGENT_REQUEST_TYPE_PASSPHRASE:
+> +			passphrase_cb =3D request->user_callback;
+> +
+> +			passphrase_cb(AGENT_RESULT_FAILED, NULL,
+> +						request->trigger,
+> +						request->user_data);
+> +			break;
+> +		case AGENT_REQUEST_TYPE_USER_NAME_PASSWD:
+> +			user_pass_cb =3D request->user_callback;
+> +
+> +			user_pass_cb(AGENT_RESULT_FAILED, NULL, NULL,
+> +						request->trigger,
+> +						request->user_data);
+> +			break;
+> +		}
+> +	}
 
-@@ -613,7 +613,9 @@ void display_agent_prompt(const char *label, bool mask_=
-input)
- 		agent_saved_input->line =3D rl_copy_text(0, rl_end);
- 		rl_set_prompt("");
- 		rl_replace_line("", 0);
--		rl_redisplay();
-+
-+		if (redisplay)
-+			rl_redisplay();
- =
+Another idea might be to create a dbus_message object that is an error-repl=
+y and =
 
- 		rl_erase_empty_line =3D 0;
- 		rl_set_prompt(prompt);
-diff --git a/client/display.h b/client/display.h
-index b5df944a..f662a470 100644
---- a/client/display.h
-+++ b/client/display.h
-@@ -51,7 +51,7 @@ void display_refresh_set_cmd(const char *family, const ch=
-ar *entity,
- void display_enable_cmd_prompt(void);
- void display_disable_cmd_prompt(void);
- =
+pass it directly to agent_finalize_pending?
 
--void display_agent_prompt(const char *label, bool mask_input);
-+void display_agent_prompt(const char *label, bool mask_input, bool redispl=
-ay);
- void display_agent_prompt_release(const char *label);
- bool display_agent_is_active(void);
- =
+>   =
 
--- =
+>   	if (request->destroy)
+>   		request->destroy(request->user_data);
+> @@ -153,6 +177,8 @@ static void passphrase_reply(struct l_dbus_message *r=
+eply,
+>   	enum agent_result result =3D AGENT_RESULT_FAILED;
+>   	agent_request_passphrase_func_t user_callback =3D request->user_callba=
+ck;
+>   =
 
-2.26.2
+> +	request->user_callback =3D NULL;
+> +
+>   	if (l_dbus_message_get_error(reply, &error, &text))
+>   		goto done;
+>   =
 
---===============1225539161653227214==--
+> @@ -175,6 +201,8 @@ static void user_name_passwd_reply(struct l_dbus_mess=
+age *reply,
+>   	agent_request_user_name_passwd_func_t user_callback =3D
+>   		request->user_callback;
+>   =
+
+> +	request->user_callback =3D NULL;
+> +
+>   	if (l_dbus_message_get_error(reply, &error, &text))
+>   		goto done;
+>   =
+
+> @@ -492,8 +520,10 @@ bool agent_request_cancel(unsigned int req_id, int r=
+eason)
+>   =
+
+>   		request =3D l_queue_remove_if(agent->requests, find_request,
+>   							L_UINT_TO_PTR(req_id));
+> -		if (request)
+> +		if (request) {
+> +			request->user_callback =3D NULL;
+>   			break;
+> +		}
+>   	}
+>   =
+
+>   	if (!request)
+> =
+
+
+Regards,
+-Denis
+--===============4538799145904671164==--
 
