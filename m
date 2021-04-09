@@ -1,96 +1,127 @@
-Content-Type: multipart/mixed; boundary="===============6628434678343928443=="
+Content-Type: multipart/mixed; boundary="===============7235310211731096765=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/3] eapol: add PMK installer support
-Date: Fri, 09 Apr 2021 09:14:44 -0700
-Message-ID: <20210409161446.1303013-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/3] netdev: add CONNECTION_TYPE_8021X_OFFLOAD
+Date: Fri, 09 Apr 2021 09:14:45 -0700
+Message-ID: <20210409161446.1303013-2-prestwoj@gmail.com>
+In-Reply-To: <20210409161446.1303013-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6628434678343928443==
+--===============7235310211731096765==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-802.1x offloading needs a way to call SET_PMK after EAP finishes.
-In the same manor as set_tk/gtk/igtk a new 'install_pmk' function
-was added which eapol can call into after EAP completes.
+This adds a new type for 8021x offload as well as support in
+building CMD_CONNECT.
+
+As described in the comment, 8021x offloading is not particularly
+similar to PSK as far as the code flow in IWD is concerned. There
+still needs to be an eapol_sm due to EAP being done in userspace.
+This throws somewhat of a wrench into our 'is_offload' cases. And
+as such this connection type is handled specially.
 ---
- src/eapol.c | 10 ++++++++++
- src/eapol.h |  5 +++++
- 2 files changed, 15 insertions(+)
+ src/netdev.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 23aaf530..3823f854 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -52,6 +52,7 @@ static uint32_t eapol_4way_handshake_time =3D 2;
- static eapol_rekey_offload_func_t rekey_offload =3D NULL;
+diff --git a/src/netdev.c b/src/netdev.c
+index d8703ed2..f41cd2c9 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -72,6 +72,7 @@ enum connection_type {
+ 	CONNECTION_TYPE_FULLMAC,
+ 	CONNECTION_TYPE_SAE_OFFLOAD,
+ 	CONNECTION_TYPE_PSK_OFFLOAD,
++	CONNECTION_TYPE_8021X_OFFLOAD,
+ };
  =
 
- static eapol_tx_packet_func_t tx_packet =3D NULL;
-+static eapol_install_pmk_func_t install_pmk =3D NULL;
- static void *tx_user_data;
- =
-
- #define VERIFY_IS_ZERO(field)						\
-@@ -2162,6 +2163,10 @@ static void eapol_eap_complete_cb(enum eap_result re=
-sult, void *user_data)
- 		sm->eap =3D NULL;
- 		handshake_failed(sm, MMPDU_REASON_CODE_IEEE8021X_FAILED);
- 		return;
-+	} else {
-+		if (install_pmk)
-+			install_pmk(sm->handshake, sm->handshake->pmk,
-+					sm->handshake->pmk_len);
+ static uint32_t unicast_watch;
+@@ -203,6 +204,15 @@ static inline bool is_offload(struct handshake_state *=
+hs)
+ 	switch (nhs->type) {
+ 	case CONNECTION_TYPE_SOFTMAC:
+ 	case CONNECTION_TYPE_FULLMAC:
++	/*
++	 * 8021x offload does not quite fit into the same category of PSK
++	 * offload. First the netdev_connect_event comes prior to EAP meaning
++	 * the handshake is not done at this point. In addition it still
++	 * requires EAP take place in userspace meaning IWD needs an eapol_sm.
++	 * Because of this, and our prior use of 'is_offload', it does not fit
++	 * into the same category and will need to be handled specially.
++	 */
++	case CONNECTION_TYPE_8021X_OFFLOAD:
+ 		return false;
+ 	case CONNECTION_TYPE_SAE_OFFLOAD:
+ 	case CONNECTION_TYPE_PSK_OFFLOAD:
+@@ -2666,6 +2676,9 @@ static struct l_genl_msg *netdev_build_cmd_connect(st=
+ruct netdev *netdev,
+ 	case CONNECTION_TYPE_PSK_OFFLOAD:
+ 		l_genl_msg_append_attr(msg, NL80211_ATTR_PMK, 32, hs->pmk);
+ 		break;
++	case CONNECTION_TYPE_8021X_OFFLOAD:
++		l_genl_msg_append_attr(msg, NL80211_ATTR_WANT_1X_4WAY_HS,
++					0, NULL);
  	}
  =
 
- 	eap_reset(sm->eap);
-@@ -2470,6 +2475,11 @@ void __eapol_set_rekey_offload_func(eapol_rekey_offl=
-oad_func_t func)
- 	rekey_offload =3D func;
+ 	if (prev_bssid)
+@@ -3045,13 +3058,21 @@ static int netdev_handshake_state_setup_connection_=
+type(
+ 		if (wiphy_has_ext_feature(wiphy,
+ 				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK))
+ 			goto psk_offload;
+-		/* fall through */
++
++		if (softmac)
++			goto softmac;
++
++		goto fullmac;
+ 	case IE_RSN_AKM_SUITE_8021X:
+ 	case IE_RSN_AKM_SUITE_FT_OVER_8021X:
+ 	case IE_RSN_AKM_SUITE_8021X_SHA256:
+ 	case IE_RSN_AKM_SUITE_8021X_SUITE_B_SHA256:
+ 	case IE_RSN_AKM_SUITE_8021X_SUITE_B_SHA384:
+ 	case IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384:
++		if (wiphy_has_ext_feature(wiphy,
++				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_1X))
++			goto offload_1x;
++
+ 		if (softmac)
+ 			goto softmac;
+ =
+
+@@ -3096,6 +3117,9 @@ sae_offload:
+ psk_offload:
+ 	nhs->type =3D CONNECTION_TYPE_PSK_OFFLOAD;
+ 	return 0;
++offload_1x:
++	nhs->type =3D CONNECTION_TYPE_8021X_OFFLOAD;
++	return 0;
  }
  =
 
-+void __eapol_set_install_pmk_func(eapol_install_pmk_func_t func)
-+{
-+	install_pmk =3D func;
-+}
-+
- void eapol_register(struct eapol_sm *sm)
- {
- 	eapol_frame_watch_func_t rx_handler =3D sm->handshake->authenticator ?
-diff --git a/src/eapol.h b/src/eapol.h
-index 0f9a6917..a948c018 100644
---- a/src/eapol.h
-+++ b/src/eapol.h
-@@ -51,6 +51,9 @@ typedef void (*eapol_frame_watch_func_t)(uint16_t proto, =
-const uint8_t *from,
- 						const struct eapol_frame *frame,
- 						bool noencrypt,
- 						void *user_data);
-+typedef void (*eapol_install_pmk_func_t)(struct handshake_state *hs,
-+						const uint8_t *pmk,
-+						size_t pmk_len);
+ static int netdev_connect_common(struct netdev *netdev,
+@@ -3181,8 +3205,12 @@ build_cmd_connect:
+ 		if (!cmd_connect)
+ 			return -EINVAL;
  =
 
- bool eapol_calculate_mic(enum ie_rsn_akm_suite akm, const uint8_t *kck,
- 				const struct eapol_key *frame, uint8_t *mic,
-@@ -102,6 +105,8 @@ void __eapol_tx_packet(uint32_t ifindex, const uint8_t =
-*dst, uint16_t proto,
- void __eapol_set_tx_packet_func(eapol_tx_packet_func_t func);
- void __eapol_set_tx_user_data(void *user_data);
+-		if (!is_offload(hs) && (is_rsn || hs->settings_8021x))
++		if (!is_offload(hs) && (is_rsn || hs->settings_8021x)) {
+ 			sm =3D eapol_sm_new(hs);
++
++			if (nhs->type =3D=3D CONNECTION_TYPE_8021X_OFFLOAD)
++				eapol_sm_set_require_handshake(sm, false);
++		}
+ 	}
  =
 
-+void __eapol_set_install_pmk_func(eapol_install_pmk_func_t func);
-+
- void __eapol_set_rekey_offload_func(eapol_rekey_offload_func_t func);
- void __eapol_update_replay_counter(uint32_t ifindex, const uint8_t *spa,
- 				const uint8_t *aa, uint64_t replay_counter);
+ 	return netdev_connect_common(netdev, cmd_connect, bss, hs, sm,
 -- =
 
 2.26.2
 
---===============6628434678343928443==--
+--===============7235310211731096765==--
 
