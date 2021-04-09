@@ -1,35 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============3392676630436388155=="
+Content-Type: multipart/mixed; boundary="===============6278026322191167508=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 1/3] eapol: add PMK installer support
-Date: Fri, 09 Apr 2021 11:34:14 -0500
-Message-ID: <efee77db-f426-3e87-bc1a-d1e2c7a2a142@gmail.com>
-In-Reply-To: <20210409161446.1303013-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v2] agent: call back even if agent disconnects
+Date: Fri, 09 Apr 2021 11:37:26 -0500
+Message-ID: <adf35e5b-e425-e091-c284-7d2a1b7a16a3@gmail.com>
+In-Reply-To: <20210409163714.1307122-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3392676630436388155==
+--===============6278026322191167508==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 4/9/21 11:14 AM, James Prestwood wrote:
-> 802.1x offloading needs a way to call SET_PMK after EAP finishes.
-> In the same manor as set_tk/gtk/igtk a new 'install_pmk' function
-> was added which eapol can call into after EAP completes.
+On 4/9/21 11:37 AM, James Prestwood wrote:
+> It was found that if the user cancels/disconnects the agent prior to
+> entering credentials, IWD would get stuck and could no longer accept
+> any connect calls with the error "Operation already in progress".
+> For example exiting iwctl in the Password prompt would cause this:
+> =
+
+> iwctl
+> $ station wlan0 connect myssid
+> $ Password: <Ctrl-C>
+> =
+
+> This was due to the agent never calling the network callback in the
+> case of an agent disconnect. Network would wait indefinitely for the
+> credentials, and disallow any future connect attempts.
+> =
+
+> To fix this agent_finalize_pending can be called in agent_disconnect
+> with a NULL reply which behaves the same as if there was an
+> internal timeout and ultimately allows network to fail the connection
 > ---
->   src/eapol.c | 10 ++++++++++
->   src/eapol.h |  5 +++++
->   2 files changed, 15 insertions(+)
+>   src/agent.c | 3 +++
+>   1 file changed, 3 insertions(+)
 > =
 
 
-All applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============3392676630436388155==--
+--===============6278026322191167508==--
 
