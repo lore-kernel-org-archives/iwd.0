@@ -1,99 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============2057025659933477736=="
+Content-Type: multipart/mixed; boundary="===============7940126515738148598=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 3/5] netdev: implement netdev_handshake_state_set_pmk
-Date: Thu, 08 Apr 2021 15:14:21 -0500
-Message-ID: <c26a63f4-1f49-64fc-ff01-49e909d3e142@gmail.com>
-In-Reply-To: <20210408154646.1182833-3-prestwoj@gmail.com>
+Subject: Re: iwd as AP "Couldn't connect to network"
+Date: Fri, 09 Apr 2021 09:06:35 -0500
+Message-ID: <6a3064b6-6830-b973-50a2-b3152f0d8520@gmail.com>
+In-Reply-To: <eee7f926c78f3dba582bc527695dad3749970181.camel@leica-camera.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2057025659933477736==
+--===============7940126515738148598==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Salahaldeen,
 
-On 4/8/21 10:46 AM, James Prestwood wrote:
-> The 8021x offloading procedure still does EAP in userspace which
-> negotiates the PMK. The kernel then expects to obtain this PMK
-> from userspace by calling SET_PMK. This then allows the firmware
-> to begin the 4-way handshake.
+On 4/7/21 10:34 AM, Altous, Salahaldeen wrote:
+> Hi Denis,
 > =
 
-> netdev_handshake_set_pmk kicks off the final userspace
-> actions prior to the firmware starting the 4-way handshake:
+> After some try and error I have found the the /etc/iwd/main.conf case
+> this error, I have deleted it. my main.conf looks like
 > =
 
->   - SET_PMK using PMK negotiated with EAP
->   - SET_STATION (concurrently with SET_PMK)
->   - Emit SETTING_KEYS event
->   - netdev_connect_ok
+> [General]
+> EnableNetworkConfiguration=3Dtrue
+> APRanges=3D192.168.5.1/24
+> [Network]
+> RoutePriorityOffset=3D200
+> NameResolvingService=3Dresolvconf
+
+This looks fine.
+
 > =
 
-> One thing to note is that the kernel provides no way of knowing if
-> the 4-way handshake completed. Assuming SET_PMK/SET_STATION come
-> back with no errors, IWD assumes the PMK was valid. If not, or
-> due to some other issue in the 4-way, the kernel will send a
-> disconnect.
-> ---
->   src/netdev.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->   src/netdev.h |  2 ++
->   2 files changed, 87 insertions(+)
+> =
+
+> Now I can start iwd 1.13 without problem but still can not connect to
+> this ap. I have started iwd-ap and I got [connection to "myssid"
+> timeout out. connection failed].
+
+Can you tell us what hardware / driver is being used for the AP side?  I as=
+sume =
+
+the same hardware works fine in station mode?
+
+> =
+
+> AP Probe Request from dc:a6:32:22:5f:ac
+> ../iwd-1.13/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 5
+> ../iwd-1.13/src/wiphy.c:wiphy_radio_work_next() Starting work item 5
+> ../iwd-1.13/src/netdev.c:netdev_mlme_notify() MLME notification Frame
+> TX Status(60)
+> ../iwd-1.13/src/frame-xchg.c:frame_xchg_mlme_notify() Received no ACK
+> ../iwd-1.13/src/frame-xchg.c:frame_xchg_tx_cb() err 0
+> ../iwd-1.13/src/frame-xchg.c:frame_xchg_wait_cancel()
+> Frame tx retry limit reached
 > =
 
 
-<snip>
+This is rather strange.  Looks like CMD_FRAME is failing.  Can you send us =
+logs =
 
-> +void netdev_handshake_set_pmk(struct handshake_state *hs)
-> +{
-> +	struct l_genl_msg *msg;
-> +	struct netdev_handshake_state *nhs =3D l_container_of(hs,
-> +				struct netdev_handshake_state, super);
-> +	struct netdev *netdev =3D nhs->netdev;
-> +
-> +	/* Only relevent for 8021x offload */
-> +	if (nhs->type !=3D CONNECTION_TYPE_8021X_OFFLOAD)
-> +		return;
-> +
-> +	msg =3D l_genl_msg_new(NL80211_CMD_SET_PMK);
-> +
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &netdev->index);
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_MAC, 6, netdev->handshake->aa);
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_PMK,
-> +				netdev->handshake->pmk_len,
-> +				netdev->handshake->pmk);
-> +
-> +	nhs->set_pmk_cmd_id =3D l_genl_family_send(nl80211, msg,
-> +							netdev_set_pmk_cb,
-> +							nhs, NULL);
-> +	if (!nhs->set_pmk_cmd_id) {
-> +		l_error("Failed to set SET_PMK");
-> +		netdev_setting_keys_failed(nhs, -EIO);
-> +		return;
-> +	}
-> +
-> +	msg =3D nl80211_build_set_station_authorized(netdev->index,
-> +							netdev->handshake->aa);
+(iwmon and iwd with '-d') of both sides of the connection?  Make sure iwmon=
+ is =
 
-I seem to recall that brcmfmac reports a -ENOTSUP error for SET_STATION.  S=
-o is =
-
-this even needed?
-
-> +
-> +	nhs->set_station_cmd_id =3D l_genl_family_send(nl80211, msg,
-> +						netdev_set_station_offload_cb,
-> +						nhs, NULL);
-> +	if (!nhs->set_station_cmd_id) {
-> +		l_error("Failed to SET_STATION");
-> +		netdev_setting_keys_failed(nhs, -EIO);
-> +	}
-> +}
-> +
+started prior to iwd so we get a trace of the full initialization procedure.
 
 Regards,
 -Denis
---===============2057025659933477736==--
+--===============7940126515738148598==--
 
