@@ -1,36 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============0256689662646212531=="
+Content-Type: multipart/mixed; boundary="===============3392676630436388155=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 3/5] netdev: implement netdev_handshake_state_set_pmk
-Date: Fri, 09 Apr 2021 11:29:50 -0500
-Message-ID: <8bcc8421-41a3-b21a-6a3e-25fcf55e8e35@gmail.com>
-In-Reply-To: <c7280601c89665b3f15f711656f2d055c4cc429a.camel@gmail.com>
+Subject: Re: [PATCH v2 1/3] eapol: add PMK installer support
+Date: Fri, 09 Apr 2021 11:34:14 -0500
+Message-ID: <efee77db-f426-3e87-bc1a-d1e2c7a2a142@gmail.com>
+In-Reply-To: <20210409161446.1303013-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0256689662646212531==
+--===============3392676630436388155==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
->> I seem to recall that brcmfmac reports a -ENOTSUP error for
->> SET_STATION.  So is
->> this even needed?
+On 4/9/21 11:14 AM, James Prestwood wrote:
+> 802.1x offloading needs a way to call SET_PMK after EAP finishes.
+> In the same manor as set_tk/gtk/igtk a new 'install_pmk' function
+> was added which eapol can call into after EAP completes.
+> ---
+>   src/eapol.c | 10 ++++++++++
+>   src/eapol.h |  5 +++++
+>   2 files changed, 15 insertions(+)
 > =
 
-> Its accepting it just fine, but I tried removing it and it looks like
-> I'm still staying connected so apparently its not required :)
-> =
 
-
-Okay, then I must be mis-remembering.  Maybe it was mwifiex and not brcmfma=
-c =
-
-actually.
+All applied, thanks.
 
 Regards,
 -Denis
---===============0256689662646212531==--
+
+--===============3392676630436388155==--
 
