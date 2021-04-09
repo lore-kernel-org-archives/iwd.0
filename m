@@ -1,58 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============1848631545130337933=="
+Content-Type: multipart/mixed; boundary="===============0256689662646212531=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2] agent: call back even if agent disconnects
-Date: Fri, 09 Apr 2021 09:37:14 -0700
-Message-ID: <20210409163714.1307122-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 3/5] netdev: implement netdev_handshake_state_set_pmk
+Date: Fri, 09 Apr 2021 11:29:50 -0500
+Message-ID: <8bcc8421-41a3-b21a-6a3e-25fcf55e8e35@gmail.com>
+In-Reply-To: <c7280601c89665b3f15f711656f2d055c4cc429a.camel@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1848631545130337933==
+--===============0256689662646212531==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-It was found that if the user cancels/disconnects the agent prior to
-entering credentials, IWD would get stuck and could no longer accept
-any connect calls with the error "Operation already in progress".
-For example exiting iwctl in the Password prompt would cause this:
+Hi James,
 
-iwctl
-$ station wlan0 connect myssid
-$ Password: <Ctrl-C>
+>> I seem to recall that brcmfmac reports a -ENOTSUP error for
+>> SET_STATION.  So is
+>> this even needed?
+> =
 
-This was due to the agent never calling the network callback in the
-case of an agent disconnect. Network would wait indefinitely for the
-credentials, and disallow any future connect attempts.
+> Its accepting it just fine, but I tried removing it and it looks like
+> I'm still staying connected so apparently its not required :)
+> =
 
-To fix this agent_finalize_pending can be called in agent_disconnect
-with a NULL reply which behaves the same as if there was an
-internal timeout and ultimately allows network to fail the connection
----
- src/agent.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/src/agent.c b/src/agent.c
-index 101eaffd..5e40e1a7 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -525,6 +525,9 @@ static void agent_disconnect(struct l_dbus *dbus, void =
-*user_data)
- =
+Okay, then I must be mis-remembering.  Maybe it was mwifiex and not brcmfma=
+c =
 
- 	l_debug("agent %s disconnected", agent->owner);
- =
+actually.
 
-+	if (agent->pending_id)
-+		agent_finalize_pending(agent, NULL);
-+
- 	l_queue_remove(agents, agent);
- =
-
- 	l_idle_oneshot(agent_free, agent, NULL);
--- =
-
-2.26.2
-
---===============1848631545130337933==--
+Regards,
+-Denis
+--===============0256689662646212531==--
 
