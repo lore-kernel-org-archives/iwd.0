@@ -1,117 +1,96 @@
-Content-Type: multipart/mixed; boundary="===============7526139914442738051=="
+Content-Type: multipart/mixed; boundary="===============6628434678343928443=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 3/5] netdev: implement netdev_handshake_state_set_pmk
-Date: Fri, 09 Apr 2021 09:09:33 -0700
-Message-ID: <c7280601c89665b3f15f711656f2d055c4cc429a.camel@gmail.com>
-In-Reply-To: <c26a63f4-1f49-64fc-ff01-49e909d3e142@gmail.com>
+Subject: [PATCH v2 1/3] eapol: add PMK installer support
+Date: Fri, 09 Apr 2021 09:14:44 -0700
+Message-ID: <20210409161446.1303013-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7526139914442738051==
+--===============6628434678343928443==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2021-04-08 at 15:14 -0500, Denis Kenzior wrote:
-> Hi James,
-> =
+802.1x offloading needs a way to call SET_PMK after EAP finishes.
+In the same manor as set_tk/gtk/igtk a new 'install_pmk' function
+was added which eapol can call into after EAP completes.
+---
+ src/eapol.c | 10 ++++++++++
+ src/eapol.h |  5 +++++
+ 2 files changed, 15 insertions(+)
 
-> On 4/8/21 10:46 AM, James Prestwood wrote:
-> > The 8021x offloading procedure still does EAP in userspace which
-> > negotiates the PMK. The kernel then expects to obtain this PMK
-> > from userspace by calling SET_PMK. This then allows the firmware
-> > to begin the 4-way handshake.
-> > =
+diff --git a/src/eapol.c b/src/eapol.c
+index 23aaf530..3823f854 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -52,6 +52,7 @@ static uint32_t eapol_4way_handshake_time =3D 2;
+ static eapol_rekey_offload_func_t rekey_offload =3D NULL;
+ =
 
-> > netdev_handshake_set_pmk kicks off the final userspace
-> > actions prior to the firmware starting the 4-way handshake:
-> > =
+ static eapol_tx_packet_func_t tx_packet =3D NULL;
++static eapol_install_pmk_func_t install_pmk =3D NULL;
+ static void *tx_user_data;
+ =
 
-> >   - SET_PMK using PMK negotiated with EAP
-> >   - SET_STATION (concurrently with SET_PMK)
-> >   - Emit SETTING_KEYS event
-> >   - netdev_connect_ok
-> > =
+ #define VERIFY_IS_ZERO(field)						\
+@@ -2162,6 +2163,10 @@ static void eapol_eap_complete_cb(enum eap_result re=
+sult, void *user_data)
+ 		sm->eap =3D NULL;
+ 		handshake_failed(sm, MMPDU_REASON_CODE_IEEE8021X_FAILED);
+ 		return;
++	} else {
++		if (install_pmk)
++			install_pmk(sm->handshake, sm->handshake->pmk,
++					sm->handshake->pmk_len);
+ 	}
+ =
 
-> > One thing to note is that the kernel provides no way of knowing if
-> > the 4-way handshake completed. Assuming SET_PMK/SET_STATION come
-> > back with no errors, IWD assumes the PMK was valid. If not, or
-> > due to some other issue in the 4-way, the kernel will send a
-> > disconnect.
-> > ---
-> >   src/netdev.c | 85
-> > ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >   src/netdev.h |  2 ++
-> >   2 files changed, 87 insertions(+)
-> > =
+ 	eap_reset(sm->eap);
+@@ -2470,6 +2475,11 @@ void __eapol_set_rekey_offload_func(eapol_rekey_offl=
+oad_func_t func)
+ 	rekey_offload =3D func;
+ }
+ =
 
-> =
++void __eapol_set_install_pmk_func(eapol_install_pmk_func_t func)
++{
++	install_pmk =3D func;
++}
++
+ void eapol_register(struct eapol_sm *sm)
+ {
+ 	eapol_frame_watch_func_t rx_handler =3D sm->handshake->authenticator ?
+diff --git a/src/eapol.h b/src/eapol.h
+index 0f9a6917..a948c018 100644
+--- a/src/eapol.h
++++ b/src/eapol.h
+@@ -51,6 +51,9 @@ typedef void (*eapol_frame_watch_func_t)(uint16_t proto, =
+const uint8_t *from,
+ 						const struct eapol_frame *frame,
+ 						bool noencrypt,
+ 						void *user_data);
++typedef void (*eapol_install_pmk_func_t)(struct handshake_state *hs,
++						const uint8_t *pmk,
++						size_t pmk_len);
+ =
 
-> <snip>
-> =
+ bool eapol_calculate_mic(enum ie_rsn_akm_suite akm, const uint8_t *kck,
+ 				const struct eapol_key *frame, uint8_t *mic,
+@@ -102,6 +105,8 @@ void __eapol_tx_packet(uint32_t ifindex, const uint8_t =
+*dst, uint16_t proto,
+ void __eapol_set_tx_packet_func(eapol_tx_packet_func_t func);
+ void __eapol_set_tx_user_data(void *user_data);
+ =
 
-> > +void netdev_handshake_set_pmk(struct handshake_state *hs)
-> > +{
-> > +	struct l_genl_msg *msg;
-> > +	struct netdev_handshake_state *nhs =3D l_container_of(hs,
-> > +				struct netdev_handshake_state, super);
-> > +	struct netdev *netdev =3D nhs->netdev;
-> > +
-> > +	/* Only relevent for 8021x offload */
-> > +	if (nhs->type !=3D CONNECTION_TYPE_8021X_OFFLOAD)
-> > +		return;
-> > +
-> > +	msg =3D l_genl_msg_new(NL80211_CMD_SET_PMK);
-> > +
-> > +	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &netdev-
-> > >index);
-> > +	l_genl_msg_append_attr(msg, NL80211_ATTR_MAC, 6, netdev-
-> > >handshake->aa);
-> > +	l_genl_msg_append_attr(msg, NL80211_ATTR_PMK,
-> > +				netdev->handshake->pmk_len,
-> > +				netdev->handshake->pmk);
-> > +
-> > +	nhs->set_pmk_cmd_id =3D l_genl_family_send(nl80211, msg,
-> > +							netdev_set_pmk_
-> > cb,
-> > +							nhs, NULL);
-> > +	if (!nhs->set_pmk_cmd_id) {
-> > +		l_error("Failed to set SET_PMK");
-> > +		netdev_setting_keys_failed(nhs, -EIO);
-> > +		return;
-> > +	}
-> > +
-> > +	msg =3D nl80211_build_set_station_authorized(netdev->index,
-> > +							netdev-
-> > >handshake->aa);
-> =
++void __eapol_set_install_pmk_func(eapol_install_pmk_func_t func);
++
+ void __eapol_set_rekey_offload_func(eapol_rekey_offload_func_t func);
+ void __eapol_update_replay_counter(uint32_t ifindex, const uint8_t *spa,
+ 				const uint8_t *aa, uint64_t replay_counter);
+-- =
 
-> I seem to recall that brcmfmac reports a -ENOTSUP error for
-> SET_STATION.  So is =
+2.26.2
 
-> this even needed?
-
-Its accepting it just fine, but I tried removing it and it looks like
-I'm still staying connected so apparently its not required :)
-
-> =
-
-> > +
-> > +	nhs->set_station_cmd_id =3D l_genl_family_send(nl80211, msg,
-> > +						netdev_set_station_offl
-> > oad_cb,
-> > +						nhs, NULL);
-> > +	if (!nhs->set_station_cmd_id) {
-> > +		l_error("Failed to SET_STATION");
-> > +		netdev_setting_keys_failed(nhs, -EIO);
-> > +	}
-> > +}
-> > +
-> =
-
-> Regards,
-> -Denis
-
---===============7526139914442738051==--
+--===============6628434678343928443==--
 
