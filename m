@@ -1,123 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============1550178854538478653=="
+Content-Type: multipart/mixed; boundary="===============1242288627309677022=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] ap: remove rates requirement for fmac cards
-Date: Mon, 12 Apr 2021 11:22:45 -0700
-Message-ID: <20210412182245.1555350-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] ap: remove rates requirement for fmac cards
+Date: Mon, 12 Apr 2021 14:17:12 -0500
+Message-ID: <1a3848d1-323e-9657-6012-a490d4b08e7d@gmail.com>
+In-Reply-To: <20210412182245.1555350-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1550178854538478653==
+--===============1242288627309677022==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-It was seen that some full mac cards/drivers do not include any
-rate information with the NEW_STATION event. This was causing
-the NEW_STATION event to be ignored, preventing AP mode from
-working on these cards.
+Hi James,
 
-Since the full mac path does not even require sta->rates the
-parsing can be removed completely.
----
- src/ap.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+On 4/12/21 1:22 PM, James Prestwood wrote:
+> It was seen that some full mac cards/drivers do not include any
+> rate information with the NEW_STATION event. This was causing
+> the NEW_STATION event to be ignored, preventing AP mode from
+> working on these cards.
+> =
 
-diff --git a/src/ap.c b/src/ap.c
-index 86451d42..46821c04 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -281,7 +281,9 @@ static void ap_sta_free(void *data)
- 	struct sta_state *sta =3D data;
- 	struct ap_state *ap =3D sta->ap;
- =
+> Since the full mac path does not even require sta->rates the
+> parsing can be removed completely.
+> ---
+>   src/ap.c | 17 +++++++++--------
+>   1 file changed, 9 insertions(+), 8 deletions(-)
+> =
 
--	l_uintset_free(sta->rates);
-+	if (sta->rates)
-+		l_uintset_free(sta->rates);
-+
- 	l_free(sta->assoc_ies);
- =
 
- 	if (sta->assoc_resp_cmd_id)
-@@ -2329,7 +2331,9 @@ static bool ap_parse_new_station_ies(const void *data=
-, uint16_t len,
- 	}
- =
+Applied, thanks.
 
- 	*rsn_out =3D rsn;
--	*rates_out =3D rates;
-+
-+	if (rates_out)
-+		*rates_out =3D rates;
- =
+Salahaldeen, can you check whether this fixes your issue?
 
- 	return true;
- =
+Regards,
+-Denis
 
-@@ -2352,7 +2356,6 @@ static void ap_handle_new_station(struct ap_state *ap=
-, struct l_genl_msg *msg)
- 	const void *data;
- 	uint8_t mac[6];
- 	uint8_t *assoc_rsne =3D NULL;
--	struct l_uintset *rates =3D NULL;
- =
-
- 	if (!l_genl_attr_init(&attr, msg))
- 		return;
-@@ -2360,11 +2363,11 @@ static void ap_handle_new_station(struct ap_state *=
-ap, struct l_genl_msg *msg)
- 	while (l_genl_attr_next(&attr, &type, &len, &data)) {
- 		switch (type) {
- 		case NL80211_ATTR_IE:
--			if (assoc_rsne || rates)
-+			if (assoc_rsne)
- 				goto cleanup;
- =
-
- 			if (!ap_parse_new_station_ies(data, len, &assoc_rsne,
--							&rates))
-+							NULL))
- 				return;
- 			break;
- 		case NL80211_ATTR_MAC:
-@@ -2376,7 +2379,7 @@ static void ap_handle_new_station(struct ap_state *ap=
-, struct l_genl_msg *msg)
- 		}
- 	}
- =
-
--	if (!assoc_rsne || !rates)
-+	if (!assoc_rsne)
- 		goto cleanup;
- =
-
- 	/*
-@@ -2391,7 +2394,6 @@ static void ap_handle_new_station(struct ap_state *ap=
-, struct l_genl_msg *msg)
- 	memcpy(sta->addr, mac, 6);
- 	sta->ap =3D ap;
- 	sta->assoc_rsne =3D assoc_rsne;
--	sta->rates =3D rates;
- 	sta->aid =3D ++ap->last_aid;
- =
-
- 	sta->associated =3D true;
-@@ -2415,7 +2417,6 @@ static void ap_handle_new_station(struct ap_state *ap=
-, struct l_genl_msg *msg)
- =
-
- cleanup:
- 	l_free(assoc_rsne);
--	l_uintset_free(rates);
- }
- =
-
- static void ap_handle_del_station(struct ap_state *ap, struct l_genl_msg *=
-msg)
--- =
-
-2.26.2
-
---===============1550178854538478653==--
+--===============1242288627309677022==--
 
