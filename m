@@ -1,43 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============6292716578612254381=="
+Content-Type: multipart/mixed; boundary="===============5420637717473537303=="
 MIME-Version: 1.0
-From: salahaldeen.altous@leica-camera.com
-Subject: Re: Start iwd device in ap mode by default
-Date: Tue, 13 Apr 2021 00:40:07 +0000
-Message-ID: <20210413004007.2848.34560@ml01.vlan13.01.org>
-In-Reply-To: <4af979fc-6455-73cb-abc2-5345c5f552f1@gmail.com>
+From: WU RUXU <wrxzzj@gmail.com>
+Subject: virtual interface isn't available in iwd
+Date: Tue, 13 Apr 2021 09:59:04 +0800
+Message-ID: <CABuKQihA8_VMsG4Rm02QyWSD9MQnag_K9kSWC=cGzDXYu0zFkg@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6292716578612254381==
+--===============5420637717473537303==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis
+hi all
 
-> Hi Salahaldeen,
-> =
+    I have create a virtual interface by following command
 
-> On 4/12/21 5:11 PM, salahaldeen.altous(a)leica-camera.com wrote:
-> =
+ /sbin/iw phy phy0 interface add wlan0_ap type managed
+/sbin/ip addr add 192.168.18.1/24 dev wlan0_ap
 
-> Unfortunately this is not yet supported.  This is definitely something th=
-at is =
+but it's not available in  device list in iwctl
 
-> needed, but nobody has gotten around to adding this functionality.  Patch=
-es are =
+wlan0_ap is available in hostapd
 
-> always welcome of course.
-Thanks for your quick reply. I will try to add this feature.
-Any hint where to start? =
+-- =
 
-> =
+Thanks
+PGP Fingerprint: F7BA D6CE 6592 77C7 0D2E  3BD5 5479 A15E B305 B8FE
 
-> Regards,
-> -Denis
+--===============5420637717473537303==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.htm"
 
+PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQtZmFt
+aWx5OmdhcmFtb25kLHNlcmlmO2ZvbnQtc2l6ZTpsYXJnZTtjb2xvcjojMDczNzYzIj5oaSBhbGw8
+L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6Z2FyYW1v
+bmQsc2VyaWY7Zm9udC1zaXplOmxhcmdlO2NvbG9yOiMwNzM3NjMiPjxicj48L2Rpdj48ZGl2IGNs
+YXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6Z2FyYW1vbmQsc2VyaWY7Zm9u
+dC1zaXplOmxhcmdlO2NvbG9yOiMwNzM3NjMiPsKgwqDCoCBJIGhhdmUgY3JlYXRlIGEgdmlydHVh
+bCBpbnRlcmZhY2UgYnkgZm9sbG93aW5nIGNvbW1hbmQ8L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9k
+ZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6Z2FyYW1vbmQsc2VyaWY7Zm9udC1zaXplOmxhcmdl
+O2NvbG9yOiMwNzM3NjMiPjxicj48L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHls
+ZT0iZm9udC1mYW1pbHk6Z2FyYW1vbmQsc2VyaWY7Zm9udC1zaXplOmxhcmdlO2NvbG9yOiMwNzM3
+NjMiPsKgL3NiaW4vaXcgcGh5IHBoeTAgaW50ZXJmYWNlIGFkZCB3bGFuMF9hcCB0eXBlIG1hbmFn
+ZWQ8L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6Z2Fy
+YW1vbmQsc2VyaWY7Zm9udC1zaXplOmxhcmdlO2NvbG9yOiMwNzM3NjMiPi9zYmluL2lwIGFkZHIg
+YWRkIDxhIGhyZWY9Imh0dHA6Ly8xOTIuMTY4LjE4LjEvMjQiPjE5Mi4xNjguMTguMS8yNDwvYT4g
+ZGV2IHdsYW4wX2FwPC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQt
+ZmFtaWx5OmdhcmFtb25kLHNlcmlmO2ZvbnQtc2l6ZTpsYXJnZTtjb2xvcjojMDczNzYzIj48YnI+
+PC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQtZmFtaWx5OmdhcmFt
+b25kLHNlcmlmO2ZvbnQtc2l6ZTpsYXJnZTtjb2xvcjojMDczNzYzIj5idXQgaXQmIzM5O3Mgbm90
+IGF2YWlsYWJsZSBpbsKgIGRldmljZSBsaXN0IGluIGl3Y3RsPC9kaXY+PGRpdiBjbGFzcz0iZ21h
+aWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQtZmFtaWx5OmdhcmFtb25kLHNlcmlmO2ZvbnQtc2l6ZTps
+YXJnZTtjb2xvcjojMDczNzYzIj48YnI+PC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIg
+c3R5bGU9ImZvbnQtZmFtaWx5OmdhcmFtb25kLHNlcmlmO2ZvbnQtc2l6ZTpsYXJnZTtjb2xvcjoj
+MDczNzYzIj53bGFuMF9hcCBpcyBhdmFpbGFibGUgaW4gaG9zdGFwZDxicj48L2Rpdj48YnI+LS0g
+PGJyPjxkaXYgZGlyPSJsdHIiIGNsYXNzPSJnbWFpbF9zaWduYXR1cmUiIGRhdGEtc21hcnRtYWls
+PSJnbWFpbF9zaWduYXR1cmUiPlRoYW5rczxicj5QR1AgRmluZ2VycHJpbnQ6IEY3QkEgRDZDRSA2
+NTkyIDc3QzcgMEQyRSDCoDNCRDUgNTQ3OSBBMTVFIEIzMDUgQjhGRTwvZGl2PjwvZGl2Pgo=
 
-Regards,
-Salahaldeen
---===============6292716578612254381==--
+--===============5420637717473537303==--
 
