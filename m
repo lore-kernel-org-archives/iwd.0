@@ -1,56 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============7358824847283366967=="
+Content-Type: multipart/mixed; boundary="===============5203847232405834392=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: Start iwd device in ap mode by default
-Date: Mon, 12 Apr 2021 22:01:12 -0500
-Message-ID: <76fa776b-6ec4-0543-ba96-72e66d6eae4f@gmail.com>
-In-Reply-To: <20210413004007.2848.34560@ml01.vlan13.01.org>
+Subject: Re: virtual interface isn't available in iwd
+Date: Mon, 12 Apr 2021 22:15:40 -0500
+Message-ID: <bf19948f-db3a-a03c-42ed-5eb1445b0204@gmail.com>
+In-Reply-To: <CABuKQihA8_VMsG4Rm02QyWSD9MQnag_K9kSWC=cGzDXYu0zFkg@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7358824847283366967==
+--===============5203847232405834392==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Salahaldeen,
+Hi,
 
-On 4/12/21 7:40 PM, salahaldeen.altous(a)leica-camera.com wrote:
-> Hi Denis
+On 4/12/21 8:59 PM, WU RUXU wrote:
+> hi all
 > =
 
->> Hi Salahaldeen,
->>
->> On 4/12/21 5:11 PM, salahaldeen.altous(a)leica-camera.com wrote:
->>
->> Unfortunately this is not yet supported.  This is definitely something t=
-hat is
->> needed, but nobody has gotten around to adding this functionality.  Patc=
-hes are
->> always welcome of course.
-> Thanks for your quick reply. I will try to add this feature.
-> Any hint where to start?
+>  =C2=A0=C2=A0=C2=A0 I have create a virtual interface by following command
+> =
 
-Start by looking into src/manager.c.  This is what is responsible for creat=
-ing =
+>  =C2=A0/sbin/iw phy phy0 interface add wlan0_ap type managed
+> /sbin/ip addr add 192.168.18.1/24 <http://192.168.18.1/24> dev wlan0_ap
+> =
 
-interfaces on the wiphys managed by iwd.  See manager_create_interfaces().
+> but it's not available in=C2=A0 device list in iwctl
 
-Right now we create a station interface and an optional P2P device wdev, =
+Right now iwd ignores any interfaces created after iwd has been initialized=
+. =
 
-depending on hardware capability.  I suppose it would make sense to have th=
-e =
+This allows one to start iwd (in station mode) and then create a virtual =
 
-following states as configurable inside main.conf:
+interface for use by hostapd for example.
 
-- station + p2p (current default)
-- ap only
-- maybe station + ap?
+Having a main.conf setting that would tell iwd to pre-create multiple inter=
+faces =
 
-Feel free to find us on IRC if you want to brainstorm live, or on the maili=
-ng list.
+and combinations thereof is something that is still on the TODO list.  See =
+my =
+
+reply to the thread (from earlier today) 'Start iwd device in ap mode by =
+
+default'.  Ideally we could teach iwd to initialize phys in station + ap mo=
+de =
+
+for example.
+
+Another possibility, if you're in a pinch, would be to pre-create the inter=
+faces =
+
+you need (using iw, or similar) and then start iwd with =
+
+'UseDefaultInterface=3Dtrue' setting.  This should then force iwd to manage=
+ all of =
+
+them.  However, this will not work for devices that can be hot-plugged.
+
+See https://iwd.wiki.kernel.org/interface_lifecycle for more details.
 
 Regards,
 -Denis
---===============7358824847283366967==--
+--===============5203847232405834392==--
 
