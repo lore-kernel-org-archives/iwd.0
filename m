@@ -1,65 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============5420637717473537303=="
+Content-Type: multipart/mixed; boundary="===============7358824847283366967=="
 MIME-Version: 1.0
-From: WU RUXU <wrxzzj@gmail.com>
-Subject: virtual interface isn't available in iwd
-Date: Tue, 13 Apr 2021 09:59:04 +0800
-Message-ID: <CABuKQihA8_VMsG4Rm02QyWSD9MQnag_K9kSWC=cGzDXYu0zFkg@mail.gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: Start iwd device in ap mode by default
+Date: Mon, 12 Apr 2021 22:01:12 -0500
+Message-ID: <76fa776b-6ec4-0543-ba96-72e66d6eae4f@gmail.com>
+In-Reply-To: <20210413004007.2848.34560@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5420637717473537303==
+--===============7358824847283366967==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-hi all
+Hi Salahaldeen,
 
-    I have create a virtual interface by following command
+On 4/12/21 7:40 PM, salahaldeen.altous(a)leica-camera.com wrote:
+> Hi Denis
+> =
 
- /sbin/iw phy phy0 interface add wlan0_ap type managed
-/sbin/ip addr add 192.168.18.1/24 dev wlan0_ap
+>> Hi Salahaldeen,
+>>
+>> On 4/12/21 5:11 PM, salahaldeen.altous(a)leica-camera.com wrote:
+>>
+>> Unfortunately this is not yet supported.  This is definitely something t=
+hat is
+>> needed, but nobody has gotten around to adding this functionality.  Patc=
+hes are
+>> always welcome of course.
+> Thanks for your quick reply. I will try to add this feature.
+> Any hint where to start?
 
-but it's not available in  device list in iwctl
+Start by looking into src/manager.c.  This is what is responsible for creat=
+ing =
 
-wlan0_ap is available in hostapd
+interfaces on the wiphys managed by iwd.  See manager_create_interfaces().
 
--- =
+Right now we create a station interface and an optional P2P device wdev, =
 
-Thanks
-PGP Fingerprint: F7BA D6CE 6592 77C7 0D2E  3BD5 5479 A15E B305 B8FE
+depending on hardware capability.  I suppose it would make sense to have th=
+e =
 
---===============5420637717473537303==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.htm"
+following states as configurable inside main.conf:
 
-PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQtZmFt
-aWx5OmdhcmFtb25kLHNlcmlmO2ZvbnQtc2l6ZTpsYXJnZTtjb2xvcjojMDczNzYzIj5oaSBhbGw8
-L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6Z2FyYW1v
-bmQsc2VyaWY7Zm9udC1zaXplOmxhcmdlO2NvbG9yOiMwNzM3NjMiPjxicj48L2Rpdj48ZGl2IGNs
-YXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6Z2FyYW1vbmQsc2VyaWY7Zm9u
-dC1zaXplOmxhcmdlO2NvbG9yOiMwNzM3NjMiPsKgwqDCoCBJIGhhdmUgY3JlYXRlIGEgdmlydHVh
-bCBpbnRlcmZhY2UgYnkgZm9sbG93aW5nIGNvbW1hbmQ8L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9k
-ZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6Z2FyYW1vbmQsc2VyaWY7Zm9udC1zaXplOmxhcmdl
-O2NvbG9yOiMwNzM3NjMiPjxicj48L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHls
-ZT0iZm9udC1mYW1pbHk6Z2FyYW1vbmQsc2VyaWY7Zm9udC1zaXplOmxhcmdlO2NvbG9yOiMwNzM3
-NjMiPsKgL3NiaW4vaXcgcGh5IHBoeTAgaW50ZXJmYWNlIGFkZCB3bGFuMF9hcCB0eXBlIG1hbmFn
-ZWQ8L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6Z2Fy
-YW1vbmQsc2VyaWY7Zm9udC1zaXplOmxhcmdlO2NvbG9yOiMwNzM3NjMiPi9zYmluL2lwIGFkZHIg
-YWRkIDxhIGhyZWY9Imh0dHA6Ly8xOTIuMTY4LjE4LjEvMjQiPjE5Mi4xNjguMTguMS8yNDwvYT4g
-ZGV2IHdsYW4wX2FwPC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQt
-ZmFtaWx5OmdhcmFtb25kLHNlcmlmO2ZvbnQtc2l6ZTpsYXJnZTtjb2xvcjojMDczNzYzIj48YnI+
-PC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQtZmFtaWx5OmdhcmFt
-b25kLHNlcmlmO2ZvbnQtc2l6ZTpsYXJnZTtjb2xvcjojMDczNzYzIj5idXQgaXQmIzM5O3Mgbm90
-IGF2YWlsYWJsZSBpbsKgIGRldmljZSBsaXN0IGluIGl3Y3RsPC9kaXY+PGRpdiBjbGFzcz0iZ21h
-aWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQtZmFtaWx5OmdhcmFtb25kLHNlcmlmO2ZvbnQtc2l6ZTps
-YXJnZTtjb2xvcjojMDczNzYzIj48YnI+PC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIg
-c3R5bGU9ImZvbnQtZmFtaWx5OmdhcmFtb25kLHNlcmlmO2ZvbnQtc2l6ZTpsYXJnZTtjb2xvcjoj
-MDczNzYzIj53bGFuMF9hcCBpcyBhdmFpbGFibGUgaW4gaG9zdGFwZDxicj48L2Rpdj48YnI+LS0g
-PGJyPjxkaXYgZGlyPSJsdHIiIGNsYXNzPSJnbWFpbF9zaWduYXR1cmUiIGRhdGEtc21hcnRtYWls
-PSJnbWFpbF9zaWduYXR1cmUiPlRoYW5rczxicj5QR1AgRmluZ2VycHJpbnQ6IEY3QkEgRDZDRSA2
-NTkyIDc3QzcgMEQyRSDCoDNCRDUgNTQ3OSBBMTVFIEIzMDUgQjhGRTwvZGl2PjwvZGl2Pgo=
+- station + p2p (current default)
+- ap only
+- maybe station + ap?
 
---===============5420637717473537303==--
+Feel free to find us on IRC if you want to brainstorm live, or on the maili=
+ng list.
+
+Regards,
+-Denis
+--===============7358824847283366967==--
 
