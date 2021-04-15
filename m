@@ -1,105 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============8726357162559836573=="
+Content-Type: multipart/mixed; boundary="===============3021191293869023914=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/8] station: specially handle FT-over-DS failure
-Date: Thu, 15 Apr 2021 15:45:07 -0700
-Message-ID: <20210415224508.1823614-7-prestwoj@gmail.com>
+Subject: [PATCH 8/8] ft: netdev: add return value to tx_associate
+Date: Thu, 15 Apr 2021 15:45:08 -0700
+Message-ID: <20210415224508.1823614-8-prestwoj@gmail.com>
 In-Reply-To: <20210415224508.1823614-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8726357162559836573==
+--===============3021191293869023914==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Depending on the netdev result, FT-over-DS failure may not need to
-be fatal. If the result is an Authentication failure this just means
-that FT-over-DS did not successfully send or receive the initial
-action frames. This means we cannot roam, but it does not mean the
-connection needs to be fully terminated. A new flag was added to
-signal FT-over-DS, and the failure code treats an authentication
-failure specially if this flag is set.
+Prior to this, an error sending the FT Reassociation was treated
+as fatal, which is correct for FT-over-Air but not for FT-over-DS.
+If the actual l_genl_family_send call fails for FT-over-DS the
+existing connection can be maintained and there is no need to
+call netdev_connect_failed.
+
+Adding a return to the tx_associate function works for both FT
+types. In the FT-over-Air case this return will ultimately get
+sent back up to auth_proto_rx_authenticate in which case will
+call netdev_connect_failed. For FT-over-DS tx_associate is
+actually called from the 'start' operation which can fail and
+still maintain the existing connection.
 ---
- src/station.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+ src/ft.c     | 4 +---
+ src/ft.h     | 2 +-
+ src/netdev.c | 8 ++++----
+ 3 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 064872c6..80609607 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -112,6 +112,7 @@ struct station {
- 	bool ap_directed_roaming : 1;
- 	bool scanning : 1;
- 	bool autoconnect : 1;
-+	bool ft_over_ds : 1;
- };
- =
-
- struct anqp_entry {
-@@ -1625,10 +1626,17 @@ static void station_roam_failed(struct station *sta=
-tion)
- 	l_debug("%u", netdev_get_ifindex(station->netdev));
- =
-
- 	/*
--	 * If we attempted a reassociation or a fast transition, and ended up
--	 * here then we are now disconnected.
-+	 * If we attempted a reassociation or a fast transition (except DS),
-+	 * and ended up here then we are now disconnected. In the case of
-+	 * FT over DS we can remain connected to the AP even if the transition
-+	 * fails.
- 	 */
- 	if (station->state =3D=3D STATION_STATE_ROAMING) {
-+		if (station->ft_over_ds) {
-+			station_enter_state(station, STATION_STATE_CONNECTED);
-+			goto delayed_retry;
-+		}
-+
- 		station_disassociated(station);
- 		return;
+diff --git a/src/ft.c b/src/ft.c
+index d1aaada7..793e3724 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -290,9 +290,7 @@ static int ft_tx_reassociate(struct ft_sm *ft)
+ 		iov_elems +=3D 1;
  	}
-@@ -1657,6 +1665,7 @@ delayed_retry:
- 	station->preparing_roam =3D false;
- 	station->roam_scan_full =3D false;
- 	station->ap_directed_roaming =3D false;
-+	station->ft_over_ds =3D false;
  =
 
- 	if (station->signal_low)
- 		station_roam_timeout_rearm(station, roam_retry_interval);
-@@ -1708,6 +1717,16 @@ static void station_fast_transition_cb(struct netdev=
- *netdev,
- 	if (station->state !=3D STATION_STATE_ROAMING)
- 		return;
+-	ft->tx_assoc(iov, iov_elems, ft->user_data);
+-
+-	return 0;
++	return ft->tx_assoc(iov, iov_elems, ft->user_data);
  =
 
-+	/*
-+	 * Auth failures are handled special here for FT-over-DS since this only
-+	 * means we cannot roam to that AP. Any other failure cannot be
-+	 * salvaged. In this case unset the flag so station_roam_failed can
-+	 * properly clean up.
-+	 */
-+	if (result !=3D NETDEV_RESULT_AUTHENTICATION_FAILED &&
-+				station->ft_over_ds)
-+		station->ft_over_ds =3D false;
+ error:
+ 	return -EINVAL;
+diff --git a/src/ft.h b/src/ft.h
+index 2dd806f2..72237a4e 100644
+--- a/src/ft.h
++++ b/src/ft.h
+@@ -26,7 +26,7 @@ struct handshake_state;
+ =
+
+ typedef void (*ft_tx_authenticate_func_t)(struct iovec *iov, size_t iov_le=
+n,
+ 					void *user_data);
+-typedef void (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_le=
+n,
++typedef int (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_len,
+ 					void *user_data);
+ =
+
+ bool ft_build_authenticate_ies(struct handshake_state *hs,
+diff --git a/src/netdev.c b/src/netdev.c
+index 95fa6909..6495451f 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -3524,7 +3524,7 @@ restore_snonce:
+ 					MMPDU_STATUS_CODE_UNSPECIFIED);
+ }
+ =
+
+-static void netdev_ft_tx_associate(struct iovec *ie_iov, size_t iov_len,
++static int netdev_ft_tx_associate(struct iovec *ie_iov, size_t iov_len,
+ 					void *user_data)
+ {
+ 	struct netdev *netdev =3D user_data;
+@@ -3542,10 +3542,10 @@ static void netdev_ft_tx_associate(struct iovec *ie=
+_iov, size_t iov_len,
+ 	if (!netdev->connect_cmd_id) {
+ 		l_genl_msg_unref(msg);
+ =
+
+-		netdev_connect_failed(netdev, NETDEV_RESULT_ASSOCIATION_FAILED,
+-					MMPDU_STATUS_CODE_UNSPECIFIED);
+-		return;
++		return -EIO;
+ 	}
 +
- 	if (result =3D=3D NETDEV_RESULT_OK)
- 		station_roamed(station);
- 	else
-@@ -1839,6 +1858,8 @@ static void station_transition_start(struct station *=
-station,
- 		/* FT-over-DS can be better suited for these situations */
- 		if ((hs->mde[4] & 1) && (station->ap_directed_roaming ||
- 				station->signal_low)) {
-+			station->ft_over_ds =3D true;
-+
- 			if (netdev_fast_transition_over_ds(station->netdev, bss,
- 					station_fast_transition_cb) < 0) {
- 				station_roam_failed(station);
++	return 0;
+ }
+ =
+
+ static void prepare_ft(struct netdev *netdev, struct scan_bss *target_bss)
 -- =
 
 2.26.2
 
---===============8726357162559836573==--
+--===============3021191293869023914==--
 
