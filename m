@@ -1,174 +1,92 @@
-Content-Type: multipart/mixed; boundary="===============1830195726833309190=="
+Content-Type: multipart/mixed; boundary="===============2611948911810971272=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/8] netdev: factor out FT handshake preparation
-Date: Thu, 15 Apr 2021 15:45:05 -0700
-Message-ID: <20210415224508.1823614-5-prestwoj@gmail.com>
+Subject: [PATCH 4/8] ft: add ft_parse_action_response
+Date: Thu, 15 Apr 2021 15:45:04 -0700
+Message-ID: <20210415224508.1823614-4-prestwoj@gmail.com>
 In-Reply-To: <20210415224508.1823614-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1830195726833309190==
+--===============2611948911810971272==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This isolates the handshake/nhs preparation for
-FT into its own function to be used by both
-FT-over-Air and FT-over-DS after refactoring.
+Parses the APs response to the initial FT-over-DS action
+frame. This sets up the handshake passed in to get it
+ready for re-association.
 ---
- src/netdev.c | 99 +++++++++++++++++++++++++++-------------------------
- 1 file changed, 52 insertions(+), 47 deletions(-)
+ src/ft.c | 34 ++++++++++++++++++++++++++++++++++
+ src/ft.h |  4 ++++
+ 2 files changed, 38 insertions(+)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index d8703ed2..4c28fb25 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -3529,6 +3529,56 @@ static void netdev_ft_tx_associate(struct iovec *ie_=
-iov, size_t iov_len,
- 	}
+diff --git a/src/ft.c b/src/ft.c
+index 9e6935e8..7826653f 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -478,6 +478,40 @@ ft_error:
+ 	return -EBADMSG;
  }
  =
 
-+static void prepare_ft(struct netdev *netdev, struct scan_bss *target_bss)
++int ft_parse_action_response(struct handshake_state *hs,
++				struct handshake_state *old,
++				const uint8_t *frame, size_t frame_len)
 +{
-+	struct netdev_handshake_state *nhs;
++	uint16_t status =3D 0;
 +
-+	memcpy(netdev->prev_bssid, netdev->handshake->aa, 6);
-+	netdev->prev_frequency =3D netdev->frequency;
-+	netdev->frequency =3D target_bss->frequency;
++	if (frame_len < 16)
++		goto parse_error;
 +
-+	netdev->associated =3D false;
-+	netdev->operational =3D false;
-+	netdev->in_ft =3D true;
++	/* Category FT */
++	if (frame[0] !=3D 6)
++		goto parse_error;
 +
-+	/*
-+	 * Cancel commands that could be running because of EAPoL activity
-+	 * like re-keying, this way the callbacks for those commands don't
-+	 * have to check if failures resulted from the transition.
-+	 */
-+	nhs =3D l_container_of(netdev->handshake,
-+				struct netdev_handshake_state, super);
++	/* FT Action */
++	if (frame[1] !=3D 2)
++		goto parse_error;
 +
-+	/* reset key states just as we do in initialization */
-+	nhs->complete =3D false;
-+	nhs->ptk_installed =3D false;
-+	nhs->gtk_installed =3D true;
-+	nhs->igtk_installed =3D true;
++	if (memcmp(frame + 2, hs->spa, 6))
++		goto parse_error;
 +
-+	if (nhs->group_new_key_cmd_id) {
-+		l_genl_family_cancel(nl80211, nhs->group_new_key_cmd_id);
-+		nhs->group_new_key_cmd_id =3D 0;
-+	}
++	if (memcmp(frame + 8, hs->aa, 6))
++		goto parse_error;
 +
-+	if (nhs->group_management_new_key_cmd_id) {
-+		l_genl_family_cancel(nl80211,
-+			nhs->group_management_new_key_cmd_id);
-+		nhs->group_management_new_key_cmd_id =3D 0;
-+	}
++	status =3D l_get_le16(frame + 14);
 +
-+	if (netdev->rekey_offload_cmd_id) {
-+		l_genl_family_cancel(nl80211, netdev->rekey_offload_cmd_id);
-+		netdev->rekey_offload_cmd_id =3D 0;
-+	}
++	if (status !=3D 0)
++		return (int)status;
 +
-+	netdev_rssi_polling_update(netdev);
++	return ft_process_ies(hs, frame + 16, frame_len - 16);
 +
-+	if (netdev->sm) {
-+		eapol_sm_free(netdev->sm);
-+		netdev->sm =3D NULL;
-+	}
++parse_error:
++	return -EBADMSG;
 +}
 +
- static void netdev_ft_request_cb(struct l_genl_msg *msg, void *user_data)
+ static int ft_rx_action(struct auth_proto *ap, const uint8_t *frame,
+ 				size_t frame_len)
  {
- 	struct netdev *netdev =3D user_data;
-@@ -3636,8 +3686,6 @@ static int fast_transition(struct netdev *netdev, str=
-uct scan_bss *target_bss,
- 				bool over_air,
- 				netdev_connect_cb_t cb)
- {
--	struct netdev_handshake_state *nhs;
--
- 	if (!netdev->operational)
- 		return -ENOTCONN;
+diff --git a/src/ft.h b/src/ft.h
+index 50090a03..a22196b6 100644
+--- a/src/ft.h
++++ b/src/ft.h
+@@ -36,6 +36,10 @@ bool ft_build_authenticate_ies(struct handshake_state *h=
+s,
+ struct handshake_state *ft_over_ds_handshake_new(struct netdev *netdev,
+ 						struct scan_bss *target);
  =
 
-@@ -3651,14 +3699,9 @@ static int fast_transition(struct netdev *netdev, st=
-ruct scan_bss *target_bss,
- 	 * Could also create a new object and copy most of the state but
- 	 * we would end up doing more work.
- 	 */
--	memcpy(netdev->prev_bssid, netdev->handshake->aa, ETH_ALEN);
- 	memcpy(netdev->prev_snonce, netdev->handshake->snonce, 32);
--
- 	handshake_state_new_snonce(netdev->handshake);
- =
-
--	netdev->prev_frequency =3D netdev->frequency;
--	netdev->frequency =3D target_bss->frequency;
--
- 	handshake_state_set_authenticator_address(netdev->handshake,
- 							target_bss->addr);
- =
-
-@@ -3667,47 +3710,9 @@ static int fast_transition(struct netdev *netdev, st=
-ruct scan_bss *target_bss,
- 							target_bss->rsne);
- 	memcpy(netdev->handshake->mde + 2, target_bss->mde, 3);
- =
-
--	netdev->associated =3D false;
--	netdev->operational =3D false;
--	netdev->in_ft =3D true;
--	netdev->connect_cb =3D cb;
--
--	/*
--	 * Cancel commands that could be running because of EAPoL activity
--	 * like re-keying, this way the callbacks for those commands don't
--	 * have to check if failures resulted from the transition.
--	 */
--	nhs =3D l_container_of(netdev->handshake,
--				struct netdev_handshake_state, super);
--
--	/* reset key states just as we do in initialization */
--	nhs->complete =3D false;
--	nhs->ptk_installed =3D false;
--	nhs->gtk_installed =3D true;
--	nhs->igtk_installed =3D true;
-+	prepare_ft(netdev, target_bss);
- =
-
--	if (nhs->group_new_key_cmd_id) {
--		l_genl_family_cancel(nl80211, nhs->group_new_key_cmd_id);
--		nhs->group_new_key_cmd_id =3D 0;
--	}
--
--	if (nhs->group_management_new_key_cmd_id) {
--		l_genl_family_cancel(nl80211,
--			nhs->group_management_new_key_cmd_id);
--		nhs->group_management_new_key_cmd_id =3D 0;
--	}
--
--	if (netdev->rekey_offload_cmd_id) {
--		l_genl_family_cancel(nl80211, netdev->rekey_offload_cmd_id);
--		netdev->rekey_offload_cmd_id =3D 0;
--	}
--
--	netdev_rssi_polling_update(netdev);
--
--	if (netdev->sm) {
--		eapol_sm_free(netdev->sm);
--		netdev->sm =3D NULL;
--	}
-+	netdev->connect_cb =3D cb;
- =
-
- 	if (over_air)
- 		netdev->ap =3D ft_over_air_sm_new(netdev->handshake,
++int ft_parse_action_response(struct handshake_state *hs,
++				struct handshake_state *old,
++				const uint8_t *frame, size_t frame_len);
++
+ struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
+ 				ft_tx_authenticate_func_t tx_auth,
+ 				ft_tx_associate_func_t tx_assoc,
 -- =
 
 2.26.2
 
---===============1830195726833309190==--
+--===============2611948911810971272==--
 
