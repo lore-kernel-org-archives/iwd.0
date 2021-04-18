@@ -1,494 +1,126 @@
-Content-Type: multipart/mixed; boundary="===============2523732444337717661=="
+Content-Type: multipart/mixed; boundary="===============4513128131706274507=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 6/8] ft: netdev: refactor FT-over-DS to properly handle
- Auth failures
-Date: Fri, 16 Apr 2021 12:37:07 -0500
-Message-ID: <c7a79691-ff4f-641d-a869-65d74a701b21@gmail.com>
-In-Reply-To: <20210415224508.1823614-6-prestwoj@gmail.com>
+From: Philip Stewart <philip.stewart.public@gmail.com>
+Subject: DEL_INTERFACE and CMD_SET_CQM failed; Could not register frame watch
+ type 00d0: -95
+Date: Sun, 18 Apr 2021 18:21:47 +0100
+Message-ID: <B8SRRQ.IJ5TG5C88S3O3@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2523732444337717661==
+--===============4513128131706274507==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hello,
+
+I've recently switched from NetworkManager and wpasupplicant to =
+
+systemd-networkd and iwd. Whilst everything appears to be working fine, =
+
+I'm curious about some failures reported by iwd:
+
+Apr 18 15:10:32 systemd[1]: Starting Wireless service...
+Apr 18 15:10:33 iwd[661]: Wireless daemon version 1.12
+Apr 18 15:10:33 systemd[1]: Started Wireless service.
+Apr 18 15:10:33 iwd[661]: station: Network configuration is disabled.
+Apr 18 15:10:33 iwd[661]: Wiphy: 0, Name: phy0
+Apr 18 15:10:33 iwd[661]:         Permanent Address: 00:00:00:00:00:00
+Apr 18 15:10:33 iwd[661]:         Bands: 2.4 GHz 5 GHz
+Apr 18 15:10:33 iwd[661]:         Ciphers: CCMP TKIP BIP
+Apr 18 15:10:33 iwd[661]:         Supported iftypes: ad-hoc station
+Apr 18 15:10:33 iwd[661]: DEL_INTERFACE failed: Operation not supported
+Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
+Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
+Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
+Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
+Apr 18 15:10:33 iwd[661]: CMD_SET_CQM failed: Operation not supported
+Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
+Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
+
+Further, I note that in the output of 'networkctl status wlan0', the =
+
+WiFi access point MAC address is reported as 00:00:00:00:00:00 and I'm =
+
+wondering if this is a consequence of these failures and if there is =
+
+anything I can do about it?
+
+Kind regards,
+Phil
+
+# lspci -vv -d 14e4:
+03:00.0 Network controller: Broadcom Inc. and subsidiaries BCM4322 =
+
+802.11a/b/g/n Wireless LAN Controller (rev 01)
+	Subsystem: Apple Inc. AirPort Extreme
+	Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- =
+
+Stepping- SERR- FastB2B- DisINTx-
+	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast >TAbort- =
+
+<TAbort- <MAbort- >SERR- <PERR- INTx-
+	Latency: 0, Cache Line Size: 256 bytes
+	Interrupt: pin A routed to IRQ 20
+	Region 0: Memory@d3200000 (64-bit, non-prefetchable) [size=3D16K]
+	Capabilities: [40] Power Management version 3
+		Flags: PMEClk- DSI- D1+ D2+ AuxCurrent=3D0mA =
+
+PME(D0+,D1-,D2-,D3hot+,D3cold+)
+		Status: D0 NoSoftRst+ PME-Enable- DSel=3D0 DScale=3D2 PME-
+	Capabilities: [58] Vendor Specific Information: Len=3D78 <?>
+	Capabilities: [e8] MSI: Enable- Count=3D1/1 Maskable- 64bit+
+		Address: 0000000000000000  Data: 0000
+	Capabilities: [d0] Express (v1) Endpoint, MSI 00
+		DevCap:	MaxPayload 128 bytes, PhantFunc 0, Latency L0s <4us, L1 =
+
+unlimited
+			ExtTag+ AttnBtn- AttnInd- PwrInd- RBE+ FLReset- SlotPowerLimit 0.000W
+		DevCtl:	CorrErr- NonFatalErr- FatalErr- UnsupReq-
+			RlxdOrd- ExtTag+ PhantFunc- AuxPwr- NoSnoop-
+			MaxPayload 128 bytes, MaxReadReq 128 bytes
+		DevSta:	CorrErr- NonFatalErr- FatalErr- UnsupReq- AuxPwr- TransPend-
+		LnkCap:	Port #0, Speed 2.5GT/s, Width x1, ASPM L0s L1, Exit Latency =
+
+L0s <4us, L1 <64us
+			ClockPM+ Surprise- LLActRep- BwNot- ASPMOptComp-
+		LnkCtl:	ASPM L0s L1 Enabled; RCB 64 bytes, Disabled- CommClk+
+			ExtSynch- ClockPM+ AutWidDis- BWInt- AutBWInt-
+		LnkSta:	Speed 2.5GT/s (ok), Width x1 (ok)
+			TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
+	Capabilities: [100 v1] Advanced Error Reporting
+		UESta:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- =
+
+MalfTLP- ECRC- UnsupReq- ACSViol-
+		UEMsk:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- =
+
+MalfTLP- ECRC- UnsupReq- ACSViol-
+		UESvrt:	DLP+ SDES- TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ =
+
+MalfTLP+ ECRC- UnsupReq- ACSViol-
+		CESta:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr-
+		CEMsk:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr+
+		AERCap:	First Error Pointer: 00, ECRCGenCap+ ECRCGenEn- ECRCChkCap+ =
+
+ECRCChkEn-
+			MultHdrRecCap- MultHdrRecEn- TLPPfxPres- HdrLogCap-
+		HeaderLog: 00000000 00000000 00000000 00000000
+	Capabilities: [13c v1] Virtual Channel
+		Caps:	LPEVC=3D0 RefClk=3D100ns PATEntryBits=3D1
+		Arb:	Fixed- WRR32- WRR64- WRR128-
+		Ctrl:	ArbSelect=3DFixed
+		Status:	InProgress-
+		VC0:	Caps:	PATOffset=3D00 MaxTimeSlots=3D1 RejSnoopTrans-
+			Arb:	Fixed- WRR32- WRR64- WRR128- TWRR128- WRR256-
+			Ctrl:	Enable+ ID=3D0 ArbSelect=3DFixed TC/VC=3Dff
+			Status:	NegoPending- InProgress-
+	Capabilities: [160 v1] Device Serial Number xx-xx-xx-xx-xx-xx-xx-xx
+	Capabilities: [16c v1] Power Budgeting <?>
+	Kernel driver in use: wl
+	Kernel modules: ssb, wl
 
-On 4/15/21 5:45 PM, James Prestwood wrote:
-> FT-over-DS should be handled differently than FT-over-Air, at least in
-> terms of the initial action frame over-DS sends. This action frame can
-> actually be sent to multiple APs, even before IWD needs to roam. An
-> error condition while sending the frame or getting a response should
-> not be treated as fatal which it is currently.
-> =
-
-> To fix this FT-over-DS needed to be refactored and the initial action
-> frame was moved outside of the auth-proto mechanism and into netdev
-> itself. Since this is not a formal Authentication frame it did not fit
-> right with how auth-protos worked. In addition there was no feasible
-> way to separate failure in this path while still keeping the existing
-> connection alive (apart from storing loads of handshake data and
-> restoring it on failure).
-> =
-
-> To maintain the current connection while still starting the over-DS
-> process a new handshake object needs to be created
-> (ft_over_ds_handshake_new). This new handshake is held in netdev and
-> if there is any failure prior to Reassociation it can simply be freed
-> and thrown out. If FT-over-DS successfully authenticates then
-> the existing netdev handshake can be swapped for the new one, and
-> Reassociation can begin. For this an auth-proto is created for
-> FT-over-DS (ft_over_ds_sm_new). Once Reassociation starts the code path
-> behaves identically to FT-over-Air.
 
-This seems to be a bit heavy, particularly if we want to use FT-over-DS to =
-
-pre-authenticate to multiple APs in the future.  All we really care about i=
-s =
-
-storing the response IEs from the 'other' APs.  Do we really need a full bl=
-own =
-
-handshake object to do that?  Can we just store the response IEs + the nonc=
-e =
-
-used + target address (could even just store the action response frame) ins=
-tead?
-
-Then when we actually trigger the actual transition, we can essentially use=
- the =
-
-same code path as for FT-over-Air, where we take the current handshake and =
-
-override certain parameters.
-
-> =
-
-> Some minor changes were also included like using frame-xchg rather
-> than sending the frame from netdev. This gets us free timeout handling
-> which reduced the complexity in netdev.
-
-One thing I still hate about frame-xchg is that it creates a radio work obj=
-ect =
-
-for every request.  This seems unnecessary for non-offchannel frames like a=
-ction =
-
-frames.  There's really no reason why we can't send a bunch of action frame=
-s all =
-
-at once and wait for the responses to come in.  frame-xchg would want to =
-
-serialize all of these unnecessarily.
-
-> =
-
-> With this change, future improvements can be made much easier such
-> as starting FT-over-DS to multiple roam candidates immediate after
-> connecting. Then, once a roam is needed, IWD has already pre-authenticated
-> with these APs and can begin association immediately.
-> ---
->   src/ft.c     |  95 ++++++-------------------
->   src/ft.h     |   1 -
->   src/netdev.c | 191 ++++++++++++++++++++++++++++++++++++++++-----------
->   3 files changed, 170 insertions(+), 117 deletions(-)
-> =
-
-
-<snip>
-
-> diff --git a/src/netdev.c b/src/netdev.c
-> index 4c28fb25..95fa6909 100644
-> --- a/src/netdev.c
-> +++ b/src/netdev.c
-> @@ -119,6 +119,7 @@ struct netdev {
->   	uint32_t rekey_offload_cmd_id;
->   	uint32_t qos_map_cmd_id;
->   	uint32_t mac_change_cmd_id;
-> +	uint32_t ft_action_cmd_id;
-
-_cmd_id postfix might be a bit confusing if you're not actually sending a g=
-enl =
-
-command but using frame-xchg.
-
->   	enum netdev_result result;
->   	uint16_t last_code; /* reason or status, depending on result */
->   	struct l_timeout *neighbor_report_timeout;
-> @@ -136,6 +137,14 @@ struct netdev {
->   	uint32_t rssi_poll_cmd_id;
->   	uint8_t set_mac_once[6];
->   =
-
-> +	/*
-> +	 * TODO: It is possible to pre-authenticate with multiple FT-over-DS
-> +	 * targets so this could be changed to an array of BSS/handshake pairs,
-> +	 * but for now it is being limited to a single FT target
-> +	 */
-> +	struct scan_bss *ft_over_ds_target;
-
-You have to be very careful with how you manage struct scan_bss ownership. =
- I =
-
-don't think storing a pointer here is a good idea.  A new scan might invali=
-date =
-
-this pointer from under you.
-
-> +	struct handshake_state *ft_over_ds_handshake;
-> +
->   	struct scan_bss *fw_roam_bss;
->   =
-
->   	uint32_t set_powered_cmd_id;
-> @@ -675,6 +684,11 @@ static void netdev_connect_free(struct netdev *netde=
-v)
->   		netdev->handshake =3D NULL;
->   	}
->   =
-
-> +	if (netdev->ft_over_ds_handshake) {
-> +		handshake_state_free(netdev->ft_over_ds_handshake);
-> +		netdev->ft_over_ds_handshake =3D NULL;
-> +	}
-> +
->   	if (netdev->neighbor_report_cb) {
->   		netdev->neighbor_report_cb(netdev, -ENOTCONN, NULL, 0,
->   						netdev->user_data);
-> @@ -810,6 +824,11 @@ static void netdev_free(void *data)
->   		netdev->get_station_cmd_id =3D 0;
->   	}
->   =
-
-> +	if (netdev->ft_action_cmd_id) {
-> +		frame_xchg_cancel(netdev->ft_action_cmd_id);
-> +		netdev->ft_action_cmd_id =3D 0;
-> +	}
-> +
->   	if (netdev->fw_roam_bss)
->   		scan_bss_free(netdev->fw_roam_bss);
->   =
-
-> @@ -3579,16 +3598,19 @@ static void prepare_ft(struct netdev *netdev, str=
-uct scan_bss *target_bss)
->   	}
->   }
->   =
-
-> -static void netdev_ft_request_cb(struct l_genl_msg *msg, void *user_data)
-> +static void netdev_ft_over_ds_auth_failed(struct netdev *netdev,
-> +						uint16_t status)
->   {
-> -	struct netdev *netdev =3D user_data;
-> -
-> -	if (l_genl_msg_get_error(msg) < 0) {
-> -		l_error("Could not send CMD_FRAME");
-> -		netdev_connect_failed(netdev,
-> -					NETDEV_RESULT_AUTHENTICATION_FAILED,
-> -					MMPDU_STATUS_CODE_UNSPECIFIED);
-> +	if (netdev->ft_over_ds_handshake) {
-> +		netdev_handshake_state_free(netdev->ft_over_ds_handshake);
-> +		netdev->ft_over_ds_handshake =3D NULL;
->   	}
-> +
-> +	netdev->ft_over_ds_target =3D NULL;
-> +
-> +	if (netdev->connect_cb)
-> +		netdev->connect_cb(netdev, NETDEV_RESULT_AUTHENTICATION_FAILED,
-> +					&status, netdev->user_data);
->   }
->   =
-
->   static void netdev_ft_response_frame_event(const struct mmpdu_header *h=
-dr,
-> @@ -3598,11 +3620,11 @@ static void netdev_ft_response_frame_event(const =
-struct mmpdu_header *hdr,
->   	int ret;
->   	uint16_t status_code =3D MMPDU_STATUS_CODE_UNSPECIFIED;
->   	struct netdev *netdev =3D user_data;
-> +	struct handshake_state *netdev_hs =3D netdev->handshake;
->   =
-
-> -	if (!netdev->ap || !netdev->in_ft)
-> -		return;
-> -
-> -	ret =3D auth_proto_rx_authenticate(netdev->ap, body, body_len);
-> +	ret =3D ft_parse_action_response(netdev->ft_over_ds_handshake,
-> +					netdev->handshake,
-> +					body, body_len);
->   	if (ret < 0)
->   		goto ft_error;
->   	else if (ret > 0) {
-> @@ -3610,12 +3632,36 @@ static void netdev_ft_response_frame_event(const =
-struct mmpdu_header *hdr,
->   		goto ft_error;
->   	}
->   =
-
-> +	/*
-> +	 * At this point the target handshake could be saved off for use later
-> +	 * if authenticating to multiple APs. As it stands now we actually want
-> +	 * to FT so begin this process immediately.
-> +	 */
-> +	prepare_ft(netdev, netdev->ft_over_ds_target);
-> +
-> +	netdev->handshake =3D netdev->ft_over_ds_handshake;
-> +
-> +	netdev->ap =3D ft_over_ds_sm_new(netdev->ft_over_ds_handshake,
-> +					netdev_ft_tx_associate, netdev);
-> +
-> +	if (!auth_proto_start(netdev->ap))
-> +		goto ft_error;
-> +
-> +	/* Past the point of no return, free the old handshake */
-> +	netdev_handshake_state_free(netdev_hs);
-> +
->   	return;
->   =
-
->   ft_error:
-> -	netdev_connect_failed(netdev, NETDEV_RESULT_AUTHENTICATION_FAILED,
-> -				status_code);
-> -	return;
-> +	l_debug("FT-over-DS to "MAC" failed",
-> +				MAC_STR(netdev->ft_over_ds_target->addr));
-> +	/*
-> +	 * A failure here doesn't need to fully disconnect, hence why the
-> +	 * old netdev->handshake was saved
-> +	 */
-> +	netdev->handshake =3D netdev_hs;
-> +
-> +	netdev_ft_over_ds_auth_failed(netdev, status_code);
->   }
->   =
-
->   static void netdev_qos_map_frame_event(const struct mmpdu_header *hdr,
-> @@ -3640,26 +3686,74 @@ static void netdev_qos_map_frame_event(const stru=
-ct mmpdu_header *hdr,
->   	netdev_send_qos_map_set(netdev, body + 4, body_len - 4);
->   }
->   =
-
-> -static void netdev_ft_over_ds_tx_authenticate(struct iovec *iov,
-> -					size_t iov_len, void *user_data)
-> +static void netdev_ft_over_ds_timeout(int error, void *user_data)
->   {
->   	struct netdev *netdev =3D user_data;
-> -	uint8_t ft_req[14];
-> +
-> +	if (error =3D=3D 0)
-> +		return;
-> +
-> +	l_debug("Sending FT-over-DS action frame failed with %d", error);
-> +
-> +	netdev_ft_over_ds_auth_failed(netdev, MMPDU_STATUS_CODE_UNSPECIFIED);
-> +}
-> +
-> +static const struct frame_xchg_prefix netdev_ft_action_prefix =3D {
-> +	.data =3D (uint8_t []) {
-> +		0x06, 0x02,
-> +	},
-> +	.len =3D 2,
-> +};
-> +
-> +static bool netdev_ft_over_ds_ready(struct wiphy_radio_work_item *item)
-> +{
-> +	struct netdev *netdev =3D l_container_of(item, struct netdev, work);
-> +	uint8_t ft_req[40];
-> +	uint8_t *ptr =3D ft_req;
->   	struct handshake_state *hs =3D netdev->handshake;
-> -	struct iovec iovs[iov_len + 1];
-> +	struct iovec iovs[5];
-> +	uint8_t buf[512];
-> +	size_t len;
->   =
-
-> -	ft_req[0] =3D 6; /* FT category */
-> -	ft_req[1] =3D 1; /* FT Request action */
-> -	memcpy(ft_req + 2, netdev->addr, 6);
-> -	memcpy(ft_req + 8, hs->aa, 6);
-> +	memset(ft_req, 0, sizeof(ft_req));
-> +
-> +	l_put_le16(0x00d0, ptr + 0);
-> +	memcpy(ptr + 4, hs->aa, 6);
-> +	memcpy(ptr + 10, netdev->addr, 6);
-> +	memcpy(ptr + 16, hs->aa, 6);
-> +
-> +	ptr =3D ft_req + 24;
-> +
-> +	ptr[0] =3D 6; /* FT category */
-> +	ptr[1] =3D 1; /* FT Request action */
-> +	memcpy(ptr + 2, netdev->addr, 6);
-> +	memcpy(ptr + 8, netdev->ft_over_ds_target->addr, 6);
->   =
-
->   	iovs[0].iov_base =3D ft_req;
->   	iovs[0].iov_len =3D sizeof(ft_req);
-> -	memcpy(iovs + 1, iov, sizeof(*iov) * iov_len);
->   =
-
-> -	netdev_send_action_framev(netdev, netdev->prev_bssid, iovs, iov_len + 1,
-> -					netdev->prev_frequency,
-> -					netdev_ft_request_cb);
-> +	if (!ft_build_authenticate_ies(hs, netdev->ft_over_ds_handshake->snonce,
-> +			buf, &len))
-> +		goto failed;
-> +
-> +	iovs[1].iov_base =3D buf;
-> +	iovs[1].iov_len =3D len;
-> +
-> +	iovs[2].iov_base =3D NULL;
-> +
-> +	netdev->ft_action_cmd_id =3D frame_xchg_start(netdev->wdev_id, iovs,
-> +					netdev->frequency, 0, 300, 0, 0,
-> +					netdev_ft_over_ds_timeout, netdev, NULL,
-> +					&netdev_ft_action_prefix,
-> +					netdev_ft_response_frame_event, NULL);
-
-Yikes, why do we use a wiphy_work for this only to have frame_xchg also mak=
-e up =
-
-a wiphy_work?  I guess you're abusing the return value semantics here?  Thi=
-s may =
-
-be a bit too subtle for good readability?
-
-> +	if (!netdev->ft_action_cmd_id)
-> +		goto failed;
-> +
-> +	return true;
-> +
-> +failed:
-> +	netdev_ft_over_ds_auth_failed(netdev, MMPDU_STATUS_CODE_UNSPECIFIED);
-> +	return true;
->   }
->   =
-
->   static bool netdev_ft_work_ready(struct wiphy_radio_work_item *item)
-> @@ -3682,8 +3776,11 @@ static const struct wiphy_radio_work_item_ops ft_w=
-ork_ops =3D {
->   	.do_work =3D netdev_ft_work_ready,
->   };
->   =
-
-> +static const struct wiphy_radio_work_item_ops ft_over_ds_work_ops =3D {
-> +	.do_work =3D netdev_ft_over_ds_ready,
-> +};
-> +
->   static int fast_transition(struct netdev *netdev, struct scan_bss *targ=
-et_bss,
-> -				bool over_air,
->   				netdev_connect_cb_t cb)
->   {
->   	if (!netdev->operational)
-> @@ -3714,14 +3811,9 @@ static int fast_transition(struct netdev *netdev, =
-struct scan_bss *target_bss,
->   =
-
->   	netdev->connect_cb =3D cb;
->   =
-
-> -	if (over_air)
-> -		netdev->ap =3D ft_over_air_sm_new(netdev->handshake,
-> +	netdev->ap =3D ft_over_air_sm_new(netdev->handshake,
->   					netdev_ft_tx_authenticate,
->   					netdev_ft_tx_associate, netdev);
-> -	else
-> -		netdev->ap =3D ft_over_ds_sm_new(netdev->handshake,
-> -					netdev_ft_over_ds_tx_authenticate,
-> -					netdev_ft_tx_associate, netdev);
->   =
-
->   	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
->   				&ft_work_ops);
-> @@ -3732,14 +3824,36 @@ static int fast_transition(struct netdev *netdev,=
- struct scan_bss *target_bss,
->   int netdev_fast_transition(struct netdev *netdev, struct scan_bss *targ=
-et_bss,
->   				netdev_connect_cb_t cb)
->   {
-> -	return fast_transition(netdev, target_bss, true, cb);
-> +	return fast_transition(netdev, target_bss, cb);
->   }
->   =
-
->   int netdev_fast_transition_over_ds(struct netdev *netdev,
->   					struct scan_bss *target_bss,
->   					netdev_connect_cb_t cb)
->   {
-> -	return fast_transition(netdev, target_bss, false, cb);
-> +	if (!netdev->operational)
-> +		return -ENOTCONN;
-> +
-> +	if (!netdev->handshake->mde || !target_bss->mde_present ||
-> +			l_get_le16(netdev->handshake->mde + 2) !=3D
-> +			l_get_le16(target_bss->mde))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Create a new handshake to be used for the initial action frame and
-> +	 * response. Since failure could happen during these initial steps the
-> +	 * current handshake must be left pristine in order to maintain the
-> +	 * existing connection.
-> +	 */
-> +	netdev->ft_over_ds_handshake =3D ft_over_ds_handshake_new(netdev,
-> +								target_bss);
-> +	netdev->ft_over_ds_target =3D target_bss;
-> +	netdev->connect_cb =3D cb;
-
-This overloading of connect_cb is also something I think we shouldn't do.  =
-I =
-
-think we have abused this in the past, but ideally we should just create an =
-
-object that holds the request data, sort of like how netdev_preauthenticate =
-
-works.  If you want to make it a singleton for the initial version, that's =
-fine. =
-
-  But lets put all the data about the ft_over_ds request in there and not t=
-ry =
-
-and overload netdev members that are used for something else.
-
-> +
-> +	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
-> +				&ft_over_ds_work_ops);
-> +
-> +	return 0;
->   }
->   =
-
->   static void netdev_preauth_cb(const uint8_t *pmk, void *user_data)
-> @@ -5340,7 +5454,6 @@ struct netdev *netdev_create_from_genl(struct l_gen=
-l_msg *msg,
->   	const uint8_t action_neighbor_report_prefix[2] =3D { 0x05, 0x05 };
->   	const uint8_t action_sa_query_resp_prefix[2] =3D { 0x08, 0x01 };
->   	const uint8_t action_sa_query_req_prefix[2] =3D { 0x08, 0x00 };
-> -	const uint8_t action_ft_response_prefix[] =3D  { 0x06, 0x02 };
->   	const uint8_t action_qos_map_prefix[] =3D { 0x01, 0x04 };
->   	struct l_io *pae_io =3D NULL;
->   =
-
-> @@ -5428,10 +5541,6 @@ struct netdev *netdev_create_from_genl(struct l_ge=
-nl_msg *msg,
->   			sizeof(action_sa_query_req_prefix),
->   			netdev_sa_query_req_frame_event, netdev, NULL);
->   =
-
-> -	frame_watch_add(wdev, 0, 0x00d0, action_ft_response_prefix,
-> -			sizeof(action_ft_response_prefix),
-> -			netdev_ft_response_frame_event, netdev, NULL);
-> -
->   	if (wiphy_supports_qos_set_map(netdev->wiphy))
->   		frame_watch_add(wdev, 0, 0x00d0, action_qos_map_prefix,
->   				sizeof(action_qos_map_prefix),
-> =
-
-
-Regards,
--Denis
---===============2523732444337717661==--
+
+--===============4513128131706274507==--
 
