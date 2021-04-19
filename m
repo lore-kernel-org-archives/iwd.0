@@ -1,126 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============4513128131706274507=="
+Content-Type: multipart/mixed; boundary="===============1629374014332395267=="
 MIME-Version: 1.0
-From: Philip Stewart <philip.stewart.public@gmail.com>
-Subject: DEL_INTERFACE and CMD_SET_CQM failed; Could not register frame watch
- type 00d0: -95
-Date: Sun, 18 Apr 2021 18:21:47 +0100
-Message-ID: <B8SRRQ.IJ5TG5C88S3O3@gmail.com>
+From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
+Subject: [PATCH] build: fix ell/shared build failure
+Date: Mon, 19 Apr 2021 11:45:50 +0000
+Message-ID: <20210419114546.840331-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4513128131706274507==
+--===============1629374014332395267==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Fix the following build error:
 
-I've recently switched from NetworkManager and wpasupplicant to =
+  $ /path/to/iwd/configure --disable-dependency-tracking
+  $ make
+    GEN      ell/shared
+  /bin/sh: line 5: ell/shared: No such file or directory
+  make: *** [Makefile:3656: ell/shared] Error 1
 
-systemd-networkd and iwd. Whilst everything appears to be working fine, =
+The error can also arise if building with --enable-external-ell.
 
-I'm curious about some failures reported by iwd:
+Fixes: ed05585063f2 ("build: Always link in the ell/useful.h header file")
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
 
-Apr 18 15:10:32 systemd[1]: Starting Wireless service...
-Apr 18 15:10:33 iwd[661]: Wireless daemon version 1.12
-Apr 18 15:10:33 systemd[1]: Started Wireless service.
-Apr 18 15:10:33 iwd[661]: station: Network configuration is disabled.
-Apr 18 15:10:33 iwd[661]: Wiphy: 0, Name: phy0
-Apr 18 15:10:33 iwd[661]:         Permanent Address: 00:00:00:00:00:00
-Apr 18 15:10:33 iwd[661]:         Bands: 2.4 GHz 5 GHz
-Apr 18 15:10:33 iwd[661]:         Ciphers: CCMP TKIP BIP
-Apr 18 15:10:33 iwd[661]:         Supported iftypes: ad-hoc station
-Apr 18 15:10:33 iwd[661]: DEL_INTERFACE failed: Operation not supported
-Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
-Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
-Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
-Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
-Apr 18 15:10:33 iwd[661]: CMD_SET_CQM failed: Operation not supported
-Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
-Apr 18 15:10:33 iwd[661]: Could not register frame watch type 00d0: -95
+diff --git a/Makefile.am b/Makefile.am
+index 644f3556..68035e46 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -625,6 +625,7 @@ unit/tls-settings.8021x: unit/cert-ca.pem unit/cert-cli=
+ent.pem unit/cert-client-
+ BUILT_SOURCES =3D $(ell_built_sources) src/builtin.h
+ =
 
-Further, I note that in the output of 'networkctl status wlan0', the =
+ ell/shared: Makefile
++	$(AM_V_at)$(MKDIR_P) ell
+ 	$(AM_V_GEN)for f in $(ell_shared) ; do \
+ 		if [ ! -f $$f ] ; then \
+ 			$(LN_S) -t ell -f $(abs_srcdir)/../ell/$$f ; \
+-- =
 
-WiFi access point MAC address is reported as 00:00:00:00:00:00 and I'm =
-
-wondering if this is a consequence of these failures and if there is =
-
-anything I can do about it?
-
-Kind regards,
-Phil
-
-# lspci -vv -d 14e4:
-03:00.0 Network controller: Broadcom Inc. and subsidiaries BCM4322 =
-
-802.11a/b/g/n Wireless LAN Controller (rev 01)
-	Subsystem: Apple Inc. AirPort Extreme
-	Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- =
-
-Stepping- SERR- FastB2B- DisINTx-
-	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast >TAbort- =
-
-<TAbort- <MAbort- >SERR- <PERR- INTx-
-	Latency: 0, Cache Line Size: 256 bytes
-	Interrupt: pin A routed to IRQ 20
-	Region 0: Memory@d3200000 (64-bit, non-prefetchable) [size=3D16K]
-	Capabilities: [40] Power Management version 3
-		Flags: PMEClk- DSI- D1+ D2+ AuxCurrent=3D0mA =
-
-PME(D0+,D1-,D2-,D3hot+,D3cold+)
-		Status: D0 NoSoftRst+ PME-Enable- DSel=3D0 DScale=3D2 PME-
-	Capabilities: [58] Vendor Specific Information: Len=3D78 <?>
-	Capabilities: [e8] MSI: Enable- Count=3D1/1 Maskable- 64bit+
-		Address: 0000000000000000  Data: 0000
-	Capabilities: [d0] Express (v1) Endpoint, MSI 00
-		DevCap:	MaxPayload 128 bytes, PhantFunc 0, Latency L0s <4us, L1 =
-
-unlimited
-			ExtTag+ AttnBtn- AttnInd- PwrInd- RBE+ FLReset- SlotPowerLimit 0.000W
-		DevCtl:	CorrErr- NonFatalErr- FatalErr- UnsupReq-
-			RlxdOrd- ExtTag+ PhantFunc- AuxPwr- NoSnoop-
-			MaxPayload 128 bytes, MaxReadReq 128 bytes
-		DevSta:	CorrErr- NonFatalErr- FatalErr- UnsupReq- AuxPwr- TransPend-
-		LnkCap:	Port #0, Speed 2.5GT/s, Width x1, ASPM L0s L1, Exit Latency =
-
-L0s <4us, L1 <64us
-			ClockPM+ Surprise- LLActRep- BwNot- ASPMOptComp-
-		LnkCtl:	ASPM L0s L1 Enabled; RCB 64 bytes, Disabled- CommClk+
-			ExtSynch- ClockPM+ AutWidDis- BWInt- AutBWInt-
-		LnkSta:	Speed 2.5GT/s (ok), Width x1 (ok)
-			TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
-	Capabilities: [100 v1] Advanced Error Reporting
-		UESta:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- =
-
-MalfTLP- ECRC- UnsupReq- ACSViol-
-		UEMsk:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- =
-
-MalfTLP- ECRC- UnsupReq- ACSViol-
-		UESvrt:	DLP+ SDES- TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ =
-
-MalfTLP+ ECRC- UnsupReq- ACSViol-
-		CESta:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr-
-		CEMsk:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr+
-		AERCap:	First Error Pointer: 00, ECRCGenCap+ ECRCGenEn- ECRCChkCap+ =
-
-ECRCChkEn-
-			MultHdrRecCap- MultHdrRecEn- TLPPfxPres- HdrLogCap-
-		HeaderLog: 00000000 00000000 00000000 00000000
-	Capabilities: [13c v1] Virtual Channel
-		Caps:	LPEVC=3D0 RefClk=3D100ns PATEntryBits=3D1
-		Arb:	Fixed- WRR32- WRR64- WRR128-
-		Ctrl:	ArbSelect=3DFixed
-		Status:	InProgress-
-		VC0:	Caps:	PATOffset=3D00 MaxTimeSlots=3D1 RejSnoopTrans-
-			Arb:	Fixed- WRR32- WRR64- WRR128- TWRR128- WRR256-
-			Ctrl:	Enable+ ID=3D0 ArbSelect=3DFixed TC/VC=3Dff
-			Status:	NegoPending- InProgress-
-	Capabilities: [160 v1] Device Serial Number xx-xx-xx-xx-xx-xx-xx-xx
-	Capabilities: [16c v1] Power Budgeting <?>
-	Kernel driver in use: wl
-	Kernel modules: ssb, wl
-
-
-
---===============4513128131706274507==--
+2.30.2
+--===============1629374014332395267==--
 
