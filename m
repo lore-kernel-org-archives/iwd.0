@@ -1,159 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============7041477088978533831=="
+Content-Type: multipart/mixed; boundary="===============3076317536482640777=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 3/8] netdev: Re-add frame watches on iftype change
-Date: Tue, 20 Apr 2021 11:35:14 -0500
-Message-ID: <20210420163519.12375-3-denkenz@gmail.com>
+Subject: [PATCH 4/8] rrm: Track that station is removed
+Date: Tue, 20 Apr 2021 11:35:15 -0500
+Message-ID: <20210420163519.12375-4-denkenz@gmail.com>
 In-Reply-To: <20210420163519.12375-1-denkenz@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7041477088978533831==
+--===============3076317536482640777==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the iftype changes, kernel silently wipes out any frame registrations
-we may have registered.  Right now, frame registrations are only done when
-the interface is created.  This can result in frame watches not being
-added if the interface type is changed between station mode to ap mode
-and then back to station mode, e.g.:
+In the case that a netdev is powered down, or an interface type change
+occurs, the station object will be removed and any watches will be
+freed.
 
-device wlan0 set-property Mode ap
-device wlan0 set-property Mode station
-
-Make sure to re-add frame registrations according to the mode if the
-interface type is changed.
+Since rrm is created when the netdev is created and persists across
+iftype and power up/down changes, it should provide a destroy callback
+to station_add_state_watch so that it can be notified when the watch is
+removed.
 ---
- src/netdev.c | 80 ++++++++++++++++++++++++++++++----------------------
- 1 file changed, 47 insertions(+), 33 deletions(-)
+ src/rrm.c | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index f4877bbd6fbb..4208deea35fa 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4867,6 +4867,51 @@ static int netdev_cqm_rssi_update(struct netdev *net=
-dev)
- 	return 0;
+diff --git a/src/rrm.c b/src/rrm.c
+index f41bc907703b..860691a6f258 100644
+--- a/src/rrm.c
++++ b/src/rrm.c
+@@ -117,6 +117,7 @@ struct rrm_beacon_req_info {
+ /* Per-netdev state */
+ struct rrm_state {
+ 	struct station *station;
++	uint32_t watch_id;
+ 	uint32_t ifindex;
+ 	uint64_t wdev_id;
+ 	struct rrm_request_info *pending;
+@@ -662,6 +663,17 @@ static void rrm_station_watch_cb(enum station_state st=
+ate, void *userdata)
+ 	}
  }
  =
 
-+static void netdev_add_station_frame_watches(struct netdev *netdev)
++static void rrm_station_watch_destroy(void *user_data)
 +{
-+	static const uint8_t action_neighbor_report_prefix[2] =3D { 0x05, 0x05 };
-+	static const uint8_t action_sa_query_resp_prefix[2] =3D { 0x08, 0x01 };
-+	static const uint8_t action_sa_query_req_prefix[2] =3D { 0x08, 0x00 };
-+	static const uint8_t action_ft_response_prefix[] =3D  { 0x06, 0x02 };
-+	static const uint8_t action_qos_map_prefix[] =3D { 0x01, 0x04 };
-+	uint64_t wdev =3D netdev->wdev_id;
++	struct rrm_state *rrm =3D user_data;
 +
-+	/* Subscribe to Management -> Action -> RM -> Neighbor Report frames */
-+	frame_watch_add(wdev, 0, 0x00d0, action_neighbor_report_prefix,
-+			sizeof(action_neighbor_report_prefix),
-+			netdev_neighbor_report_frame_event, netdev, NULL);
++	l_debug("");
 +
-+	frame_watch_add(wdev, 0, 0x00d0, action_sa_query_resp_prefix,
-+			sizeof(action_sa_query_resp_prefix),
-+			netdev_sa_query_resp_frame_event, netdev, NULL);
-+
-+	frame_watch_add(wdev, 0, 0x00d0, action_sa_query_req_prefix,
-+			sizeof(action_sa_query_req_prefix),
-+			netdev_sa_query_req_frame_event, netdev, NULL);
-+
-+	frame_watch_add(wdev, 0, 0x00d0, action_ft_response_prefix,
-+			sizeof(action_ft_response_prefix),
-+			netdev_ft_response_frame_event, netdev, NULL);
-+
-+	if (wiphy_supports_qos_set_map(netdev->wiphy))
-+		frame_watch_add(wdev, 0, 0x00d0, action_qos_map_prefix,
-+				sizeof(action_qos_map_prefix),
-+				netdev_qos_map_frame_event, netdev, NULL);
++	rrm_cancel_pending(rrm);
++	rrm->watch_id =3D 0;
++	rrm->station =3D NULL;
 +}
 +
-+static void netdev_setup_interface(struct netdev *netdev)
-+{
-+	switch (netdev->type) {
-+	case NL80211_IFTYPE_STATION:
-+		/* Set RSSI threshold for CQM notifications */
-+		netdev_cqm_rssi_update(netdev);
-+		netdev_add_station_frame_watches(netdev);
-+		break;
-+	default:
-+		break;
-+	}
-+}
+ static void rrm_frame_watch_cb(const struct mmpdu_header *mpdu,
+ 				const void *body, size_t body_len,
+ 				int rssi, void *user_data)
+@@ -684,8 +696,9 @@ static void rrm_frame_watch_cb(const struct mmpdu_heade=
+r *mpdu,
+ 			return;
+ 		}
+ =
+
+-		station_add_state_watch(rrm->station, rrm_station_watch_cb,
+-						rrm, NULL);
++		rrm->watch_id =3D station_add_state_watch(rrm->station,
++						rrm_station_watch_cb, rrm,
++						rrm_station_watch_destroy);
+ 	}
+ =
+
+ 	/*
+@@ -806,7 +819,10 @@ static void rrm_netdev_watch(struct netdev *netdev,
+ 		rrm =3D l_queue_remove_if(states, match_ifindex,
+ 						L_UINT_TO_PTR(ifindex));
+ 		if (rrm) {
+-			rrm_cancel_pending(rrm);
++			if (rrm->station && rrm->watch_id)
++				station_remove_state_watch(rrm->station,
++								rrm->watch_id);
 +
- static void netdev_set_interface_event(struct l_genl_msg *msg,
- 							struct netdev *netdev)
- {
-@@ -4887,9 +4932,7 @@ static void netdev_set_interface_event(struct l_genl_=
-msg *msg,
- 	netdev->type =3D iftype;
- 	frame_watch_wdev_remove(wdev_id);
+ 			l_free(rrm);
+ 		}
  =
 
--	/* Set RSSI threshold for CQM notifications */
--	if (netdev->type =3D=3D NL80211_IFTYPE_STATION)
--		netdev_cqm_rssi_update(netdev);
-+	netdev_setup_interface(netdev);
- }
- =
-
- static void netdev_config_notify(struct l_genl_msg *msg, void *user_data)
-@@ -5447,11 +5490,6 @@ struct netdev *netdev_create_from_genl(struct l_genl=
-_msg *msg,
- 	struct wiphy *wiphy =3D NULL;
- 	struct ifinfomsg *rtmmsg;
- 	size_t bufsize;
--	const uint8_t action_neighbor_report_prefix[2] =3D { 0x05, 0x05 };
--	const uint8_t action_sa_query_resp_prefix[2] =3D { 0x08, 0x01 };
--	const uint8_t action_sa_query_req_prefix[2] =3D { 0x08, 0x00 };
--	const uint8_t action_ft_response_prefix[] =3D  { 0x06, 0x02 };
--	const uint8_t action_qos_map_prefix[] =3D { 0x01, 0x04 };
- 	struct l_io *pae_io =3D NULL;
- =
-
- 	if (nl80211_parse_attrs(msg, NL80211_ATTR_IFINDEX, &ifindex,
-@@ -5525,31 +5563,7 @@ struct netdev *netdev_create_from_genl(struct l_genl=
-_msg *msg,
- =
-
- 	l_free(rtmmsg);
- =
-
--	/* Subscribe to Management -> Action -> RM -> Neighbor Report frames */
--	frame_watch_add(wdev, 0, 0x00d0, action_neighbor_report_prefix,
--			sizeof(action_neighbor_report_prefix),
--			netdev_neighbor_report_frame_event, netdev, NULL);
--
--	frame_watch_add(wdev, 0, 0x00d0, action_sa_query_resp_prefix,
--			sizeof(action_sa_query_resp_prefix),
--			netdev_sa_query_resp_frame_event, netdev, NULL);
--
--	frame_watch_add(wdev, 0, 0x00d0, action_sa_query_req_prefix,
--			sizeof(action_sa_query_req_prefix),
--			netdev_sa_query_req_frame_event, netdev, NULL);
--
--	frame_watch_add(wdev, 0, 0x00d0, action_ft_response_prefix,
--			sizeof(action_ft_response_prefix),
--			netdev_ft_response_frame_event, netdev, NULL);
--
--	if (wiphy_supports_qos_set_map(netdev->wiphy))
--		frame_watch_add(wdev, 0, 0x00d0, action_qos_map_prefix,
--				sizeof(action_qos_map_prefix),
--				netdev_qos_map_frame_event, netdev, NULL);
--
--	/* Set RSSI threshold for CQM notifications */
--	if (netdev->type =3D=3D NL80211_IFTYPE_STATION)
--		netdev_cqm_rssi_update(netdev);
-+	netdev_setup_interface(netdev);
- =
-
- 	return netdev;
- }
 -- =
 
 2.26.3
 
---===============7041477088978533831==--
+--===============3076317536482640777==--
 
