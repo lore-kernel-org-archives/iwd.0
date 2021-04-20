@@ -1,87 +1,91 @@
-Content-Type: multipart/mixed; boundary="===============5223335946096804391=="
+Content-Type: multipart/mixed; boundary="===============2027169014254799489=="
 MIME-Version: 1.0
-From: Philip Stewart <philip.stewart.public@gmail.com>
-Subject: Re: DEL_INTERFACE and CMD_SET_CQM failed; Could not register frame
- watch type 00d0: -95
-Date: Mon, 19 Apr 2021 22:25:30 +0100
-Message-ID: <I6YTRQ.1E4GL4W69MER2@gmail.com>
-In-Reply-To: <f868e94a-0d2f-6f59-26af-69e0b90ffede@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: [PATCH 2/8] frame-xchg: iftype changes to be managed by netdev
+Date: Tue, 20 Apr 2021 11:35:13 -0500
+Message-ID: <20210420163519.12375-2-denkenz@gmail.com>
+In-Reply-To: <20210420163519.12375-1-denkenz@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5223335946096804391==
+--===============2027169014254799489==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The joy of Broadcom...
+Since netdev now keeps track of iftype changes, let it call
+frame_watch_wdev_remove on netdevs that it manages to clear frame
+registrations that should be cleared due to an iftype change.
 
-Thanks a lot for the additional insight Denis, appreciate both of you =
+Note that P2P_DEVICE wdevs are not managed by any netdev object, but
+since their iftype cannot be changed, they should not be affected
+by this change.
+---
+ src/frame-xchg.c | 7 +------
+ src/netdev.c     | 3 +++
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-having taken the time to look at this.
+diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+index e01747326fc5..85f55f2bf941 100644
+--- a/src/frame-xchg.c
++++ b/src/frame-xchg.c
+@@ -1312,7 +1312,6 @@ static void frame_xchg_config_notify(struct l_genl_ms=
+g *msg, void *user_data)
+ 		if (!wdev) {
+ 			wdev =3D l_new(struct wdev_info, 1);
+ 			wdev->id =3D wdev_id;
+-			wdev->iftype =3D iftype;
+ =
 
-Cheers,
-Phil
+ 			if (!wdevs)
+ 				wdevs =3D l_queue_new();
+@@ -1321,11 +1320,7 @@ static void frame_xchg_config_notify(struct l_genl_m=
+sg *msg, void *user_data)
+ 			break;
+ 		}
+ =
 
-On Mon, 19 Apr, 2021 at 15:55, Denis Kenzior <denkenz@gmail.com> wrote:
-> Hi James,
-> =
+-		if (wdev->iftype !=3D iftype) {
+-			wdev->iftype =3D iftype;
+-			frame_watch_wdev_remove(wdev_id);
+-		}
+-
++		wdev->iftype =3D iftype;
+ 		break;
+ =
 
->>> 	software interface modes (can always be added):
->>> 	interface combinations are not supported
->>> 	Device supports scan flush.
->>> 	max # scan plans: 1
->>> 	max scan plan interval: -1
->>> 	max scan plan iterations: 0
->>> 	Supported extended features:
->> =
+ 	case NL80211_CMD_DEL_INTERFACE:
+diff --git a/src/netdev.c b/src/netdev.c
+index 05e22148e495..f4877bbd6fbb 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -4871,8 +4871,10 @@ static void netdev_set_interface_event(struct l_genl=
+_msg *msg,
+ 							struct netdev *netdev)
+ {
+ 	uint32_t iftype;
++	uint64_t wdev_id;
+ =
 
->> No extended features could be due to an outdated iw version, though =
+ 	if (nl80211_parse_attrs(msg, NL80211_ATTR_IFTYPE, &iftype,
++					NL80211_ATTR_WDEV, &wdev_id,
+ 					NL80211_ATTR_UNSPEC) < 0)
+ 		return;
+ =
 
->> my
->> thought was that is would support handshake offloading which is
->> somewhat old at this point.
-> =
+@@ -4883,6 +4885,7 @@ static void netdev_set_interface_event(struct l_genl_=
+msg *msg,
+ 			netdev_iftype_to_string(netdev->type),
+ 			netdev_iftype_to_string(iftype));
+ 	netdev->type =3D iftype;
++	frame_watch_wdev_remove(wdev_id);
+ =
 
-> No, its just a really bad driver :)
-> =
+ 	/* Set RSSI threshold for CQM notifications */
+ 	if (netdev->type =3D=3D NL80211_IFTYPE_STATION)
+-- =
 
->> =
+2.26.3
 
->> Since its working well for you I wouldn't worry about it, though I am
->> somewhat curious how exactly the 4-way handshake is working with a =
-
->> zero
->> MAC. Do you by chance see any eapol messages in your IWD logs =
-
->> (running
->> in debug mode):
-> =
-
-> See how the driver doesn't support any interface combinations?  It =
-
-> just means this device is stuck in station mode with a single =
-
-> interface.  So the driver doesn't even bother setting a permanent =
-
-> address on the phy.  It only sets it on the default netdev that was =
-
-> created.  Since mac randomization is disabled by default, we keep =
-
-> using that one.
-> =
-
-> We probably should limit AddressRandomizationRange setting for such =
-
-> drivers to 'full'.
-> =
-
-> No offloading either for this driver, so you're stuck with WPA2 only.
-> =
-
-> Regards,
-> -Denis
-
-
---===============5223335946096804391==--
+--===============2027169014254799489==--
 
