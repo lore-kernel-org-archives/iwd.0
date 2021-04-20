@@ -1,91 +1,106 @@
-Content-Type: multipart/mixed; boundary="===============2027169014254799489=="
+Content-Type: multipart/mixed; boundary="===============6052851260497189350=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 2/8] frame-xchg: iftype changes to be managed by netdev
-Date: Tue, 20 Apr 2021 11:35:13 -0500
-Message-ID: <20210420163519.12375-2-denkenz@gmail.com>
-In-Reply-To: <20210420163519.12375-1-denkenz@gmail.com>
+Subject: [PATCH 1/8] netdev: Track SET_INTERFACE events
+Date: Tue, 20 Apr 2021 11:35:12 -0500
+Message-ID: <20210420163519.12375-1-denkenz@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2027169014254799489==
+--===============6052851260497189350==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Since netdev now keeps track of iftype changes, let it call
-frame_watch_wdev_remove on netdevs that it manages to clear frame
-registrations that should be cleared due to an iftype change.
-
-Note that P2P_DEVICE wdevs are not managed by any netdev object, but
-since their iftype cannot be changed, they should not be affected
-by this change.
+And set the interface type based on the event rather than the command
+callback.  This allows us to track interface type changes even if they
+come from outside iwd (which shouldn't happen.)
 ---
- src/frame-xchg.c | 7 +------
- src/netdev.c     | 3 +++
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ src/netdev.c | 47 +++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 41 insertions(+), 6 deletions(-)
 
-diff --git a/src/frame-xchg.c b/src/frame-xchg.c
-index e01747326fc5..85f55f2bf941 100644
---- a/src/frame-xchg.c
-+++ b/src/frame-xchg.c
-@@ -1312,7 +1312,6 @@ static void frame_xchg_config_notify(struct l_genl_ms=
-g *msg, void *user_data)
- 		if (!wdev) {
- 			wdev =3D l_new(struct wdev_info, 1);
- 			wdev->id =3D wdev_id;
--			wdev->iftype =3D iftype;
- =
-
- 			if (!wdevs)
- 				wdevs =3D l_queue_new();
-@@ -1321,11 +1320,7 @@ static void frame_xchg_config_notify(struct l_genl_m=
-sg *msg, void *user_data)
- 			break;
- 		}
- =
-
--		if (wdev->iftype !=3D iftype) {
--			wdev->iftype =3D iftype;
--			frame_watch_wdev_remove(wdev_id);
--		}
--
-+		wdev->iftype =3D iftype;
- 		break;
- =
-
- 	case NL80211_CMD_DEL_INTERFACE:
 diff --git a/src/netdev.c b/src/netdev.c
-index 05e22148e495..f4877bbd6fbb 100644
+index a63c6b12a5d1..05e22148e495 100644
 --- a/src/netdev.c
 +++ b/src/netdev.c
-@@ -4871,8 +4871,10 @@ static void netdev_set_interface_event(struct l_genl=
-_msg *msg,
- 							struct netdev *netdev)
+@@ -4867,6 +4867,43 @@ static int netdev_cqm_rssi_update(struct netdev *net=
+dev)
+ 	return 0;
+ }
+ =
+
++static void netdev_set_interface_event(struct l_genl_msg *msg,
++							struct netdev *netdev)
++{
++	uint32_t iftype;
++
++	if (nl80211_parse_attrs(msg, NL80211_ATTR_IFTYPE, &iftype,
++					NL80211_ATTR_UNSPEC) < 0)
++		return;
++
++	if (iftype =3D=3D netdev->type)
++		return;
++
++	l_debug("Interface type changed from %s to %s",
++			netdev_iftype_to_string(netdev->type),
++			netdev_iftype_to_string(iftype));
++	netdev->type =3D iftype;
++
++	/* Set RSSI threshold for CQM notifications */
++	if (netdev->type =3D=3D NL80211_IFTYPE_STATION)
++		netdev_cqm_rssi_update(netdev);
++}
++
++static void netdev_config_notify(struct l_genl_msg *msg, void *user_data)
++{
++	struct netdev *netdev;
++
++	netdev =3D netdev_from_message(msg);
++	if (!netdev)
++		return;
++
++	switch (l_genl_msg_get_command(msg)) {
++	case NL80211_CMD_SET_INTERFACE:
++		netdev_set_interface_event(msg, netdev);
++		break;
++	}
++}
++
+ static struct l_genl_msg *netdev_build_cmd_set_interface(struct netdev *ne=
+tdev,
+ 							uint32_t iftype)
  {
- 	uint32_t iftype;
-+	uint64_t wdev_id;
+@@ -4927,12 +4964,6 @@ static void netdev_set_iftype_cb(struct l_genl_msg *=
+msg, void *user_data)
+ 	if (error !=3D 0)
+ 		goto done;
  =
 
- 	if (nl80211_parse_attrs(msg, NL80211_ATTR_IFTYPE, &iftype,
-+					NL80211_ATTR_WDEV, &wdev_id,
- 					NL80211_ATTR_UNSPEC) < 0)
- 		return;
+-	netdev->type =3D req->pending_type;
+-
+-	/* Set RSSI threshold for CQM notifications */
+-	if (netdev->type =3D=3D NL80211_IFTYPE_STATION)
+-		netdev_cqm_rssi_update(netdev);
+-
+ 	/* If the netdev was down originally, we're done */
+ 	if (!req->bring_up)
+ 		goto done;
+@@ -5635,6 +5666,10 @@ static int netdev_init(void)
+ 								NULL, NULL))
+ 		l_error("Registering for scan notifications failed");
  =
 
-@@ -4883,6 +4885,7 @@ static void netdev_set_interface_event(struct l_genl_=
-msg *msg,
- 			netdev_iftype_to_string(netdev->type),
- 			netdev_iftype_to_string(iftype));
- 	netdev->type =3D iftype;
-+	frame_watch_wdev_remove(wdev_id);
++	if (!l_genl_family_register(nl80211, "config", netdev_config_notify,
++								NULL, NULL))
++		l_error("Registering for config notifications failed");
++
+ 	return 0;
  =
 
- 	/* Set RSSI threshold for CQM notifications */
- 	if (netdev->type =3D=3D NL80211_IFTYPE_STATION)
+ fail_netlink:
 -- =
 
 2.26.3
 
---===============2027169014254799489==--
+--===============6052851260497189350==--
 
