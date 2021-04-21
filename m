@@ -1,94 +1,209 @@
-Content-Type: multipart/mixed; boundary="===============7397166495297030142=="
+Content-Type: multipart/mixed; boundary="===============6119621627989636184=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] auto-t: add stop event/non-blocking to hlrauc.py
-Date: Wed, 21 Apr 2021 11:42:27 -0700
-Message-ID: <20210421184228.2272285-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] auto-t: move AuthCenter to Setup/Tear down
+Date: Wed, 21 Apr 2021 11:42:28 -0700
+Message-ID: <20210421184228.2272285-2-prestwoj@gmail.com>
+In-Reply-To: <20210421184228.2272285-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7397166495297030142==
+--===============6119621627989636184==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There was a problem with AuthCenter where if an unhandled exception
-was thrown the read thread never exited, since stop() would never
-be called. In addition the read() call itself was blocking which
-may have led to additional issues trying to stop the thread.
-
-Now an explicit stop event was added and the socket was set to
-non-blocking. This will require autotest modification in order to
-stop AuthCenter in an appropriate location to handle any exceptions.
+By moving the AuthCenter initializer to SetUpClass we can now
+call stop() in TearDownClass which handles any exception the
+test might throw.
 ---
- autotests/util/hlrauc.py | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ autotests/testEAP-AKA-ofono/connection_test.py     | 14 +++++---------
+ .../testEAP-AKA-prime-ofono/connection_test.py     | 14 ++++----------
+ autotests/testEAP-SIM-ofono/connection_test.py     | 14 +++++---------
+ 3 files changed, 14 insertions(+), 28 deletions(-)
 
-diff --git a/autotests/util/hlrauc.py b/autotests/util/hlrauc.py
-index ab143acc..c79692f2 100644
---- a/autotests/util/hlrauc.py
-+++ b/autotests/util/hlrauc.py
-@@ -3,6 +3,7 @@ import os
- import threading
- import sys
- import signal
-+from time import sleep
- from Crypto.Cipher import AES
+diff --git a/autotests/testEAP-AKA-ofono/connection_test.py b/autotests/tes=
+tEAP-AKA-ofono/connection_test.py
+index ff987709..e667aa8d 100644
+--- a/autotests/testEAP-AKA-ofono/connection_test.py
++++ b/autotests/testEAP-AKA-ofono/connection_test.py
+@@ -12,10 +12,7 @@ from ofono import Ofono
+ from config import ctx
  =
 
- class AuthCenter:
-@@ -15,11 +16,13 @@ class AuthCenter:
-         self._sock_path =3D sock_path
-         self._read_config(config_file)
-         self._socket =3D socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-+        self._socket.setblocking(0)
-         if os.path.exists(sock_path):
-             os.unlink(sock_path)
-         self._socket.bind(sock_path)
+ class Test(unittest.TestCase):
+-
+     def test_connection_success(self):
+-        auth =3D AuthCenter('/tmp/hlrauc.sock', '/tmp/sim.db')
+-
+         ofono =3D Ofono()
+         ofono.enable_modem('/phonesim')
+         ofono.wait_for_sim_auth()
+@@ -40,11 +37,7 @@ class Test(unittest.TestCase):
+         condition =3D 'not obj.connected'
+         wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
  =
 
--        self._rxhandle =3D threading.Thread(target=3Dself._rx_thread)
-+        self.stop_event =3D threading.Event()
-+        self._rxhandle =3D threading.Thread(target=3Dself._rx_thread, args=
-=3D(self, self.stop_event))
-         self._rxhandle.ready =3D threading.Event()
-         self._rxhandle.start()
+-        try:
+-                ordered_network.network_object.connect()
+-        except:
+-                auth.stop()
+-                raise
++        ordered_network.network_object.connect()
  =
 
-@@ -30,15 +33,17 @@ class AuthCenter:
-         os.remove(self._sock_path)
-         self._socket.close()
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+@@ -54,7 +47,6 @@ class Test(unittest.TestCase):
+         condition =3D 'not obj.connected'
+         wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
  =
 
--    def _rx_thread(self):
-+    @staticmethod
-+    def _rx_thread(self, stop_event):
-         self._rxhandle.ready.set()
--        while (True):
-+        while not stop_event.isSet():
-             try:
-                 data, addr =3D self._socket.recvfrom(1000)
-                 data =3D data.decode('ascii')
-                 resp =3D self._process_data(data)
--            except OSError:
--                break
-+            except BlockingIOError:
-+                sleep(0.5)
-+                continue
-             except:
-                 print("Exception:", sys.exc_info()[0])
-                 break
-@@ -241,6 +246,7 @@ class AuthCenter:
-         '''
-             Stop the Authentication server and close the socket
-         '''
-+        self.stop_event.set()
-         self._socket.shutdown(socket.SHUT_RDWR)
-         self._socket.close()
-         self._rxhandle.join()
+-        auth.stop()
+     @classmethod
+     def setUpClass(cls):
+         if not ctx.is_process_running('ofonod'):
+@@ -62,9 +54,13 @@ class Test(unittest.TestCase):
+ =
+
+         IWD.copy_to_storage('ssidEAP-AKA.8021x')
+ =
+
++        cls.auth =3D AuthCenter('/tmp/hlrauc.sock', '/tmp/sim.db')
++
+     @classmethod
+     def tearDownClass(cls):
+         IWD.clear_storage()
+ =
+
++        cls.auth.stop()
++
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
+diff --git a/autotests/testEAP-AKA-prime-ofono/connection_test.py b/autotes=
+ts/testEAP-AKA-prime-ofono/connection_test.py
+index 01dd8249..e6dfaee0 100644
+--- a/autotests/testEAP-AKA-prime-ofono/connection_test.py
++++ b/autotests/testEAP-AKA-prime-ofono/connection_test.py
+@@ -12,10 +12,7 @@ from ofono import Ofono
+ from config import ctx
+ =
+
+ class Test(unittest.TestCase):
+-
+     def test_connection_success(self):
+-        auth =3D AuthCenter('/tmp/hlrauc.sock', '/tmp/sim.db')
+-
+         ofono =3D Ofono()
+         ofono.enable_modem('/phonesim')
+         ofono.wait_for_sim_auth()
+@@ -40,11 +37,7 @@ class Test(unittest.TestCase):
+         condition =3D 'not obj.connected'
+         wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
+ =
+
+-        try:
+-                ordered_network.network_object.connect()
+-        except:
+-                auth.stop()
+-                raise
++        ordered_network.network_object.connect()
+ =
+
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+@@ -54,8 +47,6 @@ class Test(unittest.TestCase):
+         condition =3D 'not obj.connected'
+         wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
+ =
+
+-        auth.stop()
+-
+     @classmethod
+     def setUpClass(cls):
+         if not ctx.is_process_running('ofonod'):
+@@ -63,9 +54,12 @@ class Test(unittest.TestCase):
+ =
+
+         IWD.copy_to_storage('ssidEAP-AKA.8021x')
+ =
+
++        cls.auth =3D AuthCenter('/tmp/hlrauc.sock', '/tmp/sim.db')
++
+     @classmethod
+     def tearDownClass(cls):
+         IWD.clear_storage()
++        cls.auth.stop()
+ =
+
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
+diff --git a/autotests/testEAP-SIM-ofono/connection_test.py b/autotests/tes=
+tEAP-SIM-ofono/connection_test.py
+index dcb2dcbc..e6a2d290 100644
+--- a/autotests/testEAP-SIM-ofono/connection_test.py
++++ b/autotests/testEAP-SIM-ofono/connection_test.py
+@@ -14,8 +14,6 @@ from config import ctx
+ class Test(unittest.TestCase):
+ =
+
+     def test_connection_success(self):
+-        auth =3D AuthCenter('/tmp/hlrauc.sock', '/tmp/sim.db')
+-
+         ofono =3D Ofono()
+         ofono.enable_modem('/phonesim')
+         ofono.wait_for_sim_auth()
+@@ -40,11 +38,7 @@ class Test(unittest.TestCase):
+         condition =3D 'not obj.connected'
+         wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
+ =
+
+-        try:
+-                ordered_network.network_object.connect()
+-        except:
+-                auth.stop()
+-                raise
++        ordered_network.network_object.connect()
+ =
+
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+@@ -54,8 +48,6 @@ class Test(unittest.TestCase):
+         condition =3D 'not obj.connected'
+         wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
+ =
+
+-        auth.stop()
+-
+     @classmethod
+     def setUpClass(cls):
+         if not ctx.is_process_running('ofonod'):
+@@ -63,9 +55,13 @@ class Test(unittest.TestCase):
+ =
+
+         IWD.copy_to_storage('ssidEAP-SIM.8021x')
+ =
+
++        cls.auth =3D AuthCenter('/tmp/hlrauc.sock', '/tmp/sim.db')
++
+     @classmethod
+     def tearDownClass(cls):
+         IWD.clear_storage()
+ =
+
++        cls.auth.stop()
++
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
 -- =
 
 2.26.2
 
---===============7397166495297030142==--
+--===============6119621627989636184==--
 
