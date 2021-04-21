@@ -1,79 +1,94 @@
-Content-Type: multipart/mixed; boundary="===============5674098482085981059=="
+Content-Type: multipart/mixed; boundary="===============7397166495297030142=="
 MIME-Version: 1.0
-From: KeithG <ys3al35l@gmail.com>
-Subject: ap mode problem
-Date: Wed, 21 Apr 2021 11:51:18 -0500
-Message-ID: <CAG17S_NmBoT=1JLFw4CHY5zbmHfvv6TfOwdKOTs-g2BcqWaYWw@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/2] auto-t: add stop event/non-blocking to hlrauc.py
+Date: Wed, 21 Apr 2021 11:42:27 -0700
+Message-ID: <20210421184228.2272285-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5674098482085981059==
+--===============7397166495297030142==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Group,
+There was a problem with AuthCenter where if an unhandled exception
+was thrown the read thread never exited, since stop() would never
+be called. In addition the read() call itself was blocking which
+may have led to additional issues trying to stop the thread.
 
-Trying to use ap mode on a USB dongle and having difficulty making a connec=
-tion.
+Now an explicit stop event was added and the socket was set to
+non-blocking. This will require autotest modification in order to
+stop AuthCenter in an appropriate location to handle any exceptions.
+---
+ autotests/util/hlrauc.py | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-Kernel 5.10.27, iwd 1.13
+diff --git a/autotests/util/hlrauc.py b/autotests/util/hlrauc.py
+index ab143acc..c79692f2 100644
+--- a/autotests/util/hlrauc.py
++++ b/autotests/util/hlrauc.py
+@@ -3,6 +3,7 @@ import os
+ import threading
+ import sys
+ import signal
++from time import sleep
+ from Crypto.Cipher import AES
+ =
 
-This is the dongle:
-[   29.109521] usb 1-1.5: New USB device found, idVendor=3D7392,
-idProduct=3D7811, bcdDevice=3D 2.00
-[   29.109575] usb 1-1.5: New USB device strings: Mfr=3D1, Product=3D2,
-SerialNumber=3D3
-[   29.109594] usb 1-1.5: Product: 802.11n WLAN Adapter
-[   29.109608] usb 1-1.5: Manufacturer: Realtek
-[   29.109622] usb 1-1.5: SerialNumber: 00e04c000001
-...
-[   53.336830] rtl8192cu: Chip version 0x10
-[   53.878190] rtl8192cu: Board Type 0
-[   53.878822] rtl_usb: rx_max_size 15360, rx_urb_num 8, in_ep 1
-[   53.879097] rtl8192cu: Loading firmware rtlwifi/rtl8192cufw_TMSC.bin
-[   53.879320] ieee80211 phy0: Selected rate control algorithm 'rtl_rc'
-[   54.017808] usbcore: registered new interface driver rtl8192cu
+ class AuthCenter:
+@@ -15,11 +16,13 @@ class AuthCenter:
+         self._sock_path =3D sock_path
+         self._read_config(config_file)
+         self._socket =3D socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
++        self._socket.setblocking(0)
+         if os.path.exists(sock_path):
+             os.unlink(sock_path)
+         self._socket.bind(sock_path)
+ =
 
-I enabled AP mode from iwctl:
-first setting the mode to AP then
-"ap wlan0 start SSID password"
+-        self._rxhandle =3D threading.Thread(target=3Dself._rx_thread)
++        self.stop_event =3D threading.Event()
++        self._rxhandle =3D threading.Thread(target=3Dself._rx_thread, args=
+=3D(self, self.stop_event))
+         self._rxhandle.ready =3D threading.Event()
+         self._rxhandle.start()
+ =
 
-This is what is in the journal:
-Apr 21 11:47:28 deskrune systemd[1]: Started Wireless service.
-Apr 21 11:47:28 deskrune iwd[2298]: Wiphy: 0, Name: phy0
-Apr 21 11:47:28 deskrune iwd[2298]:         Permanent Address: 80:1f:02:a2:=
-d4:4c
-Apr 21 11:47:28 deskrune iwd[2298]:         Bands: 2.4 GHz
-Apr 21 11:47:28 deskrune iwd[2298]:         Ciphers: CCMP TKIP BIP
-Apr 21 11:47:28 deskrune iwd[2298]:         Supported iftypes: ad-hoc
-station ap p2p-client p2p-go
-...
-Apr 21 11:47:28 deskrune iwd[2298]: Wiphy phy0 will only use the
-default interface
-Apr 21 11:47:51 deskrune iwd[2298]: AP Probe Request from ae:53:10:32:ee:8a
-Apr 21 11:47:51 deskrune iwd[2298]: AP Probe Response delivered OK
-Apr 21 11:47:51 deskrune iwd[2298]: AP Authentication from ae:53:10:32:ee:8a
-Apr 21 11:47:51 deskrune iwd[2298]: AP Authentication frame 2 ACKed by STA
-Apr 21 11:47:51 deskrune iwd[2298]: AP Association Request from
-ae:53:10:32:ee:8a
-Apr 21 11:47:51 deskrune iwd[2298]: AP (Re)Association Response ACK received
-Apr 21 11:47:52 deskrune iwd[2298]: 4-Way handshake failed for
-ifindex: 3, reason: 15
-Apr 21 11:47:54 deskrune iwd[2298]: AP Probe Request from b0:02:47:cc:83:f9
-Apr 21 11:47:54 deskrune iwd[2298]: AP Probe Response delivered OK
-Apr 21 11:47:54 deskrune iwd[2298]: AP Probe Request from b0:02:47:cc:83:f9
-Apr 21 11:47:57 deskrune iwd[2298]: AP Probe Request from ee:b9:80:a7:13:81
-Apr 21 11:47:57 deskrune iwd[2298]: AP Probe Response delivered OK
-Apr 21 11:47:58 deskrune iwd[2298]: AP Probe Request from b8:27:eb:18:74:9c
-Apr 21 11:47:58 deskrune iwd[2298]: AP Probe Response delivered OK
-Apr 21 11:47:58 deskrune iwd[2298]: AP Probe Request from b8:27:eb:18:74:9c
-Apr 21 11:47:58 deskrune iwd[2298]: AP Probe Request from b8:27:eb:18:74:9c
-Apr 21 11:48:01 deskrune iwd[2298]: AP Deauthentication from
-ae:53:10:32:ee:8a, reason 3
+@@ -30,15 +33,17 @@ class AuthCenter:
+         os.remove(self._sock_path)
+         self._socket.close()
+ =
 
-Is this incompatible? It works with hostapd/dnsmasq.
+-    def _rx_thread(self):
++    @staticmethod
++    def _rx_thread(self, stop_event):
+         self._rxhandle.ready.set()
+-        while (True):
++        while not stop_event.isSet():
+             try:
+                 data, addr =3D self._socket.recvfrom(1000)
+                 data =3D data.decode('ascii')
+                 resp =3D self._process_data(data)
+-            except OSError:
+-                break
++            except BlockingIOError:
++                sleep(0.5)
++                continue
+             except:
+                 print("Exception:", sys.exc_info()[0])
+                 break
+@@ -241,6 +246,7 @@ class AuthCenter:
+         '''
+             Stop the Authentication server and close the socket
+         '''
++        self.stop_event.set()
+         self._socket.shutdown(socket.SHUT_RDWR)
+         self._socket.close()
+         self._rxhandle.join()
+-- =
 
-Keith
---===============5674098482085981059==--
+2.26.2
+
+--===============7397166495297030142==--
 
