@@ -1,44 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============1754786800300862563=="
+Content-Type: multipart/mixed; boundary="===============8839134108652711959=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/7] netdev: print error number on CMD_FRAME failure
-Date: Thu, 22 Apr 2021 10:37:45 -0700
-Message-ID: <20210422173746.2324850-6-prestwoj@gmail.com>
+Subject: [PATCH 7/7] netdev: move prepare_ft call which broke FT
+Date: Thu, 22 Apr 2021 10:37:46 -0700
+Message-ID: <20210422173746.2324850-7-prestwoj@gmail.com>
 In-Reply-To: <20210422173746.2324850-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1754786800300862563==
+--===============8839134108652711959==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+The prepare_ft patch was an intermediate to a full patch
+set and was not fully tested stand alone. Its placement
+actually broke FT due to handshake->aa getting overwritten
+prior to netdev->prev_bssid being copied out. This caused
+FT to fail with "transport endpoint not connected (-107)"
 ---
- src/netdev.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ src/netdev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/netdev.c b/src/netdev.c
-index bd002ed9..28076244 100644
+index 28076244..1190399d 100644
 --- a/src/netdev.c
 +++ b/src/netdev.c
-@@ -3676,9 +3676,10 @@ static void prepare_ft(struct netdev *netdev, struct=
- scan_bss *target_bss)
- static void netdev_ft_request_cb(struct l_genl_msg *msg, void *user_data)
- {
- 	struct netdev *netdev =3D user_data;
-+	int err =3D l_genl_msg_get_error(msg);
+@@ -3789,6 +3789,8 @@ static int fast_transition(struct netdev *netdev, str=
+uct scan_bss *target_bss,
+ 			l_get_le16(target_bss->mde))
+ 		return -EINVAL;
  =
 
--	if (l_genl_msg_get_error(msg) < 0) {
--		l_error("Could not send CMD_FRAME");
-+	if (err < 0) {
-+		l_error("Could not send CMD_FRAME (%d)", err);
- 		netdev_connect_failed(netdev,
- 					NETDEV_RESULT_AUTHENTICATION_FAILED,
- 					MMPDU_STATUS_CODE_UNSPECIFIED);
++	prepare_ft(netdev, target_bss);
++
+ 	/*
+ 	 * We reuse the handshake_state object and reset what's needed.
+ 	 * Could also create a new object and copy most of the state but
+@@ -3805,8 +3807,6 @@ static int fast_transition(struct netdev *netdev, str=
+uct scan_bss *target_bss,
+ 							target_bss->rsne);
+ 	memcpy(netdev->handshake->mde + 2, target_bss->mde, 3);
+ =
+
+-	prepare_ft(netdev, target_bss);
+-
+ 	netdev->connect_cb =3D cb;
+ =
+
+ 	if (over_air)
 -- =
 
 2.26.2
 
---===============1754786800300862563==--
+--===============8839134108652711959==--
 
