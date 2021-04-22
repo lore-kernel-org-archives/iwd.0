@@ -1,43 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============3750662833929035362=="
+Content-Type: multipart/mixed; boundary="===============1754786800300862563=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/7] auto-t: properly print wait_for_object_change exception
-Date: Thu, 22 Apr 2021 10:37:44 -0700
-Message-ID: <20210422173746.2324850-5-prestwoj@gmail.com>
+Subject: [PATCH 6/7] netdev: print error number on CMD_FRAME failure
+Date: Thu, 22 Apr 2021 10:37:45 -0700
+Message-ID: <20210422173746.2324850-6-prestwoj@gmail.com>
 In-Reply-To: <20210422173746.2324850-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3750662833929035362==
+--===============1754786800300862563==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- autotests/util/iwd.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/netdev.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 6cd7a1a8..e6421088 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -1064,7 +1064,8 @@ class IWD(AsyncOpAbstract):
-                 # If neither the initial or expected condition evaluate the
-                 # object must be in another unexpected state.
-                 if not eval(from_str) and not eval(to_str):
--                    raise Exception('unexpected condition between [%s] and=
- [%s]' % from_str, to_str)
-+                    raise Exception('unexpected condition between [%s] and=
- [%s]' %
-+                                        (from_str, to_str))
+diff --git a/src/netdev.c b/src/netdev.c
+index bd002ed9..28076244 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -3676,9 +3676,10 @@ static void prepare_ft(struct netdev *netdev, struct=
+ scan_bss *target_bss)
+ static void netdev_ft_request_cb(struct l_genl_msg *msg, void *user_data)
+ {
+ 	struct netdev *netdev =3D user_data;
++	int err =3D l_genl_msg_get_error(msg);
  =
 
-                 # Initial condition does not evaluate but expected does, p=
-ass
-                 if not eval(from_str) and eval(to_str):
+-	if (l_genl_msg_get_error(msg) < 0) {
+-		l_error("Could not send CMD_FRAME");
++	if (err < 0) {
++		l_error("Could not send CMD_FRAME (%d)", err);
+ 		netdev_connect_failed(netdev,
+ 					NETDEV_RESULT_AUTHENTICATION_FAILED,
+ 					MMPDU_STATUS_CODE_UNSPECIFIED);
 -- =
 
 2.26.2
 
---===============3750662833929035362==--
+--===============1754786800300862563==--
 
