@@ -1,57 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============8839134108652711959=="
+Content-Type: multipart/mixed; boundary="===============7029166667456463017=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/7] netdev: move prepare_ft call which broke FT
-Date: Thu, 22 Apr 2021 10:37:46 -0700
-Message-ID: <20210422173746.2324850-7-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/7] test-runner: fix process cleanup loop
+Date: Thu, 22 Apr 2021 13:27:06 -0500
+Message-ID: <b038fb48-b94b-7527-0a45-9c9bd2916950@gmail.com>
 In-Reply-To: <20210422173746.2324850-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8839134108652711959==
+--===============7029166667456463017==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The prepare_ft patch was an intermediate to a full patch
-set and was not fully tested stand alone. Its placement
-actually broke FT due to handshake->aa getting overwritten
-prior to netdev->prev_bssid being copied out. This caused
-FT to fail with "transport endpoint not connected (-107)"
----
- src/netdev.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi James,
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 28076244..1190399d 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -3789,6 +3789,8 @@ static int fast_transition(struct netdev *netdev, str=
-uct scan_bss *target_bss,
- 			l_get_le16(target_bss->mde))
- 		return -EINVAL;
- =
+On 4/22/21 12:37 PM, James Prestwood wrote:
+> The processes in the list ultimately get removed for each
+> kill() call. This causes strange behavior since the list is
+> being iterated and each iteration is removing items. Instead
+> iterate over a new temporary list so the actual process list
+> can be cleaned up.
+> ---
+>   tools/test-runner | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-+	prepare_ft(netdev, target_bss);
-+
- 	/*
- 	 * We reuse the handshake_state object and reset what's needed.
- 	 * Could also create a new object and copy most of the state but
-@@ -3805,8 +3807,6 @@ static int fast_transition(struct netdev *netdev, str=
-uct scan_bss *target_bss,
- 							target_bss->rsne);
- 	memcpy(netdev->handshake->mde + 2, target_bss->mde, 3);
- =
 
--	prepare_ft(netdev, target_bss);
--
- 	netdev->connect_cb =3D cb;
- =
+All applied, thanks.
 
- 	if (over_air)
--- =
+Regards,
+-Denis
 
-2.26.2
-
---===============8839134108652711959==--
+--===============7029166667456463017==--
 
