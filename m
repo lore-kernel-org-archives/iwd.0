@@ -1,150 +1,120 @@
-Content-Type: multipart/mixed; boundary="===============3174013077842024750=="
+Content-Type: multipart/mixed; boundary="===============4274472585686107079=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/7] test-runner: fix process output truncation
-Date: Thu, 22 Apr 2021 10:37:42 -0700
-Message-ID: <20210422173746.2324850-3-prestwoj@gmail.com>
+Subject: [PATCH 4/7] auto-t: add more cleanup to ofono based tests (again)
+Date: Thu, 22 Apr 2021 10:37:43 -0700
+Message-ID: <20210422173746.2324850-4-prestwoj@gmail.com>
 In-Reply-To: <20210422173746.2324850-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3174013077842024750==
+--===============4274472585686107079==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There was a bug with process output where the last bit of data would
-never make it into stdout or log files. This was due to the IO watch
-being cleaned up when the process was killed and never allowing it
-to finish writing any pending data.
-
-Now the IO watch implementation has been moved out into its own
-function (io_process) which is now used to write the final bits of
-data out on process exit.
+The AuthCenter was still not being fully cleaned up in these
+tests. It was being stopped but there was still a reference being
+held which prevented __del__ from being called.
 ---
- tools/test-runner | 40 +++++++++++++++++-----------------------
- 1 file changed, 17 insertions(+), 23 deletions(-)
+ autotests/testEAP-AKA-ofono/connection_test.py       |  1 +
+ autotests/testEAP-AKA-prime-ofono/connection_test.py |  1 +
+ autotests/testEAP-PEAP-SIM/connection_test.py        | 12 ++++++------
+ autotests/testEAP-SIM-ofono/connection_test.py       |  1 +
+ 4 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/tools/test-runner b/tools/test-runner
-index c3a5ff89..799953de 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -244,31 +244,22 @@ class Process:
+diff --git a/autotests/testEAP-AKA-ofono/connection_test.py b/autotests/tes=
+tEAP-AKA-ofono/connection_test.py
+index e667aa8d..7b1a8c37 100644
+--- a/autotests/testEAP-AKA-ofono/connection_test.py
++++ b/autotests/testEAP-AKA-ofono/connection_test.py
+@@ -61,6 +61,7 @@ class Test(unittest.TestCase):
+         IWD.clear_storage()
  =
 
- 		self.pid.wait(timeout=3D5)
- 		self.killed =3D True
-+		self.ret =3D self.pid.returncode
+         cls.auth.stop()
++        cls.auth =3D None
  =
 
- 		self.stdout.seek(self.io_position)
- 		self.out =3D self.stdout.read()
- 		self.stdout.seek(0, 2)
--		self.ret =3D self.pid.returncode
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
+diff --git a/autotests/testEAP-AKA-prime-ofono/connection_test.py b/autotes=
+ts/testEAP-AKA-prime-ofono/connection_test.py
+index e6dfaee0..dc8f04bf 100644
+--- a/autotests/testEAP-AKA-prime-ofono/connection_test.py
++++ b/autotests/testEAP-AKA-prime-ofono/connection_test.py
+@@ -60,6 +60,7 @@ class Test(unittest.TestCase):
+     def tearDownClass(cls):
+         IWD.clear_storage()
+         cls.auth.stop()
++        cls.auth =3D None
  =
 
--		#
--		# No IO callback for wait/check=3DTrue processes so write out
--		# the data to any FD's now.
--		#
- 		if len(self.write_fds) > 0:
--			for fd in self.write_fds:
--				fd.write(self.out)
--				fd.close()
-+			self.process_io(self.stdout)
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
+diff --git a/autotests/testEAP-PEAP-SIM/connection_test.py b/autotests/test=
+EAP-PEAP-SIM/connection_test.py
+index 37398c15..4183e65e 100644
+--- a/autotests/testEAP-PEAP-SIM/connection_test.py
++++ b/autotests/testEAP-PEAP-SIM/connection_test.py
+@@ -44,26 +44,26 @@ class Test(unittest.TestCase):
  =
 
--			self.write_fds =3D []
+ =
+
+     def test_connection_success(self):
+-        auth =3D AuthCenter('/tmp/hlrauc.sock', '/tmp/sim.db')
 -
--		if self.verbose:
--			sys.__stdout__.write(self.out)
-+		self.write_fds =3D []
+         ofono =3D Ofono()
+         ofono.enable_modem('/phonesim')
+         ofono.wait_for_sim_auth()
  =
 
- 		print("%s returned %d" % (args[0], self.ret))
- 		if check and self.ret !=3D 0:
- 			raise subprocess.CalledProcessError(returncode=3Dself.ret, cmd=3Dself.a=
-rgs)
+         wd =3D IWD(True)
  =
 
--	def io_callback(self, source, cb_condition):
-+	def process_io(self, source):
- 		#
- 		# The file will have already been written to, meaning the seek
- 		# position points to EOF. This is why the position is saved so
-@@ -286,20 +277,27 @@ class Process:
+-        try:
+-            self.validate_connection(wd)
+-        finally:
+-            auth.stop()
++        self.validate_connection(wd)
  =
 
- 		for f in self.write_fds:
- 			f.write(data)
-+			f.flush()
- =
-
- 		if self.verbose:
- 			sys.__stdout__.write(data)
-+			sys.__stdout__.flush()
- =
-
- 		return True
- =
-
-+	def io_callback(self, source, cb_condition):
-+		return self.process_io(source)
+     @classmethod
+     def setUpClass(cls):
++        cls.auth =3D AuthCenter('/tmp/hlrauc.sock', '/tmp/sim.db')
 +
- 	def __del__(self):
- 		print("Del process %s" % self.args)
+         IWD.copy_to_storage('ssidEAP-PEAP-SIM.8021x')
  =
 
-+		os.remove(self.output_name)
+     @classmethod
+     def tearDownClass(cls):
+         IWD.clear_storage()
+ =
+
++        cls.auth.stop()
++        cls.auth =3D None
 +
-+		self.stdout.close()
-+
- 		if not self.killed:
- 			self.kill()
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
+diff --git a/autotests/testEAP-SIM-ofono/connection_test.py b/autotests/tes=
+tEAP-SIM-ofono/connection_test.py
+index e6a2d290..9f5f2734 100644
+--- a/autotests/testEAP-SIM-ofono/connection_test.py
++++ b/autotests/testEAP-SIM-ofono/connection_test.py
+@@ -62,6 +62,7 @@ class Test(unittest.TestCase):
+         IWD.clear_storage()
  =
 
--		os.remove(self.output_name)
--
- 	def kill(self, force=3DFalse):
- 		print("Killing process %s" % self.args)
+         cls.auth.stop()
++        cls.auth =3D None
  =
 
-@@ -319,8 +317,10 @@ class Process:
- =
-
- 		self.ctx =3D None
- =
-
--		for f in self.write_fds:
--			f.close()
-+		self.process_io(self.stdout)
-+
-+		if self.cleanup:
-+			self.cleanup()
- =
-
- 		self.write_fds =3D []
- =
-
-@@ -328,13 +328,7 @@ class Process:
- 			GLib.source_remove(self.io_watch)
- 			self.io_watch =3D None
- =
-
--		if self.cleanup:
--			self.cleanup()
--
- 		self.cleanup =3D None
--
--		self.stdout.close()
--
- 		self.killed =3D True
- =
-
- 	def wait_for_socket(self, socket, wait):
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
 -- =
 
 2.26.2
 
---===============3174013077842024750==--
+--===============4274472585686107079==--
 
