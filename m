@@ -1,301 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============2872272299762445936=="
+Content-Type: multipart/mixed; boundary="===============8069010596825641456=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 3/5] ap: Drop struct ap_config in favor of l_settings
-Date: Mon, 26 Apr 2021 20:06:39 +0200
-Message-ID: <CAOq732LK_q2qoyRM9rnQe29hf7tZDq9tQSR33=kBqKfAvAaS9A@mail.gmail.com>
-In-Reply-To: <49a98fb0-ba15-6339-db94-7f1991a401a4@gmail.com>
+Subject: Re: [PATCH 4/5] doc: Clarify settings in iwd.ap(5)
+Date: Mon, 26 Apr 2021 20:19:34 +0200
+Message-ID: <CAOq732LPQBs18angEpbP3NpbE=vCJYCnt8G2gmHXwth4HNCugg@mail.gmail.com>
+In-Reply-To: <1ef9b4de-7f23-204b-aaf8-2b283266fc19@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2872272299762445936==
+--===============8069010596825641456==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 26 Apr 2021 at 18:39, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 4/26/21 8:26 AM, Andrew Zaborowski wrote:
-> > Change ap_start to load all of the AP configuration from a struct
-> > l_settings, moving the 6 or so parameters from struct ap_config members
-> > to the l_settings groups and keys.  This extends the ap profile concept
-> > used for the DHCP settings.  ap_start callers create the l_settings
-> > object and fill the values in it or read the settings in from a file.
+On Mon, 26 Apr 2021 at 18:22, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 4/26/21 11:05 AM, Andrew Zaborowski wrote:
+> > Hi Denis,
 > >
-> > Since ap_setup_dhcp and ap_load_profile_and_dhcp no longer do the
-> > settings file loading, they needed to be refactored and some issues were
-> > fixed in their logic, e.g. l_dhcp_server_set_ip_address() was never
-> > called when the "IP pool" was used.  Also the IP pool was previously on=
-ly
-> > used if the ap->config->profile was NULL and this didn't match what the
-> > docs said:
-> > "If [IPv4].Address is not provided and no IP address is set on the
-> > interface prior to calling StartProfile the IP pool will be used."
-> > ---
-> >   src/ap.c  | 542 ++++++++++++++++++++++++++++++++----------------------
-> >   src/ap.h  |  19 +-
-> >   src/p2p.c |  53 ++++--
-> >   3 files changed, 354 insertions(+), 260 deletions(-)
+> > On Mon, 26 Apr 2021 at 17:53, Denis Kenzior <denkenz@gmail.com> wrote:
+> >>> -The group ``[IPv4]`` contains settings for IWD's built in DHCP serve=
+r. All
+> >>> -settings are optional.
+> >>> +The group ``[IPv4]`` contains settings for IWD's built-in DHCP serve=
+r. All
+> >>> +settings are optional.  They're used if network configuration was en=
+abled as
+> >>> +described in ``iwd.config(5)``.  Omitting the ``[IPv4]`` group disab=
+les
+> >>> +network configuration and the DHCP server for this access point.
+> >>>
+> >>
+> >> Hmm.. If 'all settings are optional', then how do you know whether 'IP=
+v4' group
+> >> was omitted on purpose or not?
 > >
-> > diff --git a/src/ap.c b/src/ap.c
-> > index 46821c04..d8b2a441 100644
-> > --- a/src/ap.c
-> > +++ b/src/ap.c
-> > @@ -666,25 +661,23 @@ static size_t ap_write_wsc_ie(struct ap_state *ap,
+> > Well, you have to assume everything in the config file is done on
+> > purpose.  I think this is the only place IWD looks at whether a group
+> > is present but this is the current behavior AFAIK.
 > >
-> >               wsc_pr.response_type =3D WSC_RESPONSE_TYPE_AP;
-> >               memcpy(wsc_pr.uuid_e, ap->wsc_uuid_r, sizeof(wsc_pr.uuid_=
-e));
-> > -             wsc_pr.primary_device_type =3D
-> > -                     ap->config->wsc_primary_device_type;
-> > +             wsc_pr.primary_device_type =3D ap->wsc_primary_device_typ=
-e;
-> >
-> > -             if (ap->config->wsc_name)
-> > -                     l_strlcpy(wsc_pr.device_name, ap->config->wsc_nam=
-e,
-> > +             if (ap->wsc_name)
 >
-> Hmm, isn't this always true?
+> So your intent is to have an empty [IPV4] group (i.e. '[IPv4]' line with =
+nothing
+> afterward)?
 
-Yes, good catch, this needs to check if ap->wsc_name has any characters.
+Yes, I think that was the intent of the current code,
+e1b3e73c2b3b8864e8a4288a5a0d95b990a2321f mentions that we look at
+whether the section is present although the meaning has changed since
+then it seems.
+
+>  This is a bit confusing since a user would simply omit the '[IPv4]'
+> line as well if all the options were the defaults...
+
+They will be told not to do so by the docs, but yes, I guess it can be
+confusing like anything else when it's the first time you see it.
 
 >
-> > +                     l_strlcpy(wsc_pr.device_name, ap->wsc_name,
-> >                                       sizeof(wsc_pr.device_name));
-> >
-> >               wsc_pr.config_methods =3D
-> >                       WSC_CONFIGURATION_METHOD_PUSH_BUTTON;
-> >
-> > -             if (ap->config->authorized_macs_num) {
-> > -                     size_t len;
-> > +             if (ap->authorized_macs_num) {
-> > +                     size_t len =3D ap->authorized_macs_num * 6;
-> >
-> > -                     len =3D ap->config->authorized_macs_num * 6;
-> >                       if (len > sizeof(wsc_pr.authorized_macs))
-> >                               len =3D sizeof(wsc_pr.authorized_macs);
-> >
-> >                       memcpy(wsc_pr.authorized_macs,
-> > -                             ap->config->authorized_macs, len);
-> > +                             ap->authorized_macs, len);
-> >               }
->
-> For a future patch maybe, but should this be commonized? here and ..
-
-Yep, we could do this.
-
->
-> >
-> >               wsc_data =3D wsc_build_probe_response(&wsc_pr, &wsc_data_=
-size);
-> > @@ -701,15 +694,14 @@ static size_t ap_write_wsc_ie(struct ap_state *ap,
-> >                               WSC_CONFIGURATION_METHOD_PUSH_BUTTON;
-> >               }
-> >
-> > -             if (ap->config->authorized_macs_num) {
-> > -                     size_t len;
-> > +             if (ap->authorized_macs_num) {
-> > +                     size_t len =3D ap->authorized_macs_num * 6;
-> >
-> > -                     len =3D ap->config->authorized_macs_num * 6;
-> >                       if (len > sizeof(wsc_beacon.authorized_macs))
-> >                               len =3D sizeof(wsc_beacon.authorized_macs=
-);
-> >
-> >                       memcpy(wsc_beacon.authorized_macs,
-> > -                             ap->config->authorized_macs, len);
-> > +                             ap->authorized_macs, len);
->
-> .. here is almost the same code
->
-> >               }
-> >
-> >               wsc_data =3D wsc_build_beacon(&wsc_beacon, &wsc_data_size=
-);
->
-> <snip>
->
-> > @@ -2715,24 +2654,196 @@ static int ap_load_profile_and_dhcp(struct ap_=
-state *ap, bool *wait_dhcp)
-> >               err =3D 0;
-> >       }
-> >
-> > -cleanup:
-> > -     l_settings_free(settings);
-> >       return err;
-> >   }
-> >
-> > +static bool ap_load_psk(struct ap_state *ap, const struct l_settings *=
-config)
-> > +{
-> > +     size_t psk_len;
-> > +     L_AUTO_FREE_VAR(uint8_t *, psk) =3D l_settings_get_bytes(config,
-> > +                                                             "Security=
-",
-> > +                                                             "PreShare=
-dKey",
-> > +                                                             &psk_len);
-> > +     L_AUTO_FREE_VAR(char *, passphrase) =3D l_settings_get_string(con=
-fig,
-> > +                                                             "Security=
-",
-> > +                                                             "Passphra=
-se");
-> > +     int err;
-> > +
-> > +     if (l_settings_get_value(config, "Security", "PreSharedKey")) {
->
-> Hmm, you already used get_bytes beforehand, why use get_value again?  Per=
-haps
-> using has_key would be clearer?
-
-Yes, good point also.  The intent was to differentiate between a
-missing (default) and an unparsable value.
-
->
-> i.e. if (l_settings_has_key(config, "Security", "PreSharedKey") {
-> L_AUTO_FREE psk =3D ...
->
-> if (!psk)
-> ...
->
-> > +             if (!psk || psk_len !=3D 32) {
-> > +                     l_error("AP [Security].PreSharedKey must be a 32-=
-byte "
-> > +                             "hexstring");
-> > +                     return false;
-> > +             }
-> > +
-> > +             memcpy(ap->psk, psk, 32);
-> > +             return true;
-> > +     }
-> > +
-> > +     if (!passphrase) {
->
-> If the PSK is valid, you never get to this check...?  Should probably be =
-done
-> first...
-
-Here we want the PSK to override the passphrase if both were present
-(which they shouldn't) because we do the same thing in station mode
-because we don't want to recalculate the PSK.
-
->
-> > +             l_error("AP requires one of [Security].PreSharedKey or "
-> > +                     "[Security].Passphrase to be present");
-> > +             return false;
-> > +     }
-> > +
-> > +     if (strlen(passphrase) > 63) {
-> > +             l_error("AP [Security].Passphrase must not exceed "
-> > +                     "63 characters");
-> > +             return false;
-> > +     }
-> > +
-> > +     err =3D crypto_psk_from_passphrase(passphrase, (uint8_t *) ap->ss=
-id,
-> > +                                             strlen(ap->ssid), ap->psk=
-);
-> > +     if (err < 0) {
-> > +             l_error("AP couldn't generate the PSK from given "
-> > +                     "[Security].Passphrase value: %s (%i)",
-> > +                     strerror(-err), -err);
-> > +             return false;
-> > +     }
-> > +
-> > +     strcpy(ap->passphrase, passphrase);
-> > +     return true;
-> > +}
-> > +
-> > +static int ap_load_config(struct ap_state *ap, const struct l_settings=
- *config,
-> > +                             bool *out_wait_dhcp, bool *out_cck_rates)
-> > +{
-> > +     size_t len;
-> > +     L_AUTO_FREE_VAR(char *, strval) =3D NULL;
-> > +     int err;
-> > +
-> > +     strval =3D l_settings_get_string(config, "General", "SSID");
-> > +     if (L_WARN_ON(!strval))
->
-> This is user-input, why L_WARN_ON?
-
-So the SSID is passed as a D-Bus string or generated by p2p.c and then
-written to the l_settings, it should be partly validated when we get
-here.
-
->
-> > +             return -ENOMSG;
-> > +
-> > +     len =3D strlen(strval);
-> > +     if (len < 1 || len > 32) {
-> > +             l_error("AP SSID length outside the [1, 32] range");
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     if (L_WARN_ON(!l_utf8_validate(strval, len, NULL)))
-> > +             return -EINVAL;
->
-> Same here...?
->
-> > +
-> > +     strcpy(ap->ssid, strval);
-> > +     l_free(l_steal_ptr(strval));
-> > +
-> > +     if (!ap_load_psk(ap, config))
-> > +             return -EINVAL;
-> > +
-> > +     /*
-> > +      * This loads DHCP settings either from the l_settings object or =
-uses
-> > +      * the defaults. wait_on_address will be set true if an address c=
-hange
-> > +      * is required.
-> > +      */
-> > +     err =3D ap_load_dhcp(ap, config, out_wait_dhcp);
-> > +     if (err)
-> > +             return err;
-> > +
-> > +     if (l_settings_get_value(config, "General", "Channel")) {
->
-> has_key might be better
-
-Yes.
-
->
-> > +             unsigned int uintval;
-> > +
-> > +             if (!l_settings_get_uint(config, "General", "Channel",
-> > +                                             &uintval) ||
-> > +                             !scan_channel_to_freq(uintval,
-> > +                                                     SCAN_BAND_2_4_GHZ=
-)) {
-> > +                     l_error("AP Channel value unsupported");
-> > +                     return -EINVAL;
-> > +             }
-> > +
-> > +             ap->channel =3D uintval;
-> > +     } else
-> > +             /* TODO: Start a Get Survey to decide the channel */
-> > +             ap->channel =3D 6;
-> > +
-> > +     strval =3D l_settings_get_string(config, "WSC", "DeviceName");
-> > +     if (strval) {
-> > +             len =3D strlen(strval);
-> > +
-> > +             if (len > 32) {
-> > +                     l_error("AP WSC name length outside the [1, 32] r=
-ange");
-> > +                     return -EINVAL;
-> > +             }
-> > +
-> > +             if (L_WARN_ON(!l_utf8_validate(strval, len, NULL)))
-> > +                     return -EINVAL;
->
-> l_error?
+> Maybe mention the need for this line in the docs?
 
 Ok.
 
+>  Or alternatively... Do we
+> even need the ability to turn of dhcp per profile?  Isn't
+> EnableNetworkConfiguration enough?
+
+I don't know, I'd leave that option in (in some form), I'm not sure if
+the whole profile thing was motivated by an existing request or an
+expectation of future use cases.
+
 Best regards
---===============2872272299762445936==--
+--===============8069010596825641456==--
 
