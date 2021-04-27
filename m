@@ -1,241 +1,168 @@
-Content-Type: multipart/mixed; boundary="===============6319402990325019675=="
+Content-Type: multipart/mixed; boundary="===============5807843454199421711=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/7] ft: factor out various parsing routines
-Date: Tue, 27 Apr 2021 12:49:40 -0700
-Message-ID: <20210427194945.49731-2-prestwoj@gmail.com>
+Subject: [PATCH 3/7] ft: expose ft_build_authenticate_ies
+Date: Tue, 27 Apr 2021 12:49:41 -0700
+Message-ID: <20210427194945.49731-3-prestwoj@gmail.com>
 In-Reply-To: <20210427194945.49731-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6319402990325019675==
+--===============5807843454199421711==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Break up the rather large code block which parses out IEs,
-verifies, and sets into the handshake. FT-over-DS needs these
-steps broken up in order to parse the action frame response
-without modifying the handshake.
+The building of the FT IEs for Action/Authenticate
+frames will need to be shared between ft and netdev
+once FT-over-DS is refactored.
+
+The building was refactored to work off the callers
+buffer rather than internal stack buffers. An argument
+'new_snonce' was included as FT-over-DS will generate
+a new snonce for the initial action frame, hence the
+handshakes snonce cannot be used.
 ---
- src/ft.c | 141 ++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 93 insertions(+), 48 deletions(-)
+ src/ft.c | 62 +++++++++++++++++++++++++++++++-------------------------
+ src/ft.h |  4 ++++
+ 2 files changed, 38 insertions(+), 28 deletions(-)
 
 diff --git a/src/ft.c b/src/ft.c
-index 2c58787d..698170cc 100644
+index 698170cc..80782a58 100644
 --- a/src/ft.c
 +++ b/src/ft.c
-@@ -329,19 +329,14 @@ error:
- 	return -EINVAL;
+@@ -724,19 +724,16 @@ static void ft_sm_free(struct auth_proto *ap)
+ 	l_free(ft);
  }
  =
 
--static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
--			size_t ies_len)
-+static int ft_parse_ies(const uint8_t *ies, size_t ies_len,
-+			const uint8_t **rsne_out, const uint8_t **mde_out,
-+			const uint8_t **fte_out)
+-static bool ft_start(struct auth_proto *ap)
++bool ft_build_authenticate_ies(struct handshake_state *hs,
++				const uint8_t *new_snonce, uint8_t *buf,
++				size_t *len)
  {
- 	struct ie_tlv_iter iter;
- 	const uint8_t *rsne =3D NULL;
- 	const uint8_t *mde =3D NULL;
- 	const uint8_t *fte =3D NULL;
--	uint32_t kck_len =3D handshake_state_get_kck_len(hs);
--	bool is_rsn;
+-	struct ft_sm *ft =3D l_container_of(ap, struct ft_sm, ap);
+-	struct handshake_state *hs =3D ft->hs;
+ 	uint32_t kck_len =3D handshake_state_get_kck_len(hs);
+ 	bool is_rsn =3D hs->supplicant_ie !=3D NULL;
+-	uint8_t mde[5];
+-	struct iovec iov[3];
+-	size_t iov_elems =3D 0;
++	uint8_t *ptr =3D buf;
+ =
+
+ 	if (is_rsn) {
+ 		struct ie_rsn_info rsn_info;
+-		uint8_t *rsne;
+ =
+
+ 		/*
+ 		 * Rebuild the RSNE to include the PMKR0Name and append
+@@ -757,26 +754,18 @@ static bool ft_start(struct auth_proto *ap)
+ 		rsn_info.num_pmkids =3D 1;
+ 		rsn_info.pmkids =3D hs->pmk_r0_name;
+ =
+
+-		rsne =3D alloca(256);
+-		ie_build_rsne(&rsn_info, rsne);
 -
--	/* Check 802.11r IEs */
--	if (!ies)
--		goto ft_error;
- =
-
- 	ie_tlv_iter_init(&iter, ies, ies_len);
- =
-
-@@ -370,8 +365,24 @@ static int ft_process_ies(struct handshake_state *hs, =
-const uint8_t *ies,
- 		}
+-		iov[iov_elems].iov_base =3D rsne;
+-		iov[iov_elems].iov_len =3D rsne[1] + 2;
+-		iov_elems +=3D 1;
++		ie_build_rsne(&rsn_info, ptr);
++		ptr +=3D ptr[1] + 2;
  	}
  =
 
--	is_rsn =3D hs->supplicant_ie !=3D NULL;
-+	if (rsne_out)
-+		*rsne_out =3D rsne;
+ 	/* The MDE advertised by the BSS must be passed verbatim */
+-	mde[0] =3D IE_TYPE_MOBILITY_DOMAIN;
+-	mde[1] =3D 3;
+-	memcpy(mde + 2, hs->mde + 2, 3);
+-
+-	iov[iov_elems].iov_base =3D mde;
+-	iov[iov_elems].iov_len =3D 5;
+-	iov_elems +=3D 1;
++	ptr[0] =3D IE_TYPE_MOBILITY_DOMAIN;
++	ptr[1] =3D 3;
++	memcpy(ptr + 2, hs->mde + 2, 3);
++	ptr +=3D 5;
+ =
+
+ 	if (is_rsn) {
+ 		struct ie_ft_info ft_info;
+-		uint8_t *fte;
+ =
+
+ 		/*
+ 		 * 12.8.2: "If present, the FTE shall be set as follows:
+@@ -793,17 +782,34 @@ static bool ft_start(struct auth_proto *ap)
+ 		memcpy(ft_info.r0khid, hs->r0khid, hs->r0khid_len);
+ 		ft_info.r0khid_len =3D hs->r0khid_len;
+ =
+
+-		memcpy(ft_info.snonce, hs->snonce, 32);
++		memcpy(ft_info.snonce, new_snonce, 32);
+ =
+
+-		fte =3D alloca(256);
+-		ie_build_fast_bss_transition(&ft_info, kck_len, fte);
++		ie_build_fast_bss_transition(&ft_info, kck_len, ptr);
+ =
+
+-		iov[iov_elems].iov_base =3D fte;
+-		iov[iov_elems].iov_len =3D fte[1] + 2;
+-		iov_elems +=3D 1;
++		ptr +=3D ptr[1] + 2;
+ 	}
+ =
+
+-	ft->tx_auth(iov, iov_elems, ft->user_data);
++	if (len)
++		*len =3D ptr - buf;
 +
-+	if (mde_out)
-+		*mde_out =3D mde;
-+
-+	if (fte_out)
-+		*fte_out =3D fte;
-+
-+	return 0;
- =
-
-+ft_error:
-+	return -EINVAL;
-+}
-+
-+static bool ft_verify_rsne(const uint8_t *rsne, const uint8_t *pmk_r0_name,
-+				const uint8_t *authenticator_ie)
-+{
- 	/*
- 	 * In an RSN, check for an RSNE containing the PMK-R0-Name and
- 	 * the remaining fields same as in the advertised RSNE.
-@@ -385,36 +396,31 @@ static int ft_process_ies(struct handshake_state *hs,=
- const uint8_t *ies,
- 	 * =E2=80=94 All other fields shall be identical to the contents of the
- 	 *   RSNE advertised by the AP in Beacon and Probe Response frames."
- 	 */
--	if (is_rsn) {
--		struct ie_rsn_info msg2_rsne;
- =
-
--		if (!rsne)
--			goto ft_error;
-+	struct ie_rsn_info msg2_rsne;
- =
-
--		if (ie_parse_rsne_from_data(rsne, rsne[1] + 2,
-+	if (!rsne)
-+		return false;
-+
-+	if (ie_parse_rsne_from_data(rsne, rsne[1] + 2,
- 						&msg2_rsne) < 0)
--			goto ft_error;
-+		return false;
- =
-
--		if (msg2_rsne.num_pmkids !=3D 1 ||
--				memcmp(msg2_rsne.pmkids, hs->pmk_r0_name, 16))
--			goto ft_error;
-+	if (msg2_rsne.num_pmkids !=3D 1 ||
-+				memcmp(msg2_rsne.pmkids, pmk_r0_name, 16))
-+		return false;
- =
-
--		if (!handshake_util_ap_ie_matches(rsne, hs->authenticator_ie,
--							false))
--			goto ft_error;
--	} else if (rsne)
--		goto ft_error;
-+	if (!handshake_util_ap_ie_matches(rsne, authenticator_ie, false))
-+		return false;
- =
-
--	/*
--	 * Check for an MD IE identical to the one we sent in message 1
--	 *
--	 * 12.8.3: "The MDE shall contain the MDID and FT Capability and
--	 * Policy fields. This element shall be the same as the MDE
--	 * advertised by the target AP in Beacon and Probe Response frames."
--	 */
--	if (!mde || memcmp(hs->mde, mde, hs->mde[1] + 2))
--		goto ft_error;
 +	return true;
 +}
- =
-
-+static bool ft_parse_fte(struct handshake_state *hs,
-+				const uint8_t *snonce,
-+				const uint8_t *fte,
-+				struct ie_ft_info *ft_info)
++
++static bool ft_start(struct auth_proto *ap)
 +{
- 	/*
- 	 * In an RSN, check for an FT IE with the same R0KH-ID and the same
- 	 * SNonce that we sent, and check that the R1KH-ID and the ANonce
-@@ -433,28 +439,67 @@ static int ft_process_ies(struct handshake_state *hs,=
- const uint8_t *ies,
- 	 *   of this sequence.
- 	 * =E2=80=94 All other fields shall be set to 0."
- 	 */
--	if (is_rsn) {
--		struct ie_ft_info ft_info;
--		uint8_t zeros[24] =3D {};
-+	uint8_t zeros[24] =3D {};
-+	uint32_t kck_len =3D handshake_state_get_kck_len(hs);
- =
-
--		if (!fte)
--			goto ft_error;
-+	if (!fte)
++	struct ft_sm *ft =3D l_container_of(ap, struct ft_sm, ap);
++	struct handshake_state *hs =3D ft->hs;
++	struct iovec iov;
++	uint8_t buf[512];
++	size_t len;
++
++	if (!ft_build_authenticate_ies(hs, hs->snonce, buf, &len))
 +		return false;
++
++	iov.iov_base =3D buf;
++	iov.iov_len =3D len;
++
++	ft->tx_auth(&iov, 1, ft->user_data);
  =
 
--		if (ie_parse_fast_bss_transition_from_data(fte, fte[1] + 2,
--						kck_len, &ft_info) < 0)
--			goto ft_error;
-+	if (ie_parse_fast_bss_transition_from_data(fte, fte[1] + 2,
-+					kck_len, ft_info) < 0)
-+		return false;
-+	if (ft_info->mic_element_count !=3D 0 ||
-+			memcmp(ft_info->mic, zeros, kck_len))
-+		return false;
-+	if (hs->r0khid_len !=3D ft_info->r0khid_len ||
-+			memcmp(hs->r0khid, ft_info->r0khid,
-+				hs->r0khid_len) ||
-+			!ft_info->r1khid_present)
-+		return false;
-+	if (memcmp(ft_info->snonce, snonce, 32))
-+		return false;
+ 	return true;
+ }
+diff --git a/src/ft.h b/src/ft.h
+index 6f6a7fd5..f24b3b5e 100644
+--- a/src/ft.h
++++ b/src/ft.h
+@@ -25,6 +25,10 @@ typedef void (*ft_tx_authenticate_func_t)(struct iovec *=
+iov, size_t iov_len,
+ typedef void (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_le=
+n,
+ 					void *user_data);
  =
 
--		if (ft_info.mic_element_count !=3D 0 ||
--				memcmp(ft_info.mic, zeros, kck_len))
--			goto ft_error;
-+	return true;
-+}
- =
-
--		if (hs->r0khid_len !=3D ft_info.r0khid_len ||
--				memcmp(hs->r0khid, ft_info.r0khid,
--					hs->r0khid_len) ||
--				!ft_info.r1khid_present)
-+static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
-+			size_t ies_len)
-+{
-+	const uint8_t *rsne =3D NULL;
-+	const uint8_t *mde =3D NULL;
-+	const uint8_t *fte =3D NULL;
-+	bool is_rsn;
++bool ft_build_authenticate_ies(struct handshake_state *hs,
++				const uint8_t *new_snonce, uint8_t *buf,
++				size_t *len);
 +
-+	/* Check 802.11r IEs */
-+	if (!ies)
-+		goto ft_error;
-+
-+	if (ft_parse_ies(ies, ies_len, &rsne, &mde, &fte) < 0)
-+		goto ft_error;
-+
-+	is_rsn =3D hs->supplicant_ie !=3D NULL;
-+
-+	if (is_rsn) {
-+		if (!ft_verify_rsne(rsne, hs->pmk_r0_name,
-+					hs->authenticator_ie))
- 			goto ft_error;
-+	} else if (rsne)
-+		goto ft_error;
- =
-
--		if (memcmp(ft_info.snonce, hs->snonce, 32))
-+	/*
-+	 * Check for an MD IE identical to the one we sent in message 1
-+	 *
-+	 * 12.8.3: "The MDE shall contain the MDID and FT Capability and
-+	 * Policy fields. This element shall be the same as the MDE
-+	 * advertised by the target AP in Beacon and Probe Response frames."
-+	 */
-+	if (!mde || memcmp(hs->mde, mde, hs->mde[1] + 2))
-+		goto ft_error;
-+
-+	if (is_rsn) {
-+		struct ie_ft_info ft_info;
-+
-+		if (!ft_parse_fte(hs, hs->snonce, fte, &ft_info))
- 			goto ft_error;
- =
-
- 		handshake_state_set_fte(hs, fte);
+ struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
+ 				ft_tx_authenticate_func_t tx_auth,
+ 				ft_tx_associate_func_t tx_assoc,
 -- =
 
 2.26.2
 
---===============6319402990325019675==--
+--===============5807843454199421711==--
 
