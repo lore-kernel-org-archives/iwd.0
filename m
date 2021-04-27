@@ -1,44 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============8723733232621081621=="
+Content-Type: multipart/mixed; boundary="===============1577178322019016515=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2] station: transition to disconnected on station_free
-Date: Tue, 27 Apr 2021 15:01:22 -0700
-Message-ID: <20210427220122.69865-1-prestwoj@gmail.com>
+Subject: [PATCH 1/2] netdev: only call connect_ok in station mode
+Date: Tue, 27 Apr 2021 16:08:51 -0700
+Message-ID: <20210427230852.94957-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8723733232621081621==
+--===============1577178322019016515==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows station to gracefully clean up things like the diagnostic
-interface which is directly tied to stations CONNECTED/DISCONNECTED
-states.
+netdev_connect_ok is only for station mode but AP also
+ends up on the same code path. Check the iftype before
+calling netdev_connect_ok.
 ---
- src/station.c | 2 ++
- 1 file changed, 2 insertions(+)
+ src/netdev.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-v2:
- * Move out of the netdev watch and into station_free
-
-diff --git a/src/station.c b/src/station.c
-index 9c2b4e64..325175e9 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3486,6 +3486,8 @@ static void station_free(struct station *station)
- 	if (station->connected_bss)
- 		netdev_disconnect(station->netdev, NULL, NULL);
+diff --git a/src/netdev.c b/src/netdev.c
+index 252ae78a..0feb9e66 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1337,7 +1337,8 @@ static void try_handshake_complete(struct netdev_hand=
+shake_state *nhs)
+ 		nhs->complete =3D true;
+ 		handshake_event(&nhs->super, HANDSHAKE_EVENT_COMPLETE);
  =
 
-+	station_enter_state(station, STATION_STATE_DISCONNECTED);
-+
- 	if (station->netconfig) {
- 		netconfig_destroy(station->netconfig);
- 		station->netconfig =3D NULL;
+-		netdev_connect_ok(nhs->netdev);
++		if (nhs->netdev->type =3D=3D NL80211_IFTYPE_STATION)
++			netdev_connect_ok(nhs->netdev);
+ 	}
+ }
+ =
+
 -- =
 
 2.26.2
 
---===============8723733232621081621==--
+--===============1577178322019016515==--
 
