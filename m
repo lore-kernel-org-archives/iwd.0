@@ -1,127 +1,100 @@
-Content-Type: multipart/mixed; boundary="===============4060661455994569885=="
+Content-Type: multipart/mixed; boundary="===============4472587802688750436=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/3] doc: Update iwd.ap(5) man page
-Date: Tue, 27 Apr 2021 01:34:08 +0200
-Message-ID: <20210426233408.775576-3-andrew.zaborowski@intel.com>
-In-Reply-To: <20210426233408.775576-1-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] network: copy station_has_erp_identity
+Date: Tue, 27 Apr 2021 11:06:24 -0700
+Message-ID: <20210427180626.40974-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4060661455994569885==
+--===============4472587802688750436==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Try to document some of the settings moved from struct ap_config to the
-settings object now passed to ap_start(), skip the strictly internal-use
-ones.
+This API is internal to station, but acts only on the network
+object so it is being moved into network.c and exposed.
 ---
- src/iwd.ap.rst | 60 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 59 insertions(+), 1 deletion(-)
+ src/network.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ src/network.h |  2 ++
+ 2 files changed, 43 insertions(+)
 
-diff --git a/src/iwd.ap.rst b/src/iwd.ap.rst
-index d4534120..51622509 100644
---- a/src/iwd.ap.rst
-+++ b/src/iwd.ap.rst
-@@ -41,6 +41,23 @@ SETTINGS
- The settings are split into several categories.  Each category has a group
- associated with it and is described in the corresponding table below.
+diff --git a/src/network.c b/src/network.c
+index 53fc98a1..8b68f9e1 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -50,6 +50,7 @@
+ #include "src/network.h"
+ #include "src/blacklist.h"
+ #include "src/util.h"
++#include "src/erp.h"
  =
 
-+General Settings
-+----------------
-+
-+The group ``[General]`` contains general AP configuration.
-+
-+.. list-table::
-+   :header-rows: 0
-+   :stub-columns: 0
-+   :widths: 20 80
-+   :align: left
-+
-+   * - Channel
-+     - Channel number
-+
-+       Optional channel number for the access point to operate on.  Only t=
-he
-+       2.4GHz-band channels are currently allowed.
-+
- Network Authentication Settings
- -------------------------------
+ static uint32_t known_networks_watch;
+ static uint32_t anqp_watch;
+@@ -720,6 +721,46 @@ static bool match_bss(const void *a, const void *b)
+ 	return a =3D=3D b;
+ }
  =
 
-@@ -56,7 +73,14 @@ configuration.
-    * - Passphrase
-      - 8..63 character string
++bool network_has_erp_identity(struct network *network)
++{
++	struct erp_cache_entry *cache;
++	struct l_settings *settings;
++	char *check_id;
++	const char *identity;
++	bool ret;
++
++	settings =3D network_get_settings(network);
++	if (!settings)
++		return false;
++
++	check_id =3D l_settings_get_string(settings, "Security", "EAP-Identity");
++	if (!check_id)
++		return false;
++
++	cache =3D erp_cache_get(network_get_ssid(network));
++	if (!cache) {
++		l_free(check_id);
++		return false;
++	}
++
++	identity =3D erp_cache_entry_get_identity(cache);
++
++	ret =3D strcmp(check_id, identity) =3D=3D 0;
++
++	l_free(check_id);
++	erp_cache_put(cache);
++
++	/*
++	 * The settings file must have change out from under us. In this
++	 * case we want to remove the ERP entry because it is no longer
++	 * valid.
++	 */
++	if (!ret)
++		erp_cache_remove(identity);
++
++	return ret;
++}
++
+ struct scan_bss *network_bss_select(struct network *network,
+ 						bool fallback_to_blacklist)
+ {
+diff --git a/src/network.h b/src/network.h
+index 17890496..84fc4fba 100644
+--- a/src/network.h
++++ b/src/network.h
+@@ -79,3 +79,5 @@ void network_blacklist_add(struct network *network, struc=
+t scan_bss *bss);
  =
 
--       WPA-PSK Passphrase to be used with this access point.
-+       WPA-PSK Passphrase to be used with this access point.  At least one=
- of
-+       *Passphrase*, *PreSharedKey* must be present.
+ const struct iovec *network_get_extra_ies(struct network *network,
+ 						size_t *num_elems);
 +
-+   * - PreSharedKey
-+     - 64-character hex-string
-+
-+       Processed passphrase for this network in the form of a hex-encoded
-+       32-byte pre-shared key.  Either this or *Passphrase* must be presen=
-t.
- =
-
- IPv4 Network Configuration
- --------------------------
-@@ -117,6 +141,40 @@ is desired, the group header line must still be presen=
-t:
-        From and to addresses of the range assigned to clients through DHCP.
-        If not provided the range from local address + 1 to .254 will be us=
-ed.
- =
-
-+Wi-Fi Simple Configuration
-+--------------------------
-+
-+The group ``[WSC]`` fine-tunes some Wi-Fi Simple Configuration local param=
-eters
-+(formerly known as WPS, Wi-Fi Protected Setup.)
-+
-+.. list-table::
-+   :header-rows: 0
-+   :stub-columns: 0
-+   :widths: 20 80
-+   :align: left
-+
-+   * - DeviceName
-+     - 1..32-character string
-+
-+       Optional Device Name string for the AP to advertise as.  Defaults to
-+       the SSID.
-+
-+   * - PrimaryDeviceType
-+     - Subcategory string or a 64-bit integer
-+
-+       Optional Primary Device Type for the AP to advertise as.  Defaults =
-to
-+       PC computer.  Can be specified as a lower-case WSC v2.0.5 subcatego=
-ry
-+       string or a 64-bit integer encoding, from MSB to LSB: the 16-bit
-+       category ID, the 24-bit OUI, the 8-bit OUI type and the 16-bit
-+       subcategory ID.
-+
-+   * - AuthorizedMACs
-+     - Comma-separated MAC address list
-+
-+       Optional list of Authorized MAC addresses for the WSC registrar to
-+       check on association.  Each address is specified in the
-+       colon-hexadecimal notation.  Defaults to no MAC-based checks.
-+
- SEE ALSO
- =3D=3D=3D=3D=3D=3D=3D=3D
- =
-
++bool network_has_erp_identity(struct network *network);
 -- =
 
-2.27.0
+2.26.2
 
---===============4060661455994569885==--
+--===============4472587802688750436==--
 
