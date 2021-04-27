@@ -1,41 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============7198797138252944838=="
+Content-Type: multipart/mixed; boundary="===============8627457706329717930=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 1/3] station: transition to disconnected on station_free
-Date: Tue, 27 Apr 2021 16:34:50 -0700
-Message-ID: <20210427233452.97024-1-prestwoj@gmail.com>
+Subject: [PATCH v3 2/3] netdev: only call connect_ok in station/p2p_client mode
+Date: Tue, 27 Apr 2021 16:34:51 -0700
+Message-ID: <20210427233452.97024-2-prestwoj@gmail.com>
+In-Reply-To: <20210427233452.97024-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7198797138252944838==
+--===============8627457706329717930==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows station to gracefully clean up things like the diagnostic
-interface which is directly tied to stations CONNECTED/DISCONNECTED
-states.
+netdev_connect_ok is only for station/p2p_client modes but AP
+also ends up on the same code path. Check the iftype before
+calling netdev_connect_ok.
 ---
- src/station.c | 2 ++
- 1 file changed, 2 insertions(+)
+ src/netdev.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/src/station.c b/src/station.c
-index 9c2b4e64..325175e9 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3486,6 +3486,8 @@ static void station_free(struct station *station)
- 	if (station->connected_bss)
- 		netdev_disconnect(station->netdev, NULL, NULL);
+diff --git a/src/netdev.c b/src/netdev.c
+index 252ae78a..e9fa241f 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1337,7 +1337,9 @@ static void try_handshake_complete(struct netdev_hand=
+shake_state *nhs)
+ 		nhs->complete =3D true;
+ 		handshake_event(&nhs->super, HANDSHAKE_EVENT_COMPLETE);
  =
 
-+	station_enter_state(station, STATION_STATE_DISCONNECTED);
-+
- 	if (station->netconfig) {
- 		netconfig_destroy(station->netconfig);
- 		station->netconfig =3D NULL;
+-		netdev_connect_ok(nhs->netdev);
++		if (nhs->netdev->type =3D=3D NL80211_IFTYPE_STATION ||
++				nhs->netdev->type =3D=3D NL80211_IFTYPE_P2P_CLIENT)
++			netdev_connect_ok(nhs->netdev);
+ 	}
+ }
+ =
+
 -- =
 
 2.26.2
 
---===============7198797138252944838==--
+--===============8627457706329717930==--
 
