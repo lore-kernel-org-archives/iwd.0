@@ -1,168 +1,441 @@
-Content-Type: multipart/mixed; boundary="===============5807843454199421711=="
+Content-Type: multipart/mixed; boundary="===============6672089897217937089=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/7] ft: expose ft_build_authenticate_ies
-Date: Tue, 27 Apr 2021 12:49:41 -0700
-Message-ID: <20210427194945.49731-3-prestwoj@gmail.com>
+Subject: [PATCH 4/7] ft: create cache for FT-over-DS targets
+Date: Tue, 27 Apr 2021 12:49:42 -0700
+Message-ID: <20210427194945.49731-4-prestwoj@gmail.com>
 In-Reply-To: <20210427194945.49731-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5807843454199421711==
+--===============6672089897217937089==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The building of the FT IEs for Action/Authenticate
-frames will need to be shared between ft and netdev
-once FT-over-DS is refactored.
+FT-over-DS is being separated into two independent stages. The
+first of which is the processing of the action frame response.
+The cache will hold all the parsed information from the action
+frame and allow it to be retrieved at a later time when IWD
+needs to roam.
 
-The building was refactored to work off the callers
-buffer rather than internal stack buffers. An argument
-'new_snonce' was included as FT-over-DS will generate
-a new snonce for the initial action frame, hence the
-handshakes snonce cannot be used.
+Initial cache entires should be created when the action frame is
+being sent out. Once a response is received it can be parsed and
+the matching entry (if found) will be updated with the parsed
+IEs.
+
+ft_over_ds_entry_create will create a new entry and push it into
+the queue. Entries are found based on the supplicant address and
+authenticator address. From an API standpoint the current handshake
+and target BSS are passed in. Neither the handshake nor scan_bss
+are saved directly, but only the information needed to do FT.
+
+ft_over_ds_parse_action_response parses the action response from
+the AP, verifies, and updates the matching entry with the parsed
+IEs.
+
+ft_over_ds_prepare_handshake is the final step prior to
+Reassociation. This sets all the stored IEs, anonce, and KH IDs
+into the handshake and derives the new PTK.
 ---
- src/ft.c | 62 +++++++++++++++++++++++++++++++-------------------------
- src/ft.h |  4 ++++
- 2 files changed, 38 insertions(+), 28 deletions(-)
+ src/ft.c | 296 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/ft.h |  22 +++++
+ 2 files changed, 318 insertions(+)
 
 diff --git a/src/ft.c b/src/ft.c
-index 698170cc..80782a58 100644
+index 80782a58..d9387e9b 100644
 --- a/src/ft.c
 +++ b/src/ft.c
-@@ -724,19 +724,16 @@ static void ft_sm_free(struct auth_proto *ap)
- 	l_free(ft);
+@@ -32,6 +32,25 @@
+ #include "src/ft.h"
+ #include "src/mpdu.h"
+ #include "src/auth-proto.h"
++#include "src/scan.h"
++#include "src/util.h"
++#include "src/netdev.h"
++#include "src/module.h"
++
++struct ft_ds_info {
++	uint32_t ifindex;
++
++	uint8_t spa[6];
++	uint8_t aa[6];
++	uint8_t snonce[32];
++	uint8_t mde[3];
++	uint8_t *authenticator_ie;
++	uint8_t *fte;
++	void *user_data;
++	ft_over_ds_destroy_func_t destroy;
++
++	struct ie_ft_info ft_info;
++};
+ =
+
+ struct ft_sm {
+ 	struct auth_proto ap;
+@@ -43,6 +62,8 @@ struct ft_sm {
+ 	void *user_data;
+ };
+ =
+
++static struct l_queue *ft_over_ds_entries;
++
+ /*
+  * Calculate the MIC field of the FTE and write it directly to that FTE,
+  * assuming it was all zeros before.  See 12.8.4 and 12.8.5.
+@@ -462,6 +483,52 @@ static bool ft_parse_fte(struct handshake_state *hs,
+ 	return true;
  }
  =
 
--static bool ft_start(struct auth_proto *ap)
-+bool ft_build_authenticate_ies(struct handshake_state *hs,
-+				const uint8_t *new_snonce, uint8_t *buf,
-+				size_t *len)
++static bool ft_over_ds_process_ies(struct handshake_state *hs,
++					struct ft_ds_info *info,
++					const uint8_t *ies,
++					size_t ies_len)
++{
++	const uint8_t *rsne =3D NULL;
++	const uint8_t *mde =3D NULL;
++	const uint8_t *fte =3D NULL;
++	bool is_rsn;
++
++	if (ft_parse_ies(ies, ies_len, &rsne, &mde, &fte) < 0)
++		return false;
++
++	is_rsn =3D hs->supplicant_ie !=3D NULL;
++
++	if (is_rsn) {
++		if (!ft_verify_rsne(rsne, hs->pmk_r0_name,
++					info->authenticator_ie))
++			goto ft_error;
++	} else if (rsne)
++		goto ft_error;
++
++	/*
++	 * Check for an MD IE identical to the one we sent in message 1
++	 *
++	 * 12.8.3: "The MDE shall contain the MDID and FT Capability and
++	 * Policy fields. This element shall be the same as the MDE
++	 * advertised by the target AP in Beacon and Probe Response frames."
++	 */
++	if (!mde || memcmp(info->mde, mde + 2, sizeof(info->mde)))
++		goto ft_error;
++
++	if (is_rsn) {
++		if (!ft_parse_fte(hs, info->snonce, fte, &info->ft_info))
++			goto ft_error;
++
++		info->fte =3D l_memdup(fte, fte[1] + 2);
++	} else if (fte)
++		goto ft_error;
++
++	return true;
++
++ft_error:
++	return false;
++}
++
+ static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
+ 			size_t ies_len)
  {
--	struct ft_sm *ft =3D l_container_of(ap, struct ft_sm, ap);
--	struct handshake_state *hs =3D ft->hs;
- 	uint32_t kck_len =3D handshake_state_get_kck_len(hs);
- 	bool is_rsn =3D hs->supplicant_ie !=3D NULL;
--	uint8_t mde[5];
--	struct iovec iov[3];
--	size_t iov_elems =3D 0;
-+	uint8_t *ptr =3D buf;
+@@ -520,6 +587,221 @@ ft_error:
+ 	return -EBADMSG;
+ }
  =
 
- 	if (is_rsn) {
- 		struct ie_rsn_info rsn_info;
--		uint8_t *rsne;
- =
-
- 		/*
- 		 * Rebuild the RSNE to include the PMKR0Name and append
-@@ -757,26 +754,18 @@ static bool ft_start(struct auth_proto *ap)
- 		rsn_info.num_pmkids =3D 1;
- 		rsn_info.pmkids =3D hs->pmk_r0_name;
- =
-
--		rsne =3D alloca(256);
--		ie_build_rsne(&rsn_info, rsne);
--
--		iov[iov_elems].iov_base =3D rsne;
--		iov[iov_elems].iov_len =3D rsne[1] + 2;
--		iov_elems +=3D 1;
-+		ie_build_rsne(&rsn_info, ptr);
-+		ptr +=3D ptr[1] + 2;
- 	}
- =
-
- 	/* The MDE advertised by the BSS must be passed verbatim */
--	mde[0] =3D IE_TYPE_MOBILITY_DOMAIN;
--	mde[1] =3D 3;
--	memcpy(mde + 2, hs->mde + 2, 3);
--
--	iov[iov_elems].iov_base =3D mde;
--	iov[iov_elems].iov_len =3D 5;
--	iov_elems +=3D 1;
-+	ptr[0] =3D IE_TYPE_MOBILITY_DOMAIN;
-+	ptr[1] =3D 3;
-+	memcpy(ptr + 2, hs->mde + 2, 3);
-+	ptr +=3D 5;
- =
-
- 	if (is_rsn) {
- 		struct ie_ft_info ft_info;
--		uint8_t *fte;
- =
-
- 		/*
- 		 * 12.8.2: "If present, the FTE shall be set as follows:
-@@ -793,17 +782,34 @@ static bool ft_start(struct auth_proto *ap)
- 		memcpy(ft_info.r0khid, hs->r0khid, hs->r0khid_len);
- 		ft_info.r0khid_len =3D hs->r0khid_len;
- =
-
--		memcpy(ft_info.snonce, hs->snonce, 32);
-+		memcpy(ft_info.snonce, new_snonce, 32);
- =
-
--		fte =3D alloca(256);
--		ie_build_fast_bss_transition(&ft_info, kck_len, fte);
-+		ie_build_fast_bss_transition(&ft_info, kck_len, ptr);
- =
-
--		iov[iov_elems].iov_base =3D fte;
--		iov[iov_elems].iov_len =3D fte[1] + 2;
--		iov_elems +=3D 1;
-+		ptr +=3D ptr[1] + 2;
- 	}
- =
-
--	ft->tx_auth(iov, iov_elems, ft->user_data);
-+	if (len)
-+		*len =3D ptr - buf;
++struct ft_ds_finder {
++	const uint8_t *spa;
++	const uint8_t *aa;
++};
++
++static bool ft_over_ds_match(const void *a, const void *b)
++{
++	const struct ft_ds_info *info =3D a;
++	const struct ft_ds_finder *finder =3D b;
++
++	if (memcmp(finder->spa, info->spa, 6) !=3D 0)
++		return false;
++
++	/* handle only SPA match for remove all */
++	if (!finder->aa)
++		return true;
++
++	if (memcmp(finder->aa, info->aa, 6) !=3D 0)
++		return false;
 +
 +	return true;
 +}
 +
-+static bool ft_start(struct auth_proto *ap)
++static struct ft_ds_info *ft_over_ds_find(const uint8_t *spa, const uint8_=
+t *aa)
 +{
-+	struct ft_sm *ft =3D l_container_of(ap, struct ft_sm, ap);
-+	struct handshake_state *hs =3D ft->hs;
-+	struct iovec iov;
-+	uint8_t buf[512];
-+	size_t len;
++	struct ft_ds_finder finder;
 +
-+	if (!ft_build_authenticate_ies(hs, hs->snonce, buf, &len))
++	finder.spa =3D spa;
++	finder.aa =3D aa;
++
++	return l_queue_find(ft_over_ds_entries, ft_over_ds_match, &finder);
++}
++
++/*
++ * Creates an initial over-DS entry to be updated later when IE's are added
++ */
++bool ft_over_ds_entry_create(uint32_t ifindex, struct handshake_state *hs,
++				struct scan_bss *target,
++				const uint8_t *snonce, void *user_data,
++				ft_over_ds_destroy_func_t destroy)
++{
++	struct ft_ds_info *info;
++
++	if (ft_over_ds_find(hs->spa, target->addr))
 +		return false;
 +
-+	iov.iov_base =3D buf;
-+	iov.iov_len =3D len;
++	info =3D l_new(struct ft_ds_info, 1);
 +
-+	ft->tx_auth(&iov, 1, ft->user_data);
- =
-
- 	return true;
++	info->ifindex =3D ifindex;
++	memcpy(info->spa, hs->spa, 6);
++	memcpy(info->aa, target->addr, 6);
++	memcpy(info->mde, target->mde, sizeof(info->mde));
++	memcpy(info->snonce, snonce, 32);
++	info->user_data =3D user_data;
++	info->destroy =3D destroy;
++
++	info->authenticator_ie =3D l_memdup(hs->authenticator_ie,
++						hs->authenticator_ie[1] + 2);
++
++	l_queue_push_head(ft_over_ds_entries, info);
++
++	l_debug("Created FT entry SPA: "MAC" AA: "MAC, MAC_STR(info->spa),
++			MAC_STR(info->aa));
++
++	return true;
++}
++
++static void ft_over_ds_info_free(void *data)
++{
++	struct ft_ds_info *info =3D data;
++
++	if (info->destroy)
++		info->destroy(info->user_data);
++
++	if (info->authenticator_ie)
++		l_free(info->authenticator_ie);
++
++	if (info->fte)
++		l_free(info->fte);
++
++	l_free(info);
++}
++
++static bool ft_over_ds_remove(void *data, void *user_data)
++{
++	struct ft_ds_info *info =3D data;
++
++	if (memcmp(info->spa, user_data, 6) !=3D 0)
++		return false;
++
++	ft_over_ds_info_free(info);
++
++	return true;
++}
++
++bool ft_over_ds_entry_remove_all(const uint8_t *spa)
++{
++	l_queue_foreach_remove(ft_over_ds_entries, ft_over_ds_remove,
++					(void *)spa);
++
++	return true;
++}
++
++bool ft_over_ds_entry_remove(const uint8_t *spa, const uint8_t *aa)
++{
++	struct ft_ds_finder finder;
++
++	finder.spa =3D spa;
++	finder.aa =3D aa;
++
++	l_queue_remove_if(ft_over_ds_entries, ft_over_ds_match, &finder);
++
++	return true;
++}
++
++void *ft_over_ds_entry_get_userdata(const uint8_t *spa, const uint8_t *aa)
++{
++	struct ft_ds_info *info =3D ft_over_ds_find(spa, aa);
++
++	if (!info)
++		return NULL;
++
++	return info->user_data;
++}
++
++/*
++ * Updates an over-DS entry with the action response IE's. This will parse=
+ and
++ * verify the IEs, and remove the entry if invalid.
++ */
++static bool ft_over_ds_entry_update(struct ft_ds_info *info,
++				const uint8_t *ies, size_t ies_len)
++{
++	struct netdev *netdev;
++	struct handshake_state *hs;
++
++	netdev =3D netdev_find(info->ifindex);
++	if (!netdev) {
++		/* Netdev went away, remove all cached entries */
++		ft_over_ds_entry_remove_all(info->spa);
++		return false;
++	}
++
++	hs =3D netdev_get_handshake(netdev);
++
++	if (!ft_over_ds_process_ies(hs, info, ies, ies_len)) {
++		l_queue_remove(ft_over_ds_entries, info);
++		ft_over_ds_info_free(info);
++		return false;
++	}
++
++	return true;
++}
++
++int ft_over_ds_parse_action_response(uint8_t *spa, const uint8_t *frame,
++				size_t frame_len, const uint8_t **aa_out)
++{
++	struct ft_ds_info *info;
++	uint16_t status =3D 0;
++	const uint8_t *aa;
++
++	if (frame_len < 16)
++		goto parse_error;
++
++	/* Category FT */
++	if (frame[0] !=3D 6)
++		goto parse_error;
++
++	/* FT Action */
++	if (frame[1] !=3D 2)
++		goto parse_error;
++
++	if (memcmp(frame + 2, spa, 6))
++		goto parse_error;
++
++	aa =3D frame + 8;
++
++	info =3D ft_over_ds_find(spa, aa);
++	if (!info)
++		return -ENOENT;
++
++	if (!ft_over_ds_entry_update(info, frame + 16, frame_len - 16))
++		goto parse_error;
++
++	if (aa_out)
++		*aa_out =3D aa;
++
++	return 0;
++
++parse_error:
++	return (int)status;
++}
++
++bool ft_over_ds_prepare_handshake(struct handshake_state *hs,
++					struct scan_bss *target)
++{
++	struct ft_ds_info *info =3D ft_over_ds_find(hs->spa, target->addr);
++
++	if (!info)
++		return false;
++
++	memcpy(hs->snonce, info->snonce, sizeof(hs->snonce));
++
++	handshake_state_set_fte(hs, info->fte);
++
++	handshake_state_set_anonce(hs, info->ft_info.anonce);
++
++	handshake_state_set_kh_ids(hs, info->ft_info.r0khid,
++						info->ft_info.r0khid_len,
++						info->ft_info.r1khid);
++
++	handshake_state_derive_ptk(hs);
++
++	return true;
++}
++
+ static int ft_rx_action(struct auth_proto *ap, const uint8_t *frame,
+ 				size_t frame_len)
+ {
+@@ -850,3 +1132,17 @@ struct auth_proto *ft_over_ds_sm_new(struct handshake=
+_state *hs,
+ {
+ 	return ft_sm_new(hs, tx_auth, tx_assoc, false, user_data);
  }
++
++static int ft_init(void)
++{
++	ft_over_ds_entries =3D l_queue_new();
++
++	return 0;
++}
++
++static void ft_exit(void)
++{
++	l_queue_destroy(ft_over_ds_entries, ft_over_ds_info_free);
++}
++
++IWD_MODULE(ft, ft_init, ft_exit);
 diff --git a/src/ft.h b/src/ft.h
-index 6f6a7fd5..f24b3b5e 100644
+index f24b3b5e..27d91dd4 100644
 --- a/src/ft.h
 +++ b/src/ft.h
-@@ -25,6 +25,10 @@ typedef void (*ft_tx_authenticate_func_t)(struct iovec *=
-iov, size_t iov_len,
+@@ -20,15 +20,25 @@
+  *
+  */
+ =
+
++
++struct scan_bss;
++struct netdev;
++struct handshake_state;
++
+ typedef void (*ft_tx_authenticate_func_t)(struct iovec *iov, size_t iov_le=
+n,
+ 					void *user_data);
  typedef void (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_le=
 n,
  					void *user_data);
  =
 
-+bool ft_build_authenticate_ies(struct handshake_state *hs,
-+				const uint8_t *new_snonce, uint8_t *buf,
-+				size_t *len);
++typedef void (*ft_over_ds_destroy_func_t)(void *user_data);
++
+ bool ft_build_authenticate_ies(struct handshake_state *hs,
+ 				const uint8_t *new_snonce, uint8_t *buf,
+ 				size_t *len);
+ =
+
++int ft_over_ds_parse_action_response(uint8_t *spa, const uint8_t *frame,
++				size_t frame_len, const uint8_t **aa_out);
 +
  struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
  				ft_tx_authenticate_func_t tx_auth,
  				ft_tx_associate_func_t tx_assoc,
+@@ -38,3 +48,15 @@ struct auth_proto *ft_over_ds_sm_new(struct handshake_st=
+ate *hs,
+ 				ft_tx_authenticate_func_t tx_auth,
+ 				ft_tx_associate_func_t tx_assoc,
+ 				void *user_data);
++
++bool ft_over_ds_entry_create(uint32_t ifindex, struct handshake_state *hs,
++				struct scan_bss *target,
++				const uint8_t *snonce, void *user_data,
++				ft_over_ds_destroy_func_t destroy);
++bool ft_over_ds_entry_remove_all(const uint8_t *spa);
++bool ft_over_ds_entry_remove(const uint8_t *spa, const uint8_t *aa);
++
++void *ft_over_ds_entry_get_userdata(const uint8_t *spa, const uint8_t *aa);
++
++bool ft_over_ds_prepare_handshake(struct handshake_state *hs,
++					struct scan_bss *target);
 -- =
 
 2.26.2
 
---===============5807843454199421711==--
+--===============6672089897217937089==--
 
