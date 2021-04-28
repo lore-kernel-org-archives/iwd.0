@@ -1,51 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============6608336097542087487=="
+Content-Type: multipart/mixed; boundary="===============6069668995477276045=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] netdev: zero out diagnostic info
-Date: Wed, 28 Apr 2021 11:24:35 -0500
-Message-ID: <ff2c412d-fa5d-45cc-bb3d-d97c147af67a@gmail.com>
-In-Reply-To: <20210428162113.141720-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/3] ap: Drop struct ap_config in favor of l_settings
+Date: Wed, 28 Apr 2021 11:26:13 -0500
+Message-ID: <b9f63d9b-616f-eb45-c7a4-c6442cc04741@gmail.com>
+In-Reply-To: <20210426233408.775576-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6608336097542087487==
+--===============6069668995477276045==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Andrew,
 
-On 4/28/21 11:21 AM, James Prestwood wrote:
-> The info struct is on the stack which leads to the potential
-> for uninitialized data access. Zero out the info struct prior
-> to calling the get station callback:
+On 4/26/21 6:34 PM, Andrew Zaborowski wrote:
+> Change ap_start to load all of the AP configuration from a struct
+> l_settings, moving the 6 or so parameters from struct ap_config members
+> to the l_settings groups and keys.  This extends the ap profile concept
+> used for the DHCP settings.  ap_start callers create the l_settings
+> object and fill the values in it or read the settings in from a file.
 > =
 
-> =3D=3D141137=3D=3D Conditional jump or move depends on uninitialised valu=
-e(s)
-> =3D=3D141137=3D=3D    at 0x458A6F: diagnostic_info_to_dict (diagnostic.c:=
-109)
-> =3D=3D141137=3D=3D    by 0x41200B: station_get_diagnostic_cb (station.c:3=
-620)
-> =3D=3D141137=3D=3D    by 0x405BE1: netdev_get_station_cb (netdev.c:4783)
-> =3D=3D141137=3D=3D    by 0x4722F9: process_unicast (genl.c:994)
-> =3D=3D141137=3D=3D    by 0x4722F9: received_data (genl.c:1102)
-> =3D=3D141137=3D=3D    by 0x46F28B: io_callback (io.c:120)
-> =3D=3D141137=3D=3D    by 0x46E5AC: l_main_iterate (main.c:478)
-> =3D=3D141137=3D=3D    by 0x46E65B: l_main_run (main.c:525)
-> =3D=3D141137=3D=3D    by 0x46E65B: l_main_run (main.c:507)
-> =3D=3D141137=3D=3D    by 0x46E86B: l_main_run_with_signal (main.c:647)
-> =3D=3D141137=3D=3D    by 0x403EA8: main (main.c:490)
+> Since ap_setup_dhcp and ap_load_profile_and_dhcp no longer do the
+> settings file loading, they needed to be refactored and some issues were
+> fixed in their logic, e.g. l_dhcp_server_set_ip_address() was never
+> called when the "IP pool" was used.  Also the IP pool was previously only
+> used if the ap->config->profile was NULL and this didn't match what the
+> docs said:
+> "If [IPv4].Address is not provided and no IP address is set on the
+> interface prior to calling StartProfile the IP pool will be used."
 > ---
->   src/netdev.c | 2 ++
->   1 file changed, 2 insertions(+)
+>   src/ap.c  | 547 ++++++++++++++++++++++++++++++++----------------------
+>   src/ap.h  |  19 +-
+>   src/p2p.c |  53 ++++--
+>   3 files changed, 359 insertions(+), 260 deletions(-)
 > =
 
 
-Applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
 
---===============6608336097542087487==--
+--===============6069668995477276045==--
 
