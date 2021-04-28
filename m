@@ -1,72 +1,91 @@
-Content-Type: multipart/mixed; boundary="===============3730999803512832288=="
+Content-Type: multipart/mixed; boundary="===============2422156252656712984=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 3/3] ap: set link/operstate on AP start/stop
-Date: Tue, 27 Apr 2021 16:34:52 -0700
-Message-ID: <20210427233452.97024-3-prestwoj@gmail.com>
-In-Reply-To: <20210427233452.97024-1-prestwoj@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH] ap: Deduplicate writing authorized MACs into wsc_* structs
+Date: Wed, 28 Apr 2021 17:48:37 +0200
+Message-ID: <20210428154838.1346865-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3730999803512832288==
+--===============2422156252656712984==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Prior to this netdev_connect_ok set setting this which really
-only applies to station mode. In addition this happens for each
-new station that connects to the AP. Instead set the operstate /
-link mode when AP starts and stops.
 ---
- src/ap.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ src/ap.c | 38 ++++++++++++++++++--------------------
+ 1 file changed, 18 insertions(+), 20 deletions(-)
 
 diff --git a/src/ap.c b/src/ap.c
-index 46821c04..89a05b8c 100644
+index f55341e8..31d3dfc2 100644
 --- a/src/ap.c
 +++ b/src/ap.c
-@@ -28,6 +28,7 @@
- #include <linux/if_ether.h>
- #include <netinet/in.h>
- #include <arpa/inet.h>
-+#include <linux/if.h>
+@@ -606,6 +606,20 @@ static void ap_process_wsc_probe_req(struct ap_state *=
+ap, const uint8_t *from,
+ 	}
+ }
  =
 
- #include <ell/ell.h>
- =
-
-@@ -3090,6 +3091,11 @@ static void ap_if_event_func(enum ap_event_type type=
-, const void *event_data,
- 		l_dbus_property_changed(dbus_get_bus(),
- 					netdev_get_path(ap_if->netdev),
- 					IWD_AP_INTERFACE, "Name");
++static void ap_write_authorized_macs(struct ap_state *ap,
++					size_t out_len, uint8_t *out)
++{
++	size_t len =3D ap->authorized_macs_num * 6;
 +
-+		l_rtnl_set_linkmode_and_operstate(rtnl,
-+					netdev_get_ifindex(ap_if->netdev),
-+					IF_LINK_MODE_DEFAULT, IF_OPER_UP,
-+					NULL, NULL, NULL);
- 		break;
- =
-
- 	case AP_EVENT_STOPPING:
-@@ -3104,6 +3110,11 @@ static void ap_if_event_func(enum ap_event_type type=
-, const void *event_data,
- 					netdev_get_path(ap_if->netdev),
- 					IWD_AP_INTERFACE, "Name");
- =
-
-+		l_rtnl_set_linkmode_and_operstate(rtnl,
-+					netdev_get_ifindex(ap_if->netdev),
-+					IF_LINK_MODE_DORMANT, IF_OPER_DOWN,
-+					NULL, NULL, NULL);
++	if (!len)
++		return;
 +
- 		if (!ap_if->pending)
- 			ap_if->ap =3D NULL;
++	if (len > out_len)
++		len =3D out_len;
++
++	memcpy(out, ap->authorized_macs, len);
++}
++
+ static size_t ap_get_wsc_ie_len(struct ap_state *ap,
+ 				enum mpdu_management_subtype type,
+ 				const struct mmpdu_header *client_frame,
+@@ -670,16 +684,8 @@ static size_t ap_write_wsc_ie(struct ap_state *ap,
+ 		wsc_pr.config_methods =3D
+ 			WSC_CONFIGURATION_METHOD_PUSH_BUTTON;
  =
 
+-		if (ap->authorized_macs_num) {
+-			size_t len =3D ap->authorized_macs_num * 6;
+-
+-			if (len > sizeof(wsc_pr.authorized_macs))
+-				len =3D sizeof(wsc_pr.authorized_macs);
+-
+-			memcpy(wsc_pr.authorized_macs,
+-				ap->authorized_macs, len);
+-		}
+-
++		ap_write_authorized_macs(ap, sizeof(wsc_pr.authorized_macs),
++						wsc_pr.authorized_macs);
+ 		wsc_data =3D wsc_build_probe_response(&wsc_pr, &wsc_data_size);
+ 	} else if (type =3D=3D MPDU_MANAGEMENT_SUBTYPE_BEACON) {
+ 		struct wsc_beacon wsc_beacon =3D {};
+@@ -694,16 +700,8 @@ static size_t ap_write_wsc_ie(struct ap_state *ap,
+ 				WSC_CONFIGURATION_METHOD_PUSH_BUTTON;
+ 		}
+ =
+
+-		if (ap->authorized_macs_num) {
+-			size_t len =3D ap->authorized_macs_num * 6;
+-
+-			if (len > sizeof(wsc_beacon.authorized_macs))
+-				len =3D sizeof(wsc_beacon.authorized_macs);
+-
+-			memcpy(wsc_beacon.authorized_macs,
+-				ap->authorized_macs, len);
+-		}
+-
++		ap_write_authorized_macs(ap, sizeof(wsc_beacon.authorized_macs),
++						wsc_beacon.authorized_macs);
+ 		wsc_data =3D wsc_build_beacon(&wsc_beacon, &wsc_data_size);
+ 	} else if (L_IN_SET(type, MPDU_MANAGEMENT_SUBTYPE_ASSOCIATION_RESPONSE,
+ 			MPDU_MANAGEMENT_SUBTYPE_REASSOCIATION_RESPONSE)) {
 -- =
 
-2.26.2
+2.27.0
 
---===============3730999803512832288==--
+--===============2422156252656712984==--
 
