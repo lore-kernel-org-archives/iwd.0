@@ -1,35 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============5769539295787938961=="
+Content-Type: multipart/mixed; boundary="===============0570163057221886593=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v3 2/3] netdev: only call connect_ok in station/p2p_client
- mode
-Date: Wed, 28 Apr 2021 11:36:21 -0500
-Message-ID: <f1d09290-21bf-57c4-316a-06eb196ec192@gmail.com>
-In-Reply-To: <20210427233452.97024-2-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/7] netdev: add user_data to netdev_send_action_frame[v]
+Date: Wed, 28 Apr 2021 14:16:39 -0500
+Message-ID: <207c70b7-450e-9996-375a-f4b84baf0a1c@gmail.com>
+In-Reply-To: <20210427194945.49731-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5769539295787938961==
+--===============0570163057221886593==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 4/27/21 6:34 PM, James Prestwood wrote:
-> netdev_connect_ok is only for station/p2p_client modes but AP
-> also ends up on the same code path. Check the iftype before
-> calling netdev_connect_ok.
+On 4/27/21 2:49 PM, James Prestwood wrote:
+> This makes this internal API a bit more usable by removing the
+> restriction of always having netdev as the user_data.
 > ---
->   src/netdev.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+>   src/netdev.c | 21 +++++++++++++--------
+>   1 file changed, 13 insertions(+), 8 deletions(-)
 > =
 
 
-Patch 2 & 3 applied, thanks.
+Patch 1-3 applied, thanks.
 
 Regards,
 -Denis
 
---===============5769539295787938961==--
+--===============0570163057221886593==--
 
