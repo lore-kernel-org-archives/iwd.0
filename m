@@ -1,15 +1,15 @@
-Content-Type: multipart/mixed; boundary="===============1954043200589698359=="
+Content-Type: multipart/mixed; boundary="===============9071234351494399604=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v4 1/2] station: tie diagnostic interface cleanup to
- DISCONNECTING
-Date: Wed, 28 Apr 2021 14:32:04 -0500
-Message-ID: <1e11c959-0f19-c5b4-da85-be684392225c@gmail.com>
-In-Reply-To: <20210428192701.149044-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v4 2/2] station: transition to disconnecting on
+ station_free
+Date: Wed, 28 Apr 2021 14:32:49 -0500
+Message-ID: <796e3c75-8f3e-601d-fdf3-c977117e58e1@gmail.com>
+In-Reply-To: <20210428192701.149044-2-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1954043200589698359==
+--===============9071234351494399604==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -17,27 +17,42 @@ Content-Transfer-Encoding: quoted-printable
 Hi James,
 
 On 4/28/21 2:27 PM, James Prestwood wrote:
-> Prior to this the diagnostic interface was taken down when station
-> transitioned to DISCONNECTED. This worked but once station is in
-> a DISCONNECTING state it then calls netdev_disconnect(). Trying to
-> get any diagnostic data during this time may not work as its
-> unknown what state exactly the kernel is in. To be safe take the
-> interface down when station is DISCONNECTING.
+> This allows station to gracefully clean up things like the diagnostic
+> interface which is directly tied to stations CONNECTED/DISCONNECTING
+> states.
 > ---
->   src/station.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
+>   src/station.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > =
 
 > v4:
->   * Added this patch since the diagnostic data really only is
->     relavant when station is connected.
+>   * Changed to DISCONNECTING due to new patch.
+> =
+
+> diff --git a/src/station.c b/src/station.c
+> index 0cee3525..c81c9a45 100644
+> --- a/src/station.c
+> +++ b/src/station.c
+> @@ -3487,6 +3487,8 @@ static void station_free(struct station *station)
+>   	if (station->connected_bss)
+>   		netdev_disconnect(station->netdev, NULL, NULL);
+>   =
+
+> +	station_enter_state(station, STATION_STATE_DISCONNECTING);
+> +
+
+I keep going back and forth on this, but I think it would be safer if we in=
+voked =
+
+unregister_interface directly.
+
+>   	if (station->netconfig) {
+>   		netconfig_destroy(station->netconfig);
+>   		station->netconfig =3D NULL;
 > =
 
 
-Applied, thanks.
-
 Regards,
 -Denis
-
---===============1954043200589698359==--
+--===============9071234351494399604==--
 
