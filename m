@@ -1,33 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============0570163057221886593=="
+Content-Type: multipart/mixed; boundary="===============7100739267403473779=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/7] netdev: add user_data to netdev_send_action_frame[v]
-Date: Wed, 28 Apr 2021 14:16:39 -0500
-Message-ID: <207c70b7-450e-9996-375a-f4b84baf0a1c@gmail.com>
-In-Reply-To: <20210427194945.49731-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v4 1/2] station: tie diagnostic interface cleanup to
+ DISCONNECTING
+Date: Wed, 28 Apr 2021 12:27:00 -0700
+Message-ID: <20210428192701.149044-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0570163057221886593==
+--===============7100739267403473779==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Prior to this the diagnostic interface was taken down when station
+transitioned to DISCONNECTED. This worked but once station is in
+a DISCONNECTING state it then calls netdev_disconnect(). Trying to
+get any diagnostic data during this time may not work as its
+unknown what state exactly the kernel is in. To be safe take the
+interface down when station is DISCONNECTING.
+---
+ src/station.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-On 4/27/21 2:49 PM, James Prestwood wrote:
-> This makes this internal API a bit more usable by removing the
-> restriction of always having netdev as the user_data.
-> ---
->   src/netdev.c | 21 +++++++++++++--------
->   1 file changed, 13 insertions(+), 8 deletions(-)
-> =
+v4:
+ * Added this patch since the diagnostic data really only is
+   relavant when station is connected.
 
+diff --git a/src/station.c b/src/station.c
+index 9c2b4e64..0cee3525 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1229,9 +1229,6 @@ static void station_enter_state(struct station *stati=
+on,
+ 		periodic_scan_stop(station);
+ 		break;
+ 	case STATION_STATE_DISCONNECTED:
+-		l_dbus_object_remove_interface(dbus_get_bus(),
+-					netdev_get_path(station->netdev),
+-					IWD_STATION_DIAGNOSTIC_INTERFACE);
+ 		periodic_scan_stop(station);
+ 		break;
+ 	case STATION_STATE_CONNECTED:
+@@ -1242,6 +1239,10 @@ static void station_enter_state(struct station *stat=
+ion,
+ 		periodic_scan_stop(station);
+ 		break;
+ 	case STATION_STATE_DISCONNECTING:
++		l_dbus_object_remove_interface(dbus_get_bus(),
++					netdev_get_path(station->netdev),
++					IWD_STATION_DIAGNOSTIC_INTERFACE);
++		break;
+ 	case STATION_STATE_ROAMING:
+ 		break;
+ 	}
+-- =
 
-Patch 1-3 applied, thanks.
+2.26.2
 
-Regards,
--Denis
-
---===============0570163057221886593==--
+--===============7100739267403473779==--
 
