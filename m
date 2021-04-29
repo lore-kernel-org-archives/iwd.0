@@ -1,183 +1,224 @@
-Content-Type: multipart/mixed; boundary="===============8900455097066642288=="
+Content-Type: multipart/mixed; boundary="===============8829609448087420281=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 1/7] ft: rework ft_parse_ies
-Date: Thu, 29 Apr 2021 14:43:05 -0700
-Message-ID: <20210429214311.216293-1-prestwoj@gmail.com>
+Subject: [PATCH v3 2/7] ft: create class for FT-over-DS targets
+Date: Thu, 29 Apr 2021 14:43:06 -0700
+Message-ID: <20210429214311.216293-2-prestwoj@gmail.com>
+In-Reply-To: <20210429214311.216293-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8900455097066642288==
+--===============8829609448087420281==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds the RSNE verification to ft_parse_ies which will
-be common between over-Air and over-DS.
+FT-over-DS is being separated into two independent stages. The
+first of which is the processing of the action frame response.
+This new class will hold all the parsed information from the action
+frame and allowing it to be retrieved at a later time when IWD
+needs to roam.
+
+Initial info class should be created when the action frame is
+being sent out. Once a response is received it can be parsed
+with ft_over_ds_parse_action_response. This verifies the frame
+and updates the ft_ds_info class with the parsed data.
+
+ft_over_ds_prepare_handshake is the final step prior to
+Reassociation. This sets all the stored IEs, anonce, and KH IDs
+into the handshake and derives the new PTK.
 ---
- src/ft.c | 102 +++++++++++++++++++++++++++----------------------------
- 1 file changed, 50 insertions(+), 52 deletions(-)
+ src/ft.c | 101 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/ft.h |  25 ++++++++++++++
+ 2 files changed, 126 insertions(+)
 
 diff --git a/src/ft.c b/src/ft.c
-index 85d2d369..cb374a08 100644
+index cb374a08..8ce56f14 100644
 --- a/src/ft.c
 +++ b/src/ft.c
-@@ -329,14 +329,52 @@ error:
- 	return -EINVAL;
+@@ -473,6 +473,43 @@ static bool ft_parse_fte(struct handshake_state *hs,
+ 	return true;
  }
  =
 
--static int ft_parse_ies(const uint8_t *ies, size_t ies_len,
--			const uint8_t **rsne_out, const uint8_t **mde_out,
-+static bool ft_verify_rsne(const uint8_t *rsne, const uint8_t *pmk_r0_name,
-+				const uint8_t *authenticator_ie)
++static bool ft_over_ds_process_ies(struct ft_ds_info *info,
++					struct handshake_state *hs,
++					const uint8_t *ies,
++					size_t ies_len)
 +{
++	const uint8_t *mde =3D NULL;
++	const uint8_t *fte =3D NULL;
++	bool is_rsn =3D hs->supplicant_ie !=3D NULL;
++
++	if (ft_parse_ies(hs, ies, ies_len, &mde, &fte) < 0)
++		return false;
++
 +	/*
-+	 * In an RSN, check for an RSNE containing the PMK-R0-Name and
-+	 * the remaining fields same as in the advertised RSNE.
++	 * Check for an MD IE identical to the one we sent in the initial
++	 * action frame.
 +	 *
-+	 * 12.8.3: "The RSNE shall be present only if dot11RSNAActivated
-+	 * is true. If present, the RSNE shall be set as follows:
-+	 * - Version field shall be set to 1.
-+	 * - PMKID Count field shall be set to 1.
-+	 * - PMKID List field shall be set to the value contained in the
-+	 *   first message of this sequence.
-+	 * - All other fields shall be identical to the contents of the
-+	 *   RSNE advertised by the AP in Beacon and Probe Response frames."
++	 * 12.8.3: "The MDE shall contain the MDID and FT Capability and
++	 * Policy fields. This element shall be the same as the MDE
++	 * advertised by the target AP in Beacon and Probe Response frames."
 +	 */
++	if (!mde || memcmp(info->mde, mde + 2, sizeof(info->mde)))
++		goto ft_error;
 +
-+	struct ie_rsn_info msg2_rsne;
++	if (is_rsn) {
++		if (!ft_parse_fte(hs, info->snonce, fte, &info->ft_info))
++			goto ft_error;
 +
-+	if (!rsne)
-+		return false;
++		info->fte =3D l_memdup(fte, fte[1] + 2);
++	} else if (fte)
++		goto ft_error;
 +
-+	if (ie_parse_rsne_from_data(rsne, rsne[1] + 2,
-+						&msg2_rsne) < 0)
-+		return false;
++	return true;
 +
-+	if (msg2_rsne.num_pmkids !=3D 1 ||
-+				memcmp(msg2_rsne.pmkids, pmk_r0_name, 16))
-+		return false;
++ft_error:
++	return false;
++}
 +
-+	if (!handshake_util_ap_ie_matches(rsne, authenticator_ie, false))
-+		return false;
+ static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
+ 			size_t ies_len)
+ {
+@@ -521,6 +558,59 @@ ft_error:
+ 	return -EBADMSG;
+ }
+ =
+
++int ft_over_ds_parse_action_response(struct ft_ds_info *info,
++					struct handshake_state *hs,
++					const uint8_t *frame, size_t frame_len)
++{
++	uint16_t status;
++
++	if (frame_len < 16)
++		return -EINVAL;
++
++	/* Category FT */
++	if (frame[0] !=3D 6)
++		return -EINVAL;
++
++	/* FT Action */
++	if (frame[1] !=3D 2)
++		return -EINVAL;
++
++	if (memcmp(frame + 2, info->spa, 6))
++		return -ENOENT;
++	if (memcmp(frame + 8, info->aa, 6))
++		return -ENOENT;
++
++	status =3D l_get_le16(frame + 14);
++	if (status !=3D 0)
++		return (int)status;
++
++	if (!ft_over_ds_process_ies(info, hs, frame + 16, frame_len - 16))
++		return -EBADMSG;
++
++	return 0;
++}
++
++bool ft_over_ds_prepare_handshake(struct ft_ds_info *info,
++					struct handshake_state *hs)
++{
++	if (!hs->supplicant_ie)
++		return true;
++
++	memcpy(hs->snonce, info->snonce, sizeof(hs->snonce));
++
++	handshake_state_set_fte(hs, info->fte);
++
++	handshake_state_set_anonce(hs, info->ft_info.anonce);
++
++	handshake_state_set_kh_ids(hs, info->ft_info.r0khid,
++						info->ft_info.r0khid_len,
++						info->ft_info.r1khid);
++
++	handshake_state_derive_ptk(hs);
 +
 +	return true;
 +}
 +
-+static int ft_parse_ies(struct handshake_state *hs,
-+			const uint8_t *ies, size_t ies_len,
-+			const uint8_t **mde_out,
- 			const uint8_t **fte_out)
+ static int ft_rx_action(struct auth_proto *ap, const uint8_t *frame,
+ 				size_t frame_len)
  {
- 	struct ie_tlv_iter iter;
- 	const uint8_t *rsne =3D NULL;
- 	const uint8_t *mde =3D NULL;
- 	const uint8_t *fte =3D NULL;
-+	bool is_rsn;
- =
-
- 	ie_tlv_iter_init(&iter, ies, ies_len);
- =
-
-@@ -365,8 +403,14 @@ static int ft_parse_ies(const uint8_t *ies, size_t ies=
-_len,
- 		}
- 	}
- =
-
--	if (rsne_out)
--		*rsne_out =3D rsne;
-+	is_rsn =3D hs->supplicant_ie !=3D NULL;
-+
-+	if (is_rsn) {
-+		if (!ft_verify_rsne(rsne, hs->pmk_r0_name,
-+					hs->authenticator_ie))
-+			goto ft_error;
-+	} else if (rsne)
-+		goto ft_error;
- =
-
- 	if (mde_out)
- 		*mde_out =3D mde;
-@@ -380,42 +424,6 @@ ft_error:
- 	return -EINVAL;
+@@ -549,6 +639,17 @@ auth_error:
+ 	return (int)status_code;
  }
  =
 
--static bool ft_verify_rsne(const uint8_t *rsne, const uint8_t *pmk_r0_name,
--				const uint8_t *authenticator_ie)
--{
--	/*
--	 * In an RSN, check for an RSNE containing the PMK-R0-Name and
--	 * the remaining fields same as in the advertised RSNE.
--	 *
--	 * 12.8.3: "The RSNE shall be present only if dot11RSNAActivated
--	 * is true. If present, the RSNE shall be set as follows:
--	 * - Version field shall be set to 1.
--	 * - PMKID Count field shall be set to 1.
--	 * - PMKID List field shall be set to the value contained in the
--	 *   first message of this sequence.
--	 * - All other fields shall be identical to the contents of the
--	 *   RSNE advertised by the AP in Beacon and Probe Response frames."
--	 */
--
--	struct ie_rsn_info msg2_rsne;
--
--	if (!rsne)
--		return false;
--
--	if (ie_parse_rsne_from_data(rsne, rsne[1] + 2,
--						&msg2_rsne) < 0)
--		return false;
--
--	if (msg2_rsne.num_pmkids !=3D 1 ||
--				memcmp(msg2_rsne.pmkids, pmk_r0_name, 16))
--		return false;
--
--	if (!handshake_util_ap_ie_matches(rsne, authenticator_ie, false))
--		return false;
--
--	return true;
--}
--
- static bool ft_parse_fte(struct handshake_state *hs,
- 				const uint8_t *snonce,
- 				const uint8_t *fte,
-@@ -468,25 +476,15 @@ static bool ft_parse_fte(struct handshake_state *hs,
- static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
- 			size_t ies_len)
++void ft_ds_info_free(struct ft_ds_info *info)
++{
++	__typeof__(info->free) destroy =3D info->free;
++
++	if (info->fte)
++		l_free(info->fte);
++
++	if (destroy)
++		destroy(info);
++}
++
+ static int ft_rx_authenticate(struct auth_proto *ap, const uint8_t *frame,
+ 				size_t frame_len)
  {
--	const uint8_t *rsne =3D NULL;
- 	const uint8_t *mde =3D NULL;
- 	const uint8_t *fte =3D NULL;
--	bool is_rsn;
-+	bool is_rsn =3D hs->supplicant_ie !=3D NULL;
+diff --git a/src/ft.h b/src/ft.h
+index f24b3b5e..907c3d5d 100644
+--- a/src/ft.h
++++ b/src/ft.h
+@@ -20,15 +20,37 @@
+  *
+  */
  =
 
- 	/* Check 802.11r IEs */
- 	if (!ies)
- 		goto ft_error;
++struct handshake_state;
++
+ typedef void (*ft_tx_authenticate_func_t)(struct iovec *iov, size_t iov_le=
+n,
+ 					void *user_data);
+ typedef void (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_le=
+n,
+ 					void *user_data);
  =
 
--	if (ft_parse_ies(ies, ies_len, &rsne, &mde, &fte) < 0)
--		goto ft_error;
--
--	is_rsn =3D hs->supplicant_ie !=3D NULL;
--
--	if (is_rsn) {
--		if (!ft_verify_rsne(rsne, hs->pmk_r0_name,
--					hs->authenticator_ie))
--			goto ft_error;
--	} else if (rsne)
-+	if (ft_parse_ies(hs, ies, ies_len, &mde, &fte) < 0)
- 		goto ft_error;
++typedef void (*ft_ds_free_func_t)(void *user_data);
++
++struct ft_ds_info {
++	uint8_t spa[6];
++	uint8_t aa[6];
++	uint8_t snonce[32];
++	uint8_t mde[3];
++	uint8_t *fte;
++
++	struct ie_ft_info ft_info;
++
++	void (*free)(struct ft_ds_info *s);
++};
++
++void ft_ds_info_free(struct ft_ds_info *info);
++
+ bool ft_build_authenticate_ies(struct handshake_state *hs,
+ 				const uint8_t *new_snonce, uint8_t *buf,
+ 				size_t *len);
  =
 
- 	/*
++int ft_over_ds_parse_action_response(struct ft_ds_info *info,
++					struct handshake_state *hs,
++					const uint8_t *frame, size_t frame_len);
++
+ struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
+ 				ft_tx_authenticate_func_t tx_auth,
+ 				ft_tx_associate_func_t tx_assoc,
+@@ -38,3 +60,6 @@ struct auth_proto *ft_over_ds_sm_new(struct handshake_sta=
+te *hs,
+ 				ft_tx_authenticate_func_t tx_auth,
+ 				ft_tx_associate_func_t tx_assoc,
+ 				void *user_data);
++
++bool ft_over_ds_prepare_handshake(struct ft_ds_info *info,
++					struct handshake_state *hs);
 -- =
 
 2.26.2
 
---===============8900455097066642288==--
+--===============8829609448087420281==--
 
