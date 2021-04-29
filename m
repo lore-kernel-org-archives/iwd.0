@@ -1,87 +1,156 @@
-Content-Type: multipart/mixed; boundary="===============6904901673078519845=="
+Content-Type: multipart/mixed; boundary="===============4206034041025959896=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 3/7] ft: separate over-air from over-ds initializers
-Date: Thu, 29 Apr 2021 14:43:07 -0700
-Message-ID: <20210429214311.216293-3-prestwoj@gmail.com>
+Subject: [PATCH v3 4/7] netdev: separate over-air and over-ds netdev APIs
+Date: Thu, 29 Apr 2021 14:43:08 -0700
+Message-ID: <20210429214311.216293-4-prestwoj@gmail.com>
 In-Reply-To: <20210429214311.216293-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6904901673078519845==
+--===============4206034041025959896==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/ft.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+ src/netdev.c | 68 ++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 39 insertions(+), 29 deletions(-)
 
-diff --git a/src/ft.c b/src/ft.c
-index 8ce56f14..3380f90f 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -916,10 +916,9 @@ static bool ft_start(struct auth_proto *ap)
- 	return true;
- }
- =
-
--static struct auth_proto *ft_sm_new(struct handshake_state *hs,
-+struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
- 				ft_tx_authenticate_func_t tx_auth,
- 				ft_tx_associate_func_t tx_assoc,
--				bool over_air,
- 				void *user_data)
+diff --git a/src/netdev.c b/src/netdev.c
+index 25891092..232d098d 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -3658,10 +3658,25 @@ static void prepare_ft(struct netdev *netdev, struc=
+t scan_bss *target_bss)
  {
- 	struct ft_sm *ft =3D l_new(struct ft_sm, 1);
-@@ -929,7 +928,7 @@ static struct auth_proto *ft_sm_new(struct handshake_st=
-ate *hs,
- 	ft->hs =3D hs;
- 	ft->user_data =3D user_data;
+ 	struct netdev_handshake_state *nhs;
  =
 
--	ft->ap.rx_authenticate =3D (over_air) ? ft_rx_authenticate : ft_rx_action;
-+	ft->ap.rx_authenticate =3D ft_rx_authenticate;
- 	ft->ap.rx_associate =3D ft_rx_associate;
- 	ft->ap.start =3D ft_start;
- 	ft->ap.free =3D ft_sm_free;
-@@ -937,18 +936,22 @@ static struct auth_proto *ft_sm_new(struct handshake_=
-state *hs,
- 	return &ft->ap;
++	/*
++	 * We reuse the handshake_state object and reset what's needed.
++	 * Could also create a new object and copy most of the state but
++	 * we would end up doing more work.
++	 */
++	memcpy(netdev->prev_snonce, netdev->handshake->snonce, 32);
++
+ 	memcpy(netdev->prev_bssid, netdev->handshake->aa, 6);
+ 	netdev->prev_frequency =3D netdev->frequency;
+ 	netdev->frequency =3D target_bss->frequency;
+ =
+
++	handshake_state_set_authenticator_address(netdev->handshake,
++							target_bss->addr);
++
++	if (target_bss->rsne)
++		handshake_state_set_authenticator_ie(netdev->handshake,
++							target_bss->rsne);
++	memcpy(netdev->handshake->mde + 2, target_bss->mde, 3);
++
+ 	netdev->associated =3D false;
+ 	netdev->operational =3D false;
+ 	netdev->in_ft =3D true;
+@@ -3809,8 +3824,7 @@ static const struct wiphy_radio_work_item_ops ft_work=
+_ops =3D {
+ 	.do_work =3D netdev_ft_work_ready,
+ };
+ =
+
+-static int fast_transition(struct netdev *netdev, struct scan_bss *target_=
+bss,
+-				bool over_air,
++int netdev_fast_transition(struct netdev *netdev, struct scan_bss *target_=
+bss,
+ 				netdev_connect_cb_t cb)
+ {
+ 	if (!netdev->operational)
+@@ -3823,32 +3837,13 @@ static int fast_transition(struct netdev *netdev, s=
+truct scan_bss *target_bss,
+ =
+
+ 	prepare_ft(netdev, target_bss);
+ =
+
+-	/*
+-	 * We reuse the handshake_state object and reset what's needed.
+-	 * Could also create a new object and copy most of the state but
+-	 * we would end up doing more work.
+-	 */
+-	memcpy(netdev->prev_snonce, netdev->handshake->snonce, 32);
+ 	handshake_state_new_snonce(netdev->handshake);
+ =
+
+-	handshake_state_set_authenticator_address(netdev->handshake,
+-							target_bss->addr);
+-
+-	if (target_bss->rsne)
+-		handshake_state_set_authenticator_ie(netdev->handshake,
+-							target_bss->rsne);
+-	memcpy(netdev->handshake->mde + 2, target_bss->mde, 3);
+-
+ 	netdev->connect_cb =3D cb;
+ =
+
+-	if (over_air)
+-		netdev->ap =3D ft_over_air_sm_new(netdev->handshake,
++	netdev->ap =3D ft_over_air_sm_new(netdev->handshake,
+ 					netdev_ft_tx_authenticate,
+ 					netdev_ft_tx_associate, netdev);
+-	else
+-		netdev->ap =3D ft_over_ds_sm_new(netdev->handshake,
+-					netdev_ft_over_ds_tx_authenticate,
+-					netdev_ft_tx_associate, netdev);
+ =
+
+ 	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
+ 				&ft_work_ops);
+@@ -3856,17 +3851,32 @@ static int fast_transition(struct netdev *netdev, s=
+truct scan_bss *target_bss,
+ 	return 0;
  }
  =
 
--struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
--				ft_tx_authenticate_func_t tx_auth,
--				ft_tx_associate_func_t tx_assoc,
--				void *user_data)
+-int netdev_fast_transition(struct netdev *netdev, struct scan_bss *target_=
+bss,
+-				netdev_connect_cb_t cb)
 -{
--	return ft_sm_new(hs, tx_auth, tx_assoc, true, user_data);
+-	return fast_transition(netdev, target_bss, true, cb);
 -}
 -
- struct auth_proto *ft_over_ds_sm_new(struct handshake_state *hs,
- 				ft_tx_authenticate_func_t tx_auth,
- 				ft_tx_associate_func_t tx_assoc,
- 				void *user_data)
+ int netdev_fast_transition_over_ds(struct netdev *netdev,
+ 					struct scan_bss *target_bss,
+ 					netdev_connect_cb_t cb)
  {
--	return ft_sm_new(hs, tx_auth, tx_assoc, false, user_data);
-+	struct ft_sm *ft =3D l_new(struct ft_sm, 1);
+-	return fast_transition(netdev, target_bss, false, cb);
++	if (!netdev->operational)
++		return -ENOTCONN;
 +
-+	ft->tx_assoc =3D tx_assoc;
-+	ft->tx_auth =3D tx_auth;
-+	ft->hs =3D hs;
-+	ft->user_data =3D user_data;
++	if (!netdev->handshake->mde || !target_bss->mde_present ||
++			l_get_le16(netdev->handshake->mde + 2) !=3D
++			l_get_le16(target_bss->mde))
++		return -EINVAL;
 +
-+	ft->ap.rx_authenticate =3D ft_rx_action;
-+	ft->ap.rx_associate =3D ft_rx_associate;
-+	ft->ap.start =3D ft_start;
-+	ft->ap.free =3D ft_sm_free;
++	prepare_ft(netdev, target_bss);
 +
-+	return &ft->ap;
++	handshake_state_new_snonce(netdev->handshake);
++
++	netdev->connect_cb =3D cb;
++
++	netdev->ap =3D ft_over_ds_sm_new(netdev->handshake,
++					netdev_ft_over_ds_tx_authenticate,
++					netdev_ft_tx_associate, netdev);
++
++	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
++				&ft_work_ops);
++
++	return 0;
  }
+ =
+
+ static void netdev_preauth_cb(const uint8_t *pmk, void *user_data)
 -- =
 
 2.26.2
 
---===============6904901673078519845==--
+--===============4206034041025959896==--
 
