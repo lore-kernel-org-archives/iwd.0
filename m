@@ -1,167 +1,183 @@
-Content-Type: multipart/mixed; boundary="===============5348780991921381702=="
+Content-Type: multipart/mixed; boundary="===============8900455097066642288=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 4/6] ft: netdev: refactor FT-over-DS into two stages
-Date: Thu, 29 Apr 2021 15:33:44 -0500
-Message-ID: <9d65f059-f3c9-9f30-4e59-09c1df2d5db9@gmail.com>
-In-Reply-To: <20210429194103.207447-4-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3 1/7] ft: rework ft_parse_ies
+Date: Thu, 29 Apr 2021 14:43:05 -0700
+Message-ID: <20210429214311.216293-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5348780991921381702==
+--===============8900455097066642288==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This adds the RSNE verification to ft_parse_ies which will
+be common between over-Air and over-DS.
+---
+ src/ft.c | 102 +++++++++++++++++++++++++++----------------------------
+ 1 file changed, 50 insertions(+), 52 deletions(-)
 
-On 4/29/21 2:41 PM, James Prestwood wrote:
-> FT-over-DS followed the same pattern as FT-over-Air which worked,
-> but really limited how the protocol could be used. FT-over-DS is
-> unique in that we can authenticate to many APs by sending out
-> FT action frames and parsing the results. Once parsed IWD can
-> immediately Reassociate, or do so at a later time.
-> =
+diff --git a/src/ft.c b/src/ft.c
+index 85d2d369..cb374a08 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -329,14 +329,52 @@ error:
+ 	return -EINVAL;
+ }
+ =
 
-> To take advantage of this IWD need to separate FT-over-DS into
-> two stages: action frame and reassociation.
-> =
+-static int ft_parse_ies(const uint8_t *ies, size_t ies_len,
+-			const uint8_t **rsne_out, const uint8_t **mde_out,
++static bool ft_verify_rsne(const uint8_t *rsne, const uint8_t *pmk_r0_name,
++				const uint8_t *authenticator_ie)
++{
++	/*
++	 * In an RSN, check for an RSNE containing the PMK-R0-Name and
++	 * the remaining fields same as in the advertised RSNE.
++	 *
++	 * 12.8.3: "The RSNE shall be present only if dot11RSNAActivated
++	 * is true. If present, the RSNE shall be set as follows:
++	 * - Version field shall be set to 1.
++	 * - PMKID Count field shall be set to 1.
++	 * - PMKID List field shall be set to the value contained in the
++	 *   first message of this sequence.
++	 * - All other fields shall be identical to the contents of the
++	 *   RSNE advertised by the AP in Beacon and Probe Response frames."
++	 */
++
++	struct ie_rsn_info msg2_rsne;
++
++	if (!rsne)
++		return false;
++
++	if (ie_parse_rsne_from_data(rsne, rsne[1] + 2,
++						&msg2_rsne) < 0)
++		return false;
++
++	if (msg2_rsne.num_pmkids !=3D 1 ||
++				memcmp(msg2_rsne.pmkids, pmk_r0_name, 16))
++		return false;
++
++	if (!handshake_util_ap_ie_matches(rsne, authenticator_ie, false))
++		return false;
++
++	return true;
++}
++
++static int ft_parse_ies(struct handshake_state *hs,
++			const uint8_t *ies, size_t ies_len,
++			const uint8_t **mde_out,
+ 			const uint8_t **fte_out)
+ {
+ 	struct ie_tlv_iter iter;
+ 	const uint8_t *rsne =3D NULL;
+ 	const uint8_t *mde =3D NULL;
+ 	const uint8_t *fte =3D NULL;
++	bool is_rsn;
+ =
 
-> The initial action frame stage is started by netdev. The target
-> BSS is sent an FT action frame and a new cache entry is created
-> in ft.c. Once the response is received the entry is updated
-> with all the needed data to Reassociate. To limit the record
-> keeping on netdev each FT-over-DS entry holds a userdata pointer
-> so netdev doesn't need to maintain its own list of data for
-> callbacks.
-> =
+ 	ie_tlv_iter_init(&iter, ies, ies_len);
+ =
 
-> Once the action response is parsed netdev will call back signalling
-> the action frame sequence was completed (either successfully or not).
-> At this point the 'normal' FT procedure can start using the
-> FT-over-DS auth-proto.
-> ---
->   src/ft.c     |  74 ++-----------------
->   src/ft.h     |   1 -
->   src/netdev.c | 203 ++++++++++++++++++++++++++++++++++++++++-----------
->   src/netdev.h |   8 ++
->   4 files changed, 176 insertions(+), 110 deletions(-)
-> =
+@@ -365,8 +403,14 @@ static int ft_parse_ies(const uint8_t *ies, size_t ies=
+_len,
+ 		}
+ 	}
+ =
 
+-	if (rsne_out)
+-		*rsne_out =3D rsne;
++	is_rsn =3D hs->supplicant_ie !=3D NULL;
++
++	if (is_rsn) {
++		if (!ft_verify_rsne(rsne, hs->pmk_r0_name,
++					hs->authenticator_ie))
++			goto ft_error;
++	} else if (rsne)
++		goto ft_error;
+ =
 
-<snip>
+ 	if (mde_out)
+ 		*mde_out =3D mde;
+@@ -380,42 +424,6 @@ ft_error:
+ 	return -EINVAL;
+ }
+ =
 
-> @@ -3719,44 +3732,58 @@ static void prepare_ft(struct netdev *netdev, str=
-uct scan_bss *target_bss)
->   	}
->   }
->   =
+-static bool ft_verify_rsne(const uint8_t *rsne, const uint8_t *pmk_r0_name,
+-				const uint8_t *authenticator_ie)
+-{
+-	/*
+-	 * In an RSN, check for an RSNE containing the PMK-R0-Name and
+-	 * the remaining fields same as in the advertised RSNE.
+-	 *
+-	 * 12.8.3: "The RSNE shall be present only if dot11RSNAActivated
+-	 * is true. If present, the RSNE shall be set as follows:
+-	 * - Version field shall be set to 1.
+-	 * - PMKID Count field shall be set to 1.
+-	 * - PMKID List field shall be set to the value contained in the
+-	 *   first message of this sequence.
+-	 * - All other fields shall be identical to the contents of the
+-	 *   RSNE advertised by the AP in Beacon and Probe Response frames."
+-	 */
+-
+-	struct ie_rsn_info msg2_rsne;
+-
+-	if (!rsne)
+-		return false;
+-
+-	if (ie_parse_rsne_from_data(rsne, rsne[1] + 2,
+-						&msg2_rsne) < 0)
+-		return false;
+-
+-	if (msg2_rsne.num_pmkids !=3D 1 ||
+-				memcmp(msg2_rsne.pmkids, pmk_r0_name, 16))
+-		return false;
+-
+-	if (!handshake_util_ap_ie_matches(rsne, authenticator_ie, false))
+-		return false;
+-
+-	return true;
+-}
+-
+ static bool ft_parse_fte(struct handshake_state *hs,
+ 				const uint8_t *snonce,
+ 				const uint8_t *fte,
+@@ -468,25 +476,15 @@ static bool ft_parse_fte(struct handshake_state *hs,
+ static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
+ 			size_t ies_len)
+ {
+-	const uint8_t *rsne =3D NULL;
+ 	const uint8_t *mde =3D NULL;
+ 	const uint8_t *fte =3D NULL;
+-	bool is_rsn;
++	bool is_rsn =3D hs->supplicant_ie !=3D NULL;
+ =
 
-> -static void netdev_ft_request_cb(struct l_genl_msg *msg, void *user_data)
-> +static void netdev_ft_over_ds_auth_failed(struct ft_ds_info *ft,
+ 	/* Check 802.11r IEs */
+ 	if (!ies)
+ 		goto ft_error;
+ =
 
-So really you might as well just pass netdev_ft... objects around..
+-	if (ft_parse_ies(ies, ies_len, &rsne, &mde, &fte) < 0)
+-		goto ft_error;
+-
+-	is_rsn =3D hs->supplicant_ie !=3D NULL;
+-
+-	if (is_rsn) {
+-		if (!ft_verify_rsne(rsne, hs->pmk_r0_name,
+-					hs->authenticator_ie))
+-			goto ft_error;
+-	} else if (rsne)
++	if (ft_parse_ies(hs, ies, ies_len, &mde, &fte) < 0)
+ 		goto ft_error;
+ =
 
-> +						uint16_t status)
->   {
-> -	struct netdev *netdev =3D user_data;
-> -	int err =3D l_genl_msg_get_error(msg);
-> +	struct netdev_ft_over_ds_info *info =3D l_container_of(ft,
-> +					struct netdev_ft_over_ds_info, super);
+ 	/*
+-- =
 
-to maybe avoid the need for the container_of.  Using the superclass pattern=
- here =
+2.26.2
 
-is fine, but it is actually overkill since we will not have any other types=
-.  So =
-
-even just ft_ds_info_init/ft_ds_info_deinit would be fine, but what you hav=
-e now =
-
-fine as well.
-
-> +	if (info->cb)
-> +		info->cb(info->netdev, status, info->super.aa, info->user_data);
->   =
-
-> -	if (err < 0) {
-> -		l_error("Could not send CMD_FRAME (%d)", err);
-> -		netdev_connect_failed(netdev,
-> -					NETDEV_RESULT_AUTHENTICATION_FAILED,
-> -					MMPDU_STATUS_CODE_UNSPECIFIED);
-> -	}
-> +	ft_ds_info_free(ft);
-> +
-> +	info->netdev->ft_ds_info =3D NULL;
->   }
->   =
-
->   static void netdev_ft_response_frame_event(const struct mmpdu_header *h=
-dr,
->   					const void *body, size_t body_len,
->   					int rssi, void *user_data)
->   {
-> +	struct netdev *netdev =3D user_data;
-> +	struct ft_ds_info *ft;
-> +	struct netdev_ft_over_ds_info *info;
->   	int ret;
->   	uint16_t status_code =3D MMPDU_STATUS_CODE_UNSPECIFIED;
-> -	struct netdev *netdev =3D user_data;
->   =
-
-> -	if (!netdev->ap || !netdev->in_ft)
-> +	if (!netdev->ft_ds_info)
->   		return;
->   =
-
-> -	ret =3D auth_proto_rx_authenticate(netdev->ap, body, body_len);
-> +	ft =3D netdev->ft_ds_info;
-> +	info =3D l_container_of(ft, struct netdev_ft_over_ds_info, super);
-
-isn't just &ft_ds_info->super simpler?
-
-> +
-> +	l_timeout_remove(info->timeout);
-> +	info->timeout =3D NULL;
-> +
-> +	ret =3D ft_over_ds_parse_action_response(ft, netdev->handshake,
-> +						body, body_len);
-
-So how do you know it isn't just a rogue frame?
-
->   	if (ret < 0)
-> -		goto ft_error;
-> -	else if (ret > 0) {
-> +		return;
-> +
-> +	/* Now make sure the packet contained a success status code */
-> +	if (ret > 0) {
->   		status_code =3D (uint16_t)ret;
->   		goto ft_error;
->   	}
->   =
-
-> +	if (info->cb)
-> +		info->cb(netdev, 0, info->super.aa, info->user_data);
-> +
->   	return;
->   =
-
->   ft_error:
-> -	netdev_connect_failed(netdev, NETDEV_RESULT_AUTHENTICATION_FAILED,
-> -				status_code);
-> -	return;
-> +	l_debug("FT-over-DS to "MAC" failed", MAC_STR(info->super.aa));
-> +
-> +	netdev_ft_over_ds_auth_failed(ft, status_code);
->   }
->   =
-
->   static void netdev_qos_map_frame_event(const struct mmpdu_header *hdr,
-
-<snip>
-
-Regards,
--Denis
---===============5348780991921381702==--
+--===============8900455097066642288==--
 
