@@ -1,55 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============3492605110830122251=="
+Content-Type: multipart/mixed; boundary="===============1887192932483893695=="
 MIME-Version: 1.0
-From: Khem Raj <raj.khem@gmail.com>
-Subject: Re: [PATCH] Use abs_top_srcdir in place of abs_srcdir
-Date: Wed, 28 Apr 2021 18:54:11 -0700
-Message-ID: <CAMKF1soNruMfETLYnfUavEP4TDv6WQA-4uJuBDRsXP0BeQctOQ@mail.gmail.com>
-In-Reply-To: <20210405213344.3477582-1-raj.khem@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] test-runner: fix verbose output with --valgrind
+Date: Thu, 29 Apr 2021 09:07:42 -0700
+Message-ID: <20210429160742.183855-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3492605110830122251==
+--===============1887192932483893695==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-ping
+Since using --valgrind actually runs IWD using the valgrind
+process the --verbose flag would only work if 'valgrind' was
+also specified. This was taken into account with is_verbose
+but the actual logic enabling stdout did not use that helper.
+This was due, in part, to logging since is_verbose will always
+return true if --log is used. To fix this a new flag was added
+to is_verbose which omits the --log check to handle this
+specific case.
+---
+ tools/test-runner | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-On Mon, Apr 5, 2021 at 2:33 PM Khem Raj <raj.khem@gmail.com> wrote:
->
-> this makes it build when build dir is outside of sources dir
-> ---
->  Makefile.am | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/Makefile.am b/Makefile.am
-> index 644f3556..e3f79901 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -625,9 +625,10 @@ unit/tls-settings.8021x: unit/cert-ca.pem unit/cert-=
-client.pem unit/cert-client-
->  BUILT_SOURCES =3D $(ell_built_sources) src/builtin.h
->
->  ell/shared: Makefile
-> +       $(AM_V_at)$(MKDIR_P) ell
->         $(AM_V_GEN)for f in $(ell_shared) ; do \
->                 if [ ! -f $$f ] ; then \
-> -                       $(LN_S) -t ell -f $(abs_srcdir)/../ell/$$f ; \
-> +                       $(LN_S) -t ell -f $(abs_top_srcdir)/ell/$$f ; \
->                 fi \
->         done > $@
->
-> @@ -635,7 +636,7 @@ ell/internal: Makefile
->         $(AM_V_at)$(MKDIR_P) ell
->         $(AM_V_GEN)for f in $(ell_headers) $(ell_sources) ; do \
->                 if [ ! -f $$f ] ; then \
-> -                       $(LN_S) -t ell -f $(abs_srcdir)/../ell/$$f ; \
-> +                       $(LN_S) -t ell -f $(abs_top_srcdir)/ell/$$f ; \
->                 fi \
->         done > $@
->
-> --
-> 2.31.1
->
---===============3492605110830122251==--
+diff --git a/tools/test-runner b/tools/test-runner
+index 799953de..b890b3e7 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -194,8 +194,11 @@ class Process:
+ 		self.io_position =3D self.stdout.tell()
+ =
+
+ 		if ctx:
+-			# Verbose requested, add stdout/stderr to write FD list
+-			if self.name in ctx.args.verbose:
++			# Verbose requested, add stdout/stderr to write FD list.
++			# This will end up always returning true if logging is
++			# on which isn't desired so pass log=3DFalse as to only
++			# allow stdout to processes listed in --verbose.
++			if ctx.is_verbose(self.name, log=3DFalse):
+ 				self.verbose =3D True
+ =
+
+ 			# Add output file to FD list
+@@ -693,14 +696,14 @@ class Namespace:
+ 		pid =3D self.start_process(args, env=3Denv)
+ 		return pid
+ =
+
+-	def is_verbose(self, process):
++	def is_verbose(self, process, log=3DTrue):
+ 		process =3D os.path.basename(process)
+ =
+
+ 		if self.args is None:
+ 			return False
+ =
+
+ 		# every process is verbose when logging is enabled
+-		if self.args.log:
++		if log and self.args.log:
+ 			return True
+ =
+
+ 		if process in self.args.verbose:
+-- =
+
+2.26.2
+
+--===============1887192932483893695==--
 
