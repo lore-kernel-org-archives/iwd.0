@@ -1,104 +1,221 @@
-Content-Type: multipart/mixed; boundary="===============1122293588863726204=="
+Content-Type: multipart/mixed; boundary="===============0477921967711941811=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 7/7] ft: netdev: add return value to tx_associate
-Date: Thu, 29 Apr 2021 14:43:11 -0700
-Message-ID: <20210429214311.216293-7-prestwoj@gmail.com>
-In-Reply-To: <20210429214311.216293-1-prestwoj@gmail.com>
+Subject: [PATCH v4 1/7] ft: rework ft_parse_ies
+Date: Thu, 29 Apr 2021 16:08:35 -0700
+Message-ID: <20210429230841.222368-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1122293588863726204==
+--===============0477921967711941811==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Prior to this, an error sending the FT Reassociation was treated
-as fatal, which is correct for FT-over-Air but not for FT-over-DS.
-If the actual l_genl_family_send call fails for FT-over-DS the
-existing connection can be maintained and there is no need to
-call netdev_connect_failed.
-
-Adding a return to the tx_associate function works for both FT
-types. In the FT-over-Air case this return will ultimately get
-sent back up to auth_proto_rx_authenticate in which case will
-call netdev_connect_failed. For FT-over-DS tx_associate is
-actually called from the 'start' operation which can fail and
-still maintain the existing connection.
+This adds the RSNE verification to ft_parse_ies which will
+be common between over-Air and over-DS. The MDE check was
+also factored out into its own minimal function as to
+retain the spec comment but allow reuse elsewhere.
 ---
- src/ft.c     | 4 +---
- src/ft.h     | 2 +-
- src/netdev.c | 8 ++++----
- 3 files changed, 6 insertions(+), 8 deletions(-)
+ src/ft.c | 125 +++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 66 insertions(+), 59 deletions(-)
+
+v4:
+ * Moved MDE check into its own function to avoid duplicate
+   comments
 
 diff --git a/src/ft.c b/src/ft.c
-index 353593a0..5a349511 100644
+index 85d2d369..032eefd1 100644
 --- a/src/ft.c
 +++ b/src/ft.c
-@@ -287,9 +287,7 @@ static int ft_tx_reassociate(struct ft_sm *ft)
- 		iov_elems +=3D 1;
- 	}
- =
-
--	ft->tx_assoc(iov, iov_elems, ft->user_data);
--
--	return 0;
-+	return ft->tx_assoc(iov, iov_elems, ft->user_data);
- =
-
- error:
+@@ -329,14 +329,52 @@ error:
  	return -EINVAL;
-diff --git a/src/ft.h b/src/ft.h
-index 7c009f16..3d1cfe30 100644
---- a/src/ft.h
-+++ b/src/ft.h
-@@ -24,7 +24,7 @@ struct handshake_state;
- =
-
- typedef void (*ft_tx_authenticate_func_t)(struct iovec *iov, size_t iov_le=
-n,
- 					void *user_data);
--typedef void (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_le=
-n,
-+typedef int (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_len,
- 					void *user_data);
- =
-
- typedef void (*ft_ds_free_func_t)(void *user_data);
-diff --git a/src/netdev.c b/src/netdev.c
-index 97e6665b..048c6bf6 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -3643,7 +3643,7 @@ restore_snonce:
- 					MMPDU_STATUS_CODE_UNSPECIFIED);
  }
  =
 
--static void netdev_ft_tx_associate(struct iovec *ie_iov, size_t iov_len,
-+static int netdev_ft_tx_associate(struct iovec *ie_iov, size_t iov_len,
- 					void *user_data)
- {
- 	struct netdev *netdev =3D user_data;
-@@ -3661,10 +3661,10 @@ static void netdev_ft_tx_associate(struct iovec *ie=
-_iov, size_t iov_len,
- 	if (!netdev->connect_cmd_id) {
- 		l_genl_msg_unref(msg);
- =
-
--		netdev_connect_failed(netdev, NETDEV_RESULT_ASSOCIATION_FAILED,
--					MMPDU_STATUS_CODE_UNSPECIFIED);
--		return;
-+		return -EIO;
- 	}
+-static int ft_parse_ies(const uint8_t *ies, size_t ies_len,
+-			const uint8_t **rsne_out, const uint8_t **mde_out,
++static bool ft_verify_rsne(const uint8_t *rsne, const uint8_t *pmk_r0_name,
++				const uint8_t *authenticator_ie)
++{
++	/*
++	 * In an RSN, check for an RSNE containing the PMK-R0-Name and
++	 * the remaining fields same as in the advertised RSNE.
++	 *
++	 * 12.8.3: "The RSNE shall be present only if dot11RSNAActivated
++	 * is true. If present, the RSNE shall be set as follows:
++	 * - Version field shall be set to 1.
++	 * - PMKID Count field shall be set to 1.
++	 * - PMKID List field shall be set to the value contained in the
++	 *   first message of this sequence.
++	 * - All other fields shall be identical to the contents of the
++	 *   RSNE advertised by the AP in Beacon and Probe Response frames."
++	 */
 +
-+	return 0;
++	struct ie_rsn_info msg2_rsne;
++
++	if (!rsne)
++		return false;
++
++	if (ie_parse_rsne_from_data(rsne, rsne[1] + 2,
++						&msg2_rsne) < 0)
++		return false;
++
++	if (msg2_rsne.num_pmkids !=3D 1 ||
++				memcmp(msg2_rsne.pmkids, pmk_r0_name, 16))
++		return false;
++
++	if (!handshake_util_ap_ie_matches(rsne, authenticator_ie, false))
++		return false;
++
++	return true;
++}
++
++static int ft_parse_ies(struct handshake_state *hs,
++			const uint8_t *ies, size_t ies_len,
++			const uint8_t **mde_out,
+ 			const uint8_t **fte_out)
+ {
+ 	struct ie_tlv_iter iter;
+ 	const uint8_t *rsne =3D NULL;
+ 	const uint8_t *mde =3D NULL;
+ 	const uint8_t *fte =3D NULL;
++	bool is_rsn;
+ =
+
+ 	ie_tlv_iter_init(&iter, ies, ies_len);
+ =
+
+@@ -365,8 +403,14 @@ static int ft_parse_ies(const uint8_t *ies, size_t ies=
+_len,
+ 		}
+ 	}
+ =
+
+-	if (rsne_out)
+-		*rsne_out =3D rsne;
++	is_rsn =3D hs->supplicant_ie !=3D NULL;
++
++	if (is_rsn) {
++		if (!ft_verify_rsne(rsne, hs->pmk_r0_name,
++					hs->authenticator_ie))
++			goto ft_error;
++	} else if (rsne)
++		goto ft_error;
+ =
+
+ 	if (mde_out)
+ 		*mde_out =3D mde;
+@@ -380,42 +424,6 @@ ft_error:
+ 	return -EINVAL;
  }
  =
 
- static void prepare_ft(struct netdev *netdev, struct scan_bss *target_bss)
+-static bool ft_verify_rsne(const uint8_t *rsne, const uint8_t *pmk_r0_name,
+-				const uint8_t *authenticator_ie)
+-{
+-	/*
+-	 * In an RSN, check for an RSNE containing the PMK-R0-Name and
+-	 * the remaining fields same as in the advertised RSNE.
+-	 *
+-	 * 12.8.3: "The RSNE shall be present only if dot11RSNAActivated
+-	 * is true. If present, the RSNE shall be set as follows:
+-	 * - Version field shall be set to 1.
+-	 * - PMKID Count field shall be set to 1.
+-	 * - PMKID List field shall be set to the value contained in the
+-	 *   first message of this sequence.
+-	 * - All other fields shall be identical to the contents of the
+-	 *   RSNE advertised by the AP in Beacon and Probe Response frames."
+-	 */
+-
+-	struct ie_rsn_info msg2_rsne;
+-
+-	if (!rsne)
+-		return false;
+-
+-	if (ie_parse_rsne_from_data(rsne, rsne[1] + 2,
+-						&msg2_rsne) < 0)
+-		return false;
+-
+-	if (msg2_rsne.num_pmkids !=3D 1 ||
+-				memcmp(msg2_rsne.pmkids, pmk_r0_name, 16))
+-		return false;
+-
+-	if (!handshake_util_ap_ie_matches(rsne, authenticator_ie, false))
+-		return false;
+-
+-	return true;
+-}
+-
+ static bool ft_parse_fte(struct handshake_state *hs,
+ 				const uint8_t *snonce,
+ 				const uint8_t *fte,
+@@ -465,38 +473,37 @@ static bool ft_parse_fte(struct handshake_state *hs,
+ 	return true;
+ }
+ =
+
++static bool mde_equal(const uint8_t *mde1, const uint8_t *mde2)
++{
++	if (!mde1 || !mde2)
++		return false;
++
++	/*
++	 * Check for an MD IE identical to the one we sent in message 1
++	 *
++	 * 12.8.3: "The MDE shall contain the MDID and FT Capability and
++	 * Policy fields. This element shall be the same as the MDE
++	 * advertised by the target AP in Beacon and Probe Response frames."
++	 */
++	return memcmp(mde1, mde1, mde1[1] + 2) =3D=3D 0;
++}
++
+ static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
+ 			size_t ies_len)
+ {
+-	const uint8_t *rsne =3D NULL;
+ 	const uint8_t *mde =3D NULL;
+ 	const uint8_t *fte =3D NULL;
+-	bool is_rsn;
++	bool is_rsn =3D hs->supplicant_ie !=3D NULL;
+ =
+
+ 	/* Check 802.11r IEs */
+ 	if (!ies)
+ 		goto ft_error;
+ =
+
+-	if (ft_parse_ies(ies, ies_len, &rsne, &mde, &fte) < 0)
++	if (ft_parse_ies(hs, ies, ies_len, &mde, &fte) < 0)
+ 		goto ft_error;
+ =
+
+-	is_rsn =3D hs->supplicant_ie !=3D NULL;
+ =
+
+-	if (is_rsn) {
+-		if (!ft_verify_rsne(rsne, hs->pmk_r0_name,
+-					hs->authenticator_ie))
+-			goto ft_error;
+-	} else if (rsne)
+-		goto ft_error;
+-
+-	/*
+-	 * Check for an MD IE identical to the one we sent in message 1
+-	 *
+-	 * 12.8.3: "The MDE shall contain the MDID and FT Capability and
+-	 * Policy fields. This element shall be the same as the MDE
+-	 * advertised by the target AP in Beacon and Probe Response frames."
+-	 */
+-	if (!mde || memcmp(hs->mde, mde, hs->mde[1] + 2))
++	if (!mde_equal(hs->mde, mde))
+ 		goto ft_error;
+ =
+
+ 	if (is_rsn) {
 -- =
 
 2.26.2
 
---===============1122293588863726204==--
+--===============0477921967711941811==--
 
