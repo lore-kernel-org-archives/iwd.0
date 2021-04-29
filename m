@@ -1,228 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============0140794117350862801=="
+Content-Type: multipart/mixed; boundary="===============2977445177621717213=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/6] ft: create class for FT-over-DS targets
-Date: Thu, 29 Apr 2021 12:40:58 -0700
-Message-ID: <20210429194103.207447-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/6] ft: separate over-air from over-ds initializers
+Date: Thu, 29 Apr 2021 12:40:59 -0700
+Message-ID: <20210429194103.207447-2-prestwoj@gmail.com>
+In-Reply-To: <20210429194103.207447-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0140794117350862801==
+--===============2977445177621717213==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-FT-over-DS is being separated into two independent stages. The
-first of which is the processing of the action frame response.
-This new class will hold all the parsed information from the action
-frame and allowing it to be retrieved at a later time when IWD
-needs to roam.
-
-Initial info class should be created when the action frame is
-being sent out. Once a response is received it can be parsed
-with ft_over_ds_parse_action_response. This verifies the frame
-and updates the ft_ds_info class with the parsed data.
-
-ft_over_ds_prepare_handshake is the final step prior to
-Reassociation. This sets all the stored IEs, anonce, and KH IDs
-into the handshake and derives the new PTK.
 ---
- src/ft.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/ft.h |  25 +++++++++++++
- 2 files changed, 131 insertions(+)
+ src/ft.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
 diff --git a/src/ft.c b/src/ft.c
-index 85d2d369..82c790de 100644
+index 82c790de..ea6eba69 100644
 --- a/src/ft.c
 +++ b/src/ft.c
-@@ -465,6 +465,52 @@ static bool ft_parse_fte(struct handshake_state *hs,
+@@ -923,10 +923,9 @@ static bool ft_start(struct auth_proto *ap)
  	return true;
  }
  =
 
-+static bool ft_over_ds_process_ies(struct ft_ds_info *info,
-+					struct handshake_state *hs,
-+					const uint8_t *ies,
-+					size_t ies_len)
-+{
-+	const uint8_t *rsne =3D NULL;
-+	const uint8_t *mde =3D NULL;
-+	const uint8_t *fte =3D NULL;
-+	bool is_rsn;
-+
-+	if (ft_parse_ies(ies, ies_len, &rsne, &mde, &fte) < 0)
-+		return false;
-+
-+	is_rsn =3D hs->supplicant_ie !=3D NULL;
-+
-+	if (is_rsn) {
-+		if (!ft_verify_rsne(rsne, hs->pmk_r0_name,
-+					hs->authenticator_ie))
-+			goto ft_error;
-+	} else if (rsne)
-+		goto ft_error;
-+
-+	/*
-+	 * Check for an MD IE identical to the one we sent in message 1
-+	 *
-+	 * 12.8.3: "The MDE shall contain the MDID and FT Capability and
-+	 * Policy fields. This element shall be the same as the MDE
-+	 * advertised by the target AP in Beacon and Probe Response frames."
-+	 */
-+	if (!mde || memcmp(info->mde, mde + 2, sizeof(info->mde)))
-+		goto ft_error;
-+
-+	if (is_rsn) {
-+		if (!ft_parse_fte(hs, info->snonce, fte, &info->ft_info))
-+			goto ft_error;
-+
-+		info->fte =3D l_memdup(fte, fte[1] + 2);
-+	} else if (fte)
-+		goto ft_error;
-+
-+	return true;
-+
-+ft_error:
-+	return false;
-+}
-+
- static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
- 			size_t ies_len)
+-static struct auth_proto *ft_sm_new(struct handshake_state *hs,
++struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
+ 				ft_tx_authenticate_func_t tx_auth,
+ 				ft_tx_associate_func_t tx_assoc,
+-				bool over_air,
+ 				void *user_data)
  {
-@@ -523,6 +569,55 @@ ft_error:
- 	return -EBADMSG;
+ 	struct ft_sm *ft =3D l_new(struct ft_sm, 1);
+@@ -936,7 +935,7 @@ static struct auth_proto *ft_sm_new(struct handshake_st=
+ate *hs,
+ 	ft->hs =3D hs;
+ 	ft->user_data =3D user_data;
+ =
+
+-	ft->ap.rx_authenticate =3D (over_air) ? ft_rx_authenticate : ft_rx_action;
++	ft->ap.rx_authenticate =3D ft_rx_authenticate;
+ 	ft->ap.rx_associate =3D ft_rx_associate;
+ 	ft->ap.start =3D ft_start;
+ 	ft->ap.free =3D ft_sm_free;
+@@ -944,18 +943,22 @@ static struct auth_proto *ft_sm_new(struct handshake_=
+state *hs,
+ 	return &ft->ap;
  }
  =
 
-+int ft_over_ds_parse_action_response(struct ft_ds_info *info,
-+					struct handshake_state *hs,
-+					const uint8_t *frame, size_t frame_len)
-+{
-+	uint16_t status =3D 0;
-+
-+	if (frame_len < 16)
-+		goto parse_error;
-+
-+	/* Category FT */
-+	if (frame[0] !=3D 6)
-+		goto parse_error;
-+
-+	/* FT Action */
-+	if (frame[1] !=3D 2)
-+		goto parse_error;
-+
-+	if (memcmp(frame + 2, info->spa, 6))
-+		goto parse_error;
-+	if (memcmp(frame + 8, info->aa, 6))
-+		goto parse_error;
-+
-+	if (!ft_over_ds_process_ies(info, hs, frame + 16, frame_len - 16))
-+		goto parse_error;
-+
-+	return 0;
-+
-+parse_error:
-+	return (int)status;
-+}
-+
-+bool ft_over_ds_prepare_handshake(struct ft_ds_info *info,
-+					struct handshake_state *hs)
-+{
-+	memcpy(hs->snonce, info->snonce, sizeof(hs->snonce));
-+
-+	handshake_state_set_fte(hs, info->fte);
-+
-+	handshake_state_set_anonce(hs, info->ft_info.anonce);
-+
-+	handshake_state_set_kh_ids(hs, info->ft_info.r0khid,
-+						info->ft_info.r0khid_len,
-+						info->ft_info.r1khid);
-+
-+	handshake_state_derive_ptk(hs);
-+
-+	return true;
-+}
-+
- static int ft_rx_action(struct auth_proto *ap, const uint8_t *frame,
- 				size_t frame_len)
+-struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
+-				ft_tx_authenticate_func_t tx_auth,
+-				ft_tx_associate_func_t tx_assoc,
+-				void *user_data)
+-{
+-	return ft_sm_new(hs, tx_auth, tx_assoc, true, user_data);
+-}
+-
+ struct auth_proto *ft_over_ds_sm_new(struct handshake_state *hs,
+ 				ft_tx_authenticate_func_t tx_auth,
+ 				ft_tx_associate_func_t tx_assoc,
+ 				void *user_data)
  {
-@@ -551,6 +646,17 @@ auth_error:
- 	return (int)status_code;
+-	return ft_sm_new(hs, tx_auth, tx_assoc, false, user_data);
++	struct ft_sm *ft =3D l_new(struct ft_sm, 1);
++
++	ft->tx_assoc =3D tx_assoc;
++	ft->tx_auth =3D tx_auth;
++	ft->hs =3D hs;
++	ft->user_data =3D user_data;
++
++	ft->ap.rx_authenticate =3D ft_rx_action;
++	ft->ap.rx_associate =3D ft_rx_associate;
++	ft->ap.start =3D ft_start;
++	ft->ap.free =3D ft_sm_free;
++
++	return &ft->ap;
  }
- =
-
-+void ft_ds_info_free(struct ft_ds_info *info)
-+{
-+	__typeof__(info->free) destroy =3D info->free;
-+
-+	if (info->fte)
-+		l_free(info->fte);
-+
-+	if (destroy)
-+		destroy(info);
-+}
-+
- static int ft_rx_authenticate(struct auth_proto *ap, const uint8_t *frame,
- 				size_t frame_len)
- {
-diff --git a/src/ft.h b/src/ft.h
-index f24b3b5e..907c3d5d 100644
---- a/src/ft.h
-+++ b/src/ft.h
-@@ -20,15 +20,37 @@
-  *
-  */
- =
-
-+struct handshake_state;
-+
- typedef void (*ft_tx_authenticate_func_t)(struct iovec *iov, size_t iov_le=
-n,
- 					void *user_data);
- typedef void (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_le=
-n,
- 					void *user_data);
- =
-
-+typedef void (*ft_ds_free_func_t)(void *user_data);
-+
-+struct ft_ds_info {
-+	uint8_t spa[6];
-+	uint8_t aa[6];
-+	uint8_t snonce[32];
-+	uint8_t mde[3];
-+	uint8_t *fte;
-+
-+	struct ie_ft_info ft_info;
-+
-+	void (*free)(struct ft_ds_info *s);
-+};
-+
-+void ft_ds_info_free(struct ft_ds_info *info);
-+
- bool ft_build_authenticate_ies(struct handshake_state *hs,
- 				const uint8_t *new_snonce, uint8_t *buf,
- 				size_t *len);
- =
-
-+int ft_over_ds_parse_action_response(struct ft_ds_info *info,
-+					struct handshake_state *hs,
-+					const uint8_t *frame, size_t frame_len);
-+
- struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
- 				ft_tx_authenticate_func_t tx_auth,
- 				ft_tx_associate_func_t tx_assoc,
-@@ -38,3 +60,6 @@ struct auth_proto *ft_over_ds_sm_new(struct handshake_sta=
-te *hs,
- 				ft_tx_authenticate_func_t tx_auth,
- 				ft_tx_associate_func_t tx_assoc,
- 				void *user_data);
-+
-+bool ft_over_ds_prepare_handshake(struct ft_ds_info *info,
-+					struct handshake_state *hs);
 -- =
 
 2.26.2
 
---===============0140794117350862801==--
+--===============2977445177621717213==--
 
