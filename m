@@ -1,41 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============8220183867420633413=="
+Content-Type: multipart/mixed; boundary="===============6598634432629266554=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] client: Show WEP networks as unsupported
-Date: Fri, 30 Apr 2021 13:12:22 -0500
-Message-ID: <e0b7a53b-04f8-20f0-c2db-b745f3d1f8f1@gmail.com>
-In-Reply-To: <20210430174238.1027448-1-sean.anderson@seco.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] auto-t: add FT-back to original AP on FT-PSK-roam
+Date: Fri, 30 Apr 2021 11:20:36 -0700
+Message-ID: <20210430182036.273912-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8220183867420633413==
+--===============6598634432629266554==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sean,
+---
+ autotests/testFT-PSK-roam/connection_test.py | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-On 4/30/21 12:42 PM, Sean Anderson wrote:
-> WEP networks are not supported by iwd. However, the only indication is the
-> message "Operation not supported" while trying to connect. It is not clear
-> enough that this is due to intentional lack of support (as opposed to some
-> kind of misconfiguration). This patch explicitly lists WEP networks shown
-> with get-networks as unsupported. Hopefully this will make it clearer for
-> those of us not as familiar with iwd.
-> =
+diff --git a/autotests/testFT-PSK-roam/connection_test.py b/autotests/testF=
+T-PSK-roam/connection_test.py
+index 37c6da18..7399e5e1 100644
+--- a/autotests/testFT-PSK-roam/connection_test.py
++++ b/autotests/testFT-PSK-roam/connection_test.py
+@@ -98,6 +98,25 @@ class Test(unittest.TestCase):
+         self.assertRaises(Exception, testutil.test_ifaces_connected,
+                           (self.bss_hostapd[0].ifname, device.name))
+ =
 
-> CC: James Prestwood <prestwoj@gmail.com>
-> CC: Marcel Holtmann <marcel@holtmann.org>
-> CC: Denis Kenzior <denkenz@gmail.com>
-> ---
->   client/station.c | 7 +++++--
->   1 file changed, 5 insertions(+), 2 deletions(-)
-> =
++        rule0.signal =3D -2000
++        rule1.signal =3D -8000
++
++        condition =3D 'obj.state =3D=3D DeviceState.roaming'
++        wd.wait_for_object_condition(device, condition)
++
++        # Check that iwd is on BSS 0 once out of roaming state and doesn't
++        # go through 'disconnected', 'autoconnect', 'connecting' in between
++        from_condition =3D 'obj.state =3D=3D DeviceState.roaming'
++        to_condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_change(device, from_condition, to_condition)
++
++        self.assertTrue(self.bss_hostapd[0].list_sta())
++
++        testutil.test_iface_operstate(device.name)
++        testutil.test_ifaces_connected(self.bss_hostapd[0].ifname, device.=
+name)
++        self.assertRaises(Exception, testutil.test_ifaces_connected,
++                          (self.bss_hostapd[1].ifname, device.name))
++
+     def tearDown(self):
+         os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" down')
+         os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" down')
+-- =
 
+2.26.2
 
-This is a nice improvement.  Applied, thanks.
-
-Regards,
--Denis
---===============8220183867420633413==--
+--===============6598634432629266554==--
 
