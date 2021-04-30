@@ -1,123 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============2335360502613266061=="
+Content-Type: multipart/mixed; boundary="===============7630348261964363939=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH] main: Add D-Bus Daemon.GetInfo method
-Date: Sat, 01 May 2021 00:01:24 +0200
-Message-ID: <20210430220124.3013086-1-andrew.zaborowski@intel.com>
+From: Alexander Monakov <amonakov@ispras.ru>
+Subject: Thoughts from recent troubleshooting session
+Date: Sat, 01 May 2021 01:34:28 +0300
+Message-ID: <alpine.LNX.2.20.13.2105010038000.28416@monopod.intra.ispras.ru>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2335360502613266061==
+--===============7630348261964363939==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Expose the state directory/storage directory path on D-Bus because it
-can't be known to clients until IWD runs, and client might need to
-occasionally fiddle with the network config files.  While there also
-expose the IWD version string, similar to how some other D-Bus services
-do.
----
-I'm not happy with the name of the interface and the name of the method
-but couldn't find better names that would work well and satisfy
-everybody.  "net.connman.IWD" or "net.connman.iwd.Control" are other
-names I considered, and as for GetInfo the alternative could be using
-properties similar to how org.freedesktop.NetworkManager exposes
-Version, org.freedesktop.ColorManager exposes DaemonVersion,
-org.gnome.DisplayManager exposes Version{Major,Minor,Micro}, etc.
----
- src/dbus.h |  1 +
- src/main.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
+Hi!
 
-diff --git a/src/dbus.h b/src/dbus.h
-index 4936dc6c..b3896108 100644
---- a/src/dbus.h
-+++ b/src/dbus.h
-@@ -24,6 +24,7 @@
- =
+Three days ago I popped in the IRC while investigating why IWD wouldn't
+connect to my org's WiFi with settings I ported from wpa_supplicant's
+config. We managed to narrow down the issue to kernel crypto lib failing
+to validate the leaf certificate given by the AP against the CA cert
+(the leaf is missing the AKID).
 
- #define IWD_SERVICE "net.connman.iwd"
- =
+Troubleshooting experience seems to be very hit and miss for new users
+as I'll attempt to explain below.
 
-+#define IWD_DAEMON_INTERFACE "net.connman.iwd.Daemon"
- #define IWD_AGENT_MANAGER_INTERFACE "net.connman.iwd.AgentManager"
- #define IWD_WIPHY_INTERFACE "net.connman.iwd.Adapter"
- #define IWD_DEVICE_INTERFACE "net.connman.iwd.Device"
-diff --git a/src/main.c b/src/main.c
-index 2ee6188c..f65fa7f4 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -185,6 +185,16 @@ static void request_name_callback(struct l_dbus *dbus,=
- bool success,
- 	if (!l_dbus_object_manager_enable(dbus, "/"))
- 		l_warn("Unable to register the ObjectManager");
- =
+dmesg was telling me that iwd was associating to the AP, and then one
+second later disassociating with reason 23=3DIEEE8021X_FAILED.
 
-+	if (!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
-+						IWD_DAEMON_INTERFACE,
-+						NULL) ||
-+			!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
-+						L_DBUS_INTERFACE_PROPERTIES,
-+						NULL))
-+		l_info("Unable to add %s and/or %s at %s",
-+			IWD_DAEMON_INTERFACE, L_DBUS_INTERFACE_PROPERTIES,
-+			IWD_BASE_PATH);
-+
- 	/* TODO: Always request nl80211 for now, ignoring auto-loading */
- 	l_genl_request_family(genl, NL80211_GENL_NAME, nl80211_appeared,
- 				NULL, NULL);
-@@ -194,12 +204,44 @@ fail_exit:
- 	l_main_quit();
- }
- =
+I tried running 'iwd -d' and 'IWD_TLS_DEBUG=3D1 iwd -d'. The first
+unwelcome surprise was that there was almost zero difference in the
+logs, so I had to spend a few cycles checking if I typo'ed IWD_TLS_DEBUG
+vs. IWD_DEBUG_TLS or whatever.
 
-+static struct l_dbus_message *iwd_dbus_get_info(struct l_dbus *dbus,
-+						struct l_dbus_message *message,
-+						void *user_data)
-+{
-+	struct l_dbus_message *reply;
-+	struct l_dbus_message_builder *builder;
-+	L_AUTO_FREE_VAR(char *, storage_dir) =3D storage_get_path(NULL);
-+
-+	reply =3D l_dbus_message_new_method_return(message);
-+	builder =3D l_dbus_message_builder_new(reply);
-+	l_dbus_message_builder_enter_array(builder, "{sv}");
-+
-+	dbus_append_dict_basic(builder, "StateDirectory", 's', storage_dir);
-+	dbus_append_dict_basic(builder, "Version", 's', VERSION);
-+
-+	l_dbus_message_builder_leave_array(builder);
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+
-+	return reply;
-+}
-+
-+static void iwd_setup_deamon_interface(struct l_dbus_interface *interface)
-+{
-+	l_dbus_interface_method(interface, "GetInfo", 0, iwd_dbus_get_info,
-+				"a{sv}", "", "info");
-+}
-+
- static void dbus_ready(void *user_data)
- {
- 	struct l_dbus *dbus =3D user_data;
- =
+From perusing mailing list archives I got the idea to try filling
+EAP-Identity.  This indeed got me to the TLS phase and I got dumped
+certificates in /tmp.
 
- 	l_dbus_name_acquire(dbus, "net.connman.iwd", false, false, false,
- 				request_name_callback, NULL);
-+
-+	l_dbus_register_interface(dbus, IWD_DAEMON_INTERFACE,
-+					iwd_setup_deamon_interface,
-+					NULL, false);
- }
- =
+Apparently, all other tools implicitly pick up configured inner identity
+as the outer identity if the latter is not specified (and indeed I did
+not need to specify it in wpa_supplicant Linux config, or on my phone).
+The documentation is not doing a good job of explaining the situation:
+it says EAP-Identity might be needed depending on RADIUS server, but it
+doesn't help me realize that *even if* I did not have to specify it for
+other tools, I may need to copy-paste it explicitly for IWD.
 
- static void dbus_disconnected(void *user_data)
--- =
+Another thing I want to highlight here is that debug spew from 'iwd -d'
+seems really unstructured and it's difficult to see which phases were
+completed successfully, and where things have gone off the rails.
 
-2.27.0
+I see a recent commit improved the situation a bit by hinting about
+EAP-Identity specifically.
 
---===============2335360502613266061==--
+
+With dumped certificates in /tmp I could see that the AP is presenting
+the expected root certificate, and 'openssl verify' successfully
+validates the leaf.  I spent a bit more time looking up the
+certchain_verify tool in libell and figuring how to feed it PEM
+certificates (this also seems improved with a recent commit, thanks!),
+which narrowed down the problem to the kernel failing to validate our
+certificate chain.
+
+Thanks to another recent commit I can successfully connect with IWD if I
+do not provide the CA cert in the config, but that is an undesirable
+workaround.
+
+Happy hacking.
+Alexander
+--===============7630348261964363939==--
 
