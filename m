@@ -1,112 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============7051573769379345810=="
+Content-Type: multipart/mixed; boundary="===============4450847995505806987=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v6 3/3] ft: netdev: add return value to tx_associate
-Date: Fri, 30 Apr 2021 10:47:04 -0700
-Message-ID: <20210430174704.272253-3-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v6 1/3] ft: netdev: refactor FT-over-DS into two stages
+Date: Fri, 30 Apr 2021 13:10:19 -0500
+Message-ID: <b23d84d6-7354-4571-05c2-dd85eac3d74f@gmail.com>
 In-Reply-To: <20210430174704.272253-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7051573769379345810==
+--===============4450847995505806987==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Prior to this, an error sending the FT Reassociation was treated
-as fatal, which is correct for FT-over-Air but not for FT-over-DS.
-If the actual l_genl_family_send call fails for FT-over-DS the
-existing connection can be maintained and there is no need to
-call netdev_connect_failed.
+Hi James,
 
-Adding a return to the tx_associate function works for both FT
-types. In the FT-over-Air case this return will ultimately get
-sent back up to auth_proto_rx_authenticate in which case will
-call netdev_connect_failed. For FT-over-DS tx_associate is
-actually called from the 'start' operation which can fail and
-still maintain the existing connection.
----
- src/ft.c     | 4 +---
- src/ft.h     | 2 +-
- src/netdev.c | 8 ++++----
- 3 files changed, 6 insertions(+), 8 deletions(-)
+On 4/30/21 12:47 PM, James Prestwood wrote:
+> FT-over-DS followed the same pattern as FT-over-Air which worked,
+> but really limited how the protocol could be used. FT-over-DS is
+> unique in that we can authenticate to many APs by sending out
+> FT action frames and parsing the results. Once parsed IWD can
+> immediately Reassociate, or do so at a later time.
+> =
 
-diff --git a/src/ft.c b/src/ft.c
-index 76285d13..de754fd8 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -287,9 +287,7 @@ static int ft_tx_reassociate(struct ft_sm *ft)
- 		iov_elems +=3D 1;
- 	}
- =
+> To take advantage of this IWD need to separate FT-over-DS into
+> two stages: action frame and reassociation.
+> =
 
--	ft->tx_assoc(iov, iov_elems, ft->user_data);
--
--	return 0;
-+	return ft->tx_assoc(iov, iov_elems, ft->user_data);
- =
+> The initial action frame stage is started by netdev. The target
+> BSS is sent an FT action frame and a new cache entry is created
+> in ft.c. Once the response is received the entry is updated
+> with all the needed data to Reassociate. To limit the record
+> keeping on netdev each FT-over-DS entry holds a userdata pointer
+> so netdev doesn't need to maintain its own list of data for
+> callbacks.
+> =
 
- error:
- 	return -EINVAL;
-diff --git a/src/ft.h b/src/ft.h
-index 7c009f16..3d1cfe30 100644
---- a/src/ft.h
-+++ b/src/ft.h
-@@ -24,7 +24,7 @@ struct handshake_state;
- =
+> Once the action response is parsed netdev will call back signalling
+> the action frame sequence was completed (either successfully or not).
+> At this point the 'normal' FT procedure can start using the
+> FT-over-DS auth-proto.
+> ---
+>   src/ft.c     |  74 ++----------------
+>   src/ft.h     |   1 -
+>   src/netdev.c | 211 ++++++++++++++++++++++++++++++++++++++++-----------
+>   src/netdev.h |   8 ++
+>   4 files changed, 184 insertions(+), 110 deletions(-)
+> =
 
- typedef void (*ft_tx_authenticate_func_t)(struct iovec *iov, size_t iov_le=
-n,
- 					void *user_data);
--typedef void (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_le=
-n,
-+typedef int (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_len,
- 					void *user_data);
- =
 
- typedef void (*ft_ds_free_func_t)(void *user_data);
-diff --git a/src/netdev.c b/src/netdev.c
-index 426d2930..3f8d8c48 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -3651,7 +3651,7 @@ restore_snonce:
- 					MMPDU_STATUS_CODE_UNSPECIFIED);
- }
- =
+All applied, thanks.
 
--static void netdev_ft_tx_associate(struct iovec *ie_iov, size_t iov_len,
-+static int netdev_ft_tx_associate(struct iovec *ie_iov, size_t iov_len,
- 					void *user_data)
- {
- 	struct netdev *netdev =3D user_data;
-@@ -3669,9 +3669,7 @@ static void netdev_ft_tx_associate(struct iovec *ie_i=
-ov, size_t iov_len,
- 	if (!netdev->connect_cmd_id) {
- 		l_genl_msg_unref(msg);
- =
+Regards,
+-Denis
 
--		netdev_connect_failed(netdev, NETDEV_RESULT_ASSOCIATION_FAILED,
--					MMPDU_STATUS_CODE_UNSPECIFIED);
--		return;
-+		return -EIO;
- 	}
- =
-
- 	/* No need to keep this around at this point */
-@@ -3679,6 +3677,8 @@ static void netdev_ft_tx_associate(struct iovec *ie_i=
-ov, size_t iov_len,
- 		ft_ds_info_free(&netdev->ft_ds_info->super);
- 		netdev->ft_ds_info =3D NULL;
- 	}
-+
-+	return 0;
- }
- =
-
- static void prepare_ft(struct netdev *netdev, struct scan_bss *target_bss)
--- =
-
-2.26.2
-
---===============7051573769379345810==--
+--===============4450847995505806987==--
 
