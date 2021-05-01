@@ -1,72 +1,98 @@
-Content-Type: multipart/mixed; boundary="===============4680298407465574391=="
+Content-Type: multipart/mixed; boundary="===============0519690924708041322=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] client: Show WEP networks as unsupported
-Date: Sat, 01 May 2021 04:32:29 +0200
-Message-ID: <7294ACCB-50D7-4D0B-81D1-A1C7DBE48C0A@holtmann.org>
-In-Reply-To: <20210430174238.1027448-1-sean.anderson@seco.com>
+From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
+Subject: Re: [PATCH] build: fix ell/shared build failure
+Date: Sat, 01 May 2021 16:08:19 +0000
+Message-ID: <9d2e32ee-b7bc-935e-cb29-ffc97cbcd406@bang-olufsen.dk>
+In-Reply-To: <20210419114546.840331-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4680298407465574391==
+--===============0519690924708041322==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi,
 
-> WEP networks are not supported by iwd. However, the only indication is the
-> message "Operation not supported" while trying to connect. It is not clear
-> enough that this is due to intentional lack of support (as opposed to some
-> kind of misconfiguration). This patch explicitly lists WEP networks shown
-> with get-networks as unsupported. Hopefully this will make it clearer for
-> those of us not as familiar with iwd.
+This is just a polite ping to the list in case this patch went unnoticed.
+
+Perhaps I should have given some extra background on this. We are =
+
+building iwd with Yocto/OE, and while bumping our recipe to iwd 1.13 - =
+
+which uses the tarball on kernel.org - I noticed that the build was =
+
+failing because of a missing ell/ directory.
+
+With the standard Yocto tooling, --disable-dependency-tracking is passed =
+
+by default to autotools builds[1]. Omitting this flag seems to solve the =
+
+problem.
+
+Marcel Holtmann already proposed this particular change on the list a =
+
+few weeks ago as a fix for a similar issue when building with =
+
+--enable-external-ell on Buildroot, but another solution was arrived at =
+
+in that thread. At any rate, it also addresses the build failure I =
+
+described above, so it seems to be a justifiable change. This is also =
+
+common practice for other ell/* targets in iwd's Makefile.am anyway.
+
+I am no autotools expert so I cannot really explain why =
+
+--disable-dependency-tracking and other flags cause the build to fail in =
+
+this way, but hopefully the above is a good enough justification for the =
+
+patch.
+
+Kind regards,
+Alvin
+
+[1] =
+
+http://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/meta/classes/autotools.=
+bbclass#n76
+
+On 4/19/21 1:45 PM, Alvin =C5=A0ipraga wrote:
+> Fix the following build error:
 > =
 
-> CC: James Prestwood <prestwoj@gmail.com>
-> CC: Marcel Holtmann <marcel@holtmann.org>
-> CC: Denis Kenzior <denkenz@gmail.com>
+>    $ /path/to/iwd/configure --disable-dependency-tracking
+>    $ make
+>      GEN      ell/shared
+>    /bin/sh: line 5: ell/shared: No such file or directory
+>    make: *** [Makefile:3656: ell/shared] Error 1
+> =
+
+> The error can also arise if building with --enable-external-ell.
+> =
+
+> Fixes: ed05585063f2 ("build: Always link in the ell/useful.h header file")
 > ---
-> client/station.c | 7 +++++--
-> 1 file changed, 5 insertions(+), 2 deletions(-)
+>   Makefile.am | 1 +
+>   1 file changed, 1 insertion(+)
 > =
 
-> diff --git a/client/station.c b/client/station.c
-> index de25d12b..425b10a1 100644
-> --- a/client/station.c
-> +++ b/client/station.c
-> @@ -352,7 +352,7 @@ static void ordered_networks_display(struct l_queue *=
-ordered_networks)
-> =
+> diff --git a/Makefile.am b/Makefile.am
+> index 644f3556..68035e46 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -625,6 +625,7 @@ unit/tls-settings.8021x: unit/cert-ca.pem unit/cert-c=
+lient.pem unit/cert-client-
+>   BUILT_SOURCES =3D $(ell_built_sources) src/builtin.h
+>   =
 
-> 	display_table_header("Available networks", "%s%-*s%-*s%-*s%*s",
-> 					MARGIN, 2, "", 32, "Network name",
-> -					10, "Security", 6, "Signal");
-> +					18, "Security", 6, "Signal");
-> =
-
-> 	if (!l_queue_length(ordered_networks)) {
-> 		display("No networks available\n");
-> @@ -369,13 +369,16 @@ static void ordered_networks_display(struct l_queue=
- *ordered_networks)
-> 		const char *network_name =3D network_get_name(network_i);
-> 		const char *network_type =3D network_get_type(network_i);
-> =
-
-> +		if (!strcmp(network_type, "wep"))
-> +			network_type =3D "wep (unsupported)";
-> +
-
-this is kinda neat, but I wonder if iwd itself should just stop reporting W=
-EP networks. It is actually a bad idea to report something that we can neve=
-r (and never will) connect to.
-
-Unless of course we show them as =E2=80=9Copen=E2=80=9D and break the WEP k=
-ey on the fly ;)
-
-Regards
-
-Marcel
-
---===============4680298407465574391==--
+>   ell/shared: Makefile
+> +	$(AM_V_at)$(MKDIR_P) ell
+>   	$(AM_V_GEN)for f in $(ell_shared) ; do \
+>   		if [ ! -f $$f ] ; then \
+>   			$(LN_S) -t ell -f $(abs_srcdir)/../ell/$$f ; \
+>=20
+--===============0519690924708041322==--
 
