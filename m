@@ -1,98 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============0519690924708041322=="
+Content-Type: multipart/mixed; boundary="===============1994843552292530570=="
 MIME-Version: 1.0
-From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Subject: Re: [PATCH] build: fix ell/shared build failure
-Date: Sat, 01 May 2021 16:08:19 +0000
-Message-ID: <9d2e32ee-b7bc-935e-cb29-ffc97cbcd406@bang-olufsen.dk>
-In-Reply-To: <20210419114546.840331-1-alsi@bang-olufsen.dk>
+From: Alexander Monakov <amonakov@ispras.ru>
+Subject: Re: Use of kernel crypto lib
+Date: Sun, 02 May 2021 01:09:49 +0300
+Message-ID: <alpine.LNX.2.20.13.2105020001400.28416@monopod.intra.ispras.ru>
+In-Reply-To: <D573918B-4D7E-4430-B5F1-6A874E0713D4@holtmann.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0519690924708041322==
+--===============1994843552292530570==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+I was curious about IWD enough to try it, and it seems my investigation
+helped to uncover a previously unknown compatibility issue. However, I'm not
+happy with what I see, so probably I'm not going to use IWD on a regular
+basis. I'll address individual points below:
 
-This is just a polite ping to the list in case this patch went unnoticed.
+On Sat, 1 May 2021, Marcel Holtmann wrote:
 
-Perhaps I should have given some extra background on this. We are =
+> every user has access to the Keys subsystem in the Linux kernel and can
+> load whatever certificate they want. So I don=E2=80=99t buy this argument.
 
-building iwd with Yocto/OE, and while bumping our recipe to iwd 1.13 - =
+That is a strange reference to make. I am the only human user on my laptop,
+and software I run (except IWD) is not going to load certificates obtained
+from an untrusted network device to a keyring. For example, when I browse
+the web, the browser is not giving websites sufficient access to do that.
+And that is probably true for most users of IWD.
 
-which uses the tarball on kernel.org - I noticed that the build was =
+> Frankly any ANS.1 parsing that is vulnerable is an issue here since by
+> definition a WiFi daemon has to run with pretty much root privileges.
 
-failing because of a missing ell/ directory.
+As I said, with seccomp it's possible to confine risky computations to an
+unprivileged subprocess.
 
-With the standard Yocto tooling, --disable-dependency-tracking is passed =
+> Even on a Linux with a recent systemd (where we take as much privileges
+> away as possible), there is still a large risk for overtaking the daemon.
+> That is also the reason why we generally limited our daemons to a single
+> process (LimitNPROC=3D1) since if they can=E2=80=99t spawn any other proc=
+ess, they
+> also don=E2=80=99t get into being a shell. And consistent usage of CLOEXE=
+C will
+> quickly trigger a watchdog killing the process.
 
-by default to autotools builds[1]. Omitting this flag seems to solve the =
+Yes, as you say a properly sandboxed daemon will deal less damage: an
+adversary might not possess enough exploits at the same time to break
+through all the mitigations. That is why short-cutting through all such
+counter-measures with in-kernel certificate validation is a big issue.
 
-problem.
+> Anyhow, no system is prefect and neither are any TLS libraries.
 
-Marcel Holtmann already proposed this particular change on the list a =
+Agreed, and that is why I want to see risky processing of untrusted network
+input in a minimally privileged userspace instead of kernelspace.
 
-few weeks ago as a fix for a similar issue when building with =
-
---enable-external-ell on Buildroot, but another solution was arrived at =
-
-in that thread. At any rate, it also addresses the build failure I =
-
-described above, so it seems to be a justifiable change. This is also =
-
-common practice for other ell/* targets in iwd's Makefile.am anyway.
-
-I am no autotools expert so I cannot really explain why =
-
---disable-dependency-tracking and other flags cause the build to fail in =
-
-this way, but hopefully the above is a good enough justification for the =
-
-patch.
-
-Kind regards,
-Alvin
-
-[1] =
-
-http://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/meta/classes/autotools.=
-bbclass#n76
-
-On 4/19/21 1:45 PM, Alvin =C5=A0ipraga wrote:
-> Fix the following build error:
+> > I don't buy the comparison against signed modules offered on IRC. A ran=
+dom
+> > webpage I visit cannot trivially elevate itself to root to attempt to
+> > load a module with crafted signature. IWD's use strikes me as reckless
+> > to put it mildly.
 > =
 
->    $ /path/to/iwd/configure --disable-dependency-tracking
->    $ make
->      GEN      ell/shared
->    /bin/sh: line 5: ell/shared: No such file or directory
->    make: *** [Makefile:3656: ell/shared] Error 1
-> =
+> No, not more reckless than any other daemon that has to run as root.
 
-> The error can also arise if building with --enable-external-ell.
-> =
+I don't see other daemons do in kernelspace what they could more safely
+do in userspace.
 
-> Fixes: ed05585063f2 ("build: Always link in the ell/useful.h header file")
-> ---
->   Makefile.am | 1 +
->   1 file changed, 1 insertion(+)
-> =
+> I still have to see a TLS library that is any good and that seamlessly
+> integrates with hardware crypto and TPMs. So please enlighten us here.
 
-> diff --git a/Makefile.am b/Makefile.am
-> index 644f3556..68035e46 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -625,6 +625,7 @@ unit/tls-settings.8021x: unit/cert-ca.pem unit/cert-c=
-lient.pem unit/cert-client-
->   BUILT_SOURCES =3D $(ell_built_sources) src/builtin.h
->   =
+I wouldn't mind the use of kernel crypto API when it's justified, but in
+this case I see no benefit, and a few downsides like unnecessary risks and
+highly complicated debugging, pushed by IWD on its users.
 
->   ell/shared: Makefile
-> +	$(AM_V_at)$(MKDIR_P) ell
->   	$(AM_V_GEN)for f in $(ell_shared) ; do \
->   		if [ ! -f $$f ] ; then \
->   			$(LN_S) -t ell -f $(abs_srcdir)/../ell/$$f ; \
->=20
---===============0519690924708041322==--
+Thanks.
+Alexander
+
+--===============1994843552292530570==--
 
