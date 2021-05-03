@@ -1,56 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============6614762380679284867=="
+Content-Type: multipart/mixed; boundary="===============4150966711515860791=="
 MIME-Version: 1.0
-From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Subject: Re: [PATCH] build: fix ell/shared build failure
-Date: Sun, 02 May 2021 13:38:28 +0000
-Message-ID: <bf26b6cb-b7c9-d665-a487-51b6544e6d4e@bang-olufsen.dk>
-In-Reply-To: <120183FD-B683-465C-83FF-073BE6A149BE@holtmann.org>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] test-runner: increase RAM for valgrind
+Date: Mon, 03 May 2021 14:30:41 -0700
+Message-ID: <20210503213041.361836-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6614762380679284867==
+--===============4150966711515860791==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Marcel,
+Certain tests like testAP spawn two IWD process in separate
+namespaces. When --valrind is used this eats up quite a bit
+of RAM and causes the VM to run out of memory and start
+killing off processes.
+---
+ tools/test-runner | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-On 5/2/21 12:51 PM, Marcel Holtmann wrote:
-> Hi Alvin,
-> =
+diff --git a/tools/test-runner b/tools/test-runner
+index b890b3e7..dd4cbf82 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -1570,7 +1570,15 @@ class Main:
+ 		else:
+ 			smp =3D int(nproc / 2)
+ =
 
->> This is just a polite ping to the list in case this patch went unnoticed.
->>
->> Perhaps I should have given some extra background on this. We are
->> building iwd with Yocto/OE, and while bumping our recipe to iwd 1.13 -
->> which uses the tarball on kernel.org - I noticed that the build was
->> failing because of a missing ell/ directory.
->>
->> With the standard Yocto tooling, --disable-dependency-tracking is passed
->> by default to autotools builds[1]. Omitting this flag seems to solve the
->> problem.
->>
->> Marcel Holtmann already proposed this particular change on the list a
->> few weeks ago as a fix for a similar issue when building with
->> --enable-external-ell on Buildroot, but another solution was arrived at
->> in that thread. At any rate, it also addresses the build failure I
->> described above, so it seems to be a justifiable change. This is also
->> common practice for other ell/* targets in iwd's Makefile.am anyway.
->>
->> I am no autotools expert so I cannot really explain why
->> --disable-dependency-tracking and other flags cause the build to fail in
->> this way, but hopefully the above is a good enough justification for the
->> patch.
-> =
+-		print("Using %d cores for VM" % smp)
++		#
++		# Increase RAM if valgrind is being used
++		#
++		if self.args.valgrind:
++			ram =3D 512
++		else:
++			ram =3D 256
++
++		print("Using %d cores, %d RAM for VM" % (smp, ram))
+ =
 
-> I think that I already pushed similar patch recently when updating BlueZ =
-and oFono repositories.
+ 		#
+ 		# This passes through most of the command line options to
+@@ -1593,7 +1601,7 @@ class Main:
+ 			qemu_binary,
+ 			'-machine', 'type=3Dq35,accel=3Dkvm:tcg',
+ 			'-nodefaults', '-no-user-config', '-monitor', 'none',
+-			'-display', 'none', '-m', '256M', '-nographic', '-vga',
++			'-display', 'none', '-m', '%dM' % ram, '-nographic', '-vga',
+ 			'none', '-no-acpi', '-no-hpet',
+ 			'-no-reboot', '-fsdev',
+ 			'local,id=3Dfsdev-root,path=3D/,readonly,security_model=3Dnone,multidev=
+s=3Dremap',
+-- =
 
-Thanks. Yes you're right, I missed it. Looks like commit =
+2.26.2
 
-d87b580c207fc3e5da25b596f4cef21f4dc9a690 does the trick.
-
-Kind regards,
-Alvin
---===============6614762380679284867==--
+--===============4150966711515860791==--
 
