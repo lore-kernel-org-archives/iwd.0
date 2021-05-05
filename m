@@ -1,42 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============3752497502171080094=="
+Content-Type: multipart/mixed; boundary="===============5112417557315213025=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] main: Add D-Bus Daemon.GetInfo method
-Date: Wed, 05 May 2021 10:43:37 +0200
-Message-ID: <29F0C8A8-AB3D-44ED-8943-94A0BE763F3D@holtmann.org>
-In-Reply-To: <20210430220124.3013086-1-andrew.zaborowski@intel.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 3/3] test: add test utility for Roam() method
+Date: Wed, 05 May 2021 08:53:28 -0700
+Message-ID: <20210505155328.431557-3-prestwoj@gmail.com>
+In-Reply-To: <20210505155328.431557-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3752497502171080094==
+--===============5112417557315213025==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+---
+ test/force-roam | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+ create mode 100755 test/force-roam
 
-> Expose the state directory/storage directory path on D-Bus because it
-> can't be known to clients until IWD runs, and client might need to
-> occasionally fiddle with the network config files.  While there also
-> expose the IWD version string, similar to how some other D-Bus services
-> do.
-> ---
-> I'm not happy with the name of the interface and the name of the method
-> but couldn't find better names that would work well and satisfy
-> everybody.  "net.connman.IWD" or "net.connman.iwd.Control" are other
-> names I considered, and as for GetInfo the alternative could be using
-> properties similar to how org.freedesktop.NetworkManager exposes
-> Version, org.freedesktop.ColorManager exposes DaemonVersion,
-> org.gnome.DisplayManager exposes Version{Major,Minor,Micro}, etc.
-> ---
+diff --git a/test/force-roam b/test/force-roam
+new file mode 100755
+index 00000000..b590c84a
+--- /dev/null
++++ b/test/force-roam
+@@ -0,0 +1,16 @@
++#!/usr/bin/python3
++
++import sys
++import dbus
++
++if (len(sys.argv) !=3D 3):
++    print("Usage: %s <device> <mac>" % (sys.argv[0]))
++    sys.exit(1)
++
++bus =3D dbus.SystemBus()
++device =3D dbus.Interface(bus.get_object("net.connman.iwd", sys.argv[1]),
++                                    "net.connman.iwd.StationDiagnostic")
++
++mac =3D sys.argv[2].replace(':', '')
++
++device.Roam(dbus.ByteArray.fromhex(mac))
+-- =
 
-so I am actually fine with the naming. Lets use net.connman.iwd.Daemon.GetI=
-nfo() and StateDirectory and Version as you have in this patch. Just also d=
-ocument it in doc/daemon-api.txt as well and then we can merge this.
+2.26.2
 
-Regards
-
-Marcel
-
---===============3752497502171080094==--
+--===============5112417557315213025==--
 
