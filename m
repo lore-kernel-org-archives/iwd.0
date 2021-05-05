@@ -1,96 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============7311447434413115108=="
+Content-Type: multipart/mixed; boundary="===============4692402862652961831=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/3] main: add a --developer,-E option
-Date: Wed, 05 May 2021 11:23:53 -0700
-Message-ID: <20210505182355.454265-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/3] station: add Roam() diagnostics method
+Date: Wed, 05 May 2021 11:23:54 -0700
+Message-ID: <20210505182355.454265-2-prestwoj@gmail.com>
+In-Reply-To: <20210505182355.454265-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7311447434413115108==
+--===============4692402862652961831==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This will enable developer features to be used. Currently the
-only user of this will be StationDiagnostics.Roam() method which
-should only be exposed in this mode.
+This is being added as a developer method and should not be used
+in production. For testing purposes though, it is quite useful as
+it forces IWD to roam to a provided BSS and bypasses IWD's roaming
+and ranking logic for choosing a roam candidate.
+
+To use this a BSSID is provided as the only parameter. If this
+BSS is not in IWD's current scan results -EINVAL will be returned.
+If IWD knows about the BSS it will attempt to roam to it whether
+that is via FT, FT-over-DS, or Reassociation. These details are
+still sorted out in IWDs station_transition_start() logic.
 ---
- src/iwd.h  |  1 +
- src/main.c | 12 +++++++++++-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ src/station.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
 v2:
- * Added this patch to replace the dbus config changes
+ * Check developer mode before adding Roam method
 
-diff --git a/src/iwd.h b/src/iwd.h
-index 51548cbb..1be20df3 100644
---- a/src/iwd.h
-+++ b/src/iwd.h
-@@ -41,3 +41,4 @@ const char *iwd_get_iface_blacklist(void);
- =
-
- const char *iwd_get_phy_whitelist(void);
- const char *iwd_get_phy_blacklist(void);
-+bool iwd_is_developer_mode(void);
-diff --git a/src/main.c b/src/main.c
-index 2ee6188c..8e965341 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -54,6 +54,7 @@ static const char *nointerfaces;
- static const char *phys;
- static const char *nophys;
- static const char *debugopt;
-+static bool developeropt;
- static bool terminating;
- static bool nl80211_complete;
- =
-
-@@ -126,6 +127,11 @@ const char *iwd_get_phy_blacklist(void)
- 	return nophys;
+diff --git a/src/station.c b/src/station.c
+index d2234e15..479f81f5 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3721,12 +3721,49 @@ static struct l_dbus_message *station_get_diagnosti=
+cs(struct l_dbus *dbus,
+ 	return NULL;
  }
  =
 
-+bool iwd_is_developer_mode(void)
++static struct l_dbus_message *station_force_roam(struct l_dbus *dbus,
++						struct l_dbus_message *message,
++						void *user_data)
 +{
-+	return developeropt;
++	struct station *station =3D user_data;
++	struct scan_bss *target;
++	struct l_dbus_message_iter iter;
++	uint8_t *mac;
++	uint32_t mac_len;
++
++	if (!l_dbus_message_get_arguments(message, "ay", &iter))
++		goto invalid_args;
++
++	if (!l_dbus_message_iter_get_fixed_array(&iter, &mac, &mac_len))
++		goto invalid_args;
++
++	if (mac_len !=3D 6)
++		return dbus_error_invalid_args(message);
++
++	target =3D network_bss_find_by_addr(station->connected_network, mac);
++	if (!target || target =3D=3D station->connected_bss)
++		return dbus_error_invalid_args(message);
++
++	l_debug("Attempting forced roam to BSS "MAC, MAC_STR(mac));
++
++	station_transition_start(station, target);
++
++	return l_dbus_message_new_method_return(message);
++
++invalid_args:
++	return dbus_error_invalid_args(message);
 +}
 +
- static void usage(void)
+ static void station_setup_diagnostic_interface(
+ 					struct l_dbus_interface *interface)
  {
- 	printf("iwd - Wireless daemon\n"
-@@ -143,6 +149,7 @@ static void usage(void)
+ 	l_dbus_interface_method(interface, "GetDiagnostics", 0,
+ 				station_get_diagnostics, "a{sv}", "",
+ 				"diagnostics");
++
++	if (iwd_is_developer_mode())
++		l_dbus_interface_method(interface, "Roam", 0,
++					station_force_roam, "", "ay", "mac");
  }
  =
 
- static const struct option main_options[] =3D {
-+	{ "developer",    no_argument,       NULL, 'E' },
- 	{ "dbus-debug",   no_argument,       NULL, 'B' },
- 	{ "version",      no_argument,       NULL, 'v' },
- 	{ "interfaces",   required_argument, NULL, 'i' },
-@@ -363,7 +370,7 @@ int main(int argc, char *argv[])
- 	for (;;) {
- 		int opt;
- =
-
--		opt =3D getopt_long(argc, argv, "Bi:I:p:P:d::vh",
-+		opt =3D getopt_long(argc, argv, "EBi:I:p:P:d::vh",
- 							main_options, NULL);
- 		if (opt < 0)
- 			break;
-@@ -372,6 +379,9 @@ int main(int argc, char *argv[])
- 		case 'B':
- 			enable_dbus_debug =3D true;
- 			break;
-+		case 'E':
-+			developeropt =3D true;
-+			break;
- 		case 'i':
- 			interfaces =3D optarg;
- 			break;
+ static void station_destroy_diagnostic_interface(void *user_data)
 -- =
 
 2.26.2
 
---===============7311447434413115108==--
+--===============4692402862652961831==--
 
