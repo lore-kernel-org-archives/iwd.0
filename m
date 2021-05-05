@@ -1,48 +1,115 @@
-Content-Type: multipart/mixed; boundary="===============4235308629862675181=="
+Content-Type: multipart/mixed; boundary="===============7629130938151964038=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/3] test: add test utility for Roam() method
-Date: Wed, 05 May 2021 11:23:55 -0700
-Message-ID: <20210505182355.454265-3-prestwoj@gmail.com>
-In-Reply-To: <20210505182355.454265-1-prestwoj@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/2] main: Add D-Bus Daemon.GetInfo method
+Date: Thu, 06 May 2021 00:29:13 +0200
+Message-ID: <20210505222914.50570-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4235308629862675181==
+--===============7629130938151964038==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Expose the state directory/storage directory path on D-Bus because it
+can't be known to clients until IWD runs, and client might need to
+occasionally fiddle with the network config files.  While there also
+expose the IWD version string, similar to how some other D-Bus services
+do.
 ---
- test/force-roam | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
- create mode 100755 test/force-roam
+ src/dbus.h |  1 +
+ src/main.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
-diff --git a/test/force-roam b/test/force-roam
-new file mode 100755
-index 00000000..b590c84a
---- /dev/null
-+++ b/test/force-roam
-@@ -0,0 +1,16 @@
-+#!/usr/bin/python3
+diff --git a/src/dbus.h b/src/dbus.h
+index 4936dc6c..b3896108 100644
+--- a/src/dbus.h
++++ b/src/dbus.h
+@@ -24,6 +24,7 @@
+ =
+
+ #define IWD_SERVICE "net.connman.iwd"
+ =
+
++#define IWD_DAEMON_INTERFACE "net.connman.iwd.Daemon"
+ #define IWD_AGENT_MANAGER_INTERFACE "net.connman.iwd.AgentManager"
+ #define IWD_WIPHY_INTERFACE "net.connman.iwd.Adapter"
+ #define IWD_DEVICE_INTERFACE "net.connman.iwd.Device"
+diff --git a/src/main.c b/src/main.c
+index 2ee6188c..f65fa7f4 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -185,6 +185,16 @@ static void request_name_callback(struct l_dbus *dbus,=
+ bool success,
+ 	if (!l_dbus_object_manager_enable(dbus, "/"))
+ 		l_warn("Unable to register the ObjectManager");
+ =
+
++	if (!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
++						IWD_DAEMON_INTERFACE,
++						NULL) ||
++			!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
++						L_DBUS_INTERFACE_PROPERTIES,
++						NULL))
++		l_info("Unable to add %s and/or %s at %s",
++			IWD_DAEMON_INTERFACE, L_DBUS_INTERFACE_PROPERTIES,
++			IWD_BASE_PATH);
 +
-+import sys
-+import dbus
+ 	/* TODO: Always request nl80211 for now, ignoring auto-loading */
+ 	l_genl_request_family(genl, NL80211_GENL_NAME, nl80211_appeared,
+ 				NULL, NULL);
+@@ -194,12 +204,44 @@ fail_exit:
+ 	l_main_quit();
+ }
+ =
+
++static struct l_dbus_message *iwd_dbus_get_info(struct l_dbus *dbus,
++						struct l_dbus_message *message,
++						void *user_data)
++{
++	struct l_dbus_message *reply;
++	struct l_dbus_message_builder *builder;
++	L_AUTO_FREE_VAR(char *, storage_dir) =3D storage_get_path(NULL);
 +
-+if (len(sys.argv) !=3D 3):
-+    print("Usage: %s <device> <mac>" % (sys.argv[0]))
-+    sys.exit(1)
++	reply =3D l_dbus_message_new_method_return(message);
++	builder =3D l_dbus_message_builder_new(reply);
++	l_dbus_message_builder_enter_array(builder, "{sv}");
 +
-+bus =3D dbus.SystemBus()
-+device =3D dbus.Interface(bus.get_object("net.connman.iwd", sys.argv[1]),
-+                                    "net.connman.iwd.StationDiagnostic")
++	dbus_append_dict_basic(builder, "StateDirectory", 's', storage_dir);
++	dbus_append_dict_basic(builder, "Version", 's', VERSION);
 +
-+mac =3D sys.argv[2].replace(':', '')
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
 +
-+device.Roam(dbus.ByteArray.fromhex(mac))
++	return reply;
++}
++
++static void iwd_setup_deamon_interface(struct l_dbus_interface *interface)
++{
++	l_dbus_interface_method(interface, "GetInfo", 0, iwd_dbus_get_info,
++				"a{sv}", "", "info");
++}
++
+ static void dbus_ready(void *user_data)
+ {
+ 	struct l_dbus *dbus =3D user_data;
+ =
+
+ 	l_dbus_name_acquire(dbus, "net.connman.iwd", false, false, false,
+ 				request_name_callback, NULL);
++
++	l_dbus_register_interface(dbus, IWD_DAEMON_INTERFACE,
++					iwd_setup_deamon_interface,
++					NULL, false);
+ }
+ =
+
+ static void dbus_disconnected(void *user_data)
 -- =
 
-2.26.2
+2.27.0
 
---===============4235308629862675181==--
+--===============7629130938151964038==--
 
