@@ -1,33 +1,96 @@
-Content-Type: multipart/mixed; boundary="===============8880990349783666003=="
+Content-Type: multipart/mixed; boundary="===============7311447434413115108=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH 2/3] iwd-dbus: deny Roam() method for shipped dbus config
-Date: Wed, 05 May 2021 18:11:02 +0200
-Message-ID: <0BABF147-F453-4A3E-846B-201ABA016787@holtmann.org>
-In-Reply-To: <30aee3a6fb7d45fcfefe61a2a9d8bc6f7a249d47.camel@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/3] main: add a --developer,-E option
+Date: Wed, 05 May 2021 11:23:53 -0700
+Message-ID: <20210505182355.454265-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8880990349783666003==
+--===============7311447434413115108==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This will enable developer features to be used. Currently the
+only user of this will be StationDiagnostics.Roam() method which
+should only be exposed in this mode.
+---
+ src/iwd.h  |  1 +
+ src/main.c | 12 +++++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
->> I actually dislike this. If something that is just for developers,
->> then we should add a switch that starts iwd in developer mode and
->> then these methods are added.
-> =
+v2:
+ * Added this patch to replace the dbus config changes
 
-> Sure, I'm fine with a hidden main.conf option as well. =
+diff --git a/src/iwd.h b/src/iwd.h
+index 51548cbb..1be20df3 100644
+--- a/src/iwd.h
++++ b/src/iwd.h
+@@ -41,3 +41,4 @@ const char *iwd_get_iface_blacklist(void);
+ =
 
+ const char *iwd_get_phy_whitelist(void);
+ const char *iwd_get_phy_blacklist(void);
++bool iwd_is_developer_mode(void);
+diff --git a/src/main.c b/src/main.c
+index 2ee6188c..8e965341 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -54,6 +54,7 @@ static const char *nointerfaces;
+ static const char *phys;
+ static const char *nophys;
+ static const char *debugopt;
++static bool developeropt;
+ static bool terminating;
+ static bool nl80211_complete;
+ =
 
-either that or a command line option to iwd.
+@@ -126,6 +127,11 @@ const char *iwd_get_phy_blacklist(void)
+ 	return nophys;
+ }
+ =
 
-Regards
++bool iwd_is_developer_mode(void)
++{
++	return developeropt;
++}
++
+ static void usage(void)
+ {
+ 	printf("iwd - Wireless daemon\n"
+@@ -143,6 +149,7 @@ static void usage(void)
+ }
+ =
 
-Marcel
+ static const struct option main_options[] =3D {
++	{ "developer",    no_argument,       NULL, 'E' },
+ 	{ "dbus-debug",   no_argument,       NULL, 'B' },
+ 	{ "version",      no_argument,       NULL, 'v' },
+ 	{ "interfaces",   required_argument, NULL, 'i' },
+@@ -363,7 +370,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ =
 
---===============8880990349783666003==--
+-		opt =3D getopt_long(argc, argv, "Bi:I:p:P:d::vh",
++		opt =3D getopt_long(argc, argv, "EBi:I:p:P:d::vh",
+ 							main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -372,6 +379,9 @@ int main(int argc, char *argv[])
+ 		case 'B':
+ 			enable_dbus_debug =3D true;
+ 			break;
++		case 'E':
++			developeropt =3D true;
++			break;
+ 		case 'i':
+ 			interfaces =3D optarg;
+ 			break;
+-- =
+
+2.26.2
+
+--===============7311447434413115108==--
 
