@@ -1,27 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============0609860226020644651=="
+Content-Type: multipart/mixed; boundary="===============2503433471717492272=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 2/2] doc: Daemon DBus interface documentation
-Date: Thu, 06 May 2021 22:52:02 +0200
-Message-ID: <CAOq732KPoSpCcCiDOc9U357ifTFJG2NxQHOsa9KVsoC23rTs1w@mail.gmail.com>
-In-Reply-To: <CAM7Wg-UzZFi=TUUoTuNHHroHA2bj8-pZYv9cKTCzSLKXmPZ=+w@mail.gmail.com>
+Subject: [PATCH 2/2] doc: Daemon DBus interface documentation
+Date: Thu, 06 May 2021 23:28:28 +0200
+Message-ID: <20210506212828.79315-2-andrew.zaborowski@intel.com>
+In-Reply-To: <20210506212828.79315-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0609860226020644651==
+--===============2503433471717492272==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Ryan,
+---
+ doc/daemon-api.txt | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+ create mode 100644 doc/daemon-api.txt
 
-On Thu, 6 May 2021 at 18:20, Ryan Smith <ryan.smith@density.io> wrote:
->
-> Hi Andrew,
-> Thanks for your work on IWD! There's a typo on the documentation. See bel=
-ow...
+diff --git a/doc/daemon-api.txt b/doc/daemon-api.txt
+new file mode 100644
+index 00000000..8256bb10
+--- /dev/null
++++ b/doc/daemon-api.txt
+@@ -0,0 +1,24 @@
++Daemon hierarchy
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Service		net.connman.iwd
++Interface	net.connman.iwd.Daemon [Experimental]
++Object path	/net/connman/iwd
++
++Methods		dict GetInfo()
++
++			Returns basic IWD daemon's status and configuration
++			properties.  Their values are global and may be useful
++			for D-Bus clients interacting with IWD, not so much
++			for the user.  The returned dictionary (a{sv}) maps
++			string keys to values of types defined per key.
++			Clients should ignore unknown keys.
++
++			The following key/value pairs are defined currently:
++
++			string Version - IWD release version,
++
++			string StateDirectory - Absolute path to the IWD
++			state directory where network configuration and
++			runtime state files are kept (see $STATE_DIRECTORY in
++			iwd(8) and iwd.network(5)).
+-- =
 
-Good catch, will fix and resend.
-Best regards
---===============0609860226020644651==--
+2.27.0
+
+--===============2503433471717492272==--
 
