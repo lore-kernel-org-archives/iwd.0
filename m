@@ -1,37 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============3467633474621696143=="
+Content-Type: multipart/mixed; boundary="===============2494395919631958174=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/2] main: Add D-Bus Daemon.GetInfo method
-Date: Fri, 07 May 2021 08:44:53 -0500
-Message-ID: <463c8450-4ba1-6ade-fac5-03b09e4ae8a1@gmail.com>
-In-Reply-To: <20210506212828.79315-1-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH v2 1/3] main: add a --developer,-E option
+Date: Fri, 07 May 2021 08:47:15 -0500
+Message-ID: <599fa847-b2d7-6504-498c-1406c9b70861@gmail.com>
+In-Reply-To: <20210505182355.454265-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3467633474621696143==
+--===============2494395919631958174==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Hi James,
 
-On 5/6/21 4:28 PM, Andrew Zaborowski wrote:
-> Expose the state directory/storage directory path on D-Bus because it
-> can't be known to clients until IWD runs, and client might need to
-> occasionally fiddle with the network config files.  While there also
-> expose the IWD version string, similar to how some other D-Bus services
-> do.
+On 5/5/21 1:23 PM, James Prestwood wrote:
+> This will enable developer features to be used. Currently the
+> only user of this will be StationDiagnostics.Roam() method which
+> should only be exposed in this mode.
 > ---
->   src/dbus.h |  1 +
->   src/main.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 43 insertions(+)
+>   src/iwd.h  |  1 +
+>   src/main.c | 12 +++++++++++-
+>   2 files changed, 12 insertions(+), 1 deletion(-)
+> =
+
+> v2:
+>   * Added this patch to replace the dbus config changes
 > =
 
 
-Both applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
 
---===============3467633474621696143==--
+--===============2494395919631958174==--
 
