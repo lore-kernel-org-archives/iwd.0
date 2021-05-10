@@ -1,42 +1,134 @@
-Content-Type: multipart/mixed; boundary="===============7633739460277172976=="
+Content-Type: multipart/mixed; boundary="===============2654387925555886999=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 7/7] test-runner: remove stale file after test
-Date: Fri, 07 May 2021 13:26:20 -0700
-Message-ID: <20210507202620.93540-7-prestwoj@gmail.com>
-In-Reply-To: <20210507202620.93540-1-prestwoj@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 01/11] ap: Move sending CMD_START_AP to common function
+Date: Mon, 10 May 2021 10:57:56 +0200
+Message-ID: <20210510085806.174213-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7633739460277172976==
+--===============2654387925555886999==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-test-runner will print out if files were left behind after a
-test which lets the developer know something was not cleaned
-up. But in this case test-runner should also remove these files
-so they are not left, and printed, for each subsequent test.
 ---
- tools/test-runner | 1 +
- 1 file changed, 1 insertion(+)
+ src/ap.c | 59 +++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 28 insertions(+), 31 deletions(-)
 
-diff --git a/tools/test-runner b/tools/test-runner
-index dd4cbf82..892e63ff 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1186,6 +1186,7 @@ def post_test(ctx, to_copy):
- 	allowed =3D ['phonesim.conf', 'certs', 'secrets', 'iwd']
- 	for f in [f for f in os.listdir('/tmp') if f not in allowed]:
- 		dbg("File %s was not cleaned up!" % f)
-+		os.remove('/tmp/' + f)
+diff --git a/src/ap.c b/src/ap.c
+index a0420ed1..8851cb85 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -2260,34 +2260,41 @@ static struct l_genl_msg *ap_build_cmd_start_ap(str=
+uct ap_state *ap)
+ 	return cmd;
+ }
  =
 
- 	if ctx.args.valgrind:
- 		with open('/tmp/valgrind.log', 'r') as f:
+-static void ap_ifaddr4_added_cb(int error, uint16_t type, const void *data,
+-				uint32_t len, void *user_data)
++static bool ap_start_send(struct ap_state *ap)
+ {
+-	struct ap_state *ap =3D user_data;
+-	struct l_genl_msg *cmd;
+-
+-	ap->rtnl_add_cmd =3D 0;
++	struct l_genl_msg *cmd =3D ap_build_cmd_start_ap(ap);
+ =
+
+-	if (error) {
+-		l_error("Failed to set IP address");
+-		goto error;
++	if (!cmd) {
++		l_error("ap_build_cmd_start_ap failed");
++		return false;
+ 	}
+ =
+
+-	cmd =3D ap_build_cmd_start_ap(ap);
+-	if (!cmd)
+-		goto error;
+-
+ 	ap->start_stop_cmd_id =3D l_genl_family_send(ap->nl80211, cmd,
+ 							ap_start_cb, ap, NULL);
+ 	if (!ap->start_stop_cmd_id) {
++		l_error("AP_START l_genl_family_send failed");
+ 		l_genl_msg_unref(cmd);
+-		goto error;
++		return false;
+ 	}
+ =
+
+-	return;
++	return true;
++}
+ =
+
+-error:
+-	ap_start_failed(ap);
++static void ap_ifaddr4_added_cb(int error, uint16_t type, const void *data,
++				uint32_t len, void *user_data)
++{
++	struct ap_state *ap =3D user_data;
++
++	ap->rtnl_add_cmd =3D 0;
++
++	if (error) {
++		l_error("Failed to set IP address");
++		ap_start_failed(ap);
++		return;
++	}
++
++	if (!ap_start_send(ap))
++		ap_start_failed(ap);
+ }
+ =
+
+ static bool ap_parse_new_station_ies(const void *data, uint16_t len,
+@@ -2858,7 +2865,6 @@ struct ap_state *ap_start(struct netdev *netdev, stru=
+ct l_settings *config,
+ {
+ 	struct ap_state *ap;
+ 	struct wiphy *wiphy =3D netdev_get_wiphy(netdev);
+-	struct l_genl_msg *cmd;
+ 	uint64_t wdev_id =3D netdev_get_wdev_id(netdev);
+ 	int err =3D -EINVAL;
+ 	bool wait_on_address =3D false;
+@@ -2949,22 +2955,13 @@ struct ap_state *ap_start(struct netdev *netdev, st=
+ruct l_settings *config,
+ 		return ap;
+ 	}
+ =
+
+-	cmd =3D ap_build_cmd_start_ap(ap);
+-	if (!cmd)
+-		goto error;
++	if (ap_start_send(ap)) {
++		if (err_out)
++			*err_out =3D 0;
+ =
+
+-	ap->start_stop_cmd_id =3D l_genl_family_send(ap->nl80211, cmd,
+-							ap_start_cb, ap, NULL);
+-	if (!ap->start_stop_cmd_id) {
+-		l_genl_msg_unref(cmd);
+-		goto error;
++		return ap;
+ 	}
+ =
+
+-	if (err_out)
+-		*err_out =3D 0;
+-
+-	return ap;
+-
+ error:
+ 	if (err_out)
+ 		*err_out =3D err;
 -- =
 
-2.31.1
+2.27.0
 
---===============7633739460277172976==--
+--===============2654387925555886999==--
 
