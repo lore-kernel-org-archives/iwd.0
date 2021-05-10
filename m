@@ -1,569 +1,260 @@
-Content-Type: multipart/mixed; boundary="===============6423786284762758205=="
+Content-Type: multipart/mixed; boundary="===============5103687077838236289=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 02/11] ap: Refactor DHCP settings loading
-Date: Mon, 10 May 2021 10:57:57 +0200
-Message-ID: <20210510085806.174213-2-andrew.zaborowski@intel.com>
+Subject: [PATCH 03/11] ap: Refactor global address pool loading
+Date: Mon, 10 May 2021 10:57:58 +0200
+Message-ID: <20210510085806.174213-3-andrew.zaborowski@intel.com>
 In-Reply-To: <20210510085806.174213-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6423786284762758205==
+--===============5103687077838236289==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Extend the [IPv4].Address setting's syntax to allow a new format: a list
-of <IP>/<prefix_len> -form strings that define the address space from
-which a subnet is selected.
+Deprecate the global [General].APRanges setting in favour of
+[IPv4].APAddressPool with an extended (but backwards-compatible) syntax.
+Drop the existing address pool creation code.
 
-Rewrite the DHCP settings loading without selecting a specific subnet at
-this stage because we will need to query the addresses already in use
-before this.  Validate some of the settings more thoroughly.  Name all
-netconfig-related ap_state members with the netconfig_ prefix.
-
-Make sure we always call l_dhcp_server_set_netmask(), allow netmasks
-other than 24-bit and change the default to 28 bits.
+The new APAddressPool setting has the same syntax as the profile-local
+[IPv4].Address setting.  [IPv4].Address is loaded as
+ap->netconfig_addr4_str_list the subnet selection code will fall back
+to the global setting, this way we'll have common code to handle both
+settings.
 ---
- src/ap.c | 346 ++++++++++++++++++++++++++-----------------------------
- 1 file changed, 165 insertions(+), 181 deletions(-)
+ src/ap.c | 169 +++++++++++++------------------------------------------
+ 1 file changed, 38 insertions(+), 131 deletions(-)
 
 diff --git a/src/ap.c b/src/ap.c
-index 8851cb85..db2a2c04 100644
+index db2a2c04..872c0a1f 100644
 --- a/src/ap.c
 +++ b/src/ap.c
-@@ -88,15 +88,14 @@ struct ap_state {
- 	uint16_t last_aid;
- 	struct l_queue *sta_states;
- =
-
--	struct l_dhcp_server *server;
-+	struct l_dhcp_server *netconfig_dhcp;
-+	uint8_t netconfig_prefix_len4;
-+	char **netconfig_addr4_str_list;
- 	uint32_t rtnl_add_cmd;
--	char *own_ip;
--	unsigned int ip_prefix;
- =
-
- 	bool started : 1;
- 	bool gtk_set : 1;
--	bool cleanup_ip : 1;
--	bool use_ip_pool : 1;
-+	bool enable_netconfig4 : 1;
+@@ -126,116 +126,11 @@ struct ap_wsc_pbc_probe_record {
+ 	uint64_t timestamp;
  };
  =
 
- struct sta_state {
-@@ -321,22 +320,12 @@ static void ap_reset(struct ap_state *ap)
- 	ap->started =3D false;
- =
-
- 	/* Delete IP if one was set by IWD */
--	if (ap->cleanup_ip)
--		l_rtnl_ifaddr4_delete(rtnl, netdev_get_ifindex(netdev),
--					ap->ip_prefix, ap->own_ip,
--					broadcast_from_ip(ap->own_ip),
--					NULL, NULL, NULL);
+-struct ap_ip_pool {
+-	uint32_t start;
+-	uint32_t end;
+-	uint8_t prefix;
 -
--	if (ap->own_ip) {
--		/* Release IP from pool if used */
--		if (ap->use_ip_pool)
--			ip_pool_put(ap->own_ip);
- =
-
--		l_free(ap->own_ip);
--	}
-+	if (ap->netconfig_dhcp)
-+		l_dhcp_server_stop(ap->netconfig_dhcp);
- =
-
--	if (ap->server)
--		l_dhcp_server_stop(ap->server);
-+	l_strv_free(ap->netconfig_addr4_str_list);
-+	ap->netconfig_addr4_str_list =3D NULL;
- }
- =
-
- static void ap_del_station(struct sta_state *sta, uint16_t reason,
-@@ -2163,7 +2152,7 @@ static void ap_start_cb(struct l_genl_msg *msg, void =
-*user_data)
- 		goto failed;
- 	}
- =
-
--	if (ap->server && !l_dhcp_server_start(ap->server)) {
-+	if (ap->netconfig_dhcp && !l_dhcp_server_start(ap->netconfig_dhcp)) {
- 		l_error("DHCP server failed to start");
- 		goto failed;
- 	}
-@@ -2490,182 +2479,185 @@ static void ap_mlme_notify(struct l_genl_msg *msg=
-, void *user_data)
- 	}
- }
- =
-
--static bool dhcp_load_settings(struct ap_state *ap,
--				const struct l_settings *settings)
-+#define AP_DEFAULT_IPV4_PREFIX_LEN 28
-+
-+static int ap_load_ipv4(struct ap_state *ap,
-+				const struct l_settings *config)
- {
--	struct l_dhcp_server *server =3D ap->server;
-+	uint32_t ifindex =3D netdev_get_ifindex(ap->netdev);
-+	uint32_t static_addr4 =3D 0;
- 	struct in_addr ia;
- =
-
--	L_AUTO_FREE_VAR(char *, netmask) =3D l_settings_get_string(settings,
--							"IPv4", "Netmask");
--	L_AUTO_FREE_VAR(char *, gateway) =3D l_settings_get_string(settings,
--							"IPv4", "Gateway");
--	char **dns =3D l_settings_get_string_list(settings, "IPv4",
--							"DNSList", ',');
--	char **ip_range =3D l_settings_get_string_list(settings, "IPv4",
--							"IPRange", ',');
--	unsigned int lease_time;
--	bool ret =3D false;
+-	/* Fist/last valid subnet */
+-	uint8_t sub_start;
+-	uint8_t sub_end;
 -
--	if (!l_settings_get_uint(settings, "IPv4", "LeaseTime", &lease_time))
--		lease_time =3D 0;
+-	struct l_uintset *used;
+-};
 -
--	if (gateway && !l_dhcp_server_set_gateway(server, gateway)) {
--		l_error("[IPv4].Gateway value error");
--		goto error;
--	}
-+	if (!l_settings_has_group(config, "IPv4") || !pool.used)
-+		return 0;
- =
-
--	if (dns && !l_dhcp_server_set_dns(server, dns)) {
--		l_error("[IPv4].DNSList value error");
--		goto error;
--	}
-+	ap->enable_netconfig4 =3D true;
- =
-
--	if (netmask && !l_dhcp_server_set_netmask(server, netmask)) {
--		l_error("[IPv4].Netmask value error");
--		goto error;
--	}
-+	if (l_settings_has_key(config, "IPv4", "Netmask")) {
-+		L_AUTO_FREE_VAR(char *, netmask_str) =3D
-+			l_settings_get_string(config, "IPv4", "Netmask");
- =
-
--	if (ip_range) {
--		if (l_strv_length(ip_range) !=3D 2) {
--			l_error("Two addresses expected in [IPv4].IPRange");
--			goto error;
-+		if (inet_pton(AF_INET, netmask_str, &ia) !=3D 1) {
-+			l_error("Can't parse the profile [IPv4].Netmask "
-+				"setting");
-+			return -EINVAL;
- 		}
- =
-
--		if (!l_dhcp_server_set_ip_range(server, ip_range[0],
--							ip_range[1])) {
--			l_error("Error setting IP range from [IPv4].IPRange");
--			goto error;
-+		ap->netconfig_prefix_len4 =3D __builtin_popcount(ia.s_addr);
-+
-+		if (ntohl(ia.s_addr) !=3D util_netmask_from_prefix(
-+						ap->netconfig_prefix_len4)) {
-+			l_error("Invalid profile [IPv4].Netmask value");
-+			return -EINVAL;
-+		}
-+	} else
-+		ap->netconfig_prefix_len4 =3D AP_DEFAULT_IPV4_PREFIX_LEN;
-+
-+	if (l_settings_has_key(config, "IPv4", "Address")) {
-+		char **str_list =3D l_settings_get_string_list(config, "IPv4",
-+								"Address", ',');
-+
-+		if (!str_list || !*str_list) {
-+			l_error("Can't parse the profile [IPv4].Address "
-+				"setting as a string list");
-+			l_free(str_list);
-+			return -EINVAL;
- 		}
-+
-+		ap->netconfig_addr4_str_list =3D str_list;
-+
-+		/* Check for the static IP syntax: Address=3D<IP> */
-+		if (l_strv_length(str_list) =3D=3D 1 &&
-+				inet_pton(AF_INET, *str_list, &ia) =3D=3D 1)
-+			static_addr4 =3D ntohl(ia.s_addr);
- 	}
- =
-
--	if (lease_time && !l_dhcp_server_set_lease_time(server, lease_time)) {
--		l_error("[IPv4].LeaseTime value error");
--		goto error;
-+	ap->netconfig_dhcp =3D l_dhcp_server_new(ifindex);
-+	if (!ap->netconfig_dhcp) {
-+		l_error("Failed to create DHCP server on ifindex %u", ifindex);
-+		return -EINVAL;
- 	}
- =
-
--	if (netmask && inet_pton(AF_INET, netmask, &ia) > 0)
--		ap->ip_prefix =3D __builtin_popcountl(ia.s_addr);
--	else
--		ap->ip_prefix =3D 24;
-+	if (getenv("IWD_DHCP_DEBUG"))
-+		l_dhcp_server_set_debug(ap->netconfig_dhcp, do_debug,
-+					"[DHCPv4 SERV] ", NULL);
- =
-
--	ret =3D true;
-+	ia.s_addr =3D htonl(util_netmask_from_prefix(ap->netconfig_prefix_len4));
- =
-
--error:
--	l_strv_free(dns);
--	l_strv_free(ip_range);
--	return ret;
--}
-+	if (!l_dhcp_server_set_netmask(ap->netconfig_dhcp, inet_ntoa(ia))) {
-+		l_error("l_dhcp_server_set_netmask failed");
-+		return -EINVAL;
-+	}
+-struct ap_ip_pool pool;
++static bool netconfig_enabled;
++static char **global_addr_strs;
+ static uint32_t netdev_watch;
+ struct l_netlink *rtnl;
  =
 
 -/*
-- * This will determine the IP being used for DHCP. The IP will be automati=
-cally
-- * set to ap->own_ip.
-- *
-- * The address to set (or keep) is determined in this order:
-- * 1. Address defined in provisioning file
-- * 2. Address already set on interface
-- * 3. Address in IP pool.
-- *
-- * Returns:  0 if an IP was successfully selected and needs to be set
-- *          -EALREADY if an IP was already set on the interface or
-- *            IP configuration was not enabled,
-- *          -EEXIST if the IP pool ran out of IP's
-- *          -EINVAL if there was an error.
+- * Creates pool of IPs which AP intefaces can use. Each call to ip_pool_get
+- * will advance the subnet +1 so there are no IP conflicts between AP
+- * interfaces
 - */
--static int ap_setup_dhcp(struct ap_state *ap, const struct l_settings *set=
-tings)
+-static bool ip_pool_create(const char *ip_prefix)
 -{
--	uint32_t ifindex =3D netdev_get_ifindex(ap->netdev);
--	struct in_addr ia;
--	uint32_t address =3D 0;
--	L_AUTO_FREE_VAR(char *, addr) =3D NULL;
--	int ret =3D -EINVAL;
-+	if (l_settings_has_key(config, "IPv4", "Gateway")) {
-+		L_AUTO_FREE_VAR(char *, gateway_str) =3D
-+			l_settings_get_string(config, "IPv4", "Gateway");
-+
-+		if (!l_dhcp_server_set_gateway(ap->netconfig_dhcp,
-+						gateway_str)) {
-+			l_error("l_dhcp_server_set_gateway failed");
-+			return -EINVAL;
-+		}
-+	}
- =
-
--	/* get the current address if there is one */
--	if (l_net_get_address(ifindex, &ia) && ia.s_addr !=3D 0)
--		address =3D ia.s_addr;
-+	if (l_settings_get_value(config, "IPv4", "IPRange")) {
-+		char **ip_range =3D l_settings_get_string_list(config, "IPv4",
-+								"IPRange", ',');
-+		int i;
-+		uint32_t netmask;
-+		bool r;
- =
-
--	addr =3D l_settings_get_string(settings, "IPv4", "Address");
--	if (addr) {
--		if (inet_pton(AF_INET, addr, &ia) < 0)
-+		if (!static_addr4 || !l_settings_has_key(config,
-+							"IPv4", "Netmask")) {
-+			l_error("[IPv4].IPRange only makes sense in an AP "
-+				"profile if a static local address and "
-+				"netmask have also been specified");
-+			l_strv_free(ip_range);
- 			return -EINVAL;
-+		}
- =
-
--		/* Is a matching address already set on interface? */
--		if (ia.s_addr =3D=3D address)
--			ret =3D -EALREADY;
--		else
--			ret =3D 0;
--	} else if (address) {
--		/* No address in config, but interface has one set */
--		addr =3D l_strdup(inet_ntoa(ia));
--		ret =3D -EALREADY;
--	} else if (pool.used) {
--		/* No config file, no address set. Use IP pool */
--		addr =3D ip_pool_get();
--		if (!addr) {
--			l_error("No more IP's in pool, cannot start AP on %u",
--					ifindex);
--			return -EEXIST;
-+		if (!ip_range || l_strv_length(ip_range) !=3D 2) {
-+			l_error("Can't parse the profile [IPv4].IPRange "
-+				"setting as two address strings");
-+			l_strv_free(ip_range);
-+			return -EINVAL;
- 		}
- =
-
--		ap->use_ip_pool =3D true;
--		ap->ip_prefix =3D pool.prefix;
--		ret =3D 0;
--	} else
--		return -EALREADY;
-+		netmask =3D util_netmask_from_prefix(ap->netconfig_prefix_len4);
- =
-
--	ap->server =3D l_dhcp_server_new(ifindex);
--	if (!ap->server) {
--		l_error("Failed to create DHCP server on %u", ifindex);
--		return -EINVAL;
--	}
-+		for (i =3D 0; i < 2; i++) {
-+			struct in_addr range_addr;
- =
-
--	if (getenv("IWD_DHCP_DEBUG"))
--		l_dhcp_server_set_debug(ap->server, do_debug,
--							"[DHCPv4 SERV] ", NULL);
-+			if (inet_aton(ip_range[i], &range_addr) !=3D 1) {
-+				l_error("Can't parse address in "
-+					"[IPv4].IPRange[%i]", i + 1);
-+				break;
-+			}
- =
-
--	/* Set the remaining DHCP options in config file */
--	if (!dhcp_load_settings(ap, settings))
--		return -EINVAL;
-+			if ((static_addr4 ^ ntohl(range_addr.s_addr)) &
-+					netmask) {
-+				struct in_addr addr =3D { htonl(static_addr4) };
- =
-
--	if (!l_dhcp_server_set_ip_address(ap->server, addr))
--		return -EINVAL;
-+				l_error("[IPv4].IPRange[%i] is not in the "
-+					"%s/%i subnet", i + 1, inet_ntoa(addr),
-+					ap->netconfig_prefix_len4);
-+				break;
-+			}
-+		}
- =
-
--	ap->own_ip =3D l_steal_ptr(addr);
--	return ret;
--}
-+		if (i < 2) {
-+			l_strv_free(ip_range);
-+			return -EINVAL;
-+		}
- =
-
--static int ap_load_dhcp(struct ap_state *ap, const struct l_settings *conf=
-ig,
--			bool *wait_dhcp)
--{
--	uint32_t ifindex =3D netdev_get_ifindex(ap->netdev);
--	int err =3D -EINVAL;
-+		r =3D l_dhcp_server_set_ip_range(ap->netconfig_dhcp,
-+						ip_range[0], ip_range[1]);
-+		l_strv_free(ip_range);
- =
-
--	if (!l_settings_has_group(config, "IPv4"))
--		return 0;
-+		if (!r) {
-+			l_error("l_dhcp_server_set_ip_range failed");
-+			return -EINVAL;
-+		}
-+	}
-+
-+	if (l_settings_has_key(config, "IPv4", "DNSList")) {
-+		char **str_list =3D l_settings_get_string_list(config, "IPv4",
-+								"DNSList", ',');
-+		bool r;
- =
-
--	err =3D ap_setup_dhcp(ap, config);
--	if (err =3D=3D 0) {
--		/* Address change required */
--		ap->rtnl_add_cmd =3D l_rtnl_ifaddr4_add(rtnl, ifindex,
--					ap->ip_prefix, ap->own_ip,
--					broadcast_from_ip(ap->own_ip),
--					ap_ifaddr4_added_cb, ap, NULL);
+-	if (!util_ip_prefix_tohl(ip_prefix, &pool.prefix, &pool.start,
+-					&pool.end, NULL))
+-		return false;
 -
--		if (!ap->rtnl_add_cmd) {
--			l_error("Failed to add IPv4 address");
--			return -EIO;
-+		if (!str_list || !*str_list) {
-+			l_error("Can't parse the profile [IPv4].DNSList "
-+				"setting as a string list");
-+			l_free(str_list);
-+			return -EINVAL;
- 		}
- =
-
--		ap->cleanup_ip =3D true;
-+		r =3D l_dhcp_server_set_dns(ap->netconfig_dhcp, str_list);
-+		l_strv_free(str_list);
- =
-
--		*wait_dhcp =3D true;
--		err =3D 0;
--	/* Selected address already set, continue normally */
--	} else if (err =3D=3D -EALREADY) {
--		*wait_dhcp =3D false;
--		err =3D 0;
-+		if (!r) {
-+			l_error("l_dhcp_server_set_dns failed");
-+			return -EINVAL;
-+		}
- 	}
- =
-
--	return err;
-+	if (l_settings_has_key(config, "IPv4", "LeaseTime")) {
-+		unsigned int lease_time;
-+
-+		if (!l_settings_get_uint(config, "IPv4", "LeaseTime",
-+						&lease_time)) {
-+			l_error("Error parsing [IPv4].LeaseTime as an integer");
-+			return -EINVAL;
-+		}
-+
-+		if (!l_dhcp_server_set_lease_time(ap->netconfig_dhcp,
-+							lease_time)) {
-+			l_error("l_dhcp_server_set_lease_time failed");
-+			return -EINVAL;
-+		}
-+	}
-+
-+	return 0;
- }
- =
-
- static bool ap_load_psk(struct ap_state *ap, const struct l_settings *conf=
-ig)
-@@ -2720,7 +2712,7 @@ static bool ap_load_psk(struct ap_state *ap, const st=
-ruct l_settings *config)
- }
- =
-
- static int ap_load_config(struct ap_state *ap, const struct l_settings *co=
-nfig,
--				bool *out_wait_dhcp, bool *out_cck_rates)
-+				bool *out_cck_rates)
+-	if (pool.prefix > 24) {
+-		l_error("APRanges prefix must 24 or less (%u used)",
+-				pool.prefix);
+-		memset(&pool, 0, sizeof(pool));
+-		return false;
+-	}
+-
+-	/*
+-	 * Find the number of subnets we can use, this will dictate the number
+-	 * of AP interfaces that can be created (when using DHCP)
+-	 */
+-	pool.sub_start =3D (pool.start & 0x0000ff00) >> 8;
+-	pool.sub_end =3D (pool.end & 0x0000ff00) >> 8;
+-
+-	pool.used =3D l_uintset_new_from_range(pool.sub_start, pool.sub_end);
+-
+-	return true;
+-}
+-
+-static char *ip_pool_get()
+-{
+-	uint32_t ip;
+-	struct in_addr ia;
+-	uint8_t next_subnet =3D (uint8_t)l_uintset_find_unused_min(pool.used);
+-
+-	/* This shouldn't happen */
+-	if (next_subnet < pool.sub_start || next_subnet > pool.sub_end)
+-		return NULL;
+-
+-	l_uintset_put(pool.used, next_subnet);
+-
+-	ip =3D pool.start;
+-	ip &=3D 0xffff00ff;
+-	ip |=3D (next_subnet << 8);
+-
+-	ia.s_addr =3D htonl(ip);
+-	return l_strdup(inet_ntoa(ia));
+-}
+-
+-static bool ip_pool_put(const char *address)
+-{
+-	struct in_addr ia;
+-	uint32_t ip;
+-	uint8_t subnet;
+-
+-	if (inet_aton(address, &ia) < 0)
+-		return false;
+-
+-	ip =3D ntohl(ia.s_addr);
+-
+-	subnet =3D (ip & 0x0000ff00) >> 8;
+-
+-	if (subnet < pool.sub_start || subnet > pool.sub_end)
+-		return false;
+-
+-	return l_uintset_take(pool.used, subnet);
+-}
+-
+-static void ip_pool_destroy()
+-{
+-	if (pool.used)
+-		l_uintset_free(pool.used);
+-
+-	memset(&pool, 0, sizeof(pool));
+-}
+-
+-static const char *broadcast_from_ip(const char *ip)
+-{
+-	struct in_addr ia;
+-	uint32_t bcast;
+-
+-	if (inet_aton(ip, &ia) !=3D 1)
+-		return NULL;
+-
+-	bcast =3D ntohl(ia.s_addr);
+-	bcast &=3D 0xffffff00;
+-	bcast |=3D 0x000000ff;
+-
+-	ia.s_addr =3D htonl(bcast);
+-
+-	return inet_ntoa(ia);
+-}
+-
+ static void ap_stop_handshake(struct sta_state *sta)
  {
- 	size_t len;
- 	L_AUTO_FREE_VAR(char *, strval) =3D NULL;
-@@ -2746,11 +2738,12 @@ static int ap_load_config(struct ap_state *ap, cons=
-t struct l_settings *config,
- 		return -EINVAL;
+ 	if (sta->sm) {
+@@ -2488,7 +2383,7 @@ static int ap_load_ipv4(struct ap_state *ap,
+ 	uint32_t static_addr4 =3D 0;
+ 	struct in_addr ia;
+ =
+
+-	if (!l_settings_has_group(config, "IPv4") || !pool.used)
++	if (!l_settings_has_group(config, "IPv4") || !netconfig_enabled)
+ 		return 0;
+ =
+
+ 	ap->enable_netconfig4 =3D true;
+@@ -3511,7 +3406,6 @@ static void ap_netdev_watch(struct netdev *netdev,
+ static int ap_init(void)
+ {
+ 	const struct l_settings *settings =3D iwd_get_config();
+-	bool dhcp_enable;
+ =
+
+ 	netdev_watch =3D netdev_watch_add(ap_netdev_watch, NULL, NULL);
+ =
+
+@@ -3522,31 +3416,44 @@ static int ap_init(void)
+ 			ap_diagnostic_interface_destroy, false);
  =
 
  	/*
--	 * This loads DHCP settings either from the l_settings object or uses
--	 * the defaults. wait_on_address will be set true if an address change
--	 * is required.
-+	 * This looks at the network configuration settings in @config and
-+	 * relevant global settings and if it determines that netconfig is to
-+	 * be enabled for the AP, it both creates the DHCP server object and
-+	 * processes IP settings, applying the defaults where needed.
+-	 * Reusing [General].EnableNetworkConfiguration as a switch to enable
+-	 * DHCP server. If no value is found or it is false do not create a
+-	 * DHCP server.
++	 * Enable network configuration and DHCP only if
++	 * [General].EnableNetworkConfiguration is true.
  	 */
--	err =3D ap_load_dhcp(ap, config, out_wait_dhcp);
-+	err =3D ap_load_ipv4(ap, config);
- 	if (err)
- 		return err;
- =
-
-@@ -2866,12 +2859,10 @@ struct ap_state *ap_start(struct netdev *netdev, st=
-ruct l_settings *config,
- 	struct ap_state *ap;
- 	struct wiphy *wiphy =3D netdev_get_wiphy(netdev);
- 	uint64_t wdev_id =3D netdev_get_wdev_id(netdev);
--	int err =3D -EINVAL;
--	bool wait_on_address =3D false;
- 	bool cck_rates =3D true;
- =
-
- 	if (err_out)
--		*err_out =3D err;
-+		*err_out =3D -EINVAL;
- =
-
- 	if (L_WARN_ON(!config))
- 		return NULL;
-@@ -2882,12 +2873,9 @@ struct ap_state *ap_start(struct netdev *netdev, str=
-uct l_settings *config,
- 	ap->ops =3D ops;
- 	ap->user_data =3D user_data;
- =
-
--	err =3D ap_load_config(ap, config, &wait_on_address, &cck_rates);
--	if (err)
-+	if (ap_load_config(ap, config, &cck_rates) < 0)
- 		goto error;
- =
-
--	err =3D -EINVAL;
+ 	if (!l_settings_get_bool(settings, "General",
+-				"EnableNetworkConfiguration", &dhcp_enable))
+-		dhcp_enable =3D false;
 -
- 	/* TODO: Add all ciphers supported by wiphy */
- 	ap->ciphers =3D wiphy_select_cipher(wiphy, 0xffff);
- 	ap->group_cipher =3D wiphy_select_cipher(wiphy, 0xffff);
-@@ -2948,9 +2936,8 @@ struct ap_state *ap_start(struct netdev *netdev, stru=
-ct l_settings *config,
- 	if (!ap->mlme_watch)
- 		l_error("Registering for MLME notification failed");
+-	if (dhcp_enable) {
+-		L_AUTO_FREE_VAR(char *, ip_prefix);
+-
+-		ip_prefix =3D l_settings_get_string(settings, "General",
+-							"APRanges");
+-		/*
+-		 * In this case its assumed the user only cares about station
+-		 * netconfig so we let ap_init pass but DHCP will not be
+-		 * enabled.
+-		 */
+-		if (!ip_prefix) {
+-			l_warn("[General].APRanges must be set for DHCP");
+-			return 0;
++					"EnableNetworkConfiguration",
++					&netconfig_enabled))
++		netconfig_enabled =3D false;
++
++	if (netconfig_enabled) {
++		if (l_settings_get_value(settings, "IPv4", "APAddressPool")) {
++			global_addr_strs =3D l_settings_get_string_list(settings,
++								"IPv4",
++								"APAddressPool",
++								',');
++			if (!global_addr_strs || !*global_addr_strs) {
++				l_error("Can't parse the [IPv4].APAddressPool "
++					"setting as a string list");
++				l_strv_free(global_addr_strs);
++				global_addr_strs =3D NULL;
++			}
++		} else if (l_settings_get_value(settings,
++						"General", "APRanges")) {
++			global_addr_strs =3D l_settings_get_string_list(settings,
++								"General",
++								"APRanges",
++								',');
++			if (!global_addr_strs || !*global_addr_strs) {
++				l_error("Can't parse the [General].APRanges "
++					"setting as a string list");
++				l_strv_free(global_addr_strs);
++				global_addr_strs =3D NULL;
++			}
+ 		}
  =
 
--	if (wait_on_address) {
--		if (err_out)
--			*err_out =3D 0;
-+	if (ap->enable_netconfig4) {
-+		/* TODO: select an IP address, set it and call ap_start_send */
- =
-
- 		return ap;
- 	}
-@@ -2963,9 +2950,6 @@ struct ap_state *ap_start(struct netdev *netdev, stru=
-ct l_settings *config,
+-		if (!ip_pool_create(ip_prefix))
+-			return -EINVAL;
++		/* Fall back to 192.168.0.0/16 */
++		if (!global_addr_strs)
++			global_addr_strs =3D
++				l_strv_append(NULL, "192.168.0.0/16");
  	}
  =
 
- error:
--	if (err_out)
--		*err_out =3D err;
--
- 	ap_reset(ap);
- 	l_genl_family_free(ap->nl80211);
- 	l_free(ap);
-@@ -3072,8 +3056,8 @@ void ap_free(struct ap_state *ap)
- {
- 	ap_reset(ap);
- 	l_genl_family_free(ap->nl80211);
--	if (ap->server)
--		l_dhcp_server_destroy(ap->server);
-+	if (ap->netconfig_dhcp)
-+		l_dhcp_server_destroy(ap->netconfig_dhcp);
- 	l_free(ap);
+ 	rtnl =3D iwd_get_rtnl();
+@@ -3559,7 +3466,7 @@ static void ap_exit(void)
+ 	netdev_watch_remove(netdev_watch);
+ 	l_dbus_unregister_interface(dbus_get_bus(), IWD_AP_INTERFACE);
+ =
+
+-	ip_pool_destroy();
++	l_strv_free(global_addr_strs);
  }
  =
 
+ IWD_MODULE(ap, ap_init, ap_exit)
 -- =
 
 2.27.0
 
---===============6423786284762758205==--
+--===============5103687077838236289==--
 
