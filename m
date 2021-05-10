@@ -1,66 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============7596852430761479170=="
+Content-Type: multipart/mixed; boundary="===============8324732179423288105=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 6/7] doc: document [General].RoamThreshold5G
-Date: Mon, 10 May 2021 10:13:42 -0500
-Message-ID: <b34f6ce5-936a-52ff-79de-ed22551cbe18@gmail.com>
-In-Reply-To: <20210507202620.93540-6-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: Re: ap mode problem
+Date: Mon, 10 May 2021 09:10:37 -0700
+Message-ID: <9607578469c8a0f5d902c3198a3b75df7b8179a4.camel@gmail.com>
+In-Reply-To: <CAG17S_OiVP-8e4PFzSaqzGEQiEKdyg8yv585ch-T1H0p-UkhbA@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7596852430761479170==
+--===============8324732179423288105==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Keith,
 
-On 5/7/21 3:26 PM, James Prestwood wrote:
-> ---
->   src/iwd.config.rst | 9 ++++++++-
->   1 file changed, 8 insertions(+), 1 deletion(-)
+On Mon, 2021-05-10 at 09:47 -0500, KeithG wrote:
+> James,
 > =
 
-> diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-> index 478bd616..8e3662d4 100644
-> --- a/src/iwd.config.rst
-> +++ b/src/iwd.config.rst
-> @@ -131,7 +131,14 @@ The group ``[General]`` contains general settings.
->      * - RoamThreshold
->        - Value: rssi dBm value, from -100 to 1, default: **-70**
->   =
+> I am on iwd 1.14, now and still get the same error.
 
-> -       This can be used to control how aggressively **iwd** roams.
-> +       This can be used to control how aggressively **iwd** roams from 2=
-.4Ghz
+Hmm, I just tried with 1.14 checked out and saw no problems. This was
+on a RPi 3 though, not a v1 with wifi dongle. Still, your problem does
+seem to be related to what we fixed previously as you're EAPoL frames
+look suspiciously similar.
 
-I reworded this slightly to read:
-This value can be used to control how aggressively **iwd** roams when conne=
-cted =
+Could you run unit/test-eapol and see if that passes.
 
-to a 2.4Ghz access point.
+Also, I'm guessing your using a packaged version of IWD? I would be
+curious to see how exactly this is built (what compile/link options,
+gcc version etc. Ill see if I can find this online somewhere). Our
+'fix' was a pragma disabling optimization in a specific routine, but
+maybe there are compiler options which undo this? I'm not too familiar
+with the ins and outs of pragmas.
 
-> +       networks.
-> +
-> +   * - RoamThreshold5G
-> +     - Value: rssi dBm value, from -100 to 1, default: **-76**
-> +
-> +       This value can be used to control how aggressively **iwd** roams =
-from
-> +       5GHz networks.
+Another route would be to see if you could build IWD from source
+(unless that is what you are doing already).
 
-ditto.
+I've got an old RPi 1 buried somewhere. If I can find it I will give it
+a try.
 
->   =
-
->      * - RoamRetryInterval
->        - Value: unsigned int value in seconds (default: **60**)
-> =
+Thanks,
+James
 
 
-applied, thanks.
-
-Regards,
--Denis
---===============7596852430761479170==--
+--===============8324732179423288105==--
 
