@@ -1,140 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============7033801049571562243=="
+Content-Type: multipart/mixed; boundary="===============8047798930103754858=="
 MIME-Version: 1.0
-From: KeithG <ys3al35l@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
 Subject: Re: ap mode problem
-Date: Mon, 10 May 2021 17:22:54 -0500
-Message-ID: <CAG17S_N_wNs17CCkr-fDoN4qdDCZZVSw1Yz4yRzzTFM4cJiPwQ@mail.gmail.com>
-In-Reply-To: <a0872cff318c23d5d6383cb2308129283e21b6fc.camel@gmail.com>
+Date: Mon, 10 May 2021 16:27:53 -0700
+Message-ID: <51ef6dbba033f3b57edc619817b0d6c7226998c7.camel@gmail.com>
+In-Reply-To: <CAG17S_N_wNs17CCkr-fDoN4qdDCZZVSw1Yz4yRzzTFM4cJiPwQ@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7033801049571562243==
+--===============8047798930103754858==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 10, 2021 at 12:56 PM James Prestwood <prestwoj@gmail.com> wro=
-te:
->
-> Hi Keith,
->
-> > I am using a pre-packages Arch Linux iwd package. It reports 1.14-1.
-> > I
-> > have built iwd-git, but am trying to use the Arch current if
-> > possible.
->
-> Did you notice the same behavior? Or were you referring to some
-> previous build?
->
-> If you are able to build and disable optimization (dsiable-optimization) =
-that would tell us whether this is a compiler
-> issue or not. Based on what I have seen I am certain it is, but it
-> would tell us definitively.
->
-> Finding out exactly where the compiler has gone awry is the difficult
-> part since I cannot reproduce. It may require me finding my old RPi and
-> getting that set up again.
->
-> I know the Arch package maintainer is around sometimes (on IRC at
-> least). Maybe they have some insight into what GCC version is being
-> used? Ill try finding them on IRC.
->
-> >
-> > This is what is said today when I tried to connect:
-> >
-> > May 10 11:35:38 deskrune iwd[4565]: AP Probe Request from
-> > f8:1f:32:39:fe:32
-> > May 10 11:35:38 deskrune iwd[4565]: AP Probe Response delivered OK
-> > May 10 11:35:38 deskrune iwd[4565]: AP Authentication from
-> > f8:1f:32:39:fe:32
-> > May 10 11:35:38 deskrune iwd[4565]: AP Authentication frame 2 ACKed
-> > by STA
-> > May 10 11:35:38 deskrune iwd[4565]: AP Association Request from
-> > f8:1f:32:39:fe:32
-> > May 10 11:35:38 deskrune iwd[4565]: AP (Re)Association Response ACK
-> > received
-> > May 10 11:35:40 deskrune iwd[4565]: 4-Way handshake failed for
-> > ifindex: 3, reason: 15
-> >
-> > When I run the test-eapol, I get:
-> > # ./test-eapol
-> > TEST: /EAPoL Key/Key Frame 1
-> > TEST: /EAPoL Key/Key Frame 2
-> > TEST: /EAPoL Key/Key Frame 3
-> > TEST: /EAPoL Key/Key Frame 4
-> > TEST: /EAPoL Key/Key Frame 5
-> > TEST: /EAPoL Key/Key Frame 6
-> > TEST: /EAPoL Key/Key Frame 7
-> > TEST: /EAPoL Key/Key Frame 8
-> > TEST: /EAPoL Key/Key Frame 9
-> > TEST: /EAPoL Key/Key Frame 10
-> > TEST: /EAPoL Key/Key Frame 11
-> > TEST: /EAPoL Key/Key Frame 12
-> > TEST: /EAPoL Key/Key Frame 13
-> > TEST: /EAPoL Key/Key Frame 14
-> > TEST: /EAPoL Key/Key Frame 15
-> > TEST: /EAPoL Key/Key Frame 16
-> > TEST: /EAPoL Key/Key Frame 17
-> > TEST: /EAPoL Key/Key Frame 18
-> > TEST: /EAPoL Key/Key Frame 19
-> > TEST: /EAPoL Key/Key Frame 20
-> > TEST: /EAPoL Key/Key Frame 21
-> > TEST: /EAPoL Key/Key Frame 22
-> > TEST: /EAPoL Key/Key Frame 23
-> > TEST: /EAPoL Key/Key Frame 24
-> > TEST: /EAPoL Key/Key Frame 25
-> > TEST: /EAPoL Key/Key Frame 26
-> > TEST: /EAPoL Key/Key Frame 27
-> > TEST: /EAPoL Key/Key Frame 28
-> > TEST: /EAPoL Key/Key Frame 29
-> > TEST: /EAPoL Key/Key Frame 30
-> > TEST: /EAPoL Key/Key Frame 31
-> > TEST: /EAPoL Key/Key Frame 32
-> > TEST: /EAPoL Key/MIC Test 1
-> > TEST: /EAPoL Key/MIC Test 2
-> > TEST: /EAPoL Key/Calculate MIC Test 1
-> > TEST: EAPoL/WPA2 4-Way Handshake
-> > TEST: EAPoL/WPA2 4-Way & GTK Handshake
-> > TEST: EAPoL/WPA 4-Way & GTK Handshake
-> > TEST: EAPoL/WPA2 PTK State Machine
-> > TEST: EAPoL IGTK & 4-Way Handshake
-> > TEST: EAPoL/WPA2 PTK & GTK State Machine
-> > TEST: EAPoL/WPA PTK & GTK State Machine Test 1
-> > TEST: EAPoL/WPA PTK & GTK State Machine Test 2
-> > TEST: EAPoL/WPA2 Retransmit Test
-> > TEST: EAPoL/FT-Using-PSK 4-Way Handshake
-> > TEST: EAPoL/Supplicant+Authenticator 4-Way Handshake
-> > test-eapol: unit/test-eapol.c:3698: eapol_ap_sta_handshake_test:
-> > Assertion `s.ap_success && s.sta_success' failed.
-> > Aborted (core dumped)
-> >
-> > Regards,
-> >
-> > Keith
->
-> Thanks,
-> James
->
->
-I believe they are using GCC 10.2.0 as am I. I rebuilt the iwd-git AUR
-with the addition of the suggested 'disable-optimization'. I installed
-it and restarted the iwd service and get the same result with the
-test-eapol:
-...
-TEST: EAPoL/FT-Using-PSK 4-Way Handshake
-TEST: EAPoL/Supplicant+Authenticator 4-Way Handshake
-test-eapol: unit/test-eapol.c:3698: eapol_ap_sta_handshake_test:
-Assertion `s.ap
-_success && s.sta_success' failed.
-Aborted (core dumped)
+Hi Keith,
+> =
 
-**BUT** now that I an using the latest iwd-git without optimizations
-and try to connect to it in AP mode, I connect. Also if I let connman
-use it as a tether, I also connect. If I re-build iwd-git 'with
-optimizations' and try again, it fails.
 
-This is on an "Raspberry Pi Model B Plus Rev 1.2"
+> I believe they are using GCC 10.2.0 as am I. I rebuilt the iwd-git
+> AUR
+> with the addition of the suggested 'disable-optimization'. I
+> installed
+> it and restarted the iwd service and get the same result with the
+> test-eapol:
+> ...
+> TEST: EAPoL/FT-Using-PSK 4-Way Handshake
+> TEST: EAPoL/Supplicant+Authenticator 4-Way Handshake
+> test-eapol: unit/test-eapol.c:3698: eapol_ap_sta_handshake_test:
+> Assertion `s.ap
+> _success && s.sta_success' failed.
+> Aborted (core dumped)
 
-Keith
---===============7033801049571562243==--
+Intersting. I would have expected disable-optimization to fix this. I
+am going to have to try this myself on the RPi I have. I have tried
+GCC-9 on an RPi 3, but I will try 10 too, and if I still can't repro
+I'll dig up the original Pi.
+
+> =
+
+> **BUT** now that I an using the latest iwd-git without optimizations
+> and try to connect to it in AP mode, I connect. Also if I let connman
+> use it as a tether, I also connect. If I re-build iwd-git 'with
+> optimizations' and try again, it fails.
+> =
+
+> This is on an "Raspberry Pi Model B Plus Rev 1.2"
+
+Well this is good, but also not too surprising. I was able to 'fix'
+this problem while debugging by simply adding random debug prints
+(small code changes can be enough to alter the binary and 'fix' the
+issue). We are going to have to take another look here as our previous
+fix apparently was not quite enough.
+
+Thanks for your help with debugging.
+
+James
+
+> =
+
+> Keith
+
+
+--===============8047798930103754858==--
 
