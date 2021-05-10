@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============3695323909633257755=="
+Content-Type: multipart/mixed; boundary="===============7596852430761479170=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 1/7] ie: fix ie_parse_data_rates to handle NULL
-Date: Mon, 10 May 2021 10:09:02 -0500
-Message-ID: <7b584352-d9b1-ca86-270b-57b978398430@gmail.com>
-In-Reply-To: <20210507202620.93540-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v2 6/7] doc: document [General].RoamThreshold5G
+Date: Mon, 10 May 2021 10:13:42 -0500
+Message-ID: <b34f6ce5-936a-52ff-79de-ed22551cbe18@gmail.com>
+In-Reply-To: <20210507202620.93540-6-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3695323909633257755==
+--===============7596852430761479170==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,22 +16,51 @@ Content-Transfer-Encoding: quoted-printable
 Hi James,
 
 On 5/7/21 3:26 PM, James Prestwood wrote:
-> The code was partially there to handle NULL IEs but not
-> quite. If NULL IEs are passed in base the data rate totally
-> on the basic rate RSSI table.
 > ---
->   src/ie.c | 19 ++++++++++++-------
->   1 file changed, 12 insertions(+), 7 deletions(-)
+>   src/iwd.config.rst | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
+> =
+
+> diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+> index 478bd616..8e3662d4 100644
+> --- a/src/iwd.config.rst
+> +++ b/src/iwd.config.rst
+> @@ -131,7 +131,14 @@ The group ``[General]`` contains general settings.
+>      * - RoamThreshold
+>        - Value: rssi dBm value, from -100 to 1, default: **-70**
+>   =
+
+> -       This can be used to control how aggressively **iwd** roams.
+> +       This can be used to control how aggressively **iwd** roams from 2=
+.4Ghz
+
+I reworded this slightly to read:
+This value can be used to control how aggressively **iwd** roams when conne=
+cted =
+
+to a 2.4Ghz access point.
+
+> +       networks.
+> +
+> +   * - RoamThreshold5G
+> +     - Value: rssi dBm value, from -100 to 1, default: **-76**
+> +
+> +       This value can be used to control how aggressively **iwd** roams =
+from
+> +       5GHz networks.
+
+ditto.
+
+>   =
+
+>      * - RoamRetryInterval
+>        - Value: unsigned int value in seconds (default: **60**)
 > =
 
 
-I went ahead and applied patches 1, 5, 6 (see reply separately) and 7.  I'l=
-l =
-
-leave the rest up for a few days to see if there's any additional comments.
+applied, thanks.
 
 Regards,
 -Denis
-
---===============3695323909633257755==--
+--===============7596852430761479170==--
 
