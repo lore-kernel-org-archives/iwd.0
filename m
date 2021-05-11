@@ -1,87 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============9175522239218064925=="
+Content-Type: multipart/mixed; boundary="===============8178264073900845746=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 04/11] ap: Add subnet address selection logic
-Date: Tue, 11 May 2021 23:04:42 +0200
-Message-ID: <CAOq732+uYG44riSqnxBprt0YsLXeFHY4aJ4KR8JV=buaUj+UCQ@mail.gmail.com>
-In-Reply-To: <bff1b2f2-c61e-bc8a-0574-ce371a897ec2@gmail.com>
+Subject: Re: [PATCH 1/2] station: Fix autoconnect loops
+Date: Tue, 11 May 2021 23:41:09 +0200
+Message-ID: <CAOq732JPBOr8urQ=qc1jMWULf3GxiWFrj_7OA7Z6sdmj4_hOwQ@mail.gmail.com>
+In-Reply-To: <bdbcc33cb3e86a050778ae0460d5aefe0f301c43.camel@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============9175522239218064925==
+--===============8178264073900845746==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi James,
 
-On Tue, 11 May 2021 at 17:06, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 5/10/21 3:57 AM, Andrew Zaborowski wrote:
-> > Add the ap_select_addr4 function to select a random subnet of requested
-> > size from an address space defined by a string list (for use with the
-> > AP profile [IPv4].Address and the global [IPv4].APAddressPool settings),
-> > avoiding those subnets that conflict with subnets from a second list.
-> > We take care to give a similar weight to all subnets contained in the
-> > specified ranges regardless of how many ranges contain each, basically
-> > so that overlapping ranges don't affect the probabilities (debatable.)
-> >
-> > This is added as src/ap-addr.c so that it's self-contained.
-> > ---
-> >   Makefile.am   |   3 +-
-> >   src/ap-addr.c | 231 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> >   src/ap.h      |   9 ++
-> >   3 files changed, 242 insertions(+), 1 deletion(-)
-> >   create mode 100644 src/ap-addr.c
-> >
+On Tue, 11 May 2021 at 18:32, James Prestwood <prestwoj@gmail.com> wrote:
+> On Mon, 2021-05-10 at 12:12 +0200, Andrew Zaborowski wrote:
+> > Make sure we process the result of a connect attempt both in a D-Bus
+> > triggered connection and during autoconnect.  Until now we'd only
+> > call
+> > station_connect_cb() on NETDEV_EVENT_DISCONNECT_BY_{AP,SME} if
+> > station->connect_pending was non-NULL, i.e. only in the D-Bus method.
+> > As a result we were never blacklisting BSSes and never calling
+> > network_connect_failed() (to set ask_passphrase) during autoconnect.
 >
-> I would rather we made this into a self contained module that pays attent=
-ion to
-> RTNL and tracks any addresses added / removed.  That way the caller isn't=
- forced
-> into performing an RTNL dump first...
+> Is the purpose of this to avoid re-trying the same network over and
+> over? Relying on network_autoconnect() to fail due to ask_passphrase
+> being true?
 
-That is something I considered too but think about how many RTNL
-events and process wakeups we're generating this way compared to how
-often this data is actually used in a typical IWD session... do you
-still think it's a good idea?
+Either this, or getting the BSS blacklisted.  Oherwise autoconnect is
+working around the blacklist logic and has no chance to try another
+BSS or another network.
 
-Also note we wouldn't be saving any code because the RTNL dump is
-still needed at the module init, it's only moved to a different file.
+I don't think the current blacklist and ask_passphrase logic is very
+good, but it could be misleading that station_connect_cb is called
+only in D-Bus triggered connections.  station_connect_cb is already
+handling NETDEV_RESULT_HANDSHAKE_FAILED for both manual- and
+auto-connect, it should also handle NETDEV_EVENT_DISCONNECT_BY_* for
+both cases.  Perhaps station_connect_cb should then implement a better
+policy that looks at whether we're in autoconnect or not, and handles
+NETDEV_RESULT_HANDSHAKE_FAILED and NETDEV_EVENT_DISCONNECT_BY_* in the
+same way.
 
 >
-> > diff --git a/src/ap.h b/src/ap.h
-> > index b0100f34..2163d2db 100644
-> > --- a/src/ap.h
-> > +++ b/src/ap.h
-> > @@ -97,3 +97,12 @@ bool ap_station_disconnect(struct ap_state *ap, cons=
-t uint8_t *mac,
-> >
-> >   bool ap_push_button(struct ap_state *ap);
-> >   void ap_update_beacon(struct ap_state *ap);
-> > +
-> > +struct ap_rtnl_addr4_record {
-> > +     uint32_t addr;
-> > +     uint8_t prefix_len;
-> > +};
-> > +
-> > +int ap_select_addr4(const char **addr_str_list, uint8_t prefix,
-> > +                     const struct l_queue *used_addr_dump,
-> > +                     uint32_t *out_addr);
-> >
->
-> Do we have a chance of collisions if 2 APs are brought up simultaneously?
-> Should there be an explicit reserve / release semantic?  I know you use
-> l_getrandom to pick the subnet, but what if the IP pool size is pretty sm=
-all?
+> Seems like it would be better to re-work autoconnect to actually pop
+> the list when autoconnect fails, and immediately move onto the next (no
+> scanning).
 
-If you started the APs simultaneously and the RTNL dumps had been
-running simultaneously then yeah, I guess this can happen.  I wouldn't
-worry about this, we're trying to do the best thing that's easily
-doable here but there's no guarantees that the subnets are unique on
-the system.  We can always have a race with another process, or that
-process may not even be trying to avoid conflicts or not be able to,
-because it receives a conflicting IP from DHCP.
+Yep, using autoconnect_list would at least give justification for
+having a list, as it is now we could just as well select a single
+network/bss (if ask_passphrase is true there's no point adding it to
+the list in the first place).
+
+Ideally I think this should happen:
+
+* the blacklist can be dropped completely,
+
+* a connection failure at a given timestamp causes the BSS rank and
+the network's rank to be penalized and recover to its normal value
+with time, independent of auto- vs. manual- connect.
+
+* ask_password should be set based on the failure reason, either
+always or only for manual connect (IIRC Denis thinks it should be only
+for manual connect)
 
 Best regards
---===============9175522239218064925==--
+--===============8178264073900845746==--
 
