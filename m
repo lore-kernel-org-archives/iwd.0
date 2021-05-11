@@ -1,129 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============3028848508469691306=="
+Content-Type: multipart/mixed; boundary="===============7248788406938035888=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: [PATCH 1/2] station: Fix autoconnect loops
-Date: Tue, 11 May 2021 09:32:09 -0700
-Message-ID: <bdbcc33cb3e86a050778ae0460d5aefe0f301c43.camel@gmail.com>
-In-Reply-To: <20210510101204.175551-1-andrew.zaborowski@intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 2/2] netdev: Pass a reason code with
+ NETDEV_EVENT_DISCONNECT_BY_*
+Date: Tue, 11 May 2021 11:36:25 -0500
+Message-ID: <71fc7943-1909-5d5f-ecd5-225df4206de0@gmail.com>
+In-Reply-To: <20210510101204.175551-2-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3028848508469691306==
+--===============7248788406938035888==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi Andrew,
 
-On Mon, 2021-05-10 at 12:12 +0200, Andrew Zaborowski wrote:
-> Make sure we process the result of a connect attempt both in a D-Bus
-> triggered connection and during autoconnect.=C2=A0 Until now we'd only
-> call
-> station_connect_cb() on NETDEV_EVENT_DISCONNECT_BY_{AP,SME} if
-> station->connect_pending was non-NULL, i.e. only in the D-Bus method.
-> As a result we were never blacklisting BSSes and never calling
-> network_connect_failed() (to set ask_passphrase) during autoconnect.
+On 5/10/21 5:12 AM, Andrew Zaborowski wrote:
+> Station callbacks expect a reason code (as opposed to status codes) with
+> this event type.  This shouldn't matter a lot because
+> station_disconnect_event() only actually looks at the value during
 
-Is the purpose of this to avoid re-trying the same network over and
-over? Relying on network_autoconnect() to fail due to ask_passphrase
-being true?
+I'm not sure why station is written this way.  I'm pretty sure that calling =
 
-Seems like it would be better to re-work autoconnect to actually pop
-the list when autoconnect fails, and immediately move onto the next (no
-scanning).
+station_disconnect_event() for NETDEV_EVENT_DISCONNECT_BY_SME() is the wron=
+g =
 
-> =
+thing to do.
 
-> Use station->netdev_connected to keep track of whether the event
-> actually happens in the handshake (as opposed to netconfig for
-> example)
-> to avoid calling network_connect_failed() with the "in_handshake"
-> parameter set to true.=C2=A0 Arguably we might want to call
-> netdev_connect_failed() or at least temporarily blacklist/downrank
-> the bss if the connection breaks during netconfig but I kept the
-> current logic in this commit.
-> =
+> connection establishment so usually the "result" parameter is going to
+> be HANDSHAKE_FAILED meaning that we'd already be getting a reason code
+> in status_or_reason, but there could be corner cases where we got a
+> different "result".
 
-> We might also want to call station_reassociate_cb() if we're in a
-> reassociation but this wouldn't currently make much difference (and
-> we
-> don't seem to have any flag to know that we're in a reassociation
-> right
-> now.)
+That is correct for AP disconnections during handshaking, but that is signa=
+led =
+
+by NETDEV_EVENT_DISCONNECT_BY_AP...
+
 > ---
-> =C2=A0src/station.c | 7 ++++++-
-> =C2=A01 file changed, 6 insertions(+), 1 deletion(-)
+>   src/netdev.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
 > =
 
-> diff --git a/src/station.c b/src/station.c
-> index 479f81f5..e503f636 100644
-> --- a/src/station.c
-> +++ b/src/station.c
-> @@ -113,6 +113,7 @@ struct station {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool ap_directed_roaming =
-: 1;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool scanning : 1;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool autoconnect : 1;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool netdev_connected : 1;
-> =C2=A0};
-> =C2=A0
-> =C2=A0struct anqp_entry {
-> @@ -1339,6 +1340,7 @@ static void
-> station_reset_connection_state(struct station *station)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_queue_insert(station->n=
-etworks_sorted, station-
-> >connected_network,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0network_rank_compare, NULL);
-> =C2=A0
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0station->netdev_connected =3D =
-false;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0station->connected_bss =
-=3D NULL;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0station->connected_networ=
-k =3D NULL;
-> =C2=A0
-> @@ -1370,7 +1372,9 @@ static void station_disconnect_event(struct
-> station *station, void *event_data)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_debug("%u", netdev_get_=
-ifindex(station->netdev));
-> =C2=A0
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (station->connect_pending)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (station->connect_pending ||
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(station-=
->state =3D=3D STATION_STATE_CONNECTING
-> &&
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !station=
-->netdev_connected))
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0station_connect_cb(station->netdev,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0NETDEV_RESULT_HANDSHAKE_FAILE
-> D,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0event_data, station);
-> @@ -2554,6 +2558,7 @@ static void station_connect_cb(struct netdev
-> *netdev, enum netdev_result result,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_w=
-arn("Could not request neighbor report");
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> =C2=A0
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0station->netdev_connected =3D =
-true;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0network_connected(station=
-->connected_network);
-> =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (station->netconfig)
+> diff --git a/src/netdev.c b/src/netdev.c
+> index 4fbe813a..6c063df5 100644
+> --- a/src/netdev.c
+> +++ b/src/netdev.c
+> @@ -771,10 +771,15 @@ static void netdev_connect_failed(struct netdev *ne=
+tdev,
+>   =
+
+>   	if (connect_cb)
+>   		connect_cb(netdev, result, &status_or_reason, connect_data);
+> -	else if (event_filter)
+> +	else if (event_filter) {
+> +		/* NETDEV_EVENT_DISCONNECT_BY_SME expects a reason code */
+> +		if (result !=3D NETDEV_RESULT_HANDSHAKE_FAILED)
+> +			status_or_reason =3D MMPDU_REASON_CODE_UNSPECIFIED;
+> +
+
+ From what I remember, the only time we can get here is if a rekey somehow =
+
+fails, or setting keys during a rekey fails.  Are there other cases?
+
+>   		event_filter(netdev, NETDEV_EVENT_DISCONNECT_BY_SME,
+>   				&status_or_reason,
+>   				connect_data);
+> +	}
+>   }
+>   =
+
+>   static void netdev_disconnect_cb(struct l_genl_msg *msg, void *user_dat=
+a)
+> =
 
 
---===============3028848508469691306==--
+Anyway, I applied this with a modified commit description.
+
+Regards,
+-Denis
+--===============7248788406938035888==--
 
