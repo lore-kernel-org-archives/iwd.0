@@ -1,65 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============8047798930103754858=="
+Content-Type: multipart/mixed; boundary="===============4220949358407142309=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: ap mode problem
-Date: Mon, 10 May 2021 16:27:53 -0700
-Message-ID: <51ef6dbba033f3b57edc619817b0d6c7226998c7.camel@gmail.com>
-In-Reply-To: <CAG17S_N_wNs17CCkr-fDoN4qdDCZZVSw1Yz4yRzzTFM4cJiPwQ@mail.gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 01/11] ap: Move sending CMD_START_AP to common function
+Date: Tue, 11 May 2021 09:48:09 -0500
+Message-ID: <ec7ee15e-4e3d-6665-f491-ee73c3a4a045@gmail.com>
+In-Reply-To: <20210510085806.174213-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8047798930103754858==
+--===============4220949358407142309==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+Hi Andrew,
+
+On 5/10/21 3:57 AM, Andrew Zaborowski wrote:
+> ---
+>   src/ap.c | 59 +++++++++++++++++++++++++++-----------------------------
+>   1 file changed, 28 insertions(+), 31 deletions(-)
 > =
 
 
-> I believe they are using GCC 10.2.0 as am I. I rebuilt the iwd-git
-> AUR
-> with the addition of the suggested 'disable-optimization'. I
-> installed
-> it and restarted the iwd service and get the same result with the
-> test-eapol:
-> ...
-> TEST: EAPoL/FT-Using-PSK 4-Way Handshake
-> TEST: EAPoL/Supplicant+Authenticator 4-Way Handshake
-> test-eapol: unit/test-eapol.c:3698: eapol_ap_sta_handshake_test:
-> Assertion `s.ap
-> _success && s.sta_success' failed.
-> Aborted (core dumped)
+Applied, thanks.
 
-Intersting. I would have expected disable-optimization to fix this. I
-am going to have to try this myself on the RPi I have. I have tried
-GCC-9 on an RPi 3, but I will try 10 too, and if I still can't repro
-I'll dig up the original Pi.
+Regards,
+-Denis
 
-> =
-
-> **BUT** now that I an using the latest iwd-git without optimizations
-> and try to connect to it in AP mode, I connect. Also if I let connman
-> use it as a tether, I also connect. If I re-build iwd-git 'with
-> optimizations' and try again, it fails.
-> =
-
-> This is on an "Raspberry Pi Model B Plus Rev 1.2"
-
-Well this is good, but also not too surprising. I was able to 'fix'
-this problem while debugging by simply adding random debug prints
-(small code changes can be enough to alter the binary and 'fix' the
-issue). We are going to have to take another look here as our previous
-fix apparently was not quite enough.
-
-Thanks for your help with debugging.
-
-James
-
-> =
-
-> Keith
-
-
---===============8047798930103754858==--
+--===============4220949358407142309==--
 
