@@ -1,70 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============8178264073900845746=="
+Content-Type: multipart/mixed; boundary="===============1147003965014479274=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 1/2] station: Fix autoconnect loops
-Date: Tue, 11 May 2021 23:41:09 +0200
-Message-ID: <CAOq732JPBOr8urQ=qc1jMWULf3GxiWFrj_7OA7Z6sdmj4_hOwQ@mail.gmail.com>
-In-Reply-To: <bdbcc33cb3e86a050778ae0460d5aefe0f301c43.camel@gmail.com>
+Subject: Re: [PATCH 2/2] netdev: Pass a reason code with
+ NETDEV_EVENT_DISCONNECT_BY_*
+Date: Tue, 11 May 2021 23:56:57 +0200
+Message-ID: <CAOq732Jtd25r9dL7qsqNHeLHLHxJMw14wFQi3Gvch--Aj6XpMA@mail.gmail.com>
+In-Reply-To: <71fc7943-1909-5d5f-ecd5-225df4206de0@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8178264073900845746==
+--===============1147003965014479274==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
-
-On Tue, 11 May 2021 at 18:32, James Prestwood <prestwoj@gmail.com> wrote:
-> On Mon, 2021-05-10 at 12:12 +0200, Andrew Zaborowski wrote:
-> > Make sure we process the result of a connect attempt both in a D-Bus
-> > triggered connection and during autoconnect.  Until now we'd only
-> > call
-> > station_connect_cb() on NETDEV_EVENT_DISCONNECT_BY_{AP,SME} if
-> > station->connect_pending was non-NULL, i.e. only in the D-Bus method.
-> > As a result we were never blacklisting BSSes and never calling
-> > network_connect_failed() (to set ask_passphrase) during autoconnect.
+On Tue, 11 May 2021 at 18:36, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 5/10/21 5:12 AM, Andrew Zaborowski wrote:
+> > Station callbacks expect a reason code (as opposed to status codes) with
+> > this event type.  This shouldn't matter a lot because
+> > station_disconnect_event() only actually looks at the value during
 >
-> Is the purpose of this to avoid re-trying the same network over and
-> over? Relying on network_autoconnect() to fail due to ask_passphrase
-> being true?
+> I'm not sure why station is written this way.  I'm pretty sure that calli=
+ng
+> station_disconnect_event() for NETDEV_EVENT_DISCONNECT_BY_SME() is the wr=
+ong
+> thing to do.
 
-Either this, or getting the BSS blacklisted.  Oherwise autoconnect is
-working around the blacklist logic and has no chance to try another
-BSS or another network.
-
-I don't think the current blacklist and ask_passphrase logic is very
-good, but it could be misleading that station_connect_cb is called
-only in D-Bus triggered connections.  station_connect_cb is already
-handling NETDEV_RESULT_HANDSHAKE_FAILED for both manual- and
-auto-connect, it should also handle NETDEV_EVENT_DISCONNECT_BY_* for
-both cases.  Perhaps station_connect_cb should then implement a better
-policy that looks at whether we're in autoconnect or not, and handles
-NETDEV_RESULT_HANDSHAKE_FAILED and NETDEV_EVENT_DISCONNECT_BY_* in the
-same way.
+That is currently the only use of that function though.
 
 >
-> Seems like it would be better to re-work autoconnect to actually pop
-> the list when autoconnect fails, and immediately move onto the next (no
-> scanning).
+> > connection establishment so usually the "result" parameter is going to
+> > be HANDSHAKE_FAILED meaning that we'd already be getting a reason code
+> > in status_or_reason, but there could be corner cases where we got a
+> > different "result".
+>
+> That is correct for AP disconnections during handshaking, but that is sig=
+naled
+> by NETDEV_EVENT_DISCONNECT_BY_AP...
+>
+> > ---
+> >   src/netdev.c | 7 ++++++-
+> >   1 file changed, 6 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/src/netdev.c b/src/netdev.c
+> > index 4fbe813a..6c063df5 100644
+> > --- a/src/netdev.c
+> > +++ b/src/netdev.c
+> > @@ -771,10 +771,15 @@ static void netdev_connect_failed(struct netdev *=
+netdev,
+> >
+> >       if (connect_cb)
+> >               connect_cb(netdev, result, &status_or_reason, connect_dat=
+a);
+> > -     else if (event_filter)
+> > +     else if (event_filter) {
+> > +             /* NETDEV_EVENT_DISCONNECT_BY_SME expects a reason code */
+> > +             if (result !=3D NETDEV_RESULT_HANDSHAKE_FAILED)
+> > +                     status_or_reason =3D MMPDU_REASON_CODE_UNSPECIFIE=
+D;
+> > +
+>
+>  From what I remember, the only time we can get here is if a rekey somehow
+> fails, or setting keys during a rekey fails.  Are there other cases?
 
-Yep, using autoconnect_list would at least give justification for
-having a list, as it is now we could just as well select a single
-network/bss (if ask_passphrase is true there's no point adding it to
-the list in the first place).
+In theory you can pass a null connect_cb to netdev_connect_common(),
+but in practice we don't do this so you could trigger this only for:
 
-Ideally I think this should happen:
+NETDEV_RESULT_HANDSHAKE_FAILED,
+NETDEV_RESULT_KEY_SETTING_FAILED,
+NETDEV_RESULT_ABORTED.
 
-* the blacklist can be dropped completely,
+I realize I was confused, I thought that netdev_connect_failed() was
+actually sending NETDEV_EVENT_DISCONNECT_BY_SME to station and
+triggering my autoconnect loop, but actually it was
+netdev_disconnect_event() which always calls netdev->event_filter and
+never uses netdev->connect_cb.  Perhaps netdev_disconnect_event()
+should use netdev_connect_failed() instead.
 
-* a connection failure at a given timestamp causes the BSS rank and
-the network's rank to be penalized and recover to its normal value
-with time, independent of auto- vs. manual- connect.
+>
+> >               event_filter(netdev, NETDEV_EVENT_DISCONNECT_BY_SME,
+> >                               &status_or_reason,
+> >                               connect_data);
+> > +     }
+> >   }
+> >
+> >   static void netdev_disconnect_cb(struct l_genl_msg *msg, void *user_d=
+ata)
+> >
+>
+> Anyway, I applied this with a modified commit description.
 
-* ask_password should be set based on the failure reason, either
-always or only for manual connect (IIRC Denis thinks it should be only
-for manual connect)
+Thanks.
 
 Best regards
---===============8178264073900845746==--
+--===============1147003965014479274==--
 
