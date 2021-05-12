@@ -1,55 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============8167143347276503276=="
+Content-Type: multipart/mixed; boundary="===============2940986614575493958=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 08/11] auto-t: update FT-over-DS test for new behavior
-Date: Wed, 12 May 2021 16:01:45 -0700
-Message-ID: <20210512230148.370858-8-prestwoj@gmail.com>
+Subject: [PATCH v3 09/11] ie: use bitwise compare for IE_AKM_IS_FT
+Date: Wed, 12 May 2021 16:01:46 -0700
+Message-ID: <20210512230148.370858-9-prestwoj@gmail.com>
 In-Reply-To: <20210512230148.370858-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8167143347276503276==
+--===============2940986614575493958==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The FT-over-DS procedure now authenticates with multiple BSS's
-upon connecting. This causes list_sta() to return our address for
-any authenticated APs. It has now been changed to work with this
-new behavior, as well as a check that the station fully connected
-to the expected AP initially.
+This has the same effect when passing a single AKM value, but also
+handles AKM bit fields (e.g. ie_rsn_info->akm_suites)
 ---
- autotests/testFT-PSK-over-DS/connection_test.py | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ src/ie.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/autotests/testFT-PSK-over-DS/connection_test.py b/autotests/te=
-stFT-PSK-over-DS/connection_test.py
-index 4c751841..47104b69 100644
---- a/autotests/testFT-PSK-over-DS/connection_test.py
-+++ b/autotests/testFT-PSK-over-DS/connection_test.py
-@@ -62,8 +62,13 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(device, condition)
+v3:
+ * removed extra newline
+
+diff --git a/src/ie.h b/src/ie.h
+index 600cf297..538ca9a8 100644
+--- a/src/ie.h
++++ b/src/ie.h
+@@ -289,12 +289,12 @@ enum ie_rsn_akm_suite {
+ 	(akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256))
  =
 
-+        self.bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.=
-address)
-+
-+        # list_sta actually reports any authenticated stations. Due to the
-+        # nature of FT-over-DS IWD should authenticate to all stations with
-+        # the same mobility domain. This means both APs should show our st=
-ation.
-         self.assertTrue(self.bss_hostapd[0].list_sta())
--        self.assertFalse(self.bss_hostapd[1].list_sta())
-+        self.assertTrue(self.bss_hostapd[1].list_sta())
+ #define IE_AKM_IS_FT(akm) \
+-	((akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_8021X) || \
+-	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_USING_PSK) || \
+-	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256) || \
+-	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384) || \
+-	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256) || \
+-	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
++	(akm & (IE_RSN_AKM_SUITE_FT_OVER_8021X | \
++		IE_RSN_AKM_SUITE_FT_USING_PSK | \
++		IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256 | \
++		IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384 | \
++		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 | \
++		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
  =
 
-         wd.unregister_psk_agent(psk_agent)
- =
-
+ #define IE_AKM_IS_FILS(akm) \
+ 	((akm =3D=3D IE_RSN_AKM_SUITE_FILS_SHA256) || \
 -- =
 
 2.31.1
 
---===============8167143347276503276==--
+--===============2940986614575493958==--
 
