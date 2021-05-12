@@ -1,46 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============3830846639601731100=="
+Content-Type: multipart/mixed; boundary="===============0599411920161761089=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 11/11] station: use IE_AKM_IS_FT when possible
-Date: Wed, 12 May 2021 14:46:10 -0700
-Message-ID: <20210512214610.361080-11-prestwoj@gmail.com>
-In-Reply-To: <20210512214610.361080-1-prestwoj@gmail.com>
+Subject: [PATCH v3 01/11] station: factor out logic for choosing FT
+Date: Wed, 12 May 2021 16:01:38 -0700
+Message-ID: <20210512230148.370858-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3830846639601731100==
+--===============0599411920161761089==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Update a check to use IE_AKM_IS_FT as the condition is identical
-to the macro.
 ---
- src/station.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ src/station.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
 diff --git a/src/station.c b/src/station.c
-index d3f7017d..8dfafe64 100644
+index 479f81f5..bdb8859a 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -865,11 +865,7 @@ build_ie:
- 	if (!handshake_state_set_supplicant_ie(hs, rsne_buf))
- 		goto not_supported;
+@@ -1823,13 +1823,30 @@ static void station_preauthenticate_cb(struct netde=
+v *netdev,
+ 	station_transition_reassociate(station, bss, new_hs);
+ }
  =
 
--	if (info.akm_suites & (IE_RSN_AKM_SUITE_FT_OVER_8021X |
--				IE_RSN_AKM_SUITE_FT_USING_PSK |
--				IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256 |
--				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 |
--				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
-+	if (IE_AKM_IS_FT(info.akm_suites))
- 		add_mde =3D true;
++static bool station_can_fast_transition(struct handshake_state *hs,
++					struct scan_bss *bss)
++{
++	uint16_t mdid;
++
++	if (!hs->mde)
++		return false;
++
++	if (ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
++						&mdid, NULL, NULL) < 0)
++		return false;
++
++	if (bss->mde_present && l_get_le16(bss->mde) =3D=3D mdid)
++		return true;
++
++	return false;
++}
++
+ static void station_transition_start(struct station *station,
+ 							struct scan_bss *bss)
+ {
+ 	struct handshake_state *hs =3D netdev_get_handshake(station->netdev);
+ 	struct network *connected =3D station->connected_network;
+ 	enum security security =3D network_get_security(connected);
+-	uint16_t mdid;
+ 	struct handshake_state *new_hs;
+ 	struct ie_rsn_info cur_rsne, target_rsne;
  =
 
- open_network:
+@@ -1839,12 +1856,8 @@ static void station_transition_start(struct station =
+*station,
+ 	/* Reset AP roam flag, at this point the roaming behaves the same */
+ 	station->ap_directed_roaming =3D false;
+ =
+
+-	if (hs->mde)
+-		ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
+-							&mdid, NULL, NULL);
+-
+ 	/* Can we use Fast Transition? */
+-	if (hs->mde && bss->mde_present && l_get_le16(bss->mde) =3D=3D mdid) {
++	if (station_can_fast_transition(hs, bss)) {
+ 		/* Rebuild handshake RSN for target AP */
+ 		if (station_build_handshake_rsn(hs, station->wiphy,
+ 				station->connected_network, bss) < 0) {
 -- =
 
 2.31.1
 
---===============3830846639601731100==--
+--===============0599411920161761089==--
 
