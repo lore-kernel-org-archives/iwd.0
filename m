@@ -1,53 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============7160076399170981655=="
+Content-Type: multipart/mixed; boundary="===============9035524163779322387=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 09/11] ie: add IE_AKM_HAS_FT
-Date: Wed, 12 May 2021 14:46:08 -0700
-Message-ID: <20210512214610.361080-9-prestwoj@gmail.com>
+Subject: [PATCH v2 10/11] station: make station_can_fast_transition more robust
+Date: Wed, 12 May 2021 14:46:09 -0700
+Message-ID: <20210512214610.361080-10-prestwoj@gmail.com>
 In-Reply-To: <20210512214610.361080-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7160076399170981655==
+--===============9035524163779322387==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is similar to IE_AKM_IS_FT but checks a bitmask of AKM
-suites for any FT AKMs.
+Check that the current handshake is using an FT AKM and that the
+target BSS AKM suites contain an FT AKM.
 ---
- src/ie.h | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ src/station.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/src/ie.h b/src/ie.h
-index 600cf297..9d32c7b7 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -289,12 +289,13 @@ enum ie_rsn_akm_suite {
- 	(akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256))
+diff --git a/src/station.c b/src/station.c
+index f64d352f..d3f7017d 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1796,10 +1796,23 @@ static bool station_can_fast_transition(struct hand=
+shake_state *hs,
+ 						&mdid, NULL, NULL) < 0)
+ 		return false;
  =
 
- #define IE_AKM_IS_FT(akm) \
--	((akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_8021X) || \
--	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_USING_PSK) || \
--	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256) || \
--	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384) || \
--	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256) || \
--	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
-+	(akm & (IE_RSN_AKM_SUITE_FT_OVER_8021X | \
-+		IE_RSN_AKM_SUITE_FT_USING_PSK | \
-+		IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256 | \
-+		IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384 | \
-+		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 | \
-+		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
+-	if (bss->mde_present && l_get_le16(bss->mde) =3D=3D mdid)
+-		return true;
++	if (!(bss->mde_present && l_get_le16(bss->mde) =3D=3D mdid))
++		return false;
+ =
+
+-	return false;
++	if (hs->supplicant_ie !=3D NULL) {
++		struct ie_rsn_info rsn_info;
 +
++		if (!IE_AKM_IS_FT(hs->akm_suite))
++			return false;
++
++		if (scan_bss_get_rsn_info(bss, &rsn_info) < 0)
++			return false;
++
++		if (!IE_AKM_IS_FT(rsn_info.akm_suites))
++			return false;
++	}
++
++	return true;
+ }
  =
 
- #define IE_AKM_IS_FILS(akm) \
- 	((akm =3D=3D IE_RSN_AKM_SUITE_FILS_SHA256) || \
+ static void station_transition_start(struct station *station,
 -- =
 
 2.31.1
 
---===============7160076399170981655==--
+--===============9035524163779322387==--
 
