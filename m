@@ -1,30 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============5347855944136726715=="
+Content-Type: multipart/mixed; boundary="===============3331194673930281589=="
 MIME-Version: 1.0
-From: keruspe+ml01@gmail.com
-Subject: Consider supporting building with clang
-Date: Wed, 12 May 2021 11:47:20 +0000
-Message-ID: <20210512114720.2812.33927@ml01.vlan13.01.org>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/7] station: factor out logic for choosing FT
+Date: Wed, 12 May 2021 12:21:38 -0700
+Message-ID: <20210512192144.348398-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5347855944136726715==
+--===============3331194673930281589==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+---
+ src/station.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
-Since the introduction of the _auto_ destructor macros, ell and iwd generat=
-e nested functions, which are a gnu extension not supported by clang.
+diff --git a/src/station.c b/src/station.c
+index 479f81f5..bdb8859a 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1823,13 +1823,30 @@ static void station_preauthenticate_cb(struct netde=
+v *netdev,
+ 	station_transition_reassociate(station, bss, new_hs);
+ }
+ =
 
-While adding support for that in clang would also benefit other projects, I=
- don't think this idea is going anywhere as it has been brought up numerous=
- times in the past and never went forward.
++static bool station_can_fast_transition(struct handshake_state *hs,
++					struct scan_bss *bss)
++{
++	uint16_t mdid;
++
++	if (!hs->mde)
++		return false;
++
++	if (ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
++						&mdid, NULL, NULL) < 0)
++		return false;
++
++	if (bss->mde_present && l_get_le16(bss->mde) =3D=3D mdid)
++		return true;
++
++	return false;
++}
++
+ static void station_transition_start(struct station *station,
+ 							struct scan_bss *bss)
+ {
+ 	struct handshake_state *hs =3D netdev_get_handshake(station->netdev);
+ 	struct network *connected =3D station->connected_network;
+ 	enum security security =3D network_get_security(connected);
+-	uint16_t mdid;
+ 	struct handshake_state *new_hs;
+ 	struct ie_rsn_info cur_rsne, target_rsne;
+ =
 
-The way e.g. glib deals with it is by splitting this in two, first define t=
-he destructor function alonside the struct it is going to destruct, then ho=
-ok it up with a macro like _auto_ here, this way no nested functions are ne=
-eded. Would this make sense for ell/iwd too? I can provide patches if requi=
-red.
---===============5347855944136726715==--
+@@ -1839,12 +1856,8 @@ static void station_transition_start(struct station =
+*station,
+ 	/* Reset AP roam flag, at this point the roaming behaves the same */
+ 	station->ap_directed_roaming =3D false;
+ =
+
+-	if (hs->mde)
+-		ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
+-							&mdid, NULL, NULL);
+-
+ 	/* Can we use Fast Transition? */
+-	if (hs->mde && bss->mde_present && l_get_le16(bss->mde) =3D=3D mdid) {
++	if (station_can_fast_transition(hs, bss)) {
+ 		/* Rebuild handshake RSN for target AP */
+ 		if (station_build_handshake_rsn(hs, station->wiphy,
+ 				station->connected_network, bss) < 0) {
+-- =
+
+2.31.1
+
+--===============3331194673930281589==--
 
