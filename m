@@ -1,39 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============0796036591685550280=="
+Content-Type: multipart/mixed; boundary="===============4789550400483449773=="
 MIME-Version: 1.0
-From: Rosen Penev <rosenp@gmail.com>
-Subject: Re: Consider supporting building with clang
-Date: Wed, 12 May 2021 14:44:01 -0700
-Message-ID: <CAKxU2N9n=y=KqpUcySQeraiwwyqpKTVeKmnHgnRn7EFQrsdkow@mail.gmail.com>
-In-Reply-To: <20210512114720.2812.33927@ml01.vlan13.01.org>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 01/11] station: factor out logic for choosing FT
+Date: Wed, 12 May 2021 14:46:00 -0700
+Message-ID: <20210512214610.361080-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0796036591685550280==
+--===============4789550400483449773==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 12, 2021 at 4:47 AM <keruspe+ml01@gmail.com> wrote:
->
-> Hello,
->
-> Since the introduction of the _auto_ destructor macros, ell and iwd gener=
-ate nested functions, which are a gnu extension not supported by clang.
->
-> While adding support for that in clang would also benefit other projects,=
- I don't think this idea is going anywhere as it has been brought up numero=
-us times in the past and never went forward.
->
-> The way e.g. glib deals with it is by splitting this in two, first define=
- the destructor function alonside the struct it is going to destruct, then =
-hook it up with a macro like _auto_ here, this way no nested functions are =
-needed. Would this make sense for ell/iwd too? I can provide patches if req=
-uired.
-C23 will get support for lambdas I believe.
+---
+ src/station.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
-http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2638.pdf
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
---===============0796036591685550280==--
+diff --git a/src/station.c b/src/station.c
+index 479f81f5..bdb8859a 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1823,13 +1823,30 @@ static void station_preauthenticate_cb(struct netde=
+v *netdev,
+ 	station_transition_reassociate(station, bss, new_hs);
+ }
+ =
+
++static bool station_can_fast_transition(struct handshake_state *hs,
++					struct scan_bss *bss)
++{
++	uint16_t mdid;
++
++	if (!hs->mde)
++		return false;
++
++	if (ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
++						&mdid, NULL, NULL) < 0)
++		return false;
++
++	if (bss->mde_present && l_get_le16(bss->mde) =3D=3D mdid)
++		return true;
++
++	return false;
++}
++
+ static void station_transition_start(struct station *station,
+ 							struct scan_bss *bss)
+ {
+ 	struct handshake_state *hs =3D netdev_get_handshake(station->netdev);
+ 	struct network *connected =3D station->connected_network;
+ 	enum security security =3D network_get_security(connected);
+-	uint16_t mdid;
+ 	struct handshake_state *new_hs;
+ 	struct ie_rsn_info cur_rsne, target_rsne;
+ =
+
+@@ -1839,12 +1856,8 @@ static void station_transition_start(struct station =
+*station,
+ 	/* Reset AP roam flag, at this point the roaming behaves the same */
+ 	station->ap_directed_roaming =3D false;
+ =
+
+-	if (hs->mde)
+-		ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
+-							&mdid, NULL, NULL);
+-
+ 	/* Can we use Fast Transition? */
+-	if (hs->mde && bss->mde_present && l_get_le16(bss->mde) =3D=3D mdid) {
++	if (station_can_fast_transition(hs, bss)) {
+ 		/* Rebuild handshake RSN for target AP */
+ 		if (station_build_handshake_rsn(hs, station->wiphy,
+ 				station->connected_network, bss) < 0) {
+-- =
+
+2.31.1
+
+--===============4789550400483449773==--
 
