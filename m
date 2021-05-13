@@ -1,112 +1,90 @@
-Content-Type: multipart/mixed; boundary="===============3517095356077523577=="
+Content-Type: multipart/mixed; boundary="===============0805212528933400691=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
 Subject: Re: [PATCH 8/9] autotests: Update APRanges usage in testAP
-Date: Thu, 13 May 2021 12:04:56 -0700
-Message-ID: <f6419d030212a90dcae58f9e55731a5129e2a1c2.camel@gmail.com>
-In-Reply-To: <20210513184718.265483-8-andrew.zaborowski@intel.com>
+Date: Thu, 13 May 2021 21:47:50 +0200
+Message-ID: <CAOq732LpxTmZNVu9OPdZxqBO=7XYADedW+_N+EEQXLkyaZci5w@mail.gmail.com>
+In-Reply-To: <f6419d030212a90dcae58f9e55731a5129e2a1c2.camel@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3517095356077523577==
+--===============0805212528933400691==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Hi James,
 
-On Thu, 2021-05-13 at 20:47 +0200, Andrew Zaborowski wrote:
-> [General].APRange is now [IPv4].APAddressPool and the netmask is
-> changed
-> from 23 to 27 bits to make the test correctly assert that only two
-> default-sized subnets are allowed by IWD simultaneously (default has
-> changed from 24 to 28 bits)
-> ---
-> =C2=A0autotests/testAP/dhcp/main.conf |=C2=A0 4 +++-
-> =C2=A0autotests/testAP/dhcp_test.py=C2=A0=C2=A0 | 12 +++++++++---
-> =C2=A02 files changed, 12 insertions(+), 4 deletions(-)
-> =
+On Thu, 13 May 2021 at 21:05, James Prestwood <prestwoj@gmail.com> wrote:
+> On Thu, 2021-05-13 at 20:47 +0200, Andrew Zaborowski wrote:
+> > [General].APRange is now [IPv4].APAddressPool and the netmask is
+> > changed
+> > from 23 to 27 bits to make the test correctly assert that only two
+> > default-sized subnets are allowed by IWD simultaneously (default has
+> > changed from 24 to 28 bits)
+> > ---
+> >  autotests/testAP/dhcp/main.conf |  4 +++-
+> >  autotests/testAP/dhcp_test.py   | 12 +++++++++---
+> >  2 files changed, 12 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/autotests/testAP/dhcp/main.conf
+> > b/autotests/testAP/dhcp/main.conf
+> > index 667de23c..62ae782d 100644
+> > --- a/autotests/testAP/dhcp/main.conf
+> > +++ b/autotests/testAP/dhcp/main.conf
+> > @@ -3,4 +3,6 @@ DisableMacAddressRandomization=3Dtrue
+> >
+> >  [General]
+> >  EnableNetworkConfiguration=3Dtrue
+> > -APRanges=3D192.168.80.0/23
+> > +
+> > +[IPv4]
+> > +APAddressPool=3D192.168.80.0/27
+> > diff --git a/autotests/testAP/dhcp_test.py
+> > b/autotests/testAP/dhcp_test.py
+> > index bf52fb28..e69c4465 100644
+> > --- a/autotests/testAP/dhcp_test.py
+> > +++ b/autotests/testAP/dhcp_test.py
+> > @@ -58,8 +58,14 @@ class Test(unittest.TestCase):
+> >              testutil.test_iface_operstate(dev2.name)
+> >              testutil.test_ifaces_connected(dev1.name, dev2.name,
+> > group=3DFalse)
+> >
+> > -            testutil.test_ip_address_match(dev1.name,
+> > "192.168.80.1")
+> > -            testutil.test_ip_address_match(dev2.name,
+> > "192.168.80.2")
+> > +            try:
+> > +                testutil.test_ip_address_match(dev1.name,
+> > "192.168.80.1")
+> > +                testutil.test_ip_address_match(dev2.name,
+> > "192.168.80.2")
+> > +                ip =3D "192.168.80.1"
+> > +            except:
+> > +                testutil.test_ip_address_match(dev1.name,
+> > "192.168.80.17")
+> > +                testutil.test_ip_address_match(dev2.name,
+> > "192.168.80.18")
+> > +                ip =3D "192.168.80.17"
+>
+> Not really a huge fan of this try/except. Why is it not deterministic
+> which IP each station will have?
 
-> diff --git a/autotests/testAP/dhcp/main.conf
-> b/autotests/testAP/dhcp/main.conf
-> index 667de23c..62ae782d 100644
-> --- a/autotests/testAP/dhcp/main.conf
-> +++ b/autotests/testAP/dhcp/main.conf
-> @@ -3,4 +3,6 @@ DisableMacAddressRandomization=3Dtrue
-> =C2=A0
-> =C2=A0[General]
-> =C2=A0EnableNetworkConfiguration=3Dtrue
-> -APRanges=3D192.168.80.0/23
-> +
-> +[IPv4]
-> +APAddressPool=3D192.168.80.0/27
-> diff --git a/autotests/testAP/dhcp_test.py
-> b/autotests/testAP/dhcp_test.py
-> index bf52fb28..e69c4465 100644
-> --- a/autotests/testAP/dhcp_test.py
-> +++ b/autotests/testAP/dhcp_test.py
-> @@ -58,8 +58,14 @@ class Test(unittest.TestCase):
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-testutil.test_iface_operstate(dev2.name)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-testutil.test_ifaces_connected(dev1.name, dev2.name,
-> group=3DFalse)
-> =C2=A0
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 testu=
-til.test_ip_address_match(dev1.name,
-> "192.168.80.1")
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 testu=
-til.test_ip_address_match(dev2.name,
-> "192.168.80.2")
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 try:
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 testutil.test_ip_address_match(dev1.name,
-> "192.168.80.1")
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 testutil.test_ip_address_match(dev2.name,
-> "192.168.80.2")
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 ip =3D "192.168.80.1"
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 excep=
-t:
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 testutil.test_ip_address_match(dev1.name,
-> "192.168.80.17")
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 testutil.test_ip_address_match(dev2.name,
-> "192.168.80.18")
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 ip =3D "192.168.80.17"
+The new code selects a random subnet from the configured space on
+purpose.  We can retrieve the actual address here and compare the 31
+bits of it that we want to validate but it was easier to reuse the
+testutil.test_ip_address_match API, I'll change this though if I have
+to resend this another time.
 
-Not really a huge fan of this try/except. Why is it not deterministic
-which IP each station will have? I'm probably missing something with
-the previous patches but with the new APAddressPool you set you should
-have a range of .80.1 to .80.31 right? So why wouldn't the DHCP server
-just choose 80.1 and 80.2 still?
+> I'm probably missing something with
+> the previous patches but with the new APAddressPool you set you should
+> have a range of .80.1 to .80.31 right? So why wouldn't the DHCP server
+> just choose 80.1 and 80.2 still?
 
-> =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-wd.unregister_psk_agent(psk_agent)
-> =C2=A0
-> @@ -76,7 +82,7 @@ class Test(unittest.TestCase):
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-# got initially.
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-dev4.start_ap('TestAP4', 'Password4')
-> =C2=A0
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 testu=
-til.test_ip_address_match(dev4.name,
-> "192.168.80.1")
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 testu=
-til.test_ip_address_match(dev4.name, ip)
-> =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 finally:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-dev1.stop_ap()
+The default subnet size is 16 addresses now so the code should select
+one of the two subnets that fit in the .80.0 - .80.31 range and we
+don't know which one it's going to be.
 
-Thanks,
-James
-
-
---===============3517095356077523577==--
+Best regards
+--===============0805212528933400691==--
 
