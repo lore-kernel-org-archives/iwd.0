@@ -1,31 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============4525100395491306212=="
+Content-Type: multipart/mixed; boundary="===============2773926747980377115=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v3 01/11] station: factor out logic for choosing FT
-Date: Wed, 12 May 2021 18:07:32 -0500
-Message-ID: <21380657-996c-ea0d-aeb1-65b7f35dc32e@gmail.com>
-In-Reply-To: <20210512230148.370858-1-prestwoj@gmail.com>
+From: Daniel Wagner <wagi@monom.org>
+Subject: Re: [RFC connman 1/1] WIP: Add WPA3-SAE support
+Date: Thu, 13 May 2021 12:53:19 +0200
+Message-ID: <20210513105319.7sgih2sbhrdn4dgz@beryllium.lan>
+In-Reply-To: <3d463ef3-a1ea-3c49-5d4f-79ad58e4bd7f@collabora.co.uk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4525100395491306212==
+--===============2773926747980377115==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Andrej,
 
-On 5/12/21 6:01 PM, James Prestwood wrote:
-> ---
->   src/station.c | 25 +++++++++++++++++++------
->   1 file changed, 19 insertions(+), 6 deletions(-)
+On Thu, May 13, 2021 at 11:52:32AM +0200, Andrej Shadura wrote:
+> On 12/05/2021 19:27, Ariel D'Alessandro wrote:
+> > Implement WPA3-SAE authentication on connman side.
+> > =
+
+> > Based on Tizen project:
+> > =
+
+> >   https://review.tizen.org/git/?p=3Dplatform/upstream/connman.git
+> > =
+
+> > Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
 > =
 
+> Based on my understanding how this should work, this looks reasonable to =
+me.
 
-All applied, thanks.
+Same here, this looks pretty straightforward. Thanks for picking this
+up.
 
-Regards,
--Denis
+The patch should be spitted into one which adds the SAE to the Security
+property of the Service API (please also update the documentation). The
+second patch adds the plugins/wifi.c implementation.
 
---===============4525100395491306212==--
+I am not really into the WiFi topic anymore, so I am adding the iwd
+mailing list. Maybe we get some input for the new SAE Security
+property, e.g. how this could work with iwd.
+
+Thanks,
+Daniel
+--===============2773926747980377115==--
 
