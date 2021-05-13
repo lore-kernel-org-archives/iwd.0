@@ -1,158 +1,165 @@
-Content-Type: multipart/mixed; boundary="===============4483712897013233949=="
+Content-Type: multipart/mixed; boundary="===============5516417805757727689=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 7/9] ap: Send a specific error message on async AP start
- failure
-Date: Thu, 13 May 2021 20:47:16 +0200
-Message-ID: <20210513184718.265483-7-andrew.zaborowski@intel.com>
+Subject: [PATCH 9/9] doc: Update AP settings in iwd.ap(5) and iwd.config(5)
+Date: Thu, 13 May 2021 20:47:18 +0200
+Message-ID: <20210513184718.265483-9-andrew.zaborowski@intel.com>
 In-Reply-To: <20210513184718.265483-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4483712897013233949==
+--===============5516417805757727689==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-We generate the DBus error reply type from the errno only when
-ap_start() was failing synchronously, now also send the errno through
-the callbacks so that we can also return a specific DBus reply when
-failing asynchronously.  Thea AP autotest relies on receiving the
-AlreadyExists DBus error.
 ---
- src/ap.c | 32 ++++++++++++++++++--------------
- src/ap.h |  4 ++++
- 2 files changed, 22 insertions(+), 14 deletions(-)
+ src/iwd.ap.rst     | 31 ++++++++++++++++++++++++-------
+ src/iwd.config.rst | 29 ++++++++++++++++++++++++++---
+ 2 files changed, 50 insertions(+), 10 deletions(-)
 
-diff --git a/src/ap.c b/src/ap.c
-index cffb2906..edb280ae 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -2053,9 +2053,11 @@ static void do_debug(const char *str, void *user_dat=
-a)
- 	l_info("%s%s", prefix, str);
- }
+diff --git a/src/iwd.ap.rst b/src/iwd.ap.rst
+index 51622509..5fa23179 100644
+--- a/src/iwd.ap.rst
++++ b/src/iwd.ap.rst
+@@ -104,14 +104,31 @@ is desired, the group header line must still be prese=
+nt:
+    :widths: 20 80
  =
 
--static void ap_start_failed(struct ap_state *ap)
-+static void ap_start_failed(struct ap_state *ap, int err)
- {
--	ap->ops->handle_event(AP_EVENT_START_FAILED, NULL, ap->user_data);
-+	struct ap_event_start_failed_data data =3D { err };
+    * - Address
+-     - Local IP address
++     - Local IP address or a comma-separated list of prefix-notation addre=
+sses
+ =
+
+        Optional local address pool for the access point and the DHCP serve=
+r.
+-       If provided this addresss will be set on the AP interface and any o=
+ther
+-       DHCP server options will be derived from it, unless they are overri=
+dden
+-       by other settings below.  If *Address* is not provided and no IP
+-       address is set on the interface prior to calling `StartProfile`,  t=
+he IP
+-       pool defined by the global ``[General].APRanges`` setting will be u=
+sed.
++       If a single address is provided this address will be set on the AP
++       interface and any other DHCP server options will be derived from it
++       if not overridden by other settings below.
 +
-+	ap->ops->handle_event(AP_EVENT_START_FAILED, &data, ap->user_data);
- 	ap_reset(ap);
- 	l_genl_family_free(ap->nl80211);
- =
-
-@@ -2070,22 +2072,18 @@ static void ap_start_cb(struct l_genl_msg *msg, voi=
-d *user_data)
- =
-
- 	if (l_genl_msg_get_error(msg) < 0) {
- 		l_error("START_AP failed: %i", l_genl_msg_get_error(msg));
--
--		goto failed;
-+		ap_start_failed(ap, l_genl_msg_get_error(msg));
-+		return;
- 	}
- =
-
- 	if (ap->netconfig_dhcp && !l_dhcp_server_start(ap->netconfig_dhcp)) {
- 		l_error("DHCP server failed to start");
--		goto failed;
-+		ap_start_failed(ap, -EINVAL);
-+		return;
- 	}
- =
-
- 	ap->started =3D true;
- 	ap->ops->handle_event(AP_EVENT_STARTED, NULL, ap->user_data);
--
--	return;
--
--failed:
--	ap_start_failed(ap);
- }
- =
-
- static struct l_genl_msg *ap_build_cmd_start_ap(struct ap_state *ap)
-@@ -2200,12 +2198,12 @@ static void ap_ifaddr4_added_cb(int error, uint16_t=
- type, const void *data,
- =
-
- 	if (error) {
- 		l_error("Failed to set IP address");
--		ap_start_failed(ap);
-+		ap_start_failed(ap, error);
- 		return;
- 	}
- =
-
- 	if (!ap_start_send(ap))
--		ap_start_failed(ap);
-+		ap_start_failed(ap, -EIO);
- }
- =
-
- static bool ap_parse_new_station_ies(const void *data, uint16_t len,
-@@ -2377,10 +2375,12 @@ static void ap_mlme_notify(struct l_genl_msg *msg, =
-void *user_data)
- 	switch (l_genl_msg_get_command(msg)) {
- 	case NL80211_CMD_STOP_AP:
- 		if (ap->start_stop_cmd_id) {
-+			struct ap_event_start_failed_data data =3D { -ECANCELED };
++       If a list of addresses and prefix lengths is specified (in the
++       `<IP>/<prefix-len>` format), a single subnet address will be select=
+ed
++       from the available space each time this profile is started.  The su=
+bnet
++       size is based on the ``[IPv4].Netmask`` setting.
 +
- 			l_genl_family_cancel(ap->nl80211,
- 						ap->start_stop_cmd_id);
- 			ap->start_stop_cmd_id =3D 0;
--			ap->ops->handle_event(AP_EVENT_START_FAILED, NULL,
-+			ap->ops->handle_event(AP_EVENT_START_FAILED, &data,
- 						ap->user_data);
- 		} else if (ap->started) {
- 			ap->started =3D false;
-@@ -3143,13 +3143,17 @@ static void ap_if_event_func(enum ap_event_type typ=
-e, const void *event_data,
- =
-
- 	switch (type) {
- 	case AP_EVENT_START_FAILED:
-+	{
-+		const struct ap_event_start_failed_data *data =3D event_data;
++       If *Address* is not provided and no IP address is set on the
++       interface prior to calling `StartProfile` the value of the main.conf
++       ``[IPv4].APAddressPool`` setting will be inherited, which in turn
++       defaults to 192.168.0.0/16.
 +
- 		if (L_WARN_ON(!ap_if->pending))
- 			break;
++       For example, if ``[IPv4].Netmask`` is set to 255.255.255.0 and this
++       setting, or the global *APAddressPool* fallback, is set to
++       ``192.168.0.0/16, 10.0.0.0/22``, IWD will select one of the 256 sub=
+nets
++       with addresses in the 192.168.<0-255>.0/24 range or one of the 4 su=
+bnets
++       with addresses in the 10.0.<0-3>.0/24 range, allowing 270 possible
++       subnets.  Defining an address pool larger than the desired subnet g=
+ives
++       IWD a chance to avoid conflicts if other interfaces on the system u=
+se
++       dynamically assigned addresses.
  =
 
--		reply =3D dbus_error_failed(ap_if->pending);
-+		reply =3D dbus_error_from_errno(data->error, ap_if->pending);
- 		dbus_pending_reply(&ap_if->pending, reply);
- 		ap_if->ap =3D NULL;
- 		break;
-+	}
+    * - Gateway
+      - IP Address of gateway
+@@ -122,7 +139,7 @@ is desired, the group header line must still be present:
+    * - Netmask
+      - Local netmask of the AP
  =
 
- 	case AP_EVENT_STARTED:
- 		if (L_WARN_ON(!ap_if->pending))
-diff --git a/src/ap.h b/src/ap.h
-index ff6b635d..2f1422ca 100644
---- a/src/ap.h
-+++ b/src/ap.h
-@@ -35,6 +35,10 @@ enum ap_event_type {
- 	AP_EVENT_PBC_MODE_EXIT,
- };
+-       This will be generated from ``[IPv4].Address`` if not provided.
++       Defaults to a 28-bit netmask if not provided.
  =
 
-+struct ap_event_start_failed_data {
-+	int error;
-+};
+    * - DNSList
+      - List of DNS servers as a comma-separated IP address list
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 60f5b5db..78ec284e 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -67,8 +67,8 @@ The group ``[General]`` contains general settings.
+        obtain the dynamic addresses from the network through the built-in
+        DHCP client.
+ =
+
+-       This also enables DHCP server when in AP mode when either
+-       [General].APRanges is set or an AP profile is being used.
++       This also enables network configuration and the DHCP server when in=
+ AP
++       mode and the AP profile being activated does not override it.
+ =
+
+        The network configuration feature is disabled by default.  See
+        ``[Network]`` settings for additional settings related to network
+@@ -182,7 +182,7 @@ The group ``[General]`` contains general settings.
+        then setting ``DisableANQP`` to ``false`` is recommended.
+ =
+
+ Network
+----------
++-------
+ =
+
+ The group ``[Network]`` contains network configuration related settings.
+ =
+
+@@ -319,6 +319,29 @@ No modification from defaults is normally required.
+        prevent **iwd** from roaming properly, but can be useful for networ=
+ks
+        operating under extremely low rssi levels where roaming isn't possi=
+ble.
+ =
+
++IPv4
++----
 +
- struct ap_event_station_added_data {
- 	const uint8_t *mac;
- 	const uint8_t *assoc_ies;
++The group ``[IPv4]`` contains settings related to IPv4 network configurati=
+on.
++
++.. list-table::
++   :header-rows: 0
++   :stub-columns: 0
++   :widths: 20 80
++   :align: left
++
++   * - APAddressPool
++     - Values: comma-separated list of prefix-notation IP strings
++
++       Defines the space of IPs used for the Access Point-mode subnet addr=
+esses
++       and the DHCP server.  Defaults to 192.168.0.0/16.  The prefix length
++       decides the size of the pool from which an address is selected but =
+the
++       actual subnet size (netmask) is based on the AP profile being activ=
+ated
++       and defaults to 28 bits.  The AP profile's ``[IPv4].Address`` setti=
+ng
++       overrides the global value set here.  Setting a too small address s=
+pace
++       will limit the number of access points that can be running
++       simultaneously on different interfaces.
++
+ SEE ALSO
+ =3D=3D=3D=3D=3D=3D=3D=3D
+ =
+
 -- =
 
 2.27.0
 
---===============4483712897013233949==--
+--===============5516417805757727689==--
 
