@@ -1,267 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============8207812372952521584=="
+Content-Type: multipart/mixed; boundary="===============7019795772716300130=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/9] ap: Add subnet address selection logic
-Date: Thu, 13 May 2021 20:47:12 +0200
-Message-ID: <20210513184718.265483-3-andrew.zaborowski@intel.com>
-In-Reply-To: <20210513184718.265483-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 1/9] ap: Make rtnl global static
+Date: Thu, 13 May 2021 20:47:10 +0200
+Message-ID: <20210513184718.265483-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8207812372952521584==
+--===============7019795772716300130==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add the ap_select_addr4 function to select a random subnet of requested
-size from an address space defined by a string list (for use with the
-AP profile [IPv4].Address and the global [IPv4].APAddressPool settings),
-avoiding those subnets that conflict with subnets in use.  We take care
-to give a similar weight to all subnets contained in the specified
-ranges regardless of how many ranges contain each, basically so that
-overlapping ranges don't affect the probabilities (debatable.)
 ---
- src/ap-addr.c | 202 ++++++++++++++++++++++++++++++++++++++++++++++++++
- src/ap.h      |   2 +
- 2 files changed, 204 insertions(+)
+ src/ap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/ap-addr.c b/src/ap-addr.c
-index 238cc7b5..b2a87b37 100644
---- a/src/ap-addr.c
-+++ b/src/ap-addr.c
-@@ -37,9 +37,211 @@
- #include "src/mpdu.h"
- #include "src/ap.h"
+diff --git a/src/ap.c b/src/ap.c
+index 8851cb85..7eac07d7 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -141,7 +141,7 @@ struct ap_ip_pool {
  =
 
-+struct ap_ip_range {
-+	uint32_t start;
-+	uint32_t end;
-+};
-+
- static struct l_queue *used_addr4_list;
- static struct l_netlink *rtnl;
+ struct ap_ip_pool pool;
+ static uint32_t netdev_watch;
+-struct l_netlink *rtnl;
++static struct l_netlink *rtnl;
  =
 
-+static int ap_ip_range_compare(const void *a, const void *b, void *user_da=
-ta)
-+{
-+	const struct ap_ip_range *range_a =3D a;
-+	const struct ap_ip_range *range_b =3D b;
-+
-+	return range_a->start > range_b->start ? 1 : -1;
-+}
-+
-+/*
-+ * Append any address ranges within an input start/end range which contain
-+ * at least one full subnet and don't intersect with any subnets already in
-+ * use.  This may result in the input range being split into multiple rang=
-es
-+ * of different sizes or being skipped altogether.
-+ * All inputs must be rounded to the subnet boundary and the @used queue
-+ * sorted by the subnet start address.
-+ */
-+static void ap_append_range(struct l_queue *to, const struct ap_ip_range *=
-range,
-+				struct l_queue *used, const char *str)
-+{
-+	const struct l_queue_entry *entry =3D l_queue_get_entries(used);
-+	const struct ap_ip_range *used_range =3D entry ? entry->data : NULL;
-+	uint32_t start =3D range->start;
-+	bool print =3D true;
-+
-+	while (range->end > start) {
-+		while (used_range && used_range->end <=3D start) {
-+			entry =3D entry->next;
-+			used_range =3D entry ? entry->data : NULL;
-+		}
-+
-+		/* No more used ranges that intersect with @start/@range->end */
-+		if (!used_range || range->end <=3D used_range->start) {
-+			struct ap_ip_range *sub =3D l_new(struct ap_ip_range, 1);
-+
-+			sub->start =3D start;
-+			sub->end =3D range->end;
-+			l_queue_push_tail(to, sub);
-+			l_queue_insert(used, l_memdup(sub, sizeof(*sub)),
-+					ap_ip_range_compare, NULL);
-+			return;
-+		}
-+
-+		if (print) {
-+			l_debug("Address spec %s intersects with at least one "
-+				"subnet already in use on the system or "
-+				"specified in the settings", str);
-+			print =3D false;
-+		}
-+
-+		/* Now we know @used_range is non-NULL and intersects */
-+		if (start < used_range->start) {
-+			struct ap_ip_range *sub =3D l_new(struct ap_ip_range, 1);
-+
-+			sub->start =3D start;
-+			sub->end =3D used_range->start;
-+			l_queue_push_tail(to, sub);
-+			l_queue_insert(used, l_memdup(sub, sizeof(*sub)),
-+					ap_ip_range_compare, NULL);
-+		}
-+
-+		/* Skip to the start of the next subnet */
-+		start =3D used_range->end;
-+	}
-+}
-+
-+/*
-+ * Select a subnet and a host address from a defined space.
-+ *
-+ * Returns:  0 when an address was selected and written to *out_addr,
-+ *          -EEXIST if all available subnet addresses are in use,
-+ *          -EINVAL if there was a different error.
-+ */
-+int ap_select_addr4(const char **addr_str_list, uint8_t prefix,
-+			struct netdev *netdev, uint32_t *out_addr)
-+{
-+	uint32_t total =3D 0;
-+	uint32_t selected;
-+	unsigned int i;
-+	uint32_t subnet_size =3D 1 << (32 - prefix);
-+	uint32_t host_mask =3D subnet_size - 1;
-+	uint32_t subnet_mask =3D ~host_mask;
-+	uint32_t host_addr =3D 0;
-+	struct l_queue *ranges =3D l_queue_new();
-+	struct l_queue *used =3D l_queue_new();
-+	struct in_addr ia;
-+	const struct l_queue_entry *entry;
-+	uint32_t ifindex =3D netdev ? netdev_get_ifindex(netdev) : 0;
-+	int err =3D -EINVAL;
-+
-+	/* Build a sorted list of used/unavailable subnets */
-+	for (entry =3D l_queue_get_entries((struct l_queue *) used_addr4_list);
-+			entry; entry =3D entry->next) {
-+		const struct ap_rtnl_addr4_record *rec =3D entry->data;
-+		struct ap_ip_range *range;
-+
-+		/*
-+		 * Don't add current subnets from the target interface to the used
-+		 * subnet address list because we'll be replacing them (or adding
-+		 * another secondary address) so there won't be a routing conflict.
-+		 */
-+		if (rec->ifindex =3D=3D ifindex)
-+			continue;
-+
-+		if (!rec->addr || !rec->prefix_len)
-+			continue;
-+
-+		range =3D l_new(struct ap_ip_range, 1);
-+		range->start =3D rec->addr & subnet_mask;
-+		range->end =3D (range->start + (1 << (32 - rec->prefix_len)) +
-+				subnet_size - 1) & subnet_mask;
-+		l_queue_insert(used, range, ap_ip_range_compare, NULL);
-+	}
-+
-+	/* Build the list of available subnets */
-+
-+	/* Check for the static IP syntax: Address=3D<IP> */
-+	if (l_strv_length((char **) addr_str_list) =3D=3D 1 &&
-+			inet_pton(AF_INET, *addr_str_list, &ia) =3D=3D 1) {
-+		struct ap_ip_range range;
-+
-+		host_addr =3D ntohl(ia.s_addr);
-+		range.start =3D host_addr & subnet_mask;
-+		range.end =3D range.start + subnet_size;
-+		ap_append_range(ranges, &range, used, *addr_str_list);
-+		goto check_avail;
-+	}
-+
-+	for (i =3D 0; addr_str_list[i]; i++) {
-+		struct ap_ip_range range;
-+		uint32_t addr;
-+		uint8_t addr_prefix;
-+
-+		if (!util_ip_prefix_tohl(addr_str_list[i], &addr_prefix, &addr,
-+						NULL, NULL)) {
-+			l_error("Can't parse %s as a subnet address",
-+				addr_str_list[i]);
-+			goto cleanup;
-+		}
-+
-+		if (addr_prefix > prefix) {
-+			l_debug("Address spec %s smaller than requested "
-+				"subnet (prefix len %i)", addr_str_list[i],
-+				prefix);
-+			continue;
-+		}
-+
-+		range.start =3D addr & subnet_mask;
-+		range.end =3D range.start + (1 << (32 - addr_prefix));
-+		ap_append_range(ranges, &range, used, addr_str_list[i]);
-+	}
-+
-+check_avail:
-+	if (l_queue_isempty(ranges)) {
-+		l_error("No IP subnets available for new Access Point after "
-+			"eliminating those already in use on the system");
-+		err =3D -EEXIST;
-+		goto cleanup;
-+	}
-+
-+	if (host_addr)
-+		goto done;
-+
-+	/* Count available @prefix-sized subnets */
-+	for (entry =3D l_queue_get_entries(ranges); entry; entry =3D entry->next)=
- {
-+		struct ap_ip_range *range =3D entry->data;
-+
-+		total +=3D (range->end - range->start) >> (32 - prefix);
-+	}
-+
-+	selected =3D l_getrandom_uint32() % total;
-+
-+	/* Find the @selected'th @prefix-sized subnet */
-+	for (entry =3D l_queue_get_entries(ranges);; entry =3D entry->next) {
-+		struct ap_ip_range *range =3D entry->data;
-+		uint32_t count =3D (range->end - range->start) >> (32 - prefix);
-+
-+		if (selected < count) {
-+			host_addr =3D range->start + (selected << (32 - prefix));
-+			break;
-+		}
-+
-+		selected -=3D count;
-+	}
-+
-+	if ((host_addr & 0xff) =3D=3D 0)
-+		host_addr +=3D 1;
-+
-+done:
-+	err =3D 0;
-+	*out_addr =3D host_addr;
-+
-+cleanup:
-+	l_queue_destroy(ranges, l_free);
-+	l_queue_destroy(used, l_free);
-+	return err;
-+}
-+
- static bool ap_rtnl_addr4_match_ifindex(const void *a, const void *b)
- {
- 	const struct ap_rtnl_addr4_record *addr =3D a;
-diff --git a/src/ap.h b/src/ap.h
-index 12baca8b..ff6b635d 100644
---- a/src/ap.h
-+++ b/src/ap.h
-@@ -105,4 +105,6 @@ struct ap_rtnl_addr4_record {
- 	bool secondary;
- };
- =
-
-+int ap_select_addr4(const char **addr_str_list, uint8_t prefix,
-+			struct netdev *netdev, uint32_t *out_addr);
- const struct ap_rtnl_addr4_record *ap_get_addr4(struct netdev *netdev);
+ /*
+  * Creates pool of IPs which AP intefaces can use. Each call to ip_pool_get
 -- =
 
 2.27.0
 
---===============8207812372952521584==--
+--===============7019795772716300130==--
 
