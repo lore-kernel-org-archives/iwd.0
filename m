@@ -1,165 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============5516417805757727689=="
+Content-Type: multipart/mixed; boundary="===============5036651510955256590=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 9/9] doc: Update AP settings in iwd.ap(5) and iwd.config(5)
-Date: Thu, 13 May 2021 20:47:18 +0200
-Message-ID: <20210513184718.265483-9-andrew.zaborowski@intel.com>
+Subject: [PATCH 8/9] autotests: Update APRanges usage in testAP
+Date: Thu, 13 May 2021 20:47:17 +0200
+Message-ID: <20210513184718.265483-8-andrew.zaborowski@intel.com>
 In-Reply-To: <20210513184718.265483-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5516417805757727689==
+--===============5036651510955256590==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+[General].APRange is now [IPv4].APAddressPool and the netmask is changed
+from 23 to 27 bits to make the test correctly assert that only two
+default-sized subnets are allowed by IWD simultaneously (default has
+changed from 24 to 28 bits)
 ---
- src/iwd.ap.rst     | 31 ++++++++++++++++++++++++-------
- src/iwd.config.rst | 29 ++++++++++++++++++++++++++---
- 2 files changed, 50 insertions(+), 10 deletions(-)
+ autotests/testAP/dhcp/main.conf |  4 +++-
+ autotests/testAP/dhcp_test.py   | 12 +++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/src/iwd.ap.rst b/src/iwd.ap.rst
-index 51622509..5fa23179 100644
---- a/src/iwd.ap.rst
-+++ b/src/iwd.ap.rst
-@@ -104,14 +104,31 @@ is desired, the group header line must still be prese=
-nt:
-    :widths: 20 80
+diff --git a/autotests/testAP/dhcp/main.conf b/autotests/testAP/dhcp/main.c=
+onf
+index 667de23c..62ae782d 100644
+--- a/autotests/testAP/dhcp/main.conf
++++ b/autotests/testAP/dhcp/main.conf
+@@ -3,4 +3,6 @@ DisableMacAddressRandomization=3Dtrue
  =
 
-    * - Address
--     - Local IP address
-+     - Local IP address or a comma-separated list of prefix-notation addre=
-sses
- =
-
-        Optional local address pool for the access point and the DHCP serve=
-r.
--       If provided this addresss will be set on the AP interface and any o=
-ther
--       DHCP server options will be derived from it, unless they are overri=
-dden
--       by other settings below.  If *Address* is not provided and no IP
--       address is set on the interface prior to calling `StartProfile`,  t=
-he IP
--       pool defined by the global ``[General].APRanges`` setting will be u=
-sed.
-+       If a single address is provided this address will be set on the AP
-+       interface and any other DHCP server options will be derived from it
-+       if not overridden by other settings below.
+ [General]
+ EnableNetworkConfiguration=3Dtrue
+-APRanges=3D192.168.80.0/23
 +
-+       If a list of addresses and prefix lengths is specified (in the
-+       `<IP>/<prefix-len>` format), a single subnet address will be select=
-ed
-+       from the available space each time this profile is started.  The su=
-bnet
-+       size is based on the ``[IPv4].Netmask`` setting.
-+
-+       If *Address* is not provided and no IP address is set on the
-+       interface prior to calling `StartProfile` the value of the main.conf
-+       ``[IPv4].APAddressPool`` setting will be inherited, which in turn
-+       defaults to 192.168.0.0/16.
-+
-+       For example, if ``[IPv4].Netmask`` is set to 255.255.255.0 and this
-+       setting, or the global *APAddressPool* fallback, is set to
-+       ``192.168.0.0/16, 10.0.0.0/22``, IWD will select one of the 256 sub=
-nets
-+       with addresses in the 192.168.<0-255>.0/24 range or one of the 4 su=
-bnets
-+       with addresses in the 10.0.<0-3>.0/24 range, allowing 270 possible
-+       subnets.  Defining an address pool larger than the desired subnet g=
-ives
-+       IWD a chance to avoid conflicts if other interfaces on the system u=
-se
-+       dynamically assigned addresses.
++[IPv4]
++APAddressPool=3D192.168.80.0/27
+diff --git a/autotests/testAP/dhcp_test.py b/autotests/testAP/dhcp_test.py
+index bf52fb28..e69c4465 100644
+--- a/autotests/testAP/dhcp_test.py
++++ b/autotests/testAP/dhcp_test.py
+@@ -58,8 +58,14 @@ class Test(unittest.TestCase):
+             testutil.test_iface_operstate(dev2.name)
+             testutil.test_ifaces_connected(dev1.name, dev2.name, group=3DF=
+alse)
  =
 
-    * - Gateway
-      - IP Address of gateway
-@@ -122,7 +139,7 @@ is desired, the group header line must still be present:
-    * - Netmask
-      - Local netmask of the AP
+-            testutil.test_ip_address_match(dev1.name, "192.168.80.1")
+-            testutil.test_ip_address_match(dev2.name, "192.168.80.2")
++            try:
++                testutil.test_ip_address_match(dev1.name, "192.168.80.1")
++                testutil.test_ip_address_match(dev2.name, "192.168.80.2")
++                ip =3D "192.168.80.1"
++            except:
++                testutil.test_ip_address_match(dev1.name, "192.168.80.17")
++                testutil.test_ip_address_match(dev2.name, "192.168.80.18")
++                ip =3D "192.168.80.17"
  =
 
--       This will be generated from ``[IPv4].Address`` if not provided.
-+       Defaults to a 28-bit netmask if not provided.
+             wd.unregister_psk_agent(psk_agent)
  =
 
-    * - DNSList
-      - List of DNS servers as a comma-separated IP address list
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 60f5b5db..78ec284e 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -67,8 +67,8 @@ The group ``[General]`` contains general settings.
-        obtain the dynamic addresses from the network through the built-in
-        DHCP client.
+@@ -76,7 +82,7 @@ class Test(unittest.TestCase):
+             # got initially.
+             dev4.start_ap('TestAP4', 'Password4')
  =
 
--       This also enables DHCP server when in AP mode when either
--       [General].APRanges is set or an AP profile is being used.
-+       This also enables network configuration and the DHCP server when in=
- AP
-+       mode and the AP profile being activated does not override it.
+-            testutil.test_ip_address_match(dev4.name, "192.168.80.1")
++            testutil.test_ip_address_match(dev4.name, ip)
  =
 
-        The network configuration feature is disabled by default.  See
-        ``[Network]`` settings for additional settings related to network
-@@ -182,7 +182,7 @@ The group ``[General]`` contains general settings.
-        then setting ``DisableANQP`` to ``false`` is recommended.
- =
-
- Network
-----------
-+-------
- =
-
- The group ``[Network]`` contains network configuration related settings.
- =
-
-@@ -319,6 +319,29 @@ No modification from defaults is normally required.
-        prevent **iwd** from roaming properly, but can be useful for networ=
-ks
-        operating under extremely low rssi levels where roaming isn't possi=
-ble.
- =
-
-+IPv4
-+----
-+
-+The group ``[IPv4]`` contains settings related to IPv4 network configurati=
-on.
-+
-+.. list-table::
-+   :header-rows: 0
-+   :stub-columns: 0
-+   :widths: 20 80
-+   :align: left
-+
-+   * - APAddressPool
-+     - Values: comma-separated list of prefix-notation IP strings
-+
-+       Defines the space of IPs used for the Access Point-mode subnet addr=
-esses
-+       and the DHCP server.  Defaults to 192.168.0.0/16.  The prefix length
-+       decides the size of the pool from which an address is selected but =
-the
-+       actual subnet size (netmask) is based on the AP profile being activ=
-ated
-+       and defaults to 28 bits.  The AP profile's ``[IPv4].Address`` setti=
-ng
-+       overrides the global value set here.  Setting a too small address s=
-pace
-+       will limit the number of access points that can be running
-+       simultaneously on different interfaces.
-+
- SEE ALSO
- =3D=3D=3D=3D=3D=3D=3D=3D
- =
-
+         finally:
+             dev1.stop_ap()
 -- =
 
 2.27.0
 
---===============5516417805757727689==--
+--===============5036651510955256590==--
 
