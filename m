@@ -1,65 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============8570349983575471125=="
+Content-Type: multipart/mixed; boundary="===============8843183733617487413=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 2/2] unit: update test-ie with supported rates
-Date: Fri, 14 May 2021 12:22:53 -0700
-Message-ID: <20210514192253.454140-2-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v3 1/2] ie: refactor parsing supported data rates
+Date: Fri, 14 May 2021 14:30:14 -0500
+Message-ID: <b469964f-85d6-46db-ec54-49a566df4820@gmail.com>
 In-Reply-To: <20210514192253.454140-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8570349983575471125==
+--===============8843183733617487413==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-For now this just tests supported rates with a zero length
-IE.
----
- unit/test-ie.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Hi James,
 
-diff --git a/unit/test-ie.c b/unit/test-ie.c
-index 6dd074b5..93a4f9ca 100644
---- a/unit/test-ie.c
-+++ b/unit/test-ie.c
-@@ -692,6 +692,22 @@ static void ie_test_encapsulate_wsc(const void *data)
- 	l_free(packed);
- }
- =
+On 5/14/21 2:22 PM, James Prestwood wrote:
+> Both ext/supported rates IEs are obtained from scan results. These
+> IEs are passed to ie_tlv_init/ie_tlv_next, as well as direct length
+> checks (for supported rates at least, extended supported rates can
+> be as long as a single byte integer can hold, 1 - 255) which verifies
+> that the length in the IE matches the overall IE length that is
+> stored in scan_bss. Because of this, ie_parse_supported_rates_from_data
+> was doing double duty re-initializing a TLV iterator.
+> =
 
-+static void ie_test_supported_rates(const void *data)
-+{
-+	const uint8_t zero_len_supp[] =3D { IE_TYPE_SUPPORTED_RATES, 0 };
-+	const uint8_t zero_len_ext_supp[] =3D { IE_TYPE_EXTENDED_SUPPORTED_RATES,
-+						0 };
-+	int ret;
-+
-+	ret =3D ie_parse_data_rates(zero_len_supp, NULL, NULL, NULL,
-+					-70, NULL);
-+	assert(ret =3D=3D -EINVAL);
-+
-+	ret =3D ie_parse_data_rates(NULL, zero_len_ext_supp, NULL, NULL,
-+					-70, NULL);
-+	assert(ret =3D=3D -EINVAL);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	l_test_init(&argc, &argv);
-@@ -752,6 +768,8 @@ int main(int argc, char *argv[])
- 	l_test_add("/ie/Encapsulation/WSC/Test Case 1",
- 				ie_test_encapsulate_wsc,
- 				&ie_tlv_concat_test_data_1);
-+	l_test_add("/ie/Supported rates/Test Case 1", ie_test_supported_rates,
-+				NULL);
- =
+> Intead, since we know the IE length is within bounds, the length/data
+> can simply be directly accessed out of the buffer. This avoids the need
+> for a wrapper function entirely.
+> =
 
- 	return l_test_run();
- }
--- =
+> The length parameters were also removed, since this is now obtained
+> directly from the IE.
+> ---
+>   src/ie.c | 76 +++++++++++++++-----------------------------------------
+>   src/ie.h |  6 -----
+>   2 files changed, 20 insertions(+), 62 deletions(-)
+> =
 
-2.31.1
+> v3:
+>   * Added back in len =3D=3D 0 check. This is NOT verified in scan.c, only
+>     the total length is sanity checked.
+> =
 
---===============8570349983575471125==--
+
+Applied, thanks.
+
+Regards,
+-Denis
+
+--===============8843183733617487413==--
 
