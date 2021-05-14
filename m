@@ -1,44 +1,183 @@
-Content-Type: multipart/mixed; boundary="===============7962993629579482472=="
+Content-Type: multipart/mixed; boundary="===============4521136733211069026=="
 MIME-Version: 1.0
-From: Marc-Antoine Perennou <Marc-Antoine@Perennou.com>
-Subject: [PATCH] network: use L_AUTO_FREE_VAR
-Date: Fri, 14 May 2021 18:36:40 +0200
-Message-ID: <20210514163640.305070-1-Marc-Antoine@Perennou.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2] ie: refactor parsing supported data rates
+Date: Fri, 14 May 2021 11:08:24 -0700
+Message-ID: <20210514180824.446226-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7962993629579482472==
+--===============4521136733211069026==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Marc-Antoine Perennou <Marc-Antoine@Perennou.com>
----
- src/network.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Both ext/supported rates IEs are obtained from scan results. These
+IEs are passed to ie_tlv_init/ie_tlv_next, as well as direct length
+checks (for supported rates at least, extended supported rates can
+be as long as a single byte integer can hold, 1 - 255) which verifies
+that the length in the IE matches the overall IE length that is
+stored in scan_bss. Because of this, ie_parse_supported_rates_from_data
+was doing double duty re-initializing a TLV iterator.
 
-diff --git a/src/network.c b/src/network.c
-index 9e858663..0eb3687e 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -380,10 +380,10 @@ static int network_load_psk(struct network *network, =
-bool need_passphrase)
- 	size_t psk_len;
- 	uint8_t *psk =3D l_settings_get_bytes(network->settings, "Security",
- 						"PreSharedKey", &psk_len);
--	_auto_(l_free) char *passphrase =3D
-+	L_AUTO_FREE_VAR(char *, passphrase) =3D
- 			l_settings_get_string(network->settings,
- 						"Security", "Passphrase");
--	_auto_(l_free) char *path =3D
-+	L_AUTO_FREE_VAR(char *, path) =3D
- 		storage_get_network_file_path(security, ssid);
- 	int r;
+Intead, since we know the IE length is within bounds, the length/data
+can simply be directly accessed out of the buffer. This avoids the need
+for a wrapper function entirely.
+---
+ src/ie.c | 70 +++++++++++++-------------------------------------------
+ src/ie.h |  6 -----
+ 2 files changed, 16 insertions(+), 60 deletions(-)
+
+v2:
+ * Refactored rather than fix the static analysis warning directly. This
+   change should eliminate that warning as well.
+ * Removed exposure of ie_parse_supported_rates_from_data in ie.h
+ * Removed tlv parsing as this already happened in scan.c. Changed to do
+   direct data access since the length has been verified.
+
+diff --git a/src/ie.c b/src/ie.c
+index 0b471f1b..6b8e3621 100644
+--- a/src/ie.c
++++ b/src/ie.c
+@@ -1662,10 +1662,11 @@ static const struct basic_rate_map rate_rssi_map[] =
+=3D {
+ 	{ -65, 108 },
+ };
  =
 
+-static int ie_parse_supported_rates(struct ie_tlv_iter *supp_rates_iter,
+-					struct ie_tlv_iter *ext_supp_rates_iter,
+-					int32_t rssi,
+-					uint64_t *data_rate)
++static int ie_parse_supported_rates_from_data(const uint8_t *supp_rates_ie,
++					uint8_t supp_rates_len,
++					const uint8_t *ext_supp_rates_ie,
++					uint8_t ext_supp_rates_len,
++					int32_t rssi, uint64_t *data_rate)
+ {
+ 	uint8_t max_rate =3D 0;
+ 	uint8_t highest =3D 0;
+@@ -1673,11 +1674,6 @@ static int ie_parse_supported_rates(struct ie_tlv_it=
+er *supp_rates_iter,
+ 	unsigned int len;
+ 	unsigned int i;
+ =
+
+-	len =3D ie_tlv_iter_get_length(supp_rates_iter);
+-
+-	if (len =3D=3D 0)
+-		return -EINVAL;
+-
+ 	/* Find highest rates possible with our RSSI */
+ 	for (i =3D 0; i < L_ARRAY_SIZE(rate_rssi_map); i++) {
+ 		const struct basic_rate_map *map =3D &rate_rssi_map[i];
+@@ -1688,9 +1684,14 @@ static int ie_parse_supported_rates(struct ie_tlv_it=
+er *supp_rates_iter,
+ 		max_rate =3D map->rate;
+ 	}
+ =
+
+-	if (supp_rates_iter) {
+-		/* Find highest rate in Supported Rates IE */
+-		rates =3D ie_tlv_iter_get_data(supp_rates_iter);
++	/*
++	 * Find highest rate in Supported Rates IE. These IEs have at least
++	 * been verfied that the length is within the buffer bounds (as has
++	 * ext_supp_rates_ie).
++	 */
++	if (supp_rates_ie) {
++		len =3D supp_rates_ie[1];
++		rates =3D supp_rates_ie + 2;
+ =
+
+ 		for (i =3D 0; i < len; i++) {
+ 			uint8_t r =3D rates[i] & 0x7f;
+@@ -1701,9 +1702,9 @@ static int ie_parse_supported_rates(struct ie_tlv_ite=
+r *supp_rates_iter,
+ 	}
+ =
+
+ 	/* Find highest rate in Extended Supported Rates IE */
+-	if (ext_supp_rates_iter) {
+-		len =3D ie_tlv_iter_get_length(ext_supp_rates_iter);
+-		rates =3D ie_tlv_iter_get_data(ext_supp_rates_iter);
++	if (ext_supp_rates_ie) {
++		len =3D ext_supp_rates_ie[1];
++		rates =3D ext_supp_rates_ie + 2;
+ =
+
+ 		for (i =3D 0; i < len; i++) {
+ 			uint8_t r =3D rates[i] & 0x7f;
+@@ -1721,45 +1722,6 @@ static int ie_parse_supported_rates(struct ie_tlv_it=
+er *supp_rates_iter,
+ 	return 0;
+ }
+ =
+
+-int ie_parse_supported_rates_from_data(const uint8_t *supp_rates_ie,
+-					uint8_t supp_rates_len,
+-					const uint8_t *ext_supp_rates_ie,
+-					uint8_t ext_supp_rates_len,
+-					int32_t rssi, uint64_t *data_rate)
+-{
+-	struct ie_tlv_iter supp_rates_iter;
+-	struct ie_tlv_iter ext_supp_rates_iter;
+-
+-	if (supp_rates_ie) {
+-		ie_tlv_iter_init(&supp_rates_iter, supp_rates_ie,
+-					supp_rates_len);
+-
+-		if (!ie_tlv_iter_next(&supp_rates_iter))
+-			return -EMSGSIZE;
+-
+-		if (ie_tlv_iter_get_tag(&supp_rates_iter) !=3D
+-						IE_TYPE_SUPPORTED_RATES)
+-			return -EPROTOTYPE;
+-	}
+-
+-	if (ext_supp_rates_ie) {
+-		ie_tlv_iter_init(&ext_supp_rates_iter, ext_supp_rates_ie,
+-					ext_supp_rates_len);
+-
+-		if (!ie_tlv_iter_next(&ext_supp_rates_iter))
+-			return -EMSGSIZE;
+-
+-		if (ie_tlv_iter_get_tag(&ext_supp_rates_iter) !=3D
+-					IE_TYPE_EXTENDED_SUPPORTED_RATES)
+-			return -EPROTOTYPE;
+-	}
+-
+-	return ie_parse_supported_rates(
+-			(supp_rates_ie) ? &supp_rates_iter : NULL,
+-			(ext_supp_rates_ie) ? &ext_supp_rates_iter : NULL,
+-			rssi, data_rate);
+-}
+-
+ enum ht_vht_channel_width {
+ 	HT_VHT_CHANNEL_WIDTH_20MHZ =3D 0,
+ 	HT_VHT_CHANNEL_WIDTH_40MHZ,
+diff --git a/src/ie.h b/src/ie.h
+index 538ca9a8..5f7fa199 100644
+--- a/src/ie.h
++++ b/src/ie.h
+@@ -484,12 +484,6 @@ int ie_parse_bss_load_from_data(const uint8_t *data, u=
+int8_t len,
+ 				uint8_t *out_channel_utilization,
+ 				uint16_t *out_admission_capacity);
+ =
+
+-int ie_parse_supported_rates_from_data(const uint8_t *supp_rates_ie,
+-					uint8_t supp_rates_len,
+-					const uint8_t *ext_supp_rates_ie,
+-					uint8_t ext_supp_rates_len,
+-					int32_t rssi, uint64_t *data_rate);
+-
+ int ie_parse_data_rates(const uint8_t *supp_rates_ie,
+ 			const uint8_t *ext_supp_rates_ie,
+ 			const uint8_t *ht_ie,
 -- =
 
-2.30.0
+2.31.1
 
---===============7962993629579482472==--
+--===============4521136733211069026==--
 
