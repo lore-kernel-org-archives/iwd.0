@@ -1,39 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============1612836983949672683=="
+Content-Type: multipart/mixed; boundary="===============7167210659873744140=="
 MIME-Version: 1.0
-From: Daniel Wagner <wagi@monom.org>
-Subject: Re: [RFC connman 1/1] WIP: Add WPA3-SAE support
-Date: Fri, 14 May 2021 08:47:33 +0200
-Message-ID: <20210514064733.v3pqwzmxahsinmqq@beryllium.lan>
-In-Reply-To: <386E1CEB-785C-4B14-97E7-396819BBF5D7@holtmann.org>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: Consider supporting building with clang
+Date: Fri, 14 May 2021 09:48:30 -0500
+Message-ID: <4a2a4849-64ed-581a-7dc8-36e7531988d9@gmail.com>
+In-Reply-To: <20210512114720.2812.33927@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1612836983949672683==
+--===============7167210659873744140==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Marcel,
+Hi,
 
-On Thu, May 13, 2021 at 09:01:05PM +0200, Marcel Holtmann wrote:
-> > I am not really into the WiFi topic anymore, so I am adding the iwd
-> > mailing list. Maybe we get some input for the new SAE Security
-> > property, e.g. how this could work with iwd.
->
-> don=E2=80=99t change the Service API. Even WPA3 Personal is just PSK and =
-so there is
-> no need to add another security property entry.
+On 5/12/21 6:47 AM, keruspe+ml01(a)gmail.com wrote:
+> Hello,
+> =
 
-I somehow expected PSK also covers WPA3. This means any code for
-enabling WPA3 for wpa_supplicant should go solely into plugins/wifi.c.
-Thanks for clarifying this point.
+> Since the introduction of the _auto_ destructor macros, ell and iwd gener=
+ate nested functions, which are a gnu extension not supported by clang.
+> =
 
-> Actually if you are using iwd, then the detail between WPA2 and WPA3
-> is never exposed to ConnMan.
+> While adding support for that in clang would also benefit other projects,=
+ I don't think this idea is going anywhere as it has been brought up numero=
+us times in the past and never went forward.
 
-Nice! I didn't know that iwd already supports WPA3.
+We're aware of this.  We'll take a look at this in the next few releases.
 
-Thanks,
-Daniel
---===============1612836983949672683==--
+> =
+
+> The way e.g. glib deals with it is by splitting this in two, first define=
+ the destructor function alonside the struct it is going to destruct, then =
+hook it up with a macro like _auto_ here, this way no nested functions are =
+needed. Would this make sense for ell/iwd too? I can provide patches if req=
+uired.
+
+Yes, we considered that.  However, at first glance this seemed less than id=
+eal =
+
+since our headers are not set up to make this approach very easy.  Using gc=
+c's =
+
+nested function syntax made for a much more compact and less invasive chang=
+e. =
+
+Maybe we missed something.  Feel free to take a stab at fixing this, patche=
+s are =
+
+always welcome.
+
+Regards,
+-Denis
+--===============7167210659873744140==--
 
