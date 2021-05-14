@@ -1,59 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============3685803364204226675=="
+Content-Type: multipart/mixed; boundary="===============1720411401056465438=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] ie: fix static analysis warning
-Date: Fri, 14 May 2021 08:36:38 -0700
-Message-ID: <20210514153638.427088-1-prestwoj@gmail.com>
+From: Marc-Antoine Perennou <Marc-Antoine@Perennou.com>
+Subject: [PATCH 1/2] eap: avoid nested functions
+Date: Fri, 14 May 2021 18:34:13 +0200
+Message-ID: <20210514163414.304860-1-Marc-Antoine@Perennou.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3685803364204226675==
+--===============1720411401056465438==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The supp_rates_iter was being used prior to the NULL check. This
-was fixed as well as some reordering to make the function consistent
-between supp_rates_iter and ext_supp_rates_iter.
+Signed-off-by: Marc-Antoine Perennou <Marc-Antoine@Perennou.com>
 ---
- src/ie.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ src/eap.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/src/ie.c b/src/ie.c
-index 0b471f1b..352ce469 100644
---- a/src/ie.c
-+++ b/src/ie.c
-@@ -1673,11 +1673,6 @@ static int ie_parse_supported_rates(struct ie_tlv_it=
-er *supp_rates_iter,
- 	unsigned int len;
- 	unsigned int i;
+diff --git a/src/eap.c b/src/eap.c
+index 0645be47..53e35b5e 100644
+--- a/src/eap.c
++++ b/src/eap.c
+@@ -416,6 +416,8 @@ static const char *eap_type_to_str(enum eap_type type, =
+uint32_t vendor_id,
+ #define IS_EXPANDED_RESPONSE(id, t) \
+ 	(type =3D=3D EAP_TYPE_EXPANDED && vendor_id =3D=3D (id) && vendor_type =
+=3D=3D (t))
  =
 
--	len =3D ie_tlv_iter_get_length(supp_rates_iter);
++#define response_is(wanted) ((type =3D=3D wanted) || IS_EXPANDED_RESPONSE(=
+0, wanted))
++
+ static void eap_handle_response(struct eap_state *eap, const uint8_t *pkt,
+ 				size_t len)
+ {
+@@ -428,14 +430,6 @@ static void eap_handle_response(struct eap_state *eap,=
+ const uint8_t *pkt,
+ 				eap->method->vendor_id[2];
+ 	uint32_t our_vendor_type =3D eap->method->vendor_type;
+ =
+
+-	bool response_is(enum eap_type wanted)
+-	{
+-		if (type =3D=3D wanted)
+-			return true;
 -
--	if (len =3D=3D 0)
--		return -EINVAL;
+-		return IS_EXPANDED_RESPONSE(0, wanted);
+-	}
 -
- 	/* Find highest rates possible with our RSSI */
- 	for (i =3D 0; i < L_ARRAY_SIZE(rate_rssi_map); i++) {
- 		const struct basic_rate_map *map =3D &rate_rssi_map[i];
-@@ -1688,8 +1683,9 @@ static int ie_parse_supported_rates(struct ie_tlv_ite=
-r *supp_rates_iter,
- 		max_rate =3D map->rate;
- 	}
- =
-
-+	/* Find highest rate in Supported Rates IE */
- 	if (supp_rates_iter) {
--		/* Find highest rate in Supported Rates IE */
-+		len =3D ie_tlv_iter_get_length(supp_rates_iter);
- 		rates =3D ie_tlv_iter_get_data(supp_rates_iter);
- =
-
- 		for (i =3D 0; i < len; i++) {
+ 	if (len < 1)
+ 		/* Invalid packets to be ignored */
+ 		return;
 -- =
 
-2.31.1
+2.30.0
 
---===============3685803364204226675==--
+--===============1720411401056465438==--
 
