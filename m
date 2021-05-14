@@ -1,59 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============1720411401056465438=="
+Content-Type: multipart/mixed; boundary="===============0457014203958139232=="
 MIME-Version: 1.0
 From: Marc-Antoine Perennou <Marc-Antoine@Perennou.com>
-Subject: [PATCH 1/2] eap: avoid nested functions
-Date: Fri, 14 May 2021 18:34:13 +0200
-Message-ID: <20210514163414.304860-1-Marc-Antoine@Perennou.com>
+Subject: [PATCH 2/2] ap: update for new _auto_ destructors
+Date: Fri, 14 May 2021 18:34:14 +0200
+Message-ID: <20210514163414.304860-2-Marc-Antoine@Perennou.com>
+In-Reply-To: <20210514163414.304860-1-Marc-Antoine@Perennou.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1720411401056465438==
+--===============0457014203958139232==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Signed-off-by: Marc-Antoine Perennou <Marc-Antoine@Perennou.com>
 ---
- src/eap.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ src/ap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/eap.c b/src/eap.c
-index 0645be47..53e35b5e 100644
---- a/src/eap.c
-+++ b/src/eap.c
-@@ -416,6 +416,8 @@ static const char *eap_type_to_str(enum eap_type type, =
-uint32_t vendor_id,
- #define IS_EXPANDED_RESPONSE(id, t) \
- 	(type =3D=3D EAP_TYPE_EXPANDED && vendor_id =3D=3D (id) && vendor_type =
-=3D=3D (t))
- =
-
-+#define response_is(wanted) ((type =3D=3D wanted) || IS_EXPANDED_RESPONSE(=
-0, wanted))
-+
- static void eap_handle_response(struct eap_state *eap, const uint8_t *pkt,
- 				size_t len)
+diff --git a/src/ap.c b/src/ap.c
+index 7eac07d7..82bdf34d 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -3298,7 +3298,7 @@ static struct l_dbus_message *ap_dbus_start_profile(s=
+truct l_dbus *dbus,
  {
-@@ -428,14 +430,6 @@ static void eap_handle_response(struct eap_state *eap,=
- const uint8_t *pkt,
- 				eap->method->vendor_id[2];
- 	uint32_t our_vendor_type =3D eap->method->vendor_type;
+ 	struct ap_if_data *ap_if =3D user_data;
+ 	const char *ssid;
+-	_auto_(l_settings_free) struct l_settings *config =3D NULL;
++	_auto_(l_settings) config =3D NULL;
+ 	char *config_path;
+ 	int err;
  =
 
--	bool response_is(enum eap_type wanted)
--	{
--		if (type =3D=3D wanted)
--			return true;
--
--		return IS_EXPANDED_RESPONSE(0, wanted);
--	}
--
- 	if (len < 1)
- 		/* Invalid packets to be ignored */
- 		return;
 -- =
 
 2.30.0
 
---===============1720411401056465438==--
+--===============0457014203958139232==--
 
