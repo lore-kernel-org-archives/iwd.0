@@ -1,55 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============2220489848090329614=="
+Content-Type: multipart/mixed; boundary="===============1558011588391631888=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 2/7] scan: rework BSS ranking
-Date: Wed, 19 May 2021 10:00:47 -0500
-Message-ID: <59d5f498-f319-1dd1-755e-b8df66b48c0b@gmail.com>
-In-Reply-To: <20210507202620.93540-2-prestwoj@gmail.com>
+From: KeithG <ys3al35l@gmail.com>
+Subject: How to configure an IoT wifi setup
+Date: Wed, 19 May 2021 14:36:24 -0500
+Message-ID: <CAG17S_McO=OtGotbDn7ccDSbzu7vA_T4-ge593owud37bLBr+Q@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2220489848090329614==
+--===============1558011588391631888==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Group,
 
-On 5/7/21 3:26 PM, James Prestwood wrote:
-> It was observed that IWD's ranking for BSS's did not always
-> end up with the fastest being chosen. This was due to IWD's
-> heavy weight on signal strength. This is a decent way of ranking
-> but even better is calculating a theoretical data rate which
-> was also done and factored in. The problem is the data rate
-> factor was always outdone by the signal strength.
-> =
+I am not sure if this is the right terminology but this is what I am
+trying to do:
+Power up a headless device. If it does not get an ethernet or wifi
+connection, it launches AP mode of some sort and allows a device to
+connect then configure the wifi connection by selecting an AP and
+typing in a password.
 
-> Intead remove signal strength entirely as this is already taken
-> into account with the data rate calculation. This also removes
-> the check for rate IEs. If no IEs are found the parser will
-> base the data rate soley on RSSI.
-> =
+This works with hostapd/dsnmasq, currently. I want to switch over to
+connman and/or iwd to do this, but have not been successful in doing
+this.
 
-> There were a few other factors removed which will be added back
-> when ranking *networks* rather than BSS's. WPA version (or open)
-> was removed as well as the privacy capability. These values really
-> should not differ between BSS's in the same SSID and as such
-> should be used for network ranking instead.
-> ---
->   src/scan.c | 63 ++++++++++++++----------------------------------------
->   1 file changed, 16 insertions(+), 47 deletions(-)
-> =
+If I set up connman by:
+"# connmanctl tether wifi on SSID password" I can connect and 'see' my
+new SSID, but I cannot scan for any APs to set up. I do not know how
+to set the SSID IP address, if this has been enabled in connman.
 
-> v2:
->   * Added support for BSS's that did not have any rate IEs by
->     using the same ie_parse_data_rates
-> =
+I have tried with iwctl as well:
+set up /etc/iwd/main.conf
+[General]
+EnableNetworkConfiguration=3Dtrue
+APRanges=3D192.168.1.0/24
 
+# iwctl device wlan0 set-property Mode ap
+# iwctl ap wlan0 start SSID password
 
-I went ahead and applied the rest of this series (2-4).
+With this I can connect, but once again, I cannot scan for any
+available SSIDs to connect to. It is not important that I be able to
+connect, but I do need to see the SSIDs so the user can set it up then
+reboot (or restart connman/iwd) to connect to the new 'known' SSID.
 
-Regards,
--Denis
+Thanks,
 
---===============2220489848090329614==--
+Keith
+--===============1558011588391631888==--
 
