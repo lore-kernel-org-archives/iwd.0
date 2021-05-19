@@ -1,34 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============8515817844942534898=="
+Content-Type: multipart/mixed; boundary="===============2220489848090329614=="
 MIME-Version: 1.0
-From: Daniel Wagner <wagi@monom.org>
-Subject: Re: [RFC connman 1/1] WIP: Add WPA3-SAE support
-Date: Wed, 19 May 2021 09:32:39 +0200
-Message-ID: <20210519073239.u43a27gc4r3wmivh@beryllium.lan>
-In-Reply-To: <D847F4C3-EB57-4426-B75A-F1395BE34CC6@holtmann.org>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v2 2/7] scan: rework BSS ranking
+Date: Wed, 19 May 2021 10:00:47 -0500
+Message-ID: <59d5f498-f319-1dd1-755e-b8df66b48c0b@gmail.com>
+In-Reply-To: <20210507202620.93540-2-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8515817844942534898==
+--===============2220489848090329614==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi James,
 
-On Wed, May 19, 2021 at 08:58:01AM +0200, Marcel Holtmann wrote:
-> > So AFAIU from the above, the patchset is implementing wpa_supplicant
-> > WPA3-SAE support in the right place: wifi plugin. Any change required? I
-> > understand that documentation should be updated probably, anything else?
+On 5/7/21 3:26 PM, James Prestwood wrote:
+> It was observed that IWD's ranking for BSS's did not always
+> end up with the fastest being chosen. This was due to IWD's
+> heavy weight on signal strength. This is a decent way of ranking
+> but even better is calculating a theoretical data rate which
+> was also done and factored in. The problem is the data rate
+> factor was always outdone by the signal strength.
 > =
 
-> if you need to update the Service API documentation, then you are
-> doing something wrong.
+> Intead remove signal strength entirely as this is already taken
+> into account with the data rate calculation. This also removes
+> the check for rate IEs. If no IEs are found the parser will
+> base the data rate soley on RSSI.
+> =
 
-The only thing you need to do is to extend the wifi.c plugin to set to
-SAE if it's available when PSK is selected via the D-Bus API. As Marcel
-pointed out this should not be exposed to the user.
+> There were a few other factors removed which will be added back
+> when ranking *networks* rather than BSS's. WPA version (or open)
+> was removed as well as the privacy capability. These values really
+> should not differ between BSS's in the same SSID and as such
+> should be used for network ranking instead.
+> ---
+>   src/scan.c | 63 ++++++++++++++----------------------------------------
+>   1 file changed, 16 insertions(+), 47 deletions(-)
+> =
 
-Thanks,
-DAniel
---===============8515817844942534898==--
+> v2:
+>   * Added support for BSS's that did not have any rate IEs by
+>     using the same ie_parse_data_rates
+> =
+
+
+I went ahead and applied the rest of this series (2-4).
+
+Regards,
+-Denis
+
+--===============2220489848090329614==--
 
