@@ -1,158 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============5494992882156608608=="
+Content-Type: multipart/mixed; boundary="===============4452876437029434590=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 5/7] ap: Send a specific error message on async AP start
- failure
-Date: Tue, 25 May 2021 14:55:06 +0200
-Message-ID: <20210525125508.2695708-5-andrew.zaborowski@intel.com>
+Subject: [PATCH 6/7] autotests: Update APRanges usage in testAP
+Date: Tue, 25 May 2021 14:55:07 +0200
+Message-ID: <20210525125508.2695708-6-andrew.zaborowski@intel.com>
 In-Reply-To: <20210525125508.2695708-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5494992882156608608==
+--===============4452876437029434590==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-We generate the DBus error reply type from the errno only when
-ap_start() was failing synchronously, now also send the errno through
-the callbacks so that we can also return a specific DBus reply when
-failing asynchronously.  Thea AP autotest relies on receiving the
-AlreadyExists DBus error.
+[General].APRange is now [IPv4].APAddressPool and the netmask is changed
+from 23 to 27 bits to make the test correctly assert that only two
+default-sized subnets are allowed by IWD simultaneously (default has
+changed from 24 to 28 bits)
 ---
- src/ap.c | 32 ++++++++++++++++++--------------
- src/ap.h |  4 ++++
- 2 files changed, 22 insertions(+), 14 deletions(-)
+ autotests/testAP/dhcp/main.conf |  4 +++-
+ autotests/testAP/dhcp_test.py   | 12 +++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/src/ap.c b/src/ap.c
-index 52587d9d..639c9101 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -2054,9 +2054,11 @@ static void do_debug(const char *str, void *user_dat=
-a)
- 	l_info("%s%s", prefix, str);
- }
+diff --git a/autotests/testAP/dhcp/main.conf b/autotests/testAP/dhcp/main.c=
+onf
+index 667de23c..62ae782d 100644
+--- a/autotests/testAP/dhcp/main.conf
++++ b/autotests/testAP/dhcp/main.conf
+@@ -3,4 +3,6 @@ DisableMacAddressRandomization=3Dtrue
  =
 
--static void ap_start_failed(struct ap_state *ap)
-+static void ap_start_failed(struct ap_state *ap, int err)
- {
--	ap->ops->handle_event(AP_EVENT_START_FAILED, NULL, ap->user_data);
-+	struct ap_event_start_failed_data data =3D { err };
+ [General]
+ EnableNetworkConfiguration=3Dtrue
+-APRanges=3D192.168.80.0/23
 +
-+	ap->ops->handle_event(AP_EVENT_START_FAILED, &data, ap->user_data);
- 	ap_reset(ap);
- 	l_genl_family_free(ap->nl80211);
++[IPv4]
++APAddressPool=3D192.168.80.0/27
+diff --git a/autotests/testAP/dhcp_test.py b/autotests/testAP/dhcp_test.py
+index bf52fb28..e69c4465 100644
+--- a/autotests/testAP/dhcp_test.py
++++ b/autotests/testAP/dhcp_test.py
+@@ -58,8 +58,14 @@ class Test(unittest.TestCase):
+             testutil.test_iface_operstate(dev2.name)
+             testutil.test_ifaces_connected(dev1.name, dev2.name, group=3DF=
+alse)
  =
 
-@@ -2071,22 +2073,18 @@ static void ap_start_cb(struct l_genl_msg *msg, voi=
-d *user_data)
+-            testutil.test_ip_address_match(dev1.name, "192.168.80.1")
+-            testutil.test_ip_address_match(dev2.name, "192.168.80.2")
++            try:
++                testutil.test_ip_address_match(dev1.name, "192.168.80.1")
++                testutil.test_ip_address_match(dev2.name, "192.168.80.2")
++                ip =3D "192.168.80.1"
++            except:
++                testutil.test_ip_address_match(dev1.name, "192.168.80.17")
++                testutil.test_ip_address_match(dev2.name, "192.168.80.18")
++                ip =3D "192.168.80.17"
  =
 
- 	if (l_genl_msg_get_error(msg) < 0) {
- 		l_error("START_AP failed: %i", l_genl_msg_get_error(msg));
--
--		goto failed;
-+		ap_start_failed(ap, l_genl_msg_get_error(msg));
-+		return;
- 	}
+             wd.unregister_psk_agent(psk_agent)
  =
 
- 	if (ap->netconfig_dhcp && !l_dhcp_server_start(ap->netconfig_dhcp)) {
- 		l_error("DHCP server failed to start");
--		goto failed;
-+		ap_start_failed(ap, -EINVAL);
-+		return;
- 	}
+@@ -76,7 +82,7 @@ class Test(unittest.TestCase):
+             # got initially.
+             dev4.start_ap('TestAP4', 'Password4')
  =
 
- 	ap->started =3D true;
- 	ap->ops->handle_event(AP_EVENT_STARTED, NULL, ap->user_data);
--
--	return;
--
--failed:
--	ap_start_failed(ap);
- }
+-            testutil.test_ip_address_match(dev4.name, "192.168.80.1")
++            testutil.test_ip_address_match(dev4.name, ip)
  =
 
- static struct l_genl_msg *ap_build_cmd_start_ap(struct ap_state *ap)
-@@ -2201,12 +2199,12 @@ static void ap_ifaddr4_added_cb(int error, uint16_t=
- type, const void *data,
- =
-
- 	if (error) {
- 		l_error("Failed to set IP address");
--		ap_start_failed(ap);
-+		ap_start_failed(ap, error);
- 		return;
- 	}
- =
-
- 	if (!ap_start_send(ap))
--		ap_start_failed(ap);
-+		ap_start_failed(ap, -EIO);
- }
- =
-
- static bool ap_parse_new_station_ies(const void *data, uint16_t len,
-@@ -2378,10 +2376,12 @@ static void ap_mlme_notify(struct l_genl_msg *msg, =
-void *user_data)
- 	switch (l_genl_msg_get_command(msg)) {
- 	case NL80211_CMD_STOP_AP:
- 		if (ap->start_stop_cmd_id) {
-+			struct ap_event_start_failed_data data =3D { -ECANCELED };
-+
- 			l_genl_family_cancel(ap->nl80211,
- 						ap->start_stop_cmd_id);
- 			ap->start_stop_cmd_id =3D 0;
--			ap->ops->handle_event(AP_EVENT_START_FAILED, NULL,
-+			ap->ops->handle_event(AP_EVENT_START_FAILED, &data,
- 						ap->user_data);
- 		} else if (ap->started) {
- 			ap->started =3D false;
-@@ -3145,13 +3145,17 @@ static void ap_if_event_func(enum ap_event_type typ=
-e, const void *event_data,
- =
-
- 	switch (type) {
- 	case AP_EVENT_START_FAILED:
-+	{
-+		const struct ap_event_start_failed_data *data =3D event_data;
-+
- 		if (L_WARN_ON(!ap_if->pending))
- 			break;
- =
-
--		reply =3D dbus_error_failed(ap_if->pending);
-+		reply =3D dbus_error_from_errno(data->error, ap_if->pending);
- 		dbus_pending_reply(&ap_if->pending, reply);
- 		ap_if->ap =3D NULL;
- 		break;
-+	}
- =
-
- 	case AP_EVENT_STARTED:
- 		if (L_WARN_ON(!ap_if->pending))
-diff --git a/src/ap.h b/src/ap.h
-index b0100f34..9a03d3ae 100644
---- a/src/ap.h
-+++ b/src/ap.h
-@@ -35,6 +35,10 @@ enum ap_event_type {
- 	AP_EVENT_PBC_MODE_EXIT,
- };
- =
-
-+struct ap_event_start_failed_data {
-+	int error;
-+};
-+
- struct ap_event_station_added_data {
- 	const uint8_t *mac;
- 	const uint8_t *assoc_ies;
+         finally:
+             dev1.stop_ap()
 -- =
 
 2.27.0
 
---===============5494992882156608608==--
+--===============4452876437029434590==--
 
