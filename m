@@ -1,142 +1,252 @@
-Content-Type: multipart/mixed; boundary="===============2357783952094172708=="
+Content-Type: multipart/mixed; boundary="===============6749990070484351935=="
 MIME-Version: 1.0
-From: KeithG <ys3al35l@gmail.com>
-Subject: Re: How to configure an IoT wifi setup
-Date: Sun, 23 May 2021 16:21:49 -0500
-Message-ID: <CAG17S_OXeFgfPkuK1K=S0AcVaV-UUiuuStG8dsGbA3v5YKSuJg@mail.gmail.com>
-In-Reply-To: <CAG17S_MhhFo=No8O5ki4pTq-ZxXxb6bcOLuKioKWZGBGzb_vGA@mail.gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/7] ip-pool: Track IPv4 addresses in use
+Date: Tue, 25 May 2021 14:55:02 +0200
+Message-ID: <20210525125508.2695708-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2357783952094172708==
+--===============6749990070484351935==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 21, 2021 at 12:20 AM KeithG <ys3al35l@gmail.com> wrote:
->
-> On Thu, May 20, 2021 at 7:29 PM KeithG <ys3al35l@gmail.com> wrote:
-> >
-> > On Thu, May 20, 2021 at 1:36 PM Denis Kenzior <denkenz@gmail.com> wro=
-te:
-> > >
-> > > Hi Diego,
-> > >
-> > > >>> In theory 2 can be done today, either by iwd or combo iwd/hostapd=
- with
-> > > >> some
-> > > >>> manual magic.
-> > > >
-> > > > We do exactly this on our devices, when we explored things a while =
-back it was not really an option to do it all with iwd, so we use iwd for t=
-he client part, create a new interface on the same WiFi adapter and fire up=
- a hostapd + dnsmasq combo on it as a "configuration AP", if the device is =
-not configured yet.  The advantage is that iwd works in parallel in client =
-mode so we can get the list of available networks and test that the configu=
-ration provided by the user really works without having to disconnect the u=
-ser from the "configuration AP" until configuration is complete.
-> > >
-> > > Awesome, thanks for confirming that this can be done.  In theory iwd =
-should be
-> > > getting to the point where our AP mode support should be good enough =
-for simple
-> > > scenarios like this one.
-> > >
-> > > >
-> > > > Creating a second interface in AP mode works on all the WiFi adapte=
-rs we have encountered, which are mainly Intel and Qualcomm.
-> > > >
-> > >
-> > > Keith,
-> > >
-> > > Any P2P capable adapter should be able to do this (so pretty much any=
- modern
-> > > hardware).  There was an earlier discussion on the list where I sugge=
-sted that
-> > > we add a config option to main.conf to start iwd either in station + =
-p2p or
-> > > station + ap mode.
-> > >
-> > > Patches are always welcome!
-> > >
-> > > Regards,
-> > > -Denis
-> > Denis,
-> >
-> > I appreciate the confidence but this is way out of my depth! I will
-> > wait and hope that someone can contribute to this capability. I can
-> > confirm that the AP mode works quite well even with the broadcom fmac
-> > card. As I said, we are set up to start in station mode, collect the
-> > local ssids, put them in a redis key then switch to AP mode and allow
-> > the user to select one of the previously collected SSIDs to configure.
-> > I was just hoping for a real time scan capability when in AP mode.
-> >
-> > Regards,
-> >
-> > Keith
->
-> Messing around with ap mode and seeing what was possible, tonight. I
-> can reliably get the AP mode to work. I can reliably get iwd to scan
-> and can save the SSIDs. What I cannot seem to be able to do is get it
-> to 'tether' in this manner. I have a cable on eth0 (192.168.2.x) and
-> iwd is in AP mode on wlan0 (192.168.5.1). I cannot get it to NAT using
-> iptables. This works fine for hostapd, but every time my phone
-> connects, I get 'connected, no internet'.
->
-> I've tried variants, but the iptables lines for hostapd are:
-> iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE'
-> iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT'
-> iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT'
-> sysctl net.ipv4.ip_forward=3D1
->
-> I've also tried this:
-> iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-> iptables -A FORWARD -i eth0 -o wlan0 -m state --state
-> RELATED,ESTABLISHED -j ACCEPT
-> iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
->
-> With either of these, I get no internet for wifi connected devices.
-> From cli, I can ping and wget, etc. What am I missing?
+Add the ip-pool submodule that tracks IPv4 addresses in use on the
+system for use when selecting the address for a new AP.
+---
+ Makefile.am   |   1 +
+ src/ip-pool.c | 160 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/ip-pool.h |  32 ++++++++++
+ 3 files changed, 193 insertions(+)
+ create mode 100644 src/ip-pool.c
+ create mode 100644 src/ip-pool.h
 
-Still messing with this. I decided to try to start an ad-hoc network
-from the RPi to see how it works. This is on an RPi 3B (broadcom
-fmac). I am running iwd built from git at e8eb05f. When I try to start
-an ad-hoc network, I get 'Operation Failed'
+diff --git a/Makefile.am b/Makefile.am
+index 68035e46..083bc95a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -243,6 +243,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
+h src/missing.h \
+ 					src/eap-wsc.c src/eap-wsc.h \
+ 					src/wscutil.h src/wscutil.c \
+ 					src/diagnostic.h src/diagnostic.c \
++					src/ip-pool.h src/ip-pool.c \
+ 					$(eap_sources) \
+ 					$(builtin_sources)
+ =
 
-# iwctl device wlan0 show
-                                 Device: wlan0
----------------------------------------------------------------------------=
------
-  Settable  Property            Value
----------------------------------------------------------------------------=
------
-            Name                wlan0
-         *  Mode                ad-hoc
-         *  Powered             on
-            Address             b8:27:eb:28:7d:8f
-            Adapter             phy0
-~# /usr/bin/iwctl ad-hoc wlan0 start test password
-Operation failed
+diff --git a/src/ip-pool.c b/src/ip-pool.c
+new file mode 100644
+index 00000000..1166383c
+--- /dev/null
++++ b/src/ip-pool.c
+@@ -0,0 +1,160 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <errno.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
++
++#include <ell/ell.h>
++
++#include "src/util.h"
++#include "src/iwd.h"
++#include "src/module.h"
++#include "src/netdev.h"
++#include "src/ip-pool.h"
++
++static struct l_queue *used_addr4_list;
++static struct l_netlink *rtnl;
++
++static bool ip_pool_addr4_match_ifindex(const void *a, const void *b)
++{
++	const struct ip_pool_addr4_record *addr =3D a;
++
++	return addr->ifindex =3D=3D L_PTR_TO_UINT(b) && !addr->secondary;
++}
++
++const struct ip_pool_addr4_record *ip_pool_get_addr4(struct netdev *netdev)
++{
++	return l_queue_find(used_addr4_list, ip_pool_addr4_match_ifindex,
++				L_UINT_TO_PTR(netdev_get_ifindex(netdev)));
++}
++
++static bool ip_pool_addr4_match_free(void *data, void *user_data)
++{
++	const struct ip_pool_addr4_record *a =3D data;
++	const struct ip_pool_addr4_record *b =3D user_data;
++
++	if (a->ifindex !=3D b->ifindex || a->addr !=3D b->addr ||
++			a->prefix_len !=3D b->prefix_len)
++		return false;
++
++	l_free(data);
++	return true;
++}
++
++static void ip_pool_addr_notify(uint16_t type, const void *data, uint32_t =
+len,
++				void *user_data)
++{
++	const struct ifaddrmsg *ifa =3D data;
++	char *ip_str =3D NULL;
++	int r;
++	struct in_addr ip;
++
++	if (ifa->ifa_family !=3D AF_INET || ifa->ifa_prefixlen < 1)
++		return;
++
++	len -=3D NLMSG_ALIGN(sizeof(struct ifaddrmsg));
++
++	l_rtnl_ifaddr4_extract(ifa, len, NULL, &ip_str, NULL);
++	if (!ip_str)
++		return;
++
++	r =3D inet_aton(ip_str, &ip);
++	l_free(ip_str);
++
++	if (r < 0)
++		return;
++
++	if (type =3D=3D RTM_NEWADDR) {
++		struct ip_pool_addr4_record *addr;
++
++		addr =3D l_new(struct ip_pool_addr4_record, 1);
++		addr->addr =3D ntohl(ip.s_addr);
++		addr->prefix_len =3D ifa->ifa_prefixlen;
++		addr->ifindex =3D ifa->ifa_index;
++		addr->secondary =3D !!(ifa->ifa_flags & IFA_F_SECONDARY);
++		l_queue_push_tail(used_addr4_list, addr);
++	} else if (type =3D=3D RTM_DELADDR) {
++		struct ip_pool_addr4_record addr;
++
++		addr.addr =3D ntohl(ip.s_addr);
++		addr.prefix_len =3D ifa->ifa_prefixlen;
++		addr.ifindex =3D ifa->ifa_index;
++
++		l_queue_foreach_remove(used_addr4_list,
++					ip_pool_addr4_match_free, &addr);
++	}
++}
++
++static void ip_pool_addr4_dump_cb(int error,
++					uint16_t type, const void *data,
++					uint32_t len, void *user_data)
++{
++	if (error) {
++		l_error("addr4_dump_cb: %s (%i)", strerror(-error), -error);
++		return;
++	}
++
++	ip_pool_addr_notify(type, data, len, user_data);
++}
++
++static int ip_pool_init(void)
++{
++	const struct l_settings *settings =3D iwd_get_config();
++	bool netconfig_enabled;
++
++	if (!l_settings_get_bool(settings, "General",
++				"EnableNetworkConfiguration",
++				&netconfig_enabled))
++		netconfig_enabled =3D false;
++
++	if (!netconfig_enabled)
++		return 0;
++
++	rtnl =3D iwd_get_rtnl();
++
++	if (!l_netlink_register(rtnl, RTNLGRP_IPV4_IFADDR,
++				ip_pool_addr_notify, NULL, NULL)) {
++		l_error("Failed to register for RTNL link notifications");
++		return -EIO;
++	}
++
++	if (!l_rtnl_ifaddr4_dump(rtnl, ip_pool_addr4_dump_cb, NULL, NULL)) {
++		l_error("Sending the IPv4 addr dump req failed");
++		return -EIO;
++	}
++
++	used_addr4_list =3D l_queue_new();
++	return 0;
++}
++
++static void ip_pool_exit(void)
++{
++	l_queue_destroy(used_addr4_list, l_free);
++	used_addr4_list =3D NULL;
++}
++
++IWD_MODULE(ip_pool, ip_pool_init, ip_pool_exit)
+diff --git a/src/ip-pool.h b/src/ip-pool.h
+new file mode 100644
+index 00000000..6a220735
+--- /dev/null
++++ b/src/ip-pool.h
+@@ -0,0 +1,32 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++struct netdev;
++
++struct ip_pool_addr4_record {
++	uint32_t addr;
++	uint8_t prefix_len;
++	uint32_t ifindex;
++	bool secondary;
++};
++
++const struct ip_pool_addr4_record *ip_pool_get_addr4(struct netdev *netdev=
+);
+-- =
 
-in the log:
-May 23 10:03:23 runeaudio iwd[15027]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 3
-May 23 10:03:23 runeaudio iwd[15027]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 3
-May 23 10:04:22 runeaudio iwd[15027]: src/agent.c:agent_register()
-agent register called
-May 23 10:04:22 runeaudio iwd[15027]: src/agent.c:agent_register()
-agent :1.569 path /agent/15328
-May 23 10:04:22 runeaudio iwd[15027]: Failed to join adhoc network, -22
-May 23 10:04:22 runeaudio iwd[15027]: src/agent.c:agent_disconnect()
-agent :1.569 disconnected
-May 23 10:04:22 runeaudio iwd[15027]: src/agent.c:agent_free() agent
-free 0x1f257c0
+2.27.0
 
-I thought this should be easy, but am confused trying to set up a NAT
-between the wlan0 connected devices (iwd running in AP mode) and the
-eth0 connman managed DHCP connection to the router.
-
-Keith
---===============2357783952094172708==--
+--===============6749990070484351935==--
 
