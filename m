@@ -1,52 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============1161085306888116203=="
+Content-Type: multipart/mixed; boundary="===============4569807364437302751=="
 MIME-Version: 1.0
-From: KeithG <ys3al35l@gmail.com>
-Subject: How to NAT when using iwd ap mode?
-Date: Tue, 25 May 2021 12:21:36 -0500
-Message-ID: <CAG17S_N4pXpMTj+HKGXV9HGc99fYbUDP7_27_Qv4wKBbW6Vm_w@mail.gmail.com>
+From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+Subject: Re: [RFC connman 1/1] WIP: Add WPA3-SAE support
+Date: Tue, 25 May 2021 18:53:44 -0300
+Message-ID: <fee08251-7837-b7bf-61b8-76257aaf30ca@collabora.com>
+In-Reply-To: <20210519073239.u43a27gc4r3wmivh@beryllium.lan>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1161085306888116203==
+--===============4569807364437302751==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I have been trying to get ap mode to NAT and am unsuccessful. Is this possi=
-ble?
+Hi Daniel,
 
-I can get AP mode to work with this in /etc/iwd/main.conf
+On 5/19/21 4:32 AM, Daniel Wagner wrote:
+> Hi,
+> =
 
-and I can get an IP address associated and I can connect to the
-computer running iwd in ap mode. What I cannot do is NAT the wifi
-connected device to the eth0 which has a valid connection.
+> On Wed, May 19, 2021 at 08:58:01AM +0200, Marcel Holtmann wrote:
+>>> So AFAIU from the above, the patchset is implementing wpa_supplicant
+>>> WPA3-SAE support in the right place: wifi plugin. Any change required? I
+>>> understand that documentation should be updated probably, anything else?
+>>
+>> if you need to update the Service API documentation, then you are
+>> doing something wrong.
+> =
 
-[General]
-UseDefaultInterface=3Dtrue
-EnableNetworkConfiguration=3Dtrue
-APRanges=3D192.168.5.0/24
+> The only thing you need to do is to extend the wifi.c plugin to set to
+> SAE if it's available when PSK is selected via the D-Bus API. As Marcel
+> pointed out this should not be exposed to the user.
 
-After I get my AP running and connect, I tried to run these commands
-to enable NAT:
+Sorry, I'm not sure how to address that. I might be missing something
+here, so quick questions:
 
-# sysctl net.ipv4.ip_forward=3D1
-# iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-# iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-# iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
+* Which D-Bus API call would set the service security to PSK even if
+it's registered as SAE capable?
+* Why is this a requirement and why should that go in plugin/wifi.c?
 
-When I try this, I get no 'internet' traffic from eth0.
-
-Is this due to dns? Do I need to use iptables to NAT this?
-
-When I run connman in tether mode it works. I can connect and I get
-internet traffic over wlan connected devices. When I have iwd running
-in AP mode, though, I cannot figure out how to share the eth0
-connection to the wifi connected device(s).
-
-Is there a guide on how to use the ap.iwd provisioning file? I am not
-clear on how to use it. I created a file: /etc/iwd/ap.iwd and it does
-not seem to use it. Where do you set the hostname?
-
-Keith
---===============1161085306888116203==--
+Thanks a lot for your help,
+Ariel
+--===============4569807364437302751==--
 
