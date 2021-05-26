@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============8090752877188364652=="
+Content-Type: multipart/mixed; boundary="===============3394171306125280741=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/7] ip-pool: Track IPv4 addresses in use
-Date: Wed, 26 May 2021 14:43:34 -0500
-Message-ID: <18de2797-b3fd-fd9f-7843-e34faf382278@gmail.com>
-In-Reply-To: <20210525125508.2695708-1-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 2/7] ip-pool: Add subnet address selection logic
+Date: Wed, 26 May 2021 14:56:39 -0500
+Message-ID: <c119acaf-d675-fca9-62a4-87fcefca4000@gmail.com>
+In-Reply-To: <20210525125508.2695708-2-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8090752877188364652==
+--===============3394171306125280741==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,88 +16,58 @@ Content-Transfer-Encoding: quoted-printable
 Hi Andrew,
 
 On 5/25/21 7:55 AM, Andrew Zaborowski wrote:
-> Add the ip-pool submodule that tracks IPv4 addresses in use on the
-> system for use when selecting the address for a new AP.
+> Add the ip_pool_select_addr4 function to select a random subnet of reques=
+ted
+> size from an address space defined by a string list (for use with the
+> AP profile [IPv4].Address and the global [IPv4].APAddressPool settings),
+> avoiding those subnets that conflict with subnets in use.  We take care
+> to give a similar weight to all subnets contained in the specified
+> ranges regardless of how many ranges contain each, basically so that
+> overlapping ranges don't affect the probabilities (debatable.)
 > ---
->   Makefile.am   |   1 +
->   src/ip-pool.c | 160 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   src/ip-pool.h |  32 ++++++++++
->   3 files changed, 193 insertions(+)
->   create mode 100644 src/ip-pool.c
->   create mode 100644 src/ip-pool.h
+>   src/ip-pool.c | 207 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>   src/ip-pool.h |   2 +
+>   2 files changed, 209 insertions(+)
 > =
 
 
 <snip>
 
-So I'm completely fine with the implementation now...
-
 > diff --git a/src/ip-pool.h b/src/ip-pool.h
-> new file mode 100644
-> index 00000000..6a220735
-> --- /dev/null
+> index 6a220735..8c75d03e 100644
+> --- a/src/ip-pool.h
 > +++ b/src/ip-pool.h
-> @@ -0,0 +1,32 @@
-> +/*
-> + *
-> + *  Wireless daemon for Linux
-> + *
-> + *  Copyright (C) 2021  Intel Corporation. All rights reserved.
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-130=
-1  USA
-> + *
-> + */
-> +
-> +struct netdev;
+> @@ -29,4 +29,6 @@ struct ip_pool_addr4_record {
+>   	bool secondary;
+>   };
+>   =
 
-Is there a strong reason for making this tighly-coupled to netdev?  I mean =
-in =
-
-theory ip-pool can be reused by netconfig for example, which also tracks IP=
-v4/v6 =
-
-addresses (for some unknown reason, but one thing at a time...)
-
-> +
-> +struct ip_pool_addr4_record {
-> +	uint32_t addr;
-> +	uint8_t prefix_len;
-> +	uint32_t ifindex;
-> +	bool secondary;
-> +};
-
-Is there a compelling reason to use a dedicated structure (leaking =
-
-implementation details) instead of returning a newly allocated l_rtnl_addre=
-ss =
-
-instead?
-
-> +
-> +const struct ip_pool_addr4_record *ip_pool_get_addr4(struct netdev *netd=
-ev);
+> +int ip_pool_select_addr4(const char **addr_str_list, uint8_t prefix,
+> +				struct netdev *netdev, uint32_t *out_addr);
+>   const struct ip_pool_addr4_record *ip_pool_get_addr4(struct netdev *net=
+dev);
 > =
 
 
-This function is used exactly once, when the profile is loaded.  So it isn'=
-t =
+Similarly to previous patch, do we really need the netdev object here?
 
-exactly on the hot-path where raw access to the store is needed.
+Also, what is 'prefix'?  It looks like it is used to convey the desired pre=
+fix =
+
+length size.  So should it be named appropriately?  Maybe target_prefix_len?
+
+Do you really need the netdev argument? It looks like it is used to skip ad=
+ding =
+
+that netdev's addresses to the 'used' list.  Why?  How likely is this to ha=
+ppen? =
+
+  Can't we just leave those alone and assign a new subnet regardless? Or ha=
+ve AP =
+
+wipe the addresses first?
 
 Regards,
 -Denis
---===============8090752877188364652==--
+--===============3394171306125280741==--
 
