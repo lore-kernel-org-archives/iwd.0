@@ -1,87 +1,103 @@
-Content-Type: multipart/mixed; boundary="===============0772336717913708673=="
+Content-Type: multipart/mixed; boundary="===============8090752877188364652=="
 MIME-Version: 1.0
-From: Pranav Jerry <libreinator@disroot.org>
-Subject: Using iwd.py for a project
-Date: Wed, 26 May 2021 21:55:29 +0530
-Message-ID: <IY2QTQ.MAEB01FKYJM7@disroot.org>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/7] ip-pool: Track IPv4 addresses in use
+Date: Wed, 26 May 2021 14:43:34 -0500
+Message-ID: <18de2797-b3fd-fd9f-7843-e34faf382278@gmail.com>
+In-Reply-To: <20210525125508.2695708-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0772336717913708673==
+--===============8090752877188364652==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi!
+Hi Andrew,
 
-I'm the developer of naxalnet [1], a shell
-script to create a BATMAN-Advanced mesh network without bothering with =
-
-any
-configuration.
-
-It uses iwd to create an ad-hoc network and then configures the network =
-
-using
-systemd-networkd.
-It is currently in alpha stage.
-
-I'm working on rewriting it in python and found out controlling iwd via =
-
-D-Bus
-is not easy as I thought. I searched the web for python libraries to =
-
-control iwd
-and found out on stackoverflow [2] that the iwd git repo had python3 =
-
-examples
-in `tests/`.
-
-On further exploring, I found a python library for using iwd,
-`autotests/util/iwd.py`. The python scripts used for testing in =
-
-`autotests`
-showed it was easy to use and was just what I needed to use for =
-
-connecting
-to iwd in my project.
-
-But I couldn't find any information on the library on =
-
-iwd.wiki.kernel.org and
-I think it was developed for internal use. The library is not on PyPi =
-
-either.
-I want to use the library in naxalnet, which is at present a =
-
-single-file file that
-starts with `#!/usr/bin/env python3`, meant to reside as =
-
-`/usr/bin/naxalnet`.
-
-How do I make iwd.py importable? I don't want to include iwd.py as a =
-
-file
-when I package naxalnet for distribution.
-So it probably needs to be installed by pip as a library, or by the OS =
-
-package
-manager. Can you or any other developers make iwd.py available as a =
-
-python
-package installable by pip?
-
-I'm not an experienced dev and I'm not used to python packaging, so =
-
-correct me
-if I'm wrong anywhere.
-
-[1]: https://git.disroot.org/pranav/naxalnet
-[2]: =
-
-https://stackoverflow.com/questions/60358001/accessing-iwd-dbus-interface-f=
-rom-python
+On 5/25/21 7:55 AM, Andrew Zaborowski wrote:
+> Add the ip-pool submodule that tracks IPv4 addresses in use on the
+> system for use when selecting the address for a new AP.
+> ---
+>   Makefile.am   |   1 +
+>   src/ip-pool.c | 160 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>   src/ip-pool.h |  32 ++++++++++
+>   3 files changed, 193 insertions(+)
+>   create mode 100644 src/ip-pool.c
+>   create mode 100644 src/ip-pool.h
+> =
 
 
---===============0772336717913708673==--
+<snip>
+
+So I'm completely fine with the implementation now...
+
+> diff --git a/src/ip-pool.h b/src/ip-pool.h
+> new file mode 100644
+> index 00000000..6a220735
+> --- /dev/null
+> +++ b/src/ip-pool.h
+> @@ -0,0 +1,32 @@
+> +/*
+> + *
+> + *  Wireless daemon for Linux
+> + *
+> + *  Copyright (C) 2021  Intel Corporation. All rights reserved.
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-130=
+1  USA
+> + *
+> + */
+> +
+> +struct netdev;
+
+Is there a strong reason for making this tighly-coupled to netdev?  I mean =
+in =
+
+theory ip-pool can be reused by netconfig for example, which also tracks IP=
+v4/v6 =
+
+addresses (for some unknown reason, but one thing at a time...)
+
+> +
+> +struct ip_pool_addr4_record {
+> +	uint32_t addr;
+> +	uint8_t prefix_len;
+> +	uint32_t ifindex;
+> +	bool secondary;
+> +};
+
+Is there a compelling reason to use a dedicated structure (leaking =
+
+implementation details) instead of returning a newly allocated l_rtnl_addre=
+ss =
+
+instead?
+
+> +
+> +const struct ip_pool_addr4_record *ip_pool_get_addr4(struct netdev *netd=
+ev);
+> =
+
+
+This function is used exactly once, when the profile is loaded.  So it isn'=
+t =
+
+exactly on the hot-path where raw access to the store is needed.
+
+Regards,
+-Denis
+--===============8090752877188364652==--
 
