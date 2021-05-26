@@ -1,37 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============3932159720281995745=="
+Content-Type: multipart/mixed; boundary="===============0772336717913708673=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] scan: parse NL80211_BSS_LAST_SEEN_BOOTTIME in units of
- nanoseconds
-Date: Wed, 26 May 2021 10:21:44 -0500
-Message-ID: <85dd6c57-b88a-8c89-d478-be7e30c6777a@gmail.com>
-In-Reply-To: <20210522120621.118459-1-alsi@bang-olufsen.dk>
+From: Pranav Jerry <libreinator@disroot.org>
+Subject: Using iwd.py for a project
+Date: Wed, 26 May 2021 21:55:29 +0530
+Message-ID: <IY2QTQ.MAEB01FKYJM7@disroot.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3932159720281995745==
+--===============0772336717913708673==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Alvin,
+Hi!
 
-On 5/22/21 7:06 AM, Alvin =C5=A0ipraga wrote:
-> NL80211_BSS_LAST_SEEN_BOOTTIME is expressed in nanoseconds, while BSS
-> timestamps are expressed in microseconds internally. Convert the
-> attribute to microseconds when using it to timestamp a BSS. This makes
-> iwd expire absent BSSes within 30 seconds as intended.
-> ---
->   src/scan.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+I'm the developer of naxalnet [1], a shell
+script to create a BATMAN-Advanced mesh network without bothering with =
+
+any
+configuration.
+
+It uses iwd to create an ad-hoc network and then configures the network =
+
+using
+systemd-networkd.
+It is currently in alpha stage.
+
+I'm working on rewriting it in python and found out controlling iwd via =
+
+D-Bus
+is not easy as I thought. I searched the web for python libraries to =
+
+control iwd
+and found out on stackoverflow [2] that the iwd git repo had python3 =
+
+examples
+in `tests/`.
+
+On further exploring, I found a python library for using iwd,
+`autotests/util/iwd.py`. The python scripts used for testing in =
+
+`autotests`
+showed it was easy to use and was just what I needed to use for =
+
+connecting
+to iwd in my project.
+
+But I couldn't find any information on the library on =
+
+iwd.wiki.kernel.org and
+I think it was developed for internal use. The library is not on PyPi =
+
+either.
+I want to use the library in naxalnet, which is at present a =
+
+single-file file that
+starts with `#!/usr/bin/env python3`, meant to reside as =
+
+`/usr/bin/naxalnet`.
+
+How do I make iwd.py importable? I don't want to include iwd.py as a =
+
+file
+when I package naxalnet for distribution.
+So it probably needs to be installed by pip as a library, or by the OS =
+
+package
+manager. Can you or any other developers make iwd.py available as a =
+
+python
+package installable by pip?
+
+I'm not an experienced dev and I'm not used to python packaging, so =
+
+correct me
+if I'm wrong anywhere.
+
+[1]: https://git.disroot.org/pranav/naxalnet
+[2]: =
+
+https://stackoverflow.com/questions/60358001/accessing-iwd-dbus-interface-f=
+rom-python
 
 
-Nice catch.  My bad for not testing this enough.  I added a Fixes: tag and =
-
-applied, thanks!
-
-Regards,
--Denis
---===============3932159720281995745==--
+--===============0772336717913708673==--
 
