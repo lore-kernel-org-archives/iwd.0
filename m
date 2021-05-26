@@ -1,52 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============0315664107475351776=="
+Content-Type: multipart/mixed; boundary="===============3932159720281995745=="
 MIME-Version: 1.0
-From: Daniel Wagner <wagi@monom.org>
-Subject: Re: [RFC connman 1/1] WIP: Add WPA3-SAE support
-Date: Wed, 26 May 2021 09:05:34 +0200
-Message-ID: <20210526070534.vtewwjiftzfxwki3@beryllium.lan>
-In-Reply-To: <fee08251-7837-b7bf-61b8-76257aaf30ca@collabora.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] scan: parse NL80211_BSS_LAST_SEEN_BOOTTIME in units of
+ nanoseconds
+Date: Wed, 26 May 2021 10:21:44 -0500
+Message-ID: <85dd6c57-b88a-8c89-d478-be7e30c6777a@gmail.com>
+In-Reply-To: <20210522120621.118459-1-alsi@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0315664107475351776==
+--===============3932159720281995745==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Ariel,
+Hi Alvin,
 
-On Tue, May 25, 2021 at 06:53:44PM -0300, Ariel D'Alessandro wrote:
-> On 5/19/21 4:32 AM, Daniel Wagner wrote:
-> > The only thing you need to do is to extend the wifi.c plugin to set to
-> > SAE if it's available when PSK is selected via the D-Bus API. As Marcel
-> > pointed out this should not be exposed to the user.
+On 5/22/21 7:06 AM, Alvin =C5=A0ipraga wrote:
+> NL80211_BSS_LAST_SEEN_BOOTTIME is expressed in nanoseconds, while BSS
+> timestamps are expressed in microseconds internally. Convert the
+> attribute to microseconds when using it to timestamp a BSS. This makes
+> iwd expire absent BSSes within 30 seconds as intended.
+> ---
+>   src/scan.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > =
 
-> Sorry, I'm not sure how to address that. I might be missing something
-> here, so quick questions:
-> =
 
-> * Which D-Bus API call would set the service security to PSK even if
-> it's registered as SAE capable?
+Nice catch.  My bad for not testing this enough.  I added a Fixes: tag and =
 
-This can be done via the Service API property Security.
+applied, thanks!
 
-> * Why is this a requirement and why should that go in plugin/wifi.c?
-
-There is no need to expose implementation details to the user API. SAE
-belongs to the family of PSK, hence if the user selects PSK via the
-Service API, the implementation should choose the right protocol. Since
-wpa_supplicant does not do this on it's own the plugin has to do this.
-
-If you compare this to the iwd setup, the plugins/iwd.c does not even
-know that SAE is used, it doesn't care. iwd does the right thing.
-
-Basically this means, if SAE is available just use it, there is no need
-to bother the user.
-x
-Hope this helps.
-
-Thanks,
-Daniel
---===============0315664107475351776==--
+Regards,
+-Denis
+--===============3932159720281995745==--
 
