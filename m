@@ -1,45 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============4569807364437302751=="
+Content-Type: multipart/mixed; boundary="===============0315664107475351776=="
 MIME-Version: 1.0
-From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+From: Daniel Wagner <wagi@monom.org>
 Subject: Re: [RFC connman 1/1] WIP: Add WPA3-SAE support
-Date: Tue, 25 May 2021 18:53:44 -0300
-Message-ID: <fee08251-7837-b7bf-61b8-76257aaf30ca@collabora.com>
-In-Reply-To: <20210519073239.u43a27gc4r3wmivh@beryllium.lan>
+Date: Wed, 26 May 2021 09:05:34 +0200
+Message-ID: <20210526070534.vtewwjiftzfxwki3@beryllium.lan>
+In-Reply-To: <fee08251-7837-b7bf-61b8-76257aaf30ca@collabora.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4569807364437302751==
+--===============0315664107475351776==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Daniel,
+Hi Ariel,
 
-On 5/19/21 4:32 AM, Daniel Wagner wrote:
-> Hi,
+On Tue, May 25, 2021 at 06:53:44PM -0300, Ariel D'Alessandro wrote:
+> On 5/19/21 4:32 AM, Daniel Wagner wrote:
+> > The only thing you need to do is to extend the wifi.c plugin to set to
+> > SAE if it's available when PSK is selected via the D-Bus API. As Marcel
+> > pointed out this should not be exposed to the user.
 > =
 
-> On Wed, May 19, 2021 at 08:58:01AM +0200, Marcel Holtmann wrote:
->>> So AFAIU from the above, the patchset is implementing wpa_supplicant
->>> WPA3-SAE support in the right place: wifi plugin. Any change required? I
->>> understand that documentation should be updated probably, anything else?
->>
->> if you need to update the Service API documentation, then you are
->> doing something wrong.
+> Sorry, I'm not sure how to address that. I might be missing something
+> here, so quick questions:
 > =
 
-> The only thing you need to do is to extend the wifi.c plugin to set to
-> SAE if it's available when PSK is selected via the D-Bus API. As Marcel
-> pointed out this should not be exposed to the user.
+> * Which D-Bus API call would set the service security to PSK even if
+> it's registered as SAE capable?
 
-Sorry, I'm not sure how to address that. I might be missing something
-here, so quick questions:
+This can be done via the Service API property Security.
 
-* Which D-Bus API call would set the service security to PSK even if
-it's registered as SAE capable?
-* Why is this a requirement and why should that go in plugin/wifi.c?
+> * Why is this a requirement and why should that go in plugin/wifi.c?
 
-Thanks a lot for your help,
-Ariel
---===============4569807364437302751==--
+There is no need to expose implementation details to the user API. SAE
+belongs to the family of PSK, hence if the user selects PSK via the
+Service API, the implementation should choose the right protocol. Since
+wpa_supplicant does not do this on it's own the plugin has to do this.
+
+If you compare this to the iwd setup, the plugins/iwd.c does not even
+know that SAE is used, it doesn't care. iwd does the right thing.
+
+Basically this means, if SAE is available just use it, there is no need
+to bother the user.
+x
+Hope this helps.
+
+Thanks,
+Daniel
+--===============0315664107475351776==--
 
