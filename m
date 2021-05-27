@@ -1,75 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============7291242322253573927=="
+Content-Type: multipart/mixed; boundary="===============4899904041336092544=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: How to NAT when using iwd ap mode?
-Date: Wed, 26 May 2021 18:34:17 -0500
-Message-ID: <d8eeae0b-0b5f-0835-d0db-dae1b1352a73@gmail.com>
-In-Reply-To: <CAG17S_N4pXpMTj+HKGXV9HGc99fYbUDP7_27_Qv4wKBbW6Vm_w@mail.gmail.com>
+From: Daniel Wagner <wagi@monom.org>
+Subject: Re: [RFC connman 1/1] WIP: Add WPA3-SAE support
+Date: Thu, 27 May 2021 08:56:13 +0200
+Message-ID: <20210527065613.ijyzdwptuvhxltl7@beryllium.lan>
+In-Reply-To: <1a66150d-6d5d-f4af-3207-d0510b9be695@collabora.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7291242322253573927==
+--===============4899904041336092544==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+Hi Ariel,
 
-On 5/25/21 12:21 PM, KeithG wrote:
-> I have been trying to get ap mode to NAT and am unsuccessful. Is this pos=
-sible?
+On Wed, May 26, 2021 at 06:21:37PM -0300, Ariel D'Alessandro wrote:
+> So, correct me if I'm wrong:
 > =
 
-> I can get AP mode to work with this in /etc/iwd/main.conf
+> * Changes to src/service.c should be dropped. No need to add
+> CONNMAN_SERVICE_SECURITY_SAE as we'll be treating WPA3-SAE as
+> CONNMAN_SERVICE_SECURITY_PSK.
+
+Yes
+
+> * A WPA3-SAE service can be named as *_psk. No need to name it as
+> *_sae.
+
+Yes
+
+> Looking at Tizen's implementation:
 > =
 
-> and I can get an IP address associated and I can connect to the
-> computer running iwd in ap mode. What I cannot do is NAT the wifi
-> connected device to the eth0 which has a valid connection.
-> =
+> * In order to check if SAE is available, key_mgmt capabilities should be
+> stored in GSupplicantSSID as done in [0]. This way d-bus field key_mgmt
+> can be set accordingly, similar to what's done in [1].
 
-> [General]
-> UseDefaultInterface=3Dtrue
-> EnableNetworkConfiguration=3Dtrue
-> APRanges=3D192.168.5.0/24
-> =
+Yes, that looks about right.
 
-> After I get my AP running and connect, I tried to run these commands
-> to enable NAT:
-> =
+> Note that Tizen is also storing this inside struct connman_network [2].
+> Let me know if this is allowed or should be addressed in a different way.
 
-> # sysctl net.ipv4.ip_forward=3D1
-> # iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-> # iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-> # iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
-> =
+I think key_mgmt could go into 'struct wifi_data'. No need to store this
+information a layer higher up.
 
-> When I try this, I get no 'internet' traffic from eth0.
-> =
-
-> Is this due to dns? Do I need to use iptables to NAT this?
-> =
-
-> When I run connman in tether mode it works. I can connect and I get
-> internet traffic over wlan connected devices. When I have iwd running
-> in AP mode, though, I cannot figure out how to share the eth0
-> connection to the wifi connected device(s).
-> =
-
-> Is there a guide on how to use the ap.iwd provisioning file? I am not
-> clear on how to use it. I created a file: /etc/iwd/ap.iwd and it does
-> not seem to use it. Where do you set the hostname?
-> =
-
-
-There isn't, so I came up with a very simple tutorial.  Feel free to improv=
-e it, =
-
-add on to it, etc.
-
-https://iwd.wiki.kernel.org/ap_mode
-
-Regards,
--Denis
---===============7291242322253573927==--
+Thanks,
+Daniel
+--===============4899904041336092544==--
 
