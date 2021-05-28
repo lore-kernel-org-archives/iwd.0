@@ -1,293 +1,260 @@
-Content-Type: multipart/mixed; boundary="===============9075634629027182657=="
+Content-Type: multipart/mixed; boundary="===============1997886582978242972=="
 MIME-Version: 1.0
-From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-Subject: [RFC connman v2 1/1] WIP: Add wpa_supplicant WPA3-SAE support
-Date: Thu, 27 May 2021 18:41:34 -0300
-Message-ID: <20210527214134.33792-2-ariel.dalessandro@collabora.com>
-In-Reply-To: <20210527214134.33792-1-ariel.dalessandro@collabora.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/8] ip-pool: Track IPv4 addresses in use
+Date: Fri, 28 May 2021 02:47:30 +0200
+Message-ID: <20210528004737.2878442-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============9075634629027182657==
+--===============1997886582978242972==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implement WPA3-SAE authentication on connman side using wpa_supplicant
-backend.
-
-Initially based on Tizen project:
-
-  https://review.tizen.org/git/?p=3Dplatform/upstream/connman.git
-
-Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+Add the ip-pool submodule that tracks IPv4 addresses in use on the
+system for use when selecting the address for a new AP.  l_rtnl_address
+is used internally because if we're going to return l_rtnl_address
+objects it would be misleading if we didn't fill in all of their
+properties like flags etc.
 ---
- gsupplicant/gsupplicant.h | 10 ++++++++++
- gsupplicant/supplicant.c  | 33 ++++++++++++++++++++++++++++++---
- plugins/wifi.c            | 21 +++++++++++++++++++++
- 3 files changed, 61 insertions(+), 3 deletions(-)
+ Makefile.am   |   1 +
+ src/ip-pool.c | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/ip-pool.h |  23 +++++++
+ 3 files changed, 199 insertions(+)
+ create mode 100644 src/ip-pool.c
+ create mode 100644 src/ip-pool.h
 
-diff --git a/gsupplicant/gsupplicant.h b/gsupplicant/gsupplicant.h
-index 7935c3a6..eab6293f 100644
---- a/gsupplicant/gsupplicant.h
-+++ b/gsupplicant/gsupplicant.h
-@@ -61,6 +61,7 @@ extern "C" {
- #define G_SUPPLICANT_KEYMGMT_WPA_EAP	(1 << 7)
- #define G_SUPPLICANT_KEYMGMT_WPA_EAP_256	(1 << 8)
- #define G_SUPPLICANT_KEYMGMT_WPS		(1 << 9)
-+#define G_SUPPLICANT_KEYMGMT_SAE		(1 << 10)
+diff --git a/Makefile.am b/Makefile.am
+index 68035e46..083bc95a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -243,6 +243,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
+h src/missing.h \
+ 					src/eap-wsc.c src/eap-wsc.h \
+ 					src/wscutil.h src/wscutil.c \
+ 					src/diagnostic.h src/diagnostic.c \
++					src/ip-pool.h src/ip-pool.c \
+ 					$(eap_sources) \
+ 					$(builtin_sources)
  =
 
- #define G_SUPPLICANT_PROTO_WPA		(1 << 0)
- #define G_SUPPLICANT_PROTO_RSN		(1 << 1)
-@@ -129,6 +130,12 @@ typedef enum {
- 	G_SUPPLICANT_PEER_GROUP_FAILED,
- } GSupplicantPeerState;
- =
-
-+typedef enum {
-+	G_SUPPLICANT_MFP_NONE,
-+	G_SUPPLICANT_MFP_OPTIONAL,
-+	G_SUPPLICANT_MFP_REQUIRED,
-+} GSupplicantMfpOptions;
+diff --git a/src/ip-pool.c b/src/ip-pool.c
+new file mode 100644
+index 00000000..51b3ef40
+--- /dev/null
++++ b/src/ip-pool.c
+@@ -0,0 +1,175 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
 +
- struct _GSupplicantSSID {
- 	const void *ssid;
- 	unsigned int ssid_len;
-@@ -155,6 +162,8 @@ struct _GSupplicantSSID {
- 	dbus_bool_t use_wps;
- 	const char *pin_wps;
- 	const char *bgscan;
-+	unsigned int keymgmt;
-+	GSupplicantMfpOptions ieee80211w;
- };
- =
-
- typedef struct _GSupplicantSSID GSupplicantSSID;
-@@ -339,6 +348,7 @@ bool g_supplicant_peer_is_in_a_group(GSupplicantPeer *p=
-eer);
- GSupplicantInterface *g_supplicant_peer_get_group_interface(GSupplicantPee=
-r *peer);
- bool g_supplicant_peer_is_client(GSupplicantPeer *peer);
- bool g_supplicant_peer_has_requested_connection(GSupplicantPeer *peer);
-+unsigned int g_supplicant_network_get_keymgmt(GSupplicantNetwork *network);
- =
-
- struct _GSupplicantCallbacks {
- 	void (*system_ready) (void);
-diff --git a/gsupplicant/supplicant.c b/gsupplicant/supplicant.c
-index f56b595f..be05575c 100644
---- a/gsupplicant/supplicant.c
-+++ b/gsupplicant/supplicant.c
-@@ -92,6 +92,7 @@ static struct strvalmap keymgmt_map[] =3D {
- 	{ "wpa-eap",		G_SUPPLICANT_KEYMGMT_WPA_EAP	},
- 	{ "wpa-eap-sha256",	G_SUPPLICANT_KEYMGMT_WPA_EAP_256	},
- 	{ "wps",		G_SUPPLICANT_KEYMGMT_WPS		},
-+	{ "sae",		G_SUPPLICANT_KEYMGMT_SAE		},
- 	{ }
- };
- =
-
-@@ -234,6 +235,7 @@ struct _GSupplicantNetwork {
- 	unsigned int wps_capabilities;
- 	GHashTable *bss_table;
- 	GHashTable *config_table;
-+	unsigned int keymgmt;
- };
- =
-
- struct _GSupplicantPeer {
-@@ -1427,6 +1429,14 @@ bool g_supplicant_peer_has_requested_connection(GSup=
-plicantPeer *peer)
- 	return peer->connection_requested;
- }
- =
-
-+unsigned int g_supplicant_network_get_keymgmt(GSupplicantNetwork *network)
-+{
-+	if (network =3D=3D NULL)
-+		return 0;
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+	return network->keymgmt;
-+}
++#include <errno.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
 +
- static void merge_network(GSupplicantNetwork *network)
- {
- 	GString *str;
-@@ -1457,7 +1467,8 @@ static void merge_network(GSupplicantNetwork *network)
- 	else if (g_strcmp0(mode, "1") =3D=3D 0)
- 		g_string_append_printf(str, "_adhoc");
- =
-
--	if (g_strcmp0(key_mgmt, "WPA-PSK") =3D=3D 0)
-+	if ((g_strcmp0(key_mgmt, "WPA-PSK") =3D=3D 0) ||
-+	    (g_strcmp0(key_mgmt, "SAE") =3D=3D 0))
- 		g_string_append_printf(str, "_psk");
- =
-
- 	group =3D g_string_free(str, FALSE);
-@@ -1650,6 +1661,7 @@ static int add_or_replace_bss_to_network(struct g_sup=
-plicant_bss *bss)
- 	network->name =3D create_name(bss->ssid, bss->ssid_len);
- 	network->mode =3D bss->mode;
- 	network->security =3D bss->security;
-+	network->keymgmt =3D bss->keymgmt;
- 	network->ssid_len =3D bss->ssid_len;
- 	memcpy(network->ssid, bss->ssid, bss->ssid_len);
- 	network->signal =3D bss->signal;
-@@ -1931,7 +1943,8 @@ static void bss_compute_security(struct g_supplicant_=
-bss *bss)
- 	if (bss->keymgmt &
- 			(G_SUPPLICANT_KEYMGMT_WPA_PSK |
- 				G_SUPPLICANT_KEYMGMT_WPA_FT_PSK |
--				G_SUPPLICANT_KEYMGMT_WPA_PSK_256))
-+				G_SUPPLICANT_KEYMGMT_WPA_PSK_256 |
-+				G_SUPPLICANT_KEYMGMT_SAE))
- 		bss->psk =3D TRUE;
- =
-
- 	if (bss->ieee8021x)
-@@ -4890,6 +4903,15 @@ static void add_network_security_proto(DBusMessageIt=
-er *dict,
- 	g_free(proto);
- }
- =
-
-+static void add_network_ieee80211w(DBusMessageIter *dict, GSupplicantSSID =
-*ssid)
-+{
-+	if (!(ssid->keymgmt & G_SUPPLICANT_KEYMGMT_SAE))
-+		return;
++#include <ell/ell.h>
 +
-+	supplicant_dbus_dict_append_basic(dict, "ieee80211w", DBUS_TYPE_UINT32,
-+					  &ssid->ieee80211w);
-+}
++#include "src/util.h"
++#include "src/iwd.h"
++#include "src/module.h"
++#include "src/netdev.h"
++#include "src/ip-pool.h"
 +
- static void add_network_security(DBusMessageIter *dict, GSupplicantSSID *s=
-sid)
- {
- 	char *key_mgmt;
-@@ -4907,7 +4929,10 @@ static void add_network_security(DBusMessageIter *di=
-ct, GSupplicantSSID *ssid)
- 		add_network_security_ciphers(dict, ssid);
- 		break;
- 	case G_SUPPLICANT_SECURITY_PSK:
--		key_mgmt =3D "WPA-PSK";
-+		if (ssid->keymgmt & G_SUPPLICANT_KEYMGMT_SAE)
-+			key_mgmt =3D "SAE";
-+		else
-+			key_mgmt =3D "WPA-PSK";
- 		add_network_security_psk(dict, ssid);
- 		add_network_security_ciphers(dict, ssid);
- 		add_network_security_proto(dict, ssid);
-@@ -4969,6 +4994,8 @@ static void interface_add_network_params(DBusMessageI=
-ter *iter, void *user_data)
- =
-
- 	add_network_security(&dict, ssid);
- =
-
-+	add_network_ieee80211w(&dict, ssid);
-+
- 	supplicant_dbus_dict_append_fixed_array(&dict, "ssid",
- 					DBUS_TYPE_BYTE, &ssid->ssid,
- 						ssid->ssid_len);
-diff --git a/plugins/wifi.c b/plugins/wifi.c
-index 6233fe11..f990d40c 100644
---- a/plugins/wifi.c
-+++ b/plugins/wifi.c
-@@ -167,6 +167,10 @@ struct wifi_data {
- 	int assoc_code;
- };
- =
-
-+struct wifi_network {
-+	unsigned int keymgmt;
++struct ip_pool_addr4_record {
++	uint32_t ifindex;
++	struct l_rtnl_address *addr;
 +};
 +
- struct disconnect_data {
- 	struct wifi_data *wifi;
- 	struct connman_network *network;
-@@ -809,6 +813,7 @@ static void remove_networks(struct connman_device *devi=
-ce,
- 	for (list =3D wifi->networks; list; list =3D list->next) {
- 		struct connman_network *network =3D list->data;
- =
-
-+		g_free(connman_network_get_data(network));
- 		connman_device_remove_network(device, network);
- 		connman_network_unref(network);
- 	}
-@@ -2148,6 +2153,7 @@ static GSupplicantSecurity network_security(const cha=
-r *security)
- =
-
- static void ssid_init(GSupplicantSSID *ssid, struct connman_network *netwo=
-rk)
- {
-+	struct wifi_network *network_data =3D connman_network_get_data(network);
- 	const char *security;
- =
-
- 	memset(ssid, 0, sizeof(*ssid));
-@@ -2157,6 +2163,8 @@ static void ssid_init(GSupplicantSSID *ssid, struct c=
-onnman_network *network)
- 	ssid->scan_ssid =3D 1;
- 	security =3D connman_network_get_string(network, "WiFi.Security");
- 	ssid->security =3D network_security(security);
-+	ssid->keymgmt =3D network_data->keymgmt;
-+	ssid->ieee80211w =3D G_SUPPLICANT_MFP_OPTIONAL;
- 	ssid->passphrase =3D connman_network_get_string(network,
- 						"WiFi.Passphrase");
- =
-
-@@ -2801,6 +2809,7 @@ static void network_added(GSupplicantNetwork *supplic=
-ant_network)
- 	struct connman_network *network;
- 	GSupplicantInterface *interface;
- 	struct wifi_data *wifi;
-+	struct wifi_network *network_data;
- 	const char *name, *identifier, *security, *group, *mode;
- 	const unsigned char *ssid;
- 	unsigned int ssid_len;
-@@ -2849,8 +2858,19 @@ static void network_added(GSupplicantNetwork *suppli=
-cant_network)
- 		}
- =
-
- 		wifi->networks =3D g_slist_prepend(wifi->networks, network);
++static struct l_queue *used_addr4_list;
++static struct l_netlink *rtnl;
 +
-+		network_data =3D g_try_new0(struct wifi_network, 1);
-+		if (!network_data) {
-+			connman_error("Out of memory creating wifi network");
-+			return;
-+		}
-+		connman_network_set_data(network, network_data);
- 	}
- =
-
-+	network_data =3D connman_network_get_data(network);
-+	network_data->keymgmt =3D
-+		g_supplicant_network_get_keymgmt(supplicant_network);
++static void ip_pool_addr4_record_free(void *data)
++{
++	struct ip_pool_addr4_record *rec =3D data;
 +
- 	if (name && name[0] !=3D '\0')
- 		connman_network_set_name(network, name);
- =
-
-@@ -2918,6 +2938,7 @@ static void network_removed(GSupplicantNetwork *netwo=
-rk)
- =
-
- 	wifi->networks =3D g_slist_remove(wifi->networks, connman_network);
- =
-
-+	g_free(connman_network_get_data(connman_network));
- 	connman_device_remove_network(wifi->device, connman_network);
- 	connman_network_unref(connman_network);
- }
++	l_rtnl_address_free(rec->addr);
++	l_free(rec);
++}
++
++static bool ip_pool_addr4_match_ifindex(const void *a, const void *b)
++{
++	const struct ip_pool_addr4_record *addr =3D a;
++
++	return addr->ifindex =3D=3D L_PTR_TO_UINT(b);
++}
++
++struct l_rtnl_address *ip_pool_get_addr4(uint32_t ifindex)
++{
++	const struct ip_pool_addr4_record *rec =3D
++		l_queue_find(used_addr4_list, ip_pool_addr4_match_ifindex,
++				L_UINT_TO_PTR(ifindex));
++
++	return rec ? l_rtnl_address_dup(rec->addr) : 0;
++}
++
++static bool ip_pool_addr4_match_free(void *data, void *user_data)
++{
++	const struct ip_pool_addr4_record *a =3D data;
++	const struct ip_pool_addr4_record *b =3D user_data;
++	char a_addr_str[INET_ADDRSTRLEN];
++	char b_addr_str[INET_ADDRSTRLEN];
++
++	if (a->ifindex !=3D b->ifindex ||
++			l_rtnl_address_get_prefix_length(a->addr) !=3D
++			l_rtnl_address_get_prefix_length(b->addr))
++		return false;
++
++	if (!l_rtnl_address_get_address(a->addr, a_addr_str) ||
++			!l_rtnl_address_get_address(b->addr, b_addr_str) ||
++			strcmp(a_addr_str, b_addr_str))
++		return false;
++
++	ip_pool_addr4_record_free(data);
++	return true;
++}
++
++static void ip_pool_addr_notify(uint16_t type, const void *data, uint32_t =
+len,
++				void *user_data)
++{
++	const struct ifaddrmsg *ifa =3D data;
++	struct l_rtnl_address *addr;
++
++	if (ifa->ifa_family !=3D AF_INET || ifa->ifa_prefixlen < 1)
++		return;
++
++	len -=3D NLMSG_ALIGN(sizeof(struct ifaddrmsg));
++
++	addr =3D l_rtnl_ifaddr_extract(ifa, len);
++	if (!addr)
++		return;
++
++	if (type =3D=3D RTM_NEWADDR) {
++		struct ip_pool_addr4_record *rec;
++
++		rec =3D l_new(struct ip_pool_addr4_record, 1);
++		rec->ifindex =3D ifa->ifa_index;
++		rec->addr =3D l_steal_ptr(addr);
++		l_queue_push_tail(used_addr4_list, rec);
++	} else if (type =3D=3D RTM_DELADDR) {
++		struct ip_pool_addr4_record rec;
++
++		rec.ifindex =3D ifa->ifa_index;
++		rec.addr =3D addr;
++
++		l_queue_foreach_remove(used_addr4_list,
++					ip_pool_addr4_match_free, &rec);
++	}
++
++	l_rtnl_address_free(addr);
++}
++
++static void ip_pool_addr4_dump_cb(int error,
++					uint16_t type, const void *data,
++					uint32_t len, void *user_data)
++{
++	if (error) {
++		l_error("addr4_dump_cb: %s (%i)", strerror(-error), -error);
++		return;
++	}
++
++	ip_pool_addr_notify(type, data, len, user_data);
++}
++
++static int ip_pool_init(void)
++{
++	const struct l_settings *settings =3D iwd_get_config();
++	bool netconfig_enabled;
++
++	if (!l_settings_get_bool(settings, "General",
++				"EnableNetworkConfiguration",
++				&netconfig_enabled))
++		netconfig_enabled =3D false;
++
++	if (!netconfig_enabled)
++		return 0;
++
++	rtnl =3D iwd_get_rtnl();
++
++	if (!l_netlink_register(rtnl, RTNLGRP_IPV4_IFADDR,
++				ip_pool_addr_notify, NULL, NULL)) {
++		l_error("Failed to register for RTNL link notifications");
++		return -EIO;
++	}
++
++	if (!l_rtnl_ifaddr4_dump(rtnl, ip_pool_addr4_dump_cb, NULL, NULL)) {
++		l_error("Sending the IPv4 addr dump req failed");
++		return -EIO;
++	}
++
++	used_addr4_list =3D l_queue_new();
++	return 0;
++}
++
++static void ip_pool_exit(void)
++{
++	l_queue_destroy(used_addr4_list, ip_pool_addr4_record_free);
++	used_addr4_list =3D NULL;
++}
++
++IWD_MODULE(ip_pool, ip_pool_init, ip_pool_exit)
+diff --git a/src/ip-pool.h b/src/ip-pool.h
+new file mode 100644
+index 00000000..f3c3011d
+--- /dev/null
++++ b/src/ip-pool.h
+@@ -0,0 +1,23 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++struct l_rtnl_address *ip_pool_get_addr4(uint32_t ifindex);
 -- =
 
-2.30.2
+2.27.0
 
---===============9075634629027182657==--
+--===============1997886582978242972==--
 
