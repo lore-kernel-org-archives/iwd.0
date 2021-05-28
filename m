@@ -1,57 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============1152815835949809695=="
+Content-Type: multipart/mixed; boundary="===============8073416709629963812=="
 MIME-Version: 1.0
-From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
+From: Denis Kenzior <denkenz@gmail.com>
 Subject: Re: [PATCH 1/3] network: sync known network frequency on BSS update
-Date: Fri, 28 May 2021 07:32:53 +0000
-Message-ID: <b89215c0-e4f6-bcbf-f1b0-a82dcdf6668a@bang-olufsen.dk>
-In-Reply-To: <a6f0e6cf-4b4a-c38e-6024-962c02c68930@gmail.com>
+Date: Fri, 28 May 2021 08:13:02 -0500
+Message-ID: <17d72442-420e-fd56-3616-f99d5c52d099@gmail.com>
+In-Reply-To: <b89215c0-e4f6-bcbf-f1b0-a82dcdf6668a@bang-olufsen.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1152815835949809695==
+--===============8073416709629963812==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi Alvin,
 
-On 5/27/21 8:57 PM, Denis Kenzior wrote:
-> Hi Alvin,
+>> All applied.=C2=A0 I did have to massage the formatting in patch 2 to fit
+>> into 80 columns.
 > =
 
-> On 5/27/21 9:22 AM, Alvin =C5=A0ipraga wrote:
->> From: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
->>
->> When a scan_bss is updated in the BSS list of a known network, it may be
->> on a new frequency. Sync the known frequencies list accordingly.
->> ---
->> =C2=A0 src/network.c | 6 ++++++
->> =C2=A0 1 file changed, 6 insertions(+)
->>
-> =
+> Thanks. And sorry about the formatting...
 
-> All applied.=C2=A0 I did have to massage the formatting in patch 2 to fit =
+Generally checkpatch.pl from linux kernel would catch most of these.  We do=
+ not =
 
-> into 80 columns.
+allow mixed tabs and spaces, but my vim syntax highlighting usually catches=
+ most =
 
-Thanks. And sorry about the formatting...
-
-I think it would be worth adding a .clang-format file to the project - =
-
-what do you think? As a starting point, the kernel's .clang-format seems =
-
-pretty close already. The main difference seems to be that it uses =
-
-spaces after tabs to align parameters across multiple lines. I tried =
-
-unsuccessfully to persuade it not to use any spaces for alignment, but =
-
-I'm no expert.
+of these...
 
 > =
 
-> Regards,
-> -Denis
+> I think it would be worth adding a .clang-format file to the project -
+> what do you think? As a starting point, the kernel's .clang-format seems
 
---===============1152815835949809695==--
+Hmm, you might have to educate me here.  Do note that we do not compile wit=
+h =
+
+clang right now due to _auto_ fu in useful.h.
+
+> pretty close already. The main difference seems to be that it uses
+> spaces after tabs to align parameters across multiple lines. I tried
+> unsuccessfully to persuade it not to use any spaces for alignment, but
+> I'm no expert.
+> =
+
+
+Right.  We have a few more house rules documented in doc/coding-style.txt.
+
+Regards,
+-Denis
+--===============8073416709629963812==--
 
