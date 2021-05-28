@@ -1,41 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============1181146365194831137=="
+Content-Type: multipart/mixed; boundary="===============1152815835949809695=="
 MIME-Version: 1.0
-From: Daniel Wagner <wagi@monom.org>
-Subject: Re: [RFC connman 1/1] WIP: Add WPA3-SAE support
-Date: Fri, 28 May 2021 07:20:50 +0200
-Message-ID: <20210528052050.l77aayrwalokkfoe@beryllium.lan>
-In-Reply-To: <32b4cd1c-51d1-cde9-2577-02db72a74c26@collabora.com>
+From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
+Subject: Re: [PATCH 1/3] network: sync known network frequency on BSS update
+Date: Fri, 28 May 2021 07:32:53 +0000
+Message-ID: <b89215c0-e4f6-bcbf-f1b0-a82dcdf6668a@bang-olufsen.dk>
+In-Reply-To: <a6f0e6cf-4b4a-c38e-6024-962c02c68930@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1181146365194831137==
+--===============1152815835949809695==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Denis,
 
-On Thu, May 27, 2021 at 05:28:25PM -0300, Ariel D'Alessandro wrote:
-> > I think key_mgmt could go into 'struct wifi_data'. No need to store this
-> > information a layer higher up.
->
-> The issue with 'struct wifi_data' is that it's attached to the device
-> instead of each network connection, see [0]. So, we can't store the
-> 'key_mgmt' property there as it's a shared object.
+On 5/27/21 8:57 PM, Denis Kenzior wrote:
+> Hi Alvin,
 > =
 
-> For example, iwd plugin has two different private data structs:
-> iwd_device [1] and iwd_network [2].
+> On 5/27/21 9:22 AM, Alvin =C5=A0ipraga wrote:
+>> From: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
+>>
+>> When a scan_bss is updated in the BSS list of a known network, it may be
+>> on a new frequency. Sync the known frequencies list accordingly.
+>> ---
+>> =C2=A0 src/network.c | 6 ++++++
+>> =C2=A0 1 file changed, 6 insertions(+)
+>>
 > =
 
-> We could have something similar in plugin/wifi.c. I'll send another RFC
-> patchset v2, so we can review it in-place.
+> All applied.=C2=A0 I did have to massage the formatting in patch 2 to fit =
 
-Yes, attach the key_mgmt to the network object via
+> into 80 columns.
 
-  connman_network_{set|get}_data()
+Thanks. And sorry about the formatting...
 
-Thanks,
-Daniel
---===============1181146365194831137==--
+I think it would be worth adding a .clang-format file to the project - =
+
+what do you think? As a starting point, the kernel's .clang-format seems =
+
+pretty close already. The main difference seems to be that it uses =
+
+spaces after tabs to align parameters across multiple lines. I tried =
+
+unsuccessfully to persuade it not to use any spaces for alignment, but =
+
+I'm no expert.
+
+> =
+
+> Regards,
+> -Denis
+
+--===============1152815835949809695==--
 
