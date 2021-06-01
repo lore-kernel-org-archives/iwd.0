@@ -1,40 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============4337673798987468472=="
+Content-Type: multipart/mixed; boundary="===============1700192997219971179=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/8] ip-pool: Track IPv4 addresses in use
-Date: Tue, 01 Jun 2021 10:06:10 -0500
-Message-ID: <7402bae9-f233-d2b9-f571-79ef2c59807f@gmail.com>
-In-Reply-To: <20210528004737.2878442-1-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 3/8] ap: Refactor DHCP settings loading
+Date: Tue, 01 Jun 2021 10:10:24 -0500
+Message-ID: <72f940b6-08df-fe80-c2fe-de89e6511d45@gmail.com>
+In-Reply-To: <20210528004737.2878442-3-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4337673798987468472==
+--===============1700192997219971179==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi Andrew,
+
 On 5/27/21 7:47 PM, Andrew Zaborowski wrote:
-> Add the ip-pool submodule that tracks IPv4 addresses in use on the
-> system for use when selecting the address for a new AP.  l_rtnl_address
-> is used internally because if we're going to return l_rtnl_address
-> objects it would be misleading if we didn't fill in all of their
-> properties like flags etc.
-> ---
->   Makefile.am   |   1 +
->   src/ip-pool.c | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   src/ip-pool.h |  23 +++++++
->   3 files changed, 199 insertions(+)
->   create mode 100644 src/ip-pool.c
->   create mode 100644 src/ip-pool.h
+> Extend the [IPv4].Address setting's syntax to allow a new format: a list
+> of <IP>/<prefix_len> -form strings that define the address space from
+> which a subnet is selected.  Rewrite the DHCP settings loading with
+> other notable changes:
 > =
 
+>   * validate some of the settings more thoroughly,
+>   * name all netconfig-related ap_state members with the netconfig_
+>     prefix,
+>   * make sure we always call l_dhcp_server_set_netmask(),
+>   * allow netmasks other than 24-bit and change the default to 28 bits,
+>   * as requested avoid using the l_net_ ioctl-based functions although
+>     l_dhcp still uses them internally,
+>   * as requested avoid touching the ap_state members until the end of
+>     some functions so that on error they're basically a no-op (for
+>     readabaility).
 
-I s/l_rtnl_address_dup/l_rtnl_address_clone to match ell changes and..
+I fixed this typo above and..
+
+> ---
+>   src/ap.c | 451 +++++++++++++++++++++++++++++++++++--------------------
+>   1 file changed, 288 insertions(+), 163 deletions(-)
+> =
+
 
 Applied, thanks.
 
 Regards,
 -Denis
 
---===============4337673798987468472==--
+--===============1700192997219971179==--
 
