@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============6278942788418579364=="
+Content-Type: multipart/mixed; boundary="===============4709929749657431083=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 6/8] ap: Save AP address as l_rtnl_address
-Date: Tue, 01 Jun 2021 10:20:26 -0500
-Message-ID: <393c3b03-37f2-0a9d-f2c9-300020f09745@gmail.com>
-In-Reply-To: <20210528004737.2878442-6-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 7/8] autotests: Update APRanges usage in testAP
+Date: Tue, 01 Jun 2021 10:22:48 -0500
+Message-ID: <43709184-8319-4296-2461-c8486e2df1b1@gmail.com>
+In-Reply-To: <20210528004737.2878442-7-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6278942788418579364==
+--===============4709929749657431083==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,54 +16,21 @@ Content-Transfer-Encoding: quoted-printable
 Hi Andrew,
 
 On 5/27/21 7:47 PM, Andrew Zaborowski wrote:
-> Change the char *addr_str and uint8_t prefix_len pair to an
-> l_rtnl_address object and use ell/rtnl.h utilities that use that
-> directly.  Extend broadcast_from_ip to handle prefix_len.
+> [General].APRange is now [IPv4].APAddressPool and the netmask is changed
+> from 23 to 27 bits to make the test correctly assert that only two
+> default-sized subnets are allowed by IWD simultaneously (default has
+> changed from 24 to 28 bits)
 > ---
->   src/ap.c | 43 +++++++++++++++++--------------------------
->   1 file changed, 17 insertions(+), 26 deletions(-)
+>   autotests/testAP/dhcp/main.conf |  4 +++-
+>   autotests/testAP/dhcp_test.py   | 12 +++++++++---
+>   2 files changed, 12 insertions(+), 4 deletions(-)
 > =
 
 
-<snip>
-
-> @@ -132,20 +131,15 @@ static char **global_addr4_strs;
->   static uint32_t netdev_watch;
->   static struct l_netlink *rtnl;
->   =
-
-> -static const char *broadcast_from_ip(const char *ip)
-> +static const char *broadcast_from_ip(const char *ip, uint8_t prefix_len)
->   {
->   	struct in_addr ia;
-> -	uint32_t bcast;
-> +	uint32_t netmask =3D util_netmask_from_prefix(prefix_len);
->   =
-
->   	if (inet_aton(ip, &ia) !=3D 1)
->   		return NULL;
->   =
-
-> -	bcast =3D ntohl(ia.s_addr);
-> -	bcast &=3D 0xffffff00;
-> -	bcast |=3D 0x000000ff;
-> -
-> -	ia.s_addr =3D htonl(bcast);
-> -
-> +	ia.s_addr |=3D htonl(~netmask);
->   	return inet_ntoa(ia);
->   }
->   =
-
-
-Okay, but don't you really want to use l_rtnl_address_set_broadcast(rtnl, N=
-ULL) =
-
-instead?  Also, you may want to do this directly in ip-pool.c?
-
-Applied, thanks.
+Patches 7 and 8 applied, thanks.
 
 Regards,
 -Denis
---===============6278942788418579364==--
+
+--===============4709929749657431083==--
 
