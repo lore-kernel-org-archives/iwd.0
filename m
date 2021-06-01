@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============1700192997219971179=="
+Content-Type: multipart/mixed; boundary="===============1897810080130110647=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 3/8] ap: Refactor DHCP settings loading
-Date: Tue, 01 Jun 2021 10:10:24 -0500
-Message-ID: <72f940b6-08df-fe80-c2fe-de89e6511d45@gmail.com>
-In-Reply-To: <20210528004737.2878442-3-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 2/8] ip-pool: Add subnet address selection logic
+Date: Tue, 01 Jun 2021 10:13:29 -0500
+Message-ID: <b0458196-d0c1-448e-7d50-c6445c2054b4@gmail.com>
+In-Reply-To: <20210528004737.2878442-2-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1700192997219971179==
+--===============1897810080130110647==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,28 +16,18 @@ Content-Transfer-Encoding: quoted-printable
 Hi Andrew,
 
 On 5/27/21 7:47 PM, Andrew Zaborowski wrote:
-> Extend the [IPv4].Address setting's syntax to allow a new format: a list
-> of <IP>/<prefix_len> -form strings that define the address space from
-> which a subnet is selected.  Rewrite the DHCP settings loading with
-> other notable changes:
-> =
-
->   * validate some of the settings more thoroughly,
->   * name all netconfig-related ap_state members with the netconfig_
->     prefix,
->   * make sure we always call l_dhcp_server_set_netmask(),
->   * allow netmasks other than 24-bit and change the default to 28 bits,
->   * as requested avoid using the l_net_ ioctl-based functions although
->     l_dhcp still uses them internally,
->   * as requested avoid touching the ap_state members until the end of
->     some functions so that on error they're basically a no-op (for
->     readabaility).
-
-I fixed this typo above and..
-
+> Add the ip_pool_select_addr4 function to select a random subnet of reques=
+ted
+> size from an address space defined by a string list (for use with the
+> AP profile [IPv4].Address and the global [IPv4].APAddressPool settings),
+> avoiding those subnets that conflict with subnets in use.  We take care
+> to give a similar weight to all subnets contained in the specified
+> ranges regardless of how many ranges contain each, basically so that
+> overlapping ranges don't affect the probabilities (debatable.)
 > ---
->   src/ap.c | 451 +++++++++++++++++++++++++++++++++++--------------------
->   1 file changed, 288 insertions(+), 163 deletions(-)
+>   src/ip-pool.c | 206 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>   src/ip-pool.h |   2 +
+>   2 files changed, 208 insertions(+)
 > =
 
 
@@ -46,5 +36,5 @@ Applied, thanks.
 Regards,
 -Denis
 
---===============1700192997219971179==--
+--===============1897810080130110647==--
 
