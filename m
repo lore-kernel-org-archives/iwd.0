@@ -1,34 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============1897810080130110647=="
+Content-Type: multipart/mixed; boundary="===============9165331677066090765=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/8] ip-pool: Add subnet address selection logic
-Date: Tue, 01 Jun 2021 10:13:29 -0500
-Message-ID: <b0458196-d0c1-448e-7d50-c6445c2054b4@gmail.com>
-In-Reply-To: <20210528004737.2878442-2-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 4/8] ap: Refactor global address pool loading
+Date: Tue, 01 Jun 2021 10:14:25 -0500
+Message-ID: <6f05e4a5-61d3-26b2-ea1f-c50024317320@gmail.com>
+In-Reply-To: <20210528004737.2878442-4-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1897810080130110647==
+--===============9165331677066090765==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
-
 On 5/27/21 7:47 PM, Andrew Zaborowski wrote:
-> Add the ip_pool_select_addr4 function to select a random subnet of reques=
-ted
-> size from an address space defined by a string list (for use with the
-> AP profile [IPv4].Address and the global [IPv4].APAddressPool settings),
-> avoiding those subnets that conflict with subnets in use.  We take care
-> to give a similar weight to all subnets contained in the specified
-> ranges regardless of how many ranges contain each, basically so that
-> overlapping ranges don't affect the probabilities (debatable.)
-> ---
->   src/ip-pool.c | 206 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   src/ip-pool.h |   2 +
->   2 files changed, 208 insertions(+)
+> Deprecate the global [General].APRanges setting in favour of
+> [IPv4].APAddressPool with an extended (but backwards-compatible) syntax.
+> Drop the existing address pool creation code.
 > =
+
+> The new APAddressPool setting has the same syntax as the profile-local
+> [IPv4].Address setting and the subnet selection code will fall back
+> to the global setting if it's missing, this way we use common code to
+> handle both settings.
+> ---
+>   src/ap.c | 185 +++++++++++++------------------------------------------
+>   1 file changed, 42 insertions(+), 143 deletions(-)
+> =
+
+
+<snip>
+
+> +	if (netconfig_enabled) {
+> +		if (l_settings_get_value(settings, "IPv4", "APAddressPool")) {
+> +			global_addr4_strs =3D l_settings_get_string_list(settings,
+> +								"IPv4",
+> +								"APAddressPool",
+> +								',');
+> +			if (!global_addr4_strs || !*global_addr4_strs) {
+> +				l_error("Can't parse the [IPv4].APAddressPool "
+> +					"setting as a string list");
+> +				l_strv_free(global_addr4_strs);
+> +				global_addr4_strs =3D NULL;
+> +			}
+> +		} else if (l_settings_get_value(settings,
+> +						"General", "APRanges")) {
+> +			global_addr4_strs =3D l_settings_get_string_list(settings,
+> +								"General",
+> +								"APRanges",
+> +								',');
+
+Do you want to print a warning that this setting is deprecated?
+
+> +			if (!global_addr4_strs || !*global_addr4_strs) {
+> +				l_error("Can't parse the [General].APRanges "
+> +					"setting as a string list");
+> +				l_strv_free(global_addr4_strs);
+> +				global_addr4_strs =3D NULL;
+> +			}
+>   		}
+>   =
 
 
 Applied, thanks.
@@ -36,5 +67,5 @@ Applied, thanks.
 Regards,
 -Denis
 
---===============1897810080130110647==--
+--===============9165331677066090765==--
 
