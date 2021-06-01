@@ -1,28 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============6822946355568320880=="
+Content-Type: multipart/mixed; boundary="===============4337673798987468472=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
 Subject: Re: [PATCH 1/8] ip-pool: Track IPv4 addresses in use
-Date: Sat, 29 May 2021 01:53:55 +0200
-Message-ID: <CAOq732JBzGQ3JuECAVTuYyhof9rzD9QKWUqgPR4kNboeqFqwJA@mail.gmail.com>
-In-Reply-To: <2ee1050f-9077-dfc0-8326-b597a9149972@gmail.com>
+Date: Tue, 01 Jun 2021 10:06:10 -0500
+Message-ID: <7402bae9-f233-d2b9-f571-79ef2c59807f@gmail.com>
+In-Reply-To: <20210528004737.2878442-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6822946355568320880==
+--===============4337673798987468472==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+On 5/27/21 7:47 PM, Andrew Zaborowski wrote:
+> Add the ip-pool submodule that tracks IPv4 addresses in use on the
+> system for use when selecting the address for a new AP.  l_rtnl_address
+> is used internally because if we're going to return l_rtnl_address
+> objects it would be misleading if we didn't fill in all of their
+> properties like flags etc.
+> ---
+>   Makefile.am   |   1 +
+>   src/ip-pool.c | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>   src/ip-pool.h |  23 +++++++
+>   3 files changed, 199 insertions(+)
+>   create mode 100644 src/ip-pool.c
+>   create mode 100644 src/ip-pool.h
+> =
 
-On Fri, 28 May 2021 at 16:22, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 5/27/21 7:47 PM, Andrew Zaborowski wrote:
-> src/ip-pool.c:68:15: error: implicit declaration of function
-> =E2=80=98l_rtnl_address_dup=E2=80=99; did you mean =E2=80=98l_rtnl_addres=
-s_new=E2=80=99?
 
-Oops, sure enough I forgot to send the ell patch..
+I s/l_rtnl_address_dup/l_rtnl_address_clone to match ell changes and..
 
-Best regards
---===============6822946355568320880==--
+Applied, thanks.
+
+Regards,
+-Denis
+
+--===============4337673798987468472==--
 
