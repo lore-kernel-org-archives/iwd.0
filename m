@@ -1,53 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============7806812128894005382=="
+Content-Type: multipart/mixed; boundary="===============7937285929911027977=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 11/15] p2p: Set Linkmode/operstate on GO connection
-Date: Fri, 04 Jun 2021 03:50:48 +0200
-Message-ID: <20210604015052.163727-11-andrew.zaborowski@intel.com>
+Subject: [PATCH 12/15] autotests: Initialise P2PPeer objects with correct
+ namespace
+Date: Fri, 04 Jun 2021 03:50:49 +0200
+Message-ID: <20210604015052.163727-12-andrew.zaborowski@intel.com>
 In-Reply-To: <20210604015052.163727-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7806812128894005382==
+--===============7937285929911027977==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/p2p.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ autotests/util/iwd.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/p2p.c b/src/p2p.c
-index c7c8d785..cb6cd98b 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -34,6 +34,7 @@
- #include <errno.h>
- #include <netinet/in.h>
- #include <arpa/inet.h>
-+#include <linux/if.h>
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index e6421088..350e1aca 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -826,7 +826,7 @@ class P2PDevice(IWDDBusAbstract):
+         self._peer_dict =3D {}
  =
 
- #include <ell/ell.h>
+         for path, rssi in self._iface.GetPeers():
+-            self._peer_dict[path] =3D old_dict[path] if path in old_dict e=
+lse P2PPeer(path)
++            self._peer_dict[path] =3D old_dict[path] if path in old_dict e=
+lse P2PPeer(path, namespace=3Dself._namespace)
+             self._peer_dict[path].rssi =3D rssi
  =
 
-@@ -977,6 +978,11 @@ static void p2p_group_event(enum ap_event_type type, c=
-onst void *event_data,
- 		if (dev->conn_peer_added)
- 			break;
- =
-
-+		l_rtnl_set_linkmode_and_operstate(iwd_get_rtnl(),
-+					netdev_get_ifindex(dev->conn_netdev),
-+					IF_LINK_MODE_DEFAULT, IF_OPER_UP,
-+					NULL, NULL, NULL);
-+
- 		dev->conn_peer_added =3D true;
- 		dev->conn_peer_ip =3D l_dhcp_lease_get_address(lease);
- 		l_timeout_remove(dev->conn_dhcp_timeout);
+         return self._peer_dict
 -- =
 
 2.30.2
 
---===============7806812128894005382==--
+--===============7937285929911027977==--
 
