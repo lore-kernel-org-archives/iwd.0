@@ -1,142 +1,119 @@
-Content-Type: multipart/mixed; boundary="===============2730424552335555519=="
+Content-Type: multipart/mixed; boundary="===============0609405951250715914=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 09/15] p2p: Also set a DHCP timeout in Group Owner role
-Date: Fri, 04 Jun 2021 03:50:46 +0200
-Message-ID: <20210604015052.163727-9-andrew.zaborowski@intel.com>
+Subject: [PATCH 10/15] p2p: As GO delay connect success until client gets IP
+Date: Fri, 04 Jun 2021 03:50:47 +0200
+Message-ID: <20210604015052.163727-10-andrew.zaborowski@intel.com>
 In-Reply-To: <20210604015052.163727-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2730424552335555519==
+--===============0609405951250715914==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Move the loading of the [P2P].DHCPTimeout setting to initialization and
-set the timeout both in P2P Client and P2P GO roles.
+Don't signal the connected state until the client has obtained a DHCP
+lease and we can set the ConnectedIP property.  From now on that
+property is always set when there's a connection.
 ---
- src/p2p.c | 53 ++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 30 insertions(+), 23 deletions(-)
+ src/p2p.c | 36 ++++++++++++++++++++++++++++++------
+ 1 file changed, 30 insertions(+), 6 deletions(-)
 
 diff --git a/src/p2p.c b/src/p2p.c
-index bc2d154d..22ce7042 100644
+index 22ce7042..c7c8d785 100644
 --- a/src/p2p.c
 +++ b/src/p2p.c
-@@ -170,6 +170,7 @@ struct p2p_wfd_properties {
- };
+@@ -659,10 +659,11 @@ static void p2p_connection_reset(struct p2p_device *d=
+ev)
+ 		netconfig_destroy(dev->conn_netconfig);
+ 		dev->conn_netconfig =3D NULL;
+ 		l_settings_free(dev->conn_netconfig_settings);
+-		l_free(dev->conn_peer_ip);
+-		dev->conn_peer_ip =3D NULL;
+ 	}
  =
 
- static struct l_queue *p2p_device_list;
-+static unsigned int p2p_dhcp_timeout_val;
- static struct l_settings *p2p_dhcp_settings;
- static struct p2p_wfd_properties *p2p_own_wfd;
- static unsigned int p2p_wfd_disconnect_watch;
-@@ -1175,6 +1176,22 @@ static const struct ap_ops p2p_go_ops =3D {
- 	.write_extra_ies =3D p2p_group_write_ies,
- };
++	l_free(dev->conn_peer_ip);
++	dev->conn_peer_ip =3D NULL;
++
+ 	if (dev->conn_new_intf_cmd_id)
+ 		/*
+ 		 * Note this may result in the interface being created
+@@ -948,8 +949,8 @@ static void p2p_group_event(enum ap_event_type type, co=
+nst void *event_data,
+ 			p2p_extract_wfd_properties(wfd_data, wfd_data_len,
+ 							dev->conn_peer->wfd);
  =
 
-+static void p2p_dhcp_timeout(struct l_timeout *timeout, void *user_data)
-+{
-+	struct p2p_device *dev =3D user_data;
-+
-+	l_debug("");
-+
-+	p2p_connect_failed(dev);
-+}
-+
-+static void p2p_dhcp_timeout_destroy(void *user_data)
-+{
-+	struct p2p_device *dev =3D user_data;
-+
-+	dev->conn_dhcp_timeout =3D NULL;
-+}
-+
- static void p2p_group_start(struct p2p_device *dev)
- {
- 	struct l_settings *config =3D l_settings_new();
-@@ -1233,8 +1250,15 @@ static void p2p_group_start(struct p2p_device *dev)
- 	dev->group =3D ap_start(dev->conn_netdev, config, &p2p_go_ops, NULL, dev);
- 	l_settings_free(config);
+-		dev->conn_peer_added =3D true;
+-		p2p_peer_connect_done(dev);
++		/* Setup is progressing so re-arm the timeout */
++		l_timeout_modify(dev->conn_dhcp_timeout, p2p_dhcp_timeout_val);
+ 		break;
+ 	}
  =
 
--	if (!dev->group)
-+	if (!dev->group) {
- 		p2p_connect_failed(dev);
-+		return;
+@@ -968,6 +969,28 @@ static void p2p_group_event(enum ap_event_type type, c=
+onst void *event_data,
+ 		break;
+ 	case AP_EVENT_PBC_MODE_EXIT:
+ 		break;
++
++	case AP_EVENT_DHCP_NEW_LEASE:
++	{
++		const struct l_dhcp_lease *lease =3D event_data;
++
++		if (dev->conn_peer_added)
++			break;
++
++		dev->conn_peer_added =3D true;
++		dev->conn_peer_ip =3D l_dhcp_lease_get_address(lease);
++		l_timeout_remove(dev->conn_dhcp_timeout);
++		p2p_peer_connect_done(dev);
++		break;
 +	}
 +
-+	/* Set timeout on client connecting and getting its IP */
-+	dev->conn_dhcp_timeout =3D l_timeout_create(p2p_dhcp_timeout_val,
-+						p2p_dhcp_timeout, dev,
-+						p2p_dhcp_timeout_destroy);
- }
++	case AP_EVENT_DHCP_LEASE_EXPIRED:
++		/*
++		 * Only one DHCP lease allowed for now, as soon as it expires
++		 * the connection is considered to be down.
++		 */
++		p2p_connect_failed(dev);
++		break;
+ 	};
  =
 
- static void p2p_netconfig_event_handler(enum netconfig_event event,
-@@ -1259,32 +1283,11 @@ static void p2p_netconfig_event_handler(enum netcon=
-fig_event event,
- 	}
- }
+ 	return;
+@@ -1242,7 +1265,8 @@ static void p2p_group_start(struct p2p_device *dev)
  =
 
--static void p2p_dhcp_timeout(struct l_timeout *timeout, void *user_data)
--{
--	struct p2p_device *dev =3D user_data;
--
--	l_debug("");
--
--	p2p_connect_failed(dev);
--}
--
--static void p2p_dhcp_timeout_destroy(void *user_data)
--{
--	struct p2p_device *dev =3D user_data;
--
--	dev->conn_dhcp_timeout =3D NULL;
--}
--
- static void p2p_start_client_netconfig(struct p2p_device *dev)
+ 	l_settings_set_bytes(config, "Security", "PreSharedKey", psk, 32);
+ =
+
+-	l_settings_add_group(config, "IPv4");
++	/* Enable netconfig, set maximum usable DHCP lease time */
++	l_settings_set_uint(config, "IPv4", "LeaseTime", 0x7fffffff);
+ =
+
+ 	dev->capability.group_caps |=3D P2P_GROUP_CAP_GO;
+ 	dev->capability.group_caps |=3D P2P_GROUP_CAP_GROUP_FORMATION;
+@@ -4757,7 +4781,7 @@ static bool p2p_peer_get_connected_ip(struct l_dbus *=
+dbus,
  {
- 	uint32_t ifindex =3D netdev_get_ifindex(dev->conn_netdev);
--	unsigned int dhcp_timeout_val;
- 	struct l_settings *settings;
+ 	struct p2p_peer *peer =3D user_data;
  =
 
--	if (!l_settings_get_uint(iwd_get_config(), "P2P", "DHCPTimeout",
--					&dhcp_timeout_val))
--		dhcp_timeout_val =3D 20;	/* 20s default */
--
- 	if (!dev->conn_netconfig) {
- 		dev->conn_netconfig =3D netconfig_new(ifindex);
- 		if (!dev->conn_netconfig) {
-@@ -1296,7 +1299,7 @@ static void p2p_start_client_netconfig(struct p2p_dev=
-ice *dev)
- 	settings =3D dev->conn_netconfig_settings ?: p2p_dhcp_settings;
- 	netconfig_configure(dev->conn_netconfig, settings, dev->conn_addr,
- 				p2p_netconfig_event_handler, dev);
--	dev->conn_dhcp_timeout =3D l_timeout_create(dhcp_timeout_val,
-+	dev->conn_dhcp_timeout =3D l_timeout_create(p2p_dhcp_timeout_val,
- 						p2p_dhcp_timeout, dev,
- 						p2p_dhcp_timeout_destroy);
- }
-@@ -5110,6 +5113,10 @@ static int p2p_init(void)
- 					NULL))
- 		l_error("Unable to register the P2P Service Manager object");
+-	if (!p2p_peer_operational(peer) || !peer->dev->conn_peer_ip)
++	if (!p2p_peer_operational(peer))
+ 		return false;
  =
 
-+	if (!l_settings_get_uint(iwd_get_config(), "P2P", "DHCPTimeout",
-+					&p2p_dhcp_timeout_val))
-+		p2p_dhcp_timeout_val =3D 20;	/* 20s default */
-+
- 	return 0;
- }
- =
-
+ 	l_dbus_message_builder_append_basic(builder, 's', peer->dev->conn_peer_ip=
+);
 -- =
 
 2.30.2
 
---===============2730424552335555519==--
+--===============0609405951250715914==--
 
