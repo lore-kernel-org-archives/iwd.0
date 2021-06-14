@@ -1,52 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============5354712432805029121=="
+Content-Type: multipart/mixed; boundary="===============0742610172605848190=="
 MIME-Version: 1.0
-From: Joseph Benden <joe@benden.us>
-Subject: [PATCH 1/1] eapol: Use constant-time comparison
-Date: Sun, 13 Jun 2021 13:23:44 -0700
-Message-ID: <20210613202344.4402-1-joe@benden.us>
+From: Daniel Wagner <wagi@monom.org>
+Subject: Re: [RFC connman v2 1/1] WIP: Add wpa_supplicant WPA3-SAE support
+Date: Mon, 14 Jun 2021 09:00:42 +0200
+Message-ID: <20210614070042.mtst3o4utquyzfkq@beryllium.lan>
+In-Reply-To: <20210527214134.33792-2-ariel.dalessandro@collabora.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5354712432805029121==
+--===============0742610172605848190==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This closes the possibility of a timing attack against PMKIDs.
----
- src/eapol.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Ariel,
 
-diff --git a/src/eapol.c b/src/eapol.c
-index f587e708..51fb3c92 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -1142,7 +1142,7 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *=
-sm,
- 			goto error_unspecified;
- =
+On Thu, May 27, 2021 at 06:41:34PM -0300, Ariel D'Alessandro wrote:
+> Implement WPA3-SAE authentication on connman side using wpa_supplicant
+> backend.
+> =
 
- 		for (i =3D 0; i < rsn_info.num_pmkids; i++)
--			if (!memcmp(rsn_info.pmkids + i * 16, pmkid, 16)) {
-+			if (!l_secure_memcmp(rsn_info.pmkids + i * 16, pmkid, 16)) {
- 				found =3D true;
- 				break;
- 			}
-@@ -1155,7 +1155,7 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *=
-sm,
- 		if (!handshake_state_get_pmkid(sm->handshake, own_pmkid))
- 			goto error_unspecified;
- =
+> Initially based on Tizen project:
+> =
 
--		if (memcmp(pmkid, own_pmkid, 16)) {
-+		if (l_secure_memcmp(pmkid, own_pmkid, 16)) {
- 			l_debug("Authenticator sent a PMKID that didn't match");
- =
+>   https://review.tizen.org/git/?p=3Dplatform/upstream/connman.git
+> =
 
- 			/*
--- =
+> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
 
-2.32.0
+We don't do the SOB, so I just dropped.
 
---===============5354712432805029121==--
+I applied the patch, there were small style issues which I fixed it
+directly.
+
+Probably we should update the documentation which wpa_supplicant version
+is needed to support WPA3.
+
+Thanks,
+Daniel
+--===============0742610172605848190==--
 
