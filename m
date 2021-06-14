@@ -1,40 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============6299040865810460636=="
+Content-Type: multipart/mixed; boundary="===============0301173264612082830=="
 MIME-Version: 1.0
-From: Daniel Wagner <wagi@monom.org>
-Subject: Re: [RFC connman v2 1/1] WIP: Add wpa_supplicant WPA3-SAE support
-Date: Mon, 14 Jun 2021 13:57:02 +0200
-Message-ID: <20210614115702.irahmhk4stcbhebk@beryllium.lan>
-In-Reply-To: <d7977fbd-3d03-e9d9-8a5e-1222707eb285@collabora.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] autotest: Improve cleanup in testP2P
+Date: Mon, 14 Jun 2021 09:09:44 -0500
+Message-ID: <90f32845-f9b4-01cc-ff92-8059cc388822@gmail.com>
+In-Reply-To: <20210610210352.329398-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6299040865810460636==
+--===============0301173264612082830==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Ariel,
+Hi Andrew,
 
-On Mon, Jun 14, 2021 at 08:50:10AM -0300, Ariel D'Alessandro wrote:
-> > I applied the patch, there were small style issues which I fixed it
-> > directly.
+On 6/10/21 4:03 PM, Andrew Zaborowski wrote:
+> Make sure some of the processes and files created are also cleaned up on
+> failure so that the next chance has a chance to succeed anyway.
+> ---
+>   autotests/testP2P/connection_test.py | 31 +++++++++++++++++++++-------
+>   autotests/util/wpas.py               | 11 ++++------
+>   2 files changed, 27 insertions(+), 15 deletions(-)
 > =
 
-> Great! Thanks a lot for your help.
 
-Thanks for your contribution. Really appreciated.
+Applied, thanks.
 
-> > Probably we should update the documentation which wpa_supplicant version
-> > is needed to support WPA3.
-> =
+Regards,
+-Denis
 
-> Which doc files should be updated? I can take a look at that and put
-> some notes together.
-
-There was some recommendation on the wpa_supplicant version in the
-README. I wonder if this is still valid.
-
-Thanks,
-Daniel
---===============6299040865810460636==--
+--===============0301173264612082830==--
 
