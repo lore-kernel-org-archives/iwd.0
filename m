@@ -1,41 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============5686292039541660189=="
+Content-Type: multipart/mixed; boundary="===============7149925921085100161=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 2/3] station: Check if busy in station_get_diagnostics
-Date: Fri, 18 Jun 2021 09:33:23 +0200
-Message-ID: <20210618073324.67095-2-andrew.zaborowski@intel.com>
+Subject: [PATCH 3/3] station: Stop periodic scan when netdev connected
+Date: Fri, 18 Jun 2021 09:33:24 +0200
+Message-ID: <20210618073324.67095-3-andrew.zaborowski@intel.com>
 In-Reply-To: <20210618073324.67095-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5686292039541660189==
+--===============7149925921085100161==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+For consistency call periodic_scan_stop() right after netdev signals
+connected even if station stays in the CONNECTING state because it's
+waiting for netconfig to finish.
 ---
- src/station.c | 3 +++
- 1 file changed, 3 insertions(+)
+ src/station.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/src/station.c b/src/station.c
-index 11711973..0b0cc59c 100644
+index 0b0cc59c..66ddc76e 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -3768,6 +3768,9 @@ static struct l_dbus_message *station_get_diagnostics=
-(struct l_dbus *dbus,
- 	struct station *station =3D user_data;
- 	int ret;
+@@ -2468,6 +2468,7 @@ static void station_connect_ok(struct station *statio=
+n)
+ 	}
  =
 
-+	if (station->get_station_pending)
-+		return dbus_error_busy(message);
-+
- 	ret =3D netdev_get_current_station(station->netdev,
- 				station_get_diagnostic_cb, station,
- 				station_get_diagnostic_destroy);
+ 	network_connected(station->connected_network);
++	periodic_scan_stop(station);
+ =
+
+ 	if (station->netconfig)
+ 		netconfig_configure(station->netconfig,
 -- =
 
 2.30.2
 
---===============5686292039541660189==--
+--===============7149925921085100161==--
 
