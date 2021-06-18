@@ -1,25 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============7640344976301223885=="
+Content-Type: multipart/mixed; boundary="===============6756537803294873495=="
 MIME-Version: 1.0
-From: Michael Johnson <m2johnson@locusrobotics.com>
-Subject: Re: [PATCH] Send hostname as part of DHCP request.
-Date: Fri, 18 Jun 2021 15:49:03 +0000
-Message-ID: <20210618154903.2820.41536@ml01.vlan13.01.org>
-In-Reply-To: <e1e67d58-c2c7-1001-b20e-117ae97ff414@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 3/3] station: Stop periodic scan when netdev connected
+Date: Fri, 18 Jun 2021 18:16:12 +0200
+Message-ID: <CAOq732+9jc8Mj4Gi+xrgJaVt4BHLx-LEwU9JcaDKg=efL6s0LQ@mail.gmail.com>
+In-Reply-To: <3334d49c-c269-c398-9cf7-4a4a6ca903bd@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7640344976301223885==
+--===============6756537803294873495==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Fri, 18 Jun 2021 at 17:05, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 6/18/21 2:33 AM, Andrew Zaborowski wrote:
+> > For consistency call periodic_scan_stop() right after netdev signals
+> > connected even if station stays in the CONNECTING state because it's
+> > waiting for netconfig to finish.
+>
+> Hmm, why is this needed?  We should be calling periodic_scan_stop as soon=
+ as we
+> transition to CONNECTING/CONNECTING_AUTO state.
 
-Sorry, I couldn't get git send-email to work so I just tried to use the lis=
-ts.01.org interface. I'll make the suggested change and upload a new versio=
-n and that should included the proper details.
+That's another option but I think the logic until now was that if the
+connection failed we'd just return to periodic scanning without ever
+stopping and restarting it.  During the netdev CMD_CONNECT it would be
+inhibited by the kernel or by the radio work.  We only needed to
+explicitly stop the scanning when CMD_CONNECT succeeded, so that's
+what I was trying to restore in this patch, otherwise if we were
+unlucky we might have been scanning during the netconfig.
 
-Regards,
-Michael
---===============7640344976301223885==--
+Best regards
+--===============6756537803294873495==--
 
