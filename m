@@ -1,33 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============3525230201962006255=="
+Content-Type: multipart/mixed; boundary="===============0606115864283438360=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 1/2] ap: Implement P2P GO-side 4-way handshake IP
- Allocation
-Date: Sat, 10 Jul 2021 03:37:31 +0200
-Message-ID: <CAOq732LBHNEafhFWSVPPqmtZ3iOpQc=OPxaCUqRmz7kMAKt78w@mail.gmail.com>
-In-Reply-To: <CAOq732LUGQS2ZA5A568wt1z3YeNyg7TdpsShWJiBbuQFVcye8w@mail.gmail.com>
+From: Michael Johnson <mjohnson459@gmail.com>
+Subject: Bug with RoamThreshold5G
+Date: Mon, 12 Jul 2021 14:17:01 +0100
+Message-ID: <CACsRnHXxRm=yNaPBzwGKkymvv9H3PDHfwGKbJnDc5VYcV0d=6w@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3525230201962006255==
+--===============0606115864283438360==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, 10 Jul 2021 at 02:52, Andrew Zaborowski
-<andrew.zaborowski@intel.com> wrote:
-> We'd need to start tracking the offered
-> lease expiry times though.  Right now we set a 5s timeout for offered
-> leases (lease->lifetime =3D OFFER_TIME) but
-> dhcp-server.c:set_next_expire_timer() disables all timeouts whenever
-> there's an offered lease so they're not tracked.
+Hi everyone,
 
-I misread that check, it actually disables the timeout if there are
-*only* "offered" leases on the list.  This still seems wrong.  We
-probably also need to skip the LEASE_EXPIRED event in
-lease_expired_cb() for "offered" leases because we don't emit
-NEW_LEASE for these.
+I noticed that iwd wasn't roaming as much as I would expect given a
+modified RoamTheshold5G
+value. Looking into it, it seems like when the threshold is registered
+for updates in
+netdev_build_cmd_cqm_rssi_update we always use RoamThreshold. When
+this bit of code is
+called the frequency seems to always be 0 and so the non-5G variant is
+used. This in turn becomes an issue once the frequency is set and the
+correct threshold is used for other checks (at least if
+RoamThreshold5G is configured higher than RoamThreshold).
 
-Best regards
---===============3525230201962006255==--
+Code:
+netdev_build_cmd_cqm_rssi_update(...)
+    int threshold =3D netdev->frequency > 4000 ? LOW_SIGNAL_THRESHOLD_5GHZ :
+
+   LOW_SIGNAL_THRESHOLD;
+    l_debug("frequency: %u, threshold: %d", netdev->frequency,
+threshold); // added for debug
+
+Config:
+[General]
+EnableNetworkConfiguration=3Dtrue
+RoamThreshold=3D-60
+RoamThreshold5G=3D-65
+
+Output:
+src/netdev.c:netdev_build_cmd_cqm_rssi_update() frequency: 0, threshold: -60
+
+I'm not really sure what the right fix for this is. Can it just
+request notifications for both
+thresholds?
+
+Regards,
+Michael
+--===============0606115864283438360==--
 
