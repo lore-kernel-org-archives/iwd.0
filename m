@@ -1,47 +1,103 @@
-Content-Type: multipart/mixed; boundary="===============3788979193689840380=="
+Content-Type: multipart/mixed; boundary="===============7590001013153847090=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] test-runner: set msize to remove runtime warning
-Date: Tue, 27 Jul 2021 15:11:27 -0700
-Message-ID: <20210727221128.33131-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] auto-t: fix blacklist test ranking
+Date: Tue, 27 Jul 2021 15:11:28 -0700
+Message-ID: <20210727221128.33131-2-prestwoj@gmail.com>
+In-Reply-To: <20210727221128.33131-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3788979193689840380==
+--===============7590001013153847090==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Newer QEMU version warn that msize is set too low and may result
-in poor IO performance. The default is 8KiB which QEMU claims is
-too low. Explicitly setting to 10KiB removes the warning:
+The scan ranking logic was previously changed to be based off a
+theoretical calculated data rate rather than signal strength.
+For HT/VHT networks there are many data points that can be used
+for this calculation, but non HT/VHT networks are estimated based
+on a simple table mapping signal strengths to data rates.
 
-qemu-system-x86_64: warning: 9p: degraded performance: a
-reasonable high msize should be chosen on client/guest side
-(chosen msize is <=3D 8192).
-See https://wiki.qemu.org/Documentation/9psetup#msize for details.
+This table starts at a signal strength of -65 dBm and decreases from
+there, meaning any signal strengths greater than -65 dBm will end up
+getting the same ranking. This poses a problem for 3/4 blacklisting
+tests as they set signal strengths ranging from -20 to -40 dBm.
+IWD will then autoconnect to whatever network popped up first, which
+may not be the expected network.
+
+To fix this the signal strengths were changed to much lower values
+which ensures IWD picks the expected network.
 ---
- tools/test-runner | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ autotests/testBSSBlacklist/bad_pass_test.py       | 4 ++--
+ autotests/testBSSBlacklist/connection_test.py     | 4 ++--
+ autotests/testBSSBlacklist/temp_blacklist_test.py | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/tools/test-runner b/tools/test-runner
-index bc37b80c..98164f7a 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1364,7 +1364,7 @@ def run_tests():
- 	config.ctx =3D TestContext(args)
+diff --git a/autotests/testBSSBlacklist/bad_pass_test.py b/autotests/testBS=
+SBlacklist/bad_pass_test.py
+index b0a81991..1d41f390 100644
+--- a/autotests/testBSSBlacklist/bad_pass_test.py
++++ b/autotests/testBSSBlacklist/bad_pass_test.py
+@@ -32,12 +32,12 @@ class Test(unittest.TestCase):
+         rule1 =3D hwsim.rules.create()
+         rule1.source =3D bss_radio[1].addresses[0]
+         rule1.bidirectional =3D True
+-        rule1.signal =3D -3000
++        rule1.signal =3D -7000
  =
 
- 	if args.log:
--		mount('logdir', args.log, '9p', 0, 'trans=3Dvirtio,version=3D9p2000.L')
-+		mount('logdir', args.log, '9p', 0, 'trans=3Dvirtio,version=3D9p2000.L,ms=
-ize=3D10240')
- 		# Clear out any log files from other test runs
- 		for f in glob('%s/*' % args.log):
- 			print("removing %s" % f)
+         rule2 =3D hwsim.rules.create()
+         rule2.source =3D bss_radio[2].addresses[0]
+         rule2.bidirectional =3D True
+-        rule2.signal =3D -4000
++        rule2.signal =3D -8000
+ =
+
+         wd =3D IWD(True)
+ =
+
+diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/test=
+BSSBlacklist/connection_test.py
+index 111ae582..58931d3e 100644
+--- a/autotests/testBSSBlacklist/connection_test.py
++++ b/autotests/testBSSBlacklist/connection_test.py
+@@ -34,12 +34,12 @@ class Test(unittest.TestCase):
+         rule1 =3D hwsim.rules.create()
+         rule1.source =3D bss_radio[1].addresses[0]
+         rule1.bidirectional =3D True
+-        rule1.signal =3D -3000
++        rule1.signal =3D -7000
+ =
+
+         rule2 =3D hwsim.rules.create()
+         rule2.source =3D bss_radio[2].addresses[0]
+         rule2.bidirectional =3D True
+-        rule2.signal =3D -4000
++        rule2.signal =3D -8000
+ =
+
+         wd =3D IWD(True)
+ =
+
+diff --git a/autotests/testBSSBlacklist/temp_blacklist_test.py b/autotests/=
+testBSSBlacklist/temp_blacklist_test.py
+index efb848e9..02438f89 100644
+--- a/autotests/testBSSBlacklist/temp_blacklist_test.py
++++ b/autotests/testBSSBlacklist/temp_blacklist_test.py
+@@ -32,7 +32,7 @@ class Test(unittest.TestCase):
+         rule1 =3D hwsim.rules.create()
+         rule1.source =3D bss_radio[1].addresses[0]
+         rule1.bidirectional =3D True
+-        rule1.signal =3D -2500
++        rule1.signal =3D -7000
+ =
+
+         rule2 =3D hwsim.rules.create()
+         rule2.source =3D bss_radio[2].addresses[0]
 -- =
 
 2.31.1
 
---===============3788979193689840380==--
+--===============7590001013153847090==--
 
