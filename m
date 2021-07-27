@@ -1,76 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============8787878800550425604=="
+Content-Type: multipart/mixed; boundary="===============3788979193689840380=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: Bug with RoamThreshold5G
-Date: Mon, 12 Jul 2021 11:22:37 -0500
-Message-ID: <59b2891f-bd46-ee96-a734-3ebe5be7d066@gmail.com>
-In-Reply-To: <CACsRnHXxRm=yNaPBzwGKkymvv9H3PDHfwGKbJnDc5VYcV0d=6w@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/2] test-runner: set msize to remove runtime warning
+Date: Tue, 27 Jul 2021 15:11:27 -0700
+Message-ID: <20210727221128.33131-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8787878800550425604==
+--===============3788979193689840380==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+Newer QEMU version warn that msize is set too low and may result
+in poor IO performance. The default is 8KiB which QEMU claims is
+too low. Explicitly setting to 10KiB removes the warning:
 
-On 7/12/21 8:17 AM, Michael Johnson wrote:
-> Hi everyone,
-> =
+qemu-system-x86_64: warning: 9p: degraded performance: a
+reasonable high msize should be chosen on client/guest side
+(chosen msize is <=3D 8192).
+See https://wiki.qemu.org/Documentation/9psetup#msize for details.
+---
+ tools/test-runner | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> I noticed that iwd wasn't roaming as much as I would expect given a
-> modified RoamTheshold5G
-> value. Looking into it, it seems like when the threshold is registered
-> for updates in
-> netdev_build_cmd_cqm_rssi_update we always use RoamThreshold. When
-> this bit of code is
-> called the frequency seems to always be 0 and so the non-5G variant is
-> used. This in turn becomes an issue once the frequency is set and the
-> correct threshold is used for other checks (at least if
-> RoamThreshold5G is configured higher than RoamThreshold).
-> =
+diff --git a/tools/test-runner b/tools/test-runner
+index bc37b80c..98164f7a 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -1364,7 +1364,7 @@ def run_tests():
+ 	config.ctx =3D TestContext(args)
+ =
 
-> Code:
-> netdev_build_cmd_cqm_rssi_update(...)
->      int threshold =3D netdev->frequency > 4000 ? LOW_SIGNAL_THRESHOLD_5G=
-HZ :
-> =
+ 	if args.log:
+-		mount('logdir', args.log, '9p', 0, 'trans=3Dvirtio,version=3D9p2000.L')
++		mount('logdir', args.log, '9p', 0, 'trans=3Dvirtio,version=3D9p2000.L,ms=
+ize=3D10240')
+ 		# Clear out any log files from other test runs
+ 		for f in glob('%s/*' % args.log):
+ 			print("removing %s" % f)
+-- =
 
->     LOW_SIGNAL_THRESHOLD;
->      l_debug("frequency: %u, threshold: %d", netdev->frequency,
-> threshold); // added for debug
-> =
+2.31.1
 
-> Config:
-> [General]
-> EnableNetworkConfiguration=3Dtrue
-> RoamThreshold=3D-60
-> RoamThreshold5G=3D-65
-> =
-
-> Output:
-> src/netdev.c:netdev_build_cmd_cqm_rssi_update() frequency: 0, threshold: =
--60
-> =
-
-
-Yep, seems we forgot to invoke netdev_cqm_rssi_update() in =
-
-netdev_connect/netdev_reassociate/netdev_fast_transition*
-
-> I'm not really sure what the right fix for this is. Can it just
-> request notifications for both
-> thresholds?
-
-Probably not.  If the driver doesn't support NL80211_EXT_FEATURE_CQM_RSSI_L=
-IST, =
-
-then we can only set a single threshold and we want that to be the roaming =
-
-threshold.
-
-Regards,
--Denis
---===============8787878800550425604==--
+--===============3788979193689840380==--
 
