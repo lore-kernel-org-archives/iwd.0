@@ -1,46 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============3451868205798175121=="
+Content-Type: multipart/mixed; boundary="===============4647705309667807251=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] netdev: fix RoamThreshold5G
-Date: Wed, 28 Jul 2021 10:07:06 -0500
-Message-ID: <3abab8f4-444a-1fad-5e29-8ee7f60754de@gmail.com>
-In-Reply-To: <20210727225023.36586-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/9] knownnetworks: copy network_config on update
+Date: Thu, 29 Jul 2021 15:21:46 -0700
+Message-ID: <20210729222154.159542-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3451868205798175121==
+--===============4647705309667807251==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+The network_config was not being copied to network_info when
+updated. This caused any new settings to be lost if the network
+configuration file was updated during runtime.
+---
+ src/knownnetworks.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On 7/27/21 5:50 PM, James Prestwood wrote:
-> The RoamThreshold5G was never honored because it was being
-> set prior to any connections. This caused the logic inside
-> netdev_cqm_rssi_update to always choose the 2GHz threshold
-> (RoamThreshold) due to netdev->frequency being zero at this time.
-> =
+diff --git a/src/knownnetworks.c b/src/knownnetworks.c
+index 09acdd3c..85648ead 100644
+--- a/src/knownnetworks.c
++++ b/src/knownnetworks.c
+@@ -464,6 +464,8 @@ void known_network_update(struct network_info *network,
+ 	}
+ =
 
-> Instead call netdev_cqm_rssi_update in all connect/transition
-> calls after netdev->frequency is updated. This will allow both
-> the 2G and 5G thresholds to be used depending on what frequency
-> the new BSS is.
-> =
+ 	known_network_set_autoconnect(network, new->is_autoconnectable);
++
++	memcpy(&network->config, new, sizeof(struct network_config));
+ }
+ =
 
-> The call to netdev_cqm_rssi_update in netdev_setup_interface
-> was also removed since it serves no purpose, at least now
-> that there are two thresholds to consider.
-> ---
->   src/netdev.c | 192 +++++++++++++++++++++++++--------------------------
->   1 file changed, 96 insertions(+), 96 deletions(-)
-> =
+ bool known_networks_foreach(known_networks_foreach_func_t function,
+-- =
 
+2.31.1
 
-Applied, thanks.
-
-Regards,
--Denis
-
---===============3451868205798175121==--
+--===============4647705309667807251==--
 
