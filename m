@@ -1,43 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============0559869373548226916=="
+Content-Type: multipart/mixed; boundary="===============1794530866551121486=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/9] test-runner: increase RAM to 384MB
-Date: Thu, 29 Jul 2021 15:21:50 -0700
-Message-ID: <20210729222154.159542-5-prestwoj@gmail.com>
+Subject: [PATCH 6/9] test-runner: don't reset dbus object on reset()
+Date: Thu, 29 Jul 2021 15:21:51 -0700
+Message-ID: <20210729222154.159542-6-prestwoj@gmail.com>
 In-Reply-To: <20210729222154.159542-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0559869373548226916==
+--===============1794530866551121486==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Occationally python will fatally terminate trying to load a test
-using importlib with an out of memory exception. Increasing RAM
-allows reliable exection of all tests.
+Doing this is redundant since the dbus object is initialized
+anyways when a new test starts.
 ---
- tools/test-runner | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/test-runner | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index 2d4b6b5a..ff7d9586 100755
+index ff7d9586..cb97657e 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -1585,7 +1585,7 @@ class Main:
- 		if self.args.valgrind:
- 			ram =3D 512
- 		else:
--			ram =3D 256
-+			ram =3D 384
+@@ -593,9 +593,6 @@ class Namespace:
  =
 
- 		print("Using %d cores, %d RAM for VM" % (smp, ram))
+ 		self.radios =3D []
  =
 
+-		if self.name =3D=3D "root":
+-			self._bus =3D dbus.bus.BusConnection(address_or_type=3Dself.dbus_addres=
+s)
+-
+ 		for p in list(self.processes):
+ 			print("Killing process %s" % p.name)
+ 			p.kill()
 -- =
 
 2.31.1
 
---===============0559869373548226916==--
+--===============1794530866551121486==--
 
