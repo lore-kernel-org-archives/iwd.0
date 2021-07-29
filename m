@@ -1,44 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============0623588471721330281=="
+Content-Type: multipart/mixed; boundary="===============0553783203133065247=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/9] test-runner: remove TLS debugging artifact
-Date: Thu, 29 Jul 2021 15:21:48 -0700
-Message-ID: <20210729222154.159542-3-prestwoj@gmail.com>
+Subject: [PATCH 4/9] test-runner: set msize for --monitor
+Date: Thu, 29 Jul 2021 15:21:49 -0700
+Message-ID: <20210729222154.159542-4-prestwoj@gmail.com>
 In-Reply-To: <20210729222154.159542-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0623588471721330281==
+--===============0553783203133065247==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-When logging is enabled TLS debugging is turned on which creates
-a PEM file during runtime. There is no way for IWD itself to clean
-this up since its meant to be there for debugging.
+This was added for logging but --monitor suffers the same warning
+without setting msize as well.
 ---
- tools/test-runner | 4 ++++
- 1 file changed, 4 insertions(+)
+ tools/test-runner | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index 98164f7a..fa3c434f 100755
+index fa3c434f..2d4b6b5a 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -1192,6 +1192,10 @@ def post_test(ctx, to_copy):
- 				dbg("\n")
- 				os.remove('/tmp/' + f)
+@@ -1379,7 +1379,7 @@ def run_tests():
+ 				os.remove(f)
+ 	elif args.monitor:
+ 		parent =3D os.path.abspath(os.path.join(args.monitor, os.pardir))
+-		mount('mondir', parent, '9p', 0, 'trans=3Dvirtio,version=3D9p2000.L')
++		mount('mondir', parent, '9p', 0, 'trans=3Dvirtio,version=3D9p2000.L,msiz=
+e=3D10240')
  =
 
-+	# Special case for when logging is enabled
-+	if os.path.isfile('/tmp/iwd-tls-debug-server-cert.pem'):
-+		os.remove('/tmp/iwd-tls-debug-server-cert.pem')
-+
- 	allowed =3D ['phonesim.conf', 'certs', 'secrets', 'iwd']
- 	for f in [f for f in os.listdir('/tmp') if f not in allowed]:
- 		dbg("File %s was not cleaned up!" % f)
+ 	if config.ctx.args.unit_tests is None:
+ 		run_auto_tests(config.ctx, args)
 -- =
 
 2.31.1
 
---===============0623588471721330281==--
+--===============0553783203133065247==--
 
