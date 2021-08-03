@@ -1,41 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============2929897538186772879=="
+Content-Type: multipart/mixed; boundary="===============0977594471333300840=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 3/3] erp: take cache ref in erp_new
-Date: Tue, 03 Aug 2021 13:23:28 -0700
-Message-ID: <20210803202328.140665-3-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v3 1/3] station: network: rework ERP/FILS code path
+Date: Tue, 03 Aug 2021 15:47:51 -0500
+Message-ID: <8b872f80-5d14-b572-a812-34ad197c3083@gmail.com>
 In-Reply-To: <20210803202328.140665-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2929897538186772879==
+--===============0977594471333300840==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Since the erp_state is holding a pointer to the ERP cache, as
-well as calling erp_cache_put on free, it should take a reference
-for symmetry.
----
- src/erp.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi James,
 
-diff --git a/src/erp.c b/src/erp.c
-index 4db32feb..59e6033c 100644
---- a/src/erp.c
-+++ b/src/erp.c
-@@ -336,6 +336,7 @@ struct erp_state *erp_new(struct erp_cache_entry *cache,
- 	erp->tx_packet =3D tx_packet;
- 	erp->user_data =3D user_data;
- 	erp->cache =3D cache;
-+	cache->ref++;
- =
+On 8/3/21 3:23 PM, James Prestwood wrote:
+> This refactors some code to eliminate getting the ERP entry twice
+> by simply returning it from network_has_erp_identity (now renamed
+> to network_get_erp_cache). In addition this code was moved into
+> station_build_handshake_rsn and properly cleaned up in case there
+> was an error or if a FILS AKM was not chosen.
+> ---
+>   src/network.c | 15 ++++++++-------
+>   src/network.h |  3 ++-
+>   src/station.c | 33 +++++++++++++++++++--------------
+>   3 files changed, 29 insertions(+), 22 deletions(-)
+> =
 
- 	return erp;
- }
--- =
 
-2.31.1
+<snip>
 
---===============2929897538186772879==--
+> @@ -1083,17 +1083,18 @@ bool network_has_erp_identity(struct network *net=
+work)
+>   	ret =3D strcmp(check_id, identity) =3D=3D 0;
+>   =
+
+>   	l_free(check_id);
+> -	erp_cache_put(cache);
+>   =
+
+>   	/*
+>   	 * The settings file must have change out from under us. In this
+>   	 * case we want to remove the ERP entry because it is no longer
+>   	 * valid.
+>   	 */
+> -	if (!ret)
+> +	if (!ret) {
+>   		erp_cache_remove(identity);
+
+This doesn't look right?  Shouldn't you erp_cache_put here as well?
+
+> +		return NULL;
+> +	}
+>   =
+
+> -	return ret;
+> +	return cache;
+>   }
+>   =
+
+>   const struct l_queue_entry *network_bss_list_get_entries(
+
+<snip>
+
+Regards,
+-Denis
+--===============0977594471333300840==--
 
