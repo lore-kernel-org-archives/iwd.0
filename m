@@ -1,53 +1,207 @@
-Content-Type: multipart/mixed; boundary="===============1819272174191843320=="
+Content-Type: multipart/mixed; boundary="===============2130944937777095298=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459@gmail.com>
-Subject: Re: [PATCH] wiphy: set neighbor report capability flag
-Date: Tue, 03 Aug 2021 18:41:20 +0100
-Message-ID: <CACsRnHX0yR+SnWGPPtKkKQGGdcRn=pySxjyFy4eQmG-YkfAoqw@mail.gmail.com>
-In-Reply-To: <39c22b3d-8ac1-62ee-0e10-28b483681ae4@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/2] station: network: rework ERP/FILS code path
+Date: Tue, 03 Aug 2021 12:56:37 -0700
+Message-ID: <20210803195638.138731-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1819272174191843320==
+--===============2130944937777095298==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+This refactors some code to eliminate getting the ERP entry twice
+by simply returning it from network_has_erp_identity (now renamed
+to network_get_erp_cache). In addition this code was moved into
+station_build_handshake_rsn and properly cleaned up in case there
+was an error or if a FILS AKM was not chosen.
+---
+ src/network.c | 15 ++++++++-------
+ src/network.h |  3 ++-
+ src/station.c | 33 +++++++++++++++++++--------------
+ 3 files changed, 29 insertions(+), 22 deletions(-)
 
-On Tue, 3 Aug 2021 at 17:35, Denis Kenzior <denkenz@gmail.com> wrote:
-> Hmm, I wonder if we have a different bug here.  This gives me a few ideas=
- to
-> look into, let me poke around and I'll get back to you.
->
-> What other problems are you having?
+diff --git a/src/network.c b/src/network.c
+index b78a7cbf..a6da0cab 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1056,7 +1056,7 @@ static bool match_bss(const void *a, const void *b)
+ 	return a =3D=3D b;
+ }
+ =
 
-Thank you!
+-bool network_has_erp_identity(struct network *network)
++struct erp_cache_entry *network_get_erp_cache(struct network *network)
+ {
+ 	struct erp_cache_entry *cache;
+ 	struct l_settings *settings;
+@@ -1066,16 +1066,16 @@ bool network_has_erp_identity(struct network *netwo=
+rk)
+ =
 
-The other major problem I'm having is when 802.11v is enabled the APs
-are not sending BSS-TM frames during re-associations (i.e. FT roams)
-but it does work during a full association.
-The current suspect is that the client doesn't send the "extended
-capabilities" tags in the re-association frame like it does with a
-full association. Without this the Meraki APs assume the client
-doesn't support it.
-I don't know what the standard says about this one.
+ 	settings =3D network_get_settings(network);
+ 	if (!settings)
+-		return false;
++		return NULL;
+ =
 
-> > https://mrncciew.com/2014/09/11/cwsp-802-11k-ap-assisted-roaming/
->
-> This link shows an Association Request with 'neighbor report' capability =
-zero-d
-> out.  See 'Frame 41'
+ 	check_id =3D l_settings_get_string(settings, "Security", "EAP-Identity");
+ 	if (!check_id)
+-		return false;
++		return NULL;
+ =
 
-Ah! I completely misread that as enabling an alternative "channel report".
+ 	cache =3D erp_cache_get(network_get_ssid(network));
+ 	if (!cache) {
+ 		l_free(check_id);
+-		return false;
++		return NULL;
+ 	}
+ =
 
-> It could be that Meraki really does want this, but I suspect something el=
-se is
-> the real culprit.  Lets get to the bottom of this.
+ 	identity =3D erp_cache_entry_get_identity(cache);
+@@ -1083,17 +1083,18 @@ bool network_has_erp_identity(struct network *netwo=
+rk)
+ 	ret =3D strcmp(check_id, identity) =3D=3D 0;
+ =
 
-Let me know how I can help!
+ 	l_free(check_id);
+-	erp_cache_put(cache);
+ =
 
-Regards,
-Michael
---===============1819272174191843320==--
+ 	/*
+ 	 * The settings file must have change out from under us. In this
+ 	 * case we want to remove the ERP entry because it is no longer
+ 	 * valid.
+ 	 */
+-	if (!ret)
++	if (!ret) {
+ 		erp_cache_remove(identity);
++		return NULL;
++	}
+ =
+
+-	return ret;
++	return cache;
+ }
+ =
+
+ const struct l_queue_entry *network_bss_list_get_entries(
+diff --git a/src/network.h b/src/network.h
+index 58c26e6b..2cca7ffb 100644
+--- a/src/network.h
++++ b/src/network.h
+@@ -29,6 +29,7 @@ struct station;
+ struct network;
+ struct scan_bss;
+ struct handshake_state;
++struct erp_cache_entry;
+ =
+
+ void network_connected(struct network *network);
+ void network_disconnected(struct network *network);
+@@ -87,7 +88,7 @@ void network_blacklist_add(struct network *network, struc=
+t scan_bss *bss);
+ const struct iovec *network_get_extra_ies(struct network *network,
+ 						size_t *num_elems);
+ =
+
+-bool network_has_erp_identity(struct network *network);
++struct erp_cache_entry *network_get_erp_cache(struct network *network);
+ =
+
+ const struct l_queue_entry *network_bss_list_get_entries(
+ 						struct network *network);
+diff --git a/src/station.c b/src/station.c
+index e914abb3..5414283c 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -743,7 +743,7 @@ static int station_build_handshake_rsn(struct handshake=
+_state *hs,
+ {
+ 	enum security security =3D network_get_security(network);
+ 	bool add_mde =3D false;
+-	bool fils_hint =3D false;
++	struct erp_cache_entry *erp_cache =3D NULL;
+ =
+
+ 	struct ie_rsn_info bss_info;
+ 	uint8_t rsne_buf[256];
+@@ -764,10 +764,10 @@ static int station_build_handshake_rsn(struct handsha=
+ke_state *hs,
+ 	 * wiphy may select FILS if supported by the AP.
+ 	 */
+ 	if (security =3D=3D SECURITY_8021X && hs->support_fils)
+-		fils_hint =3D network_has_erp_identity(network);
++		erp_cache =3D network_get_erp_cache(network);
+ =
+
+ 	info.akm_suites =3D wiphy_select_akm(wiphy, bss, security,
+-							&bss_info, fils_hint);
++						&bss_info, erp_cache !=3D NULL);
+ =
+
+ 	/*
+ 	 * Special case for OWE. With OWE we still need to build up the
+@@ -848,6 +848,19 @@ build_ie:
+ 	if (IE_AKM_IS_FT(info.akm_suites))
+ 		add_mde =3D true;
+ =
+
++	/*
++	 * If FILS was chosen, the ERP cache has been verified to exist. Take
++	 * a reference now so it remains valid (in case of expiration) until
++	 * FILS starts.
++	 */
++	if (hs->akm_suite & (IE_RSN_AKM_SUITE_FILS_SHA256 |
++				IE_RSN_AKM_SUITE_FILS_SHA384 |
++				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 |
++				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
++		hs->erp_cache =3D erp_cache;
++	else if (erp_cache)
++		erp_cache_put(erp_cache);
++
+ open_network:
+ 	if (security =3D=3D SECURITY_NONE)
+ 		/* Perform FT association if available */
+@@ -867,6 +880,9 @@ open_network:
+ 	return 0;
+ =
+
+ not_supported:
++	if (erp_cache)
++		erp_cache_put(erp_cache);
++
+ 	return -ENOTSUP;
+ }
+ =
+
+@@ -889,17 +905,6 @@ static struct handshake_state *station_handshake_setup=
+(struct station *station,
+ 	if (network_handshake_setup(network, hs) < 0)
+ 		goto not_supported;
+ =
+
+-	/*
+-	 * If FILS was chosen, the ERP cache has been verified to exist. We
+-	 * wait to get it until here because@this point so there are no
+-	 * failure paths before fils_sm_new
+-	 */
+-	if (hs->akm_suite & (IE_RSN_AKM_SUITE_FILS_SHA256 |
+-				IE_RSN_AKM_SUITE_FILS_SHA384 |
+-				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 |
+-				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
+-		hs->erp_cache =3D erp_cache_get(network_get_ssid(network));
+-
+ 	return hs;
+ =
+
+ not_supported:
+-- =
+
+2.31.1
+
+--===============2130944937777095298==--
 
