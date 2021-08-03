@@ -1,49 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============6590597873614293886=="
+Content-Type: multipart/mixed; boundary="===============5015530841534207391=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459@gmail.com>
-Subject: [PATCH] wiphy: set neighbor report capability flag
-Date: Tue, 03 Aug 2021 15:19:07 +0100
-Message-ID: <20210803141907.33819-1-mjohnson459@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] wiphy: set neighbor report capability flag
+Date: Tue, 03 Aug 2021 10:02:02 -0500
+Message-ID: <1ee52ba7-3c20-d73c-20e1-065595ae9e1c@gmail.com>
+In-Reply-To: <20210803141907.33819-1-mjohnson459@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6590597873614293886==
+--===============5015530841534207391==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-As we send a neighbor report request after joining a network we should
-be setting the flag in the radio measurement capabilities.
+Hi Michael,
 
-This is required by some Meraki access points.
----
- src/wiphy.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+On 8/3/21 9:19 AM, Michael Johnson wrote:
+> As we send a neighbor report request after joining a network we should
+> be setting the flag in the radio measurement capabilities.
+> =
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index e2222887..405b17be 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -1522,8 +1522,11 @@ static void wiphy_setup_rm_enabled_capabilities(stru=
-ct wiphy *wiphy)
- =
+> This is required by some Meraki access points.
 
- 	wiphy->rm_enabled_capabilities[0] =3D IE_TYPE_RM_ENABLED_CAPABILITIES;
- 	wiphy->rm_enabled_capabilities[1] =3D 5;
--	/* Bits: Passive (4), Active (5), and Beacon Table (6) capabilities */
--	wiphy->rm_enabled_capabilities[2] =3D 0x70;
-+	/*
-+	 * Bits: Neighbor Report (1), Passive (4), Active (5),
-+	 * and Beacon Table (6) capabilities
-+	 */
-+	wiphy->rm_enabled_capabilities[2] =3D 0x72;
- =
+Ugh, I'm not sure Meraki is doing the right thing here...?
 
- 	/*
- 	 * TODO: Support at least Link Measurement if TX_POWER_INSERTION is
--- =
+802.11-2020:
 
-2.25.1
+"A STA sets the Neighbor Report Capability Enabled field to 1 when =
 
---===============6590597873614293886==--
+dot11RMNeighborReportActivated is true and sets it to 0 otherwise."
+
+11.10.10.1:
+"An AP in which dot11RMNeighborReportActivated is false shall not transmit =
+a =
+
+Fine Timing Measurement Range request. An AP in which =
+
+dot11RMNeighborReportActivated is false should not ..."
+
+11.10.10.3:
+"If dot11RMNeighborReportActivated is true, an AP receiving a neighbor repo=
+rt =
+
+request shall respond with a Neighbor Report Response frame containing zero=
+ or =
+
+more Neighbor Report elements."
+
+"If dot11RMNeighborReportActivated is false in an AP receiving a neighbor r=
+eport =
+
+request, it shall ignore the request."
+
+There are no other mentions of this config value in non-AP context.
+
+How does Meraki behave if this capability isn't set?  Likely we can safely =
+set =
+
+this, but I'd want a comment explaining why this was done.
+
+> ---
+>   src/wiphy.c | 7 +++++--
+>   1 file changed, 5 insertions(+), 2 deletions(-)
+> =
+
+
+Regards,
+-Denis
+--===============5015530841534207391==--
 
