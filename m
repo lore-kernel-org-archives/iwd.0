@@ -1,66 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============7379298995807045333=="
+Content-Type: multipart/mixed; boundary="===============6973670718564074971=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/6] fils: isolate ERP cache into fils.c
-Date: Tue, 03 Aug 2021 10:27:54 -0700
-Message-ID: <20210803172759.123297-1-prestwoj@gmail.com>
+Subject: [PATCH 2/6] station: don't set ERP cache to handshake
+Date: Tue, 03 Aug 2021 10:27:55 -0700
+Message-ID: <20210803172759.123297-2-prestwoj@gmail.com>
+In-Reply-To: <20210803172759.123297-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7379298995807045333==
+--===============6973670718564074971==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This removes the need for the handshake_state to hold a reference
-to the ERP cache. Really the handshake_state was merely holding a
-pointer between station and fils and never needed to reference it
-beyond fils_sm_new.
+This is now done internally by fils.
 ---
- src/fils.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ src/station.c | 11 -----------
+ 1 file changed, 11 deletions(-)
 
-diff --git a/src/fils.c b/src/fils.c
-index 7fffefb3..4e67d8df 100644
---- a/src/fils.c
-+++ b/src/fils.c
-@@ -567,6 +567,8 @@ struct auth_proto *fils_sm_new(struct handshake_state *=
-hs,
- 				void *user_data)
- {
- 	struct fils_sm *fils;
-+	struct erp_cache_entry *erp;
-+	char ssid[33];
+diff --git a/src/station.c b/src/station.c
+index e914abb3..b793c8e5 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -889,17 +889,6 @@ static struct handshake_state *station_handshake_setup=
+(struct station *station,
+ 	if (network_handshake_setup(network, hs) < 0)
+ 		goto not_supported;
  =
 
- 	fils =3D l_new(struct fils_sm, 1);
+-	/*
+-	 * If FILS was chosen, the ERP cache has been verified to exist. We
+-	 * wait to get it until here because@this point so there are no
+-	 * failure paths before fils_sm_new
+-	 */
+-	if (hs->akm_suite & (IE_RSN_AKM_SUITE_FILS_SHA256 |
+-				IE_RSN_AKM_SUITE_FILS_SHA384 |
+-				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 |
+-				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
+-		hs->erp_cache =3D erp_cache_get(network_get_ssid(network));
+-
+ 	return hs;
  =
 
-@@ -580,7 +582,17 @@ struct auth_proto *fils_sm_new(struct handshake_state =
-*hs,
- 	fils->ap.rx_authenticate =3D fils_rx_authenticate;
- 	fils->ap.rx_associate =3D fils_rx_associate;
- =
-
--	fils->erp =3D erp_new(hs->erp_cache, fils_erp_tx_func, fils);
-+	memcpy(ssid, hs->ssid, hs->ssid_len);
-+	ssid[hs->ssid_len] =3D '\0';
-+
-+	/*
-+	 * If FILS was chosen the ERP identity is known to exist, checked by
-+	 * network_has_erp_identity. erp_new takes ownership of the cache and
-+	 * will free it upon erp_free.
-+	 */
-+	erp =3D erp_cache_get(ssid);
-+
-+	fils->erp =3D erp_new(erp, fils_erp_tx_func, fils);
- =
-
- 	return &fils->ap;
- }
+ not_supported:
 -- =
 
 2.31.1
 
---===============7379298995807045333==--
+--===============6973670718564074971==--
 
