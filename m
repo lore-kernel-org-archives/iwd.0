@@ -1,80 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============4280655170715453421=="
+Content-Type: multipart/mixed; boundary="===============0322387554727480692=="
 MIME-Version: 1.0
 From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-Subject: Re: [connman v1] wifi: Set ieee80211w as required for
- WPA3-Personal-only mode
-Date: Wed, 04 Aug 2021 18:17:20 -0300
-Message-ID: <39fccc8f-4f53-ccff-97ba-194258f07923@collabora.com>
-In-Reply-To: <20210803074104.dawii3v3bknovg2e@beryllium.lan>
+Subject: [RFC connman v1 1/1] gsupplicant: Add support for WPA3-Personal
+Date: Wed, 04 Aug 2021 18:23:14 -0300
+Message-ID: <20210804212315.265376-1-ariel.dalessandro@collabora.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4280655170715453421==
+--===============0322387554727480692==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Daniel,
+Hi all, Daniel:
 
-On 8/3/21 4:41 AM, Daniel Wagner wrote:
-> Hi Ariel,
-> =
+WPA3 support has been recently added to connman (wpa_supplicant). As
+we've been discussing on a previous thread, this only supports
+WPA3-Personal-only mode.
 
-> Thanks for tracking this! Just a stupid question:
+This RFC patchset adds support for WPA3-Personal transition mode, which
+supports both WPA2-Personal (PSK) and WPA3-Personal (SAE).
 
-Thanks for the quick feedback :-) see below.
+Based on the AP accepted key management protocols, connman configures
+wpa_supplicant as follows:
 
-> =
+* WPA3-Personal-only mode: key_mgmt=3D"SAE" ; ieee80211w=3D2
+* WPA3-Personal transition mode: key_mgmt=3D"SAE WPA-PSK" ; ieee80211w=3D1
 
-> On Mon, Aug 02, 2021 at 12:10:06PM -0300, Ariel D'Alessandro wrote:
->> From wpa_supplicant docs [0] section "ieee80211w":
->>
->>   "WPA3-Personal-only mode: ieee80211w=3D2 and key_mgmt=3DSAE".
->>
->> This means that the parameter ieee80211w has to be set to 2 (required)
->> if SAE is used. Fix it.
->>
->> [0] https://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf
->> ---
->>  plugins/wifi.c | 7 ++++++-
->>  1 file changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/plugins/wifi.c b/plugins/wifi.c
->> index 578b4be7..02603e85 100644
->> --- a/plugins/wifi.c
->> +++ b/plugins/wifi.c
->> @@ -2174,7 +2174,12 @@ static void ssid_init(GSupplicantSSID *ssid, stru=
-ct connman_network *network)
->>  	security =3D connman_network_get_string(network, "WiFi.Security");
->>  	ssid->security =3D network_security(security);
->>  	ssid->keymgmt =3D network_data->keymgmt;
->> -	ssid->ieee80211w =3D G_SUPPLICANT_MFP_OPTIONAL;
->> +	/*
->> +	 * From wpa_supplicant docs:
->> +	 * "WPA3-Personal-only mode: ieee80211w=3D2 and key_mgmt=3DSAE".
->> +	 * Set ieee80211w as required, which is sent if SAE key is used.
->> +	 */
->> +	ssid->ieee80211w =3D G_SUPPLICANT_MFP_REQUIRED;
-> =
+This patch applies cleanly on top of current master branch (commit
+e36a38d8).
 
-> Should we check the keymgmt is SAE and only then set the ieee80211w
-> value?
+I'd like to hear any thoughts you might have about this.
+For reference, see wpa_supplicant configuration [0].
 
-Thanks for asking that, two answers:
+Regards,
+Ariel D'Alessandro
 
-* `ssid->ieee80211w` only gets sent if key management is SAE, so that'd
-be redundant. See this code block [0]. So, there's no real need to check
-the keymgmt is SAE here, and `required` could be the default value.
+[0] https://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf
 
-* On the other hand, my concern now is about supporting SAE transition
-mode. Let's *drop* this patchset and I'll send an RFC patch implementing
-WPA3-Personal transition mode.
+Ariel D'Alessandro (1):
+  gsupplicant: Add support for WPA3-Personal transition mode
 
-Thanks!
-Ariel
+ gsupplicant/supplicant.c | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
-[0]
-https://git.kernel.org/pub/scm/network/connman/connman.git/tree/gsupplicant=
-/supplicant.c#n4908
---===============4280655170715453421==--
+-- =
+
+2.30.2
+
+--===============0322387554727480692==--
 
