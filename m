@@ -1,68 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============8905835740129536481=="
+Content-Type: multipart/mixed; boundary="===============7868842894921120483=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/6] auto-t: rename testFT-SAE-roam to testSAE-roam
-Date: Thu, 05 Aug 2021 08:19:57 -0700
-Message-ID: <20210805151958.288829-5-prestwoj@gmail.com>
+Subject: [PATCH 6/6] netdev: enable FILS reassociation
+Date: Thu, 05 Aug 2021 08:19:58 -0700
+Message-ID: <20210805151958.288829-6-prestwoj@gmail.com>
 In-Reply-To: <20210805151958.288829-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8905835740129536481==
+--===============7868842894921120483==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Since reassociation is now tested this name fits better
+In the same vein of SAE reassociation create a FILS auth
+proto just as we would for a normal connection. Then append
+the PREV_BSSID for reassociation.
 ---
- autotests/{testFT-SAE-roam =3D> testSAE-roam}/connection_test.py | 0
- autotests/{testFT-SAE-roam =3D> testSAE-roam}/ft-psk-3.conf      | 0
- autotests/{testFT-SAE-roam =3D> testSAE-roam}/ft-sae-1.conf      | 0
- autotests/{testFT-SAE-roam =3D> testSAE-roam}/ft-sae-2.conf      | 0
- autotests/{testFT-SAE-roam =3D> testSAE-roam}/hw.conf            | 0
- autotests/{testFT-SAE-roam =3D> testSAE-roam}/main.conf          | 0
- 6 files changed, 0 insertions(+), 0 deletions(-)
- rename autotests/{testFT-SAE-roam =3D> testSAE-roam}/connection_test.py (1=
-00%)
- rename autotests/{testFT-SAE-roam =3D> testSAE-roam}/ft-psk-3.conf (100%)
- rename autotests/{testFT-SAE-roam =3D> testSAE-roam}/ft-sae-1.conf (100%)
- rename autotests/{testFT-SAE-roam =3D> testSAE-roam}/ft-sae-2.conf (100%)
- rename autotests/{testFT-SAE-roam =3D> testSAE-roam}/hw.conf (100%)
- rename autotests/{testFT-SAE-roam =3D> testSAE-roam}/main.conf (100%)
+ src/netdev.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/autotests/testFT-SAE-roam/connection_test.py b/autotests/testS=
-AE-roam/connection_test.py
-similarity index 100%
-rename from autotests/testFT-SAE-roam/connection_test.py
-rename to autotests/testSAE-roam/connection_test.py
-diff --git a/autotests/testFT-SAE-roam/ft-psk-3.conf b/autotests/testSAE-ro=
-am/ft-psk-3.conf
-similarity index 100%
-rename from autotests/testFT-SAE-roam/ft-psk-3.conf
-rename to autotests/testSAE-roam/ft-psk-3.conf
-diff --git a/autotests/testFT-SAE-roam/ft-sae-1.conf b/autotests/testSAE-ro=
-am/ft-sae-1.conf
-similarity index 100%
-rename from autotests/testFT-SAE-roam/ft-sae-1.conf
-rename to autotests/testSAE-roam/ft-sae-1.conf
-diff --git a/autotests/testFT-SAE-roam/ft-sae-2.conf b/autotests/testSAE-ro=
-am/ft-sae-2.conf
-similarity index 100%
-rename from autotests/testFT-SAE-roam/ft-sae-2.conf
-rename to autotests/testSAE-roam/ft-sae-2.conf
-diff --git a/autotests/testFT-SAE-roam/hw.conf b/autotests/testSAE-roam/hw.=
-conf
-similarity index 100%
-rename from autotests/testFT-SAE-roam/hw.conf
-rename to autotests/testSAE-roam/hw.conf
-diff --git a/autotests/testFT-SAE-roam/main.conf b/autotests/testSAE-roam/m=
-ain.conf
-similarity index 100%
-rename from autotests/testFT-SAE-roam/main.conf
-rename to autotests/testSAE-roam/main.conf
+diff --git a/src/netdev.c b/src/netdev.c
+index e9c19faf..0800f334 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2803,6 +2803,11 @@ static void netdev_fils_tx_associate(struct iovec *i=
+ov, size_t iov_len,
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_FILS_KEK, kek_len, kek);
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_FILS_NONCES, nonces_len, nonces);
+ =
+
++	/* If doing a non-FT Reassociation */
++	if (netdev->in_roam && !IE_AKM_IS_FT(netdev->handshake->akm_suite))
++		l_genl_msg_append_attr(msg, NL80211_ATTR_PREV_BSSID, 6,
++					netdev->prev_bssid);
++
+ 	if (!l_genl_family_send(nl80211, msg, netdev_assoc_cb,
+ 							netdev, NULL)) {
+ 		l_genl_msg_unref(msg);
+@@ -3598,14 +3603,14 @@ int netdev_reassociate(struct netdev *netdev, struc=
+t scan_bss *target_bss,
+ 	if (netdev_handshake_state_setup_connection_type(hs) < 0)
+ 		return -ENOTSUP;
+ =
+
+-	/* TODO: SoftMac FILS Re-Associations are not suppored yet */
+-	if (L_WARN_ON(IE_AKM_IS_FILS(hs->akm_suite)))
+-		return -ENOTSUP;
+-
+ 	if (IE_AKM_IS_SAE(hs->akm_suite))
+ 		netdev->ap =3D sae_sm_new(hs, netdev_sae_tx_authenticate,
+ 						netdev_sae_tx_associate,
+ 						netdev);
++	else if (IE_AKM_IS_FILS(hs->akm_suite))
++		netdev->ap =3D fils_sm_new(hs, netdev_fils_tx_authenticate,
++						netdev_fils_tx_associate,
++						netdev);
+ 	else {
+ 		cmd_connect =3D netdev_build_cmd_connect(netdev, target_bss, hs,
+ 						orig_bss->addr, NULL, 0);
 -- =
 
 2.31.1
 
---===============8905835740129536481==--
+--===============7868842894921120483==--
 
