@@ -1,67 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============7868842894921120483=="
+Content-Type: multipart/mixed; boundary="===============4069924086313359171=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/6] netdev: enable FILS reassociation
-Date: Thu, 05 Aug 2021 08:19:58 -0700
-Message-ID: <20210805151958.288829-6-prestwoj@gmail.com>
-In-Reply-To: <20210805151958.288829-1-prestwoj@gmail.com>
+From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <alvin@pqrs.dk>
+Subject: [PATCH] netdev: update the netdev's frequency on channel switch events
+Date: Thu, 05 Aug 2021 17:30:27 +0200
+Message-ID: <20210805153027.3001816-1-alvin@pqrs.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7868842894921120483==
+--===============4069924086313359171==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In the same vein of SAE reassociation create a FILS auth
-proto just as we would for a normal connection. Then append
-the PREV_BSSID for reassociation.
+From: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
+
+While we correctly emit a NETDEV_EVENT_CHANNEL_SWITCHED event from
+netdev for other modules to respond to, we fail to actually update the
+frequency of the netdev object in question. Since the netdev frequency
+is used elsewhere (e.g. to send action frames), it needs updating too.
+
+Fixes: 5eb0b7ca8e04 ("netdev: add a channel switch event")
 ---
- src/netdev.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ src/netdev.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/src/netdev.c b/src/netdev.c
-index e9c19faf..0800f334 100644
+index d7182d64b0e0..aec0dcf8d75f 100644
 --- a/src/netdev.c
 +++ b/src/netdev.c
-@@ -2803,6 +2803,11 @@ static void netdev_fils_tx_associate(struct iovec *i=
-ov, size_t iov_len,
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_FILS_KEK, kek_len, kek);
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_FILS_NONCES, nonces_len, nonces);
+@@ -4710,6 +4710,8 @@ static void netdev_channel_switch_event(struct l_genl=
+_msg *msg,
  =
 
-+	/* If doing a non-FT Reassociation */
-+	if (netdev->in_roam && !IE_AKM_IS_FT(netdev->handshake->akm_suite))
-+		l_genl_msg_append_attr(msg, NL80211_ATTR_PREV_BSSID, 6,
-+					netdev->prev_bssid);
+ 	l_debug("Channel switch event, frequency: %u", *freq);
+ =
+
++	netdev->frequency =3D freq;
 +
- 	if (!l_genl_family_send(nl80211, msg, netdev_assoc_cb,
- 							netdev, NULL)) {
- 		l_genl_msg_unref(msg);
-@@ -3598,14 +3603,14 @@ int netdev_reassociate(struct netdev *netdev, struc=
-t scan_bss *target_bss,
- 	if (netdev_handshake_state_setup_connection_type(hs) < 0)
- 		return -ENOTSUP;
+ 	if (!netdev->event_filter)
+ 		return;
  =
 
--	/* TODO: SoftMac FILS Re-Associations are not suppored yet */
--	if (L_WARN_ON(IE_AKM_IS_FILS(hs->akm_suite)))
--		return -ENOTSUP;
--
- 	if (IE_AKM_IS_SAE(hs->akm_suite))
- 		netdev->ap =3D sae_sm_new(hs, netdev_sae_tx_authenticate,
- 						netdev_sae_tx_associate,
- 						netdev);
-+	else if (IE_AKM_IS_FILS(hs->akm_suite))
-+		netdev->ap =3D fils_sm_new(hs, netdev_fils_tx_authenticate,
-+						netdev_fils_tx_associate,
-+						netdev);
- 	else {
- 		cmd_connect =3D netdev_build_cmd_connect(netdev, target_bss, hs,
- 						orig_bss->addr, NULL, 0);
 -- =
 
-2.31.1
+2.32.0
 
---===============7868842894921120483==--
+--===============4069924086313359171==--
 
