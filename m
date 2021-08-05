@@ -1,112 +1,201 @@
-Content-Type: multipart/mixed; boundary="===============3740613159155940683=="
+Content-Type: multipart/mixed; boundary="===============6512975656720530761=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/6] netdev: allow SAE reassociation
-Date: Thu, 05 Aug 2021 08:19:55 -0700
-Message-ID: <20210805151958.288829-3-prestwoj@gmail.com>
+Subject: [PATCH 4/6] auto-t: add reassociate test to FT-SAE-roam
+Date: Thu, 05 Aug 2021 08:19:56 -0700
+Message-ID: <20210805151958.288829-4-prestwoj@gmail.com>
 In-Reply-To: <20210805151958.288829-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3740613159155940683==
+--===============6512975656720530761==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds support in netdev_reassociate for SAE. An SAE auth
-protocol is created rather than the connect command and from
-here there is virtually no difference to a normal connection
-attempt. The only differences are 'in_roam' is set as to
-ignore the inevitable disconnect event and PREV_BSSID is
-appended to CMD_ASSOCIATE only for this new reassociation case.
+This refactors to test both FT and reassociation.
 ---
- src/netdev.c | 27 ++++++++++++++++++++-------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+ autotests/testFT-SAE-roam/connection_test.py | 91 +++++++++++++-------
+ 1 file changed, 61 insertions(+), 30 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index eebced05..e9c19faf 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -2715,6 +2715,11 @@ static void netdev_sae_tx_associate(void *user_data)
+diff --git a/autotests/testFT-SAE-roam/connection_test.py b/autotests/testF=
+T-SAE-roam/connection_test.py
+index bea42856..16316123 100644
+--- a/autotests/testFT-SAE-roam/connection_test.py
++++ b/autotests/testFT-SAE-roam/connection_test.py
+@@ -14,32 +14,17 @@ import testutil
+ from config import ctx
  =
 
- 	l_genl_msg_append_attrv(msg, NL80211_ATTR_IE, iov, n_used);
+ class Test(unittest.TestCase):
+-    def test_roam_success(self):
+-        hwsim =3D Hwsim()
+-
+-        rule0 =3D hwsim.rules.create()
+-        rule0.source =3D self.bss_radio[0].addresses[0]
+-        rule0.bidirectional =3D True
+-
+-        rule1 =3D hwsim.rules.create()
+-        rule1.source =3D self.bss_radio[1].addresses[0]
+-        rule1.bidirectional =3D True
+-
+-        rule2 =3D hwsim.rules.create()
+-        rule2.source =3D self.bss_radio[2].addresses[0]
+-        rule2.bidirectional =3D True
+-
++    def validate_connection(self, wd, ft=3DTrue):
+         # Check that iwd selects BSS 0 first
+-        rule0.signal =3D -2000
+-        rule1.signal =3D -6900
+-        rule2.signal =3D -7200
+-
+-        wd =3D IWD(True)
++        self.rule[0].signal =3D -2000
++        self.rule[1].signal =3D -6900
++        self.rule[2].signal =3D -7200
  =
 
-+	/* If doing a non-FT Reassociation */
-+	if (netdev->in_roam && !IE_AKM_IS_FT(netdev->handshake->akm_suite))
-+		l_genl_msg_append_attr(msg, NL80211_ATTR_PREV_BSSID, 6,
-+					netdev->prev_bssid);
+         psk_agent =3D PSKAgent("EasilyGuessedPassword")
+         wd.register_psk_agent(psk_agent)
+ =
+
+         device =3D wd.list_devices(1)[0]
++        device.disconnect()
+ =
+
+         condition =3D 'not obj.scanning'
+         wd.wait_for_object_condition(device, condition)
+@@ -84,7 +69,7 @@ class Test(unittest.TestCase):
+         # by mac80211_hwsim will not finish.  If this times out then, but
+         # device_roam_trigger_cb has happened, it probably means that
+         # Neighbor Reports are broken.
+-        rule0.signal =3D -8000
++        self.rule[0].signal =3D -8000
+ =
+
+         condition =3D 'obj.state =3D=3D DeviceState.roaming'
+         wd.wait_for_object_condition(device, condition)
+@@ -95,7 +80,7 @@ class Test(unittest.TestCase):
+         to_condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_change(device, from_condition, to_condition)
+ =
+
+-        rule1.signal =3D -2000
++        self.rule[1].signal =3D -2000
+ =
+
+         # wait for IWD's signal levels to recover
+         wd.wait(5)
+@@ -107,10 +92,13 @@ class Test(unittest.TestCase):
+         self.assertRaises(Exception, testutil.test_ifaces_connected,
+                           (self.bss_hostapd[0].ifname, device.name))
+ =
+
+-        # test FT-PSK after FT-SAE
+-        rule1.signal =3D -8000
+-        rule0.signal =3D -8000
+-        rule2.signal =3D -1000
++        if not ft:
++                return
 +
- 	if (!l_genl_family_send(nl80211, msg, netdev_assoc_cb, netdev, NULL)) {
- 		l_genl_msg_unref(msg);
- 		netdev_connect_failed(netdev, NETDEV_RESULT_ASSOCIATION_FAILED,
-@@ -3583,7 +3588,7 @@ int netdev_reassociate(struct netdev *netdev, struct =
-scan_bss *target_bss,
- 			netdev_event_func_t event_filter,
- 			netdev_connect_cb_t cb, void *user_data)
- {
--	struct l_genl_msg *cmd_connect;
-+	struct l_genl_msg *cmd_connect =3D NULL;
- 	struct netdev_handshake_state;
- 	struct handshake_state *old_hs;
- 	struct eapol_sm *sm =3D NULL, *old_sm;
-@@ -3593,16 +3598,21 @@ int netdev_reassociate(struct netdev *netdev, struc=
-t scan_bss *target_bss,
- 	if (netdev_handshake_state_setup_connection_type(hs) < 0)
- 		return -ENOTSUP;
++         # test FT-PSK after FT-SAE
++        self.rule[1].signal =3D -8000
++        self.rule[0].signal =3D -8000
++        self.rule[2].signal =3D -1000
  =
 
--	/* TODO: SoftMac SAE/FILS Re-Associations are not suppored yet */
--	if (L_WARN_ON(IE_AKM_IS_SAE(hs->akm_suite) ||
--				IE_AKM_IS_FILS(hs->akm_suite)))
-+	/* TODO: SoftMac FILS Re-Associations are not suppored yet */
-+	if (L_WARN_ON(IE_AKM_IS_FILS(hs->akm_suite)))
- 		return -ENOTSUP;
- =
-
--	cmd_connect =3D netdev_build_cmd_connect(netdev, target_bss, hs,
-+	if (IE_AKM_IS_SAE(hs->akm_suite))
-+		netdev->ap =3D sae_sm_new(hs, netdev_sae_tx_authenticate,
-+						netdev_sae_tx_associate,
-+						netdev);
-+	else {
-+		cmd_connect =3D netdev_build_cmd_connect(netdev, target_bss, hs,
- 						orig_bss->addr, NULL, 0);
- =
-
--	if (is_rsn)
--		sm =3D eapol_sm_new(hs);
-+		if (is_rsn)
-+			sm =3D eapol_sm_new(hs);
-+	}
- =
-
- 	old_sm =3D netdev->sm;
- 	old_hs =3D netdev->handshake;
-@@ -3612,11 +3622,14 @@ int netdev_reassociate(struct netdev *netdev, struc=
-t scan_bss *target_bss,
- 	if (err < 0)
- 		return err;
- =
-
-+	l_debug("reassociate to "MAC, MAC_STR(target_bss->addr));
+         condition =3D 'obj.state =3D=3D DeviceState.roaming'
+         wd.wait_for_object_condition(device, condition)
+@@ -125,6 +113,35 @@ class Test(unittest.TestCase):
+         testutil.test_ifaces_connected(self.bss_hostapd[2].ifname, device.=
+name)
+         self.assertRaises(Exception, testutil.test_ifaces_connected,
+                             (self.bss_hostapd[1].ifname, device.name))
++    def test_ft_roam_success(self):
++        wd =3D IWD(True)
 +
- 	memcpy(netdev->prev_bssid, orig_bss->addr, ETH_ALEN);
++        self.bss_hostapd[0].set_value('wpa_key_mgmt', 'FT-SAE SAE')
++        self.bss_hostapd[0].reload()
++        self.bss_hostapd[0].wait_for_event("AP-ENABLED")
++        self.bss_hostapd[1].set_value('wpa_key_mgmt', 'FT-SAE SAE')
++        self.bss_hostapd[1].reload()
++        self.bss_hostapd[1].wait_for_event("AP-ENABLED")
++        self.bss_hostapd[2].set_value('wpa_key_mgmt', 'FT-PSK')
++        self.bss_hostapd[2].reload()
++        self.bss_hostapd[2].wait_for_event("AP-ENABLED")
++
++        self.validate_connection(wd, True)
++
++    def test_reassociate_roam_success(self):
++        wd =3D IWD(True)
++
++        self.bss_hostapd[0].set_value('wpa_key_mgmt', 'SAE')
++        self.bss_hostapd[0].reload()
++        self.bss_hostapd[0].wait_for_event("AP-ENABLED")
++        self.bss_hostapd[1].set_value('wpa_key_mgmt', 'SAE')
++        self.bss_hostapd[1].reload()
++        self.bss_hostapd[1].wait_for_event("AP-ENABLED")
++        self.bss_hostapd[2].set_value('wpa_key_mgmt', 'WPA-PSK')
++        self.bss_hostapd[2].reload()
++        self.bss_hostapd[2].wait_for_event("AP-ENABLED")
++
++        self.validate_connection(wd, False)
  =
 
- 	netdev->associated =3D false;
- 	netdev->operational =3D false;
- 	netdev->connected =3D false;
-+	netdev->in_roam =3D true;
+     def tearDown(self):
+         os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" down')
+@@ -134,10 +151,6 @@ class Test(unittest.TestCase):
+         os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" up')
+         os.system('ifconfig "' + self.bss_hostapd[2].ifname + '" up')
  =
 
- 	netdev_rssi_polling_update(netdev);
+-        hwsim =3D Hwsim()
+-        for rule in list(hwsim.rules.keys()):
+-            del hwsim.rules[rule]
+-
+     @classmethod
+     def setUpClass(cls):
+         hwsim =3D Hwsim()
+@@ -149,6 +162,19 @@ class Test(unittest.TestCase):
+                            hwsim.get_radio('rad1'),
+                            hwsim.get_radio('rad2') ]
+ =
+
++        cls.rule =3D [ hwsim.rules.create(),
++                     hwsim.rules.create(),
++                     hwsim.rules.create() ]
++
++        cls.rule[0].source =3D cls.bss_radio[0].addresses[0]
++        cls.rule[0].bidirectional =3D True
++
++        cls.rule[1].source =3D cls.bss_radio[1].addresses[0]
++        cls.rule[1].bidirectional =3D True
++
++        cls.rule[2].source =3D cls.bss_radio[2].addresses[0]
++        cls.rule[2].bidirectional =3D True
++
+         ctx.start_process(['ifconfig', cls.bss_hostapd[0].ifname, 'down', =
+'hw', \
+                                 'ether', '12:00:00:00:00:01', 'up'], wait=
+=3DTrue)
+         ctx.start_process(['ifconfig', cls.bss_hostapd[1].ifname, 'down', =
+'hw', \
+@@ -187,6 +213,11 @@ class Test(unittest.TestCase):
+     @classmethod
+     def tearDownClass(cls):
+         IWD.clear_storage()
++
++        hwsim =3D Hwsim()
++        for rule in list(hwsim.rules.keys()):
++            del hwsim.rules[rule]
++
+         cls.bss_hostapd =3D None
+         cls.bss_radio =3D None
  =
 
 -- =
 
 2.31.1
 
---===============3740613159155940683==--
+--===============6512975656720530761==--
 
