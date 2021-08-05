@@ -1,62 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============6665975174485275739=="
+Content-Type: multipart/mixed; boundary="===============3468656893749691321=="
 MIME-Version: 1.0
-From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-Subject: Re: [RFC connman v1 1/1] gsupplicant: Add support for WPA3-Personal
-Date: Thu, 05 Aug 2021 08:15:27 -0300
-Message-ID: <d4e6e9ee-0f0b-1fa2-c814-4eebaac304ce@collabora.com>
-In-Reply-To: <20210805060704.maeaww6q75x4obqy@beryllium.lan>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/6] netdev: check AKMs instead of in_ft for require_handshake
+Date: Thu, 05 Aug 2021 08:19:53 -0700
+Message-ID: <20210805151958.288829-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6665975174485275739==
+--===============3468656893749691321==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Daniel,
+The 'in_ft' flag is going to be renamed/repurposed to be used
+with reassociations as well as FT. Because of this the check
+here is being re-worked to use the AKMs rather than this flag.
+---
+ src/netdev.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-On 8/5/21 3:07 AM, Daniel Wagner wrote:
-> Hi Ariel,
-> =
+diff --git a/src/netdev.c b/src/netdev.c
+index deb780dc..ff9110ea 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2510,11 +2510,10 @@ static void netdev_associate_event(struct l_genl_ms=
+g *msg,
+ =
 
-> On Wed, Aug 04, 2021 at 06:23:14PM -0300, Ariel D'Alessandro wrote:
->> Hi all, Daniel:
->>
->> WPA3 support has been recently added to connman (wpa_supplicant). As
->> we've been discussing on a previous thread, this only supports
->> WPA3-Personal-only mode.
->>
->> This RFC patchset adds support for WPA3-Personal transition mode, which
->> supports both WPA2-Personal (PSK) and WPA3-Personal (SAE).
->>
->> Based on the AP accepted key management protocols, connman configures
->> wpa_supplicant as follows:
->>
->> * WPA3-Personal-only mode: key_mgmt=3D"SAE" ; ieee80211w=3D2
->> * WPA3-Personal transition mode: key_mgmt=3D"SAE WPA-PSK" ; ieee80211w=
-=3D1
->>
->> This patch applies cleanly on top of current master branch (commit
->> e36a38d8).
->>
->> I'd like to hear any thoughts you might have about this.
->> For reference, see wpa_supplicant configuration [0].
-> =
+ 		ret =3D auth_proto_rx_associate(netdev->ap, frame, frame_len);
+ 		if (ret =3D=3D 0) {
+-			bool fils =3D !!(netdev->handshake->akm_suite &
+-					(IE_RSN_AKM_SUITE_FILS_SHA256 |
+-					 IE_RSN_AKM_SUITE_FILS_SHA384 |
+-					 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384 |
+-					 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256));
++			bool require_handshake =3D IE_AKM_IS_FILS(
++					netdev->handshake->akm_suite) ||
++					IE_AKM_IS_FT(
++					netdev->handshake->akm_suite);
+ =
 
-> This looks good. If no one speaks up I am going to apply it.
+ 			auth_proto_free(netdev->ap);
+ 			netdev->ap =3D NULL;
+@@ -2530,7 +2529,7 @@ static void netdev_associate_event(struct l_genl_msg =
+*msg,
+ 			 * handshake and instead just keep the EAPoL state
+ 			 * machine for the rekeys.
+ 			 */
+-			if (netdev->in_ft || fils)
++			if (require_handshake)
+ 				eapol_sm_set_require_handshake(netdev->sm,
+ 								false);
+ =
 
-Sounds good.
+-- =
 
-> =
+2.31.1
 
-> Daniel
-> =
-
-> ps: we have a new mailing list (connman(a)lists.linux.dev). The old one
-> was shutdown.
-
-Thanks for pointing that out!
-
-Ariel
---===============6665975174485275739==--
+--===============3468656893749691321==--
 
