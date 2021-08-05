@@ -1,13 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============4069924086313359171=="
+Content-Type: multipart/mixed; boundary="===============7589250590900450771=="
 MIME-Version: 1.0
 From: Alvin =?unknown-8bit?q?=C5=A0ipraga?= <alvin@pqrs.dk>
-Subject: [PATCH] netdev: update the netdev's frequency on channel switch events
-Date: Thu, 05 Aug 2021 17:30:27 +0200
-Message-ID: <20210805153027.3001816-1-alvin@pqrs.dk>
+Subject: [PATCH v2] netdev: update the netdev's frequency on channel switch
+ events
+Date: Thu, 05 Aug 2021 17:40:24 +0200
+Message-ID: <20210805154024.3019732-1-alvin@pqrs.dk>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4069924086313359171==
+--===============7589250590900450771==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -25,7 +26,7 @@ Fixes: 5eb0b7ca8e04 ("netdev: add a channel switch event")
  1 file changed, 2 insertions(+)
 
 diff --git a/src/netdev.c b/src/netdev.c
-index d7182d64b0e0..aec0dcf8d75f 100644
+index d7182d64b0e0..2ae76a1eca68 100644
 --- a/src/netdev.c
 +++ b/src/netdev.c
 @@ -4710,6 +4710,8 @@ static void netdev_channel_switch_event(struct l_genl=
@@ -35,7 +36,7 @@ _msg *msg,
  	l_debug("Channel switch event, frequency: %u", *freq);
  =
 
-+	netdev->frequency =3D freq;
++	netdev->frequency =3D *freq;
 +
  	if (!netdev->event_filter)
  		return;
@@ -45,5 +46,5 @@ _msg *msg,
 
 2.32.0
 
---===============4069924086313359171==--
+--===============7589250590900450771==--
 
