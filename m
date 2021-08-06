@@ -1,64 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============0220717854447443822=="
+Content-Type: multipart/mixed; boundary="===============7231875506790714664=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459@gmail.com>
-Subject: Re: [PATCH] wiphy: set neighbor report capability flag
-Date: Fri, 06 Aug 2021 16:28:18 +0100
-Message-ID: <CACsRnHU6iw5HrQfDFkt_O_SnFkCZmCRBFgn0pcgRFEzf6EnGpw@mail.gmail.com>
-In-Reply-To: <4af22a81-e447-0f79-e9d3-062e6148d3ff@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: Re: how to get info about connected clients when iwd runs in AP mode?
+Date: Fri, 06 Aug 2021 09:32:15 -0700
+Message-ID: <cb60f7c9a8cdcfac082e95ba3cbfa5ce95c3523e.camel@gmail.com>
+In-Reply-To: <20210806063051.2797.40602@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0220717854447443822==
+--===============7231875506790714664==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi,
 
-Thanks for the quick fix. I've confirmed the fields are being set on
-my client but I won't be able to check the behavior until next week as
-it requires some changes to my test environment. I'll let you know how
-it goes.
+On Fri, 2021-08-06 at 06:30 +0000, salahaldeen.altous(a)leica-camera.com
+wrote:
+> Hi,
+> =
 
-I've also asked Meraki to clarify on the Neighbor Report field and
-will let you know when I hear back.
+> I have a device which running as AP point. I would like to know every
+> time there is a new connection/discounntion for this access point.
+> Does iwd API support this? DHCP is enable in AP configuration
+> (EnableNetworkConfiguration=3DTrue)
 
-Thanks again,
-Michael
+There is an access point API, GetDiagnostics(), which returns an array
+of clients (including some info about each client):
 
-On Fri, 6 Aug 2021 at 03:10, Denis Kenzior <denkenz@gmail.com> wrote:
->
-> Hi Michael,
->
-> On 8/3/21 12:41 PM, Michael Johnson wrote:
-> > Hi Denis,
-> >
-> > On Tue, 3 Aug 2021 at 17:35, Denis Kenzior <denkenz@gmail.com> wrote:
-> >> Hmm, I wonder if we have a different bug here.  This gives me a few id=
-eas to
-> >> look into, let me poke around and I'll get back to you.
-> >>
-> >> What other problems are you having?
-> >
-> > Thank you!
-> >
-> > The other major problem I'm having is when 802.11v is enabled the APs
-> > are not sending BSS-TM frames during re-associations (i.e. FT roams)
-> > but it does work during a full association.
-> > The current suspect is that the client doesn't send the "extended
-> > capabilities" tags in the re-association frame like it does with a
-> > full association. Without this the Meraki APs assume the client
-> > doesn't support it.
-> > I don't know what the standard says about this one.
-> >
->
-> I believe I have fixed this upstream now with commit 8f9e6b3f7626 ("netde=
-v: Send
-> addititional IEs for FT/SAE/OWE/FILS")
->
-> Can you give it another try?
->
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/doc/access-poi=
+nt-diagnostic-api.txt
+
+Unfortunately you cant get notified for this via PropertyChanged since
+its a DBus method rather than properties. This was done because some of
+the client info can change quite frequently (RSSI, Tx/Rx rates/modes
+etc) and we didn't want to flood DBus with these messages constantly.
+
+In iwctl we actually poll this information every second.
+
+Thanks,
+James
+
+> =
+
 > Regards,
-> -Denis
---===============0220717854447443822==--
+> Salahaldeen Altous
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+
+
+--===============7231875506790714664==--
 
