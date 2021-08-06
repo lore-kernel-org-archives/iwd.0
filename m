@@ -1,87 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============2253899424321664673=="
+Content-Type: multipart/mixed; boundary="===============6717449373860592784=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/5] netdev: move flag setting in netdev_reassociate
-Date: Fri, 06 Aug 2021 16:02:08 -0700
-Message-ID: <20210806230212.381657-1-prestwoj@gmail.com>
+Subject: [PATCH 3/5] dbus: add StationDebug interface definition
+Date: Fri, 06 Aug 2021 16:02:10 -0700
+Message-ID: <20210806230212.381657-3-prestwoj@gmail.com>
+In-Reply-To: <20210806230212.381657-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2253899424321664673==
+--===============6717449373860592784==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In the real world setting the flags prior to netdev_connect_common
-should never cause a problem, but using the developer Roam()
-command will because it forces a roam to occur with no roam scan.
-This ends up running the connect work item immediately which sets
-netdev->connected=3Dtrue, then netdev_reassociate ends
-up setting it false again right after.
-
-To handle both ways of roaming set the flags prior to
-netdev_connect_common and if it does fail reset them back to
-their original values.
+This will hold methods/properties for developers to use.
 ---
- src/netdev.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+ src/dbus.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 74eb349c..e9b4a42c 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -3611,19 +3611,19 @@ int netdev_reassociate(struct netdev *netdev, struc=
-t scan_bss *target_bss,
- 	old_sm =3D netdev->sm;
- 	old_hs =3D netdev->handshake;
+diff --git a/src/dbus.h b/src/dbus.h
+index b3896108..7703b37f 100644
+--- a/src/dbus.h
++++ b/src/dbus.h
+@@ -42,6 +42,7 @@
+ #define IWD_P2P_WFD_INTERFACE "net.connman.iwd.p2p.Display"
+ #define IWD_STATION_DIAGNOSTIC_INTERFACE "net.connman.iwd.StationDiagnosti=
+c"
+ #define IWD_AP_DIAGNOSTIC_INTERFACE "net.connman.iwd.AccessPointDiagnostic"
++#define IWD_STATION_DEBUG_INTERFACE "net.connman.iwd.StationDebug"
  =
 
-+	netdev->associated =3D false;
-+	netdev->operational =3D false;
-+	netdev->connected =3D false;
-+	netdev->in_reassoc =3D true;
-+
- 	ret =3D netdev_connect_common(netdev, target_bss, orig_bss, hs, NULL, 0,
- 					event_filter, cb, user_data);
- 	if (ret < 0)
--		return ret;
-+		goto reset_flags;
- =
-
- 	if (netdev->ap)
- 		memcpy(netdev->ap->prev_bssid, orig_bss->addr, ETH_ALEN);
- =
-
--	netdev->associated =3D false;
--	netdev->operational =3D false;
--	netdev->connected =3D false;
--	netdev->in_reassoc =3D true;
--
- 	netdev_rssi_polling_update(netdev);
- =
-
- 	if (old_sm)
-@@ -3633,6 +3633,14 @@ int netdev_reassociate(struct netdev *netdev, struct=
- scan_bss *target_bss,
- 		handshake_state_free(old_hs);
- =
-
- 	return 0;
-+
-+reset_flags:
-+	netdev->associated =3D true;
-+	netdev->operational =3D true;
-+	netdev->connected =3D true;
-+	netdev->in_reassoc =3D false;
-+
-+	return ret;
- }
- =
-
- static void netdev_join_adhoc_cb(struct l_genl_msg *msg, void *user_data)
+ #define IWD_BASE_PATH "/net/connman/iwd"
+ #define IWD_AGENT_MANAGER_PATH IWD_BASE_PATH
 -- =
 
 2.31.1
 
---===============2253899424321664673==--
+--===============6717449373860592784==--
 
