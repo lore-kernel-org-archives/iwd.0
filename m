@@ -1,437 +1,271 @@
-Content-Type: multipart/mixed; boundary="===============4214479170482651494=="
+Content-Type: multipart/mixed; boundary="===============8760220012382097380=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 8/9] ie: Add FILS IP Address Assignment parsers and builders
-Date: Sat, 07 Aug 2021 04:10:47 +0200
-Message-ID: <20210807021048.321664-8-andrew.zaborowski@intel.com>
+Subject: [PATCH 9/9] ap: Support FILS IP Address Assignment IE
+Date: Sat, 07 Aug 2021 04:10:48 +0200
+Message-ID: <20210807021048.321664-9-andrew.zaborowski@intel.com>
 In-Reply-To: <20210807021048.321664-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4214479170482651494==
+--===============8760220012382097380==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Handle the 802.11ai FILS IP Address Assignment IEs in Association
+Request frames when netconfig is enabled.  Only IPv4 is supported.
+Like the P2P IP Allocation mechanism, since the payload format and logic
+is independent form the rest of the FILS standard this is enable
+unconditionally for clients who want to use it even though we don't
+actually do FILS in AP mode.
 ---
- src/ie.c | 336 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/ie.h |  38 +++++++
- 2 files changed, 374 insertions(+)
+ src/ap.c | 114 +++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 98 insertions(+), 16 deletions(-)
 
-diff --git a/src/ie.c b/src/ie.c
-index a73d5bbc..27950025 100644
---- a/src/ie.c
-+++ b/src/ie.c
-@@ -25,6 +25,7 @@
- #endif
+diff --git a/src/ap.c b/src/ap.c
+index 09fb2467..a7f41814 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -119,6 +119,7 @@ struct sta_state {
+ 	uint8_t wsc_uuid_e[16];
+ 	bool wsc_v2;
+ 	struct l_dhcp_lease *ip_alloc_lease;
++	bool ip_alloc_sent;
+ };
  =
 
- #include <errno.h>
-+#include <arpa/inet.h>
- =
-
- #include <ell/ell.h>
- =
-
-@@ -2103,3 +2104,338 @@ bool ie_rsnxe_capable(const uint8_t *rsnxe, unsigne=
-d int bit)
- =
-
- 	return test_bit(rsnxe + 2, bit);
+ struct ap_wsc_pbc_probe_record {
+@@ -907,6 +908,25 @@ error:
+ 	ap_del_station(sta, MMPDU_REASON_CODE_UNSPECIFIED, true);
  }
-+
-+int ie_parse_fils_ip_addr_request(struct ie_tlv_iter *iter,
-+				struct ie_fils_ip_addr_request_info *out)
+ =
+
++static bool ap_sta_get_dhcp4_lease(struct sta_state *sta)
 +{
-+	unsigned int len =3D ie_tlv_iter_get_length(iter);
-+	const uint8_t *data =3D ie_tlv_iter_get_data(iter);
-+	struct ie_fils_ip_addr_request_info info =3D {};
-+	bool ipv4_specific_addr =3D false;
-+	bool ipv6_specific_addr =3D false;
++	if (sta->ip_alloc_lease)
++		return true;
 +
-+	if (len < 1)
-+		return -EMSGSIZE;
++	if (!sta->ap->netconfig_dhcp)
++		return false;
 +
-+	if (bit_field(data[0], 0, 2) =3D=3D 1)
-+		return -EINVAL;
-+	else if (bit_field(data[0], 0, 2) >=3D 2) {
-+		info.ipv4 =3D true;
-+		ipv4_specific_addr =3D (bit_field(data[0], 0, 2) =3D=3D 3);
++	sta->ip_alloc_lease =3D l_dhcp_server_discover(sta->ap->netconfig_dhcp,
++							0, NULL, sta->addr);
++	if (!sta->ip_alloc_lease) {
++		l_error("l_dhcp_server_discover() failed, see IWD_DHCP_DEBUG "
++			"output");
++		return false;
 +	}
 +
-+	if (bit_field(data[0], 2, 2) =3D=3D 1)
-+		return -EINVAL;
-+	else if (bit_field(data[0], 2, 2) >=3D 2) {
-+		info.ipv6 =3D true;
-+		ipv6_specific_addr =3D (bit_field(data[0], 2, 2) =3D=3D 3);
-+	}
-+
-+	info.dns =3D test_bit(data++, 4);
-+
-+	if (len < 1 + (ipv4_specific_addr ? 4u : 0u) +
-+			(ipv4_specific_addr ? 16u : 0u))
-+		return -EMSGSIZE;
-+
-+	if (ipv4_specific_addr) {
-+		info.ipv4_requested_addr =3D l_get_u32(data);
-+		data +=3D 4;
-+
-+		if (!info.ipv4_requested_addr)
-+			return -EINVAL;
-+	}
-+
-+	if (ipv6_specific_addr) {
-+		memcpy(info.ipv6_requested_addr, data, 16);
-+		data +=3D 16;
-+
-+		if (l_memeqzero(info.ipv6_requested_addr, 16))
-+			return -EINVAL;
-+	}
-+
-+	memcpy(out, &info, sizeof(info));
-+	return 0;
++	return true;
 +}
 +
-+void ie_build_fils_ip_addr_request(
-+				const struct ie_fils_ip_addr_request_info *info,
-+				uint8_t *to)
-+{
-+	uint8_t *len;
+ static void ap_handshake_event(struct handshake_state *hs,
+ 		enum handshake_event event, void *user_data, ...)
+ {
+@@ -919,6 +939,9 @@ static void ap_handshake_event(struct handshake_state *=
+hs,
+ 	switch (event) {
+ 	case HANDSHAKE_EVENT_COMPLETE:
+ 		if (sta->ip_alloc_lease) {
++			if (hs->support_ip_allocation)
++				sta->ip_alloc_sent =3D true;
 +
-+	*to++ =3D IE_TYPE_EXTENSION;
-+	len =3D to++;
-+	*to++ =3D IE_TYPE_FILS_IP_ADDRESS & 0xff;
-+	*to++ =3D ((info->ipv4 ? info->ipv4_requested_addr ? 3 : 2 : 0) << 0) |
-+		((info->ipv6 ? !l_memeqzero(info->ipv6_requested_addr, 16) ?
-+		  3 : 2 : 0) << 2) |
-+		((info->dns ? 1 : 0) << 4);
+ 			/*
+ 			 * Move the lease from offered to active state if the
+ 			 * client has actually used it.  In any case drop our
+@@ -926,7 +949,7 @@ static void ap_handshake_event(struct handshake_state *=
+hs,
+ 			 * and if we want to keep our reference we'd need to
+ 			 * react to relevant server events.
+ 			 */
+-			if (hs->support_ip_allocation)
++			if (sta->ip_alloc_sent)
+ 				l_dhcp_server_request(ap->netconfig_dhcp,
+ 							sta->ip_alloc_lease);
+ =
+
+@@ -948,16 +971,8 @@ static void ap_handshake_event(struct handshake_state =
+*hs,
+ 		L_AUTO_FREE_VAR(char *, lease_netmask_str) =3D NULL;
+ 		char own_addr_str[INET_ADDRSTRLEN];
+ =
+
+-		if (!sta->ip_alloc_lease)
+-			sta->ip_alloc_lease =3D l_dhcp_server_discover(
+-							ap->netconfig_dhcp,
+-							0, NULL, sta->addr);
+-
+-		if (!sta->ip_alloc_lease) {
+-			l_error("l_dhcp_server_discover() failed, see "
+-				"IWD_DHCP_DEBUG output");
++		if (!ap_sta_get_dhcp4_lease(sta))
+ 			break;
+-		}
+ =
+
+ 		lease_addr_str =3D l_dhcp_lease_get_address(sta->ip_alloc_lease);
+ 		lease_netmask_str =3D
+@@ -1377,14 +1392,16 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, =
+struct sta_state *sta,
+ 				const uint8_t *dest,
+ 				enum mmpdu_reason_code status_code,
+ 				bool reassoc, const struct mmpdu_header *req,
+-				size_t req_len, frame_xchg_cb_t callback)
++				size_t req_len,
++				const struct ie_fils_ip_addr_request_info *
++				ip_req_info, frame_xchg_cb_t callback)
+ {
+ 	const uint8_t *addr =3D netdev_get_address(ap->netdev);
+ 	enum mpdu_management_subtype stype =3D reassoc ?
+ 		MPDU_MANAGEMENT_SUBTYPE_REASSOCIATION_RESPONSE :
+ 		MPDU_MANAGEMENT_SUBTYPE_ASSOCIATION_RESPONSE;
+ 	L_AUTO_FREE_VAR(uint8_t *, mpdu_buf) =3D
+-		l_malloc(128 + ap_get_extra_ies_len(ap, stype, req, req_len));
++		l_malloc(256 + ap_get_extra_ies_len(ap, stype, req, req_len));
+ 	struct mmpdu_header *mpdu =3D (void *) mpdu_buf;
+ 	struct mmpdu_association_response *resp;
+ 	size_t ies_len =3D 0;
+@@ -1430,6 +1447,57 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, s=
+truct sta_state *sta,
+ 	ies_len +=3D ap_write_extra_ies(ap, stype, req, req_len,
+ 					resp->ies + ies_len);
+ =
+
++	if (ip_req_info) {
++		struct ie_fils_ip_addr_response_info ip_resp_info =3D {};
 +
-+	if (info->ipv4_requested_addr) {
-+		l_put_u32(info->ipv4_requested_addr, to);
-+		to +=3D 4;
-+	}
++		if (ip_req_info->ipv4 && sta && ap_sta_get_dhcp4_lease(sta)) {
++			L_AUTO_FREE_VAR(char *, lease_addr_str) =3D
++				l_dhcp_lease_get_address(sta->ip_alloc_lease);
++			L_AUTO_FREE_VAR(char *, lease_netmask_str) =3D
++				l_dhcp_lease_get_netmask(sta->ip_alloc_lease);
++			uint32_t lease_lifetime =3D
++				l_dhcp_lease_get_lifetime(sta->ip_alloc_lease);
++			L_AUTO_FREE_VAR(char *, lease_gateway_str) =3D
++				l_dhcp_lease_get_gateway(sta->ip_alloc_lease);
++			char **lease_dns_str_list =3D
++				l_dhcp_lease_get_dns(sta->ip_alloc_lease);
 +
-+	if (!l_memeqzero(info->ipv6_requested_addr, 16)) {
-+		memcpy(to, info->ipv6_requested_addr, 16);
-+		to +=3D 16;
-+	}
++			ip_resp_info.ipv4_addr =3D IP4_FROM_STR(lease_addr_str);
++			ip_resp_info.ipv4_prefix_len =3D
++				__builtin_popcount(IP4_FROM_STR(
++							lease_netmask_str));
 +
-+	*len =3D to - (len + 1);
-+}
++			if (lease_lifetime !=3D 0xffffffff)
++				ip_resp_info.ipv4_lifetime =3D lease_lifetime;
 +
-+int ie_parse_fils_ip_addr_response(struct ie_tlv_iter *iter,
-+				struct ie_fils_ip_addr_response_info *out)
-+{
-+	unsigned int len =3D ie_tlv_iter_get_length(iter);
-+	const uint8_t *data =3D ie_tlv_iter_get_data(iter);
-+	struct ie_fils_ip_addr_response_info info =3D {};
-+	const uint8_t *response_ctrl;
-+	const uint8_t *dns_ctrl;
++			if (lease_gateway_str)
++				ip_resp_info.ipv4_gateway =3D
++					IP4_FROM_STR(lease_gateway_str);
 +
-+	if (len < 2)
-+		return -EMSGSIZE;
++			if (lease_dns_str_list && lease_dns_str_list[0])
++				ip_resp_info.ipv4_dns =3D
++					IP4_FROM_STR(lease_dns_str_list[0]);
 +
-+	info.response_pending =3D test_bit(data, 0);
-+
-+	if (info.response_pending) {
-+		info.response_timeout =3D bit_field(data[0], 1, 6); /* seconds */
-+		return 0;
-+	}
-+
-+	response_ctrl =3D data++;
-+	dns_ctrl =3D data++;
-+	len -=3D 2;
-+
-+	if (test_bit(response_ctrl, 1)) {
-+		uint32_t netmask;
-+
-+		if (len < 8)
-+			return -EMSGSIZE;
-+
-+		info.ipv4_addr =3D l_get_u32(data);
-+		netmask =3D l_get_be32(data + 4);
-+		info.ipv4_prefix_len =3D __builtin_popcount(netmask);
-+		data +=3D 8;
-+		len -=3D 8;
-+
-+		if (!info.ipv4_addr || info.ipv4_prefix_len > 30 || netmask !=3D
-+				util_netmask_from_prefix(info.ipv4_prefix_len))
-+			return -EINVAL;
-+	}
-+
-+	if (test_bit(response_ctrl, 2)) {
-+		if (len < 10)
-+			return -EMSGSIZE;
-+
-+		info.ipv4_gateway =3D l_get_u32(data);
-+		memcpy(info.ipv4_gateway_mac, data + 4, 6);
-+		data +=3D 10;
-+		len -=3D 10;
-+
-+		/* Check gateway is on the same subnet */
-+		if (info.ipv4_addr && (ntohl(info.ipv4_addr ^ info.ipv4_gateway) &
-+				util_netmask_from_prefix(info.ipv4_prefix_len)))
-+			return -EINVAL;
-+	}
-+
-+	if (test_bit(response_ctrl, 3)) {
-+		if (len < 17)
-+			return -EMSGSIZE;
-+
-+		memcpy(info.ipv6_addr, data, 16);
-+		info.ipv6_prefix_len =3D data[16];
-+		data +=3D 17;
-+		len -=3D 17;
-+
-+		if (l_memeqzero(info.ipv6_addr, 16) ||
-+				info.ipv6_prefix_len > 126)
-+			return -EINVAL;
-+	}
-+
-+	if (test_bit(response_ctrl, 4)) {
-+		if (len < 22)
-+			return -EMSGSIZE;
-+
-+		memcpy(info.ipv6_gateway, data, 16);
-+		memcpy(info.ipv6_gateway_mac, data + 16, 6);
-+		data +=3D 22;
-+		len -=3D 22;
-+
-+		/* Check gateway is on the same subnet */
-+		if (!l_memeqzero(info.ipv6_addr, 12)) {
-+			int n =3D info.ipv6_prefix_len / 8;
-+			uint8_t mask =3D (1 << (info.ipv6_prefix_len & 7)) - 1;
-+
-+			if (n && memcmp(info.ipv6_addr, info.ipv6_gateway, n))
-+				return -EINVAL;
-+
-+			if (mask && ((info.ipv6_addr[n] ^
-+						info.ipv6_gateway[n]) & mask))
-+				return -EINVAL;
++			l_strv_free(lease_dns_str_list);
++			sta->ip_alloc_sent =3D true;
++		} else if (ip_req_info->ipv4 || ip_req_info->ipv6) {
++			/*
++			 * 802.11ai-2016 Section 11.47.3.3: "If the AP is unable
++			 * to assign an IP address in the (Re)Association
++			 * Response frame, then the AP sets the IP address
++			 * assignment pending flag in the IP Address Response
++			 * Control field of the FILS IP Address Assignment
++			 * element to 1 and sets the IP address request timeout
++			 * to 0 in (Re)Association Response frame."
++			 */
++			ip_resp_info.response_pending =3D 1;
++			ip_resp_info.response_timeout =3D 0;
 +		}
++
++		ie_build_fils_ip_addr_response(&ip_resp_info, resp->ies + ies_len);
++		ies_len +=3D 2 + resp->ies[ies_len + 1];
 +	}
 +
-+	if (test_bit(response_ctrl, 5)) {
-+		if (len < 1)
-+			return -EMSGSIZE;
-+
-+		info.ipv4_lifetime =3D *data++;
-+		len--;
-+	}
-+
-+	if (test_bit(response_ctrl, 6)) {
-+		if (len < 1)
-+			return -EMSGSIZE;
-+
-+		info.ipv6_lifetime =3D *data++;
-+		len--;
-+	}
-+
-+	if (test_bit(dns_ctrl, 0)) {
-+		if (len < 4)
-+			return -EMSGSIZE;
-+
-+		info.ipv4_dns =3D l_get_u32(data);
-+		data +=3D 4;
-+		len -=3D 4;
-+
-+		if (!info.ipv4_dns)
-+			return -EINVAL;
-+	}
-+
-+	if (test_bit(dns_ctrl, 1)) {
-+		if (len < 16)
-+			return -EMSGSIZE;
-+
-+		memcpy(info.ipv6_dns, data, 16);
-+		data +=3D 16;
-+		len -=3D 16;
-+
-+		if (l_memeqzero(info.ipv6_dns, 16))
-+			return -EINVAL;
-+	}
-+
-+	if (test_bit(dns_ctrl, 2)) {
-+		if (len < 6)
-+			return -EMSGSIZE;
-+
-+		memcpy(info.ipv4_dns_mac, data, 6);
-+		data +=3D 6;
-+		len -=3D 6;
-+	}
-+
-+	if (test_bit(dns_ctrl, 3)) {
-+		if (len < 6)
-+			return -EMSGSIZE;
-+
-+		memcpy(info.ipv6_dns_mac, data, 6);
-+		data +=3D 6;
-+		len -=3D 6;
-+	}
-+
-+	memcpy(out, &info, sizeof(info));
-+	return 0;
-+}
-+
-+void ie_build_fils_ip_addr_response(
-+			const struct ie_fils_ip_addr_response_info *info,
-+			uint8_t *to)
-+{
-+	uint8_t *len;
-+	uint8_t *response_ctrl;
-+	uint8_t *dns_ctrl;
-+
-+	*to++ =3D IE_TYPE_EXTENSION;
-+	len =3D to++;
-+	*to++ =3D IE_TYPE_FILS_IP_ADDRESS & 0xff;
-+	response_ctrl =3D to++;
-+	dns_ctrl =3D to++;
-+
-+	*response_ctrl =3D 0;
-+	*dns_ctrl =3D 0;
-+
-+	if (info->response_pending) {
-+		*response_ctrl |=3D 1 << 0;
-+		*response_ctrl |=3D info->response_timeout << 1;
-+		goto done;
-+	}
-+
-+	if (info->ipv4_addr) {
-+		uint32_t netmask =3D
-+			util_netmask_from_prefix(info->ipv4_prefix_len);
-+
-+		*response_ctrl |=3D 1 << 1;
-+
-+		l_put_u32(info->ipv4_addr, to);
-+		l_put_u32(htonl(netmask), to + 4);
-+		to +=3D 8;
-+	}
-+
-+	if (info->ipv4_gateway) {
-+		*response_ctrl |=3D 1 << 2;
-+
-+		l_put_u32(info->ipv4_gateway, to);
-+		memcpy(to + 4, info->ipv4_gateway_mac, 6);
-+		to +=3D 10;
-+	}
-+
-+	if (!l_memeqzero(info->ipv6_addr, 16)) {
-+		*response_ctrl |=3D 1 << 3;
-+
-+		memcpy(to, info->ipv6_addr, 16);
-+		to[16] =3D info->ipv6_prefix_len;
-+		to +=3D 17;
-+	}
-+
-+	if (!l_memeqzero(info->ipv6_gateway, 16)) {
-+		*response_ctrl |=3D 1 << 4;
-+
-+		memcpy(to, info->ipv6_gateway, 16);
-+		memcpy(to + 16, info->ipv6_gateway_mac, 6);
-+		to +=3D 22;
-+	}
-+
-+	if (info->ipv4_lifetime) {
-+		*response_ctrl |=3D 1 << 5;
-+
-+		*to++ =3D info->ipv4_lifetime;
-+	}
-+
-+	if (info->ipv6_lifetime) {
-+		*response_ctrl |=3D 1 << 6;
-+
-+		*to++ =3D info->ipv6_lifetime;
-+	}
-+
-+	if (info->ipv4_dns) {
-+		*dns_ctrl |=3D 1 << 0;
-+
-+		l_put_u32(info->ipv4_dns, to);
-+		to +=3D 4;
-+	}
-+
-+	if (!l_memeqzero(info->ipv6_dns, 16)) {
-+		*dns_ctrl |=3D 1 << 1;
-+
-+		memcpy(to, info->ipv6_dns, 16);
-+		to +=3D 16;
-+	}
-+
-+	if (!l_memeqzero(info->ipv4_dns_mac, 6)) {
-+		*dns_ctrl |=3D 1 << 2;
-+
-+		memcpy(to, info->ipv4_dns_mac, 6);
-+		to +=3D 6;
-+	}
-+
-+	if (!l_memeqzero(info->ipv6_dns_mac, 6)) {
-+		*dns_ctrl |=3D 1 << 3;
-+
-+		memcpy(to, info->ipv6_dns_mac, 6);
-+		to +=3D 6;
-+	}
-+
-+done:
-+	*len =3D to - (len + 1);
-+}
-diff --git a/src/ie.h b/src/ie.h
-index 25b56302..05afce39 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -459,6 +459,33 @@ struct ie_neighbor_report_info {
- 	bool bss_transition_pref_present : 1;
- };
+ 	return ap_send_mgmt_frame(ap, mpdu, resp->ies + ies_len - mpdu_buf,
+ 					callback, sta);
+ }
+@@ -1518,6 +1586,8 @@ static void ap_assoc_reassoc(struct sta_state *sta, b=
+ool reassoc,
+ 	struct ie_tlv_iter iter;
+ 	uint8_t *wsc_data =3D NULL;
+ 	ssize_t wsc_data_len;
++	bool fils_ip_req =3D false;
++	struct ie_fils_ip_addr_request_info fils_ip_req_info;
  =
 
-+struct ie_fils_ip_addr_request_info {
-+	bool ipv4 : 1;
-+	uint32_t ipv4_requested_addr;		/* Zero if none */
-+	bool ipv6 : 1;
-+	uint8_t ipv6_requested_addr[16];	/* Zero if none */
-+	bool dns : 1;
-+};
-+
-+struct ie_fils_ip_addr_response_info {
-+	bool response_pending : 1;
-+	uint8_t response_timeout;	/* Seconds */
-+	uint32_t ipv4_addr;		/* Zero if not provided */
-+	uint8_t ipv4_prefix_len;
-+	uint32_t ipv4_gateway;		/* Zero if not provided */
-+	uint8_t ipv4_gateway_mac[6];
-+	uint32_t ipv4_dns;		/* Zero if not provided */
-+	uint8_t ipv4_dns_mac[6];	/* Zero if not provided */
-+	uint8_t ipv4_lifetime;		/* Zero if not provided */
-+	uint8_t ipv6_addr[16];		/* Zero if not provided */
-+	uint8_t ipv6_prefix_len;
-+	uint8_t ipv6_gateway[16];	/* Zero if not provided */
-+	uint8_t ipv6_gateway_mac[6];
-+	uint8_t ipv6_dns[16];		/* Zero if not provided */
-+	uint8_t ipv6_dns_mac[6];	/* Zero if not provided */
-+	uint8_t ipv6_lifetime;		/* Zero if not provided */
-+};
-+
- extern const unsigned char ieee_oui[3];
- extern const unsigned char microsoft_oui[3];
- extern const unsigned char wifi_alliance_oui[3];
-@@ -586,3 +613,14 @@ enum ie_rsnx_capability {
- };
+ 	if (sta->assoc_resp_cmd_id)
+ 		return;
+@@ -1564,6 +1634,17 @@ static void ap_assoc_reassoc(struct sta_state *sta, =
+bool reassoc,
  =
 
- bool ie_rsnxe_capable(const uint8_t *rsnxe, unsigned int bit);
+ 			rsn =3D (const uint8_t *) ie_tlv_iter_get_data(&iter) - 2;
+ 			break;
 +
-+int ie_parse_fils_ip_addr_request(struct ie_tlv_iter *iter,
-+				struct ie_fils_ip_addr_request_info *out);
-+void ie_build_fils_ip_addr_request(
-+				const struct ie_fils_ip_addr_request_info *info,
-+				uint8_t *to);
-+int ie_parse_fils_ip_addr_response(struct ie_tlv_iter *iter,
-+				struct ie_fils_ip_addr_response_info *out);
-+void ie_build_fils_ip_addr_response(
-+			const struct ie_fils_ip_addr_response_info *info,
-+			uint8_t *to);
++		case IE_TYPE_FILS_IP_ADDRESS:
++			if (fils_ip_req || ie_parse_fils_ip_addr_request(&iter,
++						&fils_ip_req_info) < 0) {
++				l_debug("Can't parse FILS IP Address Assignment"
++					" IE, ignoring it");
++				break;
++			}
++
++			fils_ip_req =3D true;
++			break;
+ 		}
+ =
+
+ 	if (!rates || !ssid || (!wsc_data && !rsn) ||
+@@ -1696,7 +1777,8 @@ static void ap_assoc_reassoc(struct sta_state *sta, b=
+ool reassoc,
+ =
+
+ 	sta->assoc_resp_cmd_id =3D ap_assoc_resp(ap, sta, sta->addr, 0, reassoc,
+ 						req, (void *) ies + ies_len -
+-						(void *) req,
++						(void *) req, fils_ip_req ?
++						&fils_ip_req_info : NULL,
+ 						ap_success_assoc_resp_cb);
+ 	if (!sta->assoc_resp_cmd_id)
+ 		l_error("Sending success (Re)Association Response failed");
+@@ -1729,7 +1811,7 @@ bad_frame:
+ =
+
+ 	if (!ap_assoc_resp(ap, sta, sta->addr, err, reassoc,
+ 				req, (void *) ies + ies_len - (void *) req,
+-				ap_fail_assoc_resp_cb))
++				NULL, ap_fail_assoc_resp_cb))
+ 		l_error("Sending error (Re)Association Response failed");
+ }
+ =
+
+@@ -1754,7 +1836,7 @@ static void ap_assoc_req_cb(const struct mmpdu_header=
+ *hdr, const void *body,
+ 		if (!ap_assoc_resp(ap, NULL, from,
+ 				MMPDU_REASON_CODE_STA_REQ_ASSOC_WITHOUT_AUTH,
+ 				false, hdr, body + body_len - (void *) hdr,
+-				ap_fail_assoc_resp_cb))
++				NULL, ap_fail_assoc_resp_cb))
+ 			l_error("Sending error Association Response failed");
+ =
+
+ 		return;
+@@ -1802,7 +1884,7 @@ static void ap_reassoc_req_cb(const struct mmpdu_head=
+er *hdr, const void *body,
+ bad_frame:
+ 	if (!ap_assoc_resp(ap, NULL, from, err, true,
+ 				hdr, body + body_len - (void *) hdr,
+-				ap_fail_assoc_resp_cb))
++				NULL, ap_fail_assoc_resp_cb))
+ 		l_error("Sending error Reassociation Response failed");
+ }
+ =
+
 -- =
 
 2.30.2
 
---===============4214479170482651494==--
+--===============8760220012382097380==--
 
