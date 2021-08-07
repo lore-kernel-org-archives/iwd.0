@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============1342683737176156199=="
+Content-Type: multipart/mixed; boundary="===============2140223139813971426=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 4/5] station: set preparing_roam flag on Roam()
-Date: Fri, 06 Aug 2021 22:38:54 -0500
-Message-ID: <b36b8b99-4050-0a1a-a695-a3313faf21be@gmail.com>
-In-Reply-To: <20210806230212.381657-4-prestwoj@gmail.com>
+Subject: Re: [PATCH 5/5] station: add ConnectBssid() developer method
+Date: Fri, 06 Aug 2021 22:42:26 -0500
+Message-ID: <4935304d-5e5a-a7d2-8070-46c09a332b41@gmail.com>
+In-Reply-To: <20210806230212.381657-5-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1342683737176156199==
+--===============2140223139813971426==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,18 +16,73 @@ Content-Transfer-Encoding: quoted-printable
 Hi James,
 
 On 8/6/21 6:02 PM, James Prestwood wrote:
-> The preparing_roam flag is expected to be set by a few roam
-> routines and normally this is done prior to the roam scan.
-> The Roam() developer option was not doing this and would
-> cause failed roams in some cases.
+> This method will initiate a connection to a specific BSS rather
+> than relying on a network based connection (which the user has
+> no control over which specific BSS is selected).
 > ---
->   src/station.c | 3 +++
->   1 file changed, 3 insertions(+)
+>   src/station.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 98 insertions(+)
+> =
 
-Applied, thanks.
+
+<snip>
+
+> @@ -3751,6 +3759,42 @@ invalid_args:
+>   	return dbus_error_invalid_args(message);
+>   }
+>   =
+
+> +static struct network *station_find_network_from_bss(struct station *sta=
+tion,
+> +						struct scan_bss *bss)
+> +{
+> +	struct ie_rsn_info info;
+> +	int r;
+> +	enum security security;
+> +	const char *path;
+> +	char ssid[33];
+> +
+> +	memcpy(ssid, bss->ssid, bss->ssid_len);
+> +	ssid[bss->ssid_len] =3D '\0';
+> +
+> +	r =3D scan_bss_get_rsn_info(bss, &info);
+> +	if (r < 0) {
+> +		if (r !=3D -ENOENT)
+> +			return NULL;
+> +
+> +		security =3D security_determine(bss->capability, NULL);
+> +	} else
+> +		security =3D security_determine(bss->capability, &info);
+> +
+> +	path =3D iwd_network_get_path(station, ssid, security);
+> +
+> +	return l_hashmap_lookup(station->networks, path);
+
+Looks like station_add_seen_bss() does pretty much the same, so should this=
+ be a =
+
+utility function that is used by both?
+
+> +}
+> +
+> +static bool find_bss_by_addr(const void *a, const void *b)
+
+station.c already has bss_match_bssid()
+
+> +{
+> +	const struct scan_bss *bss =3D a;
+> +
+> +	if (!memcmp(bss->addr, b, 6))
+> +		return true;
+> +
+> +	return false;
+> +}
+> +
+>   static void station_setup_diagnostic_interface(
+>   					struct l_dbus_interface *interface)
+>   {
 
 Regards,
 -Denis
-
---===============1342683737176156199==--
+--===============2140223139813971426==--
 
