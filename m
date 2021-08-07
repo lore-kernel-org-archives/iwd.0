@@ -1,79 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============8162389549297417804=="
+Content-Type: multipart/mixed; boundary="===============0562314338125649928=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/5] netdev: move flag setting in netdev_reassociate
-Date: Fri, 06 Aug 2021 22:47:49 -0500
-Message-ID: <8a07355f-48be-e87d-7596-8c01456d8aa8@gmail.com>
-In-Reply-To: <20210806230212.381657-1-prestwoj@gmail.com>
+From: KeithG <ys3al35l@gmail.com>
+Subject: Nat now fails to work
+Date: Sat, 07 Aug 2021 15:48:47 -0500
+Message-ID: <CAG17S_O9rP8FqOJdOc6U3rD=w6NN3Bon-jZ2JTBqozMkDD5RUQ@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8162389549297417804==
+--===============0562314338125649928==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Group,
 
-On 8/6/21 6:02 PM, James Prestwood wrote:
-> In the real world setting the flags prior to netdev_connect_common
-> should never cause a problem, but using the developer Roam()
-> command will because it forces a roam to occur with no roam scan.
-> This ends up running the connect work item immediately which sets
-> netdev->connected=3Dtrue, then netdev_reassociate ends
-> up setting it false again right after.
-> =
+I used this page Denis made:
+https://iwd.wiki.kernel.org/ap_mode
 
-> To handle both ways of roaming set the flags prior to
-> netdev_connect_common and if it does fail reset them back to
-> their original values.
-> ---
->   src/netdev.c | 20 ++++++++++++++------
->   1 file changed, 14 insertions(+), 6 deletions(-)
-> =
+This is on a RPI3B, but I have seen it on a rpi1 with a dongle. I
+really do not think it is iwd, but I cannot figure out why it will not
+NAT. When I connect my phone or laptop, it always says 'connected, no
+internet'
 
-> diff --git a/src/netdev.c b/src/netdev.c
-> index 74eb349c..e9b4a42c 100644
-> --- a/src/netdev.c
-> +++ b/src/netdev.c
-> @@ -3611,19 +3611,19 @@ int netdev_reassociate(struct netdev *netdev, str=
-uct scan_bss *target_bss,
->   	old_sm =3D netdev->sm;
->   	old_hs =3D netdev->handshake;
->   =
+My /etc/iwd/main.conf
+[General]
+UseDefaultInterface=3Dtrue
+EnableNetworkConfiguration=3Dtrue
+[IPv4]
+APAddressPool=3D192.168.5.0/24
 
-> +	netdev->associated =3D false;
-> +	netdev->operational =3D false;
-> +	netdev->connected =3D false;
-> +	netdev->in_reassoc =3D true;
-> +
+My /var/lib/iwd/ap/ssid.ap
+[Security]
+Passphrase=3DRuneAudio
+[IPv4]
+Address=3D192.168.5.1
+Gateway=3D192.168.5.1
+Netmask=3D255.255.255.0
+DNSList=3D192.168.5.1
 
-Hmm, so why are we saving/restoring all 4 flags when it is only really conn=
-ected =
+To NAT, I execute:
+iptables -t nat -A POSTROUTING -s 192.168.5.0/24 -j MASQUERADE
+sysctl net.ipv4.ip_forward=3D1
 
-that is the problem?
+and it appears forwarding is enabled:
+# cat /proc/sys/net/ipv4/ip_forward
+1
+# iptables -t nat -L -n -v
+Chain PREROUTING (policy ACCEPT 1426 packets, 151K bytes)
+ pkts bytes target     prot opt in     out     source               destina=
+tion
 
->   	ret =3D netdev_connect_common(netdev, target_bss, orig_bss, hs, NULL, =
-0,
->   					event_filter, cb, user_data);
->   	if (ret < 0)
-> -		return ret;
-> +		goto reset_flags;
+Chain INPUT (policy ACCEPT 1192 packets, 139K bytes)
+ pkts bytes target     prot opt in     out     source               destina=
+tion
 
-I wonder if we can do something nicer?
+Chain OUTPUT (policy ACCEPT 4060 packets, 1606K bytes)
+ pkts bytes target     prot opt in     out     source               destina=
+tion
 
-One idea might be to call netdev_handshake_state_setup_connection_type() =
+Chain POSTROUTING (policy ACCEPT 4031 packets, 1600K bytes)
+ pkts bytes target     prot opt in     out     source               destina=
+tion
+   29  5599 MASQUERADE  all  --  *      *       192.168.5.0/24       0.0.0.=
+0/0
 
-earlier, prior to netdev_connect_common as that is the only source of failu=
-re =
+When I connect to it from my laptop, windows sees this:
+Wireless LAN adapter Wi-Fi:
 
-inside it.  We can then make netdev_connect_common() return void.
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : Intel(R) Wireless-AC 9560 160MHz
+   Physical Address. . . . . . . . . : 60-F2-62-AE-70-FE
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   Link-local IPv6 Address . . . . . : fe80::dc8d:27f1:52c2:5b0f%10(Preferr=
+ed)
+   IPv4 Address. . . . . . . . . . . : 192.168.5.3(Preferred)
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Lease Obtained. . . . . . . . . . : Saturday, August 7, 2021 3:42:53 PM
+   Lease Expires . . . . . . . . . . : Saturday, August 7, 2021 11:42:53 PM
+   Default Gateway . . . . . . . . . : 192.168.5.1
+   DHCP Server . . . . . . . . . . . : 192.168.5.1
+   DHCPv6 IAID . . . . . . . . . . . : 90239586
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-25-7E-CD-22-34-48-ED-06-=
+F5-9A
+   DNS Servers . . . . . . . . . . . : 192.168.5.1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
 
-Another idea might be to set netdev->connected to false afterward only if =
+but also no internet
 
-netdev->ap exists and the work item hasn't started...?
-
-Regards,
--Denis
---===============8162389549297417804==--
+What am I missing?
+--===============0562314338125649928==--
 
