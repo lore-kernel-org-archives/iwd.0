@@ -1,38 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============1499416353851480422=="
+Content-Type: multipart/mixed; boundary="===============3831770042550749240=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH] test-runner: Drop unused parameter
-Date: Mon, 09 Aug 2021 11:20:10 +0200
-Message-ID: <CAOq732JGC=-Oddn-C_QKYs5mBKym3DQvvQ-aCdvrQ4fPeKMK_w@mail.gmail.com>
-In-Reply-To: <11b428f8f83524d45f5abf5bda179fcd8a9f4b23.camel@gmail.com>
+Subject: Re: iwd provides only Legacy Access point (802.11b)
+Date: Mon, 09 Aug 2021 11:26:22 +0200
+Message-ID: <CAOq732L0F3VmCEn1A1US_DNfQi528+QJ6CtQqtpDwJR998BWfg@mail.gmail.com>
+In-Reply-To: <20210809090050.2797.71989@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1499416353851480422==
+--===============3831770042550749240==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, 7 Aug 2021 at 04:46, James Prestwood <prestwoj@gmail.com> wrote:
-> On Sat, 2021-08-07 at 03:51 +0200, Andrew Zaborowski wrote:
-> > --- a/tools/test-runner
-> > +++ b/tools/test-runner
-> > @@ -164,7 +164,7 @@ class Process:
-> >                 case.
-> >         '''
-> >         def __init__(self, args, wait=3DFalse, env=3DNone, ctx=3DNone,
-> > check=3DFalse,
-> > -                               outfile=3DNone, namespace=3DNone,
-> > need_out=3DFalse, cleanup=3DNone):
-> > +                               outfile=3DNone, namespace=3DNone,
-> > cleanup=3DNone):
->
-> This is fine, but we also need to remove the use in hostapd.py for
-> list_sta/send_bss_transition.
+Hi Salahaldeen,
 
-Good point, looks like some tests will fail without that.  I'm also
-fine dropping this patch.
+On Mon, 9 Aug 2021 at 11:00, <salahaldeen.altous@leica-camera.com> wrote:
+> I have my device started as AP and when I connect to iPhone, this warning=
+ comes (Legacy access Point 802.11b provides sub-optimal performance!!).
+> Is that possible to run iwd with 802.11g/n mode? my hardware support supp=
+ort all these modes.
+
+The code has no support for this yet because in many use cases the AP
+will not be the bottleneck, but we need to add it. Once added it would
+be enabled automatically.
 
 Best regards
---===============1499416353851480422==--
+--===============3831770042550749240==--
 
