@@ -1,166 +1,124 @@
-Content-Type: multipart/mixed; boundary="===============8060360794924778535=="
+Content-Type: multipart/mixed; boundary="===============5553969531648214504=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: how to get info about connected clients when iwd runs in AP mode?
-Date: Mon, 09 Aug 2021 08:58:50 -0700
-Message-ID: <08640727a3dc701404e13fb28211cf7adaedd1f1.camel@gmail.com>
-In-Reply-To: <e2da94d7a788840b30b45cebab451b9f36a54a3e.camel@leica-camera.com>
+Subject: [PATCH v2 1/4] netdev: move failure point out of netdev_connect_common
+Date: Mon, 09 Aug 2021 10:16:13 -0700
+Message-ID: <20210809171616.535514-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8060360794924778535==
+--===============5553969531648214504==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+The only point of failure in netdev_connect_common was setting
+up the handshake type. Moving this outside of netdev_connect_common
+makes the code flow much better in netdev_{connect,reassociate} as
+nothing needs to be reset upon failure.
+---
+ src/netdev.c | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
 
-On Mon, 2021-08-09 at 07:22 +0000, Altous, Salahaldeen wrote:
-> Hi James,
-> =
+diff --git a/src/netdev.c b/src/netdev.c
+index 1b72b0a7..479791fd 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -3442,7 +3442,7 @@ offload_1x:
+ 	return 0;
+ }
+ =
 
-> On Fri, 2021-08-06 at 09:32 -0700, James Prestwood wrote:
-> > Hi,
-> > =
+-static int netdev_connect_common(struct netdev *netdev,
++static void netdev_connect_common(struct netdev *netdev,
+ 					struct scan_bss *bss,
+ 					struct scan_bss *prev_bss,
+ 					struct handshake_state *hs,
+@@ -3463,9 +3463,6 @@ static int netdev_connect_common(struct netdev *netde=
+v,
+ 		goto build_cmd_connect;
+ 	}
+ =
 
-> > On Fri, 2021-08-06 at 06:30 +0000,
-> > salahaldeen.altous(a)leica-camera.com
-> > wrote:
-> > > Hi,
-> > > =
+-	if (netdev_handshake_state_setup_connection_type(hs) < 0)
+-		return -ENOTSUP;
+-
+ 	if (nhs->type !=3D CONNECTION_TYPE_SOFTMAC)
+ 		goto build_cmd_connect;
+ =
 
-> > > I have a device which running as AP point. I would like to know
-> > > every
-> > > time there is a new connection/discounntion for this access
-> > > point.
-> > > Does iwd API support this? DHCP is enable in AP configuration
-> > > (EnableNetworkConfiguration=3DTrue)
-> > =
+@@ -3534,7 +3531,7 @@ build_cmd_connect:
+ 	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
+ 				&connect_work_ops);
+ =
 
-> > There is an access point API, GetDiagnostics(), which returns an
-> > array
-> > of clients (including some info about each client):
-> > =
+-	return 0;
++	return;
+ }
+ =
 
-> > https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/doc/access=
--point-diagnostic-api.txt
-> =
+ int netdev_connect(struct netdev *netdev, struct scan_bss *bss,
+@@ -3554,9 +3551,14 @@ int netdev_connect(struct netdev *netdev, struct sca=
+n_bss *bss,
+ 	if (netdev->connected || netdev->connect_cmd_id || netdev->work.id)
+ 		return -EISCONN;
+ =
 
-> thanks I will test it. Is there any ready python test script for it?
+-	return netdev_connect_common(netdev, bss, NULL, hs, vendor_ies,
++	if (netdev_handshake_state_setup_connection_type(hs) < 0)
++		return -ENOTSUP;
++
++	netdev_connect_common(netdev, bss, NULL, hs, vendor_ies,
+ 					num_vendor_ies, event_filter, cb,
+ 					user_data);
++
++	return 0;
+ }
+ =
 
-Unfortunately no. Currently only iwctl uses GetDiagnostics() which you
-used below.
+ static void disconnect_idle(struct l_idle *idle, void *user_data)
+@@ -3646,24 +3648,24 @@ int netdev_reassociate(struct netdev *netdev, struc=
+t scan_bss *target_bss,
+ {
+ 	struct handshake_state *old_hs;
+ 	struct eapol_sm *old_sm;
+-	int ret;
+ =
 
-> > =
+ 	old_sm =3D netdev->sm;
+ 	old_hs =3D netdev->handshake;
+ =
 
-> > Unfortunately you cant get notified for this via PropertyChanged
-> > since
-> > its a DBus method rather than properties. This was done because
-> > some
-> > of
-> > the client info can change quite frequently (RSSI, Tx/Rx
-> > rates/modes
-> > etc) and we didn't want to flood DBus with these messages
-> > constantly.
-> > =
+-	ret =3D netdev_connect_common(netdev, target_bss, orig_bss, hs, NULL, 0,
+-					event_filter, cb, user_data);
+-	if (ret < 0)
+-		return ret;
+-
+-	if (netdev->ap)
+-		memcpy(netdev->ap->prev_bssid, orig_bss->addr, ETH_ALEN);
++	if (netdev_handshake_state_setup_connection_type(hs) < 0)
++		return -ENOTSUP;
+ =
 
-> > In iwctl we actually poll this information every second.
-> =
+ 	netdev->associated =3D false;
+ 	netdev->operational =3D false;
+ 	netdev->connected =3D false;
+ 	netdev->in_reassoc =3D true;
+ =
 
-> =
++	netdev_connect_common(netdev, target_bss, orig_bss, hs, NULL, 0,
++					event_filter, cb, user_data);
++
++	if (netdev->ap)
++		memcpy(netdev->ap->prev_bssid, orig_bss->addr, ETH_ALEN);
++
+ 	netdev_rssi_polling_update(netdev);
+ =
 
-> I was looking for notification via PropertyChanged callback. I am
-> using
-> iwd 1.13. when I run iwctl ap wlan0 show it returns always 0 client!!
-> is this a bug in the old version?
-> =
+ 	if (old_sm)
+-- =
 
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 Access Point
-> Interface=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 *
-> ---------------------------------------------------------------------
-> -----------
-> =C2=A0 Settable=C2=A0 Property=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 Value
-> ---------------------------------------------------------------------
-> -----------
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Starte=
-d=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 y=
-es
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Name=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 xxxxx-5587111
-> =
+2.31.1
 
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Client
-> 0
-> ---------------------------------------------------------------------
-> -----------
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Proper=
-ty=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Value
-> ---------------------------------------------------------------------
-> -----------
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Addres=
-s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 8=
-4:25:3f:9f:c2:54
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 RxBitr=
-ate=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kbit/s
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Expect=
-edThroughput=C2=A0 14722096=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 Kbit/s
-
-I'll admit this may look somewhat confusing, but this is actually
-printing out the one client that is connected, client 0.
-
-I will say there is very little information here. What card are you
-using?
-
-> =
-
-> [iwd]#
-> =
-
-> =
-
-> > =
-
-> > Thanks,
-> > James
-> =
-
-> Regards,Salahaldeen
-> > =
-
-> > > Regards,
-> > > Salahaldeen Altous
-> > > _______________________________________________
-> > > iwd mailing list -- iwd(a)lists.01.org
-> > > To unsubscribe send an email to iwd-leave(a)lists.01.org
-> > =
-
-> > =
-
-> Leica Camera AG | Registergericht | District Court of Wetzlar: HRB966
-> Vorstand | Executive Board: Matthias Harsch (Vorsitzender) | Dr.
-> Marita Paasch
-> Aufsichtsratsvorsitzender | Chairman of the Supervisory Board: Dr.
-> Andreas Kaufmann
-> =
-
-> This message may contain confidential and privileged information. If
-> it has been sent to you in error, please notify the sender
-> immediately by replying to the message and please delete it from your
-> computer.
-
-Thanks,
-James
-
---===============8060360794924778535==--
+--===============5553969531648214504==--
 
