@@ -1,55 +1,103 @@
-Content-Type: multipart/mixed; boundary="===============5340608065818834330=="
+Content-Type: multipart/mixed; boundary="===============6535971927927231529=="
 MIME-Version: 1.0
-From: Matt Oberle <matt.r.oberle@gmail.com>
-Subject: [PATCH 3/3] hotspot: stat fallback for unknown d_type
-Date: Mon, 09 Aug 2021 01:27:26 -0400
-Message-ID: <20210809052726.177038-3-matt.r.oberle@gmail.com>
-In-Reply-To: <20210809052726.177038-1-matt.r.oberle@gmail.com>
+From: Altous, Salahaldeen <Salahaldeen.Altous@leica-camera.com>
+Subject: Re: how to get info about connected clients when iwd runs in AP mode?
+Date: Mon, 09 Aug 2021 07:22:50 +0000
+Message-ID: <e2da94d7a788840b30b45cebab451b9f36a54a3e.camel@leica-camera.com>
+In-Reply-To: <cb60f7c9a8cdcfac082e95ba3cbfa5ce95c3523e.camel@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5340608065818834330==
+--===============6535971927927231529==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Utilize 'storage_is_file' when readdir returns DT_UNKNOWN to ensure
-features like autoconnect work on filesystems that don't return a d_type
-(eg. XFS).
----
- src/hotspot.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Hi James,
 
-diff --git a/src/hotspot.c b/src/hotspot.c
-index e99b2a38..17e8577e 100644
---- a/src/hotspot.c
-+++ b/src/hotspot.c
-@@ -495,12 +495,16 @@ static int hotspot_init(void)
- 		char *filename;
- 		struct network_config config;
- =
+On Fri, 2021-08-06 at 09:32 -0700, James Prestwood wrote:
+> Hi,
+>
+> On Fri, 2021-08-06 at 06:30 +0000,
+> salahaldeen.altous(a)leica-camera.com
+> wrote:
+> > Hi,
+> >
+> > I have a device which running as AP point. I would like to know
+> > every
+> > time there is a new connection/discounntion for this access point.
+> > Does iwd API support this? DHCP is enable in AP configuration
+> > (EnableNetworkConfiguration=3DTrue)
+>
+> There is an access point API, GetDiagnostics(), which returns an
+> array
+> of clients (including some info about each client):
+>
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/doc/access-p=
+oint-diagnostic-api.txt
 
--		if (dirent->d_type !=3D DT_REG && dirent->d_type !=3D DT_LNK)
--			continue;
--
- 		filename =3D l_strdup_printf("%s/%s", hs20_dir, dirent->d_name);
- 		s =3D l_settings_new();
- =
+thanks I will test it. Is there any ready python test script for it?
+>
+> Unfortunately you cant get notified for this via PropertyChanged
+> since
+> its a DBus method rather than properties. This was done because some
+> of
+> the client info can change quite frequently (RSSI, Tx/Rx rates/modes
+> etc) and we didn't want to flood DBus with these messages constantly.
+>
+> In iwctl we actually poll this information every second.
 
-+		if (dirent->d_type =3D=3D DT_UNKNOWN) {
-+			if (!storage_is_file(filename))
-+				goto next;
-+		} else if (dirent->d_type !=3D DT_REG && dirent->d_type !=3D DT_LNK) {
-+			goto next;
-+		}
-+
- 		if (!l_settings_load_from_file(s, filename))
- 			goto next;
- =
 
--- =
+I was looking for notification via PropertyChanged callback. I am using
+iwd 1.13. when I run iwctl ap wlan0 show it returns always 0 client!!
+is this a bug in the old version?
 
-2.32.0
+                             Access Point
+Interface                           *
+---------------------------------------------------------------------
+-----------
+  Settable  Property            Value
+---------------------------------------------------------------------
+-----------
+            Started             yes
+            Name                xxxxx-5587111
 
---===============5340608065818834330==--
+                                    Client
+0
+---------------------------------------------------------------------
+-----------
+            Property            Value
+---------------------------------------------------------------------
+-----------
+            Address             84:25:3f:9f:c2:54
+            RxBitrate           0                    Kbit/s
+            ExpectedThroughput  14722096             Kbit/s
+
+[iwd]#
+
+
+>
+> Thanks,
+> James
+
+Regards,Salahaldeen
+>
+> > Regards,
+> > Salahaldeen Altous
+> > _______________________________________________
+> > iwd mailing list -- iwd(a)lists.01.org
+> > To unsubscribe send an email to iwd-leave(a)lists.01.org
+>
+>
+Leica Camera AG | Registergericht | District Court of Wetzlar: HRB966
+Vorstand | Executive Board: Matthias Harsch (Vorsitzender) | Dr. Marita Paa=
+sch
+Aufsichtsratsvorsitzender | Chairman of the Supervisory Board: Dr. Andreas =
+Kaufmann
+
+This message may contain confidential and privileged information. If it has=
+ been sent to you in error, please notify the sender immediately by replyin=
+g to the message and please delete it from your computer.
+
+--===============6535971927927231529==--
 
