@@ -1,117 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============9180360681336628255=="
+Content-Type: multipart/mixed; boundary="===============6557682698114823724=="
 MIME-Version: 1.0
-From: KeithG <ys3al35l@gmail.com>
-Subject: Re: Nat now fails to work
-Date: Sun, 08 Aug 2021 17:48:10 -0500
-Message-ID: <CAG17S_PdztcA0aSA_wfJX6p1sX+M-xF0pUBrGL18QeZifaPH+A@mail.gmail.com>
-In-Reply-To: <CAG17S_O9rP8FqOJdOc6U3rD=w6NN3Bon-jZ2JTBqozMkDD5RUQ@mail.gmail.com>
+From: Matt Oberle <matt.r.oberle@gmail.com>
+Subject: [PATCH 1/3] storage: provide storage_is_file
+Date: Mon, 09 Aug 2021 01:27:24 -0400
+Message-ID: <20210809052726.177038-1-matt.r.oberle@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============9180360681336628255==
+--===============6557682698114823724==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Replying to my own email.
+Add a function 'storage_is_file' which will use stat to verify a
+file's existence given a path relative to the storage directory.
 
-What happens is that NAT does not work if I want to use the AP as the
-DNS server.
-The IP is 192.168.5.1, but if I set the:
-DNSList=3D8.8.8.8
+Not all filesystems provide a file type via readdir's d_type.
+XFS is a notable system with optional d_type support.
+When d_type is not supported stat must be used as a fallback.
+If a stat fallback is not provided iwd will fail to load state files.
 
-It works. How can I set the AP to use itself as the DNS server? It is
-getting the DNS from DHCP on the eth0 interface. This way if someone
-has their own PiHole or other unbound DNS, the AP can use it. Do we
-need to set a route for this, somehow?
+---
+ src/storage.c | 18 ++++++++++++++++++
+ src/storage.h |  1 +
+ 2 files changed, 19 insertions(+)
 
-Also if the adapter supports it, can AP mode also scan for SSIDs? It
-does this with hostapd and we would like it with iwd as well. This way
-iwd can be used to do an OOB wifi setup. We currently scan and save
-the SSIDs before we transition to ap mode, but would like the list of
-ssids to be 'current'.
+diff --git a/src/storage.c b/src/storage.c
+index 00d93933..4b89c615 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -29,11 +29,13 @@
+ #include <errno.h>
+ #include <ctype.h>
+ #include <fcntl.h>
++#include <stdbool.h>
+ #include <string.h>
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <time.h>
++#include <sys/stat.h>
+ #include <sys/time.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -445,3 +447,19 @@ void storage_known_frequencies_sync(struct l_settings =
+*known_freqs)
+ =
 
-Keith
+ 	l_free(known_freq_file_path);
+ }
++
++bool storage_is_file(const char *filename)
++{
++	char *path;
++	struct stat st;
++	int err;
++
++	path =3D storage_get_path("%s", filename);
++	err =3D stat(path, &st);
++	l_free(path);
++
++	if (!err && S_ISREG(st.st_mode) !=3D 0)
++		return true;
++
++	return false;
++}
+diff --git a/src/storage.h b/src/storage.h
+index 80b63c53..e1ec2cd4 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -32,6 +32,7 @@ ssize_t write_file(const void *buffer, size_t len, bool p=
+reserve_times,
+ 			const char *path_fmt, ...)
+ 	__attribute__((format(printf, 4, 5)));
+ =
 
-On Sat, Aug 7, 2021 at 3:48 PM KeithG <ys3al35l@gmail.com> wrote:
->
-> Group,
->
-> I used this page Denis made:
-> https://iwd.wiki.kernel.org/ap_mode
->
-> This is on a RPI3B, but I have seen it on a rpi1 with a dongle. I
-> really do not think it is iwd, but I cannot figure out why it will not
-> NAT. When I connect my phone or laptop, it always says 'connected, no
-> internet'
->
-> My /etc/iwd/main.conf
-> [General]
-> UseDefaultInterface=3Dtrue
-> EnableNetworkConfiguration=3Dtrue
-> [IPv4]
-> APAddressPool=3D192.168.5.0/24
->
-> My /var/lib/iwd/ap/ssid.ap
-> [Security]
-> Passphrase=3DRuneAudio
-> [IPv4]
-> Address=3D192.168.5.1
-> Gateway=3D192.168.5.1
-> Netmask=3D255.255.255.0
-> DNSList=3D192.168.5.1
->
-> To NAT, I execute:
-> iptables -t nat -A POSTROUTING -s 192.168.5.0/24 -j MASQUERADE
-> sysctl net.ipv4.ip_forward=3D1
->
-> and it appears forwarding is enabled:
-> # cat /proc/sys/net/ipv4/ip_forward
-> 1
-> # iptables -t nat -L -n -v
-> Chain PREROUTING (policy ACCEPT 1426 packets, 151K bytes)
->  pkts bytes target     prot opt in     out     source               desti=
-nation
->
-> Chain INPUT (policy ACCEPT 1192 packets, 139K bytes)
->  pkts bytes target     prot opt in     out     source               desti=
-nation
->
-> Chain OUTPUT (policy ACCEPT 4060 packets, 1606K bytes)
->  pkts bytes target     prot opt in     out     source               desti=
-nation
->
-> Chain POSTROUTING (policy ACCEPT 4031 packets, 1600K bytes)
->  pkts bytes target     prot opt in     out     source               desti=
-nation
->    29  5599 MASQUERADE  all  --  *      *       192.168.5.0/24       0.0.=
-0.0/0
->
-> When I connect to it from my laptop, windows sees this:
-> Wireless LAN adapter Wi-Fi:
->
->    Connection-specific DNS Suffix  . :
->    Description . . . . . . . . . . . : Intel(R) Wireless-AC 9560 160MHz
->    Physical Address. . . . . . . . . : 60-F2-62-AE-70-FE
->    DHCP Enabled. . . . . . . . . . . : Yes
->    Autoconfiguration Enabled . . . . : Yes
->    Link-local IPv6 Address . . . . . : fe80::dc8d:27f1:52c2:5b0f%10(Prefe=
-rred)
->    IPv4 Address. . . . . . . . . . . : 192.168.5.3(Preferred)
->    Subnet Mask . . . . . . . . . . . : 255.255.255.0
->    Lease Obtained. . . . . . . . . . : Saturday, August 7, 2021 3:42:53 PM
->    Lease Expires . . . . . . . . . . : Saturday, August 7, 2021 11:42:53 =
-PM
->    Default Gateway . . . . . . . . . : 192.168.5.1
->    DHCP Server . . . . . . . . . . . : 192.168.5.1
->    DHCPv6 IAID . . . . . . . . . . . : 90239586
->    DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-25-7E-CD-22-34-48-ED-0=
-6-F5-9A
->    DNS Servers . . . . . . . . . . . : 192.168.5.1
->    NetBIOS over Tcpip. . . . . . . . : Enabled
->
-> but also no internet
->
-> What am I missing?
---===============9180360681336628255==--
++bool storage_is_file(const char *filename);
+ bool storage_create_dirs(void);
+ void storage_cleanup_dirs(void);
+ char *storage_get_path(const char *format, ...);
+-- =
+
+2.32.0
+
+--===============6557682698114823724==--
 
