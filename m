@@ -1,92 +1,141 @@
-Content-Type: multipart/mixed; boundary="===============0903062333496086012=="
+Content-Type: multipart/mixed; boundary="===============4225486175885295342=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459@gmail.com>
-Subject: Failing to resolve after roams
-Date: Tue, 10 Aug 2021 11:58:27 +0100
-Message-ID: <CACsRnHWusQ22=YJVn23OBAC2ssiBrr5EQ_9msjamU_1dPx-DbA@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: Re: how to get info about connected clients when iwd runs in AP mode?
+Date: Tue, 10 Aug 2021 08:55:40 -0700
+Message-ID: <2560e85435802d3fadbc4ec125d3316b5bcb7f8a.camel@gmail.com>
+In-Reply-To: <4758091633c1cf9c2920e05072770bd5c84c4ad4.camel@leica-camera.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0903062333496086012==
+--===============4225486175885295342==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+Hi,
 
-I'm having a problem with iwd when it comes to roaming. Most of the
-time it is working perfectly but rarely I get into this situation
-where I can't resolve any hostnames.
-I'm using a default server setup on ubuntu which uses systemd-networkd
-and systemd-resolved with iwd configured to use
-`EnableNetworkConfiguration=3Dtrue`.
+<snip>
+> > > =
 
-Here are the debug logs of a failure case:
-```
-Aug 10 09:48:04.120612 p3-631 systemd-networkd[341]: wlan0: Lost carrier
-Aug 10 09:48:04.121287 p3-631 kernel: wlan0: send auth to <BSSID> (try 1/3)
-Aug 10 09:48:04.123440 p3-631 iwd[413]:
-src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-Aug 10 09:48:04.123440 p3-631 iwd[413]: src/netdev.c:netdev_authenticate_ev=
-ent()
-Aug 10 09:48:04.125236 p3-631 kernel: wlan0: authenticated
-Aug 10 09:48:04.125339 p3-631 kernel: wlan0: associate with <BSSID> (try 1/=
-3)
-Aug 10 09:48:04.133316 p3-631 kernel: wlan0: RX ReassocResp from
-<BSSID> (capab=3D0x1511 status=3D0 aid=3D8)
-Aug 10 09:48:04.134574 p3-631 iwd[413]:
-src/netdev.c:netdev_mlme_notify() MLME notification Associate(38)
-Aug 10 09:48:04.134574 p3-631 iwd[413]: src/netdev.c:netdev_associate_event=
-()
-Aug 10 09:48:04.134574 p3-631 iwd[413]: src/netdev.c:netdev_set_gtk() 5
-Aug 10 09:48:04.134574 p3-631 iwd[413]:
-src/station.c:station_handshake_event() Setting keys
-Aug 10 09:48:04.134574 p3-631 iwd[413]: src/netdev.c:netdev_set_tk() 5
-Aug 10 09:48:04.134574 p3-631 iwd[413]:
-src/netdev.c:netdev_mlme_notify() MLME notification Connect(46)
-Aug 10 09:48:04.134574 p3-631 iwd[413]: src/netdev.c:netdev_connect_event()
-Aug 10 09:48:04.135502 p3-631 iwd[413]:
-src/station.c:station_fast_transition_cb() 5, result: 0
-Aug 10 09:48:04.135502 p3-631 iwd[413]:
-src/station.c:station_enter_state() Old State: roaming, new state:
-connected
-Aug 10 09:48:04.135502 p3-631 iwd[413]:
-src/wiphy.c:wiphy_radio_work_done() Work item 315 done
-Aug 10 09:48:04.135791 p3-631 iwd[413]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-Aug 10 09:48:04.135936 p3-631 iwd[413]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-Aug 10 09:48:04.136075 p3-631 iwd[413]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-Aug 10 09:48:04.136231 p3-631 iwd[413]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-Aug 10 09:48:04.136460 p3-631 iwd[413]: src/wiphy.c:wiphy_reg_notify()
-Notification of command Reg Change(36)
-Aug 10 09:48:04.136460 p3-631 iwd[413]:
-src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for
-(global) is US
-Aug 10 09:48:04.136741 p3-631 iwd[413]:
-src/netdev.c:netdev_mlme_notify() MLME notification Frame TX
-Status(60)
-Aug 10 09:48:04.137287 p3-631 kernel: wlan0: associated
-```
-```
-$ sudo resolvectl status
-...
-Link 5 (wlan0)
-      Current Scopes: none
-```
+> > > I was looking for notification via PropertyChanged callback. I am
+> > > using
+> > > iwd 1.13. when I run iwctl ap wlan0 show it returns always 0
+> > > client!!
+> > > is this a bug in the old version?
+> > > =
 
-What I noticed is that when the roam works, there is a
-`systemd-networkd[341]: wlan0: Gained carrier` line at the end which
-is missing here.
-Unfortunately it happens rarely enough that capturing the netlink
-traffic is a pain so I can't see if the issue is on the iwd or systemd
-side.
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 Access Point
+> > > Interface=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 *
+> > > -----------------------------------------------------------------
+> > > ----
+> > > -----------
+> > > =C2=A0 Settable=C2=A0 Property=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 Value
+> > > -----------------------------------------------------------------
+> > > ----
+> > > -----------
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 St=
+arted=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 yes
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Na=
+me=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 xxxxx-5587111
+> > > =
 
-Has anyone else seen something like this?
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Client
+> > > 0
+> > > -----------------------------------------------------------------
+> > > ----
+> > > -----------
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Pr=
+operty=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Va=
+lue
+> > > -----------------------------------------------------------------
+> > > ----
+> > > -----------
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Ad=
+dress=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 84:25:3f:9f:c2:54
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Rx=
+Bitrate=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kbit/s
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Ex=
+pectedThroughput=C2=A0 14722096=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kbit/s
+> > =
 
-Kind Regards,
-Michael
---===============0903062333496086012==--
+> > I'll admit this may look somewhat confusing, but this is actually
+> > printing out the one client that is connected, client 0.
+> > =
+
+> I have connected multiple clients at this time but it returns only
+> client 0
+
+Would there be any way you could run iwmon at the same time as "ap
+wlan0 show" ? We get all this information from the nl8011 GET_STATION
+API so I'm curious to see exactly what that is coming up with.
+
+> > I will say there is very little information here. What card are you
+> > using?
+> > =
+
+> I am using qualcomm qca9377 chip
+> > > [iwd]#
+> > > =
+
+> > > =
+
+> > > > Thanks,
+> > > > James
+> > > =
+
+> > > Regards,Salahaldeen
+> > > > > Regards,
+> > > > > Salahaldeen Altous
+> > > > > _______________________________________________
+> > > > > iwd mailing list -- iwd(a)lists.01.org
+> > > > > To unsubscribe send an email to iwd-leave(a)lists.01.org
+> > > Leica Camera AG | Registergericht | District Court of Wetzlar:
+> > > HRB966
+> > > Vorstand | Executive Board: Matthias Harsch (Vorsitzender) | Dr.
+> > > Marita Paasch
+> > > Aufsichtsratsvorsitzender | Chairman of the Supervisory Board:
+> > > Dr.
+> > > Andreas Kaufmann
+> > > =
+
+> > > This message may contain confidential and privileged information.
+> > > If
+> > > it has been sent to you in error, please notify the sender
+> > > immediately by replying to the message and please delete it from
+> > > your
+> > > computer.
+> > =
+
+> > Thanks,
+> > James
+> > =
+
+> Leica Camera AG | Registergericht | District Court of Wetzlar: HRB966
+> Vorstand | Executive Board: Matthias Harsch (Vorsitzender) | Dr.
+> Marita Paasch
+> Aufsichtsratsvorsitzender | Chairman of the Supervisory Board: Dr.
+> Andreas Kaufmann
+> =
+
+> This message may contain confidential and privileged information. If
+> it has been sent to you in error, please notify the sender
+> immediately by replying to the message and please delete it from your
+> computer.
+
+
+--===============4225486175885295342==--
 
