@@ -1,43 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============6447575528315301502=="
+Content-Type: multipart/mixed; boundary="===============0817495700827093835=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] station: set autoconnect via setter
-Date: Thu, 12 Aug 2021 15:24:58 -0700
-Message-ID: <20210812222458.744008-1-prestwoj@gmail.com>
+Subject: [PATCH 1/3] test-runner: print uncaught test exceptions always
+Date: Thu, 12 Aug 2021 16:07:14 -0700
+Message-ID: <20210812230716.747378-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6447575528315301502==
+--===============0817495700827093835==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This updates the autoconnect property for the debug interface
 ---
- src/station.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tools/test-runner | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index b2e12e9a..a1885cfa 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2695,7 +2695,8 @@ void station_connect_network(struct station *station,=
- struct network *network,
- 	station_enter_state(station, STATION_STATE_CONNECTING);
+diff --git a/tools/test-runner b/tools/test-runner
+index 1d148b13..f18ae538 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -1259,8 +1259,8 @@ def run_auto_tests(ctx, args):
+ 				ctx.results[os.path.basename(test)] =3D rqueue.get()
  =
 
- 	station->connect_pending =3D l_dbus_message_ref(message);
--	station->autoconnect =3D true;
-+
-+	station_set_autoconnect(station, true);
- =
-
- 	return;
- =
-
+ 		except Exception as ex:
+-			print(ex)
+-			print("Uncaught exception thrown for %s" % test)
++			dbg(ex)
++			dbg("Uncaught exception thrown for %s" % test)
+ 			ctx.results[os.path.basename(test)] =3D SimpleResult(run=3D0, failures=
+=3D0,
+ 								errors=3D0, skipped=3D0, time=3D0)
+ 		finally:
 -- =
 
 2.31.1
 
---===============6447575528315301502==--
+--===============0817495700827093835==--
 
