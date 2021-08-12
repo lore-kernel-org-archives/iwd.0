@@ -1,41 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============3935023808511148581=="
+Content-Type: multipart/mixed; boundary="===============5126484079707968280=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 3/3] test: update force-roam to use Debug interface
-Date: Thu, 12 Aug 2021 12:07:23 -0700
-Message-ID: <20210812190723.732722-3-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v4 1/3] station: add ConnectBssid() developer method
+Date: Thu, 12 Aug 2021 14:59:51 -0500
+Message-ID: <4323558b-c5d4-3bfe-12b4-4bbd975de6a6@gmail.com>
 In-Reply-To: <20210812190723.732722-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3935023808511148581==
+--===============5126484079707968280==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- test/force-roam | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi James,
 
-diff --git a/test/force-roam b/test/force-roam
-index b590c84a..b45ad2e6 100755
---- a/test/force-roam
-+++ b/test/force-roam
-@@ -9,7 +9,7 @@ if (len(sys.argv) !=3D 3):
- =
+On 8/12/21 2:07 PM, James Prestwood wrote:
+> This method will initiate a connection to a specific BSS rather
+> than relying on a network based connection (which the user has
+> no control over which specific BSS is selected).
+> ---
+>   src/station.c | 143 ++++++++++++++++++++++++++++++++++++++------------
+>   1 file changed, 109 insertions(+), 34 deletions(-)
+> =
 
- bus =3D dbus.SystemBus()
- device =3D dbus.Interface(bus.get_object("net.connman.iwd", sys.argv[1]),
--                                    "net.connman.iwd.StationDiagnostic")
-+                                    "net.connman.iwd.StationDebug")
- =
+> v4:
+>   * Reworked station_parse_bss to just parse security
+>   * Updated the common code in station to use station_parse_bss_security
+>   * Limited ConnectBssid() to only non-hidden networks
+> =
 
- mac =3D sys.argv[2].replace(':', '')
- =
 
--- =
+All applied, thanks.
 
-2.31.1
+Regards,
+-Denis
 
---===============3935023808511148581==--
+--===============5126484079707968280==--
 
