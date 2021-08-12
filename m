@@ -1,161 +1,154 @@
-Content-Type: multipart/mixed; boundary="===============7362323776983386496=="
+Content-Type: multipart/mixed; boundary="===============8294112569987946765=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] test-runner: run individual test functions manually
-Date: Thu, 12 Aug 2021 16:07:16 -0700
-Message-ID: <20210812230716.747378-3-prestwoj@gmail.com>
-In-Reply-To: <20210812230716.747378-1-prestwoj@gmail.com>
+Subject: [PATCH 1/6] station: implement Scan on debug interface
+Date: Thu, 12 Aug 2021 16:12:28 -0700
+Message-ID: <20210812231233.747743-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7362323776983386496==
+--===============8294112569987946765==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-While losing the convenience of unittest this patch breaks out
-each individual test function in order to run it manually and
-get results. This vastly improves the user experience by seeing
-which test file and function is being executed rather than simply
-seeing "PASSED" for the entire test set.
-
-In addition exceptions/failures are printed out as they happen
-rather than at the end.
+This is to support the autotesting framework by allowing a smaller
+scan subset. This will cut down on the amount of time spent scanning
+via normal DBus scans (where the entire spectrum is scanned).
 ---
- tools/test-runner | 87 +++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 76 insertions(+), 11 deletions(-)
+ src/station.c | 107 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 107 insertions(+)
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 1ee2d6a6..bfa5d803 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1036,31 +1036,96 @@ def start_test(ctx, subtests, rqueue):
- 		results queue which is required since this is using
- 		multiprocessing.
- 	'''
--	suite =3D unittest.TestSuite()
-+	run =3D 0
-+	errors =3D 0
-+	failures =3D 0
-+	skipped =3D 0
+diff --git a/src/station.c b/src/station.c
+index 2155aa3c..5d447356 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3839,6 +3839,109 @@ invalid_args:
+ 	return dbus_error_invalid_args(message);
+ }
  =
 
-+	start =3D time.time()
- 	#
- 	# Iterate through each individual python test.
- 	#
- 	for s in subtests:
- 		loader =3D unittest.TestLoader()
--		subtest =3D importlib.import_module(os.path.splitext(s)[0])
--		suite.addTests(loader.loadTestsFromModule(subtest))
-+		module =3D importlib.import_module(os.path.splitext(s)[0])
-+		subtest =3D loader.loadTestsFromModule(module)
++static void station_debug_scan_triggered(int err, void *user_data)
++{
++	struct station *station =3D user_data;
++	struct l_dbus_message *reply;
 +
-+		# The test suite is being (ab)used to get a bit more granularity
-+		# with individual tests. The 'normal' way to use unittest is to
-+		# just create a test suite and run them. The problem here is that
-+		# test results are queued and printed at the very end so its
-+		# difficult to know *where* a test failed (python gives a stack
-+		# trace but printing the exception/failure immediately shows
-+		# where in the debug logs something failed). Moreso if there are
-+		# several test functions inside a single python file they run
-+		# as a single test and it is difficult (again) to know where
-+		# something failed.
++	if (err < 0) {
++		if (station->scan_pending) {
++			reply =3D dbus_error_from_errno(err,
++							station->scan_pending);
++			dbus_pending_reply(&station->scan_pending, reply);
++		}
 +
-+		# Iterating through each python test file
-+		for test in subtest:
-+			# Iterating through individual test functions inside a
-+			# Test() class. Due to the nature of unittest we have
-+			# to jump through some hoops to set up the test class
-+			# only once by turning the enumeration into a list, then
-+			# enumerating (again) to keep track of the index (just
-+			# enumerating the test class doesn't allow len() because
-+			# it is not a list).
-+			tlist =3D list(enumerate(test))
-+			for index, t in enumerate(tlist):
-+				# enumerate is returning a tuple, index 1 is our
-+				# actual object.
-+				t =3D t[1]
++		station_dbus_scan_done(station);
++		return;
++	}
 +
-+				func, file =3D str(t).split(' ')
-+				#
-+				# TODO: There may be a better way of doing this
-+				# but strigifying the test class gives us a string:
-+				# <function> (<file>.<class>)
-+				#
-+				file =3D file.strip('()').split('.')[0] + '.py'
++	l_debug("debug scan triggered for %s",
++			netdev_get_name(station->netdev));
 +
-+				# Set up class only on first test
-+				if index =3D=3D 0:
-+					dbg(file)
-+					t.setUpClass()
++	if (station->scan_pending) {
++		reply =3D l_dbus_message_new_method_return(station->scan_pending);
++		l_dbus_message_set_arguments(reply, "");
++		dbus_pending_reply(&station->scan_pending, reply);
++	}
 +
-+				dbg("\t%s RUNNING" % str(func), end=3D'')
-+				sys.__stdout__.flush()
++	station_property_set_scanning(station, true);
++}
 +
-+				# Run test (setUp/tearDown run automatically)
-+				result =3D t()
++static bool station_debug_scan_results(int err, struct l_queue *bss_list,
++					const struct scan_freq_set *freqs,
++					void *userdata)
++{
++	struct station *station =3D userdata;
++	bool autoconnect;
 +
-+				# Tear down class only on last test
-+				if index =3D=3D len(tlist) - 1:
-+					t.tearDownClass()
++	if (err) {
++		station_dbus_scan_done(station);
++		return false;
++	}
 +
-+				run +=3D result.testsRun
-+				errors +=3D len(result.errors)
-+				failures +=3D len(result.failures)
-+				skipped +=3D len(result.skipped)
++	autoconnect =3D station_is_autoconnecting(station);
++	station_set_scan_results(station, bss_list, freqs, autoconnect);
 +
-+				if len(result.errors) > 0 or len(result.failures) > 0:
-+					dbg(colored(" FAILED", "red"))
-+					for e in result.errors:
-+						dbg(e[1])
-+					for f in result.failures:
-+						dbg(f[1])
-+				elif len(result.skipped) > 0:
-+					dbg(colored(" SKIPPED", "cyan"))
-+				else:
-+					dbg(colored(" PASSED", "green"))
++	station_dbus_scan_done(station);
++
++	return true;
++}
++
++static struct l_dbus_message *station_debug_scan(struct l_dbus *dbus,
++						struct l_dbus_message *message,
++						void *user_data)
++{
++	struct station *station =3D user_data;
++	struct l_dbus_message_iter iter;
++	uint16_t *freqs;
++	uint32_t freqs_len;
++	struct scan_freq_set *freq_set;
++	unsigned int i;
++
++	if (station->dbus_scan_id)
++		return dbus_error_busy(message);
++
++	if (station->state =3D=3D STATION_STATE_CONNECTING ||
++			station->state =3D=3D STATION_STATE_CONNECTING_AUTO)
++		return dbus_error_busy(message);
++
++	if (!l_dbus_message_get_arguments(message, "aq", &iter))
++		goto invalid_args;
++
++	if (!l_dbus_message_iter_get_fixed_array(&iter, &freqs, &freqs_len))
++		goto invalid_args;
++
++	freq_set =3D scan_freq_set_new();
++
++	for (i =3D 0; i < freqs_len; i++) {
++		if (!scan_freq_set_add(freq_set, (uint32_t)freqs[i])) {
++			scan_freq_set_free(freq_set);
++			goto invalid_args;
++		}
++
++		l_debug("added frequency %u", freqs[i]);
++	}
++
++	station->dbus_scan_id =3D station_scan_trigger(station, freq_set,
++						station_debug_scan_triggered,
++						station_debug_scan_results,
++						NULL);
++
++	scan_freq_set_free(freq_set);
++
++	if (!station->dbus_scan_id)
++		goto failed;
++
++	station->scan_pending =3D l_dbus_message_ref(message);
++
++	return NULL;
++
++failed:
++	return dbus_error_failed(message);
++invalid_args:
++	return dbus_error_invalid_args(message);
++}
++
+ static bool station_property_get_autoconnect(struct l_dbus *dbus,
+ 					struct l_dbus_message *message,
+ 					struct l_dbus_message_builder *builder,
+@@ -3883,6 +3986,10 @@ static void station_setup_debug_interface(
+ 	l_dbus_interface_method(interface, "Roam", 0,
+ 					station_force_roam, "", "ay", "mac");
  =
 
- 		# Prevents future test modules with the same name (e.g.
- 		# connection_test.py) from being loaded from the cache
--		sys.modules.pop(subtest.__name__)
-+		sys.modules.pop(module.__name__)
- =
-
--	start =3D time.time()
--	runner =3D unittest.TextTestRunner()
--	result =3D runner.run(suite)
- 	#
- 	# The multiprocessing queue is picky with what objects it will serialize
- 	# and send between processes. Because of this we put the important bits
- 	# of the result into our own 'SimpleResult' tuple.
- 	#
--	sresult =3D SimpleResult(run=3Dresult.testsRun, failures=3Dlen(result.fai=
-lures),
--				errors=3Dlen(result.errors), skipped=3Dlen(result.skipped),
--				time=3Dtime.time() - start)
-+	sresult =3D SimpleResult(run=3Drun, failures=3Dfailures, errors=3Derrors,
-+				skipped=3Dskipped, time=3Dtime.time() - start)
- 	rqueue.put(sresult)
- =
-
- 	# This may not be required since we are manually popping sys.modules
-@@ -1072,7 +1137,7 @@ def pre_test(ctx, test, copied):
- 	'''
- 	os.chdir(test)
- =
-
--	dbg("Starting test %s" % test)
-+	dbg("\nStarting %s" % colored(os.path.basename(test), "white", attrs=3D['=
-bold']))
- 	if not os.path.exists(test + '/hw.conf'):
- 		raise Exception("No hw.conf found for %s" % test)
- =
-
++	l_dbus_interface_method(interface, "Scan", 0,
++					station_debug_scan, "", "aq",
++					"frequencies");
++
+ 	l_dbus_interface_property(interface, "AutoConnect", 0, "b",
+ 					station_property_get_autoconnect,
+ 					station_property_set_autoconnect);
 -- =
 
 2.31.1
 
---===============7362323776983386496==--
+--===============8294112569987946765==--
 
