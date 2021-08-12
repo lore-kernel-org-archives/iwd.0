@@ -1,86 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============2787749230503857547=="
+Content-Type: multipart/mixed; boundary="===============9135671841132038517=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/7] auto-t: iwd.py: add autoconnect property/StationDebug
-Date: Thu, 12 Aug 2021 13:38:08 -0700
-Message-ID: <20210812203812.738060-3-prestwoj@gmail.com>
+Subject: [PATCH 4/7] auto-t: iwd.py: make scan_if_needed True by default
+Date: Thu, 12 Aug 2021 13:38:09 -0700
+Message-ID: <20210812203812.738060-4-prestwoj@gmail.com>
 In-Reply-To: <20210812203812.738060-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2787749230503857547==
+--===============9135671841132038517==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+There is a common block of code in nearly every test which is incorrect,
+most likely a copy-paste from long ago. It goes something like:
+
+wd.wait_for_object_condition(device, 'not obj.scanning')
+device.scan()
+wd.wait_for_object_condition(device, 'not obj.scanning')
+
+network =3D device.get_ordered_network("ssid")
+
+The problem here is that sometimes the scanning property does not get
+updated fast enough before device.scan() returns, meaning get_ordered_netwo=
+rk
+comes up with nothing. Some tests pass scan_if_needed=3DTrue which 'fixes'
+this but ends up re-scanning after the original scan finishes.
+
+To put this to rest scan_if_needed is now defaulted to True, and no
+explicit scan should be needed.
 ---
- autotests/util/iwd.py | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ autotests/util/iwd.py | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 1785081f..5d041e57 100755
+index 5d041e57..f5c224b8 100755
 --- a/autotests/util/iwd.py
 +++ b/autotests/util/iwd.py
-@@ -226,6 +226,21 @@ class AdHocDevice(IWDDBusAbstract):
-     def connected_peers(self):
-         return self._properties['ConnectedPeers']
+@@ -410,7 +410,7 @@ class Device(IWDDBusAbstract):
  =
 
-+class StationDebug(IWDDBusAbstract):
-+    '''
-+        Class represents net.connman.iwd.StationDebug
-+    '''
-+    _iface_name =3D IWD_STATION_DEBUG_INTERFACE
-+
-+    def __init__(self, *args, **kwargs):
-+        self._debug_props =3D None
-+        self._debug_iface =3D None
-+
-+        IWDDBusAbstract.__init__(self, *args, **kwargs)
-+
-+    @property
-+    def autoconnect(self):
-+        return self._properties['AutoConnect']
+         self._wait_for_async_op()
  =
 
- class Device(IWDDBusAbstract):
-     '''
-@@ -238,6 +253,7 @@ class Device(IWDDBusAbstract):
-         self._wps_manager_if =3D None
-         self._station_if =3D None
-         self._station_props =3D None
-+        self._station_debug =3D None
-         IWDDBusAbstract.__init__(self, *args, **kwargs)
+-    def get_ordered_networks(self, scan_if_needed =3D False):
++    def get_ordered_networks(self, scan_if_needed =3D True):
+         '''Return the list of networks found in the most recent
+            scan, sorted by their user interface importance
+            score as calculated by iwd.  If the device is
+@@ -432,7 +432,13 @@ class Device(IWDDBusAbstract):
+         elif not scan_if_needed:
+             return None
  =
 
-     @property
-@@ -354,6 +370,21 @@ class Device(IWDDBusAbstract):
-         props =3D self._station_properties()
-         return bool(props['Scanning'])
+-        self.scan()
++        condition =3D 'not obj.scanning'
++        IWD._wait_for_object_condition(self, condition)
++
++        try:
++            self.scan()
++        except InProgressEx:
++            pass
  =
 
-+    @property
-+    def autoconnect(self):
-+        if not self._station_debug:
-+            self._station_debug =3D StationDebug(self._object_path)
-+
-+        return self._station_debug.autoconnect
-+
-+    @autoconnect.setter
-+    def autoconnect(self, value):
-+        if not self._station_debug:
-+            self._station_debug =3D StationDebug(self._object_path)
-+
-+        self._station_debug._prop_proxy.Set(IWD_STATION_DEBUG_INTERFACE,
-+                                            'AutoConnect', value)
-+
-     def scan(self):
-         '''Schedule a network scan.
+         condition =3D 'obj.scanning'
+         IWD._wait_for_object_condition(self, condition)
+@@ -448,7 +454,7 @@ class Device(IWDDBusAbstract):
  =
 
+         return None
+ =
+
+-    def get_ordered_network(self, network, scan_if_needed =3D False):
++    def get_ordered_network(self, network, scan_if_needed =3D True):
+         '''Returns a single network from ordered network call, or None if =
+the
+            network wasn't found. If the network is not found an exception =
+is
+            raised, this removes the need to extra asserts in autotests.
 -- =
 
 2.31.1
 
---===============2787749230503857547==--
+--===============9135671841132038517==--
 
