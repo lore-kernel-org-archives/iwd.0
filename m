@@ -1,13 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============0817495700827093835=="
+Content-Type: multipart/mixed; boundary="===============3129739252849791153=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/3] test-runner: print uncaught test exceptions always
-Date: Thu, 12 Aug 2021 16:07:14 -0700
-Message-ID: <20210812230716.747378-1-prestwoj@gmail.com>
+Subject: [PATCH 2/3] test-runner: pass **kwargs in dbg()
+Date: Thu, 12 Aug 2021 16:07:15 -0700
+Message-ID: <20210812230716.747378-2-prestwoj@gmail.com>
+In-Reply-To: <20210812230716.747378-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0817495700827093835==
+--===============3129739252849791153==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -17,25 +18,29 @@ Content-Transfer-Encoding: quoted-printable
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index 1d148b13..f18ae538 100755
+index f18ae538..1ee2d6a6 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -1259,8 +1259,8 @@ def run_auto_tests(ctx, args):
- 				ctx.results[os.path.basename(test)] =3D rqueue.get()
+@@ -46,11 +46,11 @@ TEST_MAX_TIMEOUT =3D 120
  =
 
- 		except Exception as ex:
--			print(ex)
--			print("Uncaught exception thrown for %s" % test)
-+			dbg(ex)
-+			dbg("Uncaught exception thrown for %s" % test)
- 			ctx.results[os.path.basename(test)] =3D SimpleResult(run=3D0, failures=
-=3D0,
- 								errors=3D0, skipped=3D0, time=3D0)
- 		finally:
+ dbus.mainloop.glib.DBusGMainLoop(set_as_default=3DTrue)
+ =
+
+-def dbg(*s):
++def dbg(*s, **kwargs):
+ 	'''
+ 		Allows prints if stdout has been re-directed
+ 	'''
+-	print(*s, file=3Dsys.__stdout__)
++	print(*s, **kwargs, file=3Dsys.__stdout__)
+ =
+
+ def exit_vm():
+ 	if config:
 -- =
 
 2.31.1
 
---===============0817495700827093835==--
+--===============3129739252849791153==--
 
