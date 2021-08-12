@@ -1,134 +1,74 @@
-Content-Type: multipart/mixed; boundary="===============4648079919967345074=="
+Content-Type: multipart/mixed; boundary="===============1189420930280154410=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/6] test-runner: start HostapdCLI from test-runner
-Date: Thu, 12 Aug 2021 16:12:30 -0700
-Message-ID: <20210812231233.747743-3-prestwoj@gmail.com>
+Subject: [PATCH 4/6] auto-t: iwd.py: scan only on needed frequencies
+Date: Thu, 12 Aug 2021 16:12:31 -0700
+Message-ID: <20210812231233.747743-4-prestwoj@gmail.com>
 In-Reply-To: <20210812231233.747743-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4648079919967345074==
+--===============1189420930280154410==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This gives the benefit of test-runner itself having access to
-the CLI, e.g. for getting status information.
+get_ordered_network() now scans automatically and has been updated
+to use the StationDebug.Scan() API rather than doing a full
+dbus scan (unless full_scan =3D True). The frequencies to be scanned
+are picked automatically based on the current hostapd status
+(hidden behind ctx.hostapd.get_frequency()).
 ---
- autotests/util/hostapd.py | 32 +++++++++++++++++++++++++++++---
- tools/test-runner         | 14 ++++++++++++++
- 2 files changed, 43 insertions(+), 3 deletions(-)
+ autotests/util/iwd.py | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index f75dbe6b..1575d832 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -42,6 +42,24 @@ class HostapdCLI:
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 7bb4c9f0..cee1b99d 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -414,7 +414,7 @@ class Device(IWDDBusAbstract):
  =
 
-         hapd =3D ctx.hostapd[config]
+         self._wait_for_async_op()
  =
 
-+        if not hasattr(self, '_hostapd_restarted'):
-+            self._hostapd_restarted =3D False
-+
-+        #
-+        # TODO: In theory some type of instance singleton could be created=
- for
-+        #       HostapdCLI where test-runner initializes but any subsequent
-+        #       call to HostapdCLI (with the same config) returns the same
-+        #       object that test-runner has. This would avoid setting these
-+        #       variables.
-+        #
-+        if hapd.cli:
-+            self.ifname =3D hapd.cli.ifname
-+            self.ctrl_sock =3D hapd.cli.ctrl_sock
-+            self.cmdline =3D hapd.cli.cmdline
-+            self.interface =3D hapd.intf
-+            self.config =3D hapd.config
-+            return
-+
-         self.interface =3D hapd.intf
-         self.config =3D hapd.config
+-    def get_ordered_networks(self, scan_if_needed =3D True):
++    def get_ordered_networks(self, scan_if_needed =3D True, full_scan =3D =
+False):
+         '''Return the list of networks found in the most recent
+            scan, sorted by their user interface importance
+            score as calculated by iwd.  If the device is
+@@ -440,7 +440,10 @@ class Device(IWDDBusAbstract):
+         IWD._wait_for_object_condition(self, condition)
  =
 
-@@ -53,9 +71,6 @@ class HostapdCLI:
+         try:
+-            self.scan()
++            if full_scan:
++                self.scan()
++            else:
++                self.debug_scan(ctx.get_frequencies())
+         except InProgressEx:
+             pass
  =
 
-         self.cmdline =3D ['hostapd_cli', '-p', self.socket_path, '-i', sel=
-f.ifname]
+@@ -458,7 +461,7 @@ class Device(IWDDBusAbstract):
  =
 
--        if not hasattr(self, '_hostapd_restarted'):
--            self._hostapd_restarted =3D False
--
-         self.local_ctrl =3D '/tmp/hostapd_' + str(os.getpid()) + '_' + \
-                             str(ctrl_count)
-         self.ctrl_sock =3D socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-@@ -244,3 +259,14 @@ class HostapdCLI:
-         bssid =3D [x for x in status if x.startswith('bssid')]
-         bssid =3D bssid[0].split('=3D')
-         return bssid[1]
-+
-+    @property
-+    def frequency(self):
-+        cmd =3D self.cmdline + ['status']
-+        status =3D ctx.start_process(cmd, wait=3DTrue, need_out=3DTrue).out
-+        status =3D status.split('\n')
-+
-+        frequency =3D [x for x in status if x.startswith('freq')][0]
-+        frequency =3D frequency.split('=3D')[1]
-+
-+        return int(frequency)
-diff --git a/tools/test-runner b/tools/test-runner
-index bfa5d803..87f6ec6d 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -428,6 +428,7 @@ class HostapdInstance:
- 	def __init__(self, config, radio):
- 		self.radio =3D radio
- 		self.config =3D config
-+		self.cli =3D None
+         return None
  =
 
- 		self.intf =3D radio.create_interface(self.config, 'hostapd')
- 		self.intf.set_interface_state('up')
-@@ -494,6 +495,10 @@ class Hostapd:
- =
-
- 		self.process.wait_for_socket(self.global_ctrl_iface, 30)
- =
-
-+	def attach_cli(self):
-+		for hapd in self.instances:
-+			hapd.cli =3D importlib.import_module('hostapd').HostapdCLI(config=3Dhap=
-d.config)
-+
- 	def _rewrite_config(self, config):
- 		'''
- 			Replaces any $ifaceN values with the correct interface
-@@ -841,6 +846,15 @@ class TestContext(Namespace):
- 		radius_config =3D settings.get('radius_server', None)
- =
-
- 		self.hostapd =3D Hostapd(self, hapd_radios, hapd_configs, radius_config)
-+		self.hostapd.attach_cli()
-+
-+	def get_frequencies(self):
-+		frequencies =3D []
-+
-+		for hapd in self.hostapd.instances:
-+			frequencies.append(hapd.cli.frequency)
-+
-+		return frequencies
- =
-
- 	def start_wpas_interfaces(self):
- 		if 'WPA_SUPPLICANT' not in self.hw_config:
+-    def get_ordered_network(self, network, scan_if_needed =3D True):
++    def get_ordered_network(self, network, scan_if_needed =3D True, full_s=
+can =3D False):
+         '''Returns a single network from ordered network call, or None if =
+the
+            network wasn't found. If the network is not found an exception =
+is
+            raised, this removes the need to extra asserts in autotests.
 -- =
 
 2.31.1
 
---===============4648079919967345074==--
+--===============1189420930280154410==--
 
