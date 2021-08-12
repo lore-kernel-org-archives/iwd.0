@@ -1,252 +1,168 @@
-Content-Type: multipart/mixed; boundary="===============7684226261546012428=="
+Content-Type: multipart/mixed; boundary="===============2536789383343248096=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 10/18] auto-t: add reassociation test for OWE
-Date: Thu, 12 Aug 2021 13:21:59 -0700
-Message-ID: <20210812202207.737053-10-prestwoj@gmail.com>
+Subject: [PATCH 11/18] auto-t: update testFT-8021x-roam to use roam() API
+Date: Thu, 12 Aug 2021 13:22:00 -0700
+Message-ID: <20210812202207.737053-11-prestwoj@gmail.com>
 In-Reply-To: <20210812202207.737053-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7684226261546012428==
+--===============2536789383343248096==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The timeout test was also modified to handle the additional
-radio.
 ---
- autotests/testOWE/connection_test.py          | 47 +++++++++++++------
- autotests/testOWE/hw.conf                     |  7 +--
- autotests/testOWE/main.conf                   |  2 +
- .../testOWE/{ssidOWE.conf =3D> ssidOWE-1.conf}  |  0
- autotests/testOWE/ssidOWE-2.conf              |  8 ++++
- autotests/testOWE/timeout_test.py             | 22 +++++++--
- 6 files changed, 66 insertions(+), 20 deletions(-)
- create mode 100644 autotests/testOWE/main.conf
- rename autotests/testOWE/{ssidOWE.conf =3D> ssidOWE-1.conf} (100%)
- create mode 100644 autotests/testOWE/ssidOWE-2.conf
+ .../testFT-8021x-roam/connection_test.py      | 56 ++-----------------
+ 1 file changed, 5 insertions(+), 51 deletions(-)
 
-diff --git a/autotests/testOWE/connection_test.py b/autotests/testOWE/conne=
-ction_test.py
-index ee1036c8..0be09263 100644
---- a/autotests/testOWE/connection_test.py
-+++ b/autotests/testOWE/connection_test.py
-@@ -13,40 +13,59 @@ import testutil
+diff --git a/autotests/testFT-8021x-roam/connection_test.py b/autotests/tes=
+tFT-8021x-roam/connection_test.py
+index aa8eddba..cd6ebbab 100644
+--- a/autotests/testFT-8021x-roam/connection_test.py
++++ b/autotests/testFT-8021x-roam/connection_test.py
+@@ -4,56 +4,25 @@ import unittest
+ import sys, os
+ =
+
+ sys.path.append('../util')
+-import iwd
+ from iwd import IWD
+ from iwd import NetworkType
+-from hwsim import Hwsim
+ from hostapd import HostapdCLI
+ import testutil
+ =
+
  class Test(unittest.TestCase):
+     def test_roam_success(self):
+-        hwsim =3D Hwsim()
+-
+-        rule0 =3D hwsim.rules.create()
+-        rule0.source =3D self.bss_radio[0].addresses[0]
+-        rule0.bidirectional =3D True
+-
+-        rule1 =3D hwsim.rules.create()
+-        rule1.source =3D self.bss_radio[1].addresses[0]
+-        rule1.bidirectional =3D True
+-
+-        # Check that iwd selects BSS 0 first
+-        rule0.signal =3D -2000
+-        rule1.signal =3D -6900
+-
+         wd =3D IWD(True)
  =
 
-     def test_connection_success(self):
--        hapd =3D HostapdCLI(config=3D'ssidOWE.conf')
-+        hapd =3D HostapdCLI(config=3D'ssidOWE-1.conf')
- =
-
-         wd =3D IWD()
- =
-
-         devices =3D wd.list_devices(1)
-         device =3D devices[0]
+         device =3D wd.list_devices(1)[0]
  =
 
 -        condition =3D 'not obj.scanning'
 -        wd.wait_for_object_condition(device, condition)
-+        device.get_ordered_network('ssidOWE', scan_if_needed=3DTrue)
- =
-
+-
 -        device.scan()
-+        device.connect_bssid(hapd.bssid)
- =
-
+-
+-        condition =3D 'obj.scanning'
+-        wd.wait_for_object_condition(device, condition)
+-
 -        condition =3D 'not obj.scanning'
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(device, condition)
+-        wd.wait_for_object_condition(device, condition)
+-
+-        ordered_network =3D device.get_ordered_network('TestFT')
++        ordered_network =3D device.get_ordered_network('TestFT', scan_if_n=
+eeded=3DTrue)
  =
 
--        ordered_network =3D device.get_ordered_network('ssidOWE')
-+        testutil.test_iface_operstate()
-+        testutil.test_ifaces_connected(device.name, hapd.ifname)
- =
-
--        self.assertEqual(ordered_network.type, NetworkType.open)
-+        device.disconnect()
- =
-
+         self.assertEqual(ordered_network.type, NetworkType.eap)
+-        self.assertEqual(ordered_network.signal_strength, -2000)
+-
 -        condition =3D 'not obj.connected'
 -        wd.wait_for_object_condition(ordered_network.network_object, condi=
 tion)
-+    def test_reassociate(self):
-+        hapd0 =3D HostapdCLI(config=3D'ssidOWE-1.conf')
-+        hapd1 =3D HostapdCLI(config=3D'ssidOWE-2.conf')
+ =
+
+         self.assertFalse(self.bss_hostapd[0].list_sta())
+         self.assertFalse(self.bss_hostapd[1].list_sta())
  =
 
 -        ordered_network.network_object.connect()
-+        wd =3D IWD()
-+
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+
-+        device.get_ordered_network('ssidOWE', scan_if_needed=3DTrue)
-+
-+        device.connect_bssid(hapd0.bssid)
++        device.connect_bssid(self.bss_hostapd[0].bssid)
  =
 
          condition =3D 'obj.state =3D=3D DeviceState.connected'
          wd.wait_for_object_condition(device, condition)
+@@ -64,15 +33,9 @@ class Test(unittest.TestCase):
+         testutil.test_iface_operstate(device.name)
+         testutil.test_ifaces_connected(self.bss_hostapd[0].ifname, device.=
+name)
+         self.assertRaises(Exception, testutil.test_ifaces_connected,
+-                          (self.bss_hostapd[1].ifname, device.name))
++                          (self.bss_hostapd[1].ifname, device.name, True, =
+True))
  =
 
-         testutil.test_iface_operstate()
--        testutil.test_ifaces_connected(device.name, hapd.ifname)
-+        testutil.test_ifaces_connected(device.name, hapd0.ifname)
+-        # Check that iwd starts transition to BSS 1 in less than 10 second=
+s.
+-        # The 10 seconds is longer than needed to scan on just two channels
+-        # but short enough that a full scan on the 2.4 + 5.8 bands support=
+ed
+-        # by mac80211_hwsim will not finish.  If this times out then, but
+-        # device_roam_trigger_cb has happened, it probably means that
+-        # Neighbor Reports are broken.
+-        rule0.signal =3D -8000
++        device.roam(self.bss_hostapd[1].bssid)
  =
 
--        device.disconnect()
-+        device.roam(hapd1.bssid)
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.roaming'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        from_condition =3D 'obj.state =3D=3D DeviceState.roaming'
-+        to_condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_change(device, from_condition, to_condition)
-+
-+        self.assertTrue(hapd1.list_sta())
- =
-
--        condition =3D 'not obj.connected'
--        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+        testutil.test_iface_operstate(device.name)
-+        testutil.test_ifaces_connected(hapd1.ifname, device.name)
-+        self.assertRaises(Exception, testutil.test_ifaces_connected,
-+                          (hapd0.ifname, device.name, True, True))
- =
-
-     @classmethod
-     def setUpClass(cls):
-diff --git a/autotests/testOWE/hw.conf b/autotests/testOWE/hw.conf
-index 7f6d938d..fe59f389 100644
---- a/autotests/testOWE/hw.conf
-+++ b/autotests/testOWE/hw.conf
-@@ -1,6 +1,7 @@
- [SETUP]
--num_radios=3D3
-+num_radios=3D4
- =
-
- [HOSTAPD]
--rad0=3DssidOWE.conf
--rad1=3DssidGroup20.conf
-+rad0=3DssidOWE-1.conf
-+rad1=3DssidOWE-2.conf
-+rad2=3DssidGroup20.conf
-diff --git a/autotests/testOWE/main.conf b/autotests/testOWE/main.conf
-new file mode 100644
-index 00000000..9452fb6b
---- /dev/null
-+++ b/autotests/testOWE/main.conf
-@@ -0,0 +1,2 @@
-+[Scan]
-+DisableMacAddressRandomization=3Dtrue
-diff --git a/autotests/testOWE/ssidOWE.conf b/autotests/testOWE/ssidOWE-1.c=
-onf
-similarity index 100%
-rename from autotests/testOWE/ssidOWE.conf
-rename to autotests/testOWE/ssidOWE-1.conf
-diff --git a/autotests/testOWE/ssidOWE-2.conf b/autotests/testOWE/ssidOWE-2=
-.conf
-new file mode 100644
-index 00000000..d9528a36
---- /dev/null
-+++ b/autotests/testOWE/ssidOWE-2.conf
-@@ -0,0 +1,8 @@
-+ctrl_interface=3D/var/run/hostapd
-+hw_mode=3Dg
-+channel=3D2
-+ssid=3DssidOWE
-+wpa=3D2
-+wpa_key_mgmt=3DOWE
-+rsn_pairwise=3DCCMP
-+owe_groups=3D19
-diff --git a/autotests/testOWE/timeout_test.py b/autotests/testOWE/timeout_=
-test.py
-index 39c2d429..d75bc8b9 100644
---- a/autotests/testOWE/timeout_test.py
-+++ b/autotests/testOWE/timeout_test.py
-@@ -17,9 +17,10 @@ class Test(unittest.TestCase):
-     def test_connection_success(self):
-         hwsim =3D Hwsim()
- =
-
--        bss_radio =3D hwsim.get_radio('rad0')
-+        bss_radio0 =3D hwsim.get_radio('rad0')
-+        bss_radio1 =3D hwsim.get_radio('rad1')
- =
-
--        self.assertIsNotNone(bss_radio)
-+        self.assertIsNotNone(bss_radio0)
- =
-
-         wd =3D IWD()
- =
-
-@@ -31,6 +32,9 @@ class Test(unittest.TestCase):
- =
-
-         device.scan()
- =
-
-+        condition =3D 'obj.scanning'
-+        wd.wait_for_object_condition(device, condition)
-+
-         condition =3D 'not obj.scanning'
+         condition =3D 'obj.state =3D=3D DeviceState.roaming'
          wd.wait_for_object_condition(device, condition)
+@@ -88,7 +51,7 @@ class Test(unittest.TestCase):
+         testutil.test_iface_operstate(device.name)
+         testutil.test_ifaces_connected(self.bss_hostapd[1].ifname, device.=
+name)
+         self.assertRaises(Exception, testutil.test_ifaces_connected,
+-                          (self.bss_hostapd[0].ifname, device.name))
++                          (self.bss_hostapd[0].ifname, device.name, True, =
+True))
  =
 
-@@ -42,21 +46,33 @@ class Test(unittest.TestCase):
-         wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
+     def tearDown(self):
+         os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" down')
+@@ -96,20 +59,12 @@ class Test(unittest.TestCase):
+         os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" up')
+         os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" up')
  =
 
-         rule0 =3D hwsim.rules.create()
--        rule0.source =3D bss_radio.addresses[0]
-+        rule0.source =3D bss_radio0.addresses[0]
-         rule0.bidirectional =3D True
-         rule0.drop =3D True
-         rule0.prefix =3D 'b0'
- =
-
-+        rule1 =3D hwsim.rules.create()
-+        rule1.source =3D bss_radio1.addresses[0]
-+        rule1.bidirectional =3D True
-+        rule1.drop =3D True
-+        rule1.prefix =3D 'b0'
-+
-         # Test Authenticate (b0) and Association (00) timeouts
- =
-
-         with self.assertRaises(iwd.FailedEx):
-             ordered_network.network_object.connect()
- =
-
-         rule0.prefix =3D '00'
-+        rule1.prefix =3D '00'
- =
-
-         with self.assertRaises(iwd.FailedEx):
-             ordered_network.network_object.connect()
- =
-
-+    def tearDown(self):
-+        hwsim =3D Hwsim()
-+        for rule in list(hwsim.rules.keys()):
-+            del hwsim.rules[rule]
-+
+-        hwsim =3D Hwsim()
+-        for rule in list(hwsim.rules.keys()):
+-            del hwsim.rules[rule]
+-
      @classmethod
      def setUpClass(cls):
-         pass
+         IWD.copy_to_storage('TestFT.8021x')
+ =
+
+-        hwsim =3D Hwsim()
+-
+         cls.bss_hostapd =3D [ HostapdCLI(config=3D'ft-eap-ccmp-1.conf'),
+                             HostapdCLI(config=3D'ft-eap-ccmp-2.conf') ]
+-        cls.bss_radio =3D  [ hwsim.get_radio('rad0'),
+-                           hwsim.get_radio('rad1') ]
+ =
+
+         # Set interface addresses to those expected by hostapd config files
+         os.system('ifconfig "' + cls.bss_hostapd[0].ifname +
+@@ -136,7 +91,6 @@ class Test(unittest.TestCase):
+     def tearDownClass(cls):
+         IWD.clear_storage()
+         cls.bss_hostapd =3D None
+-        cls.bss_radio =3D None
+ =
+
+ if __name__ =3D=3D '__main__':
+     unittest.main(exit=3DTrue)
 -- =
 
 2.31.1
 
---===============7684226261546012428==--
+--===============2536789383343248096==--
 
