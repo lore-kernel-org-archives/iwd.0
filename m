@@ -1,40 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============5126484079707968280=="
+Content-Type: multipart/mixed; boundary="===============4613497523159844035=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v4 1/3] station: add ConnectBssid() developer method
-Date: Thu, 12 Aug 2021 14:59:51 -0500
-Message-ID: <4323558b-c5d4-3bfe-12b4-4bbd975de6a6@gmail.com>
-In-Reply-To: <20210812190723.732722-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 01/18] auto-t: hostapd.py: add 'bssid' property
+Date: Thu, 12 Aug 2021 13:21:50 -0700
+Message-ID: <20210812202207.737053-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5126484079707968280==
+--===============4613497523159844035==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This gets the APs BSSID, bypassing the need to use hwsim
+for obtaining this address.
+---
+ autotests/util/hostapd.py | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-On 8/12/21 2:07 PM, James Prestwood wrote:
-> This method will initiate a connection to a specific BSS rather
-> than relying on a network based connection (which the user has
-> no control over which specific BSS is selected).
-> ---
->   src/station.c | 143 ++++++++++++++++++++++++++++++++++++++------------
->   1 file changed, 109 insertions(+), 34 deletions(-)
-> =
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 6031b1dc..f75dbe6b 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -234,3 +234,13 @@ class HostapdCLI:
+         '''
+         cmd =3D self.cmdline + ['req_beacon', addr, request]
+         ctx.start_process(cmd, wait=3DTrue)
++
++    @property
++    def bssid(self):
++        cmd =3D self.cmdline + ['status']
++        status =3D ctx.start_process(cmd, wait=3DTrue, need_out=3DTrue).out
++        status =3D status.split('\n')
++
++        bssid =3D [x for x in status if x.startswith('bssid')]
++        bssid =3D bssid[0].split('=3D')
++        return bssid[1]
+-- =
 
-> v4:
->   * Reworked station_parse_bss to just parse security
->   * Updated the common code in station to use station_parse_bss_security
->   * Limited ConnectBssid() to only non-hidden networks
-> =
+2.31.1
 
-
-All applied, thanks.
-
-Regards,
--Denis
-
---===============5126484079707968280==--
+--===============4613497523159844035==--
 
