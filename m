@@ -1,50 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============6246740025970182063=="
+Content-Type: multipart/mixed; boundary="===============3355023303111926879=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
 Subject: Re: Failing to resolve after roams
-Date: Thu, 12 Aug 2021 15:30:07 +0100
-Message-ID: <CACsRnHXdDCfnRVgJ4UiWKqTmoEDcFfCPzkFN6v4rrRR9GX29Hg@mail.gmail.com>
-In-Reply-To: <8c08d082-0494-8e77-32fb-2b42d99599cf@gmail.com>
+Date: Thu, 12 Aug 2021 09:40:54 -0500
+Message-ID: <d8ffff0a-17c8-9edd-7064-be62af96317b@gmail.com>
+In-Reply-To: <CACsRnHXdDCfnRVgJ4UiWKqTmoEDcFfCPzkFN6v4rrRR9GX29Hg@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6246740025970182063==
+--===============3355023303111926879==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi Michael,
 
-`systemd-networkd` isn't managing the wireless interface but still
-needs to run for wired connections (or at least shouldn't be). I'm not
-sure why it still prints connected/disconnect states. How does `iwd`
-interact with `systemd-resolved`?
+On 8/12/21 9:30 AM, Michael Johnson wrote:
+> Hi Denis,
+> =
 
-Regards,
-Michael
+> `systemd-networkd` isn't managing the wireless interface but still
+> needs to run for wired connections (or at least shouldn't be). I'm not
 
-On Thu, 12 Aug 2021 at 15:24, Denis Kenzior <denkenz@gmail.com> wrote:
->
-> Hi Michael,
->
-> On 8/10/21 5:58 AM, Michael Johnson wrote:
-> > Hi all,
-> >
-> > I'm having a problem with iwd when it comes to roaming. Most of the
-> > time it is working perfectly but rarely I get into this situation > whe=
-re I can't resolve any hostnames.
-> > I'm using a default server setup on ubuntu which uses systemd-networkd
-> > and systemd-resolved with iwd configured to use
-> > `EnableNetworkConfiguration=3Dtrue`.
-> >
->
-> Hmm, are you configuring systemd-networkd not to manage wireless interfac=
-es?
-> Otherwise iwd and networkd might be fighting each other when it comes to
-> managing the network interface.  Generally, one would not set
-> 'EnableNetworkConfiguration=3Dtrue' if networkd is being used.
->
-> Regards,
-> -Denis
---===============6246740025970182063==--
+Okay.  Not sure we tested such a setup here...
+
+> sure why it still prints connected/disconnect states. How does `iwd`
+> interact with `systemd-resolved`?
+
+iwd uses systemd-resolved dbus API to set up certain information obtained f=
+rom =
+
+DHCP (DNS, hostname, etc).  See [1].
+
+You can poke around in src/resolve.c in iwd tree for more details.  Right n=
+ow =
+
+iwd assumes that no IP configuration details change on a roam (which is wha=
+t =
+
+802.11 says).  There may be networks where this assumption breaks, but we =
+
+haven't seen any yet.  So at the moment, the resolved settings are left =
+
+untouched between roams.
+
+It might help to spy on the resolved dbus interface using dbus-monitor and =
+see =
+
+if we can learn something useful from that.
+
+[1] https://www.freedesktop.org/software/systemd/man/org.freedesktop.resolv=
+e1.html
+--===============3355023303111926879==--
 
