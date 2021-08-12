@@ -1,50 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============0206867645415315065=="
+Content-Type: multipart/mixed; boundary="===============2411414611567340225=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 03/18] test-runner: don't fatally exit on bad test
- configuration
-Date: Thu, 12 Aug 2021 13:21:52 -0700
-Message-ID: <20210812202207.737053-3-prestwoj@gmail.com>
+Subject: [PATCH 04/18] test-runner: don't run duplicate tests
+Date: Thu, 12 Aug 2021 13:21:53 -0700
+Message-ID: <20210812202207.737053-4-prestwoj@gmail.com>
 In-Reply-To: <20210812202207.737053-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0206867645415315065==
+--===============2411414611567340225==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If a test has no hw.conf file test-runner was fully exiting and not
-running any additional tests. This shouldn't happen in practice
-since all upstreamed tests should run, but if any locally created
-tests existed like this, it would cause the entire test run to exit
-early.
-
-Instead raise an exception which bails out of only that test, and
-allows the rest to continue.
+If the user provides duplicate tests in the list only append one
+of them to the list. This can happen accidentally when using
+glob matches.
 ---
- tools/test-runner | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ tools/test-runner | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index 7e789dd7..939efa51 100755
+index 939efa51..28c7d900 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -1072,8 +1072,7 @@ def pre_test(ctx, test, copied):
+@@ -1013,15 +1013,17 @@ def build_test_list(args):
+ 				tests =3D [test_root + '/' + x for x in full_list[i:] \
+ 							if x.startswith('test')]
+ 			elif os.path.exists(t):
+-				tests.append(t)
++				if t not in tests:
++					tests.append(t)
+ 			elif os.path.exists(path):
+-				tests.append(path)
++				if path not in tests:
++					tests.append(path)
+ 			else:
+ 				matches =3D glob(path)
+ 				if matches =3D=3D []:
+ 					raise Exception("Could not find test %s" % t)
  =
 
- 	dbg("Starting test %s" % test)
- 	if not os.path.exists(test + '/hw.conf'):
--		print("No hw.conf found for %s" % test)
--		exit()
-+		raise Exception("No hw.conf found for %s" % test)
+-				tests.extend(matches)
++				tests.extend(list(set(matches) - set(tests)))
  =
 
- 	ctx.hw_config =3D ConfigParser()
- 	ctx.hw_config.read(test + '/hw.conf')
+ 	return sorted(tests)
+ =
+
 -- =
 
 2.31.1
 
---===============0206867645415315065==--
+--===============2411414611567340225==--
 
