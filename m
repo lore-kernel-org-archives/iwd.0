@@ -1,42 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============0478131524724538787=="
+Content-Type: multipart/mixed; boundary="===============8123777265631791047=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/6] auto-t: use .frequency property in SAQuery-spoofing test
-Date: Thu, 12 Aug 2021 16:12:32 -0700
-Message-ID: <20210812231233.747743-5-prestwoj@gmail.com>
+Subject: [PATCH 6/6] auto-t: hostapd.py: remove get_freq()/get_config_value()
+Date: Thu, 12 Aug 2021 16:12:33 -0700
+Message-ID: <20210812231233.747743-6-prestwoj@gmail.com>
 In-Reply-To: <20210812231233.747743-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0478131524724538787==
+--===============8123777265631791047==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- autotests/testSAQuery-spoofing/connection_test.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ autotests/util/hostapd.py | 14 --------------
+ 1 file changed, 14 deletions(-)
 
-diff --git a/autotests/testSAQuery-spoofing/connection_test.py b/autotests/=
-testSAQuery-spoofing/connection_test.py
-index c4c4e923..f64a93f7 100644
---- a/autotests/testSAQuery-spoofing/connection_test.py
-+++ b/autotests/testSAQuery-spoofing/connection_test.py
-@@ -49,7 +49,7 @@ class Test(unittest.TestCase):
-             wd.wait_for_object_condition(device, condition)
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 1575d832..be6e1143 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -212,20 +212,6 @@ class HostapdCLI:
+         if 'OK' not in proc.out:
+             raise Exception('BSS_TM_REQ failed, is hostapd built with CONF=
+IG_WNM_AP=3Dy?')
  =
 
-         # Spoof a disassociate frame. This will kick off SA Query procedur=
-e.
--        hwsim.spoof_disassociate(radio, hostapd.get_freq(), device.address)
-+        hwsim.spoof_disassociate(radio, hostapd.frequency, device.address)
- =
-
-         # sleep to ensure hostapd responds and SA Query does not timeout
-         sleep(4)
+-    def get_config_value(self, key):
+-        # first find the right config file
+-        with open(self.config, 'r') as f:
+-            # read in config file and search for key
+-            cfg =3D f.read()
+-            match =3D re.search(r'%s=3D.*' % key, cfg)
+-            if match:
+-                return match.group(0).split('=3D')[1]
+-        return None
+-
+-
+-    def get_freq(self):
+-        return chan_freq_map[int(self.get_config_value('channel'))]
+-
+     def ungraceful_restart(self):
+         '''
+             Ungracefully kill and restart hostapd
 -- =
 
 2.31.1
 
---===============0478131524724538787==--
+--===============8123777265631791047==--
 
