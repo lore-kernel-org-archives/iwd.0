@@ -1,36 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============6693444712661853719=="
+Content-Type: multipart/mixed; boundary="===============6447575528315301502=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/7] station: make autoconnect settable via debug interface
-Date: Thu, 12 Aug 2021 16:59:32 -0500
-Message-ID: <0660c88a-90b4-13da-d2cd-6cbae57bbc37@gmail.com>
-In-Reply-To: <20210812203812.738060-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] station: set autoconnect via setter
+Date: Thu, 12 Aug 2021 15:24:58 -0700
+Message-ID: <20210812222458.744008-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6693444712661853719==
+--===============6447575528315301502==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This updates the autoconnect property for the debug interface
+---
+ src/station.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On 8/12/21 3:38 PM, James Prestwood wrote:
-> This adds the property "AutoConnect" to the station debug interface
-> which can be read/written to disable or enable autoconnect globally.
-> As one would expect this property is only going to be used for testing
-> hence why it was put on the debug interface. Mosts tests disable
-> autoconnect (or they should) because it leads to unexpected connections.
-> ---
->   src/station.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 44 insertions(+)
-> =
+diff --git a/src/station.c b/src/station.c
+index b2e12e9a..a1885cfa 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2695,7 +2695,8 @@ void station_connect_network(struct station *station,=
+ struct network *network,
+ 	station_enter_state(station, STATION_STATE_CONNECTING);
+ =
 
+ 	station->connect_pending =3D l_dbus_message_ref(message);
+-	station->autoconnect =3D true;
++
++	station_set_autoconnect(station, true);
+ =
 
-All applied, thanks.
+ 	return;
+ =
 
-Regards,
--Denis
+-- =
 
---===============6693444712661853719==--
+2.31.1
+
+--===============6447575528315301502==--
 
