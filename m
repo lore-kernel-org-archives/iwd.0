@@ -1,51 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============7793852581833453913=="
+Content-Type: multipart/mixed; boundary="===============6177740409151847284=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: how to get info about connected clients when iwd runs in AP mode?
-Date: Wed, 11 Aug 2021 14:32:49 -0700
-Message-ID: <00f5a5c0900d6b6c87410f0351775da9e4672865.camel@gmail.com>
-In-Reply-To: <20210811212813.2797.11785@ml01.vlan13.01.org>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: How to connect to client network using ell dbus interface
+Date: Thu, 12 Aug 2021 09:13:13 -0500
+Message-ID: <88027289-b8e1-0ab4-aff9-8e78fb83528d@gmail.com>
+In-Reply-To: <20210809114754.2797.47085@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7793852581833453913==
+--===============6177740409151847284==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2021-08-11 at 21:28 +0000, salahaldeen.altous(a)leica-camera.com
-wrote:
-> Hi James,
-> > Hi,
-> > =
+Hi Salahaldeen,
 
-> > =
+On 8/9/21 6:47 AM, salahaldeen.altous(a)leica-camera.com wrote:
+> Hi,
+> I am trying to integrate station API to my application (C code), I am usi=
+ng the interface net.connman.iwd.Station to run a scan() and the interface =
+net.connman.iwd.Network to connect() but how I can start a simple agent to =
+provide the password? Can you provide me with a complete procedure to conne=
+ct to WP2 network using ell dbus binding?
 
-> > Any way I could just get the whole log? I don't see the GET_STATION
-> > in
-> > the attached file, nor the response... Just the Event: New Station
-> > at
-> > the very beginning which appears to be due to a recent connection
-> > not
-> > IWD issuing GET_STATION.
-> > =
+There's an agent implementation that ships as part of our iwctl client.  Se=
+e:
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/client/agent.c
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/client/agent-m=
+anager.c
 
-> > Thanks,
-> > James
-> Thanks again for your reply, I will try to connect and external USB-
-> WiFi adapter to double check, =
+ell also ships with a basic dbus service example:
+https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/examples/dbus-service.c
 
-> can you advice a reference adapter?
-
-IWD should work on anything really. I've personally used some cheap
-Ralink/Realtek adapters without any problem. I've found many USB
-adpaters are from these two vendors unless you're specifically looking
-for others.
-
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
-
-
---===============7793852581833453913==--
+Regards,
+-Denis
+--===============6177740409151847284==--
 
