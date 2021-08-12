@@ -1,77 +1,86 @@
-Content-Type: multipart/mixed; boundary="===============8091980863540904807=="
+Content-Type: multipart/mixed; boundary="===============2787749230503857547=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/7] station: disable autoconnect when in developer mode
-Date: Thu, 12 Aug 2021 13:38:07 -0700
-Message-ID: <20210812203812.738060-2-prestwoj@gmail.com>
+Subject: [PATCH 3/7] auto-t: iwd.py: add autoconnect property/StationDebug
+Date: Thu, 12 Aug 2021 13:38:08 -0700
+Message-ID: <20210812203812.738060-3-prestwoj@gmail.com>
 In-Reply-To: <20210812203812.738060-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8091980863540904807==
+--===============2787749230503857547==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Most autotests do not want autoconnect behavior so it is being
-turned off by default. There are a few tests where it is needed
-and in these few cases the test can enable autoconnect through
-the new station debug property.
 ---
- src/station.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ autotests/util/iwd.py | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/src/station.c b/src/station.c
-index f9b2b16d..2155aa3c 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3507,6 +3507,7 @@ static struct station *station_create(struct netdev *=
-netdev)
- {
- 	struct station *station;
- 	struct l_dbus *dbus =3D dbus_get_bus();
-+	bool autoconnect =3D true;
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 1785081f..5d041e57 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -226,6 +226,21 @@ class AdHocDevice(IWDDBusAbstract):
+     def connected_peers(self):
+         return self._properties['ConnectedPeers']
  =
 
- 	station =3D l_new(struct station, 1);
- 	watchlist_init(&station->state_watches, NULL);
-@@ -3524,8 +3525,6 @@ static struct station *station_create(struct netdev *=
-netdev)
- =
-
- 	l_queue_push_head(station_list, station);
- =
-
--	station_set_autoconnect(station, true);
--
- 	l_dbus_object_add_interface(dbus, netdev_get_path(netdev),
- 					IWD_STATION_INTERFACE, station);
- =
-
-@@ -3536,11 +3535,15 @@ static struct station *station_create(struct netdev=
- *netdev)
- =
-
- 	station_fill_scan_freq_subsets(station);
- =
-
--	if (iwd_is_developer_mode())
-+	if (iwd_is_developer_mode()) {
- 		l_dbus_object_add_interface(dbus,
- 					netdev_get_path(station->netdev),
- 					IWD_STATION_DEBUG_INTERFACE,
- 					station);
-+		autoconnect =3D false;
-+	}
++class StationDebug(IWDDBusAbstract):
++    '''
++        Class represents net.connman.iwd.StationDebug
++    '''
++    _iface_name =3D IWD_STATION_DEBUG_INTERFACE
 +
-+	station_set_autoconnect(station, autoconnect);
++    def __init__(self, *args, **kwargs):
++        self._debug_props =3D None
++        self._debug_iface =3D None
++
++        IWDDBusAbstract.__init__(self, *args, **kwargs)
++
++    @property
++    def autoconnect(self):
++        return self._properties['AutoConnect']
  =
 
- 	return station;
- }
+ class Device(IWDDBusAbstract):
+     '''
+@@ -238,6 +253,7 @@ class Device(IWDDBusAbstract):
+         self._wps_manager_if =3D None
+         self._station_if =3D None
+         self._station_props =3D None
++        self._station_debug =3D None
+         IWDDBusAbstract.__init__(self, *args, **kwargs)
+ =
+
+     @property
+@@ -354,6 +370,21 @@ class Device(IWDDBusAbstract):
+         props =3D self._station_properties()
+         return bool(props['Scanning'])
+ =
+
++    @property
++    def autoconnect(self):
++        if not self._station_debug:
++            self._station_debug =3D StationDebug(self._object_path)
++
++        return self._station_debug.autoconnect
++
++    @autoconnect.setter
++    def autoconnect(self, value):
++        if not self._station_debug:
++            self._station_debug =3D StationDebug(self._object_path)
++
++        self._station_debug._prop_proxy.Set(IWD_STATION_DEBUG_INTERFACE,
++                                            'AutoConnect', value)
++
+     def scan(self):
+         '''Schedule a network scan.
+ =
+
 -- =
 
 2.31.1
 
---===============8091980863540904807==--
+--===============2787749230503857547==--
 
