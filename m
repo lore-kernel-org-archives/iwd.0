@@ -1,33 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============5707716147237132562=="
+Content-Type: multipart/mixed; boundary="===============2669625046559907764=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 1/3] station: Add generic Event signal
-Date: Fri, 13 Aug 2021 14:45:35 -0500
-Message-ID: <427e554f-960a-5899-8fa6-524df3f0ae22@gmail.com>
-In-Reply-To: <20210813194710.807550-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/2] auto-t: iwd.py: allow renaming in copy_to_storage
+Date: Fri, 13 Aug 2021 14:55:12 -0500
+Message-ID: <5edff976-693f-b568-22da-86fbaa0c5652@gmail.com>
+In-Reply-To: <20210813195507.807892-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5707716147237132562==
+--===============2669625046559907764==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 8/13/21 2:47 PM, James Prestwood wrote:
-> This is meant to be used as a generic notification to autotests. For
-> now 'no-roam-candidates' is the only event being sent. The idea
-> is to extend these events to signal conditions that are otherwise
-> undiscoverable in autotesting.
+On 8/13/21 2:55 PM, James Prestwood wrote:
+> By providing a 'name' keyword argument the file copied will be
+> renamed to that.
 > ---
->   src/station.c | 24 +++++++++++++++++++++++-
->   1 file changed, 23 insertions(+), 1 deletion(-)
+>   autotests/util/iwd.py | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
 
-All applied, thanks.
+Both applied, thanks.
 
 Regards,
 -Denis
 
---===============5707716147237132562==--
+--===============2669625046559907764==--
 
