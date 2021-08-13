@@ -1,32 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============6359024357815833703=="
+Content-Type: multipart/mixed; boundary="===============5865704968669623862=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] station: set autoconnect via setter
-Date: Fri, 13 Aug 2021 10:43:21 -0500
-Message-ID: <5b5ca18e-a533-4dac-5997-e063baff5d53@gmail.com>
-In-Reply-To: <20210812222458.744008-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/3] test-runner: print uncaught test exceptions always
+Date: Fri, 13 Aug 2021 10:44:02 -0500
+Message-ID: <7ce35e73-0976-6d7c-ab94-63d18aa7bf0d@gmail.com>
+In-Reply-To: <20210812230716.747378-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6359024357815833703==
+--===============5865704968669623862==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 8/12/21 5:24 PM, James Prestwood wrote:
-> This updates the autoconnect property for the debug interface
+On 8/12/21 6:07 PM, James Prestwood wrote:
 > ---
->   src/station.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+>   tools/test-runner | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > =
 
 
-Applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
 
---===============6359024357815833703==--
+--===============5865704968669623862==--
 
