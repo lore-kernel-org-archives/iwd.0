@@ -1,43 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============8751252916503876287=="
+Content-Type: multipart/mixed; boundary="===============8008506363124564543=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/6] test-runner: don't always print failure to remove ctrl
- interface
-Date: Fri, 13 Aug 2021 13:26:12 -0700
-Message-ID: <20210813202612.809470-6-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/6] auto-t: fix testAgent use of Process
+Date: Fri, 13 Aug 2021 15:19:02 -0500
+Message-ID: <ae90c7a4-3b49-2db9-e7e7-111c0534a592@gmail.com>
 In-Reply-To: <20210813202612.809470-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8751252916503876287==
+--===============8008506363124564543==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This can happen, particularly with SAQuery when hostapd is forcefully
-killed. Better to only print when running in debug mode.
----
- tools/test-runner | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi James,
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 5b8bdaf5..7e89d71c 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -541,7 +541,7 @@ class Hostapd:
- 		try:
- 			os.remove(self.global_ctrl_iface)
- 		except:
--			dbg("Failed to remove %s" % self.global_ctrl_iface)
-+			print("Failed to remove %s" % self.global_ctrl_iface)
- =
+On 8/13/21 3:26 PM, James Prestwood wrote:
+> This test was accessing the subprocess object and calling terminate
+> which ends up causing issues with test-runners own process cleanup.
+> Instead kill() should be used.
+> ---
+>   autotests/testAgent/agent_test.py | 10 ++++------
+>   1 file changed, 4 insertions(+), 6 deletions(-)
+> =
 
- 		self.instances =3D None
- =
 
--- =
+All applied, thanks.
 
-2.31.1
+Regards,
+-Denis
 
---===============8751252916503876287==--
+--===============8008506363124564543==--
 
