@@ -1,80 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============8766933040318955687=="
+Content-Type: multipart/mixed; boundary="===============9093809374509093325=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/6] auto-t: fix testAgent use of Process
-Date: Fri, 13 Aug 2021 13:26:07 -0700
-Message-ID: <20210813202612.809470-1-prestwoj@gmail.com>
+Subject: [PATCH 2/6] auto-t: use prefix on hotspot anqp test
+Date: Fri, 13 Aug 2021 13:26:08 -0700
+Message-ID: <20210813202612.809470-2-prestwoj@gmail.com>
+In-Reply-To: <20210813202612.809470-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8766933040318955687==
+--===============9093809374509093325==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This test was accessing the subprocess object and calling terminate
-which ends up causing issues with test-runners own process cleanup.
-Instead kill() should be used.
+The hotspot ANQP delay test was setting a global delay on all
+packets which had some unintended consequences. At the time this
+was the only way of simulating the test scenario but now hwsim
+supports prefix matching so only the ANQP request/response will
+be delayed.
 ---
- autotests/testAgent/agent_test.py | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ autotests/testHotspot/anqp_delay_test.py | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/autotests/testAgent/agent_test.py b/autotests/testAgent/agent_=
-test.py
-index 7d3b6119..e2d6e49e 100644
---- a/autotests/testAgent/agent_test.py
-+++ b/autotests/testAgent/agent_test.py
-@@ -58,14 +58,13 @@ class Test(unittest.TestCase):
-     def test_connection_with_other_agent(self):
-         wd =3D IWD()
+diff --git a/autotests/testHotspot/anqp_delay_test.py b/autotests/testHotsp=
+ot/anqp_delay_test.py
+index 67c12025..323e1fd3 100644
+--- a/autotests/testHotspot/anqp_delay_test.py
++++ b/autotests/testHotspot/anqp_delay_test.py
+@@ -65,14 +65,15 @@ class Test(unittest.TestCase):
  =
 
--        iwctl =3D ctx.start_process(['iwctl', '-P', 'secret_ssid2']).pid
-+        iwctl =3D ctx.start_process(['iwctl', '-P', 'secret_ssid2'])
-         # Let iwctl to start and register its agent.
-         wd.wait(2)
+         # Force the case where ANQP does not finish before Connect() comes=
+ in
+         rule0.delay =3D 100
++        rule0.prefix =3D '0d'
  =
 
-         self.check_connection(wd, 'ssid2')
+-        ordered_network.network_object.connect()
+-
+-        rule0.delay =3D 1
++        ordered_network.network_object.connect(wait=3DFalse)
  =
 
--        iwctl.terminate()
--        iwctl.communicate()
-+        iwctl.kill()
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
  =
 
-         IWD.clear_storage()
- =
-
-@@ -73,7 +72,7 @@ class Test(unittest.TestCase):
- =
-
-         wd =3D IWD()
- =
-
--        iwctl =3D ctx.start_process(['iwctl', '-P', 'secret_ssid2']).pid
-+        iwctl =3D ctx.start_process(['iwctl', '-P', 'secret_ssid2'])
-         # Let iwctl to start and register its agent.
-         wd.wait(2)
- =
-
-@@ -84,8 +83,7 @@ class Test(unittest.TestCase):
- =
-
-         wd.unregister_psk_agent(psk_agent)
- =
-
--        iwctl.terminate()
--        iwctl.communicate()
-+        iwctl.kill()
- =
-
-         IWD.clear_storage()
++        hapd.wait_for_event('AP-STA-CONNECTED')
++
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected(device.name, hapd.ifname)
  =
 
 -- =
 
 2.31.1
 
---===============8766933040318955687==--
+--===============9093809374509093325==--
 
