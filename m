@@ -1,90 +1,103 @@
-Content-Type: multipart/mixed; boundary="===============2418892534064417774=="
+Content-Type: multipart/mixed; boundary="===============7078594836907205198=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/3] auto-t: iwd.py: add StationDebug.Event support
-Date: Fri, 13 Aug 2021 12:47:09 -0700
-Message-ID: <20210813194710.807550-2-prestwoj@gmail.com>
+Subject: [PATCH v2 3/3] auto-t: speed up testRoamRetry
+Date: Fri, 13 Aug 2021 12:47:10 -0700
+Message-ID: <20210813194710.807550-3-prestwoj@gmail.com>
 In-Reply-To: <20210813194710.807550-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2418892534064417774==
+--===============7078594836907205198==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Adds a new wait_for_event API which waits for a StationDebug.Event.
+This test took quite a while to execute (~2 minutes on my machine)
+because there was simply no other way to test this scenario but
+waiting. Now the no-roam-candidates condition can be waited for
+rather than just sleeping for 20 seconds. Additionally the default
+RoamRetryInterval was being used which is 60 seconds. Instead
+main.conf can set this to 5 seconds and really cut down on the time
+to wait.
+
+Part of a comment was also removed due to being incorrect. Even
+with neighbor reports IWD still must scan, its just that the
+scan is more limited and, in theory, faster.
 ---
- autotests/util/iwd.py | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ autotests/testRoamRetry/fast_retry_test.py | 7 +++----
+ autotests/testRoamRetry/main.conf          | 2 ++
+ autotests/testRoamRetry/stop_retry_test.py | 2 +-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+ create mode 100644 autotests/testRoamRetry/main.conf
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index b5546bcd..36b8f6f9 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -233,9 +233,17 @@ class StationDebug(IWDDBusAbstract):
-     def __init__(self, *args, **kwargs):
-         self._debug_props =3D None
-         self._debug_iface =3D None
-+        self._last_event =3D None
-+        self._last_event_data =3D []
+diff --git a/autotests/testRoamRetry/fast_retry_test.py b/autotests/testRoa=
+mRetry/fast_retry_test.py
+index d6324c31..e8b5455d 100644
+--- a/autotests/testRoamRetry/fast_retry_test.py
++++ b/autotests/testRoamRetry/fast_retry_test.py
+@@ -82,7 +82,7 @@ class Test(unittest.TestCase):
+         # schedule another attempt for 60 seconds later
+         rule0.signal =3D -8000
  =
 
-         IWDDBusAbstract.__init__(self, *args, **kwargs)
+-        wd.wait(20)
++        device.wait_for_event('no-roam-candidates')
  =
 
-+        self._iface.connect_to_signal("Event", self._event_handler)
-+
-+    def _event_handler(self, event, data):
-+        self._last_event =3D event
-+        self._last_event_data =3D data
-+
-     @property
-     def autoconnect(self):
-         return self._properties['AutoConnect']
-@@ -244,6 +252,21 @@ class StationDebug(IWDDBusAbstract):
-         frequencies =3D dbus.Array([dbus.UInt16(f) for f in frequencies])
-         self._iface.Scan(frequencies)
+         self.assertEqual(device.state, iwd.DeviceState.connected)
+         self.assertTrue(bss_hostapd[0].list_sta())
+@@ -99,13 +99,12 @@ class Test(unittest.TestCase):
+         wd.wait(1)
  =
 
-+    def wait_for_event(self, event, timeout=3D10):
-+        try:
-+            if self._last_event is not None:
-+                return self._last_event_data
-+
-+            ctx.non_block_wait(lambda s, e : s._last_event =3D=3D e, timeo=
-ut, self, event,
-+                                exception=3DTimeoutError("waiting for Stat=
-ionDebug.Event"))
-+
-+            return self._last_event_data
-+        finally:
-+            # Consume the event
-+            self._last_event_data =3D None
-+            self._last_event =3D None
-+
-+
- class Device(IWDDBusAbstract):
-     '''
-         Class represents a network device object: net.connman.iwd.Device
-@@ -596,6 +619,12 @@ class Device(IWDDBusAbstract):
+         # Assert low signal for BSS 0, check that iwd starts transition to=
+ BSS 1
+-        # in less than 10 seconds. Because of the neighbor report a scan s=
+hould
+-        # not be necessary.
++        # in less than 10 seconds.
+         rule0.signal =3D -8000
+         rule1.signal =3D -2000
  =
 
-         self._station_debug.scan(frequencies)
+         condition =3D 'obj.state =3D=3D DeviceState.roaming'
+-        wd.wait_for_object_condition(device, condition, max_wait=3D10)
++        wd.wait_for_object_condition(device, condition, max_wait=3D15)
  =
 
-+    def wait_for_event(self, event, timeout=3D10):
-+        if not self._station_debug:
-+            self._station_debug =3D StationDebug(self._object_path)
-+
-+        self._station_debug.wait_for_event(event, timeout)
-+
-     def __str__(self, prefix =3D ''):
-         return prefix + 'Device: ' + self.device_path + '\n'\
-                + prefix + '\tName:\t\t' + self.name + '\n'\
+         # Check that iwd is on BSS 1 once out of roaming state and doesn't
+         # go through 'disconnected', 'autoconnect', 'connecting' in between
+diff --git a/autotests/testRoamRetry/main.conf b/autotests/testRoamRetry/ma=
+in.conf
+new file mode 100644
+index 00000000..f0d1c0f4
+--- /dev/null
++++ b/autotests/testRoamRetry/main.conf
+@@ -0,0 +1,2 @@
++[General]
++RoamRetryInterval=3D5
+diff --git a/autotests/testRoamRetry/stop_retry_test.py b/autotests/testRoa=
+mRetry/stop_retry_test.py
+index be9776a5..3bf166d8 100644
+--- a/autotests/testRoamRetry/stop_retry_test.py
++++ b/autotests/testRoamRetry/stop_retry_test.py
+@@ -99,7 +99,7 @@ class Test(unittest.TestCase):
+ =
+
+         condition =3D 'obj.state =3D=3D DeviceState.roaming'
+         self.assertRaises(TimeoutError, wd.wait_for_object_condition, devi=
+ce,
+-                          condition, max_wait=3D70)
++                          condition, max_wait=3D10)
+ =
+
+         device.disconnect()
+ =
+
 -- =
 
 2.31.1
 
---===============2418892534064417774==--
+--===============7078594836907205198==--
 
