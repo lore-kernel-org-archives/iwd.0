@@ -1,31 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============2669625046559907764=="
+Content-Type: multipart/mixed; boundary="===============8766933040318955687=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/2] auto-t: iwd.py: allow renaming in copy_to_storage
-Date: Fri, 13 Aug 2021 14:55:12 -0500
-Message-ID: <5edff976-693f-b568-22da-86fbaa0c5652@gmail.com>
-In-Reply-To: <20210813195507.807892-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/6] auto-t: fix testAgent use of Process
+Date: Fri, 13 Aug 2021 13:26:07 -0700
+Message-ID: <20210813202612.809470-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2669625046559907764==
+--===============8766933040318955687==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This test was accessing the subprocess object and calling terminate
+which ends up causing issues with test-runners own process cleanup.
+Instead kill() should be used.
+---
+ autotests/testAgent/agent_test.py | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-On 8/13/21 2:55 PM, James Prestwood wrote:
-> By providing a 'name' keyword argument the file copied will be
-> renamed to that.
-> ---
->   autotests/util/iwd.py | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
+diff --git a/autotests/testAgent/agent_test.py b/autotests/testAgent/agent_=
+test.py
+index 7d3b6119..e2d6e49e 100644
+--- a/autotests/testAgent/agent_test.py
++++ b/autotests/testAgent/agent_test.py
+@@ -58,14 +58,13 @@ class Test(unittest.TestCase):
+     def test_connection_with_other_agent(self):
+         wd =3D IWD()
+ =
 
-Both applied, thanks.
+-        iwctl =3D ctx.start_process(['iwctl', '-P', 'secret_ssid2']).pid
++        iwctl =3D ctx.start_process(['iwctl', '-P', 'secret_ssid2'])
+         # Let iwctl to start and register its agent.
+         wd.wait(2)
+ =
 
-Regards,
--Denis
+         self.check_connection(wd, 'ssid2')
+ =
 
---===============2669625046559907764==--
+-        iwctl.terminate()
+-        iwctl.communicate()
++        iwctl.kill()
+ =
+
+         IWD.clear_storage()
+ =
+
+@@ -73,7 +72,7 @@ class Test(unittest.TestCase):
+ =
+
+         wd =3D IWD()
+ =
+
+-        iwctl =3D ctx.start_process(['iwctl', '-P', 'secret_ssid2']).pid
++        iwctl =3D ctx.start_process(['iwctl', '-P', 'secret_ssid2'])
+         # Let iwctl to start and register its agent.
+         wd.wait(2)
+ =
+
+@@ -84,8 +83,7 @@ class Test(unittest.TestCase):
+ =
+
+         wd.unregister_psk_agent(psk_agent)
+ =
+
+-        iwctl.terminate()
+-        iwctl.communicate()
++        iwctl.kill()
+ =
+
+         IWD.clear_storage()
+ =
+
+-- =
+
+2.31.1
+
+--===============8766933040318955687==--
 
