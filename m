@@ -1,120 +1,200 @@
-Content-Type: multipart/mixed; boundary="===============1302689563303271484=="
+Content-Type: multipart/mixed; boundary="===============0726834670245468592=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/4] auto-t: iwd.py: clean up StationDebug
-Date: Fri, 13 Aug 2021 15:45:52 -0700
-Message-ID: <20210813224554.816379-2-prestwoj@gmail.com>
+Subject: [PATCH 3/4] auto-t: turn off scan address randomization in testHotspot
+Date: Fri, 13 Aug 2021 15:45:53 -0700
+Message-ID: <20210813224554.816379-3-prestwoj@gmail.com>
 In-Reply-To: <20210813224554.816379-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1302689563303271484==
+--===============0726834670245468592==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Initialize this once and reference that for each method/property
+This (hopefully) will make this test pass better on slower machines.
+In addition the mechanism of copying over separate main.conf files
+was changed (rather than echo'ing the option into /tmp/main.conf)
 ---
- autotests/util/iwd.py | 32 +++++++++++---------------------
- 1 file changed, 11 insertions(+), 21 deletions(-)
+ autotests/testHotspot/anqp_delay_test.py  | 5 ++---
+ autotests/testHotspot/anqp_disabled.conf  | 5 +++++
+ autotests/testHotspot/anqp_enabled.conf   | 5 +++++
+ autotests/testHotspot/autoconnect_test.py | 5 ++---
+ autotests/testHotspot/hessid_test.py      | 5 ++---
+ autotests/testHotspot/hotspot_test.py     | 5 ++---
+ autotests/testHotspot/roaming_test.py     | 5 ++---
+ 7 files changed, 20 insertions(+), 15 deletions(-)
+ create mode 100644 autotests/testHotspot/anqp_disabled.conf
+ create mode 100644 autotests/testHotspot/anqp_enabled.conf
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 737b2beb..54157b00 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -248,6 +248,12 @@ class StationDebug(IWDDBusAbstract):
-     def autoconnect(self):
-         return self._properties['AutoConnect']
+diff --git a/autotests/testHotspot/anqp_delay_test.py b/autotests/testHotsp=
+ot/anqp_delay_test.py
+index 323e1fd3..04e5a1d7 100644
+--- a/autotests/testHotspot/anqp_delay_test.py
++++ b/autotests/testHotspot/anqp_delay_test.py
+@@ -5,8 +5,8 @@ import sys
+ import os
  =
 
-+    def connect_bssid(self, address):
-+        self._iface.ConnectBssid(dbus.ByteArray.fromhex(address.replace(':=
-', '')))
+ sys.path.append('../util')
+-import iwd
+ from iwd import IWD
++from iwd import IWD_CONFIG_DIR
+ from iwd import PSKAgent
+ from iwd import NetworkType
+ from hostapd import HostapdCLI
+@@ -87,8 +87,7 @@ class Test(unittest.TestCase):
+     @classmethod
+     def setUpClass(cls):
+         IWD.copy_to_hotspot('example.conf')
+-        conf =3D '[General]\nDisableANQP=3D0\n'
+-        os.system('echo "%s" > /tmp/main.conf' % conf)
++        IWD.copy_to_storage('anqp_enabled.conf', storage_dir=3DIWD_CONFIG_=
+DIR, name=3D'main.conf')
+ =
+
+     @classmethod
+     def tearDownClass(cls):
+diff --git a/autotests/testHotspot/anqp_disabled.conf b/autotests/testHotsp=
+ot/anqp_disabled.conf
+new file mode 100644
+index 00000000..b18f66d7
+--- /dev/null
++++ b/autotests/testHotspot/anqp_disabled.conf
+@@ -0,0 +1,5 @@
++[General]
++DisableANQP=3D1
 +
-+    def roam(self, address):
-+        self._iface.Roam(dbus.ByteArray.fromhex(address.replace(':', '')))
++[Scan]
++DisableMacAddressRandomization=3Dtrue
+diff --git a/autotests/testHotspot/anqp_enabled.conf b/autotests/testHotspo=
+t/anqp_enabled.conf
+new file mode 100644
+index 00000000..c66a63e0
+--- /dev/null
++++ b/autotests/testHotspot/anqp_enabled.conf
+@@ -0,0 +1,5 @@
++[General]
++DisableANQP=3D0
 +
-     def scan(self, frequencies):
-         frequencies =3D dbus.Array([dbus.UInt16(f) for f in frequencies])
-         self._iface.Scan(frequencies)
-@@ -278,9 +284,11 @@ class Device(IWDDBusAbstract):
-         self._wps_manager_if =3D None
-         self._station_if =3D None
-         self._station_props =3D None
--        self._station_debug =3D None
-+
-         IWDDBusAbstract.__init__(self, *args, **kwargs)
++[Scan]
++DisableMacAddressRandomization=3Dtrue
+diff --git a/autotests/testHotspot/autoconnect_test.py b/autotests/testHots=
+pot/autoconnect_test.py
+index 354bf61b..777a0670 100644
+--- a/autotests/testHotspot/autoconnect_test.py
++++ b/autotests/testHotspot/autoconnect_test.py
+@@ -5,8 +5,8 @@ import sys
+ import os
  =
 
-+        self._station_debug =3D StationDebug(*args, **kwargs)
-+
-     @property
-     def _wps_manager(self):
-         if self._wps_manager_if is None:
-@@ -397,16 +405,10 @@ class Device(IWDDBusAbstract):
+ sys.path.append('../util')
+-import iwd
+ from iwd import IWD
++from iwd import IWD_CONFIG_DIR
+ from iwd import NetworkType
+ from hostapd import HostapdCLI
+ import testutil
+@@ -109,8 +109,7 @@ class Test(unittest.TestCase):
+     def setUpClass(cls):
+         IWD.copy_to_hotspot('autoconnect.conf')
+         IWD.copy_to_storage('ssidWPA2-1.psk')
+-        conf =3D '[General]\nDisableANQP=3D0\n'
+-        os.system('echo "%s" > /tmp/main.conf' % conf)
++        IWD.copy_to_storage('anqp_enabled.conf', storage_dir=3DIWD_CONFIG_=
+DIR, name=3D'main.conf')
  =
 
-     @property
-     def autoconnect(self):
--        if not self._station_debug:
--            self._station_debug =3D StationDebug(self._object_path)
--
-         return self._station_debug.autoconnect
+     @classmethod
+     def tearDownClass(cls):
+diff --git a/autotests/testHotspot/hessid_test.py b/autotests/testHotspot/h=
+essid_test.py
+index 5d3954b9..88e750de 100644
+--- a/autotests/testHotspot/hessid_test.py
++++ b/autotests/testHotspot/hessid_test.py
+@@ -5,8 +5,8 @@ import sys
+ import os
  =
 
-     @autoconnect.setter
-     def autoconnect(self, value):
--        if not self._station_debug:
--            self._station_debug =3D StationDebug(self._object_path)
--
-         self._station_debug._prop_proxy.Set(IWD_STATION_DEBUG_INTERFACE,
-                                             'AutoConnect', value)
+ sys.path.append('../util')
+-import iwd
+ from iwd import IWD
++from iwd import IWD_CONFIG_DIR
+ from iwd import PSKAgent
+ from iwd import NetworkType
+ from hostapd import HostapdCLI
+@@ -50,8 +50,7 @@ class Test(unittest.TestCase):
+     @classmethod
+     def setUpClass(cls):
+         IWD.copy_to_hotspot('hessid.conf')
+-        conf =3D '[General]\nDisableANQP=3D1\n'
+-        os.system('echo "%s" > /tmp/main.conf' % conf)
++        IWD.copy_to_storage('anqp_disabled.conf', storage_dir=3DIWD_CONFIG=
+_DIR, name=3D'main.conf')
  =
 
-@@ -602,27 +604,15 @@ class Device(IWDDBusAbstract):
-         self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
+     @classmethod
+     def tearDownClass(cls):
+diff --git a/autotests/testHotspot/hotspot_test.py b/autotests/testHotspot/=
+hotspot_test.py
+index 460ff89f..f49477dc 100644
+--- a/autotests/testHotspot/hotspot_test.py
++++ b/autotests/testHotspot/hotspot_test.py
+@@ -5,8 +5,8 @@ import sys
+ import os
  =
 
-     def connect_bssid(self, address):
--        self._station_debug_if =3D dbus.Interface(self._bus.get_object(IWD=
-_SERVICE,
--                                                self.device_path),
--                                                IWD_STATION_DEBUG_INTERFAC=
-E)
--        self._station_debug_if.ConnectBssid(dbus.ByteArray.fromhex(address=
-.replace(':', '')))
-+        self._station_debug.connect_bssid(address)
+ sys.path.append('../util')
+-import iwd
+ from iwd import IWD
++from iwd import IWD_CONFIG_DIR
+ from iwd import PSKAgent
+ from iwd import NetworkType
+ from hostapd import HostapdCLI
+@@ -50,8 +50,7 @@ class Test(unittest.TestCase):
+     @classmethod
+     def setUpClass(cls):
+         IWD.copy_to_hotspot('example.conf')
+-        conf =3D '[General]\nDisableANQP=3D0\n'
+-        os.system('echo "%s" > /tmp/main.conf' % conf)
++        IWD.copy_to_storage('anqp_enabled.conf', storage_dir=3DIWD_CONFIG_=
+DIR, name=3D'main.conf')
  =
 
-     def roam(self, address):
--        self._station_debug_if =3D dbus.Interface(self._bus.get_object(IWD=
-_SERVICE,
--                                                self.device_path),
--                                                IWD_STATION_DEBUG_INTERFAC=
-E)
--        self._station_debug_if.Roam(dbus.ByteArray.fromhex(address.replace=
-(':', '')))
-+        self._station_debug.roam(address)
+     @classmethod
+     def tearDownClass(cls):
+diff --git a/autotests/testHotspot/roaming_test.py b/autotests/testHotspot/=
+roaming_test.py
+index d18864e0..6cdd6922 100644
+--- a/autotests/testHotspot/roaming_test.py
++++ b/autotests/testHotspot/roaming_test.py
+@@ -5,8 +5,8 @@ import sys
+ import os
  =
 
-     def debug_scan(self, frequencies):
--        if not self._station_debug:
--            self._station_debug =3D StationDebug(self._object_path)
--
-         self._station_debug.scan(frequencies)
+ sys.path.append('../util')
+-import iwd
+ from iwd import IWD
++from iwd import IWD_CONFIG_DIR
+ from iwd import PSKAgent
+ from iwd import NetworkType
+ from hostapd import HostapdCLI
+@@ -50,8 +50,7 @@ class Test(unittest.TestCase):
+     @classmethod
+     def setUpClass(cls):
+         IWD.copy_to_hotspot('roaming.conf')
+-        conf =3D '[General]\nDisableANQP=3D1\n'
+-        os.system('echo "%s" > /tmp/main.conf' % conf)
++        IWD.copy_to_storage('anqp_disabled.conf', storage_dir=3DIWD_CONFIG=
+_DIR, name=3D'main.conf')
  =
 
-     def wait_for_event(self, event, timeout=3D10):
--        if not self._station_debug:
--            self._station_debug =3D StationDebug(self._object_path)
--
-         self._station_debug.wait_for_event(event, timeout)
- =
-
-     def __str__(self, prefix =3D ''):
+     @classmethod
+     def tearDownClass(cls):
 -- =
 
 2.31.1
 
---===============1302689563303271484==--
+--===============0726834670245468592==--
 
