@@ -1,52 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============8123777265631791047=="
+Content-Type: multipart/mixed; boundary="===============6359024357815833703=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/6] auto-t: hostapd.py: remove get_freq()/get_config_value()
-Date: Thu, 12 Aug 2021 16:12:33 -0700
-Message-ID: <20210812231233.747743-6-prestwoj@gmail.com>
-In-Reply-To: <20210812231233.747743-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] station: set autoconnect via setter
+Date: Fri, 13 Aug 2021 10:43:21 -0500
+Message-ID: <5b5ca18e-a533-4dac-5997-e063baff5d53@gmail.com>
+In-Reply-To: <20210812222458.744008-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8123777265631791047==
+--===============6359024357815833703==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- autotests/util/hostapd.py | 14 --------------
- 1 file changed, 14 deletions(-)
+Hi James,
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index 1575d832..be6e1143 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -212,20 +212,6 @@ class HostapdCLI:
-         if 'OK' not in proc.out:
-             raise Exception('BSS_TM_REQ failed, is hostapd built with CONF=
-IG_WNM_AP=3Dy?')
- =
+On 8/12/21 5:24 PM, James Prestwood wrote:
+> This updates the autoconnect property for the debug interface
+> ---
+>   src/station.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> =
 
--    def get_config_value(self, key):
--        # first find the right config file
--        with open(self.config, 'r') as f:
--            # read in config file and search for key
--            cfg =3D f.read()
--            match =3D re.search(r'%s=3D.*' % key, cfg)
--            if match:
--                return match.group(0).split('=3D')[1]
--        return None
--
--
--    def get_freq(self):
--        return chan_freq_map[int(self.get_config_value('channel'))]
--
-     def ungraceful_restart(self):
-         '''
-             Ungracefully kill and restart hostapd
--- =
 
-2.31.1
+Applied, thanks.
 
---===============8123777265631791047==--
+Regards,
+-Denis
+
+--===============6359024357815833703==--
 
