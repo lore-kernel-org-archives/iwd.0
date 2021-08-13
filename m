@@ -1,34 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============7558198609299402076=="
+Content-Type: multipart/mixed; boundary="===============8653254153368422020=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/6] station: implement Scan on debug interface
-Date: Fri, 13 Aug 2021 10:46:41 -0500
-Message-ID: <1b4ec3f3-bf67-048a-0d67-a00e2fdb15b6@gmail.com>
-In-Reply-To: <20210812231233.747743-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/9] eapol: Store IP address in network byte order
+Date: Fri, 13 Aug 2021 10:50:16 -0500
+Message-ID: <b89baa49-9b0c-89a5-3695-2f565eb35734@gmail.com>
+In-Reply-To: <20210807021048.321664-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7558198609299402076==
+--===============8653254153368422020==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Andrew,
 
-On 8/12/21 6:12 PM, James Prestwood wrote:
-> This is to support the autotesting framework by allowing a smaller
-> scan subset. This will cut down on the amount of time spent scanning
-> via normal DBus scans (where the entire spectrum is scanned).
+On 8/6/21 9:10 PM, Andrew Zaborowski wrote:
+> Switch handshake_state's .client_ip_addr, .subnet_mask and .go_ip_addr
+> from host byte order to network by order.
 > ---
->   src/station.c | 107 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 107 insertions(+)
+>   src/eapol.c | 12 ++++++------
+>   src/p2p.c   |  2 +-
+>   2 files changed, 7 insertions(+), 7 deletions(-)
 > =
 
 
-All applied, thanks.
+Patches 1, 3 and 4 applied, thanks.
 
 Regards,
 -Denis
 
---===============7558198609299402076==--
+--===============8653254153368422020==--
 
