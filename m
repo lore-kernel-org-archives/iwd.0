@@ -1,143 +1,120 @@
-Content-Type: multipart/mixed; boundary="===============2243829354373826077=="
+Content-Type: multipart/mixed; boundary="===============1302689563303271484=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/4] auto-t: return existing instance from HostapdCLI
-Date: Fri, 13 Aug 2021 15:45:51 -0700
-Message-ID: <20210813224554.816379-1-prestwoj@gmail.com>
+Subject: [PATCH 2/4] auto-t: iwd.py: clean up StationDebug
+Date: Fri, 13 Aug 2021 15:45:52 -0700
+Message-ID: <20210813224554.816379-2-prestwoj@gmail.com>
+In-Reply-To: <20210813224554.816379-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2243829354373826077==
+--===============1302689563303271484==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This addresses the TODO where HostapdCLI was creating separate
-objects each time HostapdCLI was called. This was worked around
-by manually setting the important members but instead the class
-can be re-worked to act as somewhat of a singleton, per-config
-at least.
-
-If there is no HostapdCLI instance for a given config one is
-created and initialized. Subsequent HostapdCLI calls (for the
-same config) will be returned the same object rather than a
-new one.
+Initialize this once and reference that for each method/property
 ---
- autotests/util/hostapd.py | 48 +++++++++++++++++++++++----------------
- tools/test-runner         |  4 ++++
- 2 files changed, 33 insertions(+), 19 deletions(-)
+ autotests/util/iwd.py | 32 +++++++++++---------------------
+ 1 file changed, 11 insertions(+), 21 deletions(-)
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index a61b2d39..aabc997b 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -28,10 +28,28 @@ chan_freq_map =3D [
- ctrl_count =3D 0
- mainloop =3D GLib.MainLoop()
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 737b2beb..54157b00 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -248,6 +248,12 @@ class StationDebug(IWDDBusAbstract):
+     def autoconnect(self):
+         return self._properties['AutoConnect']
  =
 
--class HostapdCLI:
--    def _init_hostapd(self, config=3DNone):
-+class HostapdCLI(object):
-+    _instances =3D {}
++    def connect_bssid(self, address):
++        self._iface.ConnectBssid(dbus.ByteArray.fromhex(address.replace(':=
+', '')))
 +
-+    def __new__(cls, config=3DNone, *args, **kwargs):
-+        hapd =3D ctx.hostapd[config]
++    def roam(self, address):
++        self._iface.Roam(dbus.ByteArray.fromhex(address.replace(':', '')))
 +
-+        if not config:
-+            config =3D hapd.config
+     def scan(self, frequencies):
+         frequencies =3D dbus.Array([dbus.UInt16(f) for f in frequencies])
+         self._iface.Scan(frequencies)
+@@ -278,9 +284,11 @@ class Device(IWDDBusAbstract):
+         self._wps_manager_if =3D None
+         self._station_if =3D None
+         self._station_props =3D None
+-        self._station_debug =3D None
 +
-+        if not config in cls._instances.keys():
-+            cls._instances[config] =3D object.__new__(cls, *args, **kwargs)
-+            cls._instances[config]._initialized =3D False
-+
-+        return cls._instances[config]
-+
-+    def _init_hostapd(self, config):
-         global ctrl_count
--        interface =3D None
-+
-+        if self._initialized:
-+            return
-+
-+        self._initialized =3D True
-         self.ctrl_sock =3D None
+         IWDDBusAbstract.__init__(self, *args, **kwargs)
  =
 
-         if not ctx.hostapd:
-@@ -45,21 +63,6 @@ class HostapdCLI:
-         if not hasattr(self, '_hostapd_restarted'):
-             self._hostapd_restarted =3D False
++        self._station_debug =3D StationDebug(*args, **kwargs)
++
+     @property
+     def _wps_manager(self):
+         if self._wps_manager_if is None:
+@@ -397,16 +405,10 @@ class Device(IWDDBusAbstract):
  =
 
--        #
--        # TODO: In theory some type of instance singleton could be created=
- for
--        #       HostapdCLI where test-runner initializes but any subsequent
--        #       call to HostapdCLI (with the same config) returns the same
--        #       object that test-runner has. This would avoid setting these
--        #       variables.
--        #
--        if hapd.cli:
--            self.ifname =3D hapd.cli.ifname
--            self.ctrl_sock =3D hapd.cli.ctrl_sock
--            self.cmdline =3D hapd.cli.cmdline
--            self.interface =3D hapd.intf
--            self.config =3D hapd.config
--            return
+     @property
+     def autoconnect(self):
+-        if not self._station_debug:
+-            self._station_debug =3D StationDebug(self._object_path)
 -
-         self.interface =3D hapd.intf
-         self.config =3D hapd.config
+         return self._station_debug.autoconnect
  =
 
-@@ -83,7 +86,7 @@ class HostapdCLI:
+     @autoconnect.setter
+     def autoconnect(self, value):
+-        if not self._station_debug:
+-            self._station_debug =3D StationDebug(self._object_path)
+-
+         self._station_debug._prop_proxy.Set(IWD_STATION_DEBUG_INTERFACE,
+                                             'AutoConnect', value)
  =
 
-         ctrl_count =3D ctrl_count + 1
+@@ -602,27 +604,15 @@ class Device(IWDDBusAbstract):
+         self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
  =
 
--    def __init__(self, config=3DNone):
-+    def __init__(self, config=3DNone, *args, **kwargs):
-         self._init_hostapd(config)
+     def connect_bssid(self, address):
+-        self._station_debug_if =3D dbus.Interface(self._bus.get_object(IWD=
+_SERVICE,
+-                                                self.device_path),
+-                                                IWD_STATION_DEBUG_INTERFAC=
+E)
+-        self._station_debug_if.ConnectBssid(dbus.ByteArray.fromhex(address=
+.replace(':', '')))
++        self._station_debug.connect_bssid(address)
  =
 
-     def _poll_event(self, event):
-@@ -137,6 +140,13 @@ class HostapdCLI:
-     def __del__(self):
-         self._del_hostapd()
+     def roam(self, address):
+-        self._station_debug_if =3D dbus.Interface(self._bus.get_object(IWD=
+_SERVICE,
+-                                                self.device_path),
+-                                                IWD_STATION_DEBUG_INTERFAC=
+E)
+-        self._station_debug_if.Roam(dbus.ByteArray.fromhex(address.replace=
+(':', '')))
++        self._station_debug.roam(address)
  =
 
-+        HostapdCLI._instances[self.config] =3D None
-+
-+        # Check if this is the final instance
-+        destroy =3D len([hapd for hapd in HostapdCLI._instances.values() i=
-f hapd is not None]) =3D=3D 0
-+        if destroy:
-+            HostapdCLI._instances =3D {}
-+
-     def set_value(self, key, value):
-         cmd =3D self.cmdline + ['set', key, value]
-         ctx.start_process(cmd, wait=3DTrue)
-diff --git a/tools/test-runner b/tools/test-runner
-index 0ca50ddb..5a8006a5 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -545,6 +545,10 @@ class Hostapd:
- 		except:
- 			print("Failed to remove %s" % self.global_ctrl_iface)
+     def debug_scan(self, frequencies):
+-        if not self._station_debug:
+-            self._station_debug =3D StationDebug(self._object_path)
+-
+         self._station_debug.scan(frequencies)
  =
 
-+		for hapd in self.instances:
-+			hapd.cli._instances[hapd.config] =3D None
-+			hapd.cli =3D None
-+
- 		self.instances =3D None
+     def wait_for_event(self, event, timeout=3D10):
+-        if not self._station_debug:
+-            self._station_debug =3D StationDebug(self._object_path)
+-
+         self._station_debug.wait_for_event(event, timeout)
  =
 
- 		# Hostapd may have already been stopped
+     def __str__(self, prefix =3D ''):
 -- =
 
 2.31.1
 
---===============2243829354373826077==--
+--===============1302689563303271484==--
 
