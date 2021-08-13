@@ -1,40 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============2079933272343107947=="
+Content-Type: multipart/mixed; boundary="===============1074578929685421788=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/6] test-runner: implement non_block_wait
-Date: Fri, 13 Aug 2021 11:16:39 -0500
-Message-ID: <cb3561f3-cd13-8791-3157-08e97ff8fc07@gmail.com>
-In-Reply-To: <20210813162440.793847-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/3] station: Add generic Event signal
+Date: Fri, 13 Aug 2021 12:47:08 -0700
+Message-ID: <20210813194710.807550-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2079933272343107947==
+--===============1074578929685421788==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This is meant to be used as a generic notification to autotests. For
+now 'no-roam-candidates' is the only event being sent. The idea
+is to extend these events to signal conditions that are otherwise
+undiscoverable in autotesting.
+---
+ src/station.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-On 8/13/21 11:24 AM, James Prestwood wrote:
-> There was a common bit of code all over test-runner and utilities
-> which would wait for 'something' in a loop. At best these loops
-> would do the right thing and use the GLib.iteration call as to not
-> block the main loop, and at worst would not use it and just busy
-> wait.
-> =
+diff --git a/src/station.c b/src/station.c
+index 408ae887..d3482e2c 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -153,6 +153,24 @@ static bool station_is_autoconnecting(struct station *=
+station)
+ 			station->state =3D=3D STATION_STATE_AUTOCONNECT_QUICK;
+ }
+ =
 
-> Namespace.non_block_wait unifies all these into a single API to
-> a) do the wait correctly and b) prevent duplicate code.
-> ---
->   tools/test-runner | 80 ++++++++++++++++++++++++++++++++++++++---------
->   1 file changed, 65 insertions(+), 15 deletions(-)
-> =
++static bool station_debug_event(struct station *station, const char *name)
++{
++	struct l_dbus_message *signal;
++
++	if (!iwd_is_developer_mode())
++		return true;
++
++	l_debug("StationDebug.Event(%s)", name);
++
++	signal =3D l_dbus_message_new_signal(dbus_get_bus(),
++					netdev_get_path(station->netdev),
++					IWD_STATION_DEBUG_INTERFACE, "Event");
++
++	l_dbus_message_set_arguments(signal, "sav", name, 0);
++
++	return l_dbus_send(dbus_get_bus(), signal) !=3D 0;
++}
++
+ static void station_property_set_scanning(struct station *station,
+ 								bool scanning)
+ {
+@@ -1938,8 +1956,10 @@ next:
+ 		goto fail_free_bss;
+ =
 
+ 	/* See if we have anywhere to roam to */
+-	if (!best_bss || scan_bss_addr_eq(best_bss, station->connected_bss))
++	if (!best_bss || scan_bss_addr_eq(best_bss, station->connected_bss)) {
++		station_debug_event(station, "no-roam-candidates");
+ 		goto fail_free_bss;
++	}
+ =
 
-All applied, thanks.
+ 	bss =3D network_bss_find_by_addr(network, best_bss->addr);
+ 	if (bss) {
+@@ -3991,6 +4011,8 @@ static void station_setup_debug_interface(
+ 					station_debug_scan, "", "aq",
+ 					"frequencies");
+ =
 
-Regards,
--Denis
++	l_dbus_interface_signal(interface, "Event", 0, "sav", "name", "data");
++
+ 	l_dbus_interface_property(interface, "AutoConnect", 0, "b",
+ 					station_property_get_autoconnect,
+ 					station_property_set_autoconnect);
+-- =
 
---===============2079933272343107947==--
+2.31.1
+
+--===============1074578929685421788==--
 
