@@ -1,109 +1,178 @@
-Content-Type: multipart/mixed; boundary="===============6302355156975827260=="
+Content-Type: multipart/mixed; boundary="===============8847542808713466270=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] auto-t: speed up testRoamRetry
-Date: Fri, 13 Aug 2021 09:13:46 -0700
-Message-ID: <20210813161346.793270-3-prestwoj@gmail.com>
-In-Reply-To: <20210813161346.793270-1-prestwoj@gmail.com>
+Subject: [PATCH 1/6] test-runner: implement non_block_wait
+Date: Fri, 13 Aug 2021 09:24:35 -0700
+Message-ID: <20210813162440.793847-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6302355156975827260==
+--===============8847542808713466270==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This test took quite a while to execute (~2 minutes on my machine)
-because there was simply no other way to test this scenario but
-waiting. Now RoamScanning is a property so that can be used to
-avoid sleeping. Additionally the default RoamRetryInterval was
-being used which is 60 seconds. Instead main.conf can set this to
-5 seconds and really cut down on the time to wait.
+There was a common bit of code all over test-runner and utilities
+which would wait for 'something' in a loop. At best these loops
+would do the right thing and use the GLib.iteration call as to not
+block the main loop, and at worst would not use it and just busy
+wait.
 
-Part of a comment was also removed due to being incorrect. Even
-with neighbor reports IWD still must scan, its just that the
-scan is more limited and, in theory, faster.
+Namespace.non_block_wait unifies all these into a single API to
+a) do the wait correctly and b) prevent duplicate code.
 ---
- autotests/testRoamRetry/fast_retry_test.py | 15 ++++++++++++---
- autotests/testRoamRetry/main.conf          |  2 ++
- autotests/testRoamRetry/stop_retry_test.py |  2 +-
- 3 files changed, 15 insertions(+), 4 deletions(-)
- create mode 100644 autotests/testRoamRetry/main.conf
+ tools/test-runner | 80 ++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 65 insertions(+), 15 deletions(-)
 
-diff --git a/autotests/testRoamRetry/fast_retry_test.py b/autotests/testRoa=
-mRetry/fast_retry_test.py
-index d6324c31..fccd42bb 100644
---- a/autotests/testRoamRetry/fast_retry_test.py
-+++ b/autotests/testRoamRetry/fast_retry_test.py
-@@ -82,7 +82,11 @@ class Test(unittest.TestCase):
-         # schedule another attempt for 60 seconds later
-         rule0.signal =3D -8000
+diff --git a/tools/test-runner b/tools/test-runner
+index 87f6ec6d..22e9066f 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -233,7 +233,7 @@ class Process:
+ 		if not wait and not check:
+ 			return
  =
 
--        wd.wait(20)
-+        condition =3D 'obj.roam_scanning =3D=3D True'
-+        wd.wait_for_object_condition(device, condition)
+-		self.pid.wait(timeout=3D5)
++		Namespace.non_block_wait(self.wait_for_process, 10, 1)
+ 		self.killed =3D True
+ 		self.ret =3D self.pid.returncode
+ =
+
+@@ -245,6 +245,13 @@ class Process:
+ 		if check and self.ret !=3D 0:
+ 			raise subprocess.CalledProcessError(returncode=3Dself.ret, cmd=3Dself.a=
+rgs)
+ =
+
++	def wait_for_process(self, timeout):
++		try:
++			self.pid.wait(timeout)
++			return True
++		except:
++			return False
 +
-+        condition =3D 'obj.roam_scanning =3D=3D False'
-+        wd.wait_for_object_condition(device, condition)
+ 	def process_io(self, source):
+ 		data =3D source.read()
  =
 
-         self.assertEqual(device.state, iwd.DeviceState.connected)
-         self.assertTrue(bss_hostapd[0].list_sta())
-@@ -99,11 +103,16 @@ class Test(unittest.TestCase):
-         wd.wait(1)
+@@ -312,12 +319,7 @@ class Process:
+ 		self.killed =3D True
  =
 
-         # Assert low signal for BSS 0, check that iwd starts transition to=
- BSS 1
--        # in less than 10 seconds. Because of the neighbor report a scan s=
-hould
--        # not be necessary.
-+        # in less than 10 seconds.
-         rule0.signal =3D -8000
-         rule1.signal =3D -2000
+ 	def wait_for_socket(self, socket, wait):
+-		waited =3D 0
+-		while not os.path.exists(socket):
+-			sleep(0.5)
+-			waited +=3D 0.5
+-			if waited > wait:
+-				raise Exception("Timed out waiting for socket")
++		Namespace.non_block_wait(os.path.exists, wait, socket)
  =
 
-+        condition =3D 'obj.roam_scanning =3D=3D True'
-+        wd.wait_for_object_condition(device, condition)
+ 	def __str__(self):
+ 		return str(self.args) + '\n'
+@@ -641,7 +643,7 @@ class Namespace:
+ 		p =3D self.start_process(['dbus-daemon', '--config-file=3D%s' % self.dbu=
+s_cfg],
+ 					wait=3DFalse, cleanup=3Dself._cleanup_dbus)
+ =
+
+-		p.wait_for_socket(self.dbus_address.split('=3D')[1], wait=3D5)
++		p.wait_for_socket(self.dbus_address.split('=3D')[1], 5)
+ =
+
+ 		self._bus =3D dbus.bus.BusConnection(address_or_type=3Dself.dbus_address)
+ =
+
+@@ -699,15 +701,62 @@ class Namespace:
+ =
+
+ 		return False
+ =
+
+-	def wait_for_dbus_service(self, service):
+-		tries =3D 0
++	@staticmethod
++	def non_block_wait(func, timeout, *args, exception=3DTrue):
++		'''
++			Convenience function for waiting in a non blocking
++			manor using GLibs context iteration i.e. does not block
++			the main loop while waiting.
 +
-+        condition =3D 'obj.roam_scanning =3D=3D False'
-+        wd.wait_for_object_condition(device, condition)
++			'func' will be called at least once and repeatedly until
++			either it returns success, throws an exception, or the
++			'timeout' expires.
 +
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
-         wd.wait_for_object_condition(device, condition, max_wait=3D10)
++			'timeout' is the ultimate timeout in seconds
++
++			'*args' will be passed to 'func'
++
++			If 'exception' is an Exception type it will be raised.
++			If 'exception' is True a generic TimeoutError will be raised.
++			Any other value will not result in an exception.
++		'''
++		# Simple class for signaling the wait timeout
++		class Bool:
++			def __init__(self, value):
++				self.value =3D value
++
++		def wait_timeout_cb(done):
++			done.value =3D True
++			return False
++
++		mainloop =3D GLib.MainLoop()
++		done =3D Bool(False)
++
++		timeout =3D GLib.timeout_add_seconds(timeout, wait_timeout_cb, done)
++		context =3D mainloop.get_context()
++
++		while True:
++			context.iteration(may_block=3DFalse)
++
++			try:
++				ret =3D func(*args)
++				if ret:
++					GLib.source_remove(timeout)
++					return ret
++			except Exception as e:
++				GLib.source_remove(timeout)
++				raise e
  =
 
-diff --git a/autotests/testRoamRetry/main.conf b/autotests/testRoamRetry/ma=
-in.conf
-new file mode 100644
-index 00000000..f0d1c0f4
---- /dev/null
-+++ b/autotests/testRoamRetry/main.conf
-@@ -0,0 +1,2 @@
-+[General]
-+RoamRetryInterval=3D5
-diff --git a/autotests/testRoamRetry/stop_retry_test.py b/autotests/testRoa=
-mRetry/stop_retry_test.py
-index be9776a5..3bf166d8 100644
---- a/autotests/testRoamRetry/stop_retry_test.py
-+++ b/autotests/testRoamRetry/stop_retry_test.py
-@@ -99,7 +99,7 @@ class Test(unittest.TestCase):
+-		while not self._bus.name_has_owner(service):
+-			if tries > 200:
+-				raise TimeoutError('DBus service %s did not appear', service)
+-			tries +=3D 1
+ 			sleep(0.1)
  =
 
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
-         self.assertRaises(TimeoutError, wd.wait_for_object_condition, devi=
-ce,
--                          condition, max_wait=3D70)
-+                          condition, max_wait=3D10)
++			if done.value =3D=3D True:
++				if isinstance(exception, Exception):
++					raise exception
++				elif type(exception) =3D=3D bool and exception:
++					raise TimeoutError("Timeout on non_block_wait")
++				else:
++					return
++
+ 	def __str__(self):
+ 		ret =3D 'Namespace: %s\n' % self.name
+ 		ret +=3D 'Processes:\n'
+@@ -765,7 +814,8 @@ class TestContext(Namespace):
+ 			args.extend(['--no-register'])
  =
 
-         device.disconnect()
+ 		self.start_process(args)
+-		self.wait_for_dbus_service('net.connman.hwsim')
++		self.non_block_wait(self._bus.name_has_owner, 20, 'net.connman.hwsim',
++					exception=3DTimeoutError('net.connman.hwsim did not appear'))
  =
 
+ 		for i in range(nradios):
+ 			name =3D 'rad%u' % i
 -- =
 
 2.31.1
 
---===============6302355156975827260==--
+--===============8847542808713466270==--
 
