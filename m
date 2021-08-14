@@ -1,51 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============2634725895553273808=="
+Content-Type: multipart/mixed; boundary="===============6605181002048472915=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] test-runner: only remove GLib timeout if it exists
-Date: Fri, 13 Aug 2021 15:45:54 -0700
-Message-ID: <20210813224554.816379-4-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/4] auto-t: return existing instance from HostapdCLI
+Date: Fri, 13 Aug 2021 20:39:33 -0500
+Message-ID: <d9d0c4f2-670a-2d77-97ce-d682a48048a3@gmail.com>
 In-Reply-To: <20210813224554.816379-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2634725895553273808==
+--===============6605181002048472915==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There was a race condition here where the GLib timeout could have
-fired but the test function returned successfully prior to the
-end of the while loop. This would end up causing source_remove to
-print a warning that the source did not exist.
+Hi James,
 
-Instead check if the timeout fired prior to removing it.
----
- tools/test-runner | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+On 8/13/21 5:45 PM, James Prestwood wrote:
+> This addresses the TODO where HostapdCLI was creating separate
+> objects each time HostapdCLI was called. This was worked around
+> by manually setting the important members but instead the class
+> can be re-worked to act as somewhat of a singleton, per-config
+> at least.
+> =
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 5a8006a5..dcb1ba5e 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -751,10 +751,12 @@ class Namespace:
- 			try:
- 				ret =3D func(*args)
- 				if ret:
--					GLib.source_remove(timeout)
-+					if not done.value:
-+						GLib.source_remove(timeout)
- 					return ret
- 			except Exception as e:
--				GLib.source_remove(timeout)
-+				if not done.value:
-+					GLib.source_remove(timeout)
- 				raise e
- =
+> If there is no HostapdCLI instance for a given config one is
+> created and initialized. Subsequent HostapdCLI calls (for the
+> same config) will be returned the same object rather than a
+> new one.
+> ---
+>   autotests/util/hostapd.py | 48 +++++++++++++++++++++++----------------
+>   tools/test-runner         |  4 ++++
+>   2 files changed, 33 insertions(+), 19 deletions(-)
+> =
 
- 			sleep(0.1)
--- =
 
-2.31.1
+All applied, thanks.
 
---===============2634725895553273808==--
+Regards,
+-Denis
+
+--===============6605181002048472915==--
 
