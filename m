@@ -1,56 +1,106 @@
-Content-Type: multipart/mixed; boundary="===============5019500437193600915=="
+Content-Type: multipart/mixed; boundary="===============1602133913048366175=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 2/9] handshake: Add HANDSHAKE_EVENT_IP_REQUEST
-Date: Fri, 13 Aug 2021 22:31:39 -0500
-Message-ID: <1f9d39ee-b015-f554-de96-88bb83e94d85@gmail.com>
-In-Reply-To: <CAOq732LZAqfz1aO71U_2tUhhFFQjpB+H7VC6XmTbt2LkLuWU_Q@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] auto-t: hostapd.py: remove _hostapd_restarted concept
+Date: Mon, 16 Aug 2021 09:04:50 -0700
+Message-ID: <20210816160450.11566-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5019500437193600915==
+--===============1602133913048366175==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+The destructor was trying to do more than the scope of a destructor
+by trying to handle this single case of hostapd being restarted.
 
->>> +     if (sm->handshake->support_ip_allocation &&
->>> +                     !sm->handshake->client_ip_addr) {
->>> +             handshake_event(sm->handshake, HANDSHAKE_EVENT_IP_REQUEST=
-);
->>> +
->>> +             if (!sm->handshake->client_ip_addr)
->>
->> Isn't this condition already checked above?
-> =
+Instead we can simply pass a keyword argument 'reinit' to the
+constructor to tell it to reinitialize everything. And as for killing
+hostapd this can be done in ungraceful_restart itself rather than
+trying to handle it in the destructor.
+---
+ autotests/util/hostapd.py | 21 +++++++--------------
+ 1 file changed, 7 insertions(+), 14 deletions(-)
 
-> The intention was for the handshake_event handler to try to set this,
-> so this is expected to have changed since then.  But if it's still
-> NULL then we assume there was some problem with the IP allocation.
-> =
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index aabc997b..8b81d467 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -43,10 +43,10 @@ class HostapdCLI(object):
+ =
 
+         return cls._instances[config]
+ =
 
-This really begs for a comment then.
+-    def _init_hostapd(self, config):
++    def _init_hostapd(self, config, reinit=3DFalse):
+         global ctrl_count
+ =
 
->> Do you want to distinguish between P2P IP request and FILS IP Request?  =
-Might
->> make things a bit more explicit ?
-> =
+-        if self._initialized:
++        if self._initialized and not reinit:
+             return
+ =
 
-> I thought the API could be the same for both (granted FILS sends more
-> bits of data from the lease, but I was thinking eventually we'd store
-> a whole struct l_dhcp_lease object in the handshake_state, replacing
-> client_ip_addr, subnet_mask and go_ip_addr).
-> =
+         self._initialized =3D True
+@@ -60,9 +60,6 @@ class HostapdCLI(object):
+ =
 
-> In reality, on the authenticator side we only create a struct
-> handshake_state after the association, so this only applies for P2P, I
-> can put P2P in the event name.
+         hapd =3D ctx.hostapd[config]
+ =
 
-Sounds like adding P2P to the event name would make things clearer.
+-        if not hasattr(self, '_hostapd_restarted'):
+-            self._hostapd_restarted =3D False
+-
+         self.interface =3D hapd.intf
+         self.config =3D hapd.config
+ =
 
-Regards,
--Denis
---===============5019500437193600915==--
+@@ -131,12 +128,6 @@ class HostapdCLI(object):
+         except:
+             pass
+ =
+
+-        if self._hostapd_restarted:
+-            ctx.stop_process(ctx.hostapd.process, force)
+-
+-            self.interface.set_interface_state('down')
+-            self.interface.set_interface_state('up')
+-
+     def __del__(self):
+         self._del_hostapd()
+ =
+
+@@ -215,8 +206,10 @@ class HostapdCLI(object):
+         '''
+             Ungracefully kill and restart hostapd
+         '''
+-        # set flag so hostapd can be killed after the test
+-        self._hostapd_restarted =3D True
++        ctx.stop_process(ctx.hostapd.process, True)
++
++        self.interface.set_interface_state('down')
++        self.interface.set_interface_state('up')
+ =
+
+         self._del_hostapd(force=3DTrue)
+ =
+
+@@ -226,7 +219,7 @@ class HostapdCLI(object):
+         time.sleep(1)
+ =
+
+         # New hostapd process, so re-init
+-        self._init_hostapd(config=3Dself.config)
++        self._init_hostapd(config=3Dself.config, reinit=3DTrue)
+ =
+
+     def req_beacon(self, addr, request):
+         '''
+-- =
+
+2.31.1
+
+--===============1602133913048366175==--
 
