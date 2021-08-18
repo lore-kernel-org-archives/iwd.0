@@ -1,34 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============8267304407184334211=="
+Content-Type: multipart/mixed; boundary="===============4575893678778152110=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] auto-t: separate PEAP + SIM test
-Date: Tue, 17 Aug 2021 17:02:56 -0500
-Message-ID: <e6f73884-c75d-b7f5-0fb3-2e777cc9adb8@gmail.com>
-In-Reply-To: <20210817215002.212694-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/4] network: handle NULL/hotspot networks when removing
+ secrets
+Date: Wed, 18 Aug 2021 10:26:00 -0700
+Message-ID: <20210818172603.266294-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8267304407184334211==
+--===============4575893678778152110==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+The hotspot case can actually result in network being NULL which
+ends up crashing when accessing "->secrets". In addition any
+secrets on this network were never removed for hotspot networks
+since everything happened in network_unset_hotspot.
+---
+ src/network.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-On 8/17/21 4:50 PM, James Prestwood wrote:
-> Remove EAP-SIM from the generic PEAP test case since skipping
-> (if ofono is not on system) would skip the entire test rather
-> than just the EAP-SIM portion.
-> ---
->   autotests/testEAP/connection_test.py | 29 ++++++++++++++++++++++++----
->   1 file changed, 25 insertions(+), 4 deletions(-)
-> =
+diff --git a/src/network.c b/src/network.c
+index 79f3bd33..b794e609 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1823,6 +1823,11 @@ static void network_unset_hotspot(struct network *ne=
+twork, void *user_data)
+ 		return;
+ =
 
+ 	network_set_info(network, NULL);
++
++	if (network->secrets) {
++		l_queue_destroy(network->secrets, eap_secret_info_free);
++		network->secrets =3D NULL;
++	}
+ }
+ =
 
-Applied, thanks.
+ static void emit_known_network_removed(struct station *station, void *user=
+_data)
+@@ -1850,8 +1855,10 @@ static void emit_known_network_removed(struct statio=
+n *station, void *user_data)
+ 	if (network && was_hidden)
+ 		station_hide_network(station, network);
+ =
 
-Regards,
--Denis
+-	l_queue_destroy(network->secrets, eap_secret_info_free);
+-	network->secrets =3D NULL;
++	if (network && network->secrets) {
++		l_queue_destroy(network->secrets, eap_secret_info_free);
++		network->secrets =3D NULL;
++	}
+ }
+ =
 
---===============8267304407184334211==--
+ static void network_update_hotspot(struct network *network, void *user_dat=
+a)
+-- =
+
+2.31.1
+
+--===============4575893678778152110==--
 
