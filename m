@@ -1,66 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============4575893678778152110=="
+Content-Type: multipart/mixed; boundary="===============7961031425857325232=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/4] network: handle NULL/hotspot networks when removing
- secrets
-Date: Wed, 18 Aug 2021 10:26:00 -0700
-Message-ID: <20210818172603.266294-1-prestwoj@gmail.com>
+Subject: [PATCH 2/4] hwsim: add Rule.remove_all()
+Date: Wed, 18 Aug 2021 10:26:01 -0700
+Message-ID: <20210818172603.266294-2-prestwoj@gmail.com>
+In-Reply-To: <20210818172603.266294-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4575893678778152110==
+--===============7961031425857325232==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The hotspot case can actually result in network being NULL which
-ends up crashing when accessing "->secrets". In addition any
-secrets on this network were never removed for hotspot networks
-since everything happened in network_unset_hotspot.
+There are really no cases where a test wants to remove a single
+rule. Most loop through and remove rules individually so this
+is being added as a convenience.
 ---
- src/network.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ autotests/util/hwsim.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/network.c b/src/network.c
-index 79f3bd33..b794e609 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -1823,6 +1823,11 @@ static void network_unset_hotspot(struct network *ne=
-twork, void *user_data)
- 		return;
+diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
+index 320e9dfa..4e3b8ec2 100755
+--- a/autotests/util/hwsim.py
++++ b/autotests/util/hwsim.py
+@@ -202,6 +202,10 @@ class RuleSet(collections.Mapping):
+         self._dict[path] =3D obj
+         return obj
  =
 
- 	network_set_info(network, NULL);
++    def remove_all(self):
++        for rule in self._dict.values():
++            rule.remove()
 +
-+	if (network->secrets) {
-+		l_queue_destroy(network->secrets, eap_secret_info_free);
-+		network->secrets =3D NULL;
-+	}
- }
+ class Radio(HwsimDBusAbstract):
+     _iface_name =3D HWSIM_RADIO_INTERFACE
  =
 
- static void emit_known_network_removed(struct station *station, void *user=
-_data)
-@@ -1850,8 +1855,10 @@ static void emit_known_network_removed(struct statio=
-n *station, void *user_data)
- 	if (network && was_hidden)
- 		station_hide_network(station, network);
- =
-
--	l_queue_destroy(network->secrets, eap_secret_info_free);
--	network->secrets =3D NULL;
-+	if (network && network->secrets) {
-+		l_queue_destroy(network->secrets, eap_secret_info_free);
-+		network->secrets =3D NULL;
-+	}
- }
- =
-
- static void network_update_hotspot(struct network *network, void *user_dat=
-a)
 -- =
 
 2.31.1
 
---===============4575893678778152110==--
+--===============7961031425857325232==--
 
