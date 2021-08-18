@@ -1,58 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============7304417374743956149=="
+Content-Type: multipart/mixed; boundary="===============7022462205805749906=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] test-runner: fix subtest option
-Date: Wed, 18 Aug 2021 10:26:03 -0700
-Message-ID: <20210818172603.266294-4-prestwoj@gmail.com>
-In-Reply-To: <20210818172603.266294-1-prestwoj@gmail.com>
+From: Michael Johnson <mjohnson459@gmail.com>
+Subject: Re: [PATCH] wiphy: set neighbor report capability flag
+Date: Wed, 18 Aug 2021 18:39:26 +0100
+Message-ID: <CACsRnHUM4SjW-mnKU+_9UDcqj3OpEB6q0EG46C1z7WtpQRaVwQ@mail.gmail.com>
+In-Reply-To: <CACsRnHU6iw5HrQfDFkt_O_SnFkCZmCRBFgn0pcgRFEzf6EnGpw@mail.gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7304417374743956149==
+--===============7022462205805749906==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This was not working correctly and would run all subtests when only a single
-was requested
----
- tools/test-runner | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Hi Denis,
 
-diff --git a/tools/test-runner b/tools/test-runner
-index dc65cca4..a19ce1d9 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1271,16 +1271,18 @@ def pre_test(ctx, test, copied):
- 	# Prune down any subtests if needed
- 	if ctx.args.sub_tests:
- 		ctx.args.sub_tests =3D ctx.args.sub_tests.split(',')
-+
-+		to_run =3D [x.split('.')[0] for x in ctx.args.sub_tests]
- 		pruned =3D []
- =
+A couple of updates today after some testing.
 
- 		for s in subtests:
--			file =3D s
-+			no_ext =3D s
- 			# Handle <file>.<test function> format
- 			if '.' in s:
--				file =3D s.split('.')[0] + '.py'
-+				no_ext =3D s.split('.')[0]
- =
+Firstly the fix done to add the extended capabilities tags in FT roams
+worked and I had successful 802.11v behaviour with Meraki access
+points. Thank you very much for that.
 
--			if file =3D=3D s:
--				pruned.append(file)
-+			if no_ext in to_run:
-+				pruned.append(no_ext + '.py')
- =
+Secondly, Meraki have checked their behavior and are now agreeing that
+the Neighbor Report field does not need to be set for .11k to work
+correctly and that they have a bug relating to the optional SSID tag
+not being included in the message. However they are still saying that
+setting the Neighbor Report field is subjectively "correct" citing
+section 6.3.30 of the 2020 edition of the standard (being completely
+open it is an interpretation rather than solid requirement).
+Personally, I think it makes sense for it to be set when it is
+supported but I don't suppose it makes much difference either way.
 
- 		subtests =3D pruned
- =
+Kind Regards,
+Michael
 
--- =
-
-2.31.1
-
---===============7304417374743956149==--
+On Fri, 6 Aug 2021 at 16:28, Michael Johnson <mjohnson459@gmail.com> wrot=
+e:
+>
+> Hi Denis,
+>
+> Thanks for the quick fix. I've confirmed the fields are being set on
+> my client but I won't be able to check the behavior until next week as
+> it requires some changes to my test environment. I'll let you know how
+> it goes.
+>
+> I've also asked Meraki to clarify on the Neighbor Report field and
+> will let you know when I hear back.
+>
+> Thanks again,
+> Michael
+>
+> On Fri, 6 Aug 2021 at 03:10, Denis Kenzior <denkenz@gmail.com> wrote:
+> >
+> > Hi Michael,
+> >
+> > On 8/3/21 12:41 PM, Michael Johnson wrote:
+> > > Hi Denis,
+> > >
+> > > On Tue, 3 Aug 2021 at 17:35, Denis Kenzior <denkenz@gmail.com> wrot=
+e:
+> > >> Hmm, I wonder if we have a different bug here.  This gives me a few =
+ideas to
+> > >> look into, let me poke around and I'll get back to you.
+> > >>
+> > >> What other problems are you having?
+> > >
+> > > Thank you!
+> > >
+> > > The other major problem I'm having is when 802.11v is enabled the APs
+> > > are not sending BSS-TM frames during re-associations (i.e. FT roams)
+> > > but it does work during a full association.
+> > > The current suspect is that the client doesn't send the "extended
+> > > capabilities" tags in the re-association frame like it does with a
+> > > full association. Without this the Meraki APs assume the client
+> > > doesn't support it.
+> > > I don't know what the standard says about this one.
+> > >
+> >
+> > I believe I have fixed this upstream now with commit 8f9e6b3f7626 ("net=
+dev: Send
+> > addititional IEs for FT/SAE/OWE/FILS")
+> >
+> > Can you give it another try?
+> >
+> > Regards,
+> > -Denis
+--===============7022462205805749906==--
 
