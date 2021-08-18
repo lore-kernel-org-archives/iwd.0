@@ -1,63 +1,74 @@
-Content-Type: multipart/mixed; boundary="===============8531512642120519720=="
+Content-Type: multipart/mixed; boundary="===============2863220946520076190=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] wiphy: set neighbor report capability flag
-Date: Wed, 18 Aug 2021 13:11:43 -0500
-Message-ID: <6a81b489-c4fc-7fa3-adbf-a7167774b516@gmail.com>
-In-Reply-To: <CACsRnHUM4SjW-mnKU+_9UDcqj3OpEB6q0EG46C1z7WtpQRaVwQ@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/4] network: handle NULL/hotspot networks when removing
+ secrets
+Date: Wed, 18 Aug 2021 14:50:25 -0700
+Message-ID: <20210818215028.294978-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8531512642120519720==
+--===============2863220946520076190==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+The hotspot case can actually result in network being NULL which
+ends up crashing when accessing "->secrets". In addition any
+secrets on this network were never removed for hotspot networks
+since everything happened in network_unset_hotspot.
+---
+ src/network.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-On 8/18/21 12:39 PM, Michael Johnson wrote:
-> Hi Denis,
-> =
+diff --git a/src/network.c b/src/network.c
+index 79f3bd33..d81a201d 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1823,6 +1823,9 @@ static void network_unset_hotspot(struct network *net=
+work, void *user_data)
+ 		return;
+ =
 
-> A couple of updates today after some testing.
-> =
+ 	network_set_info(network, NULL);
++
++	l_queue_destroy(network->secrets, eap_secret_info_free);
++	network->secrets =3D NULL;
+ }
+ =
 
-> Firstly the fix done to add the extended capabilities tags in FT roams
-> worked and I had successful 802.11v behaviour with Meraki access
-> points. Thank you very much for that.
+ static void emit_known_network_removed(struct station *station, void *user=
+_data)
+@@ -1841,6 +1844,9 @@ static void emit_known_network_removed(struct station=
+ *station, void *user_data)
+ 			return;
+ =
 
-Awesome, thanks for testing!
+ 		network_set_info(network, NULL);
++
++		l_queue_destroy(network->secrets, eap_secret_info_free);
++		network->secrets =3D NULL;
+ 	}
+ =
 
-> =
+ 	connected_network =3D station_get_connected_network(station);
+@@ -1849,9 +1855,6 @@ static void emit_known_network_removed(struct station=
+ *station, void *user_data)
+ =
 
-> Secondly, Meraki have checked their behavior and are now agreeing that
-> the Neighbor Report field does not need to be set for .11k to work
-> correctly and that they have a bug relating to the optional SSID tag
-> not being included in the message. However they are still saying that
-> setting the Neighbor Report field is subjectively "correct" citing
-> section 6.3.30 of the 2020 edition of the standard (being completely
+ 	if (network && was_hidden)
+ 		station_hide_network(station, network);
+-
+-	l_queue_destroy(network->secrets, eap_secret_info_free);
+-	network->secrets =3D NULL;
+ }
+ =
 
-Did they quote the exact parts they're interpreting by any chance?  I quick=
-ly =
+ static void network_update_hotspot(struct network *network, void *user_dat=
+a)
+-- =
 
-went over this section, but nothing jumps out at me.
+2.31.1
 
-> open it is an interpretation rather than solid requirement).
-> Personally, I think it makes sense for it to be set when it is
-> supported but I don't suppose it makes much difference either way.
-
-Ok.  Let me stare at this section some more.  Generally I agree that there =
-is =
-
-probably no harm in setting this bit as the STA.  But, it would be nice to =
-have =
-
-a quote from 802.11-2020 (even if it is open to interpretation) that could =
-be =
-
-used in the commit message as the justification.
-
-Regards,
--Denis
---===============8531512642120519720==--
+--===============2863220946520076190==--
 
