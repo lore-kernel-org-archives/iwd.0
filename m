@@ -1,49 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============5395030768957051105=="
+Content-Type: multipart/mixed; boundary="===============7491604600536250141=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/8] auto-t: hwsim.py: add Enabled property
-Date: Wed, 18 Aug 2021 15:09:30 -0700
-Message-ID: <20210818220934.295721-4-prestwoj@gmail.com>
+Subject: [PATCH 5/8] auto-t: hwsim.py: handle Prefix/Enabled in __str__
+Date: Wed, 18 Aug 2021 15:09:31 -0700
+Message-ID: <20210818220934.295721-5-prestwoj@gmail.com>
 In-Reply-To: <20210818220934.295721-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5395030768957051105==
+--===============7491604600536250141==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- autotests/util/hwsim.py | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ autotests/util/hwsim.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
-index 4e3b8ec2..3a83bcd8 100755
+index 3a83bcd8..52543062 100755
 --- a/autotests/util/hwsim.py
 +++ b/autotests/util/hwsim.py
-@@ -142,6 +142,16 @@ class Rule(HwsimDBusAbstract):
-                             reply_handler=3Dself._success, error_handler=
-=3Dself._failure)
-         self._wait_for_async_op()
+@@ -171,7 +171,9 @@ class Rule(HwsimDBusAbstract):
+                prefix + '\tFrequency:\t' + str(self.frequency) + '\n' + \
+                prefix + '\tApply rssi:\t' + str(self.signal) + '\n' + \
+                prefix + '\tApply drop:\t' + str(self.drop) + '\n' + \
+-               prefix + '\tPrefix:\t' + str([hex(b) for b in self.prefix])=
+ + '\n'
++               prefix + '\tPrefix:\t' + str([hex(b) for b in self.prefix])=
+ + '\n' + \
++               prefix + '\tDelay:\t' + str(self.delay) + '\n' + \
++               prefix + '\tEnabled:\t' + str(self.enabled) + '\n'
  =
 
-+    @property
-+    def enabled(self):
-+        return self._properties['Enabled']
-+
-+    @enabled.setter
-+    def enabled(self, value):
-+        self._prop_proxy.Set(self._iface_name, 'Enabled', value,
-+                            reply_handler=3Dself._success, error_handler=
-=3Dself._failure)
-+        self._wait_for_async_op()
-+
-     def remove(self):
-         self._iface.Remove(reply_handler=3Dself._success,
-                 error_handler=3Dself._failure)
+ class RuleSet(collections.Mapping):
+     def __init__(self, hwsim, objects):
 -- =
 
 2.31.1
 
---===============5395030768957051105==--
+--===============7491604600536250141==--
 
