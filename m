@@ -1,34 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============7851792731589982260=="
+Content-Type: multipart/mixed; boundary="===============0112924036592244315=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] auto-t: scan as many times as needed to find networks
-Date: Wed, 18 Aug 2021 16:56:09 -0500
-Message-ID: <90ff503d-ec60-88a6-9cda-7b48c40322ce@gmail.com>
-In-Reply-To: <20210818174634.267270-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v2 1/4] network: handle NULL/hotspot networks when
+ removing secrets
+Date: Wed, 18 Aug 2021 16:58:50 -0500
+Message-ID: <2a01feed-cfc8-e461-4597-107b32704fd4@gmail.com>
+In-Reply-To: <20210818215028.294978-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7851792731589982260==
+--===============0112924036592244315==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 8/18/21 12:46 PM, James Prestwood wrote:
-> Certain autotests coupled with slower test machines can result in lost
-> beacons and "Network not found" errors. In attempt to help with this
-> the test can just rescan (30 seconds max) until the network is found.
+On 8/18/21 4:50 PM, James Prestwood wrote:
+> The hotspot case can actually result in network being NULL which
+> ends up crashing when accessing "->secrets". In addition any
+> secrets on this network were never removed for hotspot networks
+> since everything happened in network_unset_hotspot.
 > ---
->   autotests/util/iwd.py | 22 +++++++++++++++-------
->   1 file changed, 15 insertions(+), 7 deletions(-)
+>   src/network.c | 9 ++++++---
+>   1 file changed, 6 insertions(+), 3 deletions(-)
 > =
 
 
-Applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
-
---===============7851792731589982260==--
+--===============0112924036592244315==--
 
