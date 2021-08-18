@@ -1,58 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============2698868475460942459=="
+Content-Type: multipart/mixed; boundary="===============7851792731589982260=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 4/4] test-runner: fix subtest option
-Date: Wed, 18 Aug 2021 14:50:28 -0700
-Message-ID: <20210818215028.294978-4-prestwoj@gmail.com>
-In-Reply-To: <20210818215028.294978-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH] auto-t: scan as many times as needed to find networks
+Date: Wed, 18 Aug 2021 16:56:09 -0500
+Message-ID: <90ff503d-ec60-88a6-9cda-7b48c40322ce@gmail.com>
+In-Reply-To: <20210818174634.267270-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2698868475460942459==
+--===============7851792731589982260==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This was not working correctly and would run all subtests when only a single
-was requested
----
- tools/test-runner | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Hi James,
 
-diff --git a/tools/test-runner b/tools/test-runner
-index dc65cca4..a19ce1d9 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1271,16 +1271,18 @@ def pre_test(ctx, test, copied):
- 	# Prune down any subtests if needed
- 	if ctx.args.sub_tests:
- 		ctx.args.sub_tests =3D ctx.args.sub_tests.split(',')
-+
-+		to_run =3D [x.split('.')[0] for x in ctx.args.sub_tests]
- 		pruned =3D []
- =
+On 8/18/21 12:46 PM, James Prestwood wrote:
+> Certain autotests coupled with slower test machines can result in lost
+> beacons and "Network not found" errors. In attempt to help with this
+> the test can just rescan (30 seconds max) until the network is found.
+> ---
+>   autotests/util/iwd.py | 22 +++++++++++++++-------
+>   1 file changed, 15 insertions(+), 7 deletions(-)
+> =
 
- 		for s in subtests:
--			file =3D s
-+			no_ext =3D s
- 			# Handle <file>.<test function> format
- 			if '.' in s:
--				file =3D s.split('.')[0] + '.py'
-+				no_ext =3D s.split('.')[0]
- =
 
--			if file =3D=3D s:
--				pruned.append(file)
-+			if no_ext in to_run:
-+				pruned.append(no_ext + '.py')
- =
+Applied, thanks.
 
- 		subtests =3D pruned
- =
+Regards,
+-Denis
 
--- =
-
-2.31.1
-
---===============2698868475460942459==--
+--===============7851792731589982260==--
 
