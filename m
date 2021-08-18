@@ -1,119 +1,100 @@
-Content-Type: multipart/mixed; boundary="===============7788151338162618216=="
+Content-Type: multipart/mixed; boundary="===============4814180899015342891=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/8] hwsim: require enabling rule before use
-Date: Wed, 18 Aug 2021 15:09:28 -0700
-Message-ID: <20210818220934.295721-2-prestwoj@gmail.com>
+Subject: [PATCH 3/8] hwsim: remove unconditional packet delay
+Date: Wed, 18 Aug 2021 15:09:29 -0700
+Message-ID: <20210818220934.295721-3-prestwoj@gmail.com>
 In-Reply-To: <20210818220934.295721-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============7788151338162618216==
+--===============4814180899015342891==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The hwsim Rule API was structured as properties so once a rule is
-created it automatically starts being applied to frames. This happens
-before anything has time to actually define the rule (source, destination
-etc). This leads to every single frame being matched to the rule until
-these other properties are added, which can result in unexpected behavior.
+This was initially put in to solve an issue that was specific to
+mac80211_hwsim where the connect callback would get queued and
+delayed until after the connect event. This caused IWD to get very
+confused.
 
-To fix this an "Enabled" property has been added and the rule will not
-be applied until this is true.
+Later it was found that "real" drivers can sometimes do this so
+some code was added to IWD core to handle it.
+
+Now there isn't much point to delay all frames unless a rule specifies
+so change the behavior back to sending out frames immediately.
 ---
- tools/hwsim.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ tools/hwsim.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
 diff --git a/tools/hwsim.c b/tools/hwsim.c
-index fcb83248..c7b41750 100644
+index c7b41750..cd4a99b7 100644
 --- a/tools/hwsim.c
 +++ b/tools/hwsim.c
-@@ -124,6 +124,7 @@ struct hwsim_rule {
- 	bool destination_any : 1;
- 	bool bidirectional : 1;
- 	bool drop : 1;
-+	bool enabled : 1;
- 	uint32_t frequency;
- 	int priority;
- 	int signal;
-@@ -1177,6 +1178,9 @@ static void process_rules(const struct radio_info_rec=
- *src_radio,
- 			rule_entry =3D rule_entry->next) {
- 		struct hwsim_rule *rule =3D rule_entry->data;
+@@ -1436,9 +1436,11 @@ static void frame_delay_callback(struct l_timeout *t=
+imeout, void *user_data)
+ 	else
+ 		send_frame_destroy(send_info);
  =
 
-+		if (!rule->enabled)
-+			return;
+-	l_timeout_remove(timeout);
++	if (timeout)
++		l_timeout_remove(timeout);
+ }
+ =
+
 +
- 		if (!rule->source_any &&
- 				!radio_match_addr(src_radio, rule->source) &&
- 				(!rule->bidirectional ||
-@@ -1996,6 +2000,7 @@ static struct l_dbus_message *rule_add(struct l_dbus =
+ /*
+  * Process frames in a similar way to how the kernel built-in hwsim medium
+  * does this, with an additional optimization for unicast frames and
+@@ -1457,7 +1459,7 @@ static void process_frame(struct hwsim_frame *frame)
+ 		struct radio_info_rec *radio =3D entry->data;
+ 		struct send_frame_info *send_info;
+ 		bool drop =3D drop_mcast;
+-		uint32_t delay =3D HWSIM_DELAY_MIN_MS;
++		uint32_t delay =3D 0;
+ =
+
+ 		if (radio =3D=3D frame->src_radio)
+ 			continue;
+@@ -1499,11 +1501,16 @@ static void process_frame(struct hwsim_frame *frame)
+ 		send_info->radio =3D radio;
+ 		send_info->frame =3D hwsim_frame_ref(frame);
+ =
+
+-		if (!l_timeout_create_ms(delay, frame_delay_callback,
+-						send_info, NULL)) {
+-			l_error("Error delaying frame, frame will be dropped");
+-			send_frame_destroy(send_info);
+-		}
++		if (delay) {
++			if (!l_timeout_create_ms(delay, frame_delay_callback,
++							send_info, NULL)) {
++				l_error("Error delaying frame %ums, "
++						"frame will be dropped", delay);
++				send_frame_destroy(send_info);
++			}
++		} else
++			frame_delay_callback(NULL, send_info);
++
+ 	}
+ =
+
+ 	hwsim_frame_unref(frame);
+@@ -1999,7 +2006,7 @@ static struct l_dbus_message *rule_add(struct l_dbus =
 *dbus,
+ 	rule->id =3D next_rule_id++;
  	rule->source_any =3D true;
  	rule->destination_any =3D true;
- 	rule->delay =3D HWSIM_DELAY_MIN_MS;
-+	rule->enabled =3D false;
+-	rule->delay =3D HWSIM_DELAY_MIN_MS;
++	rule->delay =3D 0;
+ 	rule->enabled =3D false;
  =
 
  	if (!rules)
- 		rules =3D l_queue_new();
-@@ -2369,6 +2374,37 @@ invalid_args:
- 	return dbus_error_invalid_args(message);
- }
- =
-
-+static bool rule_property_get_enabled(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	struct hwsim_rule *rule =3D user_data;
-+	bool bval =3D rule->enabled;
-+
-+	l_dbus_message_builder_append_basic(builder, 'b', &bval);
-+
-+	return true;
-+}
-+
-+static struct l_dbus_message *rule_property_set_enabled(
-+					struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_iter *new_value,
-+					l_dbus_property_complete_cb_t complete,
-+					void *user_data)
-+{
-+	struct hwsim_rule *rule =3D user_data;
-+	bool bval;
-+
-+	if (!l_dbus_message_iter_get_variant(new_value, "b", &bval))
-+		return dbus_error_invalid_args(message);
-+
-+	rule->enabled =3D bval;
-+
-+	return l_dbus_message_new_method_return(message);
-+}
-+
- static void setup_rule_interface(struct l_dbus_interface *interface)
- {
- 	l_dbus_interface_method(interface, "Remove", 0, rule_remove, "", "");
-@@ -2409,6 +2445,10 @@ static void setup_rule_interface(struct l_dbus_inter=
-face *interface)
- 					L_DBUS_PROPERTY_FLAG_AUTO_EMIT, "ay",
- 					rule_property_get_prefix,
- 					rule_property_set_prefix);
-+	l_dbus_interface_property(interface, "Enabled",
-+					L_DBUS_PROPERTY_FLAG_AUTO_EMIT, "b",
-+					rule_property_get_enabled,
-+					rule_property_set_enabled);
- }
- =
-
- static void request_name_callback(struct l_dbus *dbus, bool success,
 -- =
 
 2.31.1
 
---===============7788151338162618216==--
+--===============4814180899015342891==--
 
