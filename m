@@ -1,151 +1,150 @@
-Content-Type: multipart/mixed; boundary="===============0637229923009971099=="
+Content-Type: multipart/mixed; boundary="===============3949693726758727300=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/8] auto-t: update tests to enable hwsim rules
-Date: Wed, 18 Aug 2021 15:09:33 -0700
-Message-ID: <20210818220934.295721-7-prestwoj@gmail.com>
+Subject: [PATCH 8/8] auto-t: remove ANQP delay test
+Date: Wed, 18 Aug 2021 15:09:34 -0700
+Message-ID: <20210818220934.295721-8-prestwoj@gmail.com>
 In-Reply-To: <20210818220934.295721-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0637229923009971099==
+--===============3949693726758727300==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+The idea of this test is valid but it is extremely timing dependent
+which simply isn't testable on all machines. Removing this test
+at least until this can be tested reliably.
 ---
- autotests/testHT-VHT/connection_test.py    | 3 +++
- autotests/testOWE/timeout_test.py          | 2 ++
- autotests/testRSSIAgent/connection_test.py | 1 +
- autotests/testRoamRetry/fast_retry_test.py | 2 ++
- autotests/testRoamRetry/stop_retry_test.py | 2 ++
- autotests/testSAE/timeout_test.py          | 1 +
- 6 files changed, 11 insertions(+)
+ autotests/testHotspot/anqp_delay_test.py | 106 -----------------------
+ 1 file changed, 106 deletions(-)
+ delete mode 100644 autotests/testHotspot/anqp_delay_test.py
 
-diff --git a/autotests/testHT-VHT/connection_test.py b/autotests/testHT-VHT=
-/connection_test.py
-index 3d190509..051822c2 100644
---- a/autotests/testHT-VHT/connection_test.py
-+++ b/autotests/testHT-VHT/connection_test.py
-@@ -66,16 +66,19 @@ class Test(unittest.TestCase):
-         rule0.source =3D vht_radio.addresses[0]
-         rule0.bidirectional =3D True
-         rule0.signal =3D -5100
-+        rule0.enabled =3D True
- =
-
-         rule1 =3D hwsim.rules.create()
-         rule1.source =3D ht_radio.addresses[0]
-         rule1.bidirectional =3D True
-         rule1.signal =3D -5200
-+        rule1.enabled =3D True
- =
-
-         rule2 =3D hwsim.rules.create()
-         rule2.source =3D non_ht_radio.addresses[0]
-         rule2.bidirectional =3D True
-         rule2.signal =3D -5300
-+        rule2.enabled =3D True
- =
-
-         wd =3D IWD()
- =
-
-diff --git a/autotests/testOWE/timeout_test.py b/autotests/testOWE/timeout_=
-test.py
-index fbf79f4c..96d367b3 100644
---- a/autotests/testOWE/timeout_test.py
-+++ b/autotests/testOWE/timeout_test.py
-@@ -39,12 +39,14 @@ class Test(unittest.TestCase):
-         rule0.bidirectional =3D True
-         rule0.drop =3D True
-         rule0.prefix =3D 'b0'
-+        rule0.enabled =3D True
- =
-
-         rule1 =3D hwsim.rules.create()
-         rule1.source =3D bss_radio1.addresses[0]
-         rule1.bidirectional =3D True
-         rule1.drop =3D True
-         rule1.prefix =3D 'b0'
-+        rule1.enabled =3D True
- =
-
-         # Test Authenticate (b0) and Association (00) timeouts
- =
-
-diff --git a/autotests/testRSSIAgent/connection_test.py b/autotests/testRSS=
-IAgent/connection_test.py
-index f485b388..ded09f6c 100644
---- a/autotests/testRSSIAgent/connection_test.py
-+++ b/autotests/testRSSIAgent/connection_test.py
-@@ -20,6 +20,7 @@ class Test(unittest.TestCase):
-     def test_rssi_agent(self):
-         rule =3D Hwsim().rules.create()
-         rule.signal =3D -4000
-+        rule.enabled =3D True
- =
-
-         wd =3D IWD()
- =
-
-diff --git a/autotests/testRoamRetry/fast_retry_test.py b/autotests/testRoa=
-mRetry/fast_retry_test.py
-index e8b5455d..c7de5055 100644
---- a/autotests/testRoamRetry/fast_retry_test.py
-+++ b/autotests/testRoamRetry/fast_retry_test.py
-@@ -29,10 +29,12 @@ class Test(unittest.TestCase):
-         rule0 =3D hwsim.rules.create()
-         rule0.source =3D bss_radio[0].addresses[0]
-         rule0.bidirectional =3D True
-+        rule0.enabled =3D True
- =
-
-         rule1 =3D hwsim.rules.create()
-         rule1.source =3D bss_radio[1].addresses[0]
-         rule1.bidirectional =3D True
-+        rule1.enabled =3D True
- =
-
-         # Fill in the neighbor AP tables in both BSSes.  By default each
-         # instance knows only about current BSS, even inside one hostapd
-diff --git a/autotests/testRoamRetry/stop_retry_test.py b/autotests/testRoa=
-mRetry/stop_retry_test.py
-index 3bf166d8..f2f95990 100644
---- a/autotests/testRoamRetry/stop_retry_test.py
-+++ b/autotests/testRoamRetry/stop_retry_test.py
-@@ -28,10 +28,12 @@ class Test(unittest.TestCase):
-         rule0 =3D hwsim.rules.create()
-         rule0.source =3D bss_radio[0].addresses[0]
-         rule0.bidirectional =3D True
-+        rule0.enabled =3D True
- =
-
-         rule1 =3D hwsim.rules.create()
-         rule1.source =3D bss_radio[1].addresses[0]
-         rule1.bidirectional =3D True
-+        rule1.enabled =3D True
- =
-
-         # Fill in the neighbor AP tables in both BSSes.  By default each
-         # instance knows only about current BSS, even inside one hostapd
-diff --git a/autotests/testSAE/timeout_test.py b/autotests/testSAE/timeout_=
-test.py
-index 28ff288c..abef109b 100644
---- a/autotests/testSAE/timeout_test.py
-+++ b/autotests/testSAE/timeout_test.py
-@@ -35,6 +35,7 @@ class Test(unittest.TestCase):
-         rule0.bidirectional =3D True
-         rule0.drop =3D True
-         rule0.prefix =3D 'b0'
-+        rule0.enabled =3D True
- =
-
-         wd.wait(1)
-         print(rule0)
+diff --git a/autotests/testHotspot/anqp_delay_test.py b/autotests/testHotsp=
+ot/anqp_delay_test.py
+deleted file mode 100644
+index 22a5bdbe..00000000
+--- a/autotests/testHotspot/anqp_delay_test.py
++++ /dev/null
+@@ -1,106 +0,0 @@
+-#!/usr/bin/python3
+-
+-import unittest
+-import sys
+-import os
+-
+-sys.path.append('../util')
+-from iwd import IWD
+-from iwd import IWD_CONFIG_DIR
+-from iwd import PSKAgent
+-from iwd import NetworkType
+-from hostapd import HostapdCLI
+-from hwsim import Hwsim
+-import testutil
+-from time import sleep
+-
+-class Test(unittest.TestCase):
+-
+-    def test_connection_success(self):
+-        wd =3D self.wd
+-        hapd =3D self.hapd
+-        rule0 =3D self.rule0
+-
+-        devices =3D wd.list_devices(1)
+-        device =3D devices[0]
+-        device.autoconnect =3D True
+-
+-        # We are dependent on a periodic scan here. We want to wait for th=
+is
+-        # because this is the first opportunity IWD has to do ANQP. Once A=
+NQP
+-        # has been done once the network is set up and we cannot simulate =
+the
+-        # 'Connect() before ANQP' race condition anymore.
+-        condition =3D 'obj.scanning'
+-        wd.wait_for_object_condition(device, condition)
+-
+-        condition =3D 'not obj.scanning'
+-        wd.wait_for_object_condition(device, condition)
+-
+-        # If no networks were found we likely had a quick scan. Try again =
+to
+-        # allow the full autoconnect scan to happen.
+-        try:
+-            ordered_network =3D device.get_ordered_network('Hotspot')
+-        except:
+-            condition =3D 'obj.scanning'
+-            wd.wait_for_object_condition(device, condition)
+-
+-            condition =3D 'not obj.scanning'
+-            wd.wait_for_object_condition(device, condition)
+-
+-            ordered_network =3D device.get_ordered_network('Hotspot')
+-
+-        self.assertEqual(ordered_network.type, NetworkType.eap)
+-
+-        condition =3D 'not obj.connected'
+-        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
+-
+-        # Force the case where ANQP does not finish before Connect() comes=
+ in
+-        rule0.delay =3D 100
+-        rule0.prefix =3D '0d'
+-
+-        ordered_network.network_object.connect(wait=3DFalse)
+-
+-        condition =3D 'obj.state =3D=3D DeviceState.connected'
+-        wd.wait_for_object_condition(device, condition)
+-
+-        hapd.wait_for_event('AP-STA-CONNECTED')
+-
+-        testutil.test_iface_operstate()
+-        testutil.test_ifaces_connected(device.name, hapd.ifname)
+-
+-        device.disconnect()
+-
+-        condition =3D 'not obj.connected'
+-        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
+-
+-    @classmethod
+-    def setUpClass(cls):
+-        cls.hwsim =3D Hwsim()
+-
+-        bss_radio =3D cls.hwsim.get_radio('rad0')
+-        cls.rule0 =3D cls.hwsim.rules.create()
+-        cls.rule0.source =3D bss_radio.addresses[0]
+-        cls.rule0.bidirectional =3D True
+-
+-        cls.hapd =3D HostapdCLI(config=3D'ssidHotspot.conf')
+-
+-        IWD.copy_to_hotspot('example.conf')
+-        IWD.copy_to_storage('anqp_enabled.conf', storage_dir=3DIWD_CONFIG_=
+DIR, name=3D'main.conf')
+-
+-        cls.wd =3D IWD(True)
+-        cls.psk_agent =3D PSKAgent('abc', ('domain\\user', 'testpasswd'))
+-        cls.wd.register_psk_agent(cls.psk_agent)
+-
+-    @classmethod
+-    def tearDownClass(cls):
+-        IWD.clear_storage()
+-
+-        cls.wd.unregister_psk_agent(cls.psk_agent)
+-        cls.psk_agent =3D None
+-        os.remove('/tmp/main.conf')
+-
+-        cls.hwsim.rules.remove_all()
+-        cls.hwsim =3D None
+-        cls.wd =3D None
+-
+-if __name__ =3D=3D '__main__':
+-    unittest.main(exit=3DTrue)
 -- =
 
 2.31.1
 
---===============0637229923009971099==--
+--===============3949693726758727300==--
 
