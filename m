@@ -1,154 +1,103 @@
-Content-Type: multipart/mixed; boundary="===============2119782960225335922=="
+Content-Type: multipart/mixed; boundary="===============2126634442305114370=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/4] sae: handle force_default_sae_group in scan_bss
-Date: Mon, 23 Aug 2021 16:34:31 -0700
-Message-ID: <20210823233432.604561-3-prestwoj@gmail.com>
+Subject: [PATCH 4/4] unit: update test-sae with API change
+Date: Mon, 23 Aug 2021 16:34:32 -0700
+Message-ID: <20210823233432.604561-4-prestwoj@gmail.com>
 In-Reply-To: <20210823233432.604561-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2119782960225335922==
+--===============2126634442305114370==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Now a scan_bss object is passed to sae_sm_new in order to detect if
-the BSS's vendor OUI matches ones in which SAE group negotiation is
-broken. When an AP like this is found SAE will use group 19
-unconditionally, and fail if group 19 does not work. Other groups
-could be tried upon failure but per the spec group 19 must be supported
-so there isn't much use in trying other, optional groups.
-
-Note: the check on 'bss' was added in order to make unit testing
-easier to integrate as including scan.c in unit tests opens up a
-can of worms.
 ---
- src/netdev.c |  2 +-
- src/sae.c    | 26 ++++++++++++++++++++++++++
- src/sae.h    |  2 ++
- 3 files changed, 29 insertions(+), 1 deletion(-)
+ Makefile.am     |  3 ++-
+ unit/test-sae.c | 14 +++++++-------
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index d886efad..87b9c3f0 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -3470,7 +3470,7 @@ static void netdev_connect_common(struct netdev *netd=
-ev,
- 	switch (hs->akm_suite) {
- 	case IE_RSN_AKM_SUITE_SAE_SHA256:
- 	case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
--		netdev->ap =3D sae_sm_new(hs, netdev_sae_tx_authenticate,
-+		netdev->ap =3D sae_sm_new(hs, bss, netdev_sae_tx_authenticate,
- 						netdev_sae_tx_associate,
- 						netdev);
+diff --git a/Makefile.am b/Makefile.am
+index e6d2fc91..8b0df2aa 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -521,7 +521,8 @@ unit_test_sae_SOURCES =3D unit/test-sae.c \
+ 				src/handshake.h src/handshake.c \
+ 				src/erp.h src/erp.c \
+ 				src/util.h src/util.c \
+-				src/mpdu.h src/mpdu.c
++				src/mpdu.h src/mpdu.c \
++				src/scan.h
+ unit_test_sae_LDADD =3D $(ell_ldadd)
+ unit_test_sae_LDFLAGS =3D -Wl,-wrap,l_ecc_supported_ike_groups
  =
 
-diff --git a/src/sae.c b/src/sae.c
-index 5099473c..295e4a7f 100644
---- a/src/sae.c
-+++ b/src/sae.c
-@@ -34,6 +34,7 @@
- #include "src/mpdu.h"
- #include "src/auth-proto.h"
- #include "src/sae.h"
-+#include "src/scan.h"
+diff --git a/unit/test-sae.c b/unit/test-sae.c
+index d9ec6b31..00819eb2 100644
+--- a/unit/test-sae.c
++++ b/unit/test-sae.c
+@@ -171,7 +171,7 @@ static struct auth_proto *test_initialize(struct test_d=
+ata *td)
  =
 
- /* SHA-512 is the highest supported hashing function as of 802.11-2020 */
- #define SAE_MAX_HASH_LEN 64
-@@ -83,6 +84,8 @@ struct sae_sm {
- 	sae_tx_associate_func_t tx_assoc;
- 	void *user_data;
- 	enum crypto_sae sae_type;
-+
-+	bool force_default_group : 1;
- };
+ 	memset(td->test_clogging_token, 0xde, 32);
  =
 
- static enum mmpdu_status_code sae_status_code(struct sae_sm *sm)
-@@ -139,6 +142,23 @@ static int sae_choose_next_group(struct sae_sm *sm)
- 	const unsigned int *ecc_groups =3D l_ecc_supported_ike_groups();
- 	bool reset =3D sm->group_retry >=3D 0;
+-	ap =3D sae_sm_new(hs, test_tx_auth_func, test_tx_assoc_func, td);
++	ap =3D sae_sm_new(hs, NULL, test_tx_auth_func, test_tx_assoc_func, td);
  =
 
-+	/*
-+	 * If this is a buggy AP in which group negotiation is broken use the
-+	 * default group 19 and fail if this is a retry.
-+	 */
-+	if (sm->force_default_group) {
-+		if (sm->group_retry !=3D -1) {
-+			l_warn("Forced default group but was rejected!");
-+			return -ENOENT;
-+		}
-+
-+		l_debug("Forcing default SAE group 19");
-+
-+		sm->group =3D 19;
-+
-+		goto get_curve;
-+	}
-+
- 	do {
- 		sm->group_retry++;
+ 	td->commit_success =3D false;
+ 	auth_proto_start(ap);
+@@ -423,8 +423,8 @@ static void test_bad_confirm(const void *arg)
+ 	handshake_state_set_passphrase(hs2, passphrase);
+ 	handshake_state_set_authenticator(hs2, true);
  =
 
-@@ -151,6 +171,8 @@ static int sae_choose_next_group(struct sae_sm *sm)
- 		sae_reset_state(sm);
+-	ap1 =3D sae_sm_new(hs1, end_to_end_tx_func, test_tx_assoc_func, td1);
+-	ap2 =3D sae_sm_new(hs2, end_to_end_tx_func, test_tx_assoc_func, td2);
++	ap1 =3D sae_sm_new(hs1, NULL, end_to_end_tx_func, test_tx_assoc_func, td1=
+);
++	ap2 =3D sae_sm_new(hs2, NULL, end_to_end_tx_func, test_tx_assoc_func, td2=
+);
  =
 
- 	sm->group =3D ecc_groups[sm->group_retry];
-+
-+get_curve:
- 	sm->curve =3D l_ecc_curve_from_ike_group(sm->group);
+ 	/* both peers send out commit */
+ 	ap1->start(ap1);
+@@ -498,8 +498,8 @@ static void test_confirm_after_accept(const void *arg)
+ 	handshake_state_set_passphrase(hs2, passphrase);
+ 	handshake_state_set_authenticator(hs2, true);
  =
 
- 	return 0;
-@@ -1317,6 +1339,7 @@ static void sae_free(struct auth_proto *ap)
- }
+-	ap1 =3D sae_sm_new(hs1, end_to_end_tx_func, test_tx_assoc_func, td1);
+-	ap2 =3D sae_sm_new(hs2, end_to_end_tx_func, test_tx_assoc_func, td2);
++	ap1 =3D sae_sm_new(hs1, NULL, end_to_end_tx_func, test_tx_assoc_func, td1=
+);
++	ap2 =3D sae_sm_new(hs2, NULL, end_to_end_tx_func, test_tx_assoc_func, td2=
+);
  =
 
- struct auth_proto *sae_sm_new(struct handshake_state *hs,
-+				struct scan_bss *bss,
- 				sae_tx_authenticate_func_t tx_auth,
- 				sae_tx_associate_func_t tx_assoc,
- 				void *user_data)
-@@ -1351,5 +1374,8 @@ struct auth_proto *sae_sm_new(struct handshake_state =
-*hs,
- 		sm->sae_type =3D CRYPTO_SAE_LOOPING;
- 	}
+ 	/* both peers send out commit */
+ 	auth_proto_start(ap1);
+@@ -583,8 +583,8 @@ static void test_end_to_end(const void *arg)
+ 	handshake_state_set_passphrase(hs2, passphrase);
+ 	handshake_state_set_authenticator(hs2, true);
  =
 
-+	if (bss && bss->force_default_sae_group)
-+		sm->force_default_group =3D true;
-+
- 	return &sm->ap;
- }
-diff --git a/src/sae.h b/src/sae.h
-index 668d084f..d8f9f2d7 100644
---- a/src/sae.h
-+++ b/src/sae.h
-@@ -23,6 +23,7 @@
- struct auth_proto;
- struct sae_sm;
- struct handshake_state;
-+struct scan_bss;
+-	ap1 =3D sae_sm_new(hs1, end_to_end_tx_func, test_tx_assoc_func, td1);
+-	ap2 =3D sae_sm_new(hs2, end_to_end_tx_func, test_tx_assoc_func, td2);
++	ap1 =3D sae_sm_new(hs1, NULL, end_to_end_tx_func, test_tx_assoc_func, td1=
+);
++	ap2 =3D sae_sm_new(hs2, NULL, end_to_end_tx_func, test_tx_assoc_func, td2=
+);
  =
 
- typedef void (*sae_tx_authenticate_func_t)(const uint8_t *data, size_t len,
- 						void *user_data);
-@@ -31,6 +32,7 @@ typedef void (*sae_tx_associate_func_t)(void *user_data);
- bool sae_sm_is_h2e(struct auth_proto *ap);
- =
-
- struct auth_proto *sae_sm_new(struct handshake_state *hs,
-+				struct scan_bss *bss,
- 				sae_tx_authenticate_func_t tx_auth,
- 				sae_tx_associate_func_t tx_assoc,
- 				void *user_data);
+ 	/* both peers send out commit */
+ 	auth_proto_start(ap1);
 -- =
 
 2.31.1
 
---===============2119782960225335922==--
+--===============2126634442305114370==--
 
