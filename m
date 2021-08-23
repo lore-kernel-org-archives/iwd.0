@@ -1,271 +1,439 @@
-Content-Type: multipart/mixed; boundary="===============8120518604426498995=="
+Content-Type: multipart/mixed; boundary="===============1971117033411602502=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 6/9] ap: Support FILS IP Address Assignment IE
-Date: Mon, 23 Aug 2021 16:14:27 +0200
-Message-ID: <20210823141430.223543-6-andrew.zaborowski@intel.com>
+Subject: [PATCH 7/9] netconfig: Move loading settings to new method, refactor
+Date: Mon, 23 Aug 2021 16:14:28 +0200
+Message-ID: <20210823141430.223543-7-andrew.zaborowski@intel.com>
 In-Reply-To: <20210823141430.223543-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8120518604426498995==
+--===============1971117033411602502==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Handle the 802.11ai FILS IP Address Assignment IEs in Association
-Request frames when netconfig is enabled.  Only IPv4 is supported.
-Like the P2P IP Allocation mechanism, since the payload format and logic
-is independent from the rest of the FILS standard this is enabled
-unconditionally for clients who want to use it even though we don't
-actually do FILS in AP mode.
+Split loading settings out of network_configure into a new method,
+network_load_settings.  Make sure both consistently handle errors by
+printing messages and informing the caller.
 ---
- src/ap.c | 114 +++++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 98 insertions(+), 16 deletions(-)
+ src/netconfig.c | 157 +++++++++++++++++++++++++++++++-----------------
+ src/netconfig.h |   5 +-
+ src/p2p.c       |  12 +++-
+ src/station.c   |  20 +++---
+ 4 files changed, 127 insertions(+), 67 deletions(-)
 
-diff --git a/src/ap.c b/src/ap.c
-index e91f8b00..edffe906 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -119,6 +119,7 @@ struct sta_state {
- 	uint8_t wsc_uuid_e[16];
- 	bool wsc_v2;
- 	struct l_dhcp_lease *ip_alloc_lease;
-+	bool ip_alloc_sent;
- };
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 005316cd..d6113c0c 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -273,10 +273,10 @@ static struct l_rtnl_address *netconfig_get_static4_a=
+ddress(
+ 						struct netconfig *netconfig)
+ {
+ 	struct l_rtnl_address *ifaddr =3D NULL;
+-	char *ip;
+-	char *netmask;
++	L_AUTO_FREE_VAR(char *, ip) =3D NULL;
++	L_AUTO_FREE_VAR(char *, netmask) =3D NULL;
+ 	struct in_addr in_addr;
+-	char *broadcast;
++	L_AUTO_FREE_VAR(char *, broadcast) =3D NULL;
+ 	uint32_t prefix_len;
  =
 
- struct ap_wsc_pbc_probe_record {
-@@ -907,6 +908,25 @@ error:
- 	ap_del_station(sta, MMPDU_REASON_CODE_UNSPECIFIED, true);
+ 	ip =3D l_settings_get_string(netconfig->active_settings, "IPv4",
+@@ -286,33 +286,34 @@ static struct l_rtnl_address *netconfig_get_static4_a=
+ddress(
+ =
+
+ 	netmask =3D l_settings_get_string(netconfig->active_settings,
+ 						"IPv4", "Netmask");
++	if (netmask) {
++		if (inet_pton(AF_INET, netmask, &in_addr) !=3D 1) {
++			l_error("netconfig: Can't parse IPv4 Netmask");
++			return NULL;
++		}
+ =
+
+-	if (netmask && inet_pton(AF_INET, netmask, &in_addr) > 0)
+ 		prefix_len =3D __builtin_popcountl(in_addr.s_addr);
+-	else
+-		prefix_len =3D 24;
+ =
+
+-	l_free(netmask);
++		if (ntohl(in_addr.s_addr) !=3D
++				util_netmask_from_prefix(prefix_len)) {
++			l_error("netconfig: Invalid IPv4 Netmask");
++			return NULL;
++		}
++	} else
++		prefix_len =3D 24;
+ =
+
+ 	ifaddr =3D l_rtnl_address_new(ip, prefix_len);
+-	l_free(ip);
+-
+ 	if (!ifaddr) {
+-		l_error("Unable to parse IPv4.Address, ignoring...");
++		l_error("netconfig: Unable to parse IPv4.Address");
+ 		return NULL;
+ 	}
+ =
+
+ 	broadcast =3D l_settings_get_string(netconfig->active_settings,
+ 						"IPv4", "Broadcast");
+-	if (broadcast) {
+-		bool r =3D l_rtnl_address_set_broadcast(ifaddr, broadcast);
+-		l_free(broadcast);
+-
+-		if (!r) {
+-			l_error("Unable to parse IPv4.Broadcast, ignoring...");
+-			l_rtnl_address_free(ifaddr);
+-			return NULL;
+-		}
++	if (broadcast && !l_rtnl_address_set_broadcast(ifaddr, broadcast)) {
++		l_error("netconfig: Unable to parse IPv4.Broadcast");
++		l_rtnl_address_free(ifaddr);
++		return NULL;
+ 	}
+ =
+
+ 	l_rtnl_address_set_noprefixroute(ifaddr, true);
+@@ -898,14 +899,17 @@ static void netconfig_ipv4_acd_event(enum l_acd_event=
+ event, void *user_data)
+ 	}
  }
  =
 
-+static bool ap_sta_get_dhcp4_lease(struct sta_state *sta)
-+{
-+	if (sta->ip_alloc_lease)
+-static void netconfig_ipv4_select_and_install(struct netconfig *netconfig)
++static bool netconfig_ipv4_select_and_install(struct netconfig *netconfig)
+ {
+-	char ip[INET6_ADDRSTRLEN];
++	if (netconfig->rtm_protocol =3D=3D RTPROT_STATIC) {
++		char ip[INET6_ADDRSTRLEN];
++
++		if (L_WARN_ON(!netconfig->v4_address ||
++					!l_rtnl_address_get_address(
++							netconfig->v4_address,
++							ip)))
++			return false;
+ =
+
+-	netconfig->v4_address =3D netconfig_get_static4_address(netconfig);
+-	if (netconfig->v4_address &&
+-			l_rtnl_address_get_address(netconfig->v4_address, ip)) {
+-		netconfig->rtm_protocol =3D RTPROT_STATIC;
+ 		netconfig->acd =3D l_acd_new(netconfig->ifindex);
+ 		l_acd_set_event_handler(netconfig->acd,
+ 					netconfig_ipv4_acd_event, netconfig,
+@@ -926,47 +930,42 @@ static void netconfig_ipv4_select_and_install(struct =
+netconfig *netconfig)
+ 					netconfig, NULL)));
+ 		}
+ =
+
+-		return;
 +		return true;
+ 	}
+ =
+
+-	netconfig->rtm_protocol =3D RTPROT_DHCP;
+-
+ 	if (l_dhcp_client_start(netconfig->dhcp_client))
+-		return;
++		return true;
+ =
+
+ 	l_error("netconfig: Failed to start DHCPv4 client for interface %u",
+ 							netconfig->ifindex);
++	return false;
+ }
+ =
+
+-static void netconfig_ipv6_select_and_install(struct netconfig *netconfig)
++static bool netconfig_ipv6_select_and_install(struct netconfig *netconfig)
+ {
+ 	struct netdev *netdev =3D netdev_find(netconfig->ifindex);
+-	struct l_rtnl_address *address;
+-	bool enabled;
+-
+-	if (!l_settings_get_bool(netconfig->active_settings, "IPv6",
+-					"Enabled", &enabled))
+-		enabled =3D ipv6_enabled;
+ =
+
+-	if (!enabled) {
++	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_UNSPEC) {
+ 		l_debug("IPV6 configuration disabled");
+-		return;
++		return true;
+ 	}
+ =
+
+ 	sysfs_write_ipv6_setting(netdev_get_name(netdev), "disable_ipv6", "0");
+ =
+
+-	address =3D netconfig_get_static6_address(netconfig);
+-	if (address) {
+-		netconfig->rtm_v6_protocol =3D RTPROT_STATIC;
++	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_STATIC) {
++		struct l_rtnl_address *address =3D
++			netconfig_get_static6_address(netconfig);
 +
-+	if (!sta->ap->netconfig_dhcp)
-+		return false;
+ 		L_WARN_ON(!(netconfig->addr6_add_cmd_id =3D
+ 			l_rtnl_ifaddr_add(rtnl, netconfig->ifindex, address,
+ 					netconfig_ipv6_ifaddr_add_cmd_cb,
+ 					netconfig, NULL)));
+ 		l_rtnl_address_free(address);
+-		return;
++		return true;
+ 	}
+ =
+
+-	netconfig->rtm_v6_protocol =3D RTPROT_DHCP;
++	/* DHCP */
++	return true;
+ }
+ =
+
+ static int validate_dns_list(int family, char **dns_list)
+@@ -998,22 +997,22 @@ static int validate_dns_list(int family, char **dns_l=
+ist)
+ 	return n_valid;
+ }
+ =
+
+-bool netconfig_configure(struct netconfig *netconfig,
++bool netconfig_load_settings(struct netconfig *netconfig,
+ 				const struct l_settings *active_settings,
+-				const uint8_t *mac_address,
+-				netconfig_notify_func_t notify, void *user_data)
++				const uint8_t *mac_address)
+ {
+ 	char *mdns;
+-	char hostname[HOST_NAME_MAX + 1];
+ 	bool send_hostname;
++	bool enabled;
+ =
+
++	l_strfreev(netconfig->dns4_overrides);
+ 	netconfig->dns4_overrides =3D l_settings_get_string_list(active_settings,
+ 							"IPv4", "DNS", ' ');
+ =
+
+ 	if (netconfig->dns4_overrides) {
+ 		int r =3D validate_dns_list(AF_INET, netconfig->dns4_overrides);
+ =
+
+-		if (r <=3D 0) {
++		if (unlikely(r <=3D 0)) {
+ 			l_strfreev(netconfig->dns4_overrides);
+ 			netconfig->dns4_overrides =3D NULL;
+ 		}
+@@ -1022,13 +1021,14 @@ bool netconfig_configure(struct netconfig *netconfi=
+g,
+ 			l_error("netconfig: Empty IPv4.DNS entry, skipping...");
+ 	}
+ =
+
++	l_strfreev(netconfig->dns6_overrides);
+ 	netconfig->dns6_overrides =3D l_settings_get_string_list(active_settings,
+ 							"IPv6", "DNS", ' ');
+ =
+
+ 	if (netconfig->dns6_overrides) {
+ 		int r =3D validate_dns_list(AF_INET6, netconfig->dns6_overrides);
+ =
+
+-		if (r <=3D 0) {
++		if (unlikely(r <=3D 0)) {
+ 			l_strfreev(netconfig->dns6_overrides);
+ 			netconfig->dns6_overrides =3D NULL;
+ 		}
+@@ -1038,8 +1038,6 @@ bool netconfig_configure(struct netconfig *netconfig,
+ 	}
+ =
+
+ 	netconfig->active_settings =3D active_settings;
+-	netconfig->notify =3D notify;
+-	netconfig->user_data =3D user_data;
+ =
+
+ 	l_dhcp_client_set_address(netconfig->dhcp_client, ARPHRD_ETHER,
+ 							mac_address, ETH_ALEN);
+@@ -1051,6 +1049,8 @@ bool netconfig_configure(struct netconfig *netconfig,
+ 		send_hostname =3D false;
+ =
+
+ 	if (send_hostname) {
++		char hostname[HOST_NAME_MAX + 1];
 +
-+	sta->ip_alloc_lease =3D l_dhcp_server_discover(sta->ap->netconfig_dhcp,
-+							0, NULL, sta->addr);
-+	if (!sta->ip_alloc_lease) {
-+		l_error("l_dhcp_server_discover() failed, see IWD_DHCP_DEBUG "
-+			"output");
-+		return false;
-+	}
+ 		if (gethostname(hostname, sizeof(hostname)) =3D=3D 0) {
+ 			l_dhcp_client_set_hostname(
+ 				netconfig->dhcp_client, hostname);
+@@ -1060,15 +1060,62 @@ bool netconfig_configure(struct netconfig *netconfi=
+g,
+ 		}
+ 	}
+ =
+
+-	netconfig_ipv4_select_and_install(netconfig);
+-
+-	netconfig_ipv6_select_and_install(netconfig);
+-
+ 	mdns =3D l_settings_get_string(active_settings,
+ 						"Network", "MulticastDNS");
+ 	resolve_set_mdns(netconfig->resolve, mdns);
+ 	l_free(mdns);
+ =
+
++	if (l_settings_get_value(netconfig->active_settings, "IPv4",
++					"Address")) {
++		l_rtnl_address_free(netconfig->v4_address);
++		netconfig->v4_address =3D
++			netconfig_get_static4_address(netconfig);
++
++		if (unlikely(!netconfig->v4_address)) {
++			l_error("netconfig: Can't parse IPv4 address");
++			return false;
++		}
++
++		netconfig->rtm_protocol =3D RTPROT_STATIC;
++	} else
++		netconfig->rtm_protocol =3D RTPROT_DHCP;
++
++	if (!l_settings_get_bool(netconfig->active_settings, "IPv6",
++					"Enabled", &enabled))
++		enabled =3D ipv6_enabled;
++
++	if (!enabled)
++		netconfig->rtm_v6_protocol =3D RTPROT_UNSPEC;
++	else if (l_settings_get_value(netconfig->active_settings, "IPv6",
++					"Address")) {
++		__auto_type address =3D netconfig_get_static6_address(netconfig);
++
++		l_rtnl_address_free(address);
++
++		if (unlikely(!address)) {
++			l_error("netconfig: Can't parse IPv6 address");
++			return false;
++		}
++
++		netconfig->rtm_v6_protocol =3D RTPROT_STATIC;
++	} else
++		netconfig->rtm_v6_protocol =3D RTPROT_DHCP;
 +
 +	return true;
 +}
 +
- static void ap_handshake_event(struct handshake_state *hs,
- 		enum handshake_event event, void *user_data, ...)
- {
-@@ -919,6 +939,9 @@ static void ap_handshake_event(struct handshake_state *=
-hs,
- 	switch (event) {
- 	case HANDSHAKE_EVENT_COMPLETE:
- 		if (sta->ip_alloc_lease) {
-+			if (hs->support_ip_allocation)
-+				sta->ip_alloc_sent =3D true;
++bool netconfig_configure(struct netconfig *netconfig,
++				netconfig_notify_func_t notify, void *user_data)
++{
++	netconfig->notify =3D notify;
++	netconfig->user_data =3D user_data;
 +
- 			/*
- 			 * Move the lease from offered to active state if the
- 			 * client has actually used it.  In any case drop our
-@@ -926,7 +949,7 @@ static void ap_handshake_event(struct handshake_state *=
-hs,
- 			 * and if we want to keep our reference we'd need to
- 			 * react to relevant server events.
- 			 */
--			if (hs->support_ip_allocation)
-+			if (sta->ip_alloc_sent)
- 				l_dhcp_server_request(ap->netconfig_dhcp,
- 							sta->ip_alloc_lease);
++	if (unlikely(!netconfig_ipv4_select_and_install(netconfig)))
++		return false;
++
++	if (unlikely(!netconfig_ipv6_select_and_install(netconfig)))
++		return false;
++
+ 	return true;
+ }
  =
 
-@@ -948,16 +971,8 @@ static void ap_handshake_event(struct handshake_state =
-*hs,
- 		L_AUTO_FREE_VAR(char *, lease_netmask_str) =3D NULL;
- 		char own_addr_str[INET_ADDRSTRLEN];
+diff --git a/src/netconfig.h b/src/netconfig.h
+index 2c68cb1c..73e4df8b 100644
+--- a/src/netconfig.h
++++ b/src/netconfig.h
+@@ -29,9 +29,10 @@ enum netconfig_event {
+ typedef void (*netconfig_notify_func_t)(enum netconfig_event event,
+ 							void *user_data);
  =
 
--		if (!sta->ip_alloc_lease)
--			sta->ip_alloc_lease =3D l_dhcp_server_discover(
--							ap->netconfig_dhcp,
--							0, NULL, sta->addr);
--
--		if (!sta->ip_alloc_lease) {
--			l_error("l_dhcp_server_discover() failed, see "
--				"IWD_DHCP_DEBUG output");
-+		if (!ap_sta_get_dhcp4_lease(sta))
- 			break;
--		}
+-bool netconfig_configure(struct netconfig *netconfig,
++bool netconfig_load_settings(struct netconfig *netconfig,
+ 				const struct l_settings *active_settings,
+-				const uint8_t *mac_address,
++				const uint8_t *mac_address);
++bool netconfig_configure(struct netconfig *netconfig,
+ 				netconfig_notify_func_t notify,
+ 				void *user_data);
+ bool netconfig_reconfigure(struct netconfig *netconfig);
+diff --git a/src/p2p.c b/src/p2p.c
+index 8170bbe0..3328271b 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -1328,8 +1328,16 @@ static void p2p_start_client_netconfig(struct p2p_de=
+vice *dev)
+ 	}
  =
 
- 		lease_addr_str =3D l_dhcp_lease_get_address(sta->ip_alloc_lease);
- 		lease_netmask_str =3D
-@@ -1377,14 +1392,16 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, =
-struct sta_state *sta,
- 				const uint8_t *dest,
- 				enum mmpdu_reason_code status_code,
- 				bool reassoc, const struct mmpdu_header *req,
--				size_t req_len, frame_xchg_cb_t callback)
-+				size_t req_len,
-+				const struct ie_fils_ip_addr_request_info *
-+				ip_req_info, frame_xchg_cb_t callback)
- {
- 	const uint8_t *addr =3D netdev_get_address(ap->netdev);
- 	enum mpdu_management_subtype stype =3D reassoc ?
- 		MPDU_MANAGEMENT_SUBTYPE_REASSOCIATION_RESPONSE :
- 		MPDU_MANAGEMENT_SUBTYPE_ASSOCIATION_RESPONSE;
- 	L_AUTO_FREE_VAR(uint8_t *, mpdu_buf) =3D
--		l_malloc(128 + ap_get_extra_ies_len(ap, stype, req, req_len));
-+		l_malloc(256 + ap_get_extra_ies_len(ap, stype, req, req_len));
- 	struct mmpdu_header *mpdu =3D (void *) mpdu_buf;
- 	struct mmpdu_association_response *resp;
- 	size_t ies_len =3D 0;
-@@ -1430,6 +1447,57 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, s=
-truct sta_state *sta,
- 	ies_len +=3D ap_write_extra_ies(ap, stype, req, req_len,
- 					resp->ies + ies_len);
- =
-
-+	if (ip_req_info) {
-+		struct ie_fils_ip_addr_response_info ip_resp_info =3D {};
+ 	settings =3D dev->conn_netconfig_settings ?: p2p_dhcp_settings;
+-	netconfig_configure(dev->conn_netconfig, settings, dev->conn_addr,
+-				p2p_netconfig_event_handler, dev);
 +
-+		if (ip_req_info->ipv4 && sta && ap_sta_get_dhcp4_lease(sta)) {
-+			L_AUTO_FREE_VAR(char *, lease_addr_str) =3D
-+				l_dhcp_lease_get_address(sta->ip_alloc_lease);
-+			L_AUTO_FREE_VAR(char *, lease_netmask_str) =3D
-+				l_dhcp_lease_get_netmask(sta->ip_alloc_lease);
-+			uint32_t lease_lifetime =3D
-+				l_dhcp_lease_get_lifetime(sta->ip_alloc_lease);
-+			L_AUTO_FREE_VAR(char *, lease_gateway_str) =3D
-+				l_dhcp_lease_get_gateway(sta->ip_alloc_lease);
-+			char **lease_dns_str_list =3D
-+				l_dhcp_lease_get_dns(sta->ip_alloc_lease);
-+
-+			ip_resp_info.ipv4_addr =3D IP4_FROM_STR(lease_addr_str);
-+			ip_resp_info.ipv4_prefix_len =3D
-+				__builtin_popcount(IP4_FROM_STR(
-+							lease_netmask_str));
-+
-+			if (lease_lifetime !=3D 0xffffffff)
-+				ip_resp_info.ipv4_lifetime =3D lease_lifetime;
-+
-+			if (lease_gateway_str)
-+				ip_resp_info.ipv4_gateway =3D
-+					IP4_FROM_STR(lease_gateway_str);
-+
-+			if (lease_dns_str_list && lease_dns_str_list[0])
-+				ip_resp_info.ipv4_dns =3D
-+					IP4_FROM_STR(lease_dns_str_list[0]);
-+
-+			l_strv_free(lease_dns_str_list);
-+			sta->ip_alloc_sent =3D true;
-+		} else if (ip_req_info->ipv4 || ip_req_info->ipv6) {
-+			/*
-+			 * 802.11ai-2016 Section 11.47.3.3: "If the AP is unable
-+			 * to assign an IP address in the (Re)Association
-+			 * Response frame, then the AP sets the IP address
-+			 * assignment pending flag in the IP Address Response
-+			 * Control field of the FILS IP Address Assignment
-+			 * element to 1 and sets the IP address request timeout
-+			 * to 0 in (Re)Association Response frame."
-+			 */
-+			ip_resp_info.response_pending =3D 1;
-+			ip_resp_info.response_timeout =3D 0;
-+		}
-+
-+		ie_build_fils_ip_addr_response(&ip_resp_info, resp->ies + ies_len);
-+		ies_len +=3D 2 + resp->ies[ies_len + 1];
++	if (!netconfig_load_settings(dev->conn_netconfig, settings,
++					dev->conn_addr) ||
++			!netconfig_configure(dev->conn_netconfig,
++						p2p_netconfig_event_handler,
++						dev)) {
++		p2p_connect_failed(dev);
++		return;
 +	}
 +
- 	return ap_send_mgmt_frame(ap, mpdu, resp->ies + ies_len - mpdu_buf,
- 					callback, sta);
+ 	dev->conn_dhcp_timeout =3D l_timeout_create(p2p_dhcp_timeout_val,
+ 						p2p_dhcp_timeout, dev,
+ 						p2p_dhcp_timeout_destroy);
+diff --git a/src/station.c b/src/station.c
+index d61e775a..f6237ade 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2443,14 +2443,12 @@ static void station_connect_ok(struct station *stat=
+ion)
+ =
+
+ 	network_connected(station->connected_network);
+ =
+
+-	if (station->netconfig)
+-		netconfig_configure(station->netconfig,
+-					network_get_settings(
+-						station->connected_network),
+-					netdev_get_address(station->netdev),
+-					station_netconfig_event_handler,
+-					station);
+-	else
++	if (station->netconfig) {
++		if (L_WARN_ON(!netconfig_configure(station->netconfig,
++						station_netconfig_event_handler,
++						station)))
++			return;
++	} else
+ 		station_enter_state(station, STATION_STATE_CONNECTED);
  }
-@@ -1518,6 +1586,8 @@ static void ap_assoc_reassoc(struct sta_state *sta, b=
-ool reassoc,
- 	struct ie_tlv_iter iter;
- 	uint8_t *wsc_data =3D NULL;
- 	ssize_t wsc_data_len;
-+	bool fils_ip_req =3D false;
-+	struct ie_fils_ip_addr_request_info fils_ip_req_info;
  =
 
- 	if (sta->assoc_resp_cmd_id)
- 		return;
-@@ -1564,6 +1634,17 @@ static void ap_assoc_reassoc(struct sta_state *sta, =
-bool reassoc,
+@@ -2592,6 +2590,12 @@ int __station_connect_network(struct station *statio=
+n, struct network *network,
+ 	struct handshake_state *hs;
+ 	int r;
  =
 
- 			rsn =3D (const uint8_t *) ie_tlv_iter_get_data(&iter) - 2;
- 			break;
++	if (station->netconfig && !netconfig_load_settings(
++					station->netconfig,
++					network_get_settings(network),
++					netdev_get_address(station->netdev)))
++		return -EINVAL;
 +
-+		case IE_TYPE_FILS_IP_ADDRESS:
-+			if (fils_ip_req || ie_parse_fils_ip_addr_request(&iter,
-+						&fils_ip_req_info) < 0) {
-+				l_debug("Can't parse FILS IP Address Assignment"
-+					" IE, ignoring it");
-+				break;
-+			}
-+
-+			fils_ip_req =3D true;
-+			break;
- 		}
- =
-
- 	if (!rates || !ssid || (!wsc_data && !rsn) ||
-@@ -1696,7 +1777,8 @@ static void ap_assoc_reassoc(struct sta_state *sta, b=
-ool reassoc,
- =
-
- 	sta->assoc_resp_cmd_id =3D ap_assoc_resp(ap, sta, sta->addr, 0, reassoc,
- 						req, (void *) ies + ies_len -
--						(void *) req,
-+						(void *) req, fils_ip_req ?
-+						&fils_ip_req_info : NULL,
- 						ap_success_assoc_resp_cb);
- 	if (!sta->assoc_resp_cmd_id)
- 		l_error("Sending success (Re)Association Response failed");
-@@ -1729,7 +1811,7 @@ bad_frame:
- =
-
- 	if (!ap_assoc_resp(ap, sta, sta->addr, err, reassoc,
- 				req, (void *) ies + ies_len - (void *) req,
--				ap_fail_assoc_resp_cb))
-+				NULL, ap_fail_assoc_resp_cb))
- 		l_error("Sending error (Re)Association Response failed");
- }
- =
-
-@@ -1754,7 +1836,7 @@ static void ap_assoc_req_cb(const struct mmpdu_header=
- *hdr, const void *body,
- 		if (!ap_assoc_resp(ap, NULL, from,
- 				MMPDU_REASON_CODE_STA_REQ_ASSOC_WITHOUT_AUTH,
- 				false, hdr, body + body_len - (void *) hdr,
--				ap_fail_assoc_resp_cb))
-+				NULL, ap_fail_assoc_resp_cb))
- 			l_error("Sending error Association Response failed");
- =
-
- 		return;
-@@ -1802,7 +1884,7 @@ static void ap_reassoc_req_cb(const struct mmpdu_head=
-er *hdr, const void *body,
- bad_frame:
- 	if (!ap_assoc_resp(ap, NULL, from, err, true,
- 				hdr, body + body_len - (void *) hdr,
--				ap_fail_assoc_resp_cb))
-+				NULL, ap_fail_assoc_resp_cb))
- 		l_error("Sending error Reassociation Response failed");
- }
- =
-
+ 	hs =3D station_handshake_setup(station, network, bss);
+ 	if (!hs)
+ 		return -ENOTSUP;
 -- =
 
 2.30.2
 
---===============8120518604426498995==--
+--===============1971117033411602502==--
 
