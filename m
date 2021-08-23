@@ -1,83 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============1986420971545676453=="
+Content-Type: multipart/mixed; boundary="===============8252173641987503135=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 3/9] autotests: Test GO-side IP Allocation in testP2P
-Date: Mon, 23 Aug 2021 16:14:24 +0200
-Message-ID: <20210823141430.223543-3-andrew.zaborowski@intel.com>
+Subject: [PATCH 4/9] ap: Expire client's leases on disconnect
+Date: Mon, 23 Aug 2021 16:14:25 +0200
+Message-ID: <20210823141430.223543-4-andrew.zaborowski@intel.com>
 In-Reply-To: <20210823141430.223543-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1986420971545676453==
+--===============8252173641987503135==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Check if our wpa_supplicant P2P Client has received the allocated
-Clieant IP/netmask/GO IP values we sent in the 4-Way Handshake.
+If netconfig is enabled tell the DHCP server to expire any leases owned
+by the client that is disconnecting by using l_dhcp_server_expire_by_mac
+to return the IPs to the IP pool.  They're added to the expired list
+so they'd only be used if there are no other addresses left in the pool
+and can be reactivated if the client comes back before the address is
+used by somebody else.
+
+This should ensure that we're always able to offer an address to a new
+client as long as there are fewer concurrent clients than addresses in
+the configured subnet or IP range.
 ---
- autotests/testP2P/connection_test.py | 9 ++++++++-
- autotests/util/wpas.py               | 1 +
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ src/ap.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/autotests/testP2P/connection_test.py b/autotests/testP2P/conne=
-ction_test.py
-index 22871547..52da0edc 100644
---- a/autotests/testP2P/connection_test.py
-+++ b/autotests/testP2P/connection_test.py
-@@ -91,6 +91,7 @@ class Test(unittest.TestCase):
+diff --git a/src/ap.c b/src/ap.c
+index c4473c66..e91f8b00 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -268,6 +268,17 @@ static void ap_del_station(struct sta_state *sta, uint=
+16_t reason,
  =
 
-         wd.wait_for_object_condition(wpas, 'obj.p2p_group is not None', ma=
-x_wait=3D3)
-         peer_ifname =3D wpas.p2p_group['ifname']
-+        self.assertEqual(wpas.p2p_group['role'], 'GO' if not go else 'clie=
-nt')
+ 	ap_stop_handshake(sta);
  =
 
-         if not go:
-             ctx.start_process(['ifconfig', peer_ifname, '192.168.1.20', 'n=
-etmask', '255.255.255.0'], wait=3DTrue)
-@@ -102,6 +103,9 @@ class Test(unittest.TestCase):
-             client =3D wpas.p2p_clients[request['peer_iface']]
-             self.assertEqual(client['p2p_dev_addr'], wpas_peer['p2p_dev_ad=
-dr'])
-         else:
-+            self.assertEqual(wpas.p2p_group['ip_addr'], '192.168.1.2')
-+            self.assertEqual(wpas.p2p_group['ip_mask'], '255.255.255.240')
-+            self.assertEqual(wpas.p2p_group['go_ip_addr'], '192.168.1.1')
-             dhcp =3D ctx.start_process(['dhclient', '-v', '-d', '--no-pid'=
-, '-cf', '/dev/null', '-lf', '/tmp/dhcp.leases',
-                 '-sf', '/tmp/dhclient-script', peer_ifname])
-             self.dhcp =3D dhcp
-@@ -136,7 +140,10 @@ class Test(unittest.TestCase):
- =
-
-     def tearDown(self):
-         if self.p2p is not None:
--            self.p2p.enabled =3D False
-+            try:
-+                self.p2p.enabled =3D False
-+            except:
-+                pass
-         if self.wpas is not None:
-             self.wpas.clean_up()
-             self.wpas =3D None
-diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-index 1758eede..8fb725f8 100644
---- a/autotests/util/wpas.py
-+++ b/autotests/util/wpas.py
-@@ -159,6 +159,7 @@ class Wpas:
-         elif event['event'] =3D=3D 'P2P-GROUP-STARTED':
-             event.pop('event')
-             event['ifname'] =3D event.pop('arg1')
-+            event['role'] =3D event.pop('arg2')
-             self.p2p_group =3D event
-         elif event['event'] =3D=3D 'P2P-GROUP-REMOVED':
-             self.p2p_group =3D None
++	/*
++	 * Expire any DHCP leases owned by this client when it disconnects to
++	 * make it harder for somebody to DoS the IP pool.  If the client
++	 * comes back and the lease is still in the expired leases list they
++	 * will get their IP back.
++	 */
++	if (ap->netconfig_dhcp) {
++		sta->ip_alloc_lease =3D NULL;
++		l_dhcp_server_expire_by_mac(ap->netconfig_dhcp, sta->addr);
++	}
++
+ 	/*
+ 	 * If the event handler tears the AP down, we've made sure above that
+ 	 * a subsequent ap_sta_free(sta) has no need to access sta->ap.
 -- =
 
 2.30.2
 
---===============1986420971545676453==--
+--===============8252173641987503135==--
 
