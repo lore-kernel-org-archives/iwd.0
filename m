@@ -1,42 +1,176 @@
-Content-Type: multipart/mixed; boundary="===============6725781374354885656=="
+Content-Type: multipart/mixed; boundary="===============0324872602005149089=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: Failed to connect to WPA3 network after update to iwd 1.16
-Date: Mon, 23 Aug 2021 09:15:07 -0500
-Message-ID: <c71a8570-9249-a4b7-b83a-9c84e50c8146@gmail.com>
-In-Reply-To: <CAJtNWJhStLK_Kqa2uS9OPEv-vPLpnrK09c+N2vjtyPEvPKJeXw@mail.gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 9/9] station, netdev: Enable FILS IP Address Assignment
+Date: Mon, 23 Aug 2021 16:14:30 +0200
+Message-ID: <20210823141430.223543-9-andrew.zaborowski@intel.com>
+In-Reply-To: <20210823141430.223543-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6725781374354885656==
+--===============0324872602005149089==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Alex,
+Send and receive the FILS IP Address Assignment IEs during association.
+As implemented this would work independently of FILS although the only
+AP software handling this mechanism without FILS is likely IWD itself.
 
-On 8/22/21 6:17 PM, Alex Cepoi wrote:
-> Sure thing: https://gist.github.com/alexcepoi/83511b1c128767722ec8d6b50d1=
-f66a7 =
+No support is added for handling the IP assignment information sent from
+the server after the initial Association Request/Response frames, i.e.
+the information is only used if it is received directly in the
+Association Response without the "response pending" bit, otherwise the
+DHCP client will be started.
+---
+ src/handshake.c |  2 ++
+ src/handshake.h |  2 ++
+ src/netdev.c    | 15 +++++++++++++++
+ src/station.c   | 40 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 59 insertions(+)
 
-> <https://gist.github.com/alexcepoi/83511b1c128767722ec8d6b50d1f66a7>
-> =
+diff --git a/src/handshake.c b/src/handshake.c
+index f36df572..146434c2 100644
+--- a/src/handshake.c
++++ b/src/handshake.c
+@@ -106,6 +106,8 @@ void handshake_state_free(struct handshake_state *s)
+ 	l_free(s->supplicant_rsnxe);
+ 	l_free(s->mde);
+ 	l_free(s->fte);
++	l_free(s->fils_ip_req_ie);
++	l_free(s->fils_ip_resp_ie);
+ =
 
-> Does that help?
-> =
+ 	if (s->erp_cache)
+ 		erp_cache_put(s->erp_cache);
+diff --git a/src/handshake.h b/src/handshake.h
+index 31dce117..f3f6680b 100644
+--- a/src/handshake.h
++++ b/src/handshake.h
+@@ -140,6 +140,8 @@ struct handshake_state {
+ 	uint32_t client_ip_addr;
+ 	uint32_t subnet_mask;
+ 	uint32_t go_ip_addr;
++	uint8_t *fils_ip_req_ie;
++	uint8_t *fils_ip_resp_ie;
+ 	void *user_data;
+ =
 
+ 	void (*free)(struct handshake_state *s);
+diff --git a/src/netdev.c b/src/netdev.c
+index d886efad..d7945d04 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -292,6 +292,9 @@ static unsigned int netdev_populate_common_ies(struct n=
+etdev *netdev,
+ =
 
-I don't see H2E being attempted in this log?  I'm curious how you got the l=
-og in =
+ 	c_iov =3D iov_ie_append(iov, n_iov, c_iov, hs->vendor_ies);
+ =
 
-your first message on this topic?
++	if (hs->fils_ip_req_ie)
++		c_iov =3D iov_ie_append(iov, n_iov, c_iov, hs->fils_ip_req_ie);
++
+ 	return c_iov;
+ }
+ =
 
-Does iwd 1.15 still manage to connect?  Is there a firmware upgrade for the=
- Nest =
+@@ -2186,6 +2189,18 @@ process_resp_ies:
+ 				qos_set =3D data;
+ 				qos_len =3D ie_tlv_iter_get_length(&iter);
+ 				break;
++			case IE_TYPE_FILS_IP_ADDRESS:
++				if (netdev->handshake->fils_ip_resp_ie) {
++					l_debug("Duplicate response FILS IP "
++						"Address Assignment IE");
++					l_free(netdev->handshake->
++						fils_ip_resp_ie);
++				}
++
++				netdev->handshake->fils_ip_resp_ie =3D l_memdup(
++					data - 3,
++					ie_tlv_iter_get_length(&iter) + 3);
++				break;
+ 			}
+ 		}
+ =
 
-that you can try?
+diff --git a/src/station.c b/src/station.c
+index f6237ade..9f00bfb3 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -924,6 +924,7 @@ static struct handshake_state *station_handshake_setup(=
+struct station *station,
+ 	struct handshake_state *hs;
+ 	const struct iovec *vendor_ies;
+ 	size_t iov_elems =3D 0;
++	struct ie_fils_ip_addr_request_info fils_ip_req;
+ =
 
-Regards,
--Denis
---===============6725781374354885656==--
+ 	hs =3D netdev_handshake_state_new(station->netdev);
+ =
+
+@@ -940,6 +941,16 @@ static struct handshake_state *station_handshake_setup=
+(struct station *station,
+ 	vendor_ies =3D network_info_get_extra_ies(info, bss, &iov_elems);
+ 	handshake_state_set_vendor_ies(hs, vendor_ies, iov_elems);
+ =
+
++	/*
++	 * It can't hurt to try the FILS IP Address Assigment independent of
++	 * which auth-proto is actually used.
++	 */
++	if (station->netconfig && netconfig_get_fils_ip_req(station->netconfig,
++								&fils_ip_req)) {
++		hs->fils_ip_req_ie =3D l_malloc(32);
++		ie_build_fils_ip_addr_request(&fils_ip_req, hs->fils_ip_req_ie);
++	}
++
+ 	return hs;
+ =
+
+ not_supported:
+@@ -2444,6 +2455,35 @@ static void station_connect_ok(struct station *stati=
+on)
+ 	network_connected(station->connected_network);
+ =
+
+ 	if (station->netconfig) {
++		if (hs->fils_ip_req_ie && hs->fils_ip_resp_ie) {
++			struct ie_fils_ip_addr_response_info info;
++			struct ie_tlv_iter iter;
++			int r;
++
++			ie_tlv_iter_init(&iter, hs->fils_ip_resp_ie,
++						hs->fils_ip_resp_ie[1] + 2);
++			ie_tlv_iter_next(&iter);
++			r =3D ie_parse_fils_ip_addr_response(&iter, &info);
++
++			if (r !=3D 0)
++				l_debug("Error parsing the FILS IP Address "
++					"Assignment response: %s (%i)",
++					strerror(-r), -r);
++			else if (info.response_pending &&
++					info.response_timeout)
++				l_debug("FILS IP Address Assignment response "
++					"is pending (unsupported)");
++			else if (info.response_pending)
++				l_debug("FILS IP Address Assignment failed");
++			else {
++				l_debug("FILS IP Address Assignment response "
++					"OK");
++				netconfig_handle_fils_ip_resp(
++							station->netconfig,
++							&info);
++			}
++		}
++
+ 		if (L_WARN_ON(!netconfig_configure(station->netconfig,
+ 						station_netconfig_event_handler,
+ 						station)))
+-- =
+
+2.30.2
+
+--===============0324872602005149089==--
 
