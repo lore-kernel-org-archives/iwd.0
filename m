@@ -1,157 +1,88 @@
-Content-Type: multipart/mixed; boundary="===============4985509297221958071=="
+Content-Type: multipart/mixed; boundary="===============1441522365713364080=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: iwd 1.17 test suite is failing
-Date: Mon, 23 Aug 2021 08:58:54 -0500
-Message-ID: <c4b50311-84ab-236a-e3cd-49371a9d7eb4@gmail.com>
-In-Reply-To: <CABB28CwPkyQcCrznB2MbEGN5TKMoSvCnaPH5DSY5SJ-YaJe47w@mail.gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 1/9] handshake: Add HANDSHAKE_EVENT_P2P_IP_REQUEST
+Date: Mon, 23 Aug 2021 16:14:22 +0200
+Message-ID: <20210823141430.223543-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4985509297221958071==
+--===============1441522365713364080==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tomasz,
+Add a handshake event for use by the AP side for mechanisms that
+allocate client IPs during the handshake: P2P address allocation and
+FILS address assignment.  This is emitted only when EAPOL or the
+auth_proto is actually about to send the network configuration data to
+the client so that ap.c can skip allocating a DHCP leases altogether if
+the client doesn't send the required KDE or IE.
+---
+ src/eapol.c     | 17 +++++++++++++++++
+ src/handshake.h |  1 +
+ src/station.c   |  1 +
+ 3 files changed, 19 insertions(+)
 
-On 8/22/21 1:55 PM, Tomasz K=C5=82oczko wrote:
-> Hi,
-> =
+diff --git a/src/eapol.c b/src/eapol.c
+index f78bef2f..5a3ef7a0 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -1350,6 +1350,23 @@ static void eapol_send_ptk_3_of_4(struct eapol_sm *s=
+m)
+ 		key_data_len +=3D gtk_kde[1] + 2;
+ 	}
+ =
 
-> I think that it started around 1.15.
-> iwd and eel compiled with LTO.
-> =
++	if (sm->handshake->support_ip_allocation &&
++			!sm->handshake->client_ip_addr) {
++		handshake_event(sm->handshake, HANDSHAKE_EVENT_P2P_IP_REQUEST);
++
++		/*
++		 * If .support_ip_allocation was set, the
++		 * HANDSHAKE_EVENT_P2P_IP_REQUEST handler is expected to set
++		 * .client_ip_addr if not already set.  Check if the handler
++		 * was successful in allocating an address, if it wasn't we'll
++		 * just skip the IP Address Allocation KDE.  In either case if
++		 * we need to resend message 3/4 the event callback won't be
++		 * triggered again because the condition above will be false.
++		 */
++		if (!sm->handshake->client_ip_addr)
++			sm->handshake->support_ip_allocation =3D false;
++	}
++
+ 	if (sm->handshake->support_ip_allocation) {
+ 		/* Wi-Fi P2P Technical Specification v1.7 Table 59 */
+ 		key_data_buf[key_data_len++] =3D IE_TYPE_VENDOR_SPECIFIC;
+diff --git a/src/handshake.h b/src/handshake.h
+index a4c54b5a..31dce117 100644
+--- a/src/handshake.h
++++ b/src/handshake.h
+@@ -57,6 +57,7 @@ enum handshake_event {
+ 	HANDSHAKE_EVENT_REKEY_FAILED,
+ 	HANDSHAKE_EVENT_EAP_NOTIFY,
+ 	HANDSHAKE_EVENT_TRANSITION_DISABLE,
++	HANDSHAKE_EVENT_P2P_IP_REQUEST,
+ };
+ =
 
-> [tkloczko(a)barrel iwd-1.17]$ make check
-> make --no-print-directory check-am
-> make --no-print-directory check-TESTS
-> PASS: unit/test-cmac-aes
-> PASS: unit/test-hmac-md5
-> PASS: unit/test-hmac-sha1
-> PASS: unit/test-hmac-sha256
-> PASS: unit/test-prf-sha1
-> PASS: unit/test-kdf-sha256
-> PASS: unit/test-crypto
-> ./build-aux/test-driver: line 107: 3860965 Aborted =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (core dumped) =
+ typedef void (*handshake_event_func_t)(struct handshake_state *hs,
+diff --git a/src/station.c b/src/station.c
+index d3482e2c..d61e775a 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -753,6 +753,7 @@ static void station_handshake_event(struct handshake_st=
+ate *hs,
+ 	case HANDSHAKE_EVENT_COMPLETE:
+ 	case HANDSHAKE_EVENT_SETTING_KEYS_FAILED:
+ 	case HANDSHAKE_EVENT_EAP_NOTIFY:
++	case HANDSHAKE_EVENT_P2P_IP_REQUEST:
+ 		/*
+ 		 * currently we don't care about any other events. The
+ 		 * netdev_connect_cb will notify us when the connection is
+-- =
 
-> "$@" > $log_file 2>&1
-> FAIL: unit/test-eapol
+2.30.2
 
-There was indeed a failure that slipped through the cracks.  This was due t=
-o the =
-
-test not being updated and is now fixed upstream with commit ed10b00afa3f =
-
-("unit: Fix eapol IP Allocation test failure")
-
-> PASS: unit/test-mpdu
-> PASS: unit/test-ie
-> PASS: unit/test-util
-> PASS: unit/test-ssid-security
-> PASS: unit/test-arc4
-> PASS: unit/test-wsc
-> PASS: unit/test-eap-mschapv2
-> PASS: unit/test-eap-sim
-> /bin/sh ./libtool =C2=A0--tag=3DCC =C2=A0 --mode=3Dlink /usr/bin/gcc =C2=
-=A0-fvisibility=3Dhidden =
-
-> -DUNITDIR=3D\""./unit/"\" -DCERTDIR=3D\""./unit/"\" =C2=A0-O2 -g -grecord=
--gcc-switches =
-
-> -pipe -Wall -Werror=3Dformat-security -Wp,-D_FORTIFY_SOURCE=3D2 =
-
-> -Wp,-D_GLIBCXX_ASSERTIONS -specs=3D/usr/lib/rpm/redhat/redhat-hardened-cc=
-1 =
-
-> -fstack-protector-strong -specs=3D/usr/lib/rpm/redhat/redhat-annobin-cc1 =
--m64 =
-
-> -mtune=3Dgeneric -fasynchronous-unwind-tables -fstack-clash-protection =
-
-> -fcf-protection -fdata-sections -ffunction-sections -flto=3Dauto =
-
-> -flto-partition=3Dnone -Os -Wl,-wrap,l_ecc_supported_ike_groups -Wl,-z,re=
-lro =
-
-> -Wl,--as-needed -Wl,--gc-sections -Wl,-z,now =
-
-> -specs=3D/usr/lib/rpm/redhat/redhat-hardened-ld -flto=3Dauto -flto-partit=
-ion=3Dnone =
-
-> -fuse-linker-plugin -o unit/test-sae unit/test-sae.o src/sae.o src/crypto=
-.o =
-
-> src/ie.o src/handshake.o src/erp.o src/util.o src/mpdu.o -lell
-> libtool: link: /usr/bin/gcc -fvisibility=3Dhidden -DUNITDIR=3D\"./unit/\" =
-
-> -DCERTDIR=3D\"./unit/\" -O2 -g -grecord-gcc-switches -pipe -Wall =
-
-> -Werror=3Dformat-security -Wp,-D_FORTIFY_SOURCE=3D2 -Wp,-D_GLIBCXX_ASSERT=
-IONS =
-
-> -specs=3D/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong =
-
-> -specs=3D/usr/lib/rpm/redhat/redhat-annobin-cc1 -m64 -mtune=3Dgeneric =
-
-> -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection =
-
-> -fdata-sections -ffunction-sections -flto=3Dauto -flto-partition=3Dnone -=
-Os =
-
-> -Wl,-wrap -Wl,l_ecc_supported_ike_groups -Wl,-z -Wl,relro -Wl,--as-needed =
-
-> -Wl,--gc-sections -Wl,-z -Wl,now -specs=3D/usr/lib/rpm/redhat/redhat-hard=
-ened-ld =
-
-> -flto=3Dauto -flto-partition=3Dnone -fuse-linker-plugin -o unit/test-sae =
-
-> unit/test-sae.o src/sae.o src/crypto.o src/ie.o src/handshake.o src/erp.o =
-
-> src/util.o src/mpdu.o =C2=A0-lell
-> /usr/bin/ld: /tmp/cc8uiWzL.lto.o: in function `sae_choose_next_group':
-> /home/tkloczko/rpmbuild/BUILD/iwd-1.17/src/sae.c:139: undefined reference=
- to =
-
-> `__wrap_l_ecc_supported_ike_groups'
-> /usr/bin/ld: /tmp/cc8uiWzL.lto.o: in function `handshake_state_free':
-> /home/tkloczko/rpmbuild/BUILD/iwd-1.17/src/handshake.c:48: undefined refe=
-rence =
-
-> to `__wrap_l_ecc_supported_ike_groups'
-> /usr/bin/ld: /tmp/cc8uiWzL.lto.o: in function `sae_rx_authenticate':
-> /home/tkloczko/rpmbuild/BUILD/iwd-1.17/src/sae.c:161: undefined reference=
- to =
-
-> `__wrap_l_ecc_supported_ike_groups'
-
-This would have shown up earliest at iwd 1.16.  However, I'm not sure what =
-this =
-
-is about?  We use
-unit_test_sae_LDFLAGS =3D -Wl,-wrap,l_ecc_supported_ike_groups
-
-Perhaps LTO somehow interferes with that?  ell has a unit test that uses th=
-e =
-
-same mechanism for quite some time...
-
-> =
-
-> BTW is it possible to organize iwd/eel mirrors on github/gitlab to be abl=
-e =
-
-> submit such an issue without being forced to subscribe to yet another mai=
-ling =
-
-> list or put in README files details how to submit the issue?
-> =
-
-
-We'll look into it.
-
-Regards,
--Denis
---===============4985509297221958071==--
+--===============1441522365713364080==--
 
