@@ -1,78 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============3377896321159840323=="
+Content-Type: multipart/mixed; boundary="===============5021955628346361144=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/4] ie: add is_ie_default_sae_group_oui
-Date: Mon, 23 Aug 2021 16:34:29 -0700
-Message-ID: <20210823233432.604561-1-prestwoj@gmail.com>
+Subject: [PATCH 2/4] scan: set force_default_sae_group if OUI matches
+Date: Mon, 23 Aug 2021 16:34:30 -0700
+Message-ID: <20210823233432.604561-2-prestwoj@gmail.com>
+In-Reply-To: <20210823233432.604561-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3377896321159840323==
+--===============5021955628346361144==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Start an OUI list of vendors who have buggy SAE group negotiation
 ---
- src/ie.c | 25 +++++++++++++++++++++++++
- src/ie.h |  2 ++
- 2 files changed, 27 insertions(+)
+ src/scan.c | 4 +++-
+ src/scan.h | 1 +
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/src/ie.c b/src/ie.c
-index a73d5bbc..3bf3b5f0 100644
---- a/src/ie.c
-+++ b/src/ie.c
-@@ -1363,6 +1363,31 @@ bool is_ie_wpa_ie(const uint8_t *data, uint8_t len)
- 	return false;
- }
+diff --git a/src/scan.c b/src/scan.c
+index 3faa6eb4..16bd2a87 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -924,7 +924,9 @@ static bool scan_parse_vendor_specific(struct scan_bss =
+*bss, const void *data,
+ 			return false;
  =
 
-+/*
-+ * List of vendor OUIs which require the default SAE group to be used
-+ */
-+static uint8_t use_default_sae_group_ouis[][3] =3D {
-+	{ 0xf4, 0xf5, 0xe8 },
-+};
-+
-+bool is_ie_default_sae_group_oui(const void *data, uint16_t len)
-+{
-+	unsigned int i =3D 0;
-+
-+	if (len < 3)
-+		return false;
-+
-+	while (i < L_ARRAY_SIZE(use_default_sae_group_ouis)) {
-+		if (!memcmp(use_default_sae_group_ouis[i], data, 3))
-+			return true;
-+
-+		i++;
-+	}
-+
-+	return false;
-+}
-+
-+
- int ie_parse_wpa(struct ie_tlv_iter *iter, struct ie_rsn_info *out_info)
- {
- 	const uint8_t *data =3D iter->data;
-diff --git a/src/ie.h b/src/ie.h
-index 25b56302..7c4f987d 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -524,6 +524,8 @@ int ie_parse_wpa_from_data(const uint8_t *data, size_t =
-len,
- 						struct ie_rsn_info *info);
- bool is_ie_wfa_ie(const uint8_t *data, uint8_t len, uint8_t oi_type);
- bool is_ie_wpa_ie(const uint8_t *data, uint8_t len);
-+bool is_ie_default_sae_group_oui(const void *data, uint16_t len);
-+
- bool ie_build_wpa(const struct ie_rsn_info *info, uint8_t *to);
+ 		bss->hs20_capable =3D true;
+-	} else
++	} else if (is_ie_default_sae_group_oui(data, len))
++		bss->force_default_sae_group =3D true;
++	else
+ 		return false;
  =
 
- int ie_parse_bss_load(struct ie_tlv_iter *iter, uint16_t *out_sta_count,
+ 	return true;
+diff --git a/src/scan.h b/src/scan.h
+index 81c84bae..8a57c2b3 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -83,6 +83,7 @@ struct scan_bss {
+ 	bool vht_capable : 1;
+ 	bool anqp_capable : 1;
+ 	bool hs20_capable : 1;
++	bool force_default_sae_group : 1;
+ };
+ =
+
+ struct scan_parameters {
 -- =
 
 2.31.1
 
---===============3377896321159840323==--
+--===============5021955628346361144==--
 
