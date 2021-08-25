@@ -1,137 +1,137 @@
-Content-Type: multipart/mixed; boundary="===============5602317387652277767=="
+Content-Type: multipart/mixed; boundary="===============2292671113116648427=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 7/9] netconfig: Move loading settings to new method,
- refactor
-Date: Thu, 26 Aug 2021 00:17:23 +0200
-Message-ID: <CAOq732+DLLQqFcEzpJ+hZR1ucCXE8=iMdCU4xCproJhO96eKqw@mail.gmail.com>
-In-Reply-To: <6b81dfe5-686e-5ad7-762a-1133d85a7de5@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 2/4] auto-t: hostapd.py: update Process changes
+Date: Wed, 25 Aug 2021 15:17:24 -0700
+Message-ID: <20210825221726.784086-2-prestwoj@gmail.com>
+In-Reply-To: <20210825221726.784086-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5602317387652277767==
+--===============2292671113116648427==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 25 Aug 2021 at 15:53, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 8/23/21 9:14 AM, Andrew Zaborowski wrote:
-> > Split loading settings out of network_configure into a new method,
-> > network_load_settings.  Make sure both consistently handle errors by
-> > printing messages and informing the caller.
-> > ---
-> >   src/netconfig.c | 157 +++++++++++++++++++++++++++++++-----------------
-> >   src/netconfig.h |   5 +-
-> >   src/p2p.c       |  12 +++-
-> >   src/station.c   |  20 +++---
-> >   4 files changed, 127 insertions(+), 67 deletions(-)
-> >
->
->    CC       src/netconfig.o
-> src/netconfig.c: In function =E2=80=98netconfig_get_static4_address=E2=80=
-=99:
-> src/netconfig.c:298:5: error: implicit declaration of function
-> =E2=80=98util_netmask_from_prefix=E2=80=99 [-Werror=3Dimplicit-function-d=
-eclaration]
->    298 |     util_netmask_from_prefix(prefix_len)) {
->        |     ^~~~~~~~~~~~~~~~~~~~~~~~
-> src/netconfig.c:297:29: error: comparison of integer expressions of diffe=
-rent
-> signedness: =E2=80=98__uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=
-=99} and =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
->    297 |   if (ntohl(in_addr.s_addr) !=3D
->        |                             ^~
-> cc1: all warnings being treated as errors
+---
+ autotests/util/hostapd.py | 34 +++++++++++++++++++---------------
+ 1 file changed, 19 insertions(+), 15 deletions(-)
 
-Oops, apparently I added the #include in the wrong commit.
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 2dcf38f9..10104862 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -132,18 +132,18 @@ class HostapdCLI(object):
+ =
 
->
-> <snip>
->
-> > @@ -998,22 +997,22 @@ static int validate_dns_list(int family, char **d=
-ns_list)
-> >       return n_valid;
-> >   }
-> >
-> > -bool netconfig_configure(struct netconfig *netconfig,
-> > +bool netconfig_load_settings(struct netconfig *netconfig,
-> >                               const struct l_settings *active_settings,
-> > -                             const uint8_t *mac_address,
-> > -                             netconfig_notify_func_t notify, void *use=
-r_data)
-> > +                             const uint8_t *mac_address)
-> >   {
-> >       char *mdns;
-> > -     char hostname[HOST_NAME_MAX + 1];
-> >       bool send_hostname;
-> > +     bool enabled;
-> >
-> > +     l_strfreev(netconfig->dns4_overrides);
->
-> ? shouldn't this be taken care of by netconfig_reset?
+     def set_value(self, key, value):
+         cmd =3D self.cmdline + ['set', key, value]
+-        ctx.start_process(cmd, wait=3DTrue)
++        ctx.start_process(cmd).wait()
+ =
 
-I thought we might have a future use case for calling
-netconfig_load_settings() multiple times without netconfig_reset
-between, but no strong motivation for that.
+     def wps_push_button(self):
+-        ctx.start_process(self.cmdline + ['wps_pbc'], wait=3DTrue)
++        ctx.start_process(self.cmdline + ['wps_pbc']).wait()
+ =
 
->  We generally don't like
-> side-effects in our APIs.
+     def wps_pin(self, pin):
+         cmd =3D self.cmdline + ['wps_pin', 'any', pin]
+-        ctx.start_process(cmd, wait=3DTrue)
++        ctx.start_process(cmd).wait()
+ =
 
-I wouldn't call avoiding a leak a side effect ;)
+     def deauthenticate(self, client_address):
+         cmd =3D self.cmdline + ['deauthenticate', client_address]
+-        ctx.start_process(cmd, wait=3DTrue)
++        ctx.start_process(cmd).wait()
+ =
 
->
-> >       netconfig->dns4_overrides =3D l_settings_get_string_list(active_s=
-ettings,
-> >                                                       "IPv4", "DNS", ' =
-');
-> >
-> >       if (netconfig->dns4_overrides) {
-> >               int r =3D validate_dns_list(AF_INET, netconfig->dns4_over=
-rides);
-> >
-> > -             if (r <=3D 0) {
-> > +             if (unlikely(r <=3D 0)) {
-> >                       l_strfreev(netconfig->dns4_overrides);
-> >                       netconfig->dns4_overrides =3D NULL;
-> >               }
-> > @@ -1022,13 +1021,14 @@ bool netconfig_configure(struct netconfig *netc=
-onfig,
-> >                       l_error("netconfig: Empty IPv4.DNS entry, skippin=
-g...");
-> >       }
-> >
-> > +     l_strfreev(netconfig->dns6_overrides);
->
-> Same here?
->
-> >       netconfig->dns6_overrides =3D l_settings_get_string_list(active_s=
-ettings,
-> >                                                       "IPv6", "DNS", ' =
-');
-> >
-> >       if (netconfig->dns6_overrides) {
-> >               int r =3D validate_dns_list(AF_INET6, netconfig->dns6_ove=
-rrides);
-> >
-> > -             if (r <=3D 0) {
-> > +             if (unlikely(r <=3D 0)) {
-> >                       l_strfreev(netconfig->dns6_overrides);
-> >                       netconfig->dns6_overrides =3D NULL;
-> >               }
-> > @@ -1038,8 +1038,6 @@ bool netconfig_configure(struct netconfig *netcon=
-fig,
-> >       }
-> >
-> >       netconfig->active_settings =3D active_settings;
->
-> Do we even need active settings now?
+     def eapol_reauth(self, client_address):
+         cmd =3D 'IFNAME=3D' + self.ifname + ' EAPOL_REAUTH ' + client_addr=
+ess
+@@ -152,12 +152,13 @@ class HostapdCLI(object):
+     def reload(self):
+         # Seemingly all three commands needed for the instance to notice
+         # interface's address change
+-        ctx.start_process(self.cmdline + ['reload'], wait=3DTrue)
+-        ctx.start_process(self.cmdline + ['disable'], wait=3DTrue)
+-        ctx.start_process(self.cmdline + ['enable'], wait=3DTrue)
++        ctx.start_process(self.cmdline + ['reload']).wait()
++        ctx.start_process(self.cmdline + ['disable']).wait()
++        ctx.start_process(self.cmdline + ['enable']).wait()
+ =
 
-So in this method I only removed the usage of the l_settings from
-netconfig_configure() but not from other places (*_get_gateway(),
-netconfig_set_domains()) which may be called asynchronously.  It's
-something we could do separately if desired but my use case was only
-for setting the value of netconfig->rtm_protocol early.
+     def list_sta(self):
+-        proc =3D ctx.start_process(self.cmdline + ['list_sta'], wait=3DTru=
+e, need_out=3DTrue)
++        proc =3D ctx.start_process(self.cmdline + ['list_sta'])
++        proc.wait()
+ =
 
-Best regards
---===============5602317387652277767==--
+         if not proc.out:
+             return []
+@@ -166,7 +167,7 @@ class HostapdCLI(object):
+ =
+
+     def set_neighbor(self, addr, ssid, nr):
+         cmd =3D self.cmdline + ['set_neighbor', addr, 'ssid=3D"%s"' % ssid=
+, 'nr=3D%s' % nr]
+-        ctx.start_process(cmd, wait=3DTrue)
++        ctx.start_process(cmd).wait()
+ =
+
+     def send_bss_transition(self, device, nr_list):
+         # Send a BSS transition to a station (device). nr_list should be an
+@@ -189,7 +190,8 @@ class HostapdCLI(object):
+                         (addr, bss_info, op_class, chan_num, phy_num)]
+             pref +=3D 1
+ =
+
+-        proc =3D ctx.start_process(cmd, wait=3DTrue, need_out=3DTrue)
++        proc =3D ctx.start_process(cmd)
++        proc.wait()
+ =
+
+         if 'OK' not in proc.out:
+             raise Exception('BSS_TM_REQ failed, is hostapd built with CONF=
+IG_WNM_AP=3Dy?')
+@@ -199,13 +201,14 @@ class HostapdCLI(object):
+             Send a RRM Beacon request
+         '''
+         cmd =3D self.cmdline + ['req_beacon', addr, request]
+-        ctx.start_process(cmd, wait=3DTrue)
++        ctx.start_process(cmd).wait()
+ =
+
+     @property
+     def bssid(self):
+         cmd =3D self.cmdline + ['status']
+-        status =3D ctx.start_process(cmd, wait=3DTrue, need_out=3DTrue).out
+-        status =3D status.split('\n')
++        proc =3D ctx.start_process(cmd)
++        proc.wait()
++        status =3D proc.out.split('\n')
+ =
+
+         bssid =3D [x for x in status if x.startswith('bssid')]
+         bssid =3D bssid[0].split('=3D')
+@@ -214,8 +217,9 @@ class HostapdCLI(object):
+     @property
+     def frequency(self):
+         cmd =3D self.cmdline + ['status']
+-        status =3D ctx.start_process(cmd, wait=3DTrue, need_out=3DTrue).out
+-        status =3D status.split('\n')
++        proc =3D ctx.start_process(cmd)
++        proc.wait()
++        status =3D proc.out.split('\n')
+ =
+
+         frequency =3D [x for x in status if x.startswith('freq')][0]
+         frequency =3D frequency.split('=3D')[1]
+-- =
+
+2.31.1
+
+--===============2292671113116648427==--
 
