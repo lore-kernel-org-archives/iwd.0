@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============4177440479537440384=="
+Content-Type: multipart/mixed; boundary="===============1481637673826853637=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 1/4] ie: add is_ie_default_sae_group_oui
-Date: Wed, 25 Aug 2021 08:57:53 -0500
-Message-ID: <ba5eda39-cf42-8b24-83d9-73710365242b@gmail.com>
-In-Reply-To: <20210823234149.610336-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v2 3/4] sae: handle force_default_sae_group in scan_bss
+Date: Wed, 25 Aug 2021 09:01:57 -0500
+Message-ID: <c724e955-0534-1a5a-f179-50e256ba7b56@gmail.com>
+In-Reply-To: <20210823234149.610336-3-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4177440479537440384==
+--===============1481637673826853637==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -16,63 +16,70 @@ Content-Transfer-Encoding: quoted-printable
 Hi James,
 
 On 8/23/21 6:41 PM, James Prestwood wrote:
-> Start an OUI list of vendors who have buggy SAE group negotiation
-> ---
->   src/ie.c | 25 +++++++++++++++++++++++++
->   src/ie.h |  2 ++
->   2 files changed, 27 insertions(+)
+> Now a scan_bss object is passed to sae_sm_new in order to detect if
+> the BSS's vendor OUI matches ones in which SAE group negotiation is
+> broken. When an AP like this is found SAE will use group 19
+> unconditionally, and fail if group 19 does not work. Other groups
+> could be tried upon failure but per the spec group 19 must be supported
+> so there isn't much use in trying other, optional groups.
 > =
 
-> diff --git a/src/ie.c b/src/ie.c
-> index a73d5bbc..3bf3b5f0 100644
-> --- a/src/ie.c
-> +++ b/src/ie.c
-> @@ -1363,6 +1363,31 @@ bool is_ie_wpa_ie(const uint8_t *data, uint8_t len)
->   	return false;
->   }
+> Note: the check on 'bss' was added in order to make unit testing
+> easier to integrate as including scan.c in unit tests opens up a
+> can of worms.
+> ---
+>   src/netdev.c |  2 +-
+>   src/sae.c    | 27 +++++++++++++++++++++++++++
+>   src/sae.h    |  2 ++
+>   3 files changed, 30 insertions(+), 1 deletion(-)
+> =
+
+> v2:
+>   * Only force group 19 when sae_type is LOOPING
+>   * Increment group_retry when forcing group otherwise
+>     IWD would continue to try group 19 over and over
+> =
+
+
+<snip>
+
+> diff --git a/src/sae.h b/src/sae.h
+> index 668d084f..d8f9f2d7 100644
+> --- a/src/sae.h
+> +++ b/src/sae.h
+> @@ -23,6 +23,7 @@
+>   struct auth_proto;
+>   struct sae_sm;
+>   struct handshake_state;
+> +struct scan_bss;
 >   =
 
-> +/*
-> + * List of vendor OUIs which require the default SAE group to be used
-> + */
-> +static uint8_t use_default_sae_group_ouis[][3] =3D {
-> +	{ 0xf4, 0xf5, 0xe8 },
+>   typedef void (*sae_tx_authenticate_func_t)(const uint8_t *data, size_t =
+len,
+>   						void *user_data);
+> @@ -31,6 +32,7 @@ typedef void (*sae_tx_associate_func_t)(void *user_data=
+);
+>   bool sae_sm_is_h2e(struct auth_proto *ap);
+>   =
 
-I wonder if blacklisting the entire vendor oui is a good idea.  The Nest se=
-ems =
+>   struct auth_proto *sae_sm_new(struct handshake_state *hs,
+> +				struct scan_bss *bss,
+>   				sae_tx_authenticate_func_t tx_auth,
+>   				sae_tx_associate_func_t tx_assoc,
+>   				void *user_data);
+> =
 
-to send a subtype of '05' of the vendor IE.  Maybe we should limit it to th=
-at =
 
-for now?
+Looking at this again, I guess we might as well just add:
 
-> +};
-> +
-> +bool is_ie_default_sae_group_oui(const void *data, uint16_t len)
-> +{
-> +	unsigned int i =3D 0;
-> +
-> +	if (len < 3)
-> +		return false;
-> +
-> +	while (i < L_ARRAY_SIZE(use_default_sae_group_ouis)) {
-> +		if (!memcmp(use_default_sae_group_ouis[i], data, 3))
-> +			return true;
+void sae_sm_set_force_group_19(struct auth_proto *ap);
 
-So supporting matching by OUI or OUI + type might be nice.
+Which would remove the need for scan_bss dependency and the unit test can r=
+emain =
 
-> +
-> +		i++;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +
-
-double empty line
+untouched.
 
 Regards,
 -Denis
---===============4177440479537440384==--
+--===============1481637673826853637==--
 
