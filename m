@@ -1,60 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============1746700551368098595=="
+Content-Type: multipart/mixed; boundary="===============8292381264077616178=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH 1/4] test-runner: inherit Popen by Process class
-Date: Thu, 26 Aug 2021 08:57:02 -0500
-Message-ID: <1fd19ba3-afad-8b03-adc8-1e4d1fe67d70@gmail.com>
-In-Reply-To: <20210825221726.784086-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] auto-t: hwsim.py: turn Hwsim into singleton
+ (per-namespace)
+Date: Thu, 26 Aug 2021 13:33:31 -0700
+Message-ID: <20210826203333.1067317-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1746700551368098595==
+--===============8292381264077616178==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This prevents reallocation of new Hwsim classes on each call if one
+already exists. This is a bit more efficient on memory.
+---
+ autotests/util/hwsim.py | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-On 8/25/21 5:17 PM, James Prestwood wrote:
-> The Procss class was doing quite a bit of what Popen already does like
-> storing the return code and process arguments. In addition the Process
-> class ended up storing a Popen object which was frequently accessed.
-> =
+diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
+index db106dcb..cc62495c 100755
+--- a/autotests/util/hwsim.py
++++ b/autotests/util/hwsim.py
+@@ -3,6 +3,7 @@ import dbus
+ import sys
+ import collections
+ =
 
-> For both simplicity and memory savings have Process inherit Popen and
-> add the additional functionality test-runner needs like stdout
-> processing to output files and the console.
-> =
++from weakref import WeakValueDictionary
+ from abc import ABCMeta, abstractmethod
+ from enum import Enum
+ =
 
-> To do this Popen.wait() needed to be overridden to to prevent blocking
-> as well as wait for the HUP signal so we are sure all the process
-> output was written. kill() was also overritten to perform cleanup.
-> =
+@@ -297,7 +298,25 @@ class RadioList(collections.Mapping):
+         return obj
+ =
 
-> The most intrusive change was removing wait as a kwarg, and instead
-> requiring the caller to call wait(). This doesn't change much in
-> terms of complexity to the caller, but simplifies the __init__
-> routine of Process.
-> =
+ class Hwsim(iwd.AsyncOpAbstract):
++    _instances =3D WeakValueDictionary()
++
++    def __new__(cls, namespace=3Dctx):
++        name =3D namespace.name
++
++        if name not in cls._instances.keys():
++            obj =3D object.__new__(cls)
++            obj._initialized =3D False
++
++            cls._instances[name] =3D obj
++
++        return cls._instances[name]
++
+     def __init__(self, namespace=3Dctx):
++        if self._initialized:
++            return
++
++        self._initialized =3D True
++
+         self._bus =3D namespace.get_bus()
+ =
 
-> Some convenient improvements:
->   - Separate multiple process instance output (Terminate: <args> will
->     be written to outfiles each time a process dies.)
->   - Append to outfile if the same process is started again
->   - Wait for HUP before returning from wait(). This allows any remaining
->     output to be written without the need to manually call process_io.
->   - Store ctx as a class variable so callers don't need to pass it in
->     (e.g. when using Process directly rather than start_process)
-> ---
->   tools/test-runner | 228 +++++++++++++++++++++++-----------------------
->   1 file changed, 112 insertions(+), 116 deletions(-)
-> =
+         self._rule_manager_if =3D dbus.Interface(
+-- =
 
+2.31.1
 
-All applied, thanks.
-
-Regards,
--Denis
-
---===============1746700551368098595==--
+--===============8292381264077616178==--
 
