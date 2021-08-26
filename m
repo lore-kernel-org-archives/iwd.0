@@ -1,65 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============0042827862997765049=="
+Content-Type: multipart/mixed; boundary="===============1746700551368098595=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 7/9] netconfig: Move loading settings to new method,
- refactor
-Date: Thu, 26 Aug 2021 00:56:45 +0200
-Message-ID: <CAOq732Lfd_x6d9AY5B0+bLLnV_Un3AbMwdHF0n4_Y9OLfTFxdg@mail.gmail.com>
-In-Reply-To: <5fc5be3c-b015-6fa1-bae4-34a06ab8436f@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/4] test-runner: inherit Popen by Process class
+Date: Thu, 26 Aug 2021 08:57:02 -0500
+Message-ID: <1fd19ba3-afad-8b03-adc8-1e4d1fe67d70@gmail.com>
+In-Reply-To: <20210825221726.784086-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0042827862997765049==
+--===============1746700551368098595==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 26 Aug 2021 at 00:43, Denis Kenzior <denkenz@gmail.com> wrote:
-> > I thought we might have a future use case for calling
-> > netconfig_load_settings() multiple times without netconfig_reset
-> > between, but no strong motivation for that.
-> >
->
-> Can you elaborate on why we would want that?
+Hi James,
 
-When implementing a protocol similar to the FILS or P2P early IP
-allocation, we might want to first load only the user l_settings to
-find out whether the user even wants automatic netconfig.  Then
-calling load_settings() would be one way, not necessarily the best
-way, to pass the newly received network configuration to netconfig.c.
+On 8/25/21 5:17 PM, James Prestwood wrote:
+> The Procss class was doing quite a bit of what Popen already does like
+> storing the return code and process arguments. In addition the Process
+> class ended up storing a Popen object which was frequently accessed.
+> =
 
-But even then calling netconfig_reset() in between is an option.
+> For both simplicity and memory savings have Process inherit Popen and
+> add the additional functionality test-runner needs like stdout
+> processing to output files and the console.
+> =
 
-> But even more reason not to
-> side-effect.
+> To do this Popen.wait() needed to be overridden to to prevent blocking
+> as well as wait for the HUP signal so we are sure all the process
+> output was written. kill() was also overritten to perform cleanup.
+> =
 
-True.
+> The most intrusive change was removing wait as a kwarg, and instead
+> requiring the caller to call wait(). This doesn't change much in
+> terms of complexity to the caller, but simplifies the __init__
+> routine of Process.
+> =
 
->
-> >>   We generally don't like
-> >> side-effects in our APIs.
-> >
-> > I wouldn't call avoiding a leak a side effect ;)
-> >
->
-> My point is, you shouldn't be setting anything inside netconfig until you=
- know
-> the operation will succeed completely.  Doing otherwise makes error handl=
-ing a
-> nightmare.
->
-> netconfig_configure would never fail since it would ignore invalid input.=
-  In
-> fact, I'm not sure why it had a bool return in the first place.
->
-> In this patch you're changing the contract such that netconfig_load_setti=
-ngs
-> checks up-front if the networking settings are correct or not.  Side-effe=
-cting
-> is not desirable in this case.
+> Some convenient improvements:
+>   - Separate multiple process instance output (Terminate: <args> will
+>     be written to outfiles each time a process dies.)
+>   - Append to outfile if the same process is started again
+>   - Wait for HUP before returning from wait(). This allows any remaining
+>     output to be written without the need to manually call process_io.
+>   - Store ctx as a class variable so callers don't need to pass it in
+>     (e.g. when using Process directly rather than start_process)
+> ---
+>   tools/test-runner | 228 +++++++++++++++++++++++-----------------------
+>   1 file changed, 112 insertions(+), 116 deletions(-)
+> =
 
-Agreed, I'll fix this.
 
-Best regards
---===============0042827862997765049==--
+All applied, thanks.
+
+Regards,
+-Denis
+
+--===============1746700551368098595==--
 
