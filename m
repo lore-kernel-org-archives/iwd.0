@@ -1,105 +1,91 @@
-Content-Type: multipart/mixed; boundary="===============6646761624415558981=="
+Content-Type: multipart/mixed; boundary="===============7656341378923946184=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/3] auto-t: hostapd.py: properly implement singleton
- (per-config)
-Date: Thu, 26 Aug 2021 13:33:32 -0700
-Message-ID: <20210826203333.1067317-2-prestwoj@gmail.com>
+Subject: [PATCH 3/3] test-runner: only import Hwsim/HostapdCLI once
+Date: Thu, 26 Aug 2021 13:33:33 -0700
+Message-ID: <20210826203333.1067317-3-prestwoj@gmail.com>
 In-Reply-To: <20210826203333.1067317-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6646761624415558981==
+--===============7656341378923946184==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This shouldn't change any functionality but it is much more convenient
-in the cleanup path i.e. nothing special needs to be done.
+These modules only needed to be imported a single time for the entire
+run of tests. This is significantly cheaper in terms of memory and
+should prevent random OOM exceptions.
 ---
- autotests/util/hostapd.py | 16 ++++++----------
- tools/test-runner         |  7 -------
- 2 files changed, 6 insertions(+), 17 deletions(-)
+ tools/test-runner | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index 10104862..07d27f1b 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -5,6 +5,7 @@ import socket
- import select
- import time
- from gi.repository import GLib
-+from weakref import WeakValueDictionary
- from config import ctx
- =
-
- chan_freq_map =3D [
-@@ -29,7 +30,7 @@ ctrl_count =3D 0
- mainloop =3D GLib.MainLoop()
- =
-
- class HostapdCLI(object):
--    _instances =3D {}
-+    _instances =3D WeakValueDictionary()
- =
-
-     def __new__(cls, config=3DNone, *args, **kwargs):
-         hapd =3D ctx.hostapd[config]
-@@ -38,8 +39,10 @@ class HostapdCLI(object):
-             config =3D hapd.config
- =
-
-         if not config in cls._instances.keys():
--            cls._instances[config] =3D object.__new__(cls, *args, **kwargs)
--            cls._instances[config]._initialized =3D False
-+            obj =3D object.__new__(cls, *args, **kwargs)
-+            obj._initialized =3D False
-+
-+            cls._instances[config] =3D obj
- =
-
-         return cls._instances[config]
- =
-
-@@ -123,13 +126,6 @@ class HostapdCLI(object):
-         except:
-             pass
- =
-
--        HostapdCLI._instances[self.config] =3D None
--
--        # Check if this is the final instance
--        destroy =3D len([hapd for hapd in HostapdCLI._instances.values() i=
-f hapd is not None]) =3D=3D 0
--        if destroy:
--            HostapdCLI._instances =3D {}
--
-     def set_value(self, key, value):
-         cmd =3D self.cmdline + ['set', key, value]
-         ctx.start_process(cmd).wait()
 diff --git a/tools/test-runner b/tools/test-runner
-index 8b244e99..b7a283d1 100755
+index b7a283d1..513af2ab 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -541,13 +541,6 @@ class Hostapd:
- 		except:
- 			print("Failed to remove %s" % self.global_ctrl_iface)
+@@ -377,17 +377,20 @@ class VirtualRadio(Radio):
+ 		TODO: Using D-Bus to create and destroy radios is more desireable
+ 		than the command line.
+ 	'''
+-	def __init__(self, name, config=3DNone):
++
++	def __init__(self, name, cfg=3DNone):
++		global config
++
+ 		self.disable_cipher =3D None
+ 		self.disable_iftype =3D None
  =
 
--		for hapd in self.instances:
--			if not hapd.cli:
--				continue
--
--			hapd.cli._instances[hapd.config] =3D None
--			hapd.cli =3D None
--
- 		self.instances =3D None
+-		hwsim =3D importlib.import_module('hwsim').Hwsim()
++		self.hwsim =3D config.hwsim.Hwsim()
  =
 
- 		# Hostapd may have already been stopped
+-		if config:
+-			self.disable_iftype =3D config.get('iftype_disable', None)
+-			self.disable_cipher =3D config.get('cipher_disable', None)
++		if cfg:
++			self.disable_iftype =3D cfg.get('iftype_disable', None)
++			self.disable_cipher =3D cfg.get('cipher_disable', None)
+ =
+
+-		self._radio =3D hwsim.radios.create(name, p2p_device=3DTrue,
++		self._radio =3D self.hwsim.radios.create(name, p2p_device=3DTrue,
+ 					iftype_disable=3Dself.disable_iftype,
+ 					cipher_disable=3Dself.disable_cipher)
+ =
+
+@@ -499,8 +502,10 @@ class Hostapd:
+ 			self.process.wait_for_socket(hapd.intf.ctrl_interface, 30)
+ =
+
+ 	def attach_cli(self):
++		global config
++
+ 		for hapd in self.instances:
+-			hapd.cli =3D importlib.import_module('hostapd').HostapdCLI(config=3Dhap=
+d.config)
++			hapd.cli =3D config.hostapd.HostapdCLI(config=3Dhapd.config)
+ =
+
+ 	def _rewrite_config(self, config):
+ 		'''
+@@ -1502,6 +1507,10 @@ def run_tests():
+ 	config =3D importlib.import_module('config')
+ 	config.ctx =3D TestContext(args)
+ =
+
++	# Must import these after config so ctx gets set
++	config.hwsim =3D importlib.import_module('hwsim')
++	config.hostapd =3D importlib.import_module('hostapd')
++
+ 	if args.log:
+ 		mount('logdir', args.log, '9p', 0, 'trans=3Dvirtio,version=3D9p2000.L,ms=
+ize=3D10240')
+ 		# Clear out any log files from other test runs
 -- =
 
 2.31.1
 
---===============6646761624415558981==--
+--===============7656341378923946184==--
 
