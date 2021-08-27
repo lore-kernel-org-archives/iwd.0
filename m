@@ -1,104 +1,297 @@
-Content-Type: multipart/mixed; boundary="===============1608375743430114468=="
+Content-Type: multipart/mixed; boundary="===============4919453809321558537=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 4/5] ie: Extract same-subnet check code to util.h
-Date: Fri, 27 Aug 2021 05:02:06 +0200
-Message-ID: <20210827030207.353705-4-andrew.zaborowski@intel.com>
+Subject: [PATCH 5/5] netconfig: Apply MACs received in FILS IP Assigment
+Date: Fri, 27 Aug 2021 05:02:07 +0200
+Message-ID: <20210827030207.353705-5-andrew.zaborowski@intel.com>
 In-Reply-To: <20210827030207.353705-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1608375743430114468==
+--===============4919453809321558537==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Use the MAC addresses for the gateways and DNS servers received in the
+FILS IP Assigment IE together with the gateway IP and DNS server IP.
+Commit the IP to MAC mappings directly to the ARP/NDP tables so that the
+network stack can skip sending the corresponding queries over the air.
 ---
- src/ie.c   | 22 +++++++++-------------
- src/util.h | 14 ++++++++++++++
- 2 files changed, 23 insertions(+), 13 deletions(-)
+ src/netconfig.c | 123 +++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 102 insertions(+), 21 deletions(-)
 
-diff --git a/src/ie.c b/src/ie.c
-index 6f487912..0aa86af6 100644
---- a/src/ie.c
-+++ b/src/ie.c
-@@ -2309,8 +2309,10 @@ int ie_parse_fils_ip_addr_response(struct ie_tlv_ite=
-r *iter,
- 		memcpy(info.ipv4_gateway_mac, ptr + 4, 6);
- =
-
- 		/* Check gateway is on the same subnet */
--		if (info.ipv4_addr && (ntohl(info.ipv4_addr ^ info.ipv4_gateway) &
--				util_netmask_from_prefix(info.ipv4_prefix_len)))
-+		if (info.ipv4_addr &&
-+				!util_ip_subnet_match(info.ipv4_prefix_len,
-+							&info.ipv4_addr,
-+							&info.ipv4_gateway))
- 			return -EINVAL;
- 	}
- =
-
-@@ -2330,17 +2332,11 @@ int ie_parse_fils_ip_addr_response(struct ie_tlv_it=
-er *iter,
- 		memcpy(info.ipv6_gateway_mac, ptr + 16, 6);
- =
-
- 		/* Check gateway is on the same subnet */
--		if (!l_memeqzero(info.ipv6_addr, 12)) {
--			int n =3D info.ipv6_prefix_len / 8;
--			uint8_t mask =3D (1 << (info.ipv6_prefix_len & 7)) - 1;
--
--			if (n && memcmp(info.ipv6_addr, info.ipv6_gateway, n))
--				return -EINVAL;
--
--			if (mask && ((info.ipv6_addr[n] ^
--						info.ipv6_gateway[n]) & mask))
--				return -EINVAL;
--		}
-+		if (!l_memeqzero(info.ipv6_addr, 16) &&
-+				!util_ip_subnet_match(info.ipv6_prefix_len,
-+							info.ipv6_addr,
-+							info.ipv6_gateway))
-+			return -EINVAL;
- 	}
- =
-
- 	if (*resp_ctrl & IE_FILS_IP_ADDR_RESP_CTRL_IPV4_LIFETIME_INCLUDED)
-diff --git a/src/util.h b/src/util.h
-index 1604a372..ae640698 100644
---- a/src/util.h
-+++ b/src/util.h
-@@ -82,9 +82,23 @@ static inline uint32_t util_secure_fill_with_msb(uint32_=
-t val)
- bool util_ip_prefix_tohl(const char *ip, uint8_t *prefix, uint32_t *start_=
-out,
- 				uint32_t *end_out, uint32_t *mask_out);
- =
-
-+/* Host byte-order IPv4 netmask */
- static inline uint32_t util_netmask_from_prefix(uint8_t prefix_len)
- {
- 	return ~((1ull << (32 - prefix_len)) - 1);
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 6e1e1aa7..69aded52 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -196,22 +196,40 @@ static inline char *netconfig_ipv6_to_string(const ui=
+nt8_t *addr)
+ 	return addr_str;
  }
  =
 
-+/* Expects network byte-order (big-endian) addresses */
-+static inline bool util_ip_subnet_match(uint8_t prefix_len,
-+					const void *addr1, const void *addr2)
++static void netconfig_set_neighbor_entry_cb(int error,
++						uint16_t type, const void *data,
++						uint32_t len, void *user_data)
 +{
-+	const uint8_t *u8_1 =3D addr1;
-+	const uint8_t *u8_2 =3D addr2;
-+	uint8_t pref_bytes =3D prefix_len / 8;
-+
-+	return (!pref_bytes || !memcmp(u8_1, u8_2, pref_bytes)) &&
-+		!((u8_1[pref_bytes] ^ u8_2[pref_bytes]) &
-+		  ~((1u << (8 - (prefix_len % 8))) - 1));
++	if (error)
++		l_error("l_rtnl_neighbor_set_hwaddr failed: %s (%i)",
++			strerror(-error), error);
 +}
 +
- #endif /* __UTIL_H */
+ static int netconfig_set_dns(struct netconfig *netconfig)
+ {
+ 	char **dns6_list =3D NULL;
+ 	char **dns4_list =3D NULL;
+ 	unsigned int n_entries =3D 0;
+ 	char **dns_list;
++	const uint8_t *fils_dns4_mac =3D NULL;
++	const uint8_t *fils_dns6_mac =3D NULL;
++	const struct ie_fils_ip_addr_response_info *fils =3D
++		netconfig->fils_override;
+ =
+
+ 	if (!netconfig->dns4_overrides &&
+ 			netconfig->rtm_protocol =3D=3D RTPROT_DHCP) {
+ 		const struct l_dhcp_lease *lease;
+ =
+
+-		if (netconfig->fils_override &&
+-				netconfig->fils_override->ipv4_dns) {
++		if (fils && fils->ipv4_dns) {
+ 			dns4_list =3D l_new(char *, 2);
+-			dns4_list[0] =3D netconfig_ipv4_to_string(
+-					netconfig->fils_override->ipv4_dns);
++			dns4_list[0] =3D netconfig_ipv4_to_string(fils->ipv4_dns);
++
++			if (!l_memeqzero(fils->ipv4_dns_mac, 6) &&
++					util_ip_subnet_match(
++							fils->ipv4_prefix_len,
++							&fils->ipv4_addr,
++							&fils->ipv4_dns))
++				fils_dns4_mac =3D fils->ipv4_dns_mac;
+ 		} else if ((lease =3D l_dhcp_client_get_lease(
+ 						netconfig->dhcp_client)))
+ 			dns4_list =3D l_dhcp_lease_get_dns(lease);
+@@ -221,12 +239,21 @@ static int netconfig_set_dns(struct netconfig *netcon=
+fig)
+ 			netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP) {
+ 		const struct l_dhcp6_lease *lease;
+ =
+
+-		if (netconfig->fils_override &&
+-				!l_memeqzero(netconfig->fils_override->ipv6_dns,
++		if (fils && !l_memeqzero(fils->ipv6_dns,
+ 						16)) {
+ 			dns6_list =3D l_new(char *, 2);
+-			dns6_list[0] =3D netconfig_ipv6_to_string(
+-					netconfig->fils_override->ipv6_dns);
++			dns6_list[0] =3D netconfig_ipv6_to_string(fils->ipv6_dns);
++
++			/*
++			 * TODO: perhaps check that the IP is on the local
++			 * subnet.
++			 */
++			if (!l_memeqzero(fils->ipv6_dns_mac, 6) &&
++					util_ip_subnet_match(
++							fils->ipv6_prefix_len,
++							fils->ipv6_addr,
++							fils->ipv6_dns))
++				fils_dns6_mac =3D fils->ipv6_dns_mac;
+ 		} else if ((lease =3D l_dhcp6_client_get_lease(
+ 						netconfig->dhcp6_client)))
+ 			dns6_list =3D l_dhcp6_lease_get_dns(lease);
+@@ -242,15 +269,28 @@ static int netconfig_set_dns(struct netconfig *netcon=
+fig)
+ =
+
+ 	APPEND_STRDUPV(dns_list, n_entries, netconfig->dns4_overrides);
+ 	APPENDV(dns_list, n_entries, dns4_list);
+-	/* Contents now belong to ret, so not l_strfreev */
+-	l_free(dns4_list);
+ 	APPEND_STRDUPV(dns_list, n_entries, netconfig->dns6_overrides);
+ 	APPENDV(dns_list, n_entries, dns6_list);
+-	/* Contents now belong to ret, so not l_strfreev */
+-	l_free(dns6_list);
+-
+ 	resolve_set_dns(netconfig->resolve, dns_list);
++
++	if (fils_dns4_mac && !l_rtnl_neighbor_set_hwaddr(rtnl,
++					netconfig->ifindex, AF_INET,
++					&fils->ipv4_dns, fils_dns4_mac, 6,
++					netconfig_set_neighbor_entry_cb, NULL,
++					NULL))
++		l_debug("l_rtnl_neighbor_set_hwaddr failed");
++
++	if (fils_dns6_mac && !l_rtnl_neighbor_set_hwaddr(rtnl,
++					netconfig->ifindex, AF_INET6,
++					fils->ipv6_dns, fils_dns6_mac, 6,
++					netconfig_set_neighbor_entry_cb, NULL,
++					NULL))
++		l_debug("l_rtnl_neighbor_set_hwaddr failed");
++
+ 	l_strv_free(dns_list);
++	/* Contents belonged to dns_list, so not l_strfreev */
++	l_free(dns4_list);
++	l_free(dns6_list);
+ 	return 0;
+ }
+ =
+
+@@ -361,7 +401,8 @@ static struct l_rtnl_address *netconfig_get_static4_add=
+ress(
+ 	return ifaddr;
+ }
+ =
+
+-static char *netconfig_ipv4_get_gateway(struct netconfig *netconfig)
++static char *netconfig_ipv4_get_gateway(struct netconfig *netconfig,
++					const uint8_t **out_mac)
+ {
+ 	const struct l_dhcp_lease *lease;
+ 	char *gateway;
+@@ -379,10 +420,18 @@ static char *netconfig_ipv4_get_gateway(struct netcon=
+fig *netconfig)
+ =
+
+ 	case RTPROT_DHCP:
+ 		if (netconfig->fils_override &&
+-				netconfig->fils_override->ipv4_gateway)
+-			return netconfig_ipv4_to_string(
++				netconfig->fils_override->ipv4_gateway) {
++			gateway =3D netconfig_ipv4_to_string(
+ 					netconfig->fils_override->ipv4_gateway);
+ =
+
++			if (gateway && !l_memeqzero(netconfig->fils_override->
++							ipv4_gateway_mac, 6))
++				*out_mac =3D netconfig->fils_override->
++					ipv4_gateway_mac;
++
++			return gateway;
++		}
++
+ 		lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
+ 		if (!lease)
+ 			return NULL;
+@@ -431,7 +480,8 @@ no_prefix_len:
+ }
+ =
+
+ static struct l_rtnl_route *netconfig_get_static6_gateway(
+-						struct netconfig *netconfig)
++						struct netconfig *netconfig,
++						const uint8_t **out_mac)
+ {
+ 	L_AUTO_FREE_VAR(char *, gateway);
+ 	struct l_rtnl_route *ret;
+@@ -441,10 +491,13 @@ static struct l_rtnl_route *netconfig_get_static6_gat=
+eway(
+ 	if (!gateway && netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP &&
+ 			netconfig->fils_override &&
+ 			!l_memeqzero(netconfig->fils_override->ipv6_gateway,
+-					16))
++					16)) {
+ 		gateway =3D netconfig_ipv6_to_string(
+ 					netconfig->fils_override->ipv6_gateway);
+-	else if (!gateway)
++
++		if (!l_memeqzero(netconfig->fils_override->ipv6_gateway_mac, 6))
++			*out_mac =3D netconfig->fils_override->ipv6_gateway_mac;
++	} else if (!gateway)
+ 		return NULL;
+ =
+
+ 	ret =3D l_rtnl_route_new_gateway(gateway);
+@@ -678,6 +731,7 @@ static void netconfig_route_add_cmd_cb(int error, uint1=
+6_t type,
+ static bool netconfig_ipv4_routes_install(struct netconfig *netconfig)
+ {
+ 	L_AUTO_FREE_VAR(char *, gateway) =3D NULL;
++	const uint8_t *gateway_mac =3D NULL;
+ 	struct in_addr in_addr;
+ 	char ip[INET_ADDRSTRLEN];
+ 	char network[INET_ADDRSTRLEN];
+@@ -704,7 +758,7 @@ static bool netconfig_ipv4_routes_install(struct netcon=
+fig *netconfig)
+ 		return false;
+ 	}
+ =
+
+-	gateway =3D netconfig_ipv4_get_gateway(netconfig);
++	gateway =3D netconfig_ipv4_get_gateway(netconfig, &gateway_mac);
+ 	if (!gateway) {
+ 		l_debug("No gateway obtained from %s.",
+ 				netconfig->rtm_protocol =3D=3D RTPROT_STATIC ?
+@@ -732,6 +786,24 @@ static bool netconfig_ipv4_routes_install(struct netco=
+nfig *netconfig)
+ 		return false;
+ 	}
+ =
+
++	if (gateway_mac) {
++		/*
++		 * Attempt to use the gateway MAC address received from the AP
++		 * by writing the mapping directly into the netdev's ARP table
++		 * so as to save one data frame roundtrip before first IP
++		 * connections are established.  This is very low-priority but
++		 * print error messages just because they may indicate bigger
++		 * problems.
++		 */
++		if (!l_rtnl_neighbor_set_hwaddr(rtnl, netconfig->ifindex,
++					AF_INET,
++					&netconfig->fils_override->ipv4_gateway,
++					gateway_mac, 6,
++					netconfig_set_neighbor_entry_cb, NULL,
++					NULL))
++			l_debug("l_rtnl_neighbor_set_hwaddr failed");
++	}
++
+ 	return true;
+ }
+ =
+
+@@ -764,6 +836,7 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error,=
+ uint16_t type,
+ {
+ 	struct netconfig *netconfig =3D user_data;
+ 	struct l_rtnl_route *gateway;
++	const uint8_t *gateway_mac =3D NULL;
+ =
+
+ 	netconfig->addr6_add_cmd_id =3D 0;
+ =
+
+@@ -773,13 +846,21 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int erro=
+r, uint16_t type,
+ 		return;
+ 	}
+ =
+
+-	gateway =3D netconfig_get_static6_gateway(netconfig);
++	gateway =3D netconfig_get_static6_gateway(netconfig, &gateway_mac);
+ 	if (gateway) {
+ 		L_WARN_ON(!l_rtnl_route_add(rtnl, netconfig->ifindex,
+ 						gateway,
+ 						netconfig_route_generic_cb,
+ 						netconfig, NULL));
+ 		l_rtnl_route_free(gateway);
++
++		if (gateway_mac && !l_rtnl_neighbor_set_hwaddr(rtnl,
++					netconfig->ifindex, AF_INET6,
++					netconfig->fils_override->ipv6_gateway,
++					gateway_mac, 6,
++					netconfig_set_neighbor_entry_cb, NULL,
++					NULL))
++			l_debug("l_rtnl_neighbor_set_hwaddr failed");
+ 	}
+ =
+
+ 	netconfig_set_dns(netconfig);
 -- =
 
 2.30.2
 
---===============1608375743430114468==--
+--===============4919453809321558537==--
 
