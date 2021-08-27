@@ -1,14 +1,13 @@
-Content-Type: multipart/mixed; boundary="===============4919453809321558537=="
+Content-Type: multipart/mixed; boundary="===============8510819234920902367=="
 MIME-Version: 1.0
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
 Subject: [PATCH 5/5] netconfig: Apply MACs received in FILS IP Assigment
-Date: Fri, 27 Aug 2021 05:02:07 +0200
-Message-ID: <20210827030207.353705-5-andrew.zaborowski@intel.com>
-In-Reply-To: <20210827030207.353705-1-andrew.zaborowski@intel.com>
+Date: Fri, 27 Aug 2021 05:05:44 +0200
+Message-ID: <20210827030544.353932-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4919453809321558537==
+--===============8510819234920902367==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -18,11 +17,11 @@ FILS IP Assigment IE together with the gateway IP and DNS server IP.
 Commit the IP to MAC mappings directly to the ARP/NDP tables so that the
 network stack can skip sending the corresponding queries over the air.
 ---
- src/netconfig.c | 123 +++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 102 insertions(+), 21 deletions(-)
+ src/netconfig.c | 119 +++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 98 insertions(+), 21 deletions(-)
 
 diff --git a/src/netconfig.c b/src/netconfig.c
-index 6e1e1aa7..69aded52 100644
+index 6e1e1aa7..9bbaece5 100644
 --- a/src/netconfig.c
 +++ b/src/netconfig.c
 @@ -196,22 +196,40 @@ static inline char *netconfig_ipv6_to_string(const ui=
@@ -74,7 +73,7 @@ nt8_t *addr)
  		} else if ((lease =3D l_dhcp_client_get_lease(
  						netconfig->dhcp_client)))
  			dns4_list =3D l_dhcp_lease_get_dns(lease);
-@@ -221,12 +239,21 @@ static int netconfig_set_dns(struct netconfig *netcon=
+@@ -221,12 +239,17 @@ static int netconfig_set_dns(struct netconfig *netcon=
 fig)
  			netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP) {
  		const struct l_dhcp6_lease *lease;
@@ -89,10 +88,6 @@ fig)
 -					netconfig->fils_override->ipv6_dns);
 +			dns6_list[0] =3D netconfig_ipv6_to_string(fils->ipv6_dns);
 +
-+			/*
-+			 * TODO: perhaps check that the IP is on the local
-+			 * subnet.
-+			 */
 +			if (!l_memeqzero(fils->ipv6_dns_mac, 6) &&
 +					util_ip_subnet_match(
 +							fils->ipv6_prefix_len,
@@ -102,7 +97,7 @@ fig)
  		} else if ((lease =3D l_dhcp6_client_get_lease(
  						netconfig->dhcp6_client)))
  			dns6_list =3D l_dhcp6_lease_get_dns(lease);
-@@ -242,15 +269,28 @@ static int netconfig_set_dns(struct netconfig *netcon=
+@@ -242,15 +265,28 @@ static int netconfig_set_dns(struct netconfig *netcon=
 fig)
  =
 
@@ -139,7 +134,7 @@ fig)
  }
  =
 
-@@ -361,7 +401,8 @@ static struct l_rtnl_address *netconfig_get_static4_add=
+@@ -361,7 +397,8 @@ static struct l_rtnl_address *netconfig_get_static4_add=
 ress(
  	return ifaddr;
  }
@@ -151,7 +146,7 @@ ress(
  {
  	const struct l_dhcp_lease *lease;
  	char *gateway;
-@@ -379,10 +420,18 @@ static char *netconfig_ipv4_get_gateway(struct netcon=
+@@ -379,10 +416,18 @@ static char *netconfig_ipv4_get_gateway(struct netcon=
 fig *netconfig)
  =
 
@@ -175,7 +170,7 @@ fig *netconfig)
  		lease =3D l_dhcp_client_get_lease(netconfig->dhcp_client);
  		if (!lease)
  			return NULL;
-@@ -431,7 +480,8 @@ no_prefix_len:
+@@ -431,7 +476,8 @@ no_prefix_len:
  }
  =
 
@@ -186,7 +181,7 @@ fig *netconfig)
  {
  	L_AUTO_FREE_VAR(char *, gateway);
  	struct l_rtnl_route *ret;
-@@ -441,10 +491,13 @@ static struct l_rtnl_route *netconfig_get_static6_gat=
+@@ -441,10 +487,13 @@ static struct l_rtnl_route *netconfig_get_static6_gat=
 eway(
  	if (!gateway && netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP &&
  			netconfig->fils_override &&
@@ -204,7 +199,7 @@ eway(
  =
 
  	ret =3D l_rtnl_route_new_gateway(gateway);
-@@ -678,6 +731,7 @@ static void netconfig_route_add_cmd_cb(int error, uint1=
+@@ -678,6 +727,7 @@ static void netconfig_route_add_cmd_cb(int error, uint1=
 6_t type,
  static bool netconfig_ipv4_routes_install(struct netconfig *netconfig)
  {
@@ -213,7 +208,7 @@ eway(
  	struct in_addr in_addr;
  	char ip[INET_ADDRSTRLEN];
  	char network[INET_ADDRSTRLEN];
-@@ -704,7 +758,7 @@ static bool netconfig_ipv4_routes_install(struct netcon=
+@@ -704,7 +754,7 @@ static bool netconfig_ipv4_routes_install(struct netcon=
 fig *netconfig)
  		return false;
  	}
@@ -224,7 +219,7 @@ fig *netconfig)
  	if (!gateway) {
  		l_debug("No gateway obtained from %s.",
  				netconfig->rtm_protocol =3D=3D RTPROT_STATIC ?
-@@ -732,6 +786,24 @@ static bool netconfig_ipv4_routes_install(struct netco=
+@@ -732,6 +782,24 @@ static bool netconfig_ipv4_routes_install(struct netco=
 nfig *netconfig)
  		return false;
  	}
@@ -252,7 +247,7 @@ nfig *netconfig)
  }
  =
 
-@@ -764,6 +836,7 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error,=
+@@ -764,6 +832,7 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error,=
  uint16_t type,
  {
  	struct netconfig *netconfig =3D user_data;
@@ -263,7 +258,7 @@ nfig *netconfig)
  	netconfig->addr6_add_cmd_id =3D 0;
  =
 
-@@ -773,13 +846,21 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int erro=
+@@ -773,13 +842,21 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int erro=
 r, uint16_t type,
  		return;
  	}
@@ -293,5 +288,5 @@ r, uint16_t type,
 
 2.30.2
 
---===============4919453809321558537==--
+--===============8510819234920902367==--
 
