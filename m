@@ -1,35 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============5697591466191583067=="
+Content-Type: multipart/mixed; boundary="===============3864317550003636714=="
 MIME-Version: 1.0
-From: Paul Menzel <pmenzel@molgen.mpg.de>
+From: Denis Kenzior <denkenz@gmail.com>
 Subject: Re: Cannot connect to SAE protected AP with iwd 1.16 and beyond
-Date: Tue, 31 Aug 2021 08:11:55 +0200
-Message-ID: <36a705db-b6c8-c1b0-abba-a15b170fc694@molgen.mpg.de>
+Date: Tue, 31 Aug 2021 08:24:43 -0500
+Message-ID: <3d7b55d0-c0ad-f347-4764-bea6b9afae84@gmail.com>
 In-Reply-To: <20210831055406.2717.71292@ml01.vlan13.01.org>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5697591466191583067==
+--===============3864317550003636714==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear Jesus,
+Hi Jesus,
 
+On 8/31/21 12:54 AM, Jesus Gonzalez wrote:
+> Hello Denis,
+> =
 
-Am 31.08.21 um 07:54 schrieb Jesus Gonzalez:
+> this was with no NetworkManager running, and before and after a "known-ne=
+tworks forget" (so also entering the PSK again on "station wlan0 connect"),=
+ just in case it was what you just pointed out, which also was my first rea=
+ction to that message.
 
-> this was with no NetworkManager running, and before and after a
-> "known-networks forget" (so also entering the PSK again on "station
-> wlan0 connect"), just in case it was what you just pointed out, which
-> also was my first reaction to that message.
+Hard to say anything definitively without seeing the logs, but I'm not sure =
 
-If you have a little time, bisecting the commit introducing the issue =
+anything is really wrong?
 
-might be the quickest way to get to the bottom of this.
+You're trying to connect to your SAE AP with iwd 1.16, right? So that is =
 
+expected to fail: 'station wlan0 connect <foo>' will fail, and autoconnect =
+will =
 
-Kind regards,
+take over.  It will find nothing to connect to, as expected.
 
-Paul
---===============5697591466191583067==--
+You may want to just post the log.
+
+Regards,
+-Denis
+--===============3864317550003636714==--
 
