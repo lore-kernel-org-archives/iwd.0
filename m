@@ -1,43 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============3864317550003636714=="
+Content-Type: multipart/mixed; boundary="===============0345630876526233110=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: Cannot connect to SAE protected AP with iwd 1.16 and beyond
-Date: Tue, 31 Aug 2021 08:24:43 -0500
-Message-ID: <3d7b55d0-c0ad-f347-4764-bea6b9afae84@gmail.com>
-In-Reply-To: <20210831055406.2717.71292@ml01.vlan13.01.org>
+Subject: Re: [PATCH 5/5] netconfig: Apply MACs received in FILS IP Assigment
+Date: Tue, 31 Aug 2021 10:09:16 -0500
+Message-ID: <6f0b8910-a4ad-7177-6a57-a0a584d4471b@gmail.com>
+In-Reply-To: <20210827030544.353932-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3864317550003636714==
+--===============0345630876526233110==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jesus,
+Hi Andrew,
 
-On 8/31/21 12:54 AM, Jesus Gonzalez wrote:
-> Hello Denis,
+On 8/26/21 10:05 PM, Andrew Zaborowski wrote:
+> Use the MAC addresses for the gateways and DNS servers received in the
+> FILS IP Assigment IE together with the gateway IP and DNS server IP.
+> Commit the IP to MAC mappings directly to the ARP/NDP tables so that the
+> network stack can skip sending the corresponding queries over the air.
+> ---
+>   src/netconfig.c | 119 +++++++++++++++++++++++++++++++++++++++---------
+>   1 file changed, 98 insertions(+), 21 deletions(-)
 > =
 
-> this was with no NetworkManager running, and before and after a "known-ne=
-tworks forget" (so also entering the PSK again on "station wlan0 connect"),=
- just in case it was what you just pointed out, which also was my first rea=
-ction to that message.
 
-Hard to say anything definitively without seeing the logs, but I'm not sure =
-
-anything is really wrong?
-
-You're trying to connect to your SAE AP with iwd 1.16, right? So that is =
-
-expected to fail: 'station wlan0 connect <foo>' will fail, and autoconnect =
-will =
-
-take over.  It will find nothing to connect to, as expected.
-
-You may want to just post the log.
+All applied, thanks.
 
 Regards,
 -Denis
---===============3864317550003636714==--
+
+--===============0345630876526233110==--
 
