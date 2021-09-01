@@ -1,32 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============4859874644742440382=="
+Content-Type: multipart/mixed; boundary="===============3665031449196782168=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH] test-runner: Fix verbose check for processes in namespaces
-Date: Tue, 31 Aug 2021 10:11:18 -0500
-Message-ID: <69f15b24-9e28-5a9c-21ca-b4c1673e0c06@gmail.com>
-In-Reply-To: <20210828031054.28451-1-andrew.zaborowski@intel.com>
+From: Jesus Gonzalez <jesusmgh@gmail.com>
+Subject: Re: Cannot connect to SAE protected AP with iwd 1.16 and beyond
+Date: Wed, 01 Sep 2021 13:05:09 +0000
+Message-ID: <20210901130509.2717.77576@ml01.vlan13.01.org>
+In-Reply-To: <36a705db-b6c8-c1b0-abba-a15b170fc694@molgen.mpg.de>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4859874644742440382==
+--===============3665031449196782168==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Hello Paul,
 
-On 8/27/21 10:10 PM, Andrew Zaborowski wrote:
-> Check whether verbose output is enabled for process name arg[0] before
-> prepending the "ip netns exec" part to arg since arg[0] is going to be
-> "ip" after that.
-> ---
->   tools/test-runner | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+I took the time and found the culprit: it wasn't iwd, but ell, and this com=
+mit to be precise:
 
-Applied, thanks.
+https://git.kernel.org/pub/scm/libs/ell/ell.git/commit/?id=3D05f4de9663950b=
+cd4519ebec8d8c0998dc889936
 
-Regards,
--Denis
+After bisecting around iwd, including a breaking change within ell, and fin=
+ding ell to be the problem, I started bisecting ell itself. The result is, =
+iwd tag 1.16 (and the non-broken commits before that) all work fine with el=
+l right before that commit.
 
---===============4859874644742440382==--
+I hope this helps.
+
+Kind regards,
+Jesus
+--===============3665031449196782168==--
 
