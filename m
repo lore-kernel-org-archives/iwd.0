@@ -1,62 +1,77 @@
-Content-Type: multipart/mixed; boundary="===============2597651010034859968=="
+Content-Type: multipart/mixed; boundary="===============0985971266063227658=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: Re: Cannot connect to SAE protected AP with iwd 1.16 and beyond
-Date: Tue, 07 Sep 2021 14:18:38 -0700
-Message-ID: <f3fec57d587019ad7c23431da8a1932d5a7be3f4.camel@gmail.com>
-In-Reply-To: <20210901185903.2717.42774@ml01.vlan13.01.org>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: [PATCH 8/9] sae: don't send commit in confirmed state
+Date: Wed, 08 Sep 2021 01:02:27 +0200
+Message-ID: <3b994fe5-8b84-6f4d-e2d8-5e63fd05cd41@molgen.mpg.de>
+In-Reply-To: <20210907211450.27270-8-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2597651010034859968==
+--===============0985971266063227658==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jesus,
+Dear James,
 
-We think we've identified the problem which ultimately is a bug in
-hostapd. Luckily it can be worked around in IWD though. Attached is a
-patch which should hopefully fix your connection problem. This patch is
-also on the mailing list along with some others but in your case you
-should only need this single one.
 
-Thanks,
-James
+Am 07.09.21 um 23:14 schrieb James Prestwood:
+> This works around a hostapd bug (described more in the TODO comment)
 
---===============2597651010034859968==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-sae-don-t-send-commit-in-confirmed-state.patch"
+It=E2=80=99d be great, if you listed the hostapd version, you reproduced th=
+is =
 
-RnJvbSA5OTY0NjI3YzFlMjY1NTY3NjQ1Y2QwN2Y1ZjcxNzA5MDczZmNmMmNhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW1lcyBQcmVzdHdvb2QgPHByZXN0d29qQGdtYWlsLmNvbT4K
-RGF0ZTogVHVlLCA3IFNlcCAyMDIxIDE0OjA0OjA3IC0wNzAwClN1YmplY3Q6IFtQQVRDSF0gc2Fl
-OiBkb24ndCBzZW5kIGNvbW1pdCBpbiBjb25maXJtZWQgc3RhdGUKClRoaXMgd29ya3MgYXJvdW5k
-IGEgaG9zdGFwZCBidWcgKGRlc2NyaWJlZCBtb3JlIGluIHRoZSBUT0RPIGNvbW1lbnQpCnRoYXQg
-ZGVhdGhzIElXRCBpZiB0aGUgaW5pdGlhbCBjb21taXQgaXMgbm90IGFja2VkLiBUaGlzIGJlaGF2
-aW9yCmhhcyBiZWVuIGlkZW50aWZpZWQgaW4gY29uc3VtZXIgYWNjZXNzIHBvaW50cyBhbmQgbGlr
-ZWx5IHdvbid0IGV2ZXIKYmUgcGF0Y2hlZCBmb3Igb2xkZXIgZGV2aWNlcy4gQmVjYXVzZSBvZiB0
-aGlzIElXRCBtdXN0IHdvcmsgYXJvdW5kCnRoZSBwcm9ibGVtIHdoaWNoIGNhbiBiZSBlbGltaW5h
-dGVkIGJ5IG5vdCBzZW5kaW5nIG91dCB0aGlzIGNvbW1pdAptZXNzYWdlLgotLS0KIHNyYy9zYWUu
-YyB8IDEzICsrKysrKysrKysrKy0KIDEgZmlsZSBjaGFuZ2VkLCAxMiBpbnNlcnRpb25zKCspLCAx
-IGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL3NhZS5jIGIvc3JjL3NhZS5jCmluZGV4IGZi
-ZDAyOThkLi40ZWRhOTIyNSAxMDA2NDQKLS0tIGEvc3JjL3NhZS5jCisrKyBiL3NyYy9zYWUuYwpA
-QCAtMTE2NSw3ICsxMTY1LDE4IEBAIHN0YXRpYyBpbnQgc2FlX3ZlcmlmeV9jb25maXJtZWQoc3Ry
-dWN0IHNhZV9zbSAqc20sIHVpbnQxNl90IHRyYW5zLAogCXNtLT5zeW5jKys7CiAJc20tPnNjKys7
-CiAKLQlzYWVfc2VuZF9jb21taXQoc20sIHRydWUpOworCS8qCisJICogVE9ETzogVGhlcmUgaXMg
-YSBidWcgaW4gaG9zdGFwZCB3aGljaCBkZWF0aHMgc3RhdGlvbnMgaWYgYSBjb21taXQKKwkgKiBp
-cyByZWNlaXZlZCBpbiBhbiBBY2NlcHRlZCBTQUUgc3RhdGUuIFRoaXMgY2FuIGJlIHRyaWdnZXJl
-ZCBpZiB0aGUKKwkgKiBTVEEncyBjb21taXQgaXMgbm90IGFja2VkLCB3aGljaCB0cmlnZ2VycyBh
-IHJlLXRyYW5zbWlzc2lvbiwgYW5kCisJICogdWx0aW1hdGVkIGNhdXNlcyB0aGUgQVAgdG8gZGVh
-dGggSVdELgorCSAqCisJICogU2luY2UgdGhpcyBidWcgaXMgcHJlc2VudCBpbiBwcm9kdWN0aW9u
-IEFQcyBvdXQgaW4gdGhlIHdpbGQgd2UgbXVzdAorCSAqIHdvcmsgYXJvdW5kIGl0IGJ5IGdvaW5n
-IGFnYWluc3QgdGhlIHNwZWMgKDgwMi4xMS0yMDIwIDEyLjQuOC42LjUpIGFuZAorCSAqIG9ubHkg
-c2VuZCBhIGNvbmZpcm0gaGVyZS4KKwkgKgorCSAqIHNhZV9zZW5kX2NvbW1pdChzbSwgdHJ1ZSk7
-CisJICovCiAKIAlpZiAoIXNhZV9zZW5kX2NvbmZpcm0oc20pKQogCQlyZXR1cm4gLUVQUk9UTzsK
-LS0gCjIuMzEuMQoK
+with, and, if you did, add a reference to the hostapd bug report.
 
---===============2597651010034859968==--
+> that deaths IWD if the initial commit is not acked. This behavior
+> has been identified in consumer access points and likely won't ever
+> be patched for older devices. Because of this IWD must work around
+> the problem which can be eliminated by not sending out this commit
+> message.
+
+Excuse my ignorance, but how likely is it, that non-hostapd setups keep =
+
+working?
+
+
+Kind regards,
+
+Paul
+
+
+> ---
+>   src/sae.c | 13 ++++++++++++-
+>   1 file changed, 12 insertions(+), 1 deletion(-)
+> =
+
+> diff --git a/src/sae.c b/src/sae.c
+> index fbd0298d..4eda9225 100644
+> --- a/src/sae.c
+> +++ b/src/sae.c
+> @@ -1165,7 +1165,18 @@ static int sae_verify_confirmed(struct sae_sm *sm,=
+ uint16_t trans,
+>   	sm->sync++;
+>   	sm->sc++;
+>   =
+
+> -	sae_send_commit(sm, true);
+> +	/*
+> +	 * TODO: There is a bug in hostapd which deaths stations if a commit
+> +	 * is received in an Accepted SAE state. This can be triggered if the
+> +	 * STA's commit is not acked, which triggers a re-transmission, and
+> +	 * ultimated causes the AP to death IWD.
+> +	 *
+> +	 * Since this bug is present in production APs out in the wild we must
+> +	 * work around it by going against the spec (802.11-2020 12.4.8.6.5) and
+> +	 * only send a confirm here.
+> +	 *
+> +	 * sae_send_commit(sm, true);
+> +	 */
+>   =
+
+>   	if (!sae_send_confirm(sm))
+>   		return -EPROTO;
+>=20
+--===============0985971266063227658==--
 
