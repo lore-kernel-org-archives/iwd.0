@@ -1,146 +1,168 @@
-Content-Type: multipart/mixed; boundary="===============3682268057570326397=="
+Content-Type: multipart/mixed; boundary="===============1528577489189921082=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/6] test-runner: write out separators in log files
-Date: Tue, 07 Sep 2021 09:54:38 -0700
-Message-ID: <20210907165439.9913-5-prestwoj@gmail.com>
+Subject: [PATCH 6/6] test-runner: move process tracking out of Namespace
+Date: Tue, 07 Sep 2021 09:54:39 -0700
+Message-ID: <20210907165439.9913-6-prestwoj@gmail.com>
 In-Reply-To: <20210907165439.9913-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3682268057570326397==
+--===============1528577489189921082==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The test-runner logging is very basic and just dumps everything into files
-per-test. This means any subtests are just appended to existing log files
-which can be difficult to parse after the fact. This is especially hard
-when IWD/Hostapd runs once for the entirety of the test (as opposed to
-killing between tests).
-
-This patch writes out a separator between each subtests in the form:
-=3D=3D=3D=3D=3D <file>:<function> =3D=3D=3D=3D=3D
-
-To do this all processes are now kept as weak references inside the
-Process class itself. Process.write_separators() can be called which
-will iterate through all running processes and write the provided
-separator.
-
-This also paves the way to remove the ctx.processes array which is more
-trouble than its worth due to reference issues.
-
-Note: For tests which start IWD this will have no effect as the separator
-is written prior to the test running. For these tests though, it is
-much easier to read the log files because you can clearly see when
-IWD starts and exits.
+Since Process.processes is a weak reference dictionary any process
+put in this dict will disappear if all references are lost. This
+is much better than keeping a list in the Namespace which will hold
+the references forever until test-runner manually kills them all at
+the end of the test. This does still need to be done for daemon
+processes but everything else can just go away when it is no longer
+needed.
 ---
- tools/test-runner | 47 ++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 34 insertions(+), 13 deletions(-)
+ tools/test-runner | 40 +++++++++++++++++-----------------------
+ 1 file changed, 17 insertions(+), 23 deletions(-)
 
 diff --git a/tools/test-runner b/tools/test-runner
-index 1fe5e843..bd0034c2 100755
+index bd0034c2..b0d6554d 100755
 --- a/tools/test-runner
 +++ b/tools/test-runner
-@@ -27,6 +27,7 @@ from collections import namedtuple
- from time import sleep
- import dbus.mainloop.glib
- from gi.repository import GLib
-+from weakref import WeakValueDictionary
+@@ -57,12 +57,9 @@ def dbg(*s, **kwargs):
  =
 
- libc =3D ctypes.cdll['libc.so.6']
- libc.mount.argtypes =3D (ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p=
-, \
-@@ -161,8 +162,14 @@ busconfig.dtd\">
- '''
+ def exit_vm():
+ 	if config:
+-		for p in config.ctx.processes:
++		for p in Process.get_all():
+ 			print("Process %s still running!" % p.args[0])
+ 			p.kill()
+-			p =3D None
+-
+-		config.ctx.processes =3D []
  =
 
- class Process(subprocess.Popen):
-+	processes =3D WeakValueDictionary()
- 	ctx =3D None
+ 	if config.ctx and config.ctx.results:
+ 		print_results(config.ctx.results)
+@@ -178,6 +175,7 @@ class Process(subprocess.Popen):
+ 		self.out =3D ''
+ 		self.hup =3D False
+ 		self.killed =3D False
++		self.namespace =3D namespace
  =
 
-+	def __new__(cls, *args, **kwargs):
-+		obj =3D super().__new__(cls)
-+		cls.processes[id(obj)] =3D obj
-+		return obj
-+
- 	def __init__(self, args, namespace=3DNone, outfile=3DNone, env=3DNone, ch=
-eck=3DFalse, cleanup=3DNone):
- 		self.write_fds =3D []
- 		self.io_watch =3D None
-@@ -212,6 +219,30 @@ class Process(subprocess.Popen):
+ 		if not self.ctx:
+ 			global config
+@@ -219,6 +217,15 @@ class Process(subprocess.Popen):
  				raise subprocess.CalledProcessError(returncode=3Dself.returncode,
  									cmd=3Dargs)
  =
 
-+	@staticmethod
-+	def _write_io(instance, data, stdout=3DTrue):
-+		for f in instance.write_fds:
-+			f.write(data)
-+
-+			# Write out a separator so multiple process calls per
-+			# test are easer to read.
-+			if instance.hup:
-+				f.write("Terminated: {}\n\n".format(instance.args))
-+
-+			f.flush()
-+
-+		if instance.verbose and stdout:
-+			sys.__stdout__.write(data)
-+			sys.__stdout__.flush()
++	@classmethod
++	def get_all(cls):
++		return cls.processes.values()
 +
 +	@classmethod
-+	def write_separators(cls, sep):
-+		for proc in cls.processes.values():
-+			if proc.killed:
-+				continue
++	def kill_all(cls):
++		for p in cls.processes.values():
++			p.kill()
 +
-+			cls._write_io(proc, sep, stdout=3DFalse)
-+
- 	def process_io(self, source, condition):
- 		if condition & GLib.IO_HUP:
- 			self.hup =3D True
-@@ -226,19 +257,7 @@ class Process(subprocess.Popen):
- 		# Save data away in case the caller needs it (e.g. list_sta)
- 		self.out +=3D data
+ 	@staticmethod
+ 	def _write_io(instance, data, stdout=3DTrue):
+ 		for f in instance.write_fds:
+@@ -321,8 +328,6 @@ class Process(subprocess.Popen):
+ 		self.cleanup =3D None
+ 		self.killed =3D True
  =
 
--		for f in self.write_fds:
--			f.write(data)
+-		if self in self.ctx.processes:
+-			self.ctx.processes.remove(self)
+ 	# Override kill()
+ 	def kill(self, force=3DFalse):
+ 		if self.killed:
+@@ -588,7 +593,6 @@ dbus_count =3D 0
+ class Namespace:
+ 	def __init__(self, args, name, radios):
+ 		self.dbus_address =3D None
+-		self.processes =3D []
+ 		self.name =3D name
+ 		self.radios =3D radios
+ 		self.args =3D args
+@@ -607,10 +611,7 @@ class Namespace:
+ =
+
+ 		self.radios =3D []
+ =
+
+-		for p in list(self.processes):
+-			p.kill()
 -
--			# Write out a separator so multiple process calls per
--			# test are easer to read.
--			if self.hup:
--				f.write("Terminated: {}\n\n".format(self.args))
+-		self.processes =3D []
++		Process.kill_all()
+ =
+
+ 	def __del__(self):
+ 		print("Removing namespace %s" % self.name)
+@@ -628,19 +629,14 @@ class Namespace:
+ 			# In case this process needs DBus...
+ 			env['DBUS_SYSTEM_BUS_ADDRESS'] =3D self.dbus_address
+ =
+
+-		p =3D Process(args, namespace=3Dself.name, env=3Denv, **kwargs)
 -
--			f.flush()
+-		if not kwargs.get('wait', False):
+-			self.processes.append(p)
 -
--		if self.verbose:
--			sys.__stdout__.write(data)
--			sys.__stdout__.flush()
-+		self._write_io(self, data)
+-		return p
++		return Process(args, namespace=3Dself.name, env=3Denv, **kwargs)
  =
 
- 		return True
+ 	def stop_process(self, p, force=3DFalse):
+ 		p.kill(force)
  =
 
-@@ -1179,6 +1198,8 @@ def start_test(ctx, subtests, rqueue):
+ 	def is_process_running(self, process):
+-		for p in self.processes:
+-			if p.args[0] =3D=3D process:
++		for p in Process.get_all():
++			if p.namespace =3D=3D self.name and p.args[0] =3D=3D process:
+ 				return True
+ 		return False
  =
 
- 					sys.__stdout__.flush()
+@@ -698,8 +694,7 @@ class Namespace:
+ 		if self.is_verbose('iwd-acd'):
+ 			env['IWD_ACD_DEBUG'] =3D '1'
  =
 
-+					Process.write_separators("\n=3D=3D=3D=3D=3D=3D %s:%s =3D=3D=3D=3D=3D=
-=3D\n\n" % (file, func))
-+
- 					if not skip:
- 						# Run test (setUp/tearDown run automatically)
- 						result =3D t()
+-		pid =3D self.start_process(args, env=3Denv)
+-		return pid
++		return self.start_process(args, env=3Denv)
+ =
+
+ 	def is_verbose(self, process, log=3DTrue):
+ 		process =3D os.path.basename(process)
+@@ -786,7 +781,7 @@ class Namespace:
+ 	def __str__(self):
+ 		ret =3D 'Namespace: %s\n' % self.name
+ 		ret +=3D 'Processes:\n'
+-		for p in self.processes:
++		for p in Process.get_all():
+ 			ret +=3D '\t%s' % str(p)
+ =
+
+ 		ret +=3D 'Radios:\n'
+@@ -808,7 +803,6 @@ class TestContext(Namespace):
+ 	'''
+ 	def __init__(self, args):
+ 		self.name =3D None
+-		self.processes =3D []
+ 		self.args =3D args
+ 		self.hw_config =3D None
+ 		self.hostapd =3D None
 -- =
 
 2.31.1
 
---===============3682268057570326397==--
+--===============1528577489189921082==--
 
