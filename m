@@ -1,77 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============0985971266063227658=="
+Content-Type: multipart/mixed; boundary="===============6299547283925055233=="
 MIME-Version: 1.0
-From: Paul Menzel <pmenzel@molgen.mpg.de>
+From: James Prestwood <prestwoj@gmail.com>
 Subject: Re: [PATCH 8/9] sae: don't send commit in confirmed state
-Date: Wed, 08 Sep 2021 01:02:27 +0200
-Message-ID: <3b994fe5-8b84-6f4d-e2d8-5e63fd05cd41@molgen.mpg.de>
-In-Reply-To: <20210907211450.27270-8-prestwoj@gmail.com>
+Date: Tue, 07 Sep 2021 16:34:52 -0700
+Message-ID: <abf40bb3b4b2d309b5a19343388c308b54a4a3bb.camel@gmail.com>
+In-Reply-To: <3b994fe5-8b84-6f4d-e2d8-5e63fd05cd41@molgen.mpg.de>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0985971266063227658==
+--===============6299547283925055233==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear James,
+Hi Paul,
 
-
-Am 07.09.21 um 23:14 schrieb James Prestwood:
-> This works around a hostapd bug (described more in the TODO comment)
-
-It=E2=80=99d be great, if you listed the hostapd version, you reproduced th=
-is =
-
-with, and, if you did, add a reference to the hostapd bug report.
-
-> that deaths IWD if the initial commit is not acked. This behavior
-> has been identified in consumer access points and likely won't ever
-> be patched for older devices. Because of this IWD must work around
-> the problem which can be eliminated by not sending out this commit
-> message.
-
-Excuse my ignorance, but how likely is it, that non-hostapd setups keep =
-
-working?
-
-
-Kind regards,
-
-Paul
-
-
-> ---
->   src/sae.c | 13 ++++++++++++-
->   1 file changed, 12 insertions(+), 1 deletion(-)
+On Wed, 2021-09-08 at 01:02 +0200, Paul Menzel wrote:
+> Dear James,
 > =
 
-> diff --git a/src/sae.c b/src/sae.c
-> index fbd0298d..4eda9225 100644
-> --- a/src/sae.c
-> +++ b/src/sae.c
-> @@ -1165,7 +1165,18 @@ static int sae_verify_confirmed(struct sae_sm *sm,=
- uint16_t trans,
->   	sm->sync++;
->   	sm->sc++;
->   =
+> =
 
-> -	sae_send_commit(sm, true);
-> +	/*
-> +	 * TODO: There is a bug in hostapd which deaths stations if a commit
-> +	 * is received in an Accepted SAE state. This can be triggered if the
-> +	 * STA's commit is not acked, which triggers a re-transmission, and
-> +	 * ultimated causes the AP to death IWD.
-> +	 *
-> +	 * Since this bug is present in production APs out in the wild we must
-> +	 * work around it by going against the spec (802.11-2020 12.4.8.6.5) and
-> +	 * only send a confirm here.
-> +	 *
-> +	 * sae_send_commit(sm, true);
-> +	 */
->   =
+> Am 07.09.21 um 23:14 schrieb James Prestwood:
+> > This works around a hostapd bug (described more in the TODO
+> > comment)
+> =
 
->   	if (!sae_send_confirm(sm))
->   		return -EPROTO;
->=20
---===============0985971266063227658==--
+> It=E2=80=99d be great, if you listed the hostapd version, you reproduced =
+this
+> with, and, if you did, add a reference to the hostapd bug report.
+
+Sure. I did send an email to the hostapd ML if that is considered a bug
+report.
+
+> =
+
+> > that deaths IWD if the initial commit is not acked. This behavior
+> > has been identified in consumer access points and likely won't ever
+> > be patched for older devices. Because of this IWD must work around
+> > the problem which can be eliminated by not sending out this commit
+> > message.
+> =
+
+> Excuse my ignorance, but how likely is it, that non-hostapd setups
+> keep =
+
+> working?
+
+Do non-hostapd setups even exist? :) But in reality no it shouldn't
+effect anything. I do need to amend this commit slightly, but v2 will
+have identical behavior as wpa_supplicant, i.e. ignore the commit
+message completely.
+
+Thanks,
+James
+
+
+
+--===============6299547283925055233==--
 
