@@ -1,46 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============1749173984546654283=="
+Content-Type: multipart/mixed; boundary="===============8944061847819882074=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/9] auto-t: hwsim.py: add drop_ack property
-Date: Tue, 07 Sep 2021 14:14:45 -0700
-Message-ID: <20210907211450.27270-4-prestwoj@gmail.com>
+Subject: [PATCH 5/9] netdev: print error if CMD_ASSOCIATE fails
+Date: Tue, 07 Sep 2021 14:14:46 -0700
+Message-ID: <20210907211450.27270-5-prestwoj@gmail.com>
 In-Reply-To: <20210907211450.27270-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============1749173984546654283==
+--===============8944061847819882074==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- autotests/util/hwsim.py | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ src/netdev.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
-index 496c06a0..8ba9550a 100755
---- a/autotests/util/hwsim.py
-+++ b/autotests/util/hwsim.py
-@@ -161,6 +161,14 @@ class Rule(HwsimDBusAbstract):
-     def match_times(self, value):
-         self._prop_proxy.Set(self._iface_name, 'MatchTimes', dbus.UInt16(v=
-alue))
+diff --git a/src/netdev.c b/src/netdev.c
+index a5d1b8ed..b356cb01 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2712,9 +2712,10 @@ static void netdev_new_scan_results_event(struct l_g=
+enl_msg *msg,
+ static void netdev_assoc_cb(struct l_genl_msg *msg, void *user_data)
+ {
+ 	struct netdev *netdev =3D user_data;
++	int err =3D l_genl_msg_get_error(msg);
  =
 
-+    @property
-+    def drop_ack(self):
-+        return self._properties(['DropAck'])
-+
-+    @drop_ack.setter
-+    def drop_ack(self, value):
-+        self._prop_proxy.Set(self._iface_name, 'DropAck', value)
-+
-     def remove(self):
-         self._iface.Remove(reply_handler=3Dself._success,
-                 error_handler=3Dself._failure)
+-	if (l_genl_msg_get_error(msg) < 0) {
+-		l_error("Error sending CMD_ASSOCIATE");
++	if (err < 0) {
++		l_error("Error sending CMD_ASSOCIATE (%d)", err);
+ =
+
+ 		netdev_connect_failed(netdev, NETDEV_RESULT_ASSOCIATION_FAILED,
+ 					MMPDU_STATUS_CODE_UNSPECIFIED);
 -- =
 
 2.31.1
 
---===============1749173984546654283==--
+--===============8944061847819882074==--
 
