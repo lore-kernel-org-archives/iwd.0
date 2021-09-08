@@ -1,62 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============4729933621824284254=="
+Content-Type: multipart/mixed; boundary="===============8054939128606606423=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 6/7] netdev: handle non-fatal auth-proto returns
-Date: Wed, 08 Sep 2021 14:43:15 -0500
-Message-ID: <3d251684-ab1e-4486-c75d-9fec639fbb4a@gmail.com>
-In-Reply-To: <20210908181904.84594-6-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3 1/4] sae: don't send commit/confirm in confirmed state
+Date: Wed, 08 Sep 2021 13:48:02 -0700
+Message-ID: <20210908204805.92005-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============4729933621824284254==
+--===============8054939128606606423==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This works around a hostapd bug (described more in the TODO comment)
+which is exposed because of the kernels overly agressive re-transmit
+behavior on missed ACKs. Combined this results in a death if the
+initial commit is not acked. This behavior has been identified in
+consumer access points and likely won't ever be patched for older
+devices. Because of this IWD must work around the problem which can
+be eliminated by not sending out this commit message.
 
-On 9/8/21 1:19 PM, James Prestwood wrote:
-> This adds -EBADMSG/-ENOMSG to returns which won't result in
-> a deauth/failed connection.
-> ---
->   src/netdev.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> =
+This bug was reported to the hostapd ML:
 
-> diff --git a/src/netdev.c b/src/netdev.c
-> index 7909c37e..8bbd5abb 100644
-> --- a/src/netdev.c
-> +++ b/src/netdev.c
-> @@ -2715,7 +2715,8 @@ static void netdev_authenticate_event(struct l_genl=
-_msg *msg,
->   		status_code =3D L_CPU_TO_LE16(auth->status);
->   =
+https://lists.infradead.org/pipermail/hostap/2021-September/039842.html
 
->   		ret =3D auth_proto_rx_authenticate(netdev->ap, frame, frame_len);
-> -		if (ret =3D=3D 0 || ret =3D=3D -EAGAIN)
-> +		if (ret =3D=3D 0 || ret =3D=3D -EAGAIN || ret =3D=3D -EBADMSG ||
-> +						ret =3D=3D -ENOMSG)
+This change should not cause any compatibility problems to non-hostapd
+access points and is identical to how wpa_supplicant treats this
+scenario.
+---
+ src/sae.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-So we may have to be a bit careful here.  If we receive -EBADMSG/-ENOMSG an=
-d the =
+v3:
+ * Kept existing behavior for non-STA handshakes
+ * Better described the sequence of events that requires this workaround
 
-status_code !=3D 0, kernel won't keep retransmitting the Authenticate frame=
-.  So =
+diff --git a/src/sae.c b/src/sae.c
+index c14b646f..ccba74cc 100644
+--- a/src/sae.c
++++ b/src/sae.c
+@@ -1158,6 +1158,31 @@ static int sae_verify_confirmed(struct sae_sm *sm, u=
+int16_t trans,
+ 	if (l_get_le16(frame) !=3D sm->group)
+ 		return -EBADMSG;
+ =
 
-we would never actually leave the connecting state in this case...
++	/*
++	 * Because of kernel retransmit behavior on missed ACKs plus hostapd's
++	 * incorrect handling of confirm packets while in accepted state the
++	 * following can happen:
++	 *
++	 * 1. Client sends commit, not acked (committed state)
++	 * 2. AP receives commit, sends commit reply (committed state)
++	 * 3. Client retransmits original commit
++	 * 4. Client receives AP's commit, sends confirm (confirmed state)
++	 * 5. AP receives clients retransmitted commit, sends only commit
++	 * 6. AP receives clients confirm and accepts (accepted state)
++	 * 7. Client receives AP's commit and sends both commit + confirm
++	 *    (the code below).
++	 * 8. AP receives clients commit while in accepted state, and deauths
++	 *
++	 * Due to this, any commit received while in a confirmed state will be
++	 * ignored by IWD since it is probably caused by this retransmission
++	 * and sending the commit/confirm below would likely cause hostapd to
++	 * deauth us.
++	 *
++	 * As for non-sta (currently not used) we want to keep with the spec.
++	 */
++	if (!sm->handshake->authenticator)
++		return -EBADMSG;
++
+ 	/*
+ 	 * the protocol instance shall increment Sync, increment Sc, and
+ 	 * transmit its Commit and Confirm (with the new Sc value) messages.
+@@ -1170,7 +1195,7 @@ static int sae_verify_confirmed(struct sae_sm *sm, ui=
+nt16_t trans,
+ 	if (!sae_send_confirm(sm))
+ 		return -EPROTO;
+ =
 
-I guess we could ignore EBADMSG/ENOMSG only if status_code =3D=3D 0, and ot=
-herwise =
+-	return -EAGAIN;
++	return -EBADMSG;
+ }
+ =
 
-just let the connection fail.
+ /*
+-- =
 
->   			return;
->   		else if (ret > 0)
->   			status_code =3D (uint16_t)ret;
-> =
+2.31.1
 
-
-Regards,
--Denis
---===============4729933621824284254==--
+--===============8054939128606606423==--
 
