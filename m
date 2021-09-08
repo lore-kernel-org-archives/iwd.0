@@ -1,93 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============8054939128606606423=="
+Content-Type: multipart/mixed; boundary="===============0323162799696898577=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 1/4] sae: don't send commit/confirm in confirmed state
-Date: Wed, 08 Sep 2021 13:48:02 -0700
-Message-ID: <20210908204805.92005-1-prestwoj@gmail.com>
+Subject: [PATCH v3 2/4] auth-proto: document acceptable return values for
+ auth-protos
+Date: Wed, 08 Sep 2021 13:48:03 -0700
+Message-ID: <20210908204805.92005-2-prestwoj@gmail.com>
+In-Reply-To: <20210908204805.92005-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============8054939128606606423==
+--===============0323162799696898577==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This works around a hostapd bug (described more in the TODO comment)
-which is exposed because of the kernels overly agressive re-transmit
-behavior on missed ACKs. Combined this results in a death if the
-initial commit is not acked. This behavior has been identified in
-consumer access points and likely won't ever be patched for older
-devices. Because of this IWD must work around the problem which can
-be eliminated by not sending out this commit message.
-
-This bug was reported to the hostapd ML:
-
-https://lists.infradead.org/pipermail/hostap/2021-September/039842.html
-
-This change should not cause any compatibility problems to non-hostapd
-access points and is identical to how wpa_supplicant treats this
-scenario.
+Since all auth-protos are hidden behind an abstraction they need
+to be consisten with the return values as some should be handled
+specially.
 ---
- src/sae.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+ src/auth-proto.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 v3:
- * Kept existing behavior for non-STA handshakes
- * Better described the sequence of events that requires this workaround
+ * Added some more details to the comment
 
-diff --git a/src/sae.c b/src/sae.c
-index c14b646f..ccba74cc 100644
---- a/src/sae.c
-+++ b/src/sae.c
-@@ -1158,6 +1158,31 @@ static int sae_verify_confirmed(struct sae_sm *sm, u=
-int16_t trans,
- 	if (l_get_le16(frame) !=3D sm->group)
- 		return -EBADMSG;
- =
-
+diff --git a/src/auth-proto.h b/src/auth-proto.h
+index d3c4686f..33a74291 100644
+--- a/src/auth-proto.h
++++ b/src/auth-proto.h
+@@ -25,6 +25,21 @@
+ struct auth_proto {
+ 	bool (*start)(struct auth_proto *ap);
+ 	void (*free)(struct auth_proto *ap);
 +	/*
-+	 * Because of kernel retransmit behavior on missed ACKs plus hostapd's
-+	 * incorrect handling of confirm packets while in accepted state the
-+	 * following can happen:
++	 * Callback to receive an Authenticate frame. auth-protos should
++	 * return error codes consistent with one another as some are treated
++	 * specially:
 +	 *
-+	 * 1. Client sends commit, not acked (committed state)
-+	 * 2. AP receives commit, sends commit reply (committed state)
-+	 * 3. Client retransmits original commit
-+	 * 4. Client receives AP's commit, sends confirm (confirmed state)
-+	 * 5. AP receives clients retransmitted commit, sends only commit
-+	 * 6. AP receives clients confirm and accepts (accepted state)
-+	 * 7. Client receives AP's commit and sends both commit + confirm
-+	 *    (the code below).
-+	 * 8. AP receives clients commit while in accepted state, and deauths
-+	 *
-+	 * Due to this, any commit received while in a confirmed state will be
-+	 * ignored by IWD since it is probably caused by this retransmission
-+	 * and sending the commit/confirm below would likely cause hostapd to
-+	 * deauth us.
-+	 *
-+	 * As for non-sta (currently not used) we want to keep with the spec.
++	 * 0 indicates success, and that a state transition occurred.
++	 * -ENOMSG or -EBADMSG indicates the message should be ignored silently
++	 * -EAGAIN indicates a retry, and no state transition occurred. Any
++	 *         retry is handled by the auth-proto internally
++	 * -EPROTO indicates a fatal error
++	 * Any other < 0 return will be treated as a fatal error
++	 * > 0 indicates a fatal error with status code. This only applies to
++	 *         non-sta cases as non-zero status codes are rejected by the
++	 *         kernel when in station mode.
 +	 */
-+	if (!sm->handshake->authenticator)
-+		return -EBADMSG;
-+
- 	/*
- 	 * the protocol instance shall increment Sync, increment Sc, and
- 	 * transmit its Commit and Confirm (with the new Sc value) messages.
-@@ -1170,7 +1195,7 @@ static int sae_verify_confirmed(struct sae_sm *sm, ui=
-nt16_t trans,
- 	if (!sae_send_confirm(sm))
- 		return -EPROTO;
- =
-
--	return -EAGAIN;
-+	return -EBADMSG;
- }
- =
-
- /*
+ 	int (*rx_authenticate)(struct auth_proto *driver,
+ 					const uint8_t *frame, size_t len);
+ 	int (*rx_associate)(struct auth_proto *driver,
 -- =
 
 2.31.1
 
---===============8054939128606606423==--
+--===============0323162799696898577==--
 
