@@ -1,85 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============0203693855313552107=="
+Content-Type: multipart/mixed; boundary="===============6298783772762174239=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/7] sae: don't send commit/confirm in confirmed state
-Date: Wed, 08 Sep 2021 11:18:59 -0700
-Message-ID: <20210908181904.84594-2-prestwoj@gmail.com>
-In-Reply-To: <20210908181904.84594-1-prestwoj@gmail.com>
+Subject: [PATCH v2 1/7] sae: fix a spec violation with duplicate commits
+Date: Wed, 08 Sep 2021 11:18:58 -0700
+Message-ID: <20210908181904.84594-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0203693855313552107==
+--===============6298783772762174239==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This works around a hostapd bug (described more in the TODO comment)
-that deaths IWD if the initial commit is not acked. This behavior
-has been identified in consumer access points and likely won't ever
-be patched for older devices. Because of this IWD must work around
-the problem which can be eliminated by not sending out this commit
-message.
-
-This bug was reported to the hostapd ML:
-
-https://lists.infradead.org/pipermail/hostap/2021-September/039842.html
-
-This change should not cause any compatibility problems to non-hostapd
-access points and is identical to how wpa_supplicant treats this
-scenario.
+If a commit is received while in an accepted state the spec states
+the scalar should be checked against the previous commit and if
+equal the message should be silently dropped.
 ---
- src/sae.c | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
+ src/sae.c | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)
 
 v2:
- * Changed to simply drop the message. Sending only a confirm is pointless
-   since it would not verify without a commit. Also remove sc++ since this
-   should only be incremented when a confirm is sent.
+ * Changed to check the scalar rather than always ignore.
 
 diff --git a/src/sae.c b/src/sae.c
-index c14b646f..de2e0e0a 100644
+index 62fd6c88..c14b646f 100644
 --- a/src/sae.c
 +++ b/src/sae.c
-@@ -1163,14 +1163,26 @@ static int sae_verify_confirmed(struct sae_sm *sm, =
-uint16_t trans,
- 	 * transmit its Commit and Confirm (with the new Sc value) messages.
- 	 */
- 	sm->sync++;
--	sm->sc++;
--
--	sae_send_commit(sm, true);
+@@ -1182,10 +1182,32 @@ static int sae_verify_accepted(struct sae_sm *sm, u=
+int16_t trans,
+ {
+ 	uint16_t sc;
  =
 
--	if (!sae_send_confirm(sm))
--		return -EPROTO;
+-	/* spec does not specify what to do here, so print and discard */
+-	if (trans !=3D SAE_STATE_CONFIRMED) {
 +	/*
-+	 * TODO: There is a bug in hostapd which deaths stations if a commit
-+	 * is received in an Accepted SAE state. This can be triggered if the
-+	 * STA's commit is not acked, which triggers a re-transmission, and
-+	 * ultimated causes the AP to death IWD.
++	 * 12.4.8.6.1 Parent process behavior
 +	 *
-+	 * Since this bug is present in production APs out in the wild we must
-+	 * work around it by going against the spec (802.11-2020 12.4.8.6.5) and
-+	 * simply drop the message.
-+	 *
-+	 * sm->sc++;
-+	 *
-+	 * sae_send_commit(sm, true);
-+	 *
-+	 * if (!sae_send_confirm(sm))
-+	 *         return -EPROTO;
++	 * "Upon receipt of an SAE Commit message... and it is in Accepted
++	 * state, the scalar in the received frame is checked against the
++	 * peer-scalar used in authentication of the existing protocol instance
++	 * (in Accepted state). If it is identical, the frame shall be dropped"
 +	 */
++	if (trans =3D=3D SAE_STATE_COMMITTED) {
++		bool drop;
++		unsigned int nbytes =3D l_ecc_curve_get_scalar_bytes(sm->curve);
++		struct l_ecc_scalar *p_scalar;
++
++		if (len < nbytes + 2)
++			return -EMSGSIZE;
++
++		p_scalar =3D l_ecc_scalar_new(sm->curve, frame + 2, nbytes);
++
++		drop =3D l_ecc_scalars_are_equal(sm->p_scalar, p_scalar);
++		l_ecc_scalar_free(p_scalar);
++
++		if (drop)
++			return -EBADMSG;
++
+ 		l_error("received transaction %u in accepted state", trans);
+-		return -EBADMSG;
++		return -EPROTO;
+ 	}
  =
 
--	return -EAGAIN;
-+	return -EBADMSG;
- }
- =
-
- /*
+ 	if (sm->sync > SAE_SYNC_MAX)
 -- =
 
 2.31.1
 
---===============0203693855313552107==--
+--===============6298783772762174239==--
 
