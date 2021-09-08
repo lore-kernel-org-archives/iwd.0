@@ -1,122 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============3908571275649547402=="
+Content-Type: multipart/mixed; boundary="===============4766461667943010413=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz@gmail.com>
-Subject: Re: [PATCH v2 2/7] sae: don't send commit/confirm in confirmed state
-Date: Wed, 08 Sep 2021 14:25:57 -0500
-Message-ID: <b358707b-63a1-58b1-3ce1-06e68609053f@gmail.com>
-In-Reply-To: <20210908181904.84594-2-prestwoj@gmail.com>
+Subject: Re: [PATCH v2 3/7] auth-proto: document acceptable return values for
+ auth-protos
+Date: Wed, 08 Sep 2021 14:29:41 -0500
+Message-ID: <b36b1a10-c486-ddc0-6113-4fcf5bd2185b@gmail.com>
+In-Reply-To: <20210908181904.84594-3-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3908571275649547402==
+--===============4766461667943010413==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 9/8/21 1:18 PM, James Prestwood wrote:
-> This works around a hostapd bug (described more in the TODO comment)
-> that deaths IWD if the initial commit is not acked. This behavior
-
-Also kernel re-transmit behavior is a bit aggressive which is a big contrib=
-uting =
-
-factor.  It is definitely not what the spec describes.
-
-> has been identified in consumer access points and likely won't ever
-> be patched for older devices. Because of this IWD must work around
-> the problem which can be eliminated by not sending out this commit
-> message.
-> =
-
-> This bug was reported to the hostapd ML:
-> =
-
-> https://lists.infradead.org/pipermail/hostap/2021-September/039842.html
-> =
-
-> This change should not cause any compatibility problems to non-hostapd
-> access points and is identical to how wpa_supplicant treats this
-> scenario.
+On 9/8/21 1:19 PM, James Prestwood wrote:
+> Since all auth-protos are hidden behind an abstraction they need
+> to be consisten with the return values as some should be handled
+> specially.
 > ---
->   src/sae.c | 24 ++++++++++++++++++------
->   1 file changed, 18 insertions(+), 6 deletions(-)
+>   src/auth-proto.h | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
 > =
 
-> v2:
->   * Changed to simply drop the message. Sending only a confirm is pointle=
-ss
->     since it would not verify without a commit. Also remove sc++ since th=
-is
->     should only be incremented when a confirm is sent.
-> =
-
-> diff --git a/src/sae.c b/src/sae.c
-> index c14b646f..de2e0e0a 100644
-> --- a/src/sae.c
-> +++ b/src/sae.c
-> @@ -1163,14 +1163,26 @@ static int sae_verify_confirmed(struct sae_sm *sm=
-, uint16_t trans,
->   	 * transmit its Commit and Confirm (with the new Sc value) messages.
->   	 */
->   	sm->sync++;
-
-So why do we sync in this case?
-
-I would actually do something like:
-
-/* Due to kernel retransmit behavior on missing acks + hostapd using incorr=
-ect =
-
-behavior, the following sequence can happen:
-   < seq >
-
-For this reason, in station mode, we ignore any Commit messages in the Conf=
-irmed =
-
-state as they're likely caused by retransmissions.
-*/
-
-if (!sm->handshake->authenticator)
-	return -EBADMSG;
-
-> -	sm->sc++;
-> -
-> -	sae_send_commit(sm, true);
->   =
-
-> -	if (!sae_send_confirm(sm))
-> -		return -EPROTO;
+> diff --git a/src/auth-proto.h b/src/auth-proto.h
+> index d3c4686f..f39c361c 100644
+> --- a/src/auth-proto.h
+> +++ b/src/auth-proto.h
+> @@ -25,6 +25,18 @@
+>   struct auth_proto {
+>   	bool (*start)(struct auth_proto *ap);
+>   	void (*free)(struct auth_proto *ap);
 > +	/*
-> +	 * TODO: There is a bug in hostapd which deaths stations if a commit
-> +	 * is received in an Accepted SAE state. This can be triggered if the
-> +	 * STA's commit is not acked, which triggers a re-transmission, and
-> +	 * ultimated causes the AP to death IWD.
+> +	 * Callback to receive an Authenticate frame. auth-protos should
+> +	 * return error codes consistent with one another as some are treated
+> +	 * specially:
 > +	 *
-> +	 * Since this bug is present in production APs out in the wild we must
-> +	 * work around it by going against the spec (802.11-2020 12.4.8.6.5) and
-> +	 * simply drop the message.
-> +	 *
-> +	 * sm->sc++;
-> +	 *
-> +	 * sae_send_commit(sm, true);
-> +	 *
-> +	 * if (!sae_send_confirm(sm))
-> +	 *         return -EPROTO;
+> +	 * 0 indicates success
+
+Also implies a state transition has happened, right?
+
+> +	 * -ENOMSG or -EBADMSG indicates the message should be ignored silently
+> +	 * -EAGAIN indicates to try again (handled by auth-proto internally)
+
+Implies a retry is happening and state hasn't changed?
+
+> +	 * -EPROTO indicates a fatal error
+> +	 * Any other < 0 return will be treated as a fatal error
+> +	 * > 0 indicates a fatal error with status code.
+
+Might want to mention that this is only applicable for non-station cases.
+
 > +	 */
->   =
-
-> -	return -EAGAIN;
-> +	return -EBADMSG;
->   }
->   =
-
->   /*
+>   	int (*rx_authenticate)(struct auth_proto *driver,
+>   					const uint8_t *frame, size_t len);
+>   	int (*rx_associate)(struct auth_proto *driver,
 > =
 
 
 Regards,
 -Denis
---===============3908571275649547402==--
+--===============4766461667943010413==--
 
