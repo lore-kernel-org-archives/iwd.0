@@ -1,46 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============2770293650549467430=="
+Content-Type: multipart/mixed; boundary="===============1569432855650915150=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/5] auto-t: hwsim.py: add prefix_offset property
-Date: Wed, 08 Sep 2021 15:47:41 -0700
-Message-ID: <20210908224744.102156-2-prestwoj@gmail.com>
+Subject: [PATCH 3/5] auto-t: change testSAE timeout_test to use prefix_offset
+Date: Wed, 08 Sep 2021 15:47:42 -0700
+Message-ID: <20210908224744.102156-3-prestwoj@gmail.com>
 In-Reply-To: <20210908224744.102156-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============2770293650549467430==
+--===============1569432855650915150==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This makes things more clear on what frames are being blocked
+since it passes over header information to get to the actual
+SAE payload.
 ---
- autotests/util/hwsim.py | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ autotests/testSAE/timeout_test.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
-index e5d336e3..732a1fcf 100755
---- a/autotests/util/hwsim.py
-+++ b/autotests/util/hwsim.py
-@@ -169,6 +169,14 @@ class Rule(HwsimDBusAbstract):
-     def drop_ack(self, value):
-         self._prop_proxy.Set(self._iface_name, 'DropAck', value)
+diff --git a/autotests/testSAE/timeout_test.py b/autotests/testSAE/timeout_=
+test.py
+index 1792f1c0..263f4e28 100644
+--- a/autotests/testSAE/timeout_test.py
++++ b/autotests/testSAE/timeout_test.py
+@@ -49,7 +49,8 @@ class Test(unittest.TestCase):
+         rule0 =3D hwsim.rules.create()
+         rule0.source =3D bss_radio.addresses[0]
+         rule0.drop =3D True
+-        rule0.prefix =3D 'b0'
++        rule0.prefix =3D '01 00 00 00 13 00'
++        rule0.prefix_offset =3D 26
+         rule0.match_times =3D 1
+         rule0.drop_ack =3D True
+         rule0.enabled =3D True
+@@ -57,6 +58,8 @@ class Test(unittest.TestCase):
+         wd =3D IWD(True)
+         self.validate_connection(wd)
  =
 
-+    @property
-+    def prefix_offset(self):
-+        return self._properties(['PrefixOffset'])
++        rule0.remove()
 +
-+    @prefix_offset.setter
-+    def prefix_offset(self, value):
-+        self._prop_proxy.Set(self._iface_name, 'PrefixOffset', dbus.UInt16=
-(value))
-+
-     def remove(self):
-         self._iface.Remove(reply_handler=3Dself._success,
-                 error_handler=3Dself._failure)
+     @classmethod
+     def setUpClass(cls):
+         pass
 -- =
 
 2.31.1
 
---===============2770293650549467430==--
+--===============1569432855650915150==--
 
