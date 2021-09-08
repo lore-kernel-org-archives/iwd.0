@@ -1,115 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============6215189825229596536=="
+Content-Type: multipart/mixed; boundary="===============8820878354778355808=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 4/4] auto-t: add sae test for non-acked commit
-Date: Wed, 08 Sep 2021 13:48:05 -0700
-Message-ID: <20210908204805.92005-4-prestwoj@gmail.com>
-In-Reply-To: <20210908204805.92005-1-prestwoj@gmail.com>
+Subject: [PATCH v4 1/5] sae: don't send commit/confirm in confirmed state
+Date: Wed, 08 Sep 2021 14:31:57 -0700
+Message-ID: <20210908213201.97115-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6215189825229596536==
+--===============8820878354778355808==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This test simulates the scenario where IWDs commit is not acked which
-exposes a hostapd bug that ultimately fails the connection. This behavior
-can be seen by reverting the commit which works around this issue:
+This works around a hostapd bug (described more in the TODO comment)
+which is exposed because of the kernels overly agressive re-transmit
+behavior on missed ACKs. Combined this results in a death if the
+initial commit is not acked. This behavior has been identified in
+consumer access points and likely won't ever be patched for older
+devices. Because of this IWD must work around the problem which can
+be eliminated by not sending out this commit message.
 
-"sae: don't send commit in confirmed state"
+This bug was reported to the hostapd ML:
 
-With the above patch applied this test should pass.
+https://lists.infradead.org/pipermail/hostap/2021-September/039842.html
 
-Note: The existing timeout test was reused as it was not of much use
-anyways. All it did was block auth/assoc frames and expect a failure
-which didn't exercise any SAE logic anyways.
+This change should not cause any compatibility problems to non-hostapd
+access points and is identical to how wpa_supplicant treats this
+scenario.
 ---
- autotests/testSAE/timeout_test.py | 41 ++++++++++++++++---------------
- 1 file changed, 21 insertions(+), 20 deletions(-)
+ src/sae.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/autotests/testSAE/timeout_test.py b/autotests/testSAE/timeout_=
-test.py
-index abef109b..1792f1c0 100644
---- a/autotests/testSAE/timeout_test.py
-+++ b/autotests/testSAE/timeout_test.py
-@@ -9,13 +9,12 @@ from iwd import IWD
- from iwd import PSKAgent
- from iwd import NetworkType
- from hwsim import Hwsim
-+from hostapd import HostapdCLI
-+from config import ctx
+v4:
+ * Keep the -EAGAIN return for non-sta case
+
+diff --git a/src/sae.c b/src/sae.c
+index c14b646f..7e6377f5 100644
+--- a/src/sae.c
++++ b/src/sae.c
+@@ -1158,6 +1158,31 @@ static int sae_verify_confirmed(struct sae_sm *sm, u=
+int16_t trans,
+ 	if (l_get_le16(frame) !=3D sm->group)
+ 		return -EBADMSG;
  =
 
- class Test(unittest.TestCase):
- =
-
-     def validate_connection(self, wd):
--        hwsim =3D Hwsim()
--        bss_radio =3D hwsim.get_radio('rad0')
--
-         psk_agent =3D PSKAgent(["secret123", "secret123"])
-         wd.register_psk_agent(psk_agent)
- =
-
-@@ -30,29 +29,31 @@ class Test(unittest.TestCase):
-         condition =3D 'not obj.connected'
-         wd.wait_for_object_condition(network.network_object, condition)
- =
-
-+        network.network_object.connect()
++	/*
++	 * Because of kernel retransmit behavior on missed ACKs plus hostapd's
++	 * incorrect handling of confirm packets while in accepted state the
++	 * following can happen:
++	 *
++	 * 1. Client sends commit, not acked (committed state)
++	 * 2. AP receives commit, sends commit reply (committed state)
++	 * 3. Client retransmits original commit
++	 * 4. Client receives AP's commit, sends confirm (confirmed state)
++	 * 5. AP receives clients retransmitted commit, sends only commit
++	 * 6. AP receives clients confirm and accepts (accepted state)
++	 * 7. Client receives AP's commit and sends both commit + confirm
++	 *    (the code below).
++	 * 8. AP receives clients commit while in accepted state, and deauths
++	 *
++	 * Due to this, any commit received while in a confirmed state will be
++	 * ignored by IWD since it is probably caused by this retransmission
++	 * and sending the commit/confirm below would likely cause hostapd to
++	 * deauth us.
++	 *
++	 * As for non-sta (currently not used) we want to keep with the spec.
++	 */
++	if (!sm->handshake->authenticator)
++		return -EBADMSG;
 +
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+    def test_not_acked_commit(self):
-+        #
-+        # TODO: This merely forces group 19 by acting as a 'buggy' AP. Thi=
-s is
-+        # needed because the hwsim rule only matches once and must be matc=
-hed
-+        # on the first commit, not during group negotiation.
-+        #
-+        hostapd =3D HostapdCLI(config=3D'ssidSAE.conf')
-+        hostapd.set_value('vendor_elements', 'dd0cf4f5e8050500000000000000=
-')
-+
-+        hwsim =3D Hwsim()
-+        bss_radio =3D hwsim.get_radio('rad0')
-+
-         rule0 =3D hwsim.rules.create()
-         rule0.source =3D bss_radio.addresses[0]
--        rule0.bidirectional =3D True
-         rule0.drop =3D True
-         rule0.prefix =3D 'b0'
-+        rule0.match_times =3D 1
-+        rule0.drop_ack =3D True
-         rule0.enabled =3D True
- =
-
--        wd.wait(1)
--        print(rule0)
--
--        with self.assertRaises(iwd.FailedEx):
--            network.network_object.connect()
--
--        condition =3D 'not obj.connected'
--        wd.wait_for_object_condition(network.network_object, condition)
--
--        rule0.prefix =3D '00'
--        with self.assertRaises(iwd.FailedEx):
--            network.network_object.connect()
--
--        wd.unregister_psk_agent(psk_agent)
--
--    def test_connection_success(self):
-         wd =3D IWD(True)
-         self.validate_connection(wd)
- =
-
+ 	/*
+ 	 * the protocol instance shall increment Sync, increment Sc, and
+ 	 * transmit its Commit and Confirm (with the new Sc value) messages.
 -- =
 
 2.31.1
 
---===============6215189825229596536==--
+--===============8820878354778355808==--
 
