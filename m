@@ -1,73 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============6298783772762174239=="
+Content-Type: multipart/mixed; boundary="===============7346792046046835481=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/7] sae: fix a spec violation with duplicate commits
-Date: Wed, 08 Sep 2021 11:18:58 -0700
-Message-ID: <20210908181904.84594-1-prestwoj@gmail.com>
+Subject: [PATCH v2 3/7] auth-proto: document acceptable return values for
+ auth-protos
+Date: Wed, 08 Sep 2021 11:19:00 -0700
+Message-ID: <20210908181904.84594-3-prestwoj@gmail.com>
+In-Reply-To: <20210908181904.84594-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============6298783772762174239==
+--===============7346792046046835481==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If a commit is received while in an accepted state the spec states
-the scalar should be checked against the previous commit and if
-equal the message should be silently dropped.
+Since all auth-protos are hidden behind an abstraction they need
+to be consisten with the return values as some should be handled
+specially.
 ---
- src/sae.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+ src/auth-proto.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-v2:
- * Changed to check the scalar rather than always ignore.
-
-diff --git a/src/sae.c b/src/sae.c
-index 62fd6c88..c14b646f 100644
---- a/src/sae.c
-+++ b/src/sae.c
-@@ -1182,10 +1182,32 @@ static int sae_verify_accepted(struct sae_sm *sm, u=
-int16_t trans,
- {
- 	uint16_t sc;
- =
-
--	/* spec does not specify what to do here, so print and discard */
--	if (trans !=3D SAE_STATE_CONFIRMED) {
+diff --git a/src/auth-proto.h b/src/auth-proto.h
+index d3c4686f..f39c361c 100644
+--- a/src/auth-proto.h
++++ b/src/auth-proto.h
+@@ -25,6 +25,18 @@
+ struct auth_proto {
+ 	bool (*start)(struct auth_proto *ap);
+ 	void (*free)(struct auth_proto *ap);
 +	/*
-+	 * 12.4.8.6.1 Parent process behavior
++	 * Callback to receive an Authenticate frame. auth-protos should
++	 * return error codes consistent with one another as some are treated
++	 * specially:
 +	 *
-+	 * "Upon receipt of an SAE Commit message... and it is in Accepted
-+	 * state, the scalar in the received frame is checked against the
-+	 * peer-scalar used in authentication of the existing protocol instance
-+	 * (in Accepted state). If it is identical, the frame shall be dropped"
++	 * 0 indicates success
++	 * -ENOMSG or -EBADMSG indicates the message should be ignored silently
++	 * -EAGAIN indicates to try again (handled by auth-proto internally)
++	 * -EPROTO indicates a fatal error
++	 * Any other < 0 return will be treated as a fatal error
++	 * > 0 indicates a fatal error with status code.
 +	 */
-+	if (trans =3D=3D SAE_STATE_COMMITTED) {
-+		bool drop;
-+		unsigned int nbytes =3D l_ecc_curve_get_scalar_bytes(sm->curve);
-+		struct l_ecc_scalar *p_scalar;
-+
-+		if (len < nbytes + 2)
-+			return -EMSGSIZE;
-+
-+		p_scalar =3D l_ecc_scalar_new(sm->curve, frame + 2, nbytes);
-+
-+		drop =3D l_ecc_scalars_are_equal(sm->p_scalar, p_scalar);
-+		l_ecc_scalar_free(p_scalar);
-+
-+		if (drop)
-+			return -EBADMSG;
-+
- 		l_error("received transaction %u in accepted state", trans);
--		return -EBADMSG;
-+		return -EPROTO;
- 	}
- =
-
- 	if (sm->sync > SAE_SYNC_MAX)
+ 	int (*rx_authenticate)(struct auth_proto *driver,
+ 					const uint8_t *frame, size_t len);
+ 	int (*rx_associate)(struct auth_proto *driver,
 -- =
 
 2.31.1
 
---===============6298783772762174239==--
+--===============7346792046046835481==--
 
