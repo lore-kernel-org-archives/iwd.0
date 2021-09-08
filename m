@@ -1,58 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============0323162799696898577=="
+Content-Type: multipart/mixed; boundary="===============3912774604518644201=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 2/4] auth-proto: document acceptable return values for
- auth-protos
-Date: Wed, 08 Sep 2021 13:48:03 -0700
-Message-ID: <20210908204805.92005-2-prestwoj@gmail.com>
+Subject: [PATCH v3 3/4] netdev: handle non-fatal auth-proto returns
+Date: Wed, 08 Sep 2021 13:48:04 -0700
+Message-ID: <20210908204805.92005-3-prestwoj@gmail.com>
 In-Reply-To: <20210908204805.92005-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============0323162799696898577==
+--===============3912774604518644201==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Since all auth-protos are hidden behind an abstraction they need
-to be consisten with the return values as some should be handled
-specially.
+This adds -EBADMSG/-ENOMSG to be handled specially by allowing the
+frame to be dropped, similar to 0 or -EAGAIN. The difference though
+is that a non-zero authenticate status will result in the kernel
+not re-transmitting which ultimately could leave IWD in a connecting
+state with no way of leaving. Because of this we handle a non-zero
+status for these two returns as a failed connection.
 ---
- src/auth-proto.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ src/netdev.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
 v3:
- * Added some more details to the comment
+ * Only drop the message if the status was successful.
 
-diff --git a/src/auth-proto.h b/src/auth-proto.h
-index d3c4686f..33a74291 100644
---- a/src/auth-proto.h
-+++ b/src/auth-proto.h
-@@ -25,6 +25,21 @@
- struct auth_proto {
- 	bool (*start)(struct auth_proto *ap);
- 	void (*free)(struct auth_proto *ap);
-+	/*
-+	 * Callback to receive an Authenticate frame. auth-protos should
-+	 * return error codes consistent with one another as some are treated
-+	 * specially:
-+	 *
-+	 * 0 indicates success, and that a state transition occurred.
-+	 * -ENOMSG or -EBADMSG indicates the message should be ignored silently
-+	 * -EAGAIN indicates a retry, and no state transition occurred. Any
-+	 *         retry is handled by the auth-proto internally
-+	 * -EPROTO indicates a fatal error
-+	 * Any other < 0 return will be treated as a fatal error
-+	 * > 0 indicates a fatal error with status code. This only applies to
-+	 *         non-sta cases as non-zero status codes are rejected by the
-+	 *         kernel when in station mode.
-+	 */
- 	int (*rx_authenticate)(struct auth_proto *driver,
- 					const uint8_t *frame, size_t len);
- 	int (*rx_associate)(struct auth_proto *driver,
+diff --git a/src/netdev.c b/src/netdev.c
+index 7909c37e..fc4613e6 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2717,7 +2717,17 @@ static void netdev_authenticate_event(struct l_genl_=
+msg *msg,
+ 		ret =3D auth_proto_rx_authenticate(netdev->ap, frame, frame_len);
+ 		if (ret =3D=3D 0 || ret =3D=3D -EAGAIN)
+ 			return;
+-		else if (ret > 0)
++		else if (ret =3D=3D -EBADMSG || ret =3D=3D -ENOMSG) {
++			/*
++			 * Only drop if the status is success. Otherwise
++			 * dropping the message here would prevent the kernel
++			 * from re-transmitting, leaving IWD in this connecting
++			 * state. If this happens the only option is to fail the
++			 * connection here.
++			 */
++			if (status_code =3D=3D 0)
++				return;
++		} else if (ret > 0)
+ 			status_code =3D (uint16_t)ret;
+ 	}
+ =
+
 -- =
 
 2.31.1
 
---===============0323162799696898577==--
+--===============3912774604518644201==--
 
