@@ -1,56 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============5263952861137837411=="
+Content-Type: multipart/mixed; boundary="===============3073807238053428213=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 6/6] auto-t: remove ';' in testSAE autoconnect_test.py
-Date: Thu, 09 Sep 2021 15:08:48 -0700
-Message-ID: <20210909220848.19376-6-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH v3 1/6] hwsim: add MatchBytes/MatchBytesOffset rule
+ properties
+Date: Thu, 09 Sep 2021 17:01:50 -0500
+Message-ID: <4a57d392-61a8-b4a5-fb13-7b38ef43b3ce@gmail.com>
 In-Reply-To: <20210909220848.19376-1-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============5263952861137837411==
+--===============3073807238053428213==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- autotests/testSAE/autoconnect_test.py | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Hi James,
 
-diff --git a/autotests/testSAE/autoconnect_test.py b/autotests/testSAE/auto=
-connect_test.py
-index 9095b7e9..64a60e7c 100644
---- a/autotests/testSAE/autoconnect_test.py
-+++ b/autotests/testSAE/autoconnect_test.py
-@@ -35,8 +35,8 @@ class Test(unittest.TestCase):
-         wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
- =
+On 9/9/21 5:08 PM, James Prestwood wrote:
+> If set, a rule will start matching 'MatchBytes' some number of bytes
+> into the frame (MatchBytesOffset). This is useful since header
+> information, addresses, and sequence numbers may be unpredictable
+> between test runs.
+> =
 
-     def test_SAE(self):
--        self.hostapd.set_value('sae_pwe', '0');
--        self.hostapd.set_value('sae_groups', '19');
-+        self.hostapd.set_value('sae_pwe', '0')
-+        self.hostapd.set_value('sae_groups', '19')
-         self.hostapd.reload()
-         self.hostapd.wait_for_event("AP-ENABLED")
- =
+> To avoid unintended matches the Prefix property is left unchanged
+> and will match starting at the beginning of the frame.
+> ---
+>   tools/hwsim.c | 106 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 106 insertions(+)
+> =
 
-@@ -44,8 +44,8 @@ class Test(unittest.TestCase):
-         self.validate_connection(wd)
- =
 
-     def test_SAE_H2E(self):
--        self.hostapd.set_value('sae_pwe', '1');
--        self.hostapd.set_value('sae_groups', '20');
-+        self.hostapd.set_value('sae_pwe', '1')
-+        self.hostapd.set_value('sae_groups', '20')
-         self.hostapd.reload()
-         self.hostapd.wait_for_event("AP-ENABLED")
-         wd =3D IWD(True)
--- =
+All applied, thanks.
 
-2.31.1
+Regards,
+-Denis
 
---===============5263952861137837411==--
+--===============3073807238053428213==--
 
