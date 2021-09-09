@@ -1,55 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============3598577125875948757=="
+Content-Type: multipart/mixed; boundary="===============8071429589385685448=="
 MIME-Version: 1.0
-From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-Subject: Re: [RFC connman v1 1/1] gsupplicant: Add support for WPA3-Personal
-Date: Thu, 09 Sep 2021 08:10:10 -0300
-Message-ID: <9186c76b-f2e7-03ec-55ad-2bc5c3177db2@collabora.com>
-In-Reply-To: <d4e6e9ee-0f0b-1fa2-c814-4eebaac304ce@collabora.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 3/5] auto-t: change testSAE timeout_test to use
+ prefix_offset
+Date: Thu, 09 Sep 2021 14:47:37 -0500
+Message-ID: <db1bbe34-e28b-5002-5a7f-5596033c4c02@gmail.com>
+In-Reply-To: <20210908224744.102156-3-prestwoj@gmail.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3598577125875948757==
+--===============8071429589385685448==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Daniel,
+Hi James,
 
-On 8/5/21 8:15 AM, Ariel D'Alessandro wrote:
-> Hi Daniel,
+On 9/8/21 5:47 PM, James Prestwood wrote:
+> This makes things more clear on what frames are being blocked
+> since it passes over header information to get to the actual
+> SAE payload.
+> ---
+>   autotests/testSAE/timeout_test.py | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
 > =
 
-> On 8/5/21 3:07 AM, Daniel Wagner wrote:
->> Hi Ariel,
->>
->> On Wed, Aug 04, 2021 at 06:23:14PM -0300, Ariel D'Alessandro wrote:
->>> Hi all, Daniel:
->>>
->>> WPA3 support has been recently added to connman (wpa_supplicant). As
->>> we've been discussing on a previous thread, this only supports
->>> WPA3-Personal-only mode.
->>>
->>> This RFC patchset adds support for WPA3-Personal transition mode, which
->>> supports both WPA2-Personal (PSK) and WPA3-Personal (SAE).
->>>
->>> Based on the AP accepted key management protocols, connman configures
->>> wpa_supplicant as follows:
->>>
->>> * WPA3-Personal-only mode: key_mgmt=3D"SAE" ; ieee80211w=3D2
->>> * WPA3-Personal transition mode: key_mgmt=3D"SAE WPA-PSK" ; ieee80211w=
-=3D1
->>>
->>> This patch applies cleanly on top of current master branch (commit
->>> e36a38d8).
->>>
->>> I'd like to hear any thoughts you might have about this.
->>> For reference, see wpa_supplicant configuration [0].
->>
->> This looks good. If no one speaks up I am going to apply it.
+> diff --git a/autotests/testSAE/timeout_test.py b/autotests/testSAE/timeou=
+t_test.py
+> index 1792f1c0..263f4e28 100644
+> --- a/autotests/testSAE/timeout_test.py
+> +++ b/autotests/testSAE/timeout_test.py
+> @@ -49,7 +49,8 @@ class Test(unittest.TestCase):
+>           rule0 =3D hwsim.rules.create()
+>           rule0.source =3D bss_radio.addresses[0]
+>           rule0.drop =3D True
+> -        rule0.prefix =3D 'b0'
+> +        rule0.prefix =3D '01 00 00 00 13 00'
+> +        rule0.prefix_offset =3D 26
 
-Any other feedback on this one? Can we merge it?
+So I wonder if we might end up matching arbitrary frames this way?  Perhaps=
+ we =
 
-Thanks,
-Ariel
---===============3598577125875948757==--
+should keep the subtype prefix and add the prefix/prefix_offset as an addit=
+ional =
+
+match?
+
+Something like
+rule0.prefix =3D 'b0'
+rule0.match0 =3D '01 00 00 00 13 00'
+rule0.match0_offset =3D 26
+
+>           rule0.match_times =3D 1
+>           rule0.drop_ack =3D True
+>           rule0.enabled =3D True
+
+Regards,
+-Denis
+--===============8071429589385685448==--
 
