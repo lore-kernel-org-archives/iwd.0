@@ -1,31 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============3022340221554927462=="
+Content-Type: multipart/mixed; boundary="===============6668850655822534907=="
 MIME-Version: 1.0
-From: Daniel Wagner <wagi@monom.org>
-Subject: Re: [RFC connman v1 1/1] gsupplicant: Add support for WPA3-Personal
-Date: Mon, 13 Sep 2021 08:27:39 +0200
-Message-ID: <20210913062739.ltsywwgs7lzsz7mp@beryllium.lan>
-In-Reply-To: <9186c76b-f2e7-03ec-55ad-2bc5c3177db2@collabora.com>
+From: Denis Kenzior <denkenz@gmail.com>
+Subject: Re: [PATCH 1/2] doc: Add net.connman.iwd.IPv{4,6}Configuration API doc
+Date: Tue, 14 Sep 2021 16:37:21 -0500
+Message-ID: <c76f9963-3c96-3b65-4e03-2cf8ec405958@gmail.com>
+In-Reply-To: <20210908214440.358243-1-andrew.zaborowski@intel.com>
 List-Id: <iwd.lists.01.org>
 To: iwd@lists.01.org
 
---===============3022340221554927462==
+--===============6668850655822534907==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Ariel,
+Hi Andrew,
 
-[back from holiday :)]
+On 9/8/21 4:44 PM, Andrew Zaborowski wrote:
+> ---
+>   doc/ip-configuration-api.txt | 47 ++++++++++++++++++++++++++++++++++++
+>   1 file changed, 47 insertions(+)
+>   create mode 100644 doc/ip-configuration-api.txt
 
-On Thu, Sep 09, 2021 at 08:10:10AM -0300, Ariel D'Alessandro wrote:
-> >> This looks good. If no one speaks up I am going to apply it.
-> =
+Applied, thanks.
 
-> Any other feedback on this one? Can we merge it?
+Regards,
+-Denis
 
-Sure, patch applied.
-
-Thanks!
-Daniel
---===============3022340221554927462==--
+--===============6668850655822534907==--
 
