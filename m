@@ -1,44 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============8292410928933317357=="
+Content-Type: multipart/mixed; boundary="===============4318486734211737936=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 2/3] scan: set scan priority via scan_common
-Date: Tue, 11 Jan 2022 09:07:20 -0600
-Message-ID: <451616f8-9402-c544-8ac8-cebc6bfee298@gmail.com>
-In-Reply-To: 20220111001519.1013183-2-prestwoj@gmail.com
+Subject: [PATCH v2 3/7] monitor: parse WFA OWE Transition IE
+Date: Wed, 15 Sep 2021 16:05:44 -0700
+Message-ID: <20210915230548.179425-3-prestwoj@gmail.com>
+In-Reply-To: 20210915230548.179425-1-prestwoj@gmail.com
 
---===============8292410928933317357==
+--===============4318486734211737936==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 1/10/22 18:15, James Prestwood wrote:
-> This adds a priority argument to scan_common rather than hard
-> coding it when inserting the work item
-> ---
->   src/scan.c | 19 ++++++++++++-------
->   1 file changed, 12 insertions(+), 7 deletions(-)
-> =
+---
+ monitor/nlmon.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-> diff --git a/src/scan.c b/src/scan.c
-> index 54159dfd..96907e59 100644
-> --- a/src/scan.c
-> +++ b/src/scan.c
-> @@ -52,6 +52,8 @@
->   #include "src/band.h"
->   #include "src/scan.h"
->   =
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 1a26f553..177147c4 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -1009,6 +1009,21 @@ static void print_ipv4(unsigned int level, const cha=
+r *label,
+ 			addr[0], addr[1], addr[2], addr[3]);
+ }
+ =
 
-> +#define SCAN_WORK_PRIORITY 2
++static void print_ie_wfa_owe_transition(unsigned int level, const char *la=
+bel,
++						const void *data, uint16_t size)
++{
++	uint8_t bssid[6];
++	char ssid[33];
++
++	if (ie_parse_owe_transition(data, size, bssid, ssid) < 0) {
++		print_attr(level + 1, "Error parsing");
++		return;
++	}
++
++	print_attr(level + 1, "BSSID: "MAC, MAC_STR(bssid));
++	print_attr(level + 1, "SSID: %s", ssid);
++}
++
+ static void print_ie_vendor(unsigned int level, const char *label,
+ 				const void *data, uint16_t size)
+ {
+@@ -1054,6 +1069,10 @@ static void print_ie_vendor(unsigned int level, cons=
+t char *label,
+ 		case 0x12:
+ 			print_ie_rsn_suites(level + 1, label, data, size);
+ 			return;
++		case 0x1c:
++			print_ie_wfa_owe_transition(level + 1, label,
++							data - 6, size + 6);
++			return;
+ 		default:
+ 			return;
+ 		}
+-- =
 
-Can we name this SCAN_REQUEST_PRIORITY, or even simply REQUEST_PRIORITY?
+2.31.1
 
-Also, I wonder if we should put the priority numbers into wiphy.h instead o=
-f =
-
-relying on hard-coded 1/2/3 everywhere.
-
-Regards,
--Denis
---===============8292410928933317357==--
+--===============4318486734211737936==--
 
