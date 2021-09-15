@@ -1,38 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============0534658093716155033=="
+Content-Type: multipart/mixed; boundary="===============4945070922808446948=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 1/2] station: send debug "roam-scan-triggered" event
-Date: Wed, 19 Jan 2022 12:59:10 -0800
-Message-ID: <20220119205911.2281616-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 05/13] network: set handshake SSID based on BSS, not
+ network
+Date: Wed, 15 Sep 2021 14:59:30 -0500
+Message-ID: <b5de6e12-39bc-a33d-c6f8-64c9aa223a96@gmail.com>
+In-Reply-To: 20210915173624.11917-5-prestwoj@gmail.com
 
---===============0534658093716155033==
+--===============4945070922808446948==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/station.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi James,
 
-diff --git a/src/station.c b/src/station.c
-index 38d0757c..d9eb8d09 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2246,6 +2246,8 @@ static void station_roam_scan_triggered(int err, void=
- *user_data)
- 		return;
- 	}
- =
+On 9/15/21 12:36 PM, James Prestwood wrote:
+> This is being added to support OWE transition mode. For these
+> type of networks the OWE BSS may contain a different SSID than
+> that of the network, but the WFA spec requires this be hidden
+> from the user. This means we need to set the handshake SSID based
+> on the BSS rather than the network object.
+> ---
+>   src/network.c | 5 ++---
+>   src/network.h | 2 +-
+>   src/station.c | 2 +-
+>   3 files changed, 4 insertions(+), 5 deletions(-)
+> =
 
-+	station_debug_event(station, "roam-scan-triggered");
-+
- 	/*
- 	 * Do not update the Scanning property as we won't be updating the
- 	 * list of networks.
--- =
 
-2.31.1
+Applied, thanks.
 
---===============0534658093716155033==--
+Regards,
+-Denis
+
+--===============4945070922808446948==--
 
