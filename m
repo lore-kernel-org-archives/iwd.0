@@ -1,83 +1,292 @@
-Content-Type: multipart/mixed; boundary="===============0276539574872684106=="
+Content-Type: multipart/mixed; boundary="===============5774660965494033282=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 1/6] test-runner: remove root user requirement from
- log/monitor/result
-Date: Wed, 25 May 2022 12:37:24 -0700
-Message-ID: <20220525193729.336896-1-prestwoj@gmail.com>
+Subject: [PATCH v2 7/7] auto-t: add testOWE-transition
+Date: Wed, 15 Sep 2021 16:05:48 -0700
+Message-ID: <20210915230548.179425-7-prestwoj@gmail.com>
+In-Reply-To: 20210915230548.179425-1-prestwoj@gmail.com
 
---===============0276539574872684106==
+--===============5774660965494033282==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Certain aspects of QEMU like mounting host directories may still require
-root access but for UML this is not the case. To handle both cases first
-check if SUDO_UID/GID are set and use those to obtain the actual users
-ID's. Otherwise if running as non-root use the UID/GID of the user
-directly.
+This adds several tests for OWE transition networks. Hostapd
+does have special options for these networks but currently their
+implementation is incorrect as the IE is not ever added to the
+OWE BSS. Besides that using vendor_elements provides a much easier
+way to create invalid IEs to test.
 ---
- tools/runner.py | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+ .../testOWE-transition/connection_test.py     | 156 ++++++++++++++++++
+ autotests/testOWE-transition/hw.conf          |  10 ++
+ autotests/testOWE-transition/main.conf        |   2 +
+ autotests/testOWE-transition/ssidOWE.conf     |  14 ++
+ autotests/testOWE-transition/ssidOpen.conf    |   8 +
+ autotests/testOWE-transition/transition.open  |   0
+ 6 files changed, 190 insertions(+)
+ create mode 100644 autotests/testOWE-transition/connection_test.py
+ create mode 100644 autotests/testOWE-transition/hw.conf
+ create mode 100644 autotests/testOWE-transition/main.conf
+ create mode 100644 autotests/testOWE-transition/ssidOWE.conf
+ create mode 100644 autotests/testOWE-transition/ssidOpen.conf
+ create mode 100644 autotests/testOWE-transition/transition.open
 
-diff --git a/tools/runner.py b/tools/runner.py
-index 1739b786..7c177f1f 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -305,18 +305,12 @@ class RunnerAbstract:
- =
-
- 	# For QEMU/UML --log, --monitor, --result
- 	def _prepare_outfiles(self):
--		gid =3D None
- 		append_gid_uid =3D False
- =
-
--		if os.environ.get('SUDO_GID', None):
--			uid =3D int(os.environ['SUDO_UID'])
--			gid =3D int(os.environ['SUDO_GID'])
-+		uid =3D int(os.environ.get('SUDO_UID', os.getuid()))
-+		gid =3D int(os.environ.get('SUDO_GID', os.getgid()))
- =
-
- 		if self.args.log:
--			if os.getuid() !=3D 0:
--				print("--log can only be used as root user")
--				quit()
--
- 			append_gid_uid =3D True
- =
-
- 			if not os.path.exists(self.args.log):
-@@ -326,20 +320,12 @@ class RunnerAbstract:
- 				os.chown(self.args.log, uid, gid)
- =
-
- 		if self.args.monitor:
--			if os.getuid() !=3D 0:
--				print("--monitor can only be used as root user")
--				quit()
--
- 			append_gid_uid =3D True
- =
-
- 			self.args.monitor_parent =3D os.path.abspath(
- 						os.path.join(self.args.monitor, os.pardir))
- =
-
- 		if self.args.result:
--			if os.getuid() !=3D 0:
--				print("--result can only be used as root user")
--				quit()
--
- 			append_gid_uid =3D True
- =
-
- 			self.args.result_parent =3D os.path.abspath(
+diff --git a/autotests/testOWE-transition/connection_test.py b/autotests/te=
+stOWE-transition/connection_test.py
+new file mode 100644
+index 00000000..b85ea3c9
+--- /dev/null
++++ b/autotests/testOWE-transition/connection_test.py
+@@ -0,0 +1,156 @@
++#!/usr/bin/python3
++
++import unittest
++import sys
++
++sys.path.append('../util')
++import iwd
++from iwd import IWD
++from iwd import NetworkType
++from hostapd import HostapdCLI
++import testutil
++
++class Test(unittest.TestCase):
++
++    def validate(self, wd, target, autoconnect=3DFalse, connect_hidden=3DF=
+alse):
++        devices =3D wd.list_devices(1)
++        device =3D devices[0]
++        device.autoconnect =3D autoconnect
++
++        if not autoconnect:
++            if not connect_hidden:
++                condition =3D 'not obj.scanning'
++                wd.wait_for_object_condition(device, condition)
++
++                device.scan()
++
++                condition =3D 'obj.scanning'
++                wd.wait_for_object_condition(device, condition)
++
++                condition =3D 'not obj.scanning'
++                wd.wait_for_object_condition(device, condition)
++
++                network =3D device.get_ordered_network('transition', scan_=
+if_needed=3DFalse)
++
++                network.network_object.connect()
++            else:
++                device.connect_hidden_network('owe-hidden')
++
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
++
++        testutil.test_iface_operstate()
++        testutil.test_ifaces_connected(device.name, target.ifname)
++
++        self.assertIn(device.address, target.list_sta())
++
++        device.disconnect()
++
++    # Normal success case
++    def test_owe_transition(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++        self.validate(self.wd, self.hapd_owe)
++
++    # Normal success case
++    def test_owe_transition_multi_network(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++
++        self.hapd_open2.set_value('vendor_elements', 'dd17506f9a1c02000000=
+f1000c6f77652d68696464656e2d32')
++        self.hapd_open2.reload()
++        self.hapd_owe2.set_value('vendor_elements', 'dd17506f9a1c02000000f=
+0000c7472616e736974696f6e2d32')
++        self.hapd_owe2.reload()
++
++        self.validate(self.wd, self.hapd_owe)
++
++    # Normal success autoconnect case
++    def test_owe_transition_autoconnect(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++        IWD.copy_to_storage('transition.open')
++
++        self.validate(self.wd, self.hapd_owe, autoconnect=3DTrue)
++
++    # Open BSS has invalid BSSID in OWE transition element
++    # Expected connection to Open BSS
++    def test_owe_transition_invalid_open_bssid(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+f000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++
++        self.validate(self.wd, self.hapd_open)
++
++    # OWE BSS has invalid BSSID in OWE transition element
++    # Expected connection to Open BSS
++    def test_owe_transition_invalid_owe_bssid(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000ff=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++
++        self.validate(self.wd, self.hapd_open)
++
++    # No OWE hidden network exists
++    # Expected connection to Open BSS
++    def test_owe_transition_no_hidden_found(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.disable()
++
++        self.validate(self.wd, self.hapd_open)
++
++    # Directly connect to valid OWE hidden network
++    # Expected connection failure
++    def test_owe_transition_connect_hidden_valid(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++
++        with self.assertRaises(iwd.NotFoundEx):
++            self.validate(self.wd, self.hapd_owe, connect_hidden=3DTrue)
++
++    # Directly connect to invalid OWE hidden network. The SSID in the OWE =
+BSS
++    # IE points to itself. And the Open BSS IE points to a non-existent SS=
+ID.
++    # Expected connection failure
++    def test_owe_transition_connect_hidden_invalid(self):
++        self.hapd_open.set_value('vendor_elements', 'dd18506f9a1c02000000f=
+1000d6e6f2d6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a6f77652d68696464656e')
++        self.hapd_owe.reload()
++
++        with self.assertRaises(iwd.NotFoundEx):
++            self.validate(self.wd, self.hapd_owe, connect_hidden=3DTrue)
++
++    def setUp(self):
++        self.wd =3D IWD(True)
++        self.hapd_owe =3D HostapdCLI(config=3D'ssidOWE.conf')
++        self.hapd_open =3D HostapdCLI(config=3D'ssidOpen.conf')
++        self.hapd_owe2 =3D HostapdCLI(config=3D'ssidOWE-2.conf')
++        self.hapd_open2 =3D HostapdCLI(config=3D'ssidOpen-2.conf')
++
++    def tearDown(self):
++        IWD.clear_storage()
++
++        self.wd =3D None
++        self.hapd_open =3D None
++        self.hapd_owe =3D None
++
++    @classmethod
++    def setUpClass(cls):
++        pass
++
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
++
++if __name__ =3D=3D '__main__':
++    unittest.main(exit=3DTrue)
+diff --git a/autotests/testOWE-transition/hw.conf b/autotests/testOWE-trans=
+ition/hw.conf
+new file mode 100644
+index 00000000..dbd70597
+--- /dev/null
++++ b/autotests/testOWE-transition/hw.conf
+@@ -0,0 +1,10 @@
++[SETUP]
++num_radios=3D5
++hwsim_medium=3Dyes
++start_iwd=3D0
++
++[HOSTAPD]
++rad0=3DssidOpen.conf
++rad1=3DssidOWE.conf
++rad2=3DssidOpen-2.conf
++rad3=3DssidOWE-2.conf
+diff --git a/autotests/testOWE-transition/main.conf b/autotests/testOWE-tra=
+nsition/main.conf
+new file mode 100644
+index 00000000..9452fb6b
+--- /dev/null
++++ b/autotests/testOWE-transition/main.conf
+@@ -0,0 +1,2 @@
++[Scan]
++DisableMacAddressRandomization=3Dtrue
+diff --git a/autotests/testOWE-transition/ssidOWE.conf b/autotests/testOWE-=
+transition/ssidOWE.conf
+new file mode 100644
+index 00000000..c54309ae
+--- /dev/null
++++ b/autotests/testOWE-transition/ssidOWE.conf
+@@ -0,0 +1,14 @@
++ssid=3Dowe-hidden
++bssid=3D02:00:00:00:f1:00
++channel=3D1
++ignore_broadcast_ssid=3D1
++ieee80211w=3D1
++
++wpa=3D2
++wpa_key_mgmt=3DOWE
++rsn_pairwise=3DCCMP
++
++# You would conventionally use these options but hostapd does not include =
+an
++# IE for the OWE network, hence vendor_elements must be used directly
++#owe_transition_ssid=3D"transition"
++#owe_transition_bssid=3D02:00:00:00:f0:00
+diff --git a/autotests/testOWE-transition/ssidOpen.conf b/autotests/testOWE=
+-transition/ssidOpen.conf
+new file mode 100644
+index 00000000..4fc68430
+--- /dev/null
++++ b/autotests/testOWE-transition/ssidOpen.conf
+@@ -0,0 +1,8 @@
++channel=3D1
++ssid=3Dtransition
++bssid=3D02:00:00:00:f0:00
++
++# You would conventionally use these options but hostapd does not include =
+an
++# IE for the OWE network, hence vendor_elements must be used directly
++#owe_transition_ssid=3D"owe-hidden"
++#owe_transition_bssid=3D02:00:00:00:f1:00
+diff --git a/autotests/testOWE-transition/transition.open b/autotests/testO=
+WE-transition/transition.open
+new file mode 100644
+index 00000000..e69de29b
 -- =
 
-2.34.1
+2.31.1
 
---===============0276539574872684106==--
+--===============5774660965494033282==--
 
