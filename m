@@ -1,51 +1,123 @@
-Content-Type: multipart/mixed; boundary="===============7442818464772793225=="
+Content-Type: multipart/mixed; boundary="===============6274747308194091945=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd can start in AP mode
-Date: Thu, 11 Nov 2021 14:43:29 -0600
-Message-ID: <46180dc9-8e1b-4e85-6136-97dfbc904f33@gmail.com>
-In-Reply-To: 20211108043518.2830.53187@ml01.vlan13.01.org
+Subject: [PATCH 10/13] network: support connect during OWE hidden scan
+Date: Wed, 15 Sep 2021 10:36:21 -0700
+Message-ID: <20210915173624.11917-10-prestwoj@gmail.com>
+In-Reply-To: 20210915173624.11917-1-prestwoj@gmail.com
 
---===============7442818464772793225==
+--===============6274747308194091945==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Salahaldeen,
+Similar to ANQP a connect call could come in while station is
+scanning for OWE hidden networks. This is supported in the same
+manor by saving away the dbus message and resuming the connection
+after the hidden OWE scan.
+---
+ src/network.c | 48 ++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 44 insertions(+), 4 deletions(-)
 
-On 11/7/21 10:35 PM, salahaldeen.altous(a)leica-camera.com wrote:
->  From e8357b81a20f44d3473f652ef233b6598f72273f Mon Sep 17 00:00:00 2001
-> From: Salahaldeen Altous <salahaldeen.altous(a)leica-camera.com>
-> Date: Mon, 8 Nov 2021 05:16:26 +0100
-> Subject: [PATCH] iwd can start in AP mode
-> =
+diff --git a/src/network.c b/src/network.c
+index d985f811..48314a05 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -83,11 +83,13 @@ struct network {
+ 	bool ask_passphrase:1; /* Whether we should force-ask agent */
+ 	bool is_hs20:1;
+ 	bool anqp_pending:1;	/* Set if there is a pending ANQP request */
++	bool owe_hidden_pending:1;
+ 	uint8_t transition_disable; /* Temporary cache until info is set */
+ 	bool have_transition_disable:1;
+ 	int rank;
+ 	/* Holds DBus Connect() message if it comes in before ANQP finishes */
+ 	struct l_dbus_message *connect_after_anqp;
++	struct l_dbus_message *connect_after_owe_hidden;
+ };
+ =
 
-> By default iwd starts in station mode.  This can be changed by setting the
-> Mode parameter to ap in the main.conf General section. Example
-> [General]
-> Mode=3Dap
+ static bool network_settings_load(struct network *network)
+@@ -1506,6 +1508,17 @@ struct l_dbus_message *__network_connect(struct netw=
+ork *network,
+ 	case SECURITY_PSK:
+ 		return network_connect_psk(network, bss, message);
+ 	case SECURITY_NONE:
++		if (network->connect_after_owe_hidden)
++			return dbus_error_busy(message);
++
++		/* Save message and connect after OWE hidden scan is done */
++		if (network->owe_hidden_pending) {
++			network->connect_after_owe_hidden =3D
++						l_dbus_message_ref(message);
++			l_debug("Pending OWE hidden scan, delaying connect");
++			return NULL;
++		}
++
+ 		station_connect_network(station, network, bss, message);
+ 		return NULL;
+ 	case SECURITY_8021X:
+@@ -1901,11 +1914,17 @@ static void known_networks_changed(enum known_netwo=
+rks_event event,
+ static void event_watch_changed(enum station_event state,
+ 				struct network *network, void *user_data)
+ {
+-	network->anqp_pending =3D state =3D=3D STATION_EVENT_ANQP_STARTED;
++	struct l_dbus_message *reply;
+ =
 
-So does Mode=3Dap imply that we should only create AP interfaces, or does t=
-hat =
+-	if (state =3D=3D STATION_EVENT_ANQP_FINISHED &&
+-						network->connect_after_anqp) {
+-		struct l_dbus_message *reply;
++	switch (state) {
++	case STATION_EVENT_ANQP_STARTED:
++		network->anqp_pending =3D true;
++		break;
++	case STATION_EVENT_ANQP_FINISHED:
++		network->anqp_pending =3D false;
++
++		if (!network->connect_after_anqp)
++			return;
+ =
 
-imply AP + p2p?  Looks like the current implementation would still try and =
+ 		l_debug("ANQP complete, resuming connect to %s", network->ssid);
+ =
 
-create p2p interfaces as well.
+@@ -1925,6 +1944,27 @@ static void event_watch_changed(enum station_event s=
+tate,
+ =
 
-Perhaps we should name this ap+p2p for now until we implement other =
+ 		l_dbus_message_unref(network->connect_after_anqp);
+ 		network->connect_after_anqp =3D NULL;
++
++		break;
++	case STATION_EVENT_OWE_HIDDEN_STARTED:
++		network->owe_hidden_pending =3D true;
++		break;
++	case STATION_EVENT_OWE_HIDDEN_FINISHED:
++		network->owe_hidden_pending =3D false;
++
++		if (!network->connect_after_owe_hidden)
++			return;
++
++		reply =3D __network_connect(network,
++					network_bss_select(network, true),
++					network->connect_after_owe_hidden);
++		if (reply)
++			l_dbus_send(dbus_get_bus(), reply);
++
++		l_dbus_message_unref(network->connect_after_owe_hidden);
++		network->connect_after_owe_hidden =3D NULL;
++
++		break;
+ 	}
+ }
+ =
 
-combinations?  Also, could you add a quick description of this setting in =
+-- =
 
-src/iwd.config.rst?
+2.31.1
 
-> ---
->   src/manager.c | 7 +++++++
->   1 file changed, 7 insertions(+)
-> =
-
-
-Regards,
--Denis
---===============7442818464772793225==--
+--===============6274747308194091945==--
 
