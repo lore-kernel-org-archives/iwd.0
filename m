@@ -1,49 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============2465110369425681184=="
+Content-Type: multipart/mixed; boundary="===============1326202075333966265=="
 MIME-Version: 1.0
-From: Joseph Benden <joe at benden.us>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 1/7] storage: implement network profile encryption
-Date: Fri, 04 Feb 2022 16:00:52 -0700
-Message-ID: <26c0556f-c670-0bcd-2808-f9b833692d12@benden.us>
-In-Reply-To: e7e5a0d3-5cfd-be0d-c847-22e91e856e64@benden.us
+Subject: [PATCH 11/13] network: prefer OWE transition BSS over open
+Date: Wed, 15 Sep 2021 10:36:22 -0700
+Message-ID: <20210915173624.11917-11-prestwoj@gmail.com>
+In-Reply-To: 20210915173624.11917-1-prestwoj@gmail.com
 
---===============2465110369425681184==
+--===============1326202075333966265==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 2/4/22 3:55 PM, Joseph Benden wrote:
-> Hi!
->
-> It is my understanding that all secret data is to be kept as securely =
+There isn't much control station has with how BSS's are inserted to
+a network object. The rank algorithm makes that decision. Because of
+this we could end up in a situation where the Open BSS is preferred
+over the OWE transition BSS.
 
-> as possible. I'm not really seeing this carried throughout the source =
+In attempt to better handle this any Open BSS in this type of network
+will not be chosen unless its the only candidate (e.g. no other BSSs,
+inability to connect with OWE, or an improperly configured network).
+---
+ src/network.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-> code. Maybe this specific code does not need that level of security?
->
-> If I'm right, then:
->
-> The secret data should be kept in a mmap(), and mlock(), structure. =
+diff --git a/src/network.c b/src/network.c
+index 48314a05..cda507b5 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1130,6 +1130,14 @@ struct scan_bss *network_bss_select(struct network *=
+network,
+ 		if (!candidate)
+ 			candidate =3D bss;
+ =
 
-> The prevents secret data from hitting swap memory. After every use of =
++		/*
++		 * Do what we can to NOT connect to the Open BSS of an OWE
++		 * transition network. This can still happen if this is the only
++		 * BSS, or if the BSS's were improperly configured.
++		 */
++		if (!l_memeqzero(bss->owe_trans_bssid, 6) && !bss->rsne)
++			continue;
++
+ 		/* check if temporarily blacklisted */
+ 		if (l_queue_find(network->blacklist, match_bss, bss))
+ 			continue;
+-- =
 
-> the secret data; it must be explicit_bzero() and then free(). This is =
+2.31.1
 
-> so critical and tedious that it should be a macro or something from =
-
-> libell. And those are just initial thoughts for the basic safety of =
-
-> the secret data.
->
-Also copies must be mlock()'d as well. Also minimize the number of =
-
-copies, due to all the overhead needed on each one.
-> Best regards,
-> -Joe
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
->
-
---===============2465110369425681184==--
+--===============1326202075333966265==--
 
