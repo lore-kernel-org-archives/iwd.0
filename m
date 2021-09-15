@@ -1,104 +1,270 @@
-Content-Type: multipart/mixed; boundary="===============0468171451758398811=="
+Content-Type: multipart/mixed; boundary="===============3993146780506812973=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Unable to build ELL with OpenSSL 3
-Date: Wed, 09 Mar 2022 10:04:33 -0800
-Message-ID: <c1597d43bd76de5df8d7db5e10721941e053f779.camel@gmail.com>
-In-Reply-To: CAKjfnjpsLZ+amJ4ywTP=bpKt-YmoBLqV4cppNJcSrQXmNGQ5Bg@mail.gmail.com
+Subject: [PATCH 13/13] auto-t: add testOWE-transition
+Date: Wed, 15 Sep 2021 10:36:24 -0700
+Message-ID: <20210915173624.11917-13-prestwoj@gmail.com>
+In-Reply-To: 20210915173624.11917-1-prestwoj@gmail.com
 
---===============0468171451758398811==
+--===============3993146780506812973==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+This adds several tests for OWE transition networks. Hostapd
+does have special options for these networks but currently their
+implementation is incorrect as the IE is not ever added to the
+OWE BSS. Besides that using vendor_elements provides a much easier
+way to create invalid IEs to test.
+---
+ .../testOWE-transition/connection_test.py     | 140 ++++++++++++++++++
+ autotests/testOWE-transition/hw.conf          |   8 +
+ autotests/testOWE-transition/main.conf        |   2 +
+ autotests/testOWE-transition/ssidOWE.conf     |  14 ++
+ autotests/testOWE-transition/ssidOpen.conf    |   8 +
+ autotests/testOWE-transition/transition.open  |   0
+ 6 files changed, 172 insertions(+)
+ create mode 100644 autotests/testOWE-transition/connection_test.py
+ create mode 100644 autotests/testOWE-transition/hw.conf
+ create mode 100644 autotests/testOWE-transition/main.conf
+ create mode 100644 autotests/testOWE-transition/ssidOWE.conf
+ create mode 100644 autotests/testOWE-transition/ssidOpen.conf
+ create mode 100644 autotests/testOWE-transition/transition.open
 
-On Wed, 2022-03-09 at 18:36 +0800, wen zhang wrote:
-> I tried to build ELL library on my system built following LFS 11.1,
-> but the make command failed. Adding V=3D1 to the make command show one
-> openssl command failed to finish.
-> > openssl pkcs8 -in unit/cert-client-key-pkcs8.pem -out unit/cert-
-> > client-key-pkcs8-v2-des.pem -topk8 -v2 des-cbc -v2prf hmacWithSHA1
-> > -passout pass:abc
-> > =
+diff --git a/autotests/testOWE-transition/connection_test.py b/autotests/te=
+stOWE-transition/connection_test.py
+new file mode 100644
+index 00000000..224fc5e6
+--- /dev/null
++++ b/autotests/testOWE-transition/connection_test.py
+@@ -0,0 +1,140 @@
++#!/usr/bin/python3
++
++import unittest
++import sys
++
++sys.path.append('../util')
++import iwd
++from iwd import IWD
++from iwd import NetworkType
++from hostapd import HostapdCLI
++import testutil
++
++class Test(unittest.TestCase):
++
++    def validate(self, wd, target, autoconnect=3DFalse, connect_hidden=3DF=
+alse):
++        devices =3D wd.list_devices(1)
++        device =3D devices[0]
++        device.autoconnect =3D autoconnect
++
++        if not autoconnect:
++            if not connect_hidden:
++                condition =3D 'not obj.scanning'
++                wd.wait_for_object_condition(device, condition)
++
++                device.scan()
++
++                condition =3D 'obj.scanning'
++                wd.wait_for_object_condition(device, condition)
++
++                condition =3D 'not obj.scanning'
++                wd.wait_for_object_condition(device, condition)
++
++                network =3D device.get_ordered_network('transition', scan_=
+if_needed=3DFalse)
++
++                network.network_object.connect()
++            else:
++                device.connect_hidden_network('owe-hidden')
++
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
++
++        testutil.test_iface_operstate()
++        testutil.test_ifaces_connected(device.name, target.ifname)
++
++        self.assertIn(device.address, target.list_sta())
++
++        device.disconnect()
++
++    # Normal success case
++    def test_owe_transition(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++        self.validate(self.wd, self.hapd_owe)
++
++    # Normal success autoconnect case
++    def test_owe_transition_autoconnect(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++        IWD.copy_to_storage('transition.open')
++
++        self.validate(self.wd, self.hapd_owe, autoconnect=3DTrue)
++
++    # Open BSS has invalid BSSID in OWE transition element
++    # Expected connection to Open BSS
++    def test_owe_transition_invalid_open_bssid(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+f000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++
++        self.validate(self.wd, self.hapd_open)
++
++    # OWE BSS has invalid BSSID in OWE transition element
++    # Expected connection to Open BSS
++    def test_owe_transition_invalid_owe_bssid(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000ff=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++
++        self.validate(self.wd, self.hapd_open)
++
++    # No OWE hidden network exists
++    # Expected connection to Open BSS
++    def test_owe_transition_no_hidden_found(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.disable()
++
++        self.validate(self.wd, self.hapd_open)
++
++    # Directly connect to valid OWE hidden network
++    # Expected connection failure
++    def test_owe_transition_connect_hidden_valid(self):
++        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
+1000a6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.reload()
++
++        with self.assertRaises(iwd.NotFoundEx):
++            self.validate(self.wd, self.hapd_owe, connect_hidden=3DTrue)
++
++    # Directly connect to invalid OWE hidden network. The SSID in the OWE =
+BSS
++    # IE points to itself. And the Open BSS IE points to a non-existent SS=
+ID.
++    # Expected connection failure
++    def test_owe_transition_connect_hidden_invalid(self):
++        self.hapd_open.set_value('vendor_elements', 'dd18506f9a1c02000000f=
+1000d6e6f2d6f77652d68696464656e')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a6f77652d68696464656e')
++        self.hapd_owe.reload()
++
++        with self.assertRaises(iwd.NotFoundEx):
++            self.validate(self.wd, self.hapd_owe, connect_hidden=3DTrue)
++
++    def setUp(self):
++        self.wd =3D IWD(True)
++        self.hapd_owe =3D HostapdCLI(config=3D'ssidOWE.conf')
++        self.hapd_open =3D HostapdCLI(config=3D'ssidOpen.conf')
++
++    def tearDown(self):
++        IWD.clear_storage()
++
++        self.wd =3D None
++        self.hapd_open =3D None
++        self.hapd_owe =3D None
++
++    @classmethod
++    def setUpClass(cls):
++        pass
++
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
++
++if __name__ =3D=3D '__main__':
++    unittest.main(exit=3DTrue)
+diff --git a/autotests/testOWE-transition/hw.conf b/autotests/testOWE-trans=
+ition/hw.conf
+new file mode 100644
+index 00000000..b297f68d
+--- /dev/null
++++ b/autotests/testOWE-transition/hw.conf
+@@ -0,0 +1,8 @@
++[SETUP]
++num_radios=3D3
++hwsim_medium=3Dyes
++start_iwd=3D0
++
++[HOSTAPD]
++rad0=3DssidOpen.conf
++rad1=3DssidOWE.conf
+diff --git a/autotests/testOWE-transition/main.conf b/autotests/testOWE-tra=
+nsition/main.conf
+new file mode 100644
+index 00000000..9452fb6b
+--- /dev/null
++++ b/autotests/testOWE-transition/main.conf
+@@ -0,0 +1,2 @@
++[Scan]
++DisableMacAddressRandomization=3Dtrue
+diff --git a/autotests/testOWE-transition/ssidOWE.conf b/autotests/testOWE-=
+transition/ssidOWE.conf
+new file mode 100644
+index 00000000..c54309ae
+--- /dev/null
++++ b/autotests/testOWE-transition/ssidOWE.conf
+@@ -0,0 +1,14 @@
++ssid=3Dowe-hidden
++bssid=3D02:00:00:00:f1:00
++channel=3D1
++ignore_broadcast_ssid=3D1
++ieee80211w=3D1
++
++wpa=3D2
++wpa_key_mgmt=3DOWE
++rsn_pairwise=3DCCMP
++
++# You would conventionally use these options but hostapd does not include =
+an
++# IE for the OWE network, hence vendor_elements must be used directly
++#owe_transition_ssid=3D"transition"
++#owe_transition_bssid=3D02:00:00:00:f0:00
+diff --git a/autotests/testOWE-transition/ssidOpen.conf b/autotests/testOWE=
+-transition/ssidOpen.conf
+new file mode 100644
+index 00000000..4fc68430
+--- /dev/null
++++ b/autotests/testOWE-transition/ssidOpen.conf
+@@ -0,0 +1,8 @@
++channel=3D1
++ssid=3Dtransition
++bssid=3D02:00:00:00:f0:00
++
++# You would conventionally use these options but hostapd does not include =
+an
++# IE for the OWE network, hence vendor_elements must be used directly
++#owe_transition_ssid=3D"owe-hidden"
++#owe_transition_bssid=3D02:00:00:00:f1:00
+diff --git a/autotests/testOWE-transition/transition.open b/autotests/testO=
+WE-transition/transition.open
+new file mode 100644
+index 00000000..e69de29b
+-- =
 
-> =
+2.31.1
 
-> Maybe something need to migrate from OpenSSL 1 to OpenSSL 3? =
-
-
-So it appears DES was removed from OpenSSL3 as a built in module [1].
-I'm guessing there is some way to compile this in, but the
-documentation also mentions some runtime legacy provider. So I think
-you'll need to rebuild openssl with DES built in or figure out a way to
-enable this provider. I'm thinking we do want to support the default
-OpenSSL3 build at some point in the future, but I'm not sure if our
-build system can enable this feature automatically or not.=C2=A0
-
-One thing to note is that OpenSSL is only used to verify ELL's crypto
-APIs in unit testing. So this failure should not block you from using
-the ELL API or IWD. And for IWD specifically all the unit tests build
-with OpenSSL3 since none use DES.
-
-Also, there is a mailing list specific to ELL=C2=A0ell(a)lists.01.org.
-
-[1]=C2=A0https://wiki.openssl.org/index.php/OpenSSL_3.0#Providers
-
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
-
-
---===============0468171451758398811==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.htm"
-
-PGh0bWw+PGhlYWQ+PC9oZWFkPjxib2R5PjxkaXY+SGksPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRp
-dj5PbiBXZWQsIDIwMjItMDMtMDkgYXQgMTg6MzYgKzA4MDAsIHdlbiB6aGFuZyB3cm90ZTo8L2Rp
-dj48YmxvY2txdW90ZSB0eXBlPSJjaXRlIiBzdHlsZT0ibWFyZ2luOjAgMCAwIC44ZXg7IGJvcmRl
-ci1sZWZ0OjJweCAjNzI5ZmNmIHNvbGlkO3BhZGRpbmctbGVmdDoxZXgiPjxkaXYgZGlyPSJsdHIi
-PjxkaXY+SSB0cmllZCB0byBidWlsZCBFTEwgbGlicmFyeSBvbiBteSBzeXN0ZW0gYnVpbHQgZm9s
-bG93aW5nIDxhIGhyZWY9Imh0dHBzOi8vd3d3LmxpbnV4ZnJvbXNjcmF0Y2gub3JnL2xmcy92aWV3
-L3N0YWJsZS1zeXN0ZW1kLyI+TEZTIDExLjE8L2E+LCBidXQgdGhlIG1ha2UgY29tbWFuZCBmYWls
-ZWQuIEFkZGluZyBWPTEgdG8gdGhlIG1ha2UgY29tbWFuZCBzaG93IG9uZSBvcGVuc3NsIGNvbW1h
-bmQgZmFpbGVkIHRvIGZpbmlzaC48L2Rpdj48YmxvY2txdW90ZSB0eXBlPSJjaXRlIiBzdHlsZT0i
-bWFyZ2luOjAgMCAwIC44ZXg7IGJvcmRlci1sZWZ0OjJweCAjNzI5ZmNmIHNvbGlkO3BhZGRpbmct
-bGVmdDoxZXgiPjxkaXY+b3BlbnNzbCBwa2NzOCAtaW4gdW5pdC9jZXJ0LWNsaWVudC1rZXktcGtj
-czgucGVtIC1vdXQgdW5pdC9jZXJ0LWNsaWVudC1rZXktcGtjczgtdjItZGVzLnBlbSAtdG9wazgg
-LXYyIGRlcy1jYmMgLXYycHJmIGhtYWNXaXRoU0hBMSAtcGFzc291dCBwYXNzOmFiYzwvZGl2Pjxi
-cj48L2Jsb2NrcXVvdGU+PGRpdj5NYXliZSBzb21ldGhpbmcgbmVlZCB0byBtaWdyYXRlIGZyb20g
-T3BlblNTTCAxIHRvIE9wZW5TU0wgMz8gPGJyPjwvZGl2PjwvZGl2PjwvYmxvY2txdW90ZT48ZGl2
-Pjxicj48L2Rpdj48ZGl2PlNvIGl0IGFwcGVhcnMgREVTIHdhcyByZW1vdmVkIGZyb20gT3BlblNT
-TDMgYXMgYSBidWlsdCBpbiBtb2R1bGUgWzFdLiBJJ20gZ3Vlc3NpbmcgdGhlcmUgaXMgc29tZSB3
-YXkgdG8gY29tcGlsZSB0aGlzIGluLCBidXQgdGhlIGRvY3VtZW50YXRpb24gYWxzbyBtZW50aW9u
-cyBzb21lIHJ1bnRpbWUgbGVnYWN5IHByb3ZpZGVyLiBTbyBJIHRoaW5rIHlvdSdsbCBuZWVkIHRv
-IHJlYnVpbGQgb3BlbnNzbCB3aXRoIERFUyBidWlsdCBpbiBvciBmaWd1cmUgb3V0IGEgd2F5IHRv
-IGVuYWJsZSB0aGlzIHByb3ZpZGVyLiBJJ20gdGhpbmtpbmcgd2UgZG8gd2FudCB0byBzdXBwb3J0
-IHRoZSBkZWZhdWx0IE9wZW5TU0wzIGJ1aWxkIGF0IHNvbWUgcG9pbnQgaW4gdGhlIGZ1dHVyZSwg
-YnV0IEknbSBub3Qgc3VyZSBpZiBvdXIgYnVpbGQgc3lzdGVtIGNhbiBlbmFibGUgdGhpcyBmZWF0
-dXJlIGF1dG9tYXRpY2FsbHkgb3Igbm90LiZuYnNwOzwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+
-T25lIHRoaW5nIHRvIG5vdGUgaXMgdGhhdCBPcGVuU1NMIGlzIG9ubHkgdXNlZCB0byB2ZXJpZnkg
-RUxMJ3MgY3J5cHRvIEFQSXMgaW4gdW5pdCB0ZXN0aW5nLiBTbyB0aGlzIGZhaWx1cmUgc2hvdWxk
-IG5vdCBibG9jayB5b3UgZnJvbSB1c2luZyB0aGUgRUxMIEFQSSBvciBJV0QuIEFuZCBmb3IgSVdE
-IHNwZWNpZmljYWxseSBhbGwgdGhlIHVuaXQgdGVzdHMgYnVpbGQgd2l0aCBPcGVuU1NMMyBzaW5j
-ZSBub25lIHVzZSBERVMuPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5BbHNvLCB0aGVyZSBpcyBh
-IG1haWxpbmcgbGlzdCBzcGVjaWZpYyB0byBFTEwmbmJzcDs8YSBocmVmPSJtYWlsdG86ZWxsQGxp
-c3RzLjAxLm9yZyIgdGl0bGU9IkNsaWNrIHRvIG1haWwgZWxsQGxpc3RzLjAxLm9yZyIgc3R5bGU9
-IndoaXRlLXNwYWNlOiBub3dyYXA7Ij5lbGxAbGlzdHMuMDEub3JnLjwvYT48L2Rpdj48ZGl2Pjxi
-cj48L2Rpdj48ZGl2PlsxXSZuYnNwOzxhIGhyZWY9Imh0dHBzOi8vd2lraS5vcGVuc3NsLm9yZy9p
-bmRleC5waHAvT3BlblNTTF8zLjAjUHJvdmlkZXJzIj5odHRwczovL3dpa2kub3BlbnNzbC5vcmcv
-aW5kZXgucGhwL09wZW5TU0xfMy4wI1Byb3ZpZGVyczwvYT48L2Rpdj48ZGl2Pjxicj48L2Rpdj48
-YmxvY2txdW90ZSB0eXBlPSJjaXRlIiBzdHlsZT0ibWFyZ2luOjAgMCAwIC44ZXg7IGJvcmRlci1s
-ZWZ0OjJweCAjNzI5ZmNmIHNvbGlkO3BhZGRpbmctbGVmdDoxZXgiPjxkaXY+X19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX188YnI+PC9kaXY+PGRpdj5pd2QgbWFp
-bGluZyBsaXN0IC0tIDxhIGhyZWY9Im1haWx0bzppd2RAbGlzdHMuMDEub3JnIj5pd2RAbGlzdHMu
-MDEub3JnPC9hPjxicj48L2Rpdj48ZGl2PlRvIHVuc3Vic2NyaWJlIHNlbmQgYW4gZW1haWwgdG8g
-PGEgaHJlZj0ibWFpbHRvOml3ZC1sZWF2ZUBsaXN0cy4wMS5vcmciPml3ZC1sZWF2ZUBsaXN0cy4w
-MS5vcmc8L2E+PGJyPjwvZGl2PjwvYmxvY2txdW90ZT48ZGl2Pjxicj48L2Rpdj48ZGl2PjxzcGFu
-Pjwvc3Bhbj48L2Rpdj48L2JvZHk+PC9odG1sPgo=
-
---===============0468171451758398811==--
+--===============3993146780506812973==--
 
