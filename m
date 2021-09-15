@@ -1,40 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============7119943481901219261=="
+Content-Type: multipart/mixed; boundary="===============3482755343132335546=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 06/12] frame-xchg: set allow multicast flag
-Date: Tue, 18 Jan 2022 13:25:06 -0800
-Message-ID: <20220118212512.2017977-6-prestwoj@gmail.com>
-In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
+Subject: [PATCH 03/13] scan: keep track of OWE Transition element
+Date: Wed, 15 Sep 2021 10:36:14 -0700
+Message-ID: <20210915173624.11917-3-prestwoj@gmail.com>
+In-Reply-To: 20210915173624.11917-1-prestwoj@gmail.com
 
---===============7119943481901219261==
+--===============3482755343132335546==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Receiving multicast frames is required by DPP
 ---
- src/frame-xchg.c | 1 +
- 1 file changed, 1 insertion(+)
+ src/scan.c | 6 ++++++
+ src/scan.h | 2 ++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/src/frame-xchg.c b/src/frame-xchg.c
-index 5ba36081..95c030d8 100644
---- a/src/frame-xchg.c
-+++ b/src/frame-xchg.c
-@@ -611,6 +611,7 @@ bool frame_watch_add(uint64_t wdev_id, uint32_t group_i=
-d, uint16_t frame_type,
+diff --git a/src/scan.c b/src/scan.c
+index cdc14dbd..5e31c308 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -936,6 +936,12 @@ static void scan_parse_vendor_specific(struct scan_bss=
+ *bss, const void *data,
+ 		return;
+ 	}
  =
 
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &wdev_id);
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_TYPE, 2, &frame_type);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_RECEIVE_MULTICAST, 0, NULL);
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_MATCH,
- 				prefix_len, prefix);
- =
-
++	if (is_ie_wfa_ie(data, len, IE_WFA_OI_OWE_TRANSITION)) {
++		ie_parse_owe_transition(data - 2, len + 2, bss->owe_trans_bssid,
++					bss->owe_trans_ssid);
++		return;
++	}
++
+ 	if (!ie_parse_network_cost(data, len, &cost_level, &cost_flags)) {
+ 		bss->cost_level =3D cost_level;
+ 		bss->cost_flags =3D cost_flags;
+diff --git a/src/scan.h b/src/scan.h
+index be8912e6..23de472b 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -76,6 +76,8 @@ struct scan_bss {
+ 	uint64_t parent_tsf;
+ 	uint8_t *wfd;		/* Concatenated WFD IEs */
+ 	ssize_t wfd_size;	/* Size of Concatenated WFD IEs */
++	char owe_trans_ssid[33];
++	uint8_t owe_trans_bssid[6];
+ 	bool mde_present : 1;
+ 	bool cc_present : 1;
+ 	bool cap_rm_neighbor_report : 1;
 -- =
 
 2.31.1
 
---===============7119943481901219261==--
+--===============3482755343132335546==--
 
