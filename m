@@ -1,101 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============0106011424072926962=="
+Content-Type: multipart/mixed; boundary="===============7948058603822968858=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 8/9] ft: make Authenticate OCVC settable by caller
-Date: Tue, 28 Sep 2021 08:46:57 -0700
-Message-ID: <20210928154658.2382597-8-prestwoj@gmail.com>
-In-Reply-To: 20210928154658.2382597-1-prestwoj@gmail.com
+Subject: [PATCH v2 4/7] network: fix pending hidden OWE scan logic
+Date: Wed, 15 Sep 2021 16:05:45 -0700
+Message-ID: <20210915230548.179425-4-prestwoj@gmail.com>
+In-Reply-To: 20210915230548.179425-1-prestwoj@gmail.com
 
---===============0106011424072926962==
+--===============7948058603822968858==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The FT-over-DS action stage builds an FT-Request which contains an
-RSNE. Since FT-over-DS will not support OCV add a boolean to
-ft_build_authenticate_ies so the OCVC bit can be disabled rather
-than relying on the handshake setting.
+This was actually broken if triggered because __network_connect
+checks if network->connect_after_owe_hidden is set and returns
+already in progress. We want to keep this behavior though for
+obvious reasons.
+
+To fix this station_connect_network can be called directly which
+bypasses the check. This is essentially how ANQP avoids this
+problem as well.
 ---
- src/ft.c     | 6 ++++--
- src/ft.h     | 2 +-
- src/netdev.c | 4 +++-
- 3 files changed, 8 insertions(+), 4 deletions(-)
+ src/network.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/src/ft.c b/src/ft.c
-index 40e29341..9c5bc8b0 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -805,7 +805,7 @@ static bool ft_over_ds_start(struct auth_proto *ap)
- 	return ft_tx_reassociate(ft) =3D=3D 0;
- }
+diff --git a/src/network.c b/src/network.c
+index 48314a05..4768b872 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1955,11 +1955,9 @@ static void event_watch_changed(enum station_event s=
+tate,
+ 		if (!network->connect_after_owe_hidden)
+ 			return;
  =
 
--bool ft_build_authenticate_ies(struct handshake_state *hs,
-+bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
- 				const uint8_t *new_snonce, uint8_t *buf,
- 				size_t *len)
- {
-@@ -834,6 +834,7 @@ bool ft_build_authenticate_ies(struct handshake_state *=
-hs,
+-		reply =3D __network_connect(network,
++		station_connect_network(network->station, network,
+ 					network_bss_select(network, true),
+ 					network->connect_after_owe_hidden);
+-		if (reply)
+-			l_dbus_send(dbus_get_bus(), reply);
  =
 
- 		rsn_info.num_pmkids =3D 1;
- 		rsn_info.pmkids =3D hs->pmk_r0_name;
-+		rsn_info.ocvc =3D ocvc;
- =
-
- 		ie_build_rsne(&rsn_info, ptr);
- 		ptr +=3D ptr[1] + 2;
-@@ -884,7 +885,8 @@ static bool ft_start(struct auth_proto *ap)
- 	uint8_t buf[512];
- 	size_t len;
- =
-
--	if (!ft_build_authenticate_ies(hs, hs->snonce, buf, &len))
-+	if (!ft_build_authenticate_ies(hs, hs->supplicant_ocvc, hs->snonce,
-+					buf, &len))
- 		return false;
- =
-
- 	iov.iov_base =3D buf;
-diff --git a/src/ft.h b/src/ft.h
-index cc25463f..a2fa8946 100644
---- a/src/ft.h
-+++ b/src/ft.h
-@@ -44,7 +44,7 @@ struct ft_ds_info {
- =
-
- void ft_ds_info_free(struct ft_ds_info *info);
- =
-
--bool ft_build_authenticate_ies(struct handshake_state *hs,
-+bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
- 				const uint8_t *new_snonce, uint8_t *buf,
- 				size_t *len);
- =
-
-diff --git a/src/netdev.c b/src/netdev.c
-index a0669173..53a0a184 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4402,7 +4402,9 @@ int netdev_fast_transition_over_ds_action(struct netd=
-ev *netdev,
- 	iovs[0].iov_base =3D ft_req;
- 	iovs[0].iov_len =3D sizeof(ft_req);
- =
-
--	if (!ft_build_authenticate_ies(hs, info->super.snonce, buf, &len))
-+
-+	if (!ft_build_authenticate_ies(hs, false, info->super.snonce,
-+						buf, &len))
- 		goto failed;
- =
-
- 	iovs[1].iov_base =3D buf;
+ 		l_dbus_message_unref(network->connect_after_owe_hidden);
+ 		network->connect_after_owe_hidden =3D NULL;
 -- =
 
 2.31.1
 
---===============0106011424072926962==--
+--===============7948058603822968858==--
 
