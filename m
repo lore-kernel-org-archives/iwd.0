@@ -1,44 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============4523069164404659467=="
+Content-Type: multipart/mixed; boundary="===============0783740757135034871=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: [PATCH 5/5] auto-t: fix testRSSIAgent after signal agent changes
-Date: Wed, 25 May 2022 12:23:28 -0700
-Message-ID: <20220525192328.335557-5-prestwoj@gmail.com>
-In-Reply-To: 20220525192328.335557-1-prestwoj@gmail.com
+Subject: [PATCH] netconfig: Remove usage of in6_addr.__in6_u
+Date: Thu, 16 Sep 2021 01:58:29 +0200
+Message-ID: <20210915235829.536670-1-andrew.zaborowski@intel.com>
 
---===============4523069164404659467==
+--===============0783740757135034871==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The signal agent notifications were changed which breaks this test.
-Specifically commit ce227e7b94 sends a notification when connected
-which breaks the 'agent.calls' check. Since this check is done both
-after connecting and once already connected the initial value may
-be 1 or 0. Because of this that check was removed entirely.
+in6_addr.__in6_u.__u6_addr8 is glibc-specific and named differently in
+the headers shipped with musl libc for example.  The POSIX compliant and
+universal way of accessing it is in6_addr.s6_addr.
 ---
- autotests/testRSSIAgent/connection_test.py | 1 -
- 1 file changed, 1 deletion(-)
+ src/netconfig.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/autotests/testRSSIAgent/connection_test.py b/autotests/testRSS=
-IAgent/connection_test.py
-index 160a17b3..4ffa3d2c 100644
---- a/autotests/testRSSIAgent/connection_test.py
-+++ b/autotests/testRSSIAgent/connection_test.py
-@@ -56,7 +56,6 @@ class Test(unittest.TestCase):
-             # at least) uses a moving-window average value over the last R=
-SSI
-             # measurements received from the driver and it changes gradual=
-ly.
-             # Normally 1 second is enough.
--            self.assertEqual(agent.calls, 0)
-             for centre, level in rssi_pairs:
-                 rule.signal =3D centre
-                 agent.level =3D -1
+diff --git a/src/netconfig.c b/src/netconfig.c
+index ce95db0b..421270c9 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -171,7 +171,7 @@ static inline char *netconfig_ipv6_to_string(const uint=
+8_t *addr)
+ 	struct in6_addr in6_addr;
+ 	char *addr_str =3D l_malloc(INET6_ADDRSTRLEN);
+ =
+
+-	memcpy(in6_addr.__in6_u.__u6_addr8, addr, 16);
++	memcpy(in6_addr.s6_addr, addr, 16);
+ =
+
+ 	if (L_WARN_ON(unlikely(!inet_ntop(AF_INET6, &in6_addr, addr_str,
+ 						INET6_ADDRSTRLEN)))) {
 -- =
 
-2.34.1
+2.30.2
 
---===============4523069164404659467==--
+--===============0783740757135034871==--
 
