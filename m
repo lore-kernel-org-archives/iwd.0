@@ -1,76 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============5096447621180285567=="
+Content-Type: multipart/mixed; boundary="===============3985387184331867544=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459 at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: DHCP renewal stops after disconnect
-Date: Mon, 16 May 2022 10:38:34 +0100
-Message-ID: <CACsRnHVzAPXVDh2qSgGbpqo_yBAco+UHuehAZCouXbuVN7=zKQ@mail.gmail.com>
-In-Reply-To: CACsRnHV6tmVL0051RjrST91qy+YghS0ZSUzhBbr-tdxkr-cpMA@mail.gmail.com
+Subject: [PATCH v3 4/7] monitor: parse WFA OWE Transition IE
+Date: Thu, 16 Sep 2021 09:30:43 -0700
+Message-ID: <20210916163046.30817-4-prestwoj@gmail.com>
+In-Reply-To: 20210916163046.30817-1-prestwoj@gmail.com
 
---===============5096447621180285567==
+--===============3985387184331867544==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+---
+ monitor/nlmon.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-I ran this over the weekend and with the extra logging I can see that
-ACD error is "Bad file descriptor". I captured some additional fd info
-while iwd was running in the bad state and it looks like timers are
-being leaked somewhere.
+v3:
+ * Print SSIDs that are non-utf8
 
-```
-May 14 03:29:00.008410 r2-19101 iwd[477]: [DHCPv4]
-announce_wait_timeout:189 Failed to send ACD announcement: Bad file
-descriptor
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 1a26f553..f705aa9c 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -1009,6 +1009,22 @@ static void print_ipv4(unsigned int level, const cha=
+r *label,
+ 			addr[0], addr[1], addr[2], addr[3]);
+ }
+ =
 
-$ cat /proc/477/limits
-Limit Soft Limit Hard Limit Units
-...
-Max open files 1024 524288 files
++static void print_ie_wfa_owe_transition(unsigned int level, const char *la=
+bel,
++						const void *data, uint16_t size)
++{
++	uint8_t bssid[6];
++	uint8_t ssid[32];
++	size_t ssid_len;
++
++	if (ie_parse_owe_transition(data, size, bssid, ssid, &ssid_len) < 0) {
++		print_attr(level + 1, "Error parsing");
++		return;
++	}
++
++	print_attr(level + 1, "BSSID: "MAC, MAC_STR(bssid));
++	print_attr(level + 1, "SSID: %s", util_ssid_to_utf8(ssid_len, ssid));
++}
++
+ static void print_ie_vendor(unsigned int level, const char *label,
+ 				const void *data, uint16_t size)
+ {
+@@ -1054,6 +1070,10 @@ static void print_ie_vendor(unsigned int level, cons=
+t char *label,
+ 		case 0x12:
+ 			print_ie_rsn_suites(level + 1, label, data, size);
+ 			return;
++		case 0x1c:
++			print_ie_wfa_owe_transition(level + 1, label,
++							data - 6, size + 6);
++			return;
+ 		default:
+ 			return;
+ 		}
+-- =
 
-$ sudo lsof -a -p 477
-...
-iwd 477 root 1020u a_inode 0,13 0 13445 [timerfd]
-iwd 477 root 1021u a_inode 0,13 0 13445 [timerfd]
-iwd 477 root 1022u a_inode 0,13 0 13445 [timerfd]
-iwd 477 root 1023u a_inode 0,13 0 13445 [timerfd]
-```
+2.31.1
 
-https://pastebin.com/BHYVTSXT
-
-Regards,
-Michael
-
-On Fri, 13 May 2022 at 12:27, Michael Johnson <mjohnson459(a)gmail.com> wro=
-te:
->
-> Hi Denis,
->
-> I've updated some of the clients in my test environment to use your
-> latest ell debug logging patch and I'll let you know what error I see.
->
-> On Thu, 12 May 2022 at 18:50, Denis Kenzior <denkenz(a)gmail.com> wrote:
-> > > May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] announce_wait_timeout:187
-> > > Failed to send ACD announcement
-> > > ```
-> >
-> > Yes, I saw that.  Looking at the code, we should fail to start acd if w=
-e're
-> > running out of fds and this logic wouldn't be triggered...
->
-> I'm not sure this is related but I notice that in normal logging there
-> are never any retries of this method as this is never printed:
-> ```
-> announce_wait_timeout: ACD_DEBUG("Done announcing");
-> ```
-> which makes sense as the timeout object is NULL when "skip_probes" is tru=
-e.
-> ```
-> l_acd_start: announce_wait_timeout(NULL, acd);
-> ```
->
-> Regards,
-> Michael
---===============5096447621180285567==--
+--===============3985387184331867544==--
 
