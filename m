@@ -1,173 +1,127 @@
-Content-Type: multipart/mixed; boundary="===============2612754581279970858=="
+Content-Type: multipart/mixed; boundary="===============6693327456898183729=="
 MIME-Version: 1.0
-From: =?utf-8?q?=C3=89rico_Nogueira_=3Cericonr_at_disroot=2Eorg=3E?=
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] Enable DBus activation on non-systemd systems.
-Date: Sat, 13 Nov 2021 03:03:56 -0300
-Message-ID: <CFOFAY8M0DOT.XA6PQ5U1AUOG@mussels>
-In-Reply-To: YY6OmlGcmTszos5h@hindley.org.uk
+Subject: [PATCH v3 2/7] scan: allow non-utf8 SSIDs to be scanned for
+Date: Thu, 16 Sep 2021 09:30:41 -0700
+Message-ID: <20210916163046.30817-2-prestwoj@gmail.com>
+In-Reply-To: 20210916163046.30817-1-prestwoj@gmail.com
 
---===============2612754581279970858==
+--===============6693327456898183729==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri Nov 12, 2021 at 12:56 PM -03, Mark Hindley wrote:
-> Marcel,
->
-> Thanks
->
-> On Fri, Nov 12, 2021 at 03:57:59PM +0100, Marcel Holtmann wrote:
-> > > --- a/client/dbus-proxy.c
-> > > +++ b/client/dbus-proxy.c
-> > > @@ -855,13 +855,12 @@ bool dbus_proxy_init(void)
-> > > 	l_dbus_set_disconnect_handler(dbus, dbus_disconnect_callback, NULL,
-> > > 									NULL);
-> > > =
+IWD has restricted SSIDs to only utf8 so they can be displayed but
+with the addition of OWE transition networks this is an unneeded
+restriction (for these networks). The SSID of an OWE transition
+network is never displayed to the user so limiting to utf8 isn't
+required.
 
-> > > +	get_managed_objects();
-> > > 	if (command_is_interactive_mode())
-> > > 		l_dbus_add_service_watch(dbus, IWD_SERVICE,
-> > > 						service_appeared_callback,
-> > > 						service_disappeared_callback,
-> > > 						NULL, NULL);
-> > > -	else
-> > > -		get_managed_objects();
-> > =
+Allow non-utf8 SSIDs to be scanned for by including the length in
+the scan parameters and not relying on strlen().
+---
+ src/p2p.c     |  6 ++++--
+ src/scan.c    |  2 +-
+ src/scan.h    |  3 ++-
+ src/station.c | 10 +++++++---
+ 4 files changed, 14 insertions(+), 7 deletions(-)
 
-> > I don=E2=80=99t understand this change. The whole point is to actually =
-wait for the
-> > service to appear.
->
-> Yes, but it is a chicken and egg situation: plain DBus activation relies
-> on the
-> first call on the bus to trigger the activation[1]. The call at the end
-> of
-> service_appeared_callback() is never going to be reached as interactive
-> iwct is
-> just waiting having called service_disappeared_callback().
->
-> > =
+diff --git a/src/p2p.c b/src/p2p.c
+index 3328271b..3bfb771a 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -1980,7 +1980,8 @@ static void p2p_provision_scan_start(struct p2p_devic=
+e *dev)
+ =
 
-> > > =
+ 	params.flush =3D true;
+ 	params.no_cck_rates =3D true;
+-	params.ssid =3D dev->go_group_id.ssid;
++	params.ssid =3D (const uint8_t *)dev->go_group_id.ssid;
++	params.ssid_len =3D strlen(dev->go_group_id.ssid);
+ 	params.extra_ie =3D p2p_build_scan_ies(dev, buf, sizeof(buf),
+ 						&params.extra_ie_size);
+ 	L_WARN_ON(!params.extra_ie);
+@@ -3783,7 +3784,8 @@ static bool p2p_device_scan_start(struct p2p_device *=
+dev)
+ 	L_WARN_ON(!params.extra_ie);
+ 	params.flush =3D true;
+ 	/* P2P Wildcard SSID because we don't need legacy networks to reply */
+-	params.ssid =3D "DIRECT-";
++	params.ssid =3D (const uint8_t *)"DIRECT-";
++	params.ssid_len =3D strlen("DIRECT-");
+ 	/*
+ 	 * Must send probe requests at 6Mb/s, OFDM only.  The no-CCK rates
+ 	 * flag forces the drivers to do exactly this for 2.4GHz frames.
+diff --git a/src/scan.c b/src/scan.c
+index cdc14dbd..1224e18b 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -542,7 +542,7 @@ static void scan_cmds_add(struct l_queue *cmds, struct =
+scan_context *sc,
+ 	if (params->ssid) {
+ 		/* direct probe request scan */
+ 		l_genl_msg_append_attr(cmd, NL80211_ATTR_SSID,
+-					strlen(params->ssid), params->ssid);
++					params->ssid_len, params->ssid);
+ 		l_genl_msg_leave_nested(cmd);
+ =
 
-> > > 	return true;
-> > > }
-> > > diff --git a/src/main.c b/src/main.c
-> > > index 989665e4..8e3a5ca7 100644
-> > > --- a/src/main.c
-> > > +++ b/src/main.c
-> > > @@ -191,9 +191,6 @@ static void request_name_callback(struct l_dbus *=
-dbus, bool success,
-> > > 		goto fail_exit;
-> > > 	}
-> > > =
+ 		l_queue_push_tail(cmds, cmd);
+diff --git a/src/scan.h b/src/scan.h
+index be8912e6..aa3974df 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -97,7 +97,8 @@ struct scan_parameters {
+ 	bool randomize_mac_addr_hint : 1;
+ 	bool no_cck_rates : 1;
+ 	bool duration_mandatory : 1;
+-	const char *ssid;	/* Used for direct probe request */
++	const uint8_t *ssid;	/* Used for direct probe request */
++	size_t ssid_len;
+ 	const uint8_t *source_mac;
+ };
+ =
 
-> > > -	if (!l_dbus_object_manager_enable(dbus, "/"))
-> > > -		l_warn("Unable to register the ObjectManager");
-> > > -
-> > > 	if (!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
-> > > 						IWD_DAEMON_INTERFACE,
-> > > 						NULL) ||
-> > > @@ -240,6 +237,9 @@ static void dbus_ready(void *user_data)
-> > > {
-> > > 	struct l_dbus *dbus =3D user_data;
-> > > =
+diff --git a/src/station.c b/src/station.c
+index 6de5fd4a..2bd9ecfe 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2009,9 +2009,12 @@ static int station_roam_scan(struct station *station,
+ =
 
-> > > +	if (!l_dbus_object_manager_enable(dbus, "/"))
-> > > +		l_warn("Unable to register the ObjectManager");
-> > > +
-> > =
+ 	l_debug("ifindex: %u", netdev_get_ifindex(station->netdev));
+ =
 
-> > This change is unclear to me. Why would I register the ObjectManager if=
- I
-> > can=E2=80=99t acquire the name. I don=E2=80=99t get how this is suppose=
- to work. =
+-	if (station->connected_network)
++	if (station->connected_network) {
++		const char *ssid =3D network_get_ssid(station->connected_network);
+ 		/* Use direct probe request */
+-		params.ssid =3D network_get_ssid(station->connected_network);
++		params.ssid =3D (const uint8_t *)ssid;
++		params.ssid_len =3D strlen(ssid);
++	}
+ =
 
->
-> Without this change, once the name is acquired, dbus still fails to find
-> the
-> ObjectManager path as it hasn't (yet) been enabled. So the first call to
-> get_managed_objects() fails if it was also the one that caused the
-> service
-> activation.
->
-> > This is the right thing to do.
->
-> I wondered about the order here too. I know that they are different
-> bindings and
-> that it is deprecated, so it may well not be the most convincing
-> argument, but
-> GDBus docs specify this requirement[2] and use it in their examples[3]
-> where
-> object paths are registered on bus acquisition rather than name
-> acquisition.
->
-> > =
+ 	if (!freq_set)
+ 		station->roam_scan_full =3D true;
+@@ -2916,7 +2919,8 @@ static struct l_dbus_message *station_dbus_connect_hi=
+dden_network(
+ 		return dbus_error_not_hidden(message);
+ 	}
+ =
 
-> > > 	l_dbus_name_acquire(dbus, "net.connman.iwd", false, false, false,
-> > > 				request_name_callback, NULL);
-> > > =
+-	params.ssid =3D ssid;
++	params.ssid =3D (const uint8_t *)ssid;
++	params.ssid_len =3D strlen(ssid);
+ =
 
-> > > diff --git a/src/net.connman.iwd.service b/src/net.connman.iwd.servic=
-e.in
-> > > similarity index 77%
-> > > rename from src/net.connman.iwd.service
-> > > rename to src/net.connman.iwd.service.in
-> > > index d8ece4c3..a7cb7edd 100644
-> > > --- a/src/net.connman.iwd.service
-> > > +++ b/src/net.connman.iwd.service.in
-> > > @@ -1,5 +1,5 @@
-> > > [D-BUS Service]
-> > > Name=3Dnet.connman.iwd
-> > > -Exec=3D/bin/false
-> > > +Exec=3D@libexecdir@/iwd
-> > > User=3Droot
-> > > SystemdService=3Diwd.service
-> > =
+ 	/* HW cannot randomize our MAC if connected */
+ 	if (!station->connected_bss)
+-- =
 
-> > This change is not for upstream git tree. Use --disable-systemd-service=
- and
-> > then provide your own files in the distro packaging.
->
-> But this isn't about distro specific packaging, I think it is a setup
-> that works
-> both with systemd or without it. Debian has both systemd and several
-> other inits
-> available so building with --disabled-systemd-service is not an option.
+2.31.1
 
-For things like IWD, I feel DBus activation is definitely the wrong
-path. It should be a system service of some sort, so it can connect to a
-network without first being queried by a user manually, and it shouldn't
-be activated automatically. For example, in case a user accidentally
-launches iwctl when wpa_supplicant was in use instead, for whatever
-reason.
-
-You can find the service file we use in Void Linux for IWD in [1]; it
-should be compatible with any daemontools-like service manager.
-
-[1] https://github.com/void-linux/void-packages/blob/7ba71aeed459e57f2c12cd=
-6e4d1779297ee17550/srcpkgs/iwd/files/iwd/run
-
->
-> Thanks
->
-> Mark
->
-> [1]
-> https://dbus.freedesktop.org/doc/dbus-specification.html#message-bus-star=
-ting-services
->
-> [2]
-> https://www.freedesktop.org/software/gstreamer-sdk/data/docs/latest/gio/c=
-h30s03.html
->
-> [3]
-> https://gitlab.gnome.org/GNOME/glib/-/blob/HEAD/gio/tests/gdbus-example-s=
-erver.c
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
-
---===============2612754581279970858==--
+--===============6693327456898183729==--
 
