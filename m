@@ -1,43 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============0285709602314879401=="
+Content-Type: multipart/mixed; boundary="===============1732877698921600129=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459 at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 2/2] docs: Show new usage of IWD_DHCP_DEBUG
-Date: Wed, 18 May 2022 15:39:15 +0100
-Message-ID: <20220518143915.105007-2-mjohnson459@gmail.com>
-In-Reply-To: 20220518143915.105007-1-mjohnson459@gmail.com
+Subject: [PATCH v7 4/5] network: prefer OWE transition BSS over open
+Date: Fri, 17 Sep 2021 15:58:39 -0700
+Message-ID: <20210917225840.26848-4-prestwoj@gmail.com>
+In-Reply-To: 20210917225840.26848-1-prestwoj@gmail.com
 
---===============0285709602314879401==
+--===============1732877698921600129==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+There isn't much control station has with how BSS's are inserted to
+a network object. The rank algorithm makes that decision. Because of
+this we could end up in a situation where the Open BSS is preferred
+over the OWE transition BSS.
+
+In attempt to better handle this any Open BSS in this type of network
+will not be chosen unless its the only candidate (e.g. no other BSSs,
+inability to connect with OWE, or an improperly configured network).
 ---
- src/iwd.debug.rst | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/network.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/src/iwd.debug.rst b/src/iwd.debug.rst
-index 5a805562..3d4c8b58 100644
---- a/src/iwd.debug.rst
-+++ b/src/iwd.debug.rst
-@@ -40,6 +40,10 @@ ENVIRONMENT
+diff --git a/src/network.c b/src/network.c
+index f7172c78..711fb296 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1110,6 +1110,11 @@ const struct l_queue_entry *network_bss_list_get_ent=
+ries(
+ 	return l_queue_get_entries(network->bss_list);
+ }
  =
 
- *$IWD_WSC_DEBUG_KEYS* set to ``1`` enables printing received WSC keys.
- =
-
-+The granularity of the DHCP logging can also be tailored by setting
-+*$IWD_DHCP_DEBUG* to the maximum verbosity level, "debug", "info", "warn",=
- or
-+"error".
++static bool bss_is_owe(struct scan_bss *bss)
++{
++	return !l_memeqzero(bss->owe_trans_bssid, 6) && bss->rsne;
++}
 +
- SEE ALSO
- =3D=3D=3D=3D=3D=3D=3D=3D
+ struct scan_bss *network_bss_select(struct network *network,
+ 						bool fallback_to_blacklist)
+ {
+@@ -1135,6 +1140,17 @@ struct scan_bss *network_bss_select(struct network *=
+network,
+ 		if (!candidate)
+ 			candidate =3D bss;
  =
 
++		/* OWE Transition BSS */
++		if (!l_memeqzero(bss->owe_trans_bssid, 6)) {
++			/* Don't want to connect to the Open BSS if possible */
++			if (!bss->rsne)
++				continue;
++
++			/* Candidate is not OWE, set this as new candidate */
++			if (!bss_is_owe(candidate))
++				candidate =3D bss;
++		}
++
+ 		/* check if temporarily blacklisted */
+ 		if (l_queue_find(network->blacklist, match_bss, bss))
+ 			continue;
 -- =
 
-2.25.1
+2.31.1
 
---===============0285709602314879401==--
+--===============1732877698921600129==--
 
