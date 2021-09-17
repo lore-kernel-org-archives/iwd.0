@@ -1,744 +1,1242 @@
-Content-Type: multipart/mixed; boundary="===============6221452230547072306=="
+Content-Type: multipart/mixed; boundary="===============0543592715789301743=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 2/3] json: introduce JSON module
-Date: Thu, 09 Dec 2021 11:10:34 -0800
-Message-ID: <c663f358b9de6518e67a1bad3fb073d59815b7f6.camel@gmail.com>
-In-Reply-To: aee2f4f1-5912-025f-0930-8d84420f416f@gmail.com
+Subject: [PATCH] netconfig: Add IP configuration properties on Station and P2P
+Date: Fri, 17 Sep 2021 12:18:22 +0200
+Message-ID: <20210917101822.556531-1-andrew.zaborowski@intel.com>
 
---===============6221452230547072306==
+--===============0543592715789301743==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2021-12-09 at 11:52 -0600, Denis Kenzior wrote:
-> Hi James,
-> =
-
-> On 12/8/21 3:36 PM, James Prestwood wrote:
-> > This is a minimal wrapper around jsmn.h to make things a bit easier
-> > for iterating through a JSON object.
-> > =
-
-> > An iterator can be created/destroyed with json_iter_{new,free} and
-> > values can be parsed from this iterator using json_iter_parse.
-> > =
-
-> =
-
-> Have you considered using an intermediate object to hold the bits
-> that need to =
-
-> be opaque?=C2=A0 That way json_iter objects could be public and held on
-> the stack. =
-
-> Would make things easier to use / simpler to implement.
-> =
-
-> So roughly:
-> =
-
-> struct json_contents;
-> =
-
-> struct json_iter {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct json_contents *con=
-tents;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int begin;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int end;
-> };
-
-This didn't feel consistent with any other iterators on cleanup:
-
-struct json_iter iter;
-
-json_iter_init(&iter, json, json_len);
-
-...
-
-json_iter_free(&iter);
-
-> =
-
-> also you could possibly track parent objects if needed.
-> =
-
-> > Arguments to json_iter_parse should use
-> > JSON_MANDATORY/JSON_OPTIONAL
-> > macros, and terminate the argument list with JSON_FLAG_INVALID.
-> > =
-
-> > The value pointer in the MANDATORY/OPTIONAL macros can be NULL, in
-> > which case the presence of the key/value is checked but no data is
-> > returned out.
-> > =
-
-> > Currently only JSON_STRING and JSON_OBJECT types are supported.
-> > String
-> > values should be of type struct iovec *, and objects should be of
-> =
-
-> Ok, I wonder if we could allocate the strings instead of having the
-> caller do this.
-
-Sure. Initially this was supposed to be a minimal wrapper and the
-allocation seemed like too much, but this has evolved :)
-
-> =
-
-> > type struct json_iter **. These nested objects can be parsed again
-> > using json_iter_parse and should not be freed (the original
-> > iterator
-> > keeps track of nested object iterators).
-> =
-
-> It would be nice if these were simply on the stack to cut down the
-> queue management.
-> =
-
-> > ---
-> > =C2=A0 Makefile.am |=C2=A0=C2=A0 1 +
-> > =C2=A0 src/json.c=C2=A0 | 222
-> > ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > =C2=A0 src/json.h=C2=A0 |=C2=A0 84 ++++++++++++++++++++
-> > =C2=A0 3 files changed, 307 insertions(+)
-> > =C2=A0 create mode 100644 src/json.c
-> > =C2=A0 create mode 100644 src/json.h
-> > =
-
-> > v2:
-> > =C2=A0 * Re-wrote to remove callback style parsing. Instead the expected
-> > values
-> > =C2=A0=C2=A0=C2=A0 are provided to the parser directly.
-> > =
-
-> > diff --git a/Makefile.am b/Makefile.am
-> > index 7fe4b5c3..1ae7e3c0 100644
-> > --- a/Makefile.am
-> > +++ b/Makefile.am
-> > @@ -249,6 +249,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h
-> > src/iwd.h src/missing.h \
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0src/sysfs.h src/sysfs.c \
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0src/offchannel.h
-> > src/offchannel.c \
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0src/dpp-util.h src/dpp-
-> > util.c \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0src/json.h src/json.c \
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0$(eap_sources) \
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0$(builtin_sources)
-> > =C2=A0 =
-
-> > diff --git a/src/json.c b/src/json.c
-> > new file mode 100644
-> > index 00000000..9f6c744f
-> > --- /dev/null
-> > +++ b/src/json.c
-> > @@ -0,0 +1,222 @@
-> > +/*
-> > + *
-> > + *=C2=A0 Wireless daemon for Linux
-> > + *
-> > + *=C2=A0 Copyright (C) 2013-2019=C2=A0 Intel Corporation. All rights
-> > reserved.
-> =
-
-> Please update this
-> =
-
-> > + *
-> > + *=C2=A0 This library is free software; you can redistribute it and/or
-> > + *=C2=A0 modify it under the terms of the GNU Lesser General Public
-> > + *=C2=A0 License as published by the Free Software Foundation; either
-> > + *=C2=A0 version 2.1 of the License, or (at your option) any later
-> > version.
-> > + *
-> > + *=C2=A0 This library is distributed in the hope that it will be
-> > useful,
-> > + *=C2=A0 but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + *=C2=A0 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 Se=
-e the
-> > GNU
-> > + *=C2=A0 Lesser General Public License for more details.
-> > + *
-> > + *=C2=A0 You should have received a copy of the GNU Lesser General
-> > Public
-> > + *=C2=A0 License along with this library; if not, write to the Free
-> > Software
-> > + *=C2=A0 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA=C2=
-=A0
-> > 02110-1301=C2=A0 USA
-> > + *
-> > + */
-> > +
-> > +#ifdef HAVE_CONFIG_H
-> > +#include <config.h>
-> > +#endif
-> > +
-> > +#include <errno.h>
-> > +
-> > +#include <ell/ell.h>
-> > +
-> > +#include "src/json.h"
-> > +
-> > +#include "shared/jsmn.h"
-> > +
-> > +/* Max number of tokens supported. Increase if larger objects are
-> > expected */
-> > +#define JSON_DEFAULT_TOKENS 30
-> > +
-> > +#define TOK_LEN(token) (token)->end - (token)->start
-> > +#define TOK_PTR(json, token) (void *)((json) + (token)->start)
-> > +
-> > +struct json_iter {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *json;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0size_t json_len;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0jsmntok_t *tokens;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int tokens_len;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0jsmn_parser *p;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct l_queue *children;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool root : 1;
-> > +};
-> > +
-> > +static struct json_iter *iter_recurse(struct json_iter *parent,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0jsmntok_t *object)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct json_iter *iter =3D l=
-_new(struct json_iter, 1);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->json =3D parent->json;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->json_len =3D parent->j=
-son_len;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->tokens =3D object;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->children =3D l_queue_n=
-ew();
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Since object->size only i=
-ndicates the number of keys in
-> > an object
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * we cannot easily calculat=
-e the number of tokens
-> > remaining (for this
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * object) since each object=
- may have nested objects. Set
-> > tokens_len to
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * the number of tokens rema=
-ining in the overall list after
-> > 'object'
-> =
-
-> This seems brittle.=C2=A0 Can we recursively count the number of tokens
-> for each child?
-
-So this is really only for bounds checking, which may not actually be
-requred as that comment below suggests. I think so long as we trust
-JSMN we can guarantee its parsed tokens will always contain key/value
-pairs. Still, a maximum bounds probably doesn't hurt. So yes we can
-limit the bounds of these recursive iterators to only the child object.
-
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->tokens_len =3D parent-=
->tokens_len -
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0((object - parent->tokens) %
-> > sizeof(jsmntok_t));
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_queue_push_head(parent->ch=
-ildren, iter);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return iter;
-> > +}
-> > +
-> > +struct json_iter *json_iter_new(const char *json, size_t json_len)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct json_iter *iter =3D l=
-_new(struct json_iter, 1);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->json =3D json;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->json_len =3D json_len;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->p =3D l_new(jsmn_parse=
-r, 1);
-> =
-
-> Do you need jsmn_init here?
-
-Yes, below.
-
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->tokens =3D l_new(jsmnt=
-ok_t, JSON_DEFAULT_TOKENS);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->root =3D true;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0jsmn_init(iter->p);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->tokens_len =3D jsmn_pa=
-rse(iter->p, iter->json, iter-
-> > >json_len,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0iter->tokens,
-> > JSON_DEFAULT_TOKENS);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (iter->tokens_len < 0) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0json_iter_free(iter);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0return NULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iter->children =3D l_queue_n=
-ew();
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return iter;
-> > +}
-> > +
-> > +static void json_iter_destroy(void *data)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct json_iter *iter =3D d=
-ata;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0json_iter_free(iter);
-> > +}
-> > +
-> > +void json_iter_free(struct json_iter *iter)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (iter->root) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0l_free(iter->p);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0l_free(iter->tokens);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_queue_destroy(iter->childr=
-en, json_iter_destroy);
-> =
-
-> You could do:
-> l_queue_destroy(iter->children,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(l_queue_destroy_func_t *=
-) json_iter_free);
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_free(iter);
-> > +}
-> > +
-> > +static jsmntok_t *next_key(struct json_iter *iter, jsmntok_t
-> > *current)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0jsmntok_t *value;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * In theory JSMN should pre=
-vent any of these bounds checks
-> > from failing
-> =
-
-> Not very reassuring :)
-
-This was more paranoia than anything.
-
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (current + 1 > iter->toke=
-ns + iter->tokens_len)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0return NULL;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0value =3D current + 1;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (value->size =3D=3D 0)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0return value + 1;
-> =
-
-> So value->size =3D=3D 0 implies a basic type?
-
-AFAIK any value that is not an object will have a size of zero, so this
-could include strings as well not just basic types.
-> =
-
-> > + > +=C2=A0=C2=A0=C2=A0for (i =3D 0; i < value->size; i++)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0value =3D next_key(iter, value);
-> =
-
-> So this should be recursively skipping tokens when value is non-
-> basic.=C2=A0 The =
-
-> naming is a bit confusing here
-> =
-
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return value;
-> =
-
-> Since you're returning 'value', but the reader expects a 'key'.
-
-Yes, some re-naming is in order. This is actually returning a key
-though, I just reused 'value' rather than a new variable. Something
-like 'token' or 'tmp' would be better. =
-
-
-> =
-
-> > +}
-> > +
-> > +/*
-> > + * Checks that the keys value (t + 1) is in bounds, the value type
-> > matches,
-> > + * key length matches, and key string match
-> > + */
-> > +#define TOKEN_MATCHES(iter, t, key, type) \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(t) + 1 < iter->tokens + ite=
-r->tokens_len && \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(jsmntype_t)(type) =3D=3D ((=
-t) + 1)->type && \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0TOK_LEN((t)) =3D=3D (int)str=
-len((key)) && \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0!memcmp(TOK_PTR((iter)->json=
-, (t)), (key), TOK_LEN((t)))
-> > +
-> > +bool json_iter_parse(struct json_iter *iter, ...)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0va_list va;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int num =3D iter->tokens->si=
-ze;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0jsmntok_t *next;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct iovec *sval;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct json_iter **oval;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Empty object {} */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (iter->tokens_len < 1)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0return false;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0va_start(va, iter);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (true) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0enum json_flag flag;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0char *key;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0enum json_type type;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0void *value;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0jsmntok_t *v =3D NULL;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0flag =3D va_arg(va, enum json_flag);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (flag =3D=3D JSON_FLAG_INVALID)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0key =3D va_arg(va, char *);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0type =3D va_arg(va, enum json_type);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0value =3D va_arg(va, void *);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0next =3D iter->tokens + 1;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/* Iterate over this objects keys */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0for (i =3D 0; i < num; i++) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (TO=
-KEN_MATCHES(iter, next, key, type)) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0v =3D next + 1;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> =
-
-> What if the key matches but the type doesn't?=C2=A0 Shouldn't we bail
-> early?
-
-Yep, I'll add some extra checks.
-
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0next =
-=3D next_key(iter, next);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!n=
-ext)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return false;
-> =
-
-> May not be as big of a deal in this particular case, but this
-> approach is =
-
-> side-effecting on failure.=C2=A0 You could parse the object part of the
-> way through, =
-
-> then fail to find a key and bail, but you may have assigned stuff
-> along the way.
-
-Yeah I could not think of a decent way to handle this without iterating
-twice (verification first, then assignment) since we lose reference to
-the previous set of arguments with each iteration.
-
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (flag =3D=3D JSON_FLAG_MANDATORY && !v)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return=
- false;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0switch (type) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case JSON_STRING:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!v=
-alue)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0continue;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0sval =
-=3D value;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0sval->=
-iov_base =3D v ? TOK_PTR(iter->json, v)
-> > : NULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0sval->=
-iov_len =3D v ? TOK_LEN(v) : 0;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case JSON_OBJECT:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!v=
-alue)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0continue;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0oval =
-=3D value;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*oval =
-=3D v ? iter_recurse(iter, v) : NULL;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0default:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return=
- false;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0va_end(va);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return true;
-> > +}
-> > diff --git a/src/json.h b/src/json.h
-> > new file mode 100644
-> > index 00000000..202445ee
-> > --- /dev/null
-> > +++ b/src/json.h
-> > @@ -0,0 +1,84 @@
-> > +/*
-> > + *
-> > + *=C2=A0 Wireless daemon for Linux
-> > + *
-> > + *=C2=A0 Copyright (C) 2021=C2=A0 Intel Corporation. All rights reserv=
-ed.
-> > + *
-> > + *=C2=A0 This library is free software; you can redistribute it and/or
-> > + *=C2=A0 modify it under the terms of the GNU Lesser General Public
-> > + *=C2=A0 License as published by the Free Software Foundation; either
-> > + *=C2=A0 version 2.1 of the License, or (at your option) any later
-> > version.
-> > + *
-> > + *=C2=A0 This library is distributed in the hope that it will be
-> > useful,
-> > + *=C2=A0 but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + *=C2=A0 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 Se=
-e the
-> > GNU
-> > + *=C2=A0 Lesser General Public License for more details.
-> > + *
-> > + *=C2=A0 You should have received a copy of the GNU Lesser General
-> > Public
-> > + *=C2=A0 License along with this library; if not, write to the Free
-> > Software
-> > + *=C2=A0 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA=C2=
-=A0
-> > 02110-1301=C2=A0 USA
-> > + *
-> > + */
-> > +
-> > +struct json_iter;
-> > +
-> > +/*
-> > + * Identical to JSMN types
-> > + */
-> > +enum json_type {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_UNDEFINED =3D 0,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_OBJECT =3D 1 << 0,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_ARRAY =3D 1 << 1,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_STRING =3D 1 << 2,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_PRIMITIVE =3D 1 << 3
-> > +};
-> > +
-> > +enum json_flag {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_FLAG_INVALID =3D 0,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_FLAG_MANDATORY =3D 1,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_FLAG_OPTIONAL =3D 2,
-> > +};
-> > +
-> > +#define JSON_MANDATORY(key, type, out) \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_FLAG_MANDATORY, (key), =
-(type), (out)
-> > +
-> > +#define JSON_OPTIONAL(key, type, out) \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_FLAG_OPTIONAL, (key), (=
-type), (out)
-> > +
-> > +#define JSON_STR_EQ(iov, s) \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0((iov)->iov_len =3D=3D strle=
-n((s)) && \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0!memcmp((iov)->iov_base, (s)=
-, (iov)->iov_len))
-> > +
-> > +#define JSON_TO_STR(iov) \
-> > +({ \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char *_tmp =3D l_malloc((iov=
-)->iov_len + 1); \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memcpy(_tmp, (iov)->iov_base=
-, (iov)->iov_len); \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_tmp[(iov)->iov_len] =3D '\0=
-'; \
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_tmp; \
-> > +})
-> > +
-> > +struct json_iter *json_iter_new(const char *json, size_t
-> > json_len);
-> > +void json_iter_free(struct json_iter *iter);
-> > +
-> > +/*
-> > + * Parse an arbitrary number of key/value pairs from a JSON
-> > iterator. Initially
-> > + * a new JSON iterator should be created with json_iter_new() and,
-> > when done,
-> > + * freed with json_iter_free. Nested objects are also parsed with
-> > this function
-> > + * but these iterators should not be freed and are tracked by the
-> > original
-> > + * iterator.
-> > + *
-> > + * Arguments should be specified using JSON_MANDATORY or
-> > JSON_OPTIONAL:
-> > + *
-> > + * r =3D json_iter_parse(iter, JSON_MANDATORY("mykey", JSON_STRING,
-> > &strvalue),
-> > + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0JSON_OPTIONAL("=
-optkey", JSON_STRING,
-> > &optvalue));
-> > + *
-> > + * String values should be of type struct iovec *
-> > + * Object values should be of type struct json_iter **
-> > + *
-> > + * No other types are supported at this time, and json_iter_parse
-> > will fail if
-> > + * other types are encountered.
-> > + *
-> > + * JSON_OPTIONAL string values will have a NULL/0 iov_base/iov_len
-> > if they were
-> > + * not found. JSON_OPTIONAL object value iterators will be NULL if
-> > not found.
-> > + */
-> > +bool json_iter_parse(struct json_iter *iter, ...);
-> =
-
-> Just a nit, but it is a bit clearer to start the '...' after either a
-> printf-style string or an argument that could carry the sentintel
-> value.=C2=A0 For =
-
-> example:
-> =
-
-> int nl80211_parse_attrs(struct l_genl_msg *msg, int tag, ...);
-> =
-
-> It isn't much, but gives just a bit extra context for how the API is
-> supposed to =
-
-> be used.=C2=A0 So in the case of json_iter_parse it would be enum
-> json_flag.
-> =
-
-> Though really, I wonder why json_iter_parse doesn't use the sequence
-> of:
-> =
-
-> (json_type, key, value, flags) ?
-
-Yeah this is fine, I can reorder them like this and add a new
-JSON_INVALID type to signal the end.
-
-> =
-
-> Regards,
-> -Denis
-
-
---===============6221452230547072306==--
+Add the IPv{4,6}Configuration D-Bus interfaces on the station and P2P
+objects that expose current netconfig values.  Access Point and P2P-GO
+are not handled yet.
+---
+ src/dbus.h      |   2 +
+ src/netconfig.c | 651 +++++++++++++++++++++++++++++++++++++++++++-----
+ src/netconfig.h |   2 +-
+ src/p2p.c       |   4 +-
+ src/station.c   |   8 +-
+ 5 files changed, 604 insertions(+), 63 deletions(-)
+
+diff --git a/src/dbus.h b/src/dbus.h
+index 7703b37f..a345f7ac 100644
+--- a/src/dbus.h
++++ b/src/dbus.h
+@@ -43,6 +43,8 @@
+ #define IWD_STATION_DIAGNOSTIC_INTERFACE "net.connman.iwd.StationDiagnosti=
+c"
+ #define IWD_AP_DIAGNOSTIC_INTERFACE "net.connman.iwd.AccessPointDiagnostic"
+ #define IWD_STATION_DEBUG_INTERFACE "net.connman.iwd.StationDebug"
++#define IWD_IPV4_CONFIG_INTERFACE "net.connman.iwd.IPv4Configuration"
++#define IWD_IPV6_CONFIG_INTERFACE "net.connman.iwd.IPv6Configuration"
+ =
+
+ #define IWD_BASE_PATH "/net/connman/iwd"
+ #define IWD_AGENT_MANAGER_PATH IWD_BASE_PATH
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 421270c9..a529fad4 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -49,6 +49,7 @@
+ #include "src/resolve.h"
+ #include "src/util.h"
+ #include "src/ie.h"
++#include "src/dbus.h"
+ #include "src/netconfig.h"
+ =
+
+ struct netconfig {
+@@ -58,14 +59,23 @@ struct netconfig {
+ 	uint8_t rtm_protocol;
+ 	uint8_t rtm_v6_protocol;
+ 	struct l_rtnl_address *v4_address;
++	struct l_rtnl_address *v6_address;
+ 	char **dns4_overrides;
+ 	char **dns6_overrides;
++	char **dns4_list;
++	char **dns6_list;
+ 	struct ie_fils_ip_addr_response_info *fils_override;
++	char *v4_gateway_str;
++	char *v6_gateway_str;
++	char *v4_domain;
++	char **v6_domains;
+ =
+
+ 	const struct l_settings *active_settings;
+ =
+
+ 	netconfig_notify_func_t notify;
+ 	void *user_data;
++	bool v4_configured;
++	bool v6_configured;
+ =
+
+ 	struct resolve *resolve;
+ =
+
+@@ -74,6 +84,13 @@ struct netconfig {
+ 	uint32_t addr4_add_cmd_id;
+ 	uint32_t addr6_add_cmd_id;
+ 	uint32_t route4_add_gateway_cmd_id;
++	uint32_t route6_add_cmd_id;
++
++	char *dbus_path;
++	struct interface_data {
++		bool is_ipv4;
++		struct netconfig *netconfig;
++	} v4_data, v6_data;
+ };
+ =
+
+ static struct l_netlink *rtnl;
+@@ -132,6 +149,7 @@ static void netconfig_free(void *data)
+ 	l_dhcp_client_destroy(netconfig->dhcp_client);
+ 	l_dhcp6_client_destroy(netconfig->dhcp6_client);
+ =
+
++	l_free(netconfig->dbus_path);
+ 	l_free(netconfig);
+ }
+ =
+
+@@ -257,6 +275,18 @@ static void netconfig_set_neighbor_entry_cb(int error,
+ 			strerror(-error), error);
+ }
+ =
+
++static bool netconfig_strv_eq(char *const *a, char *const *b)
++{
++	if (l_strv_length((char **) a) !=3D l_strv_length((char **) b))
++		return false;
++
++	for (; a && *a; a++, b++)
++		if (strcmp(*a, *b))
++			return false;
++
++	return true;
++}
++
+ static int netconfig_set_dns(struct netconfig *netconfig)
+ {
+ 	const uint8_t *fils_dns4_mac =3D NULL;
+@@ -270,23 +300,25 @@ static int netconfig_set_dns(struct netconfig *netcon=
+fig)
+ 	char **dns_list;
+ 	const struct ie_fils_ip_addr_response_info *fils =3D
+ 		netconfig->fils_override;
++	struct l_dbus *dbus =3D dbus_get_bus();
+ =
+
+-	if (!dns4_list && !dns6_list)
+-		return 0;
++	if (dns6_list) {
++		dns_list =3D l_malloc(sizeof(char *) *
++					(n_entries4 + n_entries6 + 1));
+ =
+
+-	dns_list =3D dns4_list;
++		if (dns4_list)
++			memcpy(dns_list, dns4_list,
++				sizeof(char *) * n_entries4);
+ =
+
+-	if (dns6_list) {
+-		dns_list =3D l_realloc(dns_list,
+-				sizeof(char *) * (n_entries4 + n_entries6 + 1));
+ 		memcpy(dns_list + n_entries4, dns6_list,
+ 			sizeof(char *) * (n_entries6 + 1));
+-		/* Contents now belong to dns_list, so no l_strfreev */
+-		l_free(dns6_list);
+-	}
++	} else
++		dns_list =3D dns4_list;
+ =
+
+ 	resolve_set_dns(netconfig->resolve, dns_list);
+-	l_strv_free(dns_list);
++
++	if (dns6_list)
++		l_free(dns_list);
+ =
+
+ 	if (fils_dns4_mac && !l_rtnl_neighbor_set_hwaddr(rtnl,
+ 					netconfig->ifindex, AF_INET,
+@@ -302,6 +334,30 @@ static int netconfig_set_dns(struct netconfig *netconf=
+ig)
+ 					NULL))
+ 		l_debug("l_rtnl_neighbor_set_hwaddr failed");
+ =
+
++	if (netconfig_strv_eq(netconfig->dns4_list, dns4_list))
++		l_strv_free(dns4_list);
++	else {
++		l_strv_free(netconfig->dns4_list);
++		netconfig->dns4_list =3D dns4_list;
++
++		if (netconfig->dbus_path && netconfig->v4_configured)
++			l_dbus_property_changed(dbus, netconfig->dbus_path,
++						IWD_IPV4_CONFIG_INTERFACE,
++						"DomainNameServers");
++	}
++
++	if (netconfig_strv_eq(netconfig->dns6_list, dns6_list))
++		l_strv_free(dns6_list);
++	else {
++		l_strv_free(netconfig->dns6_list);
++		netconfig->dns6_list =3D dns6_list;
++
++		if (netconfig->dbus_path && netconfig->v6_configured)
++			l_dbus_property_changed(dbus, netconfig->dbus_path,
++						IWD_IPV6_CONFIG_INTERFACE,
++						"DomainNameServers");
++	}
++
+ 	return 0;
+ }
+ =
+
+@@ -328,6 +384,7 @@ static int netconfig_set_domains(struct netconfig *netc=
+onfig)
+ 	char *v4_domain =3D NULL;
+ 	char **v6_domains =3D NULL;
+ 	char **p;
++	struct l_dbus *dbus =3D dbus_get_bus();
+ =
+
+ 	memset(domains, 0, sizeof(domains));
+ =
+
+@@ -358,8 +415,30 @@ static int netconfig_set_domains(struct netconfig *net=
+config)
+ 					L_ARRAY_SIZE(domains) - 1, *p);
+ =
+
+ 	resolve_set_domains(netconfig->resolve, domains);
+-	l_strv_free(v6_domains);
+-	l_free(v4_domain);
++
++	if (l_streq0(v4_domain, netconfig->v4_domain))
++		l_free(v4_domain);
++	else {
++		l_free(netconfig->v4_domain);
++		netconfig->v4_domain =3D v4_domain;
++
++		if (netconfig->dbus_path && netconfig->v4_configured)
++			l_dbus_property_changed(dbus, netconfig->dbus_path,
++						IWD_IPV4_CONFIG_INTERFACE,
++						"DomainNames");
++	}
++
++	if (netconfig_strv_eq(netconfig->v6_domains, v6_domains))
++		l_strv_free(v6_domains);
++	else {
++		l_strv_free(netconfig->v6_domains);
++		netconfig->v6_domains =3D v6_domains;
++
++		if (netconfig->dbus_path && netconfig->v6_configured)
++			l_dbus_property_changed(dbus, netconfig->dbus_path,
++						IWD_IPV6_CONFIG_INTERFACE,
++						"DomainNames");
++	}
+ =
+
+ 	return 0;
+ }
+@@ -417,6 +496,8 @@ static char *netconfig_ipv4_get_gateway(struct netconfi=
+g *netconfig,
+ {
+ 	const struct l_dhcp_lease *lease;
+ 	char *gateway;
++	const struct ie_fils_ip_addr_response_info *fils =3D
++		netconfig->fils_override;
+ =
+
+ 	switch (netconfig->rtm_protocol) {
+ 	case RTPROT_STATIC:
+@@ -430,15 +511,12 @@ static char *netconfig_ipv4_get_gateway(struct netcon=
+fig *netconfig,
+ 		return gateway;
+ =
+
+ 	case RTPROT_DHCP:
+-		if (netconfig->fils_override &&
+-				netconfig->fils_override->ipv4_gateway) {
+-			gateway =3D netconfig_ipv4_to_string(
+-					netconfig->fils_override->ipv4_gateway);
++		if (fils && fils->ipv4_gateway) {
++			gateway =3D netconfig_ipv4_to_string(fils->ipv4_gateway);
+ =
+
+-			if (gateway && !l_memeqzero(netconfig->fils_override->
+-							ipv4_gateway_mac, 6))
+-				*out_mac =3D netconfig->fils_override->
+-					ipv4_gateway_mac;
++			if (gateway && out_mac &&
++					!l_memeqzero(fils->ipv4_gateway_mac, 6))
++				*out_mac =3D fils->ipv4_gateway_mac;
+ =
+
+ 			return gateway;
+ 		}
+@@ -476,7 +554,7 @@ static struct l_rtnl_address *netconfig_get_static6_add=
+ress(
+ 	prefix_len =3D strtoul(p, NULL, 10);
+ 	if (!unlikely(errno =3D=3D EINVAL || errno =3D=3D ERANGE ||
+ 			!prefix_len || prefix_len > 128)) {
+-		l_error("netconfig: Invalid prefix '%s'  provided in network"
++		l_error("netconfig: Invalid prefix '%s' provided in network"
+ 				" configuration file", p);
+ 		return NULL;
+ 	}
+@@ -492,10 +570,12 @@ no_prefix_len:
+ =
+
+ static struct l_rtnl_route *netconfig_get_static6_gateway(
+ 						struct netconfig *netconfig,
++						char **out_str,
+ 						const uint8_t **out_mac)
+ {
+ 	L_AUTO_FREE_VAR(char *, gateway);
+ 	struct l_rtnl_route *ret;
++	const uint8_t *mac =3D NULL;
+ =
+
+ 	gateway =3D l_settings_get_string(netconfig->active_settings,
+ 						"IPv6", "Gateway");
+@@ -507,7 +587,7 @@ static struct l_rtnl_route *netconfig_get_static6_gatew=
+ay(
+ 					netconfig->fils_override->ipv6_gateway);
+ =
+
+ 		if (!l_memeqzero(netconfig->fils_override->ipv6_gateway_mac, 6))
+-			*out_mac =3D netconfig->fils_override->ipv6_gateway_mac;
++			mac =3D netconfig->fils_override->ipv6_gateway_mac;
+ 	} else if (!gateway)
+ 		return NULL;
+ =
+
+@@ -521,6 +601,8 @@ static struct l_rtnl_route *netconfig_get_static6_gatew=
+ay(
+ =
+
+ 	l_rtnl_route_set_priority(ret, ROUTE_PRIORITY_OFFSET);
+ 	l_rtnl_route_set_protocol(ret, RTPROT_STATIC);
++	*out_str =3D l_steal_ptr(gateway);
++	*out_mac =3D mac;
+ =
+
+ 	return ret;
+ }
+@@ -623,6 +705,99 @@ static void netconfig_ifaddr_cmd_cb(int error, uint16_=
+t type,
+ 	netconfig_ifaddr_notify(type, data, len, user_data);
+ }
+ =
+
++static void netconfig_connected(struct netconfig *netconfig)
++{
++	if (netconfig->notify) {
++		netconfig->notify(NETCONFIG_EVENT_CONNECTED,
++					netconfig->user_data);
++		netconfig->notify =3D NULL;
++	}
++}
++
++static void netconfig_connected_v4(struct netconfig *netconfig)
++{
++	struct l_dbus *dbus =3D dbus_get_bus();
++
++	netconfig_connected(netconfig);
++
++	netconfig->v4_configured =3D true;
++
++	if (!netconfig->dbus_path)
++		return;
++
++	if (unlikely(!l_dbus_object_add_interface(dbus,
++						netconfig->dbus_path,
++						IWD_IPV4_CONFIG_INTERFACE,
++						&netconfig->v4_data)))
++		l_info("Unable to add %s at %s",
++			IWD_IPV4_CONFIG_INTERFACE, netconfig->dbus_path);
++
++	if (!netconfig->v6_configured &&
++			!l_dbus_object_add_interface(dbus, netconfig->dbus_path,
++						L_DBUS_INTERFACE_PROPERTIES,
++						netconfig))
++		/* Properties may already exist on the object, not an error */
++		l_debug("Unable to add %s at %s",
++			L_DBUS_INTERFACE_PROPERTIES, netconfig->dbus_path);
++}
++
++static void netconfig_disconnected_v4(struct netconfig *netconfig)
++{
++	struct l_dbus *dbus =3D dbus_get_bus();
++
++	netconfig->v4_configured =3D false;
++
++	if (!netconfig->dbus_path)
++		return;
++
++	if (unlikely(!l_dbus_object_remove_interface(dbus,
++						netconfig->dbus_path,
++						IWD_IPV4_CONFIG_INTERFACE)))
++		l_info("l_dbus_object_remove_interface failed for %s at %s",
++			IWD_IPV4_CONFIG_INTERFACE, netconfig->dbus_path);
++}
++
++static void netconfig_disconnected_v6(struct netconfig *netconfig)
++{
++	struct l_dbus *dbus =3D dbus_get_bus();
++
++	netconfig->v6_configured =3D false;
++
++	if (!netconfig->dbus_path)
++		return;
++
++	if (unlikely(!l_dbus_object_remove_interface(dbus,
++						netconfig->dbus_path,
++						IWD_IPV6_CONFIG_INTERFACE)))
++		l_info("l_dbus_object_remove_interface failed for %s at %s",
++			IWD_IPV6_CONFIG_INTERFACE, netconfig->dbus_path);
++}
++
++static void netconfig_connected_v6(struct netconfig *netconfig)
++{
++	struct l_dbus *dbus =3D dbus_get_bus();
++
++	netconfig->v6_configured =3D true;
++
++	if (!netconfig->dbus_path)
++		return;
++
++	if (unlikely(!l_dbus_object_add_interface(dbus,
++						netconfig->dbus_path,
++						IWD_IPV6_CONFIG_INTERFACE,
++						&netconfig->v6_data)))
++		l_info("Unable to add %s at %s",
++			IWD_IPV6_CONFIG_INTERFACE, netconfig->dbus_path);
++
++	if (!netconfig->v4_configured &&
++			!l_dbus_object_add_interface(dbus, netconfig->dbus_path,
++						L_DBUS_INTERFACE_PROPERTIES,
++						netconfig))
++		/* Properties may already exist on the object, not an error */
++		l_debug("Unable to add %s at %s",
++			L_DBUS_INTERFACE_PROPERTIES, netconfig->dbus_path);
++}
++
+ static void netconfig_ifaddr_ipv6_added(struct netconfig *netconfig,
+ 					const struct ifaddrmsg *ifa,
+ 					uint32_t len)
+@@ -732,11 +907,24 @@ static void netconfig_route_add_cmd_cb(int error, uin=
+t16_t type,
+ 		return;
+ 	}
+ =
+
+-	if (!netconfig->notify)
++	netconfig_connected_v4(netconfig);
++}
++
++static void netconfig_route6_add_cb(int error, uint16_t type,
++					const void *data, uint32_t len,
++					void *user_data)
++{
++	struct netconfig *netconfig =3D user_data;
++
++	netconfig->route6_add_cmd_id =3D 0;
++
++	if (error) {
++		l_error("netconfig: Failed to add route. Error %d: %s",
++						error, strerror(-error));
+ 		return;
++	}
+ =
+
+-	netconfig->notify(NETCONFIG_EVENT_CONNECTED, netconfig->user_data);
+-	netconfig->notify =3D NULL;
++	netconfig_connected_v6(netconfig);
+ }
+ =
+
+ static bool netconfig_ipv4_routes_install(struct netconfig *netconfig)
+@@ -775,12 +963,7 @@ static bool netconfig_ipv4_routes_install(struct netco=
+nfig *netconfig)
+ 				netconfig->rtm_protocol =3D=3D RTPROT_STATIC ?
+ 				"setting file" : "DHCPv4 lease");
+ =
+
+-		if (netconfig->notify) {
+-			netconfig->notify(NETCONFIG_EVENT_CONNECTED,
+-						netconfig->user_data);
+-			netconfig->notify =3D NULL;
+-		}
+-
++		netconfig_connected_v4(netconfig);
+ 		return true;
+ 	}
+ =
+
+@@ -847,7 +1030,7 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error=
+, uint16_t type,
+ {
+ 	struct netconfig *netconfig =3D user_data;
+ 	struct l_rtnl_route *gateway;
+-	const uint8_t *gateway_mac =3D NULL;
++	const uint8_t *gateway_mac;
+ =
+
+ 	netconfig->addr6_add_cmd_id =3D 0;
+ =
+
+@@ -857,12 +1040,16 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int err=
+or, uint16_t type,
+ 		return;
+ 	}
+ =
+
+-	gateway =3D netconfig_get_static6_gateway(netconfig, &gateway_mac);
++	gateway =3D netconfig_get_static6_gateway(netconfig,
++						&netconfig->v6_gateway_str,
++						&gateway_mac);
+ 	if (gateway) {
+-		L_WARN_ON(!l_rtnl_route_add(rtnl, netconfig->ifindex,
+-						gateway,
+-						netconfig_route_generic_cb,
+-						netconfig, NULL));
++		netconfig->route6_add_cmd_id =3D l_rtnl_route_add(rtnl,
++							netconfig->ifindex,
++							gateway,
++							netconfig_route6_add_cb,
++							netconfig, NULL);
++		L_WARN_ON(unlikely(!netconfig->route6_add_cmd_id));
+ 		l_rtnl_route_free(gateway);
+ =
+
+ 		if (gateway_mac && !l_rtnl_neighbor_set_hwaddr(rtnl,
+@@ -876,6 +1063,9 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error=
+, uint16_t type,
+ =
+
+ 	netconfig_set_dns(netconfig);
+ 	netconfig_set_domains(netconfig);
++
++	if (!netconfig->route6_add_cmd_id)
++		netconfig_connected_v6(netconfig);
+ }
+ =
+
+ static void netconfig_ifaddr_del_cmd_cb(int error, uint16_t type,
+@@ -898,11 +1088,44 @@ static void netconfig_ifaddr_del_cmd_cb(int error, u=
+int16_t type,
+ 				"Error %d: %s", error, strerror(-error));
+ }
+ =
+
++static bool netconfig_address_cmp_address(const struct l_rtnl_address *a,
++						const struct l_rtnl_address *b)
++{
++	char str_a[INET6_ADDRSTRLEN];
++	char str_b[INET6_ADDRSTRLEN];
++
++	if (a =3D=3D b)
++		return true;
++
++	if (!a || !b)
++		return false;
++
++	if (!l_rtnl_address_get_address(a, str_a) ||
++			!l_rtnl_address_get_address(b, str_b))
++		return false;
++
++	return !strcmp(str_a, str_b);
++}
++
++static bool netconfig_address_cmp_prefix_len(const struct l_rtnl_address *=
+a,
++						const struct l_rtnl_address *b)
++{
++	if (a =3D=3D b)
++		return true;
++
++	if (!a || !b)
++		return false;
++
++	return l_rtnl_address_get_prefix_length(a) =3D=3D
++		l_rtnl_address_get_prefix_length(b);
++}
++
+ static void netconfig_ipv4_dhcp_event_handler(struct l_dhcp_client *client,
+ 						enum l_dhcp_client_event event,
+ 						void *userdata)
+ {
+ 	struct netconfig *netconfig =3D userdata;
++	struct l_dbus *dbus =3D dbus_get_bus();
+ =
+
+ 	l_debug("DHCPv4 event %d", event);
+ =
+
+@@ -912,10 +1135,47 @@ static void netconfig_ipv4_dhcp_event_handler(struct=
+ l_dhcp_client *client,
+ 					netconfig->v4_address,
+ 					netconfig_ifaddr_del_cmd_cb,
+ 					netconfig, NULL));
+-		l_rtnl_address_free(netconfig->v4_address);
+ 		/* Fall through. */
+ 	case L_DHCP_CLIENT_EVENT_LEASE_OBTAINED:
+-		netconfig->v4_address =3D netconfig_get_dhcp4_address(netconfig);
++	{
++		char *gateway_str;
++		struct l_rtnl_address *address;
++
++		gateway_str =3D netconfig_ipv4_get_gateway(netconfig, NULL);
++		if (l_streq0(netconfig->v4_gateway_str, gateway_str))
++			l_free(gateway_str);
++		else {
++			l_free(netconfig->v4_gateway_str);
++			netconfig->v4_gateway_str =3D gateway_str;
++
++			if (netconfig->dbus_path && netconfig->v4_configured)
++				l_dbus_property_changed(dbus,
++						netconfig->dbus_path,
++						IWD_IPV4_CONFIG_INTERFACE,
++						"Gateway");
++		}
++
++		address =3D netconfig_get_dhcp4_address(netconfig);
++
++		if (netconfig->dbus_path && netconfig->v4_configured &&
++				!netconfig_address_cmp_prefix_len(
++							netconfig->v4_address,
++							address))
++			l_dbus_property_changed(dbus, netconfig->dbus_path,
++						IWD_IPV4_CONFIG_INTERFACE,
++						"Netmask");
++
++		if (netconfig->dbus_path && netconfig->v4_configured &&
++				netconfig_address_cmp_address(
++							netconfig->v4_address,
++							address))
++			l_dbus_property_changed(dbus, netconfig->dbus_path,
++						IWD_IPV4_CONFIG_INTERFACE,
++						"Address");
++
++		l_rtnl_address_free(netconfig->v4_address);
++		netconfig->v4_address =3D address;
++
+ 		if (!netconfig->v4_address) {
+ 			l_error("netconfig: Failed to obtain IP addresses from "
+ 							"DHCPv4 lease.");
+@@ -928,6 +1188,7 @@ static void netconfig_ipv4_dhcp_event_handler(struct l=
+_dhcp_client *client,
+ 					netconfig_ipv4_ifaddr_add_cmd_cb,
+ 					netconfig, NULL)));
+ 		break;
++	}
+ 	case L_DHCP_CLIENT_EVENT_LEASE_RENEWED:
+ 		break;
+ 	case L_DHCP_CLIENT_EVENT_LEASE_EXPIRED:
+@@ -937,6 +1198,10 @@ static void netconfig_ipv4_dhcp_event_handler(struct =
+l_dhcp_client *client,
+ 					netconfig, NULL));
+ 		l_rtnl_address_free(netconfig->v4_address);
+ 		netconfig->v4_address =3D NULL;
++		l_free(l_steal_ptr(netconfig->v4_gateway_str));
++
++		if (netconfig->v4_configured)
++			netconfig_disconnected_v4(netconfig);
+ =
+
+ 		/* Fall through. */
+ 	case L_DHCP_CLIENT_EVENT_NO_LEASE:
+@@ -960,18 +1225,76 @@ static void netconfig_dhcp6_event_handler(struct l_d=
+hcp6_client *client,
+ 						void *userdata)
+ {
+ 	struct netconfig *netconfig =3D userdata;
++	struct l_dbus *dbus =3D dbus_get_bus();
+ =
+
+ 	switch (event) {
+ 	case L_DHCP6_CLIENT_EVENT_IP_CHANGED:
+ 	case L_DHCP6_CLIENT_EVENT_LEASE_OBTAINED:
+ 	case L_DHCP6_CLIENT_EVENT_LEASE_RENEWED:
++	{
++		__auto_type lease =3D
++			l_dhcp6_client_get_lease(netconfig->dhcp6_client);
++		L_AUTO_FREE_VAR(char *, addr_str) =3D
++			l_dhcp6_lease_get_address(lease);
++		struct l_rtnl_address *address;
++		__auto_type icmp6 =3D
++			l_dhcp6_client_get_icmp6(netconfig->dhcp6_client);
++		__auto_type router =3D l_icmp6_client_get_router(icmp6);
++		char *gateway_str =3D l_icmp6_router_get_address(router);
++
++		if (l_streq0(netconfig->v6_gateway_str, gateway_str))
++			l_free(gateway_str);
++		else {
++			l_free(netconfig->v6_gateway_str);
++			netconfig->v6_gateway_str =3D gateway_str;
++
++			if (netconfig->dbus_path && netconfig->v6_configured)
++				l_dbus_property_changed(dbus,
++						netconfig->dbus_path,
++						IWD_IPV6_CONFIG_INTERFACE,
++						"Gateway");
++		}
++
++		address =3D l_rtnl_address_new(addr_str,
++					l_dhcp6_lease_get_prefix_length(lease));
++
++		if (netconfig->dbus_path && netconfig->v6_configured &&
++				!netconfig_address_cmp_prefix_len(
++							netconfig->v6_address,
++							address))
++			l_dbus_property_changed(dbus, netconfig->dbus_path,
++						IWD_IPV6_CONFIG_INTERFACE,
++						"Netmask");
++
++		if (netconfig->dbus_path && netconfig->v6_configured &&
++				netconfig_address_cmp_address(
++							netconfig->v6_address,
++							address))
++			l_dbus_property_changed(dbus, netconfig->dbus_path,
++						IWD_IPV6_CONFIG_INTERFACE,
++						"Address");
++
++		l_rtnl_address_free(netconfig->v6_address);
++		netconfig->v6_address =3D address;
++
+ 		netconfig_set_dns(netconfig);
+ 		netconfig_set_domains(netconfig);
++
++		if (!netconfig->v6_configured)
++			netconfig_connected_v6(netconfig);
++
+ 		break;
++	}
+ 	case L_DHCP6_CLIENT_EVENT_LEASE_EXPIRED:
+ 		l_debug("Lease for interface %u expired", netconfig->ifindex);
+ 		netconfig_set_dns(netconfig);
+ 		netconfig_set_domains(netconfig);
++		l_rtnl_address_free(netconfig->v6_address);
++		netconfig->v6_address =3D NULL;
++		l_free(l_steal_ptr(netconfig->v6_gateway_str));
++
++		if (netconfig->v6_configured)
++			netconfig_disconnected_v6(netconfig);
+ =
+
+ 		/* Fall through */
+ 	case L_DHCP6_CLIENT_EVENT_NO_LEASE:
+@@ -993,6 +1316,9 @@ static void netconfig_remove_v4_address(struct netconf=
+ig *netconfig)
+ 					netconfig, NULL));
+ 	l_rtnl_address_free(netconfig->v4_address);
+ 	netconfig->v4_address =3D NULL;
++
++	if (netconfig->v4_configured)
++		netconfig_disconnected_v4(netconfig);
+ }
+ =
+
+ static void netconfig_reset_v4(struct netconfig *netconfig)
+@@ -1000,14 +1326,19 @@ static void netconfig_reset_v4(struct netconfig *ne=
+tconfig)
+ 	if (netconfig->rtm_protocol) {
+ 		netconfig_remove_v4_address(netconfig);
+ =
+
+-		l_strfreev(netconfig->dns4_overrides);
+-		netconfig->dns4_overrides =3D NULL;
++		l_strv_free(l_steal_ptr(netconfig->dns4_overrides));
++		l_strv_free(l_steal_ptr(netconfig->dns4_list));
+ =
+
+ 		l_dhcp_client_stop(netconfig->dhcp_client);
+ 		netconfig->rtm_protocol =3D 0;
+ =
+
+ 		l_acd_destroy(netconfig->acd);
+ 		netconfig->acd =3D NULL;
++
++		l_free(netconfig->v4_gateway_str);
++		netconfig->v4_gateway_str =3D NULL;
++
++		l_free(l_steal_ptr(netconfig->v4_domain));
+ 	}
+ }
+ =
+
+@@ -1117,7 +1448,6 @@ static bool netconfig_ipv4_select_and_install(struct =
+netconfig *netconfig)
+ static bool netconfig_ipv6_select_and_install(struct netconfig *netconfig)
+ {
+ 	struct netdev *netdev =3D netdev_find(netconfig->ifindex);
+-	struct l_rtnl_address *address =3D NULL;
+ =
+
+ 	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_UNSPEC) {
+ 		l_debug("IPV6 configuration disabled");
+@@ -1126,10 +1456,7 @@ static bool netconfig_ipv6_select_and_install(struct=
+ netconfig *netconfig)
+ =
+
+ 	sysfs_write_ipv6_setting(netdev_get_name(netdev), "disable_ipv6", "0");
+ =
+
+-	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_STATIC)
+-		address =3D netconfig_get_static6_address(
+-						netconfig->active_settings);
+-	else if (netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP &&
++	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP &&
+ 			netconfig->fils_override &&
+ 			!l_memeqzero(netconfig->fils_override->ipv6_addr, 16)) {
+ 		uint8_t prefix_len =3D netconfig->fils_override->ipv6_prefix_len;
+@@ -1139,11 +1466,12 @@ static bool netconfig_ipv6_select_and_install(struc=
+t netconfig *netconfig)
+ 		if (unlikely(!addr_str))
+ 			return false;
+ =
+
+-		if (L_WARN_ON(unlikely(!(address =3D l_rtnl_address_new(addr_str,
+-								prefix_len)))))
++		netconfig->v6_address =3D l_rtnl_address_new(addr_str,
++								prefix_len);
++		if (L_WARN_ON(unlikely(!netconfig->v6_address)))
+ 			return false;
+ =
+
+-		l_rtnl_address_set_noprefixroute(address, true);
++		l_rtnl_address_set_noprefixroute(netconfig->v6_address, true);
+ =
+
+ 		/*
+ 		 * TODO: If netconfig->fils_override->ipv6_lifetime is set,
+@@ -1153,12 +1481,12 @@ static bool netconfig_ipv6_select_and_install(struc=
+t netconfig *netconfig)
+ 		 */
+ 	}
+ =
+
+-	if (address) {
++	if (netconfig->v6_address) {
+ 		L_WARN_ON(!(netconfig->addr6_add_cmd_id =3D
+-			l_rtnl_ifaddr_add(rtnl, netconfig->ifindex, address,
++			l_rtnl_ifaddr_add(rtnl, netconfig->ifindex,
++					netconfig->v6_address,
+ 					netconfig_ipv6_ifaddr_add_cmd_cb,
+ 					netconfig, NULL)));
+-		l_rtnl_address_free(address);
+ 		return true;
+ 	}
+ =
+
+@@ -1273,7 +1601,6 @@ bool netconfig_load_settings(struct netconfig *netcon=
+fig,
+ =
+
+ 	if (l_settings_has_key(active_settings, "IPv6", "Address")) {
+ 		v6_address =3D netconfig_get_static6_address(active_settings);
+-		l_rtnl_address_free(v6_address);
+ =
+
+ 		if (unlikely(!v6_address)) {
+ 			l_error("netconfig: Can't parse IPv6 address");
+@@ -1291,11 +1618,14 @@ bool netconfig_load_settings(struct netconfig *netc=
+onfig,
+ =
+
+ 	if (!v6_enabled)
+ 		netconfig->rtm_v6_protocol =3D RTPROT_UNSPEC;
+-	else if (v6_address)
++	else if (v6_address) {
++		netconfig->v6_address =3D l_steal_ptr(v6_address);
+ 		netconfig->rtm_v6_protocol =3D RTPROT_STATIC;
+-	else
++	} else
+ 		netconfig->rtm_v6_protocol =3D RTPROT_DHCP;
+ =
+
++	l_rtnl_address_free(v6_address);
++
+ 	if (send_hostname)
+ 		l_dhcp_client_set_hostname(netconfig->dhcp_client, hostname);
+ =
+
+@@ -1355,11 +1685,22 @@ bool netconfig_reset(struct netconfig *netconfig)
+ {
+ 	struct netdev *netdev =3D netdev_find(netconfig->ifindex);
+ =
+
++	if (netconfig->v4_configured)
++		netconfig_disconnected_v4(netconfig);
++
++	if (netconfig->v6_configured)
++		netconfig_disconnected_v6(netconfig);
++
+ 	if (netconfig->route4_add_gateway_cmd_id) {
+ 		l_netlink_cancel(rtnl, netconfig->route4_add_gateway_cmd_id);
+ 		netconfig->route4_add_gateway_cmd_id =3D 0;
+ 	}
+ =
+
++	if (netconfig->route6_add_cmd_id) {
++		l_netlink_cancel(rtnl, netconfig->route6_add_cmd_id);
++		netconfig->route6_add_cmd_id =3D 0;
++	}
++
+ 	if (netconfig->addr4_add_cmd_id) {
+ 		l_netlink_cancel(rtnl, netconfig->addr4_add_cmd_id);
+ 		netconfig->addr4_add_cmd_id =3D 0;
+@@ -1376,14 +1717,22 @@ bool netconfig_reset(struct netconfig *netconfig)
+ 	netconfig_reset_v4(netconfig);
+ =
+
+ 	if (netconfig->rtm_v6_protocol) {
+-		l_strfreev(netconfig->dns6_overrides);
+-		netconfig->dns6_overrides =3D NULL;
++		l_rtnl_address_free(netconfig->v6_address);
++		netconfig->v6_address =3D NULL;
++
++		l_strv_free(l_steal_ptr(netconfig->dns6_overrides));
++		l_strv_free(l_steal_ptr(netconfig->dns6_list));
+ =
+
+ 		l_dhcp6_client_stop(netconfig->dhcp6_client);
+ 		netconfig->rtm_v6_protocol =3D 0;
+ =
+
+ 		sysfs_write_ipv6_setting(netdev_get_name(netdev),
+ 						"disable_ipv6", "1");
++
++		l_free(netconfig->v6_gateway_str);
++		netconfig->v6_gateway_str =3D NULL;
++
++		l_strv_free(l_steal_ptr(netconfig->v6_domains));
+ 	}
+ =
+
+ 	l_free(l_steal_ptr(netconfig->fils_override));
+@@ -1434,7 +1783,7 @@ void netconfig_handle_fils_ip_resp(struct netconfig *=
+netconfig,
+ 	netconfig->fils_override =3D l_memdup(info, sizeof(*info));
+ }
+ =
+
+-struct netconfig *netconfig_new(uint32_t ifindex)
++struct netconfig *netconfig_new(uint32_t ifindex, const char *dbus_path)
+ {
+ 	struct netdev *netdev =3D netdev_find(ifindex);
+ 	struct netconfig *netconfig;
+@@ -1451,6 +1800,7 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+ =
+
+ 	netconfig =3D l_new(struct netconfig, 1);
+ 	netconfig->ifindex =3D ifindex;
++	netconfig->dbus_path =3D l_strdup(dbus_path);
+ 	netconfig->resolve =3D resolve_new(ifindex);
+ =
+
+ 	netconfig->dhcp_client =3D l_dhcp_client_new(ifindex);
+@@ -1483,6 +1833,19 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+ 	sysfs_write_ipv6_setting(netdev_get_name(netdev), "accept_ra", "0");
+ 	sysfs_write_ipv6_setting(netdev_get_name(netdev), "disable_ipv6", "1");
+ =
+
++	/*
++	 * Use struct interface_data as interface user_data so that the
++	 * property getters can check which interface they're being called
++	 * for.  For the org.freedesktop.DBus.Properties.{Get,GetAll} calls
++	 * we can read the interface name from the first argument but the
++	 * getters are also called when the InterfaceAdded signal messages
++	 * is being built.
++	 */
++	netconfig->v4_data.is_ipv4 =3D true;
++	netconfig->v4_data.netconfig =3D netconfig;
++	netconfig->v6_data.is_ipv4 =3D false;
++	netconfig->v6_data.netconfig =3D netconfig;
++
+ 	return netconfig;
+ }
+ =
+
+@@ -1500,6 +1863,167 @@ void netconfig_destroy(struct netconfig *netconfig)
+ 	netconfig_free(netconfig);
+ }
+ =
+
++static bool netconfig_property_get_method(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct interface_data *data =3D user_data;
++	uint8_t protocol;
++
++	protocol =3D data->is_ipv4 ? data->netconfig->rtm_protocol :
++		data->netconfig->rtm_v6_protocol;
++
++	l_dbus_message_builder_append_basic(builder, 's',
++						protocol =3D=3D RTPROT_DHCP ?
++						"auto" : "static");
++	return true;
++}
++
++static bool netconfig_property_get_address(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct interface_data *data =3D user_data;
++	const struct l_rtnl_address *address;
++	char ip_str[INET6_ADDRSTRLEN];
++
++	address =3D data->is_ipv4 ? data->netconfig->v4_address :
++		data->netconfig->v6_address;
++
++	if (!address || !l_rtnl_address_get_address(address, ip_str))
++		return false;
++
++	l_dbus_message_builder_append_basic(builder, 's', ip_str);
++	return true;
++}
++
++static bool netconfig_property_get_prefix(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct interface_data *data =3D user_data;
++	const struct l_rtnl_address *address;
++	uint8_t prefix_len;
++
++	address =3D data->is_ipv4 ?
++		data->netconfig->v4_address : data->netconfig->v6_address;
++
++	if (!address || !(prefix_len =3D
++				l_rtnl_address_get_prefix_length(address)))
++		return false;
++
++	l_dbus_message_builder_append_basic(builder, 'y', &prefix_len);
++	return true;
++}
++
++static bool netconfig_property_get_gateway(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct interface_data *data =3D user_data;
++	const char *gateway_str =3D data->is_ipv4 ?
++		data->netconfig->v4_gateway_str :
++		data->netconfig->v6_gateway_str;
++
++	if (!gateway_str)
++		return false;
++
++	l_dbus_message_builder_append_basic(builder, 's', gateway_str);
++	return true;
++}
++
++static bool netconfig_property_get_dnses(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct interface_data *data =3D user_data;
++	char **dns_str_list =3D data->is_ipv4 ?
++		data->netconfig->dns4_list : data->netconfig->dns6_list;
++	char **i;
++
++	if (!dns_str_list)
++		return false;
++
++	l_dbus_message_builder_enter_array(builder, "s");
++
++	for (i =3D dns_str_list; i && *i; i++)
++		l_dbus_message_builder_append_basic(builder, 's', *i);
++
++	l_dbus_message_builder_leave_array(builder);
++	return true;
++}
++
++static bool netconfig_property_get_v4_domains(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct interface_data *data =3D user_data;
++
++	if (!data->netconfig->v4_domain)
++		return false;
++
++	l_dbus_message_builder_enter_array(builder, "s");
++	l_dbus_message_builder_append_basic(builder, 's',
++						data->netconfig->v4_domain);
++	l_dbus_message_builder_leave_array(builder);
++	return true;
++}
++
++static bool netconfig_property_get_v6_domains(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct interface_data *data =3D user_data;
++	char **i;
++
++	if (!data->netconfig->v6_domains)
++		return false;
++
++	l_dbus_message_builder_enter_array(builder, "s");
++
++	for (i =3D data->netconfig->v6_domains; *i; i++)
++		l_dbus_message_builder_append_basic(builder, 's', *i);
++
++	l_dbus_message_builder_leave_array(builder);
++	return true;
++}
++
++static void netconfig_setup_interface(struct l_dbus_interface *interface,
++					bool is_ipv4)
++{
++	l_dbus_interface_property(interface, "Method", 0, "s",
++					netconfig_property_get_method, NULL);
++	l_dbus_interface_property(interface, "Address", 0, "s",
++					netconfig_property_get_address, NULL);
++	l_dbus_interface_property(interface, "PrefixLength", 0, "y",
++					netconfig_property_get_prefix, NULL);
++	l_dbus_interface_property(interface, "Gateway", 0, "s",
++					netconfig_property_get_gateway, NULL);
++	l_dbus_interface_property(interface, "DomainNameServers", 0, "as",
++					netconfig_property_get_dnses, NULL);
++	l_dbus_interface_property(interface, "DomainNames", 0, "as", is_ipv4 ?
++					netconfig_property_get_v4_domains :
++					netconfig_property_get_v6_domains,
++					NULL);
++}
++
++static void netconfig_setup_v4_interface(struct l_dbus_interface *interfac=
+e)
++{
++	netconfig_setup_interface(interface, true);
++}
++
++static void netconfig_setup_v6_interface(struct l_dbus_interface *interfac=
+e)
++{
++	netconfig_setup_interface(interface, false);
++}
++
+ static int netconfig_init(void)
+ {
+ 	uint32_t r;
+@@ -1551,6 +2075,14 @@ static int netconfig_init(void)
+ =
+
+ 	netconfig_list =3D l_queue_new();
+ =
+
++	L_WARN_ON(unlikely(!l_dbus_register_interface(dbus_get_bus(),
++						IWD_IPV4_CONFIG_INTERFACE,
++						netconfig_setup_v4_interface,
++						NULL, false)));
++	L_WARN_ON(unlikely(!l_dbus_register_interface(dbus_get_bus(),
++						IWD_IPV6_CONFIG_INTERFACE,
++						netconfig_setup_v6_interface,
++						NULL, false)));
+ 	return 0;
+ =
+
+ error:
+@@ -1567,6 +2099,9 @@ static void netconfig_exit(void)
+ 	rtnl =3D NULL;
+ =
+
+ 	l_queue_destroy(netconfig_list, netconfig_free);
++
++	l_dbus_unregister_interface(dbus_get_bus(), IWD_IPV4_CONFIG_INTERFACE);
++	l_dbus_unregister_interface(dbus_get_bus(), IWD_IPV6_CONFIG_INTERFACE);
+ }
+ =
+
+ IWD_MODULE(netconfig, netconfig_init, netconfig_exit)
+diff --git a/src/netconfig.h b/src/netconfig.h
+index fa46c7c8..5d54d9cc 100644
+--- a/src/netconfig.h
++++ b/src/netconfig.h
+@@ -45,5 +45,5 @@ bool netconfig_get_fils_ip_req(struct netconfig *netconfi=
+g,
+ void netconfig_handle_fils_ip_resp(struct netconfig *netconfig,
+ 			const struct ie_fils_ip_addr_response_info *info);
+ =
+
+-struct netconfig *netconfig_new(uint32_t ifindex);
++struct netconfig *netconfig_new(uint32_t ifindex, const char *dbus_path);
+ void netconfig_destroy(struct netconfig *netconfig);
+diff --git a/src/p2p.c b/src/p2p.c
+index 3328271b..b68e4f7c 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -1320,7 +1320,9 @@ static void p2p_start_client_netconfig(struct p2p_dev=
+ice *dev)
+ 	struct l_settings *settings;
+ =
+
+ 	if (!dev->conn_netconfig) {
+-		dev->conn_netconfig =3D netconfig_new(ifindex);
++		const char *peer_path =3D p2p_peer_get_path(dev->conn_peer);
++
++		dev->conn_netconfig =3D netconfig_new(ifindex, peer_path);
+ 		if (!dev->conn_netconfig) {
+ 			p2p_connect_failed(dev);
+ 			return;
+diff --git a/src/station.c b/src/station.c
+index 6de5fd4a..105d0ad8 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3577,6 +3577,7 @@ static struct station *station_create(struct netdev *=
+netdev)
+ 	struct station *station;
+ 	struct l_dbus *dbus =3D dbus_get_bus();
+ 	bool autoconnect =3D true;
++	const char *path;
+ =
+
+ 	station =3D l_new(struct station, 1);
+ 	watchlist_init(&station->state_watches, NULL);
+@@ -3594,11 +3595,12 @@ static struct station *station_create(struct netdev=
+ *netdev)
+ =
+
+ 	l_queue_push_head(station_list, station);
+ =
+
+-	l_dbus_object_add_interface(dbus, netdev_get_path(netdev),
+-					IWD_STATION_INTERFACE, station);
++	path =3D netdev_get_path(netdev);
++	l_dbus_object_add_interface(dbus, path, IWD_STATION_INTERFACE, station);
+ =
+
+ 	if (netconfig_enabled)
+-		station->netconfig =3D netconfig_new(netdev_get_ifindex(netdev));
++		station->netconfig =3D netconfig_new(netdev_get_ifindex(netdev),
++							path);
+ =
+
+ 	station->anqp_pending =3D l_queue_new();
+ =
+
+-- =
+
+2.30.2
+
+--===============0543592715789301743==--
 
