@@ -1,75 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============7699078659784347050=="
+Content-Type: multipart/mixed; boundary="===============7345732614745507389=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 9/9] dpp: handle protocol errors in ROC timeout
-Date: Mon, 13 Dec 2021 12:33:32 -0800
-Message-ID: <20211213203332.2191003-9-prestwoj@gmail.com>
-In-Reply-To: 20211213203332.2191003-1-prestwoj@gmail.com
+Subject: [PATCH v6 4/5] network: prefer OWE transition BSS over open
+Date: Fri, 17 Sep 2021 14:36:21 -0700
+Message-ID: <20210917213622.21881-4-prestwoj@gmail.com>
+In-Reply-To: 20210917213622.21881-1-prestwoj@gmail.com
 
---===============7699078659784347050==
+--===============7345732614745507389==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a standing TODO of properly handling these timeouts but
-for now just treat any ROC timeout as an error if authenticating
-or configuring.
+There isn't much control station has with how BSS's are inserted to
+a network object. The rank algorithm makes that decision. Because of
+this we could end up in a situation where the Open BSS is preferred
+over the OWE transition BSS.
+
+In attempt to better handle this any Open BSS in this type of network
+will not be chosen unless its the only candidate (e.g. no other BSSs,
+inability to connect with OWE, or an improperly configured network).
 ---
- src/dpp.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ src/network.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 7e41b41e..e2121915 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -1105,6 +1105,26 @@ static void dpp_presence_timeout(int error, void *us=
-er_data)
- {
- 	struct dpp_sm *dpp =3D user_data;
- =
-
-+	switch (dpp->state) {
-+	case DPP_STATE_PRESENCE:
-+		break;
-+	case DPP_STATE_NOTHING:
-+		/* Protocol already terminated */
-+		return;
-+	case DPP_STATE_AUTHENTICATING:
-+	case DPP_STATE_CONFIGURING:
-+		/*
-+		 * TODO: If either the auth or config protocol is running we
-+		 * need to stay on channel until the specified timeouts.
-+		 * Unfortunately the kernel makes this very inconvenient since
-+		 * there is no way to stay on channel indefinitely or any way
-+		 * of knowing what duration the kernel/card actually chooses.
-+		 *
-+		 * For now just treat this as a failure.
-+		 */
-+		goto protocol_failed;
-+	}
-+
- 	if (dpp->state !=3D DPP_STATE_PRESENCE) {
- 		l_debug("DPP state changed, stopping presence announcements");
- 		dpp->freqs_idx =3D 0;
-@@ -1126,6 +1146,12 @@ static void dpp_presence_timeout(int error, void *us=
-er_data)
- 	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
- 			dpp->current_freq, dpp->dwell, dpp_roc_started,
- 			dpp, dpp_presence_timeout);
-+	return;
-+
-+protocol_failed:
-+	dpp_reset(dpp);
-+	dpp_free_auth_data(dpp);
-+	return;
+diff --git a/src/network.c b/src/network.c
+index f7172c78..711fb296 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1110,6 +1110,11 @@ const struct l_queue_entry *network_bss_list_get_ent=
+ries(
+ 	return l_queue_get_entries(network->bss_list);
  }
  =
 
- /*
++static bool bss_is_owe(struct scan_bss *bss)
++{
++	return !l_memeqzero(bss->owe_trans_bssid, 6) && bss->rsne;
++}
++
+ struct scan_bss *network_bss_select(struct network *network,
+ 						bool fallback_to_blacklist)
+ {
+@@ -1135,6 +1140,17 @@ struct scan_bss *network_bss_select(struct network *=
+network,
+ 		if (!candidate)
+ 			candidate =3D bss;
+ =
+
++		/* OWE Transition BSS */
++		if (!l_memeqzero(bss->owe_trans_bssid, 6)) {
++			/* Don't want to connect to the Open BSS if possible */
++			if (!bss->rsne)
++				continue;
++
++			/* Candidate is not OWE, set this as new candidate */
++			if (!bss_is_owe(candidate))
++				candidate =3D bss;
++		}
++
+ 		/* check if temporarily blacklisted */
+ 		if (l_queue_find(network->blacklist, match_bss, bss))
+ 			continue;
 -- =
 
 2.31.1
 
---===============7699078659784347050==--
+--===============7345732614745507389==--
 
