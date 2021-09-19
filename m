@@ -1,171 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============3494662089866140682=="
+Content-Type: multipart/mixed; boundary="===============5608781867201384408=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Fabrice Fontaine <fontaine.fabrice at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 5/6] dpp: handle CHANNEL attribute in auth request
-Date: Fri, 07 Jan 2022 16:13:32 -0800
-Message-ID: <20220108001333.723634-5-prestwoj@gmail.com>
-In-Reply-To: 20220108001333.723634-1-prestwoj@gmail.com
+Subject: [PATCH] src/sae.c: Use realloc(3) instead of reallocarray(3)
+Date: Sun, 19 Sep 2021 10:57:10 +0200
+Message-ID: <20210919085710.1805075-1-fontaine.fabrice@gmail.com>
 
---===============3494662089866140682==
+--===============5608781867201384408==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-When this attribute is included, the initiator is requesting all
-future frames be sent on this channel. There is no reason for a
-configurator to act on this attribute (at least for now) so the
-request frame will be dropped in this case. Enrollees will act
-on it by switching to the new channel and sending the authentication
-response.
+reallocarray(3) has been added to glibc relatively recently (version
+2.26, from 2017) and apparently not all users run new enough glibc.
+Moreover, reallocarray is not available with uclibc-ng. Just use
+realloc(3) for now since in this case there's no real risk of overflow.
+This will avoid the following build failure since commit
+891b78e9e892a3bcd800eb3a298e6380e9a15dd1:
+
+/home/giuliobenetti/autobuild/run/instance-3/output-1/host/lib/gcc/xtensa-b=
+uildroot-linux-uclibc/10.3.0/../../../../xtensa-buildroot-linux-uclibc/bin/=
+ld: src/sae.o: in function `sae_rx_authenticate':
+sae.c:(.text+0xd74): undefined reference to `reallocarray'
+
+Fixes:
+ - http://autobuild.buildroot.org/results/c6d3f86282c44645b4f1c61882dc63ccf=
+c8eb35a
+
+Signed-off-by: Fabrice Fontaine <fontaine.fabrice(a)gmail.com>
 ---
- src/dpp.c | 77 +++++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 58 insertions(+), 19 deletions(-)
+ src/sae.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 5bf004d8..35807a8c 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -91,6 +91,7 @@ struct dpp_sm {
- 	size_t freqs_idx;
- 	uint32_t dwell;
- 	uint32_t current_freq;
-+	uint32_t new_freq;
- 	struct scan_freq_set *presence_list;
+diff --git a/src/sae.c b/src/sae.c
+index 7e6377f5..d04891e7 100644
+--- a/src/sae.c
++++ b/src/sae.c
+@@ -104,7 +104,7 @@ static void sae_rejected_groups_append(struct sae_sm *s=
+m, uint16_t group)
+ 	uint16_t i;
  =
 
- 	uint32_t offchannel_id;
-@@ -169,6 +170,7 @@ static void dpp_reset(struct dpp_sm *dpp)
- 	}
- =
-
- 	dpp->state =3D DPP_STATE_NOTHING;
-+	dpp->new_freq =3D 0;
- =
-
- 	explicit_bzero(dpp->r_nonce, dpp->nonce_len);
- 	explicit_bzero(dpp->i_nonce, dpp->nonce_len);
-@@ -1238,14 +1240,29 @@ static void dpp_roc_started(void *user_data)
- 	struct dpp_sm *dpp =3D user_data;
- =
-
- 	/*
--	 * If not in presence procedure or in a configurator role, just stay
--	 * on channel.
-+	 * - If a configurator, nothing to do but wait for a request
-+	 * - If in the presence state continue sending announcements.
-+	 * - If authenticating, and this is a result of a channel switch send
-+	 *   the authenticate response now.
- 	 */
--	if (dpp->state !=3D DPP_STATE_PRESENCE ||
--			dpp->role =3D=3D DPP_CAPABILITY_CONFIGURATOR)
-+	if (dpp->role =3D=3D DPP_CAPABILITY_CONFIGURATOR)
+ 	if (!sm->rejected_groups) {
+-		sm->rejected_groups =3D reallocarray(NULL, 2, sizeof(uint16_t));
++		sm->rejected_groups =3D realloc(NULL, 2 * sizeof(uint16_t));
+ 		sm->rejected_groups[0] =3D 1;
+ 		sm->rejected_groups[1] =3D group;
  		return;
+@@ -114,8 +114,8 @@ static void sae_rejected_groups_append(struct sae_sm *s=
+m, uint16_t group)
+ 		if (sm->rejected_groups[i] =3D=3D group)
+ 			return;
  =
 
--	dpp_presence_announce(dpp);
-+	switch (dpp->state) {
-+	case DPP_STATE_PRESENCE:
-+		dpp_presence_announce(dpp);
-+		break;
-+	case DPP_STATE_AUTHENTICATING:
-+		if (dpp->new_freq) {
-+			dpp->current_freq =3D dpp->new_freq;
-+			dpp->new_freq =3D 0;
-+			send_authenticate_response(dpp);
-+		}
-+
-+		break;
-+	default:
-+		break;
-+	}
+-	sm->rejected_groups =3D reallocarray(sm->rejected_groups,
+-						i + 1, sizeof(uint16_t));
++	sm->rejected_groups =3D realloc(sm->rejected_groups,
++					(i + 1) * sizeof(uint16_t));
+ 	sm->rejected_groups[0] +=3D 1;
+ 	sm->rejected_groups[i] =3D group;
  }
- =
-
- static void dpp_start_offchannel(struct dpp_sm *dpp, uint32_t freq);
-@@ -1332,6 +1349,7 @@ static void authenticate_request(struct dpp_sm *dpp, =
-const uint8_t *from,
- 	uint64_t k1[L_ECC_MAX_DIGITS];
- 	const void *ad0 =3D body + 2;
- 	const void *ad1 =3D body + 8;
-+	uint32_t freq;
- =
-
- 	if (dpp->state !=3D DPP_STATE_PRESENCE)
- 		return;
-@@ -1371,20 +1389,39 @@ static void authenticate_request(struct dpp_sm *dpp=
-, const uint8_t *from,
- 			}
- =
-
- 			break;
--		/*
--		 * TODO: Go on this channel for remainder of auth protocol.
--		 *
--		 * "the Responder determines whether it can use the requested
--		 * channel for the following exchanges. If so, it sends the DPP
--		 * Authentication Response frame on that channel. If not, it
--		 * discards the DPP Authentication Request frame without
--		 * replying to it."
--		 *
--		 * For the time being this feature is not being implemented and
--		 * the frame will be dropped.
--		 */
-+
- 		case DPP_ATTR_CHANNEL:
--			return;
-+			if (len !=3D 2)
-+				return;
-+
-+			freq =3D oci_to_frequency(l_get_u8(data),
-+						l_get_u8(data + 1));
-+
-+			if (freq =3D=3D dpp->current_freq)
-+				break;
-+
-+			/*
-+			 * Configurators are already connected to a network, so
-+			 * to preserve wireless performance the enrollee will
-+			 * be required to be on this channel, not a channel it
-+			 * requests.
-+			 */
-+			if (dpp->role =3D=3D DPP_CAPABILITY_CONFIGURATOR)
-+				return;
-+
-+			/*
-+			 * Otherwise, as an enrollee, we can jump to whatever
-+			 * channel the configurator requests
-+			 */
-+			dpp->new_freq =3D freq;
-+
-+			l_debug("Configurator requested a new frequency %u",
-+					dpp->new_freq);
-+
-+			offchannel_cancel(dpp->wdev_id, dpp->offchannel_id);
-+			dpp_start_offchannel(dpp, dpp->new_freq);
-+
-+			break;
- 		default:
- 			break;
- 		}
-@@ -1478,7 +1515,9 @@ static void authenticate_request(struct dpp_sm *dpp, =
-const uint8_t *from,
- 	dpp->state =3D DPP_STATE_AUTHENTICATING;
- 	dpp_reset_protocol_timer(dpp);
- =
-
--	send_authenticate_response(dpp);
-+	/* Don't send if the frequency is changing */
-+	if (!dpp->new_freq)
-+		send_authenticate_response(dpp);
- =
-
- 	return;
- =
-
 -- =
 
-2.31.1
+2.33.0
 
---===============3494662089866140682==--
+--===============5608781867201384408==--
 
