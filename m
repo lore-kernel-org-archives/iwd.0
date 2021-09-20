@@ -1,89 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============2697676459523985918=="
+Content-Type: multipart/mixed; boundary="===============5467367309553773366=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 5/6] scan: use oper_class/channel for OWE hidden scans
-Date: Wed, 22 Sep 2021 11:26:54 -0700
-Message-ID: <20210922182655.46220-5-prestwoj@gmail.com>
-In-Reply-To: 20210922182655.46220-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2] src/sae.c: fix build without reallocarray
+Date: Mon, 20 Sep 2021 10:34:10 -0500
+Message-ID: <7455fa76-7847-babe-ea08-4bcb994bb87c@gmail.com>
+In-Reply-To: 20210919191744.3963258-1-fontaine.fabrice@gmail.com
 
---===============2697676459523985918==
+--===============5467367309553773366==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If these are included in the OWE transition IE use them to scan
-for the OWE hidden network.
----
- src/scan.c | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+Hi Fabrice,
 
-diff --git a/src/scan.c b/src/scan.c
-index 54a7bc84..7b69cf3f 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -50,6 +50,7 @@
- #include "src/p2putil.h"
- #include "src/mpdu.h"
- #include "src/scan.h"
-+#include "src/band.h"
- =
+On 9/19/21 2:17 PM, Fabrice Fontaine wrote:
+> reallocarray has been added to glibc relatively recently (version 2.26,
+> from 2017) and apparently not all users run new enough glibc. Moreover,
+> reallocarray is not available with uclibc-ng. So use realloc if
+> reallocarray is not available to avoid the following build failure
+> raised since commit 891b78e9e892a3bcd800eb3a298e6380e9a15dd1:
+> =
 
- /* User configurable options */
- static double RANK_5G_FACTOR;
-@@ -670,6 +671,22 @@ uint32_t scan_active_full(uint64_t wdev_id,
- 					trigger, notify, userdata, destroy);
- }
- =
+> /home/giuliobenetti/autobuild/run/instance-3/output-1/host/lib/gcc/xtensa=
+-buildroot-linux-uclibc/10.3.0/../../../../xtensa-buildroot-linux-uclibc/bi=
+n/ld: src/sae.o: in function `sae_rx_authenticate':
+> sae.c:(.text+0xd74): undefined reference to `reallocarray'
+> =
 
-+static void scan_add_owe_freq(struct scan_freq_set *freqs,
-+				const struct scan_bss *bss)
-+{
-+	int freq;
-+
-+	if (bss->owe_trans->oper_class)
-+		freq =3D oci_to_frequency(bss->owe_trans->oper_class,
-+					bss->owe_trans->channel);
-+	else
-+		freq =3D bss->frequency;
-+
-+	L_WARN_ON(freq < 0);
-+
-+	scan_freq_set_add(freqs, freq);
-+}
-+
- static void add_owe_scan_cmd(struct scan_context *sc, struct scan_request =
-*sr,
- 				bool ignore_flush,
- 				struct scan_freq_set *freqs,
-@@ -681,7 +698,9 @@ static void add_owe_scan_cmd(struct scan_context *sc, s=
-truct scan_request *sr,
- =
+> Fixes:
+>   - http://autobuild.buildroot.org/results/c6d3f86282c44645b4f1c61882dc63=
+ccfc8eb35a
+> ---
+> Changes v1 -> v2 (after review of Denis Kenzior):
+>   - Remove SoB
+>   - Add reallocarray to missing.h
+> =
 
- 	if (!freqs) {
- 		tmp =3D scan_freq_set_new();
--		scan_freq_set_add(tmp, bss->frequency);
-+
-+		scan_add_owe_freq(tmp, bss);
-+
- 		params.freqs =3D tmp;
- 	} else
- 		params.freqs =3D freqs;
-@@ -732,7 +751,7 @@ uint32_t scan_owe_hidden(uint64_t wdev_id, struct l_que=
-ue *list,
- 	for (entry =3D l_queue_get_entries(list); entry; entry =3D entry->next) {
- 		bss =3D entry->data;
- =
+>   configure.ac  | 1 +
+>   src/missing.h | 7 +++++++
+>   2 files changed, 8 insertions(+)
+> =
 
--		scan_freq_set_add(freqs, bss->frequency);
-+		scan_add_owe_freq(freqs, bss);
- =
 
- 		/* First */
- 		if (!ssid) {
--- =
+Applied after re-wording the commit header slightly.  Thanks!
 
-2.31.1
+Regards,
+-Denis
 
---===============2697676459523985918==--
+--===============5467367309553773366==--
 
