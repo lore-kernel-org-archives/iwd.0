@@ -1,54 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============7509643246576412488=="
+Content-Type: multipart/mixed; boundary="===============8736716662300648507=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Request for feature - Scan while AP
-Date: Tue, 08 Feb 2022 13:13:53 -0800
-Message-ID: <5dfd7cd47232625a4dc259679108c64b3309be16.camel@gmail.com>
-In-Reply-To: CAG17S_M-Je-bSmxJ8PjUqip5o+rEFKQhxXWodnWayUhTzxYgJA@mail.gmail.com
+Subject: [PATCH 3/4] nlmon: print Mobility Domain element
+Date: Tue, 21 Sep 2021 13:44:47 -0700
+Message-ID: <20210921204448.119199-3-prestwoj@gmail.com>
+In-Reply-To: 20210921204448.119199-1-prestwoj@gmail.com
 
---===============7509643246576412488==
+--===============8736716662300648507==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+---
+ monitor/nlmon.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-On Fri, 2022-02-04 at 17:10 -0600, KeithG wrote:
-> I mentioned this a while ago and am wondering if this is on the list
-> of features to add. Currently, we start as connman/iwd, but if we do
-> not get an IP address, we stop iwd then start hostapd and advertise
-> as
-> an AP for initial setup. When a user connects, he/she can scan for
-> availabel SSIDS and set then up.
-> I know iwd can run in AP mode, but it cannot scan while in AP mode.
-> As
-> it is, hostapd does this for us, so we have a work around. I was
-> wondering if this functionality is in the works.
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 4cf2b856..ec7fc03a 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -2235,6 +2235,30 @@ static void print_fast_bss_transition(unsigned int l=
+evel, const char *label,
+ 	}
+ }
+ =
 
-What exactly do you need/want for the API? Same thing as
-net.connman.iwd.Station.Scan() where you issue Scan() then
-GetOrderedNetworks() for the results?
++static void print_mobility_domain(unsigned int level, const char *label,
++					const void *data, uint16_t size)
++{
++	uint16_t mdid;
++	bool ft_over_ds;
++	bool resource_req;
++
++	print_attr(level, "%s", label);
++
++	if (ie_parse_mobility_domain_from_data(data - 2, size + 2, &mdid,
++					&ft_over_ds, &resource_req) < 0) {
++		print_attr(level + 1, "error parsing");
++		return;
++	}
++
++	print_attr(level + 1, "MDID: %04x", mdid);
++
++	if (ft_over_ds)
++		print_attr(level + 1, "FT-over-DS bit set");
++
++	if (resource_req)
++		print_attr(level + 1, "Resource Request Protocol bit set");
++}
++
+ static struct attr_entry ie_entry[] =3D {
+ 	{ IE_TYPE_SSID,				"SSID",
+ 		ATTR_CUSTOM,	{ .function =3D print_ie_ssid } },
+@@ -2295,6 +2319,8 @@ static struct attr_entry ie_entry[] =3D {
+ 		ATTR_CUSTOM,	{ .function =3D print_measurement_report } },
+ 	{ IE_TYPE_FAST_BSS_TRANSITION,		"Fast BSS Transition",
+ 		ATTR_CUSTOM,	{ .function =3D print_fast_bss_transition } },
++	{ IE_TYPE_MOBILITY_DOMAIN,		"Mobility Domain",
++		ATTR_CUSTOM,	{ .function =3D print_mobility_domain } },
+ 	{ },
+ };
+ =
 
-Also one thing that may interest you is DPP. This is significantly less
-overhead/hassle than having the device change to AP mode, scan, return
-results, go back to station, then connect. You would need some way of
-bootstrapping, and compatibility may be an issue e.g. Apple devices,
-just a thought.
+-- =
 
-Thanks,
-James
+2.31.1
 
-> =
-
-> Regards,
-> =
-
-> Keith
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
-
-
---===============7509643246576412488==--
+--===============8736716662300648507==--
 
