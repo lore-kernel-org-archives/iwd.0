@@ -1,45 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============7957908526270591407=="
+Content-Type: multipart/mixed; boundary="===============4854743170218942655=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] sae: fix missing reallocarray definition
-Date: Wed, 26 Jan 2022 10:01:14 -0800
-Message-ID: <20220126180114.3164052-1-prestwoj@gmail.com>
+Subject: [PATCH 1/6] ie: add info struct for OWE transition
+Date: Wed, 22 Sep 2021 11:26:50 -0700
+Message-ID: <20210922182655.46220-1-prestwoj@gmail.com>
 
---===============7957908526270591407==
+--===============4854743170218942655==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Building on GCC 8 resulted in this compiler error. Newer versions seem
-to find malloc.h without the include, but not on GCC 8.
-
-src/sae.c:107:25: error: implicit declaration of function =E2=80=98realloca=
-rray=E2=80=99; did you mean =E2=80=98realloc=E2=80=99? [-Werror=3Dimplicit-=
-function-declaration]
-   sm->rejected_groups =3D reallocarray(NULL, 2, sizeof(uint16_t));
+These members are currently stored in scan_bss but with the
+addition of operating class/band info this will become 5
+separate members. This is a bit excessive to store in scan_bss
+separately so instead this structure can hold everything related
+to the OWE transition IE.
 ---
- src/sae.c | 2 ++
- 1 file changed, 2 insertions(+)
+ src/ie.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/sae.c b/src/sae.c
-index dc07db4b..9515b455 100644
---- a/src/sae.c
-+++ b/src/sae.c
-@@ -24,6 +24,8 @@
- #include <config.h>
- #endif
+diff --git a/src/ie.h b/src/ie.h
+index f64072b3..02892724 100644
+--- a/src/ie.h
++++ b/src/ie.h
+@@ -488,6 +488,12 @@ struct ie_fils_ip_addr_response_info {
+ 	uint8_t ipv6_lifetime;		/* Zero if not provided */
+ };
  =
 
-+#include <malloc.h>
++struct ie_owe_transition_info {
++	uint8_t bssid[6];
++	uint8_t ssid[32];
++	size_t ssid_len;
++};
 +
- #include <ell/ell.h>
- =
-
- #include "src/missing.h"
+ extern const unsigned char ieee_oui[3];
+ extern const unsigned char microsoft_oui[3];
+ extern const unsigned char wifi_alliance_oui[3];
 -- =
 
 2.31.1
 
---===============7957908526270591407==--
+--===============4854743170218942655==--
 
