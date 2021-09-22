@@ -1,73 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============5453591187498605181=="
+Content-Type: multipart/mixed; boundary="===============1012863065839379174=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: EAP server tried method 25 while client was configured for method
- 26
-Date: Thu, 12 May 2022 15:25:40 -0500
-Message-ID: <0fa43dec-26d2-6515-1b42-8db3bce19bdc@gmail.com>
-In-Reply-To: 6fc4a1a0c9cea52a46c5645cc33c2036@univie.ac.at
+Subject: [PATCH 6/6] auto-t: add oper class/band tests for OWE transition
+Date: Wed, 22 Sep 2021 11:26:55 -0700
+Message-ID: <20210922182655.46220-6-prestwoj@gmail.com>
+In-Reply-To: 20210922182655.46220-1-prestwoj@gmail.com
 
---===============5453591187498605181==
+--===============1012863065839379174==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Axel,
+---
+ .../testOWE-transition/connection_test.py     | 26 +++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-On 5/12/22 06:43, Axel Kittenberger wrote:
-> Hello, I can't get iwd to connect to a 802.1x (university) network.
-> =
+diff --git a/autotests/testOWE-transition/connection_test.py b/autotests/te=
+stOWE-transition/connection_test.py
+index 7240e3a8..9555766e 100644
+--- a/autotests/testOWE-transition/connection_test.py
++++ b/autotests/testOWE-transition/connection_test.py
+@@ -196,6 +196,30 @@ class Test(unittest.TestCase):
+         with self.assertRaises(iwd.NotFoundEx):
+             self.validate(self.wd, self.hapd_owe, connect_hidden=3DTrue)
+ =
 
-> $ cat /var/lib/iwd/eduroam.8021x
-> [Security]
-> EAP-Method=3DPEAP
-> EAP-PEAP-Phase2-Method=3DMSCHAPV2
-> EAP-PEAP-Phase2-Identity=3Dxxx
-> EAP-PEAP-Phase2-Password=3Dxxx
-> =
++    def test_owe_transition_band_info(self):
++        self.hapd_open.set_value('vendor_elements', 'dd17506f9a1c02000000f=
+1000a6f77652d68696464656e5103')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.set_value('channel', '3')
++        self.hapd_owe.reload()
++
++        self.hapd_owe2.disable()
++        self.hapd_open2.disable()
++
++        self.validate(self.wd, self.hapd_owe)
++
++    def test_owe_transition_wrong_band_info(self):
++        self.hapd_open.set_value('vendor_elements', 'dd17506f9a1c02000000f=
+1000a6f77652d68696464656e5102')
++        self.hapd_open.reload()
++        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
+000a7472616e736974696f6e')
++        self.hapd_owe.set_value('channel', '3')
++        self.hapd_owe.reload()
++
++        self.hapd_owe2.disable()
++        self.hapd_open2.disable()
++
++        self.validate(self.wd, self.hapd_open)
++
+     def setUp(self):
+         self.wd =3D IWD(True)
+         self.hapd_owe =3D HostapdCLI(config=3D'ssidOWE.conf')
+@@ -206,6 +230,8 @@ class Test(unittest.TestCase):
+     def tearDown(self):
+         IWD.clear_storage()
+ =
 
++        self.hapd_owe.set_value('channel', '1')
++
+         self.wd =3D None
+         self.hapd_open =3D None
+         self.hapd_owe =3D None
+-- =
 
-This configuration looks pretty typical for a PEAP+MSCHAPv2.
+2.31.1
 
-> produces following iwd output (started on console)
-> ""
-> Wiphy: 0, Name: phy0
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Permanent Address: 64:6c:80:e=
-d:91:b9
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bands: 2.4 GHz 5 GHz
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Ciphers: CCMP TKIP BIP
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Supported iftypes: ad-hoc sta=
-tion ap p2p-client p2p-go p2p-device
-> EAP server tried method 25 while client was configured for method 26
-
-This is very strange.  We're configured for MSCHAPv2 (method=3D26) inside t=
-he PEAP =
-
-tunnel.  It seems that the server is sending us EAP-PEAP (method=3D25) pack=
-ets =
-
-within the tunnel, which doesn't make sense from what I remember of the pro=
-tocol.
-
-Can you run with IWD_TLS_DEBUG=3D1 environment variable set and share the l=
-og? =
-
-You can send it to me privately.  See [1]
-
-> PEAP: Tunnel has disconnected with alert: close_notify
-> ""
-
-<snip>
-
-> /usr/libexec/iwd --version
-> 1.14
-
-Have you tried a later version of iwd? 1.14 is about a year old now.
-
-[1] https://iwd.wiki.kernel.org/debugging#enabling_tls_debugging
-
-Regards,
--Denis
---===============5453591187498605181==--
+--===============1012863065839379174==--
 
