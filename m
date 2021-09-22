@@ -1,196 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============3134622245312128334=="
+Content-Type: multipart/mixed; boundary="===============2697676459523985918=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 07/10] dpp: support retransmitting frames with no ACK
-Date: Tue, 11 Jan 2022 16:55:55 -0800
-Message-ID: <20220112005558.1158405-7-prestwoj@gmail.com>
-In-Reply-To: 20220112005558.1158405-1-prestwoj@gmail.com
+Subject: [PATCH 5/6] scan: use oper_class/channel for OWE hidden scans
+Date: Wed, 22 Sep 2021 11:26:54 -0700
+Message-ID: <20210922182655.46220-5-prestwoj@gmail.com>
+In-Reply-To: 20210922182655.46220-1-prestwoj@gmail.com
 
---===============3134622245312128334==
+--===============2697676459523985918==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The DPP spec says nothing about how to handle re-transmits but it
-was found in testing this can happen relatively easily for a few
-reasons.
-
-If the configurator requests a channel switch but does not get onto
-the new channel quick enough the enrollee may have already sent the
-authenticate response and it was missed. Also by nature of how the
-kernel goes offchannel there are moments in time between ROC when
-the card is idle and not receiving any frames.
-
-Only frames where there was no ACK will be retransmitted. If the
-peer received the frame and dropped it resending the same frame wont
-do any good.
+If these are included in the OWE transition IE use them to scan
+for the OWE hidden network.
 ---
- src/dpp.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 94 insertions(+), 1 deletion(-)
+ src/scan.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index c22788e7..a4cc315b 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -52,6 +52,9 @@
+diff --git a/src/scan.c b/src/scan.c
+index 54a7bc84..7b69cf3f 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -50,6 +50,7 @@
+ #include "src/p2putil.h"
+ #include "src/mpdu.h"
  #include "src/scan.h"
- #include "src/network.h"
- #include "src/handshake.h"
-+#include "src/nl80211util.h"
-+
-+#define DPP_FRAME_MAX_RETRIES 5
++#include "src/band.h"
  =
 
- static uint32_t netdev_watch;
- static struct l_genl_family *nl80211;
-@@ -118,6 +121,9 @@ struct dpp_sm {
- =
-
- 	struct dpp_configuration *config;
- 	uint32_t connect_scan_id;
-+	uint64_t frame_cookie;
-+	uint32_t mlme_watch;
-+	uint8_t frame_retry;
- =
-
- 	struct l_dbus_message *message;
- };
-@@ -174,6 +180,7 @@ static void dpp_reset(struct dpp_sm *dpp)
- =
-
- 	dpp->state =3D DPP_STATE_NOTHING;
- 	dpp->new_freq =3D 0;
-+	dpp->frame_retry =3D 0;
- =
-
- 	explicit_bzero(dpp->r_nonce, dpp->nonce_len);
- 	explicit_bzero(dpp->i_nonce, dpp->nonce_len);
-@@ -204,13 +211,26 @@ static void dpp_free(struct dpp_sm *dpp)
- 		dpp->boot_private =3D NULL;
- 	}
- =
-
-+	if (dpp->mlme_watch) {
-+		l_genl_family_unregister(nl80211, dpp->mlme_watch);
-+		dpp->mlme_watch =3D 0;
-+	}
-+
- 	l_free(dpp);
+ /* User configurable options */
+ static double RANK_5G_FACTOR;
+@@ -670,6 +671,22 @@ uint32_t scan_active_full(uint64_t wdev_id,
+ 					trigger, notify, userdata, destroy);
  }
  =
 
- static void dpp_send_frame_cb(struct l_genl_msg *msg, void *user_data)
- {
--	if (l_genl_msg_get_error(msg) < 0)
-+	struct dpp_sm *dpp =3D user_data;
-+
-+	if (l_genl_msg_get_error(msg) < 0) {
- 		l_error("Error sending frame");
-+		return;
-+	}
-+
-+	if (nl80211_parse_attrs(msg, NL80211_ATTR_COOKIE, &dpp->frame_cookie,
-+				NL80211_ATTR_UNSPEC) < 0)
-+		l_error("Error parsing frame cookie");
- }
- =
-
- static void dpp_send_frame(struct dpp_sm *dpp, struct iovec *iov, size_t i=
-ov_len,
-@@ -1575,6 +1595,76 @@ static void dpp_handle_frame(const struct mmpdu_head=
-er *frame,
- 	}
- }
- =
-
-+static void dpp_mlme_notify(struct l_genl_msg *msg, void *user_data)
++static void scan_add_owe_freq(struct scan_freq_set *freqs,
++				const struct scan_bss *bss)
 +{
-+	struct dpp_sm *dpp =3D user_data;
-+	uint64_t wdev_id =3D 0;
-+	uint64_t cookie =3D 0;
-+	bool ack =3D false;
-+	struct l_genl_attr attr;
-+	const void *data;
-+	uint16_t len;
-+	uint16_t type;
-+	const void *frame =3D NULL;
-+	uint16_t frame_len =3D 0;
-+	struct iovec iov;
-+	uint8_t cmd =3D l_genl_msg_get_command(msg);
++	int freq;
 +
-+	if (cmd !=3D NL80211_CMD_FRAME_TX_STATUS)
-+		return;
++	if (bss->owe_trans->oper_class)
++		freq =3D oci_to_frequency(bss->owe_trans->oper_class,
++					bss->owe_trans->channel);
++	else
++		freq =3D bss->frequency;
 +
-+	if (dpp->state <=3D DPP_STATE_PRESENCE)
-+		return;
++	L_WARN_ON(freq < 0);
 +
-+	l_genl_attr_init(&attr, msg);
-+
-+	while (l_genl_attr_next(&attr, &type, &len, &data)) {
-+		switch (type) {
-+		case NL80211_ATTR_WDEV:
-+			if (len !=3D 8)
-+				return;
-+
-+			wdev_id =3D l_get_u64(data);
-+			break;
-+		case NL80211_ATTR_COOKIE:
-+			if (len !=3D 8)
-+				return;
-+
-+			cookie =3D l_get_u64(data);
-+			break;
-+		case NL80211_ATTR_ACK:
-+			ack =3D true;
-+			break;
-+		case NL80211_ATTR_FRAME:
-+			frame =3D data;
-+			frame_len =3D len;
-+			break;
-+		}
-+	}
-+
-+	/*
-+	 * Only want to handle the no-ACK case. Re-transmitting an ACKed
-+	 * frame likely wont do any good, at least in the case of DPP.
-+	 */
-+	if (dpp->wdev_id !=3D wdev_id || dpp->frame_cookie !=3D cookie ||
-+				ack || !frame)
-+		return;
-+
-+	if (dpp->frame_retry > DPP_FRAME_MAX_RETRIES) {
-+		dpp_reset(dpp);
-+		return;
-+	}
-+
-+	iov.iov_base =3D (void *)frame;
-+	iov.iov_len =3D frame_len;
-+
-+	l_debug("No ACK from peer, re-transmitting");
-+
-+	dpp->frame_retry++;
-+
-+	dpp_send_frame(dpp, &iov, 1, dpp->current_freq);
++	scan_freq_set_add(freqs, freq);
 +}
 +
- static void dpp_create(struct netdev *netdev)
- {
- 	struct l_dbus *dbus =3D dbus_get_bus();
-@@ -1612,6 +1702,9 @@ static void dpp_create(struct netdev *netdev)
- 				dpp_conf_request_prefix,
- 				sizeof(dpp_conf_request_prefix),
- 				dpp_handle_config_request_frame, dpp, NULL);
-+
-+	dpp->mlme_watch =3D l_genl_family_register(nl80211, "mlme",
-+						dpp_mlme_notify, dpp, NULL);
- }
+ static void add_owe_scan_cmd(struct scan_context *sc, struct scan_request =
+*sr,
+ 				bool ignore_flush,
+ 				struct scan_freq_set *freqs,
+@@ -681,7 +698,9 @@ static void add_owe_scan_cmd(struct scan_context *sc, s=
+truct scan_request *sr,
  =
 
- static void dpp_netdev_watch(struct netdev *netdev,
+ 	if (!freqs) {
+ 		tmp =3D scan_freq_set_new();
+-		scan_freq_set_add(tmp, bss->frequency);
++
++		scan_add_owe_freq(tmp, bss);
++
+ 		params.freqs =3D tmp;
+ 	} else
+ 		params.freqs =3D freqs;
+@@ -732,7 +751,7 @@ uint32_t scan_owe_hidden(uint64_t wdev_id, struct l_que=
+ue *list,
+ 	for (entry =3D l_queue_get_entries(list); entry; entry =3D entry->next) {
+ 		bss =3D entry->data;
+ =
+
+-		scan_freq_set_add(freqs, bss->frequency);
++		scan_add_owe_freq(freqs, bss);
+ =
+
+ 		/* First */
+ 		if (!ssid) {
 -- =
 
 2.31.1
 
---===============3134622245312128334==--
+--===============2697676459523985918==--
 
