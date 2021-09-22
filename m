@@ -1,90 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============7737236961105959764=="
+Content-Type: multipart/mixed; boundary="===============2401755107594131171=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd configure location and files
-Date: Tue, 30 Nov 2021 17:53:40 -0600
-Message-ID: <070b7088-2ab6-67bf-63a1-7a1be95a58f7@gmail.com>
-In-Reply-To: CAA=hcWRD26NoeS5bgZ3kdBFz2c7n=kpan2etQkXhRKv1UavYJw@mail.gmail.com
+Subject: Re: [PATCH] netconfig: Add IP configuration properties on Station and
+ P2P
+Date: Wed, 22 Sep 2021 17:32:21 -0500
+Message-ID: <35753f1a-ca6b-4730-96ce-43e27d9cd046@gmail.com>
+In-Reply-To: CAOq732K5p9ctz2ORSULxQ0auwv8q+gdO6vgiBWoW3watGnHH7w@mail.gmail.com
 
---===============7737236961105959764==
+--===============2401755107594131171==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jupiter,
+Hi Andrew,
 
-> My bad, here is DHCP debugging, looks like failed to get DHCP server resp=
-onse:
+>>> @@ -270,23 +300,25 @@ static int netconfig_set_dns(struct netconfig *ne=
+tconfig)
+>>>        char **dns_list;
+>>>        const struct ie_fils_ip_addr_response_info *fils =3D
+>>>                netconfig->fils_override;
+>>> +     struct l_dbus *dbus =3D dbus_get_bus();
+>>>
+>>> -     if (!dns4_list && !dns6_list)
+>>> -             return 0;
+>>> +     if (dns6_list) {
+>>> +             dns_list =3D l_malloc(sizeof(char *) *
+>>> +                                     (n_entries4 + n_entries6 + 1));
+>>>
+>>> -     dns_list =3D dns4_list;
+>>> +             if (dns4_list)
+>>> +                     memcpy(dns_list, dns4_list,
+>>> +                             sizeof(char *) * n_entries4);
+>>>
+>>> -     if (dns6_list) {
+>>> -             dns_list =3D l_realloc(dns_list,
+>>> -                             sizeof(char *) * (n_entries4 + n_entries6=
+ + 1));
+>>>                memcpy(dns_list + n_entries4, dns6_list,
+>>>                        sizeof(char *) * (n_entries6 + 1));
+>>> -             /* Contents now belong to dns_list, so no l_strfreev */
+>>> -             l_free(dns6_list);
+>>> -     }
+>>> +     } else
+>>> +             dns_list =3D dns4_list;
+>>>
+>>>        resolve_set_dns(netconfig->resolve, dns_list);
+>>> -     l_strv_free(dns_list);
+>>> +
+>>> +     if (dns6_list)
+>>> +             l_free(dns_list);
+>>
+>> Why are you doing all this when you can just check for dns[4|6]_list bei=
+ng
+>> changed prior to building the list for submission to resolve_set_dns?
 > =
 
-> ../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
-> '34:08:04:12:b1:a2' freq: 2437, rank: 2722, strength: -6500
-> ../iwd-1.19/src/station.c:station_enter_state() Old State:
-> autoconnect_full, new state: connecting (auto)
-> ../iwd-1.19/src/station.c:station_netdev_event() Associating
-> ../iwd-1.19/src/station.c:station_handshake_event() Setting keys
-> ../iwd-1.19/src/station.c:station_connect_cb() 14, result: 0
-> ../iwd-1.19/src/station.c:station_connect_ok()
-> netconfig: Failed to start DHCPv4 client for interface 14
-> WARNING: ../iwd-1.19/src/station.c:station_connect_ok() condition
-> !netconfig_configure(station->netconfig,
-
-Ugh, not sure what happens here.  First, can you update to iwd 1.20?  I don=
-'t =
-
-think anything was touched around this for several releases, but I'd hate t=
-o try =
-
-and debug an old version.  Also, share the full log of iwd when this happen=
-s...
-
-Can you strace iwd and see what syscall might be failing around this time? =
- You =
-
-may also need to step through l_dhcp_client_start to see why it is failing.=
-  It =
-
-really shouldn't under normal circumstances, hence we have no debugs in thi=
-s area.
-
-> station_netconfig_event_handler, station) failed
-> [DHCPv4] dhcp_client_timeout_resend:526
-> [DHCPv4] dhcp_client_send_discover:346
-> [DHCPv4] dhcp_client_timeout_resend:526
-> [DHCPv4] dhcp_client_send_discover:346
-> [DHCPv4] dhcp_client_timeout_resend:526
-> [DHCPv4] dhcp_client_send_discover:346
-> [DHCPv4] dhcp_client_timeout_resend:526
-> [DHCPv4] dhcp_client_send_discover:346
-
-And this is even more strange.  If l_dhcp_client_start() fails, then the re=
-send =
-
-timer shouldn't even be set and you shouldn't even see this sequence.
-
-Can you try compiling with optimizations off (./configure --enable-debug =
-
---disable-optimization) and see if the behavior changes?
-
+> Do you mean why is the code calling resolve_set_dns() even if the
+> values haven't changed?  Mostly to keep the current behaviour.
 > =
 
-> Is netconfig from iwd?
 
-yes
+No.  You're building a brand new dns_list so that you're not messing with t=
+he =
 
-> =
+dns4_list / dns6_list because you want to check those for changes & send =
 
-> I think the DHCP server is running from the home WiFi modem, right? My
-> laptop is also connected to the same WiFi modem SSID JupiterIoT which
-> should rule out home WiFi network DHCP server issues.
+PropertyChanged signals.  But you can take care of the PropertyChanged sign=
+als =
 
-Given the fact that we fail to start dhcp client, I'm not sure we even send=
- any =
+up front (and you probably want to prior to the 'both lists are NULL' check =
 
-discover packets.  So your server might be just fine.
+anyway).  All the changes above are not necessary.
 
 Regards,
 -Denis
---===============7737236961105959764==--
+--===============2401755107594131171==--
 
