@@ -1,68 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============8557439894689749063=="
+Content-Type: multipart/mixed; boundary="===============8047855231652552848=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: 58e33db1-f428-4823-8cc3-d962d0fb8aa8 at slmail.me
 To: iwd at lists.01.org
-Subject: [PATCH v2 4/6] netdev: use work priorities rather than hard coding
-Date: Tue, 11 Jan 2022 09:45:12 -0800
-Message-ID: <20220111174514.1074967-4-prestwoj@gmail.com>
-In-Reply-To: 20220111174514.1074967-1-prestwoj@gmail.com
+Subject: iwd 1.18 doesn't connect to network on boot
+Date: Thu, 23 Sep 2021 11:04:32 +0000
+Message-ID: <163239507223.7.15396824044509805482.14044955@slmail.me>
 
---===============8557439894689749063==
+--===============8047855231652552848==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/netdev.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Hi,
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 78467d3e..2d49b1f8 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4040,8 +4040,8 @@ build_cmd_connect:
- 					NL80211_EXT_FEATURE_CAN_REPLACE_PTK0))
- 		handshake_state_set_no_rekey(hs, true);
- =
+I'm on Arch Linux and after recent iwd upgrade to version 1.18 I'm no longe=
+r connected to my home network when booting. Previous version works just fi=
+ne. I've managed to workaround the issue simply by going to iwctl and manua=
+lly doing disconnect/connect every time I boot the computer.
 
--	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
--				&connect_work_ops);
-+	wiphy_radio_work_insert(netdev->wiphy, &netdev->work,
-+				WIPHY_WORK_PRIORITY_CONNECT, &connect_work_ops);
- }
- =
+Before doing this iwctl reports 'connecting' state indefinitely. Network co=
+verage is always good. I have the laptop sitting on a table very close to t=
+he router and AFAIK, it didn't receive any firmware upgrade recently.
 
- int netdev_connect(struct netdev *netdev, struct scan_bss *bss,
-@@ -4620,8 +4620,8 @@ int netdev_fast_transition(struct netdev *netdev,
- 					netdev_get_oci, netdev);
- 	memcpy(netdev->ap->prev_bssid, orig_bss->addr, ETH_ALEN);
- =
+A little bit more of context in case it helps:
 
--	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
--				&ft_work_ops);
-+	wiphy_radio_work_insert(netdev->wiphy, &netdev->work,
-+				WIPHY_WORK_PRIORITY_CONNECT, &ft_work_ops);
- =
+/etc/iwd/main.conf
+[General]
+EnableNetworkConfiguration=3Dtrue
+AddressRandomization=3Dnetwork
 
- 	return 0;
- }
-@@ -4661,8 +4661,8 @@ int netdev_fast_transition_over_ds(struct netdev *net=
-dev,
- 					netdev);
- 	memcpy(netdev->ap->prev_bssid, orig_bss->addr, ETH_ALEN);
- =
+[Network]
+NameResolvingService=3Dresolvconf
 
--	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
--				&ft_work_ops);
-+	wiphy_radio_work_insert(netdev->wiphy, &netdev->work,
-+				WIPHY_WORK_PRIORITY_CONNECT, &ft_work_ops);
- =
+iwevent
+Waiting for Wireless Events from interfaces...
+10:10:55.646290 wlan0 Scan request completed
+10:10:57.801675 wlan0 Scan request completed
+10:10:58.106493 wlan0 New Access Point/Cell address:Not-Associated =3D> thi=
+s is the disconnect
+10:11:31.786703 wlan0 Scan request completed
+10:11:31.871341 wlan0 Association Request IEs:xxxxxxxxxxxxxxxxxxxxxxxxxxxxx=
+xxxxxxxxxxxxxxxxxxxx
+10:11:31.871401 wlan0 Association Response IEs:xxxxxxxxxxxxxxxxxxxxxxxxxxxx=
+xxxxxxxxxxxxxxxxxxxxx
+10:11:31.871436 wlan0 New Access Point/Cell address:xx:xx:xx:xx:xx:xx
 
- 	return 0;
- }
--- =
+Distro mantainers just upgraded to latest upstream release, without any oth=
+er modification on PKGBUILD.
 
-2.31.1
+https://github.com/archlinux/svntogit-community/blob/9b59977cbb8eb2ffe42ab6=
+13b033efa21c36c053/trunk/PKGBUILD
 
---===============8557439894689749063==--
+
+Thanks for helping!
+--
+Jason
+
+
+--===============8047855231652552848==--
 
