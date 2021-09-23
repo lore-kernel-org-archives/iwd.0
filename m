@@ -1,31 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============3098002108353947356=="
+Content-Type: multipart/mixed; boundary="===============7847341090480693596=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/3] hwsim: don't print on when send frame fails
-Date: Mon, 14 Feb 2022 16:06:15 -0600
-Message-ID: <b281d97f-69ea-0ae1-49d4-419a2b7eab8e@gmail.com>
-In-Reply-To: 20220214203439.989936-1-prestwoj@gmail.com
+Subject: Re: [PATCH 1/5] test: choose default device in force-roam
+Date: Thu, 23 Sep 2021 17:47:27 -0500
+Message-ID: <99d5f9bb-2b90-fdc3-fdbf-18e0dcb2d9dc@gmail.com>
+In-Reply-To: 20210923225728.556306-1-prestwoj@gmail.com
 
---===============3098002108353947356==
+--===============7847341090480693596==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 2/14/22 14:34, James Prestwood wrote:
-> This happens quite often and spams the console with this error.
+On 9/23/21 5:57 PM, James Prestwood wrote:
+> This makes the usage much more convenient if the system has only
+> a single device.
 > ---
->   tools/hwsim.c | 6 +-----
->   1 file changed, 1 insertion(+), 5 deletions(-)
+>   test/force-roam | 27 +++++++++++++++++++++++----
+>   1 file changed, 23 insertions(+), 4 deletions(-)
 > =
 
 
-Applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
 
---===============3098002108353947356==--
+--===============7847341090480693596==--
 
