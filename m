@@ -1,31 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============2659248385455912849=="
+Content-Type: multipart/mixed; boundary="===============5294143139605913337=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] auto-t: add missing config files (testOWE-transition)
-Date: Wed, 22 Dec 2021 18:14:16 -0600
-Message-ID: <fce0c768-e49b-84e6-8240-d3b73f475d4a@gmail.com>
-In-Reply-To: 20211223002335.14823-1-prestwoj@gmail.com
+Subject: [PATCH 2/5] test-runner: set DBUS_SYSTEM_BUS_ADDRESS for --shell
+Date: Thu, 23 Sep 2021 15:57:25 -0700
+Message-ID: <20210923225728.556306-2-prestwoj@gmail.com>
+In-Reply-To: 20210923225728.556306-1-prestwoj@gmail.com
 
---===============2659248385455912849==
+--===============5294143139605913337==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+After namespaces were added, the dbus address was customized to
+be /tmp/dbus{0..N}. This prevented any dbus applications started
+in the shell from working properly.
 
-On 12/22/21 18:23, James Prestwood wrote:
-> ---
->   autotests/testOWE-transition/ssidOWE-2.conf  | 9 +++++++++
->   autotests/testOWE-transition/ssidOpen-2.conf | 3 +++
->   2 files changed, 12 insertions(+)
->   create mode 100644 autotests/testOWE-transition/ssidOWE-2.conf
->   create mode 100644 autotests/testOWE-transition/ssidOpen-2.conf
+Set DBUS_SYSTEM_BUS_ADDRESS to the environment prior to entering
+the shell.
+---
+ tools/test-runner | 1 +
+ 1 file changed, 1 insertion(+)
 
-Applied, thanks.
+diff --git a/tools/test-runner b/tools/test-runner
+index b0d6554d..a1967173 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -1416,6 +1416,7 @@ def run_auto_tests(ctx, args):
+ 				# a set of tests was passed in just start out in the first.
+ 				#
+ 				os.chdir(tests[0])
++				os.environ['DBUS_SYSTEM_BUS_ADDRESS'] =3D ctx.dbus_address
+ 				os.system('/bin/bash')
+ 				exit()
+ =
 
-Regards,
--Denis
+-- =
 
---===============2659248385455912849==--
+2.31.1
+
+--===============5294143139605913337==--
 
