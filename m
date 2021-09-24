@@ -1,70 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============0204527653602496605=="
+Content-Type: multipart/mixed; boundary="===============1954239194137216695=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/5] test-runner: disallow result/monitor/log directly under
- /tmp
-Date: Wed, 25 May 2022 12:23:25 -0700
-Message-ID: <20220525192328.335557-2-prestwoj@gmail.com>
-In-Reply-To: 20220525192328.335557-1-prestwoj@gmail.com
+Subject: Re: iwd 1.18 doesn't connect to network on boot
+Date: Fri, 24 Sep 2021 08:55:11 -0500
+Message-ID: <98658ac1-d812-130c-4a09-b08517917160@gmail.com>
+In-Reply-To: 163248189187.7.458454357387386987.14116837@slmail.me
 
---===============0204527653602496605==
+--===============1954239194137216695==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Inside the virtual environments /tmp is mounted as its own FS and not
-taken from the host. This poses issues if any output files are directly
-under /tmp since test-runner tries to mount the parent directory (/tmp).
-The can be fixed by ensuring these output files are either not under
-/tmp or at least one folder down the tree (e.g. /tmp/outputs/outfile.txt).
+Hi Jason,
 
-Now this requirement is enforced and test-runner will not start if any
-output files parent directory is /tmp.
----
- tools/runner.py | 7 +++++++
- 1 file changed, 7 insertions(+)
+<snip>
 
-diff --git a/tools/runner.py b/tools/runner.py
-index 5f837097..90818ef1 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -311,6 +311,9 @@ class RunnerAbstract:
- 		gid =3D int(os.environ.get('SUDO_GID', os.getgid()))
- =
+> iwd[4842]: src/station.c:station_connect_cb() 8, result: 0
+> iwd[4842]: src/station.c:station_connect_ok()
 
- 		if self.args.log:
-+			if self.args.log =3D=3D '/tmp':
-+				raise Exception('Log directly cannot be /tmp')
-+
- 			append_gid_uid =3D True
- =
+So the interesting thing is that we connect successfully, so the issue is =
 
- 			if not os.path.exists(self.args.log):
-@@ -324,12 +327,16 @@ class RunnerAbstract:
- =
+actually in netconfig somewhere.  Can you tell me which version you had bef=
+ore =
 
- 			self.args.monitor_parent =3D os.path.abspath(
- 						os.path.join(self.args.monitor, os.pardir))
-+			if self.args.monitor_parent =3D=3D '/tmp':
-+				raise Exception('--monitor cannot be directly under /tmp')
- =
+that worked?  Was it 1.17 or earlier?
 
- 		if self.args.result:
- 			append_gid_uid =3D True
- =
+> iwd[4842]: src/netconfig.c:netconfig_ipv6_select_and_install() IPV6 confi=
+guration disabled
+> iwd[4842]: src/wiphy.c:wiphy_radio_work_done() Work item 2 done
+> iwd[4842]: src/netdev.c:netdev_link_notify() event 16 on ifindex 8
+> iwd[4842]: src/netdev.c:netdev_mlme_notify() MLME notification Frame TX S=
+tatus(60)
+> iwd[4842]: src/station.c:station_early_neighbor_report_cb() ifindex: 8, e=
+rror: -110(Connection timed out)
+> =
 
- 			self.args.result_parent =3D os.path.abspath(
- 						os.path.join(self.args.result, os.pardir))
-+			if self.args.result_parent =3D=3D '/tmp':
-+				raise Exception('--result cannot be directly under /tmp')
- =
+> This is the point where connection is stuck and iwctl reports 'connecting=
+' indefinitely despite being authenticated already.
 
- 		if append_gid_uid:
- 			self.args.SUDO_UID =3D uid
--- =
+Ok, can you get us a log with IWD_DHCP_DEBUG set as well?  See 'man 7 iwd.d=
+ebug'
 
-2.34.1
-
---===============0204527653602496605==--
+Regards,
+-Denis
+--===============1954239194137216695==--
 
