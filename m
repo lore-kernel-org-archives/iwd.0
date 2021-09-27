@@ -1,408 +1,174 @@
-Content-Type: multipart/mixed; boundary="===============5461299965141451409=="
+Content-Type: multipart/mixed; boundary="===============4887788377680042026=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2] offchannel: introduce new offchannel module
-Date: Tue, 30 Nov 2021 13:49:37 -0800
-Message-ID: <20211130214937.470466-1-prestwoj@gmail.com>
+Subject: [PATCH 6/9] ft: get OCI prior to reassociation
+Date: Mon, 27 Sep 2021 10:04:01 -0700
+Message-ID: <20210927170404.1292107-6-prestwoj@gmail.com>
+In-Reply-To: 20210927170404.1292107-1-prestwoj@gmail.com
 
---===============5461299965141451409==
+--===============4887788377680042026==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This module provides a convenient wrapper around both
-CMD_[CANCEL_]_REMAIN_ON_CHANNEL APIs.
-
-Certain protocols require going offchannel to send frames, and/or
-wait for a response. The frame-xchg module somewhat does this but
-has some limitations. For example you cannot just go offchannel;
-an initial frame must be sent out to start the procedure. In addition
-frame-xchg does not work for broadcasts since it expects an ACK.
-
-This module is much simpler and only handles going offchannel for
-a duration. During this time frames may be sent or received. After
-the duration the caller will get a callback and any included error
-if there was one. Any offchannel request can be cancelled prior to
-the duration expriring if the offchannel work has finished early.
+This modifies the FT logic to fist call get_oci() before
+reassociation. This allows the OCI to be included in reassociation
+and in the 4-way handshake later on.
 ---
- Makefile.am      |   1 +
- src/offchannel.c | 302 +++++++++++++++++++++++++++++++++++++++++++++++
- src/offchannel.h |  29 +++++
- 3 files changed, 332 insertions(+)
- create mode 100644 src/offchannel.c
- create mode 100644 src/offchannel.h
+ src/ft.c     | 13 ++++++++++++-
+ src/ft.h     |  2 ++
+ src/netdev.c | 20 +++++++++++++++++++-
+ 3 files changed, 33 insertions(+), 2 deletions(-)
 
-v2:
- * Removed internal timer and intead rely on the kernel to keep track
- * Specially handle the cancel case where the command had been sent to
-   the kernel already. For this we need to wait until the genl callback
-   to cancel (since we then have the cookie).
-
-diff --git a/Makefile.am b/Makefile.am
-index 1e1c230f..d93dd2c9 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -247,6 +247,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
-h src/missing.h \
- 					src/ip-pool.h src/ip-pool.c \
- 					src/band.h src/band.c \
- 					src/sysfs.h src/sysfs.c \
-+					src/offchannel.h src/offchannel.c \
- 					$(eap_sources) \
- 					$(builtin_sources)
+diff --git a/src/ft.c b/src/ft.c
+index 6897f6d7..40e29341 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -40,6 +40,7 @@ struct ft_sm {
  =
 
-diff --git a/src/offchannel.c b/src/offchannel.c
-new file mode 100644
-index 00000000..4388e398
---- /dev/null
-+++ b/src/offchannel.c
-@@ -0,0 +1,302 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+
-+#include <ell/ell.h>
-+
-+#include "linux/nl80211.h"
-+
-+#include "src/offchannel.h"
-+#include "src/wiphy.h"
-+#include "src/nl80211util.h"
-+#include "src/iwd.h"
-+#include "src/module.h"
-+
-+struct offchannel_info {
-+	uint64_t wdev_id;
-+	uint32_t freq;
-+	uint32_t duration;
-+
-+	uint32_t roc_cmd_id;
-+	uint64_t roc_cookie;
-+
-+	offchannel_started_cb_t started;
-+	offchannel_destroy_cb_t destroy;
-+	void *user_data;
-+	int error;
-+
-+	struct wiphy_radio_work_item work;
-+
-+	bool needs_cancel : 1;
-+};
-+
-+static struct l_genl_family *nl80211;
-+static struct l_queue *offchannel_list;
-+
-+static bool match_wdev(const void *a, const void *user_data)
+ 	ft_tx_authenticate_func_t tx_auth;
+ 	ft_tx_associate_func_t tx_assoc;
++	ft_get_oci get_oci;
+ =
+
+ 	void *user_data;
+ };
+@@ -640,7 +641,7 @@ static int ft_rx_authenticate(struct auth_proto *ap, co=
+nst uint8_t *frame,
+ 	if (ret < 0)
+ 		goto auth_error;
+ =
+
+-	return ft_tx_reassociate(ft);
++	return ft->get_oci(ft->user_data);
+ =
+
+ auth_error:
+ 	return (int)status_code;
+@@ -783,6 +784,13 @@ static int ft_rx_associate(struct auth_proto *ap, cons=
+t uint8_t *frame,
+ 	return 0;
+ }
+ =
+
++static int ft_rx_oci(struct auth_proto *ap)
 +{
-+	const struct offchannel_info *info =3D a;
-+	const uint64_t *wdev_id =3D user_data;
++	struct ft_sm *ft =3D l_container_of(ap, struct ft_sm, ap);
 +
-+	return info->wdev_id =3D=3D *wdev_id;
++	return ft_tx_reassociate(ft);
 +}
 +
-+static void offchannel_cancel_roc(struct offchannel_info *info)
-+{
-+	struct l_genl_msg *msg;
-+
-+	msg =3D l_genl_msg_new(NL80211_CMD_CANCEL_REMAIN_ON_CHANNEL);
-+
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &info->wdev_id);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_COOKIE, 8, &info->roc_cookie);
-+
-+	/* Nothing much can be done if this fails */
-+	if (!l_genl_family_send(nl80211, msg, NULL, NULL, NULL))
-+		l_genl_msg_unref(msg);
-+}
-+
-+static void offchannel_roc_cb(struct l_genl_msg *msg, void *user_data)
-+{
-+	struct offchannel_info *info =3D user_data;
-+
-+	info->error =3D l_genl_msg_get_error(msg);
-+	info->roc_cmd_id =3D 0;
-+
-+	if (info->error < 0) {
-+		l_debug("Error from CMD_REMAIN_ON_CHANNEL (%d)", info->error);
-+		goto work_done;
-+	}
-+
-+	info->error =3D nl80211_parse_attrs(msg, NL80211_ATTR_COOKIE,
-+					&info->roc_cookie, NL80211_ATTR_UNSPEC);
-+	if (info->error < 0) {
-+		l_error("Could not parse ROC cookie");
-+		goto work_done;
-+	}
-+
-+	/* This request was cancelled, and ROC needs to be cancelled */
-+	if (info->needs_cancel) {
-+		offchannel_cancel_roc(info);
-+		goto work_done;
-+	}
-+
-+	return;
-+
-+work_done:
-+	wiphy_radio_work_done(wiphy_find_by_wdev(info->wdev_id), info->work.id);
-+}
-+
-+static bool offchannel_work_ready(struct wiphy_radio_work_item *item)
-+{
-+	struct l_genl_msg *msg;
-+	struct offchannel_info *info =3D l_container_of(item,
-+						struct offchannel_info, work);
-+
-+	msg =3D l_genl_msg_new(NL80211_CMD_REMAIN_ON_CHANNEL);
-+
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &info->wdev_id);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY_FREQ, 4, &info->freq);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_DURATION, 4, &info->duration);
-+
-+	info->roc_cmd_id =3D l_genl_family_send(nl80211, msg, offchannel_roc_cb,
-+						info, NULL);
-+	if (!info->roc_cmd_id) {
-+		info->error =3D -EIO;
-+		l_genl_msg_unref(msg);
-+		return true;
-+	}
-+
-+	l_queue_push_head(offchannel_list, info);
-+
-+	return false;
-+}
-+
-+static void offchannel_work_destroy(struct wiphy_radio_work_item *item)
-+{
-+	struct offchannel_info *info =3D l_container_of(item,
-+						struct offchannel_info, work);
-+
-+	if (info->destroy)
-+		info->destroy(info->error, info->user_data);
-+
-+	l_queue_remove(offchannel_list, info);
-+	l_free(info);
-+}
-+
-+static const struct wiphy_radio_work_item_ops offchannel_work_ops =3D {
-+	.do_work =3D offchannel_work_ready,
-+	.destroy =3D offchannel_work_destroy,
-+};
-+
-+uint32_t offchannel_start(uint64_t wdev_id, uint32_t freq, uint32_t durati=
-on,
-+			offchannel_started_cb_t started, void *user_data,
-+			offchannel_destroy_cb_t destroy)
-+{
-+	struct offchannel_info *info =3D l_new(struct offchannel_info, 1);
-+
-+	info->wdev_id =3D wdev_id;
-+	info->freq =3D freq;
-+	info->duration =3D duration;
-+	info->started =3D started;
-+	info->destroy =3D destroy;
-+	info->user_data =3D user_data;
-+	/*
-+	 * Set error as cancelled in case this work gets cancelled prior to
-+	 * the wiphy work starting.
-+	 */
-+	info->error =3D -ECANCELED;
-+
-+	return wiphy_radio_work_insert(wiphy_find_by_wdev(wdev_id),
-+					&info->work, 1, &offchannel_work_ops);
-+}
-+
-+void offchannel_cancel(uint64_t wdev_id, uint32_t id)
-+{
-+	struct wiphy *wiphy =3D wiphy_find_by_wdev(wdev_id);
-+	struct offchannel_info *info;
-+
-+	/* Hasn't even started yet */
-+	if (!wiphy_radio_work_is_running(wiphy, id))
-+		goto work_done;
-+
-+	info =3D l_queue_find(offchannel_list, match_wdev, &wdev_id);
-+	if (!info)
-+		return;
-+
-+	if (info->roc_cmd_id) {
+ static void ft_sm_free(struct auth_proto *ap)
+ {
+ 	struct ft_sm *ft =3D l_container_of(ap, struct ft_sm, ap);
+@@ -890,12 +898,14 @@ static bool ft_start(struct auth_proto *ap)
+ struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
+ 				ft_tx_authenticate_func_t tx_auth,
+ 				ft_tx_associate_func_t tx_assoc,
++				ft_get_oci get_oci,
+ 				void *user_data)
+ {
+ 	struct ft_sm *ft =3D l_new(struct ft_sm, 1);
+ =
+
+ 	ft->tx_auth =3D tx_auth;
+ 	ft->tx_assoc =3D tx_assoc;
++	ft->get_oci =3D get_oci;
+ 	ft->hs =3D hs;
+ 	ft->user_data =3D user_data;
+ =
+
+@@ -903,6 +913,7 @@ struct auth_proto *ft_over_air_sm_new(struct handshake_=
+state *hs,
+ 	ft->ap.rx_associate =3D ft_rx_associate;
+ 	ft->ap.start =3D ft_start;
+ 	ft->ap.free =3D ft_sm_free;
++	ft->ap.rx_oci =3D ft_rx_oci;
+ =
+
+ 	return &ft->ap;
+ }
+diff --git a/src/ft.h b/src/ft.h
+index 6167e0d7..cc25463f 100644
+--- a/src/ft.h
++++ b/src/ft.h
+@@ -26,6 +26,7 @@ typedef void (*ft_tx_authenticate_func_t)(struct iovec *i=
+ov, size_t iov_len,
+ 					void *user_data);
+ typedef int (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_len,
+ 					void *user_data);
++typedef int (*ft_get_oci)(void *user_data);
+ =
+
+ typedef void (*ft_ds_free_func_t)(void *user_data);
+ =
+
+@@ -60,6 +61,7 @@ bool ft_over_ds_parse_action_ies(struct ft_ds_info *info,
+ struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
+ 				ft_tx_authenticate_func_t tx_auth,
+ 				ft_tx_associate_func_t tx_assoc,
++				ft_get_oci get_oci,
+ 				void *user_data);
+ =
+
+ struct auth_proto *ft_over_ds_sm_new(struct handshake_state *hs,
+diff --git a/src/netdev.c b/src/netdev.c
+index 5a44895d..91d1316c 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2074,6 +2074,21 @@ static void netdev_get_oci_cb(struct l_genl_msg *msg=
+, void *user_data)
+ 	handshake_state_set_chandef(netdev->handshake, l_steal_ptr(chandef));
+ =
+
+ done:
++	if (netdev->ap) {
 +		/*
-+		 * The command has been sent to the kernel. This means we must
-+		 * wait till ROC starts and cancel at that time. Cancelling just
-+		 * the ROC command now will have no effect.
++		 * Cant do much here. IWD assumes every kernel/driver supports
++		 * this. There is no way of detecting support either.
 +		 */
-+		if (l_genl_family_request_sent(nl80211, info->roc_cmd_id))
-+			info->needs_cancel =3D true;
-+
-+		l_genl_family_cancel(nl80211, info->roc_cmd_id);
-+		info->roc_cmd_id =3D 0;
-+
-+		if (!info->needs_cancel)
-+			goto work_done;
++		if (L_WARN_ON(err < 0))
++			netdev_connect_failed(netdev,
++					NETDEV_RESULT_AUTHENTICATION_FAILED,
++					MMPDU_STATUS_CODE_UNSPECIFIED);
++		else
++			auth_proto_rx_oci(netdev->ap);
 +
 +		return;
 +	}
 +
-+	/*
-+	 * Something must have happened in the genl callback. Any errors there
-+	 * will be handled already
-+	 */
-+	if (!info->roc_cookie)
-+		return;
+ 	L_WARN_ON(!eapol_start(netdev->sm));
+ }
+ =
+
+@@ -4099,6 +4114,8 @@ static void prepare_ft(struct netdev *netdev, const s=
+truct scan_bss *target_bss)
+ 	netdev->operational =3D false;
+ 	netdev->in_ft =3D true;
+ =
+
++	handshake_state_set_chandef(netdev->handshake, NULL);
 +
-+	/*
-+	 * At this point we know ROC has at least been queued (potentially not
-+	 * started) and can be cancelled.
-+	 */
-+	offchannel_cancel_roc(info);
-+
-+work_done:
-+	wiphy_radio_work_done(wiphy, id);
-+}
-+
-+static void offchannel_mlme_notify(struct l_genl_msg *msg, void *user_data)
-+{
-+	struct offchannel_info *info;
-+	uint64_t wdev_id;
-+	uint64_t cookie;
-+	uint8_t cmd;
-+
-+	cmd =3D l_genl_msg_get_command(msg);
-+
-+	if (cmd !=3D NL80211_CMD_REMAIN_ON_CHANNEL &&
-+			cmd !=3D NL80211_CMD_CANCEL_REMAIN_ON_CHANNEL)
-+		return;
-+
-+	if (nl80211_parse_attrs(msg, NL80211_ATTR_WDEV, &wdev_id,
-+					NL80211_ATTR_COOKIE, &cookie,
-+					NL80211_ATTR_UNSPEC) < 0)
-+		return;
-+
-+	info =3D l_queue_find(offchannel_list, match_wdev, &wdev_id);
-+	if (!info)
-+		return;
-+
-+	/* ROC must have been started elsewhere, not by IWD */
-+	if (info->roc_cookie !=3D cookie)
-+		return;
-+
-+	switch (cmd) {
-+	case NL80211_CMD_REMAIN_ON_CHANNEL:
-+		if (info->started)
-+			info->started(info->user_data);
-+
-+		break;
-+	case NL80211_CMD_CANCEL_REMAIN_ON_CHANNEL:
-+		info->error =3D 0;
-+
-+		wiphy_radio_work_done(wiphy_find_by_wdev(info->wdev_id),
-+					info->work.id);
-+		break;
-+	default:
-+		return;
-+	}
-+}
-+
-+static int offchannel_init(void)
-+{
-+	struct l_genl *genl =3D iwd_get_genl();
-+
-+	nl80211 =3D l_genl_family_new(genl, NL80211_GENL_NAME);
-+	if (!nl80211) {
-+		l_error("Failed to obtain nl80211");
-+		return -EIO;
-+	}
-+
-+	if (!l_genl_family_register(nl80211, "mlme", offchannel_mlme_notify,
-+								NULL, NULL)) {
-+		l_error("Failed to register for MLME");
-+		l_genl_family_free(nl80211);
-+		nl80211 =3D NULL;
-+
-+		return -EIO;
-+	}
-+
-+	offchannel_list =3D l_queue_new();
-+
-+	return 0;
-+}
-+
-+static void offchannel_exit(void)
-+{
-+	l_debug("");
-+
-+	l_genl_family_free(nl80211);
-+	nl80211 =3D NULL;
-+
-+	l_queue_destroy(offchannel_list, l_free);
-+}
-+
-+IWD_MODULE(offchannel, offchannel_init, offchannel_exit);
-diff --git a/src/offchannel.h b/src/offchannel.h
-new file mode 100644
-index 00000000..1ffa94f1
---- /dev/null
-+++ b/src/offchannel.h
-@@ -0,0 +1,29 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+typedef void (*offchannel_started_cb_t)(void *user_data);
-+typedef void (*offchannel_destroy_cb_t)(int error, void *user_data);
-+
-+uint32_t offchannel_start(uint64_t wdev_id, uint32_t freq, uint32_t durati=
-on,
-+			offchannel_started_cb_t started, void *user_data,
-+			offchannel_destroy_cb_t destroy);
-+void offchannel_cancel(uint64_t wdev_id, uint32_t id);
+ 	/*
+ 	 * Cancel commands that could be running because of EAPoL activity
+ 	 * like re-keying, this way the callbacks for those commands don't
+@@ -4274,7 +4291,8 @@ int netdev_fast_transition(struct netdev *netdev,
+ =
+
+ 	netdev->ap =3D ft_over_air_sm_new(netdev->handshake,
+ 					netdev_ft_tx_authenticate,
+-					netdev_ft_tx_associate, netdev);
++					netdev_ft_tx_associate,
++					netdev_get_oci, netdev);
+ 	memcpy(netdev->ap->prev_bssid, orig_bss->addr, ETH_ALEN);
+ =
+
+ 	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
 -- =
 
 2.31.1
 
---===============5461299965141451409==--
+--===============4887788377680042026==--
 
