@@ -1,77 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============7178118376545081142=="
+Content-Type: multipart/mixed; boundary="===============4683997272788119687=="
 MIME-Version: 1.0
-From: Gino McCarty <onigino at protonmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Disable DNS in IWD
-Date: Thu, 19 May 2022 14:41:05 +0000
-Message-ID: <bHJm3HWsDSDtX0h9yi1mxsu7h6eNouwsjiRL7NsyR26GHma3-wQXJA9KPsHBDLWuT6-9fzoT4Dl1a7MJS8AUg3SRae0Q_X-PLfBnes25VGo=@protonmail.com>
+Subject: [PATCH 2/9] ie: add OCI support in build_fast_bss_transition
+Date: Mon, 27 Sep 2021 10:03:57 -0700
+Message-ID: <20210927170404.1292107-2-prestwoj@gmail.com>
+In-Reply-To: 20210927170404.1292107-1-prestwoj@gmail.com
 
---===============7178118376545081142==
+--===============4683997272788119687==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There appears to be no method for having IWD disable DNS Updates
-is there some method that is undocumented available?
+---
+ src/ie.c | 7 +++++++
+ src/ie.h | 2 ++
+ 2 files changed, 9 insertions(+)
 
-NameResolvingService=3Dnone
+diff --git a/src/ie.c b/src/ie.c
+index 7d5222ae..11746c5c 100644
+--- a/src/ie.c
++++ b/src/ie.c
+@@ -1870,6 +1870,13 @@ bool ie_build_fast_bss_transition(const struct ie_ft=
+_info *info,
+ =
 
-I want to have IWD manage my connections and use the internal DHCP daemon
-but I do not want systemd-resolved or resolveconf being updated
-I run my own DNS daemon
+ 	L_WARN_ON(info->igtk_len); /* Not implemented */
+ =
 
-The only solution I can think of to this issue is to disable iwd connection=
- management entirely
++	if (info->oci_present) {
++		to[0] =3D 5;
++		to[1] =3D 3;
++		memcpy(to + 2, info->oci, sizeof(info->oci));
++		*len +=3D 5;
++	}
++
+ 	return true;
+ }
+ =
 
-EnableNetworkConfiguration=3Dfalse
+diff --git a/src/ie.h b/src/ie.h
+index c912d6c3..f6b15abb 100644
+--- a/src/ie.h
++++ b/src/ie.h
+@@ -435,6 +435,8 @@ struct ie_ft_info {
+ 	uint8_t igtk_ipn[6];
+ 	uint8_t igtk_len;
+ 	uint8_t igtk[24];
++	bool oci_present:1;
++	uint8_t oci[3];
+ };
+ =
 
-though i would prefer not to
+ /* See chapter 8.4.2.47 for radio measurement capability details */
+-- =
 
-Thank You,
+2.31.1
 
-Gino
-
---===============7178118376545081142==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.htm"
-
-PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250LXNpemU6IDE0cHg7IGNvbG9yOiBy
-Z2IoMzQsIDM0LCAzNCk7Ij5UaGVyZSBhcHBlYXJzIHRvIGJlIG5vIG1ldGhvZCBmb3IgaGF2aW5n
-IElXRCBkaXNhYmxlIEROUyBVcGRhdGVzPC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IGFy
-aWFsOyBmb250LXNpemU6IDE0cHg7IGNvbG9yOiByZ2IoMzQsIDM0LCAzNCk7Ij5pcyB0aGVyZSBz
-b21lIG1ldGhvZCB0aGF0IGlzIHVuZG9jdW1lbnRlZCBhdmFpbGFibGU/PC9kaXY+PGRpdiBzdHls
-ZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250LXNpemU6IDE0cHg7IGNvbG9yOiByZ2IoMzQsIDM0
-LCAzNCk7Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250LXNp
-emU6IDE0cHg7IGNvbG9yOiByZ2IoMzQsIDM0LCAzNCk7Ij48c3Bhbj5OYW1lUmVzb2x2aW5nU2Vy
-dmljZT1ub25lPC9zcGFuPjwvZGl2PjxkaXYgc3R5bGU9ImZvbnQtZmFtaWx5OiBhcmlhbDsgZm9u
-dC1zaXplOiAxNHB4OyBjb2xvcjogcmdiKDM0LCAzNCwgMzQpOyI+PGJyPjwvZGl2PjxkaXYgc3R5
-bGU9ImZvbnQtZmFtaWx5OiBhcmlhbDsgZm9udC1zaXplOiAxNHB4OyBjb2xvcjogcmdiKDM0LCAz
-NCwgMzQpOyI+SSB3YW50IHRvIGhhdmUgSVdEIG1hbmFnZSBteSBjb25uZWN0aW9ucyBhbmQgdXNl
-IHRoZSBpbnRlcm5hbCBESENQIGRhZW1vbjwvZGl2PjxkaXYgc3R5bGU9ImZvbnQtZmFtaWx5OiBh
-cmlhbDsgZm9udC1zaXplOiAxNHB4OyBjb2xvcjogcmdiKDM0LCAzNCwgMzQpOyI+YnV0IEkgZG8g
-bm90IHdhbnQgc3lzdGVtZC1yZXNvbHZlZCBvciByZXNvbHZlY29uZiBiZWluZyB1cGRhdGVkPC9k
-aXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250LXNpemU6IDE0cHg7IGNvbG9y
-OiByZ2IoMzQsIDM0LCAzNCk7Ij5JIHJ1biBteSBvd24gRE5TIGRhZW1vbjwvZGl2PjxkaXYgc3R5
-bGU9ImZvbnQtZmFtaWx5OiBhcmlhbDsgZm9udC1zaXplOiAxNHB4OyBjb2xvcjogcmdiKDM0LCAz
-NCwgMzQpOyI+PGJyPjwvZGl2PjxkaXYgc3R5bGU9ImZvbnQtZmFtaWx5OiBhcmlhbDsgZm9udC1z
-aXplOiAxNHB4OyBjb2xvcjogcmdiKDM0LCAzNCwgMzQpOyI+VGhlIG9ubHkgc29sdXRpb24gSSBj
-YW4gdGhpbmsgb2YgdG8gdGhpcyBpc3N1ZSBpcyB0byBkaXNhYmxlIGl3ZCBjb25uZWN0aW9uIG1h
-bmFnZW1lbnQgZW50aXJlbHk8YnI+PC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IGFyaWFs
-OyBmb250LXNpemU6IDE0cHg7IGNvbG9yOiByZ2IoMzQsIDM0LCAzNCk7Ij48YnI+PC9kaXY+PGRp
-diBzdHlsZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250LXNpemU6IDE0cHg7IGNvbG9yOiByZ2Io
-MzQsIDM0LCAzNCk7Ij5FbmFibGVOZXR3b3JrQ29uZmlndXJhdGlvbj1mYWxzZSA8YnI+PC9kaXY+
-PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250LXNpemU6IDE0cHg7IGNvbG9yOiBy
-Z2IoMzQsIDM0LCAzNCk7Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IGFyaWFs
-OyBmb250LXNpemU6IDE0cHg7IGNvbG9yOiByZ2IoMzQsIDM0LCAzNCk7Ij50aG91Z2ggaSB3b3Vs
-ZCBwcmVmZXIgbm90IHRvPC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250
-LXNpemU6IDE0cHg7IGNvbG9yOiByZ2IoMzQsIDM0LCAzNCk7Ij48YnI+PC9kaXY+PGRpdiBzdHls
-ZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250LXNpemU6IDE0cHg7IGNvbG9yOiByZ2IoMzQsIDM0
-LCAzNCk7Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250LXNp
-emU6IDE0cHg7IGNvbG9yOiByZ2IoMzQsIDM0LCAzNCk7Ij5UaGFuayBZb3UsPC9kaXY+PGRpdiBz
-dHlsZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250LXNpemU6IDE0cHg7IGNvbG9yOiByZ2IoMzQs
-IDM0LCAzNCk7Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IGFyaWFsOyBmb250
-LXNpemU6IDE0cHg7IGNvbG9yOiByZ2IoMzQsIDM0LCAzNCk7Ij5HaW5vPGJyPjwvZGl2Pg==
---===============7178118376545081142==--
+--===============4683997272788119687==--
 
