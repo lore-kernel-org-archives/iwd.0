@@ -1,45 +1,111 @@
-Content-Type: multipart/mixed; boundary="===============2965331576556570297=="
+Content-Type: multipart/mixed; boundary="===============0515086859701218744=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] eap-tls: Keep l_tls instance for reauthentication
-Date: Thu, 26 May 2022 11:24:41 -0500
-Message-ID: <0f936aa5-65a2-b42c-d7bb-33b3c9976837@gmail.com>
-In-Reply-To: 20220526160153.64175-1-andrew.zaborowski@intel.com
+Subject: [PATCH 3/3] monitor: print FT Request/Response frames
+Date: Mon, 27 Sep 2021 15:41:36 -0700
+Message-ID: <20210927224136.312226-3-prestwoj@gmail.com>
+In-Reply-To: 20210927224136.312226-1-prestwoj@gmail.com
 
---===============2965331576556570297==
+--===============0515086859701218744==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+---
+ monitor/nlmon.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-On 5/26/22 11:01, Andrew Zaborowski wrote:
-> After one of the eap-tls-common-based methods succeeds keep the TLS
-> tunnel instance until the method is freed, rather than free it the
-> moment the method succeeds.  This fixes repeated method runs where until
-> now each next run would attempt to create a new TLS tunnel instance
-> but would have no authentication data (CA certificate, client
-> certificate, private key and private key passphrase) since those are
-> were by the old l_tls object from the moment of the l_tls_set_auth_data()
-> call.
-> =
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 060316f7..728d7857 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -4767,6 +4767,68 @@ static void print_rm_action_frame(unsigned int level=
+, const uint8_t *body,
+ 	}
+ }
+ =
 
-> Use l_tls_reset() to reset the TLS state after method success, followed
-> by a new l_tls_start() when the reauthentication starts.
-> ---
-> Depends on the ell l_tls_reset patch.
-> =
++static void print_ft_request(unsigned int level,
++				const uint8_t *body, size_t body_len)
++{
++	struct ie_tlv_iter iter;
++
++	switch (body[0]) {
++	case 1:
++		if (body_len < 13)
++			return;
++
++		print_attr(level + 1, "FT Request");
++		break;
++	case 2:
++		if (body_len < 15)
++			return;
++
++		print_attr(level + 1, "FT Response");
++		break;
++	case 3:
++		/* FT Confirm/Ack are not yet supported */
++		print_attr(level + 1, "FT Confirm");
++		return;
++	case 4:
++		print_attr(level + 1, "FT ACK");
++		return;
++	}
++
++	print_attr(level + 1, "STA Address: "MAC, MAC_STR(body + 1));
++	print_attr(level + 1, "Target AP Address: "MAC, MAC_STR(body + 7));
++
++	if (body[0] =3D=3D 2) {
++		print_attr(level + 1, "Status: %u", l_get_le16(body + 13));
++		body +=3D 15;
++		body_len -=3D 15;
++	} else {
++		body +=3D 13;
++		body_len -=3D 15;
++	}
++
++	ie_tlv_iter_init(&iter, body, body_len);
++
++	while (ie_tlv_iter_next(&iter)) {
++		uint8_t tag =3D ie_tlv_iter_get_tag(&iter);
++		size_t len =3D ie_tlv_iter_get_length(&iter);
++		const void *data =3D ie_tlv_iter_get_data(&iter);
++
++		switch (tag) {
++		case IE_TYPE_RSN:
++			print_ie_rsn(level + 1, "RSN", data, len);
++			break;
++		case IE_TYPE_MOBILITY_DOMAIN:
++			print_mobility_domain(level + 1, "Mobility Domain",
++						data, len);
++			break;
++		case IE_TYPE_FAST_BSS_TRANSITION:
++			print_fast_bss_transition(level + 1,
++						"Fast BSS Transition",
++						data, len);
++			break;
++		}
++	}
++}
+ static void print_action_mgmt_frame(unsigned int level,
+ 					const struct mmpdu_header *mmpdu,
+ 					size_t total_len, bool no_ack)
+@@ -4829,6 +4891,9 @@ static void print_action_mgmt_frame(unsigned int leve=
+l,
+ 		if (!memcmp(oui, wifi_alliance_oui, 3) && oui[3] =3D=3D 0x09)
+ 			print_p2p_action_frame(level + 1, body + 5,
+ 						body_len - 5);
++	} else if (body[0] =3D=3D 6) {
++		print_ft_request(level, body + 1, body_len - 1);
++		return;
+ 	}
+ =
 
->   src/eap-tls-common.c | 18 +++++++++++++-----
->   1 file changed, 13 insertions(+), 5 deletions(-)
-> =
+ 	print_mpdu_frame_control(level + 1, &mmpdu->fc);
+-- =
 
+2.31.1
 
-Applied, thanks.
-
-Regards,
--Denis
-
---===============2965331576556570297==--
+--===============0515086859701218744==--
 
