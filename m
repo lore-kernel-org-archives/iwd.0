@@ -1,91 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============3465537792082126394=="
+Content-Type: multipart/mixed; boundary="===============6146673360224821037=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: DHCP renewal stops after disconnect
-Date: Wed, 11 May 2022 10:56:05 -0500
-Message-ID: <afd7b5f5-f927-aa44-e677-eed5c1aa8273@gmail.com>
-In-Reply-To: CACsRnHU00FE7T5XWf5Evc1m+DWMhmr0XDcfkY_Eor=YS04DKVQ@mail.gmail.com
+Subject: Re: [PATCH 6/9] ft: get OCI prior to reassociation
+Date: Mon, 27 Sep 2021 12:55:40 -0500
+Message-ID: <8cf91f8d-cf64-08e8-3e14-656f6f70e07a@gmail.com>
+In-Reply-To: 20210927170404.1292107-6-prestwoj@gmail.com
 
---===============3465537792082126394==
+--===============6146673360224821037==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+Hi James,
 
-On 5/11/22 05:53, Michael Johnson wrote:
-> Hey,
-> =
-
-> I'm encountering a couple of issues with the DHCP client in iwd
-> specifically when the network environment is flaky.
-> =
-
-> The major issue I have is when the iwd client is disconnected either
-> from a channel change or just a low signal. The DHCP client gets a new
-> lease when it connects but never asks for a lease renewal which
-> eventually means it loses it after the expiration. This paste shows
-> the logs of this happening https://pastebin.com/yGJbUmVR  (I have
-> enabled IWD_DHCP_DEBUG=3D1 to get more data but I am still waiting for
-> it to happen again).
-
-Nothing jumps out at me right now.  The IWD_DHCP_DEBUG log would be helpful.
-
-> =
-
-> My plan is to see if I can reproduce the issue on a smaller scale (we
-> have ~130 clients running and it happens maybe twice a day) and once I
-> can reproduce I will update iwd and ell to see if that fixes it (I'm
-> using version 1.21 iwd and 0.47 ell). I looked through the new commits
-> since my versions and there was nothing explicitly about this but
-> c78ad1bb and b02c2034 look possibly related?
-
-c78ad1bb should only affect a code path that isn't being used by iwd right =
-now.
-
-I don't think b02c2034 should affect this either.
-
-> =
-
-> For now, I wonder if you know of an obvious place that a disconnect
-> might not be cleaning up the DHCP state fully which causes the T1
-> timer not to be set?
+On 9/27/21 12:04 PM, James Prestwood wrote:
+> This modifies the FT logic to fist call get_oci() before
+> reassociation. This allows the OCI to be included in reassociation
+> and in the 4-way handshake later on.
+> ---
+>   src/ft.c     | 13 ++++++++++++-
+>   src/ft.h     |  2 ++
+>   src/netdev.c | 20 +++++++++++++++++++-
+>   3 files changed, 33 insertions(+), 2 deletions(-)
 > =
 
 
-Is the lease an inifinite lease by any chance?
+<snip>
 
-> =
+> @@ -2074,6 +2074,21 @@ static void netdev_get_oci_cb(struct l_genl_msg *m=
+sg, void *user_data)
+>   	handshake_state_set_chandef(netdev->handshake, l_steal_ptr(chandef));
+>   =
 
-> As for the second minor issue, it seems like iwd doesn't retry sending
-> a DHCPREQUEST once it's passed the T1 timer and in the RENEW state
-> which I believe it should based on
-> http://www.tcpipguide.com/free/t_DHCPLeaseRenewalandRebindingProcesses-2.=
-htm.
-> I have seen the first request being lost due to a bad signal and then
-> iwd didn't try again until T2 which is a more complete renewal. This
-> doesn't cause any interruption but does cause the lease to be removed
-> before being renewed.
+>   done:
+> +	if (netdev->ap) {
+> +		/*
+> +		 * Cant do much here. IWD assumes every kernel/driver supports
+> +		 * this. There is no way of detecting support either.
+> +		 */
+> +		if (L_WARN_ON(err < 0))
+> +			netdev_connect_failed(netdev,
+> +					NETDEV_RESULT_AUTHENTICATION_FAILED,
+> +					MMPDU_STATUS_CODE_UNSPECIFIED);
 
-Yes, we definitely should be doing retransmissions in the RENEWAL state.  W=
-e do =
+You could just let the other side reject our Association or reset ocvc, but=
+ okay.
 
-start the retransmission timer dhcp_client_t1_expired(), so the same =
+> +		else
+> +			auth_proto_rx_oci(netdev->ap);
+> +
+> +		return;
+> +	}
+> +
+>   	L_WARN_ON(!eapol_start(netdev->sm));
+>   }
+>   =
 
-retransmission logic as during DISCOVER/REQUESTING states should apply.
 
-The interesting thing is that T2 timer expiration updates the state, but st=
-ill =
+Otherwise looks fine.  Not sure if this patch requires changes due to comme=
+nts =
 
-relies on the retransmission timer to fire so that the REBIND request can b=
-e =
-
-sent.  So that implies that retransmission timer is active.
-
-Have you noticed any cases where the lease was not renewed at all?
+in patch 7.
 
 Regards,
 -Denis
---===============3465537792082126394==--
+--===============6146673360224821037==--
 
