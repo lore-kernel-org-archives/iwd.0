@@ -1,64 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============2849096078042335463=="
+Content-Type: multipart/mixed; boundary="===============3559367798144616983=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 06/14] test-runner: use may_block=True for context
- iteration (and move location)
-Date: Thu, 31 Mar 2022 16:16:33 -0700
-Message-ID: <20220331231641.484200-6-prestwoj@gmail.com>
-In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
+Subject: [PATCH 3/9] eapol: send OCI in handshake 2/4
+Date: Mon, 27 Sep 2021 10:03:58 -0700
+Message-ID: <20210927170404.1292107-3-prestwoj@gmail.com>
+In-Reply-To: 20210927170404.1292107-1-prestwoj@gmail.com
 
---===============2849096078042335463==
+--===============3559367798144616983==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows the callers condition to be checked immediately without
-the mainloop running. In addition may_block=3DTrue allows the mainloop
-to poll/sleep rather than immediately return back to the caller. This
-handles async IO much better than may_block=3DFalse, at least for our
-use-case.
 ---
- tools/run-tests | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ src/eapol.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/tools/run-tests b/tools/run-tests
-index 94b71ea4..e2993b1b 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -722,8 +722,6 @@ class Namespace:
- 		context =3D mainloop.get_context()
+diff --git a/src/eapol.c b/src/eapol.c
+index 370ead7e..8498fdb6 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -43,6 +43,7 @@
+ #include "src/watchlist.h"
+ #include "src/erp.h"
+ #include "src/iwd.h"
++#include "src/band.h"
  =
 
- 		while True:
--			context.iteration(may_block=3DFalse)
--
- 			try:
- 				ret =3D func(*args)
- 				if ret:
-@@ -735,8 +733,6 @@ class Namespace:
- 					GLib.source_remove(timeout)
- 				raise e
+ static struct l_queue *state_machines;
+ static struct l_queue *preauths;
+@@ -1244,6 +1245,21 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm =
+*sm,
+ 		ies[ies_len++] =3D 0x01;
+ 	}
  =
 
--			sleep(0.1)
--
- 			if done.value =3D=3D True:
- 				if isinstance(exception, Exception):
- 					raise exception
-@@ -745,6 +741,8 @@ class Namespace:
- 				else:
- 					return
- =
-
-+			context.iteration(may_block=3DTrue)
++	/*
++	 * IEEE 802.11-2020 Section 12.7.6.3
++	 * "Additionally, contains an OCI KDE when
++	 *  dot11RSNAOperatingChannelValidationActivated is true on the
++	 *  Supplicant."
++	 */
++	if (sm->handshake->supplicant_ocvc && sm->handshake->chandef) {
++		ies[ies_len++] =3D IE_TYPE_VENDOR_SPECIFIC;
++		ies[ies_len++] =3D 4 + 3;
++		l_put_be32(HANDSHAKE_KDE_OCI, ies + ies_len);
++		ies_len +=3D 4;
++		oci_from_chandef(sm->handshake->chandef, ies + ies_len++);
++		ies_len +=3D 3;
++	}
 +
- 	def __str__(self):
- 		ret =3D 'Namespace: %s\n' % self.name
- 		ret +=3D 'Processes:\n'
+ 	/*
+ 	 * 802.11-2020, Section 12.7.6.3:
+ 	 * "The RSNXE that the Supplicant sent in its (Re)Association Request
 -- =
 
-2.34.1
+2.31.1
 
---===============2849096078042335463==--
+--===============3559367798144616983==--
 
