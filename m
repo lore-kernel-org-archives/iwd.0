@@ -1,54 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============2463537435699705427=="
+Content-Type: multipart/mixed; boundary="===============8900695823304376675=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] knownnetworks: update known frequencies maximum to 7115
-Date: Thu, 03 Mar 2022 12:57:34 -0600
-Message-ID: <20dc4e75-fa02-1d4b-fd92-68e92cd47f36@gmail.com>
-In-Reply-To: 20220303172234.3447411-1-prestwoj@gmail.com
+Subject: Re: [PATCH 2/9] ie: add OCI support in build_fast_bss_transition
+Date: Mon, 27 Sep 2021 12:44:48 -0500
+Message-ID: <d484f8d0-49a8-21c7-5ec5-de656347b603@gmail.com>
+In-Reply-To: 20210927170404.1292107-2-prestwoj@gmail.com
 
---===============2463537435699705427==
+--===============8900695823304376675==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 3/3/22 11:22, James Prestwood wrote:
-> With the addition of 6GHz '6000' is no longer the maximum frequency
-> that could be in .known_network.freq.
+On 9/27/21 12:03 PM, James Prestwood wrote:
 > ---
->   src/knownnetworks.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   src/ie.c | 7 +++++++
+>   src/ie.h | 2 ++
+>   2 files changed, 9 insertions(+)
 > =
 
-> diff --git a/src/knownnetworks.c b/src/knownnetworks.c
-> index 87df8b4d..fc024333 100644
-> --- a/src/knownnetworks.c
-> +++ b/src/knownnetworks.c
-> @@ -856,7 +856,7 @@ static struct l_queue *known_frequencies_from_string(=
-char *freq_set_str)
->   =
 
->   		t =3D strtoul(freq_set_str, &freq_set_str, 10);
->   =
-
-> -		if (unlikely(errno =3D=3D ERANGE || !t || t > 6000))
-> +		if (unlikely(errno =3D=3D ERANGE || !t || t > 7115))
-
-Do you want to use band_freq_to_channel here instead?  That one checks the =
-valid =
-
-freqs...
-
->   			goto error;
->   =
-
->   		known_freq =3D l_new(struct known_frequency, 1);
-> =
-
+Patch 2, 3, 4 and 9 applied.
 
 Regards,
 -Denis
---===============2463537435699705427==--
+
+--===============8900695823304376675==--
 
