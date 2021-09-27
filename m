@@ -1,41 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============3243950918160093967=="
+Content-Type: multipart/mixed; boundary="===============7448389821480673328=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v5 1/4] dpp-util: add DPP attribute building APIs
-Date: Fri, 17 Dec 2021 14:15:02 -0600
-Message-ID: <1c889849-26d3-a031-8137-7cb8f47df055@gmail.com>
-In-Reply-To: 20211217191451.179444-1-prestwoj@gmail.com
+Subject: [PATCH 8/9] auto-t: set ocv on PSK FT test
+Date: Mon, 27 Sep 2021 10:04:03 -0700
+Message-ID: <20210927170404.1292107-8-prestwoj@gmail.com>
+In-Reply-To: 20210927170404.1292107-1-prestwoj@gmail.com
 
---===============3243950918160093967==
+--===============7448389821480673328==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ autotests/testPSK-roam/connection_test.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-On 12/17/21 13:14, James Prestwood wrote:
-> ---
->   src/dpp-util.c | 143 +++++++++++++++++++++++++++++++++++++++++++++++++
->   src/dpp-util.h |  10 ++++
->   src/dpp.c      |  10 ----
->   3 files changed, 153 insertions(+), 10 deletions(-)
-> =
+diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
+roam/connection_test.py
+index b4ead946..d9d86840 100644
+--- a/autotests/testPSK-roam/connection_test.py
++++ b/autotests/testPSK-roam/connection_test.py
+@@ -100,11 +100,13 @@ class Test(unittest.TestCase):
+ =
 
-> v5:
->   * Moved these APIs into dpp-util instead of dpp.c so they can be
->     unit tested
->   * Changed so the caller supplies ad0/ad1. This takes the burden off
->     these utilities to sort out what type of frame, and any quirks of
->     how AAD is supposed to be used (see comments in authentication
->     and configuration patches)
-> =
+         self.bss_hostapd[0].set_value('wpa_key_mgmt', 'FT-PSK')
+         self.bss_hostapd[0].set_value('ft_over_ds', '0')
++        self.bss_hostapd[0].set_value('ocv', '1')
+         self.bss_hostapd[0].reload()
+         self.bss_hostapd[0].wait_for_event("AP-ENABLED")
+ =
 
+         self.bss_hostapd[1].set_value('wpa_key_mgmt', 'FT-PSK')
+         self.bss_hostapd[1].set_value('ft_over_ds', '0')
++        self.bss_hostapd[0].set_value('ocv', '1')
+         self.bss_hostapd[1].reload()
+         self.bss_hostapd[1].wait_for_event("AP-ENABLED")
+ =
 
-Applied, thanks.
+@@ -115,11 +117,13 @@ class Test(unittest.TestCase):
+ =
 
-Regards,
--Denis
+         self.bss_hostapd[0].set_value('wpa_key_mgmt', 'FT-PSK')
+         self.bss_hostapd[0].set_value('ft_over_ds', '1')
++        self.bss_hostapd[0].set_value('ocv', '0')
+         self.bss_hostapd[0].reload()
+         self.bss_hostapd[0].wait_for_event("AP-ENABLED")
+ =
 
---===============3243950918160093967==--
+         self.bss_hostapd[1].set_value('wpa_key_mgmt', 'FT-PSK')
+         self.bss_hostapd[1].set_value('ft_over_ds', '1')
++        self.bss_hostapd[0].set_value('ocv', '0')
+         self.bss_hostapd[1].reload()
+         self.bss_hostapd[1].wait_for_event("AP-ENABLED")
+ =
+
+-- =
+
+2.31.1
+
+--===============7448389821480673328==--
 
