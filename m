@@ -1,145 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============2656512945065719055=="
+Content-Type: multipart/mixed; boundary="===============3732577976557962910=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 3/7] main: add SystemdEncrypt option, and initialize key
-Date: Thu, 03 Feb 2022 13:23:33 -0800
-Message-ID: <20220203212337.120613-3-prestwoj@gmail.com>
-In-Reply-To: 20220203212337.120613-1-prestwoj@gmail.com
+Subject: [PATCH 6/6] auto-t: rekey in FT/FILS tests
+Date: Tue, 28 Sep 2021 15:36:09 -0700
+Message-ID: <20210928223609.1163537-6-prestwoj@gmail.com>
+In-Reply-To: 20210928223609.1163537-1-prestwoj@gmail.com
 
---===============2656512945065719055==
+--===============3732577976557962910==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Recently systemd added the ability to pass secret credentials to
-services via LoadCredentialEncrypted/SetCredentialEncrypted. Once
-set up the service is able to read the decrypted credentials from
-a file. The file path is found in the environment variable
-CREDENTIALS_DIRECTORY + an identifier. The value of SystemdEncrypt
-should be set to the systemd key ID used when the credential was
-created.
-
-When SystemdEncrypt is set IWD will attempt to read the decrypted
-secret from systemd. If at any point this fails warnings will be
-printed but IWD will continue normally. Its expected that any failures
-will result in the inability to connect to any networks which have
-previously encrypted the passphrase/PSK without re-entering
-the passphrase manually. This could happen, for example, if the
-systemd secret was changed.
-
-Once the secret is read in it is set into storage to be used for
-profile encryption/decryption.
 ---
- src/main.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ autotests/testFILS/fils_256_test.py       | 3 +++
+ autotests/testFILS/fils_384_test.py       | 3 +++
+ autotests/testFT-FILS/connection_test.py  | 3 +++
+ autotests/testPSK-roam/connection_test.py | 3 +++
+ 4 files changed, 12 insertions(+)
 
-diff --git a/src/main.c b/src/main.c
-index d0dbedc8..a345c950 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -29,6 +29,10 @@
- #include <errno.h>
- #include <getopt.h>
- #include <signal.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <sys/stat.h>
-+#include <sys/mman.h>
- #include <ell/ell.h>
+diff --git a/autotests/testFILS/fils_256_test.py b/autotests/testFILS/fils_=
+256_test.py
+index 62de581b..02fad28e 100644
+--- a/autotests/testFILS/fils_256_test.py
++++ b/autotests/testFILS/fils_256_test.py
+@@ -55,6 +55,9 @@ class Test(unittest.TestCase):
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected(device.name, hapd.ifname)
  =
 
- #include <ell/useful.h>
-@@ -45,6 +49,7 @@
- #include "src/storage.h"
- #include "src/anqp.h"
- #include "src/netconfig.h"
-+#include "src/crypto.h"
++        hapd.rekey(device.address)
++        hapd.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
++
+         device.disconnect()
  =
 
- #include "src/backtrace.h"
+     @classmethod
+diff --git a/autotests/testFILS/fils_384_test.py b/autotests/testFILS/fils_=
+384_test.py
+index 8df5554c..8ecd2fec 100644
+--- a/autotests/testFILS/fils_384_test.py
++++ b/autotests/testFILS/fils_384_test.py
+@@ -55,6 +55,9 @@ class Test(unittest.TestCase):
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected(device.name, hapd.ifname)
  =
 
-@@ -397,6 +402,63 @@ done:
- 	return r;
- }
++        hapd.rekey(device.address)
++        hapd.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
++
+         device.disconnect()
  =
 
-+/*
-+ * Initialize a systemd encryption key for encrypting/decrypting credentia=
-ls.
-+ */
-+static void setup_system_key(void)
-+{
-+	int fd;
-+	struct stat st;
-+	const char *cred_dir;
-+	void *key =3D NULL;
-+	_auto_(l_free) char *path =3D NULL;
-+	_auto_(l_free) char *key_id =3D NULL;
-+
-+	key_id =3D l_settings_get_string(iwd_config, "General", "SystemdEncrypt");
-+	if (!key_id)
-+		return;
-+
-+	cred_dir =3D getenv("CREDENTIALS_DIRECTORY");
-+	if (!cred_dir) {
-+		l_warn("SystemdEncrypt enabled but CREDENTIALS_DIRECTORY not "
-+			"set, check iwd.service file");
-+		return;
-+	}
-+
-+	path =3D l_strdup_printf("%s/%s", cred_dir, key_id);
-+
-+	if (stat(path, &st) < 0) {
-+		l_warn("SystemdEncrypt enabled but could not stat %s",
-+			path);
-+		return;
-+	}
-+
-+	fd =3D open(path, O_RDONLY, 0);
-+	if (fd < 0) {
-+		l_warn("SystemdEncrypt enabled but cannot open secret (%d)",
-+				fd);
-+		return;
-+	}
-+
-+	if (fstat(fd, &st) < 0 || st.st_size =3D=3D 0) {
-+		close(fd);
-+		return;
-+	}
-+
-+	key =3D mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
-+	if (key =3D=3D MAP_FAILED) {
-+		l_warn("SystemdEncrypt enabled but can't mmap secret");
-+		close(fd);
-+		return;
-+	}
-+
-+	close(fd);
-+
-+	__storage_set_encryption_key(key, st.st_size);
-+
-+	munmap(key, st.st_size);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	int exit_status;
-@@ -529,6 +591,8 @@ int main(int argc, char *argv[])
- 	l_dbus_set_disconnect_handler(dbus, dbus_disconnected, NULL, NULL);
- 	dbus_init(dbus);
+     @classmethod
+diff --git a/autotests/testFT-FILS/connection_test.py b/autotests/testFT-FI=
+LS/connection_test.py
+index b136cb7b..d1389cea 100644
+--- a/autotests/testFT-FILS/connection_test.py
++++ b/autotests/testFT-FILS/connection_test.py
+@@ -95,6 +95,9 @@ class Test(unittest.TestCase):
+         self.assertRaises(Exception, testutil.test_ifaces_connected,
+                           (self.bss_hostapd[0].ifname, device.name, True, =
+True))
  =
 
-+	setup_system_key();
++        self.bss_hostapd[1].rekey(device.address)
++        self.bss_hostapd[1].wait_for_event('EAPOL-4WAY-HS-COMPLETED')
 +
- 	exit_status =3D l_main_run_with_signal(signal_handler, NULL);
+     def test_fils_ft_roam_sha256(self):
+         wd =3D IWD(True)
  =
 
- 	iwd_modules_exit();
+diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
+roam/connection_test.py
+index f9306a57..d1beb010 100644
+--- a/autotests/testPSK-roam/connection_test.py
++++ b/autotests/testPSK-roam/connection_test.py
+@@ -80,6 +80,9 @@ class Test(unittest.TestCase):
+         self.assertRaises(Exception, testutil.test_ifaces_connected,
+                           (self.bss_hostapd[0].ifname, device.name, True, =
+True))
+ =
+
++        self.bss_hostapd[1].rekey(device.address)
++        self.bss_hostapd[1].wait_for_event('EAPOL-4WAY-HS-COMPLETED')
++
+         device.roam(self.bss_hostapd[0].bssid)
+ =
+
+         condition =3D 'obj.state =3D=3D DeviceState.roaming'
 -- =
 
 2.31.1
 
---===============2656512945065719055==--
+--===============3732577976557962910==--
 
