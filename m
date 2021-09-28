@@ -1,72 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============1839054446239780793=="
+Content-Type: multipart/mixed; boundary="===============1978989594516247622=="
 MIME-Version: 1.0
-From: 54d22547-afc0-4701-b1fc-5a2a2e411646 at simplelogin.co
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd 1.21 stuck on connecting state
-Date: Fri, 14 Jan 2022 20:08:09 +0000
-Message-ID: <20220114200809.2807.69459@ml01.vlan13.01.org>
-In-Reply-To: 2aaa505ef89f9ec1635c30e3a65674fe489f6580.camel@gmail.com
+Subject: [PATCH v3 4/5] eapol: don't enforce PMKID on 1/4 if require_handshake
+ is false
+Date: Tue, 28 Sep 2021 15:25:52 -0700
+Message-ID: <20210928222553.1096611-4-prestwoj@gmail.com>
+In-Reply-To: 20210928222553.1096611-1-prestwoj@gmail.com
 
---===============1839054446239780793==
+--===============1978989594516247622==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+FT/FILS handle their own PMK derivation but rekeys still require
+using the 4-way handshake. There is some ambiguity in the spec whether
+or not the PMKID needs to be included in message 1/4 and it appears
+that when rekeying after FT/FILS hostapd does not include a PMKID.
+---
+ src/eapol.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-I've gone through debugging and this is what I have: https://termbin.com/y9=
-vq
+diff --git a/src/eapol.c b/src/eapol.c
+index 393b85a1..3c9581bc 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -1147,7 +1147,8 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *=
+sm,
+ 	 * send no PMKID KDE.
+ 	 */
+ 	if (!sm->eap_exchanged && !sm->handshake->wpa_ie &&
+-			rsn_info.num_pmkids) {
++			rsn_info.num_pmkids &&
++			sm->require_handshake) {
+ 		bool found =3D false;
+ 		int i;
+ =
 
-iwd.service
+-- =
 
-# /usr/lib/systemd/system/iwd.service
-[Unit]
-Description=3DWireless service
-After=3Dnetwork-pre.target
-Before=3Dnetwork.target
-Wants=3Dnetwork.target
+2.31.1
 
-[Service]
-Type=3Ddbus
-BusName=3Dnet.connman.iwd
-ExecStart=3D/usr/lib/iwd/iwd
-NotifyAccess=3Dmain
-LimitNPROC=3D1
-Restart=3Don-failure
-CapabilityBoundingSet=3DCAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE
-PrivateTmp=3Dtrue
-NoNewPrivileges=3Dtrue
-DevicePolicy=3Dclosed
-DeviceAllow=3D/dev/rfkill rw
-ProtectHome=3Dyes
-ProtectSystem=3Dstrict
-ProtectControlGroups=3Dyes
-ProtectKernelModules=3Dyes
-ConfigurationDirectory=3Diwd
-StateDirectory=3Diwd
-StateDirectoryMode=3D0700
-
-[Install]
-WantedBy=3Dmulti-user.target
-
-# /etc/systemd/system/iwd.service.d/override.conf
-[Service]
-RuntimeDirectory=3Dresolvconf
-ReadWritePaths=3D/etc/resolv.conf
-
-/etc/iwd/main.conf
-
-[General]
-EnableNetworkConfiguration=3Dtrue
-AddressRandomization=3Donce
-
-[Network]
-NameResolvingService=3Dresolvconf
-
-I've also tried to collect iwmon logs but they are huge, like almost 2 MB. =
-Should I filter some of the info as the wiki shows (--nortnl --nowiphy --no=
-scan).
-
-Thanks!
---===============1839054446239780793==--
+--===============1978989594516247622==--
 
