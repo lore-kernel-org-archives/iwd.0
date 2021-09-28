@@ -1,39 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============5537643846953231788=="
+Content-Type: multipart/mixed; boundary="===============4343267675036584512=="
 MIME-Version: 1.0
-From: Joseph Benden <joe at benden.us>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 1/7] storage: implement network profile encryption
-Date: Fri, 04 Feb 2022 15:55:32 -0700
-Message-ID: <e7e5a0d3-5cfd-be0d-c847-22e91e856e64@benden.us>
-In-Reply-To: 20220203212337.120613-1-prestwoj@gmail.com
+Subject: [PATCH 5/6] auto-t: hostapd.py: add rekey() utility
+Date: Tue, 28 Sep 2021 15:36:08 -0700
+Message-ID: <20210928223609.1163537-5-prestwoj@gmail.com>
+In-Reply-To: 20210928223609.1163537-1-prestwoj@gmail.com
 
---===============5537643846953231788==
+--===============4343267675036584512==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi!
+Forces GTK/PTK rekeys
+---
+ autotests/util/hostapd.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-It is my understanding that all secret data is to be kept as securely as =
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 7cb3225a..9f2dc745 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -202,6 +202,12 @@ class HostapdCLI(object):
+         cmd =3D self.cmdline + ['req_beacon', addr, request]
+         ctx.start_process(cmd).wait()
+ =
 
-possible. I'm not really seeing this carried throughout the source code. =
++    def rekey(self, address):
++        cmd =3D 'REKEY_GTK'
++        self.ctrl_sock.sendall(cmd.encode('utf-8'))
++        cmd =3D 'REKEY_PTK %s' % address
++        self.ctrl_sock.sendall(cmd.encode('utf-8'))
++
+     @property
+     def bssid(self):
+         cmd =3D self.cmdline + ['status']
+-- =
 
-Maybe this specific code does not need that level of security?
+2.31.1
 
-If I'm right, then:
-
-The secret data should be kept in a mmap(), and mlock(), structure. The =
-
-prevents secret data from hitting swap memory. After every use of the =
-
-secret data; it must be explicit_bzero() and then free(). This is so =
-
-critical and tedious that it should be a macro or something from libell. =
-
-And those are just initial thoughts for the basic safety of the secret data.
-
-Best regards,
--Joe
-
---===============5537643846953231788==--
+--===============4343267675036584512==--
 
