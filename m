@@ -1,34 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============7265639929287775352=="
+Content-Type: multipart/mixed; boundary="===============3909311823543934229=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/6] ie: add info struct for OWE transition
-Date: Wed, 22 Sep 2021 13:58:38 -0500
-Message-ID: <b82b26f5-822d-01b0-32be-e4a102cf1c3f@gmail.com>
-In-Reply-To: 20210922182655.46220-1-prestwoj@gmail.com
+Subject: [PATCH v2 7/9] auto-t: set ocv on PSK FT test
+Date: Tue, 28 Sep 2021 08:46:56 -0700
+Message-ID: <20210928154658.2382597-7-prestwoj@gmail.com>
+In-Reply-To: 20210928154658.2382597-1-prestwoj@gmail.com
 
---===============7265639929287775352==
+--===============3909311823543934229==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ autotests/testPSK-roam/connection_test.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-On 9/22/21 1:26 PM, James Prestwood wrote:
-> These members are currently stored in scan_bss but with the
-> addition of operating class/band info this will become 5
-> separate members. This is a bit excessive to store in scan_bss
-> separately so instead this structure can hold everything related
-> to the OWE transition IE.
-> ---
->   src/ie.h | 6 ++++++
->   1 file changed, 6 insertions(+)
-> =
+diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
+roam/connection_test.py
+index b4ead946..918cceb0 100644
+--- a/autotests/testPSK-roam/connection_test.py
++++ b/autotests/testPSK-roam/connection_test.py
+@@ -100,11 +100,13 @@ class Test(unittest.TestCase):
+ =
 
+         self.bss_hostapd[0].set_value('wpa_key_mgmt', 'FT-PSK')
+         self.bss_hostapd[0].set_value('ft_over_ds', '0')
++        self.bss_hostapd[0].set_value('ocv', '1')
+         self.bss_hostapd[0].reload()
+         self.bss_hostapd[0].wait_for_event("AP-ENABLED")
+ =
 
-Patches 1-3 applied, thanks.
+         self.bss_hostapd[1].set_value('wpa_key_mgmt', 'FT-PSK')
+         self.bss_hostapd[1].set_value('ft_over_ds', '0')
++        self.bss_hostapd[0].set_value('ocv', '1')
+         self.bss_hostapd[1].reload()
+         self.bss_hostapd[1].wait_for_event("AP-ENABLED")
+ =
 
-Regards,
--Denis
---===============7265639929287775352==--
+@@ -115,11 +117,13 @@ class Test(unittest.TestCase):
+ =
+
+         self.bss_hostapd[0].set_value('wpa_key_mgmt', 'FT-PSK')
+         self.bss_hostapd[0].set_value('ft_over_ds', '1')
++        self.bss_hostapd[0].set_value('ocv', '1')
+         self.bss_hostapd[0].reload()
+         self.bss_hostapd[0].wait_for_event("AP-ENABLED")
+ =
+
+         self.bss_hostapd[1].set_value('wpa_key_mgmt', 'FT-PSK')
+         self.bss_hostapd[1].set_value('ft_over_ds', '1')
++        self.bss_hostapd[1].set_value('ocv', '1')
+         self.bss_hostapd[1].reload()
+         self.bss_hostapd[1].wait_for_event("AP-ENABLED")
+ =
+
+-- =
+
+2.31.1
+
+--===============3909311823543934229==--
 
