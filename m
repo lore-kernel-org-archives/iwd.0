@@ -1,81 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============4362108791453827701=="
+Content-Type: multipart/mixed; boundary="===============0003215594852289665=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 2/3] scan: add scan_freq_set_to_fixed_array
-Date: Tue, 30 Nov 2021 10:24:12 -0800
-Message-ID: <20211130182413.437115-2-prestwoj@gmail.com>
-In-Reply-To: 20211130182413.437115-1-prestwoj@gmail.com
+Subject: [PATCH v2 9/9] netdev: rebuild RSNE for FT-over-DS
+Date: Tue, 28 Sep 2021 08:46:58 -0700
+Message-ID: <20210928154658.2382597-9-prestwoj@gmail.com>
+In-Reply-To: 20210928154658.2382597-1-prestwoj@gmail.com
 
---===============4362108791453827701==
+--===============0003215594852289665==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This serializes a scan_freq_set into a uint32_t array.
+FT-over-DS cannot use OCV due to how the kernel works. This means
+we could connect initially with OCVC set, but a FT-over-DS attempt
+needs to unset OCVC. To do this we must rebuild the RSNE and
+explicitly set OCVC to false.
 ---
- src/util.c | 33 +++++++++++++++++++++++++++++++++
- src/util.h |  2 ++
- 2 files changed, 35 insertions(+)
+ src/netdev.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/src/util.c b/src/util.c
-index 381894f4..ca0f46ae 100644
---- a/src/util.c
-+++ b/src/util.c
-@@ -470,3 +470,36 @@ void scan_freq_set_constrain(struct scan_freq_set *set,
+diff --git a/src/netdev.c b/src/netdev.c
+index 53a0a184..fb3f04c8 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -4097,6 +4097,8 @@ static int netdev_ft_tx_associate(struct iovec *ft_io=
+v, size_t n_ft_iov,
+ static void prepare_ft(struct netdev *netdev, const struct scan_bss *targe=
+t_bss)
+ {
+ 	struct netdev_handshake_state *nhs;
++	uint8_t rsne_buf[256];
++	struct ie_rsn_info info;
  =
 
- 	set->channels_2ghz &=3D constraint->channels_2ghz;
- }
-+
-+static void add_foreach(uint32_t freq, void *user_data)
-+{
-+	uint32_t **list =3D user_data;
-+
-+	**list =3D freq;
-+
-+	*list =3D *list + 1;
-+}
-+
-+uint32_t *scan_freq_set_to_fixed_array(const struct scan_freq_set *set,
-+					size_t *len_out)
-+{
-+	uint8_t count =3D 0;
-+	uint32_t *freqs;
-+
-+	count =3D __builtin_popcount(set->channels_2ghz) +
-+				l_uintset_size(set->channels_5ghz);
-+
-+	if (!count)
-+		return NULL;
-+
-+	freqs =3D l_new(uint32_t, count);
-+
-+	scan_freq_set_foreach(set, add_foreach, &freqs);
-+
-+	/* Move pointer back to start of list */
-+	freqs -=3D count;
-+
-+	*len_out =3D count;
-+
-+	return freqs;
-+}
-diff --git a/src/util.h b/src/util.h
-index 8cced9cd..b55a7ea7 100644
---- a/src/util.h
-+++ b/src/util.h
-@@ -115,5 +115,7 @@ void scan_freq_set_merge(struct scan_freq_set *to,
- void scan_freq_set_constrain(struct scan_freq_set *set,
- 					const struct scan_freq_set *constraint);
- bool scan_freq_set_isempty(const struct scan_freq_set *set);
-+uint32_t *scan_freq_set_to_fixed_array(const struct scan_freq_set *set,
-+					size_t *len_out);
+ 	/*
+ 	 * We reuse the handshake_state object and reset what's needed.
+@@ -4119,6 +4121,19 @@ static void prepare_ft(struct netdev *netdev, const =
+struct scan_bss *target_bss)
+ 	netdev->operational =3D false;
+ 	netdev->in_ft =3D true;
  =
 
- #endif /* __UTIL_H */
++	/* Always disable OCVC for FT-over-DS */
++	if (netdev->handshake->mde[4] & 1) {
++		ie_parse_rsne_from_data(netdev->handshake->supplicant_ie,
++					netdev->handshake->supplicant_ie[1] + 2,
++					&info);
++
++		info.ocvc =3D false;
++
++		ie_build_rsne(&info, rsne_buf);
++
++		handshake_state_set_supplicant_ie(netdev->handshake, rsne_buf);
++	}
++
+ 	handshake_state_set_chandef(netdev->handshake, NULL);
+ =
+
+ 	/*
 -- =
 
 2.31.1
 
---===============4362108791453827701==--
+--===============0003215594852289665==--
 
