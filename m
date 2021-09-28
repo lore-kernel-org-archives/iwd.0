@@ -1,156 +1,90 @@
-Content-Type: multipart/mixed; boundary="===============7241925602578283721=="
+Content-Type: multipart/mixed; boundary="===============8210196292542704409=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 05/13] auto-t: fixup testRoamRetry for better timing
- reliability
-Date: Mon, 28 Mar 2022 10:28:34 -0700
-Message-ID: <20220328172842.1660272-6-prestwoj@gmail.com>
-In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
+Subject: [PATCH 4/9] ft: netdev: store FT-over-DS target RSNE/WPA
+Date: Tue, 28 Sep 2021 14:27:39 -0700
+Message-ID: <20210928212744.717276-4-prestwoj@gmail.com>
+In-Reply-To: 20210928212744.717276-1-prestwoj@gmail.com
 
---===============7241925602578283721==
+--===============8210196292542704409==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Change a few critical checks that were failing sometimes:
- - A few asserts were changed to wait_for_object_condition
- - A 15 second timeout was removed (default used instead)
- - Do a full scan at beginning of each test to clear any
-   cached BSS's. The second test run was getting stale results
-   and the RSSI values were not expected.
+Keep track of the target BSS's authenticator IE for verification.
+It should not be assumed that the target BSS and original RSNE/WPA
+IE matches.
 ---
- autotests/testRoamRetry/fast_retry_test.py | 13 ++++++-------
- autotests/testRoamRetry/stop_retry_test.py |  7 +++----
- 2 files changed, 9 insertions(+), 11 deletions(-)
+ src/ft.c     |  3 +++
+ src/ft.h     |  1 +
+ src/netdev.c | 10 ++++++++++
+ 3 files changed, 14 insertions(+)
 
-diff --git a/autotests/testRoamRetry/fast_retry_test.py b/autotests/testRoa=
-mRetry/fast_retry_test.py
-index c7de5055..b45daada 100644
---- a/autotests/testRoamRetry/fast_retry_test.py
-+++ b/autotests/testRoamRetry/fast_retry_test.py
-@@ -63,7 +63,7 @@ class Test(unittest.TestCase):
-         devices =3D wd.list_devices(1)
-         device =3D devices[0]
+diff --git a/src/ft.c b/src/ft.c
+index db09aacf..fecb4c0e 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -616,6 +616,9 @@ void ft_ds_info_free(struct ft_ds_info *info)
+ 	if (info->fte)
+ 		l_free(info->fte);
  =
 
--        ordered_network =3D device.get_ordered_network('TestRoamRetry')
-+        ordered_network =3D device.get_ordered_network('TestRoamRetry', fu=
-ll_scan=3DTrue)
- =
-
-         self.assertEqual(ordered_network.type, NetworkType.psk)
- =
-
-@@ -75,18 +75,18 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(device, condition)
- =
-
--        self.assertTrue(bss_hostapd[0].list_sta())
--        self.assertFalse(bss_hostapd[1].list_sta())
-+        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
-ss)
- =
-
-         wd.wait(5)
- =
-
-         # Now push the signal LOW, wait for iwd to attempt a roam, fail, a=
-nd
--        # schedule another attempt for 60 seconds later
-+        # schedule another attempt
-         rule0.signal =3D -8000
- =
-
-         device.wait_for_event('no-roam-candidates')
- =
-
-         self.assertEqual(device.state, iwd.DeviceState.connected)
++	if (info->authenticator_ie)
++		l_free(info->authenticator_ie);
 +
-         self.assertTrue(bss_hostapd[0].list_sta())
-         self.assertFalse(bss_hostapd[1].list_sta())
+ 	if (destroy)
+ 		destroy(info);
+ }
+diff --git a/src/ft.h b/src/ft.h
+index a2fa8946..f90fc1b2 100644
+--- a/src/ft.h
++++ b/src/ft.h
+@@ -36,6 +36,7 @@ struct ft_ds_info {
+ 	uint8_t snonce[32];
+ 	uint8_t mde[3];
+ 	uint8_t *fte;
++	uint8_t *authenticator_ie;
  =
 
-@@ -101,12 +101,11 @@ class Test(unittest.TestCase):
-         wd.wait(1)
+ 	struct ie_ft_info ft_info;
  =
 
-         # Assert low signal for BSS 0, check that iwd starts transition to=
- BSS 1
--        # in less than 10 seconds.
-         rule0.signal =3D -8000
-         rule1.signal =3D -2000
+diff --git a/src/netdev.c b/src/netdev.c
+index bedc8377..603c339d 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -4375,6 +4375,7 @@ int netdev_fast_transition_over_ds_action(struct netd=
+ev *netdev,
+ 	struct iovec iovs[5];
+ 	uint8_t buf[512];
+ 	size_t len;
++	const uint8_t *ap_ie =3D NULL;
  =
 
-         condition =3D 'obj.state =3D=3D DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition, max_wait=3D15)
-+        wd.wait_for_object_condition(device, condition)
+ 	if (!netdev->operational)
+ 		return -ENOTCONN;
+@@ -4392,6 +4393,15 @@ int netdev_fast_transition_over_ds_action(struct net=
+dev *netdev,
+ 	memcpy(info->super.spa, hs->spa, ETH_ALEN);
+ 	memcpy(info->super.aa, target_bss->addr, ETH_ALEN);
+ 	memcpy(info->super.mde, target_bss->mde, sizeof(info->super.mde));
++
++	if (target_bss->rsne)
++		ap_ie =3D target_bss->rsne;
++	else if (target_bss->wpa)
++		ap_ie =3D target_bss->wpa;
++
++	if (ap_ie)
++		info->super.authenticator_ie =3D l_memdup(ap_ie, ap_ie[1] + 2);
++
+ 	l_getrandom(info->super.snonce, 32);
+ 	info->super.free =3D netdev_ft_ds_info_free;
  =
 
-         # Check that iwd is on BSS 1 once out of roaming state and doesn't
-         # go through 'disconnected', 'autoconnect', 'connecting' in between
-@@ -114,7 +113,7 @@ class Test(unittest.TestCase):
-         to_condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_change(device, from_condition, to_condition)
- =
-
--        self.assertTrue(bss_hostapd[1].list_sta())
-+        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
-ss)
- =
-
-         device.disconnect()
- =
-
-diff --git a/autotests/testRoamRetry/stop_retry_test.py b/autotests/testRoa=
-mRetry/stop_retry_test.py
-index f2f95990..3957d12d 100644
---- a/autotests/testRoamRetry/stop_retry_test.py
-+++ b/autotests/testRoamRetry/stop_retry_test.py
-@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
-         devices =3D wd.list_devices(1)
-         device =3D devices[0]
- =
-
--        ordered_network =3D device.get_ordered_network('TestRoamRetry')
-+        ordered_network =3D device.get_ordered_network('TestRoamRetry', fu=
-ll_scan=3DTrue)
- =
-
-         self.assertEqual(ordered_network.type, NetworkType.psk)
- =
-
-@@ -74,8 +74,7 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(device, condition)
- =
-
--        self.assertTrue(bss_hostapd[0].list_sta())
--        self.assertFalse(bss_hostapd[1].list_sta())
-+        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
-ss)
- =
-
-         # Now push the signal below the RSSI threshold and check that iwd
-         # connects to BSS 1
-@@ -90,7 +89,7 @@ class Test(unittest.TestCase):
-         to_condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_change(device, from_condition, to_condition)
- =
-
--        self.assertTrue(bss_hostapd[1].list_sta())
-+        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
-ss)
- =
-
-         # Now make sure that we don't roam anymore. In order to catch this=
- via
-         # DeviceState, a suitable roaming target needs to be available. So=
- jack
 -- =
 
-2.34.1
+2.31.1
 
---===============7241925602578283721==--
+--===============8210196292542704409==--
 
