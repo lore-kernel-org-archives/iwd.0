@@ -1,38 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============4028549825183986667=="
+Content-Type: multipart/mixed; boundary="===============4919937309195359039=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd 1.18 doesn't connect to network on boot
-Date: Thu, 23 Sep 2021 10:02:58 -0500
-Message-ID: <ae9fe9cc-e67b-26f4-62f9-d1a457f071eb@gmail.com>
-In-Reply-To: 163239507223.7.15396824044509805482.14044955@slmail.me
+Subject: [PATCH 1/6] doc: add testing option to hostapd.config
+Date: Tue, 28 Sep 2021 15:36:04 -0700
+Message-ID: <20210928223609.1163537-1-prestwoj@gmail.com>
 
---===============4028549825183986667==
+--===============4919937309195359039==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jason,
+This is required to be built in for hostapd to rekey on command.
+---
+ doc/hostapd.config | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 9/23/21 6:04 AM, 58e33db1-f428-4823-8cc3-d962d0fb8aa8(a)slmail.me wrote:
-> Hi,
-> =
+diff --git a/doc/hostapd.config b/doc/hostapd.config
+index 91d1b4cf..c114e127 100644
+--- a/doc/hostapd.config
++++ b/doc/hostapd.config
+@@ -36,3 +36,4 @@ CONFIG_OCV=3Dy
+ CONFIG_OWE=3Dy
+ CONFIG_DPP=3Dy
+ CONFIG_SAE=3Dy
++CONFIG_TESTING_OPTIONS=3Dy
+-- =
 
-> I'm on Arch Linux and after recent iwd upgrade to version 1.18 I'm no lon=
-ger connected to my home network when booting. Previous version works just =
-fine. I've managed to workaround the issue simply by going to iwctl and man=
-ually doing disconnect/connect every time I boot the computer.
+2.31.1
 
-Not much to go on.  Can you tell us what the previous version of iwd was?  =
-How =
-
-is your AP configured? WPA2-Personal? WPA3-Personal?  At a minimum we also =
-need =
-
-logs from iwd and preferably iwmon.  See https://iwd.wiki.kernel.org/debugg=
-ing
-
-Regards,
--Denis
---===============4028549825183986667==--
+--===============4919937309195359039==--
 
