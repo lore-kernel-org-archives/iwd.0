@@ -1,40 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============8091831408062499893=="
+Content-Type: multipart/mixed; boundary="===============6215960443042480803=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459 at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
-Date: Wed, 18 May 2022 16:03:26 +0100
-Message-ID: <CACsRnHWyCVqgz2Jh6Nr16SGVZVDvroeqCu+gXXVd+coo_AeK0w@mail.gmail.com>
-In-Reply-To: fb1c5993-f6d3-a1cc-fdfc-4193dd4a768c@gmail.com
+Subject: [PATCH v2 3/5] unit: update test-eapol with GTK API change
+Date: Tue, 28 Sep 2021 15:05:05 -0700
+Message-ID: <20210928220507.944851-3-prestwoj@gmail.com>
+In-Reply-To: 20210928220507.944851-1-prestwoj@gmail.com
 
---===============8091831408062499893==
+--===============6215960443042480803==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+---
+ unit/test-eapol.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-On Wed, 18 May 2022 at 15:06, Denis Kenzior <denkenz(a)gmail.com> wrote:
+diff --git a/unit/test-eapol.c b/unit/test-eapol.c
+index 470e0e9f..e1b6c96e 100644
+--- a/unit/test-eapol.c
++++ b/unit/test-eapol.c
+@@ -1940,6 +1940,7 @@ static void eapol_wpa2_handshake_test(const void *dat=
+a)
+ 	frame =3D eapol_create_gtk_2_of_2(EAPOL_PROTOCOL_VERSION_2004,
+ 				EAPOL_KEY_DESCRIPTOR_VERSION_HMAC_SHA1_AES,
+ 				eapol_key_test_12.key_replay_counter,
++				0, NULL,
+ 				false, 0, 16);
+ 	assert(frame);
+ 	assert(eapol_calculate_mic(IE_RSN_AKM_SUITE_PSK, ptk, frame,
+@@ -2061,8 +2062,8 @@ static void eapol_wpa_handshake_test(const void *data)
+ =
 
-> Send it out and I'll ponder which one I like more.  I think longer term, =
-it
-> might be desirable to be able to quiet down some of this output, even for=
- iwd
-> itself.
+ 	frame =3D eapol_create_gtk_2_of_2(EAPOL_PROTOCOL_VERSION_2004,
+ 				EAPOL_KEY_DESCRIPTOR_VERSION_HMAC_MD5_ARC4,
+-				eapol_key_test_18.key_replay_counter, true,
+-				gtk_step1->wpa_key_id, 16);
++				eapol_key_test_18.key_replay_counter, 0, NULL,
++				true, gtk_step1->wpa_key_id, 16);
+ 	assert(frame);
+ 	assert(eapol_calculate_mic(IE_RSN_AKM_SUITE_PSK, ptk, frame,
+ 					mic, 16));
+-- =
 
-Ok, I've sent it out.
+2.31.1
 
-I also sent another ell patch for changes that would allow limiting
-the iwd logging as well which I wrote when putting together a more
-complex patch (before it got too complex). This would go better with
-the second iwd patch as the verbosity can be reduced through a new
-`l_log_set_max_level` function in ell/log and therefore IWD_DHCP_DEBUG
-can remain simple.
-
-I don't have a matching patch to limit logging verbosity in all of iwd
-though it should be fairly straightforward to add.
-
-Regards,
-Michael
---===============8091831408062499893==--
+--===============6215960443042480803==--
 
