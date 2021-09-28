@@ -1,113 +1,110 @@
-Content-Type: multipart/mixed; boundary="===============1932455815482083561=="
+Content-Type: multipart/mixed; boundary="===============0383675888117319336=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 6/9] ft: get OCI prior to reassociation
-Date: Mon, 27 Sep 2021 11:15:10 -0700
-Message-ID: <54642fd79da805a3ed3b0c90f85b905b0469d536.camel@gmail.com>
-In-Reply-To: 8cf91f8d-cf64-08e8-3e14-656f6f70e07a@gmail.com
+Subject: [PATCH v3 2/5] eapol: include OCI in GTK 2/2
+Date: Tue, 28 Sep 2021 15:25:50 -0700
+Message-ID: <20210928222553.1096611-2-prestwoj@gmail.com>
+In-Reply-To: 20210928222553.1096611-1-prestwoj@gmail.com
 
---===============1932455815482083561==
+--===============0383675888117319336==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+---
+ src/eapol.c | 24 +++++++++++++++++++++++-
+ src/eapol.h |  2 ++
+ 2 files changed, 25 insertions(+), 1 deletion(-)
 
-On Mon, 2021-09-27 at 12:55 -0500, Denis Kenzior wrote:
-> Hi James,
-> =
+diff --git a/src/eapol.c b/src/eapol.c
+index 3127e066..393b85a1 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -762,6 +762,8 @@ struct eapol_key *eapol_create_gtk_2_of_2(
+ 				enum eapol_protocol_version protocol,
+ 				enum eapol_key_descriptor_version version,
+ 				uint64_t key_replay_counter,
++				size_t extra_len,
++				const uint8_t *extra_data,
+ 				bool is_wpa, uint8_t wpa_key_id, size_t mic_len)
+ {
+ 	uint8_t snonce[32];
+@@ -770,7 +772,8 @@ struct eapol_key *eapol_create_gtk_2_of_2(
+ 	memset(snonce, 0, sizeof(snonce));
+ 	step2 =3D eapol_create_common(protocol, version, true,
+ 					key_replay_counter, snonce,
+-					0, NULL, 0, is_wpa, mic_len);
++					extra_len, extra_data, 0, is_wpa,
++					mic_len);
+ =
 
-> On 9/27/21 12:04 PM, James Prestwood wrote:
-> > This modifies the FT logic to fist call get_oci() before
-> > reassociation. This allows the OCI to be included in reassociation
-> > and in the 4-way handshake later on.
-> > ---
-> > =C2=A0 src/ft.c=C2=A0=C2=A0=C2=A0=C2=A0 | 13 ++++++++++++-
-> > =C2=A0 src/ft.h=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 ++
-> > =C2=A0 src/netdev.c | 20 +++++++++++++++++++-
-> > =C2=A0 3 files changed, 33 insertions(+), 2 deletions(-)
-> > =
+ 	if (!step2)
+ 		return step2;
+@@ -2010,6 +2013,8 @@ static void eapol_handle_gtk_1_of_2(struct eapol_sm *=
+sm,
+ 	uint16_t igtk_key_index;
+ 	const uint8_t *oci =3D NULL;
+ 	size_t oci_len;
++	uint8_t oci_out[9];
++
+ =
 
-> =
+ 	l_debug("ifindex=3D%u", hs->ifindex);
+ =
 
-> <snip>
-> =
+@@ -2068,6 +2073,22 @@ static void eapol_handle_gtk_1_of_2(struct eapol_sm =
+*sm,
+ 	} else
+ 		igtk =3D NULL;
+ =
 
-> > @@ -2074,6 +2074,21 @@ static void netdev_get_oci_cb(struct
-> > l_genl_msg *msg, void *user_data)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0handshake_state_set_cha=
-ndef(netdev->handshake,
-> > l_steal_ptr(chandef));
-> > =C2=A0 =
++	/*
++	 * IEEE 802.11-2020 Section 12.7.7.3
++	 * "Key Data =3D OCI KDE when dot11RSNAOperatingChannelValidationActivated
++	 *  on the [Supplicant]"
++	 *
++	 * Note: The spec reads "Authenticator" but this is incorrect and
++	 * appears to be a copy-paste from a previous section. Above it has been
++	 * changed to Supplicant.
++	 */
++	if (sm->handshake->supplicant_ocvc && sm->handshake->chandef) {
++		oci_out[0] =3D IE_TYPE_VENDOR_SPECIFIC;
++		oci_out[1] =3D 4 + 3;
++		l_put_be32(HANDSHAKE_KDE_OCI, oci_out + 2);
++		oci_from_chandef(sm->handshake->chandef, oci_out + 6);
++	}
++
+ 	/*
+ 	 * 802.11-2016, Section 12.7.7.2:
+ 	 * "
+@@ -2089,6 +2110,7 @@ static void eapol_handle_gtk_1_of_2(struct eapol_sm *=
+sm,
+ 	step2 =3D eapol_create_gtk_2_of_2(sm->protocol_version,
+ 					ek->key_descriptor_version,
+ 					sm->replay_counter,
++					oci_out[1] + 2, oci_out,
+ 					hs->wpa_ie, ek->wpa_key_id,
+ 					sm->mic_len);
+ =
 
-> > =C2=A0 done:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (netdev->ap) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/*
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * Cant do much here. IWD assumes every
-> > kernel/driver supports
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * this. There is no way of detecting support
-> > either.
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (L_WARN_ON(err < 0))
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0netdev=
-_connect_failed(netdev,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0NETDEV_RESULT_AUTHENTICATIO
-> > N_FAILED,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0MMPDU_STATUS_CODE_UNSPECIFI
-> > ED);
-> =
+diff --git a/src/eapol.h b/src/eapol.h
+index a948c018..53ae6e8f 100644
+--- a/src/eapol.h
++++ b/src/eapol.h
+@@ -95,6 +95,8 @@ struct eapol_key *eapol_create_gtk_2_of_2(
+ 				enum eapol_protocol_version protocol,
+ 				enum eapol_key_descriptor_version version,
+ 				uint64_t key_replay_counter,
++				size_t extra_len,
++				const uint8_t *extra_data,
+ 				bool is_wpa, uint8_t wpa_key_id,
+ 				size_t mic_len);
+ =
 
-> You could just let the other side reject our Association or reset
-> ocvc, but okay.
-> =
+-- =
 
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0else
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0auth_p=
-roto_rx_oci(netdev->ap);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0return;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0L_WARN_ON(!eapol_start(=
-netdev->sm));
-> > =C2=A0 }
-> > =C2=A0 =
+2.31.1
 
-> =
-
-> Otherwise looks fine.=C2=A0 Not sure if this patch requires changes due to
-> comments =
-
-> in patch 7.
-
-I'll make sure. Also, I realized we will be getting the OCI again after
-FT succeeds so I need to change up some logic a bit so we only get OCI
-when its not already updated. I also have FILS changes locally which
-suffer the same problem.
-
-
-
-> =
-
-> Regards,
-> -Denis
-
-
---===============1932455815482083561==--
+--===============0383675888117319336==--
 
