@@ -1,110 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============0383675888117319336=="
+Content-Type: multipart/mixed; boundary="===============6042205419293856396=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 2/5] eapol: include OCI in GTK 2/2
-Date: Tue, 28 Sep 2021 15:25:50 -0700
-Message-ID: <20210928222553.1096611-2-prestwoj@gmail.com>
-In-Reply-To: 20210928222553.1096611-1-prestwoj@gmail.com
+Subject: Re: [PATCH 4/9] ft: netdev: store FT-over-DS target RSNE/WPA
+Date: Tue, 28 Sep 2021 16:59:27 -0500
+Message-ID: <73db0e7b-f2fe-fe91-898b-b3ae5d0f5017@gmail.com>
+In-Reply-To: 20210928212744.717276-4-prestwoj@gmail.com
 
---===============0383675888117319336==
+--===============6042205419293856396==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/eapol.c | 24 +++++++++++++++++++++++-
- src/eapol.h |  2 ++
- 2 files changed, 25 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 3127e066..393b85a1 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -762,6 +762,8 @@ struct eapol_key *eapol_create_gtk_2_of_2(
- 				enum eapol_protocol_version protocol,
- 				enum eapol_key_descriptor_version version,
- 				uint64_t key_replay_counter,
-+				size_t extra_len,
-+				const uint8_t *extra_data,
- 				bool is_wpa, uint8_t wpa_key_id, size_t mic_len)
- {
- 	uint8_t snonce[32];
-@@ -770,7 +772,8 @@ struct eapol_key *eapol_create_gtk_2_of_2(
- 	memset(snonce, 0, sizeof(snonce));
- 	step2 =3D eapol_create_common(protocol, version, true,
- 					key_replay_counter, snonce,
--					0, NULL, 0, is_wpa, mic_len);
-+					extra_len, extra_data, 0, is_wpa,
-+					mic_len);
- =
+On 9/28/21 4:27 PM, James Prestwood wrote:
+> Keep track of the target BSS's authenticator IE for verification.
+> It should not be assumed that the target BSS and original RSNE/WPA
+> IE matches.
+> ---
+>   src/ft.c     |  3 +++
+>   src/ft.h     |  1 +
+>   src/netdev.c | 10 ++++++++++
+>   3 files changed, 14 insertions(+)
+> =
 
- 	if (!step2)
- 		return step2;
-@@ -2010,6 +2013,8 @@ static void eapol_handle_gtk_1_of_2(struct eapol_sm *=
-sm,
- 	uint16_t igtk_key_index;
- 	const uint8_t *oci =3D NULL;
- 	size_t oci_len;
-+	uint8_t oci_out[9];
-+
- =
 
- 	l_debug("ifindex=3D%u", hs->ifindex);
- =
+<snip>
 
-@@ -2068,6 +2073,22 @@ static void eapol_handle_gtk_1_of_2(struct eapol_sm =
-*sm,
- 	} else
- 		igtk =3D NULL;
- =
+> @@ -4392,6 +4393,15 @@ int netdev_fast_transition_over_ds_action(struct n=
+etdev *netdev,
+>   	memcpy(info->super.spa, hs->spa, ETH_ALEN);
+>   	memcpy(info->super.aa, target_bss->addr, ETH_ALEN);
+>   	memcpy(info->super.mde, target_bss->mde, sizeof(info->super.mde));
+> +
+> +	if (target_bss->rsne)
+> +		ap_ie =3D target_bss->rsne;
+> +	else if (target_bss->wpa)
+> +		ap_ie =3D target_bss->wpa;
+> +
+> +	if (ap_ie)
+> +		info->super.authenticator_ie =3D l_memdup(ap_ie, ap_ie[1] + 2);
+> +
+>   	l_getrandom(info->super.snonce, 32);
+>   	info->super.free =3D netdev_ft_ds_info_free;
+>   =
 
-+	/*
-+	 * IEEE 802.11-2020 Section 12.7.7.3
-+	 * "Key Data =3D OCI KDE when dot11RSNAOperatingChannelValidationActivated
-+	 *  on the [Supplicant]"
-+	 *
-+	 * Note: The spec reads "Authenticator" but this is incorrect and
-+	 * appears to be a copy-paste from a previous section. Above it has been
-+	 * changed to Supplicant.
-+	 */
-+	if (sm->handshake->supplicant_ocvc && sm->handshake->chandef) {
-+		oci_out[0] =3D IE_TYPE_VENDOR_SPECIFIC;
-+		oci_out[1] =3D 4 + 3;
-+		l_put_be32(HANDSHAKE_KDE_OCI, oci_out + 2);
-+		oci_from_chandef(sm->handshake->chandef, oci_out + 6);
-+	}
-+
- 	/*
- 	 * 802.11-2016, Section 12.7.7.2:
- 	 * "
-@@ -2089,6 +2110,7 @@ static void eapol_handle_gtk_1_of_2(struct eapol_sm *=
-sm,
- 	step2 =3D eapol_create_gtk_2_of_2(sm->protocol_version,
- 					ek->key_descriptor_version,
- 					sm->replay_counter,
-+					oci_out[1] + 2, oci_out,
- 					hs->wpa_ie, ek->wpa_key_id,
- 					sm->mic_len);
- =
+> =
 
-diff --git a/src/eapol.h b/src/eapol.h
-index a948c018..53ae6e8f 100644
---- a/src/eapol.h
-+++ b/src/eapol.h
-@@ -95,6 +95,8 @@ struct eapol_key *eapol_create_gtk_2_of_2(
- 				enum eapol_protocol_version protocol,
- 				enum eapol_key_descriptor_version version,
- 				uint64_t key_replay_counter,
-+				size_t extra_len,
-+				const uint8_t *extra_data,
- 				bool is_wpa, uint8_t wpa_key_id,
- 				size_t mic_len);
- =
 
--- =
+There's no FT in WPA, so the only way we get here is with RSNE or possibly =
+Open. =
 
-2.31.1
+  So I simplified this slightly.
 
---===============0383675888117319336==--
+Patches 1-4 applied, thanks.
+
+Regards,
+-Denis
+--===============6042205419293856396==--
 
