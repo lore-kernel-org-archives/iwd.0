@@ -1,108 +1,108 @@
-Content-Type: multipart/mixed; boundary="===============7000006942507980818=="
+Content-Type: multipart/mixed; boundary="===============0286842008178870779=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: WiFi interface stuck in 'Powered off' (link down) mode after
- suspend
-Date: Thu, 28 Apr 2022 11:06:46 -0500
-Message-ID: <fad755c3-372c-8aba-9850-f5876ae0a1fc@gmail.com>
-In-Reply-To: 871qxkkeqb.fsf@toke.dk
+Subject: [PATCH v3 5/5] eapol: netdev: allow rekeys using FT-FILS
+Date: Tue, 28 Sep 2021 15:25:53 -0700
+Message-ID: <20210928222553.1096611-5-prestwoj@gmail.com>
+In-Reply-To: 20210928222553.1096611-1-prestwoj@gmail.com
 
---===============7000006942507980818==
+--===============0286842008178870779==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Toke,
+Rekeying was overlooked when implementing FT-FILS and there were
+many places where the AKM was never checked and the rekey was
+failing.
+---
+ src/eapol.c  | 17 ++++++++++++-----
+ src/netdev.c |  5 +----
+ 2 files changed, 13 insertions(+), 9 deletions(-)
 
-On 4/25/22 16:58, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> Hi everyone
-> =
+diff --git a/src/eapol.c b/src/eapol.c
+index 3c9581bc..09883645 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -231,6 +231,11 @@ static size_t eapol_get_mic_length(enum ie_rsn_akm_sui=
+te akm, size_t pmk_len)
+ 			l_error("Invalid PMK length of %zu for OWE", pmk_len);
+ 			return 0;
+ 		}
++	case IE_RSN_AKM_SUITE_FILS_SHA256:
++	case IE_RSN_AKM_SUITE_FILS_SHA384:
++	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
++	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
++		return 0;
+ 	default:
+ 		return 16;
+ 	}
+@@ -254,6 +259,8 @@ uint8_t *eapol_decrypt_key_data(enum ie_rsn_akm_suite a=
+km, const uint8_t *kek,
+ 		switch (akm) {
+ 		case IE_RSN_AKM_SUITE_FILS_SHA256:
+ 		case IE_RSN_AKM_SUITE_FILS_SHA384:
++		case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
++		case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
+ 			if (key_data_len < 16)
+ 				return NULL;
+ =
 
+@@ -329,13 +336,16 @@ uint8_t *eapol_decrypt_key_data(enum ie_rsn_akm_suite=
+ akm, const uint8_t *kek,
+ 			break;
+ 		case IE_RSN_AKM_SUITE_FILS_SHA256:
+ 		case IE_RSN_AKM_SUITE_FILS_SHA384:
++		case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
++		case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
+ 		{
+ 			struct iovec ad[1];
+ =
 
-This message somehow went into spam, so only seeing this now.
+ 			ad[0].iov_base =3D (void *)frame;
+ 			ad[0].iov_len =3D key_data - (const uint8_t *)frame;
+ =
 
-> I am encountering a strange problem with my WiFi not coming back after a
-> suspend. Specifically, after a suspend-resume cycle, iwd will report,
-> when issuing a 'station list' in iwctl:
-> =
+-			if (akm =3D=3D IE_RSN_AKM_SUITE_FILS_SHA256)
++			if (akm =3D=3D IE_RSN_AKM_SUITE_FILS_SHA256 || akm =3D=3D
++					IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256)
+ 				kek_len =3D 32;
+ 			else
+ 				kek_len =3D 64;
+@@ -1220,10 +1230,7 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm =
+*sm,
+ 			goto error_unspecified;
+ 	}
+ =
 
->    No devices in Station mode available.
-> =
+-	if (sm->handshake->akm_suite &
+-			(IE_RSN_AKM_SUITE_FT_OVER_8021X |
+-			 IE_RSN_AKM_SUITE_FT_USING_PSK |
+-			 IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256)) {
++	if (IE_AKM_IS_FT(sm->handshake->akm_suite)) {
+ 		/*
+ 		 * Rebuild the RSNE to include the PMKR1Name and append
+ 		 * MDE + FTE.
+diff --git a/src/netdev.c b/src/netdev.c
+index de6af614..c6867ce3 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2565,10 +2565,7 @@ process_resp_ies:
+ 			netdev->owe_sm =3D NULL;
+ 		}
+ =
 
-> But when issuing a 'device list' it shows up:
-> =
+-		/* FILS handles its own FT key derivation */
+-		if (fte && !(netdev->handshake->akm_suite &
+-				(IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 |
+-				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))) {
++		if (fte) {
+ 			uint32_t kck_len =3D
+ 				handshake_state_get_kck_len(netdev->handshake);
+ 			/*
+-- =
 
->    wlan0               7a:e2:f0:31:a5:ae   off        phy0      station
-> =
+2.31.1
 
-> which is a bit confusing, IMO. Issuing a 'device wlan0 show' gets me:
-
-iwctl just shows the available 'Station' interfaces.  iwd removes the stati=
-on =
-
-interfaces when the device is powered off (there's nothing to show).  'devi=
-ce =
-
-list' shows the Device interfaces which correspond to the actual netdev.  T=
-hat =
-
-is why you're seeing wlan0 in 'device list' but not in 'station list'
-
-> =
-
->              Name                wlan0
->              Mode                station
->              Powered             off
->              Address             7a:e2:f0:31:a5:ae
->              Adapter             phy0
-> =
-
-> And issuing a 'device wlan0 set-property Powered on' restores the device
-> to working order and reconnects.
-
-iwd doesn't do anything on suspend, it isn't even aware of suspend.  This l=
-ooks =
-
-like a kernel bug to me? Is the driver crashing by any chance?
-
-> =
-
-> I went looking in the iwd source code, and it looks like that 'Powered'
-> in iwd lingo translates to 'link up' in the kernel, right? Indeed,
-> issuing an 'ip link up' on the wlan device after coming back from
-> suspend is enough to get me back online.
-
-Device.Powered means IFF_UP, yes.  But as I said above, this shouldn't be =
-
-necessary if the kernel driver is doing the right thing...
-
-> =
-
-> I'm honestly not really sure if this is a bug in the kernel, or in iwd.
-> I mean, it seems like iwd should be able to just set 'link up' and
-> continue on its merry way (and indeed if I restart iwd entirely it will
-> do this). But am also fairly sure it used to work on previous kernels,
-> so maybe the kernel behaviour changed? (I have not had a chance to test
-> this as bisecting is a bit cumbersome on my daily driver laptop; so
-> figured I'd ask y'all's opinion first).
-> =
-
-> This happens on a 5.17 kernel with an Intel AX201 device (using the
-> iwlwifi) driver.
-> =
-
-> Hoping someone can help me get this fixed, whether that be by fixing iwd
-> or telling me to go bisect the kernel :)
-> =
-
-
-There have been no iwd changes in this area in quite some time, so if the k=
-ernel =
-
-is the only thing that changed, then I would look there.
-
-Regards,
--Denis
---===============7000006942507980818==--
+--===============0286842008178870779==--
 
