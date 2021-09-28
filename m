@@ -1,88 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============4911967340798864773=="
+Content-Type: multipart/mixed; boundary="===============7371349712257947322=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v4 07/10] dpp-util: add dpp_parse_configuration_object
-Date: Thu, 16 Dec 2021 14:36:19 -0600
-Message-ID: <2c079caf-7519-7589-6947-55fc223ae0f7@gmail.com>
-In-Reply-To: 20211216180854.39470-7-prestwoj@gmail.com
+Subject: [PATCH v3] ft: set OCVC false for FT-over-DS
+Date: Tue, 28 Sep 2021 09:45:53 -0700
+Message-ID: <20210928164553.2856733-1-prestwoj@gmail.com>
 
---===============4911967340798864773==
+--===============7371349712257947322==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+FT-over-DS cannot use OCV due to how the kernel works. This means
+we could connect initially with OCVC set, but a FT-over-DS attempt
+needs to unset OCVC. Set OCVC false when rebuilding the RSNE for
+reassociation.
+---
+ src/ft.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-On 12/16/21 12:08, James Prestwood wrote:
-> This parses the configuration JSON object from the configuration
-> response. Only a minimal configuration object is supported for
-> now.
-> ---
->   Makefile.am    |   3 +-
->   src/dpp-util.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++++
->   src/dpp-util.h |  12 ++++++
->   3 files changed, 124 insertions(+), 1 deletion(-)
-> =
+diff --git a/src/ft.c b/src/ft.c
+index 9c5bc8b0..52506301 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -43,6 +43,8 @@ struct ft_sm {
+ 	ft_get_oci get_oci;
+ =
 
+ 	void *user_data;
++
++	bool over_ds:1;
+ };
+ =
 
-<snip>
+ /*
+@@ -236,6 +238,10 @@ static int ft_tx_reassociate(struct ft_sm *ft)
+ 		rsn_info.num_pmkids =3D 1;
+ 		rsn_info.pmkids =3D hs->pmk_r1_name;
+ =
 
-> +/*
-> + * TODO: This handles the most basic configuration. i.e. a configuration=
- object
-> + * with ssid/passphrase/akm.
-> + */
-> +struct dpp_configuration *dpp_parse_configuration_object(const char *jso=
-n,
-> +							size_t json_len)
-> +{
-> +	struct dpp_configuration *config;
-> +	struct json_contents *c;
-> +	struct json_iter iter;
-> +	struct json_iter discovery;
-> +	struct json_iter cred;
-> +	_auto_(l_free)char *tech =3D NULL;
-> +	_auto_(l_free)char *ssid =3D NULL;
-> +	_auto_(l_free)char *akm =3D NULL;
-> +	_auto_(l_free)char *pass =3D NULL;
-> +	_auto_(l_free)char *psk =3D NULL;
++		/* Always set OCVC false for FT-over-DS */
++		if (ft->over_ds)
++			rsn_info.ocvc =3D false;
++
+ 		rsne =3D alloca(256);
+ 		ie_build_rsne(&rsn_info, rsne);
+ =
 
-nit: I changed these to have a space after l_free) and char *
+@@ -929,6 +935,7 @@ struct auth_proto *ft_over_ds_sm_new(struct handshake_s=
+tate *hs,
+ 	ft->tx_assoc =3D tx_assoc;
+ 	ft->hs =3D hs;
+ 	ft->user_data =3D user_data;
++	ft->over_ds =3D true;
+ =
 
-> +
-> +	c =3D json_contents_new(json, json_len);
-> +	if (!c)
-> +		return NULL;
-> +
-> +	json_iter_init(&iter, c);
-> +
-> +	if (!json_iter_parse(&iter,
-> +			JSON_MANDATORY("wi-fi_tech", JSON_STRING, &tech),
-> +			JSON_MANDATORY("discovery", JSON_OBJECT, &discovery),
-> +			JSON_MANDATORY("cred", JSON_OBJECT, &cred),
-> +			JSON_UNDEFINED))
-> +		goto free_contents;
-> +
-> +	if (!tech || strncmp(tech, "infra", 5))
-> +		goto free_contents;
-> +
-> +
+ 	ft->ap.rx_associate =3D ft_rx_associate;
+ 	ft->ap.start =3D ft_over_ds_start;
+-- =
 
-Got rid of this double empty line.
+2.31.1
 
-> +	if (!json_iter_parse(&discovery,
-> +			JSON_MANDATORY("ssid", JSON_STRING, &ssid),
-> +			JSON_UNDEFINED))
-> +		goto free_contents;
-> +
-> +	if (!ssid || !util_ssid_is_utf8(strlen(ssid),(const uint8_t *)ssid))
-
-And added a few spaces here for coding style reasons.
-
-Applied, thanks.
-
-Regards,
--Denis
---===============4911967340798864773==--
+--===============7371349712257947322==--
 
