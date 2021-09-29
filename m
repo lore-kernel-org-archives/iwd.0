@@ -1,68 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============8105989218322905362=="
+Content-Type: multipart/mixed; boundary="===============2247998787280376554=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] scan: remove periodic scans from queue on abort
-Date: Mon, 07 Feb 2022 13:28:06 -0800
-Message-ID: <20220207212806.449583-1-prestwoj@gmail.com>
+Subject: Re: [PATCH] station: Move netconfig_reset() to common path
+Date: Wed, 29 Sep 2021 17:07:26 -0500
+Message-ID: <2e596fd9-c849-e3b2-f296-6fffadef29af@gmail.com>
+In-Reply-To: CAOq732KHRh4HvDnGaKXqe4SPH=K=Hju=GJ-i9OJwap=jXQcKGA@mail.gmail.com
 
---===============8105989218322905362==
+--===============2247998787280376554==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The periodic scan code was refactored to make normal scans and
-periodic scans consistent by keeping both in the same queue. But
-that change left out the abort path where periodic scans were not
-actually removed from the queue.
+Hi Andrew,
 
-This fixes a rare crash when a periodic scan has been triggered and
-the device goes down. This path never removes the request from the
-queue but still frees it. Then when the scan context is removed the
-stale request is freed again.
+On 9/29/21 5:05 PM, Andrew Zaborowski wrote:
+> Hi Denis,
+> =
 
-0 0x4bb65b in scan_request_cancel src/scan.c:202
-1 0x64313c in l_queue_clear ell/queue.c:107
-2 0x643348 in l_queue_destroy ell/queue.c:82
-3 0x4bbfb7 in scan_context_free src/scan.c:209
-4 0x4c9a78 in scan_wdev_remove src/scan.c:2115
-5 0x42fecd in netdev_free src/netdev.c:965
-6 0x445827 in netdev_destroy src/netdev.c:6507
-7 0x52beb9 in manager_config_notify src/manager.c:765
-8 0x67084b in process_multicast ell/genl.c:1029
-9 0x67084b in received_data ell/genl.c:1096
-10 0x65e790 in io_callback ell/io.c:120
-11 0x65aaae in l_main_iterate ell/main.c:478
-12 0x65b213 in l_main_run ell/main.c:525
-13 0x65b213 in l_main_run ell/main.c:507
-14 0x65b72c in l_main_run_with_signal ell/main.c:647
-15 0x4124e7 in main src/main.c:532
----
- src/scan.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+> On Wed, 29 Sept 2021 at 22:06, Denis Kenzior <denkenz(a)gmail.com> wrote:
+>> On 9/29/21 11:42 AM, Andrew Zaborowski wrote:
+>>> Move the netconfig_reset calls to inside
+>>> station_reset_connection_state() instead of having each caller do
+>>
+>> This is on purpose.  There should be no need to call netconfig_reset if
+>> netconfig_configure wasn't called in the first place.
+> =
 
-diff --git a/src/scan.c b/src/scan.c
-index 99813952..1ab6420b 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -1993,9 +1993,10 @@ static void scan_notify(struct l_genl_msg *msg, void=
- *user_data)
- 			sr->triggered =3D false;
- =
+> In this case it *was* called, then for some reason the driver
+> deauthenticated when we requested a scan (from_ap is false), netdev
 
- 			/* If periodic scan, don't report the abort */
--			if (sr->periodic)
-+			if (sr->periodic) {
-+				l_queue_remove(sc->requests, sr);
- 				wiphy_radio_work_done(sc->wiphy, sr->work.id);
--			else
-+			} else
- 				scan_finished(sc, -ECANCELED, NULL, NULL, sr);
- 		} else if (wiphy_radio_work_is_running(sc->wiphy,
- 							sr->work.id)) {
--- =
+That would be useful info and should be in the commit description ;)
 
-2.31.1
+> emitted a NETDEV_EVENT_DISCONNECT_BY_SME and we end up in
+> station_connect_cb.  You're right in that station_connect_cb also
 
---===============8105989218322905362==--
+Then that sounds like a bug or another side-effect of delaying the CONNECTE=
+D =
+
+state until netconfig is done.    NETDEV_EVENT_DISCONNECT_BY_SME should res=
+ult =
+
+in station_disassociated() and not station_connect_cb()
+
+> handles failures before the netconfig_configure call, so if you want
+> to avoid the potentially unneeded netconfig_reset() I can move it
+> inside station_disconnect_event to avoid bigger changes.
+
+Regards,
+-Denis
+--===============2247998787280376554==--
 
