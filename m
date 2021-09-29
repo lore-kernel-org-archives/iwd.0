@@ -1,39 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============5318720900274024312=="
+Content-Type: multipart/mixed; boundary="===============4471757902266107647=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] anqp: return the request ID rather than true
-Date: Mon, 08 Nov 2021 09:24:37 -0800
-Message-ID: <20211108172437.989966-1-prestwoj@gmail.com>
+Subject: Re: [PATCH] station: Move netconfig_reset() to common path
+Date: Wed, 29 Sep 2021 14:51:02 -0500
+Message-ID: <a85148df-d206-87d6-a3dd-9105ecc013ee@gmail.com>
+In-Reply-To: 20210929164254.118503-1-andrew.zaborowski@intel.com
 
---===============5318720900274024312==
+--===============4471757902266107647==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/anqp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Andrew,
 
-diff --git a/src/anqp.c b/src/anqp.c
-index a3c46635..8febdf91 100644
---- a/src/anqp.c
-+++ b/src/anqp.c
-@@ -256,7 +256,7 @@ uint32_t anqp_request(uint64_t wdev_id, const uint8_t *=
-addr,
- 				&anqp_frame_prefix, anqp_response_frame_event,
- 				NULL);
- =
+On 9/29/21 11:42 AM, Andrew Zaborowski wrote:
+> Move the netconfig_reset calls to inside
+> station_reset_connection_state() instead of having each caller do
 
--	return true;
-+	return request->id;
- }
- =
+This is on purpose.  There should be no need to call netconfig_reset if =
 
- void anqp_cancel(uint32_t id)
--- =
+netconfig_configure wasn't called in the first place.
 
-2.31.1
+> netconfig_reset() followed by station_reset_connection_state().  One of
+> the callers was missing the netconfig_reset() and this was resulting in
+> the "netconfig: Failed to start DHCPv4 client for interface %u" warning.
 
---===============5318720900274024312==--
+You need to figure out why calling netconfig_load_settings causes side-effe=
+cts =
+
+and fix that instead.
+
+> ---
+>   src/station.c | 12 +++---------
+>   1 file changed, 3 insertions(+), 9 deletions(-)
+> =
+
+
+Regards,
+-Denis
+--===============4471757902266107647==--
 
