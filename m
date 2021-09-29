@@ -1,154 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============1538028964453332696=="
+Content-Type: multipart/mixed; boundary="===============3072173930254464874=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 3/6] scan: don't special case periodic scan work
-Date: Tue, 11 Jan 2022 09:45:11 -0800
-Message-ID: <20220111174514.1074967-3-prestwoj@gmail.com>
-In-Reply-To: 20220111174514.1074967-1-prestwoj@gmail.com
+Subject: Re: [PATCH] station: Move netconfig_reset() to common path
+Date: Wed, 29 Sep 2021 18:09:12 -0500
+Message-ID: <c545c951-dcf0-4e55-b426-65dc915dfb43@gmail.com>
+In-Reply-To: CAOq732KhfeRcqU1_ss+gSQBgPY_w42s-Ac3dkOp8A2_J75EQFA@mail.gmail.com
 
---===============1538028964453332696==
+--===============3072173930254464874==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Periodic scans were handled specially where they were only
-started if no other requests were pending in the scan queue.
-This is fine, and what we want, but this can actually be
-handled automatically by nature of the wiphy work queue rather
-than needing to check the request queue explicitly.
+Hi Andrew,
 
-Instead we can insert periodic scans at a lower priority than
-other scans. This puts them at the end of the work queue, as
-well as allows future requests to jump ahead if a periodic scan
-has not yet started.
+>> Now, maybe some elements of what the connect failed path does might be n=
+eeded in
+>> this failure case.  But to determine that we would need to know why the
+>> disconnect happens? How often? Is it every time? Sometimes? Once in a bl=
+ue moon,
+>> etc.
+> =
 
-Eventually, once all pending scans are done, the peridoic scan
-may begin. This is no different than the preivous behavior and
-avoids the need for any special checks once scan requests
-complete.
+> Unfortunately this applies to most failure modes in a connection (at
+> 802.11 level or at IP level -- for the user they're the same thing)
 
-One check was added to address the problem of the periodic scan
-timer firing before the scan could even start. Currently this
-happened to be handled fine in scan_periodic_queue, as it checks
-the queue length. Since this check was removed we must see check
-for this condition inside scan_periodic_timeout.
----
- src/scan.c | 50 +++++++++++++++++++++++++++++---------------------
- 1 file changed, 29 insertions(+), 21 deletions(-)
+I agree, but details matter.  So what is it you're proposing exactly?
 
-diff --git a/src/scan.c b/src/scan.c
-index e6ee3007..a82e6257 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -69,7 +69,6 @@ struct scan_periodic {
- 	scan_trigger_func_t trigger;
- 	scan_notify_func_t callback;
- 	void *userdata;
--	bool retry:1;
- 	uint32_t id;
- 	bool needs_active_scan:1;
- };
-@@ -881,27 +880,32 @@ static bool scan_periodic_notify(int err, struct l_qu=
-eue *bss_list,
- 	return false;
- }
- =
+> and I think the binary blacklisted/not blacklisted model we use
+> doesn't really work.  IIRC my initial patches used a different model
+> where the blacklist was a kind of penalty list where BSSes and/or
+> networks that fail more often are pushed further in the priority list.
 
-+static void scan_periodic_destroy(void *user_data)
-+{
-+	struct scan_context *sc =3D user_data;
-+
-+	sc->sp.id =3D 0;
-+}
-+
- static bool scan_periodic_queue(struct scan_context *sc)
- {
--	if (!l_queue_isempty(sc->requests)) {
--		sc->sp.retry =3D true;
--		return false;
--	}
-+	struct scan_parameters params =3D {};
- =
+I remember, but we have since moved on from that model of autoconnect.  We =
 
- 	if (sc->sp.needs_active_scan && known_networks_has_hidden()) {
--		struct scan_parameters params =3D {
--			.randomize_mac_addr_hint =3D true
--		};
-+		params.randomize_mac_addr_hint =3D true;
- =
+autoconnect networks now, not individual BSSes.  Eventually we will move to=
+ a =
 
- 		sc->sp.needs_active_scan =3D false;
--
--		sc->sp.id =3D scan_active_full(sc->wdev_id, &params,
--						scan_periodic_triggered,
--						scan_periodic_notify, sc, NULL);
-+		sc->sp.id =3D scan_common(sc->wdev_id, false, &params,
-+					WIPHY_WORK_PRIORITY_PERIODIC_SCAN,
-+					scan_periodic_triggered,
-+					scan_periodic_notify, sc,
-+					scan_periodic_destroy);
- 	} else
--		sc->sp.id =3D scan_passive(sc->wdev_id, NULL,
--						scan_periodic_triggered,
--						scan_periodic_notify, sc, NULL);
-+		sc->sp.id =3D scan_common(sc->wdev_id, true, &params,
-+					WIPHY_WORK_PRIORITY_PERIODIC_SCAN,
-+					scan_periodic_triggered,
-+					scan_periodic_notify, sc,
-+					scan_periodic_destroy);
- =
+network priority model in the future where the user will specify the priori=
+ty of =
 
- 	return sc->sp.id !=3D 0;
- }
-@@ -973,7 +977,6 @@ bool scan_periodic_stop(uint64_t wdev_id)
- 	sc->sp.trigger =3D NULL;
- 	sc->sp.callback =3D NULL;
- 	sc->sp.userdata =3D NULL;
--	sc->sp.retry =3D false;
- 	sc->sp.needs_active_scan =3D false;
- =
+a given network for autoconnect.  Blacklisting within the network is a diff=
+erent =
 
- 	return true;
-@@ -1004,6 +1007,16 @@ static void scan_periodic_timeout(struct l_timeout *=
-timeout, void *user_data)
- =
+topic.  Also note that we have two levels of blacklisting, so it isn't quit=
+e as =
 
- 	l_debug("scan_periodic_timeout: %" PRIx64, sc->wdev_id);
- =
+simple as you describe.
 
-+	/*
-+	 * Timeout triggered before periodic scan could even start, just rearm
-+	 * with the same interval.
-+	 */
-+	if (sc->sp.id) {
-+		l_debug("Periodic scan timer called before scan could start!");
-+		scan_periodic_rearm(sc);
-+		return;
-+	}
-+
- 	sc->sp.interval *=3D 2;
- 	if (sc->sp.interval > SCAN_MAX_INTERVAL)
- 		sc->sp.interval =3D SCAN_MAX_INTERVAL;
-@@ -1048,11 +1061,6 @@ static bool start_next_scan_request(struct wiphy_rad=
-io_work_item *item)
- =
+> In the end when we've tried all the BSSes in range we have nothing to
+> lose by retrying some of the ones we've already tried, we just don't
+> want to put them before other BSSes.  This can be done in a way that
 
- 	scan_request_failed(sc, sr, -EIO);
- =
+We do that already.
 
--	if (sc->sp.retry) {
--		sc->sp.retry =3D false;
--		scan_periodic_queue(sc);
--	}
--
- 	return true;
- }
- =
+> over time the list converges to sorted by how often a network/bss
+> fails.
+> =
 
--- =
+> This also allows you to learn from some very clear cues that we're not
+> handling, like a user manually switching to another network.
 
-2.31.1
+Regards,
+-Denis
 
---===============1538028964453332696==--
+--===============3072173930254464874==--
 
