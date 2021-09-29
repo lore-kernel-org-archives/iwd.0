@@ -1,109 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============1607965200680709230=="
+Content-Type: multipart/mixed; boundary="===============9026830194968492065=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: [PATCH 4/6] auto-t: iwd.py: add DPP utilities
-Date: Tue, 04 Jan 2022 10:18:55 -0800
-Message-ID: <20220104181857.103331-4-prestwoj@gmail.com>
-In-Reply-To: 20220104181857.103331-1-prestwoj@gmail.com
+Subject: [PATCH] station: Move netconfig_reset() to common path
+Date: Wed, 29 Sep 2021 18:42:54 +0200
+Message-ID: <20210929164254.118503-1-andrew.zaborowski@intel.com>
 
---===============1607965200680709230==
+--===============9026830194968492065==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Move the netconfig_reset calls to inside
+station_reset_connection_state() instead of having each caller do
+netconfig_reset() followed by station_reset_connection_state().  One of
+the callers was missing the netconfig_reset() and this was resulting in
+the "netconfig: Failed to start DHCPv4 client for interface %u" warning.
 ---
- autotests/util/iwd.py | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ src/station.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 34af1127..4e69c7e8 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -40,6 +40,7 @@ IWD_P2P_PEER_INTERFACE =3D        'net.connman.iwd.p2p.Pe=
-er'
- IWD_P2P_SERVICE_MANAGER_INTERFACE =3D 'net.connman.iwd.p2p.ServiceManager'
- IWD_P2P_WFD_INTERFACE =3D         'net.connman.iwd.p2p.Display'
- IWD_STATION_DEBUG_INTERFACE =3D   'net.connman.iwd.StationDebug'
-+IWD_DPP_INTERFACE =3D             'net.connman.iwd.DeviceProvisioning'
+diff --git a/src/station.c b/src/station.c
+index 934815f2..61649c74 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1501,6 +1501,9 @@ static void station_reset_connection_state(struct sta=
+tion *station)
+ 	if (!network)
+ 		return;
  =
 
- IWD_AGENT_MANAGER_PATH =3D        '/net/connman/iwd'
- IWD_TOP_LEVEL_PATH =3D            '/'
-@@ -270,6 +271,20 @@ class StationDebug(IWDDBusAbstract):
-             self._last_event_data =3D None
-             self._last_event =3D None
++	if (station->netconfig)
++		netconfig_reset(station->netconfig);
++
+ 	if (station->state =3D=3D STATION_STATE_CONNECTED ||
+ 			station->state =3D=3D STATION_STATE_CONNECTING ||
+ 			station->state =3D=3D STATION_STATE_CONNECTING_AUTO ||
+@@ -1530,9 +1533,6 @@ static void station_disassociated(struct station *sta=
+tion)
+ {
+ 	l_debug("%u", netdev_get_ifindex(station->netdev));
  =
 
-+class DeviceProvisioning(IWDDBusAbstract):
-+    '''
-+        Class represents net.connman.iwd.DeviceProvisioning
-+    '''
-+    _iface_name =3D IWD_DPP_INTERFACE
-+
-+    def start_enrollee(self):
-+        return self._iface.StartEnrollee()
-+
-+    def start_configurator(self):
-+        return self._iface.StartConfigurator()
-+
-+    def stop(self):
-+        self._iface.Stop()
+-	if (station->netconfig)
+-		netconfig_reset(station->netconfig);
+-
+ 	station_reset_connection_state(station);
  =
 
- class Device(IWDDBusAbstract):
-     '''
-@@ -283,6 +298,7 @@ class Device(IWDDBusAbstract):
-         self._station_if =3D None
-         self._station_props =3D None
-         self._station_debug_obj =3D None
-+        self._dpp_obj =3D None
+ 	station_enter_state(station, STATION_STATE_DISCONNECTED);
+@@ -2930,9 +2930,6 @@ static void station_disconnect_onconnect(struct stati=
+on *station,
+ 		return;
+ 	}
  =
 
-         IWDDBusAbstract.__init__(self, *args, **kwargs)
+-	if (station->netconfig)
+-		netconfig_reset(station->netconfig);
+-
+ 	station_reset_connection_state(station);
  =
 
-@@ -303,6 +319,17 @@ class Device(IWDDBusAbstract):
-                                             IWD_STATION_INTERFACE)
-         return self._station_if
+ 	station_enter_state(station, STATION_STATE_DISCONNECTING);
+@@ -3234,9 +3231,6 @@ int station_disconnect(struct station *station)
+ 	if (!station->connected_bss)
+ 		return -ENOTCONN;
  =
 
-+    @property
-+    def _device_provisioning(self):
-+        if self._properties['Mode'] !=3D 'station':
-+            self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
-+
-+        if self._dpp_obj is None:
-+            self._dpp_obj =3D DeviceProvisioning(object_path=3Dself._objec=
-t_path,
-+                                                namespace=3Dself._namespac=
-e)
-+
-+        return self._dpp_obj
-+
-     @property
-     def _station_debug(self):
-         if self._properties['Mode'] !=3D 'station':
-@@ -637,6 +664,15 @@ class Device(IWDDBusAbstract):
-     def wait_for_event(self, event, timeout=3D10):
-         self._station_debug.wait_for_event(event, timeout)
- =
-
-+    def dpp_start_enrollee(self):
-+        return self._device_provisioning.start_enrollee()
-+
-+    def dpp_start_configurator(self):
-+        return self._device_provisioning.start_configurator()
-+
-+    def dpp_stop(self):
-+        return self._device_provisioning.stop()
-+
-     def __str__(self, prefix =3D ''):
-         return prefix + 'Device: ' + self.device_path + '\n'\
-                + prefix + '\tName:\t\t' + self.name + '\n'\
+-	if (station->netconfig)
+-		netconfig_reset(station->netconfig);
+-
+ 	/*
+ 	 * If the disconnect somehow fails we won't know if we're still
+ 	 * connected so we may as well indicate now that we're no longer
 -- =
 
-2.31.1
+2.30.2
 
---===============1607965200680709230==--
+--===============9026830194968492065==--
 
