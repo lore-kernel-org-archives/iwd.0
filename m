@@ -1,77 +1,149 @@
-Content-Type: multipart/mixed; boundary="===============1620109243477981401=="
+Content-Type: multipart/mixed; boundary="===============4113908232397104991=="
 MIME-Version: 1.0
-From: Bruce A. Johnson <bjohnson at blueridgenetworks.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Specifying BSSID in station connect?
-Date: Mon, 17 Jan 2022 10:39:34 -0500
-Message-ID: <d748f3cc-b72d-5459-721b-7e72e821b39d@blueridgenetworks.com>
+Subject: Re: [PATCH 2/8] netconfig: Cache the IPv6 l_rtnl_address object
+Date: Wed, 29 Sep 2021 15:16:10 -0500
+Message-ID: <cdb27a68-8b72-9785-a68d-f0b14caa113d@gmail.com>
+In-Reply-To: 20210925011153.25195-2-andrew.zaborowski@intel.com
 
---===============1620109243477981401==
+--===============4113908232397104991==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Has any consideration been given to permitting the specification of a =
+Hi Andrew,
 
-particular BSSID in the /station <wlan> connect/ command? I initially =
+On 9/24/21 8:11 PM, Andrew Zaborowski wrote:
+> For symmetry with IPv4 and to make it easier to track changes to the
+> IPv6 address and netmask in future commits, add a netconfig->v6_address
+> treated in the same way as the existing netconfig->v4_address.
+> ---
+>   src/netconfig.c | 46 ++++++++++++++++++++++++++++++++--------------
+>   1 file changed, 32 insertions(+), 14 deletions(-)
+> =
 
-wrote my project to work with WPA supplicant, and this was a feature =
+> diff --git a/src/netconfig.c b/src/netconfig.c
+> index da775480..493a5c13 100644
+> --- a/src/netconfig.c
+> +++ b/src/netconfig.c
+> @@ -58,6 +58,7 @@ struct netconfig {
+>   	uint8_t rtm_protocol;
+>   	uint8_t rtm_v6_protocol;
+>   	struct l_rtnl_address *v4_address;
+> +	struct l_rtnl_address *v6_address;
+>   	char **dns4_overrides;
+>   	char **dns6_overrides;
+>   	struct ie_fils_ip_addr_response_info *fils_override;
+> @@ -983,13 +984,28 @@ static void netconfig_dhcp6_event_handler(struct l_=
+dhcp6_client *client,
+>   	case L_DHCP6_CLIENT_EVENT_IP_CHANGED:
+>   	case L_DHCP6_CLIENT_EVENT_LEASE_OBTAINED:
+>   	case L_DHCP6_CLIENT_EVENT_LEASE_RENEWED:
+> +	{
+> +		__auto_type lease =3D
+> +			l_dhcp6_client_get_lease(netconfig->dhcp6_client);
 
-that my testing guy liked. I seem some utility in being able to lock =
+Please no.  It is fine to use __auto_type in macros where they're out of si=
+ght, =
 
-onto a specific access point.
+but we shouldn't use this in the general case.
 
-Thanks!
+> +		L_AUTO_FREE_VAR(char *, addr_str) =3D
+> +			l_dhcp6_lease_get_address(lease);
 
--- =
+_auto_ would be preferred and shorter.
 
-Bruce A. Johnson
-Chantilly, VA
-USA
-OpenPGP key ID: 296D1CD6F2B84CAB https://keys.openpgp.org/
+> +		struct l_rtnl_address *address;
+> +
+> +		address =3D l_rtnl_address_new(addr_str,
+> +					l_dhcp6_lease_get_prefix_length(lease));
+> +		l_rtnl_address_free(netconfig->v6_address);
+> +		netconfig->v6_address =3D address;
+> +
+>   		netconfig_set_dns(netconfig);
+>   		netconfig_set_domains(netconfig);
+>   		break;
+> +	}
+>   	case L_DHCP6_CLIENT_EVENT_LEASE_EXPIRED:
+>   		l_debug("Lease for interface %u expired", netconfig->ifindex);
+>   		netconfig_set_dns(netconfig);
+>   		netconfig_set_domains(netconfig);
+> +		l_rtnl_address_free(netconfig->v6_address);
+> +		netconfig->v6_address =3D NULL;
+>   =
+
+>   		/* Fall through */
+>   	case L_DHCP6_CLIENT_EVENT_NO_LEASE:
+
+<snip>
+
+> @@ -1291,7 +1304,6 @@ bool netconfig_load_settings(struct netconfig *netc=
+onfig,
+>   =
+
+>   	if (l_settings_has_key(active_settings, "IPv6", "Address")) {
+>   		v6_address =3D netconfig_get_static6_address(active_settings);
+> -		l_rtnl_address_free(v6_address);
+
+Ugh.  Can we just make v6_address use _auto_.  The current upstream code is =
+
+bonkers right now.
+
+>   =
+
+>   		if (unlikely(!v6_address)) {
+>   			l_error("netconfig: Can't parse IPv6 address");
+> @@ -1309,11 +1321,14 @@ bool netconfig_load_settings(struct netconfig *ne=
+tconfig,
+>   =
+
+>   	if (!v6_enabled)
+>   		netconfig->rtm_v6_protocol =3D RTPROT_UNSPEC;
+> -	else if (v6_address)
+> +	else if (v6_address) {
+> +		netconfig->v6_address =3D l_steal_ptr(v6_address);
+
+If the intent behind netconfig_load_settings to do more than validate the =
+
+settings, then you should make sure you're not leaking anything.
+
+Before you started refactoring the API, the semantics were quite clear:
+
+netconfig_configure() --> Apply settings
+netconfig_reset() -> Tear down
+
+ad228461abbf ("netconfig: Move loading settings to new method, refactor") d=
+oes =
+
+not mention anything about changing the API semantics of this method, and f=
+or =
+
+the most part it didn't.  I think only problem area is v4_address handling.
+
+If you want to change the API semantics, then you need to explicitly call t=
+hat =
+
+out.   netconfig_load_settings() should either be safely callable multiple =
+
+times, or introduce a new API that would tear down anything that =
+
+netconfig_load_settings did.
+
+>   		netconfig->rtm_v6_protocol =3D RTPROT_STATIC;
+> -	else
+> +	} else
+>   		netconfig->rtm_v6_protocol =3D RTPROT_DHCP;
+>   =
+
+> +	l_rtnl_address_free(v6_address);
+> +
+>   	if (send_hostname)
+>   		l_dhcp_client_set_hostname(netconfig->dhcp_client, hostname);
+>   =
 
 
---===============1620109243477981401==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.htm"
-
-PGh0bWw+CiAgPGhlYWQ+CgogICAgPG1ldGEgaHR0cC1lcXVpdj0iY29udGVudC10eXBlIiBjb250
-ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9VVRGLTgiPgogIDwvaGVhZD4KICA8Ym9keT4KICAgIDxw
-PkhhcyBhbnkgY29uc2lkZXJhdGlvbiBiZWVuIGdpdmVuIHRvIHBlcm1pdHRpbmcgdGhlIHNwZWNp
-ZmljYXRpb24KICAgICAgb2YgYSBwYXJ0aWN1bGFyIEJTU0lEIGluIHRoZSA8aT5zdGF0aW9uICZs
-dDt3bGFuJmd0OyBjb25uZWN0PC9pPgogICAgICBjb21tYW5kPyBJIGluaXRpYWxseSB3cm90ZSBt
-eSBwcm9qZWN0IHRvIHdvcmsgd2l0aCBXUEEgc3VwcGxpY2FudCwKICAgICAgYW5kIHRoaXMgd2Fz
-IGEgZmVhdHVyZSB0aGF0IG15IHRlc3RpbmcgZ3V5IGxpa2VkLiBJIHNlZW0gc29tZQogICAgICB1
-dGlsaXR5IGluIGJlaW5nIGFibGUgdG8gbG9jayBvbnRvIGEgc3BlY2lmaWMgYWNjZXNzIHBvaW50
-LjwvcD4KICAgIDxwPlRoYW5rcyE8YnI+CiAgICA8L3A+CiAgICA8cHJlIGNsYXNzPSJtb3otc2ln
-bmF0dXJlIiBjb2xzPSI3MiI+LS0gCkJydWNlIEEuIEpvaG5zb24KQ2hhbnRpbGx5LCBWQQpVU0EK
-T3BlblBHUCBrZXkgSUQ6IDI5NkQxQ0Q2RjJCODRDQUIgPGEgY2xhc3M9Im1vei10eHQtbGluay1m
-cmVldGV4dCIgaHJlZj0iaHR0cHM6Ly9rZXlzLm9wZW5wZ3Aub3JnLyI+aHR0cHM6Ly9rZXlzLm9w
-ZW5wZ3Aub3JnLzwvYT48L3ByZT4KICA8L2JvZHk+CjwvaHRtbD4K
-
---===============1620109243477981401==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="OpenPGP_signature.sig"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCndzRjVCQUFCQ0FBakZpRUVtR3ZveWt3My9F
-MHgxT2VNS1cwYzF2SzRUS3NGQW1IbGpiWUZBd0FBQUFBQUNna1FLVzBjMXZLNFRLcysKemhBQXFV
-R29yTG9ISFJ4Yng2MlQwNEtFZWZFUlJydWo3V1FERFBGQ2MzNk9IVXhsdTdrbmJqdklDVEU4enFZ
-cCtyTHVRSXI3djdKRwplNVhhQm9qRDV5UGNMWGZ4blg1OGI4ZU85REZyYkhQb1pkVGVpbUVibGcy
-VkZ0QnYxSWh2VGFORnpPNUtLUnZ2YUo4aGU3aUREeUliClZhTjRIYmxBN0NoNWRKcjV6RXlRWGFa
-b0pOcHl3RzJmR01uM3JIQmtsSmJDUXlJdkxLSlZCa0tMM1BHU1cwNVl6NWN5ZFJIa255WHoKcFNh
-a2pMYWFFUlNUUHBsZTBtQWVOc1FRcG9JUkVqUjNtQ09GNEpTT1k1QS9aZ2dJRFZITWxnazBObVl6
-bGVxL0dOdkRMRllvZUlPYQp4bUJKZVB5QzUrTGtLQ05vN05ESEsrdUtrTzNhSjRYY044S2pJZzQ0
-MXBuZERBVDU5MjkzMGF4cCtiTmlSanVMWG5icHAvdnB6V3pGCmUwS0hjdEswWm1TSmVqenVnTFBZ
-OFZJUXZZRUwydFUzbTk4ZWc3ZFlOQllzSzJQa3l6ZzN5RmJjRkw1TElLRTJxbEZXKzU3V3hCUzUK
-M0tFMGkvU1V3Ujh4enRhd0dpV1VGNDZWd3lxa1ZRSURPdkZLMmpJZnVvdVRrQUE5Wi9FSDd2UzM0
-K1c2K2ZJZXBKVnFQQTZKVkp2bwoxZ3pBdzFhVEFGRWUvcHNyamdVZGxER3dtWlpRQW1lZjhndVpR
-cGhwaHFQeEVSeTJnUU5IOUYxaUxPYUVaTnNTNzkveGRFUllpMGFxCkNXNk5wZC9Fa2lVNXMwTUJj
-NHBvSjVDUEVDSFJXZGlURmJ4cVkwSHZsVWl3TElXdUYramJsQVJNZy9rWndnbHlieEtwRGtNYTZZ
-cWUKaHpNPQo9akpYOQotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============1620109243477981401==--
+Regards,
+-Denis
+--===============4113908232397104991==--
 
