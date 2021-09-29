@@ -1,40 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============6810159465539612473=="
+Content-Type: multipart/mixed; boundary="===============7984182528835227896=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 1/7] ie: add ie_parse_owe_transition_from_data
-Date: Thu, 16 Sep 2021 12:42:11 -0500
-Message-ID: <a33b688c-e04d-db5e-05d1-2734a8c40529@gmail.com>
-In-Reply-To: 20210916163046.30817-1-prestwoj@gmail.com
+Subject: [PATCH] station: Add missing netconfig_reset()
+Date: Thu, 30 Sep 2021 00:22:01 +0200
+Message-ID: <20210929222201.124492-1-andrew.zaborowski@intel.com>
 
---===============6810159465539612473==
+--===============7984182528835227896==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+On NETDEV_EVENT_DISCONNECT_BY_* events during netconfig, we'd forget to
+call netconfig_reset() before trying a new netconfig_configure()
+resulting in the "netconfig: Failed to start DHCPv4 client for interface
+%u" warning and a L_WARN_ON.  Add the missing call.
+---
+ src/station.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 9/16/21 11:30 AM, James Prestwood wrote:
-> This is a parser for the WFA OWE Transition element. For now the
-> optional band/channel bytes will not be parsed as hostapd does not
-> yet support these and would also require the 802.11 appendix E-1
-> to be added to IWD. Because of this OWE Transition networks are
-> assumed to be on the same channel as their open counterpart.
-> ---
->   src/ie.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
->   src/ie.h |  5 +++++
->   2 files changed, 50 insertions(+)
-> =
+diff --git a/src/station.c b/src/station.c
+index 934815f2..1c073fc1 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2810,6 +2810,9 @@ static void station_disconnect_event(struct station *=
+station, void *event_data)
+ 	switch (station->state) {
+ 	case STATION_STATE_CONNECTING:
+ 	case STATION_STATE_CONNECTING_AUTO:
++		if (station->netconfig)
++			netconfig_reset(station->netconfig);
++
+ 		station_connect_cb(station->netdev,
+ 					NETDEV_RESULT_HANDSHAKE_FAILED,
+ 					event_data, station);
+-- =
 
-> v3:
->   * Changed to handle non-utf8 SSIDs
-> =
+2.30.2
 
-
-Patches 1-4 applied, thanks.
-
-Regards,
--Denis
-
---===============6810159465539612473==--
+--===============7984182528835227896==--
 
