@@ -1,51 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============4371761821719417858=="
+Content-Type: multipart/mixed; boundary="===============4462554504446545935=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] test-runner: allow regex for verbose option
-Date: Fri, 03 Jun 2022 18:21:36 -0500
-Message-ID: <9aca4b07-c168-b401-dd4c-c6647f1eea54@gmail.com>
-In-Reply-To: 20220603231201.242500-1-prestwoj@gmail.com
+Subject: [PATCH 10/12] auto-t: hostapd.py: separate GTK and PTK rekeys
+Date: Mon, 04 Oct 2021 09:49:00 -0700
+Message-ID: <20211004164902.2274318-10-prestwoj@gmail.com>
+In-Reply-To: 20211004164902.2274318-1-prestwoj@gmail.com
 
---===============4371761821719417858==
+--===============4462554504446545935==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+REKEY_GTK kicks off the GTK only handshake where REKEY_PTK does
+both (via the 4-way). The way this utility was written was causing
+hostapd some major issues since both REKEY_GTK and REKEY_PTK was
+used.
 
-On 6/3/22 18:12, James Prestwood wrote:
-> The glob match was completely broken for --verbose because globs
-> are actually path matches, not generally for strings. Instead
-> match based on regular expressions.
-> =
+Instead if address is set only do REKEY_PTK. This will also rekey
+the GTK via the 4-way handshake.
 
-> First the verbose option was fixed to store it as an array as well
-> as write any list arguments into the kernel command line properly
-> (str() would include []). This has worked up until now because the
-> 'in' keyword in python will work on strings just as well
-> as lists, for example:
-> =
+If no address is set do REKEY_GTK which will only rekey the GTK.
+---
+ autotests/util/hostapd.py | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
->>>> 'test' in 'this,is,a,test'
-> True
-> =
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 9f2dc745..22802be6 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -202,11 +202,15 @@ class HostapdCLI(object):
+         cmd =3D self.cmdline + ['req_beacon', addr, request]
+         ctx.start_process(cmd).wait()
+ =
 
-> Then, the glob match was replaced with a regex match. Any exceptions
-> are caught and somewhat ignored (printed, but only seen with --debug).
-> This only guards against fatal exceptions from a user passing an
-> invalid expression.
-> ---
->   tools/runner.py |  7 +++++--
->   tools/utils.py  | 11 +++++++----
->   2 files changed, 12 insertions(+), 6 deletions(-)
-> =
+-    def rekey(self, address):
++    def rekey(self, address=3DNone):
++        if address:
++            cmd =3D 'REKEY_PTK %s' % address
++            self.ctrl_sock.sendall(cmd.encode('utf-8'))
++            self.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
++            return
++
+         cmd =3D 'REKEY_GTK'
+         self.ctrl_sock.sendall(cmd.encode('utf-8'))
+-        cmd =3D 'REKEY_PTK %s' % address
+-        self.ctrl_sock.sendall(cmd.encode('utf-8'))
+ =
 
+     @property
+     def bssid(self):
+-- =
 
-Applied, thanks.
+2.31.1
 
-Regards,
--Denis
-
---===============4371761821719417858==--
+--===============4462554504446545935==--
 
