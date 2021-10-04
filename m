@@ -1,41 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============2327929467957877596=="
+Content-Type: multipart/mixed; boundary="===============2020207447956838386=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 3/7] scan: check flush feature before using flag
-Date: Tue, 22 Feb 2022 14:57:14 -0800
-Message-ID: <20220222225718.2485794-3-prestwoj@gmail.com>
-In-Reply-To: 20220222225718.2485794-1-prestwoj@gmail.com
+Subject: [PATCH 07/12] station: set extended key capability
+Date: Mon, 04 Oct 2021 09:48:57 -0700
+Message-ID: <20211004164902.2274318-7-prestwoj@gmail.com>
+In-Reply-To: 20211004164902.2274318-1-prestwoj@gmail.com
 
---===============2327929467957877596==
+--===============2020207447956838386==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+If wiphy and the AP suppor it, set the Extended Key ID capability
+bit in the RSN info and set the handshake to use it.
 ---
- src/scan.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/station.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/scan.c b/src/scan.c
-index 7c510df8..12b7a3fd 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -362,7 +362,8 @@ static struct l_genl_msg *scan_build_cmd(struct scan_co=
-ntext *sc,
- 	if (params->freqs)
- 		scan_build_attr_scan_frequencies(msg, params->freqs);
+diff --git a/src/station.c b/src/station.c
+index f12cdde5..5605142d 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1087,6 +1087,12 @@ build_ie:
  =
 
--	if (params->flush && !ignore_flush_flag)
-+	if (params->flush && !ignore_flush_flag && wiphy_has_feature(sc->wiphy,
-+						NL80211_FEATURE_SCAN_FLUSH))
- 		flags |=3D NL80211_SCAN_FLAG_FLUSH;
+ 	info.ocvc =3D !disable_ocv;
  =
 
- 	if (!is_passive && params->randomize_mac_addr_hint &&
++	/* Extended Key IDs can only be used if supported by both AP and STA */
++	if (wiphy_supports_ext_key_id(wiphy) && bss_info.extended_key_id) {
++		info.extended_key_id =3D true;
++		hs->ext_key_id_capable =3D true;
++	}
++
+ 	/* RSN takes priority */
+ 	if (bss->rsne) {
+ 		ap_ie =3D bss->rsne;
 -- =
 
-2.34.1
+2.31.1
 
---===============2327929467957877596==--
+--===============2020207447956838386==--
 
