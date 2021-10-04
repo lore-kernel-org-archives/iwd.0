@@ -1,39 +1,117 @@
-Content-Type: multipart/mixed; boundary="===============3728341793948843173=="
+Content-Type: multipart/mixed; boundary="===============3056541371003260466=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: DHCP renewal stops after disconnect
-Date: Wed, 11 May 2022 13:21:40 -0500
-Message-ID: <3060872f-32b5-6faa-92b7-de0e8f3a1800@gmail.com>
-In-Reply-To: CACsRnHVzueqtOTO1vu73F7JkF2iv46F_2_dgzExH-vrKx5F6Gw@mail.gmail.com
+Subject: [PATCH 01/12] iwmon: add support for new key format
+Date: Mon, 04 Oct 2021 09:48:51 -0700
+Message-ID: <20211004164902.2274318-1-prestwoj@gmail.com>
 
---===============3728341793948843173==
+--===============3056541371003260466==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+The kernel has two ways SET_KEY/NEW_KEY messages can be structured.
+This implements parsers for the new key format.
+---
+ monitor/nlmon.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 71 insertions(+), 1 deletion(-)
 
-> One thing I was wondering is if some level of info logging would be
-> possible for the dhcp client. This could be similar in verbosity to
-> dhclient or networkd which would make it easier to see what happened
-> with this kind of thing. DHCP happens on a relatively slow basis so it
-> wouldn't spam much. I attempted to add this but I couldn't really find
-> a good place for it.
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 728d7857..6ded9aa2 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -5863,6 +5863,76 @@ static void print_scan_flags(unsigned int level, con=
+st char *label,
+ 	}
+ }
+ =
 
-You can start iwd with IWD_DHCP_DEBUG set but not '-d'.  So it would only p=
-rint =
++static void print_key_type(unsigned int level, const char *label,
++					const void *data, uint16_t size)
++{
++	const uint8_t *ptr =3D data;
++	const char *str;
++
++	switch (*ptr) {
++	case NL80211_KEYTYPE_GROUP:
++		str =3D "Group";
++		break;
++	case NL80211_KEYTYPE_PAIRWISE:
++		str =3D "Pairwise";
++		break;
++	case NL80211_KEYTYPE_PEERKEY:
++		str =3D "Peerkey";
++		break;
++	default:
++		str =3D "Unknown";
++	}
++
++	print_attr(level, "%s: %s", label, str);
++}
++
++static void print_key_mode(unsigned int level, const char *label,
++					const void *data, uint16_t size)
++{
++	const uint8_t *ptr =3D data;
++	const char *str;
++
++	switch (*ptr) {
++	case NL80211_KEY_RX_TX:
++		str =3D "RX/TX";
++		break;
++	case NL80211_KEY_NO_TX:
++		str =3D "RX Only";
++		break;
++	case NL80211_KEY_SET_TX:
++		str =3D "Set TX";
++		break;
++	default:
++		str =3D "Unknown";
++	}
++
++	print_attr(level, "%s: %s", label, str);
++}
++
++static const struct attr_entry default_key_type_table[] =3D {
++	{ NL80211_KEY_DEFAULT_TYPE_UNICAST, "Unicast", ATTR_FLAG },
++	{ NL80211_KEY_DEFAULT_TYPE_MULTICAST, "Multicast", ATTR_FLAG },
++	{ }
++};
++
++static const struct attr_entry key_table[] =3D {
++	{ NL80211_KEY_DATA,		"Key Data",		ATTR_BINARY },
++	{ NL80211_KEY_IDX,		"Key Index",		ATTR_U8 },
++	{ NL80211_KEY_CIPHER,		"Key Cipher",		ATTR_CUSTOM,
++					{ .function =3D print_cipher_suite } },
++	{ NL80211_KEY_SEQ,		"Key Sequence",		ATTR_BINARY },
++	{ NL80211_KEY_DEFAULT,		"Default",		ATTR_FLAG },
++	{ NL80211_KEY_DEFAULT_MGMT,	"Default Management",	ATTR_FLAG },
++	{ NL80211_KEY_TYPE,		"Key Type",		ATTR_CUSTOM,
++					{ .function =3D print_key_type} },
++	{ NL80211_KEY_DEFAULT_TYPES,	"Default Key Types",	ATTR_NESTED,
++					{ default_key_type_table } },
++	{ NL80211_KEY_MODE,		"Key Mode",		ATTR_CUSTOM,
++					{ .function =3D print_key_mode } },
++	{ NL80211_KEY_DEFAULT_BEACON,	"Default Beacon",	ATTR_FLAG },
++	{ }
++};
++
+ static const struct attr_entry attr_table[] =3D {
+ 	{ NL80211_ATTR_WIPHY,
+ 			"Wiphy", ATTR_U32 },
+@@ -6038,7 +6108,7 @@ static const struct attr_entry attr_table[] =3D {
+ 	{ NL80211_ATTR_PREV_BSSID,
+ 			"Previous BSSID", ATTR_ADDRESS },
+ 	{ NL80211_ATTR_KEY,
+-			"Key" },
++			"Key", ATTR_NESTED, { key_table } },
+ 	{ NL80211_ATTR_KEYS,
+ 			"Keys" },
+ 	{ NL80211_ATTR_PID,
+-- =
 
-the DHCP info and not anything else.
+2.31.1
 
-Or do you mean a reduced set of information prints from the dhcp_client?  S=
-hould =
-
-be possible by introducing something like l_dhcp_client_set_debug_level().
-
-Or do you mean something else?
-
-Regards,
--Denis
---===============3728341793948843173==--
+--===============3056541371003260466==--
 
