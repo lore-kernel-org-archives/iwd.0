@@ -1,58 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============1526162708526832614=="
+Content-Type: multipart/mixed; boundary="===============1035723188073698217=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 03/13] auto-t: remove waitstatus_to_exitcode for better
- compatibility
-Date: Mon, 28 Mar 2022 10:28:32 -0700
-Message-ID: <20220328172842.1660272-4-prestwoj@gmail.com>
-In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
+Subject: [PATCH 09/12] nl80211util: set multicast on new group keys
+Date: Mon, 04 Oct 2021 09:48:59 -0700
+Message-ID: <20211004164902.2274318-9-prestwoj@gmail.com>
+In-Reply-To: 20211004164902.2274318-1-prestwoj@gmail.com
 
---===============1526162708526832614==
+--===============1035723188073698217==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This was added in Python 3.9 which isn't always supported. Instead use
-the subprocess module which automatically checks the command output.
+This may not be required, but when working with extended key IDs
+setting the key mode makes each NEW_KEY explicit whether or not
+its the GTK or PTK key.
 ---
- autotests/testNetconfig/connection_test.py | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ src/nl80211util.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNet=
-config/connection_test.py
-index 8eeffbbd..91c6eb6b 100644
---- a/autotests/testNetconfig/connection_test.py
-+++ b/autotests/testNetconfig/connection_test.py
-@@ -12,6 +12,7 @@ from hostapd import HostapdCLI
- import testutil
- from config import ctx
- import os, time
-+import subprocess
+diff --git a/src/nl80211util.c b/src/nl80211util.c
+index d9d4819d..d663c6dc 100644
+--- a/src/nl80211util.c
++++ b/src/nl80211util.c
+@@ -247,6 +247,7 @@ struct l_genl_msg *nl80211_build_new_key_group(uint32_t=
+ ifindex, uint32_t cipher
+ 					size_t ctr_len, const uint8_t *addr)
+ {
+ 	struct l_genl_msg *msg;
++	uint32_t type =3D NL80211_KEYTYPE_GROUP;
  =
 
- class Test(unittest.TestCase):
+ 	msg =3D l_genl_msg_new_sized(NL80211_CMD_NEW_KEY, 512);
  =
 
-@@ -40,8 +41,8 @@ class Test(unittest.TestCase):
-         testutil.test_ifaces_connected()
+@@ -263,16 +264,11 @@ struct l_genl_msg *nl80211_build_new_key_group(uint32=
+_t ifindex, uint32_t cipher
+ 	if (ctr)
+ 		l_genl_msg_append_attr(msg, NL80211_KEY_SEQ, ctr_len, ctr);
  =
 
-         time.sleep(2)
--        ret =3D os.system('ip addr show ' + device.name + ' | grep \'inet6=
- 3ffe:501:ffff:100::\'')
--        self.assertEqual(os.waitstatus_to_exitcode(ret), 0)
-+        subprocess.check_output('ip addr show ' + device.name + \
-+                            ' | grep \'inet6 3ffe:501:ffff:100::\'', shell=
-=3DTrue)
+-	if (addr) {
+-		uint32_t type =3D NL80211_KEYTYPE_GROUP;
+-
+-		l_genl_msg_append_attr(msg, NL80211_KEY_TYPE, 4, &type);
+-		l_genl_msg_enter_nested(msg, NL80211_KEY_DEFAULT_TYPES);
+-		l_genl_msg_append_attr(msg, NL80211_KEY_DEFAULT_TYPE_MULTICAST,
++	l_genl_msg_append_attr(msg, NL80211_KEY_TYPE, 4, &type);
++	l_genl_msg_enter_nested(msg, NL80211_KEY_DEFAULT_TYPES);
++	l_genl_msg_append_attr(msg, NL80211_KEY_DEFAULT_TYPE_MULTICAST,
+ 					0, NULL);
+-		l_genl_msg_leave_nested(msg);
+-	}
+-
++	l_genl_msg_leave_nested(msg);
+ 	l_genl_msg_leave_nested(msg);
  =
 
-         device.disconnect()
- =
-
+ 	return msg;
 -- =
 
-2.34.1
+2.31.1
 
---===============1526162708526832614==--
+--===============1035723188073698217==--
 
