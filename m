@@ -1,105 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============4397340770226801697=="
+Content-Type: multipart/mixed; boundary="===============5411708955329024295=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: D-Bus policies
-Date: Tue, 25 Jan 2022 16:15:07 -0600
-Message-ID: <02eb9123-8c12-29db-a279-1ba2a21f8e57@gmail.com>
-In-Reply-To: 1693634.GKaMHTciCY@bagend
+Subject: [PATCH v2 11/11] auto-t: update rekey() use to not wait for event
+Date: Tue, 05 Oct 2021 15:00:51 -0700
+Message-ID: <20211005220051.4018694-11-prestwoj@gmail.com>
+In-Reply-To: 20211005220051.4018694-1-prestwoj@gmail.com
 
---===============4397340770226801697==
+--===============5411708955329024295==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Diederik,
+The hostapd event wait was moved into rekey() itself.
+---
+ autotests/testFILS/fils_256_test.py       | 1 -
+ autotests/testFILS/fils_384_test.py       | 1 -
+ autotests/testFT-FILS/connection_test.py  | 1 -
+ autotests/testPSK-roam/connection_test.py | 1 -
+ 4 files changed, 4 deletions(-)
 
->> Sort of.  I think in reality the vast majority of users are on single-us=
-er
->> systems with the main user already part of the 'wheel' group. So even if=
- we
->> drop the at_console usage, and allowed iwd use only for root/netdev/whee=
-l,
->> the impact should be minimal.
-> =
+diff --git a/autotests/testFILS/fils_256_test.py b/autotests/testFILS/fils_=
+256_test.py
+index 02fad28e..a4e58715 100644
+--- a/autotests/testFILS/fils_256_test.py
++++ b/autotests/testFILS/fils_256_test.py
+@@ -56,7 +56,6 @@ class Test(unittest.TestCase):
+         testutil.test_ifaces_connected(device.name, hapd.ifname)
+ =
 
-> When I setup a new Debian system, I *manually* add myself to "dialout, ad=
-m,
-> plugdev, netdev, audio, video" groups, so this is not an automatic thing.
-> I just added a 2nd user on my system and its only group membership was to=
- a
-> group named the same as the user. This is the default behavior, but it ma=
-y be
-> (a bit) different for the first user, but likely also depends on how the =
-system
-> is setup.
-> The 'wheel' group is not used/present on Debian (based distros).
+         hapd.rekey(device.address)
+-        hapd.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
+ =
 
-Sure, but the chances that the main user on a single-user system isn't part=
- of =
+         device.disconnect()
+ =
 
-'wheel' or 'netdev' should be pretty small, no?
+diff --git a/autotests/testFILS/fils_384_test.py b/autotests/testFILS/fils_=
+384_test.py
+index 8ecd2fec..e6550a17 100644
+--- a/autotests/testFILS/fils_384_test.py
++++ b/autotests/testFILS/fils_384_test.py
+@@ -56,7 +56,6 @@ class Test(unittest.TestCase):
+         testutil.test_ifaces_connected(device.name, hapd.ifname)
+ =
 
-> =
+         hapd.rekey(device.address)
+-        hapd.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
+ =
 
-> So I think the impact is not minimal. OTOH, it should be common knowledge=
- that
-> users need netdev group permissions to modify network connections.
-> =
+         device.disconnect()
+ =
 
+diff --git a/autotests/testFT-FILS/connection_test.py b/autotests/testFT-FI=
+LS/connection_test.py
+index d1389cea..14025a3b 100644
+--- a/autotests/testFT-FILS/connection_test.py
++++ b/autotests/testFT-FILS/connection_test.py
+@@ -96,7 +96,6 @@ class Test(unittest.TestCase):
+                           (self.bss_hostapd[0].ifname, device.name, True, =
+True))
+ =
 
-Agreed.
+         self.bss_hostapd[1].rekey(device.address)
+-        self.bss_hostapd[1].wait_for_event('EAPOL-4WAY-HS-COMPLETED')
+ =
 
->>> For example, if I granted access to a friend (over SSH) to my
->>> machine, he was allowed access to iwd over D-Bus before, but because he=
-'s
->>> not in the netdev group, he would then be denied access.
->>
->> Correct.  But how likely is this scenario? :)
-> =
+     def test_fils_ft_roam_sha256(self):
+         wd =3D IWD(True)
+diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
+roam/connection_test.py
+index d1beb010..ee50e4a7 100644
+--- a/autotests/testPSK-roam/connection_test.py
++++ b/autotests/testPSK-roam/connection_test.py
+@@ -81,7 +81,6 @@ class Test(unittest.TestCase):
+                           (self.bss_hostapd[0].ifname, device.name, True, =
+True))
+ =
 
-> It's the default scenario on Debian and possibly its derivatives.
-> FTR: I don't want my friend(s) granted permission to change the network
-> connection by default. If I want to grant a friend that permission, I wou=
-ld
-> add him/her to the netdev group.
+         self.bss_hostapd[1].rekey(device.address)
+-        self.bss_hostapd[1].wait_for_event('EAPOL-4WAY-HS-COMPLETED')
+ =
 
-The original intent was to disallow access to iwd for remote users.  So, in=
- the =
+         device.roam(self.bss_hostapd[0].bssid)
+ =
 
-scenario above, if your friend is not part of 'netdev' or 'wheel', then the=
-ir =
+-- =
 
-control of iwd should not have been possible.
+2.31.1
 
-> =
-
-> And Option 2 is restricted access.
-
-Right.  We'd be 'breaking' the above scenario.  But, as I mentioned before,=
- how =
-
-likely was this scenario in the first place?  Did someone really want remot=
-e =
-
-users to mess with wifi on their machine without netdev/wheel access?  Argu=
-ably =
-
-we're just fixing a bug.
-
-> =
-
-> For which Option would you like a patch?
-> =
-
-
-I'm fine with either option.  It sounds like you're favoring Option 2. =
-
-Whichever you go for, I'll let it sit on the list for a few days to see if =
-
-anyone else complains :)
-
-Regards,
--Denis
---===============4397340770226801697==--
+--===============5411708955329024295==--
 
