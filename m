@@ -1,39 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============2284816584336974253=="
+Content-Type: multipart/mixed; boundary="===============0500621702824725019=="
 MIME-Version: 1.0
-From: Rhys Perry <rhysperry111 at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [Feature discussion] Allow overriding of network-specific options
- globally
-Date: Fri, 14 Jan 2022 10:14:18 +0000
-Message-ID: <CAGTBY+s4jDG-34n83r=x32S5EwSFFR-vdfnExX2vyLw4BQKkgw@mail.gmail.com>
-In-Reply-To: CAGTBY+tVZixBJ3kpPBEYqETYt_-qwkTK4t8CYiu7tVENo9EL1w@mail.gmail.com
+Subject: [PATCH v2 08/11] nl80211util: set multicast on new group keys
+Date: Tue, 05 Oct 2021 15:00:48 -0700
+Message-ID: <20211005220051.4018694-8-prestwoj@gmail.com>
+In-Reply-To: 20211005220051.4018694-1-prestwoj@gmail.com
 
---===============2284816584336974253==
+--===============0500621702824725019==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-`Hi,
+This may not be required but setting the group key mode explicitly
+to multicast makes things consistent, even if only for the benefit
+of reading iwmon logs easier.
+---
+ src/nl80211util.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-I use IWD as the network manager on my laptop, also utilising it's
-inbuilt DHCP client. One of the things that gets on my nerves about
-this is that there is no way to override the DNS server globally, only
-per-network. This becomes rather annoying on a device like a laptop,
-where I am regularly connecting to new networks.
+diff --git a/src/nl80211util.c b/src/nl80211util.c
+index d9d4819d..d663c6dc 100644
+--- a/src/nl80211util.c
++++ b/src/nl80211util.c
+@@ -247,6 +247,7 @@ struct l_genl_msg *nl80211_build_new_key_group(uint32_t=
+ ifindex, uint32_t cipher
+ 					size_t ctr_len, const uint8_t *addr)
+ {
+ 	struct l_genl_msg *msg;
++	uint32_t type =3D NL80211_KEYTYPE_GROUP;
+ =
 
-I am proposing the ability to override network specific options (ones
-documented in `iwd.network`) globally. This would be implemented by
-having another configuration file (something like
-`/etc/iwd/network-overrides.conf`), where any network-specific options
-can be set, but globally. Of course, it is still useful to be able to
-set per-network options, so any options in the per-network configs
-(`/var/lib/iwd/*`) should take precedence over the global options.
+ 	msg =3D l_genl_msg_new_sized(NL80211_CMD_NEW_KEY, 512);
+ =
 
-What do you think of this proposal? Admittedly, I am not familiar with
-how IWD parses configs, nor the codebase in general, and my
-programming skills do have a lot to be desired, so maybe I am
-overlooking something.
+@@ -263,16 +264,11 @@ struct l_genl_msg *nl80211_build_new_key_group(uint32=
+_t ifindex, uint32_t cipher
+ 	if (ctr)
+ 		l_genl_msg_append_attr(msg, NL80211_KEY_SEQ, ctr_len, ctr);
+ =
 
-Rhys Perry
---===============2284816584336974253==--
+-	if (addr) {
+-		uint32_t type =3D NL80211_KEYTYPE_GROUP;
+-
+-		l_genl_msg_append_attr(msg, NL80211_KEY_TYPE, 4, &type);
+-		l_genl_msg_enter_nested(msg, NL80211_KEY_DEFAULT_TYPES);
+-		l_genl_msg_append_attr(msg, NL80211_KEY_DEFAULT_TYPE_MULTICAST,
++	l_genl_msg_append_attr(msg, NL80211_KEY_TYPE, 4, &type);
++	l_genl_msg_enter_nested(msg, NL80211_KEY_DEFAULT_TYPES);
++	l_genl_msg_append_attr(msg, NL80211_KEY_DEFAULT_TYPE_MULTICAST,
+ 					0, NULL);
+-		l_genl_msg_leave_nested(msg);
+-	}
+-
++	l_genl_msg_leave_nested(msg);
+ 	l_genl_msg_leave_nested(msg);
+ =
+
+ 	return msg;
+-- =
+
+2.31.1
+
+--===============0500621702824725019==--
 
