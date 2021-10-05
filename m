@@ -1,62 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============4433452404744047012=="
+Content-Type: multipart/mixed; boundary="===============4917441467655682850=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 3/7] scan: keep track of OWE Transition element
-Date: Thu, 16 Sep 2021 09:30:42 -0700
-Message-ID: <20210916163046.30817-3-prestwoj@gmail.com>
-In-Reply-To: 20210916163046.30817-1-prestwoj@gmail.com
+Subject: [PATCH v2 02/11] handshake: add flags/key_index for extended key IDs
+Date: Tue, 05 Oct 2021 15:00:42 -0700
+Message-ID: <20211005220051.4018694-2-prestwoj@gmail.com>
+In-Reply-To: 20211005220051.4018694-1-prestwoj@gmail.com
 
---===============4433452404744047012==
+--===============4917441467655682850==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+ext_key_id_capable indicates the handshake has set the capability bit
+in the RSN info. This will only be set if the AP also has the capability
+set.
+
+use_ext_key_id indicates if extended key ID procedure should be used.
+This is required because an AP may not send the KDE (even with capabilities
+set) meaning we fall back to the legacy zero key index.
+
+ptk_index is the key index the AP chose for a given rekey.
 ---
- src/scan.c | 7 +++++++
- src/scan.h | 3 +++
- 2 files changed, 10 insertions(+)
+ src/handshake.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-v3:
- * Store SSID length to handle non-utf8 SSIDs
-
-diff --git a/src/scan.c b/src/scan.c
-index 1224e18b..b2f199e5 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -936,6 +936,13 @@ static void scan_parse_vendor_specific(struct scan_bss=
- *bss, const void *data,
- 		return;
- 	}
- =
-
-+	if (is_ie_wfa_ie(data, len, IE_WFA_OI_OWE_TRANSITION)) {
-+		ie_parse_owe_transition(data - 2, len + 2, bss->owe_trans_bssid,
-+					bss->owe_trans_ssid,
-+					&bss->owe_trans_ssid_len);
-+		return;
-+	}
-+
- 	if (!ie_parse_network_cost(data, len, &cost_level, &cost_flags)) {
- 		bss->cost_level =3D cost_level;
- 		bss->cost_flags =3D cost_flags;
-diff --git a/src/scan.h b/src/scan.h
-index aa3974df..99c66bb8 100644
---- a/src/scan.h
-+++ b/src/scan.h
-@@ -76,6 +76,9 @@ struct scan_bss {
- 	uint64_t parent_tsf;
- 	uint8_t *wfd;		/* Concatenated WFD IEs */
- 	ssize_t wfd_size;	/* Size of Concatenated WFD IEs */
-+	uint8_t owe_trans_ssid[32];
-+	size_t owe_trans_ssid_len;
-+	uint8_t owe_trans_bssid[6];
- 	bool mde_present : 1;
- 	bool cc_present : 1;
- 	bool cap_rm_neighbor_report : 1;
+diff --git a/src/handshake.h b/src/handshake.h
+index 36ccc3a2..e67e2c20 100644
+--- a/src/handshake.h
++++ b/src/handshake.h
+@@ -128,6 +128,7 @@ struct handshake_state {
+ 	bool support_fils : 1;
+ 	bool authenticator_ocvc : 1;
+ 	bool supplicant_ocvc : 1;
++	bool ext_key_id_capable : 1;
+ 	uint8_t ssid[32];
+ 	size_t ssid_len;
+ 	char *passphrase;
+@@ -138,6 +139,8 @@ struct handshake_state {
+ 	uint8_t gtk_rsc[6];
+ 	uint8_t proto_version : 2;
+ 	unsigned int gtk_index;
++	bool use_ext_key_id : 1;
++	uint8_t ptk_index;
+ 	struct erp_cache_entry *erp_cache;
+ 	bool support_ip_allocation : 1;
+ 	uint32_t client_ip_addr;
 -- =
 
 2.31.1
 
---===============4433452404744047012==--
+--===============4917441467655682850==--
 
