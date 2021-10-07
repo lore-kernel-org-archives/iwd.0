@@ -1,36 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============0743895474962422877=="
+Content-Type: multipart/mixed; boundary="===============5208042394128803210=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel at holtmann.org>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [RFC 0/2] Encrypt secrets using systemd provided key
-Date: Fri, 21 Jan 2022 23:36:29 +0100
-Message-ID: <36097DFC-5155-4AA6-AF6F-9F90F3A0C77C@holtmann.org>
-In-Reply-To: 1669386.7lEct51Sfr@prancing-pony
+Subject: [PATCH v3 07/13] handshake: set extended key ID capable
+Date: Thu, 07 Oct 2021 13:49:51 -0700
+Message-ID: <20211007204957.3745985-7-prestwoj@gmail.com>
+In-Reply-To: 20211007204957.3745985-1-prestwoj@gmail.com
 
---===============0743895474962422877==
+--===============5208042394128803210==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Diederik,
+---
+ src/handshake.c | 1 +
+ 1 file changed, 1 insertion(+)
 
->> There has been interest in enabling IWD users to store their network
->> credentials in some encrypted form.
-> =
+diff --git a/src/handshake.c b/src/handshake.c
+index 58326dcd..ea1c5e4b 100644
+--- a/src/handshake.c
++++ b/src/handshake.c
+@@ -240,6 +240,7 @@ valid_ie:
+ 	s->group_management_cipher =3D info.group_management_cipher;
+ 	s->akm_suite =3D info.akm_suites;
+ 	s->supplicant_ocvc =3D info.ocvc;
++	s->ext_key_id_capable =3D info.extended_key_id;
+ =
 
-> I did/do wonder why my passphrase is stored in plain-text and not in a fo=
-rm =
+ 	/*
+ 	 * Don't set MFP for OSEN otherwise EAPoL will attempt to negotiate a
+-- =
 
-> which I can get through the wpa_passphrase* utility (I don't know the pro=
-per =
+2.31.1
 
-> term for it though). Maybe that's what others have been interested in too?
-
-because starting with WPA3, that doesn=E2=80=99t work anymore.
-
-Regards
-
-Marcel
-
---===============0743895474962422877==--
+--===============5208042394128803210==--
 
