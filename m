@@ -1,45 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============1693875082238457116=="
+Content-Type: multipart/mixed; boundary="===============9204784806933939591=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 4/5] eapol: don't enforce PMKID on 1/4 if require_handshake
- is false
-Date: Tue, 28 Sep 2021 15:05:06 -0700
-Message-ID: <20210928220507.944851-4-prestwoj@gmail.com>
-In-Reply-To: 20210928220507.944851-1-prestwoj@gmail.com
+Subject: [PATCH v3 06/13] station: set extended key capability
+Date: Thu, 07 Oct 2021 13:49:50 -0700
+Message-ID: <20211007204957.3745985-6-prestwoj@gmail.com>
+In-Reply-To: 20211007204957.3745985-1-prestwoj@gmail.com
 
---===============1693875082238457116==
+--===============9204784806933939591==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-FT/FILS handle their own PMK derivation but rekeys still require
-using the 4-way handshake. There is some ambiguity in the spec whether
-or not the PMKID needs to be included in message 1/4 and it appears
-that when rekeying after FT/FILS hostapd does not include a PMKID.
+If wiphy and the AP suppor it, set the Extended Key ID capability
+bit in the RSN info.
 ---
- src/eapol.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/station.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 9543bced..8dce9a68 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -1147,7 +1147,8 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *=
-sm,
- 	 * send no PMKID KDE.
- 	 */
- 	if (!sm->eap_exchanged && !sm->handshake->wpa_ie &&
--			rsn_info.num_pmkids) {
-+			rsn_info.num_pmkids &&
-+			sm->require_handshake) {
- 		bool found =3D false;
- 		int i;
+diff --git a/src/station.c b/src/station.c
+index f12cdde5..30335170 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1087,6 +1087,10 @@ build_ie:
  =
 
+ 	info.ocvc =3D !disable_ocv;
+ =
+
++	/* Extended Key IDs can only be used if supported by both AP and STA */
++	if (wiphy_supports_ext_key_id(wiphy) && bss_info.extended_key_id)
++		info.extended_key_id =3D true;
++
+ 	/* RSN takes priority */
+ 	if (bss->rsne) {
+ 		ap_ie =3D bss->rsne;
 -- =
 
 2.31.1
 
---===============1693875082238457116==--
+--===============9204784806933939591==--
 
