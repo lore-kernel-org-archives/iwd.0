@@ -1,68 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============5608781867201384408=="
+Content-Type: multipart/mixed; boundary="===============0168754221586913795=="
 MIME-Version: 1.0
-From: Fabrice Fontaine <fontaine.fabrice at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] src/sae.c: Use realloc(3) instead of reallocarray(3)
-Date: Sun, 19 Sep 2021 10:57:10 +0200
-Message-ID: <20210919085710.1805075-1-fontaine.fabrice@gmail.com>
+Subject: [PATCH v3 09/13] nl80211util: set multicast on new group keys
+Date: Thu, 07 Oct 2021 13:49:53 -0700
+Message-ID: <20211007204957.3745985-9-prestwoj@gmail.com>
+In-Reply-To: 20211007204957.3745985-1-prestwoj@gmail.com
 
---===============5608781867201384408==
+--===============0168754221586913795==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-reallocarray(3) has been added to glibc relatively recently (version
-2.26, from 2017) and apparently not all users run new enough glibc.
-Moreover, reallocarray is not available with uclibc-ng. Just use
-realloc(3) for now since in this case there's no real risk of overflow.
-This will avoid the following build failure since commit
-891b78e9e892a3bcd800eb3a298e6380e9a15dd1:
-
-/home/giuliobenetti/autobuild/run/instance-3/output-1/host/lib/gcc/xtensa-b=
-uildroot-linux-uclibc/10.3.0/../../../../xtensa-buildroot-linux-uclibc/bin/=
-ld: src/sae.o: in function `sae_rx_authenticate':
-sae.c:(.text+0xd74): undefined reference to `reallocarray'
-
-Fixes:
- - http://autobuild.buildroot.org/results/c6d3f86282c44645b4f1c61882dc63ccf=
-c8eb35a
-
-Signed-off-by: Fabrice Fontaine <fontaine.fabrice(a)gmail.com>
+This may not be required but setting the group key mode explicitly
+to multicast makes things consistent, even if only for the benefit
+of reading iwmon logs easier.
 ---
- src/sae.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/nl80211util.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/src/sae.c b/src/sae.c
-index 7e6377f5..d04891e7 100644
---- a/src/sae.c
-+++ b/src/sae.c
-@@ -104,7 +104,7 @@ static void sae_rejected_groups_append(struct sae_sm *s=
-m, uint16_t group)
- 	uint16_t i;
+diff --git a/src/nl80211util.c b/src/nl80211util.c
+index d9d4819d..d663c6dc 100644
+--- a/src/nl80211util.c
++++ b/src/nl80211util.c
+@@ -247,6 +247,7 @@ struct l_genl_msg *nl80211_build_new_key_group(uint32_t=
+ ifindex, uint32_t cipher
+ 					size_t ctr_len, const uint8_t *addr)
+ {
+ 	struct l_genl_msg *msg;
++	uint32_t type =3D NL80211_KEYTYPE_GROUP;
  =
 
- 	if (!sm->rejected_groups) {
--		sm->rejected_groups =3D reallocarray(NULL, 2, sizeof(uint16_t));
-+		sm->rejected_groups =3D realloc(NULL, 2 * sizeof(uint16_t));
- 		sm->rejected_groups[0] =3D 1;
- 		sm->rejected_groups[1] =3D group;
- 		return;
-@@ -114,8 +114,8 @@ static void sae_rejected_groups_append(struct sae_sm *s=
-m, uint16_t group)
- 		if (sm->rejected_groups[i] =3D=3D group)
- 			return;
+ 	msg =3D l_genl_msg_new_sized(NL80211_CMD_NEW_KEY, 512);
  =
 
--	sm->rejected_groups =3D reallocarray(sm->rejected_groups,
--						i + 1, sizeof(uint16_t));
-+	sm->rejected_groups =3D realloc(sm->rejected_groups,
-+					(i + 1) * sizeof(uint16_t));
- 	sm->rejected_groups[0] +=3D 1;
- 	sm->rejected_groups[i] =3D group;
- }
+@@ -263,16 +264,11 @@ struct l_genl_msg *nl80211_build_new_key_group(uint32=
+_t ifindex, uint32_t cipher
+ 	if (ctr)
+ 		l_genl_msg_append_attr(msg, NL80211_KEY_SEQ, ctr_len, ctr);
+ =
+
+-	if (addr) {
+-		uint32_t type =3D NL80211_KEYTYPE_GROUP;
+-
+-		l_genl_msg_append_attr(msg, NL80211_KEY_TYPE, 4, &type);
+-		l_genl_msg_enter_nested(msg, NL80211_KEY_DEFAULT_TYPES);
+-		l_genl_msg_append_attr(msg, NL80211_KEY_DEFAULT_TYPE_MULTICAST,
++	l_genl_msg_append_attr(msg, NL80211_KEY_TYPE, 4, &type);
++	l_genl_msg_enter_nested(msg, NL80211_KEY_DEFAULT_TYPES);
++	l_genl_msg_append_attr(msg, NL80211_KEY_DEFAULT_TYPE_MULTICAST,
+ 					0, NULL);
+-		l_genl_msg_leave_nested(msg);
+-	}
+-
++	l_genl_msg_leave_nested(msg);
+ 	l_genl_msg_leave_nested(msg);
+ =
+
+ 	return msg;
 -- =
 
-2.33.0
+2.31.1
 
---===============5608781867201384408==--
+--===============0168754221586913795==--
 
