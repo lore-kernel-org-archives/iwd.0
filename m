@@ -1,41 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============8912382218640785399=="
+Content-Type: multipart/mixed; boundary="===============4082298933110464824=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 3/7] scan: check flush feature before using flag
-Date: Thu, 24 Feb 2022 09:04:56 -0800
-Message-ID: <20220224170500.2779425-3-prestwoj@gmail.com>
-In-Reply-To: 20220224170500.2779425-1-prestwoj@gmail.com
+Subject: [PATCH v3 11/13] auto-t: hostapd.py: add resend_m3
+Date: Thu, 07 Oct 2021 13:49:55 -0700
+Message-ID: <20211007204957.3745985-11-prestwoj@gmail.com>
+In-Reply-To: 20211007204957.3745985-1-prestwoj@gmail.com
 
---===============8912382218640785399==
+--===============4082298933110464824==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This forces hostapd to resend message 3 of the 4-way handshake
 ---
- src/scan.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ autotests/util/hostapd.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/scan.c b/src/scan.c
-index 7c510df8..12b7a3fd 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -362,7 +362,8 @@ static struct l_genl_msg *scan_build_cmd(struct scan_co=
-ntext *sc,
- 	if (params->freqs)
- 		scan_build_attr_scan_frequencies(msg, params->freqs);
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 22802be6..5d17da6b 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -212,6 +212,10 @@ class HostapdCLI(object):
+         cmd =3D 'REKEY_GTK'
+         self.ctrl_sock.sendall(cmd.encode('utf-8'))
  =
 
--	if (params->flush && !ignore_flush_flag)
-+	if (params->flush && !ignore_flush_flag && wiphy_has_feature(sc->wiphy,
-+						NL80211_FEATURE_SCAN_FLUSH))
- 		flags |=3D NL80211_SCAN_FLAG_FLUSH;
- =
-
- 	if (!is_passive && params->randomize_mac_addr_hint &&
++    def resend_m3(self, address):
++        cmd =3D 'RESEND_M3 %s' % address
++        self.ctrl_sock.sendall(cmd.encode('utf-8'))
++
+     @property
+     def bssid(self):
+         cmd =3D self.cmdline + ['status']
 -- =
 
-2.34.1
+2.31.1
 
---===============8912382218640785399==--
+--===============4082298933110464824==--
 
