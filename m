@@ -1,40 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============0499506219211862881=="
+Content-Type: multipart/mixed; boundary="===============5942120904530741716=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Michael Nazzareno Trimarchi <michael at amarulasolutions.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 5/9] json: increase default token size to 60
-Date: Thu, 06 Jan 2022 11:50:03 -0800
-Message-ID: <20220106195007.528618-5-prestwoj@gmail.com>
-In-Reply-To: 20220106195007.528618-1-prestwoj@gmail.com
+Subject: iwd access point mode
+Date: Thu, 07 Oct 2021 21:48:10 +0200
+Message-ID: <CAOf5uwk5RkWEOuOsWTyFynQRsnWBHx8nByOzew283YHNanQQTg@mail.gmail.com>
 
---===============0499506219211862881==
+--===============5942120904530741716==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/json.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+HI all
 
-diff --git a/src/json.c b/src/json.c
-index cf233e56..aec5fe5c 100644
---- a/src/json.c
-+++ b/src/json.c
-@@ -33,7 +33,7 @@
- #include "shared/jsmn.h"
- =
+I'm playing with iwd. Looking at iwmon I can see virtual device
+discovered by iwd when they are created.
 
- /* Max number of tokens supported. Increase if larger objects are expected=
- */
--#define JSON_DEFAULT_TOKENS 30
-+#define JSON_DEFAULT_TOKENS 60
- =
+iw phy phy0 interface add wlan1 __ap
 
- #define TOK_LEN(token) (token)->end - (token)->start
- #define TOK_PTR(json, token) (void *)((json) + (token)->start)
--- =
+iwctl still report wlan0
 
-2.31.1
+ I was able to create wifi connection and access point mode using
+wpa_supplicant and NetworkManager. My idea
+is was experimenting iwd
 
---===============0499506219211862881==--
+iwctl device list still report only wlan1. The idea behind is to
+control ap+sta interface. Any feedback?
+
+Michael
+--===============5942120904530741716==--
 
