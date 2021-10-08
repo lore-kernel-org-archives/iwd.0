@@ -1,37 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============7238282680241092089=="
+Content-Type: multipart/mixed; boundary="===============5001483337128660778=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/4] p2p: Fix Device Address updates from Probe Requests
-Date: Wed, 30 Mar 2022 14:44:10 -0500
-Message-ID: <9ffda1df-4a3a-c322-b594-fd14e499f94c@gmail.com>
-In-Reply-To: 20220330173400.259961-1-andrew.zaborowski@intel.com
+Subject: Re: [PATCH] netdev: set TK index to zero for FT
+Date: Fri, 08 Oct 2021 14:14:13 -0500
+Message-ID: <7f82d3b3-5e26-d31b-1678-74b72c28126b@gmail.com>
+In-Reply-To: 20211008185005.2911529-1-prestwoj@gmail.com
 
---===============7238282680241092089==
+--===============5001483337128660778==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Hi James,
 
-On 3/30/22 12:33, Andrew Zaborowski wrote:
-> p2p_peer_update_existing may be called with a scan_bss struct built from
-> a Probe Request frame so it can't access bss->p2p_probe_resp_info even
-> if peer->bss was built from a Probe Response.  Check the source frame
-> type of the scan_bss struct before updating the Device Address.
-> =
-
-> This fixes one timing issue that would make the autotest fail often.
+On 10/8/21 1:50 PM, James Prestwood wrote:
+> Since FT re-uses the handshake the active TK index may be set to a
+> non-zero value.
 > ---
->   src/p2p.c | 10 +++++++---
->   1 file changed, 7 insertions(+), 3 deletions(-)
+>   src/netdev.c | 1 +
+>   1 file changed, 1 insertion(+)
 > =
 
 
-All applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============7238282680241092089==--
+--===============5001483337128660778==--
 
