@@ -1,91 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============2266869619119802631=="
+Content-Type: multipart/mixed; boundary="===============6755640271911732713=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v7 1/8] storage: convert storage to a module
-Date: Tue, 15 Feb 2022 12:05:24 -0600
-Message-ID: <dcc41b0b-dc58-0006-0403-2fafdf9a3919@gmail.com>
-In-Reply-To: 20220210225842.895962-1-prestwoj@gmail.com
+Subject: [PATCH v4 5/5] unit: update tests with new TK install arguments
+Date: Fri, 08 Oct 2021 11:07:26 -0700
+Message-ID: <20211008180726.2599788-5-prestwoj@gmail.com>
+In-Reply-To: 20211008180726.2599788-1-prestwoj@gmail.com
 
---===============2266869619119802631==
+--===============6755640271911732713==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ unit/test-eapol.c | 4 ++--
+ unit/test-wsc.c   | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-On 2/10/22 16:58, James Prestwood wrote:
-> ---
->   src/main.c    |   6 ---
->   src/storage.c | 102 ++++++++++++++++++++++++++------------------------
->   src/storage.h |   2 -
->   3 files changed, 54 insertions(+), 56 deletions(-)
-> =
+diff --git a/unit/test-eapol.c b/unit/test-eapol.c
+index e1b6c96e..86b154eb 100644
+--- a/unit/test-eapol.c
++++ b/unit/test-eapol.c
+@@ -2471,7 +2471,7 @@ static void eapol_sm_test_wpa_ptk_gtk_2(const void *d=
+ata)
+ 	eapol_exit();
+ }
+ =
 
+-static void verify_install_tk(struct handshake_state *hs,
++static void verify_install_tk(struct handshake_state *hs, uint8_t key_inde=
+x,
+ 				const uint8_t *tk, uint32_t cipher)
+ {
+ 	struct test_handshake_state *ths =3D
+@@ -3626,7 +3626,7 @@ static void test_ap_sta_hs_event(struct handshake_sta=
+te *hs,
+ 	assert(event !=3D HANDSHAKE_EVENT_FAILED);
+ }
+ =
 
-<snip>
+-static void test_ap_sta_install_tk(struct handshake_state *hs,
++static void test_ap_sta_install_tk(struct handshake_state *hs, uint8_t key=
+_idx,
+ 					const uint8_t *tk, uint32_t cipher)
+ {
+ 	struct test_ap_sta_hs *ths =3D
+diff --git a/unit/test-wsc.c b/unit/test-wsc.c
+index 7b24e6c5..8b130f45 100644
+--- a/unit/test-wsc.c
++++ b/unit/test-wsc.c
+@@ -2345,7 +2345,7 @@ static bool random_nonce(uint8_t nonce[])
+ 	return l_getrandom(nonce, 32);
+ }
+ =
 
->   =
+-static void test_ap_sta_install_tk(struct handshake_state *hs,
++static void test_ap_sta_install_tk(struct handshake_state *hs, uint8_t key=
+_idx,
+ 					const uint8_t *tk, uint32_t cipher)
+ {
+ 	assert(false);
+-- =
 
-> -bool storage_create_dirs(void)
-> -{
-> -	const char *state_dir;
-> -	char **state_dirs;
-> -
-> -	state_dir =3D getenv("STATE_DIRECTORY");
-> -	if (!state_dir)
-> -		state_dir =3D DAEMON_STORAGEDIR;
-> -
-> -	l_debug("Using state directory %s", state_dir);
-> -
-> -	state_dirs =3D l_strsplit(state_dir, ':');
-> -	if (!state_dirs[0]) {
-> -		l_strv_free(state_dirs);
-> -		return false;
-> -	}
-> -
-> -	storage_path =3D l_strdup(state_dirs[0]);
-> -	l_strv_free(state_dirs);
-> -
-> -	if (create_dirs(storage_path)) {
-> -		l_error("Failed to create %s", storage_path);
-> -
-> -		l_free(storage_path);
-> -
-> -		return false;
-> -	}
-> -
-> -	storage_hotspot_path =3D l_strdup_printf("%s/hotspot/", storage_path);
-> -
-> -	if (create_dirs(storage_hotspot_path)) {
-> -		l_error("Failed to create %s", storage_hotspot_path);
-> -
-> -		l_free(storage_path);
-> -		l_free(storage_hotspot_path);
-> -
-> -		return false;
-> -	}
-> -
-> -	return true;
-> -}
-> -
-> -void storage_cleanup_dirs(void)
-> -{
-> -	l_free(storage_path);
-> -	l_free(storage_hotspot_path);
-> -}
-> -
+2.31.1
 
-So these two functions are actually extremely iwd specific.  I think we may=
-be =
-
-should just put them into main.c instead.
-
->   char *storage_get_path(const char *format, ...)
->   {
->   	va_list args;
-
-Regards,
--Denis
---===============2266869619119802631==--
+--===============6755640271911732713==--
 
