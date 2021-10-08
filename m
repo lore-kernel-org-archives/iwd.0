@@ -1,149 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============8149992903002971559=="
+Content-Type: multipart/mixed; boundary="===============5034368358974768292=="
 MIME-Version: 1.0
-From: 58e33db1-f428-4823-8cc3-d962d0fb8aa8 at slmail.me
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd 1.18 doesn't connect to network on boot
-Date: Fri, 24 Sep 2021 18:23:43 +0000
-Message-ID: <163250782336.7.397747114831416417.14147430@slmail.me>
-In-Reply-To: 163250363750.7.16957800817581392078.14143021@simplelogin.co
+Subject: [PATCH v4 1/5] handshake: update TK installer/builder to take key
+ index
+Date: Fri, 08 Oct 2021 11:07:22 -0700
+Message-ID: <20211008180726.2599788-1-prestwoj@gmail.com>
 
---===============8149992903002971559==
+--===============5034368358974768292==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> Hi Jason,
-> =
+---
+ src/handshake.c | 2 +-
+ src/handshake.h | 1 +
+ src/netdev.c    | 9 +++++----
+ 3 files changed, 7 insertions(+), 5 deletions(-)
 
-> > Here you have. For some reason is not getting an IP:
-> > =
+diff --git a/src/handshake.c b/src/handshake.c
+index ea1c5e4b..8b08379d 100644
+--- a/src/handshake.c
++++ b/src/handshake.c
+@@ -666,7 +666,7 @@ void handshake_state_install_ptk(struct handshake_state=
+ *s)
+ =
 
-> =
+ 		handshake_event(s, HANDSHAKE_EVENT_SETTING_KEYS);
+ =
 
-> <snip>
-> =
+-		install_tk(s, handshake_get_tk(s), cipher);
++		install_tk(s, s->active_tk_index, handshake_get_tk(s), cipher);
+ 	}
+ }
+ =
 
-> > iwd[11413]: src/station.c:station_connect_cb() 6, result: 0
-> > iwd[11413]: src/station.c:station_connect_ok()
-> =
+diff --git a/src/handshake.h b/src/handshake.h
+index 4cf2ec63..6d56dadd 100644
+--- a/src/handshake.h
++++ b/src/handshake.h
+@@ -68,6 +68,7 @@ typedef void (*handshake_event_func_t)(struct handshake_s=
+tate *hs,
+ =
 
-> Yep, so we connect OK, start DHCP
-> =
+ typedef bool (*handshake_get_nonce_func_t)(uint8_t nonce[]);
+ typedef void (*handshake_install_tk_func_t)(struct handshake_state *hs,
++					uint8_t key_index,
+ 					const uint8_t *tk, uint32_t cipher);
+ typedef void (*handshake_install_gtk_func_t)(struct handshake_state *hs,
+ 					uint16_t key_index,
+diff --git a/src/netdev.c b/src/netdev.c
+index de155da1..de2f3d58 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1735,9 +1735,9 @@ static struct l_genl_msg *netdev_build_cmd_new_key_pa=
+irwise(
+ 							uint32_t cipher,
+ 							const uint8_t *aa,
+ 							const uint8_t *tk,
+-							size_t tk_len)
++							size_t tk_len,
++							uint8_t key_id)
+ {
+-	uint8_t key_id =3D 0;
+ 	struct l_genl_msg *msg;
+ =
 
-> > iwd[11413]: [DHCPv4] dhcp_client_send_discover:346
-> > iwd[11413]: [DHCPv4] l_dhcp_client_start:1174 Entering state: DHCP_STAT=
-E_SELECTING
-> > iwd[11413]: src/netconfig.c:netconfig_ipv6_select_and_install() IPV6 co=
-nfiguration disabled
-> > iwd[11413]: src/wiphy.c:wiphy_radio_work_done() Work item 2 done
-> > iwd[11413]: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
-> > iwd[11413]: src/netdev.c:netdev_mlme_notify() MLME notification Frame T=
-X Status(60)
-> > iwd[11413]: [DHCPv4] dhcp_client_timeout_resend:526
-> > iwd[11413]: [DHCPv4] dhcp_client_send_discover:346
-> > iwd[11413]: src/station.c:station_early_neighbor_report_cb() ifindex: 6=
-, error: -110(Connection timed out)
-> > iwd[11413]: [DHCPv4] dhcp_client_timeout_resend:526
-> > iwd[11413]: [DHCPv4] dhcp_client_send_discover:346
-> > iwd[11413]: [DHCPv4] dhcp_client_timeout_resend:526
-> > iwd[11413]: [DHCPv4] dhcp_client_send_discover:346
-> > =
+ 	msg =3D l_genl_msg_new_sized(NL80211_CMD_NEW_KEY, 512);
+@@ -1775,7 +1775,7 @@ static void netdev_group_timeout_cb(struct l_timeout =
+*timeout, void *user_data)
+ 	netdev_connect_ok(nhs->netdev);
+ }
+ =
 
-> =
+-static void netdev_set_tk(struct handshake_state *hs,
++static void netdev_set_tk(struct handshake_state *hs, uint8_t key_index,
+ 				const uint8_t *tk, uint32_t cipher)
+ {
+ 	struct netdev_handshake_state *nhs =3D
+@@ -1823,7 +1823,8 @@ static void netdev_set_tk(struct handshake_state *hs,
+ 		goto invalid_key;
+ =
 
-> But nothing gets received from the DHCP server.  I'm a bit stumped since =
-we =
+ 	msg =3D netdev_build_cmd_new_key_pairwise(netdev, cipher, addr, tk_buf,
+-						crypto_cipher_key_len(cipher));
++						crypto_cipher_key_len(cipher),
++						key_index);
+ 	nhs->pairwise_new_key_cmd_id =3D
+ 		l_genl_family_send(nl80211, msg, netdev_new_pairwise_key_cb,
+ 						nhs, NULL);
+-- =
 
-> haven't touched anything related to dhcp between 1.17 and 1.18.  We start=
-ed =
+2.31.1
 
-> sending the DHCP rapid commit option in iwd 1.17, so maybe that is why yo=
-ur =
-
-> server is ignoring us?
-> =
-
-> Does starting dhcpcd or something while iwd is in this 'connecting' state=
- obtain =
-
-> an IP?
-> =
-
-> > I think is relevant to the bug that I'm using this unit to start iwd.se=
-rvice:
-> > =
-
-> > # /usr/lib/systemd/system/iwd.service
-> > [Unit]
-> > Description=3DWireless service
-> > After=3Dnetwork-pre.target
-> > Before=3Dnetwork.target
-> > Wants=3Dnetwork.target
-> > =
-
-> > [Service]
-> > Type=3Ddbus
-> > BusName=3Dnet.connman.iwd
-> > ExecStart=3D/usr/lib/iwd/iwd
-> > NotifyAccess=3Dmain
-> > LimitNPROC=3D1
-> > Restart=3Don-failure
-> > CapabilityBoundingSet=3DCAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE
-> > PrivateTmp=3Dtrue
-> > NoNewPrivileges=3Dtrue
-> > DevicePolicy=3Dclosed
-> > DeviceAllow=3D/dev/rfkill rw
-> > ProtectHome=3Dyes
-> > ProtectSystem=3Dstrict
-> > ProtectControlGroups=3Dyes
-> > ProtectKernelModules=3Dyes
-> > ConfigurationDirectory=3Diwd
-> > StateDirectory=3Diwd
-> > StateDirectoryMode=3D0700
-> > =
-
-> > [Install]
-> > WantedBy=3Dmulti-user.target
-> > =
-
-> > # /etc/systemd/system/iwd.service.d/override.conf
-> > [Service]
-> > RuntimeDirectory=3Dresolvconf
-> > ReadWritePaths=3D/etc/resolv.conf
-> > =
-
-> > I remeber adding the override part few months ago due to another bug [1=
-]. For some reason, forcing a disconnect/connect with iwctl doesn't hit the=
- same problem.
-> =
-
-> But we're not even getting this far to even invoke resolvconf...
-> =
-
-> Any chance you can run a git bisect or otherwise narrow down what earlier =
-
-> version of iwd was working properly at boot?
-> =
-
-> Regards,
-> -Denis
-
-Well, I've discovered how to trigger the problem in my scenario. It's all r=
-elated with setting AddressRandomization to 'network'. The other two possib=
-le values 'disabled' (default) and 'once' both work fine.
-
-Previous version 1.17 didn't show this behaviour. Anyway, I'm happy with 'o=
-nce' since I no longer have specific settings by MAC in the router.
-
-For the record, this configuration was working until version 1.17 included:
-
-[General]
-EnableNetworkConfiguration=3Dtrue
-AddressRandomization=3Dnetwork
-
-[Network]
-NameResolvingService=3Dresolvconf
-
-
---===============8149992903002971559==--
+--===============5034368358974768292==--
 
