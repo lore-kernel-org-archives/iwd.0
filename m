@@ -1,43 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============8722082687862288997=="
+Content-Type: multipart/mixed; boundary="===============6932542533372050820=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 07/10] auto-t: wpas.py: allow arbitrary events to be handled
-Date: Thu, 20 Jan 2022 15:44:12 -0800
-Message-ID: <20220120234415.2469451-7-prestwoj@gmail.com>
-In-Reply-To: 20220120234415.2469451-1-prestwoj@gmail.com
+Subject: Re: [PATCH v3 07/13] handshake: set extended key ID capable
+Date: Fri, 08 Oct 2021 08:47:43 -0500
+Message-ID: <462c5ee1-82b0-ae8e-0d73-29468352430a@gmail.com>
+In-Reply-To: 20211007204957.3745985-7-prestwoj@gmail.com
 
---===============8722082687862288997==
+--===============6932542533372050820==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If an event is in response to some command which is returning an
-unexpected value (unexpected with respect to wpas.py) handle_eow
-would raise an exception.
+Hi James,
 
-Specifically with DPP this was being hit when the URI was being
-returned.
----
- autotests/util/wpas.py | 2 --
- 1 file changed, 2 deletions(-)
+On 10/7/21 3:49 PM, James Prestwood wrote:
+> ---
+>   src/handshake.c | 1 +
+>   1 file changed, 1 insertion(+)
+> =
 
-diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-index 6b845232..c8e65179 100644
---- a/autotests/util/wpas.py
-+++ b/autotests/util/wpas.py
-@@ -88,8 +88,6 @@ class Wpas:
-         def handle_eow():
-             nonlocal key, value, count, event
-             if count =3D=3D 0:
--                if key is not None or not value:
--                    raise Exception('Bad event name')
-                 key =3D 'event'
-             elif key is None:
-                 if not value:
--- =
 
-2.31.1
+Applied after merging with patch 02.
 
---===============8722082687862288997==--
+Regards,
+-Denis
+
+--===============6932542533372050820==--
 
