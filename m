@@ -1,106 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============8763036325845478833=="
+Content-Type: multipart/mixed; boundary="===============8831403087989151721=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 7/7] doc: document access point scanning
-Date: Wed, 23 Feb 2022 12:18:37 -0800
-Message-ID: <0a7e98fa25f2cd087ccb36c53980dc6c195a29f3.camel@gmail.com>
-In-Reply-To: db615d8d-a416-e3d2-ec7f-80ffdc5d1ead@gmail.com
+Subject: Re: [PATCH v3 03/13] handshake: add callback for extended key IDs
+Date: Fri, 08 Oct 2021 08:48:29 -0500
+Message-ID: <0895af1a-6dd6-9977-ba7e-29d12e7949f4@gmail.com>
+In-Reply-To: 20211007204957.3745985-3-prestwoj@gmail.com
 
---===============8763036325845478833==
+--===============8831403087989151721==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2022-02-23 at 12:43 -0600, Denis Kenzior wrote:
-> Hi James,
+Hi James,
+
+On 10/7/21 3:49 PM, James Prestwood wrote:
+> The procedure for setting extended key IDs is different from the
+> single PTK key. The key ID is toggled between 0 and 1 and the new
+> key is set as RX only, then set to RX/TX after message 4/4 goes
+> out.
 > =
 
-> On 2/22/22 16:57, James Prestwood wrote:
-> > ---
-> > =C2=A0 doc/access-point-api.txt | 27 +++++++++++++++++++++++++++
-> > =C2=A0 1 file changed, 27 insertions(+)
-> > =
-
+> Since netdev needs to set this new key before sending message 4,
+> eapol can include a built message which netdev will store if
+> required (i.e. using PAE).
+> ---
+>   src/handshake.c | 23 +++++++++++++++++++++++
+>   src/handshake.h | 12 ++++++++++++
+>   2 files changed, 35 insertions(+)
 > =
 
-> <snip>
-> =
 
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0array(dict) GetOrderedNetworks()
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Gets t=
-he list of networks found after
-> > scanning sorted
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0based =
-on signal strength. Each item in the
-> > array is a
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dictio=
-nary containing the network Name,
-> > SignalStrength,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0and Se=
-curity.
-> =
+Applied, thanks.
 
-> Security -> Type to be consistent with KnownNetwork / Network
-> interface naming =
+Regards,
+-Denis
 
-> of the properties.
-> =
-
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0This l=
-ist will expire similarly to station,
-> > and since
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0access=
- points do not do periodic scans the
-> > list may
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0become=
- empty after some time and requires
-> > scanning
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0again.
-> =
-
-> I'm not sure what this is about?=C2=A0 Scan results don't actually expire
-> in Station =
-
-> in the sense that you can keep calling GetOrderedNetworks() forever
-> and get the =
-
-> same results, as long as scanning hasn't been performed.=C2=A0 Essentially
-> if =
-
-> Scanning hasn't changed, GetOrderedNetworks() results shouldn't
-> change either.
-
-You're right, I was mis-remembering how the expiration works. Since
-station does periodic scan the BSS's get thrown out for each scan which
-is what I was somewhat trying to mirror here. But as far as
-GetOrderedNetworks goes it just takes the current list, however old it
-is.
-
-> =
-
-> I would expect the same behavior here?
-
-Sure I can remove the expiration stuff from the core patch and leave it
-up to the caller to make sure they get the networks promptly after
-scanning is finished.
-
-> =
-
-> Regards,
-> -Denis
-
-
---===============8763036325845478833==--
+--===============8831403087989151721==--
 
