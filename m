@@ -1,117 +1,150 @@
-Content-Type: multipart/mixed; boundary="===============7693090293597933358=="
+Content-Type: multipart/mixed; boundary="===============6897152481920782668=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 01/13] wiphy: change wiphy_control_port_capable -> enabled
-Date: Thu, 07 Oct 2021 13:49:45 -0700
-Message-ID: <20211007204957.3745985-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v3 05/13] netdev: support extended key IDs
+Date: Fri, 08 Oct 2021 09:11:12 -0500
+Message-ID: <8a130c78-857e-794d-3776-2f67a7b25cef@gmail.com>
+In-Reply-To: 20211007204957.3745985-5-prestwoj@gmail.com
 
---===============7693090293597933358==
+--===============6897152481920782668==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Move the reading of ControlPortOverNL80211 into wiphy itself and
-renamed wiphy_control_port_capable to wiphy_control_port_enabled.
-This makes things easier for any modules interested in control
-port support since they will only have to check this one API rather
-than read the settings and check capability.
----
- src/netdev.c |  7 +------
- src/wiphy.c  | 16 +++++++++++++---
- src/wiphy.h  |  2 +-
- 3 files changed, 15 insertions(+), 10 deletions(-)
+Hi James,
 
-diff --git a/src/netdev.c b/src/netdev.c
-index fbf3b067..de155da1 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -203,7 +203,6 @@ static struct l_netlink *rtnl =3D NULL;
- static struct l_genl_family *nl80211;
- static struct l_queue *netdev_list;
- static struct watchlist netdev_watches;
--static bool pae_over_nl80211;
- static bool mac_per_ssid;
- =
+On 10/7/21 3:49 PM, James Prestwood wrote:
+> This implements the new handshake callback for setting a TK with
+> an extended key ID. The procedure is different from legacy zero
+> index TKs.
+> =
 
- static unsigned int iov_ie_append(struct iovec *iov,
-@@ -6096,7 +6095,7 @@ struct netdev *netdev_create_from_genl(struct l_genl_=
-msg *msg,
- 		return NULL;
- 	}
- =
+> First the new TK is set as RX only. Then message 4 should be sent
+> out (so it uses the existing TK). This poses a slight issue with
+> PAE sockets since message order is not guaranteed. In this case
+> the 4th message is stored and sent after the new TK is installed.
+> Then the new TK is modified using SET_KEY to both send and
+> receive.
+> =
 
--	if (!pae_over_nl80211 || !wiphy_control_port_capable(wiphy)) {
-+	if (!wiphy_control_port_enabled(wiphy)) {
- 		pae_io =3D pae_open(ifindex);
- 		if (!pae_io) {
- 			l_error("Unable to open PAE interface");
-@@ -6233,10 +6232,6 @@ static int netdev_init(void)
- 					&LOW_SIGNAL_THRESHOLD_5GHZ))
- 		LOW_SIGNAL_THRESHOLD_5GHZ =3D -76;
- =
+> In the case of control port over NL80211 the above can be avoided
+> and we can simply install the new key, send message 4, and modify
+> the TK as TX + RX all in sequence, without waiting for any callbacks.
+> ---
+>   src/netdev.c | 401 ++++++++++++++++++++++++++++++++++++++-------------
+>   1 file changed, 297 insertions(+), 104 deletions(-)
+> =
 
--	if (!l_settings_get_bool(settings, "General", "ControlPortOverNL80211",
--					&pae_over_nl80211))
--		pae_over_nl80211 =3D true;
--
- 	rand_addr_str =3D l_settings_get_value(settings, "General",
- 						"AddressRandomization");
- 	if (rand_addr_str && !strcmp(rand_addr_str, "network"))
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 84d2a152..1a333aad 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -555,8 +555,11 @@ bool wiphy_uses_default_if(struct wiphy *wiphy)
- 	return false;
- }
- =
 
--bool wiphy_control_port_capable(struct wiphy *wiphy)
-+bool wiphy_control_port_enabled(struct wiphy *wiphy)
- {
-+	const struct l_settings *settings =3D iwd_get_config();
-+	bool enabled;
-+
- 	if (wiphy->driver_info &&
- 			wiphy->driver_info->flags & FORCE_PAE) {
- 		l_info("Not using Control Port due to driver quirks: %s",
-@@ -564,8 +567,15 @@ bool wiphy_control_port_capable(struct wiphy *wiphy)
- 		return false;
- 	}
- =
+<snip>
 
--	return wiphy_has_ext_feature(wiphy,
--			NL80211_EXT_FEATURE_CONTROL_PORT_OVER_NL80211);
-+	if (!wiphy_has_ext_feature(wiphy,
-+			NL80211_EXT_FEATURE_CONTROL_PORT_OVER_NL80211))
-+		return false;
-+
-+	if (!l_settings_get_bool(settings, "General",
-+					"ControlPortOverNL80211", &enabled))
-+		enabled =3D true;
-+
-+	return enabled;
- }
- =
+> @@ -1823,7 +2047,8 @@ static void netdev_set_tk(struct handshake_state *h=
+s,
+>   		goto invalid_key;
+>   =
 
- const uint8_t *wiphy_get_permanent_address(struct wiphy *wiphy)
-diff --git a/src/wiphy.h b/src/wiphy.h
-index d6487074..f7b6e1c4 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -102,7 +102,7 @@ bool wiphy_supports_firmware_roam(struct wiphy *wiphy);
- const char *wiphy_get_driver(struct wiphy *wiphy);
- const char *wiphy_get_name(struct wiphy *wiphy);
- bool wiphy_uses_default_if(struct wiphy *wiphy);
--bool wiphy_control_port_capable(struct wiphy *wiphy);
-+bool wiphy_control_port_enabled(struct wiphy *wiphy);
- const uint8_t *wiphy_get_permanent_address(struct wiphy *wiphy);
- const uint8_t *wiphy_get_extended_capabilities(struct wiphy *wiphy,
- 							uint32_t iftype);
--- =
+>   	msg =3D netdev_build_cmd_new_key_pairwise(netdev, cipher, addr, tk_buf,
+> -						crypto_cipher_key_len(cipher));
+> +						crypto_cipher_key_len(cipher),
+> +						hs->active_tk_index);
 
-2.31.1
+This seems inconsistent?  You pass the key_idx in the ext_tk callback, but =
+not =
 
---===============7693090293597933358==--
+here.  Bit of a pain to change the signature, but it may be nicer to just p=
+ass =
+
+the desired index into this callback.
+
+>   	nhs->pairwise_new_key_cmd_id =3D
+>   		l_genl_family_send(nl80211, msg, netdev_new_pairwise_key_cb,
+>   						nhs, NULL);
+> @@ -1836,6 +2061,74 @@ invalid_key:
+>   	netdev_setting_keys_failed(nhs, err);
+>   }
+>   =
+
+> +static void netdev_set_ext_tk(struct handshake_state *hs, uint8_t key_id=
+x,
+> +				const uint8_t *tk, uint32_t cipher,
+> +				const struct eapol_frame *step4, uint16_t proto,
+> +				bool noencrypt)
+> +{
+> +	struct netdev_handshake_state *nhs =3D
+> +		l_container_of(hs, struct netdev_handshake_state, super);
+> +	uint8_t tk_buf[32];
+> +	struct netdev *netdev =3D nhs->netdev;
+> +	struct l_genl_msg *msg;
+> +	const uint8_t *addr =3D netdev_choose_key_address(nhs);
+> +	int err;
+> +	size_t frame_size =3D sizeof(struct eapol_header) +
+> +				L_BE16_TO_CPU(step4->header.packet_len);
+> +
+> +	err =3D -ENOENT;
+> +	if (!netdev_copy_tk(tk_buf, tk, cipher, false))
+> +		goto error;
+> +
+> +	msg =3D netdev_build_cmd_new_rx_key_pairwise(netdev, cipher, addr, tk_b=
+uf,
+> +						crypto_cipher_key_len(cipher),
+> +						hs->active_tk_index);
+> +	nhs->pairwise_new_key_cmd_id =3D
+> +		l_genl_family_send(nl80211, msg, netdev_new_rx_pairwise_key_cb,
+> +						nhs, NULL);
+> +
+> +	if (!nhs->pairwise_new_key_cmd_id)
+> +		goto io_error;
+> +
+> +	/*
+> +	 * Without control port we cannot guarantee the order that messages go
+> +	 * out and must wait for NEW_KEY to call back before sending message 4
+> +	 */
+> +	if (!wiphy_control_port_enabled(netdev->wiphy)) {
+
+nit: lets just use netdev->pae_over_nl80211 for consistency.
+
+> +		netdev->ext_key_info =3D l_malloc(
+> +					sizeof(struct netdev_ext_key_info) +
+> +					frame_size);
+> +		memcpy(netdev->ext_key_info->frame, step4, frame_size);
+> +		netdev->ext_key_info->proto =3D proto;
+> +		netdev->ext_key_info->noencrypt =3D noencrypt;
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * Otherwise, order of messages will be guaranteed. Therefore we can
+> +	 * send send message 4, and set the TK to TX (below) without waiting for
+> +	 * any callbacks
+> +	 */
+> +	err =3D netdev_control_port_frame(netdev->index, netdev->handshake->aa,
+> +					proto, step4, noencrypt, NULL);
+> +	if (err < 0)
+> +		goto error;
+> +
+> +	/* Then toggle to RX + TX */
+> +	err =3D netdev_set_key_tx(netdev);
+> +	if (err < 0)
+> +		goto error;
+> +
+> +	return;
+> +
+> +io_error:
+> +	err =3D -EIO;
+> +	l_genl_msg_unref(msg);
+> +
+> +error:
+> +	netdev_setting_keys_failed(nhs, err);
+> +}
+> +
+>   static void netdev_set_pmk_cb(struct l_genl_msg *msg, void *user_data)
+>   {
+>   	struct netdev_handshake_state *nhs =3D user_data;
+
+<snip>
+
+Regards,
+-Denis
+--===============6897152481920782668==--
 
