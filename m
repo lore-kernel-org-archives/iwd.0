@@ -1,45 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============2310659486470486477=="
+Content-Type: multipart/mixed; boundary="===============1131180311886589540=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 12/13] dpp: set new_freq when configuring as initiator
-Date: Mon, 28 Mar 2022 10:28:41 -0700
-Message-ID: <20220328172842.1660272-13-prestwoj@gmail.com>
-In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
+Subject: Re: [PATCH v3 08/13] auto-t: iwd.py: make wait() a static method
+Date: Fri, 08 Oct 2021 08:50:32 -0500
+Message-ID: <c940a76f-50cb-7f30-8eba-2c37d7ad717c@gmail.com>
+In-Reply-To: 20211007204957.3745985-8-prestwoj@gmail.com
 
---===============2310659486470486477==
+--===============1131180311886589540==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is used to hold the current BSS frequency which will be
-used after IWD receives a presence announcement. Since this was
-not being set, the logic was always thinking there was a channel
-mismatch (0 !=3D current_freq) and attempting to go offchannel to
-'0' which resulted in -EINVAL, and ultimately protocol termination.
----
- src/dpp.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi James,
 
-diff --git a/src/dpp.c b/src/dpp.c
-index de8e6e14..1719a89d 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -2436,6 +2436,8 @@ static struct l_dbus_message *dpp_start_configurator_=
-common(
- =
+On 10/7/21 3:49 PM, James Prestwood wrote:
+> This allows it to be used without initializing an IWD class:
+> =
 
- 		if (!dpp->mcast_support)
- 			dpp->state =3D DPP_STATE_AUTHENTICATING;
-+
-+		dpp->new_freq =3D bss->frequency;
- 	} else
- 		dpp->current_freq =3D bss->frequency;
- =
+> IWD.wait(1)
+> ---
+>   autotests/util/iwd.py | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> =
 
--- =
 
-2.34.1
+Patches 8-11, 13 applied, thanks.
 
---===============2310659486470486477==--
+Regards,
+-Denis
+
+--===============1131180311886589540==--
 
