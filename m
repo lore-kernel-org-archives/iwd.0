@@ -1,30 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============4330284248663610128=="
+Content-Type: multipart/mixed; boundary="===============3841723924514694604=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] doc: fix overriden -> overridden
-Date: Fri, 14 Jan 2022 12:48:48 -0600
-Message-ID: <23f76358-ee2a-512c-7908-7b765005a3cf@gmail.com>
-In-Reply-To: 20220114175641.12351-1-didi.debian@cknow.org
+Subject: Re: [PATCH] station: limit extended key IDs to CCMP ciphers
+Date: Wed, 13 Oct 2021 10:35:13 -0500
+Message-ID: <6f803f48-faa9-6eae-f7b3-352e90c2b7da@gmail.com>
+In-Reply-To: 20211012153417.3781942-1-prestwoj@gmail.com
 
---===============4330284248663610128==
+--===============3841723924514694604==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Diederik,
+Hi James,
 
-On 1/14/22 11:56, Diederik de Haas wrote:
+On 10/12/21 10:34 AM, James Prestwood wrote:
 > ---
->   src/iwd.config.rst | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   src/station.c | 9 +++++++--
+>   1 file changed, 7 insertions(+), 2 deletions(-)
 > =
 
 
-Applied, thanks!
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============4330284248663610128==--
+--===============3841723924514694604==--
 
