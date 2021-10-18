@@ -1,47 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============8779122518961406145=="
+Content-Type: multipart/mixed; boundary="===============0657177468348464839=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] src/storage.c: fix build with uclibc
-Date: Mon, 28 Mar 2022 12:40:56 -0500
-Message-ID: <e463c69b-f668-70c2-1d0e-f0660eee5596@gmail.com>
-In-Reply-To: 20220325210017.525876-1-fontaine.fabrice@gmail.com
+Subject: [PATCH 3/4] auto-t: SAQuery-spoofing replace sleep with condition wait
+Date: Mon, 18 Oct 2021 15:33:58 -0700
+Message-ID: <20211018223359.497849-3-prestwoj@gmail.com>
+In-Reply-To: 20211018223359.497849-1-prestwoj@gmail.com
 
---===============8779122518961406145==
+--===============0657177468348464839==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Fabrice,
+By sleeping for 4 seconds IWD had plenty of time to fully disconnect
+and reconnect in time to pass the final "connected" check. Instead
+use wait_for_object_condition to wait for disconnected and expect
+this to fail. This will let the test fail if IWD disconnects.
+---
+ autotests/testSAQuery-spoofing/connection_test.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-On 3/25/22 16:00, Fabrice Fontaine wrote:
-> explicit_bzero is used in src/storage.c since commit
-> 01cd8587606bf2da1af245163150589834126c1c but src/missing.h is not
-> included, as a result build with uclibc fails on:
-> =
+diff --git a/autotests/testSAQuery-spoofing/connection_test.py b/autotests/=
+testSAQuery-spoofing/connection_test.py
+index f64a93f7..0ff0615f 100644
+--- a/autotests/testSAQuery-spoofing/connection_test.py
++++ b/autotests/testSAQuery-spoofing/connection_test.py
+@@ -51,8 +51,10 @@ class Test(unittest.TestCase):
+         # Spoof a disassociate frame. This will kick off SA Query procedur=
+e.
+         hwsim.spoof_disassociate(radio, hostapd.frequency, device.address)
+ =
 
-> /home/buildroot/autobuild/instance-0/output-1/host/lib/gcc/powerpc-buildr=
-oot-linux-uclibc/10.3.0/../../../../powerpc-buildroot-linux-uclibc/bin/ld: =
-src/storage.o: in function `storage_init':
-> storage.c:(.text+0x13a4): undefined reference to `explicit_bzero'
-> =
+-        # sleep to ensure hostapd responds and SA Query does not timeout
+-        sleep(4)
++        # ensure hostapd responds and SA Query does not timeout
++        with self.assertRaises(TimeoutError):
++            condition =3D 'obj.state =3D=3D DeviceState.disconnected'
++            wd.wait_for_object_condition(device, condition, 4)
+ =
 
-> Fixes:
->   - http://autobuild.buildroot.org/results/2aff8d3d7c33c95e2c57f7c8a71e69=
-939f0580a1
-> =
+         # Since disassociate was spoofed we should still be connected
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+-- =
 
-> Signed-off-by: Fabrice Fontaine <fontaine.fabrice(a)gmail.com>
+2.31.1
 
-We do not use S-o-b tags, so I took this out.
-
-> ---
->   src/storage.c | 1 +
->   1 file changed, 1 insertion(+)
-> =
-
-
-Applied, thanks.
-
---===============8779122518961406145==--
+--===============0657177468348464839==--
 
