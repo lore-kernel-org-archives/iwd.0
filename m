@@ -1,158 +1,246 @@
-Content-Type: multipart/mixed; boundary="===============5557563720028015817=="
+Content-Type: multipart/mixed; boundary="===============4109065373445442401=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 04/11] eapol: support extended key IDs
-Date: Tue, 05 Oct 2021 15:00:44 -0700
-Message-ID: <20211005220051.4018694-4-prestwoj@gmail.com>
-In-Reply-To: 20211005220051.4018694-1-prestwoj@gmail.com
+Subject: [PATCH 2/4] netdev: add OCI elements to SA Query request/response
+ frames
+Date: Mon, 18 Oct 2021 15:33:57 -0700
+Message-ID: <20211018223359.497849-2-prestwoj@gmail.com>
+In-Reply-To: 20211018223359.497849-1-prestwoj@gmail.com
 
---===============5557563720028015817==
+--===============4109065373445442401==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-802.11 added Extended Key IDs which aim to solve the issue of PTK
-key replacement during rekeys. Since swapping out the existing PTK
-may result in data loss because there may be in flight packets still
-using the old PTK.
-
-Extended Key IDs use two key IDs for the PTK, which toggle between
-0 and 1. During a rekey a new PTK is derived which uses the key ID
-not already taken by the existing PTK. This new PTK is added as RX
-only, then message 4/4 is sent. This ensure message 4 is encrypted
-using the previous PTK. Once sent, the new PTK can be modified to
-both RX and TX and the rekey is complete.
-
-To handle this in eapol the extended key ID KDE is parsed which
-gives us the new PTK key index. Using the new handshake callback
-(handshake_state_set_ext_tk) the new TK is installed. The 4th
-message is also included as an argument which is taken care of by
-netdev (in case waiting for NEW_KEY is required due to PAE socekts).
+SA query is the final protocol that requires OCI inclusion and
+verification. The OCI element is now included and verified in
+both request and response frames as required by 802.11.
 ---
- src/eapol.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 55 insertions(+), 6 deletions(-)
+ src/netdev.c | 123 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 111 insertions(+), 12 deletions(-)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 07120fdb..a5c4cc32 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -860,6 +860,7 @@ struct eapol_sm {
- 	uint8_t installed_igtk_len;
- 	uint8_t installed_igtk[CRYPTO_MAX_IGTK_LEN];
- 	unsigned int mic_len;
-+	bool rekey : 1;
- };
+diff --git a/src/netdev.c b/src/netdev.c
+index 18ac3e45..dabce0b1 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -4863,12 +4863,23 @@ static void netdev_sa_query_resp_cb(struct l_genl_m=
+sg *msg, void *user_data)
+ 			ext_error ? ext_error : strerror(-err));
+ }
  =
 
- static void eapol_sm_destroy(void *value)
-@@ -1223,6 +1224,9 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *=
-sm,
- 			return;
- 		}
++static int netdev_build_oci(struct netdev *netdev, uint8_t *out)
++{
++	out[0] =3D IE_TYPE_EXTENSION;
++	out[1] =3D 4;
++	out[2] =3D IE_TYPE_OCI & 0xff;
++
++	return oci_from_chandef(netdev->handshake->chandef, out + 3);
++}
++
+ static void netdev_sa_query_req_frame_event(const struct mmpdu_header *hdr,
+ 					const void *body, size_t body_len,
+ 					int rssi, void *user_data)
+ {
+-	uint8_t sa_resp[4];
++	uint8_t sa_resp[10];
++	uint8_t *ptr =3D sa_resp;
+ 	uint16_t transaction;
++	const uint8_t *oci;
+ 	struct netdev *netdev =3D user_data;
  =
 
-+		if (sm->handshake->ptk_complete)
-+			sm->rekey =3D true;
-+
- 		handshake_state_new_snonce(sm->handshake);
- 		handshake_state_set_anonce(sm->handshake, ek->key_nonce);
+ 	if (body_len < 4) {
+@@ -4885,15 +4896,57 @@ static void netdev_sa_query_req_frame_event(const s=
+truct mmpdu_header *hdr,
  =
 
-@@ -1649,6 +1653,8 @@ static void eapol_handle_ptk_3_of_4(struct eapol_sm *=
-sm,
- 	size_t gtk_len;
- 	const uint8_t *igtk =3D NULL;
- 	size_t igtk_len;
-+	const uint8_t *key_id =3D NULL;
-+	size_t key_id_len;
- 	const uint8_t *rsne;
- 	struct ie_rsn_info rsn_info;
- 	const uint8_t *optional_rsne =3D NULL;
-@@ -1856,6 +1862,41 @@ static void eapol_handle_ptk_3_of_4(struct eapol_sm =
-*sm,
- 	} else
- 		igtk =3D NULL;
+ 	transaction =3D l_get_u16(body + 2);
  =
 
-+	key_id =3D handshake_util_find_kde(HANDSHAKE_KDE_KEY_ID,
-+					decrypted_key_data,
-+					decrypted_key_data_size, &key_id_len);
-+	if (key_id && hs->ext_key_id_capable) {
-+		uint8_t idx;
+-	sa_resp[0] =3D 0x08;	/* SA Query */
+-	sa_resp[1] =3D 0x01;	/* Response */
+-	memcpy(sa_resp + 2, &transaction, 2);
++	body_len -=3D 4;
 +
-+		if (key_id_len !=3D 2) {
-+			l_error("invalid Key ID KDE format");
-+			handshake_failed(sm, MMPDU_REASON_CODE_UNSPECIFIED);
-+			return;
-+		}
-+
-+		idx =3D bit_field(key_id[0], 0, 2);
-+
++	if (netdev->handshake->supplicant_ocvc) {
 +		/*
-+		 * IEEE 802.11-2020 - 12.7.6.4 4-way handshake message 3
-+		 * "... the Authenticator assigns a new Key ID for the PTKSA in
-+		 * the range of 0 to 1 that is different from the Key ID
-+		 * assigned in the previous handshake"
++		 * IEEE 802.11 Section 11.13
++		 *
++		 * "A STA that supports the SA Query procedure and receives an
++		 * SA Query Request frame shall respond with an SA Query
++		 * Response frame if none of the following are true...
++		 * - OCI element is not present in the request or
++		 * - Operating channel information indicated does not match the
++		 *   current channel information (see 12.2.9)."
 +		 */
-+		if (idx !=3D 0 && idx !=3D 1 && idx !=3D hs->ptk_index) {
-+			l_error("invalid Key ID KDE value (%u)", idx);
-+			handshake_failed(sm, MMPDU_REASON_CODE_UNSPECIFIED);
++		if (ie_parse_oci(body + 4, body_len, &oci) < 0) {
++			l_debug("Could not parse OCI");
 +			return;
 +		}
 +
-+		hs->ptk_index =3D idx;
-+
-+		/* initial connection's don't do the RX only key dance */
-+		if (sm->rekey)
-+			hs->use_ext_key_id =3D true;
-+
-+		l_debug("using Extended key ID %u", hs->ptk_index);
++		if (oci_verify(oci, netdev->handshake->chandef) < 0) {
++			l_debug("Could not verify OCI");
++			return;
++		}
 +	}
 +
- 	if (hs->support_ip_allocation) {
- 		size_t len;
- 		const uint8_t *ip_alloc_kde =3D
-@@ -1934,12 +1975,6 @@ retransmit:
- 		}
++	ptr[0] =3D 0x08;	/* SA Query */
++	ptr[1] =3D 0x01;	/* Response */
++	memcpy(ptr + 2, &transaction, 2);
++
++	ptr +=3D 4;
++
++	/*
++	 * IEEE 802.11 Section 11.13
++	 *
++	 * "A STA that responds with an SA Query Response frame to a STA that
++	 * indicated OCVC capability shall include OCI element in the response
++	 * frame if dot11RSNAOperatingChannelValidationActivated is true"
++	 */
++	if (!netdev->handshake->supplicant_ocvc) {
++		if (netdev_build_oci(netdev, ptr) < 0) {
++			l_debug("Could not build OCI");
++			return;
++		}
++
++		ptr +=3D 6;
++	}
+ =
+
+ 	l_info("received SA Query request from "MAC", transaction=3D%u",
+ 			MAC_STR(hdr->address_2), transaction);
+ =
+
+ 	if (!netdev_send_action_frame(netdev, netdev->handshake->aa,
+-			sa_resp, sizeof(sa_resp),
++			sa_resp, ptr - sa_resp,
+ 			netdev->frequency,
+ 			netdev_sa_query_resp_cb, netdev)) {
+ 		l_error("error sending SA Query response");
+@@ -4906,15 +4959,22 @@ static void netdev_sa_query_resp_frame_event(const =
+struct mmpdu_header *hdr,
+ 					int rssi, void *user_data)
+ {
+ 	struct netdev *netdev =3D user_data;
++	const uint8_t *ptr =3D body;
++	const uint8_t *oci;
++
++	if (!netdev->connected)
++		return;
+ =
+
+ 	if (body_len < 4) {
+ 		l_debug("SA Query frame too short");
+ 		return;
  	}
  =
 
--	eapol_sm_write(sm, (struct eapol_frame *) step4, unencrypted);
--	l_free(step4);
--
--	if (hs->ptk_complete)
--		return;
--
- 	/*
- 	 * For WPA1 the group handshake should be happening after we set the
- 	 * ptk, this flag tells netdev to wait for the gtk/igtk before
-@@ -1954,6 +1989,20 @@ retransmit:
- 	if (igtk)
- 		eapol_install_igtk(sm, igtk_key_index, igtk, igtk_len);
++	ptr +=3D 2;
++
+ 	l_debug("SA Query src=3D"MAC" dest=3D"MAC" bssid=3D"MAC" transaction=3D%u=
+",
+ 			MAC_STR(hdr->address_2), MAC_STR(hdr->address_1),
+-			MAC_STR(hdr->address_3), l_get_u16(body + 2));
++			MAC_STR(hdr->address_3), l_get_u16(ptr));
  =
 
-+	if (hs->use_ext_key_id && sm->rekey) {
-+		handshake_state_install_ext_ptk(hs, hs->ptk_index,
-+						(struct eapol_frame *) step4,
-+						ETH_P_PAE, unencrypted);
+ 	if (!netdev->sa_query_timeout) {
+ 		l_debug("no SA Query request sent");
+@@ -4927,11 +4987,38 @@ static void netdev_sa_query_resp_frame_event(const =
+struct mmpdu_header *hdr,
+ 		return;
+ 	}
+ =
+
+-	if (memcmp(body + 2, &netdev->sa_query_id, 2)) {
++	if (memcmp(ptr, &netdev->sa_query_id, 2)) {
+ 		l_debug("SA Query transaction ID's did not match");
+ 		return;
+ 	}
+ =
+
++	if (!netdev->handshake->supplicant_ocvc)
++		goto keep_alive;
 +
++	ptr +=3D 2;
++	body_len -=3D 4;
++
++	/*
++	 * IEEE 802.11 Section 11.13
++	 *
++	 * "When a non-AP or non-PCP STA receives the SA Query Response frame
++	 * from a STA that indicated OCVC capability, it shall ensure that OCI
++	 * element is present in the response and the channel information in the
++	 * OCI element matches current operating channel parameters
++	 * (see 12.2.9). Otherwise, the receiving STA shall deem the response
++	 * as invalid and discard it"
++	 */
++	if (ie_parse_oci(ptr, body_len, &oci) < 0) {
++		l_debug("Invalid OCI element");
 +		return;
 +	}
 +
-+	eapol_sm_write(sm, (struct eapol_frame *) step4, unencrypted);
-+	l_free(step4);
-+
-+	if (hs->ptk_complete)
++	if (oci_verify(oci, netdev->handshake->chandef) < 0) {
++		l_debug("Could not verify OCI element");
 +		return;
++	}
 +
- 	handshake_state_install_ptk(hs);
++keep_alive:
+ 	l_info("SA Query response from connected BSS received, "
+ 			"keeping the connection active");
  =
 
- 	if (rekey_offload)
+@@ -4981,7 +5068,8 @@ static void netdev_unprot_disconnect_event(struct l_g=
+enl_msg *msg,
+ 	uint16_t type;
+ 	uint16_t len;
+ 	const void *data;
+-	uint8_t action_frame[4];
++	uint8_t action_frame[10];
++	uint8_t *ptr =3D action_frame;
+ 	uint8_t reason_code;
+ =
+
+ 	if (!netdev->connected)
+@@ -5025,14 +5113,25 @@ static void netdev_unprot_disconnect_event(struct l=
+_genl_msg *msg,
+ 		return;
+ 	}
+ =
+
+-	action_frame[0] =3D 0x08; /* Category: SA Query */
+-	action_frame[1] =3D 0x00; /* SA Query Action: Request */
++	ptr[0] =3D 0x08; /* Category: SA Query */
++	ptr[1] =3D 0x00; /* SA Query Action: Request */
+ =
+
+ 	/* Transaction ID */
+-	l_getrandom(action_frame + 2, 2);
++	l_getrandom(ptr + 2, 2);
++
++	ptr +=3D 4;
++
++	if (netdev->handshake->supplicant_ocvc) {
++		if (netdev_build_oci(netdev, ptr) < 0) {
++			l_debug("Could not build OCI");
++			return;
++		}
++
++		ptr +=3D 6;
++	}
+ =
+
+ 	if (!netdev_send_action_frame(netdev, netdev->handshake->aa,
+-			action_frame, sizeof(action_frame),
++			action_frame, ptr - action_frame,
+ 			netdev->frequency,
+ 			netdev_sa_query_req_cb, netdev)) {
+ 		l_error("error sending SA Query action frame");
 -- =
 
 2.31.1
 
---===============5557563720028015817==--
+--===============4109065373445442401==--
 
