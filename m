@@ -1,68 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============3072173930254464874=="
+Content-Type: multipart/mixed; boundary="===============0801864686737403844=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] station: Move netconfig_reset() to common path
-Date: Wed, 29 Sep 2021 18:09:12 -0500
-Message-ID: <c545c951-dcf0-4e55-b426-65dc915dfb43@gmail.com>
-In-Reply-To: CAOq732KhfeRcqU1_ss+gSQBgPY_w42s-Ac3dkOp8A2_J75EQFA@mail.gmail.com
+Subject: [PATCH] station: disable OCV if offloading is supported
+Date: Tue, 19 Oct 2021 14:28:22 -0700
+Message-ID: <20211019212822.572360-1-prestwoj@gmail.com>
 
---===============3072173930254464874==
+--===============0801864686737403844==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+It was seen during testing that several offload-capable cards
+were not including the OCI in the 4-way handshake. This made
+any OCV capable AP unconnectable.
 
->> Now, maybe some elements of what the connect failed path does might be n=
-eeded in
->> this failure case.  But to determine that we would need to know why the
->> disconnect happens? How often? Is it every time? Sometimes? Once in a bl=
-ue moon,
->> etc.
-> =
+To be safe disable OCV on any cards that support offloading.
+---
+ src/station.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-> Unfortunately this applies to most failure modes in a connection (at
-> 802.11 level or at IP level -- for the user they're the same thing)
+diff --git a/src/station.c b/src/station.c
+index a972b4fa..cbd72525 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1006,6 +1006,12 @@ static int station_build_handshake_rsn(struct handsh=
+ake_state *hs,
+ 	struct ie_rsn_info info;
+ 	uint8_t *ap_ie;
+ 	bool disable_ocv;
++	bool offload =3D wiphy_has_ext_feature(wiphy,
++				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK) ||
++			wiphy_has_ext_feature(wiphy,
++				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_1X) ||
++			wiphy_has_ext_feature(wiphy,
++					NL80211_EXT_FEATURE_SAE_OFFLOAD)
+ =
 
-I agree, but details matter.  So what is it you're proposing exactly?
+ 	memset(&info, 0, sizeof(info));
+ =
 
-> and I think the binary blacklisted/not blacklisted model we use
-> doesn't really work.  IIRC my initial patches used a different model
-> where the blacklist was a kind of penalty list where BSSes and/or
-> networks that fail more often are pushed further in the priority list.
+@@ -1087,7 +1093,19 @@ build_ie:
+ 					&disable_ocv))
+ 		disable_ocv =3D false;
+ =
 
-I remember, but we have since moved on from that model of autoconnect.  We =
+-	info.ocvc =3D !disable_ocv && bss_info.ocvc && info.mfpc;
++	/*
++	 * Obviously do not enable OCV if explicitly disabled or no AP support.
++	 *
++	 * Not obviously hostapd rejects OCV support if MFPC is not enabled.
++	 * This is not really specified by the spec, but we have to work around
++	 * this limitation.
++	 *
++	 * Another limitation is full mac cards. With limited testing it was
++	 * seen that they do not include the OCI in the 4-way handshake yet
++	 * still advertise the capability. Because of this OCV is disabled if
++	 * any offload features are detected (since IWD prefers to use offload).
++	 */
++	info.ocvc =3D !disable_ocv && bss_info.ocvc && info.mfpc && !offload;
+ =
 
-autoconnect networks now, not individual BSSes.  Eventually we will move to=
- a =
+ 	/*
+ 	 * IEEE 802.11-2020 9.4.2.24.4 states extended key IDs can only be used
+-- =
 
-network priority model in the future where the user will specify the priori=
-ty of =
+2.31.1
 
-a given network for autoconnect.  Blacklisting within the network is a diff=
-erent =
-
-topic.  Also note that we have two levels of blacklisting, so it isn't quit=
-e as =
-
-simple as you describe.
-
-> In the end when we've tried all the BSSes in range we have nothing to
-> lose by retrying some of the ones we've already tried, we just don't
-> want to put them before other BSSes.  This can be done in a way that
-
-We do that already.
-
-> over time the list converges to sorted by how often a network/bss
-> fails.
-> =
-
-> This also allows you to learn from some very clear cues that we're not
-> handling, like a user manually switching to another network.
-
-Regards,
--Denis
-
---===============3072173930254464874==--
+--===============0801864686737403844==--
 
