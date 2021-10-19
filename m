@@ -1,58 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============8970285904807131275=="
+Content-Type: multipart/mixed; boundary="===============0347511731330735068=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] handshake: use _hs directly in handshake_event
-Date: Wed, 26 Jan 2022 09:41:00 -0800
-Message-ID: <20220126174100.3162606-1-prestwoj@gmail.com>
+Subject: [PATCH] auto-t: add missing ocv option and wait to testChannelSwitch
+Date: Tue, 19 Oct 2021 12:02:32 -0700
+Message-ID: <20211019190232.560446-1-prestwoj@gmail.com>
 
---===============8970285904807131275==
+--===============0347511731330735068==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Certain platforms/compilers were having issues with using the 'hs'
-local in this macro (likely has something to do with the caller
-also using a local 'hs' variable name). This caused a crash on these
-platforms. Using the macro argument _hs directly fixes the crash.
+This should have been added to the original test
 ---
- src/handshake.h | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ autotests/testChannelSwitch/connection_test.py | 4 ++++
+ autotests/testChannelSwitch/ssidCCMP.conf      | 1 +
+ 2 files changed, 5 insertions(+)
 
-diff --git a/src/handshake.h b/src/handshake.h
-index 34d4829d..7136087a 100644
---- a/src/handshake.h
-+++ b/src/handshake.h
-@@ -166,19 +166,18 @@ struct handshake_state {
+diff --git a/autotests/testChannelSwitch/connection_test.py b/autotests/tes=
+tChannelSwitch/connection_test.py
+index e5421c69..03d24a77 100644
+--- a/autotests/testChannelSwitch/connection_test.py
++++ b/autotests/testChannelSwitch/connection_test.py
+@@ -39,6 +39,10 @@ class Test(unittest.TestCase):
+         testutil.test_ifaces_connected()
  =
 
- #define handshake_event(_hs, event, ...)	\
- 	(__extension__ ({	\
--		struct handshake_state *hs =3D (_hs);	\
- 		bool freed =3D false;	\
- 	\
--		if (hs->event_func && !hs->in_event) {	\
--			hs->in_event =3D true;	\
--			hs->event_func(hs, event, hs->user_data,	\
-+		if ((_hs)->event_func && !(_hs)->in_event) {	\
-+			(_hs)->in_event =3D true;	\
-+			(_hs)->event_func((_hs), event, (_hs)->user_data,	\
- 					##__VA_ARGS__); \
- 	\
--			if (!hs->in_event) {	\
--				handshake_state_free(hs);	\
-+			if (!(_hs)->in_event) {	\
-+				handshake_state_free((_hs));	\
- 				freed =3D true;	\
- 			} else	\
--				hs->in_event =3D false;	\
-+				(_hs)->in_event =3D false;	\
- 		}	\
- 		freed;	\
- 	}))
+         hapd.chan_switch(2)
++        # Make sure the SA Query is verified and IWD doesn't disconnect
++        with self.assertRaises(TimeoutError):
++            condition =3D 'obj.state =3D=3D DeviceState.disconnected'
++            wd.wait_for_object_condition(device, condition, 4)
+ =
+
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+diff --git a/autotests/testChannelSwitch/ssidCCMP.conf b/autotests/testChan=
+nelSwitch/ssidCCMP.conf
+index 074e8228..438b9955 100644
+--- a/autotests/testChannelSwitch/ssidCCMP.conf
++++ b/autotests/testChannelSwitch/ssidCCMP.conf
+@@ -5,3 +5,4 @@ ssid=3DssidCCMP
+ wpa=3D2
+ wpa_pairwise=3DCCMP
+ wpa_passphrase=3Dsecret123
++ocv=3D1
 -- =
 
 2.31.1
 
---===============8970285904807131275==--
+--===============0347511731330735068==--
 
