@@ -1,42 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============1685648849804028318=="
+Content-Type: multipart/mixed; boundary="===============8916358153967541312=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v6 1/2] dpp: add support for configuration protocol
-Date: Fri, 17 Dec 2021 15:34:41 -0600
-Message-ID: <f41cf8e0-5636-9d94-e122-40a55b806439@gmail.com>
-In-Reply-To: 20211217212952.228229-1-prestwoj@gmail.com
+Subject: [PATCH v2 7/8] auto-t: hostapd.py: add chan_switch()
+Date: Tue, 19 Oct 2021 11:19:09 -0700
+Message-ID: <20211019181910.558043-7-prestwoj@gmail.com>
+In-Reply-To: 20211019181910.558043-1-prestwoj@gmail.com
 
---===============1685648849804028318==
+--===============8916358153967541312==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Forces hostapd to channel switch
+---
+ autotests/util/hostapd.py | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-On 12/17/21 15:29, James Prestwood wrote:
-> This is a minimal implementation only supporting legacy network
-> configuration, i.e. only SSID and PSK/passphrase are supported.
-> =
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 5d17da6b..97422efc 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -216,6 +216,14 @@ class HostapdCLI(object):
+         cmd =3D 'RESEND_M3 %s' % address
+         self.ctrl_sock.sendall(cmd.encode('utf-8'))
+ =
 
-> Missing features include:
->   - Fragmentation/comeback delay support
->   - DPP AKM support
->   - 8021x/PKEX support
-> ---
->   src/dpp.c | 334 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 334 insertions(+)
-> =
++    def chan_switch(self, channel):
++        if channel > len(chan_freq_map):
++            raise Exception("Only 2.4GHz channels supported for chan_switc=
+h")
++
++        cmd =3D self.cmdline + ['chan_switch', '50', str(chan_freq_map[cha=
+nnel])]
++        ctx.start_process(cmd).wait()
++        self.wait_for_event('AP-CSA-FINISHED')
++
+     @property
+     def bssid(self):
+         cmd =3D self.cmdline + ['status']
+-- =
 
-> v6:
->   * Added length checks to configuration response
-> =
+2.31.1
 
-
-Both applied, thanks.
-
-Regards,
--Denis
-
---===============1685648849804028318==--
+--===============8916358153967541312==--
 
