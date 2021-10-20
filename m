@@ -1,86 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============0588533481728353551=="
+Content-Type: multipart/mixed; boundary="===============2146546955422182863=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd access point mode
-Date: Fri, 08 Oct 2021 09:45:14 -0500
-Message-ID: <e5efb7a7-8c5d-2955-5e1c-441f4da5fbce@gmail.com>
-In-Reply-To: CAOf5uwk5RkWEOuOsWTyFynQRsnWBHx8nByOzew283YHNanQQTg@mail.gmail.com
+Subject: [PATCH 1/4] auto-t: update blacklist test to use 'enable' on rules
+Date: Wed, 20 Oct 2021 13:53:28 -0700
+Message-ID: <20211020205331.734405-1-prestwoj@gmail.com>
 
---===============0588533481728353551==
+--===============2146546955422182863==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+---
+ autotests/testBSSBlacklist/connection_test.py | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 10/7/21 2:48 PM, Michael Nazzareno Trimarchi wrote:
-> HI all
-> =
+diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/test=
+BSSBlacklist/connection_test.py
+index bfcf0523..6a12174d 100644
+--- a/autotests/testBSSBlacklist/connection_test.py
++++ b/autotests/testBSSBlacklist/connection_test.py
+@@ -110,8 +110,11 @@ class Test(unittest.TestCase):
+ =
 
-> I'm playing with iwd. Looking at iwmon I can see virtual device
-> discovered by iwd when they are created.
-> =
+         # Have both APs drop all packets, both should get blacklisted
+         rule0.drop =3D True
++        rule0.enable =3D True
+         rule1.drop =3D True
++        rule1.enable =3D True
+         rule2.drop =3D True
++        rule2.enable =3D True
+ =
 
-> iw phy phy0 interface add wlan1 __ap
-> =
+         with self.assertRaises(iwd.FailedEx):
+             ordered_network.network_object.connect()
+-- =
 
-> iwctl still report wlan0
-> =
+2.31.1
 
-
-Right.  Since most people want to use iwd + hostapd for such tethering case=
-s, we =
-
-made the decision to simply ignore any new devices created outside iwd afte=
-r a =
-
-wiphy has been initialized.
-
-You can get around this by creating the sta + ap devices first, then starti=
-ng =
-
-iwd.  You'll need to set UseDefaultInterface=3Dtrue in /etc/iwd/main.conf. =
- See =
-
-'man 5 iwd.config' for more details.
-
->   I was able to create wifi connection and access point mode using
-> wpa_supplicant and NetworkManager. My idea
-> is was experimenting iwd
-> =
-
-> iwctl device list still report only wlan1. The idea behind is to
-> control ap+sta interface. Any feedback?
-> =
-
-
-Teaching iwd to create STA + AP interfaces when it initializes an adapter i=
-s on =
-
-the TODO list.  We already do this with P2P, but not STA + AP.  This should=
- be =
-
-fairly easy to do, but we have been busy with other tasks.  Patches are alw=
-ays =
-
-welcome!
-
-Our (preliminary) thinking on this was to add a main.conf entry that tells =
-iwd =
-
-how it should manage wiphys by default.  Something like: "sta-only", "sta+p=
-2p", =
-
-"sta+ap".  Based on the configured setting, iwd would then create the inter=
-faces =
-
-automagically (assuming hardware/driver supports it,  falling back to "sta-=
-only" =
-
-if not).
-
-Regards,
--Denis
---===============0588533481728353551==--
+--===============2146546955422182863==--
 
