@@ -1,37 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============0482174226503653926=="
+Content-Type: multipart/mixed; boundary="===============8329440094677507917=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Disable DNS in IWD
-Date: Fri, 20 May 2022 10:17:55 -0500
-Message-ID: <85cb9d4e-ed56-104d-d13e-51a2bb8ab4a2@gmail.com>
-In-Reply-To: bHJm3HWsDSDtX0h9yi1mxsu7h6eNouwsjiRL7NsyR26GHma3-wQXJA9KPsHBDLWuT6-9fzoT4Dl1a7MJS8AUg3SRae0Q_X-PLfBnes25VGo=@protonmail.com
+Subject: [PATCH 3/4] network: fix autoconnect for Open networks
+Date: Wed, 20 Oct 2021 13:53:30 -0700
+Message-ID: <20211020205331.734405-3-prestwoj@gmail.com>
+In-Reply-To: 20211020205331.734405-1-prestwoj@gmail.com
 
---===============0482174226503653926==
+--===============8329440094677507917==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Gino,
+This code path was never tested and used to ensure a OWE transition
+candidate gets selected over an open one (e.g. if all the BSS's are
+blacklisted). But this logic was incorrect and the path was being
+taken for BSS's that did not contain the owe_trans element, basically
+all BSS's. For RSN's this was somewhat fine since the final check
+would set a candidate, but for open BSS's the loop would start over
+and potentially complete the loop without ever returning a candidate.
+If fallback was false, NULL would be returned.
 
-On 5/19/22 09:41, Gino McCarty wrote:
-> There appears to be no method for having IWD disable DNS Updates
-> is there some method that is undocumented available?
-> =
+To fix this only take the OWE transition path if its an OWE transition
+BSS, i.e. inverse the logic.
+---
+ src/network.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> NameResolvingService=3Dnone
-> =
+diff --git a/src/network.c b/src/network.c
+index 110c8577..9a2d12cf 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1136,7 +1136,7 @@ struct scan_bss *network_bss_select(struct network *n=
+etwork,
+ 			candidate =3D bss;
+ =
 
+ 		/* OWE Transition BSS */
+-		if (!bss->owe_trans) {
++		if (bss->owe_trans) {
+ 			/* Don't want to connect to the Open BSS if possible */
+ 			if (!bss->rsne)
+ 				continue;
+-- =
 
-This isn't supported in any released version of iwd.  However, I just added=
- this =
+2.31.1
 
-upstream in commits:
-
-d45950908753 ("manpage: describe 'none' in NameResolvingService")
-b96bbb35e07a ("resolve: Add "none" method")
-
-Regards,
--Denis
---===============0482174226503653926==--
+--===============8329440094677507917==--
 
