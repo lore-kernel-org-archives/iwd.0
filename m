@@ -1,89 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============8811575807473862150=="
+Content-Type: multipart/mixed; boundary="===============8279685986565628801=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v6 2/2] dpp: handle protocol errors in ROC timeout
-Date: Fri, 17 Dec 2021 13:29:52 -0800
-Message-ID: <20211217212952.228229-2-prestwoj@gmail.com>
-In-Reply-To: 20211217212952.228229-1-prestwoj@gmail.com
+Subject: [PATCH 2/4] auto-t: fix testConnectAutoconnect
+Date: Wed, 20 Oct 2021 13:53:29 -0700
+Message-ID: <20211020205331.734405-2-prestwoj@gmail.com>
+In-Reply-To: 20211020205331.734405-1-prestwoj@gmail.com
 
---===============8811575807473862150==
+--===============8279685986565628801==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a standing TODO of properly handling these timeouts but
-for now just treat any ROC timeout as an error if authenticating
-or configuring.
+There was no open ssid provisioning file, which was fine as the
+first test should have created one. But to be safe, include one
+explicitly and use the proper setUp/tearDown functions.
 ---
- src/dpp.c | 35 ++++++++++++++++++++++++++++++++---
- 1 file changed, 32 insertions(+), 3 deletions(-)
+ autotests/testConnectAutoconnect/open_network_test.py | 4 ++++
+ autotests/testConnectAutoconnect/ssidOpen.open        | 1 +
+ 2 files changed, 5 insertions(+)
+ create mode 100644 autotests/testConnectAutoconnect/ssidOpen.open
 
-v6:
- * Removed unneeded call to dpp_free_auth_data
-
-diff --git a/src/dpp.c b/src/dpp.c
-index c703de75..5e125265 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -1076,10 +1076,34 @@ static void dpp_presence_timeout(int error, void *u=
-ser_data)
- {
- 	struct dpp_sm *dpp =3D user_data;
+diff --git a/autotests/testConnectAutoconnect/open_network_test.py b/autote=
+sts/testConnectAutoconnect/open_network_test.py
+index 187f2342..0af66923 100644
+--- a/autotests/testConnectAutoconnect/open_network_test.py
++++ b/autotests/testConnectAutoconnect/open_network_test.py
+@@ -24,6 +24,10 @@ class TestOpenNetwork(unittest.TestCase):
+         tca.validate('ssidOpen', False)
+         tca.validate('ssidOpen', True)
  =
 
--	if (dpp->state !=3D DPP_STATE_PRESENCE) {
--		l_debug("DPP state changed, stopping presence announcements");
--		dpp->freqs_idx =3D 0;
-+	/*
-+	 * If cancelled this is likely due to netdev going down or from Stop().
-+	 * Otherwise there was some other problem which is probably not
-+	 * recoverable.
-+	 */
-+	if (error =3D=3D -ECANCELED)
- 		return;
-+	else if (error < 0)
-+		goto protocol_failed;
++    def setUp(self):
++        IWD.copy_to_storage('ssidOpen.open')
 +
-+	switch (dpp->state) {
-+	case DPP_STATE_PRESENCE:
-+		break;
-+	case DPP_STATE_NOTHING:
-+		/* Protocol already terminated */
-+		return;
-+	case DPP_STATE_AUTHENTICATING:
-+	case DPP_STATE_CONFIGURING:
-+		/*
-+		 * TODO: If either the auth or config protocol is running we
-+		 * need to stay on channel until the specified timeouts.
-+		 * Unfortunately the kernel makes this very inconvenient since
-+		 * there is no way to stay on channel indefinitely or any way
-+		 * of knowing what duration the kernel/card actually chooses.
-+		 *
-+		 * For now just treat this as a failure.
-+		 */
-+		goto protocol_failed;
- 	}
++    def tearDown(self):
+         IWD.clear_storage()
  =
 
- 	dpp->freqs_idx++;
-@@ -1097,6 +1121,11 @@ static void dpp_presence_timeout(int error, void *us=
-er_data)
- 	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
- 			dpp->current_freq, dpp->dwell, dpp_roc_started,
- 			dpp, dpp_presence_timeout);
-+	return;
+ if __name__ =3D=3D '__main__':
+diff --git a/autotests/testConnectAutoconnect/ssidOpen.open b/autotests/tes=
+tConnectAutoconnect/ssidOpen.open
+new file mode 100644
+index 00000000..8b137891
+--- /dev/null
++++ b/autotests/testConnectAutoconnect/ssidOpen.open
+@@ -0,0 +1 @@
 +
-+protocol_failed:
-+	dpp_reset(dpp);
-+	return;
- }
- =
-
- /*
 -- =
 
 2.31.1
 
---===============8811575807473862150==--
+--===============8279685986565628801==--
 
