@@ -1,97 +1,152 @@
-Content-Type: multipart/mixed; boundary="===============0482511878282575453=="
+Content-Type: multipart/mixed; boundary="===============6947136240458460523=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel at holtmann.org>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: [RFC 0/2] Encrypt secrets using systemd provided key
-Date: Fri, 21 Jan 2022 16:20:10 +0100
-Message-ID: <358D320D-57E1-45B2-9EED-EC848D10EF5A@holtmann.org>
-In-Reply-To: 20220121004130.2473281-1-prestwoj@gmail.com
+Subject: [PATCH 10/12] doc: Add NetworkConfigurationAgent API description
+Date: Thu, 21 Oct 2021 10:50:39 +0200
+Message-ID: <20211021085041.294524-10-andrew.zaborowski@intel.com>
+In-Reply-To: 20211021085041.294524-1-andrew.zaborowski@intel.com
 
---===============0482511878282575453==
+--===============6947136240458460523==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Document the new API that clients can use to get notified of new network
+configuration and be responsible for committing it to the netdev, the
+resolver, etc.
+---
+ doc/agent-api.txt | 106 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 106 insertions(+)
 
-> There has been interest in enabling IWD users to store their network
-> credentials in some encrypted form. Recently systemd added support for
-> passing secrets/credentials to services only accessible by the service
-> they are intended. This provides a clean way of obtaining a secret key
-> which IWD can use to encrypt anything it writes to the FS. In addition
-> there is no hard dependency on systemd since the credential is provided
-> as a file (i.e. no Dbus API or linked library etc).
-> =
+diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+index 9da913e0..92317e57 100644
+--- a/doc/agent-api.txt
++++ b/doc/agent-api.txt
+@@ -25,6 +25,48 @@ Methods		void RegisterAgent(object path)
+ 					 [service].Failed
+ 					 [service].NotFound
+ =
 
-> At the moment setting up the IWD service to use this feature will be
-> left up to the user. But setting this up is very straight forward. I
-> used docs for systemd-creds (Example 2):
-> =
++		void RegisterNetworkConfigurationAgent(object path)
++
++			Register the agent for handling IPv4 and IPv6
++			configuration setting.  This method and its
++			corresponding unregister method are only supported
++			if network configuration is enabled: see
++			EnableNetworkConfiguration in iwd.config(5) and
++			NetworkConfigurationEnabled in
++			net.connman.iwd.Daemon.GetInfo in daemon-api.txt.
++
++			During a station-mode, AP-mode or P2P connection, IWD
++			will obtain the IP configuration values for a network
++			interface, either automatically from a remote server
++			(DHCP or otherwise), generate it or read it from a
++			settings file.  If no network configuration agent is
++			present, IWD immediately writes (commits) those
++			values to the corresponding interface, the routing
++			table and communicates them to the resolver.  If such
++			agent is registered, IWD requests the agent to do
++			this last step.
++
++			Connection success is not signalled until the agent
++			method has returned.  The agent may also be invoked
++			during the connection lifetime whenever the IP
++			configuration changes and after a roam.  The agent
++			object must have the NetworkConfigurationAgent
++			interface.
++
++			Possible Errors: [service].InvalidArguments
++					 [service].Failed
++					 [service].AlreadyExists
++					 [service].NotSupported
++
++		void UnregisterNetworkConfigurationAgent(object path)
++
++			Unregister an existing network configuration agent.
++
++			Possible Errors: [service].InvalidArguments
++					 [service].Failed
++					 [service].NotFound
++					 [service].NotAvailable
++
+ =
 
-> https://www.freedesktop.org/software/systemd/man/systemd-creds.html
-> =
+ Agent hierarchy
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+@@ -86,3 +128,67 @@ Examples	Requesting a passphrase for WPA2 network
+ =
 
-> The only difference is the --name argument should be iwd-secret.
-> =
+ 			RequestPassphrase("/net/connman/iwd/0/3/54657374_psk")
+ 			=3D=3D> "secret123"
++
++
++NetworkConfigurationAgent hierarchy
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Service		unique name
++Interface	net.connman.iwd.NetworkConfigurationAgent
++Object path	freely definable
++
++Methods		void Release() [noreply]
++
++			This method gets called when the service daemon
++			unregisters the agent. An agent can use it to do
++			cleanup tasks. There is no need to unregister the
++			agent, because when this method gets called it has
++			already been unregistered.
++
++		void ConfigureIPv4(object device, string interface, dict config)
++
++			This method gets called during a connection setup
++			when a new set of IPv4 configuration values is to
++			be written to a network interface.  The connection
++			is aborted if the method call returns an error or
++			times out.  The 'config' dictionary (a{sv}) maps
++			string keys to values of types defined per key.
++
++			The following key/value pairs are used, but more
++			may be added in future versions.
++
++			string Method - Indicates whether the local address
++			was set statically (value "static") or obtained
++			automatically such as through DHCP (value "auto").
++			Even when the address was obtained from the remote
++			end some configuration bits, such as DNS addresses,
++			may have been overridden locally.
++
++			string Address - Local IP address string.
++
++			byte PrefixLength - Holds the prefix-length of the
++			local subnet.  For IPv4 this maps to the netmask.
++
++			string Gateway [optional] - Local subnet's gateway
++			address if one exists.
++
++			array(string) DomainNameServers [optional] - Holds
++			the list of DNS addresses configured if any exist.
++
++			array(string) DomainNames [optional] - Holds the
++			network's local domain names if any exist.
++
++			Possible Errors: net.connman.iwd.Agent.Error.Canceled
++
++		void ConfigureIPv6(object device, string interface, dict config)
++
++			Same as ConfigureIPv4 above but for IPv6.
++
++		void Cancel(object device, string interface,
++						string reason) [noreply]
++
++			This method gets called to indicate that the connection
++			request failed before a reply was returned.  The
++			argument will indicate why the request is being
++			cancelled and may be "out-of-range", "user-canceled",
++			"timed-out" or "shutdown".
+-- =
 
-> Note: systemd version 250 is required.
-> =
+2.32.0
 
-> The reason this is being sent as an RFC is because of some open questions
-> I had and wanted feedback on:
-> =
-
-> 1. What options specifically do we want encrypted? These patches only
->    address Passphrase and PreSharedKey but really any option could be
->    encrypted. Obviously we would also want 802.1x secrets, but are there
->    other non-obvious options with privacy concerns?
-
-we only need to encrypt things that are provided by the user. If we wouldn=
-=E2=80=99t ask the user for it, then it is not worth while protecting.
-
-> 2. What is the stance on existing provisioning files? Currently these
->    changes overwrite any existing files with the new *Encrypted options
->    automatically. Is this desirable? or should user have to opt-in their
->    existing provisioning files.
-
-The problem arises that you no longer can move from one machine to the next=
- without re-entering your secrets. So I guess this only desirable if the ma=
-ster key is part of your users keyring. If you have 200 PSKs entered and yo=
-u set up a new machine, you now end up having to re-enter these as you go v=
-isiting new networks.
-
-> 3. Is the secret provided via a file enough? (the secret is still stored
->    as plaintext *somewhere*, though systemd limits permissions). Systemd
->    supports an IPC mechanism to obtain the secret. Is this more secure?
-
->From iwd perspective it is always a file. systemd does the reading from an =
-AF_UNIX socket and storing it as a file. When IPC part becomes interesting =
-if you want to provide an iwd-secrets-provider tool.
-
-Note: At least that is how I understood the man page. I have not verified t=
-his in the systemd sources.
-
-> 4. Should full provisioning file encryption be optional/supported? I felt
->    it was best to only encrypt sensitive options like PSK/Passphrase which
->    would allow editing of the provisioning file without extra steps of
->    decrypting, editing, and encrypting. I think this is above the capabil=
-ity
->    or desire of most users.
-> =
-
->    If, though, a provisioning file is never expected to change or issued =
-by
->    a network administrator that does not want it edited I could see full
->    file encryption being ok.
-
-What you want is that system / networks admins can sign their provision fil=
-e and you would verify that it is unmodified. That is generally useful as w=
-ell, but we would need to discuss where the certificate that you verify aga=
-inst comes from.
-
-Regards
-
-Marcel
-
---===============0482511878282575453==--
+--===============6947136240458460523==--
 
