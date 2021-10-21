@@ -1,68 +1,179 @@
-Content-Type: multipart/mixed; boundary="===============8387865993732377008=="
+Content-Type: multipart/mixed; boundary="===============1130932608956709771=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 4/7] scan: add support for scanning on AP interface type
-Date: Wed, 23 Feb 2022 12:50:37 -0600
-Message-ID: <0ea0a29c-edeb-b240-5c4c-98d69b555319@gmail.com>
-In-Reply-To: 20220222225718.2485794-4-prestwoj@gmail.com
+Subject: [PATCH 02/12] netconfig: Cache the IPv6 l_rtnl_address object
+Date: Thu, 21 Oct 2021 10:50:31 +0200
+Message-ID: <20211021085041.294524-2-andrew.zaborowski@intel.com>
+In-Reply-To: 20211021085041.294524-1-andrew.zaborowski@intel.com
 
---===============8387865993732377008==
+--===============1130932608956709771==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+For symmetry with netconfig->v4_address add a netconfig->v6_address
+so that we can track what the current address is at any time.
+---
+ src/netconfig.c | 44 ++++++++++++++++++++++++++++++++------------
+ 1 file changed, 32 insertions(+), 12 deletions(-)
 
-On 2/22/22 16:57, James Prestwood wrote:
-> This adds a new flag, force_ap to the scan parameters. When enabled
-> this will set NL80211_SCAN_FLAG_AP.
-> ---
->   src/scan.c | 4 ++++
->   src/scan.h | 1 +
->   2 files changed, 5 insertions(+)
-> =
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 833fd3ab..13c8c9b7 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -58,6 +58,7 @@ struct netconfig {
+ 	uint8_t rtm_protocol;
+ 	uint8_t rtm_v6_protocol;
+ 	struct l_rtnl_address *v4_address;
++	struct l_rtnl_address *v6_address;
+ 	char **dns4_overrides;
+ 	char **dns6_overrides;
+ 	char *mdns;
+@@ -131,6 +132,8 @@ static void netconfig_free_settings(struct netconfig *n=
+etconfig)
+ {
+ 	l_rtnl_address_free(netconfig->v4_address);
+ 	netconfig->v4_address =3D NULL;
++	l_rtnl_address_free(netconfig->v6_address);
++	netconfig->v6_address =3D NULL;
+ =
 
-> diff --git a/src/scan.c b/src/scan.c
-> index 12b7a3fd..01056634 100644
-> --- a/src/scan.c
-> +++ b/src/scan.c
-> @@ -391,6 +391,10 @@ static struct l_genl_msg *scan_build_cmd(struct scan=
-_context *sc,
->   					NL80211_EXT_FEATURE_SCAN_RANDOM_SN))
->   		flags |=3D NL80211_SCAN_FLAG_RANDOM_SN;
->   =
+ 	l_strfreev(netconfig->dns4_overrides);
+ 	netconfig->dns4_overrides =3D NULL;
+@@ -1031,13 +1034,28 @@ static void netconfig_dhcp6_event_handler(struct l_=
+dhcp6_client *client,
+ 	case L_DHCP6_CLIENT_EVENT_IP_CHANGED:
+ 	case L_DHCP6_CLIENT_EVENT_LEASE_OBTAINED:
+ 	case L_DHCP6_CLIENT_EVENT_LEASE_RENEWED:
++	{
++		const struct l_dhcp6_lease *lease =3D
++			l_dhcp6_client_get_lease(netconfig->dhcp6_client);
++		_auto_(l_free) char *addr_str =3D
++			l_dhcp6_lease_get_address(lease);
++		struct l_rtnl_address *address;
++
++		address =3D l_rtnl_address_new(addr_str,
++					l_dhcp6_lease_get_prefix_length(lease));
++		l_rtnl_address_free(netconfig->v6_address);
++		netconfig->v6_address =3D address;
++
+ 		netconfig_set_dns(netconfig);
+ 		netconfig_set_domains(netconfig);
+ 		break;
++	}
+ 	case L_DHCP6_CLIENT_EVENT_LEASE_EXPIRED:
+ 		l_debug("Lease for interface %u expired", netconfig->ifindex);
+ 		netconfig_set_dns(netconfig);
+ 		netconfig_set_domains(netconfig);
++		l_rtnl_address_free(netconfig->v6_address);
++		netconfig->v6_address =3D NULL;
+ =
 
-> +	if (params->force_ap && wiphy_has_feature(sc->wiphy,
-> +						NL80211_FEATURE_AP_SCAN))
+ 		/* Fall through */
+ 	case L_DHCP6_CLIENT_EVENT_NO_LEASE:
+@@ -1187,7 +1205,6 @@ static bool netconfig_ipv4_select_and_install(struct =
+netconfig *netconfig)
+ static bool netconfig_ipv6_select_and_install(struct netconfig *netconfig)
+ {
+ 	struct netdev *netdev =3D netdev_find(netconfig->ifindex);
+-	struct l_rtnl_address *address =3D NULL;
+ =
 
-You already check this in patch 5 ap_dbus_scan()?
+ 	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_UNSPEC) {
+ 		l_debug("IPV6 configuration disabled");
+@@ -1196,10 +1213,7 @@ static bool netconfig_ipv6_select_and_install(struct=
+ netconfig *netconfig)
+ =
 
-> +		flags |=3D NL80211_SCAN_FLAG_AP;
-> +
->   	if (flags)
->   		l_genl_msg_append_attr(msg, NL80211_ATTR_SCAN_FLAGS, 4, &flags);
->   =
+ 	sysfs_write_ipv6_setting(netdev_get_name(netdev), "disable_ipv6", "0");
+ =
 
-> diff --git a/src/scan.h b/src/scan.h
-> index 2c401df6..7ad50e5d 100644
-> --- a/src/scan.h
-> +++ b/src/scan.h
-> @@ -98,6 +98,7 @@ struct scan_parameters {
->   	bool randomize_mac_addr_hint : 1;
->   	bool no_cck_rates : 1;
->   	bool duration_mandatory : 1;
-> +	bool force_ap : 1;
+-	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_STATIC)
+-		address =3D netconfig_get_static6_address(
+-						netconfig->active_settings);
+-	else if (netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP &&
++	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP &&
+ 			netconfig->fils_override &&
+ 			!l_memeqzero(netconfig->fils_override->ipv6_addr, 16)) {
+ 		uint8_t prefix_len =3D netconfig->fils_override->ipv6_prefix_len;
+@@ -1209,11 +1223,12 @@ static bool netconfig_ipv6_select_and_install(struc=
+t netconfig *netconfig)
+ 		if (unlikely(!addr_str))
+ 			return false;
+ =
 
-force_ap_scan? or simply ap_scan?
+-		if (L_WARN_ON(unlikely(!(address =3D l_rtnl_address_new(addr_str,
+-								prefix_len)))))
++		netconfig->v6_address =3D l_rtnl_address_new(addr_str,
++								prefix_len);
++		if (L_WARN_ON(unlikely(!netconfig->v6_address)))
+ 			return false;
+ =
 
->   	const uint8_t *ssid;	/* Used for direct probe request */
->   	size_t ssid_len;
->   	const uint8_t *source_mac;
-> =
+-		l_rtnl_address_set_noprefixroute(address, true);
++		l_rtnl_address_set_noprefixroute(netconfig->v6_address, true);
+ =
 
+ 		/*
+ 		 * TODO: If netconfig->fils_override->ipv6_lifetime is set,
+@@ -1223,12 +1238,12 @@ static bool netconfig_ipv6_select_and_install(struc=
+t netconfig *netconfig)
+ 		 */
+ 	}
+ =
 
-Regards,
--Denis
---===============8387865993732377008==--
+-	if (address) {
++	if (netconfig->v6_address) {
+ 		L_WARN_ON(!(netconfig->addr6_add_cmd_id =3D
+-			l_rtnl_ifaddr_add(rtnl, netconfig->ifindex, address,
++			l_rtnl_ifaddr_add(rtnl, netconfig->ifindex,
++					netconfig->v6_address,
+ 					netconfig_ipv6_ifaddr_add_cmd_cb,
+ 					netconfig, NULL)));
+-		l_rtnl_address_free(address);
+ 		return true;
+ 	}
+ =
+
+@@ -1345,7 +1360,6 @@ bool netconfig_load_settings(struct netconfig *netcon=
+fig,
+ =
+
+ 	if (l_settings_has_key(active_settings, "IPv6", "Address")) {
+ 		v6_address =3D netconfig_get_static6_address(active_settings);
+-		l_rtnl_address_free(v6_address);
+ =
+
+ 		if (unlikely(!v6_address)) {
+ 			l_error("netconfig: Can't parse IPv6 address");
+@@ -1371,6 +1385,9 @@ bool netconfig_load_settings(struct netconfig *netcon=
+fig,
+ 	if (netconfig->rtm_protocol =3D=3D RTPROT_STATIC)
+ 		netconfig->v4_address =3D v4_address;
+ =
+
++	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_STATIC)
++		netconfig->v6_address =3D v6_address;
++
+ 	netconfig->active_settings =3D active_settings;
+ 	netconfig->dns4_overrides =3D dns4_overrides;
+ 	netconfig->dns6_overrides =3D dns6_overrides;
+@@ -1457,6 +1474,9 @@ bool netconfig_reset(struct netconfig *netconfig)
+ 	netconfig_reset_v4(netconfig);
+ =
+
+ 	if (netconfig->rtm_v6_protocol) {
++		l_rtnl_address_free(netconfig->v6_address);
++		netconfig->v6_address =3D NULL;
++
+ 		l_strfreev(netconfig->dns6_overrides);
+ 		netconfig->dns6_overrides =3D NULL;
+ =
+
+-- =
+
+2.32.0
+
+--===============1130932608956709771==--
 
