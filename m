@@ -1,131 +1,251 @@
-Content-Type: multipart/mixed; boundary="===============2746621939881908982=="
+Content-Type: multipart/mixed; boundary="===============1060516495317989668=="
 MIME-Version: 1.0
-From: Domien Schepers <schepers.d at northeastern.edu>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: denial-of-service vulnerability in processing of EAP failures
-Date: Fri, 06 May 2022 14:00:31 +0000
-Message-ID: <3C791664-2207-4B22-A68E-C6A02148D271@northeastern.edu>
+Subject: [PATCH 01/12] treewide: Parse EnableNetworkConfiguration in one place
+Date: Thu, 21 Oct 2021 10:50:30 +0200
+Message-ID: <20211021085041.294524-1-andrew.zaborowski@intel.com>
 
---===============2746621939881908982==
+--===============1060516495317989668==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-We discovered a denial-of-service vulnerability that allows an adversary to=
- forcibly disconnect the IWD client from a protected Wi-Fi network even whe=
-n Wi-Fi Management Frame Protection (MFP) is being used. The problem is tha=
-t the reception of an unprotected EAP-Failure message will cause the client=
- to disconnect even when MFP is used, resulting in denial-of-service.
+Add netconfig_get_enabled() and use that in all places that want to know
+whether network configuration is enabled.  Drop the enable_network_config
+deprecated setting, which was only being handled in one of these 5 or so
+places.
+---
+ src/ap.c        | 11 +++--------
+ src/ip-pool.c   | 11 ++---------
+ src/main.c      |  8 ++------
+ src/netconfig.c |  9 +++++++++
+ src/netconfig.h |  2 ++
+ src/resolve.c   | 12 ++----------
+ src/station.c   | 10 ++--------
+ 7 files changed, 22 insertions(+), 41 deletions(-)
 
-Interestingly, the attack is successful against both personal and enterpris=
-e networks. In case of enterprise networks, the EAP-Failure ID has to match=
- the session's randomized ID. However, since there are only 256 possible va=
-lues, it can be quickly brute-forced. In case of personal networks, the EAP=
--Failure ID can be set to zero.
+diff --git a/src/ap.c b/src/ap.c
+index 45e647b8..4b26e9ff 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -53,6 +53,7 @@
+ #include "src/wscutil.h"
+ #include "src/eap-wsc.h"
+ #include "src/ip-pool.h"
++#include "src/netconfig.h"
+ #include "src/ap.h"
+ #include "src/storage.h"
+ #include "src/diagnostic.h"
+@@ -132,7 +133,6 @@ struct ap_wsc_pbc_probe_record {
+ 	uint64_t timestamp;
+ };
+ =
 
-Snippet from the logs:
+-static bool netconfig_enabled;
+ static char **global_addr4_strs;
+ static uint32_t netdev_watch;
+ static struct l_netlink *rtnl;
+@@ -2826,7 +2826,7 @@ static int ap_load_ipv4(struct ap_state *ap, const st=
+ruct l_settings *config)
+ 	unsigned int lease_time =3D 0;
+ 	struct in_addr ia;
+ =
 
-	src/netdev.c:netdev_unicast_notify() Unicast notification Control Port Fra=
-me(129)
-	src/netdev.c:netdev_control_port_frame_event() =
+-	if (!l_settings_has_group(config, "IPv4") || !netconfig_enabled)
++	if (!l_settings_has_group(config, "IPv4") || !netconfig_get_enabled())
+ 		return 0;
+ =
 
-	EAP completed with eapFail
-	4-Way handshake failed for ifindex: 19, reason: 23
-	src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-	src/netdev.c:netdev_link_notify() event 16 on ifindex 19
-	src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
-	src/netdev.c:netdev_deauthenticate_event() =
+ 	if (l_settings_has_key(config, "IPv4", "Address")) {
+@@ -3829,12 +3829,7 @@ static int ap_init(void)
+ 	 * Enable network configuration and DHCP only if
+ 	 * [General].EnableNetworkConfiguration is true.
+ 	 */
+-	if (!l_settings_get_bool(settings, "General",
+-					"EnableNetworkConfiguration",
+-					&netconfig_enabled))
+-		netconfig_enabled =3D false;
+-
+-	if (netconfig_enabled) {
++	if (netconfig_get_enabled()) {
+ 		if (l_settings_get_value(settings, "IPv4", "APAddressPool")) {
+ 			global_addr4_strs =3D l_settings_get_string_list(settings,
+ 								"IPv4",
+diff --git a/src/ip-pool.c b/src/ip-pool.c
+index 82f5216e..0c84394c 100644
+--- a/src/ip-pool.c
++++ b/src/ip-pool.c
+@@ -34,6 +34,7 @@
+ #include "src/iwd.h"
+ #include "src/module.h"
+ #include "src/netdev.h"
++#include "src/netconfig.h"
+ #include "src/ip-pool.h"
+ =
 
-	src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
-	src/netdev.c:netdev_disconnect_event() =
+ struct ip_pool_addr4_record {
+@@ -357,15 +358,7 @@ static void ip_pool_addr4_dump_cb(int error,
+ =
 
+ static int ip_pool_init(void)
+ {
+-	const struct l_settings *settings =3D iwd_get_config();
+-	bool netconfig_enabled;
+-
+-	if (!l_settings_get_bool(settings, "General",
+-				"EnableNetworkConfiguration",
+-				&netconfig_enabled))
+-		netconfig_enabled =3D false;
+-
+-	if (!netconfig_enabled)
++	if (!netconfig_get_enabled())
+ 		return 0;
+ =
 
-We confirmed the attack against versions 1.24, 1.25, 1.26, 1.27. See the at=
-tachment for our proof-of-concept code to reproduce the issue.
+ 	rtnl =3D iwd_get_rtnl();
+diff --git a/src/main.c b/src/main.c
+index b67c74d9..f5095ecc 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -42,6 +42,7 @@
+ #include "src/rfkill.h"
+ #include "src/storage.h"
+ #include "src/anqp.h"
++#include "src/netconfig.h"
+ =
 
-A potential solution is to discard EAP-Failure messages when the client is =
-not using IEEE 802.1X authentication. Furthermore, one could choose to disc=
-ard EAP-Failure messages after establishing a successful connection.
+ #include "src/backtrace.h"
+ =
 
-This issue was discovered by Domien Schepers (Northeastern University) and =
-Mathy Vanhoef (imec-DistriNet, KU Leuven).
+@@ -217,12 +218,7 @@ static struct l_dbus_message *iwd_dbus_get_info(struct=
+ l_dbus *dbus,
+ 	struct l_dbus_message *reply;
+ 	struct l_dbus_message_builder *builder;
+ 	L_AUTO_FREE_VAR(char *, storage_dir) =3D storage_get_path(NULL);
+-	bool netconfig_enabled;
+-
+-	if (!l_settings_get_bool(iwd_config, "General",
+-					"EnableNetworkConfiguration",
+-					&netconfig_enabled))
+-		netconfig_enabled =3D false;
++	bool netconfig_enabled =3D netconfig_get_enabled();
+ =
 
+ 	reply =3D l_dbus_message_new_method_return(message);
+ 	builder =3D l_dbus_message_builder_new(reply);
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 2ffc5ab1..833fd3ab 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -1581,6 +1581,15 @@ void netconfig_destroy(struct netconfig *netconfig)
+ 	netconfig_free(netconfig);
+ }
+ =
 
---===============2746621939881908982==
-Content-Type: text/x-python-script
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="iwd-disconnect-eapfailure.py"
++bool netconfig_get_enabled(void)
++{
++	bool enabled;
++
++	return l_settings_get_bool(iwd_get_config(), "General",
++					"EnableNetworkConfiguration",
++					&enabled) && enabled;
++}
++
+ static int netconfig_init(void)
+ {
+ 	uint32_t r;
+diff --git a/src/netconfig.h b/src/netconfig.h
+index 3c4e7641..9d5887e9 100644
+--- a/src/netconfig.h
++++ b/src/netconfig.h
+@@ -46,3 +46,5 @@ void netconfig_handle_fils_ip_resp(struct netconfig *netc=
+onfig,
+ =
 
-IyBDb3B5cmlnaHQgKEMpIDIwMjIsIERvbWllbiBTY2hlcGVycy4NCiMgQlNEIDItQ2xhdXNlIExp
-Y2Vuc2UuDQpmcm9tIHNjYXB5LmFsbCBpbXBvcnQgKg0KaW1wb3J0IGFyZ3BhcnNlDQoNCiMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCiMjIyBJbnN0
-cnVjdGlvbnMgIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCiMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCg0KIyBFeGFtcGxlIENv
-bW1hbmRzOg0KIyA+IHB5dGhvbiBpd2QtZGlzY29ubmVjdC1lYXBmYWlsdXJlLnB5IC0taWZhY2Ug
-d2xhbjAgLS1ic3NpZCBhYTphYTphYTphYTphYTphYSAtLWNsaWVudCBiYjpiYjpiYjpiYjpiYjpi
-YiAtLWRlYXV0aA0KIyA+IHB5dGhvbiBpd2QtZGlzY29ubmVjdC1lYXBmYWlsdXJlLnB5IC0taWZh
-Y2Ugd2xhbjAgLS1ic3NpZCBhYTphYTphYTphYTphYTphYSAtLWNsaWVudCBiYjpiYjpiYjpiYjpi
-YjpiYiAtLWVhcGZhaWx1cmUNCg0KIyBXaGVyZSAtLWlmYWNlIGlzIHlvdXIgYWR2ZXJzYXJpYWwg
-aWZhY2UgaW4gbW9uaXRvciBtb2RlLCAtLWJzc2lkIGlzIHRoZSBuZXR3b3JrJ3MgQlNTSUQsDQoj
-IGFuZCAtLWNsaWVudCB0aGUgdmljdGltJ3MgTUFDIGFkZHJlc3MuDQoNCiMgVGhlIC0tZGVhdXRo
-IG9wdGlvbiBjYW4gYmUgdXNlZCB0byB2ZXJpZnkgdGhlIG5ldHdvcmsgaXMgZW5mb3JjaW5nIFdp
-LUZpIE1GUC4gSWYgeWVzLA0KIyB0aGUgdW5wcm90ZWN0ZWQgZGVhdXRoZW50aWNhdGlvbiBmcmFt
-ZSB3aWxsIGJlIGRpc2NhcmRlZC4NCg0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIw0KIyMjIE5vdGVzICMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIw0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIw0KDQojIFlvdXIgaW50ZXJmYWNlIG11c3QgYmUgc2V0IHRvIG1vbml0b3Ig
-bW9kZSBvbiB0aGUgYXBwcm9yaWF0ZSBjaGFubmVsLiBGb3IgZXhhbXBsZToNCiMgPiBpZmNvbmZp
-ZyB3bGFuMCBkb3duDQojID4gaXcgd2xhbjAgc2V0IG1vbml0b3IgY29udHJvbA0KIyA+IGlmY29u
-ZmlnIHdsYW4wIHVwDQojID4gaXcgZGV2IHdsYW4wIHNldCBjaGFubmVsIDENCiMgPiBpdyB3bGFu
-MCBpbmZvDQoNCiMgRXhhbXBsZSBJV0QgY29tbWFuZCB3aXRoIGRlYnVnIG91dHB1dDoNCiMgPiBz
-dWRvIHNyYy9pd2QgLWkgd2xhbjAgLWQNCg0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIw0KIyMjIFRyb3VibGVzaG9vdGluZyAjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIw0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIw0KDQojIC0gVmVyaWZ5IHlvdXIgaW50ZXJmYWNlIGlzIHNldCB0byBt
-b25pdG9yIG1vZGUgb24gdGhlIGFwcHJvcHJpYXRlIGNoYW5uZWwuDQojIC0gVmVyaWZ5IHlvdXIg
-bG9ncyB0byBzZWUgaWYgdGhlIHZpY3RpbSBjbGllbnQgcmVjZWl2ZXMgb3VyIGFkdmVyc2FyaWFs
-IGZyYW1lcy4NCiMgLSBPcGVuIFdpcmVzaGFyayB0byBpbnZlc3RpZ2F0ZS4gRmlsdGVyIGZvciBk
-ZWF1dGhlbnRpY2F0aW9uIGZyYW1lczoNCiMgICB3bGFuLmZjLnR5cGVfc3VidHlwZT09MHgwMDBj
-DQoNCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMN
-CiMjIyBDb2RlICMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCiMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCg0KZGVm
-IGluamVjdF9kZWF1dGgoIGlmYWNlICwgYnNzaWQgLCBjbGllbnQgKToNCgkiIiJJbmplY3QgYW4g
-dW5wcm90ZWN0ZWQgZGVhdXRoZW50aWNhdGlvbiB0byB2ZXJpZnkgV2ktRmkgTUZQIGlzIGVuZm9y
-Y2VkLiIiIg0KCXByaW50KCJbK10gSW5qZWN0aW5nIGFuIHVucHJvdGVjdGVkIGRlYXV0aGVudGlj
-YXRpb24uIikNCgkNCglmcmFtZSA9IERvdDExKCkvRG90MTFEZWF1dGgocmVhc29uPTIpICMgQXV0
-aGVudGljYXRpb24gRXhwaXJlZC4NCglmcmFtZVtEb3QxMV0uYWRkcjEgPSBjbGllbnQNCglmcmFt
-ZVtEb3QxMV0uYWRkcjIgPSBic3NpZA0KCWZyYW1lW0RvdDExXS5hZGRyMyA9IGJzc2lkDQoJDQoJ
-IyBUcmFuc21pdC4NCglwcmludCgiWytdICIgKyBmcmFtZS5zdW1tYXJ5KCkpDQoJc2VuZHAoUmFk
-aW9UYXAoKS9mcmFtZSwgaWZhY2U9aWZhY2UsIHZlcmJvc2U9RmFsc2UpDQoNCmRlZiBpbmplY3Rf
-ZWFwX2ZhaWx1cmUoIGlmYWNlICwgYnNzaWQgLCBjbGllbnQgKToNCgkiIiJJbmplY3QgRUFQLUZh
-aWx1cmVzLiIiIg0KCXByaW50KCJbK10gSW5qZWN0aW5nIEVBUC1GYWlsdXJlcy4iKQ0KCQ0KCWZy
-YW1lID0gRG90MTEodHlwZT0iRGF0YSIsIHN1YnR5cGU9MCkNCglmcmFtZVtEb3QxMV0uYWRkcjEg
-PSBjbGllbnQNCglmcmFtZVtEb3QxMV0uYWRkcjIgPSBic3NpZA0KCWZyYW1lW0RvdDExXS5hZGRy
-MyA9IGJzc2lkDQoJDQoJIyBDb25zdHJ1Y3QgYW4gRUFQLUZhaWx1cmUuDQoJZnJhbWUgLz0gTExD
-KCkvU05BUCgpL0VBUE9MKCB2ZXJzaW9uPSI4MDIuMVgtMjAwMSIgKQ0KCWZyYW1lIC89IEVBUCgg
-Y29kZT0iRmFpbHVyZSIgKQ0KDQoJIyBUcmFuc21pdC4NCglwcmludCgiWytdICIgKyBmcmFtZS5z
-dW1tYXJ5KCkpDQoJZm9yIGkgaW4gcmFuZ2UoMjU1KToNCgkJIyBOT1RFOiBBZ2FpbnN0IHBlcnNv
-bmFsIG5ldHdvcmtzIG9ubHkgYSBzaW5nbGUgZnJhbWUgd2l0aCBFQVAtSUQ9MCBpcyBzdWZmaWNp
-ZW50Lg0KCQlmcmFtZVtFQVBdLmlkID0gaQ0KCQlzZW5kcChSYWRpb1RhcCgpL2ZyYW1lLCBpZmFj
-ZT1pZmFjZSwgdmVyYm9zZT1GYWxzZSkNCgkNCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6DQoN
-CgkjIEFyZ3VtZW50IFBhcnNlci4NCglwYXJzZXIgPSBhcmdwYXJzZS5Bcmd1bWVudFBhcnNlcigp
-DQoJcGFyc2VyLmFkZF9hcmd1bWVudCggJy0taWZhY2UnICwgZGVzdD0naWZhY2UnICwgcmVxdWly
-ZWQ9VHJ1ZSAsIFwNCgkJaGVscD0nSW50ZXJmYWNlIGluIG1vbml0b3IgbW9kZS4nICkNCglwYXJz
-ZXIuYWRkX2FyZ3VtZW50KCAnLS1ic3NpZCcgLCBkZXN0PSdic3NpZCcgLCByZXF1aXJlZD1UcnVl
-ICwgXA0KCQloZWxwPSdOZXR3b3JrIEJTU0lEIGluIHh4Onh4Onh4Onh4Onh4Onh4IGZvcm1hdC4n
-ICkNCglwYXJzZXIuYWRkX2FyZ3VtZW50KCAnLS1jbGllbnQnICwgZGVzdD0nY2xpZW50JyAsIHJl
-cXVpcmVkPVRydWUgLCBcDQoJCWhlbHA9J0NsaWVudCBNQUMgaW4geHg6eHg6eHg6eHg6eHg6eHgg
-Zm9ybWF0LicgKQ0KCXBhcnNlci5hZGRfYXJndW1lbnQoICctLWRlYXV0aCcgLCBhY3Rpb249J3N0
-b3JlX3RydWUnICwgcmVxdWlyZWQ9RmFsc2UgLCBcDQoJCWhlbHA9J1ZlcmlmeSBXaS1GaSBNRlAg
-aXMgZW5mb3JjZWQgd2l0aCBhbiB1bnByb3RlY3RlZCBkZWF1dGhlbnRpY2F0aW9uLicgKQ0KCXBh
-cnNlci5hZGRfYXJndW1lbnQoICctLWVhcGZhaWx1cmUnICwgYWN0aW9uPSdzdG9yZV90cnVlJyAs
-IHJlcXVpcmVkPUZhbHNlICwgXA0KCQloZWxwPSdSdW4gdGhlIEVBUC1GYWlsdXJlIGF0dGFjay4n
-ICkNCglhcmdzID0gcGFyc2VyLnBhcnNlX2FyZ3MoKQ0KDQoJIyBSdW4uDQoJaWYgYXJncy5kZWF1
-dGg6DQoJCWluamVjdF9kZWF1dGgoIGFyZ3MuaWZhY2UgLCBhcmdzLmJzc2lkICwgYXJncy5jbGll
-bnQpDQoJZWxpZiBhcmdzLmVhcGZhaWx1cmU6DQoJCWluamVjdF9lYXBfZmFpbHVyZSggYXJncy5p
-ZmFjZSAsIGFyZ3MuYnNzaWQgLCBhcmdzLmNsaWVudCApDQoJZWxzZToNCgkJcHJpbnQoIlstXSBQ
-bGVhc2Ugc3BlY2lmeSBhbiBvcHRpb24uIikNCg==
+ struct netconfig *netconfig_new(uint32_t ifindex);
+ void netconfig_destroy(struct netconfig *netconfig);
++
++bool netconfig_get_enabled(void);
+diff --git a/src/resolve.c b/src/resolve.c
+index 9b724392..59b29ec2 100644
+--- a/src/resolve.c
++++ b/src/resolve.c
+@@ -35,6 +35,7 @@
+ #include "src/iwd.h"
+ #include "src/module.h"
+ #include "src/dbus.h"
++#include "src/netconfig.h"
+ #include "src/resolve.h"
+ =
 
---===============2746621939881908982==--
+ struct resolve_ops {
+@@ -579,18 +580,9 @@ static const struct {
+ static int resolve_init(void)
+ {
+ 	const char *method_name;
+-	bool enabled;
+ 	uint8_t i;
+ =
+
+-	if (!l_settings_get_bool(iwd_get_config(), "General",
+-					"EnableNetworkConfiguration",
+-					&enabled)) {
+-		if (!l_settings_get_bool(iwd_get_config(), "General",
+-					"enable_network_config", &enabled))
+-			enabled =3D false;
+-	}
+-
+-	if (!enabled)
++	if (!netconfig_get_enabled())
+ 		return 0;
+ =
+
+ 	method_name =3D l_settings_get_value(iwd_get_config(), "Network",
+diff --git a/src/station.c b/src/station.c
+index c73db634..d3767203 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -63,7 +63,6 @@ static uint32_t netdev_watch;
+ static uint32_t mfp_setting;
+ static uint32_t roam_retry_interval;
+ static bool anqp_disabled;
+-static bool netconfig_enabled;
+ static struct watchlist event_watches;
+ =
+
+ struct station {
+@@ -3859,7 +3858,7 @@ static struct station *station_create(struct netdev *=
+netdev)
+ 	l_dbus_object_add_interface(dbus, netdev_get_path(netdev),
+ 					IWD_STATION_INTERFACE, station);
+ =
+
+-	if (netconfig_enabled)
++	if (netconfig_get_enabled())
+ 		station->netconfig =3D netconfig_new(netdev_get_ifindex(netdev));
+ =
+
+ 	station->anqp_pending =3D l_queue_new();
+@@ -4442,12 +4441,7 @@ static int station_init(void)
+ 				&anqp_disabled))
+ 		anqp_disabled =3D true;
+ =
+
+-	if (!l_settings_get_bool(iwd_get_config(), "General",
+-					"EnableNetworkConfiguration",
+-					&netconfig_enabled))
+-			netconfig_enabled =3D false;
+-
+-	if (!netconfig_enabled)
++	if (!netconfig_get_enabled())
+ 		l_info("station: Network configuration is disabled.");
+ =
+
+ 	watchlist_init(&event_watches, NULL);
+-- =
+
+2.32.0
+
+--===============1060516495317989668==--
 
