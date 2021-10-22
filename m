@@ -1,148 +1,88 @@
-Content-Type: multipart/mixed; boundary="===============8759748019803079543=="
+Content-Type: multipart/mixed; boundary="===============5486033970056403476=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 2/2] auto-t: roam test to simulate reported crash
-Date: Wed, 19 Jan 2022 12:59:11 -0800
-Message-ID: <20220119205911.2281616-2-prestwoj@gmail.com>
-In-Reply-To: 20220119205911.2281616-1-prestwoj@gmail.com
+Subject: Re: [PATCH 03/12] netconfig: Track gateway address strings
+Date: Fri, 22 Oct 2021 12:16:56 -0500
+Message-ID: <2b2af412-93b9-d620-8e4e-7bdd7a1c35ad@gmail.com>
+In-Reply-To: 20211021085041.294524-3-andrew.zaborowski@intel.com
 
---===============8759748019803079543==
+--===============5486033970056403476==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The crash itself is caused by new roam scans overwriting the previous
-scan ID. To simulate this both BSS's are set to very low signal strength
-which will cause IWD to attempt a roam but find no better BSS candidates.
-IWD will then attempt a roam scan again. During this we kill hostapd which
-sends a disconnect and should trigger a crash without the fix.
----
- autotests/testPSK-roam/connection_test.py     |  2 +
- autotests/testPSK-roam/main.conf              |  3 +
- .../testPSK-roam/roam_ap_disconnect_test.py   | 80 +++++++++++++++++++
- 3 files changed, 85 insertions(+)
- create mode 100644 autotests/testPSK-roam/roam_ap_disconnect_test.py
+Hi Andrew,
 
-diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
-roam/connection_test.py
-index 8d9b22ad..92fdeb04 100644
---- a/autotests/testPSK-roam/connection_test.py
-+++ b/autotests/testPSK-roam/connection_test.py
-@@ -203,6 +203,8 @@ class Test(unittest.TestCase):
-     def tearDownClass(cls):
-         IWD.clear_storage()
-         cls.bss_hostapd =3D None
-+        cls.rule0.enabled =3D False
-+        cls.rule0.remove()
- =
+On 10/21/21 3:50 AM, Andrew Zaborowski wrote:
+> Cache the latest v4 and v6 gateway IP string in struct netconfig state
+> to be able to more easily detect changes in those values in future
+> commits and perhaps to simplify the ..._routes_install functions.
+> netconfig_ipv4_get_gateway's out_mac parameter can now be NULL.  While
+> editing that function fix a small formatting annoyance.
+> ---
+>   src/netconfig.c | 62 +++++++++++++++++++++++++++++++++++++++----------
+>   1 file changed, 50 insertions(+), 12 deletions(-)
+> =
 
- if __name__ =3D=3D '__main__':
-     unittest.main(exit=3DTrue)
-diff --git a/autotests/testPSK-roam/main.conf b/autotests/testPSK-roam/main=
-.conf
-index 9452fb6b..3d93ff57 100644
---- a/autotests/testPSK-roam/main.conf
-+++ b/autotests/testPSK-roam/main.conf
-@@ -1,2 +1,5 @@
- [Scan]
- DisableMacAddressRandomization=3Dtrue
-+
-+[General]
-+RoamRetryInterval=3D1
-diff --git a/autotests/testPSK-roam/roam_ap_disconnect_test.py b/autotests/=
-testPSK-roam/roam_ap_disconnect_test.py
-new file mode 100644
-index 00000000..eee7077e
---- /dev/null
-+++ b/autotests/testPSK-roam/roam_ap_disconnect_test.py
-@@ -0,0 +1,80 @@
-+#! /usr/bin/python3
-+
-+import unittest
-+import sys, os
-+
-+sys.path.append('../util')
-+from iwd import IWD
-+from iwd import NetworkType
-+from hwsim import Hwsim
-+from hostapd import HostapdCLI
-+
-+class Test(unittest.TestCase):
-+    #
-+    # Tests a crash reported where multiple roam scans combined with an AP
-+    # disconnect result in a crash getting scan results.
-+    #
-+    def test_ap_disconnect(self):
-+        wd =3D IWD(True)
-+        device =3D wd.list_devices(1)[0]
-+
-+        ordered_network =3D device.get_ordered_network('TestFT', full_scan=
-=3DTrue)
-+
-+        self.assertEqual(ordered_network.type, NetworkType.psk)
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        device.connect_bssid(self.bss_hostapd[0].bssid)
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        # Since both BSS's have low signal, the roam should fail and trigg=
-er
-+        # another roam scan.
-+        device.wait_for_event('no-roam-candidates', timeout=3D30)
-+        device.wait_for_event('roam-scan-triggered', timeout=3D30)
-+
-+        # Hostapd sends disconnect
-+        self.bss_hostapd[0].deauthenticate(device.address)
-+
-+        # IWD should recover, and not crash
-+        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+    def tearDown(self):
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" up')
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        hwsim =3D Hwsim()
-+
-+        IWD.copy_to_storage('TestFT.psk')
-+
-+        cls.bss_hostapd =3D [ HostapdCLI(config=3D'ft-psk-ccmp-1.conf'),
-+                            HostapdCLI(config=3D'ft-psk-ccmp-2.conf') ]
-+        cls.bss_hostapd[1].disable()
-+
-+        cls.bss_hostapd[0].set_value('ocv', '0')
-+        cls.bss_hostapd[0].set_value('ieee80211w', '0')
-+
-+        cls.rule0 =3D hwsim.rules.create()
-+        cls.rule0.source =3D 'any'
-+        cls.rule0.bidirectional =3D True
-+        cls.rule0.signal =3D -8000
-+        cls.rule0.enabled =3D True
-+
-+        cls.bss_hostapd[0].reload()
-+        cls.bss_hostapd[0].wait_for_event("AP-ENABLED")
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+        cls.bss_hostapd =3D None
-+        cls.rule0.remove()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
--- =
 
-2.31.1
+<snip>
 
---===============8759748019803079543==--
+> @@ -436,6 +438,8 @@ static char *netconfig_ipv4_get_gateway(struct netcon=
+fig *netconfig,
+>   {
+>   	const struct l_dhcp_lease *lease;
+>   	char *gateway;
+> +	const struct ie_fils_ip_addr_response_info *fils =3D
+> +		netconfig->fils_override;
+>   =
+
+>   	switch (netconfig->rtm_protocol) {
+>   	case RTPROT_STATIC:
+> @@ -449,15 +453,12 @@ static char *netconfig_ipv4_get_gateway(struct netc=
+onfig *netconfig,
+>   		return gateway;
+>   =
+
+>   	case RTPROT_DHCP:
+> -		if (netconfig->fils_override &&
+> -				netconfig->fils_override->ipv4_gateway) {
+> -			gateway =3D netconfig_ipv4_to_string(
+> -					netconfig->fils_override->ipv4_gateway);
+> +		if (fils && fils->ipv4_gateway) {
+> +			gateway =3D netconfig_ipv4_to_string(fils->ipv4_gateway);
+>   =
+
+> -			if (gateway && !l_memeqzero(netconfig->fils_override->
+> -							ipv4_gateway_mac, 6))
+> -				*out_mac =3D netconfig->fils_override->
+> -					ipv4_gateway_mac;
+> +			if (gateway && out_mac &&
+> +					!l_memeqzero(fils->ipv4_gateway_mac, 6))
+> +				*out_mac =3D fils->ipv4_gateway_mac;
+>   =
+
+>   			return gateway;
+>   		}
+> @@ -495,7 +496,7 @@ static struct l_rtnl_address *netconfig_get_static6_a=
+ddress(
+>   	prefix_len =3D strtoul(p, NULL, 10);
+>   	if (!unlikely(errno =3D=3D EINVAL || errno =3D=3D ERANGE ||
+>   			!prefix_len || prefix_len > 128)) {
+> -		l_error("netconfig: Invalid prefix '%s'  provided in network"
+> +		l_error("netconfig: Invalid prefix '%s' provided in network"
+>   				" configuration file", p);
+>   		return NULL;
+>   	}
+
+I separated out these 3 chunks into 2 separate commits since they did not s=
+eem =
+
+to be related to the commit description.
+
+So this commit became 3.  Please review.  Applied, thanks.
+
+Regards,
+-Denis
+--===============5486033970056403476==--
 
