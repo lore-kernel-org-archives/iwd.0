@@ -1,85 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============6611382156486516042=="
+Content-Type: multipart/mixed; boundary="===============2058746493526730668=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 2/2] auto-t: hwsim.py: support async radio creation
-Date: Wed, 16 Feb 2022 11:39:43 -0800
-Message-ID: <20220216193943.1411659-2-prestwoj@gmail.com>
-In-Reply-To: 20220216193943.1411659-1-prestwoj@gmail.com
+Subject: [PATCH] netconfig: Don't start ACD with FILS IP Assignment
+Date: Fri, 22 Oct 2021 15:04:03 +0200
+Message-ID: <20211022130403.19820-1-andrew.zaborowski@intel.com>
 
---===============6611382156486516042==
+--===============2058746493526730668==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Adds a new wait argument which, if false, will call the DBus method
-and return immediately. This allows the caller to create multiple
-radios very quickly, simulating (as close as we can) a wifi card
-with dual phy's which appear in the kernel simultaneously.
-
-The name argument was also changed to be mandatory, which is now
-required by hwsim.
+Restore the older behaviour where ACD was started only with static
+addressing.  There are various arguments for saving setup time by not
+doing ACD when a wifi network has IP addresses managed centrally (and
+some arguments against), for now just restore the behaviour from before
+FILS IP Assignment was added.
 ---
- autotests/util/hwsim.py | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+This applies on top of the netconfig agent patchset.
 
-diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
-index 34859910..ce85f43d 100755
---- a/autotests/util/hwsim.py
-+++ b/autotests/util/hwsim.py
-@@ -309,26 +309,35 @@ class RadioList(collections.Mapping):
-     def _interfaces_removed_handler(self, path, interfaces):
-         del _dict[path]
+ src/netconfig.c | 34 ++++++++++++++++++++--------------
+ 1 file changed, 20 insertions(+), 14 deletions(-)
+
+diff --git a/src/netconfig.c b/src/netconfig.c
+index a17e06bb..73a621c5 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -1653,22 +1653,28 @@ static bool netconfig_ipv4_select_and_install(struc=
+t netconfig *netconfig)
+ 							ip)))
+ 			return false;
  =
 
--    def create(self, name=3DNone, p2p_device=3DFalse, iftype_disable=3DNon=
-e,
--                cipher_disable=3DNone):
-+    def create(self, name, p2p_device=3DFalse, iftype_disable=3DNone,
-+                cipher_disable=3DNone, wait=3DTrue):
-         args =3D dbus.Dictionary({
-+            'Name': name,
-             'P2P': p2p_device,
-         }, signature=3D'sv')
- =
-
--        if name:
--            args['Name'] =3D name
+-		netconfig->acd =3D l_acd_new(netconfig->ifindex);
+-		l_acd_set_event_handler(netconfig->acd,
+-					netconfig_ipv4_acd_event, netconfig,
+-					NULL);
+-		if (getenv("IWD_ACD_DEBUG"))
+-			l_acd_set_debug(netconfig->acd, do_debug,
+-					"[ACD] ", NULL);
 -
-         if iftype_disable:
-             args['InterfaceTypeDisable'] =3D iftype_disable
+-		if (!l_acd_start(netconfig->acd, ip)) {
+-			l_error("failed to start ACD, continuing anyways");
+-			l_acd_destroy(netconfig->acd);
+-			netconfig->acd =3D NULL;
++		if (netconfig->rtm_protocol =3D=3D RTPROT_STATIC) {
++			netconfig->acd =3D l_acd_new(netconfig->ifindex);
++			l_acd_set_event_handler(netconfig->acd,
++						netconfig_ipv4_acd_event,
++						netconfig, NULL);
  =
 
-         if cipher_disable:
-             args['CipherTypeDisable'] =3D cipher_disable
- =
-
-+        if not wait:
-+            self._radio_manager.CreateRadio(args, reply_handler=3Dself._su=
-ccess,
-+                                                error_handler=3Dself._fail=
-ure)
-+            return None
+-			netconfig_set(netconfig, AF_INET, changed);
+-		} else
++			if (getenv("IWD_ACD_DEBUG"))
++				l_acd_set_debug(netconfig->acd, do_debug,
++						"[ACD] ", NULL);
 +
-         path =3D self._radio_manager.CreateRadio(args)
-         obj =3D Radio(path)
-         self._dict[path] =3D obj
-         return obj
++			if (!l_acd_start(netconfig->acd, ip)) {
++				l_error("failed to start ACD, continuing "
++					"anyways");
++				l_acd_destroy(netconfig->acd);
++				netconfig->acd =3D NULL;
++			}
++		}
++
++		if (netconfig->acd)
+ 			netconfig->pending_v4_set |=3D changed;
++		else
++			netconfig_set(netconfig, AF_INET, changed);
  =
 
-+    def _success(self, bla):
-+        pass
-+
-+    def _failure(self, ex):
-+        pass
-+
- class Hwsim(iwd.AsyncOpAbstract):
-     _instances =3D WeakValueDictionary()
- =
-
+ 		return true;
+ 	}
 -- =
 
-2.34.1
+2.32.0
 
---===============6611382156486516042==--
+--===============2058746493526730668==--
 
