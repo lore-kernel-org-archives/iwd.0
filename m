@@ -1,51 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============3342432334661157028=="
+Content-Type: multipart/mixed; boundary="===============2262676625826515885=="
 MIME-Version: 1.0
-From: Diederik de Haas <didi.debian at cknow.org>
+From: Michael Nazzareno Trimarchi <michael at amarulasolutions.com>
 To: iwd at lists.01.org
-Subject: Doesn't create global config file or its directory (/etc/iwd/)
-Date: Mon, 27 Dec 2021 19:23:44 +0100
-Message-ID: <35676143.AJtQQQMBzY@bagend>
+Subject: Signal on ap clients connected
+Date: Sun, 24 Oct 2021 08:50:56 +0000
+Message-ID: <CAOf5uw=BU=2hZAVzC__bPUwFou7G26s=mV3ujRDYSMui5A9jXQ@mail.gmail.com>
 
---===============3342432334661157028==
+--===============2262676625826515885==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi all
 
-I recently filed a Debian Bug against iwd and this is a forward for it:
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D1002575
+I have seen where I can write the call when a client is connected to
+ap mode. I will like
+to have a property of number of station connected on IWD_AP_INTERFACE.
+The diagnostic
+can be used to get all the details for each station. Is that a good idea?
 
-"I needed the "EnableNetworkConfiguration=3Dtrue" setting, which IIUC
-should be done in /etc/iwd/main.conf, but I noticed that that file
-and directory didn't exist. I resolved it by using mkdir and creating
-the file with vim (as root) and I'm assuming/hoping things like
-permissions are set correctly. But I did wonder whether I was doing it
-incorrectly (and I may have, but it's working)."
+Michael
 
-The Debian maintainer informed me that there isn't such a config file in th=
-e =
+-- =
 
-upstream source code and I think it would be helpful if the directory with =
-the =
+Michael Nazzareno Trimarchi
+Co-Founder & Chief Executive Officer
+M. +39 347 913 2170
+michael(a)amarulasolutions.com
+__________________________________
 
-correct permissions and the config file, which could f.e. only contain a =
-
-commented reference to the iwd.config man page, would be created OOTB.
-
-Cheers,
-  Diederik
-
---===============3342432334661157028==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlIVUVBQllJQUIwV0lRVDFzVVBCWXN5R21p
-NHVzeS9YYmx2T2VIN2JiZ1VDWWNvRXNBQUtDUkRYYmx2T2VIN2IKYnE4L0FQOUsrN0VTRGdoMzQ5
-MHlOcVc2eGVZMVpvZ204Y09GZnpxdmx4YTNHemY2ZVFFQWdIWDQwZXd2MzAvRQpzbTd2UVQrdEtS
-U083ZWRqbEljcHN2UTFjSVppYkFvPQo9aGpucAotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============3342432334661157028==--
+Amarula Solutions BV
+Joop Geesinkweg 125, 1114 AB, Amsterdam, NL
+T. +31 (0)85 111 9172
+info(a)amarulasolutions.com
+www.amarulasolutions.com
+--===============2262676625826515885==--
 
