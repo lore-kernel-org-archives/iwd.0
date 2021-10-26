@@ -1,89 +1,98 @@
-Content-Type: multipart/mixed; boundary="===============4711164471171093230=="
+Content-Type: multipart/mixed; boundary="===============5076509744310452890=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd stuck 'connecting', out-of-order wiphy work queue?
-Date: Thu, 28 Apr 2022 11:41:32 -0500
-Message-ID: <9c8e4116-caaf-932c-c8f7-22d9c64de9c8@gmail.com>
-In-Reply-To: 20220428144446.uaagkaurxypzjs5k@bang-olufsen.dk
+Subject: [PATCH] netdev: add SA Query delay with OCV enabled
+Date: Tue, 26 Oct 2021 15:24:27 -0700
+Message-ID: <20211026222427.1264435-1-prestwoj@gmail.com>
 
---===============4711164471171093230==
+--===============5076509744310452890==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Alvin,
+The way a SA Query was done following a channel switch was slightly
+incorrect. One because it is only needed when OCVC is set, and two
+because IWD was not waiting a random delay between 0 and 5000us as
+lined out by the spec. This patch fixes both these issues.
+---
+ src/netdev.c | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
 
-> However, the bottom line seems to be that the out-of-order work causes us=
- not to
-> immediately queue the next work item in wiphy_radio_work_done():
+diff --git a/src/netdev.c b/src/netdev.c
+index c6618546..96e473a9 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -142,6 +142,7 @@ struct netdev {
+ 	uint16_t last_code; /* reason or status, depending on result */
+ 	struct l_timeout *neighbor_report_timeout;
+ 	struct l_timeout *sa_query_timeout;
++	struct l_timeout *sa_query_delay;
+ 	struct l_timeout *group_handshake_timeout;
+ 	uint16_t sa_query_id;
+ 	uint8_t prev_snonce[32];
+@@ -797,6 +798,11 @@ static void netdev_connect_free(struct netdev *netdev)
+ 		netdev->sa_query_timeout =3D NULL;
+ 	}
+ =
 
-Correct.  The logic is a hold-over from when we didn't use priorities.  So =
-the =
++	if (netdev->sa_query_delay) {
++		l_timeout_remove(netdev->sa_query_delay);
++		netdev->sa_query_delay =3D NULL;
++	}
++
+ 	if (netdev->group_handshake_timeout) {
+ 		l_timeout_remove(netdev->group_handshake_timeout);
+ 		netdev->group_handshake_timeout =3D NULL;
+@@ -5351,6 +5357,17 @@ failed:
+ =
 
-assumption is that what is on the top of the queue is the 'running' task.  =
-This =
+ }
+ =
 
-is no longer the case.  However, this logic breaks down only in very specif=
-ic =
++static void netdev_send_sa_query_delay(struct l_timeout *timeout,
++					void *user_data)
++{
++	struct netdev *netdev =3D user_data;
++
++	netdev_send_sa_query_request(netdev);
++
++	l_timeout_remove(netdev->sa_query_delay);
++	netdev->sa_query_delay =3D NULL;
++}
++
+ static void netdev_channel_switch_event(struct l_genl_msg *msg,
+ 					struct netdev *netdev)
+ {
+@@ -5368,7 +5385,20 @@ static void netdev_channel_switch_event(struct l_gen=
+l_msg *msg,
+ =
 
-conditions which you uncovered.
+ 	handshake_state_set_chandef(netdev->handshake, l_steal_ptr(chandef));
+ =
 
-<snip>
+-	netdev_send_sa_query_request(netdev);
++	/*
++	 * IEEE 802.11-2020 11.9.3.2
++	 * "If the STA chooses to perform the specified switch and
++	 * dot11RSNAOperatingChannelValidationActivated is true and the AP has
++	 * indicated OCVC capability, after switching to the new channel the STA
++	 * shall wait a random delay uniformly-distributed in the range between
++	 * zero and 5000us, and then initiate the SA query procedure"
++	 */
++	if (netdev->handshake->supplicant_ocvc &&
++					netdev->handshake->authenticator_ocvc)
++		netdev->sa_query_delay =3D l_timeout_create_ms(
++						l_getrandom_uint32() % 5,
++						netdev_send_sa_query_delay,
++						netdev, NULL);
+ =
 
-> Specifically, the id that wiphy_radio_work_done() gets called with (4) do=
-esn't
-> match the id of the work on top of the queue (5). So next stays false and=
- we
-> don't call wiphy_radio_work_next().
-> =
+ 	if (!netdev->event_filter)
+ 		return;
+-- =
 
-> Can anybody explain what the reason for this 'next' variable is? It seems=
- like
-> we would always want to start the next work, no?
+2.31.1
 
-The reason for it is that we might remove work items that are not running. =
- We =
-
-can only run a single work item at a time, so this is distinguishing betwee=
-n a =
-
-'running work done' and 'non-running work done'.  In the latter case, we =
-
-shouldn't start any new work.
-
-> =
-
-> Not that this is a fix to the out-of-order work (start 4, done 5, see abo=
-ve),
-> but I could work around iwd getting stuck by refactoring the above functi=
-on
-> according to the attached patch. Basically I just removed the logic of th=
-is
-> 'next' variable and unconditionally call wiphy_radio_work_next().
-> =
-
-
-I think this is close.  But you need to account for the above.  We can do i=
-t in =
-
-one of two ways:
-
-1. when a work item is started, it is artificially assigned INT_MIN priorit=
-y. =
-
-So you can use that as an indicator whether the work item being finished is =
-
-running or not.
-
-2. Introduce a specific bool for this purpose.
-
-We also need to update the implementation of wiphy_radio_work_is_running() =
-since =
-
-that is also wrong.
-
-Regards,
--Denis
---===============4711164471171093230==--
+--===============5076509744310452890==--
 
