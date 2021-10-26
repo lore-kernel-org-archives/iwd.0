@@ -1,58 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============4847610455538422351=="
+Content-Type: multipart/mixed; boundary="===============5352070984718684672=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 09/11] auto-t: hostapd.py: separate GTK and PTK rekeys
-Date: Tue, 05 Oct 2021 15:00:49 -0700
-Message-ID: <20211005220051.4018694-9-prestwoj@gmail.com>
-In-Reply-To: 20211005220051.4018694-1-prestwoj@gmail.com
+Subject: Re: [PATCH] test-runner: allow wpa_supplicant to be used in --hw mode
+Date: Tue, 26 Oct 2021 17:24:18 -0500
+Message-ID: <0f064444-44d9-188f-f657-a8e19224e605@gmail.com>
+In-Reply-To: 20211026215952.1256143-1-prestwoj@gmail.com
 
---===============4847610455538422351==
+--===============5352070984718684672==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-REKEY_GTK kicks off the GTK only handshake where REKEY_PTK does
-both (via the 4-way). The way this utility was written was causing
-hostapd some major issues since both REKEY_GTK and REKEY_PTK was
-used.
+Hi James,
 
-Instead if address is set only do REKEY_PTK. This will also rekey
-the GTK via the 4-way handshake.
+On 10/26/21 4:59 PM, James Prestwood wrote:
+> This lets test-runner's physical adapter pass-through to be used with
+> wpa_supplicant.
+> ---
+>   tools/test-runner | 24 ++++++++++++++++++++++--
+>   1 file changed, 22 insertions(+), 2 deletions(-)
+> =
 
-If no address is set do REKEY_GTK which will only rekey the GTK.
----
- autotests/util/hostapd.py | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index 9f2dc745..22802be6 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -202,11 +202,15 @@ class HostapdCLI(object):
-         cmd =3D self.cmdline + ['req_beacon', addr, request]
-         ctx.start_process(cmd).wait()
- =
+Applied, thanks.
 
--    def rekey(self, address):
-+    def rekey(self, address=3DNone):
-+        if address:
-+            cmd =3D 'REKEY_PTK %s' % address
-+            self.ctrl_sock.sendall(cmd.encode('utf-8'))
-+            self.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
-+            return
-+
-         cmd =3D 'REKEY_GTK'
-         self.ctrl_sock.sendall(cmd.encode('utf-8'))
--        cmd =3D 'REKEY_PTK %s' % address
--        self.ctrl_sock.sendall(cmd.encode('utf-8'))
- =
+Regards,
+-Denis
 
-     @property
-     def bssid(self):
--- =
-
-2.31.1
-
---===============4847610455538422351==--
+--===============5352070984718684672==--
 
