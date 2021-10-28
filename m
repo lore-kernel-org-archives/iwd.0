@@ -1,48 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============2671539127645531033=="
+Content-Type: multipart/mixed; boundary="===============4330349087415711161=="
 MIME-Version: 1.0
-From: Diederik de Haas <didi.debian at cknow.org>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Doesn't create global config file or its directory (/etc/iwd/)
-Date: Sun, 09 Jan 2022 21:34:49 +0100
-Message-ID: <9439889.PT1sCMfpz1@bagend>
-In-Reply-To: 376533bb-ed0b-fdc4-203d-5c62cab26132@gmail.com
+Subject: [PATCH 3/3] test-runner: fix qemu warning for newer versions
+Date: Thu, 28 Oct 2021 10:34:10 -0700
+Message-ID: <20211028173410.86074-3-prestwoj@gmail.com>
+In-Reply-To: 20211028173410.86074-1-prestwoj@gmail.com
 
---===============2671539127645531033==
+--===============4330349087415711161==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Monday, 3 January 2022 21:34:32 CET Denis Kenzior wrote:
-> I added a sample doc/main.conf in commit:
-> 04fccea63bd4 ("doc: Add sample main.conf file").  We used to have somethi=
-ng
-> similar, but it was removed by commit:
-> e915156be1c6 ("doc: Remove obsolete main.conf example file")
-> =
+warning: short-form boolean option 'readonly' deprecated
+Please use readonly=3Don instead
+---
+ tools/test-runner | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> The sample covers main.conf options that should be most relevant towards =
-the
-> use case you describe.  If I missed some, we can add them as needed.  Let
-> us know if this is what the Debian package maintainer had in mind.
+diff --git a/tools/test-runner b/tools/test-runner
+index a1f86c00..d62f8b51 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -1806,7 +1806,7 @@ class Main:
+ 			'-display', 'none', '-m', '%dM' % ram, '-nographic', '-vga',
+ 			'none', '-no-acpi', '-no-hpet',
+ 			'-no-reboot', '-fsdev',
+-			'local,id=3Dfsdev-root,path=3D/,readonly,security_model=3Dnone,multidev=
+s=3Dremap',
++			'local,id=3Dfsdev-root,path=3D/,readonly=3Don,security_model=3Dnone,mul=
+tidevs=3Dremap',
+ 			'-device',
+ 			'virtio-9p-pci,fsdev=3Dfsdev-root,mount_tag=3D/dev/root',
+ 			'-chardev', 'stdio,id=3Dchardev-serial0,signal=3Doff',
+-- =
 
-from the Debian maintainer:
-Looks good to me.  Thanks!
+2.31.1
 
-Also thanks from my side :)
-
-Cheers,
-  Diederik
-
---===============2671539127645531033==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlIVUVBQllJQUIwV0lRVDFzVVBCWXN5R21p
-NHVzeS9YYmx2T2VIN2JiZ1VDWWR0RzZRQUtDUkRYYmx2T2VIN2IKYm5WWUFQNHkvK2pEZ3ZhcHd2
-ZjRzYkl2a2tqZEY0Z21raEZUZE5ycCtjZDhUeTRNamdFQTk2UU5idFJTVndPQgozNGFqcTJjZitF
-eHBhbkpSaVhTZXRDcUlPNTFFTVFrPQo9OGxibAotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============2671539127645531033==--
+--===============4330349087415711161==--
 
