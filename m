@@ -1,58 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============1653499772287795251=="
+Content-Type: multipart/mixed; boundary="===============0762353559939166347=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 10/13] auto-t: hostapd.py: separate GTK and PTK rekeys
-Date: Thu, 07 Oct 2021 13:49:54 -0700
-Message-ID: <20211007204957.3745985-10-prestwoj@gmail.com>
-In-Reply-To: 20211007204957.3745985-1-prestwoj@gmail.com
+Subject: [PATCH 2/3] test-runner: handle pyroute2 IW() between versions
+Date: Thu, 28 Oct 2021 10:34:09 -0700
+Message-ID: <20211028173410.86074-2-prestwoj@gmail.com>
+In-Reply-To: 20211028173410.86074-1-prestwoj@gmail.com
 
---===============1653499772287795251==
+--===============0762353559939166347==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-REKEY_GTK kicks off the GTK only handshake where REKEY_PTK does
-both (via the 4-way). The way this utility was written was causing
-hostapd some major issues since both REKEY_GTK and REKEY_PTK was
-used.
-
-Instead if address is set only do REKEY_PTK. This will also rekey
-the GTK via the 4-way handshake.
-
-If no address is set do REKEY_GTK which will only rekey the GTK.
+It appears different versions of pyroute2 may or may not have
+iwutil, and instead use pyroute2.IW() directly. Try the iwutil
+way first, then pyroute2.IW()
 ---
- autotests/util/hostapd.py | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ tools/test-runner | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index 9f2dc745..22802be6 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -202,11 +202,15 @@ class HostapdCLI(object):
-         cmd =3D self.cmdline + ['req_beacon', addr, request]
-         ctx.start_process(cmd).wait()
+diff --git a/tools/test-runner b/tools/test-runner
+index 6c7a7e45..a1f86c00 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -853,7 +853,11 @@ class TestContext(Namespace):
  =
 
--    def rekey(self, address):
-+    def rekey(self, address=3DNone):
-+        if address:
-+            cmd =3D 'REKEY_PTK %s' % address
-+            self.ctrl_sock.sendall(cmd.encode('utf-8'))
-+            self.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
-+            return
+ 	def discover_radios(self):
+ 		phys =3D []
+-		iw =3D pyroute2.iwutil.IW()
 +
-         cmd =3D 'REKEY_GTK'
-         self.ctrl_sock.sendall(cmd.encode('utf-8'))
--        cmd =3D 'REKEY_PTK %s' % address
--        self.ctrl_sock.sendall(cmd.encode('utf-8'))
++		try:
++			iw =3D pyroute2.iwutil.IW()
++		except:
++			iw =3D pyroute2.IW()
  =
 
-     @property
-     def bssid(self):
+ 		attrs =3D [phy['attrs'] for phy in iw.list_wiphy()]
+ =
+
 -- =
 
 2.31.1
 
---===============1653499772287795251==--
+--===============0762353559939166347==--
 
