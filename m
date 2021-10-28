@@ -1,110 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============1653658063739340383=="
+Content-Type: multipart/mixed; boundary="===============5086226110855285568=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 2/5] eapol: include OCI in GTK 2/2
-Date: Tue, 28 Sep 2021 15:05:04 -0700
-Message-ID: <20210928220507.944851-2-prestwoj@gmail.com>
-In-Reply-To: 20210928220507.944851-1-prestwoj@gmail.com
+Subject: [PATCH 1/3] test-runner: add support for PCI passthrough
+Date: Thu, 28 Oct 2021 10:34:08 -0700
+Message-ID: <20211028173410.86074-1-prestwoj@gmail.com>
 
---===============1653658063739340383==
+--===============5086226110855285568==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Adding back in PCI passthrough support
 ---
- src/eapol.c | 24 +++++++++++++++++++++++-
- src/eapol.h |  2 ++
- 2 files changed, 25 insertions(+), 1 deletion(-)
+ tools/test-runner | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 3127e066..9543bced 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -762,6 +762,8 @@ struct eapol_key *eapol_create_gtk_2_of_2(
- 				enum eapol_protocol_version protocol,
- 				enum eapol_key_descriptor_version version,
- 				uint64_t key_replay_counter,
-+				size_t extra_len,
-+				const uint8_t *extra_data,
- 				bool is_wpa, uint8_t wpa_key_id, size_t mic_len)
- {
- 	uint8_t snonce[32];
-@@ -770,7 +772,8 @@ struct eapol_key *eapol_create_gtk_2_of_2(
- 	memset(snonce, 0, sizeof(snonce));
- 	step2 =3D eapol_create_common(protocol, version, true,
- 					key_replay_counter, snonce,
--					0, NULL, 0, is_wpa, mic_len);
-+					extra_len, extra_data, 0, is_wpa,
-+					mic_len);
+diff --git a/tools/test-runner b/tools/test-runner
+index 156b36cc..6c7a7e45 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -1649,6 +1649,7 @@ class Main:
  =
 
- 	if (!step2)
- 		return step2;
-@@ -2010,6 +2013,8 @@ static void eapol_handle_gtk_1_of_2(struct eapol_sm *=
-sm,
- 	uint16_t igtk_key_index;
- 	const uint8_t *oci =3D NULL;
- 	size_t oci_len;
-+	uint8_t oci_out[9];
+ 	def start(self):
+ 		usb_adapters =3D None
++		pci_adapters =3D None
+ =
+
+ 		qemu_table =3D [
+ 			'qemu-system-x86_64',
+@@ -1691,7 +1692,7 @@ class Main:
+ 		if self.args.hw:
+ 			hw_conf =3D ConfigParser()
+ 			hw_conf.read(self.args.hw)
+-			# TODO: Parse PCI adapters
 +
+ 			if hw_conf.has_section('USBAdapters'):
+ 				# The actual key name of the adapter
+ 				# doesn't matter since all we need is the
+@@ -1699,6 +1700,9 @@ class Main:
+ 				# anyways once in the VM.
+ 				usb_adapters =3D [v for v in hw_conf['USBAdapters'].values()]
  =
 
- 	l_debug("ifindex=3D%u", hs->ifindex);
- =
-
-@@ -2068,6 +2073,22 @@ static void eapol_handle_gtk_1_of_2(struct eapol_sm =
-*sm,
- 	} else
- 		igtk =3D NULL;
- =
-
-+	/*
-+	 * IEEE 802.11-2020 Section 12.7.7.3
-+	 * "If dot11RSNAOperatingChannelValidationActivated is true and
-+	 * Supplicant RSNE indicates OCVC capability, the Authenticator silently
-+	 * discards message 2 if any of the following are true:
-+	 *     - OCI KDE is missing in the message
-+	 *     - Channel information in the OCI KDE does not match current
-+	 *       operating channel parameters (see 12.2.9)"
-+	 */
-+	if (sm->handshake->supplicant_ocvc && sm->handshake->chandef) {
-+		oci_out[0] =3D IE_TYPE_VENDOR_SPECIFIC;
-+		oci_out[1] =3D 4 + 3;
-+		l_put_be32(HANDSHAKE_KDE_OCI, oci_out + 2);
-+		oci_from_chandef(sm->handshake->chandef, oci_out + 6);
-+	}
++			if hw_conf.has_section('PCIAdapters'):
++				pci_adapters =3D [v for v in hw_conf['PCIAdapters'].values()]
 +
- 	/*
- 	 * 802.11-2016, Section 12.7.7.2:
- 	 * "
-@@ -2089,6 +2110,7 @@ static void eapol_handle_gtk_1_of_2(struct eapol_sm *=
-sm,
- 	step2 =3D eapol_create_gtk_2_of_2(sm->protocol_version,
- 					ek->key_descriptor_version,
- 					sm->replay_counter,
-+					oci_out[1] + 2, oci_out,
- 					hs->wpa_ie, ek->wpa_key_id,
- 					sm->mic_len);
- =
-
-diff --git a/src/eapol.h b/src/eapol.h
-index a948c018..53ae6e8f 100644
---- a/src/eapol.h
-+++ b/src/eapol.h
-@@ -95,6 +95,8 @@ struct eapol_key *eapol_create_gtk_2_of_2(
- 				enum eapol_protocol_version protocol,
- 				enum eapol_key_descriptor_version version,
- 				uint64_t key_replay_counter,
-+				size_t extra_len,
-+				const uint8_t *extra_data,
- 				bool is_wpa, uint8_t wpa_key_id,
- 				size_t mic_len);
- =
-
+ 		#
+ 		# Additional arguments not provided to test-runner which are
+ 		# needed once booted into the kernel.
+@@ -1828,6 +1832,11 @@ class Main:
+ 							'-device',
+ 							'usb-host,hostbus=3D%s,hostaddr=3D%s' % \
+ 							(bus, addr)])
++		if pci_adapters:
++			qemu_cmdline.extend(['-enable-kvm'])
++			for addr in pci_adapters:
++				qemu_cmdline.extend(['-device', 'vfio-pci,host=3D%s' % addr])
++
+ 		if self.args.log:
+ 			#
+ 			# Creates a virtfs device that can be mounted. This mount
 -- =
 
 2.31.1
 
---===============1653658063739340383==--
+--===============5086226110855285568==--
 
