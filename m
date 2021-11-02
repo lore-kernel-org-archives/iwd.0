@@ -1,54 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============3000240919107123466=="
+Content-Type: multipart/mixed; boundary="===============4699790046292549662=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 11/12] auto-t: add test for IWD as configurator + initiator
-Date: Tue, 18 Jan 2022 13:25:11 -0800
-Message-ID: <20220118212512.2017977-11-prestwoj@gmail.com>
-In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
+Subject: [PATCH 4/4] test-runner: increase test timeout maximum
+Date: Tue, 02 Nov 2021 12:57:52 -0700
+Message-ID: <20211102195752.381604-4-prestwoj@gmail.com>
+In-Reply-To: 20211102195752.381604-1-prestwoj@gmail.com
 
---===============3000240919107123466==
+--===============4699790046292549662==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+The OWE transition tests takes quite a while and sometimes hits the
+maximum timeout.
 ---
- autotests/testDPP/connection_test.py | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ tools/test-runner | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
-ction_test.py
-index 38d44b25..160e533e 100644
---- a/autotests/testDPP/connection_test.py
-+++ b/autotests/testDPP/connection_test.py
-@@ -82,6 +82,22 @@ class Test(unittest.TestCase):
+diff --git a/tools/test-runner b/tools/test-runner
+index d62f8b51..9ae33301 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -45,7 +45,7 @@ TIOCSTTY =3D 0x540E
+ config =3D None
+ intf_id =3D 0
  =
 
-         self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
+-TEST_MAX_TIMEOUT =3D 120
++TEST_MAX_TIMEOUT =3D 240
  =
 
-+    def test_iwd_as_configurator_initiator(self):
-+        self.hapd.reload()
-+        self.hapd.wait_for_event('AP-ENABLED')
-+
-+        IWD.copy_to_storage('ssidCCMP.psk')
-+        self.device.autoconnect =3D True
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        self.wd.wait_for_object_condition(self.device, condition)
-+
-+        uri =3D self.wpas.dpp_enrollee_start(oper_and_channel=3D'81/2')
-+
-+        self.device.dpp_start_configurator(uri)
-+
-+        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
-+
-     def setUp(self):
-         self.wd =3D IWD(True)
-         self.device =3D self.wd.list_devices(1)[0]
+ dbus.mainloop.glib.DBusGMainLoop(set_as_default=3DTrue)
+ =
+
 -- =
 
 2.31.1
 
---===============3000240919107123466==--
+--===============4699790046292549662==--
 
