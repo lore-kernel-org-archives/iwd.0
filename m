@@ -1,73 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============8973887726026590441=="
+Content-Type: multipart/mixed; boundary="===============5954945038344833398=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/2] offchannel: always call destroy right away on cancel
-Date: Wed, 15 Dec 2021 09:41:46 -0800
-Message-ID: <20211215174146.2465846-2-prestwoj@gmail.com>
-In-Reply-To: 20211215174146.2465846-1-prestwoj@gmail.com
+Subject: [PATCH 1/4] client: special case daemon interface for non-interactive
+Date: Tue, 02 Nov 2021 12:57:49 -0700
+Message-ID: <20211102195752.381604-1-prestwoj@gmail.com>
 
---===============8973887726026590441==
+--===============5954945038344833398==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The main cancel code path was not calling destroy immediately which
-was not consistent with other code paths/APIs.
+In non-interactive mode, when a dbus method call returns the process
+exits. This is true for all methods except agent requests since e.g.
+Connect() call automatically requests credentials and the client must
+wait for that to return before exiting. The new daemon interface must
+also be treated in the same way and not exit.
 ---
- src/offchannel.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ client/dbus-proxy.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/src/offchannel.c b/src/offchannel.c
-index ad35f4f6..4db3fcf2 100644
---- a/src/offchannel.c
-+++ b/src/offchannel.c
-@@ -208,20 +208,10 @@ void offchannel_cancel(uint64_t wdev_id, uint32_t id)
- 			goto work_done;
- 		}
- =
-
--		/*
--		 * Call destroy now to maintain consistency with any other
--		 * path leading to radio_work_done(). But set needs_cancel so
--		 * the ROC command can be canceled
--		 */
--		if (info->destroy)
--			info->destroy(info->error, info->user_data);
--
--		info->destroy =3D NULL;
--		info->started =3D NULL;
--		info->user_data =3D NULL;
-+		/* Lets the ROC callback know it needs to cancel the request */
- 		info->needs_cancel =3D true;
- =
-
--		return;
-+		goto destroy;
+diff --git a/client/dbus-proxy.c b/client/dbus-proxy.c
+index ab9fb5a5..0373a3df 100644
+--- a/client/dbus-proxy.c
++++ b/client/dbus-proxy.c
+@@ -315,7 +315,8 @@ static void proxy_callback(struct l_dbus_message *messa=
+ge, void *user_data)
  	}
  =
 
- 	/*
-@@ -239,6 +229,14 @@ void offchannel_cancel(uint64_t wdev_id, uint32_t id)
- 	 */
- 	offchannel_cancel_roc(info);
+ 	proxy =3D callback_data->user_data;
+-	if (!strcmp(proxy->type->interface, IWD_AGENT_MANAGER_INTERFACE))
++	if (!strcmp(proxy->type->interface, IWD_AGENT_MANAGER_INTERFACE) ||
++			!strcmp(proxy->type->interface, IWD_DAEMON_INTERFACE))
+ 		return;
  =
 
-+destroy:
-+	if (info->destroy)
-+		info->destroy(info->error, info->user_data);
-+
-+	info->destroy =3D NULL;
-+	info->started =3D NULL;
-+	info->user_data =3D NULL;
-+
- 	return;
- =
-
- work_done:
+ quit:
 -- =
 
 2.31.1
 
---===============8973887726026590441==--
+--===============5954945038344833398==--
 
