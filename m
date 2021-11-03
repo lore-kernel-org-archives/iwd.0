@@ -1,142 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============8464342615497591147=="
+Content-Type: multipart/mixed; boundary="===============1400555853352062736=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 06/13] auto-t: use wait_for_event in testBSSBlacklist
-Date: Mon, 28 Mar 2022 10:28:35 -0700
-Message-ID: <20220328172842.1660272-7-prestwoj@gmail.com>
-In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
+Subject: [PATCH 4/4] netconfig: netconfig_reconfigure check bool for setting
+ ARP
+Date: Wed, 03 Nov 2021 15:15:02 -0700
+Message-ID: <20211103221502.470442-4-prestwoj@gmail.com>
+In-Reply-To: 20211103221502.470442-1-prestwoj@gmail.com
 
---===============8464342615497591147==
+--===============1400555853352062736==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Depending on timing hostapd may not show a station with list_sta().
-Instead use wait_for_event.
+Only set the gateway to the ARP cache if the caller requests.
 ---
- autotests/testBSSBlacklist/connection_test.py | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ src/netconfig.c | 5 +++--
+ src/netconfig.h | 2 +-
+ src/station.c   | 3 ++-
+ 3 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/test=
-BSSBlacklist/connection_test.py
-index 6a12174d..df3bd507 100644
---- a/autotests/testBSSBlacklist/connection_test.py
-+++ b/autotests/testBSSBlacklist/connection_test.py
-@@ -33,7 +33,7 @@ class Test(unittest.TestCase):
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 6e885546..e7fd4855 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -1468,7 +1468,7 @@ bool netconfig_configure(struct netconfig *netconfig,
+ 	return true;
+ }
  =
 
-         dev1, dev2 =3D wd.list_devices(2)
+-bool netconfig_reconfigure(struct netconfig *netconfig)
++bool netconfig_reconfigure(struct netconfig *netconfig, bool set_arp_gw)
+ {
+ 	/*
+ 	 * Starting with kernel 4.20, ARP cache is flushed when the netdev
+@@ -1477,7 +1477,8 @@ bool netconfig_reconfigure(struct netconfig *netconfi=
+g)
+ 	 * lost or delayed.  Try to force the gateway into the ARP cache
+ 	 * to alleviate this
+ 	 */
+-	netconfig_gateway_to_arp(netconfig);
++	if (set_arp_gw)
++		netconfig_gateway_to_arp(netconfig);
  =
 
--        ordered_network =3D dev1.get_ordered_network("TestBlacklist")
-+        ordered_network =3D dev1.get_ordered_network("TestBlacklist", full=
-_scan=3DTrue)
+ 	if (netconfig->rtm_protocol =3D=3D RTPROT_DHCP) {
+ 		/* TODO l_dhcp_client sending a DHCP inform request */
+diff --git a/src/netconfig.h b/src/netconfig.h
+index c2e6a6f9..c9ac6f8f 100644
+--- a/src/netconfig.h
++++ b/src/netconfig.h
+@@ -36,7 +36,7 @@ bool netconfig_load_settings(struct netconfig *netconfig,
+ bool netconfig_configure(struct netconfig *netconfig,
+ 				netconfig_notify_func_t notify,
+ 				void *user_data);
+-bool netconfig_reconfigure(struct netconfig *netconfig);
++bool netconfig_reconfigure(struct netconfig *netconfig, bool set_arp_gw);
+ bool netconfig_reset(struct netconfig *netconfig);
+ char *netconfig_get_dhcp_server_ipv4(struct netconfig *netconfig);
+ bool netconfig_get_fils_ip_req(struct netconfig *netconfig,
+diff --git a/src/station.c b/src/station.c
+index 4bb8e60f..fcec0dfe 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1851,7 +1851,8 @@ static void station_roamed(struct station *station)
+ 		station_roam_timeout_rearm(station, roam_retry_interval);
  =
 
-         self.assertEqual(ordered_network.type, NetworkType.psk)
+ 	if (station->netconfig)
+-		netconfig_reconfigure(station->netconfig);
++		netconfig_reconfigure(station->netconfig,
++					!supports_arp_evict_nocarrier);
  =
 
-@@ -45,12 +45,12 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(dev1, condition)
- =
-
--        self.assertIn(dev1.address, bss_hostapd[2].list_sta())
-+        bss_hostapd[2].wait_for_event('AP-STA-CONNECTED %s' % dev1.address)
- =
-
-         # dev1 now connected, this should max out the first AP, causing th=
-e next
-         # connection to fail to this AP.
- =
-
--        ordered_network =3D dev2.get_ordered_network("TestBlacklist")
-+        ordered_network =3D dev2.get_ordered_network("TestBlacklist", full=
-_scan=3DTrue)
- =
-
-         self.assertEqual(ordered_network.type, NetworkType.psk)
- =
-
-@@ -64,7 +64,7 @@ class Test(unittest.TestCase):
- =
-
-         # We should have temporarily blacklisted the first BSS, and connec=
-ted
-         # to this one.
--        self.assertIn(dev2.address, bss_hostapd[1].list_sta())
-+        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % dev2.address)
- =
-
-         # Now check that the first BSS is still not blacklisted. We can
-         # disconnect dev1, opening up the AP for more connections
-@@ -83,7 +83,7 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(dev2, condition)
- =
-
--        self.assertIn(dev2.address, bss_hostapd[2].list_sta())
-+        bss_hostapd[2].wait_for_event('AP-STA-CONNECTED %s' % dev2.address)
- =
-
-         wd.unregister_psk_agent(psk_agent)
- =
-
-@@ -134,7 +134,7 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(device, condition)
- =
-
--        self.assertIn(device.address, bss_hostapd[0].list_sta())
-+        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
-ss)
- =
-
-         wd.unregister_psk_agent(psk_agent)
- =
-
-@@ -214,7 +214,7 @@ class Test(unittest.TestCase):
-         # should automatically try the next BSS in the list, which is
-         # bss_hostapd[1]
-         self.assertNotIn(device.address, bss_hostapd[0].list_sta())
--        self.assertIn(device.address, bss_hostapd[1].list_sta())
-+        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
-ss)
- =
-
-         rule0.drop =3D False
- =
-
-@@ -234,7 +234,7 @@ class Test(unittest.TestCase):
- =
-
-         # Same as before, make sure we didn't connect to the blacklisted A=
-P.
-         self.assertNotIn(device.address, bss_hostapd[0].list_sta())
--        self.assertIn(device.address, bss_hostapd[1].list_sta())
-+        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
-ss)
- =
-
-         # Wait for the blacklist to expire (10 seconds)
-         elapsed =3D time.time() - start
-@@ -264,7 +264,7 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(device, condition)
- =
-
--        self.assertIn(device.address, bss_hostapd[0].list_sta())
-+        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
-ss)
- =
-
-         self.wd.unregister_psk_agent(psk_agent)
- =
-
+ 	if (station->roam_freqs) {
+ 		scan_freq_set_free(station->roam_freqs);
 -- =
 
-2.34.1
+2.31.1
 
---===============8464342615497591147==--
+--===============1400555853352062736==--
 
