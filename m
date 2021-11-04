@@ -1,61 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============4488354740122002574=="
+Content-Type: multipart/mixed; boundary="===============4828191872890985493=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 1/6] dpp: don't allocate transient ssid strings
-Date: Fri, 07 Jan 2022 16:13:28 -0800
-Message-ID: <20220108001333.723634-1-prestwoj@gmail.com>
+Subject: [PATCH 1/5] scan: parse Proxy ARP bit from extended capabilities
+Date: Thu, 04 Nov 2021 10:57:54 -0700
+Message-ID: <20211104175758.532953-1-prestwoj@gmail.com>
 
---===============4488354740122002574==
+--===============4828191872890985493==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-These can be kept on the stack and avoid the need for
-allocated memory and unneeded auto-free functionality.
 ---
- src/dpp.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ src/scan.c | 17 +++++++++++++++++
+ src/scan.h |  1 +
+ 2 files changed, 18 insertions(+)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 20c27a57..61c6b36d 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -400,7 +400,7 @@ static void send_config_result(struct dpp_sm *dpp, cons=
-t uint8_t *to)
- static void dpp_write_config(struct dpp_configuration *config,
- 				struct network *network)
- {
--	_auto_(l_free) char *ssid =3D l_malloc(config->ssid_len + 1);
-+	char ssid[33];
- 	_auto_(l_settings_free) struct l_settings *settings =3D l_settings_new();
- 	_auto_(l_free) char *path;
- 	_auto_(l_free) uint8_t *psk =3D NULL;
-@@ -494,7 +494,7 @@ static void dpp_handle_config_response_frame(const stru=
-ct mmpdu_header *frame,
- 	struct station *station =3D station_find(netdev_get_ifindex(dpp->netdev));
- 	struct network *network;
- 	struct scan_bss *bss =3D NULL;
--	_auto_(l_free) char *ssid =3D NULL;
-+	char ssid[33];
+diff --git a/src/scan.c b/src/scan.c
+index be5953ad..2a96943b 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -1252,6 +1252,23 @@ static bool scan_parse_bss_information_elements(stru=
+ct scan_bss *bss,
+ 			bss->rc_ie =3D l_memdup(iter.data - 2, iter.len + 2);
  =
 
- 	if (dpp->state !=3D DPP_STATE_CONFIGURING)
- 		return;
-@@ -618,7 +618,6 @@ static void dpp_handle_config_response_frame(const stru=
-ct mmpdu_header *frame,
- 		return;
+ 			break;
++
++		case IE_TYPE_EXTENDED_CAPABILITIES:
++			/* 802.11-2020 9.4.2.26
++			 *
++			 * "The length of the Extended Capabilities field is
++			 * variable. If fewer bits are received in an Extended
++			 * Capabilities field than shown in Table 9-153, the
++			 * rest of the Extended Capabilities field bits are
++			 * assumed to be zero"
++			 *
++			 * Currently only Proxy ARP bit (12) is checked, and if
++			 * not found, this is not a fatal error.
++			 */
++			if (iter.len < 2)
++				break;
++
++			bss->proxy_arp =3D test_bit(iter.data, 12);
+ 		}
  	}
  =
 
--	ssid =3D l_malloc(config->ssid_len + 1);
- 	memcpy(ssid, config->ssid, config->ssid_len);
- 	ssid[config->ssid_len] =3D '\0';
- =
-
+diff --git a/src/scan.h b/src/scan.h
+index 22981585..0378ccca 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -86,6 +86,7 @@ struct scan_bss {
+ 	bool anqp_capable : 1;
+ 	bool hs20_capable : 1;
+ 	bool force_default_sae_group : 1;
++	bool proxy_arp : 1;
+ 	uint8_t cost_level : 3;
+ 	uint8_t cost_flags : 4;
+ };
 -- =
 
 2.31.1
 
---===============4488354740122002574==--
+--===============4828191872890985493==--
 
