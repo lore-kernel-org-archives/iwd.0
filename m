@@ -1,40 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============3616027517105330422=="
+Content-Type: multipart/mixed; boundary="===============1665690086556781513=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3] network: Hide hidden networks on connection error
-Date: Tue, 05 Apr 2022 09:34:29 -0500
-Message-ID: <07242056-a1fb-64b3-4aa5-bcbc26deb49e@gmail.com>
-In-Reply-To: MRZP264MB1544FC552250631C5868B22793E49@MRZP264MB1544.FRAP264.PROD.OUTLOOK.COM
+Subject: Re: [PATCH 1/5] scan: parse Proxy ARP bit from extended capabilities
+Date: Thu, 04 Nov 2021 14:31:21 -0500
+Message-ID: <c96bd01a-1ca9-1e8c-2e51-f42685116c13@gmail.com>
+In-Reply-To: 20211104175758.532953-1-prestwoj@gmail.com
 
---===============3616027517105330422==
+--===============1665690086556781513==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Emmanuel,
+Hi James,
 
-On 4/5/22 06:19, VAUTRIN Emmanuel (Canal Plus Prestataire) wrote:
-> If a user connection fails on a freshly scanned psk or open hidden networ=
-k,
-> during passphrase request or after, it shall be removed from the network =
-list.
-> Otherwise, it would be possible to directly connect to that known
-> network, which will appear as not hidden.
-> =
-
-> Commit 06ca8e20a9b0 ("station: Hide forgotten hidden networks")
+On 11/4/21 12:57 PM, James Prestwood wrote:
 > ---
->   src/network.c | 11 +++++++++++
->   src/station.c |  2 ++
->   2 files changed, 13 insertions(+)
-> =
+>   src/scan.c | 17 +++++++++++++++++
+>   src/scan.h |  1 +
+>   2 files changed, 18 insertions(+)
 
-
-Applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
 
---===============3616027517105330422==--
+--===============1665690086556781513==--
 
