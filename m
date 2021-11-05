@@ -1,144 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============2653349549683470215=="
+Content-Type: multipart/mixed; boundary="===============0640160081640498767=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: salahaldeen.altous at leica-camera.com
 To: iwd at lists.01.org
-Subject: [PATCH 3/4] test-runner: Don't require SUDO_GID to be set for logs
-Date: Wed, 30 Mar 2022 19:33:59 +0200
-Message-ID: <20220330173400.259961-3-andrew.zaborowski@intel.com>
-In-Reply-To: 20220330173400.259961-1-andrew.zaborowski@intel.com
+Subject: Re: IWD is running as AP with the build-in DHCP but android phones
+ report no internet connection and switch back to WiFi home network
+Date: Fri, 05 Nov 2021 17:47:31 +0000
+Message-ID: <20211105174731.2830.19174@ml01.vlan13.01.org>
+In-Reply-To: b29d30cd-7e96-3bed-4555-e79373f2dda9@gmail.com
 
---===============2653349549683470215==
+--===============0640160081640498767==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Base the root user check on os.getuid() instead of SUDO_GID so as not to
-implicitly require sudo.  SUDO_GID being set doesn't guarantee that the
-effective user is root either since you can sudo to non-root accounts.
----
- tools/test-runner | 47 ++++++++++++++++++++++++++---------------------
- 1 file changed, 26 insertions(+), 21 deletions(-)
+Hi Denis,
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 4ab42317..b443d91e 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -276,13 +276,16 @@ class Process(subprocess.Popen):
- 		return True
- =
+> Hi Salahaldeen,
+> =
 
- 	def _append_outfile(self, file, append=3DTrue):
--		gid =3D int(self.ctx.args.log_gid)
--		uid =3D int(self.ctx.args.log_uid)
- 		dir =3D os.path.dirname(file)
- =
+> On 11/5/21 10:14 AM, salahaldeen.altous(a)leica-camera.com wrote:
+> =
 
-+		if self.ctx.args.log_gid:
-+			gid =3D int(self.ctx.args.log_gid)
-+			uid =3D int(self.ctx.args.log_uid)
-+
- 		if not path_exists(dir):
- 			os.mkdir(dir)
--			os.chown(dir, uid, gid)
-+			if self.ctx.args.log_gid:
-+				os.chown(dir, uid, gid)
- =
+> Interesting.  Not sure why they would do that if the user explicitly sele=
+cted to =
 
- 		file =3D os.path.join(dir,file)
- =
+> connect to your device...
+not all Android phones are doing that. But many of them.
+> =
 
-@@ -299,7 +302,8 @@ class Process(subprocess.Popen):
- 			traceback.print_exc()
- 			exit(0)
- =
+> =
 
--		os.fchown(f.fileno(), uid, gid)
-+		if self.ctx.args.log_gid:
-+			os.fchown(f.fileno(), uid, gid)
- =
+> I suppose we could use the same approach.  Could you try the attached pat=
+ch and =
 
- 		self.write_fds.append(f)
- =
+> see if this helps.
+I have tested the attached patch but still not working. I have checked agai=
+n. We have dropped DHCP option 6 to report Domain Name servers
++dhcp-option=3Doption:dns-server
++dhcp-option=3Doption:router
 
-@@ -1833,46 +1837,47 @@ class Main:
- 		if self.args.sub_tests:
- 			options +=3D ' --sub_tests %s' % ','.join(self.args.sub_tests)
- =
+How I can also drop dhcp option 6 to report Domain Name servers?
+> =
 
-+		gid =3D None
-+		if os.environ.get('SUDO_GID', None):
-+			uid =3D int(os.environ['SUDO_UID'])
-+			gid =3D int(os.environ['SUDO_GID'])
-+
-+		append_gid_uid =3D False
-+
- 		if self.args.log:
--			if os.environ.get('SUDO_GID', None) is None:
-+			if os.getuid() !=3D 0:
- 				print("--log can only be used as root user")
- 				quit()
- =
+> Regards,
+> -Denis
 
- 			self.args.log =3D os.path.abspath(self.args.log)
--			uid =3D int(os.environ['SUDO_UID'])
--			gid =3D int(os.environ['SUDO_GID'])
-+			append_gid_uid =3D True
- =
-
- 			if not path_exists(self.args.log):
- 				os.mkdir(self.args.log)
--				os.chown(self.args.log, uid, gid)
--
--			options +=3D ' --log-gid %u' % gid
--			options +=3D ' --log-uid %u' % uid
-+				if gid:
-+					os.chown(self.args.log, uid, gid)
- =
-
- 		if self.args.monitor:
--			if os.environ.get('SUDO_GID', None) is None:
-+			if os.getuid() !=3D 0:
- 				print("--monitor can only be used as root user")
- 				quit()
- =
-
- 			self.args.monitor =3D os.path.abspath(self.args.monitor)
- 			mon_parent_dir =3D os.path.abspath(os.path.join(self.args.monitor, os.p=
-ardir))
--
--			options +=3D ' --log-gid %u' % int(os.environ['SUDO_GID'])
--			options +=3D ' --log-uid %u' % int(os.environ['SUDO_UID'])
-+			append_gid_uid =3D True
- =
-
- 		if self.args.result:
--			if os.environ.get('SUDO_GID', None) is None:
-+			if os.getuid() !=3D 0:
- 				print("--result can only be used as root user")
- 				quit()
- =
-
- 			self.args.result =3D os.path.abspath(self.args.result)
- 			result_parent_dir =3D os.path.abspath(os.path.join(self.args.result, os=
-.pardir))
-+			append_gid_uid =3D True
- =
-
--			if '--log-gid' not in options:
--				options +=3D ' --log-gid %u' % int(os.environ['SUDO_GID'])
--
--			if '--log-uid' not in options:
--				options +=3D ' --log-uid %u' % int(os.environ['SUDO_UID'])
-+		if append_gid_uid and gid:
-+			options +=3D ' --log-gid %u' % (gid,)
-+			options +=3D ' --log-uid %u' % (uid,)
- =
-
- 		denylist =3D [
- 			'auto_tests',
--- =
-
-2.32.0
-
---===============2653349549683470215==--
+Regards,
+Salahaldeen
+--===============0640160081640498767==--
 
