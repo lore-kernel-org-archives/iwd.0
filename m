@@ -1,40 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============7877577838844484290=="
+Content-Type: multipart/mixed; boundary="===============7375960914043668125=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/2] crypto: allow NULL 'ad' to aes_siv_decrypt
-Date: Thu, 16 Dec 2021 10:00:02 -0800
-Message-ID: <20211216180003.38883-1-prestwoj@gmail.com>
+Subject: Re: IWD is running as AP with the build-in DHCP but android phones
+ report no internet connection and switch back to WiFi home network
+Date: Fri, 05 Nov 2021 13:17:53 -0500
+Message-ID: <2459d9b7-2ba9-8798-21f6-35708f3ec8cc@gmail.com>
+In-Reply-To: 20211105174731.2830.19174@ml01.vlan13.01.org
 
---===============7877577838844484290==
+--===============7375960914043668125==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/crypto.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Hi Salahaldeen,
 
-diff --git a/src/crypto.c b/src/crypto.c
-index 475ebf36..cd50d6f7 100644
---- a/src/crypto.c
-+++ b/src/crypto.c
-@@ -389,7 +389,9 @@ bool aes_siv_decrypt(const void *key, size_t key_len, c=
-onst void *in,
- 	if (in_len < 16)
- 		return false;
- =
+> I have tested the attached patch but still not working. I have checked ag=
+ain. We have dropped DHCP option 6 to report Domain Name servers
+> +dhcp-option=3Doption:dns-server
+> +dhcp-option=3Doption:router
+> =
 
--	memcpy(iov, ad, sizeof(struct iovec) * num_ad);
-+	if (ad)
-+		memcpy(iov, ad, sizeof(struct iovec) * num_ad);
-+
- 	iov[num_ad].iov_base =3D (void *)out;
- 	iov[num_ad].iov_len =3D in_len - 16;
- 	num_ad++;
--- =
+> How I can also drop dhcp option 6 to report Domain Name servers?
 
-2.31.1
+So looking at ell/dhcp-server.c, we shouldn't be sending DNS server info un=
+less =
 
---===============7877577838844484290==--
+l_dhcp_server_set_dns has been called.  So this part seems OK.
+
+In iwd, src/ap.c...  We do not call l_dhcp_server_set_dns unless the profil=
+e =
+
+specifies it.  So if IPv4.DNSList isn't set, we should not be sending this =
+
+option in the lease.
+
+Can you look (or share) pcaps of iwd & dnsmasq DHCP exchanges to see / comp=
+are =
+
+what is actually happening?
+
+Regards,
+-Denis
+--===============7375960914043668125==--
 
