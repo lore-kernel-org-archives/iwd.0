@@ -1,58 +1,85 @@
-Content-Type: multipart/mixed; boundary="===============2050655941435623577=="
+Content-Type: multipart/mixed; boundary="===============0312241510991349700=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] scan: remove periodic scans from queue on abort
-Date: Mon, 07 Feb 2022 16:12:07 -0600
-Message-ID: <c1faf821-6eab-b1db-5180-ed3be95bd80a@gmail.com>
-In-Reply-To: 20220207212806.449583-1-prestwoj@gmail.com
+Subject: Re: [PATCH] station: Prevent a NULL pointer access
+Date: Sat, 06 Nov 2021 12:56:28 -0500
+Message-ID: <3c0e6c34-3054-276c-9f0f-44c57b173f84@gmail.com>
+In-Reply-To: 20211106023651.15224-1-noreply.torsten@gmail.com
 
---===============2050655941435623577==
+--===============0312241510991349700==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Torsten,
 
-On 2/7/22 15:28, James Prestwood wrote:
-> The periodic scan code was refactored to make normal scans and
-> periodic scans consistent by keeping both in the same queue. But
-> that change left out the abort path where periodic scans were not
-> actually removed from the queue.
-> =
+On 11/5/21 9:36 PM, Torsten Schmitz wrote:
+> There is an unchecked NULL pointer access in network_has_open_pair.
+> open_info can definitely be NULL, I have the coredumps to prove it.
+> Let's check owe_info too though.
 
-> This fixes a rare crash when a periodic scan has been triggered and
-> the device goes down. This path never removes the request from the
-> queue but still frees it. Then when the scan context is removed the
-> stale request is freed again.
-> =
+Thanks for the report.  Could you provide a bit more info about the network =
 
-> 0 0x4bb65b in scan_request_cancel src/scan.c:202
-> 1 0x64313c in l_queue_clear ell/queue.c:107
-> 2 0x643348 in l_queue_destroy ell/queue.c:82
-> 3 0x4bbfb7 in scan_context_free src/scan.c:209
-> 4 0x4c9a78 in scan_wdev_remove src/scan.c:2115
-> 5 0x42fecd in netdev_free src/netdev.c:965
-> 6 0x445827 in netdev_destroy src/netdev.c:6507
-> 7 0x52beb9 in manager_config_notify src/manager.c:765
-> 8 0x67084b in process_multicast ell/genl.c:1029
-> 9 0x67084b in received_data ell/genl.c:1096
-> 10 0x65e790 in io_callback ell/io.c:120
-> 11 0x65aaae in l_main_iterate ell/main.c:478
-> 12 0x65b213 in l_main_run ell/main.c:525
-> 13 0x65b213 in l_main_run ell/main.c:507
-> 14 0x65b72c in l_main_run_with_signal ell/main.c:647
-> 15 0x4124e7 in main src/main.c:532
+setup you managed to trigger this on?  I think the underlying cause would b=
+e =
+
+useful to put into the commit description.
+
 > ---
->   src/scan.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
+>   src/station.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
 > =
 
+> diff --git a/src/station.c b/src/station.c
+> index 19f2aaeb..75ec36df 100644
+> --- a/src/station.c
+> +++ b/src/station.c
+> @@ -693,11 +693,17 @@ static bool network_has_open_pair(struct network *n=
+etwork, struct scan_bss *owe)
+>   	const struct l_queue_entry *entry;
+>   	struct ie_owe_transition_info *owe_info =3D owe->owe_trans;
+>   =
 
-Applied, thanks.
+> +	if (!owe_info)
+> +		return false;
+> +
+
+This should not be necessary since owe_info is checked right before invokin=
+g =
+
+this function.  See station_owe_transition_results():
+
+	if (!bss->rsne || !bss->owe_trans ||
+		...
+		goto free;
+
+>   	for (entry =3D network_bss_list_get_entries(network); entry;
+>   				entry =3D entry->next) {
+>   		struct scan_bss *open =3D entry->data;
+>   		struct ie_owe_transition_info *open_info =3D open->owe_trans;
+>   =
+
+> +		if (!open_info)
+> +			continue;
+> +
+
+This would imply that this network has a set of APs that advertise the same =
+
+SSID, but do not advertise an OWE transition element, and some APs that do =
+
+advertise it?  I.e. some legacy APs that do not have a hidden partner?  If =
+so, =
+
+then this detail is worth mentioning.
+
+>   		/*
+>   		 * Check if this is an Open/Hidden pair:
+>   		 *
+> =
+
 
 Regards,
 -Denis
-
---===============2050655941435623577==--
+--===============0312241510991349700==--
 
