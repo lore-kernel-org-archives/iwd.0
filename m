@@ -1,110 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============6878199387932855937=="
+Content-Type: multipart/mixed; boundary="===============8754060143098494387=="
 MIME-Version: 1.0
-From: Michael Trimarchi <michael at amarulasolutions.com>
+From: Torsten Schmitz <noreply.torsten at gmail.com>
 To: iwd at lists.01.org
-Subject: [RFC PATCH V2] ap: Expose connected stations property
-Date: Sun, 24 Oct 2021 09:15:35 +0000
-Message-ID: <20211024091535.21296-1-michael@amarulasolutions.com>
+Subject: Re: [PATCH] station: Prevent a NULL pointer access
+Date: Sun, 07 Nov 2021 02:02:58 +0100
+Message-ID: <CFJ558V5FNXE.2CP12NH8WWZ8X@hostname>
+In-Reply-To: 3c0e6c34-3054-276c-9f0f-44c57b173f84@gmail.com
 
---===============6878199387932855937==
+--===============8754060143098494387==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add a way to be notified about the connected stations in access
-point mode. This can be used in order to ask from Diagnostic
-interface the properties for each station or to just use them
-from other services like connman or network manager to report
-the number of clients
+> Could you provide a bit more info about the
+> network setup you managed to trigger this on? =
 
-Signed-off-by: Michael Trimarchi <michael(a)amarulasolutions.com>
----
-Changes V1->V2:
-	typo in message dbus type
----
- src/ap.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
 
-diff --git a/src/ap.c b/src/ap.c
-index 46a7a6a8..e88be99c 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -98,6 +98,7 @@ struct ap_state {
- 	uint8_t netconfig_gateway4_mac[6];
- 	uint8_t netconfig_dns4_mac[6];
- =
+We have a mishmash of older and newer APs,
+some supporting mesh some don't all advertising the same SSID.
+There is an open and closed network.
+owe_info->ssid in the crash was the SSID of the open network.
+I do not use the open network and connecting to it with iwd
+fails.
 
-+	uint16_t connected_stations;
- 	bool started : 1;
- 	bool gtk_set : 1;
- 	bool netconfig_set_addr4 : 1;
-@@ -347,6 +348,7 @@ static void ap_new_rsna(struct sta_state *sta)
- 		event_data.assoc_ies_len =3D sta->assoc_ies_len;
- 		ap->ops->handle_event(AP_EVENT_STATION_ADDED, &event_data,
- 					ap->user_data);
-+		ap->connected_stations++;
- 	}
- }
- =
+> This would imply that this network has a set of APs that advertise the
+> same SSID, but do not advertise an OWE transition element, =
 
-@@ -385,6 +387,7 @@ static void ap_drop_rsna(struct sta_state *sta)
- 		event_data.mac =3D sta->addr;
- 		ap->ops->handle_event(AP_EVENT_STATION_REMOVED, &event_data,
- 					ap->user_data);
-+		ap->connected_stations++;
- 	}
- }
- =
+> and some APs that do advertise it? =
 
-@@ -3495,6 +3498,10 @@ static void ap_if_event_func(enum ap_event_type type=
-, const void *event_data,
- =
 
- 	case AP_EVENT_STATION_ADDED:
- 	case AP_EVENT_STATION_REMOVED:
-+		l_dbus_property_changed(dbus_get_bus(),
-+					netdev_get_path(ap_if->netdev),
-+					IWD_AP_INTERFACE, "ConnectedStations");
-+		break;
- 	case AP_EVENT_REGISTRATION_START:
- 	case AP_EVENT_REGISTRATION_SUCCESS:
- 	case AP_EVENT_PBC_MODE_EXIT:
-@@ -3626,6 +3633,19 @@ error:
- 	return dbus_error_from_errno(err, message);
- }
- =
+Sounds plausible.
 
-+static bool ap_dbus_property_connected_stations(struct l_dbus *dbus,
-+						struct l_dbus_message *message,
-+						struct l_dbus_message_builder *builder,
-+						void *user_data)
-+{
-+	struct ap_if_data *ap_if =3D user_data;
-+	uint16_t stations =3D ap_if->ap ? ap_if->ap->connected_stations : 0;
-+
-+	l_dbus_message_builder_append_basic(builder, 'q', &stations);
-+
-+	return true;
-+}
-+
- static bool ap_dbus_property_get_started(struct l_dbus *dbus,
- 					struct l_dbus_message *message,
- 					struct l_dbus_message_builder *builder,
-@@ -3668,6 +3688,9 @@ static void ap_setup_interface(struct l_dbus_interfac=
-e *interface)
- 					ap_dbus_property_get_started, NULL);
- 	l_dbus_interface_property(interface, "Name", 0, "s",
- 					ap_dbus_property_get_name, NULL);
-+
-+	l_dbus_interface_property(interface, "ConnectedStations", 0, "q",
-+					ap_dbus_property_connected_stations, NULL);
- }
- =
+>I.e. some legacy APs that do not have a hidden partner?
 
- static void ap_destroy_interface(void *user_data)
--- =
+iwd shows three hidden APs for that open network. Their addresses =
 
-2.25.1
+suggest they belong to the older APs without mesh support.
+So I think it is the older APs that do have hidden partners
+and advertise OWE transitions.
 
---===============6878199387932855937==--
+> > +	if (!owe_info)
+> > +		return false;
+> > +
+> This should not be necessary since owe_info is checked right before
+> invoking
+> this function. =
+
+
+Oh, that's right. =
+
+These big if statements seem good at hiding stuff.
+Perhaps "O2: Try to avoid complex if body" should apply
+to the if conditions as well?
+--===============8754060143098494387==--
 
