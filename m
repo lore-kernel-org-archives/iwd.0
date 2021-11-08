@@ -1,41 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============6712254839906225596=="
+Content-Type: multipart/mixed; boundary="===============4871043312951407986=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 06/10] dpp: pass dpp_sm to dpp_send_frame
-Date: Wed, 12 Jan 2022 09:40:45 -0600
-Message-ID: <def6a55e-7fc6-8579-31a7-2fde7ba1e3ea@gmail.com>
-In-Reply-To: 20220112005558.1158405-6-prestwoj@gmail.com
+Subject: [PATCH 9/9] doc: Document autotest radvd dependency
+Date: Mon, 08 Nov 2021 12:28:38 +0100
+Message-ID: <20211108112838.372416-9-andrew.zaborowski@intel.com>
+In-Reply-To: 20211108112838.372416-1-andrew.zaborowski@intel.com
 
---===============6712254839906225596==
+--===============4871043312951407986==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ doc/test-runner.txt | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 1/11/22 18:55, James Prestwood wrote:
-> The SM has the wdev_id already, so rather than using that or looking
-> up just pass the dpp_sm directly.
-> ---
->   src/dpp.c | 20 +++++++++-----------
->   1 file changed, 9 insertions(+), 11 deletions(-)
-> =
+diff --git a/doc/test-runner.txt b/doc/test-runner.txt
+index 9140aa0f..ef16aa75 100644
+--- a/doc/test-runner.txt
++++ b/doc/test-runner.txt
+@@ -29,6 +29,7 @@ OS:
+ 	11. ofono (optional)
+ 	12. phonesim (optional)
+ 	13. wpa_supplicant	2.9
++	14. radvd		2.18
+ =
 
+ Note: The version for hostapd is listed as 'recent'. Older hostapd versions
+ will work but we are continually adopting new features from hostapd and us=
+ing
+-- =
 
-<snip>
+2.32.0
 
->   =
-
-> -static void dpp_send_frame(uint64_t wdev_id, struct iovec *iov, size_t i=
-ov_len,
-> +static void dpp_send_frame(struct dpp_sm *dpp, struct iovec *iov, size_t=
- iov_len,
->   			uint32_t freq)
-
-I fixed up this line being > 80 chars and applied, thanks.
-
-Regards,
--Denis
---===============6712254839906225596==--
+--===============4871043312951407986==--
 
