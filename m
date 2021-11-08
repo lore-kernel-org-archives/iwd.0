@@ -1,440 +1,261 @@
-Content-Type: multipart/mixed; boundary="===============6946253109380652524=="
+Content-Type: multipart/mixed; boundary="===============8940491814407652265=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 3/5] tools: add decrypt-profile tool
-Date: Wed, 02 Feb 2022 11:57:01 -0800
-Message-ID: <0f83741e9822343bc98e47d3074f8061588f7847.camel@gmail.com>
-In-Reply-To: 9f6f5694-8f0a-4d01-69f5-b9695c5a0e4d@gmail.com
+Subject: [PATCH 5/9] netconfig: Try calling the agent before setting new values
+Date: Mon, 08 Nov 2021 12:28:34 +0100
+Message-ID: <20211108112838.372416-5-andrew.zaborowski@intel.com>
+In-Reply-To: 20211108112838.372416-1-andrew.zaborowski@intel.com
 
---===============6946253109380652524==
+--===============8940491814407652265==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2022-02-02 at 13:39 -0600, Denis Kenzior wrote:
-> Hi James,
-> =
+Implement the logic where, after netconfig decides on what address,
+gateway, DNS, etc. data to use, it calls the NetworkConfigurationAgent
+that may be registered and relies on it to commit the new values.  If no
+agent is registered it will proceed to set the new values as usual.  If
+it does make an agent call, it wlil wait for the call to return before
+signalling NETCONFIG_EVENT_CONNECTED.
+---
+ src/netconfig.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++
+ src/netconfig.h |   1 +
+ src/station.c   |   4 ++
+ 3 files changed, 119 insertions(+)
 
-> On 2/2/22 12:47, James Prestwood wrote:
-> > This tool will decrypt an IWD network profile which was previously
-> > encrypted using a systemd provided key. Either a text passphrase
-> > can be provided (--pass) or a file containing the secret (--file).
-> =
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 885e34a8..3a67c890 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -49,6 +49,7 @@
+ #include "src/resolve.h"
+ #include "src/util.h"
+ #include "src/ie.h"
++#include "src/agent.h"
+ #include "src/netconfig.h"
+ #include "src/sysfs.h"
+ =
 
-> You may want to provide some usage examples in the commit
-> description.=C2=A0 Maybe =
+@@ -97,6 +98,10 @@ struct netconfig {
+ 	uint32_t addr6_add_cmd_id;
+ 	uint32_t route4_add_gateway_cmd_id;
+ 	uint32_t route6_add_cmd_id;
++
++	const char *dbus_obj_path;
++	unsigned int agent_v4_req_id;
++	unsigned int agent_v6_req_id;
+ };
+ =
 
-> even mention stdin/--infile and stdout/-outfile use.
-> =
+ static struct l_netlink *rtnl;
+@@ -1031,6 +1036,92 @@ static void netconfig_ifaddr_del_cmd_cb(int error, u=
+int16_t type,
+ 				"Error %d: %s", error, strerror(-error));
+ }
+ =
 
-> > =
++static void netconfig_agent_req_cb(unsigned int req_id, enum agent_result =
+result,
++					void *user_data)
++{
++	struct netconfig *netconfig =3D user_data;
++	bool v4 =3D req_id =3D=3D netconfig->agent_v4_req_id;
++
++	if (v4)
++		netconfig->agent_v4_req_id =3D 0;
++	else
++		netconfig->agent_v6_req_id =3D 0;
++
++	if (result !=3D AGENT_RESULT_OK) {
++		l_error("Netconfig agent request for %s failed",
++			v4 ? "IPv4" : "IPv6");
++		/* TODO: report to user if v4 */
++		return;
++	}
++
++	l_debug("Netconfig agent request success for %s", v4 ? "IPv4" : "IPv6");
++
++	if (!v4)
++		return;
++
++	if (netconfig->notify) {
++		netconfig->notify(NETCONFIG_EVENT_CONNECTED,
++					netconfig->user_data);
++		netconfig->notify =3D NULL;
++	}
++}
++
++static bool netconfig_try_agent(struct netconfig *netconfig, uint8_t af)
++{
++	struct netconfig_data data =3D { .family =3D af };
++	const struct l_rtnl_address *addr;
++	char addr_str[INET6_ADDRSTRLEN];
++	char *v4_domains[] =3D { netconfig->v4_domain, NULL };
++	struct netdev *netdev =3D netdev_find(netconfig->ifindex);
++	unsigned int *id =3D (af =3D=3D AF_INET) ?
++		&netconfig->agent_v4_req_id : &netconfig->agent_v6_req_id;
++
++	if (!netconfig->dbus_obj_path)
++		return false;
++
++	addr =3D (af =3D=3D AF_INET) ? netconfig->v4_address : netconfig->v6_addr=
+ess;
++
++	if ((af =3D=3D AF_INET && netconfig->rtm_protocol =3D=3D RTPROT_STATIC) ||
++			(af =3D=3D AF_INET6 &&
++			 netconfig->rtm_v6_protocol =3D=3D RTPROT_STATIC))
++		data.method =3D NETCONFIG_METHOD_STATIC;
++	else if ((af =3D=3D AF_INET && netconfig->rtm_protocol =3D=3D RTPROT_DHCP=
+) ||
++			(af =3D=3D AF_INET6 &&
++			 netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP))
++		data.method =3D NETCONFIG_METHOD_AUTO;
++	else
++		return true;
++
++	if (addr) {
++		if (l_rtnl_address_get_address(addr, addr_str))
++			data.addr =3D addr_str;
++
++		data.prefix_len =3D l_rtnl_address_get_prefix_length(addr);
++	}
++
++	data.gateway_addr =3D (af =3D=3D AF_INET) ?
++		netconfig->v4_gateway_str : netconfig->v6_gateway_str;
++	data.dns =3D (af =3D=3D AF_INET) ?
++		netconfig->dns4_list : netconfig->dns6_list;
++	data.domain_names =3D (af =3D=3D AF_INET) ?
++		(v4_domains[0] ? v4_domains : NULL) : netconfig->v6_domains;
++
++	if (*id)
++		agent_request_cancel(*id, -ECANCELED);
++
++	*id =3D agent_request_netconfig(netconfig->dbus_obj_path,
++						netdev_get_name(netdev),
++						&data,
++						netconfig_agent_req_cb,
++						netconfig, NULL);
++	if (!*id)
++		return false;
++
++	l_debug("Netconfig request for %s on %s sent to agent",
++		(af =3D=3D AF_INET) ? "IPv4" : "IPv6", netdev_get_name(netdev));
++	return true;
++}
++
+ static bool netconfig_address_cmp_address(const struct l_rtnl_address *a,
+ 						const struct l_rtnl_address *b)
+ {
+@@ -1068,6 +1159,9 @@ static void netconfig_set(struct netconfig *netconfig=
+, uint8_t af,
+ {
+ 	struct l_rtnl_address *stale_addr;
+ =
 
-> > This can be useful for debugging, or recovering an encrypted
-> > profile after enabling SystemdEncrypt.
-> > ---
-> > =C2=A0 Makefile.am=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 8 +-
-> > =C2=A0 tools/decrypt-profile.c | 232
-> > ++++++++++++++++++++++++++++++++++++++++
-> > =C2=A0 2 files changed, 239 insertions(+), 1 deletion(-)
-> > =C2=A0 create mode 100644 tools/decrypt-profile.c
-> > =
++	if (netconfig_try_agent(netconfig, af))
++		return;
++
+ 	if (af =3D=3D AF_INET)
+ 		stale_addr =3D l_steal_ptr(netconfig->stale_v4_address);
+ 	else
+@@ -1390,6 +1484,12 @@ static void netconfig_reset_v4(struct netconfig *net=
+config)
+ =
 
-> > diff --git a/Makefile.am b/Makefile.am
-> > index 35938d22..a106b56f 100644
-> > --- a/Makefile.am
-> > +++ b/Makefile.am
-> > @@ -362,7 +362,7 @@ man_MANS +=3D wired/ead.8
-> > =C2=A0 endif
-> > =C2=A0 endif
-> > =C2=A0 =
+ 		l_acd_destroy(netconfig->acd);
+ 		netconfig->acd =3D NULL;
++
++		if (netconfig->agent_v4_req_id) {
++			agent_request_cancel(netconfig->agent_v4_req_id,
++						-ECANCELED);
++			netconfig->agent_v4_req_id =3D 0;
++		}
+ 	}
+ }
+ =
 
-> > -noinst_PROGRAMS +=3D tools/probe-req
-> > +noinst_PROGRAMS +=3D tools/probe-req tools/decrypt-profile
-> =
+@@ -1429,6 +1529,12 @@ static void netconfig_reset_v6(struct netconfig *net=
+config)
+ =
 
-> Should this be an installed binary?=C2=A0 Something like iwd-decrypt-
-> profile?
+ 		sysfs_write_ipv6_setting(netdev_get_name(netdev),
+ 						"disable_ipv6", "1");
++
++		if (netconfig->agent_v6_req_id) {
++			agent_request_cancel(netconfig->agent_v6_req_id,
++						-ECANCELED);
++			netconfig->agent_v6_req_id =3D 0;
++		}
+ 	}
+ }
+ =
 
-Sure, is there anything else I need to do for that? or anything named
-iwd-* gets installed?
+@@ -1785,6 +1891,8 @@ bool netconfig_reconfigure(struct netconfig *netconfi=
+g, bool set_arp_gw)
+ =
 
-> =
+ bool netconfig_reset(struct netconfig *netconfig)
+ {
++	netconfig->dbus_obj_path =3D NULL;
++
+ 	if (netconfig->route4_add_gateway_cmd_id) {
+ 		l_netlink_cancel(rtnl, netconfig->route4_add_gateway_cmd_id);
+ 		netconfig->route4_add_gateway_cmd_id =3D 0;
+@@ -1925,6 +2033,11 @@ void netconfig_destroy(struct netconfig *netconfig)
+ 	netconfig_free(netconfig);
+ }
+ =
 
-> > +#include <stdio.h>
-> > +#include <unistd.h>
-> > +#include <libgen.h> > +#include <fcntl.h>
-> =
++void netconfig_set_dbus_path(struct netconfig *netconfig, const char *path)
++{
++	netconfig->dbus_obj_path =3D path;
++}
++
+ bool netconfig_enabled(void)
+ {
+ 	bool enabled;
+@@ -2004,3 +2117,4 @@ static void netconfig_exit(void)
+ }
+ =
 
-> Isn't sys/stat.h enough? In any case, you might want to group related
-> #includes =
+ IWD_MODULE(netconfig, netconfig_init, netconfig_exit)
++IWD_MODULE_DEPENDS(netconfig, agent)
+diff --git a/src/netconfig.h b/src/netconfig.h
+index 48018bc1..77855b26 100644
+--- a/src/netconfig.h
++++ b/src/netconfig.h
+@@ -61,5 +61,6 @@ void netconfig_handle_fils_ip_resp(struct netconfig *netc=
+onfig,
+ =
 
-> together.
-
-libgen.h is for basename(). The pattern I usually follow groups all
-system includes together, then ELL, then locals, so I could put a
-newline before <ell/ell.h> but I'm not sure how else I could group the
-system includes...
-
-> =
-
-> > +#include <getopt.h>
-> > +#include <sys/stat.h>
-> > +#include <ell/ell.h>
-> > +
-> > +#include "ell/useful.h"
-> > +
-> > +#include "src/storage.h"
-> > +
-> =
-
-> <snip>
-> =
-
-> > +int main(int argc, char *argv[])
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *pass =3D NULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *file =3D NULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *infile =3D NULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *outfile =3D NULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_auto_(l_free) char *ssid =
-=3D NULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_auto_(l_free) char *decrypt=
-ed =3D NULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_auto_(l_settings_free) stru=
-ct l_settings *settings =3D NULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_auto_(l_free) uint8_t *secr=
-et =3D NULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0size_t secret_len =3D 0;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int ret =3D EXIT_FAILURE;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char profile[BUFSIZ];
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ssize_t len =3D 0;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char *line;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (isatty(0))
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0goto done_reading;
-> =
-
-> Err, why is the command line arguments not being parsed first?=C2=A0 I
-> mean you might =
-
-> want to use 'decrypt-profile --help' ?
-> =
-
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while ((line =3D fgets(profi=
-le + len, sizeof(profile) - len,
-> > stdin)))
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0len +=3D strlen(profile + len);
-> =
-
-> You should check whether infile was specified prior to attempting
-> this.
-> =
-
-> > +
-> > +done_reading:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (;;) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0int opt;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0opt =3D getopt_long(argc, argv, "pfhio",
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0main_options, NULL);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (opt < 0)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0switch (opt) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'p':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pass =
-=3D optarg;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'f':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0file =
-=3D optarg;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'i':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0infile=
- =3D optarg;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'o':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0outfil=
-e =3D optarg;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 's':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ssid =
-=3D l_strdup(optarg);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'h':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0usage(=
+ struct netconfig *netconfig_new(uint32_t ifindex);
+ void netconfig_destroy(struct netconfig *netconfig);
++void netconfig_set_dbus_path(struct netconfig *netconfig, const char *path=
 );
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return=
- EXIT_SUCCESS;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0default:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto f=
-ailed;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!file && !pass) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0usage();
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0goto failed;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> So if infile specified, read that.=C2=A0 Otherwise, if no --ssid, fail.=
-=C2=A0
-> Read stdin...
-> =
+ =
 
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!len && !infile) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0printf("No input file (use stdin or --
-> > infile)\n\n");
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0usage();
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0goto failed;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (len && infile) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0printf("Use only stdin or --infile for input
-> > profile\n\n");
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0usage();
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0goto failed;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> =
+ bool netconfig_enabled(void);
+diff --git a/src/station.c b/src/station.c
+index 19f2aaeb..aca59550 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2816,6 +2816,10 @@ static void station_connect_ok(struct station *stati=
+on)
+ 			}
+ 		}
+ =
 
-> Check for ssid and override that.
-> =
++		/* The path remains valid until connected_network changes */
++		netconfig_set_dbus_path(station->netconfig,
++				network_get_path(station->connected_network));
++
+ 		if (L_WARN_ON(!netconfig_configure(station->netconfig,
+ 						station_netconfig_event_handler,
+ 						station)))
+-- =
 
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (infile) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/* Try and detect SSID from input file */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (!ssid) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char *=
-dot;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ssid =
-=3D l_strdup(basename((char *)infile));
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* rem=
-ove extension */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dot =
-=3D strchr(ssid, '.');
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!d=
-ot)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto no_ssid;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*dot =
-=3D '\0';
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> =
+2.32.0
 
-> That isn't how ssids are stored in the profile.=C2=A0 You're better off
-> relying on =
-
-> storage_network_ssid_from_path() from storage.c here.
-
-Ok, that one is actually safe to use so I'll use it instead.
-
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0len =3D read_file(profile, sizeof(profile), "%s",
-> > infile);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (len < 0) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf=
-("Could not read from %s (%ld)\n",
-> > infile, len);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto f=
-ailed;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> =
-
-> Why not rely on the new functions from patch 1?=C2=A0 We could introduce a
-> full-path =
-
-> version of storage_network_open maybe.
-
-We could if you want. I just didn't want to add another API.
-
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!ssid) {
-> > +no_ssid:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0printf("Can't detect SSID from input source (use --
-> > ssid)\n");
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0goto failed;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (pass) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0secret_len =3D strlen(pass);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0secret =3D l_memdup(pass, secret_len);
-> =
-
-> Why do we need the memdup?
-
-Consistency with secret_from_file(), but yes, mmap will avoid the need
-for this.
-
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0secret =3D secret_from_file(file, &secret_len);
-> =
-
-> This could actually be an mmap instead.
-> =
-
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0__storage_set_encryption_key=
-(secret, secret_len);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0settings =3D l_settings_new(=
-);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!l_settings_load_from_da=
-ta(settings, profile, len)) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0printf("Profile is not formatted correctly\n");
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0goto failed;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!__storage_decrypt(setti=
-ngs, ssid, NULL)) {
-> =
-
-> Note that you will also get errors from this function as well.=C2=A0 So
-> I'm not sure =
-
-> if you want to re-design it to not print unnecessarily.
-
-__storage_decrypt() shouldn't print anything in this context since I
-haven't enabled logging (previous patch sets did though).
-
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0printf("Unable to decrypt profile\n");
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0goto failed;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0decrypted =3D l_settings_to_=
-data(settings, (size_t *)&len);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!outfile)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0printf("%s\n", decrypted);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0else {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0int fd =3D open(outfile, O_CREAT | O_WRONLY, S_IRUSR
-> > | S_IWUSR);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (fd < 0) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf=
-("Unable to open %s (%d)\n\n",
-> > outfile, fd);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0close(=
-fd);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto f=
-ailed;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0len =3D write(fd, decrypted, len);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0close(fd);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (len < 0) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf=
-("Unable to write to %s (%ld)\n\n",
-> > outfile, len);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto f=
-ailed;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D EXIT_SUCCESS;
-> > +
-> > +failed:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return ret;
-> > +}
-> > =
-
-> =
-
-> Regards,
-> -Denis
-
-
---===============6946253109380652524==--
+--===============8940491814407652265==--
 
