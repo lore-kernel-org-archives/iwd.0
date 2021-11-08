@@ -1,41 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============9218048437382835250=="
+Content-Type: multipart/mixed; boundary="===============1718542187841113507=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 3/3] build: ignore unknown warnings/pragmas for CC=clang
-Date: Fri, 10 Jun 2022 12:52:42 -0700
-Message-ID: <20220610195242.455453-3-prestwoj@gmail.com>
-In-Reply-To: 20220610195242.455453-1-prestwoj@gmail.com
+Subject: [PATCH 1/2] scan: use signal strength if bss ranks are equal
+Date: Mon, 08 Nov 2021 11:39:29 -0800
+Message-ID: <20211108193930.1013040-1-prestwoj@gmail.com>
 
---===============9218048437382835250==
+--===============1718542187841113507==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-IWD uses a few pragmas to ignore warnings which clang does
-not support. For -Werror builds these cause build failures
-but can be fixed by ignoring unknown warnings and pragmas.
+If two BSS's end up with the same rank sort them based on signal
+strength so IWD still prefers the higher strength BSS.
 ---
- acinclude.m4 | 5 +++++
- 1 file changed, 5 insertions(+)
+ src/scan.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index a66a3746..3fd96236 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -64,4 +64,9 @@ AC_DEFUN([COMPILER_FLAGS], [
- 			CFLAGS+=3D" -Wcast-align"
- 		fi
- 	fi
+diff --git a/src/scan.c b/src/scan.c
+index da7d129f..38a15c11 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -1628,6 +1628,10 @@ int scan_bss_rank_compare(const void *a, const void =
+*b, void *user_data)
+ {
+ 	const struct scan_bss *new_bss =3D a, *bss =3D b;
+ =
+
++	if (bss->rank =3D=3D new_bss->rank)
++		return (bss->signal_strength >
++					new_bss->signal_strength) ? 1 : -1;
 +
-+	if (test "$CC" =3D "clang"); then
-+		CFLAGS+=3D" -Wno-unknown-warning-option"
-+		CFLAGS+=3D" -Wno-unknown-pragmas"
-+	fi
- ])
+ 	return (bss->rank > new_bss->rank) ? 1 : -1;
+ }
+ =
+
 -- =
 
-2.34.1
+2.31.1
 
---===============9218048437382835250==--
+--===============1718542187841113507==--
 
