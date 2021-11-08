@@ -1,58 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============1970601524475265883=="
+Content-Type: multipart/mixed; boundary="===============7264328273967581654=="
 MIME-Version: 1.0
-From: Dayo <dayo05 at daum.net>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: [PATCH] Improve d-bus error message on iwctl
-Date: Thu, 31 Mar 2022 17:10:50 +0900
-Message-ID: <20220331171050.QGFDw5V2QzKCgc9ClG0jFw@dayo05.hanmail.net>
+Subject: [PATCH 6/9] netconfig: Don't start ACD with FILS IP Assignment
+Date: Mon, 08 Nov 2021 12:28:35 +0100
+Message-ID: <20211108112838.372416-6-andrew.zaborowski@intel.com>
+In-Reply-To: 20211108112838.372416-1-andrew.zaborowski@intel.com
 
---===============1970601524475265883==
+--===============7264328273967581654==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Restore the older behaviour where ACD was started only with static
+addressing.  There are various arguments for saving setup time by not
+doing ACD when a wifi network has IP addresses managed centrally (and
+some arguments against), for now just restore the behaviour from before
+FILS IP Assignment was added.
+---
+ src/netconfig.c | 34 ++++++++++++++++++++--------------
+ 1 file changed, 20 insertions(+), 14 deletions(-)
 
---===============1970601524475265883==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.htm"
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 3a67c890..bffa7da4 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -1622,22 +1622,28 @@ static bool netconfig_ipv4_select_and_install(struc=
+t netconfig *netconfig)
+ 							ip)))
+ 			return false;
+ =
 
-PGh0bWw+CjxoZWFkPgogICAgPHN0eWxlPgogICAgICAgIHB7bWFyZ2luLXRvcDowO21hcmdpbi1i
-b3R0b206MH0KICAgIDwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+CiAgICA8ZGl2IHN0eWxlPSJjb2xv
-cjojMTExO2ZvbnQtZmFtaWx5OkFwcGxlIFNEIEdvdGhpYyBOZW8sTWFsZ3VuIEdvdGhpYywn66eR
-7J2AIOqzoOuUlScsc2Fucy1zZXJpZjtmb250LXNpemU6MTBwdDtsaW5lLWhlaWdodDoxLjU7Ij48
-cD5JIGdvdCBlcnJvciBvZiA8YnI+PC9wPgo8cD7vu79SZWplY3RlZCBzZW5kIG1lc3NhZ2UsIDIg
-bWF0Y2hlZCBydWxlczsgdHlwZT0ibWV0aG9kX2NhbGwiLCBzZW5kZXI9IjoxLjEzNyIgKHVpZD0x
-MDAwIHBpZD0xNDMyNSBjb21tPSJjbGllbnQvaXdjdGwiKSBpbnRlcmZhY2U9Im9yZy5mcmVlZGVz
-a3RvcC5EQnVzLk9iamVjdE1hbmFnZXIiIG1lbWJlcj0iR2V0TWFuYWdlZE9iamVjdHMiIGVycm9y
-IG5hbWU9Iih1bnNldCkiIHJlcXVlc3RlZF9yZXBseT0iMCIgZGVzdGluYXRpb249Im5ldC5jb25u
-bWFuLml3ZCIgKHVpZD0wIHBpZD0zNTQgY29tbT0iL3Vzci9saWIvaXdkL2l3ZCIpPGJyPmluIGV4
-ZWN1dGlvbiBvZiBpd2N0bCB3aXRob3V0IHN1ZG8uIEJ1dCB3aGVuIEkgdHJpZWQgdG8gc2VhcmNo
-IHRoYXQsIEl0IGhhcyBsb3cgaW5mb3JtYXRpb24gaW4gZ29vZ2xlIGJ1dCBJIHNvbHZlIHRoZSBp
-c3N1ZSBhcyBleGVjdXRpbmcgd2l0aCBzdWRvLiBTbyB0aGlzIGlzIHZlcnkgc21hbGwgY2hhbmdl
-IGJ1dCB0aGlzIHdpbGwgaW1wcm92ZSB0aGlzIHNvZnR3YXJlLjwvcD4KPHA+77u/PC9wPgo8cD7v
-u79wcy4gSSBnZXQgaXNzdWUgaW4gbGludXgga2VybmVsIDUuMTYgYW5kIGxhdGVyLCBpbmNsdWRp
-bmcgNS4xNy54PGJyPjwvcD4KPHA+77u/PC9wPgo8cD7vu788YnI+PC9wPgo8cD7vu78tLS08YnI+
-Jm5ic3A7Y2xpZW50L2RidXMtcHJveHkuYyB8IDEgKzxicj4mbmJzcDsxIGZpbGUgY2hhbmdlZCwg
-MSBpbnNlcnRpb24oKyk8YnI+PGJyPmRpZmYgLS1naXQgYS9jbGllbnQvZGJ1cy1wcm94eS5jIGIv
-Y2xpZW50L2RidXMtcHJveHkuYzxicj5pbmRleCAwMzczYTNkZi4uOGNhZDNlY2UgMTAwNjQ0PGJy
-Pi0tLSBhL2NsaWVudC9kYnVzLXByb3h5LmM8YnI+KysrIGIvY2xpZW50L2RidXMtcHJveHkuYzxi
-cj5AQCAtNzIyLDYgKzcyMiw3IEBAIHN0YXRpYyB2b2lkIGdldF9tYW5hZ2VkX29iamVjdHNfY2Fs
-bGJhY2soc3RydWN0IGxfZGJ1c19tZXNzYWdlICptZXNzYWdlLDxicj4mbmJzcDsmbmJzcDsmbmJz
-cDsgJm5ic3A7aWYgKGRidXNfbWVzc2FnZV9oYXNfZXJyb3IobWVzc2FnZSkpIHs8YnI+Jm5ic3A7
-Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDtkaXNwbGF5X2Vycm9yKCJGYWls
-ZWQgdG8gcmV0cmlldmUgSVdEIGRidXMgb2JqZWN0cywgIjxicj4mbmJzcDsmbmJzcDsmbmJzcDsg
-Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsg
-Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsg
-Jm5ic3A7InF1aXR0aW5nLi4uXG4iKTs8YnI+KyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJz
-cDsgJm5ic3A7ZGlzcGxheSgiRXhlY3V0ZSBpd2N0bCB3aXRoIHJvb3QgcGVybWlzc2lvbiBpcyB0
-aGUgb25lIHdheSB0byBzb2x2ZSB0aGlzIGlzc3VlLlxuIik7PGJyPiZuYnNwOzxicj4mbmJzcDsm
-bmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwO2dvdG8gZXJyb3I7PGJyPiZuYnNw
-OyZuYnNwOyZuYnNwOyAmbmJzcDt9PGJyPi0tIDxicj4yLjM1LjE8YnI+PGJyPjxicj48L3A+PC9k
-aXY+CjwvYm9keT4KPC9odG1sPgo8aW1nIHNyYz0iaHR0cHM6Ly9jb25maXJtLm1haWwuZGF1bS5u
-ZXQvY29uZmlybWFwaS92MS91c2Vycy9kYXlvMDUlNDBoYW5tYWlsJTJFbmV0L2NtYWlscy8yMDIy
-MDMzMTE3MTA1MCUyRVFHRkR3NVYyUXpLQ2djOUNsRzBqRnclNDBkYXlvMDUlMkVoYW5tYWlsJTJF
-bmV0L3JlY2lwaWVudHMvaXdkJTQwbGlzdHMlMkUwMSUyRW9yZyI+
---===============1970601524475265883==--
+-		netconfig->acd =3D l_acd_new(netconfig->ifindex);
+-		l_acd_set_event_handler(netconfig->acd,
+-					netconfig_ipv4_acd_event, netconfig,
+-					NULL);
+-		if (getenv("IWD_ACD_DEBUG"))
+-			l_acd_set_debug(netconfig->acd, do_debug,
+-					"[ACD] ", NULL);
+-
+-		if (!l_acd_start(netconfig->acd, ip)) {
+-			l_error("failed to start ACD, continuing anyways");
+-			l_acd_destroy(netconfig->acd);
+-			netconfig->acd =3D NULL;
++		if (netconfig->rtm_protocol =3D=3D RTPROT_STATIC) {
++			netconfig->acd =3D l_acd_new(netconfig->ifindex);
++			l_acd_set_event_handler(netconfig->acd,
++						netconfig_ipv4_acd_event,
++						netconfig, NULL);
+ =
+
+-			netconfig_set(netconfig, AF_INET, changed);
+-		} else
++			if (getenv("IWD_ACD_DEBUG"))
++				l_acd_set_debug(netconfig->acd, do_debug,
++						"[ACD] ", NULL);
++
++			if (!l_acd_start(netconfig->acd, ip)) {
++				l_error("failed to start ACD, continuing "
++					"anyways");
++				l_acd_destroy(netconfig->acd);
++				netconfig->acd =3D NULL;
++			}
++		}
++
++		if (netconfig->acd)
+ 			netconfig->pending_v4_set |=3D changed;
++		else
++			netconfig_set(netconfig, AF_INET, changed);
+ =
+
+ 		return true;
+ 	}
+-- =
+
+2.32.0
+
+--===============7264328273967581654==--
 
