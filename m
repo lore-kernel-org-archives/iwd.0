@@ -1,60 +1,159 @@
-Content-Type: multipart/mixed; boundary="===============4808918223495459924=="
+Content-Type: multipart/mixed; boundary="===============6333507091170156451=="
 MIME-Version: 1.0
-From: KeithG <ys3al35l at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: iwd configure location and files
-Date: Tue, 30 Nov 2021 16:36:04 -0600
-Message-ID: <CAG17S_Pc-j0=CW1yrkbjWibooNYM4ycqKrXfJGAUVxE98QgMQg@mail.gmail.com>
-In-Reply-To: d899ecf8-deb2-f526-c20f-0fd80aba9841@gmail.com
+Subject: [PATCH 2/9] netconfig: Move FILS override checks to common functions
+Date: Mon, 08 Nov 2021 12:28:31 +0100
+Message-ID: <20211108112838.372416-2-andrew.zaborowski@intel.com>
+In-Reply-To: 20211108112838.372416-1-andrew.zaborowski@intel.com
 
---===============4808918223495459924==
+--===============6333507091170156451==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-My suggestion is along these lines. Shut down connman and run iwd
-stand alone. Use iwctl to see if it will connect to the SSID. If this
-works, delete the associated SSID files created in /var/lib/iwd. Then
-start connman and try to connect using connmanctl. I went through this
-a while back, so it does work as long as the kernel is configured for
-it and you are using recent iwd and connman. I am using connman 1.40
-and iwd 1.20 on Arch Linux Arm (RPi) and am pleased with the
-performance.
+---
+ src/netconfig.c | 56 ++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 37 insertions(+), 19 deletions(-)
 
-Keith
+diff --git a/src/netconfig.c b/src/netconfig.c
+index ea77e818..885e34a8 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -189,6 +189,36 @@ static inline char *netconfig_ipv6_to_string(const uin=
+t8_t *addr)
+ 	return addr_str;
+ }
+ =
 
-On Tue, Nov 30, 2021 at 4:04 PM Denis Kenzior <denkenz(a)gmail.com> wrote:
->
-> Hi Jupiter,
->
-> >                                 Available networks
-> > -----------------------------------------------------------------------=
----------
-> >      Network name                    Security          Signal
-> > -----------------------------------------------------------------------=
----------
-> >      JupiterIoT                      psk               ****
-> >
-> > # station wlan0 connect JupiterIoT
-> > Type the network passphrase for JupiterIoT psk.
-> > Passphrase: superpassphrase
-> > Operation aborted
-> >
->
-> Are you running connman + iwd?  Are you sure ConnMan isn't aborting the
-> connection?  Have you tried using connmanctl or using iwd + iwctl with co=
-nnman
-> not running?
->
-> We do need iwd logs and preferably iwmon logs.  You may need to build nlm=
-on
-> support into your kernel if iwmon doesn't start.  e.g. CONFIG_NLMON=3Dm o=
-r y
->
-> Regards,
-> -Denis
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
---===============4808918223495459924==--
++static bool netconfig_use_fils_addr(struct netconfig *netconfig, int af)
++{
++	if ((af =3D=3D AF_INET ? netconfig->rtm_protocol :
++				netconfig->rtm_v6_protocol) !=3D RTPROT_DHCP)
++		return false;
++
++	if (!netconfig->fils_override)
++		return false;
++
++	if (af =3D=3D AF_INET)
++		return !!netconfig->fils_override->ipv4_addr;
++
++	return !l_memeqzero(netconfig->fils_override->ipv6_addr, 16);
++}
++
++static bool netconfig_use_fils_gateway(struct netconfig *netconfig, int af)
++{
++	if ((af =3D=3D AF_INET ? netconfig->rtm_protocol :
++				netconfig->rtm_v6_protocol) !=3D RTPROT_DHCP)
++		return false;
++
++	if (!netconfig->fils_override)
++		return false;
++
++	if (af =3D=3D AF_INET)
++		return !!netconfig->fils_override->ipv4_gateway;
++
++	return !l_memeqzero(netconfig->fils_override->ipv6_gateway, 16);
++}
++
+ static char **netconfig_get_dns_list(struct netconfig *netconfig, int af,
+ 					const uint8_t **out_dns_mac)
+ {
+@@ -472,7 +502,7 @@ static char *netconfig_ipv4_get_gateway(struct netconfi=
+g *netconfig,
+ 		return gateway;
+ =
+
+ 	case RTPROT_DHCP:
+-		if (fils && fils->ipv4_gateway) {
++		if (netconfig_use_fils_gateway(netconfig, AF_INET)) {
+ 			gateway =3D netconfig_ipv4_to_string(fils->ipv4_gateway);
+ =
+
+ 			if (gateway && out_mac &&
+@@ -540,10 +570,7 @@ static struct l_rtnl_route *netconfig_get_static6_gate=
+way(
+ =
+
+ 	gateway =3D l_settings_get_string(netconfig->active_settings,
+ 						"IPv6", "Gateway");
+-	if (!gateway && netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP &&
+-			netconfig->fils_override &&
+-			!l_memeqzero(netconfig->fils_override->ipv6_gateway,
+-					16)) {
++	if (!gateway && netconfig_use_fils_gateway(netconfig, AF_INET6)) {
+ 		gateway =3D netconfig_ipv6_to_string(
+ 					netconfig->fils_override->ipv6_gateway);
+ =
+
+@@ -711,8 +738,7 @@ static void netconfig_ifaddr_ipv6_added(struct netconfi=
+g *netconfig,
+ 			ip, ifa->ifa_prefixlen);
+ =
+
+ 	if (netconfig->rtm_v6_protocol !=3D RTPROT_DHCP ||
+-			(netconfig->fils_override &&
+-			 !l_memeqzero(netconfig->fils_override->ipv6_addr, 16)))
++			netconfig_use_fils_addr(netconfig, AF_INET6))
+ 		return;
+ =
+
+ 	inet_pton(AF_INET6, ip, &in6);
+@@ -1089,9 +1115,7 @@ static void netconfig_set(struct netconfig *netconfig=
+, uint8_t af,
+ 		 * static and FILS-provided cases here.
+ 		 */
+ 	} else if (netconfig->rtm_v6_protocol =3D=3D RTPROT_STATIC ||
+-			(netconfig->fils_override &&
+-			 !l_memeqzero(netconfig->fils_override->ipv6_addr,
+-					16))) {
++			netconfig_use_fils_addr(netconfig, AF_INET6)) {
+ 		if (!netconfig->v6_address)
+ 			return;
+ =
+
+@@ -1137,9 +1161,7 @@ static void netconfig_set(struct netconfig *netconfig=
+, uint8_t af,
+ 			netconfig->notify =3D NULL;
+ 		}
+ 	} else if (netconfig->rtm_v6_protocol =3D=3D RTPROT_STATIC ||
+-			(netconfig->fils_override &&
+-			 !l_memeqzero(netconfig->fils_override->ipv6_gateway,
+-					16))) {
++			netconfig_use_fils_gateway(netconfig, AF_INET6)) {
+ 		if (changed & (NETCONFIG_CHANGED_GATEWAY))
+ 			if (netconfig_ipv6_static_gateway_route_install(
+ 								netconfig))
+@@ -1450,9 +1472,7 @@ static bool netconfig_ipv4_select_and_install(struct =
+netconfig *netconfig)
+ 	struct netdev *netdev =3D netdev_find(netconfig->ifindex);
+ 	bool set_address =3D (netconfig->rtm_protocol =3D=3D RTPROT_STATIC);
+ =
+
+-	if (netconfig->rtm_protocol =3D=3D RTPROT_DHCP &&
+-			netconfig->fils_override &&
+-			netconfig->fils_override->ipv4_addr) {
++	if (netconfig_use_fils_addr(netconfig, AF_INET)) {
+ 		L_AUTO_FREE_VAR(char *, addr_str) =3D netconfig_ipv4_to_string(
+ 					netconfig->fils_override->ipv4_addr);
+ 		uint8_t prefix_len =3D netconfig->fils_override->ipv4_prefix_len;
+@@ -1538,9 +1558,7 @@ static bool netconfig_ipv6_select_and_install(struct =
+netconfig *netconfig)
+ =
+
+ 	sysfs_write_ipv6_setting(netdev_get_name(netdev), "disable_ipv6", "0");
+ =
+
+-	if (netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP &&
+-			netconfig->fils_override &&
+-			!l_memeqzero(netconfig->fils_override->ipv6_addr, 16)) {
++	if (netconfig_use_fils_addr(netconfig, AF_INET6)) {
+ 		uint8_t prefix_len =3D netconfig->fils_override->ipv6_prefix_len;
+ 		L_AUTO_FREE_VAR(char *, addr_str) =3D netconfig_ipv6_to_string(
+ 					netconfig->fils_override->ipv6_addr);
+-- =
+
+2.32.0
+
+--===============6333507091170156451==--
 
