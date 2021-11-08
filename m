@@ -1,64 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============3498674143486884566=="
+Content-Type: multipart/mixed; boundary="===============0987855164029462611=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 4/4] doc: document access point scanning
-Date: Mon, 28 Feb 2022 10:49:39 -0800
-Message-ID: <20220228184939.3150560-4-prestwoj@gmail.com>
-In-Reply-To: 20220228184939.3150560-1-prestwoj@gmail.com
+Subject: Re: [PATCH] anqp: return the request ID rather than true
+Date: Mon, 08 Nov 2021 11:32:10 -0600
+Message-ID: <145f7010-eaf7-31cf-5a0b-9f5f0f987829@gmail.com>
+In-Reply-To: 20211108172437.989966-1-prestwoj@gmail.com
 
---===============3498674143486884566==
+--===============0987855164029462611==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- doc/access-point-api.txt | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+Hi James,
 
-diff --git a/doc/access-point-api.txt b/doc/access-point-api.txt
-index 68ba23c5..3512da82 100644
---- a/doc/access-point-api.txt
-+++ b/doc/access-point-api.txt
-@@ -37,6 +37,24 @@ Methods		void Start(string ssid, string psk)
- 						net.connman.iwd.AlreadyExists
- 						net.connman.iwd.NotFound
- =
+On 11/8/21 11:24 AM, James Prestwood wrote:
+> ---
+>   src/anqp.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-+		void Scan()
-+
-+			Schedule a network scan.
-+
-+			Possible errors:	net.connman.iwd.NotAvailable
-+						net.connman.iwd.NotSupported
-+						net.connman.iwd.Busy
-+						net.connman.iwd.Failed
-+
-+		array(dict) GetOrderedNetworks()
-+
-+			Gets the list of networks found after scanning sorted
-+			based on signal strength. Each item in the array is a
-+			dictionary containing the network Name, SignalStrength,
-+			and Security.
-+
-+			Possible errors:	net.connman.iwd.NotAvailable
-+
- Properties	boolean Started [readonly]
- =
 
- 			Reflects whether an access point has been started.
-@@ -45,3 +63,7 @@ Properties	boolean Started [readonly]
- =
+Applied, thanks.
 
- 			The SSID being broadcast for a started AP (omitted if
- 			AP has not been started)
-+
-+		boolean Scanning [readonly]
-+
-+			Reflects whether the access point is scanning.
--- =
+Regards,
+-Denis
 
-2.34.1
-
---===============3498674143486884566==--
+--===============0987855164029462611==--
 
