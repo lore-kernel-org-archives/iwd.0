@@ -1,56 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============8506135765700601154=="
+Content-Type: multipart/mixed; boundary="===============8513758618807281029=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Torsten Schmitz <noreply.torsten at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/6] scan: parse configurator connectivity element
-Date: Mon, 29 Nov 2021 15:12:56 -0800
-Message-ID: <20211129231300.108873-2-prestwoj@gmail.com>
-In-Reply-To: 20211129231300.108873-1-prestwoj@gmail.com
+Subject: [PATCH] auto-t: fix testP2P
+Date: Tue, 09 Nov 2021 19:58:49 +0100
+Message-ID: <CANvyuLWd7rvP8LvxCYza5kZZpffeze6Fa-nBUUmb7gT7fAqUEQ@mail.gmail.com>
 
---===============8506135765700601154==
+--===============8513758618807281029==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This element has no data and indicates the AP supports configuring
-stations via DPP while also serving current stations.
+testP2P was failing with
+FileNotFoundError: [Errno 2] No such file or directory:
+'/tmp/wpa_supplicant.conf'
 ---
- src/scan.c | 3 +++
- src/scan.h | 1 +
- 2 files changed, 4 insertions(+)
+ tools/test-runner | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/scan.c b/src/scan.c
-index 38a15c11..b602c8be 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -1097,6 +1097,9 @@ static void scan_parse_vendor_specific(struct scan_bs=
-s *bss, const void *data,
- 		return;
- 	}
- =
+diff --git a/tools/test-runner b/tools/test-runner
+index 9ae33301..5fc4285d 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -955,7 +955,7 @@ class TestContext(Namespace):
 
-+	if (is_ie_wfa_ie(data, len, IE_WFA_OI_CONFIGURATOR_CONNECTIVITY))
-+		bss->dpp_configurator =3D true;
-+
- 	if (!ie_parse_network_cost(data, len, &cost_level, &cost_flags)) {
- 		bss->cost_level =3D cost_level;
- 		bss->cost_flags =3D cost_flags;
-diff --git a/src/scan.h b/src/scan.h
-index 2920a1d2..66e38410 100644
---- a/src/scan.h
-+++ b/src/scan.h
-@@ -90,6 +90,7 @@ struct scan_bss {
- 	bool hs20_dgaf_disable : 1;
- 	uint8_t cost_level : 3;
- 	uint8_t cost_flags : 4;
-+	bool dpp_configurator : 1;
- };
- =
+                else:
+                        wpas_radios =3D [rad for rad in self.radios if
+rad.name in settings]
+-                       self.wpas_interfaces =3D
+[rad.create_interface('wpa_supplicant.conf', 'wpas') \
++                       self.wpas_interfaces =3D
+[rad.create_interface(settings[rad.name], 'wpas') \
+                                                for rad in wpas_radios]
 
- struct scan_parameters {
--- =
-
-2.31.1
-
---===============8506135765700601154==--
+        def start_ofono(self):
+--
+2.33.1
+--===============8513758618807281029==--
 
