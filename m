@@ -1,202 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============3182336071974161260=="
+Content-Type: multipart/mixed; boundary="===============2036064320851871928=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 07/10] dpp-util: add dpp_parse_configuration_object
-Date: Thu, 16 Dec 2021 10:08:51 -0800
-Message-ID: <20211216180854.39470-7-prestwoj@gmail.com>
-In-Reply-To: 20211216180854.39470-1-prestwoj@gmail.com
+Subject: Re: [PATCH] auto-t: fix testP2P
+Date: Tue, 09 Nov 2021 13:10:24 -0600
+Message-ID: <b9aee7ea-3064-07da-b637-bcec0e198cdd@gmail.com>
+In-Reply-To: CANvyuLWd7rvP8LvxCYza5kZZpffeze6Fa-nBUUmb7gT7fAqUEQ@mail.gmail.com
 
---===============3182336071974161260==
+--===============2036064320851871928==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This parses the configuration JSON object from the configuration
-response. Only a minimal configuration object is supported for
-now.
----
- Makefile.am    |   3 +-
- src/dpp-util.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++++
- src/dpp-util.h |  12 ++++++
- 3 files changed, 124 insertions(+), 1 deletion(-)
+Hi Torsten,
 
-diff --git a/Makefile.am b/Makefile.am
-index 332e5e4c..d079ba89 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -552,7 +552,8 @@ unit_test_p2p_LDADD =3D $(ell_ldadd)
- =
+On 11/9/21 12:58 PM, Torsten Schmitz wrote:
+> testP2P was failing with
+> FileNotFoundError: [Errno 2] No such file or directory:
+> '/tmp/wpa_supplicant.conf'
+> ---
+>   tools/test-runner | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
- unit_test_dpp_SOURCES =3D unit/test-dpp.c src/dpp-util.h src/dpp-util.c \
- 				src/band.h src/band.c \
--				src/util.h src/util.c src/crypto.h src/crypto.c
-+				src/util.h src/util.c src/crypto.h \
-+				src/crypto.c src/json.h src/json.c
- unit_test_dpp_LDADD =3D $(ell_ldadd)
- =
 
- unit_test_json_SOURCES =3D unit/test-json.c src/json.h src/json.c shared/j=
-smn.h
-diff --git a/src/dpp-util.c b/src/dpp-util.c
-index ffdc1f84..84dbbb65 100644
---- a/src/dpp-util.c
-+++ b/src/dpp-util.c
-@@ -34,6 +34,9 @@
- #include "src/util.h"
- #include "src/band.h"
- #include "src/crypto.h"
-+#include "src/json.h"
-+#include "ell/useful.h"
-+#include "src/ie.h"
- =
+This fails to apply:
 
- static void append_freqs(struct l_string *uri,
- 					const uint32_t *freqs, size_t len)
-@@ -95,6 +98,113 @@ char *dpp_generate_uri(const uint8_t *asn1, size_t asn1=
-_len, uint8_t version,
- 	return l_string_unwrap(uri);
- }
- =
+denkenz(a)localhost ~/iwd-master $ git am ~/merge/\[PATCH\]\ auto-t\:\ fix\ =
 
-+static uint32_t dpp_parse_akm(char *akms)
-+{
-+	_auto_(l_strv_free) char **split =3D l_strsplit(akms, '+');
-+	char **i =3D split;
-+	uint32_t akm_out =3D 0;
-+
-+	while (*i) {
-+		if (!strncmp(*i, "psk", 3))
-+			akm_out |=3D IE_RSN_AKM_SUITE_PSK;
-+		else if (!strncmp(*i, "sae", 3))
-+			akm_out |=3D IE_RSN_AKM_SUITE_SAE_SHA256;
-+
-+		i++;
-+	}
-+
-+	return akm_out;
-+}
-+
-+/*
-+ * TODO: This handles the most basic configuration. i.e. a configuration o=
-bject
-+ * with ssid/passphrase/akm.
-+ */
-+struct dpp_configuration *dpp_parse_configuration_object(const char *json,
-+							size_t json_len)
-+{
-+	struct dpp_configuration *config;
-+	struct json_contents *c;
-+	struct json_iter iter;
-+	struct json_iter discovery;
-+	struct json_iter cred;
-+	_auto_(l_free)char *tech =3D NULL;
-+	_auto_(l_free)char *ssid =3D NULL;
-+	_auto_(l_free)char *akm =3D NULL;
-+	_auto_(l_free)char *pass =3D NULL;
-+	_auto_(l_free)char *psk =3D NULL;
-+
-+	c =3D json_contents_new(json, json_len);
-+	if (!c)
-+		return NULL;
-+
-+	json_iter_init(&iter, c);
-+
-+	if (!json_iter_parse(&iter,
-+			JSON_MANDATORY("wi-fi_tech", JSON_STRING, &tech),
-+			JSON_MANDATORY("discovery", JSON_OBJECT, &discovery),
-+			JSON_MANDATORY("cred", JSON_OBJECT, &cred),
-+			JSON_UNDEFINED))
-+		goto free_contents;
-+
-+	if (!tech || strncmp(tech, "infra", 5))
-+		goto free_contents;
-+
-+
-+	if (!json_iter_parse(&discovery,
-+			JSON_MANDATORY("ssid", JSON_STRING, &ssid),
-+			JSON_UNDEFINED))
-+		goto free_contents;
-+
-+	if (!ssid || !util_ssid_is_utf8(strlen(ssid),(const uint8_t *)ssid))
-+		goto free_contents;
-+
-+	if (!json_iter_parse(&cred,
-+			JSON_MANDATORY("akm", JSON_STRING, &akm),
-+			JSON_OPTIONAL("pass", JSON_STRING, &pass),
-+			JSON_OPTIONAL("psk", JSON_STRING, &psk),
-+			JSON_UNDEFINED))
-+		goto free_contents;
-+
-+	if (!pass && (!psk || strlen(psk) !=3D 64))
-+		goto free_contents;
-+
-+	config =3D l_new(struct dpp_configuration, 1);
-+
-+	if (pass)
-+		config->passphrase =3D l_steal_ptr(pass);
-+	else
-+		config->psk =3D l_steal_ptr(psk);
-+
-+	memcpy(config->ssid, ssid, strlen(ssid));
-+	config->ssid_len =3D strlen(ssid);
-+
-+	config->akm_suites =3D dpp_parse_akm(akm);
-+	if (!config->akm_suites)
-+		goto free_config;
-+
-+	json_contents_free(c);
-+
-+	return config;
-+
-+free_config:
-+	dpp_configuration_free(config);
-+free_contents:
-+	json_contents_free(c);
-+	return NULL;
-+}
-+
-+void dpp_configuration_free(struct dpp_configuration *config)
-+{
-+	if (config->passphrase)
-+		l_free(config->passphrase);
-+
-+	if (config->psk)
-+		l_free(config->psk);
-+
-+	l_free(config);
-+}
-+
- void dpp_attr_iter_init(struct dpp_attr_iter *iter, const uint8_t *pdu,
- 			size_t len)
- {
-diff --git a/src/dpp-util.h b/src/dpp-util.h
-index e7e73071..84404128 100644
---- a/src/dpp-util.h
-+++ b/src/dpp-util.h
-@@ -100,6 +100,18 @@ enum dpp_attribute_type {
- 	DPP_ATTR_CONFIGURATOR_NONCE		=3D 0x1022,
- };
- =
+testP2P.eml
+Applying: auto-t: fix testP2P
+error: corrupt patch at line 13
+Patch failed at 0001 auto-t: fix testP2P
 
-+struct dpp_configuration {
-+	uint8_t ssid[32];
-+	size_t ssid_len;
-+	uint32_t akm_suites;
-+	char *passphrase;
-+	char *psk;		/* hex string */
-+};
-+
-+struct dpp_configuration *dpp_parse_configuration_object(const char *json,
-+							size_t json_len);
-+void dpp_configuration_free(struct dpp_configuration *conf);
-+
- struct dpp_attr_iter {
- 	const uint8_t *pos;
- 	const uint8_t *end;
--- =
-
-2.31.1
-
---===============3182336071974161260==--
+Regards,
+-Denis
+--===============2036064320851871928==--
 
