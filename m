@@ -1,20 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============2405848058536302597=="
+Content-Type: multipart/mixed; boundary="===============7207377045227625612=="
 MIME-Version: 1.0
-From: 54d22547-afc0-4701-b1fc-5a2a2e411646 at simplelogin.co
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd 1.21 stuck on connecting state
-Date: Sat, 29 Jan 2022 20:03:58 +0000
-Message-ID: <20220129200358.2828.46152@ml01.vlan13.01.org>
-In-Reply-To: c30d0db9e529dcdebfad5e55de3c476597075635.camel@gmail.com
+Subject: Re: Enabling IPv6 causes immediate segfault on connect
+Date: Wed, 10 Nov 2021 09:30:04 -0600
+Message-ID: <243fa539-ee0b-6286-0c99-b52afe19273a@gmail.com>
+In-Reply-To: 20211110081638.8a1b690f39566ffce5f8f765@gmx.com
 
---===============2405848058536302597==
+--===============7207377045227625612==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Sorry, didn't know that. I reproduced the problem again and uploaded the fi=
-le here: https://transfer.sh/get/jiEvOg/dhcp.pcap
+Hi,
 
-Hope this helps!
---===============2405848058536302597==--
+On 11/10/21 7:16 AM, Tmore1 wrote:
+> Hello,
+> =
+
+> After many years of managing wireless with Debian's ifupdown +
+> wpa_supplicant, I tried iwd, and I love it so far: I really appreciate
+> its polish, cleanliness, and responsiveness. Thanks much for this
+> software!
+
+Thank you for the kind words.  We're glad you like it!
+
+> =
+
+> There seems to be a problem with its IPv6 support: on my system
+> (Debian Sid, iwd 1.19 from distro repo), iwd works perfectly out of the
+> box, and continues to work with "EnableNetworkConfiguration=3DTrue", but
+> with "EnableIPv6=3Dtrue", it segfaults immediately upon connect. (This is
+> especially awkward when iwd is being managed by systemd, since I then
+> get an endless loop of the daemon crashing and immediately restarting,
+> with a steady stream of messages hitting syslog ;))
+
+I believe this issue is already fixed in ell upstream.  Commit d0f00698245a =
+
+("dhcp6: Switch to BOUND before LEASE_OBTAINED") here:
+https://git.kernel.org/pub/scm/libs/ell/ell.git/commit/?id=3Dd0f00698245a2d=
+ccbd4b853e3d7b94e7a76cd906
+
+Note that IPv6 support in iwd is still somewhat experimental since we still=
+ lack =
+
+support for SLAAC, but DHCPv6 should be mostly functional.
+
+Regards,
+-Denis
+--===============7207377045227625612==--
 
