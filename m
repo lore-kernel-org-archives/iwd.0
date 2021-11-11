@@ -1,54 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============1624052526927994437=="
+Content-Type: multipart/mixed; boundary="===============8537115499445823286=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] station: Move netconfig_reset() to common path
-Date: Thu, 30 Sep 2021 01:14:27 +0200
-Message-ID: <CAOq732KhfeRcqU1_ss+gSQBgPY_w42s-Ac3dkOp8A2_J75EQFA@mail.gmail.com>
-In-Reply-To: ee756069-16b7-d191-3333-c021303c3096@gmail.com
+Subject: Re: [PATCH] Set retain attribute on C identifier name sections
+ referenced by __start_/__stop_
+Date: Thu, 11 Nov 2021 14:29:30 -0600
+Message-ID: <11325cb5-9904-55d3-a694-bae497643669@gmail.com>
+In-Reply-To: 20211111030758.2005309-1-i@maskray.me
 
---===============1624052526927994437==
+--===============8537115499445823286==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 30 Sept 2021 at 00:57, Denis Kenzior <denkenz(a)gmail.com> wrote:
-> > I don't remember what the reasoning was, but station_connect_cb does
-> > handle some mechanisms that seem desirable here also, like trying the
-> > next bss from the autoconnect list immediately and blacklisting BSSes.
->
-> The connect failed path is generally used if the connection simply fails.
-> Either due to an invalid password, or due to handshake timeout, or some o=
-ther
-> reason where the status_code can be returned by netdev.  Once we're succe=
-ssfully
-> connected, and the driver/kernel decides to disconnect us due to a firmwa=
-re
-> crash/bug/whatever, then I'm not sure blacklisting the bss should be done.
-> Besides, we already sent the dbus message reply, etc.
->
-> Now, maybe some elements of what the connect failed path does might be ne=
-eded in
-> this failure case.  But to determine that we would need to know why the
-> disconnect happens? How often? Is it every time? Sometimes? Once in a blu=
-e moon,
-> etc.
+Hi Fangrui,
 
-Unfortunately this applies to most failure modes in a connection (at
-802.11 level or at IP level -- for the user they're the same thing)
-and I think the binary blacklisted/not blacklisted model we use
-doesn't really work.  IIRC my initial patches used a different model
-where the blacklist was a kind of penalty list where BSSes and/or
-networks that fail more often are pushed further in the priority list.
-In the end when we've tried all the BSSes in range we have nothing to
-lose by retrying some of the ones we've already tried, we just don't
-want to put them before other BSSes.  This can be done in a way that
-over time the list converges to sorted by how often a network/bss
-fails.
+On 11/10/21 9:07 PM, Fangrui Song wrote:
+> LLD 13 and GNU ld 2.37 support -z start-stop-gc which allows garbage
+> collection of C identifier name sections despite the __start_/__stop_
+> references. GNU ld before 2015-10 had the behavior as well. Simply set
+> the retain attribute so that GCC 11 (if configure-time binutils is 2.36
+> or newer)/Clang 13 will set the SHF_GNU_RETAIN section attribute to
+> prevent garbage collection.
+> =
 
-This also allows you to learn from some very clear cues that we're not
-handling, like a user manually switching to another network.
+> Without the patch, there are linker errors with -z start-stop-gc (LLD def=
+ault)
+> when -Wl,--gc-sections is used:
+> =
 
-Best regards
---===============1624052526927994437==--
+> ```
+> ld.lld: error: undefined symbol: __start___eap
+>>>> referenced by eap.c
+>>>>                src/eap.o:(eap_init)
+> ```
+> =
+
+> The remain attribute will not be needed if the metadata sections are
+> referenced by code directly.
+> ---
+>   client/command.h    | 12 +++++++-----
+>   client/dbus-proxy.h | 13 ++++++++-----
+>   src/eap-private.h   |  6 +++++-
+>   src/module.h        | 20 +++++++++++++-------
+>   4 files changed, 33 insertions(+), 18 deletions(-)
+> =
+
+
+I changed some whitespace formatting slightly to make the diff slightly mor=
+e =
+
+compact and to use tabs instead of spaces in some places.
+
+Applied, thanks!
+
+Regards,
+-Denis
+
+--===============8537115499445823286==--
 
