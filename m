@@ -1,155 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============3844255666323253956=="
+Content-Type: multipart/mixed; boundary="===============5016899801583542657=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Mark Hindley <mark at hindley.org.uk>
 To: iwd at lists.01.org
-Subject: [PATCH 4/9] dpp: add timeout for auth/config protocols
-Date: Mon, 20 Dec 2021 13:49:10 -0800
-Message-ID: <20211220214915.34093-4-prestwoj@gmail.com>
-In-Reply-To: 20211220214915.34093-1-prestwoj@gmail.com
+Subject: Re: [PATCH] Enable DBus activation on non-systemd systems.
+Date: Sat, 13 Nov 2021 07:40:11 +0000
+Message-ID: <YY9r2xKMpN2UerTG@hindley.org.uk>
+In-Reply-To: CFOFAY8M0DOT.XA6PQ5U1AUOG@mussels
 
---===============3844255666323253956==
+--===============5016899801583542657==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This also allows the card to re-issue ROC if it ends in the middle of
-authenticating or configuring as well as add a maximum timeout for
-auth/config protocols.
+=C3=89rico,
 
-IO errors were also handled as these sometimes can happen with
-certain drivers but are not fatal.
----
- src/dpp.c | 43 +++++++++++++++++++++++++++++++++----------
- 1 file changed, 33 insertions(+), 10 deletions(-)
+On Sat, Nov 13, 2021 at 03:03:56AM -0300, =C3=89rico Nogueira wrote:
+> For things like IWD, I feel DBus activation is definitely the wrong
+> path. It should be a system service of some sort, so it can connect to a
+> network without first being queried by a user manually, and it shouldn't
+> be activated automatically.
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 69dbeb1e..c98ba021 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -98,6 +98,9 @@ struct dpp_sm {
- 	struct l_ecc_point *i_proto_public;
- =
+Thanks, but I find this a confusing statement.
 
- 	uint8_t diag_token;
-+
-+	/* Timeout of either auth/config protocol */
-+	struct l_timeout *timeout;
- };
- =
+AFAIU iwd does use DBus activation currently. The Debian changelog contains=
+ this
+entry:
 
- static void dpp_free_auth_data(struct dpp_sm *dpp)
-@@ -239,6 +242,24 @@ static size_t dpp_build_config_header(const uint8_t *s=
-rc, const uint8_t *dest,
- 	return ptr - buf;
- }
- =
+  * Recommend dbus (system bus)
+    Interaction with iwd happens via dbus, i.e. as used by the iwctl
+    command (or NetworkManager iwd backend).
+    Packages using D-Bus usually doesn't describe this in their package
+    relationships and implicitly rely on everyone having a bus available.
+    People using iwd however seems to be confused about the lack of a
+    startup script and fails to realize that "dbus activation" is the
+    intended way to start iwd so hopefully making the dbus relationship more
+    explicit will give a hint and help people figure this out.
 
-+static void dpp_protocol_timeout(struct l_timeout *timeout, void *user_dat=
-a)
-+{
-+	struct dpp_sm *dpp =3D user_data;
-+
-+	l_debug("DPP timed out");
-+
-+	dpp_reset(dpp);
-+}
-+
-+static void dpp_reset_protocol_timer(struct dpp_sm *dpp)
-+{
-+	if (dpp->timeout)
-+		l_timeout_modify(dpp->timeout, 10);
-+	else
-+		dpp->timeout =3D l_timeout_create(10, dpp_protocol_timeout,
-+						dpp, NULL);
-+}
-+
- /*
-  * The configuration protocols use of AD components is somewhat confusing
-  * since the request/response frames are of a different format than the re=
-st.
-@@ -733,6 +754,7 @@ static void authenticate_confirm(struct dpp_sm *dpp, co=
-nst uint8_t *from,
- =
+So, given that DBus activation doesn't require systemd (but can make use of=
+ it),
+I was trying to understand and suggest a fix for why iwd DBus activation do=
+esn't
+work in the non-systemd case.
 
- 	l_debug("Authentication successful");
- =
-
-+	dpp_reset_protocol_timer(dpp);
- 	dpp_configuration_start(dpp, from);
- =
-
- 	return;
-@@ -941,6 +963,7 @@ static void authenticate_request(struct dpp_sm *dpp, co=
-nst uint8_t *from,
- 	memcpy(dpp->auth_addr, from, 6);
- =
-
- 	dpp->state =3D DPP_STATE_AUTHENTICATING;
-+	dpp_reset_protocol_timer(dpp);
- =
-
- 	send_authenticate_response(dpp, r_auth);
- =
-
-@@ -1013,6 +1036,12 @@ static void dpp_roc_started(void *user_data)
- {
- 	struct dpp_sm *dpp =3D user_data;
- =
-
-+	/*
-+	 * If not in presence procedure, just stay on channel.
-+	 */
-+	if (dpp->state !=3D DPP_STATE_PRESENCE)
-+		return;
-+
- 	dpp_presence_announce(dpp);
- }
- =
-
-@@ -1082,6 +1111,8 @@ static void dpp_presence_timeout(int error, void *use=
-r_data)
- 	 */
- 	if (error =3D=3D -ECANCELED)
- 		return;
-+	else if (error =3D=3D -EIO)
-+		goto next_roc;
- 	else if (error < 0)
- 		goto protocol_failed;
- =
-
-@@ -1093,16 +1124,7 @@ static void dpp_presence_timeout(int error, void *us=
-er_data)
- 		return;
- 	case DPP_STATE_AUTHENTICATING:
- 	case DPP_STATE_CONFIGURING:
--		/*
--		 * TODO: If either the auth or config protocol is running we
--		 * need to stay on channel until the specified timeouts.
--		 * Unfortunately the kernel makes this very inconvenient since
--		 * there is no way to stay on channel indefinitely or any way
--		 * of knowing what duration the kernel/card actually chooses.
--		 *
--		 * For now just treat this as a failure.
--		 */
--		goto protocol_failed;
-+		goto next_roc;
- 	}
- =
-
- 	dpp->freqs_idx++;
-@@ -1117,6 +1139,7 @@ static void dpp_presence_timeout(int error, void *use=
-r_data)
- 	l_debug("Presence timeout, moving to next frequency %u, duration %u",
- 			dpp->current_freq, dpp->dwell);
- =
-
-+next_roc:
- 	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
- 			dpp->current_freq, dpp->dwell, dpp_roc_started,
- 			dpp, dpp_presence_timeout);
--- =
-
-2.31.1
-
---===============3844255666323253956==--
+Mark
+--===============5016899801583542657==--
 
