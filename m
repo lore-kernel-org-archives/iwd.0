@@ -1,285 +1,277 @@
-Content-Type: multipart/mixed; boundary="===============7074601103221401792=="
+Content-Type: multipart/mixed; boundary="===============7903576107219398861=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 1/7] storage: implement network profile encryption
-Date: Fri, 04 Feb 2022 11:16:16 -0600
-Message-ID: <384a83c1-820b-351a-3b99-8e2e1ee5b0b0@gmail.com>
-In-Reply-To: 20220203212337.120613-1-prestwoj@gmail.com
+Subject: Re: [PATCH 4/9] agent: Implement the NetworkConfigurationAgent dbus
+ API
+Date: Sat, 13 Nov 2021 02:31:03 +0100
+Message-ID: <CAOq732+pKD78YpgyaSFC_x9pVMDk1qJrswEzfdrvSM+wmMNdsw@mail.gmail.com>
+In-Reply-To: 3d580080-e7d3-0c6a-cb9d-8aac92378558@gmail.com
 
---===============7074601103221401792==
+--===============7903576107219398861==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+On Wed, 10 Nov 2021 at 20:48, Denis Kenzior <denkenz(a)gmail.com> wrote:
+> On 11/8/21 5:28 AM, Andrew Zaborowski wrote:
+> > +enum agent_type {
+> > +     AGENT_TYPE_SECRET,
+> > +     AGENT_TYPE_NETCONFIG,
+> > +};
+> > +
+>
+> Have you considered using agent_ops, container_of, or simply an agent_free
+> version for the netconfig agent?  Given that there can be only one netcon=
+fig
+> agent, this enum seems overkill.
 
-On 2/3/22 15:23, James Prestwood wrote:
-> Some users don't like the idea of storing network credentials in plaintext
-> on the file system. As far as IWD goes the credential directory permissio=
-ns
-> should be set up such that nobody but the owner/root have access but
-> nevertheless they are still plaintext.
-> =
+Ok, I use a "container" struct around struct agent.  Or if we use both
+a separate agent_free() and send_cancel_request() then it may be
+easier to have completely separate structs too.  The agent_ops
+approach seems like a bigger gun than this enum.
 
-> For added security these credentials can be encrypted using a secret key.
-> In this patch the origination of the key does not matter, but in this
-> patch series IWD will support a systemd provided key.
-> =
+>
+> >   enum agent_request_type {
+> >       AGENT_REQUEST_TYPE_PASSPHRASE,
+> >       AGENT_REQUEST_TYPE_USER_NAME_PASSWD,
+> > @@ -50,6 +57,18 @@ struct agent_request {
+> >       agent_request_destroy_func_t destroy;
+> >   };
+> >
+> > +/* Netconfig requests are not queued and can run in parallel */
+> > +struct netconfig_request {
+> > +     unsigned int dbus_id;
+> > +     unsigned int id;
+> > +     char *path;
+>
+> Is path and ifname correspond to the same device object?  Maybe you shoul=
+d use
+> that instead?
 
-> The encryption itself will operate on the entire [Security] group as well
-> as all embedded groups. Once encrypted the [Security] group will be repla=
-ced
-> with two key/values:
-> =
+The path (in station case) is to the network object same as when we
+ask for the PSK.
 
-> EncryptedSalt - A random string of bytes used for the encryption
-> EncryptedSecurity - A string of bytes containing the encrypted [Security]
->                      group, as well as all embedded groups.
-> =
+>
+> > +     char *ifname;
+> > +     struct l_timeout *timeout;
+>
+> Remember that each timeout corresponds to an open fd.  Are you sure this =
+is
+> necessary?
 
-> After the profile has been encrypted these values should not be modified.
-> Note that any values added to [Security] after encryption has no effect.
-> Once the profile is encrypted there is no way to modify [Security] without
-> manually decrypting first, or just removing it entirely which effectively
-> treated a 'new' profile.
-> =
+We use this timeout in place of the one in "struct agent".  What we
+could do is use one actual timeout and keep re-arming it for new
+expiry times, but then I think this would be better done directly in
+ell if we want to save fds.
 
-> The encryption/decryption is done using AES-SIV with a salt value and the
-> network SSID as the IV.
-> =
+>
+> > +     void *user_data;
+> > +     void *user_callback;
+> > +     agent_request_destroy_func_t destroy;
+> > +};
+> > +
+> >   struct agent {
+> >       char *owner;
+> >       char *path;
+> > @@ -58,9 +77,11 @@ struct agent {
+> >       struct l_timeout *timeout;
+> >       int timeout_secs;
+> >       struct l_queue *requests;
+> > +     enum agent_type type;
+> >   };
+> >
+> > -static struct l_queue *agents;
+> > +static struct l_queue *secret_agents;
+> > +static struct agent *netconfig_agent;
+> >
+> >   /*
+> >    * How long we wait for user to input things.
+> > @@ -74,7 +95,8 @@ static unsigned int agent_timeout_input_request(void)
+> >       return 120;
+> >   }
+> >
+> > -static void send_cancel_request(void *user_data, int reason)
+> > +static void send_cancel_request(void *user_data, int reason,
+> > +                             const char *path, const char *ifname)
+> >   {
+> >       struct agent *agent =3D user_data;
+> >       struct l_dbus_message *message;
+> > @@ -106,7 +128,12 @@ static void send_cancel_request(void *user_data, i=
+nt reason)
+> >                                                       IWD_AGENT_INTERFA=
+CE,
+> >                                                       "Cancel");
+> >
+> > -     l_dbus_message_set_arguments(message, "s", reasonstr);
+> > +     if (path)
+> > +             l_dbus_message_set_arguments(message, "oss", path, ifname,
+> > +                                             reasonstr);
+> > +     else
+> > +             l_dbus_message_set_arguments(message, "s", reasonstr);
+> > +
+>
+> Please don't do this.  Seeing send_cancel_request(foo, reason, NULL, NULL=
+) is
+> quite confusing.  Use a separate method for this.
 
-> Once a key is set any profiles opened will automatically be encrypted and
-> re-written to disk. Modules using network_storage_open will be provided
-> the decrypted profile, and will be unaware it was ever encrypted in the
-> first place. Similarly when network_storage_sync is called the profile
-> will by automatically encrypted and written to disk without the caller
-> needing to do anything special.
-> =
+Ok.
 
-> A few private storage.c helpers were added to serve several purposes:
-> =
+> > +static void netconfig_timeout_cb(struct l_timeout *timeout, void *user=
+_data)
+> > +{
+> > +     struct netconfig_request *request =3D user_data;
+> > +     agent_request_netconfig_func_t user_callback =3D request->user_ca=
+llback;
+> > +
+> > +     l_debug("path %s ifname %s", request->path, request->ifname);
+> > +
+> > +     l_queue_remove(netconfig_agent->requests, request);
+> > +
+> > +     send_cancel_request(netconfig_agent, -ETIMEDOUT,
+> > +                             request->path, request->ifname);
+> > +
+> > +     user_callback(request->id, AGENT_RESULT_FAILED, request->user_dat=
+a);
+> > +     netconfig_request_free(request);
+>
+> We only care about results/timeouts in a very specific case (to signal we=
+'re
+> connected).  In theory, all subsequent updates might as well be sent with=
+ noreply.
 
-> __storage_set_encryption_key():
-> This sets the encryption key direct from systemd then uses extract and ex=
-pand
-> to create a new fixed length key to do encryption/decryption.
-> =
+True, that would also save fds, but it may be better to not hardcode
+this assumption in agent.c.
 
-> __storage_decrypt():
-> Low level API to decrypt an l_settings object using a previously set key =
-and
-> the SSID/name for the network. This returns a 'changed' out parameter sig=
-nifying
-> that the settings need to be encrypted and re-written to disk. The purpos=
-e of
-> exposing this is for a standalone decryption tool which does not re-write=
- any
-> settings.
-> =
+>
+> How do you plan to handle situations where a change is requested while an
+> ongoing transaction is in progress?  For example, a change to wlan0 AF_IN=
+ET is
+> pending, and another wlan0 AF_INET change is requested?  It shouldn't rea=
+lly
+> happen, but the agent backend timing is outside of our control.
 
-> __storage_open():
-> Wrapper around __storage_decrypt() that handles re-writing a new profile =
-to
-> disk. This was exposed in order to support hotspot profiles.
-> =
+Right, my idea was that this result in simultaneous ConfigureIPvX
+calls running and the agent has to see if that poses a problem for
+them.
 
-> __storage_encrypt():
-> Encrypts an l_settings object and returns the full profile as data
-> ---
->   Makefile.am   |   3 +-
->   src/storage.c | 268 +++++++++++++++++++++++++++++++++++++++++++++++---
->   src/storage.h |   8 ++
->   3 files changed, 267 insertions(+), 12 deletions(-)
-> =
+> > @@ -479,11 +683,27 @@ bool agent_request_cancel(unsigned int req_id, in=
+t reason)
+> >                       break;
+> >       }
+> >
+> > -     if (!request)
+> > -             return false;
+> > +     if (!request) {
+> > +             struct netconfig_request *nc_request;
+> > +
+> > +             if (!netconfig_agent)
+> > +                     return false;
+> > +
+> > +             nc_request =3D l_queue_remove_if(netconfig_agent->request=
+s,
+> > +                                             find_netconfig_request,
+> > +                                             L_UINT_TO_PTR(req_id));
+> > +             if (!nc_request)
+> > +                     return false;
+> > +
+> > +             send_cancel_request(netconfig_agent, reason,
+> > +                                     nc_request->path, nc_request->ifn=
+ame);
+> > +
+> > +             netconfig_request_free(nc_request);
+> > +             return true;
+> > +     }
+> >
+> >       if (!request->message) {
+> > -             send_cancel_request(agent, reason);
+> > +             send_cancel_request(agent, reason, NULL, NULL);
+> >
+> >               l_dbus_cancel(dbus_get_bus(), agent->pending_id);
+> >
+>
+> Just make this a separate function, there's almost no reuse here anyway.
 
-> v3:
->   * Created and exposed __storage_open for use in hotspot.
->   * Use extract-and-expand APIs to create encryption key
-> =
+Ok.
 
+>
+> > @@ -511,18 +731,19 @@ static void agent_disconnect(struct l_dbus *dbus,=
+ void *user_data)
+> >       if (agent->pending_id)
+> >               agent_finalize_pending(agent, NULL);
+> >
+> > -     l_queue_remove(agents, agent);
+> > +     l_queue_remove(secret_agents, agent);
+> >
+> >       l_idle_oneshot(agent_free, agent, NULL);
+>
+> What about the netconfig agent?
 
-This is looking pretty good to me now.  Just a few minor points:
+Good point..
 
-> +/*
-> + * Encrypt needed groups of 'settings' without modifying the object. Ret=
-urns
-> + * the entire settings object as data, with encrypted groups as a bytest=
-ring
-> + * set as the value to [Security].EncryptedSecurity. This also includes =
-any
-> + * embedded groups.
-> + *
-> + * Note: If encryption is not enabled or there is no Security group this=
- is
-> + *       effectively l_settings_to_data.
-> + */
-> +char *__storage_encrypt(struct l_settings *settings, const char *ssid,
+>
+> >   }
+> >
+>
+> <snip>
+>
+> > diff --git a/src/agent.h b/src/agent.h
+> > index eb08c6b6..83625618 100644
+> > --- a/src/agent.h
+> > +++ b/src/agent.h
+> > @@ -25,8 +25,11 @@
+> >   enum agent_result {
+> >       AGENT_RESULT_OK,
+> >       AGENT_RESULT_FAILED,
+> > +     AGENT_RESULT_CANCELLED,
+>
+> I think we prefer 'CANCELED'
 
-should the settings object be const?
+Ok.
 
-> +				size_t *out_len)
-> +{
-> +	struct iovec ad[2];
-> +	uint8_t salt[32];
-> +	size_t len;
-> +	_auto_(l_free) struct l_settings *to_encrypt =3D NULL;
-> +	_auto_(l_free) struct l_settings *original =3D NULL;
+>
+> >   };
+> >
+>
+> <snip>
+>
+> > diff --git a/src/netconfig.h b/src/netconfig.h
+> > index c9ac6f8f..48018bc1 100644
+> > --- a/src/netconfig.h
+> > +++ b/src/netconfig.h
+> > @@ -28,6 +28,21 @@ enum netconfig_event {
+> >       NETCONFIG_EVENT_CONNECTED,
+> >   };
+> >
+> > +enum netconfig_method {
+> > +     NETCONFIG_METHOD_STATIC,
+> > +     NETCONFIG_METHOD_AUTO,
+> > +};
+> > +
+> > +struct netconfig_data {
+> > +     uint8_t family;
+> > +     enum netconfig_method method;
+> > +     char *addr;
+> > +     uint8_t prefix_len;
+> > +     char *gateway_addr;
+> > +     char **dns;
+> > +     char **domain_names;
+> > +};
+> > +
+>
+> Since we want to introduce the 'netconfig settings applier entity', I'd s=
+ay the
+> netconfig version of this structure should use l_rtnl_* objects.  That wa=
+y, both
+> the 'immediate' and 'agent' backends for that entity can operate on the s=
+ame input.
+>
+> If you want to introduce a separate structure for agent use, then it shou=
+ld
+> probably be declared inside agent.h.
 
-I think you mean l_settings_free here.
+Ok, let's see which works better.
 
-> +	_auto_(l_free) char *plaintext =3D NULL;
-> +	_auto_(l_free) uint8_t *enc =3D NULL;
-> +	_auto_(l_strv_free) char **groups =3D NULL;
-> +	char **i;
-> +
-> +	if (!system_key_set || !l_settings_has_group(settings, "Security"))
-> +		return l_settings_to_data(settings, out_len);
-> +
-> +	/*
-> +	 * Make two copies of the settings: One will contain only data to be
-> +	 * encrypted (to_encrypt), the other will contain data to be left
-> +	 * unencrypted (original). At the end any encrypted data will be set
-> +	 * into 'original' as EncryptedSecurity.
-> +	 */
-> +	to_encrypt =3D l_settings_clone(settings);
-> +	original =3D l_settings_clone(settings);
-> +
-> +	groups =3D l_settings_get_groups(to_encrypt);
-> +	for (i =3D groups; *i; i++) {
-> +		if (encrypt_group(*i))
-> +			l_settings_remove_group(original, *i);
-> +		else
-> +			l_settings_remove_group(to_encrypt, *i);
-> +	}
-> +
-> +	l_settings_remove_embedded_groups(original);
-> +
-> +	plaintext =3D l_settings_to_data(to_encrypt, &len);
-> +	if (!plaintext)
-> +		return NULL;
-> +
-> +	l_getrandom(salt, 32);
-> +
-> +	ad[0].iov_base =3D (void *) salt;
-> +	ad[0].iov_len =3D 32;
-> +	ad[1].iov_base =3D (void *) ssid;
-> +	ad[1].iov_len =3D strlen(ssid);
-> +
-> +	enc =3D l_malloc(len + 16);
-> +
-> +	if (!aes_siv_encrypt(system_key, sizeof(system_key), plaintext, len,
-> +				ad, 2, enc)) {
-> +		l_error("Could not encrypt [Security] group");
-> +		return NULL;
-> +	}
-> +
-> +	l_settings_set_bytes(original, "Security", "EncryptedSalt", salt, 32);
-> +	l_settings_set_bytes(original, "Security", "EncryptedSecurity",
-> +				enc, len + 16);
-> +
-> +	return l_settings_to_data(original, out_len);
-> +}
-> +
-> +/*
-> + * Decrypt data in [Security].EncryptedSecurity. This data also includes
-> + * embedded groups potentially. Once decrypted the data is put back into=
- the
-> + * object.
-> + *
-> + * Note: if encryption is not enabled or there is no Security group sett=
-ings
-> + *       is not modified.
-> + */
-> +int __storage_decrypt(struct l_settings *settings, const char *ssid,
-> +				bool *changed)
-> +{
-> +	_auto_(l_settings_free) struct l_settings *security =3D NULL;
-> +	_auto_(l_free) uint8_t *encrypted =3D NULL;
-> +	_auto_(l_free) uint8_t *decrypted =3D NULL;
-> +	_auto_(l_free) uint8_t *salt =3D NULL;
-> +	_auto_(l_strv_free) char **embedded =3D NULL;
-> +	size_t elen, slen;
-> +	struct iovec ad[2];
-> +
-> +	if (!system_key_set)
-> +		goto done;
-> +
-> +	if (!l_settings_has_group(settings, "Security"))
-> +		goto done;
-> +
-> +	encrypted =3D l_settings_get_bytes(settings, "Security",
-> +						"EncryptedSecurity", &elen);
-> +	salt =3D l_settings_get_bytes(settings, "Security",
-> +						"EncryptedSalt", &slen);
-> +
-> +	/*
-> +	 * Either profile has never been loaded after enabling encryption or is
-> +	 * missing Encrypted{Salt,Security} values. If either are missing this
-> +	 * profile is corrupted and must be fixed.
-> +	 */
-> +	if (!(encrypted && salt)) {
-> +		/* Profile corrupted */
-> +		if (encrypted || salt) {
-> +			l_warn("Profile %s is corrupted reconfigure manually",
-> +					ssid);
-> +			return -EBADMSG;
-> +		}
-> +
-> +		if (changed)
-> +			*changed =3D true;
-> +
-> +		return 0;
-> +	}
-> +
-> +	decrypted =3D l_malloc(elen - 16 + 1);
-> +
-> +	ad[0].iov_base =3D (void *)salt;
-> +	ad[0].iov_len =3D slen;
-> +	ad[1].iov_base =3D (void *)ssid;
-> +	ad[1].iov_len =3D strlen(ssid);
-> +
-> +	if (!aes_siv_decrypt(system_key, sizeof(system_key), encrypted, elen,
-> +				ad, 2, decrypted)) {
-> +		l_error("Could not decrypt %s profile, did the secret change?",
-> +				ssid);
-> +		return -ENOKEY;
-> +	}
-> +
-> +	decrypted[elen - 16] =3D '\0';
-> +
-> +	/* Remove encrypted [Security], and copy the decrypted one */
-> +	l_settings_remove_group(settings, "Security");
-
-Do you want to replace this with a for loop removing all groups listed in t=
-he =
-
-encrypt_groups array?
-
-Should you also be removing any embedded groups just in case?
-
-> +
-> +	/*
-> +	 * Load decrypted data into existing settings. This is not how the API
-> +	 * is indended to be used (since this could result in duplicate groups)
-> +	 * but since the Security group was just removed and EncryptedSecurity
-> +	 * should only contain a Security group its safe to use it this way.
-> +	 */
-> +	if (!l_settings_load_from_data(settings, (const char *) decrypted,
-> +					elen - 16)) {
-> +		l_error("Could not load decrypted security group");
-> +		return -EBADMSG;
-> +	}
-> +
-> +done:
-> +	if (changed)
-> +		*changed =3D false;
-> +
-> +	return 0;
-> +}
-> +
-
-Regards,
--Denis
---===============7074601103221401792==--
+Best regards
+--===============7903576107219398861==--
 
