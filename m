@@ -1,93 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============3667781128853120929=="
+Content-Type: multipart/mixed; boundary="===============0883360407909244940=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] network: Hide hidden networks on passphrase error
-Date: Tue, 08 Mar 2022 12:09:01 -0600
-Message-ID: <be305787-4657-4278-942b-5a6c3b9e808f@gmail.com>
-In-Reply-To: MRZP264MB1544C0BDFAF731AC2E61806693099@MRZP264MB1544.FRAP264.PROD.OUTLOOK.COM
+Subject: [PATCH 2/4] crypto: use void* for hkdf_expand
+Date: Mon, 22 Nov 2021 12:44:23 -0800
+Message-ID: <20211122204425.3567479-2-prestwoj@gmail.com>
+In-Reply-To: 20211122204425.3567479-1-prestwoj@gmail.com
 
---===============3667781128853120929==
+--===============0883360407909244940==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Emmanuel,
+This makes it more flexible for other storage types
+---
+ src/crypto.c | 2 +-
+ src/crypto.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-On 3/8/22 04:59, VAUTRIN Emmanuel (Canal Plus Prestataire) wrote:
-> If a user connection fails on a freshly scanned psk hidden network,
-> during passphrase request, it shall be removed from the network list.
-> Otherwise, it would be possible to directly connect to that known
-> network, which will appear as not hidden.
-> =
+diff --git a/src/crypto.c b/src/crypto.c
+index c5bf6fe1..7d5e42fe 100644
+--- a/src/crypto.c
++++ b/src/crypto.c
+@@ -860,7 +860,7 @@ bool hkdf_extract(enum l_checksum_type type, const void=
+ *key,
+ 	return (ret =3D=3D (int) dlen);
+ }
+ =
 
-> Commit 06ca8e20a9b0 ("station: Hide forgotten hidden networks")
-> ---
->   src/network.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
-> =
+-bool hkdf_expand(enum l_checksum_type type, const uint8_t *key, size_t key=
+_len,
++bool hkdf_expand(enum l_checksum_type type, const void *key, size_t key_le=
+n,
+ 			const char *info, void *out, size_t out_len)
+ {
+ 	return prf_plus(type, key, key_len, info, out, out_len, 0);
+diff --git a/src/crypto.h b/src/crypto.h
+index eb48fe5b..b6fa2ec3 100644
+--- a/src/crypto.h
++++ b/src/crypto.h
+@@ -122,7 +122,7 @@ bool prf_plus(enum l_checksum_type type, const void *ke=
+y, size_t key_len,
+ bool hkdf_extract(enum l_checksum_type type, const void *key, size_t key_l=
+en,
+ 				uint8_t num_args, void *out, ...);
+ =
 
-> diff --git a/src/network.c b/src/network.c
-> index d7f472be97d2..ef3df96bab42 100644
-> --- a/src/network.c
-> +++ b/src/network.c
-> @@ -1204,6 +1204,7 @@ static void passphrase_callback(enum agent_result r=
-esult,
->   	struct network *network =3D user_data;
->   	struct station *station =3D network->station;
->   	struct scan_bss *bss;
-> +	bool was_hidden;
->   =
+-bool hkdf_expand(enum l_checksum_type type, const uint8_t *key, size_t key=
+_len,
++bool hkdf_expand(enum l_checksum_type type, const void *key, size_t key_le=
+n,
+ 				const char *info, void *out, size_t out_len);
+ =
 
->   	l_debug("result %d", result);
->   =
+ bool crypto_derive_pairwise_ptk(const uint8_t *pmk, size_t pmk_len,
+-- =
 
-> @@ -1242,6 +1243,13 @@ static void passphrase_callback(enum agent_result =
-result,
->   	return;
->   =
+2.31.1
 
->   err:
-> +	if (!network->settings || !l_settings_get_bool(network->settings,
-> +						NET_HIDDEN, &was_hidden))
-> +		was_hidden =3D false;
-> +
-> +	if (was_hidden)
-> +		station_hide_network(station, network);
-> +
-
-No real objections here, but there are at least two other places that might=
- be =
-
-affected by this change:
-
-In station_dbus_connect_hidden_network() there is a code path that tries to=
- skip =
-
-the hidden network scan if the network is already in the scan results.  Sin=
-ce =
-
-you're removing this possibility, that path should probably be removed.
-
-In station_hidden_network_scan_results(), if the hidden SSID we scanned for =
-
-contains BSSes in both open and PSK networks, those networks aren't hidden =
-and =
-
-could still be connectable.  This is highly unlikely, but...
-
-Alternatively, we could somehow mark these networks non-connectable unless =
-
-they're done via the ConnectHiddenNetwork() path.
-
->   	network_settings_close(network);
->   }
->   =
-
-> =
-
-
-Regards,
--Denis
---===============3667781128853120929==--
+--===============0883360407909244940==--
 
