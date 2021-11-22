@@ -1,60 +1,102 @@
-Content-Type: multipart/mixed; boundary="===============2027564365771866172=="
+Content-Type: multipart/mixed; boundary="===============7051193743794319484=="
 MIME-Version: 1.0
-From: =?utf-8?q?Joakim_Lotseng=C3=A5rd_=3Cjoakim=2El_at_orbital-systems=2Ecom?=
- =?utf-8?q?=3E?=
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Possible bug when /var/lib/iwd is a symlink
-Date: Thu, 14 Apr 2022 10:17:26 +0200
-Message-ID: <CAELJisxEWR2dcZ9x4Xr3+r=myTv7X1ncD1wkx6rZ6O3YVJRMAA@mail.gmail.com>
+Subject: [PATCH] autotests: p2p: Make waiting for dhclient more reliable
+Date: Mon, 22 Nov 2021 15:42:37 +0100
+Message-ID: <20211122144237.647864-1-andrew.zaborowski@intel.com>
 
---===============2027564365771866172==
+--===============7051193743794319484==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Make sure we wipe the leases file both for server and client, so that
+dhclient doesn't try to re-use leases from previous tests (should really
+happen) and waste time waiting for a reply.  Extend the timeout from 1s
+to 5s, sometimes it takes dhclient 1s just to start.  Disable verbose
+mode if not needed to avoid dhclient stalling if the pipe is not being
+read.
+---
+ autotests/testP2P/connection_test.py | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-Possible bug when /var/lib/iwd is a symlink:
+diff --git a/autotests/testP2P/connection_test.py b/autotests/testP2P/conne=
+ction_test.py
+index ddebc70a..d1681164 100644
+--- a/autotests/testP2P/connection_test.py
++++ b/autotests/testP2P/connection_test.py
+@@ -12,6 +12,8 @@ from config import ctx
+ from wpas import Wpas
+ =
 
-I ran across a problem when the ending part of /var/lib/iwd is a symlink.
-In my case it points to /mnt/persistent/iwd.  We are an IoT device that runs
-on UBIFS (+ tmpfs) and the entire rootfs partition of the NAND will be
-updated on FOTA.  Hence anything we want to save in an upgrade must be on a
-persistent partition.  Our target is a Freescale i.MX6 Ultralite module
-running an ARM A7 core (if that matters).
+ class Test(unittest.TestCase):
++    leases_path =3D '/tmp/dhcp.lease'
++
+     def test_1_client_go_neg_responder(self):
+         self.p2p_connect_test(preauthorize=3DFalse, go=3DFalse)
+ =
 
-Problem seems to be that the l_dir_watch_new() call in knownnetworks.c never
-follows symlink.  l_dir_watch_new() uses IN_DONT_FOLLOW in its call to
-inotify_add_watch() in ell.
+@@ -92,10 +94,11 @@ class Test(unittest.TestCase):
+         peer_ifname =3D wpas.p2p_group['ifname']
+         self.assertEqual(wpas.p2p_group['role'], 'GO' if not go else 'clie=
+nt')
+ =
 
-This will make the known network list misbehave.  If one forgets a
-known-network via iwctl, the list doesn't get updated.  The same goes for
-connecting to a not already known network.  It is easy to reproduce.  Just
-symlink /var/lib/iwd to another location and run some connect + forget in
-iwctl.  One can also note that adding a new /var/lib/iwd/my_ssid.psk, by
-manually creating the file, is not picked up by iwd automatically.
++        os.system('> ' + self.leases_path)
++
+         if not go:
+             ctx.start_process(['ip', 'addr', 'add','dev', peer_ifname, '19=
+2.168.1.20/255.255.255.0']).wait()
+-            os.system('> /tmp/dhcp.leases')
+-            dhcp =3D ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/dhcpd.=
+conf', '-lf', '/tmp/dhcp.leases', peer_ifname])
++            dhcp =3D ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/dhcpd.=
+conf', '-lf', self.leases_path, peer_ifname])
+             self.dhcp =3D dhcp
+ =
 
-I've only tested this with iwd 1.17 and ell 0.43 due to the complexity to
-build another version using Yocto.  However, I've checked the source code
-for iwd on master and they don't seem to handle the fact that /var/lib/iwd
-is a symlink.  I've tried to search the mailing-list and google, but can't
-find anything about this.  It seems I can change the /var/lib/iwd directory
-during compilation by setting DAEMON_STORAGEDIR during configure/build.
-However, that is a bit unflexible as my system is Yocto based, and hacking
-the Yocto recipes for this seems wrong.  Normally you symlink things in your
-file tree in IoT devices to point to persistent storage areas.
+             wd.wait_for_object_condition(wpas, 'len(obj.p2p_clients) =3D=
+=3D 1', max_wait=3D3)
+@@ -105,12 +108,17 @@ class Test(unittest.TestCase):
+             self.assertEqual(wpas.p2p_group['ip_addr'], '192.168.1.2')
+             self.assertEqual(wpas.p2p_group['ip_mask'], '255.255.255.240')
+             self.assertEqual(wpas.p2p_group['go_ip_addr'], '192.168.1.1')
+-            dhcp =3D ctx.start_process(['dhclient', '-v', '-d', '--no-pid'=
+, '-cf', '/dev/null', '-lf', '/tmp/dhcp.leases',
+-                '-sf', '/tmp/dhclient-script', peer_ifname])
++
++            extra_params =3D []
++            if ctx.is_verbose('dhclient'):
++                extra_params.append('-v')
++
++            dhcp =3D ctx.start_process(['dhclient', '-d', '--no-pid', '-cf=
+', '/dev/null', '-lf', self.leases_path,
++                '-sf', '/tmp/dhclient-script'] + extra_params + [peer_ifna=
+me])
+             self.dhcp =3D dhcp
+ =
 
-I don't have a solution, but at least iwd should detect that /var/lib/iwd is
-a symlink and warn the user.  The implication is that the known-network list
-doesn't work at all.  The internal known-network list should work even if
-inotify doesn't.
+         wd.wait_for_object_condition(peer, 'obj.connected', max_wait=3D15)
+-        time.sleep(1) # Give the client time to set the IP
++        time.sleep(5) # Give the client time to set the IP
+         testutil.test_ip_address_match(peer_ifname, peer.connected_ip)
+ =
 
-Perhaps also it should be allowed to change the default storage dir in
-/etc/iwd/main.conf.
+         if not go:
+@@ -146,7 +154,7 @@ class Test(unittest.TestCase):
+             self.wpas =3D None
+         if self.dhcp is not None:
+             ctx.stop_process(self.dhcp)
+-        for path in ['/tmp/dhcp.leases']:
++        for path in [self.leases_path, self.leases_path + '~']:
+             if os.path.exists(path):
+                 os.remove(path)
+ =
 
 -- =
 
-Best regards,
-Joakim Lotseng=C3=A5rd
---===============2027564365771866172==--
+2.32.0
+
+--===============7051193743794319484==--
 
