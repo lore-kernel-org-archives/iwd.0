@@ -1,31 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============1426474075216664103=="
+Content-Type: multipart/mixed; boundary="===============8404634067813957634=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/6] client: add a few return checks
-Date: Fri, 18 Mar 2022 12:47:47 -0500
-Message-ID: <7808ab50-2fc2-50d1-5ce1-9429aafd086f@gmail.com>
-In-Reply-To: 20220318164420.739968-1-prestwoj@gmail.com
+Subject: Re: iwd / wireless direct / P2P documentation
+Date: Mon, 22 Nov 2021 15:57:56 +0100
+Message-ID: <CAOq732KEN8HVDXEksH_DArx8wNwveFvDXLKMw_kx9G8=63jiKQ@mail.gmail.com>
+In-Reply-To: CADdae-gewCJPSGY-MXTYBrWGzAG-SD1LJt-+YN17Bq8wNJQAYQ@mail.gmail.com
 
---===============1426474075216664103==
+--===============8404634067813957634==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Nicolas,
 
-On 3/18/22 11:44, James Prestwood wrote:
-> These were caught by static analysis
-> ---
->   client/daemon.c | 22 +++++++++++++++-------
->   1 file changed, 15 insertions(+), 7 deletions(-)
-> =
+On Mon, 22 Nov 2021 at 15:46, Nicolas Prochazka
+<nicolas.prochazka(a)gmail.com> wrote:
+> Hello,
+> Is there a tutorial or example for configuring two linux boxes in P2P mod=
+e with iwctl ?
 
+There isn't one and no P2P commands are available in iwctl at this
+time.  P2P is still work-in-progress in IWD but generally you need a
+program that implements a P2P service (similar to bluetooth profile)
+and that program can talk to IWD directly, so iwctl commands would not
+be useful.  Wi-Fi Display is the main service that is targeted.
 
-All applied, thanks.
+Technically you should be able to run the test/connect-p2p script on
+one machine without passing any peer name, and run:
 
-Regards,
--Denis
+test/connect-p2p <first-machine's-name>
 
---===============1426474075216664103==--
+on the other and that should give you an IP connection if successful.
+Both IWD instances need to have EnableNetworkConfiguration=3D1 in their
+main.conf.
+
+Best regards
+--===============8404634067813957634==--
 
