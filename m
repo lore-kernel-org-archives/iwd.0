@@ -1,49 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============4426684871849880361=="
+Content-Type: multipart/mixed; boundary="===============4427015120041668327=="
 MIME-Version: 1.0
-From: 54d22547-afc0-4701-b1fc-5a2a2e411646 at simplelogin.co
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd 1.21 stuck on connecting state
-Date: Thu, 03 Feb 2022 20:10:55 +0000
-Message-ID: <20220203201055.3721.56890@ml01.vlan13.01.org>
-In-Reply-To: 3a4f9626fdae0a61df24e6e9c9fd7d25f0dea9b7.camel@gmail.com
+Subject: [PATCH 1/2] netdev: only set in_reassoc if using an auth-proto
+Date: Tue, 23 Nov 2021 09:37:38 -0800
+Message-ID: <20211123173739.3600218-1-prestwoj@gmail.com>
 
---===============4426684871849880361==
+--===============4427015120041668327==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> This actually got merged an hour or two ago
+The kernel strangely sends a disconnect event when using auth/assoc
+commands, but does not for CMD_CONNECT (only deauth). This wasn't
+observed and IWD assumed a disconnect event comes unconditionally.
+Because of this in_reassoc is checked in netdev_disconnect_event
+and the event is ignored if set.
 
-I noticed right after posting. Classic hehe.
+When CMD_CONNECT is used to reassociate this would cause disconnect
+events to be ignored when they should not be, preventing IWD from
+going into a disconnected state post-roam.
 
-Issue seems solved. I get connectivity and according to logs iwd is discard=
-ing previous DHCP requests:
+Now, in_reassoc is only set if an auth-proto is used.
+---
+ src/netdev.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-[DHCPv4] dhcp_client_send_discover:346
-[DHCPv4] l_dhcp_client_start:1210 Entering state: DHCP_STATE_SELECTING
-[DHCPv4] dhcp_client_timeout_resend:526
-[DHCPv4] dhcp_client_send_discover:346
-[DHCPv4] dhcp_client_rx_message:832
-[DHCPv4] dhcp_client_receive_offer:762
-[DHCPv4] dhcp_client_handle_offer:805 Entering state: DHCP_STATE_REQUESTING
-[DHCPv4] dhcp_client_send_request:396
-[DHCPv4] dhcp_client_rx_message:832
-[DHCPv4] dhcp_client_receive_offer:762
-[DHCPv4] dhcp_client_receive_offer:786 Server sent another offer, using it =
-instead
-[DHCPv4] dhcp_client_handle_offer:805 Entering state: DHCP_STATE_REQUESTING
-[DHCPv4] dhcp_client_send_request:396
-[DHCPv4] dhcp_client_rx_message:832
-[DHCPv4] dhcp_client_receive_ack:684
-[DHCPv4] dhcp_client_rx_message:905 Entering state: DHCP_STATE_BOUND
-[DHCPv4] dhcp_client_rx_message:939 T1 expiring in 21600784 ms
-[DHCPv4] l_acd_start:447 Skipping probes and sending announcements
-[DHCPv4] announce_wait_timeout:166 No conflicts found for 192.168.1.39, ann=
-ouncing address
-[DHCPv4] acd_send_packet:146 sending packet with target IP 192.168.1.39
+diff --git a/src/netdev.c b/src/netdev.c
+index 96e473a9..34ace286 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -4144,13 +4144,14 @@ int netdev_reassociate(struct netdev *netdev, struc=
+t scan_bss *target_bss,
+ 	netdev->associated =3D false;
+ 	netdev->operational =3D false;
+ 	netdev->connected =3D false;
+-	netdev->in_reassoc =3D true;
+ =
 
-Would you create a release soon?
+ 	netdev_connect_common(netdev, target_bss, orig_bss, hs, NULL, 0,
+ 					event_filter, cb, user_data);
+ =
 
-Thanks!
---===============4426684871849880361==--
+-	if (netdev->ap)
++	if (netdev->ap) {
++		netdev->in_reassoc =3D true;
+ 		memcpy(netdev->ap->prev_bssid, orig_bss->addr, ETH_ALEN);
++	}
+ =
+
+ 	netdev_rssi_polling_update(netdev);
+ =
+
+-- =
+
+2.31.1
+
+--===============4427015120041668327==--
 
