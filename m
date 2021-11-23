@@ -1,78 +1,78 @@
-Content-Type: multipart/mixed; boundary="===============4407227676261014709=="
+Content-Type: multipart/mixed; boundary="===============5142529383988418038=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 1/5] ft: check authenticator_ie from ft_ds_info,
- not handshake
-Date: Tue, 28 Sep 2021 15:25:49 -0700
-Message-ID: <20210928222553.1096611-1-prestwoj@gmail.com>
+Subject: [PATCH v2 1/2] netdev: always honor disconnect events if issued by AP
+Date: Tue, 23 Nov 2021 10:17:31 -0800
+Message-ID: <20211123181732.3617090-1-prestwoj@gmail.com>
 
---===============4407227676261014709==
+--===============5142529383988418038==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The handshake contains the current BSS's RSNE/WPA which may differ
-from the FT-over-DS target. When verifying the target BSS's RSNE/WPA
-IE needs to be checked, not the current BSS.
+The disconnect event handler was mistakenly bailing out if FT or
+reassociation was going on. This was done because a disconnect
+event is sent by the kernel when CMD_AUTH/CMD_ASSOC is used.
+
+The problem is an AP could also disconnect IWD which should never
+be ignored.
+
+To fix this always parse the disconnect event and, if issued by
+the AP, always notify watchers of the disconnect.
 ---
- src/ft.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ src/netdev.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/src/ft.c b/src/ft.c
-index fecb4c0e..7a4b16f3 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -354,6 +354,7 @@ static bool ft_verify_rsne(const uint8_t *rsne, const u=
-int8_t *pmk_r0_name,
- }
+diff --git a/src/netdev.c b/src/netdev.c
+index 96e473a9..e35a8b82 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1165,8 +1165,7 @@ static void netdev_disconnect_event(struct l_genl_msg=
+ *msg,
  =
 
- static int ft_parse_ies(struct handshake_state *hs,
-+			const uint8_t *authenticator_ie,
- 			const uint8_t *ies, size_t ies_len,
- 			const uint8_t **mde_out,
- 			const uint8_t **fte_out)
-@@ -394,8 +395,7 @@ static int ft_parse_ies(struct handshake_state *hs,
- 	is_rsn =3D hs->supplicant_ie !=3D NULL;
+ 	l_debug("");
  =
 
- 	if (is_rsn) {
--		if (!ft_verify_rsne(rsne, hs->pmk_r0_name,
--					hs->authenticator_ie))
-+		if (!ft_verify_rsne(rsne, hs->pmk_r0_name, authenticator_ie))
- 			goto ft_error;
- 	} else if (rsne)
- 		goto ft_error;
-@@ -485,7 +485,8 @@ bool ft_over_ds_parse_action_ies(struct ft_ds_info *inf=
-o,
- 	const uint8_t *fte =3D NULL;
- 	bool is_rsn =3D hs->supplicant_ie !=3D NULL;
+-	if (!netdev->connected || netdev->disconnect_cmd_id > 0 ||
+-			netdev->in_ft || netdev->in_reassoc)
++	if (!netdev->connected || netdev->disconnect_cmd_id > 0)
+ 		return;
  =
 
--	if (ft_parse_ies(hs, ies, ies_len, &mde, &fte) < 0)
-+	if (ft_parse_ies(hs, info->authenticator_ie, ies, ies_len,
-+				&mde, &fte) < 0)
- 		return false;
+ 	if (!l_genl_attr_init(&attr, msg)) {
+@@ -1190,6 +1189,13 @@ static void netdev_disconnect_event(struct l_genl_ms=
+g *msg,
+ 		}
+ 	}
  =
 
- 	if (!mde_equal(info->mde, mde))
-@@ -516,7 +517,8 @@ static int ft_process_ies(struct handshake_state *hs, c=
-onst uint8_t *ies,
- 	if (!ies)
- 		goto ft_error;
++	/*
++	 * Only ignore this event if issued by the kernel since this is
++	 * normal when using CMD_AUTH/ASSOC.
++	 */
++	if (!disconnect_by_ap && (netdev->in_ft || netdev->in_reassoc))
++		return;
++
+ 	l_info("Received Deauthentication event, reason: %hu, from_ap: %s",
+ 			reason_code, disconnect_by_ap ? "true" : "false");
  =
 
--	if (ft_parse_ies(hs, ies, ies_len, &mde, &fte) < 0)
-+	if (ft_parse_ies(hs, hs->authenticator_ie, ies, ies_len,
-+				&mde, &fte) < 0)
- 		goto ft_error;
+@@ -3171,6 +3177,7 @@ static void netdev_associate_event(struct l_genl_msg =
+*msg,
  =
 
- 	if (!mde_equal(hs->mde, mde))
+ 	if (!netdev->ap) {
+ 		netdev->associated =3D true;
++		netdev->in_reassoc =3D false;
+ 		return;
+ 	}
+ =
+
 -- =
 
 2.31.1
 
---===============4407227676261014709==--
+--===============5142529383988418038==--
 
