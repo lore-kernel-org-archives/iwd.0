@@ -1,32 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============5995458707204384283=="
+Content-Type: multipart/mixed; boundary="===============3806432666737291644=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] doc: Update the test-runner documentation
-Date: Fri, 08 Apr 2022 10:49:30 -0500
-Message-ID: <c5521c9f-9ece-eebb-eab2-b9693b04f5da@gmail.com>
-In-Reply-To: 20220407163931.1137665-1-prestwoj@gmail.com
+Subject: [PATCH v2 2/2] auto-t: testPSK-roam deauthenticate IWD after roam
+Date: Tue, 23 Nov 2021 10:17:32 -0800
+Message-ID: <20211123181732.3617090-2-prestwoj@gmail.com>
+In-Reply-To: 20211123181732.3617090-1-prestwoj@gmail.com
 
---===============5995458707204384283==
+--===============3806432666737291644==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+After roaming deauth IWD and check the connection state.
+---
+ autotests/testPSK-roam/connection_test.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-On 4/7/22 11:39, James Prestwood wrote:
-> Includes instructions for UML, which is now the preferred way to use
-> test-runner.
-> ---
->   doc/test-runner.txt | 34 ++++++++++++++++++++++++----------
->   1 file changed, 24 insertions(+), 10 deletions(-)
-> =
+diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
+roam/connection_test.py
+index 437e52fc..8d9b22ad 100644
+--- a/autotests/testPSK-roam/connection_test.py
++++ b/autotests/testPSK-roam/connection_test.py
+@@ -100,6 +100,10 @@ class Test(unittest.TestCase):
+         self.assertRaises(Exception, testutil.test_ifaces_connected,
+                           (self.bss_hostapd[1].ifname, device.name, True, =
+True))
+ =
 
++        self.bss_hostapd[0].deauthenticate(device.address)
++        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
++        wd.wait_for_object_condition(device, condition)
++
+     def test_ft_psk(self):
+         wd =3D IWD(True)
+ =
 
-Applied, thanks.
+-- =
 
-Regards,
--Denis
+2.31.1
 
---===============5995458707204384283==--
+--===============3806432666737291644==--
 
