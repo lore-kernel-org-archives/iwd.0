@@ -1,51 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============0556443343539188191=="
+Content-Type: multipart/mixed; boundary="===============8506135765700601154=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 04/10] test-runner: remove unused class members
-Date: Wed, 06 Apr 2022 12:14:47 -0700
-Message-ID: <20220406191453.978426-4-prestwoj@gmail.com>
-In-Reply-To: 20220406191453.978426-1-prestwoj@gmail.com
+Subject: [PATCH 2/6] scan: parse configurator connectivity element
+Date: Mon, 29 Nov 2021 15:12:56 -0800
+Message-ID: <20211129231300.108873-2-prestwoj@gmail.com>
+In-Reply-To: 20211129231300.108873-1-prestwoj@gmail.com
 
---===============0556443343539188191==
+--===============8506135765700601154==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This element has no data and indicates the AP supports configuring
+stations via DPP while also serving current stations.
 ---
- tools/run-tests | 5 -----
- 1 file changed, 5 deletions(-)
+ src/scan.c | 3 +++
+ src/scan.h | 1 +
+ 2 files changed, 4 insertions(+)
 
-diff --git a/tools/run-tests b/tools/run-tests
-index 5f405e67..92ba324a 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -343,12 +343,8 @@ class TestContext(Namespace):
- 		self.hw_config =3D None
- 		self.hostapd =3D None
- 		self.wpas_interfaces =3D None
--		self.cur_radio_id =3D 0
--		self.cur_iface_id =3D 0
- 		self.radios =3D []
--		self.loopback_started =3D False
- 		self.results =3D {}
--		self.mainloop =3D GLib.MainLoop()
- 		self.namespaces =3D []
- 		self._last_mem_available =3D 0
- 		self._mem_chart =3D BarChart()
-@@ -387,7 +383,6 @@ class TestContext(Namespace):
- 				rad_config =3D self.hw_config[name]
+diff --git a/src/scan.c b/src/scan.c
+index 38a15c11..b602c8be 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -1097,6 +1097,9 @@ static void scan_parse_vendor_specific(struct scan_bs=
+s *bss, const void *data,
+ 		return;
+ 	}
  =
 
- 			self.radios.append(VirtualRadio(name, rad_config))
--			self.cur_radio_id +=3D 1
++	if (is_ie_wfa_ie(data, len, IE_WFA_OI_CONFIGURATOR_CONNECTIVITY))
++		bss->dpp_configurator =3D true;
++
+ 	if (!ie_parse_network_cost(data, len, &cost_level, &cost_flags)) {
+ 		bss->cost_level =3D cost_level;
+ 		bss->cost_flags =3D cost_flags;
+diff --git a/src/scan.h b/src/scan.h
+index 2920a1d2..66e38410 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -90,6 +90,7 @@ struct scan_bss {
+ 	bool hs20_dgaf_disable : 1;
+ 	uint8_t cost_level : 3;
+ 	uint8_t cost_flags : 4;
++	bool dpp_configurator : 1;
+ };
  =
 
- 	def discover_radios(self):
- 		import pyroute2
+ struct scan_parameters {
 -- =
 
-2.34.1
+2.31.1
 
---===============0556443343539188191==--
+--===============8506135765700601154==--
 
