@@ -1,62 +1,121 @@
-Content-Type: multipart/mixed; boundary="===============0883360407909244940=="
+Content-Type: multipart/mixed; boundary="===============1152219007589312235=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/4] crypto: use void* for hkdf_expand
-Date: Mon, 22 Nov 2021 12:44:23 -0800
-Message-ID: <20211122204425.3567479-2-prestwoj@gmail.com>
-In-Reply-To: 20211122204425.3567479-1-prestwoj@gmail.com
+Subject: Re: [PATCH 3/6] scan: add scan_freq_set_serialize
+Date: Mon, 29 Nov 2021 17:37:28 -0600
+Message-ID: <f5b9b2d3-7582-dc09-36ca-d67dcf906309@gmail.com>
+In-Reply-To: 20211129231300.108873-3-prestwoj@gmail.com
 
---===============0883360407909244940==
+--===============1152219007589312235==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This makes it more flexible for other storage types
----
- src/crypto.c | 2 +-
- src/crypto.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Hi James,
 
-diff --git a/src/crypto.c b/src/crypto.c
-index c5bf6fe1..7d5e42fe 100644
---- a/src/crypto.c
-+++ b/src/crypto.c
-@@ -860,7 +860,7 @@ bool hkdf_extract(enum l_checksum_type type, const void=
- *key,
- 	return (ret =3D=3D (int) dlen);
- }
- =
+On 11/29/21 5:12 PM, James Prestwood wrote:
+> This serializes a scan_freq_set into a uint32_t array.
+> ---
+>   src/scan.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>   src/scan.h |  3 +++
+>   2 files changed, 48 insertions(+)
+> =
 
--bool hkdf_expand(enum l_checksum_type type, const uint8_t *key, size_t key=
-_len,
-+bool hkdf_expand(enum l_checksum_type type, const void *key, size_t key_le=
-n,
- 			const char *info, void *out, size_t out_len)
- {
- 	return prf_plus(type, key, key_len, info, out, out_len, 0);
-diff --git a/src/crypto.h b/src/crypto.h
-index eb48fe5b..b6fa2ec3 100644
---- a/src/crypto.h
-+++ b/src/crypto.h
-@@ -122,7 +122,7 @@ bool prf_plus(enum l_checksum_type type, const void *ke=
-y, size_t key_len,
- bool hkdf_extract(enum l_checksum_type type, const void *key, size_t key_l=
-en,
- 				uint8_t num_args, void *out, ...);
- =
+> diff --git a/src/scan.c b/src/scan.c
+> index b602c8be..1c80dd65 100644
+> --- a/src/scan.c
+> +++ b/src/scan.c
+> @@ -2370,6 +2370,51 @@ void scan_freq_set_constrain(struct scan_freq_set =
+*set,
+>   	set->channels_2ghz &=3D constraint->channels_2ghz;
+>   }
+>   =
 
--bool hkdf_expand(enum l_checksum_type type, const uint8_t *key, size_t key=
-_len,
-+bool hkdf_expand(enum l_checksum_type type, const void *key, size_t key_le=
-n,
- 				const char *info, void *out, size_t out_len);
- =
+> +struct scan_freq_get_index_data {
+> +	unsigned int target;
+> +	unsigned int current;
+> +	uint32_t found;
+> +};
 
- bool crypto_derive_pairwise_ptk(const uint8_t *pmk, size_t pmk_len,
--- =
+Whats this for?
 
-2.31.1
+> +
+> +static void count_foreach(uint32_t freq, void *user_data)
+> +{
+> +	uint8_t *count =3D user_data;
+> +
+> +	l_put_u8(*count + 1, count);
+> +}
 
---===============0883360407909244940==--
+Hmm, I wonder if you can either calculate this directly or book-keep the co=
+unt =
+
+in scan_freq_set itself.  In theory the 2g freqs (if not zero) are just =
+
+__builtin_popcount().  For the uintset it is essentially the same.
+
+> +
+> +static void add_foreach(uint32_t freq, void *user_data)
+> +{
+> +	uint32_t **list =3D user_data;
+> +
+> +	**list =3D freq;
+> +
+> +	*list =3D *list + 1;
+> +}
+> +
+> +uint32_t *scan_freq_set_serialize(const struct scan_freq_set *set,
+> +					size_t *len_out)
+> +{
+> +	uint8_t count =3D 0;
+> +	uint32_t *freqs;
+> +
+> +	scan_freq_set_foreach(set, count_foreach, &count);
+> +
+> +	if (!count)
+> +		return NULL;
+> +
+> +	freqs =3D l_new(uint32_t, count);
+> +
+> +	scan_freq_set_foreach(set, add_foreach, &freqs);
+> +
+> +	/* Move pointer back to start of list */
+> +	freqs -=3D count;
+> +
+> +	*len_out =3D count;
+> +
+> +	return freqs;
+> +}
+> +
+>   bool scan_wdev_add(uint64_t wdev_id)
+>   {
+>   	struct scan_context *sc;
+> diff --git a/src/scan.h b/src/scan.h
+> index 66e38410..e6eea1c5 100644
+> --- a/src/scan.h
+> +++ b/src/scan.h
+> @@ -191,5 +191,8 @@ void scan_freq_set_constrain(struct scan_freq_set *se=
+t,
+>   					const struct scan_freq_set *constraint);
+>   bool scan_freq_set_isempty(const struct scan_freq_set *set);
+>   =
+
+> +uint32_t *scan_freq_set_serialize(const struct scan_freq_set *set,
+> +					size_t *len_out);
+> +
+
+Can we call this scan_freq_set_to_fixed_array, similar to how l_dbus_messag=
+e =
+
+names this.
+
+>   bool scan_wdev_add(uint64_t wdev_id);
+>   bool scan_wdev_remove(uint64_t wdev_id);
+> =
+
+
+Regards,
+-Denis
+--===============1152219007589312235==--
 
