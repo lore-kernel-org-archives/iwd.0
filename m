@@ -1,98 +1,90 @@
-Content-Type: multipart/mixed; boundary="===============3100187884104494859=="
+Content-Type: multipart/mixed; boundary="===============7737236961105959764=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
-Date: Tue, 17 May 2022 13:09:02 -0500
-Message-ID: <04786874-f47b-aaa8-f3f3-1492fd268b01@gmail.com>
-In-Reply-To: 20220517171642.147923-1-mjohnson459@gmail.com
+Subject: Re: iwd configure location and files
+Date: Tue, 30 Nov 2021 17:53:40 -0600
+Message-ID: <070b7088-2ab6-67bf-63a1-7a1be95a58f7@gmail.com>
+In-Reply-To: CAA=hcWRD26NoeS5bgZ3kdBFz2c7n=kpan2etQkXhRKv1UavYJw@mail.gmail.com
 
---===============3100187884104494859==
+--===============7737236961105959764==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+Hi Jupiter,
 
-On 5/17/22 12:16, Michael Johnson wrote:
-> Allows granularly specifying the DHCP logging level. This allows the
-> user to tailor the output to what they need. By default always display
-> errors and warnings.
+> My bad, here is DHCP debugging, looks like failed to get DHCP server resp=
+onse:
 > =
 
-> 1 =3D INFO
-> 2 =3D DEBUG
-> ---
->   src/netconfig.c | 17 ++++++++++++++---
->   1 file changed, 14 insertions(+), 3 deletions(-)
+> ../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+> '34:08:04:12:b1:a2' freq: 2437, rank: 2722, strength: -6500
+> ../iwd-1.19/src/station.c:station_enter_state() Old State:
+> autoconnect_full, new state: connecting (auto)
+> ../iwd-1.19/src/station.c:station_netdev_event() Associating
+> ../iwd-1.19/src/station.c:station_handshake_event() Setting keys
+> ../iwd-1.19/src/station.c:station_connect_cb() 14, result: 0
+> ../iwd-1.19/src/station.c:station_connect_ok()
+> netconfig: Failed to start DHCPv4 client for interface 14
+> WARNING: ../iwd-1.19/src/station.c:station_connect_ok() condition
+> !netconfig_configure(station->netconfig,
+
+Ugh, not sure what happens here.  First, can you update to iwd 1.20?  I don=
+'t =
+
+think anything was touched around this for several releases, but I'd hate t=
+o try =
+
+and debug an old version.  Also, share the full log of iwd when this happen=
+s...
+
+Can you strace iwd and see what syscall might be failing around this time? =
+ You =
+
+may also need to step through l_dhcp_client_start to see why it is failing.=
+  It =
+
+really shouldn't under normal circumstances, hence we have no debugs in thi=
+s area.
+
+> station_netconfig_event_handler, station) failed
+> [DHCPv4] dhcp_client_timeout_resend:526
+> [DHCPv4] dhcp_client_send_discover:346
+> [DHCPv4] dhcp_client_timeout_resend:526
+> [DHCPv4] dhcp_client_send_discover:346
+> [DHCPv4] dhcp_client_timeout_resend:526
+> [DHCPv4] dhcp_client_send_discover:346
+> [DHCPv4] dhcp_client_timeout_resend:526
+> [DHCPv4] dhcp_client_send_discover:346
+
+And this is even more strange.  If l_dhcp_client_start() fails, then the re=
+send =
+
+timer shouldn't even be set and you shouldn't even see this sequence.
+
+Can you try compiling with optimizations off (./configure --enable-debug =
+
+--disable-optimization) and see if the behavior changes?
+
 > =
 
-> diff --git a/src/netconfig.c b/src/netconfig.c
-> index 6694a0e9..da9969f2 100644
-> --- a/src/netconfig.c
-> +++ b/src/netconfig.c
-> @@ -1621,6 +1621,8 @@ struct netconfig *netconfig_new(uint32_t ifindex)
->   	struct netdev *netdev =3D netdev_find(ifindex);
->   	struct netconfig *netconfig;
->   	struct l_icmp6_client *icmp6;
-> +	const char *debug_level =3D NULL;
-> +	int dhcp_priority =3D L_LOG_WARNING;
->   =
+> Is netconfig from iwd?
 
->   	if (!netconfig_list)
->   		return NULL;
-> @@ -1640,9 +1642,18 @@ struct netconfig *netconfig_new(uint32_t ifindex)
->   					netconfig_ipv4_dhcp_event_handler,
->   					netconfig, NULL);
->   =
+yes
 
-> -	if (getenv("IWD_DHCP_DEBUG"))
-> -		l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
-> -							"[DHCPv4] ", NULL);
-> +	debug_level =3D getenv("IWD_DHCP_DEBUG");
-> +	if (debug_level !=3D NULL)
-> +	{
-> +		// Convert from user 1 or 2 to L_LOG_*
-
-Actually, that's not our coding style.  We use Linux Kernel style, so it wo=
-uld be:
-
-if (debug_level !=3D NULL) {
-
-and no C++ comments please.
-
-> +		if (*debug_level =3D=3D '1')
-> +			dhcp_priority =3D L_LOG_INFO;
-> +		else if (*debug_level =3D=3D '2')
-> +			dhcp_priority =3D L_LOG_DEBUG;
-> +	}
-> +
-
-This changes the semantics slightly.  In our wiki, etc we show IWD_DHCP_DEB=
-UG =
-
-with value "1" to enable debugging, so I think we should be nice and keep t=
-hat =
-
-behavior if possible.  How about:
-
-if IWD_DHCP_DEBUG is not set, use L_LOG_WARNING.
-
-If IWD_DHCP_DEBUG is set and has a non-NULL value, use L_LOG_DEBUG
-
-If the value above is from the set L_LOG_ERR .. L_LOG_DEBUG (3 .. 7), then =
-use that.
-
-> +	l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
-> +					"[DHCPv4] ", NULL, dhcp_priority);
->   =
-
->   	netconfig->dhcp6_client =3D l_dhcp6_client_new(ifindex);
->   	l_dhcp6_client_set_event_handler(netconfig->dhcp6_client,
 > =
 
+> I think the DHCP server is running from the home WiFi modem, right? My
+> laptop is also connected to the same WiFi modem SSID JupiterIoT which
+> should rule out home WiFi network DHCP server issues.
+
+Given the fact that we fail to start dhcp client, I'm not sure we even send=
+ any =
+
+discover packets.  So your server might be just fine.
 
 Regards,
 -Denis
---===============3100187884104494859==--
+--===============7737236961105959764==--
 
