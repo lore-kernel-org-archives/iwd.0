@@ -1,58 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============5437807421046878890=="
+Content-Type: multipart/mixed; boundary="===============0418908169049536979=="
 MIME-Version: 1.0
-From: salahaldeen.altous at leica-camera.com
+From: Jupiter <jupiter.hce at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: IWD is running as AP with the build-in DHCP but android phones
- report no internet connection and switch back to WiFi home network
-Date: Sun, 07 Nov 2021 09:32:47 +0000
-Message-ID: <20211107093247.2830.83151@ml01.vlan13.01.org>
-In-Reply-To: 2459d9b7-2ba9-8798-21f6-35708f3ec8cc@gmail.com
+Subject: Re: iwd configure location and files
+Date: Wed, 01 Dec 2021 10:25:51 +1100
+Message-ID: <CAA=hcWRD26NoeS5bgZ3kdBFz2c7n=kpan2etQkXhRKv1UavYJw@mail.gmail.com>
+In-Reply-To: 31be7914-5c78-f1c9-1225-a271204ba153@gmail.com
 
---===============5437807421046878890==
+--===============0418908169049536979==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi Denis,
-thanks again for your quick help.
-> Hi Salahaldeen,
-> =
 
-> =
+> For DHCP debugging, refer to 'man iwd.debug'.  You will need to set the
+> appropriate environment variable (IWD_DHCP_DEBUG or so).  The iwd wiki [1]
+> has
+> examples.
 
-> So looking at ell/dhcp-server.c, we shouldn't be sending DNS server info =
-unless =
+My bad, here is DHCP debugging, looks like failed to get DHCP server respon=
+se:
 
-> l_dhcp_server_set_dns has been called.  So this part seems OK.
-Thanks for  your confirmation.
-> =
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'34:08:04:12:b1:a2' freq: 2437, rank: 2722, strength: -6500
+../iwd-1.19/src/station.c:station_enter_state() Old State:
+autoconnect_full, new state: connecting (auto)
+../iwd-1.19/src/station.c:station_netdev_event() Associating
+../iwd-1.19/src/station.c:station_handshake_event() Setting keys
+../iwd-1.19/src/station.c:station_connect_cb() 14, result: 0
+../iwd-1.19/src/station.c:station_connect_ok()
+netconfig: Failed to start DHCPv4 client for interface 14
+WARNING: ../iwd-1.19/src/station.c:station_connect_ok() condition
+!netconfig_configure(station->netconfig,
+station_netconfig_event_handler, station) failed
+[DHCPv4] dhcp_client_timeout_resend:526
+[DHCPv4] dhcp_client_send_discover:346
+[DHCPv4] dhcp_client_timeout_resend:526
+[DHCPv4] dhcp_client_send_discover:346
+[DHCPv4] dhcp_client_timeout_resend:526
+[DHCPv4] dhcp_client_send_discover:346
+[DHCPv4] dhcp_client_timeout_resend:526
+[DHCPv4] dhcp_client_send_discover:346
 
-> In iwd, src/ap.c...  We do not call l_dhcp_server_set_dns unless the prof=
-ile =
+Is netconfig from iwd?
 
-> specifies it.  So if IPv4.DNSList isn't set, we should not be sending thi=
-s =
+I think the DHCP server is running from the home WiFi modem, right? My
+laptop is also connected to the same WiFi modem SSID JupiterIoT which
+should rule out home WiFi network DHCP server issues.
 
-> option in the lease.
-> =
+Thank you very much.
 
-> Can you look (or share) pcaps of iwd & dnsmasq DHCP exchanges to see / co=
-mpare =
+Kind regards,
 
-> what is actually happening?
-
-The dnsmasq DHCP solution was running at different hardware which is using =
-openwrt. =
-
-I will try to run iwd with dnsmasq and dropping DHCP option 3 and 6 and che=
-ck if it work.
-After that I can compare between both DHCP.
-> =
-
-> Regards,
-> -Denis
-
-Regards,
-Salahaldeen
---===============5437807421046878890==--
+- jupiter
+--===============0418908169049536979==--
 
