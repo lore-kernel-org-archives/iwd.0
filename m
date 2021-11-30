@@ -1,48 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============3782466155840413012=="
+Content-Type: multipart/mixed; boundary="===============4362108791453827701=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 12/12] dpp: fix dpp_offchannel_start corner cases
-Date: Thu, 20 Jan 2022 14:20:22 -0600
-Message-ID: <33106f30-3066-e970-73a2-981276c50c6c@gmail.com>
-In-Reply-To: 20220118212512.2017977-12-prestwoj@gmail.com
+Subject: [PATCH v3 2/3] scan: add scan_freq_set_to_fixed_array
+Date: Tue, 30 Nov 2021 10:24:12 -0800
+Message-ID: <20211130182413.437115-2-prestwoj@gmail.com>
+In-Reply-To: 20211130182413.437115-1-prestwoj@gmail.com
 
---===============3782466155840413012==
+--===============4362108791453827701==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This serializes a scan_freq_set into a uint32_t array.
+---
+ src/util.c | 33 +++++++++++++++++++++++++++++++++
+ src/util.h |  2 ++
+ 2 files changed, 35 insertions(+)
 
-On 1/18/22 15:25, James Prestwood wrote:
-> The purpose of this was to have a single utility to both cancel an
-> existing offchannel operation (if one exists) and start a new one.
-> =
+diff --git a/src/util.c b/src/util.c
+index 381894f4..ca0f46ae 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -470,3 +470,36 @@ void scan_freq_set_constrain(struct scan_freq_set *set,
+ =
 
-> The problem was the previous offchannel operation was being canceled
-> first which opened up the radio work queue to other items. This is
-> not desireable as, for example, a scan would end up breaking the
-> DPP protocol most likely.
-> =
+ 	set->channels_2ghz &=3D constraint->channels_2ghz;
+ }
++
++static void add_foreach(uint32_t freq, void *user_data)
++{
++	uint32_t **list =3D user_data;
++
++	**list =3D freq;
++
++	*list =3D *list + 1;
++}
++
++uint32_t *scan_freq_set_to_fixed_array(const struct scan_freq_set *set,
++					size_t *len_out)
++{
++	uint8_t count =3D 0;
++	uint32_t *freqs;
++
++	count =3D __builtin_popcount(set->channels_2ghz) +
++				l_uintset_size(set->channels_5ghz);
++
++	if (!count)
++		return NULL;
++
++	freqs =3D l_new(uint32_t, count);
++
++	scan_freq_set_foreach(set, add_foreach, &freqs);
++
++	/* Move pointer back to start of list */
++	freqs -=3D count;
++
++	*len_out =3D count;
++
++	return freqs;
++}
+diff --git a/src/util.h b/src/util.h
+index 8cced9cd..b55a7ea7 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -115,5 +115,7 @@ void scan_freq_set_merge(struct scan_freq_set *to,
+ void scan_freq_set_constrain(struct scan_freq_set *set,
+ 					const struct scan_freq_set *constraint);
+ bool scan_freq_set_isempty(const struct scan_freq_set *set);
++uint32_t *scan_freq_set_to_fixed_array(const struct scan_freq_set *set,
++					size_t *len_out);
+ =
 
-> Starting the new offchannel then canceling is the correct order of
-> operations but to do this required saving the new ID, canceling, then
-> setting offchannel_id to the new ID so dpp_presence_timeout wouldn't
-> overwrite the new ID to zero.
-> =
+ #endif /* __UTIL_H */
+-- =
 
-> This also removes an explicit call to offchannel_cancel which is
-> already done by dpp_offchannel_start.
-> ---
->   src/dpp.c | 23 +++++++++++++++++++----
->   1 file changed, 19 insertions(+), 4 deletions(-)
-> =
+2.31.1
 
-
-Applied, thanks.
-
-Regards,
--Denis
-
---===============3782466155840413012==--
+--===============4362108791453827701==--
 
