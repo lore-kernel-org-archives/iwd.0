@@ -1,40 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============1575409153843568994=="
+Content-Type: multipart/mixed; boundary="===============6610721089284937387=="
 MIME-Version: 1.0
-From: Diederik de Haas <didi.debian at cknow.org>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] dpp: fix 2 spelling errors
-Date: Fri, 14 Jan 2022 18:38:48 +0100
-Message-ID: <20220114173847.11777-1-didi.debian@cknow.org>
+Subject: Re: [PATCH v2 2/3] scan: add scan_freq_set_serialize
+Date: Tue, 30 Nov 2021 12:26:01 -0600
+Message-ID: <b9164c3e-0847-fe30-3fda-5e4778a471a8@gmail.com>
+In-Reply-To: 20211130174813.384374-2-prestwoj@gmail.com
 
---===============1575409153843568994==
+--===============6610721089284937387==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
-Hopefully I did it correctly.
+Hi James,
 
- src/dpp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 11/30/21 11:48 AM, James Prestwood wrote:
+> This serializes a scan_freq_set into a uint32_t array.
 
-diff --git a/src/dpp.c b/src/dpp.c
-index f33b655b..78e8ffc5 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -1254,7 +1254,7 @@ static void dpp_presence_announce(struct dpp_sm *dpp)
- 	iov[1].iov_base =3D attrs;
- 	iov[1].iov_len =3D ptr - attrs;
- =
+Looks like you didn't update 'serialize' to _fixed_array in the commit head=
+er.
 
--	l_debug("Sending presense annoucement on frequency %u and waiting %u",
-+	l_debug("Sending presence announcement on frequency %u and waiting %u",
- 		dpp->current_freq, dpp->dwell);
- =
+> ---
+>   src/util.c | 33 +++++++++++++++++++++++++++++++++
+>   src/util.h |  2 ++
+>   2 files changed, 35 insertions(+)
+> =
 
- 	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
--- =
 
-2.34.1
+Please respin to use l_uintset_size.
 
---===============1575409153843568994==--
+Regards,
+-Denis
+--===============6610721089284937387==--
 
