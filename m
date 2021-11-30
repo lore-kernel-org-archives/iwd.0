@@ -1,180 +1,99 @@
-Content-Type: multipart/mixed; boundary="===============7675365705676655460=="
+Content-Type: multipart/mixed; boundary="===============6921509779981574706=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Jupiter <jupiter.hce at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 02/10] dpp-util: add URI parsing
-Date: Wed, 16 Feb 2022 12:39:23 -0800
-Message-ID: <912a107f64ac9178ac20bb5e1701dbaf95eeb083.camel@gmail.com>
-In-Reply-To: 8da7587a-d25d-5f11-5c4d-76cd54987637@gmail.com
+Subject: Re: iwd configure location and files
+Date: Wed, 01 Dec 2021 09:38:19 +1100
+Message-ID: <CAA=hcWTdHD1ez3vVCpdn4ZQB3njpnQ7DG_sO8cB3oD3E8sYDEg@mail.gmail.com>
+In-Reply-To: d899ecf8-deb2-f526-c20f-0fd80aba9841@gmail.com
 
---===============7675365705676655460==
+--===============6921509779981574706==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi James and Denis,
 
-<snip>
-> > + */
-> > +struct dpp_uri_info *dpp_parse_uri(const char *uri)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct dpp_uri_info *info;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *pos =3D uri;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *end =3D uri + st=
-rlen(uri) - 1;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int ret =3D 0;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (strncmp(pos, "DPP:", 4))
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0return NULL;
-> =
+> Alternatively you could put a file inside /var/lib/iwd which would let
+> autoconnect work (though you'll hit the same issue you previously saw
+> most likely):
+>
+> /var/lib/iwd/JupiterIoT.psk
+>
+> [Security]
+> Passphrase=3D<your passphrase>
 
-> strncmp?=C2=A0 If the string has already been validated to be a valid
-> string, then =
+That is much handy, seems it could be connected now, here is log
+copied from debug console:
 
-> strcmp is probably just fine.
+# /usr/libexec/iwd -d 'station*'
+................
 
-Since we're only checking a substring of 'pos' (that the first 4
-characters are DPP:) strncmp is needed.
+        Ciphers: CCMP TKIP BIP
+        Supported iftypes: station ap p2p-client p2p-go
+../iwd-1.19/src/station.c:station_enter_state() Old State:
+disconnected, new state: autoconnect_quick
+../iwd-1.19/src/station.c:station_quick_scan_triggered() Quick scan
+triggered for wlan0
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'34:08:04:12:b1:a2' with SSID: JupiterIoT, freq: 2437, rank: 2722,
+strength: -6500, data_rate: 81.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Added new Network
+"JupiterIoT" security psk
+../iwd-1.19/src/station.c:station_autoconnect_start()
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: JupiterIoT
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'34:08:04:12:b1:a2' freq: [ 6810.737092] mwifiex_sdio mmc0:0001:1:
+info: trying to associate to 'JupiterIoT' bssid 34:08:04:12:b2
+2437, rank: 2722, strength: -6500
+../iwd-1.19/src/station.c:station_enter_state() Old State:
+autoconnect_quick, new state: connecting (auto)
+[ 6810.842559] mwifiex_sdio mmc0:0001:1: info: associated to bssid
+34:08:04:12:b1:a2 successfully
+[ 6810.855015] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
+=3D0x2
+../iwd-1.19/src/station.c:station_netdev_event() Associating
+[ 6810.899100] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
+=3D0x2
+[ 6810.937171] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
+=3D0x2
+../iwd-1.19/src/station.c:station_handshake_event() Setting keys
+hardware_rekey not supported
+../iwd-1.19/src/station.c:station_connect_cb() 12, result: 0
+../iwd-1.19/src/station.c:station_connect_ok()
 
-> =
+But there is no IP address, I guess iwd manages DHCP, how can I debug iwd D=
+HCP?
 
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0info =3D l_new(struct dpp_ur=
-i_info, 1);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pos +=3D 4;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* EasyConnect 5.2.1 - Boots=
-trapping information format */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (; TOKEN_OK(pos); pos =
-=3D TOKEN_NEXT(pos, ';')) {
-> =
+# ifconfig
+wlan0     Link encap:Ethernet  HWaddr D4:CA:6E:A4:E8:B4
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:10 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:33 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:1650 (1.6 KiB)  TX bytes:9106 (8.8 KiB)
 
-> You don't seem to be validating that the token is terminated by ';'?
+> Are you running connman + iwd?  Are you sure ConnMan isn't aborting the
+> connection?  Have you tried using connmanctl or using iwd + iwctl with
+> connman
+> not running?
 
-Yeah, I'll get the length here and pass that to each parse function to
-verify the entire token was consumed.
+Yes, I was running connman + iwd, but I did stop connman in iwd debugging.
 
-> =
+> We do need iwd logs and preferably iwmon logs.  You may need to build nlm=
+on
+>
+> support into your kernel if iwmon doesn't start.  e.g. CONFIG_NLMON=3Dm o=
+r y
 
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0switch (*pos) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'C':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0info->=
-freqs =3D
-> > dpp_parse_class_and_channel(pos + 2);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!i=
-nfo->freqs)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto free_info;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'M':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =
-=3D dpp_parse_mac(pos + 2, info->mac);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (re=
-t < 0)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto free_info;
-> =
+Ahh, that was missing in defconfig, I am rebuilding it now, will run
+iwmon and post iwmon log.
 
-> This doesn't seem to be checking that parse_mac consumes the entire
-> token?
-> =
+Thank you very much.
 
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'V':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =
-=3D dpp_parse_version(pos + 2, &info-
-> > >version);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (re=
-t < 0)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto free_info;
-> =
+Kind regards,
 
-> This does...
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'K':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0info->=
-boot_public =3D dpp_parse_key(pos + 2);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!i=
-nfo->boot_public)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto free_info;
-> =
-
-> Unclear here?
-
-This one is tricky because l_base64_decode doesn't give back the number
-of characters consumed... Maybe l_base64_decode should fail if the
-bytes consumed !=3D length? I don't see any such checks in there.
-
-> =
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'H':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0case 'I':
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0default:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto f=
-ree_info;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Extra data found after la=
-st token */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (pos !=3D end)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0goto free_info;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* The public bootstrapping =
-key is the only required token
-> > */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!info->boot_public)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0goto free_info;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return info;
-> > +
-> > +free_info:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dpp_free_uri_info(info);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return NULL;
-> > +}
-> > +
-> =
-
-> Regards,
-> -Denis
-
-
---===============7675365705676655460==--
+- jupiter
+--===============6921509779981574706==--
 
