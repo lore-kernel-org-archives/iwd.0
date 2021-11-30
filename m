@@ -1,51 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============5584939964947939502=="
+Content-Type: multipart/mixed; boundary="===============7699830997428796727=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] monitor: fix integer comparison error (clang)
-Date: Fri, 10 Jun 2022 12:27:26 -0700
-Message-ID: <20220610192726.421340-1-prestwoj@gmail.com>
+Subject: [PATCH v3 3/3] build: update unit tests with util.c/band.c dependency
+Date: Tue, 30 Nov 2021 10:24:13 -0800
+Message-ID: <20211130182413.437115-3-prestwoj@gmail.com>
+In-Reply-To: 20211130182413.437115-1-prestwoj@gmail.com
 
---===============5584939964947939502==
+--===============7699830997428796727==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Though the documentation for NLMSG_OK uses an int type for the length
-the actual check is based on nlmsghdr->nlmsg_len which is a 32 bit
-unsigned integer. Clang was complaining about one call in nlmon.c
-because nlmsg_len was int type. Every other usage in nlmon.c uses
-a uint32_t, so use that both for consistency and to fix the warning.
-
-monitor/nlmon.c:7998:29: error: comparison of integers of different
-		signs: '__u32' (aka 'unsigned int') and 'int'
-		[-Werror,-Wsign-compare]
-        for (nlmsg =3D iov.iov_base; NLMSG_OK(nlmsg, nlmsg_len);
-                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
-/usr/include/linux/netlink.h:100:24: note: expanded from macro 'NLMSG_OK'
-                           (nlh)->nlmsg_len <=3D (len))
 ---
- monitor/nlmon.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile.am | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index fe967922..34c5eed6 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -7944,7 +7944,7 @@ static bool nlmon_receive(struct l_io *io, void *user=
-_data)
- 	unsigned char buf[8192];
- 	unsigned char control[32];
- 	ssize_t bytes_read;
--	int nlmsg_len;
-+	uint32_t nlmsg_len;
- 	int fd;
+diff --git a/Makefile.am b/Makefile.am
+index 275dd1b9..1e1c230f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -320,7 +320,8 @@ monitor_iwmon_SOURCES =3D monitor/main.c linux/nl80211.=
+h \
+ 					src/eapolutil.h src/eapolutil.c \
+ 					src/nl80211cmd.h src/nl80211cmd.c \
+ 					src/p2putil.c src/p2putil.h \
+-					src/anqputil.h src/anqputil.c
++					src/anqputil.h src/anqputil.c \
++					src/band.h src/band.c
+ monitor_iwmon_LDADD =3D $(ell_ldadd)
  =
 
- 	fd =3D l_io_get_fd(io);
+ if MANUAL_PAGES
+@@ -335,6 +336,7 @@ wired_ead_SOURCES =3D wired/main.c wired/ethdev.h wired=
+/ethdev.c \
+ 				wired/network.h wired/network.c \
+ 				wired/dbus.h wired/dbus.c \
+ 				src/module.h src/module.c \
++				src/band.h src/band.c \
+ 				$(eap_sources)
+ wired_ead_LDADD =3D $(ell_ldadd)
+ wired_ead_DEPENDENCIES =3D $(ell_dependencies)
+@@ -361,7 +363,8 @@ tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu.=
+h src/mpdu.c \
+ 					src/ie.h src/ie.c \
+ 					src/nl80211util.h src/nl80211util.c \
+ 					src/util.h src/util.c \
+-					src/common.h src/common.c
++					src/common.h src/common.c \
++					src/band.h src/band.c
+ tools_probe_req_LDADD =3D $(ell_ldadd)
+ =
+
+ if HWSIM
+@@ -370,7 +373,8 @@ bin_PROGRAMS +=3D tools/hwsim
+ tools_hwsim_SOURCES =3D tools/hwsim.c src/mpdu.h \
+ 					src/util.h src/util.c \
+ 					src/storage.h src/storage.c \
+-					src/common.h src/common.c
++					src/common.h src/common.c \
++					src/band.h src/band.c
+ tools_hwsim_LDADD =3D $(ell_ldadd)
+ =
+
+ if DBUS_POLICY
+@@ -480,7 +484,7 @@ unit_test_eapol_DEPENDENCIES =3D $(ell_dependencies) \
+ 				unit/cert-client-key-pkcs8.pem \
+ 				unit/tls-settings.8021x
+ =
+
+-unit_test_util_SOURCES =3D src/util.h src/util.c \
++unit_test_util_SOURCES =3D src/util.h src/util.c src/band.c src/band.h \
+ 				unit/test-util.c
+ unit_test_util_LDADD =3D $(ell_ldadd)
+ =
+
+@@ -537,7 +541,8 @@ unit_test_p2p_SOURCES =3D unit/test-p2p.c src/wscutil.h=
+ src/wscutil.c \
+ 				src/crypto.h src/crypto.c \
+ 				src/ie.h src/ie.c \
+ 				src/util.h src/util.c \
+-				src/p2putil.h src/p2putil.c
++				src/p2putil.h src/p2putil.c \
++				src/band.h src/band.c
+ unit_test_p2p_LDADD =3D $(ell_ldadd)
+ =
+
+ TESTS =3D $(unit_tests)
 -- =
 
-2.34.1
+2.31.1
 
---===============5584939964947939502==--
+--===============7699830997428796727==--
 
