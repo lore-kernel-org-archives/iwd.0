@@ -1,225 +1,446 @@
-Content-Type: multipart/mixed; boundary="===============3285402066110426320=="
+Content-Type: multipart/mixed; boundary="===============3667660212351486145=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 4/8] netconfig: Track gateway address strings
-Date: Sat, 25 Sep 2021 03:11:49 +0200
-Message-ID: <20210925011153.25195-4-andrew.zaborowski@intel.com>
-In-Reply-To: 20210925011153.25195-1-andrew.zaborowski@intel.com
+Subject: [PATCH v3 1/3] scan: move scan_freq_set* into util
+Date: Tue, 30 Nov 2021 10:24:11 -0800
+Message-ID: <20211130182413.437115-1-prestwoj@gmail.com>
 
---===============3285402066110426320==
+--===============3667660212351486145==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Cache the latest v4 and v6 gateway IP string in struct netconfig state
-to be able to more easily detect changes in those values in future
-commits and perhaps to simplify the ..._routes_install functions.
-netconfig_ipv4_get_gateway's out_mac parameter can now be NULL.  While
-editing that function fix a small formatting annoyance.
+This will allow scan_freq_set utilities to be used in any
+modules requiring unit testing
 ---
- src/netconfig.c | 63 +++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 51 insertions(+), 12 deletions(-)
+ src/scan.c | 160 ----------------------------------------------------
+ src/scan.h |  14 -----
+ src/util.c | 161 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/util.h |  15 +++++
+ 4 files changed, 176 insertions(+), 174 deletions(-)
 
-diff --git a/src/netconfig.c b/src/netconfig.c
-index 30e56157..e93e496c 100644
---- a/src/netconfig.c
-+++ b/src/netconfig.c
-@@ -62,6 +62,8 @@ struct netconfig {
- 	char **dns4_overrides;
- 	char **dns6_overrides;
- 	struct ie_fils_ip_addr_response_info *fils_override;
-+	char *v4_gateway_str;
-+	char *v6_gateway_str;
- =
-
- 	const struct l_settings *active_settings;
- =
-
-@@ -419,6 +421,8 @@ static char *netconfig_ipv4_get_gateway(struct netconfi=
-g *netconfig,
- {
- 	const struct l_dhcp_lease *lease;
- 	char *gateway;
-+	const struct ie_fils_ip_addr_response_info *fils =3D
-+		netconfig->fils_override;
- =
-
- 	switch (netconfig->rtm_protocol) {
- 	case RTPROT_STATIC:
-@@ -432,15 +436,12 @@ static char *netconfig_ipv4_get_gateway(struct netcon=
-fig *netconfig,
- 		return gateway;
- =
-
- 	case RTPROT_DHCP:
--		if (netconfig->fils_override &&
--				netconfig->fils_override->ipv4_gateway) {
--			gateway =3D netconfig_ipv4_to_string(
--					netconfig->fils_override->ipv4_gateway);
-+		if (fils && fils->ipv4_gateway) {
-+			gateway =3D netconfig_ipv4_to_string(fils->ipv4_gateway);
- =
-
--			if (gateway && !l_memeqzero(netconfig->fils_override->
--							ipv4_gateway_mac, 6))
--				*out_mac =3D netconfig->fils_override->
--					ipv4_gateway_mac;
-+			if (gateway && out_mac &&
-+					!l_memeqzero(fils->ipv4_gateway_mac, 6))
-+				*out_mac =3D fils->ipv4_gateway_mac;
- =
-
- 			return gateway;
- 		}
-@@ -478,7 +479,7 @@ static struct l_rtnl_address *netconfig_get_static6_add=
-ress(
- 	prefix_len =3D strtoul(p, NULL, 10);
- 	if (!unlikely(errno =3D=3D EINVAL || errno =3D=3D ERANGE ||
- 			!prefix_len || prefix_len > 128)) {
--		l_error("netconfig: Invalid prefix '%s'  provided in network"
-+		l_error("netconfig: Invalid prefix '%s' provided in network"
- 				" configuration file", p);
- 		return NULL;
- 	}
-@@ -494,6 +495,7 @@ no_prefix_len:
- =
-
- static struct l_rtnl_route *netconfig_get_static6_gateway(
- 						struct netconfig *netconfig,
-+						char **out_str,
- 						const uint8_t **out_mac)
- {
- 	L_AUTO_FREE_VAR(char *, gateway);
-@@ -524,6 +526,7 @@ static struct l_rtnl_route *netconfig_get_static6_gatew=
-ay(
- =
-
- 	l_rtnl_route_set_priority(ret, ROUTE_PRIORITY_OFFSET);
- 	l_rtnl_route_set_protocol(ret, RTPROT_STATIC);
-+	*out_str =3D l_steal_ptr(gateway);
- 	*out_mac =3D mac;
- =
-
- 	return ret;
-@@ -876,7 +879,9 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error,=
- uint16_t type,
- 		return;
- 	}
- =
-
--	gateway =3D netconfig_get_static6_gateway(netconfig, &gateway_mac);
-+	gateway =3D netconfig_get_static6_gateway(netconfig,
-+						&netconfig->v6_gateway_str,
-+						&gateway_mac);
- 	if (gateway) {
- 		netconfig->route6_add_cmd_id =3D l_rtnl_route_add(rtnl,
- 							netconfig->ifindex,
-@@ -933,10 +938,24 @@ static void netconfig_ipv4_dhcp_event_handler(struct =
-l_dhcp_client *client,
- 					netconfig->v4_address,
- 					netconfig_ifaddr_del_cmd_cb,
- 					netconfig, NULL));
--		l_rtnl_address_free(netconfig->v4_address);
- 		/* Fall through. */
- 	case L_DHCP_CLIENT_EVENT_LEASE_OBTAINED:
--		netconfig->v4_address =3D netconfig_get_dhcp4_address(netconfig);
-+	{
-+		char *gateway_str;
-+		struct l_rtnl_address *address;
-+
-+		gateway_str =3D netconfig_ipv4_get_gateway(netconfig, NULL);
-+		if (l_streq0(netconfig->v4_gateway_str, gateway_str))
-+			l_free(gateway_str);
-+		else {
-+			l_free(netconfig->v4_gateway_str);
-+			netconfig->v4_gateway_str =3D gateway_str;
-+		}
-+
-+		address =3D netconfig_get_dhcp4_address(netconfig);
-+		l_rtnl_address_free(netconfig->v4_address);
-+		netconfig->v4_address =3D address;
-+
- 		if (!netconfig->v4_address) {
- 			l_error("netconfig: Failed to obtain IP addresses from "
- 							"DHCPv4 lease.");
-@@ -949,6 +968,7 @@ static void netconfig_ipv4_dhcp_event_handler(struct l_=
-dhcp_client *client,
- 					netconfig_ipv4_ifaddr_add_cmd_cb,
- 					netconfig, NULL)));
- 		break;
-+	}
- 	case L_DHCP_CLIENT_EVENT_LEASE_RENEWED:
- 		break;
- 	case L_DHCP_CLIENT_EVENT_LEASE_EXPIRED:
-@@ -958,6 +978,7 @@ static void netconfig_ipv4_dhcp_event_handler(struct l_=
-dhcp_client *client,
- 					netconfig, NULL));
- 		l_rtnl_address_free(netconfig->v4_address);
- 		netconfig->v4_address =3D NULL;
-+		l_free(l_steal_ptr(netconfig->v4_gateway_str));
- =
-
- 		/* Fall through. */
- 	case L_DHCP_CLIENT_EVENT_NO_LEASE:
-@@ -992,6 +1013,17 @@ static void netconfig_dhcp6_event_handler(struct l_dh=
-cp6_client *client,
- 		L_AUTO_FREE_VAR(char *, addr_str) =3D
- 			l_dhcp6_lease_get_address(lease);
- 		struct l_rtnl_address *address;
-+		__auto_type icmp6 =3D
-+			l_dhcp6_client_get_icmp6(netconfig->dhcp6_client);
-+		__auto_type router =3D l_icmp6_client_get_router(icmp6);
-+		char *gateway_str =3D l_icmp6_router_get_address(router);
-+
-+		if (l_streq0(netconfig->v6_gateway_str, gateway_str))
-+			l_free(gateway_str);
-+		else {
-+			l_free(netconfig->v6_gateway_str);
-+			netconfig->v6_gateway_str =3D gateway_str;
-+		}
- =
-
- 		address =3D l_rtnl_address_new(addr_str,
- 					l_dhcp6_lease_get_prefix_length(lease));
-@@ -1008,6 +1040,7 @@ static void netconfig_dhcp6_event_handler(struct l_dh=
-cp6_client *client,
- 		netconfig_set_domains(netconfig);
- 		l_rtnl_address_free(netconfig->v6_address);
- 		netconfig->v6_address =3D NULL;
-+		l_free(l_steal_ptr(netconfig->v6_gateway_str));
- =
-
- 		/* Fall through */
- 	case L_DHCP6_CLIENT_EVENT_NO_LEASE:
-@@ -1044,6 +1077,9 @@ static void netconfig_reset_v4(struct netconfig *netc=
-onfig)
- =
-
- 		l_acd_destroy(netconfig->acd);
- 		netconfig->acd =3D NULL;
-+
-+		l_free(netconfig->v4_gateway_str);
-+		netconfig->v4_gateway_str =3D NULL;
- 	}
+diff --git a/src/scan.c b/src/scan.c
+index 4a0e274e..97b0a933 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -2017,166 +2017,6 @@ bool scan_get_firmware_scan(uint64_t wdev_id, scan_=
+notify_func_t notify,
+ 	return true;
  }
  =
 
-@@ -1427,6 +1463,9 @@ bool netconfig_reset(struct netconfig *netconfig)
+-struct scan_freq_set {
+-	uint16_t channels_2ghz;
+-	struct l_uintset *channels_5ghz;
+-};
+-
+-struct scan_freq_set *scan_freq_set_new(void)
+-{
+-	struct scan_freq_set *ret =3D l_new(struct scan_freq_set, 1);
+-
+-	/* 802.11-2012, 8.4.2.10 hints that 200 is the largest channel number */
+-	ret->channels_5ghz =3D l_uintset_new_from_range(1, 200);
+-
+-	return ret;
+-}
+-
+-void scan_freq_set_free(struct scan_freq_set *freqs)
+-{
+-	l_uintset_free(freqs->channels_5ghz);
+-	l_free(freqs);
+-}
+-
+-bool scan_freq_set_add(struct scan_freq_set *freqs, uint32_t freq)
+-{
+-	enum band_freq band;
+-	uint8_t channel;
+-
+-	channel =3D band_freq_to_channel(freq, &band);
+-	if (!channel)
+-		return false;
+-
+-	switch (band) {
+-	case BAND_FREQ_2_4_GHZ:
+-		freqs->channels_2ghz |=3D 1 << (channel - 1);
+-		return true;
+-	case BAND_FREQ_5_GHZ:
+-		return l_uintset_put(freqs->channels_5ghz, channel);
+-	}
+-
+-	return false;
+-}
+-
+-bool scan_freq_set_contains(const struct scan_freq_set *freqs, uint32_t fr=
+eq)
+-{
+-	enum band_freq band;
+-	uint8_t channel;
+-
+-	channel =3D band_freq_to_channel(freq, &band);
+-	if (!channel)
+-		return false;
+-
+-	switch (band) {
+-	case BAND_FREQ_2_4_GHZ:
+-		return freqs->channels_2ghz & (1 << (channel - 1));
+-	case BAND_FREQ_5_GHZ:
+-		return l_uintset_contains(freqs->channels_5ghz, channel);
+-	}
+-
+-	return false;
+-}
+-
+-uint32_t scan_freq_set_get_bands(struct scan_freq_set *freqs)
+-{
+-	uint32_t bands =3D 0;
+-	uint32_t max;
+-
+-	if (freqs->channels_2ghz)
+-		bands |=3D BAND_FREQ_2_4_GHZ;
+-
+-	max =3D l_uintset_get_max(freqs->channels_5ghz);
+-
+-	if (l_uintset_find_min(freqs->channels_5ghz) <=3D max)
+-		bands |=3D BAND_FREQ_5_GHZ;
+-
+-	return bands;
+-}
+-
+-static void scan_channels_5ghz_add(uint32_t channel, void *user_data)
+-{
+-	struct l_uintset *to =3D user_data;
+-
+-	l_uintset_put(to, channel);
+-}
+-
+-void scan_freq_set_merge(struct scan_freq_set *to,
+-					const struct scan_freq_set *from)
+-{
+-	to->channels_2ghz |=3D from->channels_2ghz;
+-
+-	l_uintset_foreach(from->channels_5ghz, scan_channels_5ghz_add,
+-							to->channels_5ghz);
+-}
+-
+-bool scan_freq_set_isempty(const struct scan_freq_set *set)
+-{
+-	if (set->channels_2ghz =3D=3D 0 && l_uintset_isempty(set->channels_5ghz))
+-		return true;
+-
+-	return false;
+-}
+-
+-struct channels_5ghz_foreach_data {
+-	scan_freq_set_func_t func;
+-	void *user_data;
+-};
+-
+-static void scan_channels_5ghz_frequency(uint32_t channel, void *user_data)
+-{
+-	const struct channels_5ghz_foreach_data *channels_5ghz_data =3D user_data;
+-	uint32_t freq;
+-
+-	freq =3D band_channel_to_freq(channel, BAND_FREQ_5_GHZ);
+-
+-	channels_5ghz_data->func(freq, channels_5ghz_data->user_data);
+-}
+-
+-void scan_freq_set_foreach(const struct scan_freq_set *freqs,
+-				scan_freq_set_func_t func, void *user_data)
+-{
+-	struct channels_5ghz_foreach_data data =3D { };
+-	uint8_t channel;
+-	uint32_t freq;
+-
+-	if (unlikely(!freqs || !func))
+-		return;
+-
+-	data.func =3D func;
+-	data.user_data =3D user_data;
+-
+-	l_uintset_foreach(freqs->channels_5ghz, scan_channels_5ghz_frequency,
+-									&data);
+-
+-	if (!freqs->channels_2ghz)
+-		return;
+-
+-	for (channel =3D 1; channel <=3D 14; channel++) {
+-		if (freqs->channels_2ghz & (1 << (channel - 1))) {
+-			freq =3D band_channel_to_freq(channel, BAND_FREQ_2_4_GHZ);
+-
+-			func(freq, user_data);
+-		}
+-	}
+-}
+-
+-void scan_freq_set_constrain(struct scan_freq_set *set,
+-					const struct scan_freq_set *constraint)
+-{
+-	struct l_uintset *intersection;
+-
+-	intersection =3D l_uintset_intersect(constraint->channels_5ghz,
+-							set->channels_5ghz);
+-	if (!intersection)
+-		/* This shouldn't ever be the case. */
+-		return;
+-
+-	l_uintset_free(set->channels_5ghz);
+-	set->channels_5ghz =3D intersection;
+-
+-	set->channels_2ghz &=3D constraint->channels_2ghz;
+-}
+-
+ bool scan_wdev_add(uint64_t wdev_id)
+ {
+ 	struct scan_context *sc;
+diff --git a/src/scan.h b/src/scan.h
+index 1623468e..81cb9e46 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -108,7 +108,6 @@ typedef bool (*scan_notify_func_t)(int err, struct l_qu=
+eue *bss_list,
+ 					const struct scan_freq_set *freqs,
+ 					void *userdata);
+ typedef void (*scan_destroy_func_t)(void *userdata);
+-typedef void (*scan_freq_set_func_t)(uint32_t freq, void *userdata);
  =
 
- 		sysfs_write_ipv6_setting(netdev_get_name(netdev),
- 						"disable_ipv6", "1");
+ static inline int scan_bss_addr_cmp(const struct scan_bss *a1,
+ 					const struct scan_bss *a2)
+@@ -168,18 +167,5 @@ struct scan_bss *scan_bss_new_from_probe_req(const str=
+uct mmpdu_header *mpdu,
+ 						size_t body_len,
+ 						uint32_t frequency, int rssi);
+ =
+
+-struct scan_freq_set *scan_freq_set_new(void);
+-void scan_freq_set_free(struct scan_freq_set *freqs);
+-bool scan_freq_set_add(struct scan_freq_set *freqs, uint32_t freq);
+-bool scan_freq_set_contains(const struct scan_freq_set *freqs, uint32_t fr=
+eq);
+-uint32_t scan_freq_set_get_bands(struct scan_freq_set *freqs);
+-void scan_freq_set_foreach(const struct scan_freq_set *freqs,
+-				scan_freq_set_func_t func, void *user_data);
+-void scan_freq_set_merge(struct scan_freq_set *to,
+-					const struct scan_freq_set *from);
+-void scan_freq_set_constrain(struct scan_freq_set *set,
+-					const struct scan_freq_set *constraint);
+-bool scan_freq_set_isempty(const struct scan_freq_set *set);
+-
+ bool scan_wdev_add(uint64_t wdev_id);
+ bool scan_wdev_remove(uint64_t wdev_id);
+diff --git a/src/util.c b/src/util.c
+index ca56316d..381894f4 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -35,6 +35,7 @@
+ =
+
+ #include "ell/useful.h"
+ #include "src/util.h"
++#include "src/band.h"
+ =
+
+ const char *util_ssid_to_utf8(size_t len, const uint8_t *ssid)
+ {
+@@ -309,3 +310,163 @@ bool util_ip_prefix_tohl(const char *ip, uint8_t *pre=
+fix_out,
+ =
+
+ 	return true;
+ }
 +
-+		l_free(netconfig->v6_gateway_str);
-+		netconfig->v6_gateway_str =3D NULL;
- 	}
++struct scan_freq_set {
++	uint16_t channels_2ghz;
++	struct l_uintset *channels_5ghz;
++};
++
++struct scan_freq_set *scan_freq_set_new(void)
++{
++	struct scan_freq_set *ret =3D l_new(struct scan_freq_set, 1);
++
++	/* 802.11-2012, 8.4.2.10 hints that 200 is the largest channel number */
++	ret->channels_5ghz =3D l_uintset_new_from_range(1, 200);
++
++	return ret;
++}
++
++void scan_freq_set_free(struct scan_freq_set *freqs)
++{
++	l_uintset_free(freqs->channels_5ghz);
++	l_free(freqs);
++}
++
++bool scan_freq_set_add(struct scan_freq_set *freqs, uint32_t freq)
++{
++	enum band_freq band;
++	uint8_t channel;
++
++	channel =3D band_freq_to_channel(freq, &band);
++	if (!channel)
++		return false;
++
++	switch (band) {
++	case BAND_FREQ_2_4_GHZ:
++		freqs->channels_2ghz |=3D 1 << (channel - 1);
++		return true;
++	case BAND_FREQ_5_GHZ:
++		return l_uintset_put(freqs->channels_5ghz, channel);
++	}
++
++	return false;
++}
++
++bool scan_freq_set_contains(const struct scan_freq_set *freqs, uint32_t fr=
+eq)
++{
++	enum band_freq band;
++	uint8_t channel;
++
++	channel =3D band_freq_to_channel(freq, &band);
++	if (!channel)
++		return false;
++
++	switch (band) {
++	case BAND_FREQ_2_4_GHZ:
++		return freqs->channels_2ghz & (1 << (channel - 1));
++	case BAND_FREQ_5_GHZ:
++		return l_uintset_contains(freqs->channels_5ghz, channel);
++	}
++
++	return false;
++}
++
++uint32_t scan_freq_set_get_bands(struct scan_freq_set *freqs)
++{
++	uint32_t bands =3D 0;
++	uint32_t max;
++
++	if (freqs->channels_2ghz)
++		bands |=3D BAND_FREQ_2_4_GHZ;
++
++	max =3D l_uintset_get_max(freqs->channels_5ghz);
++
++	if (l_uintset_find_min(freqs->channels_5ghz) <=3D max)
++		bands |=3D BAND_FREQ_5_GHZ;
++
++	return bands;
++}
++
++static void scan_channels_5ghz_add(uint32_t channel, void *user_data)
++{
++	struct l_uintset *to =3D user_data;
++
++	l_uintset_put(to, channel);
++}
++
++void scan_freq_set_merge(struct scan_freq_set *to,
++					const struct scan_freq_set *from)
++{
++	to->channels_2ghz |=3D from->channels_2ghz;
++
++	l_uintset_foreach(from->channels_5ghz, scan_channels_5ghz_add,
++							to->channels_5ghz);
++}
++
++bool scan_freq_set_isempty(const struct scan_freq_set *set)
++{
++	if (set->channels_2ghz =3D=3D 0 && l_uintset_isempty(set->channels_5ghz))
++		return true;
++
++	return false;
++}
++
++struct channels_5ghz_foreach_data {
++	scan_freq_set_func_t func;
++	void *user_data;
++};
++
++static void scan_channels_5ghz_frequency(uint32_t channel, void *user_data)
++{
++	const struct channels_5ghz_foreach_data *channels_5ghz_data =3D user_data;
++	uint32_t freq;
++
++	freq =3D band_channel_to_freq(channel, BAND_FREQ_5_GHZ);
++
++	channels_5ghz_data->func(freq, channels_5ghz_data->user_data);
++}
++
++void scan_freq_set_foreach(const struct scan_freq_set *freqs,
++				scan_freq_set_func_t func, void *user_data)
++{
++	struct channels_5ghz_foreach_data data =3D { };
++	uint8_t channel;
++	uint32_t freq;
++
++	if (unlikely(!freqs || !func))
++		return;
++
++	data.func =3D func;
++	data.user_data =3D user_data;
++
++	l_uintset_foreach(freqs->channels_5ghz, scan_channels_5ghz_frequency,
++									&data);
++
++	if (!freqs->channels_2ghz)
++		return;
++
++	for (channel =3D 1; channel <=3D 14; channel++) {
++		if (freqs->channels_2ghz & (1 << (channel - 1))) {
++			freq =3D band_channel_to_freq(channel, BAND_FREQ_2_4_GHZ);
++
++			func(freq, user_data);
++		}
++	}
++}
++
++void scan_freq_set_constrain(struct scan_freq_set *set,
++					const struct scan_freq_set *constraint)
++{
++	struct l_uintset *intersection;
++
++	intersection =3D l_uintset_intersect(constraint->channels_5ghz,
++							set->channels_5ghz);
++	if (!intersection)
++		/* This shouldn't ever be the case. */
++		return;
++
++	l_uintset_free(set->channels_5ghz);
++	set->channels_5ghz =3D intersection;
++
++	set->channels_2ghz &=3D constraint->channels_2ghz;
++}
+diff --git a/src/util.h b/src/util.h
+index 23353ddb..8cced9cd 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -101,4 +101,19 @@ static inline bool util_ip_subnet_match(uint8_t prefix=
+_len,
+ 		  ~((1u << (8 - (prefix_len % 8))) - 1));
+ }
  =
 
- 	l_free(l_steal_ptr(netconfig->fils_override));
++typedef void (*scan_freq_set_func_t)(uint32_t freq, void *userdata);
++
++struct scan_freq_set *scan_freq_set_new(void);
++void scan_freq_set_free(struct scan_freq_set *freqs);
++bool scan_freq_set_add(struct scan_freq_set *freqs, uint32_t freq);
++bool scan_freq_set_contains(const struct scan_freq_set *freqs, uint32_t fr=
+eq);
++uint32_t scan_freq_set_get_bands(struct scan_freq_set *freqs);
++void scan_freq_set_foreach(const struct scan_freq_set *freqs,
++				scan_freq_set_func_t func, void *user_data);
++void scan_freq_set_merge(struct scan_freq_set *to,
++					const struct scan_freq_set *from);
++void scan_freq_set_constrain(struct scan_freq_set *set,
++					const struct scan_freq_set *constraint);
++bool scan_freq_set_isempty(const struct scan_freq_set *set);
++
+ #endif /* __UTIL_H */
 -- =
 
-2.30.2
+2.31.1
 
---===============3285402066110426320==--
+--===============3667660212351486145==--
 
