@@ -1,174 +1,146 @@
-Content-Type: multipart/mixed; boundary="===============4887788377680042026=="
+Content-Type: multipart/mixed; boundary="===============9110916960813244086=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 6/9] ft: get OCI prior to reassociation
-Date: Mon, 27 Sep 2021 10:04:01 -0700
-Message-ID: <20210927170404.1292107-6-prestwoj@gmail.com>
-In-Reply-To: 20210927170404.1292107-1-prestwoj@gmail.com
+Subject: Re: iwd configure location and files
+Date: Tue, 30 Nov 2021 14:46:50 -0800
+Message-ID: <0e7ab80d46b3e138910af83e5ba138fcb3178a92.camel@gmail.com>
+In-Reply-To: CAA=hcWTdHD1ez3vVCpdn4ZQB3njpnQ7DG_sO8cB3oD3E8sYDEg@mail.gmail.com
 
---===============4887788377680042026==
+--===============9110916960813244086==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This modifies the FT logic to fist call get_oci() before
-reassociation. This allows the OCI to be included in reassociation
-and in the 4-way handshake later on.
----
- src/ft.c     | 13 ++++++++++++-
- src/ft.h     |  2 ++
- src/netdev.c | 20 +++++++++++++++++++-
- 3 files changed, 33 insertions(+), 2 deletions(-)
+On Wed, 2021-12-01 at 09:38 +1100, Jupiter wrote:
+> Hi James and Denis,
+> =
 
-diff --git a/src/ft.c b/src/ft.c
-index 6897f6d7..40e29341 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -40,6 +40,7 @@ struct ft_sm {
- =
+> > Alternatively you could put a file inside /var/lib/iwd which would
+> > let
+> > autoconnect work (though you'll hit the same issue you previously saw
+> > most likely):
+> > =
 
- 	ft_tx_authenticate_func_t tx_auth;
- 	ft_tx_associate_func_t tx_assoc;
-+	ft_get_oci get_oci;
- =
+> > /var/lib/iwd/JupiterIoT.psk
+> > =
 
- 	void *user_data;
- };
-@@ -640,7 +641,7 @@ static int ft_rx_authenticate(struct auth_proto *ap, co=
-nst uint8_t *frame,
- 	if (ret < 0)
- 		goto auth_error;
- =
+> > [Security]
+> > Passphrase=3D<your passphrase>
+> =
 
--	return ft_tx_reassociate(ft);
-+	return ft->get_oci(ft->user_data);
- =
+> That is much handy, seems it could be connected now, here is log
+> copied from debug console:
 
- auth_error:
- 	return (int)status_code;
-@@ -783,6 +784,13 @@ static int ft_rx_associate(struct auth_proto *ap, cons=
-t uint8_t *frame,
- 	return 0;
- }
- =
+Glad that worked. Still strange you couldn't do this via iwctl though
+if connman really wasn't running.
 
-+static int ft_rx_oci(struct auth_proto *ap)
-+{
-+	struct ft_sm *ft =3D l_container_of(ap, struct ft_sm, ap);
-+
-+	return ft_tx_reassociate(ft);
-+}
-+
- static void ft_sm_free(struct auth_proto *ap)
- {
- 	struct ft_sm *ft =3D l_container_of(ap, struct ft_sm, ap);
-@@ -890,12 +898,14 @@ static bool ft_start(struct auth_proto *ap)
- struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
- 				ft_tx_authenticate_func_t tx_auth,
- 				ft_tx_associate_func_t tx_assoc,
-+				ft_get_oci get_oci,
- 				void *user_data)
- {
- 	struct ft_sm *ft =3D l_new(struct ft_sm, 1);
- =
+> =
 
- 	ft->tx_auth =3D tx_auth;
- 	ft->tx_assoc =3D tx_assoc;
-+	ft->get_oci =3D get_oci;
- 	ft->hs =3D hs;
- 	ft->user_data =3D user_data;
- =
+> # /usr/libexec/iwd -d 'station*'
+> ................
+> =
 
-@@ -903,6 +913,7 @@ struct auth_proto *ft_over_air_sm_new(struct handshake_=
-state *hs,
- 	ft->ap.rx_associate =3D ft_rx_associate;
- 	ft->ap.start =3D ft_start;
- 	ft->ap.free =3D ft_sm_free;
-+	ft->ap.rx_oci =3D ft_rx_oci;
- =
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Ciphers: CCMP TKIP BIP
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Supported iftypes: station ap =
+p2p-client p2p-go
+> ../iwd-1.19/src/station.c:station_enter_state() Old State:
+> disconnected, new state: autoconnect_quick
+> ../iwd-1.19/src/station.c:station_quick_scan_triggered() Quick scan
+> triggered for wlan0
+> ../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+> '34:08:04:12:b1:a2' with SSID: JupiterIoT, freq: 2437, rank: 2722,
+> strength: -6500, data_rate: 81.0
+> ../iwd-1.19/src/station.c:station_add_seen_bss() Added new Network
+> "JupiterIoT" security psk
+> ../iwd-1.19/src/station.c:station_autoconnect_start()
+> ../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+> Trying SSID: JupiterIoT
+> ../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+> '34:08:04:12:b1:a2' freq: [ 6810.737092] mwifiex_sdio mmc0:0001:1:
+> info: trying to associate to 'JupiterIoT' bssid 34:08:04:12:b2
+> 2437, rank: 2722, strength: -6500
+> ../iwd-1.19/src/station.c:station_enter_state() Old State:
+> autoconnect_quick, new state: connecting (auto)
+> [ 6810.842559] mwifiex_sdio mmc0:0001:1: info: associated to bssid
+> 34:08:04:12:b1:a2 successfully
+> [ 6810.855015] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error,
+> result=3D0x2
+> ../iwd-1.19/src/station.c:station_netdev_event() Associating
+> [ 6810.899100] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error,
+> result=3D0x2
+> [ 6810.937171] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error,
+> result=3D0x2
+> ../iwd-1.19/src/station.c:station_handshake_event() Setting keys
+> hardware_rekey not supported
+> ../iwd-1.19/src/station.c:station_connect_cb() 12, result: 0
+> ../iwd-1.19/src/station.c:station_connect_ok()
+> =
 
- 	return &ft->ap;
- }
-diff --git a/src/ft.h b/src/ft.h
-index 6167e0d7..cc25463f 100644
---- a/src/ft.h
-+++ b/src/ft.h
-@@ -26,6 +26,7 @@ typedef void (*ft_tx_authenticate_func_t)(struct iovec *i=
-ov, size_t iov_len,
- 					void *user_data);
- typedef int (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_len,
- 					void *user_data);
-+typedef int (*ft_get_oci)(void *user_data);
- =
+> But there is no IP address, I guess iwd manages DHCP, how can I debug
+> iwd DHCP?
 
- typedef void (*ft_ds_free_func_t)(void *user_data);
- =
+IWD can manage DHCP, and this works nicely but it is not required (you
+could use conventional daemons for this, systemd, dhclient etc). If you
+want IWD to do DHCP you can enable this in /etc/iwd/main.conf:
 
-@@ -60,6 +61,7 @@ bool ft_over_ds_parse_action_ies(struct ft_ds_info *info,
- struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
- 				ft_tx_authenticate_func_t tx_auth,
- 				ft_tx_associate_func_t tx_assoc,
-+				ft_get_oci get_oci,
- 				void *user_data);
- =
+[General]
+EnableNetworkConfiguration=3DTrue
 
- struct auth_proto *ft_over_ds_sm_new(struct handshake_state *hs,
-diff --git a/src/netdev.c b/src/netdev.c
-index 5a44895d..91d1316c 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -2074,6 +2074,21 @@ static void netdev_get_oci_cb(struct l_genl_msg *msg=
-, void *user_data)
- 	handshake_state_set_chandef(netdev->handshake, l_steal_ptr(chandef));
- =
+> =
 
- done:
-+	if (netdev->ap) {
-+		/*
-+		 * Cant do much here. IWD assumes every kernel/driver supports
-+		 * this. There is no way of detecting support either.
-+		 */
-+		if (L_WARN_ON(err < 0))
-+			netdev_connect_failed(netdev,
-+					NETDEV_RESULT_AUTHENTICATION_FAILED,
-+					MMPDU_STATUS_CODE_UNSPECIFIED);
-+		else
-+			auth_proto_rx_oci(netdev->ap);
-+
-+		return;
-+	}
-+
- 	L_WARN_ON(!eapol_start(netdev->sm));
- }
- =
+> # ifconfig
+> wlan0=C2=A0=C2=A0=C2=A0=C2=A0 Link encap:Ethernet=C2=A0 HWaddr D4:CA:6E:A=
+4:E8:B4
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 UP BROADCAST RUNNI=
+NG MULTICAST=C2=A0 MTU:1500=C2=A0 Metric:1
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 RX packets:10 erro=
+rs:0 dropped:0 overruns:0 frame:0
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TX packets:33 erro=
+rs:0 dropped:0 overruns:0 carrier:0
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 collisions:0 txque=
+uelen:1000
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 RX bytes:1650 (1.6=
+ KiB)=C2=A0 TX bytes:9106 (8.8 KiB)
+> =
 
-@@ -4099,6 +4114,8 @@ static void prepare_ft(struct netdev *netdev, const s=
-truct scan_bss *target_bss)
- 	netdev->operational =3D false;
- 	netdev->in_ft =3D true;
- =
+> > Are you running connman + iwd?=C2=A0 Are you sure ConnMan isn't aborting
+> > the
+> > connection?=C2=A0 Have you tried using connmanctl or using iwd + iwctl
+> > with
+> > connman
+> > not running?
+> =
 
-+	handshake_state_set_chandef(netdev->handshake, NULL);
-+
- 	/*
- 	 * Cancel commands that could be running because of EAPoL activity
- 	 * like re-keying, this way the callbacks for those commands don't
-@@ -4274,7 +4291,8 @@ int netdev_fast_transition(struct netdev *netdev,
- =
+> Yes, I was running connman + iwd, but I did stop connman in iwd
+> debugging.
+> =
 
- 	netdev->ap =3D ft_over_air_sm_new(netdev->handshake,
- 					netdev_ft_tx_authenticate,
--					netdev_ft_tx_associate, netdev);
-+					netdev_ft_tx_associate,
-+					netdev_get_oci, netdev);
- 	memcpy(netdev->ap->prev_bssid, orig_bss->addr, ETH_ALEN);
- =
+> > We do need iwd logs and preferably iwmon logs.=C2=A0 You may need to bu=
+ild
+> > nlmon
+> > =
 
- 	wiphy_radio_work_insert(netdev->wiphy, &netdev->work, 1,
--- =
+> > support into your kernel if iwmon doesn't start.=C2=A0 e.g. CONFIG_NLMO=
+N=3Dm
+> > or y
+> =
 
-2.31.1
+> Ahh, that was missing in defconfig, I am rebuilding it now, will run
+> iwmon and post iwmon log.
+> =
 
---===============4887788377680042026==--
+> Thank you very much.
+> =
+
+> Kind regards,
+> =
+
+> - jupiter
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+
+
+--===============9110916960813244086==--
 
