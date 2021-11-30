@@ -1,47 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============0865929199098825826=="
+Content-Type: multipart/mixed; boundary="===============3279835711674760839=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 2/7] ie: update IE_AKM_IS_FILS to be bitwise
-Date: Fri, 25 Feb 2022 15:32:46 -0800
-Message-ID: <20220225233251.2958102-2-prestwoj@gmail.com>
-In-Reply-To: 20220225233251.2958102-1-prestwoj@gmail.com
+Subject: Re: iwd configure location and files
+Date: Tue, 30 Nov 2021 16:42:28 -0600
+Message-ID: <31be7914-5c78-f1c9-1225-a271204ba153@gmail.com>
+In-Reply-To: CAA=hcWTdHD1ez3vVCpdn4ZQB3njpnQ7DG_sO8cB3oD3E8sYDEg@mail.gmail.com
 
---===============0865929199098825826==
+--===============3279835711674760839==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Currently nothing actually uses this macro, but switching it to a bitwise
-comparison makes it more useful and consistent with the others.
----
- src/ie.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Hi Jupiter,
 
-diff --git a/src/ie.h b/src/ie.h
-index 9b57cf66..fac766d5 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -349,10 +349,10 @@ enum ie_rsn_akm_suite {
- 		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
- =
+> But there is no IP address, I guess iwd manages DHCP, how can I debug iwd=
+ DHCP?
+> =
 
- #define IE_AKM_IS_FILS(akm) \
--	((akm =3D=3D IE_RSN_AKM_SUITE_FILS_SHA256) || \
--	 (akm =3D=3D IE_RSN_AKM_SUITE_FILS_SHA384) || \
--	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256) || \
--	 (akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
-+	(akm & (IE_RSN_AKM_SUITE_FILS_SHA256 | \
-+		IE_RSN_AKM_SUITE_FILS_SHA384 | \
-+		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 | \
-+		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
- =
 
- #define IE_LEN(ie) \
- 	((ie) ? (ie)[1] + 2 : 0)
--- =
+iwd can be configured to do so.  You will need to add the appropriate =
 
-2.34.1
+configuration entry in /etc/iwd/main.conf.  Refer to 'man 5 iwd.config' or =
+the =
 
---===============0865929199098825826==--
+rst here: =
+
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/iwd.config=
+.rst#n57
+
+Note that for iwd + connman, connman would be the one performing DHCP and i=
+wd =
+
+should use EnableNetworkConfiguration=3Dfalse.  Daniel can correct me if I'=
+m wrong.
+
+For DHCP debugging, refer to 'man iwd.debug'.  You will need to set the =
+
+appropriate environment variable (IWD_DHCP_DEBUG or so).  The iwd wiki [1] =
+has =
+
+examples.
+
+Regards,
+-Denis
+
+[1] https://iwd.wiki.kernel.org/debugging
+--===============3279835711674760839==--
 
