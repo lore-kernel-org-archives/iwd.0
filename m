@@ -1,79 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============1267529793221174590=="
+Content-Type: multipart/mixed; boundary="===============4539081794167686882=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 1/7] storage: implement network profile encryption
-Date: Fri, 04 Feb 2022 15:23:08 -0800
-Message-ID: <cfbb2d3a56d271ee240d7e09bb221033a79ec045.camel@gmail.com>
-In-Reply-To: e7e5a0d3-5cfd-be0d-c847-22e91e856e64@benden.us
+Subject: Re: iwd configure location and files
+Date: Tue, 30 Nov 2021 13:40:06 -0800
+Message-ID: <edfc2d19d13d985a1f842eac6ddbba2cb9f5a968.camel@gmail.com>
+In-Reply-To: CAA=hcWTJ7ro79eEUw+YP4AVi0cMViuVFc0Vj=KvjxQxEFiN3xg@mail.gmail.com
 
---===============1267529793221174590==
+--===============4539081794167686882==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Joseph,
-
-On Fri, 2022-02-04 at 15:55 -0700, Joseph Benden wrote:
-> Hi!
+On Wed, 2021-12-01 at 08:29 +1100, Jupiter wrote:
+> Hi James,
 > =
 
-> It is my understanding that all secret data is to be kept as securely
-> as =
-
-> possible. I'm not really seeing this carried throughout the source
-> code. =
-
-> Maybe this specific code does not need that level of security?
-
-Currently any profile (e.g. /var/lib/iwd/foo.psk) containing secret
-data is unencypted, plaintext. We rely on the file system permissions
-to 'secure' this data (which this patch series is 'fixing' for anyone
-who wants these encrypted).
-
+> Thanks for your kind response and debug instructions.
 > =
 
-> If I'm right, then:
+> > Without any debug logs this gonna be difficult to see whats going
+> > on.
+> > If you could enable debug logging when starting IWD and capture
+> > some
+> > logs that would give us a better idea of whats going on.
+> > =
+
+> > https://iwd.wiki.kernel.org/debugging
 > =
 
-> The secret data should be kept in a mmap(), and mlock(), structure.
-> The =
+> Here is debugging:
+> =
 
-> prevents secret data from hitting swap memory. After every use of the
-> secret data; it must be explicit_bzero() and then free(). This is so =
+> # /usr/libexec/iwd -d 'station*' > iwd.log
+> =
 
-> critical and tedious that it should be a macro or something from
-> libell. =
+> $ sed -E "s/([0-9a-fA-F]{2}:?){6}/11:22:33:44:55:66/" iwd.log | sed -
+> e
+> "s/SSID:\ .*, f/SSID: xxx f/" | sed 's/Added new Network .*
+> security/Added new Network "xxx" security/'
+> # /usr/libexec/iwd -d 'station*'
 
-> And those are just initial thoughts for the basic safety of the
-> secret data.
+So you'll want to actually try connecting with iwctl too. Autoconnect
+will only work if you have previously connected successfully, i.e. a
+network file exists in /var/lib/iwd.
 
-So this is how the systemd feature works: The IWD service is given a
-path to a file. This file is decrypted by systemd and contains the
-'secret'. IWD then reads this secret in, does some hashing, and stores
-the hashed secret in RAM. Once IWD is done it never accesses the file
-again.
+Try capturing some debug logs once you've done 'station <iface> connect
+<network>' in iwctl.
 
-So I don't think its even possible for IWD to do this mmap/mlock dance
-you're describing. It really doesn't own this secret file, nor does it
-keep the file contents around long. It just derives a fixed length key
-and never uses the file again.
+Alternatively you could put a file inside /var/lib/iwd which would let
+autoconnect work (though you'll hit the same issue you previously saw
+most likely):
 
-As far as explicit_bzero'ing the hashed secret after every use, then
-reading it back in, and hashing it again when needed... this seems a
-bit crazy :)
+/var/lib/iwd/JupiterIoT.psk
+
+[Security]
+Passphrase=3D<your passphrase>
+
+
 
 Thanks,
 James
 
-> =
-
-> Best regards,
-> -Joe
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
-
-
---===============1267529793221174590==--
+--===============4539081794167686882==--
 
