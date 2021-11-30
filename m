@@ -1,76 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============6379128573571573469=="
+Content-Type: multipart/mixed; boundary="===============4284228497633560735=="
 MIME-Version: 1.0
-From: Paul Menzel <pmenzel at molgen.mpg.de>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] test-runner: increase RAM size
-Date: Sat, 19 Mar 2022 06:12:29 +0100
-Message-ID: <d454c143-cc4d-a4bb-3bd8-72e97b8e466e@molgen.mpg.de>
-In-Reply-To: 20220318223646.756590-1-prestwoj@gmail.com
+Subject: [PATCH v2 2/3] scan: add scan_freq_set_serialize
+Date: Tue, 30 Nov 2021 09:48:12 -0800
+Message-ID: <20211130174813.384374-2-prestwoj@gmail.com>
+In-Reply-To: 20211130174813.384374-1-prestwoj@gmail.com
 
---===============6379128573571573469==
+--===============4284228497633560735==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear James,
+This serializes a scan_freq_set into a uint32_t array.
+---
+ src/util.c | 33 +++++++++++++++++++++++++++++++++
+ src/util.h |  2 ++
+ 2 files changed, 35 insertions(+)
 
+diff --git a/src/util.c b/src/util.c
+index 381894f4..c0d5e258 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -470,3 +470,36 @@ void scan_freq_set_constrain(struct scan_freq_set *set,
+ =
 
-Am 18.03.22 um 23:36 schrieb James Prestwood:
-> This is explained in the comment, but until the issue can be
-> tracked down increase RAM.
+ 	set->channels_2ghz &=3D constraint->channels_2ghz;
+ }
++
++static void add_foreach(uint32_t freq, void *user_data)
++{
++	uint32_t **list =3D user_data;
++
++	**list =3D freq;
++
++	*list =3D *list + 1;
++}
++
++uint32_t *scan_freq_set_to_fixed_array(const struct scan_freq_set *set,
++					size_t *len_out)
++{
++	uint8_t count =3D 0;
++	uint32_t *freqs;
++
++	count =3D __builtin_popcount(set->channels_2ghz) +
++				l_uintset_count(set->channels_5ghz);
++
++	if (!count)
++		return NULL;
++
++	freqs =3D l_new(uint32_t, count);
++
++	scan_freq_set_foreach(set, add_foreach, &freqs);
++
++	/* Move pointer back to start of list */
++	freqs -=3D count;
++
++	*len_out =3D count;
++
++	return freqs;
++}
+diff --git a/src/util.h b/src/util.h
+index 8cced9cd..b55a7ea7 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -115,5 +115,7 @@ void scan_freq_set_merge(struct scan_freq_set *to,
+ void scan_freq_set_constrain(struct scan_freq_set *set,
+ 					const struct scan_freq_set *constraint);
+ bool scan_freq_set_isempty(const struct scan_freq_set *set);
++uint32_t *scan_freq_set_to_fixed_array(const struct scan_freq_set *set,
++					size_t *len_out);
+ =
 
-Before it was distinguished if run under Valgrind or not. It=E2=80=99s runn=
-ing =
+ #endif /* __UTIL_H */
+-- =
 
-out of memory regardless of that now?
+2.31.1
 
-The comment says, the reason is unclear, but could you document the test =
-
-setup (QEMU, Linux version, compiler) of the last successful run, and =
-
-the parameters of the first failure?
-
-
-Kind regard,
-
-Paul
-
-
-PS: To be more specific in the commit message, you could use:
-
-test-runner: Increase RAM size to 1 GB
-
-> ---
->   tools/test-runner | 13 ++++++++-----
->   1 file changed, 8 insertions(+), 5 deletions(-)
-> =
-
-> diff --git a/tools/test-runner b/tools/test-runner
-> index b0ec87a2..534f08f2 100755
-> --- a/tools/test-runner
-> +++ b/tools/test-runner
-> @@ -1816,12 +1816,15 @@ class Main:
->   			smp =3D int(nproc / 2)
->   =
-
->   		#
-> -		# Increase RAM if valgrind is being used
-> +		# TODO: Its unclear exactly what causes it (leak, fragmentation,
-> +		# or ?), but after many test runs the kernel starts running out
-> +		# of memory. This is sometimes non-fatal, e.g. a python call
-> +		# fails, but other times the kernel fully panics.
->   		#
-> -		if self.args.valgrind:
-> -			ram =3D 512
-> -		else:
-> -			ram =3D 384
-> +		# For now increase the RAM which allows full test runs to
-> +		# complete.
-> +		#
-> +		ram =3D 1024
->   =
-
->   		print("Using %d cores, %d RAM for VM" % (smp, ram))
->  =20
---===============6379128573571573469==--
+--===============4284228497633560735==--
 
