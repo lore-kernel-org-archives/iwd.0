@@ -1,82 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============5541297723918484805=="
+Content-Type: multipart/mixed; boundary="===============5015229228683635111=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 04/13] scan: change ssid scan parameter to a list
-Date: Wed, 15 Sep 2021 14:57:34 -0500
-Message-ID: <df4ee987-1233-8f2d-6b76-821cd9745489@gmail.com>
-In-Reply-To: 20210915173624.11917-4-prestwoj@gmail.com
+Subject: [PATCH v2 3/3] build: update unit tests with util.c/band.c dependency
+Date: Tue, 30 Nov 2021 09:48:13 -0800
+Message-ID: <20211130174813.384374-3-prestwoj@gmail.com>
+In-Reply-To: 20211130174813.384374-1-prestwoj@gmail.com
 
---===============5541297723918484805==
+--===============5015229228683635111==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ Makefile.am | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-On 9/15/21 12:36 PM, James Prestwood wrote:
-> The ssid parameter was used for direct probe responses for finding
-> hidden networks. OWE transition will be added which requires a
-> hidden OWE network. IWD will need to automatically hidden scan for
-> one or multiple of these networks and doing so in separate scans
-> would be hard to manage.
-> =
+diff --git a/Makefile.am b/Makefile.am
+index 275dd1b9..1e1c230f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -320,7 +320,8 @@ monitor_iwmon_SOURCES =3D monitor/main.c linux/nl80211.=
+h \
+ 					src/eapolutil.h src/eapolutil.c \
+ 					src/nl80211cmd.h src/nl80211cmd.c \
+ 					src/p2putil.c src/p2putil.h \
+-					src/anqputil.h src/anqputil.c
++					src/anqputil.h src/anqputil.c \
++					src/band.h src/band.c
+ monitor_iwmon_LDADD =3D $(ell_ldadd)
+ =
 
-> To prep for this the ssid scan parameter is being changed to a string
-> list which can contain many SSIDs to probe for.
-> ---
->   src/p2p.c     |  7 +++++--
->   src/scan.c    | 12 ++++++++----
->   src/scan.h    |  2 +-
->   src/station.c | 11 ++++++++---
->   4 files changed, 22 insertions(+), 10 deletions(-)
-> =
+ if MANUAL_PAGES
+@@ -335,6 +336,7 @@ wired_ead_SOURCES =3D wired/main.c wired/ethdev.h wired=
+/ethdev.c \
+ 				wired/network.h wired/network.c \
+ 				wired/dbus.h wired/dbus.c \
+ 				src/module.h src/module.c \
++				src/band.h src/band.c \
+ 				$(eap_sources)
+ wired_ead_LDADD =3D $(ell_ldadd)
+ wired_ead_DEPENDENCIES =3D $(ell_dependencies)
+@@ -361,7 +363,8 @@ tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu.=
+h src/mpdu.c \
+ 					src/ie.h src/ie.c \
+ 					src/nl80211util.h src/nl80211util.c \
+ 					src/util.h src/util.c \
+-					src/common.h src/common.c
++					src/common.h src/common.c \
++					src/band.h src/band.c
+ tools_probe_req_LDADD =3D $(ell_ldadd)
+ =
 
+ if HWSIM
+@@ -370,7 +373,8 @@ bin_PROGRAMS +=3D tools/hwsim
+ tools_hwsim_SOURCES =3D tools/hwsim.c src/mpdu.h \
+ 					src/util.h src/util.c \
+ 					src/storage.h src/storage.c \
+-					src/common.h src/common.c
++					src/common.h src/common.c \
++					src/band.h src/band.c
+ tools_hwsim_LDADD =3D $(ell_ldadd)
+ =
 
-<snip>
+ if DBUS_POLICY
+@@ -480,7 +484,7 @@ unit_test_eapol_DEPENDENCIES =3D $(ell_dependencies) \
+ 				unit/cert-client-key-pkcs8.pem \
+ 				unit/tls-settings.8021x
+ =
 
-> diff --git a/src/scan.c b/src/scan.c
-> index 5e31c308..e74874be 100644
-> --- a/src/scan.c
-> +++ b/src/scan.c
-> @@ -539,10 +539,14 @@ static void scan_cmds_add(struct l_queue *cmds, str=
-uct scan_context *sc,
->   =
+-unit_test_util_SOURCES =3D src/util.h src/util.c \
++unit_test_util_SOURCES =3D src/util.h src/util.c src/band.c src/band.h \
+ 				unit/test-util.c
+ unit_test_util_LDADD =3D $(ell_ldadd)
+ =
 
->   	l_genl_msg_enter_nested(cmd, NL80211_ATTR_SCAN_SSIDS);
->   =
+@@ -537,7 +541,8 @@ unit_test_p2p_SOURCES =3D unit/test-p2p.c src/wscutil.h=
+ src/wscutil.c \
+ 				src/crypto.h src/crypto.c \
+ 				src/ie.h src/ie.c \
+ 				src/util.h src/util.c \
+-				src/p2putil.h src/p2putil.c
++				src/p2putil.h src/p2putil.c \
++				src/band.h src/band.c
+ unit_test_p2p_LDADD =3D $(ell_ldadd)
+ =
 
-> -	if (params->ssid) {
-> -		/* direct probe request scan */
-> -		l_genl_msg_append_attr(cmd, NL80211_ATTR_SSID,
-> -					strlen(params->ssid), params->ssid);
-> +	/* direct probe request scan */
-> +	if (params->ssids) {
-> +		unsigned int i;
-> +
-> +		for (i =3D 0; i < l_strv_length((char **)params->ssids); i++)
-> +			l_genl_msg_append_attr(cmd, NL80211_ATTR_SSID,
+ TESTS =3D $(unit_tests)
+-- =
 
-Nested attributes work slightly differently.  The attribute in an array is =
+2.31.1
 
-supposed to be just an index starting at 0.  Kernel probably doesn't check =
-this =
-
-that strictly though.
-
-> +						strlen(params->ssids[i]),
-> +						params->ssids[i]);
-
-The real problem here is if you add more SSIDs than =
-
-wiphy_get_max_num_ssids_per_scan().  Unlikely, but... :)
-
->   		l_genl_msg_leave_nested(cmd);
->   =
-
->   		l_queue_push_tail(cmds, cmd);
-
-Regards,
--Denis
---===============5541297723918484805==--
+--===============5015229228683635111==--
 
