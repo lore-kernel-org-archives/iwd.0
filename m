@@ -1,112 +1,376 @@
-Content-Type: multipart/mixed; boundary="===============2629024652559636380=="
+Content-Type: multipart/mixed; boundary="===============5145413655832580134=="
 MIME-Version: 1.0
 From: Jupiter <jupiter.hce at gmail.com>
 To: iwd at lists.01.org
 Subject: Re: iwd configure location and files
-Date: Mon, 13 Dec 2021 15:39:17 +1100
-Message-ID: <CAA=hcWTGQ4+9Vm+Srog0KtQ85R2-o61WT0uPjw+GwB=G9mrXMg@mail.gmail.com>
-In-Reply-To: 8aa819a1-4fd4-b989-713b-6480d0dfd236@monom.org
+Date: Wed, 01 Dec 2021 08:29:27 +1100
+Message-ID: <CAA=hcWTJ7ro79eEUw+YP4AVi0cMViuVFc0Vj=KvjxQxEFiN3xg@mail.gmail.com>
+In-Reply-To: b786e77e9828625bb92a63d88630e5904234b920.camel@gmail.com
 
---===============2629024652559636380==
+--===============5145413655832580134==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Thanks all for your advice.
+Hi James,
 
-Further debugging it, it seems failing DHCP was caused by an error of
-Deauthentication even, not clear if the iwd error caused mwifiex
-disconnected from WiFi modem or the mwifiex cause iwd fall:
+Thanks for your kind response and debug instructions.
 
-# ifconfig
-wlan0     Link encap:Ethernet  HWaddr D4:CA:6E:A4:E8:B4
-          UP BROADCAST MULTICAST  MTU:1500  Metric:1
-          RX packets:226 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:224 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000
-          RX bytes:25538 (24.9 KiB)  TX bytes:30240 (29.5 KiB)
+> Without any debug logs this gonna be difficult to see whats going on.
+> If you could enable debug logging when starting IWD and capture some
+> logs that would give us a better idea of whats going on.
+>
+> https://iwd.wiki.kernel.org/debugging
 
-# systemctl status iwd -l
-* iwd.service - Wireless service
-     Loaded: loaded
-(8;;file://solar/lib/systemd/system/iwd.service/lib/systemd/system/iwd.serv=
-ice8;;;
-enabled; vendor preset: enabled)
-     Active: active (running) since Wed 2021-08-04 15:25:58 UTC; 8s ago
-   Main PID: 345 (iwd)
-     CGroup: /system.slice/iwd.service
-             `-345 /usr/libexec/iwd
+Here is debugging:
 
-Aug 04 15:25:58 solar iwd[345]:                         54.0 Mbps
-Aug 04 15:25:58 solar iwd[345]:                 HT Capabilities:
-Aug 04 15:25:58 solar iwd[345]:                         HT20
-Aug 04 15:25:58 solar iwd[345]:                         Short GI for 20Mhz
-Aug 04 15:25:58 solar iwd[345]:                 HT RX MCS indexes:
-Aug 04 15:25:58 solar iwd[345]:                         0-7
-Aug 04 15:25:58 solar iwd[345]:                         32
-Aug 04 15:25:58 solar iwd[345]:         Ciphers: CCMP TKIP BIP
-Aug 04 15:25:58 solar iwd[345]:         Supported iftypes: station ap
-p2p-client p2p-go
-Aug 04 15:26:03 solar iwd[345]: Received Deauthentication event,
-reason: 2, from_ap: true
+# /usr/libexec/iwd -d 'station*' > iwd.log
 
-[  931.528058] mwifiex_sdio mmc0:0001:1: info: successfully
-disconnected from 34:08:04:12:b1:a2: reason code 2
-[  933.540667] mwifiex_sdio mmc0:0001:1: info: trying to associate to
-'JupiterIoT' bssid 34:08:04:12:b1:a2
-[  933.564524] mwifiex_sdio mmc0:0001:1: info: associated to bssid
-34:08:04:12:b1:a2 successfully
-[  933.580086] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
-=3D0x2
-[  933.611695] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
-=3D0x2
-[  936.585096] mwifiex_sdio mmc0:0001:1: info: successfully
-disconnected from 34:08:04:12:b1:a2: reason code 2
-[  938.575824] mwifiex_sdio mmc0:0001:1: info: trying to associate to
-'JupiterIoT' bssid 34:08:04:12:b1:a2
-[  938.603801] mwifiex_sdio mmc0:0001:1: info: associated to bssid
-34:08:04:12:b1:a2 successfully
-[  938.618333] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
-=3D0x2
-[  938.655173] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
-=3D0x2
-[  941.619354] mwifiex_sdio mmc0:0001:1: info: successfully
-disconnected from 34:08:04:12:b1:a2: reason code 2
+$ sed -E "s/([0-9a-fA-F]{2}:?){6}/11:22:33:44:55:66/" iwd.log | sed -e
+"s/SSID:\ .*, f/SSID: xxx f/" | sed 's/Added new Network .*
+security/Added new Network "xxx" security/'
+# /usr/libexec/iwd -d 'station*'
+Wireless daemon version 1.19
+Loaded configuration from /etc/iwd/main.conf
+Wiphy: 0, Name: phy0
+        Permanent Address: 11:22:33:44:55:66
+        2.4Ghz Band:
+                Bitrates (non-HT):
+                         1.0 Mbps
+                         2.0 Mbps
+                         5.5 Mbps
+                        11.0 Mbps
+                         6.0 Mbps
+                         9.0 Mbps
+                        12.0 Mbps
+                        18.0 Mbps
+                        24.0 Mbps
+                        36.0 Mbps
+                        48.0 Mbps
+                        54.0 Mbps
+                HT Capabilities:
+                        HT20
+                        Short GI for 20Mhz
+                HT RX MCS indexes:
+                        0-7
+                        32
+        Ciphers: CCMP TKIP BIP
+        Supported iftypes: station ap p2p-client p2p-go
+../iwd-1.19/src/station.c:station_enter_state() Old State:
+disconnected, new state: autoconnect_quick
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'11:22:33:44:55:66' with SSID: xxx freq: 2437, rank: 2722, strength:
+-6600, data_rate: 81.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Added new Network
+"xxx" security psk
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'11:22:33:44:55:66' with SSID: xxx freq: 2412, rank: 67, strength:
+-8700, data_rate: 2.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Added new Network
+"xxx" security psk
+../iwd-1.19/src/station.c:station_autoconnect_start()
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: JupiterIoT
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'11:22:33:44:55:66' freq: 2437, rank: 2722, strength: -6600
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: WiFi-F263_Ext 2
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'11:22:33:44:55:66' freq: 2412, rank: 67, strength: -8700
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'11:22:33:44:55:66' with SSID: xxx freq: 2437, rank: 4537, strength:
+-5800, data_rate: 135.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'11:22:33:44:55:66' with SSID: xxx freq: 2412, rank: 67, strength:
+-9400, data_rate: 2.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Added new Network
+"xxx" security psk
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'11:22:33:44:55:66' with SSID: xxx freq: 2412, rank: 33, strength:
+-8900, data_rate: 1.0
+../iwd-1.19/src/station.c:station_autoconnect_start()
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: JupiterIoT
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'11:22:33:44:55:66' freq: 2437, rank: 4537, strength: -5800
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: WiFi-F263
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'11:22:33:44:55:66' freq: 2412, rank: 67, strength: -9400
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: WiFi-F263_Ext 2
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'11:22:33:44:55:66' freq: 2412, rank: 33, strength: -8900
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'11:22:33:44:55:66' with SSID: xxx freq: 2437, rank: 4537, strength:
+-6000, data_rate: 135.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'11:22:33:44:55:66' with SSID: xxx freq: 2412, rank: 184, strength:
+-8600, data_rate: 5.5
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'11:22:33:44:55:66' with SSID: xxx freq: 2412, rank: 67, strength:
+-9500, data_rate: 2.0
+../iwd-1.19/src/station.c:station_autoconnect_start()
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: JupiterIoT
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'11:22:33:44:55:66' freq: 2437, rank: 4537, strength: -6000
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: WiFi-F263_Ext 2
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'11:22:33:44:55:66' freq: 2412, rank: 184, strength: -8600
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: WiFi-F263
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'11:22:33:44:55:66' freq: 2412, rank: 67, strength: -9500
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'11:22:33:44:55:66' freq: 2417, rank: 67, strength: -9800
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
 
-I followed the document to enable all CRYPTO setup so I don't think it
-is a CRYPTO configured issue in the kernel.
+It looks like it is missing network_autoconnect? How to configure that file?
 
-CONFIG_CRYPTO_USER_API_SKCIPHER=3Dy
-CONFIG_CRYPTO_USER_API_HASH=3Dy
-CONFIG_CRYPTO_HMAC=3Dy
-CONFIG_CRYPTO_CMAC=3Dy
-CONFIG_CRYPTO_MD4=3Dy
-CONFIG_CRYPTO_MD5=3Dy
-CONFIG_CRYPTO_SHA256=3Dy
-CONFIG_CRYPTO_SHA512=3Dy
-CONFIG_CRYPTO_AES=3Dy
-CONFIG_CRYPTO_ECB=3Dy
-CONFIG_CRYPTO_ARC4=3Dy
-CONFIG_CRYPTO_DES=3Dy
-CONFIG_CRYPTO_CBC=3Dy
-CONFIG_KEY_DH_OPERATIONS=3Dy
+# export IWD_TLS_DEBUG=3D1
 
-Also searching the Internet to find someone added
-ControlPortOverNL80211=3DFalse to resolve that issue on kernel 5.9.2,
-but it did not work on my kernel 5.10.59:
+# /usr/libexec/iwd -d
 
-# cat /etc/iwd/main.conf
-[General]
-EnableNetworkConfiguration=3DTrue
-ControlPortOverNL80211=3DFalse
+Wireless daemon version 1.19
+../iwd-1.19/src/main.c:main() Using configuration directory /etc/iwd
+Loaded configuration from /etc/iwd/main.conf
+../iwd-1.19/src/storage.c:storage_create_dirs() Using state directory
+/var/lib/iwd
+../iwd-1.19/src/main.c:nl80211_appeared() Found nl80211 interface
+../iwd-1.19/src/module.c:iwd_modules_init()
+../iwd-1.19/src/wsc.c:wsc_init()
+../iwd-1.19/src/knownnetworks.c:known_network_frequencies_load() No
+known frequency file found.
+../iwd-1.19/src/eap.c:__eap_method_enable()
+../iwd-1.19/src/eap-wsc.c:eap_wsc_init()
+../iwd-1.19/src/eap-md5.c:eap_md5_init()
+../iwd-1.19/src/eap-tls.c:eap_tls_init()
+../iwd-1.19/src/eap-ttls.c:eap_ttls_init()
+../iwd-1.19/src/eap-mschapv2.c:eap_mschapv2_init()
+../iwd-1.19/src/eap-sim.c:eap_sim_init()
+../iwd-1.19/src/eap-aka.c:eap_aka_prime_init()
+../iwd-1.19/src/eap-aka.c:eap_aka_init()
+../iwd-1.19/src/eap-peap.c:eap_peap_init()
+../iwd-1.19/src/eap-gtc.c:eap_gtc_init()
+../iwd-1.19/src/eap-pwd.c:eap_pwd_init()
+../iwd-1.19/src/manager.c:manager_wiphy_dump_callback() New wiphy phy0 adde=
+d (0)
+Wiphy: 0, Name: phy0
+        Permanent Address: d4:ca:6e:a4:e8:b4
+        2.4Ghz Band:
+                Bitrates (non-HT):
+                         1.0 Mbps
+                         2.0 Mbps
+                         5.5 Mbps
+                        11.0 Mbps
+                         6.0 Mbps
+                         9.0 Mbps
+                        12.0 Mbps
+                        18.0 Mbps
+                        24.0 Mbps
+                        36.0 Mbps
+                        48.0 Mbps
+                        54.0 Mbps
+                HT Capabilities:
+                        HT20
+                        Short GI for 20Mhz
+                HT RX MCS indexes:
+                        0-7
+                        32
+        Ciphers: CCMP TKIP BIP
+        Supported iftypes: station ap p2p-client p2p-go
+../iwd-1.19/src/manager.c:manager_create_interfaces() creating wlan0
+../iwd-1.19/src/wiphy.c:wiphy_update_reg_domain() New reg domain
+country code for (global) is 00
+../iwd-1.19/src/manager.c:manager_config_notify() Notification of
+command New Interface(7)
+../iwd-1.19/src/netdev.c:netdev_link_notify() event 16 on ifindex 8
+../iwd-1.19/src/manager.c:manager_new_station_interface_cb()
+../iwd-1.19/src/netdev.c:netdev_create_from_genl() Created interface wlan0[=
+8 1]
+../iwd-1.19/src/netdev.c:netdev_link_notify() event 16 on ifindex 8
+../iwd-1.19/src/netdev.c:netdev_link_notify() event 16 on ifindex 8
+../iwd-1.19/src/netdev.c:netdev_set_4addr() netdev: 8 use_4addr: 0
+../iwd-1.19/src/netdev.c:netdev_initial_up_cb() Interface 8 initialized
+../iwd-1.19/src/netconfig.c:netconfig_new() Starting netconfig for interfac=
+e: 8
+../iwd-1.19/src/station.c:station_enter_state() Old State:
+disconnected, new state: autoconnect_quick
+../iwd-1.19/src/scan.c:scan_periodic_start() Starting periodic scan for wde=
+v 1
+../iwd-1.19/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 1
+../iwd-1.19/src/wiphy.c:wiphy_radio_work_next() Starting work item 1
+../iwd-1.19/src/rrm.c:rrm_add_frame_watches()
+../iwd-1.19/src/netdev.c:netdev_link_notify() event 16 on ifindex 8
+../iwd-1.19/src/manager.c:manager_config_notify() Notification of
+command Set Interface(6)
+../iwd-1.19/src/scan.c:scan_notify() Scan notification Trigger Scan(33)
+../iwd-1.19/src/scan.c:scan_request_triggered() Passive scan triggered
+for wdev 1
+../iwd-1.19/src/scan.c:scan_periodic_triggered() Periodic scan
+triggered for wdev 1
+../iwd-1.19/src/scan.c:scan_notify() Scan notification New Scan Results(34)
+../iwd-1.19/src/scan.c:get_scan_callback() get_scan_callback
+../iwd-1.19/src/scan.c:scan_parse_bss_information_elements() Load: 12/255
+../iwd-1.19/src/scan.c:get_scan_callback() get_scan_callback
+../iwd-1.19/src/scan.c:scan_parse_bss_information_elements() Load: 6/255
+../iwd-1.19/src/scan.c:get_scan_done() get_scan_done
+../iwd-1.19/src/scan.c:scan_periodic_rearm() Arming periodic scan timer: 10
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'34:08:04:12:b1:a2' with SSID: JupiterIoT, freq: 2437, rank: 2722,
+strength: -6500, data_rate: 81.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Added new Network
+"JupiterIoT" security psk
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'00:e0:20:17:16:eb' with SSID: WiFi-F263_Ext 2, freq: 2412, rank: 67,
+strength: -8800, data_rate: 2.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Added new Network
+"WiFi-F263_Ext 2" security psk
+../iwd-1.19/src/station.c:station_autoconnect_start()
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: JupiterIoT
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'34:08:04:12:b1:a2' freq: 2437, rank: 2722, strength: -6500
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: WiFi-F263_Ext 2
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'00:e0:20:17:16:eb' freq: 2412, rank: 67, strength: -8800
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/wiphy.c:wiphy_radio_work_done() Work item 1 done
+../iwd-1.19/src/netdev.c:netdev_link_notify() event 16 on ifindex 8
+../iwd-1.19/src/scan.c:scan_periodic_timeout() scan_periodic_timeout: 1
+../iwd-1.19/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 2
+../iwd-1.19/src/wiphy.c:wiphy_radio_work_next() Starting work item 2
+../iwd-1.19/src/scan.c:scan_notify() Scan notification Trigger Scan(33)
+../iwd-1.19/src/scan.c:scan_request_triggered() Passive scan triggered
+for wdev 1
+../iwd-1.19/src/scan.c:scan_periodic_triggered() Periodic scan
+triggered for wdev 1
+../iwd-1.19/src/scan.c:scan_notify() Scan notification New Scan Results(34)
+../iwd-1.19/src/scan.c:get_scan_callback() get_scan_callback
+../iwd-1.19/src/scan.c:scan_parse_bss_information_elements() Load: 10/255
+../iwd-1.19/src/scan.c:get_scan_callback() get_scan_callback
+../iwd-1.19/src/scan.c:scan_parse_bss_information_elements() Load: 6/255
+../iwd-1.19/src/scan.c:get_scan_callback() get_scan_callback
+../iwd-1.19/src/scan.c:scan_parse_bss_information_elements() Load: 20/255
+../iwd-1.19/src/scan.c:get_scan_done() get_scan_done
+../iwd-1.19/src/scan.c:scan_periodic_rearm() Arming periodic scan timer: 20
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'34:08:04:12:b1:a2' with SSID: JupiterIoT, freq: 2437, rank: 4537,
+strength: -5600, data_rate: 135.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'b0:95:75:98:f2:63' with SSID: WiFi-F263, freq: 2412, rank: 67,
+strength: -9400, data_rate: 2.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Added new Network
+"WiFi-F263" security psk
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'00:e0:20:17:16:eb' with SSID: WiFi-F263_Ext 2, freq: 2412, rank: 67,
+strength: -9100, data_rate: 2.0
+../iwd-1.19/src/station.c:station_autoconnect_start()
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: JupiterIoT
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'34:08:04:12:b1:a2' freq: 2437, rank: 4537, strength: -5600
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: WiFi-F263
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'b0:95:75:98:f2:63' freq: 2412, rank: 67, strength: -9400
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: WiFi-F263_Ext 2
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'00:e0:20:17:16:eb' freq: 2412, rank: 67, strength: -9100
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/wiphy.c:wiphy_radio_work_done() Work item 2 done
+../iwd-1.19/src/netdev.c:netdev_link_notify() event 16 on ifindex 8
+../iwd-1.19/src/scan.c:scan_periodic_timeout() scan_periodic_timeout: 1
+../iwd-1.19/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 3
+../iwd-1.19/src/wiphy.c:wiphy_radio_work_next() Starting work item 3
+../iwd-1.19/src/scan.c:scan_notify() Scan notification Trigger Scan(33)
+../iwd-1.19/src/scan.c:scan_request_triggered() Passive scan triggered
+for wdev 1
+../iwd-1.19/src/scan.c:scan_periodic_triggered() Periodic scan
+triggered for wdev 1
+../iwd-1.19/src/scan.c:scan_notify() Scan notification New Scan Results(34)
+../iwd-1.19/src/scan.c:get_scan_callback() get_scan_callback
+../iwd-1.19/src/scan.c:scan_parse_bss_information_elements() Load: 10/255
+../iwd-1.19/src/scan.c:get_scan_callback() get_scan_callback
+../iwd-1.19/src/scan.c:scan_parse_bss_information_elements() Load: 7/255
+../iwd-1.19/src/scan.c:get_scan_callback() get_scan_callback
+../iwd-1.19/src/scan.c:scan_parse_bss_information_elements() Load: 18/255
+../iwd-1.19/src/scan.c:get_scan_callback() get_scan_callback
+../iwd-1.19/src/scan.c:scan_parse_bss_information_elements() Load: 0/255
+../iwd-1.19/src/scan.c:get_scan_done() get_scan_done
+../iwd-1.19/src/scan.c:scan_periodic_rearm() Arming periodic scan timer: 40
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'34:08:04:12:b1:a2' with SSID: JupiterIoT, freq: 2437, rank: 3629,
+strength: -6300, data_rate: 108.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'b0:95:75:98:f2:63' with SSID: WiFi-F263, freq: 2412, rank: 67,
+strength: -9300, data_rate: 2.0
+../iwd-1.19/src/station.c:station_add_seen_bss() Processing BSS
+'00:e0:20:17:16:eb' with SSID: WiFi-F263_Ext 2, freq: 2412, rank: 67,
+strength: -8800, data_rate: 2.0
+../iwd-1.19/src/station.c:station_autoconnect_start()
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: JupiterIoT
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'34:08:04:12:b1:a2' freq: 2437, rank: 3629, strength: -6300
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: WiFi-F263
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'b0:95:75:98:f2:63' freq: 2412, rank: 67, strength: -9300
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'60:32:b1:a9:e8:4c' freq: 2417, rank: 67, strength: -9500
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+Trying SSID: WiFi-F263_Ext 2
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+'00:e0:20:17:16:eb' freq: 2412, rank: 67, strength: -8800
+../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+network_autoconnect: No such file or directory (-2)
+../iwd-1.19/src/wiphy.c:wiphy_radio_work_done() Work item 3 done
+../iwd-1.19/src/netdev.c:netdev_link_notify() event 16 on ifindex 8
 
-The other issue is the error from_ap, but I am connecting to a home
-WiFi modem, it should use a station, not ap, right? Or doesn't matter?
+# iwmon
+Wireless monitor ver 1.19
+Failed to create monitor interface nlmon: Unknown error -95
 
-Thanks for your advice.
+Thank you very much.
 
 Kind regards,
 
-Jupiter
---===============2629024652559636380==--
+- jupiter
+--===============5145413655832580134==--
 
