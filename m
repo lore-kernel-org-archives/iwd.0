@@ -1,55 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============3727047638857721481=="
+Content-Type: multipart/mixed; boundary="===============2084451489515425738=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Jupiter <jupiter.hce at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v5 4/4] dpp: handle protocol errors in ROC timeout
-Date: Fri, 17 Dec 2021 14:23:41 -0600
-Message-ID: <270a6675-b6d0-172f-efac-fabbb920c55e@gmail.com>
-In-Reply-To: 20211217191451.179444-4-prestwoj@gmail.com
+Subject: Re: iwd configure location and files
+Date: Wed, 01 Dec 2021 20:24:21 +1100
+Message-ID: <CAA=hcWR2F_dSxW+vT_x7GWaOEKpChbqvorBf=PmJZ1fveA7jNw@mail.gmail.com>
+In-Reply-To: 070b7088-2ab6-67bf-63a1-7a1be95a58f7@gmail.com
 
---===============3727047638857721481==
+--===============2084451489515425738==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Denis,
 
-On 12/17/21 13:14, James Prestwood wrote:
-> This is a standing TODO of properly handling these timeouts but
-> for now just treat any ROC timeout as an error if authenticating
-> or configuring.
-> ---
->   src/dpp.c | 36 +++++++++++++++++++++++++++++++++---
->   1 file changed, 33 insertions(+), 3 deletions(-)
-> =
+I think all strange things could be caused by Marvell firmware
+sd8801_uapsta.bin running unstable on kernel 5.10, that firmware was
+running well on kernel 4.19. Let me debug and figure out the WiFi
+firmware stability first.
 
-> diff --git a/src/dpp.c b/src/dpp.c
+Thank you.
 
-<snip>
-
-> @@ -1091,6 +1115,12 @@ static void dpp_presence_timeout(int error, void *=
-user_data)
->   	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev=
-),
->   			dpp->current_freq, dpp->dwell, dpp_roc_started,
->   			dpp, dpp_presence_timeout);
-> +	return;
-> +
-> +protocol_failed:
-> +	dpp_reset(dpp);
-> +	dpp_free_auth_data(dpp);
-
-Isn't dpp_reset already calling dpp_free_auth_data?
-
-> +	return;
->   }
->   =
-
->   /*
-> =
+- jupiter
 
 
-Regards,
--Denis
---===============3727047638857721481==--
+On 12/1/21, Denis Kenzior <denkenz(a)gmail.com> wrote:
+> Hi Jupiter,
+>
+>> My bad, here is DHCP debugging, looks like failed to get DHCP server
+>> response:
+>>
+>> ../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
+>> '34:08:04:12:b1:a2' freq: 2437, rank: 2722, strength: -6500
+>> ../iwd-1.19/src/station.c:station_enter_state() Old State:
+>> autoconnect_full, new state: connecting (auto)
+>> ../iwd-1.19/src/station.c:station_netdev_event() Associating
+>> ../iwd-1.19/src/station.c:station_handshake_event() Setting keys
+>> ../iwd-1.19/src/station.c:station_connect_cb() 14, result: 0
+>> ../iwd-1.19/src/station.c:station_connect_ok()
+>> netconfig: Failed to start DHCPv4 client for interface 14
+>> WARNING: ../iwd-1.19/src/station.c:station_connect_ok() condition
+>> !netconfig_configure(station->netconfig,
+>
+> Ugh, not sure what happens here.  First, can you update to iwd 1.20?  I
+> don't
+> think anything was touched around this for several releases, but I'd hate=
+ to
+> try
+> and debug an old version.  Also, share the full log of iwd when this
+> happens...
+>
+> Can you strace iwd and see what syscall might be failing around this time?
+> You
+> may also need to step through l_dhcp_client_start to see why it is failin=
+g.
+> It
+> really shouldn't under normal circumstances, hence we have no debugs in t=
+his
+> area.
+>
+>> station_netconfig_event_handler, station) failed
+>> [DHCPv4] dhcp_client_timeout_resend:526
+>> [DHCPv4] dhcp_client_send_discover:346
+>> [DHCPv4] dhcp_client_timeout_resend:526
+>> [DHCPv4] dhcp_client_send_discover:346
+>> [DHCPv4] dhcp_client_timeout_resend:526
+>> [DHCPv4] dhcp_client_send_discover:346
+>> [DHCPv4] dhcp_client_timeout_resend:526
+>> [DHCPv4] dhcp_client_send_discover:346
+>
+> And this is even more strange.  If l_dhcp_client_start() fails, then the
+> resend
+> timer shouldn't even be set and you shouldn't even see this sequence.
+>
+> Can you try compiling with optimizations off (./configure --enable-debug
+> --disable-optimization) and see if the behavior changes?
+>
+>>
+>> Is netconfig from iwd?
+>
+> yes
+>
+>>
+>> I think the DHCP server is running from the home WiFi modem, right? My
+>> laptop is also connected to the same WiFi modem SSID JupiterIoT which
+>> should rule out home WiFi network DHCP server issues.
+>
+> Given the fact that we fail to start dhcp client, I'm not sure we even se=
+nd
+> any
+> discover packets.  So your server might be just fine.
+>
+> Regards,
+> -Denis
+>
+
+
+--
+"A man can fail many times, but he isn't a failure until he begins to
+blame somebody else."
+-- John Burroughs
+--===============2084451489515425738==--
 
