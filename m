@@ -1,41 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============1549263640387053363=="
+Content-Type: multipart/mixed; boundary="===============6278822919923917887=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Daniel Wagner <wagi at monom.org>
 To: iwd at lists.01.org
-Subject: [PATCH 8/9] client: add DPP interface
-Date: Mon, 20 Dec 2021 13:49:14 -0800
-Message-ID: <20211220214915.34093-8-prestwoj@gmail.com>
-In-Reply-To: 20211220214915.34093-1-prestwoj@gmail.com
+Subject: Re: iwd configure location and files
+Date: Thu, 02 Dec 2021 16:47:13 +0100
+Message-ID: <8aa819a1-4fd4-b989-713b-6480d0dfd236@monom.org>
+In-Reply-To: 31be7914-5c78-f1c9-1225-a271204ba153@gmail.com
 
---===============1549263640387053363==
+--===============6278822919923917887==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- client/dbus-proxy.h | 1 +
- 1 file changed, 1 insertion(+)
+On 30.11.21 23:42, Denis Kenzior wrote:
+> Note that for iwd + connman, connman would be the one performing DHCP =
 
-diff --git a/client/dbus-proxy.h b/client/dbus-proxy.h
-index 2a366d1b..1d6af5de 100644
---- a/client/dbus-proxy.h
-+++ b/client/dbus-proxy.h
-@@ -36,6 +36,7 @@ struct proxy_interface;
- #define IWD_STATION_DIAGNOSTIC_INTERFACE "net.connman.iwd.StationDiagnosti=
-c"
- #define IWD_AP_DIAGNOSTIC_INTERFACE      "net.connman.iwd.AccessPointDiagn=
-ostic"
- #define IWD_DAEMON_INTERFACE             "net.connman.iwd.Daemon"
-+#define IWD_DPP_INTERFACE                "net.connman.iwd.DeviceProvisioni=
-ng"
- =
+> and iwd should use EnableNetworkConfiguration=3Dfalse.=C2=A0 Daniel can c=
+orrect =
 
- typedef bool (*proxy_property_match_func_t) (const void *a, const void *b);
- =
+> me if I'm wrong.
 
--- =
+This is correct. Though I think it should be possible to change this. =
 
-2.31.1
+For example for VPN the VPN service tells ConnMan the IP configuration =
 
---===============1549263640387053363==--
+to use. The iwd plugin could do the amse and tell the ConnMan core which =
+
+IP configuration to use.
+--===============6278822919923917887==--
 
