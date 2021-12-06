@@ -1,61 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============2475589926199217904=="
+Content-Type: multipart/mixed; boundary="===============3142410740692219326=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/5] dpp: don't allocate transient ssid strings
-Date: Fri, 07 Jan 2022 14:31:08 -0800
-Message-ID: <20220107223112.715855-1-prestwoj@gmail.com>
+Subject: [PATCH v4 1/2] wiphy: update wiphy_radio_work_is_running to return int
+Date: Mon, 06 Dec 2021 12:17:25 -0800
+Message-ID: <20211206201726.1192621-1-prestwoj@gmail.com>
 
---===============2475589926199217904==
+--===============3142410740692219326==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-These can be kept on the stack and avoid the need for
-allocated memory and unneeded auto-free functionality.
+This differentiates between pending, running, and non-existent:
+false, true, -ENOENT respectively
 ---
- src/dpp.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ src/wiphy.c | 10 +++++-----
+ src/wiphy.h |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 20c27a57..61c6b36d 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -400,7 +400,7 @@ static void send_config_result(struct dpp_sm *dpp, cons=
-t uint8_t *to)
- static void dpp_write_config(struct dpp_configuration *config,
- 				struct network *network)
+v4:
+ * Changed to return true/false and -ENOENT rather than a zero success retu=
+rn
+
+diff --git a/src/wiphy.c b/src/wiphy.c
+index bb1f9824..56400ea8 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -2013,14 +2013,14 @@ void wiphy_radio_work_done(struct wiphy *wiphy, uin=
+t32_t id)
+ 		wiphy_radio_work_next(wiphy);
+ }
+ =
+
+-bool wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id)
++int wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id)
  {
--	_auto_(l_free) char *ssid =3D l_malloc(config->ssid_len + 1);
-+	char ssid[33];
- 	_auto_(l_settings_free) struct l_settings *settings =3D l_settings_new();
- 	_auto_(l_free) char *path;
- 	_auto_(l_free) uint8_t *psk =3D NULL;
-@@ -494,7 +494,7 @@ static void dpp_handle_config_response_frame(const stru=
-ct mmpdu_header *frame,
- 	struct station *station =3D station_find(netdev_get_ifindex(dpp->netdev));
- 	struct network *network;
- 	struct scan_bss *bss =3D NULL;
--	_auto_(l_free) char *ssid =3D NULL;
-+	char ssid[33];
+-	struct wiphy_radio_work_item *item =3D l_queue_peek_head(wiphy->work);
+-
++	struct wiphy_radio_work_item *item =3D l_queue_find(wiphy->work, match_id,
++							L_UINT_TO_PTR(id));
+ 	if (!item)
+-		return false;
++		return -ENOENT;
  =
 
- 	if (dpp->state !=3D DPP_STATE_CONFIGURING)
- 		return;
-@@ -618,7 +618,6 @@ static void dpp_handle_config_response_frame(const stru=
-ct mmpdu_header *frame,
- 		return;
- 	}
+-	return item->id =3D=3D id;
++	return item =3D=3D l_queue_peek_head(wiphy->work) ? 1 : 0;
+ }
  =
 
--	ssid =3D l_malloc(config->ssid_len + 1);
- 	memcpy(ssid, config->ssid, config->ssid_len);
- 	ssid[config->ssid_len] =3D '\0';
- =
-
+ static int wiphy_init(void)
+diff --git a/src/wiphy.h b/src/wiphy.h
+index 9f0d6d07..592eba70 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -130,4 +130,4 @@ uint32_t wiphy_radio_work_insert(struct wiphy *wiphy,
+ 				int priority,
+ 				const struct wiphy_radio_work_item_ops *ops);
+ void wiphy_radio_work_done(struct wiphy *wiphy, uint32_t id);
+-bool wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id);
++int wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id);
 -- =
 
 2.31.1
 
---===============2475589926199217904==--
+--===============3142410740692219326==--
 
