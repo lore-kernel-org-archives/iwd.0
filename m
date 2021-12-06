@@ -1,36 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============4550663517711215505=="
+Content-Type: multipart/mixed; boundary="===============0715057525339987776=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2] iwd: Always disconnect connection completely
-Date: Tue, 25 Jan 2022 10:25:02 -0600
-Message-ID: <d0cbe87b-83c4-12c3-f109-782d2bfe366c@gmail.com>
-In-Reply-To: 20220125105734.s4cdlt2l5nl2lbls@beryllium.lan
+Subject: [PATCH] unit: fix memory leaks in test-dpp
+Date: Mon, 06 Dec 2021 15:51:26 -0800
+Message-ID: <20211206235126.1384140-1-prestwoj@gmail.com>
 
---===============4550663517711215505==
+--===============0715057525339987776==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Daniel,
+---
+ unit/test-dpp.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-> For the iwd developers: Currently ConnMan's iwd plugin doesn't track any
-> networks state. It just forwards the connect/disconnect requests from
-> the core. Do we need to filter/serialize those?
+diff --git a/unit/test-dpp.c b/unit/test-dpp.c
+index d687bba0..1d4846c7 100644
+--- a/unit/test-dpp.c
++++ b/unit/test-dpp.c
+@@ -31,6 +31,7 @@
+ =
 
-So in theory iwd should gracefully handle such scenarios.  For example:
-- Connect comes while already connected (network switch)
-- Disconnect comes when connecting (aborts the connect attempt)
-- Connect while connecting (aborts original attempt, starts new one)
+ #include "src/dpp-util.h"
+ #include "src/util.h"
++#include "ell/useful.h"
+ =
 
-There may be situations where the timing between requests is so small that =
-we =
+ /*
+  * B.2 Test Vectors for DPP Authentication Using P-256 for
+@@ -68,12 +69,13 @@ static void test_key_derivation(const void *data)
+ {
+ 	uint64_t tmp[L_ECC_MAX_DIGITS];
+ 	const struct l_ecc_curve *curve =3D l_ecc_curve_from_ike_group(19);
+-	struct l_ecc_point *i_proto_public;
+-	struct l_ecc_point *r_boot_public;
+-	struct l_ecc_scalar *r_boot_private;
+-	struct l_ecc_scalar *r_proto_private;
+-	struct l_ecc_point *r_proto_public;
+-	struct l_ecc_scalar *m, *n;
++	_auto_(l_ecc_point_free) struct l_ecc_point *i_proto_public =3D NULL;
++	_auto_(l_ecc_point_free) struct l_ecc_point *r_boot_public =3D NULL;
++	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *r_boot_private =3D NULL;
++	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *r_proto_private =3D NULL;
++	_auto_(l_ecc_point_free) struct l_ecc_point *r_proto_public =3D NULL;
++	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *m =3D NULL;
++	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *n =3D NULL;
+ 	uint64_t k1[L_ECC_MAX_DIGITS];
+ 	uint64_t k2[L_ECC_MAX_DIGITS];
+ 	uint64_t ke[L_ECC_MAX_DIGITS];
+-- =
 
-simply have to return an -EBUSY (net.connman.iwd.Busy).
+2.31.1
 
-Is there a particular scenario which isn't working?
-
-Regards,
--Denis
---===============4550663517711215505==--
+--===============0715057525339987776==--
 
