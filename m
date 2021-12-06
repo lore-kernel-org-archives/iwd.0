@@ -1,82 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============1631370328694112005=="
+Content-Type: multipart/mixed; boundary="===============6396960845672544542=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel at holtmann.org>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
-Date: Wed, 18 May 2022 16:48:23 +0200
-Message-ID: <0886D7EE-6F64-4B79-A752-980FEA0752B4@holtmann.org>
-In-Reply-To: 20220518143915.105007-1-mjohnson459@gmail.com
+Subject: [PATCH v3 1/2] wiphy: update wiphy_radio_work_is_running to return int
+Date: Mon, 06 Dec 2021 10:19:55 -0800
+Message-ID: <20211206181956.1161332-1-prestwoj@gmail.com>
 
---===============1631370328694112005==
+--===============6396960845672544542==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+This differentiates between pending, running, and non-existent:
+1, 0, -ENOENT respectively
+---
+ src/wiphy.c | 10 +++++-----
+ src/wiphy.h |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-> Allows granularly specifying the DHCP logging level. This allows the
-> user to tailor the output to what they need. By default, always display
-> info, errors and warnings to match the rest of iwd.
-> =
+diff --git a/src/wiphy.c b/src/wiphy.c
+index bb1f9824..219a3695 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -2013,14 +2013,14 @@ void wiphy_radio_work_done(struct wiphy *wiphy, uin=
+t32_t id)
+ 		wiphy_radio_work_next(wiphy);
+ }
+ =
 
-> Setting `IWD_DHCP_DEBUG` to "debug", "info", "warn", "error" will limit
-> the logging to that level or higher allowing the default logging
-> verbosity to be reduced.
-> =
+-bool wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id)
++int wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id)
+ {
+-	struct wiphy_radio_work_item *item =3D l_queue_peek_head(wiphy->work);
+-
++	struct wiphy_radio_work_item *item =3D l_queue_find(wiphy->work, match_id,
++							L_UINT_TO_PTR(id));
+ 	if (!item)
+-		return false;
++		return -ENOENT;
+ =
 
-> Setting `IWD_DHCP_DEBUG` to "1" as per the current behavior will
-> continue to enable debug level logging.
-> ---
-> src/netconfig.c | 21 ++++++++++++++++++---
-> 1 file changed, 18 insertions(+), 3 deletions(-)
-> =
+-	return item->id =3D=3D id;
++	return item =3D=3D l_queue_peek_head(wiphy->work) ? 0 : 1;
+ }
+ =
 
-> diff --git a/src/netconfig.c b/src/netconfig.c
-> index 6694a0e9..0042a55d 100644
-> --- a/src/netconfig.c
-> +++ b/src/netconfig.c
-> @@ -1621,6 +1621,8 @@ struct netconfig *netconfig_new(uint32_t ifindex)
-> 	struct netdev *netdev =3D netdev_find(ifindex);
-> 	struct netconfig *netconfig;
-> 	struct l_icmp6_client *icmp6;
-> +	const char *debug_level =3D NULL;
-> +	int dhcp_priority =3D L_LOG_INFO;
-> =
+ static int wiphy_init(void)
+diff --git a/src/wiphy.h b/src/wiphy.h
+index 9f0d6d07..592eba70 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -130,4 +130,4 @@ uint32_t wiphy_radio_work_insert(struct wiphy *wiphy,
+ 				int priority,
+ 				const struct wiphy_radio_work_item_ops *ops);
+ void wiphy_radio_work_done(struct wiphy *wiphy, uint32_t id);
+-bool wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id);
++int wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id);
+-- =
 
-> 	if (!netconfig_list)
-> 		return NULL;
-> @@ -1640,9 +1642,22 @@ struct netconfig *netconfig_new(uint32_t ifindex)
-> 					netconfig_ipv4_dhcp_event_handler,
-> 					netconfig, NULL);
-> =
+2.31.1
 
-> -	if (getenv("IWD_DHCP_DEBUG"))
-> -		l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
-> -							"[DHCPv4] ", NULL);
-> +	debug_level =3D getenv("IWD_DHCP_DEBUG");
-> +	if (debug_level !=3D NULL) {
-> +		if (strcmp("debug", debug_level) =3D=3D 0)
-> +			dhcp_priority =3D L_LOG_DEBUG;
-> +		else if (strcmp("info", debug_level) =3D=3D 0)
-> +			dhcp_priority =3D L_LOG_INFO;
-> +		else if (strcmp("warn", debug_level) =3D=3D 0)
-> +			dhcp_priority =3D L_LOG_WARNING;
-> +		else if (strcmp("error", debug_level) =3D=3D 0)
-> +			dhcp_priority =3D L_LOG_ERR;
-> +		else 	/* Default for backwards compatibility */
-> +			dhcp_priority =3D L_LOG_DEBUG;
-> +	}
-> +
-> +	l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
-> +					"[DHCPv4] ", NULL, dhcp_priority);
-
-please don=E2=80=99t always set l_dhcp_client_set_debug. It should not be s=
-et. And I don=E2=80=99t like the dhcp_priority parameter at all. That is ju=
-st convoluted code and there is no precedence with any _set_debug() APIs.
-
-Regards
-
-Marcel
-
---===============1631370328694112005==--
+--===============6396960845672544542==--
 
