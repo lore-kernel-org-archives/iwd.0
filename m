@@ -1,104 +1,134 @@
-Content-Type: multipart/mixed; boundary="===============2084451489515425738=="
+Content-Type: multipart/mixed; boundary="===============6516691806406659981=="
 MIME-Version: 1.0
-From: Jupiter <jupiter.hce at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd configure location and files
-Date: Wed, 01 Dec 2021 20:24:21 +1100
-Message-ID: <CAA=hcWR2F_dSxW+vT_x7GWaOEKpChbqvorBf=PmJZ1fveA7jNw@mail.gmail.com>
-In-Reply-To: 070b7088-2ab6-67bf-63a1-7a1be95a58f7@gmail.com
+Subject: [PATCH 3/4] dpp-util: add DPP attribute iteration APIs
+Date: Mon, 06 Dec 2021 13:03:55 -0800
+Message-ID: <20211206210356.1204046-3-prestwoj@gmail.com>
+In-Reply-To: 20211206210356.1204046-1-prestwoj@gmail.com
 
---===============2084451489515425738==
+--===============6516691806406659981==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+---
+ src/dpp-util.c | 34 ++++++++++++++++++++++++++++++++++
+ src/dpp-util.h | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 83 insertions(+)
 
-I think all strange things could be caused by Marvell firmware
-sd8801_uapsta.bin running unstable on kernel 5.10, that firmware was
-running well on kernel 4.19. Let me debug and figure out the WiFi
-firmware stability first.
+diff --git a/src/dpp-util.c b/src/dpp-util.c
+index ca641311..b7122de6 100644
+--- a/src/dpp-util.c
++++ b/src/dpp-util.c
+@@ -94,6 +94,40 @@ char *dpp_generate_uri(const uint8_t *asn1, size_t asn1_=
+len, uint8_t version,
+ 	return l_string_unwrap(uri);
+ }
+ =
 
-Thank you.
++void dpp_attr_iter_init(struct dpp_attr_iter *iter, const uint8_t *pdu,
++			size_t len)
++{
++	iter->pos =3D pdu;
++	iter->end =3D pdu + len;
++}
++
++bool dpp_attr_iter_next(struct dpp_attr_iter *iter,
++			enum dpp_attribute_type *type_out, size_t *len_out,
++			const uint8_t **data_out)
++{
++	enum dpp_attribute_type type;
++	size_t len;
++
++	if (iter->pos + 4 > iter->end)
++		return false;
++
++	type =3D l_get_le16(iter->pos);
++	len =3D l_get_le16(iter->pos + 2);
++
++	iter->pos +=3D 4;
++
++	if (iter->pos + len > iter->end)
++		return false;
++
++	*type_out =3D type;
++	*len_out =3D len;
++	*data_out =3D iter->pos;
++
++	iter->pos +=3D len;
++
++	return true;
++}
++
+ /*
+  * EasyConnect 2.0 Table 3. Key and Nonce Length Dependency on Prime Length
+  */
+diff --git a/src/dpp-util.h b/src/dpp-util.h
+index 971c0ce4..6d0dcccb 100644
+--- a/src/dpp-util.h
++++ b/src/dpp-util.h
+@@ -22,6 +22,55 @@
+ struct l_ecc_point;
+ struct l_ecc_scalar;
+ =
 
-- jupiter
++enum dpp_attribute_type {
++	/* 0000 - 0FFF reserved */
++	DPP_ATTR_STATUS				=3D 0x1000,
++	DPP_ATTR_INITIATOR_BOOT_KEY_HASH	=3D 0x1001,
++	DPP_ATTR_RESPONDER_BOOT_KEY_HASH	=3D 0x1002,
++	DPP_ATTR_INITIATOR_PROTOCOL_KEY		=3D 0x1003,
++	DPP_ATTR_WRAPPED_DATA			=3D 0x1004,
++	DPP_ATTR_INITIATOR_NONCE		=3D 0x1005,
++	DPP_ATTR_INITIATOR_CAPABILITIES		=3D 0x1006,
++	DPP_ATTR_RESPONDER_NONCE		=3D 0x1007,
++	DPP_ATTR_RESPONDER_CAPABILITIES		=3D 0x1008,
++	DPP_ATTR_RESPONDER_PROTOCOL_KEY		=3D 0x1009,
++	DPP_ATTR_INITIATOR_AUTH_TAG		=3D 0x100a,
++	DPP_ATTR_RESPONDER_AUTH_TAG		=3D 0x100b,
++	DPP_ATTR_CONFIGURATION_OBJECT		=3D 0x100c,
++	DPP_ATTR_CONNECTOR			=3D 0x100d,
++	DPP_ATTR_CONFIGURATION_REQUEST		=3D 0x100e,
++	DPP_ATTR_BOOTSTRAPPING_KEY		=3D 0x100f,
++	/* 1010 - 1011 reserved */
++	DPP_ATTR_FINITE_CYCLIC_GROUP		=3D 0x1012,
++	DPP_ATTR_ENCRYPTED_KEY			=3D 0x1013,
++	DPP_ATTR_ENROLLEE_NONCE			=3D 0x1014,
++	DPP_ATTR_CODE_IDENTIFIER		=3D 0x1015,
++	DPP_ATTR_TRANSACTION_ID			=3D 0x1016,
++	DPP_ATTR_BOOTSTRAPPING_INFO		=3D 0x1017,
++	DPP_ATTR_CHANNEL			=3D 0x1018,
++	DPP_ATTR_PROTOCOL_VERSION		=3D 0x1019,
++	DPP_ATTR_ENVELOPED_DATA			=3D 0x101a,
++	DPP_ATTR_SEND_CONN_STATUS		=3D 0x101b,
++	DPP_ATTR_CONN_STATUS			=3D 0x101c,
++	DPP_ATTR_RECONFIGURATION_FLAGS		=3D 0x101d,
++	DPP_ATTR_C_SIGN_KEY_HASH		=3D 0x101e,
++	DPP_ATTR_CSR_ATTRIBUTES_REQUEST		=3D 0x101f,
++	DPP_ATTR_ANONCE				=3D 0x1020,
++	DPP_ATTR_EID				=3D 0x1021,
++	DPP_ATTR_CONFIGURATOR_NONCE		=3D 0x1022,
++};
++
++struct dpp_attr_iter {
++	const uint8_t *pos;
++	const uint8_t *end;
++};
++
++void dpp_attr_iter_init(struct dpp_attr_iter *iter, const uint8_t *pdu,
++			size_t len);
++bool dpp_attr_iter_next(struct dpp_attr_iter *iter,
++			enum dpp_attribute_type *type, size_t *len,
++			const uint8_t **data);
++
+ char *dpp_generate_uri(const uint8_t *asn1, size_t asn1_len, uint8_t versi=
+on,
+ 			const uint8_t *mac, const uint32_t *freqs,
+ 			size_t freqs_len, const char *info, const char *host);
+-- =
 
+2.31.1
 
-On 12/1/21, Denis Kenzior <denkenz(a)gmail.com> wrote:
-> Hi Jupiter,
->
->> My bad, here is DHCP debugging, looks like failed to get DHCP server
->> response:
->>
->> ../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
->> '34:08:04:12:b1:a2' freq: 2437, rank: 2722, strength: -6500
->> ../iwd-1.19/src/station.c:station_enter_state() Old State:
->> autoconnect_full, new state: connecting (auto)
->> ../iwd-1.19/src/station.c:station_netdev_event() Associating
->> ../iwd-1.19/src/station.c:station_handshake_event() Setting keys
->> ../iwd-1.19/src/station.c:station_connect_cb() 14, result: 0
->> ../iwd-1.19/src/station.c:station_connect_ok()
->> netconfig: Failed to start DHCPv4 client for interface 14
->> WARNING: ../iwd-1.19/src/station.c:station_connect_ok() condition
->> !netconfig_configure(station->netconfig,
->
-> Ugh, not sure what happens here.  First, can you update to iwd 1.20?  I
-> don't
-> think anything was touched around this for several releases, but I'd hate=
- to
-> try
-> and debug an old version.  Also, share the full log of iwd when this
-> happens...
->
-> Can you strace iwd and see what syscall might be failing around this time?
-> You
-> may also need to step through l_dhcp_client_start to see why it is failin=
-g.
-> It
-> really shouldn't under normal circumstances, hence we have no debugs in t=
-his
-> area.
->
->> station_netconfig_event_handler, station) failed
->> [DHCPv4] dhcp_client_timeout_resend:526
->> [DHCPv4] dhcp_client_send_discover:346
->> [DHCPv4] dhcp_client_timeout_resend:526
->> [DHCPv4] dhcp_client_send_discover:346
->> [DHCPv4] dhcp_client_timeout_resend:526
->> [DHCPv4] dhcp_client_send_discover:346
->> [DHCPv4] dhcp_client_timeout_resend:526
->> [DHCPv4] dhcp_client_send_discover:346
->
-> And this is even more strange.  If l_dhcp_client_start() fails, then the
-> resend
-> timer shouldn't even be set and you shouldn't even see this sequence.
->
-> Can you try compiling with optimizations off (./configure --enable-debug
-> --disable-optimization) and see if the behavior changes?
->
->>
->> Is netconfig from iwd?
->
-> yes
->
->>
->> I think the DHCP server is running from the home WiFi modem, right? My
->> laptop is also connected to the same WiFi modem SSID JupiterIoT which
->> should rule out home WiFi network DHCP server issues.
->
-> Given the fact that we fail to start dhcp client, I'm not sure we even se=
-nd
-> any
-> discover packets.  So your server might be just fine.
->
-> Regards,
-> -Denis
->
-
-
---
-"A man can fail many times, but he isn't a failure until he begins to
-blame somebody else."
--- John Burroughs
---===============2084451489515425738==--
+--===============6516691806406659981==--
 
