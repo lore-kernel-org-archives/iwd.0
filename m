@@ -1,36 +1,370 @@
-Content-Type: multipart/mixed; boundary="===============4537580932345512555=="
+Content-Type: multipart/mixed; boundary="===============3931589778859035785=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/6] ie: add DPP configurator connectivity element
-Date: Mon, 29 Nov 2021 15:12:55 -0800
-Message-ID: <20211129231300.108873-1-prestwoj@gmail.com>
+Subject: [PATCH 1/4] dpp-util: Introduce dpp-util, and add crypto operations
+Date: Mon, 06 Dec 2021 13:03:53 -0800
+Message-ID: <20211206210356.1204046-1-prestwoj@gmail.com>
 
---===============4537580932345512555==
+--===============3931589778859035785==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/ie.h | 1 +
- 1 file changed, 1 insertion(+)
+ Makefile.am    |   1 +
+ src/dpp-util.c | 260 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/dpp-util.h |  46 +++++++++
+ 3 files changed, 307 insertions(+)
+ create mode 100644 src/dpp-util.c
+ create mode 100644 src/dpp-util.h
 
-diff --git a/src/ie.h b/src/ie.h
-index 685350d6..d460a7cc 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -292,6 +292,7 @@ enum ie_vendor_wfa_oi_type {
- 	IE_WFA_OI_OSEN =3D 0x12,
- 	IE_WFA_OI_OWE_TRANSITION =3D 0x1c,
- 	IE_WFA_OI_ROAMING_SELECTION =3D 0x1d,
-+	IE_WFA_OI_CONFIGURATOR_CONNECTIVITY =3D 0x1e,
- };
+diff --git a/Makefile.am b/Makefile.am
+index d93dd2c9..25269a0d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -248,6 +248,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
+h src/missing.h \
+ 					src/band.h src/band.c \
+ 					src/sysfs.h src/sysfs.c \
+ 					src/offchannel.h src/offchannel.c \
++					src/dpp-util.h src/dpp-util.c \
+ 					$(eap_sources) \
+ 					$(builtin_sources)
  =
 
- enum ie_advertisement_id {
+diff --git a/src/dpp-util.c b/src/dpp-util.c
+new file mode 100644
+index 00000000..8482b1ff
+--- /dev/null
++++ b/src/dpp-util.c
+@@ -0,0 +1,260 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++
++#include <errno.h>
++
++#include <ell/ell.h>
++
++#include "src/dpp-util.h"
++#include "src/util.h"
++#include "src/crypto.h"
++
++/*
++ * EasyConnect 2.0 Table 3. Key and Nonce Length Dependency on Prime Length
++ */
++static enum l_checksum_type dpp_sha_from_key_len(size_t len)
++{
++	if (len =3D=3D 32)
++		return L_CHECKSUM_SHA256;
++	else if (len =3D=3D 48)
++		return L_CHECKSUM_SHA384;
++	else if (len =3D=3D 64)
++		return L_CHECKSUM_SHA512;
++	else
++		return L_CHECKSUM_NONE;
++
++}
++
++size_t dpp_nonce_len_from_key_len(size_t len)
++{
++	if (len =3D=3D 32)
++		return 16;
++	else if (len =3D=3D 48)
++		return 24;
++	else if (len =3D=3D 64)
++		return 32;
++	else
++		return 0;
++}
++
++/*
++ * 3.2.2
++ * H()
++ */
++bool dpp_hash(enum l_checksum_type type, uint8_t *out, unsigned int num, .=
+..)
++{
++	struct l_checksum *sha =3D l_checksum_new(type);
++	size_t hsize =3D l_checksum_digest_length(type);
++	unsigned int i;
++
++	va_list va;
++
++	va_start(va, num);
++
++	for (i =3D 0; i < num; i++) {
++		void *data =3D va_arg(va, void *);
++		size_t len =3D va_arg(va, size_t);
++
++		l_checksum_update(sha, data, len);
++	}
++
++	va_end(va);
++
++	l_checksum_get_digest(sha, out, hsize);
++	l_checksum_free(sha);
++
++	return true;
++}
++
++/*
++ * 3.2.2
++ *
++ * HKDF is defined as:
++ *
++ * key =3D HKDF(salt, info, ikm)
++ *     =3D HKDF-Expand(HKDF-Extract(salt, ikm), info, len)
++ *
++ * Note: A NULL 'salt' means a zero'ed buffer and 'salt_len' should still =
+be
++ *       set for this zero'ed buffer length.
++ */
++static bool dpp_hkdf(enum l_checksum_type sha, const void *salt,
++			size_t salt_len, const char *info, const void *ikm,
++			size_t ikm_len, void *out, size_t out_len)
++{
++	uint8_t tmp[64];
++	uint8_t zero_salt[64] =3D { 0 };
++	size_t hash_len =3D l_checksum_digest_length(sha);
++
++	if (!salt)
++		salt =3D zero_salt;
++
++	if (!hkdf_extract(sha, salt, salt_len, 1, tmp,
++				ikm, ikm_len))
++		return false;
++
++	return hkdf_expand(sha, tmp, hash_len, info, out, out_len);
++}
++
++bool dpp_derive_r_auth(const void *i_nonce, const void *r_nonce,
++				size_t nonce_len, struct l_ecc_point *i_proto,
++				struct l_ecc_point *r_proto,
++				struct l_ecc_point *r_boot,
++				void *r_auth)
++{
++	uint64_t pix[L_ECC_MAX_DIGITS];
++	uint64_t prx[L_ECC_MAX_DIGITS];
++	uint64_t brx[L_ECC_MAX_DIGITS];
++	size_t keys_len;
++	uint8_t zero =3D 0;
++	enum l_checksum_type type;
++
++	keys_len =3D l_ecc_point_get_x(i_proto, pix, sizeof(pix));
++	l_ecc_point_get_x(r_proto, prx, sizeof(prx));
++	l_ecc_point_get_x(r_boot, brx, sizeof(brx));
++
++	type =3D dpp_sha_from_key_len(keys_len);
++
++	/*
++	 * R-auth =3D H(I-nonce | R-nonce | PI.x | PR.x | [ BI.x | ] BR.x | 0)
++	 */
++	return dpp_hash(type, r_auth, 6, i_nonce, nonce_len, r_nonce, nonce_len,
++			pix, keys_len, prx, keys_len, brx, keys_len, &zero, 1);
++}
++
++bool dpp_derive_i_auth(const void *r_nonce, const void *i_nonce,
++				size_t nonce_len, struct l_ecc_point *r_proto,
++				struct l_ecc_point *i_proto,
++				struct l_ecc_point *r_boot, void *i_auth)
++{
++	uint64_t prx[L_ECC_MAX_DIGITS];
++	uint64_t pix[L_ECC_MAX_DIGITS];
++	uint64_t brx[L_ECC_MAX_DIGITS];
++	size_t keys_len;
++	uint8_t one =3D 1;
++	enum l_checksum_type type;
++
++	keys_len =3D l_ecc_point_get_x(r_proto, prx, sizeof(prx));
++	l_ecc_point_get_x(i_proto, pix, sizeof(pix));
++	l_ecc_point_get_x(r_boot, brx, sizeof(brx));
++
++	type =3D dpp_sha_from_key_len(keys_len);
++
++	/*
++	 * I-auth =3D H(R-nonce | I-nonce | PR.x | PI.x | BR.x | [ BI.x | ] 1)
++	 */
++	return dpp_hash(type, i_auth, 6, r_nonce, nonce_len, i_nonce, nonce_len,
++			prx, keys_len, pix, keys_len, brx, keys_len, &one, 1);
++}
++
++/*
++ * Derives key k1. This returns the intermediate secret M.x used in derivi=
+ng
++ * key ke.
++ */
++struct l_ecc_scalar *dpp_derive_k1(const struct l_ecc_point *i_proto_publi=
+c,
++				const struct l_ecc_scalar *boot_private,
++				void *k1)
++{
++	struct l_ecc_scalar *m;
++	uint64_t mx_bytes[L_ECC_MAX_DIGITS];
++	ssize_t key_len;
++	enum l_checksum_type sha;
++
++	if (!l_ecdh_generate_shared_secret(boot_private, i_proto_public, &m))
++		return NULL;
++
++	key_len =3D l_ecc_scalar_get_data(m, mx_bytes, sizeof(mx_bytes));
++
++	sha =3D dpp_sha_from_key_len(key_len);
++
++	if (!dpp_hkdf(sha, NULL, key_len, "first intermediate key", mx_bytes,
++			key_len, k1, key_len)) {
++		l_ecc_scalar_free(m);
++		return NULL;
++	}
++
++	return m;
++}
++
++/*
++ * Derives key k2. This returns the intermediate secret N.x used in derivi=
+ng
++ * key ke.
++ */
++struct l_ecc_scalar *dpp_derive_k2(const struct l_ecc_point *i_proto_publi=
+c,
++				const struct l_ecc_scalar *proto_private,
++				void *k2)
++{
++	struct l_ecc_scalar *n;
++	uint64_t nx_bytes[L_ECC_MAX_DIGITS];
++	ssize_t key_len;
++	enum l_checksum_type sha;
++
++	if (!l_ecdh_generate_shared_secret(proto_private, i_proto_public, &n))
++		return NULL;
++
++	key_len =3D l_ecc_scalar_get_data(n, nx_bytes, sizeof(nx_bytes));
++
++	sha =3D dpp_sha_from_key_len(key_len);
++
++	if (!dpp_hkdf(sha, NULL, key_len, "second intermediate key", nx_bytes,
++			key_len, k2, key_len)) {
++		l_ecc_scalar_free(n);
++		return NULL;
++	}
++
++	return n;
++}
++
++bool dpp_derive_ke(const uint8_t *i_nonce, const uint8_t *r_nonce,
++				struct l_ecc_scalar *m, struct l_ecc_scalar *n,
++				void *ke)
++{
++	uint8_t nonces[32 + 32];
++	size_t nonce_len;
++	uint64_t mx_bytes[L_ECC_MAX_DIGITS];
++	uint64_t nx_bytes[L_ECC_MAX_DIGITS];
++	uint64_t bk[L_ECC_MAX_DIGITS];
++	ssize_t key_len;
++	enum l_checksum_type sha;
++
++	key_len =3D l_ecc_scalar_get_data(m, mx_bytes, sizeof(mx_bytes));
++	l_ecc_scalar_get_data(n, nx_bytes, sizeof(nx_bytes));
++
++	nonce_len =3D dpp_nonce_len_from_key_len(key_len);
++	sha =3D dpp_sha_from_key_len(key_len);
++
++	memcpy(nonces, i_nonce, nonce_len);
++	memcpy(nonces + nonce_len, r_nonce, nonce_len);
++
++	/* bk =3D HKDF-Extract(I-nonce | R-nonce, M.x | N.x [ | L.x]) */
++	if (!hkdf_extract(sha, nonces, nonce_len * 2, 2, bk, mx_bytes,
++			key_len, nx_bytes, key_len))
++		return false;
++
++	/* ke =3D HKDF-Expand(bk, "DPP Key", length) */
++	return hkdf_expand(sha, bk, key_len, "DPP Key", ke, key_len);
++}
+diff --git a/src/dpp-util.h b/src/dpp-util.h
+new file mode 100644
+index 00000000..92fc38e3
+--- /dev/null
++++ b/src/dpp-util.h
+@@ -0,0 +1,46 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++struct l_ecc_point;
++struct l_ecc_scalar;
++
++size_t dpp_nonce_len_from_key_len(size_t len);
++
++bool dpp_hash(enum l_checksum_type type, uint8_t *out, unsigned int num, .=
+..);
++
++bool dpp_derive_r_auth(const void *i_nonce, const void *r_nonce,
++				size_t nonce_len, struct l_ecc_point *i_proto,
++				struct l_ecc_point *r_proto,
++				struct l_ecc_point *r_boot,
++				void *r_auth);
++bool dpp_derive_i_auth(const void *r_nonce, const void *i_nonce,
++				size_t nonce_len, struct l_ecc_point *r_proto,
++				struct l_ecc_point *i_proto,
++				struct l_ecc_point *r_boot, void *i_auth);
++struct l_ecc_scalar *dpp_derive_k1(const struct l_ecc_point *i_proto_publi=
+c,
++				const struct l_ecc_scalar *boot_private,
++				void *k1);
++struct l_ecc_scalar *dpp_derive_k2(const struct l_ecc_point *i_proto_publi=
+c,
++				const struct l_ecc_scalar *proto_private,
++				void *k2);
++bool dpp_derive_ke(const uint8_t *i_nonce, const uint8_t *r_nonce,
++				struct l_ecc_scalar *m, struct l_ecc_scalar *n,
++				void *ke);
 -- =
 
 2.31.1
 
---===============4537580932345512555==--
+--===============3931589778859035785==--
 
