@@ -1,77 +1,129 @@
-Content-Type: multipart/mixed; boundary="===============2836101067757809074=="
+Content-Type: multipart/mixed; boundary="===============2532748653366448963=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 09/10] dpp: handle protocol errors in ROC timeout
-Date: Tue, 14 Dec 2021 10:12:24 -0800
-Message-ID: <20211214181225.2308043-9-prestwoj@gmail.com>
-In-Reply-To: 20211214181225.2308043-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2 2/3] json: introduce JSON module
+Date: Thu, 09 Dec 2021 13:23:02 -0600
+Message-ID: <9a0a07d9-f2f3-217e-a432-1acf05a6dd75@gmail.com>
+In-Reply-To: c663f358b9de6518e67a1bad3fb073d59815b7f6.camel@gmail.com
 
---===============2836101067757809074==
+--===============2532748653366448963==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a standing TODO of properly handling these timeouts but
-for now just treat any ROC timeout as an error if authenticating
-or configuring.
----
- src/dpp.c | 26 +++++++++++++++++++++++---
- 1 file changed, 23 insertions(+), 3 deletions(-)
+Hi James,
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 25cebfd3..a147e8c0 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -1117,10 +1117,24 @@ static void dpp_presence_timeout(int error, void *u=
-ser_data)
- {
- 	struct dpp_sm *dpp =3D user_data;
- =
+>> Have you considered using an intermediate object to hold the bits
+>> that need to
+>> be opaque?=C2=A0 That way json_iter objects could be public and held on
+>> the stack.
+>> Would make things easier to use / simpler to implement.
+>>
+>> So roughly:
+>>
+>> struct json_contents;
+>>
+>> struct json_iter {
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct json_contents *c=
+ontents;
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int begin;
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int end;
+>> };
+> =
 
--	if (dpp->state !=3D DPP_STATE_PRESENCE) {
--		l_debug("DPP state changed, stopping presence announcements");
--		dpp->freqs_idx =3D 0;
-+	switch (dpp->state) {
-+	case DPP_STATE_PRESENCE:
-+		break;
-+	case DPP_STATE_NOTHING:
-+		/* Protocol already terminated */
- 		return;
-+	case DPP_STATE_AUTHENTICATING:
-+	case DPP_STATE_CONFIGURING:
-+		/*
-+		 * TODO: If either the auth or config protocol is running we
-+		 * need to stay on channel until the specified timeouts.
-+		 * Unfortunately the kernel makes this very inconvenient since
-+		 * there is no way to stay on channel indefinitely or any way
-+		 * of knowing what duration the kernel/card actually chooses.
-+		 *
-+		 * For now just treat this as a failure.
-+		 */
-+		goto protocol_failed;
- 	}
- =
+> This didn't feel consistent with any other iterators on cleanup:
+> =
 
- 	dpp->freqs_idx++;
-@@ -1138,6 +1152,12 @@ static void dpp_presence_timeout(int error, void *us=
-er_data)
- 	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
- 			dpp->current_freq, dpp->dwell, dpp_roc_started,
- 			dpp, dpp_presence_timeout);
-+	return;
-+
-+protocol_failed:
-+	dpp_reset(dpp);
-+	dpp_free_auth_data(dpp);
-+	return;
- }
- =
+> struct json_iter iter;
+> =
 
- /*
--- =
+> json_iter_init(&iter, json, json_len);
+> =
 
-2.31.1
+> ...
+> =
 
---===============2836101067757809074==--
+> json_iter_free(&iter);
+> =
+
+
+Well, you would do something like:
+
+struct json_contents *c;
+struct json_iter iter;
+struct json_iter nested;
+_auto_(l_free) char *foo =3D NULL;
+
+c =3D json_contents_new(json, json_len);
+
+json_iter_init(&iter, c);
+json_iter_parse(&iter, JSON_STRING, "foo",
+			&foo, JSON_FLAG_MANDATORY,
+			JSON_OBJECT, "bar",
+			&nested, JSON_FLAG_OPTIONAL,
+			JSON_UNDEFINED);
+
+json_iter_parse(&nested, ...);
+
+json_contents_free(c);
+
+>>
+>> Do you need jsmn_init here?
+> =
+
+> Yes, below.
+
+Ah right, sorry for the noise.
+
+>>
+>> So value->size =3D=3D 0 implies a basic type?
+> =
+
+> AFAIK any value that is not an object will have a size of zero, so this
+> could include strings as well not just basic types.
+
+So essentially anything that is not a container?  integers, strings, etc.
+
+>>
+>>> + > +=C2=A0=C2=A0=C2=A0for (i =3D 0; i < value->size; i++)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0value =3D next_key(iter, value);
+>>
+>> So this should be recursively skipping tokens when value is non-
+>> basic.=C2=A0 The
+>> naming is a bit confusing here
+>>
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return value;
+>>
+>> Since you're returning 'value', but the reader expects a 'key'.
+> =
+
+> Yes, some re-naming is in order. This is actually returning a key
+> though, I just reused 'value' rather than a new variable. Something
+> like 'token' or 'tmp' would be better.
+
+Right, this is doing the right thing, just nitpicking the variable naming.
+
+>> May not be as big of a deal in this particular case, but this
+>> approach is
+>> side-effecting on failure.=C2=A0 You could parse the object part of the
+>> way through,
+>> then fail to find a key and bail, but you may have assigned stuff
+>> along the way.
+> =
+
+> Yeah I could not think of a decent way to handle this without iterating
+> twice (verification first, then assignment) since we lose reference to
+> the previous set of arguments with each iteration.
+
+You could iterate over the va_arg list, build a temporary structure and per=
+form =
+
+the parse.  If the parse succeeds, then assign the values in the final step.
+
+Regards,
+-Denis
+--===============2532748653366448963==--
 
