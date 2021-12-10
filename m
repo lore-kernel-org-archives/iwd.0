@@ -1,168 +1,295 @@
-Content-Type: multipart/mixed; boundary="===============7832236407648087595=="
+Content-Type: multipart/mixed; boundary="===============7632930320514786766=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel at holtmann.org>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [RFC 0/2] Encrypt secrets using systemd provided key
-Date: Fri, 21 Jan 2022 21:54:12 +0100
-Message-ID: <C89738C5-2123-43B8-8164-89EAA037DD89@holtmann.org>
-In-Reply-To: 17408ff42d125f331b1acde2ef733dd7b7f86e90.camel@gmail.com
+Subject: [PATCH v3 3/3] unit: add JSON unit test
+Date: Fri, 10 Dec 2021 13:41:39 -0800
+Message-ID: <20211210214139.2045488-3-prestwoj@gmail.com>
+In-Reply-To: 20211210214139.2045488-1-prestwoj@gmail.com
 
---===============7832236407648087595==
+--===============7632930320514786766==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ Makefile.am      |   5 +-
+ unit/test-json.c | 231 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 235 insertions(+), 1 deletion(-)
+ create mode 100644 unit/test-json.c
 
->>>>> There has been interest in enabling IWD users to store their
->>>>> network
->>>>> credentials in some encrypted form. Recently systemd added
->>>>> support
->>>>> for
->>>>> passing secrets/credentials to services only accessible by the
->>>>> service
->>>>> they are intended. This provides a clean way of obtaining a
->>>>> secret
->>>>> key
->>>>> which IWD can use to encrypt anything it writes to the FS. In
->>>>> addition
->>>>> there is no hard dependency on systemd since the credential is
->>>>> provided
->>>>> as a file (i.e. no Dbus API or linked library etc).
->>>>> =
+diff --git a/Makefile.am b/Makefile.am
+index fef2c2c4..312081a0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -396,7 +396,7 @@ unit_tests =3D unit/test-cmac-aes \
+ 		unit/test-ie unit/test-util unit/test-ssid-security \
+ 		unit/test-arc4 unit/test-wsc unit/test-eap-mschapv2 \
+ 		unit/test-eap-sim unit/test-sae unit/test-p2p unit/test-band \
+-		unit/test-dpp
++		unit/test-dpp unit/test-json
+ =
 
->>>>> At the moment setting up the IWD service to use this feature
->>>>> will
->>>>> be
->>>>> left up to the user. But setting this up is very straight
->>>>> forward.
->>>>> I
->>>>> used docs for systemd-creds (Example 2):
->>>>> =
+ if CLIENT
+ unit_tests +=3D unit/test-client
+@@ -556,6 +556,9 @@ unit_test_dpp_SOURCES =3D unit/test-dpp.c src/dpp-util.=
+h src/dpp-util.c \
+ =
 
->>>>> https://www.freedesktop.org/software/systemd/man/systemd-creds.html
->>>>> =
+ unit_test_dpp_LDADD =3D $(ell_ldadd)
+ =
 
->>>>> The only difference is the --name argument should be iwd-
->>>>> secret.
->>>>> =
++unit_test_json_SOURCES =3D unit/test-json.c src/json.h src/json.c shared/j=
+smn.h
++unit_test_json_LDADD =3D $(ell_ldadd)
++
+ TESTS =3D $(unit_tests)
+ =
 
->>>>> Note: systemd version 250 is required.
->>>>> =
+ EXTRA_DIST =3D src/genbuiltin src/iwd.service.in src/net.connman.iwd.servi=
+ce \
+diff --git a/unit/test-json.c b/unit/test-json.c
+new file mode 100644
+index 00000000..4c69a3db
+--- /dev/null
++++ b/unit/test-json.c
+@@ -0,0 +1,231 @@
++/*
++ *
++ *  Embedded Linux library
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <assert.h>
++
++#include <ell/ell.h>
++
++#include "src/json.h"
++#include "ell/useful.h"
++
++struct json_contents;
++
++
++/*
++ * Object:
++ * { "test": "<smile emoji>" }
++ */
++static void test_json_unicode(const void *data)
++{
++	struct json_iter iter;
++	_auto_(l_free)char *v;
++	uint8_t expected[] =3D { 0xF0, 0x9F, 0x98, 0x80, 0 };
++
++	uint8_t s[] =3D { '{', '"', 't', 'e', 's', 't', '"', ':',
++				'"', 0xf0, 0x9f, 0x98, 0x80, '"', '}', 0 };
++	struct json_contents *c =3D json_contents_new((const char *)s, sizeof(s));
++
++	json_iter_init(&iter, c);
++	assert(json_iter_parse(&iter, JSON_MANDATORY("test", JSON_STRING, &v),
++				JSON_UNDEFINED));
++
++	assert(!strcmp(v, (char *)expected));
++
++	json_contents_free(c);
++}
++
++static void test_json_escaped_unicode(const void *data)
++{
++	struct json_iter iter;
++	_auto_(l_free)char *v;
++	char *s =3D "{\"test\":\"\\uD8F0\"}";
++	char expected[] =3D "\\uD8F0";
++	struct json_contents *c =3D json_contents_new(s, strlen(s));
++
++	json_iter_init(&iter, c);
++	assert(json_iter_parse(&iter, JSON_MANDATORY("test", JSON_STRING, &v),
++				JSON_UNDEFINED));
++
++	assert(!strcmp(v, expected));
++
++	json_contents_free(c);
++}
++
++/*
++ * Tests that unsupported types will not parse
++ */
++static void test_json_unsupported_types(const void *data)
++{
++	/*
++	 * Valid JSON objects but currently unsupported types
++	 */
++	char arrays[] =3D "{\"test\":[1, 2, 3, 4]}";
++	char integers[] =3D "{\"test\": 10 }";
++	char bools[] =3D "{\"test\": true}";
++
++	struct json_iter iter;
++	struct json_contents *c =3D json_contents_new(arrays, strlen(arrays));
++
++	json_iter_init(&iter, c);
++	assert(!json_iter_parse(&iter,
++				JSON_MANDATORY("test", JSON_ARRAY, NULL),
++				JSON_UNDEFINED));
++	json_contents_free(c);
++
++	c =3D json_contents_new(integers, strlen(integers));
++	json_iter_init(&iter, c);
++	assert(!json_iter_parse(&iter,
++				JSON_MANDATORY("test", JSON_PRIMITIVE, NULL),
++				JSON_UNDEFINED));
++	json_contents_free(c);
++
++	c =3D json_contents_new(bools, strlen(bools));
++	json_iter_init(&iter, c);
++	assert(!json_iter_parse(&iter,
++				JSON_MANDATORY("test", JSON_PRIMITIVE, NULL),
++				JSON_UNDEFINED));
++	json_contents_free(c);
++}
++
++/*
++ * Basic test string values and nested objects
++ */
++static void test_json(const void *data)
++{
++	char json[] =3D "{\"wi-fi_tech\":\"infra\","
++			"\"discovery\":"
++				"{\"ssid\":\"somessid\"},"
++			"\"cred\":"
++				"{\"akm\":\"psk\","
++				"\"pass\":\"somepassphrase\"}}";
++	_auto_(l_free)char *tech;
++	_auto_(l_free)char *ssid;
++	_auto_(l_free)char *akm;
++	_auto_(l_free)char *pass;
++	_auto_(l_free)char *opt_not_found;
++	struct json_iter objnotfound;
++	struct json_iter discovery;
++	struct json_iter cred;
++	struct json_iter iter;
++	struct json_contents *c =3D json_contents_new(json, strlen(json));
++
++	json_iter_init(&iter, c);
++	assert(json_iter_parse(&iter,
++			JSON_MANDATORY("wi-fi_tech", JSON_STRING, &tech),
++			JSON_MANDATORY("discovery", JSON_OBJECT, &discovery),
++			JSON_MANDATORY("cred", JSON_OBJECT, &cred),
++			JSON_OPTIONAL("notfound", JSON_STRING, &opt_not_found),
++			JSON_OPTIONAL("objnotfound", JSON_OBJECT, &objnotfound),
++			JSON_UNDEFINED));
++
++	assert(opt_not_found =3D=3D NULL);
++	assert(json_object_not_found(&objnotfound));
++
++	assert(!strcmp(tech, "infra"));
++
++	assert(json_iter_parse(&discovery,
++			JSON_MANDATORY("ssid", JSON_STRING, &ssid),
++			JSON_UNDEFINED));
++
++	assert(!strcmp(ssid, "somessid"));
++
++	assert(json_iter_parse(&cred,
++			JSON_MANDATORY("akm", JSON_STRING, &akm),
++			JSON_MANDATORY("pass", JSON_STRING, &pass),
++			JSON_UNDEFINED));
++	assert(!strcmp(akm, "psk"));
++	assert(!strcmp(pass, "somepassphrase"));
++
++	json_contents_free(c);
++}
++
++/*
++ * Tests empty objects parse successfully
++ */
++static void test_json_empty_objects(const void *data)
++{
++	char empty[] =3D "{}";
++	char nested_empty[] =3D "{\"empty\":{}}";
++	struct json_iter nested_iter;
++	struct json_iter iter;
++	struct json_contents *c =3D json_contents_new(empty, strlen(empty));
++
++	json_iter_init(&iter, c);
++	assert(json_iter_parse(&iter, JSON_UNDEFINED));
++
++	assert(json_iter_parse(&iter,
++				JSON_OPTIONAL("optional", JSON_OBJECT, NULL),
++				JSON_UNDEFINED));
++
++	assert(!json_iter_parse(&iter,
++				JSON_MANDATORY("optional", JSON_OBJECT, NULL),
++				JSON_UNDEFINED));
++	json_contents_free(c);
++
++	c =3D json_contents_new(nested_empty, strlen(nested_empty));
++	json_iter_init(&iter, c);
++	assert(json_iter_parse(&iter,
++			JSON_MANDATORY("empty", JSON_OBJECT, &nested_iter),
++			JSON_UNDEFINED));
++	assert(json_iter_parse(&nested_iter, JSON_UNDEFINED));
++	json_contents_free(c);
++}
++
++/*
++ * Tests that expected key/values can be provided in an order different th=
+an
++ * they appear in the JSON string.
++ */
++static void test_json_out_of_order(const void *data)
++{
++	char object[] =3D "{\"key1\":{},\"key2\":\"val2\",\"key3\":\"val3\"}";
++	struct json_iter iter;
++	struct json_contents *c =3D json_contents_new(object, strlen(object));
++
++	json_iter_init(&iter, c);
++	assert(json_iter_parse(&iter,
++				JSON_OPTIONAL("nonexist1", JSON_STRING, NULL),
++				JSON_MANDATORY("key3", JSON_STRING, NULL),
++				JSON_MANDATORY("key2", JSON_STRING, NULL),
++				JSON_OPTIONAL("nonexist2", JSON_OBJECT, NULL),
++				JSON_MANDATORY("key1", JSON_OBJECT, NULL),
++				JSON_UNDEFINED));
++	json_contents_free(c);
++}
++
++int main(int argc, char *argv[])
++{
++	l_test_init(&argc, &argv);
++
++	l_test_add("json unicode", test_json_unicode, NULL);
++	l_test_add("json escaped unicode", test_json_escaped_unicode, NULL);
++	l_test_add("json nested objects", test_json, NULL);
++	l_test_add("json unsupported types", test_json_unsupported_types, NULL);
++	l_test_add("json empty objects", test_json_empty_objects, NULL);
++	l_test_add("json parse out of order", test_json_out_of_order, NULL);
++
++	return l_test_run();
++}
+-- =
 
->>>>> The reason this is being sent as an RFC is because of some open
->>>>> questions
->>>>> I had and wanted feedback on:
->>>>> =
+2.31.1
 
->>>>> 1. What options specifically do we want encrypted? These
->>>>> patches
->>>>> only
->>>>>    address Passphrase and PreSharedKey but really any option
->>>>> could
->>>>> be
->>>>>    encrypted. Obviously we would also want 802.1x secrets, but
->>>>> are
->>>>> there
->>>>>    other non-obvious options with privacy concerns?
->>>> =
-
->>>> we only need to encrypt things that are provided by the user. If
->>>> we
->>>> wouldn=E2=80=99t ask the user for it, then it is not worth while
->>>> protecting.
->>> =
-
->>> Ok, another option would be encrypting the entire [Security] group
->>> and
->>> assume anything here should be secure. This would actually make
->>> things
->>> quite a bit cleaner, and may be the only solution with how we do
->>> the
->>> 802.1x profiles since they are recursive.
->> =
-
->> any setting that gets asked by the user via the agent is worth
->> protecting, the rest is not worth it.
->> =
-
->> As pointed out in the other review, you need to also have some sort
->> of random nounce stored in plaintext. So besides the
->> PassphraseEncrypted, you also need PassphraseSalt or similar. And
->> then your salt value + SSID for example will be used as IV/Nounce
->> into the crypto.
-> =
-
-> Yes I realized this after sending it.
-> =
-
->> =
-
->>>>> 2. What is the stance on existing provisioning files? Currently
->>>>> these
->>>>>    changes overwrite any existing files with the new *Encrypted
->>>>> options
->>>>>    automatically. Is this desirable? or should user have to
->>>>> opt-in
->>>>> their
->>>>>    existing provisioning files.
->>>> =
-
->>>> The problem arises that you no longer can move from one machine
->>>> to
->>>> the next without re-entering your secrets. So I guess this only
->>>> desirable if the master key is part of your users keyring. If you
->>>> have 200 PSKs entered and you set up a new machine, you now end
->>>> up
->>>> having to re-enter these as you go visiting new networks.
->>> =
-
->>> How would this work though? The user would have to either manually
->>> encrypt the settings/group or have some way to tell IWD to do it?
->>> =
-
->>> I think the act of enabling the main.conf option would be enough,
->>> and
->>> we could emphasise this in the docs. Yes this means you cannot go
->>> back
->>> but if you really had 200 profiles you absolutely could not lose
->>> you
->>> probably should have those saved somewhere else, offline.
->>> =
-
->>> Also, really the only security benefit (above what we do now) is
->>> when
->>> using a TPM meaning you couldn't move the profiles between machines
->>> regardless.
->> =
-
->> So this is pretty neat for embedded devices. Let say you have a
->> weight scale with WiFi. This way you can ensure with a single system
->> key that all your credentials are protected. If you throw the device
->> away or brick it, it ensures that nobody can easily read it out by
->> just mounting the disk/flash.
->> =
-
->> For a desktop system it is ok, if you have a capable admin/user that
->> knows what they are doing. If you don=E2=80=99t they are going to scream=
- at
->> your if they move to a new system and all their WiFi is gone. If a
->> MacBook or iPhone upgrade of mine would loose me all my PSKs, I would
->> be rather mad at somebody.
-> =
-
-> Yeah I see how this could upset someone, I'm just not sure how we
-> accomplish this in a clean way. Either the user has to manually encrypt
-> it (which is awful), or we need to provide an additional setting or API
-> to say "I want to encrypt this" (which just feels redundant since
-> they've set the main.conf option already).
-
-I don=E2=80=99t have an answer for this, I am just pointing it out as a maj=
-or detail that needs to be documented in big letters.
-
-Regards
-
-Marcel
-
---===============7832236407648087595==--
+--===============7632930320514786766==--
 
