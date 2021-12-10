@@ -1,333 +1,450 @@
-Content-Type: multipart/mixed; boundary="===============3135866012064227357=="
+Content-Type: multipart/mixed; boundary="===============6329413970559443165=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v5 1/9] dpp-util: add URI parsing
-Date: Tue, 22 Feb 2022 13:30:08 -0800
-Message-ID: <20220222213016.2429382-1-prestwoj@gmail.com>
+Subject: [PATCH v4 2/3] json: introduce JSON module
+Date: Fri, 10 Dec 2021 14:33:26 -0800
+Message-ID: <20211210223327.2060720-2-prestwoj@gmail.com>
+In-Reply-To: 20211210223327.2060720-1-prestwoj@gmail.com
 
---===============3135866012064227357==
+--===============6329413970559443165==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Parses K (key), M (mac), C (class/channels), and V (version) tokens
-into a new structure dpp_uri_info. H/I are not parsed since there
-currently isn't any use for them.
+This is a minimal wrapper around jsmn.h to make things a bit easier
+for iterating through a JSON object.
+
+To use, first parse the JSON and create a contents object using
+json_contents_new(). This object can then be used to initialize a
+json_iter object using json_iter_init().
+
+The json_iter object can then be parsed with json_iter_parse by
+passing in JSON_MANDATORY/JSON_OPTIONAL arguments. Currently only
+JSON_STRING and JSON_OBJECT types are supported. Any JSON_MANDATORY
+values that are not found will result in an error.
+
+If a JSON_OPTIONAL string is not found, the pointer will be NULL.
+If a JSON_OPTIONAL object is not found, this iterator will be
+initialized but 'start' will be -1. This can be checked with a
+convenience macro json_object_not_found();
 ---
- src/dpp-util.c | 253 +++++++++++++++++++++++++++++++++++++++++++++++++
- src/dpp-util.h |  13 +++
- 2 files changed, 266 insertions(+)
+ Makefile.am |   4 +-
+ src/json.c  | 270 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/json.h  |  83 ++++++++++++++++
+ 3 files changed, 356 insertions(+), 1 deletion(-)
+ create mode 100644 src/json.c
+ create mode 100644 src/json.h
 
-v5:
- * Added several checks to the strtoul calls to handle hopefully all
-   invalid inputs that strtoul still accepts.
+v4:
+ * Fixed bug where mandatory value checks could be missed
+ * Renamed json_object_not_found to json_iter_is_valid
+ * Moved type check to not waste time if the type is unsupported.
 
-diff --git a/src/dpp-util.c b/src/dpp-util.c
-index 5199d0ae..01122e6b 100644
---- a/src/dpp-util.c
-+++ b/src/dpp-util.c
-@@ -866,3 +866,256 @@ struct l_ecc_point *dpp_point_from_asn1(const uint8_t=
- *asn1, size_t len)
- 	return l_ecc_point_from_data(curve, key_data[1],
- 					key_data + 2, elen - 2);
- }
-+
+diff --git a/Makefile.am b/Makefile.am
+index 7fe4b5c3..fef2c2c4 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -249,6 +249,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
+h src/missing.h \
+ 					src/sysfs.h src/sysfs.c \
+ 					src/offchannel.h src/offchannel.c \
+ 					src/dpp-util.h src/dpp-util.c \
++					src/json.h src/json.c \
+ 					$(eap_sources) \
+ 					$(builtin_sources)
+ =
+
+@@ -566,7 +567,8 @@ EXTRA_DIST =3D src/genbuiltin src/iwd.service.in src/ne=
+t.connman.iwd.service \
+ =
+
+ AM_CFLAGS =3D $(ell_cflags) -fvisibility=3Dhidden \
+ 				-DUNITDIR=3D\""$(top_srcdir)/unit/"\" \
+-				-DCERTDIR=3D\""$(top_builddir)/unit/"\"
++				-DCERTDIR=3D\""$(top_builddir)/unit/"\" \
++				-DJSMN_PARENT_LINKS -DJSMN_STRICT
+ =
+
+ if MAINTAINER_MODE
+ AM_CFLAGS +=3D -DHAVE_PKCS8_SUPPORT
+diff --git a/src/json.c b/src/json.c
+new file mode 100644
+index 00000000..20adcec7
+--- /dev/null
++++ b/src/json.c
+@@ -0,0 +1,270 @@
 +/*
-+ * Advances 'p' to the next character 'sep' plus one. strchr can be truste=
-d to
-+ * find the next character, but we do need to check that the next characte=
-r + 1
-+ * isn't the NULL terminator, i.e. that data actually exists past this poi=
-nt.
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
 + */
-+#define TOKEN_NEXT(p, sep) \
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <errno.h>
++
++#include <ell/ell.h>
++
++#include "src/json.h"
++
++#include "shared/jsmn.h"
++
++/* Max number of tokens supported. Increase if larger objects are expected=
+ */
++#define JSON_DEFAULT_TOKENS 30
++
++#define TOK_LEN(token) (token)->end - (token)->start
++#define TOK_PTR(json, token) (void *)((json) + (token)->start)
++#define TOK_TO_STR(json, token) \
 +({ \
-+	const char *_next =3D strchr((p), (sep)); \
-+	if (_next) { \
-+		if (*(_next + 1) =3D=3D '\0') \
-+			_next =3D NULL; \
-+		else \
-+			_next++; \
-+	} \
-+	_next; \
++	char *_tmp =3D l_malloc(TOK_LEN((token)) + 1); \
++	memcpy(_tmp, TOK_PTR((json), (token)), TOK_LEN((token))); \
++	_tmp[TOK_LEN((token))] =3D '\0'; \
++	_tmp; \
 +})
 +
-+/*
-+ * Finds the length of the current token (characters until next 'sep'). If=
- no
-+ * 'sep' is found zero is returned.
-+ */
-+#define TOKEN_LEN(p, sep) \
-+({ \
-+	const char *_next =3D strchr((p), (sep)); \
-+	if (!_next) \
-+		_next =3D (p); \
-+	(_next - (p)); \
-+})
++#define ITER_END(iter) \
++	(((iter)->contents->tokens + (iter)->start) + (iter)->count)
 +
-+/*
-+ * Ensures 'p' points to something resembling a single character followed =
-by
-+ * ':' followed by at least one non-null byte of data. This allows the par=
-se
-+ * loop to safely advance the pointer to each tokens data (pos + 2)
-+ */
-+#define TOKEN_OK(p) \
-+	((p) && (p)[0] !=3D '\0' && (p)[1] =3D=3D ':' && (p)[2] !=3D '\0') \
++struct json_contents {
++	const char *json;
++	size_t json_len;
++	jsmntok_t *tokens;
++	int tokens_len;
++	jsmn_parser *p;
++};
 +
-+static struct scan_freq_set *dpp_parse_class_and_channel(const char *token,
-+							unsigned int len)
++static jsmntok_t *next_key_in_parent(struct json_iter *iter, jsmntok_t *cu=
+rrent)
 +{
-+	const char *pos =3D token;
-+	char *end;
-+	struct scan_freq_set *freqs =3D scan_freq_set_new();
++	int parent =3D current->parent;
 +
-+	/* Checking for <operclass>/<channel>,<operclass>/<channel>,... */
-+	for (; pos && pos < token + len; pos =3D TOKEN_NEXT(pos, ',')) {
-+		unsigned long r;
-+		uint8_t channel;
-+		uint8_t oper_class;
-+		uint32_t freq;
-+
-+		/* strtoul accepts minus and plus signs before value */
-+		if (*pos =3D=3D '-' || *pos =3D=3D '+')
-+			goto free_set;
-+
-+		/* to check uint8_t overflow */
-+		r =3D oper_class =3D strtoul(pos, &end, 10);
-+
-+		if (errno =3D=3D ERANGE || errno =3D=3D EINVAL)
-+			goto free_set;
-+		/*
-+		 * Did strtoul not advance pointer, not reach the next
-+		 * token, or overflow?
-+		 */
-+		if (end =3D=3D pos || *end !=3D '/' || r !=3D oper_class)
-+			goto free_set;
-+
-+		pos =3D end + 1;
-+
-+		if (*pos =3D=3D '-' || *pos =3D=3D '+')
-+			goto free_set;
-+
-+		r =3D channel =3D strtoul(pos, &end, 10);
-+
-+		if (errno =3D=3D ERANGE || errno =3D=3D EINVAL)
-+			goto free_set;
-+		/*
-+		 * Same verification as above, but also checks either for
-+		 * another pair (,) or end of this token (;)
-+		 */
-+		if (end =3D=3D pos || (*end !=3D ',' && *end !=3D ';') || r !=3D channel)
-+			goto free_set;
-+
-+		freq =3D oci_to_frequency(oper_class, channel);
-+		if (!freq)
-+			goto free_set;
-+
-+		scan_freq_set_add(freqs, freq);
++	/* iterate the list and stop on the first token with the same parent */
++	while (++current < ITER_END(iter)) {
++		if (current->parent =3D=3D parent)
++			return current;
 +	}
 +
-+	if (token + len !=3D end)
-+		goto free_set;
-+
-+	if (scan_freq_set_isempty(freqs)) {
-+free_set:
-+		scan_freq_set_free(freqs);
-+		return NULL;
-+	}
-+
-+	return freqs;
-+}
-+
-+static int dpp_parse_mac(const char *str, unsigned int len, uint8_t *mac_o=
-ut)
-+{
-+	uint8_t mac[6];
-+	unsigned int i;
-+
-+	if (len !=3D 12)
-+		return -EINVAL;
-+
-+	for (i =3D 0; i < 12; i +=3D 2) {
-+		if (!l_ascii_isxdigit(str[i]))
-+			return -EINVAL;
-+
-+		if (!l_ascii_isxdigit(str[i + 1]))
-+			return -EINVAL;
-+	}
-+
-+	if (sscanf(str, "%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx",
-+			&mac[0], &mac[1], &mac[2],
-+			&mac[3], &mac[4], &mac[5]) !=3D 6)
-+		return -EINVAL;
-+
-+	if (!util_is_valid_sta_address(mac))
-+		return -EINVAL;
-+
-+	memcpy(mac_out, mac, 6);
-+
-+	return 0;
-+}
-+
-+static int dpp_parse_version(const char *str, unsigned int len,
-+				uint8_t *version_out)
-+{
-+	char *end;
-+	uint8_t version;
-+
-+	if (len !=3D 1)
-+		return -EINVAL;
-+
-+	version =3D strtol(str, &end, 10);
-+
-+	if (version !=3D 1 && version !=3D 2)
-+		return -EINVAL;
-+
-+	*version_out =3D version;
-+
-+	return 0;
-+}
-+
-+static struct l_ecc_point *dpp_parse_key(const char *str, unsigned int len)
-+{
-+	_auto_(l_free) uint8_t *decoded =3D NULL;
-+	size_t decoded_len;
-+
-+	decoded =3D l_base64_decode(str, len, &decoded_len);
-+	if (!decoded)
-+		return NULL;
-+
-+	return dpp_point_from_asn1(decoded, decoded_len);
-+}
-+
-+/*
-+ * Parse a bootstrapping URI. This parses the tokens defined in the Easy C=
-onnect
-+ * spec, and verifies they are the correct syntax. Some values have extra
-+ * verification:
-+ *  - The bootstrapping key is base64 decoded and converted to an l_ecc_po=
-int
-+ *  - The operating class and channels are checked against the OCI table.
-+ *  - The version is checked to be either 1 or 2, as defined by the spec.
-+ *  - The MAC is verified to be a valid station address.
-+ */
-+struct dpp_uri_info *dpp_parse_uri(const char *uri)
-+{
-+	struct dpp_uri_info *info;
-+	const char *pos =3D uri;
-+	const char *end =3D uri + strlen(uri) - 1;
-+	int ret =3D 0;
-+
-+	if (!l_str_has_prefix(pos, "DPP:"))
-+		return NULL;
-+
-+	info =3D l_new(struct dpp_uri_info, 1);
-+
-+	pos +=3D 4;
-+
-+	/* EasyConnect 5.2.1 - Bootstrapping information format */
-+	for (; TOKEN_OK(pos); pos =3D TOKEN_NEXT(pos, ';')) {
-+		unsigned int len =3D TOKEN_LEN(pos + 2, ';');
-+
-+		if (!len)
-+			goto free_info;
-+
-+		switch (*pos) {
-+		case 'C':
-+			info->freqs =3D dpp_parse_class_and_channel(pos + 2, len);
-+			if (!info->freqs)
-+				goto free_info;
-+			break;
-+		case 'M':
-+			ret =3D dpp_parse_mac(pos + 2, len, info->mac);
-+			if (ret < 0)
-+				goto free_info;
-+			break;
-+		case 'V':
-+			ret =3D dpp_parse_version(pos + 2, len, &info->version);
-+			if (ret < 0)
-+				goto free_info;
-+			break;
-+		case 'K':
-+			info->boot_public =3D dpp_parse_key(pos + 2, len);
-+			if (!info->boot_public)
-+				goto free_info;
-+			break;
-+		case 'H':
-+		case 'I':
-+			break;
-+		default:
-+			goto free_info;
-+		}
-+	}
-+
-+	/* Extra data found after last token */
-+	if (pos !=3D end)
-+		goto free_info;
-+
-+	/* The public bootstrapping key is the only required token */
-+	if (!info->boot_public)
-+		goto free_info;
-+
-+	return info;
-+
-+free_info:
-+	dpp_free_uri_info(info);
 +	return NULL;
 +}
 +
-+void dpp_free_uri_info(struct dpp_uri_info *info)
++/*
++ * 'object' is expected to be a value, so object - 1 is its key. Find
++ * the next key who's parent matches the parent of object - 1. The
++ * token preceeding this next key will mark the end of 'object'.
++ */
++static int find_object_tokens(struct json_iter *iter, jsmntok_t *object)
 +{
-+	if (info->freqs)
-+		scan_freq_set_free(info->freqs);
++	jsmntok_t *next =3D next_key_in_parent(iter, object - 1);
 +
-+	if (info->boot_public)
-+		l_ecc_point_free(info->boot_public);
++	/* End of token list */
++	if (!next)
++		next =3D ITER_END(iter);
 +
-+	if (info->information)
-+		l_free(info->information);
-+
-+	if (info->host)
-+		l_free(info->host);
-+
-+	l_free(info);
++	return ((next - object) % sizeof(jsmntok_t)) - 1;
 +}
-diff --git a/src/dpp-util.h b/src/dpp-util.h
-index 82535ff8..a3ddd452 100644
---- a/src/dpp-util.h
-+++ b/src/dpp-util.h
-@@ -22,6 +22,16 @@
- struct l_ecc_point;
- struct l_ecc_scalar;
- enum ie_rsn_akm_suite;
-+struct scan_freq_set;
 +
-+struct dpp_uri_info {
-+	struct scan_freq_set *freqs;
-+	struct l_ecc_point *boot_public;
-+	uint8_t mac[6];
-+	char *information;
-+	uint8_t version;
-+	char *host;
++static void iter_recurse(struct json_iter *iter, jsmntok_t *object,
++				struct json_iter *child)
++{
++	struct json_contents *c =3D iter->contents;
++
++	child->contents =3D c;
++	child->start =3D (object - c->tokens) % sizeof(jsmntok_t);
++	child->count =3D find_object_tokens(iter, object);
++}
++
++struct json_contents *json_contents_new(const char *json, size_t json_len)
++{
++	struct json_contents *c =3D l_new(struct json_contents, 1);
++
++	c->json =3D json;
++	c->json_len =3D json_len;
++	c->p =3D l_new(jsmn_parser, 1);
++	c->tokens =3D l_new(jsmntok_t, JSON_DEFAULT_TOKENS);
++
++	jsmn_init(c->p);
++	c->tokens_len =3D jsmn_parse(c->p, c->json, c->json_len,
++					c->tokens, JSON_DEFAULT_TOKENS);
++	if (c->tokens_len < 0) {
++		json_contents_free(c);
++		return NULL;
++	}
++
++	return c;
++}
++
++void json_iter_init(struct json_iter *iter, struct json_contents *c)
++{
++	iter->contents =3D c;
++	iter->start =3D 0;
++	iter->count =3D c->tokens_len;
++}
++
++void json_contents_free(struct json_contents *c)
++{
++	l_free(c->p);
++	l_free(c->tokens);
++	l_free(c);
++}
++
++struct json_arg {
++	enum json_type type;
++	void *value;
++	jsmntok_t *v;
 +};
- =
-
- enum dpp_frame_type {
- 	DPP_FRAME_AUTHENTICATION_REQUEST	=3D 0,
-@@ -168,3 +178,6 @@ bool dpp_derive_ke(const uint8_t *i_nonce, const uint8_=
-t *r_nonce,
- =
-
- uint8_t *dpp_point_to_asn1(const struct l_ecc_point *p, size_t *len_out);
- struct l_ecc_point *dpp_point_from_asn1(const uint8_t *asn1, size_t len);
 +
-+struct dpp_uri_info *dpp_parse_uri(const char *uri);
-+void dpp_free_uri_info(struct dpp_uri_info *info);
++static void push_arg(struct l_queue *q, enum json_type type,
++			void *value, jsmntok_t *v)
++{
++	struct json_arg *arg =3D l_new(struct json_arg, 1);
++
++	arg->type =3D type;
++	arg->value =3D value;
++	arg->v =3D v;
++
++	l_queue_push_head(q, arg);
++}
++
++static void assign_arg(void *data, void *user_data)
++{
++	struct json_iter *iter =3D user_data;
++	struct json_arg *arg =3D data;
++	struct json_contents *c =3D iter->contents;
++	char **sval;
++	struct json_iter *oval;
++
++	switch (arg->type) {
++	case JSON_STRING:
++		sval =3D arg->value;
++
++		*sval =3D arg->v ? TOK_TO_STR(c->json, arg->v) : NULL;
++
++		break;
++	case JSON_OBJECT:
++		oval =3D arg->value;
++
++		if (!arg->v)
++			oval->start =3D -1;
++		else
++			iter_recurse(iter, arg->v, oval);
++
++		break;
++	default:
++		/* Types are verified earlier, this should never happen */
++		return;
++	}
++
++	l_free(arg);
++}
++
++bool json_iter_parse(struct json_iter *iter, enum json_type type, ...)
++{
++	struct json_contents *c =3D iter->contents;
++	va_list va;
++	int i;
++	int num =3D c->tokens->size;
++	jsmntok_t *next;
++	struct l_queue *args;
++
++	if (iter->start =3D=3D -1)
++		return false;
++
++	args =3D l_queue_new();
++
++	va_start(va, type);
++
++	while (true) {
++		enum json_flag flag;
++		char *key;
++		void *value;
++		jsmntok_t *v =3D NULL;
++		void *ptr;
++		size_t len;
++
++		/* Check the type is supported before wasting any cycles */
++		switch (type) {
++		case JSON_UNDEFINED:
++			goto done;
++		case JSON_STRING:
++		case JSON_OBJECT:
++			break;
++		default:
++			goto error;
++		}
++
++		key =3D va_arg(va, char *);
++		value =3D va_arg(va, void *);
++		flag =3D va_arg(va, enum json_flag);
++
++		/* First key */
++		next =3D c->tokens + iter->start + 1;
++
++		/* Iterate over this objects keys */
++		for (i =3D 0; i < num; i++) {
++			ptr =3D TOK_PTR(c->json, next);
++			len =3D TOK_LEN(next);
++
++			if (next + 1 > ITER_END(iter))
++				goto error;
++
++			if (strlen(key) =3D=3D len && !memcmp(ptr, key, len)) {
++				/* Key found but the wrong value type */
++				if ((next + 1)->type !=3D (jsmntype_t)type)
++					goto error;
++
++				v =3D next + 1;
++				break;
++			}
++
++			next =3D next_key_in_parent(iter, next);
++			if (!next)
++				break;
++		}
++
++		if (flag =3D=3D JSON_FLAG_MANDATORY && !v)
++			goto error;
++
++		/*
++		 * Still push even if an optional value doesn't exist (!v) so
++		 * the caller can check if it was found or not.
++		 */
++		if (value)
++			push_arg(args, type, value, v);
++
++		type =3D va_arg(va, enum json_type);
++	}
++
++done:
++	va_end(va);
++
++	l_queue_foreach(args, assign_arg, iter);
++	l_queue_destroy(args, NULL);
++
++	return true;
++
++error:
++	l_queue_destroy(args, l_free);
++	return false;
++}
+diff --git a/src/json.h b/src/json.h
+new file mode 100644
+index 00000000..915b675b
+--- /dev/null
++++ b/src/json.h
+@@ -0,0 +1,83 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++struct json_iter;
++
++/*
++ * Identical to JSMN types
++ */
++enum json_type {
++	JSON_UNDEFINED =3D 0,
++	JSON_OBJECT =3D 1,
++	JSON_ARRAY =3D 2,
++	JSON_STRING =3D 3,
++	JSON_PRIMITIVE =3D 4
++};
++
++enum json_flag {
++	JSON_FLAG_MANDATORY =3D 1,
++	JSON_FLAG_OPTIONAL =3D 2,
++};
++
++struct json_iter {
++	struct json_contents *contents;
++	int start;
++	int count;
++};
++
++#define JSON_MANDATORY(key, type, out) \
++	(type), (key), (out), JSON_FLAG_MANDATORY
++
++#define JSON_OPTIONAL(key, type, out) \
++	(type), (key), (out), JSON_FLAG_OPTIONAL
++
++#define json_iter_is_valid(iter) ((iter)->start !=3D -1)
++
++struct json_contents *json_contents_new(const char *json, size_t json_len);
++void json_contents_free(struct json_contents *c);
++
++void json_iter_init(struct json_iter *iter, struct json_contents *c);
++
++/*
++ * Parse an arbitrary number of key/value pairs from a JSON iterator. Init=
+ially
++ * a new JSON contents object should be created with json_contents_new() a=
+nd,
++ * when done, freed with json_contents_free.
++ *
++ * Iterators can be initialized with the json_contents object. Nested obje=
+ct
++ * iterators are also parsed with this function.
++ *
++ * Arguments should be specified using JSON_MANDATORY or JSON_OPTIONAL:
++ *
++ * r =3D json_iter_parse(iter, JSON_MANDATORY("mykey", JSON_STRING, &strva=
+lue),
++ * 			JSON_OPTIONAL("optkey", JSON_STRING, &optvalue),
++ * 			JSON_UNDEFINED);
++ *
++ * String values should be of type char ** and must be freed
++ * Object values should be of type struct json_iter *
++ *
++ * No other types are supported at this time, and json_iter_parse will fai=
+l if
++ * other types are encountered.
++ *
++ * JSON_OPTIONAL string values will point to NULL if not found
++ * JSON_OPTIONAL objects can be checked with json_object_not_found.
++ */
++bool json_iter_parse(struct json_iter *iter, enum json_type type, ...);
 -- =
 
-2.34.1
+2.31.1
 
---===============3135866012064227357==--
+--===============6329413970559443165==--
 
