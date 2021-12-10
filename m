@@ -1,52 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============8139649178842305102=="
+Content-Type: multipart/mixed; boundary="===============3153252013691499350=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 08/10] test-runner: fix ctrl-c for UML
-Date: Wed, 06 Apr 2022 12:14:51 -0700
-Message-ID: <20220406191453.978426-8-prestwoj@gmail.com>
-In-Reply-To: 20220406191453.978426-1-prestwoj@gmail.com
+Subject: [PATCH] dpp-util: check return of l_ecc_scalar_get_data
+Date: Fri, 10 Dec 2021 08:48:39 -0800
+Message-ID: <20211210164839.1938702-1-prestwoj@gmail.com>
 
---===============8139649178842305102==
+--===============3153252013691499350==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The TIOCSTTY ioctl was not shared between UML and QEMU which prevented
-any console input from making it into UML. This fixes that, and now
-ctrl-c can be used to stop UML test execution.
+Static analysis was not happy since this return can be negative and
+it was being fed into an unsigned argument. In reality this cannot
+happen since the key buffer is always set to the maximum size supported
+by any curves.
 ---
- tools/runner.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/dpp-util.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/tools/runner.py b/tools/runner.py
-index 1c1f6eed..1f087d6c 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -289,6 +289,8 @@ class RunnerAbstract:
- 				else:
- 					os.remove(f)
+diff --git a/src/dpp-util.c b/src/dpp-util.c
+index 31d8e2c4..ac365ccc 100644
+--- a/src/dpp-util.c
++++ b/src/dpp-util.c
+@@ -420,16 +420,20 @@ struct l_ecc_scalar *dpp_derive_k1(const struct l_ecc=
+_point *i_proto_public,
+ 		return NULL;
  =
 
-+		fcntl.ioctl(STDIN_FILENO, TIOCSTTY, 1)
+ 	key_len =3D l_ecc_scalar_get_data(m, mx_bytes, sizeof(mx_bytes));
++	if (key_len < 0)
++		goto free_m;
+ =
+
+ 	sha =3D dpp_sha_from_key_len(key_len);
+ =
+
+ 	if (!dpp_hkdf(sha, NULL, key_len, "first intermediate key", mx_bytes,
+-			key_len, k1, key_len)) {
+-		l_ecc_scalar_free(m);
+-		return NULL;
+-	}
++			key_len, k1, key_len))
++		goto free_m;
+ =
+
+ 	return m;
 +
- 	def cleanup_environment(self):
- 		rmtree('/tmp/iwd')
- 		rmtree('/tmp/certs')
-@@ -491,8 +493,6 @@ class QemuRunner(RunnerAbstract):
++free_m:
++	l_ecc_scalar_free(m);
++	return NULL;
+ }
  =
 
- 		super().prepare_environment()
+ /*
+@@ -449,16 +453,20 @@ struct l_ecc_scalar *dpp_derive_k2(const struct l_ecc=
+_point *i_proto_public,
+ 		return NULL;
  =
 
--		fcntl.ioctl(STDIN_FILENO, TIOCSTTY, 1)
--
- 	def stop(self):
- 		RB_AUTOBOOT =3D 0x01234567
- 		#
+ 	key_len =3D l_ecc_scalar_get_data(n, nx_bytes, sizeof(nx_bytes));
++	if (key_len < 0)
++		goto free_n;
+ =
+
+ 	sha =3D dpp_sha_from_key_len(key_len);
+ =
+
+ 	if (!dpp_hkdf(sha, NULL, key_len, "second intermediate key", nx_bytes,
+-			key_len, k2, key_len)) {
+-		l_ecc_scalar_free(n);
+-		return NULL;
+-	}
++			key_len, k2, key_len))
++		goto free_n;
+ =
+
+ 	return n;
++
++free_n:
++	l_ecc_scalar_free(n);
++	return NULL;
+ }
+ =
+
+ bool dpp_derive_ke(const uint8_t *i_nonce, const uint8_t *r_nonce,
 -- =
 
-2.34.1
+2.31.1
 
---===============8139649178842305102==--
+--===============3153252013691499350==--
 
