@@ -1,126 +1,441 @@
-Content-Type: multipart/mixed; boundary="===============5942971550478965658=="
+Content-Type: multipart/mixed; boundary="===============1635117875260496779=="
 MIME-Version: 1.0
-From: =?utf-8?q?Joakim_Lotseng=C3=A5rd_=3Cjoakim=2El_at_orbital-systems=2Ecom?=
- =?utf-8?q?=3E?=
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Possible bug when /var/lib/iwd is a symlink
-Date: Wed, 20 Apr 2022 09:33:57 +0200
-Message-ID: <CAELJisz+CqqGUnh_oX6yxQGYvucOJtX8=FYL0up5VtSeN6WgRQ@mail.gmail.com>
-In-Reply-To: 594A53B3-A60F-46FF-A957-4678102977B4@holtmann.org
+Subject: [PATCH 5/9] dpp: send presence announcements on StartEnrollee
+Date: Mon, 13 Dec 2021 12:33:28 -0800
+Message-ID: <20211213203332.2191003-5-prestwoj@gmail.com>
+In-Reply-To: 20211213203332.2191003-1-prestwoj@gmail.com
 
---===============5942971550478965658==
+--===============1635117875260496779==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+The presence procedure implemented is a far cry from what the spec
+actually wants. There are two reason for this: a) the kernels offchannel
+support is not at a level where it will work without rather annoying
+work arounds, and b) doing the procedure outlined in the spec will
+result in terrible discovery performance.
 
-No, I have not tested STATE_DIRECTORY. I used bind mount (as
-suggested) instead, and before that the patch with realname() I sent
-in as a demo-fix.
+Because of this a simpler single channel announcement is recommended.
+This is done if the arguments to StartEnrollee contain a frequency
+list.
+---
+ src/dpp.c | 301 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 301 insertions(+)
 
-See this rather as a bug report. You get an incorrect behaviour from
-iwd if /var/lib/iwd is a symlink. It will not update the known network
-list correctly. Sadly I do not have a patch for it as it might be a
-discussion on how to solve it. I am not part of iwd core team and I
-feel I have no say in how to solve it.
+diff --git a/src/dpp.c b/src/dpp.c
+index 4e854780..e6477f5c 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -24,14 +24,33 @@
+ #include <config.h>
+ #endif
+ =
 
-The problem is very easy to reproduce. Just point /var/lib/iwd with a
-symlink to somewhere else. Run iwctl and do some "station wlanX
-connect Y" and "known-networks X forget" and watch how the
-known-networks list won't get updated correctly. In fact, the easiest
-way to reproduce is probably to just copy any ssid.psk file to
-ssid_copy.psk. Start iwd (it will then find both 'ssid' and
-'ssid_copy'). Now run a "known-networks ssid_copy forget". It will
-remove the file in /var/lib/iwd but it will not remove it from the
-'known-networks list'.
++#include <errno.h>
++
+ #include <ell/ell.h>
+ =
 
-[iwd]# known-networks list
-                                 Known Networks
----------------------------------------------------------------------------=
------
-  Name                            Security   Hidden   Last connected
----------------------------------------------------------------------------=
------
-  Orbital                         psk                 Apr 20,  7:29 AM
-  Copy                            psk                 Apr 20,  7:29 AM
++#include "linux/nl80211.h"
++
+ #include "src/dbus.h"
+ #include "src/netdev.h"
+ #include "src/module.h"
+ #include "src/dpp-util.h"
++#include "src/offchannel.h"
++#include "src/scan.h"
++#include "src/band.h"
++#include "src/wiphy.h"
++#include "src/ie.h"
++#include "src/frame-xchg.h"
++#include "src/iwd.h"
++#include "src/util.h"
+ =
 
-[iwd]# known-networks Copy forget
-[iwd]# known-networks list
-                                 Known Networks
----------------------------------------------------------------------------=
------
-  Name                            Security   Hidden   Last connected
----------------------------------------------------------------------------=
------
-  Orbital                         psk                 Apr 20,  7:29 AM
-  Copy                            psk                 Apr 20,  7:29 AM
-   <----- Should now be removed, but is still here!
+ static uint32_t netdev_watch;
++static struct l_genl_family *nl80211;
++static uint8_t broadcast[] =3D {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
++
++enum dpp_state {
++	DPP_STATE_NOTHING,
++	DPP_STATE_PRESENCE,
++};
+ =
 
-On Tue, 19 Apr 2022 at 10:53, Marcel Holtmann <marcel(a)holtmann.org> wrote:
->
-> Hi Joakim,
->
-> > Possible bug when /var/lib/iwd is a symlink:
-> >
-> > I ran across a problem when the ending part of /var/lib/iwd is a symlin=
-k.
-> > In my case it points to /mnt/persistent/iwd.  We are an IoT device that=
- runs
-> > on UBIFS (+ tmpfs) and the entire rootfs partition of the NAND will be
-> > updated on FOTA.  Hence anything we want to save in an upgrade must be =
-on a
-> > persistent partition.  Our target is a Freescale i.MX6 Ultralite module
-> > running an ARM A7 core (if that matters).
-> >
-> > Problem seems to be that the l_dir_watch_new() call in knownnetworks.c =
-never
-> > follows symlink.  l_dir_watch_new() uses IN_DONT_FOLLOW in its call to
-> > inotify_add_watch() in ell.
-> >
-> > This will make the known network list misbehave.  If one forgets a
-> > known-network via iwctl, the list doesn't get updated.  The same goes f=
-or
-> > connecting to a not already known network.  It is easy to reproduce.  J=
-ust
-> > symlink /var/lib/iwd to another location and run some connect + forget =
-in
-> > iwctl.  One can also note that adding a new /var/lib/iwd/my_ssid.psk, by
-> > manually creating the file, is not picked up by iwd automatically.
-> >
-> > I've only tested this with iwd 1.17 and ell 0.43 due to the complexity =
-to
-> > build another version using Yocto.  However, I've checked the source co=
-de
-> > for iwd on master and they don't seem to handle the fact that /var/lib/=
-iwd
-> > is a symlink.  I've tried to search the mailing-list and google, but ca=
-n't
-> > find anything about this.  It seems I can change the /var/lib/iwd direc=
-tory
-> > during compilation by setting DAEMON_STORAGEDIR during configure/build.
-> > However, that is a bit unflexible as my system is Yocto based, and hack=
-ing
-> > the Yocto recipes for this seems wrong.  Normally you symlink things in=
- your
-> > file tree in IoT devices to point to persistent storage areas.
-> >
-> > I don't have a solution, but at least iwd should detect that /var/lib/i=
-wd is
-> > a symlink and warn the user.  The implication is that the known-network=
- list
-> > doesn't work at all.  The internal known-network list should work even =
-if
-> > inotify doesn't.
-> >
-> > Perhaps also it should be allowed to change the default storage dir in
-> > /etc/iwd/main.conf.
->
-> have you tried to set the STATE_DIRECTORY environment variable?
->
-> Regards
->
-> Marcel
->
---===============5942971550478965658==--
+ struct dpp_sm {
+ 	struct netdev *netdev;
+@@ -47,14 +66,121 @@ struct dpp_sm {
+ 	size_t nonce_len;
+ 	struct l_ecc_scalar *boot_private;
+ 	struct l_ecc_point *boot_public;
++
++	enum dpp_state state;
++
++	uint32_t *freqs;
++	size_t freqs_len;
++	size_t freqs_idx;
++	uint32_t dwell;
++	uint32_t current_freq;
++	uint32_t presence_scan_id;
++	struct scan_freq_set *presence_list;
++
++	uint32_t offchannel_id;
+ };
+ =
+
++static void dpp_send_frame_cb(struct l_genl_msg *msg, void *user_data)
++{
++	if (l_genl_msg_get_error(msg) < 0)
++		l_error("Error sending frame");
++}
++
++static void dpp_send_frame(uint64_t wdev_id, struct iovec *iov, size_t iov=
+_len,
++			uint32_t freq)
++{
++	struct l_genl_msg *msg;
++
++	msg =3D l_genl_msg_new_sized(NL80211_CMD_FRAME, 512);
++	l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &wdev_id);
++	l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY_FREQ, 4, &freq);
++	l_genl_msg_append_attr(msg, NL80211_ATTR_OFFCHANNEL_TX_OK, 0, NULL);
++	l_genl_msg_append_attrv(msg, NL80211_ATTR_FRAME, iov, iov_len);
++
++	l_debug("Sending frame on frequency %u", freq);
++
++	if (!l_genl_family_send(nl80211, msg, dpp_send_frame_cb, NULL, NULL))
++		l_error("Could not send CMD_FRAME");
++}
++
++static size_t dpp_append_attr(uint8_t *to, enum dpp_attribute_type type,
++				void *attr, size_t attr_len)
++{
++	l_put_le16(type, to);
++	l_put_le16(attr_len, to + 2);
++	memcpy(to + 4, attr, attr_len);
++
++	return attr_len + 4;
++}
++
++static size_t dpp_build_header(const uint8_t *src, const uint8_t *dest,
++				enum dpp_frame_type type,
++				uint8_t buf[static 32])
++{
++	uint8_t *ptr =3D buf + 24;
++
++	memset(buf, 0, 32);
++
++	l_put_le16(0x00d0, buf);
++	memcpy(buf + 4, dest, 6);
++	memcpy(buf + 10, src, 6);
++	memcpy(buf + 16, broadcast, 6);
++
++	*ptr++ =3D 0x04;			/* Category: Public */
++	*ptr++ =3D 0x09;			/* Action: Vendor specific usage */
++	memcpy(ptr, wifi_alliance_oui, 3);
++	ptr +=3D 3;
++	*ptr++ =3D 0x1a;			/* WiFi Alliance DPP OI type */
++	*ptr++ =3D 1;			/* Cryptosuite */
++	*ptr++ =3D type;
++
++	return ptr - buf;
++}
++
++static void dpp_presence_announce(struct dpp_sm *dpp)
++{
++	struct netdev *netdev =3D dpp->netdev;
++	uint8_t hdr[32];
++	uint8_t attrs[32 + 4];
++	uint8_t hash[32];
++	uint8_t *ptr =3D attrs;
++	const uint8_t *addr =3D netdev_get_address(netdev);
++	struct iovec iov[3];
++
++	iov[0].iov_len =3D dpp_build_header(addr, broadcast,
++					DPP_FRAME_PRESENCE_ANNOUNCEMENT, hdr);
++	iov[0].iov_base =3D hdr;
++
++	dpp_hash(L_CHECKSUM_SHA256, hash, 2, "chirp", strlen("chirp"),
++			dpp->pub_asn1, dpp->pub_asn1_len);
++
++	ptr +=3D dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH, hash, 32);
++
++	iov[1].iov_base =3D attrs;
++	iov[1].iov_len =3D ptr - attrs;
++	iov[2].iov_base =3D NULL;
++
++	l_debug("Sending presense annoucement on frequency %u and waiting %u",
++		dpp->current_freq, dpp->dwell);
++
++	dpp_send_frame(netdev_get_wdev_id(netdev), iov, 2, dpp->current_freq);
++}
++
++static void dpp_roc_started(void *user_data)
++{
++	struct dpp_sm *dpp =3D user_data;
++
++	dpp_presence_announce(dpp);
++}
++
+ static void dpp_create(struct netdev *netdev)
+ {
+ 	struct l_dbus *dbus =3D dbus_get_bus();
+ 	struct dpp_sm *dpp =3D l_new(struct dpp_sm, 1);
+ =
+
+ 	dpp->netdev =3D netdev;
++	dpp->state =3D DPP_STATE_NOTHING;
++	dpp->wdev_id =3D netdev_get_wdev_id(netdev);
+ =
+
+ 	l_dbus_object_add_interface(dbus, netdev_get_path(netdev),
+ 					IWD_DPP_INTERFACE, dpp);
+@@ -81,12 +207,22 @@ static void dpp_reset(struct dpp_sm *dpp)
+ 		l_ecc_scalar_free(dpp->boot_private);
+ 		dpp->boot_private =3D NULL;
+ 	}
++
++	dpp->state =3D DPP_STATE_NOTHING;
+ }
+ =
+
+ static void dpp_free(struct dpp_sm *dpp)
+ {
+ 	dpp_reset(dpp);
+ =
+
++	if (dpp->freqs)
++		l_free(dpp->freqs);
++
++	if (dpp->offchannel_id) {
++		offchannel_cancel(dpp->wdev_id, dpp->offchannel_id);
++		dpp->offchannel_id =3D 0;
++	}
++
+ 	l_free(dpp);
+ }
+ =
+
+@@ -107,6 +243,140 @@ static void dpp_netdev_watch(struct netdev *netdev,
+ 	}
+ }
+ =
+
++static void dpp_presence_timeout(int error, void *user_data)
++{
++	struct dpp_sm *dpp =3D user_data;
++
++	if (dpp->state !=3D DPP_STATE_PRESENCE) {
++		l_debug("DPP state changed, stopping presence announcements");
++		dpp->freqs_idx =3D 0;
++		return;
++	}
++
++	dpp->freqs_idx++;
++
++	if (dpp->freqs_idx >=3D dpp->freqs_len) {
++		l_debug("Max retries on presence announcements");
++		dpp->freqs_idx =3D 0;
++	}
++
++	dpp->current_freq =3D dpp->freqs[dpp->freqs_idx];
++
++	l_debug("Presence timeout, moving to next frequency %u, duration %u",
++			dpp->current_freq, dpp->dwell);
++
++	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
++			dpp->current_freq, dpp->dwell, dpp_roc_started,
++			dpp, dpp_presence_timeout);
++}
++
++/*
++ * EasyConnect 2.0 - 6.2.2
++ */
++static uint32_t *dpp_add_default_channels(struct dpp_sm *dpp, size_t *len_=
+out)
++{
++	struct wiphy *wiphy =3D wiphy_find_by_wdev(
++					netdev_get_wdev_id(dpp->netdev));
++	const struct scan_freq_set *list =3D wiphy_get_supported_freqs(wiphy);
++	uint32_t freq;
++
++	if (!dpp->presence_list)
++		dpp->presence_list =3D scan_freq_set_new();
++
++	scan_freq_set_add(dpp->presence_list, band_channel_to_freq(6,
++						BAND_FREQ_2_4_GHZ));
++	/*
++	 * "5 GHz: Channel 44 (5.220 GHz) if local regulations permit operation
++	 * only in the 5.150 - 5.250 GHz band and Channel 149 (5.745 GHz)
++	 * otherwise"
++	 */
++	freq =3D band_channel_to_freq(149, BAND_FREQ_5_GHZ);
++
++	if (scan_freq_set_contains(list, freq))
++		scan_freq_set_add(dpp->presence_list, freq);
++	else
++		scan_freq_set_add(dpp->presence_list,
++				band_channel_to_freq(44, BAND_FREQ_5_GHZ));
++
++	/* TODO: 60GHz: Channel 2 */
++
++	return scan_freq_set_to_fixed_array(dpp->presence_list, len_out);
++}
++
++/*
++ * TODO: There is an entire procedure defined in the spec where you increa=
+se
++ * the ROC timeout with each unsuccessful iteration of channels, wait on c=
+hannel
++ * for long periods of time etc. Due to offchannel issues in the kernel th=
+is
++ * procedure is not being fully implemented. In reality doing this would r=
+esult
++ * in quite terrible DPP performance anyways. Its recommended to supply a
++ * single channel argument to StartEnrollee and only operate on that chann=
+el.
++ */
++static void dpp_start_presence_announcements(struct dpp_sm *dpp,
++						uint32_t *limit_freqs,
++						size_t limit_len)
++{
++	uint32_t max_roc =3D wiphy_get_max_roc_duration(
++					wiphy_find_by_wdev(dpp->wdev_id));
++
++	if (2000 < max_roc)
++		max_roc =3D 2000;
++
++	if (limit_freqs) {
++		dpp->freqs =3D limit_freqs;
++		dpp->freqs_len =3D limit_len;
++	} else
++		dpp->freqs =3D dpp_add_default_channels(dpp, &dpp->freqs_len);
++
++	dpp->presence_scan_id =3D 0;
++	dpp->dwell =3D max_roc;
++	dpp->freqs_idx =3D 0;
++	dpp->current_freq =3D dpp->freqs[0];
++
++	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
++			dpp->current_freq, dpp->dwell, dpp_roc_started,
++			dpp, dpp_presence_timeout);
++}
++
++static void dpp_trigger_scan(int error, void *user_data)
++{
++	struct dpp_sm *dpp =3D user_data;
++
++	if (error < 0)
++		dpp_start_presence_announcements(dpp, NULL, 0);
++}
++
++static bool dpp_scan_notify(int error, struct l_queue *bss_list,
++			const struct scan_freq_set *freqs, void *user_data)
++{
++	struct dpp_sm *dpp =3D user_data;
++	const struct l_queue_entry *bss_entry;
++
++	for (bss_entry =3D l_queue_get_entries(bss_list); bss_entry;
++						bss_entry =3D bss_entry->next) {
++		struct scan_bss *bss =3D bss_entry->data;
++
++		if (bss->dpp_configurator)
++			scan_freq_set_add(dpp->presence_list, bss->frequency);
++	}
++
++	dpp_start_presence_announcements(dpp, NULL, 0);
++
++	return false;
++}
++
++static void dpp_start_presence_scan(struct dpp_sm *dpp)
++{
++	/*
++	 * Scan for Configurator Connectivity element. If there is some problem
++	 * issuing the scan we can still continue and send presence frames
++	 */
++	dpp->presence_scan_id =3D scan_active(dpp->wdev_id, NULL, 0,
++						dpp_trigger_scan,
++						dpp_scan_notify, dpp, NULL);
++	if (!dpp->presence_scan_id)
++		dpp_start_presence_announcements(dpp, NULL, 0);
++}
++
+ static bool dpp_parse_enrollee_params(struct l_dbus_message *message,
+ 					const char **info_out,
+ 					const char **host_out,
+@@ -183,6 +453,9 @@ static struct l_dbus_message *dpp_dbus_start_enrollee(s=
+truct l_dbus *dbus,
+ 	if (!netdev_get_is_up(dpp->netdev))
+ 		return dbus_error_not_available(message);
+ =
+
++	if (dpp->state !=3D DPP_STATE_NOTHING)
++		return dbus_error_already_exists(message);
++
+ 	if (!dpp_parse_enrollee_params(message, &info, &host, &freqs,
+ 					&freqs_len))
+ 		return dbus_error_invalid_args(message);
+@@ -204,11 +477,33 @@ static struct l_dbus_message *dpp_dbus_start_enrollee=
+(struct l_dbus *dbus,
+ 					netdev_get_address(dpp->netdev), freqs,
+ 					freqs_len, info, host);
+ =
+
++	dpp->state =3D DPP_STATE_PRESENCE;
++
+ 	l_debug("DPP Start Enrollee: %s", dpp->uri);
+ =
+
+ 	l_dbus_property_changed(dbus_get_bus(), netdev_get_path(dpp->netdev),
+ 					IWD_DPP_INTERFACE, "Uri");
+ =
+
++	/*
++	 * Going off spec here. If the user requests specific frequencies only
++	 * sit on those channels for presence announcements. This addresses
++	 * issues when a large channel list is built up. Any more than a few
++	 * (one is best) channels results in horrible performance.
++	 */
++	if (freqs)
++		dpp_start_presence_announcements(dpp, freqs, freqs_len);
++	else {
++		/*
++		 * TODO: A main.conf option could be used to force the full
++		 * presence procedure, which would take into account any
++		 * matching AP frequencies, the default list, and any requested
++		 * over DBus. Again, as mentioned above, this probably is never
++		 * a good idea.
++		 */
++		l_free(freqs);
++		dpp_start_presence_scan(dpp);
++	}
++
+ 	return l_dbus_message_new_method_return(message);
+ }
+ =
+
+@@ -259,6 +554,12 @@ static void dpp_destroy_interface(void *user_data)
+ =
+
+ static int dpp_init(void)
+ {
++	nl80211 =3D l_genl_family_new(iwd_get_genl(), NL80211_GENL_NAME);
++	if (!nl80211) {
++		l_error("Failed to obtain nl80211");
++		return -EIO;
++	}
++
+ 	netdev_watch =3D netdev_watch_add(dpp_netdev_watch, NULL, NULL);
+ =
+
+ 	l_dbus_register_interface(dbus_get_bus(), IWD_DPP_INTERFACE,
+-- =
+
+2.31.1
+
+--===============1635117875260496779==--
 
