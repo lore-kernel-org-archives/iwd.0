@@ -1,70 +1,112 @@
-Content-Type: multipart/mixed; boundary="===============7345732614745507389=="
+Content-Type: multipart/mixed; boundary="===============2629024652559636380=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Jupiter <jupiter.hce at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v6 4/5] network: prefer OWE transition BSS over open
-Date: Fri, 17 Sep 2021 14:36:21 -0700
-Message-ID: <20210917213622.21881-4-prestwoj@gmail.com>
-In-Reply-To: 20210917213622.21881-1-prestwoj@gmail.com
+Subject: Re: iwd configure location and files
+Date: Mon, 13 Dec 2021 15:39:17 +1100
+Message-ID: <CAA=hcWTGQ4+9Vm+Srog0KtQ85R2-o61WT0uPjw+GwB=G9mrXMg@mail.gmail.com>
+In-Reply-To: 8aa819a1-4fd4-b989-713b-6480d0dfd236@monom.org
 
---===============7345732614745507389==
+--===============2629024652559636380==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There isn't much control station has with how BSS's are inserted to
-a network object. The rank algorithm makes that decision. Because of
-this we could end up in a situation where the Open BSS is preferred
-over the OWE transition BSS.
+Thanks all for your advice.
 
-In attempt to better handle this any Open BSS in this type of network
-will not be chosen unless its the only candidate (e.g. no other BSSs,
-inability to connect with OWE, or an improperly configured network).
----
- src/network.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Further debugging it, it seems failing DHCP was caused by an error of
+Deauthentication even, not clear if the iwd error caused mwifiex
+disconnected from WiFi modem or the mwifiex cause iwd fall:
 
-diff --git a/src/network.c b/src/network.c
-index f7172c78..711fb296 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -1110,6 +1110,11 @@ const struct l_queue_entry *network_bss_list_get_ent=
-ries(
- 	return l_queue_get_entries(network->bss_list);
- }
- =
+# ifconfig
+wlan0     Link encap:Ethernet  HWaddr D4:CA:6E:A4:E8:B4
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:226 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:224 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:25538 (24.9 KiB)  TX bytes:30240 (29.5 KiB)
 
-+static bool bss_is_owe(struct scan_bss *bss)
-+{
-+	return !l_memeqzero(bss->owe_trans_bssid, 6) && bss->rsne;
-+}
-+
- struct scan_bss *network_bss_select(struct network *network,
- 						bool fallback_to_blacklist)
- {
-@@ -1135,6 +1140,17 @@ struct scan_bss *network_bss_select(struct network *=
-network,
- 		if (!candidate)
- 			candidate =3D bss;
- =
+# systemctl status iwd -l
+* iwd.service - Wireless service
+     Loaded: loaded
+(8;;file://solar/lib/systemd/system/iwd.service/lib/systemd/system/iwd.serv=
+ice8;;;
+enabled; vendor preset: enabled)
+     Active: active (running) since Wed 2021-08-04 15:25:58 UTC; 8s ago
+   Main PID: 345 (iwd)
+     CGroup: /system.slice/iwd.service
+             `-345 /usr/libexec/iwd
 
-+		/* OWE Transition BSS */
-+		if (!l_memeqzero(bss->owe_trans_bssid, 6)) {
-+			/* Don't want to connect to the Open BSS if possible */
-+			if (!bss->rsne)
-+				continue;
-+
-+			/* Candidate is not OWE, set this as new candidate */
-+			if (!bss_is_owe(candidate))
-+				candidate =3D bss;
-+		}
-+
- 		/* check if temporarily blacklisted */
- 		if (l_queue_find(network->blacklist, match_bss, bss))
- 			continue;
--- =
+Aug 04 15:25:58 solar iwd[345]:                         54.0 Mbps
+Aug 04 15:25:58 solar iwd[345]:                 HT Capabilities:
+Aug 04 15:25:58 solar iwd[345]:                         HT20
+Aug 04 15:25:58 solar iwd[345]:                         Short GI for 20Mhz
+Aug 04 15:25:58 solar iwd[345]:                 HT RX MCS indexes:
+Aug 04 15:25:58 solar iwd[345]:                         0-7
+Aug 04 15:25:58 solar iwd[345]:                         32
+Aug 04 15:25:58 solar iwd[345]:         Ciphers: CCMP TKIP BIP
+Aug 04 15:25:58 solar iwd[345]:         Supported iftypes: station ap
+p2p-client p2p-go
+Aug 04 15:26:03 solar iwd[345]: Received Deauthentication event,
+reason: 2, from_ap: true
 
-2.31.1
+[  931.528058] mwifiex_sdio mmc0:0001:1: info: successfully
+disconnected from 34:08:04:12:b1:a2: reason code 2
+[  933.540667] mwifiex_sdio mmc0:0001:1: info: trying to associate to
+'JupiterIoT' bssid 34:08:04:12:b1:a2
+[  933.564524] mwifiex_sdio mmc0:0001:1: info: associated to bssid
+34:08:04:12:b1:a2 successfully
+[  933.580086] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
+=3D0x2
+[  933.611695] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
+=3D0x2
+[  936.585096] mwifiex_sdio mmc0:0001:1: info: successfully
+disconnected from 34:08:04:12:b1:a2: reason code 2
+[  938.575824] mwifiex_sdio mmc0:0001:1: info: trying to associate to
+'JupiterIoT' bssid 34:08:04:12:b1:a2
+[  938.603801] mwifiex_sdio mmc0:0001:1: info: associated to bssid
+34:08:04:12:b1:a2 successfully
+[  938.618333] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
+=3D0x2
+[  938.655173] mwifiex_sdio mmc0:0001:1: CMD_RESP: cmd 0x23f error, result=
+=3D0x2
+[  941.619354] mwifiex_sdio mmc0:0001:1: info: successfully
+disconnected from 34:08:04:12:b1:a2: reason code 2
 
---===============7345732614745507389==--
+I followed the document to enable all CRYPTO setup so I don't think it
+is a CRYPTO configured issue in the kernel.
+
+CONFIG_CRYPTO_USER_API_SKCIPHER=3Dy
+CONFIG_CRYPTO_USER_API_HASH=3Dy
+CONFIG_CRYPTO_HMAC=3Dy
+CONFIG_CRYPTO_CMAC=3Dy
+CONFIG_CRYPTO_MD4=3Dy
+CONFIG_CRYPTO_MD5=3Dy
+CONFIG_CRYPTO_SHA256=3Dy
+CONFIG_CRYPTO_SHA512=3Dy
+CONFIG_CRYPTO_AES=3Dy
+CONFIG_CRYPTO_ECB=3Dy
+CONFIG_CRYPTO_ARC4=3Dy
+CONFIG_CRYPTO_DES=3Dy
+CONFIG_CRYPTO_CBC=3Dy
+CONFIG_KEY_DH_OPERATIONS=3Dy
+
+Also searching the Internet to find someone added
+ControlPortOverNL80211=3DFalse to resolve that issue on kernel 5.9.2,
+but it did not work on my kernel 5.10.59:
+
+# cat /etc/iwd/main.conf
+[General]
+EnableNetworkConfiguration=3DTrue
+ControlPortOverNL80211=3DFalse
+
+The other issue is the error from_ap, but I am connecting to a home
+WiFi modem, it should use a station, not ap, right? Or doesn't matter?
+
+Thanks for your advice.
+
+Kind regards,
+
+Jupiter
+--===============2629024652559636380==--
 
