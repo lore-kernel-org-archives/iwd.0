@@ -1,57 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============0339941457487871078=="
+Content-Type: multipart/mixed; boundary="===============0450753175530248714=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: D-Bus policies
-Date: Fri, 21 Jan 2022 17:13:14 -0600
-Message-ID: <b9d48284-32bc-5ede-b3e1-c17aa544e7eb@gmail.com>
-In-Reply-To: 3141398.bvkd0EhLq2@bagend
+Subject: Re: [PATCH v2 02/10] dpp: initial skeleton DPP module
+Date: Tue, 14 Dec 2021 15:32:40 -0600
+Message-ID: <e354a331-f8bd-9b15-3310-96425d78afcf@gmail.com>
+In-Reply-To: 20211214181225.2308043-2-prestwoj@gmail.com
 
---===============0339941457487871078==
+--===============0450753175530248714==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Diederik,
+Hi James,
 
-> Looking into possible solutions, I found 2 very similar commits, but in
-> different projects, bluez and system-config-printer:
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3D3ef0ce954=
-b66fdf45538a6cdc629f3dac6642832
-> https://github.com/OpenPrinting/system-config-printer/commit/19df47d2630b=
-637d1802efe2c3cd5a00f2e40c3b
+On 12/14/21 12:12 PM, James Prestwood wrote:
+> ---
+>   Makefile.am |   1 +
+>   src/dpp.c   | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 129 insertions(+)
+>   create mode 100644 src/dpp.c
 > =
 
-> They both link to https://www.spinics.net/lists/linux-bluetooth/msg75267.=
-html
-> While I lack the knowledge to fully understand what it says I did notice =
-this:
-> "The intent is clear: As long as you are logged in to a local machine, an=
-d you
-> are the foreground/active console, you are allowed to control bluetooth.
-> However, the behavior of 'at_console' does *not* match this intent."
+> v2:
+>   * Only create dpp_sm if device is station
 > =
 
-> In other places I saw the 'at_console' stanza just plainly removed without
-> any replacement, but it could have undesirable consequences for iwd.
 
-I think the solution chosen in BlueZ which gives blanket permission to acce=
-ss =
+<snip>
 
-iwd D-Bus APIs to any local user is probably just fine.  Particularly given=
- that =
+> +
+> +static void dpp_netdev_watch(struct netdev *netdev,
+> +				enum netdev_watch_event event, void *userdata)
+> +{
+> +	if (netdev_get_iftype(netdev) !=3D NETDEV_IFTYPE_STATION)
+> +		return;
+> +
+> +	switch (event) {
+> +	case NETDEV_WATCH_EVENT_NEW:
 
-at_console effectively allowed any user to use iwd in the past.
-This effectively negates the need to provide a separate policy for wheel/ne=
-tdev =
+Can we also create it if the device is UP?
 
-and so these can be removed.
+> +		dpp_create(netdev);
+> +		break;
+> +	case NETDEV_WATCH_EVENT_DEL:
 
-Alternatively we can limit the policy only to wheel/netdev groups.
+And delete if the device is DOWN?
 
-Care to send a patch?
+> +		l_dbus_object_remove_interface(dbus_get_bus(),
+> +						netdev_get_path(netdev),
+> +						IWD_DPP_INTERFACE);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +}
+> +
+> +static struct l_dbus_message *dpp_dbus_start_enrollee(struct l_dbus *dbu=
+s,
+> +						struct l_dbus_message *message,
+> +						void *user_data)
+> +{
+> +	struct dpp_sm *dpp =3D user_data;
+> +
+> +	if (!netdev_get_is_up(dpp->netdev))
+> +		return dbus_error_not_available(message);
+
+That way you can skip this check.  There isn't much point in having this =
+
+interface around if the device is not UP anyway.
+
+> +
+> +	return dbus_error_not_supported(message);
+> +}
+> +
 
 Regards,
 -Denis
---===============0339941457487871078==--
+--===============0450753175530248714==--
 
