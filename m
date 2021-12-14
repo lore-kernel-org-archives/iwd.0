@@ -1,43 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============3020147245953951762=="
+Content-Type: multipart/mixed; boundary="===============2489273950658619387=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 09/12] auto-t: wpas.py: allow arbitrary events to be handled
-Date: Tue, 18 Jan 2022 13:25:09 -0800
-Message-ID: <20220118212512.2017977-9-prestwoj@gmail.com>
-In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
+Subject: [PATCH v2 01/10] dbus: add DPP interface
+Date: Tue, 14 Dec 2021 10:12:16 -0800
+Message-ID: <20211214181225.2308043-1-prestwoj@gmail.com>
 
---===============3020147245953951762==
+--===============2489273950658619387==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If an event is in response to some command which is returning an
-unexpected value (unexpected with respect to wpas.py) handle_eow
-would raise an exception.
-
-Specifically with DPP this was being hit when the URI was being
-returned.
 ---
- autotests/util/wpas.py | 2 --
- 1 file changed, 2 deletions(-)
+ src/dbus.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-index 6b845232..c8e65179 100644
---- a/autotests/util/wpas.py
-+++ b/autotests/util/wpas.py
-@@ -88,8 +88,6 @@ class Wpas:
-         def handle_eow():
-             nonlocal key, value, count, event
-             if count =3D=3D 0:
--                if key is not None or not value:
--                    raise Exception('Bad event name')
-                 key =3D 'event'
-             elif key is None:
-                 if not value:
+diff --git a/src/dbus.h b/src/dbus.h
+index 7703b37f..bbc76608 100644
+--- a/src/dbus.h
++++ b/src/dbus.h
+@@ -43,6 +43,7 @@
+ #define IWD_STATION_DIAGNOSTIC_INTERFACE "net.connman.iwd.StationDiagnosti=
+c"
+ #define IWD_AP_DIAGNOSTIC_INTERFACE "net.connman.iwd.AccessPointDiagnostic"
+ #define IWD_STATION_DEBUG_INTERFACE "net.connman.iwd.StationDebug"
++#define IWD_DPP_INTERFACE "net.connman.iwd.DeviceProvisioning"
+ =
+
+ #define IWD_BASE_PATH "/net/connman/iwd"
+ #define IWD_AGENT_MANAGER_PATH IWD_BASE_PATH
 -- =
 
 2.31.1
 
---===============3020147245953951762==--
+--===============2489273950658619387==--
 
