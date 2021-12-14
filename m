@@ -1,45 +1,204 @@
-Content-Type: multipart/mixed; boundary="===============7366761760092467291=="
+Content-Type: multipart/mixed; boundary="===============2822552758677167016=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Dual phy device not always detected
-Date: Thu, 10 Feb 2022 16:21:06 -0600
-Message-ID: <a21cae1c-4197-33ed-8bd7-f12681e9cfeb@gmail.com>
-In-Reply-To: CAMSdBrG=OGXZRMSjf-u41rAuTaxUdMw0sVMbNPX995B8sCiq_A@mail.gmail.com
+Subject: [PATCH v2 07/10] dpp-util: add dpp_parse_configuration_object
+Date: Tue, 14 Dec 2021 10:12:22 -0800
+Message-ID: <20211214181225.2308043-7-prestwoj@gmail.com>
+In-Reply-To: 20211214181225.2308043-1-prestwoj@gmail.com
 
---===============7366761760092467291==
+--===============2822552758677167016==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi David,
+This parses the configuration JSON object from the configuration
+response. Only a minimal configuration object is supported for
+now.
+---
+ Makefile.am    |   5 +--
+ src/dpp-util.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/dpp-util.h |  12 ++++++
+ 3 files changed, 124 insertions(+), 3 deletions(-)
 
-On 2/10/22 10:51, David Bourgeois wrote:
-> Hi,
-> =
+diff --git a/Makefile.am b/Makefile.am
+index 5d14963b..d079ba89 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -552,9 +552,8 @@ unit_test_p2p_LDADD =3D $(ell_ldadd)
+ =
 
-> We plan to use iwd for an embedded device where we need both station and =
-ap at =
+ unit_test_dpp_SOURCES =3D unit/test-dpp.c src/dpp-util.h src/dpp-util.c \
+ 				src/band.h src/band.c \
+-				src/util.h src/util.c src/crypto.h src/crypto.c
+-				src/util.h src/util.c
+-
++				src/util.h src/util.c src/crypto.h \
++				src/crypto.c src/json.h src/json.c
+ unit_test_dpp_LDADD =3D $(ell_ldadd)
+ =
 
-> the same time. For this we have devices based on the rtl88x2bu driver com=
-piled  > to enable the dual phy. This works well, the dongle is detected as=
- 2 different
-> interfaces wlan0 and wlan1 and both work properly. IWD doesn't always det=
-ect =
+ unit_test_json_SOURCES =3D unit/test-json.c src/json.h src/json.c shared/j=
+smn.h
+diff --git a/src/dpp-util.c b/src/dpp-util.c
+index 75b0b11c..54bf56cd 100644
+--- a/src/dpp-util.c
++++ b/src/dpp-util.c
+@@ -34,6 +34,9 @@
+ #include "src/util.h"
+ #include "src/band.h"
+ #include "src/crypto.h"
++#include "src/json.h"
++#include "ell/useful.h"
++#include "src/ie.h"
+ =
 
-> both interfaces though when the dongle is plugged. If IWD is restarted, t=
-hen =
+ #define TOKEN_NEXT(p, sep) \
+ ({ \
+@@ -127,6 +130,113 @@ char *dpp_generate_uri(const uint8_t *asn1, size_t as=
+n1_len, uint8_t version,
+ 	return l_string_unwrap(uri);
+ }
+ =
 
-> most of the time both interfaces are detected. When the dongle is plugged=
- at =
++static uint32_t dpp_parse_akm(char *akms)
++{
++	_auto_(l_strv_free) char **split =3D l_strsplit(akms, '+');
++	char **i =3D split;
++	uint32_t akm_out =3D 0;
++
++	while (*i) {
++		if (!strncmp(*i, "psk", 3))
++			akm_out |=3D IE_RSN_AKM_SUITE_PSK;
++		else if (!strncmp(*i, "sae", 3))
++			akm_out |=3D IE_RSN_AKM_SUITE_SAE_SHA256;
++
++		i++;
++	}
++
++	return akm_out;
++}
++
++/*
++ * TODO: This handles the most basic configuration. i.e. a configuration o=
+bject
++ * with ssid/passphrase/akm.
++ */
++struct dpp_configuration *dpp_parse_configuration_object(const char *json,
++							size_t json_len)
++{
++	struct dpp_configuration *config;
++	struct json_contents *c;
++	struct json_iter iter;
++	struct json_iter discovery;
++	struct json_iter cred;
++	_auto_(l_free)char *tech =3D NULL;
++	_auto_(l_free)char *ssid =3D NULL;
++	_auto_(l_free)char *akm =3D NULL;
++	_auto_(l_free)char *pass =3D NULL;
++	_auto_(l_free)char *psk =3D NULL;
++
++	c =3D json_contents_new(json, json_len);
++	if (!c)
++		return NULL;
++
++	json_iter_init(&iter, c);
++
++	if (!json_iter_parse(&iter,
++			JSON_MANDATORY("wi-fi_tech", JSON_STRING, &tech),
++			JSON_MANDATORY("discovery", JSON_OBJECT, &discovery),
++			JSON_MANDATORY("cred", JSON_OBJECT, &cred),
++			JSON_UNDEFINED))
++		goto free_contents;
++
++	if (!tech || strncmp(tech, "infra", 5))
++		goto free_contents;
++
++
++	if (!json_iter_parse(&discovery,
++			JSON_MANDATORY("ssid", JSON_STRING, &ssid),
++			JSON_UNDEFINED))
++		goto free_contents;
++
++	if (!ssid || !util_ssid_is_utf8(strlen(ssid),(const uint8_t *)ssid))
++		goto free_contents;
++
++	if (!json_iter_parse(&cred,
++			JSON_MANDATORY("akm", JSON_STRING, &akm),
++			JSON_OPTIONAL("pass", JSON_STRING, &pass),
++			JSON_OPTIONAL("psk", JSON_STRING, &psk),
++			JSON_UNDEFINED))
++		goto free_contents;
++
++	if (!pass && (!psk || strlen(psk) !=3D 64))
++		goto free_contents;
++
++	config =3D l_new(struct dpp_configuration, 1);
++
++	if (pass)
++		config->passphrase =3D l_steal_ptr(pass);
++	else
++		config->psk =3D l_steal_ptr(psk);
++
++	memcpy(config->ssid, ssid, strlen(ssid));
++	config->ssid_len =3D strlen(ssid);
++
++	config->akm_suites =3D dpp_parse_akm(akm);
++	if (!config->akm_suites)
++		goto free_config;
++
++	json_contents_free(c);
++
++	return config;
++
++free_config:
++	dpp_configuration_free(config);
++free_contents:
++	json_contents_free(c);
++	return NULL;
++}
++
++void dpp_configuration_free(struct dpp_configuration *config)
++{
++	if (config->passphrase)
++		l_free(config->passphrase);
++
++	if (config->psk)
++		l_free(config->psk);
++
++	l_free(config);
++}
++
+ void dpp_attr_iter_init(struct dpp_attr_iter *iter, const uint8_t *pdu,
+ 			size_t len)
+ {
+diff --git a/src/dpp-util.h b/src/dpp-util.h
+index 75bc33c1..a9995368 100644
+--- a/src/dpp-util.h
++++ b/src/dpp-util.h
+@@ -112,6 +112,18 @@ enum dpp_attribute_type {
+ 	DPP_ATTR_CONFIGURATOR_NONCE		=3D 0x1022,
+ };
+ =
 
-> boot it also works most of the time.
++struct dpp_configuration {
++	uint8_t ssid[32];
++	size_t ssid_len;
++	uint32_t akm_suites;
++	char *passphrase;
++	char *psk;		/* hex string */
++};
++
++struct dpp_configuration *dpp_parse_configuration_object(const char *json,
++							size_t json_len);
++void dpp_configuration_free(struct dpp_configuration *conf);
++
+ struct dpp_attr_iter {
+ 	const uint8_t *pos;
+ 	const uint8_t *end;
+-- =
 
-We still need to test this better here, but can you try the patch I just se=
-nt out:
-[PATCH] manager: Refine filtered dumps
+2.31.1
 
-Regards,
--Denis
---===============7366761760092467291==--
+--===============2822552758677167016==--
 
