@@ -1,71 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============2143363417931655629=="
+Content-Type: multipart/mixed; boundary="===============2637092141783883919=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/2] auto-t: add test for fixed scanning crash
-Date: Tue, 08 Feb 2022 09:35:39 -0800
-Message-ID: <20220208173539.493712-2-prestwoj@gmail.com>
-In-Reply-To: 20220208173539.493712-1-prestwoj@gmail.com
+Subject: [PATCH v3 10/11] dpp: handle protocol errors in ROC timeout
+Date: Wed, 15 Dec 2021 09:58:13 -0800
+Message-ID: <20211215175814.2467124-10-prestwoj@gmail.com>
+In-Reply-To: 20211215175814.2467124-1-prestwoj@gmail.com
 
---===============2143363417931655629==
+--===============2637092141783883919==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This simulates the conditions that trigger a free-after-use which was
-fixed with:
-
-2c355db7 ("scan: remove periodic scans from queue on abort")
-
-This behavior can be reproduced reliably using this test with the above
-patch reverted.
+This is a standing TODO of properly handling these timeouts but
+for now just treat any ROC timeout as an error if authenticating
+or configuring.
 ---
- autotests/testScan/remove_iface_test.py | 32 +++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
- create mode 100644 autotests/testScan/remove_iface_test.py
+ src/dpp.c | 36 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/autotests/testScan/remove_iface_test.py b/autotests/testScan/r=
-emove_iface_test.py
-new file mode 100644
-index 00000000..af36c1e8
---- /dev/null
-+++ b/autotests/testScan/remove_iface_test.py
-@@ -0,0 +1,32 @@
-+#!/usr/bin/python3
+diff --git a/src/dpp.c b/src/dpp.c
+index af6a5fd0..2abbc3e6 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -1128,10 +1128,34 @@ static void dpp_presence_timeout(int error, void *u=
+ser_data)
+ {
+ 	struct dpp_sm *dpp =3D user_data;
+ =
+
+-	if (dpp->state !=3D DPP_STATE_PRESENCE) {
+-		l_debug("DPP state changed, stopping presence announcements");
+-		dpp->freqs_idx =3D 0;
++	/*
++	 * If cancelled this is likely due to netdev going down or from Stop().
++	 * Otherwise there was some other problem which is probably not
++	 * recoverable.
++	 */
++	if (error =3D=3D -ECANCELED)
+ 		return;
++	else if (error < 0)
++		goto protocol_failed;
 +
-+import unittest
-+import sys
-+import os
++	switch (dpp->state) {
++	case DPP_STATE_PRESENCE:
++		break;
++	case DPP_STATE_NOTHING:
++		/* Protocol already terminated */
++		return;
++	case DPP_STATE_AUTHENTICATING:
++	case DPP_STATE_CONFIGURING:
++		/*
++		 * TODO: If either the auth or config protocol is running we
++		 * need to stay on channel until the specified timeouts.
++		 * Unfortunately the kernel makes this very inconvenient since
++		 * there is no way to stay on channel indefinitely or any way
++		 * of knowing what duration the kernel/card actually chooses.
++		 *
++		 * For now just treat this as a failure.
++		 */
++		goto protocol_failed;
+ 	}
+ =
+
+ 	dpp->freqs_idx++;
+@@ -1149,6 +1173,12 @@ static void dpp_presence_timeout(int error, void *us=
+er_data)
+ 	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
+ 			dpp->current_freq, dpp->dwell, dpp_roc_started,
+ 			dpp, dpp_presence_timeout);
++	return;
 +
-+sys.path.append('../util')
-+from iwd import IWD
-+from config import ctx
-+
-+class Test(unittest.TestCase):
-+    def test_connection_success(self):
-+        wd =3D IWD(True)
-+
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+
-+        device.autoconnect =3D True
-+        device.scan(wait=3DFalse)
-+
-+        os.system('ifconfig %s down' % device.name)
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        pass
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
++protocol_failed:
++	dpp_reset(dpp);
++	dpp_free_auth_data(dpp);
++	return;
+ }
+ =
+
+ /*
 -- =
 
 2.31.1
 
---===============2143363417931655629==--
+--===============2637092141783883919==--
 
