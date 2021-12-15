@@ -1,50 +1,202 @@
-Content-Type: multipart/mixed; boundary="===============3279835711674760839=="
+Content-Type: multipart/mixed; boundary="===============8769319601114842092=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd configure location and files
-Date: Tue, 30 Nov 2021 16:42:28 -0600
-Message-ID: <31be7914-5c78-f1c9-1225-a271204ba153@gmail.com>
-In-Reply-To: CAA=hcWTdHD1ez3vVCpdn4ZQB3njpnQ7DG_sO8cB3oD3E8sYDEg@mail.gmail.com
+Subject: [PATCH v3 08/11] dpp-util: add dpp_parse_configuration_object
+Date: Wed, 15 Dec 2021 09:58:11 -0800
+Message-ID: <20211215175814.2467124-8-prestwoj@gmail.com>
+In-Reply-To: 20211215175814.2467124-1-prestwoj@gmail.com
 
---===============3279835711674760839==
+--===============8769319601114842092==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jupiter,
+This parses the configuration JSON object from the configuration
+response. Only a minimal configuration object is supported for
+now.
+---
+ Makefile.am    |   3 +-
+ src/dpp-util.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/dpp-util.h |  12 ++++++
+ 3 files changed, 124 insertions(+), 1 deletion(-)
 
-> But there is no IP address, I guess iwd manages DHCP, how can I debug iwd=
- DHCP?
-> =
+diff --git a/Makefile.am b/Makefile.am
+index 332e5e4c..d079ba89 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -552,7 +552,8 @@ unit_test_p2p_LDADD =3D $(ell_ldadd)
+ =
 
+ unit_test_dpp_SOURCES =3D unit/test-dpp.c src/dpp-util.h src/dpp-util.c \
+ 				src/band.h src/band.c \
+-				src/util.h src/util.c src/crypto.h src/crypto.c
++				src/util.h src/util.c src/crypto.h \
++				src/crypto.c src/json.h src/json.c
+ unit_test_dpp_LDADD =3D $(ell_ldadd)
+ =
 
-iwd can be configured to do so.  You will need to add the appropriate =
+ unit_test_json_SOURCES =3D unit/test-json.c src/json.h src/json.c shared/j=
+smn.h
+diff --git a/src/dpp-util.c b/src/dpp-util.c
+index e5f76bfd..d1a6fe05 100644
+--- a/src/dpp-util.c
++++ b/src/dpp-util.c
+@@ -34,6 +34,9 @@
+ #include "src/util.h"
+ #include "src/band.h"
+ #include "src/crypto.h"
++#include "src/json.h"
++#include "ell/useful.h"
++#include "src/ie.h"
+ =
 
-configuration entry in /etc/iwd/main.conf.  Refer to 'man 5 iwd.config' or =
-the =
+ static void append_freqs(struct l_string *uri,
+ 					const uint32_t *freqs, size_t len)
+@@ -95,6 +98,113 @@ char *dpp_generate_uri(const uint8_t *asn1, size_t asn1=
+_len, uint8_t version,
+ 	return l_string_unwrap(uri);
+ }
+ =
 
-rst here: =
++static uint32_t dpp_parse_akm(char *akms)
++{
++	_auto_(l_strv_free) char **split =3D l_strsplit(akms, '+');
++	char **i =3D split;
++	uint32_t akm_out =3D 0;
++
++	while (*i) {
++		if (!strncmp(*i, "psk", 3))
++			akm_out |=3D IE_RSN_AKM_SUITE_PSK;
++		else if (!strncmp(*i, "sae", 3))
++			akm_out |=3D IE_RSN_AKM_SUITE_SAE_SHA256;
++
++		i++;
++	}
++
++	return akm_out;
++}
++
++/*
++ * TODO: This handles the most basic configuration. i.e. a configuration o=
+bject
++ * with ssid/passphrase/akm.
++ */
++struct dpp_configuration *dpp_parse_configuration_object(const char *json,
++							size_t json_len)
++{
++	struct dpp_configuration *config;
++	struct json_contents *c;
++	struct json_iter iter;
++	struct json_iter discovery;
++	struct json_iter cred;
++	_auto_(l_free)char *tech =3D NULL;
++	_auto_(l_free)char *ssid =3D NULL;
++	_auto_(l_free)char *akm =3D NULL;
++	_auto_(l_free)char *pass =3D NULL;
++	_auto_(l_free)char *psk =3D NULL;
++
++	c =3D json_contents_new(json, json_len);
++	if (!c)
++		return NULL;
++
++	json_iter_init(&iter, c);
++
++	if (!json_iter_parse(&iter,
++			JSON_MANDATORY("wi-fi_tech", JSON_STRING, &tech),
++			JSON_MANDATORY("discovery", JSON_OBJECT, &discovery),
++			JSON_MANDATORY("cred", JSON_OBJECT, &cred),
++			JSON_UNDEFINED))
++		goto free_contents;
++
++	if (!tech || strncmp(tech, "infra", 5))
++		goto free_contents;
++
++
++	if (!json_iter_parse(&discovery,
++			JSON_MANDATORY("ssid", JSON_STRING, &ssid),
++			JSON_UNDEFINED))
++		goto free_contents;
++
++	if (!ssid || !util_ssid_is_utf8(strlen(ssid),(const uint8_t *)ssid))
++		goto free_contents;
++
++	if (!json_iter_parse(&cred,
++			JSON_MANDATORY("akm", JSON_STRING, &akm),
++			JSON_OPTIONAL("pass", JSON_STRING, &pass),
++			JSON_OPTIONAL("psk", JSON_STRING, &psk),
++			JSON_UNDEFINED))
++		goto free_contents;
++
++	if (!pass && (!psk || strlen(psk) !=3D 64))
++		goto free_contents;
++
++	config =3D l_new(struct dpp_configuration, 1);
++
++	if (pass)
++		config->passphrase =3D l_steal_ptr(pass);
++	else
++		config->psk =3D l_steal_ptr(psk);
++
++	memcpy(config->ssid, ssid, strlen(ssid));
++	config->ssid_len =3D strlen(ssid);
++
++	config->akm_suites =3D dpp_parse_akm(akm);
++	if (!config->akm_suites)
++		goto free_config;
++
++	json_contents_free(c);
++
++	return config;
++
++free_config:
++	dpp_configuration_free(config);
++free_contents:
++	json_contents_free(c);
++	return NULL;
++}
++
++void dpp_configuration_free(struct dpp_configuration *config)
++{
++	if (config->passphrase)
++		l_free(config->passphrase);
++
++	if (config->psk)
++		l_free(config->psk);
++
++	l_free(config);
++}
++
+ void dpp_attr_iter_init(struct dpp_attr_iter *iter, const uint8_t *pdu,
+ 			size_t len)
+ {
+diff --git a/src/dpp-util.h b/src/dpp-util.h
+index e7e73071..84404128 100644
+--- a/src/dpp-util.h
++++ b/src/dpp-util.h
+@@ -100,6 +100,18 @@ enum dpp_attribute_type {
+ 	DPP_ATTR_CONFIGURATOR_NONCE		=3D 0x1022,
+ };
+ =
 
-https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/iwd.config=
-.rst#n57
++struct dpp_configuration {
++	uint8_t ssid[32];
++	size_t ssid_len;
++	uint32_t akm_suites;
++	char *passphrase;
++	char *psk;		/* hex string */
++};
++
++struct dpp_configuration *dpp_parse_configuration_object(const char *json,
++							size_t json_len);
++void dpp_configuration_free(struct dpp_configuration *conf);
++
+ struct dpp_attr_iter {
+ 	const uint8_t *pos;
+ 	const uint8_t *end;
+-- =
 
-Note that for iwd + connman, connman would be the one performing DHCP and i=
-wd =
+2.31.1
 
-should use EnableNetworkConfiguration=3Dfalse.  Daniel can correct me if I'=
-m wrong.
-
-For DHCP debugging, refer to 'man iwd.debug'.  You will need to set the =
-
-appropriate environment variable (IWD_DHCP_DEBUG or so).  The iwd wiki [1] =
-has =
-
-examples.
-
-Regards,
--Denis
-
-[1] https://iwd.wiki.kernel.org/debugging
---===============3279835711674760839==--
+--===============8769319601114842092==--
 
