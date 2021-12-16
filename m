@@ -1,213 +1,415 @@
-Content-Type: multipart/mixed; boundary="===============1950774803217118371=="
+Content-Type: multipart/mixed; boundary="===============0136447774043556217=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 05/11] util: add 6GHz support to scan_freq_set* APIs
-Date: Fri, 25 Feb 2022 09:58:04 -0800
-Message-ID: <20220225175810.2914413-5-prestwoj@gmail.com>
-In-Reply-To: 20220225175810.2914413-1-prestwoj@gmail.com
+Subject: [PATCH v4 08/10] dpp: add support for configuration protocol
+Date: Thu, 16 Dec 2021 10:08:52 -0800
+Message-ID: <20211216180854.39470-8-prestwoj@gmail.com>
+In-Reply-To: 20211216180854.39470-1-prestwoj@gmail.com
 
---===============1950774803217118371==
+--===============0136447774043556217==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The 6GHz channels are stored and accessed identically to 5GHz,
-just using a separate uintset object.
+This is a minimal implementation only supporting legacy network
+configuration, i.e. only SSID and PSK/passphrase are supported.
+
+Missing features include:
+ - Fragmentation/comeback delay support
+ - DPP AKM support
+ - 8021x/PKEX support
 ---
- src/util.c | 53 +++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 39 insertions(+), 14 deletions(-)
+ src/dpp.c | 298 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 298 insertions(+)
 
-diff --git a/src/util.c b/src/util.c
-index 16df59ac..2832486d 100644
---- a/src/util.c
-+++ b/src/util.c
-@@ -314,6 +314,7 @@ bool util_ip_prefix_tohl(const char *ip, uint8_t *prefi=
-x_out,
- struct scan_freq_set {
- 	uint16_t channels_2ghz;
- 	struct l_uintset *channels_5ghz;
-+	struct l_uintset *channels_6ghz;
+diff --git a/src/dpp.c b/src/dpp.c
+index a8d2fabe..ffa5a60f 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -44,6 +44,8 @@
+ #include "src/crypto.h"
+ #include "src/mpdu.h"
+ #include "ell/useful.h"
++#include "src/common.h"
++#include "src/storage.h"
+ =
+
+ static uint32_t netdev_watch;
+ static struct l_genl_family *nl80211;
+@@ -53,6 +55,7 @@ enum dpp_state {
+ 	DPP_STATE_NOTHING,
+ 	DPP_STATE_PRESENCE,
+ 	DPP_STATE_AUTHENTICATING,
++	DPP_STATE_CONFIGURING,
  };
  =
 
- struct scan_freq_set *scan_freq_set_new(void)
-@@ -322,6 +323,7 @@ struct scan_freq_set *scan_freq_set_new(void)
+ struct dpp_sm {
+@@ -84,6 +87,7 @@ struct dpp_sm {
+ 	uint8_t auth_addr[6];
+ 	uint8_t r_nonce[32];
+ 	uint8_t i_nonce[32];
++	uint8_t e_nonce[32];
  =
 
- 	/* 802.11-2012, 8.4.2.10 hints that 200 is the largest channel number */
- 	ret->channels_5ghz =3D l_uintset_new_from_range(1, 200);
-+	ret->channels_6ghz =3D l_uintset_new_from_range(1, 233);
+ 	uint64_t ke[L_ECC_MAX_DIGITS];
+ 	uint64_t k2[L_ECC_MAX_DIGITS];
+@@ -92,6 +96,8 @@ struct dpp_sm {
+ 	struct l_ecc_point *proto_public;
  =
 
- 	return ret;
- }
-@@ -329,6 +331,7 @@ struct scan_freq_set *scan_freq_set_new(void)
- void scan_freq_set_free(struct scan_freq_set *freqs)
- {
- 	l_uintset_free(freqs->channels_5ghz);
-+	l_uintset_free(freqs->channels_6ghz);
- 	l_free(freqs);
- }
- =
-
-@@ -348,7 +351,7 @@ bool scan_freq_set_add(struct scan_freq_set *freqs, uin=
-t32_t freq)
- 	case BAND_FREQ_5_GHZ:
- 		return l_uintset_put(freqs->channels_5ghz, channel);
- 	case BAND_FREQ_6_GHZ:
--		return false;
-+		return l_uintset_put(freqs->channels_6ghz, channel);
- 	}
- =
-
- 	return false;
-@@ -369,7 +372,7 @@ bool scan_freq_set_contains(const struct scan_freq_set =
-*freqs, uint32_t freq)
- 	case BAND_FREQ_5_GHZ:
- 		return l_uintset_contains(freqs->channels_5ghz, channel);
- 	case BAND_FREQ_6_GHZ:
--		return false;
-+		return l_uintset_contains(freqs->channels_6ghz, channel);
- 	}
- =
-
- 	return false;
-@@ -388,10 +391,15 @@ uint32_t scan_freq_set_get_bands(struct scan_freq_set=
- *freqs)
- 	if (l_uintset_find_min(freqs->channels_5ghz) <=3D max)
- 		bands |=3D BAND_FREQ_5_GHZ;
- =
-
-+	max =3D l_uintset_get_max(freqs->channels_6ghz);
+ 	struct l_ecc_point *i_proto_public;
 +
-+	if (l_uintset_find_min(freqs->channels_6ghz) <=3D max)
-+		bands |=3D BAND_FREQ_6_GHZ;
-+
- 	return bands;
- }
- =
-
--static void scan_channels_5ghz_add(uint32_t channel, void *user_data)
-+static void scan_channels_add(uint32_t channel, void *user_data)
- {
- 	struct l_uintset *to =3D user_data;
- =
-
-@@ -403,37 +411,41 @@ void scan_freq_set_merge(struct scan_freq_set *to,
- {
- 	to->channels_2ghz |=3D from->channels_2ghz;
- =
-
--	l_uintset_foreach(from->channels_5ghz, scan_channels_5ghz_add,
-+	l_uintset_foreach(from->channels_5ghz, scan_channels_add,
- 							to->channels_5ghz);
-+	l_uintset_foreach(from->channels_6ghz, scan_channels_add,
-+							to->channels_6ghz);
- }
- =
-
- bool scan_freq_set_isempty(const struct scan_freq_set *set)
- {
--	if (set->channels_2ghz =3D=3D 0 && l_uintset_isempty(set->channels_5ghz))
-+	if (set->channels_2ghz =3D=3D 0 && l_uintset_isempty(set->channels_5ghz) =
-&&
-+					l_uintset_isempty(set->channels_6ghz))
- 		return true;
- =
-
- 	return false;
- }
- =
-
--struct channels_5ghz_foreach_data {
-+struct channels_foreach_data {
- 	scan_freq_set_func_t func;
-+	enum band_freq band;
- 	void *user_data;
++	uint8_t diag_token;
  };
  =
 
--static void scan_channels_5ghz_frequency(uint32_t channel, void *user_data)
-+static void scan_channels_foreach(uint32_t channel, void *user_data)
- {
--	const struct channels_5ghz_foreach_data *channels_5ghz_data =3D user_data;
-+	const struct channels_foreach_data *channels_data =3D user_data;
- 	uint32_t freq;
+ static void dpp_free_auth_data(struct dpp_sm *dpp)
+@@ -248,6 +254,13 @@ static size_t dpp_append_wrapped_data(uint8_t *hdr, ui=
+nt8_t *wrap_start,
+ 		ad_size++;
+ 	}
  =
 
--	freq =3D band_channel_to_freq(channel, BAND_FREQ_5_GHZ);
-+	freq =3D band_channel_to_freq(channel, channels_data->band);
++	/* The configuration result requires this zero-length data component */
++	if (hdr && hdr[5] =3D=3D DPP_FRAME_CONFIGURATION_RESULT) {
++		ad[ad_size].iov_base =3D NULL;
++		ad[ad_size].iov_len =3D 0;
++		ad_size++;
++	}
++
+ 	va_start(va, num_attrs);
  =
 
--	channels_5ghz_data->func(freq, channels_5ghz_data->user_data);
-+	channels_data->func(freq, channels_data->user_data);
+ 	/* Count up total attributes length */
+@@ -328,6 +341,284 @@ static size_t dpp_build_header(const uint8_t *src, co=
+nst uint8_t *dest,
+ 	return ptr - buf;
  }
  =
 
- void scan_freq_set_foreach(const struct scan_freq_set *freqs,
- 				scan_freq_set_func_t func, void *user_data)
- {
--	struct channels_5ghz_foreach_data data =3D { };
-+	struct channels_foreach_data data =3D { };
- 	uint8_t channel;
- 	uint32_t freq;
- =
-
-@@ -441,10 +453,14 @@ void scan_freq_set_foreach(const struct scan_freq_set=
- *freqs,
- 		return;
- =
-
- 	data.func =3D func;
-+	data.band =3D BAND_FREQ_5_GHZ;
- 	data.user_data =3D user_data;
- =
-
--	l_uintset_foreach(freqs->channels_5ghz, scan_channels_5ghz_frequency,
--									&data);
-+	l_uintset_foreach(freqs->channels_5ghz, scan_channels_foreach, &data);
++static size_t dpp_build_config_header(const uint8_t *src, const uint8_t *d=
+est,
++					uint8_t diag_token,
++					uint8_t buf[static 37])
++{
++	uint8_t *ptr =3D buf + 24;
 +
-+	data.band =3D BAND_FREQ_6_GHZ;
++	memset(buf, 0, 37);
 +
-+	l_uintset_foreach(freqs->channels_6ghz, scan_channels_foreach, &data);
- =
-
- 	if (!freqs->channels_2ghz)
- 		return;
-@@ -472,6 +488,14 @@ void scan_freq_set_constrain(struct scan_freq_set *set,
- 	l_uintset_free(set->channels_5ghz);
- 	set->channels_5ghz =3D intersection;
- =
-
-+	intersection =3D l_uintset_intersect(constraint->channels_6ghz,
-+							set->channels_6ghz);
-+	if (!intersection)
++	l_put_le16(0x00d0, buf);
++	memcpy(buf + 4, dest, 6);
++	memcpy(buf + 10, src, 6);
++	memcpy(buf + 16, broadcast, 6);
++
++	*ptr++ =3D 0x04; /* Public */
++	*ptr++ =3D 0x0a; /* Action */
++	*ptr++ =3D diag_token;
++
++	*ptr++ =3D IE_TYPE_ADVERTISEMENT_PROTOCOL;
++	*ptr++ =3D 8; /* len */
++	*ptr++ =3D 0x00;
++	*ptr++ =3D IE_TYPE_VENDOR_SPECIFIC;
++	*ptr++ =3D 5;
++	memcpy(ptr, wifi_alliance_oui, 3);
++	ptr +=3D 3;
++	*ptr++ =3D 0x1a;
++	*ptr++ =3D 1;
++
++	return ptr - buf;
++}
++
++static void dpp_configuration_start(struct dpp_sm *dpp, const uint8_t *add=
+r)
++{
++	const char *json =3D "{\"name\":\"IWD\",\"wi-fi_tech\":\"infra\","
++				"\"netRole\":\"sta\"}";
++	struct iovec iov[3];
++	uint8_t hdr[37];
++	uint8_t attrs[512];
++	size_t json_len =3D strlen(json);
++	uint8_t *ptr =3D attrs;
++
++	l_getrandom(&dpp->diag_token, 1);
++
++	iov[0].iov_len =3D dpp_build_config_header(
++					netdev_get_address(dpp->netdev),
++					addr, dpp->diag_token, hdr);
++	iov[0].iov_base =3D hdr;
++
++	l_getrandom(dpp->e_nonce, dpp->nonce_len);
++
++	/* length */
++	ptr +=3D 2;
++
++	ptr +=3D dpp_append_wrapped_data(NULL, NULL, ptr, sizeof(attrs),
++			dpp->ke, dpp->key_len, 2,
++			DPP_ATTR_ENROLLEE_NONCE, dpp->nonce_len, dpp->e_nonce,
++			DPP_ATTR_CONFIGURATION_REQUEST, json_len, json);
++
++	l_put_le16(ptr - attrs - 2, attrs);
++
++	iov[1].iov_base =3D attrs;
++	iov[1].iov_len =3D ptr - attrs;
++
++	dpp->state =3D DPP_STATE_CONFIGURING;
++
++	dpp_send_frame(dpp->wdev_id, iov, 2, dpp->current_freq);
++}
++
++static void send_config_result(struct dpp_sm *dpp, const uint8_t *to)
++{
++	uint8_t hdr[32];
++	struct iovec iov[2];
++	uint8_t attrs[256];
++	uint8_t *ptr =3D attrs;
++	uint8_t zero =3D 0;
++
++	iov[0].iov_len =3D dpp_build_header(netdev_get_address(dpp->netdev), to,
++					DPP_FRAME_CONFIGURATION_RESULT, hdr);
++	iov[0].iov_base =3D hdr;
++
++	ptr +=3D dpp_append_wrapped_data(hdr + 26, NULL, ptr, sizeof(attrs),
++			dpp->ke, dpp->key_len, 2,
++			DPP_ATTR_STATUS, 1, &zero,
++			DPP_ATTR_ENROLLEE_NONCE, dpp->nonce_len, dpp->e_nonce);
++
++	iov[1].iov_base =3D attrs;
++	iov[1].iov_len =3D ptr - attrs;
++
++	dpp_send_frame(dpp->wdev_id, iov, 2, dpp->current_freq);
++}
++
++static void dpp_write_config(struct dpp_configuration *config)
++{
++	_auto_(l_free) char *ssid =3D l_malloc(config->ssid_len + 1);
++	_auto_(l_settings_free) struct l_settings *settings =3D l_settings_new();
++	_auto_(l_free) char *path;
++
++	memcpy(ssid, config->ssid, config->ssid_len);
++	ssid[config->ssid_len] =3D '\0';
++
++	path =3D storage_get_network_file_path(SECURITY_PSK, ssid);
++
++	if (l_settings_load_from_file(settings, path)) {
++		/* Remove any existing Security keys */
++		l_settings_remove_group(settings, "Security");
++	}
++
++	if (config->passphrase)
++		l_settings_set_string(settings, "Security", "Passphrase",
++				config->passphrase);
++	else if (config->psk)
++		l_settings_set_string(settings, "Security", "PreSharedKey",
++				config->psk);
++
++	l_debug("Storing credential for '%s(%s)'", ssid,
++						security_to_str(SECURITY_PSK));
++	storage_network_sync(SECURITY_PSK, ssid, settings);
++}
++
++static void dpp_handle_config_response_frame(const struct mmpdu_header *fr=
+ame,
++				const void *body, size_t body_len,
++				int rssi, void *user_data)
++{
++	struct dpp_sm *dpp =3D user_data;
++	const uint8_t *ptr =3D body;
++	uint16_t status;
++	uint16_t fragmented; /* Fragmented/Comeback delay field */
++	uint8_t adv_protocol_element[] =3D { 0x6C, 0x08, 0x7F };
++	uint8_t adv_protocol_id[] =3D { 0xDD, 0x05, 0x50, 0x6F,
++					0x9A, 0x1A, 0x01 };
++	uint16_t query_len;
++	struct dpp_attr_iter iter;
++	enum dpp_attribute_type type;
++	size_t len;
++	const uint8_t *data;
++	const char *json =3D NULL;
++	size_t json_len =3D 0;
++	int dstatus =3D -1;
++	const uint8_t *wrapped =3D NULL;
++	const uint8_t *e_nonce =3D NULL;
++	size_t wrapped_len =3D 0;
++	_auto_(l_free) uint8_t *unwrapped =3D NULL;
++	struct dpp_configuration *config;
++	uint8_t ad0[] =3D { 0x00, 0x10, 0x01, 0x00, 0x05 };
++	struct iovec ad =3D {
++		.iov_base =3D ad0,
++		.iov_len =3D 5
++	};
++
++	if (dpp->state !=3D DPP_STATE_CONFIGURING)
 +		return;
 +
-+	l_uintset_free(set->channels_6ghz);
-+	set->channels_6ghz =3D intersection;
++	ptr +=3D 2;
 +
- 	set->channels_2ghz &=3D constraint->channels_2ghz;
++	/*
++	 * Can a configuration request come from someone other than who you
++	 * authenticated to?
++	 */
++	if (memcmp(dpp->auth_addr, frame->address_2, 6))
++		return;
++
++	if (*ptr++ !=3D dpp->diag_token)
++		return;
++
++	status =3D l_get_le16(ptr);
++	ptr +=3D 2;
++
++	if (status !=3D 0) {
++		l_debug("Bad configuration status %u", status);
++		return;
++	}
++
++	fragmented =3D l_get_le16(ptr);
++	ptr +=3D 2;
++
++	/*
++	 * TODO: handle 0x0001 (fragmented), as well as comeback delay.
++	 */
++	if (fragmented !=3D 0) {
++		l_debug("Fragmented messages not currently supported");
++		return;
++	}
++
++	if (memcmp(ptr, adv_protocol_element, sizeof(adv_protocol_element))) {
++		l_debug("Invalid Advertisement protocol element");
++		return;
++	}
++
++	ptr +=3D sizeof(adv_protocol_element);
++
++	if (memcmp(ptr, adv_protocol_id, sizeof(adv_protocol_id))) {
++		l_debug("Invalid Advertisement protocol ID");
++		return;
++	}
++
++	ptr +=3D sizeof(adv_protocol_id);
++
++	query_len =3D l_get_le16(ptr);
++	ptr +=3D 2;
++
++	dpp_attr_iter_init(&iter, ptr, query_len);
++
++	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
++		switch (type) {
++		case DPP_ATTR_STATUS:
++			dstatus =3D l_get_u8(data);
++			break;
++		case DPP_ATTR_WRAPPED_DATA:
++			wrapped =3D data;
++			wrapped_len =3D len;
++			break;
++		default:
++			/*
++			 * TODO: CSR Attribute
++			 */
++			break;
++		}
++	}
++
++	if (dstatus !=3D DPP_STATUS_OK || !wrapped) {
++		l_debug("Bad status or missing attributes");
++		return;
++	}
++
++	unwrapped =3D l_malloc(wrapped_len - 16);
++
++	aes_siv_decrypt(dpp->ke, dpp->key_len, wrapped, wrapped_len, &ad,
++				1, unwrapped);
++
++	wrapped_len -=3D 16;
++
++	dpp_attr_iter_init(&iter, unwrapped, wrapped_len);
++
++	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
++		switch (type) {
++		case DPP_ATTR_ENROLLEE_NONCE:
++			if (len !=3D dpp->nonce_len)
++				break;
++
++			if (memcmp(data, dpp->e_nonce, dpp->nonce_len))
++				break;
++
++			e_nonce =3D data;
++			break;
++		case DPP_ATTR_CONFIGURATION_OBJECT:
++			json =3D (const char *)data;
++			json_len =3D len;
++			break;
++		default:
++			break;
++		}
++	}
++
++	if (!json || !e_nonce) {
++		l_debug("No configuration object in response");
++		return;
++	}
++
++	config =3D dpp_parse_configuration_object(json, json_len);
++	if (!config) {
++		l_error("Configuration object did not parse");
++		return;
++	}
++
++	dpp_write_config(config);
++	/*
++	 * TODO: Depending on the info included in the configuration object a
++	 * limited scan could be issued to get autoconnect to trigger faster.
++	 * In addition this network may already be in past scan results and
++	 * could be joined immediately.
++	 *
++	 * For now just wait for autoconnect.
++	 */
++
++	dpp_configuration_free(config);
++
++	send_config_result(dpp, dpp->auth_addr);
++}
++
+ static void send_authenticate_response(struct dpp_sm *dpp, void *r_auth)
+ {
+ 	uint8_t hdr[32];
+@@ -500,6 +791,8 @@ static void authenticate_confirm(struct dpp_sm *dpp, co=
+nst uint8_t *from,
+ =
+
+ 	l_debug("Authentication successful");
+ =
+
++	dpp_configuration_start(dpp, from);
++
+ 	return;
+ =
+
+ auth_confirm_failed:
+@@ -783,6 +1076,7 @@ static void dpp_create(struct netdev *netdev)
+ 	struct l_dbus *dbus =3D dbus_get_bus();
+ 	struct dpp_sm *dpp =3D l_new(struct dpp_sm, 1);
+ 	uint8_t dpp_prefix[] =3D { 0x04, 0x09, 0x50, 0x6f, 0x9a, 0x1a, 0x01 };
++	uint8_t dpp_conf_response_prefix[] =3D { 0x04, 0x0b };
+ =
+
+ 	dpp->netdev =3D netdev;
+ 	dpp->state =3D DPP_STATE_NOTHING;
+@@ -805,6 +1099,10 @@ static void dpp_create(struct netdev *netdev)
+ 	frame_watch_add(netdev_get_wdev_id(netdev), 0, 0x00d0, dpp_prefix,
+ 				sizeof(dpp_prefix), dpp_handle_auth_frame,
+ 				dpp, NULL);
++	frame_watch_add(netdev_get_wdev_id(netdev), 0, 0x00d0,
++				dpp_conf_response_prefix,
++				sizeof(dpp_conf_response_prefix),
++				dpp_handle_config_response_frame, dpp, NULL);
  }
  =
 
-@@ -491,7 +515,8 @@ uint32_t *scan_freq_set_to_fixed_array(const struct sca=
-n_freq_set *set,
- 	uint32_t *freqs;
- =
-
- 	count =3D __builtin_popcount(set->channels_2ghz) +
--				l_uintset_size(set->channels_5ghz);
-+				l_uintset_size(set->channels_5ghz) +
-+				l_uintset_size(set->channels_6ghz);
- =
-
- 	if (!count)
- 		return NULL;
+ static void dpp_netdev_watch(struct netdev *netdev,
 -- =
 
-2.34.1
+2.31.1
 
---===============1950774803217118371==--
+--===============0136447774043556217==--
 
