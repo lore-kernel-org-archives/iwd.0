@@ -1,30 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============8085947219343223105=="
+Content-Type: multipart/mixed; boundary="===============3824278185652442978=="
 MIME-Version: 1.0
-From: 1148d778-20a8-4ab0-96b7-24572ddab965 at simplelogin.co
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd fails to create device
-Date: Tue, 31 May 2022 18:39:51 +0000
-Message-ID: <20220531183951.2010.25659@ml01.vlan13.01.org>
-In-Reply-To: fcf4e3fa19e68156e95e379fafe59a0929c32a76.camel@gmail.com
+Subject: Re: [PATCH v4 10/10] doc: document DPP interface
+Date: Thu, 16 Dec 2021 14:19:29 -0600
+Message-ID: <d16adb63-bba6-a0b6-82ad-4876be9f7d2a@gmail.com>
+In-Reply-To: 20211216180854.39470-10-prestwoj@gmail.com
 
---===============8085947219343223105==
+--===============3824278185652442978==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> It would be great if you could get some iwmon logs when this happens.
-> Hopefully it happens frequent enough you can get a capture. More info
-> about how to do that can be found here:
+Hi James,
+
+On 12/16/21 12:08, James Prestwood wrote:
+> ---
+>   doc/device-provisioning.txt | 25 +++++++++++++++++++++++++
+>   1 file changed, 25 insertions(+)
+>   create mode 100644 doc/device-provisioning.txt
 > =
 
-> https://iwd.wiki.kernel.org/debugging
 
-Sure, but it doesn't happen very frequently. I'm not sure about how to appr=
-oach debugging for this, should I try to restart iwd when it happens? Maybe=
- doing this the issue is not triggered. Having iwmon logging all time seems=
- a bit too much, no?
+Applied, thanks.
 
-I could try to reproduce it somehow because it's mostly after a reboot when=
- it happens.
---===============8085947219343223105==--
+Regards,
+-Denis
+
+--===============3824278185652442978==--
 
