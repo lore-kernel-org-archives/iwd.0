@@ -1,115 +1,88 @@
-Content-Type: multipart/mixed; boundary="===============9000455683825928821=="
+Content-Type: multipart/mixed; boundary="===============4911967340798864773=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 3/4] auto-t: allow testAP to benefit from re-scanning
-Date: Tue, 02 Nov 2021 12:57:51 -0700
-Message-ID: <20211102195752.381604-3-prestwoj@gmail.com>
-In-Reply-To: 20211102195752.381604-1-prestwoj@gmail.com
+Subject: Re: [PATCH v4 07/10] dpp-util: add dpp_parse_configuration_object
+Date: Thu, 16 Dec 2021 14:36:19 -0600
+Message-ID: <2c079caf-7519-7589-6947-55fc223ae0f7@gmail.com>
+In-Reply-To: 20211216180854.39470-7-prestwoj@gmail.com
 
---===============9000455683825928821==
+--===============4911967340798864773==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If a beacon is lost testAP will fail since it did not utilize any
-rescanning logic. Now it can use this feature by passing full_scan.
-This is required since IWD APs are not known to test-runner like
-hostapd APs are.
----
- autotests/testAP/connection_test.py  | 5 +++--
- autotests/testAP/dhcp_config_test.py | 4 ++--
- autotests/testAP/dhcp_test.py        | 4 ++--
- autotests/testAP/failure_test.py     | 6 ++++--
- 4 files changed, 11 insertions(+), 8 deletions(-)
+Hi James,
 
-diff --git a/autotests/testAP/connection_test.py b/autotests/testAP/connect=
-ion_test.py
-index 1bba5f35..4c784014 100644
---- a/autotests/testAP/connection_test.py
-+++ b/autotests/testAP/connection_test.py
-@@ -55,9 +55,10 @@ class Test(unittest.TestCase):
-             condition =3D 'not obj.scanning'
-             wd.wait_for_object_condition(dev2, condition)
- =
+On 12/16/21 12:08, James Prestwood wrote:
+> This parses the configuration JSON object from the configuration
+> response. Only a minimal configuration object is supported for
+> now.
+> ---
+>   Makefile.am    |   3 +-
+>   src/dpp-util.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++++
+>   src/dpp-util.h |  12 ++++++
+>   3 files changed, 124 insertions(+), 1 deletion(-)
+> =
 
--            ordered_networks =3D dev2.get_ordered_networks()
-+            networks =3D {}
-+            networks['TestAP1'] =3D dev2.get_ordered_network('TestAP1')
-+            networks['TestAP2'] =3D dev2.get_ordered_network('TestAP2', fu=
-ll_scan=3DTrue)
- =
 
--            networks =3D { n.name: n for n in ordered_networks }
-             self.assertEqual(networks['TestAP1'].type, NetworkType.psk)
-             self.assertEqual(networks['TestAP2'].type, NetworkType.psk)
- =
+<snip>
 
-diff --git a/autotests/testAP/dhcp_config_test.py b/autotests/testAP/dhcp_c=
-onfig_test.py
-index 975cab4d..afea5415 100644
---- a/autotests/testAP/dhcp_config_test.py
-+++ b/autotests/testAP/dhcp_config_test.py
-@@ -37,9 +37,9 @@ class Test(unittest.TestCase):
-             condition =3D 'not obj.scanning'
-             wd.wait_for_object_condition(dev2, condition)
- =
+> +/*
+> + * TODO: This handles the most basic configuration. i.e. a configuration=
+ object
+> + * with ssid/passphrase/akm.
+> + */
+> +struct dpp_configuration *dpp_parse_configuration_object(const char *jso=
+n,
+> +							size_t json_len)
+> +{
+> +	struct dpp_configuration *config;
+> +	struct json_contents *c;
+> +	struct json_iter iter;
+> +	struct json_iter discovery;
+> +	struct json_iter cred;
+> +	_auto_(l_free)char *tech =3D NULL;
+> +	_auto_(l_free)char *ssid =3D NULL;
+> +	_auto_(l_free)char *akm =3D NULL;
+> +	_auto_(l_free)char *pass =3D NULL;
+> +	_auto_(l_free)char *psk =3D NULL;
 
--            ordered_networks =3D dev2.get_ordered_networks()
-+            networks =3D {}
-+            networks['APConfig'] =3D dev2.get_ordered_network('APConfig', =
-full_scan=3DTrue)
- =
+nit: I changed these to have a space after l_free) and char *
 
--            networks =3D { n.name: n for n in ordered_networks }
-             self.assertEqual(networks['APConfig'].type, NetworkType.psk)
- =
+> +
+> +	c =3D json_contents_new(json, json_len);
+> +	if (!c)
+> +		return NULL;
+> +
+> +	json_iter_init(&iter, c);
+> +
+> +	if (!json_iter_parse(&iter,
+> +			JSON_MANDATORY("wi-fi_tech", JSON_STRING, &tech),
+> +			JSON_MANDATORY("discovery", JSON_OBJECT, &discovery),
+> +			JSON_MANDATORY("cred", JSON_OBJECT, &cred),
+> +			JSON_UNDEFINED))
+> +		goto free_contents;
+> +
+> +	if (!tech || strncmp(tech, "infra", 5))
+> +		goto free_contents;
+> +
+> +
 
-             psk_agent =3D PSKAgent('password123')
-diff --git a/autotests/testAP/dhcp_test.py b/autotests/testAP/dhcp_test.py
-index e69c4465..0118b17d 100644
---- a/autotests/testAP/dhcp_test.py
-+++ b/autotests/testAP/dhcp_test.py
-@@ -34,9 +34,9 @@ class Test(unittest.TestCase):
-             condition =3D 'not obj.scanning'
-             wd.wait_for_object_condition(dev2, condition)
- =
+Got rid of this double empty line.
 
--            ordered_networks =3D dev2.get_ordered_networks()
-+            networks =3D {}
-+            networks['TestAP2'] =3D dev2.get_ordered_network('TestAP2', fu=
-ll_scan=3DTrue)
- =
+> +	if (!json_iter_parse(&discovery,
+> +			JSON_MANDATORY("ssid", JSON_STRING, &ssid),
+> +			JSON_UNDEFINED))
+> +		goto free_contents;
+> +
+> +	if (!ssid || !util_ssid_is_utf8(strlen(ssid),(const uint8_t *)ssid))
 
--            networks =3D { n.name: n for n in ordered_networks }
-             self.assertEqual(networks['TestAP2'].type, NetworkType.psk)
- =
+And added a few spaces here for coding style reasons.
 
-             psk_agent =3D PSKAgent('Password2')
-diff --git a/autotests/testAP/failure_test.py b/autotests/testAP/failure_te=
-st.py
-index fc5cb6a7..05b5a7fb 100644
---- a/autotests/testAP/failure_test.py
-+++ b/autotests/testAP/failure_test.py
-@@ -56,8 +56,10 @@ class Test(unittest.TestCase):
-             condition =3D 'not obj.scanning'
-             wd.wait_for_object_condition(dev2, condition)
- =
+Applied, thanks.
 
--            ordered_networks =3D dev2.get_ordered_networks()
--            networks =3D { n.name: n for n in ordered_networks }
-+            networks =3D {}
-+            networks['TestAP1'] =3D dev2.get_ordered_network('TestAP1')
-+            networks['TestAP2'] =3D dev2.get_ordered_network('TestAP2', fu=
-ll_scan=3DTrue)
-+
-             self.assertEqual(networks['TestAP1'].type, NetworkType.psk)
-             self.assertEqual(networks['TestAP2'].type, NetworkType.psk)
- =
-
--- =
-
-2.31.1
-
---===============9000455683825928821==--
+Regards,
+-Denis
+--===============4911967340798864773==--
 
