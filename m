@@ -1,44 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============0678789725352274646=="
+Content-Type: multipart/mixed; boundary="===============4841401098648779449=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2] auto-t: allow skipping tests is wpa_supplicant is not
- found
-Date: Thu, 02 Jun 2022 16:47:45 -0500
-Message-ID: <6e15bff1-e59e-82ad-908f-26760f67f7d3@gmail.com>
-In-Reply-To: 20220602184955.71055-1-prestwoj@gmail.com
+Subject: [PATCH v4 02/10] dbus: add DPP interface
+Date: Thu, 16 Dec 2021 10:08:46 -0800
+Message-ID: <20211216180854.39470-2-prestwoj@gmail.com>
+In-Reply-To: 20211216180854.39470-1-prestwoj@gmail.com
 
---===============0678789725352274646==
+--===============4841401098648779449==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ src/dbus.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 6/2/22 13:49, James Prestwood wrote:
-> Similarly to ofono/phonesim allow tests to be skipped if wpa_supplicant
-> is not found on the system.
-> =
+diff --git a/src/dbus.h b/src/dbus.h
+index 7703b37f..bbc76608 100644
+--- a/src/dbus.h
++++ b/src/dbus.h
+@@ -43,6 +43,7 @@
+ #define IWD_STATION_DIAGNOSTIC_INTERFACE "net.connman.iwd.StationDiagnosti=
+c"
+ #define IWD_AP_DIAGNOSTIC_INTERFACE "net.connman.iwd.AccessPointDiagnostic"
+ #define IWD_STATION_DEBUG_INTERFACE "net.connman.iwd.StationDebug"
++#define IWD_DPP_INTERFACE "net.connman.iwd.DeviceProvisioning"
+ =
 
-> This required some changes to DPP/P2P where Wpas() should be called first
-> since this can now throw a SkipTest exception.
-> =
+ #define IWD_BASE_PATH "/net/connman/iwd"
+ #define IWD_AGENT_MANAGER_PATH IWD_BASE_PATH
+-- =
 
-> The Wpas class was also made to allow __del__ to be called without
-> throwing additional exceptions in case wpa_supplicant was not found.
-> ---
->   autotests/testDPP/connection_test.py |  3 +--
->   autotests/testP2P/connection_test.py |  2 +-
->   autotests/util/wpas.py               | 13 +++++++++++--
->   tools/run-tests                      |  5 ++++-
->   4 files changed, 17 insertions(+), 6 deletions(-)
-> =
+2.31.1
 
-
-Applied, thanks.
-
-Regards,
--Denis
-
---===============0678789725352274646==--
+--===============4841401098648779449==--
 
