@@ -1,81 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============1264323869385107906=="
+Content-Type: multipart/mixed; boundary="===============3727047638857721481=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 5/5] test-runner: fix --help and unknown options
-Date: Tue, 05 Apr 2022 11:30:11 -0700
-Message-ID: <20220405183011.856403-5-prestwoj@gmail.com>
-In-Reply-To: 20220405183011.856403-1-prestwoj@gmail.com
+Subject: Re: [PATCH v5 4/4] dpp: handle protocol errors in ROC timeout
+Date: Fri, 17 Dec 2021 14:23:41 -0600
+Message-ID: <270a6675-b6d0-172f-efac-fabbb920c55e@gmail.com>
+In-Reply-To: 20211217191451.179444-4-prestwoj@gmail.com
 
---===============1264323869385107906==
+--===============3727047638857721481==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If --help or unknown options were supplied to test-runner python
-would thrown a maximum recusion depth exception. This was due to
-the way ArgumentParser was subclassed.
+Hi James,
 
-To fix this call ArgumentParser.__init__() rather than using the
-super() method. And do this also for the RunnerCoreArgParse
-subclass as well. In addition the namespace argument was removed
-from parse_args since its not used, and instead supplied directly
-to the parents parse_args method.
----
- tools/runner.py | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+On 12/17/21 13:14, James Prestwood wrote:
+> This is a standing TODO of properly handling these timeouts but
+> for now just treat any ROC timeout as an error if authenticating
+> or configuring.
+> ---
+>   src/dpp.c | 36 +++++++++++++++++++++++++++++++++---
+>   1 file changed, 33 insertions(+), 3 deletions(-)
+> =
 
-diff --git a/tools/runner.py b/tools/runner.py
-index fc1cab44..0068c74f 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -92,7 +92,7 @@ class RunnerNamespace(Namespace):
- #
- class RunnerCoreArgParse(ArgumentParser):
- 	def __init__(self, *args, **kwargs):
--		super().__init__(self, *args, **kwargs)
-+		ArgumentParser.__init__(self, *args, **kwargs)
- =
+> diff --git a/src/dpp.c b/src/dpp.c
 
- 		self.add_argument('--start', '-s',
- 				help=3D'Custom init process in virtual environment',
-@@ -154,23 +154,23 @@ class RunnerCoreArgParse(ArgumentParser):
- 				dest=3D'valgrind')
- =
+<snip>
 
- 	# Overwrite to use a custom namespace class and parse from env
--	def parse_args(self, *args, namespace=3DRunnerNamespace()):
-+	def parse_args(self, *args):
- 		if len(sys.argv) > 1:
--			return super().parse_args(*args, namespace=3Dnamespace)
-+			return super().parse_args(*args, namespace=3DRunnerNamespace())
- =
+> @@ -1091,6 +1115,12 @@ static void dpp_presence_timeout(int error, void *=
+user_data)
+>   	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev=
+),
+>   			dpp->current_freq, dpp->dwell, dpp_roc_started,
+>   			dpp, dpp_presence_timeout);
+> +	return;
+> +
+> +protocol_failed:
+> +	dpp_reset(dpp);
+> +	dpp_free_auth_data(dpp);
 
- 		options =3D []
- 		for k, v in os.environ.items():
- 			options.append('--' + k)
- 			options.append(v)
- =
+Isn't dpp_reset already calling dpp_free_auth_data?
 
--		return self.parse_known_args(args=3Doptions, namespace=3Dnamespace)[0]
-+		return self.parse_known_args(args=3Doptions, namespace=3DRunnerNamespace=
-())[0]
- =
+> +	return;
+>   }
+>   =
 
- #
- # Arguments only needed outside the test environment
- #
- class RunnerArgParse(RunnerCoreArgParse):
- 	def __init__(self, *args, **kwargs):
--		super().__init__(*args, **kwargs)
-+		RunnerCoreArgParse.__init__(self, *args, **kwargs)
- =
+>   /*
+> =
 
- 		self.add_argument('--runner', '-r',
- 				metavar=3D'<runner type>',
--- =
 
-2.34.1
-
---===============1264323869385107906==--
+Regards,
+-Denis
+--===============3727047638857721481==--
 
