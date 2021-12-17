@@ -1,53 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============0312352733638730093=="
+Content-Type: multipart/mixed; boundary="===============8169410425459430545=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 2/3] station: check supported frequencies in neighbor report
-Date: Fri, 25 Feb 2022 14:03:37 -0800
-Message-ID: <20220225220338.2942516-2-prestwoj@gmail.com>
-In-Reply-To: 20220225220338.2942516-1-prestwoj@gmail.com
+Subject: [PATCH v5 4/4] dpp: handle protocol errors in ROC timeout
+Date: Fri, 17 Dec 2021 11:14:51 -0800
+Message-ID: <20211217191451.179444-4-prestwoj@gmail.com>
+In-Reply-To: 20211217191451.179444-1-prestwoj@gmail.com
 
---===============0312352733638730093==
+--===============8169410425459430545==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the report has an unsupported frequency don't add it to the list.
+This is a standing TODO of properly handling these timeouts but
+for now just treat any ROC timeout as an error if authenticating
+or configuring.
 ---
- src/station.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ src/dpp.c | 36 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index cd119ff1..dd924c00 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1715,6 +1715,8 @@ static void parse_neighbor_report(struct station *sta=
-tion,
- 	struct scan_freq_set *freq_set_md, *freq_set_no_md;
- 	uint32_t current_freq =3D 0;
- 	struct handshake_state *hs =3D netdev_get_handshake(station->netdev);
-+	const struct scan_freq_set *supported =3D
-+				wiphy_get_supported_freqs(station->wiphy);
+diff --git a/src/dpp.c b/src/dpp.c
+index cf322e7d..f86ea6bd 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -1070,10 +1070,34 @@ static void dpp_presence_timeout(int error, void *u=
+ser_data)
+ {
+ 	struct dpp_sm *dpp =3D user_data;
  =
 
- 	freq_set_md =3D scan_freq_set_new();
- 	freq_set_no_md =3D scan_freq_set_new();
-@@ -1751,6 +1753,10 @@ static void parse_neighbor_report(struct station *st=
-ation,
- 		if (!(band & wiphy_get_supported_bands(station->wiphy)))
- 			continue;
- =
-
-+		/* Skip if frequency is not supported */
-+		if (!scan_freq_set_contains(supported, freq))
-+			continue;
+-	if (dpp->state !=3D DPP_STATE_PRESENCE) {
+-		l_debug("DPP state changed, stopping presence announcements");
+-		dpp->freqs_idx =3D 0;
++	/*
++	 * If cancelled this is likely due to netdev going down or from Stop().
++	 * Otherwise there was some other problem which is probably not
++	 * recoverable.
++	 */
++	if (error =3D=3D -ECANCELED)
+ 		return;
++	else if (error < 0)
++		goto protocol_failed;
 +
- 		if (!memcmp(info.addr,
- 				station->connected_bss->addr, ETH_ALEN)) {
- 			/*
++	switch (dpp->state) {
++	case DPP_STATE_PRESENCE:
++		break;
++	case DPP_STATE_NOTHING:
++		/* Protocol already terminated */
++		return;
++	case DPP_STATE_AUTHENTICATING:
++	case DPP_STATE_CONFIGURING:
++		/*
++		 * TODO: If either the auth or config protocol is running we
++		 * need to stay on channel until the specified timeouts.
++		 * Unfortunately the kernel makes this very inconvenient since
++		 * there is no way to stay on channel indefinitely or any way
++		 * of knowing what duration the kernel/card actually chooses.
++		 *
++		 * For now just treat this as a failure.
++		 */
++		goto protocol_failed;
+ 	}
+ =
+
+ 	dpp->freqs_idx++;
+@@ -1091,6 +1115,12 @@ static void dpp_presence_timeout(int error, void *us=
+er_data)
+ 	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
+ 			dpp->current_freq, dpp->dwell, dpp_roc_started,
+ 			dpp, dpp_presence_timeout);
++	return;
++
++protocol_failed:
++	dpp_reset(dpp);
++	dpp_free_auth_data(dpp);
++	return;
+ }
+ =
+
+ /*
 -- =
 
-2.34.1
+2.31.1
 
---===============0312352733638730093==--
+--===============8169410425459430545==--
 
