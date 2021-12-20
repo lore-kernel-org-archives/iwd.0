@@ -1,123 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============7630650551944150524=="
+Content-Type: multipart/mixed; boundary="===============4349384085137539671=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd stuck 'connecting', out-of-order wiphy work queue?
-Date: Thu, 28 Apr 2022 11:28:12 -0500
-Message-ID: <413080da-4833-fcfd-f745-abbd618b5947@gmail.com>
-In-Reply-To: 20220427151322.nfxuelvtdwc73oah@bang-olufsen.dk
+Subject: [PATCH 1/9] dpp: use frame data directly in unwrap for config response
+Date: Mon, 20 Dec 2021 13:49:07 -0800
+Message-ID: <20211220214915.34093-1-prestwoj@gmail.com>
 
---===============7630650551944150524==
+--===============4349384085137539671==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Alvin,
+Rather than hard coding ad0, use the actual frame data. There really
+isn't a reason this would differ (only status attribute) but just
+in case its better to use the frame data directly.
+---
+ src/dpp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-On 4/27/22 10:13, Alvin =C5=A0ipraga wrote:
-> Hi,
-> =
+diff --git a/src/dpp.c b/src/dpp.c
+index 5e125265..69dbeb1e 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -391,7 +391,6 @@ static void dpp_handle_config_response_frame(const stru=
+ct mmpdu_header *frame,
+ 	size_t wrapped_len =3D 0;
+ 	_auto_(l_free) uint8_t *unwrapped =3D NULL;
+ 	struct dpp_configuration *config;
+-	uint8_t ad0[] =3D { 0x00, 0x10, 0x01, 0x00, 0x05 };
+ =
 
+ 	if (dpp->state !=3D DPP_STATE_CONFIGURING)
+ 		return;
+@@ -474,7 +473,7 @@ static void dpp_handle_config_response_frame(const stru=
+ct mmpdu_header *frame,
+ 		return;
+ 	}
+ =
 
-This somehow went into spam?  Not sure why.  Gmail is doing very strange th=
-ings =
+-	unwrapped =3D dpp_unwrap_attr(ad0, sizeof(ad0), NULL, 0, dpp->ke,
++	unwrapped =3D dpp_unwrap_attr(ptr, wrapped - ptr - 4, NULL, 0, dpp->ke,
+ 					dpp->key_len, wrapped, wrapped_len,
+ 					&wrapped_len);
+ 	if (!unwrapped) {
+-- =
 
-lately.
+2.31.1
 
-> While running some automated tests for our product, I managed to make iwd=
- get
-> stuck in 'connecting' state. I haven't cracked open gdb just yet, but I w=
-ould
-> like to report my findings here in case somebody can give me some pointer=
-s as I
-> continue looking into it tomorrow.
-> =
-
-> The automated test essentially does some scans and requests iwd to connec=
-t to a
-> particular network. The network is not known, as iwd's saved data is eras=
-ed at
-> the start of the test sequence. I invoke instances of iwctl to run the sc=
-ans and
-> request the connection.
-> =
-
-
-Fun stuff, have you looked at our auto-test framework? :)  There is now sup=
-port =
-
-for User-Mode-Linux (UML) so tests run really fast.
-
-> The bug: sometimes the connect request will get stuck and iwd will stay in
-> 'connecting' state until I issue a disconnect.
-> =
-
-> Looking closely at the logs, and also with iwmon, I noticed that no conne=
-ct
-> command is actually sent over netlink to the kernel. So iwd is getting st=
-uck
-> before then.
-> =
-
-> Moreover, it seems like it might be getting stuck because the wiphy work =
-queue
-> goes out-of-order somehow? Check this snippet from the logs:
->
-
-Yes, the work queue has a concept of priority.  So things like connect is =
-
-prioritized over scans.  Periodic scans are lowest priority.
-
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() Starting work item 1
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_done() Work item 1 done
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 2
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() Starting work item 2
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 3
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_done() Work item 2 done
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() Starting work item 3
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 4
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 5
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_done() Work item 3 done
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() Starting work item 5 <---=
- 5 is started...
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_done() Work item 4 done     <---=
- 4 is done?!
-> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 6
-> =
-
-
-Hence why you're seeing this.  What happens is that you have a scan that wa=
-s =
-
-triggered over dbus using iwctl.  The fun part about this scan is that we b=
-reak =
-
-it up into several scans each operating on a subset of the supported =
-
-frequencies.  We run I think 2 out of 3 scans at which point the 'periodic =
-scan' =
-
-is also triggered.  Since the 'dbus scan' is higher priority, it is started =
-
-prior to the 'periodic scan'.  Somehow the logic gets confused here.
-
-> A brief look at the code and I can't really understand how work item 4 co=
-uld be
-> done when it was never started. Moreover, work item 5 gets started, but i=
-s never
-> done. Meanwhile, work item 6 (which I suspect to be the connect command) =
-never
-> starts.
-> =
-
-> I've attached the logs, so any hints are very welcome. This is with iwd v=
-1.26.
-> =
-
-
-Let me look at your suggested patch.
-
-Regards,
--Denis
---===============7630650551944150524==--
+--===============4349384085137539671==--
 
