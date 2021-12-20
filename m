@@ -1,32 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============6005994439176876303=="
+Content-Type: multipart/mixed; boundary="===============1549263640387053363=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] dpp: unregister interface on exit
-Date: Tue, 15 Feb 2022 15:19:44 -0600
-Message-ID: <ca6e1cad-b242-260a-7401-bf9073fec60c@gmail.com>
-In-Reply-To: 20220215211646.1328388-1-prestwoj@gmail.com
+Subject: [PATCH 8/9] client: add DPP interface
+Date: Mon, 20 Dec 2021 13:49:14 -0800
+Message-ID: <20211220214915.34093-8-prestwoj@gmail.com>
+In-Reply-To: 20211220214915.34093-1-prestwoj@gmail.com
 
---===============6005994439176876303==
+--===============1549263640387053363==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ client/dbus-proxy.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 2/15/22 15:16, James Prestwood wrote:
-> This fixes a cleanup issue where DPP tries to cleanup both on
-> dpp_exit() and when netdev goes down.
-> ---
->   src/dpp.c | 2 ++
->   1 file changed, 2 insertions(+)
-> =
+diff --git a/client/dbus-proxy.h b/client/dbus-proxy.h
+index 2a366d1b..1d6af5de 100644
+--- a/client/dbus-proxy.h
++++ b/client/dbus-proxy.h
+@@ -36,6 +36,7 @@ struct proxy_interface;
+ #define IWD_STATION_DIAGNOSTIC_INTERFACE "net.connman.iwd.StationDiagnosti=
+c"
+ #define IWD_AP_DIAGNOSTIC_INTERFACE      "net.connman.iwd.AccessPointDiagn=
+ostic"
+ #define IWD_DAEMON_INTERFACE             "net.connman.iwd.Daemon"
++#define IWD_DPP_INTERFACE                "net.connman.iwd.DeviceProvisioni=
+ng"
+ =
 
+ typedef bool (*proxy_property_match_func_t) (const void *a, const void *b);
+ =
 
-Applied, thanks.
+-- =
 
-Regards,
--Denis
+2.31.1
 
---===============6005994439176876303==--
+--===============1549263640387053363==--
 
