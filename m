@@ -1,38 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============8383438698885148404=="
+Content-Type: multipart/mixed; boundary="===============3373428843067347934=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] tools: change print to %zd for ssize_t
-Date: Thu, 24 Feb 2022 09:12:07 -0800
-Message-ID: <20220224171207.2780029-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v2 1/6] dpp: add timeout for auth/config protocols
+Date: Mon, 20 Dec 2021 18:16:15 -0600
+Message-ID: <3cee42e8-412e-5fd4-063a-c373b614591e@gmail.com>
+In-Reply-To: 20211221000747.56696-1-prestwoj@gmail.com
 
---===============8383438698885148404==
+--===============3373428843067347934==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-iwd-decrypt-profile was using %ld which isn't portable.
----
- tools/iwd-decrypt-profile.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi James,
 
-diff --git a/tools/iwd-decrypt-profile.c b/tools/iwd-decrypt-profile.c
-index e660c346..e71b56b4 100644
---- a/tools/iwd-decrypt-profile.c
-+++ b/tools/iwd-decrypt-profile.c
-@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
- 		close(fd);
- =
+On 12/20/21 18:07, James Prestwood wrote:
+> This also allows the card to re-issue ROC if it ends in the middle of
+> authenticating or configuring as well as add a maximum timeout for
+> auth/config protocols.
+> =
 
- 		if (len < 0) {
--			printf("Unable to write to %s (%ld)\n", outfile, len);
-+			printf("Unable to write to %s (%zd)\n", outfile, len);
- 			goto failed;
- 		}
- 	}
--- =
+> IO errors were also handled as these sometimes can happen with
+> certain drivers but are not fatal.
+> ---
+>   src/dpp.c | 48 ++++++++++++++++++++++++++++++++++++++----------
+>   1 file changed, 38 insertions(+), 10 deletions(-)
+> =
 
-2.34.1
+> v2:
+>   * Moved timeout cleanup into this patch
+> =
 
---===============8383438698885148404==--
+
+All applied, thanks.
+
+Regards,
+-Denis
+
+--===============3373428843067347934==--
 
