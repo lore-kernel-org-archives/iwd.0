@@ -1,64 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============2861840370198438749=="
+Content-Type: multipart/mixed; boundary="===============0494653930758622731=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Permanent disconnect when AP changes frequency
-Date: Fri, 04 Mar 2022 11:00:56 -0600
-Message-ID: <dbabf9fb-7fd0-56e8-a52d-0eee8cf86566@gmail.com>
-In-Reply-To: CACsRnHUCQkB5e3SG9kNCEWuggdfkKX1zLLayTFK3594ehduvZA@mail.gmail.com
+Subject: Re: Doesn't create global config file or its directory (/etc/iwd/)
+Date: Mon, 03 Jan 2022 14:34:32 -0600
+Message-ID: <376533bb-ed0b-fdc4-203d-5c62cab26132@gmail.com>
+In-Reply-To: 35676143.AJtQQQMBzY@bagend
 
---===============2861840370198438749==
+--===============0494653930758622731==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+Hi Diederik,
 
-On 3/4/22 09:44, Michael Johnson wrote:
-> Hi all,
-> =
+> The Debian maintainer informed me that there isn't such a config file in =
+the
+> upstream source code and I think it would be helpful if the directory wit=
+h the
+> correct permissions and the config file, which could f.e. only contain a
+> commented reference to the iwd.config man page, would be created OOTB.
 
-> I just hit a problem today where my iwd clients were getting
-> permanently disconnected from a network after the AP changed it's
-> frequency.
+I added a sample doc/main.conf in commit:
+04fccea63bd4 ("doc: Add sample main.conf file").  We used to have something =
 
-Can you elaborate?  Normally change in frequency is mostly transparent to u=
-ser =
+similar, but it was removed by commit:
+e915156be1c6 ("doc: Remove obsolete main.conf example file")
 
-space.  We should get an event from the driver/kernel telling us that this =
+The sample covers main.conf options that should be most relevant towards th=
+e use =
 
-happened, but overall it should not cause us to roam?
+case you describe.  If I missed some, we can add them as needed.  Let us kn=
+ow if =
 
-> The first time the client tries to FT roam to the changed AP it gets a
-
-Why is the roam being triggered?  This seems to be missing from your log.
-
-> result: 1 (authentication failed?). After that when it tries to
-> reconnect to another BSS in the same network but this time gets a
-> result: 2 (association failure?) and critically blacklists the BSS. It
-> tries to connect to all available BSS and gets the same error until
-
-Do you have an iwmon trace?
-
-> there are none left. This leaves the client permanently disconnected.
-> I'm guessing that changing the frequency wiped the auth from the AP
-> which explains why the initial FT roam fails but I'm not sure what
-> would be causing the subsequent failures.
-> =
-
-> Looking at `src/station.c:station_retry_with_status` would it make
-> sense to clean whatever auth data we have for FT if the status is an
-> AUTH failure?
-
-It is being wiped out anyway since we're no longer associated when the FT f=
-ails. =
-
-  Subsequent connections are being done the 'slow' way.  We'd need to see i=
-wmon =
-
-traces to understand why these associations fail.
+this is what the Debian package maintainer had in mind.
 
 Regards,
 -Denis
---===============2861840370198438749==--
+--===============0494653930758622731==--
 
