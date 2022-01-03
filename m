@@ -1,46 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============8450125639257892074=="
+Content-Type: multipart/mixed; boundary="===============4150433539489403545=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 5/6] offchannel: use work priorities rather than hard coding
-Date: Tue, 11 Jan 2022 09:45:13 -0800
-Message-ID: <20220111174514.1074967-5-prestwoj@gmail.com>
-In-Reply-To: 20220111174514.1074967-1-prestwoj@gmail.com
+Subject: Re: iwd doesn't work with openresolv
+Date: Mon, 03 Jan 2022 13:05:51 -0600
+Message-ID: <2249097a-97e0-175a-6b02-e5d6be484498@gmail.com>
+In-Reply-To: CAMhVC3Ys77EghTkso415MgyDwag4KbT_9d_NF-M+X-QGmbD3aQ@mail.gmail.com
 
---===============8450125639257892074==
+--===============4150433539489403545==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The offchannel priority was also changed to zero, which matches the
-priority of frames. Currently there should be no interaction between
-offchannel and connect (previous offchannel priority).
----
- src/offchannel.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Hi Yuri,
 
-diff --git a/src/offchannel.c b/src/offchannel.c
-index e01f76c7..c6fed569 100644
---- a/src/offchannel.c
-+++ b/src/offchannel.c
-@@ -168,8 +168,9 @@ uint32_t offchannel_start(uint64_t wdev_id, uint32_t fr=
-eq, uint32_t duration,
- 	 */
- 	info->error =3D -ECANCELED;
- =
+<snip>
 
--	return wiphy_radio_work_insert(wiphy_find_by_wdev(wdev_id),
--					&info->work, 1, &offchannel_work_ops);
-+	return wiphy_radio_work_insert(wiphy_find_by_wdev(wdev_id), &info->work,
-+					WIPHY_WORK_PRIORITY_OFFCHANNEL,
-+					&offchannel_work_ops);
- }
- =
+> [Service]
+> ReadWritePaths=3D/etc/resolv.conf.bak
+> ReadWritePaths=3D/etc/resolv.conf
+> =
 
- void offchannel_cancel(uint64_t wdev_id, uint32_t id)
--- =
+> Others suggested another way to fix it:
+> =
 
-2.31.1
+> RuntimeDirectory=3Dresolvconf
+> ReadWritePaths=3D/etc/resolv.conf
+> =
 
---===============8450125639257892074==--
+> https://bugs.archlinux.org/task/67069
+> =
+
+> Can src/iwd.service.in be adjusted?
+
+I think this or a similar issue has come up before.  The problem is that iw=
+d =
+
+supports either systemd-resolved or resolvconf.  So for systems that use =
+
+systemd-resolved (which iwd defaults to), punching this security policy =
+
+exception is not needed and arguably it should not be enabled by default.
+
+Perhaps as a compromise we may be able to ship service.in with these lines =
+added =
+
+& commented out.  Not sure if this would be of any help though.  Other idea=
+s are =
+
+welcome.
+
+Regards,
+-Denis
+--===============4150433539489403545==--
 
