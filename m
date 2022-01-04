@@ -1,198 +1,160 @@
-Content-Type: multipart/mixed; boundary="===============7124374782375953744=="
+Content-Type: multipart/mixed; boundary="===============9132282404255317301=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 03/10] unit: add DPP unit tests for URI parsing
-Date: Mon, 14 Feb 2022 13:48:02 -0800
-Message-ID: <20220214214809.1017870-3-prestwoj@gmail.com>
-In-Reply-To: 20220214214809.1017870-1-prestwoj@gmail.com
+Subject: [PATCH 6/6] auto-t: add DPP autotests
+Date: Tue, 04 Jan 2022 10:18:57 -0800
+Message-ID: <20220104181857.103331-6-prestwoj@gmail.com>
+In-Reply-To: 20220104181857.103331-1-prestwoj@gmail.com
 
---===============7124374782375953744==
+--===============9132282404255317301==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- unit/test-dpp.c | 142 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 142 insertions(+)
+ autotests/testDPP/connection_test.py | 73 ++++++++++++++++++++++++++++
+ autotests/testDPP/hostapd.conf       |  7 +++
+ autotests/testDPP/hw.conf            |  9 ++++
+ autotests/testDPP/ssidCCMP.psk       |  2 +
+ autotests/testDPP/wpas.conf          |  5 ++
+ 5 files changed, 96 insertions(+)
+ create mode 100644 autotests/testDPP/connection_test.py
+ create mode 100644 autotests/testDPP/hostapd.conf
+ create mode 100644 autotests/testDPP/hw.conf
+ create mode 100644 autotests/testDPP/ssidCCMP.psk
+ create mode 100644 autotests/testDPP/wpas.conf
 
-diff --git a/unit/test-dpp.c b/unit/test-dpp.c
-index bfe6f747..1803e688 100644
---- a/unit/test-dpp.c
-+++ b/unit/test-dpp.c
-@@ -33,6 +33,134 @@
- #include "src/util.h"
- #include "ell/useful.h"
- =
-
-+struct dpp_test_info {
-+	const char *uri;
-+	bool expect_fail;
-+	uint32_t expected_freqs[10];
-+	struct dpp_uri_info result;
-+};
+diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
+ction_test.py
+new file mode 100644
+index 00000000..43822c55
+--- /dev/null
++++ b/autotests/testDPP/connection_test.py
+@@ -0,0 +1,73 @@
++#!/usr/bin/python3
 +
-+struct dpp_test_info all_values =3D {
-+	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;K:MDkw=
-EwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=
-=3D;;",
-+	.result =3D {
-+		.mac =3D { 0x52, 0x54, 0x00, 0x58, 0x28, 0xe5 },
-+		.version =3D 2,
-+	},
-+	.expected_freqs =3D { 2412, 5180, 0 }
-+};
++import unittest
++import sys
 +
-+struct dpp_test_info no_type =3D {
-+	.uri =3D "C:81/1;K:shouldnotmatter;;",
-+	.expect_fail =3D true
-+};
++sys.path.append('../util')
++from iwd import IWD
++from wpas import Wpas
++from hostapd import HostapdCLI
 +
-+struct dpp_test_info empty =3D {
-+	.uri =3D "DPP:",
-+	.expect_fail =3D true
-+};
++class Test(unittest.TestCase):
 +
-+struct dpp_test_info no_key =3D {
-+	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;;",
-+	.expect_fail =3D true
-+};
++    def test_iwd_as_enrollee(self):
++        wpas =3D Wpas('wpas.conf')
 +
-+struct dpp_test_info data_after_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D;;C:81/1;;",
-+	.expect_fail =3D true
-+};
++        wd =3D IWD(True)
 +
-+struct dpp_test_info single_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D;",
-+	.expect_fail =3D true
-+};
++        devices =3D wd.list_devices(1)
++        device =3D devices[0]
++        device.autoconnect =3D True
 +
-+struct dpp_test_info no_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D",
-+	.expect_fail =3D true
-+};
++        uri =3D device.dpp_start_enrollee()
 +
-+struct dpp_test_info bad_key =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0;;",
-+	.expect_fail =3D true
-+};
++        wpas.dpp_configurator_create(uri)
++        wpas.dpp_configurator_start('ssidCCMP', 'secret123')
 +
-+struct dpp_test_info unexpected_id =3D {
-+	.uri =3D "DPP:Z:somedata;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoI=
-RIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+	.expect_fail =3D true
-+};
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
 +
-+struct dpp_test_info bad_channels[] =3D {
-+	{
-+		.uri =3D "DPP:C:;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQ=
-MV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWG=
-oQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPW=
-GoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRI=
-PWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZo=
-IRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIR=
-IPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+};
++        device.disconnect()
++        device.dpp_stop()
 +
-+static bool verify_info(const struct dpp_uri_info *parsed,
-+			const struct dpp_test_info *result)
-+{
-+	const struct dpp_uri_info *expected =3D &result->result;
-+	uint32_t i;
++        del wpas
 +
-+	assert(!memcmp(parsed->mac, expected->mac, 6));
-+	assert(parsed->version =3D=3D expected->version);
-+	assert(parsed->boot_public !=3D NULL);
++    def test_iwd_as_configurator(self):
++        IWD.copy_to_storage('ssidCCMP.psk')
 +
-+	for (i =3D 0; result->expected_freqs[i]; i++)
-+		assert(scan_freq_set_contains(parsed->freqs,
-+						result->expected_freqs[i]));
++        wpas =3D Wpas('wpas.conf')
++        hapd =3D HostapdCLI('hostapd.conf')
 +
-+	return true;
-+}
++        wd =3D IWD(True)
 +
-+static void test_uri_parse(const void *data)
-+{
-+	const struct dpp_test_info *test_info =3D data;
-+	struct dpp_uri_info *info;
-+	int ret;
++        devices =3D wd.list_devices(1)
++        device =3D devices[0]
++        device.autoconnect =3D True
 +
-+	info =3D dpp_parse_uri(test_info->uri);
-+	if (test_info->expect_fail) {
-+		assert(info =3D=3D NULL);
-+		return;
-+	}
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
 +
-+	assert(ret =3D=3D 0);
++        uri =3D device.dpp_start_configurator()
 +
-+	assert(verify_info(info, test_info));
++        wpas.dpp_enrollee_start(uri)
 +
-+	dpp_free_uri_info(info);
-+}
++        hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
 +
++        device.disconnect()
++        device.dpp_stop()
 +
-+static void test_bad_channels(const void *data)
-+{
-+	unsigned int i;
++        del wpas
 +
-+	for (i =3D 0; i < L_ARRAY_SIZE(bad_channels); i++)
-+		test_uri_parse(&bad_channels[i]);
-+}
++    def tearDown(self):
++        IWD.clear_storage()
 +
- /*
-  * B.2 Test Vectors for DPP Authentication Using P-256 for
-  * Responder-only Authentication
-@@ -148,5 +276,19 @@ int main(int argc, char *argv[])
- 		l_test_add("DPP test key derivation",
- 						test_key_derivation, NULL);
- =
-
-+	l_test_add("DPP URI parse", test_uri_parse, &all_values);
-+	l_test_add("DPP URI no type", test_uri_parse, &no_type);
-+	l_test_add("DPP URI empty", test_uri_parse, &empty);
-+	l_test_add("DPP URI no key", test_uri_parse, &no_key);
-+	l_test_add("DPP URI data after terminator", test_uri_parse,
-+				&data_after_terminator);
-+	l_test_add("DPP URI single terminator", test_uri_parse,
-+				&single_terminator);
-+	l_test_add("DPP URI no terminator", test_uri_parse,
-+				&no_terminator);
-+	l_test_add("DPP URI bad key", test_uri_parse, &bad_key);
-+	l_test_add("DPP URI bad channels", test_bad_channels, &bad_channels);
-+	l_test_add("DPP URI unexpected ID", test_uri_parse, &unexpected_id);
++    @classmethod
++    def setUpClass(cls):
++        pass
 +
- 	return l_test_run();
- }
++    @classmethod
++    def tearDownClass(cls):
++        pass
++
++if __name__ =3D=3D '__main__':
++    unittest.main(exit=3DTrue)
+diff --git a/autotests/testDPP/hostapd.conf b/autotests/testDPP/hostapd.conf
+new file mode 100644
+index 00000000..074e8228
+--- /dev/null
++++ b/autotests/testDPP/hostapd.conf
+@@ -0,0 +1,7 @@
++hw_mode=3Dg
++channel=3D1
++ssid=3DssidCCMP
++
++wpa=3D2
++wpa_pairwise=3DCCMP
++wpa_passphrase=3Dsecret123
+diff --git a/autotests/testDPP/hw.conf b/autotests/testDPP/hw.conf
+new file mode 100644
+index 00000000..478f0633
+--- /dev/null
++++ b/autotests/testDPP/hw.conf
+@@ -0,0 +1,9 @@
++[SETUP]
++num_radios=3D3
++start_iwd=3D0
++
++[WPA_SUPPLICANT]
++rad0=3Dwpas.conf
++
++[HOSTAPD]
++rad1=3Dhostapd.conf
+diff --git a/autotests/testDPP/ssidCCMP.psk b/autotests/testDPP/ssidCCMP.psk
+new file mode 100644
+index 00000000..abafdb66
+--- /dev/null
++++ b/autotests/testDPP/ssidCCMP.psk
+@@ -0,0 +1,2 @@
++[Security]
++Passphrase=3Dsecret123
+diff --git a/autotests/testDPP/wpas.conf b/autotests/testDPP/wpas.conf
+new file mode 100644
+index 00000000..5ec815b4
+--- /dev/null
++++ b/autotests/testDPP/wpas.conf
+@@ -0,0 +1,5 @@
++ctrl_interface=3D/tmp/rad1-p2p-wpas
++
++update_config=3D1
++pmf=3D2
++dpp_config_processing=3D2
 -- =
 
-2.34.1
+2.31.1
 
---===============7124374782375953744==--
+--===============9132282404255317301==--
 
