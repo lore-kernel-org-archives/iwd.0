@@ -1,42 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============0957571344621697911=="
+Content-Type: multipart/mixed; boundary="===============1943541002418122759=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 04/12] netconfig: Track DNS address string lists
-Date: Fri, 22 Oct 2021 12:17:25 -0500
-Message-ID: <def42f5b-07ea-786a-6f04-71f116a5160f@gmail.com>
-In-Reply-To: 20211021085041.294524-4-andrew.zaborowski@intel.com
+Subject: Re: [PATCH 1/6] auto-t: wpas.py: don't require strict match on
+ wait_for_event
+Date: Tue, 04 Jan 2022 12:03:58 -0600
+Message-ID: <edaf9497-fadf-dfb3-a1ce-7ab6a8b84692@gmail.com>
+In-Reply-To: 20220104181857.103331-1-prestwoj@gmail.com
 
---===============0957571344621697911==
+--===============1943541002418122759==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Hi James,
 
-On 10/21/21 3:50 AM, Andrew Zaborowski wrote:
-> Cache the latest v4 and v6 DNS IP string lists in struct netconfig state
-> to be able to more easily detect changes in those values in future
-> commits.  For that split netconfig_set_dns's code into this function,
-> which now only commit the values in netconfig->dns{4,6}_list to the
-> resolver, and netconfig_dns_list_update() which figures out the active
-> DNS IP address list and saves it in netconfig->dns{4,6} list.  This
-> probably saves some cycles as the callers can now decide to only
-> recalculate the dns_list which may have changed.
+On 1/4/22 12:18, James Prestwood wrote:
+> wait_for_event was checking the event string presence in the rx_data
+> array which meant the event string had to match perfectly to any
+> received events. This poses problems with events that include additional
+> information which the caller may not be able to know or does not care
+> about. For example:
 > =
 
-> While there simplify netconfig_set_dns return type to void as the result
-> was always 0 anyway and was never checked by callers.
+> DPP-RX src=3D02:00:00:00:02:00 freq=3D2437 type=3D11
+> =
+
+> Waiting for this event previously would require the caller know src, freq,
+> and type. If the caller only wants to wait for DPP-RX, it can now do that.
 > ---
->   src/netconfig.c | 101 ++++++++++++++++++++++++++++--------------------
->   1 file changed, 60 insertions(+), 41 deletions(-)
+>   autotests/util/wpas.py | 7 ++++---
+>   1 file changed, 4 insertions(+), 3 deletions(-)
 > =
 
 
-Patches 4-6 applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
 
---===============0957571344621697911==--
+--===============1943541002418122759==--
 
