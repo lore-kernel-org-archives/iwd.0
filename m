@@ -1,49 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============6655279216826665849=="
+Content-Type: multipart/mixed; boundary="===============2085679864214318073=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2] dbus: Remove 'at_console', add 'netdev' settings
-Date: Wed, 26 Jan 2022 14:06:39 -0600
-Message-ID: <e96d0cc9-5eee-8f33-a92b-9291ec5dc086@gmail.com>
-In-Reply-To: 20220126200103.16017-1-didi.debian@cknow.org
+Subject: [PATCH 1/6] auto-t: wpas.py: don't require strict match on
+ wait_for_event
+Date: Tue, 04 Jan 2022 10:18:52 -0800
+Message-ID: <20220104181857.103331-1-prestwoj@gmail.com>
 
---===============6655279216826665849==
+--===============2085679864214318073==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Diederik,
+wait_for_event was checking the event string presence in the rx_data
+array which meant the event string had to match perfectly to any
+received events. This poses problems with events that include additional
+information which the caller may not be able to know or does not care
+about. For example:
 
-On 1/26/22 14:01, Diederik de Haas wrote:
-> The 'at_console' D-Bus policy setting has been deprecated for more then
-> 10 years and could be ignored at any time in the future. Moreover, while
-> the intend was to allow locally logged on users to interact with iwd, it
-> didn't actually do that.
-> More info at https://www.spinics.net/lists/linux-bluetooth/msg75267.html
-> and https://gitlab.freedesktop.org/dbus/dbus/-/issues/52
-> Therefor remove the 'at_console' setting block.
-> =
+DPP-RX src=3D02:00:00:00:02:00 freq=3D2437 type=3D11
 
-> On Debian (based) systems, there is a standard defined group which is
-> allowed to manage network interfaces, and that is the 'netdev' group.
-> So add a D-Bus setting block to grant the 'netdev' group that access.
-> ---
-> Changes since v1:
-> - Added 'dbus' prefix to primary commit message and shortened it to
->    less then 50 chars
-> - Reformatted secondary commit message to max 72 chars and fixed a
->    small typo (_ -> ')
-> =
+Waiting for this event previously would require the caller know src, freq,
+and type. If the caller only wants to wait for DPP-RX, it can now do that.
+---
+ autotests/util/wpas.py | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
->   src/iwd-dbus.conf | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index 8fb725f8..5680ec2a 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -70,9 +70,10 @@ class Wpas:
+         while True:
+             context.iteration(may_block=3DTrue)
+ =
 
+-            if event in self._rx_data:
+-                GLib.source_remove(timeout)
+-                return self._rx_data
++            for e in self._rx_data:
++                if event in e:
++                    GLib.source_remove(timeout)
++                    return self._rx_data
+ =
 
-Applied, thanks.
+             if self._wait_timed_out:
+                 raise TimeoutError('waiting for wpas event timed out')
+-- =
 
-Regards,
--Denis
+2.31.1
 
---===============6655279216826665849==--
+--===============2085679864214318073==--
 
