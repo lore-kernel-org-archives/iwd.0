@@ -1,55 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============6735772579614389213=="
+Content-Type: multipart/mixed; boundary="===============5319004063521143472=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459 at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: DHCP renewal stops after disconnect
-Date: Fri, 13 May 2022 10:58:02 +0100
-Message-ID: <CACsRnHU_6Cp2Uz1=CaNUW47R3DYSX6_yksveJQZc0_6Kq8RB2A@mail.gmail.com>
-In-Reply-To: a4b4eb3e-c569-084d-103e-f41ccd451bd2@gmail.com
+Subject: [PATCH 1/3] auto-t: iwd.py: remove StationDebug out of Device init
+Date: Tue, 04 Jan 2022 09:37:34 -0800
+Message-ID: <20220104173736.93682-1-prestwoj@gmail.com>
 
---===============6735772579614389213==
+--===============5319004063521143472==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Since a Device class can represent multiple modes (AP, AdHoc, station)
+move StationDebug out of the init and only create this class when it
+is used (presumably only when the device is in station mode).
 
-When enabling the DHCP debug logs I also upgraded the version of iwd
-and ell in my test environment to 1.27 and 0.50 respectively so the
-most recent logs should be closer to you at least.
+The StationDebug class is now created in a property method consistent
+with 'station_if'. If Device is not in station mode it is automatically
+switched if the test tries any StationDebug methods.
 
-Regards,
-Michael
+If the Device mode is changed from 'station' the StationDebug class
+instance is destroyed.
+---
+ autotests/util/iwd.py | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-On Thu, 12 May 2022 at 18:50, Denis Kenzior <denkenz(a)gmail.com> wrote:
->
-> Hi Michael,
->
-> On 5/12/22 12:02, Michael Johnson wrote:
-> > Hi Denis,
-> >
-> > Ok, thanks! I'll try to add more debug logging and get back to you.
-> > This error might be important if it is related to an fp?
-> > ```
-> > May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] announce_wait_timeout:166
-> > No conflicts found for 10.101.8.24, announcing address
-> > May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] acd_send_packet:146
-> > sending packet with target IP 10.101.8.24
-> > May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] announce_wait_timeout:187
-> > Failed to send ACD announcement
-> > ```
->
-> Yes, I saw that.  Looking at the code, we should fail to start acd if we'=
-re
-> running out of fds and this logic wouldn't be triggered...
->
-> I'm running a full test suite under valgrind with '--track-fds=3Dyes', bu=
-t it
-> hasn't found anything so far.  You are running a different version than I=
- am
-> though...
->
-> Regards,
-> -Denis
---===============6735772579614389213==--
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index e95bd96d..7f511187 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -280,17 +280,13 @@ class Device(IWDDBusAbstract):
+     '''
+     _iface_name =3D IWD_DEVICE_INTERFACE
+ =
+
+-    def __init__(self, object_path =3D None, properties =3D None,
+-                    service=3DIWD_SERVICE, namespace=3Dctx):
++    def __init__(self, *args, **kwargs):
+         self._wps_manager_if =3D None
+         self._station_if =3D None
+         self._station_props =3D None
++        self._station_debug_obj =3D None
+ =
+
+-        IWDDBusAbstract.__init__(self, object_path, properties, service,
+-                                    namespace)
+-
+-        self._station_debug =3D StationDebug(object_path=3Dobject_path,
+-                                            namespace=3Dnamespace)
++        IWDDBusAbstract.__init__(self, *args, **kwargs)
+ =
+
+     @property
+     def _wps_manager(self):
+@@ -309,6 +305,17 @@ class Device(IWDDBusAbstract):
+                                             IWD_STATION_INTERFACE)
+         return self._station_if
+ =
+
++    @property
++    def _station_debug(self):
++        if self._properties['Mode'] !=3D 'station':
++            self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
++
++        if self._station_debug_obj is None:
++            self._station_debug_obj =3D StationDebug(object_path=3Dself._o=
+bject_path,
++                                                    namespace=3Dself._name=
+space)
++
++        return self._station_debug_obj
++
+     def _station_properties(self):
+         if self._station_props is not None:
+             return self._station_props
+@@ -335,6 +342,9 @@ class Device(IWDDBusAbstract):
+             for name, value in changed.items():
+                 self._station_props[name] =3D value
+ =
+
++                if name =3D=3D 'Mode' and value !=3D 'station':
++                    self._station_debug_obj =3D None
++
+     @property
+     def device_path(self):
+         '''
+-- =
+
+2.31.1
+
+--===============5319004063521143472==--
 
