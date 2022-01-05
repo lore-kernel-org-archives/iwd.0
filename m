@@ -1,163 +1,171 @@
-Content-Type: multipart/mixed; boundary="===============0785551186732511217=="
+Content-Type: multipart/mixed; boundary="===============4556804487733691893=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 03/10] dpp: generate URI on StartEnrollee
-Date: Tue, 14 Dec 2021 17:28:00 -0600
-Message-ID: <e8578c20-5a39-9a4d-28cf-cb128335fc3f@gmail.com>
-In-Reply-To: 20211214181225.2308043-3-prestwoj@gmail.com
+Subject: [PATCH 2/8] unit: add primitive json test
+Date: Wed, 05 Jan 2022 10:46:21 -0800
+Message-ID: <20220105184627.329505-2-prestwoj@gmail.com>
+In-Reply-To: 20220105184627.329505-1-prestwoj@gmail.com
 
---===============0785551186732511217==
+--===============4556804487733691893==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ unit/test-json.c | 111 ++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 95 insertions(+), 16 deletions(-)
 
-On 12/14/21 12:12 PM, James Prestwood wrote:
-> Generates the required keys, hashes, and sets the Uri property
-> ---
->   src/dpp.c | 120 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 118 insertions(+), 2 deletions(-)
-> =
+diff --git a/unit/test-json.c b/unit/test-json.c
+index 854b92dd..fe8f756f 100644
+--- a/unit/test-json.c
++++ b/unit/test-json.c
+@@ -84,8 +84,6 @@ static void test_json_unsupported_types(const void *data)
+ 	 * Valid JSON objects but currently unsupported types
+ 	 */
+ 	char arrays[] =3D "{\"test\":[1, 2, 3, 4]}";
+-	char integers[] =3D "{\"test\": 10 }";
+-	char bools[] =3D "{\"test\": true}";
+ =
 
-> v2;
->   * Removed Frequency option and just choose a default
->   * Use 19 as the default group
-> =
+ 	struct json_iter iter;
+ 	struct json_contents *c =3D json_contents_new(arrays, strlen(arrays));
+@@ -95,20 +93,6 @@ static void test_json_unsupported_types(const void *data)
+ 				JSON_MANDATORY("test", JSON_ARRAY, NULL),
+ 				JSON_UNDEFINED));
+ 	json_contents_free(c);
+-
+-	c =3D json_contents_new(integers, strlen(integers));
+-	json_iter_init(&iter, c);
+-	assert(!json_iter_parse(&iter,
+-				JSON_MANDATORY("test", JSON_PRIMITIVE, NULL),
+-				JSON_UNDEFINED));
+-	json_contents_free(c);
+-
+-	c =3D json_contents_new(bools, strlen(bools));
+-	json_iter_init(&iter, c);
+-	assert(!json_iter_parse(&iter,
+-				JSON_MANDATORY("test", JSON_PRIMITIVE, NULL),
+-				JSON_UNDEFINED));
+-	json_contents_free(c);
+ }
+ =
 
+ /*
+@@ -248,6 +232,100 @@ static void test_json_larger_object(const void *data)
+ 	json_contents_free(c);
+ }
+ =
 
-<snip>
++static void check_primitives(struct json_iter *i, struct json_iter *ui,
++				struct json_iter *t, struct json_iter *f,
++				struct json_iter *null, struct json_iter *obj)
++{
++
++	int i_val;
++	unsigned int ui_val;
++	bool b_val;
++
++	assert(json_iter_is_valid(i));
++	assert(!json_iter_get_uint(i, NULL));
++	assert(!json_iter_get_boolean(i, NULL));
++	assert(!json_iter_get_null(i));
++	assert(json_iter_get_int(i, &i_val));
++	assert(i_val =3D=3D -10);
++
++	assert(json_iter_is_valid(ui));
++	assert(!json_iter_get_boolean(ui, NULL));
++	assert(!json_iter_get_null(ui));
++	assert(json_iter_get_int(ui, &i_val));
++	assert(json_iter_get_uint(ui, &ui_val));
++	assert(i_val =3D=3D 10 && ui_val =3D=3D 10);
++
++
++	assert(json_iter_is_valid(t));
++	assert(!json_iter_get_null(t));
++	assert(!json_iter_get_int(t, NULL));
++	assert(!json_iter_get_uint(t, NULL));
++	assert(json_iter_get_boolean(t, &b_val));
++	assert(b_val =3D=3D true);
++
++	assert(json_iter_is_valid(f));
++	assert(!json_iter_get_null(f));
++	assert(!json_iter_get_int(f, NULL));
++	assert(!json_iter_get_uint(f, NULL));
++	assert(json_iter_get_boolean(f, &b_val));
++	assert(b_val =3D=3D false);
++
++	assert(json_iter_is_valid(null));
++	assert(!json_iter_get_int(null, NULL));
++	assert(!json_iter_get_uint(null, NULL));
++	assert(!json_iter_get_boolean(null, NULL));
++	assert(json_iter_get_null(null));
++
++	if (obj) {
++		assert(json_iter_is_valid(obj));
++		assert(json_iter_parse(obj,
++			JSON_MANDATORY("null_val", JSON_PRIMITIVE, null),
++			JSON_MANDATORY("false_val", JSON_PRIMITIVE, f),
++			JSON_MANDATORY("true_val", JSON_PRIMITIVE, t),
++			JSON_MANDATORY("int_val", JSON_PRIMITIVE, i),
++			JSON_MANDATORY("uint_val", JSON_PRIMITIVE, ui),
++			JSON_UNDEFINED));
++
++		check_primitives(i, ui, t, f, null, NULL);
++	}
++}
++
++static void test_json_primitives(const void *data)
++{
++	char json[] =3D "{\"int_val\": -10,"
++			"\"uint_val\": 10,"
++			"\"true_val\": true,"
++			"\"false_val\": false,"
++			"\"null_val\": null,"
++			"\"obj_val\":{"
++				"\"int_val\": -10,"
++				"\"uint_val\": 10,"
++				"\"true_val\": true,"
++				"\"false_val\": false,"
++				"\"null_val\": null}}";
++	struct json_contents *c =3D json_contents_new(json, strlen(json));
++	struct json_iter outer, inner, null, f, t, i, ui;
++	struct json_iter not_found;
++
++	json_iter_init(&outer, c);
++	assert(json_iter_parse(&outer,
++			JSON_MANDATORY("obj_val", JSON_OBJECT, &inner),
++			JSON_MANDATORY("null_val", JSON_PRIMITIVE, &null),
++			JSON_MANDATORY("false_val", JSON_PRIMITIVE, &f),
++			JSON_MANDATORY("true_val", JSON_PRIMITIVE, &t),
++			JSON_MANDATORY("int_val", JSON_PRIMITIVE, &i),
++			JSON_MANDATORY("uint_val", JSON_PRIMITIVE, &ui),
++			JSON_OPTIONAL("not_found", JSON_PRIMITIVE, &not_found),
++			JSON_UNDEFINED));
++
++	assert(!json_iter_is_valid(&not_found));
++
++	check_primitives(&i, &ui, &t, &f, &null, &inner);
++
++	json_contents_free(c);
++}
++
++
+ int main(int argc, char *argv[])
+ {
+ 	l_test_init(&argc, &argv);
+@@ -259,6 +337,7 @@ int main(int argc, char *argv[])
+ 	l_test_add("json empty objects", test_json_empty_objects, NULL);
+ 	l_test_add("json parse out of order", test_json_out_of_order, NULL);
+ 	l_test_add("json larger object", test_json_larger_object, NULL);
++	l_test_add("json test primitives", test_json_primitives, NULL);
+ =
 
-> @@ -72,23 +111,100 @@ static void dpp_netdev_watch(struct netdev *netdev,
->   	}
->   }
->   =
+ 	return l_test_run();
+ }
+-- =
 
-> +static bool dpp_parse_enrollee_params(struct l_dbus_message *message,
-> +					const char **info_out,
-> +					const char **host_out)
-> +{
-> +	struct l_dbus_message_iter iter;
-> +	struct l_dbus_message_iter variant;
-> +	const char *key;
-> +	char *info =3D NULL, *host =3D NULL;
-> +
-> +	if (!l_dbus_message_get_arguments(message, "a{sv}", &iter)) {
-> +		l_error("Failed to parse StartEnrollee parameters");
-> +		return false;
-> +	}
-> +
-> +	while (l_dbus_message_iter_next_entry(&iter, &key, &variant)) {
-> +		if (!strcmp(key, "Information")) {
-> +			if (!l_dbus_message_iter_get_variant(&variant, "s",
-> +								&info))
-> +				return false;
-> +		} else if (!strcmp(key, "Host")) {
-> +			if (!l_dbus_message_iter_get_variant(&variant, "s",
-> +								&host))
-> +				return false;
-> +		}
-> +		/*
-> +		 * TODO:
-> +		 *  - Allow a MAC to be specififed, this would require changing
-> +		 *    the device MAC prior to starting.
-> +		 *  - Allow a custom key pair to be supplied, or some way of
-> +		 *    deterministically generating one based on some seed.
-> +		 */
-> +	}
-> +
+2.31.1
 
-Note that Information & Hostname have some limitations as to what character=
-s are =
-
-allowed.  DBus strings are valid UTF8 strings, but it seems EasyConnect spe=
-c =
-
-wants these to be ASCII sans ';' characters.  Given the lack of utility of =
-these =
-
-parameters, perhaps we should just drop them entirely.
-
-> +	if (info_out && info)
-> +		*info_out =3D info;
-> +	else if (!info_out && info)
-> +		l_free(info);
-> +
-> +	if (host_out && host)
-> +		*host_out =3D host;
-> +	else if (!host_out && host)
-> +		l_free(host);
-> +
-> +	return true;
-> +}
-> +
->   static struct l_dbus_message *dpp_dbus_start_enrollee(struct l_dbus *db=
-us,
->   						struct l_dbus_message *message,
->   						void *user_data)
->   {
->   	struct dpp_sm *dpp =3D user_data;
-> +	const char *info =3D NULL, *host =3D NULL;
-> +	uint32_t freq =3D band_channel_to_freq(6, BAND_FREQ_2_4_GHZ);
->   =
-
->   	if (!netdev_get_is_up(dpp->netdev))
->   		return dbus_error_not_available(message);
->   =
-
-> -	return dbus_error_not_supported(message);
-> +	if (!dpp_parse_enrollee_params(message, &info, &host))
-> +		return dbus_error_invalid_args(message);
-> +
-> +	dpp->curve =3D l_ecc_curve_from_ike_group(19);
-> +	dpp->key_len =3D l_ecc_curve_get_scalar_bytes(dpp->curve);
-> +	dpp->nonce_len =3D dpp_nonce_len_from_key_len(dpp->key_len);
-> +
-
-Since the curve is most likely always going to be the same, it might make s=
-ense =
-
-to initialize these parts when creating the dpp_sm object.
-
-> +	l_ecdh_generate_key_pair(dpp->curve, &dpp->boot_private,
-> +					&dpp->boot_public);
-
-Similarly, maybe the boot key should be created only once or when the dpp_s=
-m =
-
-object is created?
-
-> +
-> +	dpp->pub_asn1 =3D l_ecc_point_to_asn1(dpp->boot_public,
-> +						&dpp->pub_asn1_len);
-> +
-> +	dpp_hash(L_CHECKSUM_SHA256, dpp->pub_boot_hash, 1,
-> +			dpp->pub_asn1, dpp->pub_asn1_len);
-> +
-> +	dpp->uri =3D dpp_generate_uri(dpp->pub_asn1, dpp->pub_asn1_len, 2,
-> +					netdev_get_address(dpp->netdev), &freq,
-> +					1, info, host);
-> +
-> +	l_debug("DPP Start Enrollee: %s", dpp->uri);
-> +
-> +	l_dbus_property_changed(dbus_get_bus(), netdev_get_path(dpp->netdev),
-> +					IWD_DPP_INTERFACE, "Uri");
-
-There is no such property now.  And you should return the uri string as par=
-t of =
-
-the method return.
-
-> +
-> +	return l_dbus_message_new_method_return(message);
->   }
->   =
-
-
-<snip>
-
-Regards,
--Denis
---===============0785551186732511217==--
+--===============4556804487733691893==--
 
