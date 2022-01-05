@@ -1,40 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============3085684035395119883=="
+Content-Type: multipart/mixed; boundary="===============8934008322547734122=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/2] dpp: init unwrapped pointer to NULL
-Date: Wed, 22 Dec 2021 15:00:17 -0800
-Message-ID: <20211222230017.12587-2-prestwoj@gmail.com>
-In-Reply-To: 20211222230017.12587-1-prestwoj@gmail.com
+Subject: [PATCH] dpp: use %zu for printing size_t
+Date: Wed, 05 Jan 2022 11:50:16 -0800
+Message-ID: <20220105195016.334937-1-prestwoj@gmail.com>
 
---===============3085684035395119883==
+--===============8934008322547734122==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Fixes possible issues with auto-free on error paths
 ---
  src/dpp.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/dpp.c b/src/dpp.c
-index 941c3f07..a4a21b3d 100644
+index 9eb1d642..dedbd3b2 100644
 --- a/src/dpp.c
 +++ b/src/dpp.c
-@@ -780,7 +780,7 @@ static void dpp_handle_config_result_frame(struct dpp_s=
-m *dpp,
- 	const void *e_nonce =3D NULL;
- 	const void *wrapped =3D NULL;
- 	size_t wrapped_len;
--	_auto_(l_free) void *unwrapped;
-+	_auto_(l_free) void *unwrapped =3D NULL;
+@@ -1272,7 +1272,7 @@ static void authenticate_request(struct dpp_sm *dpp, =
+const uint8_t *from,
+ 	}
  =
 
- 	if (dpp->state !=3D DPP_STATE_CONFIGURING)
- 		return;
+ 	if (i_nonce_len !=3D dpp->nonce_len) {
+-		l_debug("I-Nonce has unexpected length %lu", i_nonce_len);
++		l_debug("I-Nonce has unexpected length %zu", i_nonce_len);
+ 		goto auth_request_failed;
+ 	}
+ =
+
 -- =
 
 2.31.1
 
---===============3085684035395119883==--
+--===============8934008322547734122==--
 
