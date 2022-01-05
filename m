@@ -1,69 +1,110 @@
-Content-Type: multipart/mixed; boundary="===============7040748121747831601=="
+Content-Type: multipart/mixed; boundary="===============3650293108914316662=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] auto-t: use full_scan=True on testBSSBlacklist
-Date: Wed, 30 Mar 2022 14:17:59 -0700
-Message-ID: <20220330211759.1948562-1-prestwoj@gmail.com>
+Subject: [PATCH 6/8] json: support arrays of objects
+Date: Wed, 05 Jan 2022 10:46:25 -0800
+Message-ID: <20220105184627.329505-6-prestwoj@gmail.com>
+In-Reply-To: 20220105184627.329505-1-prestwoj@gmail.com
 
---===============7040748121747831601==
+--===============3650293108914316662==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This test was missed during the test-wide change.
 ---
- autotests/testBSSBlacklist/connection_test.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/json.c | 39 +++++++++++++++++++++++++++++++++++++--
+ src/json.h |  2 ++
+ 2 files changed, 39 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/test=
-BSSBlacklist/connection_test.py
-index 1bc9e604..8e239f44 100644
---- a/autotests/testBSSBlacklist/connection_test.py
-+++ b/autotests/testBSSBlacklist/connection_test.py
-@@ -101,7 +101,7 @@ class Test(unittest.TestCase):
-         devices =3D wd.list_devices(1)
-         device =3D devices[0]
+diff --git a/src/json.c b/src/json.c
+index 4e4c004e..d38d884e 100644
+--- a/src/json.c
++++ b/src/json.c
+@@ -401,6 +401,21 @@ bool json_iter_get_null(struct json_iter *iter)
+ 	return false;
+ }
  =
 
--        ordered_network =3D device.get_ordered_network("TestBlacklist")
-+        ordered_network =3D device.get_ordered_network("TestBlacklist", fu=
-ll_scan=3DTrue)
++bool json_iter_get_container(struct json_iter *iter,
++				struct json_iter *container)
++{
++	struct json_contents *c =3D iter->contents;
++	jsmntok_t *t =3D c->tokens + iter->current;
++
++	/* TODO: Add nested array support */
++	if (t->type !=3D JSMN_OBJECT)
++		return false;
++
++	iter_recurse(iter, t, container);
++
++	return true;
++}
++
+ enum json_type json_iter_get_type(struct json_iter *iter)
+ {
+ 	struct json_contents *c =3D iter->contents;
+@@ -412,15 +427,35 @@ enum json_type json_iter_get_type(struct json_iter *i=
+ter)
+ bool json_iter_next(struct json_iter *iter)
+ {
+ 	struct json_contents *c =3D iter->contents;
++	jsmntok_t *t =3D c->tokens + iter->current;
++	int inc =3D 1;
  =
 
-         self.assertEqual(ordered_network.type, NetworkType.psk)
+ 	/* For now only allow json_iter_next() on arrays */
+ 	if (!iter->array)
+ 		return false;
  =
 
-@@ -148,7 +148,7 @@ class Test(unittest.TestCase):
-         devices =3D wd.list_devices(1)
-         device =3D devices[0]
+-	if (c->tokens + iter->current + 1 > ITER_END(iter))
++	/*
++	 * If this is the initial iteration skip this and just increment
++	 * current by 1 since this iterator points to an array which needs to
++	 * be advanced to the first token in the array.
++	 *
++	 * In addition primitive types and empty object will have a size of 1,
++	 * so no special handling is needed there.
++	 *
++	 * For objects (and arrays in the future), 'current' needs to be
++	 * advanced by all objects child tokens plus the object token itself.
++	 * This check ensures:
++	 *    1. It is not the initial iteration
++	 *    2. This is an object
++	 *    3. The object is not empty
++	 */
++	if (iter->current !=3D iter->start && t->type =3D=3D JSMN_OBJECT && t->si=
+ze)
++		inc =3D find_parent_tokens(iter, t) + 1;
++
++	if (c->tokens + iter->current + inc > ITER_END(iter))
+ 		return false;
  =
 
--        ordered_network =3D device.get_ordered_network("TestBlacklist")
-+        ordered_network =3D device.get_ordered_network("TestBlacklist", fu=
-ll_scan=3DTrue)
+-	iter->current++;
++	iter->current +=3D inc;
  =
 
-         self.assertEqual(ordered_network.type, NetworkType.psk)
+ 	/* TODO: Add support for nested array iteration */
+ 	if ((c->tokens + iter->current)->type =3D=3D JSMN_ARRAY)
+diff --git a/src/json.h b/src/json.h
+index 75ac9853..c7993a5a 100644
+--- a/src/json.h
++++ b/src/json.h
+@@ -94,6 +94,8 @@ bool json_iter_get_int(struct json_iter *iter, int *i);
+ bool json_iter_get_uint(struct json_iter *iter, unsigned int *i);
+ bool json_iter_get_boolean(struct json_iter *iter, bool *b);
+ bool json_iter_get_null(struct json_iter *iter);
++bool json_iter_get_container(struct json_iter *iter,
++				struct json_iter *container);
  =
 
-@@ -188,7 +188,7 @@ class Test(unittest.TestCase):
- =
-
-         devices[1].disconnect()
- =
-
--        ordered_network =3D device.get_ordered_network("TestBlacklist")
-+        ordered_network =3D device.get_ordered_network("TestBlacklist", fu=
-ll_scan=3DTrue)
- =
-
-         self.assertEqual(ordered_network.type, NetworkType.psk)
- =
-
+ enum json_type json_iter_get_type(struct json_iter *iter);
+ bool json_iter_next(struct json_iter *iter);
 -- =
 
-2.34.1
+2.31.1
 
---===============7040748121747831601==--
+--===============3650293108914316662==--
 
