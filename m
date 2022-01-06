@@ -1,162 +1,156 @@
-Content-Type: multipart/mixed; boundary="===============3636817571131661119=="
+Content-Type: multipart/mixed; boundary="===============2894702470821584435=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 1/7] storage: implement network profile encryption
-Date: Mon, 07 Feb 2022 14:44:03 -0600
-Message-ID: <fd7febad-341e-a1f8-111f-741a13323d30@gmail.com>
-In-Reply-To: 3f97672e-a48f-6b66-e138-5e3d5af19b6f@benden.us
+Subject: [PATCH v2 5/5] unit: add checks for improper use of
+ json_iter_parse/next
+Date: Thu, 06 Jan 2022 14:52:58 -0800
+Message-ID: <20220106225258.570850-5-prestwoj@gmail.com>
+In-Reply-To: 20220106225258.570850-1-prestwoj@gmail.com
 
---===============3636817571131661119==
+--===============2894702470821584435==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Joseph,
+This adds checks to make sure these API's don't operate on
+objects/primitives they aren't supposed to.
+---
+ unit/test-json.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
-On 2/4/22 18:52, Joseph Benden wrote:
-> On 2/4/22 4:23 PM, James Prestwood wrote:
->> Hi Joseph,
->>
->> On Fri, 2022-02-04 at 15:55 -0700, Joseph Benden wrote:
->>> Hi!
->>>
->>> It is my understanding that all secret data is to be kept as securely
->>> as
->>> possible. I'm not really seeing this carried throughout the source
->>> code.
->>> Maybe this specific code does not need that level of security?
->> Currently any profile (e.g. /var/lib/iwd/foo.psk) containing secret
->> data is unencypted, plaintext. We rely on the file system permissions
->> to 'secure' this data (which this patch series is 'fixing' for anyone
->> who wants these encrypted).
-> =
+diff --git a/unit/test-json.c b/unit/test-json.c
+index fb87987d..0d48b3d1 100644
+--- a/unit/test-json.c
++++ b/unit/test-json.c
+@@ -225,12 +225,14 @@ static void check_primitives(struct json_iter *i, str=
+uct json_iter *ui,
+ 	assert(!json_iter_get_uint(i, NULL));
+ 	assert(!json_iter_get_boolean(i, NULL));
+ 	assert(!json_iter_get_null(i));
++	assert(!json_iter_next(i));
+ 	assert(json_iter_get_int(i, &i_val));
+ 	assert(i_val =3D=3D -10);
+ =
 
-> Icky... really shouldn't do it this way; secure all data at rest - even a=
-gainst =
+ 	assert(json_iter_is_valid(ui));
+ 	assert(!json_iter_get_boolean(ui, NULL));
+ 	assert(!json_iter_get_null(ui));
++	assert(!json_iter_next(ui));
+ 	assert(json_iter_get_int(ui, &i_val));
+ 	assert(json_iter_get_uint(ui, &ui_val));
+ 	assert(i_val =3D=3D 10 && ui_val =3D=3D 10);
+@@ -239,6 +241,7 @@ static void check_primitives(struct json_iter *i, struc=
+t json_iter *ui,
+ 	assert(!json_iter_get_null(t));
+ 	assert(!json_iter_get_int(t, NULL));
+ 	assert(!json_iter_get_uint(t, NULL));
++	assert(!json_iter_next(t));
+ 	assert(json_iter_get_boolean(t, &b_val));
+ 	assert(b_val =3D=3D true);
+ =
 
-> root account, if at all possible.
-> =
+@@ -246,6 +249,7 @@ static void check_primitives(struct json_iter *i, struc=
+t json_iter *ui,
+ 	assert(!json_iter_get_null(f));
+ 	assert(!json_iter_get_int(f, NULL));
+ 	assert(!json_iter_get_uint(f, NULL));
++	assert(!json_iter_next(f));
+ 	assert(json_iter_get_boolean(f, &b_val));
+ 	assert(b_val =3D=3D false);
+ =
 
+@@ -253,10 +257,12 @@ static void check_primitives(struct json_iter *i, str=
+uct json_iter *ui,
+ 	assert(!json_iter_get_int(null, NULL));
+ 	assert(!json_iter_get_uint(null, NULL));
+ 	assert(!json_iter_get_boolean(null, NULL));
++	assert(!json_iter_next(null));
+ 	assert(json_iter_get_null(null));
+ =
 
-There are lots of interesting ideas in this thread... I'm not aware of any =
+ 	if (obj) {
+ 		assert(json_iter_is_valid(obj));
++		assert(!json_iter_next(obj));
+ 		assert(json_iter_parse(obj,
+ 			JSON_MANDATORY("null_val", JSON_PRIMITIVE, null),
+ 			JSON_MANDATORY("false_val", JSON_PRIMITIVE, f),
+@@ -336,6 +342,7 @@ static void test_json_arrays(const void *data)
+ =
 
-networking daemons actually doing any of the stuff you describe here.  iwd =
-could =
+ 	while (json_iter_next(&ui_array)) {
+ 		assert(json_iter_get_type(&ui_array) =3D=3D JSON_PRIMITIVE);
++		assert(!json_iter_parse(&ui_array, JSON_UNDEFINED));
+ 		assert(json_iter_get_uint(&ui_array, &ui));
+ 		assert(ui =3D=3D (unsigned int) count);
+ 		count++;
+@@ -345,6 +352,7 @@ static void test_json_arrays(const void *data)
+ =
 
-be the first of course.
+ 	while (json_iter_next(&i_array)) {
+ 		assert(json_iter_get_type(&i_array) =3D=3D JSON_PRIMITIVE);
++		assert(!json_iter_parse(&i_array, JSON_UNDEFINED));
+ 		assert(json_iter_get_int(&i_array, &i));
+ 		assert(i =3D=3D count);
+ 		count--;
+@@ -354,6 +362,7 @@ static void test_json_arrays(const void *data)
+ =
 
-> =
+ 	while (json_iter_next(&b_array)) {
+ 		assert(json_iter_get_type(&b_array) =3D=3D JSON_PRIMITIVE);
++		assert(!json_iter_parse(&b_array, JSON_UNDEFINED));
+ 		assert(json_iter_get_boolean(&b_array, &b));
+ 		assert(b =3D=3D count % 2 ? false : true);
+ 		count++;
+@@ -363,6 +372,7 @@ static void test_json_arrays(const void *data)
+ =
 
-> So this is a can of worms... As soon as the secret data hits disk, it is =
+ 	while (json_iter_next(&n_array)) {
+ 		assert(json_iter_get_type(&n_array) =3D=3D JSON_PRIMITIVE);
++		assert(!json_iter_parse(&n_array, JSON_UNDEFINED));
+ 		assert(json_iter_get_null(&n_array));
+ 		count++;
+ 	}
+@@ -407,6 +417,8 @@ static void test_json_arrays(const void *data)
+ =
 
-> out-of-ones own control; considered revealed and/or exploited. I sure do =
-hope =
+ 	count =3D 0;
+ =
 
-> systemd does the right things here... (facepalm)
++	assert(!json_iter_parse(&obj_array, JSON_UNDEFINED));
++
+ 	while (json_iter_next(&obj_array)) {
+ 		struct json_iter object;
+ =
 
-Well, you may want to check what systemd is doing first.  I suspect the dat=
-a =
+@@ -475,17 +487,19 @@ static void test_json_nested_arrays(const void *data)
+ 			count2++;
+ 		}
+ =
 
-never actually hits disk, but goes into tmpfs.
+-		/*
+-		 * TODO: add checks for object iteration. Currently these will
+-		 * just count all tokens in the object.
+-		 */
+ 		switch (count) {
+ 		case 0:
+ 			assert(count2 =3D=3D 0);
+ 			break;
++		case 1:
++			assert(count2 =3D=3D 0);
++			break;
+ 		case 2:
+ 			assert(count2 =3D=3D 2);
+ 			break;
++		case 3:
++			assert(count2 =3D=3D 0);
++			break;
+ 		case 4:
+ 			assert(count2 =3D=3D 2);
+ 			break;
+-- =
 
-> =
+2.31.1
 
->>
->> As far as explicit_bzero'ing the hashed secret after every use, then
->> reading it back in, and hashing it again when needed... this seems a
->> bit crazy :)
-> =
-
-> Maybe crazy, most certainly needed. If not now, probably needed in the ne=
-ar =
-
-> future (after some horrible event).
-> =
-
-> So let's talk about data flows for a moment.
-> =
-
-> IWD service starts and initializes a secret data vault. This is a region =
-of =
-
-> memory which is mmap()-ed, mlock() protected, and which happens to point =
-to the =
-
-> start of a fixed struct - that is for IWD service's secret data store. [I =
-
-> envision libell having support for application secret vaults]
-> =
-
-> The external secret data enters from a file; it is read to the secret's v=
-ault, =
-
-> and is securely processed to have the derived secret data (these two valu=
-es are =
-
-> in the IWD service's secret data store).
-> =
-
-
-Sounds useful.  Any chance you would be willing to contribute?
-
-> Providing compatible with systemd's process; the secret data file is shre=
-dded =
-
-> (see DoD -style procedures for examples), and unlink()-ed from the file-s=
-ystem. =
-
-> Also (shred) explicit_bzero()-ing the filenames used and any and all memo=
-ry used =
-
-> that is not inside of the IWD service's secret data store. [I envision li=
-bell =
-
-> having a file_shred() function, using the 6/8-pass (iirc) or so methods.]
-
-See above.  I doubt this is needed.  But even if systemd somehow writes the =
-
-secret to disk, it is not up to iwd to destroy it.
-
-> =
-
-> Now, when the secret derived data is needed for incoming/outgoing frames;=
- it is =
-
-> always used directly from the service's secret data store. Try your darn-=
-ist to =
-
-> not copy it out of its place in the vault, and if it is: it must be secur=
-ely =
-
-> used and tracked for correctness.
-
-Again, this sounds useful and could be fairly easily accomplished for many =
-of =
-
-the common scenarios.  For example, most of the derived keys for the curren=
-t =
-
-connection are already stored in a single object and such memory could be l=
-ocked =
-
-if desired.  But this is a separate topic from what this patch set is tryin=
-g to =
-
-accomplish.  Feel free to start a new thread on this topic specifically.
-
-> =
-
-> Finally at program shutdown, the IWD service's secret data store is shred=
-ded =
-
-> (this is explicit_bzero()-ed), then munlock(), and munmap()-ed.
-> =
-
-
-See above.  systemd owns the secret, so there's nothing for iwd to do here.
-
-Regards,
--Denis
---===============3636817571131661119==--
+--===============2894702470821584435==--
 
