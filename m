@@ -1,77 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============4462644257279225285=="
+Content-Type: multipart/mixed; boundary="===============7121808623943671950=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 3/8] netconfig: Set netconfig_get_static6_gateway out param on
- success
-Date: Sat, 25 Sep 2021 03:11:48 +0200
-Message-ID: <20210925011153.25195-3-andrew.zaborowski@intel.com>
-In-Reply-To: 20210925011153.25195-1-andrew.zaborowski@intel.com
+Subject: [PATCH v2 4/5] json: restrict json_iter_{parse,
+ next} to objects/arrays
+Date: Thu, 06 Jan 2022 14:52:57 -0800
+Message-ID: <20220106225258.570850-4-prestwoj@gmail.com>
+In-Reply-To: 20220106225258.570850-1-prestwoj@gmail.com
 
---===============4462644257279225285==
+--===============7121808623943671950==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Make sure to only set the netconfig_get_static6_gateway's out_mac
-parameter on successful return and make sure to always set it, even if
-to NULL.
+json_iter_parse is only meant to work on objects while
+json_iter_next is only meant to work on arrays.
+
+This adds checks in both APIs to ensure they aren't being
+used incorrectly.
 ---
- src/netconfig.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ src/json.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/netconfig.c b/src/netconfig.c
-index 493a5c13..30e56157 100644
---- a/src/netconfig.c
-+++ b/src/netconfig.c
-@@ -498,6 +498,7 @@ static struct l_rtnl_route *netconfig_get_static6_gatew=
-ay(
- {
- 	L_AUTO_FREE_VAR(char *, gateway);
- 	struct l_rtnl_route *ret;
-+	const uint8_t *mac =3D NULL;
+diff --git a/src/json.c b/src/json.c
+index 0942dae3..69c1dcdb 100644
+--- a/src/json.c
++++ b/src/json.c
+@@ -200,6 +200,9 @@ bool json_iter_parse(struct json_iter *iter, enum json_=
+type type, ...)
+ 	if (iter->start =3D=3D -1)
+ 		return false;
  =
 
- 	gateway =3D l_settings_get_string(netconfig->active_settings,
- 						"IPv6", "Gateway");
-@@ -509,7 +510,7 @@ static struct l_rtnl_route *netconfig_get_static6_gatew=
-ay(
- 					netconfig->fils_override->ipv6_gateway);
++	if (c->tokens[iter->start].type !=3D JSMN_OBJECT)
++		return false;
++
+ 	args =3D l_queue_new();
  =
 
- 		if (!l_memeqzero(netconfig->fils_override->ipv6_gateway_mac, 6))
--			*out_mac =3D netconfig->fils_override->ipv6_gateway_mac;
-+			mac =3D netconfig->fils_override->ipv6_gateway_mac;
- 	} else if (!gateway)
- 		return NULL;
+ 	va_start(va, type);
+@@ -427,6 +430,9 @@ bool json_iter_next(struct json_iter *iter)
+ 	jsmntok_t *t =3D c->tokens + iter->current;
+ 	int inc =3D 1;
  =
 
-@@ -523,6 +524,7 @@ static struct l_rtnl_route *netconfig_get_static6_gatew=
-ay(
- =
-
- 	l_rtnl_route_set_priority(ret, ROUTE_PRIORITY_OFFSET);
- 	l_rtnl_route_set_protocol(ret, RTPROT_STATIC);
-+	*out_mac =3D mac;
- =
-
- 	return ret;
- }
-@@ -864,7 +866,7 @@ static void netconfig_ipv6_ifaddr_add_cmd_cb(int error,=
- uint16_t type,
- {
- 	struct netconfig *netconfig =3D user_data;
- 	struct l_rtnl_route *gateway;
--	const uint8_t *gateway_mac =3D NULL;
-+	const uint8_t *gateway_mac;
- =
-
- 	netconfig->addr6_add_cmd_id =3D 0;
- =
-
++	if (c->tokens[iter->start].type !=3D JSMN_ARRAY)
++		return false;
++
+ 	/*
+ 	 * If this is the initial iteration skip this and just increment
+ 	 * current by 1 since this iterator points to a container which needs to
 -- =
 
-2.30.2
+2.31.1
 
---===============4462644257279225285==--
+--===============7121808623943671950==--
 
