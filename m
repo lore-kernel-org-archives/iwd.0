@@ -1,43 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============5459609312279460675=="
+Content-Type: multipart/mixed; boundary="===============8506332018798234804=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 9/9] station: remove signal_low check for FT-over-DS
-Date: Mon, 27 Sep 2021 10:04:04 -0700
-Message-ID: <20210927170404.1292107-9-prestwoj@gmail.com>
-In-Reply-To: 20210927170404.1292107-1-prestwoj@gmail.com
+Subject: [PATCH v2 1/5] json: add json_iter_get_string
+Date: Thu, 06 Jan 2022 14:52:54 -0800
+Message-ID: <20220106225258.570850-1-prestwoj@gmail.com>
 
---===============5459609312279460675==
+--===============8506332018798234804==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the AP advertises FT-over-DS support it likely wants us to use
-it. Additionally signal_low is probably going to be true since IWD
-has started a roam attempt.
 ---
- src/station.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ src/json.c | 14 ++++++++++++++
+ src/json.h |  1 +
+ 2 files changed, 15 insertions(+)
 
-diff --git a/src/station.c b/src/station.c
-index 96794998..9da5c595 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2022,8 +2022,7 @@ static void station_transition_start(struct station *=
-station,
- 		vendor_ies =3D network_info_get_extra_ies(info, bss, &iov_elems);
- 		handshake_state_set_vendor_ies(hs, vendor_ies, iov_elems);
+diff --git a/src/json.c b/src/json.c
+index b48dba4a..b89fbaa6 100644
+--- a/src/json.c
++++ b/src/json.c
+@@ -398,6 +398,20 @@ bool json_iter_get_container(struct json_iter *iter,
+ 	return true;
+ }
  =
 
--		/* FT-over-DS can be better suited for these situations */
--		if ((hs->mde[4] & 1) && station->signal_low) {
-+		if ((hs->mde[4] & 1)) {
- 			ret =3D netdev_fast_transition_over_ds(station->netdev,
- 					bss, station->connected_bss,
- 					station_fast_transition_cb);
++bool json_iter_get_string(struct json_iter *iter, char **s)
++{
++	struct json_contents *c =3D iter->contents;
++	jsmntok_t *t =3D c->tokens + iter->current;
++
++	if (t->type !=3D JSMN_STRING)
++		return false;
++
++	if (s)
++		*s =3D TOK_TO_STR(c->json, t);
++
++	return true;
++}
++
+ enum json_type json_iter_get_type(struct json_iter *iter)
+ {
+ 	struct json_contents *c =3D iter->contents;
+diff --git a/src/json.h b/src/json.h
+index 518d778c..1db3428d 100644
+--- a/src/json.h
++++ b/src/json.h
+@@ -95,6 +95,7 @@ bool json_iter_get_boolean(struct json_iter *iter, bool *=
+b);
+ bool json_iter_get_null(struct json_iter *iter);
+ bool json_iter_get_container(struct json_iter *iter,
+ 				struct json_iter *container);
++bool json_iter_get_string(struct json_iter *iter, char **s);
+ =
+
+ enum json_type json_iter_get_type(struct json_iter *iter);
+ bool json_iter_next(struct json_iter *iter);
 -- =
 
 2.31.1
 
---===============5459609312279460675==--
+--===============8506332018798234804==--
 
