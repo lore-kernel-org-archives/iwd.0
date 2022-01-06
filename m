@@ -1,233 +1,155 @@
-Content-Type: multipart/mixed; boundary="===============5445539631496424669=="
+Content-Type: multipart/mixed; boundary="===============5676849479649267213=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 04/12] netconfig: Track DNS address string lists
-Date: Thu, 21 Oct 2021 10:50:33 +0200
-Message-ID: <20211021085041.294524-4-andrew.zaborowski@intel.com>
-In-Reply-To: 20211021085041.294524-1-andrew.zaborowski@intel.com
+Subject: [PATCH 5/5] unit: add checks for improper use of json_iter_parse/next
+Date: Thu, 06 Jan 2022 14:42:16 -0800
+Message-ID: <20220106224216.569171-5-prestwoj@gmail.com>
+In-Reply-To: 20220106224216.569171-1-prestwoj@gmail.com
 
---===============5445539631496424669==
+--===============5676849479649267213==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Cache the latest v4 and v6 DNS IP string lists in struct netconfig state
-to be able to more easily detect changes in those values in future
-commits.  For that split netconfig_set_dns's code into this function,
-which now only commit the values in netconfig->dns{4,6}_list to the
-resolver, and netconfig_dns_list_update() which figures out the active
-DNS IP address list and saves it in netconfig->dns{4,6} list.  This
-probably saves some cycles as the callers can now decide to only
-recalculate the dns_list which may have changed.
-
-While there simplify netconfig_set_dns return type to void as the result
-was always 0 anyway and was never checked by callers.
+This adds checks to make sure these API's don't operate on
+objects/primitives they aren't supposed to.
 ---
- src/netconfig.c | 101 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 60 insertions(+), 41 deletions(-)
+ unit/test-json.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/src/netconfig.c b/src/netconfig.c
-index 29a1dbde..3856b264 100644
---- a/src/netconfig.c
-+++ b/src/netconfig.c
-@@ -61,6 +61,8 @@ struct netconfig {
- 	struct l_rtnl_address *v6_address;
- 	char **dns4_overrides;
- 	char **dns6_overrides;
-+	char **dns4_list;
-+	char **dns6_list;
- 	char *mdns;
- 	struct ie_fils_ip_addr_response_info *fils_override;
- 	char *v4_gateway_str;
-@@ -278,52 +280,61 @@ static void netconfig_set_neighbor_entry_cb(int error,
- 			strerror(-error), error);
- }
+diff --git a/unit/test-json.c b/unit/test-json.c
+index fb87987d..0d48b3d1 100644
+--- a/unit/test-json.c
++++ b/unit/test-json.c
+@@ -225,12 +225,14 @@ static void check_primitives(struct json_iter *i, str=
+uct json_iter *ui,
+ 	assert(!json_iter_get_uint(i, NULL));
+ 	assert(!json_iter_get_boolean(i, NULL));
+ 	assert(!json_iter_get_null(i));
++	assert(!json_iter_next(i));
+ 	assert(json_iter_get_int(i, &i_val));
+ 	assert(i_val =3D=3D -10);
  =
 
--static int netconfig_set_dns(struct netconfig *netconfig)
-+static void netconfig_set_dns(struct netconfig *netconfig)
- {
--	const uint8_t *fils_dns4_mac =3D NULL;
--	const uint8_t *fils_dns6_mac =3D NULL;
--	char **dns4_list =3D netconfig_get_dns_list(netconfig, AF_INET,
--							&fils_dns4_mac);
--	char **dns6_list =3D netconfig_get_dns_list(netconfig, AF_INET6,
--							&fils_dns6_mac);
--	unsigned int n_entries4 =3D l_strv_length(dns4_list);
--	unsigned int n_entries6 =3D l_strv_length(dns6_list);
--	char **dns_list;
--	const struct ie_fils_ip_addr_response_info *fils =3D
--		netconfig->fils_override;
--
--	if (!dns4_list && !dns6_list)
--		return 0;
-+	if (!netconfig->dns4_list && !netconfig->dns6_list)
-+		return;
+ 	assert(json_iter_is_valid(ui));
+ 	assert(!json_iter_get_boolean(ui, NULL));
+ 	assert(!json_iter_get_null(ui));
++	assert(!json_iter_next(ui));
+ 	assert(json_iter_get_int(ui, &i_val));
+ 	assert(json_iter_get_uint(ui, &ui_val));
+ 	assert(i_val =3D=3D 10 && ui_val =3D=3D 10);
+@@ -239,6 +241,7 @@ static void check_primitives(struct json_iter *i, struc=
+t json_iter *ui,
+ 	assert(!json_iter_get_null(t));
+ 	assert(!json_iter_get_int(t, NULL));
+ 	assert(!json_iter_get_uint(t, NULL));
++	assert(!json_iter_next(t));
+ 	assert(json_iter_get_boolean(t, &b_val));
+ 	assert(b_val =3D=3D true);
  =
 
--	dns_list =3D dns4_list;
-+	if (netconfig->dns4_list && netconfig->dns6_list) {
-+		unsigned int n_entries4 =3D l_strv_length(netconfig->dns4_list);
-+		unsigned int n_entries6 =3D l_strv_length(netconfig->dns6_list);
-+		char **dns_list =3D l_malloc(sizeof(char *) *
-+					(n_entries4 + n_entries6 + 1));
+@@ -246,6 +249,7 @@ static void check_primitives(struct json_iter *i, struc=
+t json_iter *ui,
+ 	assert(!json_iter_get_null(f));
+ 	assert(!json_iter_get_int(f, NULL));
+ 	assert(!json_iter_get_uint(f, NULL));
++	assert(!json_iter_next(f));
+ 	assert(json_iter_get_boolean(f, &b_val));
+ 	assert(b_val =3D=3D false);
  =
 
--	if (dns6_list) {
--		dns_list =3D l_realloc(dns_list,
--				sizeof(char *) * (n_entries4 + n_entries6 + 1));
--		memcpy(dns_list + n_entries4, dns6_list,
-+		memcpy(dns_list, netconfig->dns4_list,
-+			sizeof(char *) * n_entries4);
-+		memcpy(dns_list + n_entries4, netconfig->dns6_list,
- 			sizeof(char *) * (n_entries6 + 1));
--		/* Contents now belong to dns_list, so no l_strfreev */
--		l_free(dns6_list);
-+		resolve_set_dns(netconfig->resolve, dns_list);
-+		l_free(dns_list);
-+		return;
+@@ -253,10 +257,12 @@ static void check_primitives(struct json_iter *i, str=
+uct json_iter *ui,
+ 	assert(!json_iter_get_int(null, NULL));
+ 	assert(!json_iter_get_uint(null, NULL));
+ 	assert(!json_iter_get_boolean(null, NULL));
++	assert(!json_iter_next(null));
+ 	assert(json_iter_get_null(null));
+ =
+
+ 	if (obj) {
+ 		assert(json_iter_is_valid(obj));
++		assert(!json_iter_next(obj));
+ 		assert(json_iter_parse(obj,
+ 			JSON_MANDATORY("null_val", JSON_PRIMITIVE, null),
+ 			JSON_MANDATORY("false_val", JSON_PRIMITIVE, f),
+@@ -336,6 +342,7 @@ static void test_json_arrays(const void *data)
+ =
+
+ 	while (json_iter_next(&ui_array)) {
+ 		assert(json_iter_get_type(&ui_array) =3D=3D JSON_PRIMITIVE);
++		assert(!json_iter_parse(&ui_array, JSON_UNDEFINED));
+ 		assert(json_iter_get_uint(&ui_array, &ui));
+ 		assert(ui =3D=3D (unsigned int) count);
+ 		count++;
+@@ -345,6 +352,7 @@ static void test_json_arrays(const void *data)
+ =
+
+ 	while (json_iter_next(&i_array)) {
+ 		assert(json_iter_get_type(&i_array) =3D=3D JSON_PRIMITIVE);
++		assert(!json_iter_parse(&i_array, JSON_UNDEFINED));
+ 		assert(json_iter_get_int(&i_array, &i));
+ 		assert(i =3D=3D count);
+ 		count--;
+@@ -354,6 +362,7 @@ static void test_json_arrays(const void *data)
+ =
+
+ 	while (json_iter_next(&b_array)) {
+ 		assert(json_iter_get_type(&b_array) =3D=3D JSON_PRIMITIVE);
++		assert(!json_iter_parse(&b_array, JSON_UNDEFINED));
+ 		assert(json_iter_get_boolean(&b_array, &b));
+ 		assert(b =3D=3D count % 2 ? false : true);
+ 		count++;
+@@ -363,6 +372,7 @@ static void test_json_arrays(const void *data)
+ =
+
+ 	while (json_iter_next(&n_array)) {
+ 		assert(json_iter_get_type(&n_array) =3D=3D JSON_PRIMITIVE);
++		assert(!json_iter_parse(&n_array, JSON_UNDEFINED));
+ 		assert(json_iter_get_null(&n_array));
+ 		count++;
  	}
+@@ -407,6 +417,8 @@ static void test_json_arrays(const void *data)
  =
 
--	resolve_set_dns(netconfig->resolve, dns_list);
--	l_strv_free(dns_list);
-+	resolve_set_dns(netconfig->resolve,
-+			netconfig->dns4_list ?: netconfig->dns6_list);
-+}
+ 	count =3D 0;
  =
 
--	if (fils_dns4_mac && !l_rtnl_neighbor_set_hwaddr(rtnl,
--					netconfig->ifindex, AF_INET,
--					&fils->ipv4_dns, fils_dns4_mac, 6,
--					netconfig_set_neighbor_entry_cb, NULL,
--					NULL))
--		l_debug("l_rtnl_neighbor_set_hwaddr failed");
-+static bool netconfig_dns_list_update(struct netconfig *netconfig, uint8_t=
- af)
-+{
-+	const uint8_t *fils_dns_mac =3D NULL;
-+	char ***dns_list_ptr =3D af =3D=3D AF_INET ?
-+		&netconfig->dns4_list : &netconfig->dns6_list;
-+	char **new_dns_list =3D netconfig_get_dns_list(netconfig, af,
-+							&fils_dns_mac);
++	assert(!json_iter_parse(&obj_array, JSON_UNDEFINED));
 +
-+	if (l_strv_eq(*dns_list_ptr, new_dns_list)) {
-+		l_strv_free(new_dns_list);
-+		return false;
-+	}
+ 	while (json_iter_next(&obj_array)) {
+ 		struct json_iter object;
  =
 
--	if (fils_dns6_mac && !l_rtnl_neighbor_set_hwaddr(rtnl,
--					netconfig->ifindex, AF_INET6,
--					fils->ipv6_dns, fils_dns6_mac, 6,
--					netconfig_set_neighbor_entry_cb, NULL,
--					NULL))
--		l_debug("l_rtnl_neighbor_set_hwaddr failed");
-+	l_strv_free(*dns_list_ptr);
-+	*dns_list_ptr =3D new_dns_list;
- =
-
--	return 0;
-+	if (fils_dns_mac) {
-+		const struct ie_fils_ip_addr_response_info *fils =3D
-+			netconfig->fils_override;
-+		const void *dns_ip =3D af =3D=3D AF_INET ?
-+			(const void *) &fils->ipv4_dns :
-+			(const void *) &fils->ipv6_dns;
-+
-+		if (!l_rtnl_neighbor_set_hwaddr(rtnl, netconfig->ifindex, af,
-+						dns_ip, fils_dns_mac, 6,
-+						netconfig_set_neighbor_entry_cb,
-+						NULL, NULL))
-+			l_debug("l_rtnl_neighbor_set_hwaddr failed");
-+	}
-+
-+	return true;
- }
- =
-
- static void append_domain(char **domains, unsigned int *n_domains,
-@@ -1010,6 +1021,8 @@ static void netconfig_ipv4_dhcp_event_handler(struct =
-l_dhcp_client *client,
- 			return;
+@@ -475,17 +487,19 @@ static void test_json_nested_arrays(const void *data)
+ 			count2++;
  		}
  =
 
-+		netconfig_dns_list_update(netconfig, AF_INET);
-+
- 		L_WARN_ON(!(netconfig->addr4_add_cmd_id =3D
- 				l_rtnl_ifaddr_add(rtnl, netconfig->ifindex,
- 					netconfig->v4_address,
-@@ -1079,12 +1092,14 @@ static void netconfig_dhcp6_event_handler(struct l_=
-dhcp6_client *client,
- 		l_rtnl_address_free(netconfig->v6_address);
- 		netconfig->v6_address =3D address;
- =
-
-+		netconfig_dns_list_update(netconfig, AF_INET6);
- 		netconfig_set_dns(netconfig);
- 		netconfig_set_domains(netconfig);
- 		break;
- 	}
- 	case L_DHCP6_CLIENT_EVENT_LEASE_EXPIRED:
- 		l_debug("Lease for interface %u expired", netconfig->ifindex);
-+		netconfig_dns_list_update(netconfig, AF_INET6);
- 		netconfig_set_dns(netconfig);
- 		netconfig_set_domains(netconfig);
- 		l_rtnl_address_free(netconfig->v6_address);
-@@ -1118,8 +1133,8 @@ static void netconfig_reset_v4(struct netconfig *netc=
-onfig)
- 	if (netconfig->rtm_protocol) {
- 		netconfig_remove_v4_address(netconfig);
- =
-
--		l_strfreev(netconfig->dns4_overrides);
--		netconfig->dns4_overrides =3D NULL;
-+		l_strv_free(l_steal_ptr(netconfig->dns4_overrides));
-+		l_strv_free(l_steal_ptr(netconfig->dns4_list));
- =
-
- 		l_dhcp_client_stop(netconfig->dhcp_client);
- 		netconfig->rtm_protocol =3D 0;
-@@ -1204,6 +1219,8 @@ static bool netconfig_ipv4_select_and_install(struct =
-netconfig *netconfig)
- 							ip)))
- 			return false;
- =
-
-+		netconfig_dns_list_update(netconfig, AF_INET);
-+
- 		netconfig->acd =3D l_acd_new(netconfig->ifindex);
- 		l_acd_set_event_handler(netconfig->acd,
- 					netconfig_ipv4_acd_event, netconfig,
-@@ -1275,6 +1292,8 @@ static bool netconfig_ipv6_select_and_install(struct =
-netconfig *netconfig)
- 	}
- =
-
- 	if (netconfig->v6_address) {
-+		netconfig_dns_list_update(netconfig, AF_INET6);
-+
- 		L_WARN_ON(!(netconfig->addr6_add_cmd_id =3D
- 			l_rtnl_ifaddr_add(rtnl, netconfig->ifindex,
- 					netconfig->v6_address,
-@@ -1513,8 +1532,8 @@ bool netconfig_reset(struct netconfig *netconfig)
- 		l_rtnl_address_free(netconfig->v6_address);
- 		netconfig->v6_address =3D NULL;
- =
-
--		l_strfreev(netconfig->dns6_overrides);
--		netconfig->dns6_overrides =3D NULL;
-+		l_strv_free(l_steal_ptr(netconfig->dns6_overrides));
-+		l_strv_free(l_steal_ptr(netconfig->dns6_list));
- =
-
- 		l_dhcp6_client_stop(netconfig->dhcp6_client);
- 		netconfig->rtm_v6_protocol =3D 0;
+-		/*
+-		 * TODO: add checks for object iteration. Currently these will
+-		 * just count all tokens in the object.
+-		 */
+ 		switch (count) {
+ 		case 0:
+ 			assert(count2 =3D=3D 0);
+ 			break;
++		case 1:
++			assert(count2 =3D=3D 0);
++			break;
+ 		case 2:
+ 			assert(count2 =3D=3D 2);
+ 			break;
++		case 3:
++			assert(count2 =3D=3D 0);
++			break;
+ 		case 4:
+ 			assert(count2 =3D=3D 2);
+ 			break;
 -- =
 
-2.32.0
+2.31.1
 
---===============5445539631496424669==--
+--===============5676849479649267213==--
 
