@@ -1,106 +1,124 @@
-Content-Type: multipart/mixed; boundary="===============5484389195524458671=="
+Content-Type: multipart/mixed; boundary="===============4490185940191384239=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 03/11] band: add BAND_FREQ_6_GHZ
-Date: Fri, 25 Feb 2022 09:58:02 -0800
-Message-ID: <20220225175810.2914413-3-prestwoj@gmail.com>
-In-Reply-To: 20220225175810.2914413-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2 4/9] json: add support for array iteration
+Date: Thu, 06 Jan 2022 15:59:51 -0600
+Message-ID: <4210b6c5-8411-fc54-859a-ad1512f0e042@gmail.com>
+In-Reply-To: 5760604b8089144a3b34218d22499442caa41401.camel@gmail.com
 
---===============5484389195524458671==
+--===============4490185940191384239==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a new band defined in the WiFi 6E (ax) amendment. A completely
-new value is needed due to channel reuse between 2.4/5 and 6GHz.
+Hi James,
 
-util.c needed minimal updating to prevent compile errors which will
-be fixed later to actually handle this band. WSC also needed a case
-added for 6GHz but the spec does not outline any RF Band value for
-6GHz so the 5GHz value will be returned in this case.
----
- src/band.c | 3 ++-
- src/band.h | 1 +
- src/util.c | 4 ++++
- src/wsc.c  | 1 +
- 4 files changed, 8 insertions(+), 1 deletion(-)
+>> Am I right so far?
+> =
 
-diff --git a/src/band.c b/src/band.c
-index 053f85d6..1eb94586 100644
---- a/src/band.c
-+++ b/src/band.c
-@@ -1092,10 +1092,11 @@ static const uint8_t oper_class_jp_to_global[] =3D {
- 	/* 128 - 130 is a 1 to 1 mapping */
- };
- =
+> Yes that is exactly it. Consider this array:
+> =
 
--/* Annex E, table E-4 (only 2.4GHz and 4.9 / 5GHz bands) */
-+/* Annex E, table E-4 (only 2.4GHz, 4.9 / 5GHz, and 6GHz bands) */
- static const enum band_freq oper_class_to_band_global[] =3D {
- 	[81 ... 84]   =3D BAND_FREQ_2_4_GHZ,
- 	[104 ... 130] =3D BAND_FREQ_5_GHZ,
-+	[131 ... 136] =3D BAND_FREQ_6_GHZ,
- };
- =
+> ["foo", "bar"]
+> =
 
- /* Annex E, table E-5 */
-diff --git a/src/band.h b/src/band.h
-index 2320bbcf..7b9e901f 100644
---- a/src/band.h
-+++ b/src/band.h
-@@ -39,6 +39,7 @@ enum band_chandef_width {
- enum band_freq {
- 	BAND_FREQ_2_4_GHZ =3D 0x1,
- 	BAND_FREQ_5_GHZ =3D 0x2,
-+	BAND_FREQ_6_GHZ =3D 0x4,
- };
- =
+> count_tokens_in_container() will return 2 tokens. count++ gives us 3
+> and 'start' points to the array itself.
+> =
 
- struct band_chandef {
-diff --git a/src/util.c b/src/util.c
-index 20e179a6..16df59ac 100644
---- a/src/util.c
-+++ b/src/util.c
-@@ -347,6 +347,8 @@ bool scan_freq_set_add(struct scan_freq_set *freqs, uin=
-t32_t freq)
- 		return true;
- 	case BAND_FREQ_5_GHZ:
- 		return l_uintset_put(freqs->channels_5ghz, channel);
-+	case BAND_FREQ_6_GHZ:
-+		return false;
- 	}
- =
 
- 	return false;
-@@ -366,6 +368,8 @@ bool scan_freq_set_contains(const struct scan_freq_set =
-*freqs, uint32_t freq)
- 		return freqs->channels_2ghz & (1 << (channel - 1));
- 	case BAND_FREQ_5_GHZ:
- 		return l_uintset_contains(freqs->channels_5ghz, channel);
-+	case BAND_FREQ_6_GHZ:
-+		return false;
- 	}
- =
+Ok, I think I managed to convince myself this is indeed okay, particularly =
+since =
 
- 	return false;
-diff --git a/src/wsc.c b/src/wsc.c
-index 0457ebf7..bb9f663b 100644
---- a/src/wsc.c
-+++ b/src/wsc.c
-@@ -308,6 +308,7 @@ static inline enum wsc_rf_band freq_to_rf_band(uint32_t=
- freq)
- 	case BAND_FREQ_2_4_GHZ:
- 		return WSC_RF_BAND_2_4_GHZ;
- 	case BAND_FREQ_5_GHZ:
-+	case BAND_FREQ_6_GHZ:
- 		return WSC_RF_BAND_5_0_GHZ;
- 	}
- =
+it is consistent with json_iter_init() behavior.
 
--- =
+One thing you may to do is add a check to json_iter_parse to make sure it i=
+s =
 
-2.34.1
+operating on iterators of type JSMN_OBJECT and nothing else.  That function=
+'s =
 
---===============5484389195524458671==--
+use of ITER_END is what made me suspicious.
+
+> Call json_iter_next():
+> 	'start' is advanced by 1, pointing to "foo"
+> =
+
+> Call json_iter_next():
+> 	'start' is advanced by 1, pointing to "bar"
+> =
+
+
+So in theory, you could use 'size' as a limit counter.  So for primitives, =
+set =
+
+pos to 1 and have iter_next check whether pos + 1 <=3D size.
+
+For arrays/objects, set size to 0 and don't allow getters to work if pos is=
+ 0. =
+
+Or something to that effect.  Not sure if this makes things easier or not.
+
+> Call json_iter_next():
+> 	'start' is advanced by 1, pointing to some token after "bar".
+> =
+
+> 	We then check:
+> =
+
+> 	if (c->tokens + iter->current + inc >=3D ITER_END(iter))
+> 		return false;
+> =
+
+> 	And in this case iter->current + inc will equal ITER_END
+> =
+
+
+Yes, this all makes sense.  Why do we increment by count_tokens_in_containe=
+r() + =
+
+1 though?
+
+<snip>
+
+>> One idea might be to use the 'size' variable of the start token to
+>> know whether
+>> the iterator can be advanced or not.=C2=A0 Alternatively, look up the ba=
+se
+>> type of
+>> the iterator at the start token and modify the behavior here
+>> accordingly.
+> =
+
+> Are you talking about preventing primitive iteration? Or just
+> altertering how iteration is done in general?
+
+I think both.
+
+> =
+
+> The check below ensures the token is an iterable container, and size is
+> used in that check if only to detect empty objects/arrays, which would
+> then be treated exactly like a primitive/string.
+> =
+
+> I'm not sure 'size' can be trusted soley to know if its an iterable
+> object. For example a key's size is 1. I'm not sure how an iterator
+> could end up pointing there, but checking OBJECT/ARRAY explicitly seems
+> like the safest bet to me.
+
+I would assume (hope?) that size can be trusted.  I could be wrong, but see=
+ms to =
+
+me like it would make some checks easier.
+
+Are empty objects/arrays really of size 1?  How does one distinguish betwee=
+n an =
+
+array with 1 element and an empty array?
+
+Regards,
+-Denis
+--===============4490185940191384239==--
 
