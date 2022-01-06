@@ -1,384 +1,143 @@
-Content-Type: multipart/mixed; boundary="===============4394626494574347418=="
+Content-Type: multipart/mixed; boundary="===============1844511620220925107=="
 MIME-Version: 1.0
-From: Torsten Schmitz <noreply.torsten at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] auto-t: replacing ifconfig with ip commands
-Date: Wed, 10 Nov 2021 13:55:52 +0100
-Message-ID: <20211110125552.20102-1-noreply.torsten@gmail.com>
+Subject: [PATCH v2 2/5] unit: add strings to several json iteration tests
+Date: Thu, 06 Jan 2022 14:52:55 -0800
+Message-ID: <20220106225258.570850-2-prestwoj@gmail.com>
+In-Reply-To: 20220106225258.570850-1-prestwoj@gmail.com
 
---===============4394626494574347418==
+--===============1844511620220925107==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-ifconfig and the rest of net-tools has been deprecated by
-many distributions. Use iproute2 instead.
 ---
- autotests/testFILS/fils_256_test.py           |  2 +-
- autotests/testFILS/fils_384_test.py           |  2 +-
- .../testFT-8021x-roam/connection_test.py      | 18 +++++++------
- autotests/testFT-FILS/connection_test.py      | 18 ++++++-------
- autotests/testNetconfig/connection_test.py    |  3 +--
- autotests/testNetconfig/static_test.py        |  3 +--
- autotests/testP2P/connection_test.py          |  2 +-
- autotests/testPSK-roam/connection_test.py     | 16 +++++------
- autotests/testPreauth-roam/connection_test.py |  2 +-
- autotests/testSAE-roam/connection_test.py     | 27 ++++++++++---------
- doc/test-runner.txt                           |  2 +-
- tools/test-runner                             |  6 ++---
- 12 files changed, 52 insertions(+), 49 deletions(-)
+ unit/test-json.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 38 insertions(+), 5 deletions(-)
 
-diff --git a/autotests/testFILS/fils_256_test.py b/autotests/testFILS/fils_=
-256_test.py
-index a4e58715..5fa371e1 100644
---- a/autotests/testFILS/fils_256_test.py
-+++ b/autotests/testFILS/fils_256_test.py
-@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
-     @classmethod
-     def setUpClass(cls):
-         IWD.copy_to_storage('ssidFILS-256.8021x')
--        os.system('ifconfig lo up')
-+        os.system('ip link set lo up')
-         pass
+diff --git a/unit/test-json.c b/unit/test-json.c
+index d160f6b7..fb87987d 100644
+--- a/unit/test-json.c
++++ b/unit/test-json.c
+@@ -315,7 +315,7 @@ static void test_json_arrays(const void *data)
+ 			"\"bool_array\":[true, false, true, false],"
+ 			"\"null_array\":[null, null, null, null],"
+ 			"\"obj_array\":[{}, {\"key\":\"value\", \"key2\":\"value2\"}],"
+-			"\"mixed_array\":[1, -1, true, false, null]}";
++			"\"mixed_array\":[1, -1, true, false, null, \"string\"]}";
  =
 
-     @classmethod
-diff --git a/autotests/testFILS/fils_384_test.py b/autotests/testFILS/fils_=
-384_test.py
-index e6550a17..b7174418 100644
---- a/autotests/testFILS/fils_384_test.py
-+++ b/autotests/testFILS/fils_384_test.py
-@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
-     @classmethod
-     def setUpClass(cls):
-         IWD.copy_to_storage('ssidFILS-384.8021x')
--        os.system('ifconfig lo up')
-+        os.system('ip link set lo up')
-         pass
+ 	struct json_iter iter;
+ 	struct json_iter i_array, ui_array, b_array, n_array,
+@@ -372,25 +372,34 @@ static void test_json_arrays(const void *data)
+ 	count =3D 0;
  =
 
-     @classmethod
-diff --git a/autotests/testFT-8021x-roam/connection_test.py b/autotests/tes=
-tFT-8021x-roam/connection_test.py
-index e65e4675..652677a9 100644
---- a/autotests/testFT-8021x-roam/connection_test.py
-+++ b/autotests/testFT-8021x-roam/connection_test.py
-@@ -54,10 +54,10 @@ class Test(unittest.TestCase):
-                           (self.bss_hostapd[0].ifname, device.name, True, =
-True))
+ 	while (json_iter_next(&m_array)) {
+-		assert(json_iter_get_type(&m_array) =3D=3D JSON_PRIMITIVE);
++		_auto_(l_free) char *str =3D NULL;
  =
 
-     def tearDown(self):
--        os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" down')
--        os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" down')
--        os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" up')
--        os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" up')
+ 		switch (count) {
+ 		case 0:
++			assert(json_iter_get_type(&m_array) =3D=3D JSON_PRIMITIVE);
+ 			assert(json_iter_get_uint(&m_array, &ui));
+ 			assert(ui =3D=3D 1);
+ 			break;
+ 		case 1:
++			assert(json_iter_get_type(&m_array) =3D=3D JSON_PRIMITIVE);
+ 			assert(json_iter_get_int(&m_array, &i));
+ 			assert(i =3D=3D -1);
+ 			break;
+ 		case 2:
+ 		case 3:
++			assert(json_iter_get_type(&m_array) =3D=3D JSON_PRIMITIVE);
+ 			assert(json_iter_get_boolean(&m_array, &b));
+ 			assert(b =3D=3D count % 2 ? false : true);
+ 			break;
+ 		case 4:
++			assert(json_iter_get_type(&m_array) =3D=3D JSON_PRIMITIVE);
+ 			assert(json_iter_get_null(&m_array));
+ 			break;
++		case 5:
++			assert(json_iter_get_type(&m_array) =3D=3D JSON_STRING);
++			assert(json_iter_get_string(&m_array, &str));
++			assert(!strcmp(str, "string"));
++			break;
+ 		}
  =
 
-     @classmethod
-     def setUpClass(cls):
-@@ -67,10 +67,12 @@ class Test(unittest.TestCase):
-                             HostapdCLI(config=3D'ft-eap-ccmp-2.conf') ]
+ 		count++;
+@@ -425,7 +434,7 @@ static void test_json_arrays(const void *data)
  =
 
-         # Set interface addresses to those expected by hostapd config files
--        os.system('ifconfig "' + cls.bss_hostapd[0].ifname +
--                '" down hw ether 12:00:00:00:00:01 up')
--        os.system('ifconfig "' + cls.bss_hostapd[1].ifname +
--                '" down hw ether 12:00:00:00:00:02 up')
-+        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" dow=
-n')
-+        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + \
-+                  '" address 12:00:00:00:00:01 up')
-+        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" dow=
-n')
-+        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + \
-+                  '" address 12:00:00:00:00:02 up')
+ static void test_json_nested_arrays(const void *data)
+ {
+-	char json[] =3D "{\"array\":[[], {}, [1, 2], {\"key\":\"value\"}]}";
++	char json[] =3D "{\"array\":[[], {}, [1, 2], {\"key\":\"value\"}, [\"one\=
+",\"two\"]]}";
+ 	int count =3D 0;
+ 	struct json_iter iter;
+ 	struct json_iter array;
+@@ -442,8 +451,29 @@ static void test_json_nested_arrays(const void *data)
  =
 
-         cls.bss_hostapd[0].reload()
-         cls.bss_hostapd[0].wait_for_event("AP-ENABLED")
-diff --git a/autotests/testFT-FILS/connection_test.py b/autotests/testFT-FI=
-LS/connection_test.py
-index 14025a3b..1fd4633b 100644
---- a/autotests/testFT-FILS/connection_test.py
-+++ b/autotests/testFT-FILS/connection_test.py
-@@ -124,24 +124,24 @@ class Test(unittest.TestCase):
-         self.validate_connection(wd)
+ 		assert(json_iter_get_container(&array, &inner));
  =
 
-     def tearDown(self):
--        os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" down')
--        os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" down')
--        os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" up')
--        os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" up')
+-		while (json_iter_next(&inner))
++		while (json_iter_next(&inner)) {
++			_auto_(l_free) char *str =3D NULL;
++
++			switch (count) {
++			case 0:
++			case 1:
++				assert(false);
++				break;
++			case 4:
++				assert(json_iter_get_type(&inner) =3D=3D
++							JSON_STRING);
++				assert(json_iter_get_string(&inner, &str));
++
++				if (count2 =3D=3D 0)
++					assert(!strcmp("one", str));
++				else
++					assert(!strcmp("two", str));
++
++				break;
++			}
++
+ 			count2++;
++		}
  =
 
-     @classmethod
-     def setUpClass(cls):
--        os.system('ifconfig lo up')
-+        os.system('ip link set lo up')
-         IWD.copy_to_storage('TestFT.8021x')
+ 		/*
+ 		 * TODO: add checks for object iteration. Currently these will
+@@ -456,6 +486,9 @@ static void test_json_nested_arrays(const void *data)
+ 		case 2:
+ 			assert(count2 =3D=3D 2);
+ 			break;
++		case 4:
++			assert(count2 =3D=3D 2);
++			break;
+ 		default:
+ 			break;
+ 		}
+@@ -463,7 +496,7 @@ static void test_json_nested_arrays(const void *data)
+ 		count++;
+ 	}
  =
 
-         cls.bss_hostapd =3D [ HostapdCLI(config=3D'ft-eap-ccmp-1.conf'),
-                             HostapdCLI(config=3D'ft-eap-ccmp-2.conf') ]
+-	assert(count =3D=3D 4);
++	assert(count =3D=3D 5);
  =
 
-         # Set interface addresses to those expected by hostapd config files
--        os.system('ifconfig "' + cls.bss_hostapd[0].ifname +
--                '" down hw ether 12:00:00:00:00:01 up')
--        os.system('ifconfig "' + cls.bss_hostapd[1].ifname +
--                '" down hw ether 12:00:00:00:00:02 up')
-+        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" dow=
-n')
-+        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" add=
-r 12:00:00:00:00:01 up')
-+        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" dow=
-n')
-+        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" add=
-r 12:00:00:00:00:02 up')
- =
-
-         cls.bss_hostapd[0].reload()
-         cls.bss_hostapd[0].wait_for_event("AP-ENABLED")
-diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNet=
-config/connection_test.py
-index b1d4afef..74ec224a 100644
---- a/autotests/testNetconfig/connection_test.py
-+++ b/autotests/testNetconfig/connection_test.py
-@@ -59,8 +59,7 @@ class Test(unittest.TestCase):
-         # TODO: This could be moved into test-runner itself if other tests=
- ever
-         #       require this functionality (p2p, FILS, etc.). Since its si=
-mple
-         #       enough it can stay here for now.
--        ctx.start_process(['ifconfig', hapd.ifname, '192.168.1.1',
--                            'netmask', '255.255.255.0']).wait()
-+        ctx.start_process(['ip', 'addr','add', 'dev', hapd.ifname, '192.16=
-8.1.1/255.255.255.0']).wait()
-         ctx.start_process(['touch', '/tmp/dhcpd.leases']).wait()
-         cls.dhcpd_pid =3D ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/d=
-hcpd.conf',
-                                             '-lf', '/tmp/dhcpd.leases',
-diff --git a/autotests/testNetconfig/static_test.py b/autotests/testNetconf=
-ig/static_test.py
-index eb918e92..4aae4a20 100644
---- a/autotests/testNetconfig/static_test.py
-+++ b/autotests/testNetconfig/static_test.py
-@@ -86,8 +86,7 @@ class Test(unittest.TestCase):
-         # TODO: This could be moved into test-runner itself if other tests=
- ever
-         #       require this functionality (p2p, FILS, etc.). Since its si=
-mple
-         #       enough it can stay here for now.
--        ctx.start_process(['ifconfig', hapd.ifname, '192.168.1.1',
--                            'netmask', '255.255.255.0']).wait()
-+        ctx.start_process(['ip', 'addr','add', hapd.ifname, '192.168.1.1/2=
-55.255.255.0']).wait()
-         ctx.start_process(['touch', '/tmp/dhcpd.leases']).wait()
-         cls.dhcpd_pid =3D ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/d=
-hcpd.conf',
-                                             '-lf', '/tmp/dhcpd.leases',
-diff --git a/autotests/testP2P/connection_test.py b/autotests/testP2P/conne=
-ction_test.py
-index 04f63fdf..ddebc70a 100644
---- a/autotests/testP2P/connection_test.py
-+++ b/autotests/testP2P/connection_test.py
-@@ -93,7 +93,7 @@ class Test(unittest.TestCase):
-         self.assertEqual(wpas.p2p_group['role'], 'GO' if not go else 'clie=
-nt')
- =
-
-         if not go:
--            ctx.start_process(['ifconfig', peer_ifname, '192.168.1.20', 'n=
-etmask', '255.255.255.0']).wait()
-+            ctx.start_process(['ip', 'addr', 'add','dev', peer_ifname, '19=
-2.168.1.20/255.255.255.0']).wait()
-             os.system('> /tmp/dhcp.leases')
-             dhcp =3D ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/dhcpd.=
-conf', '-lf', '/tmp/dhcp.leases', peer_ifname])
-             self.dhcp =3D dhcp
-diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
-roam/connection_test.py
-index ee50e4a7..437e52fc 100644
---- a/autotests/testPSK-roam/connection_test.py
-+++ b/autotests/testPSK-roam/connection_test.py
-@@ -150,10 +150,10 @@ class Test(unittest.TestCase):
-         self.validate_connection(wd)
- =
-
-     def tearDown(self):
--        os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" down')
--        os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" down')
--        os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" up')
--        os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" up')
- =
-
-         self.rule0.enabled =3D False
- =
-
-@@ -175,10 +175,10 @@ class Test(unittest.TestCase):
-         cls.rule0.drop =3D True
- =
-
-         # Set interface addresses to those expected by hostapd config files
--        os.system('ifconfig "' + cls.bss_hostapd[0].ifname +
--                '" down hw ether 12:00:00:00:00:01 up')
--        os.system('ifconfig "' + cls.bss_hostapd[1].ifname +
--                '" down hw ether 12:00:00:00:00:02 up')
-+        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" dow=
-n')
-+        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" add=
-r 12:00:00:00:00:01 up')
-+        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" dow=
-n')
-+        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" add=
-r 12:00:00:00:00:02 up')
- =
-
-         cls.bss_hostapd[0].reload()
-         cls.bss_hostapd[0].wait_for_event("AP-ENABLED")
-diff --git a/autotests/testPreauth-roam/connection_test.py b/autotests/test=
-Preauth-roam/connection_test.py
-index 63b73b54..61f095d3 100644
---- a/autotests/testPreauth-roam/connection_test.py
-+++ b/autotests/testPreauth-roam/connection_test.py
-@@ -86,7 +86,7 @@ class Test(unittest.TestCase):
-     def setUpClass(cls):
-         IWD.copy_to_storage('TestPreauth.8021x')
- =
-
--        os.system('ifconfig lo up')
-+        os.system('ip link set lo up')
- =
-
-     @classmethod
-     def tearDownClass(cls):
-diff --git a/autotests/testSAE-roam/connection_test.py b/autotests/testSAE-=
-roam/connection_test.py
-index 20d94c8f..23f3aaac 100644
---- a/autotests/testSAE-roam/connection_test.py
-+++ b/autotests/testSAE-roam/connection_test.py
-@@ -111,12 +111,12 @@ class Test(unittest.TestCase):
-         self.validate_connection(wd, False)
- =
-
-     def tearDown(self):
--        os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" down')
--        os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" down')
--        os.system('ifconfig "' + self.bss_hostapd[2].ifname + '" down')
--        os.system('ifconfig "' + self.bss_hostapd[0].ifname + '" up')
--        os.system('ifconfig "' + self.bss_hostapd[1].ifname + '" up')
--        os.system('ifconfig "' + self.bss_hostapd[2].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[2].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[2].ifname + '" up')
- =
-
-     @classmethod
-     def setUpClass(cls):
-@@ -124,12 +124,15 @@ class Test(unittest.TestCase):
-                             HostapdCLI(config=3D'ft-sae-2.conf'),
-                             HostapdCLI(config=3D'ft-psk-3.conf') ]
- =
-
--        ctx.start_process(['ifconfig', cls.bss_hostapd[0].ifname, 'down', =
-'hw', \
--                                'ether', '12:00:00:00:00:01', 'up']).wait()
--        ctx.start_process(['ifconfig', cls.bss_hostapd[1].ifname, 'down', =
-'hw', \
--                                'ether', '12:00:00:00:00:02', 'up']).wait()
--        ctx.start_process(['ifconfig', cls.bss_hostapd[2].ifname, 'down', =
-'hw', \
--                                'ether', '12:00:00:00:00:03', 'up']).wait()
-+        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[0].=
-ifname, 'down'])
-+        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[0].=
-ifname, \
-+                           'addr', '12:00:00:00:00:01', 'up']).wait()
-+        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[1].=
-ifname, 'down'])
-+        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[1].=
-ifname, \
-+                           'addr', '12:00:00:00:00:02', 'up']).wait()
-+        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[2].=
-ifname, 'down'])
-+        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[2].=
-ifname, \
-+                           'adrr', '12:00:00:00:00:03', 'up']).wait()
- =
-
-         # Set interface addresses to those expected by hostapd config files
-         cls.bss_hostapd[0].reload()
-diff --git a/doc/test-runner.txt b/doc/test-runner.txt
-index 9140aa0f..4f2887c3 100644
---- a/doc/test-runner.txt
-+++ b/doc/test-runner.txt
-@@ -19,7 +19,7 @@ OS:
- 	 1. qemu		2.4.1
- 	 2. Linux kernel	4.20+
- 	 3. dbus-daemon		1.11.18
--	 4. ifconfig		2.10-alpha
-+	 4. iproute2
- 	 5. iw			3.17
- 	 6. python		2.7
- 	 7. haveged		no ver. avail.
-diff --git a/tools/test-runner b/tools/test-runner
-index 5fc4285d..7fa8b840 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -361,7 +361,7 @@ class Interface:
- 		Process(['iw', 'dev', self.name, 'del']).wait()
- =
-
- 	def set_interface_state(self, state):
--		Process(['ifconfig', self.name, state]).wait()
-+		Process(['ip', 'link', 'set', self.name, state]).wait()
- =
-
- class Radio:
- 	def __init__(self, name):
-@@ -971,7 +971,7 @@ class TestContext(Namespace):
- 			print("Ofono or Phonesim not found, skipping test")
- 			return
- =
-
--		Process(['ifconfig', 'lo', 'up']).wait()
-+		Process(['ip', 'link', 'set', 'lo', 'up']).wait()
- =
-
- 		os.environ['OFONO_PHONESIM_CONFIG'] =3D '/tmp/phonesim.conf'
- =
-
-@@ -1358,7 +1358,7 @@ def post_test(ctx, to_copy):
- 			else:
- 				os.remove('/tmp/' + f)
- =
-
--		Process(['ifconfig', 'lo', 'down']).wait()
-+		Process(['ip', 'link', 'set', 'lo', 'down']).wait()
- 	except Exception as e:
- 		print("Exception thrown in post_test")
- 	finally:
+ 	json_contents_free(c);
+ }
 -- =
 
-2.33.1
+2.31.1
 
---===============4394626494574347418==--
+--===============1844511620220925107==--
 
