@@ -1,47 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============6934431294506223955=="
+Content-Type: multipart/mixed; boundary="===============7404188809640772665=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 09/14] auto-t: fix testBSSBlacklist typo
-Date: Thu, 31 Mar 2022 16:16:36 -0700
-Message-ID: <20220331231641.484200-9-prestwoj@gmail.com>
-In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2 5/9] json: increase default token size to 60
+Date: Thu, 06 Jan 2022 14:26:30 -0600
+Message-ID: <875b9889-edc6-77e4-a20e-22604fb69923@gmail.com>
+In-Reply-To: 20220106195007.528618-5-prestwoj@gmail.com
 
---===============6934431294506223955==
+--===============7404188809640772665==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The property is 'enabled' not 'enable'
----
- autotests/testBSSBlacklist/connection_test.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Hi James,
 
-diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/test=
-BSSBlacklist/connection_test.py
-index 8e239f44..9631a322 100644
---- a/autotests/testBSSBlacklist/connection_test.py
-+++ b/autotests/testBSSBlacklist/connection_test.py
-@@ -110,11 +110,11 @@ class Test(unittest.TestCase):
- =
+On 1/6/22 13:50, James Prestwood wrote:
+> ---
+>   src/json.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-         # Have both APs drop all packets, both should get blacklisted
-         rule0.drop =3D True
--        rule0.enable =3D True
-+        rule0.enabled =3D True
-         rule1.drop =3D True
--        rule1.enable =3D True
-+        rule1.enabled =3D True
-         rule2.drop =3D True
--        rule2.enable =3D True
-+        rule2.enabled =3D True
- =
 
-         with self.assertRaises(iwd.FailedEx):
-             ordered_network.network_object.connect()
--- =
+Applied, thanks.
 
-2.34.1
+Regards,
+-Denis
 
---===============6934431294506223955==--
+--===============7404188809640772665==--
 
