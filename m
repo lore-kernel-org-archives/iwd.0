@@ -1,59 +1,90 @@
-Content-Type: multipart/mixed; boundary="===============8403248381572948783=="
+Content-Type: multipart/mixed; boundary="===============1121110300565296598=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/3] p2p: fix warning for uninitialized variable (clang)
-Date: Fri, 10 Jun 2022 12:52:41 -0700
-Message-ID: <20220610195242.455453-2-prestwoj@gmail.com>
-In-Reply-To: 20220610195242.455453-1-prestwoj@gmail.com
+Subject: [PATCH v2 9/9] unit: add test for nested arrays
+Date: Thu, 06 Jan 2022 11:50:07 -0800
+Message-ID: <20220106195007.528618-9-prestwoj@gmail.com>
+In-Reply-To: 20220106195007.528618-1-prestwoj@gmail.com
 
---===============8403248381572948783==
+--===============1121110300565296598==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is actually a false positive only because
-p2p_device_validate_conn_wfd bails out if the IE is NULL which
-avoids using wfd_data_length. But its subtle and without inspecting
-the code it does seem like the length could be used uninitialized.
-
-src/p2p.c:940:7: error: variable 'wfd_data_len' is used uninitialized whene=
-ver 'if' condition is false [-Werror,-Wsometimes-uninitialized]
-                if (dev->conn_own_wfd)
-                    ^~~~~~~~~~~~~~~~~
-src/p2p.c:946:8: note: uninitialized use occurs here
-                                                        wfd_data_len))
-                                                        ^~~~~~~~~~~~
-src/p2p.c:940:3: note: remove the 'if' if its condition is always true
-                if (dev->conn_own_wfd)
-                ^~~~~~~~~~~~~~~~~~~~~~
-src/p2p.c:906:23: note: initialize the variable 'wfd_data_len' to silence t=
-his warning
-                ssize_t wfd_data_len;
-                                    ^
-                                     =3D 0
 ---
- src/p2p.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ unit/test-json.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-diff --git a/src/p2p.c b/src/p2p.c
-index ebd0f62b..a7207c30 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -903,7 +903,7 @@ static void p2p_group_event(enum ap_event_type type, co=
-nst void *event_data,
- 	{
- 		const struct ap_event_station_added_data *data =3D event_data;
- 		L_AUTO_FREE_VAR(uint8_t *, wfd_data) =3D NULL;
--		ssize_t wfd_data_len;
-+		ssize_t wfd_data_len =3D 0;
- 		struct p2p_association_req req_info;
- 		int r;
+diff --git a/unit/test-json.c b/unit/test-json.c
+index 52e3f675..3d7e690b 100644
+--- a/unit/test-json.c
++++ b/unit/test-json.c
+@@ -424,6 +424,51 @@ static void test_json_arrays(const void *data)
+ 	json_contents_free(c);
+ }
  =
 
++static void test_json_nested_arrays(const void *data)
++{
++	char json[] =3D "{\"array\":[[], {}, [1, 2], {\"key\":\"value\"}]}";
++	int count =3D 0;
++	struct json_iter iter;
++	struct json_iter array;
++	struct json_iter inner;
++	struct json_contents *c =3D json_contents_new(json, strlen(json));
++
++	json_iter_init(&iter, c);
++	assert(json_iter_parse(&iter,
++			JSON_MANDATORY("array", JSON_ARRAY, &array),
++			JSON_UNDEFINED));
++
++	while (json_iter_next(&array)) {
++		int count2 =3D 0;
++
++		assert(json_iter_get_container(&array, &inner));
++
++		while (json_iter_next(&inner))
++			count2++;
++
++		/*
++		 * TODO: add checks for object iteration. Currently these will
++		 * just count all tokens in the object.
++		 */
++		switch (count) {
++		case 0:
++			assert(count2 =3D=3D 0);
++			break;
++		case 2:
++			assert(count2 =3D=3D 2);
++			break;
++		default:
++			break;
++		}
++
++		count++;
++	}
++
++	assert(count =3D=3D 4);
++
++	json_contents_free(c);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	l_test_init(&argc, &argv);
+@@ -436,6 +481,7 @@ int main(int argc, char *argv[])
+ 	l_test_add("json larger object", test_json_larger_object, NULL);
+ 	l_test_add("json test primitives", test_json_primitives, NULL);
+ 	l_test_add("json test arrays", test_json_arrays, NULL);
++	l_test_add("json test nested arrays", test_json_nested_arrays, NULL);
+ =
+
+ 	return l_test_run();
+ }
 -- =
 
-2.34.1
+2.31.1
 
---===============8403248381572948783==--
+--===============1121110300565296598==--
 
