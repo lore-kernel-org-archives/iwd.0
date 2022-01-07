@@ -1,57 +1,171 @@
-Content-Type: multipart/mixed; boundary="===============0856452985042602062=="
+Content-Type: multipart/mixed; boundary="===============0511874980304717778=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 11/11] doc: document DPP interface
-Date: Wed, 15 Dec 2021 09:58:14 -0800
-Message-ID: <20211215175814.2467124-11-prestwoj@gmail.com>
-In-Reply-To: 20211215175814.2467124-1-prestwoj@gmail.com
+Subject: [PATCH 5/5] dpp: handle CHANNEL attribute in auth request
+Date: Fri, 07 Jan 2022 14:31:12 -0800
+Message-ID: <20220107223112.715855-5-prestwoj@gmail.com>
+In-Reply-To: 20220107223112.715855-1-prestwoj@gmail.com
 
---===============0856452985042602062==
+--===============0511874980304717778==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+When this attribute is included, the initiator is requesting all
+future frames be sent on this channel. There is no reason for a
+configurator to act on this attribute (at least for now) so the
+request frame will be dropped in this case. Enrollees will act
+on it by switching to the new channel and sending the authentication
+response.
 ---
- doc/device-provisioning.txt | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
- create mode 100644 doc/device-provisioning.txt
+ src/dpp.c | 77 +++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 58 insertions(+), 19 deletions(-)
 
-diff --git a/doc/device-provisioning.txt b/doc/device-provisioning.txt
-new file mode 100644
-index 00000000..3ac2d934
---- /dev/null
-+++ b/doc/device-provisioning.txt
-@@ -0,0 +1,25 @@
-+Device Provisioning hierarchy
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
+diff --git a/src/dpp.c b/src/dpp.c
+index 68a7d2bf..86f040e7 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -91,6 +91,7 @@ struct dpp_sm {
+ 	size_t freqs_idx;
+ 	uint32_t dwell;
+ 	uint32_t current_freq;
++	uint32_t new_freq;
+ 	struct scan_freq_set *presence_list;
+ =
+
+ 	uint32_t offchannel_id;
+@@ -169,6 +170,7 @@ static void dpp_reset(struct dpp_sm *dpp)
+ 	}
+ =
+
+ 	dpp->state =3D DPP_STATE_NOTHING;
++	dpp->new_freq =3D 0;
+ =
+
+ 	explicit_bzero(dpp->r_nonce, dpp->nonce_len);
+ 	explicit_bzero(dpp->i_nonce, dpp->nonce_len);
+@@ -1237,14 +1239,29 @@ static void dpp_roc_started(void *user_data)
+ 	struct dpp_sm *dpp =3D user_data;
+ =
+
+ 	/*
+-	 * If not in presence procedure or in a configurator role, just stay
+-	 * on channel.
++	 * - If a configurator, nothing to do but wait for a request
++	 * - If in the presence state continue sending announcements.
++	 * - If authenticating, and this is a result of a channel switch send
++	 *   the authenticate response now.
+ 	 */
+-	if (dpp->state !=3D DPP_STATE_PRESENCE ||
+-			dpp->role =3D=3D DPP_CAPABILITY_CONFIGURATOR)
++	if (dpp->role =3D=3D DPP_CAPABILITY_CONFIGURATOR)
+ 		return;
+ =
+
+-	dpp_presence_announce(dpp);
++	switch (dpp->state) {
++	case DPP_STATE_PRESENCE:
++		dpp_presence_announce(dpp);
++		break;
++	case DPP_STATE_AUTHENTICATING:
++		if (dpp->new_freq) {
++			dpp->current_freq =3D dpp->new_freq;
++			dpp->new_freq =3D 0;
++			send_authenticate_response(dpp);
++		}
 +
-+Service		net.connman.iwd
-+Interface	net.connman.iwd.DeviceProvisioning [Experimental]
-+Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}
++		break;
++	default:
++		break;
++	}
+ }
+ =
+
+ static void dpp_start_offchannel(struct dpp_sm *dpp, uint32_t freq);
+@@ -1331,6 +1348,7 @@ static void authenticate_request(struct dpp_sm *dpp, =
+const uint8_t *from,
+ 	uint64_t k1[L_ECC_MAX_DIGITS];
+ 	const void *ad0 =3D body + 2;
+ 	const void *ad1 =3D body + 8;
++	uint32_t freq;
+ =
+
+ 	if (dpp->state !=3D DPP_STATE_PRESENCE)
+ 		return;
+@@ -1370,20 +1388,39 @@ static void authenticate_request(struct dpp_sm *dpp=
+, const uint8_t *from,
+ 			}
+ =
+
+ 			break;
+-		/*
+-		 * TODO: Go on this channel for remainder of auth protocol.
+-		 *
+-		 * "the Responder determines whether it can use the requested
+-		 * channel for the following exchanges. If so, it sends the DPP
+-		 * Authentication Response frame on that channel. If not, it
+-		 * discards the DPP Authentication Request frame without
+-		 * replying to it."
+-		 *
+-		 * For the time being this feature is not being implemented and
+-		 * the frame will be dropped.
+-		 */
 +
-+Methods		string StartEnrollee()
+ 		case DPP_ATTR_CHANNEL:
+-			return;
++			if (len !=3D 2)
++				return;
 +
-+			Start a DPP enrollee. Currently only station devices are
-+			supported.
++			freq =3D oci_to_frequency(l_get_u8(data),
++						l_get_u8(data + 1));
 +
-+			Returns the enrollees URI
++			if (freq =3D=3D dpp->current_freq)
++				break;
 +
-+			Possible errors:	net.connman.iwd.InvalidArguments
-+						net.connman.iwd.AlreadyExists
-+						net.connman.iwd.NotAvailable
++			/*
++			 * Configurators are already connected to a network, so
++			 * to preserve wireless performance the enrollee will
++			 * be required to be on this channel, not a channel it
++			 * requests.
++			 */
++			if (dpp->role =3D=3D DPP_CAPABILITY_CONFIGURATOR)
++				return;
 +
-+		void Stop()
++			/*
++			 * Otherwise, as an enrollee, we can jump to whatever
++			 * channel the configurator requests
++			 */
++			dpp->new_freq =3D freq;
 +
-+			Stop an enrollee.
++			l_debug("Configurator requested a new frequency %u",
++					dpp->new_freq);
 +
-+			Possible errors:	net.connman.iwd.Busy
-+						net.connman.iwd.Failed
-+						net.connman.iwd.InvalidArguments
++			offchannel_cancel(dpp->wdev_id, dpp->offchannel_id);
++			dpp_start_offchannel(dpp, dpp->new_freq);
++
++			break;
+ 		default:
+ 			break;
+ 		}
+@@ -1477,7 +1514,9 @@ static void authenticate_request(struct dpp_sm *dpp, =
+const uint8_t *from,
+ 	dpp->state =3D DPP_STATE_AUTHENTICATING;
+ 	dpp_reset_protocol_timer(dpp);
+ =
+
+-	send_authenticate_response(dpp);
++	/* Don't send if the frequency is changing */
++	if (!dpp->new_freq)
++		send_authenticate_response(dpp);
+ =
+
+ 	return;
+ =
+
 -- =
 
 2.31.1
 
---===============0856452985042602062==--
+--===============0511874980304717778==--
 
