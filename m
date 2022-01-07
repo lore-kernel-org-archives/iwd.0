@@ -1,151 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============5629549025836564308=="
+Content-Type: multipart/mixed; boundary="===============1969629007952314792=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 4/9] json: add support for array iteration
-Date: Thu, 06 Jan 2022 11:50:02 -0800
-Message-ID: <20220106195007.528618-4-prestwoj@gmail.com>
-In-Reply-To: 20220106195007.528618-1-prestwoj@gmail.com
+Subject: [PATCH 3/5] dpp: move r_auth into dpp_sm
+Date: Fri, 07 Jan 2022 14:31:10 -0800
+Message-ID: <20220107223112.715855-3-prestwoj@gmail.com>
+In-Reply-To: 20220107223112.715855-1-prestwoj@gmail.com
 
---===============5629549025836564308==
+--===============1969629007952314792==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Arrays can now be parsed using the JSON_ARRAY type (stored in
-a struct json_iter) then iterated using json_iter_next. When
-iterating the type can be checked with json_iter_get_type. For
-each iteration the value can be obtained using any of the type
-getters (int/uint/boolean/null).
+In order to support channel switching during authentication r_auth
+needs to be held onto in dpp_sm for after the ROC call starts.
 ---
- src/json.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- src/json.h |  4 ++++
- 2 files changed, 59 insertions(+), 1 deletion(-)
+ src/dpp.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/src/json.c b/src/json.c
-index 6c88ed3a..cf233e56 100644
---- a/src/json.c
-+++ b/src/json.c
-@@ -88,7 +88,17 @@ static void iter_recurse(struct json_iter *iter, jsmntok=
-_t *token,
+diff --git a/src/dpp.c b/src/dpp.c
+index 5d52e007..25359075 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -102,6 +102,7 @@ struct dpp_sm {
  =
 
- 	child->contents =3D c;
- 	child->start =3D token - c->tokens;
-+	child->current =3D child->start;
- 	child->count =3D count_tokens_in_container(iter, token);
-+
-+	/*
-+	 * Add one to include the object/array token itself. This is required
-+	 * since 'current' points to the container initially. Only after a call
-+	 * to json_iter_next() will 'current' point to the first token in the
-+	 * container.
-+	 */
-+	if (token->type =3D=3D JSMN_OBJECT || token->type =3D=3D JSMN_ARRAY)
-+		child->count++;
- }
+ 	uint64_t ke[L_ECC_MAX_DIGITS];
+ 	uint64_t k2[L_ECC_MAX_DIGITS];
++	uint64_t r_auth[L_ECC_MAX_DIGITS];
  =
 
- struct json_contents *json_contents_new(const char *json, size_t json_len)
-@@ -160,6 +170,7 @@ static void assign_arg(void *data, void *user_data)
- 		break;
- 	case JSON_OBJECT:
- 	case JSON_PRIMITIVE:
-+	case JSON_ARRAY:
- 		iter_val =3D arg->value;
- =
-
- 		if (!arg->v)
-@@ -207,6 +218,7 @@ bool json_iter_parse(struct json_iter *iter, enum json_=
-type type, ...)
- 		case JSON_STRING:
- 		case JSON_OBJECT:
- 		case JSON_PRIMITIVE:
-+		case JSON_ARRAY:
- 			break;
- 		default:
- 			goto error;
-@@ -271,7 +283,7 @@ static bool iter_get_primitive_data(struct json_iter *i=
-ter, void **ptr,
- 					size_t *len)
+ 	struct l_ecc_scalar *proto_private;
+ 	struct l_ecc_point *proto_public;
+@@ -967,7 +968,7 @@ static void dpp_handle_config_result_frame(struct dpp_s=
+m *dpp,
+  * ad1 =3D attrs
+  * ad1_len =3D ptr - attrs
+  */
+-static void send_authenticate_response(struct dpp_sm *dpp, void *r_auth)
++static void send_authenticate_response(struct dpp_sm *dpp)
  {
- 	struct json_contents *c =3D iter->contents;
--	jsmntok_t *t =3D c->tokens + iter->start;
-+	jsmntok_t *t =3D c->tokens + iter->current;
+ 	uint8_t hdr[32];
+ 	uint8_t attrs[256];
+@@ -998,7 +999,7 @@ static void send_authenticate_response(struct dpp_sm *d=
+pp, void *r_auth)
+ 	/* Wrap up secondary data (R-Auth) */
+ 	wrapped2_len =3D dpp_append_attr(wrapped2_plaintext,
+ 					DPP_ATTR_RESPONDER_AUTH_TAG,
+-					r_auth, dpp->key_len);
++					dpp->r_auth, dpp->key_len);
+ 	/*
+ 	 * "Invocations of AES-SIV in the DPP Authentication protocol that
+ 	 * produce ciphertext that is part of an additional AES-SIV invocation
+@@ -1222,7 +1223,6 @@ static void authenticate_request(struct dpp_sm *dpp, =
+const uint8_t *from,
+ 	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *m =3D NULL;
+ 	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *n =3D NULL;
+ 	uint64_t k1[L_ECC_MAX_DIGITS];
+-	uint64_t r_auth[L_ECC_MAX_DIGITS];
+ 	const void *ad0 =3D body + 2;
+ 	const void *ad1 =3D body + 8;
  =
 
- 	if (t->type !=3D JSMN_PRIMITIVE)
- 		return false;
-@@ -370,3 +382,45 @@ bool json_iter_get_null(struct json_iter *iter)
+@@ -1363,7 +1363,7 @@ static void authenticate_request(struct dpp_sm *dpp, =
+const uint8_t *from,
  =
 
- 	return false;
- }
-+
-+enum json_type json_iter_get_type(struct json_iter *iter)
-+{
-+	struct json_contents *c =3D iter->contents;
-+	jsmntok_t *t =3D c->tokens + iter->current;
-+
-+	return (enum json_type) t->type;
-+}
-+
-+bool json_iter_next(struct json_iter *iter)
-+{
-+	struct json_contents *c =3D iter->contents;
-+	jsmntok_t *t =3D c->tokens + iter->current;
-+	int inc =3D 1;
-+
-+	/*
-+	 * If this is the initial iteration skip this and just increment
-+	 * current by 1 since this iterator points to a container which needs to
-+	 * be advanced to the first token..
-+	 *
-+	 * In addition primitive types and empty containers will have a size
-+	 * of 1, so no special handling is needed there.
-+	 *
-+	 * For non-empty containers 'current' needs to be advanced by all the
-+	 * containers child tokens, plus the container itself.
-+	 *
-+	 * This check ensures:
-+	 *    1. It is not the initial iteration
-+	 *    2. This is a container
-+	 *    3. The container is not empty
-+	 */
-+	if (iter->current !=3D iter->start && ((t->type =3D=3D JSMN_OBJECT ||
-+					t->type =3D=3D JSMN_ARRAY) && t->size))
-+		inc =3D count_tokens_in_container(iter, t) + 1;
-+
-+	if (c->tokens + iter->current + inc >=3D ITER_END(iter))
-+		return false;
-+
-+	iter->current +=3D inc;
-+
-+	return true;
-+}
-diff --git a/src/json.h b/src/json.h
-index 9f00a9d5..458deb93 100644
---- a/src/json.h
-+++ b/src/json.h
-@@ -42,6 +42,7 @@ struct json_iter {
- 	struct json_contents *contents;
- 	int start;
- 	int count;
-+	int current;
- };
+ 	if (!dpp_derive_r_auth(dpp->i_nonce, dpp->r_nonce, dpp->nonce_len,
+ 				dpp->i_proto_public, dpp->proto_public,
+-				dpp->boot_public, r_auth))
++				dpp->boot_public, dpp->r_auth))
+ 		goto auth_request_failed;
  =
 
- #define JSON_MANDATORY(key, type, out) \
-@@ -92,3 +93,6 @@ bool json_iter_get_int(struct json_iter *iter, int *i);
- bool json_iter_get_uint(struct json_iter *iter, unsigned int *i);
- bool json_iter_get_boolean(struct json_iter *iter, bool *b);
- bool json_iter_get_null(struct json_iter *iter);
-+
-+enum json_type json_iter_get_type(struct json_iter *iter);
-+bool json_iter_next(struct json_iter *iter);
+ 	memcpy(dpp->auth_addr, from, 6);
+@@ -1371,7 +1371,7 @@ static void authenticate_request(struct dpp_sm *dpp, =
+const uint8_t *from,
+ 	dpp->state =3D DPP_STATE_AUTHENTICATING;
+ 	dpp_reset_protocol_timer(dpp);
+ =
+
+-	send_authenticate_response(dpp, r_auth);
++	send_authenticate_response(dpp);
+ =
+
+ 	return;
+ =
+
 -- =
 
 2.31.1
 
---===============5629549025836564308==--
+--===============1969629007952314792==--
 
