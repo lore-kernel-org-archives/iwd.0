@@ -1,46 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============6059882981724354612=="
+Content-Type: multipart/mixed; boundary="===============6740866049382540328=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 08/11] band: keep 6GHz frequencies out of 40mhz special case
-Date: Fri, 25 Feb 2022 09:58:07 -0800
-Message-ID: <20220225175810.2914413-8-prestwoj@gmail.com>
-In-Reply-To: 20220225175810.2914413-1-prestwoj@gmail.com
+Subject: [PATCH 1/2] dpp: unref DPP frame if sending fails
+Date: Fri, 07 Jan 2022 09:58:48 -0800
+Message-ID: <20220107175849.693241-1-prestwoj@gmail.com>
 
---===============6059882981724354612==
+--===============6740866049382540328==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There is no 40MHz upper/lower concept for 6GHz so avoid this special
-handling.
 ---
- src/band.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ src/dpp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/src/band.c b/src/band.c
-index 87b70d42..984bc15d 100644
---- a/src/band.c
-+++ b/src/band.c
-@@ -902,8 +902,12 @@ int oci_verify(const uint8_t oci[static 3], const stru=
-ct band_chandef *own)
- 	 * on 40 Mhz channels.  If the STA is operating on 40 Mhz while the
- 	 * peer is operating on 80 or 160 Mhz wide channels, then only the
- 	 * primary channel validation is performed
-+	 *
-+	 * With 6GHz operating classes there is no concept of upper/lower 40mhz
-+	 * channels, therefore this special handling list not needed.
- 	 */
--	if (own_bandwidth =3D=3D 40 && oci_bandwidth =3D=3D 40) {
-+	if (own_bandwidth =3D=3D 40 && oci_bandwidth =3D=3D 40 &&
-+						info->operating_class < 131) {
- 		uint32_t behavior;
+diff --git a/src/dpp.c b/src/dpp.c
+index 54947193..f62bcebb 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -219,8 +219,10 @@ static void dpp_send_frame(uint64_t wdev_id, struct io=
+vec *iov, size_t iov_len,
  =
 
- 		/*
+ 	l_debug("Sending frame on frequency %u", freq);
+ =
+
+-	if (!l_genl_family_send(nl80211, msg, dpp_send_frame_cb, NULL, NULL))
++	if (!l_genl_family_send(nl80211, msg, dpp_send_frame_cb, NULL, NULL)) {
+ 		l_error("Could not send CMD_FRAME");
++		l_genl_msg_unref(msg);
++	}
+ }
+ =
+
+ static size_t dpp_build_header(const uint8_t *src, const uint8_t *dest,
 -- =
 
-2.34.1
+2.31.1
 
---===============6059882981724354612==--
+--===============6740866049382540328==--
 
