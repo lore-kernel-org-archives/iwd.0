@@ -1,196 +1,270 @@
-Content-Type: multipart/mixed; boundary="===============6993371034882259208=="
+Content-Type: multipart/mixed; boundary="===============0047417202235470826=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v7 1/8] storage: convert storage to a module
-Date: Thu, 10 Feb 2022 14:58:35 -0800
-Message-ID: <20220210225842.895962-1-prestwoj@gmail.com>
+Subject: [PATCH v2 4/6] dpp: refactor calls to offchannel_start into common
+ function
+Date: Fri, 07 Jan 2022 16:13:31 -0800
+Message-ID: <20220108001333.723634-4-prestwoj@gmail.com>
+In-Reply-To: 20220108001333.723634-1-prestwoj@gmail.com
 
---===============6993371034882259208==
+--===============0047417202235470826==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This will aid in channel switching during authentication by allowing
+an arbitrary channel to be passed in rather than dpp->current_freq.
 ---
- src/main.c    |   6 ---
- src/storage.c | 102 ++++++++++++++++++++++++++------------------------
- src/storage.h |   2 -
- 3 files changed, 54 insertions(+), 56 deletions(-)
+ src/dpp.c | 203 ++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 107 insertions(+), 96 deletions(-)
 
-diff --git a/src/main.c b/src/main.c
-index d0dbedc8..2102665a 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -498,9 +498,6 @@ int main(int argc, char *argv[])
- =
-
- 	exit_status =3D EXIT_FAILURE;
- =
-
--	if (!storage_create_dirs())
--		goto failed_dirs;
--
- 	genl =3D l_genl_new();
- 	if (!genl) {
- 		l_error("Failed to open generic netlink socket");
-@@ -542,9 +539,6 @@ failed_rtnl:
- 	l_genl_unref(genl);
- =
-
- failed_genl:
--	storage_cleanup_dirs();
--
--failed_dirs:
- 	l_settings_free(iwd_config);
- 	l_timeout_remove(timeout);
- 	l_main_exit();
-diff --git a/src/storage.c b/src/storage.c
-index 4b89c615..6bf0616d 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -44,6 +44,7 @@
- =
-
- #include "src/common.h"
- #include "src/storage.h"
-+#include "src/module.h"
- =
-
- #define STORAGE_DIR_MODE (S_IRUSR | S_IWUSR | S_IXUSR)
- #define STORAGE_FILE_MODE (S_IRUSR | S_IWUSR)
-@@ -184,54 +185,6 @@ error_create_dirs:
- 	return r;
+diff --git a/src/dpp.c b/src/dpp.c
+index 86178b53..5bf004d8 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -1205,6 +1205,112 @@ static bool dpp_check_roles(struct dpp_sm *dpp, uin=
+t8_t peer_capa)
+ 	return true;
  }
  =
 
--bool storage_create_dirs(void)
--{
--	const char *state_dir;
--	char **state_dirs;
--
--	state_dir =3D getenv("STATE_DIRECTORY");
--	if (!state_dir)
--		state_dir =3D DAEMON_STORAGEDIR;
--
--	l_debug("Using state directory %s", state_dir);
--
--	state_dirs =3D l_strsplit(state_dir, ':');
--	if (!state_dirs[0]) {
--		l_strv_free(state_dirs);
--		return false;
--	}
--
--	storage_path =3D l_strdup(state_dirs[0]);
--	l_strv_free(state_dirs);
--
--	if (create_dirs(storage_path)) {
--		l_error("Failed to create %s", storage_path);
--
--		l_free(storage_path);
--
--		return false;
--	}
--
--	storage_hotspot_path =3D l_strdup_printf("%s/hotspot/", storage_path);
--
--	if (create_dirs(storage_hotspot_path)) {
--		l_error("Failed to create %s", storage_hotspot_path);
--
--		l_free(storage_path);
--		l_free(storage_hotspot_path);
--
--		return false;
--	}
--
--	return true;
--}
--
--void storage_cleanup_dirs(void)
--{
--	l_free(storage_path);
--	l_free(storage_hotspot_path);
--}
--
- char *storage_get_path(const char *format, ...)
++static void dpp_presence_announce(struct dpp_sm *dpp)
++{
++	struct netdev *netdev =3D dpp->netdev;
++	uint8_t hdr[32];
++	uint8_t attrs[32 + 4];
++	uint8_t hash[32];
++	uint8_t *ptr =3D attrs;
++	const uint8_t *addr =3D netdev_get_address(netdev);
++	struct iovec iov[2];
++
++	iov[0].iov_len =3D dpp_build_header(addr, broadcast,
++					DPP_FRAME_PRESENCE_ANNOUNCEMENT, hdr);
++	iov[0].iov_base =3D hdr;
++
++	dpp_hash(L_CHECKSUM_SHA256, hash, 2, "chirp", strlen("chirp"),
++			dpp->pub_asn1, dpp->pub_asn1_len);
++
++	ptr +=3D dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH, hash, 32);
++
++	iov[1].iov_base =3D attrs;
++	iov[1].iov_len =3D ptr - attrs;
++
++	l_debug("Sending presense annoucement on frequency %u and waiting %u",
++		dpp->current_freq, dpp->dwell);
++
++	dpp_send_frame(netdev_get_wdev_id(netdev), iov, 2, dpp->current_freq);
++}
++
++static void dpp_roc_started(void *user_data)
++{
++	struct dpp_sm *dpp =3D user_data;
++
++	/*
++	 * If not in presence procedure or in a configurator role, just stay
++	 * on channel.
++	 */
++	if (dpp->state !=3D DPP_STATE_PRESENCE ||
++			dpp->role =3D=3D DPP_CAPABILITY_CONFIGURATOR)
++		return;
++
++	dpp_presence_announce(dpp);
++}
++
++static void dpp_start_offchannel(struct dpp_sm *dpp, uint32_t freq);
++
++static void dpp_presence_timeout(int error, void *user_data)
++{
++	struct dpp_sm *dpp =3D user_data;
++
++	dpp->offchannel_id =3D 0;
++
++	/*
++	 * If cancelled this is likely due to netdev going down or from Stop().
++	 * Otherwise there was some other problem which is probably not
++	 * recoverable.
++	 */
++	if (error =3D=3D -ECANCELED)
++		return;
++	else if (error =3D=3D -EIO)
++		goto next_roc;
++	else if (error < 0)
++		goto protocol_failed;
++
++	switch (dpp->state) {
++	case DPP_STATE_PRESENCE:
++		break;
++	case DPP_STATE_NOTHING:
++		/* Protocol already terminated */
++		return;
++	case DPP_STATE_AUTHENTICATING:
++	case DPP_STATE_CONFIGURING:
++		goto next_roc;
++	}
++
++	dpp->freqs_idx++;
++
++	if (dpp->freqs_idx >=3D dpp->freqs_len) {
++		l_debug("Max retries on presence announcements");
++		dpp->freqs_idx =3D 0;
++	}
++
++	dpp->current_freq =3D dpp->freqs[dpp->freqs_idx];
++
++	l_debug("Presence timeout, moving to next frequency %u, duration %u",
++			dpp->current_freq, dpp->dwell);
++
++next_roc:
++	dpp_start_offchannel(dpp, dpp->current_freq);
++
++	return;
++
++protocol_failed:
++	dpp_reset(dpp);
++	return;
++}
++
++static void dpp_start_offchannel(struct dpp_sm *dpp, uint32_t freq)
++{
++	if (dpp->offchannel_id)
++		offchannel_cancel(dpp->wdev_id, dpp->offchannel_id);
++
++	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
++				freq, dpp->dwell, dpp_roc_started,
++				dpp, dpp_presence_timeout);
++}
++
+ static void authenticate_request(struct dpp_sm *dpp, const uint8_t *from,
+ 					const uint8_t *body, size_t body_len)
  {
- 	va_list args;
-@@ -463,3 +416,56 @@ bool storage_is_file(const char *filename)
- =
-
- 	return false;
+@@ -1415,49 +1521,6 @@ static void dpp_handle_frame(const struct mmpdu_head=
+er *frame,
+ 	}
  }
-+
-+static int storage_init(void)
-+{
-+	const char *state_dir;
-+	char **state_dirs;
-+	int ret;
-+
-+	state_dir =3D getenv("STATE_DIRECTORY");
-+	if (!state_dir)
-+		state_dir =3D DAEMON_STORAGEDIR;
-+
-+	l_debug("Using state directory %s", state_dir);
-+
-+	state_dirs =3D l_strsplit(state_dir, ':');
-+	if (!state_dirs[0]) {
-+		l_strv_free(state_dirs);
-+		return -EINVAL;
-+	}
-+
-+	storage_path =3D l_strdup(state_dirs[0]);
-+	l_strv_free(state_dirs);
-+
-+	ret =3D create_dirs(storage_path);
-+	if (ret < 0) {
-+		l_error("Failed to create %s", storage_path);
-+
-+		l_free(storage_path);
-+
-+		return ret;
-+	}
-+
-+	storage_hotspot_path =3D l_strdup_printf("%s/hotspot/", storage_path);
-+
-+	ret =3D create_dirs(storage_hotspot_path);
-+	if (ret < 0) {
-+		l_error("Failed to create %s", storage_hotspot_path);
-+
-+		l_free(storage_path);
-+		l_free(storage_hotspot_path);
-+
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void storage_exit(void)
-+{
-+	l_free(storage_path);
-+	l_free(storage_hotspot_path);
-+}
-+
-+IWD_MODULE(storage, storage_init, storage_exit);
-diff --git a/src/storage.h b/src/storage.h
-index e1ec2cd4..f75185f6 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -33,8 +33,6 @@ ssize_t write_file(const void *buffer, size_t len, bool p=
-reserve_times,
- 	__attribute__((format(printf, 4, 5)));
  =
 
- bool storage_is_file(const char *filename);
--bool storage_create_dirs(void);
--void storage_cleanup_dirs(void);
- char *storage_get_path(const char *format, ...);
- char *storage_get_hotspot_path(const char *format, ...);
+-static void dpp_presence_announce(struct dpp_sm *dpp)
+-{
+-	struct netdev *netdev =3D dpp->netdev;
+-	uint8_t hdr[32];
+-	uint8_t attrs[32 + 4];
+-	uint8_t hash[32];
+-	uint8_t *ptr =3D attrs;
+-	const uint8_t *addr =3D netdev_get_address(netdev);
+-	struct iovec iov[2];
+-
+-	iov[0].iov_len =3D dpp_build_header(addr, broadcast,
+-					DPP_FRAME_PRESENCE_ANNOUNCEMENT, hdr);
+-	iov[0].iov_base =3D hdr;
+-
+-	dpp_hash(L_CHECKSUM_SHA256, hash, 2, "chirp", strlen("chirp"),
+-			dpp->pub_asn1, dpp->pub_asn1_len);
+-
+-	ptr +=3D dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH, hash, 32);
+-
+-	iov[1].iov_base =3D attrs;
+-	iov[1].iov_len =3D ptr - attrs;
+-
+-	l_debug("Sending presense annoucement on frequency %u and waiting %u",
+-		dpp->current_freq, dpp->dwell);
+-
+-	dpp_send_frame(netdev_get_wdev_id(netdev), iov, 2, dpp->current_freq);
+-}
+-
+-static void dpp_roc_started(void *user_data)
+-{
+-	struct dpp_sm *dpp =3D user_data;
+-
+-	/*
+-	 * If not in presence procedure or in a configurator role, just stay
+-	 * on channel.
+-	 */
+-	if (dpp->state !=3D DPP_STATE_PRESENCE ||
+-			dpp->role =3D=3D DPP_CAPABILITY_CONFIGURATOR)
+-		return;
+-
+-	dpp_presence_announce(dpp);
+-}
+-
+ static void dpp_create(struct netdev *netdev)
+ {
+ 	struct l_dbus *dbus =3D dbus_get_bus();
+@@ -1518,56 +1581,6 @@ static void dpp_netdev_watch(struct netdev *netdev,
+ 	}
+ }
  =
 
+-static void dpp_presence_timeout(int error, void *user_data)
+-{
+-	struct dpp_sm *dpp =3D user_data;
+-
+-	/*
+-	 * If cancelled this is likely due to netdev going down or from Stop().
+-	 * Otherwise there was some other problem which is probably not
+-	 * recoverable.
+-	 */
+-	if (error =3D=3D -ECANCELED)
+-		return;
+-	else if (error =3D=3D -EIO)
+-		goto next_roc;
+-	else if (error < 0)
+-		goto protocol_failed;
+-
+-	switch (dpp->state) {
+-	case DPP_STATE_PRESENCE:
+-		break;
+-	case DPP_STATE_NOTHING:
+-		/* Protocol already terminated */
+-		return;
+-	case DPP_STATE_AUTHENTICATING:
+-	case DPP_STATE_CONFIGURING:
+-		goto next_roc;
+-	}
+-
+-	dpp->freqs_idx++;
+-
+-	if (dpp->freqs_idx >=3D dpp->freqs_len) {
+-		l_debug("Max retries on presence announcements");
+-		dpp->freqs_idx =3D 0;
+-	}
+-
+-	dpp->current_freq =3D dpp->freqs[dpp->freqs_idx];
+-
+-	l_debug("Presence timeout, moving to next frequency %u, duration %u",
+-			dpp->current_freq, dpp->dwell);
+-
+-next_roc:
+-	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
+-			dpp->current_freq, dpp->dwell, dpp_roc_started,
+-			dpp, dpp_presence_timeout);
+-	return;
+-
+-protocol_failed:
+-	dpp_reset(dpp);
+-	return;
+-}
+-
+ /*
+  * EasyConnect 2.0 - 6.2.2
+  */
+@@ -1627,9 +1640,7 @@ static void dpp_start_presence(struct dpp_sm *dpp, ui=
+nt32_t *limit_freqs,
+ 	dpp->freqs_idx =3D 0;
+ 	dpp->current_freq =3D dpp->freqs[0];
+ =
+
+-	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
+-			dpp->current_freq, dpp->dwell, dpp_roc_started,
+-			dpp, dpp_presence_timeout);
++	dpp_start_offchannel(dpp, dpp->current_freq);
+ }
+ =
+
+ static struct l_dbus_message *dpp_dbus_start_enrollee(struct l_dbus *dbus,
 -- =
 
-2.34.1
+2.31.1
 
---===============6993371034882259208==--
+--===============0047417202235470826==--
 
