@@ -1,273 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============1280462390746002565=="
+Content-Type: multipart/mixed; boundary="===============2836050124100053427=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [RFC 2/2] network: add support for encrypted Passphrase/PSK
-Date: Thu, 20 Jan 2022 16:41:30 -0800
-Message-ID: <20220121004130.2473281-3-prestwoj@gmail.com>
-In-Reply-To: 20220121004130.2473281-1-prestwoj@gmail.com
+Subject: [PATCH v2 3/6] dpp: move r_auth into dpp_sm
+Date: Fri, 07 Jan 2022 16:13:30 -0800
+Message-ID: <20220108001333.723634-3-prestwoj@gmail.com>
+In-Reply-To: 20220108001333.723634-1-prestwoj@gmail.com
 
---===============1280462390746002565==
+--===============2836050124100053427==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Two keys were added: PreSharedKeyEncrypted, PassphraseEncrypted which
-are now automatically set/loaded if SystemdEncrypt=3Dtrue.
-
-When transitioning to this option any existing provisioning files will
-be read in as plaintext but when synced the *Encrypted options will be
-used instead. After that the file will no longer contain any plaintext
-psk/passphrase values.
-
-The encryption itself uses AES-CTR with a zero IV. This is to avoid
-extra padding and dealing with block sizes. A magic 32 bit value is
-prepended to the beginning of the plaintext data to serve as verification
-that the decryption succeeded.
-
-If decryption fails for whatever reason the behavior is no different
-than if no PSK/Passphrase value was found at all, meaning an agent
-request will be required to re-establish the PSK/passphrase or manually
-providing the PreSharedKey/Passphrase in plaintext in the provisioning file.
+In order to support channel switching during authentication r_auth
+needs to be held onto in dpp_sm for after the ROC call starts.
 ---
- src/network.c | 183 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 177 insertions(+), 6 deletions(-)
+ src/dpp.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/src/network.c b/src/network.c
-index 10937ab7..89d6b8e2 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -572,8 +572,108 @@ generate:
- 	return -EIO;
+diff --git a/src/dpp.c b/src/dpp.c
+index de897266..86178b53 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -102,6 +102,7 @@ struct dpp_sm {
+ =
+
+ 	uint64_t ke[L_ECC_MAX_DIGITS];
+ 	uint64_t k2[L_ECC_MAX_DIGITS];
++	uint64_t r_auth[L_ECC_MAX_DIGITS];
+ =
+
+ 	struct l_ecc_scalar *proto_private;
+ 	struct l_ecc_point *proto_public;
+@@ -174,6 +175,7 @@ static void dpp_reset(struct dpp_sm *dpp)
+ 	explicit_bzero(dpp->e_nonce, dpp->nonce_len);
+ 	explicit_bzero(dpp->ke, dpp->key_len);
+ 	explicit_bzero(dpp->k2, dpp->key_len);
++	explicit_bzero(dpp->r_auth, dpp->key_len);
+ =
+
+ 	dpp_free_auth_data(dpp);
  }
- =
-
-+static uint8_t *network_decrypt(const uint8_t *key, size_t key_len,
-+				void *encrypted, size_t len, size_t *len_out)
-+{
-+	struct l_cipher *aes;
-+	uint8_t iv[16] =3D { 0 };
-+	uint32_t magic =3D 0x0abcdef0;
-+	uint8_t *out;
-+
-+	aes =3D l_cipher_new(L_CIPHER_AES_CTR, key, key_len);
-+	l_cipher_set_iv(aes, iv, sizeof(iv));
-+
-+	out =3D l_malloc(len);
-+
-+	l_cipher_decrypt(aes, encrypted, out, len);
-+
-+	if (memcmp(out, &magic, 4)) {
-+		l_free(out);
-+		return NULL;
-+	}
-+
-+	memmove(out, out + 4, len - 4);
-+
-+	*len_out =3D len - 4;
-+
-+	return out;
-+}
-+
-+static int network_decrypt_secrets(const uint8_t *key, size_t key_len,
-+					struct network *network,
-+					uint8_t **psk, size_t *psk_len,
-+					char **passphrase)
-+{
-+	uint8_t *encrypted;
-+	size_t elen, dlen;
-+	uint8_t *psk_out =3D NULL;
-+	size_t psk_len_out =3D 0;
-+	char *passphrase_out =3D NULL;
-+
-+	if (*psk || *passphrase) {
-+		/*
-+		 * Likely the first time running IWD after SystemdEncrypt was
-+		 * enabled. Let network_load_psk process the psk/passphrase in
-+		 * plaintext but set sync_settings so they will be force written
-+		 * to disk as the *Encrypted options.
-+		 *
-+		 * Someone could have manually added Passphrase/PreSharedKey
-+		 * back into the file too but either way sync the settings.
-+		 */
-+		network->sync_settings =3D true;
-+		return 0;
-+	}
-+
-+	encrypted =3D l_settings_get_bytes(network->settings, "Security",
-+					"PreSharedKeyEncrypted", &elen);
-+	if (encrypted) {
-+		psk_out =3D network_decrypt(key, key_len, encrypted,
-+					elen, &psk_len_out);
-+		if (!psk_out) {
-+			l_error("Decryption failed for PreSharedKey");
-+			l_free(encrypted);
-+			return -ENOKEY;
-+		}
-+
-+		l_free(encrypted);
-+	}
-+
-+	encrypted =3D l_settings_get_bytes(network->settings, "Security",
-+					"PassphraseEncrypted", &elen);
-+	if (encrypted) {
-+		uint8_t *p =3D network_decrypt(key, key_len, encrypted,
-+						elen, &dlen);
-+		if (!p) {
-+			l_error("Decryption failed for Passphrase");
-+			l_free(encrypted);
-+			return -ENOKEY;
-+		}
-+
-+		passphrase_out =3D l_malloc(dlen + 1);
-+		memcpy(passphrase_out, p, dlen);
-+		passphrase_out[dlen] =3D '\0';
-+
-+		l_free(p);
-+		l_free(encrypted);
-+	}
-+
-+	if (psk)
-+		*psk =3D psk_out;
-+
-+	if (psk_len)
-+		*psk_len =3D psk_len_out;
-+
-+	if (passphrase)
-+		*passphrase =3D passphrase_out;
-+
-+	return 0;
-+}
-+
- static int network_load_psk(struct network *network, bool need_passphrase)
+@@ -967,7 +969,7 @@ static void dpp_handle_config_result_frame(struct dpp_s=
+m *dpp,
+  * ad1 =3D attrs
+  * ad1_len =3D ptr - attrs
+  */
+-static void send_authenticate_response(struct dpp_sm *dpp, void *r_auth)
++static void send_authenticate_response(struct dpp_sm *dpp)
  {
-+	size_t key_len;
-+	const uint8_t *key =3D iwd_get_system_key(&key_len);
-+	int ret;
- 	const char *ssid =3D network_get_ssid(network);
- 	enum security security =3D network_get_security(network);
- 	size_t psk_len;
-@@ -586,6 +686,13 @@ static int network_load_psk(struct network *network, b=
-ool need_passphrase)
- 	_auto_(l_free) char *path =3D
- 		storage_get_network_file_path(security, ssid);
+ 	uint8_t hdr[32];
+ 	uint8_t attrs[256];
+@@ -998,7 +1000,7 @@ static void send_authenticate_response(struct dpp_sm *=
+dpp, void *r_auth)
+ 	/* Wrap up secondary data (R-Auth) */
+ 	wrapped2_len =3D dpp_append_attr(wrapped2_plaintext,
+ 					DPP_ATTR_RESPONDER_AUTH_TAG,
+-					r_auth, dpp->key_len);
++					dpp->r_auth, dpp->key_len);
+ 	/*
+ 	 * "Invocations of AES-SIV in the DPP Authentication protocol that
+ 	 * produce ciphertext that is part of an additional AES-SIV invocation
+@@ -1222,7 +1224,6 @@ static void authenticate_request(struct dpp_sm *dpp, =
+const uint8_t *from,
+ 	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *m =3D NULL;
+ 	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *n =3D NULL;
+ 	uint64_t k1[L_ECC_MAX_DIGITS];
+-	uint64_t r_auth[L_ECC_MAX_DIGITS];
+ 	const void *ad0 =3D body + 2;
+ 	const void *ad1 =3D body + 8;
  =
 
-+	if (key) {
-+		ret =3D network_decrypt_secrets(key, key_len, network,
-+						&psk, &psk_len, &passphrase);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
- 	if (psk && psk_len !=3D 32) {
- 		l_error("%s: invalid PreSharedKey format", path);
- 		l_free(psk);
-@@ -639,9 +746,69 @@ static void network_settings_save_sae_pt_ecc(struct l_=
-settings *settings,
- 	l_settings_set_bytes(settings, "Security", key, buf, len);
- }
+@@ -1363,7 +1364,7 @@ static void authenticate_request(struct dpp_sm *dpp, =
+const uint8_t *from,
  =
 
-+/*
-+ * Using AES-CTR to with a zero IV to avoid dealing with padding as oppose=
-d to
-+ * regular AES. 4 magic bytes are prepended to the plaintext bytes to act =
-as
-+ * verification when the data is decrypted.
-+ */
-+static uint8_t *network_encrypt(const uint8_t *key, size_t key_len,
-+				void *decrypted, size_t len, size_t *len_out)
-+{
-+	struct l_cipher *aes;
-+	uint8_t iv[16] =3D { 0 };
-+	uint32_t magic =3D 0x0abcdef0;
-+	uint8_t in[len + 4];
-+	uint8_t *out;
-+
-+	aes =3D l_cipher_new(L_CIPHER_AES_CTR, key, key_len);
-+	l_cipher_set_iv(aes, iv, sizeof(iv));
-+
-+	memcpy(in, &magic, 4);
-+	memcpy(in + 4, decrypted, len);
-+
-+	out =3D l_malloc(len + 4);
-+
-+	l_cipher_encrypt(aes, in, out, len + 4);
-+
-+	*len_out =3D len + 4;
-+
-+	return out;
-+}
-+
-+static void network_encrypt_secrets(const uint8_t *key, size_t len,
-+					struct network *network,
-+					struct l_settings *settings)
-+{
-+	uint8_t *enc;
-+	size_t enc_len;
-+
-+	if (network->psk) {
-+		enc =3D network_encrypt(key, len, network->psk, 32, &enc_len);
-+
-+		l_settings_set_bytes(settings, "Security",
-+					"PreSharedKeyEncrypted", enc, enc_len);
-+
-+		l_free(enc);
-+	}
-+
-+	if (network->passphrase) {
-+		enc =3D network_encrypt(key, len, network->passphrase,
-+					strlen(network->passphrase), &enc_len);;
-+
-+		l_settings_set_bytes(settings, "Security",
-+					"PassphraseEncrypted", enc, enc_len);
-+
-+		l_free(enc);
-+	}
-+
-+}
-+
- static void network_settings_save(struct network *network,
- 						struct l_settings *settings)
- {
-+	size_t key_len;
-+	const uint8_t *encrypt_key =3D iwd_get_system_key(&key_len);
-+
- 	if (network->have_transition_disable) {
- 		char *modes[4];
- 		unsigned int i =3D 0;
-@@ -670,13 +837,17 @@ static void network_settings_save(struct network *net=
-work,
- 	/* We only update the [Security] bits here, wipe the group first */
- 	l_settings_remove_group(settings, "Security");
+ 	if (!dpp_derive_r_auth(dpp->i_nonce, dpp->r_nonce, dpp->nonce_len,
+ 				dpp->i_proto_public, dpp->proto_public,
+-				dpp->boot_public, r_auth))
++				dpp->boot_public, dpp->r_auth))
+ 		goto auth_request_failed;
  =
 
--	if (network->psk)
--		l_settings_set_bytes(settings, "Security", "PreSharedKey",
--					network->psk, 32);
-+	if (!encrypt_key) {
-+		if (network->psk)
-+			l_settings_set_bytes(settings, "Security", "PreSharedKey",
-+						network->psk, 32);
+ 	memcpy(dpp->auth_addr, from, 6);
+@@ -1371,7 +1372,7 @@ static void authenticate_request(struct dpp_sm *dpp, =
+const uint8_t *from,
+ 	dpp->state =3D DPP_STATE_AUTHENTICATING;
+ 	dpp_reset_protocol_timer(dpp);
  =
 
--	if (network->passphrase)
--		l_settings_set_string(settings, "Security", "Passphrase",
--					network->passphrase);
-+		if (network->passphrase)
-+			l_settings_set_string(settings, "Security", "Passphrase",
-+						network->passphrase);
-+	} else
-+		network_encrypt_secrets(encrypt_key, key_len, network,
-+						settings);
+-	send_authenticate_response(dpp, r_auth);
++	send_authenticate_response(dpp);
  =
 
- 	if (network->sae_pt_19)
- 		network_settings_save_sae_pt_ecc(settings, network->sae_pt_19);
+ 	return;
+ =
+
 -- =
 
 2.31.1
 
---===============1280462390746002565==--
+--===============2836050124100053427==--
 
