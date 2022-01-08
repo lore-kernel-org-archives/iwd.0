@@ -1,138 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============7166439047551437984=="
+Content-Type: multipart/mixed; boundary="===============1931945901775669646=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 03/11] handshake: add callback for extended key IDs
-Date: Tue, 05 Oct 2021 15:00:43 -0700
-Message-ID: <20211005220051.4018694-3-prestwoj@gmail.com>
-In-Reply-To: 20211005220051.4018694-1-prestwoj@gmail.com
+Subject: [PATCH v2 2/6] dpp: don't allow StartEnrollee while connected
+Date: Fri, 07 Jan 2022 16:13:29 -0800
+Message-ID: <20220108001333.723634-2-prestwoj@gmail.com>
+In-Reply-To: 20220108001333.723634-1-prestwoj@gmail.com
 
---===============7166439047551437984==
+--===============1931945901775669646==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The procedure for setting extended key IDs is different from the
-single PTK key. The key ID is toggled between 0 and 1 and the new
-key is set as RX only, then set to RX/TX after message 4/4 goes
-out.
-
-Since netdev needs to set this new key before sending message 4,
-eapol can include a built message which netdev will store if
-required (i.e. using PAE).
+While connected the driver ends up choosing quite small ROC
+durations leading to excessive calls to ROC. This also will
+negatively effect any wireless performance for the current
+network and possibly lead to missed DPP frames.
 ---
- src/handshake.c | 21 +++++++++++++++++++++
- src/handshake.h | 13 +++++++++++++
- 2 files changed, 34 insertions(+)
+ src/dpp.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/src/handshake.c b/src/handshake.c
-index 642a25a7..bf50656b 100644
---- a/src/handshake.c
-+++ b/src/handshake.c
-@@ -76,6 +76,7 @@ static handshake_get_nonce_func_t get_nonce =3D handshake=
-_get_nonce;
- static handshake_install_tk_func_t install_tk =3D NULL;
- static handshake_install_gtk_func_t install_gtk =3D NULL;
- static handshake_install_igtk_func_t install_igtk =3D NULL;
-+static handshake_install_ext_tk_func_t install_ext_tk =3D NULL;
+diff --git a/src/dpp.c b/src/dpp.c
+index 61c6b36d..de897266 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -1638,10 +1638,21 @@ static struct l_dbus_message *dpp_dbus_start_enroll=
+ee(struct l_dbus *dbus,
+ 	struct dpp_sm *dpp =3D user_data;
+ 	uint32_t freq =3D band_channel_to_freq(6, BAND_FREQ_2_4_GHZ);
+ 	struct l_dbus_message *reply;
++	struct station *station =3D station_find(netdev_get_ifindex(dpp->netdev));
  =
 
- void __handshake_set_get_nonce_func(handshake_get_nonce_func_t func)
- {
-@@ -97,6 +98,11 @@ void __handshake_set_install_igtk_func(handshake_install=
-_igtk_func_t func)
- 	install_igtk =3D func;
- }
+ 	if (dpp->state !=3D DPP_STATE_NOTHING)
+ 		return dbus_error_busy(message);
  =
 
-+void __handshake_set_install_ext_tk_func(handshake_install_ext_tk_func_t f=
-unc)
-+{
-+	install_ext_tk =3D func;
-+}
++	/*
++	 * Station isn't actually required for DPP itself, although this will
++	 * prevent connecting to the network once configured.
++	 */
++	if (station && station_get_connected_network(station)) {
++		l_warn("cannot be enrollee while connected, please disconnect");
++		return dbus_error_busy(message);
++	} else
++		l_debug("No station device, continuing anyways...");
 +
- void handshake_state_free(struct handshake_state *s)
- {
- 	__typeof__(s->free) destroy =3D s->free;
-@@ -663,6 +669,21 @@ void handshake_state_install_ptk(struct handshake_stat=
-e *s)
- 	}
- }
- =
-
-+void handshake_state_install_ext_ptk(struct handshake_state *s,
-+				uint8_t key_idx,
-+				struct eapol_frame *ek, uint16_t proto,
-+				bool noencrypt)
-+{
-+	if (install_ext_tk) {
-+		uint32_t cipher =3D
-+			ie_rsn_cipher_suite_to_cipher(s->pairwise_cipher);
-+
-+		install_ext_tk(s, key_idx, handshake_get_tk(s), cipher, ek,
-+				proto, noencrypt);
-+	}
-+}
-+
-+
- void handshake_state_install_gtk(struct handshake_state *s,
- 					uint16_t gtk_key_index,
- 					const uint8_t *gtk, size_t gtk_len,
-diff --git a/src/handshake.h b/src/handshake.h
-index e67e2c20..449c8fb8 100644
---- a/src/handshake.h
-+++ b/src/handshake.h
-@@ -27,6 +27,7 @@
- =
-
- struct handshake_state;
- enum crypto_cipher;
-+struct eapol_frame;
- =
-
- enum handshake_kde {
- 	/* 802.11-2020 Table 12-9 in section 12.7.2 */
-@@ -78,11 +79,18 @@ typedef void (*handshake_install_igtk_func_t)(struct ha=
-ndshake_state *hs,
- 					const uint8_t *igtk, uint8_t igtk_len,
- 					const uint8_t *ipn, uint8_t ipn_len,
- 					uint32_t cipher);
-+typedef void (*handshake_install_rx_tk_cb_t)(bool success, void *user_data=
-);
-+typedef void (*handshake_install_ext_tk_func_t)(struct handshake_state *hs,
-+					uint8_t key_idx, const uint8_t *tk,
-+					uint32_t cipher,
-+					const struct eapol_frame *step4,
-+					uint16_t proto, bool noencrypt);
- =
-
- void __handshake_set_get_nonce_func(handshake_get_nonce_func_t func);
- void __handshake_set_install_tk_func(handshake_install_tk_func_t func);
- void __handshake_set_install_gtk_func(handshake_install_gtk_func_t func);
- void __handshake_set_install_igtk_func(handshake_install_igtk_func_t func);
-+void __handshake_set_install_ext_tk_func(handshake_install_ext_tk_func_t f=
-unc);
- =
-
- struct handshake_state {
- 	uint32_t ifindex;
-@@ -227,6 +235,11 @@ size_t handshake_state_get_kek_len(struct handshake_st=
-ate *s);
- const uint8_t *handshake_state_get_kek(struct handshake_state *s);
- void handshake_state_install_ptk(struct handshake_state *s);
- =
-
-+void handshake_state_install_ext_ptk(struct handshake_state *s,
-+				uint8_t key_idx,
-+				struct eapol_frame *ek, uint16_t proto,
-+				bool noencrypt);
-+
- void handshake_state_install_gtk(struct handshake_state *s,
- 					uint16_t gtk_key_index,
- 					const uint8_t *gtk, size_t gtk_len,
+ 	dpp->uri =3D dpp_generate_uri(dpp->pub_asn1, dpp->pub_asn1_len, 2,
+ 					netdev_get_address(dpp->netdev), &freq,
+ 					1, NULL, NULL);
 -- =
 
 2.31.1
 
---===============7166439047551437984==--
+--===============1931945901775669646==--
 
