@@ -1,50 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============0575102553201970530=="
+Content-Type: multipart/mixed; boundary="===============3789397425215908145=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] sae: pass exact length to l_ecc_point_from_data
-Date: Fri, 21 Jan 2022 10:32:37 -0800
-Message-ID: <20220121183237.2549872-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v1] dpp: fix implicit declaration of function
+ explicit_bzero warning
+Date: Mon, 10 Jan 2022 15:44:49 -0600
+Message-ID: <b42ac45a-0b40-b488-6e26-4ad5a3beee5e@gmail.com>
+In-Reply-To: 20220110213218.12896-1-ps.report@gmx.net
 
---===============0575102553201970530==
+--===============3789397425215908145==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-l_ecc_point_from_data now strictly enforces the buffer length.
----
- src/sae.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi Peter,
 
-diff --git a/src/sae.c b/src/sae.c
-index b0f80bb6..dc07db4b 100644
---- a/src/sae.c
-+++ b/src/sae.c
-@@ -413,6 +413,7 @@ static struct l_ecc_point *sae_compute_pwe(const struct=
- l_ecc_curve *curve,
- 	struct l_ecc_scalar *qnr;
- 	uint8_t qnr_bin[L_ECC_SCALAR_MAX_BYTES] =3D {0};
- 	struct l_ecc_point *pwe;
-+	unsigned int bytes =3D l_ecc_curve_get_scalar_bytes(curve);
- =
+On 1/10/22 15:32, Peter Seiderer wrote:
+> - add missing src/missing.h include for explicit_bzero, fixes uclibc
+>    compile/linking
+> =
 
- 	/* create qr/qnr prior to beginning hunting-and-pecking loop */
- 	qr =3D sae_new_residue(curve, true);
-@@ -493,7 +494,7 @@ static struct l_ecc_point *sae_compute_pwe(const struct=
- l_ecc_curve *curve,
- 		return NULL;
- 	}
- =
+> Fixes:
+> =
 
--	pwe =3D l_ecc_point_from_data(curve, !is_odd + 2, x, sizeof(x));
-+	pwe =3D l_ecc_point_from_data(curve, !is_odd + 2, x, bytes);
- 	if (!pwe)
- 		l_error("computing y failed, was x quadratic residue?");
- =
+>    src/dpp.c:166:2: warning: implicit declaration of function =E2=80=98ex=
+plicit_bzero=E2=80=99 [-Wimplicit-function-declaration]
+>      166 |  explicit_bzero(dpp->r_nonce, dpp->nonce_len);
+>          |  ^~~~~~~~~~~~~~
+> ---
+>   src/dpp.c | 1 +
+>   1 file changed, 1 insertion(+)
+> =
 
--- =
 
-2.31.1
+Applied, thanks.
 
---===============0575102553201970530==--
+Regards,
+-Denis
+
+--===============3789397425215908145==--
 
