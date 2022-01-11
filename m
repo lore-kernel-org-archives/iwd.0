@@ -1,250 +1,123 @@
-Content-Type: multipart/mixed; boundary="===============2881943344046393301=="
+Content-Type: multipart/mixed; boundary="===============5032660328184249727=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v7 3/9] dpp: manually register for some frame watches
-Date: Tue, 22 Feb 2022 14:28:41 -0800
-Message-ID: <20220222222847.2480099-3-prestwoj@gmail.com>
-In-Reply-To: 20220222222847.2480099-1-prestwoj@gmail.com
+Subject: [PATCH 2/3] scan: set scan priority via scan_common
+Date: Mon, 10 Jan 2022 16:15:18 -0800
+Message-ID: <20220111001519.1013183-2-prestwoj@gmail.com>
+In-Reply-To: 20220111001519.1013183-1-prestwoj@gmail.com
 
---===============2881943344046393301==
+--===============5032660328184249727==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The frame watch which covers the presence procedure (and most
-frames for that matter) needs to support multicast frames for
-presence to work. Doing this in frame-xchg seems like the right
-choice but only ath9k supports multicast frame registration.
-Because of this limited support DPP will register for these frames
-manually.
+This adds a priority argument to scan_common rather than hard
+coding it when inserting the work item
 ---
- src/dpp.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 116 insertions(+), 8 deletions(-)
+ src/scan.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-v7:
- * Check prefix for manually registered frames since we may get other
-   CMD_FRAME's using the global genl socket
+diff --git a/src/scan.c b/src/scan.c
+index 54159dfd..96907e59 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -52,6 +52,8 @@
+ #include "src/band.h"
+ #include "src/scan.h"
+ =
 
-diff --git a/src/dpp.c b/src/dpp.c
-index cedf5bfe..6379f1fd 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -61,6 +61,9 @@ static struct l_genl_family *nl80211;
- static uint8_t broadcast[] =3D { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
- static struct l_queue *dpp_list;
- static uint32_t mlme_watch;
-+static uint32_t unicast_watch;
++#define SCAN_WORK_PRIORITY 2
 +
-+static uint8_t dpp_prefix[] =3D { 0x04, 0x09, 0x50, 0x6f, 0x9a, 0x1a, 0x01=
- };
+ /* User configurable options */
+ static double RANK_5G_FACTOR;
+ static uint32_t SCAN_MAX_INTERVAL;
+@@ -607,6 +609,7 @@ static struct scan_request *scan_request_new(struct sca=
+n_context *sc,
  =
 
- enum dpp_state {
- 	DPP_STATE_NOTHING,
-@@ -127,6 +130,8 @@ struct dpp_sm {
- 	uint8_t frame_retry;
+ static uint32_t scan_common(uint64_t wdev_id, bool passive,
+ 				const struct scan_parameters *params,
++				int priority,
+ 				scan_trigger_func_t trigger,
+ 				scan_notify_func_t notify, void *userdata,
+ 				scan_destroy_func_t destroy)
+@@ -625,7 +628,8 @@ static uint32_t scan_common(uint64_t wdev_id, bool pass=
+ive,
  =
 
- 	struct l_dbus_message *pending;
-+
-+	bool mcast_support : 1;
- };
+ 	l_queue_push_tail(sc->requests, sr);
  =
 
- static void dpp_free_auth_data(struct dpp_sm *dpp)
-@@ -1403,6 +1408,9 @@ static void authenticate_request(struct dpp_sm *dpp, =
-const uint8_t *from,
- 	const void *ad1 =3D body + 8;
- 	uint32_t freq;
- =
-
-+	if (util_is_broadcast_address(from))
-+		return;
-+
- 	if (dpp->state !=3D DPP_STATE_PRESENCE)
- 		return;
- =
-
-@@ -1577,11 +1585,10 @@ auth_request_failed:
- 	dpp_free_auth_data(dpp);
+-	return wiphy_radio_work_insert(sc->wiphy, &sr->work, 2, &work_ops);
++	return wiphy_radio_work_insert(sc->wiphy, &sr->work,
++					priority, &work_ops);
  }
  =
 
--static void dpp_handle_frame(const struct mmpdu_header *frame,
--				const void *body, size_t body_len,
--				int rssi, void *user_data)
-+static void dpp_handle_frame(struct dpp_sm *dpp,
-+				const struct mmpdu_header *frame,
-+				const void *body, size_t body_len)
+ uint32_t scan_passive(uint64_t wdev_id, struct scan_freq_set *freqs,
+@@ -634,8 +638,8 @@ uint32_t scan_passive(uint64_t wdev_id, struct scan_fre=
+q_set *freqs,
  {
--	struct dpp_sm *dpp =3D user_data;
- 	const uint8_t *ptr;
+ 	struct scan_parameters params =3D { .freqs =3D freqs };
  =
 
- 	/*
-@@ -1664,11 +1671,103 @@ static void dpp_mlme_notify(struct l_genl_msg *msg=
-, void *user_data)
- 	dpp_send_frame(dpp, &iov, 1, dpp->current_freq);
+-	return scan_common(wdev_id, true, &params, trigger, notify,
+-							userdata, destroy);
++	return scan_common(wdev_id, true, &params, SCAN_WORK_PRIORITY, trigger,
++				notify, userdata, destroy);
  }
  =
 
-+static void dpp_unicast_notify(struct l_genl_msg *msg, void *user_data)
-+{
-+	struct dpp_sm *dpp;
-+	const uint64_t *wdev_id =3D NULL;
-+	struct l_genl_attr attr;
-+	uint16_t type, len, frame_len;
-+	const void *data;
-+	const struct mmpdu_header *mpdu =3D NULL;
-+	const uint8_t *body;
-+	size_t body_len;
-+
-+	if (l_genl_msg_get_command(msg) !=3D NL80211_CMD_FRAME)
-+		return;
-+
-+	if (!l_genl_attr_init(&attr, msg))
-+		return;
-+
-+	while (l_genl_attr_next(&attr, &type, &len, &data)) {
-+		switch (type) {
-+		case NL80211_ATTR_WDEV:
-+			if (len !=3D 8)
-+				break;
-+
-+			wdev_id =3D data;
-+			break;
-+
-+		case NL80211_ATTR_FRAME:
-+			mpdu =3D mpdu_validate(data, len);
-+			if (!mpdu) {
-+				l_warn("Frame didn't validate as MMPDU");
-+				return;
-+			}
-+
-+			frame_len =3D len;
-+			break;
-+		}
-+	}
-+
-+	if (!wdev_id) {
-+		l_warn("Bad wdev attribute");
-+		return;
-+	}
-+
-+	dpp =3D l_queue_find(dpp_list, match_wdev, wdev_id);
-+	if (!dpp)
-+		return;
-+
-+	if (!mpdu) {
-+		l_warn("Missing frame data");
-+		return;
-+	}
-+
-+	body =3D mmpdu_body(mpdu);
-+	body_len =3D (const uint8_t *) mpdu + frame_len - body;
-+
-+	if (body_len < sizeof(dpp_prefix) ||
-+			memcmp(body, dpp_prefix, sizeof(dpp_prefix)) !=3D 0)
-+		return;
-+
-+	dpp_handle_frame(dpp, mpdu, body, body_len);
-+}
-+
-+static void dpp_frame_watch_cb(struct l_genl_msg *msg, void *user_data)
-+{
-+	if (l_genl_msg_get_error(msg) < 0)
-+		l_error("Could not register frame watch type %04x: %i",
-+			L_PTR_TO_UINT(user_data), l_genl_msg_get_error(msg));
-+}
-+
-+/*
-+ * Special case the frame watch which includes the presence frames since t=
-hey
-+ * require multicast support. This is only supported by ath9k, so adding
-+ * general support to frame-xchg isn't desireable.
-+ */
-+static void dpp_frame_watch(struct dpp_sm *dpp, uint16_t frame_type,
-+				const uint8_t *prefix, size_t prefix_len)
-+{
-+	struct l_genl_msg *msg;
-+
-+	msg =3D l_genl_msg_new_sized(NL80211_CMD_REGISTER_FRAME, 32 + prefix_len);
-+
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &dpp->wdev_id);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_TYPE, 2, &frame_type);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_MATCH,
-+				prefix_len, prefix);
-+	if (dpp->mcast_support)
-+		l_genl_msg_append_attr(msg, NL80211_ATTR_RECEIVE_MULTICAST,
-+					0, NULL);
-+
-+	l_genl_family_send(nl80211, msg, dpp_frame_watch_cb,
-+					L_UINT_TO_PTR(frame_type), NULL);
-+}
-+
- static void dpp_create(struct netdev *netdev)
+ uint32_t scan_passive_full(uint64_t wdev_id,
+@@ -644,7 +648,7 @@ uint32_t scan_passive_full(uint64_t wdev_id,
+ 			scan_notify_func_t notify, void *userdata,
+ 			scan_destroy_func_t destroy)
  {
- 	struct l_dbus *dbus =3D dbus_get_bus();
- 	struct dpp_sm *dpp =3D l_new(struct dpp_sm, 1);
--	uint8_t dpp_prefix[] =3D { 0x04, 0x09, 0x50, 0x6f, 0x9a, 0x1a, 0x01 };
- 	uint8_t dpp_conf_response_prefix[] =3D { 0x04, 0x0b };
- 	uint8_t dpp_conf_request_prefix[] =3D { 0x04, 0x0a };
+-	return scan_common(wdev_id, true, params, trigger,
++	return scan_common(wdev_id, true, params, SCAN_WORK_PRIORITY, trigger,
+ 				notify, userdata, destroy);
+ }
  =
 
-@@ -1678,6 +1777,9 @@ static void dpp_create(struct netdev *netdev)
- 	dpp->curve =3D l_ecc_curve_from_ike_group(19);
- 	dpp->key_len =3D l_ecc_curve_get_scalar_bytes(dpp->curve);
- 	dpp->nonce_len =3D dpp_nonce_len_from_key_len(dpp->key_len);
-+	dpp->mcast_support =3D wiphy_has_ext_feature(
-+				wiphy_find_by_wdev(dpp->wdev_id),
-+				NL80211_EXT_FEATURE_MULTICAST_REGISTRATIONS);
+@@ -658,7 +662,7 @@ uint32_t scan_active(uint64_t wdev_id, uint8_t *extra_i=
+e, size_t extra_ie_size,
+ 	params.extra_ie =3D extra_ie;
+ 	params.extra_ie_size =3D extra_ie_size;
  =
 
- 	l_ecdh_generate_key_pair(dpp->curve, &dpp->boot_private,
- 					&dpp->boot_public);
-@@ -1690,9 +1792,8 @@ static void dpp_create(struct netdev *netdev)
- 	l_dbus_object_add_interface(dbus, netdev_get_path(netdev),
- 					IWD_DPP_INTERFACE, dpp);
+-	return scan_common(wdev_id, false, &params,
++	return scan_common(wdev_id, false, &params, SCAN_WORK_PRIORITY,
+ 					trigger, notify, userdata, destroy);
+ }
  =
 
--	frame_watch_add(netdev_get_wdev_id(netdev), 0, 0x00d0, dpp_prefix,
--				sizeof(dpp_prefix), dpp_handle_frame,
--				dpp, NULL);
-+	dpp_frame_watch(dpp, 0x00d0, dpp_prefix, sizeof(dpp_prefix));
-+
- 	frame_watch_add(netdev_get_wdev_id(netdev), 0, 0x00d0,
- 				dpp_conf_response_prefix,
- 				sizeof(dpp_conf_response_prefix),
-@@ -1935,6 +2036,11 @@ static int dpp_init(void)
- 	mlme_watch =3D l_genl_family_register(nl80211, "mlme", dpp_mlme_notify,
- 						NULL, NULL);
+@@ -667,7 +671,7 @@ uint32_t scan_active_full(uint64_t wdev_id,
+ 			scan_trigger_func_t trigger, scan_notify_func_t notify,
+ 			void *userdata, scan_destroy_func_t destroy)
+ {
+-	return scan_common(wdev_id, false, params,
++	return scan_common(wdev_id, false, params, SCAN_WORK_PRIORITY,
+ 					trigger, notify, userdata, destroy);
+ }
  =
 
-+	unicast_watch =3D l_genl_add_unicast_watch(iwd_get_genl(),
-+						NL80211_GENL_NAME,
-+						dpp_unicast_notify,
-+						NULL, NULL);
-+
- 	dpp_list =3D l_queue_new();
+@@ -795,7 +799,8 @@ uint32_t scan_owe_hidden(uint64_t wdev_id, struct l_que=
+ue *list,
+ done:
+ 	l_queue_push_tail(sc->requests, sr);
  =
 
- 	return 0;
-@@ -1948,6 +2054,8 @@ static void dpp_exit(void)
+-	return wiphy_radio_work_insert(sc->wiphy, &sr->work, 2, &work_ops);
++	return wiphy_radio_work_insert(sc->wiphy, &sr->work,
++					SCAN_WORK_PRIORITY, &work_ops);
+ }
  =
 
- 	netdev_watch_remove(netdev_watch);
- =
-
-+	l_genl_remove_unicast_watch(iwd_get_genl(), unicast_watch);
-+
- 	l_genl_family_unregister(nl80211, mlme_watch);
- 	mlme_watch =3D 0;
- =
-
+ bool scan_cancel(uint64_t wdev_id, uint32_t id)
 -- =
 
-2.34.1
+2.31.1
 
---===============2881943344046393301==--
+--===============5032660328184249727==--
 
