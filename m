@@ -1,46 +1,117 @@
-Content-Type: multipart/mixed; boundary="===============4854743170218942655=="
+Content-Type: multipart/mixed; boundary="===============4519751084324798987=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/6] ie: add info struct for OWE transition
-Date: Wed, 22 Sep 2021 11:26:50 -0700
-Message-ID: <20210922182655.46220-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/6] scan: set scan priority via scan_common
+Date: Tue, 11 Jan 2022 09:45:10 -0800
+Message-ID: <20220111174514.1074967-2-prestwoj@gmail.com>
+In-Reply-To: 20220111174514.1074967-1-prestwoj@gmail.com
 
---===============4854743170218942655==
+--===============4519751084324798987==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-These members are currently stored in scan_bss but with the
-addition of operating class/band info this will become 5
-separate members. This is a bit excessive to store in scan_bss
-separately so instead this structure can hold everything related
-to the OWE transition IE.
+This adds a priority argument to scan_common rather than hard
+coding it when inserting the work item and uses the newly
+defined wiphy priority for scanning.
 ---
- src/ie.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ src/scan.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/src/ie.h b/src/ie.h
-index f64072b3..02892724 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -488,6 +488,12 @@ struct ie_fils_ip_addr_response_info {
- 	uint8_t ipv6_lifetime;		/* Zero if not provided */
- };
+diff --git a/src/scan.c b/src/scan.c
+index 54159dfd..e6ee3007 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -607,6 +607,7 @@ static struct scan_request *scan_request_new(struct sca=
+n_context *sc,
  =
 
-+struct ie_owe_transition_info {
-+	uint8_t bssid[6];
-+	uint8_t ssid[32];
-+	size_t ssid_len;
-+};
-+
- extern const unsigned char ieee_oui[3];
- extern const unsigned char microsoft_oui[3];
- extern const unsigned char wifi_alliance_oui[3];
+ static uint32_t scan_common(uint64_t wdev_id, bool passive,
+ 				const struct scan_parameters *params,
++				int priority,
+ 				scan_trigger_func_t trigger,
+ 				scan_notify_func_t notify, void *userdata,
+ 				scan_destroy_func_t destroy)
+@@ -625,7 +626,8 @@ static uint32_t scan_common(uint64_t wdev_id, bool pass=
+ive,
+ =
+
+ 	l_queue_push_tail(sc->requests, sr);
+ =
+
+-	return wiphy_radio_work_insert(sc->wiphy, &sr->work, 2, &work_ops);
++	return wiphy_radio_work_insert(sc->wiphy, &sr->work,
++					priority, &work_ops);
+ }
+ =
+
+ uint32_t scan_passive(uint64_t wdev_id, struct scan_freq_set *freqs,
+@@ -634,8 +636,8 @@ uint32_t scan_passive(uint64_t wdev_id, struct scan_fre=
+q_set *freqs,
+ {
+ 	struct scan_parameters params =3D { .freqs =3D freqs };
+ =
+
+-	return scan_common(wdev_id, true, &params, trigger, notify,
+-							userdata, destroy);
++	return scan_common(wdev_id, true, &params, WIPHY_WORK_PRIORITY_SCAN,
++				trigger, notify, userdata, destroy);
+ }
+ =
+
+ uint32_t scan_passive_full(uint64_t wdev_id,
+@@ -644,8 +646,8 @@ uint32_t scan_passive_full(uint64_t wdev_id,
+ 			scan_notify_func_t notify, void *userdata,
+ 			scan_destroy_func_t destroy)
+ {
+-	return scan_common(wdev_id, true, params, trigger,
+-				notify, userdata, destroy);
++	return scan_common(wdev_id, true, params, WIPHY_WORK_PRIORITY_SCAN,
++				trigger, notify, userdata, destroy);
+ }
+ =
+
+ uint32_t scan_active(uint64_t wdev_id, uint8_t *extra_ie, size_t extra_ie_=
+size,
+@@ -658,7 +660,7 @@ uint32_t scan_active(uint64_t wdev_id, uint8_t *extra_i=
+e, size_t extra_ie_size,
+ 	params.extra_ie =3D extra_ie;
+ 	params.extra_ie_size =3D extra_ie_size;
+ =
+
+-	return scan_common(wdev_id, false, &params,
++	return scan_common(wdev_id, false, &params, WIPHY_WORK_PRIORITY_SCAN,
+ 					trigger, notify, userdata, destroy);
+ }
+ =
+
+@@ -667,7 +669,7 @@ uint32_t scan_active_full(uint64_t wdev_id,
+ 			scan_trigger_func_t trigger, scan_notify_func_t notify,
+ 			void *userdata, scan_destroy_func_t destroy)
+ {
+-	return scan_common(wdev_id, false, params,
++	return scan_common(wdev_id, false, params, WIPHY_WORK_PRIORITY_SCAN,
+ 					trigger, notify, userdata, destroy);
+ }
+ =
+
+@@ -795,7 +797,8 @@ uint32_t scan_owe_hidden(uint64_t wdev_id, struct l_que=
+ue *list,
+ done:
+ 	l_queue_push_tail(sc->requests, sr);
+ =
+
+-	return wiphy_radio_work_insert(sc->wiphy, &sr->work, 2, &work_ops);
++	return wiphy_radio_work_insert(sc->wiphy, &sr->work,
++					WIPHY_WORK_PRIORITY_SCAN, &work_ops);
+ }
+ =
+
+ bool scan_cancel(uint64_t wdev_id, uint32_t id)
 -- =
 
 2.31.1
 
---===============4854743170218942655==--
+--===============4519751084324798987==--
 
