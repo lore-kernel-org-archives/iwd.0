@@ -1,42 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============5381369027507837393=="
+Content-Type: multipart/mixed; boundary="===============0466650392044453776=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel at holtmann.org>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [RFC 2/2] network: add support for encrypted Passphrase/PSK
-Date: Fri, 21 Jan 2022 15:53:13 +0100
-Message-ID: <3F712928-7ABB-4E97-879E-13643C3F08DD@holtmann.org>
-In-Reply-To: 20220121004130.2473281-3-prestwoj@gmail.com
+Subject: [PATCH v2 1/6] wiphy: define work priorities in one place
+Date: Tue, 11 Jan 2022 09:45:09 -0800
+Message-ID: <20220111174514.1074967-1-prestwoj@gmail.com>
 
---===============5381369027507837393==
+--===============0466650392044453776==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Work priority was never explicitly defined anywhere, and a module
+using wiphy_radio_work APIs needed to ensure it was not inserting
+at a priority that would interfere with other work.
 
-> Two keys were added: PreSharedKeyEncrypted, PassphraseEncrypted which
-> are now automatically set/loaded if SystemdEncrypt=3Dtrue.
-> =
+Now all the types of work have been defined with their own priority
+and future priorities can easily be added before, after, or in
+between existing priorities.
+---
+ src/wiphy.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-> When transitioning to this option any existing provisioning files will
-> be read in as plaintext but when synced the *Encrypted options will be
-> used instead. After that the file will no longer contain any plaintext
-> psk/passphrase values.
-> =
+diff --git a/src/wiphy.h b/src/wiphy.h
+index 592eba70..fee5d41f 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -45,6 +45,12 @@ struct wiphy_radio_work_item {
+ 	const struct wiphy_radio_work_item_ops *ops;
+ };
+ =
 
-> The encryption itself uses AES-CTR with a zero IV. This is to avoid
-> extra padding and dealing with block sizes. A magic 32 bit value is
-> prepended to the beginning of the plaintext data to serve as verification
-> that the decryption succeeded.
++#define WIPHY_WORK_PRIORITY_FRAME		0
++#define WIPHY_WORK_PRIORITY_OFFCHANNEL		0
++#define WIPHY_WORK_PRIORITY_CONNECT		1
++#define WIPHY_WORK_PRIORITY_SCAN		2
++#define WIPHY_WORK_PRIORITY_PERIODIC_SCAN	3
++
+ enum wiphy_state_watch_event {
+ 	WIPHY_STATE_WATCH_EVENT_POWERED,
+ 	WIPHY_STATE_WATCH_EVENT_RFKILLED,
+-- =
 
-so this is a bad idea. If two independent networks happen to use the same p=
-assphrase or PSK, then the encrypted data will be the same. You need to sal=
-t the encryption so that even if the plaintext is the same, the encrypted d=
-ata is different (give that you use the same key).
+2.31.1
 
-Regards
-
-Marcel
-
---===============5381369027507837393==--
+--===============0466650392044453776==--
 
