@@ -1,46 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============3129300306948116447=="
+Content-Type: multipart/mixed; boundary="===============0865396427868493779=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 2/4] dpp-util: add URI generation API
-Date: Mon, 06 Dec 2021 16:33:11 -0600
-Message-ID: <7512a662-842a-f71c-38f7-db7f7b853300@gmail.com>
-In-Reply-To: 20211206210356.1204046-2-prestwoj@gmail.com
+Subject: [PATCH v2 5/7] auto-t: wpas.py: increase timeout for auth protocol
+Date: Wed, 12 Jan 2022 10:08:43 -0800
+Message-ID: <20220112180845.1240661-5-prestwoj@gmail.com>
+In-Reply-To: 20220112180845.1240661-1-prestwoj@gmail.com
 
---===============3129300306948116447==
+--===============0865396427868493779==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 12/6/21 3:03 PM, James Prestwood wrote:
-> ---
->   src/dpp-util.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   src/dpp-util.h |  4 ++++
->   2 files changed, 64 insertions(+)
-> =
+Sometimes wpa_supplicant takes some time to respond to the initial
+presence anouncements.
+---
+ autotests/util/wpas.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> diff --git a/src/dpp-util.c b/src/dpp-util.c
-> index 8482b1ff..ca641311 100644
-> --- a/src/dpp-util.c
-> +++ b/src/dpp-util.c
-> @@ -33,6 +33,66 @@
->   #include "src/dpp-util.h"
->   #include "src/util.h"
->   #include "src/crypto.h"
-> +#include "src/scan.h"
-> +
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index b750ce31..440f6227 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -279,7 +279,7 @@ class Wpas:
+ =
 
-I switched this to include src/band.h instead of scan.h, which is what seem=
-s to =
+         self._rx_data =3D []
+         self._ctrl_request(cmd)
+-        self.wait_for_event('DPP-AUTH-SUCCESS')
++        self.wait_for_event('DPP-AUTH-SUCCESS', timeout=3D30)
+         self.wait_for_event('DPP-CONF-SENT')
+ =
 
-be intended.
+     def dpp_configurator_remove(self):
+-- =
 
-Also a whitespace fix for a line > 80 chars.
+2.31.1
 
-Patches 1-3 applied, thanks.
-
-Regards,
--Denis
-
---===============3129300306948116447==--
+--===============0865396427868493779==--
 
