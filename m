@@ -1,59 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============8790882909913520229=="
+Content-Type: multipart/mixed; boundary="===============5030398383330543300=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/2] auto-t: add EAP reauth to testEAP
-Date: Tue, 24 May 2022 13:31:45 -0700
-Message-ID: <20220524203145.3218063-2-prestwoj@gmail.com>
-In-Reply-To: 20220524203145.3218063-1-prestwoj@gmail.com
+Subject: Re: [PATCH 03/10] dpp: don't send StartEnrollee reply until
+ offchannel starts
+Date: Wed, 12 Jan 2022 09:38:50 -0600
+Message-ID: <544dc103-93f6-6772-ae13-6414e6b349c5@gmail.com>
+In-Reply-To: 20220112005558.1158405-3-prestwoj@gmail.com
 
---===============8790882909913520229==
+--===============5030398383330543300==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- autotests/testEAP/connection_test.py | 5 +++++
- 1 file changed, 5 insertions(+)
+Hi James,
 
-diff --git a/autotests/testEAP/connection_test.py b/autotests/testEAP/conne=
-ction_test.py
-index f072845b..fe048b48 100644
---- a/autotests/testEAP/connection_test.py
-+++ b/autotests/testEAP/connection_test.py
-@@ -11,6 +11,8 @@ from iwd import PSKAgent
- from hlrauc import AuthCenter
- from ofono import Ofono
- from config import ctx
-+from hostapd import HostapdCLI
-+
- import testutil
- import traceback
- =
+On 1/11/22 18:55, James Prestwood wrote:
+> IWD may be in the middle of some long operation, e.g. scanning.
+> If the URI is returned before IWD is ready, a configurator could
+> start sending frames and IWD either wont receive them, or will
+> be unable to respond quickly.
+> ---
+>   src/dpp.c | 20 ++++++++++++++------
+>   1 file changed, 14 insertions(+), 6 deletions(-)
+> =
 
-@@ -50,6 +52,8 @@ class Test(unittest.TestCase):
-         testutil.test_iface_operstate()
-         testutil.test_ifaces_connected()
- =
+> diff --git a/src/dpp.c b/src/dpp.c
+> index 98d2a75c..c10ec978 100644
+> --- a/src/dpp.c
+> +++ b/src/dpp.c
+> @@ -118,6 +118,8 @@ struct dpp_sm {
+>   =
 
-+        self.hostapd.eapol_reauth(device.address)
-+
-         if secrets:
-             wd.unregister_psk_agent(psk_agent)
- =
+>   	struct dpp_configuration *config;
+>   	uint32_t connect_scan_id;
+> +
+> +	struct l_dbus_message *message;
 
-@@ -251,6 +255,7 @@ class Test(unittest.TestCase):
-     @classmethod
-     def setUpClass(cls):
-         cls.wd =3D IWD()
-+        cls.hostapd =3D HostapdCLI()
- =
+We customarily call this member 'pending', so I changed this naming and app=
+lied.
 
-     @classmethod
-     def tearDownClass(cls):
--- =
-
-2.34.1
-
---===============8790882909913520229==--
+Regards,
+-Denis
+--===============5030398383330543300==--
 
