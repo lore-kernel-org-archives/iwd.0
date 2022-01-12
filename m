@@ -1,57 +1,76 @@
-Content-Type: multipart/mixed; boundary="===============3482755343132335546=="
+Content-Type: multipart/mixed; boundary="===============2610023955464886409=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 03/13] scan: keep track of OWE Transition element
-Date: Wed, 15 Sep 2021 10:36:14 -0700
-Message-ID: <20210915173624.11917-3-prestwoj@gmail.com>
-In-Reply-To: 20210915173624.11917-1-prestwoj@gmail.com
+Subject: [PATCH 01/10] auto-t: update wpas.py to use non_block_wait
+Date: Tue, 11 Jan 2022 16:55:49 -0800
+Message-ID: <20220112005558.1158405-1-prestwoj@gmail.com>
 
---===============3482755343132335546==
+--===============2610023955464886409==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This should be used as a replacement for the common GLib
+wait loop (internally this is all it does).
 ---
- src/scan.c | 6 ++++++
- src/scan.h | 2 ++
- 2 files changed, 8 insertions(+)
+ autotests/util/wpas.py | 31 +++++++++++--------------------
+ 1 file changed, 11 insertions(+), 20 deletions(-)
 
-diff --git a/src/scan.c b/src/scan.c
-index cdc14dbd..5e31c308 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -936,6 +936,12 @@ static void scan_parse_vendor_specific(struct scan_bss=
- *bss, const void *data,
- 		return;
- 	}
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index c26f116c..0caa947f 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -58,29 +58,20 @@ class Wpas:
+         f.close()
+         return dict([[v.strip() for v in kv] for kv in [l.split('#', 1)[0]=
+.split('=3D', 1) for l in lines] if len(kv) =3D=3D 2])
  =
 
-+	if (is_ie_wfa_ie(data, len, IE_WFA_OI_OWE_TRANSITION)) {
-+		ie_parse_owe_transition(data - 2, len + 2, bss->owe_trans_bssid,
-+					bss->owe_trans_ssid);
-+		return;
-+	}
-+
- 	if (!ie_parse_network_cost(data, len, &cost_level, &cost_flags)) {
- 		bss->cost_level =3D cost_level;
- 		bss->cost_flags =3D cost_flags;
-diff --git a/src/scan.h b/src/scan.h
-index be8912e6..23de472b 100644
---- a/src/scan.h
-+++ b/src/scan.h
-@@ -76,6 +76,8 @@ struct scan_bss {
- 	uint64_t parent_tsf;
- 	uint8_t *wfd;		/* Concatenated WFD IEs */
- 	ssize_t wfd_size;	/* Size of Concatenated WFD IEs */
-+	char owe_trans_ssid[33];
-+	uint8_t owe_trans_bssid[6];
- 	bool mde_present : 1;
- 	bool cc_present : 1;
- 	bool cap_rm_neighbor_report : 1;
+-    def wait_for_event(self, event, timeout=3D10):
+-        self._wait_timed_out =3D False
+-
+-        def wait_timeout_cb():
+-            self._wait_timed_out =3D True
+-            return False
+-
+-        timeout =3D GLib.timeout_add_seconds(timeout, wait_timeout_cb)
+-        context =3D ctx.mainloop.get_context()
++    def _check_event(self, event):
++        if not event and len(self._rx_data) >=3D 1:
++            print("returning %s" % self._rx_data[0])
++            return self._rx_data[0]
+ =
+
+-        while True:
+-            context.iteration(may_block=3DTrue)
++        for e in self._rx_data:
++            if event in e:
++                return self._rx_data
+ =
+
+-            if not event and len(self._rx_data) >=3D 1:
+-                return self._rx_data[0]
++        return False
+ =
+
+-            for e in self._rx_data:
+-                if event in e:
+-                    GLib.source_remove(timeout)
+-                    return self._rx_data
+-
+-            if self._wait_timed_out:
+-                raise TimeoutError('waiting for wpas event timed out')
++    def wait_for_event(self, event, timeout=3D10):
++        self._rx_data =3D []
++        return ctx.non_block_wait(self._check_event, timeout, event)
+ =
+
+     def wait_for_result(self, timeout=3D10):
+         self._rx_data =3D []
 -- =
 
 2.31.1
 
---===============3482755343132335546==--
+--===============2610023955464886409==--
 
