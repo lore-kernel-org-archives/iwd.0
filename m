@@ -1,45 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============0708084575287222449=="
+Content-Type: multipart/mixed; boundary="===============2449610788543682744=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/3] netdev: fix return value check for
- ft_over_ds_parse_action_ies
-Date: Mon, 27 Sep 2021 15:41:35 -0700
-Message-ID: <20210927224136.312226-2-prestwoj@gmail.com>
-In-Reply-To: 20210927224136.312226-1-prestwoj@gmail.com
+Subject: [PATCH v2 3/7] scan: don't print notification if sc is not found
+Date: Wed, 12 Jan 2022 10:08:41 -0800
+Message-ID: <20220112180845.1240661-3-prestwoj@gmail.com>
+In-Reply-To: 20220112180845.1240661-1-prestwoj@gmail.com
 
---===============0708084575287222449==
+--===============2449610788543682744==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This returns a bool but was being treated as a signed int.
+If this scan is not for any IWD wdev's don't print
 ---
- src/netdev.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ src/scan.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index d69962d1..a931d78e 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4194,9 +4194,8 @@ static void netdev_ft_response_frame_event(const stru=
-ct mmpdu_header *hdr,
- 		goto ft_error;
- 	}
+diff --git a/src/scan.c b/src/scan.c
+index 0767fa22..156d427f 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -1811,8 +1811,6 @@ static void scan_notify(struct l_genl_msg *msg, void =
+*user_data)
  =
 
--	ret =3D ft_over_ds_parse_action_ies(&info->super, netdev->handshake,
--						ies, ies_len);
--	if (ret < 0)
-+	if (!ft_over_ds_parse_action_ies(&info->super, netdev->handshake,
-+						ies, ies_len))
- 		goto ft_error;
+ 	cmd =3D l_genl_msg_get_command(msg);
  =
 
- 	info->parsed =3D true;
+-	l_debug("Scan notification %s(%u)", nl80211cmd_to_string(cmd), cmd);
+-
+ 	if (nl80211_parse_attrs(msg, NL80211_ATTR_WDEV, &wdev_id,
+ 					NL80211_ATTR_WIPHY, &wiphy_id,
+ 					NL80211_ATTR_UNSPEC) < 0)
+@@ -1822,6 +1820,8 @@ static void scan_notify(struct l_genl_msg *msg, void =
+*user_data)
+ 	if (!sc)
+ 		return;
+ =
+
++	l_debug("Scan notification %s(%u)", nl80211cmd_to_string(cmd), cmd);
++
+ 	if (!l_genl_attr_init(&attr, msg))
+ 		return;
+ =
+
 -- =
 
 2.31.1
 
---===============0708084575287222449==--
+--===============2449610788543682744==--
 
