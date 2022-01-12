@@ -1,53 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============7047539877132107256=="
+Content-Type: multipart/mixed; boundary="===============0889920903672421761=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
-Date: Tue, 17 May 2022 14:23:18 -0500
-Message-ID: <f688e6b8-8bf5-4b6e-1092-ff1283ea4c80@gmail.com>
-In-Reply-To: CACsRnHUpN+fXLekfFKzX4LmJKE_H5thYW9LK-5eXzXtw5Fy0VA@mail.gmail.com
+Subject: [PATCH v2 7/7] auto-t: improve testDPP reliablity
+Date: Wed, 12 Jan 2022 10:08:45 -0800
+Message-ID: <20220112180845.1240661-7-prestwoj@gmail.com>
+In-Reply-To: 20220112180845.1240661-1-prestwoj@gmail.com
 
---===============7047539877132107256==
+--===============0889920903672421761==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+First disconnect wpa_supplicant to make sure it wont miss frames if
+it decides to connect. Also alter the order of things for the
+configurator test so autoconnect doesn't start until after hostapd
+is up (avoids additional scanning and delays)
+---
+ autotests/testDPP/connection_test.py | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
->> This changes the semantics slightly.  In our wiki, etc we show IWD_DHCP_=
-DEBUG
->> with value "1" to enable debugging, so I think we should be nice and kee=
-p that
->> behavior if possible.  How about:
->>
->> if IWD_DHCP_DEBUG is not set, use L_LOG_WARNING.
->>
->> If IWD_DHCP_DEBUG is set and has a non-NULL value, use L_LOG_DEBUG
->>
->> If the value above is from the set L_LOG_ERR .. L_LOG_DEBUG (3 .. 7), th=
-en use that.
-> =
+diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
+ction_test.py
+index 3c3705e4..38d44b25 100644
+--- a/autotests/testDPP/connection_test.py
++++ b/autotests/testDPP/connection_test.py
+@@ -35,6 +35,7 @@ class Test(unittest.TestCase):
+         self.wd.wait_for_object_condition(self.device, condition)
+ =
 
-> I made this change but it seems quite difficult to explain in a
-> reasonable way to the user why the values are 3, 4, 6, and 7.
-> How about using strings instead? `info`, `warn`, `error`, `debug`?
-> That still allows us to keep the old behavior if it's a `1`.
+     def test_iwd_as_enrollee_scan_after(self):
++        self.wpas.disconnect()
+         uri =3D self.device.dpp_start_enrollee()
+ =
 
-Sure, that sounds even better.
+         self.wpas.dpp_configurator_create(uri)
+@@ -66,10 +67,11 @@ class Test(unittest.TestCase):
+         self.wd.wait_for_object_condition(self.device, condition)
+ =
 
-> =
+     def test_iwd_as_configurator(self):
+-        self.device.autoconnect =3D True
+-        IWD.copy_to_storage('ssidCCMP.psk')
+-
+         self.hapd.reload()
++        self.hapd.wait_for_event('AP-ENABLED')
++
++        IWD.copy_to_storage('ssidCCMP.psk')
++        self.device.autoconnect =3D True
+ =
 
-> I'm also questioning if I should keep the L_LOG_WARN as the default or
-> make it L_LOG_INFO which is more in line with what I intended when I
-> started (i.e. not setting the env should result in similar output to
-> other DHCP clients). Do you prefer WARN?
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         self.wd.wait_for_object_condition(self.device, condition)
+-- =
 
-If you intended this to be info, then do that.  iwd prints l_info, l_error =
-and =
+2.31.1
 
-l_warn messages by default and only l_debug is enabled via '-d'.
-
-Regards,
--Denis
---===============7047539877132107256==--
+--===============0889920903672421761==--
 
