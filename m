@@ -1,70 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============7030766912168952289=="
+Content-Type: multipart/mixed; boundary="===============8695081167881207251=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 2/3] network: prefer OWE transition BSS over open
-Date: Thu, 16 Sep 2021 13:49:26 -0700
-Message-ID: <20210916204927.46007-2-prestwoj@gmail.com>
-In-Reply-To: 20210916204927.46007-1-prestwoj@gmail.com
+Subject: [PATCH 09/10] auto-t: wpas.py: add configurator_remove
+Date: Tue, 11 Jan 2022 16:55:57 -0800
+Message-ID: <20220112005558.1158405-9-prestwoj@gmail.com>
+In-Reply-To: 20220112005558.1158405-1-prestwoj@gmail.com
 
---===============7030766912168952289==
+--===============8695081167881207251==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There isn't much control station has with how BSS's are inserted to
-a network object. The rank algorithm makes that decision. Because of
-this we could end up in a situation where the Open BSS is preferred
-over the OWE transition BSS.
-
-In attempt to better handle this any Open BSS in this type of network
-will not be chosen unless its the only candidate (e.g. no other BSSs,
-inability to connect with OWE, or an improperly configured network).
+wpa_supplicant has a limited number of configurator IDs, and its
+good practice to remove them after we are done.
 ---
- src/network.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ autotests/util/wpas.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/network.c b/src/network.c
-index 4768b872..bc35ddea 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -1105,6 +1105,11 @@ const struct l_queue_entry *network_bss_list_get_ent=
-ries(
- 	return l_queue_get_entries(network->bss_list);
- }
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index f8ef3357..b750ce31 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -282,6 +282,12 @@ class Wpas:
+         self.wait_for_event('DPP-AUTH-SUCCESS')
+         self.wait_for_event('DPP-CONF-SENT')
  =
 
-+static bool bss_is_owe(struct scan_bss *bss)
-+{
-+	return !l_memeqzero(bss->owe_trans_bssid, 6) && bss->rsne;
-+}
++    def dpp_configurator_remove(self):
++        self._ctrl_request('DPP_CONFIGURATOR_REMOVE *')
++        self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_REMOVE *')
++        self.wait_for_result()
 +
- struct scan_bss *network_bss_select(struct network *network,
- 						bool fallback_to_blacklist)
- {
-@@ -1130,6 +1135,17 @@ struct scan_bss *network_bss_select(struct network *=
-network,
- 		if (!candidate)
- 			candidate =3D bss;
- =
-
-+		/* OWE Transition BSS */
-+		if (!l_memeqzero(bss->owe_trans_bssid, 6)) {
-+			/* Don't want to connect to the Open BSS if possible */
-+			if (!bss->rsne)
-+				continue;
-+
-+			/* Candidate is not OWE, set this as new candidate */
-+			if (!bss_is_owe(candidate))
-+				candidate =3D bss;
-+		}
-+
- 		/* check if temporarily blacklisted */
- 		if (l_queue_find(network->blacklist, match_bss, bss))
- 			continue;
+     # Probably needed: remove references to self so that the GC can call _=
+_del__ automatically
+     def clean_up(self):
+         if self.io_watch is not None:
 -- =
 
 2.31.1
 
---===============7030766912168952289==--
+--===============8695081167881207251==--
 
