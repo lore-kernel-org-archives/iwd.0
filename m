@@ -1,30 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============0390324038242841188=="
+Content-Type: multipart/mixed; boundary="===============6530750769847045025=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] auto-t: only wait for wpa_s to get the DPP configuration
-Date: Thu, 03 Feb 2022 13:55:17 -0600
-Message-ID: <8a03250c-60d4-b97a-1df3-7cbbd4832e0a@gmail.com>
-In-Reply-To: 20220203194320.96759-1-prestwoj@gmail.com
+Subject: [PATCH v2 4/7] dpp: stop periodic scanning when starting DPP
+Date: Wed, 12 Jan 2022 10:08:42 -0800
+Message-ID: <20220112180845.1240661-4-prestwoj@gmail.com>
+In-Reply-To: 20220112180845.1240661-1-prestwoj@gmail.com
 
---===============0390324038242841188==
+--===============6530750769847045025==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ src/dpp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-On 2/3/22 13:43, James Prestwood wrote:
-> As far as wpa_supplicant goes we don't need to test if it can actually
-> connect to the network, just that it receives the DPP configuration.
-> ---
->   autotests/testDPP/connection_test.py | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/src/dpp.c b/src/dpp.c
+index 5f24de57..f33b655b 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -1809,6 +1809,8 @@ static struct l_dbus_message *dpp_dbus_start_enrollee=
+(struct l_dbus *dbus,
+ 	 */
+ 	dpp_start_presence(dpp, &freq, 1);
+ =
 
-Applied, thanks.
++	scan_periodic_stop(dpp->wdev_id);
++
+ 	return NULL;
+ }
+ =
 
-Regards,
--Denis
+@@ -1857,6 +1859,8 @@ static struct l_dbus_message *dpp_dbus_start_configur=
+ator(struct l_dbus *dbus,
+ 						network_get_ssid(network),
+ 						hs->akm_suite);
+ =
 
---===============0390324038242841188==--
++	scan_periodic_stop(dpp->wdev_id);
++
+ 	l_debug("DPP Start Configurator: %s", dpp->uri);
+ =
+
+ 	reply =3D l_dbus_message_new_method_return(message);
+-- =
+
+2.31.1
+
+--===============6530750769847045025==--
 
