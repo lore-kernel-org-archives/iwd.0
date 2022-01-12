@@ -1,25 +1,23 @@
-Content-Type: multipart/mixed; boundary="===============7847341090480693596=="
+Content-Type: multipart/mixed; boundary="===============5789448675010080039=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/5] test: choose default device in force-roam
-Date: Thu, 23 Sep 2021 17:47:27 -0500
-Message-ID: <99d5f9bb-2b90-fdc3-fdbf-18e0dcb2d9dc@gmail.com>
-In-Reply-To: 20210923225728.556306-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2 1/7] nl80211util: support ATTR_FRAME in parse_attrs()
+Date: Wed, 12 Jan 2022 12:47:29 -0600
+Message-ID: <c3919d6d-aa9d-b437-d578-7da39c4dc9cb@gmail.com>
+In-Reply-To: 20220112180845.1240661-1-prestwoj@gmail.com
 
---===============7847341090480693596==
+--===============5789448675010080039==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 9/23/21 5:57 PM, James Prestwood wrote:
-> This makes the usage much more convenient if the system has only
-> a single device.
+On 1/12/22 12:08, James Prestwood wrote:
 > ---
->   test/force-roam | 27 +++++++++++++++++++++++----
->   1 file changed, 23 insertions(+), 4 deletions(-)
+>   src/nl80211util.c | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
 > =
 
 
@@ -28,5 +26,5 @@ All applied, thanks.
 Regards,
 -Denis
 
---===============7847341090480693596==--
+--===============5789448675010080039==--
 
