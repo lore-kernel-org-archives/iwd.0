@@ -1,42 +1,100 @@
-Content-Type: multipart/mixed; boundary="===============5168924501699699688=="
+Content-Type: multipart/mixed; boundary="===============1508942735540292254=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] auto-t: only wait for wpa_s to get the DPP configuration
-Date: Thu, 03 Feb 2022 11:43:20 -0800
-Message-ID: <20220203194320.96759-1-prestwoj@gmail.com>
+Subject: [PATCH 03/10] dpp: don't send StartEnrollee reply until offchannel
+ starts
+Date: Tue, 11 Jan 2022 16:55:51 -0800
+Message-ID: <20220112005558.1158405-3-prestwoj@gmail.com>
+In-Reply-To: 20220112005558.1158405-1-prestwoj@gmail.com
 
---===============5168924501699699688==
+--===============1508942735540292254==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-As far as wpa_supplicant goes we don't need to test if it can actually
-connect to the network, just that it receives the DPP configuration.
+IWD may be in the middle of some long operation, e.g. scanning.
+If the URI is returned before IWD is ready, a configurator could
+start sending frames and IWD either wont receive them, or will
+be unable to respond quickly.
 ---
- autotests/testDPP/connection_test.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/dpp.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
-ction_test.py
-index 38d44b25..a451d584 100644
---- a/autotests/testDPP/connection_test.py
-+++ b/autotests/testDPP/connection_test.py
-@@ -80,7 +80,7 @@ class Test(unittest.TestCase):
+diff --git a/src/dpp.c b/src/dpp.c
+index 98d2a75c..c10ec978 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -118,6 +118,8 @@ struct dpp_sm {
  =
 
-         self.wpas.dpp_enrollee_start(uri)
+ 	struct dpp_configuration *config;
+ 	uint32_t connect_scan_id;
++
++	struct l_dbus_message *message;
+ };
  =
 
--        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
-+        self.wpas.wait_for_event('DPP-CONF-RECEIVED')
+ static void dpp_free_auth_data(struct dpp_sm *dpp)
+@@ -1257,6 +1259,15 @@ static void dpp_roc_started(void *user_data)
  =
 
-     def setUp(self):
-         self.wd =3D IWD(True)
+ 	switch (dpp->state) {
+ 	case DPP_STATE_PRESENCE:
++		if (dpp->message) {
++			struct l_dbus_message *reply =3D
++				l_dbus_message_new_method_return(dpp->message);
++
++			l_dbus_message_set_arguments(reply, "s", dpp->uri);
++
++			dbus_pending_reply(&dpp->message, reply);
++		}
++
+ 		dpp_presence_announce(dpp);
+ 		break;
+ 	case DPP_STATE_AUTHENTICATING:
+@@ -1694,7 +1705,6 @@ static struct l_dbus_message *dpp_dbus_start_enrollee=
+(struct l_dbus *dbus,
+ {
+ 	struct dpp_sm *dpp =3D user_data;
+ 	uint32_t freq =3D band_channel_to_freq(6, BAND_FREQ_2_4_GHZ);
+-	struct l_dbus_message *reply;
+ 	struct station *station =3D station_find(netdev_get_ifindex(dpp->netdev));
+ =
+
+ 	if (dpp->state !=3D DPP_STATE_NOTHING)
+@@ -1720,6 +1730,8 @@ static struct l_dbus_message *dpp_dbus_start_enrollee=
+(struct l_dbus *dbus,
+ =
+
+ 	l_debug("DPP Start Enrollee: %s", dpp->uri);
+ =
+
++	dpp->message =3D l_dbus_message_ref(message);
++
+ 	/*
+ 	 * Going off spec here. Select a single channel to send presence
+ 	 * announcements on. This will be advertised in the URI. The full
+@@ -1727,11 +1739,7 @@ static struct l_dbus_message *dpp_dbus_start_enrolle=
+e(struct l_dbus *dbus,
+ 	 */
+ 	dpp_start_presence(dpp, &freq, 1);
+ =
+
+-	reply =3D l_dbus_message_new_method_return(message);
+-
+-	l_dbus_message_set_arguments(reply, "s", dpp->uri);
+-
+-	return reply;
++	return NULL;
+ }
+ =
+
+ static struct l_dbus_message *dpp_dbus_start_configurator(struct l_dbus *d=
+bus,
 -- =
 
 2.31.1
 
---===============5168924501699699688==--
+--===============1508942735540292254==--
 
