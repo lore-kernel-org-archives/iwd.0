@@ -1,35 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============6610721089284937387=="
+Content-Type: multipart/mixed; boundary="===============8616631308190800443=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 2/3] scan: add scan_freq_set_serialize
-Date: Tue, 30 Nov 2021 12:26:01 -0600
-Message-ID: <b9164c3e-0847-fe30-3fda-5e4778a471a8@gmail.com>
-In-Reply-To: 20211130174813.384374-2-prestwoj@gmail.com
+Subject: [PATCH 04/10] dpp: put no station device print behind else if
+Date: Tue, 11 Jan 2022 16:55:52 -0800
+Message-ID: <20220112005558.1158405-4-prestwoj@gmail.com>
+In-Reply-To: 20220112005558.1158405-1-prestwoj@gmail.com
 
---===============6610721089284937387==
+--===============8616631308190800443==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+The previous (incorrect) else was removed since it ended up
+printing in most cases since the if clause returned. This should
+have been an else if conditional from the start and only print if the
+station device was not found.
+---
+ src/dpp.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-On 11/30/21 11:48 AM, James Prestwood wrote:
-> This serializes a scan_freq_set into a uint32_t array.
+diff --git a/src/dpp.c b/src/dpp.c
+index c10ec978..5e07a61a 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -1717,9 +1717,8 @@ static struct l_dbus_message *dpp_dbus_start_enrollee=
+(struct l_dbus *dbus,
+ 	if (station && station_get_connected_network(station)) {
+ 		l_warn("cannot be enrollee while connected, please disconnect");
+ 		return dbus_error_busy(message);
+-	}
+-
+-	l_debug("No station device, continuing anyways...");
++	} else if (!station)
++		l_debug("No station device, continuing anyways...");
+ =
 
-Looks like you didn't update 'serialize' to _fixed_array in the commit head=
-er.
+ 	dpp->uri =3D dpp_generate_uri(dpp->pub_asn1, dpp->pub_asn1_len, 2,
+ 					netdev_get_address(dpp->netdev), &freq,
+-- =
 
-> ---
->   src/util.c | 33 +++++++++++++++++++++++++++++++++
->   src/util.h |  2 ++
->   2 files changed, 35 insertions(+)
-> =
+2.31.1
 
-
-Please respin to use l_uintset_size.
-
-Regards,
--Denis
---===============6610721089284937387==--
+--===============8616631308190800443==--
 
