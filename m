@@ -1,63 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============5813010120746037070=="
+Content-Type: multipart/mixed; boundary="===============6712254839906225596=="
 MIME-Version: 1.0
-From: Paul Menzel <pmenzel at molgen.mpg.de>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3] network: Hide hidden networks on connection error
-Date: Tue, 05 Apr 2022 16:53:38 +0200
-Message-ID: <d232b9c2-e116-3f60-4c45-3ee26776d50c@molgen.mpg.de>
-In-Reply-To: 1769f085-c991-c761-01cb-adecb580b0c3@molgen.mpg.de
+Subject: Re: [PATCH 06/10] dpp: pass dpp_sm to dpp_send_frame
+Date: Wed, 12 Jan 2022 09:40:45 -0600
+Message-ID: <def6a55e-7fc6-8579-31a7-2fde7ba1e3ea@gmail.com>
+In-Reply-To: 20220112005558.1158405-6-prestwoj@gmail.com
 
---===============5813010120746037070==
+--===============6712254839906225596==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-[Resend with fixed email address, botched by me]
+Hi James,
 
-Am 05.04.22 um 16:49 schrieb Paul Menzel:
-> Dear Denis, dear Emmanuel,
+On 1/11/22 18:55, James Prestwood wrote:
+> The SM has the wdev_id already, so rather than using that or looking
+> up just pass the dpp_sm directly.
+> ---
+>   src/dpp.c | 20 +++++++++-----------
+>   1 file changed, 9 insertions(+), 11 deletions(-)
 > =
 
-> =
 
-> Am 05.04.22 um 16:34 schrieb Denis Kenzior:
->> Hi Emmanuel,
->>
->> On 4/5/22 06:19, VAUTRIN Emmanuel (Canal Plus Prestataire) wrote:
->>> If a user connection fails on a freshly scanned psk or open hidden =
+<snip>
 
->>> network,
->>> during passphrase request or after, it shall be removed from the =
+>   =
 
->>> network list.
->>> Otherwise, it would be possible to directly connect to that known
->>> network, which will appear as not hidden.
->>>
->>> Commit 06ca8e20a9b0 ("station: Hide forgotten hidden networks")
-> =
+> -static void dpp_send_frame(uint64_t wdev_id, struct iovec *iov, size_t i=
+ov_len,
+> +static void dpp_send_frame(struct dpp_sm *dpp, struct iovec *iov, size_t=
+ iov_len,
+>   			uint32_t freq)
 
-> What does this line mean?
-> =
+I fixed up this line being > 80 chars and applied, thanks.
 
-> =
-
-> Kind regards,
-> =
-
-> Paul
-> =
-
-> =
-
->>> ---
->>> =C2=A0 src/network.c | 11 +++++++++++
->>> =C2=A0 src/station.c |=C2=A0 2 ++
->>> =C2=A0 2 files changed, 13 insertions(+)
->>>
->>
->> Applied, thanks.
->>
->> Regards,
->> -Denis
---===============5813010120746037070==--
+Regards,
+-Denis
+--===============6712254839906225596==--
 
