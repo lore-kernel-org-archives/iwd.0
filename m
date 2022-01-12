@@ -1,146 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============8961526431016267145=="
+Content-Type: multipart/mixed; boundary="===============1604132804299358299=="
 MIME-Version: 1.0
-From: Axel Kittenberger <axel.kittenberger at univie.ac.at>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: EAP server tried method 25 while client was configured for method
- 26
-Date: Fri, 13 May 2022 11:16:55 +0200
-Message-ID: <83ca525f-f2bb-411f-81b5-06e17a5dad54@univie.ac.at>
-In-Reply-To: 6fc4a1a0c9cea52a46c5645cc33c2036@univie.ac.at
+Subject: Re: [PATCH 08/10] auto-t: wpas.py: add freq argument to
+ configurator_start
+Date: Wed, 12 Jan 2022 10:05:38 -0600
+Message-ID: <3897f5fb-8d4b-6e7c-8a9e-0e32ad2aa45e@gmail.com>
+In-Reply-To: 20220112005558.1158405-8-prestwoj@gmail.com
 
---===============8961526431016267145==
+--===============1604132804299358299==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi James,
 
-> This is very strange.=C2=A0 We're configured for MSCHAPv2 (method=3D26) =
+On 1/11/22 18:55, James Prestwood wrote:
+> This forces the configurator to request a new channel during the
+> authentication protocol.
+> ---
+>   autotests/util/wpas.py | 10 ++++++++--
+>   1 file changed, 8 insertions(+), 2 deletions(-)
 
-> inside the PEAP tunnel.=C2=A0 It seems that the server is sending us =
+Patches 8-10 applied, thanks.
 
-> EAP-PEAP (method=3D25) packets within the tunnel, which doesn't make =
+Regards,
+-Denis
 
-> sense from what I remember of the protocol.
->
-> Can you run with IWD_TLS_DEBUG=3D1 environment variable set and share =
-
-> the log? You can send it to me privately.=C2=A0 See [1]
-
-Unfortunately I don't have access to that laptop today (it's a =
-
-coworkers), I switched my own laptop to iwd for testing, got the same =
-
-error message, but it connects nevertheless. So I guess the issue is =
-
-something else. (That laptop had some issues with the wifi driver, thats =
-
-why I switched it to iwd a year ago, since trying to get wpa supplicant =
-
-running drove me crazy, which then worked with iwd normal WPA2 networks)
-
-> Have you tried a later version of iwd? 1.14 is about a year old now.
-
-It did compile git HEAD yesterdeay (1.24) same result.
-
-I can provide full debug output sometimes next week
-
-Thanks for the reply,
-
-- Axel
-
-
-
---===============8961526431016267145==
-Content-Type: application/pgp-keys
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="OpenPGP_0x7AC320FF153B3A9D.asc"
-
-LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCgp4c0ROQkYrUU5lWUJEQURQSlNq
-ZDZ1RFFxY09BVXNweStQblpjMWZhQnFaS2QwbXRQSFE2TnRTeFJ0djRrZnBYClFrMk9aYStXUDNx
-RnE0WFhxNnBudlJUam5sT2NmaUIzVFB3NDJXSVlhUHFad1hjcjJEelgzNVNjMnNUQyt5R3QKeGQw
-UEx6NFpra3poYU5RQjcwL2greG5CdXdtT2wvY0tlN1c3Z2Y2bkJhdkVTamdnSFgvNVpqSk40V01l
-dzRsKwpSMytwL1ZQVDM3N1Myd21JRDJtc3BXemRJWDh2U3hBVzNSalRrMWZYblZVaCs3cERuRlBs
-M2xvWGxySU1ialFZCnlZdk9WdWR5UERCTzc3MGpydUpPUDhnSzlLNy9BRWtIT3JPMWdrY0xrczZu
-UDRWS1hwMGpQTjJZMUs5c1FjTnoKUzUvZk44QWx3RHFrNjM0TjV3RFRtWSttdkQ4cUY4K25PUXdN
-N0FzUTVWMGp1WDFSTE9hTmdRWTlpbjQ5Z2NNNwpmQUgxMGRHek5SNTBCdFV1aDYrd2t2Nkh5RzZa
-UUZtTE5RSnNzWVBvOU9jazE5QzBvN0ttbXZVYytFTTZTcEFrCmxzdG5vTTBkUXhnNk5IVHJvanh4
-cTNNYU5BSEM1OHUxNnc4WXFTYmZYbmpjSCtlS1FoYTczVGp5aUVhUldOcTAKYkRrUUxsS0hON05L
-czFNQUVRRUFBYzB5UVhobGJDQkxhWFIwWlc1aVpYSm5aWElnUEdGNFpXd3VhMmwwZEdWdQpZbVZ5
-WjJWeVFIVnVhWFpwWlM1aFl5NWhkRDdDd1E4RUV3RUlBRGtXSVFRdHpUY240ZkYyc21YbzhYaDZ3
-eUQvCkZUczZuUVVDWDVBMTV3VUpCYU9hZ0FJYkF3VUxDUWdIQWdZVkNBa0tDd0lGRmdJREFRQUFD
-Z2tRZXNNZy94VTcKT3AyUGl3d0FoVjdGNDYrS09mQmVCREF1blB3ek9ZTVRJc0VwaW4yanNQR3hE
-Q2Y0MkdZdURhYlJtWlpRSHZqegp2Y1hSalMrSXdsRmhsQTBvMlFPSXZCM3RqaG1jNHJQVEsxaHpv
-dlNFQTkrUGdXa3E3MG04K3RFQk85RUxBVkQwClRQdGFLeDhBbjVFUjJmSTNXV2daOFBoWTR0TUVB
-eXowN0xoak9vMmIyMFJPZnRBRlF0eUMyR0pGMDEyQzJlb1gKY3IxNkpwZ2sycTk2dUp2RWNoT1Vy
-cW00TG9CSDJ5azdyT0EzTEs4VmVuVG9nRWg4d0NGdTNhaVg0WVlKVHN6ZQpTaTlvd2ljbEZYTG9n
-SHphZXh5QUtZcGNQVHlma0lha1pVQytrWlk0YTlYQjB1UlpzZTRqWnRSWlU3UUFKbHZqCkFaRW1m
-S1FReEgybldjR21ESEZvMEgxVUpQR2h4d1ozRktKZjJ1cnNnMk5LcUNMQmZrQmxwbXRXT2IwNysr
-amsKTFpYZW5paVhaakpMbGIwZzhiUDRHRzJwajBoWVRFNlQ4bVIyY2U1NWxPaWVMaGVuRkgvTU9E
-NDRRQUZPeXVRRgpneVVFK2FaejZpRkMzb3JMSHJ0aTdicVNGcnpqUUN6RzVIVTVtczk3L0dudFV0
-blVTSzBhWlJseW9pbmZtcnZGCmkyQ1p6RXR1d3NFUEJCTUJDQUE1RmlFRUxjMDNKK0h4ZHJKbDZQ
-RjRlc01nL3hVN09wMEZBbUdrazBFRkNRbCsKelZvQ0d3TUZDd2tJQndJR0ZRZ0pDZ3NDQlJZQ0F3
-RUFBQW9KRUhyRElQOFZPenFkRkJRTUFJb2ZSR1FlbmR3agpObnM5UFRib3J3TWhtOUZGaHVSVUVo
-czNzK2dLMjdnTk5BTngyRklNSmtOZFRQYWR4WkFRbXV5M1lEQ1lmd1RKClc4ZW1aQkhNRUk0Z3o5
-WEgzVURPRjRjSE9Cc2lPMnl3Y01SSVBJYnBrRlkvRGlUejdnZmVVUFIyaU45YTJETk4KN0ZqRzlK
-OHZ3bFhvVGdsNW9LdktXL1V2dHRIVkxzM09sRXdXTDRWT2hsalNka3o2R0NIQXRFWDc5WldmRUVj
-WgpvUDVZYjJKcWxuTGlCZzhBYzlpKy9yN3dXY08ra0hUYndxU2hUMWErblUwWmhYem9PSVhHTXBa
-UVQ0VHBPdTdlCmRDNkJtTUVzTjl1dllMSU0xenQwN3Mwdkd1QWlPNkRxcmlpYTR6WGE5Q2xLaUE2
-SGlkQ2xNY2dLUlpDSThSQUMKTW9qajE1b0xaRDNmSHl4ZFpSSnBqYVFTMEJKaGVnL3lPKzlpcFNJ
-R1ZBcmlZYWF1dndNMHRWMWhGUGJyZW1kZQpHSHZzQWR4RmhXQ3pDN2NyVmwvWTY5MFdWOHFSczF0
-ZFB5dFpOR1FiV2FvbWdlRUJGRFFSVWVTdjg3UWhPK3FPCkdENVZseW8yajVJRlMvQkNGL2JRWVk4
-bTVieXNYcXN6NTJPQkVyZ0c0MkRHU0kzZHBmSDkvYzdBelFSZmtEWG4KQVF3QXNyby8wMmtheFY3
-eXV5TzIyZDhpNnhrNDBLb3BUdXhnUzFIcVN0Y3J0Z2tXSGZhSm9OcUlYTVZmekhtYwpxQVR2YUJY
-b0JKcW5lc2l2dEdrNllGeHhCUFpTOTZtdWhzTFNja1g3aDEyUERFY0JoellISHNtRC9ybXM1ZGZ1
-ClhOWlQ4RC9rb05sZEtXb2F3ZkVUbGFieGQ1YjJRUTBmUlpDaG4wQXRFWmo1UVllQndWMlIzeUcx
-dnJpRXdqdisKVmpnb2IwL0Q1eWtSdllmOHBobVlFVDB3MHVLUE9UTTMxcjRreFQ0bDJXbjl5RXlC
-UDFrL2JiUnhYYURDaUUxTQp6eVJJZzQxV0hhaXpsc1FKZlRiN290aHRNcFpJYXhEcTVHblc1a1Zk
-S3JtVHBwSzQrSC9xL05BQ3RySHZoWmlFClZ2cFViK0Zpa0RHZENuZUJmdjZRWmwwK1FrZnVhSHJJ
-M2QvVlFxajlDSWxNWmtYNEllc2dBK1RuVUpDRFVHcUMKT3hxMXB1VWNBTFNwSGhRdUc1akNZMW1E
-SU5KVXFJQW9McS9BWEpNZmt5ZHNsandjS1JlTjBORGdGUXFLaGsyRApmemU0YmxpclR5b3pxeE8v
-RU85dWl2Tm55bW9OK2REZ3NUUGNXS0Rhd1NCZ0JBbVUrL244cWVUd2JJQkdLYndpCmZhSnRBQkVC
-QUFIQ3dQd0VHQUVJQUNZV0lRUXR6VGNuNGZGMnNtWG84WGg2d3lEL0ZUczZuUVVDWDVBMTV3VUoK
-QmFPYWdBSWJEQUFLQ1JCNnd5RC9GVHM2blNnbkMvc0dicDdlMlVqSldLSzBJclUraG5ZcWtWTnFM
-U0VPSEVRSwpuL05VeVdPSHpyNjU3TWlHZmM2Rll0L0JWVkxHSW02UVM5WGUxdVFVK2NsN1FhbE5q
-VkNBZzd4aThtYkoyUCs0CkJGSUJ5T0ZaYlM1eEllUEkrMlRTbHYycHlJSlpINGNQVnBMUlNjQW84
-MkVSL2EwS2xWYkJvRHZGQnloT0R5M00KM25mcWE1aEZGdFNmSXkrck1XQ28wU2ZlaWx5WFpqVFBR
-aU0xRGpub0VGdk5Fd29hb1hoZkhUZi85N2g0SWN6OAovcm1Dd3ZyRWRXaG5SWGFFQ3ZuQ2RVZ2pF
-U0Rlck1hRXVvakpWV2RTc2xCYmF3K2lLQU1TNUVPVGFJdG5PQXptCnJ1c1lycmtzYXBIWUdYa21Y
-Q1Y3NHpGei8yc045TVF1WGdWNS9rQVl4N1ltK0pRcy9sbCtBejdXSE15bi9JUXgKdFdCYTBSNHN5
-dGtHU1kvTm5VeVpYeU5qczNlb3k5bVhFbUk1b2RqSFZoeXJHYndHOVl6eGpRcUxYd0crdGZCagpv
-Rjc1L3kyZGoyMHN2Z0pzOEpPSkR3KzlwTEZBSllFa216RmNVOFR4VjRURHE0alYwUFcrZUlDRUZI
-dEhLb0RUCmZGK3FkTXBGdDU1VkI1dWRrbytDVnZ4bU52Y2VFekhDd1FZRUdBRUlBQ1lXSVFRdHpU
-Y240ZkYyc21YbzhYaDYKd3lEL0ZUczZuUVVDWWFTVFFRVUpDWDdOV2dJYkRBQVVDUkI2d3lEL0ZU
-czZuUWtRZXNNZy94VTdPcDJ1V2d3QQp0WElqaFF6K2ZQSEc5aURwOTlXLy9TQWhBU1FCWWxRaC9L
-SEFkYmdkcHpWeE14bXYwTzc0THo3cFNVR01haWRDCmVRRVZhUzdMMUc0VXJRdnNIZnFUdXNQS1pF
-QnZHY3FtSWhMVmhhcGVVR013Y2NsRVVlN2krZjkxbVhLK3liNDQKRGkwUzd0K01raExlQ29hRkJX
-SkQxWVVGTmFkWTB5blBkaGJhRUlacGEraWNNOTFNTlQyWTNhWjFtQm51enk4YwpaUEVYRUFtMW0w
-QWVQQ2dsVEJWbUg1QnZXeWxxRnZqVFRVRHJoNndsUGxxV2R5clJJMW1qeEptVTFaSzl1V3JCCk4w
-cjZzd0E5ZVVnUzVPMW40NGROdEVYVzNzMHoyTzI2MXduTXdjRWNFd0hJS0d4T2YxSHZUUDY4cXpW
-ejBlTEQKUk4wdE16bFJNdkU1ZU9YMHQydEovbDNsNVhNQ1lZNmxkUWpWYW5NWUc1UTlKM3hTU0gy
-SGczZ0lhdjBsSzA2UgphTVVWT01hVDNqTmlHeDVUUUFCR2JtRCswMDcxTFIwUWFad1FZWnF5R293
-MHppRjBOYnJWV2x6VVhwblI3em5YClVUYVRZSHlSbTNvUTRVVEp2YkdtOCtiZThYc3dhYU9kUUMy
-Uzl4a01EUzVwN2tkRTl4QStlY1hDdTY3QzljZTYKPWlBdTMKLS0tLS1FTkQgUEdQIFBVQkxJQyBL
-RVkgQkxPQ0stLS0tLQo=
-
---===============8961526431016267145==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="OpenPGP_signature.sig"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCndzRDVCQUFCQ0FBakZpRUVMYzAzSitIeGRy
-Smw2UEY0ZXNNZy94VTdPcDBGQW1KK0lnY0ZBd0FBQUFBQUNna1Flc01nL3hVN09wMG4KNlF2OUdl
-WWFUZ1VpNEhYVitSdEpqSC9waDNrV1ZEQzBmYytTYWd3U0xkMGpvMWY1WndLbjEwWGphd3dCTXBB
-Sk8vdHVZNloxbUhuSgpBdmlmOHJiTFZvM25WMUFBNjRheFR0M0dldEZCRWhOK2orOVdaM3UyaXln
-U01yeFF5M1JDeHRkai9UbUxBT0l3QThTMllCQVJob0F3CkZkNUtGM3o2cTd1VWpyMVR3eXhxdXEv
-VHBwYXlRSzFJOXlWai9wWnREK1ZOZytiVW9tOUt5N0E2K29kd0xycjRUc2pJSE93Y2w4bTAKMVhK
-KzYzZEh1dEN3dW9YcGhvUE5JRXlnS3I0OVo0RGxLTTBCbklwVUZmbWtDNVhiZTFJT2RTZ204Vkgr
-VDcyK2ZnMTZsRnhYTy9tMApROEtDd0YxM2VuMUtKZW9NMU13VVFXTGVLdFU2b2ZNQkRZc3pLcU90
-emFEZGdkcm94bXBiUENTejZ5V0YxNVV5dnQ3L3RCRGhnZE5PCklqRFlPNzhFemNaTTNmd2lJSktt
-NGxXelFjdVppS2g4VXVLNmdZd3ZWWUQyam1vQWFCQXdZRndiKzN0L2ZaV0FDZ0NJbXEvSFovejIK
-Yms0T3RmVGNha3hxRnRITXZWK1I3d2lLQ2FQLzVyWldUNjRVL2ljNnFTTmlCWTZNR2lHbSttQVVU
-SnJ6Cj1XQlgvCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
-
---===============8961526431016267145==--
+--===============1604132804299358299==--
 
