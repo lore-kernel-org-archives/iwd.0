@@ -1,237 +1,203 @@
-Content-Type: multipart/mixed; boundary="===============0177142107668523311=="
+Content-Type: multipart/mixed; boundary="===============1140264487899919269=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v4 7/7] hotspot: refactor dir watch to be like
- knownnetworks
-Date: Fri, 04 Feb 2022 12:42:11 -0800
-Message-ID: <e00ac4d024e64eee2b88014f4e8d66d3c2315030.camel@gmail.com>
-In-Reply-To: b033b877-e2e5-f5d8-6cf7-14645de2baef@gmail.com
+Subject: [PATCH 10/10] auto-t: add a few more DPP tests
+Date: Tue, 11 Jan 2022 16:55:58 -0800
+Message-ID: <20220112005558.1158405-10-prestwoj@gmail.com>
+In-Reply-To: 20220112005558.1158405-1-prestwoj@gmail.com
 
---===============0177142107668523311==
+--===============1140264487899919269==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+This adds 3 more tests:
+ - Channel switch during authentication
+ - Scan after configuring
+ - Retransmit auth frames
+---
+ autotests/testDPP/connection_test.py | 103 +++++++++++++++++++--------
+ autotests/testDPP/hw.conf            |   1 +
+ 2 files changed, 76 insertions(+), 28 deletions(-)
 
-On Fri, 2022-02-04 at 14:00 -0600, Denis Kenzior wrote:
-> On 2/4/22 11:31, James Prestwood wrote:
-> > The create/removed/modified cases all can be combined like they are
-> > in
-> > known networks. Create/modified were both doing nearly the same
-> > thing,
-> > and removed can easily be detected if the config was already found.
-> > =
+diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
+ction_test.py
+index 43822c55..3c3705e4 100644
+--- a/autotests/testDPP/connection_test.py
++++ b/autotests/testDPP/connection_test.py
+@@ -7,58 +7,105 @@ sys.path.append('../util')
+ from iwd import IWD
+ from wpas import Wpas
+ from hostapd import HostapdCLI
++from hwsim import Hwsim
+ =
 
-> > This is now basically the same logic as in known networks.
-> > ---
-> > =C2=A0 src/hotspot.c | 57 ++++++++++++++++------------------------------
-> > -----
-> > =C2=A0 1 file changed, 18 insertions(+), 39 deletions(-)
-> > =
+ class Test(unittest.TestCase):
+-
+     def test_iwd_as_enrollee(self):
+-        wpas =3D Wpas('wpas.conf')
++        self.device.autoconnect =3D True
++        self.hapd.reload()
++
++        uri =3D self.device.dpp_start_enrollee()
+ =
 
-> > diff --git a/src/hotspot.c b/src/hotspot.c
-> > index 832d7a31..1f9f74c5 100644
-> > --- a/src/hotspot.c
-> > +++ b/src/hotspot.c
-> > @@ -29,6 +29,7 @@
-> > =C2=A0 #include <stdio.h>
-> > =C2=A0 =
+-        wd =3D IWD(True)
++        self.wpas.dpp_configurator_create(uri)
++        self.wpas.dpp_configurator_start('ssidCCMP', 'secret123')
+ =
 
-> > =C2=A0 #include <ell/ell.h>
-> > +#include "ell/useful.h"
-> > =C2=A0 =
+-        devices =3D wd.list_devices(1)
+-        device =3D devices[0]
+-        device.autoconnect =3D True
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
+ =
 
-> > =C2=A0 #include "src/iwd.h"
-> > =C2=A0 #include "src/module.h"
-> > @@ -409,7 +410,7 @@ static void hs20_dir_watch_cb(const char
-> > *filename,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0enum l_dir_watch_event even=
-t,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0void *user_data)
-> > =C2=A0 {
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct l_settings *new;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_auto_(l_settings_free) stru=
-ct l_settings *new =3D NULL;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint64_t connected_time;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct hs20_config *hs2=
-0;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct network_config c=
-onfig;
-> > @@ -425,53 +426,31 @@ static void hs20_dir_watch_cb(const char
-> > *filename,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
-> > =C2=A0 =
+-        uri =3D device.dpp_start_enrollee()
++    def test_iwd_as_enrollee_channel_switch(self):
++        self.device.autoconnect =3D True
++        self.hapd.reload()
+ =
 
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0full_path =3D storage_g=
-et_hotspot_path("%s", filename);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0hs20 =3D l_queue_find(hs20_s=
-ettings, match_filename,
-> > full_path);
-> > =C2=A0 =
+-        wpas.dpp_configurator_create(uri)
+-        wpas.dpp_configurator_start('ssidCCMP', 'secret123')
++        uri =3D self.device.dpp_start_enrollee()
++
++        self.wpas.dpp_configurator_create(uri)
++        self.wpas.dpp_configurator_start('ssidCCMP', 'secret123', freq=3D2=
+462)
+ =
 
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0switch (event) {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case L_DIR_WATCH_EVENT_=
-CREATED:
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0new =3D l_settings_new();
-> > -
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (!l_settings_load_from_file(new, full_path)) {
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_sett=
-ings_free(new);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> > -
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0__network_config_parse(new, full_path, &config);
-> > -
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0hs20 =3D hs20_config_new(new, full_path, &config);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0l_settings_free(new);
-> > -
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (!hs20)
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
-> > -
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0l_queue_push_head(hs20_settings, hs20);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0break;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case L_DIR_WATCH_EVENT_=
-REMOVED:
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0hs20 =3D l_queue_remove_if(hs20_settings,
-> > match_filename,
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0full_path);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (!hs20)
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
-> > -
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0known_networks_remove(&hs20->super);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0break;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case L_DIR_WATCH_EVENT_=
-MODIFIED:
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0hs20 =3D l_queue_find(hs20_settings, match_filename,
-> > full_path);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (!hs20)
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
-> > -
-> =
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+-        wd.wait_for_object_condition(device, condition)
++        self.wd.wait_for_object_condition(self.device, condition)
+ =
 
-> It seems that this logic is not being preserved with this patch.=C2=A0 Is
-> this =
+-        device.disconnect()
+-        device.dpp_stop()
++    def test_iwd_as_enrollee_scan_after(self):
++        uri =3D self.device.dpp_start_enrollee()
+ =
 
-> intentional?
+-        del wpas
++        self.wpas.dpp_configurator_create(uri)
++        self.wpas.dpp_configurator_start('ssidCCMP', 'secret123')
+ =
 
-Ah you're right. Now this would create a new hs20_config for a MODIFIED
-event if not config is found. I'll need to play around with this, or
-just drop it. Its not fixing anything anyways so just leave it out for
-now.
+-    def test_iwd_as_configurator(self):
+-        IWD.copy_to_storage('ssidCCMP.psk')
++        self.hapd.reload()
++
++        with self.assertRaises(Exception):
++            self.device.get_ordered_network('ssidCCMP', scan_if_needed=3DF=
+alse)
+ =
 
-> =
+-        wpas =3D Wpas('wpas.conf')
+-        hapd =3D HostapdCLI('hostapd.conf')
++        self.hapd.wait_for_event('AP-ENABLED')
+ =
 
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0new =3D l_settings_new();
-> > =C2=A0 =
+-        wd =3D IWD(True)
++        self.device.autoconnect =3D True
++
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
++
++    def test_iwd_as_enrollee_no_ack(self):
++        self.rule0.enabled =3D True
++        self.device.autoconnect =3D True
++        self.hapd.reload()
++
++        uri =3D self.device.dpp_start_enrollee()
++
++        self.wpas.dpp_configurator_create(uri)
++        self.wpas.dpp_configurator_start('ssidCCMP', 'secret123')
++
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
++
++    def test_iwd_as_configurator(self):
++        self.device.autoconnect =3D True
++        IWD.copy_to_storage('ssidCCMP.psk')
+ =
 
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (!l_settings_load_from_file(new, full_path)) {
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_sett=
-ings_free(new);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (l_settings_load_from_file(new, full_path)) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0__netw=
-ork_config_parse(new, full_path,
-> > &config);
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (hs=
-20)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0known_network_update(&hs20->super,
-> > &config);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0else {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0hs20 =3D hs20_config_new(new,
-> > full_path, &config);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!hs20)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0return;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_queue_push_head(hs20_settings,
-> > hs20);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0} else if (hs20) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_queu=
-e_remove(hs20_settings, hs20);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0known_=
-networks_remove(&hs20->super);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > =C2=A0 =
+-        devices =3D wd.list_devices(1)
+-        device =3D devices[0]
+-        device.autoconnect =3D True
++        self.hapd.reload()
+ =
 
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0__network_config_parse(new, full_path, &config);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0known_network_update(&hs20->super, &config);
-> > -
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/* TODO: Update hotspot specific settings */
-> > -
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0l_settings_free(new);
-> > -
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case L_DIR_WATCH_EVENT_=
-ACCESSED:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > =
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+-        wd.wait_for_object_condition(device, condition)
++        self.wd.wait_for_object_condition(self.device, condition)
+ =
 
-> =
+-        uri =3D device.dpp_start_configurator()
++        uri =3D self.device.dpp_start_configurator()
+ =
 
-> Regards,
-> -Denis
+-        wpas.dpp_enrollee_start(uri)
++        self.wpas.dpp_enrollee_start(uri)
+ =
 
+-        hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
++        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
+ =
 
---===============0177142107668523311==--
+-        device.disconnect()
+-        device.dpp_stop()
++    def setUp(self):
++        self.wd =3D IWD(True)
++        self.device =3D self.wd.list_devices(1)[0]
++        self.wpas =3D Wpas('wpas.conf')
++        self.hapd =3D HostapdCLI('hostapd.conf')
++        self.hapd.disable()
++        self.hwsim =3D Hwsim()
+ =
+
+-        del wpas
++        self.rule0 =3D self.hwsim.rules.create()
++        self.rule0.prefix =3D 'd0'
++        self.rule0.match_offset =3D 24
++        self.rule0.match =3D '04 09 50 6f 9a 1a 01 01'
++        self.rule0.match_times =3D 1
++        self.rule0.drop =3D True
+ =
+
+     def tearDown(self):
++        print("calling Disconnect()")
++        self.device.disconnect()
++        self.device.dpp_stop()
++        self.wpas.dpp_configurator_remove()
++
++        self.wd =3D None
++        self.device =3D None
++        self.wpas =3D None
++        self.hapd =3D None
++        self.rule0 =3D None
+         IWD.clear_storage()
+ =
+
+     @classmethod
+diff --git a/autotests/testDPP/hw.conf b/autotests/testDPP/hw.conf
+index 478f0633..923595ea 100644
+--- a/autotests/testDPP/hw.conf
++++ b/autotests/testDPP/hw.conf
+@@ -1,6 +1,7 @@
+ [SETUP]
+ num_radios=3D3
+ start_iwd=3D0
++hwsim_medium=3Dyes
+ =
+
+ [WPA_SUPPLICANT]
+ rad0=3Dwpas.conf
+-- =
+
+2.31.1
+
+--===============1140264487899919269==--
 
