@@ -1,75 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============8139653069235617999=="
+Content-Type: multipart/mixed; boundary="===============1573327652118502894=="
 MIME-Version: 1.0
-From: =?utf-8?q?Joakim_Lotseng=C3=A5rd_=3Cjoakim=2El_at_orbital-systems=2Ecom?=
- =?utf-8?q?=3E?=
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: lib to iwd
-Date: Fri, 25 Feb 2022 09:21:39 +0100
-Message-ID: <CAELJisxbpVWA-2XLZcTJO7njv23QqVH1CQyQVbkzrZ5tSbE3OA@mail.gmail.com>
-In-Reply-To: AA5E1393-FF23-4F0F-95DF-7B273D9E47A4@holtmann.org
+Subject: Re: iwd 1.21 stuck on connecting state
+Date: Fri, 14 Jan 2022 12:51:11 -0800
+Message-ID: <63f4a6a626d48bce3cc8a7a5076c99c43d729a40.camel@gmail.com>
+In-Reply-To: 20220114200809.2807.69459@ml01.vlan13.01.org
 
---===============8139653069235617999==
+--===============1573327652118502894==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Marcel, and thanks for your answer. See below.
+Hi,
 
-On Thu, 24 Feb 2022 at 21:36, Marcel Holtmann <marcel(a)holtmann.org> wrote:
->
-> so here is the thing; for any C based library, you need to decide on a ma=
-inloop since D-Bus calls are inherently async.
->
-> While I will applaud anybody doing a GObject based wrapper, it is not som=
-ething that fits into iwd.git upstream since it goes against our philosophy=
- of keeping the dependency chain small and making this fly on small and emb=
-edded systems. Also I can not agree with all GLib and Object decisions. The=
-re is a reason why ELL exists in the first place.
->
-> I also have no interest in mainloop abstractions. It is pretty much been-=
-there-done-that-no-thank-you type of thing.
->
-> This would leave us at an ELL based library. Meaning that the application=
- pretty much also have to agree on ELL design choices. Now if that is somet=
-hing that is interesting, then sure, this could be done. However I have to =
-say, that can only be done if iwctl also utilizes that library. Providing a=
- library without any real feedback from actual users is always a mess and d=
-oomed to fail.
->
+Since you have EnableNetworkConfiguration=3Dtrue IWD is performing DHCP
+and waiting for that to succeed. I see further you tried again and got
+an IP so for some reason your DHCP server was not acting properly in
+the 'stuck in connecting case'.
 
-A previous mail answer hinted that I might have not been clear enough
-to point out that I am looking for a "third" entity, beside iwd and
-iwctl. Something that would help me get an IoT device configured via a
-side channel (bluetooth). I do not want to change any code in either
-iwd nor iwctl in regards to help with this. I want to use the DBUS API
-in a "standard" and helpful way. The way iwd intended. A lib (or
-perhaps a bunch of examples) to help with "not making common mistakes"
-and getting started.
+You could try setting IWD_DHCP_DEBUG=3D1 as an environment variable and
+try again. That may give more insight into what DHCP is waiting for.
 
-For example, if I got it right (please correct me), the passphrase
-must be provided via an agent that is registered. It would be easier
-for code to just configure an SSID+passphrase in one call to have a
-single API for that, not bothering with an agent. Much like the
---passphrase to iwctl. But that probably needs changes in iwd, which I
-do not want. But a lib/example that does this for you would be nice.
+Thanks,
+James =
 
-I am looking for a "lib" that will help with the DBUS interaction. The
-"iwd"-way of doing it. I got the tip to look at ELL for this and it
-might even be that easy that the "lib" I am looking for is really just
-a bunch of "examples" to get basic operations working/configuring an
-SSID.
 
-I too think that different types of mainloops are really a pain.
-Especially if you want to mix libraries and try to bridge things
-together. Our legacy code managed to add threading above that. And,
-well, a mess. Bluetooth stack (github: gobbledegook, GATT) with libnm,
-resulting in several g_main_loops, doesn't really play ball very well.
+On Fri, 2022-01-14 at 20:08 +0000,
+54d22547-afc0-4701-b1fc-5a2a2e411646(a)simplelogin.co wrote:
+> Hi James,
+> =
 
-Thanks for the tip of ELL.
+> I've gone through debugging and this is what I have:
+> https://termbin.com/y9vq
+> =
 
--- =
+> iwd.service
+> =
 
-Best regards,
-Joakim Lotseng=C3=A5rd
---===============8139653069235617999==--
+> # /usr/lib/systemd/system/iwd.service
+> [Unit]
+> Description=3DWireless service
+> After=3Dnetwork-pre.target
+> Before=3Dnetwork.target
+> Wants=3Dnetwork.target
+> =
+
+> [Service]
+> Type=3Ddbus
+> BusName=3Dnet.connman.iwd
+> ExecStart=3D/usr/lib/iwd/iwd
+> NotifyAccess=3Dmain
+> LimitNPROC=3D1
+> Restart=3Don-failure
+> CapabilityBoundingSet=3DCAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE
+> PrivateTmp=3Dtrue
+> NoNewPrivileges=3Dtrue
+> DevicePolicy=3Dclosed
+> DeviceAllow=3D/dev/rfkill rw
+> ProtectHome=3Dyes
+> ProtectSystem=3Dstrict
+> ProtectControlGroups=3Dyes
+> ProtectKernelModules=3Dyes
+> ConfigurationDirectory=3Diwd
+> StateDirectory=3Diwd
+> StateDirectoryMode=3D0700
+> =
+
+> [Install]
+> WantedBy=3Dmulti-user.target
+> =
+
+> # /etc/systemd/system/iwd.service.d/override.conf
+> [Service]
+> RuntimeDirectory=3Dresolvconf
+> ReadWritePaths=3D/etc/resolv.conf
+> =
+
+> /etc/iwd/main.conf
+> =
+
+> [General]
+> EnableNetworkConfiguration=3Dtrue
+> AddressRandomization=3Donce
+> =
+
+> [Network]
+> NameResolvingService=3Dresolvconf
+> =
+
+> I've also tried to collect iwmon logs but they are huge, like almost
+> 2 MB. Should I filter some of the info as the wiki shows (--nortnl --
+> nowiphy --noscan).
+> =
+
+> Thanks!
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+
+
+--===============1573327652118502894==--
 
