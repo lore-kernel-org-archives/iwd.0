@@ -1,43 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============1943541002418122759=="
+Content-Type: multipart/mixed; boundary="===============8409779986874471191=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Diederik de Haas <didi.debian at cknow.org>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/6] auto-t: wpas.py: don't require strict match on
- wait_for_event
-Date: Tue, 04 Jan 2022 12:03:58 -0600
-Message-ID: <edaf9497-fadf-dfb3-a1ce-7ab6a8b84692@gmail.com>
-In-Reply-To: 20220104181857.103331-1-prestwoj@gmail.com
+Subject: [PATCH] doc: fix overriden -> overridden
+Date: Fri, 14 Jan 2022 18:56:41 +0100
+Message-ID: <20220114175641.12351-1-didi.debian@cknow.org>
 
---===============1943541002418122759==
+--===============8409779986874471191==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ src/iwd.config.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 1/4/22 12:18, James Prestwood wrote:
-> wait_for_event was checking the event string presence in the rx_data
-> array which meant the event string had to match perfectly to any
-> received events. This poses problems with events that include additional
-> information which the caller may not be able to know or does not care
-> about. For example:
-> =
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 5cd2b06b..54943702 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -205,7 +205,7 @@ The group ``[Network]`` contains network configuration =
+related settings.
+        Sets the global default that tells **iwd** whether it should config=
+ure
+        IPv6 addresses and routes (either provided via static settings,
+        Router Advertisements or DHCPv6 protocol).  This setting is disabled
+-       by default.  This setting can also be overriden on a per-network ba=
+sis.
++       by default.  This setting can also be overridden on a per-network b=
+asis.
+ =
 
-> DPP-RX src=3D02:00:00:00:02:00 freq=3D2437 type=3D11
-> =
+    * - NameResolvingService
+      - Values: resolvconf, **systemd**
+-- =
 
-> Waiting for this event previously would require the caller know src, freq,
-> and type. If the caller only wants to wait for DPP-RX, it can now do that.
-> ---
->   autotests/util/wpas.py | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
-> =
+2.34.1
 
-
-All applied, thanks.
-
-Regards,
--Denis
-
---===============1943541002418122759==--
+--===============8409779986874471191==--
 
