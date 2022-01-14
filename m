@@ -1,270 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============3993146780506812973=="
+Content-Type: multipart/mixed; boundary="===============4882890728428596344=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 13/13] auto-t: add testOWE-transition
-Date: Wed, 15 Sep 2021 10:36:24 -0700
-Message-ID: <20210915173624.11917-13-prestwoj@gmail.com>
-In-Reply-To: 20210915173624.11917-1-prestwoj@gmail.com
+Subject: Re: [Feature discussion] Allow overriding of network-specific options
+ globally
+Date: Fri, 14 Jan 2022 12:55:52 -0600
+Message-ID: <a1de824d-e923-11d4-96c7-bba662c70843@gmail.com>
+In-Reply-To: CAGTBY+s4jDG-34n83r=x32S5EwSFFR-vdfnExX2vyLw4BQKkgw@mail.gmail.com
 
---===============3993146780506812973==
+--===============4882890728428596344==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds several tests for OWE transition networks. Hostapd
-does have special options for these networks but currently their
-implementation is incorrect as the IE is not ever added to the
-OWE BSS. Besides that using vendor_elements provides a much easier
-way to create invalid IEs to test.
----
- .../testOWE-transition/connection_test.py     | 140 ++++++++++++++++++
- autotests/testOWE-transition/hw.conf          |   8 +
- autotests/testOWE-transition/main.conf        |   2 +
- autotests/testOWE-transition/ssidOWE.conf     |  14 ++
- autotests/testOWE-transition/ssidOpen.conf    |   8 +
- autotests/testOWE-transition/transition.open  |   0
- 6 files changed, 172 insertions(+)
- create mode 100644 autotests/testOWE-transition/connection_test.py
- create mode 100644 autotests/testOWE-transition/hw.conf
- create mode 100644 autotests/testOWE-transition/main.conf
- create mode 100644 autotests/testOWE-transition/ssidOWE.conf
- create mode 100644 autotests/testOWE-transition/ssidOpen.conf
- create mode 100644 autotests/testOWE-transition/transition.open
+Hi Rhys,
 
-diff --git a/autotests/testOWE-transition/connection_test.py b/autotests/te=
-stOWE-transition/connection_test.py
-new file mode 100644
-index 00000000..224fc5e6
---- /dev/null
-+++ b/autotests/testOWE-transition/connection_test.py
-@@ -0,0 +1,140 @@
-+#!/usr/bin/python3
-+
-+import unittest
-+import sys
-+
-+sys.path.append('../util')
-+import iwd
-+from iwd import IWD
-+from iwd import NetworkType
-+from hostapd import HostapdCLI
-+import testutil
-+
-+class Test(unittest.TestCase):
-+
-+    def validate(self, wd, target, autoconnect=3DFalse, connect_hidden=3DF=
-alse):
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+        device.autoconnect =3D autoconnect
-+
-+        if not autoconnect:
-+            if not connect_hidden:
-+                condition =3D 'not obj.scanning'
-+                wd.wait_for_object_condition(device, condition)
-+
-+                device.scan()
-+
-+                condition =3D 'obj.scanning'
-+                wd.wait_for_object_condition(device, condition)
-+
-+                condition =3D 'not obj.scanning'
-+                wd.wait_for_object_condition(device, condition)
-+
-+                network =3D device.get_ordered_network('transition', scan_=
-if_needed=3DFalse)
-+
-+                network.network_object.connect()
-+            else:
-+                device.connect_hidden_network('owe-hidden')
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        testutil.test_iface_operstate()
-+        testutil.test_ifaces_connected(device.name, target.ifname)
-+
-+        self.assertIn(device.address, target.list_sta())
-+
-+        device.disconnect()
-+
-+    # Normal success case
-+    def test_owe_transition(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+        self.validate(self.wd, self.hapd_owe)
-+
-+    # Normal success autoconnect case
-+    def test_owe_transition_autoconnect(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+        IWD.copy_to_storage('transition.open')
-+
-+        self.validate(self.wd, self.hapd_owe, autoconnect=3DTrue)
-+
-+    # Open BSS has invalid BSSID in OWE transition element
-+    # Expected connection to Open BSS
-+    def test_owe_transition_invalid_open_bssid(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-f000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+
-+        self.validate(self.wd, self.hapd_open)
-+
-+    # OWE BSS has invalid BSSID in OWE transition element
-+    # Expected connection to Open BSS
-+    def test_owe_transition_invalid_owe_bssid(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000ff=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+
-+        self.validate(self.wd, self.hapd_open)
-+
-+    # No OWE hidden network exists
-+    # Expected connection to Open BSS
-+    def test_owe_transition_no_hidden_found(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.disable()
-+
-+        self.validate(self.wd, self.hapd_open)
-+
-+    # Directly connect to valid OWE hidden network
-+    # Expected connection failure
-+    def test_owe_transition_connect_hidden_valid(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+
-+        with self.assertRaises(iwd.NotFoundEx):
-+            self.validate(self.wd, self.hapd_owe, connect_hidden=3DTrue)
-+
-+    # Directly connect to invalid OWE hidden network. The SSID in the OWE =
-BSS
-+    # IE points to itself. And the Open BSS IE points to a non-existent SS=
-ID.
-+    # Expected connection failure
-+    def test_owe_transition_connect_hidden_invalid(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd18506f9a1c02000000f=
-1000d6e6f2d6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a6f77652d68696464656e')
-+        self.hapd_owe.reload()
-+
-+        with self.assertRaises(iwd.NotFoundEx):
-+            self.validate(self.wd, self.hapd_owe, connect_hidden=3DTrue)
-+
-+    def setUp(self):
-+        self.wd =3D IWD(True)
-+        self.hapd_owe =3D HostapdCLI(config=3D'ssidOWE.conf')
-+        self.hapd_open =3D HostapdCLI(config=3D'ssidOpen.conf')
-+
-+    def tearDown(self):
-+        IWD.clear_storage()
-+
-+        self.wd =3D None
-+        self.hapd_open =3D None
-+        self.hapd_owe =3D None
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        pass
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
-diff --git a/autotests/testOWE-transition/hw.conf b/autotests/testOWE-trans=
-ition/hw.conf
-new file mode 100644
-index 00000000..b297f68d
---- /dev/null
-+++ b/autotests/testOWE-transition/hw.conf
-@@ -0,0 +1,8 @@
-+[SETUP]
-+num_radios=3D3
-+hwsim_medium=3Dyes
-+start_iwd=3D0
-+
-+[HOSTAPD]
-+rad0=3DssidOpen.conf
-+rad1=3DssidOWE.conf
-diff --git a/autotests/testOWE-transition/main.conf b/autotests/testOWE-tra=
-nsition/main.conf
-new file mode 100644
-index 00000000..9452fb6b
---- /dev/null
-+++ b/autotests/testOWE-transition/main.conf
-@@ -0,0 +1,2 @@
-+[Scan]
-+DisableMacAddressRandomization=3Dtrue
-diff --git a/autotests/testOWE-transition/ssidOWE.conf b/autotests/testOWE-=
-transition/ssidOWE.conf
-new file mode 100644
-index 00000000..c54309ae
---- /dev/null
-+++ b/autotests/testOWE-transition/ssidOWE.conf
-@@ -0,0 +1,14 @@
-+ssid=3Dowe-hidden
-+bssid=3D02:00:00:00:f1:00
-+channel=3D1
-+ignore_broadcast_ssid=3D1
-+ieee80211w=3D1
-+
-+wpa=3D2
-+wpa_key_mgmt=3DOWE
-+rsn_pairwise=3DCCMP
-+
-+# You would conventionally use these options but hostapd does not include =
-an
-+# IE for the OWE network, hence vendor_elements must be used directly
-+#owe_transition_ssid=3D"transition"
-+#owe_transition_bssid=3D02:00:00:00:f0:00
-diff --git a/autotests/testOWE-transition/ssidOpen.conf b/autotests/testOWE=
--transition/ssidOpen.conf
-new file mode 100644
-index 00000000..4fc68430
---- /dev/null
-+++ b/autotests/testOWE-transition/ssidOpen.conf
-@@ -0,0 +1,8 @@
-+channel=3D1
-+ssid=3Dtransition
-+bssid=3D02:00:00:00:f0:00
-+
-+# You would conventionally use these options but hostapd does not include =
-an
-+# IE for the OWE network, hence vendor_elements must be used directly
-+#owe_transition_ssid=3D"owe-hidden"
-+#owe_transition_bssid=3D02:00:00:00:f1:00
-diff --git a/autotests/testOWE-transition/transition.open b/autotests/testO=
-WE-transition/transition.open
-new file mode 100644
-index 00000000..e69de29b
--- =
+On 1/14/22 04:14, Rhys Perry wrote:
+> `Hi,
+> =
 
-2.31.1
+> I use IWD as the network manager on my laptop, also utilising it's
+> inbuilt DHCP client. One of the things that gets on my nerves about
+> this is that there is no way to override the DNS server globally, only
+> per-network. This becomes rather annoying on a device like a laptop,
+> where I am regularly connecting to new networks.
+> =
 
---===============3993146780506812973==--
+
+Sure, I can see how this would be useful.
+
+> I am proposing the ability to override network specific options (ones
+> documented in `iwd.network`) globally. This would be implemented by
+
+I suspect only a subset of these options would make sense to be global.  DN=
+S =
+
+would be one of them.
+
+> having another configuration file (something like
+> `/etc/iwd/network-overrides.conf`), where any network-specific options
+> can be set, but globally. Of course, it is still useful to be able to
+> set per-network options, so any options in the per-network configs
+> (`/var/lib/iwd/*`) should take precedence over the global options.
+
+I'm not sure that adding yet another config file is worthwhile.  We already=
+ have =
+
+some network configuration related options in main.conf.  MulticastDNS for =
+
+example.  So I'd start by adding global DNS preference settings there first.
+
+Regards,
+-Denis
+--===============4882890728428596344==--
 
