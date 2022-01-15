@@ -1,83 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============2986416010024886125=="
+Content-Type: multipart/mixed; boundary="===============5485341162443412955=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Rhys Perry <rhysperry111 at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] test-runner: remove root user requirement from
- log/monitor/result
-Date: Thu, 21 Apr 2022 16:10:36 -0700
-Message-ID: <20220421231036.3564215-1-prestwoj@gmail.com>
+Subject: Re: [Feature discussion] Allow overriding of network-specific options
+ globally
+Date: Sat, 15 Jan 2022 16:24:19 +0000
+Message-ID: <CAGTBY+ucQ_kWfzxrZaaeL233-Xp28Cq9Kyor_Y+NeCNbGqDqcA@mail.gmail.com>
+In-Reply-To: a1de824d-e923-11d4-96c7-bba662c70843@gmail.com
 
---===============2986416010024886125==
+--===============5485341162443412955==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Certain aspects of QEMU like mounting host directories may still require
-root access but for UML this is not the case. To handle both cases first
-check if SUDO_UID/GID are set and use those to obtain the actual users
-ID's. Otherwise if running as non-root use the UID/GID of the user
-directly.
----
- tools/runner.py | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+On Fri, 14 Jan 2022 at 18:55, Denis Kenzior <denkenz(a)gmail.com> wrote:
+> > I am proposing the ability to override network specific options (ones
+> > documented in `iwd.network`) globally. This would be implemented by
+>
+> I suspect only a subset of these options would make sense to be global.  =
+DNS
+> would be one of them.
 
-diff --git a/tools/runner.py b/tools/runner.py
-index 1739b786..7c177f1f 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -305,18 +305,12 @@ class RunnerAbstract:
- =
+Yeah, that's fair. I kinda thought that'd be the case, but wasn't sure
+what the people over here's thoughts would be
 
- 	# For QEMU/UML --log, --monitor, --result
- 	def _prepare_outfiles(self):
--		gid =3D None
- 		append_gid_uid =3D False
- =
+> I'm not sure that adding yet another config file is worthwhile.  We alrea=
+dy have
+> some network configuration related options in main.conf.  MulticastDNS for
+> example.  So I'd start by adding global DNS preference settings there fir=
+st.
 
--		if os.environ.get('SUDO_GID', None):
--			uid =3D int(os.environ['SUDO_UID'])
--			gid =3D int(os.environ['SUDO_GID'])
-+		uid =3D int(os.environ.get('SUDO_UID', os.getuid()))
-+		gid =3D int(os.environ.get('SUDO_GID', os.getgid()))
- =
+Right- My programming skills aren't the best, but I'll give it a go
+:). Where do you think the DNS option should go in the main config
+file? Something like `DNSv4` and `DNSv6` in the `Network` section, or
+should the `IPv4` and `IPv6` sections be added, each with their own
+respective `DNS` entries?
 
- 		if self.args.log:
--			if os.getuid() !=3D 0:
--				print("--log can only be used as root user")
--				quit()
--
- 			append_gid_uid =3D True
- =
+Also, apologies to Denis for accidentally doing a reply instead of a
+reply-all initially, I don't participate in mailing lists that often.
 
- 			if not os.path.exists(self.args.log):
-@@ -326,20 +320,12 @@ class RunnerAbstract:
- 				os.chown(self.args.log, uid, gid)
- =
-
- 		if self.args.monitor:
--			if os.getuid() !=3D 0:
--				print("--monitor can only be used as root user")
--				quit()
--
- 			append_gid_uid =3D True
- =
-
- 			self.args.monitor_parent =3D os.path.abspath(
- 						os.path.join(self.args.monitor, os.pardir))
- =
-
- 		if self.args.result:
--			if os.getuid() !=3D 0:
--				print("--result can only be used as root user")
--				quit()
--
- 			append_gid_uid =3D True
- =
-
- 			self.args.result_parent =3D os.path.abspath(
--- =
-
-2.34.1
-
---===============2986416010024886125==--
+Rhys
+--===============5485341162443412955==--
 
