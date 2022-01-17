@@ -1,94 +1,77 @@
-Content-Type: multipart/mixed; boundary="===============1083416695860991175=="
+Content-Type: multipart/mixed; boundary="===============1620109243477981401=="
 MIME-Version: 1.0
-From: Leonard Lausen <leonard at lausen.nl>
+From: Bruce A. Johnson <bjohnson at blueridgenetworks.com>
 To: iwd at lists.01.org
-Subject: Re: segfault in parse_neighbor_report at src/station.c:1747
-Date: Tue, 05 Apr 2022 16:28:40 +0000
-Message-ID: <d4bfbc85b1e901373067ca346fd18e11@lausen.nl>
-In-Reply-To: 4a03689b-8c38-bf54-6b9b-1f158ce4780f@gmail.com
+Subject: Specifying BSSID in station connect?
+Date: Mon, 17 Jan 2022 10:39:34 -0500
+Message-ID: <d748f3cc-b72d-5459-721b-7e72e821b39d@blueridgenetworks.com>
 
---===============1083416695860991175==
+--===============1620109243477981401==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Has any consideration been given to permitting the specification of a =
 
-April 5, 2022 3:18 PM, "Denis Kenzior" <denkenz(a)gmail.com> wrote:
-> I'm curious what brand / model / firmware of router is this?
+particular BSSID in the /station <wlan> connect/ command? I initially =
 
-This is a Vodafone Station WiFi 6 also known as Technicolor CGA6444VF. Firm=
-ware-Version 19.3B57-1.0.41.
- =
+wrote my project to work with WPA supplicant, and this was a feature =
 
->> Apr 05 09:02:00 leonard-xps13 iwd[200772]: src/scan.c:scan_notify() Scan=
- notification Trigger
->> Scan(33)
->> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/netdev.c:netdev_unicast_n=
-otify() Unicast
->> notification Frame(59)
-> =
+that my testing guy liked. I seem some utility in being able to lock =
 
-> Looks like it is sending out a completely unsolicited AP directed roaming=
- frame. I need to dig into
-> the specs, but I'm not aware of any where this is allowed.
-> =
+onto a specific access point.
 
->> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_ap_dire=
-cted_roam() ifindex: 23
->> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_ap_dire=
-cted_roam() roam: BSS
->> transition received from AP: Disassociation Time: 0, Validity interval: =
-100
->> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_ap_dire=
-cted_roam() roam: AP sent a
->> preferred candidate list
->> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_neighbo=
-r_report_cb() ifindex: 23,
->> error: 0()
->> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:parse_neighbor_=
-report() Neighbor report
->> received for ec:a8:1f:99:cf:e8: ch 6 (oper class 4), MD not set
-> =
+Thanks!
 
-> And that's what causes a crash. I'll send a patch for you to try shortly.
+-- =
 
-Thank you! Your patch prevents the crash. Whenever I walk towards or away f=
-rom
-the router and the router tries to switch me between 2.4G and 5G, I see a
-`iwd[29343]: src/station.c:station_ap_directed_roam() roam: unexpected AP
-directed roam -- ignore` logline. However, my laptop remains on the 2.4G / =
-5G
-band respectively and does not switch.
+Bruce A. Johnson
+Chantilly, VA
+USA
+OpenPGP key ID: 296D1CD6F2B84CAB https://keys.openpgp.org/
 
-Do you think the router's band steering functionality is broken / non-stand=
-ard?
 
->> After enabling (to collect the debug logs) and disabling again Band
->> Steering on the router, AX210 would no longer authenticate with the
->> router "denied authentication (status 33)" and finally cause kernel
->> crash, followed by a kernel hang that could only be resolved by
->> restarting the WiFi network (by logging into the router admin interface
->> from my phone and changing WLAN Mode setting "Mixed 802.11 a/n/ac/ax" to
->> "Mixed 802.11 n/ac" which triggers the router to shutdown and start
->> again the WiFi network) followed by another crash. These are probably
->> unrelated to this issue, but you may know if and where I could report
->> them so I'm including them here. This was with AX210 firmware version
->> 68.01d30b0c.0 ty-a0-gf-a0-68.ucode and Linux 5.17.0-rc8.
-> =
+--===============1620109243477981401==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.htm"
 
-> yikes. You can try to report this on the linux-wireless mailing list:
-> linux-wireless(a)vger.kernel.org
-> =
+PGh0bWw+CiAgPGhlYWQ+CgogICAgPG1ldGEgaHR0cC1lcXVpdj0iY29udGVudC10eXBlIiBjb250
+ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9VVRGLTgiPgogIDwvaGVhZD4KICA8Ym9keT4KICAgIDxw
+PkhhcyBhbnkgY29uc2lkZXJhdGlvbiBiZWVuIGdpdmVuIHRvIHBlcm1pdHRpbmcgdGhlIHNwZWNp
+ZmljYXRpb24KICAgICAgb2YgYSBwYXJ0aWN1bGFyIEJTU0lEIGluIHRoZSA8aT5zdGF0aW9uICZs
+dDt3bGFuJmd0OyBjb25uZWN0PC9pPgogICAgICBjb21tYW5kPyBJIGluaXRpYWxseSB3cm90ZSBt
+eSBwcm9qZWN0IHRvIHdvcmsgd2l0aCBXUEEgc3VwcGxpY2FudCwKICAgICAgYW5kIHRoaXMgd2Fz
+IGEgZmVhdHVyZSB0aGF0IG15IHRlc3RpbmcgZ3V5IGxpa2VkLiBJIHNlZW0gc29tZQogICAgICB1
+dGlsaXR5IGluIGJlaW5nIGFibGUgdG8gbG9jayBvbnRvIGEgc3BlY2lmaWMgYWNjZXNzIHBvaW50
+LjwvcD4KICAgIDxwPlRoYW5rcyE8YnI+CiAgICA8L3A+CiAgICA8cHJlIGNsYXNzPSJtb3otc2ln
+bmF0dXJlIiBjb2xzPSI3MiI+LS0gCkJydWNlIEEuIEpvaG5zb24KQ2hhbnRpbGx5LCBWQQpVU0EK
+T3BlblBHUCBrZXkgSUQ6IDI5NkQxQ0Q2RjJCODRDQUIgPGEgY2xhc3M9Im1vei10eHQtbGluay1m
+cmVldGV4dCIgaHJlZj0iaHR0cHM6Ly9rZXlzLm9wZW5wZ3Aub3JnLyI+aHR0cHM6Ly9rZXlzLm9w
+ZW5wZ3Aub3JnLzwvYT48L3ByZT4KICA8L2JvZHk+CjwvaHRtbD4K
 
-> or via kernel bugzilla:
-> https://bugzilla.kernel.org/buglist.cgi?bug_status=3D__open__&component=
-=3Dnetwork-wireless&product=3DDrive
-> s
+--===============1620109243477981401==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="OpenPGP_signature.sig"
 
-Ok, thank you.
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCndzRjVCQUFCQ0FBakZpRUVtR3ZveWt3My9F
+MHgxT2VNS1cwYzF2SzRUS3NGQW1IbGpiWUZBd0FBQUFBQUNna1FLVzBjMXZLNFRLcysKemhBQXFV
+R29yTG9ISFJ4Yng2MlQwNEtFZWZFUlJydWo3V1FERFBGQ2MzNk9IVXhsdTdrbmJqdklDVEU4enFZ
+cCtyTHVRSXI3djdKRwplNVhhQm9qRDV5UGNMWGZ4blg1OGI4ZU85REZyYkhQb1pkVGVpbUVibGcy
+VkZ0QnYxSWh2VGFORnpPNUtLUnZ2YUo4aGU3aUREeUliClZhTjRIYmxBN0NoNWRKcjV6RXlRWGFa
+b0pOcHl3RzJmR01uM3JIQmtsSmJDUXlJdkxLSlZCa0tMM1BHU1cwNVl6NWN5ZFJIa255WHoKcFNh
+a2pMYWFFUlNUUHBsZTBtQWVOc1FRcG9JUkVqUjNtQ09GNEpTT1k1QS9aZ2dJRFZITWxnazBObVl6
+bGVxL0dOdkRMRllvZUlPYQp4bUJKZVB5QzUrTGtLQ05vN05ESEsrdUtrTzNhSjRYY044S2pJZzQ0
+MXBuZERBVDU5MjkzMGF4cCtiTmlSanVMWG5icHAvdnB6V3pGCmUwS0hjdEswWm1TSmVqenVnTFBZ
+OFZJUXZZRUwydFUzbTk4ZWc3ZFlOQllzSzJQa3l6ZzN5RmJjRkw1TElLRTJxbEZXKzU3V3hCUzUK
+M0tFMGkvU1V3Ujh4enRhd0dpV1VGNDZWd3lxa1ZRSURPdkZLMmpJZnVvdVRrQUE5Wi9FSDd2UzM0
+K1c2K2ZJZXBKVnFQQTZKVkp2bwoxZ3pBdzFhVEFGRWUvcHNyamdVZGxER3dtWlpRQW1lZjhndVpR
+cGhwaHFQeEVSeTJnUU5IOUYxaUxPYUVaTnNTNzkveGRFUllpMGFxCkNXNk5wZC9Fa2lVNXMwTUJj
+NHBvSjVDUEVDSFJXZGlURmJ4cVkwSHZsVWl3TElXdUYramJsQVJNZy9rWndnbHlieEtwRGtNYTZZ
+cWUKaHpNPQo9akpYOQotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
 
-Best regards
-Leonard
---===============1083416695860991175==--
+--===============1620109243477981401==--
 
