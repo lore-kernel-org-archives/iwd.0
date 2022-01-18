@@ -1,108 +1,293 @@
-Content-Type: multipart/mixed; boundary="===============2275293507306428027=="
+Content-Type: multipart/mixed; boundary="===============5849604863915825323=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2] dpp, dpp-util: cast size_t for constant arguments to va_arg
-Date: Fri, 03 Jun 2022 10:00:16 -0700
-Message-ID: <20220603170016.182052-1-prestwoj@gmail.com>
+Subject: [PATCH 03/12] dpp-util: add URI parsing
+Date: Tue, 18 Jan 2022 13:25:03 -0800
+Message-ID: <20220118212512.2017977-3-prestwoj@gmail.com>
+In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
 
---===============2275293507306428027==
+--===============5849604863915825323==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There were a few places in dpp/dpp-util which passed a single byte but
-was being read in with va_arg(va, size_t). On some architectures this was
-causing failures presumably from the compiler using an integer type
-smaller than size_t. As we do elsewhere, cast to size_t to force the
-compiler to pass a properly sized iteger to va_arg.
+Parses K (key), M (mac), C (class/channels), and V (version) tokens
+into a new structure dpp_uri_info. H/I are not parsed since there
+currently isn't any use for them.
 ---
- src/dpp-util.c |  6 ++++--
- src/dpp.c      | 10 ++++++----
- 2 files changed, 10 insertions(+), 6 deletions(-)
+ src/dpp-util.c | 217 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/dpp-util.h |  13 +++
+ 2 files changed, 230 insertions(+)
 
 diff --git a/src/dpp-util.c b/src/dpp-util.c
-index 8e7631d0..d4787b31 100644
+index 81a97f97..ed2fc038 100644
 --- a/src/dpp-util.c
 +++ b/src/dpp-util.c
-@@ -571,7 +571,8 @@ bool dpp_derive_r_auth(const void *i_nonce, const void =
-*r_nonce,
- 	 * R-auth =3D H(I-nonce | R-nonce | PI.x | PR.x | [ BI.x | ] BR.x | 0)
- 	 */
- 	return dpp_hash(type, r_auth, 6, i_nonce, nonce_len, r_nonce, nonce_len,
--			pix, keys_len, prx, keys_len, brx, keys_len, &zero, 1);
-+			pix, keys_len, prx, keys_len, brx, keys_len,
-+			&zero, (size_t) 1);
+@@ -865,3 +865,220 @@ struct l_ecc_point *dpp_point_from_asn1(const uint8_t=
+ *asn1, size_t len)
+ 	return l_ecc_point_from_data(curve, key_data[1],
+ 					key_data + 2, elen - 2);
  }
++
++/*
++ * Advances 'p' to the next character 'sep' plus one. strchr can be truste=
+d to
++ * find the next character, but we do need to check that the next characte=
+r + 1
++ * isn't the NULL terminator, i.e. that data actually exists past this poi=
+nt.
++ */
++#define TOKEN_NEXT(p, sep) \
++({ \
++	const char *_next =3D strchr((p), (sep)); \
++	if (_next) { \
++		if (*(_next + 1) =3D=3D '\0') \
++			_next =3D NULL; \
++		else \
++			_next++; \
++	} \
++	_next; \
++})
++
++/*
++ * Finds the length of the current token (characters until next 'sep'). If=
+ no
++ * 'sep' is found zero is returned.
++ */
++#define TOKEN_LEN(p, sep) \
++({ \
++	const char *_next =3D strchr((p), (sep)); \
++	if (!_next) \
++		_next =3D (p); \
++	(_next - (p)); \
++})
++
++/*
++ * Ensures 'p' points to something resembling a single character followed =
+by
++ * ':' followed by at least one non-null byte of data. This allows the par=
+se
++ * loop to safely advance the pointer to each tokens data (pos + 2)
++ */
++#define TOKEN_OK(p) \
++	((p) && (p)[0] !=3D '\0' && (p)[1] =3D=3D ':' && (p)[2] !=3D '\0') \
++
++static struct scan_freq_set *dpp_parse_class_and_channel(const char *token)
++{
++	const char *pos =3D token;
++	char *end;
++	struct scan_freq_set *freqs =3D scan_freq_set_new();
++
++	/* Checking for <operclass>/<channel>,<operclass>/<channel>,... */
++	for (; pos; pos =3D TOKEN_NEXT(pos, ',')) {
++		uint8_t channel;
++		uint8_t oper_class =3D strtol(pos, &end, 10);
++
++		if (!end || end =3D=3D pos || (end && *end !=3D '/'))
++			goto free_set;
++
++		pos =3D end + 1;
++		channel =3D strtol(pos, &end, 10);
++
++		/* Either another pair (,) or end of this token (;) */
++		if (!end || end =3D=3D pos || (*end !=3D ',' && *end !=3D ';'))
++			goto free_set;
++
++		scan_freq_set_add(freqs, oci_to_frequency(oper_class, channel));
++	}
++
++	if (scan_freq_set_isempty(freqs)) {
++free_set:
++		scan_freq_set_free(freqs);
++		return NULL;
++	}
++
++	return freqs;
++}
++
++static int dpp_parse_mac(const char *str, uint8_t *mac_out)
++{
++	uint8_t mac[6];
++	unsigned int i;
++
++	for (i =3D 0; i < 12; i +=3D 2) {
++		if (!l_ascii_isxdigit(str[i]))
++			return -EINVAL;
++
++		if (!l_ascii_isxdigit(str[i + 1]))
++			return -EINVAL;
++	}
++
++	if (sscanf(str, "%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx",
++			&mac[0], &mac[1], &mac[2],
++			&mac[3], &mac[4], &mac[5]) !=3D 6)
++		return -EINVAL;
++
++	if (!util_is_valid_sta_address(mac))
++		return -EINVAL;
++
++	memcpy(mac_out, mac, 6);
++
++	return 0;
++}
++
++static int dpp_parse_version(const char *str, uint8_t *version_out)
++{
++	char *end;
++	uint8_t version;
++	size_t len =3D TOKEN_LEN(str, ';');
++
++	if (len !=3D 1)
++		return -EINVAL;
++
++	version =3D strtol(str, &end, 10);
++
++	if (version !=3D 1 && version !=3D 2)
++		return -EINVAL;
++
++	*version_out =3D version;
++
++	return 0;
++}
++
++static struct l_ecc_point *dpp_parse_key(const char *str)
++{
++	_auto_(l_free) uint8_t *decoded =3D NULL;
++	size_t decoded_len;
++	size_t len =3D TOKEN_LEN(str, ';');
++
++	if (!len)
++		return NULL;
++
++	decoded =3D l_base64_decode(str, len, &decoded_len);
++	if (!decoded)
++		return NULL;
++
++	return dpp_point_from_asn1(decoded, decoded_len);
++}
++
++/*
++ * Parse a bootstrapping URI. This parses the tokens defined in the Easy C=
+onnect
++ * spec, and verifies they are the correct syntax. Some values have extra
++ * verification:
++ *  - The bootstrapping key is base64 decoded and converted to an l_ecc_po=
+int
++ *  - The operating class and channels are checked against the OCI table.
++ *  - The version is checked to be either 1 or 2, as defined by the spec.
++ *  - The MAC is verified to be a valid station address.
++ */
++struct dpp_uri_info *dpp_parse_uri(const char *uri)
++{
++	struct dpp_uri_info *info;
++	const char *pos =3D uri;
++	const char *end =3D uri + strlen(uri) - 1;
++	int ret =3D 0;
++
++	if (strncmp(pos, "DPP:", 4))
++		return NULL;
++
++	info =3D l_new(struct dpp_uri_info, 1);
++
++	pos +=3D 4;
++
++	/* EasyConnect 5.2.1 - Bootstrapping information format */
++	for (; TOKEN_OK(pos); pos =3D TOKEN_NEXT(pos, ';')) {
++		switch (*pos) {
++		case 'C':
++			info->freqs =3D dpp_parse_class_and_channel(pos + 2);
++			if (!info->freqs)
++				goto free_info;
++			break;
++		case 'M':
++			ret =3D dpp_parse_mac(pos + 2, info->mac);
++			if (ret < 0)
++				goto free_info;
++			break;
++		case 'V':
++			ret =3D dpp_parse_version(pos + 2, &info->version);
++			if (ret < 0)
++				goto free_info;
++			break;
++		case 'K':
++			info->boot_public =3D dpp_parse_key(pos + 2);
++			if (!info->boot_public)
++				goto free_info;
++			break;
++		case 'H':
++		case 'I':
++			break;
++		default:
++			goto free_info;
++		}
++	}
++
++	/* Extra data found after last token */
++	if (pos !=3D end)
++		goto free_info;
++
++	/* The public bootstrapping key is the only required token */
++	if (!info->boot_public)
++		goto free_info;
++
++	return info;
++
++free_info:
++	dpp_free_uri_info(info);
++	return NULL;
++}
++
++void dpp_free_uri_info(struct dpp_uri_info *info)
++{
++	if (info->freqs)
++		scan_freq_set_free(info->freqs);
++
++	if (info->boot_public)
++		l_ecc_point_free(info->boot_public);
++
++	if (info->information)
++		l_free(info->information);
++
++	if (info->host)
++		l_free(info->host);
++
++	l_free(info);
++}
+diff --git a/src/dpp-util.h b/src/dpp-util.h
+index 82535ff8..a3ddd452 100644
+--- a/src/dpp-util.h
++++ b/src/dpp-util.h
+@@ -22,6 +22,16 @@
+ struct l_ecc_point;
+ struct l_ecc_scalar;
+ enum ie_rsn_akm_suite;
++struct scan_freq_set;
++
++struct dpp_uri_info {
++	struct scan_freq_set *freqs;
++	struct l_ecc_point *boot_public;
++	uint8_t mac[6];
++	char *information;
++	uint8_t version;
++	char *host;
++};
  =
 
- bool dpp_derive_i_auth(const void *r_nonce, const void *i_nonce,
-@@ -596,7 +597,8 @@ bool dpp_derive_i_auth(const void *r_nonce, const void =
-*i_nonce,
- 	 * I-auth =3D H(R-nonce | I-nonce | PR.x | PI.x | BR.x | [ BI.x | ] 1)
- 	 */
- 	return dpp_hash(type, i_auth, 6, r_nonce, nonce_len, i_nonce, nonce_len,
--			prx, keys_len, pix, keys_len, brx, keys_len, &one, 1);
-+			prx, keys_len, pix, keys_len, brx, keys_len,
-+			&one, (size_t) 1);
- }
+ enum dpp_frame_type {
+ 	DPP_FRAME_AUTHENTICATION_REQUEST	=3D 0,
+@@ -168,3 +178,6 @@ bool dpp_derive_ke(const uint8_t *i_nonce, const uint8_=
+t *r_nonce,
  =
 
- /*
-diff --git a/src/dpp.c b/src/dpp.c
-index b70b9871..0102dc58 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -511,7 +511,7 @@ static void send_config_result(struct dpp_sm *dpp, cons=
-t uint8_t *to)
- =
-
- 	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, 0, ptr,
- 			sizeof(attrs), dpp->ke, dpp->key_len, 2,
--			DPP_ATTR_STATUS, 1, &zero,
-+			DPP_ATTR_STATUS, (size_t) 1, &zero,
- 			DPP_ATTR_ENROLLEE_NONCE, dpp->nonce_len, dpp->e_nonce);
- =
-
- 	iov[1].iov_base =3D attrs;
-@@ -1146,7 +1146,7 @@ static void send_authenticate_response(struct dpp_sm =
-*dpp)
- 			ptr, sizeof(attrs), dpp->k2, dpp->key_len, 4,
- 			DPP_ATTR_RESPONDER_NONCE, dpp->nonce_len, dpp->r_nonce,
- 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
--			DPP_ATTR_RESPONDER_CAPABILITIES, 1, &dpp->role,
-+			DPP_ATTR_RESPONDER_CAPABILITIES, (size_t) 1, &dpp->role,
- 			DPP_ATTR_WRAPPED_DATA, wrapped2_len, wrapped2);
- =
-
- 	iov[1].iov_base =3D attrs;
-@@ -1313,7 +1313,8 @@ static void dpp_auth_request_failed(struct dpp_sm *dp=
-p,
- 	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, ptr - attrs,
- 			ptr, sizeof(attrs) - (ptr - attrs), k1, dpp->key_len, 2,
- 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
--			DPP_ATTR_RESPONDER_CAPABILITIES, 1, &dpp->role);
-+			DPP_ATTR_RESPONDER_CAPABILITIES,
-+			(size_t) 1, &dpp->role);
- =
-
- 	iov[1].iov_base =3D attrs;
- 	iov[1].iov_len =3D ptr - attrs;
-@@ -1404,7 +1405,8 @@ static bool dpp_send_authenticate_request(struct dpp_=
-sm *dpp)
- 	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, ptr - attrs,
- 			ptr, sizeof(attrs), dpp->k1, dpp->key_len, 2,
- 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
--			DPP_ATTR_INITIATOR_CAPABILITIES, 1, &dpp->role);
-+			DPP_ATTR_INITIATOR_CAPABILITIES,
-+			(size_t) 1, &dpp->role);
- =
-
- 	iov[1].iov_base =3D attrs;
- 	iov[1].iov_len =3D ptr - attrs;
+ uint8_t *dpp_point_to_asn1(const struct l_ecc_point *p, size_t *len_out);
+ struct l_ecc_point *dpp_point_from_asn1(const uint8_t *asn1, size_t len);
++
++struct dpp_uri_info *dpp_parse_uri(const char *uri);
++void dpp_free_uri_info(struct dpp_uri_info *info);
 -- =
 
-2.34.1
+2.31.1
 
---===============2275293507306428027==--
+--===============5849604863915825323==--
 
