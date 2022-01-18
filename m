@@ -1,62 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============1700750956773413352=="
+Content-Type: multipart/mixed; boundary="===============3020147245953951762=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 4/9] ft: sent OCI in Reassociate
-Date: Mon, 27 Sep 2021 10:03:59 -0700
-Message-ID: <20210927170404.1292107-4-prestwoj@gmail.com>
-In-Reply-To: 20210927170404.1292107-1-prestwoj@gmail.com
+Subject: [PATCH 09/12] auto-t: wpas.py: allow arbitrary events to be handled
+Date: Tue, 18 Jan 2022 13:25:09 -0800
+Message-ID: <20220118212512.2017977-9-prestwoj@gmail.com>
+In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
 
---===============1700750956773413352==
+--===============3020147245953951762==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+If an event is in response to some command which is returning an
+unexpected value (unexpected with respect to wpas.py) handle_eow
+would raise an exception.
+
+Specifically with DPP this was being hit when the URI was being
+returned.
 ---
- src/ft.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ autotests/util/wpas.py | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/src/ft.c b/src/ft.c
-index cff1d759..6897f6d7 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -32,6 +32,7 @@
- #include "src/ft.h"
- #include "src/mpdu.h"
- #include "src/auth-proto.h"
-+#include "src/band.h"
- =
-
- struct ft_sm {
- 	struct auth_proto ap;
-@@ -273,6 +274,22 @@ static int ft_tx_reassociate(struct ft_sm *ft)
- 		memcpy(ft_info.anonce, hs->anonce, 32);
- 		memcpy(ft_info.snonce, hs->snonce, 32);
- =
-
-+		/*
-+		 * IEEE 802.11-2020 Section 13.7.1 FT reassociation in an RSN
-+		 *
-+		 * "If dot11RSNAOperatingChannelValidationActivated is true and
-+		 *  the FTO indicates OCVC capability, the target AP shall
-+		 *  ensure that OCI subelement of the FTE matches by ensuring
-+		 *  that all of the following are true:
-+		 *      - OCI subelement is present
-+		 *      - Channel information in the OCI matches current
-+		 *        operating channel parameters (see 12.2.9)"
-+		 */
-+		if (hs->supplicant_ocvc && hs->chandef) {
-+			oci_from_chandef(hs->chandef, ft_info.oci);
-+			ft_info.oci_present =3D true;
-+		}
-+
- 		fte =3D alloca(256);
- 		ie_build_fast_bss_transition(&ft_info, kck_len, fte);
- =
-
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index 6b845232..c8e65179 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -88,8 +88,6 @@ class Wpas:
+         def handle_eow():
+             nonlocal key, value, count, event
+             if count =3D=3D 0:
+-                if key is not None or not value:
+-                    raise Exception('Bad event name')
+                 key =3D 'event'
+             elif key is None:
+                 if not value:
 -- =
 
 2.31.1
 
---===============1700750956773413352==--
+--===============3020147245953951762==--
 
