@@ -1,30 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============8687527971290354078=="
+Content-Type: multipart/mixed; boundary="===============3875114976751905577=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] station: don't enable OCV unless MFPC is supported
-Date: Tue, 19 Oct 2021 17:05:33 -0500
-Message-ID: <4e56b2cc-e85f-afe8-8718-858a8bd06025@gmail.com>
-In-Reply-To: 20211019201117.564803-1-prestwoj@gmail.com
+Subject: Re: [Feature discussion] Allow overriding of network-specific options
+ globally
+Date: Tue, 18 Jan 2022 09:07:14 -0600
+Message-ID: <d123e190-b560-51ae-b1fc-8f72dfce77ac@gmail.com>
+In-Reply-To: CAGTBY+ucQ_kWfzxrZaaeL233-Xp28Cq9Kyor_Y+NeCNbGqDqcA@mail.gmail.com
 
---===============8687527971290354078==
+--===============3875114976751905577==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Rhys,
 
-On 10/19/21 3:11 PM, James Prestwood wrote:
-> ---
->   src/station.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Right- My programming skills aren't the best, but I'll give it a go
+> :). Where do you think the DNS option should go in the main config
+> file? Something like `DNSv4` and `DNSv6` in the `Network` section, or
+> should the `IPv4` and `IPv6` sections be added, each with their own
+> respective `DNS` entries?
+
+I would just mirror the way the network profiles do this.  So exact same =
+
+structure as in src/iwd.network.rst.
+
+> =
+
+> Also, apologies to Denis for accidentally doing a reply instead of a
+> reply-all initially, I don't participate in mailing lists that often.
 > =
 
 
-Applied, thanks.
+No worries.
 
 Regards,
 -Denis
 
---===============8687527971290354078==--
+--===============3875114976751905577==--
 
