@@ -1,41 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============6131907169372357382=="
+Content-Type: multipart/mixed; boundary="===============3000240919107123466=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] netdev: fix bug setting OWE IE length
-Date: Thu, 03 Feb 2022 09:24:18 -0800
-Message-ID: <20220203172418.87777-1-prestwoj@gmail.com>
+Subject: [PATCH 11/12] auto-t: add test for IWD as configurator + initiator
+Date: Tue, 18 Jan 2022 13:25:11 -0800
+Message-ID: <20220118212512.2017977-11-prestwoj@gmail.com>
+In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
 
---===============6131907169372357382==
+--===============3000240919107123466==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The length was being set to whatever the last nl80211 attribute was,
-not the length for the RESP_IE iteration.
 ---
- src/netdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ autotests/testDPP/connection_test.py | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 4dc9ce94..cda0c7fc 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -2830,7 +2830,7 @@ process_resp_ies:
- 					continue;
+diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
+ction_test.py
+index 38d44b25..160e533e 100644
+--- a/autotests/testDPP/connection_test.py
++++ b/autotests/testDPP/connection_test.py
+@@ -82,6 +82,22 @@ class Test(unittest.TestCase):
  =
 
- 				owe_dh =3D data;
--				owe_dh_len =3D len;
-+				owe_dh_len =3D ie_tlv_iter_get_length(&iter);
+         self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
  =
 
- 				break;
- =
-
++    def test_iwd_as_configurator_initiator(self):
++        self.hapd.reload()
++        self.hapd.wait_for_event('AP-ENABLED')
++
++        IWD.copy_to_storage('ssidCCMP.psk')
++        self.device.autoconnect =3D True
++
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
++
++        uri =3D self.wpas.dpp_enrollee_start(oper_and_channel=3D'81/2')
++
++        self.device.dpp_start_configurator(uri)
++
++        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
++
+     def setUp(self):
+         self.wd =3D IWD(True)
+         self.device =3D self.wd.list_devices(1)[0]
 -- =
 
 2.31.1
 
---===============6131907169372357382==--
+--===============3000240919107123466==--
 
