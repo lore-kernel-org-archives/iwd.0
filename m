@@ -1,347 +1,198 @@
-Content-Type: multipart/mixed; boundary="===============4710731117173339106=="
+Content-Type: multipart/mixed; boundary="===============0825963295960517684=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/3] json: introduce JSON module
-Date: Tue, 07 Dec 2021 12:55:46 -0800
-Message-ID: <20211207205547.1520508-2-prestwoj@gmail.com>
-In-Reply-To: 20211207205547.1520508-1-prestwoj@gmail.com
+Subject: [PATCH 04/12] unit: add DPP unit tests for URI parsing
+Date: Tue, 18 Jan 2022 13:25:04 -0800
+Message-ID: <20220118212512.2017977-4-prestwoj@gmail.com>
+In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
 
---===============4710731117173339106==
+--===============0825963295960517684==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a minimal wrapper around jsmn.h to make things a bit easier
-for iterating through a JSON object.
-
-An iterator can be created/destroyed with json_iter_{new,free} and
-the caller may call json_iter_foreach on this iterator.
-
-The callback function will contain the key and a void* value. The
-value type depends on what 'type' is set to. Currently only JSON_STRING
-and JSON_OBJECT types are supported.
-
-If the value is of type JSON_OBJECT json_iter_foreach may be used
-again to iterate it. This json_iter should not be freed and is only
-valid in the scope of the callback function.
-
-Both keys JSON_STRING values are raw pointers to the original JSON
-string and not NULL terminated. String/UTF-8 verification is left up
-to the caller.
 ---
- Makefile.am |   1 +
- src/json.c  | 204 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/json.h  |  59 +++++++++++++++
- 3 files changed, 264 insertions(+)
- create mode 100644 src/json.c
- create mode 100644 src/json.h
+ unit/test-dpp.c | 142 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 142 insertions(+)
 
-diff --git a/Makefile.am b/Makefile.am
-index 7fe4b5c3..1ae7e3c0 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -249,6 +249,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
-h src/missing.h \
- 					src/sysfs.h src/sysfs.c \
- 					src/offchannel.h src/offchannel.c \
- 					src/dpp-util.h src/dpp-util.c \
-+					src/json.h src/json.c \
- 					$(eap_sources) \
- 					$(builtin_sources)
+diff --git a/unit/test-dpp.c b/unit/test-dpp.c
+index bfe6f747..1803e688 100644
+--- a/unit/test-dpp.c
++++ b/unit/test-dpp.c
+@@ -33,6 +33,134 @@
+ #include "src/util.h"
+ #include "ell/useful.h"
  =
 
-diff --git a/src/json.c b/src/json.c
-new file mode 100644
-index 00000000..a54d0b9c
---- /dev/null
-+++ b/src/json.c
-@@ -0,0 +1,204 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2013-2019  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+
-+#include <ell/ell.h>
-+
-+#include "src/json.h"
-+#include "ell/useful.h"
-+
-+#include "shared/jsmn.h"
-+
-+/* Max number of tokens supported. Increase if larger objects are expected=
- */
-+#define JSON_DEFAULT_TOKENS 30
-+
-+#define TOK_LEN(token) (token)->end - (token)->start
-+#define TOK_PTR(json, token) (const uint8_t *)((json) + (token)->start)
-+
-+struct json_iter {
-+	char *json;
-+	size_t json_len;
-+	jsmntok_t *tokens;
-+	int tokens_len;
-+	jsmn_parser *p;
++struct dpp_test_info {
++	const char *uri;
++	bool expect_fail;
++	uint32_t expected_freqs[10];
++	struct dpp_uri_info result;
 +};
 +
-+static struct json_iter *iter_recurse(struct json_iter *parent,
-+					jsmntok_t *object)
-+{
-+	struct json_iter *iter =3D l_new(struct json_iter, 1);
-+
-+	iter->json =3D parent->json;
-+	iter->json_len =3D parent->json_len;
-+	iter->p =3D parent->p;
-+	iter->tokens =3D object;
-+
-+	/*
-+	 * Since object->size only indicates the number of keys in an object
-+	 * we cannot easily calculate the number of tokens remaining (for this
-+	 * object) since each object may have nested objects. Set tokens_len to
-+	 * the number of tokens remaining in the overall list after 'object'
-+	 */
-+	iter->tokens_len =3D parent->tokens_len -
-+				((object - parent->tokens) % sizeof(jsmntok_t));
-+
-+	return iter;
-+}
-+
-+struct json_iter *json_iter_new(const char *json, size_t json_len)
-+{
-+	struct json_iter *iter =3D l_new(struct json_iter, 1);
-+
-+	iter->json =3D l_memdup(json, json_len);
-+	iter->json_len =3D json_len;
-+	iter->p =3D l_new(jsmn_parser, 1);
-+	iter->tokens =3D l_new(jsmntok_t, JSON_DEFAULT_TOKENS);
-+
-+	jsmn_init(iter->p);
-+	iter->tokens_len =3D jsmn_parse(iter->p, iter->json, iter->json_len,
-+					iter->tokens, JSON_DEFAULT_TOKENS);
-+	if (iter->tokens_len < 0) {
-+		json_iter_free(iter);
-+		return NULL;
-+	}
-+
-+	return iter;
-+}
-+
-+void json_iter_free(struct json_iter *iter)
-+{
-+	l_free(iter->json);
-+	l_free(iter->p);
-+	l_free(iter->tokens);
-+	l_free(iter);
-+}
-+
-+static int json_iterate(struct json_iter *iter, jsmntok_t *current, int ma=
-x,
-+				json_iter_func_t func, void *user_data);
-+static int json_handle_value(struct json_iter *iter, jsmntok_t *key,
-+				jsmntok_t *value, json_iter_func_t func,
-+				void *user_data)
-+{
-+	_auto_(l_free) struct json_iter *ovalue =3D NULL;
-+
-+	switch (value->type) {
-+	case JSMN_OBJECT:
-+		/*
-+		 * Create this temporary iterator if the caller needs to
-+		 * iterate this object.
-+		 */
-+		ovalue =3D iter_recurse(iter, value);
-+
-+		if (func)
-+			if (!func(iter, TOK_PTR(iter->json, key), TOK_LEN(key),
-+					(enum json_type)value->type, ovalue, 0,
-+					user_data))
-+				return -ECANCELED;
-+
-+		/*
-+		 * Object which will be iterable in the above callback if
-+		 * needed. Move past this object with no callback.
-+		 *
-+		 * TODO: It may be possible to calculate the next token offset
-+		 * rather than iterate each token but this gets tricky since
-+		 * there are quotes, commas, braces or brackets in between
-+		 * tokens.
-+		 */
-+		return json_iterate(iter, value + 1, value->size,
-+					NULL, NULL) + 2;
-+	case JSMN_STRING:
-+		if (func)
-+			if (!func(iter, TOK_PTR(iter->json, key), TOK_LEN(key),
-+					(enum json_type)value->type,
-+					TOK_PTR(iter->json, value),
-+					TOK_LEN(value), user_data))
-+				return -ECANCELED;
-+
-+		return 2;
-+	default:
-+		return -ENOTSUP;
-+	}
-+}
-+
-+/*
-+ * Iterate tokens starting at 'current' up to 'max' key value pairs calling
-+ * 'func' for each pair.
-+ */
-+static int json_iterate(struct json_iter *iter, jsmntok_t *current, int ma=
-x,
-+				json_iter_func_t func, void *user_data)
-+{
-+	jsmntok_t *c =3D current;
-+	int keys =3D 0;
-+	int ret;
-+
-+	while (keys < max) {
-+		switch (c->type) {
-+		case JSMN_STRING:
-+			if (c + 1 > iter->tokens + iter->tokens_len)
-+				return -1;
-+
-+			ret =3D json_handle_value(iter, c, c + 1, func,
-+						user_data);
-+			if (ret < 0)
-+				return ret;
-+
-+			if (c + ret > iter->tokens + iter->tokens_len)
-+				return -EMSGSIZE;
-+
-+			c +=3D ret;
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+
-+		keys++;
-+	}
-+
-+	/* Return number of tokens consumed */
-+	return (c - current) % sizeof(jsmntok_t);
-+}
-+
-+/*
-+ * Iterate over a JSON object. This calls 'func' for each top level key/va=
-lue.
-+ * Returns true if successful, false otherwise. A False return indicates t=
-he
-+ * JSON contained currently unsupported types.
-+ */
-+bool json_iter_foreach(struct json_iter *iter, json_iter_func_t func,
-+			void *user_data)
-+{
-+	int ret;
-+
-+	/* Empty object {} */
-+	if (iter->tokens_len =3D=3D 0)
-+		return true;
-+
-+	/* tokens + 1 should point to the first key in the overall object */
-+	ret =3D json_iterate(iter, iter->tokens + 1, iter->tokens->size,
-+				func, user_data);
-+
-+	return ret >=3D 0;
-+}
-diff --git a/src/json.h b/src/json.h
-new file mode 100644
-index 00000000..91037153
---- /dev/null
-+++ b/src/json.h
-@@ -0,0 +1,59 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+struct json_iter;
-+
-+/*
-+ * Identical to JSMN types
-+ */
-+enum json_type {
-+	JSON_UNDEFINED =3D 0,
-+	JSON_OBJECT =3D 1 << 0,
-+	JSON_ARRAY =3D 1 << 1,
-+	JSON_STRING =3D 1 << 2,
-+	JSON_PRIMITIVE =3D 1 << 3
++struct dpp_test_info all_values =3D {
++	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;K:MDkw=
+EwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=
+=3D;;",
++	.result =3D {
++		.mac =3D { 0x52, 0x54, 0x00, 0x58, 0x28, 0xe5 },
++		.version =3D 2,
++	},
++	.expected_freqs =3D { 2412, 5180, 0 }
 +};
 +
-+/*
-+ * Called for each top level key/value in a JSON object. Currently only su=
-pports
-+ * objects and string types. 'type' will be either JSON_STRING or JSON_OBJ=
-ECT.
-+ * For both keys (and string values) UTF verification is left up to the ca=
-ller.
-+ *
-+ * 'key' will point directly to the keys memory location in the original J=
-SON
-+ * string and 'key_len' will be set to its length.
-+ *
-+ * If 'type' is JSON_STRING, 'value' will be const uint8_t* type and point=
- to
-+ * the direct memory location of the value in the original JSON string and
-+ * value_len will be set.
-+ *
-+ * If 'type' is JSON_OBJECT, 'value' will be of struct json_iter* type. Th=
-is can
-+ * be iterated again by calling json_iter_foreach.
-+ */
-+typedef bool (*json_iter_func_t)(struct json_iter *iter,
-+				const uint8_t *key, size_t key_len,
-+				enum json_type type, const void *value,
-+				size_t value_len, void *user_data);
++struct dpp_test_info no_type =3D {
++	.uri =3D "C:81/1;K:shouldnotmatter;;",
++	.expect_fail =3D true
++};
 +
-+struct json_iter *json_iter_new(const char *json, size_t json_len);
-+void json_iter_free(struct json_iter *iter);
-+bool json_iter_foreach(struct json_iter *iter, json_iter_func_t func,
-+			void *user_data);
++struct dpp_test_info empty =3D {
++	.uri =3D "DPP:",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info no_key =3D {
++	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info data_after_terminator =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0NjlkIA=3D;;C:81/1;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info single_terminator =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0NjlkIA=3D;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info no_terminator =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0NjlkIA=3D",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info bad_key =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info unexpected_id =3D {
++	.uri =3D "DPP:Z:somedata;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoI=
+RIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info bad_channels[] =3D {
++	{
++		.uri =3D "DPP:C:;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQ=
+MV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWG=
+oQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPW=
+GoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/1,;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRI=
+PWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/1,81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZo=
+IRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/1,/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIR=
+IPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++};
++
++static bool verify_info(const struct dpp_uri_info *parsed,
++			const struct dpp_test_info *result)
++{
++	const struct dpp_uri_info *expected =3D &result->result;
++	uint32_t i;
++
++	assert(!memcmp(parsed->mac, expected->mac, 6));
++	assert(parsed->version =3D=3D expected->version);
++	assert(parsed->boot_public !=3D NULL);
++
++	for (i =3D 0; result->expected_freqs[i]; i++)
++		assert(scan_freq_set_contains(parsed->freqs,
++						result->expected_freqs[i]));
++
++	return true;
++}
++
++static void test_uri_parse(const void *data)
++{
++	const struct dpp_test_info *test_info =3D data;
++	struct dpp_uri_info *info;
++	int ret;
++
++	info =3D dpp_parse_uri(test_info->uri);
++	if (test_info->expect_fail) {
++		assert(info =3D=3D NULL);
++		return;
++	}
++
++	assert(ret =3D=3D 0);
++
++	assert(verify_info(info, test_info));
++
++	dpp_free_uri_info(info);
++}
++
++
++static void test_bad_channels(const void *data)
++{
++	unsigned int i;
++
++	for (i =3D 0; i < L_ARRAY_SIZE(bad_channels); i++)
++		test_uri_parse(&bad_channels[i]);
++}
++
+ /*
+  * B.2 Test Vectors for DPP Authentication Using P-256 for
+  * Responder-only Authentication
+@@ -148,5 +276,19 @@ int main(int argc, char *argv[])
+ 		l_test_add("DPP test key derivation",
+ 						test_key_derivation, NULL);
+ =
+
++	l_test_add("DPP URI parse", test_uri_parse, &all_values);
++	l_test_add("DPP URI no type", test_uri_parse, &no_type);
++	l_test_add("DPP URI empty", test_uri_parse, &empty);
++	l_test_add("DPP URI no key", test_uri_parse, &no_key);
++	l_test_add("DPP URI data after terminator", test_uri_parse,
++				&data_after_terminator);
++	l_test_add("DPP URI single terminator", test_uri_parse,
++				&single_terminator);
++	l_test_add("DPP URI no terminator", test_uri_parse,
++				&no_terminator);
++	l_test_add("DPP URI bad key", test_uri_parse, &bad_key);
++	l_test_add("DPP URI bad channels", test_bad_channels, &bad_channels);
++	l_test_add("DPP URI unexpected ID", test_uri_parse, &unexpected_id);
++
+ 	return l_test_run();
+ }
 -- =
 
 2.31.1
 
---===============4710731117173339106==--
+--===============0825963295960517684==--
 
