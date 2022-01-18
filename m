@@ -1,49 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============4637171823214485903=="
+Content-Type: multipart/mixed; boundary="===============7119943481901219261=="
 MIME-Version: 1.0
-From: Torsten Schmitz <noreply.torsten at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2] station: Prevent a NULL pointer access
-Date: Sun, 07 Nov 2021 02:03:38 +0100
-Message-ID: <CFJ55REIK1NJ.3RPA8HBGL04MQ@hostname>
-In-Reply-To: 3c0e6c34-3054-276c-9f0f-44c57b173f84@gmail.com
+Subject: [PATCH 06/12] frame-xchg: set allow multicast flag
+Date: Tue, 18 Jan 2022 13:25:06 -0800
+Message-ID: <20220118212512.2017977-6-prestwoj@gmail.com>
+In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
 
---===============4637171823214485903==
+--===============7119943481901219261==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
->From 7b1ced9001b70b9644afca502ff744dd221cceab Mon Sep 17 00:00:00 2001
-From: Torsten Schmitz <noreply.torsten(a)gmail.com>
-Date: Sat, 6 Nov 2021 01:42:40 +0100
-Subject: [PATCH] station: Prevent a NULL pointer access
-
-There is an unchecked NULL pointer access in network_has_open_pair.
-open_info can be NULL, when out of multiple APs in range that advertise
-the same SSID some advertise OWE transition elments and some don't.
+Receiving multicast frames is required by DPP
 ---
- src/station.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/frame-xchg.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/station.c b/src/station.c
-index 19f2aaeb..245fd780 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -698,6 +698,10 @@ static bool network_has_open_pair(struct network *netw=
-ork, struct scan_bss *owe)
- 		struct scan_bss *open =3D entry->data;
- 		struct ie_owe_transition_info *open_info =3D open->owe_trans;
+diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+index 5ba36081..95c030d8 100644
+--- a/src/frame-xchg.c
++++ b/src/frame-xchg.c
+@@ -611,6 +611,7 @@ bool frame_watch_add(uint64_t wdev_id, uint32_t group_i=
+d, uint16_t frame_type,
  =
 
-+		/* AP does not advertise owe transition */
-+		if (!open_info)
-+			continue;
-+
- 		/*
- 		 * Check if this is an Open/Hidden pair:
- 		 *
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &wdev_id);
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_TYPE, 2, &frame_type);
++	l_genl_msg_append_attr(msg, NL80211_ATTR_RECEIVE_MULTICAST, 0, NULL);
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_MATCH,
+ 				prefix_len, prefix);
+ =
+
 -- =
 
-2.33.1
+2.31.1
 
---===============4637171823214485903==--
+--===============7119943481901219261==--
 
