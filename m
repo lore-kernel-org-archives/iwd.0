@@ -1,86 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============0859101193657021155=="
+Content-Type: multipart/mixed; boundary="===============3595888224386567732=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459 at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Permanent disconnect when AP changes frequency
-Date: Fri, 04 Mar 2022 15:44:34 +0000
-Message-ID: <CACsRnHUCQkB5e3SG9kNCEWuggdfkKX1zLLayTFK3594ehduvZA@mail.gmail.com>
+Subject: [PATCH 12/12] dpp: fix dpp_offchannel_start corner cases
+Date: Tue, 18 Jan 2022 13:25:12 -0800
+Message-ID: <20220118212512.2017977-12-prestwoj@gmail.com>
+In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
 
---===============0859101193657021155==
+--===============3595888224386567732==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+The purpose of this was to have a single utility to both cancel an
+existing offchannel operation (if one exists) and start a new one.
 
-I just hit a problem today where my iwd clients were getting
-permanently disconnected from a network after the AP changed it's
-frequency.
-The first time the client tries to FT roam to the changed AP it gets a
-result: 1 (authentication failed?). After that when it tries to
-reconnect to another BSS in the same network but this time gets a
-result: 2 (association failure?) and critically blacklists the BSS. It
-tries to connect to all available BSS and gets the same error until
-there are none left. This leaves the client permanently disconnected.
-I'm guessing that changing the frequency wiped the auth from the AP
-which explains why the initial FT roam fails but I'm not sure what
-would be causing the subsequent failures.
+The problem was the previous offchannel operation was being canceled
+first which opened up the radio work queue to other items. This is
+not desireable as, for example, a scan would end up breaking the
+DPP protocol most likely.
 
-Looking at `src/station.c:station_retry_with_status` would it make
-sense to clean whatever auth data we have for FT if the status is an
-AUTH failure?
+Starting the new offchannel then canceling is the correct order of
+operations but to do this required saving the new ID, canceling, then
+setting offchannel_id to the new ID so dpp_presence_timeout wouldn't
+overwrite the new ID to zero.
 
-```
-Mar 04 13:35:14 p3-1147 iwd[443]:
-src/station.c:station_transition_start() 5, target *:*:*:*:07:b1
-Mar 04 13:35:14 p3-1147 iwd[443]: src/netdev.c:netdev_cqm_rssi_update()
-Mar 04 13:35:14 p3-1147 iwd[443]:
-src/wiphy.c:wiphy_radio_work_insert() Inserting work item 6
-Mar 04 13:35:14 p3-1147 iwd[443]: src/station.c:station_enter_state()
-Old State: connected, new state: roaming
-Mar 04 13:35:14 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_done()
-Work item 5 done
-Mar 04 13:35:14 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_next()
-Starting work item 6
-Mar 04 13:35:14 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_done()
-Work item 6 done
-Mar 04 13:35:14 p3-1147 iwd[443]:
-src/station.c:station_fast_transition_cb() 5, result: 1
-Mar 04 13:35:14 p3-1147 iwd[443]: src/station.c:station_roam_failed() 5
-Mar 04 13:35:14 p3-1147 iwd[443]: src/station.c:station_disassociated() 5
-Mar 04 13:35:14 p3-1147 iwd[443]:
-src/resolve.c:resolve_systemd_revert() ifindex: 5
-Mar 04 13:35:14 p3-1147 iwd[443]: src/station.c:station_enter_state()
-Old State: roaming, new state: disconnected
-Mar 04 13:35:14 p3-1147 iwd[443]: src/station.c:station_enter_state()
-Old State: disconnected, new state: autoconnect_quick
-...
-Mar 04 13:36:16 p3-1147 iwd[443]:
-src/station.c:__station_connect_network() connecting to BSS
-*:*:*:*:08:71
-Mar 04 13:36:16 p3-1147 iwd[443]: src/station.c:station_enter_state()
-Old State: autoconnect_full, new state: connecting (auto)
-Mar 04 13:36:16 p3-1147 iwd[443]: src/scan.c:scan_periodic_stop()
-Stopping periodic scan for wdev 2
-Mar 04 13:36:16 p3-1147 iwd[443]: src/scan.c:scan_cancel() Trying to
-cancel scan id 13 for wdev 2
-Mar 04 13:36:16 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_done()
-Work item 13 done
-Mar 04 13:36:16 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_next()
-Starting work item 14
-Mar 04 13:36:16 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_done()
-Work item 14 done
-Mar 04 13:36:16 p3-1147 iwd[443]: src/station.c:station_connect_cb()
-5, result: 2
-Mar 04 13:36:16 p3-1147 iwd[443]: src/station.c:station_enter_state()
-Old State: connecting (auto), new state: disconnected
-...
-Mar 04 13:36:31 p3-1147 iwd[443]:
-src/station.c:station_autoconnect_next() autoconnect: No suitable
-BSSes found
-```
+This also removes an explicit call to offchannel_cancel which is
+already done by dpp_offchannel_start.
+---
+ src/dpp.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
-Kind Regards,
-Michael Johnson
---===============0859101193657021155==--
+diff --git a/src/dpp.c b/src/dpp.c
+index 80567c1a..ee1497c0 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -1422,12 +1422,28 @@ protocol_failed:
+ =
+
+ static void dpp_start_offchannel(struct dpp_sm *dpp, uint32_t freq)
+ {
++	/*
++	 * This needs to be handled carefully for a few reasons:
++	 *
++	 * First, the next offchannel operation needs to be started prior to
++	 * canceling an existing one. This is so the offchannel work can
++	 * continue uninterrupted without any other work items starting in
++	 * between canceling and starting the next (e.g. if a scan request is
++	 * sitting in the queue).
++	 *
++	 * Second, dpp_presence_timeout resets dpp->offchannel_id to zero which
++	 * is why the new ID is saved and only set to dpp->offchannel_id once
++	 * the previous offchannel work is cancelled (i.e. destroy() has been
++	 * called).
++	 */
++	uint32_t id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
++				freq, dpp->dwell, dpp_roc_started,
++				dpp, dpp_presence_timeout);
++
+ 	if (dpp->offchannel_id)
+ 		offchannel_cancel(dpp->wdev_id, dpp->offchannel_id);
+ =
+
+-	dpp->offchannel_id =3D offchannel_start(netdev_get_wdev_id(dpp->netdev),
+-				freq, dpp->dwell, dpp_roc_started,
+-				dpp, dpp_presence_timeout);
++	dpp->offchannel_id =3D id;
+ }
+ =
+
+ static void authenticate_request(struct dpp_sm *dpp, const uint8_t *from,
+@@ -1520,7 +1536,6 @@ static void authenticate_request(struct dpp_sm *dpp, =
+const uint8_t *from,
+ 			l_debug("Configurator requested a new frequency %u",
+ 					dpp->new_freq);
+ =
+
+-			offchannel_cancel(dpp->wdev_id, dpp->offchannel_id);
+ 			dpp_start_offchannel(dpp, dpp->new_freq);
+ =
+
+ 			break;
+-- =
+
+2.31.1
+
+--===============3595888224386567732==--
 
