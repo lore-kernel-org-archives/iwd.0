@@ -1,61 +1,119 @@
-Content-Type: multipart/mixed; boundary="===============8704746428896327713=="
+Content-Type: multipart/mixed; boundary="===============7207235665027538111=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] fils: pragma false positive for uninitialized variable
-Date: Fri, 10 Jun 2022 11:40:17 -0700
-Message-ID: <20220610184017.356608-1-prestwoj@gmail.com>
+Subject: [PATCH 02/12] dpp-util: add dpp_point_from_asn1()
+Date: Tue, 18 Jan 2022 13:25:02 -0800
+Message-ID: <20220118212512.2017977-2-prestwoj@gmail.com>
+In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
 
---===============8704746428896327713==
+--===============7207235665027538111==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On musl-gcc the compiler is giving a warning for igtk_key_index
-and gtk_key_index being used uninitialized. This isn't possible
-since they are only used if gtk/igtk are non-NULL so pragma to
-ignore the warning.
-
-src/fils.c: In function 'fils_rx_associate':
-src/fils.c:580:17: error: 'igtk_key_index' may be used uninitialized
-	in this function [-Werror=3Dmaybe-uninitialized]
-  580 |                 handshake_state_install_igtk(fils->hs,
-					igtk_key_index,igtk + 6,
-					igtk_len - 6, igtk);
-
-(same error for gtk_key_index)
+Given an ASN1 blob of the right form, parse and create
+an l_ecc_point object. The form used is specific to DPP
+hence why this isn't general purpose and put into dpp-util.
 ---
- src/fils.c | 3 +++
- 1 file changed, 3 insertions(+)
+ src/dpp-util.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/dpp-util.h |  1 +
+ 2 files changed, 70 insertions(+)
 
-diff --git a/src/fils.c b/src/fils.c
-index d1d46d65..c3337352 100644
---- a/src/fils.c
-+++ b/src/fils.c
-@@ -572,6 +572,8 @@ static int fils_rx_associate(struct auth_proto *driver,=
- const uint8_t *frame,
- 	handshake_state_set_pmk(fils->hs, fils->pmk, fils->pmk_len);
- 	handshake_state_set_pmkid(fils->hs, fils->pmkid);
+diff --git a/src/dpp-util.c b/src/dpp-util.c
+index 4823b2f0..81a97f97 100644
+--- a/src/dpp-util.c
++++ b/src/dpp-util.c
+@@ -796,3 +796,72 @@ uint8_t *dpp_point_to_asn1(const struct l_ecc_point *p=
+, size_t *len_out)
  =
 
-+_Pragma("GCC diagnostic push")
-+_Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
- 	if (gtk)
- 		handshake_state_install_gtk(fils->hs, gtk_key_index, gtk,
- 						gtk_len, key_rsc, 6);
-@@ -579,6 +581,7 @@ static int fils_rx_associate(struct auth_proto *driver,=
- const uint8_t *frame,
- 	if (igtk)
- 		handshake_state_install_igtk(fils->hs, igtk_key_index,
- 						igtk + 6, igtk_len - 6, igtk);
-+_Pragma("GCC diagnostic pop")
+ 	return asn1;
+ }
++
++/*
++ * Only checking for the ASN.1 form:
++ *
++ * SEQUENCE {
++ * 	SEQUENCE {
++ * 		OBJECT IDENTIFIER ecPublicKey
++ * 		OBJECT IDENTIFIER key type (p256/p384)
++ * 	}
++ * 	BITSTRING (key data)
++ * }
++ */
++struct l_ecc_point *dpp_point_from_asn1(const uint8_t *asn1, size_t len)
++{
++
++	const uint8_t *outer_seq;
++	size_t outer_len;
++	const uint8_t *inner_seq;
++	size_t inner_len;
++	const uint8_t *elem;
++	const uint8_t *key_data;
++	size_t elen =3D 0;
++	uint8_t tag;
++	unsigned int curve_num;
++	const struct l_ecc_curve *curve;
++
++	/* SEQUENCE */
++	outer_seq =3D asn1_der_find_elem(asn1, len, 0, &tag, &outer_len);
++	if (!outer_seq || tag !=3D ASN1_ID_SEQUENCE)
++		return NULL;
++
++	/* SEQUENCE */
++	inner_seq =3D asn1_der_find_elem(outer_seq, outer_len, 0, &tag, &inner_le=
+n);
++	if (!inner_seq || tag !=3D ASN1_ID_SEQUENCE)
++		return NULL;
++
++	/* OBJECT IDENTIFIER (ecPublicKey) */
++	elem =3D asn1_der_find_elem(inner_seq, inner_len, 0, &tag, &elen);
++	if (!elem || tag !=3D ASN1_ID_OID)
++		return NULL;
++
++	/* Check that this OID is ecPublicKey */
++	if (!asn1_oid_eq(&ec_oid, elen, elem))
++		return NULL;
++
++	elem =3D asn1_der_find_elem(inner_seq, inner_len, 1, &tag, &elen);
++	if (!elem || tag !=3D ASN1_ID_OID)
++		return NULL;
++
++	/* Check if ELL supports this curve */
++	if (asn1_oid_eq(&ec_p256_oid, elen, elem))
++		curve_num =3D 19;
++	else if (asn1_oid_eq(&ec_p384_oid, elen, elem))
++		curve_num =3D 20;
++	else
++		return NULL;
++
++	/* BITSTRING */
++	key_data =3D asn1_der_find_elem(outer_seq, outer_len, 1, &tag, &elen);
++	if (!key_data || tag !=3D ASN1_ID_BIT_STRING || elen < 34)
++		return NULL;
++
++	curve =3D l_ecc_curve_from_ike_group(curve_num);
++	if (!curve)
++		return NULL;
++
++	return l_ecc_point_from_data(curve, key_data[1],
++					key_data + 2, elen - 2);
++}
+diff --git a/src/dpp-util.h b/src/dpp-util.h
+index 84d33656..82535ff8 100644
+--- a/src/dpp-util.h
++++ b/src/dpp-util.h
+@@ -167,3 +167,4 @@ bool dpp_derive_ke(const uint8_t *i_nonce, const uint8_=
+t *r_nonce,
+ 				void *ke);
  =
 
- 	handshake_state_set_ptk(fils->hs, fils->kek_and_tk, fils->kek_len + 16);
- 	handshake_state_install_ptk(fils->hs);
+ uint8_t *dpp_point_to_asn1(const struct l_ecc_point *p, size_t *len_out);
++struct l_ecc_point *dpp_point_from_asn1(const uint8_t *asn1, size_t len);
 -- =
 
-2.34.1
+2.31.1
 
---===============8704746428896327713==--
+--===============7207235665027538111==--
 
