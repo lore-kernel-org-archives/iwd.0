@@ -1,50 +1,28 @@
-Content-Type: multipart/mixed; boundary="===============1631504957540700066=="
+Content-Type: multipart/mixed; boundary="===============4626533645258537587=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 03/10] test-runner: simplify start_iwd handling
-Date: Wed, 06 Apr 2022 12:14:46 -0700
-Message-ID: <20220406191453.978426-3-prestwoj@gmail.com>
-In-Reply-To: 20220406191453.978426-1-prestwoj@gmail.com
+Subject: Re: [PATCH 1/2] dpp: free nl80211 object on exit
+Date: Wed, 19 Jan 2022 17:17:50 -0600
+Message-ID: <7b061916-cf52-7799-11b1-a03059da0454@gmail.com>
+In-Reply-To: 20220119230452.2306995-1-prestwoj@gmail.com
 
---===============1631504957540700066==
+--===============4626533645258537587==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Replace two separate if blocks to handle the default value
-with fallback=3DTrue.
----
- tools/run-tests | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+Hi James,
 
-diff --git a/tools/run-tests b/tools/run-tests
-index a95a7494..5f405e67 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -886,15 +886,8 @@ def pre_test(ctx, test, copied):
- 	ctx.start_wpas_interfaces()
- 	ctx.start_ofono()
- =
+On 1/19/22 17:04, James Prestwood wrote:
+> ---
+>   src/dpp.c | 3 +++
+>   1 file changed, 3 insertions(+)
 
--	if ctx.hw_config.has_option('SETUP', 'start_iwd'):
--		start =3D ctx.hw_config.getboolean('SETUP', 'start_iwd')
--	else:
--		start =3D True
--
--	if start:
-+	if ctx.hw_config.getboolean('SETUP', 'start_iwd', fallback=3DTrue):
- 		ctx.start_iwd()
--	else:
--		print("Not starting IWD from test-runner")
- =
+Both applied, thanks.
 
- 	print(ctx)
- =
+Regards,
+-Denis
 
--- =
-
-2.34.1
-
---===============1631504957540700066==--
+--===============4626533645258537587==--
 
