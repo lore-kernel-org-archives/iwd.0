@@ -1,43 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============2264536950363129504=="
+Content-Type: multipart/mixed; boundary="===============4619102239713795294=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 3/5] station: set extended key capability
-Date: Fri, 08 Oct 2021 11:07:24 -0700
-Message-ID: <20211008180726.2599788-3-prestwoj@gmail.com>
-In-Reply-To: 20211008180726.2599788-1-prestwoj@gmail.com
+Subject: [PATCH] eap-pwd: add length checks for fragmented packets
+Date: Wed, 19 Jan 2022 10:13:02 -0800
+Message-ID: <20220119181302.2259778-1-prestwoj@gmail.com>
 
---===============2264536950363129504==
+--===============4619102239713795294==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If wiphy and the AP suppor it, set the Extended Key ID capability
-bit in the RSN info.
 ---
- src/station.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/eap-pwd.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/src/station.c b/src/station.c
-index f12cdde5..30335170 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1087,6 +1087,10 @@ build_ie:
+diff --git a/src/eap-pwd.c b/src/eap-pwd.c
+index af373493..cd6684e7 100644
+--- a/src/eap-pwd.c
++++ b/src/eap-pwd.c
+@@ -669,6 +669,14 @@ static void eap_pwd_handle_request(struct eap_state *e=
+ap,
  =
 
- 	info.ocvc =3D !disable_ocv;
- =
-
-+	/* Extended Key IDs can only be used if supported by both AP and STA */
-+	if (wiphy_supports_ext_key_id(wiphy) && bss_info.extended_key_id)
-+		info.extended_key_id =3D true;
+ 		/* remove length of Total-Length parameter (2) */
+ 		pwd->rx_frag_total =3D l_get_be16(pkt + 1) - 2;
 +
- 	/* RSN takes priority */
- 	if (bss->rsne) {
- 		ap_ie =3D bss->rsne;
++		if (pwd->rx_frag_total < len - 2) {
++			l_error("Total-Length too small for remaining length");
++			pwd->rx_frag_total =3D 0;
++
++			return;
++		}
++
+ 		pwd->rx_frag_buf =3D l_malloc(pwd->rx_frag_total);
+ =
+
+ 		/* skip copying Total-Length for easier processing later */
+@@ -687,6 +695,12 @@ static void eap_pwd_handle_request(struct eap_state *e=
+ap,
+ =
+
+ 	/* more rx fragments */
+ 	if (pwd->rx_frag_buf) {
++		if (pwd->rx_frag_total - pwd->rx_frag_count <
++						(uint16_t) len - 1) {
++			l_error("Not enough room for fragment (%zu)", len - 1);
++			return;
++
++		}
+ 		/* continue building packet (not including PWD-Exch byte) */
+ 		memcpy(pwd->rx_frag_buf + pwd->rx_frag_count, pkt + 1, len - 1);
+ 		pwd->rx_frag_count +=3D (len - 1);
 -- =
 
 2.31.1
 
---===============2264536950363129504==--
+--===============4619102239713795294==--
 
