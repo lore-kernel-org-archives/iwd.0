@@ -1,58 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============3111088601462257545=="
+Content-Type: multipart/mixed; boundary="===============7433540518227033262=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 2/4] scan: validate OWE transition operating class/channel
-Date: Wed, 22 Sep 2021 12:34:16 -0700
-Message-ID: <20210922193418.13072-2-prestwoj@gmail.com>
-In-Reply-To: 20210922193418.13072-1-prestwoj@gmail.com
+Subject: [PATCH v3 1/3] station: send debug "roam-scan-triggered" event
+Date: Wed, 19 Jan 2022 14:26:50 -0800
+Message-ID: <20220119222652.2299217-1-prestwoj@gmail.com>
 
---===============3111088601462257545==
+--===============7433540518227033262==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the IE's operating class and channel doesn't validate don't bother
-storing the IE at all.
 ---
- src/scan.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ src/station.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/src/scan.c b/src/scan.c
-index 54a7bc84..3f36ea3e 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -1063,11 +1063,19 @@ static void scan_parse_vendor_specific(struct scan_=
-bss *bss, const void *data,
- 		bss->owe_trans =3D l_new(struct ie_owe_transition_info, 1);
- =
-
- 		if (ie_parse_owe_transition(data - 2, len + 2,
--						bss->owe_trans) < 0) {
--			l_free(bss->owe_trans);
--			bss->owe_trans =3D NULL;
--		}
-+						bss->owe_trans) < 0)
-+			goto free_owe_trans;
-+
-+		if (bss->owe_trans->oper_class && oci_to_frequency(
-+						bss->owe_trans->oper_class,
-+						bss->owe_trans->channel) < 0)
-+			goto free_owe_trans;
-+
-+		return;
- =
-
-+free_owe_trans:
-+		l_free(bss->owe_trans);
-+		bss->owe_trans =3D NULL;
+diff --git a/src/station.c b/src/station.c
+index 38d0757c..d9eb8d09 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2246,6 +2246,8 @@ static void station_roam_scan_triggered(int err, void=
+ *user_data)
  		return;
  	}
  =
 
++	station_debug_event(station, "roam-scan-triggered");
++
+ 	/*
+ 	 * Do not update the Scanning property as we won't be updating the
+ 	 * list of networks.
 -- =
 
 2.31.1
 
---===============3111088601462257545==--
+--===============7433540518227033262==--
 
