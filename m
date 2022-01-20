@@ -1,84 +1,625 @@
-Content-Type: multipart/mixed; boundary="===============1537186113312908384=="
+Content-Type: multipart/mixed; boundary="===============4869532586383160542=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v5 5/6] doc: document SystemdEncrypt
-Date: Fri, 04 Feb 2022 13:33:30 -0800
-Message-ID: <20220204213331.337524-5-prestwoj@gmail.com>
-In-Reply-To: 20220204213331.337524-1-prestwoj@gmail.com
+Subject: [PATCH v2 05/10] dpp: add support for initiating as a configurator
+Date: Thu, 20 Jan 2022 15:44:10 -0800
+Message-ID: <20220120234415.2469451-5-prestwoj@gmail.com>
+In-Reply-To: 20220120234415.2469451-1-prestwoj@gmail.com
 
---===============1537186113312908384==
+--===============4869532586383160542==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+The difference between the existing code is that IWD will send the
+authentication request, making it the initiator.
+
+This handles the use case where IWD is provided a peers URI containing
+its bootstrapping key rather than IWD always providing its own URI.
+A new DBus API was added, ConfigureEnrollee().
+
+Using ConfigureEnrollee() IWD will act as a configurator but begin by
+traversing a channel list (URI provided or default) and waiting for
+presence announcements. When an announcement is received IWD will
+send an authentication request to the peer, receive its reply, and
+send an authentication confirm.
+
+As with being a responder, IWD only supports configuration to the
+currently connected BSS and will request the enrollee switch to this
+BSS's frequency to preserve network performance.
 ---
- src/iwd.config.rst  | 16 ++++++++++++++++
- src/iwd.network.rst |  6 +++++-
- 2 files changed, 21 insertions(+), 1 deletion(-)
+ src/dpp.c | 442 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 439 insertions(+), 3 deletions(-)
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 54943702..a3d19fe5 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -188,6 +188,22 @@ The group ``[General]`` contains general settings.
-        by the kernel so if kernels/drivers exist which don't support OCV i=
-t can
-        be disabled here.
+diff --git a/src/dpp.c b/src/dpp.c
+index ede4e337..9273da57 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -83,20 +83,33 @@ struct dpp_sm {
  =
 
-+   * - SystemdEncrypt
-+     - Value: Systemd key ID
+ 	uint8_t *own_asn1;
+ 	size_t own_asn1_len;
++	uint8_t *peer_asn1;
++	size_t peer_asn1_len;
+ 	uint8_t own_boot_hash[32];
++	uint8_t peer_boot_hash[32];
+ 	const struct l_ecc_curve *curve;
+ 	size_t key_len;
+ 	size_t nonce_len;
+ 	struct l_ecc_scalar *boot_private;
+ 	struct l_ecc_point *boot_public;
++	struct l_ecc_point *peer_boot_public;
+ =
+
+ 	enum dpp_state state;
+ =
+
++	/*
++	 * List of frequencies to jump between. The presence of this list is
++	 * also used to signify that a configurator is an initiator vs responder
++	 */
+ 	uint32_t *freqs;
+ 	size_t freqs_len;
+ 	size_t freqs_idx;
+ 	uint32_t dwell;
+ 	uint32_t current_freq;
++	/*
++	 * Frequency the remainder of the auth/config protocol will run on.
++	 * For an initiating configurator this is the frequency of the currently
++	 * connected BSS.
++	 */
+ 	uint32_t new_freq;
+ 	struct scan_freq_set *presence_list;
+ =
+
+@@ -107,7 +120,9 @@ struct dpp_sm {
+ 	uint8_t i_nonce[32];
+ 	uint8_t e_nonce[32];
+ =
+
++	struct l_ecc_scalar *m;
+ 	uint64_t ke[L_ECC_MAX_DIGITS];
++	uint64_t k1[L_ECC_MAX_DIGITS];
+ 	uint64_t k2[L_ECC_MAX_DIGITS];
+ 	uint64_t auth_tag[L_ECC_MAX_DIGITS];
+ =
+
+@@ -145,6 +160,16 @@ static void dpp_free_auth_data(struct dpp_sm *dpp)
+ 		l_ecc_point_free(dpp->peer_proto_public);
+ 		dpp->peer_proto_public =3D NULL;
+ 	}
 +
-+       Enables network profile encryption using a systemd provided secret =
-key.
-+       Once enabled all PSK/8021x network profiles will be encrypted
-+       automatically. Once the profile is encrypted there is no way of goi=
-ng
-+       back using IWD alone. A tool, decrypt-profile, is provided assuming=
- the
-+       secret is known which will decrypt a profile. This decrypted profile
-+       could manually be set to /var/lib/iwd to 'undo' any profile encrypt=
-ion,
-+       but its going to be a manual process.
++	if (dpp->peer_boot_public) {
++		l_ecc_point_free(dpp->peer_boot_public);
++		dpp->peer_boot_public =3D NULL;
++	}
 +
-+       Setting up systemd to provide the secret is left up to the user as =
-IWD
-+       has no way of performing this automatically. The systemd options re=
-quired
-+       are LoadCredentialEncrypted or SetCredentialEncrypted, and the secr=
-et
-+       identifier should be named whatever SystemdEncrypt is set to.
++	if (dpp->m) {
++		l_ecc_scalar_free(dpp->m);
++		dpp->m =3D NULL;
++	}
+ }
+ =
+
+ static void dpp_reset(struct dpp_sm *dpp)
+@@ -188,6 +213,7 @@ static void dpp_reset(struct dpp_sm *dpp)
+ 	explicit_bzero(dpp->i_nonce, dpp->nonce_len);
+ 	explicit_bzero(dpp->e_nonce, dpp->nonce_len);
+ 	explicit_bzero(dpp->ke, dpp->key_len);
++	explicit_bzero(dpp->k1, dpp->key_len);
+ 	explicit_bzero(dpp->k2, dpp->key_len);
+ 	explicit_bzero(dpp->auth_tag, dpp->key_len);
+ =
+
+@@ -1260,6 +1286,49 @@ static void dpp_presence_announce(struct dpp_sm *dpp)
+ 	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
+ }
+ =
+
++static void dpp_send_authenticate_request(struct dpp_sm *dpp)
++{
++	uint8_t hdr[32];
++	uint8_t attrs[256];
++	uint8_t *ptr =3D attrs;
++	uint64_t i_proto_key[L_ECC_MAX_DIGITS * 2];
++	uint8_t version =3D 2;
++	struct iovec iov[2];
 +
- Network
- -------
++	l_ecc_point_get_data(dpp->own_proto_public, i_proto_key,
++				sizeof(i_proto_key));
++
++	iov[0].iov_len =3D dpp_build_header(netdev_get_address(dpp->netdev),
++				dpp->auth_addr,
++				DPP_FRAME_AUTHENTICATION_REQUEST, hdr);
++	iov[0].iov_base =3D hdr;
++
++	ptr +=3D dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH,
++				dpp->peer_boot_hash, 32);
++	ptr +=3D dpp_append_attr(ptr, DPP_ATTR_INITIATOR_BOOT_KEY_HASH,
++				dpp->own_boot_hash, 32);
++	ptr +=3D dpp_append_attr(ptr, DPP_ATTR_INITIATOR_PROTOCOL_KEY,
++				i_proto_key, dpp->key_len * 2);
++	ptr +=3D dpp_append_attr(ptr, DPP_ATTR_PROTOCOL_VERSION, &version, 1);
++
++	if (dpp->current_freq !=3D dpp->new_freq) {
++		uint8_t pair[2] =3D { 81,
++				band_freq_to_channel(dpp->new_freq, NULL) };
++
++		ptr +=3D dpp_append_attr(ptr, DPP_ATTR_CHANNEL, pair, 2);
++	}
++
++	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, ptr - attrs,
++			ptr, sizeof(attrs), dpp->k1, dpp->key_len, 2,
++			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
++			DPP_ATTR_INITIATOR_CAPABILITIES, 1, &dpp->role);
++
++	iov[1].iov_base =3D attrs;
++	iov[1].iov_len =3D ptr - attrs;
++
++	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
++}
++
+ static void dpp_roc_started(void *user_data)
+ {
+ 	struct dpp_sm *dpp =3D user_data;
+@@ -1574,6 +1643,300 @@ auth_request_failed:
+ 	dpp_free_auth_data(dpp);
+ }
  =
 
-diff --git a/src/iwd.network.rst b/src/iwd.network.rst
-index e3d1a90a..34f8de1a 100644
---- a/src/iwd.network.rst
-+++ b/src/iwd.network.rst
-@@ -179,7 +179,11 @@ Network Authentication Settings
- -------------------------------
++static void dpp_send_authenticate_confirm(struct dpp_sm *dpp)
++{
++	uint8_t hdr[32];
++	struct iovec iov[2];
++	uint8_t attrs[256];
++	uint8_t *ptr =3D attrs;
++	uint8_t zero =3D 0;
++
++	iov[0].iov_len =3D dpp_build_header(netdev_get_address(dpp->netdev),
++					dpp->auth_addr,
++					DPP_FRAME_AUTHENTICATION_CONFIRM, hdr);
++	iov[0].iov_base =3D hdr;
++
++	ptr +=3D dpp_append_attr(ptr, DPP_ATTR_STATUS, &zero, 1);
++	ptr +=3D dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH,
++					dpp->peer_boot_hash, 32);
++
++	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, ptr - attrs, ptr,
++			sizeof(attrs), dpp->ke, dpp->key_len, 1,
++			DPP_ATTR_INITIATOR_AUTH_TAG, dpp->key_len,
++			dpp->auth_tag);
++
++	iov[1].iov_base =3D attrs;
++	iov[1].iov_len =3D ptr - attrs;
++
++	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
++}
++
++static void authenticate_response(struct dpp_sm *dpp, const uint8_t *from,
++					const uint8_t *body, size_t body_len)
++{
++	struct dpp_attr_iter iter;
++	enum dpp_attribute_type type;
++	size_t len;
++	const uint8_t *data;
++	int status =3D -1;
++	const void *r_boot_hash =3D NULL;
++	const void *r_proto =3D NULL;
++	size_t r_proto_len =3D 0;
++	const void *wrapped =3D NULL;
++	size_t wrapped_len;
++	uint8_t *unwrapped;
++	const void *r_nonce =3D NULL;
++	const void *i_nonce =3D NULL;
++	const void *r_auth =3D NULL;
++	struct l_ecc_point *r_proto_key;
++	struct l_ecc_scalar *n;
++	const void *ad0 =3D body + 2;
++	const void *ad1 =3D body + 8;
++	uint64_t r_auth_derived[L_ECC_MAX_DIGITS];
++
++	l_debug("Authenticate response");
++
++	if (dpp->state !=3D DPP_STATE_AUTHENTICATING)
++		return;
++
++	if (dpp->role !=3D DPP_CAPABILITY_CONFIGURATOR)
++		return;
++
++	if (!dpp->freqs)
++		return;
++
++	if (memcmp(from, dpp->auth_addr, 6))
++		return;
++
++	dpp_attr_iter_init(&iter, body + 8, body_len - 8);
++
++	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
++		switch (type) {
++		case DPP_ATTR_STATUS:
++			if (len !=3D 1)
++				return;
++
++			status =3D l_get_u8(data);
++			break;
++		case DPP_ATTR_RESPONDER_BOOT_KEY_HASH:
++			r_boot_hash =3D data;
++			break;
++		case DPP_ATTR_RESPONDER_PROTOCOL_KEY:
++			r_proto =3D data;
++			r_proto_len =3D len;
++			break;
++		case DPP_ATTR_PROTOCOL_VERSION:
++			if (len !=3D 1 || l_get_u8(data) !=3D 2)
++				return;
++			break;
++		case DPP_ATTR_WRAPPED_DATA:
++			wrapped =3D data;
++			wrapped_len =3D len;
++			break;
++		default:
++			break;
++		}
++	}
++
++	if (status !=3D DPP_STATUS_OK || !r_boot_hash || !r_proto ) {
++		l_debug("Auth response bad status or missing attributes");
++		return;
++	}
++
++	r_proto_key =3D l_ecc_point_from_data(dpp->curve, L_ECC_POINT_TYPE_FULL,
++						r_proto, r_proto_len);
++	if (!r_proto_key) {
++		l_debug("Peers protocol key was invalid");
++		return;
++	}
++
++	n =3D dpp_derive_k2(r_proto_key, dpp->proto_private, dpp->k2);
++
++	unwrapped =3D dpp_unwrap_attr(ad0, 6, ad1, wrapped - 4 - ad1, dpp->k2,
++					dpp->key_len, wrapped, wrapped_len,
++					&wrapped_len);
++	if (!unwrapped) {
++		l_debug("Failed to unwrap primary data");
++		return;
++	}
++
++	wrapped =3D NULL;
++
++	dpp_attr_iter_init(&iter, unwrapped, wrapped_len);
++
++	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
++		switch (type) {
++		case DPP_ATTR_RESPONDER_NONCE:
++			if (len !=3D dpp->nonce_len)
++				return;
++
++			r_nonce =3D data;
++			break;
++		case DPP_ATTR_INITIATOR_NONCE:
++			if (len !=3D dpp->nonce_len)
++				return;
++
++			i_nonce =3D data;
++			break;
++		case DPP_ATTR_RESPONDER_CAPABILITIES:
++			break;
++		case DPP_ATTR_WRAPPED_DATA:
++			wrapped =3D data;
++			wrapped_len =3D len;
++			break;
++		default:
++			break;
++		}
++	}
++
++	if (!r_nonce || !i_nonce || !wrapped) {
++		l_debug("Wrapped data missing attributes");
++		return;
++	}
++
++	if (!dpp_derive_ke(i_nonce, r_nonce, dpp->m, n, dpp->ke)) {
++		l_debug("Failed to derive ke");
++		return;
++	}
++
++	unwrapped =3D dpp_unwrap_attr(NULL, 0, NULL, 0, dpp->ke, dpp->key_len,
++					wrapped, wrapped_len, &wrapped_len);
++	if (!unwrapped) {
++		l_debug("Failed to unwrap secondary data");
++		return;
++	}
++
++	dpp_attr_iter_init(&iter, unwrapped, wrapped_len);
++
++	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
++		switch (type) {
++		case DPP_ATTR_RESPONDER_AUTH_TAG:
++			if (len !=3D dpp->key_len)
++				return;
++
++			r_auth =3D data;
++			break;
++		default:
++			break;
++		}
++	}
++
++	if (!r_auth) {
++		l_debug("R-Auth was not in secondary wrapped data");
++		return;
++	}
++
++	if (!dpp_derive_r_auth(i_nonce, r_nonce, dpp->nonce_len,
++				dpp->own_proto_public, r_proto_key,
++				dpp->peer_boot_public, r_auth_derived)) {
++		l_debug("Failed to derive r_auth");
++		return;
++	}
++
++	if (memcmp(r_auth, r_auth_derived, dpp->key_len)) {
++		l_debug("R-Auth did not verify");
++		return;
++	}
++
++	if (!dpp_derive_i_auth(r_nonce, i_nonce, dpp->nonce_len,
++				r_proto_key, dpp->own_proto_public,
++				dpp->peer_boot_public, dpp->auth_tag)) {
++		l_debug("Could not derive I-Auth");
++		return;
++	}
++
++	dpp->current_freq =3D dpp->new_freq;
++
++	dpp_send_authenticate_confirm(dpp);
++}
++
++static void dpp_handle_presence_announcement(struct dpp_sm *dpp,
++						const uint8_t *from,
++						const uint8_t *body,
++						size_t body_len)
++{
++	struct dpp_attr_iter iter;
++	enum dpp_attribute_type type;
++	size_t len;
++	const uint8_t *data;
++	const void *r_boot =3D NULL;
++	size_t r_boot_len =3D 0;
++	uint8_t hash[32];
++
++	l_debug("Presence announcement "MAC, MAC_STR(from));
++
++	/* Must be a configurator, in an initiator role, in PRESENCE state */
++	if (dpp->state !=3D DPP_STATE_PRESENCE)
++		return;
++
++	if (dpp->role !=3D DPP_CAPABILITY_CONFIGURATOR)
++		return;
++
++	if (!dpp->freqs)
++		return;
++
++	/*
++	 * The URI may not have contained a MAC address, if this announcement
++	 * verifies set auth_addr then.
++	 */
++	if (!l_memeqzero(dpp->auth_addr, 6) &&
++				memcmp(from, dpp->auth_addr, 6)) {
++		l_debug("Unexpected source "MAC" expected "MAC, MAC_STR(from),
++						MAC_STR(dpp->auth_addr));
++		return;
++	}
++
++	dpp_attr_iter_init(&iter, body + 8, body_len - 8);
++
++	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
++		switch (type) {
++		case DPP_ATTR_RESPONDER_BOOT_KEY_HASH:
++			r_boot =3D data;
++			r_boot_len =3D len;
++			break;
++		default:
++			break;
++		}
++	}
++
++	if (!r_boot || r_boot_len !=3D 32) {
++		l_debug("No responder boot hash");
++		return;
++	}
++
++	/* Hash what we have for the peer and check its our enrollee */
++	dpp_hash(L_CHECKSUM_SHA256, hash, 2, "chirp", strlen("chirp"),
++			dpp->peer_asn1, dpp->peer_asn1_len);
++
++	if (memcmp(hash, r_boot, sizeof(hash))) {
++		l_debug("Peers boot hash did not match");
++		return;
++	}
++
++	/*
++	 * This is the peer we expected, save away the address and derive the
++	 * initial keys.
++	 */
++	memcpy(dpp->auth_addr, from, 6);
++
++	l_ecdh_generate_key_pair(dpp->curve, &dpp->proto_private,
++					&dpp->own_proto_public);
++	l_getrandom(dpp->i_nonce, dpp->nonce_len);
++
++	dpp->m =3D dpp_derive_k1(dpp->peer_boot_public, dpp->proto_private,
++				dpp->k1);
++
++	dpp->state =3D DPP_STATE_AUTHENTICATING;
++
++	dpp_send_authenticate_request(dpp);
++
++	/*
++	 * Should we wait for an ACK then go offchannel?
++	 */
++	if (dpp->current_freq !=3D dpp->new_freq)
++		dpp_start_offchannel(dpp, dpp->new_freq);
++}
++
+ static void dpp_handle_frame(const struct mmpdu_header *frame,
+ 				const void *body, size_t body_len,
+ 				int rssi, void *user_data)
+@@ -1595,6 +1958,9 @@ static void dpp_handle_frame(const struct mmpdu_heade=
+r *frame,
+ 	case DPP_FRAME_AUTHENTICATION_REQUEST:
+ 		authenticate_request(dpp, frame->address_2, body, body_len);
+ 		break;
++	case DPP_FRAME_AUTHENTICATION_RESPONSE:
++		authenticate_response(dpp, frame->address_2, body, body_len);
++		break;
+ 	case DPP_FRAME_AUTHENTICATION_CONFIRM:
+ 		authenticate_confirm(dpp, frame->address_2, body, body_len);
+ 		break;
+@@ -1602,6 +1968,10 @@ static void dpp_handle_frame(const struct mmpdu_head=
+er *frame,
+ 		dpp_handle_config_result_frame(dpp, frame->address_2,
+ 						body, body_len);
+ 		break;
++	case DPP_FRAME_PRESENCE_ANNOUNCEMENT:
++		dpp_handle_presence_announcement(dpp, frame->address_2,
++							body, body_len);
++		break;
+ 	default:
+ 		l_debug("Unhandled DPP frame %u", *ptr);
+ 		break;
+@@ -1829,9 +2199,48 @@ static struct l_dbus_message *dpp_dbus_start_enrolle=
+e(struct l_dbus *dbus,
+ 	return NULL;
+ }
  =
 
- The group ``[Security]`` contains settings for Wi-Fi security and
--authentication configuration.
-+authentication configuration. This group can be encrypted by enabling
-+``SystemdEncrypt``, see *iwd.config* for details on this option. If this s=
-ection
-+is encrypted (only contains EncryptedSalt/EncryptedSecurity) it should not=
- be
-+modified. Modifying these values will result in the inability to connect t=
-o that
-+network.
+-static struct l_dbus_message *dpp_dbus_start_configurator(struct l_dbus *d=
+bus,
++/*
++ * Set up the configurator for an initiator role. The configurator
++ * will go offchannel to frequencies advertised by the enrollees URI or,
++ * if no channels are provided, use a default channel list.
++ */
++static bool dpp_configurator_start_presence(struct dpp_sm *dpp, const char=
+ *uri)
++{
++	_auto_(l_free) uint32_t *freqs =3D NULL;
++	size_t freqs_len =3D 0;
++	L_AUTO_FREE_VAR(struct dpp_uri_info *, info) =3D NULL;
++
++	info =3D dpp_parse_uri(uri);
++	if (!info)
++		return false;
++
++	if (!l_memeqzero(info->mac, 6))
++		memcpy(dpp->auth_addr, info->mac, 6);
++
++	dpp->peer_boot_public =3D l_ecc_point_clone(info->boot_public);
++	dpp->peer_asn1 =3D dpp_point_to_asn1(info->boot_public,
++						&dpp->peer_asn1_len);
++	if (!dpp->peer_asn1) {
++		l_debug("Peer boot key did not convert to asn1");
++		return false;
++	}
++
++	dpp_hash(L_CHECKSUM_SHA256, dpp->peer_boot_hash, 1, dpp->peer_asn1,
++			dpp->peer_asn1_len);
++
++	if (info->freqs)
++		freqs =3D scan_freq_set_to_fixed_array(info->freqs, &freqs_len);
++
++	dpp_start_presence(dpp, freqs, freqs_len);
++
++	return true;
++}
++
++static struct l_dbus_message *dpp_start_configurator_common(
++						struct l_dbus *dbus,
+ 						struct l_dbus_message *message,
+-						void *user_data)
++						void *user_data,
++						bool responder)
+ {
+ 	struct dpp_sm *dpp =3D user_data;
+ 	struct l_dbus_message *reply;
+@@ -1840,6 +2249,7 @@ static struct l_dbus_message *dpp_dbus_start_configur=
+ator(struct l_dbus *dbus,
+ 	struct network *network;
+ 	struct l_settings *settings;
+ 	struct handshake_state *hs =3D netdev_get_handshake(dpp->netdev);
++	const char *uri;
  =
 
- .. list-table::
-    :header-rows: 0
+ 	/*
+ 	 * For now limit the configurator to only configuring enrollees to the
+@@ -1863,13 +2273,23 @@ static struct l_dbus_message *dpp_dbus_start_config=
+urator(struct l_dbus *dbus,
+ 	if (dpp->state !=3D DPP_STATE_NOTHING)
+ 		return dbus_error_busy(message);
+ =
+
++	if (!responder) {
++		if (!l_dbus_message_get_arguments(message, "s", &uri))
++			return dbus_error_invalid_args(message);
++
++		if (!dpp_configurator_start_presence(dpp, uri))
++			return dbus_error_invalid_args(message);
++
++		dpp->new_freq =3D bss->frequency;
++	} else
++		dpp->current_freq =3D bss->frequency;
++
+ 	dpp->uri =3D dpp_generate_uri(dpp->own_asn1, dpp->own_asn1_len, 2,
+ 					netdev_get_address(dpp->netdev),
+ 					&bss->frequency, 1, NULL, NULL);
+ =
+
+ 	dpp->state =3D DPP_STATE_PRESENCE;
+ 	dpp->role =3D DPP_CAPABILITY_CONFIGURATOR;
+-	dpp->current_freq =3D bss->frequency;
+ 	dpp->config =3D dpp_configuration_new(settings,
+ 						network_get_ssid(network),
+ 						hs->akm_suite);
+@@ -1885,6 +2305,20 @@ static struct l_dbus_message *dpp_dbus_start_configu=
+rator(struct l_dbus *dbus,
+ 	return reply;
+ }
+ =
+
++static struct l_dbus_message *dpp_dbus_start_configurator(struct l_dbus *d=
+bus,
++						struct l_dbus_message *message,
++						void *user_data)
++{
++	return dpp_start_configurator_common(dbus, message, user_data, true);
++}
++
++static struct l_dbus_message *dpp_dbus_configure_enrollee(struct l_dbus *d=
+bus,
++						struct l_dbus_message *message,
++						void *user_data)
++{
++	return dpp_start_configurator_common(dbus, message, user_data, false);
++}
++
+ static struct l_dbus_message *dpp_dbus_stop(struct l_dbus *dbus,
+ 						struct l_dbus_message *message,
+ 						void *user_data)
+@@ -1902,6 +2336,8 @@ static void dpp_setup_interface(struct l_dbus_interfa=
+ce *interface)
+ 				dpp_dbus_start_enrollee, "s", "", "uri");
+ 	l_dbus_interface_method(interface, "StartConfigurator", 0,
+ 				dpp_dbus_start_configurator, "s", "", "uri");
++	l_dbus_interface_method(interface, "ConfigureEnrollee", 0,
++				dpp_dbus_configure_enrollee, "", "s", "uri");
+ 	l_dbus_interface_method(interface, "Stop", 0,
+ 				dpp_dbus_stop, "", "");
+ }
 -- =
 
 2.31.1
 
---===============1537186113312908384==--
+--===============4869532586383160542==--
 
