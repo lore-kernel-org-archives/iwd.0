@@ -1,45 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============1367285583517653086=="
+Content-Type: multipart/mixed; boundary="===============6943005133774013393=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/8] auto-t: remove waitstatus_to_exitcode for better
- compatibility
-Date: Tue, 22 Mar 2022 15:51:06 -0700
-Message-ID: <20220322225113.1023688-1-prestwoj@gmail.com>
+Subject: Re: [PATCH] eap-pwd: add length checks for fragmented packets
+Date: Thu, 20 Jan 2022 13:51:08 -0600
+Message-ID: <7a2a8f35-a4bb-b837-70e6-aa8bc648bd16@gmail.com>
+In-Reply-To: 20220119181302.2259778-1-prestwoj@gmail.com
 
---===============1367285583517653086==
+--===============6943005133774013393==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This was added in Python 3.9 which isn't always supported. Instead use
-the old way of checking the return status.
----
- autotests/testNetconfig/connection_test.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNet=
-config/connection_test.py
-index 8eeffbbd..17788011 100644
---- a/autotests/testNetconfig/connection_test.py
-+++ b/autotests/testNetconfig/connection_test.py
-@@ -41,7 +41,8 @@ class Test(unittest.TestCase):
- =
+On 1/19/22 12:13, James Prestwood wrote:
+> ---
+>   src/eap-pwd.c | 14 ++++++++++++++
+>   1 file changed, 14 insertions(+)
+> =
 
-         time.sleep(2)
-         ret =3D os.system('ip addr show ' + device.name + ' | grep \'inet6=
- 3ffe:501:ffff:100::\'')
--        self.assertEqual(os.waitstatus_to_exitcode(ret), 0)
-+        self.assertTrue(os.WIFEXITED(ret))
-+        self.assertEqual(os.WEXITSTATUS(ret), 0)
- =
 
-         device.disconnect()
- =
+Applied, thanks.
 
--- =
+Regards,
+-Denis
 
-2.34.1
-
---===============1367285583517653086==--
+--===============6943005133774013393==--
 
