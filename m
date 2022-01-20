@@ -1,59 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============5841697324665036857=="
+Content-Type: multipart/mixed; boundary="===============5679291934477181718=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 06/10] auto-t: iwd.py: allow passing uri to
- start_configurator
-Date: Mon, 14 Feb 2022 13:48:05 -0800
-Message-ID: <20220214214809.1017870-6-prestwoj@gmail.com>
-In-Reply-To: 20220214214809.1017870-1-prestwoj@gmail.com
+Subject: [PATCH v2 09/10] auto-t: add test for IWD as configurator + initiator
+Date: Thu, 20 Jan 2022 15:44:14 -0800
+Message-ID: <20220120234415.2469451-9-prestwoj@gmail.com>
+In-Reply-To: 20220120234415.2469451-1-prestwoj@gmail.com
 
---===============5841697324665036857==
+--===============5679291934477181718==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If a URI is passed this will envoke ConfigureEnrollee()
 ---
- autotests/util/iwd.py | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ autotests/testDPP/connection_test.py | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 170dd96b..d6620da5 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -280,8 +280,11 @@ class DeviceProvisioning(IWDDBusAbstract):
-     def start_enrollee(self):
-         return self._iface.StartEnrollee()
+diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
+ction_test.py
+index 38d44b25..160e533e 100644
+--- a/autotests/testDPP/connection_test.py
++++ b/autotests/testDPP/connection_test.py
+@@ -82,6 +82,22 @@ class Test(unittest.TestCase):
  =
 
--    def start_configurator(self):
--        return self._iface.StartConfigurator()
-+    def start_configurator(self, uri=3DNone):
-+        if uri:
-+            return self._iface.ConfigureEnrollee(uri)
-+        else:
-+            return self._iface.StartConfigurator()
+         self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
  =
 
-     def stop(self):
-         self._iface.Stop()
-@@ -668,8 +671,8 @@ class Device(IWDDBusAbstract):
-     def dpp_start_enrollee(self):
-         return self._device_provisioning.start_enrollee()
- =
-
--    def dpp_start_configurator(self):
--        return self._device_provisioning.start_configurator()
-+    def dpp_start_configurator(self, uri=3DNone):
-+        return self._device_provisioning.start_configurator(uri)
- =
-
-     def dpp_stop(self):
-         return self._device_provisioning.stop()
++    def test_iwd_as_configurator_initiator(self):
++        self.hapd.reload()
++        self.hapd.wait_for_event('AP-ENABLED')
++
++        IWD.copy_to_storage('ssidCCMP.psk')
++        self.device.autoconnect =3D True
++
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
++
++        uri =3D self.wpas.dpp_enrollee_start(oper_and_channel=3D'81/2')
++
++        self.device.dpp_start_configurator(uri)
++
++        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
++
+     def setUp(self):
+         self.wd =3D IWD(True)
+         self.device =3D self.wd.list_devices(1)[0]
 -- =
 
-2.34.1
+2.31.1
 
---===============5841697324665036857==--
+--===============5679291934477181718==--
 
