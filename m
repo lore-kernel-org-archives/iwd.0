@@ -1,74 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============6401000533043354744=="
+Content-Type: multipart/mixed; boundary="===============3684627820033036871=="
 MIME-Version: 1.0
-From: KeithG <ys3al35l at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Scan while AP - testing
-Date: Wed, 23 Feb 2022 19:08:22 -0600
-Message-ID: <CAG17S_P5dNR4BpKuBLcr14tRcMCGP2eost4Fjk4Ef2GUYhuUQw@mail.gmail.com>
-In-Reply-To: 06c90e881297acf641205d0a4360bbe1380d92cf.camel@gmail.com
+Subject: Re: [PATCH 06/12] frame-xchg: set allow multicast flag
+Date: Thu, 20 Jan 2022 14:17:13 -0600
+Message-ID: <0ad74b26-9ea4-d703-7026-fb4eb6ef9ecc@gmail.com>
+In-Reply-To: 20220118212512.2017977-6-prestwoj@gmail.com
 
---===============6401000533043354744==
+--===============3684627820033036871==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I applied James' latest suggested patches and was trying to see how this wo=
-rks.
+Hi James,
 
-IWD starts and I can get into AP mode and can connect. I tried connman
-to see if it would scan and got no response.  So I went into iwctl to
-see and saw this:
+On 1/18/22 15:25, James Prestwood wrote:
+> Receiving multicast frames is required by DPP
+> ---
+>   src/frame-xchg.c | 1 +
+>   1 file changed, 1 insertion(+)
+> =
 
-Access Point:
-  ap list                                           List devices in AP mode
-  ap <wlan> start <"network name"> <passphrase>     Start an access point
-                                                    called "network name" w=
-ith
-                                                    a passphrase
-  ap <wlan> start-profile <"network name">          Start an access
-point based on a disk profile
-  ap <wlan> stop                                    Stop a started access
-                                                    point
-  ap <wlan> show                                    Show AP info
-  ap <wlan> scan                                    Start an AP scan
-  ap <wlan> get-networks                            Get network list
-after scanning
+> diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+> index 5ba36081..95c030d8 100644
+> --- a/src/frame-xchg.c
+> +++ b/src/frame-xchg.c
+> @@ -611,6 +611,7 @@ bool frame_watch_add(uint64_t wdev_id, uint32_t group=
+_id, uint16_t frame_type,
+>   =
 
-looking good, but tried it and did not get anything:
+>   	l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &wdev_id);
+>   	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_TYPE, 2, &frame_type);
+> +	l_genl_msg_append_attr(msg, NL80211_ATTR_RECEIVE_MULTICAST, 0, NULL);
 
-[iwd]# ap wlan0 show
-                             Access Point Interface
----------------------------------------------------------------------------=
------
-  Settable  Property            Value
----------------------------------------------------------------------------=
------
-            Started             yes
-            Name                RuneAudioAP
-            Scanning            no
+Should this be opt-in?  You may want to audit all uses of frame_watch_add t=
+o see =
 
-                                    Client 0
----------------------------------------------------------------------------=
------
-            Property            Value
----------------------------------------------------------------------------=
------
-            Address             60:f2:62:ae:70:fe
-            TxBitrate           54000                Kbit/s
-            RxBitrate           54000                Kbit/s
+if they can deal with multicast frames.
 
-[iwd]# ap wlan0 scan
-Operation not supported
-[iwd]# ap wlan0 get-networks
-                                    Networks
----------------------------------------------------------------------------=
------
-            Property            Value
----------------------------------------------------------------------------=
------
+>   	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_MATCH,
+>   				prefix_len, prefix);
+>   =
 
-Is this the 'right way'? Are there more settings I need in my main.conf?
+> =
 
-Keith
---===============6401000533043354744==--
+
+Regards,
+-Denis
+--===============3684627820033036871==--
 
