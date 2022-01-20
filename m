@@ -1,155 +1,96 @@
-Content-Type: multipart/mixed; boundary="===============5676849479649267213=="
+Content-Type: multipart/mixed; boundary="===============6144685556223790230=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 5/5] unit: add checks for improper use of json_iter_parse/next
-Date: Thu, 06 Jan 2022 14:42:16 -0800
-Message-ID: <20220106224216.569171-5-prestwoj@gmail.com>
-In-Reply-To: 20220106224216.569171-1-prestwoj@gmail.com
+Subject: Re: [PATCH 02/12] dpp-util: add dpp_point_from_asn1()
+Date: Thu, 20 Jan 2022 15:13:09 -0800
+Message-ID: <93832ad490885f1f8e86c5c938936bb0ab606e20.camel@gmail.com>
+In-Reply-To: bfbe6420-c777-a368-8bb2-1c7776bec48b@gmail.com
 
---===============5676849479649267213==
+--===============6144685556223790230==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds checks to make sure these API's don't operate on
-objects/primitives they aren't supposed to.
----
- unit/test-json.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+On Thu, 2022-01-20 at 14:10 -0600, Denis Kenzior wrote:
+> Hi James,
+> =
 
-diff --git a/unit/test-json.c b/unit/test-json.c
-index fb87987d..0d48b3d1 100644
---- a/unit/test-json.c
-+++ b/unit/test-json.c
-@@ -225,12 +225,14 @@ static void check_primitives(struct json_iter *i, str=
-uct json_iter *ui,
- 	assert(!json_iter_get_uint(i, NULL));
- 	assert(!json_iter_get_boolean(i, NULL));
- 	assert(!json_iter_get_null(i));
-+	assert(!json_iter_next(i));
- 	assert(json_iter_get_int(i, &i_val));
- 	assert(i_val =3D=3D -10);
- =
+> On 1/18/22 15:25, James Prestwood wrote:
+> > Given an ASN1 blob of the right form, parse and create
+> > an l_ecc_point object. The form used is specific to DPP
+> > hence why this isn't general purpose and put into dpp-util.
+> > ---
+> > =C2=A0 src/dpp-util.c | 69
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++
+> > =C2=A0 src/dpp-util.h |=C2=A0 1 +
+> > =C2=A0 2 files changed, 70 insertions(+)
+> > =
 
- 	assert(json_iter_is_valid(ui));
- 	assert(!json_iter_get_boolean(ui, NULL));
- 	assert(!json_iter_get_null(ui));
-+	assert(!json_iter_next(ui));
- 	assert(json_iter_get_int(ui, &i_val));
- 	assert(json_iter_get_uint(ui, &ui_val));
- 	assert(i_val =3D=3D 10 && ui_val =3D=3D 10);
-@@ -239,6 +241,7 @@ static void check_primitives(struct json_iter *i, struc=
-t json_iter *ui,
- 	assert(!json_iter_get_null(t));
- 	assert(!json_iter_get_int(t, NULL));
- 	assert(!json_iter_get_uint(t, NULL));
-+	assert(!json_iter_next(t));
- 	assert(json_iter_get_boolean(t, &b_val));
- 	assert(b_val =3D=3D true);
- =
+> =
 
-@@ -246,6 +249,7 @@ static void check_primitives(struct json_iter *i, struc=
-t json_iter *ui,
- 	assert(!json_iter_get_null(f));
- 	assert(!json_iter_get_int(f, NULL));
- 	assert(!json_iter_get_uint(f, NULL));
-+	assert(!json_iter_next(f));
- 	assert(json_iter_get_boolean(f, &b_val));
- 	assert(b_val =3D=3D false);
- =
+> <snip>
+> =
 
-@@ -253,10 +257,12 @@ static void check_primitives(struct json_iter *i, str=
-uct json_iter *ui,
- 	assert(!json_iter_get_int(null, NULL));
- 	assert(!json_iter_get_uint(null, NULL));
- 	assert(!json_iter_get_boolean(null, NULL));
-+	assert(!json_iter_next(null));
- 	assert(json_iter_get_null(null));
- =
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* BITSTRING */
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0key_data =3D asn1_der_find_e=
+lem(outer_seq, outer_len, 1,
+> > &tag, &elen);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!key_data || tag !=3D AS=
+N1_ID_BIT_STRING || elen < 34)
+> =
 
- 	if (obj) {
- 		assert(json_iter_is_valid(obj));
-+		assert(!json_iter_next(obj));
- 		assert(json_iter_parse(obj,
- 			JSON_MANDATORY("null_val", JSON_PRIMITIVE, null),
- 			JSON_MANDATORY("false_val", JSON_PRIMITIVE, f),
-@@ -336,6 +342,7 @@ static void test_json_arrays(const void *data)
- =
+> Why 34? Aren't you only concerned that elen >=3D 2?
 
- 	while (json_iter_next(&ui_array)) {
- 		assert(json_iter_get_type(&ui_array) =3D=3D JSON_PRIMITIVE);
-+		assert(!json_iter_parse(&ui_array, JSON_UNDEFINED));
- 		assert(json_iter_get_uint(&ui_array, &ui));
- 		assert(ui =3D=3D (unsigned int) count);
- 		count++;
-@@ -345,6 +352,7 @@ static void test_json_arrays(const void *data)
- =
+Yes, thats right.
 
- 	while (json_iter_next(&i_array)) {
- 		assert(json_iter_get_type(&i_array) =3D=3D JSON_PRIMITIVE);
-+		assert(!json_iter_parse(&i_array, JSON_UNDEFINED));
- 		assert(json_iter_get_int(&i_array, &i));
- 		assert(i =3D=3D count);
- 		count--;
-@@ -354,6 +362,7 @@ static void test_json_arrays(const void *data)
- =
+> =
 
- 	while (json_iter_next(&b_array)) {
- 		assert(json_iter_get_type(&b_array) =3D=3D JSON_PRIMITIVE);
-+		assert(!json_iter_parse(&b_array, JSON_UNDEFINED));
- 		assert(json_iter_get_boolean(&b_array, &b));
- 		assert(b =3D=3D count % 2 ? false : true);
- 		count++;
-@@ -363,6 +372,7 @@ static void test_json_arrays(const void *data)
- =
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0return NULL;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0curve =3D l_ecc_curve_from_i=
+ke_group(curve_num);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!curve)
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0return NULL;
+> =
 
- 	while (json_iter_next(&n_array)) {
- 		assert(json_iter_get_type(&n_array) =3D=3D JSON_PRIMITIVE);
-+		assert(!json_iter_parse(&n_array, JSON_UNDEFINED));
- 		assert(json_iter_get_null(&n_array));
- 		count++;
- 	}
-@@ -407,6 +417,8 @@ static void test_json_arrays(const void *data)
- =
+> Perhaps this check should be moved up?
+> =
 
- 	count =3D 0;
- =
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return l_ecc_point_from_data=
+(curve, key_data[1],
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0key_data + 2, elen - 2);
+> =
 
-+	assert(!json_iter_parse(&obj_array, JSON_UNDEFINED));
-+
- 	while (json_iter_next(&obj_array)) {
- 		struct json_iter object;
- =
+> Aren't you relying on ecc_point_from_data to validate the length?=C2=A0
+> Hence the =
 
-@@ -475,17 +487,19 @@ static void test_json_nested_arrays(const void *data)
- 			count2++;
- 		}
- =
+> unnecessary '34' magic number above?
+> =
 
--		/*
--		 * TODO: add checks for object iteration. Currently these will
--		 * just count all tokens in the object.
--		 */
- 		switch (count) {
- 		case 0:
- 			assert(count2 =3D=3D 0);
- 			break;
-+		case 1:
-+			assert(count2 =3D=3D 0);
-+			break;
- 		case 2:
- 			assert(count2 =3D=3D 2);
- 			break;
-+		case 3:
-+			assert(count2 =3D=3D 0);
-+			break;
- 		case 4:
- 			assert(count2 =3D=3D 2);
- 			break;
--- =
+> Should ecc_point_from_data also validate that all of the data passed
+> in was =
 
-2.31.1
+> consumed?=C2=A0 Or maybe return the number of bytes consumed so that we
+> can validate =
 
---===============5676849479649267213==--
+> it here?
+
+I think changing point_from_data to require a strict length is fine,
+and probably the best route. Only other way would be to manually check
+before calling it.
+
+> =
+
+> Regards,
+> -Denis
+
+
+--===============6144685556223790230==--
 
