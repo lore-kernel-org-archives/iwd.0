@@ -1,28 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============2870610977668159138=="
+Content-Type: multipart/mixed; boundary="===============4146863532777767392=="
 MIME-Version: 1.0
-From: zlinuxboy at outlook.com
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: How to run separate iwd for every wifi dongle on the same host?
-Date: Thu, 21 Apr 2022 01:40:34 +0000
-Message-ID: <20220421014034.2318.714@ml01.vlan13.01.org>
+Subject: [PATCH v2 08/10] auto-t: wpas.py: handle enrollee as responder
+Date: Thu, 20 Jan 2022 15:44:13 -0800
+Message-ID: <20220120234415.2469451-8-prestwoj@gmail.com>
+In-Reply-To: 20220120234415.2469451-1-prestwoj@gmail.com
 
---===============2870610977668159138==
+--===============4146863532777767392==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I am trying to plug 3 wifi dongle into one SBC(odroid c2 running armbian 22=
-.01), wish to run separate iwd instance for each wifi dongle, in order to c=
-onnect different ssid and acquire dhcp ip address and assign to them.
+This adds support for wpa_supplicant to generate its own URI and
+start presence announcements (DPP_CHIRP).
+---
+ autotests/util/wpas.py | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-I have successfully implement with systemd-networkd+vrf+iwd, assign three w=
-ifi dongle to different vrf. start iwd, all three wifi dongle could connect=
- to the same ssid and get different ip with dhcp, including default route.
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index c8e65179..995bdad1 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -239,10 +239,17 @@ class Wpas:
+     def set(self, key, value, **kwargs):
+         self._ctrl_request('SET ' + key + ' ' + value, **kwargs)
+ =
 
-but when I assign different wifi dongle to the same ssid  with different ps=
-k(my ap is aerohive, support ppsk, everything user have a different private=
- key. cisco, ruckus, aruba has such the same feature), iwd could not save t=
-he multiple config for the same ssid, because the same ssid share one confi=
-g. so any possible to run separate iwd for every wifi dongle?
---===============2870610977668159138==--
+-    def dpp_enrollee_start(self, uri=3DNone):
++    def dpp_enrollee_start(self, uri=3DNone, oper_and_channel=3DNone):
++        if not oper_and_channel:
++            oper_and_channel =3D '81/1'
++
+         self._rx_data =3D []
+-        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode')
+-        self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode chan=3D%s' % o=
+per_and_channel)
++        self._dpp_qr_id =3D self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GET_URI %s' % self._dpp_qr_id)
++        self._dpp_uri =3D self.wait_for_result()
++
++        print("DPP Enrollee QR: %s" % self._dpp_uri)
+ =
+
+         if uri:
+             self._rx_data =3D []
+@@ -250,6 +257,10 @@ class Wpas:
+             self._dpp_qr_id =3D self.wait_for_result()
+             self._rx_data =3D []
+             self._ctrl_request('DPP_AUTH_INIT peer=3D%s role=3Denrollee' %=
+ self._dpp_qr_id)
++        else:
++            self._ctrl_request('DPP_CHIRP own=3D%s iter=3D100' % self._dpp=
+_qr_id)
++
++        return self._dpp_uri
+ =
+
+     def dpp_configurator_create(self, uri):
+         self._rx_data =3D []
+-- =
+
+2.31.1
+
+--===============4146863532777767392==--
 
