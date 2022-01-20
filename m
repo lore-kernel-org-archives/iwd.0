@@ -1,37 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============7943005355300526097=="
+Content-Type: multipart/mixed; boundary="===============4398392312109935479=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v4 01/10] dpp-util: add dpp_point_to_asn1
-Date: Thu, 16 Dec 2021 14:19:03 -0600
-Message-ID: <2f5a9c35-a873-732c-2a83-4b8576b0aa7d@gmail.com>
-In-Reply-To: 20211216180854.39470-1-prestwoj@gmail.com
+Subject: [PATCH v2 10/10] doc: document DPP ConfigureEnrollee()
+Date: Thu, 20 Jan 2022 15:44:15 -0800
+Message-ID: <20220120234415.2469451-10-prestwoj@gmail.com>
+In-Reply-To: 20220120234415.2469451-1-prestwoj@gmail.com
 
---===============7943005355300526097==
+--===============4398392312109935479==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ doc/device-provisioning-api.txt | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-On 12/16/21 12:08, James Prestwood wrote:
-> Converts an l_ecc_point to the DPP ASN.1 structure.
-> ---
->   src/dpp-util.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   src/dpp-util.h |  2 ++
->   2 files changed, 92 insertions(+)
-> =
+diff --git a/doc/device-provisioning-api.txt b/doc/device-provisioning-api.=
+txt
+index bf54c5fe..529aeeb0 100644
+--- a/doc/device-provisioning-api.txt
++++ b/doc/device-provisioning-api.txt
+@@ -37,3 +37,19 @@ Methods		string StartEnrollee()
+ 						net.connman.iwd.NotConfigured
+ 						net.connman.iwd.NotSupported
+ 						net.connman.iwd.Busy
++
++		string ConfigureEnrollee(string uri)
++
++			Start a DPP configurator with an enrollees URI.
++			Ultimately the configuration itself remains the same as
++			StartConfigurator(). This API is to handle the use case
++			where the enrollee has shared its URI to IWD.
++
++			The URI for IWD is also returned which could be used
++			in the same way as it is with StartConfigurator().
++
++			Possible errors:	net.connman.iwd.NotAvailable
++						net.connman.iwd.NotConnected
++						net.connman.iwd.NotConfigured
++						net.connman.iwd.NotSupported
++						net.connman.iwd.Busy
+-- =
 
-> v4:
->   * Removed unneeded length check
->   * Removed '512 bit' OID, this isn't actually a key size
-> =
+2.31.1
 
-
-Applied, thanks.
-
-Regards,
--Denis
-
---===============7943005355300526097==--
+--===============4398392312109935479==--
 
