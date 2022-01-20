@@ -1,52 +1,198 @@
-Content-Type: multipart/mixed; boundary="===============5588217560917968535=="
+Content-Type: multipart/mixed; boundary="===============5234455472161981516=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459 at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
-Date: Tue, 17 May 2022 20:17:28 +0100
-Message-ID: <CACsRnHUpN+fXLekfFKzX4LmJKE_H5thYW9LK-5eXzXtw5Fy0VA@mail.gmail.com>
-In-Reply-To: 04786874-f47b-aaa8-f3f3-1492fd268b01@gmail.com
+Subject: [PATCH v2 03/10] unit: add DPP unit tests for URI parsing
+Date: Thu, 20 Jan 2022 15:44:08 -0800
+Message-ID: <20220120234415.2469451-3-prestwoj@gmail.com>
+In-Reply-To: 20220120234415.2469451-1-prestwoj@gmail.com
 
---===============5588217560917968535==
+--===============5234455472161981516==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+---
+ unit/test-dpp.c | 142 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 142 insertions(+)
 
-On Tue, 17 May 2022 at 19:09, Denis Kenzior <denkenz(a)gmail.com> wrote:
-...
->
-> Actually, that's not our coding style.  We use Linux Kernel style, so it =
-would be:
+diff --git a/unit/test-dpp.c b/unit/test-dpp.c
+index bfe6f747..1803e688 100644
+--- a/unit/test-dpp.c
++++ b/unit/test-dpp.c
+@@ -33,6 +33,134 @@
+ #include "src/util.h"
+ #include "ell/useful.h"
+ =
 
-Sorry about that, I'll fix it up. I saw the functions and assumed
-without checking other `if`'s.
++struct dpp_test_info {
++	const char *uri;
++	bool expect_fail;
++	uint32_t expected_freqs[10];
++	struct dpp_uri_info result;
++};
++
++struct dpp_test_info all_values =3D {
++	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;K:MDkw=
+EwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=
+=3D;;",
++	.result =3D {
++		.mac =3D { 0x52, 0x54, 0x00, 0x58, 0x28, 0xe5 },
++		.version =3D 2,
++	},
++	.expected_freqs =3D { 2412, 5180, 0 }
++};
++
++struct dpp_test_info no_type =3D {
++	.uri =3D "C:81/1;K:shouldnotmatter;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info empty =3D {
++	.uri =3D "DPP:",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info no_key =3D {
++	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info data_after_terminator =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0NjlkIA=3D;;C:81/1;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info single_terminator =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0NjlkIA=3D;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info no_terminator =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0NjlkIA=3D",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info bad_key =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info unexpected_id =3D {
++	.uri =3D "DPP:Z:somedata;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoI=
+RIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info bad_channels[] =3D {
++	{
++		.uri =3D "DPP:C:;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQ=
+MV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWG=
+oQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPW=
+GoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/1,;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRI=
+PWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/1,81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZo=
+IRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/1,/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIR=
+IPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++};
++
++static bool verify_info(const struct dpp_uri_info *parsed,
++			const struct dpp_test_info *result)
++{
++	const struct dpp_uri_info *expected =3D &result->result;
++	uint32_t i;
++
++	assert(!memcmp(parsed->mac, expected->mac, 6));
++	assert(parsed->version =3D=3D expected->version);
++	assert(parsed->boot_public !=3D NULL);
++
++	for (i =3D 0; result->expected_freqs[i]; i++)
++		assert(scan_freq_set_contains(parsed->freqs,
++						result->expected_freqs[i]));
++
++	return true;
++}
++
++static void test_uri_parse(const void *data)
++{
++	const struct dpp_test_info *test_info =3D data;
++	struct dpp_uri_info *info;
++	int ret;
++
++	info =3D dpp_parse_uri(test_info->uri);
++	if (test_info->expect_fail) {
++		assert(info =3D=3D NULL);
++		return;
++	}
++
++	assert(ret =3D=3D 0);
++
++	assert(verify_info(info, test_info));
++
++	dpp_free_uri_info(info);
++}
++
++
++static void test_bad_channels(const void *data)
++{
++	unsigned int i;
++
++	for (i =3D 0; i < L_ARRAY_SIZE(bad_channels); i++)
++		test_uri_parse(&bad_channels[i]);
++}
++
+ /*
+  * B.2 Test Vectors for DPP Authentication Using P-256 for
+  * Responder-only Authentication
+@@ -148,5 +276,19 @@ int main(int argc, char *argv[])
+ 		l_test_add("DPP test key derivation",
+ 						test_key_derivation, NULL);
+ =
 
-> This changes the semantics slightly.  In our wiki, etc we show IWD_DHCP_D=
-EBUG
-> with value "1" to enable debugging, so I think we should be nice and keep=
- that
-> behavior if possible.  How about:
->
-> if IWD_DHCP_DEBUG is not set, use L_LOG_WARNING.
->
-> If IWD_DHCP_DEBUG is set and has a non-NULL value, use L_LOG_DEBUG
->
-> If the value above is from the set L_LOG_ERR .. L_LOG_DEBUG (3 .. 7), the=
-n use that.
++	l_test_add("DPP URI parse", test_uri_parse, &all_values);
++	l_test_add("DPP URI no type", test_uri_parse, &no_type);
++	l_test_add("DPP URI empty", test_uri_parse, &empty);
++	l_test_add("DPP URI no key", test_uri_parse, &no_key);
++	l_test_add("DPP URI data after terminator", test_uri_parse,
++				&data_after_terminator);
++	l_test_add("DPP URI single terminator", test_uri_parse,
++				&single_terminator);
++	l_test_add("DPP URI no terminator", test_uri_parse,
++				&no_terminator);
++	l_test_add("DPP URI bad key", test_uri_parse, &bad_key);
++	l_test_add("DPP URI bad channels", test_bad_channels, &bad_channels);
++	l_test_add("DPP URI unexpected ID", test_uri_parse, &unexpected_id);
++
+ 	return l_test_run();
+ }
+-- =
 
-I made this change but it seems quite difficult to explain in a
-reasonable way to the user why the values are 3, 4, 6, and 7.
-How about using strings instead? `info`, `warn`, `error`, `debug`?
-That still allows us to keep the old behavior if it's a `1`.
+2.31.1
 
-I'm also questioning if I should keep the L_LOG_WARN as the default or
-make it L_LOG_INFO which is more in line with what I intended when I
-started (i.e. not setting the env should result in similar output to
-other DHCP clients). Do you prefer WARN?
-
-Regards,
-Michael
---===============5588217560917968535==--
+--===============5234455472161981516==--
 
