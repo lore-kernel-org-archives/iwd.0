@@ -1,34 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============1392231484792796052=="
+Content-Type: multipart/mixed; boundary="===============7448424644034484079=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] netdev: add SA Query delay with OCV enabled
-Date: Tue, 26 Oct 2021 17:24:00 -0500
-Message-ID: <efe70da2-2e33-ff57-f298-4486c3e2aba0@gmail.com>
-In-Reply-To: 20211026222427.1264435-1-prestwoj@gmail.com
+Subject: [PATCH 3/3] p2p: Fix ie_tlv_extract_wfd_payload call typo
+Date: Fri, 21 Jan 2022 11:24:39 +0100
+Message-ID: <20220121102439.267357-3-andrew.zaborowski@intel.com>
+In-Reply-To: 20220121102439.267357-1-andrew.zaborowski@intel.com
 
---===============1392231484792796052==
+--===============7448424644034484079==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+WFD couldn't have worked with this typo, I must have introduced it
+when generating patches somehow.
 
-On 10/26/21 5:24 PM, James Prestwood wrote:
-> The way a SA Query was done following a channel switch was slightly
-> incorrect. One because it is only needed when OCVC is set, and two
-> because IWD was not waiting a random delay between 0 and 5000us as
-> lined out by the spec. This patch fixes both these issues.
-> ---
->   src/netdev.c | 32 +++++++++++++++++++++++++++++++-
->   1 file changed, 31 insertions(+), 1 deletion(-)
-> =
+ src/p2p.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/src/p2p.c b/src/p2p.c
+index a66f71e2..4c90efb6 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -938,7 +938,7 @@ static void p2p_group_event(enum ap_event_type type, co=
+nst void *event_data,
+ 		p2p_clear_association_req(&req_info);
+ =
 
-Applied, thanks.
+ 		if (dev->conn_own_wfd)
+-			wfd_data =3D ie_tlv_extract_p2p_payload(data->assoc_ies,
++			wfd_data =3D ie_tlv_extract_wfd_payload(data->assoc_ies,
+ 							data->assoc_ies_len,
+ 							&wfd_data_len);
+ =
 
-Regards,
--Denis
+-- =
 
---===============1392231484792796052==--
+2.32.0
+
+--===============7448424644034484079==--
 
