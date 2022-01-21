@@ -1,108 +1,167 @@
-Content-Type: multipart/mixed; boundary="===============4705358629074154645=="
+Content-Type: multipart/mixed; boundary="===============3540728916077606071=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 1/7] ie: add ie_parse_owe_transition_from_data
-Date: Wed, 15 Sep 2021 16:05:42 -0700
-Message-ID: <20210915230548.179425-1-prestwoj@gmail.com>
+Subject: Re: [RFC 0/2] Encrypt secrets using systemd provided key
+Date: Fri, 21 Jan 2022 12:19:16 -0800
+Message-ID: <6c282c5ba41e220c4cd862ee920b7164618e4390.camel@gmail.com>
+In-Reply-To: 358D320D-57E1-45B2-9EED-EC848D10EF5A@holtmann.org
 
---===============4705358629074154645==
+--===============3540728916077606071==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a parser for the WFA OWE Transition element. For now the
-optional band/channel bytes will not be parsed as hostapd does not
-yet support these and would also require the 802.11 appendix E-1
-to be added to IWD. Because of this OWE Transition networks are
-assumed to be on the same channel as their open counterpart.
----
- src/ie.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- src/ie.h |  4 ++++
- 2 files changed, 48 insertions(+)
+Hi Marcel,
 
-v2:
- * Changed to [static #] to enforce length
+On Fri, 2022-01-21 at 16:20 +0100, Marcel Holtmann wrote:
+> Hi James,
+> =
 
-diff --git a/src/ie.c b/src/ie.c
-index 1ce1d8a5..7f5b33e5 100644
---- a/src/ie.c
-+++ b/src/ie.c
-@@ -1343,6 +1343,8 @@ bool is_ie_wfa_ie(const uint8_t *data, uint8_t len, u=
-int8_t oi_type)
- 		return false;
- 	else if (oi_type =3D=3D IE_WFA_OI_HS20_INDICATION && len !=3D 5 && len !=
-=3D 7)
- 		return false;
-+	else if (oi_type =3D=3D IE_WFA_OI_OWE_TRANSITION && len < 12)
-+		return false;
- 	else if (len < 4) /* OI not handled, but at least check length */
- 		return false;
- =
+> > There has been interest in enabling IWD users to store their
+> > network
+> > credentials in some encrypted form. Recently systemd added support
+> > for
+> > passing secrets/credentials to services only accessible by the
+> > service
+> > they are intended. This provides a clean way of obtaining a secret
+> > key
+> > which IWD can use to encrypt anything it writes to the FS. In
+> > addition
+> > there is no hard dependency on systemd since the credential is
+> > provided
+> > as a file (i.e. no Dbus API or linked library etc).
+> > =
 
-@@ -2492,3 +2494,45 @@ int ie_parse_network_cost(const void *data, size_t l=
-en,
- 	*flags =3D l_get_le16(ie + 8);
- 	return 0;
- }
-+
-+int ie_parse_owe_transition(const void *data, size_t len,
-+				uint8_t bssid[static 6],
-+				char ssid[static 33])
-+{
-+	const uint8_t *ie =3D data;
-+	size_t slen;
-+
-+	if (len < 14 || ie[0] !=3D IE_TYPE_VENDOR_SPECIFIC)
-+		return -ENOMSG;
-+
-+	if (!is_ie_wfa_ie(ie + 2, len - 2, IE_WFA_OI_OWE_TRANSITION))
-+		return -ENOMSG;
-+
-+	slen =3D l_get_u8(ie + 12);
-+	if (slen > 32)
-+		return -ENOMSG;
-+
-+	/*
-+	 * WFA OWE Specification 2.3.1
-+	 *
-+	 * "Band Info and Channel Info are optional fields. If configured,
-+	 * both fields shall be included in an OWE Transition Mode element"
-+	 *
-+	 * TODO: Support Band/Channel bytes:
-+	 * For the time being the OWE transition AP is assumed to be on the same
-+	 * channel as the open AP. This means there should be no band/channel
-+	 * bytes at the end of the IE. Currently hostapd has no support for this
-+	 * so it can be skipped. In addition 802.11 Appendix E-1 needs to be
-+	 * encoded as a table to map Country/operating class to channels to make
-+	 * any sense of it.
-+	 */
-+	if (len !=3D slen + 13)
-+		return -ENOMSG;
-+
-+	memcpy(bssid, ie + 6, 6);
-+
-+	memcpy(ssid, ie + 13, slen);
-+	ssid[slen] =3D '\0';
-+
-+	return 0;
-+}
-diff --git a/src/ie.h b/src/ie.h
-index 4e1c5433..830d6de0 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -630,3 +630,7 @@ void ie_build_fils_ip_addr_response(
- =
+> > At the moment setting up the IWD service to use this feature will
+> > be
+> > left up to the user. But setting this up is very straight forward.
+> > I
+> > used docs for systemd-creds (Example 2):
+> > =
 
- int ie_parse_network_cost(const void *data, size_t len,
- 				uint16_t *flags, uint16_t *level);
-+
-+int ie_parse_owe_transition(const void *data, size_t len,
-+				uint8_t bssid[static 6],
-+				char ssid[static 33]);
--- =
+> > https://www.freedesktop.org/software/systemd/man/systemd-creds.html
+> > =
 
-2.31.1
+> > The only difference is the --name argument should be iwd-secret.
+> > =
 
---===============4705358629074154645==--
+> > Note: systemd version 250 is required.
+> > =
+
+> > The reason this is being sent as an RFC is because of some open
+> > questions
+> > I had and wanted feedback on:
+> > =
+
+> > 1. What options specifically do we want encrypted? These patches
+> > only
+> > =C2=A0=C2=A0 address Passphrase and PreSharedKey but really any option =
+could
+> > be
+> > =C2=A0=C2=A0 encrypted. Obviously we would also want 802.1x secrets, bu=
+t are
+> > there
+> > =C2=A0=C2=A0 other non-obvious options with privacy concerns?
+> =
+
+> we only need to encrypt things that are provided by the user. If we
+> wouldn=E2=80=99t ask the user for it, then it is not worth while protecti=
+ng.
+
+Ok, another option would be encrypting the entire [Security] group and
+assume anything here should be secure. This would actually make things
+quite a bit cleaner, and may be the only solution with how we do the
+802.1x profiles since they are recursive.
+
+> =
+
+> > 2. What is the stance on existing provisioning files? Currently
+> > these
+> > =C2=A0=C2=A0 changes overwrite any existing files with the new *Encrypt=
+ed
+> > options
+> > =C2=A0=C2=A0 automatically. Is this desirable? or should user have to o=
+pt-in
+> > their
+> > =C2=A0=C2=A0 existing provisioning files.
+> =
+
+> The problem arises that you no longer can move from one machine to
+> the next without re-entering your secrets. So I guess this only
+> desirable if the master key is part of your users keyring. If you
+> have 200 PSKs entered and you set up a new machine, you now end up
+> having to re-enter these as you go visiting new networks.
+
+How would this work though? The user would have to either manually
+encrypt the settings/group or have some way to tell IWD to do it?
+
+I think the act of enabling the main.conf option would be enough, and
+we could emphasise this in the docs. Yes this means you cannot go back
+but if you really had 200 profiles you absolutely could not lose you
+probably should have those saved somewhere else, offline.
+
+Also, really the only security benefit (above what we do now) is when
+using a TPM meaning you couldn't move the profiles between machines
+regardless.
+
+> =
+
+> > 3. Is the secret provided via a file enough? (the secret is still
+> > stored
+> > =C2=A0=C2=A0 as plaintext *somewhere*, though systemd limits permission=
+s).
+> > Systemd
+> > =C2=A0=C2=A0 supports an IPC mechanism to obtain the secret. Is this mo=
+re
+> > secure?
+> =
+
+> From iwd perspective it is always a file. systemd does the reading
+> from an AF_UNIX socket and storing it as a file. When IPC part
+> becomes interesting if you want to provide an iwd-secrets-provider
+> tool.
+> =
+
+> Note: At least that is how I understood the man page. I have not
+> verified this in the systemd sources.
+> =
+
+> > 4. Should full provisioning file encryption be optional/supported?
+> > I felt
+> > =C2=A0=C2=A0 it was best to only encrypt sensitive options like
+> > PSK/Passphrase which
+> > =C2=A0=C2=A0 would allow editing of the provisioning file without extra=
+ steps
+> > of
+> > =C2=A0=C2=A0 decrypting, editing, and encrypting. I think this is above=
+ the
+> > capability
+> > =C2=A0=C2=A0 or desire of most users.
+> > =
+
+> > =C2=A0=C2=A0 If, though, a provisioning file is never expected to chang=
+e or
+> > issued by
+> > =C2=A0=C2=A0 a network administrator that does not want it edited I cou=
+ld see
+> > full
+> > =C2=A0=C2=A0 file encryption being ok.
+> =
+
+> What you want is that system / networks admins can sign their
+> provision file and you would verify that it is unmodified. That is
+> generally useful as well, but we would need to discuss where the
+> certificate that you verify against comes from.
+> =
+
+> Regards
+> =
+
+> Marcel
+> =
+
+
+
+--===============3540728916077606071==--
 
