@@ -1,55 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============8279685986565628801=="
+Content-Type: multipart/mixed; boundary="===============1633061234478015302=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/4] auto-t: fix testConnectAutoconnect
-Date: Wed, 20 Oct 2021 13:53:29 -0700
-Message-ID: <20211020205331.734405-2-prestwoj@gmail.com>
-In-Reply-To: 20211020205331.734405-1-prestwoj@gmail.com
+Subject: Re: [PATCH 1/3] ap: Don't defer ap_reset when ap_free called in event
+Date: Fri, 21 Jan 2022 08:54:13 -0600
+Message-ID: <5be0d1fe-7ee6-fa75-e237-11ca03d26f81@gmail.com>
+In-Reply-To: 20220121102439.267357-1-andrew.zaborowski@intel.com
 
---===============8279685986565628801==
+--===============1633061234478015302==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There was no open ssid provisioning file, which was fine as the
-first test should have created one. But to be safe, include one
-explicitly and use the proper setUp/tearDown functions.
----
- autotests/testConnectAutoconnect/open_network_test.py | 4 ++++
- autotests/testConnectAutoconnect/ssidOpen.open        | 1 +
- 2 files changed, 5 insertions(+)
- create mode 100644 autotests/testConnectAutoconnect/ssidOpen.open
+Hi Andrew,
 
-diff --git a/autotests/testConnectAutoconnect/open_network_test.py b/autote=
-sts/testConnectAutoconnect/open_network_test.py
-index 187f2342..0af66923 100644
---- a/autotests/testConnectAutoconnect/open_network_test.py
-+++ b/autotests/testConnectAutoconnect/open_network_test.py
-@@ -24,6 +24,10 @@ class TestOpenNetwork(unittest.TestCase):
-         tca.validate('ssidOpen', False)
-         tca.validate('ssidOpen', True)
- =
+On 1/21/22 04:24, Andrew Zaborowski wrote:
+> Previously we added logic to defer doing anything in ap_free() to after
+> the AP event handler has returned so that ap_event() has a chance to
+> inform whoever called it that the ap_state has been freed.  But there's
+> also a chance that the event handler is destroying both the AP and the
+> netdev it runs on, so after the handler has returned we can't even use
+> netdev_get_wdev_id or netdev_get_ifindex.  The easiest solution seems to
+> be to call ap_reset() in ap_free() even if we're within an event handler
+> to ensure we no longer need any external objects.  Also make sure
+> ap_reset() can be called multiple times.
+> =
 
-+    def setUp(self):
-+        IWD.copy_to_storage('ssidOpen.open')
-+
-+    def tearDown(self):
-         IWD.clear_storage()
- =
+> Another option would be to watch for NETDEV_WATCH_EVENT_DEL and remove
+> our reference to the netdev (because there's no need actually call
+> l_rtnl_ifaddr_delete or frame_watch_wdev_remove if the netdev was
+> destroyed -- frame_watch already tracks netdev removals), or to save
+> just the ifindex and the wdev id...
+> ---
+>   src/ap.c | 24 ++++++++++++++++--------
+>   1 file changed, 16 insertions(+), 8 deletions(-)
+> =
 
- if __name__ =3D=3D '__main__':
-diff --git a/autotests/testConnectAutoconnect/ssidOpen.open b/autotests/tes=
-tConnectAutoconnect/ssidOpen.open
-new file mode 100644
-index 00000000..8b137891
---- /dev/null
-+++ b/autotests/testConnectAutoconnect/ssidOpen.open
-@@ -0,0 +1 @@
-+
--- =
 
-2.31.1
+All applied, thanks.
 
---===============8279685986565628801==--
+Regards,
+-Denis
+
+--===============1633061234478015302==--
 
