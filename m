@@ -1,38 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============6232058211547780255=="
+Content-Type: multipart/mixed; boundary="===============8283880180609672913=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Diederik de Haas <didi.debian at cknow.org>
 To: iwd at lists.01.org
-Subject: [PATCH 08/13] station: add OWE_HIDDEN_STARTED/FINISHED events
-Date: Wed, 15 Sep 2021 10:36:19 -0700
-Message-ID: <20210915173624.11917-8-prestwoj@gmail.com>
-In-Reply-To: 20210915173624.11917-1-prestwoj@gmail.com
+Subject: Re: [RFC 0/2] Encrypt secrets using systemd provided key
+Date: Fri, 21 Jan 2022 23:22:25 +0100
+Message-ID: <1669386.7lEct51Sfr@prancing-pony>
+In-Reply-To: 20220121004130.2473281-1-prestwoj@gmail.com
 
---===============6232058211547780255==
+--===============8283880180609672913==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/station.h | 2 ++
- 1 file changed, 2 insertions(+)
+On vrijdag 21 januari 2022 01:41:28 CET James Prestwood wrote:
+> There has been interest in enabling IWD users to store their network
+> credentials in some encrypted form.
 
-diff --git a/src/station.h b/src/station.h
-index fabdd922..67d22f03 100644
---- a/src/station.h
-+++ b/src/station.h
-@@ -48,6 +48,8 @@ enum station_state {
- enum station_event {
- 	STATION_EVENT_ANQP_STARTED,
- 	STATION_EVENT_ANQP_FINISHED,
-+	STATION_EVENT_OWE_HIDDEN_STARTED,
-+	STATION_EVENT_OWE_HIDDEN_FINISHED,
- };
- =
+I did/do wonder why my passphrase is stored in plain-text and not in a form =
 
- typedef void (*station_foreach_func_t)(struct station *, void *data);
--- =
+which I can get through the wpa_passphrase* utility (I don't know the prope=
+r =
 
-2.31.1
+term for it though). Maybe that's what others have been interested in too?
 
---===============6232058211547780255==--
+That appears to be a far simpler solution and also wouldn't have the =
+
+'transportation' issue Marcel indicated (IIUC).
+
+Regards,
+  Diederik
+
+*) having such a utility as part of iwd seems beneficial, otherwise I'd sti=
+ll =
+
+need to install wpasupplicant package (on Debian) to have such a utility.
+
+--===============8283880180609672913==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlIVUVBQllJQUIwV0lRVDFzVVBCWXN5R21p
+NHVzeS9YYmx2T2VIN2JiZ1VDWWVzeUlRQUtDUkRYYmx2T2VIN2IKYnVjWUFRRHBXTjNONW1Cbkp0
+K3EzWGZZVGR1V0RVUk1FN3dBVzYwY2ZnR1M0aG1jT3dEL1d5WS9kaWtyVDJIVgpTUVNFQ1Y2NjFD
+SHZYVkoxb3dudGtkZmJ6YkRHdncwPQo9ZmFzdAotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============8283880180609672913==--
 
