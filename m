@@ -1,42 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============0716405367424049084=="
+Content-Type: multipart/mixed; boundary="===============0339941457487871078=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] station: fix >80 character lines
-Date: Thu, 10 Feb 2022 13:06:50 -0800
-Message-ID: <20220210210650.866456-1-prestwoj@gmail.com>
+Subject: Re: D-Bus policies
+Date: Fri, 21 Jan 2022 17:13:14 -0600
+Message-ID: <b9d48284-32bc-5ede-b3e1-c17aa544e7eb@gmail.com>
+In-Reply-To: 3141398.bvkd0EhLq2@bagend
 
---===============0716405367424049084==
+--===============0339941457487871078==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/station.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Hi Diederik,
 
-diff --git a/src/station.c b/src/station.c
-index 6dc0074c..cd119ff1 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1472,8 +1472,10 @@ static void station_enter_state(struct station *stat=
-ion,
- 	case STATION_STATE_CONNECTING_AUTO:
- 		/* Refresh the ordered network list */
- 		network_rank_update(station->connected_network, true);
--		l_queue_remove(station->networks_sorted, station->connected_network);
--		l_queue_insert(station->networks_sorted, station->connected_network,
-+		l_queue_remove(station->networks_sorted,
-+					station->connected_network);
-+		l_queue_insert(station->networks_sorted,
-+					station->connected_network,
- 					network_rank_compare, NULL);
- =
+> Looking into possible solutions, I found 2 very similar commits, but in
+> different projects, bluez and system-config-printer:
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3D3ef0ce954=
+b66fdf45538a6cdc629f3dac6642832
+> https://github.com/OpenPrinting/system-config-printer/commit/19df47d2630b=
+637d1802efe2c3cd5a00f2e40c3b
+> =
 
- 		l_dbus_property_changed(dbus, netdev_get_path(station->netdev),
--- =
+> They both link to https://www.spinics.net/lists/linux-bluetooth/msg75267.=
+html
+> While I lack the knowledge to fully understand what it says I did notice =
+this:
+> "The intent is clear: As long as you are logged in to a local machine, an=
+d you
+> are the foreground/active console, you are allowed to control bluetooth.
+> However, the behavior of 'at_console' does *not* match this intent."
+> =
 
-2.34.1
+> In other places I saw the 'at_console' stanza just plainly removed without
+> any replacement, but it could have undesirable consequences for iwd.
 
---===============0716405367424049084==--
+I think the solution chosen in BlueZ which gives blanket permission to acce=
+ss =
+
+iwd D-Bus APIs to any local user is probably just fine.  Particularly given=
+ that =
+
+at_console effectively allowed any user to use iwd in the past.
+This effectively negates the need to provide a separate policy for wheel/ne=
+tdev =
+
+and so these can be removed.
+
+Alternatively we can limit the policy only to wheel/netdev groups.
+
+Care to send a patch?
+
+Regards,
+-Denis
+--===============0339941457487871078==--
 
