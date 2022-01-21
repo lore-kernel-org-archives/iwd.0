@@ -1,224 +1,168 @@
-Content-Type: multipart/mixed; boundary="===============7273535750474452983=="
+Content-Type: multipart/mixed; boundary="===============7832236407648087595=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Marcel Holtmann <marcel at holtmann.org>
 To: iwd at lists.01.org
-Subject: Re: Scan while AP - testing
-Date: Thu, 24 Feb 2022 08:36:42 -0800
-Message-ID: <9ad40e74f71d6ffc947234580b6be7e39dfc4b3a.camel@gmail.com>
-In-Reply-To: CAG17S_OfkSYZLY0WsrqmH-ecoZbi9jNy0jmhgCT0TZ1ZC1T9UQ@mail.gmail.com
+Subject: Re: [RFC 0/2] Encrypt secrets using systemd provided key
+Date: Fri, 21 Jan 2022 21:54:12 +0100
+Message-ID: <C89738C5-2123-43B8-8164-89EAA037DD89@holtmann.org>
+In-Reply-To: 17408ff42d125f331b1acde2ef733dd7b7f86e90.camel@gmail.com
 
---===============7273535750474452983==
+--===============7832236407648087595==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+Hi James,
 
-On Thu, 2022-02-24 at 10:24 -0600, KeithG wrote:
-> Hmmm. Bummer.
+>>>>> There has been interest in enabling IWD users to store their
+>>>>> network
+>>>>> credentials in some encrypted form. Recently systemd added
+>>>>> support
+>>>>> for
+>>>>> passing secrets/credentials to services only accessible by the
+>>>>> service
+>>>>> they are intended. This provides a clean way of obtaining a
+>>>>> secret
+>>>>> key
+>>>>> which IWD can use to encrypt anything it writes to the FS. In
+>>>>> addition
+>>>>> there is no hard dependency on systemd since the credential is
+>>>>> provided
+>>>>> as a file (i.e. no Dbus API or linked library etc).
+>>>>> =
+
+>>>>> At the moment setting up the IWD service to use this feature
+>>>>> will
+>>>>> be
+>>>>> left up to the user. But setting this up is very straight
+>>>>> forward.
+>>>>> I
+>>>>> used docs for systemd-creds (Example 2):
+>>>>> =
+
+>>>>> https://www.freedesktop.org/software/systemd/man/systemd-creds.html
+>>>>> =
+
+>>>>> The only difference is the --name argument should be iwd-
+>>>>> secret.
+>>>>> =
+
+>>>>> Note: systemd version 250 is required.
+>>>>> =
+
+>>>>> The reason this is being sent as an RFC is because of some open
+>>>>> questions
+>>>>> I had and wanted feedback on:
+>>>>> =
+
+>>>>> 1. What options specifically do we want encrypted? These
+>>>>> patches
+>>>>> only
+>>>>>    address Passphrase and PreSharedKey but really any option
+>>>>> could
+>>>>> be
+>>>>>    encrypted. Obviously we would also want 802.1x secrets, but
+>>>>> are
+>>>>> there
+>>>>>    other non-obvious options with privacy concerns?
+>>>> =
+
+>>>> we only need to encrypt things that are provided by the user. If
+>>>> we
+>>>> wouldn=E2=80=99t ask the user for it, then it is not worth while
+>>>> protecting.
+>>> =
+
+>>> Ok, another option would be encrypting the entire [Security] group
+>>> and
+>>> assume anything here should be secure. This would actually make
+>>> things
+>>> quite a bit cleaner, and may be the only solution with how we do
+>>> the
+>>> 802.1x profiles since they are recursive.
+>> =
+
+>> any setting that gets asked by the user via the agent is worth
+>> protecting, the rest is not worth it.
+>> =
+
+>> As pointed out in the other review, you need to also have some sort
+>> of random nounce stored in plaintext. So besides the
+>> PassphraseEncrypted, you also need PassphraseSalt or similar. And
+>> then your salt value + SSID for example will be used as IV/Nounce
+>> into the crypto.
 > =
 
-> Can you explain to a less savvy user, how my Pi3b+ is able to scan
-> while I am running hostapd?
-> When I run hostapd, I am also running iwd/connman and I can be
-> connected to the Pi via the hopstapd and with iwd running it can
-> dynamically scan for available networks. I thought that AP Scan was a
-> function/feature of the Pi3 hardware that both programs were able to
-> access it and use it simultaneously.
-
-After I replied last night I was thinking perhaps the Pi doesn't
-advertise the feature... and indeed this is true. I removed the check
-and scanning worked just fine on the RPi3. So brcmfmac is just lazy and
-never bothered to include this feature.
-
-I guess, once again, we need to tailor our code to handle this driver,
-ugh.
-
-I'll send v2 soon.
-
+> Yes I realized this after sending it.
 > =
 
-> # iw list | grep supports
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Device supports roaming.
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Device supports scan flush.
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Device supports randomizing MA=
-C-addr in sched scans.
+>> =
+
+>>>>> 2. What is the stance on existing provisioning files? Currently
+>>>>> these
+>>>>>    changes overwrite any existing files with the new *Encrypted
+>>>>> options
+>>>>>    automatically. Is this desirable? or should user have to
+>>>>> opt-in
+>>>>> their
+>>>>>    existing provisioning files.
+>>>> =
+
+>>>> The problem arises that you no longer can move from one machine
+>>>> to
+>>>> the next without re-entering your secrets. So I guess this only
+>>>> desirable if the master key is part of your users keyring. If you
+>>>> have 200 PSKs entered and you set up a new machine, you now end
+>>>> up
+>>>> having to re-enter these as you go visiting new networks.
+>>> =
+
+>>> How would this work though? The user would have to either manually
+>>> encrypt the settings/group or have some way to tell IWD to do it?
+>>> =
+
+>>> I think the act of enabling the main.conf option would be enough,
+>>> and
+>>> we could emphasise this in the docs. Yes this means you cannot go
+>>> back
+>>> but if you really had 200 profiles you absolutely could not lose
+>>> you
+>>> probably should have those saved somewhere else, offline.
+>>> =
+
+>>> Also, really the only security benefit (above what we do now) is
+>>> when
+>>> using a TPM meaning you couldn't move the profiles between machines
+>>> regardless.
+>> =
+
+>> So this is pretty neat for embedded devices. Let say you have a
+>> weight scale with WiFi. This way you can ensure with a single system
+>> key that all your credentials are protected. If you throw the device
+>> away or brick it, it ensures that nobody can easily read it out by
+>> just mounting the disk/flash.
+>> =
+
+>> For a desktop system it is ok, if you have a capable admin/user that
+>> knows what they are doing. If you don=E2=80=99t they are going to scream=
+ at
+>> your if they move to a new system and all their WiFi is gone. If a
+>> MacBook or iPhone upgrade of mine would loose me all my PSKs, I would
+>> be rather mad at somebody.
 > =
 
-> Keith
-> =
+> Yeah I see how this could upset someone, I'm just not sure how we
+> accomplish this in a clean way. Either the user has to manually encrypt
+> it (which is awful), or we need to provide an additional setting or API
+> to say "I want to encrypt this" (which just feels redundant since
+> they've set the main.conf option already).
 
-> =
+I don=E2=80=99t have an answer for this, I am just pointing it out as a maj=
+or detail that needs to be documented in big letters.
 
-> On Wed, Feb 23, 2022 at 7:28 PM James Prestwood <prestwoj(a)gmail.com>
-> wrote:
-> > =
+Regards
 
-> > Hi Keith,
-> > =
+Marcel
 
-> > On Wed, 2022-02-23 at 19:08 -0600, KeithG wrote:
-> > > I applied James' latest suggested patches and was trying to see
-> > > how
-> > > this works.
-> > > =
-
-> > > IWD starts and I can get into AP mode and can connect. I tried
-> > > connman
-> > > to see if it would scan and got no response.=C2=A0 So I went into
-> > > iwctl to
-> > > see and saw this:
-> > > =
-
-> > > Access Point:
-> > > =C2=A0 ap list=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 List devices
-> > > in
-> > > AP mode
-> > > =C2=A0 ap <wlan> start <"network name"> <passphrase>=C2=A0=C2=A0=C2=
-=A0=C2=A0 Start an
-> > > access
-> > > point
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 called
-> > > "network
-> > > name" with
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 a passphrase
-> > > =C2=A0 ap <wlan> start-profile <"network name">=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Start an
-> > > access
-> > > point based on a disk profile
-> > > =C2=A0 ap <wlan> stop=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 Stop a
-> > > started
-> > > access
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 point
-> > > =C2=A0 ap <wlan> show=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 Show AP info
-> > > =C2=A0 ap <wlan> scan=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 Start an AP
-> > > scan
-> > > =C2=A0 ap <wlan> get-networks=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Get network
-> > > list
-> > > after scanning
-> > > =
-
-> > > looking good, but tried it and did not get anything:
-> > > =
-
-> > > [iwd]# ap wlan0 show
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 Access Point Interface
-> > > -----------------------------------------------------------------
-> > > ----
-> > > -----------
-> > > =C2=A0 Settable=C2=A0 Property=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 Value
-> > > -----------------------------------------------------------------
-> > > ----
-> > > -----------
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 St=
-arted=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 yes
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Na=
-me=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 RuneAudioAP
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Sc=
-anning=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 no
-> > > =
-
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Client 0
-> > > -----------------------------------------------------------------
-> > > ----
-> > > -----------
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Pr=
-operty=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Va=
-lue
-> > > -----------------------------------------------------------------
-> > > ----
-> > > -----------
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Ad=
-dress=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 60:f2:62:ae:70:fe
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Tx=
-Bitrate=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 54000=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 Kbit/s
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Rx=
-Bitrate=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 54000=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 Kbit/s
-> > > =
-
-> > > [iwd]# ap wlan0 scan
-> > > Operation not supported
-> > > [iwd]# ap wlan0 get-networks
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Networks
-> > > -----------------------------------------------------------------
-> > > ----
-> > > -----------
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Pr=
-operty=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Va=
-lue
-> > > -----------------------------------------------------------------
-> > > ----
-> > > -----------
-> > > =
-
-> > > Is this the 'right way'? Are there more settings I need in my
-> > > main.conf?
-> > =
-
-> > Yes you're doing everything correctly, but most likely your driver
-> > doesn't actually support scanning in AP mode. I had to go through a
-> > few
-> > of my USB dongles to find one that did.
-> > =
-
-> > You can check support with iw list, and should see this:
-> > =
-
-> > "Device supports AP scan"
-> > =
-
-> > Thanks,
-> > James
-> > =
-
-> > > =
-
-> > > Keith
-> > =
-
-> > =
-
-
-
---===============7273535750474452983==--
+--===============7832236407648087595==--
 
