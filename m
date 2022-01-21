@@ -1,22 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============5122215456810056363=="
+Content-Type: multipart/mixed; boundary="===============7009763458492331120=="
 MIME-Version: 1.0
-From: 54d22547-afc0-4701-b1fc-5a2a2e411646 at simplelogin.co
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd 1.21 stuck on connecting state
-Date: Tue, 18 Jan 2022 11:43:32 +0000
-Message-ID: <20220118114332.2807.583@ml01.vlan13.01.org>
-In-Reply-To: 63f4a6a626d48bce3cc8a7a5076c99c43d729a40.camel@gmail.com
+Subject: Re: [PATCH v2 01/10] dpp-util: add dpp_point_from_asn1()
+Date: Fri, 21 Jan 2022 10:55:14 -0600
+Message-ID: <0cc5b18a-c456-14f7-1c39-8d5f9e3f6e05@gmail.com>
+In-Reply-To: 20220120234415.2469451-1-prestwoj@gmail.com
 
---===============5122215456810056363==
+--===============7009763458492331120==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-These are the logs with IWD_DHCP_DEBUG=3D1.
+Hi James,
 
-https://termbin.com/yn9k
+On 1/20/22 17:44, James Prestwood wrote:
+> Given an ASN1 blob of the right form, parse and create
+> an l_ecc_point object. The form used is specific to DPP
+> hence why this isn't general purpose and put into dpp-util.
+> ---
+>   src/dpp-util.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>   src/dpp-util.h |  1 +
+>   2 files changed, 70 insertions(+)
+> =
 
-On first attempt I didn't manage to get a connection due to DHCP, but after=
- stopping/starting it worked.
---===============5122215456810056363==--
+
+<snip>
+
+> +	/* BITSTRING */
+> +	key_data =3D asn1_der_find_elem(outer_seq, outer_len, 1, &tag, &elen);
+> +	if (!key_data || tag !=3D ASN1_ID_BIT_STRING || elen > 2)
+
+< 2?
+
+also you have a line > 80 chars in this patch.
+
+Regards,
+-Denis
+--===============7009763458492331120==--
 
