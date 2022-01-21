@@ -1,56 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============8754060143098494387=="
+Content-Type: multipart/mixed; boundary="===============6953232493427221923=="
 MIME-Version: 1.0
-From: Torsten Schmitz <noreply.torsten at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] station: Prevent a NULL pointer access
-Date: Sun, 07 Nov 2021 02:02:58 +0100
-Message-ID: <CFJ558V5FNXE.2CP12NH8WWZ8X@hostname>
-In-Reply-To: 3c0e6c34-3054-276c-9f0f-44c57b173f84@gmail.com
+Subject: [RFC 0/2] Encrypt secrets using systemd provided key
+Date: Thu, 20 Jan 2022 16:41:28 -0800
+Message-ID: <20220121004130.2473281-1-prestwoj@gmail.com>
 
---===============8754060143098494387==
+--===============6953232493427221923==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> Could you provide a bit more info about the
-> network setup you managed to trigger this on? =
+There has been interest in enabling IWD users to store their network
+credentials in some encrypted form. Recently systemd added support for
+passing secrets/credentials to services only accessible by the service
+they are intended. This provides a clean way of obtaining a secret key
+which IWD can use to encrypt anything it writes to the FS. In addition
+there is no hard dependency on systemd since the credential is provided
+as a file (i.e. no Dbus API or linked library etc).
 
+At the moment setting up the IWD service to use this feature will be
+left up to the user. But setting this up is very straight forward. I
+used docs for systemd-creds (Example 2):
 
-We have a mishmash of older and newer APs,
-some supporting mesh some don't all advertising the same SSID.
-There is an open and closed network.
-owe_info->ssid in the crash was the SSID of the open network.
-I do not use the open network and connecting to it with iwd
-fails.
+https://www.freedesktop.org/software/systemd/man/systemd-creds.html
 
-> This would imply that this network has a set of APs that advertise the
-> same SSID, but do not advertise an OWE transition element, =
+The only difference is the --name argument should be iwd-secret.
 
-> and some APs that do advertise it? =
+Note: systemd version 250 is required.
 
+The reason this is being sent as an RFC is because of some open questions
+I had and wanted feedback on:
 
-Sounds plausible.
+ 1. What options specifically do we want encrypted? These patches only
+    address Passphrase and PreSharedKey but really any option could be
+    encrypted. Obviously we would also want 802.1x secrets, but are there
+    other non-obvious options with privacy concerns?
 
->I.e. some legacy APs that do not have a hidden partner?
+ 2. What is the stance on existing provisioning files? Currently these
+    changes overwrite any existing files with the new *Encrypted options
+    automatically. Is this desirable? or should user have to opt-in their
+    existing provisioning files.
 
-iwd shows three hidden APs for that open network. Their addresses =
+ 3. Is the secret provided via a file enough? (the secret is still stored
+    as plaintext *somewhere*, though systemd limits permissions). Systemd
+    supports an IPC mechanism to obtain the secret. Is this more secure?
 
-suggest they belong to the older APs without mesh support.
-So I think it is the older APs that do have hidden partners
-and advertise OWE transitions.
+ 4. Should full provisioning file encryption be optional/supported? I felt
+    it was best to only encrypt sensitive options like PSK/Passphrase which
+    would allow editing of the provisioning file without extra steps of
+    decrypting, editing, and encrypting. I think this is above the capabili=
+ty
+    or desire of most users.
+    =
 
-> > +	if (!owe_info)
-> > +		return false;
-> > +
-> This should not be necessary since owe_info is checked right before
-> invoking
-> this function. =
+    If, though, a provisioning file is never expected to change or issued by
+    a network administrator that does not want it edited I could see full
+    file encryption being ok.
 
+James Prestwood (2):
+  main: add SystemdEncrypt option, and initialize key
+  network: add support for encrypted Passphrase/PSK
 
-Oh, that's right. =
+ src/iwd.h     |   1 +
+ src/main.c    |  64 ++++++++++++++++++
+ src/network.c | 183 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 242 insertions(+), 6 deletions(-)
 
-These big if statements seem good at hiding stuff.
-Perhaps "O2: Try to avoid complex if body" should apply
-to the if conditions as well?
---===============8754060143098494387==--
+-- =
+
+2.31.1
+
+--===============6953232493427221923==--
 
