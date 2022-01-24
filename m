@@ -1,31 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============3375357372849502928=="
+Content-Type: multipart/mixed; boundary="===============5624093518793838937=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 2/2] Document initial signal level notification
-Date: Fri, 20 May 2022 16:14:48 -0500
-Message-ID: <248b13b1-e909-c8f3-8469-319b477d15fe@gmail.com>
-In-Reply-To: CK4VZL14LK2Q.2CYO44VKYN5R9@laptop
+Subject: [RFCv2 0/3] Encrypt secrets using systemd provided key
+Date: Mon, 24 Jan 2022 11:49:33 -0800
+Message-ID: <20220124194936.2988442-1-prestwoj@gmail.com>
 
---===============3375357372849502928==
+--===============5624093518793838937==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jesse,
+v1 -> v2:
+ - Encrypt entire [Settings] group. Rather than needing to add a new
+   'Encrypted' option for each key, encrypt the entire group. This makes
+   8021x much easier to handle as well since those options are recursively
+   filled (e.g. -Phase2). Handling these individually would be quite nasty.
 
-On 5/20/22 15:54, Jesse Lentz wrote:
-> Hi Denis,
-> =
+ - Use a salt value when encrypting/decryption (EncryptedSalt)
 
-> The comma is in column 80 according to Vim's ruler. Do you recommend
-> reflowing it with a smaller tw value?
-> =
+ - Use AES-SIV instead of AES-CTR. The auth data is set to the encrypted
+   salt and network->ssid. This ensures a unique encrypted value even if
+   the passphrase is the same. AES-SIV also verifies the IV on decrypt
+   automatically so you know if it failed or succeeded.
 
+ - Added a new tool: decrypt-profile. This is nice for debugging and could
+   be used to recover encrypted profiles if you know the secret.
 
-Ah you're right.  No changes are required.
+Also if you want to play with this this yourself you can try it out even
+without systemd. Systemd only sets the CREDENTIALS_DIRECTORY environment
+variable which can be done manually. It should point to a file containing t=
+he
+decrypted secret:
 
-Regards,
--Denis
---===============3375357372849502928==--
+Create a file named 'iwd-secret' with a secret (can be binary too). For
+example:
+
+/var/lib/iwd/iwd-secret:
+secret123
+
+Enable SystemdEncrypt=3Dtrue in main.conf
+
+Start IWD with CREDENTIALS_DIRECTORY set:
+
+CREDENTIALS_DIRECTORY=3D/var/lib/iwd ./src/iwd
+
+You may also want to use a separate storage directory as IWD will encrypt
+any profile once connected to that network (i.e. when IWD sync's).
+
+James Prestwood (3):
+  main: add SystemdEncrypt option, and initialize key
+  network: add support for encrypted [Security] group
+  tools: add decrypt-profile tool
+
+ Makefile.am             |   8 +-
+ src/iwd.h               |   1 +
+ src/main.c              |  65 +++++++++++++
+ src/network.c           | 177 +++++++++++++++++++++++++++++++----
+ tools/decrypt-profile.c | 201 ++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 431 insertions(+), 21 deletions(-)
+ create mode 100644 tools/decrypt-profile.c
+
+-- =
+
+2.31.1
+
+--===============5624093518793838937==--
 
