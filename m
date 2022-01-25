@@ -1,90 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============1778686101949604629=="
+Content-Type: multipart/mixed; boundary="===============4018174067066349265=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Daniel Wagner <wagi at monom.org>
 To: iwd at lists.01.org
-Subject: [PATCH v6 2/6] hotspot: implement hotspot profile encryption
-Date: Thu, 10 Feb 2022 11:03:16 -0800
-Message-ID: <20220210190320.848755-2-prestwoj@gmail.com>
-In-Reply-To: 20220210190320.848755-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2] iwd: Always disconnect connection completely
+Date: Tue, 25 Jan 2022 11:57:34 +0100
+Message-ID: <20220125105734.s4cdlt2l5nl2lbls@beryllium.lan>
+In-Reply-To: MRZP264MB154440F1153C4C3EEFDE51A3935F9@MRZP264MB1544.FRAP264.PROD.OUTLOOK.COM
 
---===============1778686101949604629==
+--===============4018174067066349265==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Using __storage_open() hotspot can also support profile encyption.
-The hotspot consortium name is used as the 'ssid' since this stays
-consistent between hotspot networks for any profile.
----
- src/hotspot.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+On Tue, Jan 25, 2022 at 10:43:22AM +0000, VAUTRIN Emmanuel (Canal Plus Pres=
+tataire) wrote:
+> > I haven't made my mind up yet on this one. The problem I see with this
+> > is that we start add glue logic which is hard to follow and I am not
+> > sure if this is the right place for it. If you have some more info
+> > what's happening I would love to hear.
+> Indeed, Daniel it is a tricky subject.
+> =
 
-diff --git a/src/hotspot.c b/src/hotspot.c
-index 21f50690..832d7a31 100644
---- a/src/hotspot.c
-+++ b/src/hotspot.c
-@@ -95,12 +95,18 @@ static struct l_settings *hotspot_network_open(struct n=
-etwork_info *info)
- =
+> The similar patch has already been applied for wpa_supplicant
+> (cf commits referenced in the commit message), after a long discussion
+> if I remember well.
+> It is still necessary to manage the transitions between 3 known Wifi netw=
+orks:
+>  - formerly connected,
+>  - currently connected,
+>  - to be connected.
+> In this case, they are 2 disconnections to take into account:
+>  - of the currently connected
+>  - of the formerly connected,  auto-connecting at the disconnection of
+> the currently connected.
 
- 	settings =3D l_settings_new();
- =
+Let me add the iwd mailing list here. I'd like to know what we are
+supposed to handle on the plugin layer.
 
--	if (!l_settings_load_from_file(settings, config->filename)) {
--		l_settings_free(settings);
--		return NULL;
--	}
-+	if (!l_settings_load_from_file(settings, config->filename))
-+		goto error;
-+
-+	if (!__storage_open(settings, config->filename, SECURITY_8021X,
-+				config->name))
-+		goto error;
- =
+For the iwd developers: Currently ConnMan's iwd plugin doesn't track any
+networks state. It just forwards the connect/disconnect requests from
+the core. Do we need to filter/serialize those?
 
- 	return settings;
-+
-+error:
-+	l_settings_free(settings);
-+	return NULL;
- }
- =
-
- static void hotspot_network_sync(struct network_info *info,
-@@ -111,7 +117,12 @@ static void hotspot_network_sync(struct network_info *=
-info,
- 	struct hs20_config *config =3D l_container_of(info, struct hs20_config,
- 							super);
- =
-
--	data =3D l_settings_to_data(settings, &length);
-+	data =3D __storage_encrypt(settings, config->name, &length);
-+	if (!data) {
-+		l_error("Unable to sync profile %s", config->filename);
-+		return;
-+	}
-+
- 	write_file(data, length, true, "%s", config->filename);
- 	l_free(data);
- }
-@@ -338,6 +349,11 @@ static struct hs20_config *hs20_config_new(struct l_se=
-ttings *settings,
- 		goto free_values;
- 	}
- =
-
-+	if (!__storage_open(settings, filename, SECURITY_8021X, name)) {
-+		l_error("Could not open hotspot profile %s", filename);
-+		goto free_values;
-+	}
-+
- 	config =3D l_new(struct hs20_config, 1);
- =
-
- 	if (hessid_str) {
--- =
-
-2.34.1
-
---===============1778686101949604629==--
+Daniel
+--===============4018174067066349265==--
 
