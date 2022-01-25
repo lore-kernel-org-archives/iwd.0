@@ -1,45 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============8695558021109688035=="
+Content-Type: multipart/mixed; boundary="===============4550663517711215505=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/2] auto-t: delay rekeys in extended key ID test
-Date: Mon, 04 Apr 2022 08:54:33 -0700
-Message-ID: <20220404155433.733337-2-prestwoj@gmail.com>
+Subject: Re: [PATCH v2] iwd: Always disconnect connection completely
+Date: Tue, 25 Jan 2022 10:25:02 -0600
+Message-ID: <d0cbe87b-83c4-12c3-f109-782d2bfe366c@gmail.com>
+In-Reply-To: 20220125105734.s4cdlt2l5nl2lbls@beryllium.lan
 
---===============8695558021109688035==
+--===============4550663517711215505==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The test was rekeying in a loop which ends up confusing hostapd
-depending on the timing of when it gets the REKEY command and any
-responses from IWD. UML seemed to handle this fine but not QEMU.
+Hi Daniel,
 
-Instead delay the rekey a bit to allow it to fully complete before
-sending another.
----
- autotests/testWPA2-ext-key-id/connection_test.py | 2 ++
- 1 file changed, 2 insertions(+)
+> For the iwd developers: Currently ConnMan's iwd plugin doesn't track any
+> networks state. It just forwards the connect/disconnect requests from
+> the core. Do we need to filter/serialize those?
 
-diff --git a/autotests/testWPA2-ext-key-id/connection_test.py b/autotests/t=
-estWPA2-ext-key-id/connection_test.py
-index afd48149..d77a216b 100644
---- a/autotests/testWPA2-ext-key-id/connection_test.py
-+++ b/autotests/testWPA2-ext-key-id/connection_test.py
-@@ -50,6 +50,8 @@ class Test(unittest.TestCase):
-             testutil.test_iface_operstate()
-             testutil.test_ifaces_connected()
- =
+So in theory iwd should gracefully handle such scenarios.  For example:
+- Connect comes while already connected (network switch)
+- Disconnect comes when connecting (aborts the connect attempt)
+- Connect while connecting (aborts original attempt, starts new one)
 
-+            wd.wait(0.5)
-+
-         device.disconnect()
- =
+There may be situations where the timing between requests is so small that =
+we =
 
-         condition =3D 'not obj.connected'
--- =
+simply have to return an -EBUSY (net.connman.iwd.Busy).
 
-2.34.1
+Is there a particular scenario which isn't working?
 
---===============8695558021109688035==--
+Regards,
+-Denis
+--===============4550663517711215505==--
 
