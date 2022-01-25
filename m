@@ -1,58 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============5066384320718320112=="
+Content-Type: multipart/mixed; boundary="===============0865189584618354469=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 01/14] test-runner: Move environment setup into own
- module
-Date: Thu, 31 Mar 2022 18:13:39 -0500
-Message-ID: <b2218ddd-f312-73bc-6c16-a5e55ff1bb55@gmail.com>
-In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
+Subject: [PATCH] scan: parse BSS_SIGNAL_UNSPEC, fix potential zero signal
+Date: Tue, 25 Jan 2022 10:02:06 -0800
+Message-ID: <20220125180206.3098383-1-prestwoj@gmail.com>
 
---===============5066384320718320112==
+--===============0865189584618354469==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+A select few drivers send this instead of SIGNAL_MBM. The docs say this
+value is the signal 'in unspecified units, scaled to 0..100'. The range
+for SIGNAL_MBM is -10000..0 so this can be scaled to the MBM range easy
+enough...
 
-On 3/31/22 18:16, James Prestwood wrote:
-> This (as well as subsequent commits) will separate test-runner into two
-> parts:
-> =
+Now, this isn't exactly correct because this value ultimately gets
+returned from GetOrderedNetworks() and is documented as 100 * dBm where
+in reality its just a unit-less signal strength value. Its not ideal, but
+this patch at least will fix BSS ranking for these few drivers.
+---
+ src/scan.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-> 1. Environment setup
-> 2. Running tests
-> =
+I am fine leaving this on the list until we get an answer from the original
+thread about what driver this happened with:
 
-> Spurred by interest in adding UML/host support, test-runner was in need
-> of a refactor to separate out the environment setup and actually running
-> the tests.
-> =
+https://lists.01.org/hyperkitty/list/iwd(a)lists.01.org/thread/PLYNHZWEENY3=
+RIMUNAWDDPHHPHRDCJOR/
 
-> The environment (currently only Qemu) requires quite a bit of special
-> handling (ctypes mounting/reboot, 9p mounts, tons of kernel options etc)
-> which nobody writing tests should need to see or care about. This has all
-> been moved into 'runner.py'.
-> =
+If its not one of these drivers, and not related to SIGNAL_UNSPEC, we
+will need to investigate further.
 
-> Running the tests (inside test-runner) won't change much.
-> =
+diff --git a/src/scan.c b/src/scan.c
+index de507ba3..99813952 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -1372,6 +1372,22 @@ static bool scan_parse_bss_information_elements(stru=
+ct scan_bss *bss,
+ 	return have_ssid;
+ }
+ =
 
-> The new 'runner.py' module adds an abstraction class which allows differe=
-nt
-> Runner's to be implemented, and setup their own environment as they see
-> fit. This is in preparation for UML and Host runners.
-> ---
->   tools/runner.py | 485 ++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 485 insertions(+)
->   create mode 100644 tools/runner.py
-> =
++/*
++ * Maps 0..100 values to -10000..0
++ *
++ * This isn't really mapping to mBm since the input is unit-less and we ha=
+ve no
++ * idea what the driver itself does to come up with this 'strength' value =
+but
++ * this is really the best that can be done for these drivers (its only 4 =
+in
++ * tree drivers after all).
++ */
++static int32_t signal_unspec_to_mbm(uint8_t strength)
++{
++	if (L_WARN_ON(strength > 100))
++		return 0;
++
++	return ((int32_t)strength * 100) - 10000;
++}
++
+ static struct scan_bss *scan_parse_attr_bss(struct l_genl_attr *attr,
+ 						struct wiphy *wiphy,
+ 						uint32_t *out_seen_ms_ago)
+@@ -1414,6 +1430,13 @@ static struct scan_bss *scan_parse_attr_bss(struct l=
+_genl_attr *attr,
+ =
 
+ 			bss->signal_strength =3D *((int32_t *) data);
+ 			break;
++		case NL80211_BSS_SIGNAL_UNSPEC:
++			if (len !=3D 1)
++				goto fail;
++
++			bss->signal_strength =3D
++					signal_unspec_to_mbm(l_get_u8(data));
++			break;
+ 		case NL80211_BSS_INFORMATION_ELEMENTS:
+ 			ies =3D data;
+ 			ies_len =3D len;
+-- =
 
-All applied, thanks.
+2.31.1
 
-Regards,
--Denis
-
---===============5066384320718320112==--
+--===============0865189584618354469==--
 
