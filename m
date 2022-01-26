@@ -1,33 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============4919937309195359039=="
+Content-Type: multipart/mixed; boundary="===============1267325271290519006=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/6] doc: add testing option to hostapd.config
-Date: Tue, 28 Sep 2021 15:36:04 -0700
-Message-ID: <20210928223609.1163537-1-prestwoj@gmail.com>
+Subject: Re: segfault after upgrade to iwd 1.22
+Date: Wed, 26 Jan 2022 12:20:20 -0600
+Message-ID: <6e6dcd40-cafa-fd51-99d9-433e546bc7a3@gmail.com>
+In-Reply-To: 20220126164203.dnqmd3kfcqbwthiv@pine.grzadka
 
---===============4919937309195359039==
+--===============1267325271290519006==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is required to be built in for hostapd to rekey on command.
----
- doc/hostapd.config | 1 +
- 1 file changed, 1 insertion(+)
+Hi Jan,
 
-diff --git a/doc/hostapd.config b/doc/hostapd.config
-index 91d1b4cf..c114e127 100644
---- a/doc/hostapd.config
-+++ b/doc/hostapd.config
-@@ -36,3 +36,4 @@ CONFIG_OCV=3Dy
- CONFIG_OWE=3Dy
- CONFIG_DPP=3Dy
- CONFIG_SAE=3Dy
-+CONFIG_TESTING_OPTIONS=3Dy
--- =
+> I suppose hs being NULL is the reason.
 
-2.31.1
+This wasn't quite it, but something more subtle.  The following patch on th=
+e =
 
---===============4919937309195359039==--
+list should fix it:
+
+[PATCH] handshake: use _hs directly in handshake_event
+
+Regards,
+-Denis
+--===============1267325271290519006==--
 
