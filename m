@@ -1,40 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============7319632277374521695=="
+Content-Type: multipart/mixed; boundary="===============5821293540622386723=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] dpp: unregister interface on exit
-Date: Tue, 15 Feb 2022 13:16:46 -0800
-Message-ID: <20220215211646.1328388-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v2] sae: fix missing reallocarray definition
+Date: Wed, 26 Jan 2022 12:22:44 -0600
+Message-ID: <5191c2f7-d234-2444-91b1-4ea94cba38f6@gmail.com>
+In-Reply-To: 20220126181942.3165190-1-prestwoj@gmail.com
 
---===============7319632277374521695==
+--===============5821293540622386723==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This fixes a cleanup issue where DPP tries to cleanup both on
-dpp_exit() and when netdev goes down.
----
- src/dpp.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi James,
 
-diff --git a/src/dpp.c b/src/dpp.c
-index d95217c5..f6ccb926 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -1941,6 +1941,8 @@ static void dpp_exit(void)
- {
- 	l_debug("");
- =
+On 1/26/22 12:19, James Prestwood wrote:
+> Building on GCC 8 resulted in this compiler error. Newer versions seem
+> to find malloc.h without the include, but not on GCC 8.
+> =
 
-+	l_dbus_unregister_interface(dbus_get_bus(), IWD_DPP_INTERFACE);
-+
- 	netdev_watch_remove(netdev_watch);
- =
+> src/sae.c:107:25: error: implicit declaration of function 'reallocarray';
+> 	did you mean 'realloc'? [-Werror=3Dimplicit-function-declaration]
+> 	sm->rejected_groups =3D reallocarray(NULL, 2, sizeof(uint16_t));
+> ---
+>   src/sae.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> =
 
- 	l_genl_family_unregister(nl80211, mlme_watch);
--- =
 
-2.34.1
+Applied, thanks.
 
---===============7319632277374521695==--
+Regards,
+-Denis
+
+--===============5821293540622386723==--
 
