@@ -1,51 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============3218349416985505399=="
+Content-Type: multipart/mixed; boundary="===============8970285904807131275=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459 at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: DHCP renewal stops after disconnect
-Date: Wed, 11 May 2022 19:13:13 +0100
-Message-ID: <CACsRnHVzueqtOTO1vu73F7JkF2iv46F_2_dgzExH-vrKx5F6Gw@mail.gmail.com>
-In-Reply-To: facd169d-1b0d-e1f2-7cb8-4e998593c69c@gmail.com
+Subject: [PATCH] handshake: use _hs directly in handshake_event
+Date: Wed, 26 Jan 2022 09:41:00 -0800
+Message-ID: <20220126174100.3162606-1-prestwoj@gmail.com>
 
---===============3218349416985505399==
+--===============8970285904807131275==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Certain platforms/compilers were having issues with using the 'hs'
+local in this macro (likely has something to do with the caller
+also using a local 'hs' variable name). This caused a crash on these
+platforms. Using the macro argument _hs directly fixes the crash.
+---
+ src/handshake.h | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-Thank you, I'll try it out.
+diff --git a/src/handshake.h b/src/handshake.h
+index 34d4829d..7136087a 100644
+--- a/src/handshake.h
++++ b/src/handshake.h
+@@ -166,19 +166,18 @@ struct handshake_state {
+ =
 
-One thing I was wondering is if some level of info logging would be
-possible for the dhcp client. This could be similar in verbosity to
-dhclient or networkd which would make it easier to see what happened
-with this kind of thing. DHCP happens on a relatively slow basis so it
-wouldn't spam much. I attempted to add this but I couldn't really find
-a good place for it.
+ #define handshake_event(_hs, event, ...)	\
+ 	(__extension__ ({	\
+-		struct handshake_state *hs =3D (_hs);	\
+ 		bool freed =3D false;	\
+ 	\
+-		if (hs->event_func && !hs->in_event) {	\
+-			hs->in_event =3D true;	\
+-			hs->event_func(hs, event, hs->user_data,	\
++		if ((_hs)->event_func && !(_hs)->in_event) {	\
++			(_hs)->in_event =3D true;	\
++			(_hs)->event_func((_hs), event, (_hs)->user_data,	\
+ 					##__VA_ARGS__); \
+ 	\
+-			if (!hs->in_event) {	\
+-				handshake_state_free(hs);	\
++			if (!(_hs)->in_event) {	\
++				handshake_state_free((_hs));	\
+ 				freed =3D true;	\
+ 			} else	\
+-				hs->in_event =3D false;	\
++				(_hs)->in_event =3D false;	\
+ 		}	\
+ 		freed;	\
+ 	}))
+-- =
 
-Regards,
-Michael
+2.31.1
 
-On Wed, 11 May 2022 at 18:32, Denis Kenzior <denkenz(a)gmail.com> wrote:
->
-> Hi Michael,
->
->
-> > The lease should always be 2 hours if dhcpd is working correctly. The
-> > ones I've seen are always this value.
-> >
->
-> Ok.
->
-> > For this one I did have DHCP debug on. You seem to be right, it looks
-> > like we didn't renew until we timed out completely.
-> >
->
-> That would seem to confirm my hunch.  I just sent out a patch to the ell =
-mailing
-> list and to you.  See if that one fixes this particular issue.
->
-> Regards,
-> -Denis
---===============3218349416985505399==--
+--===============8970285904807131275==--
 
