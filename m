@@ -1,36 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============5482497631070398830=="
+Content-Type: multipart/mixed; boundary="===============6655279216826665849=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459 at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
-Date: Wed, 18 May 2022 13:36:20 +0100
-Message-ID: <CACsRnHX=UMyWm2EiC8CXDsopbg=k3s+pKjXWZ7TjEX-Qpqw_OQ@mail.gmail.com>
-In-Reply-To: f688e6b8-8bf5-4b6e-1092-ff1283ea4c80@gmail.com
+Subject: Re: [PATCH v2] dbus: Remove 'at_console', add 'netdev' settings
+Date: Wed, 26 Jan 2022 14:06:39 -0600
+Message-ID: <e96d0cc9-5eee-8f33-a92b-9291ec5dc086@gmail.com>
+In-Reply-To: 20220126200103.16017-1-didi.debian@cknow.org
 
---===============5482497631070398830==
+--===============6655279216826665849==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi Diederik,
 
-On Tue, 17 May 2022 at 20:23, Denis Kenzior <denkenz(a)gmail.com> wrote:
-> If you intended this to be info, then do that.  iwd prints l_info, l_erro=
-r and
-> l_warn messages by default and only l_debug is enabled via '-d'.
+On 1/26/22 14:01, Diederik de Haas wrote:
+> The 'at_console' D-Bus policy setting has been deprecated for more then
+> 10 years and could be ignored at any time in the future. Moreover, while
+> the intend was to allow locally logged on users to interact with iwd, it
+> didn't actually do that.
+> More info at https://www.spinics.net/lists/linux-bluetooth/msg75267.html
+> and https://gitlab.freedesktop.org/dbus/dbus/-/issues/52
+> Therefor remove the 'at_console' setting block.
+> =
 
-This makes me think DHCP should just follow the same pattern for
-simplicity. I have sent a new patch which always enable DHCP info
-level logging and if the user sets IWD_DHCP_DEBUG then bump it up to
-debug.
-This patch is much simpler and doesn't change the behavior of the env
-var but it comes with the downside of not being able to quieten it
-(although that is similar to iwd).
+> On Debian (based) systems, there is a standard defined group which is
+> allowed to manage network interfaces, and that is the 'netdev' group.
+> So add a D-Bus setting block to grant the 'netdev' group that access.
+> ---
+> Changes since v1:
+> - Added 'dbus' prefix to primary commit message and shortened it to
+>    less then 50 chars
+> - Reformatted secondary commit message to max 72 chars and fixed a
+>    small typo (_ -> ')
+> =
 
-I have the v3 version of this patch ready with the string comparisons
-if you prefer the first approach.
+>   src/iwd-dbus.conf | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
+
+
+Applied, thanks.
 
 Regards,
-Michael
---===============5482497631070398830==--
+-Denis
+
+--===============6655279216826665849==--
 
