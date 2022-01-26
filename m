@@ -1,74 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============0003271880919797136=="
+Content-Type: multipart/mixed; boundary="===============7302498587298204809=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 07/13] auto-t: use wait_for_event in testSAE-roam
-Date: Mon, 28 Mar 2022 10:28:36 -0700
-Message-ID: <20220328172842.1660272-8-prestwoj@gmail.com>
-In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
+Subject: Re: [PATCH] handshake: use _hs directly in handshake_event
+Date: Wed, 26 Jan 2022 12:17:08 -0600
+Message-ID: <ab727f18-cc7b-1317-d06c-72e75d1599d1@gmail.com>
+In-Reply-To: 20220126174100.3162606-1-prestwoj@gmail.com
 
---===============0003271880919797136==
+--===============7302498587298204809==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Depending on timing hostapd may not show a station with list_sta().
-Instead use wait_for_event.
----
- autotests/testSAE-roam/connection_test.py | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Hi James,
 
-diff --git a/autotests/testSAE-roam/connection_test.py b/autotests/testSAE-=
-roam/connection_test.py
-index 2409e0d1..4c49eaf8 100644
---- a/autotests/testSAE-roam/connection_test.py
-+++ b/autotests/testSAE-roam/connection_test.py
-@@ -35,7 +35,8 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(device, condition)
- =
+On 1/26/22 11:41, James Prestwood wrote:
+> Certain platforms/compilers were having issues with using the 'hs'
+> local in this macro (likely has something to do with the caller
+> also using a local 'hs' variable name). This caused a crash on these
+> platforms. Using the macro argument _hs directly fixes the crash.
+> ---
+>   src/handshake.h | 13 ++++++-------
+>   1 file changed, 6 insertions(+), 7 deletions(-)
+> =
 
--        self.assertTrue(self.bss_hostapd[0].list_sta())
-+        self.bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.=
-address)
-+
-         self.assertFalse(self.bss_hostapd[1].list_sta())
- =
 
-         testutil.test_iface_operstate(device.name)
-@@ -54,7 +55,7 @@ class Test(unittest.TestCase):
-         to_condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_change(device, from_condition, to_condition)
- =
+Applied, thanks.
 
--        self.assertTrue(self.bss_hostapd[1].list_sta())
-+        self.bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.=
-address)
- =
+Regards,
+-Denis
 
-         testutil.test_iface_operstate(device.name)
-         testutil.test_ifaces_connected(self.bss_hostapd[1].ifname, device.=
-name)
-@@ -72,8 +73,10 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state !=3D DeviceState.roaming'
-         wd.wait_for_object_condition(device, condition)
- =
-
--        self.assertEqual(device.state, iwd.DeviceState.connected)
--        self.assertTrue(self.bss_hostapd[2].list_sta())
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        self.bss_hostapd[2].wait_for_event('AP-STA-CONNECTED %s' % device.=
-address)
- =
-
-         testutil.test_iface_operstate(device.name)
-         testutil.test_ifaces_connected(self.bss_hostapd[2].ifname, device.=
-name)
--- =
-
-2.34.1
-
---===============0003271880919797136==--
+--===============7302498587298204809==--
 
