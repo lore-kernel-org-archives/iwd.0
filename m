@@ -1,33 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============0762882727004959996=="
+Content-Type: multipart/mixed; boundary="===============8807135397167563269=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Diederik de Haas <didi.debian at cknow.org>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] netconfig: Remove usage of in6_addr.__in6_u
-Date: Thu, 16 Sep 2021 11:11:34 -0500
-Message-ID: <cd2c850b-8f72-9f35-7315-0446143ed684@gmail.com>
-In-Reply-To: 20210915235829.536670-1-andrew.zaborowski@intel.com
+Subject: Re: [PATCH] Remove 'at_console' and add 'netdev' D-Bus policy setting
+Date: Wed, 26 Jan 2022 15:12:38 +0100
+Message-ID: <2419009.E5H7ZbDnId@bagend>
+In-Reply-To: 20220126140423.3974-1-didi.debian@cknow.org
 
---===============0762882727004959996==
+--===============8807135397167563269==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Wednesday, 26 January 2022 15:04:23 CET Diederik de Haas wrote:
+> Therefor remove the 'at_console_ setting block.
 
-On 9/15/21 6:58 PM, Andrew Zaborowski wrote:
-> in6_addr.__in6_u.__u6_addr8 is glibc-specific and named differently in
-> the headers shipped with musl libc for example.  The POSIX compliant and
-> universal way of accessing it is in6_addr.s6_addr.
-> ---
->   src/netconfig.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+Grr, the last underscore should've been a single quote.
 
+--===============8807135397167563269==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
 
-Applied, thanks.
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlIVUVBQllJQUIwV0lRVDFzVVBCWXN5R21p
+NHVzeS9YYmx2T2VIN2JiZ1VDWWZGVzFnQUtDUkRYYmx2T2VIN2IKYm1pTEFQMFM0bnpzY2J6OXBB
+aHJRTXh0YkZpdUZuY2NFYlVTS1dueEJNa2NTZDhvcXdFQTM0NGNjalg4eGFpNwo4SjFGdGdvRFQv
+TWtwMWZWUWNmZ09QMVZISHprNnc0PQo9V0hkMgotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
 
-Regards,
--Denis
-
---===============0762882727004959996==--
+--===============8807135397167563269==--
 
