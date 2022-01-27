@@ -1,71 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============0062876703063858132=="
+Content-Type: multipart/mixed; boundary="===============6726205017080068566=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 02/10] test-runner: remove path_exists/find_binary
-Date: Wed, 06 Apr 2022 12:14:45 -0700
-Message-ID: <20220406191453.978426-2-prestwoj@gmail.com>
-In-Reply-To: 20220406191453.978426-1-prestwoj@gmail.com
+Subject: Re: iwd 1.21 stuck on connecting state
+Date: Thu, 27 Jan 2022 11:00:51 -0800
+Message-ID: <c30d0db9e529dcdebfad5e55de3c476597075635.camel@gmail.com>
+In-Reply-To: 20220127175130.2828.48049@ml01.vlan13.01.org
 
---===============0062876703063858132==
+--===============6726205017080068566==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-These are already implemented in the shutil module
----
- tools/run-tests | 24 +-----------------------
- 1 file changed, 1 insertion(+), 23 deletions(-)
+On Thu, 2022-01-27 at 17:51 +0000,
+54d22547-afc0-4701-b1fc-5a2a2e411646(a)simplelogin.co wrote:
+> Hi again,
+> =
 
-diff --git a/tools/run-tests b/tools/run-tests
-index 4291250a..a95a7494 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -57,28 +57,6 @@ def exit_vm():
- =
+> I managed to trigger the problem while dumping tcp packets. Here is
+> the result:
+> =
 
- 	runner.stop()
- =
+> # ~ tcpdump -i wlan0 port 67 or port 68 -s 0 -w dhcp.pcap
+> tcpdump: listening on wlan0, link-type EN10MB (Ethernet), snapshot
+> length 262144 bytes
+> ^C
+> 12 packets captured
+> 12 packets received by filter
+> 0 packets dropped by kernel
+> =
 
--def path_exists(path):
--	'''
--		Searches PATH as well as absolute paths.
--	'''
--	if shutil.which(path):
--		return True
--	try:
--		os.stat(path)
--	except:
--		return False
--	return True
--
--def find_binary(list):
--	'''
--		Returns a binary from 'list' if its found in PATH or on a
--		valid absolute path.
--	'''
--	for path in list:
--		if path_exists(path):
--			return path
--	return None
--
- class Interface:
- 	def __init__(self, name, config):
- 		self.name =3D name
-@@ -529,7 +507,7 @@ class TestContext(Namespace):
- 			os.environ['IWD_SIM_KEYS'] =3D sim_keys
- 			return
- =
+> # ~ tcpdump -r dhcp.pcap =
 
--		if not find_binary(['ofonod']) or not find_binary(['phonesim']):
-+		if not shutil.which('ofonod') or not shutil.which(['phonesim']):
- 			print("Ofono or Phonesim not found, skipping test")
- 			return
- =
+> reading from file dhcp.pcap, link-type EN10MB (Ethernet), snapshot
+> length 262144
+> 18:33:36.492009 IP _gateway.bootps > 192.168.1.35.bootpc: BOOTP/DHCP,
+> Reply, length 284
+> 18:33:36.492212 IP 0.0.0.0.bootpc > 255.255.255.255.bootps:
+> BOOTP/DHCP, Request from xx:xx:xx:xx:xx:xx (oui Unknown), length 300
+> 18:33:38.606330 IP _gateway.bootps > 192.168.1.36.bootpc: BOOTP/DHCP,
+> Reply, length 284
+> 18:33:40.021633 IP 0.0.0.0.bootpc > 255.255.255.255.bootps:
+> BOOTP/DHCP, Request from xx:xx:xx:xx:xx:xx (oui Unknown), length 300
+> 18:33:48.860117 IP 0.0.0.0.bootpc > 255.255.255.255.bootps:
+> BOOTP/DHCP, Request from xx:xx:xx:xx:xx:xx (oui Unknown), length 300
+> 18:34:05.360324 IP 0.0.0.0.bootpc > 255.255.255.255.bootps:
+> BOOTP/DHCP, Request from xx:xx:xx:xx:xx:xx (oui Unknown), length 300
+> 18:34:14.092945 IP 0.0.0.0.bootpc > 255.255.255.255.bootps:
+> BOOTP/DHCP, Request from xx:xx:xx:xx:xx:xx (oui Unknown), length 300
+> 18:34:14.705123 IP 0.0.0.0.bootpc > 255.255.255.255.bootps:
+> BOOTP/DHCP, Request from xx:xx:xx:xx:xx:xx (oui Unknown), length 300
+> 18:34:16.217430 IP _gateway.bootps > host.bootpc: BOOTP/DHCP, Reply,
+> length 284
+> 18:34:16.217613 IP 0.0.0.0.bootpc > 255.255.255.255.bootps:
+> BOOTP/DHCP, Request from xx:xx:xx:xx:xx:xx (oui Unknown), length 300
+> 18:34:16.313729 IP _gateway.bootps > host.bootpc: BOOTP/DHCP, Reply,
+> length 284
+> 18:34:16.320877 IP _gateway.bootps > host.bootpc: BOOTP/DHCP, Reply,
+> length 284
+> =
 
--- =
+> So I stopped / started iwd.service and checked that connection was
+> lost (no ping). Then started dumping packets while iwctl was
+> constantly reporting 'connecting' state. From there I just
+> disconnected and connected again successfully and aborted tcpdump.
 
-2.34.1
+Could you also attach the actual pcap file for inspection? Something in
+the packet is not validating but we have no way of knowing without
+seeing the actual packet contents.
 
---===============0062876703063858132==--
+Thanks,
+James
+
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+
+
+--===============6726205017080068566==--
 
