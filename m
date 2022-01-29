@@ -1,47 +1,20 @@
-Content-Type: multipart/mixed; boundary="===============6208491379218180712=="
+Content-Type: multipart/mixed; boundary="===============2405848058536302597=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: 54d22547-afc0-4701-b1fc-5a2a2e411646 at simplelogin.co
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2] auto-t: replace ifconfig with ip commands
-Date: Thu, 11 Nov 2021 14:32:13 -0600
-Message-ID: <f5df8fb9-d0f4-7386-6f6f-05703eff4bd1@gmail.com>
-In-Reply-To: 20211111021202.26369-1-noreply.torsten@gmail.com
+Subject: Re: iwd 1.21 stuck on connecting state
+Date: Sat, 29 Jan 2022 20:03:58 +0000
+Message-ID: <20220129200358.2828.46152@ml01.vlan13.01.org>
+In-Reply-To: c30d0db9e529dcdebfad5e55de3c476597075635.camel@gmail.com
 
---===============6208491379218180712==
+--===============2405848058536302597==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Torsten,
+Sorry, didn't know that. I reproduced the problem again and uploaded the fi=
+le here: https://transfer.sh/get/jiEvOg/dhcp.pcap
 
-On 11/10/21 8:12 PM, Torsten Schmitz wrote:
-> ifconfig has long been deprecated in favor of ip from iproute2.
-> It is usually no longer installed by default.
-> ---
-> changes from v1:
->      remove ifconfig introduced in commmit d30fc978
->      fix typo adrr
->      changed commit message
-> ---
->   autotests/testFILS/fils_256_test.py           |  2 +-
->   autotests/testFILS/fils_384_test.py           |  2 +-
->   .../testFT-8021x-roam/connection_test.py      | 18 +++++++------
->   autotests/testFT-FILS/connection_test.py      | 18 ++++++-------
->   autotests/testNetconfig/connection_test.py    |  8 +++---
->   autotests/testNetconfig/static_test.py        |  3 +--
->   autotests/testP2P/connection_test.py          |  2 +-
->   autotests/testPSK-roam/connection_test.py     | 16 +++++------
->   autotests/testPreauth-roam/connection_test.py |  2 +-
->   autotests/testSAE-roam/connection_test.py     | 27 ++++++++++---------
->   doc/test-runner.txt                           |  2 +-
->   tools/test-runner                             |  6 ++---
->   12 files changed, 55 insertions(+), 51 deletions(-)
-> =
-
-
-Applied, thanks!
-
-Regards,
--Denis
---===============6208491379218180712==--
+Hope this helps!
+--===============2405848058536302597==--
 
