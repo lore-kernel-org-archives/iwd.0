@@ -1,134 +1,233 @@
-Content-Type: multipart/mixed; boundary="===============4046411495775299547=="
+Content-Type: multipart/mixed; boundary="===============6296398212162890122=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 2/2] test-runner: increase RAM size to 1GB
-Date: Mon, 21 Mar 2022 16:25:15 -0700
-Message-ID: <20220321232515.931923-2-prestwoj@gmail.com>
-In-Reply-To: 20220321232515.931923-1-prestwoj@gmail.com
+Subject: [PATCH 3/5] tools: add decrypt-profile tool
+Date: Mon, 31 Jan 2022 12:11:53 -0800
+Message-ID: <20220131201155.3878756-3-prestwoj@gmail.com>
+In-Reply-To: 20220131201155.3878756-1-prestwoj@gmail.com
 
---===============4046411495775299547==
+--===============6296398212162890122==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-As a temporary solution to kernel/python OOM exceptions increase the
-RAM size to 1GB.
+This tool will decrypt an IWD network profile which was previously
+encrypted using a systemd provided key. Either a text passphrase
+can be provided (--pass) or a file containing the secret (--file).
 
-For quite a while test-runner has run into frequent OOM exceptions when
-running many tests in a row. Its not completely known exactly why, but
-seems to point to the 9p driver which is used for sharing the root fs
-between the test-runner VM and the host.
-
-With debugging enabled (-d) one can see the available memory available
-relatively stable. If a test fails it may spike ~3-4kb but this quickly
-recovers as python garbage collects.
-
-At some point the kernel faults failing to allocate which (usually) is
-shown by a python OOM exception. At this point there is plenty of
-available memory.
-
-Dumping the kernel trace its seen that the 9p driver is involved:
-
-[  248.962949] test-runner: page allocation failure: order:7, mode:0x40dc0(=
-GFP_KERNEL|__GFP_COMP|__GFP_ZERO), nodemask=3D(null),cpuset=3D/,mems_allowe=
-d=3D0
-[  248.962958] CPU: 2 PID: 477 Comm: test-runner Not tainted 5.16.0 #91
-[  248.962960] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.1=
-4.0-4.fc34 04/01/2014
-[  248.962961] Call Trace:
-[  248.962964]  <TASK>
-[  248.962965]  dump_stack_lvl+0x34/0x44
-[  248.962971]  warn_alloc.cold+0x78/0xdc
-[  248.962975]  ? __alloc_pages_direct_compact+0x14c/0x1e0
-[  248.962979]  __alloc_pages_slowpath.constprop.0+0xbfe/0xc60
-[  248.962982]  __alloc_pages+0x2d5/0x2f0
-[  248.962984]  kmalloc_order+0x23/0x80
-[  248.962988]  kmalloc_order_trace+0x14/0x80
-[  248.962990]  v9fs_alloc_rdir_buf.isra.0+0x1f/0x30
-[  248.962994]  v9fs_dir_readdir+0x51/0x1d0
-[  248.962996]  ? __handle_mm_fault+0x6e0/0xb40
-[  248.962999]  ? inode_security+0x1d/0x50
-[  248.963009]  ? selinux_file_permission+0xff/0x140
-[  248.963011]  iterate_dir+0x16f/0x1c0
-[  248.963014]  __x64_sys_getdents64+0x7b/0x120
-[  248.963016]  ? compat_fillonedir+0x150/0x150
-[  248.963019]  do_syscall_64+0x3b/0x90
-[  248.963021]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[  248.963024] RIP: 0033:0x7fedd7c6d8c7
-[  248.963026] Code: 00 00 0f 05 eb b7 66 2e 0f 1f 84 00 00 00 00 00 0f 1f =
-00 f3 0f 1e fa b8 ff ff ff 7f 48 39 c2 48 0f 47 d0 b8 d9 00 00 00 0f 05 <48=
-> 3d 00 f0 ff ff 77 01 c3 48 8b 15 81 a5 0f 00 f7 d8 64 89 02 48
-[  248.963028] RSP: 002b:00007ffd06cd87e8 EFLAGS: 00000293 ORIG_RAX: 000000=
-00000000d9
-[  248.963031] RAX: ffffffffffffffda RBX: 000056090d87dd20 RCX: 00007fedd7c=
-6d8c7
-[  248.963032] RDX: 0000000000080000 RSI: 000056090d87dd50 RDI: 00000000000=
-0000f
-[  248.963033] RBP: 000056090d87dd50 R08: 0000000000000030 R09: 00007fedc7d=
-37af0
-[  248.963035] R10: 00007fedc7d7d730 R11: 0000000000000293 R12: fffffffffff=
-fff88
-[  248.963038] R13: 000056090d87dd24 R14: 0000000000000000 R15: 000056090d0=
-485e8
-
-Here its seen an allocation of 512k is being requested (order:7), but fault=
-s.
-In this run it there was ~35MB of available memory on the system.
-
-Available Memory: 35268 kB
-Last Test Delta: -2624 kB
-Per-test Usage:
-[  0] **        			37016
-[  1] ********* 			41584
-[  2] *         			36280
-[  3] ********* 			41452
-[  4] ********  			40940
-[  5] ******    			39284
-[  6] ****      			38348
-[  7] ***       			37496
-[  8] ****      			37892
-[  9]           			35268
-
-This can be reproduced by running all autotests (changing the ram down to
-~128MB helps trigger it faster):
-
-./tools/test-runner -k <kernel> -d
+This can be useful for debugging, or recovering an encrypted
+profile after enabling SystemdEncrypt.
 ---
- tools/test-runner | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ Makefile.am             |   8 +-
+ tools/decrypt-profile.c | 163 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 170 insertions(+), 1 deletion(-)
+ create mode 100644 tools/decrypt-profile.c
 
-diff --git a/tools/test-runner b/tools/test-runner
-index cd110411..eaa107ff 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1887,12 +1887,15 @@ class Main:
- 			smp =3D int(nproc / 2)
+diff --git a/Makefile.am b/Makefile.am
+index 35938d22..a106b56f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -362,7 +362,7 @@ man_MANS +=3D wired/ead.8
+ endif
+ endif
  =
 
- 		#
--		# Increase RAM if valgrind is being used
-+		# TODO: Its unclear exactly what causes it (leak, fragmentation,
-+		# or ?), but after many test runs the kernel starts running out
-+		# of memory. This is sometimes non-fatal, e.g. a python call
-+		# fails, but other times the kernel fully panics.
- 		#
--		if self.args.valgrind:
--			ram =3D 512
--		else:
--			ram =3D 384
-+		# For now increase the RAM which allows full test runs to
-+		# complete.
-+		#
-+		ram =3D 1024
+-noinst_PROGRAMS +=3D tools/probe-req
++noinst_PROGRAMS +=3D tools/probe-req tools/decrypt-profile
  =
 
- 		print("Using %d cores, %d RAM for VM" % (smp, ram))
+ tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu.h src/mpdu.c \
+ 					src/ie.h src/ie.c \
+@@ -372,6 +372,12 @@ tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu=
+.h src/mpdu.c \
+ 					src/band.h src/band.c
+ tools_probe_req_LDADD =3D $(ell_ldadd)
  =
 
++tools_decrypt_profile_SOURCES =3D tools/decrypt-profile.c \
++					src/common.h src/common.c \
++					src/crypto.h src/crypto.c \
++					src/storage.h src/storage.c
++tools_decrypt_profile_LDADD =3D ${ell_ldadd}
++
+ if HWSIM
+ bin_PROGRAMS +=3D tools/hwsim
+ =
+
+diff --git a/tools/decrypt-profile.c b/tools/decrypt-profile.c
+new file mode 100644
+index 00000000..7247ea35
+--- /dev/null
++++ b/tools/decrypt-profile.c
+@@ -0,0 +1,163 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2022  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++#include <getopt.h>
++#include <stdio.h>
++#include <sys/stat.h>
++#include <ell/ell.h>
++
++#include "ell/useful.h"
++
++#include "src/storage.h"
++#include "src/common.h"
++#include "src/crypto.h"
++
++static void usage(void)
++{
++	printf("decrypt-profile - Decrypt a network profile\n"
++		"Usage:\n");
++	printf("\tdecrypt-profile <file> [--pass | --file]\n");
++	printf("\n\tEither --pass or --file must be provided\n");
++	printf("Options:\n"
++		"\t-p, --pass             Password/key used to encrypt\n"
++		"\t-f, --file             File containing key\n"
++		"\t-h, --help             Show help options\n");
++}
++
++static const struct option main_options[] =3D {
++	{ "pass", required_argument,       NULL, 'p' },
++	{ "file", required_argument,       NULL, 'f' },
++	{ "debug", no_argument,            NULL, 'd' },
++	{ "help", no_argument,             NULL, 'h' },
++	{ }
++};
++
++static uint8_t *secret_from_file(const char *file, size_t *len)
++{
++	uint8_t *key;
++	struct stat st;
++
++	if (stat(file, &st) < 0)
++		return NULL;
++
++	key =3D l_malloc(st.st_size);
++
++	if (read_file(key, st.st_size, "%s", file) < 0) {
++		l_free(key);
++		return NULL;
++	}
++
++	*len =3D st.st_size;
++
++	return key;
++}
++
++int main(int argc, char *argv[])
++{
++	const char *pass =3D NULL;
++	const char *file =3D NULL;
++	bool debug =3D false;
++	const char *ssid;
++	const char *profile;
++	enum security security;
++	_auto_(l_free) char *decrypted =3D NULL;
++	_auto_(l_settings_free) struct l_settings *settings =3D NULL;
++	_auto_(l_free) uint8_t *secret =3D NULL;
++	size_t secret_len =3D 0;
++	int ret =3D EXIT_FAILURE;
++
++	if (argc > 5) {
++		usage();
++		goto failed;
++	}
++
++	for (;;) {
++		int opt;
++
++		opt =3D getopt_long(argc - 1, argv + 1, "pfhd",
++					main_options, NULL);
++		if (opt < 0)
++			break;
++
++		switch (opt) {
++		case 'p':
++			pass =3D optarg;
++			break;
++		case 'f':
++			file =3D optarg;
++			break;
++		case 'd':
++			debug =3D true;
++			break;
++		case 'h':
++			usage();
++			return EXIT_SUCCESS;
++		default:
++			goto failed;
++		}
++	}
++
++	if (!file && !pass) {
++		usage();
++		goto failed;
++	}
++
++	if (debug)
++		l_debug_enable("*");
++
++	l_log_set_stderr();
++
++	if (!storage_create_dirs())
++		return EXIT_FAILURE;
++
++	if (pass) {
++		secret_len =3D strlen(pass);
++		secret =3D l_memdup(pass, secret_len);
++	} else
++		secret =3D secret_from_file(file, &secret_len);
++
++	profile =3D argv[1];
++
++	ssid =3D storage_network_ssid_from_path(profile, &security);
++	if (!ssid) {
++		l_error("Could not locate profile %s", profile);
++		goto failed;
++	}
++
++	__storage_set_encryption_key(secret, secret_len);
++
++	settings =3D storage_network_open(security, ssid);
++	if (!settings) {
++		l_error("Could not open profile %s", profile);
++		goto failed;
++	}
++
++	decrypted =3D l_settings_to_data(settings, NULL);
++
++	l_info("%s", decrypted);
++
++	ret =3D EXIT_SUCCESS;
++
++failed:
++	storage_cleanup_dirs();
++	return ret;
++}
 -- =
 
-2.34.1
+2.31.1
 
---===============4046411495775299547==--
+--===============6296398212162890122==--
 
