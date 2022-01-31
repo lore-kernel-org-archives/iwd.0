@@ -1,198 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============4534307878758815326=="
+Content-Type: multipart/mixed; boundary="===============4997080150949901828=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v6 2/9] unit: add DPP unit tests for URI parsing
-Date: Tue, 22 Feb 2022 14:02:25 -0800
-Message-ID: <20220222220232.2475972-2-prestwoj@gmail.com>
-In-Reply-To: 20220222220232.2475972-1-prestwoj@gmail.com
+Subject: [PATCH 4/5] doc: document SystemdEncrypt
+Date: Mon, 31 Jan 2022 12:11:54 -0800
+Message-ID: <20220131201155.3878756-4-prestwoj@gmail.com>
+In-Reply-To: 20220131201155.3878756-1-prestwoj@gmail.com
 
---===============4534307878758815326==
+--===============4997080150949901828==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- unit/test-dpp.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 139 insertions(+)
+ src/iwd.config.rst  | 16 ++++++++++++++++
+ src/iwd.network.rst |  6 +++++-
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
-v6:
- * Removed a value which was uninitalized and never set
-
-diff --git a/unit/test-dpp.c b/unit/test-dpp.c
-index bfe6f747..f376345c 100644
---- a/unit/test-dpp.c
-+++ b/unit/test-dpp.c
-@@ -33,6 +33,131 @@
- #include "src/util.h"
- #include "ell/useful.h"
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 54943702..a3d19fe5 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -188,6 +188,22 @@ The group ``[General]`` contains general settings.
+        by the kernel so if kernels/drivers exist which don't support OCV i=
+t can
+        be disabled here.
  =
 
-+struct dpp_test_info {
-+	const char *uri;
-+	bool expect_fail;
-+	uint32_t expected_freqs[10];
-+	struct dpp_uri_info result;
-+};
++   * - SystemdEncrypt
++     - Value: Systemd key ID
 +
-+struct dpp_test_info all_values =3D {
-+	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;K:MDkw=
-EwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=
-=3D;;",
-+	.result =3D {
-+		.mac =3D { 0x52, 0x54, 0x00, 0x58, 0x28, 0xe5 },
-+		.version =3D 2,
-+	},
-+	.expected_freqs =3D { 2412, 5180, 0 }
-+};
++       Enables network profile encryption using a systemd provided secret =
+key.
++       Once enabled all PSK/8021x network profiles will be encrypted
++       automatically. Once the profile is encrypted there is no way of goi=
+ng
++       back using IWD alone. A tool, decrypt-profile, is provided assuming=
+ the
++       secret is known which will decrypt a profile. This decrypted profile
++       could manually be set to /var/lib/iwd to 'undo' any profile encrypt=
+ion,
++       but its going to be a manual process.
 +
-+struct dpp_test_info no_type =3D {
-+	.uri =3D "C:81/1;K:shouldnotmatter;;",
-+	.expect_fail =3D true
-+};
++       Setting up systemd to provide the secret is left up to the user as =
+IWD
++       has no way of performing this automatically. The systemd options re=
+quired
++       are LoadCredentialEncrypted or SetCredentialEncrypted, and the secr=
+et
++       identifier should be named whatever SystemdEncrypt is set to.
 +
-+struct dpp_test_info empty =3D {
-+	.uri =3D "DPP:",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info no_key =3D {
-+	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info data_after_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D;;C:81/1;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info single_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info no_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info bad_key =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info unexpected_id =3D {
-+	.uri =3D "DPP:Z:somedata;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoI=
-RIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info bad_channels[] =3D {
-+	{
-+		.uri =3D "DPP:C:;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQ=
-MV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWG=
-oQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPW=
-GoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRI=
-PWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZo=
-IRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIR=
-IPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+};
-+
-+static bool verify_info(const struct dpp_uri_info *parsed,
-+			const struct dpp_test_info *result)
-+{
-+	const struct dpp_uri_info *expected =3D &result->result;
-+	uint32_t i;
-+
-+	assert(!memcmp(parsed->mac, expected->mac, 6));
-+	assert(parsed->version =3D=3D expected->version);
-+	assert(parsed->boot_public !=3D NULL);
-+
-+	for (i =3D 0; result->expected_freqs[i]; i++)
-+		assert(scan_freq_set_contains(parsed->freqs,
-+						result->expected_freqs[i]));
-+
-+	return true;
-+}
-+
-+static void test_uri_parse(const void *data)
-+{
-+	const struct dpp_test_info *test_info =3D data;
-+	struct dpp_uri_info *info;
-+
-+	info =3D dpp_parse_uri(test_info->uri);
-+	if (test_info->expect_fail) {
-+		assert(info =3D=3D NULL);
-+		return;
-+	}
-+
-+	assert(verify_info(info, test_info));
-+
-+	dpp_free_uri_info(info);
-+}
-+
-+
-+static void test_bad_channels(const void *data)
-+{
-+	unsigned int i;
-+
-+	for (i =3D 0; i < L_ARRAY_SIZE(bad_channels); i++)
-+		test_uri_parse(&bad_channels[i]);
-+}
-+
- /*
-  * B.2 Test Vectors for DPP Authentication Using P-256 for
-  * Responder-only Authentication
-@@ -148,5 +273,19 @@ int main(int argc, char *argv[])
- 		l_test_add("DPP test key derivation",
- 						test_key_derivation, NULL);
+ Network
+ -------
  =
 
-+	l_test_add("DPP URI parse", test_uri_parse, &all_values);
-+	l_test_add("DPP URI no type", test_uri_parse, &no_type);
-+	l_test_add("DPP URI empty", test_uri_parse, &empty);
-+	l_test_add("DPP URI no key", test_uri_parse, &no_key);
-+	l_test_add("DPP URI data after terminator", test_uri_parse,
-+				&data_after_terminator);
-+	l_test_add("DPP URI single terminator", test_uri_parse,
-+				&single_terminator);
-+	l_test_add("DPP URI no terminator", test_uri_parse,
-+				&no_terminator);
-+	l_test_add("DPP URI bad key", test_uri_parse, &bad_key);
-+	l_test_add("DPP URI bad channels", test_bad_channels, &bad_channels);
-+	l_test_add("DPP URI unexpected ID", test_uri_parse, &unexpected_id);
-+
- 	return l_test_run();
- }
+diff --git a/src/iwd.network.rst b/src/iwd.network.rst
+index e3d1a90a..34f8de1a 100644
+--- a/src/iwd.network.rst
++++ b/src/iwd.network.rst
+@@ -179,7 +179,11 @@ Network Authentication Settings
+ -------------------------------
+ =
+
+ The group ``[Security]`` contains settings for Wi-Fi security and
+-authentication configuration.
++authentication configuration. This group can be encrypted by enabling
++``SystemdEncrypt``, see *iwd.config* for details on this option. If this s=
+ection
++is encrypted (only contains EncryptedSalt/EncryptedSecurity) it should not=
+ be
++modified. Modifying these values will result in the inability to connect t=
+o that
++network.
+ =
+
+ .. list-table::
+    :header-rows: 0
 -- =
 
-2.34.1
+2.31.1
 
---===============4534307878758815326==--
+--===============4997080150949901828==--
 
