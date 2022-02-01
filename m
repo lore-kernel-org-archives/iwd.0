@@ -1,52 +1,66 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC19E2FAF
-	for <iwd@lists.linux.dev>; Wed, 15 Sep 2021 18:26:12 +0000 (UTC)
-Received: by mail-qk1-f177.google.com with SMTP id bk29so4479295qkb.8
-        for <iwd@lists.linux.dev>; Wed, 15 Sep 2021 11:26:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2F82CA6;
+	Tue,  1 Feb 2022 15:44:03 +0000 (UTC)
+Received: by mail-vs1-f52.google.com with SMTP id x13so16616893vsl.10;
+        Tue, 01 Feb 2022 07:44:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=date:from:to:subject:message-id:mime-version:content-disposition;
-        bh=PcSZ6JE3kihObY1mhYPtT2/CptLZpy/2COSkLEUaGPY=;
-        b=e2XT1oYWRhunqe+apl9WDBwuLWLzxM+SJiFSRXqI2KtdF7RCGXJIIwAM4s2Lh/vDoj
-         OJs1jvy0Jy1e2QH9kha1qNrE9c/GqQyxaJVaNe0xX0g/lbkPZAGHBvz8TORVnO3by4KF
-         64xI428JkQBoU4tFO0hiVjoOOPz1eGsgW4HPU=
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=bIkL3j1SUti+mxRknWXsGzjEHfZ++LfAOrCAj6OvBfk=;
+        b=XlaBX5xf2kC2PYFh91EO4ufBvcLkfsBOS665OsIpRa9DQkpb7u+LxrdpNGJzxoAnJ0
+         6Zrb97yEFwak4wNM5a0BjH3AdPWqIlAwjxrNKkSzysr8CFAIoYhUPvJm6Qcznt67FGJa
+         7c9Sj9fxgdbh2vhCp424CZvvJ1UrpoZyojJwNagTfy7FdayiBCXf6mVeEEvxUs5vhht/
+         f371R1RqGkTBAQFf/gEHEAhojKs0nS5FarjH5vHJG+n5BYFkMvHQorqXLR+d0iWDZ/HK
+         EHDUCIDj5zcbSEABUPNFWoSmIlD5wghMJe3kzeG7eFpipQf7kXFiZVWg4C44VU3TC3nw
+         cf+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
-         :content-disposition;
-        bh=PcSZ6JE3kihObY1mhYPtT2/CptLZpy/2COSkLEUaGPY=;
-        b=x1cemNq5Or12VCso7vo4u5uD6M7ko8uXc09vKsKPJUcjDBsu9eefEITMOSCAuiEhuG
-         TiNgsrttOP++4kPWs/vHvzVp8z1GMAxONMbXI48KnPOHh3YwhtvIIxMHcIKuZiEEKBdp
-         zFnlgtdlN75O1XtVFaxj7n5a1HcEKBAiDFruBq0uYkJE+cqyXCxZvX+ObE7E0A9eU1sU
-         koMRVSnTg1/GKArZyE8SIuIBwJYzUlXzBcDDlYnlKmsdJK3J2n9PJ+ajbvA+7oThAmSb
-         zIF3GsdrXFTUruliN0rzKidL7XCeqcuVuAeLY/f3BDNwvhpuYo7FUuSnX+dzHu5/GBmP
-         gVow==
-X-Gm-Message-State: AOAM5308/Pol1MLWWzb3L/HWVW+NYVydzq1yMNO8nxErCUKPJorJY24r
-	q+PRfmx/gtqhZPMbZVDk7KMa6ZowxirElQ==
-X-Google-Smtp-Source: ABdhPJwi6k1CUOwnxg9vdcdYcB9Dp//H/1zMNOhcmB0KDatx1fYkta2nOvd1/ZN+Ejy9CETwI8RHJA==
-X-Received: by 2002:ae9:c119:: with SMTP id z25mr1289969qki.201.1631730371848;
-        Wed, 15 Sep 2021 11:26:11 -0700 (PDT)
-Received: from meerkat.local (bras-base-mtrlpq5031w-grc-32-216-209-220-181.dsl.bell.ca. [216.209.220.181])
-        by smtp.gmail.com with ESMTPSA id d20sm446126qtw.53.2021.09.15.11.26.11
-        for <iwd@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Sep 2021 11:26:11 -0700 (PDT)
-Date: Wed, 15 Sep 2021 14:26:10 -0400
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: iwd@lists.linux.dev
-Subject: Test delivery to iwd@lists.linux.dev
-Message-ID: <20210915182610.4vfhlhurrurcfi5o@meerkat.local>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=bIkL3j1SUti+mxRknWXsGzjEHfZ++LfAOrCAj6OvBfk=;
+        b=zGWqDVvgo3fGsbJUB2qbvIbUvH3FmLFGHUe7O4oCMYpBJrFkJCMIFK//PeeEY27dNW
+         FJVH1D5lPoQIz/HYt1J6kvF3pumRsxJkVeDU4C+xGHfUTDHjzdDZ8Uq1yx/0rOlveP4T
+         OqlidV41qr9eNTbit0xjltpYkU8QE+ls6bENMCclSvCx05KpvL/Ar/ZVXM88n0WgBAsY
+         +GroZfSt5PL4L5Ci1iO9pDFt2A7B9n4uPRi28XozFi78gmHfKEqDBDz/U38CEePTzvPV
+         YgTe9grvQVGyD4R9AUGkfYdVM7kI6c1zcD0gfTmAfx1A0Sbc6mrVYsNFvC/PZCbJDXyr
+         C0EA==
+X-Gm-Message-State: AOAM532vhLytiotCRPAVTS3NkTMQHmEYmql1TzuqJLZI0zqU5xd8LK1I
+	GvHOROknFivWqBaI3vJmXBH7IStEIbb3TxGL5j4yUdNuUQuRxbH4ZY2xgQ==
+X-Google-Smtp-Source: ABdhPJwhlWLLV81lekh4LZE/fQYhJPXbW4owMGw7muEEAo0II3hymR3KzIUfuse9+LlQjTToAGFxAtsFrBNFhnqhg+w=
+X-Received: by 2002:a67:ca0d:: with SMTP id z13mr10443702vsk.9.1643730242915;
+ Tue, 01 Feb 2022 07:44:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+From: sanita retan <sanitaretan@gmail.com>
+Date: Tue, 1 Feb 2022 16:43:50 +0100
+Message-ID: <CABLemWhTUqqM=_vEScEc6i=rEAnhtUrQm6-XQOgAxrr3A8p5Qg@mail.gmail.com>
+Subject: subscribe
+To: sanitaretan@gmail.com
+Cc: chrome-platform+subscribe@lists.linux.dev, chrome-platform@lists.linux.dev, 
+	connman+subscribe@lists.linux.dev, connman@lists.linux.dev, 
+	containers+subscribe@lists.linux.dev, containers@lists.linux.dev, 
+	ell+subscribe@lists.linux.dev, ell@lists.linux.dev, 
+	iwd+subscribe@lists.linux.dev, iwd@lists.linux.dev, 
+	ksummit+subscribe@lists.linux.dev, ksummit@lists.linux.dev, 
+	landlock+subscribe@lists.linux.dev, landlock@lists.linux.dev, 
+	linux-coco+subscribe@lists.linux.dev, linux-coco@lists.linux.dev, 
+	linux-staging+subscribe@lists.linux.dev, linux-staging@lists.linux.dev, 
+	linux-sunxi+subscribe@lists.linux.dev, linux-sunxi@lists.linux.dev, 
+	llvm+subscribe@lists.linux.dev, llvm@lists.linux.dev, 
+	mhi+subscribe@lists.linux.dev, mhi@lists.linux.dev, 
+	mptcp+subscribe@lists.linux.dev, mptcp@lists.linux.dev, 
+	ntb+subscribe@lists.linux.dev, ntb@lists.linux.dev, 
+	ntfs3+subscribe@lists.linux.dev, ntfs3@lists.linux.dev, 
+	nvdimm+subscribe@lists.linux.dev, nvdimm@lists.linux.dev, 
+	ofono+subscribe@lists.linux.dev, ofono@lists.linux.dev, 
+	patches+subscribe@lists.linux.dev, patches@lists.linux.dev, 
+	regressions+subscribe@lists.linux.dev, regressions@lists.linux.dev, 
+	linux-somesuch@lists.linux.dev, postmaster@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Testing list archival, please ignore.
-
--K
+subscribe
