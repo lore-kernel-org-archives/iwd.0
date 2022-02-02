@@ -1,69 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============7173476930837281047=="
+Content-Type: multipart/mixed; boundary="===============7229311991465331614=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 7/7] doc: document access point scanning
-Date: Tue, 22 Feb 2022 14:57:18 -0800
-Message-ID: <20220222225718.2485794-7-prestwoj@gmail.com>
-In-Reply-To: 20220222225718.2485794-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2 3/5] tools: add decrypt-profile tool
+Date: Wed, 02 Feb 2022 14:06:50 -0600
+Message-ID: <4f9b41d8-b1fc-10b1-972e-be15064d7a17@gmail.com>
+In-Reply-To: 0f83741e9822343bc98e47d3074f8061588f7847.camel@gmail.com
 
---===============7173476930837281047==
+--===============7229311991465331614==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- doc/access-point-api.txt | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+Hi James,
 
-diff --git a/doc/access-point-api.txt b/doc/access-point-api.txt
-index 68ba23c5..3f712cee 100644
---- a/doc/access-point-api.txt
-+++ b/doc/access-point-api.txt
-@@ -37,6 +37,29 @@ Methods		void Start(string ssid, string psk)
- 						net.connman.iwd.AlreadyExists
- 						net.connman.iwd.NotFound
- =
+>>> +#include <stdio.h>
+>>> +#include <unistd.h>
+>>> +#include <libgen.h> > +#include <fcntl.h>
+>>
+>> Isn't sys/stat.h enough? In any case, you might want to group related
+>> #includes
+>> together.
+> =
 
-+		void Scan()
-+
-+			Schedule a network scan.
-+
-+			Possible errors:	net.connman.iwd.NotAvailable
-+						net.connman.iwd.NotSupported
-+						net.connman.iwd.Busy
-+						net.connman.iwd.Failed
-+
-+		array(dict) GetOrderedNetworks()
-+
-+			Gets the list of networks found after scanning sorted
-+			based on signal strength. Each item in the array is a
-+			dictionary containing the network Name, SignalStrength,
-+			and Security.
-+
-+			This list will expire similarly to station, and since
-+			access points do not do periodic scans the list may
-+			become empty after some time and requires scanning
-+			again.
-+
-+			Possible errors:	net.connman.iwd.NotAvailable
-+
- Properties	boolean Started [readonly]
- =
+> libgen.h is for basename(). The pattern I usually follow groups all
 
- 			Reflects whether an access point has been started.
-@@ -45,3 +68,7 @@ Properties	boolean Started [readonly]
- =
+I meant for fcntl.h and stat.h.  They usually go together.  Having libgen.h=
+ in =
 
- 			The SSID being broadcast for a started AP (omitted if
- 			AP has not been started)
-+
-+		boolean Scanning [readonly]
-+
-+			Reflects whether the access point is scanning.
--- =
+between was sort of unusual.
 
-2.34.1
+>>
+>> Note that you will also get errors from this function as well.=C2=A0 So
+>> I'm not sure
+>> if you want to re-design it to not print unnecessarily.
+> =
 
---===============7173476930837281047==--
+> __storage_decrypt() shouldn't print anything in this context since I
+> haven't enabled logging (previous patch sets did though).
+
+Ok fair enough.  I couldn't recall whether l_error was always printed or no=
+t. =
+
+Still, it may be better to return a -ERRNO and print based on that from a h=
+igher =
+
+level function.
+
+Regards,
+-Denis
+--===============7229311991465331614==--
 
