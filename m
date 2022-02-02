@@ -1,62 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============3807693957064270264=="
+Content-Type: multipart/mixed; boundary="===============9096199593109543858=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen_=3Ctoke_at_toke=2Edk=3E?=
 To: iwd at lists.01.org
-Subject: Re: [PATCH] station: Add missing netconfig_reset()
-Date: Wed, 29 Sep 2021 18:12:03 -0500
-Message-ID: <082cbccd-46d4-7f99-16cf-e57a5702881c@gmail.com>
-In-Reply-To: 20210929222201.124492-1-andrew.zaborowski@intel.com
+Subject: Re: iwd 1.23 crashes in eapol_handle_pkt_1_of_4()
+Date: Wed, 02 Feb 2022 16:05:57 +0100
+Message-ID: <87czk5cnqi.fsf@toke.dk>
+In-Reply-To: 2150796.4kSMX4sLTf@bagend
 
---===============3807693957064270264==
+--===============9096199593109543858==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Diederik de Haas <didi.debian(a)cknow.org> writes:
 
-On 9/29/21 5:22 PM, Andrew Zaborowski wrote:
-> On NETDEV_EVENT_DISCONNECT_BY_* events during netconfig, we'd forget to
-> call netconfig_reset() before trying a new netconfig_configure()
-> resulting in the "netconfig: Failed to start DHCPv4 client for interface
-> %u" warning and a L_WARN_ON.  Add the missing call.
+> On 2 February 2022 13:05:56 CET Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Since updating to iwd 1.23 (from Arch packages), I've started seeing
+>> periodic crashes. =
 
-So you're still not including the useful information that would be very use=
-ful =
+>> =
 
-that was mentioned in the earlier thread...
+>> Does anyone have any ideas? :)
+>
+> According to https://bugs.debian.org/1004607, iwd 1.23 needs a newer vers=
+ion =
 
-> ---
->   src/station.c | 3 +++
->   1 file changed, 3 insertions(+)
-> =
+> of ELL (version 0.48), so maybe you need to upgrade ELL too?
 
-> diff --git a/src/station.c b/src/station.c
-> index 934815f2..1c073fc1 100644
-> --- a/src/station.c
-> +++ b/src/station.c
-> @@ -2810,6 +2810,9 @@ static void station_disconnect_event(struct station=
- *station, void *event_data)
->   	switch (station->state) {
->   	case STATION_STATE_CONNECTING:
->   	case STATION_STATE_CONNECTING_AUTO:
-> +		if (station->netconfig)
-> +			netconfig_reset(station->netconfig);
-> +
+Nope, that's not it - already running ell v0.48 :)
 
-NAK.  This is still not addressing the underlying bug.  It should not go vi=
-a the =
-
-station_connect_cb path at all.  Perhaps you need to add a new =
-
-CONNECTED_NETCONFIG state instead.
-
->   		station_connect_cb(station->netdev,
->   					NETDEV_RESULT_HANDSHAKE_FAILED,
->   					event_data, station);
-> =
-
-
-Regards,
--Denis
---===============3807693957064270264==--
+-Toke
+--===============9096199593109543858==--
 
