@@ -1,53 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============6374851518887848873=="
+Content-Type: multipart/mixed; boundary="===============4639518006099594877=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen_=3Ctoke_at_toke=2Edk=3E?=
 To: iwd at lists.01.org
-Subject: [PATCH v3 6/7] station: check supported frequencies in neighbor report
-Date: Fri, 25 Feb 2022 15:32:50 -0800
-Message-ID: <20220225233251.2958102-6-prestwoj@gmail.com>
-In-Reply-To: 20220225233251.2958102-1-prestwoj@gmail.com
+Subject: Re: iwd 1.23 crashes in eapol_handle_pkt_1_of_4()
+Date: Wed, 02 Feb 2022 23:03:10 +0100
+Message-ID: <87a6f9c4f5.fsf@toke.dk>
+In-Reply-To: c8dcc66d-8241-f31f-3e27-13274792bdaa@gmail.com
 
---===============6374851518887848873==
+--===============4639518006099594877==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the report has an unsupported frequency don't add it to the list.
----
- src/station.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Denis Kenzior <denkenz(a)gmail.com> writes:
 
-diff --git a/src/station.c b/src/station.c
-index 637d03d1..00f3d178 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1712,6 +1712,8 @@ static void parse_neighbor_report(struct station *sta=
-tion,
- 	struct scan_freq_set *freq_set_md, *freq_set_no_md;
- 	uint32_t current_freq =3D 0;
- 	struct handshake_state *hs =3D netdev_get_handshake(station->netdev);
-+	const struct scan_freq_set *supported =3D
-+				wiphy_get_supported_freqs(station->wiphy);
- =
+> Hi Toke,
+>
+> On 2/2/22 06:05, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Hi
+>> =
 
- 	freq_set_md =3D scan_freq_set_new();
- 	freq_set_no_md =3D scan_freq_set_new();
-@@ -1748,6 +1750,10 @@ static void parse_neighbor_report(struct station *st=
-ation,
- 		if (!(band & wiphy_get_supported_bands(station->wiphy)))
- 			continue;
- =
+>> Since updating to iwd 1.23 (from Arch packages), I've started seeing
+>> periodic crashes. I rebuilt iwd with debug symbols enabled and got the
+>> following backtrace out of 'coredumpctl gdb':
+>> =
 
-+		/* Skip if frequency is not supported */
-+		if (!scan_freq_set_contains(supported, freq))
-+			continue;
-+
- 		if (!memcmp(info.addr,
- 				station->connected_bss->addr, ETH_ALEN)) {
- 			/*
--- =
+>
+> *hangs his head in shame*.  So I think we screwed up the same macro 2x no=
+w.
 
-2.34.1
+Heh, yeah, did see there was a commit touching that macro, but didn't
+look closer.
 
---===============6374851518887848873==--
+> Can you please try the patch I just sent out?
+
+Can do - thanks! Did a build with it incorporated and am running that
+now. Usually crashes once every hour (with striking regularity); will
+leave it running overnight and see if the crashes are gone by tomorrow :)
+
+-Toke
+--===============4639518006099594877==--
 
