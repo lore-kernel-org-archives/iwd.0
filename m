@@ -1,52 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============3843983053185077028=="
+Content-Type: multipart/mixed; boundary="===============4492776618357331295=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/5] dpp: don't allow StartEnrollee while connected
-Date: Fri, 07 Jan 2022 14:31:09 -0800
-Message-ID: <20220107223112.715855-2-prestwoj@gmail.com>
-In-Reply-To: 20220107223112.715855-1-prestwoj@gmail.com
+Subject: [PATCH v2 4/5] doc: document SystemdEncrypt
+Date: Wed, 02 Feb 2022 10:47:43 -0800
+Message-ID: <20220202184744.1954-4-prestwoj@gmail.com>
+In-Reply-To: 20220202184744.1954-1-prestwoj@gmail.com
 
---===============3843983053185077028==
+--===============4492776618357331295==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-While connected the driver ends up choosing quite small ROC
-durations leading to excessive calls to ROC. This also will
-negatively effect any wireless performance for the current
-network and possibly lead to missed DPP frames.
 ---
- src/dpp.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ src/iwd.config.rst  | 16 ++++++++++++++++
+ src/iwd.network.rst |  6 +++++-
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 61c6b36d..5d52e007 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -1638,10 +1638,16 @@ static struct l_dbus_message *dpp_dbus_start_enroll=
-ee(struct l_dbus *dbus,
- 	struct dpp_sm *dpp =3D user_data;
- 	uint32_t freq =3D band_channel_to_freq(6, BAND_FREQ_2_4_GHZ);
- 	struct l_dbus_message *reply;
-+	struct station *station =3D station_find(netdev_get_ifindex(dpp->netdev));
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 54943702..a3d19fe5 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -188,6 +188,22 @@ The group ``[General]`` contains general settings.
+        by the kernel so if kernels/drivers exist which don't support OCV i=
+t can
+        be disabled here.
  =
 
- 	if (dpp->state !=3D DPP_STATE_NOTHING)
- 		return dbus_error_busy(message);
- =
-
-+	if (!station || station_get_connected_network(station)) {
-+		l_warn("cannot be enrollee while connected, please disconnect");
-+		return dbus_error_busy(message);
-+	}
++   * - SystemdEncrypt
++     - Value: Systemd key ID
 +
- 	dpp->uri =3D dpp_generate_uri(dpp->pub_asn1, dpp->pub_asn1_len, 2,
- 					netdev_get_address(dpp->netdev), &freq,
- 					1, NULL, NULL);
++       Enables network profile encryption using a systemd provided secret =
+key.
++       Once enabled all PSK/8021x network profiles will be encrypted
++       automatically. Once the profile is encrypted there is no way of goi=
+ng
++       back using IWD alone. A tool, decrypt-profile, is provided assuming=
+ the
++       secret is known which will decrypt a profile. This decrypted profile
++       could manually be set to /var/lib/iwd to 'undo' any profile encrypt=
+ion,
++       but its going to be a manual process.
++
++       Setting up systemd to provide the secret is left up to the user as =
+IWD
++       has no way of performing this automatically. The systemd options re=
+quired
++       are LoadCredentialEncrypted or SetCredentialEncrypted, and the secr=
+et
++       identifier should be named whatever SystemdEncrypt is set to.
++
+ Network
+ -------
+ =
+
+diff --git a/src/iwd.network.rst b/src/iwd.network.rst
+index e3d1a90a..34f8de1a 100644
+--- a/src/iwd.network.rst
++++ b/src/iwd.network.rst
+@@ -179,7 +179,11 @@ Network Authentication Settings
+ -------------------------------
+ =
+
+ The group ``[Security]`` contains settings for Wi-Fi security and
+-authentication configuration.
++authentication configuration. This group can be encrypted by enabling
++``SystemdEncrypt``, see *iwd.config* for details on this option. If this s=
+ection
++is encrypted (only contains EncryptedSalt/EncryptedSecurity) it should not=
+ be
++modified. Modifying these values will result in the inability to connect t=
+o that
++network.
+ =
+
+ .. list-table::
+    :header-rows: 0
 -- =
 
 2.31.1
 
---===============3843983053185077028==--
+--===============4492776618357331295==--
 
