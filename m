@@ -1,198 +1,302 @@
-Content-Type: multipart/mixed; boundary="===============1595671415384716892=="
+Content-Type: multipart/mixed; boundary="===============5430868384370509672=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 2/9] unit: add DPP unit tests for URI parsing
-Date: Fri, 18 Feb 2022 11:31:27 -0800
-Message-ID: <20220218193134.2143232-2-prestwoj@gmail.com>
-In-Reply-To: 20220218193134.2143232-1-prestwoj@gmail.com
+Subject: [PATCH v2 3/5] tools: add decrypt-profile tool
+Date: Wed, 02 Feb 2022 10:47:42 -0800
+Message-ID: <20220202184744.1954-3-prestwoj@gmail.com>
+In-Reply-To: 20220202184744.1954-1-prestwoj@gmail.com
 
---===============1595671415384716892==
+--===============5430868384370509672==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- unit/test-dpp.c | 142 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 142 insertions(+)
+This tool will decrypt an IWD network profile which was previously
+encrypted using a systemd provided key. Either a text passphrase
+can be provided (--pass) or a file containing the secret (--file).
 
-diff --git a/unit/test-dpp.c b/unit/test-dpp.c
-index bfe6f747..1803e688 100644
---- a/unit/test-dpp.c
-+++ b/unit/test-dpp.c
-@@ -33,6 +33,134 @@
- #include "src/util.h"
- #include "ell/useful.h"
+This can be useful for debugging, or recovering an encrypted
+profile after enabling SystemdEncrypt.
+---
+ Makefile.am             |   8 +-
+ tools/decrypt-profile.c | 232 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 239 insertions(+), 1 deletion(-)
+ create mode 100644 tools/decrypt-profile.c
+
+diff --git a/Makefile.am b/Makefile.am
+index 35938d22..a106b56f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -362,7 +362,7 @@ man_MANS +=3D wired/ead.8
+ endif
+ endif
  =
 
-+struct dpp_test_info {
-+	const char *uri;
-+	bool expect_fail;
-+	uint32_t expected_freqs[10];
-+	struct dpp_uri_info result;
-+};
+-noinst_PROGRAMS +=3D tools/probe-req
++noinst_PROGRAMS +=3D tools/probe-req tools/decrypt-profile
+ =
+
+ tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu.h src/mpdu.c \
+ 					src/ie.h src/ie.c \
+@@ -372,6 +372,12 @@ tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu=
+.h src/mpdu.c \
+ 					src/band.h src/band.c
+ tools_probe_req_LDADD =3D $(ell_ldadd)
+ =
+
++tools_decrypt_profile_SOURCES =3D tools/decrypt-profile.c \
++					src/common.h src/common.c \
++					src/crypto.h src/crypto.c \
++					src/storage.h src/storage.c
++tools_decrypt_profile_LDADD =3D ${ell_ldadd}
 +
-+struct dpp_test_info all_values =3D {
-+	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;K:MDkw=
-EwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=
-=3D;;",
-+	.result =3D {
-+		.mac =3D { 0x52, 0x54, 0x00, 0x58, 0x28, 0xe5 },
-+		.version =3D 2,
-+	},
-+	.expected_freqs =3D { 2412, 5180, 0 }
-+};
+ if HWSIM
+ bin_PROGRAMS +=3D tools/hwsim
+ =
+
+diff --git a/tools/decrypt-profile.c b/tools/decrypt-profile.c
+new file mode 100644
+index 00000000..80942dc6
+--- /dev/null
++++ b/tools/decrypt-profile.c
+@@ -0,0 +1,232 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2022  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
 +
-+struct dpp_test_info no_type =3D {
-+	.uri =3D "C:81/1;K:shouldnotmatter;;",
-+	.expect_fail =3D true
-+};
++#include <stdio.h>
++#include <unistd.h>
++#include <libgen.h>
++#include <fcntl.h>
++#include <getopt.h>
++#include <sys/stat.h>
++#include <ell/ell.h>
 +
-+struct dpp_test_info empty =3D {
-+	.uri =3D "DPP:",
-+	.expect_fail =3D true
-+};
++#include "ell/useful.h"
 +
-+struct dpp_test_info no_key =3D {
-+	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;;",
-+	.expect_fail =3D true
-+};
++#include "src/storage.h"
 +
-+struct dpp_test_info data_after_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D;;C:81/1;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info single_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info no_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info bad_key =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info unexpected_id =3D {
-+	.uri =3D "DPP:Z:somedata;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoI=
-RIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info bad_channels[] =3D {
-+	{
-+		.uri =3D "DPP:C:;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQ=
-MV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWG=
-oQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPW=
-GoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRI=
-PWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZo=
-IRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIR=
-IPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+};
-+
-+static bool verify_info(const struct dpp_uri_info *parsed,
-+			const struct dpp_test_info *result)
++static void usage(void)
 +{
-+	const struct dpp_uri_info *expected =3D &result->result;
-+	uint32_t i;
-+
-+	assert(!memcmp(parsed->mac, expected->mac, 6));
-+	assert(parsed->version =3D=3D expected->version);
-+	assert(parsed->boot_public !=3D NULL);
-+
-+	for (i =3D 0; result->expected_freqs[i]; i++)
-+		assert(scan_freq_set_contains(parsed->freqs,
-+						result->expected_freqs[i]));
-+
-+	return true;
++	printf("decrypt-profile - Decrypt a network profile\n"
++		"Usage:\n");
++	printf("\tdecrypt-profile [--pass | --file] [OPTIONS]\n");
++	printf("\n\tEither --pass or --file must be provided. The profile\n");
++	printf("\twill be read from stdin or from --infile.\n");
++	printf("\tThe --ssid argument must be used if the SSID cannot be\n");
++	printf("\tinferred from the input file\n\n");
++	printf("Options:\n"
++		"\t-p, --pass             Password/key used to encrypt\n"
++		"\t-f, --file             File containing key\n"
++		"\t-s, --ssid             SSID for associated profile (will\n"
++		"\t                       be inferred from --infile if not\n"
++		"\t                       provided)\n"
++		"\t-i, --infile           Input profile (if stdin is not used)\n"
++		"\t-o, --outfile          Output file for decrypted profile\n"
++		"\t-h, --help             Show help options\n");
++	printf("\n");
 +}
 +
-+static void test_uri_parse(const void *data)
-+{
-+	const struct dpp_test_info *test_info =3D data;
-+	struct dpp_uri_info *info;
-+	int ret;
++static const struct option main_options[] =3D {
++	{ "pass", required_argument,       NULL, 'p' },
++	{ "file", required_argument,       NULL, 'f' },
++	{ "infile", required_argument,     NULL, 'i' },
++	{ "outfile", required_argument,    NULL, 'o' },
++	{ "ssid", required_argument,       NULL, 's' },
++	{ "help", no_argument,             NULL, 'h' },
++	{ }
++};
 +
-+	info =3D dpp_parse_uri(test_info->uri);
-+	if (test_info->expect_fail) {
-+		assert(info =3D=3D NULL);
-+		return;
++static uint8_t *secret_from_file(const char *file, size_t *len)
++{
++	uint8_t *key;
++	struct stat st;
++
++	if (stat(file, &st) < 0)
++		return NULL;
++
++	key =3D l_malloc(st.st_size);
++
++	if (read_file(key, st.st_size, "%s", file) < 0) {
++		l_free(key);
++		return NULL;
 +	}
 +
-+	assert(ret =3D=3D 0);
++	*len =3D st.st_size;
 +
-+	assert(verify_info(info, test_info));
-+
-+	dpp_free_uri_info(info);
++	return key;
 +}
 +
-+
-+static void test_bad_channels(const void *data)
++int main(int argc, char *argv[])
 +{
-+	unsigned int i;
++	const char *pass =3D NULL;
++	const char *file =3D NULL;
++	const char *infile =3D NULL;
++	const char *outfile =3D NULL;
++	_auto_(l_free) char *ssid =3D NULL;
++	_auto_(l_free) char *decrypted =3D NULL;
++	_auto_(l_settings_free) struct l_settings *settings =3D NULL;
++	_auto_(l_free) uint8_t *secret =3D NULL;
++	size_t secret_len =3D 0;
++	int ret =3D EXIT_FAILURE;
++	char profile[BUFSIZ];
++	ssize_t len =3D 0;
++	char *line;
 +
-+	for (i =3D 0; i < L_ARRAY_SIZE(bad_channels); i++)
-+		test_uri_parse(&bad_channels[i]);
++	if (isatty(0))
++		goto done_reading;
++
++	while ((line =3D fgets(profile + len, sizeof(profile) - len, stdin)))
++		len +=3D strlen(profile + len);
++
++done_reading:
++	for (;;) {
++		int opt;
++
++		opt =3D getopt_long(argc, argv, "pfhio",
++					main_options, NULL);
++		if (opt < 0)
++			break;
++
++		switch (opt) {
++		case 'p':
++			pass =3D optarg;
++			break;
++		case 'f':
++			file =3D optarg;
++			break;
++		case 'i':
++			infile =3D optarg;
++			break;
++		case 'o':
++			outfile =3D optarg;
++			break;
++		case 's':
++			ssid =3D l_strdup(optarg);
++			break;
++		case 'h':
++			usage();
++			return EXIT_SUCCESS;
++		default:
++			goto failed;
++		}
++	}
++
++	if (!file && !pass) {
++		usage();
++		goto failed;
++	}
++
++	if (!len && !infile) {
++		printf("No input file (use stdin or --infile)\n\n");
++		usage();
++		goto failed;
++	}
++
++	if (len && infile) {
++		printf("Use only stdin or --infile for input profile\n\n");
++		usage();
++		goto failed;
++	}
++
++	if (infile) {
++		/* Try and detect SSID from input file */
++		if (!ssid) {
++			char *dot;
++
++			ssid =3D l_strdup(basename((char *)infile));
++			/* remove extension */
++			dot =3D strchr(ssid, '.');
++			if (!dot)
++				goto no_ssid;
++
++			*dot =3D '\0';
++		}
++
++		len =3D read_file(profile, sizeof(profile), "%s", infile);
++		if (len < 0) {
++			printf("Could not read from %s (%ld)\n", infile, len);
++			goto failed;
++		}
++	}
++
++	if (!ssid) {
++no_ssid:
++		printf("Can't detect SSID from input source (use --ssid)\n");
++		goto failed;
++	}
++
++	if (pass) {
++		secret_len =3D strlen(pass);
++		secret =3D l_memdup(pass, secret_len);
++	} else
++		secret =3D secret_from_file(file, &secret_len);
++
++	__storage_set_encryption_key(secret, secret_len);
++
++	settings =3D l_settings_new();
++
++	if (!l_settings_load_from_data(settings, profile, len)) {
++		printf("Profile is not formatted correctly\n");
++		goto failed;
++	}
++
++	if (!__storage_decrypt(settings, ssid, NULL)) {
++		printf("Unable to decrypt profile\n");
++		goto failed;
++	}
++
++	decrypted =3D l_settings_to_data(settings, (size_t *)&len);
++
++	if (!outfile)
++		printf("%s\n", decrypted);
++	else {
++		int fd =3D open(outfile, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
++
++		if (fd < 0) {
++			printf("Unable to open %s (%d)\n\n", outfile, fd);
++			close(fd);
++			goto failed;
++		}
++
++		len =3D write(fd, decrypted, len);
++
++		close(fd);
++
++		if (len < 0) {
++			printf("Unable to write to %s (%ld)\n\n", outfile, len);
++			goto failed;
++		}
++	}
++
++	ret =3D EXIT_SUCCESS;
++
++failed:
++	return ret;
 +}
-+
- /*
-  * B.2 Test Vectors for DPP Authentication Using P-256 for
-  * Responder-only Authentication
-@@ -148,5 +276,19 @@ int main(int argc, char *argv[])
- 		l_test_add("DPP test key derivation",
- 						test_key_derivation, NULL);
- =
-
-+	l_test_add("DPP URI parse", test_uri_parse, &all_values);
-+	l_test_add("DPP URI no type", test_uri_parse, &no_type);
-+	l_test_add("DPP URI empty", test_uri_parse, &empty);
-+	l_test_add("DPP URI no key", test_uri_parse, &no_key);
-+	l_test_add("DPP URI data after terminator", test_uri_parse,
-+				&data_after_terminator);
-+	l_test_add("DPP URI single terminator", test_uri_parse,
-+				&single_terminator);
-+	l_test_add("DPP URI no terminator", test_uri_parse,
-+				&no_terminator);
-+	l_test_add("DPP URI bad key", test_uri_parse, &bad_key);
-+	l_test_add("DPP URI bad channels", test_bad_channels, &bad_channels);
-+	l_test_add("DPP URI unexpected ID", test_uri_parse, &unexpected_id);
-+
- 	return l_test_run();
- }
 -- =
 
-2.34.1
+2.31.1
 
---===============1595671415384716892==--
+--===============5430868384370509672==--
 
