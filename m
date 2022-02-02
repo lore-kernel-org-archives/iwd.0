@@ -1,256 +1,440 @@
-Content-Type: multipart/mixed; boundary="===============1106316928425348013=="
+Content-Type: multipart/mixed; boundary="===============6946253109380652524=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 6/7] auto-t: add test for encrypted profiles
-Date: Fri, 04 Feb 2022 09:31:19 -0800
-Message-ID: <20220204173120.231730-6-prestwoj@gmail.com>
-In-Reply-To: 20220204173120.231730-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2 3/5] tools: add decrypt-profile tool
+Date: Wed, 02 Feb 2022 11:57:01 -0800
+Message-ID: <0f83741e9822343bc98e47d3074f8061588f7847.camel@gmail.com>
+In-Reply-To: 9f6f5694-8f0a-4d01-69f5-b9695c5a0e4d@gmail.com
 
---===============1106316928425348013==
+--===============6946253109380652524==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- .../testEncryptedProfiles/connection_test.py  | 154 ++++++++++++++++++
- autotests/testEncryptedProfiles/hw.conf       |   6 +
- autotests/testEncryptedProfiles/iwd-secret    |   1 +
- autotests/testEncryptedProfiles/main.conf     |   2 +
- autotests/testEncryptedProfiles/ssidCCMP.conf |  10 ++
- autotests/testEncryptedProfiles/ssidCCMP.psk  |   2 +
- 6 files changed, 175 insertions(+)
- create mode 100644 autotests/testEncryptedProfiles/connection_test.py
- create mode 100644 autotests/testEncryptedProfiles/hw.conf
- create mode 100644 autotests/testEncryptedProfiles/iwd-secret
- create mode 100644 autotests/testEncryptedProfiles/main.conf
- create mode 100644 autotests/testEncryptedProfiles/ssidCCMP.conf
- create mode 100644 autotests/testEncryptedProfiles/ssidCCMP.psk
+On Wed, 2022-02-02 at 13:39 -0600, Denis Kenzior wrote:
+> Hi James,
+> =
 
-diff --git a/autotests/testEncryptedProfiles/connection_test.py b/autotests=
-/testEncryptedProfiles/connection_test.py
-new file mode 100644
-index 00000000..dd4892ca
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/connection_test.py
-@@ -0,0 +1,154 @@
-+#!/usr/bin/python3
-+
-+import unittest
-+import sys
-+
-+sys.path.append('../util')
-+import iwd
-+import os
-+from iwd import IWD
-+from iwd import NetworkType
-+from iwd import PSKAgent
-+
-+class Test(unittest.TestCase):
-+    def profile_is_encrypted(self, profile):
-+        with open('/tmp/iwd/' + profile) as f:
-+            contents =3D f.read()
-+
-+        if 'Passphrase' in contents:
-+            return False
-+
-+        return True
-+
-+    def validate(self, wd):
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+
-+        ordered_network =3D device.get_ordered_network('ssidCCMP')
-+
-+        self.assertEqual(ordered_network.type, NetworkType.psk)
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        ordered_network.network_object.connect()
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        device.disconnect()
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+    # Tests that an existing plaintext profile gets encrypted
-+    def test_new_profile(self):
-+        IWD.copy_to_storage('ssidCCMP.psk')
-+
-+        mtime =3D os.path.getmtime('/tmp/iwd/' + 'ssidCCMP.psk')
-+        self.assertFalse(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+        wd =3D IWD(True)
-+
-+        # Make sure profile was accepted
-+        condition =3D 'len(obj.list_known_networks()) =3D=3D 1'
-+        wd.wait_for_object_condition(wd, condition)
-+
-+        # Check the file was modified (should be encrypted now)
-+        self.assertNotEqual(mtime, os.path.getmtime('/tmp/iwd/' + 'ssidCCM=
-P.psk'))
-+
-+        self.validate(wd)
-+
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+    # Tests that a new connection with agent gets written to an encrypted =
-profile
-+    def test_agent_profile(self):
-+        wd =3D IWD(True)
-+
-+        psk_agent =3D PSKAgent("secret123")
-+        wd.register_psk_agent(psk_agent)
-+
-+        with self.assertRaises(FileNotFoundError):
-+            self.profile_is_encrypted('ssidCCMP.psk')
-+
-+        self.validate(wd)
-+
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+        wd.unregister_psk_agent(psk_agent)
-+
-+    # Tests that an invalid profile gets re-written after an agent request
-+    def test_invalid_profile_rewritten(self):
-+        bad_config =3D '[Security]\nPassphrase=3Dincorrect\n'
-+        os.system('echo "%s" > /tmp/iwd/ssidCCMP.psk' % bad_config)
-+
-+        wd =3D IWD(True)
-+
-+        condition =3D 'len(obj.list_known_networks()) =3D=3D 1'
-+        wd.wait_for_object_condition(wd, condition)
-+
-+        # IWD should still encrypt the profile automatically
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+        # This should fail
-+        with self.assertRaises(iwd.FailedEx):
-+            self.validate(wd)
-+
-+        psk_agent =3D PSKAgent("secret123")
-+        wd.register_psk_agent(psk_agent)
-+
-+        self.validate(wd)
-+
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+    # Tests that a profile that doesn't decrypt wont become a known network
-+    def test_decryption_failure(self):
-+        bad_config =3D \
-+'''
-+[Security]
-+EncryptedSalt=3D000102030405060708090a0b0c0d0e0f
-+EncryptedSecurity=3Daabbccddeeff00112233445566778899
-+'''
-+        os.system('echo "%s" > /tmp/iwd/ssidCCMP.psk' % bad_config)
-+
-+        wd =3D IWD(True)
-+
-+        self.assertEqual(wd.list_known_networks(), [])
-+
-+    def test_runtime_profile(self):
-+        wd =3D IWD(True)
-+
-+        self.assertEqual(wd.list_known_networks(), [])
-+
-+        # Add profile after IWD starts
-+        IWD.copy_to_storage('ssidCCMP.psk')
-+
-+        self.validate(wd)
-+
-+        # Should now be encrypted
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+        with open('/tmp/iwd/ssidCCMP.psk') as f:
-+            profile =3D f.read()
-+
-+        # Edit the profile, corrupting it
-+        profile.replace('EncryptedSecurity=3D', 'EncryptedSecurity=3D00')
-+
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+    def tearDown(self):
-+        IWD.clear_storage()
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        os.environ['CREDENTIALS_DIRECTORY'] =3D '/tmp'
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
-diff --git a/autotests/testEncryptedProfiles/hw.conf b/autotests/testEncryp=
-tedProfiles/hw.conf
-new file mode 100644
-index 00000000..de81e1e2
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/hw.conf
-@@ -0,0 +1,6 @@
-+[SETUP]
-+num_radios=3D2
-+start_iwd=3D0
-+
-+[HOSTAPD]
-+rad0=3DssidCCMP.conf
-diff --git a/autotests/testEncryptedProfiles/iwd-secret b/autotests/testEnc=
-ryptedProfiles/iwd-secret
-new file mode 100644
-index 00000000..c2afca48
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/iwd-secret
-@@ -0,0 +1 @@
-+secret123
-diff --git a/autotests/testEncryptedProfiles/main.conf b/autotests/testEncr=
-yptedProfiles/main.conf
-new file mode 100644
-index 00000000..35d40c5e
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/main.conf
-@@ -0,0 +1,2 @@
-+[General]
-+SystemdEncrypt=3Diwd-secret
-diff --git a/autotests/testEncryptedProfiles/ssidCCMP.conf b/autotests/test=
-EncryptedProfiles/ssidCCMP.conf
-new file mode 100644
-index 00000000..c79f5e55
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/ssidCCMP.conf
-@@ -0,0 +1,10 @@
-+hw_mode=3Dg
-+channel=3D1
-+ssid=3DssidCCMP
-+
-+wpa=3D2
-+wpa_pairwise=3DCCMP
-+wpa_passphrase=3Dsecret123
-+
-+ieee80211w=3D2
-+wpa_key_mgmt=3DWPA-PSK-SHA256
-diff --git a/autotests/testEncryptedProfiles/ssidCCMP.psk b/autotests/testE=
-ncryptedProfiles/ssidCCMP.psk
-new file mode 100644
-index 00000000..abafdb66
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/ssidCCMP.psk
-@@ -0,0 +1,2 @@
-+[Security]
-+Passphrase=3Dsecret123
--- =
+> On 2/2/22 12:47, James Prestwood wrote:
+> > This tool will decrypt an IWD network profile which was previously
+> > encrypted using a systemd provided key. Either a text passphrase
+> > can be provided (--pass) or a file containing the secret (--file).
+> =
 
-2.31.1
+> You may want to provide some usage examples in the commit
+> description.=C2=A0 Maybe =
 
---===============1106316928425348013==--
+> even mention stdin/--infile and stdout/-outfile use.
+> =
+
+> > =
+
+> > This can be useful for debugging, or recovering an encrypted
+> > profile after enabling SystemdEncrypt.
+> > ---
+> > =C2=A0 Makefile.am=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 8 +-
+> > =C2=A0 tools/decrypt-profile.c | 232
+> > ++++++++++++++++++++++++++++++++++++++++
+> > =C2=A0 2 files changed, 239 insertions(+), 1 deletion(-)
+> > =C2=A0 create mode 100644 tools/decrypt-profile.c
+> > =
+
+> > diff --git a/Makefile.am b/Makefile.am
+> > index 35938d22..a106b56f 100644
+> > --- a/Makefile.am
+> > +++ b/Makefile.am
+> > @@ -362,7 +362,7 @@ man_MANS +=3D wired/ead.8
+> > =C2=A0 endif
+> > =C2=A0 endif
+> > =C2=A0 =
+
+> > -noinst_PROGRAMS +=3D tools/probe-req
+> > +noinst_PROGRAMS +=3D tools/probe-req tools/decrypt-profile
+> =
+
+> Should this be an installed binary?=C2=A0 Something like iwd-decrypt-
+> profile?
+
+Sure, is there anything else I need to do for that? or anything named
+iwd-* gets installed?
+
+> =
+
+> > +#include <stdio.h>
+> > +#include <unistd.h>
+> > +#include <libgen.h> > +#include <fcntl.h>
+> =
+
+> Isn't sys/stat.h enough? In any case, you might want to group related
+> #includes =
+
+> together.
+
+libgen.h is for basename(). The pattern I usually follow groups all
+system includes together, then ELL, then locals, so I could put a
+newline before <ell/ell.h> but I'm not sure how else I could group the
+system includes...
+
+> =
+
+> > +#include <getopt.h>
+> > +#include <sys/stat.h>
+> > +#include <ell/ell.h>
+> > +
+> > +#include "ell/useful.h"
+> > +
+> > +#include "src/storage.h"
+> > +
+> =
+
+> <snip>
+> =
+
+> > +int main(int argc, char *argv[])
+> > +{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *pass =3D NULL;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *file =3D NULL;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *infile =3D NULL;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *outfile =3D NULL;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_auto_(l_free) char *ssid =
+=3D NULL;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_auto_(l_free) char *decrypt=
+ed =3D NULL;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_auto_(l_settings_free) stru=
+ct l_settings *settings =3D NULL;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_auto_(l_free) uint8_t *secr=
+et =3D NULL;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0size_t secret_len =3D 0;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int ret =3D EXIT_FAILURE;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char profile[BUFSIZ];
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ssize_t len =3D 0;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char *line;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (isatty(0))
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto done_reading;
+> =
+
+> Err, why is the command line arguments not being parsed first?=C2=A0 I
+> mean you might =
+
+> want to use 'decrypt-profile --help' ?
+> =
+
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while ((line =3D fgets(profi=
+le + len, sizeof(profile) - len,
+> > stdin)))
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0len +=3D strlen(profile + len);
+> =
+
+> You should check whether infile was specified prior to attempting
+> this.
+> =
+
+> > +
+> > +done_reading:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (;;) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0int opt;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0opt =3D getopt_long(argc, argv, "pfhio",
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0main_options, NULL);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0if (opt < 0)
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0switch (opt) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0case 'p':
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pass =
+=3D optarg;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0case 'f':
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0file =
+=3D optarg;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0case 'i':
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0infile=
+ =3D optarg;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0case 'o':
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0outfil=
+e =3D optarg;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0case 's':
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ssid =
+=3D l_strdup(optarg);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0case 'h':
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0usage(=
+);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return=
+ EXIT_SUCCESS;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0default:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto f=
+ailed;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0}
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!file && !pass) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0usage();
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto failed;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> So if infile specified, read that.=C2=A0 Otherwise, if no --ssid, fail.=
+=C2=A0
+> Read stdin...
+> =
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!len && !infile) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0printf("No input file (use stdin or --
+> > infile)\n\n");
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0usage();
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto failed;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (len && infile) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0printf("Use only stdin or --infile for input
+> > profile\n\n");
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0usage();
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto failed;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> =
+
+> Check for ssid and override that.
+> =
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (infile) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0/* Try and detect SSID from input file */
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0if (!ssid) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char *=
+dot;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ssid =
+=3D l_strdup(basename((char *)infile));
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* rem=
+ove extension */
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dot =
+=3D strchr(ssid, '.');
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!d=
+ot)
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto no_ssid;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*dot =
+=3D '\0';
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> =
+
+> That isn't how ssids are stored in the profile.=C2=A0 You're better off
+> relying on =
+
+> storage_network_ssid_from_path() from storage.c here.
+
+Ok, that one is actually safe to use so I'll use it instead.
+
+> =
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0len =3D read_file(profile, sizeof(profile), "%s",
+> > infile);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0if (len < 0) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf=
+("Could not read from %s (%ld)\n",
+> > infile, len);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto f=
+ailed;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0}
+> =
+
+> Why not rely on the new functions from patch 1?=C2=A0 We could introduce a
+> full-path =
+
+> version of storage_network_open maybe.
+
+We could if you want. I just didn't want to add another API.
+
+> =
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!ssid) {
+> > +no_ssid:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0printf("Can't detect SSID from input source (use --
+> > ssid)\n");
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto failed;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (pass) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0secret_len =3D strlen(pass);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0secret =3D l_memdup(pass, secret_len);
+> =
+
+> Why do we need the memdup?
+
+Consistency with secret_from_file(), but yes, mmap will avoid the need
+for this.
+
+> =
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0secret =3D secret_from_file(file, &secret_len);
+> =
+
+> This could actually be an mmap instead.
+> =
+
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0__storage_set_encryption_key=
+(secret, secret_len);
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0settings =3D l_settings_new(=
+);
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!l_settings_load_from_da=
+ta(settings, profile, len)) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0printf("Profile is not formatted correctly\n");
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto failed;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!__storage_decrypt(setti=
+ngs, ssid, NULL)) {
+> =
+
+> Note that you will also get errors from this function as well.=C2=A0 So
+> I'm not sure =
+
+> if you want to re-design it to not print unnecessarily.
+
+__storage_decrypt() shouldn't print anything in this context since I
+haven't enabled logging (previous patch sets did though).
+
+> =
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0printf("Unable to decrypt profile\n");
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto failed;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0decrypted =3D l_settings_to_=
+data(settings, (size_t *)&len);
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!outfile)
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0printf("%s\n", decrypted);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0else {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0int fd =3D open(outfile, O_CREAT | O_WRONLY, S_IRUSR
+> > | S_IWUSR);
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0if (fd < 0) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf=
+("Unable to open %s (%d)\n\n",
+> > outfile, fd);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0close(=
+fd);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto f=
+ailed;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0len =3D write(fd, decrypted, len);
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0close(fd);
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0if (len < 0) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf=
+("Unable to write to %s (%ld)\n\n",
+> > outfile, len);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto f=
+ailed;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0}
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D EXIT_SUCCESS;
+> > +
+> > +failed:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return ret;
+> > +}
+> > =
+
+> =
+
+> Regards,
+> -Denis
+
+
+--===============6946253109380652524==--
 
