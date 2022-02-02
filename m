@@ -1,58 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============7121808623943671950=="
+Content-Type: multipart/mixed; boundary="===============0771784536775014047=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Diederik de Haas <didi.debian at cknow.org>
 To: iwd at lists.01.org
-Subject: [PATCH v2 4/5] json: restrict json_iter_{parse,
- next} to objects/arrays
-Date: Thu, 06 Jan 2022 14:52:57 -0800
-Message-ID: <20220106225258.570850-4-prestwoj@gmail.com>
-In-Reply-To: 20220106225258.570850-1-prestwoj@gmail.com
+Subject: Re: iwd 1.23 crashes in eapol_handle_pkt_1_of_4()
+Date: Wed, 02 Feb 2022 14:04:58 +0100
+Message-ID: <2150796.4kSMX4sLTf@bagend>
+In-Reply-To: 87fsp1cw2j.fsf@toke.dk
 
---===============7121808623943671950==
+--===============0771784536775014047==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-json_iter_parse is only meant to work on objects while
-json_iter_next is only meant to work on arrays.
+On 2 February 2022 13:05:56 CET Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> Since updating to iwd 1.23 (from Arch packages), I've started seeing
+> periodic crashes. =
 
-This adds checks in both APIs to ensure they aren't being
-used incorrectly.
----
- src/json.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+> =
 
-diff --git a/src/json.c b/src/json.c
-index 0942dae3..69c1dcdb 100644
---- a/src/json.c
-+++ b/src/json.c
-@@ -200,6 +200,9 @@ bool json_iter_parse(struct json_iter *iter, enum json_=
-type type, ...)
- 	if (iter->start =3D=3D -1)
- 		return false;
- =
+> Does anyone have any ideas? :)
 
-+	if (c->tokens[iter->start].type !=3D JSMN_OBJECT)
-+		return false;
-+
- 	args =3D l_queue_new();
- =
+According to https://bugs.debian.org/1004607, iwd 1.23 needs a newer versio=
+n =
 
- 	va_start(va, type);
-@@ -427,6 +430,9 @@ bool json_iter_next(struct json_iter *iter)
- 	jsmntok_t *t =3D c->tokens + iter->current;
- 	int inc =3D 1;
- =
+of ELL (version 0.48), so maybe you need to upgrade ELL too?
 
-+	if (c->tokens[iter->start].type !=3D JSMN_ARRAY)
-+		return false;
-+
- 	/*
- 	 * If this is the initial iteration skip this and just increment
- 	 * current by 1 since this iterator points to a container which needs to
--- =
+--===============0771784536775014047==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
 
-2.31.1
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlIVUVBQllJQUIwV0lRVDFzVVBCWXN5R21p
+NHVzeS9YYmx2T2VIN2JiZ1VDWWZxQmVnQUtDUkRYYmx2T2VIN2IKYnQrdkFQNGdUV1o3T1FFZlho
+eTdPaVpkenFneWpQWDVsY1BKaHRXeUxadCtxUEpDaXdEK0xabENqbEd3T0c5UApSbmhPVjY3Nklk
+cSs1TDRLQ1dtc0dVd3gwMGtlQXdBPQo9TUYxcgotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
 
---===============7121808623943671950==--
+--===============0771784536775014047==--
 
