@@ -1,119 +1,145 @@
-Content-Type: multipart/mixed; boundary="===============2808615580176270198=="
+Content-Type: multipart/mixed; boundary="===============2656512945065719055=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 6/7] auto-t: fix up a few issues in testNetconfig
-Date: Wed, 30 Mar 2022 13:23:14 -0700
-Message-ID: <20220330202315.1881335-6-prestwoj@gmail.com>
-In-Reply-To: 20220330202315.1881335-1-prestwoj@gmail.com
+Subject: [PATCH v3 3/7] main: add SystemdEncrypt option, and initialize key
+Date: Thu, 03 Feb 2022 13:23:33 -0800
+Message-ID: <20220203212337.120613-3-prestwoj@gmail.com>
+In-Reply-To: 20220203212337.120613-1-prestwoj@gmail.com
 
---===============2808615580176270198==
+--===============2656512945065719055==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
- - Setting the IP address was resulting in an error:
+Recently systemd added the ability to pass secret credentials to
+services via LoadCredentialEncrypted/SetCredentialEncrypted. Once
+set up the service is able to read the decrypted credentials from
+a file. The file path is found in the environment variable
+CREDENTIALS_DIRECTORY + an identifier. The value of SystemdEncrypt
+should be set to the systemd key ID used when the credential was
+created.
 
-   Error: any valid prefix is expected rather than "wln58".
+When SystemdEncrypt is set IWD will attempt to read the decrypted
+secret from systemd. If at any point this fails warnings will be
+printed but IWD will continue normally. Its expected that any failures
+will result in the inability to connect to any networks which have
+previously encrypted the passphrase/PSK without re-entering
+the passphrase manually. This could happen, for example, if the
+systemd secret was changed.
 
-   This is fixed by reordering the arguments with the IP address first
-
- - Remove the sleep, and use non_block_wait to wait for the IPv6 address
-   to be set.
+Once the secret is read in it is set into storage to be used for
+profile encryption/decryption.
 ---
- autotests/testNetconfig/connection_test.py | 22 +++++++++++++++-------
- autotests/testNetconfig/static_test.py     |  3 ++-
- 2 files changed, 17 insertions(+), 8 deletions(-)
+ src/main.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNet=
-config/connection_test.py
-index 91c6eb6b..672efb72 100644
---- a/autotests/testNetconfig/connection_test.py
-+++ b/autotests/testNetconfig/connection_test.py
-@@ -17,6 +17,15 @@ import subprocess
- class Test(unittest.TestCase):
+diff --git a/src/main.c b/src/main.c
+index d0dbedc8..a345c950 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -29,6 +29,10 @@
+ #include <errno.h>
+ #include <getopt.h>
+ #include <signal.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <sys/stat.h>
++#include <sys/mman.h>
+ #include <ell/ell.h>
  =
 
-     def test_connection_success(self):
-+        def check_addr(device):
-+            try:
-+                subprocess.check_output('ip addr show ' + device.name + \
-+                            ' | grep \'inet6 3ffe:501:ffff:100::\'', shell=
-=3DTrue)
-+            except:
-+                return False
+ #include <ell/useful.h>
+@@ -45,6 +49,7 @@
+ #include "src/storage.h"
+ #include "src/anqp.h"
+ #include "src/netconfig.h"
++#include "src/crypto.h"
+ =
+
+ #include "src/backtrace.h"
+ =
+
+@@ -397,6 +402,63 @@ done:
+ 	return r;
+ }
+ =
+
++/*
++ * Initialize a systemd encryption key for encrypting/decrypting credentia=
+ls.
++ */
++static void setup_system_key(void)
++{
++	int fd;
++	struct stat st;
++	const char *cred_dir;
++	void *key =3D NULL;
++	_auto_(l_free) char *path =3D NULL;
++	_auto_(l_free) char *key_id =3D NULL;
 +
-+            return True
++	key_id =3D l_settings_get_string(iwd_config, "General", "SystemdEncrypt");
++	if (!key_id)
++		return;
 +
-         wd =3D IWD(True)
++	cred_dir =3D getenv("CREDENTIALS_DIRECTORY");
++	if (!cred_dir) {
++		l_warn("SystemdEncrypt enabled but CREDENTIALS_DIRECTORY not "
++			"set, check iwd.service file");
++		return;
++	}
++
++	path =3D l_strdup_printf("%s/%s", cred_dir, key_id);
++
++	if (stat(path, &st) < 0) {
++		l_warn("SystemdEncrypt enabled but could not stat %s",
++			path);
++		return;
++	}
++
++	fd =3D open(path, O_RDONLY, 0);
++	if (fd < 0) {
++		l_warn("SystemdEncrypt enabled but cannot open secret (%d)",
++				fd);
++		return;
++	}
++
++	if (fstat(fd, &st) < 0 || st.st_size =3D=3D 0) {
++		close(fd);
++		return;
++	}
++
++	key =3D mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
++	if (key =3D=3D MAP_FAILED) {
++		l_warn("SystemdEncrypt enabled but can't mmap secret");
++		close(fd);
++		return;
++	}
++
++	close(fd);
++
++	__storage_set_encryption_key(key, st.st_size);
++
++	munmap(key, st.st_size);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	int exit_status;
+@@ -529,6 +591,8 @@ int main(int argc, char *argv[])
+ 	l_dbus_set_disconnect_handler(dbus, dbus_disconnected, NULL, NULL);
+ 	dbus_init(dbus);
  =
 
-         psk_agent =3D PSKAgent("secret123")
-@@ -40,9 +49,8 @@ class Test(unittest.TestCase):
-         testutil.test_iface_operstate()
-         testutil.test_ifaces_connected()
++	setup_system_key();
++
+ 	exit_status =3D l_main_run_with_signal(signal_handler, NULL);
  =
 
--        time.sleep(2)
--        subprocess.check_output('ip addr show ' + device.name + \
--                            ' | grep \'inet6 3ffe:501:ffff:100::\'', shell=
-=3DTrue)
-+        ctx.non_block_wait(check_addr, 10, device,
-+                            exception=3DException("IPv6 address was not se=
-t"))
- =
-
-         device.disconnect()
- =
-
-@@ -70,15 +78,15 @@ class Test(unittest.TestCase):
-         # TODO: This could be moved into test-runner itself if other tests=
- ever
-         #       require this functionality (p2p, FILS, etc.). Since its si=
-mple
-         #       enough it can stay here for now.
--        ctx.start_process(['ip', 'addr','add','dev',  hapd.ifname,
--                           '192.168.1.1/255.255.255.0']).wait()
-+        ctx.start_process(['ip', 'addr','add', '192.168.1.1/255.255.255.0',
-+                            'dev', hapd.ifname,]).wait()
-         ctx.start_process(['touch', '/tmp/dhcpd.leases']).wait()
-         cls.dhcpd_pid =3D ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/d=
-hcpd.conf',
-                                             '-lf', '/tmp/dhcpd.leases',
-                                             hapd.ifname], cleanup=3Dremove=
-_lease4)
- =
-
--        ctx.start_process(['ip', 'addr', 'add', 'dev', hapd.ifname,
--                           '3ffe:501:ffff:100::1/64']).wait()
-+        ctx.start_process(['ip', 'addr', 'add', '3ffe:501:ffff:100::1/64',
-+                            'dev', hapd.ifname]).wait()
-         ctx.start_process(['touch', '/tmp/dhcpd6.leases']).wait()
-         cls.dhcpd6_pid =3D ctx.start_process(['dhcpd', '-6', '-f', '-cf', =
-'/tmp/dhcpd-v6.conf',
-                                             '-lf', '/tmp/dhcpd6.leases',
-diff --git a/autotests/testNetconfig/static_test.py b/autotests/testNetconf=
-ig/static_test.py
-index 8e29d4eb..bba2c644 100644
---- a/autotests/testNetconfig/static_test.py
-+++ b/autotests/testNetconfig/static_test.py
-@@ -81,7 +81,8 @@ class Test(unittest.TestCase):
-         # TODO: This could be moved into test-runner itself if other tests=
- ever
-         #       require this functionality (p2p, FILS, etc.). Since its si=
-mple
-         #       enough it can stay here for now.
--        ctx.start_process(['ip', 'addr','add', hapd.ifname, '192.168.1.1/2=
-55.255.255.0']).wait()
-+        ctx.start_process(['ip', 'addr','add', '192.168.1.1/255.255.255.0',
-+                            'dev', hapd.ifname]).wait()
-         ctx.start_process(['touch', '/tmp/dhcpd.leases']).wait()
-         cls.dhcpd_pid =3D ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/d=
-hcpd.conf',
-                                             '-lf', '/tmp/dhcpd.leases',
+ 	iwd_modules_exit();
 -- =
 
-2.34.1
+2.31.1
 
---===============2808615580176270198==--
+--===============2656512945065719055==--
 
