@@ -1,75 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============6832999775632889741=="
+Content-Type: multipart/mixed; boundary="===============2381883002662546225=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2] netdev: fail connection if the link goes down
-Date: Mon, 07 Feb 2022 14:57:50 -0800
-Message-ID: <20220207225750.458709-1-prestwoj@gmail.com>
+Subject: Re: iwd 1.21 stuck on connecting state
+Date: Thu, 03 Feb 2022 09:28:55 -0800
+Message-ID: <3a4f9626fdae0a61df24e6e9c9fd7d25f0dea9b7.camel@gmail.com>
+In-Reply-To: 20220203160500.3721.69429@ml01.vlan13.01.org
 
---===============6832999775632889741==
+--===============2381883002662546225==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In certain rare cases IWD gets a link down event before nl80211 ever sends
-a disconnect event. Netdev notifies station of the link down which causes
-station to be freed, but netdev remains in the same state. Then later the
-disconnect event arrives and netdev still thinks its connected, calls into
-(the now freed) station object and causes a crash.
+Hi,
 
-To fix this netdev_connect_free() is now called on any link down events
-which will reset the netdev object to a proper state.
+This actually got merged an hour or two ago:
 
-src/netdev.c:netdev_link_notify() event 16 on ifindex 16
-src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-src/netdev.c:netdev_link_notify() event 16 on ifindex 16
-src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
-src/netdev.c:netdev_deauthenticate_event()
-src/netdev.c:netdev_link_notify() event 16 on ifindex 16
-src/station.c:station_free()
-src/netconfig.c:netconfig_destroy()
-src/resolve.c:resolve_systemd_revert() ifindex: 16
-src/station.c:station_roam_state_clear() 16
-src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
-src/netdev.c:netdev_disconnect_event()
-Received Deauthentication event, reason: 3, from_ap: false
+https://git.kernel.org/pub/scm/libs/ell/ell.git/commit/?id=3Db02c2034d8f05b=
+4d731196de51a31cf1ef282e1f
 
-0 0x472fa4 in station_disconnect_event src/station.c:2916
-1 0x472fa4 in station_netdev_event src/station.c:2954
-2 0x43a262 in netdev_disconnect_event src/netdev.c:1213
-3 0x43a262 in netdev_mlme_notify src/netdev.c:5471
-4 0x6706eb in process_multicast ell/genl.c:1029
-5 0x6706eb in received_data ell/genl.c:1096
-6 0x65e630 in io_callback ell/io.c:120
-7 0x65a94e in l_main_iterate ell/main.c:478
-8 0x65b0b3 in l_main_run ell/main.c:525
-9 0x65b0b3 in l_main_run ell/main.c:507
-10 0x65b5cc in l_main_run_with_signal ell/main.c:647
-11 0x4124d7 in main src/main.c:532
----
- src/netdev.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index bac6860c..36d183e7 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -6199,6 +6199,9 @@ static void netdev_newlink_notify(const struct ifinfo=
-msg *ifi, int bytes)
- =
+On Thu, 2022-02-03 at 16:05 +0000,
+54d22547-afc0-4701-b1fc-5a2a2e411646(a)simplelogin.co wrote:
+> Hi.
+> =
 
- 	new_up =3D netdev_get_is_up(netdev);
- =
+> > Below is a patch for ELL [1]. If its possible for you to apply it and
+> > rebuild both IWD/ELL manually to test that would be great. The issue
+> > should be solved but you will see an additional print when you
+> > normally
+> > would see IWD hang and never get connected:
+> =
 
-+	if (!new_up)
-+		netdev_connect_free(netdev);
-+
- 	/*
- 	 * If mac_change_cmd_id is set we are in the process of changing the
- 	 * MAC address and this event is a result of powering down/up. In this
--- =
+> I'm trying to apply the patch but I got several errors. I'm just
+> copying and pasting it on a new file.
+> =
 
-2.31.1
+> This is how I'm applying it: patch -d ell -p1 -i ../dhcp.patch
+> =
 
---===============6832999775632889741==--
+> First it complained about being malformed:
+> =
+
+> patching file ell/dhcp.c
+> patch: **** malformed patch at line 72: void *userdata,
+> =
+
+> Just fixed it putting lines 71 and 72 together. Then all 3 hunks
+> failed:
+> =
+
+> patching file ell/dhcp.c
+> Hunk #1 FAILED at 757.
+> Hunk #2 FAILED at 766.
+> Hunk #3 FAILED at 832.
+> 3 out of 3 hunks FAILED -- saving rejects to file ell/dhcp.c.rej
+> =
+
+> I'm not used diff patching so probably I'm doing something wrong.
+> =
+
+> > [1]
+> > https://lists.01.org/hyperkitty/list/ell(a)lists.01.org/thread/DJHXIOGG=
+OCGG
+> > ...
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+
+
+--===============2381883002662546225==--
 
