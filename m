@@ -1,90 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============1121110300565296598=="
+Content-Type: multipart/mixed; boundary="===============4309801975708675826=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen_=3Ctoke_at_toke=2Edk=3E?=
 To: iwd at lists.01.org
-Subject: [PATCH v2 9/9] unit: add test for nested arrays
-Date: Thu, 06 Jan 2022 11:50:07 -0800
-Message-ID: <20220106195007.528618-9-prestwoj@gmail.com>
-In-Reply-To: 20220106195007.528618-1-prestwoj@gmail.com
+Subject: Re: iwd 1.23 crashes in eapol_handle_pkt_1_of_4()
+Date: Thu, 03 Feb 2022 12:35:21 +0100
+Message-ID: <871r0kchdy.fsf@toke.dk>
+In-Reply-To: 87a6f9c4f5.fsf@toke.dk
 
---===============1121110300565296598==
+--===============4309801975708675826==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- unit/test-json.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+Toke H=C3=B8iland-J=C3=B8rgensen <toke(a)toke.dk> writes:
 
-diff --git a/unit/test-json.c b/unit/test-json.c
-index 52e3f675..3d7e690b 100644
---- a/unit/test-json.c
-+++ b/unit/test-json.c
-@@ -424,6 +424,51 @@ static void test_json_arrays(const void *data)
- 	json_contents_free(c);
- }
- =
+> Denis Kenzior <denkenz(a)gmail.com> writes:
+>
+>> Hi Toke,
+>>
+>> On 2/2/22 06:05, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>>> Hi
+>>> =
 
-+static void test_json_nested_arrays(const void *data)
-+{
-+	char json[] =3D "{\"array\":[[], {}, [1, 2], {\"key\":\"value\"}]}";
-+	int count =3D 0;
-+	struct json_iter iter;
-+	struct json_iter array;
-+	struct json_iter inner;
-+	struct json_contents *c =3D json_contents_new(json, strlen(json));
-+
-+	json_iter_init(&iter, c);
-+	assert(json_iter_parse(&iter,
-+			JSON_MANDATORY("array", JSON_ARRAY, &array),
-+			JSON_UNDEFINED));
-+
-+	while (json_iter_next(&array)) {
-+		int count2 =3D 0;
-+
-+		assert(json_iter_get_container(&array, &inner));
-+
-+		while (json_iter_next(&inner))
-+			count2++;
-+
-+		/*
-+		 * TODO: add checks for object iteration. Currently these will
-+		 * just count all tokens in the object.
-+		 */
-+		switch (count) {
-+		case 0:
-+			assert(count2 =3D=3D 0);
-+			break;
-+		case 2:
-+			assert(count2 =3D=3D 2);
-+			break;
-+		default:
-+			break;
-+		}
-+
-+		count++;
-+	}
-+
-+	assert(count =3D=3D 4);
-+
-+	json_contents_free(c);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	l_test_init(&argc, &argv);
-@@ -436,6 +481,7 @@ int main(int argc, char *argv[])
- 	l_test_add("json larger object", test_json_larger_object, NULL);
- 	l_test_add("json test primitives", test_json_primitives, NULL);
- 	l_test_add("json test arrays", test_json_arrays, NULL);
-+	l_test_add("json test nested arrays", test_json_nested_arrays, NULL);
- =
+>>> Since updating to iwd 1.23 (from Arch packages), I've started seeing
+>>> periodic crashes. I rebuilt iwd with debug symbols enabled and got the
+>>> following backtrace out of 'coredumpctl gdb':
+>>> =
 
- 	return l_test_run();
- }
--- =
+>>
+>> *hangs his head in shame*.  So I think we screwed up the same macro 2x n=
+ow.
+>
+> Heh, yeah, did see there was a commit touching that macro, but didn't
+> look closer.
+>
+>> Can you please try the patch I just sent out?
+>
+> Can do - thanks! Did a build with it incorporated and am running that
+> now. Usually crashes once every hour (with striking regularity); will
+> leave it running overnight and see if the crashes are gone by tomorrow
+> :)
 
-2.31.1
+Alright, so no crashes - thanks for the swift fix!
 
---===============1121110300565296598==--
+And just for future reference, in case anyone else runs into the same
+issue: The crashes were initially taking the kernel down with them,
+which has now also been fixed:
+https://lore.kernel.org/r/20220201130951.22093-1-johannes(a)sipsolutions.net
+
+-Toke
+--===============4309801975708675826==--
 
