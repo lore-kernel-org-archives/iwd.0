@@ -1,86 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============9050336549372529451=="
+Content-Type: multipart/mixed; boundary="===============3846249987114003537=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 7/7] station: enforce MFPR=1 for 6GHz frequencies
-Date: Fri, 25 Feb 2022 15:32:51 -0800
-Message-ID: <20220225233251.2958102-7-prestwoj@gmail.com>
-In-Reply-To: 20220225233251.2958102-1-prestwoj@gmail.com
+Subject: Re: [PATCH] netdev: fix bug setting OWE IE length
+Date: Thu, 03 Feb 2022 11:41:03 -0600
+Message-ID: <a4bafff2-b9ff-367e-04e2-2ab11fe265f0@gmail.com>
+In-Reply-To: 20220203172418.87777-1-prestwoj@gmail.com
 
---===============9050336549372529451==
+--===============3846249987114003537==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds checks if MFP is set to 0 or 1:
+Hi James,
 
-0 - Always fail if the frequency is 6GHz
-1 - Fail if MFPC=3D0 and the frequency is 6GHz.
-    If HW is capable set MFPR=3D1 for 6GHz
----
- src/station.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+On 2/3/22 11:24, James Prestwood wrote:
+> The length was being set to whatever the last nl80211 attribute was,
+> not the length for the RESP_IE iteration.
+> ---
+>   src/netdev.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-diff --git a/src/station.c b/src/station.c
-index 00f3d178..a5210a7d 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1012,9 +1012,13 @@ static int station_build_handshake_rsn(struct handsh=
-ake_state *hs,
- 	struct ie_rsn_info info;
- 	uint8_t *ap_ie;
- 	bool disable_ocv;
-+	enum band_freq band;
- =
 
- 	memset(&info, 0, sizeof(info));
- =
+Applied, thanks.
 
-+	if (!band_freq_to_channel(bss->frequency, &band))
-+		goto not_supported;
-+
- 	memset(&bss_info, 0, sizeof(bss_info));
- 	scan_bss_get_rsn_info(bss, &bss_info);
- =
+Regards,
+-Denis
 
-@@ -1061,12 +1065,31 @@ static int station_build_handshake_rsn(struct hands=
-hake_state *hs,
- =
-
- 	switch (mfp_setting) {
- 	case 0:
--		break;
-+		if (band !=3D BAND_FREQ_6_GHZ)
-+			break;
-+
-+		l_error("MFP turned off by [General].ManagementFrameProtection,"
-+				" 6GHz frequencies are disabled");
-+		goto not_supported;
- 	case 1:
- 		info.group_management_cipher =3D
- 			wiphy_select_cipher(wiphy,
- 				bss_info.group_management_cipher);
- 		info.mfpc =3D info.group_management_cipher !=3D 0;
-+
-+		if (band !=3D BAND_FREQ_6_GHZ)
-+			break;
-+
-+		if (!info.mfpc)
-+			goto not_supported;
-+
-+		/*
-+		 * 802.11ax Section 12.12.2
-+		 * The STA shall use management frame protection
-+		 * (MFPR=3D1) when using RSN.
-+		 */
-+		info.mfpr =3D true;
-+
- 		break;
- 	case 2:
- 		info.group_management_cipher =3D
--- =
-
-2.34.1
-
---===============9050336549372529451==--
+--===============3846249987114003537==--
 
