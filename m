@@ -1,40 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============5471192707035592443=="
+Content-Type: multipart/mixed; boundary="===============4426684871849880361=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: 54d22547-afc0-4701-b1fc-5a2a2e411646 at simplelogin.co
 To: iwd at lists.01.org
-Subject: Re: [PATCH] station: replace old BSS with 'best_bss' on roam scan
-Date: Tue, 08 Mar 2022 11:37:49 -0600
-Message-ID: <6313a7f9-b153-70e9-ee79-265d94c77fd7@gmail.com>
-In-Reply-To: 20220304212419.3534676-1-prestwoj@gmail.com
+Subject: Re: iwd 1.21 stuck on connecting state
+Date: Thu, 03 Feb 2022 20:10:55 +0000
+Message-ID: <20220203201055.3721.56890@ml01.vlan13.01.org>
+In-Reply-To: 3a4f9626fdae0a61df24e6e9c9fd7d25f0dea9b7.camel@gmail.com
 
---===============5471192707035592443==
+--===============4426684871849880361==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+> This actually got merged an hour or two ago
 
-On 3/4/22 15:24, James Prestwood wrote:
-> The logic here assumed any BSS's in the roam scan were identical to ones
-> in station's bss_list with the same address. Usually this is true but,
-> for example, if the BSS changed frequency the one in station's list is
-> invalid.
-> =
+I noticed right after posting. Classic hehe.
 
-> Intead when a match is found remove the old BSS and re-insert the new one.
+Issue seems solved. I get connectivity and according to logs iwd is discard=
+ing previous DHCP requests:
 
-Fixed this typo and...
+[DHCPv4] dhcp_client_send_discover:346
+[DHCPv4] l_dhcp_client_start:1210 Entering state: DHCP_STATE_SELECTING
+[DHCPv4] dhcp_client_timeout_resend:526
+[DHCPv4] dhcp_client_send_discover:346
+[DHCPv4] dhcp_client_rx_message:832
+[DHCPv4] dhcp_client_receive_offer:762
+[DHCPv4] dhcp_client_handle_offer:805 Entering state: DHCP_STATE_REQUESTING
+[DHCPv4] dhcp_client_send_request:396
+[DHCPv4] dhcp_client_rx_message:832
+[DHCPv4] dhcp_client_receive_offer:762
+[DHCPv4] dhcp_client_receive_offer:786 Server sent another offer, using it =
+instead
+[DHCPv4] dhcp_client_handle_offer:805 Entering state: DHCP_STATE_REQUESTING
+[DHCPv4] dhcp_client_send_request:396
+[DHCPv4] dhcp_client_rx_message:832
+[DHCPv4] dhcp_client_receive_ack:684
+[DHCPv4] dhcp_client_rx_message:905 Entering state: DHCP_STATE_BOUND
+[DHCPv4] dhcp_client_rx_message:939 T1 expiring in 21600784 ms
+[DHCPv4] l_acd_start:447 Skipping probes and sending announcements
+[DHCPv4] announce_wait_timeout:166 No conflicts found for 192.168.1.39, ann=
+ouncing address
+[DHCPv4] acd_send_packet:146 sending packet with target IP 192.168.1.39
 
-> ---
->   src/station.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
-> =
+Would you create a release soon?
 
-
-Applied, thanks.
-
-Regards,
--Denis
-
---===============5471192707035592443==--
+Thanks!
+--===============4426684871849880361==--
 
