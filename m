@@ -1,49 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============7728318116016460429=="
+Content-Type: multipart/mixed; boundary="===============7748978430309818203=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: 54d22547-afc0-4701-b1fc-5a2a2e411646 at simplelogin.co
 To: iwd at lists.01.org
-Subject: [PATCH v3 3/5] unit: update test-eapol with GTK API change
-Date: Tue, 28 Sep 2021 15:25:51 -0700
-Message-ID: <20210928222553.1096611-3-prestwoj@gmail.com>
-In-Reply-To: 20210928222553.1096611-1-prestwoj@gmail.com
+Subject: Re: iwd 1.21 stuck on connecting state
+Date: Thu, 03 Feb 2022 16:05:00 +0000
+Message-ID: <20220203160500.3721.69429@ml01.vlan13.01.org>
+In-Reply-To: 693ddbdafd550d947e1e9a2e4e36685a9a0de4c2.camel@gmail.com
 
---===============7728318116016460429==
+--===============7748978430309818203==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- unit/test-eapol.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Hi.
 
-diff --git a/unit/test-eapol.c b/unit/test-eapol.c
-index 470e0e9f..e1b6c96e 100644
---- a/unit/test-eapol.c
-+++ b/unit/test-eapol.c
-@@ -1940,6 +1940,7 @@ static void eapol_wpa2_handshake_test(const void *dat=
-a)
- 	frame =3D eapol_create_gtk_2_of_2(EAPOL_PROTOCOL_VERSION_2004,
- 				EAPOL_KEY_DESCRIPTOR_VERSION_HMAC_SHA1_AES,
- 				eapol_key_test_12.key_replay_counter,
-+				0, NULL,
- 				false, 0, 16);
- 	assert(frame);
- 	assert(eapol_calculate_mic(IE_RSN_AKM_SUITE_PSK, ptk, frame,
-@@ -2061,8 +2062,8 @@ static void eapol_wpa_handshake_test(const void *data)
- =
+> Below is a patch for ELL [1]. If its possible for you to apply it and
+> rebuild both IWD/ELL manually to test that would be great. The issue
+> should be solved but you will see an additional print when you normally
+> would see IWD hang and never get connected:
 
- 	frame =3D eapol_create_gtk_2_of_2(EAPOL_PROTOCOL_VERSION_2004,
- 				EAPOL_KEY_DESCRIPTOR_VERSION_HMAC_MD5_ARC4,
--				eapol_key_test_18.key_replay_counter, true,
--				gtk_step1->wpa_key_id, 16);
-+				eapol_key_test_18.key_replay_counter, 0, NULL,
-+				true, gtk_step1->wpa_key_id, 16);
- 	assert(frame);
- 	assert(eapol_calculate_mic(IE_RSN_AKM_SUITE_PSK, ptk, frame,
- 					mic, 16));
--- =
+I'm trying to apply the patch but I got several errors. I'm just copying an=
+d pasting it on a new file.
 
-2.31.1
+This is how I'm applying it: patch -d ell -p1 -i ../dhcp.patch
 
---===============7728318116016460429==--
+First it complained about being malformed:
+
+patching file ell/dhcp.c
+patch: **** malformed patch at line 72: void *userdata,
+
+Just fixed it putting lines 71 and 72 together. Then all 3 hunks failed:
+
+patching file ell/dhcp.c
+Hunk #1 FAILED at 757.
+Hunk #2 FAILED at 766.
+Hunk #3 FAILED at 832.
+3 out of 3 hunks FAILED -- saving rejects to file ell/dhcp.c.rej
+
+I'm not used diff patching so probably I'm doing something wrong.
+
+> [1]
+> https://lists.01.org/hyperkitty/list/ell(a)lists.01.org/thread/DJHXIOGGOC=
+GG...
+--===============7748978430309818203==--
 
