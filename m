@@ -1,61 +1,126 @@
-Content-Type: multipart/mixed; boundary="===============1507784031369858860=="
+Content-Type: multipart/mixed; boundary="===============7609744876738169467=="
 MIME-Version: 1.0
-From: VAUTRIN Emmanuel (Canal Plus Prestataire) <Emmanuel.VAUTRIN at
- cpexterne.org>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: RE: [PATCH] network: Hide hidden networks on passphrase error
-Date: Tue, 08 Mar 2022 11:05:15 +0000
-Message-ID: <
- <MRZP264MB1544F75A002E42A1A15679B893099@MRZP264MB1544.FRAP264.PROD.OUTLOOK.COM>>
-In-Reply-To: MRZP264MB1544C0BDFAF731AC2E61806693099@MRZP264MB1544.FRAP264.PROD.OUTLOOK.COM
+Subject: [PATCH v3 7/7] hotspot: refactor dir watch to be like knownnetworks
+Date: Thu, 03 Feb 2022 13:23:37 -0800
+Message-ID: <20220203212337.120613-7-prestwoj@gmail.com>
+In-Reply-To: 20220203212337.120613-1-prestwoj@gmail.com
 
---===============1507784031369858860==
+--===============7609744876738169467==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+The create/removed/modified cases all can be combined like they are in
+known networks. Create/modified were both doing nearly the same thing,
+and removed can easily be detected if the config was already found.
 
-As unfortunately my professional email server seems to replace tabs by spac=
-es,
-please find the well formatted patch as attachment.
+This is now basically the same logic as in known networks.
+---
+ src/hotspot.c | 57 ++++++++++++++++-----------------------------------
+ 1 file changed, 18 insertions(+), 39 deletions(-)
 
+diff --git a/src/hotspot.c b/src/hotspot.c
+index 832d7a31..1f9f74c5 100644
+--- a/src/hotspot.c
++++ b/src/hotspot.c
+@@ -29,6 +29,7 @@
+ #include <stdio.h>
+ =
 
-Best Regards,
+ #include <ell/ell.h>
++#include "ell/useful.h"
+ =
 
-Emmanuel
+ #include "src/iwd.h"
+ #include "src/module.h"
+@@ -409,7 +410,7 @@ static void hs20_dir_watch_cb(const char *filename,
+ 				enum l_dir_watch_event event,
+ 				void *user_data)
+ {
+-	struct l_settings *new;
++	_auto_(l_settings_free) struct l_settings *new =3D NULL;
+ 	uint64_t connected_time;
+ 	struct hs20_config *hs20;
+ 	struct network_config config;
+@@ -425,53 +426,31 @@ static void hs20_dir_watch_cb(const char *filename,
+ 		return;
+ =
 
---===============1507784031369858860==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-network-Hide-hidden-networks-on-passphrase-error.patch"
+ 	full_path =3D storage_get_hotspot_path("%s", filename);
++	hs20 =3D l_queue_find(hs20_settings, match_filename, full_path);
+ =
 
-RnJvbSAzZTlmYjI1ZDE3ZWMxYjVhNTdlNThiY2RkM2YyNTYyYjQwMDQ3MTc0IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBFbW1hbnVlbCBWQVVUUklOIDxFbW1hbnVlbC5WQVVUUklOQGNw
-ZXh0ZXJuZS5vcmc+CkRhdGU6IE1vbiwgNyBNYXIgMjAyMiAyMzo1ODowMCArMDEwMApTdWJqZWN0
-OiBbUEFUQ0hdIG5ldHdvcms6IEhpZGUgaGlkZGVuIG5ldHdvcmtzIG9uIHBhc3NwaHJhc2UgZXJy
-b3IKCklmIGEgdXNlciBjb25uZWN0aW9uIGZhaWxzIG9uIGEgZnJlc2hseSBzY2FubmVkIHBzayBo
-aWRkZW4gbmV0d29yaywKZHVyaW5nIHBhc3NwaHJhc2UgcmVxdWVzdCwgaXQgc2hhbGwgYmUgcmVt
-b3ZlZCBmcm9tIHRoZSBuZXR3b3JrIGxpc3QuCk90aGVyd2lzZSwgaXQgd291bGQgYmUgcG9zc2li
-bGUgdG8gZGlyZWN0bHkgY29ubmVjdCB0byB0aGF0IGtub3duCm5ldHdvcmssIHdoaWNoIHdpbGwg
-YXBwZWFyIGFzIG5vdCBoaWRkZW4uCgpDb21taXQgMDZjYThlMjBhOWIwICgic3RhdGlvbjogSGlk
-ZSBmb3Jnb3R0ZW4gaGlkZGVuIG5ldHdvcmtzIikKLS0tCiBzcmMvbmV0d29yay5jIHwgOCArKysr
-KysrKwogMSBmaWxlIGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL3NyYy9u
-ZXR3b3JrLmMgYi9zcmMvbmV0d29yay5jCmluZGV4IGQ3ZjQ3MmJlOTdkMi4uZWYzZGY5NmJhYjQy
-IDEwMDY0NAotLS0gYS9zcmMvbmV0d29yay5jCisrKyBiL3NyYy9uZXR3b3JrLmMKQEAgLTEyMDQs
-NiArMTIwNCw3IEBAIHN0YXRpYyB2b2lkIHBhc3NwaHJhc2VfY2FsbGJhY2soZW51bSBhZ2VudF9y
-ZXN1bHQgcmVzdWx0LAogCXN0cnVjdCBuZXR3b3JrICpuZXR3b3JrID0gdXNlcl9kYXRhOwogCXN0
-cnVjdCBzdGF0aW9uICpzdGF0aW9uID0gbmV0d29yay0+c3RhdGlvbjsKIAlzdHJ1Y3Qgc2Nhbl9i
-c3MgKmJzczsKKwlib29sIHdhc19oaWRkZW47CiAKIAlsX2RlYnVnKCJyZXN1bHQgJWQiLCByZXN1
-bHQpOwogCkBAIC0xMjQyLDYgKzEyNDMsMTMgQEAgc3RhdGljIHZvaWQgcGFzc3BocmFzZV9jYWxs
-YmFjayhlbnVtIGFnZW50X3Jlc3VsdCByZXN1bHQsCiAJcmV0dXJuOwogCiBlcnI6CisJaWYgKCFu
-ZXR3b3JrLT5zZXR0aW5ncyB8fCAhbF9zZXR0aW5nc19nZXRfYm9vbChuZXR3b3JrLT5zZXR0aW5n
-cywKKwkJCQkJCU5FVF9ISURERU4sICZ3YXNfaGlkZGVuKSkKKwkJd2FzX2hpZGRlbiA9IGZhbHNl
-OworCisJaWYgKHdhc19oaWRkZW4pCisJCXN0YXRpb25faGlkZV9uZXR3b3JrKHN0YXRpb24sIG5l
-dHdvcmspOworCiAJbmV0d29ya19zZXR0aW5nc19jbG9zZShuZXR3b3JrKTsKIH0KIAotLSAKMi4y
-NS4xCgo=
+ 	switch (event) {
+ 	case L_DIR_WATCH_EVENT_CREATED:
+-		new =3D l_settings_new();
+-
+-		if (!l_settings_load_from_file(new, full_path)) {
+-			l_settings_free(new);
+-			return;
+-		}
+-
+-		__network_config_parse(new, full_path, &config);
+-
+-		hs20 =3D hs20_config_new(new, full_path, &config);
+-		l_settings_free(new);
+-
+-		if (!hs20)
+-			return;
+-
+-		l_queue_push_head(hs20_settings, hs20);
+-		break;
+ 	case L_DIR_WATCH_EVENT_REMOVED:
+-		hs20 =3D l_queue_remove_if(hs20_settings, match_filename,
+-						full_path);
+-		if (!hs20)
+-			return;
+-
+-		known_networks_remove(&hs20->super);
+-		break;
+ 	case L_DIR_WATCH_EVENT_MODIFIED:
+-		hs20 =3D l_queue_find(hs20_settings, match_filename, full_path);
+-		if (!hs20)
+-			return;
+-
+ 		new =3D l_settings_new();
+ =
 
---===============1507784031369858860==--
+-		if (!l_settings_load_from_file(new, full_path)) {
+-			l_settings_free(new);
+-			return;
++		if (l_settings_load_from_file(new, full_path)) {
++			__network_config_parse(new, full_path, &config);
++
++			if (hs20)
++				known_network_update(&hs20->super, &config);
++			else {
++				hs20 =3D hs20_config_new(new, full_path, &config);
++				if (!hs20)
++					return;
++
++				l_queue_push_head(hs20_settings, hs20);
++			}
++		} else if (hs20) {
++			l_queue_remove(hs20_settings, hs20);
++			known_networks_remove(&hs20->super);
+ 		}
+ =
+
+-		__network_config_parse(new, full_path, &config);
+-		known_network_update(&hs20->super, &config);
+-
+-		/* TODO: Update hotspot specific settings */
+-
+-		l_settings_free(new);
+-
+ 		break;
+ 	case L_DIR_WATCH_EVENT_ACCESSED:
+ 		break;
+-- =
+
+2.31.1
+
+--===============7609744876738169467==--
 
