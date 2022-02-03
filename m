@@ -1,28 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============9011415284934787779=="
+Content-Type: multipart/mixed; boundary="===============3936428346372822196=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 1/3] station: send debug "roam-scan-triggered" event
-Date: Wed, 19 Jan 2022 16:44:15 -0600
-Message-ID: <a1037a5e-3fa8-c65c-1366-0440630720b4@gmail.com>
-In-Reply-To: 20220119222652.2299217-1-prestwoj@gmail.com
+Subject: [PATCH v3 5/7] doc: document SystemdEncrypt
+Date: Thu, 03 Feb 2022 13:23:35 -0800
+Message-ID: <20220203212337.120613-5-prestwoj@gmail.com>
+In-Reply-To: 20220203212337.120613-1-prestwoj@gmail.com
 
---===============9011415284934787779==
+--===============3936428346372822196==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ src/iwd.config.rst  | 16 ++++++++++++++++
+ src/iwd.network.rst |  6 +++++-
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
-On 1/19/22 16:26, James Prestwood wrote:
-> ---
->   src/station.c | 2 ++
->   1 file changed, 2 insertions(+)
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 54943702..a3d19fe5 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -188,6 +188,22 @@ The group ``[General]`` contains general settings.
+        by the kernel so if kernels/drivers exist which don't support OCV i=
+t can
+        be disabled here.
+ =
 
-All applied, thanks.
++   * - SystemdEncrypt
++     - Value: Systemd key ID
++
++       Enables network profile encryption using a systemd provided secret =
+key.
++       Once enabled all PSK/8021x network profiles will be encrypted
++       automatically. Once the profile is encrypted there is no way of goi=
+ng
++       back using IWD alone. A tool, decrypt-profile, is provided assuming=
+ the
++       secret is known which will decrypt a profile. This decrypted profile
++       could manually be set to /var/lib/iwd to 'undo' any profile encrypt=
+ion,
++       but its going to be a manual process.
++
++       Setting up systemd to provide the secret is left up to the user as =
+IWD
++       has no way of performing this automatically. The systemd options re=
+quired
++       are LoadCredentialEncrypted or SetCredentialEncrypted, and the secr=
+et
++       identifier should be named whatever SystemdEncrypt is set to.
++
+ Network
+ -------
+ =
 
-Regards,
--Denis
+diff --git a/src/iwd.network.rst b/src/iwd.network.rst
+index e3d1a90a..34f8de1a 100644
+--- a/src/iwd.network.rst
++++ b/src/iwd.network.rst
+@@ -179,7 +179,11 @@ Network Authentication Settings
+ -------------------------------
+ =
 
---===============9011415284934787779==--
+ The group ``[Security]`` contains settings for Wi-Fi security and
+-authentication configuration.
++authentication configuration. This group can be encrypted by enabling
++``SystemdEncrypt``, see *iwd.config* for details on this option. If this s=
+ection
++is encrypted (only contains EncryptedSalt/EncryptedSecurity) it should not=
+ be
++modified. Modifying these values will result in the inability to connect t=
+o that
++network.
+ =
+
+ .. list-table::
+    :header-rows: 0
+-- =
+
+2.31.1
+
+--===============3936428346372822196==--
 
