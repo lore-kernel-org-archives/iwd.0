@@ -1,186 +1,90 @@
-Content-Type: multipart/mixed; boundary="===============1795954475370094856=="
+Content-Type: multipart/mixed; boundary="===============1324192371166163737=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 04/13] eapol: support extended key IDs
-Date: Thu, 07 Oct 2021 13:49:48 -0700
-Message-ID: <20211007204957.3745985-4-prestwoj@gmail.com>
-In-Reply-To: 20211007204957.3745985-1-prestwoj@gmail.com
+Subject: [PATCH v3 2/7] hotspot: implement hotspot profile encryption
+Date: Thu, 03 Feb 2022 13:23:32 -0800
+Message-ID: <20220203212337.120613-2-prestwoj@gmail.com>
+In-Reply-To: 20220203212337.120613-1-prestwoj@gmail.com
 
---===============1795954475370094856==
+--===============1324192371166163737==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-802.11 added Extended Key IDs which aim to solve the issue of PTK
-key replacement during rekeys. Since swapping out the existing PTK
-may result in data loss because there may be in flight packets still
-using the old PTK.
-
-Extended Key IDs use two key IDs for the PTK, which toggle between
-0 and 1. During a rekey a new PTK is derived which uses the key ID
-not already taken by the existing PTK. This new PTK is added as RX
-only, then message 4/4 is sent. This ensure message 4 is encrypted
-using the previous PTK. Once sent, the new PTK can be modified to
-both RX and TX and the rekey is complete.
-
-To handle this in eapol the extended key ID KDE is parsed which
-gives us the new PTK key index. Using the new handshake callback
-(handshake_state_set_ext_tk) the new TK is installed. The 4th
-message is also included as an argument which is taken care of by
-netdev (in case waiting for NEW_KEY is required due to PAE socekts).
+Using __storage_open() hotspot can also support profile encyption.
+The hotspot consortium name is used as the 'ssid' since this stays
+consistent between hotspot networks for any profile.
 ---
- src/eapol.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 63 insertions(+), 9 deletions(-)
+ src/hotspot.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 07120fdb..cd481317 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -860,6 +860,7 @@ struct eapol_sm {
- 	uint8_t installed_igtk_len;
- 	uint8_t installed_igtk[CRYPTO_MAX_IGTK_LEN];
- 	unsigned int mic_len;
-+	bool rekey : 1;
- };
+diff --git a/src/hotspot.c b/src/hotspot.c
+index 21f50690..832d7a31 100644
+--- a/src/hotspot.c
++++ b/src/hotspot.c
+@@ -95,12 +95,18 @@ static struct l_settings *hotspot_network_open(struct n=
+etwork_info *info)
  =
 
- static void eapol_sm_destroy(void *value)
-@@ -1223,6 +1224,9 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *=
-sm,
- 			return;
- 		}
+ 	settings =3D l_settings_new();
  =
 
-+		if (sm->handshake->ptk_complete)
-+			sm->rekey =3D true;
+-	if (!l_settings_load_from_file(settings, config->filename)) {
+-		l_settings_free(settings);
+-		return NULL;
+-	}
++	if (!l_settings_load_from_file(settings, config->filename))
++		goto error;
 +
- 		handshake_state_new_snonce(sm->handshake);
- 		handshake_state_set_anonce(sm->handshake, ek->key_nonce);
++	if (!__storage_open(settings, config->filename, SECURITY_8021X,
++				config->name))
++		goto error;
  =
 
-@@ -1643,12 +1647,14 @@ static void eapol_handle_ptk_3_of_4(struct eapol_sm=
- *sm,
- 	struct handshake_state *hs =3D sm->handshake;
- 	const uint8_t *kck;
- 	const uint8_t *kek;
--	struct eapol_key *step4;
-+	_auto_(l_free) struct eapol_key *step4 =3D NULL;
- 	uint8_t mic[MIC_MAXLEN];
- 	const uint8_t *gtk =3D NULL;
- 	size_t gtk_len;
- 	const uint8_t *igtk =3D NULL;
- 	size_t igtk_len;
-+	const uint8_t *key_id =3D NULL;
-+	size_t key_id_len;
- 	const uint8_t *rsne;
- 	struct ie_rsn_info rsn_info;
- 	const uint8_t *optional_rsne =3D NULL;
-@@ -1856,6 +1862,44 @@ static void eapol_handle_ptk_3_of_4(struct eapol_sm =
-*sm,
- 	} else
- 		igtk =3D NULL;
+ 	return settings;
++
++error:
++	l_settings_free(settings);
++	return NULL;
+ }
  =
 
-+	key_id =3D handshake_util_find_kde(HANDSHAKE_KDE_KEY_ID,
-+					decrypted_key_data,
-+					decrypted_key_data_size, &key_id_len);
-+	if (hs->ext_key_id_capable) {
-+		uint8_t idx;
-+
-+		if (!key_id) {
-+			l_debug("No extended key KDE in frame 3/4");
-+			handshake_failed(sm, MMPDU_REASON_CODE_INVALID_IE);
-+			return;
-+		}
-+
-+		if (key_id_len !=3D 2) {
-+			l_error("invalid Key ID KDE format");
-+			handshake_failed(sm, MMPDU_REASON_CODE_INVALID_IE);
-+			return;
-+		}
-+
-+		idx =3D bit_field(key_id[0], 0, 2);
-+
-+		/*
-+		 * IEEE 802.11-2020 - 12.7.6.4 4-way handshake message 3
-+		 * "... the Authenticator assigns a new Key ID for the PTKSA in
-+		 * the range of 0 to 1 that is different from the Key ID
-+		 * assigned in the previous handshake"
-+		 */
-+		if ((idx !=3D 0 && idx !=3D 1) || (sm->rekey &&
-+						idx =3D=3D hs->active_tk_index)) {
-+			l_error("invalid Key ID KDE value (%u)", idx);
-+			handshake_failed(sm, MMPDU_REASON_CODE_INVALID_IE);
-+			return;
-+		}
-+
-+		hs->active_tk_index =3D idx;
-+
-+		l_debug("using Extended key ID %u", hs->active_tk_index);
+ static void hotspot_network_sync(struct network_info *info,
+@@ -111,7 +117,12 @@ static void hotspot_network_sync(struct network_info *=
+info,
+ 	struct hs20_config *config =3D l_container_of(info, struct hs20_config,
+ 							super);
+ =
+
+-	data =3D l_settings_to_data(settings, &length);
++	data =3D __storage_encrypt(settings, config->name, &length);
++	if (!data) {
++		l_error("Unable to sync profile %s", config->filename);
++		return;
 +	}
 +
- 	if (hs->support_ip_allocation) {
- 		size_t len;
- 		const uint8_t *ip_alloc_kde =3D
-@@ -1917,7 +1961,6 @@ retransmit:
- 		if (!eapol_calculate_mic(hs->akm_suite, kck,
- 						step4, mic, sm->mic_len)) {
- 			l_debug("MIC Calculation failed");
--			l_free(step4);
- 			handshake_failed(sm, MMPDU_REASON_CODE_UNSPECIFIED);
- 			return;
- 		}
-@@ -1928,18 +1971,11 @@ retransmit:
- 						handshake_state_get_kek_len(hs),
- 						step4, NULL, 0)) {
- 			l_debug("AES-SIV encryption failed");
--			l_free(step4);
- 			handshake_failed(sm, MMPDU_REASON_CODE_UNSPECIFIED);
- 			return;
- 		}
+ 	write_file(data, length, true, "%s", config->filename);
+ 	l_free(data);
+ }
+@@ -338,6 +349,11 @@ static struct hs20_config *hs20_config_new(struct l_se=
+ttings *settings,
+ 		goto free_values;
  	}
  =
 
--	eapol_sm_write(sm, (struct eapol_frame *) step4, unencrypted);
--	l_free(step4);
--
--	if (hs->ptk_complete)
--		return;
--
- 	/*
- 	 * For WPA1 the group handshake should be happening after we set the
- 	 * ptk, this flag tells netdev to wait for the gtk/igtk before
-@@ -1954,6 +1990,24 @@ retransmit:
- 	if (igtk)
- 		eapol_install_igtk(sm, igtk_key_index, igtk, igtk_len);
- =
-
-+	/*
-+	 * Only install if this is the first 3/4 message (not retransmitting)
-+	 * and a rekey. Initial associations don't need the special RX -> TX
-+	 * procedure and can install the TK normally
-+	 */
-+	if (key_id && hs->ext_key_id_capable && sm->rekey) {
-+		handshake_state_install_ext_ptk(hs, hs->active_tk_index,
-+						(struct eapol_frame *) step4,
-+						ETH_P_PAE, unencrypted);
-+
-+		return;
++	if (!__storage_open(settings, filename, SECURITY_8021X, name)) {
++		l_error("Could not open hotspot profile %s", filename);
++		goto free_values;
 +	}
 +
-+	eapol_sm_write(sm, (struct eapol_frame *) step4, unencrypted);
-+
-+	if (hs->ptk_complete)
-+		return;
-+
- 	handshake_state_install_ptk(hs);
+ 	config =3D l_new(struct hs20_config, 1);
  =
 
- 	if (rekey_offload)
+ 	if (hessid_str) {
 -- =
 
 2.31.1
 
---===============1795954475370094856==--
+--===============1324192371166163737==--
 
