@@ -1,170 +1,256 @@
-Content-Type: multipart/mixed; boundary="===============3862137613732271502=="
+Content-Type: multipart/mixed; boundary="===============6538763391367485437=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v8 3/6] main: add SystemdEncrypt option, and initialize key
-Date: Tue, 15 Feb 2022 13:41:31 -0800
-Message-ID: <20220215214134.1335469-3-prestwoj@gmail.com>
-In-Reply-To: 20220215214134.1335469-1-prestwoj@gmail.com
+Subject: [PATCH v5 6/6] auto-t: add test for encrypted profiles
+Date: Fri, 04 Feb 2022 13:33:31 -0800
+Message-ID: <20220204213331.337524-6-prestwoj@gmail.com>
+In-Reply-To: 20220204213331.337524-1-prestwoj@gmail.com
 
---===============3862137613732271502==
+--===============6538763391367485437==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Recently systemd added the ability to pass secret credentials to
-services via LoadCredentialEncrypted/SetCredentialEncrypted. Once
-set up the service is able to read the decrypted credentials from
-a file. The file path is found in the environment variable
-CREDENTIALS_DIRECTORY + an identifier. The value of SystemdEncrypt
-should be set to the systemd key ID used when the credential was
-created.
-
-When SystemdEncrypt is set IWD will attempt to read the decrypted
-secret from systemd. If at any point this fails warnings will be
-printed but IWD will continue normally. Its expected that any failures
-will result in the inability to connect to any networks which have
-previously encrypted the passphrase/PSK without re-entering
-the passphrase manually. This could happen, for example, if the
-systemd secret was changed.
-
-Once the secret is read in it is set into storage to be used for
-profile encryption/decryption.
 ---
- src/main.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+ .../testEncryptedProfiles/connection_test.py  | 154 ++++++++++++++++++
+ autotests/testEncryptedProfiles/hw.conf       |   6 +
+ autotests/testEncryptedProfiles/iwd-secret    |   1 +
+ autotests/testEncryptedProfiles/main.conf     |   2 +
+ autotests/testEncryptedProfiles/ssidCCMP.conf |  10 ++
+ autotests/testEncryptedProfiles/ssidCCMP.psk  |   2 +
+ 6 files changed, 175 insertions(+)
+ create mode 100644 autotests/testEncryptedProfiles/connection_test.py
+ create mode 100644 autotests/testEncryptedProfiles/hw.conf
+ create mode 100644 autotests/testEncryptedProfiles/iwd-secret
+ create mode 100644 autotests/testEncryptedProfiles/main.conf
+ create mode 100644 autotests/testEncryptedProfiles/ssidCCMP.conf
+ create mode 100644 autotests/testEncryptedProfiles/ssidCCMP.psk
 
-v8:
- * Fail init if storage_init or mlock fails.
-
-diff --git a/src/main.c b/src/main.c
-index d0dbedc8..6fcc78d9 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -29,6 +29,10 @@
- #include <errno.h>
- #include <getopt.h>
- #include <signal.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <sys/stat.h>
-+#include <sys/mman.h>
- #include <ell/ell.h>
- =
-
- #include <ell/useful.h>
-@@ -45,6 +49,7 @@
- #include "src/storage.h"
- #include "src/anqp.h"
- #include "src/netconfig.h"
-+#include "src/crypto.h"
- =
-
- #include "src/backtrace.h"
- =
-
-@@ -397,6 +402,73 @@ done:
- 	return r;
- }
- =
-
-+/*
-+ * Initialize a systemd encryption key for encrypting/decrypting credentia=
-ls.
-+ */
-+static bool setup_system_key(void)
-+{
-+	int fd;
-+	struct stat st;
-+	const char *cred_dir;
-+	void *key =3D NULL;
-+	_auto_(l_free) char *path =3D NULL;
-+	_auto_(l_free) char *key_id =3D NULL;
-+	bool r;
+diff --git a/autotests/testEncryptedProfiles/connection_test.py b/autotests=
+/testEncryptedProfiles/connection_test.py
+new file mode 100644
+index 00000000..dd4892ca
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/connection_test.py
+@@ -0,0 +1,154 @@
++#!/usr/bin/python3
 +
-+	key_id =3D l_settings_get_string(iwd_config, "General", "SystemdEncrypt");
-+	if (!key_id)
-+		return true;
++import unittest
++import sys
 +
-+	cred_dir =3D getenv("CREDENTIALS_DIRECTORY");
-+	if (!cred_dir) {
-+		l_warn("SystemdEncrypt enabled but CREDENTIALS_DIRECTORY not "
-+			"set, check iwd.service file");
-+		return false;
-+	}
++sys.path.append('../util')
++import iwd
++import os
++from iwd import IWD
++from iwd import NetworkType
++from iwd import PSKAgent
 +
-+	path =3D l_strdup_printf("%s/%s", cred_dir, key_id);
++class Test(unittest.TestCase):
++    def profile_is_encrypted(self, profile):
++        with open('/tmp/iwd/' + profile) as f:
++            contents =3D f.read()
 +
-+	if (stat(path, &st) < 0) {
-+		l_warn("SystemdEncrypt enabled but could not stat %s",
-+			path);
-+		return false;
-+	}
++        if 'Passphrase' in contents:
++            return False
 +
-+	fd =3D open(path, O_RDONLY, 0);
-+	if (fd < 0) {
-+		l_warn("SystemdEncrypt enabled but cannot open secret (%d)",
-+				fd);
-+		return false;
-+	}
++        return True
 +
-+	if (fstat(fd, &st) < 0 || st.st_size =3D=3D 0) {
-+		close(fd);
-+		return false;
-+	}
++    def validate(self, wd):
++        devices =3D wd.list_devices(1)
++        device =3D devices[0]
 +
-+	key =3D mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
-+	if (key =3D=3D MAP_FAILED) {
-+		l_warn("SystemdEncrypt enabled but can't mmap secret");
-+		close(fd);
-+		return false;
-+	}
++        ordered_network =3D device.get_ordered_network('ssidCCMP')
 +
-+	close(fd);
++        self.assertEqual(ordered_network.type, NetworkType.psk)
 +
-+	if (mlock(key, st.st_size) < 0) {
-+		l_warn("Failed to mlock Systemd secret file");
-+		return false;
-+	}
++        condition =3D 'not obj.connected'
++        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
 +
-+	r =3D storage_init(key, st.st_size);
++        ordered_network.network_object.connect()
 +
-+	munlock(key, st.st_size);
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
 +
-+	munmap(key, st.st_size);
++        device.disconnect()
 +
-+	return r;
-+}
++        condition =3D 'not obj.connected'
++        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
 +
- int main(int argc, char *argv[])
- {
- 	int exit_status;
-@@ -529,12 +601,18 @@ int main(int argc, char *argv[])
- 	l_dbus_set_disconnect_handler(dbus, dbus_disconnected, NULL, NULL);
- 	dbus_init(dbus);
- =
-
-+	if (!setup_system_key())
-+		goto failed_key;
++    # Tests that an existing plaintext profile gets encrypted
++    def test_new_profile(self):
++        IWD.copy_to_storage('ssidCCMP.psk')
 +
- 	exit_status =3D l_main_run_with_signal(signal_handler, NULL);
- =
-
- 	iwd_modules_exit();
- 	dbus_exit();
- 	l_dbus_destroy(dbus);
- =
-
-+failed_key:
-+	storage_exit();
++        mtime =3D os.path.getmtime('/tmp/iwd/' + 'ssidCCMP.psk')
++        self.assertFalse(self.profile_is_encrypted('ssidCCMP.psk'))
 +
- failed_dbus:
- 	l_netlink_destroy(rtnl);
- =
-
++        wd =3D IWD(True)
++
++        # Make sure profile was accepted
++        condition =3D 'len(obj.list_known_networks()) =3D=3D 1'
++        wd.wait_for_object_condition(wd, condition)
++
++        # Check the file was modified (should be encrypted now)
++        self.assertNotEqual(mtime, os.path.getmtime('/tmp/iwd/' + 'ssidCCM=
+P.psk'))
++
++        self.validate(wd)
++
++        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++
++    # Tests that a new connection with agent gets written to an encrypted =
+profile
++    def test_agent_profile(self):
++        wd =3D IWD(True)
++
++        psk_agent =3D PSKAgent("secret123")
++        wd.register_psk_agent(psk_agent)
++
++        with self.assertRaises(FileNotFoundError):
++            self.profile_is_encrypted('ssidCCMP.psk')
++
++        self.validate(wd)
++
++        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++
++        wd.unregister_psk_agent(psk_agent)
++
++    # Tests that an invalid profile gets re-written after an agent request
++    def test_invalid_profile_rewritten(self):
++        bad_config =3D '[Security]\nPassphrase=3Dincorrect\n'
++        os.system('echo "%s" > /tmp/iwd/ssidCCMP.psk' % bad_config)
++
++        wd =3D IWD(True)
++
++        condition =3D 'len(obj.list_known_networks()) =3D=3D 1'
++        wd.wait_for_object_condition(wd, condition)
++
++        # IWD should still encrypt the profile automatically
++        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++
++        # This should fail
++        with self.assertRaises(iwd.FailedEx):
++            self.validate(wd)
++
++        psk_agent =3D PSKAgent("secret123")
++        wd.register_psk_agent(psk_agent)
++
++        self.validate(wd)
++
++        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++
++    # Tests that a profile that doesn't decrypt wont become a known network
++    def test_decryption_failure(self):
++        bad_config =3D \
++'''
++[Security]
++EncryptedSalt=3D000102030405060708090a0b0c0d0e0f
++EncryptedSecurity=3Daabbccddeeff00112233445566778899
++'''
++        os.system('echo "%s" > /tmp/iwd/ssidCCMP.psk' % bad_config)
++
++        wd =3D IWD(True)
++
++        self.assertEqual(wd.list_known_networks(), [])
++
++    def test_runtime_profile(self):
++        wd =3D IWD(True)
++
++        self.assertEqual(wd.list_known_networks(), [])
++
++        # Add profile after IWD starts
++        IWD.copy_to_storage('ssidCCMP.psk')
++
++        self.validate(wd)
++
++        # Should now be encrypted
++        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++
++        with open('/tmp/iwd/ssidCCMP.psk') as f:
++            profile =3D f.read()
++
++        # Edit the profile, corrupting it
++        profile.replace('EncryptedSecurity=3D', 'EncryptedSecurity=3D00')
++
++        devices =3D wd.list_devices(1)
++        device =3D devices[0]
++        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
++        wd.wait_for_object_condition(device, condition)
++
++    def tearDown(self):
++        IWD.clear_storage()
++
++    @classmethod
++    def setUpClass(cls):
++        os.environ['CREDENTIALS_DIRECTORY'] =3D '/tmp'
++
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
++
++if __name__ =3D=3D '__main__':
++    unittest.main(exit=3DTrue)
+diff --git a/autotests/testEncryptedProfiles/hw.conf b/autotests/testEncryp=
+tedProfiles/hw.conf
+new file mode 100644
+index 00000000..de81e1e2
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/hw.conf
+@@ -0,0 +1,6 @@
++[SETUP]
++num_radios=3D2
++start_iwd=3D0
++
++[HOSTAPD]
++rad0=3DssidCCMP.conf
+diff --git a/autotests/testEncryptedProfiles/iwd-secret b/autotests/testEnc=
+ryptedProfiles/iwd-secret
+new file mode 100644
+index 00000000..c2afca48
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/iwd-secret
+@@ -0,0 +1 @@
++secret123
+diff --git a/autotests/testEncryptedProfiles/main.conf b/autotests/testEncr=
+yptedProfiles/main.conf
+new file mode 100644
+index 00000000..35d40c5e
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/main.conf
+@@ -0,0 +1,2 @@
++[General]
++SystemdEncrypt=3Diwd-secret
+diff --git a/autotests/testEncryptedProfiles/ssidCCMP.conf b/autotests/test=
+EncryptedProfiles/ssidCCMP.conf
+new file mode 100644
+index 00000000..c79f5e55
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/ssidCCMP.conf
+@@ -0,0 +1,10 @@
++hw_mode=3Dg
++channel=3D1
++ssid=3DssidCCMP
++
++wpa=3D2
++wpa_pairwise=3DCCMP
++wpa_passphrase=3Dsecret123
++
++ieee80211w=3D2
++wpa_key_mgmt=3DWPA-PSK-SHA256
+diff --git a/autotests/testEncryptedProfiles/ssidCCMP.psk b/autotests/testE=
+ncryptedProfiles/ssidCCMP.psk
+new file mode 100644
+index 00000000..abafdb66
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/ssidCCMP.psk
+@@ -0,0 +1,2 @@
++[Security]
++Passphrase=3Dsecret123
 -- =
 
-2.34.1
+2.31.1
 
---===============3862137613732271502==--
+--===============6538763391367485437==--
 
