@@ -1,68 +1,145 @@
-Content-Type: multipart/mixed; boundary="===============8743393983111106236=="
+Content-Type: multipart/mixed; boundary="===============1764388289159474458=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd fails to create device
-Date: Tue, 31 May 2022 13:17:01 -0700
-Message-ID: <2fec88f46974c051e5b4c277b50d2ae88c2fe5e5.camel@gmail.com>
-In-Reply-To: 20220531183951.2010.25659@ml01.vlan13.01.org
+Subject: [PATCH v4 3/7] main: add SystemdEncrypt option, and initialize key
+Date: Fri, 04 Feb 2022 09:31:16 -0800
+Message-ID: <20220204173120.231730-3-prestwoj@gmail.com>
+In-Reply-To: 20220204173120.231730-1-prestwoj@gmail.com
 
---===============8743393983111106236==
+--===============1764388289159474458==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2022-05-31 at 18:39 +0000,
-1148d778-20a8-4ab0-96b7-24572ddab965(a)simplelogin.co wrote:
-> > It would be great if you could get some iwmon logs when this
-> > happens.
-> > Hopefully it happens frequent enough you can get a capture. More
-> > info
-> > about how to do that can be found here:
-> > =
+Recently systemd added the ability to pass secret credentials to
+services via LoadCredentialEncrypted/SetCredentialEncrypted. Once
+set up the service is able to read the decrypted credentials from
+a file. The file path is found in the environment variable
+CREDENTIALS_DIRECTORY + an identifier. The value of SystemdEncrypt
+should be set to the systemd key ID used when the credential was
+created.
 
-> > https://iwd.wiki.kernel.org/debugging
-> =
+When SystemdEncrypt is set IWD will attempt to read the decrypted
+secret from systemd. If at any point this fails warnings will be
+printed but IWD will continue normally. Its expected that any failures
+will result in the inability to connect to any networks which have
+previously encrypted the passphrase/PSK without re-entering
+the passphrase manually. This could happen, for example, if the
+systemd secret was changed.
 
-> Sure, but it doesn't happen very frequently. I'm not sure about how
-> to approach debugging for this, should I try to restart iwd when it
-> happens? Maybe doing this the issue is not triggered. Having iwmon
-> logging all time seems a bit too much, no?
+Once the secret is read in it is set into storage to be used for
+profile encryption/decryption.
+---
+ src/main.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-It sounds like some kind of race condition in the kernel, which is why
-its infrequent. And yes, running iwmon all the time is going to produce
-a huge log...
+diff --git a/src/main.c b/src/main.c
+index d0dbedc8..a345c950 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -29,6 +29,10 @@
+ #include <errno.h>
+ #include <getopt.h>
+ #include <signal.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <sys/stat.h>
++#include <sys/mman.h>
+ #include <ell/ell.h>
+ =
 
-Maybe someone else has a better solution, but you could create a bash
-script (e.g. /usr/libexec/start-iwd.sh):
+ #include <ell/useful.h>
+@@ -45,6 +49,7 @@
+ #include "src/storage.h"
+ #include "src/anqp.h"
+ #include "src/netconfig.h"
++#include "src/crypto.h"
+ =
 
-#!/bin/bash
-timeout 60s iwmon --nortnl --noscan > /your/log/file &
-iwd -d
+ #include "src/backtrace.h"
+ =
 
-And have your systemd unit file run this:
+@@ -397,6 +402,63 @@ done:
+ 	return r;
+ }
+ =
 
-ExecStart=3D/usr/libexec/start-iwd.sh
++/*
++ * Initialize a systemd encryption key for encrypting/decrypting credentia=
+ls.
++ */
++static void setup_system_key(void)
++{
++	int fd;
++	struct stat st;
++	const char *cred_dir;
++	void *key =3D NULL;
++	_auto_(l_free) char *path =3D NULL;
++	_auto_(l_free) char *key_id =3D NULL;
++
++	key_id =3D l_settings_get_string(iwd_config, "General", "SystemdEncrypt");
++	if (!key_id)
++		return;
++
++	cred_dir =3D getenv("CREDENTIALS_DIRECTORY");
++	if (!cred_dir) {
++		l_warn("SystemdEncrypt enabled but CREDENTIALS_DIRECTORY not "
++			"set, check iwd.service file");
++		return;
++	}
++
++	path =3D l_strdup_printf("%s/%s", cred_dir, key_id);
++
++	if (stat(path, &st) < 0) {
++		l_warn("SystemdEncrypt enabled but could not stat %s",
++			path);
++		return;
++	}
++
++	fd =3D open(path, O_RDONLY, 0);
++	if (fd < 0) {
++		l_warn("SystemdEncrypt enabled but cannot open secret (%d)",
++				fd);
++		return;
++	}
++
++	if (fstat(fd, &st) < 0 || st.st_size =3D=3D 0) {
++		close(fd);
++		return;
++	}
++
++	key =3D mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
++	if (key =3D=3D MAP_FAILED) {
++		l_warn("SystemdEncrypt enabled but can't mmap secret");
++		close(fd);
++		return;
++	}
++
++	close(fd);
++
++	__storage_set_encryption_key(key, st.st_size);
++
++	munmap(key, st.st_size);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	int exit_status;
+@@ -529,6 +591,8 @@ int main(int argc, char *argv[])
+ 	l_dbus_set_disconnect_handler(dbus, dbus_disconnected, NULL, NULL);
+ 	dbus_init(dbus);
+ =
 
-Since this happens at startup running iwmon for 60 seconds should be
-plenty to capture the wiphy dump. This of course assumes you're using
-systemd.
++	setup_system_key();
++
+ 	exit_status =3D l_main_run_with_signal(signal_handler, NULL);
+ =
 
-Note: DO NOT use the --nowiphy. This disables the messages we need to
-look at.
+ 	iwd_modules_exit();
+-- =
 
-Thanks,
-James
+2.31.1
 
-
-> =
-
-> I could try to reproduce it somehow because it's mostly after a
-> reboot when it happens.
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
-
-
---===============8743393983111106236==--
+--===============1764388289159474458==--
 
