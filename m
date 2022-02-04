@@ -1,30 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============7732892486007806285=="
+Content-Type: multipart/mixed; boundary="===============2465110369425681184=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Joseph Benden <joe at benden.us>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/4] auto-t: update blacklist test to use 'enable' on rules
-Date: Wed, 20 Oct 2021 16:52:34 -0500
-Message-ID: <095fe6c5-4788-9b47-f75a-dadb29a212bd@gmail.com>
-In-Reply-To: 20211020205331.734405-1-prestwoj@gmail.com
+Subject: Re: [PATCH v3 1/7] storage: implement network profile encryption
+Date: Fri, 04 Feb 2022 16:00:52 -0700
+Message-ID: <26c0556f-c670-0bcd-2808-f9b833692d12@benden.us>
+In-Reply-To: e7e5a0d3-5cfd-be0d-c847-22e91e856e64@benden.us
 
---===============7732892486007806285==
+--===============2465110369425681184==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+On 2/4/22 3:55 PM, Joseph Benden wrote:
+> Hi!
+>
+> It is my understanding that all secret data is to be kept as securely =
 
-On 10/20/21 3:53 PM, James Prestwood wrote:
-> ---
->   autotests/testBSSBlacklist/connection_test.py | 3 +++
->   1 file changed, 3 insertions(+)
-> =
+> as possible. I'm not really seeing this carried throughout the source =
 
+> code. Maybe this specific code does not need that level of security?
+>
+> If I'm right, then:
+>
+> The secret data should be kept in a mmap(), and mlock(), structure. =
 
-All applied, thanks.
+> The prevents secret data from hitting swap memory. After every use of =
 
-Regards,
--Denis
+> the secret data; it must be explicit_bzero() and then free(). This is =
 
---===============7732892486007806285==--
+> so critical and tedious that it should be a macro or something from =
+
+> libell. And those are just initial thoughts for the basic safety of =
+
+> the secret data.
+>
+Also copies must be mlock()'d as well. Also minimize the number of =
+
+copies, due to all the overhead needed on each one.
+> Best regards,
+> -Joe
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+>
+
+--===============2465110369425681184==--
 
