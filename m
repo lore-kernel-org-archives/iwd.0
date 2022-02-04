@@ -1,43 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============0646855601786760692=="
+Content-Type: multipart/mixed; boundary="===============5537643846953231788=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Joseph Benden <joe at benden.us>
 To: iwd at lists.01.org
-Subject: [PATCH v5 6/9] auto-t: wpas.py: allow arbitrary events to be handled
-Date: Tue, 22 Feb 2022 13:30:13 -0800
-Message-ID: <20220222213016.2429382-6-prestwoj@gmail.com>
-In-Reply-To: 20220222213016.2429382-1-prestwoj@gmail.com
+Subject: Re: [PATCH v3 1/7] storage: implement network profile encryption
+Date: Fri, 04 Feb 2022 15:55:32 -0700
+Message-ID: <e7e5a0d3-5cfd-be0d-c847-22e91e856e64@benden.us>
+In-Reply-To: 20220203212337.120613-1-prestwoj@gmail.com
 
---===============0646855601786760692==
+--===============5537643846953231788==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If an event is in response to some command which is returning an
-unexpected value (unexpected with respect to wpas.py) handle_eow
-would raise an exception.
+Hi!
 
-Specifically with DPP this was being hit when the URI was being
-returned.
----
- autotests/util/wpas.py | 2 --
- 1 file changed, 2 deletions(-)
+It is my understanding that all secret data is to be kept as securely as =
 
-diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-index 6b845232..c8e65179 100644
---- a/autotests/util/wpas.py
-+++ b/autotests/util/wpas.py
-@@ -88,8 +88,6 @@ class Wpas:
-         def handle_eow():
-             nonlocal key, value, count, event
-             if count =3D=3D 0:
--                if key is not None or not value:
--                    raise Exception('Bad event name')
-                 key =3D 'event'
-             elif key is None:
-                 if not value:
--- =
+possible. I'm not really seeing this carried throughout the source code. =
 
-2.34.1
+Maybe this specific code does not need that level of security?
 
---===============0646855601786760692==--
+If I'm right, then:
+
+The secret data should be kept in a mmap(), and mlock(), structure. The =
+
+prevents secret data from hitting swap memory. After every use of the =
+
+secret data; it must be explicit_bzero() and then free(). This is so =
+
+critical and tedious that it should be a macro or something from libell. =
+
+And those are just initial thoughts for the basic safety of the secret data.
+
+Best regards,
+-Joe
+
+--===============5537643846953231788==--
 
