@@ -1,121 +1,256 @@
-Content-Type: multipart/mixed; boundary="===============5948313131116643098=="
+Content-Type: multipart/mixed; boundary="===============1106316928425348013=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2] scan: Sort scan_requests by wiphy work item priority
-Date: Fri, 29 Apr 2022 11:58:19 -0500
-Message-ID: <20220429165819.12162-1-denkenz@gmail.com>
+Subject: [PATCH v4 6/7] auto-t: add test for encrypted profiles
+Date: Fri, 04 Feb 2022 09:31:19 -0800
+Message-ID: <20220204173120.231730-6-prestwoj@gmail.com>
+In-Reply-To: 20220204173120.231730-1-prestwoj@gmail.com
 
---===============5948313131116643098==
+--===============1106316928425348013==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Periodic scan requests are meant to be performed with a lower priority
-than normal scan requests.  They're thus given a different priority when
-inserting them into the wiphy work queue.  Unfortunately, the priority
-is not taken into account when they are inserted into the
-sr->requests queue.  This can result in the scanning code being confused
-since it assumes the top of the queue is always the next scheduled or
-currently ongoing scan.  As a result any further wiphy_work might never be
-started properly.
-
-Apr 27 16:34:40 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert(=
-) Inserting work item 3
-Apr 27 16:34:40 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() =
-Starting work item 3
-Apr 27 16:34:40 iwd[5117]: ../iwd-1.26/src/scan.c:scan_periodic_timeout() 1
-Apr 27 16:34:40 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert(=
-) Inserting work item 4
-Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert(=
-) Inserting work item 5
-Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_done() =
-Work item 3 done
-Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() =
-Starting work item 5
-Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/scan.c:scan_notify() Scan notifi=
-cation Trigger Scan(33)
-Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/scan.c:scan_request_triggered() =
-Passive scan triggered for wdev 1
-Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/scan.c:scan_periodic_triggered()=
- Periodic scan triggered for wdev 1
-
-In the above log, scan request 5 (triggered by dbus) is started before
-scan request 4 (periodic scan).  Yet the scanning code thinks scan
-request 4 was triggered.
-
-Fix this by using the wiphy_work priority to sort the sr->requests queue
-so that the scans are ordered in the same manner.
-
-Reported-by: Alvin =C5=A0ipraga <ALSI(a)bang-olufsen.dk>
 ---
+ .../testEncryptedProfiles/connection_test.py  | 154 ++++++++++++++++++
+ autotests/testEncryptedProfiles/hw.conf       |   6 +
+ autotests/testEncryptedProfiles/iwd-secret    |   1 +
+ autotests/testEncryptedProfiles/main.conf     |   2 +
+ autotests/testEncryptedProfiles/ssidCCMP.conf |  10 ++
+ autotests/testEncryptedProfiles/ssidCCMP.psk  |   2 +
+ 6 files changed, 175 insertions(+)
+ create mode 100644 autotests/testEncryptedProfiles/connection_test.py
+ create mode 100644 autotests/testEncryptedProfiles/hw.conf
+ create mode 100644 autotests/testEncryptedProfiles/iwd-secret
+ create mode 100644 autotests/testEncryptedProfiles/main.conf
+ create mode 100644 autotests/testEncryptedProfiles/ssidCCMP.conf
+ create mode 100644 autotests/testEncryptedProfiles/ssidCCMP.psk
 
-v2 - Send priority as user_data since wiphy_radio_work_item part of the
-request hasn't been initialized yet (not inserted onto the wiphy work
-queue) and can't be compared.
-
- src/scan.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
-
-diff --git a/src/scan.c b/src/scan.c
-index b0824e72ebaf..cc6e682c93ee 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -611,6 +611,17 @@ static struct scan_request *scan_request_new(struct sc=
-an_context *sc,
- 	return sr;
- }
- =
-
-+static int insert_by_priority(const void *a, const void *b, void *user_dat=
-a)
-+{
-+	const struct scan_request *cur =3D b;
-+	int priority =3D L_PTR_TO_INT(user_data);
+diff --git a/autotests/testEncryptedProfiles/connection_test.py b/autotests=
+/testEncryptedProfiles/connection_test.py
+new file mode 100644
+index 00000000..dd4892ca
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/connection_test.py
+@@ -0,0 +1,154 @@
++#!/usr/bin/python3
 +
-+	if (cur->work.priority <=3D priority)
-+		return 1;
++import unittest
++import sys
 +
-+	return -1;
-+}
++sys.path.append('../util')
++import iwd
++import os
++from iwd import IWD
++from iwd import NetworkType
++from iwd import PSKAgent
 +
- static uint32_t scan_common(uint64_t wdev_id, bool passive,
- 				const struct scan_parameters *params,
- 				int priority,
-@@ -630,7 +641,12 @@ static uint32_t scan_common(uint64_t wdev_id, bool pas=
-sive,
- =
-
- 	scan_cmds_add(sr->cmds, sc, passive, params);
- =
-
--	l_queue_push_tail(sc->requests, sr);
-+	/*
-+	 * sr->work isn't initialized yet, it will be done by
-+	 * wiphy_radio_work_insert().  Pass the priority as user_data instead
-+	 */
-+	l_queue_insert(sc->requests, sr, insert_by_priority,
-+						L_INT_TO_PTR(priority));
- =
-
- 	return wiphy_radio_work_insert(sc->wiphy, &sr->work,
- 					priority, &work_ops);
-@@ -801,7 +817,8 @@ uint32_t scan_owe_hidden(uint64_t wdev_id, struct l_que=
-ue *list,
- 	}
- =
-
- done:
--	l_queue_push_tail(sc->requests, sr);
-+	l_queue_insert(sc->requests, sr, insert_by_priority,
-+				L_INT_TO_PTR(WIPHY_WORK_PRIORITY_SCAN));
- =
-
- 	return wiphy_radio_work_insert(sc->wiphy, &sr->work,
- 					WIPHY_WORK_PRIORITY_SCAN, &work_ops);
++class Test(unittest.TestCase):
++    def profile_is_encrypted(self, profile):
++        with open('/tmp/iwd/' + profile) as f:
++            contents =3D f.read()
++
++        if 'Passphrase' in contents:
++            return False
++
++        return True
++
++    def validate(self, wd):
++        devices =3D wd.list_devices(1)
++        device =3D devices[0]
++
++        ordered_network =3D device.get_ordered_network('ssidCCMP')
++
++        self.assertEqual(ordered_network.type, NetworkType.psk)
++
++        condition =3D 'not obj.connected'
++        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
++
++        ordered_network.network_object.connect()
++
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
++
++        device.disconnect()
++
++        condition =3D 'not obj.connected'
++        wd.wait_for_object_condition(ordered_network.network_object, condi=
+tion)
++
++    # Tests that an existing plaintext profile gets encrypted
++    def test_new_profile(self):
++        IWD.copy_to_storage('ssidCCMP.psk')
++
++        mtime =3D os.path.getmtime('/tmp/iwd/' + 'ssidCCMP.psk')
++        self.assertFalse(self.profile_is_encrypted('ssidCCMP.psk'))
++
++        wd =3D IWD(True)
++
++        # Make sure profile was accepted
++        condition =3D 'len(obj.list_known_networks()) =3D=3D 1'
++        wd.wait_for_object_condition(wd, condition)
++
++        # Check the file was modified (should be encrypted now)
++        self.assertNotEqual(mtime, os.path.getmtime('/tmp/iwd/' + 'ssidCCM=
+P.psk'))
++
++        self.validate(wd)
++
++        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++
++    # Tests that a new connection with agent gets written to an encrypted =
+profile
++    def test_agent_profile(self):
++        wd =3D IWD(True)
++
++        psk_agent =3D PSKAgent("secret123")
++        wd.register_psk_agent(psk_agent)
++
++        with self.assertRaises(FileNotFoundError):
++            self.profile_is_encrypted('ssidCCMP.psk')
++
++        self.validate(wd)
++
++        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++
++        wd.unregister_psk_agent(psk_agent)
++
++    # Tests that an invalid profile gets re-written after an agent request
++    def test_invalid_profile_rewritten(self):
++        bad_config =3D '[Security]\nPassphrase=3Dincorrect\n'
++        os.system('echo "%s" > /tmp/iwd/ssidCCMP.psk' % bad_config)
++
++        wd =3D IWD(True)
++
++        condition =3D 'len(obj.list_known_networks()) =3D=3D 1'
++        wd.wait_for_object_condition(wd, condition)
++
++        # IWD should still encrypt the profile automatically
++        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++
++        # This should fail
++        with self.assertRaises(iwd.FailedEx):
++            self.validate(wd)
++
++        psk_agent =3D PSKAgent("secret123")
++        wd.register_psk_agent(psk_agent)
++
++        self.validate(wd)
++
++        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++
++    # Tests that a profile that doesn't decrypt wont become a known network
++    def test_decryption_failure(self):
++        bad_config =3D \
++'''
++[Security]
++EncryptedSalt=3D000102030405060708090a0b0c0d0e0f
++EncryptedSecurity=3Daabbccddeeff00112233445566778899
++'''
++        os.system('echo "%s" > /tmp/iwd/ssidCCMP.psk' % bad_config)
++
++        wd =3D IWD(True)
++
++        self.assertEqual(wd.list_known_networks(), [])
++
++    def test_runtime_profile(self):
++        wd =3D IWD(True)
++
++        self.assertEqual(wd.list_known_networks(), [])
++
++        # Add profile after IWD starts
++        IWD.copy_to_storage('ssidCCMP.psk')
++
++        self.validate(wd)
++
++        # Should now be encrypted
++        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++
++        with open('/tmp/iwd/ssidCCMP.psk') as f:
++            profile =3D f.read()
++
++        # Edit the profile, corrupting it
++        profile.replace('EncryptedSecurity=3D', 'EncryptedSecurity=3D00')
++
++        devices =3D wd.list_devices(1)
++        device =3D devices[0]
++        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
++        wd.wait_for_object_condition(device, condition)
++
++    def tearDown(self):
++        IWD.clear_storage()
++
++    @classmethod
++    def setUpClass(cls):
++        os.environ['CREDENTIALS_DIRECTORY'] =3D '/tmp'
++
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
++
++if __name__ =3D=3D '__main__':
++    unittest.main(exit=3DTrue)
+diff --git a/autotests/testEncryptedProfiles/hw.conf b/autotests/testEncryp=
+tedProfiles/hw.conf
+new file mode 100644
+index 00000000..de81e1e2
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/hw.conf
+@@ -0,0 +1,6 @@
++[SETUP]
++num_radios=3D2
++start_iwd=3D0
++
++[HOSTAPD]
++rad0=3DssidCCMP.conf
+diff --git a/autotests/testEncryptedProfiles/iwd-secret b/autotests/testEnc=
+ryptedProfiles/iwd-secret
+new file mode 100644
+index 00000000..c2afca48
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/iwd-secret
+@@ -0,0 +1 @@
++secret123
+diff --git a/autotests/testEncryptedProfiles/main.conf b/autotests/testEncr=
+yptedProfiles/main.conf
+new file mode 100644
+index 00000000..35d40c5e
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/main.conf
+@@ -0,0 +1,2 @@
++[General]
++SystemdEncrypt=3Diwd-secret
+diff --git a/autotests/testEncryptedProfiles/ssidCCMP.conf b/autotests/test=
+EncryptedProfiles/ssidCCMP.conf
+new file mode 100644
+index 00000000..c79f5e55
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/ssidCCMP.conf
+@@ -0,0 +1,10 @@
++hw_mode=3Dg
++channel=3D1
++ssid=3DssidCCMP
++
++wpa=3D2
++wpa_pairwise=3DCCMP
++wpa_passphrase=3Dsecret123
++
++ieee80211w=3D2
++wpa_key_mgmt=3DWPA-PSK-SHA256
+diff --git a/autotests/testEncryptedProfiles/ssidCCMP.psk b/autotests/testE=
+ncryptedProfiles/ssidCCMP.psk
+new file mode 100644
+index 00000000..abafdb66
+--- /dev/null
++++ b/autotests/testEncryptedProfiles/ssidCCMP.psk
+@@ -0,0 +1,2 @@
++[Security]
++Passphrase=3Dsecret123
 -- =
 
-2.32.0
+2.31.1
 
---===============5948313131116643098==--
+--===============1106316928425348013==--
 
