@@ -1,74 +1,27 @@
-Content-Type: multipart/mixed; boundary="===============0677759096023468439=="
+Content-Type: multipart/mixed; boundary="===============6742708993649421844=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: KeithG <ys3al35l at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/2] p2p: Add p2p.Peer.Address D-bus property
-Date: Wed, 06 Oct 2021 22:52:13 +0200
-Message-ID: <20211006205214.227476-1-andrew.zaborowski@intel.com>
+Subject: Request for feature - Scan while AP
+Date: Fri, 04 Feb 2022 17:10:20 -0600
+Message-ID: <CAG17S_M-Je-bSmxJ8PjUqip5o+rEFKQhxXWodnWayUhTzxYgJA@mail.gmail.com>
 
---===============0677759096023468439==
+--===============6742708993649421844==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Expose the Device Address property for each peer.  The spec doesn't say
-much about how permanent the address or the name are, although the
-device address by definition lives longer than the interface addresses.
-However the device address is defined to be unique and the name is not
-so the address can be used to differentiate devices with identical name.
-Being unique also may imply that it's assigned globally and thus
-permanent.
+I mentioned this a while ago and am wondering if this is on the list
+of features to add. Currently, we start as connman/iwd, but if we do
+not get an IP address, we stop iwd then start hostapd and advertise as
+an AP for initial setup. When a user connects, he/she can scan for
+availabel SSIDS and set then up.
+I know iwd can run in AP mode, but it cannot scan while in AP mode. As
+it is, hostapd does this for us, so we have a work around. I was
+wondering if this functionality is in the works.
 
-Network Manager uses the P2P device address when saving connection
-profiles (and will need it from the backend) and in this case it seems
-better justified than using the name.
+Regards,
 
-The address is already in the object path but the object path also
-includes the local phy index which may change for no reason even when
-the peer's address hasn't changed so the path is not useful for
-remembering which device we've connected to before.  Looking at only
-parts of the path is considered wrong.
----
- src/p2p.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/src/p2p.c b/src/p2p.c
-index 90779f95..3ae28edd 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -4708,6 +4708,18 @@ static bool p2p_peer_get_name(struct l_dbus *dbus,
- 	return true;
- }
- =
-
-+static bool p2p_peer_get_addr(struct l_dbus *dbus,
-+				struct l_dbus_message *message,
-+				struct l_dbus_message_builder *builder,
-+				void *user_data)
-+{
-+	struct p2p_peer *peer =3D user_data;
-+	const char *addr =3D util_address_to_string(peer->device_addr);
-+
-+	l_dbus_message_builder_append_basic(builder, 's', addr);
-+	return true;
-+}
-+
- static bool p2p_peer_get_device(struct l_dbus *dbus,
- 				struct l_dbus_message *message,
- 				struct l_dbus_message_builder *builder,
-@@ -4825,6 +4837,8 @@ static void p2p_peer_interface_setup(struct l_dbus_in=
-terface *interface)
- {
- 	l_dbus_interface_property(interface, "Name", 0, "s",
- 					p2p_peer_get_name, NULL);
-+	l_dbus_interface_property(interface, "Address", 0, "s",
-+					p2p_peer_get_addr, NULL);
- 	l_dbus_interface_property(interface, "Device", 0, "o",
- 					p2p_peer_get_device, NULL);
- 	l_dbus_interface_property(interface, "DeviceCategory", 0, "s",
--- =
-
-2.30.2
-
---===============0677759096023468439==--
+Keith
+--===============6742708993649421844==--
 
