@@ -1,310 +1,145 @@
-Content-Type: multipart/mixed; boundary="===============3341716991935176980=="
+Content-Type: multipart/mixed; boundary="===============0563800414466071246=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 4/7] tools: add decrypt-profile tool
-Date: Fri, 04 Feb 2022 09:31:17 -0800
-Message-ID: <20220204173120.231730-4-prestwoj@gmail.com>
-In-Reply-To: 20220204173120.231730-1-prestwoj@gmail.com
+Subject: [PATCH v5 3/6] main: add SystemdEncrypt option, and initialize key
+Date: Fri, 04 Feb 2022 13:33:28 -0800
+Message-ID: <20220204213331.337524-3-prestwoj@gmail.com>
+In-Reply-To: 20220204213331.337524-1-prestwoj@gmail.com
 
---===============3341716991935176980==
+--===============0563800414466071246==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This tool will decrypt an IWD network profile which was previously
-encrypted using a systemd provided key. Either a text passphrase
-can be provided (--pass) or a file containing the secret (--file).
+Recently systemd added the ability to pass secret credentials to
+services via LoadCredentialEncrypted/SetCredentialEncrypted. Once
+set up the service is able to read the decrypted credentials from
+a file. The file path is found in the environment variable
+CREDENTIALS_DIRECTORY + an identifier. The value of SystemdEncrypt
+should be set to the systemd key ID used when the credential was
+created.
 
-This can be useful for debugging, or recovering an encrypted
-profile after enabling SystemdEncrypt.
+When SystemdEncrypt is set IWD will attempt to read the decrypted
+secret from systemd. If at any point this fails warnings will be
+printed but IWD will continue normally. Its expected that any failures
+will result in the inability to connect to any networks which have
+previously encrypted the passphrase/PSK without re-entering
+the passphrase manually. This could happen, for example, if the
+systemd secret was changed.
+
+Once the secret is read in it is set into storage to be used for
+profile encryption/decryption.
 ---
- Makefile.am                 |   8 +-
- tools/iwd-decrypt-profile.c | 240 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 247 insertions(+), 1 deletion(-)
- create mode 100644 tools/iwd-decrypt-profile.c
+ src/main.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-diff --git a/Makefile.am b/Makefile.am
-index 35938d22..a0e54594 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -362,7 +362,7 @@ man_MANS +=3D wired/ead.8
- endif
- endif
- =
-
--noinst_PROGRAMS +=3D tools/probe-req
-+noinst_PROGRAMS +=3D tools/probe-req tools/iwd-decrypt-profile
- =
-
- tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu.h src/mpdu.c \
- 					src/ie.h src/ie.c \
-@@ -372,6 +372,12 @@ tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu=
-.h src/mpdu.c \
- 					src/band.h src/band.c
- tools_probe_req_LDADD =3D $(ell_ldadd)
- =
-
-+tools_iwd_decrypt_profile_SOURCES =3D tools/iwd-decrypt-profile.c \
-+					src/common.h src/common.c \
-+					src/crypto.h src/crypto.c \
-+					src/storage.h src/storage.c
-+tools_iwd_decrypt_profile_LDADD =3D ${ell_ldadd}
-+
- if HWSIM
- bin_PROGRAMS +=3D tools/hwsim
- =
-
-diff --git a/tools/iwd-decrypt-profile.c b/tools/iwd-decrypt-profile.c
-new file mode 100644
-index 00000000..f656f9e2
---- /dev/null
-+++ b/tools/iwd-decrypt-profile.c
-@@ -0,0 +1,240 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2022  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <libgen.h>
+diff --git a/src/main.c b/src/main.c
+index d0dbedc8..a345c950 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -29,6 +29,10 @@
+ #include <errno.h>
+ #include <getopt.h>
+ #include <signal.h>
 +#include <fcntl.h>
++#include <unistd.h>
 +#include <sys/stat.h>
 +#include <sys/mman.h>
-+#include <getopt.h>
-+
-+#include <ell/ell.h>
-+
-+#include "ell/useful.h"
-+
-+#include "src/storage.h"
-+#include "src/common.h"
-+
-+static void usage(void)
-+{
-+	printf("decrypt-profile - Decrypt a network profile\n"
-+		"Usage:\n");
-+	printf("\tdecrypt-profile [--pass | --file] [OPTIONS]\n");
-+	printf("\n\tEither --pass or --file must be provided. The profile\n");
-+	printf("\twill be read from stdin or from --infile.\n");
-+	printf("\tThe --ssid argument must be used if the SSID cannot be\n");
-+	printf("\tinferred from the input file\n\n");
-+	printf("Options:\n"
-+		"\t-p, --pass             Password/key used to encrypt\n"
-+		"\t-f, --file             File containing key\n"
-+		"\t-s, --ssid             SSID for associated profile (will\n"
-+		"\t                       be inferred from --infile if not\n"
-+		"\t                       provided)\n"
-+		"\t-i, --infile           Input profile (if stdin is not used)\n"
-+		"\t-o, --outfile          Output file for decrypted profile\n"
-+		"\t-h, --help             Show help options\n");
-+	printf("\n");
-+}
-+
-+static const struct option main_options[] =3D {
-+	{ "pass", required_argument,       NULL, 'p' },
-+	{ "file", required_argument,       NULL, 'f' },
-+	{ "infile", required_argument,     NULL, 'i' },
-+	{ "outfile", required_argument,    NULL, 'o' },
-+	{ "ssid", required_argument,       NULL, 's' },
-+	{ "help", no_argument,             NULL, 'h' },
-+	{ }
-+};
-+
-+static bool secret_from_file(const char *file)
+ #include <ell/ell.h>
+ =
+
+ #include <ell/useful.h>
+@@ -45,6 +49,7 @@
+ #include "src/storage.h"
+ #include "src/anqp.h"
+ #include "src/netconfig.h"
++#include "src/crypto.h"
+ =
+
+ #include "src/backtrace.h"
+ =
+
+@@ -397,6 +402,63 @@ done:
+ 	return r;
+ }
+ =
+
++/*
++ * Initialize a systemd encryption key for encrypting/decrypting credentia=
+ls.
++ */
++static void setup_system_key(void)
 +{
 +	int fd;
 +	struct stat st;
-+	void *data =3D NULL;
++	const char *cred_dir;
++	void *key =3D NULL;
++	_auto_(l_free) char *path =3D NULL;
++	_auto_(l_free) char *key_id =3D NULL;
 +
-+	fd =3D open(file, O_RDONLY, 0);
++	key_id =3D l_settings_get_string(iwd_config, "General", "SystemdEncrypt");
++	if (!key_id)
++		return;
++
++	cred_dir =3D getenv("CREDENTIALS_DIRECTORY");
++	if (!cred_dir) {
++		l_warn("SystemdEncrypt enabled but CREDENTIALS_DIRECTORY not "
++			"set, check iwd.service file");
++		return;
++	}
++
++	path =3D l_strdup_printf("%s/%s", cred_dir, key_id);
++
++	if (stat(path, &st) < 0) {
++		l_warn("SystemdEncrypt enabled but could not stat %s",
++			path);
++		return;
++	}
++
++	fd =3D open(path, O_RDONLY, 0);
 +	if (fd < 0) {
-+		printf("Cant open %s (%d)\n", file, fd);
-+		return false;
++		l_warn("SystemdEncrypt enabled but cannot open secret (%d)",
++				fd);
++		return;
 +	}
 +
 +	if (fstat(fd, &st) < 0 || st.st_size =3D=3D 0) {
 +		close(fd);
-+		return false;
++		return;
 +	}
 +
-+	data =3D mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
++	key =3D mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
++	if (key =3D=3D MAP_FAILED) {
++		l_warn("SystemdEncrypt enabled but can't mmap secret");
++		close(fd);
++		return;
++	}
++
 +	close(fd);
 +
-+	if (data =3D=3D MAP_FAILED)
-+		return false;
++	__storage_set_encryption_key(key, st.st_size);
 +
-+	__storage_set_encryption_key(data, st.st_size);
-+
-+	munmap(data, st.st_size);
-+
-+	return true;
++	munmap(key, st.st_size);
 +}
 +
-+int main(int argc, char *argv[])
-+{
-+	const char *pass =3D NULL;
-+	const char *file =3D NULL;
-+	const char *infile =3D NULL;
-+	const char *outfile =3D NULL;
-+	const char *ssid =3D NULL;
-+	_auto_(l_free) char *decrypted =3D NULL;
-+	_auto_(l_settings_free) struct l_settings *settings =3D NULL;
-+	enum security sec;
-+	int ret =3D EXIT_FAILURE;
-+	char profile[BUFSIZ];
-+	ssize_t len =3D 0;
-+	char *line;
-+	int r;
+ int main(int argc, char *argv[])
+ {
+ 	int exit_status;
+@@ -529,6 +591,8 @@ int main(int argc, char *argv[])
+ 	l_dbus_set_disconnect_handler(dbus, dbus_disconnected, NULL, NULL);
+ 	dbus_init(dbus);
+ =
+
++	setup_system_key();
 +
-+	for (;;) {
-+		int opt;
-+
-+		opt =3D getopt_long(argc, argv, "pfhio",
-+					main_options, NULL);
-+		if (opt < 0)
-+			break;
-+
-+		switch (opt) {
-+		case 'p':
-+			pass =3D optarg;
-+			break;
-+		case 'f':
-+			file =3D optarg;
-+			break;
-+		case 'i':
-+			infile =3D optarg;
-+			break;
-+		case 'o':
-+			outfile =3D optarg;
-+			break;
-+		case 's':
-+			ssid =3D optarg;
-+			break;
-+		case 'h':
-+			usage();
-+			return EXIT_SUCCESS;
-+		default:
-+			goto failed;
-+		}
-+	}
-+
-+	/*
-+	 * Sort out the argument dependencies:
-+	 *  1. Either --file or --pass must be provided
-+	 *  2. Either stdin or --infile must be provided
-+	 *  3. If using stdin --ssid must be provided
-+	 *  4. If using --infile without --ssid, attempt to get the SSID, if
-+	 *     that fails --ssid must be provided.
-+	 */
-+
-+	if (!file && !pass) {
-+		printf("--file or --pass must be supplied\n\n");
-+		goto usage;
-+	}
-+
-+	if (isatty(0) && !infile) {
-+		printf("No input file (use stdin or --infile)\n\n");
-+		goto usage;
-+	}
-+
-+	if (!infile && !ssid) {
-+		printf("--ssid is required if --infile is missing\n\n");
-+		goto usage;
-+	}
-+
-+	if (infile && !ssid) {
-+		ssid =3D storage_network_ssid_from_path(infile, &sec);
-+		if (!ssid) {
-+			printf("Can't get SSID from --infile, use --ssid\n");
-+			goto usage;
-+		}
-+	}
-+
-+	settings =3D l_settings_new();
-+
-+	if (infile) {
-+		if (!l_settings_load_from_file(settings, infile)) {
-+			printf("Profile is not formatted correctly\n");
-+			goto failed;
-+		}
-+	} else {
-+		while ((line =3D fgets(profile + len,
-+					sizeof(profile) - len, stdin)))
-+			len +=3D strlen(profile + len);
-+
-+		if (!l_settings_load_from_data(settings, profile, len)) {
-+			printf("Profile is not formatted correctly\n");
-+			goto failed;
-+		}
-+	}
-+
-+	if (pass)
-+		__storage_set_encryption_key((const uint8_t *)pass,
-+						strlen(pass));
-+	else if (!secret_from_file(file))
-+		goto failed;
-+
-+	r =3D __storage_decrypt(settings, ssid, NULL);
-+	if (r < 0) {
-+		printf("Unable to decrypt profile (%d)\n", r);
-+		goto failed;
-+	}
-+
-+	decrypted =3D l_settings_to_data(settings, (size_t *)&len);
-+
-+	if (!outfile)
-+		printf("%s\n", decrypted);
-+	else {
-+		int fd =3D open(outfile, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
-+
-+		if (fd < 0) {
-+			printf("Unable to open %s (%d)\n", outfile, fd);
-+			close(fd);
-+			goto failed;
-+		}
-+
-+		len =3D write(fd, decrypted, len);
-+
-+		close(fd);
-+
-+		if (len < 0) {
-+			printf("Unable to write to %s (%ld)\n", outfile, len);
-+			goto failed;
-+		}
-+	}
-+
-+	ret =3D EXIT_SUCCESS;
-+
-+usage:
-+	if (ret !=3D EXIT_SUCCESS)
-+		usage();
-+
-+failed:
-+	return ret;
-+}
+ 	exit_status =3D l_main_run_with_signal(signal_handler, NULL);
+ =
+
+ 	iwd_modules_exit();
 -- =
 
 2.31.1
 
---===============3341716991935176980==--
+--===============0563800414466071246==--
 
