@@ -1,178 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============0629065051294970456=="
+Content-Type: multipart/mixed; boundary="===============1267529793221174590=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 07/10] test-runner: Unify QEMU/UML logging code
-Date: Wed, 06 Apr 2022 12:14:50 -0700
-Message-ID: <20220406191453.978426-7-prestwoj@gmail.com>
-In-Reply-To: 20220406191453.978426-1-prestwoj@gmail.com
+Subject: Re: [PATCH v3 1/7] storage: implement network profile encryption
+Date: Fri, 04 Feb 2022 15:23:08 -0800
+Message-ID: <cfbb2d3a56d271ee240d7e09bb221033a79ec045.camel@gmail.com>
+In-Reply-To: e7e5a0d3-5cfd-be0d-c847-22e91e856e64@benden.us
 
---===============0629065051294970456==
+--===============1267529793221174590==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The MountInfo tuple was changed to explicitly take a source string. This
-is redundant for UML and system mounts since the fstype/source are the same,
-but it allows QEMU to specify the '9p' fstype and use MountInfo rather than
-calling mount() explicitly.
+Hi Joseph,
 
-This also moves logging cleanup into _prepare_mounts so both UML and QEMU
-can use it.
----
- tools/runner.py | 73 +++++++++++++++++++++++++------------------------
- 1 file changed, 38 insertions(+), 35 deletions(-)
+On Fri, 2022-02-04 at 15:55 -0700, Joseph Benden wrote:
+> Hi!
+> =
 
-diff --git a/tools/runner.py b/tools/runner.py
-index d303af7e..1c1f6eed 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -24,19 +24,19 @@ MS_STRICTATIME =3D 1 << 24
- STDIN_FILENO =3D 0
- TIOCSTTY =3D 0x540E
- =
+> It is my understanding that all secret data is to be kept as securely
+> as =
 
--MountInfo =3D namedtuple('MountInfo', 'fstype target options flags')
-+MountInfo =3D namedtuple('MountInfo', 'fstype source target options flags')
- DevInfo =3D namedtuple('DevInfo', 'target linkpath')
- =
+> possible. I'm not really seeing this carried throughout the source
+> code. =
 
- mounts_common =3D [
--	MountInfo('sysfs', '/sys', '', MS_NOSUID|MS_NOEXEC|MS_NODEV),
--	MountInfo('proc', '/proc', '', MS_NOSUID|MS_NOEXEC|MS_NODEV),
--	MountInfo('devpts', '/dev/pts', 'mode=3D0620', MS_NOSUID|MS_NOEXEC),
--	MountInfo('tmpfs', '/dev/shm', 'mode=3D1777',
-+	MountInfo('sysfs', 'sysfs', '/sys', '', MS_NOSUID|MS_NOEXEC|MS_NODEV),
-+	MountInfo('proc', 'proc', '/proc', '', MS_NOSUID|MS_NOEXEC|MS_NODEV),
-+	MountInfo('devpts', 'devpts', '/dev/pts', 'mode=3D0620', MS_NOSUID|MS_NOE=
-XEC),
-+	MountInfo('tmpfs', 'tmpfs', '/dev/shm', 'mode=3D1777',
- 					MS_NOSUID|MS_NODEV|MS_STRICTATIME),
--	MountInfo('tmpfs', '/run', 'mode=3D0755',
-+	MountInfo('tmpfs', 'tmpfs', '/run', 'mode=3D0755',
- 					MS_NOSUID|MS_NODEV|MS_STRICTATIME),
--	MountInfo('tmpfs', '/tmp', '', 0),
--	MountInfo('tmpfs', '/usr/share/dbus-1', 'mode=3D0755',
-+	MountInfo('tmpfs', 'tmpfs', '/tmp', '', 0),
-+	MountInfo('tmpfs', 'tmpfs', '/usr/share/dbus-1', 'mode=3D0755',
- 					MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME),
- ]
- =
+> Maybe this specific code does not need that level of security?
 
-@@ -279,6 +279,16 @@ class RunnerAbstract:
- 		copytree(self.args.testhome + '/autotests/misc/secrets', '/tmp/secrets')
- 		copy(self.args.testhome + '/autotests/misc/phonesim/phonesim.conf', '/tm=
-p')
- =
+Currently any profile (e.g. /var/lib/iwd/foo.psk) containing secret
+data is unencypted, plaintext. We rely on the file system permissions
+to 'secure' this data (which this patch series is 'fixing' for anyone
+who wants these encrypted).
 
-+		# Clear out any log files from other test runs
-+		if self.args.log:
-+			for f in [os.path.join(self.args.log, file) for file in os.listdir(self=
-.args.log)]:
-+				print("removing %s" % f)
-+
-+				if os.path.isdir(f):
-+					rmtree(f)
-+				else:
-+					os.remove(f)
-+
- 	def cleanup_environment(self):
- 		rmtree('/tmp/iwd')
- 		rmtree('/tmp/certs')
-@@ -295,7 +305,7 @@ class RunnerAbstract:
- 			except:
- 				os.mkdir(entry.target, 755)
- =
+> =
 
--			mount(entry.fstype, entry.target, entry.fstype, entry.flags,
-+			mount(entry.source, entry.target, entry.fstype, entry.flags,
- 				entry.options)
- =
+> If I'm right, then:
+> =
 
- 		for entry in dev_table:
-@@ -463,32 +473,25 @@ class QemuRunner(RunnerAbstract):
- 		self.cmdline =3D qemu_cmdline
- =
+> The secret data should be kept in a mmap(), and mlock(), structure.
+> The =
 
- 	def prepare_environment(self):
--		mounts =3D [ MountInfo('debugfs', '/sys/kernel/debug', '', 0) ]
--
--		self._prepare_mounts(extra=3Dmounts)
--
--		super().prepare_environment()
--
--		fcntl.ioctl(STDIN_FILENO, TIOCSTTY, 1)
-+		mounts =3D [ MountInfo('debugfs', 'debugfs', '/sys/kernel/debug', '', 0)=
- ]
- =
+> prevents secret data from hitting swap memory. After every use of the
+> secret data; it must be explicit_bzero() and then free(). This is so =
 
- 		if self.args.log:
--			mount('logdir', self.args.log, '9p', 0,
--					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240')
--			# Clear out any log files from other test runs
--			for f in glob('%s/*' % self.args.log):
--				print("removing %s" % f)
-+			mounts.append(MountInfo('9p', 'logdir', self.args.log,
-+					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240', 0))
- =
+> critical and tedious that it should be a macro or something from
+> libell. =
 
--				if os.path.isdir(f):
--					rmtree(f)
--				else:
--					os.remove(f)
- 		if self.args.monitor:
--			mount('mondir', self.args.monitor_parent, '9p', 0,
--					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240')
-+			mounts.append(MountInfo('9p', 'mondir', self.args.monitor_parent,
-+					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240', 0))
- =
+> And those are just initial thoughts for the basic safety of the
+> secret data.
 
- 		if self.args.result:
--			mount('resultdir', self.args.result_parent, '9p', 0,
--					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240')
-+			mounts.append(MountInfo('9p', 'resultdir', self.args.result_parent,
-+					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240', 0))
-+
-+		self._prepare_mounts(extra=3Dmounts)
-+
-+		super().prepare_environment()
-+
-+		fcntl.ioctl(STDIN_FILENO, TIOCSTTY, 1)
- =
+So this is how the systemd feature works: The IWD service is given a
+path to a file. This file is decrypted by systemd and contains the
+'secret'. IWD then reads this secret in, does some hashing, and stores
+the hashed secret in RAM. Once IWD is done it never accesses the file
+again.
 
- 	def stop(self):
- 		RB_AUTOBOOT =3D 0x01234567
-@@ -525,16 +528,16 @@ class UmlRunner(RunnerAbstract):
- 		mounts =3D []
- =
+So I don't think its even possible for IWD to do this mmap/mlock dance
+you're describing. It really doesn't own this secret file, nor does it
+keep the file contents around long. It just derives a fixed length key
+and never uses the file again.
 
- 		if self.args.log:
--			mounts.append(MountInfo('hostfs', self.args.log,
--							self.args.log, 0))
-+			mounts.append(MountInfo('hostfs', 'hostfs', self.args.log,
-+						self.args.log, 0))
- =
+As far as explicit_bzero'ing the hashed secret after every use, then
+reading it back in, and hashing it again when needed... this seems a
+bit crazy :)
 
- 		if self.args.monitor:
--			mounts.append(MountInfo('hostfs', self.args.monitor_parent,
--							self.args.monitor_parent, 0))
-+			mounts.append(MountInfo('hostfs', 'hostfs', self.args.monitor_parent,
-+						self.args.monitor_parent, 0))
- =
+Thanks,
+James
 
- 		if self.args.result:
--			mounts.append(MountInfo('hostfs', self.args.result_parent,
--							self.args.result_parent, 0))
-+			mounts.append(MountInfo('hostfs', 'hostfs', self.args.result_parent,
-+						self.args.result_parent, 0))
- =
+> =
 
- 		self._prepare_mounts(extra=3Dmounts)
- =
+> Best regards,
+> -Joe
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
 
--- =
 
-2.34.1
-
---===============0629065051294970456==--
+--===============1267529793221174590==--
 
