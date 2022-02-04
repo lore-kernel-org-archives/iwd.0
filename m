@@ -1,105 +1,183 @@
-Content-Type: multipart/mixed; boundary="===============1687685118562669054=="
+Content-Type: multipart/mixed; boundary="===============7564413734078410104=="
 MIME-Version: 1.0
-From: =?utf-8?q?Alvin_=C5=A0ipraga_=3CALSI_at_bang-olufsen=2Edk=3E?=
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Possible bug when /var/lib/iwd is a symlink
-Date: Thu, 14 Apr 2022 12:20:01 +0000
-Message-ID: <20220414122000.bvzsws2gk2lyi6p2@bang-olufsen.dk>
-In-Reply-To: CAELJisxEWR2dcZ9x4Xr3+r=myTv7X1ncD1wkx6rZ6O3YVJRMAA@mail.gmail.com
+Subject: Re: [PATCH v4 4/7] tools: add decrypt-profile tool
+Date: Fri, 04 Feb 2022 13:57:43 -0600
+Message-ID: <6441d532-031d-c11e-6a62-46cece2fbe1c@gmail.com>
+In-Reply-To: 20220204173120.231730-4-prestwoj@gmail.com
 
---===============1687685118562669054==
+--===============7564413734078410104==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Joakim,
+Hi James,
 
-On Thu, Apr 14, 2022 at 10:17:26AM +0200, Joakim Lotseng=C4=82=E2=80=9Erd w=
-rote:
-> Hi,
+> +int main(int argc, char *argv[])
+> +{
+> +	const char *pass =3D NULL;
+> +	const char *file =3D NULL;
+> +	const char *infile =3D NULL;
+> +	const char *outfile =3D NULL;
+> +	const char *ssid =3D NULL;
+> +	_auto_(l_free) char *decrypted =3D NULL;
+> +	_auto_(l_settings_free) struct l_settings *settings =3D NULL;
+> +	enum security sec;
+> +	int ret =3D EXIT_FAILURE;
+> +	char profile[BUFSIZ];
+
+What's BUFSIZ?  Is this from the fget* utilities?  If so, that is system =
+
+dependent...
+
+> +	ssize_t len =3D 0;
+> +	char *line;
+> +	int r;
+> +
+> +	for (;;) {
+> +		int opt;
+> +
+> +		opt =3D getopt_long(argc, argv, "pfhio",
+> +					main_options, NULL);
+> +		if (opt < 0)
+> +			break;
+> +
+> +		switch (opt) {
+> +		case 'p':
+> +			pass =3D optarg;
+> +			break;
+> +		case 'f':
+> +			file =3D optarg;
+> +			break;
+> +		case 'i':
+> +			infile =3D optarg;
+> +			break;
+> +		case 'o':
+> +			outfile =3D optarg;
+> +			break;
+> +		case 's':
+> +			ssid =3D optarg;
+> +			break;
+> +		case 'h':
+> +			usage();
+> +			return EXIT_SUCCESS;
+> +		default:
+> +			goto failed;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Sort out the argument dependencies:
+> +	 *  1. Either --file or --pass must be provided
+> +	 *  2. Either stdin or --infile must be provided
+> +	 *  3. If using stdin --ssid must be provided
+> +	 *  4. If using --infile without --ssid, attempt to get the SSID, if
+> +	 *     that fails --ssid must be provided.
+> +	 */
+> +
+> +	if (!file && !pass) {
+> +		printf("--file or --pass must be supplied\n\n");
+> +		goto usage;
+> +	}
+> +
+> +	if (isatty(0) && !infile) {
+> +		printf("No input file (use stdin or --infile)\n\n");
+> +		goto usage;
+> +	}
+> +
+> +	if (!infile && !ssid) {
+> +		printf("--ssid is required if --infile is missing\n\n");
+> +		goto usage;
+> +	}
+> +
+> +	if (infile && !ssid) {
+> +		ssid =3D storage_network_ssid_from_path(infile, &sec);
+> +		if (!ssid) {
+> +			printf("Can't get SSID from --infile, use --ssid\n");
+> +			goto usage;
+> +		}
+> +	}
+> +
+> +	settings =3D l_settings_new();
+> +
+> +	if (infile) {
+> +		if (!l_settings_load_from_file(settings, infile)) {
+> +			printf("Profile is not formatted correctly\n");
+> +			goto failed;
+> +		}
+
+Okay, but in theory you can mmap this as well and combine it with the case =
+
+below.  Not sure if it makes the code any smaller though.
+
+> +	} else {
+> +		while ((line =3D fgets(profile + len,
+> +					sizeof(profile) - len, stdin)))
+> +			len +=3D strlen(profile + len);
+
+This seems a bit limiting.  Why not use a growable buffer via realloc?  Or =
+
+alternatively l_string_*
+
+> +
+> +		if (!l_settings_load_from_data(settings, profile, len)) {
+> +			printf("Profile is not formatted correctly\n");
+> +			goto failed;
+> +		}
+> +	}
+> +
+> +	if (pass)
+> +		__storage_set_encryption_key((const uint8_t *)pass,
+> +						strlen(pass));
+> +	else if (!secret_from_file(file))
+> +		goto failed;
+> +
+> +	r =3D __storage_decrypt(settings, ssid, NULL);
+> +	if (r < 0) {
+> +		printf("Unable to decrypt profile (%d)\n", r);
+> +		goto failed;
+> +	}
+> +
+> +	decrypted =3D l_settings_to_data(settings, (size_t *)&len);
+> +
+> +	if (!outfile)
+> +		printf("%s\n", decrypted);
+
+using write directly to stdout is probably better.
+
+> +	else {
+> +		int fd =3D open(outfile, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+> +
+> +		if (fd < 0) {
+> +			printf("Unable to open %s (%d)\n", outfile, fd);
+> +			close(fd);
+> +			goto failed;
+> +		}
+> +
+> +		len =3D write(fd, decrypted, len);
+> +
+> +		close(fd);
+> +
+> +		if (len < 0) {
+> +			printf("Unable to write to %s (%ld)\n", outfile, len);
+> +			goto failed;
+> +		}
+> +	}
+> +
+> +	ret =3D EXIT_SUCCESS;
+> +
+> +usage:
+> +	if (ret !=3D EXIT_SUCCESS)
+> +		usage();
+> +
+> +failed:
+> +	return ret;
+> +}
 > =
 
-> Possible bug when /var/lib/iwd is a symlink:
-> =
 
-> I ran across a problem when the ending part of /var/lib/iwd is a symlink.
-> In my case it points to /mnt/persistent/iwd.  We are an IoT device that r=
-uns
-> on UBIFS (+ tmpfs) and the entire rootfs partition of the NAND will be
-> updated on FOTA.  Hence anything we want to save in an upgrade must be on=
- a
-> persistent partition.  Our target is a Freescale i.MX6 Ultralite module
-> running an ARM A7 core (if that matters).
-> =
-
-> Problem seems to be that the l_dir_watch_new() call in knownnetworks.c ne=
-ver
-> follows symlink.  l_dir_watch_new() uses IN_DONT_FOLLOW in its call to
-> inotify_add_watch() in ell.
-> =
-
-> This will make the known network list misbehave.  If one forgets a
-> known-network via iwctl, the list doesn't get updated.  The same goes for
-> connecting to a not already known network.  It is easy to reproduce.  Just
-> symlink /var/lib/iwd to another location and run some connect + forget in
-> iwctl.  One can also note that adding a new /var/lib/iwd/my_ssid.psk, by
-> manually creating the file, is not picked up by iwd automatically.
-> =
-
-> I've only tested this with iwd 1.17 and ell 0.43 due to the complexity to
-> build another version using Yocto.  However, I've checked the source code
-
-You can just keep a recipe in your own custom layer with a higher version.
-Yocto actually makes this really easy - in practice all we do when bumping =
-iwd
-is to update the SRC_URI checksum and PV (in the filename), while the recip=
-e is
-otherwise the same as in meta-oe.
-
-> for iwd on master and they don't seem to handle the fact that /var/lib/iwd
-> is a symlink.  I've tried to search the mailing-list and google, but can't
-> find anything about this.  It seems I can change the /var/lib/iwd directo=
-ry
-> during compilation by setting DAEMON_STORAGEDIR during configure/build.
-> However, that is a bit unflexible as my system is Yocto based, and hacking
-> the Yocto recipes for this seems wrong.  Normally you symlink things in y=
-our
-> file tree in IoT devices to point to persistent storage areas.
-> =
-
-> I don't have a solution, but at least iwd should detect that /var/lib/iwd=
- is
-> a symlink and warn the user.  The implication is that the known-network l=
-ist
-> doesn't work at all.  The internal known-network list should work even if
-> inotify doesn't.
-
-The way we solve this problem in general is to bind mount a directory on ou=
-r rw
-filesystem to /var/lib/iwd. We also use Yocto, although we have a custom re=
-cipe
-for setting up our bind mounts. For inspiration, you can look at the
-volatile-binds.bb recipe in poky, which does pretty much the same.
-
-Perhaps iwd should tolerate symlinks, but iwd is not the only program that =
-has
-issues with symlinks, so often a bind mount is more robust :-)
-
-Kind regards,
-Alvin
-
-> =
-
-> Perhaps also it should be allowed to change the default storage dir in
-> /etc/iwd/main.conf.
-> =
-
-> -- =
-
-> Best regards,
-> Joakim Lotseng=C4=82=E2=80=9Erd
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
---===============1687685118562669054==--
+Regards,
+-Denis
+--===============7564413734078410104==--
 
