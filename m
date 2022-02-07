@@ -1,50 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============5067098774891233458=="
+Content-Type: multipart/mixed; boundary="===============8105989218322905362=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 00/13] Combined test-runner fixes
-Date: Mon, 28 Mar 2022 10:28:29 -0700
-Message-ID: <20220328172842.1660272-1-prestwoj@gmail.com>
+Subject: [PATCH] scan: remove periodic scans from queue on abort
+Date: Mon, 07 Feb 2022 13:28:06 -0800
+Message-ID: <20220207212806.449583-1-prestwoj@gmail.com>
 
---===============5067098774891233458==
+--===============8105989218322905362==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This combines the individual test fixes with the memory fixes
+The periodic scan code was refactored to make normal scans and
+periodic scans consistent by keeping both in the same queue. But
+that change left out the abort path where periodic scans were not
+actually removed from the queue.
 
-James Prestwood (13):
-  test-runner: add memory usage for debugging
-  test-runner: fix OOM issues (hopefully)
-  auto-t: remove waitstatus_to_exitcode for better compatibility
-  auto-t: iwd.py: fix full_scan argument
-  auto-t: fixup testRoamRetry for better timing reliability
-  auto-t: use wait_for_event in testBSSBlacklist
-  auto-t: use wait_for_event in testSAE-roam
-  auto-t: do full scan for testSAE
-  auto-t: use wait_for_event in testPSK-roam
-  auto-t: do a full scan when getting network
-  dpp: fail if disconnected during DPP protocol
-  dpp: set new_freq when configuring as initiator
-  auto-t: don't wait for wpa_supplicant to connect
+This fixes a rare crash when a periodic scan has been triggered and
+the device goes down. This path never removes the request from the
+queue but still frees it. Then when the scan context is removed the
+stale request is freed again.
 
- autotests/testBSSBlacklist/connection_test.py | 18 ++--
- autotests/testDPP/connection_test.py          |  5 +-
- autotests/testNetconfig/connection_test.py    |  5 +-
- .../testOWE-transition/connection_test.py     | 13 +--
- autotests/testPSK-roam/connection_test.py     | 29 +-----
- autotests/testRoamRetry/fast_retry_test.py    | 13 ++-
- autotests/testRoamRetry/stop_retry_test.py    |  7 +-
- autotests/testSAE-roam/connection_test.py     | 11 ++-
- autotests/testSAE/connection_test.py          | 14 +--
- autotests/util/iwd.py                         | 23 ++---
- src/dpp.c                                     | 15 +++-
- tools/test-runner                             | 89 +++++++++++++++++--
- 12 files changed, 142 insertions(+), 100 deletions(-)
+0 0x4bb65b in scan_request_cancel src/scan.c:202
+1 0x64313c in l_queue_clear ell/queue.c:107
+2 0x643348 in l_queue_destroy ell/queue.c:82
+3 0x4bbfb7 in scan_context_free src/scan.c:209
+4 0x4c9a78 in scan_wdev_remove src/scan.c:2115
+5 0x42fecd in netdev_free src/netdev.c:965
+6 0x445827 in netdev_destroy src/netdev.c:6507
+7 0x52beb9 in manager_config_notify src/manager.c:765
+8 0x67084b in process_multicast ell/genl.c:1029
+9 0x67084b in received_data ell/genl.c:1096
+10 0x65e790 in io_callback ell/io.c:120
+11 0x65aaae in l_main_iterate ell/main.c:478
+12 0x65b213 in l_main_run ell/main.c:525
+13 0x65b213 in l_main_run ell/main.c:507
+14 0x65b72c in l_main_run_with_signal ell/main.c:647
+15 0x4124e7 in main src/main.c:532
+---
+ src/scan.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
+diff --git a/src/scan.c b/src/scan.c
+index 99813952..1ab6420b 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -1993,9 +1993,10 @@ static void scan_notify(struct l_genl_msg *msg, void=
+ *user_data)
+ 			sr->triggered =3D false;
+ =
+
+ 			/* If periodic scan, don't report the abort */
+-			if (sr->periodic)
++			if (sr->periodic) {
++				l_queue_remove(sc->requests, sr);
+ 				wiphy_radio_work_done(sc->wiphy, sr->work.id);
+-			else
++			} else
+ 				scan_finished(sc, -ECANCELED, NULL, NULL, sr);
+ 		} else if (wiphy_radio_work_is_running(sc->wiphy,
+ 							sr->work.id)) {
 -- =
 
-2.34.1
+2.31.1
 
---===============5067098774891233458==--
+--===============8105989218322905362==--
 
