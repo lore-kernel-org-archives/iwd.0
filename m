@@ -1,67 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============6041136192785910558=="
+Content-Type: multipart/mixed; boundary="===============6832999775632889741=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 4/7] auto-t: testutil: wait for operstate
-Date: Wed, 30 Mar 2022 13:23:12 -0700
-Message-ID: <20220330202315.1881335-4-prestwoj@gmail.com>
-In-Reply-To: 20220330202315.1881335-1-prestwoj@gmail.com
+Subject: [PATCH v2] netdev: fail connection if the link goes down
+Date: Mon, 07 Feb 2022 14:57:50 -0800
+Message-ID: <20220207225750.458709-1-prestwoj@gmail.com>
 
---===============6041136192785910558==
+--===============6832999775632889741==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Depending on timing the operstate may not be set even when IWD shows
-as connected. Instead wait for the operstate to become set.
+In certain rare cases IWD gets a link down event before nl80211 ever sends
+a disconnect event. Netdev notifies station of the link down which causes
+station to be freed, but netdev remains in the same state. Then later the
+disconnect event arrives and netdev still thinks its connected, calls into
+(the now freed) station object and causes a crash.
+
+To fix this netdev_connect_free() is now called on any link down events
+which will reset the netdev object to a proper state.
+
+src/netdev.c:netdev_link_notify() event 16 on ifindex 16
+src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
+src/netdev.c:netdev_link_notify() event 16 on ifindex 16
+src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
+src/netdev.c:netdev_deauthenticate_event()
+src/netdev.c:netdev_link_notify() event 16 on ifindex 16
+src/station.c:station_free()
+src/netconfig.c:netconfig_destroy()
+src/resolve.c:resolve_systemd_revert() ifindex: 16
+src/station.c:station_roam_state_clear() 16
+src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
+src/netdev.c:netdev_disconnect_event()
+Received Deauthentication event, reason: 3, from_ap: false
+
+0 0x472fa4 in station_disconnect_event src/station.c:2916
+1 0x472fa4 in station_netdev_event src/station.c:2954
+2 0x43a262 in netdev_disconnect_event src/netdev.c:1213
+3 0x43a262 in netdev_mlme_notify src/netdev.c:5471
+4 0x6706eb in process_multicast ell/genl.c:1029
+5 0x6706eb in received_data ell/genl.c:1096
+6 0x65e630 in io_callback ell/io.c:120
+7 0x65a94e in l_main_iterate ell/main.c:478
+8 0x65b0b3 in l_main_run ell/main.c:525
+9 0x65b0b3 in l_main_run ell/main.c:507
+10 0x65b5cc in l_main_run_with_signal ell/main.c:647
+11 0x4124d7 in main src/main.c:532
 ---
- autotests/util/testutil.py | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ src/netdev.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/autotests/util/testutil.py b/autotests/util/testutil.py
-index 1fced6c4..01c42654 100644
---- a/autotests/util/testutil.py
-+++ b/autotests/util/testutil.py
-@@ -134,10 +134,7 @@ SIOCGIFADDR =3D 0x8915
- IFF_UP =3D 1 << 0
- IFF_RUNNING =3D 1 << 6
+diff --git a/src/netdev.c b/src/netdev.c
+index bac6860c..36d183e7 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -6199,6 +6199,9 @@ static void netdev_newlink_notify(const struct ifinfo=
+msg *ifi, int bytes)
  =
 
--def test_iface_operstate(intf=3DNone):
--    if not intf:
--        intf =3D iwd.IWD.get_instance().list_devices()[0].name
--
-+def _test_operstate(intf):
-     sock =3D socket.socket(socket.PF_PACKET, socket.SOCK_RAW)
+ 	new_up =3D netdev_get_is_up(netdev);
  =
 
-     try:
-@@ -146,10 +143,19 @@ def test_iface_operstate(intf=3DNone):
- =
-
-         # IFF_LOWER_UP and IFF_DORMANT not returned by SIOCGIFFLAGS
-         if flags & (IFF_UP | IFF_RUNNING) !=3D IFF_UP | IFF_RUNNING:
--            raise Exception(intf + ' operstate wrong')
-+            return False
++	if (!new_up)
++		netdev_connect_free(netdev);
 +
-+        return True
-     finally:
-         sock.close()
- =
-
-+def test_iface_operstate(intf=3DNone):
-+    if not intf:
-+        intf =3D iwd.IWD.get_instance().list_devices()[0].name
-+
-+    ctx.non_block_wait(_test_operstate, 10, intf,
-+                        exception=3DException(intf + ' operstate wrong'))
-+
- def test_ip_address_match(intf, ip):
-     try:
-         s =3D socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+ 	/*
+ 	 * If mac_change_cmd_id is set we are in the process of changing the
+ 	 * MAC address and this event is a result of powering down/up. In this
 -- =
 
-2.34.1
+2.31.1
 
---===============6041136192785910558==--
+--===============6832999775632889741==--
 
