@@ -1,43 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============2800332870394175609=="
+Content-Type: multipart/mixed; boundary="===============5031826890456778840=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/3] hwsim: don't print on when send frame fails
-Date: Mon, 14 Feb 2022 12:34:37 -0800
-Message-ID: <20220214203439.989936-1-prestwoj@gmail.com>
+Subject: Re: [PATCH] netdev: fix crash from not cancelling netdev_get_oci
+Date: Mon, 07 Feb 2022 13:52:25 -0600
+Message-ID: <b0cf3f4a-024c-a8a8-9aa0-e5b02e4bf63c@gmail.com>
+In-Reply-To: 20220207194334.402597-1-prestwoj@gmail.com
 
---===============2800332870394175609==
+--===============5031826890456778840==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This happens quite often and spams the console with this error.
----
- tools/hwsim.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+Hi James,
 
-diff --git a/tools/hwsim.c b/tools/hwsim.c
-index 7c32b869..f74dd82e 100644
---- a/tools/hwsim.c
-+++ b/tools/hwsim.c
-@@ -1336,11 +1336,7 @@ static void send_frame_callback(struct l_genl_msg *m=
-sg, void *user_data)
- {
- 	struct send_frame_info *info =3D user_data;
- =
+On 2/7/22 13:43, James Prestwood wrote:
+> If netdev_connect_failed is called before netdev_get_oci_cb() the
+> netdev's handshake will be destroyed and ultimately crash when the
+> callback is called.
+> =
 
--	if (l_genl_msg_get_error(msg) < 0)
--		/* Radio address or frequency didn't match */
--		l_debug("HWSIM_CMD_FRAME failed for destination %s",
--			util_address_to_string(info->radio->addrs[0]));
--	else {
-+	if (l_genl_msg_get_error(msg) =3D=3D 0) {
- 		info->frame->acked =3D true;
- 		info->frame->ack_radio =3D info->radio;
- 	}
--- =
+> This patch moves the cancelation into netdev_connect_free rather than
+> netdev_free.
+> =
 
-2.34.1
+> ++++++++ backtrace ++++++++
+> 0  0x7f4e1787d320 in /lib64/libc.so.6
+> 1  0x42634c in handshake_state_set_chandef() at src/handshake.c:1057
+> 2  0x40a11b in netdev_get_oci_cb() at src/netdev.c:2387
+> 3  0x483d7b in process_unicast() at ell/genl.c:986
+> 4  0x480d3c in io_callback() at ell/io.c:120
+> 5  0x48004d in l_main_iterate() at ell/main.c:472 (discriminator 2)
+> 6  0x4800fc in l_main_run() at ell/main.c:521
+> 7  0x48032c in l_main_run_with_signal() at ell/main.c:649
+> 8  0x403e95 in main() at src/main.c:532
+> 9  0x7f4e17867b75 in /lib64/libc.so.6
+> +++++++++++++++++++++++++++
+> ---
+>   src/netdev.c | 10 +++++-----
+>   1 file changed, 5 insertions(+), 5 deletions(-)
+> =
 
---===============2800332870394175609==--
+
+Applied, thanks.
+
+Regards,
+-Denis
+
+--===============5031826890456778840==--
 
