@@ -1,93 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============0824234573140878178=="
+Content-Type: multipart/mixed; boundary="===============1377556826837740633=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 12/12] auto-t: update rekey() use to not wait for event
-Date: Mon, 04 Oct 2021 09:49:02 -0700
-Message-ID: <20211004164902.2274318-12-prestwoj@gmail.com>
-In-Reply-To: 20211004164902.2274318-1-prestwoj@gmail.com
+Subject: [PATCH 1/2] auto-t: iwd.py: add wait argument to scan()
+Date: Tue, 08 Feb 2022 09:35:38 -0800
+Message-ID: <20220208173539.493712-1-prestwoj@gmail.com>
 
---===============0824234573140878178==
+--===============1377556826837740633==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The hostapd event wait was moved into rekey() itself.
+Lets the test continue without waiting for the method return
 ---
- autotests/testFILS/fils_256_test.py       | 1 -
- autotests/testFILS/fils_384_test.py       | 1 -
- autotests/testFT-FILS/connection_test.py  | 1 -
- autotests/testPSK-roam/connection_test.py | 1 -
- 4 files changed, 4 deletions(-)
+ autotests/util/iwd.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/testFILS/fils_256_test.py b/autotests/testFILS/fils_=
-256_test.py
-index 02fad28e..a4e58715 100644
---- a/autotests/testFILS/fils_256_test.py
-+++ b/autotests/testFILS/fils_256_test.py
-@@ -56,7 +56,6 @@ class Test(unittest.TestCase):
-         testutil.test_ifaces_connected(device.name, hapd.ifname)
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 54b4819e..170dd96b 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -450,7 +450,7 @@ class Device(IWDDBusAbstract):
+         self._station_debug._prop_proxy.Set(IWD_STATION_DEBUG_INTERFACE,
+                                             'AutoConnect', value)
  =
 
-         hapd.rekey(device.address)
--        hapd.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
+-    def scan(self):
++    def scan(self, wait=3DTrue):
+         '''Schedule a network scan.
  =
 
-         device.disconnect()
+            Possible exception: BusyEx
+@@ -460,7 +460,8 @@ class Device(IWDDBusAbstract):
+                                reply_handler=3Dself._success,
+                                error_handler=3Dself._failure)
  =
 
-diff --git a/autotests/testFILS/fils_384_test.py b/autotests/testFILS/fils_=
-384_test.py
-index 8ecd2fec..e6550a17 100644
---- a/autotests/testFILS/fils_384_test.py
-+++ b/autotests/testFILS/fils_384_test.py
-@@ -56,7 +56,6 @@ class Test(unittest.TestCase):
-         testutil.test_ifaces_connected(device.name, hapd.ifname)
+-        self._wait_for_async_op()
++        if wait:
++            self._wait_for_async_op()
  =
 
-         hapd.rekey(device.address)
--        hapd.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
- =
-
-         device.disconnect()
- =
-
-diff --git a/autotests/testFT-FILS/connection_test.py b/autotests/testFT-FI=
-LS/connection_test.py
-index d1389cea..14025a3b 100644
---- a/autotests/testFT-FILS/connection_test.py
-+++ b/autotests/testFT-FILS/connection_test.py
-@@ -96,7 +96,6 @@ class Test(unittest.TestCase):
-                           (self.bss_hostapd[0].ifname, device.name, True, =
-True))
- =
-
-         self.bss_hostapd[1].rekey(device.address)
--        self.bss_hostapd[1].wait_for_event('EAPOL-4WAY-HS-COMPLETED')
- =
-
-     def test_fils_ft_roam_sha256(self):
-         wd =3D IWD(True)
-diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
-roam/connection_test.py
-index d1beb010..ee50e4a7 100644
---- a/autotests/testPSK-roam/connection_test.py
-+++ b/autotests/testPSK-roam/connection_test.py
-@@ -81,7 +81,6 @@ class Test(unittest.TestCase):
-                           (self.bss_hostapd[0].ifname, device.name, True, =
-True))
- =
-
-         self.bss_hostapd[1].rekey(device.address)
--        self.bss_hostapd[1].wait_for_event('EAPOL-4WAY-HS-COMPLETED')
- =
-
-         device.roam(self.bss_hostapd[0].bssid)
- =
-
+     def disconnect(self):
+         '''Disconnect from the network
 -- =
 
 2.31.1
 
---===============0824234573140878178==--
+--===============1377556826837740633==--
 
