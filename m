@@ -1,295 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============7632930320514786766=="
+Content-Type: multipart/mixed; boundary="===============6105318014679752024=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: KeithG <ys3al35l at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 3/3] unit: add JSON unit test
-Date: Fri, 10 Dec 2021 13:41:39 -0800
-Message-ID: <20211210214139.2045488-3-prestwoj@gmail.com>
-In-Reply-To: 20211210214139.2045488-1-prestwoj@gmail.com
+Subject: Re: Request for feature - Scan while AP
+Date: Tue, 08 Feb 2022 16:01:48 -0600
+Message-ID: <CAG17S_MOiNOZCfCq0mCyh=bbi4QEAJPhd9+U7rV-5NC96ZepxQ@mail.gmail.com>
+In-Reply-To: 5dfd7cd47232625a4dc259679108c64b3309be16.camel@gmail.com
 
---===============7632930320514786766==
+--===============6105318014679752024==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- Makefile.am      |   5 +-
- unit/test-json.c | 231 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 235 insertions(+), 1 deletion(-)
- create mode 100644 unit/test-json.c
+James,
 
-diff --git a/Makefile.am b/Makefile.am
-index fef2c2c4..312081a0 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -396,7 +396,7 @@ unit_tests =3D unit/test-cmac-aes \
- 		unit/test-ie unit/test-util unit/test-ssid-security \
- 		unit/test-arc4 unit/test-wsc unit/test-eap-mschapv2 \
- 		unit/test-eap-sim unit/test-sae unit/test-p2p unit/test-band \
--		unit/test-dpp
-+		unit/test-dpp unit/test-json
- =
+As far as I am concerned, yes, I think the same station scan command
+would be compatible with what we have. As it is now we keep iwd up and
+launch hostapd. iwctl complains when we do this but we still get a
+list of available stations with current strength info that we can
+provision and connect to. This is the error we get when we have both
+hostapd and connman/iwd running and scanning.
+```
+Feb 08 15:45:42 alarm iwd[244]: WARNING:
+src/station.c:station_autoconnect_start() condition
+station->autoconnect_list failed
+Feb 08 15:45:42 alarm iwd[244]: Received error during
+CMD_TRIGGER_SCAN: Operation not supported (95)
+```
+I have cobbled together a config for our project that starts iwd in ap
+mode (instead of launching hostapd) if there is not an IP address that
+it connects to at boot. Since it initially starts in station mode and
+we save the local SSIDs at boot, we can select and connect, but
+current strength of that list of SSIDs is not available and if a new
+SSID shows up, we will not catch that whereas with the current setup
+of hostapd/iwd, we do. I do not know if it is reasonable or not but if
+iwd is in ap mode and connman asks for a list of SSIDs and iwd just
+provides them it would probably be easiest for us, but we could adapt
+to another means of getting the SSIDs if it this is not an
+acceptable/reasonable means of getting this info. I am not certain how
+connman would deal with this.
 
- if CLIENT
- unit_tests +=3D unit/test-client
-@@ -556,6 +556,9 @@ unit_test_dpp_SOURCES =3D unit/test-dpp.c src/dpp-util.=
-h src/dpp-util.c \
- =
+As for DPP, I am unfamiliar with it. Is there an example of it we
+could crib? If it is incompatible with apple, though, maybe not too
+useful for us as we expect all devices can connect and provision. I
+have been able to provision them with my phone or laptop.
 
- unit_test_dpp_LDADD =3D $(ell_ldadd)
- =
+Keith
 
-+unit_test_json_SOURCES =3D unit/test-json.c src/json.h src/json.c shared/j=
-smn.h
-+unit_test_json_LDADD =3D $(ell_ldadd)
-+
- TESTS =3D $(unit_tests)
- =
-
- EXTRA_DIST =3D src/genbuiltin src/iwd.service.in src/net.connman.iwd.servi=
-ce \
-diff --git a/unit/test-json.c b/unit/test-json.c
-new file mode 100644
-index 00000000..4c69a3db
---- /dev/null
-+++ b/unit/test-json.c
-@@ -0,0 +1,231 @@
-+/*
-+ *
-+ *  Embedded Linux library
-+ *
-+ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <assert.h>
-+
-+#include <ell/ell.h>
-+
-+#include "src/json.h"
-+#include "ell/useful.h"
-+
-+struct json_contents;
-+
-+
-+/*
-+ * Object:
-+ * { "test": "<smile emoji>" }
-+ */
-+static void test_json_unicode(const void *data)
-+{
-+	struct json_iter iter;
-+	_auto_(l_free)char *v;
-+	uint8_t expected[] =3D { 0xF0, 0x9F, 0x98, 0x80, 0 };
-+
-+	uint8_t s[] =3D { '{', '"', 't', 'e', 's', 't', '"', ':',
-+				'"', 0xf0, 0x9f, 0x98, 0x80, '"', '}', 0 };
-+	struct json_contents *c =3D json_contents_new((const char *)s, sizeof(s));
-+
-+	json_iter_init(&iter, c);
-+	assert(json_iter_parse(&iter, JSON_MANDATORY("test", JSON_STRING, &v),
-+				JSON_UNDEFINED));
-+
-+	assert(!strcmp(v, (char *)expected));
-+
-+	json_contents_free(c);
-+}
-+
-+static void test_json_escaped_unicode(const void *data)
-+{
-+	struct json_iter iter;
-+	_auto_(l_free)char *v;
-+	char *s =3D "{\"test\":\"\\uD8F0\"}";
-+	char expected[] =3D "\\uD8F0";
-+	struct json_contents *c =3D json_contents_new(s, strlen(s));
-+
-+	json_iter_init(&iter, c);
-+	assert(json_iter_parse(&iter, JSON_MANDATORY("test", JSON_STRING, &v),
-+				JSON_UNDEFINED));
-+
-+	assert(!strcmp(v, expected));
-+
-+	json_contents_free(c);
-+}
-+
-+/*
-+ * Tests that unsupported types will not parse
-+ */
-+static void test_json_unsupported_types(const void *data)
-+{
-+	/*
-+	 * Valid JSON objects but currently unsupported types
-+	 */
-+	char arrays[] =3D "{\"test\":[1, 2, 3, 4]}";
-+	char integers[] =3D "{\"test\": 10 }";
-+	char bools[] =3D "{\"test\": true}";
-+
-+	struct json_iter iter;
-+	struct json_contents *c =3D json_contents_new(arrays, strlen(arrays));
-+
-+	json_iter_init(&iter, c);
-+	assert(!json_iter_parse(&iter,
-+				JSON_MANDATORY("test", JSON_ARRAY, NULL),
-+				JSON_UNDEFINED));
-+	json_contents_free(c);
-+
-+	c =3D json_contents_new(integers, strlen(integers));
-+	json_iter_init(&iter, c);
-+	assert(!json_iter_parse(&iter,
-+				JSON_MANDATORY("test", JSON_PRIMITIVE, NULL),
-+				JSON_UNDEFINED));
-+	json_contents_free(c);
-+
-+	c =3D json_contents_new(bools, strlen(bools));
-+	json_iter_init(&iter, c);
-+	assert(!json_iter_parse(&iter,
-+				JSON_MANDATORY("test", JSON_PRIMITIVE, NULL),
-+				JSON_UNDEFINED));
-+	json_contents_free(c);
-+}
-+
-+/*
-+ * Basic test string values and nested objects
-+ */
-+static void test_json(const void *data)
-+{
-+	char json[] =3D "{\"wi-fi_tech\":\"infra\","
-+			"\"discovery\":"
-+				"{\"ssid\":\"somessid\"},"
-+			"\"cred\":"
-+				"{\"akm\":\"psk\","
-+				"\"pass\":\"somepassphrase\"}}";
-+	_auto_(l_free)char *tech;
-+	_auto_(l_free)char *ssid;
-+	_auto_(l_free)char *akm;
-+	_auto_(l_free)char *pass;
-+	_auto_(l_free)char *opt_not_found;
-+	struct json_iter objnotfound;
-+	struct json_iter discovery;
-+	struct json_iter cred;
-+	struct json_iter iter;
-+	struct json_contents *c =3D json_contents_new(json, strlen(json));
-+
-+	json_iter_init(&iter, c);
-+	assert(json_iter_parse(&iter,
-+			JSON_MANDATORY("wi-fi_tech", JSON_STRING, &tech),
-+			JSON_MANDATORY("discovery", JSON_OBJECT, &discovery),
-+			JSON_MANDATORY("cred", JSON_OBJECT, &cred),
-+			JSON_OPTIONAL("notfound", JSON_STRING, &opt_not_found),
-+			JSON_OPTIONAL("objnotfound", JSON_OBJECT, &objnotfound),
-+			JSON_UNDEFINED));
-+
-+	assert(opt_not_found =3D=3D NULL);
-+	assert(json_object_not_found(&objnotfound));
-+
-+	assert(!strcmp(tech, "infra"));
-+
-+	assert(json_iter_parse(&discovery,
-+			JSON_MANDATORY("ssid", JSON_STRING, &ssid),
-+			JSON_UNDEFINED));
-+
-+	assert(!strcmp(ssid, "somessid"));
-+
-+	assert(json_iter_parse(&cred,
-+			JSON_MANDATORY("akm", JSON_STRING, &akm),
-+			JSON_MANDATORY("pass", JSON_STRING, &pass),
-+			JSON_UNDEFINED));
-+	assert(!strcmp(akm, "psk"));
-+	assert(!strcmp(pass, "somepassphrase"));
-+
-+	json_contents_free(c);
-+}
-+
-+/*
-+ * Tests empty objects parse successfully
-+ */
-+static void test_json_empty_objects(const void *data)
-+{
-+	char empty[] =3D "{}";
-+	char nested_empty[] =3D "{\"empty\":{}}";
-+	struct json_iter nested_iter;
-+	struct json_iter iter;
-+	struct json_contents *c =3D json_contents_new(empty, strlen(empty));
-+
-+	json_iter_init(&iter, c);
-+	assert(json_iter_parse(&iter, JSON_UNDEFINED));
-+
-+	assert(json_iter_parse(&iter,
-+				JSON_OPTIONAL("optional", JSON_OBJECT, NULL),
-+				JSON_UNDEFINED));
-+
-+	assert(!json_iter_parse(&iter,
-+				JSON_MANDATORY("optional", JSON_OBJECT, NULL),
-+				JSON_UNDEFINED));
-+	json_contents_free(c);
-+
-+	c =3D json_contents_new(nested_empty, strlen(nested_empty));
-+	json_iter_init(&iter, c);
-+	assert(json_iter_parse(&iter,
-+			JSON_MANDATORY("empty", JSON_OBJECT, &nested_iter),
-+			JSON_UNDEFINED));
-+	assert(json_iter_parse(&nested_iter, JSON_UNDEFINED));
-+	json_contents_free(c);
-+}
-+
-+/*
-+ * Tests that expected key/values can be provided in an order different th=
-an
-+ * they appear in the JSON string.
-+ */
-+static void test_json_out_of_order(const void *data)
-+{
-+	char object[] =3D "{\"key1\":{},\"key2\":\"val2\",\"key3\":\"val3\"}";
-+	struct json_iter iter;
-+	struct json_contents *c =3D json_contents_new(object, strlen(object));
-+
-+	json_iter_init(&iter, c);
-+	assert(json_iter_parse(&iter,
-+				JSON_OPTIONAL("nonexist1", JSON_STRING, NULL),
-+				JSON_MANDATORY("key3", JSON_STRING, NULL),
-+				JSON_MANDATORY("key2", JSON_STRING, NULL),
-+				JSON_OPTIONAL("nonexist2", JSON_OBJECT, NULL),
-+				JSON_MANDATORY("key1", JSON_OBJECT, NULL),
-+				JSON_UNDEFINED));
-+	json_contents_free(c);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	l_test_init(&argc, &argv);
-+
-+	l_test_add("json unicode", test_json_unicode, NULL);
-+	l_test_add("json escaped unicode", test_json_escaped_unicode, NULL);
-+	l_test_add("json nested objects", test_json, NULL);
-+	l_test_add("json unsupported types", test_json_unsupported_types, NULL);
-+	l_test_add("json empty objects", test_json_empty_objects, NULL);
-+	l_test_add("json parse out of order", test_json_out_of_order, NULL);
-+
-+	return l_test_run();
-+}
--- =
-
-2.31.1
-
---===============7632930320514786766==--
+On Tue, Feb 8, 2022 at 3:13 PM James Prestwood <prestwoj(a)gmail.com> wrote:
+>
+> Hi Keith,
+>
+> On Fri, 2022-02-04 at 17:10 -0600, KeithG wrote:
+> > I mentioned this a while ago and am wondering if this is on the list
+> > of features to add. Currently, we start as connman/iwd, but if we do
+> > not get an IP address, we stop iwd then start hostapd and advertise
+> > as
+> > an AP for initial setup. When a user connects, he/she can scan for
+> > availabel SSIDS and set then up.
+> > I know iwd can run in AP mode, but it cannot scan while in AP mode.
+> > As
+> > it is, hostapd does this for us, so we have a work around. I was
+> > wondering if this functionality is in the works.
+>
+> What exactly do you need/want for the API? Same thing as
+> net.connman.iwd.Station.Scan() where you issue Scan() then
+> GetOrderedNetworks() for the results?
+>
+> Also one thing that may interest you is DPP. This is significantly less
+> overhead/hassle than having the device change to AP mode, scan, return
+> results, go back to station, then connect. You would need some way of
+> bootstrapping, and compatibility may be an issue e.g. Apple devices,
+> just a thought.
+>
+> Thanks,
+> James
+>
+> >
+> > Regards,
+> >
+> > Keith
+> > _______________________________________________
+> > iwd mailing list -- iwd(a)lists.01.org
+> > To unsubscribe send an email to iwd-leave(a)lists.01.org
+>
+>
+--===============6105318014679752024==--
 
