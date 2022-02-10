@@ -1,41 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============3373428843067347934=="
+Content-Type: multipart/mixed; boundary="===============3002889371712605220=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 1/6] dpp: add timeout for auth/config protocols
-Date: Mon, 20 Dec 2021 18:16:15 -0600
-Message-ID: <3cee42e8-412e-5fd4-063a-c373b614591e@gmail.com>
-In-Reply-To: 20211221000747.56696-1-prestwoj@gmail.com
+Subject: Re: [PATCH] test-runner: allow IWD to start with no radios
+Date: Thu, 10 Feb 2022 16:23:19 -0600
+Message-ID: <f9ae20fe-c54e-a09d-6cb1-8cf3cdb3907a@gmail.com>
+In-Reply-To: 20220210212928.869036-1-prestwoj@gmail.com
 
---===============3373428843067347934==
+--===============3002889371712605220==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 12/20/21 18:07, James Prestwood wrote:
-> This also allows the card to re-issue ROC if it ends in the middle of
-> authenticating or configuring as well as add a maximum timeout for
-> auth/config protocols.
-> =
-
-> IO errors were also handled as these sometimes can happen with
-> certain drivers but are not fatal.
+On 2/10/22 15:29, James Prestwood wrote:
+> This is useful for testing hotplug scenarios
 > ---
->   src/dpp.c | 48 ++++++++++++++++++++++++++++++++++++++----------
->   1 file changed, 38 insertions(+), 10 deletions(-)
-> =
-
-> v2:
->   * Moved timeout cleanup into this patch
+>   tools/test-runner | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
 > =
 
 
-All applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============3373428843067347934==--
+--===============3002889371712605220==--
 
