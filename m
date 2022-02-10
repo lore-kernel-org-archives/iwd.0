@@ -1,73 +1,90 @@
-Content-Type: multipart/mixed; boundary="===============5792619814923260248=="
+Content-Type: multipart/mixed; boundary="===============1778686101949604629=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] network: Hide hidden networks on passphrase error
-Date: Wed, 09 Mar 2022 10:22:07 -0600
-Message-ID: <472469a5-00e9-babe-4129-5f1c0971c841@gmail.com>
-In-Reply-To: MRZP264MB15442847B0DE53B9886299DE930A9@MRZP264MB1544.FRAP264.PROD.OUTLOOK.COM
+Subject: [PATCH v6 2/6] hotspot: implement hotspot profile encryption
+Date: Thu, 10 Feb 2022 11:03:16 -0800
+Message-ID: <20220210190320.848755-2-prestwoj@gmail.com>
+In-Reply-To: 20220210190320.848755-1-prestwoj@gmail.com
 
---===============5792619814923260248==
+--===============1778686101949604629==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Emmanuel,
+Using __storage_open() hotspot can also support profile encyption.
+The hotspot consortium name is used as the 'ssid' since this stays
+consistent between hotspot networks for any profile.
+---
+ src/hotspot.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
->> Alternatively, we could somehow mark these networks non-connectable unle=
-ss
->> they're done via the ConnectHiddenNetwork() path.
-> I was also thinking about this possibility. Do you think that the hidden =
-network shall also
-> be removed if an error occurs during connection, for example in station_c=
-onnect_cb?
+diff --git a/src/hotspot.c b/src/hotspot.c
+index 21f50690..832d7a31 100644
+--- a/src/hotspot.c
++++ b/src/hotspot.c
+@@ -95,12 +95,18 @@ static struct l_settings *hotspot_network_open(struct n=
+etwork_info *info)
+ =
 
-Actually, that is a good point.  We do not hide the hidden network in this =
-case. =
+ 	settings =3D l_settings_new();
+ =
 
-  It sort of depends on what we want to do about this.  Some possible strat=
-egies =
+-	if (!l_settings_load_from_file(settings, config->filename)) {
+-		l_settings_free(settings);
+-		return NULL;
+-	}
++	if (!l_settings_load_from_file(settings, config->filename))
++		goto error;
++
++	if (!__storage_open(settings, config->filename, SECURITY_8021X,
++				config->name))
++		goto error;
+ =
 
-would be:
+ 	return settings;
++
++error:
++	l_settings_free(settings);
++	return NULL;
+ }
+ =
 
-When ConnectHiddenNetwork is invoked (in the scan results callback), mark t=
-he =
+ static void hotspot_network_sync(struct network_info *info,
+@@ -111,7 +117,12 @@ static void hotspot_network_sync(struct network_info *=
+info,
+ 	struct hs20_config *config =3D l_container_of(info, struct hs20_config,
+ 							super);
+ =
 
-network as 'provisioning-hidden'.
+-	data =3D l_settings_to_data(settings, &length);
++	data =3D __storage_encrypt(settings, config->name, &length);
++	if (!data) {
++		l_error("Unable to sync profile %s", config->filename);
++		return;
++	}
++
+ 	write_file(data, length, true, "%s", config->filename);
+ 	l_free(data);
+ }
+@@ -338,6 +349,11 @@ static struct hs20_config *hs20_config_new(struct l_se=
+ttings *settings,
+ 		goto free_values;
+ 	}
+ =
 
-1. On a passphrase failure, or connect failure wipe it from the scan result =
++	if (!__storage_open(settings, filename, SECURITY_8021X, name)) {
++		l_error("Could not open hotspot profile %s", filename);
++		goto free_values;
++	}
++
+ 	config =3D l_new(struct hs20_config, 1);
+ =
 
-cache, per your proposal.
+ 	if (hessid_str) {
+-- =
 
-2. Leave the network in the cache on failure, allow the scan-results to be =
+2.34.1
 
-re-used for subsequent ConnectHiddenNetwork calls.  Disallow Network.Connec=
-t() =
-
-call if the 'provisioning-hidden' flag is set on the network.
-
-3. Similar to 2, but allow Network.Connect() to proceed normally and simply=
- set =
-
-the NET_HIDDEN value based on the 'provisioning-hidden' flag.
-
-Approach 2 & 3 avoids unnecessary scanning in case the user enters the wron=
-g =
-
-password.  On the other hand, approach 1 ensures there's no temporary netwo=
-rk =
-
-left around on failure and that seems a bit cleaner.
-
-Do note that in all cases we still end up creating a temporary Network obje=
-ct =
-
-while the connection is in progress.  And in theory Network.Connect could b=
-e =
-
-invoked on that object, but it would bounce with an InProgress error.
-
-Regards,
--Denis
---===============5792619814923260248==--
+--===============1778686101949604629==--
 
