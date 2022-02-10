@@ -1,110 +1,196 @@
-Content-Type: multipart/mixed; boundary="===============3650293108914316662=="
+Content-Type: multipart/mixed; boundary="===============6993371034882259208=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 6/8] json: support arrays of objects
-Date: Wed, 05 Jan 2022 10:46:25 -0800
-Message-ID: <20220105184627.329505-6-prestwoj@gmail.com>
-In-Reply-To: 20220105184627.329505-1-prestwoj@gmail.com
+Subject: [PATCH v7 1/8] storage: convert storage to a module
+Date: Thu, 10 Feb 2022 14:58:35 -0800
+Message-ID: <20220210225842.895962-1-prestwoj@gmail.com>
 
---===============3650293108914316662==
+--===============6993371034882259208==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/json.c | 39 +++++++++++++++++++++++++++++++++++++--
- src/json.h |  2 ++
- 2 files changed, 39 insertions(+), 2 deletions(-)
+ src/main.c    |   6 ---
+ src/storage.c | 102 ++++++++++++++++++++++++++------------------------
+ src/storage.h |   2 -
+ 3 files changed, 54 insertions(+), 56 deletions(-)
 
-diff --git a/src/json.c b/src/json.c
-index 4e4c004e..d38d884e 100644
---- a/src/json.c
-+++ b/src/json.c
-@@ -401,6 +401,21 @@ bool json_iter_get_null(struct json_iter *iter)
- 	return false;
+diff --git a/src/main.c b/src/main.c
+index d0dbedc8..2102665a 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -498,9 +498,6 @@ int main(int argc, char *argv[])
+ =
+
+ 	exit_status =3D EXIT_FAILURE;
+ =
+
+-	if (!storage_create_dirs())
+-		goto failed_dirs;
+-
+ 	genl =3D l_genl_new();
+ 	if (!genl) {
+ 		l_error("Failed to open generic netlink socket");
+@@ -542,9 +539,6 @@ failed_rtnl:
+ 	l_genl_unref(genl);
+ =
+
+ failed_genl:
+-	storage_cleanup_dirs();
+-
+-failed_dirs:
+ 	l_settings_free(iwd_config);
+ 	l_timeout_remove(timeout);
+ 	l_main_exit();
+diff --git a/src/storage.c b/src/storage.c
+index 4b89c615..6bf0616d 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -44,6 +44,7 @@
+ =
+
+ #include "src/common.h"
+ #include "src/storage.h"
++#include "src/module.h"
+ =
+
+ #define STORAGE_DIR_MODE (S_IRUSR | S_IWUSR | S_IXUSR)
+ #define STORAGE_FILE_MODE (S_IRUSR | S_IWUSR)
+@@ -184,54 +185,6 @@ error_create_dirs:
+ 	return r;
  }
  =
 
-+bool json_iter_get_container(struct json_iter *iter,
-+				struct json_iter *container)
+-bool storage_create_dirs(void)
+-{
+-	const char *state_dir;
+-	char **state_dirs;
+-
+-	state_dir =3D getenv("STATE_DIRECTORY");
+-	if (!state_dir)
+-		state_dir =3D DAEMON_STORAGEDIR;
+-
+-	l_debug("Using state directory %s", state_dir);
+-
+-	state_dirs =3D l_strsplit(state_dir, ':');
+-	if (!state_dirs[0]) {
+-		l_strv_free(state_dirs);
+-		return false;
+-	}
+-
+-	storage_path =3D l_strdup(state_dirs[0]);
+-	l_strv_free(state_dirs);
+-
+-	if (create_dirs(storage_path)) {
+-		l_error("Failed to create %s", storage_path);
+-
+-		l_free(storage_path);
+-
+-		return false;
+-	}
+-
+-	storage_hotspot_path =3D l_strdup_printf("%s/hotspot/", storage_path);
+-
+-	if (create_dirs(storage_hotspot_path)) {
+-		l_error("Failed to create %s", storage_hotspot_path);
+-
+-		l_free(storage_path);
+-		l_free(storage_hotspot_path);
+-
+-		return false;
+-	}
+-
+-	return true;
+-}
+-
+-void storage_cleanup_dirs(void)
+-{
+-	l_free(storage_path);
+-	l_free(storage_hotspot_path);
+-}
+-
+ char *storage_get_path(const char *format, ...)
+ {
+ 	va_list args;
+@@ -463,3 +416,56 @@ bool storage_is_file(const char *filename)
+ =
+
+ 	return false;
+ }
++
++static int storage_init(void)
 +{
-+	struct json_contents *c =3D iter->contents;
-+	jsmntok_t *t =3D c->tokens + iter->current;
++	const char *state_dir;
++	char **state_dirs;
++	int ret;
 +
-+	/* TODO: Add nested array support */
-+	if (t->type !=3D JSMN_OBJECT)
-+		return false;
++	state_dir =3D getenv("STATE_DIRECTORY");
++	if (!state_dir)
++		state_dir =3D DAEMON_STORAGEDIR;
 +
-+	iter_recurse(iter, t, container);
++	l_debug("Using state directory %s", state_dir);
 +
-+	return true;
++	state_dirs =3D l_strsplit(state_dir, ':');
++	if (!state_dirs[0]) {
++		l_strv_free(state_dirs);
++		return -EINVAL;
++	}
++
++	storage_path =3D l_strdup(state_dirs[0]);
++	l_strv_free(state_dirs);
++
++	ret =3D create_dirs(storage_path);
++	if (ret < 0) {
++		l_error("Failed to create %s", storage_path);
++
++		l_free(storage_path);
++
++		return ret;
++	}
++
++	storage_hotspot_path =3D l_strdup_printf("%s/hotspot/", storage_path);
++
++	ret =3D create_dirs(storage_hotspot_path);
++	if (ret < 0) {
++		l_error("Failed to create %s", storage_hotspot_path);
++
++		l_free(storage_path);
++		l_free(storage_hotspot_path);
++
++		return ret;
++	}
++
++	return 0;
 +}
 +
- enum json_type json_iter_get_type(struct json_iter *iter)
- {
- 	struct json_contents *c =3D iter->contents;
-@@ -412,15 +427,35 @@ enum json_type json_iter_get_type(struct json_iter *i=
-ter)
- bool json_iter_next(struct json_iter *iter)
- {
- 	struct json_contents *c =3D iter->contents;
-+	jsmntok_t *t =3D c->tokens + iter->current;
-+	int inc =3D 1;
- =
-
- 	/* For now only allow json_iter_next() on arrays */
- 	if (!iter->array)
- 		return false;
- =
-
--	if (c->tokens + iter->current + 1 > ITER_END(iter))
-+	/*
-+	 * If this is the initial iteration skip this and just increment
-+	 * current by 1 since this iterator points to an array which needs to
-+	 * be advanced to the first token in the array.
-+	 *
-+	 * In addition primitive types and empty object will have a size of 1,
-+	 * so no special handling is needed there.
-+	 *
-+	 * For objects (and arrays in the future), 'current' needs to be
-+	 * advanced by all objects child tokens plus the object token itself.
-+	 * This check ensures:
-+	 *    1. It is not the initial iteration
-+	 *    2. This is an object
-+	 *    3. The object is not empty
-+	 */
-+	if (iter->current !=3D iter->start && t->type =3D=3D JSMN_OBJECT && t->si=
-ze)
-+		inc =3D find_parent_tokens(iter, t) + 1;
++static void storage_exit(void)
++{
++	l_free(storage_path);
++	l_free(storage_hotspot_path);
++}
 +
-+	if (c->tokens + iter->current + inc > ITER_END(iter))
- 		return false;
++IWD_MODULE(storage, storage_init, storage_exit);
+diff --git a/src/storage.h b/src/storage.h
+index e1ec2cd4..f75185f6 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -33,8 +33,6 @@ ssize_t write_file(const void *buffer, size_t len, bool p=
+reserve_times,
+ 	__attribute__((format(printf, 4, 5)));
  =
 
--	iter->current++;
-+	iter->current +=3D inc;
+ bool storage_is_file(const char *filename);
+-bool storage_create_dirs(void);
+-void storage_cleanup_dirs(void);
+ char *storage_get_path(const char *format, ...);
+ char *storage_get_hotspot_path(const char *format, ...);
  =
 
- 	/* TODO: Add support for nested array iteration */
- 	if ((c->tokens + iter->current)->type =3D=3D JSMN_ARRAY)
-diff --git a/src/json.h b/src/json.h
-index 75ac9853..c7993a5a 100644
---- a/src/json.h
-+++ b/src/json.h
-@@ -94,6 +94,8 @@ bool json_iter_get_int(struct json_iter *iter, int *i);
- bool json_iter_get_uint(struct json_iter *iter, unsigned int *i);
- bool json_iter_get_boolean(struct json_iter *iter, bool *b);
- bool json_iter_get_null(struct json_iter *iter);
-+bool json_iter_get_container(struct json_iter *iter,
-+				struct json_iter *container);
- =
-
- enum json_type json_iter_get_type(struct json_iter *iter);
- bool json_iter_next(struct json_iter *iter);
 -- =
 
-2.31.1
+2.34.1
 
---===============3650293108914316662==--
+--===============6993371034882259208==--
 
