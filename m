@@ -1,37 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============2489273950658619387=="
+Content-Type: multipart/mixed; boundary="===============1751913356408428845=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 01/10] dbus: add DPP interface
-Date: Tue, 14 Dec 2021 10:12:16 -0800
-Message-ID: <20211214181225.2308043-1-prestwoj@gmail.com>
+Subject: [PATCH v7 2/8] knownnetworks: add dependency on storage
+Date: Thu, 10 Feb 2022 14:58:36 -0800
+Message-ID: <20220210225842.895962-2-prestwoj@gmail.com>
+In-Reply-To: 20220210225842.895962-1-prestwoj@gmail.com
 
---===============2489273950658619387==
+--===============1751913356408428845==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hotspot should be ok since its dependent on knownnetworks
 ---
- src/dbus.h | 1 +
+ src/knownnetworks.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/src/dbus.h b/src/dbus.h
-index 7703b37f..bbc76608 100644
---- a/src/dbus.h
-+++ b/src/dbus.h
-@@ -43,6 +43,7 @@
- #define IWD_STATION_DIAGNOSTIC_INTERFACE "net.connman.iwd.StationDiagnosti=
-c"
- #define IWD_AP_DIAGNOSTIC_INTERFACE "net.connman.iwd.AccessPointDiagnostic"
- #define IWD_STATION_DEBUG_INTERFACE "net.connman.iwd.StationDebug"
-+#define IWD_DPP_INTERFACE "net.connman.iwd.DeviceProvisioning"
+diff --git a/src/knownnetworks.c b/src/knownnetworks.c
+index 30426fe6..56aec5b4 100644
+--- a/src/knownnetworks.c
++++ b/src/knownnetworks.c
+@@ -1123,6 +1123,7 @@ static void known_networks_exit(void)
+ }
  =
 
- #define IWD_BASE_PATH "/net/connman/iwd"
- #define IWD_AGENT_MANAGER_PATH IWD_BASE_PATH
+ IWD_MODULE(known_networks, known_networks_init, known_networks_exit)
++IWD_MODULE_DEPENDS(known_networks, storage);
+ =
+
+ static void known_frequencies_exit(void)
+ {
 -- =
 
-2.31.1
+2.34.1
 
---===============2489273950658619387==--
+--===============1751913356408428845==--
 
