@@ -1,63 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============7049785003868578532=="
+Content-Type: multipart/mixed; boundary="===============7366761760092467291=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 4/5] auto-t: use copy_to_storage in address randomization test
-Date: Wed, 25 May 2022 12:23:27 -0700
-Message-ID: <20220525192328.335557-4-prestwoj@gmail.com>
-In-Reply-To: 20220525192328.335557-1-prestwoj@gmail.com
+Subject: Re: Dual phy device not always detected
+Date: Thu, 10 Feb 2022 16:21:06 -0600
+Message-ID: <a21cae1c-4197-33ed-8bd7-f12681e9cfeb@gmail.com>
+In-Reply-To: CAMSdBrG=OGXZRMSjf-u41rAuTaxUdMw0sVMbNPX995B8sCiq_A@mail.gmail.com
 
---===============7049785003868578532==
+--===============7366761760092467291==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This test was just piping the PSK files into /tmp/iwd/ssidCCMP.psk
-which is a bit fragile if the storage dir was ever to change. Instead
-use copy_to_storage and the 'name' keyword to copy the file.
----
- autotests/testAddressRandomization/connection_test.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Hi David,
 
-diff --git a/autotests/testAddressRandomization/connection_test.py b/autote=
-sts/testAddressRandomization/connection_test.py
-index 32163e0f..f9f62f7a 100644
---- a/autotests/testAddressRandomization/connection_test.py
-+++ b/autotests/testAddressRandomization/connection_test.py
-@@ -46,7 +46,7 @@ class Test(unittest.TestCase):
-         perm_addr =3D device.address
- =
+On 2/10/22 10:51, David Bourgeois wrote:
+> Hi,
+> =
 
-         # 1. Test per-network deterministic MAC generation
--        os.system('cat pernetwork.psk > /tmp/iwd/ssidCCMP.psk')
-+        IWD.copy_to_storage('pernetwork.psk', name=3D'ssidCCMP.psk')
-         new_addr =3D self.try_connection(wd)
-         self.assertNotEqual(perm_addr, new_addr)
-         # try again to ensure the generation was deterministic
-@@ -54,7 +54,7 @@ class Test(unittest.TestCase):
-         self.assertEqual(new_addr, new_addr2)
- =
+> We plan to use iwd for an embedded device where we need both station and =
+ap at =
 
-         # 2. Test FullAddressRandomization
--        os.system('cat full_random.psk > /tmp/iwd/ssidCCMP.psk')
-+        IWD.copy_to_storage('full_random.psk', name=3D'ssidCCMP.psk')
-         new_addr =3D self.try_connection(wd)
-         self.assertNotEqual(perm_addr, new_addr)
-         # try again to make sure the generation was random
-@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
-         self.assertNotEqual(new_addr, new_addr2)
- =
+> the same time. For this we have devices based on the rtl88x2bu driver com=
+piled  > to enable the dual phy. This works well, the dongle is detected as=
+ 2 different
+> interfaces wlan0 and wlan1 and both work properly. IWD doesn't always det=
+ect =
 
-         # 3. Test AddressOverride
--        os.system('cat override.psk > /tmp/iwd/ssidCCMP.psk')
-+        IWD.copy_to_storage('override.psk', name=3D'ssidCCMP.psk')
-         new_addr =3D self.try_connection(wd)
-         self.assertEqual(new_addr, 'e6:f6:38:a9:02:02')
- =
+> both interfaces though when the dongle is plugged. If IWD is restarted, t=
+hen =
 
--- =
+> most of the time both interfaces are detected. When the dongle is plugged=
+ at =
 
-2.34.1
+> boot it also works most of the time.
 
---===============7049785003868578532==--
+We still need to test this better here, but can you try the patch I just se=
+nt out:
+[PATCH] manager: Refine filtered dumps
+
+Regards,
+-Denis
+--===============7366761760092467291==--
 
