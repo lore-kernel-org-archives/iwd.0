@@ -1,40 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============0682165854008270499=="
+Content-Type: multipart/mixed; boundary="===============9221468453672721637=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/3] hwsim: check if radio name was already set
-Date: Fri, 18 Feb 2022 11:55:04 -0800
-Message-ID: <20220218195506.2145602-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 1/2] auto-t: iwd.py: add wait argument to scan()
+Date: Thu, 10 Feb 2022 16:24:10 -0600
+Message-ID: <c008bdef-24ff-23a8-5d8d-61691ab13cac@gmail.com>
+In-Reply-To: 20220208173539.493712-1-prestwoj@gmail.com
 
---===============0682165854008270499==
+--===============9221468453672721637==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This was caught by static analysis and shouldn't ever happen.
----
- tools/hwsim.c | 3 +++
- 1 file changed, 3 insertions(+)
+Hi James,
 
-diff --git a/tools/hwsim.c b/tools/hwsim.c
-index 3ff3faab..8c076f51 100644
---- a/tools/hwsim.c
-+++ b/tools/hwsim.c
-@@ -639,6 +639,9 @@ static void get_radio_callback(struct l_genl_msg *msg, =
-void *user_data)
- 			break;
- =
+On 2/8/22 11:35, James Prestwood wrote:
+> Lets the test continue without waiting for the method return
+> ---
+>   autotests/util/iwd.py | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> =
 
- 		case HWSIM_ATTR_RADIO_NAME:
-+			if (name)
-+				return;
-+
- 			name =3D l_strndup(data, len);
- 			break;
- 		}
--- =
 
-2.34.1
+Both applied, thanks.
 
---===============0682165854008270499==--
+Regards,
+-Denis
+
+--===============9221468453672721637==--
 
