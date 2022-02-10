@@ -1,58 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============0357596205426886598=="
+Content-Type: multipart/mixed; boundary="===============0716405367424049084=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 4/6] test-runner: skip mounting duplicate folders
-Date: Wed, 25 May 2022 12:37:27 -0700
-Message-ID: <20220525193729.336896-4-prestwoj@gmail.com>
-In-Reply-To: 20220525193729.336896-1-prestwoj@gmail.com
+Subject: [PATCH] station: fix >80 character lines
+Date: Thu, 10 Feb 2022 13:06:50 -0800
+Message-ID: <20220210210650.866456-1-prestwoj@gmail.com>
 
---===============0357596205426886598==
+--===============0716405367424049084==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the user specifies the same parent directory for several outfiles
-skip mounting since it already exists. For example:
-
---monitor /outfiles/monitor.txt --result /outfiles/result.txt
 ---
- tools/runner.py | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ src/station.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/tools/runner.py b/tools/runner.py
-index 90818ef1..bf28d9ad 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -289,7 +289,13 @@ class RunnerAbstract:
+diff --git a/src/station.c b/src/station.c
+index 6dc0074c..cd119ff1 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1472,8 +1472,10 @@ static void station_enter_state(struct station *stat=
+ion,
+ 	case STATION_STATE_CONNECTING_AUTO:
+ 		/* Refresh the ordered network list */
+ 		network_rank_update(station->connected_network, true);
+-		l_queue_remove(station->networks_sorted, station->connected_network);
+-		l_queue_insert(station->networks_sorted, station->connected_network,
++		l_queue_remove(station->networks_sorted,
++					station->connected_network);
++		l_queue_insert(station->networks_sorted,
++					station->connected_network,
+ 					network_rank_compare, NULL);
  =
 
- 	# For QEMU/UML runners
- 	def _prepare_mounts(self, extra=3D[]):
-+		mounted =3D []
-+
- 		for entry in mounts_common + extra:
-+			if entry.target in mounted:
-+				print("%s already mounted, skipping" % entry.target)
-+				continue
-+
- 			try:
- 				os.lstat(entry.target)
- 			except:
-@@ -298,6 +304,8 @@ class RunnerAbstract:
- 			mount(entry.source, entry.target, entry.fstype, entry.flags,
- 				entry.options)
- =
-
-+			mounted.append(entry.target)
-+
- 		for entry in dev_table:
- 			os.symlink(entry.target, entry.linkpath)
- =
-
+ 		l_dbus_property_changed(dbus, netdev_get_path(station->netdev),
 -- =
 
 2.34.1
 
---===============0357596205426886598==--
+--===============0716405367424049084==--
 
