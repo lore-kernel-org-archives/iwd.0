@@ -1,106 +1,152 @@
-Content-Type: multipart/mixed; boundary="===============0651137199375840948=="
+Content-Type: multipart/mixed; boundary="===============9044503146723137861=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/4] nlmon: print Fast BSS Transition element
-Date: Tue, 21 Sep 2021 13:44:46 -0700
-Message-ID: <20210921204448.119199-2-prestwoj@gmail.com>
-In-Reply-To: 20210921204448.119199-1-prestwoj@gmail.com
+Subject: [PATCH v7 5/8] main: add SystemdEncrypt option, and initialize key
+Date: Thu, 10 Feb 2022 14:58:39 -0800
+Message-ID: <20220210225842.895962-5-prestwoj@gmail.com>
+In-Reply-To: 20220210225842.895962-1-prestwoj@gmail.com
 
---===============0651137199375840948==
+--===============9044503146723137861==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- monitor/nlmon.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+Recently systemd added the ability to pass secret credentials to
+services via LoadCredentialEncrypted/SetCredentialEncrypted. Once
+set up the service is able to read the decrypted credentials from
+a file. The file path is found in the environment variable
+CREDENTIALS_DIRECTORY + an identifier. The value of SystemdEncrypt
+should be set to the systemd key ID used when the credential was
+created.
 
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 191ebf02..4cf2b856 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -2177,6 +2177,64 @@ static void print_measurement_report(unsigned int le=
-vel, const char *label,
- 	}
+When SystemdEncrypt is set IWD will attempt to read the decrypted
+secret from systemd. If at any point this fails warnings will be
+printed but IWD will continue normally. Its expected that any failures
+will result in the inability to connect to any networks which have
+previously encrypted the passphrase/PSK without re-entering
+the passphrase manually. This could happen, for example, if the
+systemd secret was changed.
+
+Once the secret is read in it is set into storage to be used for
+profile encryption/decryption.
+---
+ src/main.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
+
+diff --git a/src/main.c b/src/main.c
+index 2102665a..207daea1 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -29,6 +29,10 @@
+ #include <errno.h>
+ #include <getopt.h>
+ #include <signal.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <sys/stat.h>
++#include <sys/mman.h>
+ #include <ell/ell.h>
+ =
+
+ #include <ell/useful.h>
+@@ -45,6 +49,7 @@
+ #include "src/storage.h"
+ #include "src/anqp.h"
+ #include "src/netconfig.h"
++#include "src/crypto.h"
+ =
+
+ #include "src/backtrace.h"
+ =
+
+@@ -397,6 +402,70 @@ done:
+ 	return r;
  }
  =
 
-+static void print_fast_bss_transition(unsigned int level, const char *labe=
-l,
-+							const void *data,
-+							uint16_t size)
++/*
++ * Initialize a systemd encryption key for encrypting/decrypting credentia=
+ls.
++ */
++static void setup_system_key(void)
 +{
-+	struct ie_ft_info ft_info;
-+	uint32_t mic_len =3D 16;
++	int fd;
++	struct stat st;
++	const char *cred_dir;
++	void *key =3D NULL;
++	_auto_(l_free) char *path =3D NULL;
++	_auto_(l_free) char *key_id =3D NULL;
 +
-+	/* Most likely the MIC is 16 bytes */
-+	if (ie_parse_fast_bss_transition_from_data(data - 2, size + 2,
-+						mic_len, &ft_info) < 0) {
-+		mic_len =3D 24;
++	key_id =3D l_settings_get_string(iwd_config, "General", "SystemdEncrypt");
++	if (!key_id)
++		return;
 +
-+		/* Must be FILS, try 24 */
-+		if (ie_parse_fast_bss_transition_from_data(data - 2, size + 2,
-+						mic_len, &ft_info) < 0) {
-+			print_attr(level + 1, "error parsing");
-+			return;
-+		}
++	cred_dir =3D getenv("CREDENTIALS_DIRECTORY");
++	if (!cred_dir) {
++		l_warn("SystemdEncrypt enabled but CREDENTIALS_DIRECTORY not "
++			"set, check iwd.service file");
++		return;
 +	}
 +
-+	print_attr(level, "%s", label);
++	path =3D l_strdup_printf("%s/%s", cred_dir, key_id);
 +
-+	if (ft_info.rsnxe_used)
-+		print_attr(level + 1, "RSNXE Used set");
-+
-+	print_attr(level + 1, "MIC Element Count: %u",
-+			ft_info.mic_element_count);
-+	print_attr(level + 1, "MIC:");
-+	print_hexdump(level + 2, ft_info.mic, mic_len);
-+	print_attr(level + 1, "ANONCE:");
-+	print_hexdump(level + 2, ft_info.anonce, sizeof(ft_info.anonce));
-+	print_attr(level + 1, "SNONCE:");
-+	print_hexdump(level + 2, ft_info.snonce, sizeof(ft_info.snonce));
-+	print_attr(level + 1, "R0KHID:");
-+	print_hexdump(level + 2, ft_info.r0khid, ft_info.r0khid_len);
-+
-+	if (ft_info.r1khid_present) {
-+		print_attr(level + 1, "R1KHID:");
-+		print_hexdump(level + 2, ft_info.r1khid, sizeof(ft_info.r1khid));
++	if (stat(path, &st) < 0) {
++		l_warn("SystemdEncrypt enabled but could not stat %s",
++			path);
++		return;
 +	}
 +
-+	if (ft_info.gtk_len) {
-+		print_attr(level + 1, "GTK Key ID: %u", ft_info.gtk_key_id);
-+		print_attr(level + 1, "GTK RSC:");
-+		print_hexdump(level + 2, ft_info.gtk_rsc, sizeof(ft_info.gtk_rsc));
-+		print_attr(level + 1, "GTK:");
-+		print_hexdump(level + 2, ft_info.gtk, ft_info.gtk_len);
++	fd =3D open(path, O_RDONLY, 0);
++	if (fd < 0) {
++		l_warn("SystemdEncrypt enabled but cannot open secret (%d)",
++				fd);
++		return;
 +	}
 +
-+	if (ft_info.igtk_len) {
-+		print_attr(level + 1, "IGTK Key ID: %u", ft_info.igtk_key_id);
-+		print_attr(level + 1, "IGTK IPN:");
-+		print_hexdump(level + 2, ft_info.igtk_ipn, sizeof(ft_info.igtk_ipn));
-+		print_attr(level + 1, "IGTK:");
-+		print_hexdump(level + 2, ft_info.igtk, ft_info.igtk_len);
++	if (fstat(fd, &st) < 0 || st.st_size =3D=3D 0) {
++		close(fd);
++		return;
 +	}
++
++	key =3D mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
++	if (key =3D=3D MAP_FAILED) {
++		l_warn("SystemdEncrypt enabled but can't mmap secret");
++		close(fd);
++		return;
++	}
++
++	close(fd);
++
++	if (mlock(key, st.st_size) < 0) {
++		l_warn("Failed to mlock Systemd secret file");
++		return;
++	}
++
++	__storage_set_encryption_key(key, st.st_size);
++
++	munlock(key, st.st_size);
++
++	munmap(key, st.st_size);
 +}
 +
- static struct attr_entry ie_entry[] =3D {
- 	{ IE_TYPE_SSID,				"SSID",
- 		ATTR_CUSTOM,	{ .function =3D print_ie_ssid } },
-@@ -2235,6 +2293,8 @@ static struct attr_entry ie_entry[] =3D {
- 		ATTR_CUSTOM,	{ .function =3D print_measurement_request } },
- 	{ IE_TYPE_MEASUREMENT_REPORT,		"Measurement Report",
- 		ATTR_CUSTOM,	{ .function =3D print_measurement_report } },
-+	{ IE_TYPE_FAST_BSS_TRANSITION,		"Fast BSS Transition",
-+		ATTR_CUSTOM,	{ .function =3D print_fast_bss_transition } },
- 	{ },
- };
+ int main(int argc, char *argv[])
+ {
+ 	int exit_status;
+@@ -526,6 +595,8 @@ int main(int argc, char *argv[])
+ 	l_dbus_set_disconnect_handler(dbus, dbus_disconnected, NULL, NULL);
+ 	dbus_init(dbus);
  =
 
++	setup_system_key();
++
+ 	exit_status =3D l_main_run_with_signal(signal_handler, NULL);
+ =
+
+ 	iwd_modules_exit();
 -- =
 
-2.31.1
+2.34.1
 
---===============0651137199375840948==--
+--===============9044503146723137861==--
 
