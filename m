@@ -1,56 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============8819312061107846449=="
+Content-Type: multipart/mixed; boundary="===============6679741296217284041=="
 MIME-Version: 1.0
-From: Michael Nazzareno Trimarchi <michael at amarulasolutions.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd access point mode
-Date: Fri, 08 Oct 2021 20:53:40 +0200
-Message-ID: <CAOf5uwngjoC8r6eY3Rn16LjuNi7pcr+SDKK0BoSv3WcA-4noXA@mail.gmail.com>
-In-Reply-To: af68e3d3-d4cf-8e3e-fd1e-3a72a202f769@gmail.com
+Subject: [PATCH v3 01/10] dpp-util: fix dpp_point_from_asn1
+Date: Mon, 14 Feb 2022 13:48:00 -0800
+Message-ID: <20220214214809.1017870-1-prestwoj@gmail.com>
 
---===============8819312061107846449==
+--===============6679741296217284041==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-HI
+This got merged without a few additional fixes, in particular an
+over 80 character line and incorrect length check.
+---
+ src/dpp-util.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-On Fri, Oct 8, 2021 at 8:25 PM Denis Kenzior <denkenz(a)gmail.com> wrote:
->
-> Hi Michael,
->
-> > Anyway I have tested but it seems that it does not work for me.
-> > Virtual node are there
-> > but iwd pick one of them and they are not destroyed as you said
-> >
->
-> Okay, should be fixed now upstream with commit: a0017405064c ("manager:
-> Initialize all default interfaces")
->
-> I'm not sure what you mean by 'they are not destroyed' though?
+diff --git a/src/dpp-util.c b/src/dpp-util.c
+index 4a5bd046..5199d0ae 100644
+--- a/src/dpp-util.c
++++ b/src/dpp-util.c
+@@ -828,7 +828,8 @@ struct l_ecc_point *dpp_point_from_asn1(const uint8_t *=
+asn1, size_t len)
+ 		return NULL;
+ =
 
-destroy -> reinitialize
+ 	/* SEQUENCE */
+-	inner_seq =3D asn1_der_find_elem(outer_seq, outer_len, 0, &tag, &inner_le=
+n);
++	inner_seq =3D asn1_der_find_elem(outer_seq, outer_len, 0, &tag,
++					&inner_len);
+ 	if (!inner_seq || tag !=3D ASN1_ID_SEQUENCE)
+ 		return NULL;
+ =
 
-You are correct. I miss to rebase on newer version
+@@ -859,7 +860,7 @@ struct l_ecc_point *dpp_point_from_asn1(const uint8_t *=
+asn1, size_t len)
+ =
 
-Michael
->
-> Regards,
-> -Denis
+ 	/* BITSTRING */
+ 	key_data =3D asn1_der_find_elem(outer_seq, outer_len, 1, &tag, &elen);
+-	if (!key_data || tag !=3D ASN1_ID_BIT_STRING || elen > 2)
++	if (!key_data || tag !=3D ASN1_ID_BIT_STRING || elen < 2)
+ 		return NULL;
+ =
 
-
-
+ 	return l_ecc_point_from_data(curve, key_data[1],
 -- =
 
-Michael Nazzareno Trimarchi
-Co-Founder & Chief Executive Officer
-M. +39 347 913 2170
-michael(a)amarulasolutions.com
-__________________________________
+2.34.1
 
-Amarula Solutions BV
-Joop Geesinkweg 125, 1114 AB, Amsterdam, NL
-T. +31 (0)85 111 9172
-info(a)amarulasolutions.com
-www.amarulasolutions.com
---===============8819312061107846449==--
+--===============6679741296217284041==--
 
