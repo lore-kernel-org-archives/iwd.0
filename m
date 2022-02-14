@@ -1,41 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============5321304132977699832=="
+Content-Type: multipart/mixed; boundary="===============3070949700242665763=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] station: fix OWE scan logic with autoconnect
-Date: Thu, 20 Jan 2022 13:54:36 -0600
-Message-ID: <eb24bc28-a724-482d-c518-b793c495ff07@gmail.com>
-In-Reply-To: 20220119190345.2265563-1-prestwoj@gmail.com
+Subject: [PATCH] test-runner: fix valgrind after no radio change
+Date: Mon, 14 Feb 2022 13:41:39 -0800
+Message-ID: <20220214214139.1017355-1-prestwoj@gmail.com>
 
---===============5321304132977699832==
+--===============3070949700242665763==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+The change adding support for starting IWD with no radios ended up
+breaking the valgrind option.
+---
+ tools/test-runner | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-On 1/19/22 13:03, James Prestwood wrote:
-> station_set_scan_results takes an autoconnect flag which was being
-> set true in both regular/quick autoconnect scans. Since OWE networks
-> are processed after setting the scan results IWD could end up
-> connecting to a network before all the OWE hidden networks are
-> populated.
-> =
+diff --git a/tools/test-runner b/tools/test-runner
+index 17be0593..64407a41 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -668,7 +668,7 @@ class Namespace:
+ 		self._bus =3D dbus.bus.BusConnection(address_or_type=3Dself.dbus_address)
+ =
 
-> To fix this regular/quick autoconnect results will set the flag to
-> false, then process OWE networks, then start autoconnect. If any
-> OWE network scans are pending station_autoconnect_start will fail
-> but will pick back up after the hidden OWE scan.
-> ---
->   src/station.c | 10 ++++++++--
->   1 file changed, 8 insertions(+), 2 deletions(-)
-> =
+ 	def start_iwd(self, config_dir =3D '/tmp', storage_dir =3D '/tmp/iwd'):
+-		args =3D ['iwd', '-E']
++		args =3D []
+ 		iwd_radios =3D ','.join([r.name for r in self.radios if r.use =3D=3D 'iw=
+d'])
+ =
 
+ 		if self.args.valgrind:
+@@ -676,6 +676,8 @@ class Namespace:
+ 					'--show-leak-kinds=3Dall',
+ 					'--log-file=3D/tmp/valgrind.log.%p'])
+ =
 
-Applied, thanks.
++		args.extend(['iwd', '-E'])
++
+ 		if iwd_radios !=3D '':
+ 			args.extend(['-p', iwd_radios])
+ =
 
-Regards,
-Denis
+-- =
 
---===============5321304132977699832==--
+2.34.1
+
+--===============3070949700242665763==--
 
