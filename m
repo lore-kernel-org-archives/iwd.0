@@ -1,429 +1,262 @@
-Content-Type: multipart/mixed; boundary="===============2758369629456479214=="
+Content-Type: multipart/mixed; boundary="===============5705899417020025227=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 2/2] offchannel: introduce new offchannel module
-Date: Mon, 06 Dec 2021 12:17:26 -0800
-Message-ID: <20211206201726.1192621-2-prestwoj@gmail.com>
-In-Reply-To: 20211206201726.1192621-1-prestwoj@gmail.com
+Subject: Re: [PATCH 2/3] hwsim: allow concurrent radio creations
+Date: Mon, 14 Feb 2022 16:19:56 -0600
+Message-ID: <548ed05d-7ccb-d1a9-2fe4-8df7350878be@gmail.com>
+In-Reply-To: 20220214203439.989936-2-prestwoj@gmail.com
 
---===============2758369629456479214==
+--===============5705899417020025227==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This module provides a convenient wrapper around both
-CMD_[CANCEL_]_REMAIN_ON_CHANNEL APIs.
+Hi James,
 
-Certain protocols require going offchannel to send frames, and/or
-wait for a response. The frame-xchg module somewhat does this but
-has some limitations. For example you cannot just go offchannel;
-an initial frame must be sent out to start the procedure. In addition
-frame-xchg does not work for broadcasts since it expects an ACK.
+On 2/14/22 14:34, James Prestwood wrote:
+> Currently CreateRadio only allows a single outstanding DBus message
+> until the radio is fully created. 99% of the time this is just fine
+> but in order to test dual phy cards there needs to be support for
+> phy's appearing at the same time.
+> =
 
-This module is much simpler and only handles going offchannel for
-a duration. During this time frames may be sent or received. After
-the duration the caller will get a callback and any included error
-if there was one. Any offchannel request can be cancelled prior to
-the duration expriring if the offchannel work has finished early.
----
- Makefile.am      |   1 +
- src/offchannel.c | 325 +++++++++++++++++++++++++++++++++++++++++++++++
- src/offchannel.h |  29 +++++
- 3 files changed, 355 insertions(+)
- create mode 100644 src/offchannel.c
- create mode 100644 src/offchannel.h
+> This required storing the pending DBus message inside the radio object
+> rather than a single static variable.
+> ---
+>   tools/hwsim.c | 77 +++++++++++++++++++++++++++------------------------
+>   1 file changed, 41 insertions(+), 36 deletions(-)
+> =
 
-v4:
- * Updated to use new wiphy_radio_work_is_running return value
+> diff --git a/tools/hwsim.c b/tools/hwsim.c
+> index f74dd82e..87e5db57 100644
+> --- a/tools/hwsim.c
+> +++ b/tools/hwsim.c
+> @@ -415,6 +415,7 @@ struct radio_info_rec {
+>   	uint8_t addrs[2][ETH_ALEN];
+>   	char *name;
+>   	bool ap_only;
+> +	struct l_dbus_message *pending;
+>   };
+>   =
 
-diff --git a/Makefile.am b/Makefile.am
-index 1e1c230f..d93dd2c9 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -247,6 +247,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
-h src/missing.h \
- 					src/ip-pool.h src/ip-pool.c \
- 					src/band.h src/band.c \
- 					src/sysfs.h src/sysfs.c \
-+					src/offchannel.h src/offchannel.c \
- 					$(eap_sources) \
- 					$(builtin_sources)
- =
+>   struct interface_info_rec {
+> @@ -428,13 +429,13 @@ struct interface_info_rec {
+>   static struct l_queue *radio_info;
+>   static struct l_queue *interface_info;
+>   =
 
-diff --git a/src/offchannel.c b/src/offchannel.c
-new file mode 100644
-index 00000000..ad35f4f6
---- /dev/null
-+++ b/src/offchannel.c
-@@ -0,0 +1,325 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+
-+#include <ell/ell.h>
-+
-+#include "linux/nl80211.h"
-+
-+#include "src/offchannel.h"
-+#include "src/wiphy.h"
-+#include "src/nl80211util.h"
-+#include "src/iwd.h"
-+#include "src/module.h"
-+
-+struct offchannel_info {
-+	uint64_t wdev_id;
-+	uint32_t freq;
-+	uint32_t duration;
-+
-+	uint32_t roc_cmd_id;
-+	uint64_t roc_cookie;
-+
-+	offchannel_started_cb_t started;
-+	offchannel_destroy_cb_t destroy;
-+	void *user_data;
-+	int error;
-+
-+	struct wiphy_radio_work_item work;
-+
-+	bool needs_cancel : 1;
-+};
-+
-+static struct l_genl_family *nl80211;
-+static struct l_queue *offchannel_list;
-+
-+static bool match_wdev(const void *a, const void *user_data)
-+{
-+	const struct offchannel_info *info =3D a;
-+	const uint64_t *wdev_id =3D user_data;
-+
-+	return info->wdev_id =3D=3D *wdev_id;
-+}
-+
-+static void offchannel_cancel_roc(struct offchannel_info *info)
-+{
-+	struct l_genl_msg *msg;
-+
-+	msg =3D l_genl_msg_new(NL80211_CMD_CANCEL_REMAIN_ON_CHANNEL);
-+
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &info->wdev_id);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_COOKIE, 8, &info->roc_cookie);
-+
-+	/* Nothing much can be done if this fails */
-+	if (!l_genl_family_send(nl80211, msg, NULL, NULL, NULL))
-+		l_genl_msg_unref(msg);
-+}
-+
-+static void offchannel_roc_cb(struct l_genl_msg *msg, void *user_data)
-+{
-+	struct offchannel_info *info =3D user_data;
-+
-+	info->error =3D l_genl_msg_get_error(msg);
-+	info->roc_cmd_id =3D 0;
-+
-+	if (info->error < 0) {
-+		l_debug("Error from CMD_REMAIN_ON_CHANNEL (%d)", info->error);
-+		goto work_done;
-+	}
-+
-+	info->error =3D nl80211_parse_attrs(msg, NL80211_ATTR_COOKIE,
-+					&info->roc_cookie, NL80211_ATTR_UNSPEC);
-+	if (info->error < 0) {
-+		l_error("Could not parse ROC cookie");
-+		goto work_done;
-+	}
-+
-+	/* This request was cancelled, and ROC needs to be cancelled */
-+	if (info->needs_cancel)
-+		offchannel_cancel_roc(info);
-+
-+	return;
-+
-+work_done:
-+	wiphy_radio_work_done(wiphy_find_by_wdev(info->wdev_id), info->work.id);
-+}
-+
-+static bool offchannel_work_ready(struct wiphy_radio_work_item *item)
-+{
-+	struct l_genl_msg *msg;
-+	struct offchannel_info *info =3D l_container_of(item,
-+						struct offchannel_info, work);
-+
-+	msg =3D l_genl_msg_new(NL80211_CMD_REMAIN_ON_CHANNEL);
-+
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_WDEV, 8, &info->wdev_id);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY_FREQ, 4, &info->freq);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_DURATION, 4, &info->duration);
-+
-+	info->roc_cmd_id =3D l_genl_family_send(nl80211, msg, offchannel_roc_cb,
-+						info, NULL);
-+	if (!info->roc_cmd_id) {
-+		info->error =3D -EIO;
-+		l_genl_msg_unref(msg);
-+		return true;
-+	}
-+
-+	l_queue_push_head(offchannel_list, info);
-+
-+	return false;
-+}
-+
-+static void offchannel_work_destroy(struct wiphy_radio_work_item *item)
-+{
-+	struct offchannel_info *info =3D l_container_of(item,
-+						struct offchannel_info, work);
-+
-+	if (info->destroy)
-+		info->destroy(info->error, info->user_data);
-+
-+	l_queue_remove(offchannel_list, info);
-+	l_free(info);
-+}
-+
-+static const struct wiphy_radio_work_item_ops offchannel_work_ops =3D {
-+	.do_work =3D offchannel_work_ready,
-+	.destroy =3D offchannel_work_destroy,
-+};
-+
-+uint32_t offchannel_start(uint64_t wdev_id, uint32_t freq, uint32_t durati=
-on,
-+			offchannel_started_cb_t started, void *user_data,
-+			offchannel_destroy_cb_t destroy)
-+{
-+	struct offchannel_info *info =3D l_new(struct offchannel_info, 1);
-+
-+	info->wdev_id =3D wdev_id;
-+	info->freq =3D freq;
-+	info->duration =3D duration;
-+	info->started =3D started;
-+	info->destroy =3D destroy;
-+	info->user_data =3D user_data;
-+	/*
-+	 * Set error as cancelled in case this work gets cancelled prior to
-+	 * the wiphy work starting.
-+	 */
-+	info->error =3D -ECANCELED;
-+
-+	return wiphy_radio_work_insert(wiphy_find_by_wdev(wdev_id),
-+					&info->work, 1, &offchannel_work_ops);
-+}
-+
-+void offchannel_cancel(uint64_t wdev_id, uint32_t id)
-+{
-+	struct wiphy *wiphy =3D wiphy_find_by_wdev(wdev_id);
-+	struct offchannel_info *info;
-+	int ret;
-+
-+	if (!wiphy)
-+		return;
-+
-+	/*
-+	 * Exit if work does not exist, if it hasn't started 'done' the work,
-+	 * otherwise decide how the work needs to be canceled.
-+	 */
-+	ret =3D wiphy_radio_work_is_running(wiphy, id);
-+	if (ret < 0)
-+		return;
-+	else if (ret =3D=3D false)
-+		goto work_done;
-+
-+	info =3D l_queue_find(offchannel_list, match_wdev, &wdev_id);
-+	if (!info)
-+		return;
-+
-+	if (info->roc_cmd_id) {
-+		/*
-+		 * If the command hasn't left the genl queue it can be cancelled
-+		 * without any further action. Otherwise command has been sent
-+		 * to the kernel and we must wait until ROC starts and cancel at
-+		 * that time.
-+		 */
-+		if (!l_genl_family_request_sent(nl80211, info->roc_cmd_id)) {
-+			l_genl_family_cancel(nl80211, info->roc_cmd_id);
-+			info->roc_cmd_id =3D 0;
-+			goto work_done;
-+		}
-+
-+		/*
-+		 * Call destroy now to maintain consistency with any other
-+		 * path leading to radio_work_done(). But set needs_cancel so
-+		 * the ROC command can be canceled
-+		 */
-+		if (info->destroy)
-+			info->destroy(info->error, info->user_data);
-+
-+		info->destroy =3D NULL;
-+		info->started =3D NULL;
-+		info->user_data =3D NULL;
-+		info->needs_cancel =3D true;
-+
-+		return;
-+	}
-+
-+	/*
-+	 * Something weird must have happened on the kernel side. This error
-+	 * will already be handled in offchannel_roc_cb but warn here to inform
-+	 * the user.
-+	 */
-+	if (L_WARN_ON(!info->roc_cookie))
-+		return;
-+
-+	/*
-+	 * At this point we know ROC has at least been queued (potentially not
-+	 * started) and can be cancelled. The work will be completed once the
-+	 * kernel sends the cancel ROC event.
-+	 */
-+	offchannel_cancel_roc(info);
-+
-+	return;
-+
-+work_done:
-+	wiphy_radio_work_done(wiphy, id);
-+}
-+
-+static void offchannel_mlme_notify(struct l_genl_msg *msg, void *user_data)
-+{
-+	struct offchannel_info *info;
-+	uint64_t wdev_id;
-+	uint64_t cookie;
-+	uint8_t cmd;
-+
-+	cmd =3D l_genl_msg_get_command(msg);
-+
-+	if (cmd !=3D NL80211_CMD_REMAIN_ON_CHANNEL &&
-+			cmd !=3D NL80211_CMD_CANCEL_REMAIN_ON_CHANNEL)
-+		return;
-+
-+	if (nl80211_parse_attrs(msg, NL80211_ATTR_WDEV, &wdev_id,
-+					NL80211_ATTR_COOKIE, &cookie,
-+					NL80211_ATTR_UNSPEC) < 0)
-+		return;
-+
-+	info =3D l_queue_find(offchannel_list, match_wdev, &wdev_id);
-+	if (!info)
-+		return;
-+
-+	/* ROC must have been started elsewhere, not by IWD */
-+	if (info->roc_cookie !=3D cookie)
-+		return;
-+
-+	switch (cmd) {
-+	case NL80211_CMD_REMAIN_ON_CHANNEL:
-+		if (info->started)
-+			info->started(info->user_data);
-+
-+		break;
-+	case NL80211_CMD_CANCEL_REMAIN_ON_CHANNEL:
-+		info->error =3D 0;
-+
-+		wiphy_radio_work_done(wiphy_find_by_wdev(info->wdev_id),
-+					info->work.id);
-+		break;
-+	default:
-+		return;
-+	}
-+}
-+
-+static int offchannel_init(void)
-+{
-+	struct l_genl *genl =3D iwd_get_genl();
-+
-+	nl80211 =3D l_genl_family_new(genl, NL80211_GENL_NAME);
-+	if (!nl80211) {
-+		l_error("Failed to obtain nl80211");
-+		return -EIO;
-+	}
-+
-+	if (!l_genl_family_register(nl80211, "mlme", offchannel_mlme_notify,
-+								NULL, NULL)) {
-+		l_error("Failed to register for MLME");
-+		l_genl_family_free(nl80211);
-+		nl80211 =3D NULL;
-+
-+		return -EIO;
-+	}
-+
-+	offchannel_list =3D l_queue_new();
-+
-+	return 0;
-+}
-+
-+static void offchannel_exit(void)
-+{
-+	l_debug("");
-+
-+	l_genl_family_free(nl80211);
-+	nl80211 =3D NULL;
-+
-+	l_queue_destroy(offchannel_list, l_free);
-+}
-+
-+IWD_MODULE(offchannel, offchannel_init, offchannel_exit);
-diff --git a/src/offchannel.h b/src/offchannel.h
-new file mode 100644
-index 00000000..1ffa94f1
---- /dev/null
-+++ b/src/offchannel.h
-@@ -0,0 +1,29 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+typedef void (*offchannel_started_cb_t)(void *user_data);
-+typedef void (*offchannel_destroy_cb_t)(int error, void *user_data);
-+
-+uint32_t offchannel_start(uint64_t wdev_id, uint32_t freq, uint32_t durati=
-on,
-+			offchannel_started_cb_t started, void *user_data,
-+			offchannel_destroy_cb_t destroy);
-+void offchannel_cancel(uint64_t wdev_id, uint32_t id);
--- =
+> -static struct l_dbus_message *pending_create_msg;
+> -static uint32_t pending_create_radio_id;
+> -
+>   static void radio_free(void *user_data)
+>   {
+>   	struct radio_info_rec *rec =3D user_data;
+>   =
 
-2.31.1
+> +	if (rec->pending)
+> +		l_dbus_message_unref(rec->pending);
+> +
+>   	l_free(rec->name);
+>   	l_free(rec);
+>   }
+> @@ -512,12 +513,6 @@ static const char *interface_get_path(const struct i=
+nterface_info_rec *rec)
+>   	return path;
+>   }
+>   =
 
---===============2758369629456479214==--
+> -static struct l_dbus_message *dbus_error_busy(struct l_dbus_message *msg)
+> -{
+> -	return l_dbus_message_new_error(msg, HWSIM_SERVICE ".InProgress",
+> -					"Operation already in progress");
+> -}
+> -
+>   static struct l_dbus_message *dbus_error_failed(struct l_dbus_message *=
+msg)
+>   {
+>   	return l_dbus_message_new_error(msg, HWSIM_SERVICE ".Failed",
+> @@ -610,7 +605,7 @@ static void get_radio_callback(struct l_genl_msg *msg=
+, void *user_data)
+>   	uint8_t file_buffer[128];
+>   	int bytes, consumed;
+>   	unsigned int uintval;
+> -	bool old;
+> +	bool old =3D false;
+>   	struct radio_info_rec prev_rec;
+>   	bool name_change =3D false;
+>   	const char *path;
+> @@ -637,8 +632,15 @@ static void get_radio_callback(struct l_genl_msg *ms=
+g, void *user_data)
+>   	if (!id || !name)
+>   		return;
+>   =
+
+> +	/*
+> +	 * If the radio info exists without a pending dbus message this is a
+> +	 * name change. If the radio info exists with a pending message a
+> +	 * minimal radio was created in order to save the DBus message. This
+> +	 * can be handled nearly identical to if 'rec' is NULL by initializing
+> +	 * the object now.
+> +	 */
+>   	rec =3D l_queue_find(radio_info, radio_info_match_id, L_UINT_TO_PTR(*i=
+d));
+> -	if (rec) {
+> +	if (rec && !rec->pending) {
+>   		old =3D true;
+>   		memcpy(&prev_rec, rec, sizeof(prev_rec));
+>   =
+
+> @@ -647,8 +649,7 @@ static void get_radio_callback(struct l_genl_msg *msg=
+, void *user_data)
+>   			name_change =3D true;
+>   =
+
+>   		l_free(rec->name);
+> -	} else {
+> -		old =3D false;
+> +	} else if (!rec) {
+>   		rec =3D l_new(struct radio_info_rec, 1);
+>   		rec->id =3D *id;
+>   	}
+> @@ -758,12 +759,12 @@ static void get_radio_callback(struct l_genl_msg *m=
+sg, void *user_data)
+>   	}
+>   =
+
+>   	/* Send pending CreateRadio reply */
+> -	if (pending_create_msg && pending_create_radio_id =3D=3D rec->id) {
+> +	if (rec->pending) {
+>   		struct l_dbus_message *reply =3D
+> -			l_dbus_message_new_method_return(pending_create_msg);
+> +			l_dbus_message_new_method_return(rec->pending);
+>   =
+
+>   		l_dbus_message_set_arguments(reply, "o", path);
+> -		dbus_pending_reply(&pending_create_msg, reply);
+> +		dbus_pending_reply(&rec->pending, reply);
+>   	}
+>   =
+
+>   	return;
+> @@ -772,9 +773,9 @@ err_free_radio:
+>   	if (!old)
+>   		radio_free(rec);
+>   =
+
+> -	if (pending_create_msg && pending_create_radio_id =3D=3D *id)
+> -		dbus_pending_reply(&pending_create_msg,
+> -					dbus_error_failed(pending_create_msg));
+> +	if (rec->pending)
+> +		dbus_pending_reply(&rec->pending,
+> +					dbus_error_failed(rec->pending));
+>   }
+>   =
+
+>   static bool radio_ap_only(struct radio_info_rec *rec)
+> @@ -1642,6 +1643,7 @@ static void unicast_handler(struct l_genl_msg *msg,=
+ void *user_data)
+>   static void radio_manager_create_callback(struct l_genl_msg *msg,
+>   						void *user_data)
+>   {
+> +	struct l_dbus_message *message =3D user_data;
+>   	struct l_dbus_message *reply;
+>   	struct l_genl_attr attr;
+>   	struct radio_info_rec *radio;
+> @@ -1658,28 +1660,38 @@ static void radio_manager_create_callback(struct =
+l_genl_msg *msg,
+>   	if (err < 0)
+>   		goto error;
+>   =
+
+> -	pending_create_radio_id =3D err;
+> -
+>   	/*
+>   	 * If the NEW_RADIO event has been received we'll have added the
+>   	 * radio to radio_info already but we can send the method return
+>   	 * only now that we know the ID returned by our command.
+>   	 */
+>   	radio =3D l_queue_find(radio_info, radio_info_match_id,
+> -				L_UINT_TO_PTR(pending_create_radio_id));
+> -	if (radio && pending_create_msg) {
+> +				L_UINT_TO_PTR(err));
+> +	if (radio) {
+>   		const char *path =3D radio_get_path(radio);
+>   =
+
+> -		reply =3D l_dbus_message_new_method_return(pending_create_msg);
+> +		reply =3D l_dbus_message_new_method_return(message);
+>   		l_dbus_message_set_arguments(reply, "o", path);
+> -		dbus_pending_reply(&pending_create_msg, reply);
+> +		dbus_pending_reply(&message, reply);
+> +	} else {
+> +		/*
+> +		 * NEW_RADIO has not happened but in order to allow concurrent
+> +		 * radio creations we must save away the message now. This means
+> +		 * creating this minimal radio object in order to look up in
+> +		 * the NEW_RADIO callback and reply.
+> +		 */
+> +		radio =3D l_new(struct radio_info_rec, 1);
+> +		radio->id =3D err;
+> +		radio->pending =3D message;
+> +
+> +		l_queue_push_tail(radio_info, radio);
+>   	}
+>   =
+
+>   	return;
+>   =
+
+>   error:
+> -	reply =3D dbus_error_failed(pending_create_msg);
+> -	dbus_pending_reply(&pending_create_msg, reply);
+> +	reply =3D dbus_error_failed(message);
+> +	dbus_pending_reply(&message, reply);
+
+This all seems even messier than before.  Maybe we should just always creat=
+e the =
+
+radio info structure in radio_manager_create and just set the =
+
+pending_genl_cmd_id and dbus_message accordingly?  That way you're not crea=
+ting =
+
+the structure all over the place.
+
+>   }
+>   =
+
+>   static struct l_dbus_message *radio_manager_create(struct l_dbus *dbus,
+
+<snip>
+
+> @@ -1753,10 +1762,9 @@ static struct l_dbus_message *radio_manager_create=
+(struct l_dbus *dbus,
+>   	}
+>   =
+
+>   	l_genl_family_send(hwsim, new_msg, radio_manager_create_callback,
+> -				pending_create_msg, NULL);
+> +				message, NULL);
+
+Nit: You probably should be using the destroy callback here.  Otherwise the =
+
+messages won't be cleaned up properly.
+
+>   =
+
+> -	pending_create_msg =3D l_dbus_message_ref(message);
+> -	pending_create_radio_id =3D 0;
+> +	l_dbus_message_ref(message);
+>   =
+
+>   	return NULL;
+>   =
+
+
+<snip>
+
+Regards,
+-Denis
+--===============5705899417020025227==--
 
