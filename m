@@ -1,34 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============5736943781378513143=="
+Content-Type: multipart/mixed; boundary="===============0265294069846090671=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v7 1/9] dpp-util: add URI parsing
-Date: Tue, 22 Feb 2022 16:26:38 -0600
-Message-ID: <22ccb3dd-8272-dff0-4c3f-c7c41f9f8b85@gmail.com>
-In-Reply-To: 20220222222847.2480099-1-prestwoj@gmail.com
+Subject: Re: [PATCH v3 01/10] dpp-util: fix dpp_point_from_asn1
+Date: Mon, 14 Feb 2022 16:23:08 -0600
+Message-ID: <e475eec8-c047-9e21-0619-f358f2fbef06@gmail.com>
+In-Reply-To: 20220214214809.1017870-1-prestwoj@gmail.com
 
---===============5736943781378513143==
+--===============0265294069846090671==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 2/22/22 16:28, James Prestwood wrote:
-> Parses K (key), M (mac), C (class/channels), and V (version) tokens
-> into a new structure dpp_uri_info. H/I are not parsed since there
-> currently isn't any use for them.
+On 2/14/22 15:48, James Prestwood wrote:
+> This got merged without a few additional fixes, in particular an
+> over 80 character line and incorrect length check.
 > ---
->   src/dpp-util.c | 250 +++++++++++++++++++++++++++++++++++++++++++++++++
->   src/dpp-util.h |  13 +++
->   2 files changed, 263 insertions(+)
-> =
+>   src/dpp-util.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
 
-
-All applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============5736943781378513143==--
+--===============0265294069846090671==--
 
