@@ -1,42 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============8962657122122249863=="
+Content-Type: multipart/mixed; boundary="===============0485632770248127412=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/3] storage: remove unused variables
-Date: Fri, 10 Jun 2022 12:52:40 -0700
-Message-ID: <20220610195242.455453-1-prestwoj@gmail.com>
+Subject: [PATCH v3 08/10] auto-t: wpas.py: handle enrollee as responder
+Date: Mon, 14 Feb 2022 13:48:07 -0800
+Message-ID: <20220214214809.1017870-8-prestwoj@gmail.com>
+In-Reply-To: 20220214214809.1017870-1-prestwoj@gmail.com
 
---===============8962657122122249863==
+--===============0485632770248127412==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The auto macros apparently made it difficult for gcc to
-detect, but clang was able to find them.
+This adds support for wpa_supplicant to generate its own URI and
+start presence announcements (DPP_CHIRP).
 ---
- src/storage.c | 2 --
- 1 file changed, 2 deletions(-)
+ autotests/util/wpas.py | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/src/storage.c b/src/storage.c
-index aa8066b1..2100d08d 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -456,11 +456,9 @@ char *__storage_encrypt(const struct l_settings *setti=
-ngs, const char *name,
- int __storage_decrypt(struct l_settings *settings, const char *ssid,
- 				bool *encrypt)
- {
--	_auto_(l_settings_free) struct l_settings *security =3D NULL;
- 	_auto_(l_free) uint8_t *encrypted =3D NULL;
- 	_auto_(l_free) uint8_t *decrypted =3D NULL;
- 	_auto_(l_free) uint8_t *salt =3D NULL;
--	_auto_(l_strv_free) char **embedded =3D NULL;
- 	_auto_(l_strv_free) char **groups =3D NULL;
- 	char **i;
- 	size_t elen, slen;
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index c8e65179..995bdad1 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -239,10 +239,17 @@ class Wpas:
+     def set(self, key, value, **kwargs):
+         self._ctrl_request('SET ' + key + ' ' + value, **kwargs)
+ =
+
+-    def dpp_enrollee_start(self, uri=3DNone):
++    def dpp_enrollee_start(self, uri=3DNone, oper_and_channel=3DNone):
++        if not oper_and_channel:
++            oper_and_channel =3D '81/1'
++
+         self._rx_data =3D []
+-        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode')
+-        self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode chan=3D%s' % o=
+per_and_channel)
++        self._dpp_qr_id =3D self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GET_URI %s' % self._dpp_qr_id)
++        self._dpp_uri =3D self.wait_for_result()
++
++        print("DPP Enrollee QR: %s" % self._dpp_uri)
+ =
+
+         if uri:
+             self._rx_data =3D []
+@@ -250,6 +257,10 @@ class Wpas:
+             self._dpp_qr_id =3D self.wait_for_result()
+             self._rx_data =3D []
+             self._ctrl_request('DPP_AUTH_INIT peer=3D%s role=3Denrollee' %=
+ self._dpp_qr_id)
++        else:
++            self._ctrl_request('DPP_CHIRP own=3D%s iter=3D100' % self._dpp=
+_qr_id)
++
++        return self._dpp_uri
+ =
+
+     def dpp_configurator_create(self, uri):
+         self._rx_data =3D []
 -- =
 
 2.34.1
 
---===============8962657122122249863==--
+--===============0485632770248127412==--
 
