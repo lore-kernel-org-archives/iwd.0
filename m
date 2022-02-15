@@ -1,54 +1,85 @@
-Content-Type: multipart/mixed; boundary="===============6406697474763522018=="
+Content-Type: multipart/mixed; boundary="===============3067510312618199129=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 03/12] handshake: add flags/key_index for extended key IDs
-Date: Mon, 04 Oct 2021 09:48:53 -0700
-Message-ID: <20211004164902.2274318-3-prestwoj@gmail.com>
-In-Reply-To: 20211004164902.2274318-1-prestwoj@gmail.com
+Subject: [PATCH v2 2/2] auto-t: hwsim.py: support async radio creation
+Date: Tue, 15 Feb 2022 08:52:42 -0800
+Message-ID: <20220215165242.1086346-2-prestwoj@gmail.com>
+In-Reply-To: 20220215165242.1086346-1-prestwoj@gmail.com
 
---===============6406697474763522018==
+--===============3067510312618199129==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-ext_key_id_capable indicates the handshake has set the capability bit
-in the RSN info. This will only be set if the AP also has the capability
-set.
+Adds a new wait argument which, if false, will call the DBus method
+and return immediately. This allows the caller to create multiple
+radios very quickly, simulating (as close as we can) a wifi card
+with dual phy's which appear in the kernel simultaneously.
 
-use_ext_key_id indicates if extended key ID procedure should be used.
-This is required because an AP may not send the KDE (even with capabilities
-set) meaning we fall back to the legacy zero key index.
-
-ptk_index is the key index the AP chose for a given rekey.
+The name argument was also changed to be mandatory, which is now
+required by hwsim.
 ---
- src/handshake.h | 3 +++
- 1 file changed, 3 insertions(+)
+ autotests/util/hwsim.py | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/src/handshake.h b/src/handshake.h
-index 36ccc3a2..e67e2c20 100644
---- a/src/handshake.h
-+++ b/src/handshake.h
-@@ -128,6 +128,7 @@ struct handshake_state {
- 	bool support_fils : 1;
- 	bool authenticator_ocvc : 1;
- 	bool supplicant_ocvc : 1;
-+	bool ext_key_id_capable : 1;
- 	uint8_t ssid[32];
- 	size_t ssid_len;
- 	char *passphrase;
-@@ -138,6 +139,8 @@ struct handshake_state {
- 	uint8_t gtk_rsc[6];
- 	uint8_t proto_version : 2;
- 	unsigned int gtk_index;
-+	bool use_ext_key_id : 1;
-+	uint8_t ptk_index;
- 	struct erp_cache_entry *erp_cache;
- 	bool support_ip_allocation : 1;
- 	uint32_t client_ip_addr;
+diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
+index 34859910..ce85f43d 100755
+--- a/autotests/util/hwsim.py
++++ b/autotests/util/hwsim.py
+@@ -309,26 +309,35 @@ class RadioList(collections.Mapping):
+     def _interfaces_removed_handler(self, path, interfaces):
+         del _dict[path]
+ =
+
+-    def create(self, name=3DNone, p2p_device=3DFalse, iftype_disable=3DNon=
+e,
+-                cipher_disable=3DNone):
++    def create(self, name, p2p_device=3DFalse, iftype_disable=3DNone,
++                cipher_disable=3DNone, wait=3DTrue):
+         args =3D dbus.Dictionary({
++            'Name': name,
+             'P2P': p2p_device,
+         }, signature=3D'sv')
+ =
+
+-        if name:
+-            args['Name'] =3D name
+-
+         if iftype_disable:
+             args['InterfaceTypeDisable'] =3D iftype_disable
+ =
+
+         if cipher_disable:
+             args['CipherTypeDisable'] =3D cipher_disable
+ =
+
++        if not wait:
++            self._radio_manager.CreateRadio(args, reply_handler=3Dself._su=
+ccess,
++                                                error_handler=3Dself._fail=
+ure)
++            return None
++
+         path =3D self._radio_manager.CreateRadio(args)
+         obj =3D Radio(path)
+         self._dict[path] =3D obj
+         return obj
+ =
+
++    def _success(self, bla):
++        pass
++
++    def _failure(self, ex):
++        pass
++
+ class Hwsim(iwd.AsyncOpAbstract):
+     _instances =3D WeakValueDictionary()
+ =
+
 -- =
 
-2.31.1
+2.34.1
 
---===============6406697474763522018==--
+--===============3067510312618199129==--
 
