@@ -1,54 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============3097891871286863813=="
+Content-Type: multipart/mixed; boundary="===============8663084114253776499=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v7 8/9] auto-t: add test for IWD as configurator + initiator
-Date: Tue, 22 Feb 2022 14:28:46 -0800
-Message-ID: <20220222222847.2480099-8-prestwoj@gmail.com>
-In-Reply-To: 20220222222847.2480099-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2 1/2] hwsim: allow concurrent radio creations
+Date: Tue, 15 Feb 2022 11:16:49 -0800
+Message-ID: <556a79f1b541f77dc4a7b147935b216170425b49.camel@gmail.com>
+In-Reply-To: f90c8063-e741-cf8d-b83f-bb50b0e9687e@gmail.com
 
---===============3097891871286863813==
+--===============8663084114253776499==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- autotests/testDPP/connection_test.py | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Hi Denis,
 
-diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
-ction_test.py
-index a451d584..b58620b8 100644
---- a/autotests/testDPP/connection_test.py
-+++ b/autotests/testDPP/connection_test.py
-@@ -82,6 +82,22 @@ class Test(unittest.TestCase):
- =
+> =
 
-         self.wpas.wait_for_event('DPP-CONF-RECEIVED')
- =
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (!rec)
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0return;
+> =
 
-+    def test_iwd_as_configurator_initiator(self):
-+        self.hapd.reload()
-+        self.hapd.wait_for_event('AP-ENABLED')
-+
-+        IWD.copy_to_storage('ssidCCMP.psk')
-+        self.device.autoconnect =3D True
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        self.wd.wait_for_object_condition(self.device, condition)
-+
-+        uri =3D self.wpas.dpp_enrollee_start(oper_and_channel=3D'81/2')
-+
-+        self.device.dpp_start_configurator(uri)
-+
-+        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
-+
-     def setUp(self):
-         self.wd =3D IWD(True)
-         self.device =3D self.wd.list_devices(1)[0]
--- =
+> This part seems suspicious.=C2=A0 What if the radio is being created
+> outside hwsim?
 
-2.34.1
+I guess this is changing behavior... Currently we would still create
+the radio info object if the radio was created externally. Keeping this
+behavior will end up requiring creating the radio here and in
+CreateRadio(), nearly the same as what we had before.
 
---===============3097891871286863813==--
+I guess its up to you. Either we don't support external radio creation
+for cleaner code, or we go back to the way it was (or some variant of
+it).
+
+> =
+
+> > =C2=A0 =
+
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0l_genl_attr_init(&attr,=
+ msg);
+> > =C2=A0 =
+
+> =
+
+> Regards,
+> -Denis
+
+
+--===============8663084114253776499==--
 
