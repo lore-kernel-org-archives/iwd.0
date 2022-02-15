@@ -1,88 +1,170 @@
-Content-Type: multipart/mixed; boundary="===============0633125544184395459=="
+Content-Type: multipart/mixed; boundary="===============3862137613732271502=="
 MIME-Version: 1.0
-From: Diederik de Haas <didi.debian at cknow.org>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: D-Bus policies
-Date: Tue, 25 Jan 2022 23:43:58 +0100
-Message-ID: <1894865.INmhrTAWsV@bagend>
-In-Reply-To: 02eb9123-8c12-29db-a279-1ba2a21f8e57@gmail.com
+Subject: [PATCH v8 3/6] main: add SystemdEncrypt option, and initialize key
+Date: Tue, 15 Feb 2022 13:41:31 -0800
+Message-ID: <20220215214134.1335469-3-prestwoj@gmail.com>
+In-Reply-To: 20220215214134.1335469-1-prestwoj@gmail.com
 
---===============0633125544184395459==
+--===============3862137613732271502==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tuesday, 25 January 2022 23:15:07 CET Denis Kenzior wrote:
-> Sure, but the chances that the main user on a single-user system isn't pa=
-rt
-> of 'wheel' or 'netdev' should be pretty small, no?
+Recently systemd added the ability to pass secret credentials to
+services via LoadCredentialEncrypted/SetCredentialEncrypted. Once
+set up the service is able to read the decrypted credentials from
+a file. The file path is found in the environment variable
+CREDENTIALS_DIRECTORY + an identifier. The value of SystemdEncrypt
+should be set to the systemd key ID used when the credential was
+created.
 
-No, but it is easy to 'fix' for the main user.
-When you install a Debian system, you can explicitly use the 'root' user an=
-d =
+When SystemdEncrypt is set IWD will attempt to read the decrypted
+secret from systemd. If at any point this fails warnings will be
+printed but IWD will continue normally. Its expected that any failures
+will result in the inability to connect to any networks which have
+previously encrypted the passphrase/PSK without re-entering
+the passphrase manually. This could happen, for example, if the
+systemd secret was changed.
 
-then you specify root's password. Next to that a normal user account gets =
+Once the secret is read in it is set into storage to be used for
+profile encryption/decryption.
+---
+ src/main.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
-created. Alternatively, you can use the sudo system which the first user, i=
-e =
+v8:
+ * Fail init if storage_init or mlock fails.
 
-you, gets added to and then you can do all root-type actions via sudo.
-So the person installing the system does get full administrative permission=
-s, =
-
-which he/she can use to further setup the system.
-
-> The original intent was to disallow access to iwd for remote users.  So, =
-in
-> the scenario above, if your friend is not part of 'netdev' or 'wheel', th=
-en
-> their control of iwd should not have been possible.
-
-Correct. But in the restricted scenario (option 2), my friend would also no=
-t =
-
-have access if directly logged on to the system (locally), if not in the =
-
-'netdev' group.
-This would thus be a change in behavior as originally intended.
+diff --git a/src/main.c b/src/main.c
+index d0dbedc8..6fcc78d9 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -29,6 +29,10 @@
+ #include <errno.h>
+ #include <getopt.h>
+ #include <signal.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <sys/stat.h>
++#include <sys/mman.h>
+ #include <ell/ell.h>
  =
 
-> > And Option 2 is restricted access.
-> =
+ #include <ell/useful.h>
+@@ -45,6 +49,7 @@
+ #include "src/storage.h"
+ #include "src/anqp.h"
+ #include "src/netconfig.h"
++#include "src/crypto.h"
+ =
 
-> Right.  We'd be 'breaking' the above scenario.  But, as I mentioned befor=
-e,
-> how likely was this scenario in the first place?  Did someone really want
-> remote users to mess with wifi on their machine without netdev/wheel
-> access?  Arguably we're just fixing a bug.
+ #include "src/backtrace.h"
+ =
 
-I think we're indeed fixing a bug by allowing only netdev/wheel users the =
+@@ -397,6 +402,73 @@ done:
+ 	return r;
+ }
+ =
 
-permission to change the wifi settings.
++/*
++ * Initialize a systemd encryption key for encrypting/decrypting credentia=
+ls.
++ */
++static bool setup_system_key(void)
++{
++	int fd;
++	struct stat st;
++	const char *cred_dir;
++	void *key =3D NULL;
++	_auto_(l_free) char *path =3D NULL;
++	_auto_(l_free) char *key_id =3D NULL;
++	bool r;
++
++	key_id =3D l_settings_get_string(iwd_config, "General", "SystemdEncrypt");
++	if (!key_id)
++		return true;
++
++	cred_dir =3D getenv("CREDENTIALS_DIRECTORY");
++	if (!cred_dir) {
++		l_warn("SystemdEncrypt enabled but CREDENTIALS_DIRECTORY not "
++			"set, check iwd.service file");
++		return false;
++	}
++
++	path =3D l_strdup_printf("%s/%s", cred_dir, key_id);
++
++	if (stat(path, &st) < 0) {
++		l_warn("SystemdEncrypt enabled but could not stat %s",
++			path);
++		return false;
++	}
++
++	fd =3D open(path, O_RDONLY, 0);
++	if (fd < 0) {
++		l_warn("SystemdEncrypt enabled but cannot open secret (%d)",
++				fd);
++		return false;
++	}
++
++	if (fstat(fd, &st) < 0 || st.st_size =3D=3D 0) {
++		close(fd);
++		return false;
++	}
++
++	key =3D mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
++	if (key =3D=3D MAP_FAILED) {
++		l_warn("SystemdEncrypt enabled but can't mmap secret");
++		close(fd);
++		return false;
++	}
++
++	close(fd);
++
++	if (mlock(key, st.st_size) < 0) {
++		l_warn("Failed to mlock Systemd secret file");
++		return false;
++	}
++
++	r =3D storage_init(key, st.st_size);
++
++	munlock(key, st.st_size);
++
++	munmap(key, st.st_size);
++
++	return r;
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	int exit_status;
+@@ -529,12 +601,18 @@ int main(int argc, char *argv[])
+ 	l_dbus_set_disconnect_handler(dbus, dbus_disconnected, NULL, NULL);
+ 	dbus_init(dbus);
+ =
 
-> > For which Option would you like a patch?
-> =
++	if (!setup_system_key())
++		goto failed_key;
++
+ 	exit_status =3D l_main_run_with_signal(signal_handler, NULL);
+ =
 
-> I'm fine with either option.  It sounds like you're favoring Option 2.
-> Whichever you go for, I'll let it sit on the list for a few days to see if
-> anyone else complains :)
+ 	iwd_modules_exit();
+ 	dbus_exit();
+ 	l_dbus_destroy(dbus);
+ =
 
-Yeah, I do favor Option 2 ;-)
-A patch is coming your/the list's way (probably tomorrow, CET TZ here)
++failed_key:
++	storage_exit();
++
+ failed_dbus:
+ 	l_netlink_destroy(rtnl);
+ =
 
-Cheers,
-  Diederik
+-- =
 
---===============0633125544184395459==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
+2.34.1
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlIVUVBQllJQUIwV0lRVDFzVVBCWXN5R21p
-NHVzeS9YYmx2T2VIN2JiZ1VDWWZCOUxnQUtDUkRYYmx2T2VIN2IKYnFTdEFRRDZqTVhZeWw5c1ZW
-eTVLbWVjaUZocGZUNXBCa2cvZE9tTnFGaldVVjhJa1FFQWdySGRRaFl3ZDJmagowRWFkb1F2YlhU
-Wld1T0swektleTNwODk3Z2xFVWc4PQo9ZytzMAotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============0633125544184395459==--
+--===============3862137613732271502==--
 
