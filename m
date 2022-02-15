@@ -1,148 +1,156 @@
-Content-Type: multipart/mixed; boundary="===============1360592206504257385=="
+Content-Type: multipart/mixed; boundary="===============7382522948853033292=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 07/11] network: add 6GHz restrictions to
- network_can_connect_bss
-Date: Fri, 25 Feb 2022 11:50:20 -0800
-Message-ID: <4b88f5bbf7d828b2a692671492f4cd3365b35512.camel@gmail.com>
-In-Reply-To: 89149ea1-9603-220a-0306-f4c75605f5df@gmail.com
+Subject: Re: [PATCH v2 1/2] hwsim: allow concurrent radio creations
+Date: Tue, 15 Feb 2022 11:53:02 -0600
+Message-ID: <f90c8063-e741-cf8d-b83f-bb50b0e9687e@gmail.com>
+In-Reply-To: 20220215165242.1086346-1-prestwoj@gmail.com
 
---===============1360592206504257385==
+--===============7382522948853033292==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2022-02-25 at 13:24 -0600, Denis Kenzior wrote:
-> Hi James,
+Hi James,
+
+On 2/15/22 10:52, James Prestwood wrote:
+> Currently CreateRadio only allows a single outstanding DBus message
+> until the radio is fully created. 99% of the time this is just fine
+> but in order to test dual phy cards there needs to be support for
+> phy's appearing at the same time.
 > =
 
-> On 2/25/22 11:58, James Prestwood wrote:
-> > The 802.11ax standards adds some restrictions for the 6GHz band. In
-> > short
-> > stations must use SAE, OWE, or 8021x on this band and frame
-> > protection is
-> > required.
-> > ---
-> > =C2=A0 src/network.c | 37 +++++++++++++++++++++++++++++++++++++
-> > =C2=A0 1 file changed, 37 insertions(+)
-> > =
-
+> This required storing the pending DBus message inside the radio object
+> rather than a single static variable.
 > =
 
-> <snip>
+> To handle things a bit cleaner the radio info is now created when
+> CreateRadio is called. The name is now a required arugment which allows
+
+arugment->argument
+
+> the NEW_RADIO event to lookup. This removes the duplicate code in the
+> NEW_RADIO ack callback and leaves only error handling.
+> ---
+>   tools/hwsim.c | 147 +++++++++++++++++++++++++-------------------------
+>   1 file changed, 73 insertions(+), 74 deletions(-)
 > =
 
-> > @@ -852,6 +864,31 @@ int network_can_connect_bss(struct network
-> > *network, const struct scan_bss *bss)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > =C2=A0 =
 
-> > =C2=A0 no_transition_disable:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* 802.11ax Section 12.12.2 =
-*/
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (band =3D=3D BAND_FREQ_6_=
-GHZ) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/* STA shall not use the following cipher suite
-> > selectors */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0rsn.pairwise_ciphers &=3D
-> > ~IE_RSN_CIPHER_SUITE_USE_GROUP_CIPHER;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_TKIP;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/* STA shall not use the following AKM suite
-> > selectors */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0rsn.akm_suites &=3D ~IE_RSN_AKM_SUITE_PSK;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0rsn.akm_suites &=3D ~IE_RSN_AKM_SUITE_PSK_SHA256;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0rsn.akm_suites &=3D ~IE_RSN_AKM_SUITE_FT_USING_PSK;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/* Basically the STA must use OWE, SAE, or 8021x */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (!(rsn.akm_suites & (IE_RSN_AKM_SUITE_8021X |
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0IE_RSN_AKM_SUITE_FT_OVER_80
-> > 21X |
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0IE_RSN_AKM_SUITE_8021X_SHA2
-> > 56 |
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0IE_RSN_AKM_SUITE_SAE_SHA256
-> > |
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0IE_RSN_AKM_SUITE_FT_OVER_SA
-> > E_SHA256 |
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0IE_RSN_AKM_SUITE_FT_OVER_80
-> > 21X_SHA384 |
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0IE_RSN_AKM_SUITE_OWE)))
+Yes, this looks much better now.
+
+> v2:
+>   * Removed creating the radio in multiple places. Instead only create
+>     in the NEW_RADIO event.
 > =
 
-> I wonder if it is better to use IE_AKM_IS_SAE, IE_AKM_IS_FILS(8021x)
-> and =
 
-> IE_AKM_IS_OWE instead.
+<snip>
 
-I avoided this because they all check for only a single AKM, which I
-guess we could modify, or add IE_AKM_HAS_* variants.
+> @@ -603,17 +611,18 @@ static void get_radio_callback(struct l_genl_msg *m=
+sg, void *user_data)
+>   	struct l_genl_attr attr;
+>   	uint16_t type, len;
+>   	const void *data;
+> -	const char *name =3D NULL;
+> +	_auto_(l_free) char *name =3D NULL;
+>   	const uint32_t *id =3D NULL;
+>   	size_t name_len =3D 0;
+>   	struct radio_info_rec *rec;
+>   	uint8_t file_buffer[128];
+>   	int bytes, consumed;
+>   	unsigned int uintval;
+> -	bool old;
+> +	bool old =3D false;
+>   	struct radio_info_rec prev_rec;
+>   	bool name_change =3D false;
+>   	const char *path;
+> +	struct l_dbus_message *reply;
+>   =
 
-> =
+>   	if (!l_genl_attr_init(&attr, msg))
+>   		return;
+> @@ -628,8 +637,7 @@ static void get_radio_callback(struct l_genl_msg *msg=
+, void *user_data)
+>   			break;
+>   =
 
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return=
- -EPERM;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/* STA shall use management frame protection */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0rsn.mfpr =3D true;
-> =
+>   		case HWSIM_ATTR_RADIO_NAME:
+> -			name =3D data;
+> -			name_len =3D len;
+> +			name =3D l_strndup(data, len);
 
-> This isn't actually how we enforce MFP.=C2=A0 Not sure we ever set MFPR to
-> true =
+So why the strndup here?
 
-> unless it is for testing purposes.
+>   			break;
+>   		}
+>   	}
+> @@ -637,8 +645,13 @@ static void get_radio_callback(struct l_genl_msg *ms=
+g, void *user_data)
+>   	if (!id || !name)
+>   		return;
+>   =
 
-Yes, I saw earlier in the function it was set but it looks like this
-was just for the group management cipher check at the bottom. I'll add
-something in station.c.
+> -	rec =3D l_queue_find(radio_info, radio_info_match_id, L_UINT_TO_PTR(*id=
+));
+> -	if (rec) {
+> +	/*
+> +	 * If the radio info exists without a pending dbus message this is a
+> +	 * name change. Otherwise if the radio is not found something external
+> +	 * created it, not hwsim.
+> +	 */
+> +	rec =3D l_queue_find(radio_info, radio_info_match_name, name);
 
-> =
+If this is a name change, then how would this work?  I think you do need to =
 
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!wiphy_select_ciphe=
-r(wiphy, rsn.pairwise_ciphers))
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0return -ENOTSUP;
-> > =C2=A0 =
+match by id or by name.  This may be easier done with l_queue_get_entries s=
+tyle =
 
-> > =
+for loop.
 
-> =
+For a radio that is 'in flight', we may want to set the id to something =
 
-> Regards,
-> -Denis
+non-sensical like -1.
+
+> +	if (rec && !rec->pending) {
+>   		old =3D true;
+>   		memcpy(&prev_rec, rec, sizeof(prev_rec));
+>   =
+
+> @@ -647,13 +660,9 @@ static void get_radio_callback(struct l_genl_msg *ms=
+g, void *user_data)
+>   			name_change =3D true;
+>   =
+
+>   		l_free(rec->name);
+> -	} else {
+> -		old =3D false;
+> -		rec =3D l_new(struct radio_info_rec, 1);
+> -		rec->id =3D *id;
+> -	}
+> -
+> -	rec->name =3D l_strndup(name, name_len);
+> +		rec->name =3D l_strndup(name, name_len);
+
+so either l_strndup _only_ here or l_stealptr if you already did that above=
+. =
+
+Assuming name isn't being used below.
+
+> +	} else if (!rec)
+> +		return;
+
+This part seems suspicious.  What if the radio is being created outside hws=
+im?
+
+>   =
+
+>   	l_genl_attr_init(&attr, msg);
+>   =
 
 
---===============1360592206504257385==--
+Regards,
+-Denis
+--===============7382522948853033292==--
 
