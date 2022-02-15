@@ -1,84 +1,90 @@
-Content-Type: multipart/mixed; boundary="===============7659777673641595977=="
+Content-Type: multipart/mixed; boundary="===============7817485874971294354=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 04/10] frame-xchg: allow multicast frame watches
-Date: Thu, 17 Feb 2022 08:37:50 -0800
-Message-ID: <e1a16c74abefb772c7b7bd57cd3033cc543872ea.camel@gmail.com>
-In-Reply-To: CAOq732Jze4EpHz+hVs325D5u7ORp=Pno1hf0GDgzxxdP6iJTEA@mail.gmail.com
+Subject: [PATCH v8 2/6] hotspot: implement hotspot profile encryption
+Date: Tue, 15 Feb 2022 13:41:30 -0800
+Message-ID: <20220215214134.1335469-2-prestwoj@gmail.com>
+In-Reply-To: 20220215214134.1335469-1-prestwoj@gmail.com
 
---===============7659777673641595977==
+--===============7817485874971294354==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Using __storage_open() hotspot can also support profile encyption.
+The hotspot consortium name is used as the 'ssid' since this stays
+consistent between hotspot networks for any profile.
+---
+ src/hotspot.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
-On Thu, 2022-02-17 at 16:47 +0100, Andrew Zaborowski wrote:
-> Hi James,
-> =
+diff --git a/src/hotspot.c b/src/hotspot.c
+index 21f50690..832d7a31 100644
+--- a/src/hotspot.c
++++ b/src/hotspot.c
+@@ -95,12 +95,18 @@ static struct l_settings *hotspot_network_open(struct n=
+etwork_info *info)
+ =
 
-> On Wed, 16 Feb 2022 at 22:05, James Prestwood <prestwoj(a)gmail.com>
-> wrote:
-> > On Tue, 2022-02-15 at 00:28 +0100, Andrew Zaborowski wrote:
-> > > It may be easier to always set the flag in the REGISTER_FRAMEs
-> > > and
-> > > check whether the received frame was multicast before calling the
-> > > frame callback.=C2=A0 In that case the multicast flag can be set on a
-> > > watch
-> > > in a separate call, after frame_watch_add.
-> > =
+ 	settings =3D l_settings_new();
+ =
 
-> > So have frame_watch_set_multicast_allowed() act on entire groups
-> > rather
-> > than individual watches? I don't see any other way for it to work
-> > at
-> > least.
-> =
+-	if (!l_settings_load_from_file(settings, config->filename)) {
+-		l_settings_free(settings);
+-		return NULL;
+-	}
++	if (!l_settings_load_from_file(settings, config->filename))
++		goto error;
++
++	if (!__storage_open(settings, config->filename, SECURITY_8021X,
++				config->name))
++		goto error;
+ =
 
-> That's a good idea too.=C2=A0 I was thinking, since frame_watch_add()
-> returns no watch ID, that you'd either pass the same set of arguments
-> to frame_watch_set_multicast_allowed() that you passed to
-> frame_watch_add() to identify the watch, or do
-> frame_watch_set_multicast_by_handler (similar to
-> frame_watch_remove_by_handler).
+ 	return settings;
++
++error:
++	l_settings_free(settings);
++	return NULL;
+ }
+ =
 
-Doing it by handler seems kinda weird for an exposed API, I would
-rather do it by group for simplicity. And for any module that needs
-multicast we just use a unique group.
+ static void hotspot_network_sync(struct network_info *info,
+@@ -111,7 +117,12 @@ static void hotspot_network_sync(struct network_info *=
+info,
+ 	struct hs20_config *config =3D l_container_of(info, struct hs20_config,
+ 							super);
+ =
 
-Another option could be to return the watchlist ID from
-frame_watch_add, and something like watchlist_item_find(). Besides the
-few places that check the return I don't think this would be too
-intrusive.
+-	data =3D l_settings_to_data(settings, &length);
++	data =3D __storage_encrypt(settings, config->name, &length);
++	if (!data) {
++		l_error("Unable to sync profile %s", config->filename);
++		return;
++	}
++
+ 	write_file(data, length, true, "%s", config->filename);
+ 	l_free(data);
+ }
+@@ -338,6 +349,11 @@ static struct hs20_config *hs20_config_new(struct l_se=
+ttings *settings,
+ 		goto free_values;
+ 	}
+ =
 
-> =
++	if (!__storage_open(settings, filename, SECURITY_8021X, name)) {
++		l_error("Could not open hotspot profile %s", filename);
++		goto free_values;
++	}
++
+ 	config =3D l_new(struct hs20_config, 1);
+ =
 
-> > And I'm not sure we want to do this for group 0 since it could
-> > impact other modules.
-> =
+ 	if (hessid_str) {
+-- =
 
-> Right.
-> =
+2.34.1
 
-> > =
-
-> > Maybe also we should start using non-zero groups, i.e. each module
-> > (DPP, P2P, ANQP etc.) use their own group number? Just an idea.
-> > Maybe
-> > this is what was intended all along but at least I haven't been
-> > doing
-> > that :)
-> =
-
-> So the idea was to create groups for watches that may need to be
-> removed before the interface is removed or has its iftype changed
-> (those events implicitly discard watches) but it might also be useful
-> to do for this multicast feature.
-> =
-
-> Best regards
-
-
---===============7659777673641595977==--
+--===============7817485874971294354==--
 
