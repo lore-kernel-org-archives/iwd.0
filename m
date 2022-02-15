@@ -1,43 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============3878739599189888833=="
+Content-Type: multipart/mixed; boundary="===============5893833998732824809=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v7 6/9] auto-t: wpas.py: allow arbitrary events to be handled
-Date: Tue, 22 Feb 2022 14:28:44 -0800
-Message-ID: <20220222222847.2480099-6-prestwoj@gmail.com>
-In-Reply-To: 20220222222847.2480099-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2 1/2] hwsim: allow concurrent radio creations
+Date: Tue, 15 Feb 2022 13:40:58 -0600
+Message-ID: <6831ecc0-9251-339e-856b-d9d2ac9d669f@gmail.com>
+In-Reply-To: 556a79f1b541f77dc4a7b147935b216170425b49.camel@gmail.com
 
---===============3878739599189888833==
+--===============5893833998732824809==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If an event is in response to some command which is returning an
-unexpected value (unexpected with respect to wpas.py) handle_eow
-would raise an exception.
+Hi James,
 
-Specifically with DPP this was being hit when the URI was being
-returned.
----
- autotests/util/wpas.py | 2 --
- 1 file changed, 2 deletions(-)
+On 2/15/22 13:16, James Prestwood wrote:
+> Hi Denis,
+> =
 
-diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-index 6b845232..c8e65179 100644
---- a/autotests/util/wpas.py
-+++ b/autotests/util/wpas.py
-@@ -88,8 +88,6 @@ class Wpas:
-         def handle_eow():
-             nonlocal key, value, count, event
-             if count =3D=3D 0:
--                if key is not None or not value:
--                    raise Exception('Bad event name')
-                 key =3D 'event'
-             elif key is None:
-                 if not value:
--- =
+>>
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (!rec)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0return;
+>>
+>> This part seems suspicious.=C2=A0 What if the radio is being created
+>> outside hwsim?
+> =
 
-2.34.1
+> I guess this is changing behavior... Currently we would still create
+> the radio info object if the radio was created externally. Keeping this
+> behavior will end up requiring creating the radio here and in
+> CreateRadio(), nearly the same as what we had before.
+> =
 
---===============3878739599189888833==--
+
+CreateRadio really only creates a stub.  What is there to duplicate besides =
+
+l_new and setting the name/id?
+
+> I guess its up to you. Either we don't support external radio creation
+> for cleaner code, or we go back to the way it was (or some variant of
+> it).
+> =
+
+
+Clearly we want to support this since hwsim might start with radios already =
+
+created and this path is being used by the initial radio dump (started in =
+
+hwsim_ready).
+
+Regards,
+-Denis
+--===============5893833998732824809==--
 
