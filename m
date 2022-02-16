@@ -1,256 +1,286 @@
-Content-Type: multipart/mixed; boundary="===============3438018469255815926=="
+Content-Type: multipart/mixed; boundary="===============3644168449319090702=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v7 8/8] auto-t: add test for encrypted profiles
-Date: Thu, 10 Feb 2022 14:58:42 -0800
-Message-ID: <20220210225842.895962-8-prestwoj@gmail.com>
-In-Reply-To: 20220210225842.895962-1-prestwoj@gmail.com
+Subject: [PATCH 1/2] tools: add decrypt-profile tool
+Date: Tue, 15 Feb 2022 16:28:25 -0800
+Message-ID: <20220216002826.1361879-1-prestwoj@gmail.com>
 
---===============3438018469255815926==
+--===============3644168449319090702==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- .../testEncryptedProfiles/connection_test.py  | 154 ++++++++++++++++++
- autotests/testEncryptedProfiles/hw.conf       |   6 +
- autotests/testEncryptedProfiles/iwd-secret    |   1 +
- autotests/testEncryptedProfiles/main.conf     |   2 +
- autotests/testEncryptedProfiles/ssidCCMP.conf |  10 ++
- autotests/testEncryptedProfiles/ssidCCMP.psk  |   2 +
- 6 files changed, 175 insertions(+)
- create mode 100644 autotests/testEncryptedProfiles/connection_test.py
- create mode 100644 autotests/testEncryptedProfiles/hw.conf
- create mode 100644 autotests/testEncryptedProfiles/iwd-secret
- create mode 100644 autotests/testEncryptedProfiles/main.conf
- create mode 100644 autotests/testEncryptedProfiles/ssidCCMP.conf
- create mode 100644 autotests/testEncryptedProfiles/ssidCCMP.psk
+This tool will decrypt an IWD network profile which was previously
+encrypted using a systemd provided key. Either a text passphrase
+can be provided (--pass) or a file containing the secret (--file).
 
-diff --git a/autotests/testEncryptedProfiles/connection_test.py b/autotests=
-/testEncryptedProfiles/connection_test.py
+This can be useful for debugging, or recovering an encrypted
+profile after enabling SystemdEncrypt.
+---
+ Makefile.am                 |   8 +-
+ tools/iwd-decrypt-profile.c | 213 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 220 insertions(+), 1 deletion(-)
+ create mode 100644 tools/iwd-decrypt-profile.c
+
+Following up after the core changes were merged. The --ssid option was
+changed to --name to be consitent with the internal usage where either
+the SSID or hotspot network name can be passed.
+
+diff --git a/Makefile.am b/Makefile.am
+index 35938d22..a0e54594 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -362,7 +362,7 @@ man_MANS +=3D wired/ead.8
+ endif
+ endif
+ =
+
+-noinst_PROGRAMS +=3D tools/probe-req
++noinst_PROGRAMS +=3D tools/probe-req tools/iwd-decrypt-profile
+ =
+
+ tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu.h src/mpdu.c \
+ 					src/ie.h src/ie.c \
+@@ -372,6 +372,12 @@ tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu=
+.h src/mpdu.c \
+ 					src/band.h src/band.c
+ tools_probe_req_LDADD =3D $(ell_ldadd)
+ =
+
++tools_iwd_decrypt_profile_SOURCES =3D tools/iwd-decrypt-profile.c \
++					src/common.h src/common.c \
++					src/crypto.h src/crypto.c \
++					src/storage.h src/storage.c
++tools_iwd_decrypt_profile_LDADD =3D ${ell_ldadd}
++
+ if HWSIM
+ bin_PROGRAMS +=3D tools/hwsim
+ =
+
+diff --git a/tools/iwd-decrypt-profile.c b/tools/iwd-decrypt-profile.c
 new file mode 100644
-index 00000000..dd4892ca
+index 00000000..fa957183
 --- /dev/null
-+++ b/autotests/testEncryptedProfiles/connection_test.py
-@@ -0,0 +1,154 @@
-+#!/usr/bin/python3
++++ b/tools/iwd-decrypt-profile.c
+@@ -0,0 +1,213 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2022  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
 +
-+import unittest
-+import sys
++#include <stdio.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <sys/stat.h>
++#include <sys/mman.h>
++#include <getopt.h>
 +
-+sys.path.append('../util')
-+import iwd
-+import os
-+from iwd import IWD
-+from iwd import NetworkType
-+from iwd import PSKAgent
++#include <ell/ell.h>
 +
-+class Test(unittest.TestCase):
-+    def profile_is_encrypted(self, profile):
-+        with open('/tmp/iwd/' + profile) as f:
-+            contents =3D f.read()
++#include "ell/useful.h"
 +
-+        if 'Passphrase' in contents:
-+            return False
++#include "src/storage.h"
++#include "src/common.h"
 +
-+        return True
++static void usage(void)
++{
++	printf("decrypt-profile - Decrypt a network profile\n"
++		"Usage:\n");
++	printf("\tdecrypt-profile [--pass | --file] [OPTIONS]\n");
++	printf("\n\tEither --pass or --file must be provided. The profile\n");
++	printf("\tshould be supplied using --infile.\n");
++	printf("\tThe --name argument must be used if the name cannot be\n");
++	printf("\tinferred from the input file\n\n");
++	printf("Options:\n"
++		"\t-p, --pass             Password/key used to encrypt\n"
++		"\t-f, --file             File containing key\n"
++		"\t-s, --name             Name for associated profile (will\n"
++		"\t                       be inferred from --infile if not\n"
++		"\t                       provided). For non hotspot networks\n"
++		"\t                       this will be the SSID.\n"
++		"\t-i, --infile           Input profile\n"
++		"\t-o, --outfile          Output file for decrypted profile\n"
++		"\t-h, --help             Show help options\n");
++	printf("\n");
++}
 +
-+    def validate(self, wd):
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
++static const struct option main_options[] =3D {
++	{ "pass", required_argument,       NULL, 'p' },
++	{ "file", required_argument,       NULL, 'f' },
++	{ "infile", required_argument,     NULL, 'i' },
++	{ "outfile", required_argument,    NULL, 'o' },
++	{ "name", required_argument,       NULL, 'n' },
++	{ "help", no_argument,             NULL, 'h' },
++	{ }
++};
 +
-+        ordered_network =3D device.get_ordered_network('ssidCCMP')
++static bool secret_from_file(const char *file)
++{
++	int fd;
++	struct stat st;
++	void *data =3D NULL;
++	bool r;
 +
-+        self.assertEqual(ordered_network.type, NetworkType.psk)
++	fd =3D open(file, O_RDONLY, 0);
++	if (fd < 0) {
++		printf("Cant open %s (%d)\n", file, fd);
++		return false;
++	}
 +
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
++	if (fstat(fd, &st) < 0 || st.st_size =3D=3D 0) {
++		close(fd);
++		return false;
++	}
 +
-+        ordered_network.network_object.connect()
++	data =3D mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
++	close(fd);
 +
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
++	if (data =3D=3D MAP_FAILED)
++		return false;
 +
-+        device.disconnect()
++	r =3D storage_init(data, st.st_size);
 +
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
++	munmap(data, st.st_size);
 +
-+    # Tests that an existing plaintext profile gets encrypted
-+    def test_new_profile(self):
-+        IWD.copy_to_storage('ssidCCMP.psk')
++	return r;
++}
 +
-+        mtime =3D os.path.getmtime('/tmp/iwd/' + 'ssidCCMP.psk')
-+        self.assertFalse(self.profile_is_encrypted('ssidCCMP.psk'))
++int main(int argc, char *argv[])
++{
++	const char *pass =3D NULL;
++	const char *file =3D NULL;
++	const char *infile =3D NULL;
++	const char *outfile =3D NULL;
++	const char *name =3D NULL;
++	_auto_(l_free) char *decrypted =3D NULL;
++	_auto_(l_settings_free) struct l_settings *settings =3D NULL;
++	enum security sec;
++	int ret =3D EXIT_FAILURE;
++	ssize_t len =3D 0;
++	int r;
 +
-+        wd =3D IWD(True)
++	for (;;) {
++		int opt;
 +
-+        # Make sure profile was accepted
-+        condition =3D 'len(obj.list_known_networks()) =3D=3D 1'
-+        wd.wait_for_object_condition(wd, condition)
++		opt =3D getopt_long(argc, argv, "pfhion", main_options, NULL);
++		if (opt < 0)
++			break;
 +
-+        # Check the file was modified (should be encrypted now)
-+        self.assertNotEqual(mtime, os.path.getmtime('/tmp/iwd/' + 'ssidCCM=
-P.psk'))
++		switch (opt) {
++		case 'p':
++			pass =3D optarg;
++			break;
++		case 'f':
++			file =3D optarg;
++			break;
++		case 'i':
++			infile =3D optarg;
++			break;
++		case 'o':
++			outfile =3D optarg;
++			break;
++		case 'n':
++			name =3D optarg;
++			break;
++		case 'h':
++			usage();
++			return EXIT_SUCCESS;
++		default:
++			goto failed;
++		}
++	}
 +
-+        self.validate(wd)
++	if (!file && !pass) {
++		printf("--file or --pass must be supplied\n\n");
++		goto usage;
++	}
 +
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++	if (!infile) {
++		printf("--infile must be supplied\n\n");
++		goto usage;
++	}
 +
-+    # Tests that a new connection with agent gets written to an encrypted =
-profile
-+    def test_agent_profile(self):
-+        wd =3D IWD(True)
++	if (!name) {
++		name =3D storage_network_ssid_from_path(infile, &sec);
++		if (!name) {
++			printf("Can't get name from --infile, use --name\n\n");
++			goto usage;
++		}
++	}
 +
-+        psk_agent =3D PSKAgent("secret123")
-+        wd.register_psk_agent(psk_agent)
++	settings =3D l_settings_new();
 +
-+        with self.assertRaises(FileNotFoundError):
-+            self.profile_is_encrypted('ssidCCMP.psk')
++	if (!l_settings_load_from_file(settings, infile)) {
++		printf("Profile is not formatted correctly\n");
++		goto failed;
++	}
 +
-+        self.validate(wd)
++	if (pass) {
++		if (!storage_init((const uint8_t *)pass, strlen(pass)))
++			goto failed;
++	} else if (!secret_from_file(file))
++		goto failed;
 +
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++	r =3D __storage_decrypt(settings, name, NULL);
++	if (r < 0) {
++		printf("Unable to decrypt profile (%d)\n", r);
++		goto failed;
++	}
 +
-+        wd.unregister_psk_agent(psk_agent)
++	decrypted =3D l_settings_to_data(settings, (size_t *)&len);
 +
-+    # Tests that an invalid profile gets re-written after an agent request
-+    def test_invalid_profile_rewritten(self):
-+        bad_config =3D '[Security]\nPassphrase=3Dincorrect\n'
-+        os.system('echo "%s" > /tmp/iwd/ssidCCMP.psk' % bad_config)
++	if (!outfile)
++		fwrite(decrypted, 1, len, stdout);
++	else {
++		int fd =3D open(outfile, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
 +
-+        wd =3D IWD(True)
++		if (fd < 0) {
++			printf("Unable to open %s (%d)\n", outfile, fd);
++			close(fd);
++			goto failed;
++		}
 +
-+        condition =3D 'len(obj.list_known_networks()) =3D=3D 1'
-+        wd.wait_for_object_condition(wd, condition)
++		len =3D write(fd, decrypted, len);
 +
-+        # IWD should still encrypt the profile automatically
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
++		close(fd);
 +
-+        # This should fail
-+        with self.assertRaises(iwd.FailedEx):
-+            self.validate(wd)
++		if (len < 0) {
++			printf("Unable to write to %s (%ld)\n", outfile, len);
++			goto failed;
++		}
++	}
 +
-+        psk_agent =3D PSKAgent("secret123")
-+        wd.register_psk_agent(psk_agent)
++	ret =3D EXIT_SUCCESS;
 +
-+        self.validate(wd)
++usage:
++	if (ret !=3D EXIT_SUCCESS)
++		usage();
 +
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+    # Tests that a profile that doesn't decrypt wont become a known network
-+    def test_decryption_failure(self):
-+        bad_config =3D \
-+'''
-+[Security]
-+EncryptedSalt=3D000102030405060708090a0b0c0d0e0f
-+EncryptedSecurity=3Daabbccddeeff00112233445566778899
-+'''
-+        os.system('echo "%s" > /tmp/iwd/ssidCCMP.psk' % bad_config)
-+
-+        wd =3D IWD(True)
-+
-+        self.assertEqual(wd.list_known_networks(), [])
-+
-+    def test_runtime_profile(self):
-+        wd =3D IWD(True)
-+
-+        self.assertEqual(wd.list_known_networks(), [])
-+
-+        # Add profile after IWD starts
-+        IWD.copy_to_storage('ssidCCMP.psk')
-+
-+        self.validate(wd)
-+
-+        # Should now be encrypted
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+        with open('/tmp/iwd/ssidCCMP.psk') as f:
-+            profile =3D f.read()
-+
-+        # Edit the profile, corrupting it
-+        profile.replace('EncryptedSecurity=3D', 'EncryptedSecurity=3D00')
-+
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+    def tearDown(self):
-+        IWD.clear_storage()
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        os.environ['CREDENTIALS_DIRECTORY'] =3D '/tmp'
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
-diff --git a/autotests/testEncryptedProfiles/hw.conf b/autotests/testEncryp=
-tedProfiles/hw.conf
-new file mode 100644
-index 00000000..de81e1e2
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/hw.conf
-@@ -0,0 +1,6 @@
-+[SETUP]
-+num_radios=3D2
-+start_iwd=3D0
-+
-+[HOSTAPD]
-+rad0=3DssidCCMP.conf
-diff --git a/autotests/testEncryptedProfiles/iwd-secret b/autotests/testEnc=
-ryptedProfiles/iwd-secret
-new file mode 100644
-index 00000000..c2afca48
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/iwd-secret
-@@ -0,0 +1 @@
-+secret123
-diff --git a/autotests/testEncryptedProfiles/main.conf b/autotests/testEncr=
-yptedProfiles/main.conf
-new file mode 100644
-index 00000000..35d40c5e
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/main.conf
-@@ -0,0 +1,2 @@
-+[General]
-+SystemdEncrypt=3Diwd-secret
-diff --git a/autotests/testEncryptedProfiles/ssidCCMP.conf b/autotests/test=
-EncryptedProfiles/ssidCCMP.conf
-new file mode 100644
-index 00000000..c79f5e55
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/ssidCCMP.conf
-@@ -0,0 +1,10 @@
-+hw_mode=3Dg
-+channel=3D1
-+ssid=3DssidCCMP
-+
-+wpa=3D2
-+wpa_pairwise=3DCCMP
-+wpa_passphrase=3Dsecret123
-+
-+ieee80211w=3D2
-+wpa_key_mgmt=3DWPA-PSK-SHA256
-diff --git a/autotests/testEncryptedProfiles/ssidCCMP.psk b/autotests/testE=
-ncryptedProfiles/ssidCCMP.psk
-new file mode 100644
-index 00000000..abafdb66
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/ssidCCMP.psk
-@@ -0,0 +1,2 @@
-+[Security]
-+Passphrase=3Dsecret123
++failed:
++	return ret;
++}
 -- =
 
 2.34.1
 
---===============3438018469255815926==--
+--===============3644168449319090702==--
 
