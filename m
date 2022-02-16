@@ -1,43 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============8172608498853452947=="
+Content-Type: multipart/mixed; boundary="===============6582068670468394902=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/2] dpp: zero nonces/keys on dpp_reset
-Date: Wed, 22 Dec 2021 15:00:16 -0800
-Message-ID: <20211222230017.12587-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v3 02/10] dpp-util: add URI parsing
+Date: Wed, 16 Feb 2022 16:20:15 -0600
+Message-ID: <580b75e8-a75a-d6e1-8c68-d47de7005f5f@gmail.com>
+In-Reply-To: 912a107f64ac9178ac20bb5e1701dbaf95eeb083.camel@gmail.com
 
---===============8172608498853452947==
+--===============6582068670468394902==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/dpp.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi James,
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 48343445..941c3f07 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -163,6 +163,12 @@ static void dpp_reset(struct dpp_sm *dpp)
- =
+On 2/16/22 14:39, James Prestwood wrote:
+> Hi Denis,
+> =
 
- 	dpp->state =3D DPP_STATE_NOTHING;
- =
+> <snip>
+>>> + */
+>>> +struct dpp_uri_info *dpp_parse_uri(const char *uri)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct dpp_uri_info *info;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *pos =3D uri;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *end =3D uri + st=
+rlen(uri) - 1;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int ret =3D 0;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (strncmp(pos, "DPP:", 4))
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0return NULL;
+>>
+>> strncmp?=C2=A0 If the string has already been validated to be a valid
+>> string, then
+>> strcmp is probably just fine.
+> =
 
-+	explicit_bzero(dpp->r_nonce, dpp->nonce_len);
-+	explicit_bzero(dpp->i_nonce, dpp->nonce_len);
-+	explicit_bzero(dpp->e_nonce, dpp->nonce_len);
-+	explicit_bzero(dpp->ke, dpp->key_len);
-+	explicit_bzero(dpp->k2, dpp->key_len);
-+
- 	dpp_free_auth_data(dpp);
- }
- =
+> Since we're only checking a substring of 'pos' (that the first 4
+> characters are DPP:) strncmp is needed.
 
--- =
+Ah yes, ignore that comment.
 
-2.31.1
+Do note that l_str_has_prefix() exists, so that might be even nicer to use =
+here.
 
---===============8172608498853452947==--
+>>
+>> Unclear here?
+> =
+
+> This one is tricky because l_base64_decode doesn't give back the number
+> of characters consumed... Maybe l_base64_decode should fail if the
+> bytes consumed !=3D length? I don't see any such checks in there.
+> =
+
+
+Yes, we probably should.
+
+Regards,
+-Denis
+--===============6582068670468394902==--
 
