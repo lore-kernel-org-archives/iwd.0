@@ -1,27 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============4023419180248474185=="
+Content-Type: multipart/mixed; boundary="===============6130263344237456009=="
 MIME-Version: 1.0
-From: Paul Menzel <pmenzel at molgen.mpg.de>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2] offchannel: introduce new offchannel module
-Date: Tue, 30 Nov 2021 23:06:16 +0100
-Message-ID: <2d3972a1-04c9-a5b2-187a-c961742c5753@molgen.mpg.de>
-In-Reply-To: 20211130214937.470466-1-prestwoj@gmail.com
+Subject: Re: [PATCH 1/2] tools: add decrypt-profile tool
+Date: Wed, 16 Feb 2022 16:12:01 -0600
+Message-ID: <36fabee1-25d2-b0aa-6496-071b4e238a9e@gmail.com>
+In-Reply-To: 20220216002826.1361879-1-prestwoj@gmail.com
 
---===============4023419180248474185==
+--===============6130263344237456009==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear James,
+Hi James,
+
+On 2/15/22 18:28, James Prestwood wrote:
+> This tool will decrypt an IWD network profile which was previously
+> encrypted using a systemd provided key. Either a text passphrase
+> can be provided (--pass) or a file containing the secret (--file).
+> =
+
+> This can be useful for debugging, or recovering an encrypted
+> profile after enabling SystemdEncrypt.
+> ---
+>   Makefile.am                 |   8 +-
+>   tools/iwd-decrypt-profile.c | 213 ++++++++++++++++++++++++++++++++++++
+>   2 files changed, 220 insertions(+), 1 deletion(-)
+>   create mode 100644 tools/iwd-decrypt-profile.c
+> =
 
 
-Thank you for writing this great commit message, helping me understand, =
+Both applied, thanks.
 
-what the module does.
+Regards,
+-Denis
 
-
-Kind regards,
-
-Paul
---===============4023419180248474185==--
+--===============6130263344237456009==--
 
