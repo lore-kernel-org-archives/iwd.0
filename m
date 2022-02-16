@@ -1,56 +1,85 @@
-Content-Type: multipart/mixed; boundary="===============5893833998732824809=="
+Content-Type: multipart/mixed; boundary="===============6611382156486516042=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 1/2] hwsim: allow concurrent radio creations
-Date: Tue, 15 Feb 2022 13:40:58 -0600
-Message-ID: <6831ecc0-9251-339e-856b-d9d2ac9d669f@gmail.com>
-In-Reply-To: 556a79f1b541f77dc4a7b147935b216170425b49.camel@gmail.com
+Subject: [PATCH v3 2/2] auto-t: hwsim.py: support async radio creation
+Date: Wed, 16 Feb 2022 11:39:43 -0800
+Message-ID: <20220216193943.1411659-2-prestwoj@gmail.com>
+In-Reply-To: 20220216193943.1411659-1-prestwoj@gmail.com
 
---===============5893833998732824809==
+--===============6611382156486516042==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Adds a new wait argument which, if false, will call the DBus method
+and return immediately. This allows the caller to create multiple
+radios very quickly, simulating (as close as we can) a wifi card
+with dual phy's which appear in the kernel simultaneously.
 
-On 2/15/22 13:16, James Prestwood wrote:
-> Hi Denis,
-> =
+The name argument was also changed to be mandatory, which is now
+required by hwsim.
+---
+ autotests/util/hwsim.py | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
->>
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (!rec)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0return;
->>
->> This part seems suspicious.=C2=A0 What if the radio is being created
->> outside hwsim?
-> =
+diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
+index 34859910..ce85f43d 100755
+--- a/autotests/util/hwsim.py
++++ b/autotests/util/hwsim.py
+@@ -309,26 +309,35 @@ class RadioList(collections.Mapping):
+     def _interfaces_removed_handler(self, path, interfaces):
+         del _dict[path]
+ =
 
-> I guess this is changing behavior... Currently we would still create
-> the radio info object if the radio was created externally. Keeping this
-> behavior will end up requiring creating the radio here and in
-> CreateRadio(), nearly the same as what we had before.
-> =
+-    def create(self, name=3DNone, p2p_device=3DFalse, iftype_disable=3DNon=
+e,
+-                cipher_disable=3DNone):
++    def create(self, name, p2p_device=3DFalse, iftype_disable=3DNone,
++                cipher_disable=3DNone, wait=3DTrue):
+         args =3D dbus.Dictionary({
++            'Name': name,
+             'P2P': p2p_device,
+         }, signature=3D'sv')
+ =
 
+-        if name:
+-            args['Name'] =3D name
+-
+         if iftype_disable:
+             args['InterfaceTypeDisable'] =3D iftype_disable
+ =
 
-CreateRadio really only creates a stub.  What is there to duplicate besides =
+         if cipher_disable:
+             args['CipherTypeDisable'] =3D cipher_disable
+ =
 
-l_new and setting the name/id?
++        if not wait:
++            self._radio_manager.CreateRadio(args, reply_handler=3Dself._su=
+ccess,
++                                                error_handler=3Dself._fail=
+ure)
++            return None
++
+         path =3D self._radio_manager.CreateRadio(args)
+         obj =3D Radio(path)
+         self._dict[path] =3D obj
+         return obj
+ =
 
-> I guess its up to you. Either we don't support external radio creation
-> for cleaner code, or we go back to the way it was (or some variant of
-> it).
-> =
++    def _success(self, bla):
++        pass
++
++    def _failure(self, ex):
++        pass
++
+ class Hwsim(iwd.AsyncOpAbstract):
+     _instances =3D WeakValueDictionary()
+ =
 
+-- =
 
-Clearly we want to support this since hwsim might start with radios already =
+2.34.1
 
-created and this path is being used by the initial radio dump (started in =
-
-hwsim_ready).
-
-Regards,
--Denis
---===============5893833998732824809==--
+--===============6611382156486516042==--
 
