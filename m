@@ -1,68 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============1769397800079558891=="
+Content-Type: multipart/mixed; boundary="===============8349182021166316799=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/7] tools: add some required options to kernel config
-Date: Wed, 30 Mar 2022 13:23:09 -0700
-Message-ID: <20220330202315.1881335-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v3 04/10] frame-xchg: allow multicast frame watches
+Date: Thu, 17 Feb 2022 16:47:23 +0100
+Message-ID: <CAOq732Jze4EpHz+hVs325D5u7ORp=Pno1hf0GDgzxxdP6iJTEA@mail.gmail.com>
+In-Reply-To: c53f2941ef60b35232352b24d3ffde2d01ab10b1.camel@gmail.com
 
---===============1769397800079558891==
+--===============8349182021166316799==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-It looks like some architectures defconfig were adding these in
-automatically, but not others. Explicitly add these to make sure
-the kernel is built correctly.
----
- tools/test_runner_kernel_config | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Hi James,
 
-diff --git a/tools/test_runner_kernel_config b/tools/test_runner_kernel_con=
-fig
-index 64674683..c3e65d34 100755
---- a/tools/test_runner_kernel_config
-+++ b/tools/test_runner_kernel_config
-@@ -1,8 +1,12 @@
- #! /bin/sh
- =
+On Wed, 16 Feb 2022 at 22:05, James Prestwood <prestwoj(a)gmail.com> wrote:
+> On Tue, 2022-02-15 at 00:28 +0100, Andrew Zaborowski wrote:
+> > It may be easier to always set the flag in the REGISTER_FRAMEs and
+> > check whether the received frame was multicast before calling the
+> > frame callback.  In that case the multicast flag can be set on a
+> > watch
+> > in a separate call, after frame_watch_add.
+>
+> So have frame_watch_set_multicast_allowed() act on entire groups rather
+> than individual watches? I don't see any other way for it to work at
+> least.
 
-+scripts/config --enable CONFIG_CFG80211
-+scripts/config --enable CONFIG_MAC80211
- scripts/config --enable CONFIG_MAC80211_HWSIM
- scripts/config --enable CONFIG_NLMON
- scripts/config --enable CONFIG_VLAN_8021Q
-+scripts/config --enable CONFIG_RFKILL
-+scripts/config --enable CONFIG_IPV6
- =
+That's a good idea too.  I was thinking, since frame_watch_add()
+returns no watch ID, that you'd either pass the same set of arguments
+to frame_watch_set_multicast_allowed() that you passed to
+frame_watch_add() to identify the watch, or do
+frame_watch_set_multicast_by_handler (similar to
+frame_watch_remove_by_handler).
 
- scripts/config --enable CONFIG_EXPERT
- scripts/config --enable CONFIG_CFG80211_CERTIFICATION_ONUS
-@@ -16,14 +20,21 @@ scripts/config --enable CONFIG_CRYPTO_RSA
- scripts/config --enable CONFIG_CRYPTO_AES_X86_64
- scripts/config --enable CONFIG_CRYPTO_AES_NI_INTEL
- scripts/config --enable CONFIG_CRYPTO_MD4
-+scripts/config --enable CONFIG_CRYPTO_MD5
-+scripts/config --enable CONFIG_CRYPTO_SHA1
-+scripts/config --enable CONFIG_CRYPTO_SHA256
-+scripts/config --enable CONFIG_CRYPTO_SHA512
- scripts/config --enable CONFIG_CRYPTO_SHA1_SSSE3
- scripts/config --enable CONFIG_CRYPTO_SHA256_SSSE3
- scripts/config --enable CONFIG_CRYPTO_SHA512_SSSE3
- scripts/config --enable CONFIG_CRYPTO_ECB
-+scripts/config --enable CONFIG_CRYPTO_CBC
- scripts/config --enable CONFIG_CRYPTO_CMAC
- scripts/config --enable CONFIG_CRYPTO_DES
- scripts/config --enable CONFIG_CRYPTO_DES3_EDE_X86_64
- scripts/config --enable CONFIG_CRYPTO_ARC4
-+scripts/config --enable CONFIG_CRYPTO_HMAC
-+scripts/config --enable CONFIG_KEYS
- scripts/config --enable CONFIG_KEY_DH_OPERATIONS
- scripts/config --enable CONFIG_ASYMMETRIC_KEY_TYPE
- scripts/config --enable CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE
--- =
+> And I'm not sure we want to do this for group 0 since it could
+> impact other modules.
 
-2.34.1
+Right.
 
---===============1769397800079558891==--
+>
+> Maybe also we should start using non-zero groups, i.e. each module
+> (DPP, P2P, ANQP etc.) use their own group number? Just an idea. Maybe
+> this is what was intended all along but at least I haven't been doing
+> that :)
+
+So the idea was to create groups for watches that may need to be
+removed before the interface is removed or has its iftype changed
+(those events implicitly discard watches) but it might also be useful
+to do for this multicast feature.
+
+Best regards
+--===============8349182021166316799==--
 
