@@ -1,85 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============2098142766252233218=="
+Content-Type: multipart/mixed; boundary="===============7659777673641595977=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 09/10] auto-t: cleanup the few uses of is_verbose
-Date: Wed, 06 Apr 2022 12:14:52 -0700
-Message-ID: <20220406191453.978426-9-prestwoj@gmail.com>
-In-Reply-To: 20220406191453.978426-1-prestwoj@gmail.com
+Subject: Re: [PATCH v3 04/10] frame-xchg: allow multicast frame watches
+Date: Thu, 17 Feb 2022 08:37:50 -0800
+Message-ID: <e1a16c74abefb772c7b7bd57cd3033cc543872ea.camel@gmail.com>
+In-Reply-To: CAOq732Jze4EpHz+hVs325D5u7ORp=Pno1hf0GDgzxxdP6iJTEA@mail.gmail.com
 
---===============2098142766252233218==
+--===============7659777673641595977==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-These were used outside of run-tests in a couple places. Replace
-these with Process.is_verbose()
----
- autotests/testP2P/connection_test.py | 4 +++-
- autotests/util/wpas.py               | 5 ++++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+Hi Andrew,
 
-diff --git a/autotests/testP2P/connection_test.py b/autotests/testP2P/conne=
-ction_test.py
-index d1681164..f22f0682 100644
---- a/autotests/testP2P/connection_test.py
-+++ b/autotests/testP2P/connection_test.py
-@@ -11,6 +11,8 @@ import testutil
- from config import ctx
- from wpas import Wpas
- =
+On Thu, 2022-02-17 at 16:47 +0100, Andrew Zaborowski wrote:
+> Hi James,
+> =
 
-+from utils import Process
-+
- class Test(unittest.TestCase):
-     leases_path =3D '/tmp/dhcp.lease'
- =
+> On Wed, 16 Feb 2022 at 22:05, James Prestwood <prestwoj(a)gmail.com>
+> wrote:
+> > On Tue, 2022-02-15 at 00:28 +0100, Andrew Zaborowski wrote:
+> > > It may be easier to always set the flag in the REGISTER_FRAMEs
+> > > and
+> > > check whether the received frame was multicast before calling the
+> > > frame callback.=C2=A0 In that case the multicast flag can be set on a
+> > > watch
+> > > in a separate call, after frame_watch_add.
+> > =
 
-@@ -110,7 +112,7 @@ class Test(unittest.TestCase):
-             self.assertEqual(wpas.p2p_group['go_ip_addr'], '192.168.1.1')
- =
+> > So have frame_watch_set_multicast_allowed() act on entire groups
+> > rather
+> > than individual watches? I don't see any other way for it to work
+> > at
+> > least.
+> =
 
-             extra_params =3D []
--            if ctx.is_verbose('dhclient'):
-+            if Process.is_verbose('dhclient'):
-                 extra_params.append('-v')
- =
+> That's a good idea too.=C2=A0 I was thinking, since frame_watch_add()
+> returns no watch ID, that you'd either pass the same set of arguments
+> to frame_watch_set_multicast_allowed() that you passed to
+> frame_watch_add() to identify the watch, or do
+> frame_watch_set_multicast_by_handler (similar to
+> frame_watch_remove_by_handler).
 
-             dhcp =3D ctx.start_process(['dhclient', '-d', '--no-pid', '-cf=
-', '/dev/null', '-lf', self.leases_path,
-diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-index 995bdad1..67b32d5f 100644
---- a/autotests/util/wpas.py
-+++ b/autotests/util/wpas.py
-@@ -3,8 +3,11 @@ import os
- import socket
- from gi.repository import GLib
- from config import ctx
-+
- import binascii
- =
+Doing it by handler seems kinda weird for an exposed API, I would
+rather do it by group for simplicity. And for any module that needs
+multicast we just use a unique group.
 
-+from utils import Process
-+
- ctrl_count =3D 0
- =
+Another option could be to return the watchlist ID from
+frame_watch_add, and something like watchlist_item_find(). Besides the
+few places that check the return I don't think this would be too
+intrusive.
 
- class Wpas:
-@@ -31,7 +34,7 @@ class Wpas:
-         self.io_watch =3D None
- =
+> =
 
-         cmd =3D ['wpa_supplicant', '-i', self.interface.name, '-c', self.c=
-onfig_path]
--        if ctx.is_verbose('wpa_supplicant-dbg'):
-+        if Process.is_verbose('wpa_supplicant-dbg'):
-             cmd +=3D ['-d']
- =
+> > And I'm not sure we want to do this for group 0 since it could
+> > impact other modules.
+> =
 
-         self.wpa_supplicant =3D ctx.start_process(cmd)
--- =
+> Right.
+> =
 
-2.34.1
+> > =
 
---===============2098142766252233218==--
+> > Maybe also we should start using non-zero groups, i.e. each module
+> > (DPP, P2P, ANQP etc.) use their own group number? Just an idea.
+> > Maybe
+> > this is what was intended all along but at least I haven't been
+> > doing
+> > that :)
+> =
+
+> So the idea was to create groups for watches that may need to be
+> removed before the interface is removed or has its iftype changed
+> (those events implicitly discard watches) but it might also be useful
+> to do for this multicast feature.
+> =
+
+> Best regards
+
+
+--===============7659777673641595977==--
 
