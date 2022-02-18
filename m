@@ -1,36 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============3388656726807733069=="
+Content-Type: multipart/mixed; boundary="===============1294002696067627529=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 07/13] station: network: make ANQP watch a generic event
-Date: Wed, 15 Sep 2021 15:49:47 -0500
-Message-ID: <9c912302-4760-0157-2e32-d13454d73f6f@gmail.com>
-In-Reply-To: 20210915173624.11917-7-prestwoj@gmail.com
+Subject: [PATCH v4 9/9] doc: document DPP ConfigureEnrollee()
+Date: Fri, 18 Feb 2022 11:31:34 -0800
+Message-ID: <20220218193134.2143232-9-prestwoj@gmail.com>
+In-Reply-To: 20220218193134.2143232-1-prestwoj@gmail.com
 
---===============3388656726807733069==
+--===============1294002696067627529==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ doc/device-provisioning-api.txt | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-On 9/15/21 12:36 PM, James Prestwood wrote:
-> With the addition of OWE transition network needs to be notified
-> of the hidden OWE scan which is quite similar to how it is notified
-> of ANQP. The ANQP event watch can be made generic and reused to
-> allow other events besides ANQP.
-> ---
->   src/network.c | 15 ++++++++-------
->   src/station.c | 22 +++++++++++-----------
->   src/station.h | 12 ++++++------
->   3 files changed, 25 insertions(+), 24 deletions(-)
-> =
+diff --git a/doc/device-provisioning-api.txt b/doc/device-provisioning-api.=
+txt
+index bf54c5fe..529aeeb0 100644
+--- a/doc/device-provisioning-api.txt
++++ b/doc/device-provisioning-api.txt
+@@ -37,3 +37,19 @@ Methods		string StartEnrollee()
+ 						net.connman.iwd.NotConfigured
+ 						net.connman.iwd.NotSupported
+ 						net.connman.iwd.Busy
++
++		string ConfigureEnrollee(string uri)
++
++			Start a DPP configurator with an enrollees URI.
++			Ultimately the configuration itself remains the same as
++			StartConfigurator(). This API is to handle the use case
++			where the enrollee has shared its URI to IWD.
++
++			The URI for IWD is also returned which could be used
++			in the same way as it is with StartConfigurator().
++
++			Possible errors:	net.connman.iwd.NotAvailable
++						net.connman.iwd.NotConnected
++						net.connman.iwd.NotConfigured
++						net.connman.iwd.NotSupported
++						net.connman.iwd.Busy
+-- =
 
+2.34.1
 
-Patches 7, 8 and 10 applied, thanks.
-
-Regards,
--Denis
-
---===============3388656726807733069==--
+--===============1294002696067627529==--
 
