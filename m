@@ -1,34 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============6174858987071716836=="
+Content-Type: multipart/mixed; boundary="===============6192905022998432010=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 4/4] auto-t: add OCV to testSAQuery-spoofing
-Date: Mon, 18 Oct 2021 15:33:59 -0700
-Message-ID: <20211018223359.497849-4-prestwoj@gmail.com>
-In-Reply-To: 20211018223359.497849-1-prestwoj@gmail.com
+Subject: Re: [PATCH 2/3] main: remove unneeded stat call
+Date: Fri, 18 Feb 2022 14:46:32 -0600
+Message-ID: <4434da13-2ab1-2231-9535-dddbca6e734a@gmail.com>
+In-Reply-To: 20220218195506.2145602-2-prestwoj@gmail.com
 
---===============6174858987071716836==
+--===============6192905022998432010==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- autotests/testSAQuery-spoofing/ssidCCMP.conf | 1 +
- 1 file changed, 1 insertion(+)
+Hi James,
 
-diff --git a/autotests/testSAQuery-spoofing/ssidCCMP.conf b/autotests/testS=
-AQuery-spoofing/ssidCCMP.conf
-index 517083bf..0b70c3df 100644
---- a/autotests/testSAQuery-spoofing/ssidCCMP.conf
-+++ b/autotests/testSAQuery-spoofing/ssidCCMP.conf
-@@ -9,3 +9,4 @@ wpa_passphrase=3Dsecret123
- ieee80211w=3D2
- wpa_key_mgmt=3DWPA-PSK-SHA256
- beacon_int=3D10
-+ocv=3D1
--- =
+On 2/18/22 13:55, James Prestwood wrote:
+> Static analysis flagged that 'path' was never being checked (which
+> should not ever be NULL) but during that review I noticed stat()
+> was being called, then fstat afterwards.
+> ---
+>   src/main.c | 5 +----
+>   1 file changed, 1 insertion(+), 4 deletions(-)
+> =
 
-2.31.1
+> diff --git a/src/main.c b/src/main.c
+> index 7a378b64..d790f61f 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -428,11 +428,8 @@ static bool setup_system_key(void)
+>   	}
+>   =
 
---===============6174858987071716836==--
+>   	path =3D l_strdup_printf("%s/%s", cred_dir, key_id);
+> -
+> -	if (stat(path, &st) < 0) {
+> -		l_warn("SystemdEncrypt: Could not stat %s", path);
+> +	if (!path)
+>   		return false;
+
+l_strdup_printf doesn't fail, so I removed this if as well.
+
+> -	}
+>   =
+
+>   	fd =3D open(path, O_RDONLY, 0);
+>   	if (fd < 0) {
+> =
+
+
+Applied, thanks.
+
+Regards,
+-Denis
+--===============6192905022998432010==--
 
