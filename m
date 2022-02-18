@@ -1,67 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============8372677776166310574=="
+Content-Type: multipart/mixed; boundary="===============3800885731983818158=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459 at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
-Date: Tue, 17 May 2022 18:05:17 +0100
-Message-ID: <20220517170518.144626-1-mjohnson459@gmail.com>
+Subject: [PATCH v4 6/9] auto-t: wpas.py: allow arbitrary events to be handled
+Date: Fri, 18 Feb 2022 11:31:31 -0800
+Message-ID: <20220218193134.2143232-6-prestwoj@gmail.com>
+In-Reply-To: 20220218193134.2143232-1-prestwoj@gmail.com
 
---===============8372677776166310574==
+--===============3800885731983818158==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Allows granularly specifying the DHCP logging level. This allows the
-user to tailor the output to what they need. By default always display
-errors and warnings.
+If an event is in response to some command which is returning an
+unexpected value (unexpected with respect to wpas.py) handle_eow
+would raise an exception.
 
-1 =3D INFO
-2 =3D DEBUG
+Specifically with DPP this was being hit when the URI was being
+returned.
 ---
- src/netconfig.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ autotests/util/wpas.py | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/src/netconfig.c b/src/netconfig.c
-index 6694a0e9..7dd35b2f 100644
---- a/src/netconfig.c
-+++ b/src/netconfig.c
-@@ -1621,6 +1621,8 @@ struct netconfig *netconfig_new(uint32_t ifindex)
- 	struct netdev *netdev =3D netdev_find(ifindex);
- 	struct netconfig *netconfig;
- 	struct l_icmp6_client *icmp6;
-+	const char *debug_level =3D NULL;
-+	int dhcp_priority =3D L_LOG_WARNING;
- =
-
- 	if (!netconfig_list)
- 		return NULL;
-@@ -1640,9 +1642,18 @@ struct netconfig *netconfig_new(uint32_t ifindex)
- 					netconfig_ipv4_dhcp_event_handler,
- 					netconfig, NULL);
- =
-
--	if (getenv("IWD_DHCP_DEBUG"))
--		l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
--							"[DHCPv4] ", NULL);
-+	debug_level =3D getenv("IWD_DHCP_DEBUG");
-+	if (debug_level !=3D NULL)
-+	{
-+		// Convert from user 1 or 2 to L_LOG_*
-+		if (*debug_level =3D=3D '1')
-+			dhcp_priority =3D L_LOG_INFO;
-+		else if (*debug_level =3D=3D '2')
-+			dhcp_priority =3D L_LOG_DEBUG;
-+	}
-+
-+	l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
-+						"[DHCPv4] ", NULL, dhcp_priority);
- =
-
- 	netconfig->dhcp6_client =3D l_dhcp6_client_new(ifindex);
- 	l_dhcp6_client_set_event_handler(netconfig->dhcp6_client,
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index 6b845232..c8e65179 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -88,8 +88,6 @@ class Wpas:
+         def handle_eow():
+             nonlocal key, value, count, event
+             if count =3D=3D 0:
+-                if key is not None or not value:
+-                    raise Exception('Bad event name')
+                 key =3D 'event'
+             elif key is None:
+                 if not value:
 -- =
 
-2.25.1
+2.34.1
 
---===============8372677776166310574==--
+--===============3800885731983818158==--
 
