@@ -1,75 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============2196857415836658035=="
+Content-Type: multipart/mixed; boundary="===============0750787690150507336=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 5/6] auto-t: wpas.py: add DPP utilities
-Date: Tue, 04 Jan 2022 10:18:56 -0800
-Message-ID: <20220104181857.103331-5-prestwoj@gmail.com>
-In-Reply-To: 20220104181857.103331-1-prestwoj@gmail.com
+Subject: [PATCH v4 7/9] auto-t: wpas.py: handle enrollee as responder
+Date: Fri, 18 Feb 2022 11:31:32 -0800
+Message-ID: <20220218193134.2143232-7-prestwoj@gmail.com>
+In-Reply-To: 20220218193134.2143232-1-prestwoj@gmail.com
 
---===============2196857415836658035==
+--===============0750787690150507336==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This adds support for wpa_supplicant to generate its own URI and
+start presence announcements (DPP_CHIRP).
 ---
- autotests/util/wpas.py | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ autotests/util/wpas.py | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-index b5b539f4..c26f116c 100644
+index c8e65179..995bdad1 100644
 --- a/autotests/util/wpas.py
 +++ b/autotests/util/wpas.py
-@@ -3,6 +3,7 @@ import os
- import socket
- from gi.repository import GLib
- from config import ctx
-+import binascii
- =
-
- ctrl_count =3D 0
- =
-
-@@ -249,6 +250,31 @@ class Wpas:
+@@ -239,10 +239,17 @@ class Wpas:
      def set(self, key, value, **kwargs):
          self._ctrl_request('SET ' + key + ' ' + value, **kwargs)
  =
 
-+    def dpp_enrollee_start(self, uri=3DNone):
-+        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode')
-+        self.wait_for_result()
+-    def dpp_enrollee_start(self, uri=3DNone):
++    def dpp_enrollee_start(self, uri=3DNone, oper_and_channel=3DNone):
++        if not oper_and_channel:
++            oper_and_channel =3D '81/1'
 +
-+        if uri:
-+            self._ctrl_request('DPP_QR_CODE ' + uri)
-+            self._dpp_qr_id =3D self.wait_for_result()
-+            self._ctrl_request('DPP_AUTH_INIT peer=3D%s role=3Denrollee' %=
- self._dpp_qr_id)
-+
-+    def dpp_configurator_create(self, uri):
-+        self._ctrl_request('DPP_CONFIGURATOR_ADD')
-+        self._dpp_conf_id =3D self.wait_for_result()
-+        self._ctrl_request('DPP_QR_CODE ' + uri)
+         self._rx_data =3D []
+-        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode')
+-        self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode chan=3D%s' % o=
+per_and_channel)
 +        self._dpp_qr_id =3D self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GET_URI %s' % self._dpp_qr_id)
++        self._dpp_uri =3D self.wait_for_result()
 +
-+        print("DPP Configurator ID: %s. DPP QR ID: %s" % (self._dpp_conf_i=
-d, self._dpp_qr_id))
++        print("DPP Enrollee QR: %s" % self._dpp_uri)
+ =
+
+         if uri:
+             self._rx_data =3D []
+@@ -250,6 +257,10 @@ class Wpas:
+             self._dpp_qr_id =3D self.wait_for_result()
+             self._rx_data =3D []
+             self._ctrl_request('DPP_AUTH_INIT peer=3D%s role=3Denrollee' %=
+ self._dpp_qr_id)
++        else:
++            self._ctrl_request('DPP_CHIRP own=3D%s iter=3D100' % self._dpp=
+_qr_id)
 +
-+    def dpp_configurator_start(self, ssid, passphrase):
-+        ssid =3D binascii.hexlify(ssid.encode()).decode()
-+        passphrase =3D binascii.hexlify(passphrase.encode()).decode()
-+
-+        self._ctrl_request('DPP_AUTH_INIT peer=3D%s conf=3Dsta-psk ssid=3D=
-%s pass=3D%s' % (self._dpp_qr_id, ssid, passphrase))
-+        self.wait_for_event('DPP-AUTH-SUCCESS')
-+        self.wait_for_event('DPP-CONF-SENT')
-+
-     # Probably needed: remove references to self so that the GC can call _=
-_del__ automatically
-     def clean_up(self):
-         if self.io_watch is not None:
++        return self._dpp_uri
+ =
+
+     def dpp_configurator_create(self, uri):
+         self._rx_data =3D []
 -- =
 
-2.31.1
+2.34.1
 
---===============2196857415836658035==--
+--===============0750787690150507336==--
 
