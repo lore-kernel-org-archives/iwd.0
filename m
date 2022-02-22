@@ -1,42 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============6869379363943760541=="
+Content-Type: multipart/mixed; boundary="===============7866575217184753936=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 14/14] rrm: use ULL for static values
-Date: Thu, 31 Mar 2022 16:16:41 -0700
-Message-ID: <20220331231641.484200-14-prestwoj@gmail.com>
-In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
+Subject: [PATCH v5 8/9] auto-t: add test for IWD as configurator + initiator
+Date: Tue, 22 Feb 2022 13:30:15 -0800
+Message-ID: <20220222213016.2429382-8-prestwoj@gmail.com>
+In-Reply-To: 20220222213016.2429382-1-prestwoj@gmail.com
 
---===============6869379363943760541==
+--===============7866575217184753936==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/rrm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ autotests/testDPP/connection_test.py | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/src/rrm.c b/src/rrm.c
-index d1c7029d..d32ffbff 100644
---- a/src/rrm.c
-+++ b/src/rrm.c
-@@ -46,9 +46,9 @@
- #include "linux/nl80211.h"
+diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
+ction_test.py
+index a451d584..b58620b8 100644
+--- a/autotests/testDPP/connection_test.py
++++ b/autotests/testDPP/connection_test.py
+@@ -82,6 +82,22 @@ class Test(unittest.TestCase):
  =
 
- /* Limit requests per second */
--#define MAX_REQUESTS_PER_SEC		2
-+#define MAX_REQUESTS_PER_SEC		2ULL
- /* Microseconds between requests */
--#define MIN_MICROS_BETWEEN_REQUESTS	(1000000 / MAX_REQUESTS_PER_SEC)
-+#define MIN_MICROS_BETWEEN_REQUESTS	(1000000ULL / MAX_REQUESTS_PER_SEC)
+         self.wpas.wait_for_event('DPP-CONF-RECEIVED')
  =
 
- /* 802.11-2016 Table 9-90 */
- #define REPORT_DETAIL_NO_FIELDS_OR_ELEMS		0
++    def test_iwd_as_configurator_initiator(self):
++        self.hapd.reload()
++        self.hapd.wait_for_event('AP-ENABLED')
++
++        IWD.copy_to_storage('ssidCCMP.psk')
++        self.device.autoconnect =3D True
++
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
++
++        uri =3D self.wpas.dpp_enrollee_start(oper_and_channel=3D'81/2')
++
++        self.device.dpp_start_configurator(uri)
++
++        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
++
+     def setUp(self):
+         self.wd =3D IWD(True)
+         self.device =3D self.wd.list_devices(1)[0]
 -- =
 
 2.34.1
 
---===============6869379363943760541==--
+--===============7866575217184753936==--
 
