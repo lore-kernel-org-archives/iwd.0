@@ -1,86 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============7235454096353079405=="
+Content-Type: multipart/mixed; boundary="===============3097891871286863813=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 8/9] unit: add arrays of objects test
-Date: Thu, 06 Jan 2022 11:50:06 -0800
-Message-ID: <20220106195007.528618-8-prestwoj@gmail.com>
-In-Reply-To: 20220106195007.528618-1-prestwoj@gmail.com
+Subject: [PATCH v7 8/9] auto-t: add test for IWD as configurator + initiator
+Date: Tue, 22 Feb 2022 14:28:46 -0800
+Message-ID: <20220222222847.2480099-8-prestwoj@gmail.com>
+In-Reply-To: 20220222222847.2480099-1-prestwoj@gmail.com
 
---===============7235454096353079405==
+--===============3097891871286863813==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- unit/test-json.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+ autotests/testDPP/connection_test.py | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/unit/test-json.c b/unit/test-json.c
-index 1a7daaff..52e3f675 100644
---- a/unit/test-json.c
-+++ b/unit/test-json.c
-@@ -315,10 +315,12 @@ static void test_json_arrays(const void *data)
- 			"\"int_array\":[-1, -2, -3, -4, -5, -6],"
- 			"\"bool_array\":[true, false, true, false],"
- 			"\"null_array\":[null, null, null, null],"
-+			"\"obj_array\":[{}, {\"key\":\"value\", \"key2\":\"value2\"}],"
- 			"\"mixed_array\":[1, -1, true, false, null]}";
+diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
+ction_test.py
+index a451d584..b58620b8 100644
+--- a/autotests/testDPP/connection_test.py
++++ b/autotests/testDPP/connection_test.py
+@@ -82,6 +82,22 @@ class Test(unittest.TestCase):
  =
 
- 	struct json_iter iter;
--	struct json_iter i_array, ui_array, b_array, n_array, m_array;
-+	struct json_iter i_array, ui_array, b_array, n_array,
-+				m_array, obj_array;
- 	struct json_contents *c =3D json_contents_new(json, strlen(json));
+         self.wpas.wait_for_event('DPP-CONF-RECEIVED')
  =
 
- 	json_iter_init(&iter, c);
-@@ -328,6 +330,7 @@ static void test_json_arrays(const void *data)
- 			JSON_MANDATORY("bool_array", JSON_ARRAY, &b_array),
- 			JSON_MANDATORY("int_array", JSON_ARRAY, &i_array),
- 			JSON_MANDATORY("uint_array", JSON_ARRAY, &ui_array),
-+			JSON_MANDATORY("obj_array", JSON_ARRAY, &obj_array),
- 			JSON_UNDEFINED));
- =
-
- 	count =3D 1;
-@@ -394,6 +397,30 @@ static void test_json_arrays(const void *data)
- 		count++;
- 	}
- =
-
-+	count =3D 0;
++    def test_iwd_as_configurator_initiator(self):
++        self.hapd.reload()
++        self.hapd.wait_for_event('AP-ENABLED')
 +
-+	while (json_iter_next(&obj_array)) {
-+		struct json_iter object;
++        IWD.copy_to_storage('ssidCCMP.psk')
++        self.device.autoconnect =3D True
 +
-+		assert(json_iter_get_type(&obj_array) =3D=3D JSON_OBJECT);
-+		assert(json_iter_get_container(&obj_array, &object));
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
 +
-+		switch (count) {
-+		case 0:
-+			assert(json_iter_parse(&object, JSON_UNDEFINED));
-+			break;
-+		case 1:
-+			assert(json_iter_parse(&object,
-+				JSON_MANDATORY("key", JSON_STRING, NULL),
-+				JSON_UNDEFINED));
-+			break;
-+		}
++        uri =3D self.wpas.dpp_enrollee_start(oper_and_channel=3D'81/2')
 +
-+		count++;
-+	}
++        self.device.dpp_start_configurator(uri)
 +
-+	assert(count =3D=3D 2);
++        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
 +
- 	json_contents_free(c);
- }
- =
-
+     def setUp(self):
+         self.wd =3D IWD(True)
+         self.device =3D self.wd.list_devices(1)[0]
 -- =
 
-2.31.1
+2.34.1
 
---===============7235454096353079405==--
+--===============3097891871286863813==--
 
