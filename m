@@ -1,72 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============3327473864077199448=="
+Content-Type: multipart/mixed; boundary="===============7173476930837281047=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: DHCP renewal stops after disconnect
-Date: Thu, 12 May 2022 11:37:59 -0500
-Message-ID: <6af01b85-1425-bf35-af59-cd8d193090ec@gmail.com>
-In-Reply-To: CACsRnHUFixRz2QhQY=3cZi2e-2cr-de6AbJNmOt-XBHiNDjyXA@mail.gmail.com
+Subject: [PATCH 7/7] doc: document access point scanning
+Date: Tue, 22 Feb 2022 14:57:18 -0800
+Message-ID: <20220222225718.2485794-7-prestwoj@gmail.com>
+In-Reply-To: 20220222225718.2485794-1-prestwoj@gmail.com
 
---===============3327473864077199448==
+--===============7173476930837281047==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+---
+ doc/access-point-api.txt | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-On 5/12/22 11:19, Michael Johnson wrote:
-> Hi Denis,
-> =
+diff --git a/doc/access-point-api.txt b/doc/access-point-api.txt
+index 68ba23c5..3f712cee 100644
+--- a/doc/access-point-api.txt
++++ b/doc/access-point-api.txt
+@@ -37,6 +37,29 @@ Methods		void Start(string ssid, string psk)
+ 						net.connman.iwd.AlreadyExists
+ 						net.connman.iwd.NotFound
+ =
 
-> I'm trying out the ell patch on some clients and so far it's looking
-> good. I also have some clients running without the patch but with
++		void Scan()
++
++			Schedule a network scan.
++
++			Possible errors:	net.connman.iwd.NotAvailable
++						net.connman.iwd.NotSupported
++						net.connman.iwd.Busy
++						net.connman.iwd.Failed
++
++		array(dict) GetOrderedNetworks()
++
++			Gets the list of networks found after scanning sorted
++			based on signal strength. Each item in the array is a
++			dictionary containing the network Name, SignalStrength,
++			and Security.
++
++			This list will expire similarly to station, and since
++			access points do not do periodic scans the list may
++			become empty after some time and requires scanning
++			again.
++
++			Possible errors:	net.connman.iwd.NotAvailable
++
+ Properties	boolean Started [readonly]
+ =
 
-Cool
+ 			Reflects whether an access point has been started.
+@@ -45,3 +68,7 @@ Properties	boolean Started [readonly]
+ =
 
-> IWD_DHCP_DEBUG enabled and I saw a very similar issue occur as the
-> original major issue >
-> This was caused by the retry timing out so wouldn't have happened with
-> the patch but the result is not what I expected in that after we do a
-> full rebind, we don't send a T1 renew. I expected that it would do a
+ 			The SSID being broadcast for a started AP (omitted if
+ 			AP has not been started)
++
++		boolean Scanning [readonly]
++
++			Reflects whether the access point is scanning.
+-- =
 
-So by a full rebind you mean:
+2.34.1
 
-May 12 15:03:45 r2-19006 iwd[475]: [DHCPv4] dhcp_client_t2_expired:607
-May 12 15:03:45 r2-19006 iwd[475]: [DHCPv4] dhcp_client_t2_expired:614 Ente=
-ring =
-
-state: DHCP_STATE_REBINDING
-May 12 15:05:01 r2-19006 iwd[475]: [DHCPv4] dhcp_client_lease_expired:596
-
-Where we issue a l_dhcp_client_stop and l_dhcp_client_start() again.
-
-> full state refresh and so it should go back to working after the T2
-> timeout.
-
-So the problem is that we do not reset the timer for T2 until after the T1 =
-timer =
-
-fires.  Each l_timeout object uses an fd from the kernel, so we try to mini=
-mize =
-
-the number of timers active.
-
-As you point out, the timeout value is getting set correctly:
-
-# T1 is set correctly
-May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] dhcp_client_rx_message:943 T1 =
-
-expiring in 299927 ms
-
-So the only thing I can think of is that we're leaking the fd somehow, whic=
-h =
-
-would be pretty embarrassing.  Or we're running out of fds and can't create=
- the =
-
-new timer.  Running under strace or putting in some extra debugs might help?
-
-Regards,
--Denis
---===============3327473864077199448==--
+--===============7173476930837281047==--
 
