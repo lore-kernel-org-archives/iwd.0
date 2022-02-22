@@ -1,45 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============4443768621857718362=="
+Content-Type: multipart/mixed; boundary="===============6473950304640686295=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 1/9] doc: add DisableOCV setting
-Date: Tue, 28 Sep 2021 08:46:50 -0700
-Message-ID: <20210928154658.2382597-1-prestwoj@gmail.com>
+Subject: [PATCH v7 7/9] auto-t: wpas.py: handle enrollee as responder
+Date: Tue, 22 Feb 2022 14:28:45 -0800
+Message-ID: <20220222222847.2480099-7-prestwoj@gmail.com>
+In-Reply-To: 20220222222847.2480099-1-prestwoj@gmail.com
 
---===============4443768621857718362==
+--===============6473950304640686295==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This adds support for wpa_supplicant to generate its own URI and
+start presence announcements (DPP_CHIRP).
 ---
- src/iwd.config.rst | 7 +++++++
- 1 file changed, 7 insertions(+)
+ autotests/util/wpas.py | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 78ec284e..5cd2b06b 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -181,6 +181,13 @@ The group ``[General]`` contains general settings.
-        off by default.  If you want to easily utilize Hotspot 2.0 networks,
-        then setting ``DisableANQP`` to ``false`` is recommended.
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index c8e65179..995bdad1 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -239,10 +239,17 @@ class Wpas:
+     def set(self, key, value, **kwargs):
+         self._ctrl_request('SET ' + key + ' ' + value, **kwargs)
  =
 
-+   * - DisableOCV
-+     - Value: **false**, true
+-    def dpp_enrollee_start(self, uri=3DNone):
++    def dpp_enrollee_start(self, uri=3DNone, oper_and_channel=3DNone):
++        if not oper_and_channel:
++            oper_and_channel =3D '81/1'
 +
-+       Disable Operating Channel Validation. Support for this is not adver=
-tised
-+       by the kernel so if kernels/drivers exist which don't support OCV i=
-t can
-+       be disabled here.
+         self._rx_data =3D []
+-        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode')
+-        self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode chan=3D%s' % o=
+per_and_channel)
++        self._dpp_qr_id =3D self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GET_URI %s' % self._dpp_qr_id)
++        self._dpp_uri =3D self.wait_for_result()
 +
- Network
- -------
++        print("DPP Enrollee QR: %s" % self._dpp_uri)
  =
 
+         if uri:
+             self._rx_data =3D []
+@@ -250,6 +257,10 @@ class Wpas:
+             self._dpp_qr_id =3D self.wait_for_result()
+             self._rx_data =3D []
+             self._ctrl_request('DPP_AUTH_INIT peer=3D%s role=3Denrollee' %=
+ self._dpp_qr_id)
++        else:
++            self._ctrl_request('DPP_CHIRP own=3D%s iter=3D100' % self._dpp=
+_qr_id)
++
++        return self._dpp_uri
+ =
+
+     def dpp_configurator_create(self, uri):
+         self._rx_data =3D []
 -- =
 
-2.31.1
+2.34.1
 
---===============4443768621857718362==--
+--===============6473950304640686295==--
 
