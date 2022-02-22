@@ -1,70 +1,198 @@
-Content-Type: multipart/mixed; boundary="===============5086226110855285568=="
+Content-Type: multipart/mixed; boundary="===============1713925474218476459=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/3] test-runner: add support for PCI passthrough
-Date: Thu, 28 Oct 2021 10:34:08 -0700
-Message-ID: <20211028173410.86074-1-prestwoj@gmail.com>
+Subject: [PATCH v5 2/9] unit: add DPP unit tests for URI parsing
+Date: Tue, 22 Feb 2022 13:30:09 -0800
+Message-ID: <20220222213016.2429382-2-prestwoj@gmail.com>
+In-Reply-To: 20220222213016.2429382-1-prestwoj@gmail.com
 
---===============5086226110855285568==
+--===============1713925474218476459==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Adding back in PCI passthrough support
 ---
- tools/test-runner | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ unit/test-dpp.c | 142 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 142 insertions(+)
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 156b36cc..6c7a7e45 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1649,6 +1649,7 @@ class Main:
+diff --git a/unit/test-dpp.c b/unit/test-dpp.c
+index bfe6f747..1803e688 100644
+--- a/unit/test-dpp.c
++++ b/unit/test-dpp.c
+@@ -33,6 +33,134 @@
+ #include "src/util.h"
+ #include "ell/useful.h"
  =
 
- 	def start(self):
- 		usb_adapters =3D None
-+		pci_adapters =3D None
++struct dpp_test_info {
++	const char *uri;
++	bool expect_fail;
++	uint32_t expected_freqs[10];
++	struct dpp_uri_info result;
++};
++
++struct dpp_test_info all_values =3D {
++	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;K:MDkw=
+EwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=
+=3D;;",
++	.result =3D {
++		.mac =3D { 0x52, 0x54, 0x00, 0x58, 0x28, 0xe5 },
++		.version =3D 2,
++	},
++	.expected_freqs =3D { 2412, 5180, 0 }
++};
++
++struct dpp_test_info no_type =3D {
++	.uri =3D "C:81/1;K:shouldnotmatter;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info empty =3D {
++	.uri =3D "DPP:",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info no_key =3D {
++	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info data_after_terminator =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0NjlkIA=3D;;C:81/1;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info single_terminator =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0NjlkIA=3D;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info no_terminator =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0NjlkIA=3D",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info bad_key =3D {
++	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
+XHWCAQIhXruVWOz0;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info unexpected_id =3D {
++	.uri =3D "DPP:Z:somedata;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoI=
+RIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++	.expect_fail =3D true
++};
++
++struct dpp_test_info bad_channels[] =3D {
++	{
++		.uri =3D "DPP:C:;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQ=
+MV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWG=
+oQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPW=
+GoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/1,;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRI=
+PWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/1,81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZo=
+IRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++	{
++		.uri =3D "DPP:C:81/1,/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIR=
+IPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
++		.expect_fail =3D true
++	},
++};
++
++static bool verify_info(const struct dpp_uri_info *parsed,
++			const struct dpp_test_info *result)
++{
++	const struct dpp_uri_info *expected =3D &result->result;
++	uint32_t i;
++
++	assert(!memcmp(parsed->mac, expected->mac, 6));
++	assert(parsed->version =3D=3D expected->version);
++	assert(parsed->boot_public !=3D NULL);
++
++	for (i =3D 0; result->expected_freqs[i]; i++)
++		assert(scan_freq_set_contains(parsed->freqs,
++						result->expected_freqs[i]));
++
++	return true;
++}
++
++static void test_uri_parse(const void *data)
++{
++	const struct dpp_test_info *test_info =3D data;
++	struct dpp_uri_info *info;
++	int ret;
++
++	info =3D dpp_parse_uri(test_info->uri);
++	if (test_info->expect_fail) {
++		assert(info =3D=3D NULL);
++		return;
++	}
++
++	assert(ret =3D=3D 0);
++
++	assert(verify_info(info, test_info));
++
++	dpp_free_uri_info(info);
++}
++
++
++static void test_bad_channels(const void *data)
++{
++	unsigned int i;
++
++	for (i =3D 0; i < L_ARRAY_SIZE(bad_channels); i++)
++		test_uri_parse(&bad_channels[i]);
++}
++
+ /*
+  * B.2 Test Vectors for DPP Authentication Using P-256 for
+  * Responder-only Authentication
+@@ -148,5 +276,19 @@ int main(int argc, char *argv[])
+ 		l_test_add("DPP test key derivation",
+ 						test_key_derivation, NULL);
  =
 
- 		qemu_table =3D [
- 			'qemu-system-x86_64',
-@@ -1691,7 +1692,7 @@ class Main:
- 		if self.args.hw:
- 			hw_conf =3D ConfigParser()
- 			hw_conf.read(self.args.hw)
--			# TODO: Parse PCI adapters
++	l_test_add("DPP URI parse", test_uri_parse, &all_values);
++	l_test_add("DPP URI no type", test_uri_parse, &no_type);
++	l_test_add("DPP URI empty", test_uri_parse, &empty);
++	l_test_add("DPP URI no key", test_uri_parse, &no_key);
++	l_test_add("DPP URI data after terminator", test_uri_parse,
++				&data_after_terminator);
++	l_test_add("DPP URI single terminator", test_uri_parse,
++				&single_terminator);
++	l_test_add("DPP URI no terminator", test_uri_parse,
++				&no_terminator);
++	l_test_add("DPP URI bad key", test_uri_parse, &bad_key);
++	l_test_add("DPP URI bad channels", test_bad_channels, &bad_channels);
++	l_test_add("DPP URI unexpected ID", test_uri_parse, &unexpected_id);
 +
- 			if hw_conf.has_section('USBAdapters'):
- 				# The actual key name of the adapter
- 				# doesn't matter since all we need is the
-@@ -1699,6 +1700,9 @@ class Main:
- 				# anyways once in the VM.
- 				usb_adapters =3D [v for v in hw_conf['USBAdapters'].values()]
- =
-
-+			if hw_conf.has_section('PCIAdapters'):
-+				pci_adapters =3D [v for v in hw_conf['PCIAdapters'].values()]
-+
- 		#
- 		# Additional arguments not provided to test-runner which are
- 		# needed once booted into the kernel.
-@@ -1828,6 +1832,11 @@ class Main:
- 							'-device',
- 							'usb-host,hostbus=3D%s,hostaddr=3D%s' % \
- 							(bus, addr)])
-+		if pci_adapters:
-+			qemu_cmdline.extend(['-enable-kvm'])
-+			for addr in pci_adapters:
-+				qemu_cmdline.extend(['-device', 'vfio-pci,host=3D%s' % addr])
-+
- 		if self.args.log:
- 			#
- 			# Creates a virtfs device that can be mounted. This mount
+ 	return l_test_run();
+ }
 -- =
 
-2.31.1
+2.34.1
 
---===============5086226110855285568==--
+--===============1713925474218476459==--
 
