@@ -1,58 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============4462554504446545935=="
+Content-Type: multipart/mixed; boundary="===============8765437982566448937=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 10/12] auto-t: hostapd.py: separate GTK and PTK rekeys
-Date: Mon, 04 Oct 2021 09:49:00 -0700
-Message-ID: <20211004164902.2274318-10-prestwoj@gmail.com>
-In-Reply-To: 20211004164902.2274318-1-prestwoj@gmail.com
+Subject: [PATCH v6 9/9] doc: document DPP ConfigureEnrollee()
+Date: Tue, 22 Feb 2022 14:02:32 -0800
+Message-ID: <20220222220232.2475972-9-prestwoj@gmail.com>
+In-Reply-To: 20220222220232.2475972-1-prestwoj@gmail.com
 
---===============4462554504446545935==
+--===============8765437982566448937==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-REKEY_GTK kicks off the GTK only handshake where REKEY_PTK does
-both (via the 4-way). The way this utility was written was causing
-hostapd some major issues since both REKEY_GTK and REKEY_PTK was
-used.
-
-Instead if address is set only do REKEY_PTK. This will also rekey
-the GTK via the 4-way handshake.
-
-If no address is set do REKEY_GTK which will only rekey the GTK.
 ---
- autotests/util/hostapd.py | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ doc/device-provisioning-api.txt | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index 9f2dc745..22802be6 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -202,11 +202,15 @@ class HostapdCLI(object):
-         cmd =3D self.cmdline + ['req_beacon', addr, request]
-         ctx.start_process(cmd).wait()
- =
-
--    def rekey(self, address):
-+    def rekey(self, address=3DNone):
-+        if address:
-+            cmd =3D 'REKEY_PTK %s' % address
-+            self.ctrl_sock.sendall(cmd.encode('utf-8'))
-+            self.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
-+            return
+diff --git a/doc/device-provisioning-api.txt b/doc/device-provisioning-api.=
+txt
+index bf54c5fe..529aeeb0 100644
+--- a/doc/device-provisioning-api.txt
++++ b/doc/device-provisioning-api.txt
+@@ -37,3 +37,19 @@ Methods		string StartEnrollee()
+ 						net.connman.iwd.NotConfigured
+ 						net.connman.iwd.NotSupported
+ 						net.connman.iwd.Busy
 +
-         cmd =3D 'REKEY_GTK'
-         self.ctrl_sock.sendall(cmd.encode('utf-8'))
--        cmd =3D 'REKEY_PTK %s' % address
--        self.ctrl_sock.sendall(cmd.encode('utf-8'))
- =
-
-     @property
-     def bssid(self):
++		string ConfigureEnrollee(string uri)
++
++			Start a DPP configurator with an enrollees URI.
++			Ultimately the configuration itself remains the same as
++			StartConfigurator(). This API is to handle the use case
++			where the enrollee has shared its URI to IWD.
++
++			The URI for IWD is also returned which could be used
++			in the same way as it is with StartConfigurator().
++
++			Possible errors:	net.connman.iwd.NotAvailable
++						net.connman.iwd.NotConnected
++						net.connman.iwd.NotConfigured
++						net.connman.iwd.NotSupported
++						net.connman.iwd.Busy
 -- =
 
-2.31.1
+2.34.1
 
---===============4462554504446545935==--
+--===============8765437982566448937==--
 
