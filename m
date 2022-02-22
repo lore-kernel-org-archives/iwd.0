@@ -1,93 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============5319004063521143472=="
+Content-Type: multipart/mixed; boundary="===============5813525051785068143=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/3] auto-t: iwd.py: remove StationDebug out of Device init
-Date: Tue, 04 Jan 2022 09:37:34 -0800
-Message-ID: <20220104173736.93682-1-prestwoj@gmail.com>
+Subject: [PATCH 4/7] scan: add support for scanning on AP interface type
+Date: Tue, 22 Feb 2022 14:57:15 -0800
+Message-ID: <20220222225718.2485794-4-prestwoj@gmail.com>
+In-Reply-To: 20220222225718.2485794-1-prestwoj@gmail.com
 
---===============5319004063521143472==
+--===============5813525051785068143==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Since a Device class can represent multiple modes (AP, AdHoc, station)
-move StationDebug out of the init and only create this class when it
-is used (presumably only when the device is in station mode).
-
-The StationDebug class is now created in a property method consistent
-with 'station_if'. If Device is not in station mode it is automatically
-switched if the test tries any StationDebug methods.
-
-If the Device mode is changed from 'station' the StationDebug class
-instance is destroyed.
+This adds a new flag, force_ap to the scan parameters. When enabled
+this will set NL80211_SCAN_FLAG_AP.
 ---
- autotests/util/iwd.py | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ src/scan.c | 4 ++++
+ src/scan.h | 1 +
+ 2 files changed, 5 insertions(+)
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index e95bd96d..7f511187 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -280,17 +280,13 @@ class Device(IWDDBusAbstract):
-     '''
-     _iface_name =3D IWD_DEVICE_INTERFACE
+diff --git a/src/scan.c b/src/scan.c
+index 12b7a3fd..01056634 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -391,6 +391,10 @@ static struct l_genl_msg *scan_build_cmd(struct scan_c=
+ontext *sc,
+ 					NL80211_EXT_FEATURE_SCAN_RANDOM_SN))
+ 		flags |=3D NL80211_SCAN_FLAG_RANDOM_SN;
  =
 
--    def __init__(self, object_path =3D None, properties =3D None,
--                    service=3DIWD_SERVICE, namespace=3Dctx):
-+    def __init__(self, *args, **kwargs):
-         self._wps_manager_if =3D None
-         self._station_if =3D None
-         self._station_props =3D None
-+        self._station_debug_obj =3D None
- =
-
--        IWDDBusAbstract.__init__(self, object_path, properties, service,
--                                    namespace)
--
--        self._station_debug =3D StationDebug(object_path=3Dobject_path,
--                                            namespace=3Dnamespace)
-+        IWDDBusAbstract.__init__(self, *args, **kwargs)
- =
-
-     @property
-     def _wps_manager(self):
-@@ -309,6 +305,17 @@ class Device(IWDDBusAbstract):
-                                             IWD_STATION_INTERFACE)
-         return self._station_if
- =
-
-+    @property
-+    def _station_debug(self):
-+        if self._properties['Mode'] !=3D 'station':
-+            self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
++	if (params->force_ap && wiphy_has_feature(sc->wiphy,
++						NL80211_FEATURE_AP_SCAN))
++		flags |=3D NL80211_SCAN_FLAG_AP;
 +
-+        if self._station_debug_obj is None:
-+            self._station_debug_obj =3D StationDebug(object_path=3Dself._o=
-bject_path,
-+                                                    namespace=3Dself._name=
-space)
-+
-+        return self._station_debug_obj
-+
-     def _station_properties(self):
-         if self._station_props is not None:
-             return self._station_props
-@@ -335,6 +342,9 @@ class Device(IWDDBusAbstract):
-             for name, value in changed.items():
-                 self._station_props[name] =3D value
+ 	if (flags)
+ 		l_genl_msg_append_attr(msg, NL80211_ATTR_SCAN_FLAGS, 4, &flags);
  =
 
-+                if name =3D=3D 'Mode' and value !=3D 'station':
-+                    self._station_debug_obj =3D None
-+
-     @property
-     def device_path(self):
-         '''
+diff --git a/src/scan.h b/src/scan.h
+index 2c401df6..7ad50e5d 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -98,6 +98,7 @@ struct scan_parameters {
+ 	bool randomize_mac_addr_hint : 1;
+ 	bool no_cck_rates : 1;
+ 	bool duration_mandatory : 1;
++	bool force_ap : 1;
+ 	const uint8_t *ssid;	/* Used for direct probe request */
+ 	size_t ssid_len;
+ 	const uint8_t *source_mac;
 -- =
 
-2.31.1
+2.34.1
 
---===============5319004063521143472==--
+--===============5813525051785068143==--
 
