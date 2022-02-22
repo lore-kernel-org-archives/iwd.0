@@ -1,55 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============0240337062866409589=="
+Content-Type: multipart/mixed; boundary="===============3958564181312005822=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v7 9/9] doc: document DPP ConfigureEnrollee()
-Date: Tue, 22 Feb 2022 14:28:47 -0800
-Message-ID: <20220222222847.2480099-9-prestwoj@gmail.com>
-In-Reply-To: 20220222222847.2480099-1-prestwoj@gmail.com
+Subject: [PATCH v6 7/9] auto-t: wpas.py: handle enrollee as responder
+Date: Tue, 22 Feb 2022 14:02:30 -0800
+Message-ID: <20220222220232.2475972-7-prestwoj@gmail.com>
+In-Reply-To: 20220222220232.2475972-1-prestwoj@gmail.com
 
---===============0240337062866409589==
+--===============3958564181312005822==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This adds support for wpa_supplicant to generate its own URI and
+start presence announcements (DPP_CHIRP).
 ---
- doc/device-provisioning-api.txt | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ autotests/util/wpas.py | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-v7:
- * Changed some wording to be more explicit
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index c8e65179..995bdad1 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -239,10 +239,17 @@ class Wpas:
+     def set(self, key, value, **kwargs):
+         self._ctrl_request('SET ' + key + ' ' + value, **kwargs)
+ =
 
-diff --git a/doc/device-provisioning-api.txt b/doc/device-provisioning-api.=
-txt
-index bf54c5fe..0aba2557 100644
---- a/doc/device-provisioning-api.txt
-+++ b/doc/device-provisioning-api.txt
-@@ -37,3 +37,22 @@ Methods		string StartEnrollee()
- 						net.connman.iwd.NotConfigured
- 						net.connman.iwd.NotSupported
- 						net.connman.iwd.Busy
+-    def dpp_enrollee_start(self, uri=3DNone):
++    def dpp_enrollee_start(self, uri=3DNone, oper_and_channel=3DNone):
++        if not oper_and_channel:
++            oper_and_channel =3D '81/1'
 +
-+		string ConfigureEnrollee(string uri)
+         self._rx_data =3D []
+-        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode')
+-        self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode chan=3D%s' % o=
+per_and_channel)
++        self._dpp_qr_id =3D self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GET_URI %s' % self._dpp_qr_id)
++        self._dpp_uri =3D self.wait_for_result()
 +
-+			Start a DPP configurator with an enrollees URI.
-+			Only connected station devices are supported and will
-+			only configure the enrollee to the currently connected
-+			network.
++        print("DPP Enrollee QR: %s" % self._dpp_uri)
+ =
+
+         if uri:
+             self._rx_data =3D []
+@@ -250,6 +257,10 @@ class Wpas:
+             self._dpp_qr_id =3D self.wait_for_result()
+             self._rx_data =3D []
+             self._ctrl_request('DPP_AUTH_INIT peer=3D%s role=3Denrollee' %=
+ self._dpp_qr_id)
++        else:
++            self._ctrl_request('DPP_CHIRP own=3D%s iter=3D100' % self._dpp=
+_qr_id)
 +
-+			This API is to handle the use case where the enrollee
-+			has shared its URI to IWD (unlike StartConfigurator)
-+
-+			The URI for IWD is also returned which could be used
-+			in the same way as it is with StartConfigurator().
-+
-+			Possible errors:	net.connman.iwd.NotAvailable
-+						net.connman.iwd.NotConnected
-+						net.connman.iwd.NotConfigured
-+						net.connman.iwd.NotSupported
-+						net.connman.iwd.Busy
++        return self._dpp_uri
+ =
+
+     def dpp_configurator_create(self, uri):
+         self._rx_data =3D []
 -- =
 
 2.34.1
 
---===============0240337062866409589==--
+--===============3958564181312005822==--
 
