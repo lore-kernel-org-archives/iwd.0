@@ -1,40 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============7722265159110149552=="
+Content-Type: multipart/mixed; boundary="===============0514515027044881731=="
 MIME-Version: 1.0
-From: Diederik de Haas <didi.debian at cknow.org>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] knownnetworks: update known frequencies maximum to 7115
-Date: Thu, 03 Mar 2022 18:59:53 +0100
-Message-ID: <7452861.j3UhPhjJgs@bagend>
-In-Reply-To: 20220303172234.3447411-1-prestwoj@gmail.com
+Subject: [PATCH v5 7/9] auto-t: wpas.py: handle enrollee as responder
+Date: Tue, 22 Feb 2022 13:30:14 -0800
+Message-ID: <20220222213016.2429382-7-prestwoj@gmail.com>
+In-Reply-To: 20220222213016.2429382-1-prestwoj@gmail.com
 
---===============7722265159110149552==
+--===============0514515027044881731==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thursday, 3 March 2022 18:22:34 CET James Prestwood wrote:
-> -               if (unlikely(errno =3D=3D ERANGE || !t || t > 6000))
-> +               if (unlikely(errno =3D=3D ERANGE || !t || t > 7115))
+This adds support for wpa_supplicant to generate its own URI and
+start presence announcements (DPP_CHIRP).
+---
+ autotests/util/wpas.py | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-Sorry if this is a dumb comment, but why use a 'magic number' [1] (which =
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index c8e65179..995bdad1 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -239,10 +239,17 @@ class Wpas:
+     def set(self, key, value, **kwargs):
+         self._ctrl_request('SET ' + key + ' ' + value, **kwargs)
+ =
 
-meaning can be derived from the git commit comment, but not when just looki=
-ng =
+-    def dpp_enrollee_start(self, uri=3DNone):
++    def dpp_enrollee_start(self, uri=3DNone, oper_and_channel=3DNone):
++        if not oper_and_channel:
++            oper_and_channel =3D '81/1'
++
+         self._rx_data =3D []
+-        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode')
+-        self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode chan=3D%s' % o=
+per_and_channel)
++        self._dpp_qr_id =3D self.wait_for_result()
++        self._ctrl_request('DPP_BOOTSTRAP_GET_URI %s' % self._dpp_qr_id)
++        self._dpp_uri =3D self.wait_for_result()
++
++        print("DPP Enrollee QR: %s" % self._dpp_uri)
+ =
 
-at the source)?
+         if uri:
+             self._rx_data =3D []
+@@ -250,6 +257,10 @@ class Wpas:
+             self._dpp_qr_id =3D self.wait_for_result()
+             self._rx_data =3D []
+             self._ctrl_request('DPP_AUTH_INIT peer=3D%s role=3Denrollee' %=
+ self._dpp_qr_id)
++        else:
++            self._ctrl_request('DPP_CHIRP own=3D%s iter=3D100' % self._dpp=
+_qr_id)
++
++        return self._dpp_uri
+ =
 
-1) https://en.wikipedia.org/wiki/Magic_number_(programming)
+     def dpp_configurator_create(self, uri):
+         self._rx_data =3D []
+-- =
 
---===============7722265159110149552==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
+2.34.1
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlIVUVBQllJQUIwV0lRVDFzVVBCWXN5R21p
-NHVzeS9YYmx2T2VIN2JiZ1VDWWlFQ0dRQUtDUkRYYmx2T2VIN2IKYm1ycUFRRE4wZWdXVUZpZzhX
-dHNqcUxac2JzWkFWaUg1eGp1MjNPd1VNaXZwcGVBalFEN0JxNmlpQllYbDRnVQpWWGhwdVdjYUdC
-aVgvb3NaZGF2SjhTZkUxa3NzSkF3PQo9M045OAotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============7722265159110149552==--
+--===============0514515027044881731==--
 
