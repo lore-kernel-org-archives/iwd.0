@@ -1,30 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============4098345907258462117=="
+Content-Type: multipart/mixed; boundary="===============4320050073569490132=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/2] dpp: unref DPP frame if sending fails
-Date: Fri, 07 Jan 2022 11:56:47 -0600
-Message-ID: <7f150a0b-aad2-704a-25e0-f8835de62242@gmail.com>
-In-Reply-To: 20220107175849.693241-1-prestwoj@gmail.com
+Subject: [PATCH v5 5/9] auto-t: iwd.py: allow passing uri to start_configurator
+Date: Tue, 22 Feb 2022 13:30:12 -0800
+Message-ID: <20220222213016.2429382-5-prestwoj@gmail.com>
+In-Reply-To: 20220222213016.2429382-1-prestwoj@gmail.com
 
---===============4098345907258462117==
+--===============4320050073569490132==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+If a URI is passed this will envoke ConfigureEnrollee()
+---
+ autotests/util/iwd.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-On 1/7/22 11:58, James Prestwood wrote:
-> ---
->   src/dpp.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> =
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 170dd96b..d6620da5 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -280,8 +280,11 @@ class DeviceProvisioning(IWDDBusAbstract):
+     def start_enrollee(self):
+         return self._iface.StartEnrollee()
+ =
 
+-    def start_configurator(self):
+-        return self._iface.StartConfigurator()
++    def start_configurator(self, uri=3DNone):
++        if uri:
++            return self._iface.ConfigureEnrollee(uri)
++        else:
++            return self._iface.StartConfigurator()
+ =
 
-Both applied, thanks.
+     def stop(self):
+         self._iface.Stop()
+@@ -668,8 +671,8 @@ class Device(IWDDBusAbstract):
+     def dpp_start_enrollee(self):
+         return self._device_provisioning.start_enrollee()
+ =
 
-Regards,
--Denis
+-    def dpp_start_configurator(self):
+-        return self._device_provisioning.start_configurator()
++    def dpp_start_configurator(self, uri=3DNone):
++        return self._device_provisioning.start_configurator(uri)
+ =
 
---===============4098345907258462117==--
+     def dpp_stop(self):
+         return self._device_provisioning.stop()
+-- =
+
+2.34.1
+
+--===============4320050073569490132==--
 
