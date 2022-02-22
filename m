@@ -1,84 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============3115069221449378612=="
+Content-Type: multipart/mixed; boundary="===============2327929467957877596=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 5/7] doc: document SystemdEncrypt
-Date: Fri, 04 Feb 2022 09:31:18 -0800
-Message-ID: <20220204173120.231730-5-prestwoj@gmail.com>
-In-Reply-To: 20220204173120.231730-1-prestwoj@gmail.com
+Subject: [PATCH 3/7] scan: check flush feature before using flag
+Date: Tue, 22 Feb 2022 14:57:14 -0800
+Message-ID: <20220222225718.2485794-3-prestwoj@gmail.com>
+In-Reply-To: 20220222225718.2485794-1-prestwoj@gmail.com
 
---===============3115069221449378612==
+--===============2327929467957877596==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- src/iwd.config.rst  | 16 ++++++++++++++++
- src/iwd.network.rst |  6 +++++-
- 2 files changed, 21 insertions(+), 1 deletion(-)
+ src/scan.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 54943702..a3d19fe5 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -188,6 +188,22 @@ The group ``[General]`` contains general settings.
-        by the kernel so if kernels/drivers exist which don't support OCV i=
-t can
-        be disabled here.
+diff --git a/src/scan.c b/src/scan.c
+index 7c510df8..12b7a3fd 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -362,7 +362,8 @@ static struct l_genl_msg *scan_build_cmd(struct scan_co=
+ntext *sc,
+ 	if (params->freqs)
+ 		scan_build_attr_scan_frequencies(msg, params->freqs);
  =
 
-+   * - SystemdEncrypt
-+     - Value: Systemd key ID
-+
-+       Enables network profile encryption using a systemd provided secret =
-key.
-+       Once enabled all PSK/8021x network profiles will be encrypted
-+       automatically. Once the profile is encrypted there is no way of goi=
-ng
-+       back using IWD alone. A tool, decrypt-profile, is provided assuming=
- the
-+       secret is known which will decrypt a profile. This decrypted profile
-+       could manually be set to /var/lib/iwd to 'undo' any profile encrypt=
-ion,
-+       but its going to be a manual process.
-+
-+       Setting up systemd to provide the secret is left up to the user as =
-IWD
-+       has no way of performing this automatically. The systemd options re=
-quired
-+       are LoadCredentialEncrypted or SetCredentialEncrypted, and the secr=
-et
-+       identifier should be named whatever SystemdEncrypt is set to.
-+
- Network
- -------
+-	if (params->flush && !ignore_flush_flag)
++	if (params->flush && !ignore_flush_flag && wiphy_has_feature(sc->wiphy,
++						NL80211_FEATURE_SCAN_FLUSH))
+ 		flags |=3D NL80211_SCAN_FLAG_FLUSH;
  =
 
-diff --git a/src/iwd.network.rst b/src/iwd.network.rst
-index e3d1a90a..34f8de1a 100644
---- a/src/iwd.network.rst
-+++ b/src/iwd.network.rst
-@@ -179,7 +179,11 @@ Network Authentication Settings
- -------------------------------
- =
-
- The group ``[Security]`` contains settings for Wi-Fi security and
--authentication configuration.
-+authentication configuration. This group can be encrypted by enabling
-+``SystemdEncrypt``, see *iwd.config* for details on this option. If this s=
-ection
-+is encrypted (only contains EncryptedSalt/EncryptedSecurity) it should not=
- be
-+modified. Modifying these values will result in the inability to connect t=
-o that
-+network.
- =
-
- .. list-table::
-    :header-rows: 0
+ 	if (!is_passive && params->randomize_mac_addr_hint &&
 -- =
 
-2.31.1
+2.34.1
 
---===============3115069221449378612==--
+--===============2327929467957877596==--
 
