@@ -1,41 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============7697083731526177474=="
+Content-Type: multipart/mixed; boundary="===============4542157314423547275=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 07/14] test-runner: don't kill dmesg after individual tests
-Date: Thu, 31 Mar 2022 16:16:34 -0700
-Message-ID: <20220331231641.484200-7-prestwoj@gmail.com>
-In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
+Subject: [PATCH v6 5/9] auto-t: iwd.py: allow passing uri to start_configurator
+Date: Tue, 22 Feb 2022 14:02:28 -0800
+Message-ID: <20220222220232.2475972-5-prestwoj@gmail.com>
+In-Reply-To: 20220222220232.2475972-1-prestwoj@gmail.com
 
---===============7697083731526177474==
+--===============4542157314423547275==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This prevents any kernel logging from being available after the first
-test is finished.
+If a URI is passed this will envoke ConfigureEnrollee()
 ---
- tools/run-tests | 3 +++
- 1 file changed, 3 insertions(+)
+ autotests/util/iwd.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/tools/run-tests b/tools/run-tests
-index e2993b1b..c4d133a6 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -186,6 +186,9 @@ class Process(subprocess.Popen):
- 	@classmethod
- 	def kill_all(cls):
- 		for p in cls.processes.values():
-+			if p.args[0] =3D=3D 'dmesg':
-+				continue
-+
- 			p.kill()
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 170dd96b..d6620da5 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -280,8 +280,11 @@ class DeviceProvisioning(IWDDBusAbstract):
+     def start_enrollee(self):
+         return self._iface.StartEnrollee()
  =
 
- 	@staticmethod
+-    def start_configurator(self):
+-        return self._iface.StartConfigurator()
++    def start_configurator(self, uri=3DNone):
++        if uri:
++            return self._iface.ConfigureEnrollee(uri)
++        else:
++            return self._iface.StartConfigurator()
+ =
+
+     def stop(self):
+         self._iface.Stop()
+@@ -668,8 +671,8 @@ class Device(IWDDBusAbstract):
+     def dpp_start_enrollee(self):
+         return self._device_provisioning.start_enrollee()
+ =
+
+-    def dpp_start_configurator(self):
+-        return self._device_provisioning.start_configurator()
++    def dpp_start_configurator(self, uri=3DNone):
++        return self._device_provisioning.start_configurator(uri)
+ =
+
+     def dpp_stop(self):
+         return self._device_provisioning.stop()
 -- =
 
 2.34.1
 
---===============7697083731526177474==--
+--===============4542157314423547275==--
 
