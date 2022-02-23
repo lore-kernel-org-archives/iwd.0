@@ -1,67 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============6413602287705463773=="
+Content-Type: multipart/mixed; boundary="===============1277854939493766629=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 1/8] ie: add ie_parse_oci
-Date: Tue, 19 Oct 2021 11:19:03 -0700
-Message-ID: <20211019181910.558043-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 7/7] doc: document access point scanning
+Date: Wed, 23 Feb 2022 12:43:31 -0600
+Message-ID: <db615d8d-a416-e3d2-ec7f-80ffdc5d1ead@gmail.com>
+In-Reply-To: 20220222225718.2485794-7-prestwoj@gmail.com
 
---===============6413602287705463773==
+--===============1277854939493766629==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a very minimal parser, more or less to put the type
-and length checks into a single location.
----
- src/ie.c | 20 ++++++++++++++++++++
- src/ie.h |  2 ++
- 2 files changed, 22 insertions(+)
+Hi James,
 
-diff --git a/src/ie.c b/src/ie.c
-index 11746c5c..a5f3cbc2 100644
---- a/src/ie.c
-+++ b/src/ie.c
-@@ -2552,3 +2552,23 @@ int ie_parse_owe_transition(const void *data, size_t=
- len,
- =
+On 2/22/22 16:57, James Prestwood wrote:
+> ---
+>   doc/access-point-api.txt | 27 +++++++++++++++++++++++++++
+>   1 file changed, 27 insertions(+)
+> =
 
- 	return 0;
- }
-+
-+int ie_parse_oci(const void *data, size_t len, const uint8_t **oci)
-+{
-+	struct ie_tlv_iter iter;
-+
-+	ie_tlv_iter_init(&iter, data, len);
-+
-+	if (!ie_tlv_iter_next(&iter))
-+		return -EMSGSIZE;
-+
-+	if (ie_tlv_iter_get_length(&iter) !=3D 3)
-+		return -EMSGSIZE;
-+
-+	if (ie_tlv_iter_get_tag(&iter) !=3D IE_TYPE_OCI)
-+		return -EPROTOTYPE;
-+
-+	*oci =3D ie_tlv_iter_get_data(&iter);
-+
-+	return 0;
-+}
-diff --git a/src/ie.h b/src/ie.h
-index f6b15abb..b122524b 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -645,3 +645,5 @@ int ie_parse_network_cost(const void *data, size_t len,
- =
 
- int ie_parse_owe_transition(const void *data, size_t len,
- 				struct ie_owe_transition_info *info);
-+
-+int ie_parse_oci(const void *data, size_t len, const uint8_t **oci);
--- =
+<snip>
 
-2.31.1
+> +		array(dict) GetOrderedNetworks()
+> +
+> +			Gets the list of networks found after scanning sorted
+> +			based on signal strength. Each item in the array is a
+> +			dictionary containing the network Name, SignalStrength,
+> +			and Security.
 
---===============6413602287705463773==--
+Security -> Type to be consistent with KnownNetwork / Network interface nam=
+ing =
+
+of the properties.
+
+> +
+> +			This list will expire similarly to station, and since
+> +			access points do not do periodic scans the list may
+> +			become empty after some time and requires scanning
+> +			again.
+
+I'm not sure what this is about?  Scan results don't actually expire in Sta=
+tion =
+
+in the sense that you can keep calling GetOrderedNetworks() forever and get=
+ the =
+
+same results, as long as scanning hasn't been performed.  Essentially if =
+
+Scanning hasn't changed, GetOrderedNetworks() results shouldn't change eith=
+er.
+
+I would expect the same behavior here?
+
+Regards,
+-Denis
+--===============1277854939493766629==--
 
