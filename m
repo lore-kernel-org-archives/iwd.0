@@ -1,41 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============0494653930758622731=="
+Content-Type: multipart/mixed; boundary="===============5911229052845339569=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Doesn't create global config file or its directory (/etc/iwd/)
-Date: Mon, 03 Jan 2022 14:34:32 -0600
-Message-ID: <376533bb-ed0b-fdc4-203d-5c62cab26132@gmail.com>
-In-Reply-To: 35676143.AJtQQQMBzY@bagend
+Subject: [PATCH] sae: define _GNU_SOURCE for reallocarray definition
+Date: Thu, 24 Feb 2022 10:00:37 -0800
+Message-ID: <20220224180037.2797609-1-prestwoj@gmail.com>
 
---===============0494653930758622731==
+--===============5911229052845339569==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Diederik,
+sae.c was failing to build on some platforms:
 
-> The Debian maintainer informed me that there isn't such a config file in =
-the
-> upstream source code and I think it would be helpful if the directory wit=
-h the
-> correct permissions and the config file, which could f.e. only contain a
-> commented reference to the iwd.config man page, would be created OOTB.
+error: implicit declaration of function 'reallocarray'; did you mean 'reall=
+oc'?
+	[-Werror=3Dimplicit-function-declaration]
+---
+ src/sae.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I added a sample doc/main.conf in commit:
-04fccea63bd4 ("doc: Add sample main.conf file").  We used to have something =
+diff --git a/src/sae.c b/src/sae.c
+index a4150628..859ec94b 100644
+--- a/src/sae.c
++++ b/src/sae.c
+@@ -24,6 +24,7 @@
+ #include <config.h>
+ #endif
+ =
 
-similar, but it was removed by commit:
-e915156be1c6 ("doc: Remove obsolete main.conf example file")
++#define _GNU_SOURCE
+ #include <stdlib.h>
+ =
 
-The sample covers main.conf options that should be most relevant towards th=
-e use =
+ #include <ell/ell.h>
+-- =
 
-case you describe.  If I missed some, we can add them as needed.  Let us kn=
-ow if =
+2.34.1
 
-this is what the Debian package maintainer had in mind.
-
-Regards,
--Denis
---===============0494653930758622731==--
+--===============5911229052845339569==--
 
