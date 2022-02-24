@@ -1,36 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============2047051797995856857=="
+Content-Type: multipart/mixed; boundary="===============3657208559100085278=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 01/13] ie: add WFA OWE Transition element type
-Date: Wed, 15 Sep 2021 10:36:12 -0700
-Message-ID: <20210915173624.11917-1-prestwoj@gmail.com>
+Subject: Re: [PATCH] tools: change print to %zd for ssize_t
+Date: Thu, 24 Feb 2022 12:15:24 -0600
+Message-ID: <8644dec1-e8d2-eb6d-2c13-2bda0aa5b68b@gmail.com>
+In-Reply-To: 20220224171207.2780029-1-prestwoj@gmail.com
 
---===============2047051797995856857==
+--===============3657208559100085278==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/ie.h | 1 +
- 1 file changed, 1 insertion(+)
+Hi James,
 
-diff --git a/src/ie.h b/src/ie.h
-index a2fdc2e3..4e1c5433 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -290,6 +290,7 @@ enum ie_type {
- enum ie_vendor_wfa_oi_type {
- 	IE_WFA_OI_HS20_INDICATION =3D 0x10,
- 	IE_WFA_OI_OSEN =3D 0x12,
-+	IE_WFA_OI_OWE_TRANSITION =3D 0x1c,
- 	IE_WFA_OI_ROAMING_SELECTION =3D 0x1d,
- };
- =
+On 2/24/22 11:12, James Prestwood wrote:
+> iwd-decrypt-profile was using %ld which isn't portable.
+> ---
+>   tools/iwd-decrypt-profile.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
--- =
 
-2.31.1
+Applied, thanks.
 
---===============2047051797995856857==--
+Regards,
+-Denis
+
+--===============3657208559100085278==--
 
