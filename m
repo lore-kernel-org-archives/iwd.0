@@ -1,30 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============6932542533372050820=="
+Content-Type: multipart/mixed; boundary="===============1479032889026771820=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 07/13] handshake: set extended key ID capable
-Date: Fri, 08 Oct 2021 08:47:43 -0500
-Message-ID: <462c5ee1-82b0-ae8e-0d73-29468352430a@gmail.com>
-In-Reply-To: 20211007204957.3745985-7-prestwoj@gmail.com
+Subject: Re: [PATCH] sae: define _GNU_SOURCE for reallocarray definition
+Date: Thu, 24 Feb 2022 12:15:42 -0600
+Message-ID: <8148f6d0-e485-74ca-b6b8-2ad3dec22d82@gmail.com>
+In-Reply-To: 20220224180037.2797609-1-prestwoj@gmail.com
 
---===============6932542533372050820==
+--===============1479032889026771820==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 10/7/21 3:49 PM, James Prestwood wrote:
-> ---
->   src/handshake.c | 1 +
->   1 file changed, 1 insertion(+)
+On 2/24/22 12:00, James Prestwood wrote:
+> sae.c was failing to build on some platforms:
 > =
 
+> error: implicit declaration of function 'reallocarray'; did you mean 'rea=
+lloc'?
+> 	[-Werror=3Dimplicit-function-declaration]
+> ---
+>   src/sae.c | 1 +
+>   1 file changed, 1 insertion(+)
 
-Applied after merging with patch 02.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============6932542533372050820==--
+--===============1479032889026771820==--
 
