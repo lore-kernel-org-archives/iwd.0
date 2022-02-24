@@ -1,75 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============4066652559614343722=="
+Content-Type: multipart/mixed; boundary="===============8091802263524645811=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] dpp-util: fix dpp_point_to_asn1 compressed type
-Date: Tue, 18 Jan 2022 08:58:46 -0800
-Message-ID: <20220118165846.1968568-1-prestwoj@gmail.com>
+Subject: [PATCH v2 1/7] scan: add scan_bss_get_security
+Date: Thu, 24 Feb 2022 09:04:54 -0800
+Message-ID: <20220224170500.2779425-1-prestwoj@gmail.com>
 
---===============4066652559614343722==
+--===============8091802263524645811==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The point type was being hard coded to 0x3 (BIT1) which may have resulted
-in the peer subtracting Y from P when reading in the point (depending on
-if Y was odd or not).
-
-Instead set the compressed type to whatever avoids the subtraction which
-both saves IWD from needing to do it, as well as the peer.
+This was already implemented in station but with no dependency on
+that module at all. AP will need this for a scanning API so its
+being moved into scan.c.
 ---
- src/dpp-util.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ src/scan.c | 17 +++++++++++++++++
+ src/scan.h |  2 ++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/src/dpp-util.c b/src/dpp-util.c
-index 048009c4..a643beb1 100644
---- a/src/dpp-util.c
-+++ b/src/dpp-util.c
-@@ -728,6 +728,7 @@ uint8_t *dpp_point_to_asn1(const struct l_ecc_point *p,=
- size_t *len_out)
- 	uint64_t x[L_ECC_MAX_DIGITS];
- 	ssize_t ret;
- 	size_t len;
-+	uint8_t point_type;
+diff --git a/src/scan.c b/src/scan.c
+index 1ab6420b..7c510df8 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -1680,6 +1680,23 @@ int scan_bss_get_rsn_info(const struct scan_bss *bss=
+, struct ie_rsn_info *info)
+ 	return 0;
+ }
  =
 
- 	switch (key_size) {
- 	case 32:
-@@ -744,6 +745,17 @@ uint8_t *dpp_point_to_asn1(const struct l_ecc_point *p=
-, size_t *len_out)
- 	if (ret < 0 || ret !=3D key_size)
- 		return NULL;
- =
-
-+	/*
-+	 * Set the type to whatever avoids doing p - y when reading in the
-+	 * key. Working backwards from l_ecc_point_from_data if Y is odd and
-+	 * the type is BIT0 there is no subtraction. Similarly if Y is even
-+	 * and the type is BIT1.
-+	 */
-+	if (l_ecc_point_y_isodd(p))
-+		point_type =3D L_ECC_POINT_TYPE_COMPRESSED_BIT0;
-+	else
-+		point_type =3D L_ECC_POINT_TYPE_COMPRESSED_BIT1;
++int scan_bss_get_security(const struct scan_bss *bss, enum security *secur=
+ity)
++{
++	int ret;
++	struct ie_rsn_info info;
 +
- 	len =3D 2 + ec_oid.asn1_len + 2 + key_type->asn1_len + 2 + key_size + 4;
++	ret =3D scan_bss_get_rsn_info(bss, &info);
++	if (ret < 0) {
++		if (ret !=3D -ENOENT)
++			return ret;
++
++		*security =3D security_determine(bss->capability, NULL);
++	} else
++		*security =3D security_determine(bss->capability, &info);
++
++	return 0;
++}
++
+ int scan_bss_rank_compare(const void *a, const void *b, void *user_data)
+ {
+ 	const struct scan_bss *new_bss =3D a, *bss =3D b;
+diff --git a/src/scan.h b/src/scan.h
+index 81cb9e46..2c401df6 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -28,6 +28,7 @@ struct p2p_probe_req;
+ struct p2p_beacon;
+ struct mmpdu_header;
+ struct wiphy;
++enum security;
  =
 
- 	if (L_WARN_ON(len > 128))
-@@ -775,7 +787,7 @@ uint8_t *dpp_point_to_asn1(const struct l_ecc_point *p,=
- size_t *len_out)
- 	*ptr++ =3D ASN1_ID_BIT_STRING;
- 	*ptr++ =3D key_size + 2;
- 	*ptr++ =3D 0x00;
--	*ptr++ =3D 0x03;
-+	*ptr++ =3D point_type;
- 	memcpy(ptr, x, key_size);
- 	ptr +=3D key_size;
+ enum scan_state {
+ 	SCAN_STATE_NOT_RUNNING,
+@@ -161,6 +162,7 @@ void scan_bss_free(struct scan_bss *bss);
+ int scan_bss_rank_compare(const void *a, const void *b, void *user);
  =
 
+ int scan_bss_get_rsn_info(const struct scan_bss *bss, struct ie_rsn_info *=
+info);
++int scan_bss_get_security(const struct scan_bss *bss, enum security *secur=
+ity);
+ =
+
+ struct scan_bss *scan_bss_new_from_probe_req(const struct mmpdu_header *mp=
+du,
+ 						const uint8_t *body,
 -- =
 
-2.31.1
+2.34.1
 
---===============4066652559614343722==--
+--===============8091802263524645811==--
 
