@@ -1,687 +1,94 @@
-Content-Type: multipart/mixed; boundary="===============3578888836721872951=="
+Content-Type: multipart/mixed; boundary="===============1872523787116912844=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: =?utf-8?q?Joakim_Lotseng=C3=A5rd_=3Cjoakim=2El_at_orbital-systems=2Ecom?=
+ =?utf-8?q?=3E?=
 To: iwd at lists.01.org
-Subject: [PATCH 2/7] test-runner: remove environment specific code
-Date: Wed, 30 Mar 2022 15:20:52 -0700
-Message-ID: <20220330222057.2160244-2-prestwoj@gmail.com>
-In-Reply-To: 20220330222057.2160244-1-prestwoj@gmail.com
+Subject: lib to iwd
+Date: Thu, 24 Feb 2022 10:08:14 +0100
+Message-ID: <CAELJiszyiCShr2DRmZ=9=PUHxcN15HtMFcQ1vTnytXd+_2PsNQ@mail.gmail.com>
 
---===============3578888836721872951==
+--===============1872523787116912844==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This removes all the Qemu/environment related code as this has been
-moved into runner.py.
----
- tools/test-runner | 506 ++--------------------------------------------
- 1 file changed, 17 insertions(+), 489 deletions(-)
+Hi,
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 81624953..c6f7f550 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1,24 +1,21 @@
- #!/usr/bin/python3
- =
+TL;DR:
+Is there any lib for iwd/iwctl (like libnm for NetworkManager) written
+in C that will scan + GetOrderNetworks + configure a SSID+passphrase.
+Goal is to configure an IoT device using a side-channel, typically
+bluetooth. If not, would iwd-project accept that we contributed such a
+work? How would you want that in such a case?
 
--import argparse
- import os
- import shutil
--import ctypes
- import fcntl
--import shlex
- import sys
- import subprocess
- import atexit
- import time
- import unittest
- import importlib
--import signal
- from unittest.result import TestResult
--import pyroute2
- import multiprocessing
- import re
- import traceback
- =
+Longer:
+I am new to iwd but I have long experience developing IoT products
+using embedded Linux with WiFi. My background and understanding of
+WiFi, routing and IP in general is rather high.
 
-+from runner import Runner
-+
- from configparser import ConfigParser
- from prettytable import PrettyTable
- from termcolor import colored
-@@ -29,19 +26,6 @@ import dbus.mainloop.glib
- from gi.repository import GLib
- from weakref import WeakValueDictionary
- =
+Today we have a rather ordinary IoT Linux-based product. It has one
+ethernet port and a WiFi-card. It's based on a DiGi module. We are
+using Bluetooth (BLE) and an app (for both Android and iPhone) to
+configure the SSID the first time. We are using wpa_supplicant +
+NetworkManager today. We have our own written daemon that talks
+bluetooth with our app, and configures the SSID+any pass via libnm for
+NetworkManager.
 
--libc =3D ctypes.cdll['libc.so.6']
--libc.mount.argtypes =3D (ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p=
-, \
--			ctypes.c_ulong, ctypes.c_char_p)
--
--# Using ctypes to load the libc library is somewhat low level. Because of =
-this
--# we need to define our own flags/options for use with mounting.
--MS_NOSUID =3D 2
--MS_NODEV =3D 4
--MS_NOEXEC =3D 8
--MS_STRICTATIME =3D 1 << 24
--STDIN_FILENO =3D 0
--TIOCSTTY =3D 0x540E
--
- config =3D None
- intf_id =3D 0
- =
+Our problem:
+WiFi works badly and we had to hack a 'wifi watchdog' to kick
+wpa_supplicant (via rfkill or even restart NetworkManager). The nmlib
+usage we have suffers from bad threading and general mischief. It got
+worse with the rewrite of the backend in libnm in 1.22. We want to
+remove both NetworkManager and wpa_supplicant and only use iwd.
+Problem is that there seems to be no corresponding "libnm" towards
+iwd. One has to implement the DBUS API, rather than just use a lib. We
+only need:
+- Scan
+- GetOrderedNetworks -> Present to user over bluetooth in an app.
+- Configure user selected SSID and passphrase (only supporting
+WPA2-PSK and possibly Open is fine).
+With iwd this is simple compared to many other solutions, but still
+not just straight forward. DBUS is "complicated". I think this is a
+very common operation many IoT devices want to do. You configure the
+single SSID over a side-channel (bluetooth typically). You want a
+single SSID configured. A lib that helps with this very exact
+operation would benefit many projects.
 
-@@ -73,14 +57,7 @@ def exit_vm():
- =
+We can't use Python. Target does not have Python. It must be in C (or
+C++) to match the other half of the daemon we have to configure WiFi
+over Bluetooth.
 
- 	os.sync()
- =
+I know DPP, but:
+We really want to use our current app and solution which is a protocol
+over bluetooth we developed ourselves. Also, iPhone does not support
+DPP. In general the DPP support out there seems poor and not really
+ready for the big masses. Please correct me if I am wrong.
 
--	RB_AUTOBOOT =3D 0x01234567
--	#
--	# Calling 'reboot' or 'shutdown' from a shell (e.g. os.system('reboot'))
--	# is not the same the POSIX reboot() and will cause a kernel panic since
--	# we are the init process. The libc.reboot() allows the VM to exit
--	# gracefully.
--	#
--	libc.reboot(RB_AUTOBOOT)
-+	runner.stop()
- =
+We only want a minor "libiwd" or "libiwctl" just like libnm that can
+configure an IoT device's SSID via a side channel. How can we do this
+the easiest and most standard way?
 
- def path_exists(path):
- 	'''
-@@ -104,38 +81,6 @@ def find_binary(list):
- 			return path
- 	return None
- =
+(QR-code: If you go to our web-site you might figure out that we do
+have a display on our device. A QR-code way if DPP might be possible.
+However, we rather do it the bluetooth way due to legacy and for
+security reasons. The device is installed in Hotels where guests have
+access. With bluetooth we can add a check of "overship".)
 
--def mount(source, target, fs, flags, options=3D''):
--	'''
--		Python wrapper for libc mount()
--	'''
--	ret =3D libc.mount(source.encode(), target.encode(), fs.encode(), flags,
--				options.encode())
--	if ret < 0:
--		errno =3D ctypes.get_errno()
--		raise Exception("Could not mount %s (%d)" % (target, errno))
--
--MountInfo =3D namedtuple('MountInfo', 'fstype target options flags')
--
--mount_table =3D [
--	MountInfo('sysfs', '/sys', '', MS_NOSUID|MS_NOEXEC|MS_NODEV),
--	MountInfo('proc', '/proc', '', MS_NOSUID|MS_NOEXEC|MS_NODEV),
--	MountInfo('devpts', '/dev/pts', 'mode=3D0620', MS_NOSUID|MS_NOEXEC),
--	MountInfo('tmpfs', '/dev/shm', 'mode=3D1777', MS_NOSUID|MS_NODEV|MS_STRIC=
-TATIME),
--	MountInfo('tmpfs', '/run', 'mode=3D0755', MS_NOSUID|MS_NODEV|MS_STRICTATI=
-ME),
--	MountInfo('tmpfs', '/tmp', '', 0),
--	MountInfo('tmpfs', '/usr/share/dbus-1', 'mode=3D0755', MS_NOSUID|MS_NOEXE=
-C|MS_NODEV|MS_STRICTATIME),
--	MountInfo('debugfs', '/sys/kernel/debug', '', 0)
--]
--
--DevInfo =3D namedtuple('DevInfo', 'target linkpath')
--
--dev_table =3D [
--	DevInfo('/proc/self/fd', '/dev/fd'),
--	DevInfo('/proc/self/fd/0', '/dev/stdin'),
--	DevInfo('/proc/self/fd/1', '/dev/stdout'),
--	DevInfo('/proc/self/fd/2', '/dev/stderr')
--]
--
- # Partial DBus config. The remainder (<listen>) will be filled in for each
- # namespace that is created so each individual dbus-daemon has its own soc=
-ket
- # and address.
-@@ -910,6 +855,8 @@ class TestContext(Namespace):
- 			self.cur_radio_id +=3D 1
- =
+Contribution:
+If there is no such lib the company I work for (Orbital Systems) might
+be willing to contribute such a work. Under any applicable license
+(LGPL?). Basically take code from iwctl and make a lib. A small lib
+focused on only getting that (single?) SSID configured. I would guess
+the lib can be expanded to cover the full DBUS API of iwd, but that is
+not our goal currently. I think there are many
+projects/devices/products out there that want to configure the SSID
+via a side-channel by code and not via iwctl. How would iwd community
+recommend this be done?
 
- 	def discover_radios(self):
-+		import pyroute2
-+
- 		phys =3D []
- =
-
- 		try:
-@@ -1129,27 +1076,6 @@ class TestContext(Namespace):
- =
-
- 		return ret
- =
-
--def prepare_sandbox():
--	print('Preparing sandbox')
--
--	for entry in mount_table:
--		try:
--			os.lstat(entry.target)
--		except:
--			os.mkdir(entry.target, 755)
--
--		mount(entry.fstype, entry.target, entry.fstype, entry.flags,
--			entry.options)
--
--	for entry in dev_table:
--		os.symlink(entry.target, entry.linkpath)
--
--	os.mkdir('/tmp/iwd')
--
--	os.setsid()
--
--	fcntl.ioctl(STDIN_FILENO, TIOCSTTY, 1)
--
- def build_unit_list(args):
- 	'''
- 		Build list of unit tests based on passed arguments. This first
-@@ -1187,11 +1113,7 @@ def build_test_list(args):
- 	test_root =3D args.testhome + '/autotests'
- =
-
- 	# Run all tests
--	if not args.auto_tests:
--		# --shell with no tests implies 'shell' test
--		if args.shell:
--			return [test_root + '/shell']
--
-+	if not args.autotests:
- 		# Get list of all autotests (committed in git)
- 		tests =3D os.popen('git -C %s ls-files autotests/ | cut -f2 -d"/" \
- 					| grep "test*" | uniq' % args.testhome).read() \
-@@ -1202,7 +1124,7 @@ def build_test_list(args):
- =
-
- 		full_list =3D sorted(os.listdir(test_root))
- =
-
--		for t in args.auto_tests.split(','):
-+		for t in args.autotests.split(','):
- 			path =3D '%s/%s' % (test_root, t)
- 			if t.endswith('+'):
- 				t =3D t.split('+')[0]
-@@ -1527,26 +1449,11 @@ def print_results(results):
- def run_auto_tests(ctx, args):
- 	tests =3D build_test_list(args)
- =
-
--	# Copy autotests/misc/{certs,secrets,phonesim} so any test can refer to t=
-hem
--	shutil.copytree(args.testhome + '/autotests/misc/certs', '/tmp/certs')
--	shutil.copytree(args.testhome + '/autotests/misc/secrets', '/tmp/secrets')
--	shutil.copy(args.testhome + '/autotests/misc/phonesim/phonesim.conf', '/t=
-mp')
--
- 	for test in tests:
- 		copied =3D []
- 		try:
- 			subtests =3D pre_test(ctx, test, copied)
- =
-
--			if args.shell:
--				#
--				# Shell really isn't meant to be used with multiple tests. If
--				# a set of tests was passed in just start out in the first.
--				#
--				os.chdir(tests[0])
--				os.environ['DBUS_SYSTEM_BUS_ADDRESS'] =3D ctx.dbus_address
--				os.system('/bin/bash')
--				sys.exit()
--
- 			if len(subtests) < 1:
- 				dbg("No tests to run")
- 				sys.exit()
-@@ -1576,11 +1483,6 @@ def run_auto_tests(ctx, args):
- 		finally:
- 			post_test(ctx, copied)
- =
-
--	shutil.rmtree('/tmp/iwd')
--	shutil.rmtree('/tmp/certs')
--	shutil.rmtree('/tmp/secrets')
--	os.remove('/tmp/phonesim.conf')
--
- def run_unit_tests(ctx, args):
- 	os.chdir(args.testhome + '/unit')
- 	units =3D build_unit_list(args)
-@@ -1592,54 +1494,10 @@ def run_unit_tests(ctx, args):
- 		else:
- 			dbg("Unit test %s passed" % os.path.basename(u))
- =
-
--def run_tests():
-+def run_tests(args):
- 	global config
- =
-
--	with open('/proc/cmdline', 'r') as f:
--		cmdline =3D f.read()
--
--	start =3D cmdline.find('--testhome')
--
--	options =3D shlex.split(cmdline[start:])
--
--	parser =3D argparse.ArgumentParser()
--	parser.add_argument('--testhome')
--	parser.add_argument('--auto_tests')
--	parser.add_argument('--unit_tests')
--	parser.add_argument('--verbose', default=3D[])
--	parser.add_argument('--debug')
--	parser.add_argument('--path')
--	parser.add_argument('--valgrind')
--	parser.add_argument('--gdb')
--	parser.add_argument('--shell')
--	parser.add_argument('--log')
--	parser.add_argument('--log-gid')
--	parser.add_argument('--log-uid')
--	parser.add_argument('--hw')
--	parser.add_argument('--monitor')
--	parser.add_argument('--sub_tests')
--	parser.add_argument('--result')
--
--	args =3D parser.parse_args(options)
--
--	#
--	# This prevents any print() calls in this script from printing unless
--	# --debug is passed. For an 'always print' option use dbg()
--	#
--	if not args.debug:
--		sys.stdout =3D open(os.devnull, 'w')
--
--	if args.verbose !=3D []:
--		args.verbose =3D args.verbose.split(',')
--
--	os.environ['PATH'] =3D '%s/src' % args.testhome
--	os.environ['PATH'] +=3D ':%s/tools' % args.testhome
--	os.environ['PATH'] +=3D ':%s/client' % args.testhome
--	os.environ['PATH'] +=3D ':%s/monitor' % args.testhome
--	os.environ['PATH'] +=3D ':%s/wired' % args.testhome
--	os.environ['PATH'] +=3D ':' + args.path
--
--	sys.path.append(args.testhome + '/autotests/util')
-+	os.chdir(args.testhome)
- =
-
- 	#
- 	# This allows all autotest utils (iwd/hostapd/etc) to access the
-@@ -1654,347 +1512,17 @@ def run_tests():
- 	config.hwsim =3D importlib.import_module('hwsim')
- 	config.hostapd =3D importlib.import_module('hostapd')
- =
-
--	if args.log:
--		mount('logdir', args.log, '9p', 0, 'trans=3Dvirtio,version=3D9p2000.L,ms=
-ize=3D10240')
--		# Clear out any log files from other test runs
--		for f in glob('%s/*' % args.log):
--			print("removing %s" % f)
--
--			if os.path.isdir(f):
--				shutil.rmtree(f)
--			else:
--				os.remove(f)
--
--		# Start writing out kernel log
--		config.ctx.start_process(["dmesg", '--follow'])
--	elif args.monitor:
--		parent =3D os.path.abspath(os.path.join(args.monitor, os.pardir))
--		mount('mondir', parent, '9p', 0, 'trans=3Dvirtio,version=3D9p2000.L,msiz=
-e=3D10240')
-+	# Start writing out kernel log
-+	config.ctx.start_process(["dmesg", '--follow'])
- =
-
--	if args.result:
--		parent =3D os.path.abspath(os.path.join(args.result, os.pardir))
--		mount('resultdir', parent, '9p', 0, 'trans=3Dvirtio,version=3D9p2000.L,m=
-size=3D10240')
--
--	if config.ctx.args.unit_tests is None:
-+	if args.unit_tests is None:
- 		run_auto_tests(config.ctx, args)
- 	else:
- 		run_unit_tests(config.ctx, args)
- =
-
--class Main:
--	def __init__(self):
--		self.parser =3D argparse.ArgumentParser(
--				description=3D'IWD Test Runner')
--
--		self.parser.add_argument('--qemu', '-q',
--				metavar=3D'<QEMU binary>', type=3Dstr,
--				help=3D'QEMU binary to use',
--				dest=3D'qemu',
--				default=3DNone)
--		self.parser.add_argument('--kernel', '-k', metavar=3D'<kernel>',
--				type=3Dstr,
--				help=3D'Path to kernel image',
--				dest=3D'kernel',
--				default=3DNone)
--		self.parser.add_argument('--verbose', '-v', metavar=3D'<list>',
--				type=3Dstr,
--				help=3D'Comma separated list of applications',
--				dest=3D'verbose',
--				default=3D[])
--		self.parser.add_argument('--debug', '-d',
--				action=3D'store_true',
--				help=3D'Enable test-runner debugging',
--				dest=3D'debug')
--		self.parser.add_argument('--shell', '-s', action=3D'store_true',
--				help=3D'Boot into shell', dest=3D'shell')
--		self.parser.add_argument('--log', '-l', type=3Dstr,
--				help=3D'Directory for log files')
--		self.parser.add_argument('--hw', '-w', type=3Dstr, nargs=3D1,
--				help=3D'Use physical adapters for tests (passthrough)')
--		self.parser.add_argument('--monitor', '-m', type=3Dstr,
--				help=3D'Enables iwmon output to file')
--		self.parser.add_argument('--sub-tests', '-S', metavar=3D'<subtests>',
--				type=3Dstr, nargs=3D1, help=3D'List of subtests to run',
--				default=3DNone, dest=3D'sub_tests')
--		self.parser.add_argument('--result', '-r', type=3Dstr,
--				help=3D'Writes PASS/FAIL to results file')
--
--		# Prevent --autotest/--unittest from being used together
--		auto_unit_group =3D self.parser.add_mutually_exclusive_group()
--		auto_unit_group.add_argument('--auto-tests', '-A',
--				metavar=3D'<tests>', type=3Dstr, nargs=3D1,
--				help=3D'List of tests to run',
--				default=3DNone,
--				dest=3D'auto_tests')
--		auto_unit_group.add_argument('--unit-tests', '-U',
--				metavar=3D'<tests>', type=3Dstr, nargs=3D'?',
--				const=3D'*',
--				help=3D'List of unit tests to run',
--				dest=3D'unit_tests')
--
--		# Prevent --valgrind/--gdb from being used together
--		valgrind_gdb_group =3D self.parser.add_mutually_exclusive_group()
--		valgrind_gdb_group.add_argument('--gdb', '-g', metavar=3D'<exec>',
--				type=3Dstr, nargs=3D1,
--				help=3D'Run gdb on specified executable',
--				dest=3D'gdb')
--		valgrind_gdb_group.add_argument('--valgrind', '-V', action=3D'store_true=
-',
--				help=3D'Run valgrind on IWD', dest=3D'valgrind')
--
--		self.args =3D self.parser.parse_args()
--
--		if self.args.auto_tests:
--			self.args.auto_tests =3D self.args.auto_tests[0].split(',')
--
--		if self.args.sub_tests:
--			self.args.sub_tests =3D self.args.sub_tests[0].split(',')
--
--		if self.args.log and self.args.unit_tests:
--			dbg("Cannot use --log with --unit-tests")
--			quit()
--
--		if self.args.sub_tests:
--			if not self.args.auto_tests:
--				dbg("--sub-tests must be used with --auto-tests")
--				quit()
--
--			if len(self.args.auto_tests) > 1:
--				dbg("--sub-tests must be used with a single auto test")
--				quit()
--
--	def start(self):
--		usb_adapters =3D None
--		pci_adapters =3D None
--
--		qemu_table =3D [
--			'qemu-system-x86_64',
--			'/usr/bin/qemu-system-x86_64'
--		]
--
--		kernel_table =3D [
--			'bzImage',
--			'arch/x86/boot/bzImage',
--			'vmlinux',
--			'arch/x86/boot/vmlinux'
--		]
--
--		if self.args.qemu is None:
--			qemu_binary =3D find_binary(qemu_table)
--			if not qemu_binary:
--				print("Could not find qemu binary")
--				quit()
--		else:
--			if path_exists(self.args.qemu):
--				qemu_binary =3D self.args.qemu
--			else:
--				print("QEMU binary %s does not exist" % \
--						self.args.qemu)
--				quit()
--
--		if self.args.kernel is None:
--			kernel_binary =3D find_binary(kernel_table)
--			if not kernel_binary:
--				print("Could not find kernel image")
--				quit()
--		else:
--			if path_exists(self.args.kernel):
--				kernel_binary =3D self.args.kernel
--			else:
--				print("Kernel image %s does not exist" % \
--						self.args.kernel)
--				quit()
--
--		if self.args.hw:
--			hw_conf =3D ConfigParser()
--			hw_conf.read(self.args.hw)
--
--			if hw_conf.has_section('USBAdapters'):
--				# The actual key name of the adapter
--				# doesn't matter since all we need is the
--				# bus/address. This gets named by the kernel
--				# anyways once in the VM.
--				usb_adapters =3D [v for v in hw_conf['USBAdapters'].values()]
--
--			if hw_conf.has_section('PCIAdapters'):
--				pci_adapters =3D [v for v in hw_conf['PCIAdapters'].values()]
--
--		#
--		# Additional arguments not provided to test-runner which are
--		# needed once booted into the kernel.
--		#
--		options =3D 'init=3D%s' % os.path.realpath(sys.argv[0])
--
--		# Support running from top level as well as tools
--		if os.getcwd().endswith('tools'):
--			options +=3D ' --testhome %s/../' % os.getcwd()
--		else:
--			options +=3D ' --testhome %s' % os.getcwd()
--
--		options +=3D ' --path "%s"' % os.environ['PATH']
--
--		if self.args.auto_tests:
--			options +=3D ' --auto_tests %s' % ','.join(self.args.auto_tests)
--
--		if self.args.sub_tests:
--			options +=3D ' --sub_tests %s' % ','.join(self.args.sub_tests)
--
--		gid =3D None
--		if os.environ.get('SUDO_GID', None):
--			uid =3D int(os.environ['SUDO_UID'])
--			gid =3D int(os.environ['SUDO_GID'])
--
--		append_gid_uid =3D False
--
--		if self.args.log:
--			if os.getuid() !=3D 0:
--				print("--log can only be used as root user")
--				quit()
--
--			self.args.log =3D os.path.abspath(self.args.log)
--			append_gid_uid =3D True
--
--			if not path_exists(self.args.log):
--				os.mkdir(self.args.log)
--				if gid:
--					os.chown(self.args.log, uid, gid)
--
--		if self.args.monitor:
--			if os.getuid() !=3D 0:
--				print("--monitor can only be used as root user")
--				quit()
-+runner =3D Runner(from_env=3DTrue)
- =
-
--			self.args.monitor =3D os.path.abspath(self.args.monitor)
--			mon_parent_dir =3D os.path.abspath(os.path.join(self.args.monitor, os.p=
-ardir))
--			append_gid_uid =3D True
--
--		if self.args.result:
--			if os.getuid() !=3D 0:
--				print("--result can only be used as root user")
--				quit()
--
--			self.args.result =3D os.path.abspath(self.args.result)
--			result_parent_dir =3D os.path.abspath(os.path.join(self.args.result, os=
-.pardir))
--			append_gid_uid =3D True
--
--		if append_gid_uid and gid:
--			options +=3D ' --log-gid %u' % (gid,)
--			options +=3D ' --log-uid %u' % (uid,)
--
--		denylist =3D [
--			'auto_tests',
--			'sub_tests',
--			'qemu',
--			'kernel'
--		]
--
--		nproc =3D multiprocessing.cpu_count()
--
--		#
--		# Specially handle CPU systems with minimal cores, otherwise
--		# use half the host cores.
--		#
--		if nproc < 2:
--			smp =3D 1
--		else:
--			smp =3D int(nproc / 2)
--
--		ram =3D 256
--
--		print("Using %d cores, %d RAM for VM" % (smp, ram))
--
--		#
--		# This passes through most of the command line options to
--		# the kernel command line. Some are not relevant (e.g. qemu)
--		# so similar options are added in the denylist above. This excludes
--		# any unset options which are assumed to be None or False. This
--		# is done so default arguments can be filled once in the VM. If
--		# we pass and basic types (None, False etc.) they are turned into
--		# a string representation ('None', 'False', etc.) which is not
--		# desirable.
--		#
--		for arg in vars(self.args):
--			if arg in denylist or getattr(self.args, arg) in [None, False, []]:
--				continue
--			options +=3D ' --%s %s' % (arg, str(getattr(self.args, arg)))
--
--		kern_log =3D "ignore_loglevel" if "kernel" in self.args.verbose else "qu=
-iet"
--
--		qemu_cmdline =3D [
--			qemu_binary,
--			'-machine', 'type=3Dq35,accel=3Dkvm:tcg',
--			'-nodefaults', '-no-user-config', '-monitor', 'none',
--			'-display', 'none', '-m', '%dM' % ram, '-nographic', '-vga',
--			'none', '-no-acpi', '-no-hpet',
--			'-no-reboot', '-fsdev',
--			'local,id=3Dfsdev-root,path=3D/,readonly=3Don,security_model=3Dnone,mul=
-tidevs=3Dremap',
--			'-device',
--			'virtio-9p-pci,fsdev=3Dfsdev-root,mount_tag=3D/dev/root',
--			'-chardev', 'stdio,id=3Dchardev-serial0,signal=3Doff',
--			'-device', 'pci-serial,chardev=3Dchardev-serial0',
--			'-device', 'virtio-rng-pci',
--			'-kernel',
--			kernel_binary,
--			'-append',
--			'console=3DttyS0,115200n8 earlyprintk=3Dserial \
--				rootfstype=3D9p root=3D/dev/root \
--				rootflags=3Dtrans=3Dvirtio \
--				acpi=3Doff pci=3Dnoacpi %s ro \
--				mac80211_hwsim.radios=3D0 %s' % (kern_log, options),
--			'-smp', str(smp)
--		]
--
--		# Add two ethernet devices for testing EAD
--		qemu_cmdline.extend([
--				'-net', 'nic,model=3Dvirtio',
--				'-net', 'nic,model=3Dvirtio',
--				'-net', 'user'
--		])
--
--		if usb_adapters:
--			for bus, addr in [s.split(',') for s in usb_adapters]:
--				qemu_cmdline.extend(['-usb',
--							'-device',
--							'usb-host,hostbus=3D%s,hostaddr=3D%s' % \
--							(bus, addr)])
--		if pci_adapters:
--			qemu_cmdline.extend(['-enable-kvm'])
--			for addr in pci_adapters:
--				qemu_cmdline.extend(['-device', 'vfio-pci,host=3D%s' % addr])
--
--		if self.args.log:
--			#
--			# Creates a virtfs device that can be mounted. This mount
--			# will point back to the provided log directory and is
--			# writable unlike the rest of the mounted file system.
--			#
--			qemu_cmdline.extend([
--				'-virtfs',
--				'local,path=3D%s,mount_tag=3Dlogdir,security_model=3Dpassthrough,id=3D=
-logdir' \
--						% self.args.log
--			])
--
--		if self.args.monitor:
--			qemu_cmdline.extend([
--				'-virtfs',
--				'local,path=3D%s,mount_tag=3Dmondir,security_model=3Dpassthrough,id=3D=
-mondir' \
--						% mon_parent_dir
--			])
--
--		if self.args.result:
--			qemu_cmdline.extend([
--				'-virtfs',
--				'local,path=3D%s,mount_tag=3Dresultdir,security_model=3Dpassthrough,id=
-=3Dresultdir' \
--						% result_parent_dir
--			])
--
--		os.execlp(qemu_cmdline[0], *qemu_cmdline)
--
--if __name__ =3D=3D '__main__':
--	if os.getpid() =3D=3D 1 and os.getppid() =3D=3D 0:
--		atexit.register(exit_vm)
--		prepare_sandbox()
--		run_tests()
--
--		sys.exit()
--
--	main =3D Main()
--	main.start()
-+atexit.register(exit_vm)
-+runner.prepare_environment()
-+run_tests(runner.args)
-+runner.cleanup_environment()
--- =
-
-2.34.1
-
---===============3578888836721872951==--
+(I also asked on the IRC channel, but there wasn't much traffic there
+so I moved it to the mailing-list.)
+--
+Thanks, keeping being Awesome
+Joakim Lotseng=C3=A5rd - Orbital Systems AB - www.orbital-systems.com
+--===============1872523787116912844==--
 
