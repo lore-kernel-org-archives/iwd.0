@@ -1,54 +1,105 @@
-Content-Type: multipart/mixed; boundary="===============4917441467655682850=="
+Content-Type: multipart/mixed; boundary="===============3494235618402974104=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 02/11] handshake: add flags/key_index for extended key IDs
-Date: Tue, 05 Oct 2021 15:00:42 -0700
-Message-ID: <20211005220051.4018694-2-prestwoj@gmail.com>
-In-Reply-To: 20211005220051.4018694-1-prestwoj@gmail.com
+Subject: [PATCH v2 2/7] station: replace station_parse_bss_security
+Date: Thu, 24 Feb 2022 09:04:55 -0800
+Message-ID: <20220224170500.2779425-2-prestwoj@gmail.com>
+In-Reply-To: 20220224170500.2779425-1-prestwoj@gmail.com
 
---===============4917441467655682850==
+--===============3494235618402974104==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-ext_key_id_capable indicates the handshake has set the capability bit
-in the RSN info. This will only be set if the AP also has the capability
-set.
-
-use_ext_key_id indicates if extended key ID procedure should be used.
-This is required because an AP may not send the KDE (even with capabilities
-set) meaning we fall back to the legacy zero key index.
-
-ptk_index is the key index the AP chose for a given rekey.
+Replaces this with scan_bss_get_security
 ---
- src/handshake.h | 3 +++
- 1 file changed, 3 insertions(+)
+ src/station.c | 27 ++++-----------------------
+ 1 file changed, 4 insertions(+), 23 deletions(-)
 
-diff --git a/src/handshake.h b/src/handshake.h
-index 36ccc3a2..e67e2c20 100644
---- a/src/handshake.h
-+++ b/src/handshake.h
-@@ -128,6 +128,7 @@ struct handshake_state {
- 	bool support_fils : 1;
- 	bool authenticator_ocvc : 1;
- 	bool supplicant_ocvc : 1;
-+	bool ext_key_id_capable : 1;
- 	uint8_t ssid[32];
- 	size_t ssid_len;
- 	char *passphrase;
-@@ -138,6 +139,8 @@ struct handshake_state {
- 	uint8_t gtk_rsc[6];
- 	uint8_t proto_version : 2;
- 	unsigned int gtk_index;
-+	bool use_ext_key_id : 1;
-+	uint8_t ptk_index;
- 	struct erp_cache_entry *erp_cache;
- 	bool support_ip_allocation : 1;
- 	uint32_t client_ip_addr;
+diff --git a/src/station.c b/src/station.c
+index cd119ff1..9e58e3d6 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -346,25 +346,6 @@ static int bss_signal_strength_compare(const void *a, =
+const void *b, void *user)
+ 	return (bss->signal_strength > new_bss->signal_strength) ? 1 : -1;
+ }
+ =
+
+-static int station_parse_bss_security(struct station *station,
+-				struct scan_bss *bss,
+-				enum security *security_out)
+-{
+-	struct ie_rsn_info info;
+-	int r;
+-
+-	r =3D scan_bss_get_rsn_info(bss, &info);
+-	if (r < 0) {
+-		if (r !=3D -ENOENT)
+-			return r;
+-
+-		*security_out =3D security_determine(bss->capability, NULL);
+-	} else
+-		*security_out =3D security_determine(bss->capability, &info);
+-
+-	return 0;
+-}
+-
+ /*
+  * Returns the network object the BSS was added to or NULL if ignored.
+  */
+@@ -400,7 +381,7 @@ static struct network *station_add_seen_bss(struct stat=
+ion *station,
+ 		return NULL;
+ 	}
+ =
+
+-	if (station_parse_bss_security(station, bss, &security) < 0)
++	if (scan_bss_get_security(bss, &security) < 0)
+ 		return NULL;
+ =
+
+ 	/* Hidden OWE transition network */
+@@ -2315,7 +2296,7 @@ static bool station_roam_scan_notify(int err, struct =
+l_queue *bss_list,
+ 				memcmp(bss->ssid, hs->ssid, hs->ssid_len))
+ 			goto next;
+ =
+
+-		if (station_parse_bss_security(station, bss, &security) < 0)
++		if (scan_bss_get_security(bss, &security) < 0)
+ 			goto next;
+ =
+
+ 		if (security !=3D orig_security)
+@@ -3457,7 +3438,7 @@ static struct l_dbus_message *station_dbus_get_hidden=
+_access_points(
+ 		int16_t signal_strength =3D bss->signal_strength;
+ 		enum security security;
+ =
+
+-		if (station_parse_bss_security(station, bss, &security) < 0)
++		if (scan_bss_get_security(bss, &security) < 0)
+ 			continue;
+ =
+
+ 		l_dbus_message_builder_enter_struct(builder, "sns");
+@@ -4224,7 +4205,7 @@ static struct network *station_find_network_from_bss(=
+struct station *station,
+ 	memcpy(ssid, bss->ssid, bss->ssid_len);
+ 	ssid[bss->ssid_len] =3D '\0';
+ =
+
+-	if (station_parse_bss_security(station, bss, &security) < 0)
++	if (scan_bss_get_security(bss, &security) < 0)
+ 		return NULL;
+ =
+
+ 	return station_network_find(station, ssid, security);
 -- =
 
-2.31.1
+2.34.1
 
---===============4917441467655682850==--
+--===============3494235618402974104==--
 
