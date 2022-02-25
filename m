@@ -1,134 +1,136 @@
-Content-Type: multipart/mixed; boundary="===============1376240917566810873=="
+Content-Type: multipart/mixed; boundary="===============7342285205411576804=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: segfault in parse_neighbor_report at src/station.c:1747
-Date: Mon, 04 Apr 2022 13:23:02 -0500
-Message-ID: <0a766997-050b-d871-6e07-1c8349140968@gmail.com>
-In-Reply-To: 87k0c63wmj.fsf@lausen.nl
+Subject: [PATCH 10/11] iwmon: parse ATTR_REG_RULES
+Date: Fri, 25 Feb 2022 09:58:09 -0800
+Message-ID: <20220225175810.2914413-10-prestwoj@gmail.com>
+In-Reply-To: 20220225175810.2914413-1-prestwoj@gmail.com
 
---===============1376240917566810873==
+--===============7342285205411576804==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Leonard,
+This parses out the regulatory rules and prints them.
+---
+ monitor/nlmon.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 89 insertions(+), 1 deletion(-)
 
-On 4/3/22 12:27, Leonard Lausen wrote:
-> Hi all,
-> =
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 6ded9aa2..fe967922 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -5455,6 +5455,93 @@ static void print_wiphy_bands(unsigned int level, co=
+nst char *label,
+ 	}
+ }
+ =
 
-> connecting a laptop with Intel=C2=AE Wi-Fi 6E AX210 to a Vodafone Wi-Fi 6
-> Station sometimes triggers a segfault with ell 0.49 and iwd 1.26 in
-> parse_neighbor_report at src/station.c:1747. Earlier versions of ell and
-> iwd also segfault. Please see below excerpts from gdb. I can share the
-> full coredump if helpful. In case you require any further information or
-> would like me to test a fix, please note I will only have access to this
-> Station until Thursday April 7th.
++static void print_reg_rule_flags(unsigned int level, const char *label,
++					const void *data, uint16_t size)
++{
++	uint32_t flag;
++
++	flag =3D l_get_u32(data);
++
++	if (!flag)
++		return;
++
++	print_attr(level, "%s: len %u", label, size);
++
++	if (flag & NL80211_RRF_NO_OFDM)
++		print_attr(level + 1, "No ODFM");
++	if (flag & NL80211_RRF_NO_CCK)
++		print_attr(level + 1, "No CCK");
++	if (flag & NL80211_RRF_NO_INDOOR)
++		print_attr(level + 1, "No Indoor");
++	if (flag & NL80211_RRF_NO_OUTDOOR)
++		print_attr(level + 1, "No Outdoor");
++	if (flag & NL80211_RRF_DFS)
++		print_attr(level + 1, "DFS");
++	if (flag & NL80211_RRF_PTP_ONLY)
++		print_attr(level + 1, "PTP Only");
++	if (flag & NL80211_RRF_PTMP_ONLY)
++		print_attr(level + 1, "PTMP Only");
++	if (flag & NL80211_RRF_NO_IR)
++		print_attr(level + 1, "No IR");
++	if (flag & __NL80211_RRF_NO_IBSS)
++		print_attr(level + 1, "No IBSS");
++	if (flag & NL80211_RRF_AUTO_BW)
++		print_attr(level + 1, "Auto BW");
++	if (flag & NL80211_RRF_IR_CONCURRENT)
++		print_attr(level + 1, "IR Concurrent");
++	if (flag & NL80211_RRF_NO_HT40MINUS)
++		print_attr(level + 1, "No HT40-");
++	if (flag & NL80211_RRF_NO_HT40PLUS)
++		print_attr(level + 1, "No HT40+");
++	if (flag & NL80211_RRF_NO_80MHZ)
++		print_attr(level + 1, "No 80MHz");
++	if (flag & NL80211_RRF_NO_160MHZ)
++		print_attr(level + 1, "No 160MHz");
++	if (flag & NL80211_RRF_NO_HE)
++		print_attr(level + 1, "No HE");
++}
++
++static void print_u32_div_1000(unsigned int level, const char *label,
++					const void *data, uint16_t size)
++{
++	uint32_t val =3D l_get_u32(data) / 1000;
++
++	print_attr(level, "%s: %u MHz", label, val);
++}
++
++static const struct attr_entry reg_rule_table[] =3D {
++	{ NL80211_ATTR_REG_RULE_FLAGS, "Flags", ATTR_CUSTOM,
++					{ .function =3D print_reg_rule_flags } },
++	{ NL80211_ATTR_FREQ_RANGE_START, "Frequency Start", ATTR_CUSTOM,
++					{ .function =3D print_u32_div_1000 } },
++	{ NL80211_ATTR_FREQ_RANGE_END, "Frequency End", ATTR_CUSTOM,
++					{ .function =3D print_u32_div_1000 } },
++	{ NL80211_ATTR_FREQ_RANGE_MAX_BW, "Frequency Range Max BW", ATTR_CUSTOM,
++					{ .function =3D print_u32_div_1000 } },
++	{ NL80211_ATTR_POWER_RULE_MAX_ANT_GAIN, "Max Antenna Gain", ATTR_U32 },
++	{ NL80211_ATTR_POWER_RULE_MAX_EIRP, "Max EIRP", ATTR_U32 },
++	{ NL80211_ATTR_DFS_CAC_TIME, "DFS CAC Time", ATTR_U32 },
++	{ }
++};
++
++static void print_reg_rules(unsigned int level, const char *label,
++					const void *data, uint16_t size)
++{
++	const struct nlattr *nla;
++	uint16_t nla_type;
++
++	print_attr(level, "%s: len %u", label, size);
++
++	for (nla =3D data; NLA_OK(nla, size); nla =3D NLA_NEXT(nla, size)) {
++		nla_type =3D nla->nla_type & NLA_TYPE_MASK;
++		print_attr(level + 1, "Rule %u: len %u", nla_type,
++							NLA_PAYLOAD(nla));
++
++		print_attributes(level + 2, reg_rule_table,
++					NLA_DATA(nla), NLA_PAYLOAD(nla));
++	}
++}
++
+ static void print_eapol_key(unsigned int level, const void *data, uint32_t=
+ size)
+ {
+ 	const struct eapol_key *ek =3D (struct eapol_key *)data;
+@@ -6004,7 +6091,8 @@ static const struct attr_entry attr_table[] =3D {
+ 	{ NL80211_ATTR_REG_ALPHA2,
+ 			"Regulatory Alpha2", ATTR_STRING },
+ 	{ NL80211_ATTR_REG_RULES,
+-			"Regulatory Rules" },
++			"Regulatory Rules", ATTR_CUSTOM,
++				{ .function =3D print_reg_rules } },
+ 	{ NL80211_ATTR_MESH_CONFIG,
+ 			"Mesh Configuration" },
+ 	{ NL80211_ATTR_BSS_BASIC_RATES,
+-- =
 
-Thanks for the report.  This should have gone to the iwd mailing list which=
- I CC-ed.
+2.34.1
 
-Can you provide iwd debug logs prior to the crash?  See:
-https://iwd.wiki.kernel.org/debugging#enabling_iwd_debug_output
-
-> =
-
-> Program terminated with signal SIGSEGV, Segmentation fault.
-> #0  0x000055f07250580e in parse_neighbor_report (station=3Dstation(a)entr=
-y=3D0x55f0725c8e50,
->      reports=3Dreports(a)entry=3D0x55f0725cc35b "4\025\354\250\037\231\31=
-7", <incomplete sequence \350>, reports_len=3Dreports_len(a)entry=3D23,
->      set=3Dset(a)entry=3D0x7ffca3384ee0) at src/station.c:1747
-> 1747                            cc =3D station->connected_bss->cc;
-
-Just thinking out loud, feel free to ignore below:
-
-This would seem to imply that connected_bss is somehow not valid (we're not =
-
-connected.)  'hs' being NULL also suggests this.  But it isn't clear how we =
-
-would end up in this function since 'preparing_roam' should also be false i=
-n =
-
-this case.
-
-> (gdb) bt
-> #0  0x000055f07250580e in parse_neighbor_report (station=3Dstation(a)entr=
-y=3D0x55f0725c8e50,
->      reports=3Dreports(a)entry=3D0x55f0725cc35b "4\025\354\250\037\231\31=
-7", <incomplete sequence \350>, reports_len=3Dreports_len(a)entry=3D23,
->      set=3Dset(a)entry=3D0x7ffca3384ee0) at src/station.c:1747
-> #1  0x000055f07250928b in station_neighbor_report_cb (netdev=3D<optimized=
- out>, err=3D0,
->      reports=3D0x55f0725cc35b "4\025\354\250\037\231\317", <incomplete se=
-quence \350>, reports_len=3D23, user_data=3D0x55f0725c8e50) at src/station.=
-c:2481
-> #2  0x000055f07254f282 in frame_watch_unicast_notify (msg=3D<optimized ou=
-t>, user_data=3D0x55f0725c8580) at src/frame-xchg.c:234
-> #3  0x00007f8a4b3cca19 in dispatch_unicast_watches () from /usr/lib64/lib=
-ell.so.0
-> #4  0x00007f8a4b3ccad1 in process_unicast () from /usr/lib64/libell.so.0
-> #5  0x00007f8a4b3ccf0b in received_data () from /usr/lib64/libell.so.0
-> #6  0x00007f8a4b3c7692 in io_callback () from /usr/lib64/libell.so.0
-> #7  0x00007f8a4b3c5fe7 in l_main_iterate () from /usr/lib64/libell.so.0
-> #8  0x00007f8a4b3c612e in l_main_run () from /usr/lib64/libell.so.0
-> #9  0x00007f8a4b3c6461 in l_main_run_with_signal () from /usr/lib64/libel=
-l.so.0
-> #10 0x000055f0724f453b in main (argc=3D<optimized out>, argv=3D<optimized=
- out>) at src/main.c:600
-> (gdb) l
-> 1742                                    util_address_to_string(info.addr),
-> 1743                                    (int) info.channel_num, (int) inf=
-o.oper_class,
-> 1744                                    info.md ? "MD set" : "MD not set"=
-);
-> 1745
-> 1746                    if (station->connected_bss->cc_present)
-> 1747                            cc =3D station->connected_bss->cc;
-> 1748
-> 1749                    freq =3D station_freq_from_neighbor_report(cc, &i=
-nfo, &band);
-> 1750                    if (!freq)
-> 1751                            continue;
-> (gdb) info locals
-> info =3D {addr =3D "\354\250\037\231\317", <incomplete sequence \350>, re=
-achable =3D 0 '\000', spectrum_mgmt =3D false, qos =3D false, apsd =3D fals=
-e, rm =3D false,
->    delayed_block_ack =3D false, immediate_block_ack =3D false, security =
-=3D false, key_scope =3D false, md =3D false, ht =3D false, oper_class =3D =
-4 '\004',
->    channel_num =3D 11 '\v', phy_type =3D 0 '\000', bss_transition_pref =
-=3D 255 '\377', bss_transition_pref_present =3D true}
-> freq =3D <optimized out>
-> band =3D <optimized out>
-> cc =3D 0x0
-> iter =3D {max =3D 23, pos =3D 23, tlv =3D 0x55f0725cc35b "4\025\354\250\0=
-37\231\317", <incomplete sequence \350>, tag =3D 52, len =3D 21,
->    data =3D 0x55f0725cc35d "\354\250\037\231\317", <incomplete sequence \=
-350>}
-> count_md =3D 0
-> count_no_md =3D 0
-> freq_set_md =3D 0x55f0725d33f0
-> freq_set_no_md =3D 0x55f0725d5420
-> current_freq =3D 0
-> hs =3D 0x0
-> supported =3D 0x55f0725c4cc0
-> __func__ =3D "parse_neighbor_report"
-> (gdb) info args
-> station =3D 0x55f0725c8e50
-> reports =3D 0x55f0725cc35b "4\025\354\250\037\231\317", <incomplete seque=
-nce \350>
-> reports_len =3D 23
-> set =3D 0x7ffca3384ee0
-> =
-
-> Thank you
-> Leonard
-> =
-
-
-Regards,
--Denis
---===============1376240917566810873==--
+--===============7342285205411576804==--
 
