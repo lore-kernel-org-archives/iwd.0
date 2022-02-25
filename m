@@ -1,57 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============2396506769933477123=="
+Content-Type: multipart/mixed; boundary="===============4746091775474393333=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] test-runner: fix testhome mounting for QEMU
-Date: Fri, 03 Jun 2022 15:02:45 -0700
-Message-ID: <20220603220245.227338-1-prestwoj@gmail.com>
+Subject: [PATCH v3 1/7] ie: update IE_AKM_IS_SAE to bitwise comparison
+Date: Fri, 25 Feb 2022 15:32:45 -0800
+Message-ID: <20220225233251.2958102-1-prestwoj@gmail.com>
 
---===============2396506769933477123==
+--===============4746091775474393333==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This was lazily copied from UML but really made no sense in the context
-of QEMU. First QEMU needs the virtfs option to define the mount tag and
-in addition a 9p mount should be used rather than 'hostfs'.
+All uses of this macro will work with a bitwise comparison which is
+needed for 6GHz checks and somewhat more flexible since it can be
+used to compare RSN info, not only single AKM values.
 ---
- tools/runner.py | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ src/ie.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/runner.py b/tools/runner.py
-index bf28d9ad..ccc931ff 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -434,6 +434,11 @@ class QemuRunner(RunnerAbstract):
- 			for addr in pci_adapters:
- 				qemu_cmdline.extend(['-device', 'vfio-pci,host=3D%s' % addr])
+diff --git a/src/ie.h b/src/ie.h
+index 302cda70..9b57cf66 100644
+--- a/src/ie.h
++++ b/src/ie.h
+@@ -337,8 +337,8 @@ enum ie_rsn_akm_suite {
+ };
  =
 
-+		qemu_cmdline.extend([
-+			'-virtfs',
-+			'local,path=3D%s,%s' % (args.testhome, mount_options('homedir'))
-+		])
-+
- 		if args.log:
- 			#
- 			# Creates a virtfs device that can be mounted. This mount
-@@ -466,8 +471,8 @@ class QemuRunner(RunnerAbstract):
- 	def prepare_environment(self):
- 		mounts =3D [ MountInfo('debugfs', 'debugfs', '/sys/kernel/debug', '', 0)=
- ]
+ #define IE_AKM_IS_SAE(akm) \
+-	((akm =3D=3D IE_RSN_AKM_SUITE_SAE_SHA256) || \
+-	(akm =3D=3D IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256))
++	(akm & (IE_RSN_AKM_SUITE_SAE_SHA256 | \
++		IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256))
  =
 
--		mounts.append(MountInfo('hostfs', 'hostfs', self.args.testhome,
--					self.args.testhome, 0))
-+		mounts.append(MountInfo('9p', 'homedir', self.args.testhome,
-+					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240', 0))
- =
-
- 		if self.args.log:
- 			mounts.append(MountInfo('9p', 'logdir', self.args.log,
+ #define IE_AKM_IS_FT(akm) \
+ 	(akm & (IE_RSN_AKM_SUITE_FT_OVER_8021X | \
 -- =
 
 2.34.1
 
---===============2396506769933477123==--
+--===============4746091775474393333==--
 
