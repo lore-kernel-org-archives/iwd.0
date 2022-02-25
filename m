@@ -1,152 +1,157 @@
-Content-Type: multipart/mixed; boundary="===============0009809749437089133=="
+Content-Type: multipart/mixed; boundary="===============7686638255343664301=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 3/3] scan: don't special case periodic scan work
-Date: Mon, 10 Jan 2022 16:15:19 -0800
-Message-ID: <20220111001519.1013183-3-prestwoj@gmail.com>
-In-Reply-To: 20220111001519.1013183-1-prestwoj@gmail.com
+Subject: [PATCH v3 5/7] network: add 6GHz restrictions to
+ network_can_connect_bss
+Date: Fri, 25 Feb 2022 15:32:49 -0800
+Message-ID: <20220225233251.2958102-5-prestwoj@gmail.com>
+In-Reply-To: 20220225233251.2958102-1-prestwoj@gmail.com
 
---===============0009809749437089133==
+--===============7686638255343664301==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Periodic scans were handled specially where they were only
-started if no other requests were pending in the scan queue.
-This is fine, and what we want, but this can actually be
-handled automatically by nature of the wiphy work queue rather
-than needing to check the request queue explicitly.
-
-Instead we can insert periodic scans at a lower priority than
-other scans. This puts them at the end of the work queue, as
-well as allows future requests to jump ahead if a periodic scan
-has not yet started.
-
-Eventually, once all pending scans are done, the peridoic scan
-may begin. This is no different than the preivous behavior and
-avoids the need for any special checks once scan requests
-complete.
-
-One check was added to address the problem of the periodic scan
-timer firing before the scan could even start. Currently this
-happened to be handled fine in scan_periodic_queue, as it checks
-the queue length. Since this check was removed we must see check
-for this condition inside scan_periodic_timeout.
+The 802.11ax standards adds some restrictions for the 6GHz band. In short
+stations must use SAE, OWE, or 8021x on this band and frame protection is
+required.
 ---
- src/scan.c | 48 +++++++++++++++++++++++++++---------------------
- 1 file changed, 27 insertions(+), 21 deletions(-)
+ src/network.c | 58 +++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 45 insertions(+), 13 deletions(-)
 
-diff --git a/src/scan.c b/src/scan.c
-index 96907e59..cfcbbd3a 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -71,7 +71,6 @@ struct scan_periodic {
- 	scan_trigger_func_t trigger;
- 	scan_notify_func_t callback;
- 	void *userdata;
--	bool retry:1;
- 	uint32_t id;
- 	bool needs_active_scan:1;
- };
-@@ -883,27 +882,30 @@ static bool scan_periodic_notify(int err, struct l_qu=
-eue *bss_list,
- 	return false;
- }
+v3:
+ * Combined some of the WPA3 checks with 6GHz that duplicated
+ * Used macros rather than checking all valid AKMs
+
+diff --git a/src/network.c b/src/network.c
+index 4e7af27c..4a4a64ee 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -55,6 +55,7 @@
+ #include "src/util.h"
+ #include "src/erp.h"
+ #include "src/handshake.h"
++#include "src/band.h"
  =
 
-+static void scan_periodic_destroy(void *user_data)
-+{
-+	struct scan_context *sc =3D user_data;
+ #define SAE_PT_SETTING "SAE-PT-Group%u"
+ =
+
+@@ -774,6 +775,7 @@ int network_can_connect_bss(struct network *network, co=
+nst struct scan_bss *bss)
+ 	struct network_config *config =3D info ? &info->config : NULL;
+ 	bool can_transition_disable =3D wiphy_can_transition_disable(wiphy);
+ 	struct ie_rsn_info rsn;
++	enum band_freq band;
+ 	int ret;
+ =
+
+ 	switch (security) {
+@@ -785,6 +787,9 @@ int network_can_connect_bss(struct network *network, co=
+nst struct scan_bss *bss)
+ 		return -ENOSYS;
+ 	}
+ =
+
++	if (!band_freq_to_channel(bss->frequency, &band))
++		return -ENOTSUP;
 +
-+	sc->sp.id =3D 0;
-+}
+ 	memset(&rsn, 0, sizeof(rsn));
+ 	ret =3D scan_bss_get_rsn_info(bss, &rsn);
+ 	if (ret < 0) {
+@@ -797,6 +802,13 @@ int network_can_connect_bss(struct network *network, c=
+onst struct scan_bss *bss)
+ 		 * We assume the spec means us to check bit 3 here
+ 		 */
+ 		if (ret =3D=3D -ENOENT && security =3D=3D SECURITY_NONE) {
++			/*
++			 * 802.11ax 12.12.2 - STA shall not use Open System
++			 * authentication without encryption
++			 */
++			if (band =3D=3D BAND_FREQ_6_GHZ)
++				return -EPERM;
 +
- static bool scan_periodic_queue(struct scan_context *sc)
- {
--	if (!l_queue_isempty(sc->requests)) {
--		sc->sp.retry =3D true;
--		return false;
--	}
-+	struct scan_parameters params =3D {};
+ 			if (!config)
+ 				return 0;
  =
 
- 	if (sc->sp.needs_active_scan && known_networks_has_hidden()) {
--		struct scan_parameters params =3D {
--			.randomize_mac_addr_hint =3D true
--		};
-+		params.randomize_mac_addr_hint =3D true;
+@@ -814,26 +826,21 @@ int network_can_connect_bss(struct network *network, =
+const struct scan_bss *bss)
+ 		return ret;
+ 	}
  =
 
- 		sc->sp.needs_active_scan =3D false;
+-	if (!config || !config->have_transition_disable)
++	if (!config || !config->have_transition_disable) {
++		if (band =3D=3D BAND_FREQ_6_GHZ)
++			goto check_6ghz;
++
+ 		goto no_transition_disable;
++	}
+ =
+
+ 	if (!can_transition_disable) {
++		if (band =3D=3D BAND_FREQ_6_GHZ)
++			return -EPERM;
++
+ 		l_debug("HW not capable of Transition Disable, skip");
+ 		goto no_transition_disable;
+ 	}
+ =
+
+-	/*
+-	 * WPA3 Specification, v3, Section 8:
+-	 * - Disable use of WEP and TKIP
+-	 * - Disallow association without negotiation of PMF
+-	 */
+-	rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_TKIP;
 -
--		sc->sp.id =3D scan_active_full(sc->wdev_id, &params,
--						scan_periodic_triggered,
--						scan_periodic_notify, sc, NULL);
-+		sc->sp.id =3D scan_common(sc->wdev_id, false, &params,
-+					SCAN_WORK_PRIORITY + 1,
-+					scan_periodic_triggered,
-+					scan_periodic_notify, sc, NULL);
- 	} else
--		sc->sp.id =3D scan_passive(sc->wdev_id, NULL,
--						scan_periodic_triggered,
--						scan_periodic_notify, sc, NULL);
-+		sc->sp.id =3D scan_common(sc->wdev_id, true, &params,
-+					SCAN_WORK_PRIORITY + 1,
-+					scan_periodic_triggered,
-+					scan_periodic_notify, sc, NULL);
+-	if (!rsn.group_management_cipher)
+-		return -EPERM;
+-
+-	rsn.mfpr =3D true;
+-
+ 	/* WPA3-Personal */
+ 	if (test_bit(&config->transition_disable, 0)) {
+ 		rsn.akm_suites &=3D ~IE_RSN_AKM_SUITE_PSK;
+@@ -851,6 +858,31 @@ int network_can_connect_bss(struct network *network, c=
+onst struct scan_bss *bss)
+ 			return -EPERM;
+ 	}
  =
 
- 	return sc->sp.id !=3D 0;
- }
-@@ -975,7 +977,6 @@ bool scan_periodic_stop(uint64_t wdev_id)
- 	sc->sp.trigger =3D NULL;
- 	sc->sp.callback =3D NULL;
- 	sc->sp.userdata =3D NULL;
--	sc->sp.retry =3D false;
- 	sc->sp.needs_active_scan =3D false;
- =
-
- 	return true;
-@@ -1006,6 +1007,16 @@ static void scan_periodic_timeout(struct l_timeout *=
-timeout, void *user_data)
- =
-
- 	l_debug("scan_periodic_timeout: %" PRIx64, sc->wdev_id);
- =
-
++check_6ghz:
 +	/*
-+	 * Timeout triggered before periodic scan could even start, just rearm
-+	 * with the same interval.
++	 * WPA3 Specification, v3, Section 8:
++	 * - Disable use of WEP and TKIP
++	 * - Disallow association without negotiation of PMF
 +	 */
-+	if (sc->sp.id) {
-+		l_warn("Periodic scan timer called before scan could start!");
-+		scan_periodic_rearm(sc);
-+		return;
++	rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_TKIP;
++
++	if (!rsn.group_management_cipher)
++		return -EPERM;
++
++	rsn.mfpr =3D true;
++
++	/* 802.11ax Section 12.12.2 */
++	if (band =3D=3D BAND_FREQ_6_GHZ) {
++		/* STA shall not use the following cipher suite selectors */
++		rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_USE_GROUP_CIPHER;
++
++		/* Basically the STA must use OWE, SAE, or 8021x */
++		if (!IE_AKM_IS_SAE(rsn.akm_suites &&
++				!IE_AKM_IS_8021X(rsn.akm_suites) &&
++				(!(rsn.akm_suites | IE_RSN_AKM_SUITE_OWE))))
++			return -EPERM;
 +	}
 +
- 	sc->sp.interval *=3D 2;
- 	if (sc->sp.interval > SCAN_MAX_INTERVAL)
- 		sc->sp.interval =3D SCAN_MAX_INTERVAL;
-@@ -1050,11 +1061,6 @@ static bool start_next_scan_request(struct wiphy_rad=
-io_work_item *item)
- =
-
- 	scan_request_failed(sc, sr, -EIO);
- =
-
--	if (sc->sp.retry) {
--		sc->sp.retry =3D false;
--		scan_periodic_queue(sc);
--	}
--
- 	return true;
- }
- =
-
+ no_transition_disable:
+ 	if (!wiphy_select_cipher(wiphy, rsn.pairwise_ciphers))
+ 		return -ENOTSUP;
 -- =
 
-2.31.1
+2.34.1
 
---===============0009809749437089133==--
+--===============7686638255343664301==--
 
