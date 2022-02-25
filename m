@@ -1,38 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============4325688287165616119=="
+Content-Type: multipart/mixed; boundary="===============6792075669416263377=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd 1.18 doesn't connect to network on boot
-Date: Fri, 24 Sep 2021 13:36:59 -0500
-Message-ID: <ef7434c7-5ada-0e44-e9a4-f9f13d5f8b62@gmail.com>
-In-Reply-To: 163250782332.7.11536917905459787462.14147429@slmail.me
+Subject: [PATCH 02/11] band: remove unneeded line break
+Date: Fri, 25 Feb 2022 09:58:01 -0800
+Message-ID: <20220225175810.2914413-2-prestwoj@gmail.com>
+In-Reply-To: 20220225175810.2914413-1-prestwoj@gmail.com
 
---===============4325688287165616119==
+--===============6792075669416263377==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jason,
+This fits within 80 characters
+---
+ src/band.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> Well, I've discovered how to trigger the problem in my scenario. It's all=
- related with setting AddressRandomization to 'network'. The other two poss=
-ible values 'disabled' (default) and 'once' both work fine.
+diff --git a/src/band.c b/src/band.c
+index 28ba6a62..053f85d6 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -325,8 +325,7 @@ static bool find_best_mcs_vht(uint8_t max_index, enum o=
+fdm_channel_width width,
+ 	 */
+ =
 
-Well, I'm even more stumped then.  Looking at the commits in 1.18, I do not =
+ 	for (i =3D max_index; i >=3D 0; i--)
+-		if (band_ofdm_rate(i, width, rssi,
+-						nss, sgi, out_data_rate))
++		if (band_ofdm_rate(i, width, rssi, nss, sgi, out_data_rate))
+ 			return true;
+ =
 
-believe we changed anything even remotely related to this.  Even more =
+ 	return false;
+-- =
 
-interesting is that this only happens on boot and not in subsequent attempt=
-s =
+2.34.1
 
-which makes this hard to duplicate.
-
-I'll poke around some more, but I think a git bisect is the only way to nar=
-row =
-
-this down.
-
-Regards,
--Denis
---===============4325688287165616119==--
+--===============6792075669416263377==--
 
