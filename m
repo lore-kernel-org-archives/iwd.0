@@ -1,55 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============9012062418649721171=="
+Content-Type: multipart/mixed; boundary="===============1630485836253770167=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/5] test-runner: mount testhome rather than assume location
-Date: Wed, 25 May 2022 12:23:24 -0700
-Message-ID: <20220525192328.335557-1-prestwoj@gmail.com>
+Subject: Re: [PATCH 07/11] network: add 6GHz restrictions to
+ network_can_connect_bss
+Date: Fri, 25 Feb 2022 13:24:25 -0600
+Message-ID: <89149ea1-9603-220a-0306-f4c75605f5df@gmail.com>
+In-Reply-To: 20220225175810.2914413-7-prestwoj@gmail.com
 
---===============9012062418649721171==
+--===============1630485836253770167==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Usually the test home directory is a git repo somewhere e.g. under
-/home. But if the home directory is located under /tmp this poses
-a problem since UML remounts /tmp. To handle both cases mount
-the home directory explicity.
----
- tools/runner.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi James,
 
-diff --git a/tools/runner.py b/tools/runner.py
-index 7c177f1f..5f837097 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -451,6 +451,9 @@ class QemuRunner(RunnerAbstract):
- 	def prepare_environment(self):
- 		mounts =3D [ MountInfo('debugfs', 'debugfs', '/sys/kernel/debug', '', 0)=
- ]
- =
+On 2/25/22 11:58, James Prestwood wrote:
+> The 802.11ax standards adds some restrictions for the 6GHz band. In short
+> stations must use SAE, OWE, or 8021x on this band and frame protection is
+> required.
+> ---
+>   src/network.c | 37 +++++++++++++++++++++++++++++++++++++
+>   1 file changed, 37 insertions(+)
+> =
 
-+		mounts.append(MountInfo('hostfs', 'hostfs', self.args.testhome,
-+					self.args.testhome, 0))
-+
- 		if self.args.log:
- 			mounts.append(MountInfo('9p', 'logdir', self.args.log,
- 					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240', 0))
-@@ -513,6 +516,9 @@ class UmlRunner(RunnerAbstract):
- 			mounts.append(MountInfo('hostfs', 'hostfs', self.args.result_parent,
- 						self.args.result_parent, 0))
- =
 
-+		mounts.append(MountInfo('hostfs', 'hostfs', self.args.testhome,
-+					self.args.testhome, 0))
-+
- 		self._prepare_mounts(extra=3Dmounts)
- =
+<snip>
 
- 		super().prepare_environment()
--- =
+> @@ -852,6 +864,31 @@ int network_can_connect_bss(struct network *network,=
+ const struct scan_bss *bss)
+>   	}
+>   =
 
-2.34.1
+>   no_transition_disable:
+> +	/* 802.11ax Section 12.12.2 */
+> +	if (band =3D=3D BAND_FREQ_6_GHZ) {
+> +		/* STA shall not use the following cipher suite selectors */
+> +		rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_USE_GROUP_CIPHER;
+> +		rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_TKIP;
+> +
+> +		/* STA shall not use the following AKM suite selectors */
+> +		rsn.akm_suites &=3D ~IE_RSN_AKM_SUITE_PSK;
+> +		rsn.akm_suites &=3D ~IE_RSN_AKM_SUITE_PSK_SHA256;
+> +		rsn.akm_suites &=3D ~IE_RSN_AKM_SUITE_FT_USING_PSK;
+> +
+> +		/* Basically the STA must use OWE, SAE, or 8021x */
+> +		if (!(rsn.akm_suites & (IE_RSN_AKM_SUITE_8021X |
+> +					IE_RSN_AKM_SUITE_FT_OVER_8021X |
+> +					IE_RSN_AKM_SUITE_8021X_SHA256 |
+> +					IE_RSN_AKM_SUITE_SAE_SHA256 |
+> +					IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256 |
+> +					IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384 |
+> +					IE_RSN_AKM_SUITE_OWE)))
 
---===============9012062418649721171==--
+I wonder if it is better to use IE_AKM_IS_SAE, IE_AKM_IS_FILS(8021x) and =
+
+IE_AKM_IS_OWE instead.
+
+> +			return -EPERM;
+> +
+> +		/* STA shall use management frame protection */
+> +		rsn.mfpr =3D true;
+
+This isn't actually how we enforce MFP.  Not sure we ever set MFPR to true =
+
+unless it is for testing purposes.
+
+> +	}
+> +
+>   	if (!wiphy_select_cipher(wiphy, rsn.pairwise_ciphers))
+>   		return -ENOTSUP;
+>   =
+
+> =
+
+
+Regards,
+-Denis
+--===============1630485836253770167==--
 
