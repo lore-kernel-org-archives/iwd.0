@@ -1,152 +1,139 @@
-Content-Type: multipart/mixed; boundary="===============6947136240458460523=="
+Content-Type: multipart/mixed; boundary="===============6894851324600956675=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 10/12] doc: Add NetworkConfigurationAgent API description
-Date: Thu, 21 Oct 2021 10:50:39 +0200
-Message-ID: <20211021085041.294524-10-andrew.zaborowski@intel.com>
-In-Reply-To: 20211021085041.294524-1-andrew.zaborowski@intel.com
+Subject: [PATCH 01/11] band: add operating clases for 802.11ax
+Date: Fri, 25 Feb 2022 09:58:00 -0800
+Message-ID: <20220225175810.2914413-1-prestwoj@gmail.com>
 
---===============6947136240458460523==
+--===============6894851324600956675==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Document the new API that clients can use to get notified of new network
-configuration and be responsible for committing it to the netdev, the
-resolver, etc.
+Obtained from the IEEE 802.11ax amendment, Table E-4
 ---
- doc/agent-api.txt | 106 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 106 insertions(+)
+ src/band.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 55 insertions(+), 8 deletions(-)
 
-diff --git a/doc/agent-api.txt b/doc/agent-api.txt
-index 9da913e0..92317e57 100644
---- a/doc/agent-api.txt
-+++ b/doc/agent-api.txt
-@@ -25,6 +25,48 @@ Methods		void RegisterAgent(object path)
- 					 [service].Failed
- 					 [service].NotFound
+diff --git a/src/band.c b/src/band.c
+index 9024d186..28ba6a62 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -489,8 +489,8 @@ static int band_channel_info_get_bandwidth(const struct=
+ band_chandef *info)
+ struct operating_class_info {
+ 	uint32_t starting_frequency;
+ 	uint32_t flags;
+-	uint8_t channel_set[20];
+-	uint8_t center_frequencies[8];
++	uint8_t channel_set[60];
++	uint8_t center_frequencies[30];
+ 	uint16_t channel_spacing;
+ 	uint8_t operating_class;
+ };
+@@ -598,20 +598,20 @@ static const struct operating_class_info e4_operating=
+_classes[] =3D {
+ 	{
+ 		.operating_class =3D 125,
+ 		.starting_frequency =3D 5000,
+-		.channel_set =3D { 149, 153, 157, 161, 165, 169, 173},
++		.channel_set =3D { 149, 153, 157, 161, 165, 169, 173, 177 },
+ 		.channel_spacing =3D 20,
+ 	},
+ 	{
+ 		.operating_class =3D 126,
+ 		.starting_frequency =3D 5000,
+-		.channel_set =3D { 149, 157, 165},
++		.channel_set =3D { 149, 157, 165, 173 },
+ 		.channel_spacing =3D 40,
+ 		.flags =3D PRIMARY_CHANNEL_LOWER,
+ 	},
+ 	{
+ 		.operating_class =3D 127,
+ 		.starting_frequency =3D 5000,
+-		.channel_set =3D { 153, 161, 169 },
++		.channel_set =3D { 153, 161, 169, 177 },
+ 		.channel_spacing =3D 40,
+ 		.flags =3D PRIMARY_CHANNEL_UPPER,
+ 	},
+@@ -619,21 +619,68 @@ static const struct operating_class_info e4_operating=
+_classes[] =3D {
+ 		.operating_class =3D 128,
+ 		.starting_frequency =3D 5000,
+ 		.channel_spacing =3D 80,
+-		.center_frequencies =3D { 42, 58, 106, 122, 138, 155 },
++		.center_frequencies =3D { 42, 58, 106, 122, 138, 155, 171 },
+ 	},
+ 	{
+ 		.operating_class =3D 129,
+ 		.starting_frequency =3D 5000,
+ 		.channel_spacing =3D 160,
+-		.center_frequencies =3D { 50, 114 },
++		.center_frequencies =3D { 50, 114, 163 },
+ 	},
+ 	{
+ 		.operating_class =3D 130,
+ 		.starting_frequency =3D 5000,
+ 		.channel_spacing =3D 80,
+-		.center_frequencies =3D { 42, 58, 106, 122, 138, 155 },
++		.center_frequencies =3D { 42, 58, 106, 122, 138, 155, 171 },
+ 		.flags =3D PLUS80,
+ 	},
++	{
++		.operating_class =3D 131,
++		.starting_frequency =3D 5950,
++		.channel_spacing =3D 20,
++		.channel_set =3D { 1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45,
++				49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93,
++				97, 101, 105, 109, 113, 117, 121, 125, 129, 133,
++				137, 141, 145, 149, 153, 157, 161, 165, 169,
++				173, 177, 181, 185, 189, 193, 197, 201, 205,
++				209, 213, 217, 221, 225, 229, 233 },
++	},
++	{
++		.operating_class =3D 132,
++		.starting_frequency =3D 5950,
++		.channel_spacing =3D 40,
++		.center_frequencies =3D { 3, 11, 19, 27, 35, 43, 51, 59, 67, 75,
++					83, 91, 99, 107, 115, 123, 131, 139,
++					147, 155, 163, 171, 179, 187, 195, 203,
++					211, 219, 227 },
++	},
++	{
++		.operating_class =3D 133,
++		.starting_frequency =3D 5950,
++		.channel_spacing =3D 80,
++		.center_frequencies =3D { 7, 23, 39, 55, 71, 87, 103, 119, 135,
++					151, 167, 183, 199, 215 },
++	},
++	{
++		.operating_class =3D 134,
++		.starting_frequency =3D 5950,
++		.channel_spacing =3D 160,
++		.center_frequencies =3D { 15, 47, 79, 111, 143, 175, 207 },
++	},
++	{
++		.operating_class =3D 135,
++		.starting_frequency =3D 5950,
++		.channel_spacing =3D 80,
++		.center_frequencies =3D { 7, 23, 39, 55, 71, 87, 102, 119, 135,
++					151, 167, 183, 199, 215 },
++		.flags =3D PLUS80,
++	},
++	{
++		.operating_class =3D 136,
++		.starting_frequency =3D 5950,
++		.channel_spacing =3D 20,
++		.center_frequencies =3D { 2 },
++	}
+ };
  =
 
-+		void RegisterNetworkConfigurationAgent(object path)
-+
-+			Register the agent for handling IPv4 and IPv6
-+			configuration setting.  This method and its
-+			corresponding unregister method are only supported
-+			if network configuration is enabled: see
-+			EnableNetworkConfiguration in iwd.config(5) and
-+			NetworkConfigurationEnabled in
-+			net.connman.iwd.Daemon.GetInfo in daemon-api.txt.
-+
-+			During a station-mode, AP-mode or P2P connection, IWD
-+			will obtain the IP configuration values for a network
-+			interface, either automatically from a remote server
-+			(DHCP or otherwise), generate it or read it from a
-+			settings file.  If no network configuration agent is
-+			present, IWD immediately writes (commits) those
-+			values to the corresponding interface, the routing
-+			table and communicates them to the resolver.  If such
-+			agent is registered, IWD requests the agent to do
-+			this last step.
-+
-+			Connection success is not signalled until the agent
-+			method has returned.  The agent may also be invoked
-+			during the connection lifetime whenever the IP
-+			configuration changes and after a roam.  The agent
-+			object must have the NetworkConfigurationAgent
-+			interface.
-+
-+			Possible Errors: [service].InvalidArguments
-+					 [service].Failed
-+					 [service].AlreadyExists
-+					 [service].NotSupported
-+
-+		void UnregisterNetworkConfigurationAgent(object path)
-+
-+			Unregister an existing network configuration agent.
-+
-+			Possible Errors: [service].InvalidArguments
-+					 [service].Failed
-+					 [service].NotFound
-+					 [service].NotAvailable
-+
- =
-
- Agent hierarchy
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-@@ -86,3 +128,67 @@ Examples	Requesting a passphrase for WPA2 network
- =
-
- 			RequestPassphrase("/net/connman/iwd/0/3/54657374_psk")
- 			=3D=3D> "secret123"
-+
-+
-+NetworkConfigurationAgent hierarchy
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Service		unique name
-+Interface	net.connman.iwd.NetworkConfigurationAgent
-+Object path	freely definable
-+
-+Methods		void Release() [noreply]
-+
-+			This method gets called when the service daemon
-+			unregisters the agent. An agent can use it to do
-+			cleanup tasks. There is no need to unregister the
-+			agent, because when this method gets called it has
-+			already been unregistered.
-+
-+		void ConfigureIPv4(object device, string interface, dict config)
-+
-+			This method gets called during a connection setup
-+			when a new set of IPv4 configuration values is to
-+			be written to a network interface.  The connection
-+			is aborted if the method call returns an error or
-+			times out.  The 'config' dictionary (a{sv}) maps
-+			string keys to values of types defined per key.
-+
-+			The following key/value pairs are used, but more
-+			may be added in future versions.
-+
-+			string Method - Indicates whether the local address
-+			was set statically (value "static") or obtained
-+			automatically such as through DHCP (value "auto").
-+			Even when the address was obtained from the remote
-+			end some configuration bits, such as DNS addresses,
-+			may have been overridden locally.
-+
-+			string Address - Local IP address string.
-+
-+			byte PrefixLength - Holds the prefix-length of the
-+			local subnet.  For IPv4 this maps to the netmask.
-+
-+			string Gateway [optional] - Local subnet's gateway
-+			address if one exists.
-+
-+			array(string) DomainNameServers [optional] - Holds
-+			the list of DNS addresses configured if any exist.
-+
-+			array(string) DomainNames [optional] - Holds the
-+			network's local domain names if any exist.
-+
-+			Possible Errors: net.connman.iwd.Agent.Error.Canceled
-+
-+		void ConfigureIPv6(object device, string interface, dict config)
-+
-+			Same as ConfigureIPv4 above but for IPv6.
-+
-+		void Cancel(object device, string interface,
-+						string reason) [noreply]
-+
-+			This method gets called to indicate that the connection
-+			request failed before a reply was returned.  The
-+			argument will indicate why the request is being
-+			cancelled and may be "out-of-range", "user-canceled",
-+			"timed-out" or "shutdown".
+ static const struct operating_class_info *e4_find_opclass(uint32_t opclass)
 -- =
 
-2.32.0
+2.34.1
 
---===============6947136240458460523==--
+--===============6894851324600956675==--
 
