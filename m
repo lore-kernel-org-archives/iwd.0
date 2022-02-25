@@ -1,37 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============4870233946902142661=="
+Content-Type: multipart/mixed; boundary="===============6059882981724354612=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] Remove 'at_console' and add 'netdev' D-Bus policy setting
-Date: Wed, 26 Jan 2022 13:15:35 -0600
-Message-ID: <fd47cc4d-b5c1-df68-4836-86380b2a339c@gmail.com>
-In-Reply-To: 2768901.420F2JQYdu@bagend
+Subject: [PATCH 08/11] band: keep 6GHz frequencies out of 40mhz special case
+Date: Fri, 25 Feb 2022 09:58:07 -0800
+Message-ID: <20220225175810.2914413-8-prestwoj@gmail.com>
+In-Reply-To: 20220225175810.2914413-1-prestwoj@gmail.com
 
---===============4870233946902142661==
+--===============6059882981724354612==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Diederik,
+There is no 40MHz upper/lower concept for 6GHz so avoid this special
+handling.
+---
+ src/band.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-On 1/26/22 13:14, Diederik de Haas wrote:
-> On Wednesday, 26 January 2022 15:12:38 CET Diederik de Haas wrote:
->> On Wednesday, 26 January 2022 15:04:23 CET Diederik de Haas wrote:
->>> Therefor remove the 'at_console_ setting block.
->>
->> Grr, the last underscore should've been a single quote.
-> =
+diff --git a/src/band.c b/src/band.c
+index 87b70d42..984bc15d 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -902,8 +902,12 @@ int oci_verify(const uint8_t oci[static 3], const stru=
+ct band_chandef *own)
+ 	 * on 40 Mhz channels.  If the STA is operating on 40 Mhz while the
+ 	 * peer is operating on 80 or 160 Mhz wide channels, then only the
+ 	 * primary channel validation is performed
++	 *
++	 * With 6GHz operating classes there is no concept of upper/lower 40mhz
++	 * channels, therefore this special handling list not needed.
+ 	 */
+-	if (own_bandwidth =3D=3D 40 && oci_bandwidth =3D=3D 40) {
++	if (own_bandwidth =3D=3D 40 && oci_bandwidth =3D=3D 40 &&
++						info->operating_class < 131) {
+ 		uint32_t behavior;
+ =
 
-> And the title/subject is also suboptimal, maybe this?
-> dbus: Remove 'at_console' and add 'netdev' policy settings
-> =
+ 		/*
+-- =
 
-> Should I submit a v2 patch for that or can/will that be corrected when
-> committing the patch?
+2.34.1
 
-I haven't looked yet, so feel free to just submit a v2.
-
-Regards,
--Denis
---===============4870233946902142661==--
+--===============6059882981724354612==--
 
