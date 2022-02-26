@@ -1,66 +1,155 @@
-Content-Type: multipart/mixed; boundary="===============9138450942613123945=="
+Content-Type: multipart/mixed; boundary="===============0031494264339719636=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/2] auto-t: fix eapol_reauth utility
-Date: Tue, 24 May 2022 13:31:44 -0700
-Message-ID: <20220524203145.3218063-1-prestwoj@gmail.com>
+Subject: [PATCH v4] network: add 6GHz restrictions to network_can_connect_bss
+Date: Fri, 25 Feb 2022 17:06:39 -0800
+Message-ID: <20220226010639.2965333-1-prestwoj@gmail.com>
 
---===============9138450942613123945==
+--===============0031494264339719636==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This was passing IFNAME=3D along with EAPOL_REAUTH which does not work
-in the context of a hostapd socket where the iface is already implied.
-This fixes that issue as well as resets the events array and actually
-waits for the required events afterwards.
+The 802.11ax standards adds some restrictions for the 6GHz band. In short
+stations must use SAE, OWE, or 8021x on this band and frame protection is
+required.
 ---
- autotests/testEAP-PEAPv0-CryptoBinding/NoISK_test.py | 3 ---
- autotests/util/hostapd.py                            | 5 ++++-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ src/network.c | 58 +++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 45 insertions(+), 13 deletions(-)
 
-diff --git a/autotests/testEAP-PEAPv0-CryptoBinding/NoISK_test.py b/autotes=
-ts/testEAP-PEAPv0-CryptoBinding/NoISK_test.py
-index 9a1fa52c..0323fdc1 100644
---- a/autotests/testEAP-PEAPv0-CryptoBinding/NoISK_test.py
-+++ b/autotests/testEAP-PEAPv0-CryptoBinding/NoISK_test.py
-@@ -37,9 +37,6 @@ class Test(unittest.TestCase):
+v4:
+ * Renamed label to mfp_no_tkip
+ * Fixed missing parentheses after IS_SAE
+
+diff --git a/src/network.c b/src/network.c
+index 4e7af27c..7330126e 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -55,6 +55,7 @@
+ #include "src/util.h"
+ #include "src/erp.h"
+ #include "src/handshake.h"
++#include "src/band.h"
  =
 
-         hostapd.eapol_reauth(device.address)
+ #define SAE_PT_SETTING "SAE-PT-Group%u"
  =
 
--        hostapd.wait_for_event('CTRL-EVENT-EAP-STARTED')
--        hostapd.wait_for_event('CTRL-EVENT-EAP-SUCCESS')
+@@ -774,6 +775,7 @@ int network_can_connect_bss(struct network *network, co=
+nst struct scan_bss *bss)
+ 	struct network_config *config =3D info ? &info->config : NULL;
+ 	bool can_transition_disable =3D wiphy_can_transition_disable(wiphy);
+ 	struct ie_rsn_info rsn;
++	enum band_freq band;
+ 	int ret;
+ =
+
+ 	switch (security) {
+@@ -785,6 +787,9 @@ int network_can_connect_bss(struct network *network, co=
+nst struct scan_bss *bss)
+ 		return -ENOSYS;
+ 	}
+ =
+
++	if (!band_freq_to_channel(bss->frequency, &band))
++		return -ENOTSUP;
++
+ 	memset(&rsn, 0, sizeof(rsn));
+ 	ret =3D scan_bss_get_rsn_info(bss, &rsn);
+ 	if (ret < 0) {
+@@ -797,6 +802,13 @@ int network_can_connect_bss(struct network *network, c=
+onst struct scan_bss *bss)
+ 		 * We assume the spec means us to check bit 3 here
+ 		 */
+ 		if (ret =3D=3D -ENOENT && security =3D=3D SECURITY_NONE) {
++			/*
++			 * 802.11ax 12.12.2 - STA shall not use Open System
++			 * authentication without encryption
++			 */
++			if (band =3D=3D BAND_FREQ_6_GHZ)
++				return -EPERM;
++
+ 			if (!config)
+ 				return 0;
+ =
+
+@@ -814,26 +826,21 @@ int network_can_connect_bss(struct network *network, =
+const struct scan_bss *bss)
+ 		return ret;
+ 	}
+ =
+
+-	if (!config || !config->have_transition_disable)
++	if (!config || !config->have_transition_disable) {
++		if (band =3D=3D BAND_FREQ_6_GHZ)
++			goto mfp_no_tkip;
++
+ 		goto no_transition_disable;
++	}
+ =
+
+ 	if (!can_transition_disable) {
++		if (band =3D=3D BAND_FREQ_6_GHZ)
++			return -EPERM;
++
+ 		l_debug("HW not capable of Transition Disable, skip");
+ 		goto no_transition_disable;
+ 	}
+ =
+
+-	/*
+-	 * WPA3 Specification, v3, Section 8:
+-	 * - Disable use of WEP and TKIP
+-	 * - Disallow association without negotiation of PMF
+-	 */
+-	rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_TKIP;
 -
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(device, condition)
+-	if (!rsn.group_management_cipher)
+-		return -EPERM;
+-
+-	rsn.mfpr =3D true;
+-
+ 	/* WPA3-Personal */
+ 	if (test_bit(&config->transition_disable, 0)) {
+ 		rsn.akm_suites &=3D ~IE_RSN_AKM_SUITE_PSK;
+@@ -851,6 +858,31 @@ int network_can_connect_bss(struct network *network, c=
+onst struct scan_bss *bss)
+ 			return -EPERM;
+ 	}
  =
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index 6a9f37c7..ff5a97c1 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -163,8 +163,11 @@ class HostapdCLI(object):
-         ctx.start_process(cmd).wait()
- =
-
-     def eapol_reauth(self, client_address):
--        cmd =3D 'IFNAME=3D' + self.ifname + ' EAPOL_REAUTH ' + client_addr=
-ess
-+        self.events =3D []
-+        cmd =3D 'EAPOL_REAUTH ' + client_address
-         self.ctrl_sock.sendall(cmd.encode('utf-8'))
-+        self.wait_for_event('CTRL-EVENT-EAP-STARTED')
-+        self.wait_for_event('CTRL-EVENT-EAP-SUCCESS')
- =
-
-     def reload(self):
-         # Seemingly all three commands needed for the instance to notice
++mfp_no_tkip:
++	/*
++	 * WPA3 Specification, v3, Section 8:
++	 * - Disable use of WEP and TKIP
++	 * - Disallow association without negotiation of PMF
++	 */
++	rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_TKIP;
++
++	if (!rsn.group_management_cipher)
++		return -EPERM;
++
++	rsn.mfpr =3D true;
++
++	/* 802.11ax Section 12.12.2 */
++	if (band =3D=3D BAND_FREQ_6_GHZ) {
++		/* STA shall not use the following cipher suite selectors */
++		rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_USE_GROUP_CIPHER;
++
++		/* Basically the STA must use OWE, SAE, or 8021x */
++		if (!IE_AKM_IS_SAE(rsn.akm_suites) &&
++				!IE_AKM_IS_8021X(rsn.akm_suites) &&
++				(!(rsn.akm_suites | IE_RSN_AKM_SUITE_OWE)))
++			return -EPERM;
++	}
++
+ no_transition_disable:
+ 	if (!wiphy_select_cipher(wiphy, rsn.pairwise_ciphers))
+ 		return -ENOTSUP;
 -- =
 
 2.34.1
 
---===============9138450942613123945==--
+--===============0031494264339719636==--
 
