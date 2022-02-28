@@ -1,105 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============4542477973623510367=="
+Content-Type: multipart/mixed; boundary="===============6347030158135093333=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/7] station: replace station_parse_bss_security
-Date: Tue, 22 Feb 2022 14:57:13 -0800
-Message-ID: <20220222225718.2485794-2-prestwoj@gmail.com>
-In-Reply-To: 20220222225718.2485794-1-prestwoj@gmail.com
+Subject: [PATCH v3 1/4] scan: add support for scanning on AP interface type
+Date: Mon, 28 Feb 2022 10:49:36 -0800
+Message-ID: <20220228184939.3150560-1-prestwoj@gmail.com>
 
---===============4542477973623510367==
+--===============6347030158135093333==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Replaces this with scan_bss_get_security
+This adds a new flag, force_ap to the scan parameters. When enabled
+this will set NL80211_SCAN_FLAG_AP.
 ---
- src/station.c | 27 ++++-----------------------
- 1 file changed, 4 insertions(+), 23 deletions(-)
+ src/scan.c | 3 +++
+ src/scan.h | 1 +
+ 2 files changed, 4 insertions(+)
 
-diff --git a/src/station.c b/src/station.c
-index cd119ff1..9e58e3d6 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -346,25 +346,6 @@ static int bss_signal_strength_compare(const void *a, =
-const void *b, void *user)
- 	return (bss->signal_strength > new_bss->signal_strength) ? 1 : -1;
- }
+v3:
+ * Removed the feature check.
+
+diff --git a/src/scan.c b/src/scan.c
+index 12b7a3fd..b0824e72 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -391,6 +391,9 @@ static struct l_genl_msg *scan_build_cmd(struct scan_co=
+ntext *sc,
+ 					NL80211_EXT_FEATURE_SCAN_RANDOM_SN))
+ 		flags |=3D NL80211_SCAN_FLAG_RANDOM_SN;
  =
 
--static int station_parse_bss_security(struct station *station,
--				struct scan_bss *bss,
--				enum security *security_out)
--{
--	struct ie_rsn_info info;
--	int r;
--
--	r =3D scan_bss_get_rsn_info(bss, &info);
--	if (r < 0) {
--		if (r !=3D -ENOENT)
--			return r;
--
--		*security_out =3D security_determine(bss->capability, NULL);
--	} else
--		*security_out =3D security_determine(bss->capability, &info);
--
--	return 0;
--}
--
- /*
-  * Returns the network object the BSS was added to or NULL if ignored.
-  */
-@@ -400,7 +381,7 @@ static struct network *station_add_seen_bss(struct stat=
-ion *station,
- 		return NULL;
- 	}
++	if (params->ap_scan)
++		flags |=3D NL80211_SCAN_FLAG_AP;
++
+ 	if (flags)
+ 		l_genl_msg_append_attr(msg, NL80211_ATTR_SCAN_FLAGS, 4, &flags);
  =
 
--	if (station_parse_bss_security(station, bss, &security) < 0)
-+	if (scan_bss_get_security(bss, &security) < 0)
- 		return NULL;
- =
-
- 	/* Hidden OWE transition network */
-@@ -2315,7 +2296,7 @@ static bool station_roam_scan_notify(int err, struct =
-l_queue *bss_list,
- 				memcmp(bss->ssid, hs->ssid, hs->ssid_len))
- 			goto next;
- =
-
--		if (station_parse_bss_security(station, bss, &security) < 0)
-+		if (scan_bss_get_security(bss, &security) < 0)
- 			goto next;
- =
-
- 		if (security !=3D orig_security)
-@@ -3457,7 +3438,7 @@ static struct l_dbus_message *station_dbus_get_hidden=
-_access_points(
- 		int16_t signal_strength =3D bss->signal_strength;
- 		enum security security;
- =
-
--		if (station_parse_bss_security(station, bss, &security) < 0)
-+		if (scan_bss_get_security(bss, &security) < 0)
- 			continue;
- =
-
- 		l_dbus_message_builder_enter_struct(builder, "sns");
-@@ -4224,7 +4205,7 @@ static struct network *station_find_network_from_bss(=
-struct station *station,
- 	memcpy(ssid, bss->ssid, bss->ssid_len);
- 	ssid[bss->ssid_len] =3D '\0';
- =
-
--	if (station_parse_bss_security(station, bss, &security) < 0)
-+	if (scan_bss_get_security(bss, &security) < 0)
- 		return NULL;
- =
-
- 	return station_network_find(station, ssid, security);
+diff --git a/src/scan.h b/src/scan.h
+index 2c401df6..ba11a508 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -98,6 +98,7 @@ struct scan_parameters {
+ 	bool randomize_mac_addr_hint : 1;
+ 	bool no_cck_rates : 1;
+ 	bool duration_mandatory : 1;
++	bool ap_scan : 1;
+ 	const uint8_t *ssid;	/* Used for direct probe request */
+ 	size_t ssid_len;
+ 	const uint8_t *source_mac;
 -- =
 
 2.34.1
 
---===============4542477973623510367==--
+--===============6347030158135093333==--
 
