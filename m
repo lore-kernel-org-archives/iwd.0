@@ -1,53 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============7229311991465331614=="
+Content-Type: multipart/mixed; boundary="===============4360381674866530968=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 3/5] tools: add decrypt-profile tool
-Date: Wed, 02 Feb 2022 14:06:50 -0600
-Message-ID: <4f9b41d8-b1fc-10b1-972e-be15064d7a17@gmail.com>
-In-Reply-To: 0f83741e9822343bc98e47d3074f8061588f7847.camel@gmail.com
+Subject: [PATCH v2] knownnetworks: use band_freq_to_channel to verify known
+ freqs
+Date: Thu, 03 Mar 2022 12:09:55 -0800
+Message-ID: <20220303200955.3454945-1-prestwoj@gmail.com>
 
---===============7229311991465331614==
+--===============4360381674866530968==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+With the addition of 6GHz '6000' is no longer the maximum frequency
+that could be in .known_network.freq. For more robustness
+band_freq_to_channel is used to validate the frequency.
+---
+ src/knownnetworks.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
->>> +#include <stdio.h>
->>> +#include <unistd.h>
->>> +#include <libgen.h> > +#include <fcntl.h>
->>
->> Isn't sys/stat.h enough? In any case, you might want to group related
->> #includes
->> together.
-> =
+diff --git a/src/knownnetworks.c b/src/knownnetworks.c
+index 87df8b4d..bc603048 100644
+--- a/src/knownnetworks.c
++++ b/src/knownnetworks.c
+@@ -45,6 +45,7 @@
+ #include "src/scan.h"
+ #include "src/util.h"
+ #include "src/watchlist.h"
++#include "src/band.h"
+ =
 
-> libgen.h is for basename(). The pattern I usually follow groups all
+ static struct l_queue *known_networks;
+ static size_t num_known_hidden_networks;
+@@ -856,7 +857,8 @@ static struct l_queue *known_frequencies_from_string(ch=
+ar *freq_set_str)
+ =
 
-I meant for fcntl.h and stat.h.  They usually go together.  Having libgen.h=
- in =
+ 		t =3D strtoul(freq_set_str, &freq_set_str, 10);
+ =
 
-between was sort of unusual.
+-		if (unlikely(errno =3D=3D ERANGE || !t || t > 6000))
++		if (unlikely(errno =3D=3D ERANGE || !t ||
++					!band_freq_to_channel(t, NULL)))
+ 			goto error;
+ =
 
->>
->> Note that you will also get errors from this function as well.=C2=A0 So
->> I'm not sure
->> if you want to re-design it to not print unnecessarily.
-> =
+ 		known_freq =3D l_new(struct known_frequency, 1);
+-- =
 
-> __storage_decrypt() shouldn't print anything in this context since I
-> haven't enabled logging (previous patch sets did though).
+2.34.1
 
-Ok fair enough.  I couldn't recall whether l_error was always printed or no=
-t. =
-
-Still, it may be better to return a -ERRNO and print based on that from a h=
-igher =
-
-level function.
-
-Regards,
--Denis
---===============7229311991465331614==--
+--===============4360381674866530968==--
 
