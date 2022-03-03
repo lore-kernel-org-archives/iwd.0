@@ -1,43 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============3800885731983818158=="
+Content-Type: multipart/mixed; boundary="===============2463537435699705427=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 6/9] auto-t: wpas.py: allow arbitrary events to be handled
-Date: Fri, 18 Feb 2022 11:31:31 -0800
-Message-ID: <20220218193134.2143232-6-prestwoj@gmail.com>
-In-Reply-To: 20220218193134.2143232-1-prestwoj@gmail.com
+Subject: Re: [PATCH] knownnetworks: update known frequencies maximum to 7115
+Date: Thu, 03 Mar 2022 12:57:34 -0600
+Message-ID: <20dc4e75-fa02-1d4b-fd92-68e92cd47f36@gmail.com>
+In-Reply-To: 20220303172234.3447411-1-prestwoj@gmail.com
 
---===============3800885731983818158==
+--===============2463537435699705427==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If an event is in response to some command which is returning an
-unexpected value (unexpected with respect to wpas.py) handle_eow
-would raise an exception.
+Hi James,
 
-Specifically with DPP this was being hit when the URI was being
-returned.
----
- autotests/util/wpas.py | 2 --
- 1 file changed, 2 deletions(-)
+On 3/3/22 11:22, James Prestwood wrote:
+> With the addition of 6GHz '6000' is no longer the maximum frequency
+> that could be in .known_network.freq.
+> ---
+>   src/knownnetworks.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-index 6b845232..c8e65179 100644
---- a/autotests/util/wpas.py
-+++ b/autotests/util/wpas.py
-@@ -88,8 +88,6 @@ class Wpas:
-         def handle_eow():
-             nonlocal key, value, count, event
-             if count =3D=3D 0:
--                if key is not None or not value:
--                    raise Exception('Bad event name')
-                 key =3D 'event'
-             elif key is None:
-                 if not value:
--- =
+> diff --git a/src/knownnetworks.c b/src/knownnetworks.c
+> index 87df8b4d..fc024333 100644
+> --- a/src/knownnetworks.c
+> +++ b/src/knownnetworks.c
+> @@ -856,7 +856,7 @@ static struct l_queue *known_frequencies_from_string(=
+char *freq_set_str)
+>   =
 
-2.34.1
+>   		t =3D strtoul(freq_set_str, &freq_set_str, 10);
+>   =
 
---===============3800885731983818158==--
+> -		if (unlikely(errno =3D=3D ERANGE || !t || t > 6000))
+> +		if (unlikely(errno =3D=3D ERANGE || !t || t > 7115))
+
+Do you want to use band_freq_to_channel here instead?  That one checks the =
+valid =
+
+freqs...
+
+>   			goto error;
+>   =
+
+>   		known_freq =3D l_new(struct known_frequency, 1);
+> =
+
+
+Regards,
+-Denis
+--===============2463537435699705427==--
 
