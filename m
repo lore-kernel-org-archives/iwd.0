@@ -1,54 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============7393392592794480131=="
+Content-Type: multipart/mixed; boundary="===============2306516580921968371=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2] offchannel: introduce new offchannel module
-Date: Mon, 06 Dec 2021 12:48:20 -0600
-Message-ID: <3b9d8507-3ae5-322d-06b0-92a7c7807196@gmail.com>
-In-Reply-To: f38627a0c4c02189f3cc2e08619b6349452b58eb.camel@gmail.com
+Subject: Re: [PATCH] knownnetworks: update known frequencies maximum to 7115
+Date: Thu, 03 Mar 2022 12:23:07 -0800
+Message-ID: <95e6332cce4340c0db255465ad6b43c513de44ed.camel@gmail.com>
+In-Reply-To: 7452861.j3UhPhjJgs@bagend
 
---===============7393392592794480131==
+--===============2306516580921968371==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
-
-> Even with this though I don't see a point of waiting for the ACK since
-> the kernel will send cancel ROC. The ACK callback for this would have
-> no purpose AFAIK.
+On Thu, 2022-03-03 at 18:59 +0100, Diederik de Haas wrote:
+> On Thursday, 3 March 2022 18:22:34 CET James Prestwood wrote:
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 if (unlikely(errno =3D=3D ERANGE || !t || t > 6000))
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 if (unlikely(errno =3D=3D ERANGE || !t || t > 7115))
 > =
 
+> Sorry if this is a dumb comment, but why use a 'magic number' [1]
+> (which =
 
-If you always want to wait for the cancel event, then I would concur.  Ques=
-tion =
+> meaning can be derived from the git commit comment, but not when just
+> looking =
 
-is whether the kernel would always guarantee that this is sent.  I guess we=
-'ll =
+> at the source)?
 
-find out :)
+I'm not sure if we have a style/rule about this but I think generally
+if the value is only used once, and its clear what it is, a macro may
+not be required.
+
+*waits for angry mob*
+
+Denis' recommendation solves a few potential issues in addition to just
+updating, including the hard coded value.
 
 > =
 
-> Yes, I need to only cancel conditionally. I don't see why we need to
-> invoke destroy here though? I would rather keep destroy() in one
-> location, in the work done callback.
+> 1) https://en.wikipedia.org/wiki/Magic_number_(programming)
 
-Mostly to be nice to the consumer of these methods.  They may want to assum=
-e =
 
-that cancel succeeds synchronously and that the destroy method is invoked r=
-ight =
-
-away.  For example, this may be useful if the destroy method manipulates so=
-me =
-
-data hanging off the main object and the main object is about to be destroy=
-ed =
-
-(hence the cancel call on the ongoing request).
-
-Regards,
--Denis
---===============7393392592794480131==--
+--===============2306516580921968371==--
 
