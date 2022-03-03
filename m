@@ -1,32 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============3846249987114003537=="
+Content-Type: multipart/mixed; boundary="===============6229691109113590670=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] netdev: fix bug setting OWE IE length
-Date: Thu, 03 Feb 2022 11:41:03 -0600
-Message-ID: <a4bafff2-b9ff-367e-04e2-2ab11fe265f0@gmail.com>
-In-Reply-To: 20220203172418.87777-1-prestwoj@gmail.com
+Subject: [PATCH] knownnetworks: update known frequencies maximum to 7115
+Date: Thu, 03 Mar 2022 09:22:34 -0800
+Message-ID: <20220303172234.3447411-1-prestwoj@gmail.com>
 
---===============3846249987114003537==
+--===============6229691109113590670==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+With the addition of 6GHz '6000' is no longer the maximum frequency
+that could be in .known_network.freq.
+---
+ src/knownnetworks.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 2/3/22 11:24, James Prestwood wrote:
-> The length was being set to whatever the last nl80211 attribute was,
-> not the length for the RESP_IE iteration.
-> ---
->   src/netdev.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+diff --git a/src/knownnetworks.c b/src/knownnetworks.c
+index 87df8b4d..fc024333 100644
+--- a/src/knownnetworks.c
++++ b/src/knownnetworks.c
+@@ -856,7 +856,7 @@ static struct l_queue *known_frequencies_from_string(ch=
+ar *freq_set_str)
+ =
 
+ 		t =3D strtoul(freq_set_str, &freq_set_str, 10);
+ =
 
-Applied, thanks.
+-		if (unlikely(errno =3D=3D ERANGE || !t || t > 6000))
++		if (unlikely(errno =3D=3D ERANGE || !t || t > 7115))
+ 			goto error;
+ =
 
-Regards,
--Denis
+ 		known_freq =3D l_new(struct known_frequency, 1);
+-- =
 
---===============3846249987114003537==--
+2.34.1
+
+--===============6229691109113590670==--
 
