@@ -1,282 +1,130 @@
-Content-Type: multipart/mixed; boundary="===============5034998130530314927=="
+Content-Type: multipart/mixed; boundary="===============2829766527015109762=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v6 4/6] tools: add decrypt-profile tool
-Date: Thu, 10 Feb 2022 11:03:18 -0800
-Message-ID: <20220210190320.848755-4-prestwoj@gmail.com>
-In-Reply-To: 20220210190320.848755-1-prestwoj@gmail.com
+Subject: Re: Permanent disconnect when AP changes frequency
+Date: Fri, 04 Mar 2022 08:59:44 -0800
+Message-ID: <87a2ab3d8a1f5a382df076319068c83e9f8ff051.camel@gmail.com>
+In-Reply-To: CACsRnHUCQkB5e3SG9kNCEWuggdfkKX1zLLayTFK3594ehduvZA@mail.gmail.com
 
---===============5034998130530314927==
+--===============2829766527015109762==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This tool will decrypt an IWD network profile which was previously
-encrypted using a systemd provided key. Either a text passphrase
-can be provided (--pass) or a file containing the secret (--file).
+Hi Michael,
 
-This can be useful for debugging, or recovering an encrypted
-profile after enabling SystemdEncrypt.
----
- Makefile.am                 |   8 +-
- tools/iwd-decrypt-profile.c | 212 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 219 insertions(+), 1 deletion(-)
- create mode 100644 tools/iwd-decrypt-profile.c
+On Fri, 2022-03-04 at 15:44 +0000, Michael Johnson wrote:
+> Hi all,
+> =
 
-diff --git a/Makefile.am b/Makefile.am
-index 35938d22..a0e54594 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -362,7 +362,7 @@ man_MANS +=3D wired/ead.8
- endif
- endif
- =
+> I just hit a problem today where my iwd clients were getting
+> permanently disconnected from a network after the AP changed it's
+> frequency.
 
--noinst_PROGRAMS +=3D tools/probe-req
-+noinst_PROGRAMS +=3D tools/probe-req tools/iwd-decrypt-profile
- =
+Was this the AP doing this on its own? Or did you manually change the
+frequency. In theory a channel switch should come as an event and you
+would see this in the logs:
 
- tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu.h src/mpdu.c \
- 					src/ie.h src/ie.c \
-@@ -372,6 +372,12 @@ tools_probe_req_SOURCES =3D tools/probe-req.c src/mpdu=
-.h src/mpdu.c \
- 					src/band.h src/band.c
- tools_probe_req_LDADD =3D $(ell_ldadd)
- =
+netdev_channeL_switch_event() Channel switch event, frequenct: <freq>
 
-+tools_iwd_decrypt_profile_SOURCES =3D tools/iwd-decrypt-profile.c \
-+					src/common.h src/common.c \
-+					src/crypto.h src/crypto.c \
-+					src/storage.h src/storage.c
-+tools_iwd_decrypt_profile_LDADD =3D ${ell_ldadd}
-+
- if HWSIM
- bin_PROGRAMS +=3D tools/hwsim
- =
+> The first time the client tries to FT roam to the changed AP it gets
+> a
+> result: 1 (authentication failed?). After that when it tries to
+> reconnect to another BSS in the same network but this time gets a
+> result: 2 (association failure?) and critically blacklists the BSS.
+> It
+> tries to connect to all available BSS and gets the same error until
+> there are none left. This leaves the client permanently disconnected.
 
-diff --git a/tools/iwd-decrypt-profile.c b/tools/iwd-decrypt-profile.c
-new file mode 100644
-index 00000000..0afd7888
---- /dev/null
-+++ b/tools/iwd-decrypt-profile.c
-@@ -0,0 +1,212 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2022  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <fcntl.h>
-+#include <sys/stat.h>
-+#include <sys/mman.h>
-+#include <getopt.h>
-+
-+#include <ell/ell.h>
-+
-+#include "ell/useful.h"
-+
-+#include "src/storage.h"
-+#include "src/common.h"
-+
-+static void usage(void)
-+{
-+	printf("decrypt-profile - Decrypt a network profile\n"
-+		"Usage:\n");
-+	printf("\tdecrypt-profile [--pass | --file] [OPTIONS]\n");
-+	printf("\n\tEither --pass or --file must be provided. The profile\n");
-+	printf("\tshould be supplied using --infile.\n");
-+	printf("\tThe --ssid argument must be used if the SSID cannot be\n");
-+	printf("\tinferred from the input file\n\n");
-+	printf("Options:\n"
-+		"\t-p, --pass             Password/key used to encrypt\n"
-+		"\t-f, --file             File containing key\n"
-+		"\t-s, --ssid             SSID for associated profile (will\n"
-+		"\t                       be inferred from --infile if not\n"
-+		"\t                       provided)\n"
-+		"\t-i, --infile           Input profile\n"
-+		"\t-o, --outfile          Output file for decrypted profile\n"
-+		"\t-h, --help             Show help options\n");
-+	printf("\n");
-+}
-+
-+static const struct option main_options[] =3D {
-+	{ "pass", required_argument,       NULL, 'p' },
-+	{ "file", required_argument,       NULL, 'f' },
-+	{ "infile", required_argument,     NULL, 'i' },
-+	{ "outfile", required_argument,    NULL, 'o' },
-+	{ "ssid", required_argument,       NULL, 's' },
-+	{ "help", no_argument,             NULL, 'h' },
-+	{ }
-+};
-+
-+static bool secret_from_file(const char *file)
-+{
-+	int fd;
-+	struct stat st;
-+	void *data =3D NULL;
-+
-+	fd =3D open(file, O_RDONLY, 0);
-+	if (fd < 0) {
-+		printf("Cant open %s (%d)\n", file, fd);
-+		return false;
-+	}
-+
-+	if (fstat(fd, &st) < 0 || st.st_size =3D=3D 0) {
-+		close(fd);
-+		return false;
-+	}
-+
-+	data =3D mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
-+	close(fd);
-+
-+	if (data =3D=3D MAP_FAILED)
-+		return false;
-+
-+	__storage_set_encryption_key(data, st.st_size);
-+
-+	munmap(data, st.st_size);
-+
-+	return true;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	const char *pass =3D NULL;
-+	const char *file =3D NULL;
-+	const char *infile =3D NULL;
-+	const char *outfile =3D NULL;
-+	const char *ssid =3D NULL;
-+	_auto_(l_free) char *decrypted =3D NULL;
-+	_auto_(l_settings_free) struct l_settings *settings =3D NULL;
-+	enum security sec;
-+	int ret =3D EXIT_FAILURE;
-+	ssize_t len =3D 0;
-+	int r;
-+
-+	for (;;) {
-+		int opt;
-+
-+		opt =3D getopt_long(argc, argv, "pfhio",
-+					main_options, NULL);
-+		if (opt < 0)
-+			break;
-+
-+		switch (opt) {
-+		case 'p':
-+			pass =3D optarg;
-+			break;
-+		case 'f':
-+			file =3D optarg;
-+			break;
-+		case 'i':
-+			infile =3D optarg;
-+			break;
-+		case 'o':
-+			outfile =3D optarg;
-+			break;
-+		case 's':
-+			ssid =3D optarg;
-+			break;
-+		case 'h':
-+			usage();
-+			return EXIT_SUCCESS;
-+		default:
-+			goto failed;
-+		}
-+	}
-+
-+	if (!file && !pass) {
-+		printf("--file or --pass must be supplied\n\n");
-+		goto usage;
-+	}
-+
-+	if (!infile) {
-+		printf("--infile must be supplied\n\n");
-+		goto usage;
-+	}
-+
-+	if (!ssid) {
-+		ssid =3D storage_network_ssid_from_path(infile, &sec);
-+		if (!ssid) {
-+			printf("Can't get SSID from --infile, use --ssid\n\n");
-+			goto usage;
-+		}
-+	}
-+
-+	settings =3D l_settings_new();
-+
-+	if (!l_settings_load_from_file(settings, infile)) {
-+		printf("Profile is not formatted correctly\n");
-+		goto failed;
-+	}
-+
-+	if (pass)
-+		__storage_set_encryption_key((const uint8_t *)pass,
-+						strlen(pass));
-+	else if (!secret_from_file(file))
-+		goto failed;
-+
-+	r =3D __storage_decrypt(settings, ssid, NULL);
-+	if (r < 0) {
-+		printf("Unable to decrypt profile (%d)\n", r);
-+		goto failed;
-+	}
-+
-+	decrypted =3D l_settings_to_data(settings, (size_t *)&len);
-+
-+	if (!outfile)
-+		fwrite(decrypted, 1, len, stdout);
-+	else {
-+		int fd =3D open(outfile, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
-+
-+		if (fd < 0) {
-+			printf("Unable to open %s (%d)\n", outfile, fd);
-+			close(fd);
-+			goto failed;
-+		}
-+
-+		len =3D write(fd, decrypted, len);
-+
-+		close(fd);
-+
-+		if (len < 0) {
-+			printf("Unable to write to %s (%ld)\n", outfile, len);
-+			goto failed;
-+		}
-+	}
-+
-+	ret =3D EXIT_SUCCESS;
-+
-+usage:
-+	if (ret !=3D EXIT_SUCCESS)
-+		usage();
-+
-+failed:
-+	return ret;
-+}
--- =
+This shouldn't be permanent, but the more times the connection fails
+the longer the timer. In your case though the FT failure will not cause
+a blacklist, only the association failure. The default is 60 seconds
+though, so that is quite a while.
 
-2.34.1
+> I'm guessing that changing the frequency wiped the auth from the AP
+> which explains why the initial FT roam fails but I'm not sure what
+> would be causing the subsequent failures.
 
---===============5034998130530314927==--
+Could be. Looks like the failure after the failed roam never even got
+to the AP. So the "association failure" is really just the kernel
+failing (unless you're on brcmfmac?). Maybe something can be seen in
+the kernel logs. I'm thinking the kernel got confused maybe with the
+channel switch and probably needs to re-scan. Does a manual attempt to
+connect afterwards work?
+
+> =
+
+> Looking at `src/station.c:station_retry_with_status` would it make
+> sense to clean whatever auth data we have for FT if the status is an
+> AUTH failure?
+
+The retry logic really only matters for new connections. Once IWD goes
+into a disconnected state (like after you're roam failure) any previous
+connection data is cleared out.
+
+> =
+
+> ```
+> Mar 04 13:35:14 p3-1147 iwd[443]:
+> src/station.c:station_transition_start() 5, target *:*:*:*:07:b1
+> Mar 04 13:35:14 p3-1147 iwd[443]:
+> src/netdev.c:netdev_cqm_rssi_update()
+> Mar 04 13:35:14 p3-1147 iwd[443]:
+> src/wiphy.c:wiphy_radio_work_insert() Inserting work item 6
+> Mar 04 13:35:14 p3-1147 iwd[443]: src/station.c:station_enter_state()
+> Old State: connected, new state: roaming
+> Mar 04 13:35:14 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_done()
+> Work item 5 done
+> Mar 04 13:35:14 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_next()
+> Starting work item 6
+> Mar 04 13:35:14 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_done()
+> Work item 6 done
+> Mar 04 13:35:14 p3-1147 iwd[443]:
+> src/station.c:station_fast_transition_cb() 5, result: 1
+> Mar 04 13:35:14 p3-1147 iwd[443]: src/station.c:station_roam_failed()
+> 5
+> Mar 04 13:35:14 p3-1147 iwd[443]:
+> src/station.c:station_disassociated() 5
+> Mar 04 13:35:14 p3-1147 iwd[443]:
+> src/resolve.c:resolve_systemd_revert() ifindex: 5
+> Mar 04 13:35:14 p3-1147 iwd[443]: src/station.c:station_enter_state()
+> Old State: roaming, new state: disconnected
+> Mar 04 13:35:14 p3-1147 iwd[443]: src/station.c:station_enter_state()
+> Old State: disconnected, new state: autoconnect_quick
+> ...
+> Mar 04 13:36:16 p3-1147 iwd[443]:
+> src/station.c:__station_connect_network() connecting to BSS
+> *:*:*:*:08:71
+> Mar 04 13:36:16 p3-1147 iwd[443]: src/station.c:station_enter_state()
+> Old State: autoconnect_full, new state: connecting (auto)
+> Mar 04 13:36:16 p3-1147 iwd[443]: src/scan.c:scan_periodic_stop()
+> Stopping periodic scan for wdev 2
+> Mar 04 13:36:16 p3-1147 iwd[443]: src/scan.c:scan_cancel() Trying to
+> cancel scan id 13 for wdev 2
+> Mar 04 13:36:16 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_done()
+> Work item 13 done
+> Mar 04 13:36:16 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_next()
+> Starting work item 14
+> Mar 04 13:36:16 p3-1147 iwd[443]: src/wiphy.c:wiphy_radio_work_done()
+> Work item 14 done
+> Mar 04 13:36:16 p3-1147 iwd[443]: src/station.c:station_connect_cb()
+> 5, result: 2
+> Mar 04 13:36:16 p3-1147 iwd[443]: src/station.c:station_enter_state()
+> Old State: connecting (auto), new state: disconnected
+> ...
+> Mar 04 13:36:31 p3-1147 iwd[443]:
+> src/station.c:station_autoconnect_next() autoconnect: No suitable
+> BSSes found
+> ```
+> =
+
+> Kind Regards,
+> Michael Johnson
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+
+
+--===============2829766527015109762==--
 
