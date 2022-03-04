@@ -1,80 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============1180189965818733692=="
+Content-Type: multipart/mixed; boundary="===============2861840370198438749=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 4/7] test-runner: add initial UmlRunner implementation
-Date: Wed, 30 Mar 2022 15:20:54 -0700
-Message-ID: <20220330222057.2160244-4-prestwoj@gmail.com>
-In-Reply-To: 20220330222057.2160244-1-prestwoj@gmail.com
+Subject: Re: Permanent disconnect when AP changes frequency
+Date: Fri, 04 Mar 2022 11:00:56 -0600
+Message-ID: <dbabf9fb-7fd0-56e8-a52d-0eee8cf86566@gmail.com>
+In-Reply-To: CACsRnHUCQkB5e3SG9kNCEWuggdfkKX1zLLayTFK3594ehduvZA@mail.gmail.com
 
---===============1180189965818733692==
+--===============2861840370198438749==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows test-runner to run inside a UML binary which has some
-advantages, specifically time-travel/infinite CPU speed. This should
-fix any scheduler related failures we have on slower systems.
+Hi Michael,
 
-Currently this runner does not suppor the same features as the Qemu
-runner, specifically:
+On 3/4/22 09:44, Michael Johnson wrote:
+> Hi all,
+> =
 
- - No hardware passthrough
- - No logging/monitor (UML -> host mounting isn't implemented yet)
----
- tools/runner.py | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+> I just hit a problem today where my iwd clients were getting
+> permanently disconnected from a network after the AP changed it's
+> frequency.
 
-diff --git a/tools/runner.py b/tools/runner.py
-index 743d74b1..33c10917 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -213,7 +213,9 @@ class Runner:
- 			else:
- 				args.runner =3D 'qemu'
- =
+Can you elaborate?  Normally change in frequency is mostly transparent to u=
+ser =
 
--		if args.runner =3D=3D 'qemu':
-+		if args.runner =3D=3D 'uml':
-+			return UmlRunner(args)
-+		elif args.runner =3D=3D 'qemu':
- 			return QemuRunner(args)
- 		else:
- 			raise Exception("Unknown runner %s" % args.runner)
-@@ -483,3 +485,29 @@ class QemuRunner(RunnerAbstract):
- 		# gracefully.
- 		#
- 		libc.reboot(RB_AUTOBOOT)
-+
-+class UmlRunner(RunnerAbstract):
-+	name =3D "UML Runner"
-+
-+	def __init__(self, args):
-+		super().__init__(args)
-+
-+		if len(sys.argv) <=3D 1:
-+			return
-+
-+		if not which(args.kernel):
-+			raise Exception('Cannot locate UML binary %s' % args.kernel)
-+
-+		kern_log =3D "ignore_loglevel" if "kernel" in args.verbose else "quiet"
-+
-+		cmd =3D [args.kernel, 'rootfstype=3Dhostfs', 'ro', 'mem=3D256M', 'mac802=
-11_hwsim.radios=3D0',
-+				'time-travel=3Dinf-cpu', 'eth0=3Dmcast', 'eth1=3Dmcast',
-+				'%s '% kern_log, 'init=3D%s' % args.start]
-+		cmd.extend(args.to_cmd().split(' '))
-+
-+		self.cmdline =3D cmd
-+
-+	def prepare_environment(self):
-+		self._prepare_mounts()
-+
-+		super().prepare_environment()
--- =
+space.  We should get an event from the driver/kernel telling us that this =
 
-2.34.1
+happened, but overall it should not cause us to roam?
 
---===============1180189965818733692==--
+> The first time the client tries to FT roam to the changed AP it gets a
+
+Why is the roam being triggered?  This seems to be missing from your log.
+
+> result: 1 (authentication failed?). After that when it tries to
+> reconnect to another BSS in the same network but this time gets a
+> result: 2 (association failure?) and critically blacklists the BSS. It
+> tries to connect to all available BSS and gets the same error until
+
+Do you have an iwmon trace?
+
+> there are none left. This leaves the client permanently disconnected.
+> I'm guessing that changing the frequency wiped the auth from the AP
+> which explains why the initial FT roam fails but I'm not sure what
+> would be causing the subsequent failures.
+> =
+
+> Looking at `src/station.c:station_retry_with_status` would it make
+> sense to clean whatever auth data we have for FT if the status is an
+> AUTH failure?
+
+It is being wiped out anyway since we're no longer associated when the FT f=
+ails. =
+
+  Subsequent connections are being done the 'slow' way.  We'd need to see i=
+wmon =
+
+traces to understand why these associations fail.
+
+Regards,
+-Denis
+--===============2861840370198438749==--
 
