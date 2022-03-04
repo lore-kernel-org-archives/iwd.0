@@ -1,63 +1,94 @@
-Content-Type: multipart/mixed; boundary="===============0664733591976773740=="
+Content-Type: multipart/mixed; boundary="===============6217563320785082380=="
 MIME-Version: 1.0
 From: Michael Johnson <mjohnson459 at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Possible bug - DISASSOC_LOW_ACK
-Date: Wed, 22 Sep 2021 15:53:47 +0100
-Message-ID: <CACsRnHVji4BE+XCjXmv2myEyzJvekMex7Rv6Et5UT_iHAa5nhA@mail.gmail.com>
-In-Reply-To: 94d5719f-178a-3ca8-40a6-b6f2692934c5@gmail.com
+Subject: Re: Permanent disconnect when AP changes frequency
+Date: Fri, 04 Mar 2022 17:18:51 +0000
+Message-ID: <CACsRnHXw1gyU2pRDsVc4hqMqPk7zBcKahXOjYUPgC3_=_5KktQ@mail.gmail.com>
+In-Reply-To: 87a2ab3d8a1f5a382df076319068c83e9f8ff051.camel@gmail.com
 
---===============0664733591976773740==
+--===============6217563320785082380==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi James,
 
-On Wed, 22 Sept 2021 at 15:13, Denis Kenzior <denkenz(a)gmail.com> wrote:
-> This is indeed strange.  iwmon would capture this, but maybe it is easier=
- to put
-> in a bit more debugging into the CQM paths and see if we get some more cl=
-ues?
-> Maybe the CQM events are propagated correctly but the signal isn't below =
-the
-> roaming threshold?
+On Fri, 4 Mar 2022 at 16:59, James Prestwood <prestwoj(a)gmail.com> wrote:
 
-Maybe. I'll try and capture the contents of the CQM packets when it happens.
-
-> > I'm not sure how to reproduce this as it's relatively rare, happening
-> > 3 times in about a week. The logs below are from a machine running
-> > version 1.17.
-> > I'll see if I can start a rolling iwmon capture to get more info. Is
-> > there anything else that would be useful?
+> Was this the AP doing this on its own? Or did you manually change the
+> frequency. In theory a channel switch should come as an event and you
+> would see this in the logs:
 >
-> Might be chasing ghosts, but the only other thing I see is a a few CMD_FR=
-AME
-> events (see below) that we receive which are not recognized?  Or at least=
- I
-> don't see any logs of them being parsed.  iwmon trace will capture these,=
- but
-> may be easier to log them in your case.
+> netdev_channeL_switch_event() Channel switch event, frequenct: <freq>
 
-I can do that. I'll add extra logging to those `_notify()` methods and
-update when I see it happen again.
+I manually changed it but I don't see any "Channel switch event" in
+the logs. The client wasn't connected to the AP at the time of the
+change and it only failed when it tried to roam normally.
 
-> Did we just roam, or is something else going on?
+> This shouldn't be permanent, but the more times the connection fails
+> the longer the timer. In your case though the FT failure will not cause
+> a blacklist, only the association failure. The default is 60 seconds
+> though, so that is quite a while.
 
-We roamed at 15:40:21.954094 and then lost comms at 15:42:30.885817.
-I've put the full logs here https://pastebin.com/FJxpGmfd.
+It looks like it came off the blacklist once but still failed and was
+put back on it.
 
-> > Sep 21 15:46:41.998639 p3-683 kernel: wlan0: deauthenticated from
-> > ea:9e:38:78:08:71 (Reason: 34=3DDISASSOC_LOW_ACK)
+Mar 04 13:35:15 p3-1147 iwd[443]:
+src/station.c:__station_connect_network() connecting to BSS *:08:71
+Mar 04 13:35:15 p3-1147 iwd[443]: src/station.c:station_connect_cb()
+5, result: 2
+Mar 04 13:35:15 p3-1147 iwd[443]: src/station.c:station_connect_cb()
+Nothing left on autoconnect list
+Mar 04 13:35:23 p3-1147 iwd[443]:
+src/station.c:__station_connect_network() connecting to BSS *:07:b1
+Mar 04 13:35:23 p3-1147 iwd[443]: src/station.c:station_connect_cb()
+5, result: 2
+Mar 04 13:35:23 p3-1147 iwd[443]: src/station.c:station_connect_cb()
+Nothing left on autoconnect list
+Mar 04 13:36:16 p3-1147 iwd[443]:
+src/station.c:__station_connect_network() connecting to BSS *:08:71
+Mar 04 13:36:16 p3-1147 iwd[443]: src/station.c:station_connect_cb()
+5, result: 2
+Mar 04 13:36:16 p3-1147 iwd[443]: src/station.c:station_connect_cb()
+Nothing left on autoconnect list
+Mar 04 13:36:24 p3-1147 iwd[443]:
+src/station.c:__station_connect_network() connecting to BSS *:07:b1
+Mar 04 13:36:24 p3-1147 iwd[443]: src/station.c:station_connect_cb()
+5, result: 2
+Mar 04 13:36:24 p3-1147 iwd[443]: src/station.c:station_connect_cb()
+Nothing left on autoconnect list
+
+> > I'm guessing that changing the frequency wiped the auth from the AP
+> > which explains why the initial FT roam fails but I'm not sure what
+> > would be causing the subsequent failures.
 >
-> Hmm, never seen this before.  I wonder if the power limit event the kernel
-> prints about earlier has something to do with this?
+> Could be. Looks like the failure after the failed roam never even got
+> to the AP. So the "association failure" is really just the kernel
+> failing (unless you're on brcmfmac?). Maybe something can be seen in
+> the kernel logs. I'm thinking the kernel got confused maybe with the
+> channel switch and probably needs to re-scan. Does a manual attempt to
+> connect afterwards work?
 
-The "Limit TX power" message is always printed after a roam. I'm not
-entirely sure why but I believe APs to advertise which power level to
-use?
+The kernel didn't print anything to the logs but I can try and capture
+extra details with iwmon. I couldn't test a manual connect as it's a
+headless machine but it was fine after a reboot.
+I can try to trigger it again with a hardwire so I can check the
+manual connection.
+
+> > Looking at `src/station.c:station_retry_with_status` would it make
+> > sense to clean whatever auth data we have for FT if the status is an
+> > AUTH failure?
+>
+> The retry logic really only matters for new connections. Once IWD goes
+> into a disconnected state (like after you're roam failure) any previous
+> connection data is cleared out.
+
+Does that mean whatever is going wrong is at the kernel level? It
+seems like some state is cached somewhere if all subsequent
+connections fail.
 
 Regards,
 Michael
---===============0664733591976773740==--
+--===============6217563320785082380==--
 
