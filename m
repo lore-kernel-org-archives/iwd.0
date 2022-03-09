@@ -1,40 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============2607939230744020278=="
+Content-Type: multipart/mixed; boundary="===============2661984795546262135=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: VAUTRIN Emmanuel (Canal Plus Prestataire) <Emmanuel.VAUTRIN at
+ cpexterne.org>
 To: iwd at lists.01.org
-Subject: [PATCH] unit: add checksum/random check for test-dpp
-Date: Mon, 10 Jan 2022 14:05:35 -0800
-Message-ID: <20220110220535.1002289-1-prestwoj@gmail.com>
+Subject: RE: [PATCH] network: Hide hidden networks on passphrase error
+Date: Wed, 09 Mar 2022 08:28:11 +0000
+Message-ID: <
+ <MRZP264MB15442847B0DE53B9886299DE930A9@MRZP264MB1544.FRAP264.PROD.OUTLOOK.COM>>
+In-Reply-To: be305787-4657-4278-942b-5a6c3b9e808f@gmail.com
 
---===============2607939230744020278==
+--===============2661984795546262135==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- unit/test-dpp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> No real objections here, but there are at least two other places that mig=
+ht be
+> affected by this change:
+>
+> In station_dbus_connect_hidden_network() there is a code path that tries =
+to skip
+> the hidden network scan if the network is already in the scan results.  S=
+ince
+> you're removing this possibility, that path should probably be removed.
 
-diff --git a/unit/test-dpp.c b/unit/test-dpp.c
-index 1d4846c7..c40fd8b5 100644
---- a/unit/test-dpp.c
-+++ b/unit/test-dpp.c
-@@ -143,7 +143,9 @@ int main(int argc, char *argv[])
- {
- 	l_test_init(&argc, &argv);
- =
+> In station_hidden_network_scan_results(), if the hidden SSID we scanned f=
+or
+> contains BSSes in both open and PSK networks, those networks aren't hidde=
+n and
+> could still be connectable.  This is highly unlikely, but...
+Thank you Denis, I will check that. As I am not familiar with iwd source co=
+de,
+it may take some time.
 
--	l_test_add("DPP test key derivation", test_key_derivation, NULL);
-+	if (l_checksum_is_supported(L_CHECKSUM_SHA256, true) &&
-+						l_getrandom_is_supported())
-+		l_test_add("DPP test key derivation", test_key_derivation, NULL);
- =
+> Alternatively, we could somehow mark these networks non-connectable unless
+> they're done via the ConnectHiddenNetwork() path.
+I was also thinking about this possibility. Do you think that the hidden ne=
+twork shall also
+be removed if an error occurs during connection, for example in station_con=
+nect_cb?
 
- 	return l_test_run();
- }
--- =
+Best Regards,
 
-2.31.1
-
---===============2607939230744020278==--
+Emmanuel
+--===============2661984795546262135==--
 
