@@ -1,147 +1,156 @@
-Content-Type: multipart/mixed; boundary="===============7665689774445816049=="
+Content-Type: multipart/mixed; boundary="===============6541155774290714996=="
 MIME-Version: 1.0
-From: Bruce A. Johnson <bjohnson at blueridgenetworks.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Usable link speed info from iwd?
-Date: Wed, 09 Mar 2022 15:55:42 -0500
-Message-ID: <ab667060-d8a4-6df9-45e7-978460169b61@blueridgenetworks.com>
+Subject: Re: Usable link speed info from iwd?
+Date: Wed, 09 Mar 2022 14:19:39 -0800
+Message-ID: <530a6a543af8f457fc91312410c3994499aad9ea.camel@gmail.com>
+In-Reply-To: ab667060-d8a4-6df9-45e7-978460169b61@blueridgenetworks.com
 
---===============7665689774445816049==
+--===============6541155774290714996==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Does anyone have a recommendation on how to obtain usable link speed =
+On Wed, 2022-03-09 at 15:55 -0500, Bruce A. Johnson wrote:
+> Does anyone have a recommendation on how to obtain usable link speed
+> information from iwd? Not finding anything in the API, I resorted to
+> the iw tool, and that gave me unbelievable information like:
+> iw dev wlan0 link
+> Connected to 94:a6:7e:e0:9b:10 (on wlan0)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SSID: NETGEAR62-5G
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 freq: 5180
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 RX: 729218722 bytes (698037 pa=
+ckets)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TX: 649796954 bytes (597324 pa=
+ckets)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 signal: -36 dBm
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rx bitrate: 24.0 MBit/s
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tx bitrate: 6.0 MBit/s
+> =
 
-information from iwd? Not finding anything in the API, I resorted to the =
-
-iw tool, and that gave me unbelievable information like:
-
-iw dev wlan0 link
-Connected to 94:a6:7e:e0:9b:10 (on wlan0)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SSID: NETGEAR62-5G
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 freq: 5180
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 RX: 729218722 bytes (698037 pac=
-kets)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TX: 649796954 bytes (597324 pac=
-kets)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 signal: -36 dBm
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rx bitrate: 24.0 MBit/s
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tx bitrate: 6.0 MBit/s
-
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bss flags:=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 short-slot-time
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dtim period:=C2=A0=C2=A0=C2=A0 1
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 beacon int:=C2=A0=C2=A0=C2=A0=
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bss flags:=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 short-slot-time
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dtim period:=C2=A0=C2=A0=C2=A0=
+ 1
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 beacon int:=C2=A0=C2=A0=C2=A0=
 =C2=A0 100
+> When the connection was in this state, I was able to pass data with
+> iperf3 at nearly 100 Mbps in either direction with no packet loss on
+> the transmit and about 1% packet loss on the receive. When I moved
+> the router 10-12 meters further away, iw reported a higher bit rate.
+> (I couldn't test throughput because there was no connection on the
+> WAN side in the new location.)
+> # iw dev wlan0 link
+> Connected to 94:a6:7e:e0:9b:10 (on wlan0)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SSID: NETGEAR62-5G
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 freq: 5180
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 RX: 24944 bytes (170 packets)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TX: 1949 bytes (12 packets)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 signal: -64 dBm
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rx bitrate: 260.0 MBit/s VHT-M=
+CS 3 80MHz short GI VHT-NSS 2
 
-When the connection was in this state, I was able to pass data with =
+Ah I missed this. For whatever reason VHT (Very High Throughput) was
+not enabled before. This isn't something IWD has a choice over, the AP
+controls whether its using HT, VHT, or legacy and as you've seen here
+there are other heuristics to determine whether it is used.
 
-iperf3 at nearly 100 Mbps in either direction with no packet loss on the =
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tx bitrate: 6.0 MBit/s
+> =
 
-transmit and about 1% packet loss on the receive. When I moved the =
-
-router 10-12 meters further away, iw reported a _higher_ bit rate. (I =
-
-couldn't test throughput because there was no connection on the WAN side =
-
-in the new location.)
-
-# iw dev wlan0 link
-Connected to 94:a6:7e:e0:9b:10 (on wlan0)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SSID: NETGEAR62-5G
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 freq: 5180
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 RX: 24944 bytes (170 packets)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TX: 1949 bytes (12 packets)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 signal: -64 dBm
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rx bitrate: 260.0 MBit/s VHT-MC=
-S 3 80MHz short GI VHT-NSS 2
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tx bitrate: 6.0 MBit/s
-
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bss flags:=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 short-slot-time
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dtim period:=C2=A0=C2=A0=C2=A0 1
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 beacon int:=C2=A0=C2=A0=C2=A0=
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bss flags:=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 short-slot-time
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dtim period:=C2=A0=C2=A0=C2=A0=
+ 1
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 beacon int:=C2=A0=C2=A0=C2=A0=
 =C2=A0 100
+> I must have a misunderstanding of what those figures mean. Is it that
+> the only reasonable indication of link quality is the signal
+> strength?
+> -- =
 
-I must have a misunderstanding of what those figures mean. Is it that =
-
-the only reasonable indication of link quality is the signal strength?
-
--- =
-
-Bruce Johnson
-Chantilly, Virginia
-OpenPGP key ID: 296D1CD6F2B84CABhttps://keys.openpgp.org/
+> Bruce Johnson
+> Chantilly, Virginia
+> OpenPGP key ID: 296D1CD6F2B84CAB https://keys.openpgp.org/
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
 
 
---===============7665689774445816049==
+--===============6541155774290714996==
 Content-Type: text/html
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="attachment.htm"
 
-PGh0bWw+DQogIDxoZWFkPg0KDQogICAgPG1ldGEgaHR0cC1lcXVpdj0iY29udGVudC10eXBlIiBj
-b250ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9VVRGLTgiPg0KICA8L2hlYWQ+DQogIDxib2R5Pg0K
-ICAgIDxwPkRvZXMgYW55b25lIGhhdmUgYSByZWNvbW1lbmRhdGlvbiBvbiBob3cgdG8gb2J0YWlu
-IHVzYWJsZSBsaW5rDQogICAgICBzcGVlZCBpbmZvcm1hdGlvbiBmcm9tIGl3ZD8gTm90IGZpbmRp
-bmcgYW55dGhpbmcgaW4gdGhlIEFQSSwgSQ0KICAgICAgcmVzb3J0ZWQgdG8gdGhlIGl3IHRvb2ws
-IGFuZCB0aGF0IGdhdmUgbWUgdW5iZWxpZXZhYmxlIGluZm9ybWF0aW9uDQogICAgICBsaWtlOjwv
-cD4NCiAgICA8cHJlPml3IGRldiB3bGFuMCBsaW5rDQpDb25uZWN0ZWQgdG8gOTQ6YTY6N2U6ZTA6
-OWI6MTAgKG9uIHdsYW4wKQ0KwqDCoMKgwqDCoMKgwqAgU1NJRDogTkVUR0VBUjYyLTVHDQrCoMKg
-wqDCoMKgwqDCoCBmcmVxOiA1MTgwDQrCoMKgwqDCoMKgwqDCoCBSWDogNzI5MjE4NzIyIGJ5dGVz
-ICg2OTgwMzcgcGFja2V0cykNCsKgwqDCoMKgwqDCoMKgIFRYOiA2NDk3OTY5NTQgYnl0ZXMgKDU5
-NzMyNCBwYWNrZXRzKQ0KwqDCoMKgwqDCoMKgwqAgc2lnbmFsOiAtMzYgZEJtDQrCoMKgwqDCoMKg
-wqDCoCByeCBiaXRyYXRlOiAyNC4wIE1CaXQvcw0KwqDCoMKgwqDCoMKgwqAgdHggYml0cmF0ZTog
-Ni4wIE1CaXQvcw0KDQrCoMKgwqDCoMKgwqDCoCBic3MgZmxhZ3M6wqDCoMKgwqDCoCBzaG9ydC1z
-bG90LXRpbWUNCsKgwqDCoMKgwqDCoMKgIGR0aW0gcGVyaW9kOsKgwqDCoCAxDQrCoMKgwqDCoMKg
-wqDCoCBiZWFjb24gaW50OsKgwqDCoMKgIDEwMDwvcHJlPg0KICAgIDxwPldoZW4gdGhlIGNvbm5l
-Y3Rpb24gd2FzIGluIHRoaXMgc3RhdGUsIEkgd2FzIGFibGUgdG8gcGFzcyBkYXRhDQogICAgICB3
-aXRoIGlwZXJmMyBhdCBuZWFybHkgMTAwIE1icHMgaW4gZWl0aGVyIGRpcmVjdGlvbiB3aXRoIG5v
-IHBhY2tldA0KICAgICAgbG9zcyBvbiB0aGUgdHJhbnNtaXQgYW5kIGFib3V0IDElIHBhY2tldCBs
-b3NzIG9uIHRoZSByZWNlaXZlLiBXaGVuDQogICAgICBJIG1vdmVkIHRoZSByb3V0ZXIgMTAtMTIg
-bWV0ZXJzIGZ1cnRoZXIgYXdheSwgaXcgcmVwb3J0ZWQgYSA8dT5oaWdoZXI8L3U+DQogICAgICBi
-aXQgcmF0ZS4gKEkgY291bGRuJ3QgdGVzdCB0aHJvdWdocHV0IGJlY2F1c2UgdGhlcmUgd2FzIG5v
-DQogICAgICBjb25uZWN0aW9uIG9uIHRoZSBXQU4gc2lkZSBpbiB0aGUgbmV3IGxvY2F0aW9uLik8
-YnI+DQogICAgPC9wPg0KICAgIDxwcmU+IyBpdyBkZXYgd2xhbjAgbGluaw0KQ29ubmVjdGVkIHRv
-IDk0OmE2OjdlOmUwOjliOjEwIChvbiB3bGFuMCkNCsKgwqDCoMKgwqDCoMKgIFNTSUQ6IE5FVEdF
-QVI2Mi01Rw0KwqDCoMKgwqDCoMKgwqAgZnJlcTogNTE4MA0KwqDCoMKgwqDCoMKgwqAgUlg6IDI0
-OTQ0IGJ5dGVzICgxNzAgcGFja2V0cykNCsKgwqDCoMKgwqDCoMKgIFRYOiAxOTQ5IGJ5dGVzICgx
-MiBwYWNrZXRzKQ0KwqDCoMKgwqDCoMKgwqAgc2lnbmFsOiAtNjQgZEJtDQrCoMKgwqDCoMKgwqDC
-oCByeCBiaXRyYXRlOiAyNjAuMCBNQml0L3MgVkhULU1DUyAzIDgwTUh6IHNob3J0IEdJIFZIVC1O
-U1MgMg0KwqDCoMKgwqDCoMKgwqAgdHggYml0cmF0ZTogNi4wIE1CaXQvcw0KDQrCoMKgwqDCoMKg
-wqDCoCBic3MgZmxhZ3M6wqDCoMKgwqDCoCBzaG9ydC1zbG90LXRpbWUNCsKgwqDCoMKgwqDCoMKg
-IGR0aW0gcGVyaW9kOsKgwqDCoCAxDQrCoMKgwqDCoMKgwqDCoCBiZWFjb24gaW50OsKgwqDCoMKg
-IDEwMDwvcHJlPg0KICAgIDxwPkkgbXVzdCBoYXZlIGEgbWlzdW5kZXJzdGFuZGluZyBvZiB3aGF0
-IHRob3NlIGZpZ3VyZXMgbWVhbi4gSXMgaXQNCiAgICAgIHRoYXQgdGhlIG9ubHkgcmVhc29uYWJs
-ZSBpbmRpY2F0aW9uIG9mIGxpbmsgcXVhbGl0eSBpcyB0aGUgc2lnbmFsDQogICAgICBzdHJlbmd0
-aD88L3A+DQogICAgPHByZSBjbGFzcz0ibW96LXNpZ25hdHVyZSIgY29scz0iNzIiPi0tIA0KQnJ1
-Y2UgSm9obnNvbg0KQ2hhbnRpbGx5LCBWaXJnaW5pYQ0KT3BlblBHUCBrZXkgSUQ6IDI5NkQxQ0Q2
-RjJCODRDQUIgPGEgY2xhc3M9Im1vei10eHQtbGluay1mcmVldGV4dCIgaHJlZj0iaHR0cHM6Ly9r
-ZXlzLm9wZW5wZ3Aub3JnLyI+aHR0cHM6Ly9rZXlzLm9wZW5wZ3Aub3JnLzwvYT48L3ByZT4NCiAg
-PC9ib2R5Pg0KPC9odG1sPg0K
+PGh0bWw+PGhlYWQ+CgogICAgCiAgPC9oZWFkPgogIDxib2R5PjxkaXY+T24gV2VkLCAyMDIyLTAz
+LTA5IGF0IDE1OjU1IC0wNTAwLCBCcnVjZSBBLiBKb2huc29uIHdyb3RlOjwvZGl2PjxibG9ja3F1
+b3RlIHR5cGU9ImNpdGUiIHN0eWxlPSJtYXJnaW46MCAwIDAgLjhleDsgYm9yZGVyLWxlZnQ6MnB4
+ICM3MjlmY2Ygc29saWQ7cGFkZGluZy1sZWZ0OjFleCI+PHA+RG9lcyBhbnlvbmUgaGF2ZSBhIHJl
+Y29tbWVuZGF0aW9uIG9uIGhvdyB0byBvYnRhaW4gdXNhYmxlIGxpbmsgc3BlZWQgaW5mb3JtYXRp
+b24gZnJvbSBpd2Q/IE5vdCBmaW5kaW5nIGFueXRoaW5nIGluIHRoZSBBUEksIEkgcmVzb3J0ZWQg
+dG8gdGhlIGl3IHRvb2wsIGFuZCB0aGF0IGdhdmUgbWUgdW5iZWxpZXZhYmxlIGluZm9ybWF0aW9u
+IGxpa2U6PC9wPjxwcmU+aXcgZGV2IHdsYW4wIGxpbms8L3ByZT48cHJlPkNvbm5lY3RlZCB0byA5
+NDphNjo3ZTplMDo5YjoxMCAob24gd2xhbjApPC9wcmU+PHByZT4mbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgU1NJRDogTkVUR0VBUjYyLTVHPC9wcmU+PHByZT4mbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgZnJlcTogNTE4MDwvcHJlPjxw
+cmU+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFJYOiA3MjkyMTg3
+MjIgYnl0ZXMgKDY5ODAzNyBwYWNrZXRzKTwvcHJlPjxwcmU+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFRYOiA2NDk3OTY5NTQgYnl0ZXMgKDU5NzMyNCBwYWNrZXRz
+KTwvcHJlPjxwcmU+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHNp
+Z25hbDogLTM2IGRCbTwvcHJlPjxwcmU+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7IHJ4IGJpdHJhdGU6IDI0LjAgTUJpdC9zPC9wcmU+PHByZT4mbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgdHggYml0cmF0ZTogNi4wIE1CaXQvczwvcHJl
+PjxwcmU+PGJyPjwvcHJlPjxwcmU+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7IGJzcyBmbGFnczombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgc2hvcnQtc2xv
+dC10aW1lPC9wcmU+PHByZT4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsgZHRpbSBwZXJpb2Q6Jm5ic3A7Jm5ic3A7Jm5ic3A7IDE8L3ByZT48cHJlPiZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBiZWFjb24gaW50OiZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyAxMDA8L3ByZT48cD5XaGVuIHRoZSBjb25uZWN0aW9uIHdhcyBpbiB0aGlzIHN0
+YXRlLCBJIHdhcyBhYmxlIHRvIHBhc3MgZGF0YSB3aXRoIGlwZXJmMyBhdCBuZWFybHkgMTAwIE1i
+cHMgaW4gZWl0aGVyIGRpcmVjdGlvbiB3aXRoIG5vIHBhY2tldCBsb3NzIG9uIHRoZSB0cmFuc21p
+dCBhbmQgYWJvdXQgMSUgcGFja2V0IGxvc3Mgb24gdGhlIHJlY2VpdmUuIFdoZW4gSSBtb3ZlZCB0
+aGUgcm91dGVyIDEwLTEyIG1ldGVycyBmdXJ0aGVyIGF3YXksIGl3IHJlcG9ydGVkIGEgPHU+aGln
+aGVyPC91PiBiaXQgcmF0ZS4gKEkgY291bGRuJ3QgdGVzdCB0aHJvdWdocHV0IGJlY2F1c2UgdGhl
+cmUgd2FzIG5vIGNvbm5lY3Rpb24gb24gdGhlIFdBTiBzaWRlIGluIHRoZSBuZXcgbG9jYXRpb24u
+KTxicj48L3A+PHByZT4jIGl3IGRldiB3bGFuMCBsaW5rPC9wcmU+PHByZT5Db25uZWN0ZWQgdG8g
+OTQ6YTY6N2U6ZTA6OWI6MTAgKG9uIHdsYW4wKTwvcHJlPjxwcmU+Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFNTSUQ6IE5FVEdFQVI2Mi01RzwvcHJlPjxwcmU+Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IGZyZXE6IDUxODA8L3ByZT48
+cHJlPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBSWDogMjQ5NDQg
+Ynl0ZXMgKDE3MCBwYWNrZXRzKTwvcHJlPjxwcmU+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7IFRYOiAxOTQ5IGJ5dGVzICgxMiBwYWNrZXRzKTwvcHJlPjxwcmU+Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHNpZ25hbDogLTY0IGRCbTwv
+cHJlPjxwcmU+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHJ4IGJp
+dHJhdGU6IDI2MC4wIE1CaXQvcyBWSFQtTUNTIDMgODBNSHogc2hvcnQgR0kgVkhULU5TUyAyPC9w
+cmU+PC9ibG9ja3F1b3RlPjxkaXY+PGJyPjwvZGl2PjxkaXY+QWggSSBtaXNzZWQgdGhpcy4gRm9y
+IHdoYXRldmVyIHJlYXNvbiBWSFQgKFZlcnkgSGlnaCBUaHJvdWdocHV0KSB3YXMgbm90IGVuYWJs
+ZWQgYmVmb3JlLiBUaGlzIGlzbid0IHNvbWV0aGluZyBJV0QgaGFzIGEgY2hvaWNlIG92ZXIsIHRo
+ZSBBUCBjb250cm9scyB3aGV0aGVyIGl0cyB1c2luZyBIVCwgVkhULCBvciBsZWdhY3kgYW5kIGFz
+IHlvdSd2ZSBzZWVuIGhlcmUgdGhlcmUgYXJlIG90aGVyIGhldXJpc3RpY3MgdG8gZGV0ZXJtaW5l
+IHdoZXRoZXIgaXQgaXMgdXNlZC48L2Rpdj48ZGl2Pjxicj48L2Rpdj48YmxvY2txdW90ZSB0eXBl
+PSJjaXRlIiBzdHlsZT0ibWFyZ2luOjAgMCAwIC44ZXg7IGJvcmRlci1sZWZ0OjJweCAjNzI5ZmNm
+IHNvbGlkO3BhZGRpbmctbGVmdDoxZXgiPjxwcmU+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7IHR4IGJpdHJhdGU6IDYuMCBNQml0L3M8L3ByZT48cHJlPjxicj48L3By
+ZT48cHJlPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBic3MgZmxh
+Z3M6Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHNob3J0LXNsb3QtdGltZTwvcHJlPjxw
+cmU+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IGR0aW0gcGVyaW9k
+OiZuYnNwOyZuYnNwOyZuYnNwOyAxPC9wcmU+PHByZT4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsgYmVhY29uIGludDombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMTAw
+PC9wcmU+PHA+SSBtdXN0IGhhdmUgYSBtaXN1bmRlcnN0YW5kaW5nIG9mIHdoYXQgdGhvc2UgZmln
+dXJlcyBtZWFuLiBJcyBpdCB0aGF0IHRoZSBvbmx5IHJlYXNvbmFibGUgaW5kaWNhdGlvbiBvZiBs
+aW5rIHF1YWxpdHkgaXMgdGhlIHNpZ25hbCBzdHJlbmd0aD88L3A+PHByZT4tLSA8L3ByZT48cHJl
+PkJydWNlIEpvaG5zb248L3ByZT48cHJlPkNoYW50aWxseSwgVmlyZ2luaWE8L3ByZT48cHJlPk9w
+ZW5QR1Aga2V5IElEOiAyOTZEMUNENkYyQjg0Q0FCIDxhIGNsYXNzPSJtb3otdHh0LWxpbmstZnJl
+ZXRleHQiIGhyZWY9Imh0dHBzOi8va2V5cy5vcGVucGdwLm9yZy8iPmh0dHBzOi8va2V5cy5vcGVu
+cGdwLm9yZy88L2E+PC9wcmU+PGRpdj5fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXzxicj48L2Rpdj48ZGl2Pml3ZCBtYWlsaW5nIGxpc3QgLS0gPGEgaHJlZj0i
+bWFpbHRvOml3ZEBsaXN0cy4wMS5vcmciPml3ZEBsaXN0cy4wMS5vcmc8L2E+PGJyPjwvZGl2Pjxk
+aXY+VG8gdW5zdWJzY3JpYmUgc2VuZCBhbiBlbWFpbCB0byA8YSBocmVmPSJtYWlsdG86aXdkLWxl
+YXZlQGxpc3RzLjAxLm9yZyI+aXdkLWxlYXZlQGxpc3RzLjAxLm9yZzwvYT48YnI+PC9kaXY+PC9i
+bG9ja3F1b3RlPjxkaXY+PGJyPjwvZGl2PjxkaXY+PHNwYW4+PC9zcGFuPjwvZGl2PjwvYm9keT48
+L2h0bWw+Cg==
 
---===============7665689774445816049==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="OpenPGP_signature.sig"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCndzRjVCQUFCQ0FBakZpRUVtR3ZveWt3My9F
-MHgxT2VNS1cwYzF2SzRUS3NGQW1JcEZFNEZBd0FBQUFBQUNna1FLVzBjMXZLNFRLdTEKYkEvL1pL
-U2JnbmhnSWZkcHZuRWFSTnVFSUxqSGZkNUIwVm1QK05EeWNEWXRaOUxQOGlGMmlVczVyVEh1M0Fp
-aWJqNXJBc3hLYVZPSwplTUxZT054ZXY1U0crcjdPbkxWMmVrWDRyYkdBWWthN013cVludTlOTDdl
-eTRrKy9zSVNTdytDRERQVGtnYzN1RkdURDQyUEZISEtPClVsQlNBVlZicUNQdkJ2MjdJWEY0TXN6
-cFJRN1RON0dJcFN6NDJvUzVkU3ZRb1NFbTJ1NVRWeUkwZlZqdmEzWjNPWFVLVTQ2WXhsZjUKRFNl
-U3hGVzR4Y1dxdm1YeUtMcTNtc0JkN1JjTi90RndJb3NvcXIwOTgwSnNLYkNqM0RxY2VLSnY5N2Nk
-Qnh3RnFlTjhtbzdQNWRtdQpucWZmOVpFWUg4Tk1EUTIxeHdUQkcwa0Z0TnBUOW9oZTA0bkFOMHZH
-U2h1V2RWYm1ocHhJVU9sNnUvV3Q3RmlxNC9FTExPMWhreWJzClJ3VFZqVmJGbDhaQnpKZkpKWGFh
-dDRIS1B2SURkMGhWRU5TRDFhOE9MRzVzMlVsZzlsYjRCMnNQb3dwam1MSnN2ZjBhQjBEWDFKUGsK
-TkRqYlBUMU9ZRXpSRU5IV3RWcVJkWU83NjlEL1hrbmtWd2F3VmxFSGViL2l5UzBhVXdNekdkYlFt
-Y1ovblpFN0IvQ3RGK3ZwbWtRZApvQlJZZ3RIOFIyT0xoNmduWXJ6MEl3K0RIQmZzR2JVSG1DdlB1
-UE82Smo5NmYrV2RqSmpDYmczdTkreVBwRkdEUnUxaHdDSXNqWFA1CjFMcHNlUUViL0hRd0dGNkJJ
-ZlgwMUlYOXF4eGZWenFOaXFQeWw4WjdOVVhLR3pUcmNBVnVETHY2elJ3N3E3cFBuREdqMW44R0g3
-UE8KRFY4PQo9cnFyYQotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============7665689774445816049==--
+--===============6541155774290714996==--
 
