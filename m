@@ -1,74 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============7617962814301379241=="
+Content-Type: multipart/mixed; boundary="===============6822625554453119990=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: wen zhang <zhw2101024 at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 5/8] auto-t: use wait_for_event in testSAE-roam
-Date: Tue, 22 Mar 2022 15:51:10 -0700
-Message-ID: <20220322225113.1023688-5-prestwoj@gmail.com>
-In-Reply-To: 20220322225113.1023688-1-prestwoj@gmail.com
+Subject: Unable to build ELL with OpenSSL 3
+Date: Wed, 09 Mar 2022 18:36:17 +0800
+Message-ID: <CAKjfnjpsLZ+amJ4ywTP=bpKt-YmoBLqV4cppNJcSrQXmNGQ5Bg@mail.gmail.com>
 
---===============7617962814301379241==
+--===============6822625554453119990==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Depending on timing hostapd may not show a station with list_sta().
-Instead use wait_for_event.
----
- autotests/testSAE-roam/connection_test.py | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+I tried to build ELL library on my system built following LFS 11.1
+<https://www.linuxfromscratch.org/lfs/view/stable-systemd/>, but the make
+command failed. Adding V=3D1 to the make command show one openssl command
+failed to finish.
 
-diff --git a/autotests/testSAE-roam/connection_test.py b/autotests/testSAE-=
-roam/connection_test.py
-index 2409e0d1..4c49eaf8 100644
---- a/autotests/testSAE-roam/connection_test.py
-+++ b/autotests/testSAE-roam/connection_test.py
-@@ -35,7 +35,8 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_condition(device, condition)
- =
+> openssl pkcs8 -in unit/cert-client-key-pkcs8.pem -out
+> unit/cert-client-key-pkcs8-v2-des.pem -topk8 -v2 des-cbc -v2prf
+> hmacWithSHA1 -passout pass:abc
+>
+Maybe something need to migrate from OpenSSL 1 to OpenSSL 3?
 
--        self.assertTrue(self.bss_hostapd[0].list_sta())
-+        self.bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.=
-address)
-+
-         self.assertFalse(self.bss_hostapd[1].list_sta())
- =
+--===============6822625554453119990==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.htm"
 
-         testutil.test_iface_operstate(device.name)
-@@ -54,7 +55,7 @@ class Test(unittest.TestCase):
-         to_condition =3D 'obj.state =3D=3D DeviceState.connected'
-         wd.wait_for_object_change(device, from_condition, to_condition)
- =
+PGRpdiBkaXI9Imx0ciI+PGRpdj5JIHRyaWVkIHRvIGJ1aWxkIEVMTCBsaWJyYXJ5IG9uIG15IHN5
+c3RlbSBidWlsdCBmb2xsb3dpbmcgPGEgaHJlZj0iaHR0cHM6Ly93d3cubGludXhmcm9tc2NyYXRj
+aC5vcmcvbGZzL3ZpZXcvc3RhYmxlLXN5c3RlbWQvIj5MRlMgMTEuMTwvYT4sIGJ1dCB0aGUgbWFr
+ZSBjb21tYW5kIGZhaWxlZC4gQWRkaW5nIFY9MSB0byB0aGUgbWFrZSBjb21tYW5kIHNob3cgb25l
+IG9wZW5zc2wgY29tbWFuZCBmYWlsZWQgdG8gZmluaXNoLjwvZGl2PjxibG9ja3F1b3RlIGNsYXNz
+PSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjowcHggMHB4IDBweCAwLjhleDtib3JkZXItbGVm
+dDoxcHggc29saWQgcmdiKDIwNCwyMDQsMjA0KTtwYWRkaW5nLWxlZnQ6MWV4Ij48ZGl2Pm9wZW5z
+c2wgcGtjczggLWluIHVuaXQvY2VydC1jbGllbnQta2V5LXBrY3M4LnBlbSAtb3V0IHVuaXQvY2Vy
+dC1jbGllbnQta2V5LXBrY3M4LXYyLWRlcy5wZW0gLXRvcGs4IC12MiBkZXMtY2JjIC12MnByZiBo
+bWFjV2l0aFNIQTEgLXBhc3NvdXQgcGFzczphYmM8L2Rpdj48L2Jsb2NrcXVvdGU+PGRpdj5NYXli
+ZSBzb21ldGhpbmcgbmVlZCB0byBtaWdyYXRlIGZyb20gT3BlblNTTCAxIHRvIE9wZW5TU0wgMz8g
+PGJyPjwvZGl2PjwvZGl2Pgo=
 
--        self.assertTrue(self.bss_hostapd[1].list_sta())
-+        self.bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.=
-address)
- =
-
-         testutil.test_iface_operstate(device.name)
-         testutil.test_ifaces_connected(self.bss_hostapd[1].ifname, device.=
-name)
-@@ -72,8 +73,10 @@ class Test(unittest.TestCase):
-         condition =3D 'obj.state !=3D DeviceState.roaming'
-         wd.wait_for_object_condition(device, condition)
- =
-
--        self.assertEqual(device.state, iwd.DeviceState.connected)
--        self.assertTrue(self.bss_hostapd[2].list_sta())
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        self.bss_hostapd[2].wait_for_event('AP-STA-CONNECTED %s' % device.=
-address)
- =
-
-         testutil.test_iface_operstate(device.name)
-         testutil.test_ifaces_connected(self.bss_hostapd[2].ifname, device.=
-name)
--- =
-
-2.34.1
-
---===============7617962814301379241==--
+--===============6822625554453119990==--
 
