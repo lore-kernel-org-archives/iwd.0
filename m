@@ -1,64 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============7358646471813652353=="
+Content-Type: multipart/mixed; boundary="===============6840545365516277944=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: =?utf-8?q?Vladim=C3=ADr_Dudr_=3Cvladimir_at_tango-dj=2Ecz=3E?=
 To: iwd at lists.01.org
-Subject: [PATCH 1/5] json: add json_iter_get_string
-Date: Thu, 06 Jan 2022 14:42:12 -0800
-Message-ID: <20220106224216.569171-1-prestwoj@gmail.com>
+Subject: [PATCH] client: make grey really grey
+Date: Mon, 14 Mar 2022 21:49:45 +0100
+Message-ID: <20220314204944.246498-1-vladimir@tango-dj.cz>
 
---===============7358646471813652353==
+--===============6840545365516277944==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hello, =
+
+I dared to fix displaying of grey color for iwctl. I tested in Kitty,
+Xterm, Termite, foot and Alarcitty.
+
+\e[1;30m is bold black, often, but not always displayed bright black or
+bold bright black. In case it is displayed as real black it is
+invisible. \e[1;90m is explicit bold bright black.
+
+\e[37m is white, therefore it is not suitable to be
+labeled as GREY, which is \e[90m. Anyway, this define is used only in
+header, so matching the color to BOLDGRAY seems intuitive. =
+
+
+Cheers, =
+
+Vladim=C3=ADr
 ---
- src/json.c | 14 ++++++++++++++
- src/json.h |  1 +
- 2 files changed, 15 insertions(+)
+ client/display.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/json.c b/src/json.c
-index b48dba4a..b89fbaa6 100644
---- a/src/json.c
-+++ b/src/json.c
-@@ -398,6 +398,20 @@ bool json_iter_get_container(struct json_iter *iter,
- 	return true;
- }
+diff --git a/client/display.h b/client/display.h
+index b5df944a..7747c6a0 100644
+--- a/client/display.h
++++ b/client/display.h
+@@ -23,8 +23,8 @@
+ struct command;
+ struct command_family;
  =
 
-+bool json_iter_get_string(struct json_iter *iter, char **s)
-+{
-+	struct json_contents *c =3D iter->contents;
-+	jsmntok_t *t =3D c->tokens + iter->current;
-+
-+	if (t->type !=3D JSMN_STRING)
-+		return false;
-+
-+	if (s)
-+		*s =3D TOK_TO_STR(c->json, t);
-+
-+	return true;
-+}
-+
- enum json_type json_iter_get_type(struct json_iter *iter)
- {
- 	struct json_contents *c =3D iter->contents;
-diff --git a/src/json.h b/src/json.h
-index 518d778c..1db3428d 100644
---- a/src/json.h
-+++ b/src/json.h
-@@ -95,6 +95,7 @@ bool json_iter_get_boolean(struct json_iter *iter, bool *=
-b);
- bool json_iter_get_null(struct json_iter *iter);
- bool json_iter_get_container(struct json_iter *iter,
- 				struct json_iter *container);
-+bool json_iter_get_string(struct json_iter *iter, char **s);
- =
-
- enum json_type json_iter_get_type(struct json_iter *iter);
- bool json_iter_next(struct json_iter *iter);
+-#define COLOR_BOLDGRAY	"\x1B[1;30m"
+-#define COLOR_GRAY	"\x1b[37m"
++#define COLOR_BOLDGRAY	"\x1B[1;90m"
++#define COLOR_GRAY	"\x1b[90m"
+ #define COLOR_GREEN	"\x1b[32m"
+ #define COLOR_RED	"\x1B[0;91m"
+ #define COLOR_BLUE	"\x1B[94m"
 -- =
 
-2.31.1
+2.35.1
 
---===============7358646471813652353==--
+--===============6840545365516277944==--
 
