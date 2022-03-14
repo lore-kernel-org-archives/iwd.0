@@ -1,124 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============3157662282043074076=="
+Content-Type: multipart/mixed; boundary="===============4820593528299669693=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 11/14] auto-t: cleanup testRRM
-Date: Thu, 31 Mar 2022 16:16:38 -0700
-Message-ID: <20220331231641.484200-11-prestwoj@gmail.com>
-In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
+Subject: Re: [PATCH] client: make grey really grey
+Date: Mon, 14 Mar 2022 14:40:21 -0700
+Message-ID: <b36ff816d2a4daf4ec1398bf8b676e22bc564834.camel@gmail.com>
+In-Reply-To: 20220314204944.246498-1-vladimir@tango-dj.cz
 
---===============3157662282043074076==
+--===============4820593528299669693==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This removes prints which were never supposed to make it upstream as
-well as changes sleep() to wd.wait() as well as increase the wait
-period to fix issues with how fast UML runs the tests.
----
- autotests/testRRM/connection_test.py | 32 ++++++++++------------------
- 1 file changed, 11 insertions(+), 21 deletions(-)
+Hi,
 
-diff --git a/autotests/testRRM/connection_test.py b/autotests/testRRM/conne=
-ction_test.py
-index 278c69ce..4d894958 100644
---- a/autotests/testRRM/connection_test.py
-+++ b/autotests/testRRM/connection_test.py
-@@ -11,8 +11,6 @@ from iwd import NetworkType
- from hostapd import HostapdCLI
- import testutil
- =
+On Mon, 2022-03-14 at 21:49 +0100, Vladim=C3=ADr Dudr wrote:
+> Hello, =
 
--from time import sleep
--
- # Table beacon with wildcard BSSID
- basic_beacon =3D '51000000000002ffffffffffff020100'
- # Table beacon with wildcard BSSID and SSID filter
-@@ -53,51 +51,43 @@ class Test(unittest.TestCase):
- =
+> I dared to fix displaying of grey color for iwctl. I tested in Kitty,
+> Xterm, Termite, foot and Alarcitty.
+> =
 
-         hapd.wait_for_event('AP-STA-CONNECTED')
- =
+> \e[1;30m is bold black, often, but not always displayed bright black
+> or
+> bold bright black. In case it is displayed as real black it is
+> invisible. \e[1;90m is explicit bold bright black.
+> =
 
-+        wd.wait(1)
-+
-         # This should return both APs
-         hapd.req_beacon(device.address, basic_beacon)
- =
+> \e[37m is white, therefore it is not suitable to be
+> labeled as GREY, which is \e[90m. Anyway, this define is used only in
+> header, so matching the color to BOLDGRAY seems intuitive. =
 
-         for e in ['BEACON-RESP-RX', 'BEACON-RESP-RX']:
--            event =3D hapd.wait_for_event(e)
--            if event:
--                print(event)
-+            hapd.wait_for_event(e)
- =
 
--        sleep(0.5)
-+        wd.wait(1)
- =
+This definitely makes the table headers show up which I kinda forgot
+existed since they were nearly black. Thanks.
 
-         # This should return just ssidRRM
-         hapd.req_beacon(device.address, beacon_with_ssid)
--        event =3D hapd.wait_for_event('BEACON-RESP-RX')
--        if event:
--            print(event)
-+        hapd.wait_for_event('BEACON-RESP-RX')
- =
+My only suggestion would be to change the commit description a bit to
+look more like a git commit, something like:
 
--        sleep(0.5)
-+        wd.wait(1)
- =
+"Fixed displaying of grey color for iwctl...."
 
-         # This should passive scan on channel 11, returning otherSSID
-         hapd.req_beacon(device.address, beacon_passive)
-         # TODO: See if we are scanning here (scan not initiated from stati=
-on)
- =
+The rest seems fine to me.
 
--        event =3D hapd.wait_for_event('BEACON-RESP-RX')
--        if event:
--            print(event)
-+        hapd.wait_for_event('BEACON-RESP-RX')
- =
+Thanks,
+James
 
--        sleep(0.5)
-+        wd.wait(1)
- =
+> =
 
-         # This should active scan on channel 11, returning otherSSID
-         hapd.req_beacon(device.address, beacon_active)
-         # TODO: See if we are scanning here (scan not initiated from stati=
-on)
- =
+> Cheers, =
 
--        event =3D hapd.wait_for_event('BEACON-RESP-RX')
--        if event:
--            print(event)
-+        hapd.wait_for_event('BEACON-RESP-RX')
- =
+> Vladim=C3=ADr
+> ---
+> =C2=A0client/display.h | 4 ++--
+> =C2=A01 file changed, 2 insertions(+), 2 deletions(-)
+> =
 
--        sleep(0.5)
-+        wd.wait(1)
- =
+> diff --git a/client/display.h b/client/display.h
+> index b5df944a..7747c6a0 100644
+> --- a/client/display.h
+> +++ b/client/display.h
+> @@ -23,8 +23,8 @@
+> =C2=A0struct command;
+> =C2=A0struct command_family;
+> =C2=A0
+> -#define COLOR_BOLDGRAY=C2=A0"\x1B[1;30m"
+> -#define COLOR_GRAY=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"\x1b[37m"
+> +#define COLOR_BOLDGRAY=C2=A0"\x1B[1;90m"
+> +#define COLOR_GRAY=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"\x1b[90m"
+> =C2=A0#define COLOR_GREEN=C2=A0=C2=A0=C2=A0=C2=A0"\x1b[32m"
+> =C2=A0#define COLOR_RED=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"\x1B[0;91m"
+> =C2=A0#define COLOR_BLUE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"\x1B[94m"
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
 
-          # This should passive scan on channel 11, returning otherSSID
-         hapd.req_beacon(device.address, beacon_passive_duration)
-         # TODO: See if we are scanning here (scan not initiated from stati=
-on)
- =
 
--        event =3D hapd.wait_for_event('BEACON-RESP-RX')
--        if event:
--            print(event)
-+        hapd.wait_for_event('BEACON-RESP-RX')
- =
-
-         device.disconnect()
- =
-
--- =
-
-2.34.1
-
---===============3157662282043074076==--
+--===============4820593528299669693==--
 
