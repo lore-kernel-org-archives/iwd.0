@@ -1,32 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============2842255290520930383=="
+Content-Type: multipart/mixed; boundary="===============7701320652153880015=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] test-runner: fix valgrind after no radio change
-Date: Mon, 14 Feb 2022 16:03:38 -0600
-Message-ID: <4f4fbb7f-0a4c-6ec9-9853-728c94250bf4@gmail.com>
-In-Reply-To: 20220214214139.1017355-1-prestwoj@gmail.com
+Subject: Re: [PATCH 1/1] client: fix colors to make grey really grey
+Date: Wed, 16 Mar 2022 09:57:14 -0500
+Message-ID: <83acb067-edb8-92dd-2d74-c0f6d83d52b4@gmail.com>
+In-Reply-To: 20220316090633.13369-2-vladimir@tango-dj.cz
 
---===============2842255290520930383==
+--===============7701320652153880015==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Hi Vladim=C3=ADr,
 
-On 2/14/22 15:41, James Prestwood wrote:
-> The change adding support for starting IWD with no radios ended up
-> breaking the valgrind option.
+On 3/16/22 04:06, Vladim=C3=ADr Dudr wrote:
+> \e[1;30m is bold black, often, but not always displayed bright black or
+> bold bright black. In case it is displayed as real black it is
+> invisible. \e[1;90m is explicit bold bright black.
+> =
+
+> \e[37m is white, therefore it is not suitable to be labeled as GREY,
+> which is \e[90m
 > ---
->   tools/test-runner | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+>   client/display.h | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > =
 
 
-Applied.  I squashed this into the commit in question.
+Applied, thanks!
 
 Regards,
 -Denis
 
---===============2842255290520930383==--
+--===============7701320652153880015==--
 
