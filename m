@@ -1,49 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============8110945228469052585=="
+Content-Type: multipart/mixed; boundary="===============5683252132987170442=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] station: replace old BSS with 'best_bss' on roam scan
-Date: Fri, 04 Mar 2022 13:24:19 -0800
-Message-ID: <20220304212419.3534676-1-prestwoj@gmail.com>
+Subject: [PATCH 4/6] wired: check eap_load_settings
+Date: Fri, 18 Mar 2022 09:44:18 -0700
+Message-ID: <20220318164420.739968-4-prestwoj@gmail.com>
+In-Reply-To: 20220318164420.739968-1-prestwoj@gmail.com
 
---===============8110945228469052585==
+--===============5683252132987170442==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The logic here assumed any BSS's in the roam scan were identical to ones
-in station's bss_list with the same address. Usually this is true but,
-for example, if the BSS changed frequency the one in station's list is
-invalid.
-
-Intead when a match is found remove the old BSS and re-insert the new one.
+Caught by static analysis
 ---
- src/station.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ wired/ethdev.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 92b2667b..f6f0adac 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2368,8 +2368,12 @@ next:
+diff --git a/wired/ethdev.c b/wired/ethdev.c
+index e000afae..db5a9ac9 100644
+--- a/wired/ethdev.c
++++ b/wired/ethdev.c
+@@ -238,10 +238,15 @@ static void rx_packet(struct ethdev *dev, const uint8=
+_t *addr,
  =
 
- 	bss =3D network_bss_find_by_addr(network, best_bss->addr);
- 	if (bss) {
--		scan_bss_free(best_bss);
--		best_bss =3D bss;
-+		network_bss_update(network, best_bss);
-+		l_queue_remove(station->bss_list, bss);
-+		scan_bss_free(bss);
+ 			l_debug("Created new EAPoL session");
+ =
+
+-			l_queue_push_tail(dev->eapol_sessions, eapol);
+-
+ 			eapol->cred =3D network_lookup_security("default");
+-			eap_load_settings(eapol->eap, eapol->cred, "EAP-");
++			if (!eapol->cred || !eap_load_settings(eapol->eap,
++						eapol->cred, "EAP-")) {
++				l_error("Failed to load EAP settings");
++				eapol_free(eapol);
++				return;
++			}
 +
-+		l_queue_insert(station->bss_list, best_bss,
-+				scan_bss_rank_compare, NULL);
- 	} else {
- 		network_bss_add(network, best_bss);
- 		l_queue_push_tail(station->bss_list, best_bss);
++			l_queue_push_tail(dev->eapol_sessions, eapol);
+ =
+
+ 			eap_set_key_material_func(eapol->eap, eap_key_material);
+ 			eap_set_event_func(eapol->eap, eap_event);
 -- =
 
 2.34.1
 
---===============8110945228469052585==--
+--===============5683252132987170442==--
 
