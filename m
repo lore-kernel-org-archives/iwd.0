@@ -1,69 +1,76 @@
-Content-Type: multipart/mixed; boundary="===============7716070674588859545=="
+Content-Type: multipart/mixed; boundary="===============6379128573571573469=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Paul Menzel <pmenzel at molgen.mpg.de>
 To: iwd at lists.01.org
-Subject: [PATCH v4 13/13] auto-t: don't wait for wpa_supplicant to connect
-Date: Mon, 28 Mar 2022 10:28:42 -0700
-Message-ID: <20220328172842.1660272-14-prestwoj@gmail.com>
-In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
+Subject: Re: [PATCH] test-runner: increase RAM size
+Date: Sat, 19 Mar 2022 06:12:29 +0100
+Message-ID: <d454c143-cc4d-a4bb-3bd8-72e97b8e466e@molgen.mpg.de>
+In-Reply-To: 20220318223646.756590-1-prestwoj@gmail.com
 
---===============7716070674588859545==
+--===============6379128573571573469==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-When configuring wpa_supplicant all we care about is that it
-received the configuration object. wpa_supplicant takes quite a bit
-of time to connect in some cases so waiting for that is unneeded.
+Dear James,
 
-This also increases the DPP timeout which may be required on slower
-systems or if the timing is particularly unlucky when receiving
-frames.
----
- autotests/testDPP/connection_test.py | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
-ction_test.py
-index b58620b8..ab3cbf95 100644
---- a/autotests/testDPP/connection_test.py
-+++ b/autotests/testDPP/connection_test.py
-@@ -80,7 +80,7 @@ class Test(unittest.TestCase):
- =
+Am 18.03.22 um 23:36 schrieb James Prestwood:
+> This is explained in the comment, but until the issue can be
+> tracked down increase RAM.
 
-         self.wpas.dpp_enrollee_start(uri)
- =
+Before it was distinguished if run under Valgrind or not. It=E2=80=99s runn=
+ing =
 
--        self.wpas.wait_for_event('DPP-CONF-RECEIVED')
-+        self.wpas.wait_for_event('DPP-CONF-RECEIVED', timeout=3D30)
- =
+out of memory regardless of that now?
 
-     def test_iwd_as_configurator_initiator(self):
-         self.hapd.reload()
-@@ -96,7 +96,7 @@ class Test(unittest.TestCase):
- =
+The comment says, the reason is unclear, but could you document the test =
 
-         self.device.dpp_start_configurator(uri)
- =
+setup (QEMU, Linux version, compiler) of the last successful run, and =
 
--        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
-+        self.wpas.wait_for_event('DPP-CONF-RECEIVED', timeout=3D30)
- =
+the parameters of the first failure?
 
-     def setUp(self):
-         self.wd =3D IWD(True)
-@@ -118,6 +118,7 @@ class Test(unittest.TestCase):
-         self.device.disconnect()
-         self.device.dpp_stop()
-         self.wpas.dpp_configurator_remove()
-+        self.wpas.clean_up()
- =
 
-         self.wd =3D None
-         self.device =3D None
--- =
+Kind regard,
 
-2.34.1
+Paul
 
---===============7716070674588859545==--
+
+PS: To be more specific in the commit message, you could use:
+
+test-runner: Increase RAM size to 1 GB
+
+> ---
+>   tools/test-runner | 13 ++++++++-----
+>   1 file changed, 8 insertions(+), 5 deletions(-)
+> =
+
+> diff --git a/tools/test-runner b/tools/test-runner
+> index b0ec87a2..534f08f2 100755
+> --- a/tools/test-runner
+> +++ b/tools/test-runner
+> @@ -1816,12 +1816,15 @@ class Main:
+>   			smp =3D int(nproc / 2)
+>   =
+
+>   		#
+> -		# Increase RAM if valgrind is being used
+> +		# TODO: Its unclear exactly what causes it (leak, fragmentation,
+> +		# or ?), but after many test runs the kernel starts running out
+> +		# of memory. This is sometimes non-fatal, e.g. a python call
+> +		# fails, but other times the kernel fully panics.
+>   		#
+> -		if self.args.valgrind:
+> -			ram =3D 512
+> -		else:
+> -			ram =3D 384
+> +		# For now increase the RAM which allows full test runs to
+> +		# complete.
+> +		#
+> +		ram =3D 1024
+>   =
+
+>   		print("Using %d cores, %d RAM for VM" % (smp, ram))
+>  =20
+--===============6379128573571573469==--
 
