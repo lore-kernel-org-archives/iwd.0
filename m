@@ -1,39 +1,74 @@
-Content-Type: multipart/mixed; boundary="===============6130263344237456009=="
+Content-Type: multipart/mixed; boundary="===============7617962814301379241=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/2] tools: add decrypt-profile tool
-Date: Wed, 16 Feb 2022 16:12:01 -0600
-Message-ID: <36fabee1-25d2-b0aa-6496-071b4e238a9e@gmail.com>
-In-Reply-To: 20220216002826.1361879-1-prestwoj@gmail.com
+Subject: [PATCH 5/8] auto-t: use wait_for_event in testSAE-roam
+Date: Tue, 22 Mar 2022 15:51:10 -0700
+Message-ID: <20220322225113.1023688-5-prestwoj@gmail.com>
+In-Reply-To: 20220322225113.1023688-1-prestwoj@gmail.com
 
---===============6130263344237456009==
+--===============7617962814301379241==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Depending on timing hostapd may not show a station with list_sta().
+Instead use wait_for_event.
+---
+ autotests/testSAE-roam/connection_test.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-On 2/15/22 18:28, James Prestwood wrote:
-> This tool will decrypt an IWD network profile which was previously
-> encrypted using a systemd provided key. Either a text passphrase
-> can be provided (--pass) or a file containing the secret (--file).
-> =
+diff --git a/autotests/testSAE-roam/connection_test.py b/autotests/testSAE-=
+roam/connection_test.py
+index 2409e0d1..4c49eaf8 100644
+--- a/autotests/testSAE-roam/connection_test.py
++++ b/autotests/testSAE-roam/connection_test.py
+@@ -35,7 +35,8 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+ =
 
-> This can be useful for debugging, or recovering an encrypted
-> profile after enabling SystemdEncrypt.
-> ---
->   Makefile.am                 |   8 +-
->   tools/iwd-decrypt-profile.c | 213 ++++++++++++++++++++++++++++++++++++
->   2 files changed, 220 insertions(+), 1 deletion(-)
->   create mode 100644 tools/iwd-decrypt-profile.c
-> =
+-        self.assertTrue(self.bss_hostapd[0].list_sta())
++        self.bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.=
+address)
++
+         self.assertFalse(self.bss_hostapd[1].list_sta())
+ =
 
+         testutil.test_iface_operstate(device.name)
+@@ -54,7 +55,7 @@ class Test(unittest.TestCase):
+         to_condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_change(device, from_condition, to_condition)
+ =
 
-Both applied, thanks.
+-        self.assertTrue(self.bss_hostapd[1].list_sta())
++        self.bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.=
+address)
+ =
 
-Regards,
--Denis
+         testutil.test_iface_operstate(device.name)
+         testutil.test_ifaces_connected(self.bss_hostapd[1].ifname, device.=
+name)
+@@ -72,8 +73,10 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state !=3D DeviceState.roaming'
+         wd.wait_for_object_condition(device, condition)
+ =
 
---===============6130263344237456009==--
+-        self.assertEqual(device.state, iwd.DeviceState.connected)
+-        self.assertTrue(self.bss_hostapd[2].list_sta())
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
++
++        self.bss_hostapd[2].wait_for_event('AP-STA-CONNECTED %s' % device.=
+address)
+ =
+
+         testutil.test_iface_operstate(device.name)
+         testutil.test_ifaces_connected(self.bss_hostapd[2].ifname, device.=
+name)
+-- =
+
+2.34.1
+
+--===============7617962814301379241==--
 
