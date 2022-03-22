@@ -1,86 +1,153 @@
-Content-Type: multipart/mixed; boundary="===============5224183909940919944=="
+Content-Type: multipart/mixed; boundary="===============5568307647774222112=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] src/sae.c: Use realloc(3) instead of reallocarray(3)
-Date: Sun, 19 Sep 2021 12:54:39 -0500
-Message-ID: <a79af225-e17c-7207-9f2c-024ea3dca56f@gmail.com>
-In-Reply-To: 20210919085710.1805075-1-fontaine.fabrice@gmail.com
+Subject: [PATCH v3 1/2] test-runner: add memory usage for debugging
+Date: Tue, 22 Mar 2022 15:49:20 -0700
+Message-ID: <20220322224921.1023591-1-prestwoj@gmail.com>
 
---===============5224183909940919944==
+--===============5568307647774222112==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Fabrice,
+In debug mode the test context is printed before each test. This
+adds some additional information in there:
 
-On 9/19/21 3:57 AM, Fabrice Fontaine wrote:
-> reallocarray(3) has been added to glibc relatively recently (version
-> 2.26, from 2017) and apparently not all users run new enough glibc.
-> Moreover, reallocarray is not available with uclibc-ng. Just use
-> realloc(3) for now since in this case there's no real risk of overflow.
-> This will avoid the following build failure since commit
-> 891b78e9e892a3bcd800eb3a298e6380e9a15dd1:
-> =
+Available Memory: /proc/meminfo: MemAvailable
+Last Test Delta: Change in usage between current and last test
+Per-test Usage: Graph of usage relative to all past tests. This is
+                useful for seeing a trend down/up of usage.
+---
+ tools/test-runner | 73 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 72 insertions(+), 1 deletion(-)
 
-> /home/giuliobenetti/autobuild/run/instance-3/output-1/host/lib/gcc/xtensa=
--buildroot-linux-uclibc/10.3.0/../../../../xtensa-buildroot-linux-uclibc/bi=
-n/ld: src/sae.o: in function `sae_rx_authenticate':
-> sae.c:(.text+0xd74): undefined reference to `reallocarray'
-> =
+diff --git a/tools/test-runner b/tools/test-runner
+index b0ec87a2..cd110411 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -807,6 +807,47 @@ class Namespace:
+ =
 
-> Fixes:
->   - http://autobuild.buildroot.org/results/c6d3f86282c44645b4f1c61882dc63=
-ccfc8eb35a
-> =
+ 		return ret
+ =
 
-> Signed-off-by: Fabrice Fontaine <fontaine.fabrice(a)gmail.com>
++class BarChart():
++	def __init__(self, height=3D10, max_width=3D80):
++		self._height =3D height
++		self._max_width =3D max_width
++		self._values =3D []
++		self._max_value =3D 0
++		self._min_value =3D 0
++
++	def add_value(self, value):
++		if len(self._values) =3D=3D 0:
++			self._max_value =3D int(1.01 * value)
++			self._min_value =3D int(0.99 * value)
++		elif value > self._max_value:
++			self._max_value =3D int(1.01 * value)
++		elif value < self._min_value:
++			self._min_value =3D int(0.99 * value)
++
++		self._values.append(value)
++
++	def _value_to_stars(self, value):
++		# Need to scale value (range of min_value -> max_value) to
++		# a range of 0 -> height
++		#
++		# Scaled =3D ((value - min_value) / ( max_value - min_value)) * (Height =
+- 0) + 0
++
++		return int(((value - self._min_value) /
++			(self._max_value - self._min_value)) * self._height)
++
++	def __str__(self):
++		# Need to map value from range 0 - self._height
++		ret =3D ''
++
++		for i, value in enumerate(self._values):
++			stars =3D self._value_to_stars(value)
++			ret +=3D '[%3u] ' % i + '%-10s' % ('*' * stars) + '\t\t\t%d\n' % value
++
++		ret +=3D '\n'
++
++		return ret
++
++
+ class TestContext(Namespace):
+ 	'''
+ 		Contains all information for a given set of tests being run
+@@ -825,6 +866,8 @@ class TestContext(Namespace):
+ 		self.results =3D {}
+ 		self.mainloop =3D GLib.MainLoop()
+ 		self.namespaces =3D []
++		self._last_mem_available =3D 0
++		self._mem_chart =3D BarChart()
+ =
 
-No S-o-b tags please.
+ 	def start_dbus_monitor(self):
+ 		if not self.is_verbose('dbus-monitor'):
+@@ -1036,6 +1079,18 @@ class TestContext(Namespace):
+ =
 
-> ---
->   src/sae.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> =
+ 		self.reset()
+ =
 
-> diff --git a/src/sae.c b/src/sae.c
-> index 7e6377f5..d04891e7 100644
-> --- a/src/sae.c
-> +++ b/src/sae.c
-> @@ -104,7 +104,7 @@ static void sae_rejected_groups_append(struct sae_sm =
-*sm, uint16_t group)
->   	uint16_t i;
->   =
++	def meminfo_to_dict(self):
++		ret =3D {}
++
++		with open('/proc/meminfo', 'r') as f:
++			data =3D f.read().strip().split('\n')
++
++		for l in data:
++			entry =3D l.split(':')
++			ret[entry[0]] =3D int(entry[1].removesuffix('kB'))
++
++		return ret
++
+ 	def __str__(self):
+ 		ret =3D 'Arguments:\n'
+ 		for arg in vars(self.args):
+@@ -1048,6 +1103,16 @@ class TestContext(Namespace):
+ 		else:
+ 			ret +=3D '\tNo Hostapd instances\n'
+ =
 
->   	if (!sm->rejected_groups) {
-> -		sm->rejected_groups =3D reallocarray(NULL, 2, sizeof(uint16_t));
-> +		sm->rejected_groups =3D realloc(NULL, 2 * sizeof(uint16_t));
->   		sm->rejected_groups[0] =3D 1;
->   		sm->rejected_groups[1] =3D group;
->   		return;
-> @@ -114,8 +114,8 @@ static void sae_rejected_groups_append(struct sae_sm =
-*sm, uint16_t group)
->   		if (sm->rejected_groups[i] =3D=3D group)
->   			return;
->   =
++		info =3D self.meminfo_to_dict()
++		self._mem_chart.add_value(info['MemAvailable'])
++
++		ret +=3D 'Available Memory: %u kB\n' % info['MemAvailable']
++		ret +=3D 'Last Test Delta: %+d kB\n' % (info['MemAvailable'] - self._las=
+t_mem_available)
++		ret +=3D 'Per-test Usage:\n'
++		ret +=3D str(self._mem_chart)
++
++		self._last_mem_available =3D info['MemAvailable']
++
+ 		ret +=3D super().__str__()
+ =
 
-> -	sm->rejected_groups =3D reallocarray(sm->rejected_groups,
-> -						i + 1, sizeof(uint16_t));
-> +	sm->rejected_groups =3D realloc(sm->rejected_groups,
-> +					(i + 1) * sizeof(uint16_t));
+ 		for n in self.namespaces:
+@@ -1171,7 +1236,13 @@ def start_test(ctx, subtests, rqueue):
+ 	#
+ 	for s in subtests:
+ 		loader =3D unittest.TestLoader()
+-		module =3D importlib.import_module(os.path.splitext(s)[0])
++		try:
++			module =3D importlib.import_module(os.path.splitext(s)[0])
++		except OSError as e:
++			dbg(subprocess.check_output("dmesg | tail -80", shell=3DTrue).decode('u=
+tf-8'))
++			print(ctx)
++			raise e
++
+ 		subtest =3D loader.loadTestsFromModule(module)
+ =
 
-Can we add this to missing.h instead?  The reallocarray version is more cle=
-ar / =
+ 		# The test suite is being (ab)used to get a bit more granularity
+-- =
 
-preferable to open-coded version.
+2.34.1
 
->   	sm->rejected_groups[0] +=3D 1;
->   	sm->rejected_groups[i] =3D group;
->   }
-> =
-
-
-Regards,
--Denis
---===============5224183909940919944==--
+--===============5568307647774222112==--
 
