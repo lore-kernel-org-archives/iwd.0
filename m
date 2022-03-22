@@ -1,68 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============8872278258780116442=="
+Content-Type: multipart/mixed; boundary="===============4535019490738789583=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 10/12] auto-t: wpas.py: handle enrollee as responder
-Date: Tue, 18 Jan 2022 13:25:10 -0800
-Message-ID: <20220118212512.2017977-10-prestwoj@gmail.com>
-In-Reply-To: 20220118212512.2017977-1-prestwoj@gmail.com
+Subject: [PATCH 6/8] dpp: fail if disconnected during DPP protocol
+Date: Tue, 22 Mar 2022 15:51:11 -0700
+Message-ID: <20220322225113.1023688-6-prestwoj@gmail.com>
+In-Reply-To: 20220322225113.1023688-1-prestwoj@gmail.com
 
---===============8872278258780116442==
+--===============4535019490738789583==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds support for wpa_supplicant to generate its own URI and
-start presence announcements (DPP_CHIRP).
+If the connected BSS is NULL IWD was disconnected and this should
+trigger a protocol termination.
 ---
- autotests/util/wpas.py | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ src/dpp.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-index c8e65179..995bdad1 100644
---- a/autotests/util/wpas.py
-+++ b/autotests/util/wpas.py
-@@ -239,10 +239,17 @@ class Wpas:
-     def set(self, key, value, **kwargs):
-         self._ctrl_request('SET ' + key + ' ' + value, **kwargs)
+diff --git a/src/dpp.c b/src/dpp.c
+index f2421b69..de8e6e14 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -1294,7 +1294,7 @@ static void dpp_presence_announce(struct dpp_sm *dpp)
+ 	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
+ }
  =
 
--    def dpp_enrollee_start(self, uri=3DNone):
-+    def dpp_enrollee_start(self, uri=3DNone, oper_and_channel=3DNone):
-+        if not oper_and_channel:
-+            oper_and_channel =3D '81/1'
-+
-         self._rx_data =3D []
--        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode')
--        self.wait_for_result()
-+        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode chan=3D%s' % o=
-per_and_channel)
-+        self._dpp_qr_id =3D self.wait_for_result()
-+        self._ctrl_request('DPP_BOOTSTRAP_GET_URI %s' % self._dpp_qr_id)
-+        self._dpp_uri =3D self.wait_for_result()
-+
-+        print("DPP Enrollee QR: %s" % self._dpp_uri)
+-static void dpp_send_authenticate_request(struct dpp_sm *dpp)
++static bool dpp_send_authenticate_request(struct dpp_sm *dpp)
+ {
+ 	uint8_t hdr[32];
+ 	uint8_t attrs[256];
+@@ -1305,6 +1305,12 @@ static void dpp_send_authenticate_request(struct dpp=
+_sm *dpp)
+ 	struct station *station =3D station_find(netdev_get_ifindex(dpp->netdev));
+ 	struct scan_bss *bss =3D station_get_connected_bss(station);
  =
 
-         if uri:
-             self._rx_data =3D []
-@@ -250,6 +257,10 @@ class Wpas:
-             self._dpp_qr_id =3D self.wait_for_result()
-             self._rx_data =3D []
-             self._ctrl_request('DPP_AUTH_INIT peer=3D%s role=3Denrollee' %=
- self._dpp_qr_id)
-+        else:
-+            self._ctrl_request('DPP_CHIRP own=3D%s iter=3D100' % self._dpp=
-_qr_id)
++	/* Got disconnected by the time the peer was discovered */
++	if (!bss) {
++		dpp_reset(dpp);
++		return false;
++	}
 +
-+        return self._dpp_uri
+ 	l_ecc_point_get_data(dpp->own_proto_public, i_proto_key,
+ 				sizeof(i_proto_key));
  =
 
-     def dpp_configurator_create(self, uri):
-         self._rx_data =3D []
+@@ -1337,6 +1343,8 @@ static void dpp_send_authenticate_request(struct dpp_=
+sm *dpp)
+ 	iov[1].iov_len =3D ptr - attrs;
+ =
+
+ 	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
++
++	return true;
+ }
+ =
+
+ static void dpp_roc_started(void *user_data)
+@@ -1948,7 +1956,8 @@ static void dpp_handle_presence_announcement(struct d=
+pp_sm *dpp,
+ =
+
+ 	dpp->state =3D DPP_STATE_AUTHENTICATING;
+ =
+
+-	dpp_send_authenticate_request(dpp);
++	if (!dpp_send_authenticate_request(dpp))
++		return;
+ =
+
+ 	/*
+ 	 * Should we wait for an ACK then go offchannel?
 -- =
 
-2.31.1
+2.34.1
 
---===============8872278258780116442==--
+--===============4535019490738789583==--
 
