@@ -1,49 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============2998117628930239964=="
+Content-Type: multipart/mixed; boundary="===============7847241278537320166=="
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459 at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Unsupported finite cyclic group
-Date: Fri, 20 May 2022 17:56:30 +0100
-Message-ID: <CACsRnHXwiVWBBx9k--3j4XWkPX=cwhBDQr81w9a98BjAa-E85A@mail.gmail.com>
-In-Reply-To: 8d92aea3-241c-85ed-6742-14a61203edc4@gmail.com
+Subject: [PATCH 8/8] auto-t: don't wait for wpa_supplicant to connect
+Date: Tue, 22 Mar 2022 15:51:13 -0700
+Message-ID: <20220322225113.1023688-8-prestwoj@gmail.com>
+In-Reply-To: 20220322225113.1023688-1-prestwoj@gmail.com
 
---===============2998117628930239964==
+--===============7847241278537320166==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+When configuring wpa_supplicant all we care about is that it
+received the configuration object. wpa_supplicant takes quite a bit
+of time to connect in some cases so waiting for that is unneeded.
 
-I'm fairly sure it was doing FT as it is set up for that and I don't
-see a 4 way handshake in the log. I do see
-`station_fast_transition_cb` being called as well so I guess it was
-trying FT?
-```
-May 19 16:16:11.696848 r2-19105 iwd[462]:
-src/station.c:station_fast_transition_cb() 5, result: 2
-```
-The AP hasn't changed for a while now so I don't think it is directly
-that however it could be that the error it is giving is complete
-nonsense. A second prior to the "finite cycle group" error it does
-also say there was an "Invalid authentication" from the same client so
-maybe it is a red herring if it doesn't make sense in the context.
+This also increases the DPP timeout which may be required on slower
+systems or if the timing is particularly unlucky when receiving
+frames.
+---
+ autotests/testDPP/connection_test.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Looking more into the difference between 1.21 and master clients,
-oddly I actually see the failure to roam in both (looking for the
-station_fast_transition with result 2) however the AP only reports
-errors for the clients running master. Odd.
+diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
+ction_test.py
+index b58620b8..ab3cbf95 100644
+--- a/autotests/testDPP/connection_test.py
++++ b/autotests/testDPP/connection_test.py
+@@ -80,7 +80,7 @@ class Test(unittest.TestCase):
+ =
 
-The other two errors which happen after this on master don't happen on
-1.21. In that case iwd performs a passive scan (same) and then
-connects fine without any "Error sending CMD_ASSOCIATE (-2)" error.
-Likewise the neighbor report is fine in 1.21 but not master.
+         self.wpas.dpp_enrollee_start(uri)
+ =
 
-Sorry, I think I'm missing some hidden variable here so I'll see if I
-can create a better bug report. I'll set up a capture of iwmon logging
-to get more solid data to go on and narrow down what is happening in
-what version.
+-        self.wpas.wait_for_event('DPP-CONF-RECEIVED')
++        self.wpas.wait_for_event('DPP-CONF-RECEIVED', timeout=3D30)
+ =
 
-Regards,
-Michael
---===============2998117628930239964==--
+     def test_iwd_as_configurator_initiator(self):
+         self.hapd.reload()
+@@ -96,7 +96,7 @@ class Test(unittest.TestCase):
+ =
+
+         self.device.dpp_start_configurator(uri)
+ =
+
+-        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
++        self.wpas.wait_for_event('DPP-CONF-RECEIVED', timeout=3D30)
+ =
+
+     def setUp(self):
+         self.wd =3D IWD(True)
+@@ -118,6 +118,7 @@ class Test(unittest.TestCase):
+         self.device.disconnect()
+         self.device.dpp_stop()
+         self.wpas.dpp_configurator_remove()
++        self.wpas.clean_up()
+ =
+
+         self.wd =3D None
+         self.device =3D None
+-- =
+
+2.34.1
+
+--===============7847241278537320166==--
 
