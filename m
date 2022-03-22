@@ -1,170 +1,142 @@
-Content-Type: multipart/mixed; boundary="===============7360675418641003734=="
+Content-Type: multipart/mixed; boundary="===============1844868497942251018=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 6/9] unit: add test for json arrays
-Date: Thu, 06 Jan 2022 11:50:04 -0800
-Message-ID: <20220106195007.528618-6-prestwoj@gmail.com>
-In-Reply-To: 20220106195007.528618-1-prestwoj@gmail.com
+Subject: [PATCH 4/8] auto-t: use wait_for_event in testBSSBlacklist
+Date: Tue, 22 Mar 2022 15:51:09 -0700
+Message-ID: <20220322225113.1023688-4-prestwoj@gmail.com>
+In-Reply-To: 20220322225113.1023688-1-prestwoj@gmail.com
 
---===============7360675418641003734==
+--===============1844868497942251018==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Depending on timing hostapd may not show a station with list_sta().
+Instead use wait_for_event.
 ---
- unit/test-json.c | 113 ++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 92 insertions(+), 21 deletions(-)
+ autotests/testBSSBlacklist/connection_test.py | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/unit/test-json.c b/unit/test-json.c
-index fe8f756f..1a7daaff 100644
---- a/unit/test-json.c
-+++ b/unit/test-json.c
-@@ -75,26 +75,6 @@ static void test_json_escaped_unicode(const void *data)
- 	json_contents_free(c);
- }
+diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/test=
+BSSBlacklist/connection_test.py
+index 6a12174d..df3bd507 100644
+--- a/autotests/testBSSBlacklist/connection_test.py
++++ b/autotests/testBSSBlacklist/connection_test.py
+@@ -33,7 +33,7 @@ class Test(unittest.TestCase):
  =
 
--/*
-- * Tests that unsupported types will not parse
-- */
--static void test_json_unsupported_types(const void *data)
--{
--	/*
--	 * Valid JSON objects but currently unsupported types
--	 */
--	char arrays[] =3D "{\"test\":[1, 2, 3, 4]}";
--
--	struct json_iter iter;
--	struct json_contents *c =3D json_contents_new(arrays, strlen(arrays));
--
--	json_iter_init(&iter, c);
--	assert(!json_iter_parse(&iter,
--				JSON_MANDATORY("test", JSON_ARRAY, NULL),
--				JSON_UNDEFINED));
--	json_contents_free(c);
--}
--
- /*
-  * Basic test string values and nested objects
-  */
-@@ -325,6 +305,97 @@ static void test_json_primitives(const void *data)
- 	json_contents_free(c);
- }
+         dev1, dev2 =3D wd.list_devices(2)
  =
 
-+static void test_json_arrays(const void *data)
-+{
-+	unsigned int ui;
-+	int i;
-+	bool b;
-+	int count;
-+	char json[] =3D "{\"uint_array\":[1, 2, 3, 4, 5, 6],"
-+			"\"int_array\":[-1, -2, -3, -4, -5, -6],"
-+			"\"bool_array\":[true, false, true, false],"
-+			"\"null_array\":[null, null, null, null],"
-+			"\"mixed_array\":[1, -1, true, false, null]}";
-+
-+	struct json_iter iter;
-+	struct json_iter i_array, ui_array, b_array, n_array, m_array;
-+	struct json_contents *c =3D json_contents_new(json, strlen(json));
-+
-+	json_iter_init(&iter, c);
-+	assert(json_iter_parse(&iter,
-+			JSON_MANDATORY("mixed_array", JSON_ARRAY, &m_array),
-+			JSON_MANDATORY("null_array", JSON_ARRAY, &n_array),
-+			JSON_MANDATORY("bool_array", JSON_ARRAY, &b_array),
-+			JSON_MANDATORY("int_array", JSON_ARRAY, &i_array),
-+			JSON_MANDATORY("uint_array", JSON_ARRAY, &ui_array),
-+			JSON_UNDEFINED));
-+
-+	count =3D 1;
-+
-+	while (json_iter_next(&ui_array)) {
-+		assert(json_iter_get_type(&ui_array) =3D=3D JSON_PRIMITIVE);
-+		assert(json_iter_get_uint(&ui_array, &ui));
-+		assert(ui =3D=3D (unsigned int) count);
-+		count++;
-+	}
-+
-+	count =3D -1;
-+
-+	while (json_iter_next(&i_array)) {
-+		assert(json_iter_get_type(&i_array) =3D=3D JSON_PRIMITIVE);
-+		assert(json_iter_get_int(&i_array, &i));
-+		assert(i =3D=3D count);
-+		count--;
-+	}
-+
-+	count =3D 0;
-+
-+	while (json_iter_next(&b_array)) {
-+		assert(json_iter_get_type(&b_array) =3D=3D JSON_PRIMITIVE);
-+		assert(json_iter_get_boolean(&b_array, &b));
-+		assert(b =3D=3D count % 2 ? false : true);
-+		count++;
-+	}
-+
-+	count =3D 0;
-+
-+	while (json_iter_next(&n_array)) {
-+		assert(json_iter_get_type(&n_array) =3D=3D JSON_PRIMITIVE);
-+		assert(json_iter_get_null(&n_array));
-+		count++;
-+	}
-+
-+	assert(count =3D=3D 4);
-+
-+	count =3D 0;
-+
-+	while (json_iter_next(&m_array)) {
-+		assert(json_iter_get_type(&m_array) =3D=3D JSON_PRIMITIVE);
-+
-+		switch (count) {
-+		case 0:
-+			assert(json_iter_get_uint(&m_array, &ui));
-+			assert(ui =3D=3D 1);
-+			break;
-+		case 1:
-+			assert(json_iter_get_int(&m_array, &i));
-+			assert(i =3D=3D -1);
-+			break;
-+		case 2:
-+		case 3:
-+			assert(json_iter_get_boolean(&m_array, &b));
-+			assert(b =3D=3D count % 2 ? false : true);
-+			break;
-+		case 4:
-+			assert(json_iter_get_null(&m_array));
-+			break;
-+		}
-+
-+		count++;
-+	}
-+
-+	json_contents_free(c);
-+}
+-        ordered_network =3D dev1.get_ordered_network("TestBlacklist")
++        ordered_network =3D dev1.get_ordered_network("TestBlacklist", full=
+_scan=3DTrue)
  =
 
- int main(int argc, char *argv[])
- {
-@@ -333,11 +404,11 @@ int main(int argc, char *argv[])
- 	l_test_add("json unicode", test_json_unicode, NULL);
- 	l_test_add("json escaped unicode", test_json_escaped_unicode, NULL);
- 	l_test_add("json nested objects", test_json, NULL);
--	l_test_add("json unsupported types", test_json_unsupported_types, NULL);
- 	l_test_add("json empty objects", test_json_empty_objects, NULL);
- 	l_test_add("json parse out of order", test_json_out_of_order, NULL);
- 	l_test_add("json larger object", test_json_larger_object, NULL);
- 	l_test_add("json test primitives", test_json_primitives, NULL);
-+	l_test_add("json test arrays", test_json_arrays, NULL);
+         self.assertEqual(ordered_network.type, NetworkType.psk)
  =
 
- 	return l_test_run();
- }
+@@ -45,12 +45,12 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(dev1, condition)
+ =
+
+-        self.assertIn(dev1.address, bss_hostapd[2].list_sta())
++        bss_hostapd[2].wait_for_event('AP-STA-CONNECTED %s' % dev1.address)
+ =
+
+         # dev1 now connected, this should max out the first AP, causing th=
+e next
+         # connection to fail to this AP.
+ =
+
+-        ordered_network =3D dev2.get_ordered_network("TestBlacklist")
++        ordered_network =3D dev2.get_ordered_network("TestBlacklist", full=
+_scan=3DTrue)
+ =
+
+         self.assertEqual(ordered_network.type, NetworkType.psk)
+ =
+
+@@ -64,7 +64,7 @@ class Test(unittest.TestCase):
+ =
+
+         # We should have temporarily blacklisted the first BSS, and connec=
+ted
+         # to this one.
+-        self.assertIn(dev2.address, bss_hostapd[1].list_sta())
++        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % dev2.address)
+ =
+
+         # Now check that the first BSS is still not blacklisted. We can
+         # disconnect dev1, opening up the AP for more connections
+@@ -83,7 +83,7 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(dev2, condition)
+ =
+
+-        self.assertIn(dev2.address, bss_hostapd[2].list_sta())
++        bss_hostapd[2].wait_for_event('AP-STA-CONNECTED %s' % dev2.address)
+ =
+
+         wd.unregister_psk_agent(psk_agent)
+ =
+
+@@ -134,7 +134,7 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+ =
+
+-        self.assertIn(device.address, bss_hostapd[0].list_sta())
++        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
+ss)
+ =
+
+         wd.unregister_psk_agent(psk_agent)
+ =
+
+@@ -214,7 +214,7 @@ class Test(unittest.TestCase):
+         # should automatically try the next BSS in the list, which is
+         # bss_hostapd[1]
+         self.assertNotIn(device.address, bss_hostapd[0].list_sta())
+-        self.assertIn(device.address, bss_hostapd[1].list_sta())
++        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
+ss)
+ =
+
+         rule0.drop =3D False
+ =
+
+@@ -234,7 +234,7 @@ class Test(unittest.TestCase):
+ =
+
+         # Same as before, make sure we didn't connect to the blacklisted A=
+P.
+         self.assertNotIn(device.address, bss_hostapd[0].list_sta())
+-        self.assertIn(device.address, bss_hostapd[1].list_sta())
++        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
+ss)
+ =
+
+         # Wait for the blacklist to expire (10 seconds)
+         elapsed =3D time.time() - start
+@@ -264,7 +264,7 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+ =
+
+-        self.assertIn(device.address, bss_hostapd[0].list_sta())
++        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
+ss)
+ =
+
+         self.wd.unregister_psk_agent(psk_agent)
+ =
+
 -- =
 
-2.31.1
+2.34.1
 
---===============7360675418641003734==--
+--===============1844868497942251018==--
 
