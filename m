@@ -1,151 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============1497526819619073906=="
+Content-Type: multipart/mixed; boundary="===============6544547950250077790=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] test-runner: increase RAM size
-Date: Sat, 19 Mar 2022 19:26:39 -0700
-Message-ID: <3487e5393b77fde3846406d5f704b17c74f7cf1c.camel@gmail.com>
-In-Reply-To: d454c143-cc4d-a4bb-3bd8-72e97b8e466e@molgen.mpg.de
+Subject: [PATCH v4 11/13] dpp: fail if disconnected during DPP protocol
+Date: Mon, 28 Mar 2022 10:28:40 -0700
+Message-ID: <20220328172842.1660272-12-prestwoj@gmail.com>
+In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
 
---===============1497526819619073906==
+--===============6544547950250077790==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Paul,
+If the connected BSS is NULL IWD was disconnected and this should
+trigger a protocol termination.
+---
+ src/dpp.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-On Sat, 2022-03-19 at 06:12 +0100, Paul Menzel wrote:
-> Dear James,
-> =
+diff --git a/src/dpp.c b/src/dpp.c
+index f2421b69..de8e6e14 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -1294,7 +1294,7 @@ static void dpp_presence_announce(struct dpp_sm *dpp)
+ 	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
+ }
+ =
 
-> =
+-static void dpp_send_authenticate_request(struct dpp_sm *dpp)
++static bool dpp_send_authenticate_request(struct dpp_sm *dpp)
+ {
+ 	uint8_t hdr[32];
+ 	uint8_t attrs[256];
+@@ -1305,6 +1305,12 @@ static void dpp_send_authenticate_request(struct dpp=
+_sm *dpp)
+ 	struct station *station =3D station_find(netdev_get_ifindex(dpp->netdev));
+ 	struct scan_bss *bss =3D station_get_connected_bss(station);
+ =
 
-> Am 18.03.22 um 23:36 schrieb James Prestwood:
-> > This is explained in the comment, but until the issue can be
-> > tracked down increase RAM.
-> =
++	/* Got disconnected by the time the peer was discovered */
++	if (!bss) {
++		dpp_reset(dpp);
++		return false;
++	}
++
+ 	l_ecc_point_get_data(dpp->own_proto_public, i_proto_key,
+ 				sizeof(i_proto_key));
+ =
 
-> Before it was distinguished if run under Valgrind or not. It=E2=80=99s
-> running =
+@@ -1337,6 +1343,8 @@ static void dpp_send_authenticate_request(struct dpp_=
+sm *dpp)
+ 	iov[1].iov_len =3D ptr - attrs;
+ =
 
-> out of memory regardless of that now?
+ 	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
++
++	return true;
+ }
+ =
 
-I think you're referring to the --valgrind option? This runs valgrind
-on IWD. The issue here is the entire kernel/system is running out of
-memory which is not a leak from IWD itself but some other test process.
+ static void dpp_roc_started(void *user_data)
+@@ -1948,7 +1956,8 @@ static void dpp_handle_presence_announcement(struct d=
+pp_sm *dpp,
+ =
 
-> =
+ 	dpp->state =3D DPP_STATE_AUTHENTICATING;
+ =
 
-> The comment says, the reason is unclear, but could you document the
-> test =
+-	dpp_send_authenticate_request(dpp);
++	if (!dpp_send_authenticate_request(dpp))
++		return;
+ =
 
-> setup (QEMU, Linux version, compiler) of the last successful run, and
-> the parameters of the first failure?
+ 	/*
+ 	 * Should we wait for an ACK then go offchannel?
+-- =
 
-Yeah, I can explain this further in the commit. But basically any full
-test run exibits this behavior. Usually about 20-25 tests and it OOM's.
+2.34.1
 
-I've tried digging into this a few times and come up with nothing. As
-the tests execute the kernels available memory continues to go down.
-This memory does get reclaimed for some time and will bounce around at
-high usage. This does seem somewhat normal as far as I understand how
-the kernel handles process memory.
-
-In *most* cases its python getting an OOM exception when importing an
-individual test, i.e. Line 1174:
-
-module =3D importlib.import_module(os.path.splitext(s)[0])
-
-Othertimes its non-fatal and some random python call (like
-os.list_dir()) will OOM. And other times the kernel just throws a panic
-and OOM's.
-
-My guess with the import_module() case is that the test, and all its
-import dependencies, is quite large to import in this fashion. This is
-somewhat of a non-standard way of importing modules (rather than
-'import <module>' at the top) but its needed for how test-runner
-operates in a single python interpreter.
-
-Thanks,
-James
-
-> =
-
-> =
-
-> Kind regard,
-> =
-
-> Paul
-> =
-
-> =
-
-> PS: To be more specific in the commit message, you could use:
-> =
-
-> test-runner: Increase RAM size to 1 GB
-> =
-
-> > ---
-> > =C2=A0 tools/test-runner | 13 ++++++++-----
-> > =C2=A0 1 file changed, 8 insertions(+), 5 deletions(-)
-> > =
-
-> > diff --git a/tools/test-runner b/tools/test-runner
-> > index b0ec87a2..534f08f2 100755
-> > --- a/tools/test-runner
-> > +++ b/tools/test-runner
-> > @@ -1816,12 +1816,15 @@ class Main:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-smp =3D int(nproc / 2)
-> > =C2=A0 =
-
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0#
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0# Increase RAM if valgrind is being used
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0# TODO: Its unclear exactly what causes it (leak,
-> > fragmentation,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0# or ?), but after many test runs the kernel starts
-> > running out
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0# of memory. This is sometimes non-fatal, e.g. a
-> > python call
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0# fails, but other times the kernel fully panics.
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0#
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if self.args.valgrind:
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ram =
-=3D 512
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0else:
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ram =
-=3D 384
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0# For now increase the RAM which allows full test
-> > runs to
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0# complete.
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0#
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0ram =3D 1024
-> > =C2=A0 =
-
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0print("Using %d cores, %d RAM for VM" % (smp, ra=
-m))
-> > =C2=A0 =
-
-
-
---===============1497526819619073906==--
+--===============6544547950250077790==--
 
