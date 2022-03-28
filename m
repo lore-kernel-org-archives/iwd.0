@@ -1,56 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============7012225936476739019=="
+Content-Type: multipart/mixed; boundary="===============8779122518961406145=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 1/7] nl80211util: support ATTR_FRAME in parse_attrs()
-Date: Wed, 12 Jan 2022 10:08:39 -0800
-Message-ID: <20220112180845.1240661-1-prestwoj@gmail.com>
+Subject: Re: [PATCH] src/storage.c: fix build with uclibc
+Date: Mon, 28 Mar 2022 12:40:56 -0500
+Message-ID: <e463c69b-f668-70c2-1d0e-f0660eee5596@gmail.com>
+In-Reply-To: 20220325210017.525876-1-fontaine.fabrice@gmail.com
 
---===============7012225936476739019==
+--===============8779122518961406145==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/nl80211util.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Hi Fabrice,
 
-diff --git a/src/nl80211util.c b/src/nl80211util.c
-index d663c6dc..9cd538ec 100644
---- a/src/nl80211util.c
-+++ b/src/nl80211util.c
-@@ -118,6 +118,16 @@ static bool extract_flag(const void *data, uint16_t le=
-n, void *o)
- 	return true;
- }
- =
+On 3/25/22 16:00, Fabrice Fontaine wrote:
+> explicit_bzero is used in src/storage.c since commit
+> 01cd8587606bf2da1af245163150589834126c1c but src/missing.h is not
+> included, as a result build with uclibc fails on:
+> =
 
-+static bool extract_iovec(const void *data, uint16_t len, void *o)
-+{
-+	struct iovec *iov =3D o;
-+
-+	iov->iov_base =3D (void *) data;
-+	iov->iov_len =3D len;
-+
-+	return true;
-+}
-+
- static attr_handler handler_for_type(enum nl80211_attrs type)
- {
- 	switch (type) {
-@@ -145,6 +155,8 @@ static attr_handler handler_for_type(enum nl80211_attrs=
- type)
- 	case NL80211_ATTR_CENTER_FREQ1:
- 	case NL80211_ATTR_CENTER_FREQ2:
- 		return extract_uint32;
-+	case NL80211_ATTR_FRAME:
-+		return extract_iovec;
- 	default:
- 		break;
- 	}
--- =
+> /home/buildroot/autobuild/instance-0/output-1/host/lib/gcc/powerpc-buildr=
+oot-linux-uclibc/10.3.0/../../../../powerpc-buildroot-linux-uclibc/bin/ld: =
+src/storage.o: in function `storage_init':
+> storage.c:(.text+0x13a4): undefined reference to `explicit_bzero'
+> =
 
-2.31.1
+> Fixes:
+>   - http://autobuild.buildroot.org/results/2aff8d3d7c33c95e2c57f7c8a71e69=
+939f0580a1
+> =
 
---===============7012225936476739019==--
+> Signed-off-by: Fabrice Fontaine <fontaine.fabrice(a)gmail.com>
+
+We do not use S-o-b tags, so I took this out.
+
+> ---
+>   src/storage.c | 1 +
+>   1 file changed, 1 insertion(+)
+> =
+
+
+Applied, thanks.
+
+--===============8779122518961406145==--
 
