@@ -1,136 +1,74 @@
-Content-Type: multipart/mixed; boundary="===============3039976138471126418=="
+Content-Type: multipart/mixed; boundary="===============0003271880919797136=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v4 7/7] hotspot: refactor dir watch to be like
- knownnetworks
-Date: Fri, 04 Feb 2022 14:00:53 -0600
-Message-ID: <b033b877-e2e5-f5d8-6cf7-14645de2baef@gmail.com>
-In-Reply-To: 20220204173120.231730-7-prestwoj@gmail.com
+Subject: [PATCH v4 07/13] auto-t: use wait_for_event in testSAE-roam
+Date: Mon, 28 Mar 2022 10:28:36 -0700
+Message-ID: <20220328172842.1660272-8-prestwoj@gmail.com>
+In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
 
---===============3039976138471126418==
+--===============0003271880919797136==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 2/4/22 11:31, James Prestwood wrote:
-> The create/removed/modified cases all can be combined like they are in
-> known networks. Create/modified were both doing nearly the same thing,
-> and removed can easily be detected if the config was already found.
-> =
+Depending on timing hostapd may not show a station with list_sta().
+Instead use wait_for_event.
+---
+ autotests/testSAE-roam/connection_test.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-> This is now basically the same logic as in known networks.
-> ---
->   src/hotspot.c | 57 ++++++++++++++++-----------------------------------
->   1 file changed, 18 insertions(+), 39 deletions(-)
-> =
+diff --git a/autotests/testSAE-roam/connection_test.py b/autotests/testSAE-=
+roam/connection_test.py
+index 2409e0d1..4c49eaf8 100644
+--- a/autotests/testSAE-roam/connection_test.py
++++ b/autotests/testSAE-roam/connection_test.py
+@@ -35,7 +35,8 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+ =
 
-> diff --git a/src/hotspot.c b/src/hotspot.c
-> index 832d7a31..1f9f74c5 100644
-> --- a/src/hotspot.c
-> +++ b/src/hotspot.c
-> @@ -29,6 +29,7 @@
->   #include <stdio.h>
->   =
+-        self.assertTrue(self.bss_hostapd[0].list_sta())
++        self.bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.=
+address)
++
+         self.assertFalse(self.bss_hostapd[1].list_sta())
+ =
 
->   #include <ell/ell.h>
-> +#include "ell/useful.h"
->   =
+         testutil.test_iface_operstate(device.name)
+@@ -54,7 +55,7 @@ class Test(unittest.TestCase):
+         to_condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_change(device, from_condition, to_condition)
+ =
 
->   #include "src/iwd.h"
->   #include "src/module.h"
-> @@ -409,7 +410,7 @@ static void hs20_dir_watch_cb(const char *filename,
->   				enum l_dir_watch_event event,
->   				void *user_data)
->   {
-> -	struct l_settings *new;
-> +	_auto_(l_settings_free) struct l_settings *new =3D NULL;
->   	uint64_t connected_time;
->   	struct hs20_config *hs20;
->   	struct network_config config;
-> @@ -425,53 +426,31 @@ static void hs20_dir_watch_cb(const char *filename,
->   		return;
->   =
+-        self.assertTrue(self.bss_hostapd[1].list_sta())
++        self.bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.=
+address)
+ =
 
->   	full_path =3D storage_get_hotspot_path("%s", filename);
-> +	hs20 =3D l_queue_find(hs20_settings, match_filename, full_path);
->   =
+         testutil.test_iface_operstate(device.name)
+         testutil.test_ifaces_connected(self.bss_hostapd[1].ifname, device.=
+name)
+@@ -72,8 +73,10 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state !=3D DeviceState.roaming'
+         wd.wait_for_object_condition(device, condition)
+ =
 
->   	switch (event) {
->   	case L_DIR_WATCH_EVENT_CREATED:
-> -		new =3D l_settings_new();
-> -
-> -		if (!l_settings_load_from_file(new, full_path)) {
-> -			l_settings_free(new);
-> -			return;
-> -		}
-> -
-> -		__network_config_parse(new, full_path, &config);
-> -
-> -		hs20 =3D hs20_config_new(new, full_path, &config);
-> -		l_settings_free(new);
-> -
-> -		if (!hs20)
-> -			return;
-> -
-> -		l_queue_push_head(hs20_settings, hs20);
-> -		break;
->   	case L_DIR_WATCH_EVENT_REMOVED:
-> -		hs20 =3D l_queue_remove_if(hs20_settings, match_filename,
-> -						full_path);
-> -		if (!hs20)
-> -			return;
-> -
-> -		known_networks_remove(&hs20->super);
-> -		break;
->   	case L_DIR_WATCH_EVENT_MODIFIED:
-> -		hs20 =3D l_queue_find(hs20_settings, match_filename, full_path);
-> -		if (!hs20)
-> -			return;
-> -
+-        self.assertEqual(device.state, iwd.DeviceState.connected)
+-        self.assertTrue(self.bss_hostapd[2].list_sta())
++        condition =3D 'obj.state =3D=3D DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
++
++        self.bss_hostapd[2].wait_for_event('AP-STA-CONNECTED %s' % device.=
+address)
+ =
 
-It seems that this logic is not being preserved with this patch.  Is this =
+         testutil.test_iface_operstate(device.name)
+         testutil.test_ifaces_connected(self.bss_hostapd[2].ifname, device.=
+name)
+-- =
 
-intentional?
+2.34.1
 
->   		new =3D l_settings_new();
->   =
-
-> -		if (!l_settings_load_from_file(new, full_path)) {
-> -			l_settings_free(new);
-> -			return;
-> +		if (l_settings_load_from_file(new, full_path)) {
-> +			__network_config_parse(new, full_path, &config);
-> +
-> +			if (hs20)
-> +				known_network_update(&hs20->super, &config);
-> +			else {
-> +				hs20 =3D hs20_config_new(new, full_path, &config);
-> +				if (!hs20)
-> +					return;
-> +
-> +				l_queue_push_head(hs20_settings, hs20);
-> +			}
-> +		} else if (hs20) {
-> +			l_queue_remove(hs20_settings, hs20);
-> +			known_networks_remove(&hs20->super);
->   		}
->   =
-
-> -		__network_config_parse(new, full_path, &config);
-> -		known_network_update(&hs20->super, &config);
-> -
-> -		/* TODO: Update hotspot specific settings */
-> -
-> -		l_settings_free(new);
-> -
->   		break;
->   	case L_DIR_WATCH_EVENT_ACCESSED:
->   		break;
-> =
-
-
-Regards,
--Denis
---===============3039976138471126418==--
+--===============0003271880919797136==--
 
