@@ -1,31 +1,105 @@
-Content-Type: multipart/mixed; boundary="===============1137966621077336780=="
+Content-Type: multipart/mixed; boundary="===============4800106430279077204=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 07/12] dpp: add support for initiating as a configurator
-Date: Thu, 20 Jan 2022 14:22:15 -0600
-Message-ID: <81f8d5b7-5832-e6cc-6727-0db804a15e3c@gmail.com>
-In-Reply-To: 20220118212512.2017977-7-prestwoj@gmail.com
+Subject: [PATCH v4 09/13] auto-t: use wait_for_event in testPSK-roam
+Date: Mon, 28 Mar 2022 10:28:38 -0700
+Message-ID: <20220328172842.1660272-10-prestwoj@gmail.com>
+In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
 
---===============1137966621077336780==
+--===============4800106430279077204==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 1/18/22 15:25, James Prestwood wrote:
-> The difference between the existing code is that IWD will send the
-> authentication request, making it the initiator.
-> =
+Depending on timing hostapd may not show a station with list_sta()
+Instead use wait_for_event
+---
+ autotests/testPSK-roam/connection_test.py | 29 ++++-------------------
+ 1 file changed, 4 insertions(+), 25 deletions(-)
 
-> This handles the use case where IWD is provided a peers URI containing
-> its bootstrapping key rather than IWD always providing its own URI.
-> A new DBus API was added, ConfigureEnrollee().
-> =
+diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
+roam/connection_test.py
+index 92fdeb04..f1b43130 100644
+--- a/autotests/testPSK-roam/connection_test.py
++++ b/autotests/testPSK-roam/connection_test.py
+@@ -16,20 +16,7 @@ class Test(unittest.TestCase):
+     def validate_connection(self, wd, over_ds=3DFalse):
+         device =3D wd.list_devices(1)[0]
+ =
 
+-        condition =3D 'not obj.scanning'
+-        wd.wait_for_object_condition(device, condition)
+-
+-        # Scanning is unavoidable in this case since several hostapd
+-        # configurations are tested and changed mid-test
+-        device.scan()
+-
+-        condition =3D 'obj.scanning'
+-        wd.wait_for_object_condition(device, condition)
+-
+-        condition =3D 'not obj.scanning'
+-        wd.wait_for_object_condition(device, condition)
+-
+-        ordered_network =3D device.get_ordered_network('TestFT')
++        ordered_network =3D device.get_ordered_network('TestFT', full_scan=
+=3DTrue)
+ =
 
-Is a patch for doc/device-provisioning-api.txt missing?
+         self.assertEqual(ordered_network.type, NetworkType.psk)
+ =
 
-Regards,
--Denis
---===============1137966621077336780==--
+@@ -44,15 +31,7 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+ =
+
+-        self.assertTrue(self.bss_hostapd[0].list_sta())
+-
+-        # list_sta actually reports any authenticated stations. Due to the
+-        # nature of FT-over-DS IWD should authenticate to all stations with
+-        # the same mobility domain. This means both APs should show our st=
+ation.
+-        if over_ds:
+-            self.assertTrue(self.bss_hostapd[1].list_sta())
+-        else:
+-            self.assertFalse(self.bss_hostapd[1].list_sta())
++        self.bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.=
+address)
+ =
+
+         testutil.test_iface_operstate(device.name)
+         testutil.test_ifaces_connected(self.bss_hostapd[0].ifname, device.=
+name)
+@@ -73,7 +52,7 @@ class Test(unittest.TestCase):
+         to_condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_change(device, from_condition, to_condition)
+ =
+
+-        self.assertTrue(self.bss_hostapd[1].list_sta())
++        self.bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.=
+address)
+ =
+
+         testutil.test_iface_operstate(device.name)
+         testutil.test_ifaces_connected(self.bss_hostapd[1].ifname, device.=
+name)
+@@ -93,7 +72,7 @@ class Test(unittest.TestCase):
+         to_condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_change(device, from_condition, to_condition)
+ =
+
+-        self.assertTrue(self.bss_hostapd[0].list_sta())
++        self.bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.=
+address)
+ =
+
+         testutil.test_iface_operstate(device.name)
+         testutil.test_ifaces_connected(self.bss_hostapd[0].ifname, device.=
+name)
+-- =
+
+2.34.1
+
+--===============4800106430279077204==--
 
