@@ -1,96 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============2583601207645427275=="
+Content-Type: multipart/mixed; boundary="===============7716070674588859545=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 7/9] station: set OCVC for handshakes
-Date: Mon, 27 Sep 2021 12:47:22 -0500
-Message-ID: <9f03e8c8-e09b-108d-ac69-0843ea1d9860@gmail.com>
-In-Reply-To: 20210927170404.1292107-7-prestwoj@gmail.com
+Subject: [PATCH v4 13/13] auto-t: don't wait for wpa_supplicant to connect
+Date: Mon, 28 Mar 2022 10:28:42 -0700
+Message-ID: <20220328172842.1660272-14-prestwoj@gmail.com>
+In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
 
---===============2583601207645427275==
+--===============7716070674588859545==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+When configuring wpa_supplicant all we care about is that it
+received the configuration object. wpa_supplicant takes quite a bit
+of time to connect in some cases so waiting for that is unneeded.
 
-On 9/27/21 12:04 PM, James Prestwood wrote:
-> Setting OCVC true for all connections except FT-over-DS. Since
-> Authentication is skipped there is no way to obtain OCI information
-> from the kernel prior to (Re)association.
-> ---
->   src/station.c | 15 +++++++++++----
->   1 file changed, 11 insertions(+), 4 deletions(-)
-> =
+This also increases the DPP timeout which may be required on slower
+systems or if the timing is particularly unlucky when receiving
+frames.
+---
+ autotests/testDPP/connection_test.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-> diff --git a/src/station.c b/src/station.c
-> index 672c4860..96794998 100644
-> --- a/src/station.c
-> +++ b/src/station.c
-> @@ -998,11 +998,11 @@ static int station_build_handshake_rsn(struct hands=
-hake_state *hs,
->   	enum security security =3D network_get_security(network);
->   	bool add_mde =3D false;
->   	struct erp_cache_entry *erp_cache =3D NULL;
-> -
->   	struct ie_rsn_info bss_info;
->   	uint8_t rsne_buf[256];
->   	struct ie_rsn_info info;
->   	uint8_t *ap_ie;
-> +	bool ocvc =3D true;
->   =
+diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
+ction_test.py
+index b58620b8..ab3cbf95 100644
+--- a/autotests/testDPP/connection_test.py
++++ b/autotests/testDPP/connection_test.py
+@@ -80,7 +80,7 @@ class Test(unittest.TestCase):
+ =
 
->   	memset(&info, 0, sizeof(info));
->   =
+         self.wpas.dpp_enrollee_start(uri)
+ =
 
-> @@ -1080,6 +1080,16 @@ static int station_build_handshake_rsn(struct hand=
-shake_state *hs,
->   		goto not_supported;
->   =
+-        self.wpas.wait_for_event('DPP-CONF-RECEIVED')
++        self.wpas.wait_for_event('DPP-CONF-RECEIVED', timeout=3D30)
+ =
 
->   build_ie:
-> +	if (IE_AKM_IS_FT(info.akm_suites)) {
-> +		/* Don't set OCVC if FT-over-DS is enabled */
-> +		if (bss->mde[2] & 1)
-> +			ocvc =3D false;
-> +
-> +		add_mde =3D true;
-> +	}
-> +
-> +	info.ocvc =3D ocvc;
-> +
+     def test_iwd_as_configurator_initiator(self):
+         self.hapd.reload()
+@@ -96,7 +96,7 @@ class Test(unittest.TestCase):
+ =
 
-You can't really do it this way since this builds the handshake for an init=
-ial =
+         self.device.dpp_start_configurator(uri)
+ =
 
-association.  Only FT-over-DS is affected, and so you want to reset ocvc =
+-        self.hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
++        self.wpas.wait_for_event('DPP-CONF-RECEIVED', timeout=3D30)
+ =
 
-elsewhere.  Maybe prior to calling netdev_fast_transition_over_ds or somewh=
-ere =
+     def setUp(self):
+         self.wd =3D IWD(True)
+@@ -118,6 +118,7 @@ class Test(unittest.TestCase):
+         self.device.disconnect()
+         self.device.dpp_stop()
+         self.wpas.dpp_configurator_remove()
++        self.wpas.clean_up()
+ =
 
-inside that function.
+         self.wd =3D None
+         self.device =3D None
+-- =
 
->   	/* RSN takes priority */
->   	if (bss->rsne) {
->   		ap_ie =3D bss->rsne;
-> @@ -1099,9 +1109,6 @@ build_ie:
->   	if (!handshake_state_set_supplicant_ie(hs, rsne_buf))
->   		goto not_supported;
->   =
+2.34.1
 
-> -	if (IE_AKM_IS_FT(info.akm_suites))
-> -		add_mde =3D true;
-> -
->   	/*
->   	 * If FILS was chosen, the ERP cache has been verified to exist. Take
->   	 * a reference now so it remains valid (in case of expiration) until
-> =
-
-
-Also, can we add a way to disable OCV in case we get into compatibility iss=
-ues?
-
-Regards,
--Denis
---===============2583601207645427275==--
+--===============7716070674588859545==--
 
