@@ -1,61 +1,142 @@
-Content-Type: multipart/mixed; boundary="===============8995476079489118920=="
+Content-Type: multipart/mixed; boundary="===============8464342615497591147=="
 MIME-Version: 1.0
-From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen_=3Ctoke_at_toke=2Edk=3E?=
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: WiFi interface stuck in 'Powered off' (link down) mode after suspend
-Date: Mon, 25 Apr 2022 23:58:04 +0200
-Message-ID: <871qxkkeqb.fsf@toke.dk>
+Subject: [PATCH v4 06/13] auto-t: use wait_for_event in testBSSBlacklist
+Date: Mon, 28 Mar 2022 10:28:35 -0700
+Message-ID: <20220328172842.1660272-7-prestwoj@gmail.com>
+In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
 
---===============8995476079489118920==
+--===============8464342615497591147==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi everyone
+Depending on timing hostapd may not show a station with list_sta().
+Instead use wait_for_event.
+---
+ autotests/testBSSBlacklist/connection_test.py | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-I am encountering a strange problem with my WiFi not coming back after a
-suspend. Specifically, after a suspend-resume cycle, iwd will report,
-when issuing a 'station list' in iwctl:
+diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/test=
+BSSBlacklist/connection_test.py
+index 6a12174d..df3bd507 100644
+--- a/autotests/testBSSBlacklist/connection_test.py
++++ b/autotests/testBSSBlacklist/connection_test.py
+@@ -33,7 +33,7 @@ class Test(unittest.TestCase):
+ =
 
-  No devices in Station mode available.
+         dev1, dev2 =3D wd.list_devices(2)
+ =
 
-But when issuing a 'device list' it shows up:
+-        ordered_network =3D dev1.get_ordered_network("TestBlacklist")
++        ordered_network =3D dev1.get_ordered_network("TestBlacklist", full=
+_scan=3DTrue)
+ =
 
-  wlan0               7a:e2:f0:31:a5:ae   off        phy0      station   =
+         self.assertEqual(ordered_network.type, NetworkType.psk)
+ =
 
+@@ -45,12 +45,12 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(dev1, condition)
+ =
 
-which is a bit confusing, IMO. Issuing a 'device wlan0 show' gets me:
+-        self.assertIn(dev1.address, bss_hostapd[2].list_sta())
++        bss_hostapd[2].wait_for_event('AP-STA-CONNECTED %s' % dev1.address)
+ =
 
-            Name                wlan0
-            Mode                station
-            Powered             off
-            Address             7a:e2:f0:31:a5:ae
-            Adapter             phy0                                       =
-    =
+         # dev1 now connected, this should max out the first AP, causing th=
+e next
+         # connection to fail to this AP.
+ =
 
+-        ordered_network =3D dev2.get_ordered_network("TestBlacklist")
++        ordered_network =3D dev2.get_ordered_network("TestBlacklist", full=
+_scan=3DTrue)
+ =
 
-And issuing a 'device wlan0 set-property Powered on' restores the device
-to working order and reconnects.
+         self.assertEqual(ordered_network.type, NetworkType.psk)
+ =
 
-I went looking in the iwd source code, and it looks like that 'Powered'
-in iwd lingo translates to 'link up' in the kernel, right? Indeed,
-issuing an 'ip link up' on the wlan device after coming back from
-suspend is enough to get me back online.
+@@ -64,7 +64,7 @@ class Test(unittest.TestCase):
+ =
 
-I'm honestly not really sure if this is a bug in the kernel, or in iwd.
-I mean, it seems like iwd should be able to just set 'link up' and
-continue on its merry way (and indeed if I restart iwd entirely it will
-do this). But am also fairly sure it used to work on previous kernels,
-so maybe the kernel behaviour changed? (I have not had a chance to test
-this as bisecting is a bit cumbersome on my daily driver laptop; so
-figured I'd ask y'all's opinion first).
+         # We should have temporarily blacklisted the first BSS, and connec=
+ted
+         # to this one.
+-        self.assertIn(dev2.address, bss_hostapd[1].list_sta())
++        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % dev2.address)
+ =
 
-This happens on a 5.17 kernel with an Intel AX201 device (using the
-iwlwifi) driver.
+         # Now check that the first BSS is still not blacklisted. We can
+         # disconnect dev1, opening up the AP for more connections
+@@ -83,7 +83,7 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(dev2, condition)
+ =
 
-Hoping someone can help me get this fixed, whether that be by fixing iwd
-or telling me to go bisect the kernel :)
+-        self.assertIn(dev2.address, bss_hostapd[2].list_sta())
++        bss_hostapd[2].wait_for_event('AP-STA-CONNECTED %s' % dev2.address)
+ =
 
--Toke
---===============8995476079489118920==--
+         wd.unregister_psk_agent(psk_agent)
+ =
+
+@@ -134,7 +134,7 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+ =
+
+-        self.assertIn(device.address, bss_hostapd[0].list_sta())
++        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
+ss)
+ =
+
+         wd.unregister_psk_agent(psk_agent)
+ =
+
+@@ -214,7 +214,7 @@ class Test(unittest.TestCase):
+         # should automatically try the next BSS in the list, which is
+         # bss_hostapd[1]
+         self.assertNotIn(device.address, bss_hostapd[0].list_sta())
+-        self.assertIn(device.address, bss_hostapd[1].list_sta())
++        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
+ss)
+ =
+
+         rule0.drop =3D False
+ =
+
+@@ -234,7 +234,7 @@ class Test(unittest.TestCase):
+ =
+
+         # Same as before, make sure we didn't connect to the blacklisted A=
+P.
+         self.assertNotIn(device.address, bss_hostapd[0].list_sta())
+-        self.assertIn(device.address, bss_hostapd[1].list_sta())
++        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
+ss)
+ =
+
+         # Wait for the blacklist to expire (10 seconds)
+         elapsed =3D time.time() - start
+@@ -264,7 +264,7 @@ class Test(unittest.TestCase):
+         condition =3D 'obj.state =3D=3D DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+ =
+
+-        self.assertIn(device.address, bss_hostapd[0].list_sta())
++        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.addre=
+ss)
+ =
+
+         self.wd.unregister_psk_agent(psk_agent)
+ =
+
+-- =
+
+2.34.1
+
+--===============8464342615497591147==--
 
