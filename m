@@ -1,46 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============1717675741887918469=="
+Content-Type: multipart/mixed; boundary="===============8464455527067624036=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: [PATCH] station: limit extended key IDs to CCMP ciphers
-Date: Tue, 12 Oct 2021 08:34:17 -0700
-Message-ID: <20211012153417.3781942-1-prestwoj@gmail.com>
+Subject: [PATCH 4/4] test-runner: Replace exit with sys.exit
+Date: Wed, 30 Mar 2022 19:34:00 +0200
+Message-ID: <20220330173400.259961-4-andrew.zaborowski@intel.com>
+In-Reply-To: 20220330173400.259961-1-andrew.zaborowski@intel.com
 
---===============1717675741887918469==
+--===============8464455527067624036==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+exit comes from the site module which is "useful for the interactive
+interpreter shell and should not be used in programs."
+(https://docs.python.org/3/library/constants.html#constants-added-by-the-si=
+te-module)
+Replace with sys.exit().  I for an undefined error for exit in
+exit_vm().
 ---
- src/station.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ tools/test-runner | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index bfd69777..c73db634 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1087,8 +1087,13 @@ build_ie:
+diff --git a/tools/test-runner b/tools/test-runner
+index b443d91e..81624953 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -300,7 +300,7 @@ class Process(subprocess.Popen):
+ 			f =3D open(os.path.join(dir, file), mode)
+ 		except Exception as e:
+ 			traceback.print_exc()
+-			exit(0)
++			sys.exit(0)
  =
 
- 	info.ocvc =3D !disable_ocv && bss_info.ocvc;
+ 		if self.ctx.args.log_gid:
+ 			os.fchown(f.fileno(), uid, gid)
+@@ -1545,11 +1545,11 @@ def run_auto_tests(ctx, args):
+ 				os.chdir(tests[0])
+ 				os.environ['DBUS_SYSTEM_BUS_ADDRESS'] =3D ctx.dbus_address
+ 				os.system('/bin/bash')
+-				exit()
++				sys.exit()
  =
 
--	/* Extended Key IDs can only be used if supported by both AP and STA */
--	if (wiphy_supports_ext_key_id(wiphy) && bss_info.extended_key_id)
-+	/*
-+	 * IEEE 802.11-2020 9.4.2.24.4 states extended key IDs can only be used
-+	 * with CCMP/GCMP cipher suites. We also only enable support if the AP
-+	 * also indicates support.
-+	 */
-+	if (wiphy_supports_ext_key_id(wiphy) && bss_info.extended_key_id &&
-+			info.pairwise_ciphers =3D=3D IE_RSN_CIPHER_SUITE_CCMP)
- 		info.extended_key_id =3D true;
+ 			if len(subtests) < 1:
+ 				dbg("No tests to run")
+-				exit()
++				sys.exit()
  =
 
- 	/* RSN takes priority */
+ 			rqueue =3D multiprocessing.Queue()
+ 			p =3D multiprocessing.Process(target=3Dstart_test, args=3D(ctx, subtest=
+s, rqueue))
+@@ -1994,7 +1994,7 @@ if __name__ =3D=3D '__main__':
+ 		prepare_sandbox()
+ 		run_tests()
+ =
+
+-		exit()
++		sys.exit()
+ =
+
+ 	main =3D Main()
+ 	main.start()
 -- =
 
-2.31.1
+2.32.0
 
---===============1717675741887918469==--
+--===============8464455527067624036==--
 
