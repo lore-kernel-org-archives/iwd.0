@@ -1,51 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============0640160081640498767=="
+Content-Type: multipart/mixed; boundary="===============7238282680241092089=="
 MIME-Version: 1.0
-From: salahaldeen.altous at leica-camera.com
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: IWD is running as AP with the build-in DHCP but android phones
- report no internet connection and switch back to WiFi home network
-Date: Fri, 05 Nov 2021 17:47:31 +0000
-Message-ID: <20211105174731.2830.19174@ml01.vlan13.01.org>
-In-Reply-To: b29d30cd-7e96-3bed-4555-e79373f2dda9@gmail.com
+Subject: Re: [PATCH 1/4] p2p: Fix Device Address updates from Probe Requests
+Date: Wed, 30 Mar 2022 14:44:10 -0500
+Message-ID: <9ffda1df-4a3a-c322-b594-fd14e499f94c@gmail.com>
+In-Reply-To: 20220330173400.259961-1-andrew.zaborowski@intel.com
 
---===============0640160081640498767==
+--===============7238282680241092089==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Hi Andrew,
 
-> Hi Salahaldeen,
+On 3/30/22 12:33, Andrew Zaborowski wrote:
+> p2p_peer_update_existing may be called with a scan_bss struct built from
+> a Probe Request frame so it can't access bss->p2p_probe_resp_info even
+> if peer->bss was built from a Probe Response.  Check the source frame
+> type of the scan_bss struct before updating the Device Address.
 > =
 
-> On 11/5/21 10:14 AM, salahaldeen.altous(a)leica-camera.com wrote:
+> This fixes one timing issue that would make the autotest fail often.
+> ---
+>   src/p2p.c | 10 +++++++---
+>   1 file changed, 7 insertions(+), 3 deletions(-)
 > =
 
-> Interesting.  Not sure why they would do that if the user explicitly sele=
-cted to =
 
-> connect to your device...
-not all Android phones are doing that. But many of them.
-> =
-
-> =
-
-> I suppose we could use the same approach.  Could you try the attached pat=
-ch and =
-
-> see if this helps.
-I have tested the attached patch but still not working. I have checked agai=
-n. We have dropped DHCP option 6 to report Domain Name servers
-+dhcp-option=3Doption:dns-server
-+dhcp-option=3Doption:router
-
-How I can also drop dhcp option 6 to report Domain Name servers?
-> =
-
-> Regards,
-> -Denis
+All applied, thanks.
 
 Regards,
-Salahaldeen
---===============0640160081640498767==--
+-Denis
+
+--===============7238282680241092089==--
 
