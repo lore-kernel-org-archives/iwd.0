@@ -1,43 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============0618321594476295532=="
+Content-Type: multipart/mixed; boundary="===============7195974693424564987=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/2] doc: Document the p2p.Peer.Address property
-Date: Wed, 06 Oct 2021 22:52:14 +0200
-Message-ID: <20211006205214.227476-2-andrew.zaborowski@intel.com>
-In-Reply-To: 20211006205214.227476-1-andrew.zaborowski@intel.com
+Subject: [PATCH 2/7] tools: add UML specific options to the kernel config
+Date: Wed, 30 Mar 2022 13:23:10 -0700
+Message-ID: <20220330202315.1881335-2-prestwoj@gmail.com>
+In-Reply-To: 20220330202315.1881335-1-prestwoj@gmail.com
 
---===============0618321594476295532==
+--===============7195974693424564987==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 ---
- doc/p2p-peer-api.txt | 5 +++++
- 1 file changed, 5 insertions(+)
+ tools/test_runner_kernel_config | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/doc/p2p-peer-api.txt b/doc/p2p-peer-api.txt
-index cc5b1918..a4c120d1 100644
---- a/doc/p2p-peer-api.txt
-+++ b/doc/p2p-peer-api.txt
-@@ -19,6 +19,11 @@ Properties	string Name [readonly]
- =
-
- 			P2P Peer's display name
- =
-
-+		string Address [readonly]
+diff --git a/tools/test_runner_kernel_config b/tools/test_runner_kernel_con=
+fig
+index c3e65d34..f29c1781 100755
+--- a/tools/test_runner_kernel_config
++++ b/tools/test_runner_kernel_config
+@@ -46,3 +46,7 @@ scripts/config --enable CONFIG_HW_RANDOM_VIRTIO
+ scripts/config --enable CONFIG_HW_RANDOM_INTEL
+ #scripts/config --enable CONFIG_HW_RANDOM_AMD
+ scripts/config --enable CONFIG_SECURITYFS
 +
-+			The peer's unique Device Address in the xx:xx:xx:xx:xx:xx
-+			format.
-+
- 		string DeviceCategory [readonly]
- =
-
- 			The category part of the peer's declared
++# Options needed for UML
++scripts/config --enable CONFIG_BINFMT_ELF
++scripts/config --enable CONFIG_HOSTFS
 -- =
 
-2.30.2
+2.34.1
 
---===============0618321594476295532==--
+--===============7195974693424564987==--
 
