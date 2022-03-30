@@ -1,156 +1,119 @@
-Content-Type: multipart/mixed; boundary="===============2894702470821584435=="
+Content-Type: multipart/mixed; boundary="===============2808615580176270198=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 5/5] unit: add checks for improper use of
- json_iter_parse/next
-Date: Thu, 06 Jan 2022 14:52:58 -0800
-Message-ID: <20220106225258.570850-5-prestwoj@gmail.com>
-In-Reply-To: 20220106225258.570850-1-prestwoj@gmail.com
+Subject: [PATCH 6/7] auto-t: fix up a few issues in testNetconfig
+Date: Wed, 30 Mar 2022 13:23:14 -0700
+Message-ID: <20220330202315.1881335-6-prestwoj@gmail.com>
+In-Reply-To: 20220330202315.1881335-1-prestwoj@gmail.com
 
---===============2894702470821584435==
+--===============2808615580176270198==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds checks to make sure these API's don't operate on
-objects/primitives they aren't supposed to.
+ - Setting the IP address was resulting in an error:
+
+   Error: any valid prefix is expected rather than "wln58".
+
+   This is fixed by reordering the arguments with the IP address first
+
+ - Remove the sleep, and use non_block_wait to wait for the IPv6 address
+   to be set.
 ---
- unit/test-json.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ autotests/testNetconfig/connection_test.py | 22 +++++++++++++++-------
+ autotests/testNetconfig/static_test.py     |  3 ++-
+ 2 files changed, 17 insertions(+), 8 deletions(-)
 
-diff --git a/unit/test-json.c b/unit/test-json.c
-index fb87987d..0d48b3d1 100644
---- a/unit/test-json.c
-+++ b/unit/test-json.c
-@@ -225,12 +225,14 @@ static void check_primitives(struct json_iter *i, str=
-uct json_iter *ui,
- 	assert(!json_iter_get_uint(i, NULL));
- 	assert(!json_iter_get_boolean(i, NULL));
- 	assert(!json_iter_get_null(i));
-+	assert(!json_iter_next(i));
- 	assert(json_iter_get_int(i, &i_val));
- 	assert(i_val =3D=3D -10);
+diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNet=
+config/connection_test.py
+index 91c6eb6b..672efb72 100644
+--- a/autotests/testNetconfig/connection_test.py
++++ b/autotests/testNetconfig/connection_test.py
+@@ -17,6 +17,15 @@ import subprocess
+ class Test(unittest.TestCase):
  =
 
- 	assert(json_iter_is_valid(ui));
- 	assert(!json_iter_get_boolean(ui, NULL));
- 	assert(!json_iter_get_null(ui));
-+	assert(!json_iter_next(ui));
- 	assert(json_iter_get_int(ui, &i_val));
- 	assert(json_iter_get_uint(ui, &ui_val));
- 	assert(i_val =3D=3D 10 && ui_val =3D=3D 10);
-@@ -239,6 +241,7 @@ static void check_primitives(struct json_iter *i, struc=
-t json_iter *ui,
- 	assert(!json_iter_get_null(t));
- 	assert(!json_iter_get_int(t, NULL));
- 	assert(!json_iter_get_uint(t, NULL));
-+	assert(!json_iter_next(t));
- 	assert(json_iter_get_boolean(t, &b_val));
- 	assert(b_val =3D=3D true);
- =
-
-@@ -246,6 +249,7 @@ static void check_primitives(struct json_iter *i, struc=
-t json_iter *ui,
- 	assert(!json_iter_get_null(f));
- 	assert(!json_iter_get_int(f, NULL));
- 	assert(!json_iter_get_uint(f, NULL));
-+	assert(!json_iter_next(f));
- 	assert(json_iter_get_boolean(f, &b_val));
- 	assert(b_val =3D=3D false);
- =
-
-@@ -253,10 +257,12 @@ static void check_primitives(struct json_iter *i, str=
-uct json_iter *ui,
- 	assert(!json_iter_get_int(null, NULL));
- 	assert(!json_iter_get_uint(null, NULL));
- 	assert(!json_iter_get_boolean(null, NULL));
-+	assert(!json_iter_next(null));
- 	assert(json_iter_get_null(null));
- =
-
- 	if (obj) {
- 		assert(json_iter_is_valid(obj));
-+		assert(!json_iter_next(obj));
- 		assert(json_iter_parse(obj,
- 			JSON_MANDATORY("null_val", JSON_PRIMITIVE, null),
- 			JSON_MANDATORY("false_val", JSON_PRIMITIVE, f),
-@@ -336,6 +342,7 @@ static void test_json_arrays(const void *data)
- =
-
- 	while (json_iter_next(&ui_array)) {
- 		assert(json_iter_get_type(&ui_array) =3D=3D JSON_PRIMITIVE);
-+		assert(!json_iter_parse(&ui_array, JSON_UNDEFINED));
- 		assert(json_iter_get_uint(&ui_array, &ui));
- 		assert(ui =3D=3D (unsigned int) count);
- 		count++;
-@@ -345,6 +352,7 @@ static void test_json_arrays(const void *data)
- =
-
- 	while (json_iter_next(&i_array)) {
- 		assert(json_iter_get_type(&i_array) =3D=3D JSON_PRIMITIVE);
-+		assert(!json_iter_parse(&i_array, JSON_UNDEFINED));
- 		assert(json_iter_get_int(&i_array, &i));
- 		assert(i =3D=3D count);
- 		count--;
-@@ -354,6 +362,7 @@ static void test_json_arrays(const void *data)
- =
-
- 	while (json_iter_next(&b_array)) {
- 		assert(json_iter_get_type(&b_array) =3D=3D JSON_PRIMITIVE);
-+		assert(!json_iter_parse(&b_array, JSON_UNDEFINED));
- 		assert(json_iter_get_boolean(&b_array, &b));
- 		assert(b =3D=3D count % 2 ? false : true);
- 		count++;
-@@ -363,6 +372,7 @@ static void test_json_arrays(const void *data)
- =
-
- 	while (json_iter_next(&n_array)) {
- 		assert(json_iter_get_type(&n_array) =3D=3D JSON_PRIMITIVE);
-+		assert(!json_iter_parse(&n_array, JSON_UNDEFINED));
- 		assert(json_iter_get_null(&n_array));
- 		count++;
- 	}
-@@ -407,6 +417,8 @@ static void test_json_arrays(const void *data)
- =
-
- 	count =3D 0;
- =
-
-+	assert(!json_iter_parse(&obj_array, JSON_UNDEFINED));
+     def test_connection_success(self):
++        def check_addr(device):
++            try:
++                subprocess.check_output('ip addr show ' + device.name + \
++                            ' | grep \'inet6 3ffe:501:ffff:100::\'', shell=
+=3DTrue)
++            except:
++                return False
 +
- 	while (json_iter_next(&obj_array)) {
- 		struct json_iter object;
++            return True
++
+         wd =3D IWD(True)
  =
 
-@@ -475,17 +487,19 @@ static void test_json_nested_arrays(const void *data)
- 			count2++;
- 		}
+         psk_agent =3D PSKAgent("secret123")
+@@ -40,9 +49,8 @@ class Test(unittest.TestCase):
+         testutil.test_iface_operstate()
+         testutil.test_ifaces_connected()
  =
 
--		/*
--		 * TODO: add checks for object iteration. Currently these will
--		 * just count all tokens in the object.
--		 */
- 		switch (count) {
- 		case 0:
- 			assert(count2 =3D=3D 0);
- 			break;
-+		case 1:
-+			assert(count2 =3D=3D 0);
-+			break;
- 		case 2:
- 			assert(count2 =3D=3D 2);
- 			break;
-+		case 3:
-+			assert(count2 =3D=3D 0);
-+			break;
- 		case 4:
- 			assert(count2 =3D=3D 2);
- 			break;
+-        time.sleep(2)
+-        subprocess.check_output('ip addr show ' + device.name + \
+-                            ' | grep \'inet6 3ffe:501:ffff:100::\'', shell=
+=3DTrue)
++        ctx.non_block_wait(check_addr, 10, device,
++                            exception=3DException("IPv6 address was not se=
+t"))
+ =
+
+         device.disconnect()
+ =
+
+@@ -70,15 +78,15 @@ class Test(unittest.TestCase):
+         # TODO: This could be moved into test-runner itself if other tests=
+ ever
+         #       require this functionality (p2p, FILS, etc.). Since its si=
+mple
+         #       enough it can stay here for now.
+-        ctx.start_process(['ip', 'addr','add','dev',  hapd.ifname,
+-                           '192.168.1.1/255.255.255.0']).wait()
++        ctx.start_process(['ip', 'addr','add', '192.168.1.1/255.255.255.0',
++                            'dev', hapd.ifname,]).wait()
+         ctx.start_process(['touch', '/tmp/dhcpd.leases']).wait()
+         cls.dhcpd_pid =3D ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/d=
+hcpd.conf',
+                                             '-lf', '/tmp/dhcpd.leases',
+                                             hapd.ifname], cleanup=3Dremove=
+_lease4)
+ =
+
+-        ctx.start_process(['ip', 'addr', 'add', 'dev', hapd.ifname,
+-                           '3ffe:501:ffff:100::1/64']).wait()
++        ctx.start_process(['ip', 'addr', 'add', '3ffe:501:ffff:100::1/64',
++                            'dev', hapd.ifname]).wait()
+         ctx.start_process(['touch', '/tmp/dhcpd6.leases']).wait()
+         cls.dhcpd6_pid =3D ctx.start_process(['dhcpd', '-6', '-f', '-cf', =
+'/tmp/dhcpd-v6.conf',
+                                             '-lf', '/tmp/dhcpd6.leases',
+diff --git a/autotests/testNetconfig/static_test.py b/autotests/testNetconf=
+ig/static_test.py
+index 8e29d4eb..bba2c644 100644
+--- a/autotests/testNetconfig/static_test.py
++++ b/autotests/testNetconfig/static_test.py
+@@ -81,7 +81,8 @@ class Test(unittest.TestCase):
+         # TODO: This could be moved into test-runner itself if other tests=
+ ever
+         #       require this functionality (p2p, FILS, etc.). Since its si=
+mple
+         #       enough it can stay here for now.
+-        ctx.start_process(['ip', 'addr','add', hapd.ifname, '192.168.1.1/2=
+55.255.255.0']).wait()
++        ctx.start_process(['ip', 'addr','add', '192.168.1.1/255.255.255.0',
++                            'dev', hapd.ifname]).wait()
+         ctx.start_process(['touch', '/tmp/dhcpd.leases']).wait()
+         cls.dhcpd_pid =3D ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/d=
+hcpd.conf',
+                                             '-lf', '/tmp/dhcpd.leases',
 -- =
 
-2.31.1
+2.34.1
 
---===============2894702470821584435==--
+--===============2808615580176270198==--
 
