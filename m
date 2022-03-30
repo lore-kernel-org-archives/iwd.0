@@ -1,106 +1,144 @@
-Content-Type: multipart/mixed; boundary="===============7856940892974953081=="
+Content-Type: multipart/mixed; boundary="===============2653349549683470215=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: [PATCH] dpp,dpp-util: use 'ULL' for constant arguments to va_arg
-Date: Fri, 03 Jun 2022 09:38:57 -0700
-Message-ID: <20220603163857.179014-1-prestwoj@gmail.com>
+Subject: [PATCH 3/4] test-runner: Don't require SUDO_GID to be set for logs
+Date: Wed, 30 Mar 2022 19:33:59 +0200
+Message-ID: <20220330173400.259961-3-andrew.zaborowski@intel.com>
+In-Reply-To: 20220330173400.259961-1-andrew.zaborowski@intel.com
 
---===============7856940892974953081==
+--===============2653349549683470215==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There were a few places in dpp/dpp-util which passed a single byte but
-was being read in with va_arg(va, size_t). On some architectures this was
-causing failures presumably from the compiler using an integer type
-smaller than size_t. As we do elsewhere, use 1ULL to force the compiler
-to pass a properly sized iteger to va_arg.
+Base the root user check on os.getuid() instead of SUDO_GID so as not to
+implicitly require sudo.  SUDO_GID being set doesn't guarantee that the
+effective user is root either since you can sudo to non-root accounts.
 ---
- src/dpp-util.c | 6 ++++--
- src/dpp.c      | 8 ++++----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ tools/test-runner | 47 ++++++++++++++++++++++++++---------------------
+ 1 file changed, 26 insertions(+), 21 deletions(-)
 
-diff --git a/src/dpp-util.c b/src/dpp-util.c
-index 8e7631d0..8cb37340 100644
---- a/src/dpp-util.c
-+++ b/src/dpp-util.c
-@@ -571,7 +571,8 @@ bool dpp_derive_r_auth(const void *i_nonce, const void =
-*r_nonce,
- 	 * R-auth =3D H(I-nonce | R-nonce | PI.x | PR.x | [ BI.x | ] BR.x | 0)
- 	 */
- 	return dpp_hash(type, r_auth, 6, i_nonce, nonce_len, r_nonce, nonce_len,
--			pix, keys_len, prx, keys_len, brx, keys_len, &zero, 1);
-+			pix, keys_len, prx, keys_len, brx, keys_len,
-+			&zero, 1ULL);
- }
+diff --git a/tools/test-runner b/tools/test-runner
+index 4ab42317..b443d91e 100755
+--- a/tools/test-runner
++++ b/tools/test-runner
+@@ -276,13 +276,16 @@ class Process(subprocess.Popen):
+ 		return True
  =
 
- bool dpp_derive_i_auth(const void *r_nonce, const void *i_nonce,
-@@ -596,7 +597,8 @@ bool dpp_derive_i_auth(const void *r_nonce, const void =
-*i_nonce,
- 	 * I-auth =3D H(R-nonce | I-nonce | PR.x | PI.x | BR.x | [ BI.x | ] 1)
- 	 */
- 	return dpp_hash(type, i_auth, 6, r_nonce, nonce_len, i_nonce, nonce_len,
--			prx, keys_len, pix, keys_len, brx, keys_len, &one, 1);
-+			prx, keys_len, pix, keys_len, brx, keys_len,
-+			&one, 1ULL);
- }
+ 	def _append_outfile(self, file, append=3DTrue):
+-		gid =3D int(self.ctx.args.log_gid)
+-		uid =3D int(self.ctx.args.log_uid)
+ 		dir =3D os.path.dirname(file)
  =
 
- /*
-diff --git a/src/dpp.c b/src/dpp.c
-index b70b9871..d6b312d7 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -511,7 +511,7 @@ static void send_config_result(struct dpp_sm *dpp, cons=
-t uint8_t *to)
++		if self.ctx.args.log_gid:
++			gid =3D int(self.ctx.args.log_gid)
++			uid =3D int(self.ctx.args.log_uid)
++
+ 		if not path_exists(dir):
+ 			os.mkdir(dir)
+-			os.chown(dir, uid, gid)
++			if self.ctx.args.log_gid:
++				os.chown(dir, uid, gid)
  =
 
- 	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, 0, ptr,
- 			sizeof(attrs), dpp->ke, dpp->key_len, 2,
--			DPP_ATTR_STATUS, 1, &zero,
-+			DPP_ATTR_STATUS, 1ULL, &zero,
- 			DPP_ATTR_ENROLLEE_NONCE, dpp->nonce_len, dpp->e_nonce);
+ 		file =3D os.path.join(dir,file)
  =
 
- 	iov[1].iov_base =3D attrs;
-@@ -1146,7 +1146,7 @@ static void send_authenticate_response(struct dpp_sm =
-*dpp)
- 			ptr, sizeof(attrs), dpp->k2, dpp->key_len, 4,
- 			DPP_ATTR_RESPONDER_NONCE, dpp->nonce_len, dpp->r_nonce,
- 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
--			DPP_ATTR_RESPONDER_CAPABILITIES, 1, &dpp->role,
-+			DPP_ATTR_RESPONDER_CAPABILITIES, 1ULL, &dpp->role,
- 			DPP_ATTR_WRAPPED_DATA, wrapped2_len, wrapped2);
+@@ -299,7 +302,8 @@ class Process(subprocess.Popen):
+ 			traceback.print_exc()
+ 			exit(0)
  =
 
- 	iov[1].iov_base =3D attrs;
-@@ -1313,7 +1313,7 @@ static void dpp_auth_request_failed(struct dpp_sm *dp=
-p,
- 	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, ptr - attrs,
- 			ptr, sizeof(attrs) - (ptr - attrs), k1, dpp->key_len, 2,
- 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
--			DPP_ATTR_RESPONDER_CAPABILITIES, 1, &dpp->role);
-+			DPP_ATTR_RESPONDER_CAPABILITIES, 1ULL, &dpp->role);
+-		os.fchown(f.fileno(), uid, gid)
++		if self.ctx.args.log_gid:
++			os.fchown(f.fileno(), uid, gid)
  =
 
- 	iov[1].iov_base =3D attrs;
- 	iov[1].iov_len =3D ptr - attrs;
-@@ -1404,7 +1404,7 @@ static bool dpp_send_authenticate_request(struct dpp_=
-sm *dpp)
- 	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, ptr - attrs,
- 			ptr, sizeof(attrs), dpp->k1, dpp->key_len, 2,
- 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
--			DPP_ATTR_INITIATOR_CAPABILITIES, 1, &dpp->role);
-+			DPP_ATTR_INITIATOR_CAPABILITIES, 1ULL, &dpp->role);
+ 		self.write_fds.append(f)
  =
 
- 	iov[1].iov_base =3D attrs;
- 	iov[1].iov_len =3D ptr - attrs;
+@@ -1833,46 +1837,47 @@ class Main:
+ 		if self.args.sub_tests:
+ 			options +=3D ' --sub_tests %s' % ','.join(self.args.sub_tests)
+ =
+
++		gid =3D None
++		if os.environ.get('SUDO_GID', None):
++			uid =3D int(os.environ['SUDO_UID'])
++			gid =3D int(os.environ['SUDO_GID'])
++
++		append_gid_uid =3D False
++
+ 		if self.args.log:
+-			if os.environ.get('SUDO_GID', None) is None:
++			if os.getuid() !=3D 0:
+ 				print("--log can only be used as root user")
+ 				quit()
+ =
+
+ 			self.args.log =3D os.path.abspath(self.args.log)
+-			uid =3D int(os.environ['SUDO_UID'])
+-			gid =3D int(os.environ['SUDO_GID'])
++			append_gid_uid =3D True
+ =
+
+ 			if not path_exists(self.args.log):
+ 				os.mkdir(self.args.log)
+-				os.chown(self.args.log, uid, gid)
+-
+-			options +=3D ' --log-gid %u' % gid
+-			options +=3D ' --log-uid %u' % uid
++				if gid:
++					os.chown(self.args.log, uid, gid)
+ =
+
+ 		if self.args.monitor:
+-			if os.environ.get('SUDO_GID', None) is None:
++			if os.getuid() !=3D 0:
+ 				print("--monitor can only be used as root user")
+ 				quit()
+ =
+
+ 			self.args.monitor =3D os.path.abspath(self.args.monitor)
+ 			mon_parent_dir =3D os.path.abspath(os.path.join(self.args.monitor, os.p=
+ardir))
+-
+-			options +=3D ' --log-gid %u' % int(os.environ['SUDO_GID'])
+-			options +=3D ' --log-uid %u' % int(os.environ['SUDO_UID'])
++			append_gid_uid =3D True
+ =
+
+ 		if self.args.result:
+-			if os.environ.get('SUDO_GID', None) is None:
++			if os.getuid() !=3D 0:
+ 				print("--result can only be used as root user")
+ 				quit()
+ =
+
+ 			self.args.result =3D os.path.abspath(self.args.result)
+ 			result_parent_dir =3D os.path.abspath(os.path.join(self.args.result, os=
+.pardir))
++			append_gid_uid =3D True
+ =
+
+-			if '--log-gid' not in options:
+-				options +=3D ' --log-gid %u' % int(os.environ['SUDO_GID'])
+-
+-			if '--log-uid' not in options:
+-				options +=3D ' --log-uid %u' % int(os.environ['SUDO_UID'])
++		if append_gid_uid and gid:
++			options +=3D ' --log-gid %u' % (gid,)
++			options +=3D ' --log-uid %u' % (uid,)
+ =
+
+ 		denylist =3D [
+ 			'auto_tests',
 -- =
 
-2.34.1
+2.32.0
 
---===============7856940892974953081==--
+--===============2653349549683470215==--
 
