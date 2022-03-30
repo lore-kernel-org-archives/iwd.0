@@ -1,32 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============8956031853734036724=="
+Content-Type: multipart/mixed; boundary="===============0285359914354595534=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/5] hwsim: add NoVirtualInterface option to DBus API
-Date: Tue, 05 Apr 2022 13:34:37 -0500
-Message-ID: <24efd174-ede9-5dda-57d8-3a1752f0921f@gmail.com>
-In-Reply-To: 20220405183011.856403-1-prestwoj@gmail.com
+Subject: Re: [PATCH] auto-t: use full_scan=True on testBSSBlacklist
+Date: Wed, 30 Mar 2022 16:17:24 -0500
+Message-ID: <69ab2d9a-1d02-bba8-10ba-ccbbc39a408a@gmail.com>
+In-Reply-To: 20220330211759.1948562-1-prestwoj@gmail.com
 
---===============8956031853734036724==
+--===============0285359914354595534==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 4/5/22 13:30, James Prestwood wrote:
-> This was available with --no-interface but no such option existed
-> for the DBus API.
+On 3/30/22 16:17, James Prestwood wrote:
+> This test was missed during the test-wide change.
 > ---
->   tools/hwsim.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
+>   autotests/testBSSBlacklist/connection_test.py | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
 > =
 
 
-All applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
 
---===============8956031853734036724==--
+--===============0285359914354595534==--
 
