@@ -1,292 +1,141 @@
-Content-Type: multipart/mixed; boundary="===============3644308453286720158=="
+Content-Type: multipart/mixed; boundary="===============0687779978371093959=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 7/7] auto-t: add testOWE-transition
-Date: Thu, 16 Sep 2021 09:30:46 -0700
-Message-ID: <20210916163046.30817-7-prestwoj@gmail.com>
-In-Reply-To: 20210916163046.30817-1-prestwoj@gmail.com
+Subject: Re: [PATCH] Improve d-bus error message on iwctl
+Date: Thu, 31 Mar 2022 08:56:48 -0700
+Message-ID: <8b611c68bdc55afcb92948c970919f807b99dc30.camel@gmail.com>
+In-Reply-To: 20220331171050.QGFDw5V2QzKCgc9ClG0jFw@dayo05.hanmail.net
 
---===============3644308453286720158==
+--===============0687779978371093959==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds several tests for OWE transition networks. Hostapd
-does have special options for these networks but currently their
-implementation is incorrect as the IE is not ever added to the
-OWE BSS. Besides that using vendor_elements provides a much easier
-way to create invalid IEs to test.
----
- .../testOWE-transition/connection_test.py     | 156 ++++++++++++++++++
- autotests/testOWE-transition/hw.conf          |  10 ++
- autotests/testOWE-transition/main.conf        |   2 +
- autotests/testOWE-transition/ssidOWE.conf     |  14 ++
- autotests/testOWE-transition/ssidOpen.conf    |   8 +
- autotests/testOWE-transition/transition.open  |   0
- 6 files changed, 190 insertions(+)
- create mode 100644 autotests/testOWE-transition/connection_test.py
- create mode 100644 autotests/testOWE-transition/hw.conf
- create mode 100644 autotests/testOWE-transition/main.conf
- create mode 100644 autotests/testOWE-transition/ssidOWE.conf
- create mode 100644 autotests/testOWE-transition/ssidOpen.conf
- create mode 100644 autotests/testOWE-transition/transition.open
+Hi,
 
-diff --git a/autotests/testOWE-transition/connection_test.py b/autotests/te=
-stOWE-transition/connection_test.py
-new file mode 100644
-index 00000000..b85ea3c9
---- /dev/null
-+++ b/autotests/testOWE-transition/connection_test.py
-@@ -0,0 +1,156 @@
-+#!/usr/bin/python3
-+
-+import unittest
-+import sys
-+
-+sys.path.append('../util')
-+import iwd
-+from iwd import IWD
-+from iwd import NetworkType
-+from hostapd import HostapdCLI
-+import testutil
-+
-+class Test(unittest.TestCase):
-+
-+    def validate(self, wd, target, autoconnect=3DFalse, connect_hidden=3DF=
-alse):
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+        device.autoconnect =3D autoconnect
-+
-+        if not autoconnect:
-+            if not connect_hidden:
-+                condition =3D 'not obj.scanning'
-+                wd.wait_for_object_condition(device, condition)
-+
-+                device.scan()
-+
-+                condition =3D 'obj.scanning'
-+                wd.wait_for_object_condition(device, condition)
-+
-+                condition =3D 'not obj.scanning'
-+                wd.wait_for_object_condition(device, condition)
-+
-+                network =3D device.get_ordered_network('transition', scan_=
-if_needed=3DFalse)
-+
-+                network.network_object.connect()
-+            else:
-+                device.connect_hidden_network('owe-hidden')
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        testutil.test_iface_operstate()
-+        testutil.test_ifaces_connected(device.name, target.ifname)
-+
-+        self.assertIn(device.address, target.list_sta())
-+
-+        device.disconnect()
-+
-+    # Normal success case
-+    def test_owe_transition(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+        self.validate(self.wd, self.hapd_owe)
-+
-+    # Normal success case
-+    def test_owe_transition_multi_network(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+
-+        self.hapd_open2.set_value('vendor_elements', 'dd17506f9a1c02000000=
-f1000c6f77652d68696464656e2d32')
-+        self.hapd_open2.reload()
-+        self.hapd_owe2.set_value('vendor_elements', 'dd17506f9a1c02000000f=
-0000c7472616e736974696f6e2d32')
-+        self.hapd_owe2.reload()
-+
-+        self.validate(self.wd, self.hapd_owe)
-+
-+    # Normal success autoconnect case
-+    def test_owe_transition_autoconnect(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+        IWD.copy_to_storage('transition.open')
-+
-+        self.validate(self.wd, self.hapd_owe, autoconnect=3DTrue)
-+
-+    # Open BSS has invalid BSSID in OWE transition element
-+    # Expected connection to Open BSS
-+    def test_owe_transition_invalid_open_bssid(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-f000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+
-+        self.validate(self.wd, self.hapd_open)
-+
-+    # OWE BSS has invalid BSSID in OWE transition element
-+    # Expected connection to Open BSS
-+    def test_owe_transition_invalid_owe_bssid(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000ff=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+
-+        self.validate(self.wd, self.hapd_open)
-+
-+    # No OWE hidden network exists
-+    # Expected connection to Open BSS
-+    def test_owe_transition_no_hidden_found(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.disable()
-+
-+        self.validate(self.wd, self.hapd_open)
-+
-+    # Directly connect to valid OWE hidden network
-+    # Expected connection failure
-+    def test_owe_transition_connect_hidden_valid(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd15506f9a1c02000000f=
-1000a6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.reload()
-+
-+        with self.assertRaises(iwd.NotFoundEx):
-+            self.validate(self.wd, self.hapd_owe, connect_hidden=3DTrue)
-+
-+    # Directly connect to invalid OWE hidden network. The SSID in the OWE =
-BSS
-+    # IE points to itself. And the Open BSS IE points to a non-existent SS=
-ID.
-+    # Expected connection failure
-+    def test_owe_transition_connect_hidden_invalid(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd18506f9a1c02000000f=
-1000d6e6f2d6f77652d68696464656e')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a6f77652d68696464656e')
-+        self.hapd_owe.reload()
-+
-+        with self.assertRaises(iwd.NotFoundEx):
-+            self.validate(self.wd, self.hapd_owe, connect_hidden=3DTrue)
-+
-+    def setUp(self):
-+        self.wd =3D IWD(True)
-+        self.hapd_owe =3D HostapdCLI(config=3D'ssidOWE.conf')
-+        self.hapd_open =3D HostapdCLI(config=3D'ssidOpen.conf')
-+        self.hapd_owe2 =3D HostapdCLI(config=3D'ssidOWE-2.conf')
-+        self.hapd_open2 =3D HostapdCLI(config=3D'ssidOpen-2.conf')
-+
-+    def tearDown(self):
-+        IWD.clear_storage()
-+
-+        self.wd =3D None
-+        self.hapd_open =3D None
-+        self.hapd_owe =3D None
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        pass
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
-diff --git a/autotests/testOWE-transition/hw.conf b/autotests/testOWE-trans=
-ition/hw.conf
-new file mode 100644
-index 00000000..dbd70597
---- /dev/null
-+++ b/autotests/testOWE-transition/hw.conf
-@@ -0,0 +1,10 @@
-+[SETUP]
-+num_radios=3D5
-+hwsim_medium=3Dyes
-+start_iwd=3D0
-+
-+[HOSTAPD]
-+rad0=3DssidOpen.conf
-+rad1=3DssidOWE.conf
-+rad2=3DssidOpen-2.conf
-+rad3=3DssidOWE-2.conf
-diff --git a/autotests/testOWE-transition/main.conf b/autotests/testOWE-tra=
-nsition/main.conf
-new file mode 100644
-index 00000000..9452fb6b
---- /dev/null
-+++ b/autotests/testOWE-transition/main.conf
-@@ -0,0 +1,2 @@
-+[Scan]
-+DisableMacAddressRandomization=3Dtrue
-diff --git a/autotests/testOWE-transition/ssidOWE.conf b/autotests/testOWE-=
-transition/ssidOWE.conf
-new file mode 100644
-index 00000000..c54309ae
---- /dev/null
-+++ b/autotests/testOWE-transition/ssidOWE.conf
-@@ -0,0 +1,14 @@
-+ssid=3Dowe-hidden
-+bssid=3D02:00:00:00:f1:00
-+channel=3D1
-+ignore_broadcast_ssid=3D1
-+ieee80211w=3D1
-+
-+wpa=3D2
-+wpa_key_mgmt=3DOWE
-+rsn_pairwise=3DCCMP
-+
-+# You would conventionally use these options but hostapd does not include =
-an
-+# IE for the OWE network, hence vendor_elements must be used directly
-+#owe_transition_ssid=3D"transition"
-+#owe_transition_bssid=3D02:00:00:00:f0:00
-diff --git a/autotests/testOWE-transition/ssidOpen.conf b/autotests/testOWE=
--transition/ssidOpen.conf
-new file mode 100644
-index 00000000..4fc68430
---- /dev/null
-+++ b/autotests/testOWE-transition/ssidOpen.conf
-@@ -0,0 +1,8 @@
-+channel=3D1
-+ssid=3Dtransition
-+bssid=3D02:00:00:00:f0:00
-+
-+# You would conventionally use these options but hostapd does not include =
-an
-+# IE for the OWE network, hence vendor_elements must be used directly
-+#owe_transition_ssid=3D"owe-hidden"
-+#owe_transition_bssid=3D02:00:00:00:f1:00
-diff --git a/autotests/testOWE-transition/transition.open b/autotests/testO=
-WE-transition/transition.open
-new file mode 100644
-index 00000000..e69de29b
--- =
+On Thu, 2022-03-31 at 17:10 +0900, Dayo wrote:
+> I got error of =
 
-2.31.1
+> =EF=BB=BFRejected send message, 2 matched rules; type=3D"method_call",
+> sender=3D":1.137" (uid=3D1000 pid=3D14325 comm=3D"client/iwctl")
+> interface=3D"org.freedesktop.DBus.ObjectManager"
+> member=3D"GetManagedObjects" error name=3D"(unset)" requested_reply=3D"0"
+> destination=3D"net.connman.iwd" (uid=3D0 pid=3D354 comm=3D"/usr/lib/iwd/i=
+wd")
+> in execution of iwctl without sudo. But when I tried to search that,
+> It has low information in google but I solve the issue as executing
+> with sudo. So this is very small change but this will improve this
+> software.
+> =EF=BB=BF
+> =EF=BB=BFps. I get issue in linux kernel 5.16 and later, including 5.17.x
 
---===============3644308453286720158==--
+This is actually result of removing =C2=A0'at_console' from the dbus
+configuration which we did a couple releases ago. The fix here is to
+add your user to the netdev group if you don't want to run with root.
+I'm not sure we want this debug print as-is for a few reasons. First
+being that it should explain the netdev group requirement rather than
+'root permission'. And second that this could be an error for any
+number of reasons, not necissarily because of permissions.
+
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/?id=3D010b0e=
+27f98442ad9366ecdcb09601f92334c293
+
+> =EF=BB=BF
+> =EF=BB=BF
+> =EF=BB=BF---
+> =C2=A0client/dbus-proxy.c | 1 +
+> =C2=A01 file changed, 1 insertion(+)
+> =
+
+> diff --git a/client/dbus-proxy.c b/client/dbus-proxy.c
+> index 0373a3df..8cad3ece 100644
+> --- a/client/dbus-proxy.c
+> +++ b/client/dbus-proxy.c
+> @@ -722,6 +722,7 @@ static void get_managed_objects_callback(struct
+> l_dbus_message *message,
+> =C2=A0=C2=A0=C2=A0 =C2=A0if (dbus_message_has_error(message)) {
+> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0display_error("Failed to retr=
+ieve IWD dbus objects, "
+> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
+=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0"quittin=
+g...\n");
+> +=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0display("Execute iwctl with root p=
+ermission is the one way
+> to solve this issue.\n");
+> =C2=A0
+> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0goto error;
+> =C2=A0=C2=A0=C2=A0 =C2=A0}
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+
+
+--===============0687779978371093959==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.htm"
+
+PGh0bWw+PGhlYWQ+CiAgICA8c3R5bGU+CiAgICAgICAgcHttYXJnaW4tdG9wOjA7bWFyZ2luLWJv
+dHRvbTowfQogICAgPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT48ZGl2PkhpLDwvZGl2PjxkaXY+PGJy
+PjwvZGl2PjxkaXY+T24gVGh1LCAyMDIyLTAzLTMxIGF0IDE3OjEwICswOTAwLCBEYXlvIHdyb3Rl
+OjwvZGl2PjxibG9ja3F1b3RlIHR5cGU9ImNpdGUiIHN0eWxlPSJtYXJnaW46MCAwIDAgLjhleDsg
+Ym9yZGVyLWxlZnQ6MnB4ICM3MjlmY2Ygc29saWQ7cGFkZGluZy1sZWZ0OjFleCI+PGRpdiBzdHls
+ZT0iY29sb3I6IzExMTtmb250LWZhbWlseTpBcHBsZSBTRCBHb3RoaWMgTmVvLE1hbGd1biBHb3Ro
+aWMsJ+unkeydgCDqs6DrlJUnLHNhbnMtc2VyaWY7Zm9udC1zaXplOjEwcHQ7bGluZS1oZWlnaHQ6
+MS41OyI+PHA+SSBnb3QgZXJyb3Igb2YgPGJyPjwvcD48cD7vu79SZWplY3RlZCBzZW5kIG1lc3Nh
+Z2UsIDIgbWF0Y2hlZCBydWxlczsgdHlwZT0ibWV0aG9kX2NhbGwiLCBzZW5kZXI9IjoxLjEzNyIg
+KHVpZD0xMDAwIHBpZD0xNDMyNSBjb21tPSJjbGllbnQvaXdjdGwiKSBpbnRlcmZhY2U9Im9yZy5m
+cmVlZGVza3RvcC5EQnVzLk9iamVjdE1hbmFnZXIiIG1lbWJlcj0iR2V0TWFuYWdlZE9iamVjdHMi
+IGVycm9yIG5hbWU9Iih1bnNldCkiIHJlcXVlc3RlZF9yZXBseT0iMCIgZGVzdGluYXRpb249Im5l
+dC5jb25ubWFuLml3ZCIgKHVpZD0wIHBpZD0zNTQgY29tbT0iL3Vzci9saWIvaXdkL2l3ZCIpPGJy
+PmluIGV4ZWN1dGlvbiBvZiBpd2N0bCB3aXRob3V0IHN1ZG8uIEJ1dCB3aGVuIEkgdHJpZWQgdG8g
+c2VhcmNoIHRoYXQsIEl0IGhhcyBsb3cgaW5mb3JtYXRpb24gaW4gZ29vZ2xlIGJ1dCBJIHNvbHZl
+IHRoZSBpc3N1ZSBhcyBleGVjdXRpbmcgd2l0aCBzdWRvLiBTbyB0aGlzIGlzIHZlcnkgc21hbGwg
+Y2hhbmdlIGJ1dCB0aGlzIHdpbGwgaW1wcm92ZSB0aGlzIHNvZnR3YXJlLjwvcD48cD7vu788L3A+
+PHA+77u/cHMuIEkgZ2V0IGlzc3VlIGluIGxpbnV4IGtlcm5lbCA1LjE2IGFuZCBsYXRlciwgaW5j
+bHVkaW5nIDUuMTcueDxicj48L3A+PC9kaXY+PC9ibG9ja3F1b3RlPjxkaXY+PGJyPjwvZGl2Pjxk
+aXY+VGhpcyBpcyBhY3R1YWxseSByZXN1bHQgb2YgcmVtb3ZpbmcgJm5ic3A7J2F0X2NvbnNvbGUn
+IGZyb20gdGhlIGRidXMgY29uZmlndXJhdGlvbiB3aGljaCB3ZSBkaWQgYSBjb3VwbGUgcmVsZWFz
+ZXMgYWdvLiBUaGUgZml4IGhlcmUgaXMgdG8gYWRkIHlvdXIgdXNlciB0byB0aGUgbmV0ZGV2IGdy
+b3VwIGlmIHlvdSBkb24ndCB3YW50IHRvIHJ1biB3aXRoIHJvb3QuIEknbSBub3Qgc3VyZSB3ZSB3
+YW50IHRoaXMgZGVidWcgcHJpbnQgYXMtaXMgZm9yIGEgZmV3IHJlYXNvbnMuIEZpcnN0IGJlaW5n
+IHRoYXQgaXQgc2hvdWxkIGV4cGxhaW4gdGhlIG5ldGRldiBncm91cCByZXF1aXJlbWVudCByYXRo
+ZXIgdGhhbiAncm9vdCBwZXJtaXNzaW9uJy4gQW5kIHNlY29uZCB0aGF0IHRoaXMgY291bGQgYmUg
+YW4gZXJyb3IgZm9yIGFueSBudW1iZXIgb2YgcmVhc29ucywgbm90IG5lY2lzc2FyaWx5IGJlY2F1
+c2Ugb2YgcGVybWlzc2lvbnMuPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj48YSBocmVmPSJodHRw
+czovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbmV0d29yay93aXJlbGVzcy9pd2QuZ2l0L2NvbW1p
+dC8/aWQ9MDEwYjBlMjdmOTg0NDJhZDkzNjZlY2RjYjA5NjAxZjkyMzM0YzI5MyI+aHR0cHM6Ly9n
+aXQua2VybmVsLm9yZy9wdWIvc2NtL25ldHdvcmsvd2lyZWxlc3MvaXdkLmdpdC9jb21taXQvP2lk
+PTAxMGIwZTI3Zjk4NDQyYWQ5MzY2ZWNkY2IwOTYwMWY5MjMzNGMyOTM8L2E+PC9kaXY+PGRpdj48
+YnI+PC9kaXY+PGJsb2NrcXVvdGUgdHlwZT0iY2l0ZSIgc3R5bGU9Im1hcmdpbjowIDAgMCAuOGV4
+OyBib3JkZXItbGVmdDoycHggIzcyOWZjZiBzb2xpZDtwYWRkaW5nLWxlZnQ6MWV4Ij48ZGl2IHN0
+eWxlPSJjb2xvcjojMTExO2ZvbnQtZmFtaWx5OkFwcGxlIFNEIEdvdGhpYyBOZW8sTWFsZ3VuIEdv
+dGhpYywn66eR7J2AIOqzoOuUlScsc2Fucy1zZXJpZjtmb250LXNpemU6MTBwdDtsaW5lLWhlaWdo
+dDoxLjU7Ij48cD7vu788L3A+PHA+77u/PGJyPjwvcD48cD7vu78tLS08YnI+Jm5ic3A7Y2xpZW50
+L2RidXMtcHJveHkuYyB8IDEgKzxicj4mbmJzcDsxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24o
+Kyk8YnI+PGJyPmRpZmYgLS1naXQgYS9jbGllbnQvZGJ1cy1wcm94eS5jIGIvY2xpZW50L2RidXMt
+cHJveHkuYzxicj5pbmRleCAwMzczYTNkZi4uOGNhZDNlY2UgMTAwNjQ0PGJyPi0tLSBhL2NsaWVu
+dC9kYnVzLXByb3h5LmM8YnI+KysrIGIvY2xpZW50L2RidXMtcHJveHkuYzxicj5AQCAtNzIyLDYg
+KzcyMiw3IEBAIHN0YXRpYyB2b2lkIGdldF9tYW5hZ2VkX29iamVjdHNfY2FsbGJhY2soc3RydWN0
+IGxfZGJ1c19tZXNzYWdlICptZXNzYWdlLDxicj4mbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7aWYg
+KGRidXNfbWVzc2FnZV9oYXNfZXJyb3IobWVzc2FnZSkpIHs8YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7
+ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDtkaXNwbGF5X2Vycm9yKCJGYWlsZWQgdG8gcmV0cmll
+dmUgSVdEIGRidXMgb2JqZWN0cywgIjxicj4mbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7
+Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7
+Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7InF1aXR0
+aW5nLi4uXG4iKTs8YnI+KyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ZGlz
+cGxheSgiRXhlY3V0ZSBpd2N0bCB3aXRoIHJvb3QgcGVybWlzc2lvbiBpcyB0aGUgb25lIHdheSB0
+byBzb2x2ZSB0aGlzIGlzc3VlLlxuIik7PGJyPiZuYnNwOzxicj4mbmJzcDsmbmJzcDsmbmJzcDsg
+Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwO2dvdG8gZXJyb3I7PGJyPiZuYnNwOyZuYnNwOyZuYnNw
+OyAmbmJzcDt9PGJyPjwvcD48ZGl2Pl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fPGJyPjwvZGl2PjxkaXY+aXdkIG1haWxpbmcgbGlzdCAtLSA8YSBocmVmPSJt
+YWlsdG86aXdkQGxpc3RzLjAxLm9yZyI+aXdkQGxpc3RzLjAxLm9yZzwvYT48YnI+PC9kaXY+PGRp
+dj5UbyB1bnN1YnNjcmliZSBzZW5kIGFuIGVtYWlsIHRvIDxhIGhyZWY9Im1haWx0bzppd2QtbGVh
+dmVAbGlzdHMuMDEub3JnIj5pd2QtbGVhdmVAbGlzdHMuMDEub3JnPC9hPjxicj48L2Rpdj48L2Rp
+dj48L2Jsb2NrcXVvdGU+PGRpdj48YnI+PC9kaXY+PGRpdj48c3Bhbj48L3NwYW4+PC9kaXY+PC9i
+b2R5PjwvaHRtbD4K
+
+--===============0687779978371093959==--
 
