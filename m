@@ -1,30 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============7118110900903097635=="
+Content-Type: multipart/mixed; boundary="===============7697083731526177474=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] auto-t: iwd.py: use spaces instead of tabs
-Date: Tue, 04 Jan 2022 12:34:48 -0600
-Message-ID: <daacc920-b5b2-500f-d14d-28baa699d826@gmail.com>
-In-Reply-To: 20220104182953.110310-1-prestwoj@gmail.com
+Subject: [PATCH v2 07/14] test-runner: don't kill dmesg after individual tests
+Date: Thu, 31 Mar 2022 16:16:34 -0700
+Message-ID: <20220331231641.484200-7-prestwoj@gmail.com>
+In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
 
---===============7118110900903097635==
+--===============7697083731526177474==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This prevents any kernel logging from being available after the first
+test is finished.
+---
+ tools/run-tests | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 1/4/22 12:29, James Prestwood wrote:
-> ---
->   autotests/util/iwd.py | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+diff --git a/tools/run-tests b/tools/run-tests
+index e2993b1b..c4d133a6 100755
+--- a/tools/run-tests
++++ b/tools/run-tests
+@@ -186,6 +186,9 @@ class Process(subprocess.Popen):
+ 	@classmethod
+ 	def kill_all(cls):
+ 		for p in cls.processes.values():
++			if p.args[0] =3D=3D 'dmesg':
++				continue
++
+ 			p.kill()
+ =
 
+ 	@staticmethod
+-- =
 
-Applied, thanks.
+2.34.1
 
-Regards,
--Denis
-
---===============7118110900903097635==--
+--===============7697083731526177474==--
 
