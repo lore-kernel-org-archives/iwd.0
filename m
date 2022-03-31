@@ -1,293 +1,172 @@
-Content-Type: multipart/mixed; boundary="===============5796763920106194561=="
+Content-Type: multipart/mixed; boundary="===============2487382152012567343=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 02/10] dpp-util: add URI parsing
-Date: Thu, 20 Jan 2022 15:44:07 -0800
-Message-ID: <20220120234415.2469451-2-prestwoj@gmail.com>
-In-Reply-To: 20220120234415.2469451-1-prestwoj@gmail.com
+Subject: [PATCH v2 12/14] auto-t: hostapd.py: use IO watch for hostapd events
+Date: Thu, 31 Mar 2022 16:16:39 -0700
+Message-ID: <20220331231641.484200-12-prestwoj@gmail.com>
+In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
 
---===============5796763920106194561==
+--===============2487382152012567343==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Parses K (key), M (mac), C (class/channels), and V (version) tokens
-into a new structure dpp_uri_info. H/I are not parsed since there
-currently isn't any use for them.
+With how fast UML is hostapd events were being sent out prior to
+ever calling wait_for_event. Instead set an IO watch on the control
+socket and cache all events as they come. Then, when wait_for_event
+is called, it can reference this list. If the event is found any
+older events are purged from the list.
+
+The AP-ENABLED event needed a special case because hostapd gets
+started before the IO watch can be registered. To fix this an
+enabled property was added which queries the state directly. This
+is checked first, and if not enabled wait_for_event continues normally.
 ---
- src/dpp-util.c | 217 +++++++++++++++++++++++++++++++++++++++++++++++++
- src/dpp-util.h |  13 +++
- 2 files changed, 230 insertions(+)
+ autotests/util/hostapd.py | 68 ++++++++++++++++++++++++++-------------
+ tools/run-tests           |  3 +-
+ 2 files changed, 48 insertions(+), 23 deletions(-)
 
-diff --git a/src/dpp-util.c b/src/dpp-util.c
-index 4a5bd046..6add2ded 100644
---- a/src/dpp-util.c
-+++ b/src/dpp-util.c
-@@ -865,3 +865,220 @@ struct l_ecc_point *dpp_point_from_asn1(const uint8_t=
- *asn1, size_t len)
- 	return l_ecc_point_from_data(curve, key_data[1],
- 					key_data + 2, elen - 2);
- }
-+
-+/*
-+ * Advances 'p' to the next character 'sep' plus one. strchr can be truste=
-d to
-+ * find the next character, but we do need to check that the next characte=
-r + 1
-+ * isn't the NULL terminator, i.e. that data actually exists past this poi=
-nt.
-+ */
-+#define TOKEN_NEXT(p, sep) \
-+({ \
-+	const char *_next =3D strchr((p), (sep)); \
-+	if (_next) { \
-+		if (*(_next + 1) =3D=3D '\0') \
-+			_next =3D NULL; \
-+		else \
-+			_next++; \
-+	} \
-+	_next; \
-+})
-+
-+/*
-+ * Finds the length of the current token (characters until next 'sep'). If=
- no
-+ * 'sep' is found zero is returned.
-+ */
-+#define TOKEN_LEN(p, sep) \
-+({ \
-+	const char *_next =3D strchr((p), (sep)); \
-+	if (!_next) \
-+		_next =3D (p); \
-+	(_next - (p)); \
-+})
-+
-+/*
-+ * Ensures 'p' points to something resembling a single character followed =
-by
-+ * ':' followed by at least one non-null byte of data. This allows the par=
-se
-+ * loop to safely advance the pointer to each tokens data (pos + 2)
-+ */
-+#define TOKEN_OK(p) \
-+	((p) && (p)[0] !=3D '\0' && (p)[1] =3D=3D ':' && (p)[2] !=3D '\0') \
-+
-+static struct scan_freq_set *dpp_parse_class_and_channel(const char *token)
-+{
-+	const char *pos =3D token;
-+	char *end;
-+	struct scan_freq_set *freqs =3D scan_freq_set_new();
-+
-+	/* Checking for <operclass>/<channel>,<operclass>/<channel>,... */
-+	for (; pos; pos =3D TOKEN_NEXT(pos, ',')) {
-+		uint8_t channel;
-+		uint8_t oper_class =3D strtol(pos, &end, 10);
-+
-+		if (!end || end =3D=3D pos || (end && *end !=3D '/'))
-+			goto free_set;
-+
-+		pos =3D end + 1;
-+		channel =3D strtol(pos, &end, 10);
-+
-+		/* Either another pair (,) or end of this token (;) */
-+		if (!end || end =3D=3D pos || (*end !=3D ',' && *end !=3D ';'))
-+			goto free_set;
-+
-+		scan_freq_set_add(freqs, oci_to_frequency(oper_class, channel));
-+	}
-+
-+	if (scan_freq_set_isempty(freqs)) {
-+free_set:
-+		scan_freq_set_free(freqs);
-+		return NULL;
-+	}
-+
-+	return freqs;
-+}
-+
-+static int dpp_parse_mac(const char *str, uint8_t *mac_out)
-+{
-+	uint8_t mac[6];
-+	unsigned int i;
-+
-+	for (i =3D 0; i < 12; i +=3D 2) {
-+		if (!l_ascii_isxdigit(str[i]))
-+			return -EINVAL;
-+
-+		if (!l_ascii_isxdigit(str[i + 1]))
-+			return -EINVAL;
-+	}
-+
-+	if (sscanf(str, "%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx",
-+			&mac[0], &mac[1], &mac[2],
-+			&mac[3], &mac[4], &mac[5]) !=3D 6)
-+		return -EINVAL;
-+
-+	if (!util_is_valid_sta_address(mac))
-+		return -EINVAL;
-+
-+	memcpy(mac_out, mac, 6);
-+
-+	return 0;
-+}
-+
-+static int dpp_parse_version(const char *str, uint8_t *version_out)
-+{
-+	char *end;
-+	uint8_t version;
-+	size_t len =3D TOKEN_LEN(str, ';');
-+
-+	if (len !=3D 1)
-+		return -EINVAL;
-+
-+	version =3D strtol(str, &end, 10);
-+
-+	if (version !=3D 1 && version !=3D 2)
-+		return -EINVAL;
-+
-+	*version_out =3D version;
-+
-+	return 0;
-+}
-+
-+static struct l_ecc_point *dpp_parse_key(const char *str)
-+{
-+	_auto_(l_free) uint8_t *decoded =3D NULL;
-+	size_t decoded_len;
-+	size_t len =3D TOKEN_LEN(str, ';');
-+
-+	if (!len)
-+		return NULL;
-+
-+	decoded =3D l_base64_decode(str, len, &decoded_len);
-+	if (!decoded)
-+		return NULL;
-+
-+	return dpp_point_from_asn1(decoded, decoded_len);
-+}
-+
-+/*
-+ * Parse a bootstrapping URI. This parses the tokens defined in the Easy C=
-onnect
-+ * spec, and verifies they are the correct syntax. Some values have extra
-+ * verification:
-+ *  - The bootstrapping key is base64 decoded and converted to an l_ecc_po=
-int
-+ *  - The operating class and channels are checked against the OCI table.
-+ *  - The version is checked to be either 1 or 2, as defined by the spec.
-+ *  - The MAC is verified to be a valid station address.
-+ */
-+struct dpp_uri_info *dpp_parse_uri(const char *uri)
-+{
-+	struct dpp_uri_info *info;
-+	const char *pos =3D uri;
-+	const char *end =3D uri + strlen(uri) - 1;
-+	int ret =3D 0;
-+
-+	if (strncmp(pos, "DPP:", 4))
-+		return NULL;
-+
-+	info =3D l_new(struct dpp_uri_info, 1);
-+
-+	pos +=3D 4;
-+
-+	/* EasyConnect 5.2.1 - Bootstrapping information format */
-+	for (; TOKEN_OK(pos); pos =3D TOKEN_NEXT(pos, ';')) {
-+		switch (*pos) {
-+		case 'C':
-+			info->freqs =3D dpp_parse_class_and_channel(pos + 2);
-+			if (!info->freqs)
-+				goto free_info;
-+			break;
-+		case 'M':
-+			ret =3D dpp_parse_mac(pos + 2, info->mac);
-+			if (ret < 0)
-+				goto free_info;
-+			break;
-+		case 'V':
-+			ret =3D dpp_parse_version(pos + 2, &info->version);
-+			if (ret < 0)
-+				goto free_info;
-+			break;
-+		case 'K':
-+			info->boot_public =3D dpp_parse_key(pos + 2);
-+			if (!info->boot_public)
-+				goto free_info;
-+			break;
-+		case 'H':
-+		case 'I':
-+			break;
-+		default:
-+			goto free_info;
-+		}
-+	}
-+
-+	/* Extra data found after last token */
-+	if (pos !=3D end)
-+		goto free_info;
-+
-+	/* The public bootstrapping key is the only required token */
-+	if (!info->boot_public)
-+		goto free_info;
-+
-+	return info;
-+
-+free_info:
-+	dpp_free_uri_info(info);
-+	return NULL;
-+}
-+
-+void dpp_free_uri_info(struct dpp_uri_info *info)
-+{
-+	if (info->freqs)
-+		scan_freq_set_free(info->freqs);
-+
-+	if (info->boot_public)
-+		l_ecc_point_free(info->boot_public);
-+
-+	if (info->information)
-+		l_free(info->information);
-+
-+	if (info->host)
-+		l_free(info->host);
-+
-+	l_free(info);
-+}
-diff --git a/src/dpp-util.h b/src/dpp-util.h
-index 82535ff8..a3ddd452 100644
---- a/src/dpp-util.h
-+++ b/src/dpp-util.h
-@@ -22,6 +22,16 @@
- struct l_ecc_point;
- struct l_ecc_scalar;
- enum ie_rsn_akm_suite;
-+struct scan_freq_set;
-+
-+struct dpp_uri_info {
-+	struct scan_freq_set *freqs;
-+	struct l_ecc_point *boot_public;
-+	uint8_t mac[6];
-+	char *information;
-+	uint8_t version;
-+	char *host;
-+};
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 4ae7c42d..6a9f37c7 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -81,27 +81,48 @@ class HostapdCLI(object):
  =
 
- enum dpp_frame_type {
- 	DPP_FRAME_AUTHENTICATION_REQUEST	=3D 0,
-@@ -168,3 +178,6 @@ bool dpp_derive_ke(const uint8_t *i_nonce, const uint8_=
-t *r_nonce,
+         self.ctrl_sock.connect(self.socket_path + '/' + self.ifname)
  =
 
- uint8_t *dpp_point_to_asn1(const struct l_ecc_point *p, size_t *len_out);
- struct l_ecc_point *dpp_point_from_asn1(const uint8_t *asn1, size_t len);
++        self.events =3D []
++        self.io_watch =3D GLib.io_add_watch(self.ctrl_sock, GLib.IO_IN, se=
+lf._handle_data_in)
 +
-+struct dpp_uri_info *dpp_parse_uri(const char *uri);
-+void dpp_free_uri_info(struct dpp_uri_info *info);
+         if 'OK' not in self._ctrl_request('ATTACH'):
+             raise Exception('ATTACH failed')
+ =
+
+         ctrl_count =3D ctrl_count + 1
+ =
+
+-    def _poll_event(self, event):
+-        if not self._data_available(0.25):
+-            return False
++    def _handle_data_in(self, sock, *args):
++        newdata =3D sock.recv(4096)
++
++        decoded =3D newdata.decode('utf-8')
++        if len(decoded) >=3D 3 and decoded[0] =3D=3D '<' and decoded[2] =
+=3D=3D '>':
++            decoded =3D decoded[3:]
++        while len(decoded) and decoded[-1] =3D=3D '\n':
++            decoded =3D decoded[:-1]
++
++        self.events.insert(0, decoded)
++
++        return True
+ =
+
+-        data =3D self.ctrl_sock.recv(4096).decode('utf-8')
+-        if event in data:
+-            return data
++    def _poll_event(self, event):
++        # Look through the list (most recent is first) until the even is f=
+ound.
++        # Once found consume this event and any older ones as to not
++        # accidentally trigger a false positive later on.
++        for idx, e in enumerate(self.events):
++            if event in e:
++                self.events =3D self.events[:idx]
++                return e
+ =
+
+         return False
+ =
+
+     def wait_for_event(self, event, timeout=3D10):
++        if event =3D=3D 'AP-ENABLED':
++            if self.enabled:
++                return 'AP-ENABLED'
++
+         return ctx.non_block_wait(self._poll_event, timeout, event,
+                                     exception=3DTimeoutError("waiting for =
+event"))
+ =
+
+-    def _data_available(self, timeout=3D2):
+-        [r, w, e] =3D select.select([self.ctrl_sock], [], [], timeout)
++    def _data_available(self):
++        [r, w, e] =3D select.select([self.ctrl_sock], [], [])
+         if r:
+             return True
+         return False
+@@ -228,25 +249,28 @@ class HostapdCLI(object):
+         ctx.start_process(cmd).wait()
+         self.wait_for_event('AP-CSA-FINISHED')
+ =
+
+-    @property
+-    def bssid(self):
++    def _get_status(self):
++        ret =3D {}
++
+         cmd =3D self.cmdline + ['status']
+         proc =3D ctx.start_process(cmd)
+         proc.wait()
+-        status =3D proc.out.split('\n')
++        status =3D proc.out.strip().split('\n')
+ =
+
+-        bssid =3D [x for x in status if x.startswith('bssid')]
+-        bssid =3D bssid[0].split('=3D')
+-        return bssid[1]
++        for kv in status:
++            k, v =3D kv.split('=3D')
++            ret[k] =3D v
++
++        return ret
+ =
+
+     @property
+-    def frequency(self):
+-        cmd =3D self.cmdline + ['status']
+-        proc =3D ctx.start_process(cmd)
+-        proc.wait()
+-        status =3D proc.out.split('\n')
++    def bssid(self):
++        return self._get_status()['bssid[0]']
+ =
+
+-        frequency =3D [x for x in status if x.startswith('freq')][0]
+-        frequency =3D frequency.split('=3D')[1]
++    @property
++    def frequency(self):
++        return int(self._get_status()['freq'])
+ =
+
+-        return int(frequency)
++    @property
++    def enabled(self):
++        return self._get_status()['state'] =3D=3D 'ENABLED'
+diff --git a/tools/run-tests b/tools/run-tests
+index c4d133a6..2b9290ed 100755
+--- a/tools/run-tests
++++ b/tools/run-tests
+@@ -540,7 +540,8 @@ class Hostapd:
+ 		except:
+ 			print("Failed to remove %s" % self.global_ctrl_iface)
+ =
+
+-		self.instances =3D None
++		for hapd in self.instances:
++			GLib.source_remove(hapd.cli.io_watch)
+ =
+
+ 		# Hostapd may have already been stopped
+ 		if self.process:
 -- =
 
-2.31.1
+2.34.1
 
---===============5796763920106194561==--
+--===============2487382152012567343==--
 
