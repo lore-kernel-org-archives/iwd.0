@@ -1,33 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============6326988392211645752=="
+Content-Type: multipart/mixed; boundary="===============6054830886411607716=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 3/9] doc: Add NetworkConfigurationAgent API description
-Date: Wed, 10 Nov 2021 12:04:39 -0600
-Message-ID: <27f4453a-c4a3-131d-1f5a-db6a01291447@gmail.com>
-In-Reply-To: 20211108112838.372416-3-andrew.zaborowski@intel.com
+Subject: [PATCH v2 10/14] auto-t: wait for roam events in proper order
+Date: Thu, 31 Mar 2022 16:16:37 -0700
+Message-ID: <20220331231641.484200-10-prestwoj@gmail.com>
+In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
 
---===============6326988392211645752==
+--===============6054830886411607716==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+These were out of order and would sometimes fail the check.
+---
+ autotests/testPSK-roam/roam_ap_disconnect_test.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 11/8/21 5:28 AM, Andrew Zaborowski wrote:
-> Document the new API that clients can use to get notified of new network
-> configuration and be responsible for committing it to the netdev, the
-> resolver, etc.
-> ---
->   doc/agent-api.txt | 106 ++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 106 insertions(+)
-> =
+diff --git a/autotests/testPSK-roam/roam_ap_disconnect_test.py b/autotests/=
+testPSK-roam/roam_ap_disconnect_test.py
+index 9cef3090..760c25fa 100644
+--- a/autotests/testPSK-roam/roam_ap_disconnect_test.py
++++ b/autotests/testPSK-roam/roam_ap_disconnect_test.py
+@@ -32,8 +32,8 @@ class Test(unittest.TestCase):
+ =
 
+         # Since both BSS's have low signal, the roam should fail and trigg=
+er
+         # another roam scan.
+-        device.wait_for_event('no-roam-candidates', timeout=3D30)
+         device.wait_for_event('roam-scan-triggered', timeout=3D30)
++        device.wait_for_event('no-roam-candidates', timeout=3D30)
+ =
 
-Applied, thanks.
+         # Hostapd sends disconnect
+         self.bss_hostapd[0].disable()
+-- =
 
-Regards,
--Denis
+2.34.1
 
---===============6326988392211645752==--
+--===============6054830886411607716==--
 
