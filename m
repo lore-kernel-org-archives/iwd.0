@@ -1,58 +1,92 @@
-Content-Type: multipart/mixed; boundary="===============0418908169049536979=="
+Content-Type: multipart/mixed; boundary="===============6625909932616438452=="
 MIME-Version: 1.0
-From: Jupiter <jupiter.hce at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd configure location and files
-Date: Wed, 01 Dec 2021 10:25:51 +1100
-Message-ID: <CAA=hcWRD26NoeS5bgZ3kdBFz2c7n=kpan2etQkXhRKv1UavYJw@mail.gmail.com>
-In-Reply-To: 31be7914-5c78-f1c9-1225-a271204ba153@gmail.com
+Subject: [PATCH v2 13/14] auto-t: iwd.py: use IO watch for station debug events
+Date: Thu, 31 Mar 2022 16:16:40 -0700
+Message-ID: <20220331231641.484200-13-prestwoj@gmail.com>
+In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
 
---===============0418908169049536979==
+--===============6625909932616438452==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+Similarly to hostapd.wait_for_event, IWD's variant needed to act on
+an IO watch because events were being received prior to even calling
+wait_for_event.
+---
+ autotests/util/iwd.py | 27 ++++++++++++---------------
+ 1 file changed, 12 insertions(+), 15 deletions(-)
 
-> For DHCP debugging, refer to 'man iwd.debug'.  You will need to set the
-> appropriate environment variable (IWD_DHCP_DEBUG or so).  The iwd wiki [1]
-> has
-> examples.
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 253fe25e..a2062258 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -232,16 +232,14 @@ class StationDebug(IWDDBusAbstract):
+     _iface_name =3D IWD_STATION_DEBUG_INTERFACE
+ =
 
-My bad, here is DHCP debugging, looks like failed to get DHCP server respon=
-se:
+     def __init__(self, *args, **kwargs):
+-        self._last_event =3D None
+-        self._last_event_data =3D []
++        self._events =3D []
+ =
 
-../iwd-1.19/src/station.c:station_autoconnect_next() autoconnect:
-'34:08:04:12:b1:a2' freq: 2437, rank: 2722, strength: -6500
-../iwd-1.19/src/station.c:station_enter_state() Old State:
-autoconnect_full, new state: connecting (auto)
-../iwd-1.19/src/station.c:station_netdev_event() Associating
-../iwd-1.19/src/station.c:station_handshake_event() Setting keys
-../iwd-1.19/src/station.c:station_connect_cb() 14, result: 0
-../iwd-1.19/src/station.c:station_connect_ok()
-netconfig: Failed to start DHCPv4 client for interface 14
-WARNING: ../iwd-1.19/src/station.c:station_connect_ok() condition
-!netconfig_configure(station->netconfig,
-station_netconfig_event_handler, station) failed
-[DHCPv4] dhcp_client_timeout_resend:526
-[DHCPv4] dhcp_client_send_discover:346
-[DHCPv4] dhcp_client_timeout_resend:526
-[DHCPv4] dhcp_client_send_discover:346
-[DHCPv4] dhcp_client_timeout_resend:526
-[DHCPv4] dhcp_client_send_discover:346
-[DHCPv4] dhcp_client_timeout_resend:526
-[DHCPv4] dhcp_client_send_discover:346
+         IWDDBusAbstract.__init__(self, *args, **kwargs)
+ =
 
-Is netconfig from iwd?
+         self._iface.connect_to_signal("Event", self._event_handler)
+ =
 
-I think the DHCP server is running from the home WiFi modem, right? My
-laptop is also connected to the same WiFi modem SSID JupiterIoT which
-should rule out home WiFi network DHCP server issues.
+     def _event_handler(self, event, data):
+-        self._last_event =3D event
+-        self._last_event_data =3D data
++        self._events.insert(0, (event, data))
+ =
 
-Thank you very much.
+     @property
+     def autoconnect(self):
+@@ -257,19 +255,18 @@ class StationDebug(IWDDBusAbstract):
+         frequencies =3D dbus.Array([dbus.UInt16(f) for f in frequencies])
+         self._iface.Scan(frequencies)
+ =
 
-Kind regards,
+-    def wait_for_event(self, event, timeout=3D10):
+-        try:
+-            if self._last_event is not None:
+-                return self._last_event_data
++    def _poll_event(self, event):
++        for idx, e in enumerate(self._events):
++            if event =3D=3D e[0]:
++                # Consume any older events
++                self._events =3D self._events[:idx]
++                return True
+ =
 
-- jupiter
---===============0418908169049536979==--
+-            ctx.non_block_wait(lambda s, e : s._last_event =3D=3D e, timeo=
+ut, self, event,
+-                                exception=3DTimeoutError("waiting for Stat=
+ionDebug.Event"))
++        return False
+ =
+
+-            return self._last_event_data
+-        finally:
+-            # Consume the event
+-            self._last_event_data =3D None
+-            self._last_event =3D None
++    def wait_for_event(self, event, timeout=3D10):
++        return ctx.non_block_wait(self._poll_event, timeout, event,
++                                    exception=3DTimeoutError("waiting for =
+event"))
+ =
+
+ class DeviceProvisioning(IWDDBusAbstract):
+     '''
+-- =
+
+2.34.1
+
+--===============6625909932616438452==--
 
