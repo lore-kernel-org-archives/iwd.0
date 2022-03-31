@@ -1,160 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============9132282404255317301=="
+Content-Type: multipart/mixed; boundary="===============1970601524475265883=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Dayo <dayo05 at daum.net>
 To: iwd at lists.01.org
-Subject: [PATCH 6/6] auto-t: add DPP autotests
-Date: Tue, 04 Jan 2022 10:18:57 -0800
-Message-ID: <20220104181857.103331-6-prestwoj@gmail.com>
-In-Reply-To: 20220104181857.103331-1-prestwoj@gmail.com
+Subject: [PATCH] Improve d-bus error message on iwctl
+Date: Thu, 31 Mar 2022 17:10:50 +0900
+Message-ID: <20220331171050.QGFDw5V2QzKCgc9ClG0jFw@dayo05.hanmail.net>
 
---===============9132282404255317301==
+--===============1970601524475265883==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- autotests/testDPP/connection_test.py | 73 ++++++++++++++++++++++++++++
- autotests/testDPP/hostapd.conf       |  7 +++
- autotests/testDPP/hw.conf            |  9 ++++
- autotests/testDPP/ssidCCMP.psk       |  2 +
- autotests/testDPP/wpas.conf          |  5 ++
- 5 files changed, 96 insertions(+)
- create mode 100644 autotests/testDPP/connection_test.py
- create mode 100644 autotests/testDPP/hostapd.conf
- create mode 100644 autotests/testDPP/hw.conf
- create mode 100644 autotests/testDPP/ssidCCMP.psk
- create mode 100644 autotests/testDPP/wpas.conf
 
-diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/conne=
-ction_test.py
-new file mode 100644
-index 00000000..43822c55
---- /dev/null
-+++ b/autotests/testDPP/connection_test.py
-@@ -0,0 +1,73 @@
-+#!/usr/bin/python3
-+
-+import unittest
-+import sys
-+
-+sys.path.append('../util')
-+from iwd import IWD
-+from wpas import Wpas
-+from hostapd import HostapdCLI
-+
-+class Test(unittest.TestCase):
-+
-+    def test_iwd_as_enrollee(self):
-+        wpas =3D Wpas('wpas.conf')
-+
-+        wd =3D IWD(True)
-+
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+        device.autoconnect =3D True
-+
-+        uri =3D device.dpp_start_enrollee()
-+
-+        wpas.dpp_configurator_create(uri)
-+        wpas.dpp_configurator_start('ssidCCMP', 'secret123')
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        device.disconnect()
-+        device.dpp_stop()
-+
-+        del wpas
-+
-+    def test_iwd_as_configurator(self):
-+        IWD.copy_to_storage('ssidCCMP.psk')
-+
-+        wpas =3D Wpas('wpas.conf')
-+        hapd =3D HostapdCLI('hostapd.conf')
-+
-+        wd =3D IWD(True)
-+
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+        device.autoconnect =3D True
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        uri =3D device.dpp_start_configurator()
-+
-+        wpas.dpp_enrollee_start(uri)
-+
-+        hapd.wait_for_event('AP-STA-CONNECTED 42:00:00:00:00:00')
-+
-+        device.disconnect()
-+        device.dpp_stop()
-+
-+        del wpas
-+
-+    def tearDown(self):
-+        IWD.clear_storage()
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        pass
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        pass
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
-diff --git a/autotests/testDPP/hostapd.conf b/autotests/testDPP/hostapd.conf
-new file mode 100644
-index 00000000..074e8228
---- /dev/null
-+++ b/autotests/testDPP/hostapd.conf
-@@ -0,0 +1,7 @@
-+hw_mode=3Dg
-+channel=3D1
-+ssid=3DssidCCMP
-+
-+wpa=3D2
-+wpa_pairwise=3DCCMP
-+wpa_passphrase=3Dsecret123
-diff --git a/autotests/testDPP/hw.conf b/autotests/testDPP/hw.conf
-new file mode 100644
-index 00000000..478f0633
---- /dev/null
-+++ b/autotests/testDPP/hw.conf
-@@ -0,0 +1,9 @@
-+[SETUP]
-+num_radios=3D3
-+start_iwd=3D0
-+
-+[WPA_SUPPLICANT]
-+rad0=3Dwpas.conf
-+
-+[HOSTAPD]
-+rad1=3Dhostapd.conf
-diff --git a/autotests/testDPP/ssidCCMP.psk b/autotests/testDPP/ssidCCMP.psk
-new file mode 100644
-index 00000000..abafdb66
---- /dev/null
-+++ b/autotests/testDPP/ssidCCMP.psk
-@@ -0,0 +1,2 @@
-+[Security]
-+Passphrase=3Dsecret123
-diff --git a/autotests/testDPP/wpas.conf b/autotests/testDPP/wpas.conf
-new file mode 100644
-index 00000000..5ec815b4
---- /dev/null
-+++ b/autotests/testDPP/wpas.conf
-@@ -0,0 +1,5 @@
-+ctrl_interface=3D/tmp/rad1-p2p-wpas
-+
-+update_config=3D1
-+pmf=3D2
-+dpp_config_processing=3D2
--- =
+--===============1970601524475265883==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.htm"
 
-2.31.1
-
---===============9132282404255317301==--
+PGh0bWw+CjxoZWFkPgogICAgPHN0eWxlPgogICAgICAgIHB7bWFyZ2luLXRvcDowO21hcmdpbi1i
+b3R0b206MH0KICAgIDwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+CiAgICA8ZGl2IHN0eWxlPSJjb2xv
+cjojMTExO2ZvbnQtZmFtaWx5OkFwcGxlIFNEIEdvdGhpYyBOZW8sTWFsZ3VuIEdvdGhpYywn66eR
+7J2AIOqzoOuUlScsc2Fucy1zZXJpZjtmb250LXNpemU6MTBwdDtsaW5lLWhlaWdodDoxLjU7Ij48
+cD5JIGdvdCBlcnJvciBvZiA8YnI+PC9wPgo8cD7vu79SZWplY3RlZCBzZW5kIG1lc3NhZ2UsIDIg
+bWF0Y2hlZCBydWxlczsgdHlwZT0ibWV0aG9kX2NhbGwiLCBzZW5kZXI9IjoxLjEzNyIgKHVpZD0x
+MDAwIHBpZD0xNDMyNSBjb21tPSJjbGllbnQvaXdjdGwiKSBpbnRlcmZhY2U9Im9yZy5mcmVlZGVz
+a3RvcC5EQnVzLk9iamVjdE1hbmFnZXIiIG1lbWJlcj0iR2V0TWFuYWdlZE9iamVjdHMiIGVycm9y
+IG5hbWU9Iih1bnNldCkiIHJlcXVlc3RlZF9yZXBseT0iMCIgZGVzdGluYXRpb249Im5ldC5jb25u
+bWFuLml3ZCIgKHVpZD0wIHBpZD0zNTQgY29tbT0iL3Vzci9saWIvaXdkL2l3ZCIpPGJyPmluIGV4
+ZWN1dGlvbiBvZiBpd2N0bCB3aXRob3V0IHN1ZG8uIEJ1dCB3aGVuIEkgdHJpZWQgdG8gc2VhcmNo
+IHRoYXQsIEl0IGhhcyBsb3cgaW5mb3JtYXRpb24gaW4gZ29vZ2xlIGJ1dCBJIHNvbHZlIHRoZSBp
+c3N1ZSBhcyBleGVjdXRpbmcgd2l0aCBzdWRvLiBTbyB0aGlzIGlzIHZlcnkgc21hbGwgY2hhbmdl
+IGJ1dCB0aGlzIHdpbGwgaW1wcm92ZSB0aGlzIHNvZnR3YXJlLjwvcD4KPHA+77u/PC9wPgo8cD7v
+u79wcy4gSSBnZXQgaXNzdWUgaW4gbGludXgga2VybmVsIDUuMTYgYW5kIGxhdGVyLCBpbmNsdWRp
+bmcgNS4xNy54PGJyPjwvcD4KPHA+77u/PC9wPgo8cD7vu788YnI+PC9wPgo8cD7vu78tLS08YnI+
+Jm5ic3A7Y2xpZW50L2RidXMtcHJveHkuYyB8IDEgKzxicj4mbmJzcDsxIGZpbGUgY2hhbmdlZCwg
+MSBpbnNlcnRpb24oKyk8YnI+PGJyPmRpZmYgLS1naXQgYS9jbGllbnQvZGJ1cy1wcm94eS5jIGIv
+Y2xpZW50L2RidXMtcHJveHkuYzxicj5pbmRleCAwMzczYTNkZi4uOGNhZDNlY2UgMTAwNjQ0PGJy
+Pi0tLSBhL2NsaWVudC9kYnVzLXByb3h5LmM8YnI+KysrIGIvY2xpZW50L2RidXMtcHJveHkuYzxi
+cj5AQCAtNzIyLDYgKzcyMiw3IEBAIHN0YXRpYyB2b2lkIGdldF9tYW5hZ2VkX29iamVjdHNfY2Fs
+bGJhY2soc3RydWN0IGxfZGJ1c19tZXNzYWdlICptZXNzYWdlLDxicj4mbmJzcDsmbmJzcDsmbmJz
+cDsgJm5ic3A7aWYgKGRidXNfbWVzc2FnZV9oYXNfZXJyb3IobWVzc2FnZSkpIHs8YnI+Jm5ic3A7
+Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDtkaXNwbGF5X2Vycm9yKCJGYWls
+ZWQgdG8gcmV0cmlldmUgSVdEIGRidXMgb2JqZWN0cywgIjxicj4mbmJzcDsmbmJzcDsmbmJzcDsg
+Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsg
+Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsg
+Jm5ic3A7InF1aXR0aW5nLi4uXG4iKTs8YnI+KyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJz
+cDsgJm5ic3A7ZGlzcGxheSgiRXhlY3V0ZSBpd2N0bCB3aXRoIHJvb3QgcGVybWlzc2lvbiBpcyB0
+aGUgb25lIHdheSB0byBzb2x2ZSB0aGlzIGlzc3VlLlxuIik7PGJyPiZuYnNwOzxicj4mbmJzcDsm
+bmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwO2dvdG8gZXJyb3I7PGJyPiZuYnNw
+OyZuYnNwOyZuYnNwOyAmbmJzcDt9PGJyPi0tIDxicj4yLjM1LjE8YnI+PGJyPjxicj48L3A+PC9k
+aXY+CjwvYm9keT4KPC9odG1sPgo8aW1nIHNyYz0iaHR0cHM6Ly9jb25maXJtLm1haWwuZGF1bS5u
+ZXQvY29uZmlybWFwaS92MS91c2Vycy9kYXlvMDUlNDBoYW5tYWlsJTJFbmV0L2NtYWlscy8yMDIy
+MDMzMTE3MTA1MCUyRVFHRkR3NVYyUXpLQ2djOUNsRzBqRnclNDBkYXlvMDUlMkVoYW5tYWlsJTJF
+bmV0L3JlY2lwaWVudHMvaXdkJTQwbGlzdHMlMkUwMSUyRW9yZyI+
+--===============1970601524475265883==--
 
