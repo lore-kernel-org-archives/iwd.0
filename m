@@ -1,90 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============9008559001441883313=="
+Content-Type: multipart/mixed; boundary="===============5066384320718320112=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v5 2/6] hotspot: implement hotspot profile encryption
-Date: Fri, 04 Feb 2022 13:33:27 -0800
-Message-ID: <20220204213331.337524-2-prestwoj@gmail.com>
-In-Reply-To: 20220204213331.337524-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2 01/14] test-runner: Move environment setup into own
+ module
+Date: Thu, 31 Mar 2022 18:13:39 -0500
+Message-ID: <b2218ddd-f312-73bc-6c16-a5e55ff1bb55@gmail.com>
+In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
 
---===============9008559001441883313==
+--===============5066384320718320112==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Using __storage_open() hotspot can also support profile encyption.
-The hotspot consortium name is used as the 'ssid' since this stays
-consistent between hotspot networks for any profile.
----
- src/hotspot.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+Hi James,
 
-diff --git a/src/hotspot.c b/src/hotspot.c
-index 21f50690..832d7a31 100644
---- a/src/hotspot.c
-+++ b/src/hotspot.c
-@@ -95,12 +95,18 @@ static struct l_settings *hotspot_network_open(struct n=
-etwork_info *info)
- =
+On 3/31/22 18:16, James Prestwood wrote:
+> This (as well as subsequent commits) will separate test-runner into two
+> parts:
+> =
 
- 	settings =3D l_settings_new();
- =
+> 1. Environment setup
+> 2. Running tests
+> =
 
--	if (!l_settings_load_from_file(settings, config->filename)) {
--		l_settings_free(settings);
--		return NULL;
--	}
-+	if (!l_settings_load_from_file(settings, config->filename))
-+		goto error;
-+
-+	if (!__storage_open(settings, config->filename, SECURITY_8021X,
-+				config->name))
-+		goto error;
- =
+> Spurred by interest in adding UML/host support, test-runner was in need
+> of a refactor to separate out the environment setup and actually running
+> the tests.
+> =
 
- 	return settings;
-+
-+error:
-+	l_settings_free(settings);
-+	return NULL;
- }
- =
+> The environment (currently only Qemu) requires quite a bit of special
+> handling (ctypes mounting/reboot, 9p mounts, tons of kernel options etc)
+> which nobody writing tests should need to see or care about. This has all
+> been moved into 'runner.py'.
+> =
 
- static void hotspot_network_sync(struct network_info *info,
-@@ -111,7 +117,12 @@ static void hotspot_network_sync(struct network_info *=
-info,
- 	struct hs20_config *config =3D l_container_of(info, struct hs20_config,
- 							super);
- =
+> Running the tests (inside test-runner) won't change much.
+> =
 
--	data =3D l_settings_to_data(settings, &length);
-+	data =3D __storage_encrypt(settings, config->name, &length);
-+	if (!data) {
-+		l_error("Unable to sync profile %s", config->filename);
-+		return;
-+	}
-+
- 	write_file(data, length, true, "%s", config->filename);
- 	l_free(data);
- }
-@@ -338,6 +349,11 @@ static struct hs20_config *hs20_config_new(struct l_se=
-ttings *settings,
- 		goto free_values;
- 	}
- =
+> The new 'runner.py' module adds an abstraction class which allows differe=
+nt
+> Runner's to be implemented, and setup their own environment as they see
+> fit. This is in preparation for UML and Host runners.
+> ---
+>   tools/runner.py | 485 ++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 485 insertions(+)
+>   create mode 100644 tools/runner.py
+> =
 
-+	if (!__storage_open(settings, filename, SECURITY_8021X, name)) {
-+		l_error("Could not open hotspot profile %s", filename);
-+		goto free_values;
-+	}
-+
- 	config =3D l_new(struct hs20_config, 1);
- =
 
- 	if (hessid_str) {
--- =
+All applied, thanks.
 
-2.31.1
+Regards,
+-Denis
 
---===============9008559001441883313==--
+--===============5066384320718320112==--
 
