@@ -1,567 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============8657288792975384528=="
+Content-Type: multipart/mixed; boundary="===============5189457461913410074=="
 MIME-Version: 1.0
-From: Marcel Holtmann <marcel at holtmann.org>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v7 3/8] storage: implement network profile encryption
-Date: Fri, 11 Feb 2022 18:04:11 +0100
-Message-ID: <9718E496-59CC-4B34-A303-EAECFD409190@holtmann.org>
-In-Reply-To: 20220210225842.895962-3-prestwoj@gmail.com
+Subject: [PATCH v2 04/14] test-runner: add initial UmlRunner implementation
+Date: Thu, 31 Mar 2022 16:16:31 -0700
+Message-ID: <20220331231641.484200-4-prestwoj@gmail.com>
+In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
 
---===============8657288792975384528==
+--===============5189457461913410074==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This allows test-runner to run inside a UML binary which has some
+advantages, specifically time-travel/infinite CPU speed. This should
+fix any scheduler related failures we have on slower systems.
 
-> Some users don't like the idea of storing network credentials in plaintext
-> on the file system. As far as IWD goes the credential directory permissio=
-ns
-> should be set up such that nobody but the owner/root have access but
-> nevertheless they are still plaintext.
-> =
+Currently this runner does not suppor the same features as the Qemu
+runner, specifically:
 
-> For added security these credentials can be encrypted using a secret key.
-> In this patch the origination of the key does not matter, but in this
-> patch series IWD will support a systemd provided key.
-> =
+ - No hardware passthrough
+ - No logging/monitor (UML -> host mounting isn't implemented yet)
+---
+ tools/runner.py | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-> The encryption itself will operate on the entire [Security] group as well
-> as all embedded groups. Once encrypted the [Security] group will be repla=
-ced
-> with two key/values:
-> =
+diff --git a/tools/runner.py b/tools/runner.py
+index 743d74b1..33c10917 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -213,7 +213,9 @@ class Runner:
+ 			else:
+ 				args.runner =3D 'qemu'
+ =
 
-> EncryptedSalt - A random string of bytes used for the encryption
-> EncryptedSecurity - A string of bytes containing the encrypted [Security]
->                    group, as well as all embedded groups.
-> =
+-		if args.runner =3D=3D 'qemu':
++		if args.runner =3D=3D 'uml':
++			return UmlRunner(args)
++		elif args.runner =3D=3D 'qemu':
+ 			return QemuRunner(args)
+ 		else:
+ 			raise Exception("Unknown runner %s" % args.runner)
+@@ -483,3 +485,29 @@ class QemuRunner(RunnerAbstract):
+ 		# gracefully.
+ 		#
+ 		libc.reboot(RB_AUTOBOOT)
++
++class UmlRunner(RunnerAbstract):
++	name =3D "UML Runner"
++
++	def __init__(self, args):
++		super().__init__(args)
++
++		if len(sys.argv) <=3D 1:
++			return
++
++		if not which(args.kernel):
++			raise Exception('Cannot locate UML binary %s' % args.kernel)
++
++		kern_log =3D "ignore_loglevel" if "kernel" in args.verbose else "quiet"
++
++		cmd =3D [args.kernel, 'rootfstype=3Dhostfs', 'ro', 'mem=3D256M', 'mac802=
+11_hwsim.radios=3D0',
++				'time-travel=3Dinf-cpu', 'eth0=3Dmcast', 'eth1=3Dmcast',
++				'%s '% kern_log, 'init=3D%s' % args.start]
++		cmd.extend(args.to_cmd().split(' '))
++
++		self.cmdline =3D cmd
++
++	def prepare_environment(self):
++		self._prepare_mounts()
++
++		super().prepare_environment()
+-- =
 
-> After the profile has been encrypted these values should not be modified.
-> Note that any values added to [Security] after encryption has no effect.
-> Once the profile is encrypted there is no way to modify [Security] without
-> manually decrypting first, or just removing it entirely which effectively
-> treated a 'new' profile.
-> =
+2.34.1
 
-> The encryption/decryption is done using AES-SIV with a salt value and the
-> network SSID as the IV.
-> =
-
-> Once a key is set any profiles opened will automatically be encrypted and
-> re-written to disk. Modules using network_storage_open will be provided
-> the decrypted profile, and will be unaware it was ever encrypted in the
-> first place. Similarly when network_storage_sync is called the profile
-> will by automatically encrypted and written to disk without the caller
-> needing to do anything special.
-> =
-
-> A few private storage.c helpers were added to serve several purposes:
-> =
-
-> __storage_set_encryption_key():
-> This sets the encryption key direct from systemd then uses extract and ex=
-pand
-> to create a new fixed length key to do encryption/decryption.
-> =
-
-> __storage_decrypt():
-> Low level API to decrypt an l_settings object using a previously set key =
-and
-> the SSID/name for the network. This returns a 'changed' out parameter sig=
-nifying
-> that the settings need to be encrypted and re-written to disk. The purpos=
-e of
-> exposing this is for a standalone decryption tool which does not re-write=
- any
-> settings.
-> =
-
-> __storage_open():
-> Wrapper around __storage_decrypt() that handles re-writing a new profile =
-to
-> disk. This was exposed in order to support hotspot profiles.
-> =
-
-> __storage_encrypt():
-> Encrypts an l_settings object and returns the full profile as data
-> ---
-> Makefile.am   |   3 +-
-> src/storage.c | 287 ++++++++++++++++++++++++++++++++++++++++++++++++--
-> src/storage.h |   8 ++
-> 3 files changed, 286 insertions(+), 12 deletions(-)
-> =
-
-> v7:
-> * Added mlock/munlock to the system_key buffer
-> =
-
-> diff --git a/Makefile.am b/Makefile.am
-> index 89c053a6..35938d22 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -381,7 +381,8 @@ tools_hwsim_SOURCES =3D tools/hwsim.c src/mpdu.h \
-> 					src/nl80211util.h src/nl80211util.c \
-> 					src/storage.h src/storage.c \
-> 					src/common.h src/common.c \
-> -					src/band.h src/band.c
-> +					src/band.h src/band.c \
-> +					src/crypto.h src/crypto.c
-> tools_hwsim_LDADD =3D $(ell_ldadd)
-> =
-
-> if DBUS_POLICY
-> diff --git a/src/storage.c b/src/storage.c
-> index 6bf0616d..4918824e 100644
-> --- a/src/storage.c
-> +++ b/src/storage.c
-> @@ -39,12 +39,15 @@
-> #include <sys/time.h>
-> #include <sys/types.h>
-> #include <sys/stat.h>
-> +#include <sys/mman.h>
-> =
-
-> #include <ell/ell.h>
-> +#include "ell/useful.h"
-> =
-
-> #include "src/common.h"
-> #include "src/storage.h"
-> #include "src/module.h"
-> +#include "src/crypto.h"
-> =
-
-> #define STORAGE_DIR_MODE (S_IRUSR | S_IWUSR | S_IXUSR)
-> #define STORAGE_FILE_MODE (S_IRUSR | S_IWUSR)
-> @@ -53,6 +56,8 @@
-> =
-
-> static char *storage_path =3D NULL;
-> static char *storage_hotspot_path =3D NULL;
-> +static uint8_t system_key[32];
-> +static bool system_key_set =3D false;
-> =
-
-> static int create_dirs(const char *filename)
-> {
-> @@ -300,24 +305,254 @@ const char *storage_network_ssid_from_path(const c=
-har *path,
-> 	return buf;
-> }
-> =
-
-> +/* Groups requiring encryption (if enabled) */
-> +static char *encrypt_groups[] =3D {
-> +	"Security",
-> +	NULL
-> +};
-> +
-> +static bool encrypt_group(const char *group)
-> +{
-> +	char **g;
-> +
-> +	for (g =3D encrypt_groups; *g; g++) {
-> +		if (!strcmp(*g, group))
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +/*
-> + * Encrypt needed groups of 'settings' without modifying the object. Ret=
-urns
-> + * the entire settings object as data, with encrypted groups as a bytest=
-ring
-> + * set as the value to [Security].EncryptedSecurity. This also includes =
-any
-> + * embedded groups.
-> + *
-> + * Note: If encryption is not enabled or there is no Security group this=
- is
-> + *       effectively l_settings_to_data.
-> + */
-> +char *__storage_encrypt(const struct l_settings *settings, const char *s=
-sid,
-> +				size_t *out_len)
-> +{
-> +	struct iovec ad[2];
-> +	uint8_t salt[32];
-> +	size_t len;
-> +	_auto_(l_settings_free) struct l_settings *to_encrypt =3D NULL;
-> +	_auto_(l_settings_free) struct l_settings *original =3D NULL;
-> +	_auto_(l_free) char *plaintext =3D NULL;
-> +	_auto_(l_free) uint8_t *enc =3D NULL;
-> +	_auto_(l_strv_free) char **groups =3D NULL;
-> +	char **i;
-> +
-> +	if (!system_key_set || !l_settings_has_group(settings, "Security"))
-> +		return l_settings_to_data(settings, out_len);
-> +
-> +	/*
-> +	 * Make two copies of the settings: One will contain only data to be
-> +	 * encrypted (to_encrypt), the other will contain data to be left
-> +	 * unencrypted (original). At the end any encrypted data will be set
-> +	 * into 'original' as EncryptedSecurity.
-> +	 */
-> +	to_encrypt =3D l_settings_clone(settings);
-> +	original =3D l_settings_clone(settings);
-> +
-> +	groups =3D l_settings_get_groups(to_encrypt);
-> +	for (i =3D groups; *i; i++) {
-> +		if (encrypt_group(*i))
-> +			l_settings_remove_group(original, *i);
-> +		else
-> +			l_settings_remove_group(to_encrypt, *i);
-> +	}
-> +
-> +	l_settings_remove_embedded_groups(original);
-> +
-> +	plaintext =3D l_settings_to_data(to_encrypt, &len);
-> +	if (!plaintext)
-> +		return NULL;
-> +
-> +	l_getrandom(salt, 32);
-> +
-> +	ad[0].iov_base =3D (void *) salt;
-> +	ad[0].iov_len =3D 32;
-> +	ad[1].iov_base =3D (void *) ssid;
-> +	ad[1].iov_len =3D strlen(ssid);
-
-you want to use the SSID as string here since that is how we store it? Or w=
-ould you rather use the fixed size binary blob of the SSID on how it goes o=
-ver the air? So a comment is required here.
-
-> +
-> +	enc =3D l_malloc(len + 16);
-> +
-> +	if (!aes_siv_encrypt(system_key, sizeof(system_key), plaintext, len,
-> +				ad, 2, enc)) {
-> +		l_error("Could not encrypt [Security] group");
-> +		return NULL;
-> +	}
-> +
-> +	l_settings_set_bytes(original, "Security", "EncryptedSalt", salt, 32);
-> +	l_settings_set_bytes(original, "Security", "EncryptedSecurity",
-> +				enc, len + 16);
-
-You do need to comment the + 16 since it is not obvious.
-
-> +
-> +	return l_settings_to_data(original, out_len);
-> +}
-> +
-> +/*
-> + * Decrypt data in [Security].EncryptedSecurity. This data also includes
-> + * embedded groups potentially. Once decrypted the data is put back into=
- the
-> + * object.
-> + *
-> + * Note: if encryption is not enabled or there is no Security group sett=
-ings
-> + *       is not modified.
-> + */
-> +int __storage_decrypt(struct l_settings *settings, const char *ssid,
-> +				bool *changed)
-> +{
-> +	_auto_(l_settings_free) struct l_settings *security =3D NULL;
-> +	_auto_(l_free) uint8_t *encrypted =3D NULL;
-> +	_auto_(l_free) uint8_t *decrypted =3D NULL;
-> +	_auto_(l_free) uint8_t *salt =3D NULL;
-> +	_auto_(l_strv_free) char **embedded =3D NULL;
-> +	_auto_(l_strv_free) char **groups =3D NULL;
-> +	char **i;
-> +	size_t elen, slen;
-> +	struct iovec ad[2];
-> +
-> +	if (!system_key_set)
-> +		goto done;
-> +
-> +	if (!l_settings_has_group(settings, "Security"))
-> +		goto done;
-> +
-> +	encrypted =3D l_settings_get_bytes(settings, "Security",
-> +						"EncryptedSecurity", &elen);
-> +	salt =3D l_settings_get_bytes(settings, "Security",
-> +						"EncryptedSalt", &slen);
-> +
-> +	/*
-> +	 * Either profile has never been loaded after enabling encryption or is
-> +	 * missing Encrypted{Salt,Security} values. If either are missing this
-> +	 * profile is corrupted and must be fixed.
-> +	 */
-> +	if (!(encrypted && salt)) {
-> +		/* Profile corrupted */
-> +		if (encrypted || salt) {
-> +			l_warn("Profile %s is corrupted reconfigure manually",
-> +					ssid);
-> +			return -EBADMSG;
-> +		}
-> +
-> +		if (changed)
-> +			*changed =3D true;
-> +
-> +		return 0;
-> +	}
-> +
-> +	decrypted =3D l_malloc(elen - 16 + 1);
-> +
-> +	ad[0].iov_base =3D (void *)salt;
-> +	ad[0].iov_len =3D slen;
-> +	ad[1].iov_base =3D (void *)ssid;
-> +	ad[1].iov_len =3D strlen(ssid);
-> +
-> +	if (!aes_siv_decrypt(system_key, sizeof(system_key), encrypted, elen,
-> +				ad, 2, decrypted)) {
-> +		l_error("Could not decrypt %s profile, did the secret change?",
-> +				ssid);
-> +		return -ENOKEY;
-> +	}
-> +
-> +	decrypted[elen - 16] =3D '\0';
-> +
-> +	/*
-> +	 * Remove any groups that are marked as encrypted (plus embedded),
-> +	 * and copy the decrypted groups back into settings.
-> +	 */
-> +	groups =3D l_settings_get_groups(settings);
-> +	for (i =3D groups; *i; i++) {
-> +		if (encrypt_group(*i))
-> +			l_settings_remove_group(settings, *i);
-> +	}
-> +
-> +	l_settings_remove_embedded_groups(settings);
-> +
-> +	/*
-> +	 * Load decrypted data into existing settings. This is not how the API
-> +	 * is indended to be used (since this could result in duplicate groups)
-> +	 * but since the Security group was just removed and EncryptedSecurity
-> +	 * should only contain a Security group its safe to use it this way.
-> +	 */
-> +	if (!l_settings_load_from_data(settings, (const char *) decrypted,
-> +					elen - 16)) {
-> +		l_error("Could not load decrypted security group");
-> +		return -EBADMSG;
-> +	}
-
-Same as with the other functions. Comments required on the input/output cho=
-ices.
-
-> +
-> +done:
-> +	if (changed)
-> +		*changed =3D false;
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Direct open() by path. 'name' is used for decryption and depends on t=
-he
-> + * module calling. For regular storage operations 'name' is the SSID. For
-> + * hotspot 'name' is the consortium name (since the SSID is not always t=
-he
-> + * same).
-> + */
-> +bool __storage_open(struct l_settings *settings, const char *path,
-> +			enum security type, const char *name)
-> +{
-> +	bool changed;
-> +	_auto_(l_free) char *encrypted =3D NULL;
-> +	size_t elen;
-> +
-> +	if (type =3D=3D SECURITY_NONE)
-> +		return true;
-> +
-> +	if (__storage_decrypt(settings, name, &changed) < 0)
-> +		return false;
-> +
-> +	if (!changed)
-> +		return true;
-> +
-> +	/* Profile never encrypted before. Encrypt and write to disk */
-> +	encrypted =3D __storage_encrypt(settings, name, &elen);
-> +	if (!encrypted) {
-> +		l_error("Could not encrypt new profile %s", name);
-> +		return false;
-> +	}
-> +
-> +	if (write_file(encrypted, elen, false, "%s", path) < 0) {
-> +		l_error("Failed to write out encrypted profile");
-> +		return false;
-> +	}
-> +
-> +	l_debug("Encrypted a new profile %s", path);
-> +
-> +	return true;
-> +}
-> +
-> struct l_settings *storage_network_open(enum security type, const char *s=
-sid)
-> {
-> 	struct l_settings *settings;
-> -	char *path;
-> +	_auto_(l_free) char *path =3D NULL;
-> =
-
-> 	if (ssid =3D=3D NULL)
-> 		return NULL;
-> =
-
-> 	path =3D storage_get_network_file_path(type, ssid);
-> +
-> 	settings =3D l_settings_new();
-> =
-
-> -	if (!l_settings_load_from_file(settings, path)) {
-> -		l_settings_free(settings);
-> -		settings =3D NULL;
-> -	}
-> +	if (!l_settings_load_from_file(settings, path))
-> +		goto error;
-> +
-> +	if (!__storage_open(settings, path, type, ssid))
-> +		goto error;
-> =
-
-> -	l_free(path);
-> 	return settings;
-> +
-> +error:
-> +	l_settings_free(settings);
-> +	return NULL;
-> }
-> =
-
-> int storage_network_touch(enum security type, const char *ssid)
-> @@ -341,15 +576,19 @@ int storage_network_touch(enum security type, const=
- char *ssid)
-> void storage_network_sync(enum security type, const char *ssid,
-> 				struct l_settings *settings)
-> {
-> -	char *data;
-> +	_auto_(l_free) char *data =3D NULL;
-> +	_auto_(l_free) char *path =3D NULL;
-> 	size_t length =3D 0;
-> -	char *path;
-> =
-
-> 	path =3D storage_get_network_file_path(type, ssid);
-> -	data =3D l_settings_to_data(settings, &length);
-> +	data =3D __storage_encrypt(settings, ssid, &length);
-> +
-> +	if (!data) {
-> +		l_error("Unable to sync profile %s", ssid);
-> +		return;
-> +	}
-> +
-> 	write_file(data, length, true, "%s", path);
-> -	l_free(data);
-> -	l_free(path);
-> }
-> =
-
-> int storage_network_remove(enum security type, const char *ssid)
-> @@ -417,6 +656,27 @@ bool storage_is_file(const char *filename)
-> 	return false;
-> }
-> =
-
-> +/*
-> + * Initialize a systemd encryption key for encrypting/decrypting credent=
-ials.
-> + * This uses the 'extract and expand' concept from RFC 5869 to derive a =
-new,
-> + * fixed length, key.
-> + */
-> +void __storage_set_encryption_key(const uint8_t *key, size_t key_len)
-> +{
-> +	uint8_t tmp[32];
-> +
-> +	if (!hkdf_extract(L_CHECKSUM_SHA256, NULL, 0, 1, tmp, key, key_len))
-> +		return;
-> +
-> +	if (!hkdf_expand(L_CHECKSUM_SHA256, tmp, sizeof(tmp), "IWD System Key",
-> +				system_key, sizeof(system_key)))
-
-So I have a dislike putting the IWD name in front of it. They are daemon sp=
-ecific to begin with. I would leave it at =E2=80=9CSystem Key=E2=80=9D. Key=
- names should be domain specific and any attempt to make the globally uniqu=
-e will fail anyway.
-
-The actual key is required to be provided by a human user creating the unit=
- file. And thus it is specific to iwd=E2=80=99s unit file. If they end up r=
-e-using this for another daemon, then that is just plain stupid.
-
-Now that all said, I am not sure you are using this correctly. I know you h=
-ave defined the extract and expand functions, but I was really more thinkin=
-g about the simple version of this:
-
-	interim-key =3D func(SALT, system-key)
-	encryption-key =3D func(interim-key, =E2=80=9CSystem Key=E2=80=9D)
-
-While the SALT is just a 32 octet random string instead of the default sequ=
-ence of 0x00.
-
-Since later on your are using AES for the encryption with a 128-bit key, I =
-would recommend to just go with AES-CMAC. That means you can define func as=
- this:
-
-	func(K, ID) =3D AES-CMAC(K, ID)
-
-Where K is the 128-bit key into the AES-CMAS hash.
-
-> +		return;
-> +
-> +	L_WARN_ON(mlock(system_key, sizeof(system_key)) < 0);
-
-Actually, better to just abort here. Let it fail if we can=E2=80=99t lock t=
-he memory. Otherwise also you call to unlock below is unbalanced.
-
-> +
-> +	system_key_set =3D true;
-> +}
-> +
-> static int storage_init(void)
-> {
-> 	const char *state_dir;
-> @@ -466,6 +726,11 @@ static void storage_exit(void)
-> {
-> 	l_free(storage_path);
-> 	l_free(storage_hotspot_path);
-> +
-> +	if (system_key_set) {
-> +		explicit_bzero(system_key, sizeof(system_key));
-> +		munlock(system_key, sizeof(system_key));
-> +	}
-> }
-> =
-
-> IWD_MODULE(storage, storage_init, storage_exit);
-> diff --git a/src/storage.h b/src/storage.h
-> index f75185f6..a3ae71be 100644
-> --- a/src/storage.h
-> +++ b/src/storage.h
-> @@ -48,3 +48,11 @@ int storage_network_remove(enum security type, const c=
-har *ssid);
-> =
-
-> struct l_settings *storage_known_frequencies_load(void);
-> void storage_known_frequencies_sync(struct l_settings *known_freqs);
-> +
-> +void __storage_set_encryption_key(const uint8_t *key, size_t key_len);
-> +int __storage_decrypt(struct l_settings *settings, const char *ssid,
-> +				bool *changed);
-> +char *__storage_encrypt(const struct l_settings *settings, const char *s=
-sid,
-> +				size_t *out_len);
-> +bool __storage_open(struct l_settings *settings, const char *path,
-> +			enum security type, const char *name);
-
-Regards
-
-Marcel
-
---===============8657288792975384528==--
+--===============5189457461913410074==--
 
