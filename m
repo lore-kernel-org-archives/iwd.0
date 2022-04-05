@@ -1,61 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============3083266176697786590=="
+Content-Type: multipart/mixed; boundary="===============4724164999859689388=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: VAUTRIN Emmanuel (Canal Plus Prestataire) <Emmanuel.VAUTRIN at
+ cpexterne.org>
 To: iwd at lists.01.org
-Subject: [PATCH v2 1/2] wiphy: add wiphy_can_offload
-Date: Tue, 19 Oct 2021 14:52:46 -0700
-Message-ID: <20211019215247.574475-1-prestwoj@gmail.com>
+Subject: RE: [PATCH v3] network: Hide hidden networks on connection error
+Date: Tue, 05 Apr 2022 15:13:37 +0000
+Message-ID: <
+ <MRZP264MB1544A9FEA7E838B1D012BEAC93E49@MRZP264MB1544.FRAP264.PROD.OUTLOOK.COM>>
+In-Reply-To: 6d23ac69-5867-5c26-b1f6-a51d3672249d@gmail.com
 
---===============3083266176697786590==
+--===============4724164999859689388==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a convenience method for detecting any supported offload
-extended features (4way/1x/SAE).
----
- src/wiphy.c | 11 +++++++++++
- src/wiphy.h |  1 +
- 2 files changed, 12 insertions(+)
+> Emmanuel was referring to the commit that added 'station_hide_network' AP=
+I here.
+>  It wasn't really relevant to this commit and I took this line out when p=
+ushing
+> the commit upstream.  I should have (and failed to) mentioned this in my =
+earlier
+> reply.
+Exactly. As the former implementation was incomplete but not wrong, I didn'=
+t want to
+specify it as a "Fix" of the  the related commit, but only refer it as "Com=
+mit".
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 1a333aad..4d740ba3 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -459,6 +459,17 @@ bool wiphy_can_transition_disable(struct wiphy *wiphy)
- 	return true;
- }
- =
+Best Regards,
 
-+/* Catch all for the offload features */
-+bool wiphy_can_offload(struct wiphy *wiphy)
-+{
-+	return wiphy_has_ext_feature(wiphy,
-+				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK) ||
-+				wiphy_has_ext_feature(wiphy,
-+				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_1X) ||
-+				wiphy_has_ext_feature(wiphy,
-+				NL80211_EXT_FEATURE_SAE_OFFLOAD);
-+}
-+
- bool wiphy_supports_ext_key_id(struct wiphy *wiphy)
- {
- 	return wiphy_has_ext_feature(wiphy, NL80211_EXT_FEATURE_EXT_KEY_ID);
-diff --git a/src/wiphy.h b/src/wiphy.h
-index f7b6e1c4..9f0d6d07 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -83,6 +83,7 @@ uint32_t wiphy_get_supported_bands(struct wiphy *wiphy);
- const struct scan_freq_set *wiphy_get_supported_freqs(
- 						const struct wiphy *wiphy);
- bool wiphy_can_transition_disable(struct wiphy *wiphy);
-+bool wiphy_can_offload(struct wiphy *wiphy);
- bool wiphy_supports_cmds_auth_assoc(struct wiphy *wiphy);
- bool wiphy_can_randomize_mac_addr(struct wiphy *wiphy);
- bool wiphy_rrm_capable(struct wiphy *wiphy);
--- =
-
-2.31.1
-
---===============3083266176697786590==--
+Emmanuel
+--===============4724164999859689388==--
 
