@@ -1,80 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============5189457461913410074=="
+Content-Type: multipart/mixed; boundary="===============4587182990705963037=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 04/14] test-runner: add initial UmlRunner implementation
-Date: Thu, 31 Mar 2022 16:16:31 -0700
-Message-ID: <20220331231641.484200-4-prestwoj@gmail.com>
-In-Reply-To: 20220331231641.484200-1-prestwoj@gmail.com
+Subject: Re: [PATCH v3] network: Hide hidden networks on connection error
+Date: Tue, 05 Apr 2022 09:53:33 -0500
+Message-ID: <6d23ac69-5867-5c26-b1f6-a51d3672249d@gmail.com>
+In-Reply-To: 1769f085-c991-c761-01cb-adecb580b0c3@molgen.mpg.de
 
---===============5189457461913410074==
+--===============4587182990705963037==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows test-runner to run inside a UML binary which has some
-advantages, specifically time-travel/infinite CPU speed. This should
-fix any scheduler related failures we have on slower systems.
+Hi Paul,
 
-Currently this runner does not suppor the same features as the Qemu
-runner, specifically:
+>>> Commit 06ca8e20a9b0 ("station: Hide forgotten hidden networks")
+> =
 
- - No hardware passthrough
- - No logging/monitor (UML -> host mounting isn't implemented yet)
----
- tools/runner.py | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+> What does this line mean?
+> =
 
-diff --git a/tools/runner.py b/tools/runner.py
-index 743d74b1..33c10917 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -213,7 +213,9 @@ class Runner:
- 			else:
- 				args.runner =3D 'qemu'
- =
 
--		if args.runner =3D=3D 'qemu':
-+		if args.runner =3D=3D 'uml':
-+			return UmlRunner(args)
-+		elif args.runner =3D=3D 'qemu':
- 			return QemuRunner(args)
- 		else:
- 			raise Exception("Unknown runner %s" % args.runner)
-@@ -483,3 +485,29 @@ class QemuRunner(RunnerAbstract):
- 		# gracefully.
- 		#
- 		libc.reboot(RB_AUTOBOOT)
-+
-+class UmlRunner(RunnerAbstract):
-+	name =3D "UML Runner"
-+
-+	def __init__(self, args):
-+		super().__init__(args)
-+
-+		if len(sys.argv) <=3D 1:
-+			return
-+
-+		if not which(args.kernel):
-+			raise Exception('Cannot locate UML binary %s' % args.kernel)
-+
-+		kern_log =3D "ignore_loglevel" if "kernel" in args.verbose else "quiet"
-+
-+		cmd =3D [args.kernel, 'rootfstype=3Dhostfs', 'ro', 'mem=3D256M', 'mac802=
-11_hwsim.radios=3D0',
-+				'time-travel=3Dinf-cpu', 'eth0=3Dmcast', 'eth1=3Dmcast',
-+				'%s '% kern_log, 'init=3D%s' % args.start]
-+		cmd.extend(args.to_cmd().split(' '))
-+
-+		self.cmdline =3D cmd
-+
-+	def prepare_environment(self):
-+		self._prepare_mounts()
-+
-+		super().prepare_environment()
--- =
+Emmanuel was referring to the commit that added 'station_hide_network' API =
+here. =
 
-2.34.1
+  It wasn't really relevant to this commit and I took this line out when pu=
+shing =
 
---===============5189457461913410074==--
+the commit upstream.  I should have (and failed to) mentioned this in my ea=
+rlier =
+
+reply.
+
+Regards,
+-Denis
+--===============4587182990705963037==--
 
