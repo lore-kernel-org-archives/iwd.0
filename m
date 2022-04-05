@@ -1,29 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============0095720061304350630=="
+Content-Type: multipart/mixed; boundary="===============5735348315625873687=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 4/9] json: add support for array iteration
-Date: Thu, 06 Jan 2022 16:12:58 -0600
-Message-ID: <54f00788-1a11-b156-3232-4521bc6e7180@gmail.com>
-In-Reply-To: 4210b6c5-8411-fc54-859a-ad1512f0e042@gmail.com
+Subject: [PATCH 4/5] test-runner: enable scripts to be executed as init
+Date: Tue, 05 Apr 2022 11:30:10 -0700
+Message-ID: <20220405183011.856403-4-prestwoj@gmail.com>
+In-Reply-To: 20220405183011.856403-1-prestwoj@gmail.com
 
---===============0095720061304350630==
+--===============5735348315625873687==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This enables CONFIG_BINFMT_SCRIPT which allows the init process to
+interpret #! and execute the script rather than requiring a binary
+for init.
+---
+ tools/test_runner_kernel_config | 1 +
+ 1 file changed, 1 insertion(+)
 
-> Yes, this all makes sense.=C2=A0 Why do we increment by count_tokens_in_c=
-ontainer() + =
+diff --git a/tools/test_runner_kernel_config b/tools/test_runner_kernel_con=
+fig
+index 7806fdb2..c7049edd 100755
+--- a/tools/test_runner_kernel_config
++++ b/tools/test_runner_kernel_config
+@@ -51,3 +51,4 @@ scripts/config --enable CONFIG_SECURITYFS
+ scripts/config --enable CONFIG_BINFMT_ELF
+ scripts/config --enable CONFIG_HOSTFS
+ scripts/config --enable CONFIG_UML_TIME_TRAVEL_SUPPORT
++scripts/config --enable CONFIG_BINFMT_SCRIPT
+-- =
 
-> 1 though?
+2.34.1
 
-Ah nevermind, I gotcha.
-
-Anyhow, I applied the rest of this series.
-
-Regards,
--Denis
---===============0095720061304350630==--
+--===============5735348315625873687==--
 
