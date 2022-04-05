@@ -1,82 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============5169223276415093915=="
+Content-Type: multipart/mixed; boundary="===============0822617278063645995=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Paul Menzel <pmenzel at molgen.mpg.de>
 To: iwd at lists.01.org
-Subject: [PATCH v2 1/2] test-runner: use type=os.path.abspath for argparse
-Date: Tue, 05 Apr 2022 15:40:29 -0700
-Message-ID: <20220405224030.884883-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v3] network: Hide hidden networks on connection error
+Date: Tue, 05 Apr 2022 16:49:01 +0200
+Message-ID: <1769f085-c991-c761-01cb-adecb580b0c3@molgen.mpg.de>
+In-Reply-To: 07242056-a1fb-64b3-4aa5-bcbc26deb49e@gmail.com
 
---===============5169223276415093915==
+--===============0822617278063645995==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a convenient type which automatically resolves the argument
-to an absolute path. Use this for any arguments expected to be
-paths.
----
- tools/runner.py | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+Dear Denis, dear Emmanuel,
 
-diff --git a/tools/runner.py b/tools/runner.py
-index 0068c74f..8e1ac1d7 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -97,7 +97,8 @@ class RunnerCoreArgParse(ArgumentParser):
- 		self.add_argument('--start', '-s',
- 				help=3D'Custom init process in virtual environment',
- 				dest=3D'start',
--				default=3DNone)
-+				default=3DNone,
-+				type=3Dos.path.abspath)
- 		self.add_argument('--verbose', '-v', metavar=3D'<list>',
- 				type=3Dstr,
- 				help=3D'Comma separated list of applications',
-@@ -108,16 +109,17 @@ class RunnerCoreArgParse(ArgumentParser):
- 				help=3D'Enable test-runner debugging',
- 				dest=3D'dbg')
- 		self.add_argument('--log', '-l',
--				type=3Dstr,
-+				type=3Dos.path.abspath,
- 				help=3D'Directory for log files')
- 		self.add_argument('--monitor', '-m',
--				type=3Dstr,
-+				type=3Dos.path.abspath,
- 				help=3D'Enables iwmon output to file')
- 		self.add_argument('--sub-tests', '-S',
- 				metavar=3D'<subtests>',
- 				type=3Dstr, nargs=3D1, help=3D'List of subtests to run',
- 				default=3DNone, dest=3D'sub_tests')
--		self.add_argument('--result', '-e', type=3Dstr,
-+		self.add_argument('--result', '-e',
-+				type=3Dos.path.abspath,
- 				help=3D'Writes PASS/FAIL to results file')
- 		self.add_argument('--hw', '-w',
- 				type=3Dstr,
-@@ -211,8 +213,6 @@ class Runner:
- 				args.start =3D os.path.abspath('tools/run-tests')
- 			else:
- 				raise Exception("Cannot locate run-tests binary")
--		else:
--			args.start =3D os.path.abspath(args.start)
- =
 
- 		# If no runner is specified but we have a kernel image assume
- 		# if the kernel is executable its UML, otherwise qemu
-@@ -242,9 +242,6 @@ class RunnerAbstract:
- 	def __init__(self, args):
- 		self.args =3D args
- =
+Am 05.04.22 um 16:34 schrieb Denis Kenzior:
+> Hi Emmanuel,
+> =
 
--		if self.args.log:
--			self.args.log =3D os.path.abspath(self.args.log)
--
- 	def start(self):
- 		print("Starting %s" % self.name)
- 		os.execlpe(self.cmdline[0], *self.cmdline, self.env)
--- =
+> On 4/5/22 06:19, VAUTRIN Emmanuel (Canal Plus Prestataire) wrote:
+>> If a user connection fails on a freshly scanned psk or open hidden netwo=
+rk,
+>> during passphrase request or after, it shall be removed from the network=
+ list.
+>> Otherwise, it would be possible to directly connect to that known
+>> network, which will appear as not hidden.
+>>
+>> Commit 06ca8e20a9b0 ("station: Hide forgotten hidden networks")
 
-2.34.1
+What does this line mean?
 
---===============5169223276415093915==--
+
+Kind regards,
+
+Paul
+
+
+>> ---
+>> =C2=A0 src/network.c | 11 +++++++++++
+>> =C2=A0 src/station.c |=C2=A0 2 ++
+>> =C2=A0 2 files changed, 13 insertions(+)
+>>
+> =
+
+> Applied, thanks.
+> =
+
+> Regards,
+> -Denis
+--===============0822617278063645995==--
 
