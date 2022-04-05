@@ -1,73 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============9074071182699261843=="
+Content-Type: multipart/mixed; boundary="===============1264323869385107906=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 6/7] network: prefer OWE transition BSS over open
-Date: Wed, 15 Sep 2021 16:05:47 -0700
-Message-ID: <20210915230548.179425-6-prestwoj@gmail.com>
-In-Reply-To: 20210915230548.179425-1-prestwoj@gmail.com
+Subject: [PATCH 5/5] test-runner: fix --help and unknown options
+Date: Tue, 05 Apr 2022 11:30:11 -0700
+Message-ID: <20220405183011.856403-5-prestwoj@gmail.com>
+In-Reply-To: 20220405183011.856403-1-prestwoj@gmail.com
 
---===============9074071182699261843==
+--===============1264323869385107906==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There isn't much control station has with how BSS's are inserted to
-a network object. The rank algorithm makes that decision. Because of
-this we could end up in a situation where the Open BSS is preferred
-over the OWE transition BSS.
+If --help or unknown options were supplied to test-runner python
+would thrown a maximum recusion depth exception. This was due to
+the way ArgumentParser was subclassed.
 
-In attempt to better handle this any Open BSS in this type of network
-will not be chosen unless its the only candidate (e.g. no other BSSs,
-inability to connect with OWE, or an improperly configured network).
+To fix this call ArgumentParser.__init__() rather than using the
+super() method. And do this also for the RunnerCoreArgParse
+subclass as well. In addition the namespace argument was removed
+from parse_args since its not used, and instead supplied directly
+to the parents parse_args method.
 ---
- src/network.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ tools/runner.py | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-v2:
- * Set candidate if it is not already OWE
-
-diff --git a/src/network.c b/src/network.c
-index 4768b872..bc35ddea 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -1105,6 +1105,11 @@ const struct l_queue_entry *network_bss_list_get_ent=
-ries(
- 	return l_queue_get_entries(network->bss_list);
- }
+diff --git a/tools/runner.py b/tools/runner.py
+index fc1cab44..0068c74f 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -92,7 +92,7 @@ class RunnerNamespace(Namespace):
+ #
+ class RunnerCoreArgParse(ArgumentParser):
+ 	def __init__(self, *args, **kwargs):
+-		super().__init__(self, *args, **kwargs)
++		ArgumentParser.__init__(self, *args, **kwargs)
  =
 
-+static bool bss_is_owe(struct scan_bss *bss)
-+{
-+	return !l_memeqzero(bss->owe_trans_bssid, 6) && bss->rsne;
-+}
-+
- struct scan_bss *network_bss_select(struct network *network,
- 						bool fallback_to_blacklist)
- {
-@@ -1130,6 +1135,17 @@ struct scan_bss *network_bss_select(struct network *=
-network,
- 		if (!candidate)
- 			candidate =3D bss;
+ 		self.add_argument('--start', '-s',
+ 				help=3D'Custom init process in virtual environment',
+@@ -154,23 +154,23 @@ class RunnerCoreArgParse(ArgumentParser):
+ 				dest=3D'valgrind')
  =
 
-+		/* OWE Transition BSS */
-+		if (!l_memeqzero(bss->owe_trans_bssid, 6)) {
-+			/* Don't want to connect to the Open BSS if possible */
-+			if (!bss->rsne)
-+				continue;
-+
-+			/* Candidate is not OWE, set this as new candidate */
-+			if (!bss_is_owe(candidate))
-+				candidate =3D bss;
-+		}
-+
- 		/* check if temporarily blacklisted */
- 		if (l_queue_find(network->blacklist, match_bss, bss))
- 			continue;
+ 	# Overwrite to use a custom namespace class and parse from env
+-	def parse_args(self, *args, namespace=3DRunnerNamespace()):
++	def parse_args(self, *args):
+ 		if len(sys.argv) > 1:
+-			return super().parse_args(*args, namespace=3Dnamespace)
++			return super().parse_args(*args, namespace=3DRunnerNamespace())
+ =
+
+ 		options =3D []
+ 		for k, v in os.environ.items():
+ 			options.append('--' + k)
+ 			options.append(v)
+ =
+
+-		return self.parse_known_args(args=3Doptions, namespace=3Dnamespace)[0]
++		return self.parse_known_args(args=3Doptions, namespace=3DRunnerNamespace=
+())[0]
+ =
+
+ #
+ # Arguments only needed outside the test environment
+ #
+ class RunnerArgParse(RunnerCoreArgParse):
+ 	def __init__(self, *args, **kwargs):
+-		super().__init__(*args, **kwargs)
++		RunnerCoreArgParse.__init__(self, *args, **kwargs)
+ =
+
+ 		self.add_argument('--runner', '-r',
+ 				metavar=3D'<runner type>',
 -- =
 
-2.31.1
+2.34.1
 
---===============9074071182699261843==--
+--===============1264323869385107906==--
 
