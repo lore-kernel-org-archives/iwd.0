@@ -1,47 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============7960178241157458890=="
+Content-Type: multipart/mixed; boundary="===============5813010120746037070=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Paul Menzel <pmenzel at molgen.mpg.de>
 To: iwd at lists.01.org
-Subject: Re: iwd configure location and files
-Date: Tue, 30 Nov 2021 16:01:49 -0600
-Message-ID: <d899ecf8-deb2-f526-c20f-0fd80aba9841@gmail.com>
-In-Reply-To: CAA=hcWSGuuPcXbt6M=SOBmC+wYmPxMseG8veBgK9PUP8Or-bpA@mail.gmail.com
+Subject: Re: [PATCH v3] network: Hide hidden networks on connection error
+Date: Tue, 05 Apr 2022 16:53:38 +0200
+Message-ID: <d232b9c2-e116-3f60-4c45-3ee26776d50c@molgen.mpg.de>
+In-Reply-To: 1769f085-c991-c761-01cb-adecb580b0c3@molgen.mpg.de
 
---===============7960178241157458890==
+--===============5813010120746037070==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jupiter,
+[Resend with fixed email address, botched by me]
 
->                                 Available networks
-> -------------------------------------------------------------------------=
--------
->      Network name                    Security          Signal
-> -------------------------------------------------------------------------=
--------
->      JupiterIoT                      psk               ****
+Am 05.04.22 um 16:49 schrieb Paul Menzel:
+> Dear Denis, dear Emmanuel,
 > =
 
-> # station wlan0 connect JupiterIoT
-> Type the network passphrase for JupiterIoT psk.
-> Passphrase: superpassphrase
-> Operation aborted
 > =
 
+> Am 05.04.22 um 16:34 schrieb Denis Kenzior:
+>> Hi Emmanuel,
+>>
+>> On 4/5/22 06:19, VAUTRIN Emmanuel (Canal Plus Prestataire) wrote:
+>>> If a user connection fails on a freshly scanned psk or open hidden =
 
-Are you running connman + iwd?  Are you sure ConnMan isn't aborting the =
+>>> network,
+>>> during passphrase request or after, it shall be removed from the =
 
-connection?  Have you tried using connmanctl or using iwd + iwctl with conn=
-man =
+>>> network list.
+>>> Otherwise, it would be possible to directly connect to that known
+>>> network, which will appear as not hidden.
+>>>
+>>> Commit 06ca8e20a9b0 ("station: Hide forgotten hidden networks")
+> =
 
-not running?
+> What does this line mean?
+> =
 
-We do need iwd logs and preferably iwmon logs.  You may need to build nlmon =
+> =
 
-support into your kernel if iwmon doesn't start.  e.g. CONFIG_NLMON=3Dm or y
+> Kind regards,
+> =
 
-Regards,
--Denis
---===============7960178241157458890==--
+> Paul
+> =
+
+> =
+
+>>> ---
+>>> =C2=A0 src/network.c | 11 +++++++++++
+>>> =C2=A0 src/station.c |=C2=A0 2 ++
+>>> =C2=A0 2 files changed, 13 insertions(+)
+>>>
+>>
+>> Applied, thanks.
+>>
+>> Regards,
+>> -Denis
+--===============5813010120746037070==--
 
