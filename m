@@ -1,70 +1,94 @@
-Content-Type: multipart/mixed; boundary="===============1732877698921600129=="
+Content-Type: multipart/mixed; boundary="===============1083416695860991175=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Leonard Lausen <leonard at lausen.nl>
 To: iwd at lists.01.org
-Subject: [PATCH v7 4/5] network: prefer OWE transition BSS over open
-Date: Fri, 17 Sep 2021 15:58:39 -0700
-Message-ID: <20210917225840.26848-4-prestwoj@gmail.com>
-In-Reply-To: 20210917225840.26848-1-prestwoj@gmail.com
+Subject: Re: segfault in parse_neighbor_report at src/station.c:1747
+Date: Tue, 05 Apr 2022 16:28:40 +0000
+Message-ID: <d4bfbc85b1e901373067ca346fd18e11@lausen.nl>
+In-Reply-To: 4a03689b-8c38-bf54-6b9b-1f158ce4780f@gmail.com
 
---===============1732877698921600129==
+--===============1083416695860991175==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-There isn't much control station has with how BSS's are inserted to
-a network object. The rank algorithm makes that decision. Because of
-this we could end up in a situation where the Open BSS is preferred
-over the OWE transition BSS.
+Hi Denis,
 
-In attempt to better handle this any Open BSS in this type of network
-will not be chosen unless its the only candidate (e.g. no other BSSs,
-inability to connect with OWE, or an improperly configured network).
----
- src/network.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+April 5, 2022 3:18 PM, "Denis Kenzior" <denkenz(a)gmail.com> wrote:
+> I'm curious what brand / model / firmware of router is this?
 
-diff --git a/src/network.c b/src/network.c
-index f7172c78..711fb296 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -1110,6 +1110,11 @@ const struct l_queue_entry *network_bss_list_get_ent=
-ries(
- 	return l_queue_get_entries(network->bss_list);
- }
+This is a Vodafone Station WiFi 6 also known as Technicolor CGA6444VF. Firm=
+ware-Version 19.3B57-1.0.41.
  =
 
-+static bool bss_is_owe(struct scan_bss *bss)
-+{
-+	return !l_memeqzero(bss->owe_trans_bssid, 6) && bss->rsne;
-+}
-+
- struct scan_bss *network_bss_select(struct network *network,
- 						bool fallback_to_blacklist)
- {
-@@ -1135,6 +1140,17 @@ struct scan_bss *network_bss_select(struct network *=
-network,
- 		if (!candidate)
- 			candidate =3D bss;
- =
+>> Apr 05 09:02:00 leonard-xps13 iwd[200772]: src/scan.c:scan_notify() Scan=
+ notification Trigger
+>> Scan(33)
+>> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/netdev.c:netdev_unicast_n=
+otify() Unicast
+>> notification Frame(59)
+> =
 
-+		/* OWE Transition BSS */
-+		if (!l_memeqzero(bss->owe_trans_bssid, 6)) {
-+			/* Don't want to connect to the Open BSS if possible */
-+			if (!bss->rsne)
-+				continue;
-+
-+			/* Candidate is not OWE, set this as new candidate */
-+			if (!bss_is_owe(candidate))
-+				candidate =3D bss;
-+		}
-+
- 		/* check if temporarily blacklisted */
- 		if (l_queue_find(network->blacklist, match_bss, bss))
- 			continue;
--- =
+> Looks like it is sending out a completely unsolicited AP directed roaming=
+ frame. I need to dig into
+> the specs, but I'm not aware of any where this is allowed.
+> =
 
-2.31.1
+>> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_ap_dire=
+cted_roam() ifindex: 23
+>> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_ap_dire=
+cted_roam() roam: BSS
+>> transition received from AP: Disassociation Time: 0, Validity interval: =
+100
+>> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_ap_dire=
+cted_roam() roam: AP sent a
+>> preferred candidate list
+>> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_neighbo=
+r_report_cb() ifindex: 23,
+>> error: 0()
+>> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:parse_neighbor_=
+report() Neighbor report
+>> received for ec:a8:1f:99:cf:e8: ch 6 (oper class 4), MD not set
+> =
 
---===============1732877698921600129==--
+> And that's what causes a crash. I'll send a patch for you to try shortly.
+
+Thank you! Your patch prevents the crash. Whenever I walk towards or away f=
+rom
+the router and the router tries to switch me between 2.4G and 5G, I see a
+`iwd[29343]: src/station.c:station_ap_directed_roam() roam: unexpected AP
+directed roam -- ignore` logline. However, my laptop remains on the 2.4G / =
+5G
+band respectively and does not switch.
+
+Do you think the router's band steering functionality is broken / non-stand=
+ard?
+
+>> After enabling (to collect the debug logs) and disabling again Band
+>> Steering on the router, AX210 would no longer authenticate with the
+>> router "denied authentication (status 33)" and finally cause kernel
+>> crash, followed by a kernel hang that could only be resolved by
+>> restarting the WiFi network (by logging into the router admin interface
+>> from my phone and changing WLAN Mode setting "Mixed 802.11 a/n/ac/ax" to
+>> "Mixed 802.11 n/ac" which triggers the router to shutdown and start
+>> again the WiFi network) followed by another crash. These are probably
+>> unrelated to this issue, but you may know if and where I could report
+>> them so I'm including them here. This was with AX210 firmware version
+>> 68.01d30b0c.0 ty-a0-gf-a0-68.ucode and Linux 5.17.0-rc8.
+> =
+
+> yikes. You can try to report this on the linux-wireless mailing list:
+> linux-wireless(a)vger.kernel.org
+> =
+
+> or via kernel bugzilla:
+> https://bugzilla.kernel.org/buglist.cgi?bug_status=3D__open__&component=
+=3Dnetwork-wireless&product=3DDrive
+> s
+
+Ok, thank you.
+
+Best regards
+Leonard
+--===============1083416695860991175==--
 
