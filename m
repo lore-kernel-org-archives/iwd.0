@@ -1,23 +1,26 @@
-Content-Type: multipart/mixed; boundary="===============0987855164029462611=="
+Content-Type: multipart/mixed; boundary="===============2126108270078652738=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] anqp: return the request ID rather than true
-Date: Mon, 08 Nov 2021 11:32:10 -0600
-Message-ID: <145f7010-eaf7-31cf-5a0b-9f5f0f987829@gmail.com>
-In-Reply-To: 20211108172437.989966-1-prestwoj@gmail.com
+Subject: Re: [PATCH] doc: update hwsim documentation
+Date: Tue, 05 Apr 2022 13:51:18 -0500
+Message-ID: <32746b40-c659-65f2-d063-b618d46668c4@gmail.com>
+In-Reply-To: 20220405185057.858098-1-prestwoj@gmail.com
 
---===============0987855164029462611==
+--===============2126108270078652738==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 11/8/21 11:24 AM, James Prestwood wrote:
+On 4/5/22 13:50, James Prestwood wrote:
+> This was quite dated and needed to be updated both to
+> reflect the API change to a dictionary argument, as well
+> as document NoVirtualInterface.
 > ---
->   src/anqp.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   doc/hwsim-radio-api.txt | 32 ++++++++++++++++++++++++--------
+>   1 file changed, 24 insertions(+), 8 deletions(-)
 > =
 
 
@@ -26,5 +29,5 @@ Applied, thanks.
 Regards,
 -Denis
 
---===============0987855164029462611==--
+--===============2126108270078652738==--
 
