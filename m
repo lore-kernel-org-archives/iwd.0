@@ -1,157 +1,74 @@
-Content-Type: multipart/mixed; boundary="===============7686638255343664301=="
+Content-Type: multipart/mixed; boundary="===============1686564341401593114=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 5/7] network: add 6GHz restrictions to
- network_can_connect_bss
-Date: Fri, 25 Feb 2022 15:32:49 -0800
-Message-ID: <20220225233251.2958102-5-prestwoj@gmail.com>
-In-Reply-To: 20220225233251.2958102-1-prestwoj@gmail.com
+Subject: Re: segfault in parse_neighbor_report at src/station.c:1747
+Date: Wed, 06 Apr 2022 17:44:59 +0200
+Message-ID: <CAOq732LR9Lw3ED4DtgrpVfmZ3wvpn4O7NNCJdev+axia9aUiwg@mail.gmail.com>
+In-Reply-To: 1e259b78-1dc7-36c4-6c6f-8efe28ee1050@gmail.com
 
---===============7686638255343664301==
+--===============1686564341401593114==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The 802.11ax standards adds some restrictions for the 6GHz band. In short
-stations must use SAE, OWE, or 8021x on this band and frame protection is
-required.
----
- src/network.c | 58 +++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 45 insertions(+), 13 deletions(-)
+Hi,
 
-v3:
- * Combined some of the WPA3 checks with 6GHz that duplicated
- * Used macros rather than checking all valid AKMs
+On Tue, 5 Apr 2022 at 20:32, Denis Kenzior <denkenz(a)gmail.com> wrote:
+> On 4/5/22 12:35, Leonard Lausen wrote:
+> > % iwctl station wlan0 show
+> > Station: wlan0
+> > -----------------------------------------------------------------------=
+---------
+> > Settable Property Value
+> > -----------------------------------------------------------------------=
+---------
+> > Scanning no
+> > State disconnected
+> >
+>
+> interesting that you have 'wlan0' here, but 'wlp58s0' in your NM configur=
+ation.
+>   I suspect NM isn't using iwd at all.
+>
+> Anyway, this confirms iwd thinks it is not connected, which means that...
+>
+> >> I'm confused why the AP is even sending this. Maybe the kernel crash y=
+ou reported is confusing
+> >> everything.
+> >
+> > The kernel crash should be unrelated. I rebooted and verified the iwctl=
+ station
+> > wlan0 show output remains the same. I'm using NetworkManager with iwd b=
+ackend
+> > and NetworkManager does show me as connected. Maybe that is related?
+> >
+>
+> NM probably starts up wpa_s to manage the connection.
+>
+> > % sudo cat /etc/NetworkManager/conf.d/backend.conf
+> > [device]
+> > match-device=3Dwlp58s0
+>
+> I'm not sure this directive is actually supported by the iwd backend.
 
-diff --git a/src/network.c b/src/network.c
-index 4e7af27c..4a4a64ee 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -55,6 +55,7 @@
- #include "src/util.h"
- #include "src/erp.h"
- #include "src/handshake.h"
-+#include "src/band.h"
- =
+FTR this sounds right.  NM calls a "factory class" for each netdev on
+the system.  This looks up the backend for that specific device name
+("wlan0"), which would return empty and so fall back to
+wpa_supplicant.  It would auto-activate wpa_supplicant and not
+activate IWD.
 
- #define SAE_PT_SETTING "SAE-PT-Group%u"
- =
+But, if IWD is started by NM for another device on the system, or like
+Leonard asserts is auto-activated by iwctl, IWD will try to manage all
+wifi devices by default and will be trying to run autoconnect on
+wlan0.
 
-@@ -774,6 +775,7 @@ int network_can_connect_bss(struct network *network, co=
-nst struct scan_bss *bss)
- 	struct network_config *config =3D info ? &info->config : NULL;
- 	bool can_transition_disable =3D wiphy_can_transition_disable(wiphy);
- 	struct ie_rsn_info rsn;
-+	enum band_freq band;
- 	int ret;
- =
+In theory "match-device=3D" could be used on a system with NM+IWD if IWD
+is configured to not manage the remaining devices, that would also
+prevent IWD from recreating the virtual interfaces (usually with a new
+name) and confusing NM's lookups by name.  But generally there's
+little point using "match-device=3D" with "wifi.backend=3D".
 
- 	switch (security) {
-@@ -785,6 +787,9 @@ int network_can_connect_bss(struct network *network, co=
-nst struct scan_bss *bss)
- 		return -ENOSYS;
- 	}
- =
-
-+	if (!band_freq_to_channel(bss->frequency, &band))
-+		return -ENOTSUP;
-+
- 	memset(&rsn, 0, sizeof(rsn));
- 	ret =3D scan_bss_get_rsn_info(bss, &rsn);
- 	if (ret < 0) {
-@@ -797,6 +802,13 @@ int network_can_connect_bss(struct network *network, c=
-onst struct scan_bss *bss)
- 		 * We assume the spec means us to check bit 3 here
- 		 */
- 		if (ret =3D=3D -ENOENT && security =3D=3D SECURITY_NONE) {
-+			/*
-+			 * 802.11ax 12.12.2 - STA shall not use Open System
-+			 * authentication without encryption
-+			 */
-+			if (band =3D=3D BAND_FREQ_6_GHZ)
-+				return -EPERM;
-+
- 			if (!config)
- 				return 0;
- =
-
-@@ -814,26 +826,21 @@ int network_can_connect_bss(struct network *network, =
-const struct scan_bss *bss)
- 		return ret;
- 	}
- =
-
--	if (!config || !config->have_transition_disable)
-+	if (!config || !config->have_transition_disable) {
-+		if (band =3D=3D BAND_FREQ_6_GHZ)
-+			goto check_6ghz;
-+
- 		goto no_transition_disable;
-+	}
- =
-
- 	if (!can_transition_disable) {
-+		if (band =3D=3D BAND_FREQ_6_GHZ)
-+			return -EPERM;
-+
- 		l_debug("HW not capable of Transition Disable, skip");
- 		goto no_transition_disable;
- 	}
- =
-
--	/*
--	 * WPA3 Specification, v3, Section 8:
--	 * - Disable use of WEP and TKIP
--	 * - Disallow association without negotiation of PMF
--	 */
--	rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_TKIP;
--
--	if (!rsn.group_management_cipher)
--		return -EPERM;
--
--	rsn.mfpr =3D true;
--
- 	/* WPA3-Personal */
- 	if (test_bit(&config->transition_disable, 0)) {
- 		rsn.akm_suites &=3D ~IE_RSN_AKM_SUITE_PSK;
-@@ -851,6 +858,31 @@ int network_can_connect_bss(struct network *network, c=
-onst struct scan_bss *bss)
- 			return -EPERM;
- 	}
- =
-
-+check_6ghz:
-+	/*
-+	 * WPA3 Specification, v3, Section 8:
-+	 * - Disable use of WEP and TKIP
-+	 * - Disallow association without negotiation of PMF
-+	 */
-+	rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_TKIP;
-+
-+	if (!rsn.group_management_cipher)
-+		return -EPERM;
-+
-+	rsn.mfpr =3D true;
-+
-+	/* 802.11ax Section 12.12.2 */
-+	if (band =3D=3D BAND_FREQ_6_GHZ) {
-+		/* STA shall not use the following cipher suite selectors */
-+		rsn.pairwise_ciphers &=3D ~IE_RSN_CIPHER_SUITE_USE_GROUP_CIPHER;
-+
-+		/* Basically the STA must use OWE, SAE, or 8021x */
-+		if (!IE_AKM_IS_SAE(rsn.akm_suites &&
-+				!IE_AKM_IS_8021X(rsn.akm_suites) &&
-+				(!(rsn.akm_suites | IE_RSN_AKM_SUITE_OWE))))
-+			return -EPERM;
-+	}
-+
- no_transition_disable:
- 	if (!wiphy_select_cipher(wiphy, rsn.pairwise_ciphers))
- 		return -ENOTSUP;
--- =
-
-2.34.1
-
---===============7686638255343664301==--
+Best regards
+--===============1686564341401593114==--
 
