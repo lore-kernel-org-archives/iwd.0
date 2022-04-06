@@ -1,261 +1,85 @@
-Content-Type: multipart/mixed; boundary="===============8940491814407652265=="
+Content-Type: multipart/mixed; boundary="===============2098142766252233218=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 5/9] netconfig: Try calling the agent before setting new values
-Date: Mon, 08 Nov 2021 12:28:34 +0100
-Message-ID: <20211108112838.372416-5-andrew.zaborowski@intel.com>
-In-Reply-To: 20211108112838.372416-1-andrew.zaborowski@intel.com
+Subject: [PATCH 09/10] auto-t: cleanup the few uses of is_verbose
+Date: Wed, 06 Apr 2022 12:14:52 -0700
+Message-ID: <20220406191453.978426-9-prestwoj@gmail.com>
+In-Reply-To: 20220406191453.978426-1-prestwoj@gmail.com
 
---===============8940491814407652265==
+--===============2098142766252233218==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implement the logic where, after netconfig decides on what address,
-gateway, DNS, etc. data to use, it calls the NetworkConfigurationAgent
-that may be registered and relies on it to commit the new values.  If no
-agent is registered it will proceed to set the new values as usual.  If
-it does make an agent call, it wlil wait for the call to return before
-signalling NETCONFIG_EVENT_CONNECTED.
+These were used outside of run-tests in a couple places. Replace
+these with Process.is_verbose()
 ---
- src/netconfig.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/netconfig.h |   1 +
- src/station.c   |   4 ++
- 3 files changed, 119 insertions(+)
+ autotests/testP2P/connection_test.py | 4 +++-
+ autotests/util/wpas.py               | 5 ++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/src/netconfig.c b/src/netconfig.c
-index 885e34a8..3a67c890 100644
---- a/src/netconfig.c
-+++ b/src/netconfig.c
-@@ -49,6 +49,7 @@
- #include "src/resolve.h"
- #include "src/util.h"
- #include "src/ie.h"
-+#include "src/agent.h"
- #include "src/netconfig.h"
- #include "src/sysfs.h"
+diff --git a/autotests/testP2P/connection_test.py b/autotests/testP2P/conne=
+ction_test.py
+index d1681164..f22f0682 100644
+--- a/autotests/testP2P/connection_test.py
++++ b/autotests/testP2P/connection_test.py
+@@ -11,6 +11,8 @@ import testutil
+ from config import ctx
+ from wpas import Wpas
  =
 
-@@ -97,6 +98,10 @@ struct netconfig {
- 	uint32_t addr6_add_cmd_id;
- 	uint32_t route4_add_gateway_cmd_id;
- 	uint32_t route6_add_cmd_id;
++from utils import Process
 +
-+	const char *dbus_obj_path;
-+	unsigned int agent_v4_req_id;
-+	unsigned int agent_v6_req_id;
- };
+ class Test(unittest.TestCase):
+     leases_path =3D '/tmp/dhcp.lease'
  =
 
- static struct l_netlink *rtnl;
-@@ -1031,6 +1036,92 @@ static void netconfig_ifaddr_del_cmd_cb(int error, u=
-int16_t type,
- 				"Error %d: %s", error, strerror(-error));
- }
+@@ -110,7 +112,7 @@ class Test(unittest.TestCase):
+             self.assertEqual(wpas.p2p_group['go_ip_addr'], '192.168.1.1')
  =
 
-+static void netconfig_agent_req_cb(unsigned int req_id, enum agent_result =
-result,
-+					void *user_data)
-+{
-+	struct netconfig *netconfig =3D user_data;
-+	bool v4 =3D req_id =3D=3D netconfig->agent_v4_req_id;
-+
-+	if (v4)
-+		netconfig->agent_v4_req_id =3D 0;
-+	else
-+		netconfig->agent_v6_req_id =3D 0;
-+
-+	if (result !=3D AGENT_RESULT_OK) {
-+		l_error("Netconfig agent request for %s failed",
-+			v4 ? "IPv4" : "IPv6");
-+		/* TODO: report to user if v4 */
-+		return;
-+	}
-+
-+	l_debug("Netconfig agent request success for %s", v4 ? "IPv4" : "IPv6");
-+
-+	if (!v4)
-+		return;
-+
-+	if (netconfig->notify) {
-+		netconfig->notify(NETCONFIG_EVENT_CONNECTED,
-+					netconfig->user_data);
-+		netconfig->notify =3D NULL;
-+	}
-+}
-+
-+static bool netconfig_try_agent(struct netconfig *netconfig, uint8_t af)
-+{
-+	struct netconfig_data data =3D { .family =3D af };
-+	const struct l_rtnl_address *addr;
-+	char addr_str[INET6_ADDRSTRLEN];
-+	char *v4_domains[] =3D { netconfig->v4_domain, NULL };
-+	struct netdev *netdev =3D netdev_find(netconfig->ifindex);
-+	unsigned int *id =3D (af =3D=3D AF_INET) ?
-+		&netconfig->agent_v4_req_id : &netconfig->agent_v6_req_id;
-+
-+	if (!netconfig->dbus_obj_path)
-+		return false;
-+
-+	addr =3D (af =3D=3D AF_INET) ? netconfig->v4_address : netconfig->v6_addr=
-ess;
-+
-+	if ((af =3D=3D AF_INET && netconfig->rtm_protocol =3D=3D RTPROT_STATIC) ||
-+			(af =3D=3D AF_INET6 &&
-+			 netconfig->rtm_v6_protocol =3D=3D RTPROT_STATIC))
-+		data.method =3D NETCONFIG_METHOD_STATIC;
-+	else if ((af =3D=3D AF_INET && netconfig->rtm_protocol =3D=3D RTPROT_DHCP=
-) ||
-+			(af =3D=3D AF_INET6 &&
-+			 netconfig->rtm_v6_protocol =3D=3D RTPROT_DHCP))
-+		data.method =3D NETCONFIG_METHOD_AUTO;
-+	else
-+		return true;
-+
-+	if (addr) {
-+		if (l_rtnl_address_get_address(addr, addr_str))
-+			data.addr =3D addr_str;
-+
-+		data.prefix_len =3D l_rtnl_address_get_prefix_length(addr);
-+	}
-+
-+	data.gateway_addr =3D (af =3D=3D AF_INET) ?
-+		netconfig->v4_gateway_str : netconfig->v6_gateway_str;
-+	data.dns =3D (af =3D=3D AF_INET) ?
-+		netconfig->dns4_list : netconfig->dns6_list;
-+	data.domain_names =3D (af =3D=3D AF_INET) ?
-+		(v4_domains[0] ? v4_domains : NULL) : netconfig->v6_domains;
-+
-+	if (*id)
-+		agent_request_cancel(*id, -ECANCELED);
-+
-+	*id =3D agent_request_netconfig(netconfig->dbus_obj_path,
-+						netdev_get_name(netdev),
-+						&data,
-+						netconfig_agent_req_cb,
-+						netconfig, NULL);
-+	if (!*id)
-+		return false;
-+
-+	l_debug("Netconfig request for %s on %s sent to agent",
-+		(af =3D=3D AF_INET) ? "IPv4" : "IPv6", netdev_get_name(netdev));
-+	return true;
-+}
-+
- static bool netconfig_address_cmp_address(const struct l_rtnl_address *a,
- 						const struct l_rtnl_address *b)
- {
-@@ -1068,6 +1159,9 @@ static void netconfig_set(struct netconfig *netconfig=
-, uint8_t af,
- {
- 	struct l_rtnl_address *stale_addr;
+             extra_params =3D []
+-            if ctx.is_verbose('dhclient'):
++            if Process.is_verbose('dhclient'):
+                 extra_params.append('-v')
  =
 
-+	if (netconfig_try_agent(netconfig, af))
-+		return;
+             dhcp =3D ctx.start_process(['dhclient', '-d', '--no-pid', '-cf=
+', '/dev/null', '-lf', self.leases_path,
+diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
+index 995bdad1..67b32d5f 100644
+--- a/autotests/util/wpas.py
++++ b/autotests/util/wpas.py
+@@ -3,8 +3,11 @@ import os
+ import socket
+ from gi.repository import GLib
+ from config import ctx
 +
- 	if (af =3D=3D AF_INET)
- 		stale_addr =3D l_steal_ptr(netconfig->stale_v4_address);
- 	else
-@@ -1390,6 +1484,12 @@ static void netconfig_reset_v4(struct netconfig *net=
-config)
+ import binascii
  =
 
- 		l_acd_destroy(netconfig->acd);
- 		netconfig->acd =3D NULL;
++from utils import Process
 +
-+		if (netconfig->agent_v4_req_id) {
-+			agent_request_cancel(netconfig->agent_v4_req_id,
-+						-ECANCELED);
-+			netconfig->agent_v4_req_id =3D 0;
-+		}
- 	}
- }
+ ctrl_count =3D 0
  =
 
-@@ -1429,6 +1529,12 @@ static void netconfig_reset_v6(struct netconfig *net=
-config)
+ class Wpas:
+@@ -31,7 +34,7 @@ class Wpas:
+         self.io_watch =3D None
  =
 
- 		sysfs_write_ipv6_setting(netdev_get_name(netdev),
- 						"disable_ipv6", "1");
-+
-+		if (netconfig->agent_v6_req_id) {
-+			agent_request_cancel(netconfig->agent_v6_req_id,
-+						-ECANCELED);
-+			netconfig->agent_v6_req_id =3D 0;
-+		}
- 	}
- }
+         cmd =3D ['wpa_supplicant', '-i', self.interface.name, '-c', self.c=
+onfig_path]
+-        if ctx.is_verbose('wpa_supplicant-dbg'):
++        if Process.is_verbose('wpa_supplicant-dbg'):
+             cmd +=3D ['-d']
  =
 
-@@ -1785,6 +1891,8 @@ bool netconfig_reconfigure(struct netconfig *netconfi=
-g, bool set_arp_gw)
- =
-
- bool netconfig_reset(struct netconfig *netconfig)
- {
-+	netconfig->dbus_obj_path =3D NULL;
-+
- 	if (netconfig->route4_add_gateway_cmd_id) {
- 		l_netlink_cancel(rtnl, netconfig->route4_add_gateway_cmd_id);
- 		netconfig->route4_add_gateway_cmd_id =3D 0;
-@@ -1925,6 +2033,11 @@ void netconfig_destroy(struct netconfig *netconfig)
- 	netconfig_free(netconfig);
- }
- =
-
-+void netconfig_set_dbus_path(struct netconfig *netconfig, const char *path)
-+{
-+	netconfig->dbus_obj_path =3D path;
-+}
-+
- bool netconfig_enabled(void)
- {
- 	bool enabled;
-@@ -2004,3 +2117,4 @@ static void netconfig_exit(void)
- }
- =
-
- IWD_MODULE(netconfig, netconfig_init, netconfig_exit)
-+IWD_MODULE_DEPENDS(netconfig, agent)
-diff --git a/src/netconfig.h b/src/netconfig.h
-index 48018bc1..77855b26 100644
---- a/src/netconfig.h
-+++ b/src/netconfig.h
-@@ -61,5 +61,6 @@ void netconfig_handle_fils_ip_resp(struct netconfig *netc=
-onfig,
- =
-
- struct netconfig *netconfig_new(uint32_t ifindex);
- void netconfig_destroy(struct netconfig *netconfig);
-+void netconfig_set_dbus_path(struct netconfig *netconfig, const char *path=
-);
- =
-
- bool netconfig_enabled(void);
-diff --git a/src/station.c b/src/station.c
-index 19f2aaeb..aca59550 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2816,6 +2816,10 @@ static void station_connect_ok(struct station *stati=
-on)
- 			}
- 		}
- =
-
-+		/* The path remains valid until connected_network changes */
-+		netconfig_set_dbus_path(station->netconfig,
-+				network_get_path(station->connected_network));
-+
- 		if (L_WARN_ON(!netconfig_configure(station->netconfig,
- 						station_netconfig_event_handler,
- 						station)))
+         self.wpa_supplicant =3D ctx.start_process(cmd)
 -- =
 
-2.32.0
+2.34.1
 
---===============8940491814407652265==--
+--===============2098142766252233218==--
 
