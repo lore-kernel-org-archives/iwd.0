@@ -1,43 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============5294143139605913337=="
+Content-Type: multipart/mixed; boundary="===============8490193155515626148=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/5] test-runner: set DBUS_SYSTEM_BUS_ADDRESS for --shell
-Date: Thu, 23 Sep 2021 15:57:25 -0700
-Message-ID: <20210923225728.556306-2-prestwoj@gmail.com>
-In-Reply-To: 20210923225728.556306-1-prestwoj@gmail.com
+Subject: [PATCH 10/10] test-runner: allow decode failure when writing IO
+Date: Wed, 06 Apr 2022 12:14:53 -0700
+Message-ID: <20220406191453.978426-10-prestwoj@gmail.com>
+In-Reply-To: 20220406191453.978426-1-prestwoj@gmail.com
 
---===============5294143139605913337==
+--===============8490193155515626148==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-After namespaces were added, the dbus address was customized to
-be /tmp/dbus{0..N}. This prevented any dbus applications started
-in the shell from working properly.
-
-Set DBUS_SYSTEM_BUS_ADDRESS to the environment prior to entering
-the shell.
+If this fails, e.g. an invalid utf-8 character it should not cause
+the test to fail.
 ---
- tools/test-runner | 1 +
- 1 file changed, 1 insertion(+)
+ tools/utils.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/tools/test-runner b/tools/test-runner
-index b0d6554d..a1967173 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1416,6 +1416,7 @@ def run_auto_tests(ctx, args):
- 				# a set of tests was passed in just start out in the first.
- 				#
- 				os.chdir(tests[0])
-+				os.environ['DBUS_SYSTEM_BUS_ADDRESS'] =3D ctx.dbus_address
- 				os.system('/bin/bash')
- 				exit()
+diff --git a/tools/utils.py b/tools/utils.py
+index be4c8638..55db4227 100644
+--- a/tools/utils.py
++++ b/tools/utils.py
+@@ -168,7 +168,10 @@ class Process(subprocess.Popen):
+ 		if not data:
+ 			return True
  =
 
+-		data =3D data.decode('utf-8')
++		try:
++			data =3D data.decode('utf-8')
++		except:
++			return True
+ =
+
+ 		# Save data away in case the caller needs it (e.g. list_sta)
+ 		self.out +=3D data
 -- =
 
-2.31.1
+2.34.1
 
---===============5294143139605913337==--
+--===============8490193155515626148==--
 
