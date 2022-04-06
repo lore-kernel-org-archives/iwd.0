@@ -1,43 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============9095005729433742322=="
+Content-Type: multipart/mixed; boundary="===============6829392695485842708=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 3/3] test-runner: don't copy __pycache__ in tests
-Date: Tue, 04 Jan 2022 09:37:36 -0800
-Message-ID: <20220104173736.93682-3-prestwoj@gmail.com>
-In-Reply-To: 20220104173736.93682-1-prestwoj@gmail.com
+Subject: [PATCH 2/2] test-runner: resolve --kernel absolute path
+Date: Wed, 06 Apr 2022 15:08:56 -0700
+Message-ID: <20220406220856.996243-2-prestwoj@gmail.com>
+In-Reply-To: 20220406220856.996243-1-prestwoj@gmail.com
 
---===============9095005729433742322==
+--===============6829392695485842708==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is created by the python interpreter for speed optimization
-but poses problems if copied to /tmp since previous tests may
-have already copied it leading to an exception.
+This only posed a problem oddly if the kernel binary was in the same
+directory as test-runner. Resolving the absolute path with the
+argument parser resolves the issue.
 ---
- tools/test-runner | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tools/runner.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/test-runner b/tools/test-runner
-index 4f16bd65..c35466c1 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1296,7 +1296,8 @@ def pre_test(ctx, test, copied):
- 	subtests =3D [f for f in files if f.startswith('test') or \
- 			os.path.splitext(f)[0].endswith('test')]
- 	# Everything else (except .py files)
--	to_copy =3D [f for f in list(set(files) - set(subtests)) if not f.endswit=
-h('.py')]
-+	to_copy =3D [f for f in list(set(files) - set(subtests)) if not f.endswit=
-h('.py') \
-+								and f !=3D '__pycache__']
- 	for f in to_copy:
- 		if os.path.isdir(f):
- 			shutil.copytree(f, '/tmp/' + f)
+diff --git a/tools/runner.py b/tools/runner.py
+index 1f087d6c..1cb01d29 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -183,7 +183,7 @@ class RunnerArgParse(RunnerCoreArgParse):
+ 				default=3DNone)
+ 		self.add_argument('--kernel', '-k',
+ 				metavar=3D'<kernel>',
+-				type=3Dstr,
++				type=3Dos.path.abspath,
+ 				help=3D'Path to kernel/uml image',
+ 				dest=3D'kernel',
+ 				default=3DNone)
 -- =
 
-2.31.1
+2.34.1
 
---===============9095005729433742322==--
+--===============6829392695485842708==--
 
