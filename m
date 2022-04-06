@@ -1,392 +1,1076 @@
-Content-Type: multipart/mixed; boundary="===============7796084646096562997=="
+Content-Type: multipart/mixed; boundary="===============1003032190634492970=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 2/3] json: introduce JSON module
-Date: Wed, 08 Dec 2021 13:36:35 -0800
-Message-ID: <20211208213636.1697316-2-prestwoj@gmail.com>
-In-Reply-To: 20211208213636.1697316-1-prestwoj@gmail.com
+Subject: [PATCH 01/10] test-runner: isolate Process/Namespace into utils
+Date: Wed, 06 Apr 2022 12:14:44 -0700
+Message-ID: <20220406191453.978426-1-prestwoj@gmail.com>
 
---===============7796084646096562997==
+--===============1003032190634492970==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a minimal wrapper around jsmn.h to make things a bit easier
-for iterating through a JSON object.
+Way too many classes have a dependency on the TestContext class, in
+most cases only for is_verbose. This patch removes the dependency from
+Process and Namespace classes.
 
-An iterator can be created/destroyed with json_iter_{new,free} and
-values can be parsed from this iterator using json_iter_parse.
+For Process, the test arguments can be parsed in the class itself which
+will allow for this class to be completely isolated into its own file.
 
-Arguments to json_iter_parse should use JSON_MANDATORY/JSON_OPTIONAL
-macros, and terminate the argument list with JSON_FLAG_INVALID.
-
-The value pointer in the MANDATORY/OPTIONAL macros can be NULL, in
-which case the presence of the key/value is checked but no data is
-returned out.
-
-Currently only JSON_STRING and JSON_OBJECT types are supported. String
-values should be of type struct iovec *, and objects should be of
-type struct json_iter **. These nested objects can be parsed again
-using json_iter_parse and should not be freed (the original iterator
-keeps track of nested object iterators).
+The Namespace class was already relatively isolated. Both were moved
+into utils.py which makes 'run-tests' quite a bit nicer to look at and
+more fitting to its name.
 ---
- Makefile.am |   1 +
- src/json.c  | 222 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/json.h  |  84 ++++++++++++++++++++
- 3 files changed, 307 insertions(+)
- create mode 100644 src/json.c
- create mode 100644 src/json.h
+ tools/run-tests | 470 +-----------------------------------------------
+ tools/utils.py  | 455 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 464 insertions(+), 461 deletions(-)
+ create mode 100644 tools/utils.py
 
-v2:
- * Re-wrote to remove callback style parsing. Instead the expected values
-   are provided to the parser directly.
-
-diff --git a/Makefile.am b/Makefile.am
-index 7fe4b5c3..1ae7e3c0 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -249,6 +249,7 @@ src_iwd_SOURCES =3D src/main.c linux/nl80211.h src/iwd.=
-h src/missing.h \
- 					src/sysfs.h src/sysfs.c \
- 					src/offchannel.h src/offchannel.c \
- 					src/dpp-util.h src/dpp-util.c \
-+					src/json.h src/json.c \
- 					$(eap_sources) \
- 					$(builtin_sources)
+diff --git a/tools/run-tests b/tools/run-tests
+index 0534a12f..4291250a 100755
+--- a/tools/run-tests
++++ b/tools/run-tests
+@@ -2,7 +2,6 @@
  =
 
-diff --git a/src/json.c b/src/json.c
+ import os
+ import shutil
+-import fcntl
+ import sys
+ import subprocess
+ import atexit
+@@ -14,17 +13,16 @@ import multiprocessing
+ import re
+ import traceback
+ =
+
+-from runner import Runner
+-
+ from configparser import ConfigParser
+ from prettytable import PrettyTable
+ from termcolor import colored
+ from glob import glob
+ from collections import namedtuple
+-from time import sleep
+ import dbus.mainloop.glib
+ from gi.repository import GLib
+-from weakref import WeakValueDictionary
++
++from runner import Runner
++from utils import Process, Namespace
+ =
+
+ config =3D None
+ intf_id =3D 0
+@@ -81,241 +79,6 @@ def find_binary(list):
+ 			return path
+ 	return None
+ =
+
+-# Partial DBus config. The remainder (<listen>) will be filled in for each
+-# namespace that is created so each individual dbus-daemon has its own soc=
+ket
+-# and address.
+-dbus_config =3D '''
+-<!DOCTYPE busconfig PUBLIC \
+-"-//freedesktop//DTD D-Bus Bus Configuration 1.0//EN" \
+-"http://www.freedesktop.org/standards/dbus/1.0/\
+-busconfig.dtd\">
+-<busconfig>
+-<type>system</type>
+-<limit name=3D\"reply_timeout\">2147483647</limit>
+-<auth>ANONYMOUS</auth>
+-<allow_anonymous/>
+-<policy context=3D\"default\">
+-<allow user=3D\"*\"/>
+-<allow own=3D\"*\"/>
+-<allow send_type=3D\"method_call\"/>
+-<allow send_type=3D\"signal\"/>
+-<allow send_type=3D\"method_return\"/>
+-<allow send_type=3D\"error\"/>
+-<allow receive_type=3D\"method_call\"/>
+-<allow receive_type=3D\"signal\"/>
+-<allow receive_type=3D\"method_return\"/>
+-<allow receive_type=3D\"error\"/>
+-<allow send_destination=3D\"*\" eavesdrop=3D\"true\"/>
+-<allow eavesdrop=3D\"true\"/>
+-</policy>
+-'''
+-
+-class Process(subprocess.Popen):
+-	processes =3D WeakValueDictionary()
+-	ctx =3D None
+-
+-	def __new__(cls, *args, **kwargs):
+-		obj =3D super().__new__(cls)
+-		cls.processes[id(obj)] =3D obj
+-		return obj
+-
+-	def __init__(self, args, namespace=3DNone, outfile=3DNone, env=3DNone, ch=
+eck=3DFalse, cleanup=3DNone):
+-		self.write_fds =3D []
+-		self.io_watch =3D None
+-		self.cleanup =3D cleanup
+-		self.verbose =3D False
+-		self.out =3D ''
+-		self.hup =3D False
+-		self.killed =3D False
+-		self.namespace =3D namespace
+-
+-		logfile =3D args[0]
+-
+-		if not self.ctx:
+-			global config
+-			self.ctx =3D config.ctx
+-
+-		if self.ctx.is_verbose(args[0], log=3DFalse):
+-			self.verbose =3D True
+-
+-		if namespace:
+-			args =3D ['ip', 'netns', 'exec', namespace] + args
+-			logfile +=3D '-%s' % namespace
+-
+-		if outfile:
+-			# outfile is only used by iwmon, in which case we don't want
+-			# to append to an existing file.
+-			self._append_outfile(outfile, append=3DFalse)
+-
+-		if self.ctx.args.log:
+-			testdir =3D os.getcwd()
+-
+-			# Special case any processes started prior to a test
+-			# (i.e. from testhome). Put these in the root log directory
+-			if testdir =3D=3D self.ctx.args.testhome:
+-				testdir =3D '.'
+-			else:
+-				testdir =3D os.path.basename(testdir)
+-
+-			logfile =3D '%s/%s/%s' % (self.ctx.args.log, testdir, logfile)
+-			self._append_outfile(logfile)
+-
+-		super().__init__(args, stdout=3Dsubprocess.PIPE, stderr=3Dsubprocess.STD=
+OUT,
+-					env=3Denv, cwd=3Dos.getcwd())
+-
+-		# Set as non-blocking so read() in the IO callback doesn't block forever
+-		fl =3D fcntl.fcntl(self.stdout, fcntl.F_GETFL)
+-		fcntl.fcntl(self.stdout, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+-
+-		self.io_watch =3D GLib.io_add_watch(self.stdout, GLib.IO_IN |
+-						GLib.IO_HUP | GLib.IO_ERR, self.process_io)
+-
+-		print("Starting process {}".format(self.args))
+-
+-		if check:
+-			self.wait(10)
+-			self.killed =3D True
+-			if self.returncode !=3D 0:
+-				raise subprocess.CalledProcessError(returncode=3Dself.returncode,
+-									cmd=3Dargs)
+-
+-	@classmethod
+-	def get_all(cls):
+-		return cls.processes.values()
+-
+-	@classmethod
+-	def kill_all(cls):
+-		for p in cls.processes.values():
+-			if p.args[0] =3D=3D 'dmesg':
+-				continue
+-
+-			p.kill()
+-
+-	@staticmethod
+-	def _write_io(instance, data, stdout=3DTrue):
+-		for f in instance.write_fds:
+-			f.write(data)
+-
+-			# Write out a separator so multiple process calls per
+-			# test are easer to read.
+-			if instance.hup:
+-				f.write("Terminated: {}\n\n".format(instance.args))
+-
+-			f.flush()
+-
+-		if instance.verbose and stdout:
+-			sys.__stdout__.write(data)
+-			sys.__stdout__.flush()
+-
+-	@classmethod
+-	def write_separators(cls, sep):
+-		for proc in cls.processes.values():
+-			if proc.killed:
+-				continue
+-
+-			cls._write_io(proc, sep, stdout=3DFalse)
+-
+-	def process_io(self, source, condition):
+-		if condition & GLib.IO_HUP:
+-			self.hup =3D True
+-
+-		data =3D source.read()
+-
+-		if not data:
+-			return True
+-
+-		data =3D data.decode('utf-8')
+-
+-		# Save data away in case the caller needs it (e.g. list_sta)
+-		self.out +=3D data
+-
+-		self._write_io(self, data)
+-
+-		return True
+-
+-	def _append_outfile(self, file, append=3DTrue):
+-		gid =3D int(os.environ.get('SUDO_GID', os.getgid()))
+-		uid =3D int(os.environ.get('SUDO_UID', os.getuid()))
+-		dir =3D os.path.dirname(file)
+-
+-		if not path_exists(dir):
+-			os.mkdir(dir)
+-			os.chown(dir, uid, gid)
+-
+-		file =3D os.path.join(dir,file)
+-
+-		# If the out file exists, append. Useful for processes like
+-		# hostapd_cli where it is called multiple times independently.
+-		if os.path.isfile(file) and append:
+-			mode =3D 'a'
+-		else:
+-			mode =3D 'w'
+-
+-		try:
+-			f =3D open(file, mode)
+-		except Exception as e:
+-			traceback.print_exc()
+-			sys.exit(0)
+-
+-		os.fchown(f.fileno(), uid, gid)
+-
+-		self.write_fds.append(f)
+-
+-	def wait_for_socket(self, socket, wait):
+-		Namespace.non_block_wait(os.path.exists, wait, socket)
+-
+-	# Wait for both process termination and HUP signal
+-	def __wait(self, timeout):
+-		try:
+-			super().wait(timeout)
+-			if not self.hup:
+-				return False
+-
+-			return True
+-		except:
+-			return False
+-
+-	# Override wait() so it can do so non-blocking
+-	def wait(self, timeout=3D10):
+-		Namespace.non_block_wait(self.__wait, timeout, 1)
+-		self._cleanup()
+-
+-	def _cleanup(self):
+-		if self.cleanup:
+-			self.cleanup()
+-
+-		self.write_fds =3D []
+-
+-		if self.io_watch:
+-			GLib.source_remove(self.io_watch)
+-			self.io_watch =3D None
+-
+-		self.cleanup =3D None
+-		self.killed =3D True
+-
+-	# Override kill()
+-	def kill(self, force=3DFalse):
+-		if self.killed:
+-			return
+-
+-		print("Killing process {}".format(self.args))
+-
+-		if force:
+-			super().kill()
+-		else:
+-			self.terminate()
+-
+-		try:
+-			self.wait(timeout=3D15)
+-		except:
+-			dbg("Process %s did not complete in 15 seconds!" % self.name)
+-			super().kill()
+-
+-		self._cleanup()
+-
+-	def __str__(self):
+-		return str(self.args) + '\n'
+-
+ class Interface:
+ 	def __init__(self, name, config):
+ 		self.name =3D name
+@@ -447,9 +210,7 @@ class Hostapd:
+ 		A set of running hostapd instances. This is really just a single
+ 		process since hostapd can be started with multiple config files.
+ 	'''
+-	def __init__(self, ctx, radios, configs, radius):
+-		self.ctx =3D ctx
+-
++	def __init__(self, radios, configs, radius):
+ 		if len(configs) !=3D len(radios):
+ 			raise Exception("Config (%d) and radio (%d) list length not equal" % \
+ 						(len(configs), len(radios)))
+@@ -485,7 +246,7 @@ class Hostapd:
+ 		if radius:
+ 			args.append(radius)
+ =
+
+-		if ctx.is_verbose('hostapd'):
++		if Process.is_verbose('hostapd'):
+ 			args.append('-d')
+ =
+
+ 		self.process =3D Process(args)
+@@ -545,226 +306,13 @@ class Hostapd:
+ =
+
+ 		# Hostapd may have already been stopped
+ 		if self.process:
+-			self.ctx.stop_process(self.process)
+-
+-		self.ctx =3D None
++			self.process.kill()
+ =
+
+ 		# Hostapd creates simdb sockets for EAP-SIM/AKA tests but does not
+ 		# clean them up.
+ 		for f in glob("/tmp/eap_sim_db*"):
+ 			os.remove(f)
+ =
+
+-dbus_count =3D 0
+-
+-class Namespace:
+-	def __init__(self, args, name, radios):
+-		self.dbus_address =3D None
+-		self.name =3D name
+-		self.radios =3D radios
+-		self.args =3D args
+-
+-		Process(['ip', 'netns', 'add', name]).wait()
+-		for r in radios:
+-			Process(['iw', 'phy', r.name, 'set', 'netns', 'name', name]).wait()
+-
+-		self.start_dbus()
+-
+-	def reset(self):
+-		self._bus =3D None
+-
+-		for r in self.radios:
+-			r._radio =3D None
+-
+-		self.radios =3D []
+-
+-		Process.kill_all()
+-
+-	def __del__(self):
+-		if self.name:
+-			print("Removing namespace %s" % self.name)
+-
+-			Process(['ip', 'netns', 'del', self.name]).wait()
+-
+-	def get_bus(self):
+-		return self._bus
+-
+-	def start_process(self, args, env=3DNone, **kwargs):
+-		if not env:
+-			env =3D os.environ.copy()
+-
+-		if hasattr(self, "dbus_address"):
+-			# In case this process needs DBus...
+-			env['DBUS_SYSTEM_BUS_ADDRESS'] =3D self.dbus_address
+-
+-		return Process(args, namespace=3Dself.name, env=3Denv, **kwargs)
+-
+-	def stop_process(self, p, force=3DFalse):
+-		p.kill(force)
+-
+-	def is_process_running(self, process):
+-		for p in Process.get_all():
+-			if p.namespace =3D=3D self.name and p.args[0] =3D=3D process:
+-				return True
+-		return False
+-
+-	def _cleanup_dbus(self):
+-		try:
+-			os.remove(self.dbus_address.split('=3D')[1])
+-		except:
+-			pass
+-
+-		os.remove(self.dbus_cfg)
+-
+-	def start_dbus(self):
+-		global dbus_count
+-
+-		self.dbus_address =3D 'unix:path=3D/tmp/dbus%d' % dbus_count
+-		self.dbus_cfg =3D '/tmp/dbus%d.conf' % dbus_count
+-		dbus_count +=3D 1
+-
+-		with open(self.dbus_cfg, 'w+') as f:
+-			f.write(dbus_config)
+-			f.write('<listen>%s</listen>\n' % self.dbus_address)
+-			f.write('</busconfig>\n')
+-
+-		p =3D self.start_process(['dbus-daemon', '--config-file=3D%s' % self.dbu=
+s_cfg],
+-					cleanup=3Dself._cleanup_dbus)
+-
+-		p.wait_for_socket(self.dbus_address.split('=3D')[1], 5)
+-
+-		self._bus =3D dbus.bus.BusConnection(address_or_type=3Dself.dbus_address)
+-
+-	def start_iwd(self, config_dir =3D '/tmp', storage_dir =3D '/tmp/iwd'):
+-		args =3D []
+-		iwd_radios =3D ','.join([r.name for r in self.radios if r.use =3D=3D 'iw=
+d'])
+-
+-		if self.args.valgrind:
+-			args.extend(['valgrind', '--leak-check=3Dfull', '--track-origins=3Dyes',
+-					'--show-leak-kinds=3Dall',
+-					'--log-file=3D/tmp/valgrind.log.%p'])
+-
+-		args.extend(['iwd', '-E'])
+-
+-		if iwd_radios !=3D '':
+-			args.extend(['-p', iwd_radios])
+-
+-		if self.is_verbose(args[0]):
+-			args.append('-d')
+-
+-		env =3D os.environ.copy()
+-
+-		env['CONFIGURATION_DIRECTORY'] =3D config_dir
+-		env['STATE_DIRECTORY'] =3D storage_dir
+-
+-		if self.is_verbose('iwd-dhcp'):
+-			env['IWD_DHCP_DEBUG'] =3D '1'
+-
+-		if self.is_verbose('iwd-tls'):
+-			env['IWD_TLS_DEBUG'] =3D '1'
+-
+-		if self.is_verbose('iwd-acd'):
+-			env['IWD_ACD_DEBUG'] =3D '1'
+-
+-		return self.start_process(args, env=3Denv)
+-
+-	def is_verbose(self, process, log=3DTrue):
+-		process =3D os.path.basename(process)
+-
+-		if self.args is None:
+-			return False
+-
+-		# every process is verbose when logging is enabled
+-		if log and self.args.log:
+-			return True
+-
+-		if process in self.args.verbose:
+-			return True
+-
+-		# Special case here to enable verbose output with valgrind running
+-		if process =3D=3D 'valgrind' and 'iwd' in self.args.verbose:
+-			return True
+-
+-		# Handle any glob matches
+-		for item in self.args.verbose:
+-			if process in glob(item):
+-				return True
+-
+-		return False
+-
+-	@staticmethod
+-	def non_block_wait(func, timeout, *args, exception=3DTrue):
+-		'''
+-			Convenience function for waiting in a non blocking
+-			manor using GLibs context iteration i.e. does not block
+-			the main loop while waiting.
+-
+-			'func' will be called at least once and repeatedly until
+-			either it returns success, throws an exception, or the
+-			'timeout' expires.
+-
+-			'timeout' is the ultimate timeout in seconds
+-
+-			'*args' will be passed to 'func'
+-
+-			If 'exception' is an Exception type it will be raised.
+-			If 'exception' is True a generic TimeoutError will be raised.
+-			Any other value will not result in an exception.
+-		'''
+-		# Simple class for signaling the wait timeout
+-		class Bool:
+-			def __init__(self, value):
+-				self.value =3D value
+-
+-		def wait_timeout_cb(done):
+-			done.value =3D True
+-			return False
+-
+-		mainloop =3D GLib.MainLoop()
+-		done =3D Bool(False)
+-
+-		timeout =3D GLib.timeout_add_seconds(timeout, wait_timeout_cb, done)
+-		context =3D mainloop.get_context()
+-
+-		while True:
+-			try:
+-				ret =3D func(*args)
+-				if ret:
+-					if not done.value:
+-						GLib.source_remove(timeout)
+-					return ret
+-			except Exception as e:
+-				if not done.value:
+-					GLib.source_remove(timeout)
+-				raise e
+-
+-			if done.value =3D=3D True:
+-				if isinstance(exception, Exception):
+-					raise exception
+-				elif type(exception) =3D=3D bool and exception:
+-					raise TimeoutError("Timeout on non_block_wait")
+-				else:
+-					return
+-
+-			context.iteration(may_block=3DTrue)
+-
+-	def __str__(self):
+-		ret =3D 'Namespace: %s\n' % self.name
+-		ret +=3D 'Processes:\n'
+-		for p in Process.get_all():
+-			ret +=3D '\t%s' % str(p)
+-
+-		ret +=3D 'Radios:\n'
+-		if len(self.radios) > 0:
+-			for r in self.radios:
+-				ret +=3D '\t%s\n' % str(r)
+-		else:
+-			ret +=3D '\tNo Radios\n'
+-
+-		ret +=3D 'DBus Address: %s\n' % self.dbus_address
+-		ret +=3D '=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D\n\n'
+-
+-		return ret
+-
+ class BarChart():
+ 	def __init__(self, height=3D10, max_width=3D80):
+ 		self._height =3D height
+@@ -828,7 +376,7 @@ class TestContext(Namespace):
+ 		self._mem_chart =3D BarChart()
+ =
+
+ 	def start_dbus_monitor(self):
+-		if not self.is_verbose('dbus-monitor'):
++		if not Process.is_verbose('dbus-monitor'):
+ 			return
+ =
+
+ 		self.start_process(['dbus-monitor', '--address', self.dbus_address])
+@@ -933,7 +481,7 @@ class TestContext(Namespace):
+ =
+
+ 		radius_config =3D settings.get('radius_server', None)
+ =
+
+-		self.hostapd =3D Hostapd(self, hapd_radios, hapd_configs, radius_config)
++		self.hostapd =3D Hostapd(hapd_radios, hapd_configs, radius_config)
+ 		self.hostapd.attach_cli()
+ =
+
+ 	def get_frequencies(self):
+@@ -1001,7 +549,7 @@ class TestContext(Namespace):
+ 		time.sleep(3)
+ =
+
+ 		ofono_args =3D ['ofonod', '-n', '--plugin=3Datmodem,phonesim']
+-		if self.is_verbose('ofonod'):
++		if Process.is_verbose('ofonod'):
+ 			ofono_args.append('-d')
+ =
+
+ 		self.start_process(ofono_args)
+diff --git a/tools/utils.py b/tools/utils.py
 new file mode 100644
-index 00000000..9f6c744f
+index 00000000..4c71e934
 --- /dev/null
-+++ b/src/json.c
-@@ -0,0 +1,222 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2013-2019  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
++++ b/tools/utils.py
+@@ -0,0 +1,455 @@
++import os
++import subprocess
++import fcntl
++import sys
++import traceback
++import shutil
++import dbus
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++from gi.repository import GLib
++from weakref import WeakValueDictionary
++from glob import glob
 +
-+#include <errno.h>
++from runner import RunnerCoreArgParse
 +
-+#include <ell/ell.h>
++class Process(subprocess.Popen):
++	processes =3D WeakValueDictionary()
++	testargs =3D RunnerCoreArgParse().parse_args()
 +
-+#include "src/json.h"
++	def __new__(cls, *args, **kwargs):
++		obj =3D super().__new__(cls)
++		cls.processes[id(obj)] =3D obj
++		return obj
 +
-+#include "shared/jsmn.h"
++	def __init__(self, args, namespace=3DNone, outfile=3DNone, env=3DNone, ch=
+eck=3DFalse, cleanup=3DNone):
++		self.write_fds =3D []
++		self.io_watch =3D None
++		self.cleanup =3D cleanup
++		self.verbose =3D False
++		self.out =3D ''
++		self.hup =3D False
++		self.killed =3D False
++		self.namespace =3D namespace
 +
-+/* Max number of tokens supported. Increase if larger objects are expected=
- */
-+#define JSON_DEFAULT_TOKENS 30
++		logfile =3D args[0]
 +
-+#define TOK_LEN(token) (token)->end - (token)->start
-+#define TOK_PTR(json, token) (void *)((json) + (token)->start)
++		if Process.is_verbose(args[0], log=3DFalse):
++			self.verbose =3D True
 +
-+struct json_iter {
-+	const char *json;
-+	size_t json_len;
-+	jsmntok_t *tokens;
-+	int tokens_len;
-+	jsmn_parser *p;
-+	struct l_queue *children;
-+	bool root : 1;
-+};
++		if namespace:
++			args =3D ['ip', 'netns', 'exec', namespace] + args
++			logfile +=3D '-%s' % namespace
 +
-+static struct json_iter *iter_recurse(struct json_iter *parent,
-+					jsmntok_t *object)
-+{
-+	struct json_iter *iter =3D l_new(struct json_iter, 1);
++		if outfile:
++			# outfile is only used by iwmon, in which case we don't want
++			# to append to an existing file.
++			self._append_outfile(outfile, append=3DFalse)
 +
-+	iter->json =3D parent->json;
-+	iter->json_len =3D parent->json_len;
-+	iter->tokens =3D object;
-+	iter->children =3D l_queue_new();
++		if self.testargs.log:
++			testdir =3D os.getcwd()
 +
-+	/*
-+	 * Since object->size only indicates the number of keys in an object
-+	 * we cannot easily calculate the number of tokens remaining (for this
-+	 * object) since each object may have nested objects. Set tokens_len to
-+	 * the number of tokens remaining in the overall list after 'object'
-+	 */
-+	iter->tokens_len =3D parent->tokens_len -
-+				((object - parent->tokens) % sizeof(jsmntok_t));
++			# Special case any processes started prior to a test
++			# (i.e. from testhome). Put these in the root log directory
++			if testdir =3D=3D self.testargs.testhome:
++				testdir =3D '.'
++			else:
++				testdir =3D os.path.basename(testdir)
 +
-+	l_queue_push_head(parent->children, iter);
++			logfile =3D '%s/%s/%s' % (self.testargs.log, testdir, logfile)
++			self._append_outfile(logfile)
 +
-+	return iter;
-+}
++		super().__init__(args, stdout=3Dsubprocess.PIPE, stderr=3Dsubprocess.STD=
+OUT,
++					env=3Denv, cwd=3Dos.getcwd())
 +
-+struct json_iter *json_iter_new(const char *json, size_t json_len)
-+{
-+	struct json_iter *iter =3D l_new(struct json_iter, 1);
++		# Set as non-blocking so read() in the IO callback doesn't block forever
++		fl =3D fcntl.fcntl(self.stdout, fcntl.F_GETFL)
++		fcntl.fcntl(self.stdout, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 +
-+	iter->json =3D json;
-+	iter->json_len =3D json_len;
-+	iter->p =3D l_new(jsmn_parser, 1);
-+	iter->tokens =3D l_new(jsmntok_t, JSON_DEFAULT_TOKENS);
-+	iter->root =3D true;
++		self.io_watch =3D GLib.io_add_watch(self.stdout, GLib.IO_IN |
++						GLib.IO_HUP | GLib.IO_ERR, self.process_io)
 +
-+	jsmn_init(iter->p);
-+	iter->tokens_len =3D jsmn_parse(iter->p, iter->json, iter->json_len,
-+					iter->tokens, JSON_DEFAULT_TOKENS);
-+	if (iter->tokens_len < 0) {
-+		json_iter_free(iter);
-+		return NULL;
-+	}
++		print("Starting process {}".format(self.args))
 +
-+	iter->children =3D l_queue_new();
++		if check:
++			self.wait(10)
++			self.killed =3D True
++			if self.returncode !=3D 0:
++				raise subprocess.CalledProcessError(returncode=3Dself.returncode,
++									cmd=3Dargs)
 +
-+	return iter;
-+}
++	@staticmethod
++	def is_verbose(process, log=3DTrue):
++		process =3D os.path.basename(process)
 +
-+static void json_iter_destroy(void *data)
-+{
-+	struct json_iter *iter =3D data;
++		if Process.testargs is None:
++			return False
 +
-+	json_iter_free(iter);
-+}
++		# every process is verbose when logging is enabled
++		if log and Process.testargs.log:
++			return True
 +
-+void json_iter_free(struct json_iter *iter)
-+{
-+	if (iter->root) {
-+		l_free(iter->p);
-+		l_free(iter->tokens);
-+	}
++		if process in Process.testargs.verbose:
++			return True
 +
-+	l_queue_destroy(iter->children, json_iter_destroy);
-+	l_free(iter);
-+}
++		# Special case here to enable verbose output with valgrind running
++		if process =3D=3D 'valgrind' and 'iwd' in Process.testargs.verbose:
++			return True
 +
-+static jsmntok_t *next_key(struct json_iter *iter, jsmntok_t *current)
-+{
-+	jsmntok_t *value;
-+	int i;
++		# Handle any glob matches
++		for item in Process.testargs.verbose:
++			if process in glob(item):
++				return True
 +
-+	/*
-+	 * In theory JSMN should prevent any of these bounds checks from failing
-+	 */
-+	if (current + 1 > iter->tokens + iter->tokens_len)
-+		return NULL;
++		return False
 +
-+	value =3D current + 1;
++	@classmethod
++	def get_all(cls):
++		return cls.processes.values()
 +
-+	if (value->size =3D=3D 0)
-+		return value + 1;
++	@classmethod
++	def kill_all(cls):
++		for p in cls.processes.values():
++			if p.args[0] =3D=3D 'dmesg':
++				continue
 +
-+	for (i =3D 0; i < value->size; i++)
-+		value =3D next_key(iter, value);
++			p.kill()
 +
-+	return value;
-+}
++	@staticmethod
++	def _write_io(instance, data, stdout=3DTrue):
++		for f in instance.write_fds:
++			f.write(data)
 +
-+/*
-+ * Checks that the keys value (t + 1) is in bounds, the value type matches,
-+ * key length matches, and key string match
-+ */
-+#define TOKEN_MATCHES(iter, t, key, type) \
-+	(t) + 1 < iter->tokens + iter->tokens_len && \
-+	(jsmntype_t)(type) =3D=3D ((t) + 1)->type && \
-+	TOK_LEN((t)) =3D=3D (int)strlen((key)) && \
-+	!memcmp(TOK_PTR((iter)->json, (t)), (key), TOK_LEN((t)))
++			# Write out a separator so multiple process calls per
++			# test are easer to read.
++			if instance.hup:
++				f.write("Terminated: {}\n\n".format(instance.args))
 +
-+bool json_iter_parse(struct json_iter *iter, ...)
-+{
-+	va_list va;
-+	int i;
-+	int num =3D iter->tokens->size;
-+	jsmntok_t *next;
-+	struct iovec *sval;
-+	struct json_iter **oval;
++			f.flush()
 +
-+	/* Empty object {} */
-+	if (iter->tokens_len < 1)
-+		return false;
++		if instance.verbose and stdout:
++			sys.__stdout__.write(data)
++			sys.__stdout__.flush()
 +
-+	va_start(va, iter);
++	@classmethod
++	def write_separators(cls, sep):
++		for proc in cls.processes.values():
++			if proc.killed:
++				continue
 +
-+	while (true) {
-+		enum json_flag flag;
-+		char *key;
-+		enum json_type type;
-+		void *value;
-+		jsmntok_t *v =3D NULL;
++			cls._write_io(proc, sep, stdout=3DFalse)
 +
-+		flag =3D va_arg(va, enum json_flag);
++	def process_io(self, source, condition):
++		if condition & GLib.IO_HUP:
++			self.hup =3D True
 +
-+		if (flag =3D=3D JSON_FLAG_INVALID)
-+			break;
++		data =3D source.read()
 +
-+		key =3D va_arg(va, char *);
-+		type =3D va_arg(va, enum json_type);
-+		value =3D va_arg(va, void *);
++		if not data:
++			return True
 +
-+		next =3D iter->tokens + 1;
++		data =3D data.decode('utf-8')
 +
-+		/* Iterate over this objects keys */
-+		for (i =3D 0; i < num; i++) {
-+			if (TOKEN_MATCHES(iter, next, key, type)) {
-+				v =3D next + 1;
-+				break;
-+			}
++		# Save data away in case the caller needs it (e.g. list_sta)
++		self.out +=3D data
 +
-+			next =3D next_key(iter, next);
-+			if (!next)
-+				return false;
-+		}
++		self._write_io(self, data)
 +
-+		if (flag =3D=3D JSON_FLAG_MANDATORY && !v)
-+			return false;
++		return True
 +
-+		switch (type) {
-+		case JSON_STRING:
-+			if (!value)
-+				continue;
++	def _append_outfile(self, file, append=3DTrue):
++		gid =3D int(os.environ.get('SUDO_GID', os.getgid()))
++		uid =3D int(os.environ.get('SUDO_UID', os.getuid()))
++		dir =3D os.path.dirname(file)
 +
-+			sval =3D value;
-+			sval->iov_base =3D v ? TOK_PTR(iter->json, v) : NULL;
-+			sval->iov_len =3D v ? TOK_LEN(v) : 0;
++		if not os.path.exists(dir):
++			os.mkdir(dir)
++			os.chown(dir, uid, gid)
 +
-+			break;
-+		case JSON_OBJECT:
-+			if (!value)
-+				continue;
++		file =3D os.path.join(dir,file)
 +
-+			oval =3D value;
-+			*oval =3D v ? iter_recurse(iter, v) : NULL;
++		# If the out file exists, append. Useful for processes like
++		# hostapd_cli where it is called multiple times independently.
++		if os.path.isfile(file) and append:
++			mode =3D 'a'
++		else:
++			mode =3D 'w'
 +
-+			break;
-+		default:
-+			return false;
-+		}
-+	}
++		try:
++			f =3D open(file, mode)
++		except Exception as e:
++			traceback.print_exc()
++			sys.exit(0)
 +
-+	va_end(va);
++		os.fchown(f.fileno(), uid, gid)
 +
-+	return true;
-+}
-diff --git a/src/json.h b/src/json.h
-new file mode 100644
-index 00000000..202445ee
---- /dev/null
-+++ b/src/json.h
-@@ -0,0 +1,84 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
- USA
-+ *
-+ */
++		self.write_fds.append(f)
 +
-+struct json_iter;
++	def wait_for_socket(self, socket, wait):
++		Namespace.non_block_wait(os.path.exists, wait, socket)
 +
-+/*
-+ * Identical to JSMN types
-+ */
-+enum json_type {
-+	JSON_UNDEFINED =3D 0,
-+	JSON_OBJECT =3D 1 << 0,
-+	JSON_ARRAY =3D 1 << 1,
-+	JSON_STRING =3D 1 << 2,
-+	JSON_PRIMITIVE =3D 1 << 3
-+};
++	# Wait for both process termination and HUP signal
++	def __wait(self, timeout):
++		try:
++			super().wait(timeout)
++			if not self.hup:
++				return False
 +
-+enum json_flag {
-+	JSON_FLAG_INVALID =3D 0,
-+	JSON_FLAG_MANDATORY =3D 1,
-+	JSON_FLAG_OPTIONAL =3D 2,
-+};
++			return True
++		except:
++			return False
 +
-+#define JSON_MANDATORY(key, type, out) \
-+	JSON_FLAG_MANDATORY, (key), (type), (out)
++	# Override wait() so it can do so non-blocking
++	def wait(self, timeout=3D10):
++		Namespace.non_block_wait(self.__wait, timeout, 1)
++		self._cleanup()
 +
-+#define JSON_OPTIONAL(key, type, out) \
-+	JSON_FLAG_OPTIONAL, (key), (type), (out)
++	def _cleanup(self):
++		if self.cleanup:
++			self.cleanup()
 +
-+#define JSON_STR_EQ(iov, s) \
-+	((iov)->iov_len =3D=3D strlen((s)) && \
-+	!memcmp((iov)->iov_base, (s), (iov)->iov_len))
++		self.write_fds =3D []
 +
-+#define JSON_TO_STR(iov) \
-+({ \
-+	char *_tmp =3D l_malloc((iov)->iov_len + 1); \
-+	memcpy(_tmp, (iov)->iov_base, (iov)->iov_len); \
-+	_tmp[(iov)->iov_len] =3D '\0'; \
-+	_tmp; \
-+})
++		if self.io_watch:
++			GLib.source_remove(self.io_watch)
++			self.io_watch =3D None
 +
-+struct json_iter *json_iter_new(const char *json, size_t json_len);
-+void json_iter_free(struct json_iter *iter);
++		self.cleanup =3D None
++		self.killed =3D True
 +
-+/*
-+ * Parse an arbitrary number of key/value pairs from a JSON iterator. Init=
-ially
-+ * a new JSON iterator should be created with json_iter_new() and, when do=
-ne,
-+ * freed with json_iter_free. Nested objects are also parsed with this fun=
-ction
-+ * but these iterators should not be freed and are tracked by the original
-+ * iterator.
-+ *
-+ * Arguments should be specified using JSON_MANDATORY or JSON_OPTIONAL:
-+ *
-+ * r =3D json_iter_parse(iter, JSON_MANDATORY("mykey", JSON_STRING, &strva=
-lue),
-+ * 			JSON_OPTIONAL("optkey", JSON_STRING, &optvalue));
-+ *
-+ * String values should be of type struct iovec *
-+ * Object values should be of type struct json_iter **
-+ *
-+ * No other types are supported at this time, and json_iter_parse will fai=
-l if
-+ * other types are encountered.
-+ *
-+ * JSON_OPTIONAL string values will have a NULL/0 iov_base/iov_len if they=
- were
-+ * not found. JSON_OPTIONAL object value iterators will be NULL if not fou=
-nd.
-+ */
-+bool json_iter_parse(struct json_iter *iter, ...);
++	# Override kill()
++	def kill(self, force=3DFalse):
++		if self.killed:
++			return
++
++		print("Killing process {}".format(self.args))
++
++		if force:
++			super().kill()
++		else:
++			self.terminate()
++
++		try:
++			self.wait(timeout=3D15)
++		except:
++			print("Process %s did not complete in 15 seconds!" % self.name)
++			super().kill()
++
++		self._cleanup()
++
++	def __str__(self):
++		return str(self.args) + '\n'
++
++dbus_count =3D 0
++# Partial DBus config. The remainder (<listen>) will be filled in for each
++# namespace that is created so each individual dbus-daemon has its own soc=
+ket
++# and address.
++dbus_config =3D '''
++<!DOCTYPE busconfig PUBLIC \
++"-//freedesktop//DTD D-Bus Bus Configuration 1.0//EN" \
++"http://www.freedesktop.org/standards/dbus/1.0/\
++busconfig.dtd\">
++<busconfig>
++<type>system</type>
++<limit name=3D\"reply_timeout\">2147483647</limit>
++<auth>ANONYMOUS</auth>
++<allow_anonymous/>
++<policy context=3D\"default\">
++<allow user=3D\"*\"/>
++<allow own=3D\"*\"/>
++<allow send_type=3D\"method_call\"/>
++<allow send_type=3D\"signal\"/>
++<allow send_type=3D\"method_return\"/>
++<allow send_type=3D\"error\"/>
++<allow receive_type=3D\"method_call\"/>
++<allow receive_type=3D\"signal\"/>
++<allow receive_type=3D\"method_return\"/>
++<allow receive_type=3D\"error\"/>
++<allow send_destination=3D\"*\" eavesdrop=3D\"true\"/>
++<allow eavesdrop=3D\"true\"/>
++</policy>
++'''
++
++class Namespace:
++	def __init__(self, args, name, radios):
++		self.dbus_address =3D None
++		self.name =3D name
++		self.radios =3D radios
++		self.args =3D args
++
++		Process(['ip', 'netns', 'add', name]).wait()
++		for r in radios:
++			Process(['iw', 'phy', r.name, 'set', 'netns', 'name', name]).wait()
++
++		self.start_dbus()
++
++	def reset(self):
++		self._bus =3D None
++
++		for r in self.radios:
++			r._radio =3D None
++
++		self.radios =3D []
++
++		Process.kill_all()
++
++	def __del__(self):
++		if self.name:
++			print("Removing namespace %s" % self.name)
++
++			Process(['ip', 'netns', 'del', self.name]).wait()
++
++	def get_bus(self):
++		return self._bus
++
++	def start_process(self, args, env=3DNone, **kwargs):
++		if not env:
++			env =3D os.environ.copy()
++
++		if hasattr(self, "dbus_address"):
++			# In case this process needs DBus...
++			env['DBUS_SYSTEM_BUS_ADDRESS'] =3D self.dbus_address
++
++		return Process(args, namespace=3Dself.name, env=3Denv, **kwargs)
++
++	def stop_process(self, p, force=3DFalse):
++		p.kill(force)
++
++	def is_process_running(self, process):
++		for p in Process.get_all():
++			if p.namespace =3D=3D self.name and p.args[0] =3D=3D process:
++				return True
++		return False
++
++	def _cleanup_dbus(self):
++		try:
++			os.remove(self.dbus_address.split('=3D')[1])
++		except:
++			pass
++
++		os.remove(self.dbus_cfg)
++
++	def start_dbus(self):
++		global dbus_count
++
++		self.dbus_address =3D 'unix:path=3D/tmp/dbus%d' % dbus_count
++		self.dbus_cfg =3D '/tmp/dbus%d.conf' % dbus_count
++		dbus_count +=3D 1
++
++		with open(self.dbus_cfg, 'w+') as f:
++			f.write(dbus_config)
++			f.write('<listen>%s</listen>\n' % self.dbus_address)
++			f.write('</busconfig>\n')
++
++		p =3D self.start_process(['dbus-daemon', '--config-file=3D%s' % self.dbu=
+s_cfg],
++					cleanup=3Dself._cleanup_dbus)
++
++		p.wait_for_socket(self.dbus_address.split('=3D')[1], 5)
++
++		self._bus =3D dbus.bus.BusConnection(address_or_type=3Dself.dbus_address)
++
++	def start_iwd(self, config_dir =3D '/tmp', storage_dir =3D '/tmp/iwd'):
++		args =3D []
++		iwd_radios =3D ','.join([r.name for r in self.radios if r.use =3D=3D 'iw=
+d'])
++
++		if self.args.valgrind:
++			args.extend(['valgrind', '--leak-check=3Dfull', '--track-origins=3Dyes',
++					'--show-leak-kinds=3Dall',
++					'--log-file=3D/tmp/valgrind.log.%p'])
++
++		args.extend(['iwd', '-E'])
++
++		if iwd_radios !=3D '':
++			args.extend(['-p', iwd_radios])
++
++		if Process.is_verbose(args[0]):
++			args.append('-d')
++
++		env =3D os.environ.copy()
++
++		env['CONFIGURATION_DIRECTORY'] =3D config_dir
++		env['STATE_DIRECTORY'] =3D storage_dir
++
++		if Process.is_verbose('iwd-dhcp'):
++			env['IWD_DHCP_DEBUG'] =3D '1'
++
++		if Process.is_verbose('iwd-tls'):
++			env['IWD_TLS_DEBUG'] =3D '1'
++
++		if Process.is_verbose('iwd-acd'):
++			env['IWD_ACD_DEBUG'] =3D '1'
++
++		return self.start_process(args, env=3Denv)
++
++	@staticmethod
++	def non_block_wait(func, timeout, *args, exception=3DTrue):
++		'''
++			Convenience function for waiting in a non blocking
++			manor using GLibs context iteration i.e. does not block
++			the main loop while waiting.
++
++			'func' will be called at least once and repeatedly until
++			either it returns success, throws an exception, or the
++			'timeout' expires.
++
++			'timeout' is the ultimate timeout in seconds
++
++			'*args' will be passed to 'func'
++
++			If 'exception' is an Exception type it will be raised.
++			If 'exception' is True a generic TimeoutError will be raised.
++			Any other value will not result in an exception.
++		'''
++		# Simple class for signaling the wait timeout
++		class Bool:
++			def __init__(self, value):
++				self.value =3D value
++
++		def wait_timeout_cb(done):
++			done.value =3D True
++			return False
++
++		mainloop =3D GLib.MainLoop()
++		done =3D Bool(False)
++
++		timeout =3D GLib.timeout_add_seconds(timeout, wait_timeout_cb, done)
++		context =3D mainloop.get_context()
++
++		while True:
++			try:
++				ret =3D func(*args)
++				if ret:
++					if not done.value:
++						GLib.source_remove(timeout)
++					return ret
++			except Exception as e:
++				if not done.value:
++					GLib.source_remove(timeout)
++				raise e
++
++			if done.value =3D=3D True:
++				if isinstance(exception, Exception):
++					raise exception
++				elif type(exception) =3D=3D bool and exception:
++					raise TimeoutError("Timeout on non_block_wait")
++				else:
++					return
++
++			context.iteration(may_block=3DTrue)
++
++	def __str__(self):
++		ret =3D 'Namespace: %s\n' % self.name
++		ret +=3D 'Processes:\n'
++		for p in Process.get_all():
++			ret +=3D '\t%s' % str(p)
++
++		ret +=3D 'Radios:\n'
++		if len(self.radios) > 0:
++			for r in self.radios:
++				ret +=3D '\t%s\n' % str(r)
++		else:
++			ret +=3D '\tNo Radios\n'
++
++		ret +=3D 'DBus Address: %s\n' % self.dbus_address
++		ret +=3D '=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D\n\n'
++
++		return ret
 -- =
 
-2.31.1
+2.34.1
 
---===============7796084646096562997==--
+--===============1003032190634492970==--
 
