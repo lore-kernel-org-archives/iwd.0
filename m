@@ -1,76 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============2684008652530184960=="
+Content-Type: multipart/mixed; boundary="===============0062876703063858132=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] netdev: fail connection if the link goes down
-Date: Mon, 07 Feb 2022 14:43:15 -0800
-Message-ID: <20220207224315.457316-1-prestwoj@gmail.com>
+Subject: [PATCH 02/10] test-runner: remove path_exists/find_binary
+Date: Wed, 06 Apr 2022 12:14:45 -0700
+Message-ID: <20220406191453.978426-2-prestwoj@gmail.com>
+In-Reply-To: 20220406191453.978426-1-prestwoj@gmail.com
 
---===============2684008652530184960==
+--===============0062876703063858132==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In certain rare cases IWD gets a link down event before nl80211 ever sends
-a disconnect event. Netdev notifies station of the link down which causes
-station to be freed, but netdev remains in the same state. Then later the
-disconnect event arrives and netdev still thinks its connected, calls into
-(the now freed) station object and causes a crash.
-
-To fix this netdev_connect_failed() is now called on any link down events
-which will reset the netdev object to a proper state.
-
-src/netdev.c:netdev_link_notify() event 16 on ifindex 16
-src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-src/netdev.c:netdev_link_notify() event 16 on ifindex 16
-src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
-src/netdev.c:netdev_deauthenticate_event()
-src/netdev.c:netdev_link_notify() event 16 on ifindex 16
-src/station.c:station_free()
-src/netconfig.c:netconfig_destroy()
-src/resolve.c:resolve_systemd_revert() ifindex: 16
-src/station.c:station_roam_state_clear() 16
-src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
-src/netdev.c:netdev_disconnect_event()
-Received Deauthentication event, reason: 3, from_ap: false
-
-0 0x472fa4 in station_disconnect_event src/station.c:2916
-1 0x472fa4 in station_netdev_event src/station.c:2954
-2 0x43a262 in netdev_disconnect_event src/netdev.c:1213
-3 0x43a262 in netdev_mlme_notify src/netdev.c:5471
-4 0x6706eb in process_multicast ell/genl.c:1029
-5 0x6706eb in received_data ell/genl.c:1096
-6 0x65e630 in io_callback ell/io.c:120
-7 0x65a94e in l_main_iterate ell/main.c:478
-8 0x65b0b3 in l_main_run ell/main.c:525
-9 0x65b0b3 in l_main_run ell/main.c:507
-10 0x65b5cc in l_main_run_with_signal ell/main.c:647
-11 0x4124d7 in main src/main.c:532
+These are already implemented in the shutil module
 ---
- src/netdev.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ tools/run-tests | 24 +-----------------------
+ 1 file changed, 1 insertion(+), 23 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index bac6860c..02ee9920 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -6199,6 +6199,10 @@ static void netdev_newlink_notify(const struct ifinf=
-omsg *ifi, int bytes)
+diff --git a/tools/run-tests b/tools/run-tests
+index 4291250a..a95a7494 100755
+--- a/tools/run-tests
++++ b/tools/run-tests
+@@ -57,28 +57,6 @@ def exit_vm():
  =
 
- 	new_up =3D netdev_get_is_up(netdev);
+ 	runner.stop()
  =
 
-+	if (!new_up)
-+		netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
-+					MMPDU_STATUS_CODE_UNSPECIFIED);
-+
- 	/*
- 	 * If mac_change_cmd_id is set we are in the process of changing the
- 	 * MAC address and this event is a result of powering down/up. In this
+-def path_exists(path):
+-	'''
+-		Searches PATH as well as absolute paths.
+-	'''
+-	if shutil.which(path):
+-		return True
+-	try:
+-		os.stat(path)
+-	except:
+-		return False
+-	return True
+-
+-def find_binary(list):
+-	'''
+-		Returns a binary from 'list' if its found in PATH or on a
+-		valid absolute path.
+-	'''
+-	for path in list:
+-		if path_exists(path):
+-			return path
+-	return None
+-
+ class Interface:
+ 	def __init__(self, name, config):
+ 		self.name =3D name
+@@ -529,7 +507,7 @@ class TestContext(Namespace):
+ 			os.environ['IWD_SIM_KEYS'] =3D sim_keys
+ 			return
+ =
+
+-		if not find_binary(['ofonod']) or not find_binary(['phonesim']):
++		if not shutil.which('ofonod') or not shutil.which(['phonesim']):
+ 			print("Ofono or Phonesim not found, skipping test")
+ 			return
+ =
+
 -- =
 
-2.31.1
+2.34.1
 
---===============2684008652530184960==--
+--===============0062876703063858132==--
 
