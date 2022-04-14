@@ -1,54 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============2950980040928073480=="
+Content-Type: multipart/mixed; boundary="===============1295197758196291187=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: =?utf-8?q?Joakim_Lotseng=C3=A5rd_=3Cjoakim=2El_at_orbital-systems=2Ecom?=
+ =?utf-8?q?=3E?=
 To: iwd at lists.01.org
-Subject: [PATCH] autotests: Work around wpa_s config issue in testP2P
-Date: Mon, 06 Jun 2022 11:01:54 +0200
-Message-ID: <20220606090154.980544-1-andrew.zaborowski@intel.com>
+Subject: Re: Possible bug when /var/lib/iwd is a symlink
+Date: Thu, 14 Apr 2022 10:54:03 +0200
+Message-ID: <CAELJiswi7Du1tEP_WmR2PN-_Pg+qPMep9NKUQYqWTAOxZHAtTw@mail.gmail.com>
+In-Reply-To: CAELJisxEWR2dcZ9x4Xr3+r=myTv7X1ncD1wkx6rZ6O3YVJRMAA@mail.gmail.com
 
---===============2950980040928073480==
+--===============1295197758196291187==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Since commit 922fa099721903b106a7bc1ccd1ffe8c4a7bce69 in hostap, our
-setting of config_methods on P2P-client interface was ignored.  Work
-around that commit, in addition to the previous workaround we have in
-this test, to again ensure the correct config_methods value is used.
----
- autotests/testP2P/connection_test.py | 5 +++++
- 1 file changed, 5 insertions(+)
+On Thu, 14 Apr 2022 at 10:17, Joakim Lotseng=C3=A5rd
+<joakim.l(a)orbital-systems.com> wrote:
+>
+> Possible bug when /var/lib/iwd is a symlink:
+>
 
-diff --git a/autotests/testP2P/connection_test.py b/autotests/testP2P/conne=
-ction_test.py
-index 383e0cef..479076e8 100644
---- a/autotests/testP2P/connection_test.py
-+++ b/autotests/testP2P/connection_test.py
-@@ -87,7 +87,12 @@ class Test(unittest.TestCase):
-             # For some reason wpa_supplicant's newly created P2P-client in=
-terface doesn't inherit
-             # the settings from the main interface which were loaded from =
-the config file
-             # (P2P-device and P2P-GO interfaces do), we need to set config=
-_methods again.
-+            #
-+            # Additionally since hostap commit 922fa099721903b106a7bc1ccd1=
-ffe8c4a7bce69,
-+            # just setting config_methods to the same value we used last t=
-ime is detected as
-+            # a NOOP so we need to set it to a different value first for i=
-t to take effect.
-             peer_ifname =3D 'p2p-' + wpas.interface.name + '-0'
-+            wpas.set('config_methods', '', ifname=3Dpeer_ifname)
-             wpas.set('config_methods', wpas.config['config_methods'], ifna=
-me=3Dpeer_ifname)
-             wpas.set('device_name', wpas.config['device_name'], ifname=3Dp=
-eer_ifname)
-             wpas.set('device_type', wpas.config['device_type'], ifname=3Dp=
-eer_ifname)
+Follow up with a demo-patch that solves the problem, but probably isn't the
+correct solution. I have not thought about any security implications this m=
+ight
+have.
+
+Subject: [PATCH]: Resolve /var/lib/iwd before inotify
+
+l_dir_watch_new() in knownnetworks.c will not follow symlink.
+
+Quick hack to realname() resolve before adding the inotify.
+
+If not done, the known network list will misbehave. Forgotten
+networks will not be removed, and connected networks won't
+get added to the known network list.
+---
+ src/knownnetworks.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/knownnetworks.c b/src/knownnetworks.c
+index 487b7017..89c0efcc 100644
+--- a/src/knownnetworks.c
++++ b/src/knownnetworks.c
+@@ -1102,9 +1102,13 @@ static int known_networks_init(void)
+
+  closedir(dir);
+
+- storage_dir_watch =3D l_dir_watch_new(storage_dir,
++ // HAX: Resolve the storage_dir as l_dir_watch_new() won't follow symlinks
++ char *storage_dir_real =3D realpath(storage_dir, NULL);
++ storage_dir_watch =3D l_dir_watch_new(storage_dir_real,
+  known_networks_watch_cb, NULL,
+  known_networks_watch_destroy);
++ free(storage_dir_real);
++
+  watchlist_init(&known_network_watches, NULL);
+
+  return 0;
 -- =
 
-2.34.1
-
---===============2950980040928073480==--
+2.25.1
+--===============1295197758196291187==--
 
