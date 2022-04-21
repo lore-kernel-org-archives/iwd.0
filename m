@@ -1,68 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============3142410740692219326=="
+Content-Type: multipart/mixed; boundary="===============4370678538275197606=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v4 1/2] wiphy: update wiphy_radio_work_is_running to return int
-Date: Mon, 06 Dec 2021 12:17:25 -0800
-Message-ID: <20211206201726.1192621-1-prestwoj@gmail.com>
+Subject: Re: How to run separate iwd for every wifi dongle on the same host?
+Date: Thu, 21 Apr 2022 14:29:39 -0500
+Message-ID: <212175de-72bc-7278-280d-6682d19be617@gmail.com>
+In-Reply-To: 20220421125452.2318.30914@ml01.vlan13.01.org
 
---===============3142410740692219326==
+--===============4370678538275197606==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This differentiates between pending, running, and non-existent:
-false, true, -ENOENT respectively
----
- src/wiphy.c | 10 +++++-----
- src/wiphy.h |  2 +-
- 2 files changed, 6 insertions(+), 6 deletions(-)
+Hi,
 
-v4:
- * Changed to return true/false and -ENOENT rather than a zero success retu=
-rn
+On 4/21/22 07:54, zlinuxboy(a)outlook.com wrote:
+> could you elaborate more details about how to create private dbus and sta=
+rt iwd instance to attach these dbus?
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index bb1f9824..56400ea8 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -2013,14 +2013,14 @@ void wiphy_radio_work_done(struct wiphy *wiphy, uin=
-t32_t id)
- 		wiphy_radio_work_next(wiphy);
- }
- =
+You can take a look at the ell dbus unit test, to get the general idea:
 
--bool wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id)
-+int wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id)
- {
--	struct wiphy_radio_work_item *item =3D l_queue_peek_head(wiphy->work);
--
-+	struct wiphy_radio_work_item *item =3D l_queue_find(wiphy->work, match_id,
-+							L_UINT_TO_PTR(id));
- 	if (!item)
--		return false;
-+		return -ENOENT;
- =
+https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/unit/test-dbus.c
 
--	return item->id =3D=3D id;
-+	return item =3D=3D l_queue_peek_head(wiphy->work) ? 1 : 0;
- }
- =
+Also look at iwd's test-runner, it does something similar as well.
 
- static int wiphy_init(void)
-diff --git a/src/wiphy.h b/src/wiphy.h
-index 9f0d6d07..592eba70 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -130,4 +130,4 @@ uint32_t wiphy_radio_work_insert(struct wiphy *wiphy,
- 				int priority,
- 				const struct wiphy_radio_work_item_ops *ops);
- void wiphy_radio_work_done(struct wiphy *wiphy, uint32_t id);
--bool wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id);
-+int wiphy_radio_work_is_running(struct wiphy *wiphy, uint32_t id);
--- =
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/tools/utils.py=
+#n266
 
-2.31.1
+Basically you need to:
 
---===============3142410740692219326==--
+1. Start a private dbus-daemon instance at a private address.
+2. Point iwd to this dbus-daemon instance by setting the DBUS_SYSTEM_BUS_AD=
+DRESS =
+
+environment variable prior to starting iwd.
+3. Override iwd's STATE_DIRECTORY or CONFIGURATION_DIRECTORY as needed by =
+
+setting the appropriate environment variables (see 'man 8 iwd').
+4. Each iwd instance would only be accessible via the private dbus daemon =
+
+instance.  So 'iwctl' or your own dbus client would need to use the private=
+ dbus =
+
+address(es) from step 1.
+
+Probably something else I'm not thinking of?  Hope this helps.
+
+Regards,
+-Denis
+--===============4370678538275197606==--
 
