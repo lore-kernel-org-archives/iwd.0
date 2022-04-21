@@ -1,63 +1,19 @@
-Content-Type: multipart/mixed; boundary="===============6582068670468394902=="
+Content-Type: multipart/mixed; boundary="===============9115545993604793907=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: zlinuxboy at outlook.com
 To: iwd at lists.01.org
-Subject: Re: [PATCH v3 02/10] dpp-util: add URI parsing
-Date: Wed, 16 Feb 2022 16:20:15 -0600
-Message-ID: <580b75e8-a75a-d6e1-8c68-d47de7005f5f@gmail.com>
-In-Reply-To: 912a107f64ac9178ac20bb5e1701dbaf95eeb083.camel@gmail.com
+Subject: Re: How to run separate iwd for every wifi dongle on the same host?
+Date: Thu, 21 Apr 2022 12:54:52 +0000
+Message-ID: <20220421125452.2318.30914@ml01.vlan13.01.org>
+In-Reply-To: 9bc2b923-ff45-52a3-270f-5ca8fa18daf6@gmail.com
 
---===============6582068670468394902==
+--===============9115545993604793907==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
-
-On 2/16/22 14:39, James Prestwood wrote:
-> Hi Denis,
-> =
-
-> <snip>
->>> + */
->>> +struct dpp_uri_info *dpp_parse_uri(const char *uri)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct dpp_uri_info *info;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *pos =3D uri;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *end =3D uri + st=
-rlen(uri) - 1;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int ret =3D 0;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (strncmp(pos, "DPP:", 4))
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0return NULL;
->>
->> strncmp?=C2=A0 If the string has already been validated to be a valid
->> string, then
->> strcmp is probably just fine.
-> =
-
-> Since we're only checking a substring of 'pos' (that the first 4
-> characters are DPP:) strncmp is needed.
-
-Ah yes, ignore that comment.
-
-Do note that l_str_has_prefix() exists, so that might be even nicer to use =
-here.
-
->>
->> Unclear here?
-> =
-
-> This one is tricky because l_base64_decode doesn't give back the number
-> of characters consumed... Maybe l_base64_decode should fail if the
-> bytes consumed !=3D length? I don't see any such checks in there.
-> =
-
-
-Yes, we probably should.
-
-Regards,
--Denis
---===============6582068670468394902==--
+could you elaborate more details about how to create private dbus and start=
+ iwd instance to attach these dbus?
+I am totally new on these field.Thanks in advanced.
+--===============9115545993604793907==--
 
