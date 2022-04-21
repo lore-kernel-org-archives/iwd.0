@@ -1,44 +1,28 @@
-Content-Type: multipart/mixed; boundary="===============1967053823183316344=="
+Content-Type: multipart/mixed; boundary="===============2870610977668159138=="
 MIME-Version: 1.0
-From: Jan Palus <jpalus at fastmail.com>
+From: zlinuxboy at outlook.com
 To: iwd at lists.01.org
-Subject: segfault after upgrade to iwd 1.22
-Date: Wed, 26 Jan 2022 17:42:03 +0100
-Message-ID: <20220126164203.dnqmd3kfcqbwthiv@pine.grzadka>
+Subject: How to run separate iwd for every wifi dongle on the same host?
+Date: Thu, 21 Apr 2022 01:40:34 +0000
+Message-ID: <20220421014034.2318.714@ml01.vlan13.01.org>
 
---===============1967053823183316344==
+--===============2870610977668159138==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-iwd on my raspberry pi zero started to crash after upgrade to iwd 1.22:
+I am trying to plug 3 wifi dongle into one SBC(odroid c2 running armbian 22=
+.01), wish to run separate iwd instance for each wifi dongle, in order to c=
+onnect different ssid and acquire dhcp ip address and assign to them.
 
-Program terminated with signal SIGSEGV, Segmentation fault.
-#0  0x000211c4 in netdev_connect_event (msg=3D<optimized out>, netdev=3D0x2=
-016940) at src/netdev.c:2915
-2915  if (is_offload(hs) && handshake_event(hs, HANDSHAKE_EVENT_SETTING_KEY=
-S))
-(gdb) bt
-#0  0x000211c4 in netdev_connect_event (msg=3D<optimized out>, netdev=3D0x2=
-016940) at src/netdev.c:2915
-#1  0x76f11220 in process_multicast (nlmsg=3D0x7e8acafc, group=3D<optimized=
- out>, genl=3D<optimized out>) at ell/genl.c:1029
-#2  received_data (io=3D<optimized out>, user_data=3D<optimized out>) at el=
-l/genl.c:1096
-#3  0x76f0da08 in io_callback (fd=3D<optimized out>, events=3D1, user_data=
-=3D0x200a560) at ell/io.c:120
-#4  0x76f0ca78 in l_main_iterate (timeout=3D<optimized out>) at ell/main.c:=
-478
-#5  0x76f0cb74 in l_main_run () at ell/main.c:525
-#6  l_main_run () at ell/main.c:507
-#7  0x76f0cdd4 in l_main_run_with_signal (callback=3Dcallback(a)entry=3D0x1=
-8c94 <signal_handler>, user_data=3Duser_data(a)entry=3D0x0)
-    at ell/main.c:647
-#8  0x00018178 in main (argc=3D<optimized out>, argv=3D<optimized out>) at =
-src/main.c:532
+I have successfully implement with systemd-networkd+vrf+iwd, assign three w=
+ifi dongle to different vrf. start iwd, all three wifi dongle could connect=
+ to the same ssid and get different ip with dhcp, including default route.
 
-I suppose hs being NULL is the reason.
-
-Disabling handshake offloading in brcmfmac fixes crash.
---===============1967053823183316344==--
+but when I assign different wifi dongle to the same ssid  with different ps=
+k(my ap is aerohive, support ppsk, everything user have a different private=
+ key. cisco, ruckus, aruba has such the same feature), iwd could not save t=
+he multiple config for the same ssid, because the same ssid share one confi=
+g. so any possible to run separate iwd for every wifi dongle?
+--===============2870610977668159138==--
 
