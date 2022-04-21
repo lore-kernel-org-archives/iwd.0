@@ -1,31 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============9221468453672721637=="
+Content-Type: multipart/mixed; boundary="===============4993958832782751608=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/2] auto-t: iwd.py: add wait argument to scan()
-Date: Thu, 10 Feb 2022 16:24:10 -0600
-Message-ID: <c008bdef-24ff-23a8-5d8d-61691ab13cac@gmail.com>
-In-Reply-To: 20220208173539.493712-1-prestwoj@gmail.com
+Subject: [PATCH] test-runner: mount testhome rather than assume location
+Date: Thu, 21 Apr 2022 16:30:52 -0700
+Message-ID: <20220421233052.3710361-1-prestwoj@gmail.com>
 
---===============9221468453672721637==
+--===============4993958832782751608==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Usually the test home directory is a git repo somewhere e.g. under
+/home. But if the home directory is located under /tmp this poses
+a problem since UML remounts /tmp. To handle both cases mount
+the home directory explicity.
+---
+ tools/runner.py | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 2/8/22 11:35, James Prestwood wrote:
-> Lets the test continue without waiting for the method return
-> ---
->   autotests/util/iwd.py | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> =
+diff --git a/tools/runner.py b/tools/runner.py
+index 7c177f1f..ac063c32 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -451,6 +451,9 @@ class QemuRunner(RunnerAbstract):
+ 	def prepare_environment(self):
+ 		mounts =3D [ MountInfo('debugfs', 'debugfs', '/sys/kernel/debug', '', 0)=
+ ]
+ =
 
++		mounts.append(MountInfo('hostfs', 'hostfs', self.args.testhome,
++					self.args.testhome, 0))
++
+ 		if self.args.log:
+ 			mounts.append(MountInfo('9p', 'logdir', self.args.log,
+ 					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240', 0))
+-- =
 
-Both applied, thanks.
+2.34.1
 
-Regards,
--Denis
-
---===============9221468453672721637==--
+--===============4993958832782751608==--
 
