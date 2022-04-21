@@ -1,65 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============7092496715501525508=="
+Content-Type: multipart/mixed; boundary="===============4565722063690593219=="
 MIME-Version: 1.0
-From: VAUTRIN Emmanuel (Canal Plus Prestataire) <Emmanuel.VAUTRIN at
- cpexterne.org>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] network: Hide hidden networks on passphrase error
-Date: Tue, 08 Mar 2022 10:59:56 +0000
-Message-ID: <
- <MRZP264MB1544C0BDFAF731AC2E61806693099@MRZP264MB1544.FRAP264.PROD.OUTLOOK.COM>>
-In-Reply-To: 20220308105408.226598-1-Emmanuel.VAUTRIN@cpexterne.org
+Subject: Re: How to run separate iwd for every wifi dongle on the same host?
+Date: Wed, 20 Apr 2022 20:57:56 -0500
+Message-ID: <9bc2b923-ff45-52a3-270f-5ca8fa18daf6@gmail.com>
+In-Reply-To: 20220421014034.2318.714@ml01.vlan13.01.org
 
---===============7092496715501525508==
+--===============4565722063690593219==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If a user connection fails on a freshly scanned psk hidden network,
-during passphrase request, it shall be removed from the network list.
-Otherwise, it would be possible to directly connect to that known
-network, which will appear as not hidden.
+Hi,
 
-Commit 06ca8e20a9b0 ("station: Hide forgotten hidden networks")
----
- src/network.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+On 4/20/22 20:40, zlinuxboy(a)outlook.com wrote:
+> I am trying to plug 3 wifi dongle into one SBC(odroid c2 running armbian =
+22.01), wish to run separate iwd instance for each wifi dongle, in order to=
+ connect different ssid and acquire dhcp ip address and assign to them.
+> =
 
-diff --git a/src/network.c b/src/network.c
-index d7f472be97d2..ef3df96bab42 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -1204,6 +1204,7 @@ static void passphrase_callback(enum agent_result res=
-ult,
- 	struct network *network =3D user_data;
- 	struct station *station =3D network->station;
- 	struct scan_bss *bss;
-+	bool was_hidden;
- =
+> I have successfully implement with systemd-networkd+vrf+iwd, assign three=
+ wifi dongle to different vrf. start iwd, all three wifi dongle could conne=
+ct to the same ssid and get different ip with dhcp, including default route.
 
- 	l_debug("result %d", result);
- =
+vrf?
 
-@@ -1242,6 +1243,13 @@ static void passphrase_callback(enum agent_result re=
-sult,
- 	return;
- =
+> =
 
- err:
-+	if (!network->settings || !l_settings_get_bool(network->settings,
-+						NET_HIDDEN, &was_hidden))
-+		was_hidden =3D false;
-+
-+	if (was_hidden)
-+		station_hide_network(station, network);
-+
- 	network_settings_close(network);
- }
- =
+> but when I assign different wifi dongle to the same ssid  with different =
+psk(my ap is aerohive, support ppsk, everything user have a different priva=
+te key. cisco, ruckus, aruba has such the same feature), iwd could not save=
+ the multiple config for the same ssid, because the same ssid share one con=
+fig. so any possible to run separate iwd for every wifi dongle?
 
--- =
+I don't think you'd be able to accomplish this easily with iwd as of today.=
+  You =
 
-2.25.1
+can try running a private system bus (dbus) for each iwd instance and using=
+ phy =
 
+filtering (see 'iwd --help') so that each iwd instance only manages the =
 
---===============7092496715501525508==--
+particular phy you want.  Or use namespaces.  But you'd need to access each=
+ iwd =
+
+instance via its private bus/namespace separately.  You'd also need to over=
+ride =
+
+the state directory for each iwd instance.
+
+Also, iwd isn't aware of SAE password identities (I assume this is what you=
+ mean =
+
+by PPSK).  Or is this something else?
+
+Anyhow, you'd probably need to add some intelligence into iwd for it to use =
+
+multiple PSKs on the same SSID properly within the same iwd instance.
+
+Regards,
+-Denis
+--===============4565722063690593219==--
 
