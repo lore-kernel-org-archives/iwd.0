@@ -1,92 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============2886067548985479694=="
+Content-Type: multipart/mixed; boundary="===============2986416010024886125=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v4 06/10] dpp: add DPP authentication protocol
-Date: Thu, 16 Dec 2021 14:42:50 -0600
-Message-ID: <0ddc36ad-487d-e3c0-e743-2f32b53d9492@gmail.com>
-In-Reply-To: 20211216180854.39470-6-prestwoj@gmail.com
+Subject: [PATCH] test-runner: remove root user requirement from
+ log/monitor/result
+Date: Thu, 21 Apr 2022 16:10:36 -0700
+Message-ID: <20220421231036.3564215-1-prestwoj@gmail.com>
 
---===============2886067548985479694==
+--===============2986416010024886125==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 12/16/21 12:08, James Prestwood wrote:
-> This implements the DPP protocol used to authenticate to a
-> DPP configurator.
-> =
+Certain aspects of QEMU like mounting host directories may still require
+root access but for UML this is not the case. To handle both cases first
+check if SUDO_UID/GID are set and use those to obtain the actual users
+ID's. Otherwise if running as non-root use the UID/GID of the user
+directly.
+---
+ tools/runner.py | 18 ++----------------
+ 1 file changed, 2 insertions(+), 16 deletions(-)
 
-> Note this is not a full implementation of the protocol and
-> there are a few missing features which will be added as
-> needed:
-> =
+diff --git a/tools/runner.py b/tools/runner.py
+index 1739b786..7c177f1f 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -305,18 +305,12 @@ class RunnerAbstract:
+ =
 
->   - Mutual authentication (needed for BLE bootstrapping)
->   - Configurator support
->   - Initiator role
-> ---
->   src/dpp.c | 571 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 571 insertions(+)
-> =
+ 	# For QEMU/UML --log, --monitor, --result
+ 	def _prepare_outfiles(self):
+-		gid =3D None
+ 		append_gid_uid =3D False
+ =
 
+-		if os.environ.get('SUDO_GID', None):
+-			uid =3D int(os.environ['SUDO_UID'])
+-			gid =3D int(os.environ['SUDO_GID'])
++		uid =3D int(os.environ.get('SUDO_UID', os.getuid()))
++		gid =3D int(os.environ.get('SUDO_GID', os.getgid()))
+ =
 
-<snip>
+ 		if self.args.log:
+-			if os.getuid() !=3D 0:
+-				print("--log can only be used as root user")
+-				quit()
+-
+ 			append_gid_uid =3D True
+ =
 
-> @@ -143,6 +179,34 @@ static void dpp_send_frame(uint64_t wdev_id, struct =
-iovec *iov, size_t iov_len,
->   		l_error("Could not send CMD_FRAME");
->   }
->   =
+ 			if not os.path.exists(self.args.log):
+@@ -326,20 +320,12 @@ class RunnerAbstract:
+ 				os.chown(self.args.log, uid, gid)
+ =
 
-> +static uint8_t *dpp_unwrap_attr(enum dpp_frame_type type, const void *st=
-art,
-> +				const void *key, size_t key_len,
-> +				const uint8_t *wrapped, size_t wrapped_len,
-> +				size_t *unwrapped_len)
-> +{
-> +	uint8_t ad0[] =3D { 0x50, 0x6f, 0x9a, 0x1a, 0x01, type };
-> +	struct iovec ad[2];
-> +	uint8_t *unwrapped;
-> +
-> +	ad[0].iov_base =3D ad0;
-> +	ad[0].iov_len =3D sizeof(ad0);
-> +
-> +	ad[1].iov_base =3D (void *)start;
-> +	ad[1].iov_len =3D ((wrapped - 4) - ((const uint8_t *)start));
+ 		if self.args.monitor:
+-			if os.getuid() !=3D 0:
+-				print("--monitor can only be used as root user")
+-				quit()
+-
+ 			append_gid_uid =3D True
+ =
 
-Ok, but I think you may need a comment about this referencing the spec =
+ 			self.args.monitor_parent =3D os.path.abspath(
+ 						os.path.join(self.args.monitor, os.pardir))
+ =
 
-explaining the AD data setup being used.
+ 		if self.args.result:
+-			if os.getuid() !=3D 0:
+-				print("--result can only be used as root user")
+-				quit()
+-
+ 			append_gid_uid =3D True
+ =
 
-Also, why do you have 'wrapped' as a const uint8_t * and 'start' as a const=
- void =
+ 			self.args.result_parent =3D os.path.abspath(
+-- =
 
-*?  Might be easier to make them both const void * and avoid this cast.
+2.34.1
 
-> +
-> +	unwrapped =3D l_malloc(wrapped_len - 16);
-> +
-> +	if (!aes_siv_decrypt(key, key_len, wrapped, wrapped_len, ad, 2,
-> +				unwrapped)) {
-> +		l_free(unwrapped);
-> +		return NULL;
-> +	}
-> +
-> +	*unwrapped_len =3D wrapped_len - 16;
-> +
-> +	return unwrapped;
-> +}
-> +
->   static size_t dpp_append_attr(uint8_t *to, enum dpp_attribute_type type,
->   				void *attr, size_t attr_len)
->   {
-
-Do you want to split out the protocol parsers / builders from dpp.c into =
-
-dpp-util or another file so they can be unit tested separately?
-
-Regards,
--Denis
---===============2886067548985479694==--
+--===============2986416010024886125==--
 
