@@ -1,49 +1,123 @@
-Content-Type: multipart/mixed; boundary="===============8765437982566448937=="
+Content-Type: multipart/mixed; boundary="===============7630650551944150524=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v6 9/9] doc: document DPP ConfigureEnrollee()
-Date: Tue, 22 Feb 2022 14:02:32 -0800
-Message-ID: <20220222220232.2475972-9-prestwoj@gmail.com>
-In-Reply-To: 20220222220232.2475972-1-prestwoj@gmail.com
+Subject: Re: iwd stuck 'connecting', out-of-order wiphy work queue?
+Date: Thu, 28 Apr 2022 11:28:12 -0500
+Message-ID: <413080da-4833-fcfd-f745-abbd618b5947@gmail.com>
+In-Reply-To: 20220427151322.nfxuelvtdwc73oah@bang-olufsen.dk
 
---===============8765437982566448937==
+--===============7630650551944150524==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- doc/device-provisioning-api.txt | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Hi Alvin,
 
-diff --git a/doc/device-provisioning-api.txt b/doc/device-provisioning-api.=
-txt
-index bf54c5fe..529aeeb0 100644
---- a/doc/device-provisioning-api.txt
-+++ b/doc/device-provisioning-api.txt
-@@ -37,3 +37,19 @@ Methods		string StartEnrollee()
- 						net.connman.iwd.NotConfigured
- 						net.connman.iwd.NotSupported
- 						net.connman.iwd.Busy
-+
-+		string ConfigureEnrollee(string uri)
-+
-+			Start a DPP configurator with an enrollees URI.
-+			Ultimately the configuration itself remains the same as
-+			StartConfigurator(). This API is to handle the use case
-+			where the enrollee has shared its URI to IWD.
-+
-+			The URI for IWD is also returned which could be used
-+			in the same way as it is with StartConfigurator().
-+
-+			Possible errors:	net.connman.iwd.NotAvailable
-+						net.connman.iwd.NotConnected
-+						net.connman.iwd.NotConfigured
-+						net.connman.iwd.NotSupported
-+						net.connman.iwd.Busy
--- =
+On 4/27/22 10:13, Alvin =C5=A0ipraga wrote:
+> Hi,
+> =
 
-2.34.1
 
---===============8765437982566448937==--
+This somehow went into spam?  Not sure why.  Gmail is doing very strange th=
+ings =
+
+lately.
+
+> While running some automated tests for our product, I managed to make iwd=
+ get
+> stuck in 'connecting' state. I haven't cracked open gdb just yet, but I w=
+ould
+> like to report my findings here in case somebody can give me some pointer=
+s as I
+> continue looking into it tomorrow.
+> =
+
+> The automated test essentially does some scans and requests iwd to connec=
+t to a
+> particular network. The network is not known, as iwd's saved data is eras=
+ed at
+> the start of the test sequence. I invoke instances of iwctl to run the sc=
+ans and
+> request the connection.
+> =
+
+
+Fun stuff, have you looked at our auto-test framework? :)  There is now sup=
+port =
+
+for User-Mode-Linux (UML) so tests run really fast.
+
+> The bug: sometimes the connect request will get stuck and iwd will stay in
+> 'connecting' state until I issue a disconnect.
+> =
+
+> Looking closely at the logs, and also with iwmon, I noticed that no conne=
+ct
+> command is actually sent over netlink to the kernel. So iwd is getting st=
+uck
+> before then.
+> =
+
+> Moreover, it seems like it might be getting stuck because the wiphy work =
+queue
+> goes out-of-order somehow? Check this snippet from the logs:
+>
+
+Yes, the work queue has a concept of priority.  So things like connect is =
+
+prioritized over scans.  Periodic scans are lowest priority.
+
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() Starting work item 1
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_done() Work item 1 done
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 2
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() Starting work item 2
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 3
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_done() Work item 2 done
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() Starting work item 3
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 4
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 5
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_done() Work item 3 done
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() Starting work item 5 <---=
+ 5 is started...
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_done() Work item 4 done     <---=
+ 4 is done?!
+> ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert() Inserting work item 6
+> =
+
+
+Hence why you're seeing this.  What happens is that you have a scan that wa=
+s =
+
+triggered over dbus using iwctl.  The fun part about this scan is that we b=
+reak =
+
+it up into several scans each operating on a subset of the supported =
+
+frequencies.  We run I think 2 out of 3 scans at which point the 'periodic =
+scan' =
+
+is also triggered.  Since the 'dbus scan' is higher priority, it is started =
+
+prior to the 'periodic scan'.  Somehow the logic gets confused here.
+
+> A brief look at the code and I can't really understand how work item 4 co=
+uld be
+> done when it was never started. Moreover, work item 5 gets started, but i=
+s never
+> done. Meanwhile, work item 6 (which I suspect to be the connect command) =
+never
+> starts.
+> =
+
+> I've attached the logs, so any hints are very welcome. This is with iwd v=
+1.26.
+> =
+
+
+Let me look at your suggested patch.
+
+Regards,
+-Denis
+--===============7630650551944150524==--
 
