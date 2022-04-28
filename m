@@ -1,75 +1,108 @@
-Content-Type: multipart/mixed; boundary="===============1012863065839379174=="
+Content-Type: multipart/mixed; boundary="===============7000006942507980818=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 6/6] auto-t: add oper class/band tests for OWE transition
-Date: Wed, 22 Sep 2021 11:26:55 -0700
-Message-ID: <20210922182655.46220-6-prestwoj@gmail.com>
-In-Reply-To: 20210922182655.46220-1-prestwoj@gmail.com
+Subject: Re: WiFi interface stuck in 'Powered off' (link down) mode after
+ suspend
+Date: Thu, 28 Apr 2022 11:06:46 -0500
+Message-ID: <fad755c3-372c-8aba-9850-f5876ae0a1fc@gmail.com>
+In-Reply-To: 871qxkkeqb.fsf@toke.dk
 
---===============1012863065839379174==
+--===============7000006942507980818==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- .../testOWE-transition/connection_test.py     | 26 +++++++++++++++++++
- 1 file changed, 26 insertions(+)
+Hi Toke,
 
-diff --git a/autotests/testOWE-transition/connection_test.py b/autotests/te=
-stOWE-transition/connection_test.py
-index 7240e3a8..9555766e 100644
---- a/autotests/testOWE-transition/connection_test.py
-+++ b/autotests/testOWE-transition/connection_test.py
-@@ -196,6 +196,30 @@ class Test(unittest.TestCase):
-         with self.assertRaises(iwd.NotFoundEx):
-             self.validate(self.wd, self.hapd_owe, connect_hidden=3DTrue)
- =
+On 4/25/22 16:58, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> Hi everyone
+> =
 
-+    def test_owe_transition_band_info(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd17506f9a1c02000000f=
-1000a6f77652d68696464656e5103')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.set_value('channel', '3')
-+        self.hapd_owe.reload()
-+
-+        self.hapd_owe2.disable()
-+        self.hapd_open2.disable()
-+
-+        self.validate(self.wd, self.hapd_owe)
-+
-+    def test_owe_transition_wrong_band_info(self):
-+        self.hapd_open.set_value('vendor_elements', 'dd17506f9a1c02000000f=
-1000a6f77652d68696464656e5102')
-+        self.hapd_open.reload()
-+        self.hapd_owe.set_value('vendor_elements', 'dd15506f9a1c02000000f0=
-000a7472616e736974696f6e')
-+        self.hapd_owe.set_value('channel', '3')
-+        self.hapd_owe.reload()
-+
-+        self.hapd_owe2.disable()
-+        self.hapd_open2.disable()
-+
-+        self.validate(self.wd, self.hapd_open)
-+
-     def setUp(self):
-         self.wd =3D IWD(True)
-         self.hapd_owe =3D HostapdCLI(config=3D'ssidOWE.conf')
-@@ -206,6 +230,8 @@ class Test(unittest.TestCase):
-     def tearDown(self):
-         IWD.clear_storage()
- =
 
-+        self.hapd_owe.set_value('channel', '1')
-+
-         self.wd =3D None
-         self.hapd_open =3D None
-         self.hapd_owe =3D None
--- =
+This message somehow went into spam, so only seeing this now.
 
-2.31.1
+> I am encountering a strange problem with my WiFi not coming back after a
+> suspend. Specifically, after a suspend-resume cycle, iwd will report,
+> when issuing a 'station list' in iwctl:
+> =
 
---===============1012863065839379174==--
+>    No devices in Station mode available.
+> =
+
+> But when issuing a 'device list' it shows up:
+> =
+
+>    wlan0               7a:e2:f0:31:a5:ae   off        phy0      station
+> =
+
+> which is a bit confusing, IMO. Issuing a 'device wlan0 show' gets me:
+
+iwctl just shows the available 'Station' interfaces.  iwd removes the stati=
+on =
+
+interfaces when the device is powered off (there's nothing to show).  'devi=
+ce =
+
+list' shows the Device interfaces which correspond to the actual netdev.  T=
+hat =
+
+is why you're seeing wlan0 in 'device list' but not in 'station list'
+
+> =
+
+>              Name                wlan0
+>              Mode                station
+>              Powered             off
+>              Address             7a:e2:f0:31:a5:ae
+>              Adapter             phy0
+> =
+
+> And issuing a 'device wlan0 set-property Powered on' restores the device
+> to working order and reconnects.
+
+iwd doesn't do anything on suspend, it isn't even aware of suspend.  This l=
+ooks =
+
+like a kernel bug to me? Is the driver crashing by any chance?
+
+> =
+
+> I went looking in the iwd source code, and it looks like that 'Powered'
+> in iwd lingo translates to 'link up' in the kernel, right? Indeed,
+> issuing an 'ip link up' on the wlan device after coming back from
+> suspend is enough to get me back online.
+
+Device.Powered means IFF_UP, yes.  But as I said above, this shouldn't be =
+
+necessary if the kernel driver is doing the right thing...
+
+> =
+
+> I'm honestly not really sure if this is a bug in the kernel, or in iwd.
+> I mean, it seems like iwd should be able to just set 'link up' and
+> continue on its merry way (and indeed if I restart iwd entirely it will
+> do this). But am also fairly sure it used to work on previous kernels,
+> so maybe the kernel behaviour changed? (I have not had a chance to test
+> this as bisecting is a bit cumbersome on my daily driver laptop; so
+> figured I'd ask y'all's opinion first).
+> =
+
+> This happens on a 5.17 kernel with an Intel AX201 device (using the
+> iwlwifi) driver.
+> =
+
+> Hoping someone can help me get this fixed, whether that be by fixing iwd
+> or telling me to go bisect the kernel :)
+> =
+
+
+There have been no iwd changes in this area in quite some time, so if the k=
+ernel =
+
+is the only thing that changed, then I would look there.
+
+Regards,
+-Denis
+--===============7000006942507980818==--
 
