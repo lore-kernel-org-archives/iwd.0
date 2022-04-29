@@ -1,380 +1,110 @@
-Content-Type: multipart/mixed; boundary="===============5048862662893874788=="
+Content-Type: multipart/mixed; boundary="===============7181740395571328339=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v6 3/5] station: handle OWE Transition procedure
-Date: Fri, 17 Sep 2021 14:36:20 -0700
-Message-ID: <20210917213622.21881-3-prestwoj@gmail.com>
-In-Reply-To: 20210917213622.21881-1-prestwoj@gmail.com
+Subject: [PATCH] scan: Sort scan_requests by wiphy work item priority
+Date: Fri, 29 Apr 2022 09:37:50 -0500
+Message-ID: <20220429143750.6364-1-denkenz@gmail.com>
 
---===============5048862662893874788==
+--===============7181740395571328339==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-OWE Transition is described in the WiFi Alliance OWE Specification
-version 1.1. The idea behind it is to support both legacy devices
-without any concept of OWE as well as modern ones which support the
-OWE protocol.
+Periodic scan requests are meant to be performed with a lower priority
+than normal scan requests.  They're thus given a different priority when
+inserting them into the wiphy work queue.  Unfortunately, the priority
+is not taken into account when they are inserted into the
+sr->requests queue.  This can result in the scanning code being confused
+since it assumes the top of the queue is always the next scheduled or
+currently ongoing scan.  As a result any further wiphy_work might never be
+started properly.
 
-OWE is a somewhat special type of network. Where it advertises an
-RSN element but is still "open". This apparently confuses older
-devices so the OWE transition procedure was created.
+Apr 27 16:34:40 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert(=
+) Inserting work item 3
+Apr 27 16:34:40 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() =
+Starting work item 3
+Apr 27 16:34:40 iwd[5117]: ../iwd-1.26/src/scan.c:scan_periodic_timeout() 1
+Apr 27 16:34:40 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert(=
+) Inserting work item 4
+Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_insert(=
+) Inserting work item 5
+Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_done() =
+Work item 3 done
+Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/wiphy.c:wiphy_radio_work_next() =
+Starting work item 5
+Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/scan.c:scan_notify() Scan notifi=
+cation Trigger Scan(33)
+Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/scan.c:scan_request_triggered() =
+Passive scan triggered for wdev 1
+Apr 27 16:34:43 iwd[5117]: ../iwd-1.26/src/scan.c:scan_periodic_triggered()=
+ Periodic scan triggered for wdev 1
 
-The idea is simple: have two BSS's, one open, and one as a hidden
-OWE network. Each network advertises a vendor IE which points to the
-other. A device sees the open network and can connect (legacy) or
-parse the IE, scan for the hidden OWE network, and connect to that
-instead.
+In the above log, scan request 5 (triggered by dbus) is started before
+scan request 4 (periodic scan).  Yet the scanning code thinks scan
+request 4 was triggered.
 
-Care was taken to handle connections to hidden networks directly.
-The policy is being set that any hidden network with the WFA OWE IE
-is not connectable via ConnectHiddenNetwork(). These networks are
-special, and can only be connected to via the network object for
-the paired open network.
+Fix this by using the wiphy_work priority to sort the sr->requests queue
+so that the scans are ordered in the same manner.
 
-When scan results come in from any source (DBus, quick, autoconnect)
-each BSS is checked for the OWE Transition IE. A few paths can be
-taken here when the IE is found:
-
-1. The BSS is open. The BSSID in the IE is checked against the
-   current scan results (excluding hidden networks). If a match is
-   found we should already have the hidden OWE BSS and nothing
-   else needs to be done (3).
-
-2. The BSS is open. The BSSID in the IE is not found in the
-   current scan results, and the open network also has no OWE BSS
-   in it. This will be processed after scan results.
-
-3. The BSS is not open and contains the OWE IE. This BSS will
-   automatically get added to the network object and nothing else
-   needs to be done.
-
-After the scan results each network is checked for any non-paired
-open BSS's. If found a scan is started for these BSS's per-network.
-Once these scan results come in the network is notified.
-
->From here network.c can detect that this is an OWE transition
-network and connect to the OWE BSS rather than the open one.
+Reported-by: Alvin =C5=A0ipraga <ALSI(a)bang-olufsen.dk>
 ---
- src/station.c | 226 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 226 insertions(+)
+ src/scan.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-v6:
- * Process each network after all the scan results
-
-diff --git a/src/station.c b/src/station.c
-index e9bc7e65..5676a251 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -87,6 +87,7 @@ struct station {
- 	uint32_t dbus_scan_id;
- 	uint32_t quick_scan_id;
- 	uint32_t hidden_network_scan_id;
-+	struct l_queue *owe_hidden_scan_ids;
- =
-
- 	/* Roaming related members */
- 	struct timespec roam_min_time;
-@@ -254,6 +255,9 @@ static void station_autoconnect_start(struct station *s=
-tation)
- 	if (!l_queue_isempty(station->anqp_pending))
- 		return;
- =
-
-+	if (station->owe_hidden_scan_ids)
-+		return;
-+
- 	if (L_WARN_ON(station->autoconnect_list))
- 		l_queue_destroy(station->autoconnect_list, NULL);
- =
-
-@@ -395,6 +399,44 @@ static struct network *station_add_seen_bss(struct sta=
-tion *station,
- 	if (station_parse_bss_security(station, bss, &security) < 0)
- 		return NULL;
- =
-
-+	/* Hidden OWE transition network */
-+	if (security =3D=3D SECURITY_NONE && bss->rsne &&
-+					!l_memeqzero(bss->owe_trans_bssid, 6)) {
-+		/*
-+		 * WiFi Alliance OWE Specification v1.1 - Section 2.2.1:
-+		 *
-+		 * "2. An OWE AP shall use two different SSIDs, one for OWE
-+		 *     and one for Open"
-+		 *
-+		 * "4. The OWE BSS shall include the OWE Transition Mode element
-+		 *     in all Beacon and Probe Response frames to encapsulate
-+		 *     the BSSID and SSID of the Open BSS"
-+		 *
-+		 * Meaning the hidden SSID should not match the SSID in the
-+		 * hidden network's OWE IE. Might as well restrict BSSID as well
-+		 * to be safe.
-+		 *
-+		 * In addition this SSID must be a valid utf8 string otherwise
-+		 * we could not look up the network. Note that this is not true
-+		 * for the open BSS IE, it can be non-utf8.
-+		 */
-+		if (!util_ssid_is_utf8(bss->owe_trans_ssid_len,
-+					bss->owe_trans_ssid))
-+			return NULL;
-+
-+		if (!memcmp(bss->owe_trans_ssid, bss->ssid, bss->ssid_len))
-+			return NULL;
-+
-+		if (!memcmp(bss->owe_trans_bssid, bss->addr, 6))
-+			return NULL;
-+
-+		memcpy(ssid, bss->owe_trans_ssid, sizeof(bss->owe_trans_ssid));
-+		ssid[bss->owe_trans_ssid_len] =3D '\0';
-+
-+		l_debug("Found hidden OWE network, using %s for network lookup",
-+				ssid);
-+	}
-+
- 	path =3D iwd_network_get_path(station, ssid, security);
- =
-
- 	network =3D l_hashmap_lookup(station->networks, path);
-@@ -645,6 +687,174 @@ static bool station_start_anqp(struct station *statio=
-n, struct network *network,
- 	return true;
+diff --git a/src/scan.c b/src/scan.c
+index b0824e72ebaf..dd4fca531b36 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -611,6 +611,17 @@ static struct scan_request *scan_request_new(struct sc=
+an_context *sc,
+ 	return sr;
  }
  =
 
-+/*
-+ * Check if this is an Open/Hidden pair:
-+ *
-+ * Open SSID equals the SSID in OWE IE
-+ * Open BSSID equals the BSSID in OWE IE
-+ *
-+ * OWE SSID equals the SSID in Open IE
-+ * OWE BSSID equals the BSSID in Open IE
-+ */
-+#define OPEN_OWE_PAIR(open, owe) \
-+( \
-+	(open)->ssid_len =3D=3D (owe)->owe_trans_ssid_len && \
-+	(open)->owe_trans_ssid_len =3D=3D (owe)->ssid_len && \
-+	!memcmp((open)->ssid, (owe)->owe_trans_ssid, (open)->ssid_len) && \
-+	!memcmp((open)->owe_trans_ssid, (owe)->ssid, (owe)->ssid_len) && \
-+	!memcmp((open)->addr, (owe)->owe_trans_bssid, 6) && \
-+	!memcmp((open)->owe_trans_bssid, (owe)->addr, 6) \
-+)
-+
-+static bool network_has_open_pair(struct network *network, struct scan_bss=
- *owe)
++static int insert_by_priority(const void *a, const void *b, void *user_dat=
+a)
 +{
-+	const struct l_queue_entry *entry;
++	const struct scan_request *new =3D a;
++	const struct scan_request *cur =3D b;
 +
-+	for (entry =3D network_bss_list_get_entries(network); entry;
-+				entry =3D entry->next) {
-+		struct scan_bss *open =3D entry->data;
++	if (cur->work.priority <=3D new->work.priority)
++		return 1;
 +
-+		if (OPEN_OWE_PAIR(open, owe))
-+			return true;
-+	}
-+
-+	return false;
++	return -1;
 +}
 +
-+static bool station_owe_transition_results(int err, struct l_queue *bss_li=
-st,
-+					const struct scan_freq_set *freqs,
-+					void *userdata)
-+{
-+	struct network *network =3D userdata;
-+	struct station *station =3D network_get_station(network);
-+	struct scan_bss *bss;
-+
-+	station_property_set_scanning(station, false);
-+
-+	if (err)
-+		return err =3D=3D 0;
-+
-+	while ((bss =3D l_queue_pop_head(bss_list))) {
-+		/*
-+		 * Don't handle the open BSS, hidden BSS, BSS with no OWE
-+		 * Transition IE, or an IE with a non-utf8 SSID
-+		 */
-+		if (!bss->rsne || l_memeqzero(bss->owe_trans_bssid, 6) ||
-+				util_ssid_is_hidden(bss->ssid_len, bss->ssid) ||
-+				!util_ssid_is_utf8(bss->owe_trans_ssid_len,
-+							bss->owe_trans_ssid))
-+			goto free;
-+
-+
-+		/* Check if we have an open BSS that matches */
-+		if (!network_has_open_pair(network, bss))
-+			goto free;
-+
-+		l_debug("Adding OWE transition network "MAC" to %s",
-+				MAC_STR(bss->addr), network_get_ssid(network));
-+
-+		l_queue_push_tail(station->bss_list, bss);
-+		network_bss_add(network, bss);
-+
-+		continue;
-+
-+free:
-+		scan_bss_free(bss);
-+	}
-+
-+	l_queue_destroy(bss_list, NULL);
-+
-+	return true;
-+}
-+
-+static void station_owe_transition_triggered(int err, void *user_data)
-+{
-+	struct network *network =3D user_data;
-+	struct station *station =3D network_get_station(network);
-+
-+	if (err < 0) {
-+		l_debug("OWE transition scan trigger failed: %i", err);
-+		return;
-+	}
-+
-+	l_debug("OWE transition scan triggered");
-+
-+	station_property_set_scanning(station, true);
-+}
-+
-+static void station_owe_transition_destroy(void *userdata)
-+{
-+	struct network *network =3D userdata;
-+	struct station *station =3D network_get_station(network);
-+
-+	l_queue_pop_head(station->owe_hidden_scan_ids);
-+
-+	if (l_queue_isempty(station->owe_hidden_scan_ids)) {
-+		l_queue_destroy(station->owe_hidden_scan_ids, NULL);
-+		station->owe_hidden_scan_ids =3D NULL;
-+	}
-+
-+	WATCHLIST_NOTIFY(&event_watches, station_event_watch_func_t,
-+				STATION_EVENT_OWE_HIDDEN_FINISHED, network);
-+
-+	station_autoconnect_start(station);
-+}
-+
-+static void foreach_add_owe_scan(struct network *network, void *data)
-+{
-+	struct station *station =3D data;
-+	const struct l_queue_entry *entry;
-+	struct l_queue *list =3D NULL;
-+	uint32_t id;
-+
-+	for (entry =3D network_bss_list_get_entries(network); entry;
-+				entry =3D entry->next) {
-+		struct scan_bss *open =3D entry->data;
-+
-+		if (l_memeqzero(open->owe_trans_bssid, 6))
-+			continue;
-+
-+		/* only want the open networks with WFA OWE IE */
-+		if (open->rsne)
-+			continue;
-+
-+		/* BSS already in network object */
-+		if (network_bss_find_by_addr(network, open->owe_trans_bssid))
-+			continue;
-+
-+		if (!list)
-+			list =3D l_queue_new();
-+
-+		l_queue_push_tail(list, open);
-+	}
-+
-+	if (!list)
-+		return;
-+
-+	id =3D scan_owe_hidden(netdev_get_wdev_id(station->netdev), list,
-+				station_owe_transition_triggered,
-+				station_owe_transition_results,
-+				network, station_owe_transition_destroy);
-+	if (!id)
-+		goto done;
-+
-+	if (!station->owe_hidden_scan_ids)
-+		station->owe_hidden_scan_ids =3D l_queue_new();
-+
-+	l_queue_push_tail(station->owe_hidden_scan_ids, L_UINT_TO_PTR(id));
-+
-+	WATCHLIST_NOTIFY(&event_watches, station_event_watch_func_t,
-+				STATION_EVENT_OWE_HIDDEN_STARTED, network);
-+
-+done:
-+	l_queue_destroy(list, NULL);
-+}
-+
-+static void station_process_owe_transition_networks(struct station *statio=
-n)
-+{
-+	station_network_foreach(station, foreach_add_owe_scan, station);
-+}
-+
- static bool bss_free_if_ssid_not_utf8(void *data, void *user_data)
- {
- 	struct scan_bss *bss =3D data;
-@@ -991,6 +1201,8 @@ static bool new_scan_results(int err, struct l_queue *=
-bss_list,
+ static uint32_t scan_common(uint64_t wdev_id, bool passive,
+ 				const struct scan_parameters *params,
+ 				int priority,
+@@ -630,7 +641,7 @@ static uint32_t scan_common(uint64_t wdev_id, bool pass=
+ive,
  =
 
- 	station_set_scan_results(station, bss_list, freqs, true);
+ 	scan_cmds_add(sr->cmds, sc, passive, params);
  =
 
-+	station_process_owe_transition_networks(station);
-+
- 	return true;
- }
+-	l_queue_push_tail(sc->requests, sr);
++	l_queue_insert(sc->requests, sr, insert_by_priority, NULL);
  =
 
-@@ -1061,6 +1273,8 @@ static bool station_quick_scan_results(int err, struc=
-t l_queue *bss_list,
+ 	return wiphy_radio_work_insert(sc->wiphy, &sr->work,
+ 					priority, &work_ops);
+@@ -801,7 +812,7 @@ uint32_t scan_owe_hidden(uint64_t wdev_id, struct l_que=
+ue *list,
+ 	}
  =
 
- 	station_set_scan_results(station, bss_list, freqs, true);
- =
-
-+	station_process_owe_transition_networks(station);
-+
  done:
- 	if (station->state =3D=3D STATION_STATE_AUTOCONNECT_QUICK)
- 		/*
-@@ -3155,6 +3369,8 @@ static void station_dbus_scan_done(struct station *st=
-ation,
- 	station->dbus_scan_id =3D 0;
- 	station_property_set_scanning(station, false);
+-	l_queue_push_tail(sc->requests, sr);
++	l_queue_insert(sc->requests, sr, insert_by_priority, NULL);
  =
 
-+	station_process_owe_transition_networks(station);
-+
- 	if (try_autoconnect) {
- 		station->autoconnect_can_start =3D true;
- 		station_autoconnect_start(station);
-@@ -3705,6 +3921,16 @@ static void station_free(struct station *station)
- 		scan_cancel(netdev_get_wdev_id(station->netdev),
- 				station->hidden_network_scan_id);
- =
-
-+	if (station->owe_hidden_scan_ids) {
-+		void *ptr;
-+
-+		while ((ptr =3D l_queue_pop_head(station->owe_hidden_scan_ids)))
-+			scan_cancel(netdev_get_wdev_id(station->netdev),
-+					L_PTR_TO_UINT(ptr));
-+
-+		l_queue_destroy(station->owe_hidden_scan_ids, NULL);
-+	}
-+
- 	station_roam_state_clear(station);
- =
-
- 	l_queue_destroy(station->networks_sorted, NULL);
+ 	return wiphy_radio_work_insert(sc->wiphy, &sr->work,
+ 					WIPHY_WORK_PRIORITY_SCAN, &work_ops);
 -- =
 
-2.31.1
+2.32.0
 
---===============5048862662893874788==--
+--===============7181740395571328339==--
 
