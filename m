@@ -1,48 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============0466650392044453776=="
+Content-Type: multipart/mixed; boundary="===============4135827054019123242=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 1/6] wiphy: define work priorities in one place
-Date: Tue, 11 Jan 2022 09:45:09 -0800
-Message-ID: <20220111174514.1074967-1-prestwoj@gmail.com>
+Subject: Re: denial-of-service vulnerability in 4-way handshake
+Date: Mon, 09 May 2022 13:50:56 -0500
+Message-ID: <6f30f047-0e8a-69cd-c9f1-a446080f82bb@gmail.com>
+In-Reply-To: 22F152D7-6A5D-4AEA-B2EB-D3C54462409F@northeastern.edu
 
---===============0466650392044453776==
+--===============4135827054019123242==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Work priority was never explicitly defined anywhere, and a module
-using wiphy_radio_work APIs needed to ensure it was not inserting
-at a priority that would interfere with other work.
+Hi Domien,
 
-Now all the types of work have been defined with their own priority
-and future priorities can easily be added before, after, or in
-between existing priorities.
----
- src/wiphy.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+On 5/6/22 09:00, Domien Schepers wrote:
+> We discovered a denial-of-service vulnerability that allows an adversary =
+to forcibly disconnect the IWD client from a protected Wi-Fi network even w=
+hen Wi-Fi Management Frame Protection (MFP) is being used. The problem is t=
+hat the reception
 
-diff --git a/src/wiphy.h b/src/wiphy.h
-index 592eba70..fee5d41f 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -45,6 +45,12 @@ struct wiphy_radio_work_item {
- 	const struct wiphy_radio_work_item_ops *ops;
- };
- =
+Looks like kernel/driver is letting through an unencrypted EAPOL Data frame=
+ even =
 
-+#define WIPHY_WORK_PRIORITY_FRAME		0
-+#define WIPHY_WORK_PRIORITY_OFFCHANNEL		0
-+#define WIPHY_WORK_PRIORITY_CONNECT		1
-+#define WIPHY_WORK_PRIORITY_SCAN		2
-+#define WIPHY_WORK_PRIORITY_PERIODIC_SCAN	3
-+
- enum wiphy_state_watch_event {
- 	WIPHY_STATE_WATCH_EVENT_POWERED,
- 	WIPHY_STATE_WATCH_EVENT_RFKILLED,
--- =
+when we're already set up encryption keys.  MFP won't really be of much hel=
+p here?
 
-2.31.1
+  of an unprotected and invalid handshake message 1/4 will cause the client=
+ to =
 
---===============0466650392044453776==--
+disconnect even when MFP is used, resulting in denial-of-service.
+> =
+
+
+<snip>
+
+> A potential solution is to discard the invalid handshake message instead =
+of disconnecting.
+
+Yes, this particular symptom could be fixed in this way.  802.11-2020 does =
+
+explicitly state in section 12.7.2 that "EAPOL-Key frames containing invali=
+d =
+
+field values shall be silently discarded."  So I think I'll send a patch th=
+at =
+
+does that.  But even then, we'd still be open to other forms of similar att=
+acks.
+
+The real fix is that we should not allow unencrypted EAPoL 1/4 packets (or =
+EAP =
+
+for that matter) to be processed once the keys have been set (with the cave=
+at =
+
+that there is special case of EAPoL 3/4 packets that are being retransmitte=
+d =
+
+during the initial handshake.)  Unfortunately, 802.11 never explicitly requ=
+ires =
+
+this that I can find.
+
+In theory the EAPOL over NL80211 transport does provide us with a hint that=
+ a =
+
+packet was received encrypted or unencrypted.  So we could try and drop any =
+
+unencrypted packets after the initial handshake is complete and the keys ha=
+ve =
+
+been set.  But I'm not sure whether this hint can be always trusted?  Also,=
+ the =
+
+legacy PAE raw socket transport also doesn't provide this information.
+
+Did you bring this up with the kernel wireless maintainers by any chance?
+
+Regards,
+-Denis
+--===============4135827054019123242==--
 
