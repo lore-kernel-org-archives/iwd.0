@@ -1,74 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============1686564341401593114=="
+Content-Type: multipart/mixed; boundary="===============3196655718216989996=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: segfault in parse_neighbor_report at src/station.c:1747
-Date: Wed, 06 Apr 2022 17:44:59 +0200
-Message-ID: <CAOq732LR9Lw3ED4DtgrpVfmZ3wvpn4O7NNCJdev+axia9aUiwg@mail.gmail.com>
-In-Reply-To: 1e259b78-1dc7-36c4-6c6f-8efe28ee1050@gmail.com
+Subject: Re: Connecting to 802.1X ethernet?
+Date: Wed, 11 May 2022 09:44:57 -0500
+Message-ID: <0f1c7c28-bc38-2b55-8e0f-3a1d4afb1f92@gmail.com>
+In-Reply-To: CAGTBY+uzUrPaTE7-46RQaKf1W_6Fab6eowrhknut0LC06F280w@mail.gmail.com
 
---===============1686564341401593114==
+--===============3196655718216989996==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Rhys,
 
-On Tue, 5 Apr 2022 at 20:32, Denis Kenzior <denkenz(a)gmail.com> wrote:
-> On 4/5/22 12:35, Leonard Lausen wrote:
-> > % iwctl station wlan0 show
-> > Station: wlan0
-> > -----------------------------------------------------------------------=
----------
-> > Settable Property Value
-> > -----------------------------------------------------------------------=
----------
-> > Scanning no
-> > State disconnected
-> >
->
-> interesting that you have 'wlan0' here, but 'wlp58s0' in your NM configur=
-ation.
->   I suspect NM isn't using iwd at all.
->
-> Anyway, this confirms iwd thinks it is not connected, which means that...
->
-> >> I'm confused why the AP is even sending this. Maybe the kernel crash y=
-ou reported is confusing
-> >> everything.
-> >
-> > The kernel crash should be unrelated. I rebooted and verified the iwctl=
- station
-> > wlan0 show output remains the same. I'm using NetworkManager with iwd b=
-ackend
-> > and NetworkManager does show me as connected. Maybe that is related?
-> >
->
-> NM probably starts up wpa_s to manage the connection.
->
-> > % sudo cat /etc/NetworkManager/conf.d/backend.conf
-> > [device]
-> > match-device=3Dwlp58s0
->
-> I'm not sure this directive is actually supported by the iwd backend.
+On 5/11/22 06:17, Rhys Perry wrote:
+> Hi,
+> =
 
-FTR this sounds right.  NM calls a "factory class" for each netdev on
-the system.  This looks up the backend for that specific device name
-("wlan0"), which would return empty and so fall back to
-wpa_supplicant.  It would auto-activate wpa_supplicant and not
-activate IWD.
+> My school uses PEAP-MSCHAPV2 8021X authentication for both it's
+> wireless and wired networks. I can successfully connect to the network
+> wirelessly using iwd, so all is good there.
+> =
 
-But, if IWD is started by NM for another device on the system, or like
-Leonard asserts is auto-activated by iwctl, IWD will try to manage all
-wifi devices by default and will be trying to run autoconnect on
-wlan0.
+> I was wondering if it is possible to also use iwd to connect to
+> ethernet (and possible handle dhcp too?). I have heard that ead might
 
-In theory "match-device=3D" could be used on a system with NM+IWD if IWD
-is configured to not manage the remaining devices, that would also
-prevent IWD from recreating the virtual interfaces (usually with a new
-name) and confusing NM's lookups by name.  But generally there's
-little point using "match-device=3D" with "wifi.backend=3D".
+Not with iwd, it only manages wireless interfaces.
 
-Best regards
---===============1686564341401593114==--
+> be able to help with that, but am not too sure about how to get that
+> working. I found the ead executable, but I'm not sure how exactly it
+> needs to be configured.
+
+Should be as simple as putting your .8021x file into ead's storage director=
+y as =
+
+'default.8021x'.  ead storage directory is usually /var/lib/ead, so =
+
+'/var/lib/ead/default.8021x'.  The settings file syntax is identical to iwd.
+
+Note that ead doesn't support dhcp just yet, so you will need to run an ext=
+ernal =
+
+dhcp client on the ethernet device.
+
+Once we finish some refactoring of ell's netconfig code we plan to teach ea=
+d to =
+
+manage dhcp/dhcpv6 as well.
+
+Hope this helps.
+
+Regards,
+-Denis
+--===============3196655718216989996==--
 
