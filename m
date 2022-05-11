@@ -1,67 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============7234639709380030774=="
+Content-Type: multipart/mixed; boundary="===============3218349416985505399=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Michael Johnson <mjohnson459 at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 7/9] json: add json_iter_get_container
-Date: Thu, 06 Jan 2022 11:50:05 -0800
-Message-ID: <20220106195007.528618-7-prestwoj@gmail.com>
-In-Reply-To: 20220106195007.528618-1-prestwoj@gmail.com
+Subject: Re: DHCP renewal stops after disconnect
+Date: Wed, 11 May 2022 19:13:13 +0100
+Message-ID: <CACsRnHVzueqtOTO1vu73F7JkF2iv46F_2_dgzExH-vrKx5F6Gw@mail.gmail.com>
+In-Reply-To: facd169d-1b0d-e1f2-7cb8-4e998593c69c@gmail.com
 
---===============7234639709380030774==
+--===============3218349416985505399==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows getting an iterator for a container nested inside
-an array.
----
- src/json.c | 14 ++++++++++++++
- src/json.h |  2 ++
- 2 files changed, 16 insertions(+)
+Hi Denis,
 
-diff --git a/src/json.c b/src/json.c
-index aec5fe5c..6e40629d 100644
---- a/src/json.c
-+++ b/src/json.c
-@@ -383,6 +383,20 @@ bool json_iter_get_null(struct json_iter *iter)
- 	return false;
- }
- =
+Thank you, I'll try it out.
 
-+bool json_iter_get_container(struct json_iter *iter,
-+				struct json_iter *container)
-+{
-+	struct json_contents *c =3D iter->contents;
-+	jsmntok_t *t =3D c->tokens + iter->current;
-+
-+	if (t->type !=3D JSMN_OBJECT && t->type !=3D JSMN_ARRAY)
-+		return false;
-+
-+	iter_recurse(iter, t, container);
-+
-+	return true;
-+}
-+
- enum json_type json_iter_get_type(struct json_iter *iter)
- {
- 	struct json_contents *c =3D iter->contents;
-diff --git a/src/json.h b/src/json.h
-index 458deb93..518d778c 100644
---- a/src/json.h
-+++ b/src/json.h
-@@ -93,6 +93,8 @@ bool json_iter_get_int(struct json_iter *iter, int *i);
- bool json_iter_get_uint(struct json_iter *iter, unsigned int *i);
- bool json_iter_get_boolean(struct json_iter *iter, bool *b);
- bool json_iter_get_null(struct json_iter *iter);
-+bool json_iter_get_container(struct json_iter *iter,
-+				struct json_iter *container);
- =
+One thing I was wondering is if some level of info logging would be
+possible for the dhcp client. This could be similar in verbosity to
+dhclient or networkd which would make it easier to see what happened
+with this kind of thing. DHCP happens on a relatively slow basis so it
+wouldn't spam much. I attempted to add this but I couldn't really find
+a good place for it.
 
- enum json_type json_iter_get_type(struct json_iter *iter);
- bool json_iter_next(struct json_iter *iter);
--- =
+Regards,
+Michael
 
-2.31.1
-
---===============7234639709380030774==--
+On Wed, 11 May 2022 at 18:32, Denis Kenzior <denkenz(a)gmail.com> wrote:
+>
+> Hi Michael,
+>
+>
+> > The lease should always be 2 hours if dhcpd is working correctly. The
+> > ones I've seen are always this value.
+> >
+>
+> Ok.
+>
+> > For this one I did have DHCP debug on. You seem to be right, it looks
+> > like we didn't renew until we timed out completely.
+> >
+>
+> That would seem to confirm my hunch.  I just sent out a patch to the ell =
+mailing
+> list and to you.  See if that one fixes this particular issue.
+>
+> Regards,
+> -Denis
+--===============3218349416985505399==--
 
