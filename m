@@ -1,41 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============4330349087415711161=="
+Content-Type: multipart/mixed; boundary="===============7560468248471776371=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Michael Johnson <mjohnson459 at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 3/3] test-runner: fix qemu warning for newer versions
-Date: Thu, 28 Oct 2021 10:34:10 -0700
-Message-ID: <20211028173410.86074-3-prestwoj@gmail.com>
-In-Reply-To: 20211028173410.86074-1-prestwoj@gmail.com
+Subject: DHCP renewal stops after disconnect
+Date: Wed, 11 May 2022 11:53:28 +0100
+Message-ID: <CACsRnHU00FE7T5XWf5Evc1m+DWMhmr0XDcfkY_Eor=YS04DKVQ@mail.gmail.com>
 
---===============4330349087415711161==
+--===============7560468248471776371==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-warning: short-form boolean option 'readonly' deprecated
-Please use readonly=3Don instead
----
- tools/test-runner | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hey,
 
-diff --git a/tools/test-runner b/tools/test-runner
-index a1f86c00..d62f8b51 100755
---- a/tools/test-runner
-+++ b/tools/test-runner
-@@ -1806,7 +1806,7 @@ class Main:
- 			'-display', 'none', '-m', '%dM' % ram, '-nographic', '-vga',
- 			'none', '-no-acpi', '-no-hpet',
- 			'-no-reboot', '-fsdev',
--			'local,id=3Dfsdev-root,path=3D/,readonly,security_model=3Dnone,multidev=
-s=3Dremap',
-+			'local,id=3Dfsdev-root,path=3D/,readonly=3Don,security_model=3Dnone,mul=
-tidevs=3Dremap',
- 			'-device',
- 			'virtio-9p-pci,fsdev=3Dfsdev-root,mount_tag=3D/dev/root',
- 			'-chardev', 'stdio,id=3Dchardev-serial0,signal=3Doff',
--- =
+I'm encountering a couple of issues with the DHCP client in iwd
+specifically when the network environment is flaky.
 
-2.31.1
+The major issue I have is when the iwd client is disconnected either
+from a channel change or just a low signal. The DHCP client gets a new
+lease when it connects but never asks for a lease renewal which
+eventually means it loses it after the expiration. This paste shows
+the logs of this happening https://pastebin.com/yGJbUmVR  (I have
+enabled IWD_DHCP_DEBUG=3D1 to get more data but I am still waiting for
+it to happen again).
 
---===============4330349087415711161==--
+My plan is to see if I can reproduce the issue on a smaller scale (we
+have ~130 clients running and it happens maybe twice a day) and once I
+can reproduce I will update iwd and ell to see if that fixes it (I'm
+using version 1.21 iwd and 0.47 ell). I looked through the new commits
+since my versions and there was nothing explicitly about this but
+c78ad1bb and b02c2034 look possibly related?
+
+For now, I wonder if you know of an obvious place that a disconnect
+might not be cleaning up the DHCP state fully which causes the T1
+timer not to be set?
+
+
+As for the second minor issue, it seems like iwd doesn't retry sending
+a DHCPREQUEST once it's passed the T1 timer and in the RENEW state
+which I believe it should based on
+http://www.tcpipguide.com/free/t_DHCPLeaseRenewalandRebindingProcesses-2.ht=
+m.
+I have seen the first request being lost due to a bad signal and then
+iwd didn't try again until T2 which is a more complete renewal. This
+doesn't cause any interruption but does cause the lease to be removed
+before being renewed.
+
+
+Kind Regards,
+Michael Johnson
+--===============7560468248471776371==--
 
