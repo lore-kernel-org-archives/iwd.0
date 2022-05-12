@@ -1,44 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============3806432666737291644=="
+Content-Type: multipart/mixed; boundary="===============5453591187498605181=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 2/2] auto-t: testPSK-roam deauthenticate IWD after roam
-Date: Tue, 23 Nov 2021 10:17:32 -0800
-Message-ID: <20211123181732.3617090-2-prestwoj@gmail.com>
-In-Reply-To: 20211123181732.3617090-1-prestwoj@gmail.com
+Subject: Re: EAP server tried method 25 while client was configured for method
+ 26
+Date: Thu, 12 May 2022 15:25:40 -0500
+Message-ID: <0fa43dec-26d2-6515-1b42-8db3bce19bdc@gmail.com>
+In-Reply-To: 6fc4a1a0c9cea52a46c5645cc33c2036@univie.ac.at
 
---===============3806432666737291644==
+--===============5453591187498605181==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-After roaming deauth IWD and check the connection state.
----
- autotests/testPSK-roam/connection_test.py | 4 ++++
- 1 file changed, 4 insertions(+)
+Hi Axel,
 
-diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
-roam/connection_test.py
-index 437e52fc..8d9b22ad 100644
---- a/autotests/testPSK-roam/connection_test.py
-+++ b/autotests/testPSK-roam/connection_test.py
-@@ -100,6 +100,10 @@ class Test(unittest.TestCase):
-         self.assertRaises(Exception, testutil.test_ifaces_connected,
-                           (self.bss_hostapd[1].ifname, device.name, True, =
-True))
- =
+On 5/12/22 06:43, Axel Kittenberger wrote:
+> Hello, I can't get iwd to connect to a 802.1x (university) network.
+> =
 
-+        self.bss_hostapd[0].deauthenticate(device.address)
-+        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
-+        wd.wait_for_object_condition(device, condition)
-+
-     def test_ft_psk(self):
-         wd =3D IWD(True)
- =
+> $ cat /var/lib/iwd/eduroam.8021x
+> [Security]
+> EAP-Method=3DPEAP
+> EAP-PEAP-Phase2-Method=3DMSCHAPV2
+> EAP-PEAP-Phase2-Identity=3Dxxx
+> EAP-PEAP-Phase2-Password=3Dxxx
+> =
 
--- =
 
-2.31.1
+This configuration looks pretty typical for a PEAP+MSCHAPv2.
 
---===============3806432666737291644==--
+> produces following iwd output (started on console)
+> ""
+> Wiphy: 0, Name: phy0
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Permanent Address: 64:6c:80:e=
+d:91:b9
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bands: 2.4 GHz 5 GHz
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Ciphers: CCMP TKIP BIP
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Supported iftypes: ad-hoc sta=
+tion ap p2p-client p2p-go p2p-device
+> EAP server tried method 25 while client was configured for method 26
+
+This is very strange.  We're configured for MSCHAPv2 (method=3D26) inside t=
+he PEAP =
+
+tunnel.  It seems that the server is sending us EAP-PEAP (method=3D25) pack=
+ets =
+
+within the tunnel, which doesn't make sense from what I remember of the pro=
+tocol.
+
+Can you run with IWD_TLS_DEBUG=3D1 environment variable set and share the l=
+og? =
+
+You can send it to me privately.  See [1]
+
+> PEAP: Tunnel has disconnected with alert: close_notify
+> ""
+
+<snip>
+
+> /usr/libexec/iwd --version
+> 1.14
+
+Have you tried a later version of iwd? 1.14 is about a year old now.
+
+[1] https://iwd.wiki.kernel.org/debugging#enabling_tls_debugging
+
+Regards,
+-Denis
+--===============5453591187498605181==--
 
