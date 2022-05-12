@@ -1,43 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============1254731262002385971=="
+Content-Type: multipart/mixed; boundary="===============3327473864077199448=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 4/7] ie: add IE_AKM_IS_8021X
-Date: Fri, 25 Feb 2022 15:32:48 -0800
-Message-ID: <20220225233251.2958102-4-prestwoj@gmail.com>
-In-Reply-To: 20220225233251.2958102-1-prestwoj@gmail.com
+Subject: Re: DHCP renewal stops after disconnect
+Date: Thu, 12 May 2022 11:37:59 -0500
+Message-ID: <6af01b85-1425-bf35-af59-cd8d193090ec@gmail.com>
+In-Reply-To: CACsRnHUFixRz2QhQY=3cZi2e-2cr-de6AbJNmOt-XBHiNDjyXA@mail.gmail.com
 
---===============1254731262002385971==
+--===============3327473864077199448==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/ie.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi Michael,
 
-diff --git a/src/ie.h b/src/ie.h
-index fac766d5..7786ea74 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -354,6 +354,12 @@ enum ie_rsn_akm_suite {
- 		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 | \
- 		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384))
- =
+On 5/12/22 11:19, Michael Johnson wrote:
+> Hi Denis,
+> =
 
-+#define IE_AKM_IS_8021X(akm) \
-+	(akm & (IE_RSN_AKM_SUITE_8021X | \
-+		IE_RSN_AKM_SUITE_FT_OVER_8021X | \
-+		IE_RSN_AKM_SUITE_8021X_SHA256 | \
-+		IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384))
-+
- #define IE_LEN(ie) \
- 	((ie) ? (ie)[1] + 2 : 0)
- =
+> I'm trying out the ell patch on some clients and so far it's looking
+> good. I also have some clients running without the patch but with
 
--- =
+Cool
 
-2.34.1
+> IWD_DHCP_DEBUG enabled and I saw a very similar issue occur as the
+> original major issue >
+> This was caused by the retry timing out so wouldn't have happened with
+> the patch but the result is not what I expected in that after we do a
+> full rebind, we don't send a T1 renew. I expected that it would do a
 
---===============1254731262002385971==--
+So by a full rebind you mean:
+
+May 12 15:03:45 r2-19006 iwd[475]: [DHCPv4] dhcp_client_t2_expired:607
+May 12 15:03:45 r2-19006 iwd[475]: [DHCPv4] dhcp_client_t2_expired:614 Ente=
+ring =
+
+state: DHCP_STATE_REBINDING
+May 12 15:05:01 r2-19006 iwd[475]: [DHCPv4] dhcp_client_lease_expired:596
+
+Where we issue a l_dhcp_client_stop and l_dhcp_client_start() again.
+
+> full state refresh and so it should go back to working after the T2
+> timeout.
+
+So the problem is that we do not reset the timer for T2 until after the T1 =
+timer =
+
+fires.  Each l_timeout object uses an fd from the kernel, so we try to mini=
+mize =
+
+the number of timers active.
+
+As you point out, the timeout value is getting set correctly:
+
+# T1 is set correctly
+May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] dhcp_client_rx_message:943 T1 =
+
+expiring in 299927 ms
+
+So the only thing I can think of is that we're leaking the fd somehow, whic=
+h =
+
+would be pretty embarrassing.  Or we're running out of fds and can't create=
+ the =
+
+new timer.  Running under strace or putting in some extra debugs might help?
+
+Regards,
+-Denis
+--===============3327473864077199448==--
 
