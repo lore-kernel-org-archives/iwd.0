@@ -1,68 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============6473950304640686295=="
+Content-Type: multipart/mixed; boundary="===============5481674494897664641=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Michael Johnson <mjohnson459 at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v7 7/9] auto-t: wpas.py: handle enrollee as responder
-Date: Tue, 22 Feb 2022 14:28:45 -0800
-Message-ID: <20220222222847.2480099-7-prestwoj@gmail.com>
-In-Reply-To: 20220222222847.2480099-1-prestwoj@gmail.com
+Subject: Re: DHCP renewal stops after disconnect
+Date: Thu, 12 May 2022 18:02:04 +0100
+Message-ID: <CACsRnHW67Kv0TRCJaZQUVOWiyprw7Vckx+7jpY1EnJOxOsk_2A@mail.gmail.com>
+In-Reply-To: 6af01b85-1425-bf35-af59-cd8d193090ec@gmail.com
 
---===============6473950304640686295==
+--===============5481674494897664641==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds support for wpa_supplicant to generate its own URI and
-start presence announcements (DPP_CHIRP).
----
- autotests/util/wpas.py | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+Hi Denis,
 
-diff --git a/autotests/util/wpas.py b/autotests/util/wpas.py
-index c8e65179..995bdad1 100644
---- a/autotests/util/wpas.py
-+++ b/autotests/util/wpas.py
-@@ -239,10 +239,17 @@ class Wpas:
-     def set(self, key, value, **kwargs):
-         self._ctrl_request('SET ' + key + ' ' + value, **kwargs)
- =
+Ok, thanks! I'll try to add more debug logging and get back to you.
+This error might be important if it is related to an fp?
+```
+May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] announce_wait_timeout:166
+No conflicts found for 10.101.8.24, announcing address
+May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] acd_send_packet:146
+sending packet with target IP 10.101.8.24
+May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] announce_wait_timeout:187
+Failed to send ACD announcement
+```
 
--    def dpp_enrollee_start(self, uri=3DNone):
-+    def dpp_enrollee_start(self, uri=3DNone, oper_and_channel=3DNone):
-+        if not oper_and_channel:
-+            oper_and_channel =3D '81/1'
-+
-         self._rx_data =3D []
--        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode')
--        self.wait_for_result()
-+        self._ctrl_request('DPP_BOOTSTRAP_GEN type=3Dqrcode chan=3D%s' % o=
-per_and_channel)
-+        self._dpp_qr_id =3D self.wait_for_result()
-+        self._ctrl_request('DPP_BOOTSTRAP_GET_URI %s' % self._dpp_qr_id)
-+        self._dpp_uri =3D self.wait_for_result()
-+
-+        print("DPP Enrollee QR: %s" % self._dpp_uri)
- =
+Regards,
+Michael
 
-         if uri:
-             self._rx_data =3D []
-@@ -250,6 +257,10 @@ class Wpas:
-             self._dpp_qr_id =3D self.wait_for_result()
-             self._rx_data =3D []
-             self._ctrl_request('DPP_AUTH_INIT peer=3D%s role=3Denrollee' %=
- self._dpp_qr_id)
-+        else:
-+            self._ctrl_request('DPP_CHIRP own=3D%s iter=3D100' % self._dpp=
-_qr_id)
-+
-+        return self._dpp_uri
- =
-
-     def dpp_configurator_create(self, uri):
-         self._rx_data =3D []
--- =
-
-2.34.1
-
---===============6473950304640686295==--
+On Thu, 12 May 2022 at 17:38, Denis Kenzior <denkenz(a)gmail.com> wrote:
+>
+> Hi Michael,
+>
+> On 5/12/22 11:19, Michael Johnson wrote:
+> > Hi Denis,
+> >
+> > I'm trying out the ell patch on some clients and so far it's looking
+> > good. I also have some clients running without the patch but with
+>
+> Cool
+>
+> > IWD_DHCP_DEBUG enabled and I saw a very similar issue occur as the
+> > original major issue >
+> > This was caused by the retry timing out so wouldn't have happened with
+> > the patch but the result is not what I expected in that after we do a
+> > full rebind, we don't send a T1 renew. I expected that it would do a
+>
+> So by a full rebind you mean:
+>
+> May 12 15:03:45 r2-19006 iwd[475]: [DHCPv4] dhcp_client_t2_expired:607
+> May 12 15:03:45 r2-19006 iwd[475]: [DHCPv4] dhcp_client_t2_expired:614 En=
+tering
+> state: DHCP_STATE_REBINDING
+> May 12 15:05:01 r2-19006 iwd[475]: [DHCPv4] dhcp_client_lease_expired:596
+>
+> Where we issue a l_dhcp_client_stop and l_dhcp_client_start() again.
+>
+> > full state refresh and so it should go back to working after the T2
+> > timeout.
+>
+> So the problem is that we do not reset the timer for T2 until after the T=
+1 timer
+> fires.  Each l_timeout object uses an fd from the kernel, so we try to mi=
+nimize
+> the number of timers active.
+>
+> As you point out, the timeout value is getting set correctly:
+>
+> # T1 is set correctly
+> May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] dhcp_client_rx_message:943 T1
+> expiring in 299927 ms
+>
+> So the only thing I can think of is that we're leaking the fd somehow, wh=
+ich
+> would be pretty embarrassing.  Or we're running out of fds and can't crea=
+te the
+> new timer.  Running under strace or putting in some extra debugs might he=
+lp?
+>
+> Regards,
+> -Denis
+--===============5481674494897664641==--
 
