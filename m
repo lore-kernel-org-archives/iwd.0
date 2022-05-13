@@ -1,256 +1,146 @@
-Content-Type: multipart/mixed; boundary="===============2580194700558876192=="
+Content-Type: multipart/mixed; boundary="===============8961526431016267145=="
 MIME-Version: 1.0
-From: Tmore1 <tmore1 at gmx.com>
+From: Axel Kittenberger <axel.kittenberger at univie.ac.at>
 To: iwd at lists.01.org
-Subject: Enabling IPv6 causes immediate segfault on connect
-Date: Wed, 10 Nov 2021 08:16:38 -0500
-Message-ID: <20211110081638.8a1b690f39566ffce5f8f765@gmx.com>
+Subject: Re: EAP server tried method 25 while client was configured for method
+ 26
+Date: Fri, 13 May 2022 11:16:55 +0200
+Message-ID: <83ca525f-f2bb-411f-81b5-06e17a5dad54@univie.ac.at>
+In-Reply-To: 6fc4a1a0c9cea52a46c5645cc33c2036@univie.ac.at
 
---===============2580194700558876192==
+--===============8961526431016267145==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
 
-After many years of managing wireless with Debian's ifupdown +
-wpa_supplicant, I tried iwd, and I love it so far: I really appreciate
-its polish, cleanliness, and responsiveness. Thanks much for this
-software!
+> This is very strange.=C2=A0 We're configured for MSCHAPv2 (method=3D26) =
 
-There seems to be a problem with its IPv6 support: on my system
-(Debian Sid, iwd 1.19 from distro repo), iwd works perfectly out of the
-box, and continues to work with "EnableNetworkConfiguration=3DTrue", but
-with "EnableIPv6=3Dtrue", it segfaults immediately upon connect. (This is
-especially awkward when iwd is being managed by systemd, since I then
-get an endless loop of the daemon crashing and immediately restarting,
-with a steady stream of messages hitting syslog ;))
+> inside the PEAP tunnel.=C2=A0 It seems that the server is sending us =
 
-FWIW, some Arch users have reported similar issues:
+> EAP-PEAP (method=3D25) packets within the tunnel, which doesn't make =
 
-https://bugs.archlinux.org/task/71718
+> sense from what I remember of the protocol.
+>
+> Can you run with IWD_TLS_DEBUG=3D1 environment variable set and share =
 
-Here's my debug output:
+> the log? You can send it to me privately.=C2=A0 See [1]
 
-*****
+Unfortunately I don't have access to that laptop today (it's a =
 
-root(a)lila:~# /usr/libexec/iwd -d
-Wireless daemon version 1.19
-src/main.c:main() Using configuration directory /etc/iwd
-Loaded configuration from /etc/iwd/main.conf
-src/storage.c:storage_create_dirs() Using state directory /var/lib/iwd
-src/main.c:nl80211_appeared() Found nl80211 interface
-src/module.c:iwd_modules_init()
-src/wsc.c:wsc_init()
-src/resolve.c:resolve_resolvconf_init() Trying to find resolvconf in $PATH
-src/resolve.c:resolve_resolvconf_init() resolvconf found as: /sbin/resolvco=
-nf
-src/eap.c:__eap_method_enable()
-src/eap-wsc.c:eap_wsc_init()
-src/eap-md5.c:eap_md5_init()
-src/eap-tls.c:eap_tls_init()
-src/eap-ttls.c:eap_ttls_init()
-src/eap-mschapv2.c:eap_mschapv2_init()
-src/eap-sim.c:eap_sim_init()
-src/eap-aka.c:eap_aka_prime_init()
-src/eap-aka.c:eap_aka_init()
-src/eap-peap.c:eap_peap_init()
-src/eap-gtc.c:eap_gtc_init()
-src/eap-pwd.c:eap_pwd_init()
-src/manager.c:manager_wiphy_dump_callback() New wiphy phy0 added (0)
-Wiphy: 0, Name: phy0
-	Permanent Address: xx:xx:xx:xx:xx:xx
-	2.4Ghz Band:
-		Bitrates (non-HT):
-			 1.0 Mbps
-			 2.0 Mbps
-			 5.5 Mbps
-			11.0 Mbps
-			 6.0 Mbps
-			 9.0 Mbps
-			12.0 Mbps
-			18.0 Mbps
-			24.0 Mbps
-			36.0 Mbps
-			48.0 Mbps
-			54.0 Mbps
-		HT Capabilities:
-			HT40
-			Short GI for 20Mhz
-			Short GI for 40Mhz
-		HT RX MCS indexes:
-			0-15
-	5Ghz Band:
-		Bitrates (non-HT):
-			 6.0 Mbps
-			 9.0 Mbps
-			12.0 Mbps
-			18.0 Mbps
-			24.0 Mbps
-			36.0 Mbps
-			48.0 Mbps
-			54.0 Mbps
-		HT Capabilities:
-			HT40
-			Short GI for 20Mhz
-			Short GI for 40Mhz
-		HT RX MCS indexes:
-			0-15
-		VHT Capabilities:
-			Short GI for 80Mhz
-			Max RX MCS: 0-9 for NSS: 2
-			Max TX MCS: 0-9 for NSS: 2
-	Ciphers: CCMP TKIP BIP
-	Supported iftypes: ad-hoc station ap p2p-client p2p-go p2p-device
-src/manager.c:manager_create_interfaces() creating wlan0
-src/manager.c:manager_create_interfaces() creating wlan0-p2p
-src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for phy0 =
-is US
-src/manager.c:manager_config_notify() Notification of command New Interface=
-(7)
-src/netdev.c:netdev_link_notify() event 16 on ifindex 13
-src/manager.c:manager_new_station_interface_cb()
-src/netdev.c:netdev_create_from_genl() Created interface wlan0[13 a]
-src/manager.c:manager_config_notify() Notification of command New Interface=
-(7)
-src/manager.c:manager_new_p2p_interface_cb()
-src/p2p.c:p2p_device_update_from_genl() Created P2P device b
-src/netdev.c:netdev_link_notify() event 16 on ifindex 13
-src/wiphy.c:wiphy_reg_notify() Notification of command Wiphy Reg Change(113)
-src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for phy0 =
-is XX
-src/netdev.c:netdev_set_4addr() netdev: 13 use_4addr: 0
-src/netdev.c:netdev_initial_up_cb() Interface 13 initialized
-src/netconfig.c:netconfig_new() Starting netconfig for interface: 13
-src/station.c:station_enter_state() Old State: disconnected, new state: aut=
-oconnect_quick
-src/wiphy.c:wiphy_radio_work_insert() Inserting work item 1
-src/wiphy.c:wiphy_radio_work_next() Starting work item 1
-src/rrm.c:rrm_add_frame_watches()
-src/netdev.c:netdev_link_notify() event 16 on ifindex 13
-src/netdev.c:netdev_link_notify() event 16 on ifindex 13
-src/manager.c:manager_config_notify() Notification of command Set Interface=
-(6)
-src/scan.c:scan_notify() Scan notification Trigger Scan(33)
-src/scan.c:scan_request_triggered() Active scan triggered for wdev a
-src/station.c:station_quick_scan_triggered() Quick scan triggered for wlan0
-src/wiphy.c:wiphy_reg_notify() Notification of command Wiphy Reg Change(113)
-src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for phy0 =
-is US
-src/scan.c:scan_notify() Scan notification New Scan Results(34)
-src/netdev.c:netdev_link_notify() event 16 on ifindex 13
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:scan_parse_bss_information_elements() Load: 0/255
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:scan_parse_bss_information_elements() Load: 66/255
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:scan_parse_bss_information_elements() Load: 212/255
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:scan_parse_bss_information_elements() Load: 43/255
-src/scan.c:scan_parse_advertisement_protocol()
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:scan_parse_bss_information_elements() Load: 206/255
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:scan_parse_bss_information_elements() Load: 205/255
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:scan_parse_bss_information_elements() Load: 68/255
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:get_scan_callback() get_scan_callback
-src/scan.c:scan_parse_bss_information_elements() Load: 19/255
-src/scan.c:get_scan_done() get_scan_done
+coworkers), I switched my own laptop to iwd for testing, got the same =
 
-...
+error message, but it connects nevertheless. So I guess the issue is =
 
-src/station.c:station_autoconnect_start()
-src/station.c:station_autoconnect_next() autoconnect: Trying SSID: nnnnnnnn
-src/station.c:station_autoconnect_next() autoconnect: 'xx:xx:xx:xx:xx:xx' f=
-req: 5180, rank: 13107, strength: -6300
-src/netdev.c:netdev_cqm_rssi_update()
-src/wiphy.c:wiphy_radio_work_insert() Inserting work item 2
-src/station.c:__station_connect_network() connecting to BSS xx:xx:xx:xx:xx:=
-xx
-src/station.c:station_enter_state() Old State: autoconnect_quick, new state=
-: connecting (auto)
-src/scan.c:scan_cancel() Trying to cancel scan id 1 for wdev a
-src/wiphy.c:wiphy_radio_work_done() Work item 1 done
-src/wiphy.c:wiphy_radio_work_next() Starting work item 2
-src/netdev.c:netdev_mlme_notify() MLME notification New Station(19)
-src/station.c:station_netdev_event() Associating
-src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-src/netdev.c:netdev_authenticate_event()
-src/netdev.c:netdev_mlme_notify() MLME notification Associate(38)
-src/netdev.c:netdev_associate_event()
-src/netdev.c:netdev_link_notify() event 16 on ifindex 13
-src/netdev.c:netdev_mlme_notify() MLME notification Connect(46)
-src/netdev.c:netdev_connect_event()
-src/netdev.c:netdev_link_notify() event 16 on ifindex 13
-src/netdev.c:netdev_link_notify() event 16 on ifindex 13
-src/netdev.c:netdev_get_oci_cb() Obtained OCI: freq: 5180, width: 3, center=
-1: 5210, center2: 0
-src/netdev.c:netdev_link_notify() event 16 on ifindex 13
-src/netdev.c:netdev_unicast_notify() Unicast notification Control Port Fram=
-e(129)
-src/netdev.c:netdev_control_port_frame_event()
-src/eapol.c:eapol_handle_ptk_1_of_4() ifindex=3D13
-src/netdev.c:netdev_mlme_notify() MLME notification Control Port TX Status(=
-139)
-src/netdev.c:netdev_unicast_notify() Unicast notification Control Port Fram=
-e(129)
-src/netdev.c:netdev_control_port_frame_event()
-src/eapol.c:eapol_handle_ptk_3_of_4() ifindex=3D13
-src/netdev.c:netdev_set_gtk() 13
-src/station.c:station_handshake_event() Setting keys
-src/netdev.c:netdev_set_tk() 13
-src/netdev.c:netdev_set_rekey_offload() 13
-src/netdev.c:netdev_mlme_notify() MLME notification Control Port TX Status(=
-139)
-src/netdev.c:netdev_mlme_notify() MLME notification Notify CQM(64)
-src/station.c:station_connect_cb() 13, result: 0
-src/station.c:station_connect_ok()
-src/wiphy.c:wiphy_radio_work_done() Work item 2 done
-src/netdev.c:netdev_link_notify() event 16 on ifindex 13
-src/netconfig.c:netconfig_ifaddr_ipv6_added() ifindex 13: ifaddr fe80::1a5e=
-:fff:fe82:bdec/64
-Segmentation fault
+something else. (That laptop had some issues with the wifi driver, thats =
 
-*****
+why I switched it to iwd a year ago, since trying to get wpa supplicant =
 
-And here's syslog:
+running drove me crazy, which then worked with iwd normal WPA2 networks)
 
-Nov  9 19:55:07 lila kernel: [  952.596320] wlan0: authenticated
-Nov  9 19:55:07 lila kernel: [  952.597667] wlan0: associate with xx:xx:xx:=
-xx:xx:xx (try 1/3)
-Nov  9 19:55:07 lila kernel: [  952.601524] wlan0: RX AssocResp from xx:xx:=
-xx:xx:xx:xx (capab=3D0x11 status=3D0 aid=3D1)
-Nov  9 19:55:07 lila kernel: [  952.603444] wlan0: associated
-Nov  9 19:55:07 lila kernel: [  952.655558] IPv6: ADDRCONF(NETDEV_CHANGE): =
-wlan0: link becomes ready
-Nov  9 19:55:08 lila avahi-daemon[771]: Joining mDNS multicast group on int=
-erface wlan0.IPv6 with address fe80::1a5e:fff:fe82:bdec.
-Nov  9 19:55:08 lila avahi-daemon[771]: New relevant interface wlan0.IPv6 f=
-or mDNS.
-Nov  9 19:55:08 lila avahi-daemon[771]: Registering new address record for =
-fe80::1a5e:fff:fe82:bdec on wlan0.*.
-Nov  9 19:55:08 lila kernel: [  953.801798] iwd[3276]: segfault at 0 ip 000=
-07f3da1e5a231 sp 00007ffdbcbf18c8 error 4 in libc-2.32.so[7f3da1d21000+1490=
-00]
-Nov  9 19:55:08 lila kernel: [  953.801833] Code: 84 00 00 00 00 00 0f 1f 0=
-0 31 c0 c5 f8 77 c3 66 2e 0f 1f 84 00 00 00 00 00 89 f9 48 89 fa c5 f9 ef c=
-0 83 e1 3f 83 f9 20 77 1f <c5> fd 74 0f c5 fd d7 c1 85 c0 0f 85 df 00 00 00=
- 48 83 c7 20 83 e1
-Nov  9 19:55:08 lila kernel: [  953.841933] wlan0: deauthenticating from xx=
-:xx:xx:xx:xx:xx by local choice (Reason: 3=3DDEAUTH_LEAVING)
-Nov  9 19:55:08 lila avahi-daemon[771]: Interface wlan0.IPv6 no longer rele=
-vant for mDNS.
-Nov  9 19:55:08 lila avahi-daemon[771]: Leaving mDNS multicast group on int=
-erface wlan0.IPv6 with address fe80::1a5e:fff:fe82:bdec.
-Nov  9 19:55:08 lila avahi-daemon[771]: Withdrawing address record for fe80=
-::1a5e:fff:fe82:bdec on wlan0.
+> Have you tried a later version of iwd? 1.14 is about a year old now.
 
-Tmore1 <tmore1(a)gmx.com>
---===============2580194700558876192==--
+It did compile git HEAD yesterdeay (1.24) same result.
+
+I can provide full debug output sometimes next week
+
+Thanks for the reply,
+
+- Axel
+
+
+
+--===============8961526431016267145==
+Content-Type: application/pgp-keys
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="OpenPGP_0x7AC320FF153B3A9D.asc"
+
+LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCgp4c0ROQkYrUU5lWUJEQURQSlNq
+ZDZ1RFFxY09BVXNweStQblpjMWZhQnFaS2QwbXRQSFE2TnRTeFJ0djRrZnBYClFrMk9aYStXUDNx
+RnE0WFhxNnBudlJUam5sT2NmaUIzVFB3NDJXSVlhUHFad1hjcjJEelgzNVNjMnNUQyt5R3QKeGQw
+UEx6NFpra3poYU5RQjcwL2greG5CdXdtT2wvY0tlN1c3Z2Y2bkJhdkVTamdnSFgvNVpqSk40V01l
+dzRsKwpSMytwL1ZQVDM3N1Myd21JRDJtc3BXemRJWDh2U3hBVzNSalRrMWZYblZVaCs3cERuRlBs
+M2xvWGxySU1ialFZCnlZdk9WdWR5UERCTzc3MGpydUpPUDhnSzlLNy9BRWtIT3JPMWdrY0xrczZu
+UDRWS1hwMGpQTjJZMUs5c1FjTnoKUzUvZk44QWx3RHFrNjM0TjV3RFRtWSttdkQ4cUY4K25PUXdN
+N0FzUTVWMGp1WDFSTE9hTmdRWTlpbjQ5Z2NNNwpmQUgxMGRHek5SNTBCdFV1aDYrd2t2Nkh5RzZa
+UUZtTE5RSnNzWVBvOU9jazE5QzBvN0ttbXZVYytFTTZTcEFrCmxzdG5vTTBkUXhnNk5IVHJvanh4
+cTNNYU5BSEM1OHUxNnc4WXFTYmZYbmpjSCtlS1FoYTczVGp5aUVhUldOcTAKYkRrUUxsS0hON05L
+czFNQUVRRUFBYzB5UVhobGJDQkxhWFIwWlc1aVpYSm5aWElnUEdGNFpXd3VhMmwwZEdWdQpZbVZ5
+WjJWeVFIVnVhWFpwWlM1aFl5NWhkRDdDd1E4RUV3RUlBRGtXSVFRdHpUY240ZkYyc21YbzhYaDZ3
+eUQvCkZUczZuUVVDWDVBMTV3VUpCYU9hZ0FJYkF3VUxDUWdIQWdZVkNBa0tDd0lGRmdJREFRQUFD
+Z2tRZXNNZy94VTcKT3AyUGl3d0FoVjdGNDYrS09mQmVCREF1blB3ek9ZTVRJc0VwaW4yanNQR3hE
+Q2Y0MkdZdURhYlJtWlpRSHZqegp2Y1hSalMrSXdsRmhsQTBvMlFPSXZCM3RqaG1jNHJQVEsxaHpv
+dlNFQTkrUGdXa3E3MG04K3RFQk85RUxBVkQwClRQdGFLeDhBbjVFUjJmSTNXV2daOFBoWTR0TUVB
+eXowN0xoak9vMmIyMFJPZnRBRlF0eUMyR0pGMDEyQzJlb1gKY3IxNkpwZ2sycTk2dUp2RWNoT1Vy
+cW00TG9CSDJ5azdyT0EzTEs4VmVuVG9nRWg4d0NGdTNhaVg0WVlKVHN6ZQpTaTlvd2ljbEZYTG9n
+SHphZXh5QUtZcGNQVHlma0lha1pVQytrWlk0YTlYQjB1UlpzZTRqWnRSWlU3UUFKbHZqCkFaRW1m
+S1FReEgybldjR21ESEZvMEgxVUpQR2h4d1ozRktKZjJ1cnNnMk5LcUNMQmZrQmxwbXRXT2IwNysr
+amsKTFpYZW5paVhaakpMbGIwZzhiUDRHRzJwajBoWVRFNlQ4bVIyY2U1NWxPaWVMaGVuRkgvTU9E
+NDRRQUZPeXVRRgpneVVFK2FaejZpRkMzb3JMSHJ0aTdicVNGcnpqUUN6RzVIVTVtczk3L0dudFV0
+blVTSzBhWlJseW9pbmZtcnZGCmkyQ1p6RXR1d3NFUEJCTUJDQUE1RmlFRUxjMDNKK0h4ZHJKbDZQ
+RjRlc01nL3hVN09wMEZBbUdrazBFRkNRbCsKelZvQ0d3TUZDd2tJQndJR0ZRZ0pDZ3NDQlJZQ0F3
+RUFBQW9KRUhyRElQOFZPenFkRkJRTUFJb2ZSR1FlbmR3agpObnM5UFRib3J3TWhtOUZGaHVSVUVo
+czNzK2dLMjdnTk5BTngyRklNSmtOZFRQYWR4WkFRbXV5M1lEQ1lmd1RKClc4ZW1aQkhNRUk0Z3o5
+WEgzVURPRjRjSE9Cc2lPMnl3Y01SSVBJYnBrRlkvRGlUejdnZmVVUFIyaU45YTJETk4KN0ZqRzlK
+OHZ3bFhvVGdsNW9LdktXL1V2dHRIVkxzM09sRXdXTDRWT2hsalNka3o2R0NIQXRFWDc5WldmRUVj
+WgpvUDVZYjJKcWxuTGlCZzhBYzlpKy9yN3dXY08ra0hUYndxU2hUMWErblUwWmhYem9PSVhHTXBa
+UVQ0VHBPdTdlCmRDNkJtTUVzTjl1dllMSU0xenQwN3Mwdkd1QWlPNkRxcmlpYTR6WGE5Q2xLaUE2
+SGlkQ2xNY2dLUlpDSThSQUMKTW9qajE1b0xaRDNmSHl4ZFpSSnBqYVFTMEJKaGVnL3lPKzlpcFNJ
+R1ZBcmlZYWF1dndNMHRWMWhGUGJyZW1kZQpHSHZzQWR4RmhXQ3pDN2NyVmwvWTY5MFdWOHFSczF0
+ZFB5dFpOR1FiV2FvbWdlRUJGRFFSVWVTdjg3UWhPK3FPCkdENVZseW8yajVJRlMvQkNGL2JRWVk4
+bTVieXNYcXN6NTJPQkVyZ0c0MkRHU0kzZHBmSDkvYzdBelFSZmtEWG4KQVF3QXNyby8wMmtheFY3
+eXV5TzIyZDhpNnhrNDBLb3BUdXhnUzFIcVN0Y3J0Z2tXSGZhSm9OcUlYTVZmekhtYwpxQVR2YUJY
+b0JKcW5lc2l2dEdrNllGeHhCUFpTOTZtdWhzTFNja1g3aDEyUERFY0JoellISHNtRC9ybXM1ZGZ1
+ClhOWlQ4RC9rb05sZEtXb2F3ZkVUbGFieGQ1YjJRUTBmUlpDaG4wQXRFWmo1UVllQndWMlIzeUcx
+dnJpRXdqdisKVmpnb2IwL0Q1eWtSdllmOHBobVlFVDB3MHVLUE9UTTMxcjRreFQ0bDJXbjl5RXlC
+UDFrL2JiUnhYYURDaUUxTQp6eVJJZzQxV0hhaXpsc1FKZlRiN290aHRNcFpJYXhEcTVHblc1a1Zk
+S3JtVHBwSzQrSC9xL05BQ3RySHZoWmlFClZ2cFViK0Zpa0RHZENuZUJmdjZRWmwwK1FrZnVhSHJJ
+M2QvVlFxajlDSWxNWmtYNEllc2dBK1RuVUpDRFVHcUMKT3hxMXB1VWNBTFNwSGhRdUc1akNZMW1E
+SU5KVXFJQW9McS9BWEpNZmt5ZHNsandjS1JlTjBORGdGUXFLaGsyRApmemU0YmxpclR5b3pxeE8v
+RU85dWl2Tm55bW9OK2REZ3NUUGNXS0Rhd1NCZ0JBbVUrL244cWVUd2JJQkdLYndpCmZhSnRBQkVC
+QUFIQ3dQd0VHQUVJQUNZV0lRUXR6VGNuNGZGMnNtWG84WGg2d3lEL0ZUczZuUVVDWDVBMTV3VUoK
+QmFPYWdBSWJEQUFLQ1JCNnd5RC9GVHM2blNnbkMvc0dicDdlMlVqSldLSzBJclUraG5ZcWtWTnFM
+U0VPSEVRSwpuL05VeVdPSHpyNjU3TWlHZmM2Rll0L0JWVkxHSW02UVM5WGUxdVFVK2NsN1FhbE5q
+VkNBZzd4aThtYkoyUCs0CkJGSUJ5T0ZaYlM1eEllUEkrMlRTbHYycHlJSlpINGNQVnBMUlNjQW84
+MkVSL2EwS2xWYkJvRHZGQnloT0R5M00KM25mcWE1aEZGdFNmSXkrck1XQ28wU2ZlaWx5WFpqVFBR
+aU0xRGpub0VGdk5Fd29hb1hoZkhUZi85N2g0SWN6OAovcm1Dd3ZyRWRXaG5SWGFFQ3ZuQ2RVZ2pF
+U0Rlck1hRXVvakpWV2RTc2xCYmF3K2lLQU1TNUVPVGFJdG5PQXptCnJ1c1lycmtzYXBIWUdYa21Y
+Q1Y3NHpGei8yc045TVF1WGdWNS9rQVl4N1ltK0pRcy9sbCtBejdXSE15bi9JUXgKdFdCYTBSNHN5
+dGtHU1kvTm5VeVpYeU5qczNlb3k5bVhFbUk1b2RqSFZoeXJHYndHOVl6eGpRcUxYd0crdGZCagpv
+Rjc1L3kyZGoyMHN2Z0pzOEpPSkR3KzlwTEZBSllFa216RmNVOFR4VjRURHE0alYwUFcrZUlDRUZI
+dEhLb0RUCmZGK3FkTXBGdDU1VkI1dWRrbytDVnZ4bU52Y2VFekhDd1FZRUdBRUlBQ1lXSVFRdHpU
+Y240ZkYyc21YbzhYaDYKd3lEL0ZUczZuUVVDWWFTVFFRVUpDWDdOV2dJYkRBQVVDUkI2d3lEL0ZU
+czZuUWtRZXNNZy94VTdPcDJ1V2d3QQp0WElqaFF6K2ZQSEc5aURwOTlXLy9TQWhBU1FCWWxRaC9L
+SEFkYmdkcHpWeE14bXYwTzc0THo3cFNVR01haWRDCmVRRVZhUzdMMUc0VXJRdnNIZnFUdXNQS1pF
+QnZHY3FtSWhMVmhhcGVVR013Y2NsRVVlN2krZjkxbVhLK3liNDQKRGkwUzd0K01raExlQ29hRkJX
+SkQxWVVGTmFkWTB5blBkaGJhRUlacGEraWNNOTFNTlQyWTNhWjFtQm51enk4YwpaUEVYRUFtMW0w
+QWVQQ2dsVEJWbUg1QnZXeWxxRnZqVFRVRHJoNndsUGxxV2R5clJJMW1qeEptVTFaSzl1V3JCCk4w
+cjZzd0E5ZVVnUzVPMW40NGROdEVYVzNzMHoyTzI2MXduTXdjRWNFd0hJS0d4T2YxSHZUUDY4cXpW
+ejBlTEQKUk4wdE16bFJNdkU1ZU9YMHQydEovbDNsNVhNQ1lZNmxkUWpWYW5NWUc1UTlKM3hTU0gy
+SGczZ0lhdjBsSzA2UgphTVVWT01hVDNqTmlHeDVUUUFCR2JtRCswMDcxTFIwUWFad1FZWnF5R293
+MHppRjBOYnJWV2x6VVhwblI3em5YClVUYVRZSHlSbTNvUTRVVEp2YkdtOCtiZThYc3dhYU9kUUMy
+Uzl4a01EUzVwN2tkRTl4QStlY1hDdTY3QzljZTYKPWlBdTMKLS0tLS1FTkQgUEdQIFBVQkxJQyBL
+RVkgQkxPQ0stLS0tLQo=
+
+--===============8961526431016267145==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="OpenPGP_signature.sig"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCndzRDVCQUFCQ0FBakZpRUVMYzAzSitIeGRy
+Smw2UEY0ZXNNZy94VTdPcDBGQW1KK0lnY0ZBd0FBQUFBQUNna1Flc01nL3hVN09wMG4KNlF2OUdl
+WWFUZ1VpNEhYVitSdEpqSC9waDNrV1ZEQzBmYytTYWd3U0xkMGpvMWY1WndLbjEwWGphd3dCTXBB
+Sk8vdHVZNloxbUhuSgpBdmlmOHJiTFZvM25WMUFBNjRheFR0M0dldEZCRWhOK2orOVdaM3UyaXln
+U01yeFF5M1JDeHRkai9UbUxBT0l3QThTMllCQVJob0F3CkZkNUtGM3o2cTd1VWpyMVR3eXhxdXEv
+VHBwYXlRSzFJOXlWai9wWnREK1ZOZytiVW9tOUt5N0E2K29kd0xycjRUc2pJSE93Y2w4bTAKMVhK
+KzYzZEh1dEN3dW9YcGhvUE5JRXlnS3I0OVo0RGxLTTBCbklwVUZmbWtDNVhiZTFJT2RTZ204Vkgr
+VDcyK2ZnMTZsRnhYTy9tMApROEtDd0YxM2VuMUtKZW9NMU13VVFXTGVLdFU2b2ZNQkRZc3pLcU90
+emFEZGdkcm94bXBiUENTejZ5V0YxNVV5dnQ3L3RCRGhnZE5PCklqRFlPNzhFemNaTTNmd2lJSktt
+NGxXelFjdVppS2g4VXVLNmdZd3ZWWUQyam1vQWFCQXdZRndiKzN0L2ZaV0FDZ0NJbXEvSFovejIK
+Yms0T3RmVGNha3hxRnRITXZWK1I3d2lLQ2FQLzVyWldUNjRVL2ljNnFTTmlCWTZNR2lHbSttQVVU
+SnJ6Cj1XQlgvCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
+
+--===============8961526431016267145==--
 
