@@ -1,81 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============3005966298208506851=="
+Content-Type: multipart/mixed; boundary="===============6735772579614389213=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Michael Johnson <mjohnson459 at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/4] p2p: Fix Device Address updates from Probe Requests
-Date: Wed, 30 Mar 2022 12:41:35 -0700
-Message-ID: <76b7984ff1ad01ef3b09ac3abd67150a650deb59.camel@gmail.com>
-In-Reply-To: 20220330173400.259961-1-andrew.zaborowski@intel.com
+Subject: Re: DHCP renewal stops after disconnect
+Date: Fri, 13 May 2022 10:58:02 +0100
+Message-ID: <CACsRnHU_6Cp2Uz1=CaNUW47R3DYSX6_yksveJQZc0_6Kq8RB2A@mail.gmail.com>
+In-Reply-To: a4b4eb3e-c569-084d-103e-f41ccd451bd2@gmail.com
 
---===============3005966298208506851==
+--===============6735772579614389213==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+Hi Denis,
 
-On Wed, 2022-03-30 at 19:33 +0200, Andrew Zaborowski wrote:
-> p2p_peer_update_existing may be called with a scan_bss struct built
-> from
-> a Probe Request frame so it can't access bss->p2p_probe_resp_info
-> even
-> if peer->bss was built from a Probe Response.=C2=A0 Check the source frame
-> type of the scan_bss struct before updating the Device Address.
-> =
+When enabling the DHCP debug logs I also upgraded the version of iwd
+and ell in my test environment to 1.27 and 0.50 respectively so the
+most recent logs should be closer to you at least.
 
-> This fixes one timing issue that would make the autotest fail often.
+Regards,
+Michael
 
-So I'm still seeing test_3_go_go_neg_responder and
-test_4_go_go_neg_initiator failing, but the other two pass now.
-
-> ---
-> =C2=A0src/p2p.c | 10 +++++++---
-> =C2=A01 file changed, 7 insertions(+), 3 deletions(-)
-> =
-
-> diff --git a/src/p2p.c b/src/p2p.c
-> index 4c90efb6..ebd0f62b 100644
-> --- a/src/p2p.c
-> +++ b/src/p2p.c
-> @@ -3655,11 +3655,15 @@ static bool p2p_peer_update_existing(struct
-> scan_bss *bss,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Some property changes =
-may need to be notified here.
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> =C2=A0
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (peer->device_addr =3D=3D p=
-eer->bss->addr)
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0peer->device_addr =3D bss->addr;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0else
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (bss->source_frame =3D=3D S=
-CAN_BSS_PROBE_RESP)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0peer->device_addr =3D
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bss=
-->p2p_probe_resp_info-
-> >device_info.device_addr;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0else if (bss->source_frame =3D=
-=3D SCAN_BSS_PROBE_REQ &&
-> !l_memeqzero(
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bss->p2p_=
-probe_req_info-
-> >device_info.device_addr, 6))
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0peer->device_addr =3D
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bss->p2p_=
-probe_req_info-
-> >device_info.device_addr;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0else
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0peer->device_addr =3D bss->addr;
-> =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0scan_bss_free(peer->bss);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0peer->bss =3D bss;
-
-
---===============3005966298208506851==--
+On Thu, 12 May 2022 at 18:50, Denis Kenzior <denkenz(a)gmail.com> wrote:
+>
+> Hi Michael,
+>
+> On 5/12/22 12:02, Michael Johnson wrote:
+> > Hi Denis,
+> >
+> > Ok, thanks! I'll try to add more debug logging and get back to you.
+> > This error might be important if it is related to an fp?
+> > ```
+> > May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] announce_wait_timeout:166
+> > No conflicts found for 10.101.8.24, announcing address
+> > May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] acd_send_packet:146
+> > sending packet with target IP 10.101.8.24
+> > May 12 15:05:02 r2-19006 iwd[475]: [DHCPv4] announce_wait_timeout:187
+> > Failed to send ACD announcement
+> > ```
+>
+> Yes, I saw that.  Looking at the code, we should fail to start acd if we'=
+re
+> running out of fds and this logic wouldn't be triggered...
+>
+> I'm running a full test suite under valgrind with '--track-fds=3Dyes', bu=
+t it
+> hasn't found anything so far.  You are running a different version than I=
+ am
+> though...
+>
+> Regards,
+> -Denis
+--===============6735772579614389213==--
 
