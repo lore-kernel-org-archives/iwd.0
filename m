@@ -1,52 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============0436803094471849509=="
+Content-Type: multipart/mixed; boundary="===============7047539877132107256=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 3/9] auth-proto: add auth_proto_rx_oci
-Date: Tue, 28 Sep 2021 08:46:52 -0700
-Message-ID: <20210928154658.2382597-3-prestwoj@gmail.com>
-In-Reply-To: 20210928154658.2382597-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
+Date: Tue, 17 May 2022 14:23:18 -0500
+Message-ID: <f688e6b8-8bf5-4b6e-1092-ff1283ea4c80@gmail.com>
+In-Reply-To: CACsRnHUpN+fXLekfFKzX4LmJKE_H5thYW9LK-5eXzXtw5Fy0VA@mail.gmail.com
 
---===============0436803094471849509==
+--===============7047539877132107256==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows auth protos to get notified when the chandef has been
-set. Since netdev sets chandef already there is no arguments.
----
- src/auth-proto.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Hi Michael,
 
-diff --git a/src/auth-proto.h b/src/auth-proto.h
-index 33a74291..9f8da604 100644
---- a/src/auth-proto.h
-+++ b/src/auth-proto.h
-@@ -44,6 +44,7 @@ struct auth_proto {
- 					const uint8_t *frame, size_t len);
- 	int (*rx_associate)(struct auth_proto *driver,
- 					const uint8_t *frame, size_t len);
-+	int (*rx_oci)(struct auth_proto *driver);
- 	bool (*auth_timeout)(struct auth_proto *ap);
- 	bool (*assoc_timeout)(struct auth_proto *ap);
- 	uint8_t prev_bssid[6];
-@@ -98,3 +99,11 @@ static inline bool auth_proto_assoc_timeout(struct auth_=
-proto *ap)
- =
+>> This changes the semantics slightly.  In our wiki, etc we show IWD_DHCP_=
+DEBUG
+>> with value "1" to enable debugging, so I think we should be nice and kee=
+p that
+>> behavior if possible.  How about:
+>>
+>> if IWD_DHCP_DEBUG is not set, use L_LOG_WARNING.
+>>
+>> If IWD_DHCP_DEBUG is set and has a non-NULL value, use L_LOG_DEBUG
+>>
+>> If the value above is from the set L_LOG_ERR .. L_LOG_DEBUG (3 .. 7), th=
+en use that.
+> =
 
- 	return false;
- }
-+
-+static inline int auth_proto_rx_oci(struct auth_proto *ap)
-+{
-+	if (ap && ap->rx_oci)
-+		return ap->rx_oci(ap);
-+
-+	return -ENOTSUP;
-+}
--- =
+> I made this change but it seems quite difficult to explain in a
+> reasonable way to the user why the values are 3, 4, 6, and 7.
+> How about using strings instead? `info`, `warn`, `error`, `debug`?
+> That still allows us to keep the old behavior if it's a `1`.
 
-2.31.1
+Sure, that sounds even better.
 
---===============0436803094471849509==--
+> =
+
+> I'm also questioning if I should keep the L_LOG_WARN as the default or
+> make it L_LOG_INFO which is more in line with what I intended when I
+> started (i.e. not setting the env should result in similar output to
+> other DHCP clients). Do you prefer WARN?
+
+If you intended this to be info, then do that.  iwd prints l_info, l_error =
+and =
+
+l_warn messages by default and only l_debug is enabled via '-d'.
+
+Regards,
+-Denis
+--===============7047539877132107256==--
 
