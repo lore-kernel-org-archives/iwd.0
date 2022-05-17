@@ -1,57 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============5813525051785068143=="
+Content-Type: multipart/mixed; boundary="===============8372677776166310574=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Michael Johnson <mjohnson459 at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 4/7] scan: add support for scanning on AP interface type
-Date: Tue, 22 Feb 2022 14:57:15 -0800
-Message-ID: <20220222225718.2485794-4-prestwoj@gmail.com>
-In-Reply-To: 20220222225718.2485794-1-prestwoj@gmail.com
+Subject: [PATCH 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
+Date: Tue, 17 May 2022 18:05:17 +0100
+Message-ID: <20220517170518.144626-1-mjohnson459@gmail.com>
 
---===============5813525051785068143==
+--===============8372677776166310574==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This adds a new flag, force_ap to the scan parameters. When enabled
-this will set NL80211_SCAN_FLAG_AP.
+Allows granularly specifying the DHCP logging level. This allows the
+user to tailor the output to what they need. By default always display
+errors and warnings.
+
+1 =3D INFO
+2 =3D DEBUG
 ---
- src/scan.c | 4 ++++
- src/scan.h | 1 +
- 2 files changed, 5 insertions(+)
+ src/netconfig.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/src/scan.c b/src/scan.c
-index 12b7a3fd..01056634 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -391,6 +391,10 @@ static struct l_genl_msg *scan_build_cmd(struct scan_c=
-ontext *sc,
- 					NL80211_EXT_FEATURE_SCAN_RANDOM_SN))
- 		flags |=3D NL80211_SCAN_FLAG_RANDOM_SN;
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 6694a0e9..7dd35b2f 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -1621,6 +1621,8 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+ 	struct netdev *netdev =3D netdev_find(ifindex);
+ 	struct netconfig *netconfig;
+ 	struct l_icmp6_client *icmp6;
++	const char *debug_level =3D NULL;
++	int dhcp_priority =3D L_LOG_WARNING;
  =
 
-+	if (params->force_ap && wiphy_has_feature(sc->wiphy,
-+						NL80211_FEATURE_AP_SCAN))
-+		flags |=3D NL80211_SCAN_FLAG_AP;
+ 	if (!netconfig_list)
+ 		return NULL;
+@@ -1640,9 +1642,18 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+ 					netconfig_ipv4_dhcp_event_handler,
+ 					netconfig, NULL);
+ =
+
+-	if (getenv("IWD_DHCP_DEBUG"))
+-		l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
+-							"[DHCPv4] ", NULL);
++	debug_level =3D getenv("IWD_DHCP_DEBUG");
++	if (debug_level !=3D NULL)
++	{
++		// Convert from user 1 or 2 to L_LOG_*
++		if (*debug_level =3D=3D '1')
++			dhcp_priority =3D L_LOG_INFO;
++		else if (*debug_level =3D=3D '2')
++			dhcp_priority =3D L_LOG_DEBUG;
++	}
 +
- 	if (flags)
- 		l_genl_msg_append_attr(msg, NL80211_ATTR_SCAN_FLAGS, 4, &flags);
++	l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
++						"[DHCPv4] ", NULL, dhcp_priority);
  =
 
-diff --git a/src/scan.h b/src/scan.h
-index 2c401df6..7ad50e5d 100644
---- a/src/scan.h
-+++ b/src/scan.h
-@@ -98,6 +98,7 @@ struct scan_parameters {
- 	bool randomize_mac_addr_hint : 1;
- 	bool no_cck_rates : 1;
- 	bool duration_mandatory : 1;
-+	bool force_ap : 1;
- 	const uint8_t *ssid;	/* Used for direct probe request */
- 	size_t ssid_len;
- 	const uint8_t *source_mac;
+ 	netconfig->dhcp6_client =3D l_dhcp6_client_new(ifindex);
+ 	l_dhcp6_client_set_event_handler(netconfig->dhcp6_client,
 -- =
 
-2.34.1
+2.25.1
 
---===============5813525051785068143==--
+--===============8372677776166310574==--
 
