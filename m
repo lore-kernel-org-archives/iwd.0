@@ -1,115 +1,98 @@
-Content-Type: multipart/mixed; boundary="===============8170943769735110578=="
+Content-Type: multipart/mixed; boundary="===============3100187884104494859=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] doc: Extend the IP configuration agent API
-Date: Mon, 13 Dec 2021 16:03:39 +0100
-Message-ID: <20211213150339.65543-1-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH v2 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
+Date: Tue, 17 May 2022 13:09:02 -0500
+Message-ID: <04786874-f47b-aaa8-f3f3-1492fd268b01@gmail.com>
+In-Reply-To: 20220517171642.147923-1-mjohnson459@gmail.com
 
---===============8170943769735110578==
+--===============3100187884104494859==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Basically convert the flat dictionary parameter passed to the agent with
-configuration bits such as local address and gateway address, into an
-array of such dictionaries.  While it's possible to set up multiple
-subnets on one IPv4 network this is mostly meant for IPv6 where a set of
-RFCs and recommendations document how multiple Router Advertisements can
-be received on a network and, if some of them don't have the "managed"
-but set, we end up with multiple addresses assigned through SLAAC.  On
-our own request we may also be assigned multiple addresses within each
-subnet through DHCP.
+Hi Michael,
 
-There are no plans to support such setups at this time but being a
-public API it needs to be future proof.
----
- doc/agent-api.txt | 38 ++++++++++++++++++++++++--------------
- 1 file changed, 24 insertions(+), 14 deletions(-)
+On 5/17/22 12:16, Michael Johnson wrote:
+> Allows granularly specifying the DHCP logging level. This allows the
+> user to tailor the output to what they need. By default always display
+> errors and warnings.
+> =
 
-diff --git a/doc/agent-api.txt b/doc/agent-api.txt
-index 250628eb..f348a37d 100644
---- a/doc/agent-api.txt
-+++ b/doc/agent-api.txt
-@@ -145,32 +145,41 @@ Methods		void Release() [noreply]
- 			agent, because when this method gets called it has
- 			already been unregistered.
- =
+> 1 =3D INFO
+> 2 =3D DEBUG
+> ---
+>   src/netconfig.c | 17 ++++++++++++++---
+>   1 file changed, 14 insertions(+), 3 deletions(-)
+> =
 
--		void ConfigureIPv4(object device, string interface, dict config)
-+		void ConfigureIPv4(object device, string interface,
-+				   array(dict) configs)
- =
+> diff --git a/src/netconfig.c b/src/netconfig.c
+> index 6694a0e9..da9969f2 100644
+> --- a/src/netconfig.c
+> +++ b/src/netconfig.c
+> @@ -1621,6 +1621,8 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+>   	struct netdev *netdev =3D netdev_find(ifindex);
+>   	struct netconfig *netconfig;
+>   	struct l_icmp6_client *icmp6;
+> +	const char *debug_level =3D NULL;
+> +	int dhcp_priority =3D L_LOG_WARNING;
+>   =
 
- 			This method gets called during a connection setup
- 			when a new set of IPv4 configuration values is to
- 			be written to a network interface.  The connection
- 			is aborted if the method call returns an error or
--			times out.  The 'config' dictionary (a{sv}) maps
--			string keys to values of types defined per key.
-+			times out.  The 'configs' array contains a set of
-+			IP configurations, one for each subnet that is
-+			present on the network.  Each subnet configuration
-+			dictionary (a{sv}) maps string keys to values of
-+			types defined per key.
- =
+>   	if (!netconfig_list)
+>   		return NULL;
+> @@ -1640,9 +1642,18 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+>   					netconfig_ipv4_dhcp_event_handler,
+>   					netconfig, NULL);
+>   =
 
- 			The following key/value pairs are used, but more
--			may be added in future versions.
-+			may be added in future versions.  This dictionary
-+			is defined in the same way for IPv4 and IPv6.
- =
+> -	if (getenv("IWD_DHCP_DEBUG"))
+> -		l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
+> -							"[DHCPv4] ", NULL);
+> +	debug_level =3D getenv("IWD_DHCP_DEBUG");
+> +	if (debug_level !=3D NULL)
+> +	{
+> +		// Convert from user 1 or 2 to L_LOG_*
 
- 			string Method - Indicates whether the local address
--			was set statically (value "static") or obtained
--			automatically such as through DHCP (value "auto").
--			Even when the address was obtained from the remote
--			end some configuration bits, such as DNS addresses,
--			may have been overridden locally.
--
--			string Address - Local IP address string.
-+			on this subnet was set statically (value "static") or
-+			obtained automatically such as through DHCP (value
-+			"auto", inclused SLAAC for IPv6).  Even when the
-+			address was obtained from the remote end some
-+			configuration bits, such as DNS addresses, may have
-+			been overridden locally.
- =
+Actually, that's not our coding style.  We use Linux Kernel style, so it wo=
+uld be:
 
- 			byte PrefixLength - Holds the prefix-length of the
- 			local subnet.  For IPv4 this maps to the netmask.
- =
+if (debug_level !=3D NULL) {
 
--			string Gateway [optional] - Local subnet's gateway
--			address if one exists.
-+			array(string, uint16) Addresses - Local IP address
-+			strings and their integer relative preference values.
-+			Addresses with a lower value in the second element
-+			are preferred.
-+
-+			string Gateway [optional] - The subnet's gateway or
-+			router address if one exists.
- =
+and no C++ comments please.
 
- 			array(string) DomainNameServers [optional] - Holds
- 			the list of DNS addresses configured if any exist.
-@@ -180,7 +189,8 @@ Methods		void Release() [noreply]
- =
+> +		if (*debug_level =3D=3D '1')
+> +			dhcp_priority =3D L_LOG_INFO;
+> +		else if (*debug_level =3D=3D '2')
+> +			dhcp_priority =3D L_LOG_DEBUG;
+> +	}
+> +
 
- 			Possible Errors: net.connman.iwd.Agent.Error.Canceled
- =
+This changes the semantics slightly.  In our wiki, etc we show IWD_DHCP_DEB=
+UG =
 
--		void ConfigureIPv6(object device, string interface, dict config)
-+		void ConfigureIPv6(object device, string interface,
-+				   array(dict) configs)
- =
+with value "1" to enable debugging, so I think we should be nice and keep t=
+hat =
 
- 			Same as ConfigureIPv4 above but for IPv6.
- =
+behavior if possible.  How about:
 
--- =
+if IWD_DHCP_DEBUG is not set, use L_LOG_WARNING.
 
-2.32.0
+If IWD_DHCP_DEBUG is set and has a non-NULL value, use L_LOG_DEBUG
 
---===============8170943769735110578==--
+If the value above is from the set L_LOG_ERR .. L_LOG_DEBUG (3 .. 7), then =
+use that.
+
+> +	l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
+> +					"[DHCPv4] ", NULL, dhcp_priority);
+>   =
+
+>   	netconfig->dhcp6_client =3D l_dhcp6_client_new(ifindex);
+>   	l_dhcp6_client_set_event_handler(netconfig->dhcp6_client,
+> =
+
+
+Regards,
+-Denis
+--===============3100187884104494859==--
 
