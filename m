@@ -1,36 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============0505249386432982843=="
+Content-Type: multipart/mixed; boundary="===============2141156651473266418=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Michael Johnson <mjohnson459 at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v2 1/6] test-runner: remove root user requirement from
- log/monitor/result
-Date: Wed, 25 May 2022 15:00:26 -0500
-Message-ID: <6cf675a8-019d-d063-3709-234329440108@gmail.com>
-In-Reply-To: 20220525193729.336896-1-prestwoj@gmail.com
+Subject: [PATCH 2/2] docs: Update IWD_DHCP_DEBUG values
+Date: Tue, 17 May 2022 18:05:18 +0100
+Message-ID: <20220517170518.144626-2-mjohnson459@gmail.com>
+In-Reply-To: 20220517170518.144626-1-mjohnson459@gmail.com
 
---===============0505249386432982843==
+--===============2141156651473266418==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Use ``1`` and ``2`` for debug level to maintain compatibility with
+existing settings.
+---
+ src/iwd.debug.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 5/25/22 14:37, James Prestwood wrote:
-> Certain aspects of QEMU like mounting host directories may still require
-> root access but for UML this is not the case. To handle both cases first
-> check if SUDO_UID/GID are set and use those to obtain the actual users
-> ID's. Otherwise if running as non-root use the UID/GID of the user
-> directly.
-> ---
->   tools/runner.py | 18 ++----------------
->   1 file changed, 2 insertions(+), 16 deletions(-)
-> =
+diff --git a/src/iwd.debug.rst b/src/iwd.debug.rst
+index 5a805562..e218c4a8 100644
+--- a/src/iwd.debug.rst
++++ b/src/iwd.debug.rst
+@@ -34,7 +34,7 @@ ENVIRONMENT
+ =
 
+ *$IWD_GENL_DEBUG* set to ``1`` enables printing Generic Netlink communicat=
+ion with the kernel.
+ =
 
-All applied, thanks.
+-*$IWD_DHCP_DEBUG* set to ``1`` enables DHCP debugging.
++*$IWD_DHCP_DEBUG* set to ``1`` (info) or ``2`` (debug) to enabled DHCP log=
+ging.
+ =
 
-Regards,
--Denis
+ *$IWD_TLS_DEBUG* set to ``1`` enables TLS debugging.
+ =
 
---===============0505249386432982843==--
+-- =
+
+2.25.1
+
+--===============2141156651473266418==--
 
