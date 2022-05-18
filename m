@@ -1,53 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============5526961130260169000=="
+Content-Type: multipart/mixed; boundary="===============8091831408062499893=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Michael Johnson <mjohnson459 at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] json: fix pointer arithmetic error
-Date: Fri, 10 Dec 2021 16:13:07 -0800
-Message-ID: <20211211001307.2102791-1-prestwoj@gmail.com>
+Subject: Re: [PATCH v2 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
+Date: Wed, 18 May 2022 16:03:26 +0100
+Message-ID: <CACsRnHWyCVqgz2Jh6Nr16SGVZVDvroeqCu+gXXVd+coo_AeK0w@mail.gmail.com>
+In-Reply-To: fb1c5993-f6d3-a1cc-fdfc-4193dd4a768c@gmail.com
 
---===============5526961130260169000==
+--===============8091831408062499893==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Subtracting the pointers is sufficient for counting the tokens,
-they do not need to be modulus the size of jsmntok_t
----
- src/json.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Denis,
 
-diff --git a/src/json.c b/src/json.c
-index 20adcec7..39570e7e 100644
---- a/src/json.c
-+++ b/src/json.c
-@@ -82,7 +82,7 @@ static int find_object_tokens(struct json_iter *iter, jsm=
-ntok_t *object)
- 	if (!next)
- 		next =3D ITER_END(iter);
- =
+On Wed, 18 May 2022 at 15:06, Denis Kenzior <denkenz(a)gmail.com> wrote:
 
--	return ((next - object) % sizeof(jsmntok_t)) - 1;
-+	return next - object - 1;
- }
- =
+> Send it out and I'll ponder which one I like more.  I think longer term, =
+it
+> might be desirable to be able to quiet down some of this output, even for=
+ iwd
+> itself.
 
- static void iter_recurse(struct json_iter *iter, jsmntok_t *object,
-@@ -91,7 +91,7 @@ static void iter_recurse(struct json_iter *iter, jsmntok_=
-t *object,
- 	struct json_contents *c =3D iter->contents;
- =
+Ok, I've sent it out.
 
- 	child->contents =3D c;
--	child->start =3D (object - c->tokens) % sizeof(jsmntok_t);
-+	child->start =3D object - c->tokens;
- 	child->count =3D find_object_tokens(iter, object);
- }
- =
+I also sent another ell patch for changes that would allow limiting
+the iwd logging as well which I wrote when putting together a more
+complex patch (before it got too complex). This would go better with
+the second iwd patch as the verbosity can be reduced through a new
+`l_log_set_max_level` function in ell/log and therefore IWD_DHCP_DEBUG
+can remain simple.
 
--- =
+I don't have a matching patch to limit logging verbosity in all of iwd
+though it should be fairly straightforward to add.
 
-2.31.1
-
---===============5526961130260169000==--
+Regards,
+Michael
+--===============8091831408062499893==--
 
