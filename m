@@ -1,36 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============6920524721217622683=="
+Content-Type: multipart/mixed; boundary="===============0285709602314879401=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Michael Johnson <mjohnson459 at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH 1/2] auto-t: correctly import Mapping from collections
-Date: Wed, 01 Jun 2022 11:02:26 -0500
-Message-ID: <4f5236bb-6fb1-47cd-86a0-052024470458@gmail.com>
-In-Reply-To: 20220601160548.262018-1-prestwoj@gmail.com
+Subject: [PATCH v3 2/2] docs: Show new usage of IWD_DHCP_DEBUG
+Date: Wed, 18 May 2022 15:39:15 +0100
+Message-ID: <20220518143915.105007-2-mjohnson459@gmail.com>
+In-Reply-To: 20220518143915.105007-1-mjohnson459@gmail.com
 
---===============6920524721217622683==
+--===============0285709602314879401==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+---
+ src/iwd.debug.rst | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-On 6/1/22 11:05, James Prestwood wrote:
-> The current way this was being done was to import collections and
-> use collections.Mapping. This has been deprecated since python 3.3
-> but has worked up until python 3.10. After python 3.10 this will
-> no longer work, and Mapping must be imported from collections.abc.
-> ---
->   autotests/util/ead.py   | 4 ++--
->   autotests/util/hwsim.py | 6 +++---
->   autotests/util/iwd.py   | 5 +++--
->   3 files changed, 8 insertions(+), 7 deletions(-)
-> =
+diff --git a/src/iwd.debug.rst b/src/iwd.debug.rst
+index 5a805562..3d4c8b58 100644
+--- a/src/iwd.debug.rst
++++ b/src/iwd.debug.rst
+@@ -40,6 +40,10 @@ ENVIRONMENT
+ =
 
+ *$IWD_WSC_DEBUG_KEYS* set to ``1`` enables printing received WSC keys.
+ =
 
-Both applied, thanks.
++The granularity of the DHCP logging can also be tailored by setting
++*$IWD_DHCP_DEBUG* to the maximum verbosity level, "debug", "info", "warn",=
+ or
++"error".
++
+ SEE ALSO
+ =3D=3D=3D=3D=3D=3D=3D=3D
+ =
 
-Regards,
--Denis
+-- =
 
---===============6920524721217622683==--
+2.25.1
+
+--===============0285709602314879401==--
 
