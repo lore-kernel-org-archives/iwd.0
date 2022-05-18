@@ -1,82 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============6544547950250077790=="
+Content-Type: multipart/mixed; boundary="===============1631370328694112005=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Marcel Holtmann <marcel at holtmann.org>
 To: iwd at lists.01.org
-Subject: [PATCH v4 11/13] dpp: fail if disconnected during DPP protocol
-Date: Mon, 28 Mar 2022 10:28:40 -0700
-Message-ID: <20220328172842.1660272-12-prestwoj@gmail.com>
-In-Reply-To: 20220328172842.1660272-1-prestwoj@gmail.com
+Subject: Re: [PATCH v3 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
+Date: Wed, 18 May 2022 16:48:23 +0200
+Message-ID: <0886D7EE-6F64-4B79-A752-980FEA0752B4@holtmann.org>
+In-Reply-To: 20220518143915.105007-1-mjohnson459@gmail.com
 
---===============6544547950250077790==
+--===============1631370328694112005==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If the connected BSS is NULL IWD was disconnected and this should
-trigger a protocol termination.
----
- src/dpp.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+Hi Michael,
 
-diff --git a/src/dpp.c b/src/dpp.c
-index f2421b69..de8e6e14 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -1294,7 +1294,7 @@ static void dpp_presence_announce(struct dpp_sm *dpp)
- 	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
- }
- =
+> Allows granularly specifying the DHCP logging level. This allows the
+> user to tailor the output to what they need. By default, always display
+> info, errors and warnings to match the rest of iwd.
+> =
 
--static void dpp_send_authenticate_request(struct dpp_sm *dpp)
-+static bool dpp_send_authenticate_request(struct dpp_sm *dpp)
- {
- 	uint8_t hdr[32];
- 	uint8_t attrs[256];
-@@ -1305,6 +1305,12 @@ static void dpp_send_authenticate_request(struct dpp=
-_sm *dpp)
- 	struct station *station =3D station_find(netdev_get_ifindex(dpp->netdev));
- 	struct scan_bss *bss =3D station_get_connected_bss(station);
- =
+> Setting `IWD_DHCP_DEBUG` to "debug", "info", "warn", "error" will limit
+> the logging to that level or higher allowing the default logging
+> verbosity to be reduced.
+> =
 
-+	/* Got disconnected by the time the peer was discovered */
-+	if (!bss) {
-+		dpp_reset(dpp);
-+		return false;
-+	}
-+
- 	l_ecc_point_get_data(dpp->own_proto_public, i_proto_key,
- 				sizeof(i_proto_key));
- =
+> Setting `IWD_DHCP_DEBUG` to "1" as per the current behavior will
+> continue to enable debug level logging.
+> ---
+> src/netconfig.c | 21 ++++++++++++++++++---
+> 1 file changed, 18 insertions(+), 3 deletions(-)
+> =
 
-@@ -1337,6 +1343,8 @@ static void dpp_send_authenticate_request(struct dpp_=
-sm *dpp)
- 	iov[1].iov_len =3D ptr - attrs;
- =
+> diff --git a/src/netconfig.c b/src/netconfig.c
+> index 6694a0e9..0042a55d 100644
+> --- a/src/netconfig.c
+> +++ b/src/netconfig.c
+> @@ -1621,6 +1621,8 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+> 	struct netdev *netdev =3D netdev_find(ifindex);
+> 	struct netconfig *netconfig;
+> 	struct l_icmp6_client *icmp6;
+> +	const char *debug_level =3D NULL;
+> +	int dhcp_priority =3D L_LOG_INFO;
+> =
 
- 	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
-+
-+	return true;
- }
- =
+> 	if (!netconfig_list)
+> 		return NULL;
+> @@ -1640,9 +1642,22 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+> 					netconfig_ipv4_dhcp_event_handler,
+> 					netconfig, NULL);
+> =
 
- static void dpp_roc_started(void *user_data)
-@@ -1948,7 +1956,8 @@ static void dpp_handle_presence_announcement(struct d=
-pp_sm *dpp,
- =
+> -	if (getenv("IWD_DHCP_DEBUG"))
+> -		l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
+> -							"[DHCPv4] ", NULL);
+> +	debug_level =3D getenv("IWD_DHCP_DEBUG");
+> +	if (debug_level !=3D NULL) {
+> +		if (strcmp("debug", debug_level) =3D=3D 0)
+> +			dhcp_priority =3D L_LOG_DEBUG;
+> +		else if (strcmp("info", debug_level) =3D=3D 0)
+> +			dhcp_priority =3D L_LOG_INFO;
+> +		else if (strcmp("warn", debug_level) =3D=3D 0)
+> +			dhcp_priority =3D L_LOG_WARNING;
+> +		else if (strcmp("error", debug_level) =3D=3D 0)
+> +			dhcp_priority =3D L_LOG_ERR;
+> +		else 	/* Default for backwards compatibility */
+> +			dhcp_priority =3D L_LOG_DEBUG;
+> +	}
+> +
+> +	l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
+> +					"[DHCPv4] ", NULL, dhcp_priority);
 
- 	dpp->state =3D DPP_STATE_AUTHENTICATING;
- =
+please don=E2=80=99t always set l_dhcp_client_set_debug. It should not be s=
+et. And I don=E2=80=99t like the dhcp_priority parameter at all. That is ju=
+st convoluted code and there is no precedence with any _set_debug() APIs.
 
--	dpp_send_authenticate_request(dpp);
-+	if (!dpp_send_authenticate_request(dpp))
-+		return;
- =
+Regards
 
- 	/*
- 	 * Should we wait for an ACK then go offchannel?
--- =
+Marcel
 
-2.34.1
-
---===============6544547950250077790==--
+--===============1631370328694112005==--
 
