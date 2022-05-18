@@ -1,68 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============0481480862693788384=="
+Content-Type: multipart/mixed; boundary="===============3374341380662957330=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Michael Johnson <mjohnson459 at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: IWD is running as AP with the build-in DHCP but android phones
- report no internet connection and switch back to WiFi home network
-Date: Fri, 05 Nov 2021 10:35:07 -0500
-Message-ID: <b29d30cd-7e96-3bed-4555-e79373f2dda9@gmail.com>
-In-Reply-To: 20211105151439.2830.39111@ml01.vlan13.01.org
+Subject: [PATCH v3 1/2] netconfig: Add multiple levels to IWD_DHCP_DEBUG
+Date: Wed, 18 May 2022 15:39:14 +0100
+Message-ID: <20220518143915.105007-1-mjohnson459@gmail.com>
 
---===============0481480862693788384==
+--===============3374341380662957330==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Salahaldeen,
+Allows granularly specifying the DHCP logging level. This allows the
+user to tailor the output to what they need. By default, always display
+info, errors and warnings to match the rest of iwd.
 
-On 11/5/21 10:14 AM, salahaldeen.altous(a)leica-camera.com wrote:
-> Hi,
-> I have a stand alone device (without internet access) using iwd in Access=
- point mode but some android phones connected to this device show no intern=
-et connection and switch back to WiFi home network.
+Setting `IWD_DHCP_DEBUG` to "debug", "info", "warn", "error" will limit
+the logging to that level or higher allowing the default logging
+verbosity to be reduced.
 
-Interesting.  Not sure why they would do that if the user explicitly select=
-ed to =
+Setting `IWD_DHCP_DEBUG` to "1" as per the current behavior will
+continue to enable debug level logging.
+---
+ src/netconfig.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-connect to your device...
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 6694a0e9..0042a55d 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -1621,6 +1621,8 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+ 	struct netdev *netdev =3D netdev_find(ifindex);
+ 	struct netconfig *netconfig;
+ 	struct l_icmp6_client *icmp6;
++	const char *debug_level =3D NULL;
++	int dhcp_priority =3D L_LOG_INFO;
+ =
 
-> With different  dhcp-server (dnsmasq) this problem have been solved by dr=
-oping defaultroute in answered DHCP requests. How I can solve no internet c=
-onnection with iwd and the built-in DHCP server.
+ 	if (!netconfig_list)
+ 		return NULL;
+@@ -1640,9 +1642,22 @@ struct netconfig *netconfig_new(uint32_t ifindex)
+ 					netconfig_ipv4_dhcp_event_handler,
+ 					netconfig, NULL);
+ =
 
-I suppose we could use the same approach.  Could you try the attached patch=
- and =
+-	if (getenv("IWD_DHCP_DEBUG"))
+-		l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
+-							"[DHCPv4] ", NULL);
++	debug_level =3D getenv("IWD_DHCP_DEBUG");
++	if (debug_level !=3D NULL) {
++		if (strcmp("debug", debug_level) =3D=3D 0)
++			dhcp_priority =3D L_LOG_DEBUG;
++		else if (strcmp("info", debug_level) =3D=3D 0)
++			dhcp_priority =3D L_LOG_INFO;
++		else if (strcmp("warn", debug_level) =3D=3D 0)
++			dhcp_priority =3D L_LOG_WARNING;
++		else if (strcmp("error", debug_level) =3D=3D 0)
++			dhcp_priority =3D L_LOG_ERR;
++		else 	/* Default for backwards compatibility */
++			dhcp_priority =3D L_LOG_DEBUG;
++	}
++
++	l_dhcp_client_set_debug(netconfig->dhcp_client, do_debug,
++					"[DHCPv4] ", NULL, dhcp_priority);
+ =
 
-see if this helps.
+ 	netconfig->dhcp6_client =3D l_dhcp6_client_new(ifindex);
+ 	l_dhcp6_client_set_event_handler(netconfig->dhcp6_client,
+-- =
 
-Regards,
--Denis
+2.25.1
 
---===============0481480862693788384==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-dhcp-server-Omit-OPTION_ROUTER-if-not-configured.patch"
-
-RnJvbSAyZjExNGI4NGQzZTk5MGYyZDExNjRjZDIyNTk1NTZiYmJjZDBjMmVjIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEZW5pcyBLZW56aW9yIDxkZW5rZW56QGdtYWlsLmNvbT4KRGF0
-ZTogRnJpLCA1IE5vdiAyMDIxIDEwOjI4OjMyIC0wNTAwClN1YmplY3Q6IFtQQVRDSF0gZGhjcC1z
-ZXJ2ZXI6IE9taXQgT1BUSU9OX1JPVVRFUiBpZiBub3QgY29uZmlndXJlZAoKSW5zdGVhZCBvZiBh
-c3N1bWluZyB0aGF0IE9QVElPTl9ST1VURVIgc2hvdWxkIGFsd2F5cyBiZSBzZW50LCBhbmQKc2V0
-dGluZyBpdCB0byB0aGUgZGhjcCBzZXJ2ZXIncyBJUCBhZGRyZXNzLCBvbWl0IGl0IGVudGlyZWx5
-IGlmIHRoZQpnYXRld2F5IHdhcyBub3QgcHJvdmlkZWQgKGkuZS4gbF9kaGNwX3NlcnZlcl9zZXRf
-Z2F0ZXdheSB3YXMgbm90CmNhbGxlZC4pCi0tLQogZWxsL2RoY3Atc2VydmVyLmMgfCA0IC0tLS0K
-IDEgZmlsZSBjaGFuZ2VkLCA0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2VsbC9kaGNwLXNl
-cnZlci5jIGIvZWxsL2RoY3Atc2VydmVyLmMKaW5kZXggOWMwNjI4YTZjMzBlLi5jOGIwNmE2ZWY0
-MDkgMTAwNjQ0Ci0tLSBhL2VsbC9kaGNwLXNlcnZlci5jCisrKyBiL2VsbC9kaGNwLXNlcnZlci5j
-CkBAIC0xMDMyLDEwICsxMDMyLDYgQEAgTElCX0VYUE9SVCBib29sIGxfZGhjcF9zZXJ2ZXJfc3Rh
-cnQoc3RydWN0IGxfZGhjcF9zZXJ2ZXIgKnNlcnZlcikKIAkJc2VydmVyLT5hZGRyZXNzID0gaWEu
-c19hZGRyOwogCX0KIAotCS8qIEFzc2lnbiBhIGRlZmF1bHQgZ2F0ZXdheSBpZiBub3QgYWxyZWFk
-eSBzZXQgKi8KLQlpZiAoIXNlcnZlci0+Z2F0ZXdheSkKLQkJc2VydmVyLT5nYXRld2F5ID0gc2Vy
-dmVyLT5hZGRyZXNzOwotCiAJLyogQXNzaWduIGEgZGVmYXVsdCBuZXRtYXNrIGlmIG5vdCBhbHJl
-YWR5ICovCiAJaWYgKCFzZXJ2ZXItPm5ldG1hc2spIHsKIAkJaWYgKGluZXRfcHRvbihBRl9JTkVU
-LCIyNTUuMjU1LjI1NS4wIiwgJmlhKSAhPSAxKQotLSAKMi4yNi4zCgo=
-
---===============0481480862693788384==--
+--===============3374341380662957330==--
 
