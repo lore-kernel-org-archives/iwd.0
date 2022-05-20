@@ -1,45 +1,22 @@
-Content-Type: multipart/mixed; boundary="===============2020207447956838386=="
+Content-Type: multipart/mixed; boundary="===============1395589116419490301=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Jesse Lentz <jesse at twosheds.org>
 To: iwd at lists.01.org
-Subject: [PATCH 07/12] station: set extended key capability
-Date: Mon, 04 Oct 2021 09:48:57 -0700
-Message-ID: <20211004164902.2274318-7-prestwoj@gmail.com>
-In-Reply-To: 20211004164902.2274318-1-prestwoj@gmail.com
+Subject: Re: [PATCH 1/2] Initial signal level notification
+Date: Fri, 20 May 2022 16:50:52 -0400
+Message-ID: <CK4VWGI22Z9E.18TYUYIXWI6DO@laptop>
+In-Reply-To: a5abf8cf-ab6e-7ea5-a458-f5d629f18561@gmail.com
 
---===============2020207447956838386==
+--===============1395589116419490301==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If wiphy and the AP suppor it, set the Extended Key ID capability
-bit in the RSN info and set the handshake to use it.
----
- src/station.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi Denis,
 
-diff --git a/src/station.c b/src/station.c
-index f12cdde5..5605142d 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1087,6 +1087,12 @@ build_ie:
- =
+Thanks for the feedback; I'll submit a revised patch.
 
- 	info.ocvc =3D !disable_ocv;
- =
-
-+	/* Extended Key IDs can only be used if supported by both AP and STA */
-+	if (wiphy_supports_ext_key_id(wiphy) && bss_info.extended_key_id) {
-+		info.extended_key_id =3D true;
-+		hs->ext_key_id_capable =3D true;
-+	}
-+
- 	/* RSN takes priority */
- 	if (bss->rsne) {
- 		ap_ie =3D bss->rsne;
--- =
-
-2.31.1
-
---===============2020207447956838386==--
+Sincerely,
+Jesse
+--===============1395589116419490301==--
 
