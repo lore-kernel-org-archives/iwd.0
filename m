@@ -1,41 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============8409779986874471191=="
+Content-Type: multipart/mixed; boundary="===============2978422787608162785=="
 MIME-Version: 1.0
-From: Diederik de Haas <didi.debian at cknow.org>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] doc: fix overriden -> overridden
-Date: Fri, 14 Jan 2022 18:56:41 +0100
-Message-ID: <20220114175641.12351-1-didi.debian@cknow.org>
+Subject: Re: [PATCH 1/2] Initial signal level notification
+Date: Fri, 20 May 2022 17:00:00 -0500
+Message-ID: <4d0d7992-e1cd-1dd0-3591-f7a161e6e295@gmail.com>
+In-Reply-To: 20220520215324.15537-1-jesse@twosheds.org
 
---===============8409779986874471191==
+--===============2978422787608162785==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/iwd.config.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Jesse,
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 5cd2b06b..54943702 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -205,7 +205,7 @@ The group ``[Network]`` contains network configuration =
-related settings.
-        Sets the global default that tells **iwd** whether it should config=
-ure
-        IPv6 addresses and routes (either provided via static settings,
-        Router Advertisements or DHCPv6 protocol).  This setting is disabled
--       by default.  This setting can also be overriden on a per-network ba=
-sis.
-+       by default.  This setting can also be overridden on a per-network b=
-asis.
- =
+On 5/20/22 16:53, Jesse Lentz wrote:
+> After registration of a SignalLevelAgent, make iwd inform the client of
+> the initial signal level via a "Changed" method call.
+> ---
+>   src/netdev.c  |  5 +++++
+>   src/netdev.h  |  1 +
+>   src/station.c | 19 ++++++++++++++-----
+>   3 files changed, 20 insertions(+), 5 deletions(-)
+> =
 
-    * - NameResolvingService
-      - Values: resolvconf, **systemd**
--- =
 
-2.34.1
+I added a 'station:' prefix to the commit message and...
 
---===============8409779986874471191==--
+> +	if (station->connected_network)
+> +	{
+
+... since we use the kernel coding style, I amended this to:
+if (..) {
+
+Both patches applied, thanks!
+
+Regards,
+-Denis
+--===============2978422787608162785==--
 
