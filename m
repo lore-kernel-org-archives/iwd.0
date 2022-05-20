@@ -1,65 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============4565722063690593219=="
+Content-Type: multipart/mixed; boundary="===============6895989396627898732=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Jesse Lentz <jesse at twosheds.org>
 To: iwd at lists.01.org
-Subject: Re: How to run separate iwd for every wifi dongle on the same host?
-Date: Wed, 20 Apr 2022 20:57:56 -0500
-Message-ID: <9bc2b923-ff45-52a3-270f-5ca8fa18daf6@gmail.com>
-In-Reply-To: 20220421014034.2318.714@ml01.vlan13.01.org
+Subject: [PATCH 2/2] Document initial signal level notification
+Date: Fri, 20 May 2022 14:59:48 -0400
+Message-ID: <20220520185948.9533-2-jesse@twosheds.org>
+In-Reply-To: 20220520185948.9533-1-jesse@twosheds.org
 
---===============4565722063690593219==
+--===============6895989396627898732==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Document the initial "Changed" method call following SignalLevelAgent
+registration.
+---
+ doc/station-api.txt | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-On 4/20/22 20:40, zlinuxboy(a)outlook.com wrote:
-> I am trying to plug 3 wifi dongle into one SBC(odroid c2 running armbian =
-22.01), wish to run separate iwd instance for each wifi dongle, in order to=
- connect different ssid and acquire dhcp ip address and assign to them.
-> =
+diff --git a/doc/station-api.txt b/doc/station-api.txt
+index 0bb372ab..05dd137e 100644
+--- a/doc/station-api.txt
++++ b/doc/station-api.txt
+@@ -182,16 +182,17 @@ Methods		void Release(object device) [noreply]
+ 		void Changed(object device, uint8 level) [noreply]
+ =
 
-> I have successfully implement with systemd-networkd+vrf+iwd, assign three=
- wifi dongle to different vrf. start iwd, all three wifi dongle could conne=
-ct to the same ssid and get different ip with dhcp, including default route.
+ 			This method gets called when the signal strength
+-			measurement for the device's connected network
+-			changes enough to go from one level to another out
+-			of the N ranges defined by the array of (N-1)
+-			threshold values passed to RegisterSignalLevelAgent().
+-			The level parameter is in the range from 0 to N,
+-			0 being the strongest signal or above the first
+-			threshold value in the array, and N being the
+-			weakest and below the last threshold value.  For
+-			example if RegisterSignalLevelAgent was called with
+-			the array [-40, -50, -60], the 'level' parameter of
+-			0 would mean signal is received at -40 or more dBm
+-			and 3 would mean below -60 dBm and might correspond
+-			to 1 out of 4 bars on a UI signal meter.
++			measurement for the device's connected network changes
++			enough to go from one level to another out of the N
++			ranges defined by the array of (N-1) threshold values
++			passed to RegisterSignalLevelAgent().  It also gets
++			called immediately after the signal level agent is
++			registered.  The level parameter is in the range from 0
++			to N, 0 being the strongest signal or above the first
++			threshold value in the array, and N being the weakest
++			and below the last threshold value.  For example if
++			RegisterSignalLevelAgent was called with the array [-40,
++			-50, -60], the 'level' parameter of 0 would mean signal
++			is received at -40 or more dBm and 3 would mean below
++			-60 dBm and might correspond to 1 out of 4 bars on a UI
++			signal meter.
+-- =
 
-vrf?
+2.36.0
 
-> =
-
-> but when I assign different wifi dongle to the same ssid  with different =
-psk(my ap is aerohive, support ppsk, everything user have a different priva=
-te key. cisco, ruckus, aruba has such the same feature), iwd could not save=
- the multiple config for the same ssid, because the same ssid share one con=
-fig. so any possible to run separate iwd for every wifi dongle?
-
-I don't think you'd be able to accomplish this easily with iwd as of today.=
-  You =
-
-can try running a private system bus (dbus) for each iwd instance and using=
- phy =
-
-filtering (see 'iwd --help') so that each iwd instance only manages the =
-
-particular phy you want.  Or use namespaces.  But you'd need to access each=
- iwd =
-
-instance via its private bus/namespace separately.  You'd also need to over=
-ride =
-
-the state directory for each iwd instance.
-
-Also, iwd isn't aware of SAE password identities (I assume this is what you=
- mean =
-
-by PPSK).  Or is this something else?
-
-Anyhow, you'd probably need to add some intelligence into iwd for it to use =
-
-multiple PSKs on the same SSID properly within the same iwd instance.
-
-Regards,
--Denis
---===============4565722063690593219==--
+--===============6895989396627898732==--
 
