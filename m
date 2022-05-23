@@ -1,61 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============8047855231652552848=="
+Content-Type: multipart/mixed; boundary="===============0556152682483097580=="
 MIME-Version: 1.0
-From: 58e33db1-f428-4823-8cc3-d962d0fb8aa8 at slmail.me
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: iwd 1.18 doesn't connect to network on boot
-Date: Thu, 23 Sep 2021 11:04:32 +0000
-Message-ID: <163239507223.7.15396824044509805482.14044955@slmail.me>
+Subject: Re: [PATCH 1/2] station: Simplify usage of
+ station_signal_agent_notify()
+Date: Mon, 23 May 2022 12:57:25 -0500
+Message-ID: <f3aecafc-8274-e374-648a-a6d267ba58c5@gmail.com>
+In-Reply-To: 20220523062053.16206-1-jesse@twosheds.org
 
---===============8047855231652552848==
+--===============0556152682483097580==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Jesse,
 
-I'm on Arch Linux and after recent iwd upgrade to version 1.18 I'm no longe=
-r connected to my home network when booting. Previous version works just fi=
-ne. I've managed to workaround the issue simply by going to iwctl and manua=
-lly doing disconnect/connect every time I boot the computer.
-
-Before doing this iwctl reports 'connecting' state indefinitely. Network co=
-verage is always good. I have the laptop sitting on a table very close to t=
-he router and AFAIK, it didn't receive any firmware upgrade recently.
-
-A little bit more of context in case it helps:
-
-/etc/iwd/main.conf
-[General]
-EnableNetworkConfiguration=3Dtrue
-AddressRandomization=3Dnetwork
-
-[Network]
-NameResolvingService=3Dresolvconf
-
-iwevent
-Waiting for Wireless Events from interfaces...
-10:10:55.646290 wlan0 Scan request completed
-10:10:57.801675 wlan0 Scan request completed
-10:10:58.106493 wlan0 New Access Point/Cell address:Not-Associated =3D> thi=
-s is the disconnect
-10:11:31.786703 wlan0 Scan request completed
-10:11:31.871341 wlan0 Association Request IEs:xxxxxxxxxxxxxxxxxxxxxxxxxxxxx=
-xxxxxxxxxxxxxxxxxxxx
-10:11:31.871401 wlan0 Association Response IEs:xxxxxxxxxxxxxxxxxxxxxxxxxxxx=
-xxxxxxxxxxxxxxxxxxxxx
-10:11:31.871436 wlan0 New Access Point/Cell address:xx:xx:xx:xx:xx:xx
-
-Distro mantainers just upgraded to latest upstream release, without any oth=
-er modification on PKGBUILD.
-
-https://github.com/archlinux/svntogit-community/blob/9b59977cbb8eb2ffe42ab6=
-13b033efa21c36c053/trunk/PKGBUILD
+On 5/23/22 01:20, Jesse Lentz wrote:
+> station_signal_agent_notify() has been refactored so that its usage is
+> simpler. station_rssi_level_changed() has been replaced by an inlined
+> call to station_signal_agent_notify().
+> ---
+>   src/station.c | 38 ++++++++++++--------------------------
+>   1 file changed, 12 insertions(+), 26 deletions(-)
+> =
 
 
-Thanks for helping!
---
-Jason
+Both applied, thanks.
 
+Regards,
+-Denis
 
---===============8047855231652552848==--
+--===============0556152682483097580==--
 
