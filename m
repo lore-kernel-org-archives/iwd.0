@@ -1,46 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============0815104796929776159=="
+Content-Type: multipart/mixed; boundary="===============8823457171390919591=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/3] main: remove unneeded stat call
-Date: Fri, 18 Feb 2022 11:55:05 -0800
-Message-ID: <20220218195506.2145602-2-prestwoj@gmail.com>
-In-Reply-To: 20220218195506.2145602-1-prestwoj@gmail.com
+Subject: Re: [PATCH] netdev: Initialize signal level during connection attempt
+Date: Mon, 23 May 2022 12:38:32 -0500
+Message-ID: <939cb234-1f21-e1ba-6865-0d853a1e5d16@gmail.com>
+In-Reply-To: 20220523042843.14058-1-jesse@twosheds.org
 
---===============0815104796929776159==
+--===============8823457171390919591==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Static analysis flagged that 'path' was never being checked (which
-should not ever be NULL) but during that review I noticed stat()
-was being called, then fstat afterwards.
----
- src/main.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Hi Jesse,
 
-diff --git a/src/main.c b/src/main.c
-index 7a378b64..d790f61f 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -428,11 +428,8 @@ static bool setup_system_key(void)
- 	}
- =
+On 5/22/22 23:28, Jesse Lentz wrote:
+> The call to netdev_rssi_level_init() in netdev_connect_common() is
+> currently a no-op, because netdev->connected has not yet been set at
+> this stage of the connection attempt. Because netdev_rssi_level_init()
+> is only used twice, it's been replaced by two inlined calls to
+> netdev_set_rssi_level_idx().
+> ---
+>   src/netdev.c | 20 ++++++++++----------
+>   1 file changed, 10 insertions(+), 10 deletions(-)
+> =
 
- 	path =3D l_strdup_printf("%s/%s", cred_dir, key_id);
--
--	if (stat(path, &st) < 0) {
--		l_warn("SystemdEncrypt: Could not stat %s", path);
-+	if (!path)
- 		return false;
--	}
- =
 
- 	fd =3D open(path, O_RDONLY, 0);
- 	if (fd < 0) {
--- =
+Applied, thanks.
 
-2.34.1
+Regards,
+-Denis
 
---===============0815104796929776159==--
+--===============8823457171390919591==--
 
