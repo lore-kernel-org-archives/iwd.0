@@ -1,41 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============5805626626743482757=="
+Content-Type: multipart/mixed; boundary="===============2932980042971874546=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 5/5] handshake: free chandef if already set
-Date: Thu, 23 Sep 2021 15:57:28 -0700
-Message-ID: <20210923225728.556306-5-prestwoj@gmail.com>
-In-Reply-To: 20210923225728.556306-1-prestwoj@gmail.com
+Subject: Re: [PATCH] ft: remove frame type check in FT
+Date: Mon, 23 May 2022 13:01:45 -0500
+Message-ID: <4a37ea31-42b9-52f6-bb56-9db3134cccb0@gmail.com>
+In-Reply-To: 20220523181649.33288-1-prestwoj@gmail.com
 
---===============5805626626743482757==
+--===============2932980042971874546==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This can happen with FT, since the handshake object is reused.
----
- src/handshake.c | 3 +++
- 1 file changed, 3 insertions(+)
+Hi James,
 
-diff --git a/src/handshake.c b/src/handshake.c
-index 10923fbf..642a25a7 100644
---- a/src/handshake.c
-+++ b/src/handshake.c
-@@ -1024,6 +1024,9 @@ bool handshake_state_add_ecc_sae_pt(struct handshake_=
-state *s,
- void handshake_state_set_chandef(struct handshake_state *s,
- 						struct band_chandef *chandef)
- {
-+	if (s->chandef)
-+		l_free(s->chandef);
-+
- 	s->chandef =3D chandef;
- }
- =
+On 5/23/22 13:16, James Prestwood wrote:
+> A user reported that IWD was failing to FT in some cases and this was
+> due to the AP setting the Retry bit in the frame type. This was
+> unexpected by IWD since it directly checks the frame type against
+> 0x00b0 which does not account for any B8-B15 bits being set.
+> =
 
--- =
+> IWD doesn't need to verify the frame type field for a few reasons:
+> First mpdu_validate checks the management frame type, Second the kernel
+> checks prior to forwarding the event. Because of this the check was
+> removed completely.
+> ---
+>   src/ft.c | 5 -----
+>   1 file changed, 5 deletions(-)
+> =
 
-2.31.1
 
---===============5805626626743482757==--
+Applied, thanks.
+
+Regards,
+-Denis
+
+--===============2932980042971874546==--
 
