@@ -1,65 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============4318486734211737936=="
+Content-Type: multipart/mixed; boundary="===============5390702387812995222=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Jesse Lentz <jesse at twosheds.org>
 To: iwd at lists.01.org
-Subject: [PATCH v2 3/7] monitor: parse WFA OWE Transition IE
-Date: Wed, 15 Sep 2021 16:05:44 -0700
-Message-ID: <20210915230548.179425-3-prestwoj@gmail.com>
-In-Reply-To: 20210915230548.179425-1-prestwoj@gmail.com
+Subject: [PATCH 2/2] station: Provide SignalLevelAgent update while connecting
+Date: Mon, 23 May 2022 02:20:53 -0400
+Message-ID: <20220523062053.16206-2-jesse@twosheds.org>
+In-Reply-To: 20220523062053.16206-1-jesse@twosheds.org
 
---===============4318486734211737936==
+--===============5390702387812995222==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+When a station enters the "connecting" state, if a SignalLevelAgent is
+registered, provide an initial signal level via a "Changed" method call.
 ---
- monitor/nlmon.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ src/station.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 1a26f553..177147c4 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -1009,6 +1009,21 @@ static void print_ipv4(unsigned int level, const cha=
-r *label,
- 			addr[0], addr[1], addr[2], addr[3]);
- }
+diff --git a/src/station.c b/src/station.c
+index 6aad40cb..7c88f266 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1487,6 +1487,9 @@ static void station_enter_state(struct station *stati=
+on,
+ 				network_get_path(station->connected_network),
+ 				IWD_NETWORK_INTERFACE, "Connected");
  =
 
-+static void print_ie_wfa_owe_transition(unsigned int level, const char *la=
-bel,
-+						const void *data, uint16_t size)
-+{
-+	uint8_t bssid[6];
-+	char ssid[33];
++		if (station->signal_agent)
++			station_signal_agent_notify(station);
 +
-+	if (ie_parse_owe_transition(data, size, bssid, ssid) < 0) {
-+		print_attr(level + 1, "Error parsing");
-+		return;
-+	}
-+
-+	print_attr(level + 1, "BSSID: "MAC, MAC_STR(bssid));
-+	print_attr(level + 1, "SSID: %s", ssid);
-+}
-+
- static void print_ie_vendor(unsigned int level, const char *label,
- 				const void *data, uint16_t size)
- {
-@@ -1054,6 +1069,10 @@ static void print_ie_vendor(unsigned int level, cons=
-t char *label,
- 		case 0x12:
- 			print_ie_rsn_suites(level + 1, label, data, size);
- 			return;
-+		case 0x1c:
-+			print_ie_wfa_owe_transition(level + 1, label,
-+							data - 6, size + 6);
-+			return;
- 		default:
- 			return;
- 		}
+ 		periodic_scan_stop(station);
+ 		break;
+ 	case STATION_STATE_CONNECTED:
 -- =
 
-2.31.1
+2.36.0
 
---===============4318486734211737936==--
+--===============5390702387812995222==--
 
