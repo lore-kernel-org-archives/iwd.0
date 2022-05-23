@@ -1,104 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============1573327652118502894=="
+Content-Type: multipart/mixed; boundary="===============1595107830264499378=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd 1.21 stuck on connecting state
-Date: Fri, 14 Jan 2022 12:51:11 -0800
-Message-ID: <63f4a6a626d48bce3cc8a7a5076c99c43d729a40.camel@gmail.com>
-In-Reply-To: 20220114200809.2807.69459@ml01.vlan13.01.org
+Subject: [PATCH] ft: remove frame type check in FT
+Date: Mon, 23 May 2022 11:16:49 -0700
+Message-ID: <20220523181649.33288-1-prestwoj@gmail.com>
 
---===============1573327652118502894==
+--===============1595107830264499378==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+A user reported that IWD was failing to FT in some cases and this was
+due to the AP setting the Retry bit in the frame type. This was
+unexpected by IWD since it directly checks the frame type against
+0x00b0 which does not account for any B8-B15 bits being set.
 
-Since you have EnableNetworkConfiguration=3Dtrue IWD is performing DHCP
-and waiting for that to succeed. I see further you tried again and got
-an IP so for some reason your DHCP server was not acting properly in
-the 'stuck in connecting case'.
+IWD doesn't need to verify the frame type field for a few reasons:
+First mpdu_validate checks the management frame type, Second the kernel
+checks prior to forwarding the event. Because of this the check was
+removed completely.
+---
+ src/ft.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-You could try setting IWD_DHCP_DEBUG=3D1 as an environment variable and
-try again. That may give more insight into what DHCP is waiting for.
+diff --git a/src/ft.c b/src/ft.c
+index 2b41ae18..2285a86f 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -122,16 +122,11 @@ static bool ft_parse_authentication_resp_frame(const =
+uint8_t *data, size_t len,
+ 				uint16_t *out_status, const uint8_t **out_ies,
+ 				size_t *out_ies_len)
+ {
+-	const uint16_t frame_type =3D 0x00b0;
+ 	uint16_t status =3D 0;
+ =
 
-Thanks,
-James =
+ 	if (len < 30)
+ 		return false;
+ =
 
+-	/* Check FC =3D=3D Management Frame -> Authentication */
+-	if (l_get_le16(data + 0) !=3D frame_type)
+-		return false;
+-
+ 	if (memcmp(data + 4, addr1, 6))
+ 		return false;
+ 	if (memcmp(data + 10, addr2, 6))
+-- =
 
-On Fri, 2022-01-14 at 20:08 +0000,
-54d22547-afc0-4701-b1fc-5a2a2e411646(a)simplelogin.co wrote:
-> Hi James,
-> =
+2.34.1
 
-> I've gone through debugging and this is what I have:
-> https://termbin.com/y9vq
-> =
-
-> iwd.service
-> =
-
-> # /usr/lib/systemd/system/iwd.service
-> [Unit]
-> Description=3DWireless service
-> After=3Dnetwork-pre.target
-> Before=3Dnetwork.target
-> Wants=3Dnetwork.target
-> =
-
-> [Service]
-> Type=3Ddbus
-> BusName=3Dnet.connman.iwd
-> ExecStart=3D/usr/lib/iwd/iwd
-> NotifyAccess=3Dmain
-> LimitNPROC=3D1
-> Restart=3Don-failure
-> CapabilityBoundingSet=3DCAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE
-> PrivateTmp=3Dtrue
-> NoNewPrivileges=3Dtrue
-> DevicePolicy=3Dclosed
-> DeviceAllow=3D/dev/rfkill rw
-> ProtectHome=3Dyes
-> ProtectSystem=3Dstrict
-> ProtectControlGroups=3Dyes
-> ProtectKernelModules=3Dyes
-> ConfigurationDirectory=3Diwd
-> StateDirectory=3Diwd
-> StateDirectoryMode=3D0700
-> =
-
-> [Install]
-> WantedBy=3Dmulti-user.target
-> =
-
-> # /etc/systemd/system/iwd.service.d/override.conf
-> [Service]
-> RuntimeDirectory=3Dresolvconf
-> ReadWritePaths=3D/etc/resolv.conf
-> =
-
-> /etc/iwd/main.conf
-> =
-
-> [General]
-> EnableNetworkConfiguration=3Dtrue
-> AddressRandomization=3Donce
-> =
-
-> [Network]
-> NameResolvingService=3Dresolvconf
-> =
-
-> I've also tried to collect iwmon logs but they are huge, like almost
-> 2 MB. Should I filter some of the info as the wiki shows (--nortnl --
-> nowiphy --noscan).
-> =
-
-> Thanks!
-> _______________________________________________
-> iwd mailing list -- iwd(a)lists.01.org
-> To unsubscribe send an email to iwd-leave(a)lists.01.org
-
-
---===============1573327652118502894==--
+--===============1595107830264499378==--
 
