@@ -1,55 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============1451013757948578565=="
+Content-Type: multipart/mixed; boundary="===============5312523255476911446=="
 MIME-Version: 1.0
-From: Andrew Zaborowski <andrew.zaborowski at intel.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 1/4] p2p: Fix Device Address updates from Probe Requests
-Date: Wed, 30 Mar 2022 19:33:57 +0200
-Message-ID: <20220330173400.259961-1-andrew.zaborowski@intel.com>
+Subject: [PATCH 3/5] test-runner: skip mounting duplicate folders
+Date: Wed, 25 May 2022 12:23:26 -0700
+Message-ID: <20220525192328.335557-3-prestwoj@gmail.com>
+In-Reply-To: 20220525192328.335557-1-prestwoj@gmail.com
 
---===============1451013757948578565==
+--===============5312523255476911446==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-p2p_peer_update_existing may be called with a scan_bss struct built from
-a Probe Request frame so it can't access bss->p2p_probe_resp_info even
-if peer->bss was built from a Probe Response.  Check the source frame
-type of the scan_bss struct before updating the Device Address.
+If the user specifies the same parent directory for several outfiles
+skip mounting since it already exists. For example:
 
-This fixes one timing issue that would make the autotest fail often.
+--monitor /outfiles/monitor.txt --result /outfiles/result.txt
 ---
- src/p2p.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ tools/runner.py | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/src/p2p.c b/src/p2p.c
-index 4c90efb6..ebd0f62b 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -3655,11 +3655,15 @@ static bool p2p_peer_update_existing(struct scan_bs=
-s *bss,
- 	 * Some property changes may need to be notified here.
- 	 */
+diff --git a/tools/runner.py b/tools/runner.py
+index 90818ef1..bf28d9ad 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -289,7 +289,13 @@ class RunnerAbstract:
  =
 
--	if (peer->device_addr =3D=3D peer->bss->addr)
--		peer->device_addr =3D bss->addr;
--	else
-+	if (bss->source_frame =3D=3D SCAN_BSS_PROBE_RESP)
- 		peer->device_addr =3D
- 			bss->p2p_probe_resp_info->device_info.device_addr;
-+	else if (bss->source_frame =3D=3D SCAN_BSS_PROBE_REQ && !l_memeqzero(
-+			bss->p2p_probe_req_info->device_info.device_addr, 6))
-+		peer->device_addr =3D
-+			bss->p2p_probe_req_info->device_info.device_addr;
-+	else
-+		peer->device_addr =3D bss->addr;
+ 	# For QEMU/UML runners
+ 	def _prepare_mounts(self, extra=3D[]):
++		mounted =3D []
++
+ 		for entry in mounts_common + extra:
++			if entry.target in mounted:
++				print("%s already mounted, skipping" % entry.target)
++				continue
++
+ 			try:
+ 				os.lstat(entry.target)
+ 			except:
+@@ -298,6 +304,8 @@ class RunnerAbstract:
+ 			mount(entry.source, entry.target, entry.fstype, entry.flags,
+ 				entry.options)
  =
 
- 	scan_bss_free(peer->bss);
- 	peer->bss =3D bss;
++			mounted.append(entry.target)
++
+ 		for entry in dev_table:
+ 			os.symlink(entry.target, entry.linkpath)
+ =
+
 -- =
 
-2.32.0
+2.34.1
 
---===============1451013757948578565==--
+--===============5312523255476911446==--
 
