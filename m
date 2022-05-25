@@ -1,32 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============6407373961812021323=="
+Content-Type: multipart/mixed; boundary="===============0204527653602496605=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: iwd access point mode
-Date: Fri, 08 Oct 2021 13:25:57 -0500
-Message-ID: <af68e3d3-d4cf-8e3e-fd1e-3a72a202f769@gmail.com>
-In-Reply-To: CAOf5uwmuz-S8_XO9HD-h_2rr5YOi6M50Fg4nh9yXYkCh2mEVTA@mail.gmail.com
+Subject: [PATCH 2/5] test-runner: disallow result/monitor/log directly under
+ /tmp
+Date: Wed, 25 May 2022 12:23:25 -0700
+Message-ID: <20220525192328.335557-2-prestwoj@gmail.com>
+In-Reply-To: 20220525192328.335557-1-prestwoj@gmail.com
 
---===============6407373961812021323==
+--===============0204527653602496605==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+Inside the virtual environments /tmp is mounted as its own FS and not
+taken from the host. This poses issues if any output files are directly
+under /tmp since test-runner tries to mount the parent directory (/tmp).
+The can be fixed by ensuring these output files are either not under
+/tmp or at least one folder down the tree (e.g. /tmp/outputs/outfile.txt).
 
-> Anyway I have tested but it seems that it does not work for me.
-> Virtual node are there
-> but iwd pick one of them and they are not destroyed as you said
-> =
+Now this requirement is enforced and test-runner will not start if any
+output files parent directory is /tmp.
+---
+ tools/runner.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
+diff --git a/tools/runner.py b/tools/runner.py
+index 5f837097..90818ef1 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -311,6 +311,9 @@ class RunnerAbstract:
+ 		gid =3D int(os.environ.get('SUDO_GID', os.getgid()))
+ =
 
-Okay, should be fixed now upstream with commit: a0017405064c ("manager: =
+ 		if self.args.log:
++			if self.args.log =3D=3D '/tmp':
++				raise Exception('Log directly cannot be /tmp')
++
+ 			append_gid_uid =3D True
+ =
 
-Initialize all default interfaces")
+ 			if not os.path.exists(self.args.log):
+@@ -324,12 +327,16 @@ class RunnerAbstract:
+ =
 
-I'm not sure what you mean by 'they are not destroyed' though?
+ 			self.args.monitor_parent =3D os.path.abspath(
+ 						os.path.join(self.args.monitor, os.pardir))
++			if self.args.monitor_parent =3D=3D '/tmp':
++				raise Exception('--monitor cannot be directly under /tmp')
+ =
 
-Regards,
--Denis
---===============6407373961812021323==--
+ 		if self.args.result:
+ 			append_gid_uid =3D True
+ =
+
+ 			self.args.result_parent =3D os.path.abspath(
+ 						os.path.join(self.args.result, os.pardir))
++			if self.args.result_parent =3D=3D '/tmp':
++				raise Exception('--result cannot be directly under /tmp')
+ =
+
+ 		if append_gid_uid:
+ 			self.args.SUDO_UID =3D uid
+-- =
+
+2.34.1
+
+--===============0204527653602496605==--
 
