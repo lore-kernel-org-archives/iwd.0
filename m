@@ -1,54 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============0418529329341555750=="
+Content-Type: multipart/mixed; boundary="===============9006843619455619603=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/6] dpp-util: move up va_end before possible error case
-Date: Fri, 18 Mar 2022 09:44:16 -0700
-Message-ID: <20220318164420.739968-2-prestwoj@gmail.com>
-In-Reply-To: 20220318164420.739968-1-prestwoj@gmail.com
+Subject: [PATCH v2 2/6] test-runner: mount testhome rather than assume location
+Date: Wed, 25 May 2022 12:37:25 -0700
+Message-ID: <20220525193729.336896-2-prestwoj@gmail.com>
+In-Reply-To: 20220525193729.336896-1-prestwoj@gmail.com
 
---===============0418529329341555750==
+--===============9006843619455619603==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This was caught by static analysis
+Usually the test home directory is a git repo somewhere e.g. under
+/home. But if the home directory is located under /tmp this poses
+a problem since UML remounts /tmp. To handle both cases mount
+the home directory explicity.
 ---
- src/dpp-util.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/runner.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/dpp-util.c b/src/dpp-util.c
-index cd627e2a..8e7631d0 100644
---- a/src/dpp-util.c
-+++ b/src/dpp-util.c
-@@ -408,6 +408,8 @@ size_t dpp_append_wrapped_data(const void *ad0, size_t =
-ad0_len,
- 		va_arg(va, void*);
- 	}
+diff --git a/tools/runner.py b/tools/runner.py
+index 7c177f1f..5f837097 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -451,6 +451,9 @@ class QemuRunner(RunnerAbstract):
+ 	def prepare_environment(self):
+ 		mounts =3D [ MountInfo('debugfs', 'debugfs', '/sys/kernel/debug', '', 0)=
+ ]
  =
 
-+	va_end(va);
++		mounts.append(MountInfo('hostfs', 'hostfs', self.args.testhome,
++					self.args.testhome, 0))
 +
- 	if (to_len < attrs_len + 4 + 16)
- 		return false;
+ 		if self.args.log:
+ 			mounts.append(MountInfo('9p', 'logdir', self.args.log,
+ 					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240', 0))
+@@ -513,6 +516,9 @@ class UmlRunner(RunnerAbstract):
+ 			mounts.append(MountInfo('hostfs', 'hostfs', self.args.result_parent,
+ 						self.args.result_parent, 0))
  =
 
-@@ -415,8 +417,6 @@ size_t dpp_append_wrapped_data(const void *ad0, size_t =
-ad0_len,
++		mounts.append(MountInfo('hostfs', 'hostfs', self.args.testhome,
++					self.args.testhome, 0))
++
+ 		self._prepare_mounts(extra=3Dmounts)
  =
 
- 	ptr =3D plaintext;
- =
-
--	va_end(va);
--
- 	va_start(va, num_attrs);
- =
-
- 	/* Build up plaintext attributes */
+ 		super().prepare_environment()
 -- =
 
 2.34.1
 
---===============0418529329341555750==--
+--===============9006843619455619603==--
 
