@@ -1,93 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============5411708955329024295=="
+Content-Type: multipart/mixed; boundary="===============6123701267342265938=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v2 11/11] auto-t: update rekey() use to not wait for event
-Date: Tue, 05 Oct 2021 15:00:51 -0700
-Message-ID: <20211005220051.4018694-11-prestwoj@gmail.com>
-In-Reply-To: 20211005220051.4018694-1-prestwoj@gmail.com
+Subject: [PATCH v2 5/6] auto-t: use copy_to_storage in address randomization
+ test
+Date: Wed, 25 May 2022 12:37:28 -0700
+Message-ID: <20220525193729.336896-5-prestwoj@gmail.com>
+In-Reply-To: 20220525193729.336896-1-prestwoj@gmail.com
 
---===============5411708955329024295==
+--===============6123701267342265938==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The hostapd event wait was moved into rekey() itself.
+This test was just piping the PSK files into /tmp/iwd/ssidCCMP.psk
+which is a bit fragile if the storage dir was ever to change. Instead
+use copy_to_storage and the 'name' keyword to copy the file.
 ---
- autotests/testFILS/fils_256_test.py       | 1 -
- autotests/testFILS/fils_384_test.py       | 1 -
- autotests/testFT-FILS/connection_test.py  | 1 -
- autotests/testPSK-roam/connection_test.py | 1 -
- 4 files changed, 4 deletions(-)
+ autotests/testAddressRandomization/connection_test.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/autotests/testFILS/fils_256_test.py b/autotests/testFILS/fils_=
-256_test.py
-index 02fad28e..a4e58715 100644
---- a/autotests/testFILS/fils_256_test.py
-+++ b/autotests/testFILS/fils_256_test.py
-@@ -56,7 +56,6 @@ class Test(unittest.TestCase):
-         testutil.test_ifaces_connected(device.name, hapd.ifname)
+diff --git a/autotests/testAddressRandomization/connection_test.py b/autote=
+sts/testAddressRandomization/connection_test.py
+index 32163e0f..f9f62f7a 100644
+--- a/autotests/testAddressRandomization/connection_test.py
++++ b/autotests/testAddressRandomization/connection_test.py
+@@ -46,7 +46,7 @@ class Test(unittest.TestCase):
+         perm_addr =3D device.address
  =
 
-         hapd.rekey(device.address)
--        hapd.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
+         # 1. Test per-network deterministic MAC generation
+-        os.system('cat pernetwork.psk > /tmp/iwd/ssidCCMP.psk')
++        IWD.copy_to_storage('pernetwork.psk', name=3D'ssidCCMP.psk')
+         new_addr =3D self.try_connection(wd)
+         self.assertNotEqual(perm_addr, new_addr)
+         # try again to ensure the generation was deterministic
+@@ -54,7 +54,7 @@ class Test(unittest.TestCase):
+         self.assertEqual(new_addr, new_addr2)
  =
 
-         device.disconnect()
+         # 2. Test FullAddressRandomization
+-        os.system('cat full_random.psk > /tmp/iwd/ssidCCMP.psk')
++        IWD.copy_to_storage('full_random.psk', name=3D'ssidCCMP.psk')
+         new_addr =3D self.try_connection(wd)
+         self.assertNotEqual(perm_addr, new_addr)
+         # try again to make sure the generation was random
+@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
+         self.assertNotEqual(new_addr, new_addr2)
  =
 
-diff --git a/autotests/testFILS/fils_384_test.py b/autotests/testFILS/fils_=
-384_test.py
-index 8ecd2fec..e6550a17 100644
---- a/autotests/testFILS/fils_384_test.py
-+++ b/autotests/testFILS/fils_384_test.py
-@@ -56,7 +56,6 @@ class Test(unittest.TestCase):
-         testutil.test_ifaces_connected(device.name, hapd.ifname)
- =
-
-         hapd.rekey(device.address)
--        hapd.wait_for_event('EAPOL-4WAY-HS-COMPLETED')
- =
-
-         device.disconnect()
- =
-
-diff --git a/autotests/testFT-FILS/connection_test.py b/autotests/testFT-FI=
-LS/connection_test.py
-index d1389cea..14025a3b 100644
---- a/autotests/testFT-FILS/connection_test.py
-+++ b/autotests/testFT-FILS/connection_test.py
-@@ -96,7 +96,6 @@ class Test(unittest.TestCase):
-                           (self.bss_hostapd[0].ifname, device.name, True, =
-True))
- =
-
-         self.bss_hostapd[1].rekey(device.address)
--        self.bss_hostapd[1].wait_for_event('EAPOL-4WAY-HS-COMPLETED')
- =
-
-     def test_fils_ft_roam_sha256(self):
-         wd =3D IWD(True)
-diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-=
-roam/connection_test.py
-index d1beb010..ee50e4a7 100644
---- a/autotests/testPSK-roam/connection_test.py
-+++ b/autotests/testPSK-roam/connection_test.py
-@@ -81,7 +81,6 @@ class Test(unittest.TestCase):
-                           (self.bss_hostapd[0].ifname, device.name, True, =
-True))
- =
-
-         self.bss_hostapd[1].rekey(device.address)
--        self.bss_hostapd[1].wait_for_event('EAPOL-4WAY-HS-COMPLETED')
- =
-
-         device.roam(self.bss_hostapd[0].bssid)
+         # 3. Test AddressOverride
+-        os.system('cat override.psk > /tmp/iwd/ssidCCMP.psk')
++        IWD.copy_to_storage('override.psk', name=3D'ssidCCMP.psk')
+         new_addr =3D self.try_connection(wd)
+         self.assertEqual(new_addr, 'e6:f6:38:a9:02:02')
  =
 
 -- =
 
-2.31.1
+2.34.1
 
---===============5411708955329024295==--
+--===============6123701267342265938==--
 
