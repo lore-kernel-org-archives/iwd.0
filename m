@@ -1,53 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============2247998787280376554=="
+Content-Type: multipart/mixed; boundary="===============4523069164404659467=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] station: Move netconfig_reset() to common path
-Date: Wed, 29 Sep 2021 17:07:26 -0500
-Message-ID: <2e596fd9-c849-e3b2-f296-6fffadef29af@gmail.com>
-In-Reply-To: CAOq732KHRh4HvDnGaKXqe4SPH=K=Hju=GJ-i9OJwap=jXQcKGA@mail.gmail.com
+Subject: [PATCH 5/5] auto-t: fix testRSSIAgent after signal agent changes
+Date: Wed, 25 May 2022 12:23:28 -0700
+Message-ID: <20220525192328.335557-5-prestwoj@gmail.com>
+In-Reply-To: 20220525192328.335557-1-prestwoj@gmail.com
 
---===============2247998787280376554==
+--===============4523069164404659467==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+The signal agent notifications were changed which breaks this test.
+Specifically commit ce227e7b94 sends a notification when connected
+which breaks the 'agent.calls' check. Since this check is done both
+after connecting and once already connected the initial value may
+be 1 or 0. Because of this that check was removed entirely.
+---
+ autotests/testRSSIAgent/connection_test.py | 1 -
+ 1 file changed, 1 deletion(-)
 
-On 9/29/21 5:05 PM, Andrew Zaborowski wrote:
-> Hi Denis,
-> =
+diff --git a/autotests/testRSSIAgent/connection_test.py b/autotests/testRSS=
+IAgent/connection_test.py
+index 160a17b3..4ffa3d2c 100644
+--- a/autotests/testRSSIAgent/connection_test.py
++++ b/autotests/testRSSIAgent/connection_test.py
+@@ -56,7 +56,6 @@ class Test(unittest.TestCase):
+             # at least) uses a moving-window average value over the last R=
+SSI
+             # measurements received from the driver and it changes gradual=
+ly.
+             # Normally 1 second is enough.
+-            self.assertEqual(agent.calls, 0)
+             for centre, level in rssi_pairs:
+                 rule.signal =3D centre
+                 agent.level =3D -1
+-- =
 
-> On Wed, 29 Sept 2021 at 22:06, Denis Kenzior <denkenz(a)gmail.com> wrote:
->> On 9/29/21 11:42 AM, Andrew Zaborowski wrote:
->>> Move the netconfig_reset calls to inside
->>> station_reset_connection_state() instead of having each caller do
->>
->> This is on purpose.  There should be no need to call netconfig_reset if
->> netconfig_configure wasn't called in the first place.
-> =
+2.34.1
 
-> In this case it *was* called, then for some reason the driver
-> deauthenticated when we requested a scan (from_ap is false), netdev
-
-That would be useful info and should be in the commit description ;)
-
-> emitted a NETDEV_EVENT_DISCONNECT_BY_SME and we end up in
-> station_connect_cb.  You're right in that station_connect_cb also
-
-Then that sounds like a bug or another side-effect of delaying the CONNECTE=
-D =
-
-state until netconfig is done.    NETDEV_EVENT_DISCONNECT_BY_SME should res=
-ult =
-
-in station_disassociated() and not station_connect_cb()
-
-> handles failures before the netconfig_configure call, so if you want
-> to avoid the potentially unneeded netconfig_reset() I can move it
-> inside station_disconnect_event to avoid bigger changes.
-
-Regards,
--Denis
---===============2247998787280376554==--
+--===============4523069164404659467==--
 
