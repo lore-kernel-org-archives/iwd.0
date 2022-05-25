@@ -1,54 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============0523522983422657083=="
+Content-Type: multipart/mixed; boundary="===============7049785003868578532=="
 MIME-Version: 1.0
-From: Tmore1 <tmore1 at gmx.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: Enabling IPv6 causes immediate segfault on connect
-Date: Wed, 10 Nov 2021 13:37:01 -0500
-Message-ID: <20211110133701.f4958131332fa9d070abef93@gmx.com>
-In-Reply-To: 243fa539-ee0b-6286-0c99-b52afe19273a@gmail.com
+Subject: [PATCH 4/5] auto-t: use copy_to_storage in address randomization test
+Date: Wed, 25 May 2022 12:23:27 -0700
+Message-ID: <20220525192328.335557-4-prestwoj@gmail.com>
+In-Reply-To: 20220525192328.335557-1-prestwoj@gmail.com
 
---===============0523522983422657083==
+--===============7049785003868578532==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 10 Nov 2021 09:30:04 -0600
-Denis Kenzior <denkenz(a)gmail.com> wrote:
+This test was just piping the PSK files into /tmp/iwd/ssidCCMP.psk
+which is a bit fragile if the storage dir was ever to change. Instead
+use copy_to_storage and the 'name' keyword to copy the file.
+---
+ autotests/testAddressRandomization/connection_test.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> Hi,
->
-> On 11/10/21 7:16 AM, Tmore1 wrote:
-> > Hello,
-> >
-> > After many years of managing wireless with Debian's ifupdown +
-> > wpa_supplicant, I tried iwd, and I love it so far: I really appreciate
-> > its polish, cleanliness, and responsiveness. Thanks much for this
-> > software!
->
-> Thank you for the kind words.  We're glad you like it!
->
-> >
-> > There seems to be a problem with its IPv6 support: on my system
-> > (Debian Sid, iwd 1.19 from distro repo), iwd works perfectly out of the
-> > box, and continues to work with "EnableNetworkConfiguration=3DTrue", but
-> > with "EnableIPv6=3Dtrue", it segfaults immediately upon connect. (This =
-is
-> > especially awkward when iwd is being managed by systemd, since I then
-> > get an endless loop of the daemon crashing and immediately restarting,
-> > with a steady stream of messages hitting syslog ;))
->
-> I believe this issue is already fixed in ell upstream.  Commit d0f0069824=
-5a
-> ("dhcp6: Switch to BOUND before LEASE_OBTAINED") here:
-> https://git.kernel.org/pub/scm/libs/ell/ell.git/commit/?id=3Dd0f00698245a=
-2dccbd4b853e3d7b94e7a76cd906
+diff --git a/autotests/testAddressRandomization/connection_test.py b/autote=
+sts/testAddressRandomization/connection_test.py
+index 32163e0f..f9f62f7a 100644
+--- a/autotests/testAddressRandomization/connection_test.py
++++ b/autotests/testAddressRandomization/connection_test.py
+@@ -46,7 +46,7 @@ class Test(unittest.TestCase):
+         perm_addr =3D device.address
+ =
 
-Great - thanks much!
+         # 1. Test per-network deterministic MAC generation
+-        os.system('cat pernetwork.psk > /tmp/iwd/ssidCCMP.psk')
++        IWD.copy_to_storage('pernetwork.psk', name=3D'ssidCCMP.psk')
+         new_addr =3D self.try_connection(wd)
+         self.assertNotEqual(perm_addr, new_addr)
+         # try again to ensure the generation was deterministic
+@@ -54,7 +54,7 @@ class Test(unittest.TestCase):
+         self.assertEqual(new_addr, new_addr2)
+ =
 
-> Note that IPv6 support in iwd is still somewhat experimental since we sti=
-ll lack
-> support for SLAAC, but DHCPv6 should be mostly functional.
+         # 2. Test FullAddressRandomization
+-        os.system('cat full_random.psk > /tmp/iwd/ssidCCMP.psk')
++        IWD.copy_to_storage('full_random.psk', name=3D'ssidCCMP.psk')
+         new_addr =3D self.try_connection(wd)
+         self.assertNotEqual(perm_addr, new_addr)
+         # try again to make sure the generation was random
+@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
+         self.assertNotEqual(new_addr, new_addr2)
+ =
 
-Tmore1 <tmore1(a)gmx.com>
---===============0523522983422657083==--
+         # 3. Test AddressOverride
+-        os.system('cat override.psk > /tmp/iwd/ssidCCMP.psk')
++        IWD.copy_to_storage('override.psk', name=3D'ssidCCMP.psk')
+         new_addr =3D self.try_connection(wd)
+         self.assertEqual(new_addr, 'e6:f6:38:a9:02:02')
+ =
+
+-- =
+
+2.34.1
+
+--===============7049785003868578532==--
 
