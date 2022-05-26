@@ -1,143 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============7017056438805493275=="
+Content-Type: multipart/mixed; boundary="===============6670943725012284105=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: Re: [RFC PATCH V2] ap: Expose connected stations property
-Date: Mon, 25 Oct 2021 13:35:54 -0500
-Message-ID: <f1469c75-9918-6b4d-30ed-c8fc59ae972f@gmail.com>
-In-Reply-To: 20211024091535.21296-1-michael@amarulasolutions.com
+Subject: [PATCH] eap-tls: Keep l_tls instance for reauthentication
+Date: Thu, 26 May 2022 18:01:53 +0200
+Message-ID: <20220526160153.64175-1-andrew.zaborowski@intel.com>
 
---===============7017056438805493275==
+--===============6670943725012284105==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+After one of the eap-tls-common-based methods succeeds keep the TLS
+tunnel instance until the method is freed, rather than free it the
+moment the method succeeds.  This fixes repeated method runs where until
+now each next run would attempt to create a new TLS tunnel instance
+but would have no authentication data (CA certificate, client
+certificate, private key and private key passphrase) since those are
+were by the old l_tls object from the moment of the l_tls_set_auth_data()
+call.
 
-On 10/24/21 4:15 AM, Michael Trimarchi wrote:
-> Add a way to be notified about the connected stations in access
-> point mode. This can be used in order to ask from Diagnostic
-> interface the properties for each station or to just use them
-> from other services like connman or network manager to report
-> the number of clients
+Use l_tls_reset() to reset the TLS state after method success, followed
+by a new l_tls_start() when the reauthentication starts.
+---
+Depends on the ell l_tls_reset patch.
 
-So do you want the actual number of clients or a way to know when the clien=
-t =
+ src/eap-tls-common.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-list has changed?  If it is the latter, then a signal might be better.
+diff --git a/src/eap-tls-common.c b/src/eap-tls-common.c
+index 75d3aa33..acc5b387 100644
+--- a/src/eap-tls-common.c
++++ b/src/eap-tls-common.c
+@@ -131,10 +131,13 @@ static void __eap_tls_common_state_reset(struct eap_t=
+ls_state *eap_tls)
+ 	eap_tls->expecting_frag_ack =3D false;
+ 	eap_tls->tunnel_ready =3D false;
+ =
 
-Also, you should document the new property in doc/access-point-api.txt in a =
+-	if (eap_tls->tunnel) {
+-		l_tls_free(eap_tls->tunnel);
+-		eap_tls->tunnel =3D NULL;
+-	}
++	/*
++	 * Keep the tunnel instance to avoid losing the authentication
++	 * settings that we may have loaded with l_tls_set_auth_data()
++	 * since .reset_state is not supposed to clear settings.
++	 */
++	if (eap_tls->tunnel)
++		l_tls_reset(eap_tls->tunnel);
+ =
 
-separate patch.
+ 	eap_tls->tx_frag_offset =3D 0;
+ 	eap_tls->tx_frag_last_len =3D 0;
+@@ -167,6 +170,10 @@ static void __eap_tls_common_state_free(struct eap_tls=
+_state *eap_tls)
+ 		l_key_free(eap_tls->client_key);
+ =
 
-> =
+ 	l_strv_free(eap_tls->domain_mask);
++
++	if (eap_tls->tunnel)
++		l_tls_free(eap_tls->tunnel);
++
+ 	l_free(eap_tls);
+ }
+ =
 
-> Signed-off-by: Michael Trimarchi <michael(a)amarulasolutions.com>
+@@ -569,7 +576,7 @@ static bool eap_tls_tunnel_init(struct eap_state *eap)
+ 	struct eap_tls_state *eap_tls =3D eap_get_data(eap);
+ =
 
-We don't use S-o-B in ell/iwd.
+ 	if (eap_tls->tunnel)
+-		return false;
++		goto start;
+ =
 
-> ---
-> Changes V1->V2:
-> 	typo in message dbus type
-> ---
->   src/ap.c | 23 +++++++++++++++++++++++
->   1 file changed, 23 insertions(+)
-> =
+ 	eap_tls->tunnel =3D l_tls_new(false, eap_tls_tunnel_data_received,
+ 					eap_tls_tunnel_data_send,
+@@ -626,6 +633,7 @@ static bool eap_tls_tunnel_init(struct eap_state *eap)
+ 	if (eap_tls->domain_mask)
+ 		l_tls_set_domain_mask(eap_tls->tunnel, eap_tls->domain_mask);
+ =
 
-> diff --git a/src/ap.c b/src/ap.c
-> index 46a7a6a8..e88be99c 100644
-> --- a/src/ap.c
-> +++ b/src/ap.c
-> @@ -98,6 +98,7 @@ struct ap_state {
->   	uint8_t netconfig_gateway4_mac[6];
->   	uint8_t netconfig_dns4_mac[6];
->   =
++start:
+ 	if (!l_tls_start(eap_tls->tunnel)) {
+ 		l_error("%s: Failed to start the TLS client",
+ 						eap_get_method_name(eap));
+-- =
 
-> +	uint16_t connected_stations;
+2.32.0
 
-num_connected_stations?
-
->   	bool started : 1;
->   	bool gtk_set : 1;
->   	bool netconfig_set_addr4 : 1;
-> @@ -347,6 +348,7 @@ static void ap_new_rsna(struct sta_state *sta)
->   		event_data.assoc_ies_len =3D sta->assoc_ies_len;
->   		ap->ops->handle_event(AP_EVENT_STATION_ADDED, &event_data,
->   					ap->user_data);
-> +		ap->connected_stations++;
->   	}
->   }
->   =
-
-> @@ -385,6 +387,7 @@ static void ap_drop_rsna(struct sta_state *sta)
->   		event_data.mac =3D sta->addr;
->   		ap->ops->handle_event(AP_EVENT_STATION_REMOVED, &event_data,
->   					ap->user_data);
-> +		ap->connected_stations++;
-
-do you mean ap->connected_stations-- here?
-
->   	}
->   }
->   =
-
-> @@ -3495,6 +3498,10 @@ static void ap_if_event_func(enum ap_event_type ty=
-pe, const void *event_data,
->   =
-
->   	case AP_EVENT_STATION_ADDED:
->   	case AP_EVENT_STATION_REMOVED:
-> +		l_dbus_property_changed(dbus_get_bus(),
-> +					netdev_get_path(ap_if->netdev),
-> +					IWD_AP_INTERFACE, "ConnectedStations");
-> +		break;
->   	case AP_EVENT_REGISTRATION_START:
->   	case AP_EVENT_REGISTRATION_SUCCESS:
->   	case AP_EVENT_PBC_MODE_EXIT:
-> @@ -3626,6 +3633,19 @@ error:
->   	return dbus_error_from_errno(err, message);
->   }
->   =
-
-> +static bool ap_dbus_property_connected_stations(struct l_dbus *dbus,
-> +						struct l_dbus_message *message,
-> +						struct l_dbus_message_builder *builder,
-> +						void *user_data)
-> +{
-> +	struct ap_if_data *ap_if =3D user_data;
-> +	uint16_t stations =3D ap_if->ap ? ap_if->ap->connected_stations : 0;
-
-You could simply omit this property if the AP isn't started by returning fa=
-lse.
-
-> +
-> +	l_dbus_message_builder_append_basic(builder, 'q', &stations);
-> +
-> +	return true;
-> +}
-> +
->   static bool ap_dbus_property_get_started(struct l_dbus *dbus,
->   					struct l_dbus_message *message,
->   					struct l_dbus_message_builder *builder,
-> @@ -3668,6 +3688,9 @@ static void ap_setup_interface(struct l_dbus_interf=
-ace *interface)
->   					ap_dbus_property_get_started, NULL);
->   	l_dbus_interface_property(interface, "Name", 0, "s",
->   					ap_dbus_property_get_name, NULL);
-> +
-> +	l_dbus_interface_property(interface, "ConnectedStations", 0, "q",
-
-Just curious, why was uint16_t chosen as the return type?
-
-> +					ap_dbus_property_connected_stations, NULL);
->   }
->   =
-
->   static void ap_destroy_interface(void *user_data)
-> =
-
-
-Regards,
--Denis
---===============7017056438805493275==--
+--===============6670943725012284105==--
 
