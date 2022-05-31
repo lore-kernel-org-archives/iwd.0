@@ -1,256 +1,361 @@
-Content-Type: multipart/mixed; boundary="===============2442634927729046400=="
+Content-Type: multipart/mixed; boundary="===============5090647513547766589=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v6 6/6] auto-t: add test for encrypted profiles
-Date: Thu, 10 Feb 2022 11:03:20 -0800
-Message-ID: <20220210190320.848755-6-prestwoj@gmail.com>
-In-Reply-To: 20220210190320.848755-1-prestwoj@gmail.com
+Subject: Re: iwd fails to create device
+Date: Tue, 31 May 2022 09:06:01 -0700
+Message-ID: <fcf4e3fa19e68156e95e379fafe59a0929c32a76.camel@gmail.com>
+In-Reply-To: 20220528192423.2134.31838@ml01.vlan13.01.org
 
---===============2442634927729046400==
+--===============5090647513547766589==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- .../testEncryptedProfiles/connection_test.py  | 154 ++++++++++++++++++
- autotests/testEncryptedProfiles/hw.conf       |   6 +
- autotests/testEncryptedProfiles/iwd-secret    |   1 +
- autotests/testEncryptedProfiles/main.conf     |   2 +
- autotests/testEncryptedProfiles/ssidCCMP.conf |  10 ++
- autotests/testEncryptedProfiles/ssidCCMP.psk  |   2 +
- 6 files changed, 175 insertions(+)
- create mode 100644 autotests/testEncryptedProfiles/connection_test.py
- create mode 100644 autotests/testEncryptedProfiles/hw.conf
- create mode 100644 autotests/testEncryptedProfiles/iwd-secret
- create mode 100644 autotests/testEncryptedProfiles/main.conf
- create mode 100644 autotests/testEncryptedProfiles/ssidCCMP.conf
- create mode 100644 autotests/testEncryptedProfiles/ssidCCMP.psk
+Hi,
 
-diff --git a/autotests/testEncryptedProfiles/connection_test.py b/autotests=
-/testEncryptedProfiles/connection_test.py
-new file mode 100644
-index 00000000..dd4892ca
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/connection_test.py
-@@ -0,0 +1,154 @@
-+#!/usr/bin/python3
-+
-+import unittest
-+import sys
-+
-+sys.path.append('../util')
-+import iwd
-+import os
-+from iwd import IWD
-+from iwd import NetworkType
-+from iwd import PSKAgent
-+
-+class Test(unittest.TestCase):
-+    def profile_is_encrypted(self, profile):
-+        with open('/tmp/iwd/' + profile) as f:
-+            contents =3D f.read()
-+
-+        if 'Passphrase' in contents:
-+            return False
-+
-+        return True
-+
-+    def validate(self, wd):
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+
-+        ordered_network =3D device.get_ordered_network('ssidCCMP')
-+
-+        self.assertEqual(ordered_network.type, NetworkType.psk)
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+        ordered_network.network_object.connect()
-+
-+        condition =3D 'obj.state =3D=3D DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        device.disconnect()
-+
-+        condition =3D 'not obj.connected'
-+        wd.wait_for_object_condition(ordered_network.network_object, condi=
-tion)
-+
-+    # Tests that an existing plaintext profile gets encrypted
-+    def test_new_profile(self):
-+        IWD.copy_to_storage('ssidCCMP.psk')
-+
-+        mtime =3D os.path.getmtime('/tmp/iwd/' + 'ssidCCMP.psk')
-+        self.assertFalse(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+        wd =3D IWD(True)
-+
-+        # Make sure profile was accepted
-+        condition =3D 'len(obj.list_known_networks()) =3D=3D 1'
-+        wd.wait_for_object_condition(wd, condition)
-+
-+        # Check the file was modified (should be encrypted now)
-+        self.assertNotEqual(mtime, os.path.getmtime('/tmp/iwd/' + 'ssidCCM=
-P.psk'))
-+
-+        self.validate(wd)
-+
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+    # Tests that a new connection with agent gets written to an encrypted =
-profile
-+    def test_agent_profile(self):
-+        wd =3D IWD(True)
-+
-+        psk_agent =3D PSKAgent("secret123")
-+        wd.register_psk_agent(psk_agent)
-+
-+        with self.assertRaises(FileNotFoundError):
-+            self.profile_is_encrypted('ssidCCMP.psk')
-+
-+        self.validate(wd)
-+
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+        wd.unregister_psk_agent(psk_agent)
-+
-+    # Tests that an invalid profile gets re-written after an agent request
-+    def test_invalid_profile_rewritten(self):
-+        bad_config =3D '[Security]\nPassphrase=3Dincorrect\n'
-+        os.system('echo "%s" > /tmp/iwd/ssidCCMP.psk' % bad_config)
-+
-+        wd =3D IWD(True)
-+
-+        condition =3D 'len(obj.list_known_networks()) =3D=3D 1'
-+        wd.wait_for_object_condition(wd, condition)
-+
-+        # IWD should still encrypt the profile automatically
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+        # This should fail
-+        with self.assertRaises(iwd.FailedEx):
-+            self.validate(wd)
-+
-+        psk_agent =3D PSKAgent("secret123")
-+        wd.register_psk_agent(psk_agent)
-+
-+        self.validate(wd)
-+
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+    # Tests that a profile that doesn't decrypt wont become a known network
-+    def test_decryption_failure(self):
-+        bad_config =3D \
-+'''
-+[Security]
-+EncryptedSalt=3D000102030405060708090a0b0c0d0e0f
-+EncryptedSecurity=3Daabbccddeeff00112233445566778899
-+'''
-+        os.system('echo "%s" > /tmp/iwd/ssidCCMP.psk' % bad_config)
-+
-+        wd =3D IWD(True)
-+
-+        self.assertEqual(wd.list_known_networks(), [])
-+
-+    def test_runtime_profile(self):
-+        wd =3D IWD(True)
-+
-+        self.assertEqual(wd.list_known_networks(), [])
-+
-+        # Add profile after IWD starts
-+        IWD.copy_to_storage('ssidCCMP.psk')
-+
-+        self.validate(wd)
-+
-+        # Should now be encrypted
-+        self.assertTrue(self.profile_is_encrypted('ssidCCMP.psk'))
-+
-+        with open('/tmp/iwd/ssidCCMP.psk') as f:
-+            profile =3D f.read()
-+
-+        # Edit the profile, corrupting it
-+        profile.replace('EncryptedSecurity=3D', 'EncryptedSecurity=3D00')
-+
-+        devices =3D wd.list_devices(1)
-+        device =3D devices[0]
-+        condition =3D 'obj.state =3D=3D DeviceState.disconnected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+    def tearDown(self):
-+        IWD.clear_storage()
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        os.environ['CREDENTIALS_DIRECTORY'] =3D '/tmp'
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ =3D=3D '__main__':
-+    unittest.main(exit=3DTrue)
-diff --git a/autotests/testEncryptedProfiles/hw.conf b/autotests/testEncryp=
-tedProfiles/hw.conf
-new file mode 100644
-index 00000000..de81e1e2
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/hw.conf
-@@ -0,0 +1,6 @@
-+[SETUP]
-+num_radios=3D2
-+start_iwd=3D0
-+
-+[HOSTAPD]
-+rad0=3DssidCCMP.conf
-diff --git a/autotests/testEncryptedProfiles/iwd-secret b/autotests/testEnc=
-ryptedProfiles/iwd-secret
-new file mode 100644
-index 00000000..c2afca48
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/iwd-secret
-@@ -0,0 +1 @@
-+secret123
-diff --git a/autotests/testEncryptedProfiles/main.conf b/autotests/testEncr=
-yptedProfiles/main.conf
-new file mode 100644
-index 00000000..35d40c5e
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/main.conf
-@@ -0,0 +1,2 @@
-+[General]
-+SystemdEncrypt=3Diwd-secret
-diff --git a/autotests/testEncryptedProfiles/ssidCCMP.conf b/autotests/test=
-EncryptedProfiles/ssidCCMP.conf
-new file mode 100644
-index 00000000..c79f5e55
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/ssidCCMP.conf
-@@ -0,0 +1,10 @@
-+hw_mode=3Dg
-+channel=3D1
-+ssid=3DssidCCMP
-+
-+wpa=3D2
-+wpa_pairwise=3DCCMP
-+wpa_passphrase=3Dsecret123
-+
-+ieee80211w=3D2
-+wpa_key_mgmt=3DWPA-PSK-SHA256
-diff --git a/autotests/testEncryptedProfiles/ssidCCMP.psk b/autotests/testE=
-ncryptedProfiles/ssidCCMP.psk
-new file mode 100644
-index 00000000..abafdb66
---- /dev/null
-+++ b/autotests/testEncryptedProfiles/ssidCCMP.psk
-@@ -0,0 +1,2 @@
-+[Security]
-+Passphrase=3Dsecret123
--- =
+On Sat, 2022-05-28 at 19:24 +0000,
+1148d778-20a8-4ab0-96b7-24572ddab965(a)simplelogin.co wrote:
+> Hi,
+> =
 
-2.34.1
+> A few times I've already seen a strange behaviour right after
+> rebooting. All of the sudden the wifi card is no longer available. To
+> me it looks like iwd fails to detect and rename the device. Hopefully
+> it happens very seldom.
+> =
 
---===============2442634927729046400==--
+> $ journalctl -b -1 | grep -i wifi
+> may 27 12:02:52 kernel: Intel(R) Wireless WiFi driver for Linux
+> may 27 12:02:52 kernel: iwlwifi 0000:03:00.0: enabling device (0000 ->
+> 0002)
+> may 27 12:02:52 kernel: iwlwifi 0000:03:00.0: Direct firmware load for
+> iwlwifi-cc-a0-69.ucode failed with error -2
+> may 27 12:02:52 kernel: iwlwifi 0000:03:00.0: api flags index 2 larger
+> than supported by driver
+> may 27 12:02:52 kernel: iwlwifi 0000:03:00.0: TLV_FW_FSEQ_VERSION: FSEQ
+> Version: 89.3.35.37
+> may 27 12:02:52 kernel: iwlwifi 0000:03:00.0: loaded firmware version
+> 68.01d30b0c.0 cc-a0-68.ucode op_mode iwlmvm
+> may 27 12:02:52 kernel: iwlwifi 0000:03:00.0: Detected Intel(R) Wi-Fi 6
+> AX200 160MHz, REV=3D0x340
+> may 27 12:02:53 kernel: iwlwifi 0000:03:00.0: Detected RF HR B3,
+> rfid=3D0x10a100
+> may 27 12:02:53 kernel: iwlwifi 0000:03:00.0: base HW address:
+> xx:xx:xx:xx:xx:xx
+> =
+
+> =
+
+> $ journalctl -b -1 | grep -i iwd
+> may 27 12:02:53 iwd[863]: Wireless daemon version 1.27
+> may 27 12:02:53 iwd[863]: Loaded configuration from /etc/iwd/main.conf
+> may 27 12:02:53 audit[1]: SERVICE_START pid=3D1 uid=3D0 auid=3D4294967295
+> ses=3D4294967295 msg=3D'unit=3Diwd comm=3D"systemd"
+> exe=3D"/usr/lib/systemd/systemd" hostname=3D? addr=3D? terminal=3D?
+> res=3Dsuccess'
+> may 27 12:02:53 iwd[863]: Wiphy: 0, Name: phy0
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ Permanent Address: xx:xx:xx:xx:xx:xx
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 2.4Ghz Band:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bitrates (non-HT):
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 1.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 2.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 5.5 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 11.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 6.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 9.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 12.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 18.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 24.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 36.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 48.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 54.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HT Capabilities:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 HT40
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 20Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 40Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HT RX MCS indexes:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 0-15
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 5Ghz Band:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bitrates (non-HT):
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 6.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 9.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 12.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 18.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 24.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 36.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 48.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 54.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HT Capabilities:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 HT40
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 20Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 40Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HT RX MCS indexes:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 0-15
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VHT Capabilities:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 160 Mhz operation
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 80Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 160 and
+> 80 + 80 Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Max RX MCS: 0-9 for
+> NSS: 2
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Max TX MCS: 0-9 for
+> NSS: 2
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ Ciphers: CCMP TKIP BIP
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ Supported iftypes: ad-hoc station ap
+> p2p-client p2p-go p2p-device
+> may 27 12:02:53 iwd[863]: Unable to add the net.connman.iwd.Adapter
+> interface to /net/connman/iwd/0
+> may 27 12:02:53 iwd[863]: Unable to add the
+> org.freedesktop.DBus.Properties interface to /net/connman/iwd/0
+> may 27 12:02:53 iwd[863]: Wiphy: 0, Name: phy0
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ Permanent Address: xx:xx:xx:xx:xx:xx
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 2.4Ghz Band:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bitrates (non-HT):
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 1.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 2.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 5.5 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 11.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 6.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 9.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 12.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 18.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 24.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 36.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 48.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 54.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HT Capabilities:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 HT40
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 20Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 40Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HT RX MCS indexes:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 0-15
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 5Ghz Band:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bitrates (non-HT):
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 6.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 9.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 12.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 18.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 24.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 36.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 48.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 54.0 Mbps
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HT Capabilities:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 HT40
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 20Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 40Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HT RX MCS indexes:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 0-15
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VHT Capabilities:
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 160 Mhz operation
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 80Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Short GI for 160 and
+> 80 + 80 Mhz
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Max RX MCS: 0-9 for
+> NSS: 2
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Max TX MCS: 0-9 for
+> NSS: 2
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ Ciphers: CCMP TKIP BIP
+> may 27 12:02:53 iwd[863]:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ Supported iftypes: ad-hoc station ap
+> p2p-client p2p-go p2p-device
+> may 27 12:02:53 iwd[863]: DEL_INTERFACE failed: No such device
+> may 27 12:02:53 iwd[863]: Could not register frame watch type 00d0: -19
+> may 27 12:02:53 iwd[863]: RTM_GETLINK error -19: No such device
+> may 27 12:02:53 iwd[863]: Could not register frame watch type 00d0: -19
+> may 27 12:02:53 iwd[863]: Could not register frame watch type 00d0: -19
+> may 27 12:02:53 iwd[863]: Could not register frame watch type 00d0: -19
+> may 27 12:02:53 iwd[863]: Could not register frame watch type 00d0: -19
+> may 27 12:03:31 iwd[863]: D-Bus disconnected, quitting...
+> may 27 12:03:32 iwd[863]: Terminate
+> may 27 12:03:32 iwd[863]: Removing scan context for wdev 2
+> may 27 12:03:33 systemd[1]: iwd.service: Deactivated successfully.
+
+This looks very familiar to an issue we fixed with dual-phy cards, but
+this isn't the case for you. Its as if your phy is being detected
+twice.
+
+It would be great if you could get some iwmon logs when this happens.
+Hopefully it happens frequent enough you can get a capture. More info
+about how to do that can be found here:
+
+https://iwd.wiki.kernel.org/debugging
+
+> =
+
+> Arch Linux wiki on iwd troubleshooting mentions two issues that look
+> possible causes to me:
+> - Low entropy pool
+> - Wireless device not renamed by udev
+> =
+
+> You can check it here:
+> https://wiki.archlinux.org/title/Iwd#Troubleshooting
+> =
+
+> Any help to fix this issue would be appreciated.
+> =
+
+> Thanks!
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+
+
+--===============5090647513547766589==--
 
