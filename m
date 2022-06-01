@@ -1,45 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============1933127913795987702=="
+Content-Type: multipart/mixed; boundary="===============6920524721217622683=="
 MIME-Version: 1.0
 From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] fils: pragma false positive for uninitialized variable
-Date: Fri, 10 Jun 2022 13:59:36 -0500
-Message-ID: <abdb0d23-8395-93a4-770f-5083794b10aa@gmail.com>
-In-Reply-To: 20220610184017.356608-1-prestwoj@gmail.com
+Subject: Re: [PATCH 1/2] auto-t: correctly import Mapping from collections
+Date: Wed, 01 Jun 2022 11:02:26 -0500
+Message-ID: <4f5236bb-6fb1-47cd-86a0-052024470458@gmail.com>
+In-Reply-To: 20220601160548.262018-1-prestwoj@gmail.com
 
---===============1933127913795987702==
+--===============6920524721217622683==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Hi James,
 
-On 6/10/22 13:40, James Prestwood wrote:
-> On musl-gcc the compiler is giving a warning for igtk_key_index
-> and gtk_key_index being used uninitialized. This isn't possible
-> since they are only used if gtk/igtk are non-NULL so pragma to
-> ignore the warning.
-> =
-
-> src/fils.c: In function 'fils_rx_associate':
-> src/fils.c:580:17: error: 'igtk_key_index' may be used uninitialized
-> 	in this function [-Werror=3Dmaybe-uninitialized]
->    580 |                 handshake_state_install_igtk(fils->hs,
-> 					igtk_key_index,igtk + 6,
-> 					igtk_len - 6, igtk);
-> =
-
-> (same error for gtk_key_index)
+On 6/1/22 11:05, James Prestwood wrote:
+> The current way this was being done was to import collections and
+> use collections.Mapping. This has been deprecated since python 3.3
+> but has worked up until python 3.10. After python 3.10 this will
+> no longer work, and Mapping must be imported from collections.abc.
 > ---
->   src/fils.c | 3 +++
->   1 file changed, 3 insertions(+)
+>   autotests/util/ead.py   | 4 ++--
+>   autotests/util/hwsim.py | 6 +++---
+>   autotests/util/iwd.py   | 5 +++--
+>   3 files changed, 8 insertions(+), 7 deletions(-)
 > =
 
 
-Applied, thanks.
+Both applied, thanks.
 
 Regards,
 -Denis
 
---===============1933127913795987702==--
+--===============6920524721217622683==--
 
