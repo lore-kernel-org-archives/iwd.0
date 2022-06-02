@@ -1,40 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============1417803046725530551=="
+Content-Type: multipart/mixed; boundary="===============0678789725352274646=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 2/9] dpp-util: pass actual ad_size, not hard coded '2'.
-Date: Mon, 20 Dec 2021 13:49:08 -0800
-Message-ID: <20211220214915.34093-2-prestwoj@gmail.com>
-In-Reply-To: 20211220214915.34093-1-prestwoj@gmail.com
+Subject: Re: [PATCH v2] auto-t: allow skipping tests is wpa_supplicant is not
+ found
+Date: Thu, 02 Jun 2022 16:47:45 -0500
+Message-ID: <6e15bff1-e59e-82ad-908f-26760f67f7d3@gmail.com>
+In-Reply-To: 20220602184955.71055-1-prestwoj@gmail.com
 
---===============1417803046725530551==
+--===============0678789725352274646==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/dpp-util.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi James,
 
-diff --git a/src/dpp-util.c b/src/dpp-util.c
-index 5e8ab2a7..1db38cfb 100644
---- a/src/dpp-util.c
-+++ b/src/dpp-util.c
-@@ -280,7 +280,7 @@ uint8_t *dpp_unwrap_attr(const void *ad0, size_t ad0_le=
-n, const void *ad1,
- =
+On 6/2/22 13:49, James Prestwood wrote:
+> Similarly to ofono/phonesim allow tests to be skipped if wpa_supplicant
+> is not found on the system.
+> =
 
- 	unwrapped =3D l_malloc(wrapped_len - 16);
- =
+> This required some changes to DPP/P2P where Wpas() should be called first
+> since this can now throw a SkipTest exception.
+> =
 
--	if (!aes_siv_decrypt(key, key_len, wrapped, wrapped_len, ad, 2,
-+	if (!aes_siv_decrypt(key, key_len, wrapped, wrapped_len, ad, ad_size,
- 				unwrapped)) {
- 		l_free(unwrapped);
- 		return NULL;
--- =
+> The Wpas class was also made to allow __del__ to be called without
+> throwing additional exceptions in case wpa_supplicant was not found.
+> ---
+>   autotests/testDPP/connection_test.py |  3 +--
+>   autotests/testP2P/connection_test.py |  2 +-
+>   autotests/util/wpas.py               | 13 +++++++++++--
+>   tools/run-tests                      |  5 ++++-
+>   4 files changed, 17 insertions(+), 6 deletions(-)
+> =
 
-2.31.1
 
---===============1417803046725530551==--
+Applied, thanks.
+
+Regards,
+-Denis
+
+--===============0678789725352274646==--
 
