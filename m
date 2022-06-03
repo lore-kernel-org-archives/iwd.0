@@ -1,45 +1,108 @@
-Content-Type: multipart/mixed; boundary="===============0585524002048507997=="
+Content-Type: multipart/mixed; boundary="===============2275293507306428027=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH 8/9] eapol: don't enforce PMKID on 1/4 if require_handshake is
- false
-Date: Tue, 28 Sep 2021 14:27:43 -0700
-Message-ID: <20210928212744.717276-8-prestwoj@gmail.com>
-In-Reply-To: 20210928212744.717276-1-prestwoj@gmail.com
+Subject: [PATCH v2] dpp, dpp-util: cast size_t for constant arguments to va_arg
+Date: Fri, 03 Jun 2022 10:00:16 -0700
+Message-ID: <20220603170016.182052-1-prestwoj@gmail.com>
 
---===============0585524002048507997==
+--===============2275293507306428027==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-FT/FILS handle their own PMK derivation but rekeys still require
-using the 4-way handshake. There is some ambiguity in the spec whether
-or not the PMKID needs to be included in message 1/4 and it appears
-that when rekeying after FT/FILS hostapd does not include a PMKID.
+There were a few places in dpp/dpp-util which passed a single byte but
+was being read in with va_arg(va, size_t). On some architectures this was
+causing failures presumably from the compiler using an integer type
+smaller than size_t. As we do elsewhere, cast to size_t to force the
+compiler to pass a properly sized iteger to va_arg.
 ---
- src/eapol.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/dpp-util.c |  6 ++++--
+ src/dpp.c      | 10 ++++++----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 85718ed1..f0b26ea0 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -1147,7 +1147,8 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *=
-sm,
- 	 * send no PMKID KDE.
+diff --git a/src/dpp-util.c b/src/dpp-util.c
+index 8e7631d0..d4787b31 100644
+--- a/src/dpp-util.c
++++ b/src/dpp-util.c
+@@ -571,7 +571,8 @@ bool dpp_derive_r_auth(const void *i_nonce, const void =
+*r_nonce,
+ 	 * R-auth =3D H(I-nonce | R-nonce | PI.x | PR.x | [ BI.x | ] BR.x | 0)
  	 */
- 	if (!sm->eap_exchanged && !sm->handshake->wpa_ie &&
--			rsn_info.num_pmkids) {
-+			rsn_info.num_pmkids &&
-+			sm->require_handshake) {
- 		bool found =3D false;
- 		int i;
+ 	return dpp_hash(type, r_auth, 6, i_nonce, nonce_len, r_nonce, nonce_len,
+-			pix, keys_len, prx, keys_len, brx, keys_len, &zero, 1);
++			pix, keys_len, prx, keys_len, brx, keys_len,
++			&zero, (size_t) 1);
+ }
  =
 
+ bool dpp_derive_i_auth(const void *r_nonce, const void *i_nonce,
+@@ -596,7 +597,8 @@ bool dpp_derive_i_auth(const void *r_nonce, const void =
+*i_nonce,
+ 	 * I-auth =3D H(R-nonce | I-nonce | PR.x | PI.x | BR.x | [ BI.x | ] 1)
+ 	 */
+ 	return dpp_hash(type, i_auth, 6, r_nonce, nonce_len, i_nonce, nonce_len,
+-			prx, keys_len, pix, keys_len, brx, keys_len, &one, 1);
++			prx, keys_len, pix, keys_len, brx, keys_len,
++			&one, (size_t) 1);
+ }
+ =
+
+ /*
+diff --git a/src/dpp.c b/src/dpp.c
+index b70b9871..0102dc58 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -511,7 +511,7 @@ static void send_config_result(struct dpp_sm *dpp, cons=
+t uint8_t *to)
+ =
+
+ 	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, 0, ptr,
+ 			sizeof(attrs), dpp->ke, dpp->key_len, 2,
+-			DPP_ATTR_STATUS, 1, &zero,
++			DPP_ATTR_STATUS, (size_t) 1, &zero,
+ 			DPP_ATTR_ENROLLEE_NONCE, dpp->nonce_len, dpp->e_nonce);
+ =
+
+ 	iov[1].iov_base =3D attrs;
+@@ -1146,7 +1146,7 @@ static void send_authenticate_response(struct dpp_sm =
+*dpp)
+ 			ptr, sizeof(attrs), dpp->k2, dpp->key_len, 4,
+ 			DPP_ATTR_RESPONDER_NONCE, dpp->nonce_len, dpp->r_nonce,
+ 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
+-			DPP_ATTR_RESPONDER_CAPABILITIES, 1, &dpp->role,
++			DPP_ATTR_RESPONDER_CAPABILITIES, (size_t) 1, &dpp->role,
+ 			DPP_ATTR_WRAPPED_DATA, wrapped2_len, wrapped2);
+ =
+
+ 	iov[1].iov_base =3D attrs;
+@@ -1313,7 +1313,8 @@ static void dpp_auth_request_failed(struct dpp_sm *dp=
+p,
+ 	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, ptr - attrs,
+ 			ptr, sizeof(attrs) - (ptr - attrs), k1, dpp->key_len, 2,
+ 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
+-			DPP_ATTR_RESPONDER_CAPABILITIES, 1, &dpp->role);
++			DPP_ATTR_RESPONDER_CAPABILITIES,
++			(size_t) 1, &dpp->role);
+ =
+
+ 	iov[1].iov_base =3D attrs;
+ 	iov[1].iov_len =3D ptr - attrs;
+@@ -1404,7 +1405,8 @@ static bool dpp_send_authenticate_request(struct dpp_=
+sm *dpp)
+ 	ptr +=3D dpp_append_wrapped_data(hdr + 26, 6, attrs, ptr - attrs,
+ 			ptr, sizeof(attrs), dpp->k1, dpp->key_len, 2,
+ 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
+-			DPP_ATTR_INITIATOR_CAPABILITIES, 1, &dpp->role);
++			DPP_ATTR_INITIATOR_CAPABILITIES,
++			(size_t) 1, &dpp->role);
+ =
+
+ 	iov[1].iov_base =3D attrs;
+ 	iov[1].iov_len =3D ptr - attrs;
 -- =
 
-2.31.1
+2.34.1
 
---===============0585524002048507997==--
+--===============2275293507306428027==--
 
