@@ -1,60 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============4619102239713795294=="
+Content-Type: multipart/mixed; boundary="===============6335233071700245900=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] eap-pwd: add length checks for fragmented packets
-Date: Wed, 19 Jan 2022 10:13:02 -0800
-Message-ID: <20220119181302.2259778-1-prestwoj@gmail.com>
+Subject: [PATCH 1/2] auto-t: remove ifconfig call from testScan
+Date: Fri, 03 Jun 2022 10:05:53 -0700
+Message-ID: <20220603170554.183478-1-prestwoj@gmail.com>
 
---===============4619102239713795294==
+--===============6335233071700245900==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+ifconfig isn't available by default in several linux distros
+so instead use 'ip' which seems to be much more widespread.
 ---
- src/eap-pwd.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ autotests/testScan/remove_iface_test.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/eap-pwd.c b/src/eap-pwd.c
-index af373493..cd6684e7 100644
---- a/src/eap-pwd.c
-+++ b/src/eap-pwd.c
-@@ -669,6 +669,14 @@ static void eap_pwd_handle_request(struct eap_state *e=
-ap,
+diff --git a/autotests/testScan/remove_iface_test.py b/autotests/testScan/r=
+emove_iface_test.py
+index af36c1e8..4f9eef93 100644
+--- a/autotests/testScan/remove_iface_test.py
++++ b/autotests/testScan/remove_iface_test.py
+@@ -18,7 +18,7 @@ class Test(unittest.TestCase):
+         device.autoconnect =3D True
+         device.scan(wait=3DFalse)
  =
 
- 		/* remove length of Total-Length parameter (2) */
- 		pwd->rx_frag_total =3D l_get_be16(pkt + 1) - 2;
-+
-+		if (pwd->rx_frag_total < len - 2) {
-+			l_error("Total-Length too small for remaining length");
-+			pwd->rx_frag_total =3D 0;
-+
-+			return;
-+		}
-+
- 		pwd->rx_frag_buf =3D l_malloc(pwd->rx_frag_total);
+-        os.system('ifconfig %s down' % device.name)
++        os.system('ip link set dev %s down' % device.name)
  =
 
- 		/* skip copying Total-Length for easier processing later */
-@@ -687,6 +695,12 @@ static void eap_pwd_handle_request(struct eap_state *e=
-ap,
- =
-
- 	/* more rx fragments */
- 	if (pwd->rx_frag_buf) {
-+		if (pwd->rx_frag_total - pwd->rx_frag_count <
-+						(uint16_t) len - 1) {
-+			l_error("Not enough room for fragment (%zu)", len - 1);
-+			return;
-+
-+		}
- 		/* continue building packet (not including PWD-Exch byte) */
- 		memcpy(pwd->rx_frag_buf + pwd->rx_frag_count, pkt + 1, len - 1);
- 		pwd->rx_frag_count +=3D (len - 1);
+     @classmethod
+     def setUpClass(cls):
 -- =
 
-2.31.1
+2.34.1
 
---===============4619102239713795294==--
+--===============6335233071700245900==--
 
