@@ -1,58 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============4542157314423547275=="
+Content-Type: multipart/mixed; boundary="===============7041601036507912295=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v6 5/9] auto-t: iwd.py: allow passing uri to start_configurator
-Date: Tue, 22 Feb 2022 14:02:28 -0800
-Message-ID: <20220222220232.2475972-5-prestwoj@gmail.com>
-In-Reply-To: 20220222220232.2475972-1-prestwoj@gmail.com
+Subject: Re: [PATCH 1/2] auto-t: remove ifconfig call from testScan
+Date: Fri, 03 Jun 2022 11:59:37 -0500
+Message-ID: <bd2271eb-4b3e-c2a0-571e-a2663faa5b97@gmail.com>
+In-Reply-To: 20220603170554.183478-1-prestwoj@gmail.com
 
---===============4542157314423547275==
+--===============7041601036507912295==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If a URI is passed this will envoke ConfigureEnrollee()
----
- autotests/util/iwd.py | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Hi James,
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 170dd96b..d6620da5 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -280,8 +280,11 @@ class DeviceProvisioning(IWDDBusAbstract):
-     def start_enrollee(self):
-         return self._iface.StartEnrollee()
- =
+On 6/3/22 12:05, James Prestwood wrote:
+> ifconfig isn't available by default in several linux distros
+> so instead use 'ip' which seems to be much more widespread.
+> ---
+>   autotests/testScan/remove_iface_test.py | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
--    def start_configurator(self):
--        return self._iface.StartConfigurator()
-+    def start_configurator(self, uri=3DNone):
-+        if uri:
-+            return self._iface.ConfigureEnrollee(uri)
-+        else:
-+            return self._iface.StartConfigurator()
- =
 
-     def stop(self):
-         self._iface.Stop()
-@@ -668,8 +671,8 @@ class Device(IWDDBusAbstract):
-     def dpp_start_enrollee(self):
-         return self._device_provisioning.start_enrollee()
- =
+Both applied, thanks.
 
--    def dpp_start_configurator(self):
--        return self._device_provisioning.start_configurator()
-+    def dpp_start_configurator(self, uri=3DNone):
-+        return self._device_provisioning.start_configurator(uri)
- =
+Regards,
+-Denis
 
-     def dpp_stop(self):
-         return self._device_provisioning.stop()
--- =
-
-2.34.1
-
---===============4542157314423547275==--
+--===============7041601036507912295==--
 
