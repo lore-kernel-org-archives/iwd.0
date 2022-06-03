@@ -1,53 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============1447025107607519092=="
+Content-Type: multipart/mixed; boundary="===============2396506769933477123=="
 MIME-Version: 1.0
-From: Leonard Lausen <leonard at lausen.nl>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: segfault in parse_neighbor_report at src/station.c:1747
-Date: Tue, 05 Apr 2022 22:32:39 +0000
-Message-ID: <3cca9dfa225332ae782c3bf99ebd5913@lausen.nl>
-In-Reply-To: 2f87d1e1f09d2d07cf1c23fb62b75b8d@lausen.nl
+Subject: [PATCH] test-runner: fix testhome mounting for QEMU
+Date: Fri, 03 Jun 2022 15:02:45 -0700
+Message-ID: <20220603220245.227338-1-prestwoj@gmail.com>
 
---===============1447025107607519092==
+--===============2396506769933477123==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Denis,
+This was lazily copied from UML but really made no sense in the context
+of QEMU. First QEMU needs the virtfs option to define the mount tag and
+in addition a 9p mount should be used rather than 'hostfs'.
+---
+ tools/runner.py | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
->> I'm not sure what is going on, but according to iwd, you're not even con=
-nected!? What does 'iwctl
->> station wlan0 show' say?
-> =
+diff --git a/tools/runner.py b/tools/runner.py
+index bf28d9ad..ccc931ff 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -434,6 +434,11 @@ class QemuRunner(RunnerAbstract):
+ 			for addr in pci_adapters:
+ 				qemu_cmdline.extend(['-device', 'vfio-pci,host=3D%s' % addr])
+ =
 
-> % iwctl station wlan0 show
-> Station: wlan0
-> -------------------------------------------------------------------------=
--------
-> Settable Property Value
-> -------------------------------------------------------------------------=
--------
-> Scanning no
-> State disconnected
-> =
++		qemu_cmdline.extend([
++			'-virtfs',
++			'local,path=3D%s,%s' % (args.testhome, mount_options('homedir'))
++		])
++
+ 		if args.log:
+ 			#
+ 			# Creates a virtfs device that can be mounted. This mount
+@@ -466,8 +471,8 @@ class QemuRunner(RunnerAbstract):
+ 	def prepare_environment(self):
+ 		mounts =3D [ MountInfo('debugfs', 'debugfs', '/sys/kernel/debug', '', 0)=
+ ]
+ =
 
->> I'm confused why the AP is even sending this. Maybe the kernel crash you=
- reported is confusing
->> everything.
+-		mounts.append(MountInfo('hostfs', 'hostfs', self.args.testhome,
+-					self.args.testhome, 0))
++		mounts.append(MountInfo('9p', 'homedir', self.args.testhome,
++					'trans=3Dvirtio,version=3D9p2000.L,msize=3D10240', 0))
+ =
 
-The NetworkManager "running" with iwd backend was not actually linked to iw=
-d,
-causing the discrepancy. Thus I think this segfault in parse_neighbor_repor=
-t at
-src/station.c:1747 is due to my user-error having both iwd (which get's
-activated when running iwctl thanks to systemd) as well as NetworkManager
-non-iwd backend running. There are still other issues with this router, Int=
-el's
-AX210 and 801.22ax causing system hangs and kernel crashes, but maybe iwd i=
-s not
-involved. I'll investigate and update this thread if I can identify any iwd
-issues.
+ 		if self.args.log:
+ 			mounts.append(MountInfo('9p', 'logdir', self.args.log,
+-- =
 
-Thank you
-Leonard
---===============1447025107607519092==--
+2.34.1
+
+--===============2396506769933477123==--
 
