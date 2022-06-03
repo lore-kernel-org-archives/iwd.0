@@ -1,47 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============5016899801583542657=="
+Content-Type: multipart/mixed; boundary="===============1101760641139199653=="
 MIME-Version: 1.0
-From: Mark Hindley <mark at hindley.org.uk>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH] Enable DBus activation on non-systemd systems.
-Date: Sat, 13 Nov 2021 07:40:11 +0000
-Message-ID: <YY9r2xKMpN2UerTG@hindley.org.uk>
-In-Reply-To: CFOFAY8M0DOT.XA6PQ5U1AUOG@mussels
+Subject: Re: [PATCH v2] dpp,dpp-util: cast size_t for constant arguments to
+ va_arg
+Date: Fri, 03 Jun 2022 11:55:46 -0500
+Message-ID: <b2a30d65-20e9-7cd2-30a2-d070c841c793@gmail.com>
+In-Reply-To: 20220603170016.182052-1-prestwoj@gmail.com
 
---===============5016899801583542657==
+--===============1101760641139199653==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-=C3=89rico,
+Hi James,
 
-On Sat, Nov 13, 2021 at 03:03:56AM -0300, =C3=89rico Nogueira wrote:
-> For things like IWD, I feel DBus activation is definitely the wrong
-> path. It should be a system service of some sort, so it can connect to a
-> network without first being queried by a user manually, and it shouldn't
-> be activated automatically.
+On 6/3/22 12:00, James Prestwood wrote:
+> There were a few places in dpp/dpp-util which passed a single byte but
+> was being read in with va_arg(va, size_t). On some architectures this was
+> causing failures presumably from the compiler using an integer type
+> smaller than size_t. As we do elsewhere, cast to size_t to force the
+> compiler to pass a properly sized iteger to va_arg.
+> ---
+>   src/dpp-util.c |  6 ++++--
+>   src/dpp.c      | 10 ++++++----
+>   2 files changed, 10 insertions(+), 6 deletions(-)
+> =
 
-Thanks, but I find this a confusing statement.
 
-AFAIU iwd does use DBus activation currently. The Debian changelog contains=
- this
-entry:
+Applied, thanks.
 
-  * Recommend dbus (system bus)
-    Interaction with iwd happens via dbus, i.e. as used by the iwctl
-    command (or NetworkManager iwd backend).
-    Packages using D-Bus usually doesn't describe this in their package
-    relationships and implicitly rely on everyone having a bus available.
-    People using iwd however seems to be confused about the lack of a
-    startup script and fails to realize that "dbus activation" is the
-    intended way to start iwd so hopefully making the dbus relationship more
-    explicit will give a hint and help people figure this out.
+Regards,
+-Denis
 
-So, given that DBus activation doesn't require systemd (but can make use of=
- it),
-I was trying to understand and suggest a fix for why iwd DBus activation do=
-esn't
-work in the non-systemd case.
-
-Mark
---===============5016899801583542657==--
+--===============1101760641139199653==--
 
