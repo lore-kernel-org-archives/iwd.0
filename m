@@ -1,198 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============1713925474218476459=="
+Content-Type: multipart/mixed; boundary="===============2950980040928073480=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski at intel.com>
 To: iwd at lists.01.org
-Subject: [PATCH v5 2/9] unit: add DPP unit tests for URI parsing
-Date: Tue, 22 Feb 2022 13:30:09 -0800
-Message-ID: <20220222213016.2429382-2-prestwoj@gmail.com>
-In-Reply-To: 20220222213016.2429382-1-prestwoj@gmail.com
+Subject: [PATCH] autotests: Work around wpa_s config issue in testP2P
+Date: Mon, 06 Jun 2022 11:01:54 +0200
+Message-ID: <20220606090154.980544-1-andrew.zaborowski@intel.com>
 
---===============1713925474218476459==
+--===============2950980040928073480==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Since commit 922fa099721903b106a7bc1ccd1ffe8c4a7bce69 in hostap, our
+setting of config_methods on P2P-client interface was ignored.  Work
+around that commit, in addition to the previous workaround we have in
+this test, to again ensure the correct config_methods value is used.
 ---
- unit/test-dpp.c | 142 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 142 insertions(+)
+ autotests/testP2P/connection_test.py | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/unit/test-dpp.c b/unit/test-dpp.c
-index bfe6f747..1803e688 100644
---- a/unit/test-dpp.c
-+++ b/unit/test-dpp.c
-@@ -33,6 +33,134 @@
- #include "src/util.h"
- #include "ell/useful.h"
- =
-
-+struct dpp_test_info {
-+	const char *uri;
-+	bool expect_fail;
-+	uint32_t expected_freqs[10];
-+	struct dpp_uri_info result;
-+};
-+
-+struct dpp_test_info all_values =3D {
-+	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;K:MDkw=
-EwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=
-=3D;;",
-+	.result =3D {
-+		.mac =3D { 0x52, 0x54, 0x00, 0x58, 0x28, 0xe5 },
-+		.version =3D 2,
-+	},
-+	.expected_freqs =3D { 2412, 5180, 0 }
-+};
-+
-+struct dpp_test_info no_type =3D {
-+	.uri =3D "C:81/1;K:shouldnotmatter;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info empty =3D {
-+	.uri =3D "DPP:",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info no_key =3D {
-+	.uri =3D "DPP:C:81/1,115/36;I:SN=3D4774LH2b4044;M:5254005828e5;V:2;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info data_after_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D;;C:81/1;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info single_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info no_terminator =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0NjlkIA=3D",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info bad_key =3D {
-+	.uri =3D "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00=
-XHWCAQIhXruVWOz0;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info unexpected_id =3D {
-+	.uri =3D "DPP:Z:somedata;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoI=
-RIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+	.expect_fail =3D true
-+};
-+
-+struct dpp_test_info bad_channels[] =3D {
-+	{
-+		.uri =3D "DPP:C:;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQ=
-MV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWG=
-oQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPW=
-GoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRI=
-PWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,81/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZo=
-IRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+	{
-+		.uri =3D "DPP:C:81/1,/;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIR=
-IPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=3D;;",
-+		.expect_fail =3D true
-+	},
-+};
-+
-+static bool verify_info(const struct dpp_uri_info *parsed,
-+			const struct dpp_test_info *result)
-+{
-+	const struct dpp_uri_info *expected =3D &result->result;
-+	uint32_t i;
-+
-+	assert(!memcmp(parsed->mac, expected->mac, 6));
-+	assert(parsed->version =3D=3D expected->version);
-+	assert(parsed->boot_public !=3D NULL);
-+
-+	for (i =3D 0; result->expected_freqs[i]; i++)
-+		assert(scan_freq_set_contains(parsed->freqs,
-+						result->expected_freqs[i]));
-+
-+	return true;
-+}
-+
-+static void test_uri_parse(const void *data)
-+{
-+	const struct dpp_test_info *test_info =3D data;
-+	struct dpp_uri_info *info;
-+	int ret;
-+
-+	info =3D dpp_parse_uri(test_info->uri);
-+	if (test_info->expect_fail) {
-+		assert(info =3D=3D NULL);
-+		return;
-+	}
-+
-+	assert(ret =3D=3D 0);
-+
-+	assert(verify_info(info, test_info));
-+
-+	dpp_free_uri_info(info);
-+}
-+
-+
-+static void test_bad_channels(const void *data)
-+{
-+	unsigned int i;
-+
-+	for (i =3D 0; i < L_ARRAY_SIZE(bad_channels); i++)
-+		test_uri_parse(&bad_channels[i]);
-+}
-+
- /*
-  * B.2 Test Vectors for DPP Authentication Using P-256 for
-  * Responder-only Authentication
-@@ -148,5 +276,19 @@ int main(int argc, char *argv[])
- 		l_test_add("DPP test key derivation",
- 						test_key_derivation, NULL);
- =
-
-+	l_test_add("DPP URI parse", test_uri_parse, &all_values);
-+	l_test_add("DPP URI no type", test_uri_parse, &no_type);
-+	l_test_add("DPP URI empty", test_uri_parse, &empty);
-+	l_test_add("DPP URI no key", test_uri_parse, &no_key);
-+	l_test_add("DPP URI data after terminator", test_uri_parse,
-+				&data_after_terminator);
-+	l_test_add("DPP URI single terminator", test_uri_parse,
-+				&single_terminator);
-+	l_test_add("DPP URI no terminator", test_uri_parse,
-+				&no_terminator);
-+	l_test_add("DPP URI bad key", test_uri_parse, &bad_key);
-+	l_test_add("DPP URI bad channels", test_bad_channels, &bad_channels);
-+	l_test_add("DPP URI unexpected ID", test_uri_parse, &unexpected_id);
-+
- 	return l_test_run();
- }
+diff --git a/autotests/testP2P/connection_test.py b/autotests/testP2P/conne=
+ction_test.py
+index 383e0cef..479076e8 100644
+--- a/autotests/testP2P/connection_test.py
++++ b/autotests/testP2P/connection_test.py
+@@ -87,7 +87,12 @@ class Test(unittest.TestCase):
+             # For some reason wpa_supplicant's newly created P2P-client in=
+terface doesn't inherit
+             # the settings from the main interface which were loaded from =
+the config file
+             # (P2P-device and P2P-GO interfaces do), we need to set config=
+_methods again.
++            #
++            # Additionally since hostap commit 922fa099721903b106a7bc1ccd1=
+ffe8c4a7bce69,
++            # just setting config_methods to the same value we used last t=
+ime is detected as
++            # a NOOP so we need to set it to a different value first for i=
+t to take effect.
+             peer_ifname =3D 'p2p-' + wpas.interface.name + '-0'
++            wpas.set('config_methods', '', ifname=3Dpeer_ifname)
+             wpas.set('config_methods', wpas.config['config_methods'], ifna=
+me=3Dpeer_ifname)
+             wpas.set('device_name', wpas.config['device_name'], ifname=3Dp=
+eer_ifname)
+             wpas.set('device_type', wpas.config['device_type'], ifname=3Dp=
+eer_ifname)
 -- =
 
 2.34.1
 
---===============1713925474218476459==--
+--===============2950980040928073480==--
 
