@@ -1,90 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============1324192371166163737=="
+Content-Type: multipart/mixed; boundary="===============8962657122122249863=="
 MIME-Version: 1.0
 From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 2/7] hotspot: implement hotspot profile encryption
-Date: Thu, 03 Feb 2022 13:23:32 -0800
-Message-ID: <20220203212337.120613-2-prestwoj@gmail.com>
-In-Reply-To: 20220203212337.120613-1-prestwoj@gmail.com
+Subject: [PATCH 1/3] storage: remove unused variables
+Date: Fri, 10 Jun 2022 12:52:40 -0700
+Message-ID: <20220610195242.455453-1-prestwoj@gmail.com>
 
---===============1324192371166163737==
+--===============8962657122122249863==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Using __storage_open() hotspot can also support profile encyption.
-The hotspot consortium name is used as the 'ssid' since this stays
-consistent between hotspot networks for any profile.
+The auto macros apparently made it difficult for gcc to
+detect, but clang was able to find them.
 ---
- src/hotspot.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+ src/storage.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/src/hotspot.c b/src/hotspot.c
-index 21f50690..832d7a31 100644
---- a/src/hotspot.c
-+++ b/src/hotspot.c
-@@ -95,12 +95,18 @@ static struct l_settings *hotspot_network_open(struct n=
-etwork_info *info)
- =
-
- 	settings =3D l_settings_new();
- =
-
--	if (!l_settings_load_from_file(settings, config->filename)) {
--		l_settings_free(settings);
--		return NULL;
--	}
-+	if (!l_settings_load_from_file(settings, config->filename))
-+		goto error;
-+
-+	if (!__storage_open(settings, config->filename, SECURITY_8021X,
-+				config->name))
-+		goto error;
- =
-
- 	return settings;
-+
-+error:
-+	l_settings_free(settings);
-+	return NULL;
- }
- =
-
- static void hotspot_network_sync(struct network_info *info,
-@@ -111,7 +117,12 @@ static void hotspot_network_sync(struct network_info *=
-info,
- 	struct hs20_config *config =3D l_container_of(info, struct hs20_config,
- 							super);
- =
-
--	data =3D l_settings_to_data(settings, &length);
-+	data =3D __storage_encrypt(settings, config->name, &length);
-+	if (!data) {
-+		l_error("Unable to sync profile %s", config->filename);
-+		return;
-+	}
-+
- 	write_file(data, length, true, "%s", config->filename);
- 	l_free(data);
- }
-@@ -338,6 +349,11 @@ static struct hs20_config *hs20_config_new(struct l_se=
-ttings *settings,
- 		goto free_values;
- 	}
- =
-
-+	if (!__storage_open(settings, filename, SECURITY_8021X, name)) {
-+		l_error("Could not open hotspot profile %s", filename);
-+		goto free_values;
-+	}
-+
- 	config =3D l_new(struct hs20_config, 1);
- =
-
- 	if (hessid_str) {
+diff --git a/src/storage.c b/src/storage.c
+index aa8066b1..2100d08d 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -456,11 +456,9 @@ char *__storage_encrypt(const struct l_settings *setti=
+ngs, const char *name,
+ int __storage_decrypt(struct l_settings *settings, const char *ssid,
+ 				bool *encrypt)
+ {
+-	_auto_(l_settings_free) struct l_settings *security =3D NULL;
+ 	_auto_(l_free) uint8_t *encrypted =3D NULL;
+ 	_auto_(l_free) uint8_t *decrypted =3D NULL;
+ 	_auto_(l_free) uint8_t *salt =3D NULL;
+-	_auto_(l_strv_free) char **embedded =3D NULL;
+ 	_auto_(l_strv_free) char **groups =3D NULL;
+ 	char **i;
+ 	size_t elen, slen;
 -- =
 
-2.31.1
+2.34.1
 
---===============1324192371166163737==--
+--===============8962657122122249863==--
 
