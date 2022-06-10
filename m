@@ -1,183 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============7564413734078410104=="
+Content-Type: multipart/mixed; boundary="===============8403248381572948783=="
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: Re: [PATCH v4 4/7] tools: add decrypt-profile tool
-Date: Fri, 04 Feb 2022 13:57:43 -0600
-Message-ID: <6441d532-031d-c11e-6a62-46cece2fbe1c@gmail.com>
-In-Reply-To: 20220204173120.231730-4-prestwoj@gmail.com
+Subject: [PATCH 2/3] p2p: fix warning for uninitialized variable (clang)
+Date: Fri, 10 Jun 2022 12:52:41 -0700
+Message-ID: <20220610195242.455453-2-prestwoj@gmail.com>
+In-Reply-To: 20220610195242.455453-1-prestwoj@gmail.com
 
---===============7564413734078410104==
+--===============8403248381572948783==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+This is actually a false positive only because
+p2p_device_validate_conn_wfd bails out if the IE is NULL which
+avoids using wfd_data_length. But its subtle and without inspecting
+the code it does seem like the length could be used uninitialized.
 
-> +int main(int argc, char *argv[])
-> +{
-> +	const char *pass =3D NULL;
-> +	const char *file =3D NULL;
-> +	const char *infile =3D NULL;
-> +	const char *outfile =3D NULL;
-> +	const char *ssid =3D NULL;
-> +	_auto_(l_free) char *decrypted =3D NULL;
-> +	_auto_(l_settings_free) struct l_settings *settings =3D NULL;
-> +	enum security sec;
-> +	int ret =3D EXIT_FAILURE;
-> +	char profile[BUFSIZ];
+src/p2p.c:940:7: error: variable 'wfd_data_len' is used uninitialized whene=
+ver 'if' condition is false [-Werror,-Wsometimes-uninitialized]
+                if (dev->conn_own_wfd)
+                    ^~~~~~~~~~~~~~~~~
+src/p2p.c:946:8: note: uninitialized use occurs here
+                                                        wfd_data_len))
+                                                        ^~~~~~~~~~~~
+src/p2p.c:940:3: note: remove the 'if' if its condition is always true
+                if (dev->conn_own_wfd)
+                ^~~~~~~~~~~~~~~~~~~~~~
+src/p2p.c:906:23: note: initialize the variable 'wfd_data_len' to silence t=
+his warning
+                ssize_t wfd_data_len;
+                                    ^
+                                     =3D 0
+---
+ src/p2p.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-What's BUFSIZ?  Is this from the fget* utilities?  If so, that is system =
+diff --git a/src/p2p.c b/src/p2p.c
+index ebd0f62b..a7207c30 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -903,7 +903,7 @@ static void p2p_group_event(enum ap_event_type type, co=
+nst void *event_data,
+ 	{
+ 		const struct ap_event_station_added_data *data =3D event_data;
+ 		L_AUTO_FREE_VAR(uint8_t *, wfd_data) =3D NULL;
+-		ssize_t wfd_data_len;
++		ssize_t wfd_data_len =3D 0;
+ 		struct p2p_association_req req_info;
+ 		int r;
+ =
 
-dependent...
+-- =
 
-> +	ssize_t len =3D 0;
-> +	char *line;
-> +	int r;
-> +
-> +	for (;;) {
-> +		int opt;
-> +
-> +		opt =3D getopt_long(argc, argv, "pfhio",
-> +					main_options, NULL);
-> +		if (opt < 0)
-> +			break;
-> +
-> +		switch (opt) {
-> +		case 'p':
-> +			pass =3D optarg;
-> +			break;
-> +		case 'f':
-> +			file =3D optarg;
-> +			break;
-> +		case 'i':
-> +			infile =3D optarg;
-> +			break;
-> +		case 'o':
-> +			outfile =3D optarg;
-> +			break;
-> +		case 's':
-> +			ssid =3D optarg;
-> +			break;
-> +		case 'h':
-> +			usage();
-> +			return EXIT_SUCCESS;
-> +		default:
-> +			goto failed;
-> +		}
-> +	}
-> +
-> +	/*
-> +	 * Sort out the argument dependencies:
-> +	 *  1. Either --file or --pass must be provided
-> +	 *  2. Either stdin or --infile must be provided
-> +	 *  3. If using stdin --ssid must be provided
-> +	 *  4. If using --infile without --ssid, attempt to get the SSID, if
-> +	 *     that fails --ssid must be provided.
-> +	 */
-> +
-> +	if (!file && !pass) {
-> +		printf("--file or --pass must be supplied\n\n");
-> +		goto usage;
-> +	}
-> +
-> +	if (isatty(0) && !infile) {
-> +		printf("No input file (use stdin or --infile)\n\n");
-> +		goto usage;
-> +	}
-> +
-> +	if (!infile && !ssid) {
-> +		printf("--ssid is required if --infile is missing\n\n");
-> +		goto usage;
-> +	}
-> +
-> +	if (infile && !ssid) {
-> +		ssid =3D storage_network_ssid_from_path(infile, &sec);
-> +		if (!ssid) {
-> +			printf("Can't get SSID from --infile, use --ssid\n");
-> +			goto usage;
-> +		}
-> +	}
-> +
-> +	settings =3D l_settings_new();
-> +
-> +	if (infile) {
-> +		if (!l_settings_load_from_file(settings, infile)) {
-> +			printf("Profile is not formatted correctly\n");
-> +			goto failed;
-> +		}
+2.34.1
 
-Okay, but in theory you can mmap this as well and combine it with the case =
-
-below.  Not sure if it makes the code any smaller though.
-
-> +	} else {
-> +		while ((line =3D fgets(profile + len,
-> +					sizeof(profile) - len, stdin)))
-> +			len +=3D strlen(profile + len);
-
-This seems a bit limiting.  Why not use a growable buffer via realloc?  Or =
-
-alternatively l_string_*
-
-> +
-> +		if (!l_settings_load_from_data(settings, profile, len)) {
-> +			printf("Profile is not formatted correctly\n");
-> +			goto failed;
-> +		}
-> +	}
-> +
-> +	if (pass)
-> +		__storage_set_encryption_key((const uint8_t *)pass,
-> +						strlen(pass));
-> +	else if (!secret_from_file(file))
-> +		goto failed;
-> +
-> +	r =3D __storage_decrypt(settings, ssid, NULL);
-> +	if (r < 0) {
-> +		printf("Unable to decrypt profile (%d)\n", r);
-> +		goto failed;
-> +	}
-> +
-> +	decrypted =3D l_settings_to_data(settings, (size_t *)&len);
-> +
-> +	if (!outfile)
-> +		printf("%s\n", decrypted);
-
-using write directly to stdout is probably better.
-
-> +	else {
-> +		int fd =3D open(outfile, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
-> +
-> +		if (fd < 0) {
-> +			printf("Unable to open %s (%d)\n", outfile, fd);
-> +			close(fd);
-> +			goto failed;
-> +		}
-> +
-> +		len =3D write(fd, decrypted, len);
-> +
-> +		close(fd);
-> +
-> +		if (len < 0) {
-> +			printf("Unable to write to %s (%ld)\n", outfile, len);
-> +			goto failed;
-> +		}
-> +	}
-> +
-> +	ret =3D EXIT_SUCCESS;
-> +
-> +usage:
-> +	if (ret !=3D EXIT_SUCCESS)
-> +		usage();
-> +
-> +failed:
-> +	return ret;
-> +}
-> =
-
-
-Regards,
--Denis
---===============7564413734078410104==--
+--===============8403248381572948783==--
 
