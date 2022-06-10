@@ -1,126 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============7609744876738169467=="
+Content-Type: multipart/mixed; boundary="===============1933127913795987702=="
 MIME-Version: 1.0
-From: James Prestwood <prestwoj at gmail.com>
+From: Denis Kenzior <denkenz at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH v3 7/7] hotspot: refactor dir watch to be like knownnetworks
-Date: Thu, 03 Feb 2022 13:23:37 -0800
-Message-ID: <20220203212337.120613-7-prestwoj@gmail.com>
-In-Reply-To: 20220203212337.120613-1-prestwoj@gmail.com
+Subject: Re: [PATCH] fils: pragma false positive for uninitialized variable
+Date: Fri, 10 Jun 2022 13:59:36 -0500
+Message-ID: <abdb0d23-8395-93a4-770f-5083794b10aa@gmail.com>
+In-Reply-To: 20220610184017.356608-1-prestwoj@gmail.com
 
---===============7609744876738169467==
+--===============1933127913795987702==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The create/removed/modified cases all can be combined like they are in
-known networks. Create/modified were both doing nearly the same thing,
-and removed can easily be detected if the config was already found.
+Hi James,
 
-This is now basically the same logic as in known networks.
----
- src/hotspot.c | 57 ++++++++++++++++-----------------------------------
- 1 file changed, 18 insertions(+), 39 deletions(-)
+On 6/10/22 13:40, James Prestwood wrote:
+> On musl-gcc the compiler is giving a warning for igtk_key_index
+> and gtk_key_index being used uninitialized. This isn't possible
+> since they are only used if gtk/igtk are non-NULL so pragma to
+> ignore the warning.
+> =
 
-diff --git a/src/hotspot.c b/src/hotspot.c
-index 832d7a31..1f9f74c5 100644
---- a/src/hotspot.c
-+++ b/src/hotspot.c
-@@ -29,6 +29,7 @@
- #include <stdio.h>
- =
+> src/fils.c: In function 'fils_rx_associate':
+> src/fils.c:580:17: error: 'igtk_key_index' may be used uninitialized
+> 	in this function [-Werror=3Dmaybe-uninitialized]
+>    580 |                 handshake_state_install_igtk(fils->hs,
+> 					igtk_key_index,igtk + 6,
+> 					igtk_len - 6, igtk);
+> =
 
- #include <ell/ell.h>
-+#include "ell/useful.h"
- =
+> (same error for gtk_key_index)
+> ---
+>   src/fils.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> =
 
- #include "src/iwd.h"
- #include "src/module.h"
-@@ -409,7 +410,7 @@ static void hs20_dir_watch_cb(const char *filename,
- 				enum l_dir_watch_event event,
- 				void *user_data)
- {
--	struct l_settings *new;
-+	_auto_(l_settings_free) struct l_settings *new =3D NULL;
- 	uint64_t connected_time;
- 	struct hs20_config *hs20;
- 	struct network_config config;
-@@ -425,53 +426,31 @@ static void hs20_dir_watch_cb(const char *filename,
- 		return;
- =
 
- 	full_path =3D storage_get_hotspot_path("%s", filename);
-+	hs20 =3D l_queue_find(hs20_settings, match_filename, full_path);
- =
+Applied, thanks.
 
- 	switch (event) {
- 	case L_DIR_WATCH_EVENT_CREATED:
--		new =3D l_settings_new();
--
--		if (!l_settings_load_from_file(new, full_path)) {
--			l_settings_free(new);
--			return;
--		}
--
--		__network_config_parse(new, full_path, &config);
--
--		hs20 =3D hs20_config_new(new, full_path, &config);
--		l_settings_free(new);
--
--		if (!hs20)
--			return;
--
--		l_queue_push_head(hs20_settings, hs20);
--		break;
- 	case L_DIR_WATCH_EVENT_REMOVED:
--		hs20 =3D l_queue_remove_if(hs20_settings, match_filename,
--						full_path);
--		if (!hs20)
--			return;
--
--		known_networks_remove(&hs20->super);
--		break;
- 	case L_DIR_WATCH_EVENT_MODIFIED:
--		hs20 =3D l_queue_find(hs20_settings, match_filename, full_path);
--		if (!hs20)
--			return;
--
- 		new =3D l_settings_new();
- =
+Regards,
+-Denis
 
--		if (!l_settings_load_from_file(new, full_path)) {
--			l_settings_free(new);
--			return;
-+		if (l_settings_load_from_file(new, full_path)) {
-+			__network_config_parse(new, full_path, &config);
-+
-+			if (hs20)
-+				known_network_update(&hs20->super, &config);
-+			else {
-+				hs20 =3D hs20_config_new(new, full_path, &config);
-+				if (!hs20)
-+					return;
-+
-+				l_queue_push_head(hs20_settings, hs20);
-+			}
-+		} else if (hs20) {
-+			l_queue_remove(hs20_settings, hs20);
-+			known_networks_remove(&hs20->super);
- 		}
- =
-
--		__network_config_parse(new, full_path, &config);
--		known_network_update(&hs20->super, &config);
--
--		/* TODO: Update hotspot specific settings */
--
--		l_settings_free(new);
--
- 		break;
- 	case L_DIR_WATCH_EVENT_ACCESSED:
- 		break;
--- =
-
-2.31.1
-
---===============7609744876738169467==--
+--===============1933127913795987702==--
 
