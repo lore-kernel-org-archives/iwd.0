@@ -1,47 +1,47 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B872F21
-	for <iwd@lists.linux.dev>; Tue, 14 Jun 2022 23:37:37 +0000 (UTC)
-Received: by mail-pl1-f178.google.com with SMTP id i15so9020670plr.1
-        for <iwd@lists.linux.dev>; Tue, 14 Jun 2022 16:37:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A490C2902
+	for <iwd@lists.linux.dev>; Wed, 15 Jun 2022 22:52:20 +0000 (UTC)
+Received: by mail-pg1-f174.google.com with SMTP id 123so12697592pgb.5
+        for <iwd@lists.linux.dev>; Wed, 15 Jun 2022 15:52:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=fSmuJEN3gBAmZLdQEAae5VrrSum5TbqQyeWYORbZFI4=;
-        b=E6GqZ6/LNSOiliO3QFIEDh04yk8xVucpXc80sManTH90tb5rMi9OGNQyN/pO+PdtZX
-         SKoeRzIFSzNi0sc0F1SJS9IzZlfG5x1EAjnDDeXCd3uh/HvCbE44lnCZlaB92czbtle7
-         Gjmr/8JCW7E2jdpQWsIQj4C4CcEHgudkp1Iaw/GVzZoHoga8PE7ebtpGJr/NkD+hz+vz
-         NDSdFMW8/rt1D8UCEkMV42lqA+OnT3mJo4LrV1xNMwj2IsVGLW/wgDr7//MasAJmpNJi
-         QmbNenDGvYfYr341qYk5T/c0FbiQbSciSkhSl4enwaeGL6SFVscXChkF1XIslaP33GwK
-         OgAQ==
+        bh=yCcBpF+YvPeCBecxmz9G9P4nU5CJiJy5WnTlSLB3XZI=;
+        b=FjeriXNWsBB8gnyajEnNMuEw22CDEANw7U9iN9XtDnEG9g06SnLXwMWHfX6h9oxRPu
+         4JvEBxHIwecrNWClGqrD1/CbYK8dLVNDphot/3TSHw76D1Je901IzyWKZDhITGrT6e5U
+         ZeZls3ciWpaCpsg4Y+1Vn8btkbRfBeYppVP5ukEq8wsLRpFZxO+KIoayvQkLvaXCvs51
+         iMaVafc+p4AySLH9Ljn5x4o6VoyqSbsV0Di3k8kF6Txl/5fzYI6J5JPbpGo1/WmyreL4
+         xc191RZ3laRH1SHcJU9zD9jLi3CA4vY6D8+p5iJTKGkM9AVJxWgzJ7GHNZukYNnExrqG
+         lwqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=fSmuJEN3gBAmZLdQEAae5VrrSum5TbqQyeWYORbZFI4=;
-        b=g81gW0Q6YhuYUrXRtx9FHZO74035qJ3SHa4Z5K7m3vRiaHAWqEWDrzGnFDohFy6RfO
-         6b5zGxC0bgKEW1sESWFa3G6n+P5g8UO/oD4PL2ENy9/i7i+99sLTw0y7+eX6LuncOAKp
-         lCUgUIV/TXzpdviBsdTg7C7imsqaqtAZURA+Jn5G1oW35dMtAbZ6Rll36ASH0BjR5wiB
-         AlX60TnRb9LIj/hQi2r4RVasfEGBZcgLcTv6rTMv8zfziR6nEMmoFZSeVcu/3a6a5gS7
-         xpRFrhMMKPlYNe5bLIgGg+JJLEEH3UqgV0seOL8BR7OGSKIXFyb+5uS9RF4oNwQWlJFD
-         71fQ==
-X-Gm-Message-State: AJIora8aCS+LKho55bmf0Ijn8OX5FvXYpBTp702zphG1vS4/+7nsCueN
-	pYGtdfJn5vF2KgyOs5EGy+GCEgKs2AI=
-X-Google-Smtp-Source: AGRyM1s8/OnuDewDdzA1yIvq9SB0jwbZ7xA8OqT7ekI3bxX4Xx9JBFPZGQ6PR9q3EsggL9yW2ZJNAw==
-X-Received: by 2002:a17:902:7005:b0:163:ffe7:32eb with SMTP id y5-20020a170902700500b00163ffe732ebmr6612109plk.18.1655249857281;
-        Tue, 14 Jun 2022 16:37:37 -0700 (PDT)
+        bh=yCcBpF+YvPeCBecxmz9G9P4nU5CJiJy5WnTlSLB3XZI=;
+        b=S5Jlt2cUxtZ7NI9im3a7GaHWbdGgxVW4TWlnFlKt3W43LAdBsF3wNC/qZZgn/dtnSl
+         Izu2i5f2rFqfSYRR7WT+ERFKHuSITxLOxXx7CZUEPNffIyA7U2R1Jfky3Kmy6dfcibBa
+         2lWbHJrfAVYHqSYVKq+whRQXke4KTQSIEv0wqgEEJaYntx070Rc/jkJeaqe6q2gholKE
+         JtPLilOZPI93MSUvR1EfLGuAWJFs64WkARbYl64A+U4xNk3sRnPbEo8K+x7AfSPsY/iD
+         kRZGQlJDylXEKMuqGrV40/I53akbHlWGReldyj4z3f1OiZfIG4iy0TYxw+0HKXoeZDDH
+         ngNA==
+X-Gm-Message-State: AJIora+RyHOw5bHdgeSYoodpKng7p3EAF3f0RDXr4+KdBMdtzcHot+W6
+	kW6ZAGy9wHXYEqV2Th+42vtLaAUWnD4=
+X-Google-Smtp-Source: AGRyM1twYwzbTwCwNUG6Y8IuNUCgKwgntFPW2TY/qIwgsxQ9prhRBWmXZ1B18MUivrMziUPNYh99nA==
+X-Received: by 2002:a63:130f:0:b0:401:ce98:24eb with SMTP id i15-20020a63130f000000b00401ce9824ebmr1783681pgl.217.1655333539647;
+        Wed, 15 Jun 2022 15:52:19 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id x15-20020a63b34f000000b003fe28130b12sm8248614pgt.62.2022.06.14.16.37.36
+        by smtp.gmail.com with ESMTPSA id jb21-20020a170903259500b0015ed003552fsm125466plb.293.2022.06.15.15.52.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jun 2022 16:37:36 -0700 (PDT)
+        Wed, 15 Jun 2022 15:52:19 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] storage: warn user on badly named provisioning file
-Date: Tue, 14 Jun 2022 16:35:29 -0700
-Message-Id: <20220614233529.714721-1-prestwoj@gmail.com>
+Subject: [PATCH] auto-t: fix timing issue in testEncryptedProfiles
+Date: Wed, 15 Jun 2022 15:50:12 -0700
+Message-Id: <20220615225012.932391-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
@@ -51,34 +51,40 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The man pages (iwd.network) have a section about how to name provisioning
-files containing non-alphanumeric characters but not everyone reads the
-entire man page.
+test_decryption_failure is quite simple and only verifies that a known
+network exists after starting. This causes the test to end before IWD can
+fully start up leaving the DBus utilities in limbo having not fully
+initialized.
 
-Warning them that the provisioning file was not read and pointing to
-'man iwd.network' should lead someone in the right direction.
+Then, on the next test, stale InterfaceAdded signals arrive (for Station
+and P2P) which throw exceptions when trying to get the bus (since IWD is
+long gone). In addition the next IWD instance has started so any paths
+included in the InterfaceAdded signals are bogus and cause additional
+exceptions.
+
+At the end of this test we can call list_devices() which will wait for
+the InterfaceAdded signal, and cleanly exit afterwards.
 ---
- src/storage.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ autotests/testEncryptedProfiles/connection_test.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/storage.c b/src/storage.c
-index 2100d08d..528bdbf4 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -321,8 +321,12 @@ const char *storage_network_ssid_from_path(const char *path,
- 			if (!isalnum(*c) && !strchr("-_ ", *c))
- 				break;
+diff --git a/autotests/testEncryptedProfiles/connection_test.py b/autotests/testEncryptedProfiles/connection_test.py
+index dd4892ca..2b846596 100644
+--- a/autotests/testEncryptedProfiles/connection_test.py
++++ b/autotests/testEncryptedProfiles/connection_test.py
+@@ -115,6 +115,12 @@ EncryptedSecurity=aabbccddeeff00112233445566778899
  
--		if (c < end)
-+		if (c < end) {
-+			l_warn("Provisioning file %s contains non-alphanumeric "
-+				"characters in the name. Please hex-encode. "
-+				"See man iwd.network", path);
- 			return NULL;
-+		}
+         self.assertEqual(wd.list_known_networks(), [])
  
- 		memcpy(buf, filename, end - filename);
- 		buf[end - filename] = '\0';
++        # This test starts and stops IWD so quickly the DBus utilities don't
++        # even have a chance to set up the Device interface object which causes
++        # exceptions on the next test as the InterfaceAdded signals arrive. This
++        # allows the device interface to get set up before ending the test.
++        wd.list_devices(1)
++
+     def test_runtime_profile(self):
+         wd = IWD(True)
+ 
 -- 
 2.34.1
 
