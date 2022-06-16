@@ -1,36 +1,36 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2649161
-	for <iwd@lists.linux.dev>; Thu, 16 Jun 2022 00:02:49 +0000 (UTC)
-Received: by mail-wm1-f45.google.com with SMTP id c130-20020a1c3588000000b0039c6fd897b4so1967378wma.4
-        for <iwd@lists.linux.dev>; Wed, 15 Jun 2022 17:02:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3008D161
+	for <iwd@lists.linux.dev>; Thu, 16 Jun 2022 00:02:51 +0000 (UTC)
+Received: by mail-wr1-f41.google.com with SMTP id o8so17334263wro.3
+        for <iwd@lists.linux.dev>; Wed, 15 Jun 2022 17:02:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=2dDbwvFgz76PsafAvHmieGDJCVxo8ZlIG5n+Gj5BMRg=;
-        b=MUv+sXjjZENGkkbEQXEpu5FDx0ss2e3B5BTnqvOpe/MuCs36yIKSZvx4QsCFBQcxy8
-         9YJ8TyxnK9lwjgGVYQs5sKGfXK40D8q92VtSxiebGiCz9Ms71zn98D8Oy9OcXB/CDS53
-         JEAkCyZLmL34yefBBTadTm0Qzfb9t/qY17n7FxwzpoAH8cQyWFlEgzx4OXnv9ceX9n/S
-         qHobpJhsgF6SbZkSgv5DIgXVNYzr+qHi+wuHLa5n43eZGhiPR81ZKHcPReBDsP/vyTYt
-         mC5Oy8wqvfLD8TnIaBnpc23+tjbOo1VA7n0RE1iJE/AZe9QqX8MZ0hG46oxYniuedFjb
-         iN6g==
-X-Gm-Message-State: AOAM532dRf+x7PKwNF4zzkG9ykEBsL0fkDMtMURU24sk8O2yVkzpXKwL
-	gH5tYXLyOfdGGlkUp/Blp1OAPrdb16Y=
-X-Google-Smtp-Source: ABdhPJzFpQKMpoDQ2lxDUelfUe6xsofXdcjQBye9xG14nHgthHSOVJL5MDME6Q/NlTbcGp4WyAj4dw==
-X-Received: by 2002:a05:600c:358c:b0:39c:97ed:baa5 with SMTP id p12-20020a05600c358c00b0039c97edbaa5mr12724779wmq.77.1655337767755;
-        Wed, 15 Jun 2022 17:02:47 -0700 (PDT)
+        bh=O0sR9/tzsW65TSQaduxKmzndHRSeunmPPlcf5mdr3AI=;
+        b=KfEDs+PJfIex2UM9DyaPM9iXAc6LZQCxiIpBEOVBkeYyqAP+k4z49a0N0w5SkFknuD
+         bjemgIFjWBDZnC/C9RYbdJXKXEXJL8w/nqJ5wH6xXu4Lc9f8SWk2Dne5yF3coqA54enS
+         OxpK8NVYMEyFlf9lg5DdGWunkhKJLa12RIcEkks0+RJS+h4DUfi62Eqe+SGwIygbouMM
+         Pl8MvmLknfChwre+13bNNDbCAOyY91Da83H2y+VlNOL6t0uRkNGSV2rejctgRCXPBpvB
+         Wv8bEB+UL4YrQm43/j4IIeTfS6I9nwDMIirBfjOhJSI3veXjYffVIpoQdNevhVTQFLNU
+         dwuw==
+X-Gm-Message-State: AJIora8pHfm0O3h6/3MhjX5zBYdmReaJYdZRoWMO7Cjujn1QgiLEuf6G
+	sXHxccrle5XZNCr6hlri+s7DUx9XrFo=
+X-Google-Smtp-Source: AGRyM1v8QXc6s0ZV3058xI1061gzYW1Get+zUEdklN5kJGM9xBvAzniK1ZrBmnB4doBd6aGUoreD7A==
+X-Received: by 2002:a05:6000:1789:b0:219:2aa8:7159 with SMTP id e9-20020a056000178900b002192aa87159mr2050202wrg.474.1655337769101;
+        Wed, 15 Jun 2022 17:02:49 -0700 (PDT)
 Received: from iss.Home ([82.213.231.20])
-        by smtp.gmail.com with ESMTPSA id az10-20020adfe18a000000b00210396b2eaesm337452wrb.45.2022.06.15.17.02.46
+        by smtp.gmail.com with ESMTPSA id az10-20020adfe18a000000b00210396b2eaesm337452wrb.45.2022.06.15.17.02.47
         for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jun 2022 17:02:47 -0700 (PDT)
+        Wed, 15 Jun 2022 17:02:48 -0700 (PDT)
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
 To: iwd@lists.linux.dev
-Subject: [PATCH 09/15] autotests: Ensure storage_dir exists, clean up
-Date: Thu, 16 Jun 2022 02:02:25 +0200
-Message-Id: <20220616000231.1966008-9-andrew.zaborowski@intel.com>
+Subject: [PATCH 10/15] autotests: In testNetconfig add static IPv6, add comments
+Date: Thu, 16 Jun 2022 02:02:26 +0200
+Message-Id: <20220616000231.1966008-10-andrew.zaborowski@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220616000231.1966008-1-andrew.zaborowski@intel.com>
 References: <20220616000231.1966008-1-andrew.zaborowski@intel.com>
@@ -42,117 +42,76 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In iwd.py make sure all the static methods that touch IWD storage take the
-storage_dir parameter instead of hardcoding IWD_STORAGE_DIR, and make
-sure that parameter is actually used.
-
-Create the directory if it doesn't exist before copying files into it.
-This fixes a problem in testNetconfig where
-
-`IWD.copy_to_storage('ssidTKIP.psk', '/tmp/storage')`
-
-would result in /tmp/storage being created as a file, rather than a
-directory containing a file, and resulting in IWD failing to start with:
-
-`Failed to create /tmp/storage`
-
-runner.py creates /tmp/iwd but that doesn't account for IWD sessions
-with a custom storage dir path.
+In static_test.py add IPv6.  Add comments on what we're actually testing
+since it wasn't very clear.  After the expected ACD conflict detection,
+succeed if either the lost address was removed or the client disconnected
+from the AP since this seems like a correct action for netconfig to
+implement.
 ---
- autotests/testNetconfig/static_test.py |  2 +-
- autotests/util/iwd.py                  | 39 ++++++++++++++++----------
- 2 files changed, 25 insertions(+), 16 deletions(-)
+ autotests/testNetconfig/ssidTKIP.psk   |  7 +++++++
+ autotests/testNetconfig/static_test.py | 11 ++++++++++-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
+diff --git a/autotests/testNetconfig/ssidTKIP.psk b/autotests/testNetconfig/ssidTKIP.psk
+index eea59cda..72a71ce9 100644
+--- a/autotests/testNetconfig/ssidTKIP.psk
++++ b/autotests/testNetconfig/ssidTKIP.psk
+@@ -1,7 +1,14 @@
+ [IPv4]
++# Use a different netmask than DHCP on purpose, but use the same address
++# as DHCP would assign us to produce a conflict and test ACD
+ Address=192.168.1.10
+ Netmask=255.255.255.128
+ Gateway=192.168.1.1
+ 
++[IPv6]
++# Use a different subnet than DHCP on purpose
++Address=3ffe:501:ffff:200::10/80
++Gateway=3ffe:501:ffff:200::1
++
+ [Settings]
+ AutoConnect=false
 diff --git a/autotests/testNetconfig/static_test.py b/autotests/testNetconfig/static_test.py
-index e82dbaeb..8d5710c1 100644
+index 8d5710c1..a3b294a2 100644
 --- a/autotests/testNetconfig/static_test.py
 +++ b/autotests/testNetconfig/static_test.py
-@@ -91,7 +91,7 @@ class Test(unittest.TestCase):
+@@ -16,6 +16,7 @@ import os
+ class Test(unittest.TestCase):
  
-     @classmethod
-     def tearDownClass(cls):
--        IWD.clear_storage()
-+        IWD.clear_storage(storage_dir='/tmp/storage')
-         cls.dhcpd_pid.kill()
+     def test_connection_success(self):
++        # Use a non-default storage_dir for one of the instances, the default for the other one
+         wd = IWD(True, iwd_storage_dir='/tmp/storage')
  
- if __name__ == '__main__':
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 6cee1e07..f609e37e 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -1086,7 +1086,7 @@ class IWD(AsyncOpAbstract):
-     psk_agent = None
+         ns0 = ctx.get_namespace('ns0')
+@@ -46,19 +47,27 @@ class Test(unittest.TestCase):
+         testutil.test_ifaces_connected()
  
-     def __init__(self, start_iwd_daemon = False, iwd_config_dir = '/tmp',
--                            iwd_storage_dir = '/tmp/iwd', namespace=ctx):
-+                            iwd_storage_dir = IWD_STORAGE_DIR, namespace=ctx):
-         self.namespace = namespace
-         self._bus = namespace.get_bus()
+         testutil.test_ip_address_match(dev1.name, '192.168.1.10', 25)
++        testutil.test_ip_address_match(dev1.name, '3ffe:501:ffff:200::10', 80)
  
-@@ -1197,40 +1197,49 @@ class IWD(AsyncOpAbstract):
-         os.system('rm -rf ' + storage_dir + '/ap/*')
+         ordered_network = dev2.get_ordered_network('ssidTKIP')
  
-     @staticmethod
--    def create_in_storage(file_name, file_content):
--        fo = open(IWD_STORAGE_DIR + '/' + file_name, 'w')
-+    def create_in_storage(file_name, file_content, storage_dir=IWD_STORAGE_DIR):
-+        fo = open(storage_dir + '/' + file_name, 'w')
+         condition = 'not obj.connected'
+         wd_ns0.wait_for_object_condition(ordered_network.network_object, condition)
  
-         fo.write(file_content)
-         fo.close()
++        # Connect to the same network from a dynamically configured client.  The
++        # DHCP server doesn't know (even though dev1 announced itself) that
++        # 192.168.1.10 is already in use and if it assigns dev2 the lowest
++        # available address, that's going to be 192.168.1.10.  dev1's ACD
++        # implementation should then stop using this address.
+         ordered_network.network_object.connect()
  
-+    @staticmethod
-+    def _ensure_storage_dir_exists(storage_dir):
-+        if not os.path.exists(storage_dir):
-+            os.mkdir(storage_dir)
-+
-     @staticmethod
-     def copy_to_storage(source, storage_dir=IWD_STORAGE_DIR, name=None):
-         import shutil
+         condition = 'obj.state == DeviceState.connected'
+         wd_ns0.wait_for_object_condition(dev2, condition)
  
-         assert not os.path.isabs(source)
+         wd.wait(1)
+-        testutil.test_ip_address_match(dev1.name, None)
++        # Check dev1 is now disconnected or without its IPv4 address
++        if dev1.state == iwd.DeviceState.connected:
++            testutil.test_ip_address_match(dev1.name, None)
  
-+        target = storage_dir
-         if name:
--            storage_dir += '/%s' % name
-+            target += '/%s' % name
- 
--        shutil.copy(source, storage_dir)
-+        IWD._ensure_storage_dir_exists(storage_dir)
-+        shutil.copy(source, target)
- 
-     @staticmethod
--    def copy_to_hotspot(source):
--        if not os.path.exists(IWD_STORAGE_DIR + "/hotspot"):
--            os.mkdir(IWD_STORAGE_DIR + "/hotspot")
-+    def copy_to_hotspot(source, storage_dir=IWD_STORAGE_DIR):
-+        IWD._ensure_storage_dir_exists(storage_dir)
-+
-+        if not os.path.exists(storage_dir + "/hotspot"):
-+            os.mkdir(storage_dir + "/hotspot")
- 
--        IWD.copy_to_storage(source, IWD_STORAGE_DIR + "/hotspot")
-+        IWD.copy_to_storage(source, storage_dir + "/hotspot")
- 
-     @staticmethod
--    def copy_to_ap(source):
--        if not os.path.exists(IWD_STORAGE_DIR + "/ap"):
--            os.mkdir(IWD_STORAGE_DIR + "/ap")
-+    def copy_to_ap(source, storage_dir=IWD_STORAGE_DIR):
-+        if not os.path.exists(storage_dir + "/ap"):
-+            os.mkdir(storage_dir + "/ap")
- 
--        IWD.copy_to_storage(source, IWD_STORAGE_DIR + '/ap/')
-+        IWD.copy_to_storage(source, storage_dir + '/ap/')
- 
-     @staticmethod
--    def remove_from_storage(file_name):
--        os.system('rm -rf ' + IWD_STORAGE_DIR + '/\'' + file_name + '\'')
-+    def remove_from_storage(file_name, storage_dir=IWD_STORAGE_DIR):
-+        os.system('rm -rf ' + storage_dir + '/\'' + file_name + '\'')
- 
-     def list_devices(self, wait_to_appear = 0, max_wait = 50, p2p = False):
-         if not wait_to_appear:
+         dev1.disconnect()
+         dev2.disconnect()
 -- 
 2.34.1
 
