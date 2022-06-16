@@ -1,47 +1,36 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A490C2902
-	for <iwd@lists.linux.dev>; Wed, 15 Jun 2022 22:52:20 +0000 (UTC)
-Received: by mail-pg1-f174.google.com with SMTP id 123so12697592pgb.5
-        for <iwd@lists.linux.dev>; Wed, 15 Jun 2022 15:52:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=yCcBpF+YvPeCBecxmz9G9P4nU5CJiJy5WnTlSLB3XZI=;
-        b=FjeriXNWsBB8gnyajEnNMuEw22CDEANw7U9iN9XtDnEG9g06SnLXwMWHfX6h9oxRPu
-         4JvEBxHIwecrNWClGqrD1/CbYK8dLVNDphot/3TSHw76D1Je901IzyWKZDhITGrT6e5U
-         ZeZls3ciWpaCpsg4Y+1Vn8btkbRfBeYppVP5ukEq8wsLRpFZxO+KIoayvQkLvaXCvs51
-         iMaVafc+p4AySLH9Ljn5x4o6VoyqSbsV0Di3k8kF6Txl/5fzYI6J5JPbpGo1/WmyreL4
-         xc191RZ3laRH1SHcJU9zD9jLi3CA4vY6D8+p5iJTKGkM9AVJxWgzJ7GHNZukYNnExrqG
-         lwqw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F95B7E
+	for <iwd@lists.linux.dev>; Thu, 16 Jun 2022 00:02:40 +0000 (UTC)
+Received: by mail-wr1-f51.google.com with SMTP id c21so17347574wrb.1
+        for <iwd@lists.linux.dev>; Wed, 15 Jun 2022 17:02:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=yCcBpF+YvPeCBecxmz9G9P4nU5CJiJy5WnTlSLB3XZI=;
-        b=S5Jlt2cUxtZ7NI9im3a7GaHWbdGgxVW4TWlnFlKt3W43LAdBsF3wNC/qZZgn/dtnSl
-         Izu2i5f2rFqfSYRR7WT+ERFKHuSITxLOxXx7CZUEPNffIyA7U2R1Jfky3Kmy6dfcibBa
-         2lWbHJrfAVYHqSYVKq+whRQXke4KTQSIEv0wqgEEJaYntx070Rc/jkJeaqe6q2gholKE
-         JtPLilOZPI93MSUvR1EfLGuAWJFs64WkARbYl64A+U4xNk3sRnPbEo8K+x7AfSPsY/iD
-         kRZGQlJDylXEKMuqGrV40/I53akbHlWGReldyj4z3f1OiZfIG4iy0TYxw+0HKXoeZDDH
-         ngNA==
-X-Gm-Message-State: AJIora+RyHOw5bHdgeSYoodpKng7p3EAF3f0RDXr4+KdBMdtzcHot+W6
-	kW6ZAGy9wHXYEqV2Th+42vtLaAUWnD4=
-X-Google-Smtp-Source: AGRyM1twYwzbTwCwNUG6Y8IuNUCgKwgntFPW2TY/qIwgsxQ9prhRBWmXZ1B18MUivrMziUPNYh99nA==
-X-Received: by 2002:a63:130f:0:b0:401:ce98:24eb with SMTP id i15-20020a63130f000000b00401ce9824ebmr1783681pgl.217.1655333539647;
-        Wed, 15 Jun 2022 15:52:19 -0700 (PDT)
-Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id jb21-20020a170903259500b0015ed003552fsm125466plb.293.2022.06.15.15.52.19
+        bh=HeUk5YNtIO9TeLXsTOkL/ZW/66PCg3ok0c0E8E/QVV8=;
+        b=i8S4TMzCV/aNEVLCjr3qCfcQHHXQgCBld52FSb+i797M8rz1myX3TJqmqzKWzqMWsp
+         eG34wrDHuiA5/44huTsPR/mlhIYQ++cmDX2Lzcmz6CyT9kztbsCiQ6X2NGH2BnML6RiL
+         1nlOr9N2KTQQ1MVqJpgQp8oKBA5OqT+FqSCVkZgSpH08uIMwdxcdEeC9kPEsLDHoykpR
+         Xh/RVahfTShghkuJNZZAhdYHzS5ww9TlMDfy//IW4wcVTGLMe0GiNaCZaEpVmIq1032M
+         39eDELcULtuNk2W02RxmYivZzCue+Rv7RXhTau1A8JVFyW69nXsQTdfnNcDIEp9j1kGW
+         z6ZQ==
+X-Gm-Message-State: AJIora/7pm0v+6paT46Jxy4dAD05aFeDeUUKHDA+4OiPP0BuAtsWyQZq
+	GOK/DIkCsAhdYrRdkmHKgZ0XYvhhJgU=
+X-Google-Smtp-Source: AGRyM1t94Gvnv4yjWU9eLRAmGzPDaBx8wDm0pmepV6p8ojaGpE3qhhQAyPrLvJf3+16LyoxTuIL5hA==
+X-Received: by 2002:adf:d205:0:b0:213:b49a:9fc7 with SMTP id j5-20020adfd205000000b00213b49a9fc7mr1991770wrh.589.1655337758266;
+        Wed, 15 Jun 2022 17:02:38 -0700 (PDT)
+Received: from iss.Home ([82.213.231.20])
+        by smtp.gmail.com with ESMTPSA id az10-20020adfe18a000000b00210396b2eaesm337452wrb.45.2022.06.15.17.02.37
+        for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jun 2022 15:52:19 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
+        Wed, 15 Jun 2022 17:02:37 -0700 (PDT)
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
 To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] auto-t: fix timing issue in testEncryptedProfiles
-Date: Wed, 15 Jun 2022 15:50:12 -0700
-Message-Id: <20220615225012.932391-1-prestwoj@gmail.com>
+Subject: [PATCH 01/15] netconfig: Fix address format validation
+Date: Thu, 16 Jun 2022 02:02:17 +0200
+Message-Id: <20220616000231.1966008-1-andrew.zaborowski@intel.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
@@ -51,40 +40,37 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-test_decryption_failure is quite simple and only verifies that a known
-network exists after starting. This causes the test to end before IWD can
-fully start up leaving the DBus utilities in limbo having not fully
-initialized.
-
-Then, on the next test, stale InterfaceAdded signals arrive (for Station
-and P2P) which throw exceptions when trying to get the bus (since IWD is
-long gone). In addition the next IWD instance has started so any paths
-included in the InterfaceAdded signals are bogus and cause additional
-exceptions.
-
-At the end of this test we can call list_devices() which will wait for
-the InterfaceAdded signal, and cleanly exit afterwards.
+Drop the wrong negation in the error check.  Check that there are no extra
+characters after prefix length suffix.  Reset errno 0 before the strtoul
+call, as recommended by the manpage.
 ---
- autotests/testEncryptedProfiles/connection_test.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+ src/netconfig.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/testEncryptedProfiles/connection_test.py b/autotests/testEncryptedProfiles/connection_test.py
-index dd4892ca..2b846596 100644
---- a/autotests/testEncryptedProfiles/connection_test.py
-+++ b/autotests/testEncryptedProfiles/connection_test.py
-@@ -115,6 +115,12 @@ EncryptedSecurity=aabbccddeeff00112233445566778899
+diff --git a/src/netconfig.c b/src/netconfig.c
+index 2ab03b90..4a70b0ca 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -515,6 +515,7 @@ static struct l_rtnl_address *netconfig_get_static6_address(
+ {
+ 	L_AUTO_FREE_VAR(char *, ip);
+ 	char *p;
++	char *endp;
+ 	struct l_rtnl_address *ret;
+ 	uint32_t prefix_len = 128;
  
-         self.assertEqual(wd.list_known_networks(), [])
+@@ -530,8 +531,9 @@ static struct l_rtnl_address *netconfig_get_static6_address(
+ 	if (*++p == '\0')
+ 		goto no_prefix_len;
  
-+        # This test starts and stops IWD so quickly the DBus utilities don't
-+        # even have a chance to set up the Device interface object which causes
-+        # exceptions on the next test as the InterfaceAdded signals arrive. This
-+        # allows the device interface to get set up before ending the test.
-+        wd.list_devices(1)
-+
-     def test_runtime_profile(self):
-         wd = IWD(True)
- 
+-	prefix_len = strtoul(p, NULL, 10);
+-	if (!unlikely(errno == EINVAL || errno == ERANGE ||
++	errno = 0;
++	prefix_len = strtoul(p, &endp, 10);
++	if (unlikely(*endp != '\0' || errno ||
+ 			!prefix_len || prefix_len > 128)) {
+ 		l_error("netconfig: Invalid prefix '%s' provided in network"
+ 				" configuration file", p);
 -- 
 2.34.1
 
