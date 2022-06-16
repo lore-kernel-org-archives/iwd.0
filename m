@@ -1,93 +1,74 @@
-Content-Type: multipart/mixed; boundary="===============0616154899837865398=="
+Content-Type: multipart/mixed; boundary="===============1704262640090392700=="
 MIME-Version: 1.0
-From: Marc-Antoine Perennou <Marc-Antoine at Perennou.com>
+From: James Prestwood <prestwoj at gmail.com>
 To: iwd at lists.01.org
-Subject: [PATCH] eap: Remove nested function use
-Date: Sat, 06 Nov 2021 20:34:32 +0100
-Message-ID: <20211106193432.4018165-1-Marc-Antoine@Perennou.com>
+Subject: Re: [ANNOUNCE] IWD switching to new mailing list
+Date: Thu, 16 Jun 2022 08:21:53 -0700
+Message-ID: <101cdb95b2520fda625cc66a2284dedb69abb457.camel@gmail.com>
+In-Reply-To: 736475cf-374c-71e1-7591-b679f7de6134@molgen.mpg.de
 
---===============0616154899837865398==
+--===============1704262640090392700==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This allows building iwd with clang
+On Thu, 2022-06-16 at 07:20 +0200, Paul Menzel wrote:
+> Dear James,
+> =
 
-Signed-off-by: Marc-Antoine Perennou <Marc-Antoine(a)Perennou.com>
----
- src/eap.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+> =
 
-diff --git a/src/eap.c b/src/eap.c
-index 0645be47..10381af7 100644
---- a/src/eap.c
-+++ b/src/eap.c
-@@ -416,6 +416,9 @@ static const char *eap_type_to_str(enum eap_type type, =
-uint32_t vendor_id,
- #define IS_EXPANDED_RESPONSE(id, t) \
- 	(type =3D=3D EAP_TYPE_EXPANDED && vendor_id =3D=3D (id) && vendor_type =
-=3D=3D (t))
- =
+> Am 16.06.22 um 01:52 schrieb James Prestwood:
+> =
 
-+#define RESPONSE_IS(t) \
-+	(type =3D=3D (t) || IS_EXPANDED_RESPONSE(0, (t)))
-+
- static void eap_handle_response(struct eap_state *eap, const uint8_t *pkt,
- 				size_t len)
- {
-@@ -428,14 +431,6 @@ static void eap_handle_response(struct eap_state *eap,=
- const uint8_t *pkt,
- 				eap->method->vendor_id[2];
- 	uint32_t our_vendor_type =3D eap->method->vendor_type;
- =
+> > IWD is swiching to a new mailing list: iwd(a)lists.linux.dev. This
+> > list
+> > is currently active and ready so any future patches, questions, or
+> > comments can be sent there!
+> =
 
--	bool response_is(enum eap_type wanted)
--	{
--		if (type =3D=3D wanted)
--			return true;
--
--		return IS_EXPANDED_RESPONSE(0, wanted);
--	}
--
- 	if (len < 1)
- 		/* Invalid packets to be ignored */
- 		return;
-@@ -461,7 +456,7 @@ static void eap_handle_response(struct eap_state *eap, =
-const uint8_t *pkt,
- 			return;
- 	}
- =
+> Are subscribers moved automatically? Is there going to be a hard cut,
+> that means, the old (this) list is closed?
 
--	if (response_is(EAP_TYPE_NAK)) {
-+	if (RESPONSE_IS(EAP_TYPE_NAK)) {
- 		l_debug("EAP peer not configured for method: %s",
- 			eap_type_to_str(our_type, our_vendor_id,
- 							our_vendor_type));
-@@ -500,7 +495,7 @@ static void eap_handle_response(struct eap_state *eap, =
-const uint8_t *pkt,
- 	 */
- =
+I've asked the admins if its possible to move the subscriber list over,
+but as of now its not automatic.
 
- 	if (!eap->identity) {
--		if (!response_is(EAP_TYPE_IDENTITY))
-+		if (!RESPONSE_IS(EAP_TYPE_IDENTITY))
- 			goto unsupported_method;
- =
+We haven't discussed a hard cut, but we'll still monitor the 01.org
+list for a while.
 
- 		/*
-@@ -528,7 +523,7 @@ static void eap_handle_response(struct eap_state *eap, =
-const uint8_t *pkt,
- 	 * (with the exception of the Nak)
- 	 */
- 	if (our_type !=3D EAP_TYPE_EXPANDED) {
--		if (response_is(our_type))
-+		if (RESPONSE_IS(our_type))
- 			goto handle_response;
- 	} else if (IS_EXPANDED_RESPONSE(our_vendor_id, our_vendor_type))
- 		goto handle_response;
--- =
+Marcel,
 
-2.33.0
+Is it possible to add an auto-reply to the 01.org list, and point users
+to iwd(a)lists.linux.dev?
 
---===============0616154899837865398==--
+Thanks,
+James
+
+> =
+
+> =
+
+> Kind regards,
+> =
+
+> Paul
+> =
+
+> =
+
+> PS: The new list also seems to be already hooked up to
+> lore.kernel.org =
+
+> [1], which can be used as the list archive.
+> =
+
+> =
+
+> [1]: https://lore.kernel.org/iwd/
+> _______________________________________________
+> iwd mailing list -- iwd(a)lists.01.org
+> To unsubscribe send an email to iwd-leave(a)lists.01.org
+
+
+--===============1704262640090392700==--
 
