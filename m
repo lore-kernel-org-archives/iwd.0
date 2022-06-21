@@ -1,142 +1,59 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459117499
-	for <iwd@lists.linux.dev>; Tue, 21 Jun 2022 21:04:21 +0000 (UTC)
-Received: by mail-pj1-f45.google.com with SMTP id 73-20020a17090a0fcf00b001eaee69f600so14691715pjz.1
-        for <iwd@lists.linux.dev>; Tue, 21 Jun 2022 14:04:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:subject:from:to:date:in-reply-to:references:user-agent
-         :mime-version:content-transfer-encoding;
-        bh=d83/GaPJEU02aiKQ6IlsTndIoVFbglj5EzHqj6yXRe0=;
-        b=a8z7YWTCf3/87e2jszROdZmGkLQfJK2mvU3D63ariX6QxGlNUyYKZd5B2Sp3v1s4CF
-         ruiC3Z1ge0MBmNL6J4NLqbzAmEH9k9Eh7OFG2dBfCndJS0ebzhpVKmDUlLNfUx56PasH
-         XHkMcWvS7Dbu9FITXOVO+ONV/EtOeh2FfptNSvVCD3q17iLqkRwbDHZQPTfP1UdwnyS3
-         Eno8YYHajd9of+DMcu9zLVqUL4gvTps/QTs1li4P1lA0h8kZTdIfm1HMZvIdlmPp4SWP
-         jWTKMXWNhQUhOvgziKp+Jf0MBsXAhqBKBpyo6uSnvuNVTAIggHWtxMl6U+UI6e/Zawco
-         Cjww==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E0D7499
+	for <iwd@lists.linux.dev>; Tue, 21 Jun 2022 21:18:12 +0000 (UTC)
+Received: by mail-lf1-f45.google.com with SMTP id a13so14598486lfr.10
+        for <iwd@lists.linux.dev>; Tue, 21 Jun 2022 14:18:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=d83/GaPJEU02aiKQ6IlsTndIoVFbglj5EzHqj6yXRe0=;
-        b=HvNoay7tKJf0fhgQHV+oc0jPUq99CnES7y0pxjgMH9/igVSOzlxeUenAhMU5Qpby8I
-         OqZ90hvH7Z13+fn+ne4B7e61ifPg80odl8CtwMZxnWWYNgPj5ogI84BRU2d4IUkOtiYx
-         BlGSRaBOg7AEQx0ck+4377Cklt+wiibNC3GU692rUvFHW9honqhAp/K0J3fpm0OJEGOH
-         MPG3ug7ePRn3PcdxHTezTA4gCbCy60UORa1/Z0wFhJiJuuSRoglQmyMlwodL/sfIrPDf
-         IVrh7Va4tT3ckSyowDmcJau9DeKsSBVDsnpnW4iCDLQSQUxYDR0zfq14L/rFHMA82Ftw
-         WJMw==
-X-Gm-Message-State: AJIora9Lowz/B+VMp84VzpF/oBNNZAInhEFh9xxw+go873a6V18pgiGE
-	4GIvf3tlsFSlzzpaXfJrhU8=
-X-Google-Smtp-Source: AGRyM1vxXasVgBaQ6J8DKC5eSh6ArSykqL5mGgW6rKEznT94Ku8i2LGxNROn6OHE58TFXaj26PRyJQ==
-X-Received: by 2002:a17:90b:3a87:b0:1e8:789d:c60 with SMTP id om7-20020a17090b3a8700b001e8789d0c60mr34362250pjb.77.1655845460721;
-        Tue, 21 Jun 2022 14:04:20 -0700 (PDT)
-Received: from [192.168.254.55] ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id d26-20020aa7869a000000b0051c4f6d2d95sm5817169pfo.106.2022.06.21.14.04.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 14:04:20 -0700 (PDT)
-Message-ID: <a0ee1952ace452c971d98cc208bd9d9eac1a3e92.camel@gmail.com>
-Subject: Re: [PATCH 14/15] autotests: Add bad netconfig settings scenario
-From: James Prestwood <prestwoj@gmail.com>
-To: Andrew Zaborowski <andrew.zaborowski@intel.com>, iwd@lists.linux.dev
-Date: Tue, 21 Jun 2022 14:04:19 -0700
-In-Reply-To: <20220616000231.1966008-14-andrew.zaborowski@intel.com>
-References: <20220616000231.1966008-1-andrew.zaborowski@intel.com>
-	 <20220616000231.1966008-14-andrew.zaborowski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-3.fc34) 
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=H/r+hVYYZxqfYHIYEHJKyauA4sC/Z+gMTbf2AObmOfo=;
+        b=i92u6zFBgshSxmErfWj4fA112pxTzolNHTHtOOTxOLWP9dBMX889jqVWr2fyffcoeS
+         oTfE1czjKMAYVXT3nmv66cAES/MYkQcOXCNwnBuHV1V4jMGDBJv61mK/8v7K0fwYyqaX
+         dSLwySTaQDq0oEpT5ZtcfpINrXBvmHOsMPW0F13Z1A7Axh0iWLMzsa2RoTzFaLsDiAaX
+         mx543YZnxuJPDaayE5Igjgd4W080d6PswHJia5p2YrhsyX4NMqXD8/jBpmFLdcxo4dRo
+         hn0nUvOURlbd6mWtpcS3q2FEH4n+piRViQ/bC8HNIUxSU1+t+DCIEnYjORv8XgM6RQaV
+         Ku4Q==
+X-Gm-Message-State: AJIora8+m3QcyxM+l+rZx4+JxIzUQYNGbHCm7bcslw8mxAKhYwbRudRC
+	UV6DF0Pj96Yuy27yTcDxTeASDqLXHiw/jw==
+X-Google-Smtp-Source: AGRyM1s68Bkp3EaqOvr1Q5AWdvOtec3az55GIuMNp9m/LAynYxIUEuMOrirP1PKKAHf4L5uPlUoTdg==
+X-Received: by 2002:a05:6512:c21:b0:47f:6392:dcf5 with SMTP id z33-20020a0565120c2100b0047f6392dcf5mr130431lfu.117.1655846290539;
+        Tue, 21 Jun 2022 14:18:10 -0700 (PDT)
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com. [209.85.208.180])
+        by smtp.gmail.com with ESMTPSA id r10-20020a19440a000000b00478f1bd611csm2290348lfa.284.2022.06.21.14.18.09
+        for <iwd@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jun 2022 14:18:10 -0700 (PDT)
+Received: by mail-lj1-f180.google.com with SMTP id s14so10216882ljs.3
+        for <iwd@lists.linux.dev>; Tue, 21 Jun 2022 14:18:09 -0700 (PDT)
+X-Received: by 2002:a2e:2c0e:0:b0:25a:6b43:eff8 with SMTP id
+ s14-20020a2e2c0e000000b0025a6b43eff8mr30509ljs.299.1655846289821; Tue, 21 Jun
+ 2022 14:18:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220616000231.1966008-1-andrew.zaborowski@intel.com>
+ <20220616000231.1966008-14-andrew.zaborowski@intel.com> <a0ee1952ace452c971d98cc208bd9d9eac1a3e92.camel@gmail.com>
+In-Reply-To: <a0ee1952ace452c971d98cc208bd9d9eac1a3e92.camel@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Date: Tue, 21 Jun 2022 23:17:58 +0200
+X-Gmail-Original-Message-ID: <CAOq732KZuR=cqNnozGDdnR94AAgh-B2Hu0patzN3smL_oSf=rQ@mail.gmail.com>
+Message-ID: <CAOq732KZuR=cqNnozGDdnR94AAgh-B2Hu0patzN3smL_oSf=rQ@mail.gmail.com>
+Subject: Re: [PATCH 14/15] autotests: Add bad netconfig settings scenario
+To: James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Andrew,
+On Tue, 21 Jun 2022 at 23:04, James Prestwood <prestwoj@gmail.com> wrote:
+> Does this happen to depend on patch 13/15? I applied all the other
+> autotest changes but this one fails to pass testNetconfig. The
+> assertRaises() call is what fails for me.
 
-On Thu, 2022-06-16 at 02:02 +0200, Andrew Zaborowski wrote:
-> ---
->  autotests/testNetconfig/connection_test.py | 30 +++++++++++++++++++++-
->  autotests/testNetconfig/mismatch.psk       |  7 +++++
->  2 files changed, 36 insertions(+), 1 deletion(-)
->  create mode 100644 autotests/testNetconfig/mismatch.psk
-> 
-> diff --git a/autotests/testNetconfig/connection_test.py
-> b/autotests/testNetconfig/connection_test.py
-> index 4b05c745..837b19ec 100644
-> --- a/autotests/testNetconfig/connection_test.py
-> +++ b/autotests/testNetconfig/connection_test.py
-> @@ -92,6 +92,35 @@ class Test(unittest.TestCase):
->  
->          wd.unregister_psk_agent(psk_agent)
->  
-> +    def test_addr_type_error(self):
-> +        IWD.copy_to_storage('mismatch.psk', name='ssidTKIP.psk')
-> +        wd = IWD(True)
-> +
-> +        psk_agent = PSKAgent("secret123")
-> +        wd.register_psk_agent(psk_agent)
-> +
-> +        devices = wd.list_devices(1)
-> +        device = devices[0]
-> +
-> +        ordered_network = device.get_ordered_network('ssidTKIP')
-> +
-> +        self.assertEqual(ordered_network.type, NetworkType.psk)
-> +
-> +        condition = 'not obj.connected'
-> +        wd.wait_for_object_condition(ordered_network.network_object,
-> condition)
-> +
-> +        # Ideally we want to check that this errors out at an early
-> phase, especially
-> +        # before any radio operations, due to netconfig setting
-> validation, but this is
-> +        # tricky to ensure.  Also ideally this would happen even
-> before asking the user
-> +        # for the passphrase which is easier to ensure in the tests,
-> but currently IWD
-> +        # asks for the PSK before control reaches station.c.
-> +        self.assertRaises(iwd.InvalidArgumentsEx,
-> ordered_network.network_object.connect)
-> +
-> +        wd.unregister_psk_agent(psk_agent)
-> +
-> +    def tearDown(self):
-> +        IWD.clear_storage()
-> +
->      @classmethod
->      def setUpClass(cls):
->          def remove_lease4():
-> @@ -147,7 +176,6 @@ class Test(unittest.TestCase):
->  
->      @classmethod
->      def tearDownClass(cls):
-> -        IWD.clear_storage()
->          ctx.stop_process(cls.dhcpd_pid)
->          cls.dhcpd_pid = None
->          ctx.stop_process(cls.dhcpd6_pid)
-> diff --git a/autotests/testNetconfig/mismatch.psk
-> b/autotests/testNetconfig/mismatch.psk
-> new file mode 100644
-> index 00000000..f8920b7c
-> --- /dev/null
-> +++ b/autotests/testNetconfig/mismatch.psk
-> @@ -0,0 +1,7 @@
-> +[IPv6]
-> +# IPv4 addresses where IPv6 are expected
-> +Address=192.168.1.10
-> +Gateway=192.168.1.1
-> +
-> +[Settings]
-> +AutoConnect=false
+It does, sorry I didn't make this clear.  Both 14 and 15 depend on 13/15.
 
-Does this happen to depend on patch 13/15? I applied all the other
-autotest changes but this one fails to pass testNetconfig. The
-assertRaises() call is what fails for me.
-
-Thanks,
-James
-
+Best regards
