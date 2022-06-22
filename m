@@ -1,98 +1,101 @@
-Content-Type: multipart/mixed; boundary="===============8470057054864874226=="
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D221111B
+	for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 20:35:40 +0000 (UTC)
+Received: by mail-pj1-f48.google.com with SMTP id i8-20020a17090aee8800b001ecc929d14dso2300522pjz.0
+        for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 13:35:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:subject:from:to:date:in-reply-to:references:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=IvNMzT4O+us/Cpn6R2ParIaxcTpUEwsEurb7CYXgSMM=;
+        b=HemKuTVIDx8wKutVDHwmX4QYB64OUiJ+DoIRAoUdHRVnDgK7divxRybOhBVtX76mLh
+         IMpU1/lADpb4MbjqEOixQqMvbqjY/ieFsCwJZ0a0QhKTcJJijjf6BJKAxQx8FFp9phjW
+         W0+xIe4MlCezOJom6WD9SdsQkKLFnMGpTrTxbjzfExFpFMYT55/ancGEgrsstmPVRlf2
+         9l7BE+oQTmwxS6aU/cT57k0yKTbVax+SGJ7RbPOzkERwF203xYC3/Ddmw/DW1oROEg1B
+         SIt/OcmlWxPcR0cv9dimNX1D7uBnvPLDsiPnpbPs14GHJ3isMi4jqhwVNDpu8zNDlAc3
+         eBxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=IvNMzT4O+us/Cpn6R2ParIaxcTpUEwsEurb7CYXgSMM=;
+        b=8OFnoKAkrePjCzU4PgGNg4T8JWSbwJz9exQo6lUyJjWKByIsVL+WUdVFNlU038FS4W
+         DaBjn/t7Vm+RqIkjtcGytnZOv/kRtKPpO36/cn3fY/FTMcJcfSsqwV9pPyg2CwB92FnR
+         G28W+jnH+of8I/7s/2QScce6mNKksifPmCH0IHcCK3VrYQ/mPz09LeWMZRDMyc8uen50
+         06XE5Pd0oyx1Ln0Ubiv/kuRFURnv0O34AeuZX5AKGuT9Jc38H9KLLZTS6lfSuWP+Jx8m
+         ygGQKP/tyLfvDWDt7AH8Vo21lqgwUD2XQAvJYeK6OqfrzbHb5cDUSpXoQjF7FTZ4cqc+
+         QG0A==
+X-Gm-Message-State: AJIora+GQoRMblxzAdatKWsmLUj0AJrPR1t3kG8AD1vI/koNqYV0VZF6
+	J1GaMzFzCiaq3JzKB+ciYMUoQOahfxU=
+X-Google-Smtp-Source: AGRyM1tD+JvMOdVnFlSkzhQjQ0i/0OwV+u75aXkJuS7rzCd8ai7H2ykE8cTv+Mp0qb07LOU6+bMxgQ==
+X-Received: by 2002:a17:90b:1117:b0:1ea:58d2:85d3 with SMTP id gi23-20020a17090b111700b001ea58d285d3mr180089pjb.167.1655930139635;
+        Wed, 22 Jun 2022 13:35:39 -0700 (PDT)
+Received: from [192.168.254.55] ([50.45.187.22])
+        by smtp.gmail.com with ESMTPSA id h14-20020a170902f7ce00b0016909678e2csm8999424plw.292.2022.06.22.13.35.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jun 2022 13:35:39 -0700 (PDT)
+Message-ID: <312b2cd5fdede0d7fdd7f45aeda5919e9b22950f.camel@gmail.com>
+Subject: Re: [PATCH 2/2] doc: Add State and Role properties to DPP API
+From: James Prestwood <prestwoj@gmail.com>
+To: Jesse Lentz <jesse@twosheds.org>, iwd@lists.linux.dev
+Date: Wed, 22 Jun 2022 13:35:38 -0700
+In-Reply-To: <20220622194142.213135-2-jesse@twosheds.org>
+References: <20220622194142.213135-1-jesse@twosheds.org>
+	 <20220622194142.213135-2-jesse@twosheds.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-3.fc34) 
+Precedence: bulk
+X-Mailing-List: iwd@lists.linux.dev
+List-Id: <iwd.lists.linux.dev>
+List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
+List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: Denis Kenzior <denkenz at gmail.com>
-To: iwd at lists.01.org
-Subject: Re: segfault in parse_neighbor_report at src/station.c:1747
-Date: Tue, 05 Apr 2022 10:15:43 -0500
-Message-ID: <4a03689b-8c38-bf54-6b9b-1f158ce4780f@gmail.com>
-In-Reply-To: 1077324508f3b40f15026b53b08e46f2@lausen.nl
+Content-Transfer-Encoding: 8bit
 
---===============8470057054864874226==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Hi Jesse,
 
-Hi Leonard,
+On Wed, 2022-06-22 at 15:41 -0400, Jesse Lentz wrote:
+> Document the State and Role properties of the DeviceProvisioning API.
+> ---
+>  doc/device-provisioning-api.txt | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/doc/device-provisioning-api.txt b/doc/device-
+> provisioning-api.txt
+> index 0aba2557..c1d706ec 100644
+> --- a/doc/device-provisioning-api.txt
+> +++ b/doc/device-provisioning-api.txt
+> @@ -56,3 +56,13 @@ Methods              string StartEnrollee()
+>                                                 net.connman.iwd.NotCo
+> nfigured
+>                                                 net.connman.iwd.NotSu
+> pported
+>                                                 net.connman.iwd.Busy
+> +
+> +Properties     string State [readonly, optional]
+> +
+> +                       Reflects the DPP state. Possible values are
+> "presence",
+> +                       "authenticating", and "configuring".
 
-On 4/5/22 04:40, Leonard Lausen wrote:
-> Hi Denis,
-> =
+I think a "stopped" state would also be needed.
 
-> (resending as prior message to the iwd mailing-list was rejected as I was=
- not a list member)
-> =
+> +
+> +               string Role [readonly, optional]
+> +
+> +                       Reflects the DPP role. Possible values are
+> "enrollee"
+> +                       and "configurator"
 
-> thank you for forwarding this report to the right mailing list. I'm
+I don't think you actually need this one. The role should be implied by
+however you started DPP:
 
-no worries
+StartEnrollee() -> enrollee
+StartConfigurator() -> configurator
+ConfigureEnrollee() -> configurator
 
-> adding the debug log below. The router triggering the issue is
-> ec:a8:1f:99:cf:f0. I noticed that the issue will not occur when
-> disabling Band Steering on the router and splitting the 2.4G and 5G
-> networks into two separate SSIDs.
-> =
-
-
-I'm curious what brand / model / firmware of router is this?
-
-<snip>
-
-> Apr 05 09:02:00 leonard-xps13 iwd[200772]: src/scan.c:scan_notify() Scan =
-notification Trigger
-> Scan(33)
-> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/netdev.c:netdev_unicast_no=
-tify() Unicast
-> notification Frame(59)
-
-Looks like it is sending out a completely unsolicited AP directed roaming f=
-rame. =
-
-  I need to dig into the specs, but I'm not aware of any where this is allo=
-wed.
-
-> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_ap_direc=
-ted_roam() ifindex: 23
-> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_ap_direc=
-ted_roam() roam: BSS
-> transition received from AP: Disassociation Time: 0, Validity interval: 1=
-00
-> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_ap_direc=
-ted_roam() roam: AP sent a
-> preferred candidate list
-> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:station_neighbor=
-_report_cb() ifindex: 23,
-> error: 0()
-> Apr 05 09:02:01 leonard-xps13 iwd[200772]: src/station.c:parse_neighbor_r=
-eport() Neighbor report
-> received for ec:a8:1f:99:cf:e8: ch 6 (oper class 4), MD not set
-
-And that's what causes a crash.  I'll send a patch for you to try shortly.
-
-
-<snip>
-
-> =
-
-> After enabling (to collect the debug logs) and disabling again Band
-> Steering on the router, AX210 would no longer authenticate with the
-> router "denied authentication (status 33)" and finally cause kernel
-> crash, followed by a kernel hang that could only be resolved by
-> restarting the WiFi network (by logging into the router admin interface
-> from my phone and changing WLAN Mode setting "Mixed 802.11 a/n/ac/ax" to
-> "Mixed 802.11 n/ac" which triggers the router to shutdown and start
-> again the WiFi network) followed by another crash. These are probably
-> unrelated to this issue, but you may know if and where I could report
-> them so I'm including them here. This was with AX210 firmware version
-> 68.01d30b0c.0 ty-a0-gf-a0-68.ucode and Linux 5.17.0-rc8.
-
-yikes.  You can try to report this on the linux-wireless mailing list:
-linux-wireless(a)vger.kernel.org
-
-or via kernel bugzilla:
-https://bugzilla.kernel.org/buglist.cgi?bug_status=3D__open__&component=3Dn=
-etwork-wireless&product=3DDrivers
-
-Regards,
--Denis
---===============8470057054864874226==--
+Thanks,
+James
 
