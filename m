@@ -1,91 +1,72 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A551C26
-	for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 23:04:32 +0000 (UTC)
-Received: by mail-pl1-f179.google.com with SMTP id d5so16612639plo.12
-        for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 16:04:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=PhyFgYJMib1r+sn6iBZbjKCM1irtidU6HBjh0Q4XXVM=;
-        b=iEx1k5p7/UQN1bba4GcyqSoNnzk6v+7FGDJrElawZOfntM7A5rWPB0NLh2Ktfjg2fi
-         XeZsa4i0EczgksyVrdqovjlv4TohUFUdeU7CQA6fYqMFCF+CMBHm8JxgVFLGsIOzoNca
-         T6kymCh2yIktoVjVgr4lK0YPx+xT5zWVSz8jKkvNorpoMKZTqGk7rvmioTXVvvj9WI4v
-         BZ7fd8lU3j7UrHD7r06tJ4tGq/n3k6X78pi1k3cecss+G9svyHpbD2TOk0qs4WSQms+L
-         yqrdSn8/kj8VR+aSjpLKIFkcIJlqiEezHpqtehyRKNNGTid/sFM4NnS6tjXVlOB2VnUc
-         FHiQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F811C26
+	for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 23:27:01 +0000 (UTC)
+Received: by mail-lj1-f175.google.com with SMTP id j22so14613139ljg.0
+        for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 16:27:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=PhyFgYJMib1r+sn6iBZbjKCM1irtidU6HBjh0Q4XXVM=;
-        b=E6Syz9OXqX9deVexvPcG8iCzXWgPyZys9KOPZhE1iM25+DyQ9SbRKOY9oC0e0VXQFY
-         V/dRkl85ojGXFQJO1zvZeVGZBMeyUEQrlT/Xf12LN9uVAoOzmlvupAUgsGOxX3uOMmC6
-         4i3nAROVqJ800P6c3V5IBMXt8HtUNYQHgYL2cDguSTKjsebmtA4/KqgQ8frW15XJhg5y
-         gO6eTtFOJz0Qdo6EAh2CAEA8jW83KIeST+zEN/1gDc2jd1iPG3RW2d414bcCKHEs0FGp
-         NxYtnhW1KrZvQpfTIKkF7pMYPCnpKvTaVMRbZ3zGCJf2vSYrbD0d1jTi4eKhRYW9D7tI
-         0d/g==
-X-Gm-Message-State: AJIora9bA20JeoxUazhS6OfXX2jE2tg30nYsp5dex3XtGD/oRx5A3kjo
-	VO3NXW8yr1p5J+Kl643YiSrhTOUXAkM=
-X-Google-Smtp-Source: AGRyM1s6QmfIDH8S6WvpApP3bONVFm4v3xzR9n2WSC8SLa836Dz8VDjewEfDbhcbiEk04gf7Bjvwfw==
-X-Received: by 2002:a17:90b:4b02:b0:1e2:ff51:272a with SMTP id lx2-20020a17090b4b0200b001e2ff51272amr763475pjb.56.1655939071497;
-        Wed, 22 Jun 2022 16:04:31 -0700 (PDT)
-Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id jb6-20020a170903258600b0016a12571537sm9107052plb.299.2022.06.22.16.04.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jun 2022 16:04:31 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] auto-t: fix hardcoded 'wlan1' in testNetconfig
-Date: Wed, 22 Jun 2022 16:02:19 -0700
-Message-Id: <20220622230219.1557695-3-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220622230219.1557695-1-prestwoj@gmail.com>
-References: <20220622230219.1557695-1-prestwoj@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mVkbXZvryI6cP8/KSssRDs4+P07NpL9abutyewbIzt8=;
+        b=2/mf+VTrogZfxJprKlwEsxw2Uf9LhgCRcgE+ciXKU8gFWBakGIY4n0Z76bxoJtmlHE
+         XEu4tfgJI9uhdTz41uk4sdagFvnppN2654qkseqNLSfD4aQ6hw4jwiwya8uYr9K/X8UN
+         QeI1ZL3A9Ml/A189nWq9EISuAqc2aL4fxvgSpzS2vZfh7xJ6BbbSpfNJNt5Iipw1/huG
+         ahWg4ZdWh82a9sQQZh+NmkPI/JRpQ3vDPeVKO1ckuRR7x8eWHczB1T8U+kFttiKAUP1v
+         rCmWoHfM5Tl8881drVZVAtQs2d6WIcTZoJhPeE/lICnvc12hs7ncXzyXp0e/+B3RH4c9
+         WlvQ==
+X-Gm-Message-State: AJIora8YjzxTn6FJMfxoRqkmjJU+HHxaLp4oK1qi1+9EpItjbcLBfUK3
+	YKIoW65mIkBhZ44iWc6AETMGJHMiEHRLgA==
+X-Google-Smtp-Source: AGRyM1ssa3VsblggOx44IK+0SwzW8hXmnlJG8rOgkTJVcx/JvmrNnlx/cbq12wkjeZB2n7Jy6oeiGA==
+X-Received: by 2002:a05:651c:1503:b0:24c:81df:e1f2 with SMTP id e3-20020a05651c150300b0024c81dfe1f2mr3200835ljf.182.1655940419282;
+        Wed, 22 Jun 2022 16:26:59 -0700 (PDT)
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com. [209.85.167.48])
+        by smtp.gmail.com with ESMTPSA id u9-20020a199209000000b0047da6e495b1sm2727599lfd.4.2022.06.22.16.26.58
+        for <iwd@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Jun 2022 16:26:58 -0700 (PDT)
+Received: by mail-lf1-f48.google.com with SMTP id c4so30339518lfj.12
+        for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 16:26:58 -0700 (PDT)
+X-Received: by 2002:a05:6512:401d:b0:47f:654d:e48d with SMTP id
+ br29-20020a056512401d00b0047f654de48dmr3628090lfb.359.1655940418281; Wed, 22
+ Jun 2022 16:26:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220616000231.1966008-1-andrew.zaborowski@intel.com>
+ <20220616000231.1966008-14-andrew.zaborowski@intel.com> <a0ee1952ace452c971d98cc208bd9d9eac1a3e92.camel@gmail.com>
+ <CAOq732KZuR=cqNnozGDdnR94AAgh-B2Hu0patzN3smL_oSf=rQ@mail.gmail.com> <51dc9302-29e1-134c-7358-65ebdaae4db9@gmail.com>
+In-Reply-To: <51dc9302-29e1-134c-7358-65ebdaae4db9@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Date: Thu, 23 Jun 2022 01:26:46 +0200
+X-Gmail-Original-Message-ID: <CAOq732Japcdcb2Y-j4KgtDV1Vb2ciwW2AEJCRCzzfvCn1KKJRQ@mail.gmail.com>
+Message-ID: <CAOq732Japcdcb2Y-j4KgtDV1Vb2ciwW2AEJCRCzzfvCn1KKJRQ@mail.gmail.com>
+Subject: Re: [PATCH 14/15] autotests: Add bad netconfig settings scenario
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-This works, if testNetconfig is the only test. Otherwise it will always
-fail since the interface naming increments for each test.
----
- autotests/testNetconfig/connection_test.py | 2 +-
- autotests/testNetconfig/static_test.py     | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Hi Denis,
 
-diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNetconfig/connection_test.py
-index 4b05c745..e73ab335 100644
---- a/autotests/testNetconfig/connection_test.py
-+++ b/autotests/testNetconfig/connection_test.py
-@@ -80,7 +80,7 @@ class Test(unittest.TestCase):
-         rclog = open('/tmp/resolvconf.log', 'r')
-         entries = rclog.readlines()
-         rclog.close()
--        expected_rclog = ['-a wlan1.dns\n', 'nameserver 192.168.1.2\n', 'nameserver 3ffe:501:ffff:100::2\n']
-+        expected_rclog = ['-a %s.dns\n' % ifname, 'nameserver 192.168.1.2\n', 'nameserver 3ffe:501:ffff:100::2\n']
-         # Every real resolvconf -a run overwrites the previous settings.  Check the last three lines
-         # of our log since we care about the end result here.
-         self.assertEqual(expected_rclog, entries[-3:])
-diff --git a/autotests/testNetconfig/static_test.py b/autotests/testNetconfig/static_test.py
-index ac525b28..d9f0b9cb 100644
---- a/autotests/testNetconfig/static_test.py
-+++ b/autotests/testNetconfig/static_test.py
-@@ -75,7 +75,7 @@ class Test(unittest.TestCase):
-         rclog = open('/tmp/resolvconf.log', 'r')
-         entries = rclog.readlines()
-         rclog.close()
--        expected_rclog = ['-a wlan1.dns\n', 'nameserver 192.168.1.4\n', 'nameserver 3ffe:501:ffff:200::4\n']
-+        expected_rclog = ['-a %s.dns\n' % ifname, 'nameserver 192.168.1.4\n', 'nameserver 3ffe:501:ffff:200::4\n']
-         # Every resolvconf -a run overwrites the previous settings.  Check the last three lines
-         # of the log since we care about the end result here.
-         self.assertEqual(expected_rclog, entries[-3:])
--- 
-2.34.1
+On Wed, 22 Jun 2022 at 23:02, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 6/21/22 16:17, Andrew Zaborowski wrote:
+> > On Tue, 21 Jun 2022 at 23:04, James Prestwood <prestwoj@gmail.com> wrote:
+> >> Does this happen to depend on patch 13/15? I applied all the other
+> >> autotest changes but this one fails to pass testNetconfig. The
+> >> assertRaises() call is what fails for me.
+> >
+> > It does, sorry I didn't make this clear.  Both 14 and 15 depend on 13/15.
+> >
+>
+> Can this test be made applicable to the current netconfig implementation?  In
+> other words, does it really need to depend on patch 13?  Same with 15?
 
+Since this tests things that are fixed by switching to l_netconfig,
+the test doesn't need any changes but src/netconfig.c does (that's
+what patch 13 does), but it's safe to hold on with this.
+
+Best regards
