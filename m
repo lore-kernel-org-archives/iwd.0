@@ -1,79 +1,86 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C96111B
-	for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 21:02:11 +0000 (UTC)
-Received: by mail-oi1-f179.google.com with SMTP id i25so22761325oii.7
-        for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 14:02:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9041C26
+	for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 23:04:30 +0000 (UTC)
+Received: by mail-pj1-f50.google.com with SMTP id h9-20020a17090a648900b001ecb8596e43so839998pjj.5
+        for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 16:04:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=oifZpFT813Jx2qDh6ppQo1xkdKk2gW+w5c/U51FpjR8=;
-        b=OhkJUKS+5XhpbgwbeYc9MXsxh7BQPCpyOUrgk8QTtgjDMSdVPlbe8pQrocZCS5DkX2
-         X+vkC4rGy6PHrBZ4HmVSpjqwK8b4WPmwUVAREzZVTDX3/lw4gzKW0cBJfGS4tJl8Bq+G
-         UgVH/cVUK9YbHoXRg7KiHaeCwHR/8xJLMiRPn9o/pcHmOCc5TxsG+i881QJ/qcCVwWeC
-         lL6W30lmZGc0/yK5jepBt92WZnQNK2VXLwVx0hLHmAILG3v+T2Ug7JnJIlyhOFDV/ed9
-         HY3wEL1jNtb0UW8QTxexj63fdEoiQRuIH9Zh5/rAopcPKz5pHETozCSOlylX5Sjmwv6f
-         laZg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZlE+0kiYyBnWayQKTw22/X9Se/HRLW1FM2DdocyjSOw=;
+        b=lsIhwb+pskhYMFzIf592dBRgd3TYmzDbqF3u/pf3HgEFeoknaM93Wztrqq8wRqZPgH
+         TYKA4NR3kwfWwrYHbvhCghjYC+0eiVd2m5L+O1zTul5Gauf1EIsPWyB0IWU3VmkV0+BV
+         C5BwY0NGm1R5vybfpwqp8WMRYnevM5ls0B8wtsQ0oRBrhGgrTulzaf+JFb8fRvX2y90s
+         9v5Gqjtce5r7i/D6HNoDHKmV7sHTWScugzu1OIinno7/B+BpmZ4o5OAgZ5+vGyy4P9AQ
+         uNbdJAobwRhk5QRWY5GA3m46XOjEs91OSGgb7ZPglEXQCwEyNaQ1XtmXT8CBGpDeluK6
+         LDwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=oifZpFT813Jx2qDh6ppQo1xkdKk2gW+w5c/U51FpjR8=;
-        b=Eir7rciuH365mZ3nNqJc+DNNKdmNz9+Q42ECvG1qVeAyIGq2YU62fhfuooqeBWgPoE
-         EVqO4ERO1Mw0Ie7UWPmRsqoHCqfrCMPE3LTGG70OlJYbqatuVczeKQLx9eEclV6zBfb5
-         gaqhTneyS0iLMArZshDx6PRlu3iQMacVtswteNvRc6toho74CfDFq6qPgUg2saelmBMB
-         ilXDDcMiRRNkz0zzlxYTBtprYk67zT8wqdtJgY/W1xrhMtFNQO0dVtr2hIQusPBAA+0p
-         BDBc2XNdNXajEiYJ50yEpnOuVKiEsEs46fgqf1HchW+xSTZv33hClMjbaCUKioL2Qo8q
-         CsRA==
-X-Gm-Message-State: AJIora8UaG/ZdEMxEIBFoAfHhp48VBkZwcWgNcfnnhw+Jh1mI2OsqIV7
-	ecDBxIm4ZvjfWinoDOdkVW+0i6xmfIGSEesL
-X-Google-Smtp-Source: AGRyM1sbR6FM33Nv2xraYBNtKoj7aUjqVXodw9M0Dg5ccMrMTfaSL+x0AhZ4GVVsOr0nnEpB4ItTtg==
-X-Received: by 2002:a05:6808:148b:b0:32f:6ef6:47eb with SMTP id e11-20020a056808148b00b0032f6ef647ebmr152770oiw.285.1655931730230;
-        Wed, 22 Jun 2022 14:02:10 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id p3-20020a4a8143000000b0035eb4e5a6cbsm12289437oog.33.2022.06.22.14.02.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jun 2022 14:02:09 -0700 (PDT)
-Message-ID: <51dc9302-29e1-134c-7358-65ebdaae4db9@gmail.com>
-Date: Wed, 22 Jun 2022 15:59:21 -0500
+        bh=ZlE+0kiYyBnWayQKTw22/X9Se/HRLW1FM2DdocyjSOw=;
+        b=xlQht18+1In7Z0kmhwrMXIKr/vS6snQblvwoH81aui1Kmjipcm3PYRgCKUw7ixoRNW
+         FPhmAOZTat6TZLVhMe2r1i+PsPHdmCMWU5GrPdlSXuCSE39qQge+GIXO6U7ZCMn5K9Ru
+         fT8VmzvybMdrtW6Vp3qEkizJpMotZ/yw4Nr+5Exhg3IHZpNxEvexGWXzzTwN35Vfe4Or
+         TAOuI+rSxOqhe8Jkek8otesh8ZCKf40XAzFSXgxqcUKuebmeOTiHlP0IYiNuol22Eevn
+         igNRrxa6TgKwZ8iNZRWGEKSm2iWhJwcbH4aNH/sV8Ize8A+e6C91LENZ8u5W4cQmqT8T
+         /Ivg==
+X-Gm-Message-State: AJIora+JgUaLBmSS+r5kkWFHpFP4/cs4TwURq/E3zkZKREwqSf1dwwVt
+	tIPCQCaAf+eFuzet8BSGFsHVpuue24w=
+X-Google-Smtp-Source: AGRyM1vwyjVmRUOMEqsYEkoHh5VkRZs+s8u99/MAKd5L4H/U8bWzE0X19Dq+Qf59Xp7RDV8S7XiAVQ==
+X-Received: by 2002:a17:902:cec4:b0:16a:1fc3:b6e6 with SMTP id d4-20020a170902cec400b0016a1fc3b6e6mr19067723plg.129.1655939069957;
+        Wed, 22 Jun 2022 16:04:29 -0700 (PDT)
+Received: from localhost.localdomain ([50.45.187.22])
+        by smtp.gmail.com with ESMTPSA id jb6-20020a170903258600b0016a12571537sm9107052plb.299.2022.06.22.16.04.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jun 2022 16:04:29 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] test-runner: exclude 'iwd-rtnl' from being enabled with --log
+Date: Wed, 22 Jun 2022 16:02:17 -0700
+Message-Id: <20220622230219.1557695-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH 14/15] autotests: Add bad netconfig settings scenario
-Content-Language: en-US
-To: Andrew Zaborowski <andrew.zaborowski@intel.com>,
- James Prestwood <prestwoj@gmail.com>
-Cc: iwd@lists.linux.dev
-References: <20220616000231.1966008-1-andrew.zaborowski@intel.com>
- <20220616000231.1966008-14-andrew.zaborowski@intel.com>
- <a0ee1952ace452c971d98cc208bd9d9eac1a3e92.camel@gmail.com>
- <CAOq732KZuR=cqNnozGDdnR94AAgh-B2Hu0patzN3smL_oSf=rQ@mail.gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CAOq732KZuR=cqNnozGDdnR94AAgh-B2Hu0patzN3smL_oSf=rQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+Enabling this ends up dumping so much logging and, at least with namespaces,
+seems to break the logger module and cause really weird behavior, worst of
+which is that all processes start dumping to stdout.
 
-On 6/21/22 16:17, Andrew Zaborowski wrote:
-> On Tue, 21 Jun 2022 at 23:04, James Prestwood <prestwoj@gmail.com> wrote:
->> Does this happen to depend on patch 13/15? I applied all the other
->> autotest changes but this one fails to pass testNetconfig. The
->> assertRaises() call is what fails for me.
-> 
-> It does, sorry I didn't make this clear.  Both 14 and 15 depend on 13/15.
-> 
+This can still be enabled explicitly with --verbose iwd-rtnl, but is turned
+off by default when --log is used.
+---
+ tools/utils.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Can this test be made applicable to the current netconfig implementation?  In 
-other words, does it really need to depend on patch 13?  Same with 15?
+diff --git a/tools/utils.py b/tools/utils.py
+index fd51b6e8..e424231f 100644
+--- a/tools/utils.py
++++ b/tools/utils.py
+@@ -142,13 +142,14 @@ class Process(subprocess.Popen):
+ 
+ 	@staticmethod
+ 	def is_verbose(process, log=True):
++		exclude = ['iwd-rtnl']
+ 		process = os.path.basename(process)
+ 
+ 		if Process.testargs is None:
+ 			return False
+ 
+ 		# every process is verbose when logging is enabled
+-		if log and Process.testargs.log:
++		if log and Process.testargs.log and process not in exclude:
+ 			return True
+ 
+ 		if process in Process.testargs.verbose:
+-- 
+2.34.1
 
-Regards,
--Denis
