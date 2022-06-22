@@ -1,44 +1,44 @@
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C894111B
-	for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 21:00:52 +0000 (UTC)
-Received: by mail-oi1-f181.google.com with SMTP id u189so2593747oib.4
-        for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 14:00:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C96111B
+	for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 21:02:11 +0000 (UTC)
+Received: by mail-oi1-f179.google.com with SMTP id i25so22761325oii.7
+        for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 14:02:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:from:in-reply-to:content-transfer-encoding;
-        bh=nIL3tN9Ea6wde5il0DY7jZdcF15jQuQxgiTkYYqPq50=;
-        b=mIj+6GdYSEkWHL7Ij5KAAuxdwFN8CcvftQl2+bzopbFhY4FXqerLApVVGmzTqlFeGe
-         Y+n2macovATvT7ys3CNMwbF09b0fSOObLuAv0L5/hvxu/pxHvsQBpYpM9hHqG+rqreky
-         0Alv7hV3HBF87rz4xjVKqK1LniBZ645IX3Fbs9TWh1Xw6r9+7R2FfQlBbGkKPfT8PrxN
-         oTzQ4huEnRS8bTEHnU3Jb+DGYF1jdTwlSU9RRVOV+zNfMj0ApsAu6pOFs3O4TZCUWefQ
-         HO+K8DzlY4d1CuYmcVBLbVYf9wwJo8RxSAbZCQMwh3RzZ/ilb0xdjlOtxuNoWMtokrB0
-         KlMA==
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=oifZpFT813Jx2qDh6ppQo1xkdKk2gW+w5c/U51FpjR8=;
+        b=OhkJUKS+5XhpbgwbeYc9MXsxh7BQPCpyOUrgk8QTtgjDMSdVPlbe8pQrocZCS5DkX2
+         X+vkC4rGy6PHrBZ4HmVSpjqwK8b4WPmwUVAREzZVTDX3/lw4gzKW0cBJfGS4tJl8Bq+G
+         UgVH/cVUK9YbHoXRg7KiHaeCwHR/8xJLMiRPn9o/pcHmOCc5TxsG+i881QJ/qcCVwWeC
+         lL6W30lmZGc0/yK5jepBt92WZnQNK2VXLwVx0hLHmAILG3v+T2Ug7JnJIlyhOFDV/ed9
+         HY3wEL1jNtb0UW8QTxexj63fdEoiQRuIH9Zh5/rAopcPKz5pHETozCSOlylX5Sjmwv6f
+         laZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=nIL3tN9Ea6wde5il0DY7jZdcF15jQuQxgiTkYYqPq50=;
-        b=Lnq1MX6+haX6R0GdJgHGGFHtcZ+l6vuRDnzC8+vTyFk8F/oIIgML6O6VMlm1nvP/yb
-         mo37wZLciDs/43BVb13gn4egRzWD5cho15rNgIIlP19q45v4+LhZIv0VnByXQBZdOczr
-         glN3kBUinObOypnMi8jdMZRV6Gb7Nh8GNM613klCFGFV7e8wsc2hiNFC9z0wCflVdI4s
-         2oWUERUw2VvlTMxZ4wwpMNEiC7a7cXVSF29Z9BdafdOnOAuyPiI5PvxCTJsam52DE0Rd
-         uuz5YcwV9gqlMjU44elie8zOpE/IRRdE9dSFur+HS0Kdd3PLtwDc7fys2rspYqvG+9+u
-         P4CQ==
-X-Gm-Message-State: AJIora/R3O/+a7Xy1CtB6Cn4uHF1ds5MKlP/q/90EkiMvRKegOBJTRkq
-	DwewkuJ3LE3kC9KsSJ0xzfg=
-X-Google-Smtp-Source: AGRyM1uu0e54HkX149nWRJe/xSt+m8Xe/QByC7aXxtW7oONA4ogxJvJKDRxcQIoB7/FFGsYn3cZuvw==
-X-Received: by 2002:a05:6808:f0f:b0:32f:7a00:1605 with SMTP id m15-20020a0568080f0f00b0032f7a001605mr171272oiw.276.1655931651390;
-        Wed, 22 Jun 2022 14:00:51 -0700 (PDT)
+        bh=oifZpFT813Jx2qDh6ppQo1xkdKk2gW+w5c/U51FpjR8=;
+        b=Eir7rciuH365mZ3nNqJc+DNNKdmNz9+Q42ECvG1qVeAyIGq2YU62fhfuooqeBWgPoE
+         EVqO4ERO1Mw0Ie7UWPmRsqoHCqfrCMPE3LTGG70OlJYbqatuVczeKQLx9eEclV6zBfb5
+         gaqhTneyS0iLMArZshDx6PRlu3iQMacVtswteNvRc6toho74CfDFq6qPgUg2saelmBMB
+         ilXDDcMiRRNkz0zzlxYTBtprYk67zT8wqdtJgY/W1xrhMtFNQO0dVtr2hIQusPBAA+0p
+         BDBc2XNdNXajEiYJ50yEpnOuVKiEsEs46fgqf1HchW+xSTZv33hClMjbaCUKioL2Qo8q
+         CsRA==
+X-Gm-Message-State: AJIora8UaG/ZdEMxEIBFoAfHhp48VBkZwcWgNcfnnhw+Jh1mI2OsqIV7
+	ecDBxIm4ZvjfWinoDOdkVW+0i6xmfIGSEesL
+X-Google-Smtp-Source: AGRyM1sbR6FM33Nv2xraYBNtKoj7aUjqVXodw9M0Dg5ccMrMTfaSL+x0AhZ4GVVsOr0nnEpB4ItTtg==
+X-Received: by 2002:a05:6808:148b:b0:32f:6ef6:47eb with SMTP id e11-20020a056808148b00b0032f6ef647ebmr152770oiw.285.1655931730230;
+        Wed, 22 Jun 2022 14:02:10 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id n35-20020a056870822300b00101c9597c6fsm7806398oae.28.2022.06.22.14.00.50
+        by smtp.googlemail.com with ESMTPSA id p3-20020a4a8143000000b0035eb4e5a6cbsm12289437oog.33.2022.06.22.14.02.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jun 2022 14:00:51 -0700 (PDT)
-Message-ID: <ddc047f0-ea93-d374-775d-97f97452ab88@gmail.com>
-Date: Wed, 22 Jun 2022 15:58:10 -0500
+        Wed, 22 Jun 2022 14:02:09 -0700 (PDT)
+Message-ID: <51dc9302-29e1-134c-7358-65ebdaae4db9@gmail.com>
+Date: Wed, 22 Jun 2022 15:59:21 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -47,43 +47,33 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.3.0
-Subject: Re: [PATCH 05/15] testrunner: Fix parsing for some arguments
+Subject: Re: [PATCH 14/15] autotests: Add bad netconfig settings scenario
 Content-Language: en-US
-To: Andrew Zaborowski <andrew.zaborowski@intel.com>, iwd@lists.linux.dev
+To: Andrew Zaborowski <andrew.zaborowski@intel.com>,
+ James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev
 References: <20220616000231.1966008-1-andrew.zaborowski@intel.com>
- <20220616000231.1966008-5-andrew.zaborowski@intel.com>
+ <20220616000231.1966008-14-andrew.zaborowski@intel.com>
+ <a0ee1952ace452c971d98cc208bd9d9eac1a3e92.camel@gmail.com>
+ <CAOq732KZuR=cqNnozGDdnR94AAgh-B2Hu0patzN3smL_oSf=rQ@mail.gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220616000231.1966008-5-andrew.zaborowski@intel.com>
+In-Reply-To: <CAOq732KZuR=cqNnozGDdnR94AAgh-B2Hu0patzN3smL_oSf=rQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi Andrew,
 
-On 6/15/22 19:02, Andrew Zaborowski wrote:
-> Currently the parameter values reach run-tests by first being parsed by
-> runner.py's RunnerArgParser, then the resulting object members being
-> encoded as a commandline string, then as environment variables, then the
-> environment being converted to a python string list and passed to
-> RunnerCoreArgParser again.  Where argument names (like --sub-tests) had
-> dashes, the object members had underscores (.sub_tests), this wasn't
-> taken into account when building the python string list from environment
-> variables so convert all underscores to dashes and hope that all the
-> names match now.
+On 6/21/22 16:17, Andrew Zaborowski wrote:
+> On Tue, 21 Jun 2022 at 23:04, James Prestwood <prestwoj@gmail.com> wrote:
+>> Does this happen to depend on patch 13/15? I applied all the other
+>> autotest changes but this one fails to pass testNetconfig. The
+>> assertRaises() call is what fails for me.
 > 
-> Additionally some arguments used nargs='1' or nargs='*' which resulted
-> in their python values becoming lists.  They were converted back to command
-> line arguments such as: --sub_tests ['static_test.py'], and when parsed
-> by RunnerCoreArgParser again, the values ended up being lists of lists.
-> In all three cases it seems the actual user of the parsed value actually
-> expects a single string with comma-separated substrings in it so just drop
-> the nargs= uses.
-> ---
->   tools/runner.py | 7 ++-----
->   1 file changed, 2 insertions(+), 5 deletions(-)
+> It does, sorry I didn't make this clear.  Both 14 and 15 depend on 13/15.
 > 
 
-Patches 5,8-12 applied, thanks.
+Can this test be made applicable to the current netconfig implementation?  In 
+other words, does it really need to depend on patch 13?  Same with 15?
 
 Regards,
 -Denis
-
