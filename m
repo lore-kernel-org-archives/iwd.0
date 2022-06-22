@@ -1,84 +1,77 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEC93C3E
-	for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 23:53:27 +0000 (UTC)
-Received: by mail-pj1-f46.google.com with SMTP id p3-20020a17090a428300b001ec865eb4a2so874971pjg.3
-        for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 16:53:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7453A3C27
+	for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 23:53:39 +0000 (UTC)
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-f2a4c51c45so24493323fac.9
+        for <iwd@lists.linux.dev>; Wed, 22 Jun 2022 16:53:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Vp9T7DsuX3lWGqUry2DlP1/Aj7+OeQy7ebehAH7GZsA=;
-        b=QLPdZ0kQm52pC8209SkuWaYaLZh6jOEdTtqsNGp1GtzlsNPh+02Qyijk5LDd10Q244
-         bPXmiZvzWifs+AZ/pxKDM1Dn83f+M1NqzbZ5SRwd/tmR2uzR36SZA0CHibOhsnExeKD3
-         CLv93bVsTsHquG3IjE9q0nA0PTzjnE3sVI1mhPYYH3bX40YJSmB/ZDZjlmEEG59/Wzue
-         hsZZ9tLCfe0dVNyvlLnDJKjoknnRgmgSlwEHo6XHMW/hKCucDMjQvoPFyUWHfjTcv5Zb
-         2+SO8ZXVyYhb1FzLoU15q3ZquXeC7e74y+xxZIfDmb4AeIRBvjDkOTwFkReC5mFQOoCV
-         Yfyg==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:from:in-reply-to:content-transfer-encoding;
+        bh=fIEK6+dumEP/jc+kJTSrVk4SUDSDsh1Ob9edQG7Wd1M=;
+        b=K9kXy7Un9LlKxPxSXd13wm4qVt8TkA2fHZLvPo5aXgrzDarXYnXyqxh9FVkcpEc5io
+         Yw/6Rt2FxmaGwEJJMsy6ejbf63xyp37y+1s+Vr/psEXZv4pfGAyVN0FMzQG0nCpGRDW3
+         IfsjSCwVsYL6RAS8wPenjdjvvglzgHznn96P+yHHNmanaFRMI7OU2Bz7OI3TCaORCR3h
+         vqupaTqFWV7olePn7edpPDq261smaYcUEBq+0j7+KfxViqokKlmaYGPc4/M+TuYR0//0
+         Jk2J2qXgwzIWOpqMO7TAHUL9aUkeYuTr0yZA+y7834mJke9ZtLnGB4kxJF7haZVI5Rhi
+         XRtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=Vp9T7DsuX3lWGqUry2DlP1/Aj7+OeQy7ebehAH7GZsA=;
-        b=6IzNH/xc56zdT2EnV0dX3/lepLy7TXh3ds6XESrzkCp3bljL1UMNWYECBwUOVyUtJ3
-         2Puw3jQbf+jptbR5Mbcy4CTfYUCSNGY6QVZcNc0vUR0FLPnv0NXfx6nilSVpPekwWEAD
-         r1EbjhITjXi4pSGPwc/Ugu5JK55h04u25VyJs2o2oZVxtj0K22HXl0YYUfz8GuWjHVdR
-         y9GCKRWGUuEyiiqkNBr/4O6BGgKBXcJngU8pHItXXVW9OCUtgEAwn2hAOppxD6yZboQn
-         YoJthinto5RAp1zkhSvHdLASEzumrZhPniTYCIokO0uR/qCO2Luls8ptxl6z6ScFV7hQ
-         r+gw==
-X-Gm-Message-State: AJIora9mr+a3AUSEBadNUcCt88dusDqnPOsz1N9DPRL2DV61qKp+xIfF
-	Ey5XMR6fELzyG8CD3jweWTivtFLn8b4=
-X-Google-Smtp-Source: AGRyM1vHyPsMl6U4AqgoNY3tCLOO9QTQu+zRVxOEvFjNLHTTk9KxTW6YD81aQsBdKj1jKGOMTUrO+w==
-X-Received: by 2002:a17:90b:248b:b0:1ec:9869:59a0 with SMTP id nt11-20020a17090b248b00b001ec986959a0mr952504pjb.37.1655942006381;
-        Wed, 22 Jun 2022 16:53:26 -0700 (PDT)
-Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id h21-20020a62b415000000b0051bc5f4df1csm14114899pfn.154.2022.06.22.16.53.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jun 2022 16:53:26 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] test-runner: fix result/monitor options
-Date: Wed, 22 Jun 2022 16:51:16 -0700
-Message-Id: <20220622235116.1562570-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        bh=fIEK6+dumEP/jc+kJTSrVk4SUDSDsh1Ob9edQG7Wd1M=;
+        b=r4pw1xGGoDmSxs0K1YHelzgAQeRSCgyDRpV+gzyQY0fuvHsVHz0jJIVdpWKnXw+HwB
+         CVkWoIunHG6kFQdGGS4Houf8qpRUPFofoVxj0kMzVKGPlp1HzztE+gEXS3NOQ7ZDV5WK
+         R4ZTF7Ikp/4jwBetFi6z0hxF+W0ZtdnLtO9mYtPUDvy4SgF35gZ/sc5APj52PkjCI0WF
+         vKOEj2y+3DS1PxMZTljERj1oQINvVTesZvyQEnY5m4s6Tat0NrFmuc7xnkd4gsV3p6tl
+         flgJ28qBJds8DJCqpdeB10r4il0OgrmsA3pVV22gsI94Rx6MERA4IcCbX085coLSzwEe
+         z19A==
+X-Gm-Message-State: AJIora9PQ0AlY+gGN6o6uLe5BlkZFSj2EcmNGJXsmdSDkbHT+I+eH9L+
+	Vgcbv5QGDZloQXeNPXbXaRBYgBNegVhhGEiG
+X-Google-Smtp-Source: AGRyM1uRg/Cfayv/yMo99qW8/PUtn7dfljEuE6WdKEy2/v6I+lB1HbPXS7SYWk0/x9K0aophqaXI3Q==
+X-Received: by 2002:a05:6870:b4a7:b0:101:bd1f:1deb with SMTP id y39-20020a056870b4a700b00101bd1f1debmr577622oap.147.1655942018673;
+        Wed, 22 Jun 2022 16:53:38 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id u6-20020a056870184600b0010173875df2sm11309777oaf.58.2022.06.22.16.53.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Jun 2022 16:53:38 -0700 (PDT)
+Message-ID: <9a26d08b-846d-ba5e-bd74-8b954be05648@gmail.com>
+Date: Wed, 22 Jun 2022 18:37:43 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 1/3] test-runner: exclude 'iwd-rtnl' from being enabled
+ with --log
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220622230219.1557695-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220622230219.1557695-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-An earlier commit fixed several options but ended up breaking others. The
-result_parent/monitor_parent options are hidden from the user and only meant
-to be passed to the kernel but they relied on the fact that the underscore
-was present, not a dash. This updates the argument to use a dash:
+Hi James,
 
---result-parent
---monitor-parent
+On 6/22/22 18:02, James Prestwood wrote:
+> Enabling this ends up dumping so much logging and, at least with namespaces,
+> seems to break the logger module and cause really weird behavior, worst of
+> which is that all processes start dumping to stdout.
+> 
+> This can still be enabled explicitly with --verbose iwd-rtnl, but is turned
+> off by default when --log is used.
+> ---
+>   tools/utils.py | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 
-Fixes: 00e41eb0ff ("test-runner: Fix parsing for some arguments")
----
- tools/runner.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+All applied, thanks.
 
-diff --git a/tools/runner.py b/tools/runner.py
-index b018a0ad..d39b560f 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -117,8 +117,8 @@ class RunnerCoreArgParse(ArgumentParser):
- 				type=str,
- 				help='Use physical adapters for tests (passthrough)')
- 		self.add_argument('--testhome', help=SUPPRESS)
--		self.add_argument('--monitor_parent', help=SUPPRESS)
--		self.add_argument('--result_parent', help=SUPPRESS)
-+		self.add_argument('--monitor-parent', help=SUPPRESS)
-+		self.add_argument('--result-parent', help=SUPPRESS)
- 
- 		# Prevent --autotest/--unittest from being used together
- 		auto_unit_group = self.add_mutually_exclusive_group()
--- 
-2.34.1
+Regards,
+-Denis
 
