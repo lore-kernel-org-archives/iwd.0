@@ -1,48 +1,50 @@
 Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE96946B7
-	for <iwd@lists.linux.dev>; Fri, 24 Jun 2022 23:09:54 +0000 (UTC)
-Received: by mail-pj1-f53.google.com with SMTP id 73-20020a17090a0fcf00b001eaee69f600so4148001pjz.1
-        for <iwd@lists.linux.dev>; Fri, 24 Jun 2022 16:09:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE84646B8
+	for <iwd@lists.linux.dev>; Fri, 24 Jun 2022 23:09:55 +0000 (UTC)
+Received: by mail-pj1-f53.google.com with SMTP id t3-20020a17090a510300b001ea87ef9a3dso4117736pjh.4
+        for <iwd@lists.linux.dev>; Fri, 24 Jun 2022 16:09:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4ZzlOpSGZ27RBtGg/CurunhAG1/LCTLedRPaMpLqxQ0=;
-        b=WZtsIpTcfK0/8rKAjPEsq81lMPxYDoBUTLs3w/nMvoDOjAG/GlvZECHcYz85sroXFW
-         sPOC9Wm/hQ9GQxgt29E4PH4iHoBs6r9COmudBjAIZzzJg5K47FhXULcdBteCLI0M0kxr
-         10AAJUzVw4wKsCtV7DGkM3Y50jQ6iWEBxl2SvzB4g0uY7CAhjhZL2w0n2nU1oaHZDuN9
-         TsEvmuZIJHt+a3FvlcdUOL2/tHzwPJgDqHE3TNsggbkQxiH4ic314qIYJEI9AkvzvRC7
-         Xc9JI1qvZWN9Vslk2vrM9I5TaUwnMa3vuHFf8ggBo0xLJ+0JbJW7Vn00P2fy3z9Q5suA
-         5Wbg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=cBV4hQEgPqKcyinKv7psJB0197D8SzSiAL8wt3qxwKE=;
+        b=g2RhhkE0+XQjgM1j78vsECIZJDnnNsGcQIEC+R4c6loUYCyg1v39vWzlT6GQQ/WbcA
+         3WeiO2GgueAGNW0AUAWbn1PYDJINzH4MMlBlLCG4hRMBf/AA9saaif4fMC8um3wT1vNu
+         XegbtNlrUTDWUrcQmGhWTARQR6Xltiy5JOCfVShGyo9iu80sqt9wkxDYTahKlRYqUF83
+         bNHJoVWvmqRfTpFl1lmNautkY/kehdfDtKCyM8UOrNRSpQMYT8E2BddYfhWe9p9Qnwfa
+         lI3OBrawpNAQ8mSmddxQfEJzgQhKip7C8dZXw1w9KV2c7cvRORap8ue2sRObFUvYkW3I
+         /dcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4ZzlOpSGZ27RBtGg/CurunhAG1/LCTLedRPaMpLqxQ0=;
-        b=OA4V8AKJDTp+9gjQiX7Bh0JsU9/DG7nmahgz9foB6h5wedq/lA/pSTGxPq+3Ua+gVV
-         zeykRr/UP147BRkDuKS7Z3a4heN5aPzOHdT+zPIK4lW6aiVlkdbCfg0XK1S1DEe+Ve9W
-         uabrfw4Ncim04mCZxGjHOWfBcF0uFOtb52vPEjJsVxhFxzeiKjXKm0nKRrQl51R0eT1h
-         kQUdWVRfWZsH6XSjA8pBmCRGthJaSFf+BKSmq4/SgdfKKVwDfy8XK7qhThJAjjESz3LY
-         wy36ZsUvCoBNwtIvQUmwBjFcR0uyR1dXFZzEpI7xSPCCfbvLNQIXIfiFKglxQ1YAoiwT
-         pPrA==
-X-Gm-Message-State: AJIora/3Np/VwAQ0P2QFIs7Baf2EE7LrFpnP6vjMj+cPQDErS3yiSPWo
-	eexoMMEy3kKnHOkvTgXMG5dCR6jBBXo=
-X-Google-Smtp-Source: AGRyM1soJyv235pT6mso+P9xCC8E5Obd/wR72CtFH7AJhnTGGncTLrJ2uooNaxT9E8FTUD8zQz4xeg==
-X-Received: by 2002:a17:90b:3b41:b0:1ed:25b1:e53a with SMTP id ot1-20020a17090b3b4100b001ed25b1e53amr6274810pjb.71.1656112193827;
-        Fri, 24 Jun 2022 16:09:53 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=cBV4hQEgPqKcyinKv7psJB0197D8SzSiAL8wt3qxwKE=;
+        b=5rGUJTaWHH5f9aoYzYIQUWUag1oJin0wO/nU1HYWkz9UY5JWEX3fkckisZ7eCVUdIM
+         f8YvB+kaZbHgdV4iYilXo711bT0RBibgJkuJN1wDztDNpmY+oMbf6QEvKClhy0EWbCSq
+         F86N/sfgXh2v+lr6zs+nCJLMXc16S7AEMpiLLhWQw6tgB1dvg95Pwq3xYnDA+W5SJL7X
+         2/Ni6MrbGqFby7v/VQFY1BY/yTBkTPq9gz3KUHb4xTdfekJKS3F0v05xpH3pagAcfD7R
+         aJdk6oi3pmLotyK7hcmK8qkTYakmthfc3V9EfJT5w78fWgCJ5DqPwIVhtSvvOygLhjY5
+         ldHg==
+X-Gm-Message-State: AJIora+zvPRnBIjWr0PXUiJSGlnuUaMEi0RUC5m/LWSEnJmEqmJShtuz
+	KswZcHO2zwmvPjqsK7O0ez2rprX2pn4=
+X-Google-Smtp-Source: AGRyM1tFgWwGpno6OmXvDzWxFWzyvLgNbre0e4zMVrDP1xfEjai+JCDnab0j3XyGhflJjUCqIKQtsA==
+X-Received: by 2002:a17:90a:f991:b0:1ec:92c0:595 with SMTP id cq17-20020a17090af99100b001ec92c00595mr1347815pjb.145.1656112194881;
+        Fri, 24 Jun 2022 16:09:54 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id 64-20020a17090a09c600b001ec9ae91e30sm4449767pjo.12.2022.06.24.16.09.53
+        by smtp.gmail.com with ESMTPSA id 64-20020a17090a09c600b001ec9ae91e30sm4449767pjo.12.2022.06.24.16.09.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jun 2022 16:09:53 -0700 (PDT)
+        Fri, 24 Jun 2022 16:09:54 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/8] test-runner: remove reference to missing class member
-Date: Fri, 24 Jun 2022 16:07:34 -0700
-Message-Id: <20220624230741.1957863-1-prestwoj@gmail.com>
+Subject: [PATCH 2/8] test-runner: make is_process_running more accurate
+Date: Fri, 24 Jun 2022 16:07:35 -0700
+Message-Id: <20220624230741.1957863-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220624230741.1957863-1-prestwoj@gmail.com>
+References: <20220624230741.1957863-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,25 +53,44 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The print statement was referencing self.name, which doesn't exist. Use
-self.args[0] instead.
+This function was checking if the process object exists, which can
+persist long after a process is killed, or dies unexpectedly. Check
+that the actual PID exists by sending signal 0.
 ---
- tools/utils.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/utils.py | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/tools/utils.py b/tools/utils.py
-index 66002f77..857aa1eb 100644
+index 857aa1eb..7272c1f9 100644
 --- a/tools/utils.py
 +++ b/tools/utils.py
-@@ -259,7 +259,7 @@ class Process(subprocess.Popen):
- 		try:
- 			self.wait(timeout=15)
- 		except:
--			print("Process %s did not complete in 15 seconds!" % self.name)
-+			print("Process %s did not complete in 15 seconds!" % self.args[0])
- 			super().kill()
+@@ -342,10 +342,24 @@ class Namespace:
+ 	def stop_process(self, p, force=False):
+ 		p.kill(force)
  
- 		self._cleanup()
++	def _is_running(self, pid):
++		try:
++			os.kill(pid, 0)
++		except OSError:
++			return False
++
++		return True
++
+ 	def is_process_running(self, process):
+ 		for p in Process.get_all():
+-			if p.namespace == self.name and p.args[0] == process:
+-				return True
++			# Namespace processes are actually started by 'ip' where
++			# the actual process name is at index 4 of the arguments.
++			idx = 0 if not p.namespace else 4
++
++			if p.namespace == self.name and p.args[idx] == process:
++				# The process object exists, but make sure its
++				# actually running.
++				return self._is_running(p.pid)
+ 		return False
+ 
+ 	def _cleanup_dbus(self):
 -- 
 2.34.1
 
