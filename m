@@ -1,114 +1,73 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBC34A02
-	for <iwd@lists.linux.dev>; Fri, 24 Jun 2022 23:10:00 +0000 (UTC)
-Received: by mail-pg1-f169.google.com with SMTP id 184so3660512pga.12
-        for <iwd@lists.linux.dev>; Fri, 24 Jun 2022 16:10:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9535F46B7
+	for <iwd@lists.linux.dev>; Fri, 24 Jun 2022 23:26:14 +0000 (UTC)
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-101ab23ff3fso5792953fac.1
+        for <iwd@lists.linux.dev>; Fri, 24 Jun 2022 16:26:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=OCkwC2D0RD4oXZXaVih5oSm/+99d3lakST5G0fiiLKM=;
-        b=EmT9NJSOAp3rzRQVOaqUsa0ay+4nmuozTAirCbdl0XjYMtSRo+0gCXuAdAIA7yPi6h
-         VONpaaXk0DEZjKifZSYrKrtbwlgEGNBySCg0Ae+tq5CkM8FF213QtUtpNtCjSxnkwOlB
-         hHWq0KL9qGVxmoz4ba2q7JMijmCwjjfIBSCZ7U+px2hsqUM0/Ezi40EdvSArWYtlrdTG
-         lHxTuvx0AXb+Psp5OnELugkuq3HXxGxrJgj8gDyQ6XKJfMBXgQ72JPNxiKkfU+tgSV8j
-         ZxfKm3sukxGIyBDVjNho53CQDw7ycCc1pyPorYQ20Q1dPj/a7QZPfKUuoogt6lqb0Xk5
-         wBkg==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:from:in-reply-to:content-transfer-encoding;
+        bh=+7ZTqc69mqPfT1beQb8mD7YNoD4JX6AqXE+rl16aplM=;
+        b=qYonmm6SY2FSO+OxiJsIq3rbE3KPXRF0b7QJPUP6DDxAXB3MBwGlYsnZaiJAFw5lWV
+         kkNEW8TAqAHfmvIXNzi75XcqwDzf1DtkDTPf4QRUQTLn4hyiSfrOLdjU9jojxr5cDXu+
+         lVFrC5CBUWNAFwwUcOrMvXLBxs3id8bHaNn0UHIUYKqInrK9qTdLOhg0Ze+7u+UNCgHl
+         hWlCFo8/Fg3XAmY+hRzeXm6Wheq2zj9AA9ABwGDa1ThKlsxdElwQHGqc58ApNJSS4WZi
+         jcOU9Txptw3FlwU6MI1RG6SEsAc0ZPEIIiC8v76WgBD4EaKK8QHrjDrs3s8D19FAN7/x
+         U5cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=OCkwC2D0RD4oXZXaVih5oSm/+99d3lakST5G0fiiLKM=;
-        b=B0QjbAAxTLYClbqZ6oAHXXz6eLCBfxSD9xK58YK41KRzX4Z9e9kFztwaJqPwdvqJkE
-         dDzUjMEVPeX0tz7rlFQ3VKORorrmUMdoTYn1ZclpSmcQkO6Y5X/qpxCXxFGTs7RzTs78
-         9o8jCYFsvWa4nbubydOnuBSctED+qqspd1sBPz5rgr8uv5E2id0gVkEIXMSIuQhv516o
-         9VTJEFiI/OHnZNTTCul7/mnk+iTCkNw0X/7rNfzUSp2uv6uH13tnQ2VRvQCPP7P4EKlv
-         UW2Q2gslNx1TC4e+iw9rXRj0ElAG+ARXEg78gJxTIMBBDwleNJF/mpz5LQ3mPRjwoSXR
-         BaWQ==
-X-Gm-Message-State: AJIora+GYT+ffF57dqzp1mvOIGOuY5tRtQDq3yzDKGTew/5ycCdkF1Rm
-	6PQK0LmMbq99+KEiWFu01j1Twj0rzzM=
-X-Google-Smtp-Source: AGRyM1vPOIEuxkvYpxbp+UAwbSwu2Y5K3j/JizgXz7i1d/DW1D/4o9P6Jrs/XPgQKSEDqyqCAKU1vw==
-X-Received: by 2002:a63:d50f:0:b0:408:994a:96d5 with SMTP id c15-20020a63d50f000000b00408994a96d5mr1074841pgg.299.1656112200018;
-        Fri, 24 Jun 2022 16:10:00 -0700 (PDT)
-Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id 64-20020a17090a09c600b001ec9ae91e30sm4449767pjo.12.2022.06.24.16.09.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jun 2022 16:09:59 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 8/8] unit: update test-eapol to use the new ptk verify APIs
-Date: Fri, 24 Jun 2022 16:07:41 -0700
-Message-Id: <20220624230741.1957863-8-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220624230741.1957863-1-prestwoj@gmail.com>
-References: <20220624230741.1957863-1-prestwoj@gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=+7ZTqc69mqPfT1beQb8mD7YNoD4JX6AqXE+rl16aplM=;
+        b=Z1/Zfpg5dA6VOhaWhy4+K+bBkEskclfVModRybejz6V4qwdnatlwDSgUI13tXnXNcB
+         ad1I9OydFMHg4AIvAd1ZT5P2DtchPcUOetI9MIhpwMPGHnyK4hDEglxbXuIHPPsnyYVn
+         iaLwuL3nPlkyFOzYspubB1/2wpsmwzEt4E8NhhqP7ArtzPlaxfaRAuvQgM6IljxhnDUR
+         IN9njVR9p9eAicfGbrB6zkxhgpxaPNM8UkrUMpBIOkAiec5L1Tw1sLKktYmkTf7kVSFs
+         C8UQFyz/vryRM+wb/bp4mj+OtfKdEfFzyo6bh9WtUm3s0vWyHG4FFuTH8UC2CHBISxcG
+         mGRA==
+X-Gm-Message-State: AJIora/6QaLtVoy43SfVuRAfrk4u1NC4eRqtaRUSQnm+JOoy31NSiRLq
+	3cvOJ1FA71bfP5+Rtswj3Ls=
+X-Google-Smtp-Source: AGRyM1upOd/6jvfiWT/BO16HpjhfmwIiql/P0OP7jnhBE5vpw+HLGw2b5smR49jm8esoERHzNT0c+Q==
+X-Received: by 2002:a05:6870:9711:b0:101:ae38:6c85 with SMTP id n17-20020a056870971100b00101ae386c85mr3674539oaq.50.1656113173652;
+        Fri, 24 Jun 2022 16:26:13 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id n39-20020a056870972700b000f333ac991fsm2804116oaq.27.2022.06.24.16.26.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Jun 2022 16:26:13 -0700 (PDT)
+Message-ID: <864ef05f-2cba-9cb4-4be6-bc3805b732c5@gmail.com>
+Date: Fri, 24 Jun 2022 18:13:20 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 1/8] test-runner: remove reference to missing class member
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220624230741.1957863-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220624230741.1957863-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- unit/test-eapol.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Hi James,
 
-diff --git a/unit/test-eapol.c b/unit/test-eapol.c
-index d3cfac11..227e485f 100644
---- a/unit/test-eapol.c
-+++ b/unit/test-eapol.c
-@@ -1768,13 +1768,13 @@ static void eapol_4way_test(const void *data)
- 	step1 = eapol_key_validate(eapol_key_data_3,
- 					sizeof(eapol_key_data_3), 16);
- 	assert(step1);
--	assert(eapol_verify_ptk_1_of_4(step1, 16));
-+	assert(eapol_verify_ptk_1_of_4(step1, 16, false));
- 	memcpy(anonce, step1->key_nonce, sizeof(step1->key_nonce));
- 
- 	step2 = eapol_key_validate(eapol_key_data_4,
- 					sizeof(eapol_key_data_4), 16);
- 	assert(step2);
--	assert(eapol_verify_ptk_2_of_4(step2));
-+	assert(eapol_verify_ptk_2_of_4(step2, false));
- 	memcpy(snonce, step2->key_nonce, sizeof(step2->key_nonce));
- 
- 	assert(!crypto_psk_from_passphrase(passphrase, (uint8_t *) ssid,
-@@ -1853,13 +1853,13 @@ static void eapol_wpa2_handshake_test(const void *data)
- 	ptk_step1 = eapol_key_validate(eapol_key_data_7,
- 					sizeof(eapol_key_data_7), 16);
- 	assert(ptk_step1);
--	assert(eapol_verify_ptk_1_of_4(ptk_step1, 16));
-+	assert(eapol_verify_ptk_1_of_4(ptk_step1, 16, false));
- 	memcpy(anonce, ptk_step1->key_nonce, sizeof(ptk_step1->key_nonce));
- 
- 	ptk_step2 = eapol_key_validate(eapol_key_data_8,
- 					sizeof(eapol_key_data_8), 16);
- 	assert(ptk_step2);
--	assert(eapol_verify_ptk_2_of_4(ptk_step2));
-+	assert(eapol_verify_ptk_2_of_4(ptk_step2, false));
- 	memcpy(snonce, ptk_step2->key_nonce, sizeof(ptk_step2->key_nonce));
- 
- 	assert(!crypto_psk_from_passphrase(passphrase, (uint8_t *) ssid,
-@@ -1983,13 +1983,13 @@ static void eapol_wpa_handshake_test(const void *data)
- 	ptk_step1 = eapol_key_validate(eapol_key_data_13,
- 					sizeof(eapol_key_data_13), 16);
- 	assert(ptk_step1);
--	assert(eapol_verify_ptk_1_of_4(ptk_step1, 16));
-+	assert(eapol_verify_ptk_1_of_4(ptk_step1, 16, false));
- 	memcpy(anonce, ptk_step1->key_nonce, sizeof(ptk_step1->key_nonce));
- 
- 	ptk_step2 = eapol_key_validate(eapol_key_data_14,
- 					sizeof(eapol_key_data_14), 16);
- 	assert(ptk_step2);
--	assert(eapol_verify_ptk_2_of_4(ptk_step2));
-+	assert(eapol_verify_ptk_2_of_4(ptk_step2, false));
- 	memcpy(snonce, ptk_step2->key_nonce, sizeof(ptk_step2->key_nonce));
- 
- 	assert(!crypto_psk_from_passphrase(passphrase, (uint8_t *) ssid,
--- 
-2.34.1
+On 6/24/22 18:07, James Prestwood wrote:
+> The print statement was referencing self.name, which doesn't exist. Use
+> self.args[0] instead.
+> ---
+>   tools/utils.py | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+
+All applied, thanks.
+
+Regards,
+-Denis
 
