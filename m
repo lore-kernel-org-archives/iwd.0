@@ -1,75 +1,130 @@
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1BD7A
-	for <iwd@lists.linux.dev>; Wed, 29 Jun 2022 18:37:54 +0000 (UTC)
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-fe023ab520so22562390fac.10
-        for <iwd@lists.linux.dev>; Wed, 29 Jun 2022 11:37:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D267A
+	for <iwd@lists.linux.dev>; Wed, 29 Jun 2022 19:29:17 +0000 (UTC)
+Received: by mail-pj1-f50.google.com with SMTP id cv13so16568036pjb.4
+        for <iwd@lists.linux.dev>; Wed, 29 Jun 2022 12:29:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:from:in-reply-to:content-transfer-encoding;
-        bh=OJ40JhU6QnX2h5X+lxldJOYgHh//MzQmiA9d2m2V3jM=;
-        b=MlAXuK5o1Ncgcx5H8s3dTmNoFo7tMBAYh2QFoq+ZUjDa7K/AwSe8MoIYlIulP79YEQ
-         QVWRE17JJBZ7ZVrrn/GRMBBPc43TNVPPApJodU7i1jecKSkcVOq8vGFzGN2rp33fXb35
-         4vGYJnPXoI9vdf1lxibNvFCVIRdAguHn1hULqR5P1UyPVlSO6yOo8OWbxTS1yaDl2kX2
-         Rx5uRQIw4hO4B2MqAAXlZzvgDtbXtSZ8pqSNz/0mA6YefiNQWp/aeJXWQeMy5izAVU9L
-         TeJAy7+C+jM9nuDgCpX/E/C599YjHd7Oqr2fJ7Qh/gLFW2tBic2cjebQzb9MGXzk8HVK
-         37Ew==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hGNIyz1SSJAjs9vNjEYg+XJJhw8sk8UkWWsSzCbZNt8=;
+        b=MExaCisBmQjiSzqiKpoLcyhmO7fYeqk8f8hYHjP4PmMML2dNFrLXYKbC75kxgQgUwm
+         iimo6qWVmgClhuXoVEEsNZ3FSOVtIfHhpuwZ1DSChggxezBg1uOikZY12pNCE/io1J91
+         Hs45MpDRnltmdfF+P7zAdFBYYzIIfxldjDKTpD6Ut3LIlcPd2ivDg+C6ZGcB3BFnLm3t
+         Dx9aOmhNav2BfGAQ+E9cge9+MH7K80xi3Dy3I8VQBvTqjpoW2zBhdRya7kGVtg0V4DCE
+         GMWipSWDwst47f4urmhGMXfT+2pa7XQYbRK1Rn2AqO5dD64vh2lRFQ/eP9JQbZKwGLwf
+         yGKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=OJ40JhU6QnX2h5X+lxldJOYgHh//MzQmiA9d2m2V3jM=;
-        b=7BVKoUvw96qbfUUL5SX3W+WVXGdXkm3uBwJNbcvHPrKzFJKaM89q/k351ihOjElLJn
-         fPZ/T7MuBHb/XGHxHqbz2eUUbsF/wyeoLcx+IxQ2eCs2hR1jRQx/djKbxbpixS/3S4s7
-         Hl3umBzfjVpIWele0ah92DoN4sPLLOAdO4r3gEe0uXgO5X3Em/iPxD9n/GHM2ir7/hVD
-         Iqw3+h/TKkG0b/moFh+9+rCxIsw0lbdAGVI4+NkCunYmzXEmXvTo+VMi5FKPY/c0sd9z
-         MrOc1Xh+eCSYgwGpPHqRxhVD2khrvxuVMmbEI3iosz0hN/D4IK4lagqgWbe26XBt8doa
-         fGnw==
-X-Gm-Message-State: AJIora8eqqijWHsF8eq4uBOmKj3boacGujslSfFRFvBXqIyCrKMK6HzL
-	F3vrMUN+/G/UN/Hpq7cPksU=
-X-Google-Smtp-Source: AGRyM1sTvBPbzo727k3LSiVdUGl6YwfqZuuxJF18Z6jkvZpiYV8WPgWlDgABrUvruozUXUtqR+5X9w==
-X-Received: by 2002:a05:6870:d5a3:b0:f2:c923:682f with SMTP id u35-20020a056870d5a300b000f2c923682fmr2749827oao.120.1656527873876;
-        Wed, 29 Jun 2022 11:37:53 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 127-20020aca0785000000b00334c2e81dfbsm1694797oih.0.2022.06.29.11.37.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jun 2022 11:37:53 -0700 (PDT)
-Message-ID: <538789c6-d9bf-c8ee-6371-d4e464741186@gmail.com>
-Date: Wed, 29 Jun 2022 13:25:51 -0500
+        bh=hGNIyz1SSJAjs9vNjEYg+XJJhw8sk8UkWWsSzCbZNt8=;
+        b=HN9LqF+CnCnICH+0aEQCPTNBPylEw4a0bevrrKCT/0eMruAMKfmag3XA7i/E8WWqr7
+         8tU7a6IxIGWUPZDhzEhsVg0S4j9hZwJsifGmHWYsheZSICoGaedp/v7M/x/xNKgjSY1n
+         CGJO3pgWPk9+MJMVCBGi7Cdg2UVu5kqI4QRv4jk90nDXuGeVziBNtlApWI99kg91Rfav
+         iwUCcsgqTuBspSSyTXw3jy25ANPxM91VJoWvbaLJpjSMuoFsk84CDJ0gUJmTwEehUdDs
+         yOp98vh3yXpyP2Lx2Xd4Ju63vTr7yAKbn2UENdePPPXV+MbvFA6E7ZO9N8N87SUzsC+H
+         w0ng==
+X-Gm-Message-State: AJIora+nYI/nthrigJpJPzMFjTJ6tF7PewPoqtb4TNph7W4pYDLud3xr
+	dzQ5Y6lp/93lbt5LRsm4GGb3WmV0x/s=
+X-Google-Smtp-Source: AGRyM1tKFKI8wnk0DAxXud/IjBVSVWh/TWcC85ubGV2Mooug54EXgvYzV6DXqo8llWkV830P0KMObQ==
+X-Received: by 2002:a17:90b:3e89:b0:1ee:195e:abaf with SMTP id rj9-20020a17090b3e8900b001ee195eabafmr7665325pjb.112.1656530957131;
+        Wed, 29 Jun 2022 12:29:17 -0700 (PDT)
+Received: from localhost.localdomain ([50.45.187.22])
+        by smtp.gmail.com with ESMTPSA id i29-20020a63585d000000b00407e25d4527sm11497734pgm.22.2022.06.29.12.29.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jun 2022 12:29:16 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/2] client: support multi-line print for long values
+Date: Wed, 29 Jun 2022 12:27:08 -0700
+Message-Id: <20220629192709.38743-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH 1/2] auto-t: allow multiple PSKAgent's to be registered
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20220629173113.2442455-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220629173113.2442455-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+The generic proxy property display was limited to a width for names/value
+which makes the output look nice and uniform, but will cut off any values
+which are longer than this limit.
 
-On 6/29/22 12:31, James Prestwood wrote:
-> By creating a new bus connection for each agent we can register multiple
-> with IWD. This did mean the agent interface needs to be unique for each
-> agent (removing _agent_manager_if) as well as tracking multiple agents
-> in a list.
-> ---
->   autotests/util/iwd.py | 51 ++++++++++++++++++++-----------------------
->   1 file changed, 24 insertions(+), 27 deletions(-)
-> 
+This patch adds some logic to detect this, and continue displaying the
+value on the next line.
 
-Both applied, thanks.
+The width arguments were also updated to be unsigned, which allows checking
+the length without a cast.
+---
+ client/dbus-proxy.c | 21 +++++++++++++++++++--
+ client/dbus-proxy.h |  3 ++-
+ 2 files changed, 21 insertions(+), 3 deletions(-)
 
-Regards,
--Denis
+diff --git a/client/dbus-proxy.c b/client/dbus-proxy.c
+index 624ce4aa..9f05c0e7 100644
+--- a/client/dbus-proxy.c
++++ b/client/dbus-proxy.c
+@@ -49,7 +49,8 @@ static struct l_queue *proxy_interface_types;
+ 
+ void proxy_properties_display(const struct proxy_interface *proxy,
+ 				const char *caption, const char *margin,
+-				int name_column_width, int value_column_width)
++				unsigned int name_column_width,
++				unsigned int value_column_width)
+ {
+ 	const void *data;
+ 	const struct proxy_interface_property *properties;
+@@ -67,14 +68,30 @@ void proxy_properties_display(const struct proxy_interface *proxy,
+ 	properties = proxy->type->properties;
+ 
+ 	for (i = 0; properties[i].name; i++) {
++		const char *str;
++		size_t len;
++		size_t j;
++
+ 		if (!properties[i].tostr)
+ 			continue;
+ 
++		str = properties[i].tostr(data);
++		len = str ? strlen(str) : 0;
++
+ 		display("%s%*s  %-*s%-.*s\n", margin,
+ 			8, properties[i].is_read_write ?
+ 				COLOR_BOLDGRAY "       *" COLOR_OFF : "",
+ 			name_column_width, properties[i].name,
+-			value_column_width, properties[i].tostr(data) ? : "");
++			value_column_width, str ? : "");
++
++		if (len <= value_column_width)
++			continue;
++
++		/* Display remaining data */
++		for (j = value_column_width; j < len; j += value_column_width)
++			display("%s%*s  %-*s%-.*s\n", margin, 8, "",
++				name_column_width, "", value_column_width,
++				str + j);
+ 	}
+ }
+ 
+diff --git a/client/dbus-proxy.h b/client/dbus-proxy.h
+index 1d6af5de..34917e82 100644
+--- a/client/dbus-proxy.h
++++ b/client/dbus-proxy.h
+@@ -89,7 +89,8 @@ bool proxy_interface_method_call(const struct proxy_interface *proxy,
+ 
+ void proxy_properties_display(const struct proxy_interface *proxy,
+ 				const char *caption, const char *margin,
+-				int name_column_width, int value_column_width);
++				unsigned int name_column_width,
++				unsigned int value_column_width);
+ 
+ char *proxy_property_str_completion(const struct proxy_interface_type *type,
+ 					proxy_property_match_func_t function,
+-- 
+2.34.1
 
