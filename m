@@ -1,207 +1,81 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B296F6AB4
-	for <iwd@lists.linux.dev>; Wed, 29 Jun 2022 19:29:18 +0000 (UTC)
-Received: by mail-pf1-f170.google.com with SMTP id x4so16041779pfq.2
-        for <iwd@lists.linux.dev>; Wed, 29 Jun 2022 12:29:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A336AB4
+	for <iwd@lists.linux.dev>; Wed, 29 Jun 2022 20:08:50 +0000 (UTC)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-101d96fe0a5so22944330fac.2
+        for <iwd@lists.linux.dev>; Wed, 29 Jun 2022 13:08:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=fdnFL5XnWt70hBI3QkLY123iL6CCK5NEa7rKhqjbxIs=;
-        b=MTynJJckER3AWHtwjuUxrrDQfAp7h6H3NIKIMQa++UNFldbmRllpe2h6ricmYu63p2
-         wyzMICqfGl6n051ZeGeWfZxqjyUTZTXlUk0c1XwSOT0OhfQDiWqjj7QP8KH+Bq9flu+V
-         21yGM5eeX+xsNaQD+mPd8ymMOn40Usq+U4m7hDPnxSwVVtVVRV0Pv7fQAL534uGrgBIO
-         Hd0CU0syrJdxkR1uM3TvqJOC2vlLjJ9VVP4W+SiIg4t7ESxHGVYZ77Q8XgVIJTv2xWfW
-         X4nJjzlkjN5Gkn1me0jsACTQPxQXBZ9hDicvUVXXCA66LWbPmtCeZ6osOt9X7qaGLvES
-         PWzg==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:from:in-reply-to:content-transfer-encoding;
+        bh=Zg7ttPQRLM5k4CSJgslwTvlYZbk3S74oFPLqANZcnfA=;
+        b=PijVT3ngmKHo3x33WF0plXrhpUw8ThIqRQP9cvrMwstMvwy9AxkE4R+HIYpsSUhnH4
+         zFdZ+p7twLynkfODYf9c6UUU6UbafSS3JEEPtUkYRyqMDFrSFv/FwWDzS3JJdlfKqSNC
+         aXY9JKrVtAN4154cEUwi7rlUVL3XQWWAlRMVGBpJ2a+INbU23ymY7WvUefPZoF4MgsfF
+         nyeJdE5FKKjMEf7ZuNm8IsW49uoC4zdYq5Ch8T3iFqKKzShU5SXOwfd7t3j9v4uUmZXd
+         Y7mTbHAnciqjZLjp15DoGrJswyp+h94LY5i/x4F5w/LeWfwokUyNO+P4k7+VqqzQXYZ4
+         RFAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=fdnFL5XnWt70hBI3QkLY123iL6CCK5NEa7rKhqjbxIs=;
-        b=Q9MlsQCjh6OCX3RjLPsaSaAdwK5SQo2lCW7wrCsiwm43B1fXp7vRkIGpNfpXqfle2c
-         EuNoW7b/FVmqzH/kBfZEGDMBz8ZbmlS5fJfZFzn3z66QZLWc+oZ+BXFhtt4xhX3jBHRQ
-         AZsvc0OJ0KhGbctfNEXbqiTCysAQRyZAW1a97yleQCALGe/1w7LAHcGLhrsKugWIOWs5
-         KNvByXpOWVnQ16siXR7gnFsv55kIqPFZ0X1OMs2Xelz5rnCe+dMlpGgkPD27xS095q0n
-         JAg2AO4RGjTcCfTe0Y97/PE93yuLcaatDDUzR63exRx03JAIsi4TIf7LcMTEQJ7Ev+G2
-         8EBA==
-X-Gm-Message-State: AJIora/Kcr0bWY9TfGQponIBmVlhYpZsiDLqQt4CsqKJFNyMwUASn6BI
-	arendvr0DpbzjIQxScDRw/XnSMApnHc=
-X-Google-Smtp-Source: AGRyM1tkzYEyBRN8O0OuKX6ZeudQK7+WTxknS98B4oJBE+LHmH1oQU8bp9wp4f74bSoz7U/5aJN97A==
-X-Received: by 2002:a65:53c8:0:b0:40d:77fc:5f05 with SMTP id z8-20020a6553c8000000b0040d77fc5f05mr4064183pgr.263.1656530957971;
-        Wed, 29 Jun 2022 12:29:17 -0700 (PDT)
-Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id i29-20020a63585d000000b00407e25d4527sm11497734pgm.22.2022.06.29.12.29.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jun 2022 12:29:17 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] client: add "dpp <wlan> show" command
-Date: Wed, 29 Jun 2022 12:27:09 -0700
-Message-Id: <20220629192709.38743-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220629192709.38743-1-prestwoj@gmail.com>
-References: <20220629192709.38743-1-prestwoj@gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Zg7ttPQRLM5k4CSJgslwTvlYZbk3S74oFPLqANZcnfA=;
+        b=T/9abV+5jx0juiA7kJH1C93Wo8xdJBx3r0mz9Hy4ZV2q0XMrRLYddrD3pl+zRKVATD
+         9djF4klchmfnqXPbIJJk/MIvz5uXlKW949VpqEO2HZkqg0bbgUppFFQt5zmHZXsGP+DD
+         U1YiXF78RmfpIUl37rANdDc+oyqrtCRufqQ0k+7LirAitAPTWFIkH7VIqdWQoMKfmTkG
+         UbmsnUAdpzw64pYi+K6qPzN+2FPYcVlGWv5v1GToUCGmhJQfbqbLIp0CnnFJS4pNE6LX
+         9odwopkKHJ76PNJgtAk4syAU94/9d1/Wbaak8AqFP5JO/Cj11kIeGG3OWFcARkghZSo9
+         G5Bw==
+X-Gm-Message-State: AJIora/UOdHpH/QUY9PS+3+Tf9rOvxPYhaL0wOEW6i124KlTVEFIkLDL
+	aBNq1GXoWo5ZIoHeq6rWoBU=
+X-Google-Smtp-Source: AGRyM1sDsSRSwCRRLuQiVYo5TNaIBGulKPXNyI3HXBbPtg7j6DEePZiIBOlYULpAOKU1tCs+EAU/bA==
+X-Received: by 2002:a05:6870:f287:b0:109:d5fb:15be with SMTP id u7-20020a056870f28700b00109d5fb15bemr2982814oap.12.1656533330020;
+        Wed, 29 Jun 2022 13:08:50 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id z23-20020a4ad1b7000000b0035eb4e5a6b6sm9736305oor.12.2022.06.29.13.08.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Jun 2022 13:08:49 -0700 (PDT)
+Message-ID: <f08faaf0-3c29-0acf-d95a-cb57d82cfccd@gmail.com>
+Date: Wed, 29 Jun 2022 14:48:42 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 1/2] client: support multi-line print for long values
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220629192709.38743-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220629192709.38743-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This will show the newly added DPP properties
----
- client/dpp.c | 117 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 117 insertions(+)
+Hi James,
 
-diff --git a/client/dpp.c b/client/dpp.c
-index 120dd9ee..af69d2c0 100644
---- a/client/dpp.c
-+++ b/client/dpp.c
-@@ -34,8 +34,111 @@
- #include "client/device.h"
- #include "client/display.h"
- 
-+struct dpp {
-+	bool started;
-+	char *role;
-+	char *uri;
-+};
-+
-+static void *dpp_create(void)
-+{
-+	return l_new(struct dpp, 1);
-+}
-+
-+static void dpp_destroy(void *data)
-+{
-+	struct dpp *dpp = data;
-+
-+	if (dpp->role)
-+		l_free(dpp->role);
-+	if (dpp->uri)
-+		l_free(dpp->uri);
-+
-+	l_free(dpp);
-+}
-+
-+static void update_started(void *data, struct l_dbus_message_iter *variant)
-+{
-+	struct dpp *dpp = data;
-+	bool value;
-+
-+	if (!l_dbus_message_iter_get_variant(variant, "b", &value)) {
-+		dpp->started = false;
-+		return;
-+	}
-+
-+	dpp->started = value;
-+}
-+
-+static const char *started_tostr(const void *data)
-+{
-+	const struct dpp *dpp = data;
-+
-+	return dpp->started ? "yes" : "no";
-+}
-+
-+static void update_role(void *data, struct l_dbus_message_iter *variant)
-+{
-+	struct dpp *dpp = data;
-+	const char *value;
-+
-+	if (dpp->role)
-+		l_free(dpp->role);
-+
-+	if (!l_dbus_message_iter_get_variant(variant, "s", &value)) {
-+		dpp->role = NULL;
-+		return;
-+	}
-+
-+	dpp->role = l_strdup(value);
-+}
-+
-+static const char *role_tostr(const void *data)
-+{
-+	const struct dpp *dpp = data;
-+
-+	return dpp->role;
-+}
-+
-+static void update_uri(void *data, struct l_dbus_message_iter *variant)
-+{
-+	struct dpp *dpp = data;
-+	const char *value;
-+
-+	if (dpp->uri)
-+		l_free(dpp->uri);
-+
-+	if (!l_dbus_message_iter_get_variant(variant, "s", &value)) {
-+		dpp->uri = NULL;
-+		return;
-+	}
-+
-+	dpp->uri = l_strdup(value);
-+}
-+
-+static const char *uri_tostr(const void *data)
-+{
-+	const struct dpp *dpp = data;
-+
-+	return dpp->uri;
-+}
-+
-+static const struct proxy_interface_property dpp_properties[] = {
-+	{ "Started",	"b", update_started,	started_tostr },
-+	{ "Role",	"s", update_role, 	role_tostr },
-+	{ "URI",	"s", update_uri,	uri_tostr },
-+	{ }
-+};
-+
-+static const struct proxy_interface_type_ops dpp_ops = {
-+	.create = dpp_create,
-+	.destroy = dpp_destroy,
-+};
-+
- static struct proxy_interface_type dpp_interface_type = {
- 	.interface = IWD_DPP_INTERFACE,
-+	.properties = dpp_properties,
-+	.ops = &dpp_ops,
- };
- 
- static void check_errors_method_callback(struct l_dbus_message *message,
-@@ -174,6 +277,19 @@ static enum cmd_status cmd_stop(const char *device_name,
- 	return CMD_STATUS_TRIGGERED;
- }
- 
-+static enum cmd_status cmd_show(const char *device_name,
-+						char **argv, int argc)
-+{
-+	const struct proxy_interface *proxy =
-+			device_proxy_find(device_name, IWD_DPP_INTERFACE);
-+	char *caption = l_strdup_printf("%s: %s", "DPP", device_name);
-+
-+	proxy_properties_display(proxy, caption, MARGIN, 20, 47);
-+	l_free(caption);
-+
-+	return CMD_STATUS_DONE;
-+}
-+
- static const struct command dpp_commands[] = {
- 	{ NULL, "list", NULL, cmd_list, "List DPP-capable devices", true },
- 	{ "<wlan>", "start-enrollee", NULL, cmd_start_enrollee,
-@@ -181,6 +297,7 @@ static const struct command dpp_commands[] = {
- 	{ "<wlan>", "start-configurator", NULL, cmd_start_configurator,
- 							"Starts a DPP Configurator" },
- 	{ "<wlan>", "stop", NULL, cmd_stop, "Aborts DPP operations" },
-+	{ "<wlan>", "show", NULL, cmd_show, "Shows the DPP state" },
- 	{ }
- };
- 
--- 
-2.34.1
+On 6/29/22 14:27, James Prestwood wrote:
+> The generic proxy property display was limited to a width for names/value
+> which makes the output look nice and uniform, but will cut off any values
+> which are longer than this limit.
+> 
+> This patch adds some logic to detect this, and continue displaying the
+> value on the next line.
+> 
+> The width arguments were also updated to be unsigned, which allows checking
+> the length without a cast.
+> ---
+>   client/dbus-proxy.c | 21 +++++++++++++++++++--
+>   client/dbus-proxy.h |  3 ++-
+>   2 files changed, 21 insertions(+), 3 deletions(-)
+> 
+
+Both applied, thanks.
+
+Regards,
+-Denis
 
