@@ -1,48 +1,50 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47DF27B
-	for <iwd@lists.linux.dev>; Thu, 30 Jun 2022 18:06:00 +0000 (UTC)
-Received: by mail-pj1-f44.google.com with SMTP id 73-20020a17090a0fcf00b001eaee69f600so230017pjz.1
-        for <iwd@lists.linux.dev>; Thu, 30 Jun 2022 11:06:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66017B
+	for <iwd@lists.linux.dev>; Thu, 30 Jun 2022 18:06:01 +0000 (UTC)
+Received: by mail-pl1-f179.google.com with SMTP id jh14so89793plb.1
+        for <iwd@lists.linux.dev>; Thu, 30 Jun 2022 11:06:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qtGZToBq6FGjpXuT2wG0YMa/oqd0RIE4ptaHo29vJYI=;
-        b=b0e9ouKm6T/7CJl2qJsyiqmPIq7aXJT4y236SVCHIIdB4yq8Xo8zdH4wVtv7W13N4r
-         N5tbtv9Stpt5sez4zKOTc+3EgoiaH31BBeZ0HQR6CMBjC49gRBGSYAeWA2CAzMAWHmod
-         lqHNf5U2Yh50v+Uuv0Hghcvf5GRcse4ERDSz7qm8L1VCWavilCX7773JrP2SaGQ2p4vs
-         /NauX8OLWMnLPQHAeBkHr0Crjp91+/qHBNtYhZ6GU+RRQ6pb2IsYUwv0896OogW3uC89
-         QyxNjjLeevDX87jI7Vaj2thf3EzJkDT30QXitczbFh2a6WrCoRcaoPYNI6HiZydu8lwn
-         5jZQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=+o1nLAtiA1ovow+LoyeteKJX/MfOtqjxXhBG/kg4zjk=;
+        b=AQVwDY5WxEfM9KFDmOQTOQgSEMyqEw4dQ0T7/XYvhh5/KZyBnsBtCcFPWLEQyaZUJe
+         kMWs/1IDtUwlM7Mmlg4nahIqwAQE0eqaVO0BQ8ihK4opceEP3tcTnYH+Ty/JEF+Uz5/+
+         0mHeiLEq0UosFtMbLL4uOxaNS97luz5xrD6C0flto+m9/WehzNd7pB9b7Ax0BY4f/jet
+         QvfvUo5U96HNLIbPsfBcbTX6hQ1Fbnnkn5kPJKOIbKMVHQOLrFcg/0osC+blSaUKnKby
+         BOcii9qD1G0wTILARYLQkK4gEnOgnrHxdlRUv1W16vQ+iSFaEkqV8kSN1rwnMTKjfCnh
+         2PHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qtGZToBq6FGjpXuT2wG0YMa/oqd0RIE4ptaHo29vJYI=;
-        b=uLkYsGxHvRpE+Y3CXWty74QJ8J01Da8S7RRRk4AVdLvMH5CcbIkRl4djByhzRIiByj
-         gHFaLvk/SkWV4mwYgSLN41+13X/1d5JB321R0C9XgNWiGpHFINohVSmldABcfdJPWU7y
-         lDf7Fs1MRWNjodm+cxi8Ob2EBA6qbpSeCTtf2lAunLFHQ8e5V8HFYAFfhsedsb/wuOer
-         JS+BosJk/emDe1DhlmezcB282fD2aV41pha7v3AEggx+AT94NmfsF2ospFtWmvn+x7xi
-         WTMAv69/CJVcbYaCF35hbtZtVo5haaknCVpO2PTHG9vJaHzbUI5eEC/Uu5ovW0QYD1MU
-         YSpQ==
-X-Gm-Message-State: AJIora+gGIlEXtIzQ2KMb9qNM+smDpp557ECjofeXYQGnbULmONTbiuX
-	lex32TSgSbS/akpVVMx5lPFAC0U3CNw=
-X-Google-Smtp-Source: AGRyM1vyYIy1UY8/N/+2KEEXwS3ChN+qBuSB11QzoHIyPWGIYZfIz3CswaT03yVIpahUblg/yDx4hA==
-X-Received: by 2002:a17:90b:1d04:b0:1ec:f898:d863 with SMTP id on4-20020a17090b1d0400b001ecf898d863mr13579494pjb.79.1656612359536;
-        Thu, 30 Jun 2022 11:05:59 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=+o1nLAtiA1ovow+LoyeteKJX/MfOtqjxXhBG/kg4zjk=;
+        b=we0WWpZIvkJjzfTze5pyEztaGLIEICAjg6t1RyWNDM5vS208v1wreZFzB2Y9kLBtT3
+         sQV//SaRJOOz9pVdKXeA0p6rxcuDMw53UWEi7S+8Ib9OHr4HzB31iA8Iy+AJKTo1FXpi
+         AHiQvO5hY2UINxIlcUS8abAaiNWQG32/ChG9vqePaL1pVz0LLq8lRFdvLbpyWZruPkGt
+         6GKBGws72c7uN+4sexZfxx9uIzv81iKuGCMVlwPGn3Sh+bGaxByxjmCAqvNMrzgask4Y
+         fhU2aN8APQOInrhrjzY86ITCD2JjyzALr4ShePt3UFgQuvAkyiiipfZdNG2Y0iTJS6Tj
+         Zh5w==
+X-Gm-Message-State: AJIora+qNy+seQDTlwTMlN39AYJgn1nZsBr7PO1/4uXPq/Rb6Fzd+6S8
+	UYLwIvG2lwYXacXb/8jo37ZVC5PJncA=
+X-Google-Smtp-Source: AGRyM1ts2nRIQF/q/A3muVWe9X/+b3ognBuq59kOHBKTbZnNqY/U/HNYfB8PowNAqDeY9Zczw6Jveg==
+X-Received: by 2002:a17:90b:1a8c:b0:1ed:1afb:7a73 with SMTP id ng12-20020a17090b1a8c00b001ed1afb7a73mr11811602pjb.144.1656612360655;
+        Thu, 30 Jun 2022 11:06:00 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id h6-20020a170902680600b00163ffe73300sm13777187plk.137.2022.06.30.11.05.58
+        by smtp.gmail.com with ESMTPSA id h6-20020a170902680600b00163ffe73300sm13777187plk.137.2022.06.30.11.05.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 11:05:59 -0700 (PDT)
+        Thu, 30 Jun 2022 11:06:00 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/7] auto-t: iwd.py: add DPP properties
-Date: Thu, 30 Jun 2022 11:03:25 -0700
-Message-Id: <20220630180331.206419-1-prestwoj@gmail.com>
+Subject: [PATCH 2/7] auto-t: add client test to testKnownNetworks
+Date: Thu, 30 Jun 2022 11:03:26 -0700
+Message-Id: <20220630180331.206419-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220630180331.206419-1-prestwoj@gmail.com>
+References: <20220630180331.206419-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,33 +53,56 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+Tests iwctl functionality with known-networks command
 ---
- autotests/util/iwd.py | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ .../testKnownNetworks/known_network_test.py   | 23 +++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 5591d7e1..df310a32 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -294,6 +294,18 @@ class DeviceProvisioning(IWDDBusAbstract):
-     def stop(self):
-         self._iface.Stop()
+diff --git a/autotests/testKnownNetworks/known_network_test.py b/autotests/testKnownNetworks/known_network_test.py
+index 2bdcc955..a383e5ff 100644
+--- a/autotests/testKnownNetworks/known_network_test.py
++++ b/autotests/testKnownNetworks/known_network_test.py
+@@ -2,10 +2,11 @@
  
-+    @property
-+    def uri(self):
-+        return self._properties['URI']
+ import unittest
+ import sys
++import subprocess
+ 
+ sys.path.append('../util')
+-import iwd
+ from iwd import IWD
++from config import ctx
+ 
+ class Test(unittest.TestCase):
+ 
+@@ -70,8 +71,26 @@ class Test(unittest.TestCase):
+ 
+         self.list_removal_and_addition(wd)
+ 
++    def test_client_known_networks(self):
++        networks = ['Hotspot Network', 'ssidOpen', 'ssidTKIP', 'ssidEAP-TLS']
++        wd = IWD(True)
 +
-+    @property
-+    def started(self):
-+        return self._properties['Started']
++        iwctl = ctx.start_process(['iwctl', 'known-networks', 'list'], check=True)
 +
-+    @property
-+    def role(self):
-+        return self._properties['Role']
++        for n in networks:
++            self.assertIn(n, iwctl.out)
 +
- class Device(IWDDBusAbstract):
-     '''
-         Class represents a network device object: net.connman.iwd.Device
++        for n in networks:
++            ctx.start_process(['iwctl', 'known-networks', n, 'show'], check=True)
++
++        networks.remove('ssidOpen')
++        ctx.start_process(['iwctl', 'known-networks', 'ssidOpen', 'forget'], check=True)
++
++        with self.assertRaises(subprocess.CalledProcessError):
++            ctx.start_process(['iwctl', 'known-networks', 'ssidOpen', 'show'], check=True)
++
+     @classmethod
+-    def setUpClass(cls):
++    def setUp(self):
+         IWD.copy_to_storage('known_networks/ssidOpen.open')
+         IWD.copy_to_storage('known_networks/ssidTKIP.psk')
+         IWD.copy_to_storage('known_networks/ssidEAP-TLS.8021x')
 -- 
 2.34.1
 
