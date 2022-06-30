@@ -1,47 +1,47 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66017B
-	for <iwd@lists.linux.dev>; Thu, 30 Jun 2022 18:06:01 +0000 (UTC)
-Received: by mail-pl1-f179.google.com with SMTP id jh14so89793plb.1
-        for <iwd@lists.linux.dev>; Thu, 30 Jun 2022 11:06:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E90B746A
+	for <iwd@lists.linux.dev>; Thu, 30 Jun 2022 18:06:02 +0000 (UTC)
+Received: by mail-pl1-f181.google.com with SMTP id r1so51594plo.10
+        for <iwd@lists.linux.dev>; Thu, 30 Jun 2022 11:06:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=+o1nLAtiA1ovow+LoyeteKJX/MfOtqjxXhBG/kg4zjk=;
-        b=AQVwDY5WxEfM9KFDmOQTOQgSEMyqEw4dQ0T7/XYvhh5/KZyBnsBtCcFPWLEQyaZUJe
-         kMWs/1IDtUwlM7Mmlg4nahIqwAQE0eqaVO0BQ8ihK4opceEP3tcTnYH+Ty/JEF+Uz5/+
-         0mHeiLEq0UosFtMbLL4uOxaNS97luz5xrD6C0flto+m9/WehzNd7pB9b7Ax0BY4f/jet
-         QvfvUo5U96HNLIbPsfBcbTX6hQ1Fbnnkn5kPJKOIbKMVHQOLrFcg/0osC+blSaUKnKby
-         BOcii9qD1G0wTILARYLQkK4gEnOgnrHxdlRUv1W16vQ+iSFaEkqV8kSN1rwnMTKjfCnh
-         2PHg==
+        bh=WnNhMt2Hzuc0vXrTWH6rZReuZu7TSMyg/rWTjU3eC/k=;
+        b=ZLrC/RgWLFpQ+klLpUAgW+uEB6QMCtUDf9ESeith6fqWOKzH7rNg0NYSP6X/ORw0do
+         qTPfQUHgfBRLs5Y0NQSovZyzpVirRhdgGBmpyK4muwv7G9LdMKtiC6pdNvFlS55YdB9I
+         4eQ/ZivR2JVxbcmMG3X5P/jcxjymh4d+8OZt0MxLASNWBMFeMt8fOXmQXSEVDbcQkh9y
+         a0Hj3GqGQSQB77Phn56qC2FJIGMpQTtLL0lleRb61w3MsEavBznBnaGKWI75lIm32bFX
+         wuIBUVKOYfGAcvd/W203BknHfdJAjvNH87RYl/cKudKt4cz3I7q+iBm2AKD24jMWeQLD
+         +f4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=+o1nLAtiA1ovow+LoyeteKJX/MfOtqjxXhBG/kg4zjk=;
-        b=we0WWpZIvkJjzfTze5pyEztaGLIEICAjg6t1RyWNDM5vS208v1wreZFzB2Y9kLBtT3
-         sQV//SaRJOOz9pVdKXeA0p6rxcuDMw53UWEi7S+8Ib9OHr4HzB31iA8Iy+AJKTo1FXpi
-         AHiQvO5hY2UINxIlcUS8abAaiNWQG32/ChG9vqePaL1pVz0LLq8lRFdvLbpyWZruPkGt
-         6GKBGws72c7uN+4sexZfxx9uIzv81iKuGCMVlwPGn3Sh+bGaxByxjmCAqvNMrzgask4Y
-         fhU2aN8APQOInrhrjzY86ITCD2JjyzALr4ShePt3UFgQuvAkyiiipfZdNG2Y0iTJS6Tj
-         Zh5w==
-X-Gm-Message-State: AJIora+qNy+seQDTlwTMlN39AYJgn1nZsBr7PO1/4uXPq/Rb6Fzd+6S8
-	UYLwIvG2lwYXacXb/8jo37ZVC5PJncA=
-X-Google-Smtp-Source: AGRyM1ts2nRIQF/q/A3muVWe9X/+b3ognBuq59kOHBKTbZnNqY/U/HNYfB8PowNAqDeY9Zczw6Jveg==
-X-Received: by 2002:a17:90b:1a8c:b0:1ed:1afb:7a73 with SMTP id ng12-20020a17090b1a8c00b001ed1afb7a73mr11811602pjb.144.1656612360655;
-        Thu, 30 Jun 2022 11:06:00 -0700 (PDT)
+        bh=WnNhMt2Hzuc0vXrTWH6rZReuZu7TSMyg/rWTjU3eC/k=;
+        b=sjCgzkR/KLj2lT8N3rJgTwNrzuY+SpLYe18gPp0aihzpMWoAZy5qDA4ZBxUlEG/GwI
+         SHUxX5gK9N7PtbJuUP9lX6xSnlWEKSFB8ttVkEljL/vq3Dkw3qtKPi0kgUlmYyfRGGJK
+         a38tlvvwm7nEd3xIOvo1hThyXl+xcsE4jVa/498g4ynDlmUw4cqcrmY0GTmMiLmNYg5I
+         J35fdwEdT6Fz2OF+UwJiWGW9jpJzR9+GNRRn4XCT6XqcTLd9KxHqSF6+UeLPzU0XRAdj
+         Z1uK86mJqMHGdeg0sak73OX58uWo5aXq61tmFy+d3OqTpAMnFNsF8y1V5Nr8Vmt/wtYq
+         A2LA==
+X-Gm-Message-State: AJIora+s4u52tnRZ0XrxmOAegOhhEWiYy41bDBTWoxDJICB+xEXmBa+g
+	1J/8Qyti7nn2Z8ISAJ/S84IgFOGDR6A=
+X-Google-Smtp-Source: AGRyM1uom0LM2ofiwkGkjXEPQYkw4IBg+VvhSgq45mFNpfZVX6xajGC1jVazjPPXNGruHMev5nqCKw==
+X-Received: by 2002:a17:90a:410a:b0:1ef:3ca7:79a5 with SMTP id u10-20020a17090a410a00b001ef3ca779a5mr4437660pjf.154.1656612361495;
+        Thu, 30 Jun 2022 11:06:01 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id h6-20020a170902680600b00163ffe73300sm13777187plk.137.2022.06.30.11.05.59
+        by smtp.gmail.com with ESMTPSA id h6-20020a170902680600b00163ffe73300sm13777187plk.137.2022.06.30.11.06.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 11:06:00 -0700 (PDT)
+        Thu, 30 Jun 2022 11:06:01 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/7] auto-t: add client test to testKnownNetworks
-Date: Thu, 30 Jun 2022 11:03:26 -0700
-Message-Id: <20220630180331.206419-2-prestwoj@gmail.com>
+Subject: [PATCH 3/7] auto-t: add client test to testEAP-WPS
+Date: Thu, 30 Jun 2022 11:03:27 -0700
+Message-Id: <20220630180331.206419-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220630180331.206419-1-prestwoj@gmail.com>
 References: <20220630180331.206419-1-prestwoj@gmail.com>
@@ -53,56 +53,101 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Tests iwctl functionality with known-networks command
+Tests iwctl functionality with wsc commands
 ---
- .../testKnownNetworks/known_network_test.py   | 23 +++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ autotests/testEAP-WPS/four_digit_pin_test.py | 16 +++++++++++-----
+ autotests/testEAP-WPS/push_button_test.py    | 17 ++++++++++++-----
+ 2 files changed, 23 insertions(+), 10 deletions(-)
 
-diff --git a/autotests/testKnownNetworks/known_network_test.py b/autotests/testKnownNetworks/known_network_test.py
-index 2bdcc955..a383e5ff 100644
---- a/autotests/testKnownNetworks/known_network_test.py
-+++ b/autotests/testKnownNetworks/known_network_test.py
-@@ -2,10 +2,11 @@
- 
- import unittest
+diff --git a/autotests/testEAP-WPS/four_digit_pin_test.py b/autotests/testEAP-WPS/four_digit_pin_test.py
+index 7bdb57cb..d30492fb 100644
+--- a/autotests/testEAP-WPS/four_digit_pin_test.py
++++ b/autotests/testEAP-WPS/four_digit_pin_test.py
+@@ -4,22 +4,23 @@ import unittest
  import sys
-+import subprocess
  
  sys.path.append('../util')
 -import iwd
  from iwd import IWD
+-from iwd import DeviceState
+-
+ from hostapd import HostapdCLI
 +from config import ctx
  
  class Test(unittest.TestCase):
  
-@@ -70,8 +71,26 @@ class Test(unittest.TestCase):
+-    def four_digit_pin_success(self, wd):
++    def four_digit_pin_success(self, wd, client=False):
  
-         self.list_removal_and_addition(wd)
+         devices = wd.list_devices(1)
+         device = devices[0]
+         pin = '1234'
+         self.hostapd.wps_pin(pin)
  
-+    def test_client_known_networks(self):
-+        networks = ['Hotspot Network', 'ssidOpen', 'ssidTKIP', 'ssidEAP-TLS']
+-        device.wps_start_pin(pin)
++        if not client:
++            device.wps_start_pin(pin)
++        else:
++            ctx.start_process(['iwctl', 'wsc', device.name, 'start-user-pin', pin], check=True)
+ 
+         condition = 'obj.state == DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+@@ -36,6 +37,11 @@ class Test(unittest.TestCase):
+ 
+         self.four_digit_pin_success(wd)
+ 
++    def test_client_four_digit_pin(self):
 +        wd = IWD(True)
 +
-+        iwctl = ctx.start_process(['iwctl', 'known-networks', 'list'], check=True)
-+
-+        for n in networks:
-+            self.assertIn(n, iwctl.out)
-+
-+        for n in networks:
-+            ctx.start_process(['iwctl', 'known-networks', n, 'show'], check=True)
-+
-+        networks.remove('ssidOpen')
-+        ctx.start_process(['iwctl', 'known-networks', 'ssidOpen', 'forget'], check=True)
-+
-+        with self.assertRaises(subprocess.CalledProcessError):
-+            ctx.start_process(['iwctl', 'known-networks', 'ssidOpen', 'show'], check=True)
++        self.four_digit_pin_success(wd, client=True)
 +
      @classmethod
--    def setUpClass(cls):
-+    def setUp(self):
-         IWD.copy_to_storage('known_networks/ssidOpen.open')
-         IWD.copy_to_storage('known_networks/ssidTKIP.psk')
-         IWD.copy_to_storage('known_networks/ssidEAP-TLS.8021x')
+     def setUpClass(cls):
+         cls.hostapd = HostapdCLI(config='ssidWPS.conf')
+diff --git a/autotests/testEAP-WPS/push_button_test.py b/autotests/testEAP-WPS/push_button_test.py
+index 08463f15..e2b4c2b2 100644
+--- a/autotests/testEAP-WPS/push_button_test.py
++++ b/autotests/testEAP-WPS/push_button_test.py
+@@ -4,20 +4,22 @@ import unittest
+ import sys
+ 
+ sys.path.append('../util')
+-import iwd
+ from iwd import IWD
+-from iwd import DeviceState
+-
+ from hostapd import HostapdCLI
++from config import ctx
++
+ class Test(unittest.TestCase):
+ 
+-    def push_button_success(self, wd):
++    def push_button_success(self, wd, client=False):
+         self.hostapd.wps_push_button()
+ 
+         devices = wd.list_devices(1)
+         device = devices[0]
+ 
+-        device.wps_push_button()
++        if not client:
++            device.wps_push_button()
++        else:
++            ctx.start_process(['iwctl', 'wsc', device.name, 'push-button'], check=True)
+ 
+         condition = 'obj.state == DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
+@@ -34,6 +36,11 @@ class Test(unittest.TestCase):
+ 
+         self.push_button_success(wd)
+ 
++    def test_client_push_button(self):
++        wd = IWD(True)
++
++        self.push_button_success(wd, client=True)
++
+     @classmethod
+     def setUpClass(cls):
+         cls.hostapd = HostapdCLI(config='ssidWPS.conf')
 -- 
 2.34.1
 
