@@ -1,47 +1,47 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859C16651
-	for <iwd@lists.linux.dev>; Wed,  6 Jul 2022 21:31:12 +0000 (UTC)
-Received: by mail-pl1-f182.google.com with SMTP id z1so8899588plb.1
-        for <iwd@lists.linux.dev>; Wed, 06 Jul 2022 14:31:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBB653BA
+	for <iwd@lists.linux.dev>; Wed,  6 Jul 2022 21:31:10 +0000 (UTC)
+Received: by mail-pj1-f42.google.com with SMTP id o31-20020a17090a0a2200b001ef7bd037bbso11635878pjo.0
+        for <iwd@lists.linux.dev>; Wed, 06 Jul 2022 14:31:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=nhQtO/Y2h9D6l5zhv4lQX1YLXzkVZFFQJbFi4F+4SY8=;
-        b=bgEUd2cswzSMAEiJh+qfMPA5JaAlnyJanNvsLMuM67Y0r/7TB29fROxxvE6z4gV6Ky
-         XHS3gmmJB3pc8/AuKtg0/Pc/XSMoejixLhC93Rc0Q9dG2UIkazMMfcuN3qhnAwsS2gE4
-         CzVIUAsh69fX9HrZ7G6/neRGSBBm7DeDOwLFT9QYguyRqrwSYsLVRp7FfNQKIjihUXfR
-         7yTXfV++rdCsTPKzXhoSJN6Unw9DCY1UMdVwbga7jh85Be1to65nlzCsAJbGHioMVld+
-         ZALrEItQsygIj0cH6aAxW2MAGeLvUVlBzoYiu4ZJ7mbRbnjJxmMZ34KuDeWnnfYK+mqu
-         jtuw==
+        bh=rRdtgstkk3/2WInkCaBSCRTBij0JsCS6mhIC+ypjjWA=;
+        b=kCM38qZ8y0kNhnHaUHJ8jz79GrHgXjgeKoI3n35f2CQEJ9q7zW5rVXO0h3MUYP6q9A
+         lfZ2uFl7vk/K7gCw2z9QA9T58NIIZauqStYbn8I1vf+VPEkCcdb8SSls50ykdpj1qES0
+         eJzMy/X4RPoppFf9tNDHhdqBt+URfWwGTeKMtsYa4Aq2Ixl+1dAg2Z/h/IlGs5klnd/E
+         ca+0SlU03VRWocsPHZ78+HlcItxQX7QcKdnc9gf+d90c36MOvGw1BlsjlRxx65HbtHXR
+         ZsX04TnqZX6XhZ8gCuE+I/0GA5B22tdxdmYBQJBHYvUFP1EgsbvOYADX5XIL89/sbn1C
+         xQ6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=nhQtO/Y2h9D6l5zhv4lQX1YLXzkVZFFQJbFi4F+4SY8=;
-        b=zPIsP32TO0hFs0FdcONP4JF3p7HFQIh/td7pwSW9A6U6ifEJh5BCKkp/wTpHYT8lI1
-         6AUfVNdGmrObbwnQGSPkuJeOmU5jPSef2BRJ8hCwZ3GSNCXV4m8QXyCW72ttybfD73nY
-         aIDxFalyv6qaqmKUzOEL7esVQDzitaaCg31kZlc1rpXrokwjKqqXF4uxdnxyzR+k0fxS
-         kBOIF/lisP3OB3JP5OD/ISZJyWETX+HV9ObV5dKI9IVnnK002HHxjBjzfBeOl9Ee3+0N
-         l9k/l6+a1lYN9+yyZb4Mi9WoiWeaeFSIWhfsudLKUBszz0nW5Kl/fZza0c2+1uPmKGlk
-         vg/Q==
-X-Gm-Message-State: AJIora9y3DGaVRhkHFDVeomTZ6dQSazqVQGO6ylDLWR2BN7V7k76pf8r
-	Sw0cwf5F4DWiy7zPyt2EIUF9dOa6fcY=
-X-Google-Smtp-Source: AGRyM1uFM0eX8EzwUchIFzZBpm7QEo8dFv2RSrzMVwxdzmbR147M4pP/SeN2iFRyf0o/zWzKemTMPA==
-X-Received: by 2002:a17:90b:3e85:b0:1ed:5a12:513c with SMTP id rj5-20020a17090b3e8500b001ed5a12513cmr866642pjb.64.1657143071743;
-        Wed, 06 Jul 2022 14:31:11 -0700 (PDT)
+        bh=rRdtgstkk3/2WInkCaBSCRTBij0JsCS6mhIC+ypjjWA=;
+        b=4WPt4C4288Zn0HipIn7IL89TyYrShyfTBKNTD53CMvSWgiuNKnlrs56nNVZuAJEYE9
+         XPShTuSNy5gemgQMMgWC3yF2EyzP+w+Bn3P8xZABaEuI3XaUDbyAAYehy+gdVEaiHwGs
+         dJNeyGSeR8LJ0GyN4vwUBhlU9qjTc44NDdcs/Y3RugXq/36OV3HYCk0MFTbxyi0UGF+i
+         XdWTy1I7Rb/gE2s4zoHVpN+qMc/kcaGn9KVkk7KYXFLknKEqiX9mx/pyUnx8R4hcxe98
+         mz/KUeYweWfpQl2OfxVnwuqcccF1PV8xQAhb3HTvlvfEimBroanedSAIoXYS7N8fQTVx
+         hBXA==
+X-Gm-Message-State: AJIora+7Rz/8AXmnikWtk9FNlaJQbAe4S7B2Lja0HLBa2lWcMI5Wd8gD
+	r+A7Hs/0QYfp+tBk4rHUIBjUArjli6U=
+X-Google-Smtp-Source: AGRyM1ur8KwEFWErTC9V1oInBJZH5K+3OusyDsybBckChMUqPH3geDfEsr4egMKlxZFbKtWCePt91A==
+X-Received: by 2002:a17:90a:9a8e:b0:1ef:7c8f:4522 with SMTP id e14-20020a17090a9a8e00b001ef7c8f4522mr828392pjp.151.1657143069716;
+        Wed, 06 Jul 2022 14:31:09 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id v6-20020aa799c6000000b00527f5aee1a4sm15347609pfi.33.2022.07.06.14.31.11
+        by smtp.gmail.com with ESMTPSA id v6-20020aa799c6000000b00527f5aee1a4sm15347609pfi.33.2022.07.06.14.31.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 14:31:11 -0700 (PDT)
+        Wed, 06 Jul 2022 14:31:09 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 13/14] client: update adapter table header
-Date: Wed,  6 Jul 2022 14:28:50 -0700
-Message-Id: <20220706212851.92685-13-prestwoj@gmail.com>
+Subject: [PATCH 11/14] client: update command table header
+Date: Wed,  6 Jul 2022 14:28:48 -0700
+Message-Id: <20220706212851.92685-11-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220706212851.92685-1-prestwoj@gmail.com>
 References: <20220706212851.92685-1-prestwoj@gmail.com>
@@ -55,43 +55,52 @@ Content-Transfer-Encoding: 8bit
 
 The table header needs to be adjusted to include spaces between
 columns.
-
-The 'adapter list' command was also updated to shorted a few
-columns which were quite long for the data that is actually displayed.
 ---
- client/adapter.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ client/command.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/client/adapter.c b/client/adapter.c
-index 6a0d3455..394eae0d 100644
---- a/client/adapter.c
-+++ b/client/adapter.c
-@@ -185,9 +185,10 @@ static void display_adapter_inline(const char *margin, const void *data)
- {
- 	const struct adapter *adapter = data;
+diff --git a/client/command.c b/client/command.c
+index 74f11c4a..c0576e97 100644
+--- a/client/command.c
++++ b/client/command.c
+@@ -509,16 +509,16 @@ static void list_commands(const char *command_family,
  
--	display("%s%-*s%-*s%-.*s%-.*s\n", margin,
--		19, adapter->name ? : "-", 10, get_powered_tostr(adapter),
--		20, adapter->vendor ? : "-", 20, adapter->model ? : "-");
-+	display_table_row(margin, 4, 8, adapter->name ? : "-",
-+				8, get_powered_tostr(adapter),
-+				20, adapter->vendor ? : "-",
-+				20, adapter->model ? : "-");
+ static void list_cmd_options(void)
+ {
+-	display(MARGIN "--%-*s%s\n", 48, COMMAND_OPTION_USERNAME,
++	display(MARGIN "--%-*s  %s\n", 48, COMMAND_OPTION_USERNAME,
+ 					"Provide username");
+-	display(MARGIN "--%-*s%s\n", 48, COMMAND_OPTION_PASSWORD,
++	display(MARGIN "--%-*s  %s\n", 48, COMMAND_OPTION_PASSWORD,
+ 					"Provide password");
+-	display(MARGIN "--%-*s%s\n", 48, COMMAND_OPTION_PASSPHRASE,
++	display(MARGIN "--%-*s  %s\n", 48, COMMAND_OPTION_PASSPHRASE,
+ 					"Provide passphrase");
+-	display(MARGIN "--%-*s%s\n", 48, COMMAND_OPTION_DONTASK,
++	display(MARGIN "--%-*s  %s\n", 48, COMMAND_OPTION_DONTASK,
+ 					"Don't ask for missing\n"
+-					"\t\t\t\t\t\t    credentials");
+-	display(MARGIN "--%-*s%s\n", 48, "help", "Display help");
++					"\t\t\t\t\t\t      credentials");
++	display(MARGIN "--%-*s  %s\n", 48, "help", "Display help");
  }
  
- static void *adapter_create(void)
-@@ -268,8 +269,9 @@ static const struct proxy_interface *get_adapter_proxy_by_name(
- static enum cmd_status cmd_list(const char *adapter_name,
- 						char **argv, int argc)
- {
--	display_table_header("Adapters", MARGIN "%-*s%-*s%-*s%-*s", 19, "Name",
--				10, "Powered", 20, "Vendor", 20, "Model");
-+	display_table_header("Adapters", MARGIN "%-*s  %-*s  %-*s  %-*s",
-+				8, "Name", 8, "Powered",
-+				20, "Vendor", 20, "Model");
+ static void list_cmd_families(void)
+@@ -542,12 +542,12 @@ static void command_display_help(void)
+ 	display(MARGIN "iwctl [--options] [commands]\n");
+ 	display_table_footer();
  
- 	proxy_interface_display_list(adapter_interface_type.interface);
+-	display_table_header("Available options", MARGIN "%-*s%-*s",
++	display_table_header("Available options", MARGIN "%-*s  %-*s",
+ 					50, "Options", 28, "Description");
+ 	list_cmd_options();
+ 	display_table_footer();
  
+-	display_table_header("Available commands", MARGIN "%-*s%-*s",
++	display_table_header("Available commands", MARGIN "%-*s  %-*s",
+ 					50, "Commands", 28, "Description");
+ 	list_cmd_families();
+ 	display_table_footer();
 -- 
 2.34.1
 
