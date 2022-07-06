@@ -1,36 +1,36 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A9B5390
-	for <iwd@lists.linux.dev>; Wed,  6 Jul 2022 16:57:20 +0000 (UTC)
-Received: by mail-wr1-f45.google.com with SMTP id f2so17544848wrr.6
-        for <iwd@lists.linux.dev>; Wed, 06 Jul 2022 09:57:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E947538E
+	for <iwd@lists.linux.dev>; Wed,  6 Jul 2022 16:57:24 +0000 (UTC)
+Received: by mail-wr1-f54.google.com with SMTP id v16so11470950wrd.13
+        for <iwd@lists.linux.dev>; Wed, 06 Jul 2022 09:57:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=AkRCqMqOAI4MxU+FKUC5JmYcC5eB+RU9kqBfTbQ6TIE=;
-        b=ah7aG1j/lfqhqVR7mid0EsKU6Ce65VhqDEY9RTXygQFDtbxRb3728aJdyz1kwOAEmx
-         3tFeeWWPliJdNEGCyqHYQaI4q3X20yIq1o+3f5ChB4DgyDN3CEHnz1Qx7Q9Ah6P0KYHD
-         ed66w67Llw4rXWdjdi68S76zk2zE4NW0W1m9cu8X0Da5/zSTAkHlW+BGdLdMezbcQ77/
-         1KchT3XcDDvLBweJ9dMw8kgC+/S2r9y+eGGBUUxd7/tJ+7h/fZgE2H97qOABEASnNqs4
-         mplmugm2gq2hTN8YyyMXx9KeegOI5KKrfkX/yuXOMcKKdT7r934fwvcPvmT+xhoFHcuv
-         OJDg==
-X-Gm-Message-State: AJIora+EKpQ8rnn9cj46GoNsvjtZ+8UnNMhHJNvsIEQM1hL7DrD/85xZ
-	ffWOIcJ5x/Uz6jLqFbH4aPQnoqlzhxMyWrGu
-X-Google-Smtp-Source: AGRyM1s+k7HHnJsx69syTrOjhE8kTKsPpUG6q0q0gacAJOVzLoEugfbHw6JSCittUx4rz2sm3MpFpQ==
-X-Received: by 2002:a5d:6487:0:b0:21b:983c:5508 with SMTP id o7-20020a5d6487000000b0021b983c5508mr37869787wri.185.1657126638375;
-        Wed, 06 Jul 2022 09:57:18 -0700 (PDT)
+        bh=OzTh6igeO54jbl7BgIiqX7fqS3m8ywvuTz5lfA1RBQ8=;
+        b=cfmsMWLCBRwPYwuUiQS7FAuYPREh7grHbOnKFvrB8JTHeBjiiMgCBHApTOvrIM9YAm
+         7iYHVnGz2pXcimYuOxxkAZQKW9lZJMQyMmWw3/TUplY4NWGLmO/KZbKCaxJtnU9MnH/T
+         9tpj1BeRLS4r/4LV7Vzkx0qL8GQa4HRVAu5Jlch0ozcRwcvL6lOdvKNCfJEt9QX30ZX4
+         Qsi89LAtnq+71cIIyCl3saUOhBZQXqRINuqX/heCAc8MvyChtWiGaz4zLhIGOioZgoeg
+         r9QVewimxCdopV9E7xZWKfUQK0rWiTjWsmppiA/EiE0b2v3H82p1jYX/4FncF1Hc4jsS
+         zoQw==
+X-Gm-Message-State: AJIora+YHRmyzcowFVKiXvfsuQOGiqLPX/KRAelT/zIlmdySVvgxUK23
+	kcMWVKhCDM8uhk8Ab8hCgCRcSMcbI5llr0fW
+X-Google-Smtp-Source: AGRyM1tVIlIAKxuRodtoXqDJMvPfUPeX6MXemefJRtyD+HR71VrMEZVyt3QVG2tQMzGePugOuKyKsg==
+X-Received: by 2002:a5d:4889:0:b0:21b:293e:9e43 with SMTP id g9-20020a5d4889000000b0021b293e9e43mr38077095wrq.705.1657126643377;
+        Wed, 06 Jul 2022 09:57:23 -0700 (PDT)
 Received: from localhost.localdomain ([46.222.51.165])
-        by smtp.gmail.com with ESMTPSA id j8-20020a05600c190800b0039c5642e430sm29147856wmq.20.2022.07.06.09.57.16
+        by smtp.gmail.com with ESMTPSA id j8-20020a05600c190800b0039c5642e430sm29147856wmq.20.2022.07.06.09.57.21
         for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 09:57:18 -0700 (PDT)
+        Wed, 06 Jul 2022 09:57:22 -0700 (PDT)
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
 To: iwd@lists.linux.dev
-Subject: [PATCH 3/5] autotests: Also validate correct hostname sent over DHCPv4
-Date: Wed,  6 Jul 2022 18:57:00 +0200
-Message-Id: <20220706165702.3241756-3-andrew.zaborowski@intel.com>
+Subject: [PATCH 5/5] test-runner: Mark source directory as safe for git
+Date: Wed,  6 Jul 2022 18:57:02 +0200
+Message-Id: <20220706165702.3241756-5-andrew.zaborowski@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220706165702.3241756-1-andrew.zaborowski@intel.com>
 References: <20220706165702.3241756-1-andrew.zaborowski@intel.com>
@@ -42,60 +42,57 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- autotests/testNetconfig/auto.psk           | 5 +++++
- autotests/testNetconfig/connection_test.py | 5 +++++
- 2 files changed, 10 insertions(+)
- create mode 100644 autotests/testNetconfig/auto.psk
+Since we use git ls-files to produce the list of all tests (without -A), if
+the source directory is owned by somebody other than root one might get:
 
-diff --git a/autotests/testNetconfig/auto.psk b/autotests/testNetconfig/auto.psk
-new file mode 100644
-index 00000000..4077d65f
---- /dev/null
-+++ b/autotests/testNetconfig/auto.psk
-@@ -0,0 +1,5 @@
-+[IPv4]
-+SendHostname=true
-+
-+[Settings]
-+AutoConnect=false
-diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNetconfig/connection_test.py
-index aebb0a2e..cf90993a 100644
---- a/autotests/testNetconfig/connection_test.py
-+++ b/autotests/testNetconfig/connection_test.py
-@@ -36,6 +36,8 @@ class Test(unittest.TestCase):
-                     return socket.inet_pton(socket.AF_INET6, l.split(None, 1)[1].split('/', 1)[0])
-             return None
- 
-+        os.system("hostname test-sta")
-+        IWD.copy_to_storage('auto.psk', name='ap-ns1.psk')
-         wd = IWD(True)
- 
-         psk_agent = PSKAgent("secret123")
-@@ -109,6 +111,7 @@ class Test(unittest.TestCase):
-         leases_file = self.parse_lease_file('/tmp/dhcpd.leases', socket.AF_INET)
-         lease = leases_file['leases'][socket.inet_pton(socket.AF_INET, '192.168.1.10')]
-         self.assertEqual(lease['state'], 'active')
-+        self.assertEqual(lease['client-hostname'], 'test-sta')
-         self.assertTrue(lease['starts'] < connect_time)
-         self.assertTrue(lease['ends'] > connect_time)
-         # The T1 is 15 seconds per dhcpd.conf.  This is the approximate interval between lease
-@@ -123,6 +126,7 @@ class Test(unittest.TestCase):
-         leases_file = self.parse_lease_file('/tmp/dhcpd.leases', socket.AF_INET)
-         new_lease = leases_file['leases'][socket.inet_pton(socket.AF_INET, '192.168.1.10')]
-         self.assertEqual(new_lease['state'], 'active')
-+        self.assertEqual(new_lease['client-hostname'], 'test-sta')
-         self.assertTrue(new_lease['starts'] > lease['starts'] + 10)
-         self.assertTrue(new_lease['starts'] < lease['starts'] + 25)
-         self.assertTrue(new_lease['ends'] > lease['ends'] + 10)
-@@ -162,6 +166,7 @@ class Test(unittest.TestCase):
-         leases_file = self.parse_lease_file('/tmp/dhcpd.leases', socket.AF_INET)
-         new_lease = leases_file['leases'][socket.inet_pton(socket.AF_INET, '192.168.1.10')]
-         self.assertEqual(new_lease['state'], 'active')
-+        self.assertEqual(lease['client-hostname'], 'test-sta')
-         self.assertTrue(new_lease['starts'] > lease['starts'] + 70)
-         self.assertTrue(new_lease['starts'] < lease['starts'] + 85)
-         self.assertTrue(new_lease['ends'] > lease['ends'] + 70)
+fatal: unsafe repository ('/home/balrog/repos/iwd' is owned by someone else)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/balrog/repos/iwd
+
+Starting
+/home/balrog/repos/iwd/tools/..//autotests/ threw an uncaught exception
+Traceback (most recent call last):
+  File "/home/balrog/repos/iwd/tools/run-tests", line 966, in run_auto_tests
+    subtests = pre_test(ctx, test, copied)
+  File "/home/balrog/repos/iwd/tools/run-tests", line 814, in pre_test
+    raise Exception("No hw.conf found for %s" % test)
+Exception: No hw.conf found for /home/balrog/repos/iwd/tools/..//autotests/
+
+Mark args.testhome as a safe directory on every run.
+---
+ tools/run-tests | 4 +++-
+ tools/runner.py | 1 +
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tools/run-tests b/tools/run-tests
+index f916fba6..c32fbe34 100755
+--- a/tools/run-tests
++++ b/tools/run-tests
+@@ -628,8 +628,10 @@ def build_test_list(args):
+ 	# Run all tests
+ 	if not args.autotests:
+ 		# Get list of all autotests (committed in git)
++		Process(['git', 'config', '--system', '--add', 'safe.directory',
++					os.path.normpath(args.testhome)]).wait()
+ 		tests = os.popen('git -C %s ls-files autotests/ | cut -f2 -d"/" \
+-					| grep "test*" | uniq' % args.testhome).read() \
++					| grep "^test" | uniq' % args.testhome).read() \
+ 					.strip().split('\n')
+ 		tests = [test_root + '/' + t for t in tests]
+ 	else:
+diff --git a/tools/runner.py b/tools/runner.py
+index d39b560f..164bc881 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -36,6 +36,7 @@ mounts_common = [
+ 	MountInfo('tmpfs', 'tmpfs', '/run', 'mode=0755',
+ 					MS_NOSUID|MS_NODEV|MS_STRICTATIME),
+ 	MountInfo('tmpfs', 'tmpfs', '/tmp', '', 0),
++	MountInfo('tmpfs', 'tmpfs', '/etc', '', 0),
+ 	MountInfo('tmpfs', 'tmpfs', '/usr/share/dbus-1', 'mode=0755',
+ 					MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME),
+ ]
 -- 
 2.34.1
 
