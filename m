@@ -1,47 +1,47 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3732F21
-	for <iwd@lists.linux.dev>; Wed,  6 Jul 2022 22:21:32 +0000 (UTC)
-Received: by mail-pg1-f172.google.com with SMTP id g4so15183544pgc.1
-        for <iwd@lists.linux.dev>; Wed, 06 Jul 2022 15:21:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8713A665F
+	for <iwd@lists.linux.dev>; Wed,  6 Jul 2022 22:21:33 +0000 (UTC)
+Received: by mail-pf1-f174.google.com with SMTP id j3so3001234pfb.6
+        for <iwd@lists.linux.dev>; Wed, 06 Jul 2022 15:21:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=mYEunOFTFC/n9/8Um0rXVxJFt1Z1Q3f5kP2ThqZP93U=;
-        b=hFSmBbai6lDfofr+YHMBOvpbWBcUZdgUgQ8cJecTAqQY6QmHfv8CAnRLfiZUg0ZOmv
-         nKEVVUTLDhnZXBuBl7xebni4gll3KVM/dAC3Mgch8S9iV8FQPqLXKa+EVwwejQCZErIB
-         Q3lMXeZLRfrxFHlkpO6cOKXFAfiYC9v3jz3ncwkWlfobhbt014Q2wnfRkB6GgwAwVd/q
-         1+/Dz8SbOVtF87HGmi9UCfky5x3TBql10eRay60w8tq20rtx42oAyxw9eh8AMByhIuuu
-         ikNUXy1GWWswVyBgXJr0wEsEOwufK9I+3FHHJQqlY6kjN5CVuwSNWb8usxcbAzkOmxSj
-         oThw==
+        bh=BmMZpc14Ab1wbx04tHduSMqXwFCtXithIXdMgoNEut8=;
+        b=BMhSzMPTTi2F/Jko40C1oWojoi5HjPqygRZyoRT0w7bI35o+AP3vEeZjLV8Xf/3Td/
+         y6CAY2QGtoiaXsoGypAR1oYiC9wMA8UxSjgYAX6KZHNVEuBmmyB+iq73VpeaWr1imnRm
+         xY5psgpzpzP/PyFG2RlidMaKwdqYv6BRpQDE14DzVt0b0rY26NAa5LAkkIiZQi5tRlWR
+         oSHFYoNbfiSrWKs61t4cIKZmkYcRWhQkVxNSF6OT087YVAq0fgvfTkRZuIqP8Ywgn+jw
+         r1n8Y4hf+sTG5FGKclq/EC6VXkgQUmt7LfQiSujn1zhrxFcl+fYQRkGGrSJu+Qy9y+2u
+         pOTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=mYEunOFTFC/n9/8Um0rXVxJFt1Z1Q3f5kP2ThqZP93U=;
-        b=yhnplOM5FdXQ+v5YkdEAawn6n4KANWOmQTrYsLTDXt6fLdfY5JwDWNSkIsng6zwsEI
-         LyMifHRtUXGYl6F8RLocPhp58YB3NZYPZmSyfFOaZEsYGV+xA+R33X+XHM016SBCZkuk
-         L3kbxtIJSDS6Jleg2xjFQAhzXWo+RA0W6KIWsKN/RGTz1g+M3IYNUUe8GOWNdr5gQLoI
-         Pm61ut4vWi2+3hMPhey2+40h7wE94CjEdYGHfMhnk9BOZbjmeFJdok2fpnkkJp4KXCd8
-         S7yveO5uD3Ob4X86qPcTiHIVpknYCNPxrh2S/H64izqLnMTDGz0UFa1zzFm4AFSk0d5s
-         rexw==
-X-Gm-Message-State: AJIora8Nhn5UoC7Dn9f6EOe1z+1Aacpb9+uCFu1f1AY1JBJIus8P5S5o
-	VJaUdmAeAzyJaphXLKLKvzqEy6xkjkE=
-X-Google-Smtp-Source: AGRyM1sp6vWcLMlzjE8rG0rHdaPaWtB0cVUCQ3e0qSWnpfQ8k5sZf0ssBceNaK+/fFom7GC2tARaRg==
-X-Received: by 2002:a17:90a:4e05:b0:1ec:8de4:1dd5 with SMTP id n5-20020a17090a4e0500b001ec8de41dd5mr1071738pjh.242.1657146091909;
-        Wed, 06 Jul 2022 15:21:31 -0700 (PDT)
+        bh=BmMZpc14Ab1wbx04tHduSMqXwFCtXithIXdMgoNEut8=;
+        b=obtf1Tmla6+68yfXZGgvIQ19yKcLK2yHCcEYXtbVro3bn7hwhbdjuPH1F2noG83FcE
+         /s/R4vAmj9AlOMewrQyk59iUUNNmUBdC8B/kL/Gca0Y27h7bgC+QgPb24smSx7UAgp6e
+         N6o66Bw8b80kidDbvO3y8Kjasz5zGQnbUXNFTYeq+iOUJxPJ43h3knwY1DbLlsWcFSgT
+         iEpSjYS33GZdoyqFVXIEUW7VNQJEnx6Zs2sl5Nq0LrUBG5dl4vypvzLqYkO1ODL7kRyI
+         ysNoZn1kYHMDUtUA9/feuN2jQy9IID+34SL3jLlmyXnK5hJZddM/RvsNNQoy4FXgroFr
+         5qqQ==
+X-Gm-Message-State: AJIora9qABoUJXDMRV2sZWIfZIB+WbzrQWqHXuCRmbOk1a83SctV+gdE
+	Uo9cI2DmsUN8/ztMz+C75U6yWv8ZX9w=
+X-Google-Smtp-Source: AGRyM1uXBFlFCDzVh1FoOYdSFoSzISeX6UxPImFsLSYqELobYxHXGQhK4r2NZbn58/HcHOFOh1j1fQ==
+X-Received: by 2002:a17:902:c205:b0:16b:f021:4299 with SMTP id 5-20020a170902c20500b0016bf0214299mr12633929pll.70.1657146092740;
+        Wed, 06 Jul 2022 15:21:32 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id u9-20020a170902e80900b0016a163d1cd5sm26517696plg.253.2022.07.06.15.21.31
+        by smtp.gmail.com with ESMTPSA id u9-20020a170902e80900b0016a163d1cd5sm26517696plg.253.2022.07.06.15.21.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 15:21:31 -0700 (PDT)
+        Wed, 06 Jul 2022 15:21:32 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 06/14] client: check NULL return for DPP cmd_show
-Date: Wed,  6 Jul 2022 15:18:59 -0700
-Message-Id: <20220706221907.126408-6-prestwoj@gmail.com>
+Subject: [PATCH v2 07/14] client: update CLEAR_SCREEN to be consistent with others
+Date: Wed,  6 Jul 2022 15:19:00 -0700
+Message-Id: <20220706221907.126408-7-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220706221907.126408-1-prestwoj@gmail.com>
 References: <20220706221907.126408-1-prestwoj@gmail.com>
@@ -53,28 +53,24 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the DPP interface goes away this could return NULL which was
-unchecked. Caught by static analysis.
+Clear screen used a \033 escape sequence while others used a \x
 ---
- client/dpp.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ client/display.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/client/dpp.c b/client/dpp.c
-index cd05a33b..a659f545 100644
---- a/client/dpp.c
-+++ b/client/dpp.c
-@@ -284,6 +284,11 @@ static enum cmd_status cmd_show(const char *device_name,
- 			device_proxy_find(device_name, IWD_DPP_INTERFACE);
- 	char *caption = l_strdup_printf("%s: %s", "DPP", device_name);
+diff --git a/client/display.h b/client/display.h
+index c34cab9c..8e597bb5 100644
+--- a/client/display.h
++++ b/client/display.h
+@@ -30,7 +30,7 @@ struct command_family;
+ #define COLOR_BLUE	"\x1B[94m"
+ #define COLOR_YELLOW	"\x1b[33m"
+ #define COLOR_OFF	"\x1B[0m"
+-#define CLEAR_SCREEN	"\033[2J"
++#define CLEAR_SCREEN	"\x1b[2J"
+ #define MARGIN		"  "
  
-+	if (!proxy) {
-+		display("No DPP interface on device: '%s'\n", device_name);
-+		return CMD_STATUS_INVALID_VALUE;
-+	}
-+
- 	proxy_properties_display(proxy, caption, MARGIN, 20, 47);
- 	l_free(caption);
- 
+ void display(const char *format, ...)
 -- 
 2.34.1
 
