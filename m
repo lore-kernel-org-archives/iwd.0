@@ -1,47 +1,47 @@
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8586646
-	for <iwd@lists.linux.dev>; Wed,  6 Jul 2022 22:21:37 +0000 (UTC)
-Received: by mail-pg1-f175.google.com with SMTP id s206so15174567pgs.3
-        for <iwd@lists.linux.dev>; Wed, 06 Jul 2022 15:21:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0B8666B
+	for <iwd@lists.linux.dev>; Wed,  6 Jul 2022 22:21:38 +0000 (UTC)
+Received: by mail-pf1-f174.google.com with SMTP id g126so1225228pfb.3
+        for <iwd@lists.linux.dev>; Wed, 06 Jul 2022 15:21:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=bK+1hhQOyVtvJnFigsHxDF6e/MUMdEEF7UQ1BjC5dVE=;
-        b=p5mZOSg+H85CQWNnamGEy1gAAyXVfknXDgQMmXrD++fFMqWg59a+XfOrviUGkMgEN2
-         bQq8zHfR61lUZRielt2VVPhuLGGxrhndxCQ1tRneTb0DPkTcYZc9QmXkVjLYkJhL81Qi
-         NCUxXJViVU5GHeiJDdydL0vAOC8RkACzB6rb8efrwe0IEOxmDlvcCQ5l0+K40C9t7HjF
-         vGOfPWZt8rei+6m3n12d6hiDxgeD2J++tpwIxtqbU+RtQ1WmmF0Liuwm3HNWFhpiqOvJ
-         BooNuT1R/90qgjrGcP9A67x2Plp5CQjr5DFEPqhnKoKqJNMt5XAzBi/FJ1IKOwS8roYT
-         6K9w==
+        bh=nhQtO/Y2h9D6l5zhv4lQX1YLXzkVZFFQJbFi4F+4SY8=;
+        b=HJi8gbUOysrULXTmBQA+nehDJvDR0f9/a9w0wTXw7Zde3MmfRjBHQOfy7uv6QqTUZB
+         tu8M+VIVStttGWY6nBm394NtHNRVcIwho5OEgRf9+pp1+FBjMNn/D32ITa2Ld39P+e45
+         aXvmg2+zOlkYvcJOhKzgpnP7HYNOKzO4e7SKSNJLy/sWhlCPyZFCe98kRnTQ7UJo9d/3
+         RF5VyRwElI83RMRkgKpI0OC1GYPlEOAykkVksij1gPvJRSPZfaQw2i5vmN/FV/yw6KG0
+         58GWlN4ta9GWKo1QCqF8hdAJiLHPoN7ItBhEmV8BtSANeVuFnCKMWEHo/GVc9DLRohtR
+         RZyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=bK+1hhQOyVtvJnFigsHxDF6e/MUMdEEF7UQ1BjC5dVE=;
-        b=4mL/7Ng0CYsLYOsJbabdIyqHf0qIZxPaq8tPCsj9mxnWjL9VKrkPQLuUS5ohV+5waZ
-         USCCowwdYuHKuBbOI7eop0eTU6ZgyjUnlfvZ81YRjSLJ1BhuT0919OQ1Jcg9poOiCqh/
-         x2mQDvpZD0UHV7qJPIZoxUOGqrX2c3ErPKyDl41MzCMR9Uqs90cJ5MCyEnhVRNooMPKl
-         Mq0Q80p19Wwg7hg57m9q4P0i9rct62RoYBrzw/88cxWFJ3uiSgPw7yo1Nu9UFu8bng9g
-         2Px6y5b/IQa5MOmRcD4rNEHtjx/35N3/FTZHzBKpZ3FGsMrkLJZ6ots+HxG9vJYdp/S4
-         m68A==
-X-Gm-Message-State: AJIora/2ZAp4MoD3pGsj9zrULUT8dnq9n2WF8BU7yeFdnGIiRaqwrsNU
-	mkVjv/EWWMK6YhfbvBCIygzx2DHDxRg=
-X-Google-Smtp-Source: AGRyM1vwpuRzw4CssGyGLauudfEPjfqAXljQervpnFAp2qHi4+TS3r9kH4V8QkC96xdkHKDbvCJvgQ==
-X-Received: by 2002:a63:2a82:0:b0:412:82d9:f015 with SMTP id q124-20020a632a82000000b0041282d9f015mr7814288pgq.447.1657146096729;
-        Wed, 06 Jul 2022 15:21:36 -0700 (PDT)
+        bh=nhQtO/Y2h9D6l5zhv4lQX1YLXzkVZFFQJbFi4F+4SY8=;
+        b=sdketImCBkSXjCtGGRfaibCjrG3JiqqyJZUzKnkv48AuHGGIMQ5HzhNtzrrFT9sER7
+         byVNGREElQ5DFb90Yi4bi55rU1died0nOq5zixJgQZGhS2nUCvQi0WmgR6uBNX8QrD9C
+         YdU/1pBk9nI3o3i1sKAawKnZJ3GwLTZqG3A4AH3pg/U1DA4FGEHFn77w3VrQh7S8T8GG
+         agqudzhsp5FjftBcORKnsmxrOr4azzsaMxfe44P7qo4oG4CwE+qivMmunMUupnirNP8C
+         pJahHR0gARkpB12gUfJK2zW7UB8VeG9DNrYv+OXCR1/Wu3Bg6B7UCEX2NUGU8jYTT9OA
+         1v+Q==
+X-Gm-Message-State: AJIora/rQK6XAdjUA5WPUaDWbEEDrblMguSSGmscliIB/y2B3th2fYvN
+	rZwvraXNL4/mnM4+wt8i3qj8ndMpfGc=
+X-Google-Smtp-Source: AGRyM1vO9Cvd/aOd12Xc1yaa2JANEuiBqz+3xPq2J6pekbDwqi4MXPn/OzObiwK5OAeS913d5Xzxfw==
+X-Received: by 2002:a63:1f66:0:b0:412:2f72:ec19 with SMTP id q38-20020a631f66000000b004122f72ec19mr17354122pgm.282.1657146097529;
+        Wed, 06 Jul 2022 15:21:37 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
         by smtp.gmail.com with ESMTPSA id u9-20020a170902e80900b0016a163d1cd5sm26517696plg.253.2022.07.06.15.21.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 15:21:36 -0700 (PDT)
+        Wed, 06 Jul 2022 15:21:37 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 12/14] client: update device to use display_table_row
-Date: Wed,  6 Jul 2022 15:19:05 -0700
-Message-Id: <20220706221907.126408-12-prestwoj@gmail.com>
+Subject: [PATCH v2 13/14] client: update adapter table header
+Date: Wed,  6 Jul 2022 15:19:06 -0700
+Message-Id: <20220706221907.126408-13-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220706221907.126408-1-prestwoj@gmail.com>
 References: <20220706221907.126408-1-prestwoj@gmail.com>
@@ -53,53 +53,44 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- client/device.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+The table header needs to be adjusted to include spaces between
+columns.
 
-diff --git a/client/device.c b/client/device.c
-index 5b971883..9f8d731c 100644
---- a/client/device.c
-+++ b/client/device.c
-@@ -54,9 +54,10 @@ static void display_device(const struct proxy_interface *proxy)
- 	l_free(caption);
+The 'adapter list' command was also updated to shorted a few
+columns which were quite long for the data that is actually displayed.
+---
+ client/adapter.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/client/adapter.c b/client/adapter.c
+index 6a0d3455..394eae0d 100644
+--- a/client/adapter.c
++++ b/client/adapter.c
+@@ -185,9 +185,10 @@ static void display_adapter_inline(const char *margin, const void *data)
+ {
+ 	const struct adapter *adapter = data;
  
- 	if (device->adapter) {
--		display("%s%*s  %-*s%-*s\n", MARGIN, 8, "", 20, "Adapter", 47,
--			proxy_interface_get_identity_str(
-+		display_table_row(MARGIN, 3, 8, "", 20, "Adapter", 47,
-+				proxy_interface_get_identity_str(
- 						device->adapter) ? : "");
-+
- 	}
- 
- 	display_table_footer();
-@@ -216,12 +217,11 @@ static void display_device_inline(const char *margin, const void *data)
- 	else
- 		adapter_str = "-";
- 
--	display("%s%-*s%-*s%-*s%-*s%-*s\n", margin,
--		20, device->name ? : "",
--		20, device->address ? : "",
--		10, get_powered_tostr(device),
--		10, adapter_str,
--		10, device->mode);
-+	display_table_row(margin, 5, 20, device->name ? : "",
-+				20, device->address ? : "",
-+				10, get_powered_tostr(device),
-+				10, adapter_str,
-+				10, device->mode);
+-	display("%s%-*s%-*s%-.*s%-.*s\n", margin,
+-		19, adapter->name ? : "-", 10, get_powered_tostr(adapter),
+-		20, adapter->vendor ? : "-", 20, adapter->model ? : "-");
++	display_table_row(margin, 4, 8, adapter->name ? : "-",
++				8, get_powered_tostr(adapter),
++				20, adapter->vendor ? : "-",
++				20, adapter->model ? : "-");
  }
  
- static const char *device_identity(void *data)
-@@ -368,7 +368,7 @@ static void check_errors_method_callback(struct l_dbus_message *message,
- static enum cmd_status cmd_list(const char *device_name,
+ static void *adapter_create(void)
+@@ -268,8 +269,9 @@ static const struct proxy_interface *get_adapter_proxy_by_name(
+ static enum cmd_status cmd_list(const char *adapter_name,
  						char **argv, int argc)
  {
--	display_table_header("Devices", MARGIN "%-*s%-*s%-*s%-*s%-*s",
-+	display_table_header("Devices", MARGIN "%-*s  %-*s  %-*s  %-*s  %-*s",
- 				20, "Name", 20, "Address", 10, "Powered",
- 				10, "Adapter", 10, "Mode");
+-	display_table_header("Adapters", MARGIN "%-*s%-*s%-*s%-*s", 19, "Name",
+-				10, "Powered", 20, "Vendor", 20, "Model");
++	display_table_header("Adapters", MARGIN "%-*s  %-*s  %-*s  %-*s",
++				8, "Name", 8, "Powered",
++				20, "Vendor", 20, "Model");
+ 
+ 	proxy_interface_display_list(adapter_interface_type.interface);
  
 -- 
 2.34.1
