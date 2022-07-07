@@ -1,77 +1,91 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C346E2913
-	for <iwd@lists.linux.dev>; Thu,  7 Jul 2022 17:57:38 +0000 (UTC)
-Received: by mail-pf1-f169.google.com with SMTP id d10so7124494pfd.9
-        for <iwd@lists.linux.dev>; Thu, 07 Jul 2022 10:57:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DE72596
+	for <iwd@lists.linux.dev>; Thu,  7 Jul 2022 19:28:59 +0000 (UTC)
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-10be0d7476aso19710856fac.2
+        for <iwd@lists.linux.dev>; Thu, 07 Jul 2022 12:28:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=NBza7GTBinUd6pDhR8LmGnIFuQRHAGBueMNiYVmpyNY=;
-        b=KL7txRJDycl//K1ae5w2kH90y9k9Vvr32QRaSX2Z9Qp1tE24J8zDEKsDIGyLnnqL8u
-         K8jNKSNItyt+bS9oCVmWgjWcELfzvceQuISKGE2woFfzIChgoBN7wdDn9Lz0/f775+ZM
-         HL7wh0J4borM0NhilsYgplxjO0lo0jCJaaWIgiCqx9Z3zOXT4+XLiILI+xoqxooiD7Lu
-         tY6CYvzcJENmXCEr7WO3EJ4G71jvqviPx8j8G/GN/vGgzgC+jPg1Bfbn0l7hKXb5zwC5
-         08hqo26XeVpRUTvQyR8m0wZQ6umIPFTLQUbh2hrKZP2RSWv/9B49xMEUMoA6Oi9i68rQ
-         UcDw==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:from:in-reply-to:content-transfer-encoding;
+        bh=jzpnUZCCeWDegEvi1tr0lGm6Eywl3UBO6JgSk/ymqCk=;
+        b=VG1FEES7gFowK0FarUpfUJb92OGn7bmH5q1nfW0tOtJecb5moGyJm3pYix7Ek4lZZ0
+         hBg6dcemefGR9FQEWe/Pz6BXU7RobTKIVu0wBAwQi3vIuKR/EfFi6Q/2RTdnWru+cjlA
+         c83Lp/YL/PqY5PWGYXc4kKfqAa3TmHVQbiMYwEpZhw7oFC6+UEX6vqItyYOt3zJ30edh
+         DoTc9OEHWyPNGc3XxJ4IGtbOO+nlz0wZlOcXbVBvzUbWtWD6E57/cKHfl+Sjd0+iuyS9
+         T0ulwQJVJdXWyjt9W+JhQC428GY4nxADjwavBDdqUJXRCe48tJBYQRuQxjzC/M88qpqE
+         cqbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=NBza7GTBinUd6pDhR8LmGnIFuQRHAGBueMNiYVmpyNY=;
-        b=XhiHK4WGIaZTzKw3BkVDmJAOf69J8CsFQ/ISJSYCpLnA0C4twmM4uF1P61KBaqO1jz
-         mElPyCGybRuGuD8OikXcmOZLyAz0sID5nTQn1q1K55Ui1szsQtt7yV5CP0E1zq23xd82
-         XNYv6yXiYqbnEO7HKbHE6VAXpfXLUAwdFCjj3KAzY3HbaHPWu9tRBeR2cUIGG3WbCF0W
-         EsJEL91jtj4O7nbcfL0CPmtkXE6gga8Gs7yezMWwkYPVso/t+lHVdAu2TJlLeeWiU0AG
-         dtQRln1sQx9JvGOdlKJAhRzcmTzb1UbjzGMEXp5rOuiHFTWf0qJxXenwRLfcF897FiQx
-         nHfQ==
-X-Gm-Message-State: AJIora9dVIhy0uduFW8ugeNXqMWJ1ykmzff5SHmUa2qwCeyVjrSTjS/N
-	NYouByrS6ZN0SLZyN3TaPQC6suS9dHE=
-X-Google-Smtp-Source: AGRyM1sLolCOn5DcIJNvxNAFEPXWM0w57RuU/59eUxSunBGGJRRn8jRFYmSJRzC0S4+XIeFVxXRt8w==
-X-Received: by 2002:a17:90b:2152:b0:1ef:9c75:66d8 with SMTP id kt18-20020a17090b215200b001ef9c7566d8mr6765873pjb.5.1657216658045;
-        Thu, 07 Jul 2022 10:57:38 -0700 (PDT)
-Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id y3-20020a17090322c300b001618b70dcc9sm28855223plg.101.2022.07.07.10.57.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jul 2022 10:57:37 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 14/14] client: update ad-hoc table header
-Date: Thu,  7 Jul 2022 10:55:11 -0700
-Message-Id: <20220707175511.224597-14-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220707175511.224597-1-prestwoj@gmail.com>
-References: <20220707175511.224597-1-prestwoj@gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=jzpnUZCCeWDegEvi1tr0lGm6Eywl3UBO6JgSk/ymqCk=;
+        b=5FGLyicRmI9TLNG0mAf+9HGyzZ7Q0Cy04obt8fTG4lpc292CuOHvyWFUvK6WWz26F8
+         meOecQMGg7CrGyeilOHaP8NFZlDAIagYyLb+EcW7s0HvnrxRsNiDshDlk/m0uJfBkvRo
+         m1hZ+jOJB0FFURoFOaihFXnmZgSgyJHDWQxyzGiicrOJ5oeovKK64HCGbaF5tFuMgyeX
+         N8XZ8bhgbeQw3hAVD+r1adiePBvPzfcMI+o5F5TPu2co4wonzUZYyMlHeKuTziBRWmkd
+         DmKByeBC1K5mEaj1nPubq+A4xUaWC9gmWbYxvD5Rw9J/CGI+422fTkYbl5j2hUL8OGhA
+         JuNw==
+X-Gm-Message-State: AJIora9Bt7g6y7qdRjn6FO0JBQeHlGzXcwZxKypzMysyEyb/+IKF3H87
+	yiUG6sJmFqN6xIckRXEfE/Q=
+X-Google-Smtp-Source: AGRyM1u0ykmNBaK5rCXIhpJjs5y9yFht/jSfqpqQWIEuvmcNAgVfIZByDWJ2k2bufCU42h9bmPyUEg==
+X-Received: by 2002:a05:6870:e613:b0:10b:8204:85e1 with SMTP id q19-20020a056870e61300b0010b820485e1mr3894663oag.65.1657222138943;
+        Thu, 07 Jul 2022 12:28:58 -0700 (PDT)
+Received: from [10.0.2.15] ([136.32.1.70])
+        by smtp.googlemail.com with ESMTPSA id o7-20020a056871078700b000e686d1386dsm22872191oap.7.2022.07.07.12.28.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Jul 2022 12:28:58 -0700 (PDT)
+Message-ID: <83fb9f3d-5e3a-68fe-c274-0c7af57b5843@gmail.com>
+Date: Thu, 7 Jul 2022 14:09:53 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v3 01/14] client: add generic display function for table
+ rows
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220707175511.224597-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220707175511.224597-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The table header needs to be adjusted to include spaces between
-columns.
----
- client/ad-hoc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi James,
 
-diff --git a/client/ad-hoc.c b/client/ad-hoc.c
-index 33bff9ca..49c97f74 100644
---- a/client/ad-hoc.c
-+++ b/client/ad-hoc.c
-@@ -117,7 +117,7 @@ static enum cmd_status cmd_list(const char *device_name, char **argv, int argc)
- 	struct l_queue *match =
- 		proxy_interface_find_all(IWD_AD_HOC_INTERFACE, NULL, NULL);
- 
--	display_table_header("Devices in Ad-Hoc Mode", MARGIN "%-*s%-*s",
-+	display_table_header("Devices in Ad-Hoc Mode", MARGIN "%-*s  %-*s",
- 				20, "Name", 8, "Started");
- 
- 	if (!match) {
--- 
-2.34.1
+On 7/7/22 12:54, James Prestwood wrote:
+> There was no easy to use API for printing the contents of a table, and
+> was left up to the caller to handle manually. This adds display_table_row
+> which makes displaying tables much easier, including automatic support
+> for line truncation and continuation on the next line.
+> 
+> Lines which are too long will be truncated and displayed on the next
+> line while also taking into account any colored output. This works with any
+> number of columns.
+> 
+> This removes the need for the module to play games with encoding newlines
+> and tabs to make the output look nice.
+> 
+> As a start, this functionality was added to the command display.
+> ---
+>   client/display.c | 181 ++++++++++++++++++++++++++++++++++++++++++++++-
+>   client/display.h |   1 +
+>   2 files changed, 179 insertions(+), 3 deletions(-)
+> 
 
+<snip>
+
+> +static bool entires_done(unsigned int num, struct table_entry *e)
+
+I s/entires_done/entries_done
+
+and applied the entire series, thanks.
+
+Regards,
+-Denis
