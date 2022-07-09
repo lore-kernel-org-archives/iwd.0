@@ -1,47 +1,36 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A12C7A
-	for <iwd@lists.linux.dev>; Fri,  8 Jul 2022 19:03:04 +0000 (UTC)
-Received: by mail-pg1-f181.google.com with SMTP id i190so10478493pge.7
-        for <iwd@lists.linux.dev>; Fri, 08 Jul 2022 12:03:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4TX7DF+LSXN3nmESKjhaVPjLIuO7S1w/eytvXP8aCnI=;
-        b=MJduSd+PurM4f3ozfDqqBXcPIfYBLEhHVyygwSrNlJskpyTCI+MT6p2XLJCIdM4221
-         sH/tAHhncSmndK8fGHwTIhG9PhJ6V5ik8GtMIevWLBHShjKDtYBla2SAn0JydOl+qIrn
-         YsaM5hYX/82IOvop8hZxnehByxiwVrS5htXgy34/AOG7YuSvzWDGctMjXYT633AfnwIu
-         b5yDKEWIIMvM7Eq0P8cnkwy60qEETWkFvnwHDrLVkYTzfGd0HbvkCY2F3liJEvUH7JWF
-         LD7HMNfn4cWEfz/hqEtNr4xTzSBZZeqwblGWbLP41MNRG+GUiGVJW7Y9nQH4qZbqhXtz
-         wfvQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC11B7B
+	for <iwd@lists.linux.dev>; Sat,  9 Jul 2022 00:23:47 +0000 (UTC)
+Received: by mail-lf1-f51.google.com with SMTP id m18so233963lfg.10
+        for <iwd@lists.linux.dev>; Fri, 08 Jul 2022 17:23:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=4TX7DF+LSXN3nmESKjhaVPjLIuO7S1w/eytvXP8aCnI=;
-        b=pnMgMiQkXrs/m2jxpWUPkUaP2qPsxQMvs1wGudXS9D9I6R45zWbPBA6B4bLYOYcNDh
-         XHpTM+s0I3pA2bHoK9L7G72w6/SMgUr6EZ/sDrLA/IM9klWU5w2kFySxHInhUKzhz85x
-         A4RpERaexFKGkLOCyZy36nj4Jnj9RnzUZvehaj2H857pdOh8LEv2vuiqMAEKjSQU7qH5
-         Qt1VYxDvagyvrHLoR1Q1FHBjbghwgUVcqr9uF7qXUuCf32S7YyOIduz85WRBlU7ZujVX
-         zieLmfiZeWF1X7tlSYgI+Xrb0q7jrJsRaWHv3/qBnJIRL0SpWTka37p0Kio6i8ZC2JbE
-         RuVA==
-X-Gm-Message-State: AJIora8FwGzGMpoBPvM95uX4hD8/DDVJ8zOwbIh6ZK2btpETn+ToGFZm
-	Wu+OcRK9wbPh6mhLwTkp+noFTFkGdsU=
-X-Google-Smtp-Source: AGRyM1vIocm8XkCG0PGUIKsHaPIgUVrjJvMokhtcTBaBnAAqv6Uadpy+tgvws5yG274a0HiOG8LkPQ==
-X-Received: by 2002:a65:5b44:0:b0:412:b6dc:7076 with SMTP id y4-20020a655b44000000b00412b6dc7076mr4354406pgr.601.1657306983233;
-        Fri, 08 Jul 2022 12:03:03 -0700 (PDT)
-Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id d16-20020a170902b71000b0016a7b9558f7sm27751500pls.136.2022.07.08.12.03.02
+        bh=oMRtQtgUz2EtBbp03irnzLKde5/LAmHU5gXcX1O9N9E=;
+        b=mvFM9DHCEMWrczEKkMPcyvF3A5iI62NaBQ+fXjpsoKYkvIta6YqcKOCHLNQtnvZFW9
+         pcEranluLWAdscoubNdrBp/cLbAmWQjvasR/D0kqbRjvO0UR6mrO3hEZeOcAA+vHFdn5
+         NK5tiMamqoqEAu/5LFbwkxrIgzQNDGCDyMPvXTss8yOysc3VTDCgeeHvGUVh0pySo7Yc
+         O2sHfc0l03HVlTsI86X0CX4DAkoalTxx/8eVvglc80H64sypbU4Mx6rW3Cg7KOhE7uJV
+         acIwlN5PlVqgCUq+J8+cfEaH0z9ibfqzy2wgO9B1+5jWtDSfmcsqqNWPWY8OL4BubUzs
+         EImQ==
+X-Gm-Message-State: AJIora/e1kYBhBmME6H+XYZHkWWLlLnBolKPPAKh+nFLLpNKwC5ZerCE
+	BwDu2DbV4Cljhur5O5eCoULNvbFCu9Xn2NvF
+X-Google-Smtp-Source: AGRyM1uE3cGKPyWJeMKNvdDKed15Hnd4kljLt0A6XCrNfjAdVzp0qqIoLClfBxO3g36te/+Wmy+3bQ==
+X-Received: by 2002:a05:6512:31d0:b0:47f:9f1e:f08b with SMTP id j16-20020a05651231d000b0047f9f1ef08bmr3830044lfe.250.1657326225553;
+        Fri, 08 Jul 2022 17:23:45 -0700 (PDT)
+Received: from localhost.localdomain (public-gprs650242.centertel.pl. [5.184.83.67])
+        by smtp.gmail.com with ESMTPSA id f19-20020ac25333000000b00478fe690207sm75603lfh.286.2022.07.08.17.23.44
+        for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jul 2022 12:03:02 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
+        Fri, 08 Jul 2022 17:23:44 -0700 (PDT)
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
 To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] test-runner: run prepare_environment with --start
-Date: Fri,  8 Jul 2022 12:00:54 -0700
-Message-Id: <20220708190054.299224-1-prestwoj@gmail.com>
+Subject: [PATCH v3 1/4] test-runner: Support running hostapd in namespaces
+Date: Sat,  9 Jul 2022 02:23:31 +0200
+Message-Id: <20220709002334.3329502-1-andrew.zaborowski@intel.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
@@ -51,95 +40,252 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The --start option was directly passed to the kernel init parameter,
-preventing any environment setup from happening.
-
-Intead always use 'run-tests' as the init process but detect --start
-and execute that binary/script once inside the environment.
+The kernel will not let us test some scenarios of communication between
+two hwsim radios (e.g. STA and AP) if they're in the same net namespace.
+For example, when connected, you can't add normal IPv4 subnet routes for
+the same subnet on two different interfaces in one namespace (you'd
+either get an EEXIST or you'd replace the other route), you can set
+different metrics on the routes but that won't fix IP routing.  For
+testNetconfig the result is that communication works for DHCP before we
+get the inital lease but renewals won't work because they're unicast.
+Allow hostapd to run on a radio that has been moved to a different
+namespace in hw.conf so we don't have to work around these issues.
 ---
- tools/run-tests |  7 ++++++-
- tools/runner.py | 24 ++++++++++++++----------
- 2 files changed, 20 insertions(+), 11 deletions(-)
+changes in v2:
+ - ensure at least one hostapd session starts if the [HOSTAPD] section
+   is present to mimic original behaviour and fix testEAD
+v3:
+ - make sure Radio.ns and Interface.ns are always valid (equal ctx
+   instead of None) to simplify Process(namespace=self.ns) calls
+
+ tools/run-tests | 90 ++++++++++++++++++++++++++++++-------------------
+ tools/utils.py  |  2 +-
+ 2 files changed, 57 insertions(+), 35 deletions(-)
 
 diff --git a/tools/run-tests b/tools/run-tests
-index 565847df..8724877e 100755
+index 565847df..76784aa3 100755
 --- a/tools/run-tests
 +++ b/tools/run-tests
-@@ -1011,5 +1011,10 @@ runner = Runner()
+@@ -58,28 +58,34 @@ def exit_vm():
+ 	runner.stop()
  
- atexit.register(exit_vm)
- runner.prepare_environment()
--run_tests(runner.args)
-+
-+if runner.args.start:
-+	os.system(runner.args.start)
-+else:
-+	run_tests(runner.args)
-+
- runner.cleanup_environment()
-diff --git a/tools/runner.py b/tools/runner.py
-index d39b560f..cf904412 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -197,14 +197,6 @@ class Runner:
- 			else:
- 				args.testhome = os.getcwd()
+ class Interface:
+-	def __init__(self, name, config):
++	def __init__(self, name, config, ns):
+ 		self.name = name
+ 		self.ctrl_interface = '/var/run/hostapd/' + name
+ 		self.config = config
++		self.ns = ns
  
--		if args.start is None:
--			if os.path.exists('run-tests'):
--				args.start = os.path.abspath('run-tests')
--			elif os.path.exists('tools/run-tests'):
--				args.start = os.path.abspath('tools/run-tests')
--			else:
--				raise Exception("Cannot locate run-tests binary")
+ 	def __del__(self):
+-		Process(['iw', 'dev', self.name, 'del']).wait()
++		Process(['iw', 'dev', self.name, 'del'], namespace=self.ns.name).wait()
+ 
+ 	def set_interface_state(self, state):
+-		Process(['ip', 'link', 'set', self.name, state]).wait()
++		Process(['ip', 'link', 'set', self.name, state], namespace=self.ns.name).wait()
+ 
+ class Radio:
+-	def __init__(self, name):
++	def __init__(self, name, default_ns):
+ 		self.name = name
+ 		# hostapd will reset this if this radio is used by it
+ 		self.use = 'iwd'
+ 		self.interface = None
++		self.ns = default_ns
+ 
+ 	def __del__(self):
+ 		print("Removing radio %s" % self.name)
+ 		self.interface = None
+ 
++	def set_namespace(self, ns):
++		self.ns = ns
++		Process(['iw', 'phy', self.name, 'set', 'netns', 'name', ns.name]).wait()
++
+ 	def create_interface(self, config, use):
+ 		global intf_id
+ 
+@@ -87,19 +93,21 @@ class Radio:
+ 
+ 		intf_id += 1
+ 
+-		self.interface = Interface(ifname, config)
++		self.interface = Interface(ifname, config, self.ns)
+ 		self.use = use
+ 
+ 		Process(['iw', 'phy', self.name, 'interface', 'add', ifname,
+-				'type', 'managed']).wait()
++				'type', 'managed'], namespace=self.ns.name).wait()
+ 
+ 		return self.interface
+ 
+ 	def __str__(self):
+ 		ret = self.name + ':\n'
+-		ret += '\tUsed By: %s ' % self.use
++		ret += '\tUsed By: %s' % self.use
+ 		if self.interface:
+-			ret += '(%s)' % self.interface.name
++			ret += ' (%s)' % self.interface.name
++		if self.ns is not None:
++			ret += ' (ns=%s)' % self.ns.name
+ 
+ 		ret += '\n'
+ 
+@@ -113,7 +121,7 @@ class VirtualRadio(Radio):
+ 		than the command line.
+ 	'''
+ 
+-	def __init__(self, name, cfg=None):
++	def __init__(self, name, default_ns, cfg=None):
+ 		global config
+ 
+ 		self.disable_cipher = None
+@@ -129,7 +137,7 @@ class VirtualRadio(Radio):
+ 					iftype_disable=self.disable_iftype,
+ 					cipher_disable=self.disable_cipher)
+ 
+-		super().__init__(self._radio.name)
++		super().__init__(self._radio.name, default_ns)
+ 
+ 	def __del__(self):
+ 		super().__del__()
+@@ -188,7 +196,7 @@ class Hostapd:
+ 		A set of running hostapd instances. This is really just a single
+ 		process since hostapd can be started with multiple config files.
+ 	'''
+-	def __init__(self, radios, configs, radius):
++	def __init__(self, ns, radios, configs, radius):
+ 		if len(configs) != len(radios):
+ 			raise Exception("Config (%d) and radio (%d) list length not equal" % \
+ 						(len(configs), len(radios)))
+@@ -198,8 +206,8 @@ class Hostapd:
+ 		Process(['ip', 'link', 'set', 'eth0', 'up']).wait()
+ 		Process(['ip', 'link', 'set', 'eth1', 'up']).wait()
+ 
+-		self.global_ctrl_iface = '/var/run/hostapd/ctrl'
 -
- 		# If no runner is specified but we have a kernel image assume
- 		# if the kernel is executable its UML, otherwise qemu
- 		if not args.runner:
-@@ -231,6 +223,16 @@ class RunnerAbstract:
- 	def __init__(self, args):
- 		self.args = args
++		self.ns = ns
++		self.global_ctrl_iface = '/var/run/hostapd/ctrl' + (str(ns.name) if ns.name else 'main')
+ 		self.instances = [HostapdInstance(c, r) for c, r in zip(configs, radios)]
  
-+		if len(sys.argv) <= 1:
-+			return
+ 		ifaces = [rad.interface.name for rad in radios]
+@@ -227,7 +235,7 @@ class Hostapd:
+ 		if Process.is_verbose('hostapd'):
+ 			args.append('-d')
+ 
+-		self.process = Process(args)
++		self.process = Process(args, namespace=ns.name)
+ 
+ 		self.process.wait_for_socket(self.global_ctrl_iface, 30)
+ 
+@@ -340,7 +348,7 @@ class TestContext(Namespace):
+ 			if self.hw_config.has_section(name):
+ 				rad_config = self.hw_config[name]
+ 
+-			self.radios.append(VirtualRadio(name, rad_config))
++			self.radios.append(VirtualRadio(name, self, rad_config))
+ 
+ 	def discover_radios(self):
+ 		import pyroute2
+@@ -362,7 +370,7 @@ class TestContext(Namespace):
+ 					break
+ 
+ 		print('Discovered radios: %s' % str(phys))
+-		self.radios = [Radio(name) for name in phys]
++		self.radios = [Radio(name, self) for name in phys]
+ 
+ 	def start_radios(self):
+ 		reg_domain = self.hw_config['SETUP'].get('reg_domain', None)
+@@ -397,32 +405,44 @@ class TestContext(Namespace):
+ 			#          tests. In this case you would not care what
+ 			#          was using each radio, just that there was
+ 			#          enough to run all tests.
+-			nradios = 0
+-			for k, _ in settings.items():
+-				if k == 'radius_server':
+-					continue
+-				nradios += 1
+-
+-			hapd_radios = self.radios[:nradios]
+-
++			hapd_configs = [conf for rad, conf in settings.items() if rad != 'radius_server']
++			hapd_processes = [(self, self.radios[:len(hapd_configs)], hapd_configs)]
+ 		else:
+-			hapd_radios = [rad for rad in self.radios if rad.name in settings]
+-
+-		hapd_configs = [conf for rad, conf in settings.items() if rad != 'radius_server']
++			hapd_processes = []
++			for ns in [self] + self.namespaces:
++				ns_radios = [rad for rad in ns.radios if rad.name in settings]
++				if len(ns_radios):
++					ns_configs = [settings[rad.name] for rad in ns_radios]
++					hapd_processes.append((ns, ns_radios, ns_configs))
++			if not hapd_processes:
++				hapd_processes.append((self, [], []))
+ 
+ 		radius_config = settings.get('radius_server', None)
+ 
+-		self.hostapd = Hostapd(hapd_radios, hapd_configs, radius_config)
+-		self.hostapd.attach_cli()
++		self.hostapd = [Hostapd(ns, radios, configs, radius_config)
++				for ns, radios, configs in hapd_processes]
 +
-+		if os.path.exists('run-tests'):
-+			self.init = os.path.abspath('run-tests')
-+		elif os.path.exists('tools/run-tests'):
-+			self.init = os.path.abspath('tools/run-tests')
-+		else:
-+			raise Exception("Cannot locate run-tests binary")
++		for hapd in self.hostapd:
++			hapd.attach_cli()
+ 
+ 	def get_frequencies(self):
+ 		frequencies = []
+ 
+-		for hapd in self.hostapd.instances:
+-			frequencies.append(hapd.cli.frequency)
++		for hapd in self.hostapd:
++			frequencies += [instance.cli.frequency for instance in hapd.instances]
+ 
+ 		return frequencies
+ 
++	def get_hapd_instance(self, config=None):
++		instances = [i for hapd in self.hostapd for i in hapd.instances]
 +
- 	def start(self):
- 		print("Starting %s" % self.name)
- 		os.execlpe(self.cmdline[0], *self.cmdline, self.env)
-@@ -279,6 +281,8 @@ class RunnerAbstract:
- 
- 		fcntl.ioctl(STDIN_FILENO, TIOCSTTY, 1)
- 
-+		os.system('ip link set dev lo up')
++		if config is None:
++			return instances[0]
 +
- 	def cleanup_environment(self):
- 		rmtree('/tmp/iwd')
- 		rmtree('/tmp/certs')
-@@ -413,7 +417,7 @@ class QemuRunner(RunnerAbstract):
- 				rootflags=trans=virtio \
- 				acpi=off pci=noacpi %s ro \
- 				mac80211_hwsim.radios=0 init=%s %s' %
--						(kern_log, args.start, args.to_cmd()),
-+						(kern_log, self.init, args.to_cmd()),
- 		]
++		for hapd in instances:
++			if hapd.config == config:
++				return hapd
++
+ 	def start_wpas_interfaces(self):
+ 		if 'WPA_SUPPLICANT' not in self.hw_config:
+ 			return
+@@ -543,11 +563,13 @@ class TestContext(Namespace):
+ 		for arg in vars(self.args):
+ 			ret += '\t --%s %s\n' % (arg, str(getattr(self.args, arg)))
  
- 		# Add two ethernet devices for testing EAD
-@@ -516,7 +520,7 @@ class UmlRunner(RunnerAbstract):
+-		ret += 'Hostapd:\n'
+ 		if self.hostapd:
+-			for h in self.hostapd.instances:
+-				ret += '\t%s\n' % str(h)
++			for hapd in self.hostapd:
++				ret += 'Hostapd (ns=%s):\n' % (hapd.ns.name,)
++				for h in hapd.instances:
++					ret += '\t%s\n' % (str(h),)
+ 		else:
++			ret += 'Hostapd:\n'
+ 			ret += '\tNo Hostapd instances\n'
  
- 		cmd = [args.kernel, 'rootfstype=hostfs', 'ro', 'mem=256M', 'mac80211_hwsim.radios=0',
- 				'time-travel=inf-cpu', 'eth0=mcast', 'eth1=mcast',
--				'%s '% kern_log, 'init=%s' % args.start]
-+				'%s' % kern_log, 'init=%s' % self.init]
- 		cmd.extend(args.to_cmd().split(' '))
+ 		info = self.meminfo_to_dict()
+diff --git a/tools/utils.py b/tools/utils.py
+index f3e12a85..bc030230 100644
+--- a/tools/utils.py
++++ b/tools/utils.py
+@@ -324,7 +324,7 @@ class Namespace:
  
- 		self.cmdline = cmd
+ 		Process(['ip', 'netns', 'add', name]).wait()
+ 		for r in radios:
+-			Process(['iw', 'phy', r.name, 'set', 'netns', 'name', name]).wait()
++			r.set_namespace(self)
+ 
+ 		self.start_dbus()
+ 
 -- 
 2.34.1
 
