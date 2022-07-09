@@ -1,37 +1,39 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC11B7B
-	for <iwd@lists.linux.dev>; Sat,  9 Jul 2022 00:23:47 +0000 (UTC)
-Received: by mail-lf1-f51.google.com with SMTP id m18so233963lfg.10
-        for <iwd@lists.linux.dev>; Fri, 08 Jul 2022 17:23:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A68623
+	for <iwd@lists.linux.dev>; Sat,  9 Jul 2022 00:23:49 +0000 (UTC)
+Received: by mail-lf1-f50.google.com with SMTP id t25so250750lfg.7
+        for <iwd@lists.linux.dev>; Fri, 08 Jul 2022 17:23:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oMRtQtgUz2EtBbp03irnzLKde5/LAmHU5gXcX1O9N9E=;
-        b=mvFM9DHCEMWrczEKkMPcyvF3A5iI62NaBQ+fXjpsoKYkvIta6YqcKOCHLNQtnvZFW9
-         pcEranluLWAdscoubNdrBp/cLbAmWQjvasR/D0kqbRjvO0UR6mrO3hEZeOcAA+vHFdn5
-         NK5tiMamqoqEAu/5LFbwkxrIgzQNDGCDyMPvXTss8yOysc3VTDCgeeHvGUVh0pySo7Yc
-         O2sHfc0l03HVlTsI86X0CX4DAkoalTxx/8eVvglc80H64sypbU4Mx6rW3Cg7KOhE7uJV
-         acIwlN5PlVqgCUq+J8+cfEaH0z9ibfqzy2wgO9B1+5jWtDSfmcsqqNWPWY8OL4BubUzs
-         EImQ==
-X-Gm-Message-State: AJIora/e1kYBhBmME6H+XYZHkWWLlLnBolKPPAKh+nFLLpNKwC5ZerCE
-	BwDu2DbV4Cljhur5O5eCoULNvbFCu9Xn2NvF
-X-Google-Smtp-Source: AGRyM1uE3cGKPyWJeMKNvdDKed15Hnd4kljLt0A6XCrNfjAdVzp0qqIoLClfBxO3g36te/+Wmy+3bQ==
-X-Received: by 2002:a05:6512:31d0:b0:47f:9f1e:f08b with SMTP id j16-20020a05651231d000b0047f9f1ef08bmr3830044lfe.250.1657326225553;
-        Fri, 08 Jul 2022 17:23:45 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=dLeBLlFb2VWCq8mi5cBvb2tZCHs9jRN+Oh5Yaj39gms=;
+        b=erdHmZt8WVMlE5dKD/VsVlm6IC6Imi65xeFQ+b8DQn4t+r0BIPDijgCdDKvK35Wv0v
+         VK9EPAfo7qfQAe95hH2GqUwHhv5/8RBCF8QW1TDLJhkU78TUNfEnXRVyd2h5F4qzYKnn
+         amwBUWvaTGHErCZL/dbwe6E/m+Euo1qi2yPD/sZDd+nsSzKHPYo6aRmnbFiL2b6smTQh
+         cQWS+Nh2FZ10J3nYiY1V6sAa5wrjyKgBw78fDzZT5VdGTV63nknz29JQcqtQ/xWWBgjp
+         5nqjOd2onNcYjDIxMmJjVbDDC8ddTR9FRsed6sdoibmgvTKf9CqEVinlZBZh1AvBVP9W
+         85rg==
+X-Gm-Message-State: AJIora8zVJdjt7zCvzlx21Ewm7dMvEVFyYm7AXU9PNsLY2BOnreomGyJ
+	eRuF9Xcyp+cpzcGypu/V/yJnhb85OWTVP1bs
+X-Google-Smtp-Source: AGRyM1uXozJGDrLvG3dW5WZnH6iWHgy9/sw6PiXE5/NZ74p16QfBPtD3ezvLR6LmyAtMxtr2p7656A==
+X-Received: by 2002:a05:6512:12c7:b0:481:51ff:d027 with SMTP id p7-20020a05651212c700b0048151ffd027mr3937814lfg.577.1657326226999;
+        Fri, 08 Jul 2022 17:23:46 -0700 (PDT)
 Received: from localhost.localdomain (public-gprs650242.centertel.pl. [5.184.83.67])
-        by smtp.gmail.com with ESMTPSA id f19-20020ac25333000000b00478fe690207sm75603lfh.286.2022.07.08.17.23.44
+        by smtp.gmail.com with ESMTPSA id f19-20020ac25333000000b00478fe690207sm75603lfh.286.2022.07.08.17.23.45
         for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jul 2022 17:23:44 -0700 (PDT)
+        Fri, 08 Jul 2022 17:23:46 -0700 (PDT)
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
 To: iwd@lists.linux.dev
-Subject: [PATCH v3 1/4] test-runner: Support running hostapd in namespaces
-Date: Sat,  9 Jul 2022 02:23:31 +0200
-Message-Id: <20220709002334.3329502-1-andrew.zaborowski@intel.com>
+Subject: [PATCH v3 2/4] autotests: DHCPv4 renewal/resend test in testNetconfig
+Date: Sat,  9 Jul 2022 02:23:32 +0200
+Message-Id: <20220709002334.3329502-2-andrew.zaborowski@intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220709002334.3329502-1-andrew.zaborowski@intel.com>
+References: <20220709002334.3329502-1-andrew.zaborowski@intel.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -40,252 +42,456 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The kernel will not let us test some scenarios of communication between
-two hwsim radios (e.g. STA and AP) if they're in the same net namespace.
-For example, when connected, you can't add normal IPv4 subnet routes for
-the same subnet on two different interfaces in one namespace (you'd
-either get an EEXIST or you'd replace the other route), you can set
-different metrics on the routes but that won't fix IP routing.  For
-testNetconfig the result is that communication works for DHCP before we
-get the inital lease but renewals won't work because they're unicast.
-Allow hostapd to run on a radio that has been moved to a different
-namespace in hw.conf so we don't have to work around these issues.
+Test that the DHCPv4 lease got renewed after the T1 timer runs out.
+Then also simulate the DHCPREQUEST during renew being lost and
+retransmitted and the lease eventually getting renewed T1 + 60s later.
+
+The main downside is that this test will inevitably take a while if
+running in Qemu without the time travel ability.
+
+Update the test and some utility code to run hostapd in an isolated net
+namespace for connection_test.py.  We now need a second hostapd
+instance though because in static_test.py we test ACD and we need to
+produce an IP conflict.  Moving the hostapd instance unexpectedly fixes
+dhcpd's internal mechanism to avoid IP conflicts and it would no longer
+assign 192.168.1.10 to the second client, it'd notice that address was
+already in use and assign the next free address, or fail if there was
+none.  So add a second hostapd instance that runs in the main namespace
+together with the statically-configured client, it turns out the test
+relies on the kernel being unable to deliver IP traffic to interfaces on
+the same system.
 ---
-changes in v2:
- - ensure at least one hostapd session starts if the [HOSTAPD] section
-   is present to mimic original behaviour and fix testEAD
-v3:
- - make sure Radio.ns and Interface.ns are always valid (equal ctx
-   instead of None) to simplify Process(namespace=self.ns) calls
+ .../{ssidTKIP.conf => ap-main.conf}           |   2 +-
+ autotests/testNetconfig/ap-ns1.conf           |   7 +
+ autotests/testNetconfig/connection_test.py    | 195 +++++++++++++++---
+ autotests/testNetconfig/dhcpd.conf            |  14 +-
+ autotests/testNetconfig/hw.conf               |   8 +-
+ .../{ssidTKIP.psk => static.psk}              |   0
+ autotests/testNetconfig/static_test.py        |   8 +-
+ autotests/util/hostapd.py                     |   6 +-
+ 8 files changed, 202 insertions(+), 38 deletions(-)
+ rename autotests/testNetconfig/{ssidTKIP.conf => ap-main.conf} (83%)
+ create mode 100644 autotests/testNetconfig/ap-ns1.conf
+ rename autotests/testNetconfig/{ssidTKIP.psk => static.psk} (100%)
 
- tools/run-tests | 90 ++++++++++++++++++++++++++++++-------------------
- tools/utils.py  |  2 +-
- 2 files changed, 57 insertions(+), 35 deletions(-)
-
-diff --git a/tools/run-tests b/tools/run-tests
-index 565847df..76784aa3 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -58,28 +58,34 @@ def exit_vm():
- 	runner.stop()
+diff --git a/autotests/testNetconfig/ssidTKIP.conf b/autotests/testNetconfig/ap-main.conf
+similarity index 83%
+rename from autotests/testNetconfig/ssidTKIP.conf
+rename to autotests/testNetconfig/ap-main.conf
+index 11ef15f0..0ec7fdfa 100644
+--- a/autotests/testNetconfig/ssidTKIP.conf
++++ b/autotests/testNetconfig/ap-main.conf
+@@ -1,6 +1,6 @@
+ hw_mode=g
+ channel=1
+-ssid=ssidTKIP
++ssid=ap-main
  
- class Interface:
--	def __init__(self, name, config):
-+	def __init__(self, name, config, ns):
- 		self.name = name
- 		self.ctrl_interface = '/var/run/hostapd/' + name
- 		self.config = config
-+		self.ns = ns
- 
- 	def __del__(self):
--		Process(['iw', 'dev', self.name, 'del']).wait()
-+		Process(['iw', 'dev', self.name, 'del'], namespace=self.ns.name).wait()
- 
- 	def set_interface_state(self, state):
--		Process(['ip', 'link', 'set', self.name, state]).wait()
-+		Process(['ip', 'link', 'set', self.name, state], namespace=self.ns.name).wait()
- 
- class Radio:
--	def __init__(self, name):
-+	def __init__(self, name, default_ns):
- 		self.name = name
- 		# hostapd will reset this if this radio is used by it
- 		self.use = 'iwd'
- 		self.interface = None
-+		self.ns = default_ns
- 
- 	def __del__(self):
- 		print("Removing radio %s" % self.name)
- 		self.interface = None
- 
-+	def set_namespace(self, ns):
-+		self.ns = ns
-+		Process(['iw', 'phy', self.name, 'set', 'netns', 'name', ns.name]).wait()
+ wpa=1
+ wpa_pairwise=TKIP
+diff --git a/autotests/testNetconfig/ap-ns1.conf b/autotests/testNetconfig/ap-ns1.conf
+new file mode 100644
+index 00000000..5459173f
+--- /dev/null
++++ b/autotests/testNetconfig/ap-ns1.conf
+@@ -0,0 +1,7 @@
++hw_mode=g
++channel=1
++ssid=ap-ns1
 +
- 	def create_interface(self, config, use):
- 		global intf_id
++wpa=1
++wpa_pairwise=TKIP
++wpa_passphrase=secret123
+diff --git a/autotests/testNetconfig/connection_test.py b/autotests/testNetconfig/connection_test.py
+index 5481e624..aebb0a2e 100644
+--- a/autotests/testNetconfig/connection_test.py
++++ b/autotests/testNetconfig/connection_test.py
+@@ -13,6 +13,7 @@ import testutil
+ from config import ctx
+ import os
+ import socket
++import datetime, time
  
-@@ -87,19 +93,21 @@ class Radio:
+ class Test(unittest.TestCase):
  
- 		intf_id += 1
+@@ -27,6 +28,14 @@ class Test(unittest.TestCase):
  
--		self.interface = Interface(ifname, config)
-+		self.interface = Interface(ifname, config, self.ns)
- 		self.use = use
+             return True
  
- 		Process(['iw', 'phy', self.name, 'interface', 'add', ifname,
--				'type', 'managed']).wait()
-+				'type', 'managed'], namespace=self.ns.name).wait()
++        def get_ll_addrs6(ns, ifname):
++            show_ip = ns.start_process(['ip', 'addr', 'show', ifname])
++            show_ip.wait()
++            for l in show_ip.out.split('\n'):
++                if 'inet6 fe80::' in l:
++                    return socket.inet_pton(socket.AF_INET6, l.split(None, 1)[1].split('/', 1)[0])
++            return None
++
+         wd = IWD(True)
  
- 		return self.interface
+         psk_agent = PSKAgent("secret123")
+@@ -35,7 +44,7 @@ class Test(unittest.TestCase):
+         devices = wd.list_devices(1)
+         device = devices[0]
  
- 	def __str__(self):
- 		ret = self.name + ':\n'
--		ret += '\tUsed By: %s ' % self.use
-+		ret += '\tUsed By: %s' % self.use
- 		if self.interface:
--			ret += '(%s)' % self.interface.name
-+			ret += ' (%s)' % self.interface.name
-+		if self.ns is not None:
-+			ret += ' (ns=%s)' % self.ns.name
+-        ordered_network = device.get_ordered_network('ssidTKIP')
++        ordered_network = device.get_ordered_network('ap-ns1')
  
- 		ret += '\n'
+         self.assertEqual(ordered_network.type, NetworkType.psk)
  
-@@ -113,7 +121,7 @@ class VirtualRadio(Radio):
- 		than the command line.
- 	'''
+@@ -46,18 +55,21 @@ class Test(unittest.TestCase):
  
--	def __init__(self, name, cfg=None):
-+	def __init__(self, name, default_ns, cfg=None):
- 		global config
+         condition = 'obj.state == DeviceState.connected'
+         wd.wait_for_object_condition(device, condition)
++        connect_time = time.time()
  
- 		self.disable_cipher = None
-@@ -129,7 +137,7 @@ class VirtualRadio(Radio):
- 					iftype_disable=self.disable_iftype,
- 					cipher_disable=self.disable_cipher)
+         testutil.test_iface_operstate()
+-        testutil.test_ifaces_connected()
  
--		super().__init__(self._radio.name)
-+		super().__init__(self._radio.name, default_ns)
+         testutil.test_ip_address_match(device.name, '192.168.1.10', 17, 24)
+         ctx.non_block_wait(check_addr, 10, device,
+                             exception=Exception("IPv6 address was not set"))
  
- 	def __del__(self):
- 		super().__del__()
-@@ -188,7 +196,7 @@ class Hostapd:
- 		A set of running hostapd instances. This is really just a single
- 		process since hostapd can be started with multiple config files.
- 	'''
--	def __init__(self, radios, configs, radius):
-+	def __init__(self, ns, radios, configs, radius):
- 		if len(configs) != len(radios):
- 			raise Exception("Config (%d) and radio (%d) list length not equal" % \
- 						(len(configs), len(radios)))
-@@ -198,8 +206,8 @@ class Hostapd:
- 		Process(['ip', 'link', 'set', 'eth0', 'up']).wait()
- 		Process(['ip', 'link', 'set', 'eth1', 'up']).wait()
++        # Cannot use test_ifaces_connected() across namespaces (implementation details)
++        testutil.test_ip_connected(('192.168.1.10', ctx), ('192.168.1.1', self.ns1))
++
+         ifname = str(device.name)
+-        router_ll_addr = [addr for addr, _, _ in testutil.get_addrs6(self.hapd.ifname) if addr[0:2] == b'\xfe\x80'][0]
++        router_ll_addr = get_ll_addrs6(self.ns1, self.hapd.ifname)
+         # Since we're in an isolated VM with freshly created interfaces we know any routes
+-        # will have been created by IWD and don't have to allow for pre-existing routes
++        # will have been created by IWD and we don't have to allow for pre-existing routes
+         # in the table.
+         # Flags: 1=RTF_UP, 2=RTF_GATEWAY
+         expected_routes4 = {
+@@ -94,6 +106,67 @@ class Test(unittest.TestCase):
+         # of our log since we care about the end result here.
+         self.assertEqual(expected_rclog, entries[-3:])
  
--		self.global_ctrl_iface = '/var/run/hostapd/ctrl'
++        leases_file = self.parse_lease_file('/tmp/dhcpd.leases', socket.AF_INET)
++        lease = leases_file['leases'][socket.inet_pton(socket.AF_INET, '192.168.1.10')]
++        self.assertEqual(lease['state'], 'active')
++        self.assertTrue(lease['starts'] < connect_time)
++        self.assertTrue(lease['ends'] > connect_time)
++        # The T1 is 15 seconds per dhcpd.conf.  This is the approximate interval between lease
++        # renewals we should see from the client (+/- 1 second + some jitter).  Wait a little
++        # less than twice that time (25s) so that we can expect the lease was renewed strictly
++        # once (not 0 or 2 times) by that time, check that the lease timestamps have changed by
++        # at least 10s so as to leave a lot of margin.
++        renew_time = lease['starts'] + 15
++        now = time.time()
++        ctx.non_block_wait(lambda: False, renew_time + 10 - now, exception=False)
++
++        leases_file = self.parse_lease_file('/tmp/dhcpd.leases', socket.AF_INET)
++        new_lease = leases_file['leases'][socket.inet_pton(socket.AF_INET, '192.168.1.10')]
++        self.assertEqual(new_lease['state'], 'active')
++        self.assertTrue(new_lease['starts'] > lease['starts'] + 10)
++        self.assertTrue(new_lease['starts'] < lease['starts'] + 25)
++        self.assertTrue(new_lease['ends'] > lease['ends'] + 10)
++        self.assertTrue(new_lease['ends'] < lease['ends'] + 25)
++
++        # Now wait another T1 seconds but don't let our DHCP client get its REQUEST out this
++        # time so as to test renew timeouts and resends.  The retry interval is 60 seconds
++        # since (T2 - T1) / 2 is shorter than 60s.  It is now about 10s since the last
++        # renewal or 5s before the next DHCPREQUEST frame that is going to be lost.  We'll
++        # wait T1 seconds, so until about 10s after the failed attempt, we'll check that
++        # there was no renewal by that time, just in case, and we'll reenable frame delivery.
++        # We'll then wait another 60s and we should see the lease has been successfully
++        # renewed some 10 seconds earlier on the 1st DHCPREQUEST retransmission.
++        #
++        # We can't use hswim to block the frames from reaching the AP because we'd lose
++        # beacons and get disconnected.  We also can't drop our subnet route or IP address
++        # because IWD's sendto() call would synchronously error out and the DHCP client
++        # would just give up.  Add a false route to break routing to 192.168.1.1 and delete
++        # it afterwards.
++        os.system('ip route add 192.168.1.1/32 dev ' + ifname  + ' via 192.168.1.100 preference 0')
++
++        lease = new_lease
++        renew_time = lease['starts'] + 15
++        now = time.time()
++        ctx.non_block_wait(lambda: False, renew_time + 10 - now, exception=False)
++
++        leases_file = self.parse_lease_file('/tmp/dhcpd.leases', socket.AF_INET)
++        new_lease = leases_file['leases'][socket.inet_pton(socket.AF_INET, '192.168.1.10')]
++        self.assertEqual(new_lease['starts'], lease['starts'])
++
++        os.system('ip route del 192.168.1.1/32 dev ' + ifname  + ' via 192.168.1.100 preference 0')
++
++        retry_time = lease['starts'] + 75
++        now = time.time()
++        ctx.non_block_wait(lambda: False, retry_time + 10 - now, exception=False)
++
++        leases_file = self.parse_lease_file('/tmp/dhcpd.leases', socket.AF_INET)
++        new_lease = leases_file['leases'][socket.inet_pton(socket.AF_INET, '192.168.1.10')]
++        self.assertEqual(new_lease['state'], 'active')
++        self.assertTrue(new_lease['starts'] > lease['starts'] + 70)
++        self.assertTrue(new_lease['starts'] < lease['starts'] + 85)
++        self.assertTrue(new_lease['ends'] > lease['ends'] + 70)
++        self.assertTrue(new_lease['ends'] < lease['ends'] + 85)
++
+         device.disconnect()
+ 
+         condition = 'not obj.connected'
+@@ -116,25 +189,27 @@ class Test(unittest.TestCase):
+             except:
+                 pass
+ 
+-        hapd = HostapdCLI()
+-        cls.hapd = hapd
++        cls.ns1 = ctx.get_namespace('ns1')
++        cls.hapd = HostapdCLI('ap-ns1.conf')
+         # TODO: This could be moved into test-runner itself if other tests ever
+         #       require this functionality (p2p, FILS, etc.). Since its simple
+         #       enough it can stay here for now.
+-        ctx.start_process(['ip', 'addr','add', '192.168.1.1/255.255.128.0',
+-                            'dev', hapd.ifname,]).wait()
+-        ctx.start_process(['touch', '/tmp/dhcpd.leases']).wait()
+-        cls.dhcpd_pid = ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/dhcpd.conf',
+-                                            '-lf', '/tmp/dhcpd.leases',
+-                                            hapd.ifname], cleanup=remove_lease4)
 -
-+		self.ns = ns
-+		self.global_ctrl_iface = '/var/run/hostapd/ctrl' + (str(ns.name) if ns.name else 'main')
- 		self.instances = [HostapdInstance(c, r) for c, r in zip(configs, radios)]
- 
- 		ifaces = [rad.interface.name for rad in radios]
-@@ -227,7 +235,7 @@ class Hostapd:
- 		if Process.is_verbose('hostapd'):
- 			args.append('-d')
- 
--		self.process = Process(args)
-+		self.process = Process(args, namespace=ns.name)
- 
- 		self.process.wait_for_socket(self.global_ctrl_iface, 30)
- 
-@@ -340,7 +348,7 @@ class TestContext(Namespace):
- 			if self.hw_config.has_section(name):
- 				rad_config = self.hw_config[name]
- 
--			self.radios.append(VirtualRadio(name, rad_config))
-+			self.radios.append(VirtualRadio(name, self, rad_config))
- 
- 	def discover_radios(self):
- 		import pyroute2
-@@ -362,7 +370,7 @@ class TestContext(Namespace):
- 					break
- 
- 		print('Discovered radios: %s' % str(phys))
--		self.radios = [Radio(name) for name in phys]
-+		self.radios = [Radio(name, self) for name in phys]
- 
- 	def start_radios(self):
- 		reg_domain = self.hw_config['SETUP'].get('reg_domain', None)
-@@ -397,32 +405,44 @@ class TestContext(Namespace):
- 			#          tests. In this case you would not care what
- 			#          was using each radio, just that there was
- 			#          enough to run all tests.
--			nradios = 0
--			for k, _ in settings.items():
--				if k == 'radius_server':
--					continue
--				nradios += 1
--
--			hapd_radios = self.radios[:nradios]
--
-+			hapd_configs = [conf for rad, conf in settings.items() if rad != 'radius_server']
-+			hapd_processes = [(self, self.radios[:len(hapd_configs)], hapd_configs)]
- 		else:
--			hapd_radios = [rad for rad in self.radios if rad.name in settings]
--
--		hapd_configs = [conf for rad, conf in settings.items() if rad != 'radius_server']
-+			hapd_processes = []
-+			for ns in [self] + self.namespaces:
-+				ns_radios = [rad for rad in ns.radios if rad.name in settings]
-+				if len(ns_radios):
-+					ns_configs = [settings[rad.name] for rad in ns_radios]
-+					hapd_processes.append((ns, ns_radios, ns_configs))
-+			if not hapd_processes:
-+				hapd_processes.append((self, [], []))
- 
- 		radius_config = settings.get('radius_server', None)
- 
--		self.hostapd = Hostapd(hapd_radios, hapd_configs, radius_config)
--		self.hostapd.attach_cli()
-+		self.hostapd = [Hostapd(ns, radios, configs, radius_config)
-+				for ns, radios, configs in hapd_processes]
+-        ctx.start_process(['ip', 'addr', 'add', '3ffe:501:ffff:100::1/72',
+-                            'dev', hapd.ifname]).wait()
+-        ctx.start_process(['touch', '/tmp/dhcpd6.leases']).wait()
+-        cls.dhcpd6_pid = ctx.start_process(['dhcpd', '-6', '-f', '-cf', '/tmp/dhcpd-v6.conf',
+-                                            '-lf', '/tmp/dhcpd6.leases',
+-                                            hapd.ifname], cleanup=remove_lease6)
+-        ctx.start_process(['sysctl', 'net.ipv6.conf.' + hapd.ifname + '.forwarding=1']).wait()
++        cls.ns1.start_process(['ip', 'addr','add', '192.168.1.1/17',
++                            'dev', cls.hapd.ifname]).wait()
++        cls.ns1.start_process(['touch', '/tmp/dhcpd.leases']).wait()
++        cls.dhcpd_pid = cls.ns1.start_process(['dhcpd', '-f', '-d', '-cf', '/tmp/dhcpd.conf',
++                                                '-lf', '/tmp/dhcpd.leases',
++                                                cls.hapd.ifname], cleanup=remove_lease4)
 +
-+		for hapd in self.hostapd:
-+			hapd.attach_cli()
++        cls.ns1.start_process(['ip', 'addr', 'add', '3ffe:501:ffff:100::1/72',
++                            'dev', cls.hapd.ifname]).wait()
++        cls.ns1.start_process(['touch', '/tmp/dhcpd6.leases']).wait()
++        cls.dhcpd6_pid = cls.ns1.start_process(['dhcpd', '-6', '-f', '-d',
++                                                '-cf', '/tmp/dhcpd-v6.conf',
++                                                '-lf', '/tmp/dhcpd6.leases',
++                                                cls.hapd.ifname], cleanup=remove_lease6)
++        cls.ns1.start_process(['sysctl',
++                                'net.ipv6.conf.' + cls.hapd.ifname + '.forwarding=1']).wait()
+         # Send out Router Advertisements telling clients to use DHCPv6.
+         # Note trying to send the RAs from the router's global IPv6 address by adding a
+         # "AdvRASrcAddress { 3ffe:501:ffff:100::1; };" line will fail because the client
+@@ -142,7 +217,7 @@ class Test(unittest.TestCase):
+         # with a non-link-local gateway address that is present on another interface in the
+         # same namespace.
+         config = open('/tmp/radvd.conf', 'w')
+-        config.write('interface ' + hapd.ifname + ''' {
++        config.write('interface ' + cls.hapd.ifname + ''' {
+             AdvSendAdvert on;
+             AdvManagedFlag on;
+             prefix 3ffe:501:ffff:100::/72 { AdvAutonomous off; };
+@@ -151,7 +226,8 @@ class Test(unittest.TestCase):
+             route 3ffe:501:ffff:500::/66 { AdvRoutePreference high; };
+             };''')
+         config.close()
+-        cls.radvd_pid = ctx.start_process(['radvd', '-n', '-d5', '-p', '/tmp/radvd.pid', '-C', '/tmp/radvd.conf'])
++        cls.radvd_pid = cls.ns1.start_process(['radvd', '-n', '-d5',
++                                                '-p', '/tmp/radvd.pid', '-C', '/tmp/radvd.conf'])
  
- 	def get_frequencies(self):
- 		frequencies = []
+         cls.orig_path = os.environ['PATH']
+         os.environ['PATH'] = '/tmp/test-bin:' + os.environ['PATH']
+@@ -160,14 +236,83 @@ class Test(unittest.TestCase):
+     @classmethod
+     def tearDownClass(cls):
+         IWD.clear_storage()
+-        ctx.stop_process(cls.dhcpd_pid)
++        cls.ns1.stop_process(cls.dhcpd_pid)
+         cls.dhcpd_pid = None
+-        ctx.stop_process(cls.dhcpd6_pid)
++        cls.ns1.stop_process(cls.dhcpd6_pid)
+         cls.dhcpd6_pid = None
+-        ctx.stop_process(cls.radvd_pid)
++        cls.ns1.stop_process(cls.radvd_pid)
+         cls.radvd_pid = None
+         os.system('rm -rf /tmp/radvd.conf /tmp/resolvconf.log /tmp/test-bin')
+         os.environ['PATH'] = cls.orig_path
  
--		for hapd in self.hostapd.instances:
--			frequencies.append(hapd.cli.frequency)
-+		for hapd in self.hostapd:
-+			frequencies += [instance.cli.frequency for instance in hapd.instances]
- 
- 		return frequencies
- 
-+	def get_hapd_instance(self, config=None):
-+		instances = [i for hapd in self.hostapd for i in hapd.instances]
++    @staticmethod
++    def parse_lease_file(path, family):
++        file = open(path, 'r')
++        lines = file.readlines()
++        file.close()
 +
-+		if config is None:
-+			return instances[0]
++        stack = [[]]
++        statement = []
++        token = ''
++        for line in lines:
++            whitespace = False
++            quote = False
++            for ch in line:
++                if not quote and ch in ' \t\r\n;{}=#':
++                    if len(token):
++                        statement.append(token)
++                        token = ''
++                if not quote and ch in ';{}':
++                    if len(statement):
++                        stack[-1].append(statement)
++                        statement = []
++                if ch == '"':
++                    quote = not quote
++                elif quote or ch not in ' \t\r\n;{}#':
++                    token += ch
++                if ch == '#':
++                    break
++                elif ch == '{':
++                    stack.append([])
++                elif ch == '}':
++                    statements = stack.pop()
++                    stack[-1][-1].append(statements)
++            if len(token):
++                statement.append(token)
++                token = ''
++        if len(statement):
++            stack[-1].append(statement)
++        statements = stack.pop(0)
++        if len(stack):
++            raise Exception('Unclosed block(s)')
 +
-+		for hapd in instances:
-+			if hapd.config == config:
-+				return hapd
++        contents = {'leases':{}}
++        for s in statements:
++            if s[0] == 'lease':
++                ip = socket.inet_pton(family, s[1])
++                lease = {}
++                for param in s[2]:
++                    if param[0] in ('starts', 'ends', 'tstp', 'tsfp', 'atsfp', 'cltt'):
++                        weekday = param[1]
++                        year, month, day = param[2].split('/')
++                        hour, minute, second = param[3].split(':')
++                        dt = datetime.datetime(
++                                int(year), int(month), int(day),
++                                int(hour), int(minute), int(second),
++                                tzinfo=datetime.timezone.utc)
++                        lease[param[0]] = dt.timestamp()
++                    elif param[0:2] == ['binding', 'state']:
++                        lease['state'] = param[2]
++                    elif param[0:2] == ['hardware', 'ethernet']:
++                        lease['hwaddr'] = bytes([int(v, 16) for v in param[2].split(':')])
++                    elif param[0] in ('preferred-life', 'max-life'):
++                        lease[param[0]] = int(param[1])
++                    elif param[0] in ('client-hostname'):
++                        lease[param[0]] = param[1]
++                contents['leases'][ip] = lease # New entries overwrite older ones
++            elif s[0] == 'server-duid':
++                contents[s[0]] = s[1]
++        return contents
 +
- 	def start_wpas_interfaces(self):
- 		if 'WPA_SUPPLICANT' not in self.hw_config:
- 			return
-@@ -543,11 +563,13 @@ class TestContext(Namespace):
- 		for arg in vars(self.args):
- 			ret += '\t --%s %s\n' % (arg, str(getattr(self.args, arg)))
+ if __name__ == '__main__':
+     unittest.main(exit=True)
+diff --git a/autotests/testNetconfig/dhcpd.conf b/autotests/testNetconfig/dhcpd.conf
+index d8a9d24c..0a154637 100644
+--- a/autotests/testNetconfig/dhcpd.conf
++++ b/autotests/testNetconfig/dhcpd.conf
+@@ -1,5 +1,15 @@
+-default-lease-time 600;         # 10 minutes
+-max-lease-time 7200;            # 2  hours
++default-lease-time 120;         # 2 minutes
++min-lease-time 120;             # 2 minutes
++max-lease-time 120;             # 2 minutes
++option dhcp-renewal-time 15;    # 15 secs for T1
++# We set a relatively low lease lifetime of 2 minutes but our renewal interval
++# (T1) is still unproportionally low to speed the test up -- 12% instead of the
++# default 50% lifetime value.  We need a lifetime in the order of minutes
++# because minimum lease renewal retry interval is 60s per spec.  However by
++# default dhcpd will not renew leases that are newer than 25% their lifetime.
++# Set that threshold to 1% so that we can verify that the lease is renewed
++# without waiting too long.
++dhcp-cache-threshold 1;
  
--		ret += 'Hostapd:\n'
- 		if self.hostapd:
--			for h in self.hostapd.instances:
--				ret += '\t%s\n' % str(h)
-+			for hapd in self.hostapd:
-+				ret += 'Hostapd (ns=%s):\n' % (hapd.ns.name,)
-+				for h in hapd.instances:
-+					ret += '\t%s\n' % (str(h),)
- 		else:
-+			ret += 'Hostapd:\n'
- 			ret += '\tNo Hostapd instances\n'
+ option broadcast-address 192.168.127.255;
+ option routers 192.168.1.254;
+diff --git a/autotests/testNetconfig/hw.conf b/autotests/testNetconfig/hw.conf
+index d5adc9ad..edf656d6 100644
+--- a/autotests/testNetconfig/hw.conf
++++ b/autotests/testNetconfig/hw.conf
+@@ -1,9 +1,11 @@
+ [SETUP]
+-num_radios=3
++num_radios=4
+ start_iwd=0
  
- 		info = self.meminfo_to_dict()
-diff --git a/tools/utils.py b/tools/utils.py
-index f3e12a85..bc030230 100644
---- a/tools/utils.py
-+++ b/tools/utils.py
-@@ -324,7 +324,7 @@ class Namespace:
+ [HOSTAPD]
+-rad0=ssidTKIP.conf
++rad2=ap-main.conf
++rad3=ap-ns1.conf
  
- 		Process(['ip', 'netns', 'add', name]).wait()
- 		for r in radios:
--			Process(['iw', 'phy', r.name, 'set', 'netns', 'name', name]).wait()
-+			r.set_namespace(self)
+ [NameSpaces]
+-ns0=rad2
++ns0=rad0
++ns1=rad3
+diff --git a/autotests/testNetconfig/ssidTKIP.psk b/autotests/testNetconfig/static.psk
+similarity index 100%
+rename from autotests/testNetconfig/ssidTKIP.psk
+rename to autotests/testNetconfig/static.psk
+diff --git a/autotests/testNetconfig/static_test.py b/autotests/testNetconfig/static_test.py
+index d9f0b9cb..01d694ca 100644
+--- a/autotests/testNetconfig/static_test.py
++++ b/autotests/testNetconfig/static_test.py
+@@ -32,7 +32,7 @@ class Test(unittest.TestCase):
+         dev1 = wd.list_devices(1)[0]
+         dev2 = wd_ns0.list_devices(1)[0]
  
- 		self.start_dbus()
+-        ordered_network = dev1.get_ordered_network('ssidTKIP')
++        ordered_network = dev1.get_ordered_network('ap-main')
  
+         self.assertEqual(ordered_network.type, NetworkType.psk)
+ 
+@@ -80,7 +80,7 @@ class Test(unittest.TestCase):
+         # of the log since we care about the end result here.
+         self.assertEqual(expected_rclog, entries[-3:])
+ 
+-        ordered_network = dev2.get_ordered_network('ssidTKIP')
++        ordered_network = dev2.get_ordered_network('ap-main')
+ 
+         condition = 'not obj.connected'
+         wd_ns0.wait_for_object_condition(ordered_network.network_object, condition)
+@@ -117,7 +117,7 @@ class Test(unittest.TestCase):
+             except:
+                 pass
+ 
+-        hapd = HostapdCLI()
++        hapd = HostapdCLI('ap-main.conf')
+         # TODO: This could be moved into test-runner itself if other tests ever
+         #       require this functionality (p2p, FILS, etc.). Since it's simple
+         #       enough it can stay here for now.
+@@ -127,7 +127,7 @@ class Test(unittest.TestCase):
+         cls.dhcpd_pid = ctx.start_process(['dhcpd', '-f', '-cf', '/tmp/dhcpd.conf',
+                                             '-lf', '/tmp/dhcpd.leases',
+                                             hapd.ifname], cleanup=remove_lease)
+-        IWD.copy_to_storage('ssidTKIP.psk', '/tmp/storage')
++        IWD.copy_to_storage('static.psk', '/tmp/storage', 'ap-main.psk')
+ 
+         cls.orig_path = os.environ['PATH']
+         os.environ['PATH'] = '/tmp/test-bin:' + os.environ['PATH']
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 758427fe..3ae8ff89 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -33,7 +33,7 @@ class HostapdCLI(object):
+     _instances = WeakValueDictionary()
+ 
+     def __new__(cls, config=None, *args, **kwargs):
+-        hapd = ctx.hostapd[config]
++        hapd = ctx.get_hapd_instance(config)
+ 
+         if not config:
+             config = hapd.config
+@@ -58,10 +58,10 @@ class HostapdCLI(object):
+         if not ctx.hostapd:
+             raise Exception("No hostapd instances are configured")
+ 
+-        if not config and len(ctx.hostapd.instances) > 1:
++        if not config and sum([len(hapd.instances) for hapd in ctx.hostapd]) > 1:
+             raise Exception('config must be provided if more than one hostapd instance exists')
+ 
+-        hapd = ctx.hostapd[config]
++        hapd = ctx.get_hapd_instance(config)
+ 
+         self.interface = hapd.intf
+         self.config = hapd.config
 -- 
 2.34.1
 
