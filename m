@@ -1,44 +1,44 @@
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743BA4411
-	for <iwd@lists.linux.dev>; Mon, 11 Jul 2022 16:13:57 +0000 (UTC)
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-10bd4812c29so7221962fac.11
-        for <iwd@lists.linux.dev>; Mon, 11 Jul 2022 09:13:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7004681
+	for <iwd@lists.linux.dev>; Tue, 12 Jul 2022 18:02:25 +0000 (UTC)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-10bf634bc50so11282590fac.3
+        for <iwd@lists.linux.dev>; Tue, 12 Jul 2022 11:02:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :references:from:in-reply-to:content-transfer-encoding;
-        bh=9vjyLfjJS5zopS/gtYQ2haaBihRp+b5TdLI8T6O1Zy4=;
-        b=Q9Jzw/x9Ekc65rSxaqahqotg04kM4WUD0BUO92JLPNSpSdICw+59TU+I4GWumkAXHX
-         SumLhDnicewb1yXpAklWU5tyWRBlpjV7foYZGMPNq7gWfb5330+/xXFcLde3vD+ynWKj
-         fUmzzV6+1/cwXCfzn6MZTcXyt8hWs56ohEtN0TkAlXxux9kUuJFJXd5z1IuDpx112rHZ
-         0oOUvsm9szR3A1E6Q+sdfajbhn0NrA+IRKDs3u2RLLhvRTKYcXWB5WyKCuMlm4VIuJ/o
-         Uav+SLYGw/TQ+4XfcZfwUjkMQFLIJMD4AhEk1lhmlO+cSlZeiPlRi4Z+o9flOIdffePL
-         TGcA==
+        bh=/RGd0JoWH8PDw321UscLiepIJqbKaiRhPDrOiJgzYQg=;
+        b=B219RDGBAaLg6hjT40iaHra/nfGxf10juT33Cdwvz5phya6Hp0TB77xpOJ5hYdKP6E
+         xua141EoCJT/Wu53fOVp6haOgcTxAWZIGgAslqT2mJ1BgsFnrnZZXeY+jdazRUnXo1sS
+         9l/ZYzbCf0c7gEhuugI99fOaNbv9KlSbgbmkaxjjpzX4w8cF130y+N+uFkYMdiPoDL0x
+         erSpLsHKPMbo1J8thUJNhJTkAJNopd9fzp9JcOhfNMUeaFF57XYdcYS6/6V1mTLvVunJ
+         eJkG9dHoXjI5e1flqGfVqWoiA9WMWp0SqXw9OzrNebG8xB9sLh3YdAZLzUlxoRhyGjBR
+         Mhrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=9vjyLfjJS5zopS/gtYQ2haaBihRp+b5TdLI8T6O1Zy4=;
-        b=3Jt0INCKo/zPcI4een4YPqVTF7P4ufoZkRjVS7b5W2I92+VS+YMkMPWn1Hu2VRSwLv
-         gZtTRSY4yoE1pdoQnzxSVv9/0Vvj8rWaKDLn4UUjT7ZerLaERk0gu9UTR0qY4O4NmXiR
-         CESkECoE3LBDeDyKCh+FHl6WXh7iFdKd2Cgvdoa2hOgD9rlqVaSXKIlu3v0HdxZRe+g/
-         9ujiFH56FYYs9CWqI8Ni9u3NuXDXiYZtCtWRyML2Wc12T339LCqDC+gQG7qSbWcfhSKr
-         kUssi64lsyam0+SXUOt3ck7vFZramHok0fFc1TMwkMBRHPoAqT5ofubL5Iwj0hTyaMQI
-         mRZQ==
-X-Gm-Message-State: AJIora/XgnOcHGoaedpGeK+FhQOPe04Q0CdQAS06o9LrbUeOUf4BiTce
-	JjsV8Dg+y2vEm3iUSW6cLEs=
-X-Google-Smtp-Source: AGRyM1v3AAzeXnd1LNKpzmDuCZ8eXR5EvznUOjwnSlSWRjKfLPII+k9FlnIE01OXu8BqXO/powkNgA==
-X-Received: by 2002:a05:6870:c5a0:b0:10c:5a7f:1e1c with SMTP id ba32-20020a056870c5a000b0010c5a7f1e1cmr8123048oab.250.1657556036502;
-        Mon, 11 Jul 2022 09:13:56 -0700 (PDT)
+        bh=/RGd0JoWH8PDw321UscLiepIJqbKaiRhPDrOiJgzYQg=;
+        b=y5pj3iQEno9z+0q0tJ+McxHQRV/Lbtfa6+U0kGoykywQtPET6u5Y8rpy8pg31ZeCn4
+         aadt8o3TMRacPTtWGwhvo1n4jZ9fzUvJyIqhW48ausXqraFzCs/B1z8Z4anAwvBF1LtU
+         Zuqj13/WtB5UoBd2/BZu4o0LvlXggBKjW+vW6+hDMAU3tth01NMgku7+TV/CPcJYgpeo
+         7gy6iYP/Vt0VAbN5WBkXZNRYPe/d7LaRmztSEPMoz8SJ7alLK1mOqQpXCInRi70ofXrH
+         dQUqupNDwlEde82DZU3zg8zz2UfmFk60JYSo02VeZIeciW1wk3QRCFVRgPH/RRJyEkyh
+         qImA==
+X-Gm-Message-State: AJIora9t0SS/6xGtw7TbRtnOoLBmuCRGjkUZaB/PnvF3q82AqkbZ760j
+	V4JNCCZQHL5AQq0WupS9gS4=
+X-Google-Smtp-Source: AGRyM1uh1vBDRtPx2/rWWDjVhUMqnZM3vVzWQMOv55HIROc5m+IUF5jNlEh6fU6KCqj6gjLouoKy7w==
+X-Received: by 2002:a05:6870:b3a7:b0:10c:224c:a0b6 with SMTP id w39-20020a056870b3a700b0010c224ca0b6mr2421614oap.248.1657648944646;
+        Tue, 12 Jul 2022 11:02:24 -0700 (PDT)
 Received: from [10.0.2.15] (216.106.68.145.reverse.socket.net. [216.106.68.145])
-        by smtp.googlemail.com with ESMTPSA id y15-20020a9d460f000000b0061c514a3b7bsm787424ote.10.2022.07.11.09.13.55
+        by smtp.googlemail.com with ESMTPSA id u3-20020a056870d58300b000f34dacf350sm5079713oao.6.2022.07.12.11.02.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Jul 2022 09:13:56 -0700 (PDT)
-Message-ID: <ec060bfd-8ba2-605c-3979-60a220194920@gmail.com>
-Date: Mon, 11 Jul 2022 11:11:56 -0500
+        Tue, 12 Jul 2022 11:02:24 -0700 (PDT)
+Message-ID: <f83c458b-4d6d-4f07-d253-b27b1e48250d@gmail.com>
+Date: Tue, 12 Jul 2022 12:48:26 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -47,29 +47,41 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH] test-runner: run prepare_environment with --start
+Subject: Re: [PATCH v3 1/4] test-runner: Support running hostapd in namespaces
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20220708190054.299224-1-prestwoj@gmail.com>
+To: Andrew Zaborowski <andrew.zaborowski@intel.com>, iwd@lists.linux.dev
+References: <20220709002334.3329502-1-andrew.zaborowski@intel.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220708190054.299224-1-prestwoj@gmail.com>
+In-Reply-To: <20220709002334.3329502-1-andrew.zaborowski@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi James,
+Hi Andrew,
 
-On 7/8/22 14:00, James Prestwood wrote:
-> The --start option was directly passed to the kernel init parameter,
-> preventing any environment setup from happening.
-> 
-> Intead always use 'run-tests' as the init process but detect --start
-> and execute that binary/script once inside the environment.
+On 7/8/22 19:23, Andrew Zaborowski wrote:
+> The kernel will not let us test some scenarios of communication between
+> two hwsim radios (e.g. STA and AP) if they're in the same net namespace.
+> For example, when connected, you can't add normal IPv4 subnet routes for
+> the same subnet on two different interfaces in one namespace (you'd
+> either get an EEXIST or you'd replace the other route), you can set
+> different metrics on the routes but that won't fix IP routing.  For
+> testNetconfig the result is that communication works for DHCP before we
+> get the inital lease but renewals won't work because they're unicast.
+> Allow hostapd to run on a radio that has been moved to a different
+> namespace in hw.conf so we don't have to work around these issues.
 > ---
->   tools/run-tests |  7 ++++++-
->   tools/runner.py | 24 ++++++++++++++----------
->   2 files changed, 20 insertions(+), 11 deletions(-)
+> changes in v2:
+>   - ensure at least one hostapd session starts if the [HOSTAPD] section
+>     is present to mimic original behaviour and fix testEAD
+> v3:
+>   - make sure Radio.ns and Interface.ns are always valid (equal ctx
+>     instead of None) to simplify Process(namespace=self.ns) calls
+> 
+>   tools/run-tests | 90 ++++++++++++++++++++++++++++++-------------------
+>   tools/utils.py  |  2 +-
+>   2 files changed, 57 insertions(+), 35 deletions(-)
 
-Applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
