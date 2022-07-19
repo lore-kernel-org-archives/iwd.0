@@ -1,76 +1,78 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0312320E
-	for <iwd@lists.linux.dev>; Mon, 18 Jul 2022 16:03:19 +0000 (UTC)
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-10c0052da61so24866432fac.12
-        for <iwd@lists.linux.dev>; Mon, 18 Jul 2022 09:03:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8887F4A1E
+	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 18:18:59 +0000 (UTC)
+Received: by mail-pl1-f179.google.com with SMTP id j12so12704664plj.8
+        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 11:18:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=w085JLBpQ99GiE/XhaYNJfQBr+pEB2OcgTk7lKRlgKg=;
-        b=GuoYzSA84uoDuH7WXv1gYnn+iIIKMWkA3DnuPPikZ/Zw1yWOSHkHBLzAJIu+hvNtov
-         wJgn/skkQa18nmJhknifGyBRS4TVt1JpuUVgE8hToQx+P+Pos2ewH06VCOM51Mxdphxp
-         20zAmjI8wpgQUlZNyhn/qPSrO8LHxKZioSCVQ+jovypqIFWSvYMfgcyzeVLNca4Azrp7
-         /Uwekl2g5MgDjQAKT9/bIFOtqtNkpIfyMbFyJ4LaB73ZaNfhVTCjbCkNI3gzgqM3OFfe
-         Sd4JZUb5ICZqgNQbhMZ44fG4hTrjQVYppMA69IAPnvY+yBWBt7zgWS3jZQi4YSHjGiMr
-         AGQw==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=dzqkttZ3kngl+YvPKW8HkzNlryZ+F8utjzVq1sveBv4=;
+        b=qfaNLM8FLzyOkEe2SMDNYu0oAp5iXz0flyoyaDiULe11j7AGRupTc8YGJi2+820eOp
+         LZ5DPr4YdVxd+PIdGYPHQ3/1QqZE6VpPYdlvFKlbo70DRqO7YYceqS3vqLGWMttksj3F
+         jNkVDEMSDccMjkbO31xUXp5xXBakd0+/xawMQXkmnxpIZHE+5q7j3DrhHqPrxpgJ6pDk
+         M1FPBJ8WBMxW6DarnMgBhl9NM1Vi+zqhLjFSfW2PH/Na1CBbysQhrDe5gKbOtImt6PuE
+         4yZ3JDZFx4UP66RGF4SXWk2ARadLEDA/oTlekojDT/9ebJhsK98fYe5ucjaqiBKLBw7g
+         YlLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=w085JLBpQ99GiE/XhaYNJfQBr+pEB2OcgTk7lKRlgKg=;
-        b=cEDzpzBVrY+l1/0nTgV2Wgm5N96pNmN/Y7PT/qsPlO0kl9n0Wz0y5Blog94xtit43U
-         yB5e6OYoob+f3K1W9oVghOrvSyeJgx1X/eHW+MIbkhCqXKTkpQjb5Vtp2PWJyBjA6c/M
-         XzP18vDn6hAv19bEfAAl6XMBASEirX6AA3ekGw8/38cANq/ovpLOb+3oAgQ+RRrpdgLl
-         RJZSFjIylzs6qeqpFHzkV8e32Bs2M9hrrfcFLNNvMeyRIGNiIE74/cuFMqWMMjCapTzg
-         V454Dr3ZuCEgsRzZKqHkGqp86EemDDeKmSgVoXTyI77f5B/h20EHQcwZvMTb6Xs5ObKS
-         Q39Q==
-X-Gm-Message-State: AJIora+++ntb5pMJTvo+ebCLdiKX35rGip7SdPUnIeiQsCaF2HcIvZSY
-	7Q5kylamG0GbfDiD/ZwW7Xo=
-X-Google-Smtp-Source: AGRyM1vdrS81veLxpN4/wrKw7IK16w4Ceh/Dpbq8hnMD/X//UwKcz9sd7MqwZ4iMRFs+0TyR63Eo5A==
-X-Received: by 2002:a05:6808:f8a:b0:33a:3b5d:d5f5 with SMTP id o10-20020a0568080f8a00b0033a3b5dd5f5mr11179812oiw.287.1658160198894;
-        Mon, 18 Jul 2022 09:03:18 -0700 (PDT)
-Received: from [10.0.2.15] (216.106.68.145.reverse.socket.net. [216.106.68.145])
-        by smtp.googlemail.com with ESMTPSA id t24-20020a4ae418000000b004359b581401sm1268232oov.25.2022.07.18.09.03.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Jul 2022 09:03:18 -0700 (PDT)
-Message-ID: <9bd2acd5-b987-9c7d-73c6-f133e8f98d0c@gmail.com>
-Date: Mon, 18 Jul 2022 10:58:58 -0500
+        bh=dzqkttZ3kngl+YvPKW8HkzNlryZ+F8utjzVq1sveBv4=;
+        b=smNpU+tLyCuMVr3+ugibt5okzln3jY0oEUwsRojW4INRjEk1oEZlIjj76bJgEqO2lQ
+         snngGgYfo1bo0Iut2sqA9ttSW2f2G8XKEQTpxnCIxlP0aqBAbRW1vXHMfA88Y7fp8u70
+         XEvJDrgBMwOe+EnJgxxqocZ0fjFeRFRBg0AygcTccFENmRLDiQf3pVgdLZr5kLm09oSp
+         gCP/sdGEXWVZIgICTuc/vbWM2gDkV0VNZrqoCeV3+JufymJuBhG8rNwfqh/9/6VrN7WQ
+         cqmJ2tnGqtgP3Db7mlpvPOtg0N9atOtHH/z3kCDfQmjmGYGx1ekDtoI/edXDynvQRxfN
+         yX4Q==
+X-Gm-Message-State: AJIora+OTqgl9TypBeNGCWBHR5pwBfDbEHm+1+JUJtU1C9m+YOvL0gB3
+	hZw6m9oyRVNKfQABWidhmfeysW0JFSc=
+X-Google-Smtp-Source: AGRyM1u/DyKlsb5IoiFpwj7By1U40FH//gfa2lhag8jQaChQweI0DWgUH4VGyb4I9e/CnFggY5NbZQ==
+X-Received: by 2002:a17:902:f7c7:b0:16d:b03:2a18 with SMTP id h7-20020a170902f7c700b0016d0b032a18mr4477653plw.171.1658254738616;
+        Tue, 19 Jul 2022 11:18:58 -0700 (PDT)
+Received: from localhost.localdomain ([50.45.187.22])
+        by smtp.gmail.com with ESMTPSA id i11-20020a170902c94b00b0016cdfcdcff2sm7658467pla.19.2022.07.19.11.18.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Jul 2022 11:18:58 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] test-runner: allow infinite process wait
+Date: Tue, 19 Jul 2022 11:16:45 -0700
+Message-Id: <20220719181647.452178-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: iwd 1.28 segfault while terminating
-Content-Language: en-US
-To: =?UTF-8?Q?Alvin_=c5=a0ipraga?= <ALSI@bang-olufsen.dk>
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>,
- Emil Dahl Juhl <EMDJ@bang-olufsen.dk>
-References: <20220714165240.244e25gcyjtaxhx2@bang-olufsen.dk>
- <75994299-03a7-8a01-30ca-2342e5d7c5e0@gmail.com>
- <20220718091017.yk2yu5fwrf5qbyoc@bang-olufsen.dk>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220718091017.yk2yu5fwrf5qbyoc@bang-olufsen.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Alvin,
+subprocess.Popen's wait() method was overwritten to be non-blocking but
+in certain circumstances you do want to wait forever. Fix this to allow
+timeout=None, which calls the parent wait() method directly.
+---
+ tools/utils.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> Thanks a lot for the patch. Sorry for the slow reply. But I tried it now > and it seems to do the job: after hundreds of cycles it didn't segfault> at 
-all. Previously it was reproducible after 2-3 cycles. And I had a> look over the 
-patch and it seems correct.
-Excellent, thanks for testing!
+diff --git a/tools/utils.py b/tools/utils.py
+index f3e12a85..156f8ce4 100644
+--- a/tools/utils.py
++++ b/tools/utils.py
+@@ -246,6 +246,10 @@ class Process(subprocess.Popen):
+ 
+ 	# Override wait() so it can do so non-blocking
+ 	def wait(self, timeout=10):
++		if timeout == None:
++			super().wait()
++			return
++
+ 		Namespace.non_block_wait(self.__wait, timeout, 1)
+ 		self._cleanup()
+ 
+-- 
+2.34.1
 
-> 
-> Do you intend to commit it to the upstream git tree?
-
-Yes, pushed out upstream now.
-
-Regards,
--Denis
