@@ -1,99 +1,74 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CB553A7
-	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 22:32:00 +0000 (UTC)
-Received: by mail-pl1-f171.google.com with SMTP id w7so828223plp.5
-        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 15:32:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78642561
+	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 23:05:19 +0000 (UTC)
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-10c0119dd16so34040080fac.6
+        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 16:05:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Wg0FqvAGdQmhWcx1Rh6Wtr2dDeDZXDZaJsqxMuBDV3g=;
-        b=Ld23kgmVlkcgklKQ5YXxLOkpLtdfqmmWPgDYhfzxGTzE7Gxen/EXdJJ6vLI2eVm9jW
-         5lEIWx+2lwWCqqoAIRQdGGXS6EDuZXrj8asxsGi7beH0K7us6EVUeMPUnSxzGK5KG77a
-         6y9YDGE9ouNsGNTRppJVa+8QXuSRG3Bsg/DyPYJ1/q5SzfIC9kY3/T6sYh2e0DWLfl3F
-         P8jb/nVi39XkgBYK6badu+1lwdkNEJ/rxNdY/UoVyqSnt4J37/jPyHd3fyQwLpNtZiLe
-         eD9g4cMhf5vPcUx7xMbuM+CJcDMpNkwqpg2j2bzU/eM0XDcCJYsvkMdzvZSgQSu8EZkk
-         3SPg==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:from:in-reply-to:content-transfer-encoding;
+        bh=SRoZYG1C0mblqgdR61CVWUbTgxYVOBwpfH7CEb1yYlk=;
+        b=pwV/rxwoX1PxRRe8iQFyKUMJY/gmNxLKmfPDiCgD151I78EfYPQbzkeckf5AE3H3hQ
+         FQ9UicEtEdpdnSI5RgtSiuXc8UYXqLrBteF5vCqajOkg+kdjpqnOI2n4FP41j2U15e2O
+         fn4br0c5J5OyY/D4WgNwnY0UOVF8LoyxYgdTl+v1hHGzYcQ5OFHn+mD/Xa+LePio9E+4
+         TDa+svxjxSveADI6J8igt5hcAdzVSTK1MTRA1/fjWRQ4xI1iFYz/DKCzUYYTtLLLjtAq
+         OGz/4odtnTx6rp4DYqG0iKvU5luNQYitjpLzV8GstFzs/6NmjU2Othb61JeR5milZ6OL
+         d4Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Wg0FqvAGdQmhWcx1Rh6Wtr2dDeDZXDZaJsqxMuBDV3g=;
-        b=oP3Xt0NgiuaIlYhuA/NVGas9O8AZtd7iimaZePMUUk6Vhv4uBHPNgdzDpS9xKJYRSU
-         CZLuE5goSFAOlrtM7FPLoa4tx4/FUNQbSz5MVvqToclfllqnIQ6DwR5HGo8aNSbTHWV9
-         9ix0WTqUeBfh+WKCjOwwI+5QGAuCriWJXblzIJ7Uhiqtd2eQ2CGuu7ui8g7xsePSvCPm
-         EHJVgRR0kQ/qv4A+d81EXvmswx1OIeg3+KUdxLVCSvF1FjXKoqa9OgXYtwqPY94nhpW2
-         QKHIjI4Ds9HHrNgH0crEJYMaZRWnY9+KCMDiMtRTAfjyH8mARseIgfjjz18u8pRNvBD6
-         f+pw==
-X-Gm-Message-State: AJIora+TLjHC3oA8HXKvGlSRIoQ4Ic/fk1RwC4fooMTBdIRezuCamMoW
-	YtmsLpfk2S0vfy4HbJasIVX8eCNKFW8=
-X-Google-Smtp-Source: AGRyM1snjyeUwaqPcfYy1xWZ+JjPMUQtOww+0wUXTVsi70qqLMlzs+9riBmztdl434aMbMNCCLOLng==
-X-Received: by 2002:a17:90a:460e:b0:1f1:acb6:34 with SMTP id w14-20020a17090a460e00b001f1acb60034mr1761885pjg.167.1658269919641;
-        Tue, 19 Jul 2022 15:31:59 -0700 (PDT)
-Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id g3-20020a170902e38300b0015e8d4eb1c8sm12067154ple.18.2022.07.19.15.31.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 15:31:59 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] wiphy: fix strange compiler bug with gcc 11.2
-Date: Tue, 19 Jul 2022 15:29:50 -0700
-Message-Id: <20220719222950.540619-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220719222950.540619-1-prestwoj@gmail.com>
-References: <20220719222950.540619-1-prestwoj@gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=SRoZYG1C0mblqgdR61CVWUbTgxYVOBwpfH7CEb1yYlk=;
+        b=Ew7f7g3D/fecS9kSWNBEK/yDr8iBnGctFiUuFj3331w2Cb5ws1IxqG/UyaHrXpXcdd
+         XJlfeg7NvtuYhKeeq4SL1eYYIN/GUfny+tIrFZVCunv2jqNVoLmmJMPY8QnNGOB7EBrj
+         zEZRuF9iV2o1HbgeJThSsSvQnRx30WtZS1AMT4w0N9mPLj8GQtWln9qlTU5X10KTuYb8
+         mCedOXVOODgrKzc6jb2GzBKAMym0vlumEXvObgTes1Duf9EEbAj+HN/GGZVC2tG3ntwJ
+         3FA8b/yAS9dO6PcDOVHoPzroQ9wqXJaTFJU/Dz86vewo94wrEr1VGVgbOFJUX9llKp9u
+         Cmjw==
+X-Gm-Message-State: AJIora9gq4GinlN7Npn97YySH4jvf1BWXNHB0IKQTIqzPqR76AoKPBuh
+	jqLrwWWrWl9wLMcxdnauGtA=
+X-Google-Smtp-Source: AGRyM1uAFsf74WMWXaxbLpX9amTtwWM4wWoapFJT0yxscIfu5wvmooylVbLhjLFSQZUDYGRWQC9dMA==
+X-Received: by 2002:a05:6870:4286:b0:10c:326a:27a with SMTP id y6-20020a056870428600b0010c326a027amr975754oah.259.1658271918695;
+        Tue, 19 Jul 2022 16:05:18 -0700 (PDT)
+Received: from [10.0.2.15] (216.106.68.145.reverse.socket.net. [216.106.68.145])
+        by smtp.googlemail.com with ESMTPSA id l20-20020a4ae2d4000000b00435b646f160sm682518oot.5.2022.07.19.16.05.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Jul 2022 16:05:18 -0700 (PDT)
+Message-ID: <bf381f0b-06a9-0c0e-5bca-8157d8d35aba@gmail.com>
+Date: Tue, 19 Jul 2022 17:45:37 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 1/2] unit: memset band to zero after alloc
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220719222950.540619-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220719222950.540619-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-There appears to be a compiler bug with gcc 11.2 which thinks the vht_mcs_set
-is a zero length array, and the memset of size 8 is out of bounds. This is only
-seen once an element is added to 'struct band'.
+Hi James,
 
-In file included from /usr/include/string.h:519,
-                 from src/wiphy.c:34:
-In function ‘memset’,
-    inlined from ‘band_new_from_message’ at src/wiphy.c:1300:2,
-    inlined from ‘parse_supported_bands’ at src/wiphy.c:1423:11,
-    inlined from ‘wiphy_parse_attributes’ at src/wiphy.c:1596:5,
-    inlined from ‘wiphy_update_from_genl’ at src/wiphy.c:1773:2:
-/usr/include/bits/string_fortified.h:59:10: error: ‘__builtin_memset’ offset [0, 7] is out of the bounds [0, 0] [-Werror=array-bounds]
-   59 |   return __builtin___memset_chk (__dest, __ch, __len,
-      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   60 |                                  __glibc_objsize0 (__dest));
-      |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~
----
- src/wiphy.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+On 7/19/22 17:29, James Prestwood wrote:
+> In test-band the band object was allocated using l_malloc, but not
+> memset to zero. This will cause problems if allocated pointers are
+> included in struct band once band is freed.
+> ---
+>   unit/test-band.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index a52d0941..4dcfb8b3 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -1187,7 +1187,15 @@ static struct band *band_new_from_message(struct l_genl_attr *band)
- 	toalloc = sizeof(struct band) + count * sizeof(uint8_t);
- 	ret = l_malloc(toalloc);
- 	memset(ret, 0, toalloc);
-+
-+#if __GNUC__ == 11 && __GNUC_MINOR__ == 2
-+_Pragma("GCC diagnostic push")
-+_Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
-+#endif
- 	memset(ret->vht_mcs_set, 0xff, sizeof(ret->vht_mcs_set));
-+#if __GNUC__ == 11 && __GNUC_MINOR__ == 2
-+_Pragma("GCC diagnostic pop")
-+#endif
- 
- 	return ret;
- }
--- 
-2.34.1
+Both applied, thanks.
+
+Regards,
+-Denis
 
