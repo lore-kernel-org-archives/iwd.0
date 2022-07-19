@@ -1,47 +1,47 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8574C67
-	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 18:18:59 +0000 (UTC)
-Received: by mail-pl1-f182.google.com with SMTP id f11so12705689plr.4
-        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 11:18:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954E14C6D
+	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 18:19:00 +0000 (UTC)
+Received: by mail-pj1-f50.google.com with SMTP id s18-20020a17090aa11200b001f1e9e2438cso3828423pjp.2
+        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 11:19:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=jQNE1ia2VUIM3+zj5hueqNZxabr1Ll8cgUbflC1qpT8=;
-        b=JDiyRCRrYSTPjIbRsANs81g+R75gcW07iICApytr2/XthOqmh8LaHgmEfac4Eh6i8o
-         /Z5U/UY8CHe+IIk8L2K5duhD12aerI6rNhpO8yG3M0/bij9dbT8PfxWoA1tS2VtdyuXS
-         ioa+JSK5cbh322rdeAj6ylcYZKgT8lCeirz7vB0mCFGavBRH2CwyJHcQS4lnG1/XfpBA
-         N+dPWd732uRj8Ex+hqWi/qLsC7AY2s425ZNIpsfe8mRSH2UgqIAY7uRTp2h6H3EvEQJB
-         +jrQUiQk3tD+KyNj61k2qE8qRjOJkWdHtySTXZ5kdocJQA1WMafEY1hQn7svTOc7UGHJ
-         bCFg==
+        bh=ek4+0xhkCQg7JmisIChHW3JfHeFzcT8R9pu89k7ig2A=;
+        b=RytMHRJGKYWKrK+m6aC8gfBkpzACdjJlRjYmN9gVKpln4S80C728WtbHaIFqQ4s0Ag
+         TjaMbIt3iz7vbUmM8KayeRc5lTuuxiELCGMbfCdaR3Ln8GRxMmDUC9b5ja8yyl6C7jvY
+         kHZ/2IrECvwoFr+QgdUbNA7qc0fuF277p2E9xltxQ4HmZnxFt2QoXpxffygND6dtLMHe
+         KRmYavuqjxjL99b0R8qwtjyln+4iFOznfGmpmS1zRi8xKw0CzLqCNXdJI2n2Ukh/r1cL
+         KhJPQbRyO8pyn2/xeX1Di99AOfDFX9QlpR5ZfZ1L20m7Fg2EoYcyuBTVyy6RAaQOZkBl
+         OT5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jQNE1ia2VUIM3+zj5hueqNZxabr1Ll8cgUbflC1qpT8=;
-        b=FUpkfSQBdc7qscGTLqQ5d9bdF2qzNBprGOWJgc1BsEvPxW1IqsXdP2lKuYPkyexugX
-         LhruQ/duSlir0gdb/69briv80S7QjUs4L1wllM3QuohLea83hpbdiCriqxj48tINzq15
-         QILTEs0OOod26MZ7aRS9+u33/ii0buqZsNIzga8q4NyeieotKkNmCZnuqPHohUzFMc2S
-         AGBP9WA8QYrpStmdlEA4Jokp/nbKi53gQ2vZpBPfooRurSsyVctXQ5e22eKlSCPpiCgg
-         hCTi/ovjYKR93Pnv2Th+GGX7wDQ32u1FUYVMxjuQo3rsYKyA4+l151KZeBNmnwRhcn9d
-         JcpA==
-X-Gm-Message-State: AJIora8OpkE0AbGfgGSEBs2KV17VPhHcQ/KMzURsAhtqVqvPy/g9EgaT
-	hy0GCysQ+dcfUMgMEIbiy5nJisRb7xQ=
-X-Google-Smtp-Source: AGRyM1v9iuavBLMZlRKKQBcrKea7VcCjG26TDZN9M0uVSm6IkuASTDsFdGssuki+LEK+dvuH8NLNvg==
-X-Received: by 2002:a17:902:d2c8:b0:16c:4746:90e9 with SMTP id n8-20020a170902d2c800b0016c474690e9mr34227434plc.98.1658254739074;
+        bh=ek4+0xhkCQg7JmisIChHW3JfHeFzcT8R9pu89k7ig2A=;
+        b=AHNf+QEulL/ah/HIppB6qfoLvncUFDCfL76mbXNU9fwakCUny1YphzjnSqEpO+/xow
+         MCPblgFBHXwsKoNLNloR/xmG3uEDADEnVFZkHSK30vPDykqPKGbwwEeU+dBe4/RjCFWD
+         bNx/jCKAFgqmbvuSDSRjZYMHJy6rrefrl/UWuSiORY2ImOAWoHnRgst1NUfITMIwNY7z
+         0/Zc8yaGnnBa50tul5sat4pjEXbuJN6Wy5SZ/T7cB9yYXT//puKGzs5ceVAefvV+kIEh
+         XjPc/MtWK1B6N4JzFjRajQQ6yxVXR6oyOw6Kf0VGy/f0l+b9drBtQcxl0MoP6GDegWjt
+         VkYw==
+X-Gm-Message-State: AJIora8vcRhFxxQx/pEwIy6A5EHQpuHu2g0xQSOGvFMz5eElCEHuBOdH
+	p5jAJwAzDYV6d6iKv4TudOOX4Qtq4nE=
+X-Google-Smtp-Source: AGRyM1uzjYhlbNl+1sv3pNqw3PwaRPGuG5uI02YMbYb/KLJlzSWmZTpph25EGrIZVGKAtzy7UVJpeA==
+X-Received: by 2002:a17:90a:fe0d:b0:1ef:b025:cc7b with SMTP id ck13-20020a17090afe0d00b001efb025cc7bmr678865pjb.71.1658254739742;
         Tue, 19 Jul 2022 11:18:59 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id i11-20020a170902c94b00b0016cdfcdcff2sm7658467pla.19.2022.07.19.11.18.58
+        by smtp.gmail.com with ESMTPSA id i11-20020a170902c94b00b0016cdfcdcff2sm7658467pla.19.2022.07.19.11.18.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 11:18:58 -0700 (PDT)
+        Tue, 19 Jul 2022 11:18:59 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/3] test-runner: set up environment with --start
-Date: Tue, 19 Jul 2022 11:16:46 -0700
-Message-Id: <20220719181647.452178-2-prestwoj@gmail.com>
+Subject: [PATCH 3/3] test-runner: automatically find PCI passthrough config
+Date: Tue, 19 Jul 2022 11:16:47 -0700
+Message-Id: <20220719181647.452178-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220719181647.452178-1-prestwoj@gmail.com>
 References: <20220719181647.452178-1-prestwoj@gmail.com>
@@ -53,102 +53,86 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The --start option was directly passed to the kernel init parameter,
-preventing any environment setup from happening.
+When PCI adapters are properly configured they should exist in the
+vfio-pci system tree. It is assumed any devices configured as such
+are used for test-runner.
 
-Intead always use 'run-tests' as the init process but detect --start
-and execute that binary/script once inside the environment. This also
-starts dbus, and sets the right dbus address for any processes started
-by the --start script.
+This removes the need for a hw.conf file to be supplied, but still
+is required for USB adapters. Because of this the --hw option was
+updated to allow no value, or a file path.
 ---
- tools/run-tests | 12 +++++++++++-
- tools/runner.py | 24 ++++++++++++++----------
- 2 files changed, 25 insertions(+), 11 deletions(-)
+ tools/runner.py | 42 ++++++++++++++++++++++++++++++++----------
+ 1 file changed, 32 insertions(+), 10 deletions(-)
 
-diff --git a/tools/run-tests b/tools/run-tests
-index 565847df..f59c71fe 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -1011,5 +1011,15 @@ runner = Runner()
- 
- atexit.register(exit_vm)
- runner.prepare_environment()
--run_tests(runner.args)
-+
-+if runner.args.start:
-+	ctx = TestContext(runner.args)
-+	ctx.start_dbus()
-+	os.chdir(runner.args.testhome)
-+	os.environ['DBUS_SYSTEM_BUS_ADDRESS'] = ctx.dbus_address
-+
-+	subprocess.run([runner.args.start])
-+else:
-+	run_tests(runner.args)
-+
- runner.cleanup_environment()
 diff --git a/tools/runner.py b/tools/runner.py
-index d39b560f..cf904412 100644
+index cf904412..4f1b64c7 100644
 --- a/tools/runner.py
 +++ b/tools/runner.py
-@@ -197,14 +197,6 @@ class Runner:
- 			else:
- 				args.testhome = os.getcwd()
+@@ -115,6 +115,9 @@ class RunnerCoreArgParse(ArgumentParser):
+ 				help='Writes PASS/FAIL to results file')
+ 		self.add_argument('--hw', '-w',
+ 				type=str,
++				nargs='?',
++				const=True,
++				action='store',
+ 				help='Use physical adapters for tests (passthrough)')
+ 		self.add_argument('--testhome', help=SUPPRESS)
+ 		self.add_argument('--monitor-parent', help=SUPPRESS)
+@@ -381,18 +384,18 @@ class QemuRunner(RunnerAbstract):
+ 		self._prepare_outfiles()
  
--		if args.start is None:
--			if os.path.exists('run-tests'):
--				args.start = os.path.abspath('run-tests')
--			elif os.path.exists('tools/run-tests'):
--				args.start = os.path.abspath('tools/run-tests')
--			else:
--				raise Exception("Cannot locate run-tests binary")
--
- 		# If no runner is specified but we have a kernel image assume
- 		# if the kernel is executable its UML, otherwise qemu
- 		if not args.runner:
-@@ -231,6 +223,16 @@ class RunnerAbstract:
- 	def __init__(self, args):
- 		self.args = args
+ 		if args.hw:
+-			hw_conf = ConfigParser()
+-			hw_conf.read(args.hw)
++			if os.path.isfile(args.hw):
++				hw_conf = ConfigParser()
++				hw_conf.read(args.hw)
  
-+		if len(sys.argv) <= 1:
-+			return
+-			if hw_conf.has_section('USBAdapters'):
+-				# The actual key name of the adapter
+-				# doesn't matter since all we need is the
+-				# bus/address. This gets named by the kernel
+-				# anyways once in the VM.
+-				usb_adapters = [v for v in hw_conf['USBAdapters'].values()]
++				if hw_conf.has_section('USBAdapters'):
++					# The actual key name of the adapter
++					# doesn't matter since all we need is the
++					# bus/address. This gets named by the kernel
++					# anyways once in the VM.
++					usb_adapters = [v for v in hw_conf['USBAdapters'].values()]
+ 
+-			if hw_conf.has_section('PCIAdapters'):
+-				pci_adapters = [v for v in hw_conf['PCIAdapters'].values()]
++			pci_adapters = self._find_pci_adapters()
+ 
+ 		kern_log = "ignore_loglevel" if "kernel" in args.verbose else "quiet"
+ 
+@@ -472,6 +475,25 @@ class QemuRunner(RunnerAbstract):
+ 
+ 		self.cmdline = qemu_cmdline
+ 
++	def _find_pci_adapters(self):
++		adapters = []
 +
-+		if os.path.exists('run-tests'):
-+			self.init = os.path.abspath('run-tests')
-+		elif os.path.exists('tools/run-tests'):
-+			self.init = os.path.abspath('tools/run-tests')
-+		else:
-+			raise Exception("Cannot locate run-tests binary")
++		try:
++			files = os.listdir('/sys/module/vfio_pci/drivers/pci:vfio-pci')
++		except:
++			return None
 +
- 	def start(self):
- 		print("Starting %s" % self.name)
- 		os.execlpe(self.cmdline[0], *self.cmdline, self.env)
-@@ -279,6 +281,8 @@ class RunnerAbstract:
- 
- 		fcntl.ioctl(STDIN_FILENO, TIOCSTTY, 1)
- 
-+		os.system('ip link set dev lo up')
++		for bus_addr in files:
++			if not bus_addr.startswith('0000:'):
++				continue
 +
- 	def cleanup_environment(self):
- 		rmtree('/tmp/iwd')
- 		rmtree('/tmp/certs')
-@@ -413,7 +417,7 @@ class QemuRunner(RunnerAbstract):
- 				rootflags=trans=virtio \
- 				acpi=off pci=noacpi %s ro \
- 				mac80211_hwsim.radios=0 init=%s %s' %
--						(kern_log, args.start, args.to_cmd()),
-+						(kern_log, self.init, args.to_cmd()),
- 		]
++			adapters.append(bus_addr.replace('0000:', ''))
++
++		if len(adapters) == 0:
++			return None
++
++		return adapters
++
+ 	def prepare_environment(self):
+ 		mounts = [ MountInfo('debugfs', 'debugfs', '/sys/kernel/debug', '', 0) ]
  
- 		# Add two ethernet devices for testing EAD
-@@ -516,7 +520,7 @@ class UmlRunner(RunnerAbstract):
- 
- 		cmd = [args.kernel, 'rootfstype=hostfs', 'ro', 'mem=256M', 'mac80211_hwsim.radios=0',
- 				'time-travel=inf-cpu', 'eth0=mcast', 'eth1=mcast',
--				'%s '% kern_log, 'init=%s' % args.start]
-+				'%s' % kern_log, 'init=%s' % self.init]
- 		cmd.extend(args.to_cmd().split(' '))
- 
- 		self.cmdline = cmd
 -- 
 2.34.1
 
