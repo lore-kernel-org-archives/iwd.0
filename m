@@ -1,48 +1,50 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871544C77
-	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 18:54:33 +0000 (UTC)
-Received: by mail-pf1-f171.google.com with SMTP id b9so14411484pfp.10
-        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 11:54:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC364C79
+	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 18:54:34 +0000 (UTC)
+Received: by mail-pg1-f177.google.com with SMTP id g4so14333289pgc.1
+        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 11:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MrN63qWlC0eGThSaST+KTEZ+HMIG+SOOOEU1SOly46w=;
-        b=LN/6J/LJiJercXKa+4ZFHpMvC5ad9Us471zossEyqrNjhkjngdEc1ZNolA5rxVHMsN
-         AQKywhyTJFTlGr8j+MBsiQYLpF3axlQFhRLz0Heih3UB2I7a98Yoqebk8I27z1hRBNWD
-         SAdo3qll8IR6bNVFm6Wf+RJcdXUfydevv5XQ2Yu0JW/KrfI6mp98FnnUnewwv65+AXnb
-         pKpZ9sWJZFClfCnqkarMPRclpZzQxQzu8jgJ+Lhmc1vl3PG1u5CfOe7vaoO62GFcPtir
-         EwVnGJrJhVoQ7uQJMBSkEi/3aF4MvIAgowPWkAhnsBeQ4f+qH3JgnhG9gUKhEVvH/maJ
-         NWoA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=sXH3OzZkLBPR6ZmtGWLtpJEAWfagUWw8oGir3M1fMoo=;
+        b=qvKLBw69xkHfrg8+dcJFcnVSN1Ye91oVo89/i+wQBAIrMzVK/eaEuuANx8d8RcO5Tj
+         pfev0YuEnPuMpVSFQ6zUPIxPLfh55PaqwTsobBiQkN/vfO0cUIBQMdkAfAE3LIuNFVst
+         AwYOdG3BZxMf5/TIAplskR8Q8qH4Rc+Kp9aR0l4bcJ5x7VUPkaAS7gFiKv+zTE/YX4Am
+         8gYbfBW/nju/02gR2JzeIngTWC928jRxjdxcLCeFvkjG17SaXsQBeYK9pa0BHUadjVaS
+         QWJIZz+L2IuuyKzgP27j6og87o8J4HJpMtm3Otuxp3KszEGFzHqd9tMOUqRyIICsBDyt
+         0sgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MrN63qWlC0eGThSaST+KTEZ+HMIG+SOOOEU1SOly46w=;
-        b=yxeq2MOOOFlXzqZ02q8ujBfLqPixhQGzFRKNsgM4HHaMSpLikJ3fuQG7HriR+tBncw
-         w0ftaXLKrrI5FqgiGUCohkhipa/5LlDjOuvkGL/hEpixhNBOCsKt6Ncbp/ygLqkfKY7r
-         NOUKSV1spRxJ+eTYQ6L3Z8GvfN973KmdphZqGqhculdNXYmbLCex03Zx9t9J7GXeu9RJ
-         Qh6KO3FLYJl7isnqVt9GGhS5IJLC2r1LpkapuWxgXltNmHhrnG40sBPl77SthHly+3tb
-         Oq1iZ8R3yA425koEnwXiFka8e/a5M94Dxq3aZHPWu4VspOyn/kSmWqxJaJFTu+1+FDao
-         WDkQ==
-X-Gm-Message-State: AJIora+z0HVlZ/s/dUJJo5Jl2sLBmi7+FzL6N1xehY9I2vBN+MEdMc3Y
-	GjLNzqe+wwJKjDMCgqP5fo0R4ZnmkSg=
-X-Google-Smtp-Source: AGRyM1v+UfjDsgcTBaKRBiQ3ggp2l6cbXg0cGOH5gRLHDeH8ey/C1xJrtSao1q+05v1i1VTkL2c1PA==
-X-Received: by 2002:a63:cf18:0:b0:40d:5506:df97 with SMTP id j24-20020a63cf18000000b0040d5506df97mr30225659pgg.43.1658256872778;
-        Tue, 19 Jul 2022 11:54:32 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=sXH3OzZkLBPR6ZmtGWLtpJEAWfagUWw8oGir3M1fMoo=;
+        b=EcpnY6g50l/M5EH/11zqZ92p72/EwFdJTlv8EUsl9/kK3eOKLYFUCUmPOGOukSviT4
+         7GxhT2CiXIJJpUprJ7HII/0A1bZ5vI0685cmwaqLhjLwLzu8ZiMR55JLPmadpOVDjzMt
+         9wntnhbc+S0lYoE9YVlkOnA3Nby4QzS0cibA5CVebIqn6Y0qsdFp+ysdhmY/PMHz+npG
+         K1ZwNr7S7I2+6/w2dLCmXHW5K22cNclKww3LHloiovTMr9JwPK1SvXOxIaGxpr9u/r5h
+         JhIE0mxOz+nkOqqu/TjU7IZAGydn+uBeiP622BNRVQrCrA/4znVqitd4QQaxrNABRblF
+         6ifA==
+X-Gm-Message-State: AJIora/gFh78M+RiV+QIU7cbP2V5zGYLWPNKAPvYEqblzzVdB2HwQZvH
+	f7ihq3T4v15Pfrqmkhux1I4Wcz9jneQ=
+X-Google-Smtp-Source: AGRyM1v08xDGNuS1hAr9HgOUdsJisbDP+M4uYdcIiuE2TLAM4nhyTQkN2r0QGSR/aKb7Z8l3+Gjsng==
+X-Received: by 2002:a63:4722:0:b0:40d:289e:8637 with SMTP id u34-20020a634722000000b0040d289e8637mr30017582pga.362.1658256873379;
+        Tue, 19 Jul 2022 11:54:33 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
         by smtp.gmail.com with ESMTPSA id w24-20020aa79558000000b0052af2e8bba3sm11851616pfq.37.2022.07.19.11.54.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 11:54:32 -0700 (PDT)
+        Tue, 19 Jul 2022 11:54:33 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/3] test-runner: allow infinite process wait
-Date: Tue, 19 Jul 2022 11:52:21 -0700
-Message-Id: <20220719185223.456197-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/3] test-runner: start dbus with --start
+Date: Tue, 19 Jul 2022 11:52:22 -0700
+Message-Id: <20220719185223.456197-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220719185223.456197-1-prestwoj@gmail.com>
+References: <20220719185223.456197-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,27 +53,32 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-subprocess.Popen's wait() method was overwritten to be non-blocking but
-in certain circumstances you do want to wait forever. Fix this to allow
-timeout=None, which calls the parent wait() method directly.
+Starts dbus-daemon as well as sets the right environment variables
+so IWD can start (and any other dbus services).
 ---
- tools/utils.py | 4 ++++
- 1 file changed, 4 insertions(+)
+ tools/run-tests | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/tools/utils.py b/tools/utils.py
-index bc030230..7a182848 100644
---- a/tools/utils.py
-+++ b/tools/utils.py
-@@ -246,6 +246,10 @@ class Process(subprocess.Popen):
+v2:
+ - Rebased so it would apply cleanly.
+
+diff --git a/tools/run-tests b/tools/run-tests
+index 8f84c844..e45ffe46 100755
+--- a/tools/run-tests
++++ b/tools/run-tests
+@@ -1037,7 +1037,12 @@ atexit.register(exit_vm)
+ runner.prepare_environment()
  
- 	# Override wait() so it can do so non-blocking
- 	def wait(self, timeout=10):
-+		if timeout == None:
-+			super().wait()
-+			return
+ if runner.args.start:
+-	os.system(runner.args.start)
++	ctx = TestContext(runner.args)
++	ctx.start_dbus()
++	os.chdir(runner.args.testhome)
++	os.environ['DBUS_SYSTEM_BUS_ADDRESS'] = ctx.dbus_address
 +
- 		Namespace.non_block_wait(self.__wait, timeout, 1)
- 		self._cleanup()
++	subprocess.run([runner.args.start])
+ else:
+ 	run_tests(runner.args)
  
 -- 
 2.34.1
