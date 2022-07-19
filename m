@@ -1,50 +1,48 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954E14C6D
-	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 18:19:00 +0000 (UTC)
-Received: by mail-pj1-f50.google.com with SMTP id s18-20020a17090aa11200b001f1e9e2438cso3828423pjp.2
-        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 11:19:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871544C77
+	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 18:54:33 +0000 (UTC)
+Received: by mail-pf1-f171.google.com with SMTP id b9so14411484pfp.10
+        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 11:54:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=ek4+0xhkCQg7JmisIChHW3JfHeFzcT8R9pu89k7ig2A=;
-        b=RytMHRJGKYWKrK+m6aC8gfBkpzACdjJlRjYmN9gVKpln4S80C728WtbHaIFqQ4s0Ag
-         TjaMbIt3iz7vbUmM8KayeRc5lTuuxiELCGMbfCdaR3Ln8GRxMmDUC9b5ja8yyl6C7jvY
-         kHZ/2IrECvwoFr+QgdUbNA7qc0fuF277p2E9xltxQ4HmZnxFt2QoXpxffygND6dtLMHe
-         KRmYavuqjxjL99b0R8qwtjyln+4iFOznfGmpmS1zRi8xKw0CzLqCNXdJI2n2Ukh/r1cL
-         KhJPQbRyO8pyn2/xeX1Di99AOfDFX9QlpR5ZfZ1L20m7Fg2EoYcyuBTVyy6RAaQOZkBl
-         OT5w==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=MrN63qWlC0eGThSaST+KTEZ+HMIG+SOOOEU1SOly46w=;
+        b=LN/6J/LJiJercXKa+4ZFHpMvC5ad9Us471zossEyqrNjhkjngdEc1ZNolA5rxVHMsN
+         AQKywhyTJFTlGr8j+MBsiQYLpF3axlQFhRLz0Heih3UB2I7a98Yoqebk8I27z1hRBNWD
+         SAdo3qll8IR6bNVFm6Wf+RJcdXUfydevv5XQ2Yu0JW/KrfI6mp98FnnUnewwv65+AXnb
+         pKpZ9sWJZFClfCnqkarMPRclpZzQxQzu8jgJ+Lhmc1vl3PG1u5CfOe7vaoO62GFcPtir
+         EwVnGJrJhVoQ7uQJMBSkEi/3aF4MvIAgowPWkAhnsBeQ4f+qH3JgnhG9gUKhEVvH/maJ
+         NWoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ek4+0xhkCQg7JmisIChHW3JfHeFzcT8R9pu89k7ig2A=;
-        b=AHNf+QEulL/ah/HIppB6qfoLvncUFDCfL76mbXNU9fwakCUny1YphzjnSqEpO+/xow
-         MCPblgFBHXwsKoNLNloR/xmG3uEDADEnVFZkHSK30vPDykqPKGbwwEeU+dBe4/RjCFWD
-         bNx/jCKAFgqmbvuSDSRjZYMHJy6rrefrl/UWuSiORY2ImOAWoHnRgst1NUfITMIwNY7z
-         0/Zc8yaGnnBa50tul5sat4pjEXbuJN6Wy5SZ/T7cB9yYXT//puKGzs5ceVAefvV+kIEh
-         XjPc/MtWK1B6N4JzFjRajQQ6yxVXR6oyOw6Kf0VGy/f0l+b9drBtQcxl0MoP6GDegWjt
-         VkYw==
-X-Gm-Message-State: AJIora8vcRhFxxQx/pEwIy6A5EHQpuHu2g0xQSOGvFMz5eElCEHuBOdH
-	p5jAJwAzDYV6d6iKv4TudOOX4Qtq4nE=
-X-Google-Smtp-Source: AGRyM1uzjYhlbNl+1sv3pNqw3PwaRPGuG5uI02YMbYb/KLJlzSWmZTpph25EGrIZVGKAtzy7UVJpeA==
-X-Received: by 2002:a17:90a:fe0d:b0:1ef:b025:cc7b with SMTP id ck13-20020a17090afe0d00b001efb025cc7bmr678865pjb.71.1658254739742;
-        Tue, 19 Jul 2022 11:18:59 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=MrN63qWlC0eGThSaST+KTEZ+HMIG+SOOOEU1SOly46w=;
+        b=yxeq2MOOOFlXzqZ02q8ujBfLqPixhQGzFRKNsgM4HHaMSpLikJ3fuQG7HriR+tBncw
+         w0ftaXLKrrI5FqgiGUCohkhipa/5LlDjOuvkGL/hEpixhNBOCsKt6Ncbp/ygLqkfKY7r
+         NOUKSV1spRxJ+eTYQ6L3Z8GvfN973KmdphZqGqhculdNXYmbLCex03Zx9t9J7GXeu9RJ
+         Qh6KO3FLYJl7isnqVt9GGhS5IJLC2r1LpkapuWxgXltNmHhrnG40sBPl77SthHly+3tb
+         Oq1iZ8R3yA425koEnwXiFka8e/a5M94Dxq3aZHPWu4VspOyn/kSmWqxJaJFTu+1+FDao
+         WDkQ==
+X-Gm-Message-State: AJIora+z0HVlZ/s/dUJJo5Jl2sLBmi7+FzL6N1xehY9I2vBN+MEdMc3Y
+	GjLNzqe+wwJKjDMCgqP5fo0R4ZnmkSg=
+X-Google-Smtp-Source: AGRyM1v+UfjDsgcTBaKRBiQ3ggp2l6cbXg0cGOH5gRLHDeH8ey/C1xJrtSao1q+05v1i1VTkL2c1PA==
+X-Received: by 2002:a63:cf18:0:b0:40d:5506:df97 with SMTP id j24-20020a63cf18000000b0040d5506df97mr30225659pgg.43.1658256872778;
+        Tue, 19 Jul 2022 11:54:32 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id i11-20020a170902c94b00b0016cdfcdcff2sm7658467pla.19.2022.07.19.11.18.59
+        by smtp.gmail.com with ESMTPSA id w24-20020aa79558000000b0052af2e8bba3sm11851616pfq.37.2022.07.19.11.54.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 11:18:59 -0700 (PDT)
+        Tue, 19 Jul 2022 11:54:32 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] test-runner: automatically find PCI passthrough config
-Date: Tue, 19 Jul 2022 11:16:47 -0700
-Message-Id: <20220719181647.452178-3-prestwoj@gmail.com>
+Subject: [PATCH v2 1/3] test-runner: allow infinite process wait
+Date: Tue, 19 Jul 2022 11:52:21 -0700
+Message-Id: <20220719185223.456197-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220719181647.452178-1-prestwoj@gmail.com>
-References: <20220719181647.452178-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,85 +51,27 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When PCI adapters are properly configured they should exist in the
-vfio-pci system tree. It is assumed any devices configured as such
-are used for test-runner.
-
-This removes the need for a hw.conf file to be supplied, but still
-is required for USB adapters. Because of this the --hw option was
-updated to allow no value, or a file path.
+subprocess.Popen's wait() method was overwritten to be non-blocking but
+in certain circumstances you do want to wait forever. Fix this to allow
+timeout=None, which calls the parent wait() method directly.
 ---
- tools/runner.py | 42 ++++++++++++++++++++++++++++++++----------
- 1 file changed, 32 insertions(+), 10 deletions(-)
+ tools/utils.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tools/runner.py b/tools/runner.py
-index cf904412..4f1b64c7 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -115,6 +115,9 @@ class RunnerCoreArgParse(ArgumentParser):
- 				help='Writes PASS/FAIL to results file')
- 		self.add_argument('--hw', '-w',
- 				type=str,
-+				nargs='?',
-+				const=True,
-+				action='store',
- 				help='Use physical adapters for tests (passthrough)')
- 		self.add_argument('--testhome', help=SUPPRESS)
- 		self.add_argument('--monitor-parent', help=SUPPRESS)
-@@ -381,18 +384,18 @@ class QemuRunner(RunnerAbstract):
- 		self._prepare_outfiles()
+diff --git a/tools/utils.py b/tools/utils.py
+index bc030230..7a182848 100644
+--- a/tools/utils.py
++++ b/tools/utils.py
+@@ -246,6 +246,10 @@ class Process(subprocess.Popen):
  
- 		if args.hw:
--			hw_conf = ConfigParser()
--			hw_conf.read(args.hw)
-+			if os.path.isfile(args.hw):
-+				hw_conf = ConfigParser()
-+				hw_conf.read(args.hw)
- 
--			if hw_conf.has_section('USBAdapters'):
--				# The actual key name of the adapter
--				# doesn't matter since all we need is the
--				# bus/address. This gets named by the kernel
--				# anyways once in the VM.
--				usb_adapters = [v for v in hw_conf['USBAdapters'].values()]
-+				if hw_conf.has_section('USBAdapters'):
-+					# The actual key name of the adapter
-+					# doesn't matter since all we need is the
-+					# bus/address. This gets named by the kernel
-+					# anyways once in the VM.
-+					usb_adapters = [v for v in hw_conf['USBAdapters'].values()]
- 
--			if hw_conf.has_section('PCIAdapters'):
--				pci_adapters = [v for v in hw_conf['PCIAdapters'].values()]
-+			pci_adapters = self._find_pci_adapters()
- 
- 		kern_log = "ignore_loglevel" if "kernel" in args.verbose else "quiet"
- 
-@@ -472,6 +475,25 @@ class QemuRunner(RunnerAbstract):
- 
- 		self.cmdline = qemu_cmdline
- 
-+	def _find_pci_adapters(self):
-+		adapters = []
+ 	# Override wait() so it can do so non-blocking
+ 	def wait(self, timeout=10):
++		if timeout == None:
++			super().wait()
++			return
 +
-+		try:
-+			files = os.listdir('/sys/module/vfio_pci/drivers/pci:vfio-pci')
-+		except:
-+			return None
-+
-+		for bus_addr in files:
-+			if not bus_addr.startswith('0000:'):
-+				continue
-+
-+			adapters.append(bus_addr.replace('0000:', ''))
-+
-+		if len(adapters) == 0:
-+			return None
-+
-+		return adapters
-+
- 	def prepare_environment(self):
- 		mounts = [ MountInfo('debugfs', 'debugfs', '/sys/kernel/debug', '', 0) ]
+ 		Namespace.non_block_wait(self.__wait, timeout, 1)
+ 		self._cleanup()
  
 -- 
 2.34.1
