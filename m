@@ -1,47 +1,47 @@
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB404C82
-	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 18:58:03 +0000 (UTC)
-Received: by mail-pg1-f175.google.com with SMTP id f65so14289629pgc.12
-        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 11:58:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7AB539F
+	for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 18:58:05 +0000 (UTC)
+Received: by mail-pf1-f181.google.com with SMTP id y141so14431346pfb.7
+        for <iwd@lists.linux.dev>; Tue, 19 Jul 2022 11:58:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=KcvNn+AQjlEqAPy2h2PYY6FrxxoPivkqhcSN5c1hIno=;
-        b=Up9X9HOlaNZB8wGFI/zvDWukJflJM+WP6NFPmNoR1OS8mNEmGygMu4TKyHBJ+4oiSi
-         x0HcbdnwNGBm8MXEvxv9WosVBHl59Y53BiA7OmggQ5MVolTk88CZYOvteesBU+jTUG9P
-         GiStsS3J9SwxUz+cL6P9QsdJGQWc51CfGg9+/UoVkMVBmkRWSx+cHSh+nTcZ6XS7SZZ0
-         Dle44/OhBd9wSEYa6CfP2usRyn9UlxVLudGCp2yvJ8CQ5SXk1RnGEsiEMbOYWCVNHCAh
-         Y0y2NK3FGZu867zjUbphcnGobNUUUgffJ3qVZ7gDedJy1DCsaSeN9iARfuMGq7QUokiB
-         MacQ==
+        bh=7rTgQX2BLtDwl0a6votul3jNEOBhBycdyWui9PbU/aQ=;
+        b=qAtB/WzksmdCyUbGhjkHSk3Nv0AOFJ4Q5Bc3eFOCr84Tv8W2ZvMD3QrI7jo2TVSxF/
+         HPkjvc6GC95lQBQtNTn4V1eG/b1juLoE5bzgI+K6Ilb6zwJph455mqwR6T4aOJRF3EBp
+         gI6N8N4D7ixs9lYGqn8MFomVVuX/l7Awj23bWH0EebscxMovegC39okE0tv4S6CwXREc
+         KIbjcKaSWSImx5ZJY2HfK+Zpd0zh3A6QN4F7JR35uTtZcbUX4xWtgngg2xYUm7uwW41v
+         FpT3KgbtKlWRgZn2A7HEELDqt8/ppnuE7j5MncAtD5u63Z34q5si+PtRiqFznUeGIpt7
+         pUkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=KcvNn+AQjlEqAPy2h2PYY6FrxxoPivkqhcSN5c1hIno=;
-        b=lB9T0y+QvapxGIhMc37baQUvXiahm+XpczRtHLDeXP7QrYEtiGIaD8v4z5LttEMhiH
-         NpQYDgXDNPkEqvdkNd/ELx8226ajwYvQ5xgYnvR0t0jcHkJCqXKYlp1D1KuS+QnFCRIC
-         viUmBqSwKOC5Wqa2VTSYuLilkk6zcxc3oo9gtLssqXZKDetQLIFiwy1Paxwt+HWMaB4x
-         qud7nHGm5zno0OyWyS+sqDg4DvmwvJ+iTTQ8kv7XqcftwOHyfgbJUMGUqRin0Plnl1Qd
-         QFw0i2fzw31Miwjf8ozgOpSFUgAtcAfilAQDT1xmQy2bkobB30Q8qQeukGkpx32aGYeI
-         rndA==
-X-Gm-Message-State: AJIora9+iCviqzng0I4q2fRPLKgzF7BjtO/pTqSQyfoxmJZFrCFHfB9H
-	Kbz2GLT4R43KSxYWD4HT4ZHkt28Bgac=
-X-Google-Smtp-Source: AGRyM1sXiKGzmBwKxWo3Cqs8haYexY/iu8WEEc36ZvHYMs3w0oRxE+FHBEHVmpDJwozltNZxblCbLg==
-X-Received: by 2002:a65:6151:0:b0:412:e419:d651 with SMTP id o17-20020a656151000000b00412e419d651mr30660252pgv.378.1658257082836;
-        Tue, 19 Jul 2022 11:58:02 -0700 (PDT)
+        bh=7rTgQX2BLtDwl0a6votul3jNEOBhBycdyWui9PbU/aQ=;
+        b=E6b5mzgJ/EIDxyPuFoubf3H4XDKlAqYnS/Q+ABKmoluZJQ76lUXGuPRVxojYKAeu40
+         k9BP4SvW8YBE+0/CIxZt0eWHXCKpY8CFGllxyv1TxCqK99j1yjfX5btqI6MRbqwI4fpl
+         wT4MXV1aZbdjLai+FoRKQ9HFHRG6R/r4l5nA+FB7orZjQfL3xYvRdzfa1fMYwdy7dtC+
+         4gDIYRwy2e7UGd2XCR20tuXcblVtjfibkKiNtzx9wHesCOTXVu9pnwXPcByEDEk6X5Qo
+         eh5hrPcbiGgJhnJcS5sPPCC3hj8B72780UlpE8rHd/bxRbOzNQzC7sRkucHmHmXvzNhn
+         RQMQ==
+X-Gm-Message-State: AJIora+4IBxdyYdg3Yu1G+hnGIoLvJ03Ey+qzqbeCP7AwDTUZ64ZVvcY
+	KKFFMUpcYAPqTB6Pg8FGybx1q2n7dQc=
+X-Google-Smtp-Source: AGRyM1sQDxqJdJZcVLgn70FF7ENkU5ozoyk9QH0xJwY09CrOhzoJcCHQ9TUm3HxQLuti1ZjGQZW6+Q==
+X-Received: by 2002:a05:6a00:893:b0:528:646f:528a with SMTP id q19-20020a056a00089300b00528646f528amr34460183pfj.21.1658257084634;
+        Tue, 19 Jul 2022 11:58:04 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id u7-20020a170902e80700b0016c68b56be7sm11937785plg.158.2022.07.19.11.58.02
+        by smtp.gmail.com with ESMTPSA id u7-20020a170902e80700b0016c68b56be7sm11937785plg.158.2022.07.19.11.58.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 11:58:02 -0700 (PDT)
+        Tue, 19 Jul 2022 11:58:04 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 09/12] band: add find_best_mcs_nss
-Date: Tue, 19 Jul 2022 11:55:41 -0700
-Message-Id: <20220719185544.456727-9-prestwoj@gmail.com>
+Subject: [PATCH 11/12] wiphy: use HE element for data rate estimation
+Date: Tue, 19 Jul 2022 11:55:43 -0700
+Message-Id: <20220719185544.456727-11-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220719185544.456727-1-prestwoj@gmail.com>
 References: <20220719185544.456727-1-prestwoj@gmail.com>
@@ -53,113 +53,47 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is a general way of finding the best MCS/NSS values which will work
-for HT, VHT, and HE by passing in the max MCS values for each value which
-the MCS map could contain (0, 1, or 2).
+If an HE element is found, prefer using this for the rate estimation
+since it will likely yield the fastest rate.
 ---
- src/band.c | 75 +++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 51 insertions(+), 24 deletions(-)
+ src/wiphy.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/src/band.c b/src/band.c
-index 67bbcd79..0728b0cc 100644
---- a/src/band.c
-+++ b/src/band.c
-@@ -334,6 +334,56 @@ static bool find_best_mcs_vht(uint8_t max_index, enum ofdm_channel_width width,
- 	return false;
- }
+diff --git a/src/wiphy.c b/src/wiphy.c
+index f83353ed..cb4be66c 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -788,6 +788,7 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
+ 	const void *vht_operation = NULL;
+ 	const void *ht_capabilities = NULL;
+ 	const void *ht_operation = NULL;
++	const void *he_capabilities = NULL;
+ 	const struct band *bandp;
+ 	enum band_freq band;
  
-+static bool find_best_mcs_nss(const uint8_t *rx_map, const uint8_t *tx_map,
-+				uint8_t value0, uint8_t value1, uint8_t value2,
-+				uint32_t *mcs_out, uint32_t *nss_out)
-+{
-+	uint32_t nss = 0;
-+	uint32_t max_mcs = 0;
-+	int bitoffset;
-+
-+	for (bitoffset = 14; bitoffset >= 0; bitoffset -= 2) {
-+		uint8_t rx_val = bit_field(rx_map[bitoffset / 8],
-+							bitoffset % 8, 2);
-+		uint8_t tx_val = bit_field(tx_map[bitoffset / 8],
-+							bitoffset % 8, 2);
-+
-+		/*
-+		 * 0 indicates support for MCS 0 - value0
-+		 * 1 indicates support for MCS 0 - value1
-+		 * 2 indicates support for MCS 0 - value2
-+		 * 3 indicates no support
-+		 */
-+
-+		if (rx_val == 3 || tx_val == 3)
-+			continue;
-+
-+		/* rx_val/tx_val tells us which value# to use */
-+		max_mcs = minsize(rx_val, tx_val);
-+		switch (max_mcs) {
-+		case 0:
-+			max_mcs = value0;
-+			break;
-+		case 1:
-+			max_mcs = value1;
-+			break;
-+		case 2:
-+			max_mcs = value2;
-+			break;
-+		}
-+
-+		nss = bitoffset / 2 + 1;
-+		break;
-+	}
-+
-+	if (!nss)
-+		return false;
-+
-+	*nss_out = nss;
-+	*mcs_out = max_mcs;
-+
-+	return true;
-+}
- /*
-  * IEEE 802.11 - Table 9-250
-  *
-@@ -355,7 +405,6 @@ int band_estimate_vht_rx_rate(const struct band *band,
- 	uint32_t max_mcs = 7; /* MCS 0-7 for NSS:1 is always supported */
- 	const uint8_t *rx_mcs_map;
- 	const uint8_t *tx_mcs_map;
--	int bitoffset;
- 	uint8_t chan_width;
- 	uint8_t channel_offset;
- 	bool sgi;
-@@ -378,29 +427,7 @@ int band_estimate_vht_rx_rate(const struct band *band,
- 	rx_mcs_map = band->vht_mcs_set;
- 	tx_mcs_map = vhtc + 2 + 8;
+@@ -847,11 +848,22 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
  
--	for (bitoffset = 14; bitoffset >= 0; bitoffset -= 2) {
--		uint8_t rx_val = bit_field(rx_mcs_map[bitoffset / 8],
--							bitoffset % 8, 2);
--		uint8_t tx_val = bit_field(tx_mcs_map[bitoffset / 8],
--							bitoffset % 8, 2);
--
--		/*
--		 * 0 indicates support for MCS 0-7
--		 * 1 indicates support for MCS 0-8
--		 * 2 indicates support for MCS 0-9
--		 * 3 indicates no support
--		 */
--
--		if (rx_val == 3 || tx_val == 3)
--			continue;
--
--		/* 7 + rx_val/tx_val gives us the maximum mcs index */
--		max_mcs = minsize(rx_val, tx_val) + 7;
--		nss = bitoffset / 2 + 1;
--		break;
--	}
--
--	if (!nss)
-+	if (!find_best_mcs_nss(rx_mcs_map, tx_mcs_map, 7, 8, 9, &max_mcs, &nss))
- 		return -EBADMSG;
+ 			vht_operation = iter.data - 2;
+ 			break;
++		case IE_TYPE_HE_CAPABILITIES:
++			if (iter.len < 21)
++				return -EBADMSG;
++
++			he_capabilities = iter.data - 2;
++			break;
+ 		default:
+ 			break;
+ 		}
+ 	}
  
- 	/*
++	if (!band_estimate_he_rx_rate(bandp, he_capabilities,
++					bss->signal_strength / 100,
++					out_data_rate))
++		return 0;
++
+ 	if (!band_estimate_vht_rx_rate(bandp, vht_capabilities, vht_operation,
+ 					ht_capabilities, ht_operation,
+ 					bss->signal_strength / 100,
 -- 
 2.34.1
 
