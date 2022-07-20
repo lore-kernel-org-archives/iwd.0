@@ -1,37 +1,37 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6B1746A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891CB7465
 	for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 19:45:28 +0000 (UTC)
-Received: by mail-pj1-f44.google.com with SMTP id o18so4509838pjs.2
+Received: by mail-pj1-f54.google.com with SMTP id l14-20020a17090a72ce00b001f20ed3c55dso3243035pjk.5
         for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 12:45:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Vrcw2QBRPwT2GjuLiuX9hGERdTcp9ruT4hwdAiRupcw=;
-        b=RMcF3X/Yxlg6GGjIqGawFnj3umDMJ8FOq6spmXJt/ljcD8gRbo5t7oK3BCuvTiWUH+
-         p7XMJyWQthqO+wcVJ7ExhI1nghATUig0KDwQ3TiZSE1FP22h4WPhA96aquXIXP6Z25vl
-         PN+/mwTQctbTEMxZOhbrAFhpzqz1CqPbmEmzZS0/bsQMs8+wj1B/N2pusBQ+yFCQh+bm
-         Idt8nCTIaRt4oL6xnzk9kikO8HLHeXdBXm2r7wP8BaGCIcusftZ3zFKhT2naWHfIC+kf
-         VjJufnepUf1CNy2Modq+gkKR0It/PyT0Or48AgxFRBme4d9wh4UGF/4M7tGXm2tOfDX/
-         AnsA==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fzgWkHdpOZwzkHFmTVCkiNp4g6XXof65EIlZz4sA4mo=;
+        b=AQuwG9bBXeNILr+gEYUBvjoadvIaSs9aKodeItCUBpj8TMN/GRtRidpZev4jNPGBUM
+         NeOGGIHGKzRKF/qMxuz0Nrlj74IMcTc0YZ8cPxaHQcJVLtGcPWZtP40NuiAVlKosqrZ7
+         VV2Kvs7c3w3OYyVrLOOiIyXmJElvZzLEoTSFd2bjH7MtcGDMpUmwKMNXcEjzMNsWahgB
+         8TTdU6OwfQyMvvJebtw3Lz5WEUiwFaBtT2MYBuc8NaKqRoqc6EW3nigECSbWX01mBgWu
+         ngX4Cl8BtepLLwV3STQcBwubYcvRHEESG5P39ZZiotQgFv8136nc7W50AhKhGpFJmeSF
+         MtPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Vrcw2QBRPwT2GjuLiuX9hGERdTcp9ruT4hwdAiRupcw=;
-        b=Eylp90bzuw6eErhZ3Rgz1f/3uNl7P5GFpQfWBKdIRKSttOpHWDuWdabPv57KrLW6+J
-         /ukHstkkQRMwbzP4pvaNPLFu6il4yNdMfG43k8UDE9egwx3RPOwrpdu+Zzxm//0gHWkL
-         MFouzjjocxbsJ1NvtAhA4SNIiGdySeKiWfRVmpJXyiJdkumpQH8WZZvwPQa6ir7gRMVU
-         ZgSpz+WyO4GszfFCwuBfcSCmrSDxQD45XgHCigtCZEp7wSRYDMs5EOncF1cWQhGoLJn8
-         8ngEZLv7Y/mEgI9ZPzl6KCiNmKOFePpbu221mgNEMBDEz1u9aZR3lWrPBG2Ct/gpaw7d
-         5pBw==
-X-Gm-Message-State: AJIora9vcGm2kI9ODCa2qCh9FND79Vg3tVIEOUMMhgyFfkfB3PAqZYD0
-	4zr77TxWgw22Q6PH40bd3kxGVQcAGKo=
-X-Google-Smtp-Source: AGRyM1vWFKL7FaweuxfyPC3Ws8QmyiZVARp3vuJnJTV9xYmv/i21Uuksq/Gob5uKhpnfL6frhjWLzQ==
-X-Received: by 2002:a17:90a:d243:b0:1ef:9e70:3d4e with SMTP id o3-20020a17090ad24300b001ef9e703d4emr7279685pjw.232.1658346328031;
-        Wed, 20 Jul 2022 12:45:28 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fzgWkHdpOZwzkHFmTVCkiNp4g6XXof65EIlZz4sA4mo=;
+        b=b/xPAmm3EWU62g+4vv4dNWvlP8WYxNPSnH0w11I9gA7b21NV9ZvWRiDuIqWl0hx00F
+         /K9ZvDyVWNpgahkB+CmrtqOjrOlsfG+r1vPTDklei+dGOuPt9xkbp6paWZ4x0hvCioqf
+         kyelKhlO93xgF8jp7+4WEaf5guAExBRk0MDL3CID06WGCV7C6spdWSRndyyfhfwthha2
+         qi1Jn4evTJurFzhrTTBtvB/3K40Ku9u863t7LdY5id0AptTQkQvKM+n8qCs0idxy+oY6
+         Elc9Fvz+y7DkftHw3uDw1gfcrnNpZCVkKGMQ9DzQJwYNgqvYyfqSN7aBdgPjzHgj1Mk7
+         y0Sw==
+X-Gm-Message-State: AJIora9yu2xi7+CxpQEwtSBV1ZyGb36N+JwDC8M/3037MOBAMVBIzWcl
+	S0d/SXsLcw7xrfsZ0pf3Z6XeybvMm+M=
+X-Google-Smtp-Source: AGRyM1s6z/FXnnaINegyvhTSV6Jkg0nv8/UAoFTK3VrPitXX7f4ASBKmF0BUhrHPf7BjyN8XVlRHBw==
+X-Received: by 2002:a17:90a:cf17:b0:1ef:bd2b:1a59 with SMTP id h23-20020a17090acf1700b001efbd2b1a59mr7408504pju.144.1658346327481;
+        Wed, 20 Jul 2022 12:45:27 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
         by smtp.gmail.com with ESMTPSA id f1-20020a170902684100b0016ccbc9db0fsm7064734pln.5.2022.07.20.12.45.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
@@ -39,12 +39,10 @@ Received: from localhost.localdomain ([50.45.187.22])
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 2/3] wiphy: use HE element for data rate estimation
-Date: Wed, 20 Jul 2022 12:43:16 -0700
-Message-Id: <20220720194317.809749-2-prestwoj@gmail.com>
+Subject: [PATCH v4 1/3] band: add band_estimate_he_rx_rate
+Date: Wed, 20 Jul 2022 12:43:15 -0700
+Message-Id: <20220720194317.809749-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220720194317.809749-1-prestwoj@gmail.com>
-References: <20220720194317.809749-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,47 +51,318 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If an HE element is found, prefer using this for the rate estimation
-since it will likely yield the fastest rate.
+Similar to the HT/VHT APIs, this estimates the data rate based on the
+HE Capabilities element, in addition to our own capabilities. The
+logic is much the same as HT/VHT. The major difference being that HE
+uses several MCS tables depending on the channel width. Each width
+MCS set is checked (if supported) and the highest estimated rate out
+of all the MCS sets is used.
 ---
- src/wiphy.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ src/band.c | 245 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ src/band.h |   3 +-
+ 2 files changed, 239 insertions(+), 9 deletions(-)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 696064c0..9bcbea77 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -788,6 +788,7 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
- 	const void *vht_operation = NULL;
- 	const void *ht_capabilities = NULL;
- 	const void *ht_operation = NULL;
-+	const void *he_capabilities = NULL;
- 	const struct band *bandp;
- 	enum band_freq band;
+v3:
+ * Bail if previous width support bits aren't set
+ * Loop over all <= 80mhz widths (rate may be faster)
+ * Remove find_he_width_offset and check inline
+
+v4:
+ * Removed debug prints that were left accidentally
+
+diff --git a/src/band.c b/src/band.c
+index 0728b0cc..a44a6024 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -28,7 +28,8 @@
  
-@@ -847,11 +848,22 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
+ #include "ell/useful.h"
  
- 			vht_operation = iter.data - 2;
- 			break;
-+		case IE_TYPE_HE_CAPABILITIES:
-+			if (iter.len < 23)
-+				return -EBADMSG;
+-#include "band.h"
++#include "src/band.h"
++#include "src/netdev.h"
+ 
+ void band_free(struct band *band)
+ {
+@@ -125,14 +126,21 @@ int band_estimate_nonht_rate(const struct band *band,
+ }
+ 
+ /*
+- * Base RSSI values for 20MHz (both HT and VHT) channel. These values can be
++ * Base RSSI values for 20MHz (HT, VHT and HE) channel. These values can be
+  * used to calculate the minimum RSSI values for all other channel widths. HT
+- * MCS indexes are grouped into ranges of 8 (per spatial stream) where VHT are
+- * grouped in chunks of 10. This just means HT will not use the last two
+- * index's of this array.
++ * MCS indexes are grouped into ranges of 8 (per spatial stream), VHT in groups
++ * of 10 and HE in groups of 12. This just means HT will not use the last four
++ * index's of this array, and VHT won't use the last two.
++ *
++ * Note: The values here are not based on anything from 802.11 but data
++ *       found elsewhere online (presumably from testing, we hope). The two
++ *       indexes for HE (MCS 11/12) are not based on any data, but just
++ *       increased by 3dB compared to the previous value. We consider this good
++ *       enough for its purpose to estimate the date rate for network/BSS
++ *       preference.
+  */
+-static const int32_t ht_vht_base_rssi[] = {
+-	-82, -79, -77, -74, -70, -66, -65, -64, -59, -57
++static const int32_t ht_vht_he_base_rssi[] = {
++	-82, -79, -77, -74, -70, -66, -65, -64, -59, -57, -54, -51
+ };
+ 
+ /*
+@@ -194,7 +202,7 @@ bool band_ofdm_rate(uint8_t index, enum ofdm_channel_width width,
+ 	uint64_t rate;
+ 	int32_t width_adjust = width * 3;
+ 
+-	if (rssi < ht_vht_base_rssi[index] + width_adjust)
++	if (rssi < ht_vht_he_base_rssi[index] + width_adjust)
+ 		return false;
+ 
+ 	rate = ht_vht_rates[width][index];
+@@ -495,6 +503,227 @@ try_vht80:
+ 	return -ENETUNREACH;
+ }
+ 
++/*
++ * Data Rate for HE is much the same as HT/VHT but some additional MCS indexes
++ * were added. This mean rfactors, and nbpscs will contain two additional
++ * values:
++ *
++ * rfactors.extend([3/4, 5/6])
++ * nbpscs.extend([10, 10])
++ *
++ * The guard interval also differs:
++ *
++ * Tdft = 12.8us
++ * Tgi = 0.8, 1.6 or 2.3us
++ *
++ * The Nsd values for HE are:
++ *
++ * Nsd = [234, 468, 980, 1960]
++ *
++ * The formula is identical to HT/VHT:
++ *
++ * Nsd * Nbpscs * R * Nss / (Tdft + Tgi)
++ *
++ * Note: The table below assumes a 0.8us GI. There isn't any way to know what
++ *       GI will be used for an actual connection, so assume the best.
++ */
++static uint64_t he_rates[4][12] = {
++	[OFDM_CHANNEL_WIDTH_20MHZ] = {
++		8600000ULL, 17200000ULL, 25800000ULL, 34400000ULL,
++		51600000ULL, 68800000ULL, 77400000ULL, 86000000ULL,
++		103200000ULL, 114700000ULL, 129000000ULL, 143300000ULL,
++	},
++	[OFDM_CHANNEL_WIDTH_40MHZ] = {
++		17200000ULL, 34400000ULL, 51600000ULL, 68800000ULL,
++		103200000ULL, 137600000ULL, 154900000ULL, 172000000ULL,
++		206500000ULL, 229400000ULL, 258000000ULL, 286800000ULL,
++	},
++	[OFDM_CHANNEL_WIDTH_80MHZ] = {
++		36000000ULL, 72000000ULL, 108000000ULL, 144100000ULL,
++		216200000ULL, 288200000ULL, 324300000ULL, 360300000ULL,
++		432400000ULL, 480400000ULL, 540400000ULL, 600500000ULL,
++	},
++	[OFDM_CHANNEL_WIDTH_160MHZ] = {
++		72000000ULL, 144100000ULL, 216200000ULL, 288200000ULL,
++		432400000ULL, 576500000ULL, 648500000ULL, 720600000ULL,
++		864700000ULL, 960800000ULL, 1080900000ULL, 1201000000ULL,
++	},
++};
 +
-+			he_capabilities = iter.data - 2;
++static bool band_he_rate(uint8_t index, enum ofdm_channel_width width,
++			int32_t rssi, uint8_t nss, uint64_t *data_rate)
++{
++	uint64_t rate;
++	int32_t width_adjust;
++
++	width_adjust = width * 3;
++
++	if (rssi < ht_vht_he_base_rssi[index] + width_adjust)
++		return false;
++
++	rate = he_rates[width][index];
++
++	rate *= nss;
++
++	*data_rate = rate;
++	return true;
++}
++
++static bool find_rate_he(const uint8_t *rx_map, const uint8_t *tx_map,
++				enum ofdm_channel_width width, int32_t rssi,
++				uint64_t *out_data_rate)
++{
++	uint32_t nss;
++	uint32_t max_mcs;
++	int i;
++
++	if (!find_best_mcs_nss(rx_map, tx_map, 7, 9, 11,
++				&max_mcs, &nss))
++		return false;
++
++	for (i = max_mcs; i >= 0; i--)
++		if (band_he_rate(i, width, rssi, nss, out_data_rate))
++			return true;
++
++	return false;
++}
++
++/*
++ * HE data rate is calculated based on 802.11ax - Section 27.5
++ */
++int band_estimate_he_rx_rate(const struct band *band, const uint8_t *hec,
++				int32_t rssi, uint64_t *out_data_rate)
++{
++	enum ofdm_channel_width width = OFDM_CHANNEL_WIDTH_20MHZ;
++	enum ofdm_channel_width i;
++	const struct band_he_capabilities *he_cap = NULL;
++	const struct l_queue_entry *entry;
++	const uint8_t *rx_map;
++	const uint8_t *tx_map;
++	bool mcs80p80 = false;
++	uint64_t rate = 0;
++	uint64_t new_rate = 0;
++	uint8_t width_set;
++
++	if (!hec || !band->he_capabilities)
++		return -EBADMSG;
++
++	for (entry = l_queue_get_entries(band->he_capabilities);
++						entry; entry = entry->next) {
++		const struct band_he_capabilities *cap = entry->data;
++
++		/*
++		 * TODO: Station type is assumed here since it is the only
++		 *       consumer of these data rate estimation APIs. If this
++		 *       changes the iftype would need to be passed in.
++		 */
++		if (cap->iftypes & (1 << NETDEV_IFTYPE_STATION)) {
++			he_cap = cap;
 +			break;
- 		default:
- 			break;
- 		}
- 	}
- 
-+	if (!band_estimate_he_rx_rate(bandp, he_capabilities,
-+					bss->signal_strength / 100,
-+					out_data_rate))
-+		return 0;
++		}
++	}
 +
- 	if (!band_estimate_vht_rx_rate(bandp, vht_capabilities, vht_operation,
- 					ht_capabilities, ht_operation,
- 					bss->signal_strength / 100,
++	if (!he_cap)
++		return -ENOTSUP;
++
++	/* AND the width sets, giving the widths supported by both */
++	width_set = bit_field(he_cap->he_phy_capa[0], 1, 7) &
++				bit_field((hec + 8)[0], 1, 7);
++
++	/*
++	 * 802.11ax Table 9-322b
++	 */
++	switch (band->freq) {
++	case BAND_FREQ_2_4_GHZ:
++		/* B0 indicates support for 40MHz */
++		if (test_bit(&width_set, 0))
++			width = OFDM_CHANNEL_WIDTH_40MHZ;
++
++		break;
++	case BAND_FREQ_5_GHZ:
++	case BAND_FREQ_6_GHZ:
++		/* B1 indicates support for 40MHz and 80MHz, choose 80 */
++		if (test_bit(&width_set, 1))
++			width = OFDM_CHANNEL_WIDTH_80MHZ;
++
++		/* B2 indicates support for 160MHz */
++		if (test_bit(&width_set, 2)) {
++			if (width != OFDM_CHANNEL_WIDTH_80MHZ) {
++				l_warn("Support for 160MHz but not 80MHz!");
++				return -EBADMSG;
++			}
++
++			width = OFDM_CHANNEL_WIDTH_160MHZ;
++		}
++
++		/* B3 indicates support for 80+80MHz */
++		if (test_bit(&width_set, 3)) {
++			if (width != OFDM_CHANNEL_WIDTH_160MHZ) {
++				l_warn("Support for 80+80MHz but not 160MHz!");
++				return -EBADMSG;
++			}
++
++			mcs80p80 = true;
++		}
++
++		break;
++	}
++
++	/*
++	 * The HE-MCS maps are 19 bytes into the HE Capabilities IE, and
++	 * alternate RX/TX every 2 bytes. Start the TX map 19 + 2 bytes
++	 * into the MCS set. For each MCS set find the best data rate.
++	 *
++	 * Note: Since 'hec' is an extended IE index 0 is actually the length
++	 *       since wiphy offsets data - 2.
++	 */
++	rx_map = he_cap->he_mcs_set;
++	tx_map = hec + 21;
++
++	/* 80+80MHz MCS set */
++	if (mcs80p80) {
++		/* 21 + 8 - 1 (len) bytes into the IE, plus 2 for the MCS set */
++		if (hec[0] < 30)
++			return -EBADMSG;
++
++		if (find_rate_he(rx_map + 8, tx_map + 8,
++				OFDM_CHANNEL_WIDTH_160MHZ, rssi, &new_rate))
++			rate = new_rate;
++	}
++
++	/* 160MHz MCS set */
++	if (width == OFDM_CHANNEL_WIDTH_160MHZ) {
++		/* 21 + 4 - 1 (len) bytes into the IE, plus 2 for the MCS set */
++		if (hec[0] < 26)
++			return -EBADMSG;
++
++		if (find_rate_he(rx_map + 4, tx_map + 4,
++				OFDM_CHANNEL_WIDTH_160MHZ, rssi, &new_rate) &&
++				new_rate > rate)
++			rate = new_rate;
++	}
++
++	/*
++	 * <= 80MHz MCS set. Adjust width to this range (if needed) and check
++	 * every smaller width in case the rate is higher
++	 */
++	if (width > OFDM_CHANNEL_WIDTH_80MHZ)
++		width = OFDM_CHANNEL_WIDTH_80MHZ;
++
++	for (i = OFDM_CHANNEL_WIDTH_20MHZ; i <= width; i++) {
++		if (find_rate_he(rx_map, tx_map, i, rssi, &new_rate) &&
++					new_rate > rate)
++			rate = new_rate;
++	}
++
++	if (!rate)
++		return -EBADMSG;
++
++	*out_data_rate = rate;
++
++	return 0;
++}
++
+ static int band_channel_info_get_bandwidth(const struct band_chandef *info)
+ {
+ 	switch (info->channel_width) {
+diff --git a/src/band.h b/src/band.h
+index 1f1269c7..9b307a77 100644
+--- a/src/band.h
++++ b/src/band.h
+@@ -74,7 +74,8 @@ void band_free(struct band *band);
+ bool band_ofdm_rate(uint8_t index, enum ofdm_channel_width width,
+ 			int32_t rssi, uint8_t nss, bool sgi,
+ 			uint64_t *data_rate);
+-
++int band_estimate_he_rx_rate(const struct band *band, const uint8_t *hec,
++				int32_t rssi, uint64_t *out_dat_rate);
+ int band_estimate_vht_rx_rate(const struct band *band,
+ 				const uint8_t *vhtc, const uint8_t *vhto,
+ 				const uint8_t *htc, const uint8_t *hto,
 -- 
 2.34.1
 
