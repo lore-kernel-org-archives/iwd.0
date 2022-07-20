@@ -1,50 +1,48 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501E97482
-	for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 21:31:42 +0000 (UTC)
-Received: by mail-pg1-f171.google.com with SMTP id 72so17607499pge.0
-        for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 14:31:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4840747E
+	for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 22:17:14 +0000 (UTC)
+Received: by mail-pl1-f176.google.com with SMTP id d7so68820plr.9
+        for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 15:17:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=3Cym2Dk/UPwkyWfaFRs+bMw8sm+2E3/Ymulo/x6MDfU=;
-        b=L1olZftlCiN6hEeY95FyuAr3Exx2bREqBFrd78avy8i5cz08HXzoBuBJOdOlvCBtiY
-         85OvIUE4oA+Eah9Nj0ROWU6cQbyqidMCIE6IQTgDtROwBuYdTqdF++KFlthLKOJW8md2
-         P7ZNgqtMQNDF8wFGt/415cwydI4Wr6ar4kmX+dalvJpBPLLnnXIm4XZtasPbySUgDZ/M
-         pHl97vTWiQOyOVsahEpgwFe0J6CHo7xzvwL9Wd+etpNobd4Mpr9odX6sVntK3Dr/0n/A
-         QPKAdZRM3+aa4EWdcxY+8JhdU/Y8LnvuYlcYWbk6sgl5asNDqxRMBQuyanMIzll+YlDt
-         MHBA==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=0NMJ8OT3tYSx1a5FOr4/YBmdnssT7l39LN0oyZfg/wQ=;
+        b=YHrjhPSRn3AKCb3cXpuyJHAgS1dz+c40vFtch68nG7Zj2q/LaI3kV61y7ZFNt4g+AN
+         DGmwYsYtJWPSdqKRkTb382wRq/rdhoBd3kBR2M5uEP0fG8nsIKY6p37VmlT6wx9rA6w/
+         rGQmDxBCb6iNdLqFwcjc6ECjq1K4nJPojBKTe7ExZKnAMVIUqNJ7fXpDIMT+jwxoOH41
+         gJdosETEO8n9sylPUAHKbnqTvlbUhwUZ4O0GLfXgqtp3I0JPVUvBGYhO0/NkGMuMznBA
+         Ca8togqjcUa7qFaJ9IzqOPVeNiQUlT8H9i0cELP4Rx9zBr8uaAwxuq3is9dzc0G5Y4KF
+         PxBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3Cym2Dk/UPwkyWfaFRs+bMw8sm+2E3/Ymulo/x6MDfU=;
-        b=u1wwnN4a76GPnm8tzu8clT6Vt4kLxcMA14Siu4qIjR+mFOKYZRbuWI9xklEDJ9937N
-         eG4DU0i+2bIMmzBFMa7Rcw3yCo1uGBrFHyXSJpejfXtgpuJYq4m7P1FSTCxz4HedF1d/
-         1mbEdH9yZ5RkdQGrZNWhLO0g3IWmVR+fS9p1umlb9OF/u9FpEYDaTFD6eRaKdRdwAReo
-         nJTv1Rq09/Fe7J6CC0ctpE5rBKXJBdKUxew7plV3ouWfqZ/Fx0KxnYzDUh4Piz8r2qUk
-         G+o2ta7DaoZI0/ZDjeMTAaOAcJtAGaalVUq7Eot7CzdL1eZdZ4s6jNz/KzRw4JKl/71k
-         gJUw==
-X-Gm-Message-State: AJIora/sXUkWdR5n3bACzJqJbXSIK37nkkH3AAK9s8v61XZFAXjtymnQ
-	ddw/YkWeHVO9xikrgYm9mWUwO/Tj9xA=
-X-Google-Smtp-Source: AGRyM1u+egWUObXPPvLvSbob47kNZ2t8LbmOWEpxYOnu4Vg8fAa10FMY+nwwCmz3ocr77KB6bl/gOQ==
-X-Received: by 2002:aa7:80d3:0:b0:52b:9237:a355 with SMTP id a19-20020aa780d3000000b0052b9237a355mr8620008pfn.73.1658352701454;
-        Wed, 20 Jul 2022 14:31:41 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=0NMJ8OT3tYSx1a5FOr4/YBmdnssT7l39LN0oyZfg/wQ=;
+        b=2I2+jO1BJA/VmxB+dbti443h9/vI8z8CNHtmU2K6imyVCNndHTqQtfwrvlh9gu5UCp
+         betXGXrVhxYZzW8CjE1uzWEnUHNQxKUgVam2YL8DovMzFs371oNoiNgvypnEvWhKD4+o
+         Ay+oZRLienFUvwDLLm1chm9JIQzmO9xea/MISzQ/xrmnY/PDXIH1cwv0sVT4djIp+4Hy
+         f5ENWQWKuaX5wrqvsGjJaGziTydxeMnVXJ+kAe0vLqTDff98fHF5eMt90LtFOMquBDik
+         li5y/48p14dnnadpnCl6QYFldRXzQOtcFnholHwp6EhpQNtVS4pa//obkYyNmqjLOqpX
+         Y6oA==
+X-Gm-Message-State: AJIora8Cg0vYkdXkhQwMuj0SpfD5D4yjVOVpvCJV3Fze1Cayjai9nMWK
+	KiSiSo3KRg05MgYY7EFVR7IjBGF4+wc=
+X-Google-Smtp-Source: AGRyM1sWx1IaYZMwbcXOqtRLJwKxof8DdG2UcfXTpGaoYhb1y8fA5wF8uQ/rvfhNcs84zyxWrBbP1Q==
+X-Received: by 2002:a17:902:efd5:b0:16d:2da8:64a7 with SMTP id ja21-20020a170902efd500b0016d2da864a7mr2100850plb.157.1658355433976;
+        Wed, 20 Jul 2022 15:17:13 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id y22-20020a170902b49600b0016c5306917fsm41475plr.53.2022.07.20.14.31.40
+        by smtp.gmail.com with ESMTPSA id q10-20020a170903204a00b0016a1e2d148csm75859pla.32.2022.07.20.15.17.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 14:31:41 -0700 (PDT)
+        Wed, 20 Jul 2022 15:17:13 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 5/5] unit: add HE tests to test-band
-Date: Wed, 20 Jul 2022 14:29:32 -0700
-Message-Id: <20220720212932.873353-5-prestwoj@gmail.com>
+Subject: [PATCH v6 1/5] ie: add validation for HE Capabilities element
+Date: Wed, 20 Jul 2022 15:15:03 -0700
+Message-Id: <20220720221507.886811-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220720212932.873353-1-prestwoj@gmail.com>
-References: <20220720212932.873353-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,280 +51,79 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This tests for all the possible widths selected in 2.4 and 5/6GHz,
-as well as some failure tests.
+This makes sure the width set bits are sane, and validates the length
+depending on which MCS sets are enabled.
 ---
- unit/test-band.c | 243 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 243 insertions(+)
+ src/ie.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ src/ie.h |  2 ++
+ 2 files changed, 50 insertions(+)
 
-diff --git a/unit/test-band.c b/unit/test-band.c
-index 0dd9b67b..90b48f9f 100644
---- a/unit/test-band.c
-+++ b/unit/test-band.c
-@@ -32,6 +32,8 @@
- #include <ell/ell.h>
+diff --git a/src/ie.c b/src/ie.c
+index 7ef07c37..070454ef 100644
+--- a/src/ie.c
++++ b/src/ie.c
+@@ -2577,3 +2577,51 @@ int ie_parse_oci(const void *data, size_t len, const uint8_t **oci)
  
- #include "src/band.h"
-+#include "src/netdev.h"
-+#include "src/ie.h"
- 
- static struct band *new_band()
- {
-@@ -284,6 +286,228 @@ static void band_test_vht_1(const void *data)
- 	band_free(band);
+ 	return 0;
  }
- 
-+struct he_test_data {
-+	enum band_freq freq;
-+	int32_t rssi;
-+	uint64_t expected_rate;
-+	int expected_return;
-+	/* Own capabilities */
-+	struct band_he_capabilities capabilities;
-+	/* Peer HE Capabilities IE */
-+	uint8_t he_capabilities[31];
 +
-+};
-+
-+/* IWD doesn't look at this */
-+#define HE_MAC_CAPA 0, 0, 0, 0, 0, 0
-+/* IWD only cares about the width set byte */
-+#define HE_PHY_CAPA(wset) wset, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-+
-+#define MCS7		0
-+#define MCS9		1
-+#define MCS11		2
-+#define MCS_UNSUP	0xff, 0xff
-+/* A readable macro for defining MCS sets */
-+#define HE_MCS_SET(mcs, nss) \
-+	(nss >= 1 ? mcs << 0 : 3 << 0) | \
-+	(nss >= 2 ? mcs << 2 : 3 << 2) | \
-+	(nss >= 3 ? mcs << 4 : 3 << 4) | \
-+	(nss >= 4 ? mcs << 6 : 3 << 6),  \
-+	(nss >= 5 ? mcs << 0 : 3 << 0) | \
-+	(nss >= 6 ? mcs << 2 : 3 << 2) | \
-+	(nss >= 7 ? mcs << 4 : 3 << 4) | \
-+	(nss >= 8 ? mcs << 6 : 3 << 6)
-+
-+/* 2.4GHz, 20MHz, MCS 7, NSS 1 */
-+const struct he_test_data he_test_2_4_20mhz_mcs_7_nss_1 = {
-+	.freq = BAND_FREQ_2_4_GHZ,
-+	.rssi = -20,
-+	.expected_rate = 86000000ULL,
-+	.capabilities = {
-+		.he_mcs_set = { HE_MCS_SET(MCS7, 1), MCS_UNSUP },
-+		.he_phy_capa = { HE_PHY_CAPA(0x00) },
-+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
-+	},
-+	.he_capabilities = {
-+		22, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
-+		HE_PHY_CAPA(0x00), MCS_UNSUP, HE_MCS_SET(MCS7, 1),
-+	},
-+};
-+
-+/* 2.4GHz, 40MHz, MCS 7, NSS 1 */
-+const struct he_test_data he_test_2_4_40mhz_mcs_7_nss_1 = {
-+	.freq = BAND_FREQ_2_4_GHZ,
-+	.rssi = -20,
-+	.expected_rate = 172000000ULL,
-+	.capabilities = {
-+		.he_mcs_set = { HE_MCS_SET(MCS7, 1), MCS_UNSUP },
-+		.he_phy_capa = { HE_PHY_CAPA(0x02) },
-+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
-+	},
-+	.he_capabilities = {
-+		22, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
-+		HE_PHY_CAPA(0x02), MCS_UNSUP, HE_MCS_SET(MCS7, 1),
-+	},
-+};
-+
-+/* 5GHz, 20MHz, MCS 7, NSS 1 */
-+const struct he_test_data he_test_5_20mhz_mcs_7_nss_1 = {
-+	.freq = BAND_FREQ_5_GHZ,
-+	.rssi = -20,
-+	.expected_rate = 86000000ULL,
-+	.capabilities = {
-+		.he_mcs_set = { HE_MCS_SET(MCS7, 1), MCS_UNSUP },
-+		.he_phy_capa = { HE_PHY_CAPA(0x00) },
-+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
-+	},
-+	.he_capabilities = {
-+		22, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
-+		HE_PHY_CAPA(0x00), MCS_UNSUP, HE_MCS_SET(MCS7, 1)
-+	},
-+};
-+
-+/* 5GHz, 80MHz, MCS 7, NSS 1 */
-+const struct he_test_data he_test_5_80mhz_mcs_7_nss_1 = {
-+	.freq = BAND_FREQ_5_GHZ,
-+	.rssi = -20,
-+	.expected_rate = 360300000ULL,
-+	.capabilities = {
-+		.he_mcs_set = { HE_MCS_SET(MCS7, 1), MCS_UNSUP },
-+		.he_phy_capa = { HE_PHY_CAPA(0x04) },
-+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
-+	},
-+	.he_capabilities = {
-+		22, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
-+		HE_PHY_CAPA(0x04), MCS_UNSUP, HE_MCS_SET(MCS7, 1)
-+	},
-+};
-+
-+/* 5GHz, 160MHz, MCS 7, NSS 1 */
-+const struct he_test_data he_test_5_160mhz_mcs_7_nss_1 = {
-+	.freq = BAND_FREQ_5_GHZ,
-+	.rssi = -20,
-+	.expected_rate = 720600000ULL,
-+	.capabilities = {
-+		.he_mcs_set = { HE_MCS_SET(MCS7, 1), MCS_UNSUP,
-+				HE_MCS_SET(MCS7, 1), MCS_UNSUP },
-+		.he_phy_capa = { HE_PHY_CAPA(0x0c) },
-+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
-+	},
-+	.he_capabilities = {
-+		26, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
-+		HE_PHY_CAPA(0x0c), MCS_UNSUP, HE_MCS_SET(MCS7, 1),
-+				MCS_UNSUP, HE_MCS_SET(MCS7, 1)
-+	},
-+};
-+
-+/* 5GHz, 160/80+80MHz, MCS 7, NSS 1 */
-+const struct he_test_data he_test_5_160_80_P_80_mhz_mcs_7_nss_1 = {
-+	.freq = BAND_FREQ_5_GHZ,
-+	.rssi = -20,
-+	.expected_rate = 720600000ULL,
-+	.capabilities = {
-+		.he_mcs_set = { HE_MCS_SET(MCS7, 1), MCS_UNSUP,
-+				HE_MCS_SET(MCS7, 1), MCS_UNSUP,
-+				HE_MCS_SET(MCS7, 1), MCS_UNSUP },
-+		.he_phy_capa = { HE_PHY_CAPA(0x1c) },
-+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
-+	},
-+	.he_capabilities = {
-+		30, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
-+		HE_PHY_CAPA(0x1c), MCS_UNSUP, HE_MCS_SET(MCS7, 1),
-+				MCS_UNSUP, HE_MCS_SET(MCS7, 1),
-+				MCS_UNSUP, HE_MCS_SET(MCS7, 1)
-+	},
-+};
-+
-+/* 5GHz, max data rate */
-+const struct he_test_data he_test_5_max_data_rate = {
-+	.freq = BAND_FREQ_5_GHZ,
-+	.rssi = -20,
-+	.expected_rate = 1201000000ULL * 8ULL,
-+	.capabilities = {
-+		.he_mcs_set = { HE_MCS_SET(MCS11, 8), MCS_UNSUP,
-+				HE_MCS_SET(MCS11, 8), MCS_UNSUP,
-+				HE_MCS_SET(MCS11, 8), MCS_UNSUP },
-+		.he_phy_capa = { HE_PHY_CAPA(0x1c) },
-+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
-+	},
-+	.he_capabilities = {
-+		30, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
-+		HE_PHY_CAPA(0x1c), MCS_UNSUP, HE_MCS_SET(MCS11, 8),
-+				MCS_UNSUP, HE_MCS_SET(MCS11, 8),
-+				MCS_UNSUP, HE_MCS_SET(MCS11, 8)
-+	},
-+};
-+
-+const struct he_test_data he_all_mcs_unsupported = {
-+	.freq = BAND_FREQ_5_GHZ,
-+	.rssi = -20,
-+	.expected_rate = 1201000000ULL * 8ULL,
-+	.expected_return = -EBADMSG,
-+	.capabilities = {
-+		.he_mcs_set = { MCS_UNSUP, MCS_UNSUP,
-+				MCS_UNSUP, MCS_UNSUP,
-+				MCS_UNSUP, MCS_UNSUP },
-+		.he_phy_capa = { HE_PHY_CAPA(0x1c) },
-+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
-+	},
-+	.he_capabilities = {
-+		30, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
-+		HE_PHY_CAPA(0x1c), MCS_UNSUP, MCS_UNSUP,
-+				MCS_UNSUP, MCS_UNSUP,
-+				MCS_UNSUP, MCS_UNSUP
-+	},
-+};
-+
-+/* 5GHz, max data rate, low-rssi */
-+const struct he_test_data he_test_5_low_rssi = {
-+	.freq = BAND_FREQ_5_GHZ,
-+	.rssi = -80, /* Should force 20MHz/MCS0 width to be used */
-+	.expected_rate = 8600000ULL * 8ULL,
-+	.capabilities = {
-+		.he_mcs_set = { HE_MCS_SET(MCS11, 8), MCS_UNSUP,
-+				HE_MCS_SET(MCS11, 8), MCS_UNSUP,
-+				HE_MCS_SET(MCS11, 8), MCS_UNSUP },
-+		.he_phy_capa = { HE_PHY_CAPA(0x1c) },
-+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
-+	},
-+	.he_capabilities = {
-+		30, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
-+		HE_PHY_CAPA(0x1c), MCS_UNSUP, HE_MCS_SET(MCS11, 8),
-+				MCS_UNSUP, HE_MCS_SET(MCS11, 8),
-+				MCS_UNSUP, HE_MCS_SET(MCS11, 8)
-+	},
-+};
-+
-+static void band_test_he(const void *data)
++/*
++ * Checks the supported width set (Table 9-322b) meets the following
++ * requirements:
++ *  - B0 and bits B1/B2/B3 are mutually exclusive.
++ *  - B2 is only set if B1 is set
++ *  - B3 is only set if B2 is set (and in turn, B1 is set)
++ *  - The IE length supports B2 and B3 MCS sets
++ */
++bool ie_validate_he_capabilities(const void *data, size_t len)
 +{
-+	const struct he_test_data *he_data = data;
-+	struct band *band;
-+	uint64_t rate = 0;
-+	int ret;
++	uint8_t width_set;
++	const uint8_t *ptr = data;
++	bool freq_2_4;
++	bool width_40_80;
++	bool width_160;
++	bool width_80p80;
 +
-+	band = new_band();
-+	band->freq = he_data->freq;
-+	band->he_capabilities = l_queue_new();
++	if (len < 22)
++		return false;
 +
-+	l_queue_push_tail(band->he_capabilities,
-+				(void*)&(he_data->capabilities));
++	width_set = bit_field((ptr + 7)[0], 1, 7);
 +
-+	assert(ie_validate_he_capabilities(he_data->he_capabilities + 2,
-+					he_data->he_capabilities[0]));
++	/* B0 indicates support for 40MHz, but only in 2.4GHz band */
++	freq_2_4 = test_bit(&width_set, 0);
 +
-+	ret = band_estimate_he_rx_rate(band, he_data->he_capabilities + 2,
-+					he_data->rssi, &rate);
-+	assert(ret == he_data->expected_return);
++	/* B1 indicates support for 40/80MHz */
++	width_40_80 = test_bit(&width_set, 1);
 +
-+	if (ret == 0)
-+		assert(rate == he_data->expected_rate);
++	if (width_40_80 && freq_2_4)
++		return false;
 +
-+	l_queue_destroy(band->he_capabilities, NULL);
-+	l_free(band);
++	/* B2 indicates support for 160MHz MCS table */
++	width_160 = test_bit(&width_set, 2);
++
++	/* Ensure B1 is set, not B0, and the length includes this MCS table */
++	if (width_160 && (!width_40_80 || freq_2_4 || len < 26))
++		return false;
++
++	/* B3 indicates support for 80+80Mhz MCS table */
++	width_80p80 = test_bit(&width_set, 3);
++
++	/* Ensure B2 is set, not B0, and the length includes this MCS table */
++	if (width_80p80 && (!width_160 || freq_2_4 || len < 30))
++		return false;
++
++	return true;
 +}
-+
- struct oci2freq_data {
- 	unsigned int op;
- 	unsigned int chan;
-@@ -436,6 +660,25 @@ int main(int argc, char *argv[])
+diff --git a/src/ie.h b/src/ie.h
+index d38e9e8e..e56df984 100644
+--- a/src/ie.h
++++ b/src/ie.h
+@@ -682,3 +682,5 @@ int ie_parse_owe_transition(const void *data, size_t len,
+ 				struct ie_owe_transition_info *info);
  
- 	l_test_add("/band/VHT/test1", band_test_vht_1, NULL);
- 
-+	l_test_add("/band/HE/test/2.4GHz/20MHz/MCS7/NSS1", band_test_he,
-+					&he_test_2_4_20mhz_mcs_7_nss_1);
-+	l_test_add("/band/HE/test/2.4GHz/40MHz/MCS7/NSS1", band_test_he,
-+					&he_test_2_4_40mhz_mcs_7_nss_1);
-+	l_test_add("/band/HE/test/5GHz/20MHz/MCS7/NSS1", band_test_he,
-+					&he_test_5_20mhz_mcs_7_nss_1);
-+	l_test_add("/band/HE/test/5GHz/80MHz/MCS7/NSS1", band_test_he,
-+					&he_test_5_80mhz_mcs_7_nss_1);
-+	l_test_add("/band/HE/test/5GHz/160MHz/MCS7/NSS1", band_test_he,
-+					&he_test_5_160mhz_mcs_7_nss_1);
-+	l_test_add("/band/HE/test/5GHz/160/80+80MHz/MCS7/NSS1", band_test_he,
-+					&he_test_5_160_80_P_80_mhz_mcs_7_nss_1);
-+	l_test_add("/band/HE/test/5GHz/max data rate", band_test_he,
-+					&he_test_5_max_data_rate);
-+	l_test_add("/band/HE/test/all MCS unsupported", band_test_he,
-+					&he_all_mcs_unsupported);
-+	l_test_add("/band/HE/test/low RSSI", band_test_he,
-+					&he_test_5_low_rssi);
+ int ie_parse_oci(const void *data, size_t len, const uint8_t **oci);
 +
- 	l_test_add("/band/oci2freq 1", test_oci2freq, &oci2freq_data_1);
- 	l_test_add("/band/oci2freq 2", test_oci2freq, &oci2freq_data_2);
- 	l_test_add("/band/oci2freq 3", test_oci2freq, &oci2freq_data_3);
++bool ie_validate_he_capabilities(const void *data, size_t len);
 -- 
 2.34.1
 
