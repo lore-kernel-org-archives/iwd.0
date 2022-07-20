@@ -1,48 +1,50 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4840747E
-	for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 22:17:14 +0000 (UTC)
-Received: by mail-pl1-f176.google.com with SMTP id d7so68820plr.9
-        for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 15:17:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1347A747E
+	for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 22:17:16 +0000 (UTC)
+Received: by mail-pj1-f47.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so3570125pjf.2
+        for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 15:17:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0NMJ8OT3tYSx1a5FOr4/YBmdnssT7l39LN0oyZfg/wQ=;
-        b=YHrjhPSRn3AKCb3cXpuyJHAgS1dz+c40vFtch68nG7Zj2q/LaI3kV61y7ZFNt4g+AN
-         DGmwYsYtJWPSdqKRkTb382wRq/rdhoBd3kBR2M5uEP0fG8nsIKY6p37VmlT6wx9rA6w/
-         rGQmDxBCb6iNdLqFwcjc6ECjq1K4nJPojBKTe7ExZKnAMVIUqNJ7fXpDIMT+jwxoOH41
-         gJdosETEO8n9sylPUAHKbnqTvlbUhwUZ4O0GLfXgqtp3I0JPVUvBGYhO0/NkGMuMznBA
-         Ca8togqjcUa7qFaJ9IzqOPVeNiQUlT8H9i0cELP4Rx9zBr8uaAwxuq3is9dzc0G5Y4KF
-         PxBw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=0FUZ24uKdjXbXR5N8bxcxWhCdfkYHd6fP/PdcchXM+w=;
+        b=XJARpSot/J6pBBVOtn8FqtfZKZESSeyX6cPcabxzsH5sFngKukogYD+C8Edot1b7Bg
+         MZthQ9CILbxaEJYIzy05HYSbv2O3eQSIinpl3YlLD9OSxs6lT1X5HmlK66GulhdEX5fx
+         2qP0fWuQ6ucK7M+0afFWLcZscV5ScdySybwA3q9QttslsGV7JPzYhKWho0hoMUPqC/n2
+         I+S8bVd6K9Dd2LcVuUni+e8g3cdpok+S8GGYAW3xhFTflk83l5ng8q1oFsz52yqD9uuL
+         vw08d1sX57zRNfKDiK207vE8GeU7KvOB9wAa5Z6LcEOkl2Z0+nz8fSEVwYK3KFPEIIl0
+         gmgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0NMJ8OT3tYSx1a5FOr4/YBmdnssT7l39LN0oyZfg/wQ=;
-        b=2I2+jO1BJA/VmxB+dbti443h9/vI8z8CNHtmU2K6imyVCNndHTqQtfwrvlh9gu5UCp
-         betXGXrVhxYZzW8CjE1uzWEnUHNQxKUgVam2YL8DovMzFs371oNoiNgvypnEvWhKD4+o
-         Ay+oZRLienFUvwDLLm1chm9JIQzmO9xea/MISzQ/xrmnY/PDXIH1cwv0sVT4djIp+4Hy
-         f5ENWQWKuaX5wrqvsGjJaGziTydxeMnVXJ+kAe0vLqTDff98fHF5eMt90LtFOMquBDik
-         li5y/48p14dnnadpnCl6QYFldRXzQOtcFnholHwp6EhpQNtVS4pa//obkYyNmqjLOqpX
-         Y6oA==
-X-Gm-Message-State: AJIora8Cg0vYkdXkhQwMuj0SpfD5D4yjVOVpvCJV3Fze1Cayjai9nMWK
-	KiSiSo3KRg05MgYY7EFVR7IjBGF4+wc=
-X-Google-Smtp-Source: AGRyM1sWx1IaYZMwbcXOqtRLJwKxof8DdG2UcfXTpGaoYhb1y8fA5wF8uQ/rvfhNcs84zyxWrBbP1Q==
-X-Received: by 2002:a17:902:efd5:b0:16d:2da8:64a7 with SMTP id ja21-20020a170902efd500b0016d2da864a7mr2100850plb.157.1658355433976;
-        Wed, 20 Jul 2022 15:17:13 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=0FUZ24uKdjXbXR5N8bxcxWhCdfkYHd6fP/PdcchXM+w=;
+        b=jHneCVY114TNjpySA36pojO3Sizs9hxPJBDR1G8E/YDZ3BoeBwdT1KcoOozXSVRJwv
+         kE7wSRFSlzGpUmOFot2llFBHdgUhOrUJRuuwCTwh17gO34jE9Hg7l6NKoDC2TyC0tdAa
+         EV4VRjpToorHwIQYNonar9CSoJ+2OxMCYKlpddeP9+vv/ho7qvRpwv8y7fjwboY8SN+k
+         GAaBvRqkr8gvPhOkT1VWA2l1TRfoohKHlUMz03grDtnCZHi6QneVuR6FlVClCKi/oMRi
+         qHmkd75iRKG9vYrHo8XA0D/ZIR4TRH55JxYCVPpRD/aVwtJZgzpmAdsGIOILf4Pl6+Qi
+         vUdA==
+X-Gm-Message-State: AJIora8kg0BwJ9bbc+Q5UovLnxkzGYnxBF9E27QmeCHOKpwWkXI4ZbXp
+	Fuv8OfwZP9IqRhgWdrAIFJd6Q5ZLY58=
+X-Google-Smtp-Source: AGRyM1vQI7bmOpFMWtWi/8BmMqx1aPMbMrvrCzsVMntIGJPC1UJqIsbnMOAGkhdbpiaPKv/OE3ecow==
+X-Received: by 2002:a17:903:2285:b0:16c:33dc:8754 with SMTP id b5-20020a170903228500b0016c33dc8754mr41222209plh.126.1658355435372;
+        Wed, 20 Jul 2022 15:17:15 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id q10-20020a170903204a00b0016a1e2d148csm75859pla.32.2022.07.20.15.17.13
+        by smtp.gmail.com with ESMTPSA id q10-20020a170903204a00b0016a1e2d148csm75859pla.32.2022.07.20.15.17.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 15:17:13 -0700 (PDT)
+        Wed, 20 Jul 2022 15:17:15 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v6 1/5] ie: add validation for HE Capabilities element
-Date: Wed, 20 Jul 2022 15:15:03 -0700
-Message-Id: <20220720221507.886811-1-prestwoj@gmail.com>
+Subject: [PATCH v6 3/5] wiphy: use HE element for data rate estimation
+Date: Wed, 20 Jul 2022 15:15:05 -0700
+Message-Id: <20220720221507.886811-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220720221507.886811-1-prestwoj@gmail.com>
+References: <20220720221507.886811-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,79 +53,47 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This makes sure the width set bits are sane, and validates the length
-depending on which MCS sets are enabled.
+If an HE element is found, prefer using this for the rate estimation
+since it will likely yield the fastest rate.
 ---
- src/ie.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/ie.h |  2 ++
- 2 files changed, 50 insertions(+)
+ src/wiphy.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/src/ie.c b/src/ie.c
-index 7ef07c37..070454ef 100644
---- a/src/ie.c
-+++ b/src/ie.c
-@@ -2577,3 +2577,51 @@ int ie_parse_oci(const void *data, size_t len, const uint8_t **oci)
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 696064c0..09b99fb2 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -788,6 +788,7 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
+ 	const void *vht_operation = NULL;
+ 	const void *ht_capabilities = NULL;
+ 	const void *ht_operation = NULL;
++	const void *he_capabilities = NULL;
+ 	const struct band *bandp;
+ 	enum band_freq band;
  
- 	return 0;
- }
-+
-+/*
-+ * Checks the supported width set (Table 9-322b) meets the following
-+ * requirements:
-+ *  - B0 and bits B1/B2/B3 are mutually exclusive.
-+ *  - B2 is only set if B1 is set
-+ *  - B3 is only set if B2 is set (and in turn, B1 is set)
-+ *  - The IE length supports B2 and B3 MCS sets
-+ */
-+bool ie_validate_he_capabilities(const void *data, size_t len)
-+{
-+	uint8_t width_set;
-+	const uint8_t *ptr = data;
-+	bool freq_2_4;
-+	bool width_40_80;
-+	bool width_160;
-+	bool width_80p80;
-+
-+	if (len < 22)
-+		return false;
-+
-+	width_set = bit_field((ptr + 7)[0], 1, 7);
-+
-+	/* B0 indicates support for 40MHz, but only in 2.4GHz band */
-+	freq_2_4 = test_bit(&width_set, 0);
-+
-+	/* B1 indicates support for 40/80MHz */
-+	width_40_80 = test_bit(&width_set, 1);
-+
-+	if (width_40_80 && freq_2_4)
-+		return false;
-+
-+	/* B2 indicates support for 160MHz MCS table */
-+	width_160 = test_bit(&width_set, 2);
-+
-+	/* Ensure B1 is set, not B0, and the length includes this MCS table */
-+	if (width_160 && (!width_40_80 || freq_2_4 || len < 26))
-+		return false;
-+
-+	/* B3 indicates support for 80+80Mhz MCS table */
-+	width_80p80 = test_bit(&width_set, 3);
-+
-+	/* Ensure B2 is set, not B0, and the length includes this MCS table */
-+	if (width_80p80 && (!width_160 || freq_2_4 || len < 30))
-+		return false;
-+
-+	return true;
-+}
-diff --git a/src/ie.h b/src/ie.h
-index d38e9e8e..e56df984 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -682,3 +682,5 @@ int ie_parse_owe_transition(const void *data, size_t len,
- 				struct ie_owe_transition_info *info);
+@@ -847,11 +848,22 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
  
- int ie_parse_oci(const void *data, size_t len, const uint8_t **oci);
+ 			vht_operation = iter.data - 2;
+ 			break;
++		case IE_TYPE_HE_CAPABILITIES:
++			if (!ie_validate_he_capabilities(iter.data, iter.len))
++				return -EBADMSG;
 +
-+bool ie_validate_he_capabilities(const void *data, size_t len);
++			he_capabilities = iter.data;
++			break;
+ 		default:
+ 			break;
+ 		}
+ 	}
+ 
++	if (!band_estimate_he_rx_rate(bandp, he_capabilities,
++					bss->signal_strength / 100,
++					out_data_rate))
++		return 0;
++
+ 	if (!band_estimate_vht_rx_rate(bandp, vht_capabilities, vht_operation,
+ 					ht_capabilities, ht_operation,
+ 					bss->signal_strength / 100,
 -- 
 2.34.1
 
