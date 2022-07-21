@@ -1,74 +1,177 @@
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916C7748C
-	for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 22:52:08 +0000 (UTC)
-Received: by mail-oi1-f172.google.com with SMTP id x185so12756733oig.1
-        for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 15:52:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9841FA5
+	for <iwd@lists.linux.dev>; Thu, 21 Jul 2022 02:15:17 +0000 (UTC)
+Received: by mail-ot1-f46.google.com with SMTP id w6-20020a056830410600b0061c99652493so173582ott.8
+        for <iwd@lists.linux.dev>; Wed, 20 Jul 2022 19:15:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:from:in-reply-to:content-transfer-encoding;
-        bh=zzqxef0fJazWhgFydBqLOwkaeS200vqU/2Fmp1y1v8o=;
-        b=nR/SKVaPyfLOHoTPDXmaHViEpn5BeqFeTxlRX6iBJoyVJ2s8Pep7TXRI/cOJyIaQgO
-         IbHRWFIAUGYoqJ0keZ6oslpzUXtIIp3nIMwFYh1BsR/Z/rgFOGnvTf8SlSmZjZIxx6gz
-         UzETyR3nu+kWKs+BiepXQYyxoSn02uuHJu0DPVI9NtbPH3iEvbMLegKYnaSLt75mujTz
-         sHd3BTdfFFEriZg5TUUMtj8uRda0VWw4nF3MiCzALuTAV5qaz22ftN8EyoXqrLVlqrwN
-         VBuXx6bZwvpUC5bTSautFcq/3D1c0hmdzdWSC1GTuuDazuntau84wv8N3g5Ul4dVk9Az
-         1scQ==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=7W9vQDbjB1NxCd28MDgNH6QLWOgBBnRi7TVfoKS+/QQ=;
+        b=SsrXfoJ660zLv203sAWrseJQ0BI8VWgMA8IHj+Px2+5cmh6V8V81Wt9L/RnLGnf4TW
+         Vppek0MwHDnUd5Vn5vjyRgV2HzbDbrZbHFATswCeCia1olmo9sBytpvijc78fjN8S8VM
+         euZPxDtxwQFdjvTJejJRkv2TgDSuvw5kzuANOTseyCf5fCsPs99tZYvnc3iKO6VxExA1
+         aI6g6hYJLDAHjCzGml5GMRSsZxMWo8RiOvf2c48aGKogo0QHsYkK96IwM3PWzLRjPxsw
+         fAUfesdeSG7RoOCwgHsCu0Gyx9Si1DP36bgdfDfdmLnvgAHuTY7wVqgsz9GLly3XLqpD
+         X4uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=zzqxef0fJazWhgFydBqLOwkaeS200vqU/2Fmp1y1v8o=;
-        b=wiU5uFKBdKFeOEn1TM7+uSrivlcpnk2xkR/oL6dc8yD7I8K3fPHUTl17lVxp4+u53S
-         +YagIvesMrcMs/3miEZ9jJh5ci6zy0grJFijbHLnAf+YAS3bupsWdxPBLb0ZEgrwm0iK
-         iGQ5NHNhwWKBmkCiAgqWeTwxTOM6VVNAsLcN1FbKBwqc0Y+8Xq5cj6h+AY2EgMo4XLwe
-         mlONj1sTru7aBk92xYZp5bHVShb0W+f+YeMmEXKbWWxmfx0FjzB7Pl+/s8SEXH+fmWfr
-         X9L19CBB6oToYkRP7vwQNFARG4k9E3UF17Reql13+n6ITdLFse3wYS/1ooOqPHg+LXb3
-         OATg==
-X-Gm-Message-State: AJIora++rKEkH0ZQJ97PSrYsBL76/r7DAa835zLlmEivEcQXANWjq4d8
-	J7wCnBtm9xG/qGBqCKCO+Vc=
-X-Google-Smtp-Source: AGRyM1t9VkjB9/ADvAgNgS86cP7AeQqU/iIFrE1ZDHIYrtVILN4hcGCQ0OBQZnYUyn7Z4VTUYPToLw==
-X-Received: by 2002:aca:5944:0:b0:33a:a1dd:def2 with SMTP id n65-20020aca5944000000b0033aa1dddef2mr2266728oib.13.1658357527673;
-        Wed, 20 Jul 2022 15:52:07 -0700 (PDT)
-Received: from [10.0.2.15] (216.106.68.145.reverse.socket.net. [216.106.68.145])
-        by smtp.googlemail.com with ESMTPSA id k6-20020a4aa5c6000000b004279be23ed4sm109554oom.41.2022.07.20.15.52.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Jul 2022 15:52:07 -0700 (PDT)
-Message-ID: <80fdea9d-3d7b-3332-eba2-f88087232e25@gmail.com>
-Date: Wed, 20 Jul 2022 17:50:56 -0500
+        bh=7W9vQDbjB1NxCd28MDgNH6QLWOgBBnRi7TVfoKS+/QQ=;
+        b=QQpSHdDHB2/osce56jPLQ93v2pwuzktMl0kp8lQ9ldpDuKs3TbeXckQItcfrCuPXNl
+         uMdXwZjFY1bwD0XTOB0u7NbhT3La+gihnTVEOacKBTJgW2tPJwO/RGbn030AUKl7uCvV
+         xcY42GCnj4X+42vrZhF0k84IPefZIn1AYNJ0ZwpX5aOyDm97elHP7bfsnhSXVzT62++v
+         R+BOcLhcyyaHVtnPyAbb/Mldp35wlU4zcPCT1QhfceApSWaYH/vGb5NKQnTJaFOvVed+
+         Ie/wiOoO8Fr9WSvRLb85ZYu8+hKCYlqbvmueFa2NP+uaouAXZdIuXVHVPmJDiqr5AoW3
+         Pvlg==
+X-Gm-Message-State: AJIora/wySLHOVxBiWlhb7z0yy0DCO+Yr8qUTajiCB00MUPwMYg4UbWy
+	wXEprpU7bobE4kK+MaA9gaw=
+X-Google-Smtp-Source: AGRyM1tKyVrw1eVwsSJKJ/uSufzc1Pg6TWp9JuO7F94WQdjI5XBigagbYl+di6LttejUijoJPl81Nw==
+X-Received: by 2002:a9d:ba6:0:b0:61c:309d:d487 with SMTP id 35-20020a9d0ba6000000b0061c309dd487mr16128751oth.183.1658369716205;
+        Wed, 20 Jul 2022 19:15:16 -0700 (PDT)
+Received: from localhost.localdomain (216.106.68.145.reverse.socket.net. [216.106.68.145])
+        by smtp.gmail.com with ESMTPSA id w22-20020a056870e2d600b0010cb6fa9166sm297581oad.0.2022.07.20.19.15.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jul 2022 19:15:15 -0700 (PDT)
+From: Denis Kenzior <denkenz@gmail.com>
+To: jtavares@kvh.com,
+	iwd@lists.linux.dev
+Cc: Denis Kenzior <denkenz@gmail.com>
+Subject: [PATCH] tools: Add simple utility to generate the PSK
+Date: Wed, 20 Jul 2022 21:13:14 -0500
+Message-Id: <20220721021314.14066-1-denkenz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v6 1/5] ie: add validation for HE Capabilities element
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20220720221507.886811-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220720221507.886811-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+This utility is the equivalent to wpa_passphrase and produces a PSK as
+would be generated by iwd.
+---
+ .gitignore      |  1 +
+ Makefile.am     |  5 +++-
+ tools/iwd-psk.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 75 insertions(+), 1 deletion(-)
+ create mode 100644 tools/iwd-psk.c
 
-On 7/20/22 17:15, James Prestwood wrote:
-> This makes sure the width set bits are sane, and validates the length
-> depending on which MCS sets are enabled.
-> ---
->   src/ie.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
->   src/ie.h |  2 ++
->   2 files changed, 50 insertions(+)
-> 
-
-All applied, thanks.
-
-Regards,
--Denis
+diff --git a/.gitignore b/.gitignore
+index 0886643b8b99..3bd270c070fe 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -38,6 +38,7 @@ tools/hwsim
+ tools/hwsim.1
+ tools/probe-req
+ tools/iwd-decrypt-profile
++tools/iwd-psk
+ unit/test-cmac-aes
+ unit/test-arc4
+ unit/test-hmac-md5
+diff --git a/Makefile.am b/Makefile.am
+index cffb0738fc55..148ffba0bb67 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -363,7 +363,7 @@ man_MANS += wired/ead.8
+ endif
+ endif
+ 
+-noinst_PROGRAMS += tools/probe-req tools/iwd-decrypt-profile
++noinst_PROGRAMS += tools/probe-req tools/iwd-decrypt-profile tools/iwd-psk
+ 
+ tools_probe_req_SOURCES = tools/probe-req.c src/mpdu.h src/mpdu.c \
+ 					src/ie.h src/ie.c \
+@@ -379,6 +379,9 @@ tools_iwd_decrypt_profile_SOURCES = tools/iwd-decrypt-profile.c \
+ 					src/storage.h src/storage.c
+ tools_iwd_decrypt_profile_LDADD = ${ell_ldadd}
+ 
++tools_iwd_psk_SOURCES = tools/iwd-psk.c src/crypto.h src/crypto.c
++tools_iwd_psk_LDADD = ${ell_ldadd}
++
+ if HWSIM
+ bin_PROGRAMS += tools/hwsim
+ 
+diff --git a/tools/iwd-psk.c b/tools/iwd-psk.c
+new file mode 100644
+index 000000000000..0a0625c3be8a
+--- /dev/null
++++ b/tools/iwd-psk.c
+@@ -0,0 +1,70 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2022  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <stdio.h>
++#include <ell/ell.h>
++
++#include "ell/useful.h"
++#include "src/crypto.h"
++
++static void usage(const char *exec_name)
++{
++	printf("%s - Generate a psk from passphrase\n"
++		"Usage:\n", exec_name);
++	printf("\%s <ssid> <passphrase>\n", exec_name);
++	printf("\n");
++}
++
++int main(int argc, char *argv[])
++{
++	int ret = EXIT_FAILURE;
++	unsigned char *ssid;
++	size_t ssid_len;
++	const char *passphrase;
++	uint8_t psk[32];
++	char *hexpsk;
++	int err;
++
++	if (argc != 3) {
++		usage(argv[0]);
++		goto done;
++	}
++
++	ssid = (unsigned char *) argv[1];
++	ssid_len = strlen(argv[1]);
++	passphrase = argv[2];
++
++	err = crypto_psk_from_passphrase(passphrase, ssid, ssid_len, psk);
++	if (err < 0) {
++		printf("Unable to generate passphrase: %s\n", strerror(-err));
++		goto done;
++	}
++
++	hexpsk = l_util_hexstring(psk, sizeof(psk));
++	printf("PreSharedKey=%s\n", hexpsk);
++	l_free(hexpsk);
++
++	ret = EXIT_SUCCESS;
++
++done:
++	return ret;
++}
+-- 
+2.35.1
 
