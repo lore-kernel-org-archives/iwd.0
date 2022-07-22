@@ -1,44 +1,44 @@
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238BB4A2C
-	for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 17:22:15 +0000 (UTC)
-Received: by mail-oi1-f177.google.com with SMTP id bb16so6202291oib.11
-        for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 10:22:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E529D4A2C
+	for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 17:56:18 +0000 (UTC)
+Received: by mail-oi1-f175.google.com with SMTP id bb16so6297412oib.11
+        for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 10:56:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :references:from:in-reply-to:content-transfer-encoding;
-        bh=tJZgIB/gWZe7Mmt1eE8T+/BvCGkPhtkz7WjzNj/Cc74=;
-        b=ZUfJgCz36tFglAFgxwQ64ZwBwEFtT+t8wd8wELgjAOsZYhgxGg2m3o8vTMPppPabuQ
-         ZKY4C/lrTEcbzLTMzWw53KbWMpiZ7D6xxQ6GVizirdIdbcLjMUcBFoCeJ5sm1n+2Ly3i
-         NyV4A1MZBWdfpp3yEQTaM39SQJkwdaFv3J/CQxE1yt9PlM++zXhxR+bc4fU/KXOMs4xL
-         W+fAhGQDKsWR6h0c82JWs/+YH0XXICi9f1dMMrSQwAb7RzLRoSRWtO5i9n7vyx7WI19N
-         9tAjV0CujeymxVEooLKQg2QNYu2yLY2ggT3C/h+bWFGNLkNmao9U6rw3gKZ5lfd7g4qg
-         3YQQ==
+        bh=zrPNzYvVZGSBIRWPda8MU1qgnztCWIicc/KJHIgLxUQ=;
+        b=Ig22I5YaaY3ZysO1xYhLEh4HwT41tUpofgaB3mIAInAjPRwoKHZKr+DBglT7m9dBzI
+         jPxQZLAlyu3XLbQe6oYNJ9L3VhSb5Iv/PWtOo3cN0iFXXxLaBQLYMAGqu7IPbqKYcKdb
+         K8HON3u3iU/CETkc1byTw7ZA1ZiCiNJY8Opy0XbMDWxDeaeo5PDuqFGLI3AaPBjVT1kp
+         fbIT+4+EgzKH0lQDXyvX+R30l4G5d1GTpAqOduhuVZZVgZ2aWuEtHhDkOkZAgViSKQtV
+         n5QqjeGdPt4TDcgFD/jVdpBYtJbi3DAyAnkyTmf+KheZyIurP6ZMb0cuBC7Gjrk+3qDo
+         33qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=tJZgIB/gWZe7Mmt1eE8T+/BvCGkPhtkz7WjzNj/Cc74=;
-        b=ARw3aMXEV1JYIeXmXkd5bEa9OM6RfBNuIvfTDaKDgB9qDV+tm36MyyQsUDsH3dDopO
-         z2f7zsskcsFFzmSI1zlziT9L0Avnyo8JDYW9kTkEQAdx/4dgt7fVdl1357MqQinoLBFe
-         aOuiEpvRwub3SUzPMwqZoRv757lYj8Pv0ySCkw193UT5G4NY7oJAIKpYzjRfspUVx+xr
-         cvnzKLOFdIbg9vsWc/m8IVE/IZd9ft+4Vn6xqlOd8kYSVE392bG2urSbaZQKgMAuMz8J
-         wS22bQfcsRrUTTUG+T6bVIEWlttXrzFtB9Ej30Va+dn/E6uWRYhrw8Ih987dLNYukCcZ
-         3UQw==
-X-Gm-Message-State: AJIora9xd1jqRcodSR+EsJzmQx9CQLYNGic+Rf5Zj1aaJG5mMcg0rxMV
-	vDn8QIIpFVTHteBkCnTn/Og=
-X-Google-Smtp-Source: AGRyM1t+Rvdn5WDplp10jtMutKrlyf4h2SGIkXNcYq5+ajv9D0KYvBrp0f+bEwkjDAIrG60qiIL9Ig==
-X-Received: by 2002:a05:6808:209d:b0:33a:8b99:f7a3 with SMTP id s29-20020a056808209d00b0033a8b99f7a3mr360658oiw.119.1658510534166;
-        Fri, 22 Jul 2022 10:22:14 -0700 (PDT)
+        bh=zrPNzYvVZGSBIRWPda8MU1qgnztCWIicc/KJHIgLxUQ=;
+        b=zaq0PVgWfPV/8ROwxbwFIRfYlFhvsEC145bQJbIUpcu0mzn/HkQSksVvYT2bYBoBke
+         eXEc0bTzLJtJNNrulu2ELMNbaKxd3Eujh0OvDgBsXmsfZTOFxfiEb0KTIaBvm3JDu8ks
+         SudtSS7QhD8M79MP007xuk21BhYfr3H8S65SbY/9SjDqQGY6pX8ETfl511URbyuy34vw
+         tMMWMAUj9/VBAquctdSNCFimRfx9AtwDugjfZm+B9vkJ0w3iuXhsffN6JHWe4K/XvpXh
+         a8EZewtMg8LnaFgAI8h104cXO29k4mXvdmPpgzGzam4x+5ltUHApGiDr0qj0JV5RkEjj
+         V1gg==
+X-Gm-Message-State: AJIora99PNSaxra/OTAxthdIHzDlH9Yy4VLvDk2DX6t7iYZPSU951kDI
+	QCWzy6+JCR1w7NsvmsOAlGc69SXxsTQ=
+X-Google-Smtp-Source: AGRyM1tEdPmFc1aDFVUoH91TPzcQRmaIWFHeyC/b+jQ0uyhkzvjNkgv2ulMYq7xvybJ6FLMlUXppqg==
+X-Received: by 2002:aca:3cd6:0:b0:33a:a673:2926 with SMTP id j205-20020aca3cd6000000b0033aa6732926mr434213oia.40.1658512577930;
+        Fri, 22 Jul 2022 10:56:17 -0700 (PDT)
 Received: from [10.0.2.15] ([136.32.1.70])
-        by smtp.googlemail.com with ESMTPSA id i17-20020a9d68d1000000b0061c4d5a5616sm2158711oto.63.2022.07.22.10.22.13
+        by smtp.googlemail.com with ESMTPSA id c17-20020a056870b29100b000e686d1386dsm2567176oao.7.2022.07.22.10.56.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Jul 2022 10:22:13 -0700 (PDT)
-Message-ID: <e144ecce-eaad-0156-4f9a-947c0b01b555@gmail.com>
-Date: Fri, 22 Jul 2022 12:04:21 -0500
+        Fri, 22 Jul 2022 10:56:17 -0700 (PDT)
+Message-ID: <692012c2-ff3f-185a-47de-f09d99311296@gmail.com>
+Date: Fri, 22 Jul 2022 12:38:34 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -47,44 +47,75 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH 1/7] wiphy: fix runtime error from bit shift
+Subject: Re: [PATCH 5/7] manager: re-dump wiphy on regulatory change
 Content-Language: en-US
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
 References: <20220722163417.1119334-1-prestwoj@gmail.com>
+ <20220722163417.1119334-5-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220722163417.1119334-1-prestwoj@gmail.com>
+In-Reply-To: <20220722163417.1119334-5-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
 On 7/22/22 11:34, James Prestwood wrote:
-> The compiler treated the '1' as an int type which was not big enough
-> to hold a bit shift of 31. Change this to 1ULL to fix the error:
+> This is required due to the kernel not waiting for regulatory updates before
+> sending the wiphy dump. The initial dump usually contains all supported
+> frequencies, none of which are disabled. Later, the regulatory subsystem
+> populates the frequency list which can significantly limit allowed frequencies.
 > 
-> runtime error: left shift of 1 by 31 places cannot be represented in type 'int'
+> Even disregarding this problem, any regulatory update will modify the allowed
+> frequencies so re-dumping wiphy should still be done on a regulatory change.
+
+git likes it if the description lines are limited to 72 columns.
+
 > ---
->   src/wiphy.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   src/manager.c | 58 ++++++++++++++++++++++++++++++++++++++++++---------
+>   1 file changed, 48 insertions(+), 10 deletions(-)
 > 
-> diff --git a/src/wiphy.c b/src/wiphy.c
-> index 09b99fb2..4b9e130a 100644
-> --- a/src/wiphy.c
-> +++ b/src/wiphy.c
-> @@ -957,7 +957,7 @@ static void wiphy_print_he_capabilities(struct band *band,
->   	uint8_t width_set = bit_field(he_cap->he_phy_capa[0], 1, 7);
+> diff --git a/src/manager.c b/src/manager.c
+> index ca29e110..c8d56a99 100644
+> --- a/src/manager.c
+> +++ b/src/manager.c
+> @@ -666,6 +666,29 @@ static int manager_wiphy_filtered_dump(uint32_t wiphy_id,
+>   	return 0;
+>   }
 >   
->   	for (i = 0; i < 32; i++) {
-> -		if (!(he_cap->iftypes & (1 << i)))
-> +		if (!(he_cap->iftypes & (1ULL << i)))
+> +static unsigned int manager_dump_wiphy(uint32_t wiphy_id)
+> +{
+> +	struct l_genl_msg *msg;
+> +	unsigned int wiphy_dump;
+> +
+> +	msg = l_genl_msg_new_sized(NL80211_CMD_GET_WIPHY, 128);
+> +
+> +	if (wiphy_id)
 
-That seems overkill, wouldn't 1U be enough?  Or just make 'i' unsigned?
+Do note that phys start numbering at 0.  So this is probably not going to work.
 
-Have you looked into using wiphy_get_supported_iftypes() here instead?
+> +		l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY, 4, &wiphy_id);
+> +
+> +	l_genl_msg_append_attr(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP, 0, NULL);
+> +	wiphy_dump = l_genl_family_dump(nl80211, msg,
+> +						manager_wiphy_dump_callback,
 
->   			continue;
->   
->   		if (L_WARN_ON(s >= type_buf + sizeof(type_buf)))
+Are the parsers really setup to free-and-re-parse the wiphy dump information? 
+Perhaps using a callback that would parse only a subset of the information would 
+be better?
+
+> +						NULL,
+> +						manager_wiphy_dump_done);
+> +	if (!wiphy_dump) {
+> +		l_error("Wiphy information dump failed");
+> +		l_genl_msg_unref(msg);
+> +	}
+> +
+> +	return wiphy_dump;
+> +}
+> +
+>   static void manager_config_notify(struct l_genl_msg *msg, void *user_data)
+>   {
+>   	uint8_t cmd;
 
 Regards,
 -Denis
