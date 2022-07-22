@@ -1,107 +1,146 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBFA4A2C
-	for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 18:12:41 +0000 (UTC)
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-10d9137bd2eso7252639fac.3
-        for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 11:12:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9756B4A2C
+	for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 18:19:02 +0000 (UTC)
+Received: by mail-pf1-f171.google.com with SMTP id b9so5100953pfp.10
+        for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 11:19:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:from:in-reply-to:content-transfer-encoding;
-        bh=zPvDJxSqKvxbNWXGm7lax/1XAuopqUfsEtLWJ9PTyi4=;
-        b=XeytMiX/17F53bHEycEhfcyj+xQsf7HWNocJWe4p7jGw28pd1azC6pL70qFveXAY3+
-         hp4/2gH1nqP/hJ3GW18aeDLYEEzzSzIeSa2rA3l1wVHuLgHjmHkwfBITdXCilATCHD2i
-         iOQR829Lt8NIHgKSr9VcADhWX0yCjAeghyVwpkDykMZ50lSlOmcIk3Yq2mBCugtEJUEJ
-         N8n0msgAiPfjL64PFyvcDMMZ/Yi7XcVIhx69L0bs/uNcChzmClpstM8AlVv2kNgBdgYH
-         NGjIhGNOGaa2Q2QIKtf6Y9UlmJIhxyQrAk4qu97buIHGl5cmWo2oZL6BR+ZDOidu6BN+
-         fGfA==
+        h=message-id:subject:from:to:date:in-reply-to:references:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=oaQJQTQbO5ZKlIBGheC2Qy1RCC+zOuBrKGw5yA7FdRs=;
+        b=nko/AcWFR8w3Y5KZ0CQ0labmMNghrbNSJKcSzsHK2tJaKo37pH6O21nTEsF25+QKmH
+         K95umCL58TB+5myu6NoKgxefwQi0YlIUO56CxjuCnOQGhs6C+7Dimg2iRPQd3D8uXqiQ
+         6ME9eVxaCPiILszm37o9elPHw46dydC55/odYfkRsNrx1UY9fgiSKK6HHwwWiAOkJMjq
+         NxiaQSq5LdwRSI5F93KjgeQoJ4rVFtl2m2wrMnru9JwJrbWKWGuktt5CdxT7t1Iygoet
+         8DPxOIuwFQS9ZTGan5AEmAwer+RWnm7pk2d9LII0C1kVR+seTOUO6tP7kgqIFQKA7HCk
+         uj8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=zPvDJxSqKvxbNWXGm7lax/1XAuopqUfsEtLWJ9PTyi4=;
-        b=cxRnOmdTAwOrZqrEANV81orzC1XQGKRGYP9pvKmKAY2Jl9xQQb798sHhGRttuBMni6
-         1wTfnHDaecwpIxwC6jt6l0jKDJ6x/mBY5Z6obvK4p/nT6tb8RO54jnX0AvsBvk7wmMhW
-         QcrcSGBGB759/b17s6fA2dIKLDRsD7ZWVy3u9+llBlPDaI+0qTDWaRkd9aV9qezQAk62
-         oqUFipRBxdaohHyBCRY3Vt/1D7TBxuSTrLRa0qM1/7f2VtN6Rfal21lJaDfXPjaCYaaX
-         RTPgnRsvCoBBTazmO+l4hwhlVsyaCzOKvKZrS3QQ57+2boUgQomrn53XnjKoyqMmnLCN
-         nRxg==
-X-Gm-Message-State: AJIora/NuQO+jT5jJkqLNDrZbG1ieA6u+lw1NbMY7IhyVLR6zDqjNi0+
-	30Yn50gtLQctdGFKWGG/+GBH8bCGs5o=
-X-Google-Smtp-Source: AGRyM1tZeZdxPdWBH/EJDHEVjBCWW/i7rH9+IHpPQbjVfpD2GFKUD9llWMasdjmJ5+a74VQG51ZI9w==
-X-Received: by 2002:a05:6870:c227:b0:10b:f184:e12 with SMTP id z39-20020a056870c22700b0010bf1840e12mr677256oae.199.1658513560403;
-        Fri, 22 Jul 2022 11:12:40 -0700 (PDT)
-Received: from [10.0.2.15] ([136.32.1.70])
-        by smtp.googlemail.com with ESMTPSA id ca23-20020a056830611700b0061c7ac52b75sm2367764otb.26.2022.07.22.11.12.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Jul 2022 11:12:40 -0700 (PDT)
-Message-ID: <3e06e40c-d82d-d00a-5050-080668b68216@gmail.com>
-Date: Fri, 22 Jul 2022 13:08:47 -0500
+        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=oaQJQTQbO5ZKlIBGheC2Qy1RCC+zOuBrKGw5yA7FdRs=;
+        b=c/B92NFprKHHj7lKG1riCm4OSwJnzWEO1oGYrTu3wARXsXttpC/lMFlPXd1Q6PQnqq
+         rDvAltT4SzTw7hkhbLX8WhUdlSicB6lAsWQ904NDR1WFcFxvbbAbOna2eVHlIJN+4418
+         YZ25MVt/NzAM6HUsn37O9XhVoPprNxJtPaSxrbVwqdoHjynYxBpybtZJsHSKX7Gh/Rc8
+         +xlom2lPuHYiGdWOFn3XVtDeghcYn/+Mud9H2jeRz/xVYFAfkaxTs5Z9rwLoq0zKpyIv
+         CBkhRxC/oCwzb3iY/I1pSa+0y2KC55vi89SQ6MlJqE6wMb3ry8RQpJGGTqWeF0ryADtk
+         s+Yw==
+X-Gm-Message-State: AJIora/YXreJoSrYb8Q79s0c7TnsXSKcYwy2TqDlfPd5LXxfuRfxlnbu
+	NKIinIDJytY6TtvYKbkVa5o=
+X-Google-Smtp-Source: AGRyM1vECGxbBpI/MgSjVMFEK0UOWN+bjUiOA54umnqFgKskCSad3+9Yh0nqCWLS2/4oxJUoQGCYSw==
+X-Received: by 2002:a05:6a00:134c:b0:52a:c52f:b339 with SMTP id k12-20020a056a00134c00b0052ac52fb339mr1221323pfu.32.1658513941811;
+        Fri, 22 Jul 2022 11:19:01 -0700 (PDT)
+Received: from [192.168.254.55] ([50.45.187.22])
+        by smtp.gmail.com with ESMTPSA id o16-20020a170902d4d000b0016bdc98730bsm4099419plg.151.2022.07.22.11.19.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Jul 2022 11:19:01 -0700 (PDT)
+Message-ID: <cef5bf6d59f8c480ed948edbc6bb45b098d1ee84.camel@gmail.com>
+Subject: Re: [PATCH 5/7] manager: re-dump wiphy on regulatory change
+From: James Prestwood <prestwoj@gmail.com>
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+Date: Fri, 22 Jul 2022 11:18:56 -0700
+In-Reply-To: <692012c2-ff3f-185a-47de-f09d99311296@gmail.com>
+References: <20220722163417.1119334-1-prestwoj@gmail.com>
+	 <20220722163417.1119334-5-prestwoj@gmail.com>
+	 <692012c2-ff3f-185a-47de-f09d99311296@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-3.fc34) 
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 6/7] wiphy: track disabled frequencies on multiple dumps
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20220722163417.1119334-1-prestwoj@gmail.com>
- <20220722163417.1119334-6-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220722163417.1119334-6-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
-
-On 7/22/22 11:34, James Prestwood wrote:
-> If a frequency is disabled, it should not be added to the supported list which
-> it previously was. In this case its added to the (new) disabled_freqs list.
+On Fri, 2022-07-22 at 12:38 -0500, Denis Kenzior wrote:
+> Hi James,
 > 
-> Now that wiphy's are dumped on regulatory changes frequencies may be added or
-> removed from either the supported or disabled frequency list. These changes
-> are now tracked to keep the lists accurate.
-> ---
->   src/wiphy.c | 35 ++++++++++++++++++++++++++++++++---
->   src/wiphy.h |  1 +
->   2 files changed, 33 insertions(+), 3 deletions(-)
+> On 7/22/22 11:34, James Prestwood wrote:
+> > This is required due to the kernel not waiting for regulatory
+> > updates before
+> > sending the wiphy dump. The initial dump usually contains all
+> > supported
+> > frequencies, none of which are disabled. Later, the regulatory
+> > subsystem
+> > populates the frequency list which can significantly limit allowed
+> > frequencies.
+> > 
+> > Even disregarding this problem, any regulatory update will modify
+> > the allowed
+> > frequencies so re-dumping wiphy should still be done on a
+> > regulatory change.
 > 
+> git likes it if the description lines are limited to 72 columns.
+> 
+> > ---
+> >   src/manager.c | 58 ++++++++++++++++++++++++++++++++++++++++++----
+> > -----
+> >   1 file changed, 48 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/src/manager.c b/src/manager.c
+> > index ca29e110..c8d56a99 100644
+> > --- a/src/manager.c
+> > +++ b/src/manager.c
+> > @@ -666,6 +666,29 @@ static int
+> > manager_wiphy_filtered_dump(uint32_t wiphy_id,
+> >         return 0;
+> >   }
+> >   
+> > +static unsigned int manager_dump_wiphy(uint32_t wiphy_id)
+> > +{
+> > +       struct l_genl_msg *msg;
+> > +       unsigned int wiphy_dump;
+> > +
+> > +       msg = l_genl_msg_new_sized(NL80211_CMD_GET_WIPHY, 128);
+> > +
+> > +       if (wiphy_id)
+> 
+> Do note that phys start numbering at 0.  So this is probably not
+> going to work.
 
-<snip>
+Whoops, I thought zero was reserved. I'll use -1 instead.
 
-> +		/*
-> +		 * Wiphy is dumped again on every regulatory domain change which
-> +		 * may contain disabled frequencies which were previously
-> +		 * allowed. If disabled, remove from supported. If supported,
-> +		 * remove from disabled.
-> +		 */
+> 
+> > +               l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY, 4,
+> > &wiphy_id);
+> > +
+> > +       l_genl_msg_append_attr(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP,
+> > 0, NULL);
+> > +       wiphy_dump = l_genl_family_dump(nl80211, msg,
+> > +                                               manager_wiphy_dump_
+> > callback,
+> 
+> Are the parsers really setup to free-and-re-parse the wiphy dump
+> information? 
+> Perhaps using a callback that would parse only a subset of the
+> information would 
+> be better?
 
-I would do this differently and leave 'supported_freqs' alone and only track the 
-disabled freqs.
+I thought they were since the wiphy dump comes as tons of separate
+messages. Once the wiphy object is created we just keep adding stuff to
+it. But maybe I overlooked this.
 
-> +		if (disabled) {
-> +			scan_freq_set_add(wiphy->disabled_freqs, freq);
-> +			scan_freq_set_remove(wiphy->supported_freqs, freq);
-> +		} else {
-> +			scan_freq_set_add(wiphy->supported_freqs, freq);
-> +			scan_freq_set_remove(wiphy->disabled_freqs, freq);
-> +		}
+> 
+> > +                                               NULL,
+> > +                                               manager_wiphy_dump_
+> > done);
+> > +       if (!wiphy_dump) {
+> > +               l_error("Wiphy information dump failed");
+> > +               l_genl_msg_unref(msg);
+> > +       }
+> > +
+> > +       return wiphy_dump;
+> > +}
+> > +
+> >   static void manager_config_notify(struct l_genl_msg *msg, void
+> > *user_data)
+> >   {
+> >         uint8_t cmd;
+> 
+> Regards,
+> -Denis
 
-Also you can simply clear the 'disabled_freqs' set on reg change, before parsing 
-the disabled flags.
 
-Then make sure wiphy_constrain_freq_set() takes everything into account. 
-Perhaps we need a new scan_freq_set_* API?
-
-
->   	}
->   }
->   
-
-Regards,
--Denis
