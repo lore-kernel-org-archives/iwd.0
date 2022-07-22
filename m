@@ -1,47 +1,47 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EED44A2C
-	for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 16:37:15 +0000 (UTC)
-Received: by mail-pj1-f43.google.com with SMTP id v16-20020a17090abb9000b001f25244c65dso1254523pjr.2
-        for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 09:37:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C724A2C
+	for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 16:37:16 +0000 (UTC)
+Received: by mail-pj1-f42.google.com with SMTP id p6-20020a17090a680600b001f2267a1c84so6949037pjj.5
+        for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 09:37:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=qKhcnbNdSwvhA7rR0O08Kw3sCNSNtux7PL2RgOPbCKM=;
-        b=OZeYF6CnQWXe8b15xAXRNVSKqAYnzsttgLd27b99fhMxQ1l8oehoobVtBUE7ouHsht
-         30Cmc5gGa3k0HCKwivJyTHyACiTTaiTCCYn9ceR4Md2bF+0WhzzXuN0SKB8RPoImjcGB
-         Hjx3MZuQa5LcZoPfgFjItcaANrEmomFsPmzm5o5XrSX/9/0tWWgpxQwEMUYI4mKF9d6j
-         JDYXz9mDGYFpR2eaYGuVlFPKR/KWVhCiHmPWzsrTOEgoLEem3AnuuOPDd5hPwlbc+mpV
-         eUqx1MvpRPHIm/fQccVexvL/YnaxGrEhXZ3k2c64cMqxrdBslE/nzF3zmXnXsA9WlrGs
-         +bnQ==
+        bh=svzd3PF6k8MkSduQuJ28bOzWlvPKhFyicr0L1IYzjLI=;
+        b=VIgHy8cfNpHo+Bl4jQITwQUVmEfaEXkFjvuF7olyLO27ykNvigIOPZzV3okjHOlMna
+         lbLs37kTGbIOiT2NVylDPUc9ABuTIUpaWWB+y1JKeXr7Zu/734H98Au4mcGgEvSL3/Hb
+         D9PY7qhsV6E7mkcu0ZCDJmtJXjvMQ+hpH0WeIBbdRogB3uV5O2wqp5+nKGNM4BGVo2W+
+         UgEVQhj9MA5ZviMKxu0JkaMtfuPpftcswdv7MV4scZ9F3NQbesDsaav6MgU8Bwi1R+7b
+         sMPs62ppgi5k7ClJw3Gzw5DNsbjcwZA2wUokpd+Q3ebO+Tl8vI+mvNtYgOlY80FFc0Yj
+         bEag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=qKhcnbNdSwvhA7rR0O08Kw3sCNSNtux7PL2RgOPbCKM=;
-        b=dm6aT078lGdF+WuwZIW16sjErK5sTMXMKsZ8Q3r8BwML89UDjm7RhS3xhwFJZpdVE7
-         IROyU0dQbh1C0QMzCLM2FPUXFGUZcjIdli6wHczvPZRBCpRSM762n9LZcTQ8W11wHewu
-         1775l7bR0pEaWt7Fka649ItAkAU0ldfj8FIFo7FxH+uY46gtis6QT9OCk7084DKPsKTC
-         OPGpy65N81skS6G+uyNtwORtRypqZ0o731Cg8mqdw6pegUscEA9L2n81sJAQ8VxYRrBV
-         tQ0XXARF6LI/cVZwewMRzd+W+iGh1BocgOiHDXKBJ8YaqDNWYZVUFV9uIBbvD/GNZc8x
-         wxtg==
-X-Gm-Message-State: AJIora9V1bK6+lMLhnwzw0sMY27hbdtZ9GyQ2smaDLnyI1DLxQ+cVzTe
-	Eg1DsRxnIQX2txhZI8mGwFApn7UCP60=
-X-Google-Smtp-Source: AGRyM1vOUJY0qUmuxCCfxp8xpvJ1ZcGYaBGDXlsLkZb/vcIfK0x946QmHTimmtPzgONm1BEdMa8cgQ==
-X-Received: by 2002:a17:902:cf06:b0:16b:cc33:5bce with SMTP id i6-20020a170902cf0600b0016bcc335bcemr689713plg.152.1658507834555;
-        Fri, 22 Jul 2022 09:37:14 -0700 (PDT)
+        bh=svzd3PF6k8MkSduQuJ28bOzWlvPKhFyicr0L1IYzjLI=;
+        b=S5xBHXg86pZ5078qf7yCoK+sQ19Cx2WoiCP4b5kFNOVHVHz54w/4nENVwE0q55l6tM
+         eaH42DfvzbY4hCVLg0Nuq48lcuoskYJfzckcwPFWiame96SUcZj8c49q72W61LulM81t
+         OhZmiajGVXGqerIctpxjJL1mX9qWkJxS4v/R2KaqX6WWpZzZCog5HYkLIQ1ZjRErpOqH
+         e+v7l3iJJPVK5iX7kyqdkJdh3Oafz+mKJqmYt/4Ht5KM3zR4c5OxXwyy0bzjAi0dGZGK
+         dO8mU3L4Ow9wQFKuoZigqsyzmTjPVqJlwXMNwfuQdQHiZnFv2ytExt5Sblh5h3/JKRBx
+         V5pw==
+X-Gm-Message-State: AJIora/zfXdXRf4AZFM4B1HtsPZg1GVP+AU0sJHNG39VSJlT0hOkO+5h
+	c6pCa/ljqZDsR+KG18zSFqQacImA9T8=
+X-Google-Smtp-Source: AGRyM1tKmURBlaeTYmKRaF1dzXGAiRGYXas9kDbr+nyOPmoIqpY0kPlj/gzCHMqySEoo9J+fQMQmBQ==
+X-Received: by 2002:a17:90b:4b4d:b0:1ef:a2c2:6bcc with SMTP id mi13-20020a17090b4b4d00b001efa2c26bccmr507358pjb.186.1658507835325;
+        Fri, 22 Jul 2022 09:37:15 -0700 (PDT)
 Received: from localhost.localdomain ([50.45.187.22])
         by smtp.gmail.com with ESMTPSA id p18-20020a170902e75200b0016a109c7606sm4013887plf.259.2022.07.22.09.37.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jul 2022 09:37:14 -0700 (PDT)
+        Fri, 22 Jul 2022 09:37:15 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/7] wiphy: track disabled frequencies on multiple dumps
-Date: Fri, 22 Jul 2022 09:34:16 -0700
-Message-Id: <20220722163417.1119334-6-prestwoj@gmail.com>
+Subject: [PATCH 7/7] station: do full passive scan if 6GHz is supported but disabled.
+Date: Fri, 22 Jul 2022 09:34:17 -0700
+Message-Id: <20220722163417.1119334-7-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220722163417.1119334-1-prestwoj@gmail.com>
 References: <20220722163417.1119334-1-prestwoj@gmail.com>
@@ -53,113 +53,72 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If a frequency is disabled, it should not be added to the supported list which
-it previously was. In this case its added to the (new) disabled_freqs list.
+The kernel handles setting the regulatory domain by receiving beacons which
+set the country IE. Presumably since most regulatory domains disallow 6GHz
+the default (world) domain also disables it. This means until the country
+is set, 6GHz is disabled.
 
-Now that wiphy's are dumped on regulatory changes frequencies may be added or
-removed from either the supported or disabled frequency list. These changes
-are now tracked to keep the lists accurate.
+This poses a problem for IWD's quick scanning since it only scans a few
+frequencies and this likely isn't enough beacons for the firmware to update
+the country, leaving 6Ghz inaccessable to the user without manual intervention
+(e.g. iw scan passive, or periodic scans by IWD).
+
+To try and work around this limitation the quick scan logic has been updated
+to check if a 6GHz AP has been connected to before and if that frequency is
+disabled (but supported). If this is the case IWD will opt for a full passive
+scan rather than scanning a limited set of frequencies.
 ---
- src/wiphy.c | 35 ++++++++++++++++++++++++++++++++---
- src/wiphy.h |  1 +
- 2 files changed, 33 insertions(+), 3 deletions(-)
+ src/station.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 4b9e130a..7d123e0c 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -104,6 +104,7 @@ struct wiphy {
- 	uint16_t supported_iftypes;
- 	uint16_t supported_ciphers;
- 	struct scan_freq_set *supported_freqs;
-+	struct scan_freq_set *disabled_freqs;
- 	struct band *band_2g;
- 	struct band *band_5g;
- 	struct band *band_6g;
-@@ -316,6 +317,7 @@ static struct wiphy *wiphy_new(uint32_t id)
+diff --git a/src/station.c b/src/station.c
+index 02f21c76..373bd1c3 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1352,12 +1352,35 @@ static void station_quick_scan_destroy(void *userdata)
  
- 	wiphy->id = id;
- 	wiphy->supported_freqs = scan_freq_set_new();
-+	wiphy->disabled_freqs = scan_freq_set_new();
- 	watchlist_init(&wiphy->state_watches, NULL);
- 	wiphy->extended_capabilities[0] = IE_TYPE_EXTENDED_CAPABILITIES;
- 	wiphy->extended_capabilities[1] = EXT_CAP_LEN;
-@@ -357,6 +359,7 @@ static void wiphy_free(void *data)
- 	}
- 
- 	scan_freq_set_free(wiphy->supported_freqs);
-+	scan_freq_set_free(wiphy->disabled_freqs);
- 	watchlist_destroy(&wiphy->state_watches);
- 	l_free(wiphy->model_str);
- 	l_free(wiphy->vendor_str);
-@@ -454,6 +457,11 @@ const struct scan_freq_set *wiphy_get_supported_freqs(
- 	return wiphy->supported_freqs;
- }
- 
-+const struct scan_freq_set *wiphy_get_disabled_freqs(const struct wiphy *wiphy)
-+{
-+	return wiphy->disabled_freqs;
-+}
-+
- bool wiphy_can_transition_disable(struct wiphy *wiphy)
+ static int station_quick_scan_trigger(struct station *station)
  {
- 	/*
-@@ -1208,19 +1216,40 @@ static void parse_supported_frequencies(struct wiphy *wiphy,
- 	struct l_genl_attr attr;
++	uint32_t max_freq;
+ 	struct scan_freq_set *known_freq_set;
++	const struct scan_freq_set *supported = wiphy_get_supported_freqs(
++								station->wiphy);
++	const struct scan_freq_set *disabled = wiphy_get_disabled_freqs(
++								station->wiphy);
  
- 	while (l_genl_attr_next(freqs, NULL, NULL, NULL)) {
-+		uint32_t freq = 0;
-+		bool disabled = false;
+ 	known_freq_set = known_networks_get_recent_frequencies(5);
+ 	if (!known_freq_set)
+ 		return -ENODATA;
+ 
++	/*
++	 * This means IWD has previously connected to a 6GHz AP before, but now
++	 * the regulatory domain disallows 6GHz likely caused by a reboot or
++	 * the firmware going down. The only way to re-enable 6GHz is to get
++	 * enough beacons via scanning for the firmware to set the regulatory
++	 * domain and open up the frequencies.
++	 */
++	max_freq = scan_freq_set_max(known_freq_set);
++	if (max_freq > 6000 && scan_freq_set_contains(disabled, max_freq)) {
++		l_debug("6GHz may be available, doing full passive scan");
++		station->quick_scan_id = scan_passive(
++					netdev_get_wdev_id(station->netdev),
++					supported, station_quick_scan_triggered,
++					station_quick_scan_results, station,
++					station_quick_scan_destroy);
++		goto done;
++	}
 +
- 		if (!l_genl_attr_recurse(freqs, &attr))
- 			continue;
+ 	if (!wiphy_constrain_freq_set(station->wiphy, known_freq_set)) {
+ 		scan_freq_set_free(known_freq_set);
+ 		return -ENOTSUP;
+@@ -1368,6 +1391,7 @@ static int station_quick_scan_trigger(struct station *station)
+ 						station_quick_scan_triggered,
+ 						station_quick_scan_results,
+ 						station_quick_scan_destroy);
++done:
+ 	scan_freq_set_free(known_freq_set);
  
- 		while (l_genl_attr_next(&attr, &type, &len, &data)) {
--			uint32_t u32;
- 
- 			switch (type) {
- 			case NL80211_FREQUENCY_ATTR_FREQ:
--				u32 = *((uint32_t *) data);
--				scan_freq_set_add(wiphy->supported_freqs, u32);
-+				freq = *((uint32_t *) data);
-+				break;
-+			case NL80211_FREQUENCY_ATTR_DISABLED:
-+				disabled = true;
- 				break;
- 			}
- 		}
-+
-+		if (!freq)
-+			continue;
-+
-+		/*
-+		 * Wiphy is dumped again on every regulatory domain change which
-+		 * may contain disabled frequencies which were previously
-+		 * allowed. If disabled, remove from supported. If supported,
-+		 * remove from disabled.
-+		 */
-+		if (disabled) {
-+			scan_freq_set_add(wiphy->disabled_freqs, freq);
-+			scan_freq_set_remove(wiphy->supported_freqs, freq);
-+		} else {
-+			scan_freq_set_add(wiphy->supported_freqs, freq);
-+			scan_freq_set_remove(wiphy->disabled_freqs, freq);
-+		}
- 	}
- }
- 
-diff --git a/src/wiphy.h b/src/wiphy.h
-index acc64193..9a3b96f9 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -93,6 +93,7 @@ const char *wiphy_get_path(struct wiphy *wiphy);
- uint32_t wiphy_get_supported_bands(struct wiphy *wiphy);
- const struct scan_freq_set *wiphy_get_supported_freqs(
- 						const struct wiphy *wiphy);
-+const struct scan_freq_set *wiphy_get_disabled_freqs(const struct wiphy *wiphy);
- bool wiphy_can_transition_disable(struct wiphy *wiphy);
- bool wiphy_can_offload(struct wiphy *wiphy);
- bool wiphy_supports_cmds_auth_assoc(struct wiphy *wiphy);
+ 	if (!station->quick_scan_id)
 -- 
 2.34.1
 
