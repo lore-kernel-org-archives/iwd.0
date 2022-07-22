@@ -1,95 +1,77 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469D9441A
-	for <iwd@lists.linux.dev>; Thu, 21 Jul 2022 14:17:44 +0000 (UTC)
-Received: by mail-pl1-f172.google.com with SMTP id q5so1924463plr.11
-        for <iwd@lists.linux.dev>; Thu, 21 Jul 2022 07:17:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF0515BA
+	for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 16:37:12 +0000 (UTC)
+Received: by mail-pj1-f43.google.com with SMTP id v16-20020a17090abb9000b001f25244c65dso1254434pjr.2
+        for <iwd@lists.linux.dev>; Fri, 22 Jul 2022 09:37:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amarulasolutions.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zbKhOuyRnt/61QH9p/iv4tWBidAdq7fluyqyhXzF2p8=;
-        b=iRrAJWcaWodEbbg5NFb931t+moWM3ZeuHDSNigrO69jGWXCPOpwI02IVUG639mtiAW
-         1ig50sjNcTnK9b6xsVVhTXk9HA6MQ75Ct6zW555JaIJUI14ty1CMGAadXpILi7OZ1A+s
-         1jzciCIrjZKIO9NROEWFHrK4Gaw8vAW/rmjUc=
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=RCFO7wruesz0nYBxQHkS7ZnaRMC+O+2nQM8zZtTBnzQ=;
+        b=Jj/LtKWULwmveC99uu/mkjxSjURwZag0TNNoUC69w3fn2BxDjgXDYbbhGR0DuAhOQR
+         2al+qTPnjjek0NcCs03n81fG5frYa1CsE8XHQ1fl9Z0Gzt+QnS4KybY69dNfxkscHfFo
+         8IWjVb4eepQyIvpqQkCBvRh8wMw/t3lZ+pn0V7+FKTMbmUsVKJMxGS25xL2eFsTmbO1q
+         1Za35Te+txiyc0HqJFKNE2/ifkVJxTlMk4TwPTlq3DEq4RkCS2KTLPcICtwK4qORrdJf
+         Q+yHzIe859OhtvwaRhEKtutksg9UbWrnmsouoxUMYsj3NEKnxyhaSfkICtnXxwMyVdh2
+         RqSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zbKhOuyRnt/61QH9p/iv4tWBidAdq7fluyqyhXzF2p8=;
-        b=thak8XiCHR5xqxcWBhVlXwcZmBkhMOM9IfvPuitwo1ySm5lvgXNTPwSTjhsuLc8WOf
-         yPIaj+HvtCMPtdbuOmY5FQVoLRDluU4R1xkjBPRsv08gz3/ZU548qJeY1nPub8tGoJzs
-         k4KYjeEMaKlikVHlUZ6Obs2vtMqjFZkuDlSrB4KsAIwUqByUxA9ulxBh/If5hk0t2lHZ
-         hF0uoEt9tiI1HgqLTDBkBt6JJT9IOa+3Z9/YscGhmC2N1Yvvmcm9lTVqcPYDS6tKUB50
-         uTtuXpbGcg9gJAx4Xx83YGy3iNk+QBoKouH8jOwCBr1t1Fl2xGmNzEfy4RmckSnN0yL1
-         FABg==
-X-Gm-Message-State: AJIora+lQa6nbZJ3KL7Lq5xKcfajnoanVp55XU7gCxHhX+ek8Hk3SrCu
-	uvY7AhG7PH9Nc1IDoDV7P+p7YzggMBVL4ydUeS52LQ==
-X-Google-Smtp-Source: AGRyM1s+dzkw5Asi6j2pqnYkeLoH0yM2bNqyOI2JSM493B+l1+8BigI+wMho/a+icb0sgXLfhCTbIR1MZ9bhvBAlqtU=
-X-Received: by 2002:a17:90b:4387:b0:1f1:f944:16f3 with SMTP id
- in7-20020a17090b438700b001f1f94416f3mr11859569pjb.118.1658413063532; Thu, 21
- Jul 2022 07:17:43 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=RCFO7wruesz0nYBxQHkS7ZnaRMC+O+2nQM8zZtTBnzQ=;
+        b=S/ZINI9b195i+zESS6B9UWBmw/OnnN63L6Tv9ZQF1aT7o7N8abG+D/NXkVX7Bw6I+p
+         XEHLEz3wCGf16BB2uyTxdQCqcI83UoR/lW0sBkuTD489VsptBhi6KF3j3CXj0g0RMuBd
+         U5SGGSOKxRSIzjRVHz9DuZxn/PpXG685ZEgwaUrXZGfj7hYrfo1387EyDcJ9iUXkGuTq
+         n57Ul8ZjdZjUE8WXibTbAMrs/Ozyb1pWAWB7rX0067hCLnlsBWzN8zPPedseDXH4aQ80
+         vSsUSEhH9eUqu4lkTg1CZJ1lc/yAyUM2fz5j5bY9wxYyiaX3QnoQZyO2oKP2hKa2UZL3
+         atuA==
+X-Gm-Message-State: AJIora9i0aC1qxAWsKB/L7HzAA2G7qfcLSX7kfPeHZ9xaRg2uOOOpZAA
+	YxQXnvGJEBzzpUJs4thfN3aqZsQLDLo=
+X-Google-Smtp-Source: AGRyM1sQx7OjmOMtw+KF/pR12lj36H4ol1aSemhGl4YnN+FpdCiDqcr/bEPgzDoKZOCKW97VsBzXhw==
+X-Received: by 2002:a17:90a:4402:b0:1f2:3507:5f96 with SMTP id s2-20020a17090a440200b001f235075f96mr513787pjg.22.1658507831561;
+        Fri, 22 Jul 2022 09:37:11 -0700 (PDT)
+Received: from localhost.localdomain ([50.45.187.22])
+        by smtp.gmail.com with ESMTPSA id p18-20020a170902e75200b0016a109c7606sm4013887plf.259.2022.07.22.09.37.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Jul 2022 09:37:11 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/7] wiphy: fix runtime error from bit shift
+Date: Fri, 22 Jul 2022 09:34:11 -0700
+Message-Id: <20220722163417.1119334-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20220721021314.14066-1-denkenz@gmail.com> <b240184c-d90a-db5f-e7f0-ff2c5b432e6b@kvh.com>
- <daab977b-fdf1-274b-0ebd-45d71b090500@gmail.com> <CAG17S_OysUm+YSDobUTLnY3k7mU86WMoVRY7D3iz7dFMBYYopg@mail.gmail.com>
- <f2c732a0-fb4d-c37b-b4c5-99006c1a9245@kvh.com>
-In-Reply-To: <f2c732a0-fb4d-c37b-b4c5-99006c1a9245@kvh.com>
-From: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>
-Date: Thu, 21 Jul 2022 16:17:31 +0200
-Message-ID: <CAOf5uw=byqhi9yZSGZMwGr+ZAwEknhhn2c4sgqXixFnO9-FfLQ@mail.gmail.com>
-Subject: Re: [PATCH] tools: Add simple utility to generate the PSK
-To: James Tavares <jtavares@kvh.com>
-Cc: KeithG <ys3al35l@gmail.com>, Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi
+The compiler treated the '1' as an int type which was not big enough
+to hold a bit shift of 31. Change this to 1ULL to fix the error:
 
-On Thu, Jul 21, 2022 at 3:39 PM James Tavares <jtavares@kvh.com> wrote:
->
-> On 7/21/22 9:26 AM, KeithG wrote:
->
-> > Interesting... Which arm distribution are you using?
->
-> NXP (aka "Freescale") Linux kernel (based on kernel 5.10.9)
-> Variscite Linux layer
-> Yocto Gatesgarth
->
-> Hardware is a DART-MX8M-PLUS SOM from Variscite with an NXP i.MX 8M Plus
-> processor.
->
->
-> Does anyone have a suggestion for a libkcapi-based test that help
-> isolate kernel issue vs. iwd issue?
->
-> I was looking at the kcapi-dgst tool but honest have gotten a little
-> tripped up with it.
+runtime error: left shift of 1 by 31 places cannot be represented in type 'int'
+---
+ src/wiphy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Can you try to disable caam?
-
-Michael
-
->
-> Regard,s
-> James
->
->
-
-
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 09b99fb2..4b9e130a 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -957,7 +957,7 @@ static void wiphy_print_he_capabilities(struct band *band,
+ 	uint8_t width_set = bit_field(he_cap->he_phy_capa[0], 1, 7);
+ 
+ 	for (i = 0; i < 32; i++) {
+-		if (!(he_cap->iftypes & (1 << i)))
++		if (!(he_cap->iftypes & (1ULL << i)))
+ 			continue;
+ 
+ 		if (L_WARN_ON(s >= type_buf + sizeof(type_buf)))
 -- 
-Michael Nazzareno Trimarchi
-Co-Founder & Chief Executive Officer
-M. +39 347 913 2170
-michael@amarulasolutions.com
-__________________________________
+2.34.1
 
-Amarula Solutions BV
-Joop Geesinkweg 125, 1114 AB, Amsterdam, NL
-T. +31 (0)85 111 9172
-info@amarulasolutions.com
-www.amarulasolutions.com
