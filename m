@@ -1,104 +1,72 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA7B6002
-	for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 17:09:33 +0000 (UTC)
-Received: by mail-pj1-f53.google.com with SMTP id x24-20020a17090ab01800b001f21556cf48so17861142pjq.4
-        for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 10:09:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE907F0
+	for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 20:52:52 +0000 (UTC)
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-10d8880d055so20133351fac.8
+        for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 13:52:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=938HBuN8/PrTz5GFsUu7VC25WsYBvaZnhaGeh+wBQP8=;
-        b=GpNfMLTHzSBeghQvrYksFWJ6jLwciwzGUk7i6VreKv9HPwRmOL1+bDucJCFiVGyJNd
-         jfGF6NLQyJUsb/fTbsTQee2+jOa5o0s/Hgqe2kFzQlV8KRVVemCNPTg3KCC9ZxD+pMgN
-         smMUjsfJD5ZSnx9oTz+5d3BB9916YYAmrFwC734AI1LFRmiOeKp1axzcPx515FZmnJAu
-         nhBBwJMed2m8L+LDI1s3343Eo5SkfsWiUNKLe04iCcx1HL5BEfCgncxPeQOR3lKzsz2g
-         33SfWT2Cm8lOalYlP3mHW3BRi5W5Wt1VT4/jtOBG1ULXTnaAmWyu4tC/P4VIt9I89vvX
-         IUuQ==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:from:in-reply-to:content-transfer-encoding;
+        bh=CuEWUE3pejzTEPdfHm7ki7JyhxKGLgCOdJtuVEchCQo=;
+        b=FYGK2bFbrHRxPUICXKmPzafoQSMnNgynyXP7RwNYysT9an4NdQBFng2KCWaMcmVdoU
+         rDBsDqv2/kcMSqvv8YPOdXAGHRV2lOTse6ZSZK1dBpsFOnsKn9gO1aD5zp5MDVXuU8wk
+         UhMKb01zcaafnGQ8MKpMA/EDA2Hgr0oVMvMaqC7YKbTdLV/P7jh2VwgnTdgQ1qPmbA/X
+         zXnufvy5GCawlV3UhnmjY8lcT63nveDFdkKw4Bg4odwKnhmMqhc4xGrtD349/UyTSqmq
+         9WoeRntj4MOltl4FIXIgmT7KlzsflLXVBKxMU6L38n6iywRYvJRvuPbsHHvuDbtoD5cJ
+         JlBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=938HBuN8/PrTz5GFsUu7VC25WsYBvaZnhaGeh+wBQP8=;
-        b=nkzRMVNrLPb3RzupEWqpo9uoAN3W+uVj9CmUGw/cTdJldCAso4kqRYKXb1wNB30HUu
-         8T88SbKsdxOtu2AMRcnlYha6/mKEHR/jRlHCQ0z+PdtTiQoLk3aAq0O8Z4+BOf57P6fX
-         MXvOLD+FWlELfdqx405b6zNEMnRLT+A8ywCIkRWMX1+mH2SPoq1h1akiiz0iV1TEpuHI
-         gIpbnkAsruffXxrEpg6viEMeh/gMpTPwWfTQ+7R8DQeDU1KJv+4du1kNi1YBMqbf/kwG
-         zMjdrOH4iwsQtfxK8BNhs0919r3KAn9fLRFnHJKzc5oPx+Jvsv8qLwoN6Fpr87L0AWE+
-         PqyA==
-X-Gm-Message-State: AJIora9HPP1MWarUjf8Hru46Z0mym2BJm/kARhBj1cY5XmAyj74DA/6w
-	LgH4Ia6+tS9J6kqRD7ljc5/dZYaoLZw=
-X-Google-Smtp-Source: AGRyM1s+XDCatIjCnuq3f0xiLrmeBZWUYp9BT1LW/GwMAhSj5+awHIQQOyT9khStjUHJjPd95gQ+LA==
-X-Received: by 2002:a17:90a:8a0e:b0:1f2:f07d:39bb with SMTP id w14-20020a17090a8a0e00b001f2f07d39bbmr209981pjn.94.1658855372582;
-        Tue, 26 Jul 2022 10:09:32 -0700 (PDT)
-Received: from jprestwo-xps.none (h208-100-169-68.bendor.broadband.dynamic.tds.net. [208.100.169.68])
-        by smtp.gmail.com with ESMTPSA id 21-20020a170902c11500b0016c09e23b18sm11778694pli.154.2022.07.26.10.09.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jul 2022 10:09:32 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 10/10] nl80211util: add nested attribute support
-Date: Tue, 26 Jul 2022 10:09:20 -0700
-Message-Id: <20220726170920.15929-10-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20220726170920.15929-1-prestwoj@gmail.com>
-References: <20220726170920.15929-1-prestwoj@gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=CuEWUE3pejzTEPdfHm7ki7JyhxKGLgCOdJtuVEchCQo=;
+        b=ncfCkEH8RZYdQSzKHsm9Qik41JV/R8U4AO/AniIlp959inrNURZptXdzE1u5EL61PF
+         EECCNVieP9PT6FkrcEFpSDNKu5UCinPjoDmQ7L0EagDw9FPjDBTyUa0l8Qpf4pfd+FDS
+         /uD/i+NOLWjVYMp8UAwfDmtYuEGLt874KallehGlMfNY+mpICgwkSeAf+oFnfMcz77c4
+         Jo9xjz58GXvPiys2m7+wZSbca3n4yrrNpvIJM47nljSnJAeblWC3QibFIsmtQpf8YS8F
+         LxuIORBsxDH8/w4tBfXfSPmU2g6dtgxA1T7IVhu5e173EUtkjBVLyxcedGcPlMOSNaG9
+         f1hg==
+X-Gm-Message-State: AJIora+cUjnarbP/B8All3roqisp9ezZYKV+859GNghd2vkoNCTRptaN
+	FRP+kz5f2mE/jccpA3MIywU=
+X-Google-Smtp-Source: AGRyM1suuLRVwKdvJmw9X6qrT4d43nNdAiRgZ5MiMiiA6geGnSjgWcuy6LB7x+68IbVH2D8gc09H4g==
+X-Received: by 2002:a05:6870:f222:b0:10b:7326:18c2 with SMTP id t34-20020a056870f22200b0010b732618c2mr511144oao.55.1658868772065;
+        Tue, 26 Jul 2022 13:52:52 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id l4-20020a9d7084000000b00616d25dc933sm6527203otj.69.2022.07.26.13.52.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Jul 2022 13:52:51 -0700 (PDT)
+Message-ID: <1ce38f3e-8bc0-d82c-6507-7c25b6560bb3@gmail.com>
+Date: Tue, 26 Jul 2022 15:52:20 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 01/10] manager: unregister nl80211 config watch
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220726170920.15929-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220726170920.15929-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Adds support for nested attributes in nl80211_parse_attrs
----
- src/nl80211util.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Hi James,
 
-diff --git a/src/nl80211util.c b/src/nl80211util.c
-index 9cd538ec..9092b204 100644
---- a/src/nl80211util.c
-+++ b/src/nl80211util.c
-@@ -128,6 +128,16 @@ static bool extract_iovec(const void *data, uint16_t len, void *o)
- 	return true;
- }
- 
-+static bool extract_nested(const void *data, uint16_t len, void *o)
-+{
-+	const struct l_genl_attr *outer = data;
-+	struct l_genl_attr *nested = o;
-+
-+	l_genl_attr_recurse(outer, nested);
-+
-+	return true;
-+}
-+
- static attr_handler handler_for_type(enum nl80211_attrs type)
- {
- 	switch (type) {
-@@ -157,6 +167,8 @@ static attr_handler handler_for_type(enum nl80211_attrs type)
- 		return extract_uint32;
- 	case NL80211_ATTR_FRAME:
- 		return extract_iovec;
-+	case NL80211_ATTR_WIPHY_BANDS:
-+		return extract_nested;
- 	default:
- 		break;
- 	}
-@@ -222,6 +234,10 @@ int nl80211_parse_attrs(struct l_genl_msg *msg, int tag, ...)
- 			goto done;
- 		}
- 
-+		/* For nested attributes use the outer attribute as data */
-+		if (entry->handler == extract_nested)
-+			data = &attr;
-+
- 		if (!entry->handler(data, len, entry->data)) {
- 			ret = -EINVAL;
- 			goto done;
--- 
-2.34.3
+On 7/26/22 12:09, James Prestwood wrote:
+> For consistency unregister the config watch when manager exits
+> ---
+>   src/manager.c | 9 +++++++--
+>   1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+
+All but patch 4 applied, thanks.
+
+Regards,
+-Denis
 
