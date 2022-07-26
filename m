@@ -1,47 +1,47 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E934F5390
-	for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 17:09:32 +0000 (UTC)
-Received: by mail-pg1-f169.google.com with SMTP id 6so13637158pgb.13
-        for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 10:09:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA7B6002
+	for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 17:09:33 +0000 (UTC)
+Received: by mail-pj1-f53.google.com with SMTP id x24-20020a17090ab01800b001f21556cf48so17861142pjq.4
+        for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 10:09:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=cTnwEXVZ31oHReA81rvxjD/SAzbDjuxQKl7Dj/EUJV8=;
-        b=Vq7PZR4zEf74sp1Nm7zGjphDrwfqxd/YrcdEzakasGefZGwOeQPg8fbfvVBsoMxX6M
-         Mf7F136OX9hcOp7HmG+oRrN3C1KackJsy6UCE0aZWuiaUSvzlYp0oumst8dcCkAh8Zda
-         gd+Nq7+WKYD2wJsdLrBTBgcXzmSQ5nxETmwQe4ikG84dlkQ5ust4xoCUHfHHeo60yjuR
-         MljnunE4SFZECLpNv6Bdf252oB9PeZRGESt/DgUMdJthGBUyjnWWIbBdj59n+r+lYefw
-         YkeVmdLwi33b6EeYoCiYkptQqNLxrsyyx36XT46K5lVCa5kI7N/LelqZd4TwQlErSb8Q
-         Ouuw==
+        bh=938HBuN8/PrTz5GFsUu7VC25WsYBvaZnhaGeh+wBQP8=;
+        b=GpNfMLTHzSBeghQvrYksFWJ6jLwciwzGUk7i6VreKv9HPwRmOL1+bDucJCFiVGyJNd
+         jfGF6NLQyJUsb/fTbsTQee2+jOa5o0s/Hgqe2kFzQlV8KRVVemCNPTg3KCC9ZxD+pMgN
+         smMUjsfJD5ZSnx9oTz+5d3BB9916YYAmrFwC734AI1LFRmiOeKp1axzcPx515FZmnJAu
+         nhBBwJMed2m8L+LDI1s3343Eo5SkfsWiUNKLe04iCcx1HL5BEfCgncxPeQOR3lKzsz2g
+         33SfWT2Cm8lOalYlP3mHW3BRi5W5Wt1VT4/jtOBG1ULXTnaAmWyu4tC/P4VIt9I89vvX
+         IUuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=cTnwEXVZ31oHReA81rvxjD/SAzbDjuxQKl7Dj/EUJV8=;
-        b=diBRc+0NbfuVGOFS412vVKZicTz7ncbS/dW6DYO4Y/++kJ0aBPcIuL5wrq5fqC4mDe
-         z0tV5hFiQWO1KwMxHSLChZ0aIyABwhUxX1yNl/+ROrKksCRV/si2LCkD8Qx2G64EiOcM
-         hvB7ex4NU7KasGtEqchzW9mEtJau4Qs7nuCYgnvOGD6PxcnpGok0r7dGCL6Ejh10Pi13
-         rIaNVOQsJnHZfOSViPbW/UbJf53+Xkv4l8VIxbJKynPeKKw82PISBF+wXPUbq2HSXgMH
-         6+JzQTumm7N3IK15h1Ipzvxmjqk/BDl/mczbj+S883J8RKuxc+iif6Cz/5sKEh9++xEU
-         vGwA==
-X-Gm-Message-State: AJIora+q0BroIqtaG8FfHWoQDg9jB7aAS1CA7ZdHTC6Q+cMDZ7skgrBH
-	1pKM8cTOPDQkM3VCi2JH2stTnP6lvGY=
-X-Google-Smtp-Source: AGRyM1uLnHNg1iy08jMsNN4ylFW8PFb66oGwjsaauXEOVG5CasYcP5Ews1FhoAp+A4rdRVf0qOeunA==
-X-Received: by 2002:a65:6e41:0:b0:412:4c1f:9936 with SMTP id be1-20020a656e41000000b004124c1f9936mr16181897pgb.455.1658855371939;
-        Tue, 26 Jul 2022 10:09:31 -0700 (PDT)
+        bh=938HBuN8/PrTz5GFsUu7VC25WsYBvaZnhaGeh+wBQP8=;
+        b=nkzRMVNrLPb3RzupEWqpo9uoAN3W+uVj9CmUGw/cTdJldCAso4kqRYKXb1wNB30HUu
+         8T88SbKsdxOtu2AMRcnlYha6/mKEHR/jRlHCQ0z+PdtTiQoLk3aAq0O8Z4+BOf57P6fX
+         MXvOLD+FWlELfdqx405b6zNEMnRLT+A8ywCIkRWMX1+mH2SPoq1h1akiiz0iV1TEpuHI
+         gIpbnkAsruffXxrEpg6viEMeh/gMpTPwWfTQ+7R8DQeDU1KJv+4du1kNi1YBMqbf/kwG
+         zMjdrOH4iwsQtfxK8BNhs0919r3KAn9fLRFnHJKzc5oPx+Jvsv8qLwoN6Fpr87L0AWE+
+         PqyA==
+X-Gm-Message-State: AJIora9HPP1MWarUjf8Hru46Z0mym2BJm/kARhBj1cY5XmAyj74DA/6w
+	LgH4Ia6+tS9J6kqRD7ljc5/dZYaoLZw=
+X-Google-Smtp-Source: AGRyM1s+XDCatIjCnuq3f0xiLrmeBZWUYp9BT1LW/GwMAhSj5+awHIQQOyT9khStjUHJjPd95gQ+LA==
+X-Received: by 2002:a17:90a:8a0e:b0:1f2:f07d:39bb with SMTP id w14-20020a17090a8a0e00b001f2f07d39bbmr209981pjn.94.1658855372582;
+        Tue, 26 Jul 2022 10:09:32 -0700 (PDT)
 Received: from jprestwo-xps.none (h208-100-169-68.bendor.broadband.dynamic.tds.net. [208.100.169.68])
-        by smtp.gmail.com with ESMTPSA id 21-20020a170902c11500b0016c09e23b18sm11778694pli.154.2022.07.26.10.09.31
+        by smtp.gmail.com with ESMTPSA id 21-20020a170902c11500b0016c09e23b18sm11778694pli.154.2022.07.26.10.09.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jul 2022 10:09:31 -0700 (PDT)
+        Tue, 26 Jul 2022 10:09:32 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 09/10] wiphy: constrain scan set by disabled frequencies
-Date: Tue, 26 Jul 2022 10:09:19 -0700
-Message-Id: <20220726170920.15929-9-prestwoj@gmail.com>
+Subject: [PATCH 10/10] nl80211util: add nested attribute support
+Date: Tue, 26 Jul 2022 10:09:20 -0700
+Message-Id: <20220726170920.15929-10-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220726170920.15929-1-prestwoj@gmail.com>
 References: <20220726170920.15929-1-prestwoj@gmail.com>
@@ -53,24 +53,52 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With the addition of disabled_freqs, wiphy_constrain_freq_set needs
-to also remove any frequencies which are disabled.
+Adds support for nested attributes in nl80211_parse_attrs
 ---
- src/wiphy.c | 1 +
- 1 file changed, 1 insertion(+)
+ src/nl80211util.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 5329e8e4..30653b91 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -707,6 +707,7 @@ bool wiphy_constrain_freq_set(const struct wiphy *wiphy,
- 						struct scan_freq_set *set)
- {
- 	scan_freq_set_constrain(set, wiphy->supported_freqs);
-+	scan_freq_set_subtract(set, wiphy->disabled_freqs);
+diff --git a/src/nl80211util.c b/src/nl80211util.c
+index 9cd538ec..9092b204 100644
+--- a/src/nl80211util.c
++++ b/src/nl80211util.c
+@@ -128,6 +128,16 @@ static bool extract_iovec(const void *data, uint16_t len, void *o)
+ 	return true;
+ }
  
- 	if (!scan_freq_set_get_bands(set))
- 		/* The set is empty. */
++static bool extract_nested(const void *data, uint16_t len, void *o)
++{
++	const struct l_genl_attr *outer = data;
++	struct l_genl_attr *nested = o;
++
++	l_genl_attr_recurse(outer, nested);
++
++	return true;
++}
++
+ static attr_handler handler_for_type(enum nl80211_attrs type)
+ {
+ 	switch (type) {
+@@ -157,6 +167,8 @@ static attr_handler handler_for_type(enum nl80211_attrs type)
+ 		return extract_uint32;
+ 	case NL80211_ATTR_FRAME:
+ 		return extract_iovec;
++	case NL80211_ATTR_WIPHY_BANDS:
++		return extract_nested;
+ 	default:
+ 		break;
+ 	}
+@@ -222,6 +234,10 @@ int nl80211_parse_attrs(struct l_genl_msg *msg, int tag, ...)
+ 			goto done;
+ 		}
+ 
++		/* For nested attributes use the outer attribute as data */
++		if (entry->handler == extract_nested)
++			data = &attr;
++
+ 		if (!entry->handler(data, len, entry->data)) {
+ 			ret = -EINVAL;
+ 			goto done;
 -- 
 2.34.3
 
