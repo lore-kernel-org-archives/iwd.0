@@ -1,47 +1,47 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1E05385
-	for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 17:09:28 +0000 (UTC)
-Received: by mail-pl1-f170.google.com with SMTP id w10so2334083plq.0
-        for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 10:09:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9A1538D
+	for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 17:09:29 +0000 (UTC)
+Received: by mail-pg1-f174.google.com with SMTP id 12so13442864pga.1
+        for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 10:09:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ldr+thN1768lc2hRHqCnC5Ptsz0dCZYYSWJQ9WpU2OM=;
-        b=i2orZ/xSZkgEDxDTq34a8EW3Le1JGX18SHQ3ENtae3OFtAO5uJERUR/ezDJ+3QUib7
-         wiPwVB3t6OV1oScF6KOQ8d2vD4l9h3PIuAlIVREjLhEOrLkzOvtwzFsyWSK+2jE5HEGw
-         6cpnwFp4CNjKUW4vOKH0jWYz74nrAc1LZhWwtgYUTKHB10yFwDTCmgu3mrdo9s34MBDn
-         J3NvOEFoeQxueCB4TdGTsgYLK5tBe61Bpbqo36z1hTkt+nFHKkoyJrea36i8RHCkfn7b
-         xRA39I5pxjA92P3CYOvzKScr3xq9XIWR+snTM7kyNyK/Rej4LLX3ZucVs73vMW+8zBbF
-         2TOA==
+        bh=oyagTKirmCVe+uNqX/I1wqYpK2BA/6J0aDtzUFH90c8=;
+        b=hEMmwcDILj6et+i6FFnQWSlcYcZEKsQ0WN2VXey/0Q4rBPwoVA3TsctWUaYccAD0eM
+         tx1xSNdWOTk6b3rjBIerARLXl9FZUhxyPZB5uGrO3DPEgC5N9lsQtxBV3B+nj6NQ5jNU
+         QZR7CRwCTv3/jmKominsMQo0JHKfqARVzutf7ZiitFFAN3k64gfoVN2L03aOmv2YZmDT
+         23qw5MuqRhWS9jDCp1qGeEssMxfsTotkvXLVYYyR9X3E/fREYWsUSm2YwcTO9d4gBp/N
+         iUWdvlWctxYnk5a2nNlZIQPglwjPjUCPPabCOzB2Jw3r5PXdvoTks1RSXT1Lc8YLIROQ
+         C+8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ldr+thN1768lc2hRHqCnC5Ptsz0dCZYYSWJQ9WpU2OM=;
-        b=SZ7U7MldLXSg8mX/ptL1EHQat0h5I9pa5e50l8MybZhPa8t00maj7Bk5n0woX0TK08
-         Y883f2DVwh0JRsceH9VagacJwN6eZE6QEnHcraEuBPRNa4HtGDJIWcIX5mgYGUiaTL2H
-         7F7o0NQ5K5EKoz2niQFLYNXZo1Asqa9j0ukUmkpCnoC1y+a8TrUw1onfO0YpMJhIRP1k
-         o4vkIm6PxAVObQcuy5LwoON+vJXsW2TYAK7B/wsuhKWHqTb2kZyIPDv3Fx84X/ELZvnt
-         P/ebB7jdjzDWUqlXK4WM7wci3O509nOzGyPTJrNJwwPl8M3lk8uj8G0L0hW0mUgWpBiC
-         6ijQ==
-X-Gm-Message-State: AJIora9BDE9t+ubT5kn7AVuMnI07aApw5rMDVoFa0tWsCzQFvmxnGekv
-	MVzQazn/qsPCuMLgBJmsDJ0Tq2hlDt8=
-X-Google-Smtp-Source: AGRyM1uvs/VbW7LiGvZFld9xt4NncoCU03lN2zFvpYURVUs77g5HT805nYnzDBP2zJs+7w2I+06jsg==
-X-Received: by 2002:a17:90b:4a10:b0:1f2:a45c:125 with SMTP id kk16-20020a17090b4a1000b001f2a45c0125mr192796pjb.246.1658855368238;
+        bh=oyagTKirmCVe+uNqX/I1wqYpK2BA/6J0aDtzUFH90c8=;
+        b=XmXHp47xmeggBLLZgmgCBVdT/MKNC0PaE/PakdUe/e7xdQANioVyDDBQhnRYnkGXYS
+         mqBw5AkkbKMPHPb1J7a3wZuCnE6MVRn7JukuZ4yGQRZr5Br28iQDZRB52+o2p2nyAMGL
+         KfK3Q8pm8U4dI78nAUlF1VitxFRafLQYDHVRHENldBub5jLZ0IBhbhAYnqYL+oYqLGOJ
+         ZIMoICKM5DXyRBi9Qy3L53MMWWtYw25syKppQUzet+Serquf8h5eRCTqiEeQ/UAmC1Fm
+         pTYv2TZ0TstS/i5m2jN8qD1haYLs0IMxrNs3bSn3+xRvv/qqnQwbPM6iDBg117sYxvu9
+         gYKQ==
+X-Gm-Message-State: AJIora+9DtWPLaWbEkn3pPaGF1Yt1Qbhnh32sUyJbJgm9lE4cFVlM9Ae
+	A+dpY5wbsti24ZNztSkSdhVUlauQg3g=
+X-Google-Smtp-Source: AGRyM1uXdWgT4/ABEtHhf+5CHHnzUL/ipWmWlt46HaLM++NvtmFYdbyc58dZHeN3+MCmSJMk3FjR8w==
+X-Received: by 2002:a63:83c7:0:b0:41a:4956:5b57 with SMTP id h190-20020a6383c7000000b0041a49565b57mr15714985pge.538.1658855368907;
         Tue, 26 Jul 2022 10:09:28 -0700 (PDT)
 Received: from jprestwo-xps.none (h208-100-169-68.bendor.broadband.dynamic.tds.net. [208.100.169.68])
-        by smtp.gmail.com with ESMTPSA id 21-20020a170902c11500b0016c09e23b18sm11778694pli.154.2022.07.26.10.09.27
+        by smtp.gmail.com with ESMTPSA id 21-20020a170902c11500b0016c09e23b18sm11778694pli.154.2022.07.26.10.09.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jul 2022 10:09:27 -0700 (PDT)
+        Tue, 26 Jul 2022 10:09:28 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 04/10] wiphy: fix runtime error from bit shift
-Date: Tue, 26 Jul 2022 10:09:14 -0700
-Message-Id: <20220726170920.15929-4-prestwoj@gmail.com>
+Subject: [PATCH 05/10] scan: make scan_freq_set const in scan_passive
+Date: Tue, 26 Jul 2022 10:09:15 -0700
+Message-Id: <20220726170920.15929-5-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220726170920.15929-1-prestwoj@gmail.com>
 References: <20220726170920.15929-1-prestwoj@gmail.com>
@@ -53,102 +53,139 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The compiler treated the '1' as an int type which was not big enough
-to hold a bit shift of 31:
+The scan_passive API wasn't using a const struct scan_freq_set as it
+should be since it's not modifying the contents. Changing this to
+const did require some additional changes like making the scan_parameters
+'freqs' member const as well.
 
-runtime error: left shift of 1 by 31 places cannot be represented in
-		type 'int'
-
-Instead of doing the iftype check manually, refactor
-wiphy_get_supported_iftypes by adding a subroutine which just parses
-out iftypes from a mask into a char** list. This removes the need to
-case each iftype into a string.
+After changing scan_parameters, p2p needed updating since it was using
+scan_parameters.freqs directly. This was changed to using a separate
+scan_freq_set pointer, then setting to scan_parameters.freqs when needed.
 ---
- src/wiphy.c | 48 ++++++++++++++----------------------------------
- 1 file changed, 14 insertions(+), 34 deletions(-)
+ src/p2p.c  | 21 +++++++++++++--------
+ src/scan.c |  4 ++--
+ src/scan.h |  4 ++--
+ 3 files changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 09b99fb2..98bd3aa4 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -707,17 +707,16 @@ bool wiphy_constrain_freq_set(const struct wiphy *wiphy,
- 	return true;
+diff --git a/src/p2p.c b/src/p2p.c
+index a7207c30..ff3b8e45 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -1977,6 +1977,7 @@ static bool p2p_provision_scan_notify(int err, struct l_queue *bss_list,
+ static void p2p_provision_scan_start(struct p2p_device *dev)
+ {
+ 	struct scan_parameters params = {};
++	struct scan_freq_set *freqs = NULL;
+ 	uint8_t buf[256];
+ 
+ 	params.flush = true;
+@@ -2005,16 +2006,17 @@ static void p2p_provision_scan_start(struct p2p_device *dev)
+ 	 * contain all of the 2.4 and 5G channels.
+ 	 */
+ 	if (dev->conn_go_scan_retry < 12) {
+-		params.freqs = scan_freq_set_new();
+-		scan_freq_set_add(params.freqs, dev->conn_go_oper_freq);
++		freqs = scan_freq_set_new();
++		scan_freq_set_add(freqs, dev->conn_go_oper_freq);
++		params.freqs = freqs;
+ 	}
+ 
+ 	dev->scan_id = scan_active_full(dev->wdev_id, &params, NULL,
+ 					p2p_provision_scan_notify, dev,
+ 					p2p_scan_destroy);
+ 
+-	if (params.freqs)
+-		scan_freq_set_free(params.freqs);
++	if (freqs)
++		scan_freq_set_free(freqs);
  }
  
--static char **wiphy_get_supported_iftypes(struct wiphy *wiphy, uint16_t mask)
-+static char **wiphy_iftype_mask_to_str(uint16_t mask)
+ static void p2p_start_client_provision(struct p2p_device *dev)
+@@ -3777,6 +3779,7 @@ schedule:
+ static bool p2p_device_scan_start(struct p2p_device *dev)
  {
--	uint16_t supported_mask = wiphy->supported_iftypes & mask;
--	char **ret = l_new(char *, __builtin_popcount(supported_mask) + 1);
-+	char **ret = l_new(char *, __builtin_popcount(mask) + 1);
+ 	struct scan_parameters params = {};
++	struct scan_freq_set *freqs;
+ 	uint8_t buf[256];
  	unsigned int i;
- 	unsigned int j;
  
--	for (j = 0, i = 0; i < sizeof(supported_mask) * 8; i++) {
-+	for (j = 0, i = 0; i < sizeof(mask) * 8; i++) {
- 		const char *str;
+@@ -3812,13 +3815,13 @@ static bool p2p_device_scan_start(struct p2p_device *dev)
+ 	 * Request frames intended for both P2P Devices and non-P2P Devices."
+ 	 */
+ 	params.no_cck_rates = true;
+-	params.freqs = scan_freq_set_new();
++	freqs = scan_freq_set_new();
  
--		if (!(supported_mask & (1 << i)))
-+		if (!(mask & (1 << i)))
- 			continue;
+ 	for (i = 0; i < L_ARRAY_SIZE(channels_social); i++) {
+ 		int chan = channels_social[i];
+ 		uint32_t freq = band_channel_to_freq(chan, BAND_FREQ_2_4_GHZ);
  
- 		str = netdev_iftype_to_string(i + 1);
-@@ -728,6 +727,11 @@ static char **wiphy_get_supported_iftypes(struct wiphy *wiphy, uint16_t mask)
- 	return ret;
+-		scan_freq_set_add(params.freqs, freq);
++		scan_freq_set_add(freqs, freq);
+ 	}
+ 
+ 	/*
+@@ -3845,12 +3848,14 @@ static bool p2p_device_scan_start(struct p2p_device *dev)
+ 			dev->chans_per_scan = CHANS_PER_SCAN;
+ 		}
+ 
+-		scan_freq_set_add(params.freqs, freq);
++		scan_freq_set_add(freqs, freq);
+ 	}
+ 
++	params.freqs = freqs;
++
+ 	dev->scan_id = scan_active_full(dev->wdev_id, &params, NULL,
+ 					p2p_scan_notify, dev, p2p_scan_destroy);
+-	scan_freq_set_free(params.freqs);
++	scan_freq_set_free(freqs);
+ 
+ 	return dev->scan_id != 0;
+ }
+diff --git a/src/scan.c b/src/scan.c
+index 39aef625..03e5b8d9 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -279,7 +279,7 @@ static void scan_freq_append(uint32_t freq, void *user_data)
  }
  
-+static char **wiphy_get_supported_iftypes(struct wiphy *wiphy, uint16_t mask)
-+{
-+	return wiphy_iftype_mask_to_str(wiphy->supported_iftypes & mask);
-+}
-+
- bool wiphy_supports_iftype(struct wiphy *wiphy, uint32_t iftype)
+ static void scan_build_attr_scan_frequencies(struct l_genl_msg *msg,
+-						struct scan_freq_set *freqs)
++					const struct scan_freq_set *freqs)
  {
- 	if (iftype > sizeof(wiphy->supported_iftypes) * 8)
-@@ -951,38 +955,14 @@ static void wiphy_print_mcs_info(const uint8_t *mcs_map,
- static void wiphy_print_he_capabilities(struct band *band,
- 				const struct band_he_capabilities *he_cap)
+ 	struct scan_freq_append_data append_data = { msg, 0 };
+ 
+@@ -654,7 +654,7 @@ static uint32_t scan_common(uint64_t wdev_id, bool passive,
+ 					priority, &work_ops);
+ }
+ 
+-uint32_t scan_passive(uint64_t wdev_id, struct scan_freq_set *freqs,
++uint32_t scan_passive(uint64_t wdev_id, const struct scan_freq_set *freqs,
+ 			scan_trigger_func_t trigger, scan_notify_func_t notify,
+ 			void *userdata, scan_destroy_func_t destroy)
  {
--	int i;
--	char type_buf[128];
--	char *s = type_buf;
-+	_auto_(l_strv_free) char **iftypes = NULL;
-+	_auto_(l_free) char *joined = NULL;
- 	uint8_t width_set = bit_field(he_cap->he_phy_capa[0], 1, 7);
+diff --git a/src/scan.h b/src/scan.h
+index 79bec605..58b8332b 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -93,7 +93,7 @@ struct scan_bss {
+ struct scan_parameters {
+ 	const uint8_t *extra_ie;
+ 	size_t extra_ie_size;
+-	struct scan_freq_set *freqs;
++	const struct scan_freq_set *freqs;
+ 	uint16_t duration;
+ 	bool flush : 1;
+ 	bool randomize_mac_addr_hint : 1;
+@@ -130,7 +130,7 @@ struct l_genl_msg *scan_build_trigger_scan_bss(uint32_t ifindex,
+ 						const uint8_t *ssid,
+ 						uint32_t ssid_len);
  
--	for (i = 0; i < 32; i++) {
--		if (!(he_cap->iftypes & (1 << i)))
--			continue;
--
--		if (L_WARN_ON(s >= type_buf + sizeof(type_buf)))
--			return;
--
--		switch (i) {
--		case NETDEV_IFTYPE_ADHOC:
--			s += sprintf(s, "%s ", "Ad-Hoc");
--			break;
--		case NETDEV_IFTYPE_STATION:
--			s += sprintf(s, "%s ", "Station");
--			break;
--		case NETDEV_IFTYPE_AP:
--			s += sprintf(s, "%s ", "AP");
--			break;
--		case NETDEV_IFTYPE_P2P_CLIENT:
--			s += sprintf(s, "%s ", "P2P Client");
--			break;
--		case NETDEV_IFTYPE_P2P_GO:
--			s += sprintf(s, "%s ", "P2P GO");
--			break;
--		}
--	}
-+	iftypes = wiphy_iftype_mask_to_str(he_cap->iftypes);
-+	joined = l_strjoinv(iftypes, ' ');
- 
--	l_info("\t\t\tInterface Types: %s", type_buf);
-+	l_info("\t\t\tInterface Types: %s", joined);
- 
- 	switch (band->freq) {
- 	case BAND_FREQ_2_4_GHZ:
+-uint32_t scan_passive(uint64_t wdev_id, struct scan_freq_set *freqs,
++uint32_t scan_passive(uint64_t wdev_id, const struct scan_freq_set *freqs,
+ 			scan_trigger_func_t trigger, scan_notify_func_t notify,
+ 			void *userdata, scan_destroy_func_t destroy);
+ uint32_t scan_passive_full(uint64_t wdev_id,
 -- 
 2.34.3
 
