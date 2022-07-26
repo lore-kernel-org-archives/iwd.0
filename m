@@ -1,48 +1,50 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9E75385
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D92538D
 	for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 17:09:27 +0000 (UTC)
-Received: by mail-pl1-f181.google.com with SMTP id w7so13878702ply.12
+Received: by mail-pl1-f177.google.com with SMTP id g17so13917632plh.2
         for <iwd@lists.linux.dev>; Tue, 26 Jul 2022 10:09:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nSDFxzgCBZiCgNlewWaW6PVPMdCZ0EHWwfb78WuBIDA=;
-        b=SwCRIUd7L6FfRS6ptoWLEQU+9hGrTIyOB8x9luwNF13JtMysXzsnxIgOFd5Jjd1GkH
-         7Do+NyoiEdTYvhigFlq9Knq+HJlJnU6fI53F3WH8N7GpKaMeLriPtZ1uzq+/w0pKSxm9
-         3EaTgbBJQ/4V3XfPDsBGJXTnirW0m4nvuG8E9u+pu2tHUAGeH4WE6igi4bXst2q3wbGq
-         llVeUFb8JWoJbQYDCBjcjmnQJh8ERUGxeU8wiQARSQzNu+0ZtsTmArd+H103Gs/SV+0S
-         GsvfdGyJj4z6kykPCnl2OwhWw6lZngBMU2EnmHH19ZfHYAVr0ntS8go9WrV89u9sXdVW
-         qGNQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=7TTyZe83Hk9H7pabp5ySRnmEEzh4iiyvRt7AWb8wgEk=;
+        b=bfRbuFuxWvcr7M3qoXlXT+RRk2GrWEL3mDQe0622WSgoO0ieyOXzf4Q2EEdSwxQUve
+         uaCLbVXsc32KW2Dxwyo3qoqekKCy6ryrxhJ0TE+2fQ0F9HqooSB3OivkJeDTRkBOSnQz
+         o8cc9552Ai0PIQFlsE2fvr+BR24qNMnUcuz4B6eFOQyir07NrX9dyN3OzomvW6bJzJkq
+         MkIIheDni7B2idL3UyO4jpijU9QlAiaRt/KQO+KKOcXgLydDbduISkNww3Yz0xOVW99Y
+         VoeQOJGLH/PuF2TZfks1ptY30ycBIjCTItF6b52AWrCF/NBK5g8ZSxm7hW1DbTuGYEwS
+         lepA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nSDFxzgCBZiCgNlewWaW6PVPMdCZ0EHWwfb78WuBIDA=;
-        b=zfbI6d51GOUiXGlwmEJl+od+iF2Z8AtRSFFE7kMvJBy/wyGjnf/Jl1rTlBaxOdqutQ
-         tPnvZ+vaLHdjllEyg7l2r1PudEMPMLrc91SnPapKoyHi7bzhlvTvwum4sgEaL6o+44PI
-         irwz1OcWwT0diAARSDGiyNCk6k9ohtx3WpgUWGan5Sm9yNgWdn0U0NGwkr0+bnSt7Tkv
-         hmOFHEzhYK3VivdmsHkqzrfQodi9rg2hueSAZb1TEdgUBqHNrQVLyMrpgpQARE8YRToB
-         eUNTnq7hq1B40+8fwiTqAsmrh3RocVZFHB+55qNlbBNzVB5Dn52Kgdq+ZTANA0errrZV
-         Yp+g==
-X-Gm-Message-State: AJIora9+45TbH7ZhkZp7HueRaAGlB7GbdLPWMgZYH1RLF2FMqseeReLg
-	LQGAR0Dvg0APB/lIWhaN46iRkzXHo9Q=
-X-Google-Smtp-Source: AGRyM1sSlDe0sKScQ8ANvTOOetCLRzy0Pluk3eDc6hRDXphf64TfdfcrhFsEheQQW9TiM9ZGat+KnQ==
-X-Received: by 2002:a17:902:6ac5:b0:16d:1664:39c9 with SMTP id i5-20020a1709026ac500b0016d166439c9mr17527097plt.104.1658855366321;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=7TTyZe83Hk9H7pabp5ySRnmEEzh4iiyvRt7AWb8wgEk=;
+        b=iSJTYF/66EJoy4rGQL99N8pwyCB0ED7Mf0UKIQclUq/nc79/Q3JOgMGm9lVm9pGh6i
+         GEoafteX1QqYe/EN5LrWVmWIuqFPPb6LYh31gRMRGKwehVegJnKe0H8fc85lYVcnufgn
+         wFzKs/gyzSi0GIOGgqDzjpDBAPb1umEhnMObVbWYFa6DLUvjtnjkn5v4HbwajjefF7dD
+         CDpfgVy++hFIhHs3qui3QgZab3ByTvu4K0qM+5HID96DP8wJjwTturzjEMWHrXpp50V0
+         YjXKtBKb1xG5RZSndepwMIb/Vg5KVnhIZFAoJ1M1oC0WB00vqIWA2Ve0owjxwRG/C5sw
+         uAaQ==
+X-Gm-Message-State: AJIora+Ow/C4lOL3ix107Zqd3IyXZ5BL/50lA7w3+QdjfJfSkLclu5dj
+	ztlcinNsLpnJVlE4EvAUA27L3Wa3FeI=
+X-Google-Smtp-Source: AGRyM1tPct5YzQGLYdF5KAnNFGZcwlnkJF1LrVu0NaWWZTMgnt+++E3eCiW1O3euiMYsM6mxfzIuyw==
+X-Received: by 2002:a17:90b:1c0b:b0:1f0:23df:5406 with SMTP id oc11-20020a17090b1c0b00b001f023df5406mr168437pjb.157.1658855366844;
         Tue, 26 Jul 2022 10:09:26 -0700 (PDT)
 Received: from jprestwo-xps.none (h208-100-169-68.bendor.broadband.dynamic.tds.net. [208.100.169.68])
-        by smtp.gmail.com with ESMTPSA id 21-20020a170902c11500b0016c09e23b18sm11778694pli.154.2022.07.26.10.09.25
+        by smtp.gmail.com with ESMTPSA id 21-20020a170902c11500b0016c09e23b18sm11778694pli.154.2022.07.26.10.09.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jul 2022 10:09:25 -0700 (PDT)
+        Tue, 26 Jul 2022 10:09:26 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 01/10] manager: unregister nl80211 config watch
-Date: Tue, 26 Jul 2022 10:09:11 -0700
-Message-Id: <20220726170920.15929-1-prestwoj@gmail.com>
+Subject: [PATCH 02/10] test-runner: make developer mode optional
+Date: Tue, 26 Jul 2022 10:09:12 -0700
+Message-Id: <20220726170920.15929-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20220726170920.15929-1-prestwoj@gmail.com>
+References: <20220726170920.15929-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,45 +53,37 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For consistency unregister the config watch when manager exits
+IWD can now be started without -E if needed
 ---
- src/manager.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ tools/utils.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/src/manager.c b/src/manager.c
-index ca29e110..437841b3 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -49,6 +49,7 @@ static char **whitelist_filter;
- static char **blacklist_filter;
- static bool randomize;
- static bool use_default;
-+static unsigned int config_watch;
+diff --git a/tools/utils.py b/tools/utils.py
+index 7a182848..a1b3e041 100644
+--- a/tools/utils.py
++++ b/tools/utils.py
+@@ -411,7 +411,8 @@ class Namespace:
  
- struct wiphy_setup_state {
- 	uint32_t id;
-@@ -820,8 +821,10 @@ static int manager_init(void)
+ 		self._bus = dbus.bus.BusConnection(address_or_type=self.dbus_address)
  
- 	pending_wiphys = l_queue_new();
+-	def start_iwd(self, config_dir = '/tmp', storage_dir = '/tmp/iwd'):
++	def start_iwd(self, config_dir = '/tmp', storage_dir = '/tmp/iwd',
++				developer_mode = True):
+ 		args = []
+ 		iwd_radios = ','.join([r.name for r in self.radios if r.use == 'iwd'])
  
--	if (!l_genl_family_register(nl80211, "config", manager_config_notify,
--					NULL, NULL)) {
-+	config_watch = l_genl_family_register(nl80211, "config",
-+						manager_config_notify,
-+						NULL, NULL);
-+	if (!config_watch) {
- 		l_error("Registering for config notifications failed");
- 		goto error;
- 	}
-@@ -880,6 +883,8 @@ static void manager_exit(void)
- 	l_strfreev(whitelist_filter);
- 	l_strfreev(blacklist_filter);
+@@ -420,7 +421,10 @@ class Namespace:
+ 					'--show-leak-kinds=all',
+ 					'--log-file=/tmp/valgrind.log.%p'])
  
-+	l_genl_family_unregister(nl80211, config_watch);
+-		args.extend(['iwd', '-E'])
++		args.append('iwd')
 +
- 	l_queue_destroy(pending_wiphys, wiphy_setup_state_free);
- 	pending_wiphys = NULL;
++		if developer_mode:
++			args.append('-E')
  
+ 		if iwd_radios != '':
+ 			args.extend(['-p', iwd_radios])
 -- 
 2.34.3
 
