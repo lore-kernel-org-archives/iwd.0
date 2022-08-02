@@ -1,115 +1,120 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36607F
-	for <iwd@lists.linux.dev>; Mon,  1 Aug 2022 18:40:15 +0000 (UTC)
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-10e615a36b0so13163652fac.1
-        for <iwd@lists.linux.dev>; Mon, 01 Aug 2022 11:40:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE517F
+	for <iwd@lists.linux.dev>; Tue,  2 Aug 2022 10:47:36 +0000 (UTC)
+Received: by mail-wr1-f44.google.com with SMTP id l4so17397205wrm.13
+        for <iwd@lists.linux.dev>; Tue, 02 Aug 2022 03:47:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=Gs494ayUVnanwqpkM4arENRtdZP64ZkTtslr8zm5dV4=;
-        b=PVy91BN9CAnuQjKXlZ8JrLTan3RRqBlAcjZtONPjzTx9i24GXTBGaE8GCFS8ixjdze
-         Tf3jBrZJQFk06CY8sbYD38OHr0RfFJVDT/sWHnIrPjWpmmzx8vsyPH8Pg+NrZ1Oj6cM/
-         k3x8TFGM1pO0b6qoYs3VU3ahGx6doMlNu8i4U80Pg/XqwjtzDRGRD/43d0pTIWG2OGkI
-         0frwvsoQiUR2Nl2JX90vjNTZBr+NRPYuPhqKhAJWqFXuR9FWeDbbWa+xyPG5MsCjC5Nw
-         0vXekr3KVObisA9aP8lAE12k8Ye373lJaRjox6sMN70T9aTYOs8nDQ517JKLdkBR97HT
-         yFjw==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Wz3RIueN5KpuN/E3m+Gi4gfge+0RUWDAqM0nf6WlZ0o=;
+        b=g3hdJeXWnmnZCN2pjAaDXPrT1Y/4/OP18Yo9UhdHo8a9idzOPt1J/mFDYfm2aZ0OSk
+         tVaquwM8iEHYWWvIhU0ri4gVREidYMI8c6CHpO1Slj7mvkAyhUvXQXgnoJicykKCa/I6
+         FeMSJelrTq2gY43NpT6u6NCRcnKslRIZuj8glhCQDsuBENPB8bEVO4aje86Fd5fYQd4f
+         DnUQU+fupq8KurYZ0UTuAj1RjKDUM/mIv9dE1E8fyt59RaCpY0gDgN8vYMS972+IH9Sn
+         3jPDOXvRTb23Hx86gnDJec6kXMhYfVytnGnDusspSqHSguRW6Dh/lIwvd8oGZsHTmT/a
+         55Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=Gs494ayUVnanwqpkM4arENRtdZP64ZkTtslr8zm5dV4=;
-        b=lYwKWmSvR5XDfqevTKbFBGaJ81iAcMODA9YgYiSx2L8lVrQd1wOub8ZJogiZUeTi1G
-         WdCu2mOrhgiLxVkyY7K99isVS8RJZ1esOg5QEM+Pb4Izuaij86y/9F6jHcBS2LGmmNhB
-         7+uym+m4F+DoPhZzjSWWNugBPyouq8hFzqTYr26UV8SKI9t3aRWip51f3SF7FkO03Csr
-         nwDtDgrOEv6edaFGb/JqAUV5eZ0Hf9q7twesovvvCGAkr7xwZs/MXTnxXnKfPywZ5f3l
-         Y+VyouoVFl5JrRBzVgjfcmgSUbt64lszELl9WcYiRR0ZRSu8QO7WspO7lD9ptP/drYwr
-         Vy8w==
-X-Gm-Message-State: ACgBeo2G9VOkrgk1/a7r/jxC3EEem+acEpA5N4bwg/MPTuHSiEqb9WFD
-	MZPPTVR5eZ/OMVTHPLOs5KU=
-X-Google-Smtp-Source: AA6agR6RUnsXCw0QgGLWYtRmcLgidIkCuZHG69o0AMFQ2IhUB362NjQB1bUmm4yNfOAwGBDflHJebA==
-X-Received: by 2002:a05:6870:808b:b0:10e:cb5e:b268 with SMTP id q11-20020a056870808b00b0010ecb5eb268mr4052362oab.162.1659379214854;
-        Mon, 01 Aug 2022 11:40:14 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id l44-20020a9d1b2f000000b0061d1f5582dfsm2947438otl.0.2022.08.01.11.40.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Aug 2022 11:40:14 -0700 (PDT)
-Message-ID: <837ca848-73dc-3811-2845-8d9be235afa6@gmail.com>
-Date: Mon, 1 Aug 2022 13:30:44 -0500
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Wz3RIueN5KpuN/E3m+Gi4gfge+0RUWDAqM0nf6WlZ0o=;
+        b=3LF/PtKdQJQf8G3zc+sOYe1k5EYvlQrEzVKVmwkUjXj8elo8B30fay5W244wiu6T3c
+         Wf+k/WdCoTnuVQspU47S3PgfhMZhUj/nt+XLgA5K+M3c1FP5Nto+76K7AViVDCxOKv3N
+         72z7ePNNRuSjnpz3bhFYgp35LfzGn2YP4ZR4wEKYBjpBjvcYs2hDiuWOAHnkH6LV37pk
+         hdLiyl4YVjjC7Ga03SY8NLVrRgr+4XQKr9wHxCTN3YG5mSkabY8HvPfcrrmuaExeYoDO
+         6tkzMKR3MD8KsRunmSwwmmyymG6Eb9WUdQcFFf32lBQ8evnv6oK3IvOX8jQhLztTUH4V
+         TJGg==
+X-Gm-Message-State: ACgBeo2SakpDZJKvUEXMByroDKV126hATz/LHQBdSKvaAjzxuAWF2NA6
+	QsCi1rHwRx5cxEOe5ts3BYEAX5g0vJSEFw==
+X-Google-Smtp-Source: AA6agR6Nmmfxf7cO/DYd3f8GHjJKeIMWWIfDnzwpbv0v2SzSC7OPk4D82JxC86CqDDwrzJqKqED+Gw==
+X-Received: by 2002:a5d:47cd:0:b0:220:70a2:5383 with SMTP id o13-20020a5d47cd000000b0022070a25383mr1658091wrc.258.1659437254079;
+        Tue, 02 Aug 2022 03:47:34 -0700 (PDT)
+Received: from localhost.localdomain (cpc156731-sgyl45-2-0-cust617.18-2.cable.virginm.net. [82.31.54.106])
+        by smtp.gmail.com with ESMTPSA id p18-20020a5d4592000000b0021f73c66198sm10558389wrq.1.2022.08.02.03.47.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Aug 2022 03:47:33 -0700 (PDT)
+From: Michael Johnson <mjohnson459@gmail.com>
+To: iwd@lists.linux.dev
+Cc: Michael Johnson <mjohnson459@gmail.com>
+Subject: [PATCH v2] netdev: Add logging for CQM messages
+Date: Tue,  2 Aug 2022 11:47:28 +0100
+Message-Id: <20220802104728.48628-1-mjohnson459@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 1/2] netdev: Add logging for CQM messages
-Content-Language: en-US
-To: Michael Johnson <mjohnson459@gmail.com>
-Cc: iwd@lists.linux.dev
-References: <20220801100631.41605-1-mjohnson459@gmail.com>
- <6bc199e2-2f40-b192-9de6-30fceb2510ea@gmail.com>
- <CACsRnHULBH=jmCiG4=kczJALPsy7Whx+TmDf-JhQryyc5GwBow@mail.gmail.com>
- <c012837a-9d79-1909-dd2f-3fcd98828d52@gmail.com>
- <CACsRnHW4N1aBkcJyeAppgMj1bqV8t3V_BwYrjy+MB=S0uepaWg@mail.gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CACsRnHW4N1aBkcJyeAppgMj1bqV8t3V_BwYrjy+MB=S0uepaWg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Michael,
+Add extra logging around CQM events to help track wifi status. This is
+useful for headless systems that can only be accessed over the network
+and so information in the logs is invaluable for debugging outages.
 
-On 8/1/22 13:09, Michael Johnson wrote:
-> Hi Denis,
-> 
-> On Mon, 1 Aug 2022 at 18:24, Denis Kenzior <denkenz@gmail.com> wrote:
->> I wonder if we should report this over D-Bus instead?  I mean you can always
->> setup your own SignalLevelAgent, or we could even add more reporting via
->> StationDiagnostic interface?
-> 
-> I actually do record the signal level separately but it's stored in an
-> annoying binary format so access is more painful :(. This was just to
-> make things easier and reduce the jump from wpa_supplicant to iwd for
-> anyone on plain ubuntu etc. I can understand why you don't want the
-> spam though.
+Prior to this change, the only log for CQM messages is saying one was
+received. This adds details to what attributes were set and the
+associated data with them.
 
-I don't mind the spam in debug mode, that's what it is for.  But not sure they 
-really belong at info/warn levels.  I think we can consider putting in roaming 
-related messages at the info level since that type of information might be 
-generally useful.
+The signal strength log format was chosen to roughly match
+wpa_supplicant's which looks like this:
 
-> 
->> Right, but I think it sets a single CQM threshold, not multiple like we (might)
->> do.  Also, wpa_s is very spammy since it is really (only) meant for testing wifi
->> implementations in a lab ;)
-> 
-> haha fair. Of course, it's still the default on most linux systems ;).
-> 
+CTRL-EVENT-SIGNAL-CHANGE above=1 signal=-60 noise=-96 txrate=6000
+---
+ src/netdev.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-And we're working to change that.
+diff --git a/src/netdev.c b/src/netdev.c
+index 5a6a7b70..47e076e2 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1092,12 +1092,26 @@ static void netdev_cqm_event(struct l_genl_msg *msg, struct netdev *netdev)
+ 					rssi_event = (uint32_t *) data;
+ 					break;
+ 
++				case NL80211_ATTR_CQM_PKT_LOSS_EVENT:
++					if (len != 4)
++						continue;
++
++					l_debug("Packets lost event: %d",
++							*(uint32_t *) data);
++					break;
++
++				case NL80211_ATTR_CQM_BEACON_LOSS_EVENT:
++					l_debug("Beacon lost event");
++					break;
++
+ 				case NL80211_ATTR_CQM_RSSI_LEVEL:
+ 					if (len != 4)
+ 						continue;
+ 
+ 					rssi_val = (int32_t *) data;
+ 					break;
++				default:
++					l_debug("Unknown CQM event: %d", type);
+ 				}
+ 			}
+ 
+@@ -1106,10 +1120,14 @@ static void netdev_cqm_event(struct l_genl_msg *msg, struct netdev *netdev)
+ 	}
+ 
+ 	if (rssi_event) {
+-		if (rssi_val)
++		if (rssi_val) {
++			l_debug("Signal change event (above=%d signal=%d)",
++							*rssi_event, *rssi_val);
+ 			netdev_cqm_event_rssi_value(netdev, *rssi_val);
+-		else
++		} else {
++			l_debug("Signal change event (above=%d)", *rssi_event);
+ 			netdev_cqm_event_rssi_threshold(netdev, *rssi_event);
++		}
+ 	}
+ }
+ 
+-- 
+2.25.1
 
-> 
-> What would you like to do with the patch? I'm happy to drop it if its
-> too spammy or we can lower the level to debug? Or make it only print
-> when the threshold changes.
-
-I don't mind these at debug level, if you want to start with that.
-
-> Are you happy with the packet loss and beacon loss events or are they
-> too much as well?
-
-As I mentioned before, kernel will generally disconnect us as soon as the beacon 
-loss event happens (depends on the STA capability if I recall correctly).  Not 
-sure how really useful this is, but since beacon loss goes via dmesg at 'info' 
-level, I think it would be fine for iwd to do so as well.
-
-The packet loss one I'm not sure.  Certaintly not 'warn'.  I think I'd start 
-with 'debug' since this event isn't being reacted to (yet).
-
-Regards,
--Denis
