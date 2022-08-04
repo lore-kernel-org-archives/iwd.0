@@ -1,47 +1,47 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AD35381
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34F25385
 	for <iwd@lists.linux.dev>; Thu,  4 Aug 2022 18:51:19 +0000 (UTC)
-Received: by mail-pf1-f173.google.com with SMTP id w185so299067pfb.4
+Received: by mail-pg1-f179.google.com with SMTP id h132so646785pgc.10
         for <iwd@lists.linux.dev>; Thu, 04 Aug 2022 11:51:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=X11Al+otvb1mqCp6xZM1E1PKL9zxEt5ibnsXp3lZgns=;
-        b=QvGjurhSIcauuBhVqxfHyLlTDwaHoEqAEalm40RTJM/2iewcUDo/qWfLyZHcDwa70G
-         hiy/sGSX3li8GkWsgq+VY6RXxMZYaQRQ38rqz8R8TBBwQmjMqrvL4gJEbkV0lQUqNRFH
-         D7BzQQ4OVprr2Uc2dQdg6DLxhF+SQkX9mfmkTYKIczFU8q2GaLpCggoKKqzCFZNhSMXH
-         ahLXs54nYB6qKIy8C60HHXJgnNqTqMO1ror5RGC7jQLG2rnoUJlLw+dw0sfceR47QfmR
-         7K60bLaxIp6z04i5JWKo2Yr6DR5GnojEbW5u6MXhEcoCt6V5ecIeyzgWaFQJKGkpBVcB
-         yxNQ==
+        bh=qe39BLq4IBDTBxHdRyJt9ZBbv1zb2MsXCAL9qTwxMkA=;
+        b=QGgeig/5c92II35Mfql4FGT5lvMvgFkKYRH3C2gSI3L17xUxHXCXeMxoX9qRwQ8maC
+         bvAoIzgTHEV2MfC9ZrOJwfjuqRprKzFAlgiuwn4zHE1B4dgSVFopP6l5BBay3rhvsd6/
+         lMCCG+xaEL96Nhe97l8eqNqE7zo3Vv9zJRtTmmcgVIKXbdMKZ+76v2SEqPGnY7z3/JyY
+         /wpyhsEMjbScfGXl9PZwyGOMHdUvSNpBuH0mHojBQgUqncv3KhHfSJKKiiNQ9URuAcpb
+         1j0K9umTGCiaDXLD3VoX+Gt93kdjArIFsLqRTTC+UvWyO3jM0loiyPvYEdiIGrbeOY9t
+         V5HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=X11Al+otvb1mqCp6xZM1E1PKL9zxEt5ibnsXp3lZgns=;
-        b=BGYuYHqhSy8BycHsmE8tnjxYtvso5dltrpTawz3Z8Pd5wR34/tHKfhhMtPvld31Q9x
-         nQnbE0KMfl4OSDSRpOZb5IQF55OM80IZTU2ZCCN/TchBZWoSrdroBEH43iNolKNjyw/q
-         il3RbIrCQjT19C/WaHIPQSR8bQeglSTKp8pgCfcSFXy1yGs3FeK1ZYY7xOChXeVKytpl
-         l6edE2IHJygqHz5xRqb8m0rOJ0s6Y3WSaZoow4H5gSJhSj6dnPvTNpNz1D4O9pwe55mp
-         ia9vsDBSz1nX0/i4q3c4Enwi7NQ+oQBbnDVTqUq12Ofc3br/MUtFiRdaUDjZFVSrfof/
-         MGHQ==
-X-Gm-Message-State: ACgBeo2AN7byvwYQaYNlB0//WB90jf/F8v44d/Rv/adzh4sOAfUyL2Pt
-	Az3WZcQolXth3QhjQM/A92/Bhv51gZQ=
-X-Google-Smtp-Source: AA6agR5tn8zaXlsqOKR/7jokIQgzFet0NwZzv6QH3lBhYBUvkYqa2SmpqkmC7n1KUDej+HmwjvFLZA==
-X-Received: by 2002:a63:4c4c:0:b0:41c:b81a:a16f with SMTP id m12-20020a634c4c000000b0041cb81aa16fmr2600429pgl.584.1659639078443;
+        bh=qe39BLq4IBDTBxHdRyJt9ZBbv1zb2MsXCAL9qTwxMkA=;
+        b=eSp/bFsC0F1iWei5gjZNx+5XurCikNket3ciNZqMQ/57px1X7YZfmsRUaiVwrkv8Vh
+         T1FPE8sSegohYldT7uh6c/U78eqhE39jaweTLwpTPDK6A+LwvjaDmskmS0R0dRI7Jycg
+         AzisroP5zIJkP17ZvVKK3vEpH4jon7Sx9KRYUSkttH3xNwRo2CiPcc6WTblpIoA/iO4n
+         zWwgj+2sWZE8zXkdGeRVCz1ua/zOWtLdTTvXoPcYV1UKGys6ljxQ18k3QlAXTXvPwWvT
+         OVcdU0ID5Lj2PfmmaLa6o9/VqLVeuLtvLhTN9POEgiUGGlorcq5pEcBJ/p7/pFVs8nQe
+         EMDQ==
+X-Gm-Message-State: ACgBeo1KcyogrgRP+kFRoUPR0vJDyiRhiezsijrBnnlbXtozyS6Kek6K
+	tJxsmt3KeaMqvKqubTRx6uoIWvlVKAE=
+X-Google-Smtp-Source: AA6agR4tw95mKtK0uo/viQorqEzwbQszxnZhM+0G0Ja1O6P2eSJyQTCYj12kg+MSBzG+KRC+r/ofDQ==
+X-Received: by 2002:a05:6a00:1a14:b0:52d:5fee:d46b with SMTP id g20-20020a056a001a1400b0052d5feed46bmr2961431pfv.82.1659639078931;
         Thu, 04 Aug 2022 11:51:18 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id c7-20020a634e07000000b0041b3c112b1esm219954pgb.29.2022.08.04.11.51.17
+        by smtp.gmail.com with ESMTPSA id c7-20020a634e07000000b0041b3c112b1esm219954pgb.29.2022.08.04.11.51.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 04 Aug 2022 11:51:18 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 5/7] scan: split full scans by band to enable 6GHz
-Date: Thu,  4 Aug 2022 11:51:10 -0700
-Message-Id: <20220804185112.457670-5-prestwoj@gmail.com>
+Subject: [PATCH v3 6/7] scan: watch for regdom updates to enable 6GHz
+Date: Thu,  4 Aug 2022 11:51:11 -0700
+Message-Id: <20220804185112.457670-6-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220804185112.457670-1-prestwoj@gmail.com>
 References: <20220804185112.457670-1-prestwoj@gmail.com>
@@ -53,173 +53,234 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The kernel's regulatory domain updates after some number of beacons
-are processed. This triggers a regulatory domain update (and wiphy
-dump) but only after a scan request. This means a full scan started
-prior to the regdom being set will not include any 6Ghz BSS's even
-if the regdom was unlocked during the scan.
-
-This can be worked around by splitting up a large scan request into
-multiple requests allowing one of the first commands to trigger a
-regdom update. Once the regdom updates (and wiphy dumps) we are
-hopefully still scanning and could append an additional request to
-scan 6GHz.
+This functionality works around the kernel's behavior of allowing
+6GHz only after a regulatory domain update. If the regdom updates
+scan.c needs to be aware in order to split up periodic scans, or
+insert 6GHz frequencies into an ongoing periodic scan. Doing this
+allows any 6GHz BSS's to show up in the scan results rather than
+needing to issue an entirely new scan to see these BSS's.
 ---
- src/scan.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 89 insertions(+), 8 deletions(-)
+ src/scan.c | 165 +++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 147 insertions(+), 18 deletions(-)
 
 diff --git a/src/scan.c b/src/scan.c
-index b666ba2e..e016bd4d 100644
+index e016bd4d..40e527d9 100644
 --- a/src/scan.c
 +++ b/src/scan.c
-@@ -352,9 +352,24 @@ static bool scan_mac_address_randomization_is_disabled(void)
- 	return disabled;
+@@ -71,6 +71,8 @@ struct scan_periodic {
+ 	void *userdata;
+ 	uint32_t id;
+ 	bool needs_active_scan:1;
++	/* Delay periodic scan results until regulatory domain updates */
++	bool wait_on_regdom:1;
+ };
+ 
+ struct scan_request {
+@@ -108,6 +110,7 @@ struct scan_request {
+ 
+ struct scan_context {
+ 	uint64_t wdev_id;
++	uint32_t wiphy_watch_id;
+ 	/*
+ 	 * Tells us whether a scan, our own or external, is running.
+ 	 * Set when scan gets triggered, cleared when scan done and
+@@ -126,6 +129,8 @@ struct scan_context {
+ 	 */
+ 	unsigned int get_fw_scan_cmd_id;
+ 	struct wiphy *wiphy;
++	/* 6GHz may become available after a regdom update */
++	bool expect_6ghz : 1;
+ };
+ 
+ struct scan_results {
+@@ -184,24 +189,6 @@ static void scan_request_failed(struct scan_context *sc,
+ 	wiphy_radio_work_done(sc->wiphy, sr->work.id);
  }
  
-+static struct scan_freq_set *scan_get_allowed_freqs(struct scan_context *sc)
-+{
-+	struct scan_freq_set *allowed = scan_freq_set_new();
-+
-+	scan_freq_set_merge(allowed, wiphy_get_supported_freqs(sc->wiphy));
-+
-+	if (!wiphy_constrain_freq_set(sc->wiphy, allowed)) {
-+		scan_freq_set_free(allowed);
-+		allowed = NULL;
-+	}
-+
-+	return allowed;
-+}
-+
- static struct l_genl_msg *scan_build_cmd(struct scan_context *sc,
- 					bool ignore_flush_flag, bool is_passive,
--					const struct scan_parameters *params)
-+					const struct scan_parameters *params,
-+					const struct scan_freq_set *freqs)
+-static struct scan_context *scan_context_new(uint64_t wdev_id)
+-{
+-	struct wiphy *wiphy = wiphy_find_by_wdev(wdev_id);
+-	struct scan_context *sc;
+-
+-	if (!wiphy)
+-		return NULL;
+-
+-	sc = l_new(struct scan_context, 1);
+-
+-	sc->wdev_id = wdev_id;
+-	sc->wiphy = wiphy;
+-	sc->state = SCAN_STATE_NOT_RUNNING;
+-	sc->requests = l_queue_new();
+-
+-	return sc;
+-}
+-
+ static void scan_request_cancel(void *data)
  {
- 	struct l_genl_msg *msg;
- 	uint32_t flags = 0;
-@@ -366,8 +381,8 @@ static struct l_genl_msg *scan_build_cmd(struct scan_context *sc,
- 	if (wiphy_get_max_scan_ie_len(sc->wiphy))
- 		scan_build_attr_ie(msg, sc, params);
+ 	struct scan_request *sr = data;
+@@ -227,6 +214,8 @@ static void scan_context_free(struct scan_context *sc)
+ 	if (sc->get_fw_scan_cmd_id && nl80211)
+ 		l_genl_family_cancel(nl80211, sc->get_fw_scan_cmd_id);
  
--	if (params->freqs)
--		scan_build_attr_scan_frequencies(msg, params->freqs);
-+	if (freqs)
-+		scan_build_attr_scan_frequencies(msg, freqs);
- 
- 	if (params->flush && !ignore_flush_flag && wiphy_has_feature(sc->wiphy,
- 						NL80211_FEATURE_SCAN_FLUSH))
-@@ -524,16 +539,36 @@ static bool scan_cmds_add_hidden(const struct network_info *network,
- 		 * of all scans in the batch after the last scan is finished.
- 		 */
- 		*data->cmd = scan_build_cmd(data->sc, true, false,
--								data->params);
-+							data->params,
-+							data->params->freqs);
- 		l_genl_msg_enter_nested(*data->cmd, NL80211_ATTR_SCAN_SSIDS);
- 	}
- 
- 	return true;
++	wiphy_state_watch_remove(sc->wiphy, sc->wiphy_watch_id);
++
+ 	l_free(sc);
  }
  
--static void scan_cmds_add(struct l_queue *cmds, struct scan_context *sc,
-+static void scan_foreach_freq_split_bands(uint32_t freq, void *user_data)
-+{
-+	struct scan_freq_set **subsets = user_data;
-+	int idx;
-+
-+	if (freq < 3000)
-+		idx = 0;
-+	else if (freq < 6000)
-+		idx = 1;
-+	else
-+		idx = 2;
-+
-+	if (!subsets[idx])
-+		subsets[idx] = scan_freq_set_new();
-+
-+	scan_freq_set_add(subsets[idx], freq);
-+}
-+
-+static void scan_build_next_cmd(struct l_queue *cmds, struct scan_context *sc,
- 				bool passive,
--				const struct scan_parameters *params)
-+				const struct scan_parameters *params,
-+				const struct scan_freq_set *freqs)
- {
- 	struct l_genl_msg *cmd;
- 	struct scan_cmds_add_data data = {
-@@ -544,7 +579,7 @@ static void scan_cmds_add(struct l_queue *cmds, struct scan_context *sc,
- 		wiphy_get_max_num_ssids_per_scan(sc->wiphy),
- 	};
- 
--	cmd = scan_build_cmd(sc, false, passive, params);
-+	cmd = scan_build_cmd(sc, false, passive, params, freqs);
- 
- 	if (passive) {
- 		/* passive scan */
-@@ -572,6 +607,52 @@ static void scan_cmds_add(struct l_queue *cmds, struct scan_context *sc,
- 	l_queue_push_tail(cmds, cmd);
+@@ -477,6 +466,142 @@ done:
+ 	return msg;
  }
  
-+static void scan_cmds_add(struct l_queue *cmds, struct scan_context *sc,
-+				bool passive,
-+				const struct scan_parameters *params)
++static void scan_add_6ghz(uint32_t freq, void *user_data)
 +{
-+	unsigned int i;
-+	struct scan_freq_set *subsets[3] = { 0 };
-+	struct scan_freq_set *allowed;
++	struct scan_freq_set *freqs = user_data;
 +
-+	/*
-+	 * If the frequencies are explicit don't break up the request
-+	 */
-+	if (params->freqs) {
-+		scan_build_next_cmd(cmds, sc, passive, params, params->freqs);
++	if (freq < 6000)
 +		return;
-+	}
 +
-+	/*
-+	 * Otherwise a full spectrum scan will likely open up the 6GHz
-+	 * band. The problem is the regdom update occurs after an
-+	 * individual scan request so a single request isn't going to
-+	 * include potential 6GHz results.
-+	 *
-+	 * Instead we can break this full scan up into individual bands
-+	 * and increase our chances of the regdom updating after one of
-+	 * the earlier requests. If it does update to allow 6GHz an
-+	 * extra 6GHz-only passive scan can be appended to this request
-+	 * at that time.
-+	 */
++	scan_freq_set_add(freqs, freq);
++}
++
++static void scan_wiphy_watch(struct wiphy *wiphy,
++				enum wiphy_state_watch_event event,
++				void *user_data)
++{
++	struct scan_context *sc = user_data;
++	struct scan_request *sr = NULL;
++	struct l_genl_msg *msg;
++	struct scan_parameters params = { 0 };
++	struct scan_freq_set *freqs_6ghz;
++	struct scan_freq_set *allowed;
++	bool allow_6g;
++	const struct scan_freq_set *supported =
++					wiphy_get_supported_freqs(wiphy);
++
++	/* Only care about regulatory events, and if 6GHz capable */
++	if ((event != WIPHY_STATE_WATCH_EVENT_REGDOM_STARTED &&
++			event != WIPHY_STATE_WATCH_EVENT_REGDOM_DONE) ||
++			!(scan_freq_set_get_bands(supported) & BAND_FREQ_6_GHZ))
++		return;
 +
 +	allowed = scan_get_allowed_freqs(sc);
-+	if (L_WARN_ON(!allowed))
++	allow_6g = scan_freq_set_get_bands(allowed) & BAND_FREQ_6_GHZ;
++
++	switch (event) {
++	case WIPHY_STATE_WATCH_EVENT_REGDOM_STARTED:
++		if (allow_6g)
++			goto done;
++
++		sc->expect_6ghz = true;
++
++		/*
++		 * If there is a running/queued periodic scan we may need to
++		 * delay the results if 6GHz becomes available.
++		 */
++		if (sc->sp.id)
++			sc->sp.wait_on_regdom = true;
++
++		goto done;
++	case WIPHY_STATE_WATCH_EVENT_REGDOM_DONE:
++		if (!sc->expect_6ghz)
++			goto done;
++
++		sc->expect_6ghz = false;
++
++		if (!sc->sp.id)
++			goto done;
++
++		sr = l_queue_find(sc->requests, scan_request_match,
++						L_UINT_TO_PTR(sc->sp.id));
++		if (!sr)
++			goto done;
++
++		/* This update did not allow 6GHz */
++		if (!allow_6g)
++			goto check_periodic;
++
++		/*
++		 * At this point we know there is an ongoing periodic scan.
++		 * Create a new 6GHz passive scan request and append to the
++		 * command list
++		 */
++		freqs_6ghz = scan_freq_set_new();
++
++		scan_freq_set_foreach(allowed, scan_add_6ghz, freqs_6ghz);
++
++		msg = scan_build_cmd(sc, false, true, &params, freqs_6ghz);
++		l_queue_push_tail(sr->cmds, msg);
++
++		scan_freq_set_free(freqs_6ghz);
++
++check_periodic:
++		if (sc->sp.wait_on_regdom) {
++			/* Periodic scan results delayed until this update */
++			if (sr && l_queue_peek_head(sc->requests) == sr)
++				start_next_scan_request(&sr->work);
++
++			sc->sp.wait_on_regdom = false;
++		}
++
++		break;
++	default:
 +		return;
-+
-+	scan_freq_set_foreach(allowed, scan_foreach_freq_split_bands, subsets);
-+	scan_freq_set_free(allowed);
-+
-+	for(i = 0; i < L_ARRAY_SIZE(subsets); i++) {
-+		if (!subsets[i])
-+			continue;
-+
-+		scan_build_next_cmd(cmds, sc, passive, params,
-+					subsets[i]);
-+		scan_freq_set_free(subsets[i]);
 +	}
++
++done:
++	scan_freq_set_free(allowed);
 +}
 +
- static int scan_request_send_trigger(struct scan_context *sc,
- 					struct scan_request *sr)
- {
-@@ -743,7 +824,7 @@ static void add_owe_scan_cmd(struct scan_context *sc, struct scan_request *sr,
- 	params.ssid_len = bss->owe_trans->ssid_len;
- 	params.flush = true;
++/*
++ * Should only used to initialize 'expect_6ghz'. This is only to cover the case
++ * of a scan context being created during a regulatory update, which means it
++ * would miss the START event. If a DONE event comes, and expect_6ghz is false,
++ * no further action would be taken which may be incorrect.
++ */
++static bool scan_expect_6ghz(struct wiphy *wiphy)
++{
++	const struct scan_freq_set *supported =
++					wiphy_get_supported_freqs(wiphy);
++
++	if (!(scan_freq_set_get_bands(supported) & BAND_FREQ_6_GHZ))
++		return false;
++
++	return wiphy_regdom_is_updating(wiphy);
++}
++
++static struct scan_context *scan_context_new(uint64_t wdev_id)
++{
++	struct wiphy *wiphy = wiphy_find_by_wdev(wdev_id);
++	struct scan_context *sc;
++
++	if (!wiphy)
++		return NULL;
++
++	sc = l_new(struct scan_context, 1);
++
++	sc->wdev_id = wdev_id;
++	sc->wiphy = wiphy;
++	sc->state = SCAN_STATE_NOT_RUNNING;
++	sc->requests = l_queue_new();
++	sc->expect_6ghz = scan_expect_6ghz(wiphy);
++	sc->wiphy_watch_id = wiphy_state_watch_add(wiphy, scan_wiphy_watch,
++							sc, NULL);
++
++	return sc;
++}
++
+ struct l_genl_msg *scan_build_trigger_scan_bss(uint32_t ifindex,
+ 						struct wiphy *wiphy,
+ 						uint32_t frequency,
+@@ -2120,6 +2245,10 @@ static void scan_notify(struct l_genl_msg *msg, void *user_data)
+ 		if (sr && sr->triggered) {
+ 			sr->triggered = false;
  
--	cmd = scan_build_cmd(sc, ignore_flush, false, &params);
-+	cmd = scan_build_cmd(sc, ignore_flush, false, &params, params.freqs);
- 
- 	l_genl_msg_enter_nested(cmd, NL80211_ATTR_SCAN_SSIDS);
- 	l_genl_msg_append_attr(cmd, 0, params.ssid_len, params.ssid);
++			/* Regdom changed during a periodic scan */
++			if (sc->sp.id == sr->work.id && sc->sp.wait_on_regdom)
++				return;
++
+ 			if (!sr->callback) {
+ 				scan_finished(sc, -ECANCELED, NULL, NULL, sr);
+ 				break;
 -- 
 2.34.3
 
