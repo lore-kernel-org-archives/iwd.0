@@ -1,130 +1,173 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ganymed.uberspace.de (ganymed.uberspace.de [185.26.156.242])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6D14C81
-	for <iwd@lists.linux.dev>; Wed,  3 Aug 2022 21:36:54 +0000 (UTC)
-Received: by mail-pg1-f170.google.com with SMTP id f65so16232229pgc.12
-        for <iwd@lists.linux.dev>; Wed, 03 Aug 2022 14:36:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=NMN4ENhg0USTSbcYp8In7w4M752ZysXh+ylnFB8Hq2I=;
-        b=jPB9qQzSsR8f4i2ZV89YeyEq+gmpp/YVpazHhLNPDsMjZlWMEBkcHIIc3l0Vm5Iidp
-         Kc9aCoHHmvxsgSQ5V5xge09D4WSrBBknuEZaa4TxBdVvjQ8wp8z6dGVmbogJKcs1kfWH
-         bANtyTzKpjcbFQ2jokZsKI9dYCQ694MhSf6Hw1NWfzeVT+HkmqEkcxEW70R6aRkXL90P
-         a6uyqyrxPWWGaXakOjeBv2D6VN9kq31DRlQSgyRJW7V6whpHVEMQwny7K+y8uYhTvl+V
-         id/soM7L9gbf7NaAUWXfz8rXcJDQEvgAkGAGpbWFCXdeAtnjA83pYMhlrCY6pHNsVmq+
-         iBKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=NMN4ENhg0USTSbcYp8In7w4M752ZysXh+ylnFB8Hq2I=;
-        b=FEFPiiXJydOthbP0tGssWj3z8SbW8w8VsiR1SwdvkbvDHjQBJHqV23mVIJ03NGNG8e
-         +nJHR2l7CTd7fKMh9FyksnHoA65WWl3D+Q4bipZYfCjcKJxMXNhghRsQUQnavzSpijVW
-         hCs8M2lCeOQ3njBnobyCGiMpy50SVkjGZcQfZZgWgEZBHzIFau7zNFjTM4C0Vwsrx+Cr
-         b24DctJ4m8/g2HTUkHQ6qZwvSPVJJAUpISS2pPpXU2IeWHpo5vT1qS4vIDYERYngfoTZ
-         OE2dxh7X7HjVAEqDzVapxeMnQF9XHcR/okgwwhgca9AXlfpFHCkTory2n4KkjPakHiGW
-         KbPA==
-X-Gm-Message-State: AJIora+Qz/enZM0thbrLSz7y7pkTB+Fob02GO4LxetO8OsXzp8ZaPcmr
-	jTpCCuNyiMp76PfJpSB0g91i6PCuxDg=
-X-Google-Smtp-Source: AGRyM1vAhTxhqXLIy2teJcoQUr1vEo8KLNL1qn57xhVGHExG0vjwXIkhXIm4vKVqyuw/xMzJwQFuSQ==
-X-Received: by 2002:a05:6a00:aca:b0:52b:bd66:8c94 with SMTP id c10-20020a056a000aca00b0052bbd668c94mr27993815pfl.3.1659562614180;
-        Wed, 03 Aug 2022 14:36:54 -0700 (PDT)
-Received: from jprestwo-xps.none ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id b13-20020a65578d000000b00419fc2c27d8sm11527066pgr.43.2022.08.03.14.36.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Aug 2022 14:36:53 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 13/13] wiphy: don't re-dump wiphy if the regdom didn't change
-Date: Wed,  3 Aug 2022 14:36:44 -0700
-Message-Id: <20220803213644.277534-13-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20220803213644.277534-1-prestwoj@gmail.com>
-References: <20220803213644.277534-1-prestwoj@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADF3210F
+	for <iwd@lists.linux.dev>; Thu,  4 Aug 2022 11:11:52 +0000 (UTC)
+Received: (qmail 20046 invoked by uid 989); 4 Aug 2022 11:05:08 -0000
+Authentication-Results: ganymed.uberspace.de;
+	auth=pass (plain)
+Message-ID: <323e3bd2-e17f-bd9e-51ac-714d2befd060@a-kobel.de>
+Date: Thu, 4 Aug 2022 13:05:03 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Content-Language: en-US
+To: iwd@lists.linux.dev
+From: Alexander Kobel <a-kobel@a-kobel.de>
+Subject: [PATCH] manager: Fix typo
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms080300070702000208030006"
+X-Rspamd-Bar: -----
+X-Rspamd-Report: BAYES_HAM(-2.999018) SIGNED_SMIME(-2) MIME_GOOD(-0.2)
+X-Rspamd-Score: -5.199018
+Received: from unknown (HELO unkown) (::1)
+	by ganymed.uberspace.de (Haraka/2.8.28) with ESMTPSA; Thu, 04 Aug 2022 13:05:08 +0200
 
-For whatever reason the kernel will send regdom updates even if
-the regdom didn't change. This ends up causing wiphy to dump
-which isn't needed since there should be no changes in disabled
-frequencies.
+This is a cryptographically signed message in MIME format.
 
-Now the previous country is checked against the new one, and if
-they match the wiphy is not dumped again.
+--------------ms080300070702000208030006
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
 ---
- src/wiphy.c | 38 +++++++++++++++++++++++++++-----------
- 1 file changed, 27 insertions(+), 11 deletions(-)
+ src/manager.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index dec4b15e..cf7bd9bd 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -2029,7 +2029,20 @@ static void wiphy_dump_after_regdom(struct wiphy *wiphy)
- static void wiphy_update_reg_domain(struct wiphy *wiphy, bool global,
- 					struct l_genl_msg *msg)
- {
--	char *out_country;
-+	char out_country[2];
-+	char *orig;
-+
-+	/*
-+	 * Write the new country code or XX if the reg domain is not a
-+	 * country domain.
-+	 */
-+	if (nl80211_parse_attrs(msg, NL80211_ATTR_REG_ALPHA2, out_country,
-+				NL80211_ATTR_UNSPEC) < 0)
-+		out_country[0] = out_country[1] = 'X';
-+
-+	l_debug("New reg domain country code for %s is %c%c",
-+		global ? "(global)" : wiphy->name,
-+		out_country[0], out_country[1]);
+diff --git a/src/manager.c b/src/manager.c
+index 437841b3..6ff642f1 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -755,7 +755,7 @@ static void manager_config_notify(struct l_genl_msg *msg, void *user_data)
  
- 	if (global)
- 		/*
-@@ -2043,21 +2056,24 @@ static void wiphy_update_reg_domain(struct wiphy *wiphy, bool global,
- 		 * wiphy created (that is not self-managed anyway) and we
- 		 * haven't received any REG_CHANGE events yet.
- 		 */
--		out_country = regdom_country;
-+		orig = regdom_country;
-+
- 	else
--		out_country = wiphy->regdom_country;
-+		orig = wiphy->regdom_country;
- 
- 	/*
--	 * Write the new country code or XX if the reg domain is not a
--	 * country domain.
-+	 * The kernel seems to send regdom updates even if the country didn't
-+	 * change. Skip these as there is no reason to re-dump.
- 	 */
--	if (nl80211_parse_attrs(msg, NL80211_ATTR_REG_ALPHA2, out_country,
--				NL80211_ATTR_UNSPEC) < 0)
--		out_country[0] = out_country[1] = 'X';
-+	if (orig[0] == out_country[0] && orig[1] == out_country[1]) {
-+		if (wiphy && wiphy->get_reg_id)
-+			wiphy->get_reg_id = 0;
- 
--	l_debug("New reg domain country code for %s is %c%c",
--		global ? "(global)" : wiphy->name,
--		out_country[0], out_country[1]);
-+		return;
-+	}
-+
-+	orig[0] = out_country[0];
-+	orig[1] = out_country[1];
- 
- 	/* Don't dump wiphy from a GET_REG call */
- 	if (wiphy && wiphy->get_reg_id) {
+ 		if (!wiphy_find(wiphy_id)) {
+ 			l_warn("Received a NEW_INTERFACE for a wiphy id"
+-				" that isn't tracked.  This is most ikely a"
++				" that isn't tracked.  This is most likely a"
+ 				" kernel bug where NEW_WIPHY events that are"
+ 				" too large are dropped on the floor."
+ 				"  Attempting a workaround...");
 -- 
-2.34.3
+2.37.1
 
+
+--------------ms080300070702000208030006
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCC
+Ew0wggY9MIIEJaADAgECAgg3B676YzbKKTANBgkqhkiG9w0BAQsFADBSMQswCQYDVQQGEwJE
+RTEXMBUGA1UECgwORnJhdW5ob2ZlciBTSVQxKjAoBgNVBAMMIVZvbGtzdmVyc2NobHVlc3Nl
+bHVuZyBSb290IENBIEcwMjAeFw0yMDA1MjYxMzIxNDFaFw0zMDA1MjUxMzIxNDFaMFUxCzAJ
+BgNVBAYTAkRFMRcwFQYDVQQKDA5GcmF1bmhvZmVyIFNJVDEtMCsGA1UEAwwkVm9sa3N2ZXJz
+Y2hsdWVzc2VsdW5nIFByaXZhdGUgQ0EgRzAyMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIIC
+CgKCAgEAzW9OcLabPtfz9rbgtyyuNQCQkmI8cPW39VGsXLX1J9EIcUPvp1ysi6kuqMfw+YOC
+LjxopSIhpjhH/p84LzmcBJElRPkzWHJreZry+Lu5SDhOcOH49fNEo7UeYE0wkSJNv+jLMWwU
+H93dPaSNeRN/5/Peq6tcKTx0FflS2ZScP9OcPvXgp1c/bXYoRyiOGSVR8/+7qlwNuku2px6f
+0c6XOKOwkyTeSghmQ8vdfeqcMd9fNUhn/ijWFHahr0LUGB9We6SoxklOz9gfgSCjhInt+4qy
+N6bHl/utH/vj1qnuhkaP25h1eCbz2WKqv0wKWwa/r4F0ItLYYP2YhwICTNLDDT8GmctRdt2S
+yLmgXo9Gz0nrwrYuGMWcXNLm682Fgg3wQne0DTszFFUU8PrVOtgzB5Qm6DPrRSUHXQEfT7DY
+ZzDA+FmSoTSiCe+aoNPbglta4gDar0B/gni15LtCzW4tNhk3fXkYxEWpbq32vNy3wCDOQazc
+vxzko5Ior1iDZJNuzurtp5qRjAnOcUiKhNUJeBnmLDB/Di9XZHIQCD0EjiZzef0OR4+ZbPPM
+xl6n9KHdrZ2c8r3yjGJtGkeMc0aMkBpvYNDy/s4fYnE5MRIOWdmMnq23/DvCpsQtF5UWZlF9
+MaKVcjXmtGpnhpe0XOkFXvxd9PSM0Oe4uei+buhbF7ECAwEAAaOCARIwggEOMBIGA1UdEwEB
+/wQIMAYBAf8CAQAwHwYDVR0jBBgwFoAUPnwBB805qJCxODW0j7v1rBeEocAwTQYIKwYBBQUH
+AQEEQTA/MD0GCCsGAQUFBzAChjFodHRwOi8vdm9sa3N2ZXJzY2hsdWVzc2VsdW5nLmRlL2Nh
+L3Jvb3RjYV9nMDIuY3J0MBQGA1UdIAQNMAswCQYHKyQPCQMBATBDBgNVHR8EPDA6MDigNqA0
+hjJodHRwOi8vdm9sa3N2ZXJzY2hsdWVzc2VsdW5nLmRlL2NybC9yb290Y2FfZzAyLmNybDAd
+BgNVHQ4EFgQUBNGCAAc5XwIAgrw4HtCXwN3HOwMwDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3
+DQEBCwUAA4ICAQAPsI1fETAPUfq7LoI2FxRDylRduC/nVhVca7ORxhZXrFmksT/q1jHU4eXK
+IhcVms623/FHhcVHl1qB5G/cgU2OtjEP5/BXIRu4I78EZIhb8U3ZGe9gZql/RSOBD08lhmzv
+fRz+nwE2Pl9stzXKohjGRWyfFfuaWKLXUZzCK/wYX6IqhTxjkoEFSgejoO41B886rrm3+aaO
+5Db5EBW4gYWF9VCV3bmedmTJzbvOOYDxaVT1+O8E9Ym5BZL+qJNjgdjJXE1TUGyUg6ZweNHT
+dse6xTc9KhfnAyppkMUu9AKT6jkloA6l0/T3zEMKhvtf9gLYWJ0zMwm1JfQk5mVMZtQoOPYI
+Wj7IVUKPZJMizHoaAAIzi7C0w3XpN3xMDJOs5eRsRPk0qF8UulshIUA/6idOrg7eUY4WZGN1
+RZsFYyhBg1sPaeFyFAUs0XJUrWLOKO5f9VZGbmEF6gqbTxdwMCJZzonwpUxVwxKLMa+Z4EMG
+QoY1rLNPCRZlzhW+TRBsuy4tGN21PlhvcvEnxs8eHvqlwfM/KwYtXhLG8881KMMSzemRvX/c
+pNCU2YlHpAwpdm6cAn60leS0WPfTb6QAqmtQTij6uAfFN46hQDLqpfTWnoPSMvbeyFwqP6Fv
+V6RgquAIpe9p5daLY9M+Krkd7mH8QR2PN615TboR0ocoF4REdTCCBlwwggREoAMCAQICCBUM
+N0NLozG+MA0GCSqGSIb3DQEBCwUAMFUxCzAJBgNVBAYTAkRFMRcwFQYDVQQKDA5GcmF1bmhv
+ZmVyIFNJVDEtMCsGA1UEAwwkVm9sa3N2ZXJzY2hsdWVzc2VsdW5nIFByaXZhdGUgQ0EgRzAy
+MB4XDTIwMTAxMTE2NTIzN1oXDTIzMTAxMDE2NTIzN1owgYkxGDAWBgNVBAMMD0FMRVhBTkRF
+UiBLT0JFTDEOMAwGA1UEBAwFS09CRUwxEjAQBgNVBCoMCUFMRVhBTkRFUjFJMEcGA1UEBRNA
+RDQwMDNFMTc4OTlGMTQzMTI2ODExMzM0OUY1N0M1QzU0NEQ5RjcwNDVCQTkyMEJEMzdDQURB
+NTQzOEFGQ0EzODCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBAM9yNVKr/cuT0WnJ
+PLe7kmfd5Wo7rlb1F+harCy3OLgaTqkMI6j37OTXMAmdkZ0y7zrlhbEGCEpODaDPYwVSEb+s
+Cv05n3SAMCdy9kQlnqP9We7C/2mbnuKYhpO5P6mUVdPoM+tfTM22YH7CzO8sa1Tq1s/DrIZs
+NhXDRvWZEdDwUCjLPKVXGtTqHbUjs7OufxpbyzA7xHE5N7qRff1WrOuq/RS1OvGZVcUjLAmI
+loYCvYm1Q3oBYuSZygOsawjmJQ14fh7dKkOjogx6byElWAVBkUQxud8CtBHW+L4VY35uinRJ
+k81mwI8ac0zS5FEbYWoF9Gi5pWbCgoIvGXIMcPEQqu8mVBpN/CAMUOUlIkOPDvFqfiQ9TI2C
+xnNih8csWwVInRS7m8itJrnlbVfDwdHMJhPT522gCDOC6lXaRUizwGqRh/26W1dJqA2SYmEn
+EMH/TcP3eyiFLN5QDXm2odnh+rbvQbwEtlPxup24HGe8RqWFdiCOW1syM+V74lUn5wIDAQAB
+o4IBeTCCAXUwHQYDVR0RBBYwFIESYS1rb2JlbEBhLWtvYmVsLmRlMA4GA1UdDwEB/wQEAwIG
+wDATBgNVHSUEDDAKBggrBgEFBQcDBDAMBgNVHRMBAf8EAjAAMB8GA1UdIwQYMBaAFATRggAH
+OV8CAIK8OB7Ql8DdxzsDMIGCBggrBgEFBQcBAQR2MHQwQAYIKwYBBQUHMAKGNGh0dHA6Ly92
+b2xrc3ZlcnNjaGx1ZXNzZWx1bmcuZGUvY2EvcHJpdmF0ZWNhX2cwMi5jcnQwMAYIKwYBBQUH
+MAGGJGh0dHA6Ly9vY3NwLnZvbGtzdmVyc2NobHVlc3NlbHVuZy5kZTAUBgNVHSAEDTALMAkG
+ByskDwkDAQEwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL3ZvbGtzdmVyc2NobHVlc3NlbHVu
+Zy5kZS9jcmwvcHJpdmF0ZWNhX2cwMi5jcmwwHQYDVR0OBBYEFDadSlBdeaipQdbmS4vn439F
+6fkNMA0GCSqGSIb3DQEBCwUAA4ICAQBUhcmTTecspwaSgUUlrG/gUPzDLM/Ty0Jpz4GvRbRn
+kJxHlHAopkk8P1SXlnOy2kfC5LgFCRB9tJqSlXmIXwphm90fZKRGZU2dBgxGkDQppXGH6PjJ
+P52QAhvpztJDPEqfqkzcpKdkYuFg+KEzqZmsu8Mvy4rqCTRIAtOX5zHVFEIarp7YUMNhzGxg
+eQakmDjykC1Xksx/ULsX7r5QW5Fqp1ZL5obNmA2emJgn0VrKRIYY8vqnOwUi13G/lDa+fphz
+PMhpIKOKQ9Wy0Wn8mBdSdIqmt2L58Pu14ygwOkK3vnb/QKqayhwme2uf4waXG5or3wZdSr39
+SvvGZT8Z6cHw6n7Jw0+gRApkB1cUO7j1T/aHCBcZPJ5i6bBoGrT5E8IHIqj+oZXUCY7jxknL
+aHaiOARg8fFkf8lp3uy7ay4WcDIorPa9ugNaCP3SnYvtKvk44ulgMIjhvkG1Mga/70SA9Evq
+3cFUle3jaaEYujSxLnN8LVm39dR93QCqcdkIayPA9LT6vizlGoA6BdOMWDzKWWnoelYTb+Ip
+iqpafot50MCUqf1e2T0z8Ygki1LLOxlpi/DWQApb/Qq9EomeEYMKm0aJc7166pLiWsk1fWOX
+kwBa3phG+CbbUxqotGP++r39Dk8Diny+lYjkRXpoqggzF9g9uxARXBIw0H+G6XbgCzCCBmgw
+ggRQoAMCAQICCGRFBiAAmYjgMA0GCSqGSIb3DQEBCwUAMFUxCzAJBgNVBAYTAkRFMRcwFQYD
+VQQKDA5GcmF1bmhvZmVyIFNJVDEtMCsGA1UEAwwkVm9sa3N2ZXJzY2hsdWVzc2VsdW5nIFBy
+aXZhdGUgQ0EgRzAyMB4XDTIwMTAxMTE2NTIyM1oXDTIzMTAxMDE2NTIyM1owgYkxGDAWBgNV
+BAMMD0FMRVhBTkRFUiBLT0JFTDEOMAwGA1UEBAwFS09CRUwxEjAQBgNVBCoMCUFMRVhBTkRF
+UjFJMEcGA1UEBRNARDQwMDNFMTc4OTlGMTQzMTI2ODExMzM0OUY1N0M1QzU0NEQ5RjcwNDVC
+QTkyMEJEMzdDQURBNTQzOEFGQ0EzODCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGB
+AIHe4er7YlQrv+fgKBYbb2FSJLtzoB9s4ZhYgIfQuR1x9+WJvj9EMne5rsHB+OJ5bwZQ1Fnh
+qhJhtepikZhLDRVfRbzRdrOSzxnkePhH/SZ9VhtN6327PuSAwxe/te/DPDo6aWZj3d7RoioE
+UgkyF5gNWYu082LeSHbvNpDcHUN2Rs7XgZi5uBUnHR1btXA7BOzUMfPhEIqwuCDKLZAGCc0q
+2JKhKeOIOsoZ8lP2/HfW3Az1ij6xztb/HfoZnyZMpQC1ly7VgJU5rTLRJz39kscZSBcnxRqP
+8cE9rrlPZOgRPK2NR4x+30Sr9sOtnbRYldKWT4uCtqrPrnxNKiDkv3P2h1yKYbCamlqwaoJW
+cjrphzLycSGHitalla/f82xHSN+7gJHGp91WYIn+c6jPLcx0wmKUJBB1TIEaeh4izkqLwB0P
+1HUBHo50OdmTnRGdnvNt/+Xsc9KetVnmJM2bqXXDlgYMfsULoe6Y0AVemQFvd1V49GePGpGT
+NGMe5jf7NwIDAQABo4IBhTCCAYEwHQYDVR0RBBYwFIESYS1rb2JlbEBhLWtvYmVsLmRlMA4G
+A1UdDwEB/wQEAwIEMDAfBgNVHSUEGDAWBgorBgEEAYI3CgMEBggrBgEFBQcDBDAMBgNVHRMB
+Af8EAjAAMB8GA1UdIwQYMBaAFATRggAHOV8CAIK8OB7Ql8DdxzsDMIGCBggrBgEFBQcBAQR2
+MHQwQAYIKwYBBQUHMAKGNGh0dHA6Ly92b2xrc3ZlcnNjaGx1ZXNzZWx1bmcuZGUvY2EvcHJp
+dmF0ZWNhX2cwMi5jcnQwMAYIKwYBBQUHMAGGJGh0dHA6Ly9vY3NwLnZvbGtzdmVyc2NobHVl
+c3NlbHVuZy5kZTAUBgNVHSAEDTALMAkGByskDwkDAQEwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0
+cDovL3ZvbGtzdmVyc2NobHVlc3NlbHVuZy5kZS9jcmwvcHJpdmF0ZWNhX2cwMi5jcmwwHQYD
+VR0OBBYEFJiKTcJJSCtBVQS6oS4OSO8QKEWBMA0GCSqGSIb3DQEBCwUAA4ICAQBfdnVpzlnO
+JupsJfdYW9xyt3lSky85oA1qPichmW6UjrnIZdunQPJrCTTM+7wUqeqwlhbRmwUKgAPH/5fc
+cOnyMulgbvc50VV+mBK4ph/1/fhom7zJYEfvKEpPWg5tGx3/Mp6YIVvuhRnZ7vmodMGXgj/f
+1D7yHFJib/430e6pcD76DPaAFA1cVVp5FUP+b0fBzvgYjsgSwL2GTXXaNGEaLqBuhtmInBh/
+y4X2ZEz8kw6B2P0GpQ8jg+5I1tNM6vf/KH2FxDj/ykmSsgtyrQAddEjrNQbaQAzXTtHAPui/
+6/wbgYfLp05aH7PsLsKGdDS9yb8UaWfWgwFuFz3dLXSdI3YYhXB2QnASX5RV3ndnu9vwGmns
+c6iu4C9+h0hFdcWMIEso5K/mV/kXO31xzw7JLU2y5Nk7XEgrXwqFuX4ZruqCfw3EXP1hYnmt
+OtfAaSLzTdBS0GskGGnWAs12dJrL8FysZbtX5cgWMyT1nun8ksvSodVgQ+7BA5YHTwfHussP
+nPBDabaHmlOUVBi3IYZvoJ90XwuuMvVqcYeEzvuGDrssZHY2pG9DqTeXfzmUdpTfMy7zwu5K
+jBPKilDLTXJkrA5wlQpSihjSQG/UPLP+YDsrEuwwBC1DbcSn5KOyMXFpfxsoSegFzb0lxPRc
+6sScLr/v96FwvwWpL54Fp9dr0TGCA80wggPJAgEBMGEwVTELMAkGA1UEBhMCREUxFzAVBgNV
+BAoMDkZyYXVuaG9mZXIgU0lUMS0wKwYDVQQDDCRWb2xrc3ZlcnNjaGx1ZXNzZWx1bmcgUHJp
+dmF0ZSBDQSBHMDICCBUMN0NLozG+MA0GCWCGSAFlAwQCAQUAoIIBvTAYBgkqhkiG9w0BCQMx
+CwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yMjA4MDQxMTA1MDNaMC8GCSqGSIb3DQEJ
+BDEiBCBZraPVRJ4uANfMb1GJFFWfqFaCLedo6wEu520cEf5ZCTBsBgkqhkiG9w0BCQ8xXzBd
+MAsGCWCGSAFlAwQBKjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCA
+MA0GCCqGSIb3DQMCAgFAMAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMHAGCSsGAQQBgjcQBDFj
+MGEwVTELMAkGA1UEBhMCREUxFzAVBgNVBAoMDkZyYXVuaG9mZXIgU0lUMS0wKwYDVQQDDCRW
+b2xrc3ZlcnNjaGx1ZXNzZWx1bmcgUHJpdmF0ZSBDQSBHMDICCGRFBiAAmYjgMHIGCyqGSIb3
+DQEJEAILMWOgYTBVMQswCQYDVQQGEwJERTEXMBUGA1UECgwORnJhdW5ob2ZlciBTSVQxLTAr
+BgNVBAMMJFZvbGtzdmVyc2NobHVlc3NlbHVuZyBQcml2YXRlIENBIEcwMgIIZEUGIACZiOAw
+DQYJKoZIhvcNAQEBBQAEggGAas8oWw5aVDBQnxzsxgt6KffjNr+Zd3fLF03gSuigE+SCc3gC
+XQ0mF7OguZcWf1pJ3blGzQpF5CzS/bOv+oVenXBZEg3A2qt8WPIGA0Gn23iCR1kcX0tir6+A
+DsCZRW6+MK/HxnRhZW6v+TzyyYS3DBUnUPmdrZT1qnUq87Dlgir6+5Da6HoyrlD8kzLRHd81
+utunId6TQgsEEajyIn/wn08bdqzo15HqLXcPVMrg4fmL/zyE377gJnVTaK8/mcYkCOvEmfpO
+TKNGmrbLm0Jv3IZJj9KJLAhZJ1WzAL4I9LD8ioXjUTn7Wqj2wfPRpR9rXzoHTR2w8SIveZG/
+KSFH3kix2uk/qhQYv+1lJXv/QIC4OtlyJQ+4BcHqfGiw0e5/CJvxXRCu5uh7rh9ansyX8NKU
+axExsqd9mG+R8Zg2dlsPeKKwm6d9YF1AA16N04lx+58L/9j7g48vtrFZ+6iNAnygF3ctA7GW
+wte0LdxJVGMiIorHl4LQ9oUzm0VPMdunAAAAAAAA
+--------------ms080300070702000208030006--
