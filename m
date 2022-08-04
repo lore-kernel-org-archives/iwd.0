@@ -1,78 +1,108 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E9F7C
-	for <iwd@lists.linux.dev>; Thu,  4 Aug 2022 17:06:38 +0000 (UTC)
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-10ec41637b3so232040fac.4
-        for <iwd@lists.linux.dev>; Thu, 04 Aug 2022 10:06:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1DE28F9
+	for <iwd@lists.linux.dev>; Thu,  4 Aug 2022 18:51:16 +0000 (UTC)
+Received: by mail-pg1-f175.google.com with SMTP id 73so649652pgb.9
+        for <iwd@lists.linux.dev>; Thu, 04 Aug 2022 11:51:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=Pm6Fg7+689KeRTx8er3osU2ucx5lzmgjlpfDsH0i6jQ=;
-        b=H+N13BhD7hBi/KLGku1OuhcRqqXTtlDbhBswkwMjLO7zCrkNFkdltg4884tvw6St3f
-         RVj0cIWB+eKP/AnBgqMQHjXXEQTXoku5gALmBaSRiZQA2RY9aCYFTyfVqlyx9q7CBtxC
-         IcuJ1BoBRle+n3q7pRyKJ04+bBDiGG0QsvLL1+e15H5DFMsphlVCXj5VR13ZyWPHATTI
-         RJ4qMHq5JfmRRf5Joo9i5J+jiaQeG3N6mEpLfesj8Udw0YOYn1X/PJTPD8SWHFrT9Cq0
-         JG7eMMuK+uU459JDamqHKvr39KS0hXRGCUN0caoxEC5lQd04L63x7Jk7xDYJY2uw6Ovm
-         mmuw==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=Zk4Gb2yzPjGHSmFkTzbrJdoEFExhA3Rvdlbad4oek8A=;
+        b=JAFvsqdPrQNyt4ClUPIb2vxb0k61Tkl5SPCSpJZ7vFslvzSoyVrJC8VSUYHitzMo90
+         7isTbsb76JGZWKgPxYmAsbcN2e+KRRFgVU02gpnA4mMamYO+efGTc0p2PjGLugE5xoFe
+         Lovt24fp34CF6rohNYCpJ6jD02BvujB+W7xVQaN9+0+YT8lQGapr00lkhUy/1G+D/8Mk
+         g8RQw7l53K/PiFGDQpznjIk3E20ppB1wXkrAUuYVxy61EefntXLyDUtemmY3Uc275KMo
+         zVwCaAMzk3vjqfLcC7MGqGywa+f7+sLBRSphkJ7knpPyNMXYSEpoSe5aVXOhRDyIXzhD
+         DZ+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=Pm6Fg7+689KeRTx8er3osU2ucx5lzmgjlpfDsH0i6jQ=;
-        b=bvkx5fwa2kgJyXeDyb1uBfJNCvyWqFkII+XXX0x4Mn0TdauoA+PPgVE7pskHTGwNRn
-         YbfghJrZKLlF5Y8dmxmDRugDq3d7WN0kAeszyvBvHeIv8WSMyhUiYa6olPV2eg51g1xg
-         UHWWqN904dwBB6DJnFIKu0VmXV66UNw/Cw0X0Zh65NdHig+CTPOkWHQ+eUmwb07+qpmt
-         /DS1H98F6rRwyQKq+XKbUFrtwLcT0wtuzdbcmtD+9938qNJXA0DrfKu1WJAg9NedlUVN
-         L/7f34BLe4tXel40X2GRqHldCVaq4Rgsukiyql+i62oEV36PUU0J85wt2oFlCRw15nBb
-         u6Qw==
-X-Gm-Message-State: ACgBeo25i8XbbxeQYsLLof/qW5FVNvoiYzrSTZnAt+1oPR/70GSTesxL
-	HaJai8yQ1lrmw82gzEio1KM=
-X-Google-Smtp-Source: AA6agR5kO7o8/qulZ3PyKlktTqq35N497p9qlDARub7rKJ7dyasiyGDKJUFJxV37JBH3hYku7RsTug==
-X-Received: by 2002:a05:6870:f149:b0:dd:f3b0:986d with SMTP id l9-20020a056870f14900b000ddf3b0986dmr4671394oac.148.1659632797632;
-        Thu, 04 Aug 2022 10:06:37 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id f17-20020a056870899100b0010d3438b20esm228178oaq.29.2022.08.04.10.06.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Aug 2022 10:06:37 -0700 (PDT)
-Message-ID: <fce45fa4-cf76-63e8-a53e-09fbf0a4a426@gmail.com>
-Date: Thu, 4 Aug 2022 11:48:25 -0500
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=Zk4Gb2yzPjGHSmFkTzbrJdoEFExhA3Rvdlbad4oek8A=;
+        b=0Vn02Luq+SYt4IRRzk3ud0X+GeQKQR63dNF5hDD5Q2jQ59hDy2PKi3g1HzNZ0vX2H+
+         yhp8KM9tfYRLo8jDkNrx+Q0xYLv3SmsxEj9GU5f4GSm8Th3iGUE0v94yFObE+ichmGZN
+         NAsAZ7HmYyzE0G4LuPEyJ6SH096S5lG4M2SV/YmqzfdgHr3Iiw2L5ElaKZI+oZ0XKxj+
+         XEZ4UT/9zyXMZsmFpzJWlHlg4B0jZDI7szAgmN5Ta8QfMxMdN5Jvie8l2vXK1oGtmOs1
+         yRgVNqY0Da0A4HFid5jPHf19ieMu0pbuyXvoTvOXuKvDVgF0vp5e9F4HFEV6/a4t9PgE
+         H9Zg==
+X-Gm-Message-State: ACgBeo3wUEIEWJIqYtDFaqh7uBVwQZKen87/fipY/3kDg+pz4t5OBjjp
+	k1hbW3b0vuhETqbee9/SXOBpDLUlYXY=
+X-Google-Smtp-Source: AA6agR7P49edvbF+wGIk8nm4AviG7+JHE6nHAl87ekX+oo9X7yGWYM3RCHxVfCu8hnnySh9giXBwCA==
+X-Received: by 2002:aa7:8e91:0:b0:52d:8ebf:29a4 with SMTP id a17-20020aa78e91000000b0052d8ebf29a4mr3204355pfr.1.1659639075439;
+        Thu, 04 Aug 2022 11:51:15 -0700 (PDT)
+Received: from jprestwo-xps.none ([50.45.187.22])
+        by smtp.gmail.com with ESMTPSA id c7-20020a634e07000000b0041b3c112b1esm219954pgb.29.2022.08.04.11.51.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Aug 2022 11:51:15 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3 1/7] wiphy: track GET_REG ID
+Date: Thu,  4 Aug 2022 11:51:06 -0700
+Message-Id: <20220804185112.457670-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2 09/13] wiphy: add wiphy_country_is_unknown
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20220803213644.277534-1-prestwoj@gmail.com>
- <20220803213644.277534-9-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220803213644.277534-9-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Keep track of the GET_REG call so it can be canceled if the wiphy
+goes down.
+---
+ src/wiphy.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-On 8/3/22 16:36, James Prestwood wrote:
-> A helper to check whether the country code corresponds to a
-> real country, or some special code indicating the country isn't
-> yet set. For now, the special codes are OO (world roaming) and
-> XX (unknown entity).
-> ---
->   src/wiphy.c | 16 ++++++++++++++++
->   src/wiphy.h |  1 +
->   2 files changed, 17 insertions(+)
-> 
+v3:
+ * Moved this out into its own patch
 
-Applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 8cb9eb39..30b860da 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -121,6 +121,7 @@ struct wiphy {
+ 	/* Work queue for this radio */
+ 	struct l_queue *work;
+ 	bool work_in_callback;
++	unsigned int get_reg_id;
+ 
+ 	bool support_scheduled_scan:1;
+ 	bool support_rekey_offload:1;
+@@ -341,6 +342,9 @@ static void wiphy_free(void *data)
+ 
+ 	l_debug("Freeing wiphy %s[%u]", wiphy->name, wiphy->id);
+ 
++	if (wiphy->get_reg_id)
++		l_genl_family_cancel(nl80211, wiphy->get_reg_id);
++
+ 	for (i = 0; i < NUM_NL80211_IFTYPES; i++)
+ 		l_free(wiphy->iftype_extended_capabilities[i]);
+ 
+@@ -1875,6 +1879,8 @@ static void wiphy_get_reg_cb(struct l_genl_msg *msg, void *user_data)
+ 	uint32_t tmp;
+ 	bool global;
+ 
++	wiphy->get_reg_id = 0;
++
+ 	/*
+ 	 * NL80211_CMD_GET_REG contains an NL80211_ATTR_WIPHY iff the wiphy
+ 	 * uses a self-managed regulatory domain.
+@@ -1892,8 +1898,9 @@ static void wiphy_get_reg_domain(struct wiphy *wiphy)
+ 	msg = l_genl_msg_new(NL80211_CMD_GET_REG);
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY, 4, &wiphy->id);
+ 
+-	if (!l_genl_family_send(wiphy->nl80211, msg, wiphy_get_reg_cb, wiphy,
+-				NULL)) {
++	wiphy->get_reg_id = l_genl_family_send(wiphy->nl80211, msg,
++						wiphy_get_reg_cb, wiphy, NULL);
++	if (!wiphy->get_reg_id) {
+ 		l_error("Error sending NL80211_CMD_GET_REG for %s", wiphy->name);
+ 		l_genl_msg_unref(msg);
+ 	}
+-- 
+2.34.3
 
