@@ -1,277 +1,78 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93656AAD
-	for <iwd@lists.linux.dev>; Thu,  4 Aug 2022 22:02:53 +0000 (UTC)
-Received: by mail-pl1-f182.google.com with SMTP id iw1so1032835plb.6
-        for <iwd@lists.linux.dev>; Thu, 04 Aug 2022 15:02:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CBF23A1
+	for <iwd@lists.linux.dev>; Fri,  5 Aug 2022 17:06:22 +0000 (UTC)
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-10dc1b16c12so3565745fac.6
+        for <iwd@lists.linux.dev>; Fri, 05 Aug 2022 10:06:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=wfLBRlYqB6Hhy3IEaoMJSS9tQKJKoI49aX+f7vXHaWU=;
-        b=ZsHj5gL9H/JNWNoEP/KRIMSNOKWQc71MZArEA0ykDQDyWcYCTRpgbLcaS7TQknhSYl
-         357j9818IhPHW6u+avvOCMUpzgbCJ/B0vfDzPblA3S0m9rU6cmy0N1zx/DLRIR54xWrk
-         d/OYkozhrLJhziYzDCWNXg9xU3IfbkOuZKoFQuHVVfD+g4miIetHJDGdzZ5X8/xkdLhK
-         9PY+ET2Ei2gFXAH7ouGO0L5kCCDx83QZIC0sH67B6y5DaULnqYv6am8meG2yneil6WUI
-         6QiUZtsRydJ5Fi7VEmjx39pj44Hpt3MRNGc8SfyxWzpUBKoANUmPyA5541ux26jDt7q1
-         wytw==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc;
+        bh=OFhk5VP+yyUwC2+Y8324x23AJk+bFjsqmhDhcqC7lR4=;
+        b=lSdRlomY5wlFcqozr9kw9dozWsPFuQSTYSg+Ei0TofPXEy0rP+vqpOxBvJjD50QR66
+         clxm2uTIoEnZuIBHkvUQVbHp1gmxNVZfKjt7ACT9ADfh2HHN1dma6xJw4LNke1o1BQ7v
+         YLvVLAxtkH9nPRkDlrM+ctoli1WVI5Ex6kNEBhtrBFOiMHY0lWS7fceM/TKguhWRTpLR
+         XBsyjb3vLKKYvWKnhC6OOyvhcrgFb4GLGPblZ2PjtlyRjRhsrKf+SWIjZGAh31Z6r914
+         HllKUBXNNdOB9aJDvS4Qo2mckgjiCuroEsSy5CsCa6NKiau80/oCzf/ib4dj3e8UuXS1
+         tpCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=wfLBRlYqB6Hhy3IEaoMJSS9tQKJKoI49aX+f7vXHaWU=;
-        b=32UBS8jLa1Od+mwgSrJCng0B1DFJ1JhXvyQ1gJEkyDscQtugH30ayRgb0h/tbgyZ1M
-         58fb6ApSh2h/fmoKcc8zox37IrEs933VgdDPqVRpo8kDNJMUYMu0k+aYC81YUhgtStXR
-         ErbBeg7IO93+8CZ4gSa2OsEj+4/sn6QEq60IC4U8IWkt1LjEzv9bIOiWmU5BSSz00fmL
-         RqTtx/8upNMIuYZEZL7RTHVArx1MfvA0fVY1LFaDPRHy1beJwyFXJE1CCeCEFe8CgouT
-         YojDuzbttMoxCnEDwYrAqeWTHS8hPe9YYuVseLrVyxPyTiHhbtw/1NPyORQ58WiXjTgY
-         kuug==
-X-Gm-Message-State: ACgBeo2ZVXDJjgbTaO3S2Wj7bU99bIQeFHBNzhw3qeFO8tEni+k/VeUy
-	dyYWLd/e3hC6htqfWVrU1ubcTTY1ngQ=
-X-Google-Smtp-Source: AA6agR6PgwSrMSNdKZlK3/hKcZmERhUvtxX7Emiw3yAnzHrxj6/W/1Re8pJbayxiBAnqkOnYF0hpxQ==
-X-Received: by 2002:a17:902:c713:b0:16e:cbe3:29da with SMTP id p19-20020a170902c71300b0016ecbe329damr3642167plp.61.1659650573057;
-        Thu, 04 Aug 2022 15:02:53 -0700 (PDT)
-Received: from jprestwo-xps.none ([50.45.187.22])
-        by smtp.gmail.com with ESMTPSA id p3-20020a170902ebc300b0016dbdf7b97bsm1376886plg.266.2022.08.04.15.02.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Aug 2022 15:02:52 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 3/3] scan: watch for regdom updates to enable 6GHz
-Date: Thu,  4 Aug 2022 15:02:49 -0700
-Message-Id: <20220804220249.508207-3-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20220804220249.508207-1-prestwoj@gmail.com>
-References: <20220804220249.508207-1-prestwoj@gmail.com>
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=OFhk5VP+yyUwC2+Y8324x23AJk+bFjsqmhDhcqC7lR4=;
+        b=dg8UB+/TLx9zxhiu+kP5wHh9u1MqOfP70uzAJ20o8ESWx/Cizy9o7oeqhqKswDchMU
+         30fylC+eNzeSGLW1esPKOtGzGzkpZVlBer/klopntrWEWrx0055ejcPeEhzLOJWx6n1+
+         fhKxBhlnooYpj3ikDBTsT1ROfqDcyuoZrdEEdV1hsVs7sm63XqNxx5eWy7Pm2Vk1A4o2
+         zFORy2+jICHee3EBJq2Ll3wJZfofYUwsx5BcKv+hmO85M+sgmDrF6dGWvXrpHbvi7FU6
+         Rwx01ySFVd6HA8mBCiHZshsTwbh7X69SkkIUS+3m9lBdpspuUVaMK5nZTMOno8SpCKrt
+         jhZw==
+X-Gm-Message-State: ACgBeo1iRLd0PRjjWqaMzTG9IlGzQl4VjrF4IEprI/PJwEn4nDDikHPe
+	5t7deZNcIDzh7MvB5fRgdts=
+X-Google-Smtp-Source: AA6agR7M7iRcnjpzphlhzZwFQl5/csSmTrpILDNVF7IaJ9kkrbNX2g8j6bcmYIHP1UqMK9mMzbGbvw==
+X-Received: by 2002:a05:6870:430b:b0:f2:ca00:e775 with SMTP id w11-20020a056870430b00b000f2ca00e775mr7277619oah.288.1659719181891;
+        Fri, 05 Aug 2022 10:06:21 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id j13-20020a9d768d000000b00618ecbca69asm781398otl.74.2022.08.05.10.06.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Aug 2022 10:06:21 -0700 (PDT)
+Message-ID: <66f0e017-d0df-c0a3-1871-d4e80c7e8bae@gmail.com>
+Date: Fri, 5 Aug 2022 11:54:55 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v4 1/3] util: add scan_freq_set_copy_bands
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220804220249.508207-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220804220249.508207-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This functionality works around the kernel's behavior of allowing
-6GHz only after a regulatory domain update. If the regdom updates
-scan.c needs to be aware in order to split up periodic scans, or
-insert 6GHz frequencies into an ongoing periodic scan. Doing this
-allows any 6GHz BSS's to show up in the scan results rather than
-needing to issue an entirely new scan to see these BSS's.
----
- src/scan.c | 146 +++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 114 insertions(+), 32 deletions(-)
+Hi James,
 
-v4:
- * Remove wait_for_regdom/expect_6ghz flags. This reduced the complexity
-   and avoided the need to even check for the STARTED regdom event.
- * Fixed issue where a periodic scan waiting on the regdom wasn't parsing
-   the NEW_SCAN_RESULT frequencies before bailing out of the notify callback
- * Fixed issue where a periodic scan was not finished if a new scan command
-   was not appended.
+On 8/4/22 17:02, James Prestwood wrote:
+> This creates a new scan_freq_set from an input set which only contains
+> frequencies from bands included in the mask.
+> ---
+>   src/util.c | 21 +++++++++++++++++++++
+>   src/util.h |  2 ++
+>   2 files changed, 23 insertions(+)
 
-diff --git a/src/scan.c b/src/scan.c
-index 12c970a7..d044e80c 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -110,6 +110,7 @@ struct scan_request {
- 
- struct scan_context {
- 	uint64_t wdev_id;
-+	uint32_t wiphy_watch_id;
- 	/*
- 	 * Tells us whether a scan, our own or external, is running.
- 	 * Set when scan gets triggered, cleared when scan done and
-@@ -186,24 +187,6 @@ static void scan_request_failed(struct scan_context *sc,
- 	wiphy_radio_work_done(sc->wiphy, sr->work.id);
- }
- 
--static struct scan_context *scan_context_new(uint64_t wdev_id)
--{
--	struct wiphy *wiphy = wiphy_find_by_wdev(wdev_id);
--	struct scan_context *sc;
--
--	if (!wiphy)
--		return NULL;
--
--	sc = l_new(struct scan_context, 1);
--
--	sc->wdev_id = wdev_id;
--	sc->wiphy = wiphy;
--	sc->state = SCAN_STATE_NOT_RUNNING;
--	sc->requests = l_queue_new();
--
--	return sc;
--}
--
- static void scan_request_cancel(void *data)
- {
- 	struct scan_request *sr = data;
-@@ -229,6 +212,8 @@ static void scan_context_free(struct scan_context *sc)
- 	if (sc->get_fw_scan_cmd_id && nl80211)
- 		l_genl_family_cancel(nl80211, sc->get_fw_scan_cmd_id);
- 
-+	wiphy_state_watch_remove(sc->wiphy, sc->wiphy_watch_id);
-+
- 	l_free(sc);
- }
- 
-@@ -2006,6 +1991,108 @@ static void get_scan_done(void *user)
- 	l_free(results);
- }
- 
-+static void scan_get_results(struct scan_context *sc, struct scan_request *sr)
-+{
-+	struct scan_results *results;
-+	struct l_genl_msg *scan_msg;
-+
-+	results = l_new(struct scan_results, 1);
-+	results->sc = sc;
-+	results->time_stamp = l_time_now();
-+	results->sr = sr;
-+	results->bss_list = l_queue_new();
-+
-+	scan_msg = l_genl_msg_new_sized(NL80211_CMD_GET_SCAN, 8);
-+
-+	l_genl_msg_append_attr(scan_msg, NL80211_ATTR_WDEV, 8,
-+					&sc->wdev_id);
-+	sc->get_scan_cmd_id = l_genl_family_dump(nl80211, scan_msg,
-+						get_scan_callback,
-+						results, get_scan_done);
-+}
-+
-+static void scan_wiphy_watch(struct wiphy *wiphy,
-+				enum wiphy_state_watch_event event,
-+				void *user_data)
-+{
-+	struct scan_context *sc = user_data;
-+	struct scan_request *sr = NULL;
-+	struct l_genl_msg *msg = NULL;
-+	struct scan_parameters params = { 0 };
-+	struct scan_freq_set *freqs_6ghz;
-+	struct scan_freq_set *allowed;
-+	bool allow_6g;
-+	const struct scan_freq_set *supported =
-+					wiphy_get_supported_freqs(wiphy);
-+
-+	/* Only care about regulatory events, and if 6GHz capable */
-+	if (event != WIPHY_STATE_WATCH_EVENT_REGDOM_DONE ||
-+			!(scan_freq_set_get_bands(supported) & BAND_FREQ_6_GHZ))
-+		return;
-+
-+	if (!sc->sp.id)
-+		return;
-+
-+	sr = l_queue_find(sc->requests, scan_request_match,
-+						L_UINT_TO_PTR(sc->sp.id));
-+	if (!sr)
-+		return;
-+
-+	allowed = scan_get_allowed_freqs(sc);
-+	allow_6g = scan_freq_set_get_bands(allowed) & BAND_FREQ_6_GHZ;
-+
-+	/*
-+	 * This update did not allow 6GHz, or the original request was
-+	 * not expecting 6GHz. The periodic scan should now be ended.
-+	 */
-+	if (!allow_6g || !sr->split) {
-+		scan_get_results(sc, sr);
-+		goto free_allowed;
-+	}
-+
-+	/*
-+	 * At this point we know there is an ongoing periodic scan.
-+	 * Create a new 6GHz passive scan request and append to the
-+	 * command list
-+	 */
-+	freqs_6ghz = scan_freq_set_copy_bands(allowed, BAND_FREQ_6_GHZ);
-+
-+	msg = scan_build_cmd(sc, false, true, &params, freqs_6ghz);
-+	l_queue_push_tail(sr->cmds, msg);
-+
-+	scan_freq_set_free(freqs_6ghz);
-+
-+	/*
-+	 * If this periodic scan is at the top of the queue, continue
-+	 * running it.
-+	 */
-+	if (l_queue_peek_head(sc->requests) == sr)
-+		start_next_scan_request(&sr->work);
-+
-+free_allowed:
-+	scan_freq_set_free(allowed);
-+}
-+
-+static struct scan_context *scan_context_new(uint64_t wdev_id)
-+{
-+	struct wiphy *wiphy = wiphy_find_by_wdev(wdev_id);
-+	struct scan_context *sc;
-+
-+	if (!wiphy)
-+		return NULL;
-+
-+	sc = l_new(struct scan_context, 1);
-+
-+	sc->wdev_id = wdev_id;
-+	sc->wiphy = wiphy;
-+	sc->state = SCAN_STATE_NOT_RUNNING;
-+	sc->requests = l_queue_new();
-+	sc->wiphy_watch_id = wiphy_state_watch_add(wiphy, scan_wiphy_watch,
-+							sc, NULL);
-+
-+	return sc;
-+}
-+
- static bool scan_parse_flush_flag_from_msg(struct l_genl_msg *msg)
- {
- 	struct l_genl_attr attr;
-@@ -2094,8 +2181,6 @@ static void scan_notify(struct l_genl_msg *msg, void *user_data)
- 	switch (cmd) {
- 	case NL80211_CMD_NEW_SCAN_RESULTS:
- 	{
--		struct l_genl_msg *scan_msg;
--		struct scan_results *results;
- 		bool send_next = false;
- 		bool retry = false;
- 		bool get_results = false;
-@@ -2106,6 +2191,14 @@ static void scan_notify(struct l_genl_msg *msg, void *user_data)
- 		if (sr && sr->triggered) {
- 			sr->triggered = false;
- 
-+			/* Regdom changed during a periodic scan */
-+			if (sc->sp.id == sr->work.id &&
-+					wiphy_regdom_is_updating(sc->wiphy)) {
-+				scan_parse_result_frequencies(msg,
-+							sr->freqs_scanned);
-+				return;
-+			}
-+
- 			if (!sr->callback) {
- 				scan_finished(sc, -ECANCELED, NULL, NULL, sr);
- 				break;
-@@ -2162,20 +2255,9 @@ static void scan_notify(struct l_genl_msg *msg, void *user_data)
- 		if (!get_results)
- 			break;
- 
--		results = l_new(struct scan_results, 1);
--		results->sc = sc;
--		results->time_stamp = l_time_now();
--		results->sr = sr;
--		results->bss_list = l_queue_new();
--
- 		scan_parse_result_frequencies(msg, sr->freqs_scanned);
- 
--		scan_msg = l_genl_msg_new_sized(NL80211_CMD_GET_SCAN, 8);
--		l_genl_msg_append_attr(scan_msg, NL80211_ATTR_WDEV, 8,
--					&sc->wdev_id);
--		sc->get_scan_cmd_id = l_genl_family_dump(nl80211, scan_msg,
--							get_scan_callback,
--							results, get_scan_done);
-+		scan_get_results(sc, sr);
- 
- 		break;
- 	}
--- 
-2.34.3
+<snip>
 
+> +struct scan_freq_set *scan_freq_set_copy_bands(const struct scan_freq_set *set,
+> +						uint32_t band_mask);
+
+I renamed this scan_freq_set_clone() and applied, thanks.
+
+Regards,
+-Denis
