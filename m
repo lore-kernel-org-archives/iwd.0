@@ -1,47 +1,47 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5F13D90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00193D88
 	for <iwd@lists.linux.dev>; Mon,  8 Aug 2022 17:14:12 +0000 (UTC)
-Received: by mail-pf1-f173.google.com with SMTP id f192so8625661pfa.9
+Received: by mail-pg1-f170.google.com with SMTP id r22so6724878pgm.5
         for <iwd@lists.linux.dev>; Mon, 08 Aug 2022 10:14:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=opHczMfeZdStThwEfUauOQjRo99oUUDw5Ktzg8xvm2I=;
-        b=UAJmxYrM1wDu3FidDsphAwe0NVmGTDapNmvOT/gkrp23GHNs3x+kcaz5PLUkyKcoFG
-         K7TX2UaRd4z+9w1QA2a8GvjIUF1PGU3N7sA1dhTvxu3WSj3BUysG/qWIXfLibkxBKM7b
-         yoKqSUxePWexdGAaFWKLbuQQrq2kfCZbUVA1qnirG4jqd5UTYL+lLhiwhkgJy5iwn+KT
-         k9pZuveg2/2U2q3gakpRlVDjHqv0nQMTLu3WkX+RrhlJJHeN1gIh2Iy+/uR1IadSiRaO
-         mXadJr7SlwuxShwlJIT+lD5Aw87aBcKlaHYJhryRisAINQmzIpV0MgW8/Z0y+Cch430l
-         KVzA==
+        bh=Yq7eTnTHZKeOLbA2X8+EU/IZyNMTpolPM9o1DWQMPbg=;
+        b=bedcVmInVW6RwJnqGW3s0aeQOc0mQWWKll/v0LXnT1OvMa0Ynflgh5nuCNcUbNOdS9
+         wae16XYis5UJ40COXzaJwaYIIiJt2NRw1uAp0Rb2bugFE3epO5ismi/CKc8DSASXQmtc
+         2j/Gu60qCv4JpLUQ+YFHiBg9zdlRAyp4vV6GVgW6hS4KSgiyENVUmaGAaqzuSDxJ263z
+         55THyaVp/1R8EiVVv9dkFa+oIR3iBR++3+XxtnYuaTUEdk+w5YSwzpVAD0c2s59BZDUY
+         7oQtFR7V0RA52nAkA1z1rqmKMZbzFtVjONCp6rPFdZ29GPKeMcjCvpcgB2k4XKJ+tHBI
+         kZpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=opHczMfeZdStThwEfUauOQjRo99oUUDw5Ktzg8xvm2I=;
-        b=DqviJxNvuFD8bEwAU2Gq7NUUOOcqC53Ztmja3f9wwVXy7VWt50r5mISVHCT7YcOsSw
-         4OX2NT45Jc9uVl79b02w+8vCvmDfBFyQH8ZwZyQj99AurtL9xysOZw1zHCubAqhc6Df/
-         kZAImBLzbzpQuUswL+giSPUtW7qVjM8dwb7CrWd1yzgPsDnQjR2FLwV1y+8PAbleArZ0
-         ZZuVdzGabn62b4ylnq4MXE9+Wbg6CoKdn/RSXEeNIKVsWsdZWexSnC7W/bh1DEFPQV2C
-         QVlRqAa9qBOvS5iB2ovKER8QtVnQw9wE+8lgrzy9wzZKI7rVlN1EPDL6/Ane8pWY6s71
-         zHhA==
-X-Gm-Message-State: ACgBeo3AMZxSUfoKfPfOZrE4Xtt2sNuPHwob0ZquhbPQF9CVf4ZKqYNZ
-	G5ZHlAX1qY8d43rYgAljYVg3KLNyZ3A=
-X-Google-Smtp-Source: AA6agR49EYaR2Pn6z3NL5Ad22aGRtzH5GzMByq07xjtqQZs7/BFZ+90YPdubRve/pl8SS49aM9f/+g==
-X-Received: by 2002:a65:6043:0:b0:41d:978:7a47 with SMTP id a3-20020a656043000000b0041d09787a47mr12353842pgp.484.1659978851424;
-        Mon, 08 Aug 2022 10:14:11 -0700 (PDT)
+        bh=Yq7eTnTHZKeOLbA2X8+EU/IZyNMTpolPM9o1DWQMPbg=;
+        b=LNTsdcJvE0dI9TVjFTjYHi01x7FgU4NPJOodIz9oaka3uz1vWLW3MA/qhXCtAMRfsC
+         irRJihv7N4Do+LqEcuG/0fozwqpgGN/BgJWFPyPo01MY7SjqLgzLFyYiX50C5S5aJD+f
+         V27sSvpg+tkuekzzm7U+bfhym+DkYyFbWNrMOx+ZE+r2sly6sH6Lhg8+KMjSzC6OGmI3
+         2BUfBihOIlrYvVsEUy4fsUJbnH8D/GncSlY7yFwSXO4dblKareCHENNKLihtvkOc3owv
+         lAbaHrma+dQj+IjCa0fMOcpjilowIb5fsS6pAjQOqXya4W9/6N/DC1+Y+0B4o7o0v1pW
+         D/oQ==
+X-Gm-Message-State: ACgBeo0jYmipL928VgZAse1YGRVHkkhuMI1DFbxxhNTE9M8UW9Yuhfp6
+	aZexPzD4qcMo93+oVBsneRSEIPbEVw0=
+X-Google-Smtp-Source: AA6agR5gN03ccrtMBGRvwnXEP0N4RfKW6QjcQpqrbx9YeA8ADkMuXQ4v/undPijhh7fiIwcIWlaxVQ==
+X-Received: by 2002:a65:6b96:0:b0:41a:617f:e193 with SMTP id d22-20020a656b96000000b0041a617fe193mr16147369pgw.85.1659978852006;
+        Mon, 08 Aug 2022 10:14:12 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
-        by smtp.gmail.com with ESMTPSA id w1-20020a1709026f0100b0016dd667d511sm8932754plk.252.2022.08.08.10.14.10
+        by smtp.gmail.com with ESMTPSA id w1-20020a1709026f0100b0016dd667d511sm8932754plk.252.2022.08.08.10.14.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 08 Aug 2022 10:14:11 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/4] network: add setter/getter/flag for forcing default OWE group
-Date: Mon,  8 Aug 2022 10:14:05 -0700
-Message-Id: <20220808171406.12931-3-prestwoj@gmail.com>
+Subject: [PATCH 4/4] station: re-try OWE if buggy AP is detected
+Date: Mon,  8 Aug 2022 10:14:06 -0700
+Message-Id: <20220808171406.12931-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220808171406.12931-1-prestwoj@gmail.com>
 References: <20220808171406.12931-1-prestwoj@gmail.com>
@@ -53,66 +53,75 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If a OWE network is buggy and requires the default group this info
-needs to be stored in network in order for it to set this into the
-handshake on future connect attempts.
+Some APs use an older hostapd OWE implementation which incorrectly
+derives the PTK. To work around this group 19 should be used for
+these APs. If there is a failure (reason=2) and the AKM is OWE
+set force default group into network and retry. If this has been
+done already the behavior is no different and the BSS will be
+blacklisted.
 ---
- src/network.c | 14 ++++++++++++++
- src/network.h |  2 ++
- 2 files changed, 16 insertions(+)
+ src/station.c | 37 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/src/network.c b/src/network.c
-index 70cb925c..c0befa42 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -88,6 +88,7 @@ struct network {
- 	bool provisioning_hidden:1;
- 	uint8_t transition_disable; /* Temporary cache until info is set */
- 	bool have_transition_disable:1;
-+	bool force_default_owe_group:1;
- 	int rank;
- 	/* Holds DBus Connect() message if it comes in before ANQP finishes */
- 	struct l_dbus_message *connect_after_anqp;
-@@ -525,6 +526,9 @@ int network_handshake_setup(struct network *network, struct scan_bss *bss,
- 		handshake_state_set_protocol_version(hs, eapol_proto_version);
- 	}
- 
-+	if (hs->akm_suite == IE_RSN_AKM_SUITE_OWE)
-+		hs->force_default_owe_group = network->force_default_owe_group;
-+
- 	/*
- 	 * The randomization options in the provisioning file are dependent on
- 	 * main.conf: [General].AddressRandomization=network. Any other value
-@@ -764,6 +768,16 @@ void network_set_info(struct network *network, struct network_info *info)
- 					IWD_NETWORK_INTERFACE, "KnownNetwork");
+diff --git a/src/station.c b/src/station.c
+index c5dfc48e..40f9848f 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2815,6 +2815,31 @@ static bool station_try_next_bss(struct station *station)
+ 	return true;
  }
  
-+void network_set_force_default_owe_group(struct network *network)
++static bool station_retry_owe_default_group(struct station *station)
 +{
-+	network->force_default_owe_group = true;
++	const uint8_t *rsne = station->connected_bss->rsne;
++	struct ie_rsn_info info;
++
++	if (!rsne)
++		return false;
++
++	if (ie_parse_rsne_from_data(rsne, rsne[1] + 2, &info))
++		return false;
++
++	if (!(info.akm_suites & IE_RSN_AKM_SUITE_OWE))
++		return false;
++
++	/* If we already forced group 19, allow the BSS to be blacklisted */
++	if (network_get_force_default_owe_group(station->connected_network))
++		return false;
++
++	l_debug("Buggy OWE AP detected, retrying by forcing group 19!");
++
++	network_set_force_default_owe_group(station->connected_network);
++
++	return true;
 +}
 +
-+bool network_get_force_default_owe_group(struct network *network)
-+{
-+	return network->force_default_owe_group;
-+}
-+
- static inline bool __bss_is_sae(const struct scan_bss *bss,
- 						const struct ie_rsn_info *rsn)
+ static bool station_retry_with_reason(struct station *station,
+ 					uint16_t reason_code)
  {
-diff --git a/src/network.h b/src/network.h
-index d69d63b0..c6b99f6c 100644
---- a/src/network.h
-+++ b/src/network.h
-@@ -58,6 +58,8 @@ void network_sync_settings(struct network *network);
+@@ -2825,12 +2850,20 @@ static bool station_retry_with_reason(struct station *station,
+ 	 * Other reason codes can be added here if its decided we want to
+ 	 * fail in those cases.
+ 	 */
+-	if (reason_code == MMPDU_REASON_CODE_PREV_AUTH_NOT_VALID ||
+-			reason_code == MMPDU_REASON_CODE_IEEE8021X_FAILED)
++	switch (reason_code) {
++	case MMPDU_REASON_CODE_PREV_AUTH_NOT_VALID:
++		if (station_retry_owe_default_group(station))
++			goto try_next;
++		/* fall through */
++	case MMPDU_REASON_CODE_IEEE8021X_FAILED:
+ 		return false;
++	default:
++		break;
++	}
  
- const struct network_info *network_get_info(const struct network *network);
- void network_set_info(struct network *network, struct network_info *info);
-+void network_set_force_default_owe_group(struct network *network);
-+bool network_get_force_default_owe_group(struct network *network);
+ 	blacklist_add_bss(station->connected_bss->addr);
  
- int network_can_connect_bss(struct network *network,
- 						const struct scan_bss *bss);
++try_next:
+ 	return station_try_next_bss(station);
+ }
+ 
 -- 
 2.34.3
 
