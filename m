@@ -1,47 +1,47 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBF4468E
-	for <iwd@lists.linux.dev>; Tue,  9 Aug 2022 18:48:10 +0000 (UTC)
-Received: by mail-pj1-f43.google.com with SMTP id q7-20020a17090a7a8700b001f300db8677so13042327pjf.5
-        for <iwd@lists.linux.dev>; Tue, 09 Aug 2022 11:48:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9023C4693
+	for <iwd@lists.linux.dev>; Tue,  9 Aug 2022 18:48:11 +0000 (UTC)
+Received: by mail-pj1-f46.google.com with SMTP id 15-20020a17090a098f00b001f305b453feso18524260pjo.1
+        for <iwd@lists.linux.dev>; Tue, 09 Aug 2022 11:48:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=IPu+zk/t4fWWnok/PJoKTmzBeUVbEvPoKTaQGz6oXnw=;
-        b=Z8+24CtGxzdv0mXgwHHOPqD1t93tjtDTYohnuWTY1AO+OQHnGzNLtQtVGGgXBF6q51
-         vUghkepeCY/yPStXGC8UccB9/Ru9xLQf8EIlKB+YaoKhA9wSHEJyk2gLq7bt+meXDV4p
-         427sdeFq4RZA9d2t8q4tsIPbAhvUn2gl06vzmR4/Y6UWI3kYgTuqztpMfuo/IuBrEhaM
-         T0T/Je61euz0AcmQWgU+YWlAM9SaKzUgoxW4r0rpS8fRv3/yEDZSEjnerZTPXau++rKa
-         xMdYu4g6Ry8qENjduQSg7F+6ta1G1P0rt3rrUVhcQm8Se2OT1389fo4cv3WZkTQV5s3Q
-         NzLw==
+        bh=DQ9SFN96wr9VZA9gLupqLHzJJW2TZ7neyOqY6kogg24=;
+        b=JdsVkX1rOFpRzy50vKBsBlh4zN1FIHGZef1jvRHUZJUJai8PGXCPGx9QbbqqU2ADxr
+         yVQNAehCAzOYRra2aWRjy63n9BS5BM4rfeVMweYJQSm8Xd7EO+ezChxOisM1xGZsRUmC
+         DUtn7Kb315pUtB1o05uoX9MHhtIp+7YCXxLSHWFc/Y7/Y/CqUOePNIweADhuckRE7AU0
+         jdhflaReZU+hj4MT5tgz21be7vQviY8fzxYe5l7OraSLVINcXktEJufrN++/nUvwZWYW
+         HP4ZtxXXPwcUPexi8A8EE9oM180XKnlbcpgumyVGVMUr1LRoy+lCmykU/PSWwE279awS
+         u3Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=IPu+zk/t4fWWnok/PJoKTmzBeUVbEvPoKTaQGz6oXnw=;
-        b=boGoo9hKLlFQJcGSkrj9RhCJc1F3KMzRSL+gInXqT5UW8dQvwquy2DVHHizTDXyaPm
-         +jNsGxxd0HqKn/LRdPnxDwdmLK0dyDC3hZdZbYTzfkLJYy+ljW1G9SKZ92rkkYFXoMjI
-         G7y/8gQ6yO2T51PyJEm+UWconvY3dDuwzoIQ85b1pyaFDP26xYtNybB+B2hk8lR3C20T
-         iiM6it6mdfuIYf5TaEiovADDXmRscsCGiyAUhZpIzKt4K+KdG3DOdVbOHG08hAe/XdXA
-         KK6sFr8XPkr0FkHOZQMZK2qJ4w2zhwH4JZylT7w7vSI9a8oTuj9AWNdDeJOPsKa/p/EA
-         FUJw==
-X-Gm-Message-State: ACgBeo2IwoaM7WDlRtAoY5FK7sp4qwq7A64ONq43+xSRuzt7yr4+JBU7
-	G1qy09PrFv2BSMojSNYykc9G3ooEEyI=
-X-Google-Smtp-Source: AA6agR7Q09xqThHmC3ak2epXVjYfmkSoLjNWrFyUkZeBjqLNP9uXiOkXHZnUDSRsj+EcYL7QpJ3Sjg==
-X-Received: by 2002:a17:902:bc49:b0:16d:ac99:f96f with SMTP id t9-20020a170902bc4900b0016dac99f96fmr24473025plz.130.1660070889901;
-        Tue, 09 Aug 2022 11:48:09 -0700 (PDT)
+        bh=DQ9SFN96wr9VZA9gLupqLHzJJW2TZ7neyOqY6kogg24=;
+        b=HrjS2KNB0xgVsrSxM9XGGrFdBsUhrSonjYkZH/138yXWi2oermc8Pgi7OPp1rva+NB
+         1u9T6PomvDXhf04vqxNmNXkJITkc3Vp/wvtVLrLjazOPZ8O6eiTnelf2M26vdoIyzQot
+         aRUh1WMVDNW6c2gMVCbZIerJ7kQ7yj3V6VXEvmOteNzgPLg8ZzSi2OiaXhFPhWVRckAU
+         cNgFoWrm68i0atjS7MuNrNs7Hi/kvL6iklyHhSQytl0KcSNj1mW4DaaL8jIXx7myvM9e
+         5VgeQA3KfyGlmVRcXnNo2HJPxXWTL+H7CsUWdtRzBindl+gRye9YMcC84IXQOeijXtIX
+         GCkg==
+X-Gm-Message-State: ACgBeo0+GoCm/j6bA52bMqKZOHBG9/8rQqR58zWrYThgvS3BvZveDnEz
+	QOlRiGO9hGq0gEGLqx5rqUFagl9074o=
+X-Google-Smtp-Source: AA6agR4gwWU8TOe8gSkU5P4PYULGGgWjVVYPbdU0jL84Z1gkZHIXNAFPacFX+ysJq+6ECw4Vy7JcwA==
+X-Received: by 2002:a17:902:8683:b0:171:3114:7678 with SMTP id g3-20020a170902868300b0017131147678mr1115748plo.172.1660070890801;
+        Tue, 09 Aug 2022 11:48:10 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
-        by smtp.gmail.com with ESMTPSA id x15-20020a170902ec8f00b0016a0bf0ce32sm11403157plg.70.2022.08.09.11.48.09
+        by smtp.gmail.com with ESMTPSA id x15-20020a170902ec8f00b0016a0bf0ce32sm11403157plg.70.2022.08.09.11.48.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Aug 2022 11:48:09 -0700 (PDT)
+        Tue, 09 Aug 2022 11:48:10 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/4] monitor: add more array type support
-Date: Tue,  9 Aug 2022 11:48:05 -0700
-Message-Id: <20220809184807.147780-2-prestwoj@gmail.com>
+Subject: [PATCH 4/4] monitor: add support for HE element
+Date: Tue,  9 Aug 2022 11:48:07 -0700
+Message-Id: <20220809184807.147780-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220809184807.147780-1-prestwoj@gmail.com>
 References: <20220809184807.147780-1-prestwoj@gmail.com>
@@ -53,104 +53,49 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The ATTR_ARRAY type was quite limited, only supporting u16/u32 and
-addresses. This moves 'array_type' out of the union in attr_entry
-which allows nested/function to be supplied along with array_type.
-
-This poses an issue with defining const entries unless array_type
-is moved *after* the union. Otherwise nearly every single definition
-would require setting array_type to zero in the const definition.
-
-Instead array_type will come after the union, and the few definitions
-which use ATTR_ARRAY have been updated to fix the compile errors.
+Support for the HE IE.
 ---
- monitor/nlmon.c | 32 +++++++++++++++++++++++---------
- 1 file changed, 23 insertions(+), 9 deletions(-)
+ monitor/nlmon.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 54aaa465..cb1097fa 100644
+index d7327abb..2a68d0dc 100644
 --- a/monitor/nlmon.c
 +++ b/monitor/nlmon.c
-@@ -139,11 +139,13 @@ struct attr_entry {
- 	uint16_t attr;
- 	const char *str;
- 	enum attr_type type;
-+
- 	union {
- 		const struct attr_entry *nested;
--		enum attr_type array_type;
- 		attr_func_t function;
- 	};
-+
-+	enum attr_type array_type;
- };
- 
- static void print_attributes(int indent, const struct attr_entry *table,
-@@ -6230,11 +6232,9 @@ static const struct attr_entry attr_table[] = {
- 	{ NL80211_ATTR_MAX_NUM_SCAN_SSIDS,
- 			"Max Number Scan SSIDs", ATTR_U8 },
- 	{ NL80211_ATTR_SCAN_FREQUENCIES,
--			"Scan Frequencies", ATTR_ARRAY,
--						{ .array_type = ATTR_U32 } },
-+			"Scan Frequencies", ATTR_ARRAY, {}, ATTR_U32 },
- 	{ NL80211_ATTR_SCAN_SSIDS,
--			"Scan SSIDs", ATTR_ARRAY,
--					{ .array_type = ATTR_BINARY } },
-+			"Scan SSIDs", ATTR_ARRAY, {}, ATTR_BINARY },
- 	{ NL80211_ATTR_GENERATION,
- 			"Generation", ATTR_U32 },
- 	{ NL80211_ATTR_BSS,
-@@ -6488,8 +6488,7 @@ static const struct attr_entry attr_table[] = {
- 	{ NL80211_ATTR_ACL_POLICY,
- 			"ACL Policy", ATTR_U32 },
- 	{ NL80211_ATTR_MAC_ADDRS,
--			"MAC Addresses", ATTR_ARRAY,
--					{ .array_type = ATTR_ADDRESS } },
-+			"MAC Addresses", ATTR_ARRAY, {}, ATTR_ADDRESS },
- 	{ NL80211_ATTR_MAC_ACL_MAX,
- 			"MAC ACL Max" },
- 	{ NL80211_ATTR_RADAR_EVENT,
-@@ -6691,6 +6690,7 @@ static void print_value(int indent, const char *label, enum attr_type type,
- }
- 
- static void print_array(int indent, enum attr_type type,
-+						const struct attr_entry *entry,
- 						const void *buf, uint32_t len)
- {
- 	const struct nlattr *nla;
-@@ -6700,8 +6700,22 @@ static void print_array(int indent, enum attr_type type,
- 		char str[8];
- 
- 		snprintf(str, sizeof(str), "%u", nla_type);
--		print_value(indent, str, type,
-+
-+		switch (type) {
-+		case ATTR_NESTED:
-+			if (entry->nested)
-+				print_attributes(indent + 1, entry->nested,
-+					NLA_DATA(nla), NLA_PAYLOAD(nla));
-+			else
-+				printf("missing nested table\n");
-+			break;
-+		default:
-+			print_value(indent, str, type,
- 				NLA_DATA(nla), NLA_PAYLOAD(nla));
-+			break;
-+		}
-+
-+
+@@ -5540,6 +5540,24 @@ static void print_band_rates(unsigned int level, const char *label,
  	}
  }
  
-@@ -6832,7 +6846,7 @@ static void print_attributes(int indent, const struct attr_entry *table,
- 						NLA_PAYLOAD(nla));
- 			if (array_type == ATTR_UNSPEC)
- 				printf("missing type\n");
--			print_array(indent + 1, array_type,
-+			print_array(indent + 1, array_type, &table[i],
- 					NLA_DATA(nla), NLA_PAYLOAD(nla));
- 			break;
- 		case ATTR_FLAG_OR_U16:
++static const struct attr_entry iftype_data_table[] = {
++	{ NL80211_BAND_IFTYPE_ATTR_IFTYPES, "Interface Types", ATTR_NESTED,
++			{ iftype_table } },
++	{ NL80211_BAND_IFTYPE_ATTR_HE_CAP_MAC, "HE MAC Capabilities",
++			ATTR_BINARY },
++	{ NL80211_BAND_IFTYPE_ATTR_HE_CAP_PHY, "HE PHY Capabilities",
++			ATTR_BINARY },
++	{ NL80211_BAND_IFTYPE_ATTR_HE_CAP_MCS_SET, "HE NSS/MCS Set",
++			ATTR_BINARY },
++	{ NL80211_BAND_IFTYPE_ATTR_HE_CAP_PPE, "HE PPE Thresholds",
++			ATTR_BINARY },
++	{ NL80211_BAND_IFTYPE_ATTR_MAX, "Highest band HE capability attribute",
++			ATTR_BINARY },
++	{ NL80211_BAND_IFTYPE_ATTR_HE_6GHZ_CAPA, "HE 6GHz band capabilities",
++			ATTR_BINARY },
++	{ }
++};
++
+ static const struct attr_entry wiphy_bands_table[] = {
+ 	{ NL80211_BAND_ATTR_FREQS, "Frequencies",
+ 			ATTR_CUSTOM, { .function = print_band_frequencies } },
+@@ -5553,6 +5571,8 @@ static const struct attr_entry wiphy_bands_table[] = {
+ 	{ NL80211_BAND_ATTR_HT_AMPDU_DENSITY, "AMPDU Density" },
+ 	{ NL80211_BAND_ATTR_VHT_MCS_SET, "VHT MCS Set" },
+ 	{ NL80211_BAND_ATTR_VHT_CAPA, "VHT Capabilities" },
++	{ NL80211_BAND_ATTR_IFTYPE_DATA, "Interface Type Data",
++			ATTR_ARRAY, { iftype_data_table }, ATTR_NESTED },
+ 	{ }
+ };
+ 
 -- 
 2.34.3
 
