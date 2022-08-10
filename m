@@ -1,47 +1,47 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDE44A02
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD1F4A0B
 	for <iwd@lists.linux.dev>; Wed, 10 Aug 2022 23:16:27 +0000 (UTC)
-Received: by mail-pl1-f169.google.com with SMTP id 13so14113557plo.12
+Received: by mail-pg1-f179.google.com with SMTP id l64so15709090pge.0
         for <iwd@lists.linux.dev>; Wed, 10 Aug 2022 16:16:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=h8rZW2gOtN49OqCge9lG30TpdQHxK7Xm2nwcx1D/OXA=;
-        b=HG43XXOgVsbUqTNWb2qkX5y75RKdwxFCjbrh3HS/YNwF/TQok0AxM5xu4RjqVnPIPO
-         e0pFiVtergypeGAKRpxPoRTxK0SYT6e9RdnNsOcb4vwAaCflaICxBO5oL4UznJvOl/hu
-         lT4gdHPpkZ3qqdrd24qOUKTiahztY5VabIVplnn45yGZum74r3Tt+erADz1qX3RC3NOv
-         IzrNF7DITy1VmHWF5UVijzQ1EQMwzQN0H9l9o7pUAbrVuXhcvlbAdvW7xlXK+y14cTSX
-         qnhlZyTV0uhhEhpolPJuRAnUQMrLc/oZWGRoe4hCutwBZKw6F9C/pDgm/ZBXztRVQx7f
-         pyaQ==
+        bh=nrMrHXj+Q3ApX7vId0w8i47zqx22NefJojzfDCg8v3s=;
+        b=k4HBrlZwgjLKClEh3XlMNQ4MqtMQL0TMLix2tefvDU80nAjon4OglQbtgEhMxsGbye
+         PafF2zockPMx+yadbQ9272gWuKIpnIi4nkazUSlxFw+8BFh2lHqMAyx1NYYINPQXNcww
+         01wNwt0xZuBLFfLrAG5868BGGE9tQr4o7C4PoVSdEKgi9IjJwpzrr8jDqX1RIl9wGaoQ
+         XZy4wPXW54YbvU+765KOn/dSM8bjONHiAOz9MuHHALI7tTxHh1QSNo1zMEv3k7UOVLEl
+         QDvcamoUrySTU7nOV+yRJ1Rza6YReCJ6DQEDoZVhErYY6/mMXn+Bxt3F0+inqqnFjFyO
+         CuHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=h8rZW2gOtN49OqCge9lG30TpdQHxK7Xm2nwcx1D/OXA=;
-        b=KdtEpNzXwYKeYuwj/moxAtGtxt50do4OiOl2bjrdAfOHbak5X8W+dwUlOhN+5bOK6S
-         2fipqVlzl/rPCDtDunr0bcJUKGCcw4HOhtj87mRILvvnh7NAT2wxPjH4dUjW17t9QTtM
-         3ZSyqAKS4w11S74Hs/ogfPKpmlIipA7oNYRlDMT38ccDyVue3U0SoeUtYsFfFZKtt7xF
-         /HOiAstf+Swm6VZJKYT2BOMe/1CWGFuL095eF++Zc6oSdconWANczJy48lPx+x1KLQBX
-         Qa9rDMcpoN3wwwDBw8lkUQYv0UTOJqWJU13OVlKVp5mCkqpkaEr8KtMTLEPDxppnWLHP
-         elMA==
-X-Gm-Message-State: ACgBeo0dN6ypMw8kViFPVUuh6yPjdeDQgbXQfThIK24lcXgdDX2qIa8d
-	HP1fEYfUeA7gXeqGhYgx7oYrVU0NiZk=
-X-Google-Smtp-Source: AA6agR4RMP739TS+pS1IkgI64Xjpd9p1YwZWbGQXcpMPzQ3WWAslGJBdDbXoKBQPecuyzU+3C4yz6Q==
-X-Received: by 2002:a17:902:b214:b0:171:2e1f:6d1a with SMTP id t20-20020a170902b21400b001712e1f6d1amr6888899plr.147.1660173386548;
-        Wed, 10 Aug 2022 16:16:26 -0700 (PDT)
+        bh=nrMrHXj+Q3ApX7vId0w8i47zqx22NefJojzfDCg8v3s=;
+        b=nVQxj7MmSIu9UTHF4r/YTF5mW5tQdK750Gfi14V4TbddW4dSvQrJPIgtKvKU+1XBca
+         4/yDLb/SgY23UD1xm9vrZgeWLLg2nXzaGii28Kz1getBvBy/wPesRiylUr3MYYMd0CoU
+         fKgbs5IgAlh8awXoIZc1K0RBBYSPRPkeT4hapmaSHVK5oj5NHLPSMUtx1LK4T87jyWgx
+         4o3+X8EcAm4uxraO3jnvo5AK+hEKu5CWwA/GruQw3/oHhuwu7ISQDg1UFKEs2UjP+Rne
+         aDfOD9SB83TqodFOZxhE92hPCoENjiptVAsqT5K+JmqIEeLUhrW3MYGcOBu90sumF1pC
+         7hOg==
+X-Gm-Message-State: ACgBeo1W5Lafb+g2FUj+4gYru0+EFXK65ts+keqQgZfRhhUXcCCJQO1b
+	Bb5Ltwkq+LWOzNHpSKigKNRfCxDtZl8=
+X-Google-Smtp-Source: AA6agR65uFC7BYAjgZe5CGQl61iWnnO2VChfC6zuc4ujWBVio1CxD3w19eFcceyQyZKSkDUZofbl9w==
+X-Received: by 2002:a62:6545:0:b0:52b:6daa:1540 with SMTP id z66-20020a626545000000b0052b6daa1540mr29074479pfb.29.1660173387156;
+        Wed, 10 Aug 2022 16:16:27 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
-        by smtp.gmail.com with ESMTPSA id t7-20020a170902e84700b0016d62ba5665sm13540246plg.254.2022.08.10.16.16.25
+        by smtp.gmail.com with ESMTPSA id t7-20020a170902e84700b0016d62ba5665sm13540246plg.254.2022.08.10.16.16.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 10 Aug 2022 16:16:26 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/8] client: add STATION_DEBUG_INTERFACE definition
-Date: Wed, 10 Aug 2022 16:16:19 -0700
-Message-Id: <20220810231621.372514-6-prestwoj@gmail.com>
+Subject: [PATCH 7/8] client: add station-debug command interface
+Date: Wed, 10 Aug 2022 16:16:20 -0700
+Message-Id: <20220810231621.372514-7-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220810231621.372514-1-prestwoj@gmail.com>
 References: <20220810231621.372514-1-prestwoj@gmail.com>
@@ -53,22 +53,453 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+This lets iwctl call methods on .StationDebug. The command
+name is called 'debug'. This can only be used when both iwctl
+and IWD are in developer mode (-E)
 ---
- client/dbus-proxy.h | 1 +
- 1 file changed, 1 insertion(+)
+ Makefile.am            |   4 +-
+ client/station-debug.c | 417 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 420 insertions(+), 1 deletion(-)
+ create mode 100644 client/station-debug.c
 
-diff --git a/client/dbus-proxy.h b/client/dbus-proxy.h
-index 34917e82..0b4fec43 100644
---- a/client/dbus-proxy.h
-+++ b/client/dbus-proxy.h
-@@ -34,6 +34,7 @@ struct proxy_interface;
- #define IWD_WSC_INTERFACE                "net.connman.iwd.SimpleConfiguration"
- #define IWD_STATION_INTERFACE            "net.connman.iwd.Station"
- #define IWD_STATION_DIAGNOSTIC_INTERFACE "net.connman.iwd.StationDiagnostic"
-+#define IWD_STATION_DEBUG_INTERFACE      "net.connman.iwd.StationDebug"
- #define IWD_AP_DIAGNOSTIC_INTERFACE      "net.connman.iwd.AccessPointDiagnostic"
- #define IWD_DAEMON_INTERFACE             "net.connman.iwd.Daemon"
- #define IWD_DPP_INTERFACE                "net.connman.iwd.DeviceProvisioning"
+diff --git a/Makefile.am b/Makefile.am
+index cffb0738..ed93d000 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -301,7 +301,9 @@ client_iwctl_SOURCES = client/main.c \
+ 			client/wsc.c client/station.c \
+ 			client/diagnostic.c client/diagnostic.h \
+ 			client/daemon.c client/daemon.h \
+-			client/dpp.c
++			client/dpp.c client/station-debug.c \
++			src/util.c src/util.h \
++			src/band.c src/band.h
+ 
+ client_iwctl_LDADD = $(ell_ldadd) $(READLINE_LIBS)
+ 
+diff --git a/client/station-debug.c b/client/station-debug.c
+new file mode 100644
+index 00000000..9e1d8756
+--- /dev/null
++++ b/client/station-debug.c
+@@ -0,0 +1,417 @@
++#include <ell/ell.h>
++#include "ell/useful.h"
++
++#include "client/command.h"
++#include "client/dbus-proxy.h"
++#include "client/device.h"
++#include "client/display.h"
++#include "client/properties.h"
++#include "src/util.h"
++
++struct station_debug {
++	struct l_queue *network_list;
++	bool autoconnect;
++};
++
++struct network {
++	char *ssid;
++	struct l_queue *bss_list;
++};
++
++struct bss {
++	uint8_t addr[6];
++	uint32_t frequency;
++	int8_t rssi;
++	int32_t rank;
++	uint8_t mde[3];
++};
++
++static void network_free(void *data)
++{
++	struct network *network = data;
++
++	l_queue_destroy(network->bss_list, l_free);
++}
++
++static void *station_debug_create(void)
++{
++	struct station_debug *debug = l_new(struct station_debug, 1);
++
++	debug->network_list = l_queue_new();
++
++	return debug;
++}
++
++static void station_debug_destroy(void *data)
++{
++	struct station_debug *debug = data;
++
++	l_queue_destroy(debug->network_list, network_free);
++
++	l_free(debug);
++}
++
++static void check_errors_method_callback(struct l_dbus_message *message,
++								void *user_data)
++{
++	dbus_message_has_error(message);
++}
++
++static enum cmd_status cmd_debug_connect(const char *device_name,
++						char **argv, int argc)
++{
++
++	const struct proxy_interface *debug_i;
++	uint8_t addr[6];
++
++	if (argc < 1)
++		return CMD_STATUS_INVALID_ARGS;
++
++	debug_i = device_proxy_find(device_name, IWD_STATION_DEBUG_INTERFACE);
++	if (!debug_i)
++		return CMD_STATUS_INVALID_VALUE;
++
++	if (!util_string_to_address(argv[0], addr))
++		return CMD_STATUS_INVALID_ARGS;
++
++	proxy_interface_method_call(debug_i, "ConnectBssid", "ay",
++					check_errors_method_callback, 6,
++					addr[0], addr[1], addr[2],
++					addr[3], addr[4], addr[5]);
++	return CMD_STATUS_TRIGGERED;
++}
++
++static enum cmd_status cmd_debug_roam(const char *device_name,
++						char **argv, int argc)
++{
++	const struct proxy_interface *debug_i;
++	uint8_t addr[6];
++
++	if (argc < 1)
++		return CMD_STATUS_INVALID_ARGS;
++
++	debug_i = device_proxy_find(device_name, IWD_STATION_DEBUG_INTERFACE);
++	if (!debug_i)
++		return CMD_STATUS_INVALID_VALUE;
++
++	if (!util_string_to_address(argv[0], addr))
++		return CMD_STATUS_INVALID_ARGS;
++
++	proxy_interface_method_call(debug_i, "Roam", "ay",
++					check_errors_method_callback, 6,
++					addr[0], addr[1], addr[2],
++					addr[3], addr[4], addr[5]);
++	return CMD_STATUS_TRIGGERED;
++}
++
++static void get_byte_array(struct l_dbus_message_iter *variant, uint8_t *out,
++				unsigned int len)
++{
++	struct l_dbus_message_iter array;
++	uint32_t elems = 6;
++	uint8_t *a;
++
++	if (!l_dbus_message_iter_get_variant(variant, "ay", &array))
++		goto error;
++
++	if (!l_dbus_message_iter_get_fixed_array(&array, &a, &elems))
++		goto error;
++
++	if (elems != len)
++		goto error;
++
++	memcpy(out, a, len);
++
++	return;
++
++error:
++	display_error("Invalid Address element");
++}
++
++static uint32_t get_u32(struct l_dbus_message_iter *variant)
++{
++	uint32_t u32 = 0;
++
++	if (!l_dbus_message_iter_get_variant(variant, "u", &u32))
++		display_error("Invalid Frequency element");
++
++	return u32;
++}
++
++static uint32_t get_i32(struct l_dbus_message_iter *variant)
++{
++	int32_t i32 = 0;
++
++	if (!l_dbus_message_iter_get_variant(variant, "i", &i32))
++		display_error("Invalid Frequency element");
++
++	return i32;
++}
++
++static void display_bss(struct bss *bss)
++{
++	char row[128];
++
++	sprintf(row, "%s%-*s  "MAC"  %-*i  %-*u  %-*i  %02x%02x%02x",
++		MARGIN MARGIN, 4, "", MAC_STR(bss->addr), 4, bss->rssi,
++		6, bss->frequency, 8, bss->rank,
++		bss->mde[0], bss->mde[1], bss->mde[2]);
++
++	display("%s\n", row);
++
++	return;
++}
++
++static void get_networks_method_callback(struct l_dbus_message *message,
++								void *user_data)
++{
++	struct proxy_interface *debug_i = user_data;
++	struct station_debug *debug = proxy_interface_get_data(debug_i);
++	struct l_dbus_message_iter iter;
++	struct l_dbus_message_iter variant;
++	struct l_dbus_message_iter array;
++	struct l_dbus_message_iter dict;
++	const char *key;
++
++	if (dbus_message_has_error(message))
++		return;
++
++	if (!l_dbus_message_get_arguments(message, "a{sv}", &iter)) {
++		l_error("Failed to parse GetDiagnostics message");
++		return;
++	}
++
++	display_table_header("Available Networks (debug)",
++				"%s%-*s  %-*s  %-*s  %-*s  %-*s  %-*s  %-*s",
++				"", 2, "", 4, "SSID", 17, "BSSID", 4, "RSSI",
++				6, "Freq", 8, "Rank", 10, "MDE");
++
++	while (l_dbus_message_iter_next_entry(&iter, &key, &variant)) {
++		struct network *network = l_new(struct network, 1);
++
++		network->ssid = l_strdup(key);
++		network->bss_list = l_queue_new();
++
++		if (!strcmp(network->ssid, ""))
++			display_table_row(MARGIN MARGIN, 3, 32, "Hidden BSS's",
++					18, "", 6, "");
++		else
++			display_table_row(MARGIN MARGIN, 3, 32, network->ssid,
++					18, "", 6, "");
++
++		l_dbus_message_iter_get_variant(&variant, "aa{sv}", &array);
++
++		while (l_dbus_message_iter_next_entry(&array, &dict)) {
++			struct bss *bss = l_new(struct bss, 1);
++
++			while (l_dbus_message_iter_next_entry(&dict, &key,
++								&variant)) {
++				if (!strcmp(key, "Address"))
++					get_byte_array(&variant, bss->addr, 6);
++				else if (!strcmp(key, "Frequency"))
++					bss->frequency = get_u32(&variant);
++				else if (!strcmp(key, "RSSI"))
++					bss->rssi = get_i32(&variant);
++				else if (!strcmp(key, "Rank"))
++					bss->rank = get_i32(&variant);
++				else if (!strcmp(key, "MDE"))
++					get_byte_array(&variant, bss->mde, 3);
++			}
++
++			display_bss(bss);
++
++			l_queue_push_tail(network->bss_list, bss);
++		}
++
++		l_queue_push_tail(debug->network_list, network);
++	}
++
++	display_table_footer();
++}
++
++static enum cmd_status cmd_debug_get_networks(const char *device_name,
++						char **argv, int argc)
++{
++	const struct proxy_interface *debug_i;
++
++	debug_i = device_proxy_find(device_name, IWD_STATION_DEBUG_INTERFACE);
++	if (!debug_i)
++		return CMD_STATUS_INVALID_VALUE;
++
++	proxy_interface_method_call(debug_i, "GetNetworks", "",
++					get_networks_method_callback);
++
++	return CMD_STATUS_TRIGGERED;
++}
++
++static char *connect_debug_cmd_arg_completion(const char *text, int state,
++						const char *device_name)
++{
++	const struct proxy_interface *debug_i;
++	struct station_debug *debug;
++	static const struct l_queue_entry *n_entry;
++	static const struct l_queue_entry *b_entry;
++	size_t len = strlen(text);
++
++	debug_i = device_proxy_find(device_name, IWD_STATION_DEBUG_INTERFACE);
++	if (!debug_i)
++		return NULL;
++
++	debug = proxy_interface_get_data(debug_i);
++
++	if (!state)
++		n_entry = l_queue_get_entries(debug->network_list);
++
++	while (n_entry) {
++		struct network *network = n_entry->data;
++
++		n_entry = n_entry->next;
++
++		if (!b_entry)
++			b_entry = l_queue_get_entries(network->bss_list);
++
++		while (b_entry) {
++			struct bss *bss = b_entry->data;
++			char addr_str[18];
++
++			b_entry = b_entry->next;
++
++			sprintf(addr_str, MAC, MAC_STR(bss->addr));
++
++			if (len > strlen(addr_str))
++				return NULL;
++
++			if (strncmp(text, addr_str, len))
++				continue;
++
++			return l_strdup_printf(MAC, MAC_STR(bss->addr));
++		}
++	}
++
++	return NULL;
++}
++
++static const char *get_autoconnect_tostr(const void *data)
++{
++	const struct station_debug *debug = data;
++
++	return debug->autoconnect ? "on" : "off";
++}
++
++static void update_autoconnect(void *data, struct l_dbus_message_iter *variant)
++{
++	struct station_debug *debug = data;
++	bool value;
++
++	if (!l_dbus_message_iter_get_variant(variant, "b", &value)) {
++		debug->autoconnect = false;
++
++		return;
++	}
++
++	debug->autoconnect = value;
++}
++
++static const struct proxy_interface_property debug_properties[] = {
++	{ "AutoConnect",  "b", update_autoconnect,  get_autoconnect_tostr, true,
++			properties_builder_append_on_off_variant,
++			properties_on_off_opts },
++	{ }
++};
++
++static enum cmd_status cmd_debug_set_autoconnect(const char *device_name,
++						char **argv, int argc)
++{
++	const struct proxy_interface *proxy = device_proxy_find(device_name,
++						IWD_STATION_DEBUG_INTERFACE);
++
++	if (!proxy)
++		return CMD_STATUS_INVALID_VALUE;
++
++	if (argc != 1)
++		return CMD_STATUS_INVALID_ARGS;
++
++	if (!proxy_property_set(proxy, "AutoConnect", argv[0],
++						check_errors_method_callback))
++		return CMD_STATUS_INVALID_VALUE;
++
++	return CMD_STATUS_TRIGGERED;
++}
++
++static const struct command station_debug_commands[] = {
++	{ "<wlan>", "connect", "<bssid>", cmd_debug_connect,
++					"Connect to a specific BSS", false,
++					connect_debug_cmd_arg_completion },
++	{ "<wlan>", "roam", "<bssid>", cmd_debug_roam,
++					"Roam to a BSS", false },
++	{ "<wlan>", "get-networks", NULL, cmd_debug_get_networks,
++					"Get networks", true },
++	{ "<wlan>", "autoconnect", "on|off", cmd_debug_set_autoconnect,
++					"Set AutoConnect property", false },
++	{ }
++};
++
++static char *family_debug_arg_completion(const char *text, int state)
++{
++	return device_arg_completion(text, state, station_debug_commands,
++						IWD_STATION_DEBUG_INTERFACE);
++}
++
++static char *entity_debug_arg_completion(const char *text, int state)
++{
++	return command_entity_arg_completion(text, state,
++						station_debug_commands);
++}
++
++static struct command_family station_debug_command_family = {
++	.caption = "Station Debug",
++	.name = "debug",
++	.command_list = station_debug_commands,
++	.family_arg_completion = family_debug_arg_completion,
++	.entity_arg_completion = entity_debug_arg_completion,
++};
++
++static int station_debug_command_family_init(void)
++{
++	if (command_is_developer_mode())
++		command_family_register(&station_debug_command_family);
++
++	return 0;
++}
++
++static void station_debug_command_family_exit(void)
++{
++	if (command_is_developer_mode())
++		command_family_unregister(&station_debug_command_family);
++}
++
++COMMAND_FAMILY(station_debug_command_family, station_debug_command_family_init,
++					station_debug_command_family_exit)
++
++static const struct proxy_interface_type_ops station_debug_ops = {
++	.create = station_debug_create,
++	.destroy = station_debug_destroy,
++};
++
++static struct proxy_interface_type station_debug_interface_type = {
++	.interface = IWD_STATION_DEBUG_INTERFACE,
++	.ops = &station_debug_ops,
++	.properties = debug_properties,
++};
++
++static int station_debug_interface_init(void)
++{
++	if (command_is_developer_mode())
++		proxy_interface_type_register(&station_debug_interface_type);
++
++	return 0;
++}
++
++static void station_debug_interface_exit(void)
++{
++	if (command_is_developer_mode())
++		proxy_interface_type_unregister(&station_debug_interface_type);
++}
++
++INTERFACE_TYPE(station_debug_interface_type, station_debug_interface_init,
++					station_debug_interface_exit)
 -- 
 2.34.3
 
