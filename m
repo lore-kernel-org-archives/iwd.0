@@ -1,50 +1,48 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6942E46AC
-	for <iwd@lists.linux.dev>; Thu, 11 Aug 2022 17:59:07 +0000 (UTC)
-Received: by mail-pf1-f177.google.com with SMTP id g12so17127687pfb.3
-        for <iwd@lists.linux.dev>; Thu, 11 Aug 2022 10:59:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6DD4A0A
+	for <iwd@lists.linux.dev>; Thu, 11 Aug 2022 18:47:38 +0000 (UTC)
+Received: by mail-pl1-f170.google.com with SMTP id g13so10726654plo.6
+        for <iwd@lists.linux.dev>; Thu, 11 Aug 2022 11:47:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=bQHd1bKvsoQtg+sNOI9cwdpCJrHos8NUF8yaXX7/Q9E=;
-        b=Mcm4M74fZOgj81Vz44FdvbD1z/LL9P9AyqHQdRcCi7/wmQ5bP6jcfPFzK5hcDqCyQi
-         qYwJ69SA4ilaYpEtimjQQmrfR/apbqKztJPB3mFaRZmoRMdwqY+SaPFTU13luOyR4hYR
-         UCDmAHR+IGkn8uRawRYmrgzux27pvGsvrW0y5fdc2DAVDz/uyFMeBM25838vvl//V9Ug
-         9gVYHzV6quaVCMBYFnujPfGdL0QyEDxu7Ey7Sia0QehZphofH915rgZo7po0REI5/L7z
-         gHAyj0TIlxsz9ZER9qBkBsPjskaXWgZ0QpoeihTJeluvASn6fsGh8H4yuSjdJSSOCe2f
-         zsEw==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=ScYNqYcGxI0Yy3FBPl3VJlZtt2r+8cp6HszI1rnbEQU=;
+        b=K1unrB8jAKkJuSD7nwqsrDUrpm3vs/kmpEUgxNDPIkZTpofyMRaEzCwbX+9Aslodwq
+         VWomrGQCK158sXoYObQzTaGJmpU0tIunXFLD/6RNQcweEGp12CmNP183gCM/LnzdQeGK
+         JX6iSpueeJogmFqBBwRjDf3QU2WH85ORXKfMVWSDu1JRwniO2fdfaCZOBOnGjZ0t/hq0
+         fsuGUWJLTBfZY9zk/R/AEBTWUdZKzck4pOQcq8nnutgO/OOJYVexvGeydgoy3a3cEHrn
+         +i9xsuBNmXAQbPLY2zuRkMCCYkzU2u8k3wP4/5E+ht8jV9cuhTgZwfbWAD9Dm79ZxdvE
+         xflw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=bQHd1bKvsoQtg+sNOI9cwdpCJrHos8NUF8yaXX7/Q9E=;
-        b=7jstHIB35eL5LpkS2qCw2C257C22I7AvPmbEk35g7OiX4b/UHnh0jhr/lxbZQE+DJG
-         elm/XVgxPhSp2J9RjJdiIlNLG2yfXzAeFhwlDK7vAGdaw+cdYyGb8YMG6K2pEdAiZPm9
-         kfHgtH/O3F22WmOolrkBL3gI6vB8XQydtM8P/TyZQYKeAlOg5Fbpl1VQYNIuAEUJzYez
-         /N9qDO5DWRjtILCYUBmMOW2cVq82D/EBNh0TWFH2TSNUmkLn6zRkynKXM/CmC6lq7QoE
-         fUw/XlJ4pYNL9QLY9Wlk9ALiZZK8kTJcvVmGD4wKLjBk9mN+MPMXNWarmD3aooOD/wTL
-         dBig==
-X-Gm-Message-State: ACgBeo3hgU3+fAzkFIKxv12KcpDOmvg6ssqFfjkMt4ITt6rQGMsYNIRN
-	ZkEKYCBMT7LhAOF40zEWq7ap0toXw/c=
-X-Google-Smtp-Source: AA6agR4AIsvfQbmR4zgc0GMiQRxllsiXeUCi4IPvsD8Ck3NH69Ozx9CxfQGMp7rUCnrJKypo8AKMJA==
-X-Received: by 2002:a63:d750:0:b0:41b:3eec:f9d0 with SMTP id w16-20020a63d750000000b0041b3eecf9d0mr163361pgi.289.1660240746659;
-        Thu, 11 Aug 2022 10:59:06 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=ScYNqYcGxI0Yy3FBPl3VJlZtt2r+8cp6HszI1rnbEQU=;
+        b=Fp9xHCWEDQEW0+nmwyCCEbPnhSNOvhPeNtLdZY1+O9+2Q1uAq4V/TaHJdDsXycLjTM
+         GG/Qr+R1ntiKajAN90HmQmQFzo/yvnLRacipfhPBG/zfxoxuU3icMAIgyJtZokd/fWG6
+         GIW9iB68D338t+xO5aGN+9Ij2WB1qNHPSRYhFr4BlNmXNKp9rHRwoiWF4TzJiUQ62oXT
+         hdNcRi5Ne2v3ChR3suj7YFUL1FGU7CoBfmxw/oM3P5IQduIPZHmBwt9KDgY6pQvrVqtR
+         5AQcdM/Mkkn50iZfZH/bIoUGIKXAHoU6btg4u1nIKOcLpo1M4uQMlYLWCpxr83VII2jM
+         /tLw==
+X-Gm-Message-State: ACgBeo0j7vb7i6PGlDWOR+B2iPLC2B0AtjYMd5WOfBpIgL9A8Nh+vAVY
+	MoacIoHTsQVFNKWs7JILB3dQoJzCTOQ=
+X-Google-Smtp-Source: AA6agR7KaZbWwW28fVrTmxUkXw63sZrRHj8TC3NEZh2z2ZXkZNno3Px98aeWuX2RWnLRxuX/+SPTQg==
+X-Received: by 2002:a17:902:70c7:b0:170:9030:8219 with SMTP id l7-20020a17090270c700b0017090308219mr419623plt.163.1660243657875;
+        Thu, 11 Aug 2022 11:47:37 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
-        by smtp.gmail.com with ESMTPSA id w125-20020a626283000000b0052ab602a7d0sm4292685pfb.100.2022.08.11.10.59.06
+        by smtp.gmail.com with ESMTPSA id k3-20020aa79983000000b0052b84ca900csm24986pfh.62.2022.08.11.11.47.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Aug 2022 10:59:06 -0700 (PDT)
+        Thu, 11 Aug 2022 11:47:37 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 6/6] device: command: remove default device concept
-Date: Thu, 11 Aug 2022 10:59:00 -0700
-Message-Id: <20220811175900.443310-6-prestwoj@gmail.com>
+Subject: [PATCH v3 1/6] doc: add documentation for StationDebug
+Date: Thu, 11 Aug 2022 11:47:30 -0700
+Message-Id: <20220811184735.465951-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20220811175900.443310-1-prestwoj@gmail.com>
-References: <20220811175900.443310-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,160 +51,88 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There was quite a bit of framework behind setting/resetting a default
-device, which is now no longer needed.
 ---
- client/command.c    | 18 ----------------
- client/command.h    |  3 ---
- client/dbus-proxy.c |  2 --
- client/device.c     | 50 ---------------------------------------------
- 4 files changed, 73 deletions(-)
+ doc/station-debug-api.txt | 68 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
+ create mode 100644 doc/station-debug-api.txt
 
-diff --git a/client/command.c b/client/command.c
-index 46752c72..dbd97703 100644
---- a/client/command.c
-+++ b/client/command.c
-@@ -329,9 +329,6 @@ static char **cmd_completion_match_family_cmd(const char *cmd_family,
- 			break;
- 		}
- 
--		if (family->set_default_entity)
--			family->set_default_entity(arg1);
--
- 		matches = cmd_completion_match_entity_cmd(arg2, text,
- 							family->command_list);
- 
-@@ -663,21 +660,6 @@ int command_get_exit_status(void)
- 	return exit_status;
- }
- 
--void command_reset_default_entities(void)
--{
--	const struct l_queue_entry *entry;
--
--	for (entry = l_queue_get_entries(command_families); entry;
--							entry = entry->next) {
--		struct command_family *family = entry->data;
--
--		if (!family->reset_default_entity)
--			continue;
--
--		family->reset_default_entity();
--	}
--}
--
- void command_family_register(const struct command_family *family)
- {
- 	l_queue_push_tail(command_families, (void *) family);
-diff --git a/client/command.h b/client/command.h
-index 1f841689..96eefdec 100644
---- a/client/command.h
-+++ b/client/command.h
-@@ -56,8 +56,6 @@ struct command_family {
- 	const struct command *command_list;
- 	command_rl_completion_func_t family_arg_completion;
- 	command_rl_completion_func_t entity_arg_completion;
--	void (*set_default_entity)(const char *entity);
--	void (*reset_default_entity)(void);
- };
- 
- bool command_option_get(const char *name, const char **value_out);
-@@ -74,7 +72,6 @@ void command_noninteractive_trigger(void);
- bool command_is_interactive_mode(void);
- int command_get_exit_status(void);
- void command_set_exit_status(int status);
--void command_reset_default_entities(void);
- 
- void command_family_register(const struct command_family *family);
- void command_family_unregister(const struct command_family *family);
-diff --git a/client/dbus-proxy.c b/client/dbus-proxy.c
-index 1534488e..42b8427f 100644
---- a/client/dbus-proxy.c
-+++ b/client/dbus-proxy.c
-@@ -806,8 +806,6 @@ static void service_disappeared_callback(struct l_dbus *dbus,
- 
- 	l_queue_clear(proxy_interfaces, proxy_interface_destroy);
- 
--	command_reset_default_entities();
--
- 	display_disable_cmd_prompt();
- }
- 
-diff --git a/client/device.c b/client/device.c
-index 8b27ddd2..ce2afc81 100644
---- a/client/device.c
-+++ b/client/device.c
-@@ -42,8 +42,6 @@ struct device {
- 	const struct proxy_interface *adapter;
- };
- 
--static struct proxy_interface *default_device;
--
- static void display_device(const struct proxy_interface *proxy)
- {
- 	const struct device *device = proxy_interface_get_data(proxy);
-@@ -260,52 +258,6 @@ static bool match_by_partial_name(const void *a, const void *b)
- 	return !strncmp(device->name, text, strlen(text));
- }
- 
--static bool match_all(const void *a, const void *b)
--{
--	return true;
--}
--
--static void device_set_default(const char *device_name)
--{
--	struct l_queue *match;
--
--	if (!device_name)
--		return;
--
--	match = proxy_interface_find_all(device_interface_type.interface,
--						match_by_name, device_name);
--
--	if (!match)
--		return;
--
--	default_device = l_queue_pop_head(match);
--	l_queue_destroy(match, NULL);
--}
--
--static void device_reset_default(void)
--{
--	default_device = NULL;
--}
--
--const struct proxy_interface *device_get_default(void)
--{
--	struct l_queue *match;
--
--	if (default_device)
--		return default_device;
--
--	match = proxy_interface_find_all(device_interface_type.interface,
--							match_all, NULL);
--
--	if (!match)
--		return NULL;
--
--	default_device = l_queue_pop_head(match);
--	l_queue_destroy(match, NULL);
--
--	return default_device;
--}
--
- const struct proxy_interface *device_proxy_find_by_name(const char *name)
- {
- 	struct l_queue *match;
-@@ -464,8 +416,6 @@ static struct command_family device_command_family = {
- 	.command_list = device_commands,
- 	.family_arg_completion = family_arg_completion,
- 	.entity_arg_completion = entity_arg_completion,
--	.set_default_entity = device_set_default,
--	.reset_default_entity = device_reset_default,
- };
- 
- static int device_command_family_init(void)
+v3:
+ * Removed the special /hidden object 
+
+diff --git a/doc/station-debug-api.txt b/doc/station-debug-api.txt
+new file mode 100644
+index 00000000..ad91fc3b
+--- /dev/null
++++ b/doc/station-debug-api.txt
+@@ -0,0 +1,68 @@
++Station Debug hierarchy [experimental]
++============================
++
++These are all development APIs not meant for production use.
++
++Service		net.connman.iwd
++Interface	net.connman.iwd.StationDebug
++Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}
++
++Methods		void ConnectBssid(array(y) address)
++
++			Connect to a specific BSS. The address parameter should
++			be a byte array of length 6, the BSSID of a BSS which
++			IWD already has in its scan list.
++
++			Possible errors: net.connman.iwd.InvalidArguments
++					 net.connman.iwd.NotFound
++
++		void Roam(array(y) address)
++
++			Roam to a specific BSS. The address parameter should be
++			a byte array of length 6, the BSSID of a BSS to roam to.
++			This BSS needs to be in IWD's scan results and fit the
++			requirements for a roam candidate (same network).
++			The type of roam is dependent on the network and is
++			chosen automatically by IWD.
++
++			Possible errors: net.connman.iwd.InvalidArguments
++					 net.connman.iwd.NotConnected
++
++		void Scan(array(q) frequencies)
++
++			Scan on specific frequencies. The frequencies parameter
++			should be a list of valid frequencies.
++
++			Possible errors: net.connman.iwd.Busy
++					 net.connman.iwd.InvalidArguments
++					 net.connamn.iwd.Failed
++
++		a{oaa{sv}} GetNetworks()
++
++			Get a list of networks including data for individual
++			BSS's. Returns a dictionary where keys are network
++			object paths and values are arrays of dictionaries
++			containing BSS information:
++
++			{
++				/network/path/1: [
++					{
++						Address: 11:22:33:44:55,
++						Frequency: 1234,
++						RSSI: -20,
++						Rank: 1000
++						MDE: 001122
++					},
++					{ ... }
++				]
++			}
++
++Signals:	Event(s name, av data)
++
++			Signal sent for various debug events. The 'name' is the
++			event name, and 'data' is event dependent.
++
++Properties:	boolean AutoConnect
++
++			True if IWD is in an autoconnect state. This property
++			can be written to put IWD into an autoconnect state.
 -- 
 2.34.3
 
