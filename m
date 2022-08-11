@@ -1,48 +1,50 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6DD4A0A
-	for <iwd@lists.linux.dev>; Thu, 11 Aug 2022 18:47:38 +0000 (UTC)
-Received: by mail-pl1-f170.google.com with SMTP id g13so10726654plo.6
-        for <iwd@lists.linux.dev>; Thu, 11 Aug 2022 11:47:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EBA4A0F
+	for <iwd@lists.linux.dev>; Thu, 11 Aug 2022 18:47:39 +0000 (UTC)
+Received: by mail-pl1-f180.google.com with SMTP id o3so17666861ple.5
+        for <iwd@lists.linux.dev>; Thu, 11 Aug 2022 11:47:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=ScYNqYcGxI0Yy3FBPl3VJlZtt2r+8cp6HszI1rnbEQU=;
-        b=K1unrB8jAKkJuSD7nwqsrDUrpm3vs/kmpEUgxNDPIkZTpofyMRaEzCwbX+9Aslodwq
-         VWomrGQCK158sXoYObQzTaGJmpU0tIunXFLD/6RNQcweEGp12CmNP183gCM/LnzdQeGK
-         JX6iSpueeJogmFqBBwRjDf3QU2WH85ORXKfMVWSDu1JRwniO2fdfaCZOBOnGjZ0t/hq0
-         fsuGUWJLTBfZY9zk/R/AEBTWUdZKzck4pOQcq8nnutgO/OOJYVexvGeydgoy3a3cEHrn
-         +i9xsuBNmXAQbPLY2zuRkMCCYkzU2u8k3wP4/5E+ht8jV9cuhTgZwfbWAD9Dm79ZxdvE
-         xflw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc;
+        bh=A7LOA1OwzhRcAntRdWxP2AFiw4AilpcarcHxoDbK+MY=;
+        b=LrJcCAH6rWGjJTxaqD746PyeYwDhJCKSmVpFb1MjCt7HGQIbbfLbjjKvj0pl+Wbio3
+         mJv7oNjbwAATiAejDxk77lPsnHDD7DOeAYM0Jl2aGryz0cdiIeJgNlG4LPmXnn0Zcidi
+         POISd5LZqVh2id8in/xxnRFbdLv2CC5CZnvqx8Fmglu9xtkoTuZYmF7y4vUmfKOqzZt6
+         hOvYhTBYt5EAzQvH7ngc4oeT2oNHfK0umHdZS8p8oFHdyTvRq0nu4reA/j8vorY+J22I
+         RxrV39GZdUaLiB448sdoi2KolW+1otkeUvXJV0UDHDqv0nP0TdqQ+pH3J56GjFvaffp0
+         IrUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=ScYNqYcGxI0Yy3FBPl3VJlZtt2r+8cp6HszI1rnbEQU=;
-        b=Fp9xHCWEDQEW0+nmwyCCEbPnhSNOvhPeNtLdZY1+O9+2Q1uAq4V/TaHJdDsXycLjTM
-         GG/Qr+R1ntiKajAN90HmQmQFzo/yvnLRacipfhPBG/zfxoxuU3icMAIgyJtZokd/fWG6
-         GIW9iB68D338t+xO5aGN+9Ij2WB1qNHPSRYhFr4BlNmXNKp9rHRwoiWF4TzJiUQ62oXT
-         hdNcRi5Ne2v3ChR3suj7YFUL1FGU7CoBfmxw/oM3P5IQduIPZHmBwt9KDgY6pQvrVqtR
-         5AQcdM/Mkkn50iZfZH/bIoUGIKXAHoU6btg4u1nIKOcLpo1M4uQMlYLWCpxr83VII2jM
-         /tLw==
-X-Gm-Message-State: ACgBeo0j7vb7i6PGlDWOR+B2iPLC2B0AtjYMd5WOfBpIgL9A8Nh+vAVY
-	MoacIoHTsQVFNKWs7JILB3dQoJzCTOQ=
-X-Google-Smtp-Source: AA6agR7KaZbWwW28fVrTmxUkXw63sZrRHj8TC3NEZh2z2ZXkZNno3Px98aeWuX2RWnLRxuX/+SPTQg==
-X-Received: by 2002:a17:902:70c7:b0:170:9030:8219 with SMTP id l7-20020a17090270c700b0017090308219mr419623plt.163.1660243657875;
-        Thu, 11 Aug 2022 11:47:37 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=A7LOA1OwzhRcAntRdWxP2AFiw4AilpcarcHxoDbK+MY=;
+        b=hSEOp3kEyepszDl7/oxNsk/Q2DOtiFqMh5Tkvkg8dHpix2S9PqGOk38yukkux6cEev
+         +Hpz8FhAKd4A25dQSyf2ctAEVvlzWGL0oUjyc2dytfBwAJKj17om4WaembEl4jP9P13t
+         NSCNPyj10ElmNG+DqB/ULlcug0+nLd3g7PCXgelBDTlxJPgk05MCkCF7pS7FIrB8BDnZ
+         Vfei4/21lPPjUfyvjC4vQvyhXNF9gOK1mCOw8aGOz/l2ZW+w8GqzrUhnPpq4//v2d5jd
+         +HA13fz83AUTVGb3CgG0uIiCVeFMKEuiG0QzIAi/BykQ/IaktZBJ/IvmSW6CTPv7dO6l
+         UPXA==
+X-Gm-Message-State: ACgBeo1pGiA9dtITWKUMCiwRBCa3H7kJkNH2BbYNuJDmvVW24axebu9l
+	lYR0ihVvkMu16Hu9ehrK3AZBMKl7p8U=
+X-Google-Smtp-Source: AA6agR4Tjx7lDP/rweLTJ6vRAq61YH+Vi2sA0j2+IQA//qnavrXQN3JUdA5h3bDlHDBM+xr3AxbU8A==
+X-Received: by 2002:a17:90b:33c4:b0:1f5:8428:beb9 with SMTP id lk4-20020a17090b33c400b001f58428beb9mr9978751pjb.95.1660243658334;
+        Thu, 11 Aug 2022 11:47:38 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
         by smtp.gmail.com with ESMTPSA id k3-20020aa79983000000b0052b84ca900csm24986pfh.62.2022.08.11.11.47.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Aug 2022 11:47:37 -0700 (PDT)
+        Thu, 11 Aug 2022 11:47:38 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 1/6] doc: add documentation for StationDebug
-Date: Thu, 11 Aug 2022 11:47:30 -0700
-Message-Id: <20220811184735.465951-1-prestwoj@gmail.com>
+Subject: [PATCH v3 2/6] station: add debug method GetNetworks
+Date: Thu, 11 Aug 2022 11:47:31 -0700
+Message-Id: <20220811184735.465951-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20220811184735.465951-1-prestwoj@gmail.com>
+References: <20220811184735.465951-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,88 +53,121 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+This gets all networks but includes individual entries for each
+BSS.
 ---
- doc/station-debug-api.txt | 68 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
- create mode 100644 doc/station-debug-api.txt
+ src/station.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 87 insertions(+)
 
 v3:
- * Removed the special /hidden object 
+ * Removed hidden networks from the list. GetHiddenAccessPoints could
+   be used instead.
 
-diff --git a/doc/station-debug-api.txt b/doc/station-debug-api.txt
-new file mode 100644
-index 00000000..ad91fc3b
---- /dev/null
-+++ b/doc/station-debug-api.txt
-@@ -0,0 +1,68 @@
-+Station Debug hierarchy [experimental]
-+============================
+diff --git a/src/station.c b/src/station.c
+index 57dbd0d5..66b296b8 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -4600,6 +4600,90 @@ static struct l_dbus_message *station_property_set_autoconnect(
+ 	return l_dbus_message_new_method_return(message);
+ }
+ 
++static void station_append_byte_array(struct l_dbus_message_builder *builder,
++					const char *name,
++					const uint8_t *bytes, size_t len)
++{
++	size_t i;
 +
-+These are all development APIs not meant for production use.
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_append_basic(builder, 's', name);
++	l_dbus_message_builder_enter_variant(builder, "ay");
++	l_dbus_message_builder_enter_array(builder, "y");
 +
-+Service		net.connman.iwd
-+Interface	net.connman.iwd.StationDebug
-+Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}
++	for (i = 0; i < len; i++)
++		l_dbus_message_builder_append_basic(builder, 'y', &bytes[i]);
 +
-+Methods		void ConnectBssid(array(y) address)
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_leave_variant(builder);
++	l_dbus_message_builder_leave_dict(builder);
++}
 +
-+			Connect to a specific BSS. The address parameter should
-+			be a byte array of length 6, the BSSID of a BSS which
-+			IWD already has in its scan list.
++static void station_append_bss_list(struct l_dbus_message_builder *builder,
++					const struct l_queue_entry *entry)
++{
++	for (; entry; entry = entry->next) {
++		struct scan_bss *bss = entry->data;
++		int32_t rssi = bss->signal_strength / 100;
 +
-+			Possible errors: net.connman.iwd.InvalidArguments
-+					 net.connman.iwd.NotFound
++		l_dbus_message_builder_enter_array(builder, "{sv}");
 +
-+		void Roam(array(y) address)
++		dbus_append_dict_basic(builder, "Frequency", 'u',
++						&bss->frequency);
++		dbus_append_dict_basic(builder, "RSSI", 'i',
++						&rssi);
++		dbus_append_dict_basic(builder, "Rank", 'q', &bss->rank);
 +
-+			Roam to a specific BSS. The address parameter should be
-+			a byte array of length 6, the BSSID of a BSS to roam to.
-+			This BSS needs to be in IWD's scan results and fit the
-+			requirements for a roam candidate (same network).
-+			The type of roam is dependent on the network and is
-+			chosen automatically by IWD.
++		dbus_append_dict_basic(builder, "Address", 's',
++					util_address_to_string(bss->addr));
 +
-+			Possible errors: net.connman.iwd.InvalidArguments
-+					 net.connman.iwd.NotConnected
++		station_append_byte_array(builder, "MDE", bss->mde, 3);
 +
-+		void Scan(array(q) frequencies)
++		l_dbus_message_builder_leave_array(builder);
++	}
++}
 +
-+			Scan on specific frequencies. The frequencies parameter
-+			should be a list of valid frequencies.
++static struct l_dbus_message *station_debug_get_networks(struct l_dbus *dbus,
++						struct l_dbus_message *message,
++						void *user_data)
++{
++	struct station *station = user_data;
++	struct l_dbus_message *reply =
++				l_dbus_message_new_method_return(message);
++	struct l_dbus_message_builder *builder =
++				l_dbus_message_builder_new(reply);
++	const struct l_queue_entry *entry;
 +
-+			Possible errors: net.connman.iwd.Busy
-+					 net.connman.iwd.InvalidArguments
-+					 net.connamn.iwd.Failed
++	l_dbus_message_builder_enter_array(builder, "{oaa{sv}}");
 +
-+		a{oaa{sv}} GetNetworks()
++	if (l_queue_isempty(station->networks_sorted))
++		goto done;
 +
-+			Get a list of networks including data for individual
-+			BSS's. Returns a dictionary where keys are network
-+			object paths and values are arrays of dictionaries
-+			containing BSS information:
++	for (entry = l_queue_get_entries(station->networks_sorted); entry;
++							entry = entry->next) {
++		const struct network *network = entry->data;
 +
-+			{
-+				/network/path/1: [
-+					{
-+						Address: 11:22:33:44:55,
-+						Frequency: 1234,
-+						RSSI: -20,
-+						Rank: 1000
-+						MDE: 001122
-+					},
-+					{ ... }
-+				]
-+			}
++		l_dbus_message_builder_enter_dict(builder, "oaa{sv}");
++		l_dbus_message_builder_append_basic(builder, 'o',
++						network_get_path(network));
++		l_dbus_message_builder_enter_array(builder, "a{sv}");
 +
-+Signals:	Event(s name, av data)
++		station_append_bss_list(builder,
++					network_bss_list_get_entries(network));
 +
-+			Signal sent for various debug events. The 'name' is the
-+			event name, and 'data' is event dependent.
++		l_dbus_message_builder_leave_array(builder);
++		l_dbus_message_builder_leave_dict(builder);
++	}
 +
-+Properties:	boolean AutoConnect
++done:
++	l_dbus_message_builder_leave_array(builder);
 +
-+			True if IWD is in an autoconnect state. This property
-+			can be written to put IWD into an autoconnect state.
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++
++	return reply;
++}
++
+ static void station_setup_debug_interface(
+ 					struct l_dbus_interface *interface)
+ {
+@@ -4612,6 +4696,9 @@ static void station_setup_debug_interface(
+ 	l_dbus_interface_method(interface, "Scan", 0,
+ 					station_debug_scan, "", "aq",
+ 					"frequencies");
++	l_dbus_interface_method(interface, "GetNetworks", 0,
++				station_debug_get_networks, "a{oaa{sv}}", "",
++				"networks");
+ 
+ 	l_dbus_interface_signal(interface, "Event", 0, "sav", "name", "data");
+ 
 -- 
 2.34.3
 
