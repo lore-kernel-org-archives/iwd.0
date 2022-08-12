@@ -1,45 +1,45 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED39138C
-	for <iwd@lists.linux.dev>; Fri, 12 Aug 2022 15:10:08 +0000 (UTC)
-Received: by mail-oi1-f176.google.com with SMTP id u14so1456993oie.2
-        for <iwd@lists.linux.dev>; Fri, 12 Aug 2022 08:10:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD8220E4
+	for <iwd@lists.linux.dev>; Fri, 12 Aug 2022 16:03:10 +0000 (UTC)
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-116c7286aaaso1378957fac.11
+        for <iwd@lists.linux.dev>; Fri, 12 Aug 2022 09:03:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc;
-        bh=cpLeLFb9DxIezkBsYWtMuwUgmfl8F9mdICSmoCW9ZZA=;
-        b=E40VriEFuo/Vg/JxKSmEX4H38CEe5fIMJ2n89XD5ifOhl/Xek0GgwoMlL+Iciyh7g3
-         l6xdf9cwi7FD7GTp92qSrOfHxDyj4puTezKDcKLjNlAtqzmmBeuAZFBGUKLc7oVWob3b
-         ezXhRUbxUircJgfa5xQwe8YXJqnJ9qhdLJcxNB9ePxv6svKw4vqVnfdQQ09xd6PC9SnZ
-         D5z/e6HQTW7tgrobEGZ0dpF9rUDJoU0Q9GPtCYuEic/KExOm5qrBgT986reZzYfdWd0l
-         u0hzd7VsFTy3WfR0DuOEiMcW5oTvUHIb88l9xAoKpnvfFav0K7SVCoRN31ygi2snDZR1
-         wk0Q==
+        bh=H9boJwox2w3HFIfeK0SiZ8uFvcvyWqwjsJi3u3ckHLw=;
+        b=VLhYzyYhR0jOOlS07GbJP6SNS1yVq4bQrug6TRvyg03XBbsEj7KZODH/THBA+tmLG3
+         nesAlM/K49pUUJ+EU6+LyObSjYiR1XCGEumeFZtA5w3KTj9LSBRcTP8z3knWv2Zce4yF
+         fL/clf4blmNplJ/2q8dsbd+RiWzBrB1E9/RHPJKg37A5ARsKdeP1uDqTQEk8cR+ZF1Lg
+         YqxxGB8L7XfG9tmFWVAaeLfdPBOtnqSb9Z+i6VecGxDdlkmJXsm6AkPPQB+CZ+0QN5XF
+         XyfdY67uOUDG2paalsW258tAPI/B7jX6v21ZueY5/lwPUHpXFyKK2oi610DDN/0fiw9v
+         phfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc;
-        bh=cpLeLFb9DxIezkBsYWtMuwUgmfl8F9mdICSmoCW9ZZA=;
-        b=OEOLqSHvcQ6IPu22QzNTKthlcReO0cYeSTgemr8cmvruXyhnxL0nA0C8rvtTehZoEH
-         X2FBAU6KplJZoZ0aoyLeUgEvGYutD7ywDtZ7ttJDukfzaa9e7f9ankuXiivi64IsxlC9
-         BN2VMbk7c504AumXnQsvejiq6z42SJk0ERg3UnqfpBAvu+7i1IQ74u7yv/LwT39tPYB0
-         y99bPQAkEkacplIU78lwcZUHyGLgJIxkBJ6+0+PD6cjS3Wr6Xcx3e0+pAywzA3Laow4y
-         YhvE9Kr3GiqdQsJuC1l2UVKIxeq8btOMxjZarkh6+dsyMDmajdZLigs55TKOVYqwZifE
-         YBwg==
-X-Gm-Message-State: ACgBeo0Y1kYWhOhwSyowWluxoptCkJ2Zm1wGfDiWxTUhrvZ6o0qXCQtJ
-	Db4gJQPhyIiMuUVrJJWWAOaOMXfzHmU=
-X-Google-Smtp-Source: AA6agR6yDdxAjVijOSjivW9f0ftyxUcRaxcrc39f7vCKD+p8H9nmhtTh5r5kePebu+iwSuLzjEZeHg==
-X-Received: by 2002:a05:6808:1687:b0:32c:3e3e:89b1 with SMTP id bb7-20020a056808168700b0032c3e3e89b1mr1964871oib.60.1660317007774;
-        Fri, 12 Aug 2022 08:10:07 -0700 (PDT)
+        bh=H9boJwox2w3HFIfeK0SiZ8uFvcvyWqwjsJi3u3ckHLw=;
+        b=KGCH+2l7yPHTvTYLkIUPcAdPE7BcfXPXz/IO23444BY4umhYazMBZCHB6Jn+K/4rmD
+         OnWawnYzW24XFlylQnswk/jvJAnxCqR+pow3Wos7GZ7HXdcRU2SRf2Btw7zrD1iuHCMn
+         r+aZY9eo12LPLwKC6r9cQ4TZyNiTwNQkHV3BsqiwA6FTRjpK1Iarb52wQ/hWJnMoUyh5
+         jhUvhNTN86bpYKTPSHHHEhIiBFZfHS/gPzuokHTH8Ms+6KDMhVYvLf4FhFT1Y33Htm8t
+         EazdB6TTjai+htpUcFj2k0iUw0Wj7kaUNOHhdI6TUfBYO8HVW4cIQQw0oojhVRkXE+zQ
+         rJ+w==
+X-Gm-Message-State: ACgBeo2y03wUGDvg2G2eE5wGUDCQb8hvrgUs99bwor/uPsdNEtHdCKHJ
+	sFW4ZAg83/czGiBYu4Oq6rGfgfuxS94=
+X-Google-Smtp-Source: AA6agR5edG3ZaoD99+B5L8vaF3WW1L2YRtHXksNA6fYj6/V90Tte8p/3sglGSRXRF5VzoDhiGy5GPQ==
+X-Received: by 2002:a05:6870:b154:b0:110:b77f:4d73 with SMTP id a20-20020a056870b15400b00110b77f4d73mr6089572oal.199.1660320189932;
+        Fri, 12 Aug 2022 09:03:09 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id z23-20020a056870461700b0010bf07976c9sm358207oao.41.2022.08.12.08.10.07
+        by smtp.googlemail.com with ESMTPSA id w25-20020a4a3559000000b004358b15cfe8sm396127oog.13.2022.08.12.09.03.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Aug 2022 08:10:07 -0700 (PDT)
-Message-ID: <47479f89-c065-8402-818b-d0becc285c27@gmail.com>
-Date: Fri, 12 Aug 2022 10:01:31 -0500
+        Fri, 12 Aug 2022 09:03:09 -0700 (PDT)
+Message-ID: <ebbf6098-299a-63cf-e016-5d200784970a@gmail.com>
+Date: Fri, 12 Aug 2022 10:45:34 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,67 +53,32 @@ Content-Language: en-US
 To: Joachim Breitner <mail@joachim-breitner.de>, iwd@lists.linux.dev
 References: <f79517c3f23c14dcd6db0dd5f3fb48fdeb687315.camel@joachim-breitner.de>
  <fa74ccdf82f2f4db651d50e51583bd85eca3fb28.camel@joachim-breitner.de>
+ <47479f89-c065-8402-818b-d0becc285c27@gmail.com>
+ <bb8de096a7a6d3775271e598189c312e1d9079ac.camel@joachim-breitner.de>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <fa74ccdf82f2f4db651d50e51583bd85eca3fb28.camel@joachim-breitner.de>
+In-Reply-To: <bb8de096a7a6d3775271e598189c312e1d9079ac.camel@joachim-breitner.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi Joachim,
 
-> I recorded the output of iwd -d on 5.15 and 5.19, see attachement. The
-> relevant bit seems to be
+>    Model: "Intel Wi-Fi 6 AX201"
+
+Ok, we should have one of these to test on our side.  But so far I see nothing 
+to indicate that this is an iwd bug.  Seems like a kernel regression?  I would 
+file a bug against the kernel or check if something like this already exists. 
+See bugzilla.kernel.org.
+
+>>
+>> So the question is why is the kernel changing this behavior?
 > 
+> I could narrow it down to 5.15 vs. 5.17, if that helps. But
+> linux/drivers/net/wireless/intel/iwlwifi seems to be a rather busy
+> directory:
+> https://github.com/torvalds/linux/commits/v5.17/drivers/net/wireless/intel/iwlwifi
 
-We should add this to our debug output, but what driver / hardware are you using?
-
-> src/station.c:station_enter_state() Old State: connected, new state: disconnected
-> src/station.c:station_enter_state() Old State: disconnected, new state: autoconnect_quick
-> src/wiphy.c:wiphy_radio_work_insert() Inserting work item 3
-> src/wiphy.c:wiphy_radio_work_next() Starting work item 3
-> src/wiphy.c:wiphy_reg_notify() Notification of command Wiphy Reg Change(113)
-> src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for phy0 is XX
-> src/scan.c:scan_notify() Scan notification Trigger Scan(33)
-> src/netconfig.c:netconfig_ifaddr_deleted() ifaddr 192.168.178.39/24
-> src/scan.c:scan_request_triggered() Active scan triggered for wdev 6
-> src/station.c:station_quick_scan_triggered() Quick scan triggered for wlan0
-> src/scan.c:scan_notify() Scan notification New Scan Results(34)
-> src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-> src/scan.c:get_scan_callback() get_scan_callback
-> src/scan.c:scan_parse_bss_information_elements() Load: 31/255
-> src/scan.c:get_scan_callback() get_scan_callback
-> src/scan.c:get_scan_callback() get_scan_callback
-> 
->                             
-
-So with 5.15, the underlying netdev is disconnected.  We get notified of that 
-and start scanning.
-
-> with 5.15 and
-> 
-> src/station.c:station_enter_state() Old State: connected, new state:
-> disconnected
-> src/station.c:station_enter_state() Old State: disconnected, new state:
-> autoconnect_quick
-> src/wiphy.c:wiphy_radio_work_insert() Inserting work item 3
-> src/wiphy.c:wiphy_radio_work_next() Starting work item 3
-> src/netdev.c:netdev_link_notify() event 16 on ifindex 3
-
-Here, we receive what looks to be an IFDOWN event.
-
-> src/station.c:station_free()
-> src/netconfig.c:netconfig_destroy()
-> src/scan.c:scan_cancel() Trying to cancel scan id 3 for wdev 3
-> src/scan.c:scan_cancel() Scan is already started
-> src/wiphy.c:wiphy_radio_work_done() Work item 3 done
-> src/station.c:station_roam_state_clear() 3
-> src/rrm.c:rrm_station_watch_destroy()
-> 
-
-So the question is why is the kernel changing this behavior?  iwd is not aware 
-of resume/suspend, so I'm not sure we can tell whether the ifdown event came 
-from the user manually bringing down the device or due to suspend / resume.
-
-What does rfkill look like on 5.15 & 5.19 after resume?
+That would help, but ideally we need a bisected commit or something else 
+concrete to work with.  Do you see anything suspicious in dmesg?
 
 Regards,
 -Denis
