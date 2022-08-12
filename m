@@ -1,84 +1,121 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD8220E4
-	for <iwd@lists.linux.dev>; Fri, 12 Aug 2022 16:03:10 +0000 (UTC)
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-116c7286aaaso1378957fac.11
-        for <iwd@lists.linux.dev>; Fri, 12 Aug 2022 09:03:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=H9boJwox2w3HFIfeK0SiZ8uFvcvyWqwjsJi3u3ckHLw=;
-        b=VLhYzyYhR0jOOlS07GbJP6SNS1yVq4bQrug6TRvyg03XBbsEj7KZODH/THBA+tmLG3
-         nesAlM/K49pUUJ+EU6+LyObSjYiR1XCGEumeFZtA5w3KTj9LSBRcTP8z3knWv2Zce4yF
-         fL/clf4blmNplJ/2q8dsbd+RiWzBrB1E9/RHPJKg37A5ARsKdeP1uDqTQEk8cR+ZF1Lg
-         YqxxGB8L7XfG9tmFWVAaeLfdPBOtnqSb9Z+i6VecGxDdlkmJXsm6AkPPQB+CZ+0QN5XF
-         XyfdY67uOUDG2paalsW258tAPI/B7jX6v21ZueY5/lwPUHpXFyKK2oi610DDN/0fiw9v
-         phfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=H9boJwox2w3HFIfeK0SiZ8uFvcvyWqwjsJi3u3ckHLw=;
-        b=KGCH+2l7yPHTvTYLkIUPcAdPE7BcfXPXz/IO23444BY4umhYazMBZCHB6Jn+K/4rmD
-         OnWawnYzW24XFlylQnswk/jvJAnxCqR+pow3Wos7GZ7HXdcRU2SRf2Btw7zrD1iuHCMn
-         r+aZY9eo12LPLwKC6r9cQ4TZyNiTwNQkHV3BsqiwA6FTRjpK1Iarb52wQ/hWJnMoUyh5
-         jhUvhNTN86bpYKTPSHHHEhIiBFZfHS/gPzuokHTH8Ms+6KDMhVYvLf4FhFT1Y33Htm8t
-         EazdB6TTjai+htpUcFj2k0iUw0Wj7kaUNOHhdI6TUfBYO8HVW4cIQQw0oojhVRkXE+zQ
-         rJ+w==
-X-Gm-Message-State: ACgBeo2y03wUGDvg2G2eE5wGUDCQb8hvrgUs99bwor/uPsdNEtHdCKHJ
-	sFW4ZAg83/czGiBYu4Oq6rGfgfuxS94=
-X-Google-Smtp-Source: AA6agR5edG3ZaoD99+B5L8vaF3WW1L2YRtHXksNA6fYj6/V90Tte8p/3sglGSRXRF5VzoDhiGy5GPQ==
-X-Received: by 2002:a05:6870:b154:b0:110:b77f:4d73 with SMTP id a20-20020a056870b15400b00110b77f4d73mr6089572oal.199.1660320189932;
-        Fri, 12 Aug 2022 09:03:09 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id w25-20020a4a3559000000b004358b15cfe8sm396127oog.13.2022.08.12.09.03.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Aug 2022 09:03:09 -0700 (PDT)
-Message-ID: <ebbf6098-299a-63cf-e016-5d200784970a@gmail.com>
-Date: Fri, 12 Aug 2022 10:45:34 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73F320E4
+	for <iwd@lists.linux.dev>; Fri, 12 Aug 2022 16:03:12 +0000 (UTC)
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4M47Wm6j3Dz9sSd;
+	Fri, 12 Aug 2022 17:53:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=joachim-breitner.de;
+	s=MBO0001; t=1660319636;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gq9K7Ut0VDNSbQN5E/R6I08u8mjD2j9KFdVwanBPk6Q=;
+	b=PjDp8j/wUWDWIyGiVCaGk7H5UXgXIyQYhiH9CWWD9/nTmHHX0FM+1f0t0Arluio3DElrre
+	T14Bmf6cTvscTmxC6erYSFFIO3wXEMrynHfB24L3MiRqZ8ErvWaZICfVDE+ku+aRRzDM0k
+	enVpEJKa5Pgqo5YW5sYfWELFdbJSGtNP7BfzqoZym0QKGIJAC3Ocn8BQbEkbi2vRbaV/d7
+	KzuSwL4eWCgs8XZ5T+0o+qXafq9sd32CIOGHyn/Wa90jqUrIRzoPJ+WJAT67i3WXDLs4FL
+	qhiQQ27nIZGMBJPfDbYOfbRYyt3InEG0YSTM1hc8lflC0maCaT147k+3y1arTA==
+Message-ID: <bb8de096a7a6d3775271e598189c312e1d9079ac.camel@joachim-breitner.de>
+Subject: Re: iwd needs restart after suspending
+From: Joachim Breitner <mail@joachim-breitner.de>
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+Date: Fri, 12 Aug 2022 17:53:55 +0200
+In-Reply-To: <47479f89-c065-8402-818b-d0becc285c27@gmail.com>
+References: 
+	<f79517c3f23c14dcd6db0dd5f3fb48fdeb687315.camel@joachim-breitner.de>
+	 <fa74ccdf82f2f4db651d50e51583bd85eca3fb28.camel@joachim-breitner.de>
+	 <47479f89-c065-8402-818b-d0becc285c27@gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: iwd needs restart after suspending
-Content-Language: en-US
-To: Joachim Breitner <mail@joachim-breitner.de>, iwd@lists.linux.dev
-References: <f79517c3f23c14dcd6db0dd5f3fb48fdeb687315.camel@joachim-breitner.de>
- <fa74ccdf82f2f4db651d50e51583bd85eca3fb28.camel@joachim-breitner.de>
- <47479f89-c065-8402-818b-d0becc285c27@gmail.com>
- <bb8de096a7a6d3775271e598189c312e1d9079ac.camel@joachim-breitner.de>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <bb8de096a7a6d3775271e598189c312e1d9079ac.camel@joachim-breitner.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Hi Joachim,
+Dear Denis,
 
->    Model: "Intel Wi-Fi 6 AX201"
 
-Ok, we should have one of these to test on our side.  But so far I see nothing 
-to indicate that this is an iwd bug.  Seems like a kernel regression?  I would 
-file a bug against the kernel or check if something like this already exists. 
-See bugzilla.kernel.org.
+Am Freitag, dem 12.08.2022 um 10:01 -0500 schrieb Denis Kenzior:
+> > I recorded the output of iwd -d on 5.15 and 5.19, see attachement. The
+> > relevant bit seems to be
+> >=20
+>=20
+> We should add this to our debug output, but what driver / hardware are yo=
+u using?
 
->>
->> So the question is why is the kernel changing this behavior?
-> 
-> I could narrow it down to 5.15 vs. 5.17, if that helps. But
-> linux/drivers/net/wireless/intel/iwlwifi seems to be a rather busy
-> directory:
-> https://github.com/torvalds/linux/commits/v5.17/drivers/net/wireless/intel/iwlwifi
 
-That would help, but ideally we need a bisected commit or something else 
-concrete to work with.  Do you see anything suspicious in dmesg?
+~ $ hwinfo --wlan
+06: PCI 14.3: 0282 WLAN controller                             =20
+  [Created at pci.386]
+  Unique ID: y9sn.qVqUKmQ3GD6
+  SysFS ID: /devices/pci0000:00/0000:00:14.3
+  SysFS BusID: 0000:00:14.3
+  Hardware Class: network
+  Model: "Intel Wi-Fi 6 AX201"
+  Vendor: pci 0x8086 "Intel Corporation"
+  Device: pci 0xa0f0 "Wi-Fi 6 AX201"
+  SubVendor: pci 0x8086 "Intel Corporation"
+  SubDevice: pci 0x0070=20
+  Revision: 0x20
+  Driver: "iwlwifi"
+  Driver Modules: "iwlwifi"
+  Device File: wlan0
+  Features: WLAN
+  Memory Range: 0x603d1cc000-0x603d1cffff (rw,non-prefetchable)
+  IRQ: 16 (no events)
+  HW Address: 2c:8d:b1:25:46:21
+  Permanent HW Address: 2c:8d:b1:25:46:21
+  Link detected: yes
+  WLAN channels: 1 2 3 4 5 6 7 8 9 10 11 12 13 36 40 44 48 52 56 60 64 100 =
+104 108 112 116 120 124 128 132 136 140
+  WLAN frequencies: 2.412 2.417 2.422 2.427 2.432 2.437 2.442 2.447 2.452 2=
+.457 2.462 2.467 2.472 5.18 5.2 5.22 5.24 5.26 5.28 5.3 5.32 5.5 5.52 5.54 =
+5.56 5.58 5.6 5.62 5.64 5.66 5.68 5.7
+  WLAN encryption modes: WEP40 WEP104 TKIP CCMP
+  WLAN authentication modes: open sharedkey wpa-psk wpa-eap
+  Module Alias: "pci:v00008086d0000A0F0sv00008086sd00000070bc02sc80i00"
+  Config Status: cfg=3Dnew, avail=3Dyes, need=3Dno, active=3Dunknown
 
-Regards,
--Denis
+>=20
+> So the question is why is the kernel changing this behavior?
+
+I could narrow it down to 5.15 vs. 5.17, if that helps. But=20
+linux/drivers/net/wireless/intel/iwlwifi seems to be a rather busy
+directory:
+https://github.com/torvalds/linux/commits/v5.17/drivers/net/wireless/intel/=
+iwlwifi
+
+>   iwd is not aware=20
+> of resume/suspend, so I'm not sure we can tell whether the ifdown event c=
+ame=20
+> from the user manually bringing down the device or due to suspend / resum=
+e.
+>=20
+> What does rfkill look like on 5.15 & 5.19 after resume?
+
+
+On 5.19, before suspend, after suspend and after restarting iwd it is
+always simply
+
+~ $ LANG=3DC rfkill
+ID TYPE      DEVICE                   SOFT      HARD
+ 0 bluetooth tpacpi_bluetooth_sw unblocked unblocked
+ 1 bluetooth hci0                unblocked unblocked
+ 2 wlan      phy0                unblocked unblocked
+
+Cheers,
+Joachim
+
+--=20
+Joachim Breitner
+  mail@joachim-breitner.de
+  http://www.joachim-breitner.de/
+
