@@ -1,37 +1,39 @@
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73F320E4
-	for <iwd@lists.linux.dev>; Fri, 12 Aug 2022 16:03:12 +0000 (UTC)
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91AF620E4
+	for <iwd@lists.linux.dev>; Fri, 12 Aug 2022 16:16:11 +0000 (UTC)
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4M47Wm6j3Dz9sSd;
-	Fri, 12 Aug 2022 17:53:56 +0200 (CEST)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4M481J74xZz9sTD;
+	Fri, 12 Aug 2022 18:16:04 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=joachim-breitner.de;
-	s=MBO0001; t=1660319636;
+	s=MBO0001; t=1660320965;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Gq9K7Ut0VDNSbQN5E/R6I08u8mjD2j9KFdVwanBPk6Q=;
-	b=PjDp8j/wUWDWIyGiVCaGk7H5UXgXIyQYhiH9CWWD9/nTmHHX0FM+1f0t0Arluio3DElrre
-	T14Bmf6cTvscTmxC6erYSFFIO3wXEMrynHfB24L3MiRqZ8ErvWaZICfVDE+ku+aRRzDM0k
-	enVpEJKa5Pgqo5YW5sYfWELFdbJSGtNP7BfzqoZym0QKGIJAC3Ocn8BQbEkbi2vRbaV/d7
-	KzuSwL4eWCgs8XZ5T+0o+qXafq9sd32CIOGHyn/Wa90jqUrIRzoPJ+WJAT67i3WXDLs4FL
-	qhiQQ27nIZGMBJPfDbYOfbRYyt3InEG0YSTM1hc8lflC0maCaT147k+3y1arTA==
-Message-ID: <bb8de096a7a6d3775271e598189c312e1d9079ac.camel@joachim-breitner.de>
+	bh=ZeqigphSaIz1yKQV+Ue751ayFnN8JRf1cP7aQzTH7HY=;
+	b=EuBFffaGTAHEJRG5CFD9w4JaOAHfCYCrMFNIe2sY84bZNN9JlnVGh5H+MSIhL/BA3GqV+1
+	D4SlLAWzldc2Re0u19iw+hcLJfRltwzoyzCNQ7cWqtmiuf1tOqTgp3Af7mf9P3oZpSJsZp
+	zMTk+ZhtbGzOD5D6jx2CIl7LcxU9/ueFtXXk3OfUDXgTM267kwBfmG/bJaCDF4ZQQ8xyzM
+	NB72RJ+Artw0qObw6lFFtreiY6yoapxweosnvJ+zFfD4c2vdxqbgdJRGuBW8qkMd5Onumh
+	j9mPTYycG25syvtOGCHS1uKaGYsfwCuERY6u0Y7DBqBh5VLY+DIk0nUxL0/zzw==
+Message-ID: <bf762c9c0e528ef2a04ee423d54c4be0c082be77.camel@joachim-breitner.de>
 Subject: Re: iwd needs restart after suspending
 From: Joachim Breitner <mail@joachim-breitner.de>
 To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-Date: Fri, 12 Aug 2022 17:53:55 +0200
-In-Reply-To: <47479f89-c065-8402-818b-d0becc285c27@gmail.com>
+Date: Fri, 12 Aug 2022 18:16:04 +0200
+In-Reply-To: <ebbf6098-299a-63cf-e016-5d200784970a@gmail.com>
 References: 
 	<f79517c3f23c14dcd6db0dd5f3fb48fdeb687315.camel@joachim-breitner.de>
 	 <fa74ccdf82f2f4db651d50e51583bd85eca3fb28.camel@joachim-breitner.de>
 	 <47479f89-c065-8402-818b-d0becc285c27@gmail.com>
-Content-Type: text/plain; charset="ISO-8859-15"
+	 <bb8de096a7a6d3775271e598189c312e1d9079ac.camel@joachim-breitner.de>
+	 <ebbf6098-299a-63cf-e016-5d200784970a@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
@@ -39,80 +41,78 @@ List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+X-Rspamd-Queue-Id: 4M481J74xZz9sTD
 
-Dear Denis,
+Hi,
 
+Am Freitag, dem 12.08.2022 um 10:45 -0500 schrieb Denis Kenzior:
 
-Am Freitag, dem 12.08.2022 um 10:01 -0500 schrieb Denis Kenzior:
-> > I recorded the output of iwd -d on 5.15 and 5.19, see attachement. The
-> > relevant bit seems to be
+> > >=20
+> > > So the question is why is the kernel changing this behavior?
 > >=20
+> > I could narrow it down to 5.15 vs. 5.17, if that helps. But
+> > linux/drivers/net/wireless/intel/iwlwifi seems to be a rather busy
+> > directory:
+> > https://github.com/torvalds/linux/commits/v5.17/drivers/net/wireless/in=
+tel/iwlwifi
 >=20
-> We should add this to our debug output, but what driver / hardware are yo=
-u using?
+> That would help, but ideally we need a bisected commit or something else=
+=20
+> concrete to work with.
 
+Yeah, but bisecting this with all the manual rebuilding, rebooting,
+suspending sounds daunting=E2=80=A6
 
-~ $ hwinfo --wlan
-06: PCI 14.3: 0282 WLAN controller                             =20
-  [Created at pci.386]
-  Unique ID: y9sn.qVqUKmQ3GD6
-  SysFS ID: /devices/pci0000:00/0000:00:14.3
-  SysFS BusID: 0000:00:14.3
-  Hardware Class: network
-  Model: "Intel Wi-Fi 6 AX201"
-  Vendor: pci 0x8086 "Intel Corporation"
-  Device: pci 0xa0f0 "Wi-Fi 6 AX201"
-  SubVendor: pci 0x8086 "Intel Corporation"
-  SubDevice: pci 0x0070=20
-  Revision: 0x20
-  Driver: "iwlwifi"
-  Driver Modules: "iwlwifi"
-  Device File: wlan0
-  Features: WLAN
-  Memory Range: 0x603d1cc000-0x603d1cffff (rw,non-prefetchable)
-  IRQ: 16 (no events)
-  HW Address: 2c:8d:b1:25:46:21
-  Permanent HW Address: 2c:8d:b1:25:46:21
-  Link detected: yes
-  WLAN channels: 1 2 3 4 5 6 7 8 9 10 11 12 13 36 40 44 48 52 56 60 64 100 =
-104 108 112 116 120 124 128 132 136 140
-  WLAN frequencies: 2.412 2.417 2.422 2.427 2.432 2.437 2.442 2.447 2.452 2=
-.457 2.462 2.467 2.472 5.18 5.2 5.22 5.24 5.26 5.28 5.3 5.32 5.5 5.52 5.54 =
-5.56 5.58 5.6 5.62 5.64 5.66 5.68 5.7
-  WLAN encryption modes: WEP40 WEP104 TKIP CCMP
-  WLAN authentication modes: open sharedkey wpa-psk wpa-eap
-  Module Alias: "pci:v00008086d0000A0F0sv00008086sd00000070bc02sc80i00"
-  Config Status: cfg=3Dnew, avail=3Dyes, need=3Dno, active=3Dunknown
+>   Do you see anything suspicious in dmesg?
 
->=20
-> So the question is why is the kernel changing this behavior?
+Hmm, maybe this is suspicious?
 
-I could narrow it down to 5.15 vs. 5.17, if that helps. But=20
-linux/drivers/net/wireless/intel/iwlwifi seems to be a rather busy
-directory:
-https://github.com/torvalds/linux/commits/v5.17/drivers/net/wireless/intel/=
-iwlwifi
+[ 6215.382573] PM: suspend entry (s2idle)
+[ 6215.391000] Filesystems sync: 0.008 seconds
+[ 6215.514851] Freezing user space processes ... (elapsed 0.001 seconds) do=
+ne.
+[ 6215.516769] OOM killer disabled.
+[ 6215.516781] Freezing remaining freezable tasks ... (elapsed 0.001 second=
+s) done.
+[ 6215.517980] printk: Suspending console(s) (use no_console_suspend to deb=
+ug)
+[ 6215.518444] wlan0: deauthenticating from dc:15:c8:12:e8:85 by local choi=
+ce (Reason: 3=3DDEAUTH_LEAVING)
+[ 6215.638139] iwlmei 0000:00:16.0-13280904-7792-4fcb-a1aa-5e70cbb1e865: Co=
+uldn't get ACK from CSME on HOST_GOES_DOWN message
+[ 6215.638250] iwlmei 0000:00:16.0-13280904-7792-4fcb-a1aa-5e70cbb1e865: fa=
+iled to send the SAP_ME_MSG_CHECK_SHARED_AREA message -19
+[ 6216.985516] ACPI: EC: interrupt blocked
+[ 6220.116906] ACPI: EC: interrupt unblocked
+[ 6220.412349] i2c_hid_acpi i2c-ELAN0672:00: i2c_hid_get_input: incomplete =
+report (14/65280)
+[ 6220.437632] nvme nvme0: Shutdown timeout set to 10 seconds
+[ 6220.439318] nvme nvme0: 8/0/0 default/read/poll queues
+[ 6220.694608] OOM killer enabled.
+[ 6220.694611] Restarting tasks ...=20
+[ 6220.694710] usb 3-3: USB disconnect, device number 7
+[ 6220.695734] done.
+[ 6220.700829] mei_hdcp 0000:00:16.0-b638ab7e-94e2-4ea2-a552-d1c54b627f04: =
+bound 0000:00:02.0 (ops i915_hdcp_component_ops [i915])
+[ 6220.706607] thermal thermal_zone7: failed to read out thermal zone (-61)
+[ 6220.810825] PM: suspend exit
+[ 6220.811417] usb 3-3: new full-speed USB device number 8 using xhci_hcd
+[ 6220.940161] usb 3-3: New USB device found, idVendor=3D06cb, idProduct=3D=
+00fc, bcdDevice=3D 0.00
+[ 6220.940169] usb 3-3: New USB device strings: Mfr=3D0, Product=3D0, Seria=
+lNumber=3D1
+[ 6220.940172] usb 3-3: SerialNumber: ce8cf4b20507
 
->   iwd is not aware=20
-> of resume/suspend, so I'm not sure we can tell whether the ifdown event c=
-ame=20
-> from the user manually bringing down the device or due to suspend / resum=
-e.
->=20
-> What does rfkill look like on 5.15 & 5.19 after resume?
+ah, googling for that message leads to this thread, which seems highly
+relevant, and it seems upstream knows about it:
+https://www.spinics.net/lists/linux-wireless/msg223249.html
 
-
-On 5.19, before suspend, after suspend and after restarting iwd it is
-always simply
-
-~ $ LANG=3DC rfkill
-ID TYPE      DEVICE                   SOFT      HARD
- 0 bluetooth tpacpi_bluetooth_sw unblocked unblocked
- 1 bluetooth hci0                unblocked unblocked
- 2 wlan      phy0                unblocked unblocked
+Unfortunately, no resolution in that thread. I=E2=80=99ll try to follow up
+there.
 
 Cheers,
 Joachim
+
 
 --=20
 Joachim Breitner
