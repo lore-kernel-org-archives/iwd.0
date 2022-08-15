@@ -1,121 +1,114 @@
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91AF620E4
-	for <iwd@lists.linux.dev>; Fri, 12 Aug 2022 16:16:11 +0000 (UTC)
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4M481J74xZz9sTD;
-	Fri, 12 Aug 2022 18:16:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=joachim-breitner.de;
-	s=MBO0001; t=1660320965;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZeqigphSaIz1yKQV+Ue751ayFnN8JRf1cP7aQzTH7HY=;
-	b=EuBFffaGTAHEJRG5CFD9w4JaOAHfCYCrMFNIe2sY84bZNN9JlnVGh5H+MSIhL/BA3GqV+1
-	D4SlLAWzldc2Re0u19iw+hcLJfRltwzoyzCNQ7cWqtmiuf1tOqTgp3Af7mf9P3oZpSJsZp
-	zMTk+ZhtbGzOD5D6jx2CIl7LcxU9/ueFtXXk3OfUDXgTM267kwBfmG/bJaCDF4ZQQ8xyzM
-	NB72RJ+Artw0qObw6lFFtreiY6yoapxweosnvJ+zFfD4c2vdxqbgdJRGuBW8qkMd5Onumh
-	j9mPTYycG25syvtOGCHS1uKaGYsfwCuERY6u0Y7DBqBh5VLY+DIk0nUxL0/zzw==
-Message-ID: <bf762c9c0e528ef2a04ee423d54c4be0c082be77.camel@joachim-breitner.de>
-Subject: Re: iwd needs restart after suspending
-From: Joachim Breitner <mail@joachim-breitner.de>
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-Date: Fri, 12 Aug 2022 18:16:04 +0200
-In-Reply-To: <ebbf6098-299a-63cf-e016-5d200784970a@gmail.com>
-References: 
-	<f79517c3f23c14dcd6db0dd5f3fb48fdeb687315.camel@joachim-breitner.de>
-	 <fa74ccdf82f2f4db651d50e51583bd85eca3fb28.camel@joachim-breitner.de>
-	 <47479f89-c065-8402-818b-d0becc285c27@gmail.com>
-	 <bb8de096a7a6d3775271e598189c312e1d9079ac.camel@joachim-breitner.de>
-	 <ebbf6098-299a-63cf-e016-5d200784970a@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3AC1C04
+	for <iwd@lists.linux.dev>; Mon, 15 Aug 2022 14:17:56 +0000 (UTC)
+Received: by mail-oi1-f177.google.com with SMTP id n133so8740496oib.0
+        for <iwd@lists.linux.dev>; Mon, 15 Aug 2022 07:17:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=VOKaic084+f/Bp8A+XmRsNJ9jr7zmPihX2fudvqx4+g=;
+        b=cRTi/ea6QMKECoV3IJrxeF+LLZ4sOn8ronlYpAE4z3n/XDMKtSqEXxm4+j0LqEVEKM
+         MG/z7ZnqRPGp21gVMp9epFThjzJctN1tDWj4nG8SXQGRM5iY8N7mvDDJn5/P5QcNDuIu
+         Olguw8EvtrbDlJ4QZE84qh4PZHUKbG+hQ14BrQ0jQByVHlFOFIGaUy+Pxlqh6Njeeujz
+         zbIvnDNj8Yuqzb3jpyyVr/Mr+aGGhhfVEMSm3+lW0E3EC38pIuvUivjyteD+nKANTMjD
+         jzYEl6X30FZYJ4Bl17GNxm+14ZPx3zmXM9rQ1p45gpWgG8Wqo8X5GDY4O/ZJyrp0WfF+
+         ckRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=VOKaic084+f/Bp8A+XmRsNJ9jr7zmPihX2fudvqx4+g=;
+        b=HsWa3hX0UQVKY34YucxKpaPTrvfH2LOYn9l2ARjb7dDmMCqX5n2YiZ3Vge9JDDOiC3
+         dXVifM5Fzrrkc0LWpd3tSpUGswJ2uxSbc6CBexyEXKUXA4FRtKJDQgayddVfGm49YuGw
+         eynYHYcnu6wbTdQqFF0EEBd4+a264Cnk/Kcj03YhGVutDxJKqgbbOONZYHQ+GMubFc2I
+         43ePrcl38ovfLN3F5oCu04pCU7hYpa/prc/CNzDeTrAZgNLV7Oef7o3lwdFFkCX3Tgvb
+         rlDFcG9u4G6Fm2yrzeUBp5yM2r0oLjq0XYHhlA3TU/IoqZUJURaZ8fgQiFu45zSY1SSQ
+         frEg==
+X-Gm-Message-State: ACgBeo0dZ8S6hNtkN1Q6fV+mDV5imhhH5bfpSPIXTe7k1GzmumcGdIJA
+	uyvWG1umZ2XrsS1HDTMeLZo12q6G529i28rHJGE=
+X-Google-Smtp-Source: AA6agR6sl8oLvw/DdlbHka1/nKPNe8EEVps2ZmFtIyAmPaJKMGiN/H63rA0DONKPYmtPd0H09fe+exfkl4GiHCOLgR4=
+X-Received: by 2002:a05:6808:1708:b0:335:1b16:fb09 with SMTP id
+ bc8-20020a056808170800b003351b16fb09mr11012891oib.7.1660573075363; Mon, 15
+ Aug 2022 07:17:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 4M481J74xZz9sTD
+References: <20220809230428.215970-1-prestwoj@gmail.com>
+In-Reply-To: <20220809230428.215970-1-prestwoj@gmail.com>
+From: Michael Johnson <mjohnson459@gmail.com>
+Date: Mon, 15 Aug 2022 15:17:44 +0100
+Message-ID: <CACsRnHV_DwbST4Qyk2Qv=n_t_khKdfrRQm16FLmkCG3HGD5qTg@mail.gmail.com>
+Subject: Re: [RFC 0/4] Roam based on packet loss event
+To: James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Hi James,
 
-Am Freitag, dem 12.08.2022 um 10:45 -0500 schrieb Denis Kenzior:
+I've been testing this today and it does seem to do what is intended.
+When we get a packet loss event we start a scan.
 
-> > >=20
-> > > So the question is why is the kernel changing this behavior?
-> >=20
-> > I could narrow it down to 5.15 vs. 5.17, if that helps. But
-> > linux/drivers/net/wireless/intel/iwlwifi seems to be a rather busy
-> > directory:
-> > https://github.com/torvalds/linux/commits/v5.17/drivers/net/wireless/in=
-tel/iwlwifi
->=20
-> That would help, but ideally we need a bisected commit or something else=
-=20
-> concrete to work with.
+```
+Aug 15 12:07:17 p3-1337 iwd[447]: src/netdev.c:netdev_mlme_notify()
+MLME notification Notify CQM(64)
+Aug 15 12:07:17 p3-1337 iwd[447]: src/netdev.c:netdev_cqm_event()
+Signal change event (above=1 signal=-60)
+Aug 15 12:08:20 p3-1337 iwd[447]: src/netdev.c:netdev_mlme_notify()
+MLME notification Notify CQM(64)
+Aug 15 12:08:20 p3-1337 iwd[447]: src/station.c:station_packets_lost()
+Packets lost event: 10
+Aug 15 12:08:20 p3-1337 iwd[447]: src/station.c:station_roam_scan() ifindex: 5
+Aug 15 12:08:20 p3-1337 iwd[447]:
+src/wiphy.c:wiphy_radio_work_insert() Inserting work item 61
+Aug 15 12:08:20 p3-1337 iwd[447]: src/wiphy.c:wiphy_radio_work_next()
+Starting work item 61
+Aug 15 12:08:20 p3-1337 iwd[447]: src/station.c:station_start_roam()
+Using cached neighbor report for roam
+Aug 15 12:08:20 p3-1337 iwd[447]: src/scan.c:scan_notify() Scan
+notification Trigger Scan(33)
+```
 
-Yeah, but bisecting this with all the manual rebuilding, rebooting,
-suspending sounds daunting=E2=80=A6
+In most cases, this does result in a better BSSID being found and a
+roam occuring. Occasionally a better BSSID isn't found and the roam
+fails, presumably when the packet loss event is not directly caused by
+a low RSSI. Either way the new behaviour does add more opportunities
+for fixing itself so seems an improvement, thanks!
 
->   Do you see anything suspicious in dmesg?
+Regards,
+Michael
 
-Hmm, maybe this is suspicious?
-
-[ 6215.382573] PM: suspend entry (s2idle)
-[ 6215.391000] Filesystems sync: 0.008 seconds
-[ 6215.514851] Freezing user space processes ... (elapsed 0.001 seconds) do=
-ne.
-[ 6215.516769] OOM killer disabled.
-[ 6215.516781] Freezing remaining freezable tasks ... (elapsed 0.001 second=
-s) done.
-[ 6215.517980] printk: Suspending console(s) (use no_console_suspend to deb=
-ug)
-[ 6215.518444] wlan0: deauthenticating from dc:15:c8:12:e8:85 by local choi=
-ce (Reason: 3=3DDEAUTH_LEAVING)
-[ 6215.638139] iwlmei 0000:00:16.0-13280904-7792-4fcb-a1aa-5e70cbb1e865: Co=
-uldn't get ACK from CSME on HOST_GOES_DOWN message
-[ 6215.638250] iwlmei 0000:00:16.0-13280904-7792-4fcb-a1aa-5e70cbb1e865: fa=
-iled to send the SAP_ME_MSG_CHECK_SHARED_AREA message -19
-[ 6216.985516] ACPI: EC: interrupt blocked
-[ 6220.116906] ACPI: EC: interrupt unblocked
-[ 6220.412349] i2c_hid_acpi i2c-ELAN0672:00: i2c_hid_get_input: incomplete =
-report (14/65280)
-[ 6220.437632] nvme nvme0: Shutdown timeout set to 10 seconds
-[ 6220.439318] nvme nvme0: 8/0/0 default/read/poll queues
-[ 6220.694608] OOM killer enabled.
-[ 6220.694611] Restarting tasks ...=20
-[ 6220.694710] usb 3-3: USB disconnect, device number 7
-[ 6220.695734] done.
-[ 6220.700829] mei_hdcp 0000:00:16.0-b638ab7e-94e2-4ea2-a552-d1c54b627f04: =
-bound 0000:00:02.0 (ops i915_hdcp_component_ops [i915])
-[ 6220.706607] thermal thermal_zone7: failed to read out thermal zone (-61)
-[ 6220.810825] PM: suspend exit
-[ 6220.811417] usb 3-3: new full-speed USB device number 8 using xhci_hcd
-[ 6220.940161] usb 3-3: New USB device found, idVendor=3D06cb, idProduct=3D=
-00fc, bcdDevice=3D 0.00
-[ 6220.940169] usb 3-3: New USB device strings: Mfr=3D0, Product=3D0, Seria=
-lNumber=3D1
-[ 6220.940172] usb 3-3: SerialNumber: ce8cf4b20507
-
-ah, googling for that message leads to this thread, which seems highly
-relevant, and it seems upstream knows about it:
-https://www.spinics.net/lists/linux-wireless/msg223249.html
-
-Unfortunately, no resolution in that thread. I=E2=80=99ll try to follow up
-there.
-
-Cheers,
-Joachim
-
-
---=20
-Joachim Breitner
-  mail@joachim-breitner.de
-  http://www.joachim-breitner.de/
-
+On Wed, 10 Aug 2022 at 00:04, James Prestwood <prestwoj@gmail.com> wrote:
+>
+> A few weeks ago a user (CC'ed) reported that his driver was not roaming
+> as expected, and would get disconnected before any CQM RSSI events got
+> to userspace. He did see that the kernel was sending packet loss events
+> which should also be a good reason to roam.
+>
+> These patches do just that, roam based on packet loss events.
+>
+> Sending as an RFC so Michael can (hopefully) give this a trial run. I
+> can simulate packet loss events in a virtual environment, but testing
+> on the driver in question would be best.
+>
+> James Prestwood (4):
+>   station: react to (new) netdev packet loss event
+>   netdev: handle packet loss notification
+>   auto-t: add generic tx_packet function
+>   auto-t: add packet loss test to testPSK-roam
+>
+>  autotests/testPSK-roam/connection_test.py | 46 ++++++++++++++++++++++-
+>  autotests/util/testutil.py                |  7 ++++
+>  src/netdev.c                              |  8 ++--
+>  src/netdev.h                              |  1 +
+>  src/station.c                             | 39 ++++++++++++++++---
+>  5 files changed, 90 insertions(+), 11 deletions(-)
+>
+> --
+> 2.34.3
+>
