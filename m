@@ -1,81 +1,90 @@
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFC01104
-	for <iwd@lists.linux.dev>; Tue, 16 Aug 2022 20:42:51 +0000 (UTC)
-Received: by mail-ot1-f53.google.com with SMTP id l5-20020a05683004a500b0063707ff8244so8180643otd.12
-        for <iwd@lists.linux.dev>; Tue, 16 Aug 2022 13:42:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599704A09
+	for <iwd@lists.linux.dev>; Fri, 19 Aug 2022 19:24:37 +0000 (UTC)
+Received: by mail-pj1-f53.google.com with SMTP id r15-20020a17090a1bcf00b001fabf42a11cso5729709pjr.3
+        for <iwd@lists.linux.dev>; Fri, 19 Aug 2022 12:24:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=4iwayhSn28c0eZfLsRiyR/5CwGkUUxbnj6XGFoF/Fq4=;
-        b=bbA+MyobgE+vX/I2xuwc3a++LJL1sC0tyI4b8ASmYjBR16TeJ1k3f5jMLU+FIz83I/
-         KY0bKmkWkWZnKAfSM6tvy30m9ZK8u9C3yPQAmem0R5K6YNocpIQ8Cr9W/Mssj6J/PF9U
-         h3PRhdvV/Bjh1vhmXOCVZk/qtoEejYiMR1tO02qvxv32r+3ISxVLEfWoqkfRus0gHQ6t
-         GgfdGNoGBTYyqw2dub2G+18oEQGQcbBFBJLDAjvJzLZqBW6MXXyOAIsi8ZSDCkx76eHr
-         DUvKggD7GbWam+FXJ+evU4rdEdDcmddHM31VYBEFZOr8O7jsZ6M+jM3wjoyaQWHeiBcK
-         l3Kg==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=ecd4WSKnsxwRkeaxJFCq86kDCaceKAaImv7wkDcSUKY=;
+        b=ZSCVb0yHhSu5VoWJs9dGYM8YUdiganBGKcc7HI97oqmfc8VSXssWDnyL/9l2HCJY2F
+         3N5zqI5Pg63+D4EC4agmtvlW/93GVdU2jZUc6vggTOG04GKbDYJS8CD9FxLJZPDXOlTr
+         Y/HY/cWAZylXQonkDXKrqWwg7Z46IzXv/ojyBbMJdbVgaOhakMbUp0FDTA6CXY4MZr3u
+         JjDQ/zkuICNwbxOVPg/ripvi+ATZgxxL24hOHR/nmNgNuCfly+pnDUWXLCsELexWgyUl
+         TRI9ZoVbzGJE0uaaRGyJa9G134xSEaiISkujHd3XxxSu3uMBxCQZXOUTffLEbq6PNGyT
+         yM0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=4iwayhSn28c0eZfLsRiyR/5CwGkUUxbnj6XGFoF/Fq4=;
-        b=YKNC5YoAloMuTfDoUrGA2UHYIDOSU7mVrYofGmoVDQOZOGnS+w5i6Bd8ageQtOS0zd
-         QIxyVILMYq3VV/nd7Hl2XSxuXqS57t8maNEkqFuC22FOBvUT+R5OTh4wqc/TQgQ99zyv
-         sa0klA4gLAhXuCNyQ8i2B/Ppx0W0xDTgYBnzPfh71iN29LPGJixHsfWBZYDf1tbgwKJG
-         biJ8a5ITkLCN61iJIKA9ftj9xhC/QdxpcjSDA+r+mZuk5fNAFhkZT0zdS5IKpyK76Lh0
-         3tKC0GiX/ADFJba4kXp/5NFBbfjlvgu6sCodL5MbgslRVtHw7IN6tSnZRKEvsREx9nrf
-         eRqw==
-X-Gm-Message-State: ACgBeo1Cb14Q/SzDFRrpuuFj/JD4c9w1mtj5lpNbxseExYDeumTLiapi
-	tkRNHxVimlPZdto2lIvpJ+sVgExEqgY=
-X-Google-Smtp-Source: AA6agR4KxCXa+AfAl0p+2mLIw3KMdOiVZ6yNFP/k9nEbBabdfXVBDmslNsgJb7juwls4yH/vkB54Pg==
-X-Received: by 2002:a9d:2dc9:0:b0:638:a55c:a891 with SMTP id g67-20020a9d2dc9000000b00638a55ca891mr4201371otb.81.1660682570492;
-        Tue, 16 Aug 2022 13:42:50 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id r131-20020acaf389000000b00344eb5a9416sm360943oih.55.2022.08.16.13.42.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Aug 2022 13:42:50 -0700 (PDT)
-Message-ID: <56a12204-5d4b-6c0a-6b87-f6faf4296408@gmail.com>
-Date: Tue, 16 Aug 2022 15:31:12 -0500
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=ecd4WSKnsxwRkeaxJFCq86kDCaceKAaImv7wkDcSUKY=;
+        b=rb0i1vAUr4mWEzKMU5P8upqMBxH/l6N9cCu3zadRUPeWUer8eHo9dpp5gVlcdR8J6X
+         EsUX2lrXIj27rttkyQjBNpoAd7DCfHUrPjLGIBlUQ27SGSqhX1XnzK3SD95/GaUX4wTy
+         KepMG/IWMHfWhn7l1IgHJUd9mTe1W9Pl6ulILFlWVbDOjl1qxBcCFztePPXpmdor+abu
+         imAacACKxqS/OuuwZxm50m5NriUtEr6bPorFJrDJffQxk5I6Rrm1fVwz0bVqpc61Vjwo
+         zxAkefFHWdBOh8UUPfyW972rS8aY/DB5fCCQ7DcP4XvqgxqfYzQ0JmWZZoBnS5+QqElp
+         Bxkw==
+X-Gm-Message-State: ACgBeo1Gn0+bW2qQk5a2Yg+2g5s+7YODcI5lW/j7krhgvrVk3V1xkdh3
+	FIZibhIdxEm/8kvxMdSpUP2ecZBFeyw=
+X-Google-Smtp-Source: AA6agR7UfD79XdvDgjQ4PaaK4I1xKq+ConT9G+7FgV8OMQl9eWYemuWTiWGIrutIuuq93RkO+P/jYQ==
+X-Received: by 2002:a17:902:ba96:b0:170:9f15:b997 with SMTP id k22-20020a170902ba9600b001709f15b997mr8447153pls.34.1660937076521;
+        Fri, 19 Aug 2022 12:24:36 -0700 (PDT)
+Received: from jprestwo-xps.none ([50.39.168.145])
+        by smtp.gmail.com with ESMTPSA id t2-20020a170902d14200b0016dbe37cebdsm3472982plt.246.2022.08.19.12.24.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Aug 2022 12:24:36 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/5] test-runner: double RAM for --valgrind
+Date: Fri, 19 Aug 2022 12:24:27 -0700
+Message-Id: <20220819192431.1605386-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [RFC 0/4] Roam based on packet loss event
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-Cc: mjohnson459@gmail.com
-References: <20220809230428.215970-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220809230428.215970-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+It seems 256MB was right on the edge if valgrind was being used and
+sometimes the test would fail with OOM exceptions.
+---
+ tools/runner.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-On 8/9/22 18:04, James Prestwood wrote:
-> A few weeks ago a user (CC'ed) reported that his driver was not roaming
-> as expected, and would get disconnected before any CQM RSSI events got
-> to userspace. He did see that the kernel was sending packet loss events
-> which should also be a good reason to roam.
-> 
-> These patches do just that, roam based on packet loss events.
-> 
-> Sending as an RFC so Michael can (hopefully) give this a trial run. I
-> can simulate packet loss events in a virtual environment, but testing
-> on the driver in question would be best.
-> 
+diff --git a/tools/runner.py b/tools/runner.py
+index a96627de..004bf46d 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -370,6 +370,7 @@ class QemuRunner(RunnerAbstract):
+ 
+ 		usb_adapters = None
+ 		pci_adapters = None
++		ram = 256
+ 
+ 		super().__init__(args)
+ 
+@@ -400,11 +401,14 @@ class QemuRunner(RunnerAbstract):
+ 
+ 		kern_log = "ignore_loglevel" if "kernel" in args.verbose else "quiet"
+ 
++		if args.valgrind:
++			ram *= 2
++
+ 		qemu_cmdline = [
+ 			'qemu-system-x86_64',
+ 			'-machine', 'type=q35,accel=kvm:tcg',
+ 			'-nodefaults', '-no-user-config', '-monitor', 'none',
+-			'-display', 'none', '-m', '256M', '-nographic', '-vga',
++			'-display', 'none', '-m', '%dM' % ram, '-nographic', '-vga',
+ 			'none', '-no-acpi', '-no-hpet',
+ 			'-no-reboot', '-fsdev',
+ 			'local,id=fsdev-root,path=/,readonly=on,security_model=none,multidevs=remap',
+-- 
+2.34.3
 
-I went ahead and applied this series.  Hopefully the default packet loss 
-threshold is good enough.  Worst case we might have to make it configurable or 
-disable it on certain drivers.
-
-Regards,
--Denis
