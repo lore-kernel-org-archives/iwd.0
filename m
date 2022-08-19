@@ -1,50 +1,48 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125C74A14
-	for <iwd@lists.linux.dev>; Fri, 19 Aug 2022 19:24:39 +0000 (UTC)
-Received: by mail-pj1-f54.google.com with SMTP id s4-20020a17090a5d0400b001fabc6bb0baso5188116pji.1
-        for <iwd@lists.linux.dev>; Fri, 19 Aug 2022 12:24:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68F14A14
+	for <iwd@lists.linux.dev>; Fri, 19 Aug 2022 20:26:26 +0000 (UTC)
+Received: by mail-pj1-f53.google.com with SMTP id s36-20020a17090a69a700b001faad0a7a34so8532775pjj.4
+        for <iwd@lists.linux.dev>; Fri, 19 Aug 2022 13:26:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=PyaCBV50H/xF9xv3Fm+FcwZnifyGExGBQ/U5FJwtPqg=;
-        b=NIY4GN7r/vazkw8qon7caoEfP5LqKXe1esHMTe0k8/Ca84fl0m4i13KeJ5ndLT7YIP
-         N/JIR2LXc+lW9Wxwuqm7vHS7b6TsdKddDTOKum6k2KXWAr7OvIO2l/fD2RM7tWGNEiNW
-         Ryb/9J7XC+jwpogGvUwOu/kyzghXPej+yqVSfMW9xZT58ENKZCzlAlfXgTaKVKdj4Miv
-         zHd4c/yOPDVbNeuC+GWllhvCAfesMVARuhvmULt984VD8l3QKRdDLQ5IrJiOnCBKL3Zy
-         HF/Zo/CXtGv7sUziwl7pnk+hZ14oEl8uudIp2nXc2F7EB/eR0XYM4h7Cq6pF5A9BZjyb
-         9LMQ==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=ecd4WSKnsxwRkeaxJFCq86kDCaceKAaImv7wkDcSUKY=;
+        b=ONAxMwihEDEdQ/KNx7RRB0l/6dW62gm/5KoPGkJM+0ICVAxKfcGIccp06oOh9l+pEV
+         3QDeTHH4LRsHYVwyftF5i2qkotWEeJ3EaoH7nYfz27Y0+ySkednMF7iCfw1TPooCs3HB
+         mFjV4G8DHL5hXO/BiwtErzeraPvhNt53bgP0Xk6F/sjZ6e3a1/ngxmTtXQOtEnBegnIj
+         /O/vlMzDyLbj1ScA+Et+btLnhbrNS6bZJlD4fkPX2+GwwcX6wHKRDcvSX30FP04aW8Ev
+         KrGJzR4Tv9uEyj4WBX2KMErdpM8vpc/F6iRTzHLrYYb/TXwxww+ZJKv0qecPQJ24pMET
+         OODA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=PyaCBV50H/xF9xv3Fm+FcwZnifyGExGBQ/U5FJwtPqg=;
-        b=4OIk7NBbKVOinmdhOTsfuYerOtuGTrNEH/wMU0S1M+3CrsNDy9hBERlcRBfdkJufEN
-         DyYEduLeMs/FJ3SfP21w3YWSyPLS5mBYmBvPKnCvd7eayAUbQd+CcxwwRfB1ipvHCoQ0
-         x9k+aYCgN64EETLxN64YxJP+6sUr2GHzaKHrwnn9DNxUGHjxdZ6g9wEYL0mIdoG7Wc7i
-         z8VagbwImtNtKVGt8DB+CnrDpTSddMfOeuh8GhE/dkRaIpHsd0qyV+Xh1TXAXGe3QmDV
-         3xGPZ3T2VsipZXvSp2OmttjkysOlMnDYN5LWIHU35L3WUP54hCoYE1/Sn9ggGhQ5rjgG
-         dADg==
-X-Gm-Message-State: ACgBeo2rXXJ9vd2Tz8C0vWdfQ3hSaLsqlAsOu9CCX7YgdfvidHqe4DEF
-	f0U0gAWw05KYzdjeLyFMmCkaCHw0+tY=
-X-Google-Smtp-Source: AA6agR7r7KeKalAX6CfDvAX/355zX0uyXQeKZCBrw4UO1Ekalw9+9psWukru+GTVIvyvBnmtn0Ct9g==
-X-Received: by 2002:a17:903:2602:b0:172:ba94:1590 with SMTP id jd2-20020a170903260200b00172ba941590mr6843629plb.146.1660937079288;
-        Fri, 19 Aug 2022 12:24:39 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=ecd4WSKnsxwRkeaxJFCq86kDCaceKAaImv7wkDcSUKY=;
+        b=4K5V1VTXS0bDevXBASgQUB/bkDuoE01SDXKbo4ZxvesStTviKWvBoz1uM24mYK4+Uj
+         UcuRQy74NyrLJsyngaijVQKiMHO45AJgWCKRZl7M80yfTE2xWrOinyVeGyYHIPgQtVd2
+         OyR2QD5LiW9yjVIqhJQrzUN7rdoNQd9806Wu3F0HgijZXmLDIlzY30CmYzd3uhyl7+hX
+         6paNtSRq3qdHc/nRbfDamHWR+LkPUzhVnx1wYpVcAvPQNFPGHbbEOx9h+j8+wmChoG0u
+         tBawKRARbNoCe93J61lukRk33udqqEhyxbs6xoHfqMZCzbnHJDG/IKfbrBKeuVKn6SSZ
+         ticA==
+X-Gm-Message-State: ACgBeo3tVWU2auANB+/yyVxxQyZhFNVBarLThSEZL9CTuOl7sc392e5L
+	Ojrn9FsGMQpCyWCX8/KXDONEvANYbZU=
+X-Google-Smtp-Source: AA6agR6u16yLV778QTBOB+J0a3Q9EHg4nTfggLBYc834vqBfDfgU4E5NRXF5OsfVoqAkyVZnck0HxA==
+X-Received: by 2002:a17:90a:55:b0:1f7:4513:8cac with SMTP id 21-20020a17090a005500b001f745138cacmr9954547pjb.93.1660940785973;
+        Fri, 19 Aug 2022 13:26:25 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
-        by smtp.gmail.com with ESMTPSA id t2-20020a170902d14200b0016dbe37cebdsm3472982plt.246.2022.08.19.12.24.38
+        by smtp.gmail.com with ESMTPSA id t15-20020a17090340cf00b0016dbce87aecsm22206pld.182.2022.08.19.13.26.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Aug 2022 12:24:38 -0700 (PDT)
+        Fri, 19 Aug 2022 13:26:25 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/5] auto-t: fix testNetconfig static test
-Date: Fri, 19 Aug 2022 12:24:31 -0700
-Message-Id: <20220819192431.1605386-5-prestwoj@gmail.com>
+Subject: [PATCH v2 1/5] test-runner: double RAM for --valgrind
+Date: Fri, 19 Aug 2022 13:26:20 -0700
+Message-Id: <20220819202624.1681246-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20220819192431.1605386-1-prestwoj@gmail.com>
-References: <20220819192431.1605386-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,71 +51,40 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This test was updated to add namespaces which actually 'fixed' dhcpd's
-address conflict detection since it uses ICMP echo requests. Part of
-this test assumed the DHCP server would not detect a conflict which
-isn't true for dhcpd (and any decent DHCP server I would guess). This
-check now fails since dhcpd detects a conflict (the static address)
-and hands out the next available address.
-
-Testing conflict detection like this is really only testing dhcpd
-behavior, and however IWD behaves here isn't important since the
-network is doomed from the start.
+It seems 256MB was right on the edge if valgrind was being used and
+sometimes the test would fail with OOM exceptions.
 ---
- autotests/testNetconfig/static_test.py | 28 --------------------------
- 1 file changed, 28 deletions(-)
+ tools/runner.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/autotests/testNetconfig/static_test.py b/autotests/testNetconfig/static_test.py
-index 01d694ca..aac2adcc 100644
---- a/autotests/testNetconfig/static_test.py
-+++ b/autotests/testNetconfig/static_test.py
-@@ -20,17 +20,10 @@ class Test(unittest.TestCase):
-         # Use a non-default storage_dir for one of the instances, the default for the other one
-         wd = IWD(True, iwd_storage_dir='/tmp/storage')
+diff --git a/tools/runner.py b/tools/runner.py
+index a96627de..004bf46d 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -370,6 +370,7 @@ class QemuRunner(RunnerAbstract):
  
--        ns0 = ctx.get_namespace('ns0')
--
--        wd_ns0 = IWD(True, namespace=ns0)
--
-         psk_agent = PSKAgent("secret123")
--        psk_agent_ns0 = PSKAgent("secret123", namespace=ns0)
-         wd.register_psk_agent(psk_agent)
--        wd_ns0.register_psk_agent(psk_agent_ns0)
+ 		usb_adapters = None
+ 		pci_adapters = None
++		ram = 256
  
-         dev1 = wd.list_devices(1)[0]
--        dev2 = wd_ns0.list_devices(1)[0]
+ 		super().__init__(args)
  
-         ordered_network = dev1.get_ordered_network('ap-main')
+@@ -400,11 +401,14 @@ class QemuRunner(RunnerAbstract):
  
-@@ -80,28 +73,7 @@ class Test(unittest.TestCase):
-         # of the log since we care about the end result here.
-         self.assertEqual(expected_rclog, entries[-3:])
+ 		kern_log = "ignore_loglevel" if "kernel" in args.verbose else "quiet"
  
--        ordered_network = dev2.get_ordered_network('ap-main')
--
--        condition = 'not obj.connected'
--        wd_ns0.wait_for_object_condition(ordered_network.network_object, condition)
--
--        # Connect to the same network from a dynamically configured client.  The
--        # DHCP server doesn't know (even though dev1 announced itself) that
--        # 192.168.1.10 is already in use and if it assigns dev2 the lowest
--        # available address, that's going to be 192.168.1.10.  dev1's ACD
--        # implementation should then stop using this address.
--        ordered_network.network_object.connect()
--
--        condition = 'obj.state == DeviceState.connected'
--        wd_ns0.wait_for_object_condition(dev2, condition)
--
--        wd.wait(1)
--        # Check dev1 is now disconnected or without its IPv4 address
--        if dev1.state == iwd.DeviceState.connected:
--            testutil.test_ip_address_match(dev1.name, None)
--
-         dev1.disconnect()
--        dev2.disconnect()
- 
-         condition = 'not obj.connected'
-         wd.wait_for_object_condition(ordered_network.network_object, condition)
++		if args.valgrind:
++			ram *= 2
++
+ 		qemu_cmdline = [
+ 			'qemu-system-x86_64',
+ 			'-machine', 'type=q35,accel=kvm:tcg',
+ 			'-nodefaults', '-no-user-config', '-monitor', 'none',
+-			'-display', 'none', '-m', '256M', '-nographic', '-vga',
++			'-display', 'none', '-m', '%dM' % ram, '-nographic', '-vga',
+ 			'none', '-no-acpi', '-no-hpet',
+ 			'-no-reboot', '-fsdev',
+ 			'local,id=fsdev-root,path=/,readonly=on,security_model=none,multidevs=remap',
 -- 
 2.34.3
 
