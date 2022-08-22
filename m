@@ -1,47 +1,47 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9BE4A17
-	for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 18:25:33 +0000 (UTC)
-Received: by mail-pl1-f174.google.com with SMTP id c2so10694963plo.3
-        for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 11:25:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3294A18
+	for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 18:25:34 +0000 (UTC)
+Received: by mail-pg1-f169.google.com with SMTP id r69so10125797pgr.2
+        for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 11:25:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=VjVcuI/u0rJMbr1M/MD6lzT4QAzs5eSFQPyZCGKGx6U=;
-        b=Gm8LAKUBQUskOjOexTmhqPUmQw+YGkR7BXgl+1E1YldetUeCcVg1aD45alrTsM0Jx2
-         H9SfER+igwTRziudhSoGjDUgsgxbhsCeN95pvFnl90mESxglioGtcXipfenNrDUyBDyJ
-         3M8caw7rwD7LEVTyJmvre3we/EN64sudbdeVG5kKHpXuschsi+RuUn82B7Iwf2ssOw6d
-         E8JsWNECdq031OKhapXI8Qx0jnXt2Lg1taCq9gYreOaRTU9CAtbWscaMrzPKPmmP6PDL
-         zrrYYOj/Ch9xuASzq6APhQviluWB0N6kSdX00Ejs0JkoLiSdr2CLEsPXIcH5ODmw1Ovu
-         owYQ==
+        bh=MK443qbrSJ+NQ7mbUC4R5V85T6XrEWA/99+qPDUxiPE=;
+        b=BmrZOg8rVCa7BHklmAaEL4vb1fp7zrvx6+JTvohBPqDrwRC9OGvw/BrgeIjuoPTjpn
+         Cu5YbHiWHitCERDatGkv5dngX6LTg1w8hCJ22uYxxNZ+pQS2H51lBIlYlMdRZlGEL+Bi
+         Sqzv2TYHYvIYx2cq1zwzjJSjGtTpBlYEguKiqxnK+CGY8ExmiJuR0KQlhAoKhvgE6/ma
+         23Hqz6Q7j+2N0pEmtIeYnAc6gAvqSgMeFGzCimL5EEJvEFCDbLzS6psLMtYr84ztqKev
+         iVcX4yCZOcxd07ex+iAqCOX6IhrTdnJYUzlYKiZOsKDH3JpXmvL8tr3gAF+1+2QQjqjj
+         CW7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=VjVcuI/u0rJMbr1M/MD6lzT4QAzs5eSFQPyZCGKGx6U=;
-        b=WVUq+g3/pphT2G33arEQBRKif73kL/srKzwTZGItXzX8rZiYreAmwMXH1zjkCfHunF
-         urlrW6BzBYOvdRnRKK6dcuXiBUE3AZuP97bL0+ejB0o7bF1AyI17ZK8EXKmATW8s+npI
-         /lHCzqnpf4xUINQJbhfOULDjCnl+EuOMKfHpD40m+lDgUxasqDaRBFU+Dve5DmsTfSbh
-         KNyX6ZDTjr1S/EAJrRiA9UacOQ+ms/EeNYdnsWA3yBQ3KLDMQvuiSFhtBZLyfslMo7rI
-         Cg20qPkZZb9w7COKI5pnxZViZ/qhhg/dIUWQvvcXFwX26J0MzQ46HSVvuQafa2hup1HE
-         naig==
-X-Gm-Message-State: ACgBeo03jp5ZID+LcX820RV4BXdfptDsBSX1UplLIahTsJxKRfUHlydU
-	uh7kyIgCqdlxZu+IkxVmsLuJNZ28Sbs=
-X-Google-Smtp-Source: AA6agR7D8E/cAeqe0xE2jiTYfDCDpqoV/HrCGgJM7V3fdrphhwM3/Q3Cv+eUfVAlYHBgjPYI11k6Ug==
-X-Received: by 2002:a17:903:1ce:b0:16f:145c:a842 with SMTP id e14-20020a17090301ce00b0016f145ca842mr21105040plh.83.1661192733029;
+        bh=MK443qbrSJ+NQ7mbUC4R5V85T6XrEWA/99+qPDUxiPE=;
+        b=sMl3XP78nVbxd0oxQdchxCILK+X3otgJ8IXnVdCgSIwg3XGxmJNhO8vVFFFor48Srl
+         ygH/Sv0Ut5sb69l0ynoxmi6j/ESh3Eu+aEbj5lCjLrvEAdm86yUS/Va6vZh/PA6uGJLz
+         XpQJRAxztUfPODxdSn50Q979AT2ZqIr0Ren0VYKkrvZXtpT1geY7TyXkRjfBnz/YetMs
+         C5sqRG3l1S2GYlMsfdmWCcxbjtuOVxAknaObKohQHpeYDTVimjZBhxR6gR5vHcBZlcGB
+         QtNYPxmbY21C+rU5KH3Y8CLOetoYv4rHAMWb92R95hv2pdYaQXf9WXCZcJwtQe5Vczv3
+         dDvA==
+X-Gm-Message-State: ACgBeo2/8zrXeA+XjwCKVpbBaS/eIFRkaTHtFFxC+XHrAC5YnSbZfCxh
+	JiAErBS55uLMAiEB4ov8/keDAQVMLiE=
+X-Google-Smtp-Source: AA6agR6EyULYJvoHB6KA8XF4vz05VtEF2IqH08kXWvTIX/nWdH2hDmVjYU2qnDi0T0fWv2wzNHfxXw==
+X-Received: by 2002:a05:6a00:1650:b0:52f:20d6:e858 with SMTP id m16-20020a056a00165000b0052f20d6e858mr21915774pfc.36.1661192733705;
         Mon, 22 Aug 2022 11:25:33 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
-        by smtp.gmail.com with ESMTPSA id w1-20020a1709026f0100b00172bd4c12b2sm1612024plk.224.2022.08.22.11.25.32
+        by smtp.gmail.com with ESMTPSA id w1-20020a1709026f0100b00172bd4c12b2sm1612024plk.224.2022.08.22.11.25.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 11:25:32 -0700 (PDT)
+        Mon, 22 Aug 2022 11:25:33 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/9] ft: netdev: rename structs/APIs to prepare for refactor
-Date: Mon, 22 Aug 2022 11:25:18 -0700
-Message-Id: <20220822182525.2078312-2-prestwoj@gmail.com>
+Subject: [PATCH 3/9] station: have station_transition_start take a list of BSS's
+Date: Mon, 22 Aug 2022 11:25:19 -0700
+Message-Id: <20220822182525.2078312-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220822182525.2078312-1-prestwoj@gmail.com>
 References: <20220822182525.2078312-1-prestwoj@gmail.com>
@@ -53,361 +53,193 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Much of the over-DS processing can be combined with over-air once
-the authenticate stage is performed via CMD_FRAME. To prepare for
-this rename all the 'over_ds' structs/APIs so the name makes sense
-once used with the over-air code path.
----
- src/ft.c     | 17 +++++------
- src/ft.h     | 17 ++++-------
- src/netdev.c | 81 ++++++++++++++++++++++++++--------------------------
- 3 files changed, 53 insertions(+), 62 deletions(-)
+This prepares for the FT-over-Air refactor, which will allow a
+candidate list to be provided to netdev_fast_transition. For now
+generate this candidate list but use the first (best) entry for the
+roam.
 
-diff --git a/src/ft.c b/src/ft.c
-index 2285a86f..04ae2775 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -348,7 +348,7 @@ static bool ft_verify_rsne(const uint8_t *rsne, const uint8_t *pmk_r0_name,
- 	return true;
+This does slightly change the logic and all roam candidates are
+added to stations->bss_list (where before only the best candidate
+was), but this shouldn't effect how IWD behaves externally.
+---
+ src/station.c | 99 +++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 68 insertions(+), 31 deletions(-)
+
+diff --git a/src/station.c b/src/station.c
+index 66b296b8..33cea14a 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2181,13 +2181,14 @@ static void station_preauthenticate_cb(struct netdev *netdev,
  }
  
--static int ft_parse_ies(struct handshake_state *hs,
-+static int parse_ies(struct handshake_state *hs,
- 			const uint8_t *authenticator_ie,
- 			const uint8_t *ies, size_t ies_len,
- 			const uint8_t **mde_out,
-@@ -471,16 +471,14 @@ static bool mde_equal(const uint8_t *mde1, const uint8_t *mde2)
- 	return memcmp(mde1, mde1, mde1[1] + 2) == 0;
- }
- 
--bool ft_over_ds_parse_action_ies(struct ft_ds_info *info,
--					struct handshake_state *hs,
--					const uint8_t *ies,
--					size_t ies_len)
-+bool ft_parse_ies(struct ft_info *info, struct handshake_state *hs,
-+			const uint8_t *ies, size_t ies_len)
+ static void station_transition_start(struct station *station,
+-							struct scan_bss *bss)
++						struct l_queue *candidates)
  {
- 	const uint8_t *mde = NULL;
- 	const uint8_t *fte = NULL;
- 	bool is_rsn = hs->supplicant_ie != NULL;
- 
--	if (ft_parse_ies(hs, info->authenticator_ie, ies, ies_len,
-+	if (parse_ies(hs, info->authenticator_ie, ies, ies_len,
- 				&mde, &fte) < 0)
- 		return false;
- 
-@@ -512,7 +510,7 @@ static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
- 	if (!ies)
- 		goto ft_error;
- 
--	if (ft_parse_ies(hs, hs->authenticator_ie, ies, ies_len,
-+	if (parse_ies(hs, hs->authenticator_ie, ies, ies_len,
- 				&mde, &fte) < 0)
- 		goto ft_error;
- 
-@@ -585,8 +583,7 @@ int ft_over_ds_parse_action_response(const uint8_t *frame, size_t frame_len,
- 	return 0;
- }
- 
--bool ft_over_ds_prepare_handshake(struct ft_ds_info *info,
--					struct handshake_state *hs)
-+bool ft_prepare_handshake(struct ft_info *info, struct handshake_state *hs)
- {
- 	if (!hs->supplicant_ie)
- 		return true;
-@@ -606,7 +603,7 @@ bool ft_over_ds_prepare_handshake(struct ft_ds_info *info,
- 	return true;
- }
- 
--void ft_ds_info_free(struct ft_ds_info *info)
-+void ft_info_free(struct ft_info *info)
- {
- 	__typeof__(info->free) destroy = info->free;
- 
-diff --git a/src/ft.h b/src/ft.h
-index f90fc1b2..8bb31b28 100644
---- a/src/ft.h
-+++ b/src/ft.h
-@@ -28,9 +28,7 @@ typedef int (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_len,
- 					void *user_data);
- typedef int (*ft_get_oci)(void *user_data);
- 
--typedef void (*ft_ds_free_func_t)(void *user_data);
--
--struct ft_ds_info {
-+struct ft_info {
- 	uint8_t spa[6];
- 	uint8_t aa[6];
- 	uint8_t snonce[32];
-@@ -40,10 +38,10 @@ struct ft_ds_info {
- 
- 	struct ie_ft_info ft_info;
- 
--	void (*free)(struct ft_ds_info *s);
-+	void (*free)(struct ft_info *s);
- };
- 
--void ft_ds_info_free(struct ft_ds_info *info);
-+void ft_info_free(struct ft_info *info);
- 
- bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
- 				const uint8_t *new_snonce, uint8_t *buf,
-@@ -54,10 +52,8 @@ int ft_over_ds_parse_action_response(const uint8_t *frame, size_t frame_len,
- 					const uint8_t **aa_out,
- 					const uint8_t **ies_out,
- 					size_t *ies_len);
--bool ft_over_ds_parse_action_ies(struct ft_ds_info *info,
--					struct handshake_state *hs,
--					const uint8_t *ies,
--					size_t ies_len);
-+bool ft_parse_ies(struct ft_info *info, struct handshake_state *hs,
-+			const uint8_t *ies, size_t ies_len);
- 
- struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
- 				ft_tx_authenticate_func_t tx_auth,
-@@ -69,5 +65,4 @@ struct auth_proto *ft_over_ds_sm_new(struct handshake_state *hs,
- 				ft_tx_associate_func_t tx_assoc,
- 				void *user_data);
- 
--bool ft_over_ds_prepare_handshake(struct ft_ds_info *info,
--					struct handshake_state *hs);
-+bool ft_prepare_handshake(struct ft_info *info, struct handshake_state *hs);
-diff --git a/src/netdev.c b/src/netdev.c
-index 0d48631c..165dc157 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -96,8 +96,8 @@ struct netdev_handshake_state {
- 	enum connection_type type;
- };
- 
--struct netdev_ft_over_ds_info {
--	struct ft_ds_info super;
-+struct netdev_ft_info {
-+	struct ft_info super;
- 	struct netdev *netdev;
- 
- 	bool parsed : 1;
-@@ -176,7 +176,7 @@ struct netdev {
- 	struct l_genl_msg *auth_cmd;
- 	struct wiphy_radio_work_item work;
- 
--	struct l_queue *ft_ds_list;
-+	struct l_queue *ft_list;
- 
- 	struct netdev_ext_key_info *ext_key_info;
- 
-@@ -752,11 +752,11 @@ static void netdev_preauth_destroy(void *data)
- 	l_free(state);
- }
- 
--static void netdev_ft_ds_entry_free(void *data)
-+static void netdev_ft_entry_free(void *data)
- {
--	struct netdev_ft_over_ds_info *info = data;
-+	struct netdev_ft_info *info = data;
- 
--	ft_ds_info_free(&info->super);
-+	ft_info_free(&info->super);
- }
- 
- static void netdev_connect_free(struct netdev *netdev)
-@@ -848,9 +848,9 @@ static void netdev_connect_free(struct netdev *netdev)
- 		netdev->get_oci_cmd_id = 0;
- 	}
- 
--	if (netdev->ft_ds_list) {
--		l_queue_destroy(netdev->ft_ds_list, netdev_ft_ds_entry_free);
--		netdev->ft_ds_list = NULL;
-+	if (netdev->ft_list) {
-+		l_queue_destroy(netdev->ft_list, netdev_ft_entry_free);
-+		netdev->ft_list = NULL;
- 	}
- }
- 
-@@ -962,9 +962,9 @@ static void netdev_free(void *data)
- 	if (netdev->fw_roam_bss)
- 		scan_bss_free(netdev->fw_roam_bss);
- 
--	if (netdev->ft_ds_list) {
--		l_queue_destroy(netdev->ft_ds_list, netdev_ft_ds_entry_free);
--		netdev->ft_ds_list = NULL;
-+	if (netdev->ft_list) {
-+		l_queue_destroy(netdev->ft_list, netdev_ft_entry_free);
-+		netdev->ft_list = NULL;
- 	}
- 
- 	scan_wdev_remove(netdev->wdev_id);
-@@ -1415,9 +1415,9 @@ static void netdev_connect_ok(struct netdev *netdev)
- 		netdev->fw_roam_bss = NULL;
- 	}
- 
--	if (netdev->ft_ds_list) {
--		l_queue_destroy(netdev->ft_ds_list, netdev_ft_ds_entry_free);
--		netdev->ft_ds_list = NULL;
-+	if (netdev->ft_list) {
-+		l_queue_destroy(netdev->ft_list, netdev_ft_entry_free);
-+		netdev->ft_list = NULL;
- 	}
- 
- 	if (netdev->connect_cb) {
-@@ -4508,22 +4508,22 @@ static void prepare_ft(struct netdev *netdev, const struct scan_bss *target_bss)
- 	}
- }
- 
--static void netdev_ft_over_ds_auth_failed(struct netdev_ft_over_ds_info *info,
-+static void netdev_ft_over_ds_auth_failed(struct netdev_ft_info *info,
- 						uint16_t status)
- {
--	l_queue_remove(info->netdev->ft_ds_list, info);
--	ft_ds_info_free(&info->super);
-+	l_queue_remove(info->netdev->ft_list, info);
-+	ft_info_free(&info->super);
- }
- 
--struct ft_ds_finder {
-+struct ft_finder {
- 	const uint8_t *spa;
- 	const uint8_t *aa;
- };
- 
--static bool match_ft_ds_info(const void *a, const void *b)
-+static bool match_ft_info(const void *a, const void *b)
- {
--	const struct netdev_ft_over_ds_info *info = a;
--	const struct ft_ds_finder *finder = b;
-+	const struct netdev_ft_info *info = a;
-+	const struct ft_finder *finder = b;
- 
- 	if (memcmp(info->super.spa, finder->spa, 6))
- 		return false;
-@@ -4538,14 +4538,14 @@ static void netdev_ft_response_frame_event(const struct mmpdu_header *hdr,
- 					int rssi, void *user_data)
- {
- 	struct netdev *netdev = user_data;
--	struct netdev_ft_over_ds_info *info;
-+	struct netdev_ft_info *info;
+ 	struct handshake_state *hs = netdev_get_handshake(station->netdev);
+ 	struct network *connected = station->connected_network;
+ 	enum security security = network_get_security(connected);
+ 	struct handshake_state *new_hs;
+ 	struct ie_rsn_info cur_rsne, target_rsne;
++	struct scan_bss *bss = l_queue_peek_head(candidates);
  	int ret;
- 	uint16_t status_code = MMPDU_STATUS_CODE_UNSPECIFIED;
- 	const uint8_t *aa;
- 	const uint8_t *spa;
- 	const uint8_t *ies;
- 	size_t ies_len;
--	struct ft_ds_finder finder;
-+	struct ft_finder finder;
  
- 	if (!netdev->connected)
- 		return;
-@@ -4558,7 +4558,7 @@ static void netdev_ft_response_frame_event(const struct mmpdu_header *hdr,
- 	finder.spa = spa;
- 	finder.aa = aa;
+ 	l_debug("%u, target %s", netdev_get_ifindex(station->netdev),
+@@ -2311,14 +2312,15 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 	struct station *station = userdata;
+ 	struct network *network = station->connected_network;
+ 	struct handshake_state *hs = netdev_get_handshake(station->netdev);
+-	struct scan_bss *current_bss = station->connected_bss;
++	struct scan_bss *current_bss;
+ 	struct scan_bss *bss;
+-	struct scan_bss *best_bss = NULL;
+-	double best_bss_rank = 0.0;
++	struct scan_bss *old_bss = NULL;
++	double cur_bss_rank = 0.0;
+ 	static const double RANK_FT_FACTOR = 1.3;
+ 	uint16_t mdid;
+ 	enum security orig_security, security;
+ 	bool seen = false;
++	struct l_queue *candidates = NULL;
  
--	info = l_queue_find(netdev->ft_ds_list, match_ft_ds_info, &finder);
-+	info = l_queue_find(netdev->ft_list, match_ft_info, &finder);
- 	if (!info)
- 		return;
+ 	if (err) {
+ 		station_roam_failed(station);
+@@ -2337,6 +2339,27 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 		ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
+ 							&mdid, NULL, NULL);
  
-@@ -4568,8 +4568,7 @@ static void netdev_ft_response_frame_event(const struct mmpdu_header *hdr,
- 		goto ft_error;
++	/* Ranks better than the current BSS will go into the candidates list */
++	current_bss = l_queue_find(bss_list, bss_match_bssid,
++					station->connected_bss->addr);
++	if (!current_bss) {
++		cur_bss_rank = 0;
++		current_bss = station->connected_bss;
++	} else
++		cur_bss_rank = current_bss->rank;
++
++	if (hs->mde)
++		cur_bss_rank *= RANK_FT_FACTOR;
++
++	/*
++	 * TODO: Best to base this check off the actual transition request by
++	 *       looking at disassociation imminent and bss termination bits.
++	 *       For now keep existing behavior by always roaming if there are
++	 *       any candidates.
++	 */
++	if (station->ap_directed_roaming)
++		cur_bss_rank = 0;
++
+ 	/*
+ 	 * BSSes in the bss_list come already ranked with their initial
+ 	 * association preference rank value.  We only need to add preference
+@@ -2387,51 +2410,59 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
+ 			rank *= RANK_FT_FACTOR;
+ 
+-		if (rank > best_bss_rank) {
+-			if (best_bss)
+-				scan_bss_free(best_bss);
++		if (rank <= cur_bss_rank)
++			goto next;
++
++		if (!candidates)
++			candidates = l_queue_new();
+ 
+-			best_bss = bss;
+-			best_bss_rank = rank;
++		l_queue_insert(candidates, bss, scan_bss_rank_compare, NULL);
+ 
+-			continue;
++		l_debug("Adding BSS "MAC" as roam candidate",
++					MAC_STR(bss->addr));
++		/*
++		 * Should only get here if the rank is better than our current
++		 * BSS. Any BSS's here need to be added to the bss_list in case
++		 * they are chosen to roam to. This also avoids the need to
++		 * free candidates entries separately.
++		 */
++		old_bss = network_bss_find_by_addr(network, bss->addr);
++		if (old_bss) {
++			network_bss_update(network, bss);
++			l_queue_remove(station->bss_list, old_bss);
++			scan_bss_free(old_bss);
++
++			l_queue_insert(station->bss_list, bss,
++					scan_bss_rank_compare, NULL);
++		} else {
++			network_bss_add(network, bss);
++			l_queue_push_tail(station->bss_list, bss);
+ 		}
+ 
++		continue;
+ next:
+ 		scan_bss_free(bss);
  	}
  
--	if (!ft_over_ds_parse_action_ies(&info->super, netdev->handshake,
--						ies, ies_len))
-+	if (!ft_parse_ies(&info->super, netdev->handshake, ies, ies_len))
- 		goto ft_error;
+ 	l_queue_destroy(bss_list, NULL);
  
- 	info->parsed = true;
-@@ -4661,8 +4660,8 @@ int netdev_fast_transition_over_ds(struct netdev *netdev,
- 					const struct scan_bss *orig_bss,
- 					netdev_connect_cb_t cb)
- {
--	struct netdev_ft_over_ds_info *info;
--	struct ft_ds_finder finder;
-+	struct netdev_ft_info *info;
-+	struct ft_finder finder;
+-	if (!seen)
+-		goto fail_free_bss;
++	bss = l_queue_peek_head(candidates);
  
- 	if (!netdev->operational)
- 		return -ENOTCONN;
-@@ -4675,14 +4674,14 @@ int netdev_fast_transition_over_ds(struct netdev *netdev,
- 	finder.spa = netdev->addr;
- 	finder.aa = target_bss->addr;
+ 	/* See if we have anywhere to roam to */
+-	if (!best_bss || scan_bss_addr_eq(best_bss, station->connected_bss)) {
+-		station_debug_event(station, "no-roam-candidates");
++	if (!seen || !bss || scan_bss_addr_eq(bss, station->connected_bss))
+ 		goto fail_free_bss;
+-	}
  
--	info = l_queue_find(netdev->ft_ds_list, match_ft_ds_info, &finder);
-+	info = l_queue_find(netdev->ft_list, match_ft_info, &finder);
+-	bss = network_bss_find_by_addr(network, best_bss->addr);
+-	if (bss) {
+-		network_bss_update(network, best_bss);
+-		l_queue_remove(station->bss_list, bss);
+-		scan_bss_free(bss);
++	station_transition_start(station, candidates);
  
- 	if (!info || !info->parsed)
- 		return -ENOENT;
+-		l_queue_insert(station->bss_list, best_bss,
+-				scan_bss_rank_compare, NULL);
+-	} else {
+-		network_bss_add(network, best_bss);
+-		l_queue_push_tail(station->bss_list, best_bss);
+-	}
+-
+-	station_transition_start(station, best_bss);
++	l_queue_destroy(candidates, NULL);
  
- 	prepare_ft(netdev, target_bss);
+ 	return true;
  
--	ft_over_ds_prepare_handshake(&info->super, netdev->handshake);
-+	ft_prepare_handshake(&info->super, netdev->handshake);
+ fail_free_bss:
+-	if (best_bss)
+-		scan_bss_free(best_bss);
++	station_debug_event(station, "no-roam-candidates");
++
++	if (candidates)
++		l_queue_destroy(candidates, NULL);
  
- 	netdev->connect_cb = cb;
+ 	station_roam_failed(station);
  
-@@ -4699,7 +4698,7 @@ int netdev_fast_transition_over_ds(struct netdev *netdev,
+@@ -4356,6 +4387,7 @@ static struct l_dbus_message *station_force_roam(struct l_dbus *dbus,
+ 	struct l_dbus_message_iter iter;
+ 	uint8_t *mac;
+ 	uint32_t mac_len;
++	struct l_queue *candidate;
  
- static void netdev_ft_request_cb(struct l_genl_msg *msg, void *user_data)
- {
--	struct netdev_ft_over_ds_info *info = user_data;
-+	struct netdev_ft_info *info = user_data;
+ 	if (!l_dbus_message_get_arguments(message, "ay", &iter))
+ 		goto invalid_args;
+@@ -4385,7 +4417,12 @@ static struct l_dbus_message *station_force_roam(struct l_dbus *dbus,
+ 	/* The various roam routines expect this to be set from scanning */
+ 	station->preparing_roam = true;
  
- 	if (l_genl_msg_get_error(msg) < 0) {
- 		l_error("Could not send CMD_FRAME for FT-over-DS");
-@@ -4708,10 +4707,10 @@ static void netdev_ft_request_cb(struct l_genl_msg *msg, void *user_data)
- 	}
- }
+-	station_transition_start(station, target);
++	candidate = l_queue_new();
++	l_queue_push_head(candidate, target);
++
++	station_transition_start(station, candidate);
++
++	l_queue_destroy(candidate, NULL);
  
--static void netdev_ft_ds_info_free(struct ft_ds_info *ft)
-+static void netdev_ft_info_free(struct ft_info *ft)
- {
--	struct netdev_ft_over_ds_info *info = l_container_of(ft,
--					struct netdev_ft_over_ds_info, super);
-+	struct netdev_ft_info *info = l_container_of(ft,
-+					struct netdev_ft_info, super);
+ 	return l_dbus_message_new_method_return(message);
  
- 	l_free(info);
- }
-@@ -4719,7 +4718,7 @@ static void netdev_ft_ds_info_free(struct ft_ds_info *ft)
- int netdev_fast_transition_over_ds_action(struct netdev *netdev,
- 					const struct scan_bss *target_bss)
- {
--	struct netdev_ft_over_ds_info *info;
-+	struct netdev_ft_info *info;
- 	uint8_t ft_req[14];
- 	struct handshake_state *hs = netdev->handshake;
- 	struct iovec iovs[5];
-@@ -4736,7 +4735,7 @@ int netdev_fast_transition_over_ds_action(struct netdev *netdev,
- 
- 	l_debug("");
- 
--	info = l_new(struct netdev_ft_over_ds_info, 1);
-+	info = l_new(struct netdev_ft_info, 1);
- 	info->netdev = netdev;
- 
- 	memcpy(info->super.spa, hs->spa, ETH_ALEN);
-@@ -4748,7 +4747,7 @@ int netdev_fast_transition_over_ds_action(struct netdev *netdev,
- 						target_bss->rsne[1] + 2);
- 
- 	l_getrandom(info->super.snonce, 32);
--	info->super.free = netdev_ft_ds_info_free;
-+	info->super.free = netdev_ft_info_free;
- 
- 	ft_req[0] = 6; /* FT category */
- 	ft_req[1] = 1; /* FT Request action */
-@@ -4767,10 +4766,10 @@ int netdev_fast_transition_over_ds_action(struct netdev *netdev,
- 
- 	iovs[2].iov_base = NULL;
- 
--	if (!netdev->ft_ds_list)
--		netdev->ft_ds_list = l_queue_new();
-+	if (!netdev->ft_list)
-+		netdev->ft_list = l_queue_new();
- 
--	l_queue_push_head(netdev->ft_ds_list, info);
-+	l_queue_push_head(netdev->ft_list, info);
- 
- 	netdev_send_action_framev(netdev, netdev->handshake->aa, iovs, 2,
- 					netdev->frequency,
 -- 
 2.34.3
 
