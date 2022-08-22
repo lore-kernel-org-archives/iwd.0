@@ -1,47 +1,47 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F3E2F56
-	for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 17:01:56 +0000 (UTC)
-Received: by mail-pj1-f54.google.com with SMTP id ds12-20020a17090b08cc00b001fae6343d9fso6197240pjb.0
-        for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 10:01:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F5C46AC
+	for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 17:01:55 +0000 (UTC)
+Received: by mail-pf1-f171.google.com with SMTP id 83so5213276pfw.6
+        for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 10:01:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=oaytClLNVcMoG5g/aV/h9Xp5KhfN+snUxmprD+oOSJ4=;
-        b=Tr0eKbQKNlEr4Kmt0ZWh6sfUgpcoHB5doqY+an+5cDEmj1hueBhJ8FrnoJxAv1uNkB
-         99j+HWkQmxWzsDr6+2Uk1hSu60y9yDI82AX2ZdbOJgp2REZYfxV7S0/ApfHV6PxvG3d1
-         2tV9GyOl27MUaNI/E/kzN6e8kg+JTFmd3UK+5gkIg+Uv3ZH3WLjwWfMCSoWZT4VI/Zza
-         Pt6bawe/Y4vKZZPOAcvEbFK0vyslLOYr3AJLLJsvG3aPT9Idm+sJU64bI3tUtsHa9EEH
-         iFJ9qq0gznGTYhOkLgJ/JeXxb7RXTj5KWjCX3heHAC+7k9nwH4F+cTiRTyfJwDEbg2O3
-         V8tw==
+        bh=Te6a3F5PsQ8Moyr2UMG0VTHxxZL6Jj/WY6EIkBJtPo4=;
+        b=oyLyGgBjSEKmSxyC+nI2mnm/dwjKdl78G9vxkWh3hZfvTxrughQFVPj+X907+xtj+W
+         eJQlbdvTe1YcEgBcZOTsGbiuMG+I1YyFwC1HpSBP/l69Sk602wwQpa4NOGlYZ7lQVfJS
+         YmQrw2IePESbAjHXkInLOz/rRUdVZQHewWr5qVu9w70tPt6ua/De90ucZ8NdHCBK8HQU
+         3CdrZB+wcckYXfLlHoK+babNYOFE6lUsRWGzob0caWwqy3tafwdD/y6Qkhvl1NzS6ji6
+         pRXYD7jVj0BxIYMT9/v6iWmVPCcbVQZ/3QxvsZoSqa1SLOCS9yf8KNpvD7gOycvRpm95
+         Q4fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=oaytClLNVcMoG5g/aV/h9Xp5KhfN+snUxmprD+oOSJ4=;
-        b=51eaB2QAcKBDpjJE2XrkXXj0CusZtlkZh+7XWouDkD7hxsJM5xNAGTjIirSoC3qJUQ
-         stWHyTDHhIEobEGCWDfzRnG3S2opp8KEaGQADLkhaOYA6BufL21VbRECFY5b6xEipkp6
-         CMZKH1Quw2BjCqLdgubOTEDss5aMvh5Yijqg2qYRipbeJhfPAR+tdEEC3L9sMJNXa+By
-         0TRC205f4kwrIVc6Svk3XN/K1ks1PoId+sMmQsiXqoMO5pWoq9uZlWu0Pv9PbcTRCryc
-         31V7EXIYabibIBYydkk8//KqdzUUe08QpeDDQkp4ah528OrjrMuNXexq4fdb/9vhwHKI
-         ebjQ==
-X-Gm-Message-State: ACgBeo2qCmZOqZAD+4qEx/XGDVnK6EA8csUPZJoOXJWTH4TkzXMiuVea
-	4Ijk/snUR5ReIW0lMuV5x20H8Gset4w=
-X-Google-Smtp-Source: AA6agR7sW4VoBL0vzbhXcfrE6umQ7/EJxW3G3nnjr1xhJ6IrfdkywF/ikr/019g4vjL42z2XHfN0Yw==
-X-Received: by 2002:a17:902:7d86:b0:170:a752:cbd1 with SMTP id a6-20020a1709027d8600b00170a752cbd1mr21028938plm.17.1661187715559;
-        Mon, 22 Aug 2022 10:01:55 -0700 (PDT)
+        bh=Te6a3F5PsQ8Moyr2UMG0VTHxxZL6Jj/WY6EIkBJtPo4=;
+        b=P5Akd7RfuRV8jYrajgT70MwWfYfd9FfgvFbIpzQgu+Ap+RBkSWOfVRjAJH4WeQpDuf
+         tEaU+H2NoyzZiukdcEWmtwBtXjVXbqo7F7Q/5HBIHp2XscLzcyy+93yh3dyqwm8vrKuc
+         psq4MVEs+UypULLdQLkRLX0abWSBYmlLffMnfVT+3q2qg2Ze3Ey4blm9ZCB0KPzhOEkF
+         6xz8GczVlaftqKKWseo9qp7+3mlZ7ROGWFq2f4Dznd4ed+pity1ds1hFWcTlsuMtRzuT
+         8fttMsf2Dr+ixbiCJ9iRr5qVM0q1OHXTWL03N7yntQ6x0C0KuvExGAU+PTs75JPX4FOj
+         YHCw==
+X-Gm-Message-State: ACgBeo0ePzNo4Uz2KYI+GppX1gNoidAGXOqOUbXvalq5mlrs2OZA2r7f
+	l51KyAtRcEtnrJRfjKvpf2XwNdASad4=
+X-Google-Smtp-Source: AA6agR683+FaazdSkizL8MK5lYFAhs0gt7nTeiOJcNMeGzSG/yszLi63dcsp8CBKA7mcKBkVXDfJ5g==
+X-Received: by 2002:a05:6a00:148c:b0:52e:a630:afc7 with SMTP id v12-20020a056a00148c00b0052ea630afc7mr22021721pfu.0.1661187714834;
+        Mon, 22 Aug 2022 10:01:54 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
         by smtp.gmail.com with ESMTPSA id d1-20020a170903230100b0016ef87334aesm8691002plh.162.2022.08.22.10.01.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 10:01:55 -0700 (PDT)
+        Mon, 22 Aug 2022 10:01:54 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 5/6] auto-t: remove bringing up lo interface
-Date: Mon, 22 Aug 2022 10:01:49 -0700
-Message-Id: <20220822170150.2049490-5-prestwoj@gmail.com>
+Subject: [PATCH v4 4/6] auto-t: update tests to use set_address/group_neighbors
+Date: Mon, 22 Aug 2022 10:01:48 -0700
+Message-Id: <20220822170150.2049490-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220822170150.2049490-1-prestwoj@gmail.com>
 References: <20220822170150.2049490-1-prestwoj@gmail.com>
@@ -53,88 +53,284 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Several tests were setting lo up which is already done by
-test-runner.
+This reduces the big blocks of copied code with a few function calls.
 ---
- autotests/testFILS/fils_256_test.py           | 2 --
- autotests/testFILS/fils_384_test.py           | 2 --
- autotests/testFT-FILS/connection_test.py      | 1 -
- autotests/testPreauth-roam/connection_test.py | 2 --
- tools/run-tests                               | 3 ---
- 5 files changed, 10 deletions(-)
+ .../testFT-8021x-roam/connection_test.py      | 26 ++----------
+ autotests/testFT-FILS/connection_test.py      | 24 ++---------
+ autotests/testPSK-roam/connection_test.py     | 24 ++---------
+ .../testPSK-roam/roam_ap_disconnect_test.py   | 12 ++----
+ autotests/testPreauth-roam/connection_test.py | 13 +-----
+ autotests/testRoamRetry/fast_retry_test.py    | 15 +------
+ autotests/testRoamRetry/stop_retry_test.py    | 15 +------
+ autotests/testSAE-roam/connection_test.py     | 42 +++----------------
+ 8 files changed, 23 insertions(+), 148 deletions(-)
 
-diff --git a/autotests/testFILS/fils_256_test.py b/autotests/testFILS/fils_256_test.py
-index 5fa371e1..7018f0f2 100644
---- a/autotests/testFILS/fils_256_test.py
-+++ b/autotests/testFILS/fils_256_test.py
-@@ -62,8 +62,6 @@ class Test(unittest.TestCase):
-     @classmethod
-     def setUpClass(cls):
-         IWD.copy_to_storage('ssidFILS-256.8021x')
--        os.system('ip link set lo up')
--        pass
+diff --git a/autotests/testFT-8021x-roam/connection_test.py b/autotests/testFT-8021x-roam/connection_test.py
+index 6853bdb0..d3f8e2c6 100644
+--- a/autotests/testFT-8021x-roam/connection_test.py
++++ b/autotests/testFT-8021x-roam/connection_test.py
+@@ -66,28 +66,10 @@ class Test(unittest.TestCase):
+         cls.bss_hostapd = [ HostapdCLI(config='ft-eap-ccmp-1.conf'),
+                             HostapdCLI(config='ft-eap-ccmp-2.conf') ]
  
-     @classmethod
-     def tearDownClass(cls):
-diff --git a/autotests/testFILS/fils_384_test.py b/autotests/testFILS/fils_384_test.py
-index b7174418..ce8904df 100644
---- a/autotests/testFILS/fils_384_test.py
-+++ b/autotests/testFILS/fils_384_test.py
-@@ -62,8 +62,6 @@ class Test(unittest.TestCase):
-     @classmethod
-     def setUpClass(cls):
-         IWD.copy_to_storage('ssidFILS-384.8021x')
--        os.system('ip link set lo up')
--        pass
+-        # Set interface addresses to those expected by hostapd config files
+-        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" down')
+-        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + \
+-                  '" address 12:00:00:00:00:01 up')
+-        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" down')
+-        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + \
+-                  '" address 12:00:00:00:00:02 up')
+-
+-        cls.bss_hostapd[0].reload()
+-        cls.bss_hostapd[0].wait_for_event("AP-ENABLED")
+-        cls.bss_hostapd[1].reload()
+-        cls.bss_hostapd[1].wait_for_event("AP-ENABLED")
+-
+-        # Fill in the neighbor AP tables in both BSSes.  By default each
+-        # instance knows only about current BSS, even inside one hostapd
+-        # process.
+-        # FT still works without the neighbor AP table but neighbor reports
+-        # have to be disabled in the .conf files
+-        cls.bss_hostapd[0].set_neighbor('12:00:00:00:00:02', 'TestFT',
+-                '1200000000028f0000005102060603000000')
+-        cls.bss_hostapd[1].set_neighbor('12:00:00:00:00:01', 'TestFT',
+-                '1200000000018f0000005101060603000000')
++        cls.bss_hostapd[0].set_address('12:00:00:00:00:01')
++        cls.bss_hostapd[1].set_address('12:00:00:00:00:02')
++
++        HostapdCLI.group_neighbors(*cls.bss_hostapd)
  
      @classmethod
      def tearDownClass(cls):
 diff --git a/autotests/testFT-FILS/connection_test.py b/autotests/testFT-FILS/connection_test.py
-index b1ec42e0..5d60bf4d 100644
+index c1deb77c..b1ec42e0 100644
 --- a/autotests/testFT-FILS/connection_test.py
 +++ b/autotests/testFT-FILS/connection_test.py
-@@ -122,7 +122,6 @@ class Test(unittest.TestCase):
- 
-     @classmethod
-     def setUpClass(cls):
--        os.system('ip link set lo up')
-         IWD.copy_to_storage('TestFT.8021x')
- 
+@@ -128,26 +128,10 @@ class Test(unittest.TestCase):
          cls.bss_hostapd = [ HostapdCLI(config='ft-eap-ccmp-1.conf'),
-diff --git a/autotests/testPreauth-roam/connection_test.py b/autotests/testPreauth-roam/connection_test.py
-index 3c8fa0bb..02d03361 100644
---- a/autotests/testPreauth-roam/connection_test.py
-+++ b/autotests/testPreauth-roam/connection_test.py
-@@ -75,8 +75,6 @@ class Test(unittest.TestCase):
-     def setUpClass(cls):
-         IWD.copy_to_storage('TestPreauth.8021x')
+                             HostapdCLI(config='ft-eap-ccmp-2.conf') ]
  
--        os.system('ip link set lo up')
+-        # Set interface addresses to those expected by hostapd config files
+-        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" down')
+-        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" addr 12:00:00:00:00:01 up')
+-        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" down')
+-        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" addr 12:00:00:00:00:02 up')
 -
+-        cls.bss_hostapd[0].reload()
+-        cls.bss_hostapd[0].wait_for_event("AP-ENABLED")
+-        cls.bss_hostapd[1].reload()
+-        cls.bss_hostapd[1].wait_for_event("AP-ENABLED")
+-
+-        # Fill in the neighbor AP tables in both BSSes.  By default each
+-        # instance knows only about current BSS, even inside one hostapd
+-        # process.
+-        # FT still works without the neighbor AP table but neighbor reports
+-        # have to be disabled in the .conf files
+-        cls.bss_hostapd[0].set_neighbor('12:00:00:00:00:02', 'TestFT',
+-                '1200000000028f0000005102060603000000')
+-        cls.bss_hostapd[1].set_neighbor('12:00:00:00:00:01', 'TestFT',
+-                '1200000000018f0000005101060603000000')
++        cls.bss_hostapd[0].set_address('12:00:00:00:00:01')
++        cls.bss_hostapd[1].set_address('12:00:00:00:00:02')
++
++        HostapdCLI.group_neighbors(*cls.bss_hostapd)
+ 
      @classmethod
      def tearDownClass(cls):
-         IWD.clear_storage()
-diff --git a/tools/run-tests b/tools/run-tests
-index e45ffe46..9620ed1f 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -487,8 +487,6 @@ class TestContext(Namespace):
- 			print("Ofono or Phonesim not found, skipping test")
- 			return
+diff --git a/autotests/testPSK-roam/connection_test.py b/autotests/testPSK-roam/connection_test.py
+index 364f75c2..2206f120 100644
+--- a/autotests/testPSK-roam/connection_test.py
++++ b/autotests/testPSK-roam/connection_test.py
+@@ -199,26 +199,10 @@ class Test(unittest.TestCase):
+         cls.rule2.source = rad0.addresses[0]
+         cls.rule2.signal = -7000
  
--		Process(['ip', 'link', 'set', 'lo', 'up']).wait()
+-        # Set interface addresses to those expected by hostapd config files
+-        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" down')
+-        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" addr 12:00:00:00:00:01 up')
+-        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" down')
+-        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" addr 12:00:00:00:00:02 up')
 -
- 		os.environ['OFONO_PHONESIM_CONFIG'] = '/tmp/phonesim.conf'
+-        cls.bss_hostapd[0].reload()
+-        cls.bss_hostapd[0].wait_for_event("AP-ENABLED")
+-        cls.bss_hostapd[1].reload()
+-        cls.bss_hostapd[1].wait_for_event("AP-ENABLED")
+-
+-        # Fill in the neighbor AP tables in both BSSes.  By default each
+-        # instance knows only about current BSS, even inside one hostapd
+-        # process.
+-        # FT still works without the neighbor AP table but neighbor reports
+-        # have to be disabled in the .conf files
+-        cls.bss_hostapd[0].set_neighbor('12:00:00:00:00:02', 'TestFT',
+-                '1200000000028f0000005102060603000000')
+-        cls.bss_hostapd[1].set_neighbor('12:00:00:00:00:01', 'TestFT',
+-                '1200000000018f0000005101060603000000')
++        cls.bss_hostapd[0].set_address('12:00:00:00:00:01')
++        cls.bss_hostapd[1].set_address('12:00:00:00:00:02')
++
++        HostapdCLI.group_neighbors(*cls.bss_hostapd)
  
- 		phonesim_args = ['phonesim', '-p', '12345', '/usr/share/phonesim/default.xml']
-@@ -889,7 +887,6 @@ def post_test(ctx, to_copy):
- 			elif os.path.exists('/tmp/' + f):
- 				os.remove('/tmp/' + f)
+     @classmethod
+     def tearDownClass(cls):
+diff --git a/autotests/testPSK-roam/roam_ap_disconnect_test.py b/autotests/testPSK-roam/roam_ap_disconnect_test.py
+index 760c25fa..416541ce 100644
+--- a/autotests/testPSK-roam/roam_ap_disconnect_test.py
++++ b/autotests/testPSK-roam/roam_ap_disconnect_test.py
+@@ -46,10 +46,7 @@ class Test(unittest.TestCase):
+         self.validate()
  
--		Process(['ip', 'link', 'set', 'lo', 'down']).wait()
- 	except Exception as e:
- 		print("Exception thrown in post_test")
- 	finally:
+     def test_ap_disconnect_neighbors(self):
+-        self.bss_hostapd[0].set_neighbor('12:00:00:00:00:02', 'TestFT',
+-                '1200000000028f0000005102060603000000')
+-        self.bss_hostapd[1].set_neighbor('12:00:00:00:00:01', 'TestFT',
+-                '1200000000018f0000005101060603000000')
++        HostapdCLI.group_neighbors(*self.bss_hostapd)
+ 
+         self.validate()
+ 
+@@ -85,11 +82,8 @@ class Test(unittest.TestCase):
+         cls.rule0.signal = -8000
+         cls.rule0.enabled = True
+ 
+-        # Set interface addresses to those expected by hostapd config files
+-        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" down')
+-        os.system('ip link set dev "' + cls.bss_hostapd[0].ifname + '" addr 12:00:00:00:00:01 up')
+-        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" down')
+-        os.system('ip link set dev "' + cls.bss_hostapd[1].ifname + '" addr 12:00:00:00:00:02 up')
++        cls.bss_hostapd[0].set_address('12:00:00:00:00:01')
++        cls.bss_hostapd[1].set_address('12:00:00:00:00:02')
+ 
+     @classmethod
+     def tearDownClass(cls):
+diff --git a/autotests/testPreauth-roam/connection_test.py b/autotests/testPreauth-roam/connection_test.py
+index 26475698..3c8fa0bb 100644
+--- a/autotests/testPreauth-roam/connection_test.py
++++ b/autotests/testPreauth-roam/connection_test.py
+@@ -17,18 +17,7 @@ class Test(unittest.TestCase):
+         bss0_addr = bss_hostapd[0].bssid
+         bss1_addr = bss_hostapd[1].bssid
+ 
+-        # Fill in the neighbor AP tables in both BSSes.  By default each
+-        # instance knows only about current BSS, even inside one hostapd
+-        # process.
+-        # Roaming still works without the neighbor AP table but neighbor
+-        # reports have to be disabled in the .conf files
+-        bss0_nr = ''.join(bss0_addr.split(':')) + \
+-                '8f0000005101060603000000'
+-        bss1_nr = ''.join(bss1_addr.split(':')) + \
+-                '8f0000005102060603000000'
+-
+-        bss_hostapd[0].set_neighbor(bss1_addr, 'TestPreauth', bss1_nr)
+-        bss_hostapd[1].set_neighbor(bss0_addr, 'TestPreauth', bss0_nr)
++        HostapdCLI.group_neighbors(*bss_hostapd)
+ 
+         wd = IWD(True)
+ 
+diff --git a/autotests/testRoamRetry/fast_retry_test.py b/autotests/testRoamRetry/fast_retry_test.py
+index b45daada..373f3d45 100644
+--- a/autotests/testRoamRetry/fast_retry_test.py
++++ b/autotests/testRoamRetry/fast_retry_test.py
+@@ -36,20 +36,7 @@ class Test(unittest.TestCase):
+         rule1.bidirectional = True
+         rule1.enabled = True
+ 
+-        # Fill in the neighbor AP tables in both BSSes.  By default each
+-        # instance knows only about current BSS, even inside one hostapd
+-        # process.
+-        # Roaming still works without the neighbor AP table but neighbor
+-        # reports have to be disabled in the .conf files
+-        bss0_nr = ''.join(bss_radio[0].addresses[0].split(':')) + \
+-                '8f0000005101060603000000'
+-        bss1_nr = ''.join(bss_radio[1].addresses[0].split(':')) + \
+-                '8f0000005102060603000000'
+-
+-        bss_hostapd[0].set_neighbor(bss_radio[1].addresses[0], 'TestRoamRetry',
+-                bss1_nr)
+-        bss_hostapd[1].set_neighbor(bss_radio[0].addresses[0], 'TestRoamRetry',
+-                bss0_nr)
++        HostapdCLI.group_neighbors(*bss_hostapd)
+ 
+         # Start in the vicinity of BSS 0, check that iwd connects to BSS 0
+         rule0.signal = -2000
+diff --git a/autotests/testRoamRetry/stop_retry_test.py b/autotests/testRoamRetry/stop_retry_test.py
+index 3957d12d..b5eb6f77 100644
+--- a/autotests/testRoamRetry/stop_retry_test.py
++++ b/autotests/testRoamRetry/stop_retry_test.py
+@@ -35,20 +35,7 @@ class Test(unittest.TestCase):
+         rule1.bidirectional = True
+         rule1.enabled = True
+ 
+-        # Fill in the neighbor AP tables in both BSSes.  By default each
+-        # instance knows only about current BSS, even inside one hostapd
+-        # process.
+-        # Roaming still works without the neighbor AP table but neighbor
+-        # reports have to be disabled in the .conf files
+-        bss0_nr = ''.join(bss_radio[0].addresses[0].split(':')) + \
+-                '8f0000005101060603000000'
+-        bss1_nr = ''.join(bss_radio[1].addresses[0].split(':')) + \
+-                '8f0000005102060603000000'
+-
+-        bss_hostapd[0].set_neighbor(bss_radio[1].addresses[0], 'TestRoamRetry',
+-                bss1_nr)
+-        bss_hostapd[1].set_neighbor(bss_radio[0].addresses[0], 'TestRoamRetry',
+-                bss0_nr)
++        HostapdCLI.group_neighbors(*bss_hostapd)
+ 
+         # Start in the vicinity of BSS 0, check that iwd connects to BSS 0
+         rule0.signal = -2000
+diff --git a/autotests/testSAE-roam/connection_test.py b/autotests/testSAE-roam/connection_test.py
+index 2c8cd799..ac44b4b2 100644
+--- a/autotests/testSAE-roam/connection_test.py
++++ b/autotests/testSAE-roam/connection_test.py
+@@ -120,43 +120,11 @@ class Test(unittest.TestCase):
+                             HostapdCLI(config='ft-sae-2.conf'),
+                             HostapdCLI(config='ft-psk-3.conf') ]
+ 
+-        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[0].ifname, 'down']).wait()
+-        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[0].ifname, \
+-                           'addr', '12:00:00:00:00:01', 'up']).wait()
+-        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[1].ifname, 'down']).wait()
+-        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[1].ifname, \
+-                           'addr', '12:00:00:00:00:02', 'up']).wait()
+-        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[2].ifname, 'down']).wait()
+-        ctx.start_process(['ip', 'link', 'set', 'dev', cls.bss_hostapd[2].ifname, \
+-                           'addr', '12:00:00:00:00:03', 'up']).wait()
+-
+-        # Set interface addresses to those expected by hostapd config files
+-        cls.bss_hostapd[0].reload()
+-        cls.bss_hostapd[0].wait_for_event("AP-ENABLED")
+-        cls.bss_hostapd[1].reload()
+-        cls.bss_hostapd[1].wait_for_event("AP-ENABLED")
+-        cls.bss_hostapd[2].reload()
+-        cls.bss_hostapd[2].wait_for_event("AP-ENABLED")
+-
+-        # Fill in the neighbor AP tables in both BSSes.  By default each
+-        # instance knows only about current BSS, even inside one hostapd
+-        # process.
+-        # FT still works without the neighbor AP table but neighbor reports
+-        # have to be disabled in the .conf files
+-        cls.bss_hostapd[0].set_neighbor('12:00:00:00:00:02', 'TestFT',
+-                '1200000000028f0000005102060603000000')
+-        cls.bss_hostapd[0].set_neighbor('12:00:00:00:00:03', 'TestFT',
+-                '1200000000038f0000005102060603000000')
+-
+-        cls.bss_hostapd[1].set_neighbor('12:00:00:00:00:01', 'TestFT',
+-                '1200000000018f0000005101060603000000')
+-        cls.bss_hostapd[1].set_neighbor('12:00:00:00:00:03', 'TestFT',
+-                '1200000000038f0000005101060603000000')
+-
+-        cls.bss_hostapd[2].set_neighbor('12:00:00:00:00:01', 'TestFT',
+-                '1200000000018f0000005101060603000000')
+-        cls.bss_hostapd[2].set_neighbor('12:00:00:00:00:02', 'TestFT',
+-                '1200000000028f0000005101060603000000')
++        cls.bss_hostapd[0].set_address('12:00:00:00:00:01')
++        cls.bss_hostapd[1].set_address('12:00:00:00:00:02')
++        cls.bss_hostapd[2].set_address('12:00:00:00:00:03')
++
++        HostapdCLI.group_neighbors(*cls.bss_hostapd)
+ 
+         IWD.copy_to_storage('TestFT.psk')
+ 
 -- 
 2.34.3
 
