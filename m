@@ -1,47 +1,47 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB9A2597
-	for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 15:58:08 +0000 (UTC)
-Received: by mail-pf1-f180.google.com with SMTP id y15so6766668pfr.9
-        for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 08:58:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85FD2594
+	for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 15:58:09 +0000 (UTC)
+Received: by mail-pg1-f170.google.com with SMTP id q9so705890pgq.6
+        for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 08:58:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=oaytClLNVcMoG5g/aV/h9Xp5KhfN+snUxmprD+oOSJ4=;
-        b=N4ZbToQMj+pNwqelTENzDISWX6yCScl6CI78s0Vs9EAoVJEDs9zulAd79FhV17eD6c
-         cqIp51wd4fN9k13ncHJAJVd8bxGtuuiWALgTLoGT2Sku7c77qENrH7fhhLhWv60kuVVx
-         1XTvRyR0RaKsVIq8OsvSKHSDm1B/thq0JLVwqnP1HOL0itPf41/7rkuOIehnRAP8fneB
-         SnSZ+0mSUf+bIk1JrA3PyEiImH1R+2DxsK1WrxaGpLXhVVQlScVJkWzPDURyj9C2b7LT
-         4anNn98kHBI2TJtGocInaiZXpfWFt/I9ruXXGXOQ+DSajsXGw8qH2BG2Y8+LYnLhDBBi
-         ho4g==
+        bh=PyaCBV50H/xF9xv3Fm+FcwZnifyGExGBQ/U5FJwtPqg=;
+        b=p4lyerG0RjyyQbjFzdVdb84pCYpdo2Y1BU0VTuUZ2f55A9LHCYQvo59MAVrCjQ4oM3
+         U4XIAs6AVjICMJtOSSL+EYkXzNBeds0o2RxF+hIsR9hUA6460r8P1C2HhmOTCtUHGfbZ
+         iMIWr+jvj1Zhra71dDjgkBkmqDyr8PpOTsGsYHCX97AM3lhwe8Xk+6+r1AoGVz7VbMiz
+         TAD18qiCq9yWOi9p/mY0uRnv/DAt540UvPfXTmG/zj/UVhKtWrXhk+K7jXA/FznP0+rK
+         QdnH44tZMaRoKxvmRq9AieMqMDOhNj9Qy+RTGAVqv6baLhrxnD9SrfmwPKufpANAoMmw
+         urMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=oaytClLNVcMoG5g/aV/h9Xp5KhfN+snUxmprD+oOSJ4=;
-        b=a58Yth3UjO88jxouKwiTa4FNnu9LkOWhRe+bOIqkRJOMqNcRxDD61Br5l9eqOz9BMN
-         jx8FJv0wedcd+3+1fwOAC54RcDtVilZ1su1vfl8uovmj/WCw/dqHXDEi1Vhy4wuLC7y0
-         m6oCKGvHjtMgXb1yp99fv+eYM3qMg/0+ivq7bn7SjN+W29b87P6tQdVPQHcExue+hOd6
-         2pAk+wF9NufyS4PXzre0cLfTkq6se9I6j98LqzLX5By7IZVxo9mKkyLTlehci+1+GErY
-         NomKHnFo3KoNFPaJqi0sOSdnas1T0JVEzkKUYtWRPJcufljIq/wxUZLX16WuoSgMymmZ
-         OYVw==
-X-Gm-Message-State: ACgBeo19fxOROalmpp783xgg3BrqYguIhYwN4XH23ih4bN48F5cUN0nN
-	Ewn3A4adrUmIiXKEQjnETv0IjP7NnlQ=
-X-Google-Smtp-Source: AA6agR7p93LXAv2jmhSEYGnfKYGaci2++2utKp124ZhYYeVpVfsTGsmQj293aGnt+XIwGOtwaRzoSg==
-X-Received: by 2002:a05:6a00:4393:b0:52f:3603:e62f with SMTP id bt19-20020a056a00439300b0052f3603e62fmr21309583pfb.23.1661183888232;
+        bh=PyaCBV50H/xF9xv3Fm+FcwZnifyGExGBQ/U5FJwtPqg=;
+        b=zFmoFiAsOQGJIjaMO7OHpF5gy6Rb6oXWKyDGQqlkgKjJSyqKZW16fYv6cx8Rj2pcWN
+         /6zq0RWW1LcY/auffzlgVvFfeDXYFtIcMvLNTX/UhfJhYSK4ZBVOgPBDMI6FQGslZgrR
+         4+MZnbG2k1/JjrTH3KM5PDn7cf74ixuzo0HtwglMAPHP5IdUNbcYGO3kow0+re5jWfyk
+         Q2pDDb9J4hR0Ze1cYSoaKXmR35CRcsesVrNkfBGe137TYOgRl2HTJ595vQZ4WP6WRiNI
+         CI7jI+AnZ/n2ETvP+MXjKf1nvJyGl7woASBL9DQuPiO6BsAfVH7zIF9dsKPOl4EPzKBB
+         X72A==
+X-Gm-Message-State: ACgBeo0DxsVMx7Q/epE7/emrVD/dsxM9wqrXzJf2O9HdLRh8Nr1j10/u
+	N5GaNvm2zJdXa89yJpUTCkmqujoM9nw=
+X-Google-Smtp-Source: AA6agR7s0PJd0JffaR08EBFcysuXckPQuRJwK+mD3E/1a3wJ7KMUm9EJtV5mhhovD6BCAA7NC8cgSg==
+X-Received: by 2002:a63:4d4f:0:b0:412:a02e:2896 with SMTP id n15-20020a634d4f000000b00412a02e2896mr17648868pgl.337.1661183888946;
         Mon, 22 Aug 2022 08:58:08 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
-        by smtp.gmail.com with ESMTPSA id x64-20020a628643000000b005368192372fsm3216440pfd.200.2022.08.22.08.58.07
+        by smtp.gmail.com with ESMTPSA id x64-20020a628643000000b005368192372fsm3216440pfd.200.2022.08.22.08.58.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 08:58:07 -0700 (PDT)
+        Mon, 22 Aug 2022 08:58:08 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 4/5] auto-t: remove bringing up lo interface
-Date: Mon, 22 Aug 2022 08:58:03 -0700
-Message-Id: <20220822155804.2006566-4-prestwoj@gmail.com>
+Subject: [PATCH v3 5/5] auto-t: fix testNetconfig static test
+Date: Mon, 22 Aug 2022 08:58:04 -0700
+Message-Id: <20220822155804.2006566-5-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220822155804.2006566-1-prestwoj@gmail.com>
 References: <20220822155804.2006566-1-prestwoj@gmail.com>
@@ -53,88 +53,71 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Several tests were setting lo up which is already done by
-test-runner.
----
- autotests/testFILS/fils_256_test.py           | 2 --
- autotests/testFILS/fils_384_test.py           | 2 --
- autotests/testFT-FILS/connection_test.py      | 1 -
- autotests/testPreauth-roam/connection_test.py | 2 --
- tools/run-tests                               | 3 ---
- 5 files changed, 10 deletions(-)
+This test was updated to add namespaces which actually 'fixed' dhcpd's
+address conflict detection since it uses ICMP echo requests. Part of
+this test assumed the DHCP server would not detect a conflict which
+isn't true for dhcpd (and any decent DHCP server I would guess). This
+check now fails since dhcpd detects a conflict (the static address)
+and hands out the next available address.
 
-diff --git a/autotests/testFILS/fils_256_test.py b/autotests/testFILS/fils_256_test.py
-index 5fa371e1..7018f0f2 100644
---- a/autotests/testFILS/fils_256_test.py
-+++ b/autotests/testFILS/fils_256_test.py
-@@ -62,8 +62,6 @@ class Test(unittest.TestCase):
-     @classmethod
-     def setUpClass(cls):
-         IWD.copy_to_storage('ssidFILS-256.8021x')
--        os.system('ip link set lo up')
--        pass
+Testing conflict detection like this is really only testing dhcpd
+behavior, and however IWD behaves here isn't important since the
+network is doomed from the start.
+---
+ autotests/testNetconfig/static_test.py | 28 --------------------------
+ 1 file changed, 28 deletions(-)
+
+diff --git a/autotests/testNetconfig/static_test.py b/autotests/testNetconfig/static_test.py
+index 01d694ca..aac2adcc 100644
+--- a/autotests/testNetconfig/static_test.py
++++ b/autotests/testNetconfig/static_test.py
+@@ -20,17 +20,10 @@ class Test(unittest.TestCase):
+         # Use a non-default storage_dir for one of the instances, the default for the other one
+         wd = IWD(True, iwd_storage_dir='/tmp/storage')
  
-     @classmethod
-     def tearDownClass(cls):
-diff --git a/autotests/testFILS/fils_384_test.py b/autotests/testFILS/fils_384_test.py
-index b7174418..ce8904df 100644
---- a/autotests/testFILS/fils_384_test.py
-+++ b/autotests/testFILS/fils_384_test.py
-@@ -62,8 +62,6 @@ class Test(unittest.TestCase):
-     @classmethod
-     def setUpClass(cls):
-         IWD.copy_to_storage('ssidFILS-384.8021x')
--        os.system('ip link set lo up')
--        pass
- 
-     @classmethod
-     def tearDownClass(cls):
-diff --git a/autotests/testFT-FILS/connection_test.py b/autotests/testFT-FILS/connection_test.py
-index b1ec42e0..5d60bf4d 100644
---- a/autotests/testFT-FILS/connection_test.py
-+++ b/autotests/testFT-FILS/connection_test.py
-@@ -122,7 +122,6 @@ class Test(unittest.TestCase):
- 
-     @classmethod
-     def setUpClass(cls):
--        os.system('ip link set lo up')
-         IWD.copy_to_storage('TestFT.8021x')
- 
-         cls.bss_hostapd = [ HostapdCLI(config='ft-eap-ccmp-1.conf'),
-diff --git a/autotests/testPreauth-roam/connection_test.py b/autotests/testPreauth-roam/connection_test.py
-index 3c8fa0bb..02d03361 100644
---- a/autotests/testPreauth-roam/connection_test.py
-+++ b/autotests/testPreauth-roam/connection_test.py
-@@ -75,8 +75,6 @@ class Test(unittest.TestCase):
-     def setUpClass(cls):
-         IWD.copy_to_storage('TestPreauth.8021x')
- 
--        os.system('ip link set lo up')
+-        ns0 = ctx.get_namespace('ns0')
 -
-     @classmethod
-     def tearDownClass(cls):
-         IWD.clear_storage()
-diff --git a/tools/run-tests b/tools/run-tests
-index e45ffe46..9620ed1f 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -487,8 +487,6 @@ class TestContext(Namespace):
- 			print("Ofono or Phonesim not found, skipping test")
- 			return
- 
--		Process(['ip', 'link', 'set', 'lo', 'up']).wait()
+-        wd_ns0 = IWD(True, namespace=ns0)
 -
- 		os.environ['OFONO_PHONESIM_CONFIG'] = '/tmp/phonesim.conf'
+         psk_agent = PSKAgent("secret123")
+-        psk_agent_ns0 = PSKAgent("secret123", namespace=ns0)
+         wd.register_psk_agent(psk_agent)
+-        wd_ns0.register_psk_agent(psk_agent_ns0)
  
- 		phonesim_args = ['phonesim', '-p', '12345', '/usr/share/phonesim/default.xml']
-@@ -889,7 +887,6 @@ def post_test(ctx, to_copy):
- 			elif os.path.exists('/tmp/' + f):
- 				os.remove('/tmp/' + f)
+         dev1 = wd.list_devices(1)[0]
+-        dev2 = wd_ns0.list_devices(1)[0]
  
--		Process(['ip', 'link', 'set', 'lo', 'down']).wait()
- 	except Exception as e:
- 		print("Exception thrown in post_test")
- 	finally:
+         ordered_network = dev1.get_ordered_network('ap-main')
+ 
+@@ -80,28 +73,7 @@ class Test(unittest.TestCase):
+         # of the log since we care about the end result here.
+         self.assertEqual(expected_rclog, entries[-3:])
+ 
+-        ordered_network = dev2.get_ordered_network('ap-main')
+-
+-        condition = 'not obj.connected'
+-        wd_ns0.wait_for_object_condition(ordered_network.network_object, condition)
+-
+-        # Connect to the same network from a dynamically configured client.  The
+-        # DHCP server doesn't know (even though dev1 announced itself) that
+-        # 192.168.1.10 is already in use and if it assigns dev2 the lowest
+-        # available address, that's going to be 192.168.1.10.  dev1's ACD
+-        # implementation should then stop using this address.
+-        ordered_network.network_object.connect()
+-
+-        condition = 'obj.state == DeviceState.connected'
+-        wd_ns0.wait_for_object_condition(dev2, condition)
+-
+-        wd.wait(1)
+-        # Check dev1 is now disconnected or without its IPv4 address
+-        if dev1.state == iwd.DeviceState.connected:
+-            testutil.test_ip_address_match(dev1.name, None)
+-
+         dev1.disconnect()
+-        dev2.disconnect()
+ 
+         condition = 'not obj.connected'
+         wd.wait_for_object_condition(ordered_network.network_object, condition)
 -- 
 2.34.3
 
