@@ -1,48 +1,50 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28776256C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55E02594
 	for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 15:58:07 +0000 (UTC)
-Received: by mail-pl1-f177.google.com with SMTP id m2so10329463pls.4
+Received: by mail-pf1-f178.google.com with SMTP id w29so5191277pfj.3
         for <iwd@lists.linux.dev>; Mon, 22 Aug 2022 08:58:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=ecd4WSKnsxwRkeaxJFCq86kDCaceKAaImv7wkDcSUKY=;
-        b=LizSFMGJIbrVMh8vs5Y5t/ub1TV+fTZbhI/Ob+NxYlABDcDiDY1Jl8T/f4QD/ZrL+F
-         ZfjZf3lSybneOZ4KOkDlJYZjyqGkBZKR0iEJOVMDemWu8B+t09YGPS75fZy7eaV7+WEI
-         t9+zY6QfVfNk99CvXLqPf5wYx6j0CmDt3oWl+ro8RBTbj820LplwGCjolwicSCmPqK7V
-         qw/9kAS4dhNBKdywfyYGWVGJSy+2gVtnOXJtwsFb/lec/oCwbl023FxB4BqykyLjsrU9
-         LUnCyIdvagVXuYttHTzr1YQRI2SxaX41YxmR0KZk1yv6hiM/HLYuL3zE3rgfzCK8Uofy
-         ltlA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc;
+        bh=cLqZNAZ2bC8+7FrYtP6Gp/ZSnMJLta9rTFEInz1Nvo8=;
+        b=Q83fb57H1Dod5vgwgyaDeSezmlP7IW8CElvfBH8b9NJKCucPeeP2X58fw4ezKt3ZMk
+         h/muhEqpc2l4jLJNLsCFaaWUR8AGje/jYP2XjuCEQs57MnWmhz0G0DiaBpCgqHXnshvC
+         iGldHagdJ7IxeGlztMB76Egxn+CmNysXVe9ASJ3XqeyfO5KzowG2T8UzcIrjA27WTff/
+         T05/STYt4fQSbDN4/qdyNNeaxT33oBF0LJLAxZoYuxc8hKqz5t+B8YeegJsJYC0Joo81
+         o1eBVciRaF+ZPM0NBMtuiD72iJJ7W6zjYfAuQdW781LPL4uxTRIx3eUjSZLfFzG4NBf7
+         273w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=ecd4WSKnsxwRkeaxJFCq86kDCaceKAaImv7wkDcSUKY=;
-        b=Au5ik4mLq7z/xgpNS2dp0qt7ikyO/AcIU/4uT2Ge02/gupljHeulT27+Sl+QeM7enJ
-         6j5i0yHDeeo/UlvWhIBucGftyIoVqh8LCzaBEdDpipxbioaKwYRWK1O/hwuMIVOt1kWy
-         EHLy2PwRQOpKX7ctokNoNZX7SnD4HtFVTNp5xFEzsmR1XbYgnHpOm2swpAHcATE/SX2o
-         Yh4HsTVWAe3WyHX47wup4ripRT1f5vfB8Bvmo/t9kOAAc74r2Sgq9iEY7k1cAQMjeWRu
-         q00a4tNF9Nl+Oz3nVIV42fu8Gm9dXVbmpMoESXDr3lOZmcAUn0EGPoL1Bzchb26NeflT
-         Trtg==
-X-Gm-Message-State: ACgBeo0t0S63hTa45al/RyZcqItZgPZCW99VhuyXHcsSK8XAYqz5mkyP
-	kBdNWqC/n1euYU72DFF3DVIjr60dK2k=
-X-Google-Smtp-Source: AA6agR5DNro9VDC/KQYGi5S9GpJtf84GY//XK4PgyiFKiyPj2R7vHCUuShuXdseSZACzbnZktxQ1AA==
-X-Received: by 2002:a17:903:1209:b0:16b:81f6:e952 with SMTP id l9-20020a170903120900b0016b81f6e952mr21368195plh.48.1661183886320;
-        Mon, 22 Aug 2022 08:58:06 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=cLqZNAZ2bC8+7FrYtP6Gp/ZSnMJLta9rTFEInz1Nvo8=;
+        b=d/jA/beQ5D8zpoD4GX7084Al3Q1L8db7kEvlwI7y9jxaqKTDMw8r3WXf2MJEIAnmCi
+         4GEfL1yYWouIb9X3w/fZ6aDRcPW/ayQI5d2liFawgcR5z96uMnsCBP+forovdVKPWlEz
+         bB+lFwatdLPL277aUdryJ8VLJUfuwTKEL36Z+/KwtRKO6qbk/gvS6KMTj6oRKcw6iMVm
+         UXcJkynJAEYjvl5lm8Kodl0/JRvMsozg3xrHNzyrSGhZvx9J6Y310eeq6YJRJVrbdr1I
+         EL1stsO+pKifEMKbaZl4otQWZmXOWD4X5UF8Zar8Ro0A6u6u4ehPmmPkFQwN3rbGyJb6
+         mJPA==
+X-Gm-Message-State: ACgBeo25epa+RLHy3MjaK8wOv9CEd+ocsMyAixd5v6Z46LWNl/u6neG5
+	z3QbzKroYH+NQzKfnXfsHKdxfIxNNis=
+X-Google-Smtp-Source: AA6agR56UtVL58QfBOHRdLJ2KUygCPNx7VKMtRJTsv5cqcwOiApaX4oSvGb+BwwJPPmhUDOfnh5j3A==
+X-Received: by 2002:a63:174c:0:b0:42a:81ff:6913 with SMTP id 12-20020a63174c000000b0042a81ff6913mr8156439pgx.625.1661183887054;
+        Mon, 22 Aug 2022 08:58:07 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
-        by smtp.gmail.com with ESMTPSA id x64-20020a628643000000b005368192372fsm3216440pfd.200.2022.08.22.08.58.05
+        by smtp.gmail.com with ESMTPSA id x64-20020a628643000000b005368192372fsm3216440pfd.200.2022.08.22.08.58.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 08:58:05 -0700 (PDT)
+        Mon, 22 Aug 2022 08:58:06 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 1/5] test-runner: double RAM for --valgrind
-Date: Mon, 22 Aug 2022 08:58:00 -0700
-Message-Id: <20220822155804.2006566-1-prestwoj@gmail.com>
+Subject: [PATCH v3 2/5] auto-t: hostapd: add set_address/group_neighbors
+Date: Mon, 22 Aug 2022 08:58:01 -0700
+Message-Id: <20220822155804.2006566-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20220822155804.2006566-1-prestwoj@gmail.com>
+References: <20220822155804.2006566-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,40 +53,62 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It seems 256MB was right on the edge if valgrind was being used and
-sometimes the test would fail with OOM exceptions.
----
- tools/runner.py | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+This adds a few utilities for setting up an FT environment. All the
+roaming tests basically copy/paste the same code for setting up the
+hostapd instances and this can cause problems if not done correctly.
 
-diff --git a/tools/runner.py b/tools/runner.py
-index a96627de..004bf46d 100644
---- a/tools/runner.py
-+++ b/tools/runner.py
-@@ -370,6 +370,7 @@ class QemuRunner(RunnerAbstract):
- 
- 		usb_adapters = None
- 		pci_adapters = None
-+		ram = 256
- 
- 		super().__init__(args)
- 
-@@ -400,11 +401,14 @@ class QemuRunner(RunnerAbstract):
- 
- 		kern_log = "ignore_loglevel" if "kernel" in args.verbose else "quiet"
- 
-+		if args.valgrind:
-+			ram *= 2
+set_address() sets the MAC address on the device, and restarts hostapd
+group_neighbors() takes a list of HostapdCLI objects and makes each a
+    neighbor to the others.
+
+The neighbor report element requires the operating class which isn't
+advertised by hostapd. For this we assume operating class 81 but this
+can be set explicitly if it differs. Currently no roaming tests use
+5/6GHz frequencies, and just in case an exception will be thrown if
+the channel is greater than 14 and the op_class didn't change.
+---
+ autotests/util/hostapd.py | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 3ae8ff89..d6c13e2b 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -281,3 +281,34 @@ class HostapdCLI(object):
+     @property
+     def enabled(self):
+         return self._get_status()['state'] == 'ENABLED'
 +
- 		qemu_cmdline = [
- 			'qemu-system-x86_64',
- 			'-machine', 'type=q35,accel=kvm:tcg',
- 			'-nodefaults', '-no-user-config', '-monitor', 'none',
--			'-display', 'none', '-m', '256M', '-nographic', '-vga',
-+			'-display', 'none', '-m', '%dM' % ram, '-nographic', '-vga',
- 			'none', '-no-acpi', '-no-hpet',
- 			'-no-reboot', '-fsdev',
- 			'local,id=fsdev-root,path=/,readonly=on,security_model=none,multidevs=remap',
++    def set_address(self, mac):
++        os.system('ip link set dev %s down' % self.ifname)
++        os.system('ip link set dev %s addr %s up' % (self.ifname, mac))
++
++        self.reload()
++        self.wait_for_event("AP-ENABLED")
++
++    def _add_neighbors(self, *args, op_class=81):
++        for hapd in args:
++            status = hapd._get_status()
++
++            ssid = status['ssid[0]']
++            bssid = status['bssid[0]']
++            channel = int(status['channel'])
++
++            if (channel > 14 and op_class == 81):
++                raise Exception("default add_neighbors assumes opclass 0x51!")
++
++            channel = '{:02x}'.format(channel)
++            oper_class = '{:02x}'.format(op_class)
++
++            self.set_neighbor(bssid, ssid, '%s8f000000%s%s060603000000' %
++                                (bssid.replace(':', ''), oper_class, channel))
++
++    @classmethod
++    def group_neighbors(cls, *args):
++        for hapd in args:
++            others = [h for h in args if h != hapd]
++
++            hapd._add_neighbors(*others)
 -- 
 2.34.3
 
