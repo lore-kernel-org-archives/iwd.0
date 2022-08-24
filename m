@@ -1,87 +1,139 @@
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607DB66E8
-	for <iwd@lists.linux.dev>; Tue, 23 Aug 2022 20:51:21 +0000 (UTC)
-Received: by mail-oi1-f175.google.com with SMTP id v125so17463663oie.0
-        for <iwd@lists.linux.dev>; Tue, 23 Aug 2022 13:51:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2921C3A
+	for <iwd@lists.linux.dev>; Wed, 24 Aug 2022 22:55:25 +0000 (UTC)
+Received: by mail-pg1-f170.google.com with SMTP id 202so16280374pgc.8
+        for <iwd@lists.linux.dev>; Wed, 24 Aug 2022 15:55:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=FbDBcFt5yAqD2eGvAP1CNFhgNytiokrCg2hBdWY1zJA=;
-        b=Jjb830JlVHcT58uh6y57hEWKojIHX+EPTwDyxXLI7Qe3wcUEmCV1iRMZdFjPrRZWQ3
-         Q6tBRi5psnAJX/8F8yzLbdQL5qZ+UkhLcvXxpSyJskV4LCsxXPwsp/5ZGckQ6TwVJMZD
-         DRieqLkmFMz1uEEO8W4U5b6PxIwCCVL8dRCuhs8++yQ67evpHvr1g6nhm+/vc6v4MoXh
-         OkO7xQkEvQA/oD5TzfEXYo/CG9OBfnDOVFp0SbGGlO8IVmI78MJf6IsmPKCeqtNMQceX
-         sRpTZqhy1uVE/IBHjb1lU0aFumr41E986P7RV9Vfhm2pgGToVQdWy7CKNh1JKPNtDXBH
-         Wx+w==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=8sFP2wUffrdzvdYya0knROp5q2bk9q9P+Z4NTzglWLQ=;
+        b=CMTGUaZKLcv9E0mSCn3uCgMK3UUHFDR8R8k0nYWdx2zqYxmoIPox+29uJy7b/DbmH5
+         Suzojcz1fb35b3mCRnuiRTWd+4H8BlVpdvLR2cgQypK5lRWxn7EX8//m9WWgl8U7Rwyt
+         mk7jlMGxElwFfPZ7O+LCbCvJFZF+0ZQVlSikhCkwegfMtRVwnqcPPrU+bWS5cY90IbGe
+         kcDTMa4QTb00S3v0qSvgLN6lP7njxUsQkhSFBYCx+BIEQRxnXIW+E8o19rLPVOWJlErp
+         XDIJrLdULEwisjj7WEvV+pUmNIU+ZR6YhNZM8Y5YQvb5ZDbluYmqBp8fKdbjj2zkO177
+         OXqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=FbDBcFt5yAqD2eGvAP1CNFhgNytiokrCg2hBdWY1zJA=;
-        b=xaA/eSSYHyLYlzjVsmY0kFqzEZAOo73CXiEwORuqcjuQhDyxFRZpKWIOp+ihVxx4Lr
-         2BxbRyw381zCFH3qgjnqbQx8RxDyoPnUlG7BjL3fu3TuUqQvvSPDIWB78O0vO0m+W853
-         f7uh6ZvHE37gtkP9YrStobc2KgXyqvEJ3NE+w7H2OP7Xz86iLepAV/mYQqvvQY4YOCJk
-         68ZO6KHDWpkCl/PmfEMSByVvf2AuHnq/7tYejSwBY3z9litMGC1fcaRImDOXb9DrpIuy
-         mz5avhHtKPl6ZG+mO3AMI0AIliFF/2eKl6JYbQ8Df1mDTf7JhD5BQKN45jbKp9Xi3K3T
-         HPYQ==
-X-Gm-Message-State: ACgBeo1xDIGvZK/41HiaMuebbUjbXHxyrfoZYcXTKB8va1wRDsvTnchX
-	gXoAblhvDyNpFaPY/p98N3U=
-X-Google-Smtp-Source: AA6agR6FAqWoCIkKXMFkn12+VZ/ba2JrKqC13lFTQ/cA8RxzQtjGZFsnlf5+dCysYSX4/o5QeLQvOA==
-X-Received: by 2002:a54:4412:0:b0:343:50f0:4899 with SMTP id k18-20020a544412000000b0034350f04899mr2007251oiw.72.1661287880341;
-        Tue, 23 Aug 2022 13:51:20 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id m37-20020a05687088a500b0010efb044e37sm4073449oam.27.2022.08.23.13.51.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Aug 2022 13:51:20 -0700 (PDT)
-Message-ID: <29bbb0a6-424b-2c1c-4269-0075dfdf51f1@gmail.com>
-Date: Tue, 23 Aug 2022 15:47:23 -0500
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=8sFP2wUffrdzvdYya0knROp5q2bk9q9P+Z4NTzglWLQ=;
+        b=ejkHjhSb9R+6DRUU4uFUXXtl0rHct/hijyAbkWaVTSBVjmJvXwfu5K0tKFTN8J5yyK
+         jf/YzCdhcRDixHaQXJzIWbd9oFsN0HF8Ex3FGfbq6Bd9wqJABfO9Bz1EnZk1GeXldvtn
+         naQJBDVnt9laHIzaOXC8IjMbK8JUuWAjWn2hg1jVlTHGE4rxkxMh/mpDfDkX5YPvy4ju
+         bVqGjdvaugN0iuPdozEbPpscWXPpvTc7Wafj1HPquW5YzVVBTJPDBYTN1qAidB87aCtC
+         w04LhPnCa1UGZvOTTno5b3pRxx43r8OgEHv23AmQ0IY7OzAg3nYlvFo1tAKoQP13mFFO
+         eXMA==
+X-Gm-Message-State: ACgBeo3vrEbI2XW9/bMQW8me0ekihRy2U6meJy2iQs+jwLUrzk3RLzzw
+	/KLgDdLgQSmvU/UPnGQ0xC7KadZnCFs=
+X-Google-Smtp-Source: AA6agR6pdO4Hc7fxjkS4TqogqwKpgERO5aNzASMf52WlgrSNwlaqEA/LuuIMqafwUwX4CaN9g8TCbQ==
+X-Received: by 2002:a63:1e48:0:b0:429:e6ee:780d with SMTP id p8-20020a631e48000000b00429e6ee780dmr835483pgm.383.1661381724808;
+        Wed, 24 Aug 2022 15:55:24 -0700 (PDT)
+Received: from jprestwo-xps.none ([50.39.168.145])
+        by smtp.gmail.com with ESMTPSA id jn22-20020a170903051600b0016bcc35000asm6228682plb.302.2022.08.24.15.55.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Aug 2022 15:55:24 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/9] frame-xchg: add type to frame_xchg_prefix
+Date: Wed, 24 Aug 2022 15:55:10 -0700
+Message-Id: <20220824225518.2558698-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 1/3] autotests: Fix testNetconfig ACD test
-Content-Language: en-US
-To: Andrew Zaborowski <andrew.zaborowski@intel.com>, iwd@lists.linux.dev
-References: <20220823163616.1466543-1-andrew.zaborowski@intel.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220823163616.1466543-1-andrew.zaborowski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+All uses of frame-xchg were for action frames, and the frame type
+was hard coded. Soon other frame types will be needed so the type
+must now be specified in the frame_xchg_prefix structure.
+---
+ src/anqp.c       | 1 +
+ src/frame-xchg.c | 2 +-
+ src/frame-xchg.h | 1 +
+ src/p2p.c        | 4 ++++
+ 4 files changed, 7 insertions(+), 1 deletion(-)
 
-On 8/23/22 11:36, Andrew Zaborowski wrote:
-> Part of static_test.py starts a second IWD instance and tries to make
-> it connect to the AP with the same IP address as the first IWD instance
-> which is already connected, to produce an IP conflict.  For this, the
-> second instance uses DHCP and the test expects the DHCP server to offer
-> the address 192.168.1.10 to it.  However in the current setup the DHCP
-> server manages to detect that 192.168.1.10 is in use and offers .11
-> instead.  Break the DHCP server's conflict detection by disabling ICMP
-> ping replies in order to fix the test.
-> 
-> Previously this has worked because the AP's and the DHCP server's
-> network interface is in the same network namespace as the first IWD
-> instance's network interface meaning that pings between the two
-> interfaces shouldn't work (a known Linux kernel routing quirk...).
-> I am not sure why those pings currently do work but take no chances and
-> disable ICMP pings.
-> ---
->   autotests/testNetconfig/static_test.py | 15 ++++++++++-----
->   1 file changed, 10 insertions(+), 5 deletions(-)
-> 
-
-All applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/anqp.c b/src/anqp.c
+index 8febdf91..a3c3d7ed 100644
+--- a/src/anqp.c
++++ b/src/anqp.c
+@@ -156,6 +156,7 @@ static bool anqp_response_frame_event(const struct mmpdu_header *hdr,
+ }
+ 
+ static const struct frame_xchg_prefix anqp_frame_prefix = {
++	.frame_type = 0x00d0,
+ 	.data = (uint8_t []) {
+ 		0x04, 0x0b,
+ 	},
+diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+index 5ba36081..158befd0 100644
+--- a/src/frame-xchg.c
++++ b/src/frame-xchg.c
+@@ -1193,7 +1193,7 @@ uint32_t frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t freq,
+ 		watch = l_new(struct frame_xchg_watch_data, 1);
+ 		watch->prefix = prefix;
+ 		watch->cb = va_arg(resp_args, void *);
+-		frame_watch_add(wdev_id, group_id, 0x00d0,
++		frame_watch_add(wdev_id, group_id, prefix->frame_type,
+ 				prefix->data, prefix->len,
+ 				frame_xchg_resp_cb, fx, NULL);
+ 
+diff --git a/src/frame-xchg.h b/src/frame-xchg.h
+index e3748538..360bb4d4 100644
+--- a/src/frame-xchg.h
++++ b/src/frame-xchg.h
+@@ -32,6 +32,7 @@ typedef void (*frame_xchg_cb_t)(int err, void *user_data);
+ typedef void (*frame_xchg_destroy_func_t)(void *user_data);
+ 
+ struct frame_xchg_prefix {
++	uint16_t frame_type;
+ 	const uint8_t *data;
+ 	size_t len;
+ };
+diff --git a/src/p2p.c b/src/p2p.c
+index ff3b8e45..45a1b70b 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -820,6 +820,7 @@ static void p2p_peer_frame_xchg(struct p2p_peer *peer, struct iovec *tx_body,
+ 
+ static const struct frame_xchg_prefix p2p_frame_go_neg_req = {
+ 	/* Management -> Public Action -> P2P -> GO Negotiation Request */
++	.frame_type = 0x00d0,
+ 	.data = (uint8_t []) {
+ 		0x04, 0x09, 0x50, 0x6f, 0x9a, 0x09,
+ 		P2P_ACTION_GO_NEGOTIATION_REQ
+@@ -829,6 +830,7 @@ static const struct frame_xchg_prefix p2p_frame_go_neg_req = {
+ 
+ static const struct frame_xchg_prefix p2p_frame_go_neg_resp = {
+ 	/* Management -> Public Action -> P2P -> GO Negotiation Response */
++	.frame_type = 0x00d0,
+ 	.data = (uint8_t []) {
+ 		0x04, 0x09, 0x50, 0x6f, 0x9a, 0x09,
+ 		P2P_ACTION_GO_NEGOTIATION_RESP
+@@ -838,6 +840,7 @@ static const struct frame_xchg_prefix p2p_frame_go_neg_resp = {
+ 
+ static const struct frame_xchg_prefix p2p_frame_go_neg_confirm = {
+ 	/* Management -> Public Action -> P2P -> GO Negotiation Confirm */
++	.frame_type = 0x00d0,
+ 	.data = (uint8_t []) {
+ 		0x04, 0x09, 0x50, 0x6f, 0x9a, 0x09,
+ 		P2P_ACTION_GO_NEGOTIATION_CONFIRM
+@@ -847,6 +850,7 @@ static const struct frame_xchg_prefix p2p_frame_go_neg_confirm = {
+ 
+ static const struct frame_xchg_prefix p2p_frame_pd_resp = {
+ 	/* Management -> Public Action -> P2P -> Provision Discovery Response */
++	.frame_type = 0x00d0,
+ 	.data = (uint8_t []) {
+ 		0x04, 0x09, 0x50, 0x6f, 0x9a, 0x09,
+ 		P2P_ACTION_PROVISION_DISCOVERY_RESP
+-- 
+2.34.3
 
