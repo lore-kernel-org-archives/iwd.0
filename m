@@ -1,47 +1,47 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0071C3F
-	for <iwd@lists.linux.dev>; Wed, 24 Aug 2022 22:55:26 +0000 (UTC)
-Received: by mail-pj1-f44.google.com with SMTP id f21so18541278pjt.2
-        for <iwd@lists.linux.dev>; Wed, 24 Aug 2022 15:55:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2779C2906
+	for <iwd@lists.linux.dev>; Wed, 24 Aug 2022 22:55:27 +0000 (UTC)
+Received: by mail-pj1-f52.google.com with SMTP id bf22so18519702pjb.4
+        for <iwd@lists.linux.dev>; Wed, 24 Aug 2022 15:55:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=gFElWuCeSR+AcV03npos0O/uoBc+c67rzeyqpJ9LpuA=;
-        b=H9DAI/RNdyApcc2KDxlFM7dKVN3hn3fzTDNA/eEOsK4XpFVrqqXWJu9BQLUcv5v+GG
-         eiLcw0hn7IihqxNL8BR3r1/IvA9f2ISeArrCSt0YRGpG+qOA7YgHl8n6PlOWqZxtJg97
-         NFKIVY3acDi3Lq/7eY4uHrK14I9gXIYmhP6K3EI7sfQyHoyN4/yr0emu731TDTaudmvN
-         Rc/51h2W0xITAwr9PKjNYRcj7+ERp33Qp5EZftmQ0/r8ZEq3iAS+FlzS/7TeHIc8HnNM
-         eq9vPClAG2FzFELELx3tazytM032FftxZdcufDZlU7yY1d+qLxJKP3tHGhaFMA01iNIl
-         r3fQ==
+        bh=78ArZr6x3j206Ry8lGiidW5SM5BRsWX4yBIbih3yb8g=;
+        b=aIePHe7Fs3SIKrPpmLHMRiqsMaR2euhDljNUk7HUfWBXnO8N3vtx8hWph9XPGmH8+u
+         b6TTH0vjoXRxbokeC5PlU7ca1ChHdPfrzh3hvXKuipFwm1ga7xfNPmGi2jJduu3Eh2Kk
+         1onSeOu+eNy3WmpvaeatVm9X3zLAw7ayL+z56Yj7qtYhXEW+sB+nOJNCfR1DLwlwOBm6
+         Iotc/eIR1ib8cag6umgs4g5WGypKBaTuYUmfRsLW7BWQb028iB+GPYicQSoSbkruk/EV
+         sKIN2C6ImwQ3lLkqCDclVK00i8F5SiL1JGW5i+SNcz+CyhuVZDfHSnQ6cvQJN9Pqj7Ja
+         nOlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=gFElWuCeSR+AcV03npos0O/uoBc+c67rzeyqpJ9LpuA=;
-        b=svB5iB1Lm/5atSAmWnsYoUryKBzaYPYNQT47ZoDHMZXWt89d65CiWiAili6Tq9aWHq
-         9pnbHdXRPGcvAstmjCOmS6iXSeS0DECMVdiyz162QkwCd85frGg0ssFlHXfo8TlN0O6D
-         oui+zjzPxAEfYU3lqnMpT1HumSef6ySj/mLu7BAHIA9FAGgnIBWsNdw3a85qmarG3DV4
-         jn8T4x89V6kt3DL7Vw6BRtkV8vorG0svHvFYAeNxK/7AwVpzLimKRXY8ugbek4uj1hNH
-         FSos7alOxOv6o6qCkGoL+TqZ6beTh8w6vd9MCFm7T0i+DscpURZEGistu5t/QdvMrp+P
-         rlqw==
-X-Gm-Message-State: ACgBeo2e6YsOfrJWwk7vpIwIx1c9Ch9cKGvV4GcJ2TKb5pS1PQBLSLe8
-	z0DQB4QY56VxLPeIJEssv30akf/aeVY=
-X-Google-Smtp-Source: AA6agR7vrsprec1eHjwU4D6YQB1VAtxpyyfcnugFhHBTbH22LywuURntkxc/2Rf8D4Yz8bxm+LnfEw==
-X-Received: by 2002:a17:903:286:b0:172:fa5b:d18f with SMTP id j6-20020a170903028600b00172fa5bd18fmr920905plr.51.1661381725851;
-        Wed, 24 Aug 2022 15:55:25 -0700 (PDT)
+        bh=78ArZr6x3j206Ry8lGiidW5SM5BRsWX4yBIbih3yb8g=;
+        b=1rLcADv1jCtN2wWRh9OQmXcHupytRZVUeThbaEf8XoFS5OIKc/SUBQw58Vwggo/bl3
+         n2rnBtCTWngrGcYB35wEx0NtM9PHCop1+jqFmgwal5fcmgKOFk0weoS7wssnU2vUtD6D
+         atGvIwCGrsxxn+QViLFVqlABjcnmDnmH8xmlXncdcofd7ghEFYAYJ3tOu9CzgV4c694S
+         xugMBJg0JPA28YJ2ebXP+1IPebANcZEsN+AUsc7Vup8FEqtBsfFsuGJWM9KCpDKzuNCf
+         M4u0P71lWUz0JEhQ2l5srrvwvwfZvkTk22MPhlelRBcSbfuni5F9iZc4dLswk2JLWTK/
+         4Gmw==
+X-Gm-Message-State: ACgBeo29fqpxuO0gAb/vS+RbA7XdCa35a44uoFkdqyjy2gipfcmj5jH+
+	ZVzUdGffQtBvWXjYe7UcEhN10+vJ84s=
+X-Google-Smtp-Source: AA6agR6By7KoJdMXGhN90GFi8mm07j1BTWw3UGs5365kFkgdGjJbz5rbKXunYOJSMPbbh/+MO6yqwA==
+X-Received: by 2002:a17:902:9888:b0:172:e456:307 with SMTP id s8-20020a170902988800b00172e4560307mr1020674plp.21.1661381726479;
+        Wed, 24 Aug 2022 15:55:26 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
         by smtp.gmail.com with ESMTPSA id jn22-20020a170903051600b0016bcc35000asm6228682plb.302.2022.08.24.15.55.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Aug 2022 15:55:25 -0700 (PDT)
+        Wed, 24 Aug 2022 15:55:26 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/9] ft: remove OCI element from auth/assoc
-Date: Wed, 24 Aug 2022 15:55:12 -0700
-Message-Id: <20220824225518.2558698-3-prestwoj@gmail.com>
+Subject: [PATCH v2 4/9] frame-xchg: create global group enum
+Date: Wed, 24 Aug 2022 15:55:13 -0700
+Message-Id: <20220824225518.2558698-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220824225518.2558698-1-prestwoj@gmail.com>
 References: <20220824225518.2558698-1-prestwoj@gmail.com>
@@ -53,107 +53,122 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-FT is moving to authentication via CMD_FRAME which breaks the ability
-to get the OCI from the kernel (since its now an offchannel operation).
-Using OCI during FT isn't that useful anyways, so its being removed.
+Only P2P utilizes groups for now but to avoid conflicts in group
+numbers for other modules create a global list which can be added
+to as needed.
 ---
- src/ft.c     | 26 ++------------------------
- src/ft.h     |  2 +-
- src/netdev.c |  3 +--
- 3 files changed, 4 insertions(+), 27 deletions(-)
+ src/frame-xchg.h |  7 +++++++
+ src/p2p.c        | 24 +++++++++---------------
+ 2 files changed, 16 insertions(+), 15 deletions(-)
 
-diff --git a/src/ft.c b/src/ft.c
-index 2285a86f..7ae78476 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -233,10 +233,6 @@ static int ft_tx_reassociate(struct ft_sm *ft)
- 		rsn_info.num_pmkids = 1;
- 		rsn_info.pmkids = hs->pmk_r1_name;
+diff --git a/src/frame-xchg.h b/src/frame-xchg.h
+index 360bb4d4..5b55ded8 100644
+--- a/src/frame-xchg.h
++++ b/src/frame-xchg.h
+@@ -37,6 +37,13 @@ struct frame_xchg_prefix {
+ 	size_t len;
+ };
  
--		/* Always set OCVC false for FT-over-DS */
--		if (ft->over_ds)
--			rsn_info.ocvc = false;
++enum frame_xchg_group {
++	FRAME_GROUP_DEFAULT = 0,
++	FRAME_GROUP_P2P_LISTEN,
++	FRAME_GROUP_P2P_CONNECT,
++	FRAME_GROUP_FT,
++};
++
+ bool frame_watch_add(uint64_t wdev_id, uint32_t group, uint16_t frame_type,
+ 			const uint8_t *prefix, size_t prefix_len,
+ 			frame_watch_cb_t handler, void *user_data,
+diff --git a/src/p2p.c b/src/p2p.c
+index 45a1b70b..cfd8560a 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -190,12 +190,6 @@ static const int channels_scan_2_4_other[] = { 2, 3, 4, 5, 7, 8, 9, 10 };
+  */
+ #define P2P_GO_INTENT 2
+ 
+-enum {
+-	FRAME_GROUP_DEFAULT = 0,
+-	FRAME_GROUP_LISTEN,
+-	FRAME_GROUP_CONNECT,
+-};
 -
- 		rsne = alloca(256);
- 		ie_build_rsne(&rsn_info, rsne);
+ static bool p2p_device_match(const void *a, const void *b)
+ {
+ 	const struct p2p_device *dev = a;
+@@ -718,7 +712,7 @@ static void p2p_connection_reset(struct p2p_device *dev)
  
-@@ -276,22 +272,6 @@ static int ft_tx_reassociate(struct ft_sm *ft)
- 		memcpy(ft_info.anonce, hs->anonce, 32);
- 		memcpy(ft_info.snonce, hs->snonce, 32);
+ 	netdev_watch_remove(dev->conn_netdev_watch_id);
  
--		/*
--		 * IEEE 802.11-2020 Section 13.7.1 FT reassociation in an RSN
--		 *
--		 * "If dot11RSNAOperatingChannelValidationActivated is true and
--		 *  the FTO indicates OCVC capability, the target AP shall
--		 *  ensure that OCI subelement of the FTE matches by ensuring
--		 *  that all of the following are true:
--		 *      - OCI subelement is present
--		 *      - Channel information in the OCI matches current
--		 *        operating channel parameters (see 12.2.9)"
--		 */
--		if (hs->supplicant_ocvc && hs->chandef) {
--			oci_from_chandef(hs->chandef, ft_info.oci);
--			ft_info.oci_present = true;
--		}
--
- 		fte = alloca(256);
- 		ie_build_fast_bss_transition(&ft_info, kck_len, fte);
+-	frame_watch_group_remove(dev->wdev_id, FRAME_GROUP_CONNECT);
++	frame_watch_group_remove(dev->wdev_id, FRAME_GROUP_P2P_CONNECT);
+ 	frame_xchg_stop_wdev(dev->wdev_id);
  
-@@ -812,7 +792,7 @@ static bool ft_over_ds_start(struct auth_proto *ap)
- 	return ft_tx_reassociate(ft) == 0;
+ 	if (!dev->enabled || (dev->enabled && dev->start_stop_cmd_id)) {
+@@ -2527,13 +2521,13 @@ respond:
+ 
+ 	if (status == P2P_STATUS_SUCCESS)
+ 		p2p_peer_frame_xchg(peer, iov, dev->addr, 0, 600, 0, true,
+-					FRAME_GROUP_CONNECT,
++					FRAME_GROUP_P2P_CONNECT,
+ 					p2p_go_negotiation_resp_done,
+ 					&p2p_frame_go_neg_confirm,
+ 					p2p_go_negotiation_confirm_cb, NULL);
+ 	else
+ 		p2p_peer_frame_xchg(peer, iov, dev->addr, 0, 0, 0, true,
+-					FRAME_GROUP_CONNECT,
++					FRAME_GROUP_P2P_CONNECT,
+ 					p2p_go_negotiation_resp_err_done, NULL);
+ 
+ 	l_debug("GO Negotiation Response sent with status %i", status);
+@@ -2804,7 +2798,7 @@ static bool p2p_go_negotiation_resp_cb(const struct mmpdu_header *mpdu,
+ 	iov[iov_len].iov_base = NULL;
+ 
+ 	p2p_peer_frame_xchg(dev->conn_peer, iov, dev->conn_peer->device_addr,
+-				0, 0, 0, false, FRAME_GROUP_CONNECT,
++				0, 0, 0, false, FRAME_GROUP_P2P_CONNECT,
+ 				p2p_go_negotiation_confirm_done, NULL);
+ 	l_free(confirm_body);
+ 
+@@ -2893,7 +2887,7 @@ static void p2p_start_go_negotiation(struct p2p_device *dev)
+ 
+ 	p2p_peer_frame_xchg(dev->conn_peer, iov, dev->conn_peer->device_addr,
+ 				100, resp_timeout, 256, false,
+-				FRAME_GROUP_CONNECT,
++				FRAME_GROUP_P2P_CONNECT,
+ 				p2p_go_negotiation_req_done,
+ 				&p2p_frame_go_neg_resp,
+ 				p2p_go_negotiation_resp_cb, NULL);
+@@ -3035,7 +3029,7 @@ static void p2p_start_provision_discovery(struct p2p_device *dev)
+ 	 * sent to the P2P Device Address of the P2P Group Owner"
+ 	 */
+ 	p2p_peer_frame_xchg(dev->conn_peer, iov, dev->conn_peer->device_addr,
+-				200, 600, 8, false, FRAME_GROUP_CONNECT,
++				200, 600, 8, false, FRAME_GROUP_P2P_CONNECT,
+ 				p2p_provision_disc_req_done,
+ 				&p2p_frame_pd_resp, p2p_provision_disc_resp_cb,
+ 				NULL);
+@@ -4167,9 +4161,9 @@ static void p2p_device_discovery_start(struct p2p_device *dev)
+ 		dev->listen_channel = channels_social[l_getrandom_uint32() %
+ 						L_ARRAY_SIZE(channels_social)];
+ 
+-	frame_watch_add(dev->wdev_id, FRAME_GROUP_LISTEN, 0x0040,
++	frame_watch_add(dev->wdev_id, FRAME_GROUP_P2P_LISTEN, 0x0040,
+ 			(uint8_t *) "", 0, p2p_device_probe_cb, dev, NULL);
+-	frame_watch_add(dev->wdev_id, FRAME_GROUP_LISTEN, 0x00d0,
++	frame_watch_add(dev->wdev_id, FRAME_GROUP_P2P_LISTEN, 0x00d0,
+ 			p2p_frame_go_neg_req.data, p2p_frame_go_neg_req.len,
+ 			p2p_device_go_negotiation_req_cb, dev, NULL);
+ 
+@@ -4187,7 +4181,7 @@ static void p2p_device_discovery_stop(struct p2p_device *dev)
+ 		l_timeout_remove(dev->scan_timeout);
+ 
+ 	p2p_device_roc_cancel(dev);
+-	frame_watch_group_remove(dev->wdev_id, FRAME_GROUP_LISTEN);
++	frame_watch_group_remove(dev->wdev_id, FRAME_GROUP_P2P_LISTEN);
  }
  
--bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
-+bool ft_build_authenticate_ies(struct handshake_state *hs,
- 				const uint8_t *new_snonce, uint8_t *buf,
- 				size_t *len)
- {
-@@ -841,7 +821,6 @@ bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
- 
- 		rsn_info.num_pmkids = 1;
- 		rsn_info.pmkids = hs->pmk_r0_name;
--		rsn_info.ocvc = ocvc;
- 
- 		ie_build_rsne(&rsn_info, ptr);
- 		ptr += ptr[1] + 2;
-@@ -892,8 +871,7 @@ static bool ft_start(struct auth_proto *ap)
- 	uint8_t buf[512];
- 	size_t len;
- 
--	if (!ft_build_authenticate_ies(hs, hs->supplicant_ocvc, hs->snonce,
--					buf, &len))
-+	if (!ft_build_authenticate_ies(hs, hs->snonce, buf, &len))
- 		return false;
- 
- 	iov.iov_base = buf;
-diff --git a/src/ft.h b/src/ft.h
-index f90fc1b2..dd56da23 100644
---- a/src/ft.h
-+++ b/src/ft.h
-@@ -45,7 +45,7 @@ struct ft_ds_info {
- 
- void ft_ds_info_free(struct ft_ds_info *info);
- 
--bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
-+bool ft_build_authenticate_ies(struct handshake_state *hs,
- 				const uint8_t *new_snonce, uint8_t *buf,
- 				size_t *len);
- 
-diff --git a/src/netdev.c b/src/netdev.c
-index 3cc34fcd..36e9fc26 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4759,8 +4759,7 @@ int netdev_fast_transition_over_ds_action(struct netdev *netdev,
- 	iovs[0].iov_base = ft_req;
- 	iovs[0].iov_len = sizeof(ft_req);
- 
--	if (!ft_build_authenticate_ies(hs, false, info->super.snonce,
--						buf, &len))
-+	if (!ft_build_authenticate_ies(hs, info->super.snonce, buf, &len))
- 		goto failed;
- 
- 	iovs[1].iov_base = buf;
+ static void p2p_device_enable_cb(struct l_genl_msg *msg, void *user_data)
 -- 
 2.34.3
 
