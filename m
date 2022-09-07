@@ -1,48 +1,48 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB5E539B
-	for <iwd@lists.linux.dev>; Wed,  7 Sep 2022 23:32:07 +0000 (UTC)
-Received: by mail-pf1-f174.google.com with SMTP id 145so16157815pfw.4
-        for <iwd@lists.linux.dev>; Wed, 07 Sep 2022 16:32:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF6689DD
+	for <iwd@lists.linux.dev>; Wed,  7 Sep 2022 23:32:06 +0000 (UTC)
+Received: by mail-pj1-f53.google.com with SMTP id fv3so9919084pjb.0
+        for <iwd@lists.linux.dev>; Wed, 07 Sep 2022 16:32:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=GWa0yLj79HNbCIGQlvsU65AS9u79rObDUUZOp4frGwE=;
-        b=VGFG6NAc4zT5bwFlGJyAmtTvhZ+I26maI2KZ6gNmIoYkD7r0rO53DFptkSOxn74SrZ
-         1FNdjCvoAvN7D6QPOXUOhf8ivlIeOS4M4ijEutgZjoGYQ1lnPIIi9XvNOusntfKOybGW
-         n1DEwH0CKcrEmKJ4cfCfT0aQTM8VD5nycqpRgQbSHVHUcwqtscmQx88Fygn0sdtPOXka
-         XENMKxGAimfWQTdL9QS9nU1SaNPN1gmm/49LFqU3Y6PLPOwtmvcoo+T4eDM97BUzb1gj
-         8M3fQEc81nwwfBteisG9oiswC/Wyr/StiekOeLbHS1z7Vrv3LYQgYYAQ+63K/tbZ141G
-         OB0g==
+        bh=vYQwrQl5sojdsnudr7L9/Y5gIk/q0qAGIl5pIAzjBpY=;
+        b=YtJtX97WYmc8kTeDNoTgY2k6ytaFuo8VDFj8D/ZxMpYu8dbumTSN4tHmptz+8EBh3g
+         qx2+2RXPq2NbU7Ay1EZfnYaPB3aIr8/FTRgjxxQtpY3dBlmMbwx5N1IBiL5pq6MwqYj8
+         uvTK3CTVfe1PTwWPM7zY7mkCjaerM0xYpPHp4+6xcvZLlvnVKZLLzR8Y4fzwuJo2fq4b
+         2DyC/pmmN80gHEVj1GueebF4ztc3yazzPVn29NsO/4lJLTwDpTU5lpwcmaWEjCZa16Wq
+         XS+L+0g0iK6jQrpYPf2emY3IlYNnevV4JBvRa8sDC6Y3APQVfBAy0PgRoHlJBcRDTk4J
+         IXjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=GWa0yLj79HNbCIGQlvsU65AS9u79rObDUUZOp4frGwE=;
-        b=uLKAFnaD+0cZJzksx2ttqM4nqiZWgANv9Um40tzZyCMTOJgdnoiNF5KshWh5V0aGpn
-         7KFD7W3Xi7XRC6iBwph1cAsC1ea3fZ1XWDQbRmxGJcD9QlFtIjFDVCsUJk680Bal+SU2
-         9eHHTRc3i+DuXWv5tjOCiL3D2RVem5rtjhaQXrkX/e3LQbjwlLm7JQ1Hua8FcyPqoba/
-         lcmMHwLLyiubgNZZjJ4EOw23HjVbiFWK4W1Ei0YYdPLF0OZnj0rxRjThfMtkqNNm6doW
-         AXZE/8B67vGK8zpU3VdpqDyLD4FvB15vRKaclKFq6/xQd5ZHJhkq/jbdGR8HGNA110X3
-         F1kw==
-X-Gm-Message-State: ACgBeo1CELS63czwu7+WLRXAruSsybr/NQyWOodV+qEAWgDuYOo4Q48x
-	Yuo7OUlGLNOcPUwThd1Gy/qhb8joDdc=
-X-Google-Smtp-Source: AA6agR6gANwsAoie+Opq5Yab78f3iFV92adv+xDvjHPK5Josj9LdkjMzvCnQsJac8UHu16pw9/Jz6g==
-X-Received: by 2002:a63:5a44:0:b0:431:fa3a:f92c with SMTP id k4-20020a635a44000000b00431fa3af92cmr5558465pgm.471.1662593526651;
+        bh=vYQwrQl5sojdsnudr7L9/Y5gIk/q0qAGIl5pIAzjBpY=;
+        b=MgoX1UT96T9B4+HOlExgTYPwrBj2Vr3/8VOJtp+3Tvgfnjf29lSkEQ+0NKrtyw5Lb0
+         TTueDobrq/ZrPuB9YCc//hf0sApEIgj+1/smETij2Q/qg4HDmNk9suTs+Lcj++XmvEBK
+         ajLymUuipRwiR5UNCipEeEwjHRLOPeLXNgSsiBEA0QgkoyQHcEKAO61XLQxh4khTHz83
+         zIjt4hSWeH7Bv2QqSyR87vD9yP2c3BpvndWW9pUF1003zPcMGhtxccLOKveinpY+HaPf
+         kDZj8qOG6DhXC9dMGkJSeHVkS4pfpUc5kLwRA6G1mmrIxzb3Nnga80EER26wG6LCx+GU
+         ixKQ==
+X-Gm-Message-State: ACgBeo0v66Y698zVd5ZU1iT3bNFu3VHq8QMF7nWM/FxPQC77u9tqGVRY
+	64BNmEOlyz95PZNZjgKXMXl5GhprU3w=
+X-Google-Smtp-Source: AA6agR73M4R7fr2OfX2Iu2inO5nDH2kMVBb+xHHLkkGlOwL9V+vOfq/mzTUVD9CI7IOZ+IJ5wcqnJg==
+X-Received: by 2002:a17:90a:e7c2:b0:1f4:feeb:20ee with SMTP id kb2-20020a17090ae7c200b001f4feeb20eemr994812pjb.114.1662593526137;
         Wed, 07 Sep 2022 16:32:06 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.168.145])
-        by smtp.gmail.com with ESMTPSA id q24-20020a63f958000000b004348bd693a8sm4918192pgk.31.2022.09.07.16.32.06
+        by smtp.gmail.com with ESMTPSA id q24-20020a63f958000000b004348bd693a8sm4918192pgk.31.2022.09.07.16.32.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 16:32:06 -0700 (PDT)
+        Wed, 07 Sep 2022 16:32:05 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] wiphy: support country code override
-Date: Wed,  7 Sep 2022 16:32:01 -0700
-Message-Id: <20220907233201.227577-4-prestwoj@gmail.com>
+Subject: [PATCH 3/4] wiphy: only do global GET_REG once
+Date: Wed,  7 Sep 2022 16:32:00 -0700
+Message-Id: <20220907233201.227577-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220907233201.227577-1-prestwoj@gmail.com>
 References: <20220907233201.227577-1-prestwoj@gmail.com>
@@ -54,141 +54,92 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Depending on the device the regulatory domain may never get
-set on its own. This is worked around in wpa_supplicant by
-allowing the user to supply a country code. The kernel
-_should_ set this on its own based on the docs, but ultimately
-will fall back to user defined if the driver doesn't set it.
+Getting the regulatory domain for self-managed wiphys requires
+providing the wiphy ID, but this is not the case for any device
+under the global regulatory domain. This is not tied to any
+specific wiphy so there is no need to supply a wiphy ID or do
+a dump for each wiphy.
 
-IWD now needs to work around this problem by allowing users
-to supply the country code in main.conf.
-
-A few notes here:
- - Setting the country may not effect the actual regulatory
-   domain. This is because the kernel still remains in control.
-   Any request is merely a hint to the kernel.
- - This only applies to devices under the global regulatory
-   domain. Self-managed devices will not allow setting the
-   regdom.
+Now GET_REG will be tracked globally if its a global call and
+will only be called once.
 ---
- src/wiphy.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 79 insertions(+), 1 deletion(-)
+ src/wiphy.c | 35 ++++++++++++++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 7 deletions(-)
 
 diff --git a/src/wiphy.c b/src/wiphy.c
-index af675694..b87cfefd 100644
+index f295d87d..af675694 100644
 --- a/src/wiphy.c
 +++ b/src/wiphy.c
-@@ -65,7 +65,9 @@ static char **whitelist_filter;
+@@ -64,6 +64,7 @@ static struct l_hwdb *hwdb;
+ static char **whitelist_filter;
  static char **blacklist_filter;
  static int mac_randomize_bytes = 6;
- static unsigned int get_reg_id;
-+static unsigned int set_reg_id;
++static unsigned int get_reg_id;
  static char regdom_country[2];
-+static char regdom_override[2];
  static uint32_t work_ids;
  static unsigned int wiphy_dump_id;
+@@ -2076,7 +2077,10 @@ static void wiphy_get_reg_cb(struct l_genl_msg *msg, void *user_data)
+ 	uint32_t tmp;
+ 	bool global;
  
-@@ -2090,6 +2092,14 @@ static void wiphy_get_reg_cb(struct l_genl_msg *msg, void *user_data)
- 				NL80211_ATTR_UNSPEC) < 0;
+-	wiphy->get_reg_id = 0;
++	if (wiphy)
++		wiphy->get_reg_id = 0;
++	else
++		get_reg_id = 0;
  
- 	wiphy_update_reg_domain(wiphy, global, msg);
-+
-+	if (global && regdom_override[0] && regdom_override[1]) {
-+		if (regdom_override[0] != regdom_country[0] ||
-+				regdom_override[1] != regdom_country[1])
-+			l_warn("Regdom %c%c does not match override %c%c",
-+				regdom_country[0], regdom_country[1],
-+				regdom_override[0], regdom_override[1]);
-+	}
- }
- 
+ 	/*
+ 	 * NL80211_CMD_GET_REG contains an NL80211_ATTR_WIPHY iff the wiphy
+@@ -2091,16 +2095,28 @@ static void wiphy_get_reg_cb(struct l_genl_msg *msg, void *user_data)
  static void wiphy_get_reg_domain(struct wiphy *wiphy)
-@@ -2119,6 +2129,69 @@ static void wiphy_get_reg_domain(struct wiphy *wiphy)
- 		get_reg_id = id;
+ {
+ 	struct l_genl_msg *msg;
++	unsigned int id;
++
++	/* Already doing a global dump */
++	if (!wiphy && get_reg_id)
++		return;
+ 
+ 	msg = l_genl_msg_new(NL80211_CMD_GET_REG);
+-	l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY, 4, &wiphy->id);
+ 
+-	wiphy->get_reg_id = l_genl_family_send(nl80211, msg, wiphy_get_reg_cb,
+-						wiphy, NULL);
+-	if (!wiphy->get_reg_id) {
+-		l_error("Error sending NL80211_CMD_GET_REG for %s", wiphy->name);
++	if (wiphy)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_WIPHY, 4, &wiphy->id);
++
++	id = l_genl_family_send(nl80211, msg, wiphy_get_reg_cb, wiphy, NULL);
++	if (!id) {
++		l_error("Error sending NL80211_CMD_GET_REG for %s",
++				wiphy ? wiphy->name : "(global)");
+ 		l_genl_msg_unref(msg);
+ 	}
++
++	if (wiphy)
++		wiphy->get_reg_id = id;
++	else
++		get_reg_id = id;
  }
  
-+static void wiphy_set_reg_cb(struct l_genl_msg *msg, void *user_data)
-+{
-+	int err = l_genl_msg_get_error(msg);
-+
-+	set_reg_id = 0;
-+
-+	/* Just warn if the CC was invalid, can't do much else here... */
-+	if (err < 0)
-+		l_warn("Error setting regulatory domain (%d)", err);
-+
-+	/*
-+	 * Always get the regdom to see if the override actually worked. The
-+	 * kernel may choose to ignore REQ_SET_REG requests. If so this will be
-+	 * logged. Since this only applies to the global regdom do a global
-+	 * GET_REG with wiphy set to NULL
-+	 */
-+	wiphy_get_reg_domain(NULL);
-+}
-+
-+static void wiphy_set_reg_domain(const char *cc)
-+{
-+	struct l_genl_msg *msg;
-+
-+	regdom_override[0] = cc[0];
-+	regdom_override[1] = cc[1];
-+
-+	msg = l_genl_msg_new(NL80211_CMD_REQ_SET_REG);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_REG_ALPHA2, 2, cc);
-+
-+	set_reg_id = l_genl_family_send(nl80211, msg, wiphy_set_reg_cb,
-+					NULL, NULL);
-+	/* Could try getting the regdom, but that likely wouldn't work either */
-+	if (L_WARN_ON(!set_reg_id))
-+		return;
-+
-+	l_debug("Trying to set country to %s", cc);
-+}
-+
-+static void wiphy_setup_reg_domain(struct wiphy *wiphy)
-+{
-+	const struct l_settings *config = iwd_get_config();
-+	const char *cc = l_settings_get_value(config, "General", "Country");
-+
-+	/*
-+	 * At least do basic validation. If this fails force a GET_REG but do
-+	 * not try setting the domain.
-+	 */
-+	if (cc) {
-+		if (strlen(cc) != 2 || !l_ascii_isalpha(cc[0]) ||
-+					!l_ascii_isalpha(cc[1])) {
-+			l_error("Invalid setting [General].Country=%s", cc);
-+			cc = NULL;
-+		}
-+	}
-+
-+	if (!cc || wiphy->self_managed) {
-+		wiphy_get_reg_domain(wiphy->self_managed ? wiphy : NULL);
-+		return;
-+	}
-+
-+	wiphy_set_reg_domain(cc);
-+}
-+
  void wiphy_create_complete(struct wiphy *wiphy)
- {
- 	wiphy_register(wiphy);
-@@ -2133,7 +2206,7 @@ void wiphy_create_complete(struct wiphy *wiphy)
+@@ -2117,7 +2133,7 @@ void wiphy_create_complete(struct wiphy *wiphy)
  
  	wiphy_set_station_capability_bits(wiphy);
  	wiphy_setup_rm_enabled_capabilities(wiphy);
--	wiphy_get_reg_domain(wiphy->self_managed ? wiphy : NULL);
-+	wiphy_setup_reg_domain(wiphy);
+-	wiphy_get_reg_domain(wiphy);
++	wiphy_get_reg_domain(wiphy->self_managed ? wiphy : NULL);
  
  	wiphy_print_basic_info(wiphy);
  }
-@@ -2540,6 +2613,11 @@ static void wiphy_exit(void)
- 		get_reg_id = 0;
+@@ -2519,6 +2535,11 @@ static void wiphy_exit(void)
+ 		wiphy_dump_id = 0;
  	}
  
-+	if (set_reg_id) {
-+		l_genl_family_cancel(nl80211, set_reg_id);
-+		set_reg_id = 0;
++	if (get_reg_id) {
++		l_genl_family_cancel(nl80211, get_reg_id);
++		get_reg_id = 0;
 +	}
 +
  	l_queue_destroy(wiphy_list, wiphy_free);
