@@ -1,91 +1,75 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9754A2D
-	for <iwd@lists.linux.dev>; Fri,  9 Sep 2022 16:07:06 +0000 (UTC)
-Received: by mail-pg1-f171.google.com with SMTP id c24so1980417pgg.11
-        for <iwd@lists.linux.dev>; Fri, 09 Sep 2022 09:07:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381BF33DA
+	for <iwd@lists.linux.dev>; Tue, 13 Sep 2022 14:17:22 +0000 (UTC)
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-127dca21a7dso32425487fac.12
+        for <iwd@lists.linux.dev>; Tue, 13 Sep 2022 07:17:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=dKWryWbj5Np598O2h8N+Oyw9Cf+gv62I5NbZlj9W4xc=;
-        b=XQli1zlOt8UnlxWzeUXa6ZAXf5Mm3CmHRWVE1cy7VUgM+MxeXPN1qZRkeG/WNLg0Yx
-         cvz4aP8Tly9VlBOcetpthk9W0tYySd0jU3WJCX1ibF7ZgVVf9VArqzxYEEicYxhNHjFm
-         1VA8iPdaQ9vanWAOAicJZ1k4OJLoYmacsfUrZIQ1tXoefNT4H+W+ThTdez3jRpPONI1G
-         A8hMPYCzMHyadWuBEI5V3SVyrq4LQomjHHqF2T9RWMnUHbopRI+JdOXKP3SVT4vJibBj
-         E8v2BdIOuEnF9ewbos/pF/6CKJ5FrlG7EAxJTXwFlzZ2hsbaA0dxh6xS9XBBviOr4SH4
-         EHlg==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=TPHFa5Ytmd0Qlqm9gcdrJCnky6Q12gVdBti4h0LIjpc=;
+        b=BPhKSJ6FczXFcogpTlpMZjp+72yxlAcdh1ZdfZg6rQgqjPjnpnmeukaK8gZSUDx51a
+         Y2uvZ+Poaf6PSxlhuuTOG7zuEbG1gef4tZu0K9G/maRDYg8eH8tKMynpk2NB2vgITUGu
+         E+Zflckan42eFMCKorhEIaYlXMHtO/MSjYPXdpXhwtO1DJG0Os5dtaisRPbvLA7BMWi2
+         6s32lF8c/Ru95OyqtQiAha3Mc1RvStct0xQKGSVom2JhbYLQej/KReAqVG3jpWgKox2W
+         iO64b9YCacpW1c5CZ1Xy5gIX/mCG5+7pj2v06KFkr9ucA8fXEC1kElUsRonG7sSbYy9E
+         Qtog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=dKWryWbj5Np598O2h8N+Oyw9Cf+gv62I5NbZlj9W4xc=;
-        b=4Pd9uek34lrqqEsiXQlRz7taFI+J4HkwRbymonpfkWYz24vs8oN7fHqmWDHIvJ34pR
-         mv89GjMOg8YbnOUbmbiEQKHKV0dgsN0N1NnReuvDLw1+nfcHBiSXZ0ozwMODeD3baEs6
-         IImdFL6ub2nrVXq2FMIMvasWHOQK9AA6drqq6dd3f2xvGUgrMLxBYIT6HeSABih2N4e+
-         MvsxiCC9ZHKF0pmOlnhjPQcmFRijsRRLfwt7/OA5e1WQB//uxEBl4NBNe4KTJEHHqwC8
-         ynK8qRvHe+jAcAsamZ2XvdKbL3lRtpcOF2wvzanfH4MpW1YspTOsN31bHf9io5KU9bca
-         zeNQ==
-X-Gm-Message-State: ACgBeo2BEiVY0FZJ6jjdYmPwGXsAddk4ip/hTgtETl2WW21198+ZcAsd
-	ZRspY8d26qEFfhtFiTyM6aaCKTIHpFQ=
-X-Google-Smtp-Source: AA6agR7jrhP6rUPmv+dtwrLDprOC6BJzArtyYW//e6JNF2o9xpeQHuOC4eM/Hb5/CWt2oKuiCSaNJA==
-X-Received: by 2002:a63:e352:0:b0:42b:dc03:cc38 with SMTP id o18-20020a63e352000000b0042bdc03cc38mr12314727pgj.545.1662739625562;
-        Fri, 09 Sep 2022 09:07:05 -0700 (PDT)
-Received: from jprestwo-xps.none ([50.39.168.145])
-        by smtp.gmail.com with ESMTPSA id c3-20020a654203000000b0042c0ffa0e62sm684144pgq.47.2022.09.09.09.07.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Sep 2022 09:07:05 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] auto-t: remove ptk/gtk rekey value for testPSK-roam
-Date: Fri,  9 Sep 2022 09:07:03 -0700
-Message-Id: <20220909160703.490083-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=TPHFa5Ytmd0Qlqm9gcdrJCnky6Q12gVdBti4h0LIjpc=;
+        b=LyQ3q6tL1cTGbgxQm6e1dySwT/GSxV0F8ocg2mQ/1whZZ7iSr7U+pVmo0jJbYblWj3
+         inI0jQxopLXdVQ3apahN0jz2qOnfQsYlfOgMG5bCm+vZgDWiez3eg7JXvfXHCm+3Ul5j
+         fPTi68mIR6KvcaHimWBjE1oCz/fHzmdD2FPCIBfc1iHO3sMsj47oLgZ5AJctQHZHMj91
+         8Br9rDBOdq1fRqDQUpHxkJhBn+cAcS5rquvjDcg4GyYHXTHN2fO6/eCsGJfE/11GQm2x
+         MyZ/AoVkfGSJH4pKsvT1zjHqvL38vO+KpFyAvqkRoFFaGU/r+bDswemkqUhCrZePcaEz
+         QZ9Q==
+X-Gm-Message-State: ACgBeo1Z9mbQdOWgSp0lFtYrFqBFXZixLsk87g+ORNKVWQoy8+aVekm8
+	6ogQjNBPW0MsXIIGIPen64A=
+X-Google-Smtp-Source: AA6agR48Z4wwa4KBUb7IDEXZd4Zw1osyoRJ5xfoV9qUcKinKSRMs9jiqaQ9bLWU4g2xAyCw5yI/cmQ==
+X-Received: by 2002:a05:6808:130a:b0:344:e23f:811b with SMTP id y10-20020a056808130a00b00344e23f811bmr1570112oiv.82.1663078641062;
+        Tue, 13 Sep 2022 07:17:21 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id p43-20020a05687056ab00b0010bf07976c9sm7124190oao.41.2022.09.13.07.17.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Sep 2022 07:17:20 -0700 (PDT)
+Message-ID: <ff518d68-aa1a-2e0b-1226-0da967c05a4a@gmail.com>
+Date: Tue, 13 Sep 2022 09:00:39 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 01/10] doc: Update Netconfig Agent API doc
+Content-Language: en-US
+To: Andrew Zaborowski <andrew.zaborowski@intel.com>, iwd@lists.linux.dev
+References: <20220829173601.1963953-1-andrew.zaborowski@intel.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220829173601.1963953-1-andrew.zaborowski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When timed very badly the hostapd rekey timer could kick off
-during the roam scan which ultimately results in the AP
-disconnecting since IWD cannot reply to any EAPoL frames
-during a scan.
----
- autotests/testPSK-roam/ft-psk-ccmp-1.conf | 2 --
- autotests/testPSK-roam/ft-psk-ccmp-2.conf | 2 --
- 2 files changed, 4 deletions(-)
+Hi Andrew,
 
-diff --git a/autotests/testPSK-roam/ft-psk-ccmp-1.conf b/autotests/testPSK-roam/ft-psk-ccmp-1.conf
-index c012b4ef..4a2ceba5 100644
---- a/autotests/testPSK-roam/ft-psk-ccmp-1.conf
-+++ b/autotests/testPSK-roam/ft-psk-ccmp-1.conf
-@@ -13,8 +13,6 @@ wpa=2
- wpa_key_mgmt=FT-PSK
- wpa_pairwise=CCMP
- wpa_passphrase=EasilyGuessedPassword
--wpa_ptk_rekey=30
--wpa_group_rekey=80
- ieee80211w=1
- rsn_preauth=1
- rsn_preauth_interfaces=lo
-diff --git a/autotests/testPSK-roam/ft-psk-ccmp-2.conf b/autotests/testPSK-roam/ft-psk-ccmp-2.conf
-index 84875fdc..a42e175d 100644
---- a/autotests/testPSK-roam/ft-psk-ccmp-2.conf
-+++ b/autotests/testPSK-roam/ft-psk-ccmp-2.conf
-@@ -13,8 +13,6 @@ wpa=2
- wpa_key_mgmt=FT-PSK
- wpa_pairwise=CCMP
- wpa_passphrase=EasilyGuessedPassword
--wpa_ptk_rekey=30
--wpa_group_rekey=80
- ieee80211w=1
- rsn_preauth=1
- rsn_preauth_interfaces=lo
--- 
-2.34.3
+On 8/29/22 12:35, Andrew Zaborowski wrote:
+> Update ConfigureIPv{4,6}() parameters to simplify mapping our sets of
+> addresses and routes directly to D-Bus dictionaries.  Split Cancel()
+> into CancelIPv{4,6}().
+> ---
+>   doc/agent-api.txt | 123 ++++++++++++++++++++++++++++++++++++----------
+>   1 file changed, 97 insertions(+), 26 deletions(-)
+> 
+
+All applied, thanks.
+
+Regards,
+-Denis
 
