@@ -1,96 +1,86 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221074C8C
-	for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 20:55:58 +0000 (UTC)
-Received: by mail-pf1-f174.google.com with SMTP id e5so19260144pfl.2
-        for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 13:55:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E044C8C
+	for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 21:09:59 +0000 (UTC)
+Received: by mail-oi1-f178.google.com with SMTP id m81so2116676oia.1
+        for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 14:09:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=+JzW7VnwR/FW2qLFYt6b6aIFvnLxLEYb3/54IE2kMFk=;
-        b=IKc6PysC9tlk5zRm9B+0tf3Og39uuQJilvaD6lT2tOn8MLOr7q3l2QnKQY3IHJnC4j
-         lSdWU49k8oyPuvO1s0jVoLiVFlokL6VNezGHt16yUdwIZFvJ1Y7wwRAeB9CIuS7A8N+n
-         O7CHLGGZbGGn0AZmd9FsdrZ4YVU/8LZ/UCi1BOhyUdhnLGHbeoYW7gAtge+iLk55u2R/
-         nv/jeTYyIzjZpQ9tp0gQ3TOD/hIrnrRCDB6UogP+gEP6+1XMdPbgjWF5eZcacv0xNQS/
-         LClvW8sI2K1DT7jLTi0N8PvVzDHjTogbzcDxhxCDYf2CM9Er1PgNOz4uKe1llZclr3zr
-         ogIw==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=51K2caaOVYM2u6BJO2aP33+rLDyHi14FiBSfTFX5FHU=;
+        b=alpIwA8c/LdV/Lb3dLZSn6DIyohH5ogWNzYGz4MWzrsqC5p7NZ3U7xrGVskFZGEGWQ
+         k3na2uJTinUCt7njnEsjKQQRlUHbrabYKPTq/0AMgjxkXQoSLE7Fbe6/ZY2K7BRmM8vY
+         3uzpMGTgv7woiGxSO7pYZyQGi4zsMl6kAiazmrH0NxtB8vIovIKYW5AKVWcrDxnpVS3t
+         H8pq0bsep6CMxARemRjLzaJyAf/So9DCxTjjG16w1Fs+immAZ2Yls8x/AeYmosIgPuwK
+         sOzW4K32IV+CplGiZ52c74QLjrpaEnwzi9hV8DOavmSubOTuEFpxhs0r7tdDR7OjixX2
+         vhLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=+JzW7VnwR/FW2qLFYt6b6aIFvnLxLEYb3/54IE2kMFk=;
-        b=bf7jEwi6NId3SzrF4naLi8i7EK5aW7B0te7rF3KpDkd7cH1Jq+GAWnriaSUrcWRxkg
-         pxTeI809CbNTKJmA/zUqBFFth/NLJK4uiZeRAwuYJoNGfGBmkKnajFJvBhcJ2CPja7Be
-         EiSA6lgvNR6dmeHMzbVN9489MT6B5h1KQxlazoysp1eT5JbwCPfuz6kBcZ5FlWSTBF/5
-         uwveq0ojsjP+Fowesa4bk+wUMT3zwFkyarC/JAZ6qIxsS9i0yOFzhz4qKZDZY/IY6Kay
-         mTDUoi+izWsA02AiAGLzLQNxgGtf6RZfSEM3wzhUs93PYg6S8kZlDOQ4MFSfOFodCdq8
-         JqlA==
-X-Gm-Message-State: ACrzQf39wszee+nJac3OLz5Fg3ihkvesTQ2CSsu5Ve07JNxEeRKV/6dI
-	ERAXsnWbMrNekfxFZgWbbqzmm4PrA8A=
-X-Google-Smtp-Source: AMsMyM5fUSgEGavG/alF7Sqp8O4PXMmWamSxuXodM2Zxum354eu3FP0DLlpWQ3M2FOjkmjOQZfEtgg==
-X-Received: by 2002:a63:77c4:0:b0:435:4224:98b6 with SMTP id s187-20020a6377c4000000b00435422498b6mr1537057pgc.94.1663275357494;
-        Thu, 15 Sep 2022 13:55:57 -0700 (PDT)
-Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id e19-20020a656bd3000000b004351358f056sm11923834pgw.85.2022.09.15.13.55.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Sep 2022 13:55:57 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] monitor: parse probe response frames
-Date: Thu, 15 Sep 2022 13:55:54 -0700
-Message-Id: <20220915205554.1061014-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20220915205554.1061014-1-prestwoj@gmail.com>
-References: <20220915205554.1061014-1-prestwoj@gmail.com>
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=51K2caaOVYM2u6BJO2aP33+rLDyHi14FiBSfTFX5FHU=;
+        b=ccPGZ9sHE22Gg46NV//tYWXZVX1FZqdM9kbffcRGYRGhJzRXYWMTFL7PgqIJMeNLnU
+         QfaazYHR2idERYVdm2f/CXfC4hoaB4COmBQRAJ6UTCXtz+J6Q9ZEHWb+gWIPxAKZqepp
+         ylZgc4OM+1belAKItmTczfcYgzfsQF5t0lj+rtr8ArlafW0cgmkpNb9toQ+qqn0DrZno
+         Xsr9PtnQQ/KdeCydZeaTXOyFcKTrHsd8u24s4Z3PMZrH/LrY5hbyejtpe4w6zjqSbCN3
+         c2pTwovAu0cmXqjQae/hcbEe+StaYUnWLNxTRphnNxW1eqrBAp3cDM8Xb88A2TE4DJSx
+         DxwQ==
+X-Gm-Message-State: ACgBeo2M2f/EM74bdsEG2V6/fqJK7EJQr7GID5nz2J3+b8QM20BFsLvv
+	Htg1VmkbVTlw3PVSP4l1q38=
+X-Google-Smtp-Source: AA6agR7siR4TRF/+iqKCipKPXjDYEQsNUdsUTpOXPik+7sn+/bl1lHI8Cxx95ylgLHcfU8tk5Uf0FA==
+X-Received: by 2002:a05:6808:a19:b0:34f:d8d0:260 with SMTP id n25-20020a0568080a1900b0034fd8d00260mr5398524oij.166.1663276198699;
+        Thu, 15 Sep 2022 14:09:58 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id fo16-20020a0568709a1000b001273c4097a4sm2004189oab.17.2022.09.15.14.09.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Sep 2022 14:09:58 -0700 (PDT)
+Message-ID: <4099c298-be28-8a9a-d1af-c86c7134aa0e@gmail.com>
+Date: Thu, 15 Sep 2022 15:49:22 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH] station: scan before a forced roam
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220914155413.748576-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220914155413.748576-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- monitor/nlmon.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 15f4c828..5ae014e4 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -5018,6 +5018,16 @@ static void print_action_mgmt_frame(unsigned int level,
- 	print_mmpdu_header(level + 1, mmpdu);
- }
- 
-+static void print_probe_response(unsigned int level,
-+				const struct mmpdu_header *mmpdu, size_t len)
-+{
-+	const struct mmpdu_probe_response *resp = mmpdu_body(mmpdu);
-+
-+	print_attr(level, "Subtype: Probe Response");
-+	print_ie(level + 1, "Probe Response IEs", resp->ies,
-+			(const uint8_t *) mmpdu + len - resp->ies);
-+}
-+
- static void print_frame_type(unsigned int level, const char *label,
- 					const void *data, uint16_t size)
- {
-@@ -5063,7 +5073,10 @@ static void print_frame_type(unsigned int level, const char *label,
- 		str = "Probe request";
- 		break;
- 	case 0x05:
--		str = "Probe response";
-+		if (mpdu)
-+			print_probe_response(level + 1, mpdu, size);
-+		else
-+			str = "Probe response";
- 		break;
- 	case 0x06:
- 		str = "Timing Advertisement";
--- 
-2.34.3
+On 9/14/22 10:54, James Prestwood wrote:
+> This will make the debug API more robust as well as fix issues
+> certain drivers have when trying to roam. Some of these drivers
+> may flush scan results after CMD_CONNECT which results in -ENOENT
+> when trying to roam with CMD_AUTHENTICATE unless you rescan
+> explicitly.
+> 
+> Now this will be taken care of automatically and station will first
+> scan for the BSS (or full scan if not already in results) and
+> attempt to roam once the BSS is seen in a fresh scan.
+> 
+> The logic to replace the old BSS object was factored out into its
+> own function to be shared by the non-debug roam scan. It was also
+> simplified to just update the network since this will remove the
+> old BSS if it exists.
+> ---
+>   src/station.c | 143 +++++++++++++++++++++++++++++++++++++++++++-------
+>   1 file changed, 124 insertions(+), 19 deletions(-)
+> 
+
+Applied, thanks.
+
+Regards,
+-Denis
 
