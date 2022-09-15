@@ -1,96 +1,77 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9939C4C91
-	for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 21:18:56 +0000 (UTC)
-Received: by mail-pj1-f52.google.com with SMTP id o70-20020a17090a0a4c00b00202f898fa86so9117437pjo.2
-        for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 14:18:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095024C91
+	for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 21:20:17 +0000 (UTC)
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-127f5411b9cso49362587fac.4
+        for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 14:20:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=+JzW7VnwR/FW2qLFYt6b6aIFvnLxLEYb3/54IE2kMFk=;
-        b=EB0n2TIOuPzNaOfL0yDOygPoaxHZnTgfEEXQcn9ZMWevYfVtsp4b+BYYiqlacok4WW
-         P5wrbtVoME7QK4+MHG+9mreFg4561ACZT6RMFQFcDo2JXuiMDKPWcSTOh0GGP8sYlyvj
-         J9cBgvcW9Yvsy4zKf4o3gKHQv8j7Jt95xNywwS9qbtX2ssflMeqFCOV5ag2Rx9l47OiQ
-         9s2COTpOmq9pnvAHzxdjkxZM01zjAvqC4z570HPce68uUYuvDmBKRqtzYMksmkDrfbvj
-         uZMCK+FM3ZsBccktsLD4UgVVT3t+pQFUPWFdGOWTzO4E/Z8/bHvvfCUA6TNEVivxwzYB
-         bZCA==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=qyuq0nXeQ639C19Jv14c+Y9yqUlHRKGNNtIWZAZ1LRE=;
+        b=GauTxiE04GvEkPp7dfX9xFwgLyC7Y8fCrkF+dOWv9O++f3nJskbjdE4mOcKc5OrWH7
+         hzmWnbrzCfxMRwWRfmuy/q7L684XUnuFvicDa8yXDOrx76cv2SQ0hh+x43F+fDAim7/J
+         Lrbhxf41iKxB1E2l4Xi+g5dEJhOa0PjIymVgZCEBDHM8RTMHCmYxojTHU4usIrXfFmiV
+         aUsa5ytSr/pmgRI5omVlJEeX+qROZtQhRrjrpYCEp/0TNVlw29p/iRMYCyzZJ0n7NqBg
+         ItFPfztxLdChD8TL0spsP/PdNddUZFAiROJZXGMbsVr1z5AAfKgeHVAT6igUgbukp8hv
+         hrDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=+JzW7VnwR/FW2qLFYt6b6aIFvnLxLEYb3/54IE2kMFk=;
-        b=vcRL3DMq2EL2IckeIOHClOd/9pUBNomphU4uXpmeVZSb9huCg8UcyOenEUhAiMXOum
-         5dK2j3xlgBjhQjh59q4jiNYzrYNicJW6vWpCdyJOG/ZNk+ymJhO8D0qY7ueQIJEge6Op
-         l+MEQjHbxOmOmKFxIPkbTMDSqqSzFdDZmOTCWS+Va71WzAq7BoZ62GTZjYPUB9WC9E4q
-         aaq7Yhg/FWZ57/f+zAdeV3Ie1FsCjy+4jJU3DpDNsAQonNA939v8y62Qn4vvqMuNMy4S
-         ycfyQ3YfGGl4BNvq7xwUyzmQam98WimDpiyKMNsQh0hL7v58OPMZwmhG1rLMeNyrQQWE
-         H6vw==
-X-Gm-Message-State: ACrzQf0lAADdENtEyyMxYz0I0qAykmKYZRZ1v1YN83J0qXkico69cIT0
-	wUCxjcWsNGLe7bRojN2aaUOnfp+OydQ=
-X-Google-Smtp-Source: AMsMyM7BF4aR7+axs9gNWsuXOrThL04PlSJM4qiWCYG26HmvEsWyz2QwigjOtaUYLb8gLfyy8tPf6g==
-X-Received: by 2002:a17:903:41c6:b0:178:348e:f760 with SMTP id u6-20020a17090341c600b00178348ef760mr1450379ple.123.1663276735989;
-        Thu, 15 Sep 2022 14:18:55 -0700 (PDT)
-Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id 2-20020a621902000000b0054aa69bc192sm125139pfz.72.2022.09.15.14.18.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Sep 2022 14:18:55 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/2] monitor: parse probe response frames
-Date: Thu, 15 Sep 2022 14:18:53 -0700
-Message-Id: <20220915211853.1093078-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20220915211853.1093078-1-prestwoj@gmail.com>
-References: <20220915211853.1093078-1-prestwoj@gmail.com>
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=qyuq0nXeQ639C19Jv14c+Y9yqUlHRKGNNtIWZAZ1LRE=;
+        b=NY1Uq0spZxkKLfmi5+hRsiMnCk0wHppeiArdbiavXw5kmPfbDG3KQWb3pEAsrXuDjB
+         a4a3Zkf9FYu3vT7ZYdOGtC+AjPDpc7Bn3fciEkZ9IdrVFxm6FhYTi+96mgiWVw9fIxdU
+         MQWnbrlmVj+3zYyplFBbh/PlOa5PHovxwcAs6goZpAanyvqlf7ra0MjAu8FJTOAEYsvw
+         MiTc79XKN03OA6a9dhyL27xaOqgiHcb4eVcs1t7tt1TZhwCqtevEx47dhxxm+rMVjmVf
+         +2co/vC6P4KeZZw+leYsZVq40q3OhFPw4lUqaKUAPf7Tpaozzjff0I5zXQNoqldBTP2w
+         EA4g==
+X-Gm-Message-State: ACrzQf3jlBOZydZ5T4VJrzckt7kevfCKFxheIDKpwc2YGi8SIgt1Krdf
+	Ug+Sjf73wnzNMVDVoO1Uh2UbCxkdquM=
+X-Google-Smtp-Source: AMsMyM4vBvpjY6PJm5zf8FrQMoEMb05wBoLzqmjysIfGnUL7jAgEStAKnUZHDQLcLarXo1mO0yShnA==
+X-Received: by 2002:a05:6870:a78f:b0:127:ef52:2c7f with SMTP id x15-20020a056870a78f00b00127ef522c7fmr924209oao.237.1663276817088;
+        Thu, 15 Sep 2022 14:20:17 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id cg18-20020a056830631200b0065818e6fbdasm2194626otb.24.2022.09.15.14.20.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Sep 2022 14:20:16 -0700 (PDT)
+Message-ID: <ef1d0f7e-10c6-d2d1-4a86-c09571c68372@gmail.com>
+Date: Thu, 15 Sep 2022 16:16:00 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v2 1/2] mpdu: fix timestamp size in mpdu frames
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220915211853.1093078-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220915211853.1093078-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- monitor/nlmon.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 15f4c828..5ae014e4 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -5018,6 +5018,16 @@ static void print_action_mgmt_frame(unsigned int level,
- 	print_mmpdu_header(level + 1, mmpdu);
- }
- 
-+static void print_probe_response(unsigned int level,
-+				const struct mmpdu_header *mmpdu, size_t len)
-+{
-+	const struct mmpdu_probe_response *resp = mmpdu_body(mmpdu);
-+
-+	print_attr(level, "Subtype: Probe Response");
-+	print_ie(level + 1, "Probe Response IEs", resp->ies,
-+			(const uint8_t *) mmpdu + len - resp->ies);
-+}
-+
- static void print_frame_type(unsigned int level, const char *label,
- 					const void *data, uint16_t size)
- {
-@@ -5063,7 +5073,10 @@ static void print_frame_type(unsigned int level, const char *label,
- 		str = "Probe request";
- 		break;
- 	case 0x05:
--		str = "Probe response";
-+		if (mpdu)
-+			print_probe_response(level + 1, mpdu, size);
-+		else
-+			str = "Probe response";
- 		break;
- 	case 0x06:
- 		str = "Timing Advertisement";
--- 
-2.34.3
+On 9/15/22 16:18, James Prestwood wrote:
+> Beacons, probe responses and timing advertisements were only using
+> 1 byte for the timestamps which should be 8 bytes.
+> ---
+>   src/mpdu.h | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> v2:
+>   * Use __le64 rather than uint64_t
+> 
+
+Both applied, thanks.
+
+Regards,
+-Denis
 
