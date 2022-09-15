@@ -1,48 +1,51 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B094403
-	for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 20:55:57 +0000 (UTC)
-Received: by mail-pl1-f178.google.com with SMTP id s18so13563767plr.4
-        for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 13:55:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221074C8C
+	for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 20:55:58 +0000 (UTC)
+Received: by mail-pf1-f174.google.com with SMTP id e5so19260144pfl.2
+        for <iwd@lists.linux.dev>; Thu, 15 Sep 2022 13:55:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=IlT/6XyqP0a7mRpx1Cddn97vcKDkSytAjyVoAExYO40=;
-        b=d3N01LqgzDCFwv/mnncgAeWzkYuVi7yBI4HSHaz2e77mJINDOqTidoSfgPWAXYzKzR
-         dQXE5mZdp/co0pRF7nExAAES6ykVxbqTKsoIazWJ1IMLAhnKoIrTYF1dSjLp1IydSYyt
-         OCp0Z43xgP8llIyc5EaU8lebWAw1M6emSBBOLjE1qUNqdV7cqU+mSrxtmfFlDjhhgZ0m
-         Q62QUPCtrde4C0yka9EBj3EyLn0Y3qeNvX4hzbVJnKSOZfP+KvbMgWNmZv9mheCa4b2q
-         VnDy7RVpwZpO1I27BFRJtpNVMAymTQWmlCx3z4wtLss1z87xDqRMsevkvtUVbGihvCRk
-         fCPw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=+JzW7VnwR/FW2qLFYt6b6aIFvnLxLEYb3/54IE2kMFk=;
+        b=IKc6PysC9tlk5zRm9B+0tf3Og39uuQJilvaD6lT2tOn8MLOr7q3l2QnKQY3IHJnC4j
+         lSdWU49k8oyPuvO1s0jVoLiVFlokL6VNezGHt16yUdwIZFvJ1Y7wwRAeB9CIuS7A8N+n
+         O7CHLGGZbGGn0AZmd9FsdrZ4YVU/8LZ/UCi1BOhyUdhnLGHbeoYW7gAtge+iLk55u2R/
+         nv/jeTYyIzjZpQ9tp0gQ3TOD/hIrnrRCDB6UogP+gEP6+1XMdPbgjWF5eZcacv0xNQS/
+         LClvW8sI2K1DT7jLTi0N8PvVzDHjTogbzcDxhxCDYf2CM9Er1PgNOz4uKe1llZclr3zr
+         ogIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=IlT/6XyqP0a7mRpx1Cddn97vcKDkSytAjyVoAExYO40=;
-        b=gx8PTcCJoKijg/K5ZUb7uL4aXexFGgMXQhGbKfDWye2RDmLZmXqko7O/HQuWETdbkW
-         0hx3ORamisJqQN0J1dhg3oDQ+3XxeAwvbKjF2JU+CWdRiuRbwq5ApHGCSFOjmRA4EIaY
-         ujD6Xx4O733GipDYGT7ylT4w+Yy2aRl9oCj4Kd863yDnoEADlHQtCq1Olx6OYkgcCUhl
-         /7J4e9iH2OU/UO7BRHw3JvJy/O96BrNu8OKepAI4YJhZ0gJCbSb3vKm/f8xqvAZ1CPJ4
-         j1BYZrTwx/QIardaXvSj3YAhbKaZD3Fc2uuJ70L5jH0uu+I0qkxLNb7V3NYh/FIjvsq4
-         k9Lw==
-X-Gm-Message-State: ACrzQf3PJASKCllaN383+UcaiBmPqVx8dBoHi02m7ego10K7/MVEEDDV
-	oa9OKOS/rcQf7V1Sldu8cuNY67YfrwM=
-X-Google-Smtp-Source: AMsMyM4Qqezokii7X6zMbwKzdzmt+6xnuf9+2wfwLkpVeVAVQTb/Cq4xYWAuOdL+a1td9dm02zRBlw==
-X-Received: by 2002:a17:903:2015:b0:178:8022:ff1 with SMTP id s21-20020a170903201500b0017880220ff1mr381096pla.18.1663275356832;
-        Thu, 15 Sep 2022 13:55:56 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=+JzW7VnwR/FW2qLFYt6b6aIFvnLxLEYb3/54IE2kMFk=;
+        b=bf7jEwi6NId3SzrF4naLi8i7EK5aW7B0te7rF3KpDkd7cH1Jq+GAWnriaSUrcWRxkg
+         pxTeI809CbNTKJmA/zUqBFFth/NLJK4uiZeRAwuYJoNGfGBmkKnajFJvBhcJ2CPja7Be
+         EiSA6lgvNR6dmeHMzbVN9489MT6B5h1KQxlazoysp1eT5JbwCPfuz6kBcZ5FlWSTBF/5
+         uwveq0ojsjP+Fowesa4bk+wUMT3zwFkyarC/JAZ6qIxsS9i0yOFzhz4qKZDZY/IY6Kay
+         mTDUoi+izWsA02AiAGLzLQNxgGtf6RZfSEM3wzhUs93PYg6S8kZlDOQ4MFSfOFodCdq8
+         JqlA==
+X-Gm-Message-State: ACrzQf39wszee+nJac3OLz5Fg3ihkvesTQ2CSsu5Ve07JNxEeRKV/6dI
+	ERAXsnWbMrNekfxFZgWbbqzmm4PrA8A=
+X-Google-Smtp-Source: AMsMyM5fUSgEGavG/alF7Sqp8O4PXMmWamSxuXodM2Zxum354eu3FP0DLlpWQ3M2FOjkmjOQZfEtgg==
+X-Received: by 2002:a63:77c4:0:b0:435:4224:98b6 with SMTP id s187-20020a6377c4000000b00435422498b6mr1537057pgc.94.1663275357494;
+        Thu, 15 Sep 2022 13:55:57 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id e19-20020a656bd3000000b004351358f056sm11923834pgw.85.2022.09.15.13.55.56
+        by smtp.gmail.com with ESMTPSA id e19-20020a656bd3000000b004351358f056sm11923834pgw.85.2022.09.15.13.55.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Sep 2022 13:55:56 -0700 (PDT)
+        Thu, 15 Sep 2022 13:55:57 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] mpdu: fix timestamp size in mpdu frames
-Date: Thu, 15 Sep 2022 13:55:53 -0700
-Message-Id: <20220915205554.1061014-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] monitor: parse probe response frames
+Date: Thu, 15 Sep 2022 13:55:54 -0700
+Message-Id: <20220915205554.1061014-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20220915205554.1061014-1-prestwoj@gmail.com>
+References: <20220915205554.1061014-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,42 +54,43 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Beacons, probe responses and timing advertisements were only using
-1 byte for the timestamps which should be 8 bytes.
 ---
- src/mpdu.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ monitor/nlmon.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/src/mpdu.h b/src/mpdu.h
-index 36fe2470..32aa5712 100644
---- a/src/mpdu.h
-+++ b/src/mpdu.h
-@@ -374,7 +374,7 @@ struct mmpdu_probe_request {
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 15f4c828..5ae014e4 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -5018,6 +5018,16 @@ static void print_action_mgmt_frame(unsigned int level,
+ 	print_mmpdu_header(level + 1, mmpdu);
+ }
  
- /* 802.11, Section 8.3.3.10 */
- struct mmpdu_probe_response {
--	uint8_t timestamp;
-+	uint64_t timestamp;
- 	__le16 beacon_interval;
- 	struct mmpdu_field_capability capability;
- 	uint8_t ies[0];
-@@ -382,14 +382,14 @@ struct mmpdu_probe_response {
- 
- /* 802.11, Section 8.3.3.15 */
- struct mmpdu_timing_advertisement {
--	uint8_t timestamp;
-+	uint64_t timestamp;
- 	struct mmpdu_field_capability capability;
- 	uint8_t ies[0];
- } __attribute__ ((packed));
- 
- /* 802.11, Section 8.3.3.2 */
- struct mmpdu_beacon {
--	uint8_t timestamp;
-+	uint64_t timestamp;
- 	__le16 beacon_interval;
- 	struct mmpdu_field_capability capability;
- 	uint8_t ies[0];
++static void print_probe_response(unsigned int level,
++				const struct mmpdu_header *mmpdu, size_t len)
++{
++	const struct mmpdu_probe_response *resp = mmpdu_body(mmpdu);
++
++	print_attr(level, "Subtype: Probe Response");
++	print_ie(level + 1, "Probe Response IEs", resp->ies,
++			(const uint8_t *) mmpdu + len - resp->ies);
++}
++
+ static void print_frame_type(unsigned int level, const char *label,
+ 					const void *data, uint16_t size)
+ {
+@@ -5063,7 +5073,10 @@ static void print_frame_type(unsigned int level, const char *label,
+ 		str = "Probe request";
+ 		break;
+ 	case 0x05:
+-		str = "Probe response";
++		if (mpdu)
++			print_probe_response(level + 1, mpdu, size);
++		else
++			str = "Probe response";
+ 		break;
+ 	case 0x06:
+ 		str = "Timing Advertisement";
 -- 
 2.34.3
 
