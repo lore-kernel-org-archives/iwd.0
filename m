@@ -1,17 +1,16 @@
-Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
+Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388054C95
-	for <iwd@lists.linux.dev>; Fri, 16 Sep 2022 11:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79FA53A7
+	for <iwd@lists.linux.dev>; Fri, 16 Sep 2022 13:45:03 +0000 (UTC)
 Received: from [10.172.195.180] (1.general.seb128.uk.vpn [10.172.195.180])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 435C33FD5D
-	for <iwd@lists.linux.dev>; Fri, 16 Sep 2022 11:32:59 +0000 (UTC)
-Content-Type: multipart/mixed; boundary="------------ooMhD0vMM55n1jcbCAfU7b70"
-Message-ID: <6f1b3f13-a261-a917-1439-3f17908a7f81@ubuntu.com>
-Date: Fri, 16 Sep 2022 13:32:59 +0200
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 659F63F12E
+	for <iwd@lists.linux.dev>; Fri, 16 Sep 2022 13:37:45 +0000 (UTC)
+Message-ID: <afcd1b75-6cac-9efa-5ed0-d1ebb5a46f0d@ubuntu.com>
+Date: Fri, 16 Sep 2022 15:37:43 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -20,125 +19,33 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.2
+From: Sebastien Bacher <seb128@ubuntu.com>
+Subject: No rule to make target 'src/iwd.debug.7'
 To: iwd@lists.linux.dev
 Content-Language: en-US
-From: Sebastien Bacher <seb128@ubuntu.com>
-Subject: 1.30 fails to connect to some APs
-
-This is a multi-part message in MIME format.
---------------ooMhD0vMM55n1jcbCAfU7b70
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Using iwd 1.30 on Ubuntu Kinetic, I've some APs my laptop fails to 
-connect to
+The error was initial found while trying to build an Ubuntu package 
+update for iwd but can be triggered by those steps (basically building, 
+cleaning the tree and trying to build again)
 
-I'm including a log from 'iwd -d' while trying to connect using
+$ wget 
+https://mirrors.edge.kernel.org/pub/linux/network/wireless/iwd-1.30.tar.xz
+$ tar xf iwd-1.30.tar.xz
+$ cd iwd-1.30
+$ ./configure
+$ make
+$ make distclean
+$ autoreconf
+$ ./configure
+$ make
+...
 
-$ sudo iwctl station wlan0 connect <APNAME>
-
-The log states
-
-'wiphy_select_akm() Network is WPA3-Personal...'
-
-But iwlist states 'IE: IEEE 802.11i/WPA2 Version 1' and using 
-wpasupplicant works fine and network-manager also flags it as WPA2, 
-could it be that iwd wrongly detect the authentification to use?
+  GEN      src/iwd.8
+make[1]: *** No rule to make target 'src/iwd.debug.7', needed by 
+'all-am'.  Stop.
+make: *** [Makefile:1579: all] Error 2
 
 Cheers,
-Sebastien Bacher
-
---------------ooMhD0vMM55n1jcbCAfU7b70
-Content-Type: text/plain; charset=UTF-8; name="iwdlog"
-Content-Disposition: attachment; filename="iwdlog"
-Content-Transfer-Encoding: base64
-
-c3JjL2FnZW50LmM6YWdlbnRfcmVnaXN0ZXIoKSBhZ2VudCByZWdpc3RlciBjYWxsZWQKc3Jj
-L2FnZW50LmM6YWdlbnRfcmVnaXN0ZXIoKSBhZ2VudCA6MS4xMzkgcGF0aCAvYWdlbnQvMTE1
-MDAKc3JjL25ldHdvcmsuYzpuZXR3b3JrX2Nvbm5lY3QoKSAKc3JjL3dpcGh5LmM6d2lwaHlf
-c2VsZWN0X2FrbSgpIE5ldHdvcmsgaXMgV1BBMy1QZXJzb25hbC4uLgpzcmMvbmV0d29yay5j
-Om5ldHdvcmtfY29ubmVjdF9wc2soKSBhc2tfcGFzc3BocmFzZTogdHJ1ZQpzcmMvYWdlbnQu
-YzphZ2VudF9yZXF1ZXN0X3Bhc3NwaHJhc2UoKSBhZ2VudCAweDU1ZDYwMTQ3OGRiMCBvd25l
-ciA6MS4xMzkgcGF0aCAvYWdlbnQvMTE1MDAKc3JjL2FnZW50LmM6YWdlbnRfc2VuZF9uZXh0
-X3JlcXVlc3QoKSBzZW5kIHJlcXVlc3QgdG8gOjEuMTM5IC9hZ2VudC8xMTUwMApzcmMvYWdl
-bnQuYzphZ2VudF9yZWNlaXZlX3JlcGx5KCkgYWdlbnQgMHg1NWQ2MDE0NzhkYjAgcmVxdWVz
-dCBpZCAzOApzcmMvbmV0d29yay5jOnBhc3NwaHJhc2VfY2FsbGJhY2soKSByZXN1bHQgMApz
-cmMvd2lwaHkuYzp3aXBoeV9zZWxlY3RfYWttKCkgTmV0d29yayBpcyBXUEEzLVBlcnNvbmFs
-Li4uCnNyYy9uZXR3b3JrLmM6bmV0d29ya19nZW5lcmF0ZV9zYWVfcHQoKSBHZW5lcmF0aW5n
-IFBUIGZvciBHcm91cCAxOQpzcmMvbmV0d29yay5jOm5ldHdvcmtfZ2VuZXJhdGVfc2FlX3B0
-KCkgR2VuZXJhdGluZyBQVCBmb3IgR3JvdXAgMjAKc3JjL3dpcGh5LmM6d2lwaHlfc2VsZWN0
-X2FrbSgpIE5ldHdvcmsgaXMgV1BBMy1QZXJzb25hbC4uLgpzcmMvc2FlLmM6c2FlX3NtX25l
-dygpIFVzaW5nIFNBRSBIdW50aW5nIGFuZCBQZWNraW5nCnNyYy9uZXRkZXYuYzpuZXRkZXZf
-Y3FtX3Jzc2lfdXBkYXRlKCkgCnNyYy93aXBoeS5jOndpcGh5X3JhZGlvX3dvcmtfaW5zZXJ0
-KCkgSW5zZXJ0aW5nIHdvcmsgaXRlbSAzCnNyYy93aXBoeS5jOndpcGh5X3JhZGlvX3dvcmtf
-bmV4dCgpIFN0YXJ0aW5nIHdvcmsgaXRlbSAzCnNyYy9zdGF0aW9uLmM6X19zdGF0aW9uX2Nv
-bm5lY3RfbmV0d29yaygpIGNvbm5lY3RpbmcgdG8gQlNTIGUwOjYzOmRhOjUyOjk4OjA4CnNy
-Yy9zdGF0aW9uLmM6c3RhdGlvbl9lbnRlcl9zdGF0ZSgpIE9sZCBTdGF0ZTogZGlzY29ubmVj
-dGVkLCBuZXcgc3RhdGU6IGNvbm5lY3RpbmcKc3JjL25ldGRldi5jOm5ldGRldl9tbG1lX25v
-dGlmeSgpIE1MTUUgbm90aWZpY2F0aW9uIE5ldyBTdGF0aW9uKDE5KQpzcmMvbmV0ZGV2LmM6
-bmV0ZGV2X21sbWVfbm90aWZ5KCkgTUxNRSBub3RpZmljYXRpb24gQXV0aGVudGljYXRlKDM3
-KQpzcmMvbmV0ZGV2LmM6bmV0ZGV2X2F1dGhlbnRpY2F0ZV9ldmVudCgpIApzcmMvc2FlLmM6
-c2FlX3ZlcmlmeV9wYWNrZXQoKSByeCB0cmFucz0xLCBzdGF0ZT1jb21taXR0ZWQKc3JjL25l
-dGRldi5jOm5ldGRldl9tbG1lX25vdGlmeSgpIE1MTUUgbm90aWZpY2F0aW9uIERlbCBTdGF0
-aW9uKDIwKQpzcmMvbmV0ZGV2LmM6bmV0ZGV2X21sbWVfbm90aWZ5KCkgTUxNRSBub3RpZmlj
-YXRpb24gTmV3IFN0YXRpb24oMTkpCnNyYy9uZXRkZXYuYzpuZXRkZXZfbWxtZV9ub3RpZnko
-KSBNTE1FIG5vdGlmaWNhdGlvbiBBdXRoZW50aWNhdGUoMzcpCnNyYy9uZXRkZXYuYzpuZXRk
-ZXZfYXV0aGVudGljYXRlX2V2ZW50KCkgCnNyYy9zYWUuYzpzYWVfdmVyaWZ5X3BhY2tldCgp
-IHJ4IHRyYW5zPTEsIHN0YXRlPWNvbW1pdHRlZApzcmMvbmV0ZGV2LmM6bmV0ZGV2X21sbWVf
-bm90aWZ5KCkgTUxNRSBub3RpZmljYXRpb24gQXV0aGVudGljYXRlKDM3KQpzcmMvbmV0ZGV2
-LmM6bmV0ZGV2X2F1dGhlbnRpY2F0ZV9ldmVudCgpIApzcmMvc2FlLmM6c2FlX3ZlcmlmeV9w
-YWNrZXQoKSByeCB0cmFucz0yLCBzdGF0ZT1jb25maXJtZWQKc3JjL3dpcGh5LmM6d2lwaHlf
-cmFkaW9fd29ya19kb25lKCkgV29yayBpdGVtIDMgZG9uZQpzcmMvc3RhdGlvbi5jOnN0YXRp
-b25fY29ubmVjdF9jYigpIDIyLCByZXN1bHQ6IDEKc3JjL3dpcGh5LmM6d2lwaHlfc2VsZWN0
-X2FrbSgpIE5ldHdvcmsgaXMgV1BBMy1QZXJzb25hbC4uLgpzcmMvc3RhdGlvbi5jOnN0YXRp
-b25fcmVzZXRfY29ubmVjdGlvbl9zdGF0ZSgpIDIyCnNyYy9zdGF0aW9uLmM6c3RhdGlvbl9y
-b2FtX3N0YXRlX2NsZWFyKCkgMjIKc3JjL3N0YXRpb24uYzpzdGF0aW9uX2VudGVyX3N0YXRl
-KCkgT2xkIFN0YXRlOiBjb25uZWN0aW5nLCBuZXcgc3RhdGU6IGRpc2Nvbm5lY3RlZApzcmMv
-c3RhdGlvbi5jOnN0YXRpb25fZW50ZXJfc3RhdGUoKSBPbGQgU3RhdGU6IGRpc2Nvbm5lY3Rl
-ZCwgbmV3IHN0YXRlOiBhdXRvY29ubmVjdF9xdWljawpzcmMvd2lwaHkuYzp3aXBoeV9yYWRp
-b193b3JrX2luc2VydCgpIEluc2VydGluZyB3b3JrIGl0ZW0gNApzcmMvd2lwaHkuYzp3aXBo
-eV9yYWRpb193b3JrX25leHQoKSBTdGFydGluZyB3b3JrIGl0ZW0gNApzcmMvbmV0ZGV2LmM6
-bmV0ZGV2X21sbWVfbm90aWZ5KCkgTUxNRSBub3RpZmljYXRpb24gRGVsIFN0YXRpb24oMjAp
-CnNyYy9zY2FuLmM6c2Nhbl9ub3RpZnkoKSBTY2FuIG5vdGlmaWNhdGlvbiBUcmlnZ2VyIFNj
-YW4oMzMpCnNyYy9zY2FuLmM6c2Nhbl9yZXF1ZXN0X3RyaWdnZXJlZCgpIEFjdGl2ZSBzY2Fu
-IHRyaWdnZXJlZCBmb3Igd2RldiBlCnNyYy9zdGF0aW9uLmM6c3RhdGlvbl9xdWlja19zY2Fu
-X3RyaWdnZXJlZCgpIFF1aWNrIHNjYW4gdHJpZ2dlcmVkIGZvciB3bGFuMApzcmMvYWdlbnQu
-YzphZ2VudF9kaXNjb25uZWN0KCkgYWdlbnQgOjEuMTM5IGRpc2Nvbm5lY3RlZApzcmMvYWdl
-bnQuYzphZ2VudF9mcmVlKCkgYWdlbnQgZnJlZSAweDU1ZDYwMTQ3OGRiMApzcmMvc2Nhbi5j
-OnNjYW5fbm90aWZ5KCkgU2NhbiBub3RpZmljYXRpb24gTmV3IFNjYW4gUmVzdWx0cygzNCkK
-c3JjL25ldGRldi5jOm5ldGRldl9saW5rX25vdGlmeSgpIGV2ZW50IDE2IG9uIGlmaW5kZXgg
-MjIKLi4uCnNyYy9zdGF0aW9uLmM6c3RhdGlvbl9hZGRfc2Vlbl9ic3MoKSBQcm9jZXNzaW5n
-IEJTUyAnN2E6ODM6YzI6MTY6MmM6MGYnIHdpdGggU1NJRDogPEFQU05BTUVTPiwgZnJlcTog
-NTYwMCwgcmFuazogMjk0Niwgc3RyZW5ndGg6IC01NTAwLCBkYXRhX3JhdGU6IDM2MC4wCi4u
-LgpzcmMvd2lwaHkuYzp3aXBoeV9zZWxlY3RfYWttKCkgTmV0d29yayBpcyBXUEEzLVBlcnNv
-bmFsLi4uCnNyYy9zdGF0aW9uLmM6c3RhdGlvbl9hdXRvY29ubmVjdF9uZXh0KCkgYXV0b2Nv
-bm5lY3Q6IFRyeWluZyBTU0lEOiA8UFVCTElDQVA+CnNyYy9zdGF0aW9uLmM6c3RhdGlvbl9h
-dXRvY29ubmVjdF9uZXh0KCkgYXV0b2Nvbm5lY3Q6ICc3YTo4MzpjMjoxNjoyYzowZicgZnJl
-cTogNTYwMCwgcmFuazogMjk0Niwgc3RyZW5ndGg6IC01NTAwCnNyYy93aXBoeS5jOndpcGh5
-X3NlbGVjdF9ha20oKSBOZXR3b3JrIGlzIFdQQTMtUGVyc29uYWwuLi4Kc3JjL3NhZS5jOnNh
-ZV9zbV9uZXcoKSBVc2luZyBTQUUgSHVudGluZyBhbmQgUGVja2luZwpzcmMvbmV0ZGV2LmM6
-bmV0ZGV2X2NxbV9yc3NpX3VwZGF0ZSgpIApzcmMvd2lwaHkuYzp3aXBoeV9yYWRpb193b3Jr
-X2luc2VydCgpIEluc2VydGluZyB3b3JrIGl0ZW0gNQpzcmMvc3RhdGlvbi5jOl9fc3RhdGlv
-bl9jb25uZWN0X25ldHdvcmsoKSBjb25uZWN0aW5nIHRvIEJTUyA3YTo4MzpjMjoxNjoyYzow
-ZgpzcmMvc3RhdGlvbi5jOnN0YXRpb25fZW50ZXJfc3RhdGUoKSBPbGQgU3RhdGU6IGF1dG9j
-b25uZWN0X3F1aWNrLCBuZXcgc3RhdGU6IGNvbm5lY3RpbmcgKGF1dG8pCnNyYy9zY2FuLmM6
-c2Nhbl9jYW5jZWwoKSBUcnlpbmcgdG8gY2FuY2VsIHNjYW4gaWQgNCBmb3Igd2RldiBlCnNy
-Yy93aXBoeS5jOndpcGh5X3JhZGlvX3dvcmtfZG9uZSgpIFdvcmsgaXRlbSA0IGRvbmUKc3Jj
-L3dpcGh5LmM6d2lwaHlfcmFkaW9fd29ya19uZXh0KCkgU3RhcnRpbmcgd29yayBpdGVtIDUK
-c3JjL25ldGRldi5jOm5ldGRldl9tbG1lX25vdGlmeSgpIE1MTUUgbm90aWZpY2F0aW9uIE5l
-dyBTdGF0aW9uKDE5KQpzcmMvc3RhdGlvbi5jOnN0YXRpb25fZGJ1c19kaXNjb25uZWN0KCkg
-CnNyYy9zdGF0aW9uLmM6c3RhdGlvbl9yZXNldF9jb25uZWN0aW9uX3N0YXRlKCkgMjIKc3Jj
-L3N0YXRpb24uYzpzdGF0aW9uX3JvYW1fc3RhdGVfY2xlYXIoKSAyMgpzcmMvc3RhdGlvbi5j
-OnN0YXRpb25fZW50ZXJfc3RhdGUoKSBPbGQgU3RhdGU6IGNvbm5lY3RpbmcgKGF1dG8pLCBu
-ZXcgc3RhdGU6IGRpc2Nvbm5lY3RpbmcKc3JjL3dpcGh5LmM6d2lwaHlfcmFkaW9fd29ya19k
-b25lKCkgV29yayBpdGVtIDUgZG9uZQpzcmMvc3RhdGlvbi5jOnN0YXRpb25fY29ubmVjdF9j
-YigpIDIyLCByZXN1bHQ6IDUKc3JjL3N0YXRpb24uYzpzdGF0aW9uX2Rpc2Nvbm5lY3RfY2Io
-KSAyMiwgc3VjY2VzczogMQpzcmMvc3RhdGlvbi5jOnN0YXRpb25fZW50ZXJfc3RhdGUoKSBP
-bGQgU3RhdGU6IGRpc2Nvbm5lY3RpbmcsIG5ldyBzdGF0ZTogZGlzY29ubmVjdGVkCnNyYy9u
-ZXRkZXYuYzpuZXRkZXZfbWxtZV9ub3RpZnkoKSBNTE1FIG5vdGlmaWNhdGlvbiBBdXRoZW50
-aWNhdGUoMzcpCnNyYy9uZXRkZXYuYzpuZXRkZXZfYXV0aGVudGljYXRlX2V2ZW50KCkgClVu
-ZXhwZWN0ZWQgY29ubmVjdGlvbiByZWxhdGVkIGV2ZW50IC0tIGlzIGFub3RoZXIgc3VwcGxp
-Y2FudCBydW5uaW5nPwpzcmMvbmV0ZGV2LmM6bmV0ZGV2X21sbWVfbm90aWZ5KCkgTUxNRSBu
-b3RpZmljYXRpb24gRGVsIFN0YXRpb24oMjApCgoK
-
---------------ooMhD0vMM55n1jcbCAfU7b70--
+Sebastien
