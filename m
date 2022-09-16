@@ -1,78 +1,57 @@
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39365C81
-	for <iwd@lists.linux.dev>; Fri, 16 Sep 2022 16:15:09 +0000 (UTC)
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-127ba06d03fso52828790fac.3
-        for <iwd@lists.linux.dev>; Fri, 16 Sep 2022 09:15:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=pw77p8cR/musOHBBag8bIBvyKElomCSycx3io7RBOuo=;
-        b=XeAJH+uiP/a+kHksOzXjZKOMb1TwPdYKjFSSbZVguAzf+cNSViu8FGYjQgN5hAADeq
-         C7jSMQ+76yFeTXIEGjWIJQSxLGuFfQG0TOs77Iz2q3dgr706JH/WRUQaJTKe8qpyCoXX
-         TQYrgT6QY3aUzyHxRDwGWqKamp+N9mMBPba1i0g4ZFD19zAAUhVYokI3ptaTnVgur15n
-         OYNomVU0GZvpLv+gVWlIT2u/yNqpEeQDUcal9M7hmYkGolSKa19ugwQR81cfBYrLJVqw
-         fvk76/HjPfZTbVXENpCugmMuaxaTN13jqOvyt5VIkfhzGsbJEKBAp2qjCuACtlX4mZ5+
-         ZjFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=pw77p8cR/musOHBBag8bIBvyKElomCSycx3io7RBOuo=;
-        b=J462WMBc5/bwnvn9TUqQfCopnreQTxDVZMvqlnNIGML79saRlxAuSjLZDPjrU0I/i+
-         wd4uwDjStJOneKvOypxUqPSr1pS0+84chNryqFK5i2v44atKrW8uyolih3xu7lrm2HWH
-         4SIOpD+kSy52YrPy+DxeYmSCNejAt7vS7J1OfQj1fDAfabcv/wFW+xh3OhzpzFxCsG0d
-         jqB8hYGtWp1zAy68sjOgFVojHOP2qsDrkldc6LD7p5TwzSAIdZYX78v8soYEkv5OKWOe
-         6mIBSiuj0LMYGpJbLSK1AHWf2Or7Z9EANbKWMnJwfbS+sGg2l3Gab1D/BRr+FhB2uG3I
-         TzfA==
-X-Gm-Message-State: ACrzQf2ymqJ1bKWxeYZGCu0+2gyYCmLbzPPtaiPcwZ4hIfHyR36IGGk6
-	ipW0gVtHwOS71LancGJx4s4=
-X-Google-Smtp-Source: AMsMyM5/3pCbxRCWUcQLq99x0UTnixACI+BcgInt2DYBLrloeAhl8ONuKP/54FUZ/xi95ahuAJUNdA==
-X-Received: by 2002:a05:6870:5488:b0:127:7a3d:bf27 with SMTP id f8-20020a056870548800b001277a3dbf27mr3342150oan.101.1663344908910;
-        Fri, 16 Sep 2022 09:15:08 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id j26-20020a9d769a000000b006394756c04fsm10080562otl.0.2022.09.16.09.15.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Sep 2022 09:15:08 -0700 (PDT)
-Message-ID: <7103b392-9757-1537-fd13-3b76ee21c919@gmail.com>
-Date: Fri, 16 Sep 2022 11:04:56 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC225C81
+	for <iwd@lists.linux.dev>; Fri, 16 Sep 2022 16:16:23 +0000 (UTC)
+Received: from [10.172.195.180] (1.general.seb128.uk.vpn [10.172.195.180])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id B3B0C3F5E3;
+	Fri, 16 Sep 2022 16:16:21 +0000 (UTC)
+Message-ID: <5d1b0088-5ab2-65bd-6b4c-27caa2b4ec1c@ubuntu.com>
+Date: Fri, 16 Sep 2022 18:16:21 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v3 01/14] frame-xchg: add type to frame_xchg_prefix
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: 1.30 fails to connect to some APs
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <6f1b3f13-a261-a917-1439-3f17908a7f81@ubuntu.com>
+ <19fd781d-a60c-81f2-4814-da4b2097e4c3@gmail.com>
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20220915220741.1128728-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220915220741.1128728-1-prestwoj@gmail.com>
+From: Sebastien Bacher <seb128@ubuntu.com>
+In-Reply-To: <19fd781d-a60c-81f2-4814-da4b2097e4c3@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Hey Denis,
 
-On 9/15/22 17:07, James Prestwood wrote:
-> All uses of frame-xchg were for action frames, and the frame type
-> was hard coded. Soon other frame types will be needed so the type
-> must now be specified in the frame_xchg_prefix structure.
-> ---
->   src/anqp.c       | 1 +
->   src/frame-xchg.c | 2 +-
->   src/frame-xchg.h | 1 +
->   src/p2p.c        | 4 ++++
->   4 files changed, 7 insertions(+), 1 deletion(-)
-> 
+Thanks for the reply. That's the access point from a coworking space and 
+I'm not there anymore for today but I will get the debugging log and 
+extra information next week.
 
-Patch 1-2 applied, thanks.
+Cheers,
+Sebastien Bacher
 
-Regards,
--Denis
-
+Le 16/09/2022 à 16:28, Denis Kenzior a écrit :
+>
+> Can you tell us more about the AP? Do you have any way of obtaining 
+> logs from it by any chance?  Does 'iw dev <foo> scan' results for your 
+> AP list any Vendor IEs?  Note that iwd uses P384 curves for SAE by 
+> default (for higher security). Some older WPA3 implementations 
+> implement the spec poorly when curves other than P256 are used.
+>
+> Also, it might be useful for us to look at the iwmon output.  See 
+> [2].  Start iwmon just prior to iwctl 'station <device> scan' and 
+> 'station <device> connect...'  Feel free to send the output to me 
+> directly if there are any privacy concerns.
+>
+> [1] 
+> https://github.com/HewlettPackard/wireless-tools/blob/master/wireless_tools/iwlist.c#L301 
+>
+> [2] https://iwd.wiki.kernel.org/debugging#iwmon
