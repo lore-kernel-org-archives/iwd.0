@@ -1,48 +1,48 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403AB2565
-	for <iwd@lists.linux.dev>; Wed, 21 Sep 2022 22:32:08 +0000 (UTC)
-Received: by mail-pl1-f177.google.com with SMTP id w13so7080051plp.1
-        for <iwd@lists.linux.dev>; Wed, 21 Sep 2022 15:32:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 163472585
+	for <iwd@lists.linux.dev>; Wed, 21 Sep 2022 22:32:09 +0000 (UTC)
+Received: by mail-pj1-f44.google.com with SMTP id q35-20020a17090a752600b002038d8a68fbso314647pjk.0
+        for <iwd@lists.linux.dev>; Wed, 21 Sep 2022 15:32:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=ZYemObZfKvNmbIFr59S3Atqmsp9DxVnnA4+BVcFyz/Q=;
-        b=lwycB1Bgicxi9PxMUvrtZw01bjApO/siODVJtQZGBr2q0a3/Ucb/+xgwyPNm4uFXXe
-         5dFRgc2GGd8B3SWdvIWyQtdFk/Bs498l0Y2iJmqGThWKY6hVPm13n8zW0I1TaJFjIi0z
-         eCZTOvJ3ZnWw3VfsTOiLb8gd2TosVB8163Q2NmOkmqy0jCAF77lvJw8mWROMolUJUSn/
-         BSPaKei+IhSsRzPtrA/po3nxYm620hXJRcXojcOA1Di/TBtdgHJCqY5DQlIAIfDZp/Gr
-         UJuBz097oICUHayvXmnjLIShgGwLtAD3QTWGm6OOYIgeOeKW7bqNkoU8uuwsrP31mu+A
-         NsyQ==
+        bh=0XmSRQjn/XMCsg4DxdUZrzjSpZtwT/1LiQ+G3vLl7Xo=;
+        b=J3Ml7m7wUcP479EcZend3raOftt4KRxzlB8ZRT3fijFOsw4UbXC56pt+YNRNrSjovz
+         DPzMHjGZhaZvSJO2ChKCuZz3bN0mrSgxdqfsubdMVfoXI6yDckXJLLwNre1CdbOJuuUT
+         XRQpQYKlQfpsXpGm6ynymF6M3fHCgk7Ij07OxEonoGIrT9zcgspkVSuVTVybLX0QbDjV
+         vYJx4I5JDXV69DlbSerA/f1rKGw96B52TUgK3l06TCmGBMDgbLxUxVd8MpHVUTceWT8A
+         DxA7M4K+MhScZPH0Adyv01ca3JKleI5Sd3uDHy9gpTEhH+y18WKWNqzTUuZZRsQYpi3H
+         bWzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=ZYemObZfKvNmbIFr59S3Atqmsp9DxVnnA4+BVcFyz/Q=;
-        b=CKELedwy93O0nykZFw/PAUAsA+QhdvgI3yfZBC7ug3K+qzsmgnv/IlIS6g8vBvLXkG
-         WCfSkTb1HUF9rwp0kCvWMYkUixshmoS30NBMqFNbNI4IdiBmZopZGRGEzUa91Hl7UlwT
-         tKPofgSiX4tlHbjb6+BAWIFGAHLoeaiiQ+ZvJZdqCTv40GwCg9QS51y/UCkmmSfd6Atx
-         W9lhoBlj+J+1wku0ggUk93wHdnvbwmU7YKQiMgrZ00sXfsAwuLUtsWz58YVAWpemYd60
-         UKlEPOLi3K2ai6Vte1Hd32R2feiGYKBUgnfgpXKIHF0Kw0Jq6WFLZgFYcXq6cvsZbzNu
-         4IgA==
-X-Gm-Message-State: ACrzQf1FeUPwQAul+3Qcx8XIhuHatatrxPP3Os001uOgzOKQTwUe/uKn
-	9dcQmG81wyBUE4HLXZyCo88OGuDW6+4=
-X-Google-Smtp-Source: AMsMyM6LPdyovnzLuAYN+ddVLc0SEcFR8+WqTY6cz8/IeFtep5d90PerKkNYIdy++/GkAipV1IJK2w==
-X-Received: by 2002:a17:902:ec8f:b0:177:ff40:19bf with SMTP id x15-20020a170902ec8f00b00177ff4019bfmr297573plg.141.1663799527728;
-        Wed, 21 Sep 2022 15:32:07 -0700 (PDT)
+        bh=0XmSRQjn/XMCsg4DxdUZrzjSpZtwT/1LiQ+G3vLl7Xo=;
+        b=60+18D9G4jXU0oc8xrUdZCWLhQyYkxMmdMZ9b2YIZUR8ECTtk0Tl50JhkvahpXHzH/
+         lAAGQwp/c3QS1uFCPcN67xi3FGYJMPDHD+/Hchwg9xJXUak1d2VIXC5zwDHlBY+KVbSt
+         d6lwo70fsurzpB+k12HuIqtIpqUC4bgmhWJNnmEe3O0RrwKsjcxiasE7JjppWbxXCh77
+         5GTdmOmL8iMMGwv5xaQ65ewUkGjuYtTuiP+aDjL0UmKyhY2THarvjcRafp93s6NctJ32
+         itktpfLYpF/EOsmzYmRGuAmErk1dG99ADeUKqfn6ngw+Q5vU/DuVFl2suGUYtiFg9L6o
+         SxAg==
+X-Gm-Message-State: ACrzQf16BPCmstSfqdST+a2+HLzvLQQnH+3zU3rQM8bX1xV5gvrF4aym
+	TVcESEvzW3Zm61YcO3wneJ/9SoantJU=
+X-Google-Smtp-Source: AMsMyM66ZzKvEdjbRu5miteam3tvTBET4cMkouTK20CYHc/h17Wia1iY0supXHUe7rRf6Z54BWxmrw==
+X-Received: by 2002:a17:90a:fe90:b0:202:a345:b7a6 with SMTP id co16-20020a17090afe9000b00202a345b7a6mr392970pjb.14.1663799528415;
+        Wed, 21 Sep 2022 15:32:08 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
         by smtp.gmail.com with ESMTPSA id r10-20020a63e50a000000b00438c0571456sm2393135pgh.24.2022.09.21.15.32.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Sep 2022 15:32:07 -0700 (PDT)
+        Wed, 21 Sep 2022 15:32:08 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 12/15] station: try multiple roam candidates
-Date: Wed, 21 Sep 2022 15:31:55 -0700
-Message-Id: <20220921223158.704658-12-prestwoj@gmail.com>
+Subject: [PATCH v4 13/15] netdev: ft: complete FT refactor
+Date: Wed, 21 Sep 2022 15:31:56 -0700
+Message-Id: <20220921223158.704658-13-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220921223158.704658-1-prestwoj@gmail.com>
 References: <20220921223158.704658-1-prestwoj@gmail.com>
@@ -54,315 +54,154 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This converts station to using ft_action/ft_authenticate and
-ft_associate and dropping the use of the netdev-only/auth-proto
-logic.
+This finalizes the refactor by moving all the handshake prep
+into FT itself (most was already in there). The netdev-specific
+flags and state were added into netdev_ft_tx_associate which
+now avoids any need for a netdev API related to FT.
 
-Doing this allows for more flexibility if FT fails by letting
-IWD try another roam candidate instead of disconnecting.
+The NETDEV_EVENT_FT_ROAMED event is now emitted once FT completes
+(netdev_connect_ok). This did require moving the 'in_ft' flag
+setting until after the keys are set into the kernel otherwise
+netdev_connect_ok has no context as to if this was FT or some
+other connection attempt.
+
+In addition the prev_snonce was removed from netdev. Restoring
+the snonce has no value once association begins. If association
+fails it will result in a disconnect regardless which requires
+a new snonce to be generated
 ---
- src/station.c | 213 +++++++++++++++++++++++++++++++-------------------
- 1 file changed, 131 insertions(+), 82 deletions(-)
+ src/ft.c     | 10 ++++++++
+ src/netdev.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 68 insertions(+), 7 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 03b0ddcb..27858557 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -59,6 +59,7 @@
- #include "src/frame-xchg.h"
- #include "src/sysfs.h"
- #include "src/band.h"
-+#include "src/ft.h"
- 
- static struct l_queue *station_list;
- static uint32_t netdev_watch;
-@@ -115,6 +116,8 @@ struct station {
- 
- 	uint32_t wiphy_watch;
- 
-+	struct wiphy_radio_work_item ft_work;
-+
- 	bool preparing_roam : 1;
- 	bool roam_scan_full : 1;
- 	bool signal_low : 1;
-@@ -1646,6 +1649,8 @@ static void station_roam_state_clear(struct station *station)
- 		l_queue_destroy(station->roam_bss_list, NULL);
- 		station->roam_bss_list = NULL;
- 	}
-+
-+	ft_reset(netdev_get_ifindex(station->netdev));
- }
- 
- static void station_reset_connection_state(struct station *station)
-@@ -1957,7 +1962,8 @@ static void station_ft_ds_action_start(struct station *station)
- 		 * Fire and forget. Netdev will maintain a cache of responses
- 		 * and when the time comes these can be referenced for a roam
- 		 */
--		netdev_fast_transition_over_ds_action(station->netdev, bss);
-+		ft_action(netdev_get_ifindex(station->netdev),
-+				station->connected_bss->frequency, bss);
- 	}
- }
- 
-@@ -2092,42 +2098,26 @@ static void station_reassociate_cb(struct netdev *netdev,
- 		station_roam_failed(station);
- }
- 
--static void station_fast_transition_cb(struct netdev *netdev,
--					enum netdev_result result,
--					void *event_data,
--					void *user_data)
--{
--	struct station *station = user_data;
--
--	l_debug("%u, result: %d", netdev_get_ifindex(station->netdev), result);
--
--	if (station->state != STATION_STATE_ROAMING)
--		return;
--
--	if (result == NETDEV_RESULT_OK)
--		station_roamed(station);
--	else
--		station_roam_failed(station);
--}
--
- static void station_netdev_event(struct netdev *netdev, enum netdev_event event,
- 					void *event_data, void *user_data);
- 
--static void station_transition_reassociate(struct station *station,
-+static int station_transition_reassociate(struct station *station,
- 						struct scan_bss *bss,
- 						struct handshake_state *new_hs)
+diff --git a/src/ft.c b/src/ft.c
+index 613c6477..65cd38cb 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -1124,9 +1124,19 @@ static void ft_info_destroy(void *data)
+ static void ft_prepare_handshake(struct ft_info *info,
+ 					struct handshake_state *hs)
  {
--	if (netdev_reassociate(station->netdev, bss, station->connected_bss,
-+	int ret;
++	handshake_state_set_authenticator_address(hs, info->aa);
 +
-+	ret = netdev_reassociate(station->netdev, bss, station->connected_bss,
- 				new_hs, station_netdev_event,
--				station_reassociate_cb, station) < 0) {
--		handshake_state_free(new_hs);
--		station_roam_failed(station);
--		return;
--	}
-+				station_reassociate_cb, station);
-+	if (ret < 0)
-+		return ret;
- 
- 	station->connected_bss = bss;
- 	station->preparing_roam = false;
- 	station_enter_state(station, STATION_STATE_ROAMING);
++	memcpy(hs->mde + 2, info->mde, 3);
 +
-+	return 0;
- }
++	handshake_state_set_chandef(hs, NULL);
++
+ 	if (!hs->supplicant_ie)
+ 		return;
  
- static bool bss_match_bssid(const void *a, const void *b)
-@@ -2199,18 +2189,98 @@ static void station_preauthenticate_cb(struct netdev *netdev,
- 		handshake_state_set_supplicant_ie(new_hs, rsne_buf);
++	if (info->authenticator_ie)
++		handshake_state_set_authenticator_ie(hs,
++							info->authenticator_ie);
++
+ 	memcpy(hs->snonce, info->snonce, sizeof(hs->snonce));
+ 
+ 	handshake_state_set_fte(hs, info->fte);
+diff --git a/src/netdev.c b/src/netdev.c
+index e14fb7cc..536ae644 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1413,6 +1413,15 @@ static void netdev_connect_ok(struct netdev *netdev)
+ 			scan_bss_free(netdev->fw_roam_bss);
+ 
+ 		netdev->fw_roam_bss = NULL;
++	} else if (netdev->in_ft) {
++		if (netdev->event_filter)
++			netdev->event_filter(netdev, NETDEV_EVENT_FT_ROAMED,
++						NULL, netdev->user_data);
++		netdev->in_ft = false;
++	} else if (netdev->connect_cb) {
++		netdev->connect_cb(netdev, NETDEV_RESULT_OK, NULL,
++					netdev->user_data);
++		netdev->connect_cb = NULL;
  	}
  
--	station_transition_reassociate(station, bss, new_hs);
-+	if (station_transition_reassociate(station, bss, new_hs) < 0) {
-+		handshake_state_free(new_hs);
-+		station_roam_failed(station);
-+	}
- }
+ 	if (netdev->ft_ds_list) {
+@@ -1420,12 +1429,6 @@ static void netdev_connect_ok(struct netdev *netdev)
+ 		netdev->ft_ds_list = NULL;
+ 	}
  
--static void station_transition_start(struct station *station)
-+static void station_transition_start(struct station *station);
-+
-+static bool station_ft_work_ready(struct wiphy_radio_work_item *item)
-+{
-+	struct station *station = l_container_of(item, struct station, ft_work);
-+	struct scan_bss *bss = l_queue_pop_head(station->roam_bss_list);
-+	int ret;
-+
-+	ret = ft_associate(netdev_get_ifindex(station->netdev), bss->addr);
-+	if (ret == -ENOENT) {
-+		station_transition_start(station);
-+		return true;
-+	} else if (ret < 0)
-+		goto assoc_failed;
-+
-+	station->connected_bss = bss;
-+	station->preparing_roam = false;
-+	station_enter_state(station, STATION_STATE_ROAMING);
-+
-+	return true;
-+
-+assoc_failed:
-+	station_roam_failed(station);
-+	return true;
-+}
-+
-+static const struct wiphy_radio_work_item_ops ft_work_ops = {
-+	.do_work = station_ft_work_ready,
-+};
-+
-+static bool station_fast_transition(struct station *station,
-+					struct scan_bss *bss)
-+{
-+	struct handshake_state *hs = netdev_get_handshake(station->netdev);
-+	struct network *connected = station->connected_network;
-+	const struct network_info *info = network_get_info(connected);
-+	const struct iovec *vendor_ies;
-+	size_t iov_elems = 0;
-+	int ret;
-+
-+	/* Rebuild handshake RSN for target AP */
-+	if (station_build_handshake_rsn(hs, station->wiphy,
-+				station->connected_network, bss) < 0)
-+		return false;
-+
-+	/* Reset the vendor_ies in case they're different */
-+	vendor_ies = network_info_get_extra_ies(info, bss, &iov_elems);
-+	handshake_state_set_vendor_ies(hs, vendor_ies, iov_elems);
-+
-+	if ((hs->mde[4] & 1)) {
-+		ret = ft_associate(netdev_get_ifindex(station->netdev),
-+					bss->addr);
-+		/* No action responses from this BSS, try over air */
-+		if (ret == -ENOENT)
-+			goto try_over_air;
-+		else if (ret < 0)
-+			return false;
-+
-+		station->connected_bss = bss;
-+		station->preparing_roam = false;
-+		station_enter_state(station, STATION_STATE_ROAMING);
-+
-+		return true;
-+	} else {
-+try_over_air:
-+		/*
-+		 * Send FT-Authenticate and insert a work item which will be
-+		 * gated until authentication completes
-+		 */
-+		ft_authenticate(netdev_get_ifindex(station->netdev), bss);
-+
-+		wiphy_radio_work_insert(station->wiphy, &station->ft_work,
-+				WIPHY_WORK_PRIORITY_CONNECT, &ft_work_ops);
-+
-+		return true;
-+	}
-+}
-+
-+static bool station_try_next_transition(struct station *station,
-+					struct scan_bss *bss)
+-	if (netdev->connect_cb) {
+-		netdev->connect_cb(netdev, NETDEV_RESULT_OK, NULL,
+-					netdev->user_data);
+-		netdev->connect_cb = NULL;
+-	}
+-
+ 	netdev_rssi_polling_update(netdev);
+ 
+ 	if (netdev->work.id)
+@@ -3280,7 +3283,6 @@ static void netdev_associate_event(struct l_genl_msg *msg,
+ 			eapol_sm_set_require_handshake(netdev->sm,
+ 							false);
+ 
+-		netdev->in_ft = false;
+ 		netdev->in_reassoc = false;
+ 		netdev->associated = true;
+ 		return;
+@@ -4446,6 +4448,7 @@ static int netdev_ft_tx_associate(uint32_t ifindex, uint32_t freq,
+ 					struct iovec *ft_iov, size_t n_ft_iov)
  {
- 	struct handshake_state *hs = netdev_get_handshake(station->netdev);
- 	struct network *connected = station->connected_network;
- 	enum security security = network_get_security(connected);
- 	struct handshake_state *new_hs;
- 	struct ie_rsn_info cur_rsne, target_rsne;
--	int ret;
--	struct scan_bss *bss = l_queue_peek_head(station->roam_bss_list);
+ 	struct netdev *netdev = netdev_find(ifindex);
++	struct netdev_handshake_state *nhs;
+ 	struct handshake_state *hs = netdev->handshake;
+ 	struct l_genl_msg *msg;
+ 	struct iovec iov[64];
+@@ -4454,6 +4457,54 @@ static int netdev_ft_tx_associate(uint32_t ifindex, uint32_t freq,
+ 	enum mpdu_management_subtype subtype =
+ 				MPDU_MANAGEMENT_SUBTYPE_REASSOCIATION_REQUEST;
  
- 	l_debug("%u, target %s", netdev_get_ifindex(station->netdev),
- 			util_address_to_string(bss->addr));
-@@ -2219,54 +2289,8 @@ static void station_transition_start(struct station *station)
- 	station->ap_directed_roaming = false;
- 
- 	/* Can we use Fast Transition? */
--	if (station_can_fast_transition(hs, bss)) {
--		const struct network_info *info = network_get_info(connected);
--		const struct iovec *vendor_ies;
--		size_t iov_elems = 0;
--
--		/* Rebuild handshake RSN for target AP */
--		if (station_build_handshake_rsn(hs, station->wiphy,
--				station->connected_network, bss) < 0) {
--			l_error("rebuilding handshake rsne failed");
--			station_roam_failed(station);
--			return;
--		}
--
--		/* Reset the vendor_ies in case they're different */
--		vendor_ies = network_info_get_extra_ies(info, bss, &iov_elems);
--		handshake_state_set_vendor_ies(hs, vendor_ies, iov_elems);
--
--		if ((hs->mde[4] & 1)) {
--			ret = netdev_fast_transition_over_ds(station->netdev,
--					bss, station->connected_bss,
--					station_fast_transition_cb);
--			/* No action responses from this BSS, try over air */
--			if (ret == -ENOENT)
--				goto try_over_air;
--			else if (ret < 0) {
--				/*
--				 * If we are here FT-over-air will not work
--				 * either (identical checks) so try again later.
--				 */
--				station_roam_retry(station);
--				return;
--			}
--		} else {
--try_over_air:
--			if (netdev_fast_transition(station->netdev, bss,
--					station->connected_bss,
--					station_fast_transition_cb) < 0) {
--				station_roam_failed(station);
--				return;
--			}
--		}
--
--		station->connected_bss = bss;
--		station->preparing_roam = false;
--		station_enter_state(station, STATION_STATE_ROAMING);
--
--		return;
--	}
-+	if (station_can_fast_transition(hs, bss))
-+		return station_fast_transition(station, bss);
- 
- 	/* Non-FT transition */
- 
-@@ -2296,17 +2320,42 @@ try_over_air:
- 		if (netdev_preauthenticate(station->netdev, bss,
- 						station_preauthenticate_cb,
- 						station) >= 0)
--			return;
-+			return true;
- 	}
- 
- 	new_hs = station_handshake_setup(station, connected, bss);
- 	if (!new_hs) {
- 		l_error("station_handshake_setup failed in reassociation");
--		station_roam_failed(station);
--		return;
-+		return false;
-+	}
-+
-+	if (station_transition_reassociate(station, bss, new_hs) < 0) {
-+		handshake_state_free(new_hs);
-+		return false;
- 	}
- 
--	station_transition_reassociate(station, bss, new_hs);
-+	return true;
-+}
-+
-+static void station_transition_start(struct station *station)
-+{
-+	struct scan_bss *bss;
-+	bool roaming = false;
++	/*
++	 * At this point there is no going back with FT so reset all the flags
++	 * needed to associate with a new BSS.
++	 */
++	netdev->frequency = freq;
++	netdev->handshake->active_tk_index = 0;
++	netdev->associated = false;
++	netdev->operational = false;
++	netdev->in_ft = true;
 +
 +	/*
-+	 * For each failed attempt pop the BSS leaving the head of the queue
-+	 * with the current roam candidate.
++	 * Cancel commands that could be running because of EAPoL activity
++	 * like re-keying, this way the callbacks for those commands don't
++	 * have to check if failures resulted from the transition.
 +	 */
-+	while ((bss = l_queue_peek_head(station->roam_bss_list))) {
-+		roaming = station_try_next_transition(station, bss);
-+		if (roaming)
-+			break;
++	nhs = l_container_of(netdev->handshake,
++				struct netdev_handshake_state, super);
 +
-+		l_queue_pop_head(station->roam_bss_list);
++	/* reset key states just as we do in initialization */
++	nhs->complete = false;
++	nhs->ptk_installed = false;
++	nhs->gtk_installed = true;
++	nhs->igtk_installed = true;
++
++	if (nhs->group_new_key_cmd_id) {
++		l_genl_family_cancel(nl80211, nhs->group_new_key_cmd_id);
++		nhs->group_new_key_cmd_id = 0;
 +	}
 +
-+	if (!roaming)
-+		station_roam_failed(station);
- }
++	if (nhs->group_management_new_key_cmd_id) {
++		l_genl_family_cancel(nl80211,
++			nhs->group_management_new_key_cmd_id);
++		nhs->group_management_new_key_cmd_id = 0;
++	}
++
++	if (netdev->rekey_offload_cmd_id) {
++		l_genl_family_cancel(nl80211, netdev->rekey_offload_cmd_id);
++		netdev->rekey_offload_cmd_id = 0;
++	}
++
++	netdev_rssi_polling_update(netdev);
++	netdev_cqm_rssi_update(netdev);
++
++	if (netdev->sm) {
++		eapol_sm_free(netdev->sm);
++		netdev->sm = NULL;
++	}
++
+ 	msg = netdev_build_cmd_associate_common(netdev);
  
- static void station_roam_scan_triggered(int err, void *user_data)
+ 	c_iov = netdev_populate_common_ies(netdev, hs, msg, iov, n_iov, c_iov);
 -- 
 2.34.3
 
