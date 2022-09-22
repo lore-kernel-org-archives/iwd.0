@@ -1,48 +1,51 @@
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF06666E8
-	for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 22:08:12 +0000 (UTC)
-Received: by mail-pg1-f177.google.com with SMTP id 78so10491606pgb.13
-        for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 15:08:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C959F8B22
+	for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 22:08:13 +0000 (UTC)
+Received: by mail-pf1-f178.google.com with SMTP id e68so10632829pfe.1
+        for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 15:08:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=bYdPLqPezP8J8H+Ltk1uQfrTZTCXGPsJ566xdQAaqSU=;
-        b=PaPtxRnU1YNeQAt9SQl7jB468svT89gKpTx5Jtx1uuN2p5OA2W0xbKb16IXc/mbBZs
-         M8EgnNzpY8r+OtHUurfxhAoemzT0beZVCmGakIEZYpCuxWUFp6XyOhkBTis+b7DjbcGC
-         CpaGfnojJIeVkrq6aZP0x5s++ZDJtltn0Tut+Y2/wO43jtG39zfA0r1GvaOV0WKg2200
-         8sLz3hHq5orzyako9ONH0hTpyXY3M956bG2joBFZSYyeecJN/nNiebd6FQHS6tGPw6rG
-         pybacL9Sckt9FBe6r6xtieWwyvIjV/qAcqamV0+Qxge4iXaw0t3Nltp8Hj236k+aljMJ
-         hYjQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=FRGEGYP5j/QAM0EQTtcDKOY1OpeB2GABU0OqiyH9Tbc=;
+        b=Jh31h7kzH5DVLoKieU9+9XYhcrxe9e/0Heic2TcpCnQI9U1jctw5TJ8fE/5S0kCT1B
+         G9irySekxpYw9sKOalO8KecnjrUvVTduSx0H5TgZAnwFJbRf3qzmZY9GnebYrW9znA3P
+         JEJgV45p7GBd13Mawwdm6liiTDaaYPjTVrvgzwDgdxBKYXCELoPm+qniAEvTVfotQEDx
+         tf9/6AInsR9eb6Ve03Vd8WZFaUvlYOJZubc6t+BNM6HxYgVvRuWdKjbY8EmHem59LO7G
+         Jxfg3xaJQc4aShVt65cd2m8Rxz6jzuIEx3wzAfW9MImhnaZ1IxniVYFTLMuFg9VTSaz8
+         E6tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=bYdPLqPezP8J8H+Ltk1uQfrTZTCXGPsJ566xdQAaqSU=;
-        b=aINWozdGKZl0Gha26vs3zRLjE7h/5prwJ+O2+pZviVIPs8y8gZZRmJsUIo/1nKp+S7
-         rQynuWxCg1UjkFxoR80F1s9qV2pafYN7avptNb5OxlN0gqyCruOEqTOSrJS3u8Xksa4J
-         klv05VtrV4D1ITWLguthZZlwJpaycs+req+9x0byc7O+v5g3fd2SKQTZt5HQqT3ZPdM9
-         TS5uZGp/CHQmsHreOmLVuiEFORO/7ynzZ3RLfg3Deqpzs0FhzWnHj7e9r/4ZtiKeGtn7
-         X2Nzh1AmuSAKf8sIf2uAKLu+OZimd7+XGOXlI3KvgLCLH+D0a7hyIMicI/Z+mu50q8Kx
-         e9IQ==
-X-Gm-Message-State: ACrzQf2lgrpqjzW9muJtXpDizjmISBwvANa2TsKk33dnzUWtvJlOBJ6u
-	3QiKRc1YjMZXDqYXlLBptrQHhqGblPE=
-X-Google-Smtp-Source: AMsMyM4NsLT3l0QWg8Hc2k+ueDqfNakYXAEXbxRGDT+sFIvLDokLj6JMBmy+pzcGhVNbcQtXeP5g/g==
-X-Received: by 2002:a05:6a00:1706:b0:547:3e11:9160 with SMTP id h6-20020a056a00170600b005473e119160mr5742072pfc.79.1663884491816;
-        Thu, 22 Sep 2022 15:08:11 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=FRGEGYP5j/QAM0EQTtcDKOY1OpeB2GABU0OqiyH9Tbc=;
+        b=Q/2wOfOMinSYRptAJnWhEvrJQMSKEdGkik/qWc0/wNltafnnrHM7/CqKGlRA8Rb/Ru
+         iTYVsIDqa8M6Ahw5Q6IqRJGKN3X/LoKewsu3HYg3wTZfeUPe0FtfmAMAWXjdK/Nbiv3q
+         hgS43JrI/3N48mfvTzQ3JE4NHSEi8s+bktvwDMznZmTUMBfXmZUUcAy88EJgalfshYhJ
+         cen2yONxAJ5fDiuZyFw+YTFkLmeVHvVHlTu9HeomBRAlmaPte/5hBjgEvN7Byrg8889W
+         H+1ka6wkIYcHdGg+P0Iapk04VBQIuSrg6gsVy32p7mPblakWPnIyaJ3ny6Pij5s0TmhQ
+         TjZA==
+X-Gm-Message-State: ACrzQf05wubv+ft3Chta5xf+9qhWFFSBGkBjF5NI2HsjwWCedCO4sUZi
+	3Qim4oGDx1hGrFjZxdwsuhmo8oEY2V4=
+X-Google-Smtp-Source: AMsMyM6ds9vja+9VPHeFdc3dF9MjHuwtCK9DG9Ewu1BZ6K9K9l2cu4E/c7mD5bTAKISrm/VRxeQ2FQ==
+X-Received: by 2002:a62:e90d:0:b0:556:63e7:2579 with SMTP id j13-20020a62e90d000000b0055663e72579mr898093pfh.6.1663884493077;
+        Thu, 22 Sep 2022 15:08:13 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id f15-20020aa7968f000000b005386162bc2asm4980448pfk.92.2022.09.22.15.08.11
+        by smtp.gmail.com with ESMTPSA id f15-20020aa7968f000000b005386162bc2asm4980448pfk.92.2022.09.22.15.08.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 15:08:11 -0700 (PDT)
+        Thu, 22 Sep 2022 15:08:12 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 01/11] ft: netdev: prep for FT isolation into ft.c
-Date: Thu, 22 Sep 2022 15:07:59 -0700
-Message-Id: <20220922220809.862022-1-prestwoj@gmail.com>
+Subject: [PATCH v5 03/11] ft: implement offchannel authentication
+Date: Thu, 22 Sep 2022 15:08:01 -0700
+Message-Id: <20220922220809.862022-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20220922220809.862022-1-prestwoj@gmail.com>
+References: <20220922220809.862022-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,579 +54,146 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently netdev handles caching FT auth information and uses FT
-parsers/auth-proto to manage the protocol. This sets up to remove
-this state machine from netdev and isolate it into ft.c.
-
-This does not break the existing auth-proto (hence the slight
-modifications, which will be removed soon).
-
-Eventually the auth-proto will be removed from FT entirely, replaced
-just by an FT state machine, similar to how EAPoL works (netdev hooks
-to TX/RX frames).
+A new API was added, ft_authenticate, which will send an
+authentication frame offchannel via CMD_FRAME. This bypasses
+the kernel's authentication state allowing multiple auth
+attempts to take place without disconnecting.
 ---
- src/ft.c     | 319 ++++++++++++++++++++++++++++++++++++++++++++++++---
- src/ft.h     |  22 +++-
- src/netdev.c |  29 +++--
- 3 files changed, 337 insertions(+), 33 deletions(-)
+ src/ft.c | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/ft.h |  3 ++
+ 2 files changed, 94 insertions(+)
 
 diff --git a/src/ft.c b/src/ft.c
-index 2285a86f..9d18f0a9 100644
+index 9d18f0a9..7234306c 100644
 --- a/src/ft.c
 +++ b/src/ft.c
-@@ -33,6 +33,30 @@
- #include "src/mpdu.h"
- #include "src/auth-proto.h"
- #include "src/band.h"
-+#include "src/scan.h"
-+#include "src/util.h"
-+#include "src/netdev.h"
-+#include "src/module.h"
-+
-+static ft_tx_frame_func_t tx_frame = NULL;
-+static ft_tx_associate_func_t tx_assoc = NULL;
-+static struct l_queue *info_list = NULL;
-+
-+struct ft_info {
-+	uint32_t ifindex;
-+	uint8_t spa[6];
-+	uint8_t aa[6];
-+	uint8_t snonce[32];
-+	uint8_t mde[3];
-+	uint8_t *fte;
-+	uint8_t *authenticator_ie;
-+	uint8_t prev_bssid[6];
-+	uint32_t frequency;
-+
-+	struct ie_ft_info ft_info;
-+
-+	bool parsed : 1;
-+};
+@@ -37,6 +37,8 @@
+ #include "src/util.h"
+ #include "src/netdev.h"
+ #include "src/module.h"
++#include "src/offchannel.h"
++#include "src/wiphy.h"
  
- struct ft_sm {
- 	struct auth_proto ap;
-@@ -45,6 +69,8 @@ struct ft_sm {
- 	void *user_data;
+ static ft_tx_frame_func_t tx_frame = NULL;
+ static ft_tx_associate_func_t tx_assoc = NULL;
+@@ -52,6 +54,7 @@ struct ft_info {
+ 	uint8_t *authenticator_ie;
+ 	uint8_t prev_bssid[6];
+ 	uint32_t frequency;
++	uint32_t offchannel_id;
  
- 	bool over_ds : 1;
-+
-+	uint8_t prev_bssid[6];
- };
+ 	struct ie_ft_info ft_info;
  
- /*
-@@ -202,11 +228,13 @@ static bool ft_parse_associate_resp_frame(const uint8_t *frame, size_t frame_len
- 	return true;
+@@ -1169,6 +1172,94 @@ failed:
+ 	return ret;
  }
  
--static int ft_tx_reassociate(struct ft_sm *ft)
-+static int ft_tx_reassociate(uint32_t ifindex, uint32_t freq,
-+				const uint8_t *prev_bssid)
- {
-+	struct netdev *netdev = netdev_find(ifindex);
-+	struct handshake_state *hs = netdev_get_handshake(netdev);
- 	struct iovec iov[3];
- 	int iov_elems = 0;
--	struct handshake_state *hs = ft->hs;
- 	uint32_t kck_len = handshake_state_get_kck_len(hs);
- 	bool is_rsn = hs->supplicant_ie != NULL;
- 	uint8_t *rsne = NULL;
-@@ -233,9 +261,8 @@ static int ft_tx_reassociate(struct ft_sm *ft)
- 		rsn_info.num_pmkids = 1;
- 		rsn_info.pmkids = hs->pmk_r1_name;
- 
--		/* Always set OCVC false for FT-over-DS */
--		if (ft->over_ds)
--			rsn_info.ocvc = false;
-+		/* Always set OCVC false for FT for now */
-+		rsn_info.ocvc = false;
- 
- 		rsne = alloca(256);
- 		ie_build_rsne(&rsn_info, rsne);
-@@ -306,7 +333,7 @@ static int ft_tx_reassociate(struct ft_sm *ft)
- 		iov_elems += 1;
- 	}
- 
--	return ft->tx_assoc(iov, iov_elems, ft->user_data);
-+	return tx_assoc(ifindex, freq, prev_bssid, iov, iov_elems);
- 
- error:
- 	return -EINVAL;
-@@ -348,7 +375,7 @@ static bool ft_verify_rsne(const uint8_t *rsne, const uint8_t *pmk_r0_name,
- 	return true;
- }
- 
--static int ft_parse_ies(struct handshake_state *hs,
-+static int parse_ies(struct handshake_state *hs,
- 			const uint8_t *authenticator_ie,
- 			const uint8_t *ies, size_t ies_len,
- 			const uint8_t **mde_out,
-@@ -480,7 +507,7 @@ bool ft_over_ds_parse_action_ies(struct ft_ds_info *info,
- 	const uint8_t *fte = NULL;
- 	bool is_rsn = hs->supplicant_ie != NULL;
- 
--	if (ft_parse_ies(hs, info->authenticator_ie, ies, ies_len,
-+	if (parse_ies(hs, info->authenticator_ie, ies, ies_len,
- 				&mde, &fte) < 0)
- 		return false;
- 
-@@ -512,7 +539,7 @@ static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
- 	if (!ies)
- 		goto ft_error;
- 
--	if (ft_parse_ies(hs, hs->authenticator_ie, ies, ies_len,
-+	if (parse_ies(hs, hs->authenticator_ie, ies, ies_len,
- 				&mde, &fte) < 0)
- 		goto ft_error;
- 
-@@ -654,11 +681,10 @@ auth_error:
- 	return (int)status_code;
- }
- 
--static int ft_rx_associate(struct auth_proto *ap, const uint8_t *frame,
--				size_t frame_len)
-+int __ft_rx_associate(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
- {
--	struct ft_sm *ft = l_container_of(ap, struct ft_sm, ap);
--	struct handshake_state *hs = ft->hs;
-+	struct netdev *netdev = netdev_find(ifindex);
-+	struct handshake_state *hs = netdev_get_handshake(netdev);
- 	uint32_t kck_len = handshake_state_get_kck_len(hs);
- 	const uint8_t *rsne = NULL;
- 	const uint8_t *mde = NULL;
-@@ -671,6 +697,9 @@ static int ft_rx_associate(struct auth_proto *ap, const uint8_t *frame,
- 					&mde, &fte))
- 		return -EBADMSG;
- 
-+	if (out_status != 0)
-+		return (int)out_status;
-+
- 	/*
- 	 * During a transition in an RSN, check for an RSNE containing the
- 	 * PMK-R1-Name and the remaining fields same as in the advertised
-@@ -785,17 +814,25 @@ static int ft_rx_associate(struct auth_proto *ap, const uint8_t *frame,
- 						ft_info.igtk_ipn);
- 		}
- 
--		handshake_state_install_ptk(ft->hs);
-+		handshake_state_install_ptk(hs);
- 	}
- 
- 	return 0;
- }
- 
-+static int ft_rx_associate(struct auth_proto *ap, const uint8_t *frame,
++void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
 +				size_t frame_len)
-+{
-+	struct ft_sm *sm = l_container_of(ap, struct ft_sm, ap);
-+
-+	return __ft_rx_associate(sm->hs->ifindex, frame, frame_len);
-+}
-+
- static int ft_rx_oci(struct auth_proto *ap)
- {
- 	struct ft_sm *ft = l_container_of(ap, struct ft_sm, ap);
- 
--	return ft_tx_reassociate(ft);
-+	return ft_tx_reassociate(ft->hs->ifindex, 0, ft->prev_bssid);
- }
- 
- static void ft_sm_free(struct auth_proto *ap)
-@@ -809,7 +846,7 @@ static bool ft_over_ds_start(struct auth_proto *ap)
- {
- 	struct ft_sm *ft = l_container_of(ap, struct ft_sm, ap);
- 
--	return ft_tx_reassociate(ft) == 0;
-+	return ft_tx_reassociate(ft->hs->ifindex, 0, ft->prev_bssid) == 0;
- }
- 
- bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
-@@ -924,6 +961,8 @@ struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
- 	ft->ap.free = ft_sm_free;
- 	ft->ap.rx_oci = ft_rx_oci;
- 
-+	memcpy(ft->prev_bssid, hs->aa, 6);
-+
- 	return &ft->ap;
- }
- 
-@@ -942,5 +981,253 @@ struct auth_proto *ft_over_ds_sm_new(struct handshake_state *hs,
- 	ft->ap.start = ft_over_ds_start;
- 	ft->ap.free = ft_sm_free;
- 
-+	memcpy(ft->prev_bssid, hs->aa, 6);
-+
- 	return &ft->ap;
- }
-+
-+void __ft_set_tx_frame_func(ft_tx_frame_func_t func)
-+{
-+	tx_frame = func;
-+}
-+
-+void __ft_set_tx_associate_func(ft_tx_associate_func_t func)
-+{
-+	tx_assoc = func;
-+}
-+
-+static bool ft_parse_ies(struct ft_info *info, struct handshake_state *hs,
-+			const uint8_t *ies, size_t ies_len)
-+{
-+	const uint8_t *mde = NULL;
-+	const uint8_t *fte = NULL;
-+	bool is_rsn = hs->supplicant_ie != NULL;
-+
-+	if (parse_ies(hs, info->authenticator_ie, ies, ies_len,
-+				&mde, &fte) < 0)
-+		return false;
-+
-+	if (!mde_equal(info->mde, mde))
-+		goto ft_error;
-+
-+	if (is_rsn) {
-+		if (!ft_parse_fte(hs, info->snonce, fte, &info->ft_info))
-+			goto ft_error;
-+
-+		info->fte = l_memdup(fte, fte[1] + 2);
-+	} else if (fte)
-+		goto ft_error;
-+
-+	return true;
-+
-+ft_error:
-+	return false;
-+}
-+
-+static struct ft_info *ft_info_find(uint32_t ifindex, const uint8_t *aa)
-+{
-+	const struct l_queue_entry *e;
-+
-+	for (e = l_queue_get_entries(info_list); e; e = e->next) {
-+		struct ft_info *info = e->data;
-+
-+		if (info->ifindex != ifindex)
-+			continue;
-+
-+		if (aa && memcmp(info->aa, aa, 6))
-+			continue;
-+
-+		return info;
-+	}
-+
-+	return NULL;
-+}
-+
-+void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
 +{
 +	struct netdev *netdev = netdev_find(ifindex);
 +	struct handshake_state *hs = netdev_get_handshake(netdev);
 +	struct ft_info *info;
-+	int ret;
-+	const uint8_t *aa = NULL;
-+	const uint8_t *spa = NULL;
-+	const uint8_t *ies = NULL;
-+	size_t ies_len = 0;
++	uint16_t status;
++	const uint8_t *ies;
++	size_t ies_len;
 +
-+	ret = ft_over_ds_parse_action_response(frame, frame_len, &spa, &aa,
-+						&ies, &ies_len);
-+	if (ret != 0)
-+		return;
-+
-+	info = ft_info_find(ifindex, aa);
++	info = ft_info_find(ifindex, NULL);
 +	if (!info)
 +		return;
 +
++	if (!ft_parse_authentication_resp_frame(frame, frame_len,
++					info->spa, info->aa, info->aa, 2,
++					&status, &ies, &ies_len))
++		return;
++
++	if (status != 0)
++		return;
++
 +	if (!ft_parse_ies(info, hs, ies, ies_len))
-+		goto ft_error;
++		return;
 +
 +	info->parsed = true;
 +
 +	return;
-+
-+ft_error:
-+	l_debug("FT-over-DS authenticate to "MAC" failed", MAC_STR(info->aa));
 +}
 +
-+static struct ft_info *ft_info_new(struct handshake_state *hs,
-+					const struct scan_bss *target_bss)
++static void ft_send_authenticate(void *user_data)
 +{
-+	struct ft_info *info = l_new(struct ft_info, 1);
-+
-+	info->ifindex = hs->ifindex;
-+	memcpy(info->spa, hs->spa, 6);
-+	memcpy(info->aa, target_bss->addr, 6);
-+	memcpy(info->mde, target_bss->mde, sizeof(info->mde));
-+	memcpy(info->prev_bssid, hs->aa, 6);
-+
-+	info->frequency = target_bss->frequency;
-+
-+	if (target_bss->rsne)
-+		info->authenticator_ie = l_memdup(target_bss->rsne,
-+						target_bss->rsne[1] + 2);
-+
-+	l_getrandom(info->snonce, 32);
-+
-+	return info;
-+}
-+
-+static void ft_info_destroy(void *data)
-+{
-+	struct ft_info *info = data;
-+
-+	if (info->fte)
-+		l_free(info->fte);
-+
-+	if (info->authenticator_ie)
-+		l_free(info->authenticator_ie);
-+
-+	l_free(info);
-+}
-+
-+static void ft_prepare_handshake(struct ft_info *info,
-+					struct handshake_state *hs)
-+{
-+	if (!hs->supplicant_ie)
-+		return;
-+
-+	memcpy(hs->snonce, info->snonce, sizeof(hs->snonce));
-+
-+	handshake_state_set_fte(hs, info->fte);
-+
-+	handshake_state_set_anonce(hs, info->ft_info.anonce);
-+
-+	handshake_state_set_kh_ids(hs, info->ft_info.r0khid,
-+						info->ft_info.r0khid_len,
-+						info->ft_info.r1khid);
-+
-+	handshake_state_derive_ptk(hs);
-+}
-+
-+int ft_action(uint32_t ifindex, uint32_t freq, const struct scan_bss *target)
-+{
-+	struct netdev *netdev = netdev_find(ifindex);
++	struct ft_info *info = user_data;
++	struct netdev *netdev = netdev_find(info->ifindex);
 +	struct handshake_state *hs = netdev_get_handshake(netdev);
-+	struct ft_info *info;
-+	uint8_t ft_req[14];
-+	struct iovec iov[5];
-+	uint8_t ies[512];
++	uint8_t ies[256];
 +	size_t len;
-+	int ret = -EINVAL;
++	struct iovec iov[2];
++	struct mmpdu_authentication auth;
 +
-+	info = ft_info_new(hs, target);
++	/* Authentication body */
++	auth.algorithm = L_CPU_TO_LE16(MMPDU_AUTH_ALGO_FT);
++	auth.transaction_sequence = L_CPU_TO_LE16(1);
++	auth.status = L_CPU_TO_LE16(0);
 +
-+	ft_req[0] = 6; /* FT category */
-+	ft_req[1] = 1; /* FT Request action */
-+	memcpy(ft_req + 2, info->spa, 6);
-+	memcpy(ft_req + 8, info->aa, 6);
++	iov[0].iov_base = &auth;
++	iov[0].iov_len = sizeof(struct mmpdu_authentication);
 +
 +	if (!ft_build_authenticate_ies(hs, hs->supplicant_ocvc, info->snonce,
 +					ies, &len))
-+		goto failed;
-+
-+	iov[0].iov_base = ft_req;
-+	iov[0].iov_len = sizeof(ft_req);
++		return;
 +
 +	iov[1].iov_base = ies;
 +	iov[1].iov_len = len;
 +
-+	ret = tx_frame(hs->ifindex, 0x00d0, freq, hs->aa, iov, 2);
-+	if (ret < 0)
-+		goto failed;
++	tx_frame(info->ifindex, 0x00b0, info->frequency, info->aa, iov, 2);
++}
++
++static void ft_authenticate_destroy(int error, void *user_data)
++{
++	struct ft_info *info = user_data;
++
++	if (error == 0)
++		return;
++
++	l_debug("Error in authentication offchannel (%d)", error);
++
++	ft_clear_authentications(info->ifindex);
++}
++
++int ft_authenticate(uint32_t ifindex, const struct scan_bss *target)
++{
++	struct netdev *netdev = netdev_find(ifindex);
++	struct handshake_state *hs = netdev_get_handshake(netdev);
++	struct ft_info *info = ft_info_new(hs, target);
++
++	info->offchannel_id = offchannel_start(netdev_get_wdev_id(netdev),
++						WIPHY_WORK_PRIORITY_FT,
++						target->frequency,
++						200, ft_send_authenticate, info,
++						ft_authenticate_destroy);
++	ft_clear_authentications(ifindex);
 +
 +	l_queue_push_tail(info_list, info);
 +
 +	return 0;
-+
-+failed:
-+	l_free(info);
-+	return ret;
 +}
 +
-+int ft_associate(uint32_t ifindex, const uint8_t *addr)
-+{
-+	struct netdev *netdev = netdev_find(ifindex);
-+	struct handshake_state *hs = netdev_get_handshake(netdev);
-+	struct ft_info *info;
-+	int ret;
-+
-+	/*
-+	 * TODO: Since FT-over-DS is done early, before the time of roaming, it
-+	 *       may end up that a completely new BSS is the best candidate and
-+	 *       we haven't yet authenticated. We could actually authenticate
-+	 *       at this point, but for now just assume the caller will choose
-+	 *       a different BSS.
-+	 */
-+	info = ft_info_find(ifindex, addr);
-+	if (!info)
-+		return -ENOENT;
-+
-+	ft_prepare_handshake(info, hs);
-+
-+	ret = ft_tx_reassociate(ifindex, info->frequency, info->prev_bssid);
-+
-+	/* After this no previous auths will be valid */
-+	ft_clear_authentications(ifindex);
-+
-+	return ret;
-+}
-+
-+static bool remove_ifindex(void *data, void *user_data)
-+{
-+	struct ft_info *info = data;
-+	uint32_t ifindex = L_PTR_TO_UINT(user_data);
-+
-+	if (info->ifindex != ifindex)
-+		return false;
-+
-+	ft_info_destroy(info);
-+	return true;
-+}
-+
-+void ft_clear_authentications(uint32_t ifindex)
-+{
-+	l_queue_foreach_remove(info_list, remove_ifindex,
-+				L_UINT_TO_PTR(ifindex));
-+}
-+
-+static int ft_init(void)
-+{
-+	info_list = l_queue_new();
-+
-+	return 0;
-+}
-+
-+static void ft_exit(void)
-+{
-+	if (!l_queue_isempty(info_list))
-+		l_warn("stale FT info objects found!");
-+
-+	l_queue_destroy(info_list, ft_info_destroy);
-+}
-+
-+IWD_MODULE(ft, ft_init, ft_exit);
+ int ft_associate(uint32_t ifindex, const uint8_t *addr)
+ {
+ 	struct netdev *netdev = netdev_find(ifindex);
 diff --git a/src/ft.h b/src/ft.h
-index f90fc1b2..fd6dfdae 100644
+index fd6dfdae..0e8c3a90 100644
 --- a/src/ft.h
 +++ b/src/ft.h
-@@ -21,11 +21,19 @@
-  */
+@@ -85,7 +85,10 @@ void __ft_set_tx_associate_func(ft_tx_associate_func_t func);
+ int __ft_rx_associate(uint32_t ifindex, const uint8_t *frame,
+ 			size_t frame_len);
+ void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len);
++void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
++				size_t frame_len);
  
- struct handshake_state;
-+struct scan_bss;
-+
-+typedef int (*ft_tx_frame_func_t)(uint32_t ifindex, uint16_t frame_type,
-+					uint32_t frequency,
-+					const uint8_t *dest, struct iovec *iov,
-+					size_t iov_len);
- 
- typedef void (*ft_tx_authenticate_func_t)(struct iovec *iov, size_t iov_len,
- 					void *user_data);
--typedef int (*ft_tx_associate_func_t)(struct iovec *ie_iov, size_t iov_len,
--					void *user_data);
-+
-+typedef int (*ft_tx_associate_func_t)(uint32_t ifindex, uint32_t freq,
-+					const uint8_t *prev_bssid,
-+					struct iovec *ie_iov, size_t iov_len);
- typedef int (*ft_get_oci)(void *user_data);
- 
- typedef void (*ft_ds_free_func_t)(void *user_data);
-@@ -71,3 +79,13 @@ struct auth_proto *ft_over_ds_sm_new(struct handshake_state *hs,
- 
- bool ft_over_ds_prepare_handshake(struct ft_ds_info *info,
- 					struct handshake_state *hs);
-+
-+void __ft_set_tx_frame_func(ft_tx_frame_func_t func);
-+void __ft_set_tx_associate_func(ft_tx_associate_func_t func);
-+int __ft_rx_associate(uint32_t ifindex, const uint8_t *frame,
-+			size_t frame_len);
-+void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len);
-+
-+void ft_clear_authentications(uint32_t ifindex);
-+int ft_action(uint32_t ifindex, uint32_t freq, const struct scan_bss *target);
-+int ft_associate(uint32_t ifindex, const uint8_t *addr);
-diff --git a/src/netdev.c b/src/netdev.c
-index 7f4101be..5828b4ea 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4409,11 +4409,11 @@ restore_snonce:
- 					MMPDU_STATUS_CODE_UNSPECIFIED);
- }
- 
--static int netdev_ft_tx_associate(struct iovec *ft_iov, size_t n_ft_iov,
--					void *user_data)
-+static int netdev_ft_tx_associate(uint32_t ifindex, uint32_t freq,
-+					const uint8_t *prev_bssid,
-+					struct iovec *ft_iov, size_t n_ft_iov)
- {
--	struct netdev *netdev = user_data;
--	struct auth_proto *ap = netdev->ap;
-+	struct netdev *netdev = netdev_find(ifindex);
- 	struct handshake_state *hs = netdev->handshake;
- 	struct l_genl_msg *msg;
- 	struct iovec iov[64];
-@@ -4434,7 +4434,7 @@ static int netdev_ft_tx_associate(struct iovec *ft_iov, size_t n_ft_iov,
- 	mpdu_sort_ies(subtype, iov, c_iov);
- 
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_PREV_BSSID, ETH_ALEN,
--				ap->prev_bssid);
-+				prev_bssid);
- 	l_genl_msg_append_attrv(msg, NL80211_ATTR_IE, iov, c_iov);
- 
- 	netdev->connect_cmd_id = l_genl_family_send(nl80211, msg,
-@@ -4646,17 +4646,15 @@ int netdev_fast_transition(struct netdev *netdev,
- 			l_get_le16(target_bss->mde))
- 		return -EINVAL;
- 
--	prepare_ft(netdev, target_bss);
--
--	handshake_state_new_snonce(netdev->handshake);
--
- 	netdev->connect_cb = cb;
- 
- 	netdev->ap = ft_over_air_sm_new(netdev->handshake,
- 					netdev_ft_tx_authenticate,
- 					netdev_ft_tx_associate,
- 					netdev_get_oci, netdev);
--	memcpy(netdev->ap->prev_bssid, orig_bss->addr, ETH_ALEN);
-+	prepare_ft(netdev, target_bss);
-+
-+	handshake_state_new_snonce(netdev->handshake);
- 
- 	wiphy_radio_work_insert(netdev->wiphy, &netdev->work,
- 				WIPHY_WORK_PRIORITY_CONNECT, &ft_work_ops);
-@@ -4688,16 +4686,14 @@ int netdev_fast_transition_over_ds(struct netdev *netdev,
- 	if (!info || !info->parsed)
- 		return -ENOENT;
- 
--	prepare_ft(netdev, target_bss);
--
--	ft_over_ds_prepare_handshake(&info->super, netdev->handshake);
--
- 	netdev->connect_cb = cb;
- 
- 	netdev->ap = ft_over_ds_sm_new(netdev->handshake,
- 					netdev_ft_tx_associate,
- 					netdev);
--	memcpy(netdev->ap->prev_bssid, orig_bss->addr, ETH_ALEN);
-+	prepare_ft(netdev, target_bss);
-+
-+	ft_over_ds_prepare_handshake(&info->super, netdev->handshake);
- 
- 	wiphy_radio_work_insert(netdev->wiphy, &netdev->work,
- 				WIPHY_WORK_PRIORITY_CONNECT, &ft_work_ops);
-@@ -6643,6 +6639,8 @@ static int netdev_init(void)
- 	__eapol_set_tx_packet_func(netdev_control_port_frame);
- 	__eapol_set_install_pmk_func(netdev_set_pmk);
- 
-+	__ft_set_tx_associate_func(netdev_ft_tx_associate);
-+
- 	unicast_watch = l_genl_add_unicast_watch(genl, NL80211_GENL_NAME,
- 						netdev_unicast_notify,
- 						NULL, NULL);
-@@ -6707,3 +6705,4 @@ IWD_MODULE(netdev, netdev_init, netdev_exit);
- IWD_MODULE_DEPENDS(netdev, eapol);
- IWD_MODULE_DEPENDS(netdev, frame_xchg);
- IWD_MODULE_DEPENDS(netdev, wiphy);
-+IWD_MODULE_DEPENDS(netdev, ft);
+ void ft_clear_authentications(uint32_t ifindex);
+ int ft_action(uint32_t ifindex, uint32_t freq, const struct scan_bss *target);
+ int ft_associate(uint32_t ifindex, const uint8_t *addr);
++int ft_authenticate(uint32_t ifindex, const struct scan_bss *target);
 -- 
 2.34.3
 
