@@ -1,85 +1,116 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D19366E8
-	for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 16:18:20 +0000 (UTC)
-Received: by mail-ot1-f42.google.com with SMTP id x23-20020a056830409700b00655c6dace73so6533931ott.11
-        for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 09:18:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214E38B21
+	for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 22:08:12 +0000 (UTC)
+Received: by mail-pg1-f175.google.com with SMTP id b5so2360519pgb.6
+        for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 15:08:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=jxzIs/NOMHUMQ29TG3sG3pl1tw6gP/uDeTdguhrXedw=;
-        b=LJAFS8XJ4qHmjeZTF9gVnRNuU+s+7sZFB94jtUZdcxXMBHA2W2iXqw9MFiEiZN1pGl
-         4oojHWc2ajS4ZYmGLvEJNwDwoK/Pywx3RtX6bTWemELu04Txl5h+1Q71EQDxQOXwcTle
-         toqWbX3aSeXwdwol8+cx48kj2WQbIQTDvzqd34+mY632ZFOs13oIOKlzT6Z/7MDGb4k6
-         cU2kIT5t5GuRJ0KQQz8PA5Xc/nj9fpSTMiKmDSEu75y41mey3AsKun9as/KLrI1dEF06
-         m8tx751wblQEpdfye2jsdGdHzwtAbBUg/8OV6hv9jvTzZkRqMj1DtGddcI0S41ZKQ6mu
-         6QiA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=aWgSsAMsEryEhhY2g+r3DfcL0ztmqDPtcT1XdsRBzAk=;
+        b=DJLpatjSuv+xVQSBqwBBpXoVx3a7Q/h4yAzp/S68BNpIct+AUwYq3sBtiWOOW5mYWN
+         Iy7VFxXkJUy59wdXdJqcrBlHh9vssMAn4dDP0nUvZDtHhBuVHJ4EiNlGI753wp9Ck4Pn
+         RxQp0mCckjxyFN4k8xCTmQSn299s10GeRtfCGlLq3ATwhxviGxpUZv7kyIiIqta6Bqy3
+         s9JwVpRFbp6CEYnft48Y/QjblQ8Ol9wAq7/nvqT8j0fiHhhnSBaD0dwqE3X0Gwnw3Ef8
+         fuP1Ez5CuEamNCJ2+DfmkrtF8svVTUxZJbdAJVJUcAU+wZoiyy7rYJ3wbKvfsOz4cuy3
+         OFRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=jxzIs/NOMHUMQ29TG3sG3pl1tw6gP/uDeTdguhrXedw=;
-        b=b2P6pYga8+eK3yDO6tXsjhiWhgylxFMu/Fcd94rviL3Xghafnw9p5bJ9dXW5XD7yZq
-         853fTfXglBeNShxqkYUM78IKclR09mJLhZzcLuihYjReI4YLb4kHa8cj7LfTzIfAMYUg
-         kfHAayqHmioLamHa1QCBerSU3Fwwl0wAzuUgLyJcUP5e6NzFUv9Cc1c8dK39r0hP4chK
-         PTYzcEvoS26LVqT7aKCNe12zKPhCnu3Edm0Oy+HhUv/FN3buuMtKBk0XXCjxK394wjKu
-         PrMhcyBBe048iz3Azd0Pell2xfSRgFX2vBkA3oxfdZaBmzS+AR0cks1n1358G8a7JR+i
-         pzZA==
-X-Gm-Message-State: ACrzQf2CZVYheaaIvZqfIeCYTmOq3peIyz/wVpyEAHGq84c31INql3rP
-	uOGTUILU60c9wc43Ki9IrLE=
-X-Google-Smtp-Source: AMsMyM7Ii24Bq4PvtnXczivFoxEZHiyA5YAdeiTyWKB1huIia3g2LFRsolkx3ixBYhFZt+tiWjMA5w==
-X-Received: by 2002:a05:6830:2a0e:b0:65b:d5a3:ef8a with SMTP id y14-20020a0568302a0e00b0065bd5a3ef8amr2026289otu.93.1663863500110;
-        Thu, 22 Sep 2022 09:18:20 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id h2-20020a9d6a42000000b00637032a39a3sm2863411otn.6.2022.09.22.09.18.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Sep 2022 09:18:19 -0700 (PDT)
-Message-ID: <50ac31bf-7c7e-706e-a7d0-11132cb7ab12@gmail.com>
-Date: Thu, 22 Sep 2022 11:18:18 -0500
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=aWgSsAMsEryEhhY2g+r3DfcL0ztmqDPtcT1XdsRBzAk=;
+        b=Gzr1SYz8RpmsclpQvsiCbG5K84FwOd3rP4yGxLwqOCY+oDSbL0f86YFPZ0sOpSbIBC
+         9T5Qs9iXD1p6IPvrg1u65P/bICD/CphlQaEZQBQx8X4Oe7mNlX303jazHjgPkNXMvWjT
+         rpi4zdnOnjLv2trX49qQcHfyQ5M31mGkWZlcUzN1STPqL2hCZ5CuNg7Vsq4OJsLMxXu/
+         cmLJPgwVu7DBmzHyIyUZWa6yCxwzAzIsmP/w5zOkNkvQCYdWN8vnmuSnqgfHPT0i/xP9
+         JY6haONwsWrc7ATzKWoPQxzR5kKeF0rHzkgyIC7S6ybO0cQg0HM/NblsOwiwNzGPs6E5
+         AtUw==
+X-Gm-Message-State: ACrzQf0hhfHpExzCa8Yty43BcOH80rl/lAVotRsaj0eVdBsEsyOvVt9X
+	+8JRyu3j7QqtLaBuFtbQgoPPEyS/+Gw=
+X-Google-Smtp-Source: AMsMyM6gvVQBPuKregr/Cwfsx7tnZ8+hgiU8cqpUBYVven89//9ol/s4IOM5H/F/70fLZdFcxuObNQ==
+X-Received: by 2002:aa7:87d6:0:b0:53e:79bb:feb2 with SMTP id i22-20020aa787d6000000b0053e79bbfeb2mr5762885pfo.13.1663884492366;
+        Thu, 22 Sep 2022 15:08:12 -0700 (PDT)
+Received: from jprestwo-xps.none ([50.54.173.139])
+        by smtp.gmail.com with ESMTPSA id f15-20020aa7968f000000b005386162bc2asm4980448pfk.92.2022.09.22.15.08.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Sep 2022 15:08:12 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v5 02/11] netdev: add FT TX frame hook
+Date: Thu, 22 Sep 2022 15:08:00 -0700
+Message-Id: <20220922220809.862022-2-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20220922220809.862022-1-prestwoj@gmail.com>
+References: <20220922220809.862022-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v4 05/15] ft: netdev: prep for FT isolation into ft.c
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20220921223158.704658-1-prestwoj@gmail.com>
- <20220921223158.704658-5-prestwoj@gmail.com>
- <258acf4a-457b-4154-9be1-f78eb0154bdb@gmail.com>
- <052453327454f732c39f4bdeb888a737eca53cf5.camel@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <052453327454f732c39f4bdeb888a737eca53cf5.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+A netdev hook for FT to send out frames. This will be used both for
+FT-over-DS action frames and FT-over-Air authentication.
+---
+ src/netdev.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-> True, I guess I could do l_queue_peek_head() in the while condition,
-> then pop/free if the ifindex matches.
-> 
-> I've run into this a few times. Would be nice if we had an API to
-> remove/free multiple entries based on a match function. Or if an
-> l_queue_entry loop allowed removal, maybe it does already.
+diff --git a/src/netdev.c b/src/netdev.c
+index 5828b4ea..22e07145 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -4367,6 +4367,38 @@ static uint32_t netdev_send_action_frame(struct netdev *netdev,
+ 						user_data);
+ }
+ 
++static void netdev_ft_frame_cb(struct l_genl_msg *msg, void *user_data)
++{
++	if (l_genl_msg_get_error(msg) < 0)
++		l_debug("Failed to send FT-Frame");
++}
++
++static int netdev_tx_ft_frame_frame(uint32_t ifindex, uint16_t frame_type,
++					uint32_t frequency, const uint8_t *dest,
++					struct iovec *iov, size_t iov_len)
++{
++	struct netdev *netdev = netdev_find(ifindex);
++	struct l_genl_msg *msg = nl80211_build_cmd_frame(netdev->index,
++							frame_type,
++							netdev->addr, dest,
++							frequency,
++							iov, iov_len);
++
++	/*
++	 * Even though the kernel is doing offchannel for Authentication this
++	 * flag is still required otherwise the kernel gives -EBUSY.
++	 */
++	l_genl_msg_append_attr(msg, NL80211_ATTR_OFFCHANNEL_TX_OK, 0, NULL);
++
++	if (!l_genl_family_send(nl80211, msg, netdev_ft_frame_cb,
++				netdev, NULL)) {
++		l_genl_msg_unref(msg);
++		return -EIO;
++	}
++
++	return 0;
++}
++
+ static void netdev_cmd_authenticate_ft_cb(struct l_genl_msg *msg,
+ 						void *user_data)
+ {
+@@ -6639,6 +6671,7 @@ static int netdev_init(void)
+ 	__eapol_set_tx_packet_func(netdev_control_port_frame);
+ 	__eapol_set_install_pmk_func(netdev_set_pmk);
+ 
++	__ft_set_tx_frame_func(netdev_tx_ft_frame_frame);
+ 	__ft_set_tx_associate_func(netdev_ft_tx_associate);
+ 
+ 	unicast_watch = l_genl_add_unicast_watch(genl, NL80211_GENL_NAME,
+-- 
+2.34.3
 
-We do have this, l_queue_foreach_remove().
-
->>> +IWD_MODULE(ft, ft_init, ft_exit);
->>
->> Does netdev need an IWD_MODULE_DEPENDS on ft now?
-> 
-> I don't think so? Since init/exit aren't using any netdev calls I think
-> its safe.
-
-No, the other way around.  netdev (maybe?) needs a dependency on ft, since 
-netdev invokes __ft_set*
-
-Regards,
--Denis
