@@ -1,48 +1,48 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE242F29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0532F2E
 	for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 22:08:15 +0000 (UTC)
-Received: by mail-pf1-f172.google.com with SMTP id v186so2689048pfv.11
+Received: by mail-pg1-f177.google.com with SMTP id 78so10491737pgb.13
         for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 15:08:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=UPncq6eUZ2yYPFluqxeXLVJdF3T72EPaF6MeOVk+SwE=;
-        b=EwErohYaqfuMmu3LP4on+njlruoVUXR+5h/akORXo18biUExCGWgJSk/ZbH0tiSAdW
-         5d16SvwdF1vwOfc7RekSFG7we9l6sVJTOXrN/8S/74T6g6tzFEmbOJvyXismiM11M9oJ
-         oFcQ2TzFu80I+eOpgoIERiY53AVOKRU4SPXtwxzcaZO8ZCCM6Xxd8WAKRLhFC/qL65oU
-         iXfMzRE3u9St6IlhBtQlv0eEpj8wS4lK3ekQ2jEmmuC36dxHjYv0QvkBQjKvc+sqBtXY
-         6oal6pSKPKXPXo30oRjoNcPXkCSSJ/VbfjZYV3B+fA17He9ixpLgGwQ65JX2QkYwVz9j
-         F3rQ==
+        bh=jGcqJ1aeluPEWtm41rf9y65MKWG/RtwIWujY9JdwMZM=;
+        b=U8hoVSQO3Vb4fdpIYB2i9TEgUcQc0N+K53limzcTLN2C+o/9JTFnXSg2w5Y72EZbmy
+         JSsB+1D0/EYgLsJ3RpEzlO1S+d2XkXEj3eQfFxZ0YDjJ85BDp6USOUesIamyPLk/MVlp
+         FsePDLhpBpJpkuyrst3oV42Z9lKf6OQ2FsNI49JsjZUwjScPLhlveMMtmMfJJ5yyb/V0
+         E6vnJ18TSKKNVAR/8JrU/Yc+l/ObxyxZfN/yz4w1nNXmJWhvwjQa+kY2GQ8LjdioGxfw
+         /9wOS5VFKa3o7KAHZ13/J/0gxU815q9dHOlB/wDC6co2HJBl6SmAa8SgwpEjypQVXRMP
+         vxMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=UPncq6eUZ2yYPFluqxeXLVJdF3T72EPaF6MeOVk+SwE=;
-        b=xeHCnf4A4SUSwLTLn1MqyyEKVtBMl9rWtvDRpeWaY7a2WI1zOt33S5kWBzicZtSdB3
-         wRwV7yKb+qfwNV/uThRmd52DEffqSAiszLnCWV3vKFW5hMZbIKEPaYs/JkeqUVagOW6e
-         Tw2A8gzSCtIW0mvbvKVs2QYquSp2ACP1XKShljVlG+G59qDyPyNVrVXDnw0xtith+2mm
-         6c0Tddm2zqwu+YnBOhdjWGrD+hrVL5877wKq4ejeHMBrvGUbwIbdvqKmDDAj64baKNGm
-         bc6y7PfCQw+AKLNAZoEia4H5FmxxAN2EVlitdtdADHZtnMHC8rZGG9YPHFEvva1+xVR7
-         8gdA==
-X-Gm-Message-State: ACrzQf1L3/LNHOXzrx9mpPosCe5d00z6xvHH4fVAtzr4gAOEDP8nIuLb
-	TKLEgc4PALrlGtcpHCms9mSm/GmTgJE=
-X-Google-Smtp-Source: AMsMyM4KG5FdNZNGwEe2NWJbzjztfVm6O4a6PGObmFVDvemKdnX6qY9Qa+sLuzo7PexOwfujPYuOaA==
-X-Received: by 2002:a05:6a00:4205:b0:54b:6e95:268e with SMTP id cd5-20020a056a00420500b0054b6e95268emr5762933pfb.50.1663884494545;
-        Thu, 22 Sep 2022 15:08:14 -0700 (PDT)
+        bh=jGcqJ1aeluPEWtm41rf9y65MKWG/RtwIWujY9JdwMZM=;
+        b=S0iB8eVNlkDbTUv21SBLACG+U5q3n7tJd+kuZIlfYYYtFpb0+sGLvhfSZE+edrXcqD
+         0gqPTIcHTSbEVB3HxUrpit+Qgt5KnD1fQ5AcvPSGph+vPyQfH38T/WNJxaLBchTP4War
+         mkD+xlmd8bBORyO4DEQtGjvQHCF2fl7TAR4r34gDdo0DIzXdvy375KeYIQ2qHhbvHl7N
+         S8JN/S+pLc8eoq6/QuSoW2JbZePRR3uxsDWZTEoXH1T5w4zIOeVxoClyZNzgFv0f8Fs8
+         tFFMwv6C7P8wPnrixt06eapgf+Vyv+jDMnm9gx23WkmSYVcDUk9P/bJzs+1o9dIV93Gb
+         YHiw==
+X-Gm-Message-State: ACrzQf0nM0oFkYHmRdAEtctwqfPgZ88uCZ+6/5DW9zBpbNX/Zwy1W7Xs
+	FC9i1/wgUDgCDy/Kti68JCT9Oijab7E=
+X-Google-Smtp-Source: AMsMyM4QQyucUEVI1wqzSae2FHvwb7rrHAst1QyUHyHnOeFlkz6dZ9cPHJE4myn/ZzV0b6J++ikZJw==
+X-Received: by 2002:a05:6a00:808:b0:54c:40da:74f3 with SMTP id m8-20020a056a00080800b0054c40da74f3mr5670615pfk.62.1663884495188;
+        Thu, 22 Sep 2022 15:08:15 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id f15-20020aa7968f000000b005386162bc2asm4980448pfk.92.2022.09.22.15.08.13
+        by smtp.gmail.com with ESMTPSA id f15-20020aa7968f000000b005386162bc2asm4980448pfk.92.2022.09.22.15.08.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 22 Sep 2022 15:08:14 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 05/11] netdev: hook in RX for FT-Action/Authentication/Association
-Date: Thu, 22 Sep 2022 15:08:03 -0700
-Message-Id: <20220922220809.862022-5-prestwoj@gmail.com>
+Subject: [PATCH v5 06/11] ft: update action response parsing to include header
+Date: Thu, 22 Sep 2022 15:08:04 -0700
+Message-Id: <20220922220809.862022-6-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220922220809.862022-1-prestwoj@gmail.com>
 References: <20220922220809.862022-1-prestwoj@gmail.com>
@@ -54,223 +54,47 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This forwards Action, Authentication and Association frames to
-ft.c via their new hooks in netdev.
-
-Note that this will break FT-over-Air temporarily since the
-auth-proto still is in use.
+Now the full action frame including the header is provided to ft
+which breaks the existing parser since it assumes the buffer starts
+at the body of the message.
 ---
- src/netdev.c | 147 ++++++++++++++++++++++-----------------------------
- 1 file changed, 64 insertions(+), 83 deletions(-)
+ src/ft.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 22e07145..397b1c4a 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -3192,13 +3192,15 @@ static void netdev_associate_event(struct l_genl_msg *msg,
- 	const uint8_t *frame = NULL;
- 	uint16_t status_code = MMPDU_STATUS_CODE_UNSPECIFIED;
- 	int ret;
-+	const struct mmpdu_header *hdr;
-+	const struct mmpdu_association_response *assoc;
- 
- 	l_debug("");
- 
- 	if (!netdev->connected || netdev->aborting)
- 		return;
- 
--	if (!netdev->ap) {
-+	if (!netdev->ap && !netdev->in_ft) {
- 		netdev->associated = true;
- 		netdev->in_reassoc = false;
- 		return;
-@@ -3238,61 +3240,59 @@ static void netdev_associate_event(struct l_genl_msg *msg,
- 	if (L_WARN_ON(!frame))
- 		goto assoc_failed;
- 
--	if (netdev->ap) {
--		const struct mmpdu_header *hdr;
--		const struct mmpdu_association_response *assoc;
--
--		hdr = mpdu_validate(frame, frame_len);
--		if (L_WARN_ON(!hdr))
--			goto assoc_failed;
--
--		assoc = mmpdu_body(hdr);
--		status_code = L_CPU_TO_LE16(assoc->status_code);
-+	hdr = mpdu_validate(frame, frame_len);
-+	if (L_WARN_ON(!hdr))
-+		goto assoc_failed;
- 
--		ret = auth_proto_rx_associate(netdev->ap, frame, frame_len);
--		if (ret == 0) {
--			bool fils = !!(netdev->handshake->akm_suite &
--					(IE_RSN_AKM_SUITE_FILS_SHA256 |
--					 IE_RSN_AKM_SUITE_FILS_SHA384 |
--					 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384 |
--					 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256));
-+	assoc = mmpdu_body(hdr);
-+	status_code = L_CPU_TO_LE16(assoc->status_code);
- 
-+	if (netdev->ap)
-+		ret = auth_proto_rx_associate(netdev->ap, frame,
-+							frame_len);
-+	else
-+		ret = __ft_rx_associate(netdev->index, frame,
-+							frame_len);
-+	if (ret == 0) {
-+		bool fils = !!(netdev->handshake->akm_suite &
-+				(IE_RSN_AKM_SUITE_FILS_SHA256 |
-+				 IE_RSN_AKM_SUITE_FILS_SHA384 |
-+				 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384 |
-+				 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256));
-+
-+		if (netdev->ap) {
- 			auth_proto_free(netdev->ap);
- 			netdev->ap = NULL;
-+		}
- 
--			netdev->sm = eapol_sm_new(netdev->handshake);
--			eapol_register(netdev->sm);
--
--			/* Just in case this was a retry */
--			netdev->ignore_connect_event = false;
--
--			/*
--			 * If in FT and/or FILS we don't force an initial 4-way
--			 * handshake and instead just keep the EAPoL state
--			 * machine for the rekeys.
--			 */
--			if (netdev->in_ft || fils)
--				eapol_sm_set_require_handshake(netdev->sm,
--								false);
-+		netdev->sm = eapol_sm_new(netdev->handshake);
-+		eapol_register(netdev->sm);
- 
--			netdev->in_ft = false;
--			netdev->in_reassoc = false;
--			netdev->associated = true;
--			return;
--		} else if (ret == -EAGAIN) {
--			/*
--			 * Here to support OWE retries. OWE will retry
--			 * internally, but a connect event will still be emitted
--			 */
--			netdev->ignore_connect_event = true;
--			return;
--		} else if (ret > 0)
--			status_code = (uint16_t)ret;
-+		/* Just in case this was a retry */
-+		netdev->ignore_connect_event = false;
- 
--		goto assoc_failed;
--	}
-+		/*
-+		 * If in FT and/or FILS we don't force an initial 4-way
-+		 * handshake and instead just keep the EAPoL state
-+		 * machine for the rekeys.
-+		 */
-+		if (netdev->in_ft || fils)
-+			eapol_sm_set_require_handshake(netdev->sm,
-+							false);
- 
--	return;
-+		netdev->in_ft = false;
-+		netdev->in_reassoc = false;
-+		netdev->associated = true;
-+		return;
-+	} else if (ret == -EAGAIN) {
-+		/*
-+		 * Here to support OWE retries. OWE will retry
-+		 * internally, but a connect event will still be emitted
-+		 */
-+		netdev->ignore_connect_event = true;
-+		return;
-+	} else if (ret > 0)
-+		status_code = (uint16_t)ret;
- 
- assoc_failed:
- 	netdev->result = NETDEV_RESULT_ASSOCIATION_FAILED;
-@@ -4578,49 +4578,25 @@ static void netdev_ft_response_frame_event(const struct mmpdu_header *hdr,
- 					int rssi, void *user_data)
+diff --git a/src/ft.c b/src/ft.c
+index 7234306c..4005e8b6 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -579,13 +579,18 @@ int ft_over_ds_parse_action_response(const uint8_t *frame, size_t frame_len,
+ 					const uint8_t **ies_out,
+ 					size_t *ies_len)
  {
- 	struct netdev *netdev = user_data;
--	struct netdev_ft_over_ds_info *info;
--	int ret;
--	uint16_t status_code = MMPDU_STATUS_CODE_UNSPECIFIED;
--	const uint8_t *aa;
--	const uint8_t *spa;
--	const uint8_t *ies;
--	size_t ies_len;
--	struct ft_ds_finder finder;
++	struct mmpdu_header *hdr = (struct mmpdu_header *)frame;
++	size_t hdr_len = mmpdu_header_len(hdr);
+ 	uint16_t status;
+ 	const uint8_t *aa;
+ 	const uint8_t *spa;
  
- 	if (!netdev->connected)
- 		return;
+-	if (frame_len < 16)
++	if (frame_len < hdr_len + 16)
+ 		return -EINVAL;
  
--	ret = ft_over_ds_parse_action_response(body, body_len, &spa, &aa,
--						&ies, &ies_len);
--	if (ret < 0)
--		return;
-+	__ft_rx_action(netdev->index, (const uint8_t *)hdr,
-+			mmpdu_header_len(hdr) + body_len);
-+}
- 
--	finder.spa = spa;
--	finder.aa = aa;
-+static void netdev_ft_auth_response_frame_event(const struct mmpdu_header *hdr,
-+					const void *body, size_t body_len,
-+					int rssi, void *user_data)
-+{
-+	struct netdev *netdev = user_data;
- 
--	info = l_queue_find(netdev->ft_ds_list, match_ft_ds_info, &finder);
--	if (!info)
-+	if (!netdev->connected)
- 		return;
- 
--	/* Lookup successful, now check the status code */
--	if (ret > 0) {
--		status_code = (uint16_t)ret;
--		goto ft_error;
--	}
--
--	if (!ft_over_ds_parse_action_ies(&info->super, netdev->handshake,
--						ies, ies_len))
--		goto ft_error;
--
--	info->parsed = true;
--
--	return;
--
--ft_error:
--	l_debug("FT-over-DS to "MAC" failed (%d)", MAC_STR(info->super.aa),
--			status_code);
--
--	netdev_ft_over_ds_auth_failed(info, status_code);
-+	__ft_rx_authenticate(netdev->index, (const uint8_t *)hdr,
-+			mmpdu_header_len(hdr) + body_len);
- }
- 
- static void netdev_qos_map_frame_event(const struct mmpdu_header *hdr,
-@@ -5846,6 +5822,7 @@ static void netdev_add_station_frame_watches(struct netdev *netdev)
- 	static const uint8_t action_sa_query_resp_prefix[2] = { 0x08, 0x01 };
- 	static const uint8_t action_sa_query_req_prefix[2] = { 0x08, 0x00 };
- 	static const uint8_t action_ft_response_prefix[] =  { 0x06, 0x02 };
-+	static const uint8_t auth_ft_response_prefix[] = { 0x02, 0x00 };
- 	static const uint8_t action_qos_map_prefix[] = { 0x01, 0x04 };
- 	uint64_t wdev = netdev->wdev_id;
- 
-@@ -5866,6 +5843,10 @@ static void netdev_add_station_frame_watches(struct netdev *netdev)
- 			sizeof(action_ft_response_prefix),
- 			netdev_ft_response_frame_event, netdev, NULL);
- 
-+	frame_watch_add(wdev, 0, 0x00b0, auth_ft_response_prefix,
-+			sizeof(auth_ft_response_prefix),
-+			netdev_ft_auth_response_frame_event, netdev, NULL);
++	frame += hdr_len;
++	frame_len -= hdr_len;
 +
- 	if (wiphy_supports_qos_set_map(netdev->wiphy))
- 		frame_watch_add(wdev, 0, 0x00d0, action_qos_map_prefix,
- 				sizeof(action_qos_map_prefix),
+ 	/* Category FT */
+ 	if (frame[0] != 6)
+ 		return -EINVAL;
+@@ -597,6 +602,9 @@ int ft_over_ds_parse_action_response(const uint8_t *frame, size_t frame_len,
+ 	spa = frame + 2;
+ 	aa = frame + 8;
+ 
++	if (memcmp(spa, hdr->address_1, 6))
++		return -EINVAL;
++
+ 	status = l_get_le16(frame + 14);
+ 	if (status != 0)
+ 		return (int)status;
 -- 
 2.34.3
 
