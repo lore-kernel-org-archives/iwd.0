@@ -1,48 +1,48 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3648B23
-	for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 22:08:14 +0000 (UTC)
-Received: by mail-pf1-f173.google.com with SMTP id v186so2689009pfv.11
-        for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 15:08:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE242F29
+	for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 22:08:15 +0000 (UTC)
+Received: by mail-pf1-f172.google.com with SMTP id v186so2689048pfv.11
+        for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 15:08:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=8zeQ9hV7F5E7+NNg4pgVIkUZOKqYlDcLTsspPPixF/c=;
-        b=Zb557IgIok74brsLU4G+Ij73TbG9/DYRzGwHhWl1kthr9+nS9+lTp/tXTL8ZDAPskr
-         NrIzECCWqa4sHp/c35vTfoYex5YgGTLL5g1TRoDkZIBmS8U8JpLNsigMSUiWYFi+uDbV
-         Vu+s80ol6WG4fjMYyOr7W/blHMNDFwpFLicFp+VNGwNY8aU6pcWU+FhRjNar9fqr+1te
-         Z0XjxiufRZl22uzn+iV4hT1my8eUDq1o0ftF4aq99D20qo4499g/1W1R/pG5fKqnGwUi
-         pZ6ANNHE7WiUOW5K0WEvcdYqItxKo5jMuz/Caqya2ed0MTei5rYeQZGLQTpe7cmAD6w5
-         On7g==
+        bh=UPncq6eUZ2yYPFluqxeXLVJdF3T72EPaF6MeOVk+SwE=;
+        b=EwErohYaqfuMmu3LP4on+njlruoVUXR+5h/akORXo18biUExCGWgJSk/ZbH0tiSAdW
+         5d16SvwdF1vwOfc7RekSFG7we9l6sVJTOXrN/8S/74T6g6tzFEmbOJvyXismiM11M9oJ
+         oFcQ2TzFu80I+eOpgoIERiY53AVOKRU4SPXtwxzcaZO8ZCCM6Xxd8WAKRLhFC/qL65oU
+         iXfMzRE3u9St6IlhBtQlv0eEpj8wS4lK3ekQ2jEmmuC36dxHjYv0QvkBQjKvc+sqBtXY
+         6oal6pSKPKXPXo30oRjoNcPXkCSSJ/VbfjZYV3B+fA17He9ixpLgGwQ65JX2QkYwVz9j
+         F3rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=8zeQ9hV7F5E7+NNg4pgVIkUZOKqYlDcLTsspPPixF/c=;
-        b=YMkDRgLbZsKCx1NFlN82CrklJ3eChh+/iaYRHBE4y7Oa/ABi/j/SUI46p1BlZvthJl
-         jnjZMglDKQ5Ia524bbZ4MSBdsLVHhyHT0OY+9YaNlDHxmRdAjt8EQQVjRtxB6ONDca1b
-         bwt4d53/GbsxGxN2+2p8CyrLnINIHmzosvGqvoJ2Vf51sTNwdGKpZGhxdsZ6gavW1/D5
-         xnygK8FloXziPLbr0KO/ofvAHMNd3IsLePz9VWmfIHoVkm/9+KkUmH8ygOVbA3lZaaa3
-         NBCFL9vYYifxguw06ifi28H0sygP+ZAsqPnwFfwBpy/WJ5Pj9XLBkOQGeE98Q3t0yM2l
-         fxiA==
-X-Gm-Message-State: ACrzQf0v/fDJ/tQ9eAfWnoiEW2ivav8kcqzL+u++I2ZJ/MPHXQLmPDsL
-	ARQvNn9WGfiIY+T86SlEV0Y1RDaps04=
-X-Google-Smtp-Source: AMsMyM7BPEQjJ4CI8tgDfgmvd1QzDjEYzz+cuX965U5RjAbXmUjqI19KyhFCcGsW8ATonY4bBBRC3w==
-X-Received: by 2002:a63:e709:0:b0:438:98e8:d1c with SMTP id b9-20020a63e709000000b0043898e80d1cmr4931458pgi.403.1663884493697;
-        Thu, 22 Sep 2022 15:08:13 -0700 (PDT)
+        bh=UPncq6eUZ2yYPFluqxeXLVJdF3T72EPaF6MeOVk+SwE=;
+        b=xeHCnf4A4SUSwLTLn1MqyyEKVtBMl9rWtvDRpeWaY7a2WI1zOt33S5kWBzicZtSdB3
+         wRwV7yKb+qfwNV/uThRmd52DEffqSAiszLnCWV3vKFW5hMZbIKEPaYs/JkeqUVagOW6e
+         Tw2A8gzSCtIW0mvbvKVs2QYquSp2ACP1XKShljVlG+G59qDyPyNVrVXDnw0xtith+2mm
+         6c0Tddm2zqwu+YnBOhdjWGrD+hrVL5877wKq4ejeHMBrvGUbwIbdvqKmDDAj64baKNGm
+         bc6y7PfCQw+AKLNAZoEia4H5FmxxAN2EVlitdtdADHZtnMHC8rZGG9YPHFEvva1+xVR7
+         8gdA==
+X-Gm-Message-State: ACrzQf1L3/LNHOXzrx9mpPosCe5d00z6xvHH4fVAtzr4gAOEDP8nIuLb
+	TKLEgc4PALrlGtcpHCms9mSm/GmTgJE=
+X-Google-Smtp-Source: AMsMyM4KG5FdNZNGwEe2NWJbzjztfVm6O4a6PGObmFVDvemKdnX6qY9Qa+sLuzo7PexOwfujPYuOaA==
+X-Received: by 2002:a05:6a00:4205:b0:54b:6e95:268e with SMTP id cd5-20020a056a00420500b0054b6e95268emr5762933pfb.50.1663884494545;
+        Thu, 22 Sep 2022 15:08:14 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
         by smtp.gmail.com with ESMTPSA id f15-20020aa7968f000000b005386162bc2asm4980448pfk.92.2022.09.22.15.08.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 15:08:13 -0700 (PDT)
+        Thu, 22 Sep 2022 15:08:14 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 04/11] station: create list of roam candidates
-Date: Thu, 22 Sep 2022 15:08:02 -0700
-Message-Id: <20220922220809.862022-4-prestwoj@gmail.com>
+Subject: [PATCH v5 05/11] netdev: hook in RX for FT-Action/Authentication/Association
+Date: Thu, 22 Sep 2022 15:08:03 -0700
+Message-Id: <20220922220809.862022-5-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220922220809.862022-1-prestwoj@gmail.com>
 References: <20220922220809.862022-1-prestwoj@gmail.com>
@@ -54,227 +54,223 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The current behavior is to only find the best roam candidate, which
-generally is fine. But if for whatever reason IWD fails to roam it
-would be nice having a few backup BSS's rather than having to
-re-scan, or worse disassociate and reconnect entirely.
+This forwards Action, Authentication and Association frames to
+ft.c via their new hooks in netdev.
 
-This patch doesn't change the roam behavior, just prepares for
-using a roam candidate list. One difference though is any roam
-candidates are added to station->bss_list, rather than just the
-best BSS. This shouldn't effect any external behavior.
-
-The candidate list is built based on scan_bss rank. First we establish
-a base rank, the rank of the current BSS (or zero if AP roaming). Any
-BSS in the results with a higher rank, excluding the current BSS, will
-be added to the sorted station->roam_bss_list as well as stations
-overall BSS list. If the resulting list is empty there were no better
-BSS's, otherwise station can now try to roam starting with the best
-candidate (head of the roam list).
+Note that this will break FT-over-Air temporarily since the
+auth-proto still is in use.
 ---
- src/station.c | 76 +++++++++++++++++++++++++++++++--------------------
- 1 file changed, 46 insertions(+), 30 deletions(-)
+ src/netdev.c | 147 ++++++++++++++++++++++-----------------------------
+ 1 file changed, 64 insertions(+), 83 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 868bb725..991c8394 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -107,6 +107,7 @@ struct station {
- 
- 	/* Set of frequencies to scan first when attempting a roam */
- 	struct scan_freq_set *roam_freqs;
-+	struct l_queue *roam_bss_list;
- 
- 	/* Frequencies split into subsets by priority */
- 	struct scan_freq_set *scan_freqs_order[3];
-@@ -1640,6 +1641,8 @@ static void station_roam_state_clear(struct station *station)
- 		scan_freq_set_free(station->roam_freqs);
- 		station->roam_freqs = NULL;
- 	}
-+
-+	l_queue_clear(station->roam_bss_list, NULL);
- }
- 
- static void station_reset_connection_state(struct station *station)
-@@ -1981,6 +1984,8 @@ static void station_roamed(struct station *station)
- 			l_warn("Could not request neighbor report");
- 	}
- 
-+	l_queue_clear(station->roam_bss_list, NULL);
-+
- 	station_ft_ds_action_start(station);
- 
- 	station_enter_state(station, STATION_STATE_CONNECTED);
-@@ -2005,6 +2010,8 @@ static void station_roam_failed(struct station *station)
- {
- 	l_debug("%u", netdev_get_ifindex(station->netdev));
- 
-+	l_queue_clear(station->roam_bss_list, NULL);
-+
- 	/*
- 	 * If we attempted a reassociation or a fast transition, and ended up
- 	 * here then we are now disconnected.
-@@ -2186,8 +2193,7 @@ static void station_preauthenticate_cb(struct netdev *netdev,
- 	station_transition_reassociate(station, bss, new_hs);
- }
- 
--static void station_transition_start(struct station *station,
--							struct scan_bss *bss)
-+static void station_transition_start(struct station *station)
- {
- 	struct handshake_state *hs = netdev_get_handshake(station->netdev);
- 	struct network *connected = station->connected_network;
-@@ -2195,6 +2201,7 @@ static void station_transition_start(struct station *station,
- 	struct handshake_state *new_hs;
- 	struct ie_rsn_info cur_rsne, target_rsne;
+diff --git a/src/netdev.c b/src/netdev.c
+index 22e07145..397b1c4a 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -3192,13 +3192,15 @@ static void netdev_associate_event(struct l_genl_msg *msg,
+ 	const uint8_t *frame = NULL;
+ 	uint16_t status_code = MMPDU_STATUS_CODE_UNSPECIFIED;
  	int ret;
-+	struct scan_bss *bss = l_queue_peek_head(station->roam_bss_list);
++	const struct mmpdu_header *hdr;
++	const struct mmpdu_association_response *assoc;
  
- 	l_debug("%u, target %s", netdev_get_ifindex(station->netdev),
- 			util_address_to_string(bss->addr));
-@@ -2334,12 +2341,10 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 	struct handshake_state *hs = netdev_get_handshake(station->netdev);
- 	struct scan_bss *current_bss = station->connected_bss;
- 	struct scan_bss *bss;
--	struct scan_bss *best_bss = NULL;
--	double best_bss_rank = 0.0;
-+	double cur_bss_rank = 0.0;
- 	static const double RANK_FT_FACTOR = 1.3;
- 	uint16_t mdid;
- 	enum security orig_security, security;
--	bool seen = false;
+ 	l_debug("");
  
- 	if (err) {
- 		station_roam_failed(station);
-@@ -2358,6 +2363,19 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 		ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
- 							&mdid, NULL, NULL);
+ 	if (!netdev->connected || netdev->aborting)
+ 		return;
  
-+	/*
-+	 * Find the current BSS rank, use the updated result if it exists. If
-+	 * this is an AP roam keep the current rank as zero to force the roam
-+	 * to occur.
-+	 */
-+	bss = l_queue_find(bss_list, bss_match_bssid, current_bss->addr);
-+	if (bss && !station->ap_directed_roaming) {
-+		cur_bss_rank = bss->rank;
-+
-+		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
-+			cur_bss_rank *= RANK_FT_FACTOR;
-+	}
-+
- 	/*
- 	 * BSSes in the bss_list come already ranked with their initial
- 	 * association preference rank value.  We only need to add preference
-@@ -2379,9 +2397,8 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 				bss->frequency, bss->rank, bss->signal_strength,
- 				kbps100 / 10, kbps100 % 10);
+-	if (!netdev->ap) {
++	if (!netdev->ap && !netdev->in_ft) {
+ 		netdev->associated = true;
+ 		netdev->in_reassoc = false;
+ 		return;
+@@ -3238,61 +3240,59 @@ static void netdev_associate_event(struct l_genl_msg *msg,
+ 	if (L_WARN_ON(!frame))
+ 		goto assoc_failed;
  
--		/* Skip the BSS we are connected to if doing an AP roam */
--		if (station->ap_directed_roaming && !memcmp(bss->addr,
--				station->connected_bss->addr, 6))
-+		/* Skip the BSS we are connected to */
-+		if (!memcmp(bss->addr, station->connected_bss->addr, 6))
- 			goto next;
- 
- 		/* Skip result if it is not part of the ESS */
-@@ -2395,8 +2412,6 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 		if (security != orig_security)
- 			goto next;
- 
--		seen = true;
+-	if (netdev->ap) {
+-		const struct mmpdu_header *hdr;
+-		const struct mmpdu_association_response *assoc;
 -
- 		if (network_can_connect_bss(network, bss) < 0)
- 			goto next;
+-		hdr = mpdu_validate(frame, frame_len);
+-		if (L_WARN_ON(!hdr))
+-			goto assoc_failed;
+-
+-		assoc = mmpdu_body(hdr);
+-		status_code = L_CPU_TO_LE16(assoc->status_code);
++	hdr = mpdu_validate(frame, frame_len);
++	if (L_WARN_ON(!hdr))
++		goto assoc_failed;
  
-@@ -2408,15 +2423,19 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
- 			rank *= RANK_FT_FACTOR;
+-		ret = auth_proto_rx_associate(netdev->ap, frame, frame_len);
+-		if (ret == 0) {
+-			bool fils = !!(netdev->handshake->akm_suite &
+-					(IE_RSN_AKM_SUITE_FILS_SHA256 |
+-					 IE_RSN_AKM_SUITE_FILS_SHA384 |
+-					 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384 |
+-					 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256));
++	assoc = mmpdu_body(hdr);
++	status_code = L_CPU_TO_LE16(assoc->status_code);
  
--		if (rank > best_bss_rank) {
--			if (best_bss)
--				scan_bss_free(best_bss);
-+		if (rank <= cur_bss_rank)
-+			goto next;
++	if (netdev->ap)
++		ret = auth_proto_rx_associate(netdev->ap, frame,
++							frame_len);
++	else
++		ret = __ft_rx_associate(netdev->index, frame,
++							frame_len);
++	if (ret == 0) {
++		bool fils = !!(netdev->handshake->akm_suite &
++				(IE_RSN_AKM_SUITE_FILS_SHA256 |
++				 IE_RSN_AKM_SUITE_FILS_SHA384 |
++				 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384 |
++				 IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256));
++
++		if (netdev->ap) {
+ 			auth_proto_free(netdev->ap);
+ 			netdev->ap = NULL;
++		}
  
--			best_bss = bss;
--			best_bss_rank = rank;
+-			netdev->sm = eapol_sm_new(netdev->handshake);
+-			eapol_register(netdev->sm);
+-
+-			/* Just in case this was a retry */
+-			netdev->ignore_connect_event = false;
+-
+-			/*
+-			 * If in FT and/or FILS we don't force an initial 4-way
+-			 * handshake and instead just keep the EAPoL state
+-			 * machine for the rekeys.
+-			 */
+-			if (netdev->in_ft || fils)
+-				eapol_sm_set_require_handshake(netdev->sm,
+-								false);
++		netdev->sm = eapol_sm_new(netdev->handshake);
++		eapol_register(netdev->sm);
+ 
+-			netdev->in_ft = false;
+-			netdev->in_reassoc = false;
+-			netdev->associated = true;
+-			return;
+-		} else if (ret == -EAGAIN) {
+-			/*
+-			 * Here to support OWE retries. OWE will retry
+-			 * internally, but a connect event will still be emitted
+-			 */
+-			netdev->ignore_connect_event = true;
+-			return;
+-		} else if (ret > 0)
+-			status_code = (uint16_t)ret;
++		/* Just in case this was a retry */
++		netdev->ignore_connect_event = false;
+ 
+-		goto assoc_failed;
+-	}
 +		/*
-+		 * We need to update/add any potential roam candidate so
-+		 * station/network know it exists.
++		 * If in FT and/or FILS we don't force an initial 4-way
++		 * handshake and instead just keep the EAPoL state
++		 * machine for the rekeys.
 +		 */
-+		station_update_roam_bss(station, bss);
++		if (netdev->in_ft || fils)
++			eapol_sm_set_require_handshake(netdev->sm,
++							false);
  
--			continue;
--		}
-+		l_queue_insert(station->roam_bss_list, bss,
-+				scan_bss_rank_compare, NULL);
-+
-+		continue;
+-	return;
++		netdev->in_ft = false;
++		netdev->in_reassoc = false;
++		netdev->associated = true;
++		return;
++	} else if (ret == -EAGAIN) {
++		/*
++		 * Here to support OWE retries. OWE will retry
++		 * internally, but a connect event will still be emitted
++		 */
++		netdev->ignore_connect_event = true;
++		return;
++	} else if (ret > 0)
++		status_code = (uint16_t)ret;
  
- next:
- 		scan_bss_free(bss);
-@@ -2424,25 +2443,17 @@ next:
+ assoc_failed:
+ 	netdev->result = NETDEV_RESULT_ASSOCIATION_FAILED;
+@@ -4578,49 +4578,25 @@ static void netdev_ft_response_frame_event(const struct mmpdu_header *hdr,
+ 					int rssi, void *user_data)
+ {
+ 	struct netdev *netdev = user_data;
+-	struct netdev_ft_over_ds_info *info;
+-	int ret;
+-	uint16_t status_code = MMPDU_STATUS_CODE_UNSPECIFIED;
+-	const uint8_t *aa;
+-	const uint8_t *spa;
+-	const uint8_t *ies;
+-	size_t ies_len;
+-	struct ft_ds_finder finder;
  
- 	l_queue_destroy(bss_list, NULL);
+ 	if (!netdev->connected)
+ 		return;
  
--	if (!seen)
--		goto fail_free_bss;
+-	ret = ft_over_ds_parse_action_response(body, body_len, &spa, &aa,
+-						&ies, &ies_len);
+-	if (ret < 0)
+-		return;
++	__ft_rx_action(netdev->index, (const uint8_t *)hdr,
++			mmpdu_header_len(hdr) + body_len);
++}
+ 
+-	finder.spa = spa;
+-	finder.aa = aa;
++static void netdev_ft_auth_response_frame_event(const struct mmpdu_header *hdr,
++					const void *body, size_t body_len,
++					int rssi, void *user_data)
++{
++	struct netdev *netdev = user_data;
+ 
+-	info = l_queue_find(netdev->ft_ds_list, match_ft_ds_info, &finder);
+-	if (!info)
++	if (!netdev->connected)
+ 		return;
+ 
+-	/* Lookup successful, now check the status code */
+-	if (ret > 0) {
+-		status_code = (uint16_t)ret;
+-		goto ft_error;
+-	}
 -
- 	/* See if we have anywhere to roam to */
--	if (!best_bss || scan_bss_addr_eq(best_bss, station->connected_bss)) {
-+	if (l_queue_isempty(station->roam_bss_list)) {
- 		station_debug_event(station, "no-roam-candidates");
--		goto fail_free_bss;
-+		goto fail;
- 	}
- 
--	station_update_roam_bss(station, best_bss);
+-	if (!ft_over_ds_parse_action_ies(&info->super, netdev->handshake,
+-						ies, ies_len))
+-		goto ft_error;
 -
--	station_transition_start(station, best_bss);
-+	station_transition_start(station);
- 
- 	return true;
- 
--fail_free_bss:
--	if (best_bss)
--		scan_bss_free(best_bss);
+-	info->parsed = true;
 -
-+fail:
- 	station_roam_failed(station);
- 
- 	return true;
-@@ -4158,6 +4169,8 @@ static struct station *station_create(struct netdev *netdev)
- 
- 	station_set_autoconnect(station, autoconnect);
- 
-+	station->roam_bss_list = l_queue_new();
-+
- 	return station;
+-	return;
+-
+-ft_error:
+-	l_debug("FT-over-DS to "MAC" failed (%d)", MAC_STR(info->super.aa),
+-			status_code);
+-
+-	netdev_ft_over_ds_auth_failed(info, status_code);
++	__ft_rx_authenticate(netdev->index, (const uint8_t *)hdr,
++			mmpdu_header_len(hdr) + body_len);
  }
  
-@@ -4247,6 +4260,8 @@ static void station_free(struct station *station)
+ static void netdev_qos_map_frame_event(const struct mmpdu_header *hdr,
+@@ -5846,6 +5822,7 @@ static void netdev_add_station_frame_watches(struct netdev *netdev)
+ 	static const uint8_t action_sa_query_resp_prefix[2] = { 0x08, 0x01 };
+ 	static const uint8_t action_sa_query_req_prefix[2] = { 0x08, 0x00 };
+ 	static const uint8_t action_ft_response_prefix[] =  { 0x06, 0x02 };
++	static const uint8_t auth_ft_response_prefix[] = { 0x02, 0x00 };
+ 	static const uint8_t action_qos_map_prefix[] = { 0x01, 0x04 };
+ 	uint64_t wdev = netdev->wdev_id;
  
- 	wiphy_state_watch_remove(station->wiphy, station->wiphy_watch);
+@@ -5866,6 +5843,10 @@ static void netdev_add_station_frame_watches(struct netdev *netdev)
+ 			sizeof(action_ft_response_prefix),
+ 			netdev_ft_response_frame_event, netdev, NULL);
  
-+	l_queue_destroy(station->roam_bss_list, NULL);
++	frame_watch_add(wdev, 0, 0x00b0, auth_ft_response_prefix,
++			sizeof(auth_ft_response_prefix),
++			netdev_ft_auth_response_frame_event, netdev, NULL);
 +
- 	l_free(station);
- }
- 
-@@ -4398,10 +4413,11 @@ static bool station_force_roam_scan_notify(int err, struct l_queue *bss_list,
- 
- 	/* The various roam routines expect this to be set from scanning */
- 	station->preparing_roam = true;
-+	l_queue_push_tail(station->roam_bss_list, target);
- 
- 	station_update_roam_bss(station, target);
- 
--	station_transition_start(station, target);
-+	station_transition_start(station);
- 
- 	reply = l_dbus_message_new_method_return(data->pending);
- 
+ 	if (wiphy_supports_qos_set_map(netdev->wiphy))
+ 		frame_watch_add(wdev, 0, 0x00d0, action_qos_map_prefix,
+ 				sizeof(action_qos_map_prefix),
 -- 
 2.34.3
 
