@@ -1,51 +1,48 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEDE2F2E
-	for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 22:08:19 +0000 (UTC)
-Received: by mail-pf1-f171.google.com with SMTP id b23so10593414pfp.9
-        for <iwd@lists.linux.dev>; Thu, 22 Sep 2022 15:08:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD44468B
+	for <iwd@lists.linux.dev>; Mon, 26 Sep 2022 18:52:06 +0000 (UTC)
+Received: by mail-pj1-f46.google.com with SMTP id go6so7152049pjb.2
+        for <iwd@lists.linux.dev>; Mon, 26 Sep 2022 11:52:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=AzrztUuuPCl1EHEXOfJ9BK+/IR+wHu/eLVw69YB/C7M=;
-        b=AGtLLf8gsxuLVEHd+1/5du8hohgbKrZRpHiNHdNn6aqQjZd3ePIHGL0nL8RVTGQaFu
-         mEhgvQ6CRYxnd4MAYe22v2gsu5sl2Ja+5I+LjITSJXK82eoAj+6Ihi8qyVSOWRFW3F4o
-         KcbLBcVBbbMDHip+H7Pl6f9f/H998/SsXyB1G8YUVQ00cJH8SkMFOZOd1NNPTOEiSAyn
-         hghvADsVmGOn9LdF4EqTumrpCqtmdBTwuSgvwgCGTCGIVAPDUClWw154ce9Z/CL773qE
-         Kq9rUwk4pCdZHo8p4u2dTfQ16O7wl/v03gdId4tCP2Hf/OK13GLpIRNR2AfjsKjLfcIH
-         hF/g==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=ITC5IZz3L8Y8JX+F/EmYt4YUsUY5e/AZOpXyj3Az49M=;
+        b=JoacY7NKiNvXFGc4CiiiW4DMpEQWF94ADnlVkQPLqgAP/OXc38mXZWKoua7lTJMjkn
+         ffuvD8/J67+DT1QDKmRee9URDq/2N8keoXs9b6b5xmvYf0wVPJqS9pz8DyC+eo8VcLwv
+         CDw4FFOFc8/OtTJi5EGDHAv1ztltdpX/R2Ee9t3GMd4zhBTqL4cmnH261YeMwSd/x3Ei
+         ubJm4hFO3jIhpvwVdypEWfjUDrWmT0UgMjSSzlPCSS7GIPKc29iTPvaxMO5eoX1tNv8h
+         pqOr4j1xsb9M9dWUykHUpC6d3BYtqSp1hEVRcsAvNdxmVDG0tyZZ0NemGxRrLSfPAUuY
+         LXKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=AzrztUuuPCl1EHEXOfJ9BK+/IR+wHu/eLVw69YB/C7M=;
-        b=geC/FKbCeRIPAZ8DNDboL9goVhV+UeM+MzlbbScU4bRaJj6Vq3jvp3b1hKLajrxelb
-         1Z8NvFRzw16IlHNL6VJ2U8z1gnldjgg1723M4y7DqJrSG1fgcWVbri3Syh+wQpOg7GCx
-         8XguhXs/gG7trpR/rZfdMYz0aqSbAYDETKscwqyOiQuwkX2prOfXGT+yt8TGwUPPc0Uc
-         x062H1ildYLwkxZh2m7P9y4LUr09lsizAJwHnZNBjHkdLrh14rSMslAhF9Td6Mc8hV01
-         qChmiwx6h1+GYyL98EOH6YD+ttDRMYMU1UwY+apLxtFSlz3idv7U2Kj+hrYotAUkXECj
-         P25w==
-X-Gm-Message-State: ACrzQf0+2pmr5kqsEJWwAqwmk/JJ1t+LVZytt5A2OqkzooDr6gXTSkFb
-	4eRA2WXqTDER9NsNYTAGv+LA8liPokI=
-X-Google-Smtp-Source: AMsMyM7rbj9AkL/4Rl+gOcryw6p6UCfd5ClRpSgLEudVkJaJqsUEqRwkZiXq0EP9WEL0vpJh1tQJGg==
-X-Received: by 2002:a63:db54:0:b0:43a:390b:716 with SMTP id x20-20020a63db54000000b0043a390b0716mr4802778pgi.360.1663884498951;
-        Thu, 22 Sep 2022 15:08:18 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=ITC5IZz3L8Y8JX+F/EmYt4YUsUY5e/AZOpXyj3Az49M=;
+        b=NoMlBeIetQNPVEfqIPues6kD67CKs1gsoKN/q+WtfNMh0R8J+8Lx5SP5nwiEKXHn02
+         qM3WCrwLJPLaBAY6qgMJ0qCstSTpVqMxV5jH4GB82GHLxk8KVU88c1IR/3n9rxN/Gmsk
+         8Fx6ESscHPQ/nQL3z3ZHTekgL+K6fdAw7+LI5vhH/+4/SvPWoZGDOlA/RxrzmTjMYwAZ
+         G5bDt728E2RnQ82ADkGys5zzMW9NAtxYhUUS1XsnJDqNkGE4cV+MLVLbs2GSZYVC96oO
+         rReU18P6jMq/lETgDEpW7SBFCreGqFwOXQiIu09rAQ4rM9qdcI/vDa9/BrepzoNv8cKB
+         fVAw==
+X-Gm-Message-State: ACrzQf3p0MYKKi2zN4clHs9vVDqKMOy3kehGE8TdaPjZwDyIwuXRezAP
+	Z+iZiosCjQIO8jMo/ubgm49hRfY3p+4=
+X-Google-Smtp-Source: AMsMyM4mAoW9Jf5OIan7TdRAO0wdY0Cv/6qbKF9NJdnpGM2DfSOV6qHhusdbLtLxNXBTxInP7mWfTA==
+X-Received: by 2002:a17:903:18b:b0:176:afb8:b4ab with SMTP id z11-20020a170903018b00b00176afb8b4abmr23883638plg.80.1664218325648;
+        Mon, 26 Sep 2022 11:52:05 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id f15-20020aa7968f000000b005386162bc2asm4980448pfk.92.2022.09.22.15.08.18
+        by smtp.gmail.com with ESMTPSA id p14-20020a17090b010e00b00202d36b7403sm7111115pjz.25.2022.09.26.11.52.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 15:08:18 -0700 (PDT)
+        Mon, 26 Sep 2022 11:52:05 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 11/11] ft: remove auth-proto/ft_sm
-Date: Thu, 22 Sep 2022 15:08:09 -0700
-Message-Id: <20220922220809.862022-11-prestwoj@gmail.com>
+Subject: [PATCH 1/2] sae: add IWD_SAE_DEBUG for more SAE debug messages
+Date: Mon, 26 Sep 2022 11:52:01 -0700
+Message-Id: <20220926185202.52479-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20220922220809.862022-1-prestwoj@gmail.com>
-References: <20220922220809.862022-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -54,376 +51,200 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is no longer used.
+SAE will now check for IWD_SAE_DEBUG and enable more debug logging
+using the new macro, sae_debug.
 ---
- src/ft.c | 255 +------------------------------------------------------
- src/ft.h |  49 -----------
- 2 files changed, 3 insertions(+), 301 deletions(-)
+ src/sae.c | 70 +++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 58 insertions(+), 12 deletions(-)
 
-diff --git a/src/ft.c b/src/ft.c
-index 7ca9a3f0..3576ab98 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -61,21 +61,6 @@ struct ft_info {
- 	bool parsed : 1;
- };
+diff --git a/src/sae.c b/src/sae.c
+index 859ec94b..cfd4d650 100644
+--- a/src/sae.c
++++ b/src/sae.c
+@@ -37,6 +37,9 @@
+ #include "src/mpdu.h"
+ #include "src/auth-proto.h"
+ #include "src/sae.h"
++#include "src/module.h"
++
++static bool debug;
  
--struct ft_sm {
--	struct auth_proto ap;
--	struct handshake_state *hs;
--
--	ft_tx_authenticate_func_t tx_auth;
--	ft_tx_associate_func_t tx_assoc;
--	ft_get_oci get_oci;
--
--	void *user_data;
--
--	bool over_ds : 1;
--
--	uint8_t prev_bssid[6];
--};
--
- /*
-  * Calculate the MIC field of the FTE and write it directly to that FTE,
-  * assuming it was all zeros before.  See 12.8.4 and 12.8.5.
-@@ -501,79 +486,8 @@ static bool mde_equal(const uint8_t *mde1, const uint8_t *mde2)
- 	return memcmp(mde1, mde1, mde1[1] + 2) == 0;
- }
+ /* SHA-512 is the highest supported hashing function as of 802.11-2020 */
+ #define SAE_MAX_HASH_LEN 64
+@@ -45,6 +48,12 @@
+ #define SAE_SYNC_MAX		3
+ #define SAE_MAX_ASSOC_RETRY	3
  
--bool ft_over_ds_parse_action_ies(struct ft_ds_info *info,
--					struct handshake_state *hs,
--					const uint8_t *ies,
--					size_t ies_len)
--{
--	const uint8_t *mde = NULL;
--	const uint8_t *fte = NULL;
--	bool is_rsn = hs->supplicant_ie != NULL;
--
--	if (parse_ies(hs, info->authenticator_ie, ies, ies_len,
--				&mde, &fte) < 0)
--		return false;
--
--	if (!mde_equal(info->mde, mde))
--		goto ft_error;
--
--	if (is_rsn) {
--		if (!ft_parse_fte(hs, info->snonce, fte, &info->ft_info))
--			goto ft_error;
--
--		info->fte = l_memdup(fte, fte[1] + 2);
--	} else if (fte)
--		goto ft_error;
--
--	return true;
--
--ft_error:
--	return false;
--}
--
--static int ft_process_ies(struct handshake_state *hs, const uint8_t *ies,
--			size_t ies_len)
--{
--	const uint8_t *mde = NULL;
--	const uint8_t *fte = NULL;
--	bool is_rsn = hs->supplicant_ie != NULL;
--
--	/* Check 802.11r IEs */
--	if (!ies)
--		goto ft_error;
--
--	if (parse_ies(hs, hs->authenticator_ie, ies, ies_len,
--				&mde, &fte) < 0)
--		goto ft_error;
--
--	if (!mde_equal(hs->mde, mde))
--		goto ft_error;
--
--	if (is_rsn) {
--		struct ie_ft_info ft_info;
--
--		if (!ft_parse_fte(hs, hs->snonce, fte, &ft_info))
--			goto ft_error;
--
--		handshake_state_set_fte(hs, fte);
--
--		handshake_state_set_anonce(hs, ft_info.anonce);
--
--		handshake_state_set_kh_ids(hs, ft_info.r0khid,
--						ft_info.r0khid_len,
--						ft_info.r1khid);
--
--		handshake_state_derive_ptk(hs);
--	} else if (fte)
--		goto ft_error;
--
--	return 0;
--
--ft_error:
--	return -EBADMSG;
--}
--
--int ft_over_ds_parse_action_response(const uint8_t *frame, size_t frame_len,
-+static int ft_over_ds_parse_action_response(const uint8_t *frame,
-+					size_t frame_len,
- 					const uint8_t **spa_out,
- 					const uint8_t **aa_out,
- 					const uint8_t **ies_out,
-@@ -623,75 +537,6 @@ int ft_over_ds_parse_action_response(const uint8_t *frame, size_t frame_len,
++#define sae_debug(fmat, ...) \
++({	\
++	if (debug) \
++		l_info("[SAE]: "fmat, ##__VA_ARGS__); \
++})
++
+ enum sae_state {
+ 	SAE_STATE_NOTHING = 0,
+ 	SAE_STATE_COMMITTED = 1,
+@@ -154,7 +163,7 @@ static int sae_choose_next_group(struct sae_sm *sm)
+ 			return -ENOENT;
+ 		}
+ 
+-		l_debug("Forcing default SAE group 19");
++		sae_debug("Forcing default SAE group 19");
+ 
+ 		sm->group_retry++;
+ 		sm->group = 19;
+@@ -176,6 +185,8 @@ static int sae_choose_next_group(struct sae_sm *sm)
+ 	sm->group = ecc_groups[sm->group_retry];
+ 
+ get_curve:
++	sae_debug("Using group %u", sm->group);
++
+ 	sm->curve = l_ecc_curve_from_ike_group(sm->group);
+ 
  	return 0;
- }
+@@ -327,6 +338,9 @@ static int sae_reject(struct sae_sm *sm, uint16_t transaction, uint16_t status)
+ 		ptr += 2;
+ 	}
  
--bool ft_over_ds_prepare_handshake(struct ft_ds_info *info,
--					struct handshake_state *hs)
--{
--	if (!hs->supplicant_ie)
--		return true;
--
--	memcpy(hs->snonce, info->snonce, sizeof(hs->snonce));
--
--	handshake_state_set_fte(hs, info->fte);
--
--	handshake_state_set_anonce(hs, info->ft_info.anonce);
--
--	handshake_state_set_kh_ids(hs, info->ft_info.r0khid,
--						info->ft_info.r0khid_len,
--						info->ft_info.r1khid);
--
--	handshake_state_derive_ptk(hs);
--
--	return true;
--}
--
--void ft_ds_info_free(struct ft_ds_info *info)
--{
--	__typeof__(info->free) destroy = info->free;
--
--	if (info->fte)
--		l_free(info->fte);
--
--	if (info->authenticator_ie)
--		l_free(info->authenticator_ie);
--
--	if (destroy)
--		destroy(info);
--}
--
--static int ft_rx_authenticate(struct auth_proto *ap, const uint8_t *frame,
--				size_t frame_len)
--{
--	struct ft_sm *ft = l_container_of(ap, struct ft_sm, ap);
--	uint16_t status_code = MMPDU_STATUS_CODE_UNSPECIFIED;
--	const uint8_t *ies = NULL;
--	size_t ies_len;
--	int ret;
--
--	/*
--	 * Parse the Authentication Response and validate the contents
--	 * according to 12.5.2 / 12.5.4: RSN or non-RSN Over-the-air
--	 * FT Protocol.
--	 */
--	if (!ft_parse_authentication_resp_frame(frame, frame_len, ft->hs->spa,
--						ft->hs->aa, ft->hs->aa,
--						2, &status_code,
--						&ies, &ies_len))
--		goto auth_error;
--
--	/* AP Rejected the authenticate / associate */
--	if (status_code != 0)
--		goto auth_error;
--
--	ret = ft_process_ies(ft->hs, ies, ies_len);
--	if (ret < 0)
--		goto auth_error;
--
--	return ft->get_oci(ft->user_data);
--
--auth_error:
--	return (int)status_code;
--}
--
- int __ft_rx_associate(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
- {
- 	struct netdev *netdev = netdev_find(ifindex);
-@@ -831,36 +676,7 @@ int __ft_rx_associate(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
- 	return 0;
- }
++	sae_debug("Rejecting exchange transaction=%u status=%u",
++			transaction, status);
++
+ 	sm->tx_auth(reject, ptr - reject, sm->user_data);
  
--static int ft_rx_associate(struct auth_proto *ap, const uint8_t *frame,
--				size_t frame_len)
--{
--	struct ft_sm *sm = l_container_of(ap, struct ft_sm, ap);
--
--	return __ft_rx_associate(sm->hs->ifindex, frame, frame_len);
--}
--
--static int ft_rx_oci(struct auth_proto *ap)
--{
--	struct ft_sm *ft = l_container_of(ap, struct ft_sm, ap);
--
--	return ft_tx_reassociate(ft->hs->ifindex, 0, ft->prev_bssid);
--}
--
--static void ft_sm_free(struct auth_proto *ap)
--{
--	struct ft_sm *ft = l_container_of(ap, struct ft_sm, ap);
--
--	l_free(ft);
--}
--
--static bool ft_over_ds_start(struct auth_proto *ap)
--{
--	struct ft_sm *ft = l_container_of(ap, struct ft_sm, ap);
--
--	return ft_tx_reassociate(ft->hs->ifindex, 0, ft->prev_bssid) == 0;
--}
--
--bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
-+static bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
- 				const uint8_t *new_snonce, uint8_t *buf,
- 				size_t *len)
- {
-@@ -932,71 +748,6 @@ bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
+ 	return status;
+@@ -631,6 +645,9 @@ static bool sae_send_confirm(struct sae_sm *sm)
+ 	memcpy(ptr, confirm, r);
+ 	ptr += r;
+ 
++	sae_debug("Sending Confirm to "MAC" sc=%u",
++			MAC_STR(sm->handshake->aa), sm->sc);
++
+ 	sm->tx_auth(body, ptr - body, sm->user_data);
  	return true;
  }
+@@ -827,6 +844,8 @@ static int sae_process_confirm(struct sae_sm *sm, const uint8_t *from,
  
--static bool ft_start(struct auth_proto *ap)
--{
--	struct ft_sm *ft = l_container_of(ap, struct ft_sm, ap);
--	struct handshake_state *hs = ft->hs;
--	struct iovec iov;
--	uint8_t buf[512];
--	size_t len;
--
--	if (!ft_build_authenticate_ies(hs, hs->supplicant_ocvc, hs->snonce,
--					buf, &len))
--		return false;
--
--	iov.iov_base = buf;
--	iov.iov_len = len;
--
--	ft->tx_auth(&iov, 1, ft->user_data);
--
--	return true;
--}
--
--struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
--				ft_tx_authenticate_func_t tx_auth,
--				ft_tx_associate_func_t tx_assoc,
--				ft_get_oci get_oci,
--				void *user_data)
--{
--	struct ft_sm *ft = l_new(struct ft_sm, 1);
--
--	ft->tx_auth = tx_auth;
--	ft->tx_assoc = tx_assoc;
--	ft->get_oci = get_oci;
--	ft->hs = hs;
--	ft->user_data = user_data;
--
--	ft->ap.rx_authenticate = ft_rx_authenticate;
--	ft->ap.rx_associate = ft_rx_associate;
--	ft->ap.start = ft_start;
--	ft->ap.free = ft_sm_free;
--	ft->ap.rx_oci = ft_rx_oci;
--
--	memcpy(ft->prev_bssid, hs->aa, 6);
--
--	return &ft->ap;
--}
--
--struct auth_proto *ft_over_ds_sm_new(struct handshake_state *hs,
--				ft_tx_associate_func_t tx_assoc,
--				void *user_data)
--{
--	struct ft_sm *ft = l_new(struct ft_sm, 1);
--
--	ft->tx_assoc = tx_assoc;
--	ft->hs = hs;
--	ft->user_data = user_data;
--	ft->over_ds = true;
--
--	ft->ap.rx_associate = ft_rx_associate;
--	ft->ap.start = ft_over_ds_start;
--	ft->ap.free = ft_sm_free;
--
--	memcpy(ft->prev_bssid, hs->aa, 6);
--
--	return &ft->ap;
--}
--
- void __ft_set_tx_frame_func(ft_tx_frame_func_t func)
+ 	sm->state = SAE_STATE_ACCEPTED;
+ 
++	sae_debug("Sending Associate to "MAC, MAC_STR(sm->handshake->aa));
++
+ 	sm->tx_assoc(sm->user_data);
+ 
+ 	return 0;
+@@ -844,6 +863,8 @@ static bool sae_send_commit(struct sae_sm *sm, bool retry)
+ 	if (r < 0)
+ 		return false;
+ 
++	sae_debug("Sending Commit to "MAC, MAC_STR(hs->aa));
++
+ 	sm->tx_auth(commit, r, sm->user_data);
+ 
+ 	return true;
+@@ -858,6 +879,8 @@ static bool sae_assoc_timeout(struct auth_proto *ap)
+ 
+ 	sm->assoc_retry++;
+ 
++	sae_debug("Retry Associate to "MAC, MAC_STR(sm->handshake->aa));
++
+ 	sm->tx_assoc(sm->user_data);
+ 
+ 	return true;
+@@ -921,6 +944,8 @@ static int sae_process_anti_clogging(struct sae_sm *sm, const uint8_t *ptr,
+ 		return -EBADMSG;
+ 	}
+ 
++	sae_debug("Processed anti-clogging token");
++
+ 	l_free(sm->token);
+ 	sm->token = l_memdup(ptr, len);
+ 	sm->token_len = len;
+@@ -1036,6 +1061,9 @@ static int sae_verify_committed(struct sae_sm *sm, uint16_t transaction,
+ 			goto reject_unsupp_group;
+ 		}
+ 
++		sae_debug("AP rejected group, trying again with group %u",
++				sm->group);
++
+ 		sm->sync = 0;
+ 		sae_send_commit(sm, false);
+ 
+@@ -1297,8 +1325,6 @@ static int sae_verify_packet(struct sae_sm *sm, uint16_t trans,
+ 				uint16_t status, const uint8_t *frame,
+ 				size_t len)
  {
- 	tx_frame = func;
-diff --git a/src/ft.h b/src/ft.h
-index 0e8c3a90..f3f19599 100644
---- a/src/ft.h
-+++ b/src/ft.h
-@@ -20,7 +20,6 @@
-  *
-  */
+-	l_debug("rx trans=%u, state=%s", trans, sae_state_to_str(sm->state));
+-
+ 	if (trans != SAE_STATE_COMMITTED && trans != SAE_STATE_CONFIRMED)
+ 		return -EBADMSG;
  
--struct handshake_state;
- struct scan_bss;
+@@ -1324,16 +1350,23 @@ static int sae_rx_authenticate(struct auth_proto *ap,
+ 	const struct mmpdu_header *hdr = (const struct mmpdu_header *) frame;
+ 	const struct mmpdu_authentication *auth = mmpdu_body(hdr);
+ 	int ret;
++	uint16_t transaction = L_LE16_TO_CPU(auth->transaction_sequence);
++	uint16_t status = L_LE16_TO_CPU(auth->status);
++
++	sae_debug("Received frame transaction=%u status=%u state=%s",
++			transaction, status, sae_state_to_str(sm->state));
  
- typedef int (*ft_tx_frame_func_t)(uint32_t ifindex, uint16_t frame_type,
-@@ -28,57 +27,9 @@ typedef int (*ft_tx_frame_func_t)(uint32_t ifindex, uint16_t frame_type,
- 					const uint8_t *dest, struct iovec *iov,
- 					size_t iov_len);
+ 	len -= mmpdu_header_len(hdr);
  
--typedef void (*ft_tx_authenticate_func_t)(struct iovec *iov, size_t iov_len,
--					void *user_data);
--
- typedef int (*ft_tx_associate_func_t)(uint32_t ifindex, uint32_t freq,
- 					const uint8_t *prev_bssid,
- 					struct iovec *ie_iov, size_t iov_len);
--typedef int (*ft_get_oci)(void *user_data);
--
--typedef void (*ft_ds_free_func_t)(void *user_data);
--
--struct ft_ds_info {
--	uint8_t spa[6];
--	uint8_t aa[6];
--	uint8_t snonce[32];
--	uint8_t mde[3];
--	uint8_t *fte;
--	uint8_t *authenticator_ie;
--
--	struct ie_ft_info ft_info;
--
--	void (*free)(struct ft_ds_info *s);
--};
--
--void ft_ds_info_free(struct ft_ds_info *info);
--
--bool ft_build_authenticate_ies(struct handshake_state *hs, bool ocvc,
--				const uint8_t *new_snonce, uint8_t *buf,
--				size_t *len);
--
--int ft_over_ds_parse_action_response(const uint8_t *frame, size_t frame_len,
--					const uint8_t **spa_out,
--					const uint8_t **aa_out,
--					const uint8_t **ies_out,
--					size_t *ies_len);
--bool ft_over_ds_parse_action_ies(struct ft_ds_info *info,
--					struct handshake_state *hs,
--					const uint8_t *ies,
--					size_t ies_len);
--
--struct auth_proto *ft_over_air_sm_new(struct handshake_state *hs,
--				ft_tx_authenticate_func_t tx_auth,
--				ft_tx_associate_func_t tx_assoc,
--				ft_get_oci get_oci,
--				void *user_data);
--
--struct auth_proto *ft_over_ds_sm_new(struct handshake_state *hs,
--				ft_tx_associate_func_t tx_assoc,
--				void *user_data);
--
--bool ft_over_ds_prepare_handshake(struct ft_ds_info *info,
--					struct handshake_state *hs);
+-	ret = sae_verify_packet(sm, L_LE16_TO_CPU(auth->transaction_sequence),
+-					L_LE16_TO_CPU(auth->status),
+-					auth->ies, len - 6);
+-	if (ret != 0)
++	ret = sae_verify_packet(sm, transaction, status, auth->ies, len - 6);
++	if (ret != 0) {
++		if (ret < 0 && ret != -EAGAIN)
++			sae_debug("Frame did not verify (%s)", strerror(-ret));
++
+ 		return ret;
++	}
  
- void __ft_set_tx_frame_func(ft_tx_frame_func_t func);
- void __ft_set_tx_associate_func(ft_tx_associate_func_t func);
+-	switch (L_LE16_TO_CPU(auth->transaction_sequence)) {
++	switch (transaction) {
+ 	case SAE_STATE_COMMITTED:
+ 		return sae_process_commit(sm, hdr->address_2, auth->ies,
+ 						len - 6);
+@@ -1341,8 +1374,7 @@ static int sae_rx_authenticate(struct auth_proto *ap,
+ 		return sae_process_confirm(sm, hdr->address_2, auth->ies,
+ 						len - 6);
+ 	default:
+-		l_error("invalid transaction sequence %u",
+-				L_LE16_TO_CPU(auth->transaction_sequence));
++		l_error("invalid transaction sequence %u", transaction);
+ 	}
+ 
+ 	/* should never get here */
+@@ -1442,12 +1474,26 @@ struct auth_proto *sae_sm_new(struct handshake_state *hs,
+ 						hs->authenticator_rsnxe;
+ 
+ 	if (ie_rsnxe_capable(rsnxe, IE_RSNX_SAE_H2E) && hs->ecc_sae_pts) {
+-		l_debug("Using SAE H2E");
++		sae_debug("Using SAE H2E");
+ 		sm->sae_type = CRYPTO_SAE_HASH_TO_ELEMENT;
+ 	} else {
+-		l_debug("Using SAE Hunting and Pecking");
++		sae_debug("Using SAE Hunting and Pecking");
+ 		sm->sae_type = CRYPTO_SAE_LOOPING;
+ 	}
+ 
+ 	return &sm->ap;
+ }
++
++static int sae_init(void)
++{
++	if (getenv("IWD_SAE_DEBUG"))
++		debug = true;
++
++	return 0;
++}
++
++static void sae_exit(void)
++{
++}
++
++IWD_MODULE(sae, sae_init, sae_exit);
 -- 
 2.34.3
 
