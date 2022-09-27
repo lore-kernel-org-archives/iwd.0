@@ -1,48 +1,51 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538404C86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE27E4C94
 	for <iwd@lists.linux.dev>; Tue, 27 Sep 2022 23:15:54 +0000 (UTC)
-Received: by mail-pj1-f46.google.com with SMTP id u59-20020a17090a51c100b00205d3c44162so188866pjh.2
+Received: by mail-pf1-f171.google.com with SMTP id y136so11015645pfb.3
         for <iwd@lists.linux.dev>; Tue, 27 Sep 2022 16:15:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=3qUJWxkBTbbULDpAU1gBxkyt9fcNcfCyWjdRtPurZ6M=;
-        b=JLI4O3UZOdT9Vhoyjp1pRwiXQwDqDZ1H4aikV+4T7jfQN3Mr/20pXGFk/zeWARusmW
-         m0wgqsFBYZmpja4unOtNJI/DP0gK/XdOadyBrhxFF31iZZwp6f/yqHJT2zQ8Lv+zp4A6
-         +1dKXSLNR5Hhp0+L1TFRBLSOKmqVjke7QSMQ+46CeQUGSQcVlWrTdOrp8pG+C3rCIp2e
-         5y1qTE0OLqpou5+69OjVkf1l/wQDPrB2oqhHf/+EwBvyeM1bbY9lAOkOHwNK6WVAat+l
-         fiCLkesBQOh7Yt6klbqN1gUNnOJ+37jgwEiL4wZ34y21xXTb5ytt86num6+IcauwEqZd
-         7KAQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=zI8Rbuhn8/NNo0p64mmMtHrGsxh0kBUjMQn/xfXf5dk=;
+        b=M1ZhQFKLxEGqxLBlb/mRpvzaXR5QDefXG+m553QUXQs2BGfD11NBClKvUWF37TyD5Q
+         zzyKNiHwjKdmaT9PcTcNFeYH9Vtd50VKTM5J43d7MRW1coUjirm34ce9AcOCWQz1gsZe
+         MPQCbRFzFnW4/Q51TEO+z4Ml1vnww4udvt/zvRsm++eCW97jGBuVWx0FTaJKQaVMbymt
+         e+NEC2JI9g2lWvqI6tUT9gjcahze9viwi5kS3b62Ze7V7NADzEwTE9va1wkF+hUpuNv6
+         idqVtXcKIvA5h6Ri15QgO8tWoMeAcq0+OhOVkHIxd1tqUAgcgTseFjMLaWKfI2dpQVta
+         xqkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=3qUJWxkBTbbULDpAU1gBxkyt9fcNcfCyWjdRtPurZ6M=;
-        b=cakKs9eJ15nE4JHTxi2qHBYmIUTJz31K0aVMvr6/9SlYPxnjbDVtcGFRM2GM6sFcWh
-         zk8kk5Pzs8L+4Lb1CKTJad3pNELpzw81QLxTPcaziFaWCbuUGSVQicvqcGhKc2AlpPXQ
-         1lyKLZoegEPkpharmoBIzAdOeJL7IbPPEARMZ7YJ8r33LQVKPXnCXVfDjXdz2YyaYV3e
-         biiiTYWT+gvXg60DP8+6ZBYeMddA/j2i80TQxrekuaxFn+sTc2NRqWQdwW0LGZ0ztWdG
-         /9TWsL276AQfHM6xu45qpJWeX0sBLMv3jKpv8ctVLPgUG+2XuwH4fw8KVfK5Ao4zUl6d
-         eEUg==
-X-Gm-Message-State: ACrzQf1oTpvTVHaWVcKOqgilHil62kHI9RZSpf2MK5Xwyu15H9cFNR+0
-	GJALTHZMY7aKODV9aO/XX6kTlRQc5MI=
-X-Google-Smtp-Source: AMsMyM7e15ZsekOovvbBCtJTP31LGX9yGNlNdCaOCTJrDfuwxQHTFUswyWnFXRF+IzqnKdsoeqoZ3w==
-X-Received: by 2002:a17:90a:1b43:b0:203:70c0:9f60 with SMTP id q61-20020a17090a1b4300b0020370c09f60mr6873781pjq.184.1664320553388;
-        Tue, 27 Sep 2022 16:15:53 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=zI8Rbuhn8/NNo0p64mmMtHrGsxh0kBUjMQn/xfXf5dk=;
+        b=5R3Gq7fAlRfgJ6zaQSkWBatEtWI5oO+eyFrD1+fOrNVUa2Kt7T7Pib0snzhC3broen
+         hn4vpkHVvUOT6rAacKI2XnVvCYN4DJBvZc4qlIu1W+q31ftMU4wd7LpU1oGE6oVTUuT9
+         GzepA8tzrKjE2vggQe+NSfMDL1m8/tvTWRseHIf3q0bD2XVH+DFn6G8qODJqU/MGuoLl
+         NwHDhojfeRPEmcLapsMHn1IGkWlhJq5LFL6RECeESHfjo36P1PMDVF4gjrRI4r1SxTPD
+         1f/AFPnvKrlqWxYzPDGNtAz2b+stKUDdobKWhU8g5pDjQsodLyXQY/DiC61d0ym3nEZ3
+         3mQw==
+X-Gm-Message-State: ACrzQf3KPbzeX/qfSG2d7YO+usAPSEjAaXEfw0lNfvwN5yUUSyziTtoi
+	lyVGEjGZcJLOln8Uum+SABMe6CRghaE=
+X-Google-Smtp-Source: AMsMyM4Ricp4LtnxJZfoqhLKrgjyvmXO3NY4YvPOH3+53iQ0E54KW/zpR6288vXsRJjepObKAcPt9g==
+X-Received: by 2002:a05:6a00:190d:b0:550:6db3:b9be with SMTP id y13-20020a056a00190d00b005506db3b9bemr31795654pfi.1.1664320554172;
+        Tue, 27 Sep 2022 16:15:54 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id c67-20020a624e46000000b0053eec4bb1b1sm2345349pfb.64.2022.09.27.16.15.52
+        by smtp.gmail.com with ESMTPSA id c67-20020a624e46000000b0053eec4bb1b1sm2345349pfb.64.2022.09.27.16.15.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 27 Sep 2022 16:15:53 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/3] station: handle ROAMING state in disconnect event
-Date: Tue, 27 Sep 2022 16:15:47 -0700
-Message-Id: <20220927231549.310800-1-prestwoj@gmail.com>
+Subject: [PATCH 2/3] ft: clear ft_info inside offchannel destroy
+Date: Tue, 27 Sep 2022 16:15:48 -0700
+Message-Id: <20220927231549.310800-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20220927231549.310800-1-prestwoj@gmail.com>
+References: <20220927231549.310800-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,38 +54,54 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This both adds proper handling to the new roaming logic and fixes
-a potential bug with firmware roams.
-
-The new way roaming works doesn't use a connect callback. This
-means that any disconnect event or call to netdev_connect_failed
-will result in the event handler being called, where before the
-connect callback would. This means we need to handle the ROAMING
-state in the station disconnect event so IWD properly disassociates
-and station goes out of ROAMING.
-
-With firmware roams netdev gets an event which transitions station
-into ROAMING. Then netdev issues GET_SCAN. During this time a
-disconnect event could come in which would end up in
-station_disconnect_event since there is no connect callback. This
-needs to be handled the same and let IWD transition out of the
-ROAMING state.
+Once offchannel completes we can check if the info structure was
+parsed, indicating authentication succeeded. If not there is no
+reason to keep it around since IWD will either try another BSS or
+fail.
 ---
- src/station.c | 1 +
- 1 file changed, 1 insertion(+)
+ src/ft.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 4e07ef19..c3f3b383 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3172,6 +3172,7 @@ static void station_disconnect_event(struct station *station, void *event_data)
- 					event_data, station);
+diff --git a/src/ft.c b/src/ft.c
+index 72c42309..5b53810a 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -960,18 +960,17 @@ void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
+ 					&status, &ies, &ies_len))
  		return;
- 	case STATION_STATE_CONNECTED:
-+	case STATION_STATE_ROAMING:
- 		station_disassociated(station);
- 		return;
- 	default:
+ 
+-	/* Verified to be expected target, offchannel can be canceled */
+-	offchannel_cancel(netdev_get_wdev_id(netdev), info->offchannel_id);
+-
+ 	if (status != 0)
+-		return;
++		goto cancel;
+ 
+ 	if (!ft_parse_ies(info, hs, ies, ies_len))
+-		return;
++		goto cancel;
+ 
+ 	info->parsed = true;
+ 
+-	return;
++cancel:
++	/* Verified to be expected target, offchannel can be canceled */
++	offchannel_cancel(netdev_get_wdev_id(netdev), info->offchannel_id);
+ }
+ 
+ static void ft_send_authenticate(void *user_data)
+@@ -1007,6 +1006,11 @@ static void ft_authenticate_destroy(int error, void *user_data)
+ 	struct ft_info *info = user_data;
+ 
+ 	info->offchannel_id = 0;
++
++	if (!info->parsed) {
++		l_queue_remove(info_list, info);
++		ft_info_destroy(info);
++	}
+ }
+ 
+ /*
 -- 
 2.34.3
 
