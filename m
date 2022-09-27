@@ -1,84 +1,88 @@
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA1D4C64
-	for <iwd@lists.linux.dev>; Tue, 27 Sep 2022 22:39:24 +0000 (UTC)
-Received: by mail-oi1-f175.google.com with SMTP id s125so13508280oie.4
-        for <iwd@lists.linux.dev>; Tue, 27 Sep 2022 15:39:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538404C86
+	for <iwd@lists.linux.dev>; Tue, 27 Sep 2022 23:15:54 +0000 (UTC)
+Received: by mail-pj1-f46.google.com with SMTP id u59-20020a17090a51c100b00205d3c44162so188866pjh.2
+        for <iwd@lists.linux.dev>; Tue, 27 Sep 2022 16:15:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=1nFuZvfCDuxRIPoOTDi9totiXw2ZKiN3h5D1vZrnXfQ=;
-        b=RisaBoiF96N+0dIZJT4qSaqiXI8Chxco0DYWrWhDkrXJCtl24njDYJrpIJZNDfwNpX
-         kiwDGnHbbhv2PD0SaTq3VqHOrMac10wcSpasoUdaHDGVx9aZSdP/PWFbdZ7757vQsgW3
-         Hc7v64cqrrl5w7fdNhQVRtsZmjzI9oPL1lXn778eOmkVpL7reoQASZ9JfYp8Ec94yT1b
-         wYiKdgTImz1aBNWT1mK78iggCJp1sk/+u2O/+Cnwhkv5t6ty6xrjF0zElv/2xwnKz5AX
-         jkcTKQRQoQLGigsn20En0MrGG64p6GuBPedhIKfBGI6xG1FA2/ejaflH8Ksi+vTRAhLR
-         DrMw==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=3qUJWxkBTbbULDpAU1gBxkyt9fcNcfCyWjdRtPurZ6M=;
+        b=JLI4O3UZOdT9Vhoyjp1pRwiXQwDqDZ1H4aikV+4T7jfQN3Mr/20pXGFk/zeWARusmW
+         m0wgqsFBYZmpja4unOtNJI/DP0gK/XdOadyBrhxFF31iZZwp6f/yqHJT2zQ8Lv+zp4A6
+         +1dKXSLNR5Hhp0+L1TFRBLSOKmqVjke7QSMQ+46CeQUGSQcVlWrTdOrp8pG+C3rCIp2e
+         5y1qTE0OLqpou5+69OjVkf1l/wQDPrB2oqhHf/+EwBvyeM1bbY9lAOkOHwNK6WVAat+l
+         fiCLkesBQOh7Yt6klbqN1gUNnOJ+37jgwEiL4wZ34y21xXTb5ytt86num6+IcauwEqZd
+         7KAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=1nFuZvfCDuxRIPoOTDi9totiXw2ZKiN3h5D1vZrnXfQ=;
-        b=E8HEbkNv5HJ7kZikzC2O+/9GF2Kxat2YApjIsoqW75AsIiJryMsSvgXznMJ5OaOyOV
-         cRtspIQNon7v0hGGRiKoZ27m8YTBgJVXfrw3eq9evqz82i/v1O6D9I4n0hdlbzc/zVCC
-         pWo+doOI2NT4zLXoQTUNUPh9Fq8QmW1/rlVnVtLpfMROu8ylqmoh/orxtryvglxM0m8b
-         alav4KI9OzZkmrthBgGZbsqnq3gP6L2P/EikFVAC+9iix2BwrbYacE5JqRkb5DCngyGG
-         N+bbCteQXsglme9r74nwA3urWsDvYhJ+zfUYghc1zcrP/jrtP6CIlOjaEI5WowFMgMp1
-         GGEw==
-X-Gm-Message-State: ACrzQf1nJqT2YCuKP/puckqUkJv0vwt5sqEUwLvydURVbMv8LcNP2dS/
-	D9J+3wI6eYW/LCTxJupkCji97UMAMbs=
-X-Google-Smtp-Source: AMsMyM76iImABSLmXjyEpDZt/SknUY1okhCguIEaUHGJwwKQOgZIUuVUycvy+fLWV+lHUm433zdQLg==
-X-Received: by 2002:a05:6808:1312:b0:350:6c53:4d91 with SMTP id y18-20020a056808131200b003506c534d91mr2777017oiv.264.1664318363408;
-        Tue, 27 Sep 2022 15:39:23 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id b7-20020a4ab487000000b0044b22632d51sm1140867ooo.2.2022.09.27.15.39.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Sep 2022 15:39:23 -0700 (PDT)
-Message-ID: <78b164f3-66a2-e66e-539d-fe8e219a2c1a@gmail.com>
-Date: Tue, 27 Sep 2022 17:39:22 -0500
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=3qUJWxkBTbbULDpAU1gBxkyt9fcNcfCyWjdRtPurZ6M=;
+        b=cakKs9eJ15nE4JHTxi2qHBYmIUTJz31K0aVMvr6/9SlYPxnjbDVtcGFRM2GM6sFcWh
+         zk8kk5Pzs8L+4Lb1CKTJad3pNELpzw81QLxTPcaziFaWCbuUGSVQicvqcGhKc2AlpPXQ
+         1lyKLZoegEPkpharmoBIzAdOeJL7IbPPEARMZ7YJ8r33LQVKPXnCXVfDjXdz2YyaYV3e
+         biiiTYWT+gvXg60DP8+6ZBYeMddA/j2i80TQxrekuaxFn+sTc2NRqWQdwW0LGZ0ztWdG
+         /9TWsL276AQfHM6xu45qpJWeX0sBLMv3jKpv8ctVLPgUG+2XuwH4fw8KVfK5Ao4zUl6d
+         eEUg==
+X-Gm-Message-State: ACrzQf1oTpvTVHaWVcKOqgilHil62kHI9RZSpf2MK5Xwyu15H9cFNR+0
+	GJALTHZMY7aKODV9aO/XX6kTlRQc5MI=
+X-Google-Smtp-Source: AMsMyM7e15ZsekOovvbBCtJTP31LGX9yGNlNdCaOCTJrDfuwxQHTFUswyWnFXRF+IzqnKdsoeqoZ3w==
+X-Received: by 2002:a17:90a:1b43:b0:203:70c0:9f60 with SMTP id q61-20020a17090a1b4300b0020370c09f60mr6873781pjq.184.1664320553388;
+        Tue, 27 Sep 2022 16:15:53 -0700 (PDT)
+Received: from jprestwo-xps.none ([50.54.173.139])
+        by smtp.gmail.com with ESMTPSA id c67-20020a624e46000000b0053eec4bb1b1sm2345349pfb.64.2022.09.27.16.15.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Sep 2022 16:15:53 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] station: handle ROAMING state in disconnect event
+Date: Tue, 27 Sep 2022 16:15:47 -0700
+Message-Id: <20220927231549.310800-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v6 01/11] ft: netdev: prep for FT isolation into ft.c
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20220927194731.269732-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220927194731.269732-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+This both adds proper handling to the new roaming logic and fixes
+a potential bug with firmware roams.
 
-On 9/27/22 14:47, James Prestwood wrote:
-> Currently netdev handles caching FT auth information and uses FT
-> parsers/auth-proto to manage the protocol. This sets up to remove
-> this state machine from netdev and isolate it into ft.c.
-> 
-> This does not break the existing auth-proto (hence the slight
-> modifications, which will be removed soon).
-> 
-> Eventually the auth-proto will be removed from FT entirely, replaced
-> just by an FT state machine, similar to how EAPoL works (netdev hooks
-> to TX/RX frames).
-> ---
->   src/ft.c     | 319 ++++++++++++++++++++++++++++++++++++++++++++++++---
->   src/ft.h     |  22 +++-
->   src/netdev.c |  29 +++--
->   3 files changed, 337 insertions(+), 33 deletions(-)
-> 
+The new way roaming works doesn't use a connect callback. This
+means that any disconnect event or call to netdev_connect_failed
+will result in the event handler being called, where before the
+connect callback would. This means we need to handle the ROAMING
+state in the station disconnect event so IWD properly disassociates
+and station goes out of ROAMING.
 
-All applied, thanks.
+With firmware roams netdev gets an event which transitions station
+into ROAMING. Then netdev issues GET_SCAN. During this time a
+disconnect event could come in which would end up in
+station_disconnect_event since there is no connect callback. This
+needs to be handled the same and let IWD transition out of the
+ROAMING state.
+---
+ src/station.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Regards,
--Denis
+diff --git a/src/station.c b/src/station.c
+index 4e07ef19..c3f3b383 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3172,6 +3172,7 @@ static void station_disconnect_event(struct station *station, void *event_data)
+ 					event_data, station);
+ 		return;
+ 	case STATION_STATE_CONNECTED:
++	case STATION_STATE_ROAMING:
+ 		station_disassociated(station);
+ 		return;
+ 	default:
+-- 
+2.34.3
 
