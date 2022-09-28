@@ -1,48 +1,51 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A5281F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBCD46AA
 	for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 16:36:41 +0000 (UTC)
-Received: by mail-pj1-f46.google.com with SMTP id r8-20020a17090a560800b00205eaaba073so2169782pjf.1
+Received: by mail-pg1-f174.google.com with SMTP id u69so12711206pgd.2
         for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 09:36:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=Lf/Sq4Zhn844p9dx0dFvi3fLZvsVq7BikkxvwICxJ2M=;
-        b=M4X9/TMtmr09/GAtdNjj4l+o4xm3WjEgw0y6PC7/dVLMpRwnI+7pUew/UOSG1BT+wb
-         TGxMZuf/hFmsElOmLL4N7lZTIU/7HAHeGWu51iNSfv+OhGl6VdBCn4fah27sPHccWwIF
-         tCsLZqKvl8x8LVBl5kvlF10pyrhXeO1no8KXfNEjqHOxupB3mGtdt2VoGg25f8f4Y3DO
-         7V3eW4L8cFOovNbLj7RoAIjyh1RK55kMQIqWFuJ+Nl8UMb2t9dk6N4WhhIWZTwCGkkJX
-         uVIJsslYyG9OZ6RZYz7zZRgR54UcXIH2lK5xtxcw0kpno0q5HIWtwdCzXtbs6hdUF0Hn
-         hW7Q==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=AyRGKycpPWdRLjuC6nbJno10yBdQV0z8McSGx2OKtx8=;
+        b=SSM0jGyjUi1oil26W8aVHGflY2RW0p+MOdeXHXrLhwguaq6fQysXGxo+qxILqRqD62
+         pa6RfkATIQfmLQ97cDyX5E9Aj/StAOh7IKYs6XmfLXjZW8yOXuUOk4Fok7+BQhFVIAgO
+         WLZudwkFS1edF69AcREnZGRMzCr+bjrO6TcAIhg2e/yWwdI+oZ9iRWkir9/Fr7dkQHuf
+         IG98FuTr1Q7ynt9uPVQP7W8bJrNs3TrFn69Q4++QHZTp/w7TfEzJaZs0X4V8qYZtNJwW
+         54KQzjkkiZmhrasJ0Sib7PhFne5WoL5Ghoacr9kfeanZwp9Q380S9oSvA35XUHzP6vsd
+         b2Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=Lf/Sq4Zhn844p9dx0dFvi3fLZvsVq7BikkxvwICxJ2M=;
-        b=gJ2G6HLbHmeWGNzhWJBpwJwUViCh+vU2Lq7h3HB569Ul5Weqq24t0iqQhewcXeA8EU
-         IIFr6JhYFZJIXbc4/oUWB4zLvWPgLf88JV1+jbHwAVXMCisNp+zVmDUi13N6RECs/zVc
-         wtSfF1t0A5kEiv3MapMXfu1hYYfdIASMG0E8dUcZR0euLKa4kkdlPJ8lAN1cwBZYkash
-         RbZrr2aikTG+02n4QWiN6XzFJgjEGB+VQDs6JMGGKMJaObPKfDqUeG2zmuJC8VQxJHS2
-         SDsEscNnguXvvyE8ehd/5c3Xde5JzqLSYfDtflZ6pZyhKDoR+35cvJtRUhIqVMHYXx4R
-         EX5Q==
-X-Gm-Message-State: ACrzQf0Ox+ladMHHlxfq6oUd8jO7yV6Kr+alv1TCOhYhw3/aMMqOqf1R
-	SIWSgTnjGsL/8XevffaG/YJCg0diI90=
-X-Google-Smtp-Source: AMsMyM52RA+a9Zz+GgmcK01mCeEpzk91FKE7wxnuYsT6cdgNiOtU1A12mpByuTdaKqtyh680X0+6Cg==
-X-Received: by 2002:a17:902:9a8b:b0:17a:455:d967 with SMTP id w11-20020a1709029a8b00b0017a0455d967mr658362plp.52.1664383000714;
-        Wed, 28 Sep 2022 09:36:40 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=AyRGKycpPWdRLjuC6nbJno10yBdQV0z8McSGx2OKtx8=;
+        b=5qQkdTv9PEi+YrhnA5bvjI+X5OtmtbZH3GecTSFg29rrJPek+krUPghl6F0lasUYtC
+         pKyeFTUMNniFneO6p9e/AGvAaetFnt5PSUXNFs7RsZnvw9C7J9DMIQ0iCxGpFS+MjQlp
+         Dx3niioF7KwVq5E0LElgIQumEI09LESslX9Uth1rX1/WxKuHtf7AouTmVay/cAohIG+0
+         Wd8MpKnIAsHGmllMJILu6notra6ZX0AiQSCgzw+SA8KZ+HtqGHpASRji83idqovbnlsO
+         R3nYVT9Jm4IpZD2xC48abh5/mWSrAvrp/6sNdzEVCjZ03PkUEhV2VMfdbs26V+wQDZZR
+         qd/g==
+X-Gm-Message-State: ACrzQf0tIzht/bH2pNqSrCBYO2a+3EO8WBbEvkbrdidrvsSRhhq3uQ4o
+	tg+5S+WWPzpxHG0AoT7gFkKR0pbYB1Q=
+X-Google-Smtp-Source: AMsMyM7RlL7DBO1s1UsXjjHY0U8RHHmKNSR1ecY/3evXko92sb3pOb1yceio4ISRwsknQFjpOBLb2A==
+X-Received: by 2002:a63:4752:0:b0:439:5dcc:fd78 with SMTP id w18-20020a634752000000b004395dccfd78mr29022655pgk.104.1664383001225;
+        Wed, 28 Sep 2022 09:36:41 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id lb12-20020a17090b4a4c00b00205fafa6768sm661184pjb.6.2022.09.28.09.36.39
+        by smtp.gmail.com with ESMTPSA id lb12-20020a17090b4a4c00b00205fafa6768sm661184pjb.6.2022.09.28.09.36.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 09:36:40 -0700 (PDT)
+        Wed, 28 Sep 2022 09:36:41 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/6] station: reorder AP roam logic
-Date: Wed, 28 Sep 2022 09:36:32 -0700
-Message-Id: <20220928163637.344656-1-prestwoj@gmail.com>
+Subject: [PATCH 2/6] auto-t: set disassociation imminent for bss transitions
+Date: Wed, 28 Sep 2022 09:36:33 -0700
+Message-Id: <20220928163637.344656-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20220928163637.344656-1-prestwoj@gmail.com>
+References: <20220928163637.344656-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,86 +54,36 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There are a few checks that can be done prior to parsing the
-request, in addition the explicit check for preparing_roam was
-removed since this is taken care of by station_cannot_roam().
+Allow the caller to set the disassociation imminent bit when
+sending the BSS transition request.
 ---
- src/station.c | 55 +++++++++++++++++++++++----------------------------
- 1 file changed, 25 insertions(+), 30 deletions(-)
+ autotests/util/hostapd.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/src/station.c b/src/station.c
-index 4e07ef19..061e8747 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2763,6 +2763,31 @@ static void station_ap_directed_roam(struct station *station,
- 	if (station_cannot_roam(station))
- 		return;
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index d6c13e2b..bb27686f 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -199,7 +199,7 @@ class HostapdCLI(object):
+         cmd = self.cmdline + ['remove_neighbor', addr]
+         ctx.start_process(cmd).wait()
  
-+	if (station->state != STATION_STATE_CONNECTED) {
-+		l_debug("roam: unexpected AP directed roam -- ignore");
-+		return;
-+	}
+-    def send_bss_transition(self, device, nr_list):
++    def send_bss_transition(self, device, nr_list, disassoc_imminent=True):
+         # Send a BSS transition to a station (device). nr_list should be an
+         # array of tuples containing the BSS address and neighbor report.
+         # Parsing the neighbor report is a bit ugly but it makes it more
+@@ -207,6 +207,10 @@ class HostapdCLI(object):
+         # string could be used in both API's.
+         pref = 1
+         cmd = self.cmdline + ['bss_tm_req', device]
 +
-+	/*
-+	 * Sanitize the frame to check that it is from our current AP.
-+	 *
-+	 * 802.11-2020 Section 9.3.3.1 about Address2:
-+	 * "If the STA is an AP with dot11MultiBSSDImplemented set to false,
-+	 * then this address is the BSSID."
-+	 *
-+	 * Address3:
-+	 * "If the STA is an AP or PCP, the Address 3 field is the same as the
-+	 * Address 2 field."
-+	 *
-+	 * For now check that Address2 & Address3 is the same as the connected
-+	 * BSS address.
-+	 */
-+	if (memcmp(hdr->address_2, station->connected_bss, ETH_ALEN) ||
-+			memcmp(hdr->address_2, hdr->address_3, ETH_ALEN)) {
-+		l_debug("roam: AP directed roam not from our AP -- ignore");
-+		return;
-+	}
++        if disassoc_imminent:
++            cmd.append('disassoc_imminent=1')
 +
- 	if (body_len < 7)
- 		goto format_error;
- 
-@@ -2816,36 +2841,6 @@ static void station_ap_directed_roam(struct station *station,
- 		pos += url_len;
- 	}
- 
--	if (station->state != STATION_STATE_CONNECTED) {
--		l_debug("roam: unexpected AP directed roam -- ignore");
--		return;
--	}
--
--	/*
--	 * Sanitize the frame to check that it is from our current AP.
--	 *
--	 * 802.11-2020 Section 9.3.3.1 about Address2:
--	 * "If the STA is an AP with dot11MultiBSSDImplemented set to false,
--	 * then this address is the BSSID."
--	 *
--	 * Address3:
--	 * "If the STA is an AP or PCP, the Address 3 field is the same as the
--	 * Address 2 field."
--	 *
--	 * For now check that Address2 & Address3 is the same as the connected
--	 * BSS address.
--	 */
--	if (memcmp(hdr->address_2, station->connected_bss, ETH_ALEN) ||
--			memcmp(hdr->address_2, hdr->address_3, ETH_ALEN)) {
--		l_debug("roam: AP directed roam not from our AP -- ignore");
--		return;
--	}
--
--	if (station->preparing_roam) {
--		l_debug("roam: roam attempt already in progress -- ignore");
--		return;
--	}
--
- 	station->ap_directed_roaming = true;
- 	station->preparing_roam = true;
- 
+         for i in nr_list:
+             addr = i[0]
+             nr = i[1]
 -- 
 2.34.3
 
