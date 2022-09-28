@@ -1,48 +1,48 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBCD46AA
-	for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 16:36:41 +0000 (UTC)
-Received: by mail-pg1-f174.google.com with SMTP id u69so12711206pgd.2
-        for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 09:36:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A1646AB
+	for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 16:36:42 +0000 (UTC)
+Received: by mail-pf1-f172.google.com with SMTP id l65so12981775pfl.8
+        for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 09:36:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=AyRGKycpPWdRLjuC6nbJno10yBdQV0z8McSGx2OKtx8=;
-        b=SSM0jGyjUi1oil26W8aVHGflY2RW0p+MOdeXHXrLhwguaq6fQysXGxo+qxILqRqD62
-         pa6RfkATIQfmLQ97cDyX5E9Aj/StAOh7IKYs6XmfLXjZW8yOXuUOk4Fok7+BQhFVIAgO
-         WLZudwkFS1edF69AcREnZGRMzCr+bjrO6TcAIhg2e/yWwdI+oZ9iRWkir9/Fr7dkQHuf
-         IG98FuTr1Q7ynt9uPVQP7W8bJrNs3TrFn69Q4++QHZTp/w7TfEzJaZs0X4V8qYZtNJwW
-         54KQzjkkiZmhrasJ0Sib7PhFne5WoL5Ghoacr9kfeanZwp9Q380S9oSvA35XUHzP6vsd
-         b2Lg==
+        bh=daoyJskCorBwtjTefK4kh/+BP86K5/WFluk80efkMnU=;
+        b=ZiVEsB82xMVHfAzuAQCiJ9iryovNU3osY+fy82Lwdp0zUVq9fHAOaZY/Ue6KacVkPu
+         nu2OIsRbEzn6HpDw4H9NGd37Y06mAfymBEiYqtkDmcqRgOf2xwqQOWQzt8fQZLElg2op
+         riD9pk42NcjUd2Cx1PqbvxOxmnJNNEpuIJZ+BdcXHSSQOL3qUfd3vbUD4HETYXxB2FD0
+         ftQdOV1PiEhtvASBHH5v7e8llwqKWSdh/SEG0W/ZmuEgJd8qzqi9Aa2OEjlNawaPc6QX
+         yNfTYgUgysg66lU8Hi+FzWsUifJT3aSTVlH01ygJarj9i7CBJKqsW8T9XfeDUe4jXkki
+         wrgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=AyRGKycpPWdRLjuC6nbJno10yBdQV0z8McSGx2OKtx8=;
-        b=5qQkdTv9PEi+YrhnA5bvjI+X5OtmtbZH3GecTSFg29rrJPek+krUPghl6F0lasUYtC
-         pKyeFTUMNniFneO6p9e/AGvAaetFnt5PSUXNFs7RsZnvw9C7J9DMIQ0iCxGpFS+MjQlp
-         Dx3niioF7KwVq5E0LElgIQumEI09LESslX9Uth1rX1/WxKuHtf7AouTmVay/cAohIG+0
-         Wd8MpKnIAsHGmllMJILu6notra6ZX0AiQSCgzw+SA8KZ+HtqGHpASRji83idqovbnlsO
-         R3nYVT9Jm4IpZD2xC48abh5/mWSrAvrp/6sNdzEVCjZ03PkUEhV2VMfdbs26V+wQDZZR
-         qd/g==
-X-Gm-Message-State: ACrzQf0tIzht/bH2pNqSrCBYO2a+3EO8WBbEvkbrdidrvsSRhhq3uQ4o
-	tg+5S+WWPzpxHG0AoT7gFkKR0pbYB1Q=
-X-Google-Smtp-Source: AMsMyM7RlL7DBO1s1UsXjjHY0U8RHHmKNSR1ecY/3evXko92sb3pOb1yceio4ISRwsknQFjpOBLb2A==
-X-Received: by 2002:a63:4752:0:b0:439:5dcc:fd78 with SMTP id w18-20020a634752000000b004395dccfd78mr29022655pgk.104.1664383001225;
+        bh=daoyJskCorBwtjTefK4kh/+BP86K5/WFluk80efkMnU=;
+        b=XcozHWwaTMv8w/Q4LDF2AAsuH0ngKWp71VEz0f4svm3Y1GurAY50ZklNisC3NXqfFv
+         6AVnXO8F4wI3PcCjCihcLOc73ub+LiEV7VAeSrdq56NK+QhiRG5HK0pZkMr4LT2XskOB
+         amyRB+Ya03sgaR/zi/wAsXrAlmB1ku3McmVsA38NouKdDOKIQV9s0+4dkiBmghVxfUaX
+         aUr5wu+ab0kuF7RqAjMcg/MWH8zKj20JI9nEjDJXTVJoiPaI2wbffZY+xQ4UOYJkn3xc
+         aLTxkyaSlyHGJGJdzN3wmSJd+OtTmOrTLUGDL5ldMaAQK1oUBXUka7HYbTKIGmMJL5ng
+         DPfw==
+X-Gm-Message-State: ACrzQf06594ePZpO4Dzv/XRB/J9lRIYpSWTH6EWi3O0ZTEyI7LEqyLnP
+	3IfH5Pz+zfGfZXvlSJtBzX1OyU2MPGA=
+X-Google-Smtp-Source: AMsMyM6HNx2PpdiPsCvcw/2VTPmSoM3iGjSgsh/uE/sNjteHCr3GgYZAsYIaZqtsWMf5AP9HHtI+fQ==
+X-Received: by 2002:a63:1a04:0:b0:42b:d33a:2613 with SMTP id a4-20020a631a04000000b0042bd33a2613mr29132928pga.429.1664383001818;
         Wed, 28 Sep 2022 09:36:41 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id lb12-20020a17090b4a4c00b00205fafa6768sm661184pjb.6.2022.09.28.09.36.40
+        by smtp.gmail.com with ESMTPSA id lb12-20020a17090b4a4c00b00205fafa6768sm661184pjb.6.2022.09.28.09.36.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 28 Sep 2022 09:36:41 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/6] auto-t: set disassociation imminent for bss transitions
-Date: Wed, 28 Sep 2022 09:36:33 -0700
-Message-Id: <20220928163637.344656-2-prestwoj@gmail.com>
+Subject: [PATCH 3/6] station: check disassociation bits for AP roaming
+Date: Wed, 28 Sep 2022 09:36:34 -0700
+Message-Id: <20220928163637.344656-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20220928163637.344656-1-prestwoj@gmail.com>
 References: <20220928163637.344656-1-prestwoj@gmail.com>
@@ -54,36 +54,61 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow the caller to set the disassociation imminent bit when
-sending the BSS transition request.
----
- autotests/util/hostapd.py | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+AP roaming was structured such that any AP roam request would
+force IWD to roam (assuming BSS's were found in scan results).
+This isn't always the best behavior since IWD may be connected
+to the best BSS in range.
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index d6c13e2b..bb27686f 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -199,7 +199,7 @@ class HostapdCLI(object):
-         cmd = self.cmdline + ['remove_neighbor', addr]
-         ctx.start_process(cmd).wait()
+Only force a roam if the AP includes one of the 3 disassociation/
+termination bits. Otherwise attempt to roam but don't set the
+ap_directed_roaming flag which will allows IWD to stay with the
+current BSS if no better candidates are found.
+---
+ src/station.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/src/station.c b/src/station.c
+index 061e8747..2ae8a6bf 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2746,6 +2746,7 @@ static bool station_cannot_roam(struct station *station)
+ }
  
--    def send_bss_transition(self, device, nr_list):
-+    def send_bss_transition(self, device, nr_list, disassoc_imminent=True):
-         # Send a BSS transition to a station (device). nr_list should be an
-         # array of tuples containing the BSS address and neighbor report.
-         # Parsing the neighbor report is a bit ugly but it makes it more
-@@ -207,6 +207,10 @@ class HostapdCLI(object):
-         # string could be used in both API's.
-         pref = 1
-         cmd = self.cmdline + ['bss_tm_req', device]
+ #define WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST	(1 << 0)
++#define WNM_REQUEST_MODE_DISASSOCIATION_IMMINENT	(1 << 2)
+ #define WNM_REQUEST_MODE_TERMINATION_IMMINENT		(1 << 3)
+ #define WNM_REQUEST_MODE_ESS_DISASSOCIATION_IMMINENT	(1 << 4)
+ 
+@@ -2818,7 +2819,20 @@ static void station_ap_directed_roam(struct station *station,
+ 			dtimer, valid_interval,
+ 			MAC_STR(hdr->address_3));
+ 
+-	/* check req_mode for optional values */
++	/*
++	 * The ap_directed_roaming flag forces IWD to roam if there are any
++	 * candidates, even if they are worse than the current BSS. This isn't
++	 * always a good idea since we may be associated to the best BSS. Where
++	 * this does matter is if the AP indicates its going down or will be
++	 * disassociating us. If either of these bits are set, set the
++	 * ap_directed_roaming flag. Otherwise still try roaming but don't
++	 * treat it any different than a normal roam.
++	 */
++	if (req_mode & (WNM_REQUEST_MODE_DISASSOCIATION_IMMINENT |
++			WNM_REQUEST_MODE_TERMINATION_IMMINENT |
++			WNM_REQUEST_MODE_ESS_DISASSOCIATION_IMMINENT))
++		station->ap_directed_roaming = true;
 +
-+        if disassoc_imminent:
-+            cmd.append('disassoc_imminent=1')
-+
-         for i in nr_list:
-             addr = i[0]
-             nr = i[1]
+ 	if (req_mode & WNM_REQUEST_MODE_TERMINATION_IMMINENT) {
+ 		if (pos + 12 > body_len)
+ 			goto format_error;
+@@ -2841,7 +2855,6 @@ static void station_ap_directed_roam(struct station *station,
+ 		pos += url_len;
+ 	}
+ 
+-	station->ap_directed_roaming = true;
+ 	station->preparing_roam = true;
+ 
+ 	l_timeout_remove(station->roam_trigger_timeout);
 -- 
 2.34.3
 
