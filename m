@@ -1,51 +1,48 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737544C96
-	for <iwd@lists.linux.dev>; Tue, 27 Sep 2022 23:15:55 +0000 (UTC)
-Received: by mail-pf1-f175.google.com with SMTP id b23so10977817pfp.9
-        for <iwd@lists.linux.dev>; Tue, 27 Sep 2022 16:15:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A5281F
+	for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 16:36:41 +0000 (UTC)
+Received: by mail-pj1-f46.google.com with SMTP id r8-20020a17090a560800b00205eaaba073so2169782pjf.1
+        for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 09:36:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=izPUVM0zy5ff8kD5uJl7DhB6dOs5+FosR6ZhTjrT3bo=;
-        b=OGhRDLF71Tw7/yYUsWC1l3YgovemhATuUqmNn4892qVVJssv3lV6iQXw7ZdOs+3VWc
-         t6ndrzrsZmwE0lTSQLHgd0F3aURekBWZVkpxgcZeSzA286fxotknT0lrAK4JNMiF2v1P
-         UXISOMas5WpB9ywwDZ4U6K9gFHIayQpEcYqFte3czPo1eFxAxnVejrx+vQayLV5dYC1b
-         q32bgfggklxqFjx6IQQTZ+ZGpls1bZsPRqNgOymTcTyYSEDthF/36pIHZVz5tHLWuiKN
-         qN2u0ut2UeMv3bsXY+FAqg4hpW6aJ0WQuV3iHsFavXCc0OkOff5MBWGGmDbOMYvceZIB
-         b8jA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=Lf/Sq4Zhn844p9dx0dFvi3fLZvsVq7BikkxvwICxJ2M=;
+        b=M4X9/TMtmr09/GAtdNjj4l+o4xm3WjEgw0y6PC7/dVLMpRwnI+7pUew/UOSG1BT+wb
+         TGxMZuf/hFmsElOmLL4N7lZTIU/7HAHeGWu51iNSfv+OhGl6VdBCn4fah27sPHccWwIF
+         tCsLZqKvl8x8LVBl5kvlF10pyrhXeO1no8KXfNEjqHOxupB3mGtdt2VoGg25f8f4Y3DO
+         7V3eW4L8cFOovNbLj7RoAIjyh1RK55kMQIqWFuJ+Nl8UMb2t9dk6N4WhhIWZTwCGkkJX
+         uVIJsslYyG9OZ6RZYz7zZRgR54UcXIH2lK5xtxcw0kpno0q5HIWtwdCzXtbs6hdUF0Hn
+         hW7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=izPUVM0zy5ff8kD5uJl7DhB6dOs5+FosR6ZhTjrT3bo=;
-        b=fooI06Sz2t6gW9u6zGnwM+BEQY8cE+ck5yf69WCggOLBYJJMVBX0CM9cqcgxnmrF7i
-         OUZzlO9EIoz+8kdq2BmWH4osX5JjEzG1WVanhDEysavOnwvp00ywZJAhUl4+NobOOdvn
-         6nHrGCHl0jsdqCkyGyaNQSNSUi3VcRYJAPFLZUkec0DxD5Ws19peA5ivR0qTtoEPaYNk
-         pxFMnCFr0Pg4nyObNTcC1ODhXdp1BB6MrtxtPZFc+BxHXzrWRv5baXC+aoD1T0KhgkpN
-         iLK707TwhhUXjQAcEdLp2eZ/1pO+2VWkgATh7O+ZSkMl1KewTtROBNorJmif2wvyubKQ
-         Y22w==
-X-Gm-Message-State: ACrzQf3LHg3blZXY5mTiGoqzZOq+PVoj2ye/JfSmMUzrivDXJxwGfuFw
-	MebSASFsAjDJMNM7CRv1OEJKByyhdzg=
-X-Google-Smtp-Source: AMsMyM76ceZixRrgP1u3CvFDYxIIuhQQc9WBlBh7IDUe6VG7B1pBTFemxbqYz6T/agoI4YwrcstTmQ==
-X-Received: by 2002:a62:8345:0:b0:53e:a1bf:8df9 with SMTP id h66-20020a628345000000b0053ea1bf8df9mr31616506pfe.68.1664320554854;
-        Tue, 27 Sep 2022 16:15:54 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=Lf/Sq4Zhn844p9dx0dFvi3fLZvsVq7BikkxvwICxJ2M=;
+        b=gJ2G6HLbHmeWGNzhWJBpwJwUViCh+vU2Lq7h3HB569Ul5Weqq24t0iqQhewcXeA8EU
+         IIFr6JhYFZJIXbc4/oUWB4zLvWPgLf88JV1+jbHwAVXMCisNp+zVmDUi13N6RECs/zVc
+         wtSfF1t0A5kEiv3MapMXfu1hYYfdIASMG0E8dUcZR0euLKa4kkdlPJ8lAN1cwBZYkash
+         RbZrr2aikTG+02n4QWiN6XzFJgjEGB+VQDs6JMGGKMJaObPKfDqUeG2zmuJC8VQxJHS2
+         SDsEscNnguXvvyE8ehd/5c3Xde5JzqLSYfDtflZ6pZyhKDoR+35cvJtRUhIqVMHYXx4R
+         EX5Q==
+X-Gm-Message-State: ACrzQf0Ox+ladMHHlxfq6oUd8jO7yV6Kr+alv1TCOhYhw3/aMMqOqf1R
+	SIWSgTnjGsL/8XevffaG/YJCg0diI90=
+X-Google-Smtp-Source: AMsMyM52RA+a9Zz+GgmcK01mCeEpzk91FKE7wxnuYsT6cdgNiOtU1A12mpByuTdaKqtyh680X0+6Cg==
+X-Received: by 2002:a17:902:9a8b:b0:17a:455:d967 with SMTP id w11-20020a1709029a8b00b0017a0455d967mr658362plp.52.1664383000714;
+        Wed, 28 Sep 2022 09:36:40 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id c67-20020a624e46000000b0053eec4bb1b1sm2345349pfb.64.2022.09.27.16.15.54
+        by smtp.gmail.com with ESMTPSA id lb12-20020a17090b4a4c00b00205fafa6768sm661184pjb.6.2022.09.28.09.36.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 16:15:54 -0700 (PDT)
+        Wed, 28 Sep 2022 09:36:40 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] ft: fix ft_associate to verify if authentication succeeded
-Date: Tue, 27 Sep 2022 16:15:49 -0700
-Message-Id: <20220927231549.310800-3-prestwoj@gmail.com>
+Subject: [PATCH 1/6] station: reorder AP roam logic
+Date: Wed, 28 Sep 2022 09:36:32 -0700
+Message-Id: <20220928163637.344656-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20220927231549.310800-1-prestwoj@gmail.com>
-References: <20220927231549.310800-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -54,25 +51,86 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ft_associate was only checking the presence of the info structure,
-not if it actually succeeded to authenticate.
+There are a few checks that can be done prior to parsing the
+request, in addition the explicit check for preparing_roam was
+removed since this is taken care of by station_cannot_roam().
 ---
- src/ft.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/station.c | 55 +++++++++++++++++++++++----------------------------
+ 1 file changed, 25 insertions(+), 30 deletions(-)
 
-diff --git a/src/ft.c b/src/ft.c
-index 5b53810a..cc13d2bf 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -1055,7 +1055,7 @@ int ft_associate(uint32_t ifindex, const uint8_t *addr)
- 	 *       a different BSS.
- 	 */
- 	info = ft_info_find(ifindex, addr);
--	if (!info)
-+	if (!info || !info->parsed)
- 		return -ENOENT;
+diff --git a/src/station.c b/src/station.c
+index 4e07ef19..061e8747 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2763,6 +2763,31 @@ static void station_ap_directed_roam(struct station *station,
+ 	if (station_cannot_roam(station))
+ 		return;
  
- 	ft_prepare_handshake(info, hs);
++	if (station->state != STATION_STATE_CONNECTED) {
++		l_debug("roam: unexpected AP directed roam -- ignore");
++		return;
++	}
++
++	/*
++	 * Sanitize the frame to check that it is from our current AP.
++	 *
++	 * 802.11-2020 Section 9.3.3.1 about Address2:
++	 * "If the STA is an AP with dot11MultiBSSDImplemented set to false,
++	 * then this address is the BSSID."
++	 *
++	 * Address3:
++	 * "If the STA is an AP or PCP, the Address 3 field is the same as the
++	 * Address 2 field."
++	 *
++	 * For now check that Address2 & Address3 is the same as the connected
++	 * BSS address.
++	 */
++	if (memcmp(hdr->address_2, station->connected_bss, ETH_ALEN) ||
++			memcmp(hdr->address_2, hdr->address_3, ETH_ALEN)) {
++		l_debug("roam: AP directed roam not from our AP -- ignore");
++		return;
++	}
++
+ 	if (body_len < 7)
+ 		goto format_error;
+ 
+@@ -2816,36 +2841,6 @@ static void station_ap_directed_roam(struct station *station,
+ 		pos += url_len;
+ 	}
+ 
+-	if (station->state != STATION_STATE_CONNECTED) {
+-		l_debug("roam: unexpected AP directed roam -- ignore");
+-		return;
+-	}
+-
+-	/*
+-	 * Sanitize the frame to check that it is from our current AP.
+-	 *
+-	 * 802.11-2020 Section 9.3.3.1 about Address2:
+-	 * "If the STA is an AP with dot11MultiBSSDImplemented set to false,
+-	 * then this address is the BSSID."
+-	 *
+-	 * Address3:
+-	 * "If the STA is an AP or PCP, the Address 3 field is the same as the
+-	 * Address 2 field."
+-	 *
+-	 * For now check that Address2 & Address3 is the same as the connected
+-	 * BSS address.
+-	 */
+-	if (memcmp(hdr->address_2, station->connected_bss, ETH_ALEN) ||
+-			memcmp(hdr->address_2, hdr->address_3, ETH_ALEN)) {
+-		l_debug("roam: AP directed roam not from our AP -- ignore");
+-		return;
+-	}
+-
+-	if (station->preparing_roam) {
+-		l_debug("roam: roam attempt already in progress -- ignore");
+-		return;
+-	}
+-
+ 	station->ap_directed_roaming = true;
+ 	station->preparing_roam = true;
+ 
 -- 
 2.34.3
 
