@@ -1,45 +1,45 @@
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A835381
-	for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 21:18:10 +0000 (UTC)
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-1280590722dso18935111fac.1
-        for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 14:18:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147495381
+	for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 21:22:43 +0000 (UTC)
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-1319cf91d8aso4980230fac.5
+        for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 14:22:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date;
-        bh=s1P4suImYDvpM83CvCrkBlX4d93q1Xo0NAPtWOUeJuE=;
-        b=kGmy6WtylEgWl21n0pxb/KaHnjQ73rLYvaiu2W9K4CHknwcGovz350Jgfm7rzjkVZq
-         0kB66csasuKXWee3DlfGy8TFdS2TMtckbscGTvz6QR0kczwjPzXE4c0dWhSZAKqEYJCV
-         L1NITF0+cV7CjanELvr6//v5ZwbFsWBaqQtap0iryguEmwnTMSczMVcyY/alscHryzyf
-         Xx58McdzLlCCNYf2iF8fpbu7TwXbzPYcSgsU8oLdyXIEdmlYn8Hs26cbVVbnnDpREB0y
-         XXxqf+iP/GmMG6RgwHSMdNYrm6joauiM3uk34UzFcjeoE2wGdCxHTfteQFe2SBgfOHwm
-         qBFg==
+        bh=bWiE+Qn4aZbSjx9chQibE2lKe687QtQiu1wSxSRfceI=;
+        b=n7IAFxqwKmd7YaqGiGQ7vpTyxPyjiNwG0KmrUu5tFm5q2OD/M6Hz00dtuUifO2aHUa
+         RD0a0eMxkmZvM/Q+eOXGBlFtZTAaVqWVG8p6GRQetWMeJIL50PGrstKTJAIL9HTlMRcO
+         4Esw3HVRa+AzMl8qhfvCuYFzF473tYtpqRPh4mu0/ETZ/ovJKvq6Df5We5BtAZrvmSkn
+         tcloJg3b5UKeULwIruPyqI9yd/Q1H9EdO3A/VYnJZQIRHkzAHkjumWYqjBS8J/+tDwFd
+         wMYr9vdQHXwb+sndXtdtlsUDBmR/0TDFrPM05QCtKVpNB3OU0sc1IhoNkDDz7B1OS53g
+         sMIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=s1P4suImYDvpM83CvCrkBlX4d93q1Xo0NAPtWOUeJuE=;
-        b=k2zKukGx6OJDlwaiAXzcYmsDrASgSLTQ4zuFuCZ5q6QG3QuoN9LbfWnqYBa90NK7VV
-         LfJi2yfSOwk9RMKzcT3sX/PJhthVTiyZthyWsnGJPt5bbtKbFiNRqGI3Nh86+lB6kekg
-         GYD5cbf1IboFGvrMneatTRbGHQlKN38pO35zv1Q5L0iNym2a/FZhM69OYRRXG32hgGI+
-         AGGvAJeIFmYIPEMUyeFPJF7Z+ZH8r7Yn/Tdwzi6WvhIbpRBOf5U4P7rTZrJ0pX6GRqPP
-         UthbasbpEGOTBh7f2iKX1OFtgUmgw8khYDtiVnw5psNoImSVbGbPpjdkyrFnjq0nkfLc
-         ZnOQ==
-X-Gm-Message-State: ACrzQf10HO5bFyNFjCp6V1salNt3CzyAwDXbQJuo3NQlQ2gO6/YCHPCt
-	B+O6ahGqSZd/bpKUmHyU22s=
-X-Google-Smtp-Source: AMsMyM5nvB3XJbfdTuz8cD1qoETUDkQo/Pjx3IMRyYq2/5yHq0Bov/mAPuTqfSqgwrQn2yloEzSpMQ==
-X-Received: by 2002:a05:6870:529:b0:130:b1cd:f6f8 with SMTP id j41-20020a056870052900b00130b1cdf6f8mr6460943oao.55.1664399889644;
-        Wed, 28 Sep 2022 14:18:09 -0700 (PDT)
+        bh=bWiE+Qn4aZbSjx9chQibE2lKe687QtQiu1wSxSRfceI=;
+        b=8Iz7DzilSP4QDUz5of5XAsmcwGCqaUybQbaM6dKMUe6Dzl+YeAsWYL8k5+coGGeOw6
+         f9+cS9UWlyuAwaWH9c5hgDXWkN397R+VSuz19RvczDEf1snDWsXd7EUlhmrIZoWB1SzM
+         12aH3Z7mB2sFhoSlzHUMEtYiUFa0tTl+oHluYhyVufgHhuceiTnqzEXh46kvL4Hhaa+r
+         V+foco45QncRz58jthLRTqjqPE5L52uSR4lIp3lcAEA0+w6aWiJ/LadX+41kGABF4/z8
+         L4UiYGvKXGVMFYoydQXR3lY8bJmeRkggpLYi3eZc/lR5SxSt6wG7nvAPyfya1GiDr5hg
+         CJzg==
+X-Gm-Message-State: ACrzQf0c+CJ+0gnb3MUm8F//5ShL6WZf+D2IwIY70CxM/B3c/O9/z6yc
+	RroTUszgBwLlJIkamkaIddWGykJclYw=
+X-Google-Smtp-Source: AMsMyM6yJ+YjYLvFbuMDIoK+RUZwRDlcTfdI/myAtj1aUPk4Aidj5cDPJePEhnIY+rfFM5s8M4glHw==
+X-Received: by 2002:a05:6870:e386:b0:127:bc46:769e with SMTP id x6-20020a056870e38600b00127bc46769emr6616759oad.180.1664400163129;
+        Wed, 28 Sep 2022 14:22:43 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id k20-20020a056830151400b0065c3bb3c72esm2607887otp.14.2022.09.28.14.18.09
+        by smtp.googlemail.com with ESMTPSA id c22-20020a056808105600b0033b31480f38sm2187983oih.34.2022.09.28.14.22.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Sep 2022 14:18:09 -0700 (PDT)
-Message-ID: <6c107e6b-b572-a4bc-899e-ab12745672ab@gmail.com>
-Date: Wed, 28 Sep 2022 16:18:08 -0500
+        Wed, 28 Sep 2022 14:22:42 -0700 (PDT)
+Message-ID: <3c60a851-efe4-0cd4-2b4f-1a5ac66fda5f@gmail.com>
+Date: Wed, 28 Sep 2022 16:22:41 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,61 +48,30 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: IWD dhcp issue?
+Subject: Re: [PATCH 1/2] station: add two new roaming states (FT/FW)
 Content-Language: en-US
-To: "Johnson, Bryce" <Bryce.Johnson@landisgyr.com>,
- "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <PAXPR01MB9217E777D1480543FFEC84B5F4529@PAXPR01MB9217.eurprd01.prod.exchangelabs.com>
- <d741365d-e97e-57a1-2521-40e921edbdbb@gmail.com>
- <PAXPR01MB9217CF309994538C6383C6FDF4559@PAXPR01MB9217.eurprd01.prod.exchangelabs.com>
- <PAXPR01MB921770F406F322FC843535D6F4549@PAXPR01MB9217.eurprd01.prod.exchangelabs.com>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220928183351.363600-1-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <PAXPR01MB921770F406F322FC843535D6F4549@PAXPR01MB9217.eurprd01.prod.exchangelabs.com>
+In-Reply-To: <20220928183351.363600-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Bryce,
+Hi James,
 
-On 9/28/22 14:49, Johnson, Bryce wrote:
-> Hi Denis,
+On 9/28/22 13:33, James Prestwood wrote:
+> This adds two new station states to differentiate between
+> reassociation (ROAMING), Fast transition (FT_ROAMING) or a firmare
+> based roam (FW_ROAMING).
+> ---
+>   src/station.c | 33 +++++++++++++++++++++++++--------
+>   src/station.h |  4 +++-
+>   src/wsc.c     |  2 ++
+>   3 files changed, 30 insertions(+), 9 deletions(-)
 > 
->>
->>> Can you try the attached patch (against ell) and see if that fixes this issue?
->>>
->>
->> I've applied the patch against ell 0.53 and I'll report back.  Might take a few days to try and cause the same issue.
->>
-> 
-> Patch appears to work, thanks!.  I am losing connection to the AP, but it recovering and getting an IP.
 
-Nice.  Thanks for testing, I've applied this patch upstream now.  Still not sure 
-why multiple offers are being generated by the DHCP server.
-
-> 
-> For example:
-> 
-> 2022-09-28 04:32:25.014258289  Received Deauthentication event, reason: 4, from_ap: false
-> [36937.849778] wlan0: authenticate with 80:cc:9c:34:f1:04
-> [36937.892504] wlan0: send auth to 80:cc:9c:34:f1:04 (try 1/3)
-> [36937.931625] wlan0: authenticated
-> [36937.941512] wlan0: associate with 80:cc:9c:34:f1:04 (try 1/3)
-> [36937.982983] wlan0: RX AssocResp from 80:cc:9c:34:f1:04 (capab=0x1411 status=0 aid=1)
-> [36938.041861] wlan0: associated
-> 2022-09-28 04:32:27.711606506  [DHCPv4] l_dhcp_client_stop:1249 Entering state: DHCP_STATE_INIT
-> 2022-09-28 04:32:29.071006405  [DHCPv4] l_dhcp_client_start:1204 Entering state: DHCP_STATE_SELECTING
-> 2022-09-28 04:34:30.280932943  [DHCPv4] dhcp_client_handle_offer:796 Entering state: DHCP_STATE_REQUESTING
-> 2022-09-28 04:34:30.319997105  [DHCPv4] dhcp_client_rx_message:900 Entering state: DHCP_STATE_BOUND
-> 2022-09-28 04:34:30.320984511  [DHCPv4] dhcp_client_rx_message:933 T1 expiring in 43200343 ms
-> 
-> I'm checking with silabs who make the WF200 chipset we are using to help debug the Deauthentication events.
-> 
-> In parallel I was running the same setup on the same router with IWD dhcp disabled and using dhcpcd.  Odd thing is I don't get Received Deauthentication or authentication timed out (at least in the day I've been running it).  I'm going to keep investigating that.  Might be some other issue going on there.
-
-For Deauthentication, I'm wondering whether this has to do with power 
-saving/WMM?  But then that doesn't really explain why iwd + dhcpcd doesn't 
-trigger it.  Maybe dhcpcd sends something that iwd's dhcp implementation does 
-not? ACD or ICMP or ?  It would help to know why the firmware decides to 
-disconnect for inactivity reasons.  What does it consider "activity"?
+Both applied, thanks.
 
 Regards,
 -Denis
+
