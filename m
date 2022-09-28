@@ -1,71 +1,108 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213F14C7A
-	for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 19:53:03 +0000 (UTC)
-Received: by mail-pj1-f47.google.com with SMTP id i15-20020a17090a4b8f00b0020073b4ac27so2576696pjh.3
-        for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 12:53:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A835381
+	for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 21:18:10 +0000 (UTC)
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-1280590722dso18935111fac.1
+        for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 14:18:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:from:to:cc:subject:date;
-        bh=66hdlKxJoTzfXoXoYTqvDsTiXCC8BgyIp2XLbg0UHOI=;
-        b=T+zb84o9Qche1oPeFePf8TlVTY42z/JB/78zr/gwlGZG/qdM8E5ClMDpMvhMjFLYMV
-         SqyK36eZcYKqTYmxpT4Fcm71xHTARSWwYqdVwRhtnNTCNdP+ai9LIRaKCmWgi/uHJ5Sf
-         2YiGvmU6EDneMEqCNbNZQsikkpHm1TG53ZhAJsjhHeURT5+HXrVPan+SLHNDjz9GYHOq
-         J/e+CZ66mSx16sspxXuMGuvHHBSlNki7yZDainU4hjsj93b/aWXYTm43afL9MA/am97C
-         Mn/dI8Ul9+s9iTF1sGyVKFga5dadXmtjkVkUHB0pgGEbJhzUJaOiWSffMSx84IzGOUvP
-         3HWw==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=s1P4suImYDvpM83CvCrkBlX4d93q1Xo0NAPtWOUeJuE=;
+        b=kGmy6WtylEgWl21n0pxb/KaHnjQ73rLYvaiu2W9K4CHknwcGovz350Jgfm7rzjkVZq
+         0kB66csasuKXWee3DlfGy8TFdS2TMtckbscGTvz6QR0kczwjPzXE4c0dWhSZAKqEYJCV
+         L1NITF0+cV7CjanELvr6//v5ZwbFsWBaqQtap0iryguEmwnTMSczMVcyY/alscHryzyf
+         Xx58McdzLlCCNYf2iF8fpbu7TwXbzPYcSgsU8oLdyXIEdmlYn8Hs26cbVVbnnDpREB0y
+         XXxqf+iP/GmMG6RgwHSMdNYrm6joauiM3uk34UzFcjeoE2wGdCxHTfteQFe2SBgfOHwm
+         qBFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date;
-        bh=66hdlKxJoTzfXoXoYTqvDsTiXCC8BgyIp2XLbg0UHOI=;
-        b=4k+TiKaSudz27n2+gL0U9vK+c36OShlkZXnwBzEOXj4DKkE2r/tDvACHBbonJrY0az
-         0vHr5I8GCloSUX2bDKtmDMlXndBm7bxheB63J6QO+F4QGyyUnMCHV/yJUnVDQ7KvVy9y
-         s7RYpPGogMy7flYCEZsEQXvAEgj+Kw+DZ22XNmcLFvYjjZ1H/YPuTrVvNApQMGyjbCYY
-         ReJOnGFVzfyZboLw9JI+afRex/i223JHOLHMmU90x4oUq6Dmmovlt5vvKAZioiRkOWRl
-         1fCywdAqHR/Y9Zq1ppel6IsEDhOyEDox9+X+C9FHdMLey5gUquGELXKQmDZAuUHiO7ry
-         6i3w==
-X-Gm-Message-State: ACrzQf3FawR9IfmUZIuy7P0k3BJKHSvkMm92V66DwPelwC8mMvbdtMJb
-	midCSEDrRSOliw+2usOwcxY=
-X-Google-Smtp-Source: AMsMyM5s5WopV7uXNdPYKRVu0hXCHX+CQ2IKds+gL9AI5bI72JmWkEJcadAstoaZrfmnHNHSqihcMw==
-X-Received: by 2002:a17:902:7b8e:b0:178:b9c9:97a1 with SMTP id w14-20020a1709027b8e00b00178b9c997a1mr1369938pll.111.1664394782376;
-        Wed, 28 Sep 2022 12:53:02 -0700 (PDT)
-Received: from [192.168.68.74] ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id b2-20020a170902d50200b00176ba091cd3sm4122820plg.196.2022.09.28.12.53.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 12:53:02 -0700 (PDT)
-Message-ID: <af8597070f31d8c5b3df9daa7a79e26201d781f7.camel@gmail.com>
-Subject: Re: Cannot turn on AP mode without any error message
-From: James Prestwood <prestwoj@gmail.com>
-To: Chang Liu <goduck777@gmail.com>, iwd@lists.linux.dev
-Date: Wed, 28 Sep 2022 12:53:01 -0700
-In-Reply-To: <d007b616-5957-8010-bb01-bae8a5398add@gmail.com>
-References: <2031ff9c-0fff-18f7-2ad7-860e2b51ee22@gmail.com>
-	 <f66462932dacecb2231bf356770165309c49beab.camel@gmail.com>
-	 <7fc91799-e030-fe90-44e9-c6490fbb6bb8@gmail.com>
-	 <e5c70eecaa96e951176b6f99912822cb2ef5b3a9.camel@gmail.com>
-	 <d007b616-5957-8010-bb01-bae8a5398add@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=s1P4suImYDvpM83CvCrkBlX4d93q1Xo0NAPtWOUeJuE=;
+        b=k2zKukGx6OJDlwaiAXzcYmsDrASgSLTQ4zuFuCZ5q6QG3QuoN9LbfWnqYBa90NK7VV
+         LfJi2yfSOwk9RMKzcT3sX/PJhthVTiyZthyWsnGJPt5bbtKbFiNRqGI3Nh86+lB6kekg
+         GYD5cbf1IboFGvrMneatTRbGHQlKN38pO35zv1Q5L0iNym2a/FZhM69OYRRXG32hgGI+
+         AGGvAJeIFmYIPEMUyeFPJF7Z+ZH8r7Yn/Tdwzi6WvhIbpRBOf5U4P7rTZrJ0pX6GRqPP
+         UthbasbpEGOTBh7f2iKX1OFtgUmgw8khYDtiVnw5psNoImSVbGbPpjdkyrFnjq0nkfLc
+         ZnOQ==
+X-Gm-Message-State: ACrzQf10HO5bFyNFjCp6V1salNt3CzyAwDXbQJuo3NQlQ2gO6/YCHPCt
+	B+O6ahGqSZd/bpKUmHyU22s=
+X-Google-Smtp-Source: AMsMyM5nvB3XJbfdTuz8cD1qoETUDkQo/Pjx3IMRyYq2/5yHq0Bov/mAPuTqfSqgwrQn2yloEzSpMQ==
+X-Received: by 2002:a05:6870:529:b0:130:b1cd:f6f8 with SMTP id j41-20020a056870052900b00130b1cdf6f8mr6460943oao.55.1664399889644;
+        Wed, 28 Sep 2022 14:18:09 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id k20-20020a056830151400b0065c3bb3c72esm2607887otp.14.2022.09.28.14.18.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Sep 2022 14:18:09 -0700 (PDT)
+Message-ID: <6c107e6b-b572-a4bc-899e-ab12745672ab@gmail.com>
+Date: Wed, 28 Sep 2022 16:18:08 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: IWD dhcp issue?
+Content-Language: en-US
+To: "Johnson, Bryce" <Bryce.Johnson@landisgyr.com>,
+ "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+References: <PAXPR01MB9217E777D1480543FFEC84B5F4529@PAXPR01MB9217.eurprd01.prod.exchangelabs.com>
+ <d741365d-e97e-57a1-2521-40e921edbdbb@gmail.com>
+ <PAXPR01MB9217CF309994538C6383C6FDF4559@PAXPR01MB9217.eurprd01.prod.exchangelabs.com>
+ <PAXPR01MB921770F406F322FC843535D6F4549@PAXPR01MB9217.eurprd01.prod.exchangelabs.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <PAXPR01MB921770F406F322FC843535D6F4549@PAXPR01MB9217.eurprd01.prod.exchangelabs.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Chang,
+Hi Bryce,
 
-I think we got this issue fixed. There are two patches on the list if
-you are able to try them out:
+On 9/28/22 14:49, Johnson, Bryce wrote:
+> Hi Denis,
+> 
+>>
+>>> Can you try the attached patch (against ell) and see if that fixes this issue?
+>>>
+>>
+>> I've applied the patch against ell 0.53 and I'll report back.  Might take a few days to try and cause the same issue.
+>>
+> 
+> Patch appears to work, thanks!.  I am losing connection to the AP, but it recovering and getting an IP.
 
-https://lore.kernel.org/iwd/20220928194852.375786-1-prestwoj@gmail.com/T/#t
-https://lore.kernel.org/iwd/20220928194852.375786-2-prestwoj@gmail.com/T/#u
+Nice.  Thanks for testing, I've applied this patch upstream now.  Still not sure 
+why multiple offers are being generated by the DHCP server.
 
-Thanks,
-James
+> 
+> For example:
+> 
+> 2022-09-28 04:32:25.014258289  Received Deauthentication event, reason: 4, from_ap: false
+> [36937.849778] wlan0: authenticate with 80:cc:9c:34:f1:04
+> [36937.892504] wlan0: send auth to 80:cc:9c:34:f1:04 (try 1/3)
+> [36937.931625] wlan0: authenticated
+> [36937.941512] wlan0: associate with 80:cc:9c:34:f1:04 (try 1/3)
+> [36937.982983] wlan0: RX AssocResp from 80:cc:9c:34:f1:04 (capab=0x1411 status=0 aid=1)
+> [36938.041861] wlan0: associated
+> 2022-09-28 04:32:27.711606506  [DHCPv4] l_dhcp_client_stop:1249 Entering state: DHCP_STATE_INIT
+> 2022-09-28 04:32:29.071006405  [DHCPv4] l_dhcp_client_start:1204 Entering state: DHCP_STATE_SELECTING
+> 2022-09-28 04:34:30.280932943  [DHCPv4] dhcp_client_handle_offer:796 Entering state: DHCP_STATE_REQUESTING
+> 2022-09-28 04:34:30.319997105  [DHCPv4] dhcp_client_rx_message:900 Entering state: DHCP_STATE_BOUND
+> 2022-09-28 04:34:30.320984511  [DHCPv4] dhcp_client_rx_message:933 T1 expiring in 43200343 ms
+> 
+> I'm checking with silabs who make the WF200 chipset we are using to help debug the Deauthentication events.
+> 
+> In parallel I was running the same setup on the same router with IWD dhcp disabled and using dhcpcd.  Odd thing is I don't get Received Deauthentication or authentication timed out (at least in the day I've been running it).  I'm going to keep investigating that.  Might be some other issue going on there.
 
+For Deauthentication, I'm wondering whether this has to do with power 
+saving/WMM?  But then that doesn't really explain why iwd + dhcpcd doesn't 
+trigger it.  Maybe dhcpcd sends something that iwd's dhcp implementation does 
+not? ACD or ICMP or ?  It would help to know why the firmware decides to 
+disconnect for inactivity reasons.  What does it consider "activity"?
+
+Regards,
+-Denis
