@@ -1,145 +1,88 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469AB4A30
-	for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 16:36:44 +0000 (UTC)
-Received: by mail-pf1-f175.google.com with SMTP id a29so13007478pfk.5
-        for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 09:36:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E9F4A11
+	for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 17:34:44 +0000 (UTC)
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-131886d366cso6551988fac.10
+        for <iwd@lists.linux.dev>; Wed, 28 Sep 2022 10:34:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=iH+4Jo+fCew/LPaJAoClJ2OUSvozaWEqbypNDM9tiRc=;
-        b=YCCucu+9QYUUyrdpcPt887b3Mnxocf0hkRZcYxrbAoSwwrBaedP5F7BgBWNYr56RsZ
-         20e5JXMsD7ax0QZ5yUtyD/6R+jnrnmLet8jBIFrpG+z8BYuTGUDt1prXM5p7H7B5iZVQ
-         hC6vEacTx5FAXYuikPCKEwDpYDLyjK2UcAPiJzPWe/YcAfFaMEGCHGpJ538VKpFHsVJd
-         1L3AKmU6jKLjpopAh7rp5POpSaXLAj1eY0zmTuRV2SQNyN8bOMQ3jDD4E/4989xLn/8q
-         uoMRS4HffBXsxO7rl/Gc8ZvXPq/o6WJiSUGm8jAuokDbvFMYkr4xYvtxqsCidiRF39x6
-         HD8g==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=Ka7qvSB4l/4lEcqQDo8vU+PSjeJhCYYYbd+1vpaTYcE=;
+        b=SFU1GRIZdaAYdg9qDSXoSx8vu98OTtO8pY3mYRg3SEjfa55Tz6FGsj1PWl7vGVGWrC
+         FKbElyvG1zeGVpn5tiwbrOav2S2waRP2xHP6Mf/cm/h5I38rUxHeBrfue1e8l+mwEiux
+         ae+W6u8VWjgm6lr0vKmVR489KynaFDjbeD/mN1hNHdcmUTO+vI3wlMbPNLE4aTOhNWv7
+         7TWbY7kPBsBhRpnPVGKO/lPC/KYhtSPuTU3WCtCWPz1Ghg4mCNN7qzuPYkmuq+gdt8bD
+         fs0SyRULGQqi6jREyBXGG8lpv97hH2YNPmkyoHmH9Y65P5++2BLdTvAa6le2DhADDBe5
+         DqdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=iH+4Jo+fCew/LPaJAoClJ2OUSvozaWEqbypNDM9tiRc=;
-        b=hp/9cEnPejEidHYBeHuuA1zcKguvFt9KkmmchIL9CBGsW9QBjpDrNcNa5Qhxiv0vW5
-         7d60t8aDUpYIxfcGho8EwguOEfOUR8VlnkLUzs7/QIm4xqYwwUKEIZfSfsjc8T4MlSgR
-         Web/A3xsM/HEhPCSYIAvx8iekwbriC2NUD3Z9RR7fw+72iFFcisuURm+TNOSnzJ0UWxN
-         wfcY7XqMNaBJDfEc9AA10IsQo1H3b47F7stbt+hAuLkctpdtPAgHnMus7afGzlggO0jO
-         RGF/ftDHIcM07ks5I2cYy25Zfd6gsrbgU79v7ESe9H+cJDDhY6tpaZYZ4ikKr0MWHQBL
-         g47w==
-X-Gm-Message-State: ACrzQf1rjdiAnRw9zVb6+wxKBnU9YeAOaGqCZh2LiDz2B+PsAXMg7nHL
-	pmYGk75kysNO8CormT+hvSJAAM1Ux10=
-X-Google-Smtp-Source: AMsMyM5r6krDfRfzktYa9u5BcWRNGaQMJgo+54ArD+IuNObDJ/uUZCGZrGfQCemJ4JwzZMVIXaP0/w==
-X-Received: by 2002:a05:6a00:2316:b0:548:58b6:b17c with SMTP id h22-20020a056a00231600b0054858b6b17cmr35340150pfh.53.1664383003640;
-        Wed, 28 Sep 2022 09:36:43 -0700 (PDT)
-Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id lb12-20020a17090b4a4c00b00205fafa6768sm661184pjb.6.2022.09.28.09.36.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 09:36:43 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/6] auto-t: add a no candidate test to testAPRoam
-Date: Wed, 28 Sep 2022 09:36:37 -0700
-Message-Id: <20220928163637.344656-6-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20220928163637.344656-1-prestwoj@gmail.com>
-References: <20220928163637.344656-1-prestwoj@gmail.com>
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Ka7qvSB4l/4lEcqQDo8vU+PSjeJhCYYYbd+1vpaTYcE=;
+        b=gAtFtW7dhi6BcPqEZh9FAPkjdKJFNeiNENYFvOMKy47daXZOnGmZ1YAHyWOHzkf753
+         2OlSR6skllqVIFm7biYMfWwVGU369r8eUxv/fsLQdbg1hEEtKn0nNqtUWuXFQqq3UpOk
+         6d8d+D9qYhwv+qPIRH9oiUKlSZXiQR9kK5YHOINTU+ZShHUtblELfEAOPisl23lyfQ58
+         HE5vO/mVjAGC4X/Y3dgDKg/LzgR4fqYESzXBp6gXNNz2Wqf/FMpeH4ZdX1mcJfwLBboO
+         0W3C1ufJ4f93446HwJePqB4X/3P4CHpImrhPKl1UqItMWjk1XM5VOhqhyoqiYeOomcOi
+         d3gA==
+X-Gm-Message-State: ACrzQf2+NADrt6FR0wxHxx+963bAbgiWwctJ2TtLNHaKyxh90eSPuiME
+	8QHY2XiO103U1+pUXNYDm/Y=
+X-Google-Smtp-Source: AMsMyM6s6RW3nO91qQg5PizPT45xFitLoi8zKvH2zt/oMoPtwxKD15Kq5db+dsQmrxh1WHjsCBKa+Q==
+X-Received: by 2002:a05:6871:893:b0:131:84aa:5b80 with SMTP id r19-20020a056871089300b0013184aa5b80mr5590824oaq.257.1664386483437;
+        Wed, 28 Sep 2022 10:34:43 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id m7-20020a4a9507000000b00475f26931c8sm2175662ooi.13.2022.09.28.10.34.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Sep 2022 10:34:42 -0700 (PDT)
+Message-ID: <fd7c11cd-3389-dcf3-e8d7-d4f29ca6b250@gmail.com>
+Date: Wed, 28 Sep 2022 12:34:41 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 1/3] station: handle ROAMING state in disconnect event
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20220927231549.310800-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20220927231549.310800-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This tests the new behavior where the roam request does not
-indicate disassociation is imminent. In this case if no
-candidates are found IWD should not roam.
----
- autotests/testAPRoam/connection_test.py | 43 ++++++++++++++-----------
- 1 file changed, 24 insertions(+), 19 deletions(-)
+Hi James,
 
-diff --git a/autotests/testAPRoam/connection_test.py b/autotests/testAPRoam/connection_test.py
-index 41d70f3a..a419f4aa 100644
---- a/autotests/testAPRoam/connection_test.py
-+++ b/autotests/testAPRoam/connection_test.py
-@@ -12,11 +12,7 @@ from hostapd import HostapdCLI
- 
- class Test(unittest.TestCase):
- 
--    def test_connection_success(self):
--        bss_hostapd = [ HostapdCLI(config='ssid1.conf'),
--                        HostapdCLI(config='ssid2.conf'),
--                        HostapdCLI(config='ssid3.conf') ]
--
-+    def validate(self, expect_roam=True):
-         wd = IWD()
- 
-         devices = wd.list_devices(1)
-@@ -29,38 +25,47 @@ class Test(unittest.TestCase):
-         condition = 'not obj.connected'
-         wd.wait_for_object_condition(ordered_network.network_object, condition)
- 
--        device.connect_bssid(bss_hostapd[0].bssid)
-+        device.connect_bssid(self.bss_hostapd[0].bssid)
- 
-         condition = 'obj.state == DeviceState.connected'
-         wd.wait_for_object_condition(device, condition)
- 
--        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED')
--
--        self.assertFalse(bss_hostapd[1].list_sta())
-+        self.bss_hostapd[0].wait_for_event('AP-STA-CONNECTED')
- 
--        bss_hostapd[0].send_bss_transition(device.address,
--                [(bss_hostapd[1].bssid, '8f0000005102060603000000')])
-+        self.assertFalse(self.bss_hostapd[1].list_sta())
- 
--        condition = 'obj.state == DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition)
--
--        condition = 'obj.state != DeviceState.roaming'
--        wd.wait_for_object_condition(device, condition)
-+        self.bss_hostapd[0].send_bss_transition(device.address,
-+                [(self.bss_hostapd[1].bssid, '8f0000005102060603000000')],
-+                disassoc_imminent=expect_roam)
- 
--        condition = 'obj.state == DeviceState.connected'
--        wd.wait_for_object_condition(device, condition)
-+        if expect_roam:
-+            from_condition = 'obj.state == DeviceState.roaming'
-+            to_condition = 'obj.state == DeviceState.connected'
-+            wd.wait_for_object_change(device, from_condition, to_condition)
- 
--        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.address)
-+            self.bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.address)
-+        else:
-+            device.wait_for_event("no-roam-candidates")
- 
-         device.disconnect()
- 
-         condition = 'not obj.connected'
-         wd.wait_for_object_condition(ordered_network.network_object, condition)
- 
-+    def test_disassoc_imminent(self):
-+        self.validate(expect_roam=True)
-+
-+    def test_no_candidates(self):
-+        self.validate(expect_roam=False)
-+
-     @classmethod
-     def setUpClass(cls):
-         IWD.copy_to_storage('TestAPRoam.psk')
- 
-+        cls.bss_hostapd = [ HostapdCLI(config='ssid1.conf'),
-+                            HostapdCLI(config='ssid2.conf'),
-+                            HostapdCLI(config='ssid3.conf') ]
-+
-     @classmethod
-     def tearDownClass(cls):
-         IWD.clear_storage()
--- 
-2.34.3
+On 9/27/22 18:15, James Prestwood wrote:
+> This both adds proper handling to the new roaming logic and fixes
+> a potential bug with firmware roams.
+> 
+> The new way roaming works doesn't use a connect callback. This
+> means that any disconnect event or call to netdev_connect_failed
+> will result in the event handler being called, where before the
+> connect callback would. This means we need to handle the ROAMING
+> state in the station disconnect event so IWD properly disassociates
+> and station goes out of ROAMING.
+> 
+> With firmware roams netdev gets an event which transitions station
+> into ROAMING. Then netdev issues GET_SCAN. During this time a
+> disconnect event could come in which would end up in
+> station_disconnect_event since there is no connect callback. This
+> needs to be handled the same and let IWD transition out of the
+> ROAMING state.
+> ---
+>   src/station.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+
+All applied, thanks.
+
+Regards,
+-Denis
 
