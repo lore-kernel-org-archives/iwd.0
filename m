@@ -1,48 +1,51 @@
 Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761915C85
-	for <iwd@lists.linux.dev>; Fri, 30 Sep 2022 23:28:14 +0000 (UTC)
-Received: by mail-pl1-f177.google.com with SMTP id n7so5189605plp.1
-        for <iwd@lists.linux.dev>; Fri, 30 Sep 2022 16:28:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0A65C8C
+	for <iwd@lists.linux.dev>; Fri, 30 Sep 2022 23:28:15 +0000 (UTC)
+Received: by mail-pl1-f177.google.com with SMTP id 10so1564017pli.0
+        for <iwd@lists.linux.dev>; Fri, 30 Sep 2022 16:28:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=DpFnhWCfsEj1q/S7UiJdV0ZemoICfY9pwIoCaPjmWpU=;
-        b=jzqe7ag1qBTyLK6P+69NFtBzI8M0BSTE8CfSwR1iWvqv9ywHn3CwcWBQcJzTRvcKwx
-         JRbKWQ19sGOZdV9soIE/EVlZ12YAxqCAqDoPUCVvD8bjZXo19Sm2gBumL7Ybw4yDwYKV
-         iNMdmCJ/svSO7pIrBdyDtOcvxU3EJo4K2QudrcBO5GmFCSVwrsJF8S4phec/ITkav0DE
-         ygLl8aV78xN2MuvGTmOZjLACYK0xIj1INRBdgI1yNogOgLxOsKfd5WkaBWRBTrnyL8T4
-         4HhHI6cPLOH2BcPvaeTf+lTnDeCU8r141oO1wvh7Ul2ksKvrLYPoEN4B6DjGG6xPtYl0
-         LcSQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=Am6rwPGAzyxKnklm5MTt++rEqsudpEW14wY+h1lBoTU=;
+        b=P1sacYl6oVIcNCnkNpiwvU5iuMhqHUoXQWmosgDdbmBU27KHiZ6vRYprqBnXz/vx47
+         7J5+Wu+dEfUkAUKPPlthjEa2sSNvPFdS2pPJD0cEV7BdiKLOGVNYaGXSv5zobAVRMIuN
+         hpJ6c2D3MLKSqZMF+czKcPRiNUvp1GqI7wVhaa6P/wk3LUj6K4R6B4M2aynmQMRsnUtH
+         LCbZpzbd0+83L9Xa5srfYgfpPSRxSDa6uJTHNt5r/D54pLRASdv5fjWFWZoAUk4jy6Wq
+         MG4A36UpSl63ZsxL8QFKkfUW0t3BOdqjlwnv3VqIZsHddmqrFHRamE9zvVkBMwLcv50G
+         dbMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=DpFnhWCfsEj1q/S7UiJdV0ZemoICfY9pwIoCaPjmWpU=;
-        b=WYeF8x26FNfAkI0777Tyed0e/nY+lIUIdXGGKrP/KcCqpP47eiGDldTYTpZx0wF7Hx
-         leJOjTOHU3RWUv8HDsUH0tJvZVYYdDN2v/TR2cJ9UtrEBhuidBBCD0vANmuPYCUbl7N/
-         w5ON0DCRxFKCCihSfmeNKGYcovHcMlSd6zG+tvJjpm19+0Qzeo1uVcbjnChCAG1MJMud
-         UuCHgJ7hzlHgudMrtDWyaIYQmPDceq6Rsv1QPomIzJreeNAj91smbgRb/5mqLvjQjvz0
-         T3mEhZh45ZxDZmO/JuAysb3eTaKXXzw5DLIpeKZm7ggPYyQm+3pCoq47XKXx4t4194tq
-         e/lA==
-X-Gm-Message-State: ACrzQf0/hKQtxPYobS71up4GUgi7jyaSz9NGfWC8Nig99eHgOUdDVvWU
-	bGB/4IuAzpI0uUWwLnoyKGiCE+QCQy4=
-X-Google-Smtp-Source: AMsMyM521LYFZ7LAgE6XfoEiOOIGZMKq7YNLJWHW/y8IRWJ1FqhHS8UBSu+RAL9IfdI82N/X9GJ/Aw==
-X-Received: by 2002:a17:902:8ec5:b0:179:d8f4:cb64 with SMTP id x5-20020a1709028ec500b00179d8f4cb64mr11195072plo.16.1664580493631;
-        Fri, 30 Sep 2022 16:28:13 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=Am6rwPGAzyxKnklm5MTt++rEqsudpEW14wY+h1lBoTU=;
+        b=l739Dfsp8DiqvYBBunDXDwPJ0K3t7KXyG92Y+aTa++pxHm+qAY9dI9FpFIWmXHoNnf
+         TKSkIDwDTs+gBGMJuIN0+XxI9/T3YPQQV41hivkH+OvT+qCAl+nzqhXiCAVc6HPPPfir
+         Ja/ZuuPeFRyiFSRsD89VImdzxxivJ57CLYaWLqhT5r0xgi7xFIshORhGzUFS5Y+Z7j0V
+         6xb2fwkUvgjOPsuJJBLAT9Vn+0cvEMgyuH+zO1Rl0GHPh4aV7KmsnQTEiVU03dGF6Cim
+         cBDEnE0VCJnPhPOyhQ6xnf6ZSu9naFxTbTlZ6DEfkjp/RaE3oh+hGk1vE+aN+GRjbZ3x
+         QOTQ==
+X-Gm-Message-State: ACrzQf0xbTqunObZAMWEqbdUKny1s7uGCKLeTW4lrJGc43m5hsiPvsvy
+	kIXuUjZLtIv+S/EfsIuQ4vZ8xkKEyaY=
+X-Google-Smtp-Source: AMsMyM6lBwcwjSujwXKk1QA77Frz7+24zPxoFkDfTS9b8hb1UgFIpFB94zTrDREAEzjvYTymmDPOXw==
+X-Received: by 2002:a17:902:db12:b0:176:d6a4:53ab with SMTP id m18-20020a170902db1200b00176d6a453abmr11511346plx.113.1664580494750;
+        Fri, 30 Sep 2022 16:28:14 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.54.173.139])
-        by smtp.gmail.com with ESMTPSA id u2-20020a170902e5c200b001767f6f04efsm2467893plf.242.2022.09.30.16.28.12
+        by smtp.gmail.com with ESMTPSA id u2-20020a170902e5c200b001767f6f04efsm2467893plf.242.2022.09.30.16.28.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Sep 2022 16:28:12 -0700 (PDT)
+        Fri, 30 Sep 2022 16:28:13 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] test-runner: write out individual test results
-Date: Fri, 30 Sep 2022 16:28:08 -0700
-Message-Id: <20220930232809.810726-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] monitor: change Port ID to %u print
+Date: Fri, 30 Sep 2022 16:28:09 -0700
+Message-Id: <20220930232809.810726-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20220930232809.810726-1-prestwoj@gmail.com>
+References: <20220930232809.810726-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,47 +54,24 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The --results option only wrote PASS/FAIL for the entire run.
-Instead write out each individual test result.
+The port ID is a u32 so print with %u rather than %d
 ---
- tools/run-tests | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ monitor/nlmon.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/run-tests b/tools/run-tests
-index 9620ed1f..32c09723 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -37,6 +37,14 @@ def dbg(*s, **kwargs):
- 	'''
- 	print(*s, **kwargs, file=sys.__stdout__)
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 5ae014e4..2e232130 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -7952,7 +7952,7 @@ static void print_nlmsghdr(const struct timeval *tv,
+ 							nlmsg->nlmsg_flags);
+ 	print_field("Sequence number: %u (0x%08x)",
+ 					nlmsg->nlmsg_seq, nlmsg->nlmsg_seq);
+-	print_field("Port ID: %d", nlmsg->nlmsg_pid);
++	print_field("Port ID: %u", nlmsg->nlmsg_pid);
+ }
  
-+def write_results(file, results):
-+	with open(file, 'w') as f:
-+		for test, results in results.items():
-+			if results.failures != 0 or results.errors != 0:
-+				f.write('%s:FAIL\n' % test)
-+			else:
-+				f.write('%s:PASS\n' % test)
-+
- def exit_vm():
- 	if config:
- 		for p in Process.get_all():
-@@ -45,13 +53,9 @@ def exit_vm():
- 
- 		if config.ctx and config.ctx.results:
- 			success = print_results(config.ctx.results)
--		else:
--			success = False
- 
--		if config.ctx.args.result:
--			result = 'PASS' if success else 'FAIL'
--			with open(config.ctx.args.result, 'w') as f:
--				f.write(result)
-+			if config.ctx.args.result:
-+				write_results(config.ctx.args.result, config.ctx.results)
- 
- 	os.sync()
- 
+ static void print_nlmsg(const struct timeval *tv, const struct nlmsghdr *nlmsg)
 -- 
 2.34.3
 
