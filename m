@@ -1,45 +1,45 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833757C
-	for <iwd@lists.linux.dev>; Mon,  3 Oct 2022 15:40:07 +0000 (UTC)
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-1324e7a1284so4730016fac.10
-        for <iwd@lists.linux.dev>; Mon, 03 Oct 2022 08:40:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E644C33D9
+	for <iwd@lists.linux.dev>; Tue,  4 Oct 2022 17:45:27 +0000 (UTC)
+Received: by mail-oi1-f173.google.com with SMTP id t79so1702305oie.0
+        for <iwd@lists.linux.dev>; Tue, 04 Oct 2022 10:45:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date;
-        bh=FFvklGZxSbnIQRLxdIaCz3wJXFQfrI4yjpA+MKypAqU=;
-        b=WKxJ1D07jhOm3uU/zQ9hKn8Ao1skE73Xpa18xyZ5Mj4O3jxOqXeJ2ig1rYRLedPjCY
-         X1NKUQelMzNhRl0RIUedEm4fisk5SJrMxGIEWn61WOVx/UsijQNTFAJYG+Hb2fM7uMff
-         +jYKKIm8j8AgWQELOKcsl99QadrDZprAquprzJL+/ZWjT6bd1H4Vfz9XjcOH/GGsvNbo
-         w+ASe6H7KytaWSNa89QfNlXnvmMVaC6CNNaRecW1qf/++R3ut23mWHxPMOYFiZ/1Wres
-         BJtPqVHKwCI0JiaCRfoMiIEj6vhxI+Kl8BI/g2HScp3KEmWMfzg/1PjtDWJtaICbhvIp
-         luhQ==
+        bh=daWoDMbixSQL1gBe7e8WUSV5XTQrY6h7vt/fpMnTaLA=;
+        b=CmBxvvYtR4gv0REDlxN5fBLAfZ0y1S4uo11etl8iDcuhqtXsso3Gtum2K2BQ02Rrrv
+         rfcXtRDY8+U3TNw/Q6qzq4loTAPTvXhTtMJXs4p87PkGv2xGMAo01Lo2cl7Plg0vFbCo
+         ajKDOlQ0GNM6DfdugQ6oKADnB7S/+Oh9zGUWTZeyYNATXiLHm1hO9ORlIoVoPHse+nVU
+         NvUY1JnyROkFhImChWD9oTF6LMijhoNq4F2ZLYXVRDZtf0VUor2RUNOOSrVkZMEfLH9P
+         PYTQFNIrKFVVffYEah9RPj71n8AxKvqtJtPuI7WDtQGz2SyCYLiv39+NlwsA7m2MTJCZ
+         8YbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=FFvklGZxSbnIQRLxdIaCz3wJXFQfrI4yjpA+MKypAqU=;
-        b=8BW+mlw9EQmgOzkoQWUjKMcZmJgE1Au4zIFlcNk1v4E1SSmDXh5BgAWuzcCI8YMiwJ
-         ph0nu1nXdwcRAhGBbJiKH8UOZgZylTesbXwpUDNUT7NTePWyze0qREhCcMeX3iRyeI7M
-         6h9LacZxTM230LtEkLRz957DN0bvS4HCFVfwbmdG7eEHd1HgwVQm2hvLyAgCxFsl/rQ2
-         n9+Kn5KpNsqhb1DSs5z7IxBjlynXR+0jAxSXOtYoz2iBw8HOba1oZhUkOQLKv0lML6Ze
-         Zzb+jpIIWWWTP8wjNFtP22+KLM3HFjIiHZiGXPe+L99iYsDlXmb5BjFjft21DMVxR/rn
-         RSyg==
-X-Gm-Message-State: ACrzQf2ZXdmHMnz5fzxc13qqUAEZ3wpWunnAAsDrfK3MctGqI64dVQxU
-	/e6U+FeRE4U0VZbAJE0IEPQ=
-X-Google-Smtp-Source: AMsMyM6XzQUuzFT75HZYCPvTuNBfWDDSBVUgRH3CNwNxsTmPR/yk/X/+vtKx66dNiKMlJHaNas9Vmw==
-X-Received: by 2002:a05:6870:d20d:b0:131:75ef:d40f with SMTP id g13-20020a056870d20d00b0013175efd40fmr5483288oac.227.1664811606723;
-        Mon, 03 Oct 2022 08:40:06 -0700 (PDT)
+        bh=daWoDMbixSQL1gBe7e8WUSV5XTQrY6h7vt/fpMnTaLA=;
+        b=y8q4YzQEjIDsrYqWdRlW+IoqWp5299x3qmOO/cWH1N/vneSVF85m8LiAHJwjV6LkSK
+         XzCxNXKtdUccoToS91shhT/D2bi/7rQ8sWBVBJDhJmVdrlYTHX8bWPnfV/oZ9EX0cReS
+         AoJCEBcUSvC05khoROaNp+0Mu/RpzN68P31yUc+CrmExpA6QozbIXfsLg4J1XpR0gFy+
+         yetN5gBSjuEd7w9wKnN/O+yKHXDjaw9GM1kLjS9tdNhJYdeQAOZoVuuyPkAHUmMC6XoN
+         f9Y948/O/Ht9ztorAVplrHBnapvmBlll0ibJYF+3dhVTGj0W90xJlMWTDjpRuOMcAXYg
+         I3Ng==
+X-Gm-Message-State: ACrzQf1BaFazhNkwkftUkcYiSQVVJ9NkDOmT/lO7ctWphLQyohixZHWW
+	QgzXwwjHC8iTuVBT/BLJbFkBNPI1mKo=
+X-Google-Smtp-Source: AMsMyM4iQy3NhLH8DTpDNkQPA/+9VvDaYhGFob1fiwJutMYcq0c0hTM2a7JHcIZnSnRVPabvHCs+ig==
+X-Received: by 2002:aca:2215:0:b0:350:37b4:c55 with SMTP id b21-20020aca2215000000b0035037b40c55mr420386oic.210.1664905527012;
+        Tue, 04 Oct 2022 10:45:27 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id y14-20020a056870b48e00b00127fbb7afffsm688783oap.5.2022.10.03.08.40.05
+        by smtp.googlemail.com with ESMTPSA id n9-20020a4ac709000000b00425806a20f5sm2673887ooq.3.2022.10.04.10.45.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Oct 2022 08:40:06 -0700 (PDT)
-Message-ID: <bd9c4d51-a3ca-16c2-5000-7e94afd21425@gmail.com>
-Date: Mon, 3 Oct 2022 10:40:04 -0500
+        Tue, 04 Oct 2022 10:45:26 -0700 (PDT)
+Message-ID: <f6f552c0-bf23-7f75-62ef-86f73cd187d6@gmail.com>
+Date: Tue, 4 Oct 2022 12:45:25 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,25 +48,25 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH 1/2] test-runner: write out individual test results
+Subject: Re: [PATCH 1/3] autotests: Add a stateless DHCPv6 test case
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20220930232809.810726-1-prestwoj@gmail.com>
+To: Andrew Zaborowski <andrew.zaborowski@intel.com>, iwd@lists.linux.dev
+References: <20220930144801.548229-1-andrew.zaborowski@intel.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20220930232809.810726-1-prestwoj@gmail.com>
+In-Reply-To: <20220930144801.548229-1-andrew.zaborowski@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi James,
+Hi Andrew,
 
-On 9/30/22 18:28, James Prestwood wrote:
-> The --results option only wrote PASS/FAIL for the entire run.
-> Instead write out each individual test result.
+On 9/30/22 09:47, Andrew Zaborowski wrote:
 > ---
->   tools/run-tests | 16 ++++++++++------
->   1 file changed, 10 insertions(+), 6 deletions(-)
+>   autotests/testNetconfig/stateless_test.py | 162 ++++++++++++++++++++++
+>   1 file changed, 162 insertions(+)
+>   create mode 100644 autotests/testNetconfig/stateless_test.py
+> 
 
-Both applied, thanks.
+Applied, thanks.
 
 Regards,
 -Denis
