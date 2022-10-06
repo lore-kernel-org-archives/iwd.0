@@ -1,63 +1,75 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E43E812
-	for <iwd@lists.linux.dev>; Thu,  6 Oct 2022 13:22:37 +0000 (UTC)
-Received: by mail-qt1-f174.google.com with SMTP id fb18so912899qtb.12
-        for <iwd@lists.linux.dev>; Thu, 06 Oct 2022 06:22:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C27520E0
+	for <iwd@lists.linux.dev>; Thu,  6 Oct 2022 14:02:14 +0000 (UTC)
+Received: by mail-oi1-f182.google.com with SMTP id n83so2093888oif.11
+        for <iwd@lists.linux.dev>; Thu, 06 Oct 2022 07:02:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date;
-        bh=I/HEY49CGZYniocRJN9kwVCEkFVg+JvRAB5OJw9Q27s=;
-        b=QMEjanOpQ98yn6zyGZ+gAK8Ms7HfDLM3xESpWq+Mpg0ExtADxUEItSF+OVdFSlERCI
-         rPDWr0IHg6K4ziqiPPuCZdFJ788vKyQi7VByYU0SMaihG4CG/vTOesz4JzcJVK0FWuPB
-         ZCtMtKPge+apRCjT84pDjU/7WsHn18Dt4fNFyKDwBVqY47pco/HcYEv29zqo7LjYdsaZ
-         IwPRECr/MxOeJuqFWEgH37aJEmkKIRrD9s+NYnR926JhQMDEWz3NshmDlfVW57U4jaGZ
-         2kmeCGiSzf7P26tbz0opxIi2CTOTTcYkBZoXpuXMIISOAUg0wIKgGdjse9BOlUEZ7SF7
-         u6zw==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c2wJwq7SAPqkExEUOPF1OrWSNPjGqwbATxUd3G/338k=;
+        b=FGSgTSkrmeCuZY83wpsR9+m5vMmnz27A2yGT88j+sPmG74cXhYhN5CvBOx3E89B7I5
+         SpHPlS/VILiPNipi09FalwpEuGBz3mrYA6uaExj5yXsA9hN/J6/ajyt0SMOXgwt2oel4
+         rH5qvM9H2A8BrPbA1aHscIDmp2vFsNvJZyeHSt93vMnHB1qIYN9XotOnFC+EAzQRiSpb
+         o0BRPun/QJJCjSA01xP06/UN7Tx3UybVN1s8f0NqI34qqgClp1O4UwuUdQxC3emSzNcg
+         etul1b0KSf3N6BhoIRdYnkYyC+ZfrLTMUVtlaH1ANQG6uNI2wJsXZtW6K/urR5+HTUvK
+         OUVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=I/HEY49CGZYniocRJN9kwVCEkFVg+JvRAB5OJw9Q27s=;
-        b=yyMexMrsipfDfLKKrMy8aXhFWCRl2x77ZQ1CjO5jCJrJJMItRCTvKlRo3IWUASc0KH
-         B4YP8Fm9nFg4wEllgx/kbNsomNoQBErpJaYV6HW7uvUtJfmlp9PTKP7bLJNgXNdwk7YS
-         GS1zZUrYD+MPGbDXGdYqkISjeJd42zzOV+7W1otchMB/Mxca0eG7wb2WFTOZ8FGWmWEU
-         gGuxTQ1x6P4Hg69nwEdPBAGHoiMOSkHkcWhNmVoO+/89eLfq3ZqzjrkAzN7Q/RjeYt+A
-         hmMngZ+ylRUjwzxVHPUcbjzNllAcBdxMjVgi3LDuNMqEqX/lqMyrDOHHDa3+HsgtqCd7
-         BjsA==
-X-Gm-Message-State: ACrzQf3CErp9lqEVUFAimVWPaAl2TPTULBfOGFuQ4oadxA+Z9pfQ0gDr
-	nIIiKtdnNfXJZd643Z0Pa45n0EXM9K9+cKjR69eHef1v
-X-Google-Smtp-Source: AMsMyM7Ux+uMHdyLclgOpMnBtWA9wRsxw3KNiRiuYVbAP8iG/tHX2E6qijSYDn1vFmits0jmgEQMNZnV0Qj+UDMH078=
-X-Received: by 2002:a05:622a:1:b0:35d:43bc:d21c with SMTP id
- x1-20020a05622a000100b0035d43bcd21cmr3306936qtw.371.1665062556087; Thu, 06
- Oct 2022 06:22:36 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c2wJwq7SAPqkExEUOPF1OrWSNPjGqwbATxUd3G/338k=;
+        b=rcgB6L7QPY8qmPnBIG9HVD0cbru0+K+cPK1TXm5UfkMLGcV52paHpgSnvcg0p7+iy4
+         3DcfdqY94uKEAOOYV7uHRD0S+pwtNrO62QwaBzE8yChJ4bOQrNrWJqyanZObxppMHqqa
+         FqYriUpt7Tpbk+32G31Gh5CrfK7aDX2EvHpkfhGgov+bHMr7i+bMJvdvzdv4bbcasahR
+         NA437F0nV9D0Y2K0puIvZsP+s32besuFqbg5b1ItnD/1eoKSxBjJHB3m8RRGxwgkKsXR
+         PUuvUvEUrLnaRM36yu+9Ja6ZKEO6VR5s5gtwA6yNcwP2YwgvswvwTVPpRZ5Qoo/avuIC
+         ERww==
+X-Gm-Message-State: ACrzQf1ieTvgcG65e1yF5yLKXES6RSZPxgKU462pWnu1iFFS2hIr9FQt
+	7VA/fUgKnUEfPX2/uGGD2G15eUnBPdU=
+X-Google-Smtp-Source: AMsMyM6yja0Aw1MZAriEzGUbpkQob5cWRBJuUZMwdEf3n42qtW+Q2Bh2pvalCAC8ZHRk87lCdrl15Q==
+X-Received: by 2002:a05:6808:1529:b0:350:2872:4077 with SMTP id u41-20020a056808152900b0035028724077mr2488935oiw.41.1665064932944;
+        Thu, 06 Oct 2022 07:02:12 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id y40-20020a056870b02800b0012d130c2fdasm6771897oae.48.2022.10.06.07.02.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Oct 2022 07:02:11 -0700 (PDT)
+Message-ID: <185244f1-c2cf-2a4e-7081-514dc682cbcc@gmail.com>
+Date: Thu, 6 Oct 2022 09:02:10 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: Emil Velikov <emil.l.velikov@gmail.com>
-Date: Thu, 6 Oct 2022 14:22:25 +0100
-Message-ID: <CACvgo52+1i7iZ-vzqf1RUpZvMa3-EgaDoid=Y9dch4=d_dq-5Q@mail.gmail.com>
-Subject: GCMP and other unknown ciphers
-To: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 1/6] station: add two debug events for FT
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20221005224632.780575-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20221005224632.780575-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Greetings team,
+Hi James,
 
-Recently we've noticed that IWD fails to connect to WPA2-PSK networks
-whenever GCMP+CCMP cipher is used. Browsing through the IWD code-base
-it appears that it lacks support for GCMP, GCMP-256 and CCMP-256
-amongst others.
+On 10/5/22 17:46, James Prestwood wrote:
+> These events are sent if IWD fails to authentiate
+> (ft-over-air-roam-failed) or if it falls back to over air after
+> failing to use FT-over-DS (try-ft-over-air)
+> ---
+>   src/station.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+> 
 
-Was my analysis correct - is GCMP supported? Are there any plans on doing so?
+All applied, thanks.
 
-Somewhat relatedly - is there a configuration knob that one can switch
-and let IWD fall-back to the other supported ciphers? In the GCMP+CCMP
-case, we can opt for CCMP for example.
+Regards,
+-Denis
 
-Thanks in advance,
-Emil
