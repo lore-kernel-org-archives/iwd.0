@@ -1,45 +1,46 @@
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C27520E0
-	for <iwd@lists.linux.dev>; Thu,  6 Oct 2022 14:02:14 +0000 (UTC)
-Received: by mail-oi1-f182.google.com with SMTP id n83so2093888oif.11
-        for <iwd@lists.linux.dev>; Thu, 06 Oct 2022 07:02:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655BA363
+	for <iwd@lists.linux.dev>; Thu,  6 Oct 2022 14:34:03 +0000 (UTC)
+Received: by mail-oi1-f169.google.com with SMTP id w127so2226484oiw.8
+        for <iwd@lists.linux.dev>; Thu, 06 Oct 2022 07:34:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=c2wJwq7SAPqkExEUOPF1OrWSNPjGqwbATxUd3G/338k=;
-        b=FGSgTSkrmeCuZY83wpsR9+m5vMmnz27A2yGT88j+sPmG74cXhYhN5CvBOx3E89B7I5
-         SpHPlS/VILiPNipi09FalwpEuGBz3mrYA6uaExj5yXsA9hN/J6/ajyt0SMOXgwt2oel4
-         rH5qvM9H2A8BrPbA1aHscIDmp2vFsNvJZyeHSt93vMnHB1qIYN9XotOnFC+EAzQRiSpb
-         o0BRPun/QJJCjSA01xP06/UN7Tx3UybVN1s8f0NqI34qqgClp1O4UwuUdQxC3emSzNcg
-         etul1b0KSf3N6BhoIRdYnkYyC+ZfrLTMUVtlaH1ANQG6uNI2wJsXZtW6K/urR5+HTUvK
-         OUVQ==
+        h=in-reply-to:from:references:to:content-language:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U51vuW8yqZi9hTC4IWDsGECe92KgOVvPSAyE8uo753w=;
+        b=lwLvtCSWpwVIJ1SQYgwhi0Eose8ReKSz8cgqWN1Ca7/G+HZ4sWgxn4e0ap6RXdnwzB
+         bhiJ+H66dSfsWdJyDIjvlrMm8uT2YS8NrWtXMQGaCV0WevzhfZNdF6dRrb13O47b9khE
+         2XMpz9oCl2hBEnZrCOIfa9lGe3+vFmJz9S0YPTtYJLSTC9K8XHxDcbqNkWuwmhuPy0ce
+         tjKoWjrgSvcfW0fx4PiOJwYrEvb+T9MCppKCDWt8xwBe0RtgjfrNd2MLVEcQVRiQFgaR
+         QSd0OgIUOWYkNsZPemM91rHu07zLD897yayXAPRB44QTJaI2rsUeVrKPBAHDmNSemzFx
+         aNXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c2wJwq7SAPqkExEUOPF1OrWSNPjGqwbATxUd3G/338k=;
-        b=rcgB6L7QPY8qmPnBIG9HVD0cbru0+K+cPK1TXm5UfkMLGcV52paHpgSnvcg0p7+iy4
-         3DcfdqY94uKEAOOYV7uHRD0S+pwtNrO62QwaBzE8yChJ4bOQrNrWJqyanZObxppMHqqa
-         FqYriUpt7Tpbk+32G31Gh5CrfK7aDX2EvHpkfhGgov+bHMr7i+bMJvdvzdv4bbcasahR
-         NA437F0nV9D0Y2K0puIvZsP+s32besuFqbg5b1ItnD/1eoKSxBjJHB3m8RRGxwgkKsXR
-         PUuvUvEUrLnaRM36yu+9Ja6ZKEO6VR5s5gtwA6yNcwP2YwgvswvwTVPpRZ5Qoo/avuIC
-         ERww==
-X-Gm-Message-State: ACrzQf1ieTvgcG65e1yF5yLKXES6RSZPxgKU462pWnu1iFFS2hIr9FQt
-	7VA/fUgKnUEfPX2/uGGD2G15eUnBPdU=
-X-Google-Smtp-Source: AMsMyM6yja0Aw1MZAriEzGUbpkQob5cWRBJuUZMwdEf3n42qtW+Q2Bh2pvalCAC8ZHRk87lCdrl15Q==
-X-Received: by 2002:a05:6808:1529:b0:350:2872:4077 with SMTP id u41-20020a056808152900b0035028724077mr2488935oiw.41.1665064932944;
-        Thu, 06 Oct 2022 07:02:12 -0700 (PDT)
+        h=in-reply-to:from:references:to:content-language:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=U51vuW8yqZi9hTC4IWDsGECe92KgOVvPSAyE8uo753w=;
+        b=ZIYwVT5uuy4XueUOh7nbGlAaRUn07RMo0p5DcZHlIem6nKePtGvXNYwpmj+XVHoxck
+         qgxkSE9Q4G+cmfxEll/FSF00ndj5mo1Baafy2kleaDyc2A7unSauEP4yRRsdDiZtbJwv
+         WuGHv/mSuqjPmYy99cCPXRnNzHzOTDmhczkVkM+oTw/XQjV5hU/krKTCApYlY51XLDDC
+         3GUc1f9NKWfN6Ch2+UrPgfscqghg78fblGyqWpWffXMqL3KN2aU2puIbt+4vsGGebepP
+         XN1Yl+lPsZgijt1I4Ql6Mx2WLh/kXrla6l5/q/MRJPYsyjzgGBfzBoWOSre5zHPc+Raf
+         GqWQ==
+X-Gm-Message-State: ACrzQf2HxbGAB0Kmfg/nWEcq+RBwTkxphDi6e3dP/epX3ojL7s0Db0Yy
+	NCuPEI6FLSndvpONy4+Uu5KqHvyG3ng=
+X-Google-Smtp-Source: AMsMyM4ddWnlk8HRCltPcuD9R93ozKWMjWM4dLpQLA6fIajfSyV8onjyJTfEju5+JOgX4CIbggAHSg==
+X-Received: by 2002:a05:6808:10d2:b0:354:814:9ef with SMTP id s18-20020a05680810d200b00354081409efmr3364904ois.24.1665066842387;
+        Thu, 06 Oct 2022 07:34:02 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id y40-20020a056870b02800b0012d130c2fdasm6771897oae.48.2022.10.06.07.02.11
+        by smtp.googlemail.com with ESMTPSA id bx21-20020a056830601500b0065689e13f52sm5534020otb.71.2022.10.06.07.34.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Oct 2022 07:02:11 -0700 (PDT)
-Message-ID: <185244f1-c2cf-2a4e-7081-514dc682cbcc@gmail.com>
-Date: Thu, 6 Oct 2022 09:02:10 -0500
+        Thu, 06 Oct 2022 07:34:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="------------wIDUEuvjaXE3nPKW3JpIceas"
+Message-ID: <772f09aa-fe9e-708e-2ec2-a89f8784d391@gmail.com>
+Date: Thu, 6 Oct 2022 09:34:00 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,28 +49,85 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH 1/6] station: add two debug events for FT
+Subject: Re: GCMP and other unknown ciphers
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20221005224632.780575-1-prestwoj@gmail.com>
+To: Emil Velikov <emil.l.velikov@gmail.com>, iwd@lists.linux.dev
+References: <CACvgo52+1i7iZ-vzqf1RUpZvMa3-EgaDoid=Y9dch4=d_dq-5Q@mail.gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221005224632.780575-1-prestwoj@gmail.com>
+In-Reply-To: <CACvgo52+1i7iZ-vzqf1RUpZvMa3-EgaDoid=Y9dch4=d_dq-5Q@mail.gmail.com>
+
+This is a multi-part message in MIME format.
+--------------wIDUEuvjaXE3nPKW3JpIceas
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi James,
+Hi Emil,
 
-On 10/5/22 17:46, James Prestwood wrote:
-> These events are sent if IWD fails to authentiate
-> (ft-over-air-roam-failed) or if it falls back to over air after
-> failing to use FT-over-DS (try-ft-over-air)
-> ---
->   src/station.c | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
+On 10/6/22 08:22, Emil Velikov wrote:
+> Greetings team,
+> 
+> Recently we've noticed that IWD fails to connect to WPA2-PSK networks
+> whenever GCMP+CCMP cipher is used. Browsing through the IWD code-base
+> it appears that it lacks support for GCMP, GCMP-256 and CCMP-256
+> amongst others.
+
+We do not support or select GCMP.  But I'm not sure why this would prevent a 
+connection?  We would always select CCMP instead.  See wiphy_select_cipher().
+
+Hmm... maybe we reject GCMP at a lower layer...?  Try the attached patch?
+
+> 
+> Was my analysis correct - is GCMP supported? Are there any plans on doing so?
+
+No real plans, patches are always welcome.
+
+> 
+> Somewhat relatedly - is there a configuration knob that one can switch
+> and let IWD fall-back to the other supported ciphers? In the GCMP+CCMP
+> case, we can opt for CCMP for example.
 > 
 
-All applied, thanks.
+This should already happen.
 
 Regards,
 -Denis
+--------------wIDUEuvjaXE3nPKW3JpIceas
+Content-Type: text/x-patch; charset=UTF-8;
+ name="0001-ie-Skip-unknown-pairwise-ciphers.patch"
+Content-Disposition: attachment;
+ filename="0001-ie-Skip-unknown-pairwise-ciphers.patch"
+Content-Transfer-Encoding: base64
 
+RnJvbSAxNTU4NjdlMGFjYmI3YWI2NTY2NzZkZWM2NjZhMWI3NWUyNWU5MGU2IE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBEZW5pcyBLZW56aW9yIDxkZW5rZW56QGdtYWlsLmNv
+bT4KRGF0ZTogVGh1LCA2IE9jdCAyMDIyIDA5OjMwOjE3IC0wNTAwClN1YmplY3Q6IFtQQVRD
+SF0gaWU6IFNraXAgdW5rbm93biBwYWlyd2lzZSBjaXBoZXJzCgotLS0KIHNyYy9pZS5jIHwg
+MTYgKysrKysrKysrLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQsIDkgaW5zZXJ0aW9ucygrKSwg
+NyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvaWUuYyBiL3NyYy9pZS5jCmluZGV4
+IDA3MDQ1NGVmNGY4Zi4uMTNlOTIxZGFjNWJjIDEwMDY0NAotLS0gYS9zcmMvaWUuYworKysg
+Yi9zcmMvaWUuYwpAQCAtNTg5LDE1ICs1ODksMTQgQEAgc3RhdGljIGJvb2wgaWVfcGFyc2Vf
+Z3JvdXBfY2lwaGVyKGNvbnN0IHVpbnQ4X3QgKmRhdGEsCiAJcmV0dXJuIHRydWU7CiB9CiAK
+LXN0YXRpYyBib29sIGllX3BhcnNlX3BhaXJ3aXNlX2NpcGhlcihjb25zdCB1aW50OF90ICpk
+YXRhLAorc3RhdGljIGludCBpZV9wYXJzZV9wYWlyd2lzZV9jaXBoZXIoY29uc3QgdWludDhf
+dCAqZGF0YSwKIAkJCQkJZW51bSBpZV9yc25fY2lwaGVyX3N1aXRlICpvdXQpCiB7CiAJZW51
+bSBpZV9yc25fY2lwaGVyX3N1aXRlIHRtcDsKLQogCWJvb2wgciA9IGllX3BhcnNlX2NpcGhl
+cl9zdWl0ZShkYXRhLCAmdG1wKTsKIAogCWlmICghcikKLQkJcmV0dXJuIHI7CisJCXJldHVy
+biAtRU5PRU5UOwogCiAJc3dpdGNoICh0bXApIHsKIAljYXNlIElFX1JTTl9DSVBIRVJfU1VJ
+VEVfQ0NNUDoKQEAgLTYwNywxMSArNjA2LDExIEBAIHN0YXRpYyBib29sIGllX3BhcnNlX3Bh
+aXJ3aXNlX2NpcGhlcihjb25zdCB1aW50OF90ICpkYXRhLAogCWNhc2UgSUVfUlNOX0NJUEhF
+Ul9TVUlURV9VU0VfR1JPVVBfQ0lQSEVSOgogCQlicmVhazsKIAlkZWZhdWx0OgotCQlyZXR1
+cm4gZmFsc2U7CisJCXJldHVybiAtRVJBTkdFOwogCX0KIAogCSpvdXQgPSB0bXA7Ci0JcmV0
+dXJuIHRydWU7CisJcmV0dXJuIDA7CiB9CiAKIHN0YXRpYyBib29sIGllX3BhcnNlX2dyb3Vw
+X21hbmFnZW1lbnRfY2lwaGVyKGNvbnN0IHVpbnQ4X3QgKmRhdGEsCkBAIC02ODIsOSArNjgx
+LDEyIEBAIHN0YXRpYyBpbnQgcGFyc2VfY2lwaGVycyhjb25zdCB1aW50OF90ICpkYXRhLCBz
+aXplX3QgbGVuLAogCS8qIFBhcnNlIFBhaXJ3aXNlIENpcGhlciBTdWl0ZSBMaXN0IGZpZWxk
+ICovCiAJZm9yIChpID0gMCwgb3V0X2luZm8tPnBhaXJ3aXNlX2NpcGhlcnMgPSAwOyBpIDwg
+Y291bnQ7IGkrKykgewogCQllbnVtIGllX3Jzbl9jaXBoZXJfc3VpdGUgc3VpdGU7CisJCWlu
+dCByID0gaWVfcGFyc2VfcGFpcndpc2VfY2lwaGVyKGRhdGEgKyBpICogNCwgJnN1aXRlKTsK
+IAotCQlpZiAoIWllX3BhcnNlX3BhaXJ3aXNlX2NpcGhlcihkYXRhICsgaSAqIDQsICZzdWl0
+ZSkpCi0JCQlyZXR1cm4gLUVSQU5HRTsKKwkJaWYgKHIgPT0gLUVOT0VOVCkgLyogU2tpcCB1
+bmtub3duICovCisJCQljb250aW51ZTsKKwkJZWxzZSBpZiAociA8IDApCisJCQlyZXR1cm4g
+cjsKIAogCQlvdXRfaW5mby0+cGFpcndpc2VfY2lwaGVycyB8PSBzdWl0ZTsKIAl9Ci0tIAoy
+LjM1LjEKCg==
+
+--------------wIDUEuvjaXE3nPKW3JpIceas--
