@@ -1,84 +1,80 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B79EF4C80
-	for <iwd@lists.linux.dev>; Fri,  7 Oct 2022 19:59:40 +0000 (UTC)
-Received: by mail-pf1-f171.google.com with SMTP id y136so5811343pfb.3
-        for <iwd@lists.linux.dev>; Fri, 07 Oct 2022 12:59:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEB27E
+	for <iwd@lists.linux.dev>; Sat,  8 Oct 2022 03:40:23 +0000 (UTC)
+Received: by mail-oi1-f173.google.com with SMTP id w196so1206766oiw.8
+        for <iwd@lists.linux.dev>; Fri, 07 Oct 2022 20:40:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PtBi06s7pypBJTzIoBWY0QEV6ZEAuaptWYT3owZYKxI=;
-        b=grT6IBsov2pz/1A/4Jk03Ulj5MjWQs1qkA3U9Mg8yujx6JODTB6xLlQZYc8+ua1kN5
-         +9DXC8cZy0SyJ0Ad+oDuD+HxUtxxQxy0q3bE1yeo2Zpt6f3q9dRzcHMFdI81bh0tGvvf
-         iXGohu+TChMcc5ijV9/w7yhN07pGl1PstV17nEk+vuQ6ZcQLj1G+m772YlyBVL+UNzI0
-         Ei2vZbvV0MYbh8lTXMl+cubq/lKfxr2vLv3mx8/GFEXPq6F/sVhfKEdrlvQGukZjenU+
-         hxAqPAzj7NVQNI7XIAHOS5hpGMtA0nFEttiOZQq01WyFP57CLt8eU6yBSvy9zBXYezxR
-         vvoA==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xuOeRfzMfjKnLRpFScyECkURZfFhKgtEI7T0XV7LYz8=;
+        b=fpW8olAXwY3+gi5ZCuXr3owISEmohAFQYRrEUfq9Y+GnqiYbBAb/9N5SY412+0s1Oq
+         L7+fAUVb5UrCV+K+NHiZewsMIwBCZVxVbMzF1j3P2EYrVWgJ6xcZzXvaNLMcr5P5jhXx
+         o792J7g6l6fT+jcZJETmk71ilBwkHoZ43OBviPkhiYeGg9iaI+eJbIZd6JFssLwJAjvz
+         bue6xEXuzOWL+snyqHmUWzdqf+5oXqY/WoGOGmQNmoDwEnG5sPEVoGwsUuvySaZiqSS9
+         Z3jCNSpHPTCrHTttALZrh+BOt45WwnzTGNBpKzt1g2nl888R3lVCgzFOxUMRjjqKwjUz
+         LhZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PtBi06s7pypBJTzIoBWY0QEV6ZEAuaptWYT3owZYKxI=;
-        b=vapQMqqMf3QuEJNFin471AK7NfUXIsnbADz3BHOa8494xzZ5+6v5npsCdkXDvt1Mms
-         IGWlW5ysFy3sEEybmk+W2htGkD8ZE//sF/DSemXdgB/PTen3mB9I0V0liVtl00HY7FdP
-         GlUMz9gqSnyPdPGBs1rxcST4KUof8nEF5VKqkB7kqRUHUEQd+qd6IUxB9uuNpdwLGHul
-         qK7z5zOBtSR77jBGys9RtJ4FmRq+oPGPCyN+pmm6sbZ6d49TRXGyzTAApyq4hTSJo1BS
-         BH+LXcwvlCOdtqq817IZ4yKwkXiDpc2Qq0w3l6Kt/C61JFymAsfYHtq52phH0xKmQBSD
-         J4/w==
-X-Gm-Message-State: ACrzQf2EF9w2G7JxRpuMamDH2ncYNWjNpQspoaGk81vg4Z7UwMtm/PA9
-	AJPPyHdhOi7T3nWjSyyqsp3jXuAsYVc=
-X-Google-Smtp-Source: AMsMyM6YNZmFCeYzRp73wu4A63UEXNGK4O2A4CvLF4pn7tsHWA026gwNkRhqrKztU11U6dqj5/tG2A==
-X-Received: by 2002:a63:1d1:0:b0:43a:348b:63fd with SMTP id 200-20020a6301d1000000b0043a348b63fdmr6194558pgb.52.1665172779977;
-        Fri, 07 Oct 2022 12:59:39 -0700 (PDT)
-Received: from jprestwo-xps.none (h67-204-159-212.bendor.broadband.dynamic.tds.net. [67.204.159.212])
-        by smtp.gmail.com with ESMTPSA id 142-20020a621794000000b005623f96c24bsm2032965pfx.89.2022.10.07.12.59.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 12:59:39 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] client: better support utf-8 for table rows
-Date: Fri,  7 Oct 2022 12:59:37 -0700
-Message-Id: <20221007195937.8842-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xuOeRfzMfjKnLRpFScyECkURZfFhKgtEI7T0XV7LYz8=;
+        b=ThtnwAjZCUZDMCuGP9FdtsIkMWOfIKekiACkQy7VoqW890+iq46Tn6FVq33G7h08Dp
+         RFP1+z4rR5p4qKH2z6eJPywQURPitDNJRAY+/Fgnc4LVK2D5c9UunDn/beuB4ZcKeoim
+         N/ACMvUDb0/XmwoGr4V9UjHVJxaYtXJu05vhSfD3FALWjDLcwUqSHi5LdfMh3YBiClzZ
+         Io4+BKkZH6oVJM4m39SQvctrFrHAkNENfLcfGkvLOJvC/j24uvCMxoco+o/JWs8Ja5nj
+         y4QLavgzZWDMq6oTyMImZ8Ygfdo39WJPedxetV8uSuMt0+97WmIXz0TzOZsH4zEZXfFl
+         XDNA==
+X-Gm-Message-State: ACrzQf39g3ObkozpkkhXeK3NuUGoFXtYj1aJkDl0VfBT6+0vNlBjL4vw
+	ihb0JOeMSW7RbxJSV+gS3l84aSzgb8k=
+X-Google-Smtp-Source: AMsMyM6jVPSswiZw9SPGIokOiCDVqQVytC31UFA9CdX6dzfwsTgr3VlMCJrDic6P0yPiPiZCs7Rubw==
+X-Received: by 2002:a05:6808:d52:b0:350:9a6a:3c82 with SMTP id w18-20020a0568080d5200b003509a6a3c82mr4091272oik.197.1665200423075;
+        Fri, 07 Oct 2022 20:40:23 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id y9-20020a056870418900b0010e73e252b8sm2275044oac.6.2022.10.07.20.40.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Oct 2022 20:40:22 -0700 (PDT)
+Message-ID: <f4d3f7da-85b8-3913-852f-468290c7af66@gmail.com>
+Date: Fri, 7 Oct 2022 22:40:21 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH] client: better support utf-8 for table rows
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20221007195937.8842-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20221007195937.8842-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The utf-8 bytes were being counted as normal ascii so the
-width maximum was not being increased to include
-non-printable bytes like it is for color escape sequences.
-This lead to the row not printing enough characters which
-effected the text further down the line.
+Hi James,
 
-Fix this by increasing 'max' when non-codepoint utf-8
-characters are found.
----
- client/display.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+On 10/7/22 14:59, James Prestwood wrote:
+> The utf-8 bytes were being counted as normal ascii so the
+> width maximum was not being increased to include
+> non-printable bytes like it is for color escape sequences.
+> This lead to the row not printing enough characters which
+> effected the text further down the line.
+> 
+> Fix this by increasing 'max' when non-codepoint utf-8
+> characters are found.
+> ---
+>   client/display.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
 
-diff --git a/client/display.c b/client/display.c
-index 2b0fd4f7..b729ad4c 100644
---- a/client/display.c
-+++ b/client/display.c
-@@ -410,7 +410,9 @@ static char* next_line(char *s, unsigned int *max, char **color_out)
- 			/* color escape won't count for column width */
- 			*max += color_end(s + i);
- 			last_color = i;
--		}
-+		/* Add width for non-codepoint UTF-8 bytes */
-+		} else if (((uint8_t)s[i] >> 6) == 2)
-+			*max += 1;
- 	}
- 
- 	/* Reached the end of the string within the column bounds */
--- 
-2.34.3
+Applied, thanks.
+
+Regards,
+-Denis
 
