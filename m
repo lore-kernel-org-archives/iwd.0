@@ -1,76 +1,65 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2833207
-	for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 15:57:10 +0000 (UTC)
-Received: by mail-pf1-f176.google.com with SMTP id i3so11103345pfk.9
-        for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 08:57:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3C53207
+	for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 16:10:10 +0000 (UTC)
+Received: by mail-pj1-f50.google.com with SMTP id d7-20020a17090a2a4700b0020d268b1f02so4070526pjg.1
+        for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 09:10:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:from:to:cc:subject:date
+        h=in-reply-to:references:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=32F8weFQB2tf4HtcPu4l/OqVWpfO4fNvUgXRBN2SQQ8=;
-        b=nawMUSXhlXucAVZaGJQK3nz5nYt+KdE0lB2MbrQVYnr2rvttmyZtYQMJ0mQneVDABI
-         UNFLHUvNeftDgFOuqeWNRhF/B6p4KtvRkoMIn61ZYyRqrjHLUYEXHL9nO145/0PSgJhd
-         jh4zlDMQqilqgNERR/0z3C88C3c+CfIDZjnsiL5YOhbW2+bury/kjdxD/TLcs7o/NIiw
-         YhFHtMv6iXc8v5tjddKZ8zDBsmVZGa6zy/lNkVL33jWBFKUwvZWAqfvyaoHNrgOErKo3
-         GCKPmkoSIv3MsfU5FREUg0306sOWyJBNE0WVeQv/+YzGdsit/Quiu9wpr9CEUI9lBMpT
-         CpQg==
+        bh=5CxqcKe1O6K6D03Ds3rTEaLTEnXz08iv6x6jNdUUTIE=;
+        b=kRrFCD5QCYogBB1sqDNUO/BGD8RJF5uRS4I9SUHA/ewrk0UVHCTOm3yeKUjh7yCd51
+         Nwg83mAsVKJcE4CdM7QYpAlH/HRXWhPi5B7xRSHW5aMkZk5YMCu9WCJAPQjkEIvO8c2p
+         DQ6lYShG7cByn7tvNbs3KiXwhJ5OLNddNWZsTJHJJbTBDtZffjrwZQ3LODtZV8GqLM6u
+         UMqjr0XjYpVpLrEohKWEXxE1egkoQl2bqKkTzspg8ss1bN2hkWL88aSWDsWl5eLQfPor
+         LN5JH8AnMutKV2Ld3gskzFZ2l8povwBaPMrLTehmfKYRmXgqGJrpkGIbt+zlx1tEcsQU
+         ly6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=32F8weFQB2tf4HtcPu4l/OqVWpfO4fNvUgXRBN2SQQ8=;
-        b=Fz7HyhbYXmKvtEkS6xzCJpxuVm9MHQ+XJleLkY0AR5cNPj9gH0hJ835QD9d1ivg7cO
-         A7YP8Fp11/aO7ydVTZHjPEGbwcfx1VKXYYGLbG1LFszRSA2GXMWnYmzaBHuAooMZ3XKr
-         EQopFABc3aJOFXvthsZzgMKPzuZCMNWRGIAYF8Frpv927sF2xvbDPpL02HOcy3VmUGIu
-         M9lwhBAbhTpn4nRGPV1id6mLv8A1FqTqKcE39xxJLb0wrlLELAh5Mxqxl4N8x3dhHnf/
-         WnG8aBvINNpppcksNwBt3xH6UWYrC7PBLEN9eHGVr65rFjf8MJi7bNuEgAMTdJNOWhF1
-         IOCg==
-X-Gm-Message-State: ACrzQf13MhQeicBkip/fGms1Wu4h3z5HOzJGjVyHRoknUQktypIWP2LA
-	N/V152tveDaOsjRHVgMWO+ZlikQktTI=
-X-Google-Smtp-Source: AMsMyM5Frl8m0fBSisFBQvQ9Txa3pWbLFtLo4hNxJrA/4tKCPZpO6Hpf+WtWnhftMzmqISBmFUXavg==
-X-Received: by 2002:a63:5a63:0:b0:42f:e143:80d4 with SMTP id k35-20020a635a63000000b0042fe14380d4mr17439951pgm.456.1665417429922;
-        Mon, 10 Oct 2022 08:57:09 -0700 (PDT)
-Received: from [192.168.254.15] ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id d5-20020a17090a2a4500b001f2ef3c7956sm9341081pjg.25.2022.10.10.08.57.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Oct 2022 08:57:09 -0700 (PDT)
-Message-ID: <72fd6e3e0ee1ac040f4ad1af0dcffc5f693b3c5a.camel@gmail.com>
-Subject: Re: [PATCH] client: handle wide chars for table rows
-From: James Prestwood <prestwoj@gmail.com>
-To: Pinghao Wu <xdavidwuph@gmail.com>, iwd@lists.linux.dev
-Date: Mon, 10 Oct 2022 08:57:09 -0700
-In-Reply-To: <20221008075509.26252-1-xdavidwuph@gmail.com>
-References: <20221008075509.26252-1-xdavidwuph@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        h=in-reply-to:references:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=5CxqcKe1O6K6D03Ds3rTEaLTEnXz08iv6x6jNdUUTIE=;
+        b=HblSGS6/xMJlkOB9qFrxxufQdlVCscutZG5O8z/rYcEqOyX3OeZ4urkw4z0LV7VyHj
+         S1XWkN6rFqKVbeT8G+3kOya5NXEqy+MPxXedgenA9o4B92HF5adj6wFuPRcvUr1pt8bb
+         trw9tL+EbzywuMmJlxShlYxhDlqiW64B+F81KCiKU3YwJnp7wexUHhZaLL3JguxqsiqQ
+         q/hOYzs03a/X1jFtwZVozS/3xTzp2d71Wl/ZBl7AaUCvH/7M7Y5f9NNVdI0PLDwP2mTk
+         fuqiFxf5Tzc1UQHgdb+s2ZHyyabo8mPAtNe2SpclQbuZxVTPD6H9a0oxjHir/DFf8RAO
+         PwOg==
+X-Gm-Message-State: ACrzQf0YwwVTIbjFM4vznd0BiSMkOG8E1jR7sVmmgPsPvJdTxNAwFIMn
+	8MN7TdlWaw9T0GN3MYLhuuV2Bap0EXI=
+X-Google-Smtp-Source: AMsMyM7VGQy7F5YbuSwwCGJd0s9smCbEKTDd7S4vA7p3hkUMIEAsXUbK3CsEyputHtP3ofd8hx6d8w==
+X-Received: by 2002:a17:903:189:b0:183:7473:57f1 with SMTP id z9-20020a170903018900b00183747357f1mr409628plg.28.1665418209903;
+        Mon, 10 Oct 2022 09:10:09 -0700 (PDT)
+Received: from localhost (114-41-39-105.dynamic-ip.hinet.net. [114.41.39.105])
+        by smtp.gmail.com with ESMTPSA id t6-20020aa79466000000b005631af4ece2sm3858802pfq.182.2022.10.10.09.10.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Oct 2022 09:10:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 11 Oct 2022 00:09:38 +0800
+Message-Id: <CNIDH0YNL06Q.3B8CX0X2XUXID@xps>
+Subject: Re: [PATCH] client: handle wide chars for table rows
+From: "Pinghao Wu" <xdavidwuph@gmail.com>
+To: "James Prestwood" <prestwoj@gmail.com>, <iwd@lists.linux.dev>
+X-Mailer: aerc 0.12.0
+References: <20221008075509.26252-1-xdavidwuph@gmail.com>
+ <72fd6e3e0ee1ac040f4ad1af0dcffc5f693b3c5a.camel@gmail.com>
+In-Reply-To: <72fd6e3e0ee1ac040f4ad1af0dcffc5f693b3c5a.camel@gmail.com>
 
-Hi Pinghao,
+The current non-codepoint UTF-8 method assumes that a codepoint occupies
+one column while printing. This is not true for some characters like
+Chinese characters, which occupies two columns.
 
-On Sat, 2022-10-08 at 15:55 +0800, Pinghao Wu wrote:
-> Try to find out printing width of wide chars using current locale and
-> its byte length before falling back to non-codepoint UTF-8 bytes
-> method.
-
-So IWD itself only supports utf-8 so I'm not sure adding support for
-wide chars in iwctl is really useful.
-
-This function is for printing table rows and any data in these rows
-comes from DBus, which will always be utf8.
-
-Unless you have some other use case I hadn't thought of?
-
-Thanks,
-James
-
-
+The motivation of this patch is to handle these "wide" (in printing
+columns) chars properly via wcwidth(). It's not actually about
+non-UTF-8, but it is also useful for that case.
