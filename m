@@ -1,128 +1,73 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0797233CC
-	for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 18:27:24 +0000 (UTC)
-Received: by mail-pg1-f181.google.com with SMTP id s206so10929233pgs.3
-        for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 11:27:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D302F56
+	for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 18:42:47 +0000 (UTC)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-1364357a691so6902232fac.7
+        for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 11:42:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cAk3ePPNh4NiPV0nEiIIOTacKphvCbMkuo9Uy1PKjgk=;
-        b=bvndvNF7sTmnIdgZOskCNASrdrDQv9pnGcS6Sfrc3BFwa5uonNX/tlILCOQk4BOMoL
-         Xq6ZD9hWnOZyZtB2y3zfxSJRAY7mjvQwvkf5Sb5LFCq4ZpwzkBoAcrlUBcExwXcRRZmO
-         uP6bcGBqhhUNWoFcwyWr1+xqdEKGJeJNDsjKFv4Un8ojKqk52bbrq4ekyMtlpwH9G7hw
-         I+altxvogci1ndWnTrOwz7sk4zICQQuUBhrzD0zJ7iD9317T5D1T/e65T/2mIFp5jE1m
-         IImmeTAlJmaQ1Yc/sH9HidklaPC9MKEPhoHRs9H8tcm/rxZjwCbhfQrZAaIxlPGIGOMw
-         LkSw==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xSFUMo7lRYHbjtORr7uk8gfW9sgah4zX3gesekcNZto=;
+        b=agcWzcd+7D0ObIIwFjKeHU8FeM6yr+bNfzrW2VGo4viBfwyk4EmxiHXtSyBM4E2zP5
+         +VIb2Bs2VaRaLQg1Hr6U5+Tp9hXr2Sx+sb8n+o5wTDa9bNj2lB291UauaWP5X/mdaSri
+         HHUeNIBuWBK6OlyDbAJYpPC8e/BgPgill3xJXFmzzsBWT8K7zOlsnmK8ljeOLm2lmCje
+         xU0AVgLsXwoQlHMeq9ixg18djcKL9jrQvwCkNf2oTJPS8AnNQiqL0V9IeNr/T8gffmc+
+         nd/sHzrX9zi1kfCV2+fNhToceO/c52e0Vj1l/Zyf4e3cMzZ7jCC+af5THozTVUiPDXgE
+         yxZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cAk3ePPNh4NiPV0nEiIIOTacKphvCbMkuo9Uy1PKjgk=;
-        b=AvybXqSoyCCFfg6sST8n/cp06Vb1N4Z3SMzkIEdsAWiljEiwmxrx8wsa6HeC9faZ+y
-         crkT6LcKXxxwQywL0KW4T3Dr7Uiiq5SqKJIpA+Ca0Zdh4ftqLUDGjXAriHrFXalkqSZ2
-         RCJiZkFYVXXK2owHOGbcXMze0uMjGBSAQIg+x/ZDEKv0roYsGZHTtL73BFNJZIZzYfKO
-         6ooFf6BG1e245bGS5o9+PGf8zFdp07RWRl5WPHSr4ITscQqcOjHklD9dINXHIKTFOdEI
-         0UBaD3pQqv3rLFHg236/nFYgRLVBt5eF3XXNI4buGVimDy58e9FvjrVNZTED0URKK8Iq
-         1xgw==
-X-Gm-Message-State: ACrzQf3ScT9QN+3nfPRuu6an9ldPNRaacFPuACJNvygLoYaMVYCUxIfd
-	qkVpTMfAhbnimi0KQJNfY/QmkV0yqb8=
-X-Google-Smtp-Source: AMsMyM6XnnXKxFSQYCBk4AWkxqWV3ga0HvoqkzVwQItWNKRw73uAjkteiU76RyAGpQlagc78O9FGGA==
-X-Received: by 2002:a63:b64:0:b0:439:8143:c184 with SMTP id a36-20020a630b64000000b004398143c184mr17584225pgl.22.1665426444047;
-        Mon, 10 Oct 2022 11:27:24 -0700 (PDT)
-Received: from localhost.localdomain (114-41-39-105.dynamic-ip.hinet.net. [114.41.39.105])
-        by smtp.gmail.com with ESMTPSA id bc8-20020a656d88000000b0043a1c0a0ab1sm6395211pgb.83.2022.10.10.11.27.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Oct 2022 11:27:23 -0700 (PDT)
-From: Pinghao Wu <xdavidwuph@gmail.com>
-To: iwd@lists.linux.dev
-Cc: Pinghao Wu <xdavidwuph@gmail.com>
-Subject: [PATCH v2] client: handle wide chars for table rows
-Date: Tue, 11 Oct 2022 02:26:03 +0800
-Message-Id: <20221010182603.55042-1-xdavidwuph@gmail.com>
-X-Mailer: git-send-email 2.38.0
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xSFUMo7lRYHbjtORr7uk8gfW9sgah4zX3gesekcNZto=;
+        b=04mV0D8uOEoXKd/DtbrwqVf7qgW8k+TvADAr7xltxnDaK+Jo2KmLc82/kKI0Wy/sMq
+         eH8WzQvKqlpyge5pdlHI0EccZZLoZieEU2idRWv9A+pUmlGoJziZ6AwVz8GlLqcidBXw
+         KR9nbeiH9YGRkdue8LT5nAbhL0KFQwEvesdzo1SubHd8q2fvVgz5jfb8ZER2uAp1EXs9
+         WparrKAbpXimDNDfuaVeyV+17+KpNb1cCOq3ow6CJywMbNwlXrdCpws09+G/YqauTEtj
+         GGVEVGZEHb8I06NcfrNgSdWZWJCfydZ7d39EBS3MqUiI2gJhIGqADaFNE/9AH9F/mLI9
+         UEuQ==
+X-Gm-Message-State: ACrzQf0wtgzHPa4en726pe/wzf4G5XppCKUNGy752JqjsxnoL9Dqh3P5
+	R5i9ZreAy0NqEVH5ppKYlMeTw/MUEog=
+X-Google-Smtp-Source: AMsMyM5rq9mgQ058UiLkWVrtcDk/dsaLMPHvO5ggHHT+k6iiNxr+ymXXNgOkbvN8MBCyoGnZp8yU2A==
+X-Received: by 2002:a05:6870:c14e:b0:133:14d6:cf57 with SMTP id g14-20020a056870c14e00b0013314d6cf57mr12387385oad.155.1665427366292;
+        Mon, 10 Oct 2022 11:42:46 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id h13-20020a056870538d00b00127ba61535fsm5514133oan.15.2022.10.10.11.42.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Oct 2022 11:42:45 -0700 (PDT)
+Message-ID: <bb04c207-6e8c-79e1-be29-7aa930cca8d4@gmail.com>
+Date: Mon, 10 Oct 2022 13:42:35 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH] src/station.c: remove excess if clause
+Content-Language: en-US
+To: Peter Shkenev <mustela@erminea.space>, iwd@lists.linux.dev
+References: <20221009132744.8998-1-mustela@erminea.space>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20221009132744.8998-1-mustela@erminea.space>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Find out printing width of wide chars via wcwidth().
----
- client/display.c | 18 ++++++++++++++----
- client/main.c    |  3 +++
- 2 files changed, 17 insertions(+), 4 deletions(-)
+Hi Peter,
 
-diff --git a/client/display.c b/client/display.c
-index b729ad4c..42b5336e 100644
---- a/client/display.c
-+++ b/client/display.c
-@@ -30,6 +30,7 @@
- #include <sys/stat.h>
- #include <sys/ioctl.h>
- #include <unistd.h>
-+#include <wchar.h>
- 
- #include <readline/history.h>
- #include <readline/readline.h>
-@@ -401,18 +402,27 @@ static char* next_line(char *s, unsigned int *max, char **color_out)
- 	unsigned int i;
- 	int last_space = -1;
- 	int last_color = -1;
-+	int s_len = strlen(s);
- 
- 	/* Find the last space before 'max', as well as any color */
--	for (i = 0; i <= *max && s[i] != '\0'; i++) {
-+	for (i = 0; i <= *max && i != s_len; i++) {
- 		if (s[i] == ' ')
- 			last_space = i;
- 		else if (s[i] == 0x1b) {
- 			/* color escape won't count for column width */
- 			*max += color_end(s + i);
- 			last_color = i;
--		/* Add width for non-codepoint UTF-8 bytes */
--		} else if (((uint8_t)s[i] >> 6) == 2)
--			*max += 1;
-+		/* Non-ASCII */
-+		} else if (s[i] & 0x80) {
-+			wchar_t w;
-+			int w_mblen = l_utf8_get_codepoint(&s[i], s_len - i, &w);
-+			if (w_mblen > 0) {
-+				/* Compensate max bytes */
-+				*max += w_mblen - wcwidth(w);
-+				/* Skip other bytes of this codepoint */
-+				i += w_mblen - 1;
-+			}
-+		}
- 	}
- 
- 	/* Reached the end of the string within the column bounds */
-diff --git a/client/main.c b/client/main.c
-index df5c0a61..7e8dead4 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -25,6 +25,7 @@
- #endif
- 
- #include <errno.h>
-+#include <locale.h>
- #include <signal.h>
- #include <ell/ell.h>
- 
-@@ -50,6 +51,8 @@ int main(int argc, char *argv[])
- {
- 	bool all_done;
- 
-+	setlocale(LC_CTYPE, "");
-+
- 	if (!l_main_init())
- 		return EXIT_FAILURE;
- 
--- 
-2.38.0
+On 10/9/22 08:27, Peter Shkenev wrote:
+> No functional changes are intended.
+> ---
+>   src/station.c | 7 ++-----
+>   1 file changed, 2 insertions(+), 5 deletions(-)
+> 
+
+Applied, thanks.
+
+Regards,
+-Denis
 
