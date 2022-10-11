@@ -1,52 +1,49 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F3D5C8A
-	for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 19:40:15 +0000 (UTC)
-Received: by mail-pg1-f176.google.com with SMTP id q9so11041286pgq.8
-        for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 12:40:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18A015A9
+	for <iwd@lists.linux.dev>; Tue, 11 Oct 2022 04:14:32 +0000 (UTC)
+Received: by mail-pf1-f180.google.com with SMTP id y1so5291542pfr.3
+        for <iwd@lists.linux.dev>; Mon, 10 Oct 2022 21:14:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kqsYzApM6Z1MqTA2/xFnKsCLy3ac7h8gphO9sNqCxVw=;
-        b=Hm+8dIYjoNeqaQIqIn7OBCQ0waJeouFhuSec3qLGHVXZBLHENLKWTDI9kRXvrMhhm9
-         zP/rEnoNRqTgEo51Od+QTGp+vVFbcGtuwcgsBTPlN3KGytju968CIoCeqJFF49LgVv29
-         sHecgc8MQEedo2xSeyY3xFKO98rXE0FHd3HcKhmwoWEU96BGnfvOEAKglBvYjqeUr72w
-         Dhua9I52J357wzDaoJOKMycK1rdIsekboqtxQEOMFFMOWPNqjlhPkZ608dbrkMxwgYaG
-         F9zN5y2AvfamYNAIbSqH4ERr/B9dSbrj5Tu7BaYfYaKGCqGIaRORXcR2Bgh2MtA+ehBJ
-         8MzQ==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fqpd8JQ6JEAnxJ076ZqwRsqmbbzH/jJZufuIT6z9vMk=;
+        b=FkYr+JFBPG+3o1cnpa9j4JJubYKpUlwjn3tLuvuAD4BYRJRNWTqCk/kfeo+hxqLbs/
+         XN/CyNg0XA1AOSAUX6XC3NpFiEWY8pPpVt/QwmP62PJskNPdRWFiBrY2fUCmgM/oR/+y
+         8+rf2r1tUjwNfGNaJo3pifdio25E6+mYPjGOvnlbE/GybzMVRkWqIUKp/hbMq+Zeh/VI
+         AyI0H36Yn3TGClWin9qWWyO8zxwNwD4uhnPhUChQmzmsSoL3fB4ZG+SE0Fs6A1Q/QagQ
+         eQTZZSpEwZ4NbPjTjzviErhegUD2OjVc90oj2eCNbtj+Dv6bzTwzGRFctNzoU/R6cAMI
+         N8tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kqsYzApM6Z1MqTA2/xFnKsCLy3ac7h8gphO9sNqCxVw=;
-        b=yrQl5QOjNWLbltlzsygIklqMoYkrp/9P0O/R3FjWFEke95hXwG+Riy/ZK0KlVrEy4r
-         qLvRsbyvF5Pa8FgCCoE7O33B/x871UlpjXbBvnvmW448c3/dH2Bman9Ggvjfqp0rDLW+
-         u6Grv7xNN+QJz4pRos/5QK3cPT7uTSSew4GsJ5PCD4X2pXUnULHktcyCw8fODXM/EUi+
-         QlCPIBdUiL86Q6HY0U76beLEu695nU9gYlyWlY3dPRR5LQb/TqeKqAq3uMpZV3QLA+i+
-         RNp5Bh4pggww0ejpvBbCihG0J+6XitoVLWpsTEvdWvlY5MMS7mpz00Yhf1xLbW9xIAva
-         GKpA==
-X-Gm-Message-State: ACrzQf3PcYPIn55Y2QY9yxNIdnyvQY9QocI2ruR7j18EBZn0JJks7+jW
-	+Cs0D8nbIlDfHjSXfTfUZM643RWnP/g=
-X-Google-Smtp-Source: AMsMyM7Jw0zCShpZ2CJB1O5xAOH3ZZ0x6S59+u00bWpQ1QBjWF/j9bhtwrry9VvHZ9fKyO0WBfygyw==
-X-Received: by 2002:a05:6a00:bc7:b0:563:2e85:1cf with SMTP id x7-20020a056a000bc700b005632e8501cfmr10124126pfu.1.1665430814912;
-        Mon, 10 Oct 2022 12:40:14 -0700 (PDT)
-Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id i4-20020a63bf44000000b0044046aec036sm6486995pgo.81.2022.10.10.12.40.14
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fqpd8JQ6JEAnxJ076ZqwRsqmbbzH/jJZufuIT6z9vMk=;
+        b=xWoo2iqDpQ90PNt9VhPDed8TvAsZ/eB+8FRxxTRvIxANvq1OxSib6pgjj/0Clr8sON
+         wooNoKm0T8ddevXqo9+R76hyiiyNUYaBfD21x8RbAmO+Q6GzhU8kEvcdRyFYtjXmPNHT
+         kuAwy7BjWlSSzMvujonivso6IXGyHmS1MyONg4z7WqUD62JMGj/D5q5AIJqIsQo6FDm4
+         3g/DDz8VExO5RQdmOZA+/FppMB4L2PKGAUO+I3n7P9plHOwctqtvFl84ErB/c2x88Qhx
+         /v0JCpc0Hk6TJv/V8E9tGkoQ4/uOmEijpbofSa/xih8B2vyGvzO4LEi+jabETnP08F3H
+         UZbA==
+X-Gm-Message-State: ACrzQf1tltwwDbk2BdJpgDwo7A6Wp8SNHqQIFQgzKWDRvG24XxEGXbav
+	1hcufHyKJNo7vaMp4PPsGtugTrU30RA=
+X-Google-Smtp-Source: AMsMyM7eKqzzlkLCMblP6Jy/1yHdDHITQ3LAjTZ5QQqU8DJuYvxzwiqrjZ2oczIjXUkVvJ7q4V+FXQ==
+X-Received: by 2002:a05:6a00:b4d:b0:561:b974:94b9 with SMTP id p13-20020a056a000b4d00b00561b97494b9mr22996179pfo.26.1665461671632;
+        Mon, 10 Oct 2022 21:14:31 -0700 (PDT)
+Received: from localhost.localdomain (114-41-39-105.dynamic-ip.hinet.net. [114.41.39.105])
+        by smtp.gmail.com with ESMTPSA id g2-20020a170902d1c200b0016cf3f124e1sm7414307plb.234.2022.10.10.21.14.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Oct 2022 12:40:14 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
+        Mon, 10 Oct 2022 21:14:30 -0700 (PDT)
+From: Pinghao Wu <xdavidwuph@gmail.com>
 To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] station: contrain known frequencies before roam scan
-Date: Mon, 10 Oct 2022 12:40:11 -0700
-Message-Id: <20221010194011.55962-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20221010194011.55962-1-prestwoj@gmail.com>
-References: <20221010194011.55962-1-prestwoj@gmail.com>
+Cc: Pinghao Wu <xdavidwuph@gmail.com>
+Subject: [PATCH v3] client: handle wide chars for table rows
+Date: Tue, 11 Oct 2022 12:11:10 +0800
+Message-Id: <20221011041108.5933-1-xdavidwuph@gmail.com>
+X-Mailer: git-send-email 2.38.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -55,37 +52,91 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The known frequency list may include frequencies that once were
-allowed but are now disabled due to regulatory restrictions. Don't
-include these frequencies in the roam scan.
+Find out printing width of wide chars via wcwidth().
 ---
- src/station.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+v3:
+	Code simplification
+	Unify handling of color escape / char width a bit
 
-diff --git a/src/station.c b/src/station.c
-index f138846d..986d6757 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2659,12 +2659,17 @@ static int station_roam_scan_known_freqs(struct station *station)
- 						station->connected_network);
- 	struct scan_freq_set *freqs = network_info_get_roam_frequencies(info,
- 					station->connected_bss->frequency, 5);
--	int r;
-+	int r = -ENODATA;
+ client/display.c | 30 +++++++++++++++++++++---------
+ client/main.c    |  3 +++
+ 2 files changed, 24 insertions(+), 9 deletions(-)
+
+diff --git a/client/display.c b/client/display.c
+index b729ad4c..5ec80789 100644
+--- a/client/display.c
++++ b/client/display.c
+@@ -30,6 +30,7 @@
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
+ #include <unistd.h>
++#include <wchar.h>
  
- 	if (!freqs)
--		return -ENODATA;
-+		return r;
-+
-+	if (!wiphy_constrain_freq_set(station->wiphy, freqs))
-+		goto free_set;
+ #include <readline/history.h>
+ #include <readline/readline.h>
+@@ -398,21 +399,32 @@ static unsigned int color_end(char *s)
+  */
+ static char* next_line(char *s, unsigned int *max, char **color_out)
+ {
+-	unsigned int i;
++	unsigned int i = 0;
+ 	int last_space = -1;
+ 	int last_color = -1;
++	int s_len = strlen(s);
  
- 	r = station_roam_scan(station, freqs);
+ 	/* Find the last space before 'max', as well as any color */
+-	for (i = 0; i <= *max && s[i] != '\0'; i++) {
+-		if (s[i] == ' ')
+-			last_space = i;
+-		else if (s[i] == 0x1b) {
++	while (i <= *max && i != s_len) {
++		int sequence_len;
++		int sequence_columns;
 +
-+free_set:
- 	scan_freq_set_free(freqs);
- 	return r;
- }
++		if (s[i] == 0x1b) {
++			sequence_len = color_end(s + i);
+ 			/* color escape won't count for column width */
+-			*max += color_end(s + i);
++			sequence_columns = 0;
+ 			last_color = i;
+-		/* Add width for non-codepoint UTF-8 bytes */
+-		} else if (((uint8_t)s[i] >> 6) == 2)
+-			*max += 1;
++		} else {
++			if (s[i] == ' ')
++				last_space = i;
++			wchar_t w;
++			sequence_len = l_utf8_get_codepoint(&s[i], s_len - i, &w);
++			sequence_columns = wcwidth(w);
++		}
++
++		/* Compensate max bytes */
++		*max += sequence_len - sequence_columns;
++		i += sequence_len;
+ 	}
+ 
+ 	/* Reached the end of the string within the column bounds */
+diff --git a/client/main.c b/client/main.c
+index df5c0a61..7e8dead4 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -25,6 +25,7 @@
+ #endif
+ 
+ #include <errno.h>
++#include <locale.h>
+ #include <signal.h>
+ #include <ell/ell.h>
+ 
+@@ -50,6 +51,8 @@ int main(int argc, char *argv[])
+ {
+ 	bool all_done;
+ 
++	setlocale(LC_CTYPE, "");
++
+ 	if (!l_main_init())
+ 		return EXIT_FAILURE;
+ 
 -- 
-2.34.3
+2.38.0
 
