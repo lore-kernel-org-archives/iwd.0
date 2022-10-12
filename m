@@ -1,49 +1,49 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4AD28E7
-	for <iwd@lists.linux.dev>; Wed, 12 Oct 2022 18:35:25 +0000 (UTC)
-Received: by mail-pf1-f179.google.com with SMTP id h13so15863529pfr.7
-        for <iwd@lists.linux.dev>; Wed, 12 Oct 2022 11:35:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D258290A
+	for <iwd@lists.linux.dev>; Wed, 12 Oct 2022 18:35:26 +0000 (UTC)
+Received: by mail-pj1-f54.google.com with SMTP id x31-20020a17090a38a200b0020d2afec803so2856650pjb.2
+        for <iwd@lists.linux.dev>; Wed, 12 Oct 2022 11:35:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hxG3xTaX7TZEbLUFVGOiAYtxJmDDjJT1BBE+07PGVKA=;
-        b=iLeqruqFLp3NFR5ILrzuak7Z06h0l4V8LwHy50mTRI4zknAGuehhV/YAOoOHYpl5Ao
-         eM0ATCJ1Z4wZlvSrXW1d958Rc97MsuVbExEQzwSAdhh6GOTUDbgDP1yUTzvfK4itHKB4
-         ELri69LO6r6sf7sZUMJyGtCaiiV/wzGOV73O9H96cBnn0DZhORFvyZf30f/HDcRhpcIe
-         qw+dS0E1cg3l8I7rwyUbFmsifWLwdt+Dt32lmBtpqunuYyvhsTJ0E7+zVGu2xPizXQr2
-         xEE+XVwlpUTc6GlE/OowAac3km5SAfr/62676YvCffLvzb0UVuX4CkjFeuLcRJ6x64te
-         OaHA==
+        bh=+V6MG0rymQeMsYvPM5LgtIrSIncJ3qS9dsrtmSj57Y0=;
+        b=CdFnUZLKy3GNSvoN5LfDzM5c+DE+0cvc7L8s9EeB7WWrv48fEhdCBMkljP/iEKB7JM
+         SHNCdhw6bUfVV9htMVn88gW5ezpB1ghQ7Igy210G1YYZPcwWy2HmKOThuAVfQLpfjnlz
+         VUsTIvs/BKUYmhrtLUG3r0ExSiIPMEeN4VXFv8ET/saLfI6g6ce4HHhSxLZbWGaUA1MQ
+         4ero/5szhwse6IgaR09VlDBc9bjW0PDuEzwEm9WlxOnVqFohk8m9ZjV7sNzE6wxHYi4+
+         Eo96DksEGc7dyQ4+aVGHdQ2m6X5z8xEm0dR49XNhxUz0drxnRHbytV97qLPM6620cU2l
+         0O6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hxG3xTaX7TZEbLUFVGOiAYtxJmDDjJT1BBE+07PGVKA=;
-        b=7/gw/83RngegZM9JwAmpw5TIIZBBiFlQQf2LBYwnLoPgdL46bNUvFhGJJOkuVjeIsF
-         SJrNOScBGpt+GpDF2k6vURx9Ic8Q+R0eINV1a8Jk8m7iLF6Eh8zZ4SFGp/KOURTw+DB/
-         V7SYy177y9GFzzTBxZyJg7xNKrQoPj5T6c+nNKKWHbLOC7pBbLQ2tn7B+g4svh5/j6wG
-         BOYny1r+KXB3/uOsz/Y0uu6Us7uUneT2gZFkIxJWl+ns98/EcR3+/Ovj8Tj0ERSOENSP
-         sncFjZuT5bDyKmXf19GAwqjAp+Ry3qWtxVL1+FZHDP5Iz/ibH6It1XY1peXWllKNTy1b
-         ZoOw==
-X-Gm-Message-State: ACrzQf3OewN0wuxO9oLjNEFmzNHjkOQX7VIdQLwAI6zifEJtv7ik9jij
-	KITXJhXctEch3deNhAYKo8SS9ZxcFKM=
-X-Google-Smtp-Source: AMsMyM63tnpSkcmlVazdg/L0Pjn7MZKwUrVDRWNzrs1/i9nacHmLCp7LBRlePHEopGyIK72tGeTH8g==
-X-Received: by 2002:a65:6bc4:0:b0:439:8ff8:e2e1 with SMTP id e4-20020a656bc4000000b004398ff8e2e1mr26803309pgw.91.1665599725091;
+        bh=+V6MG0rymQeMsYvPM5LgtIrSIncJ3qS9dsrtmSj57Y0=;
+        b=0kOO7BkQlTNcDKty1eG58aRWkuBkXa4th93Ukja5qOR7zaKnOcaQzjuLZ1S0K6DNKe
+         FqKNOm9fa2WX5ehDVvkpq41Lx1llGnMVc/3gW+z/+oFXSyNISr+kTKbFP7ojAU31T+Gi
+         gqkThnBsQbxEiFf8l9UiPlq3pwT++HV0TIqflaTX82wgiWwhO/w2pee0/D59m1Kaj44G
+         DdkY44pE8IbMDfEwAvGj1xphbXcdenafG0Z2Z7Dcoe0rdNLnOQKTS+319CwRubUuhCvi
+         xxegnFig9/4LUIAOPQus6Cz1jqySw7Ix6SUOc0k/cyZfA1LmfgV6Ly0zfH6yF7kBgnkG
+         qCOg==
+X-Gm-Message-State: ACrzQf3eYdMcrg3v3Lk3LdyRL3N7MPQ3FbE7t88gVKzReoRf+BP04wld
+	yUj/EJNXNEvOdH4fcsKMI0xbrUmzWDk=
+X-Google-Smtp-Source: AMsMyM5+yqlhu6dpKi0FDn/HDv2Tkvpr8g1WVlSh/XSwKfDtqNKxlyDzeVc4XapDLsE4Chpr3kpd/Q==
+X-Received: by 2002:a17:90a:a088:b0:20d:67b7:546d with SMTP id r8-20020a17090aa08800b0020d67b7546dmr6822459pjp.6.1665599725867;
         Wed, 12 Oct 2022 11:35:25 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id h5-20020a17090a648500b0020d352dc81fsm1771341pjj.54.2022.10.12.11.35.24
+        by smtp.gmail.com with ESMTPSA id h5-20020a17090a648500b0020d352dc81fsm1771341pjj.54.2022.10.12.11.35.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Oct 2022 11:35:24 -0700 (PDT)
+        Wed, 12 Oct 2022 11:35:25 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/4] client: add extra parameter for new width when printing rows
-Date: Wed, 12 Oct 2022 11:35:20 -0700
-Message-Id: <20221012183522.321041-2-prestwoj@gmail.com>
+Subject: [PATCH 3/4] client: fix not accounting for color escapes after line break
+Date: Wed, 12 Oct 2022 11:35:21 -0700
+Message-Id: <20221012183522.321041-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221012183522.321041-1-prestwoj@gmail.com>
 References: <20221012183522.321041-1-prestwoj@gmail.com>
@@ -55,93 +55,64 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The old 'max' parameter was being used both as an input and output
-parameter which was confusing. Instead have next_line take the
-column width as input, and output a new width which includes any
-color escapes and wide characters.
+Each color escape is tracked and the new_width is adjusted
+accordingly. But if the color escape comes after a space which breaks
+the line, the adjusted width ends up being too long since that escape
+sequence isn't appearing on the current line. This causes the next
+column to be shifted over.
 ---
- client/display.c | 25 ++++++++++++++-----------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+ client/display.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/client/display.c b/client/display.c
-index 03ea33a1..df0950d2 100644
+index df0950d2..812fa711 100644
 --- a/client/display.c
 +++ b/client/display.c
-@@ -388,24 +388,27 @@ static unsigned int color_end(char *s)
- }
- 
- /*
-- * Finds last space in 's' before 'max' characters, terminates at that index,
-+ * Finds last space in 's' before 'width' characters, terminates at that index,
-  * and returns a new string to be printed on the next line.
-  *
-- * 'max' should be set to the column width, but is also an out parameter since
-- * this width can be updated if colored escapes are detected.
-+ * 'new_width' will be updated to include extra bytes for color escapes or
-+ * wide characters if found.
-  *
-  * Any colored escapes found are set to 'color_out' so they can be re-enabled
-  * on the next line.
-  */
--static char* next_line(char *s, unsigned int *max, char **color_out)
-+static char* next_line(char *s, unsigned int width, unsigned int *new_width,
-+			char **color_out)
- {
- 	unsigned int i = 0;
+@@ -404,8 +404,10 @@ static char* next_line(char *s, unsigned int width, unsigned int *new_width,
  	int last_space = -1;
  	int last_color = -1;
  	unsigned int s_len = strlen(s);
++	unsigned int color_adjust = 0;
  
-+	*new_width = width;
-+
+ 	*new_width = width;
++	*color_out = NULL;
+ 
  	/* Find the last space before 'max', as well as any color */
--	while (i <= *max && i != s_len) {
-+	while (i <= *new_width && i < s_len) {
- 		int sequence_len;
- 		int sequence_columns;
- 		wchar_t w;
-@@ -424,17 +427,17 @@ static char* next_line(char *s, unsigned int *max, char **color_out)
- 		}
+ 	while (i <= *new_width && i < s_len) {
+@@ -418,9 +420,22 @@ static char* next_line(char *s, unsigned int width, unsigned int *new_width,
+ 			/* color escape won't count for column width */
+ 			sequence_columns = 0;
+ 			last_color = i;
++
++			/*
++			 * Color after a space. If the line gets broken this
++			 * will need to be removed off new_width since it will
++			 * appear on the next line.
++			 */
++			if (last_space != -1)
++				color_adjust += sequence_len;
++
+ 		} else {
+-			if (s[i] == ' ')
++			if (s[i] == ' ') {
+ 				last_space = i;
++				/* Any past colors will appear on this line */
++				color_adjust = 0;
++			}
++
+ 			sequence_len = l_utf8_get_codepoint(&s[i], s_len - i,
+ 									&w);
+ 			sequence_columns = wcwidth(w);
+@@ -446,8 +461,8 @@ static char* next_line(char *s, unsigned int width, unsigned int *new_width,
+ 	if (last_color != -1 && last_space >= last_color)
+ 		*color_out = l_strndup(s + last_color,
+ 					color_end(s + last_color));
+-	else
+-		*color_out = NULL;
++	else if (last_color != -1 && last_space < last_color)
++		*new_width -= color_adjust;
  
- 		/* Compensate max bytes */
--		*max += sequence_len - sequence_columns;
-+		*new_width += sequence_len - sequence_columns;
- 		i += sequence_len;
- 	}
- 
- 	/* Reached the end of the string within the column bounds */
--	if (i <= *max)
-+	if (i <= *new_width)
- 		return NULL;
- 
- 	/* Not anywhere nice to split the line */
- 	if (last_space == -1)
--		last_space = *max - 1;
-+		last_space = *new_width - 1;
- 
- 	/*
- 	 * Only set the color if it occurred prior to the last space. If after,
-@@ -465,7 +468,7 @@ static int entry_append(struct table_entry *e, char *line_buf)
- {
- 	char *value = e->next;
- 	unsigned int ret = 0;
--	unsigned int width = e->width;
-+	unsigned int new_width;
- 
- 	/* Empty line */
- 	if (!value)
-@@ -479,10 +482,10 @@ static int entry_append(struct table_entry *e, char *line_buf)
- 	}
- 
- 	/* Advance entry to next line, and terminate current */
--	e->next = next_line(value, &width, &e->color);
-+	e->next = next_line(value, e->width, &new_width, &e->color);
- 
- 	/* Append current line */
--	ret += sprintf(line_buf + ret, "%-*s  ", width, value);
-+	ret += sprintf(line_buf + ret, "%-*s  ", new_width, value);
- 
- 	l_free(value);
+ 	s[last_space] = '\0';
  
 -- 
 2.34.3
