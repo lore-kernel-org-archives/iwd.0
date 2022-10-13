@@ -1,76 +1,126 @@
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA46728E7
-	for <iwd@lists.linux.dev>; Wed, 12 Oct 2022 18:56:27 +0000 (UTC)
-Received: by mail-oo1-f41.google.com with SMTP id g15-20020a4a894f000000b0047f8e899623so12755633ooi.5
-        for <iwd@lists.linux.dev>; Wed, 12 Oct 2022 11:56:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874DD33C5
+	for <iwd@lists.linux.dev>; Thu, 13 Oct 2022 16:14:27 +0000 (UTC)
+Received: by mail-pl1-f171.google.com with SMTP id z20so2216052plb.10
+        for <iwd@lists.linux.dev>; Thu, 13 Oct 2022 09:14:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lPI/FiSdvpnNWKF3j3ZaPJXK85TfQxAX7S1FZOAofHM=;
-        b=mYY0k2UyZvSkpXpl81hVHxfYFMoGcIUJI1vQu7xQ8s+1KcUVvWHFnmhyY94PibwzRl
-         mG5mNbyAZZ9B9DJBgW8B54bDf1oDhCUvekrv7n+oiGOUYNOKFM7TbGDRk4srXk3KL/WO
-         oMU+PnOTTwv8kgyJnq3Q0Fl9h7wHH2+0RHa5Kg6YfGVxs71N13VINrKHw8rj2dZQtyMX
-         UlmctlCw4ZlCREZ2kpmowpXNDBYNNAaTmkzJaigB+pP3gaVrGGKZkg29pykaTnrrtH+t
-         ED9SGQGBYl+m+wHxRYSvK3/wR3Pejax7+NbC3zk7enp+AR6DpciVhULlkwBuNWmHCA6W
-         0zjQ==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=omAxKsaiuhTu43Q9IBksvFlEh2avylYpO1p7e8w5D6A=;
+        b=VcAqLDUWnGEfm89VobOzwiOrZOCkEOjXYvqQSQJ6nPXhPoIzh2EJzCjUH6UWVBsZHx
+         3LCpJJxaAVPOxQH2CgkSsd2KF4fDp+5XDFkliq/3GqKMfWdyqKPzSOMfRMq56XtjPyp1
+         GybIXXzWpm+XdafkVsVNRcyxBqiFG7PqD9a23Z3bZBmI0LmIBZD63r8AB/FlfgWMu+cJ
+         KQx5ws6/0YAUeUsNJfn0Gcvc7hkfpyNeCRDnIwIY0ZJ7TUgIfw+yzBf3vRtTBjuLaIWW
+         3lKc57xINivGFvNZURHNcKxnGNIMx2Kwci0ifbMFJxSW+dtHiN39n0/ewV5Dk+Is4EJD
+         7YfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lPI/FiSdvpnNWKF3j3ZaPJXK85TfQxAX7S1FZOAofHM=;
-        b=vRM8gOTL1RxIbaeNE9bhnDX4FnSStJMrPeUS7KX7dIaP/8ygonQ11MXnM+Hl/Ip9UN
-         cmE3VsHny3al/+duydTYNHiRFGoWgqRIX/iPkkv96XDgrJX7fjoM0Qfp1UU4SMqGdhJz
-         AwHYxrq9l1ynXBX6ns/6UMML1zcxcvpv5md/4x2IyHc5sAKiFVfhE+YXQCij9yNy3EIf
-         TXXj/kCUyLmLcFDQ/RRv0GXypxPOSBWI+sNP8iAchWh7H/YxetYYP4eIUfEKk3yPRAUT
-         SVc+Ggs/wsA4LizA4Wwm0aqkfZWwo2RfqsQmHVLKCIdbeGWt4xEhH5RHbRkjbhqv7hzu
-         61OQ==
-X-Gm-Message-State: ACrzQf1qoDaVU70C2YKeNOEUmZr2i0LQzvJsfG7iZnE+k7nOgNSCGWrh
-	OL37oHNahFdefwkuYbvj6Hs=
-X-Google-Smtp-Source: AMsMyM6MWRvtA11fYn6Bnva8Xfjk5tQOYfGYRF2baVMT9bWcyK+wmpsHAYs3opUfAnfr9PP5Oq89BA==
-X-Received: by 2002:a9d:4905:0:b0:655:fb61:72ab with SMTP id e5-20020a9d4905000000b00655fb6172abmr13822588otf.192.1665600986770;
-        Wed, 12 Oct 2022 11:56:26 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id o13-20020a9d404d000000b00661a80d555fsm2958830oti.40.2022.10.12.11.56.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Oct 2022 11:56:26 -0700 (PDT)
-Message-ID: <ece2ffa4-85f1-7966-76b0-70226a18d4cc@gmail.com>
-Date: Wed, 12 Oct 2022 13:56:25 -0500
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=omAxKsaiuhTu43Q9IBksvFlEh2avylYpO1p7e8w5D6A=;
+        b=BmXQub5fBOd7r+UYpQbKH+jRP4PvSz2gyi6rFmwORM1wOyULvqEc8umR2uGsKpJa17
+         YQzDrkjyX9K2wewLvXc086AJoHvYu7vbltAeoTWL2Cq3r9w+MjMRJEmDksYpJymM3Zlw
+         Ihyv4rUgN+797BtU/+fq9SdmNrhssxBWfdq0bfAs6FXnXLvrYLtOw52vXpagVbpcqbeT
+         GIhOqLkhjORNllgp5pB+oWpxvCqDbgy7UlwUhZgU0tytVQ8Q+7v7jv/5O7KwbfXcFDsj
+         S/RzxtjMVT3aaeQedIt1YIkaVvAWcdHaDwjWY0Jgu7j43+kKaTW7n+IYLANdv4tquMka
+         sedg==
+X-Gm-Message-State: ACrzQf3fDxc77JBeQ+iIKvfL6a3ByKK898e4PO/5GO5EfmP8XoK2VswF
+	o67LGnxiSprJnPtTKsktn8EUpuBX9kM=
+X-Google-Smtp-Source: AMsMyM7H1ac7d+934zF39zkh3J1ZzkmnGiNUUkKyzeCwTl/q+ysdhYTm7rISqlOUEIpj8bnTQoTBlg==
+X-Received: by 2002:a17:902:d714:b0:17f:5813:1df4 with SMTP id w20-20020a170902d71400b0017f58131df4mr502443ply.148.1665677666681;
+        Thu, 13 Oct 2022 09:14:26 -0700 (PDT)
+Received: from jprestwo-xps.none ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id f8-20020a170902ce8800b001750792f20asm34043plg.238.2022.10.13.09.14.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Oct 2022 09:14:26 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/2] monitor: use int length for NLMSG_NEXT
+Date: Thu, 13 Oct 2022 09:14:23 -0700
+Message-Id: <20221013161424.505633-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 1/4] client: validate utf-8 before displaying row
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20221012183522.321041-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221012183522.321041-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+In all uses of NLMSG_{NEXT,OK,ALIGN} the length was unsigned
+which is not what these macros expect. According to the docs
+the length should be int type, so this was changed for all
+uses in monitor.
 
-On 10/12/22 13:35, James Prestwood wrote:
-> In theory any input to this function should have valid utf-8 but
-> just in case the strings should be validated. This removes the
-> need to check the return of l_utf8_get_codepoint which is useful
-> since there is no graceful failure path at this point.
-> ---
->   client/display.c | 20 ++++++++++++++------
->   1 file changed, 14 insertions(+), 6 deletions(-)
-> 
+The was causing random, somewhat rare, crashes in nlmon_receive.
+---
+ monitor/main.c  | 2 +-
+ monitor/nlmon.c | 6 +++---
+ monitor/nlmon.h | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-All applied, thanks.
-
-Regards,
--Denis
+diff --git a/monitor/main.c b/monitor/main.c
+index 9117fba3..78ee0d38 100644
+--- a/monitor/main.c
++++ b/monitor/main.c
+@@ -451,7 +451,7 @@ static int analyze_pcap(const char *pathname)
+ 
+ 	while (pcap_read(pcap, &tv, buf, snaplen, &len, &real_len)) {
+ 		struct nlmsghdr *nlmsg;
+-		uint32_t aligned_len;
++		int aligned_len;
+ 		uint16_t arphrd_type;
+ 		uint16_t proto_type;
+ 
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 2222db09..573d16df 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -8080,7 +8080,7 @@ static void print_rtnl_msg(const struct timeval *tv,
+ void nlmon_print_rtnl(struct nlmon *nlmon, const struct timeval *tv,
+ 					const void *data, uint32_t size)
+ {
+-	uint32_t aligned_size = NLMSG_ALIGN(size);
++	int aligned_size = NLMSG_ALIGN(size);
+ 	const struct nlmsghdr *nlmsg;
+ 
+ 	update_time_offset(tv);
+@@ -8112,7 +8112,7 @@ void nlmon_print_rtnl(struct nlmon *nlmon, const struct timeval *tv,
+ }
+ 
+ void nlmon_print_genl(struct nlmon *nlmon, const struct timeval *tv,
+-					const void *data, uint32_t size)
++					const void *data, int size)
+ {
+ 	const struct nlmsghdr *nlmsg;
+ 
+@@ -8144,7 +8144,7 @@ static bool nlmon_receive(struct l_io *io, void *user_data)
+ 	unsigned char buf[8192];
+ 	unsigned char control[32];
+ 	ssize_t bytes_read;
+-	uint32_t nlmsg_len;
++	int nlmsg_len;
+ 	int fd;
+ 
+ 	fd = l_io_get_fd(io);
+diff --git a/monitor/nlmon.h b/monitor/nlmon.h
+index f2f2892a..b8cb81db 100644
+--- a/monitor/nlmon.h
++++ b/monitor/nlmon.h
+@@ -41,7 +41,7 @@ void nlmon_destroy(struct nlmon *nlmon);
+ void nlmon_print_rtnl(struct nlmon *nlmon, const struct timeval *tv,
+ 					const void *data, uint32_t size);
+ void nlmon_print_genl(struct nlmon *nlmon, const struct timeval *tv,
+-					const void *data, uint32_t size);
++					const void *data, int size);
+ void nlmon_print_pae(struct nlmon *nlmon, const struct timeval *tv,
+ 					uint8_t type, int index,
+ 					const void *data, uint32_t size);
+-- 
+2.34.3
 
