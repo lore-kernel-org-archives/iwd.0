@@ -1,49 +1,49 @@
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B676AA0
-	for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 19:14:07 +0000 (UTC)
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-1324e7a1284so4714090fac.10
-        for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 12:14:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D7D6AA4
+	for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 19:14:08 +0000 (UTC)
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-13af2d12469so4698011fac.13
+        for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 12:14:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j65mOG+qaztQKHrnBzciwpQiF/Uq0W5eKoVH0mT3nh4=;
-        b=T8Tz0lR+HmoUubUTc/xgdukPOCAkd6vcel+CKtmQemwdlFZCf2RgBZxt5Y5+Vu5wSu
-         XQ+Dlaqbmi6fCK9nGACd6zeTEYPmGY03Floi7AHCHr1cRIuDICd9vmZXTwhr0FvdHpjT
-         Oo4KReqBRL7810pNBnEyjUO0D3MPts266AHfRZgiz9vc9adZCzXAjs50JPu4xPlce23F
-         qhqP3UFTSRBfRK1aQa/kCMEk68iEQNzkZxPJhv7kh18RMvdWtlU7cI0cK9cH9bbGzRRi
-         9Vf1ZpOv0bQ42OGhMZL7drvU2dGvyEkqj17DJY1RUnJBDIvnrfkjVrTXAyJ9XamWccG8
-         K9MA==
+        bh=U1FbxXAJPHzCn5v6mwheNTG8PW972DaO5UUUnm8tB1I=;
+        b=o+Ib2vtSF77AXWRXkGyyjEZjC7/VjDcPg4v8BJycnZvH6ky8hH8N9zEp72COlf4tgj
+         /8GcwZzv64ajLCQz1VOGKxHWkuqhO8FY4CrRr/gyO64IltItOCKNHsL6Fahs5fVbvMjZ
+         R+CoabI8rgbOB64dGMoFXXECd+2f5S5cR4ERqiN1DLinpSc4T3gFydgp2ZMP/zsxwaU0
+         Ff4Nii1pdtcYz/EinoACJVT3PGMxR4pOJRQaLCHic8GDs3D+rYcV/5G1fOYMKCS0V0Jx
+         Ib0cmVuoSXLPthwOaoa+Z7Hcznw3ZWzfBWpoLK2lozz4JGCtHlVzOpYDmkYneBcciOZ+
+         lA2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j65mOG+qaztQKHrnBzciwpQiF/Uq0W5eKoVH0mT3nh4=;
-        b=WUzxaOyswWpXogTAZws1B8yFKhbjcI8Fw2JWUaICh66VkuDRjcBVDmtZj+OOyF/jBJ
-         IjwhH3Q7LScho+2WTqxaDFN8NN0uCU3HxvA1yLE3DHpivdiQSVNVegO47LUvJdiMTh3z
-         PthcpnjOW57s82TB0waefX+jGdY/W5EIGJet0Bk4iKCrrWFoOaZCLlG/0WXf85EEwUdl
-         sqiVVubfdqKGvbLxmGliVFsqJBT4hjHNFiZ1iZ1Q6w9shLzWlkZvb5Xoa2UgBWSQFAgD
-         OCD+77YywntermXFphzrVVDXrh3UZJYt/VVUPwr2MhMQ0lWsqPjx8WUAmAdYs7ZFC/Ry
-         p32w==
-X-Gm-Message-State: ACrzQf3P6RQEfpI/QXFT3NkamBqqCyiQToqfw+YyTOm6WlGvmc8Y4DUn
-	CGAT9yO3PN4viQQqtcO+uppyVR6bSVk=
-X-Google-Smtp-Source: AMsMyM4i2iwNYH2qEYry3JARUgsRMXaom3GVHoLbNWerbop3xAsFIdHlRmyPWKF752/NV11/c1JtCA==
-X-Received: by 2002:a05:6870:c092:b0:132:a01f:7c31 with SMTP id c18-20020a056870c09200b00132a01f7c31mr13685642oad.56.1666379646748;
-        Fri, 21 Oct 2022 12:14:06 -0700 (PDT)
+        bh=U1FbxXAJPHzCn5v6mwheNTG8PW972DaO5UUUnm8tB1I=;
+        b=29ba6w6wM4l5Sv7UzNRY+TCes164CgzDKPPdgoAdFb2eWNbZgczv/nx0/SLoXc6VRn
+         CkIrkfm3BiRGk4TmVa4NrzSO5Hn2tXf8XbAHdpzH9dzgncDKNJTNJSguaS/72l6rJ7xl
+         3i4jSpI7X8G1oXOPAB6ziA+5wO3fJqaNBtVlgQTqKA408bvayaq2c5wcFrlST+WX/GKe
+         yfxaUZ2PLK8eAnDiEyJtcD6c2KtXkR+enZ105h2c/z3Jz8FlBtH+upB9EnkXhf0+jSNm
+         HAkGhlWCjIqnMNB6wONTMcx0ncjd19O0oZ8UFn6gPmJ3YdPKkee1c4Pqlq96Aq5GsSvr
+         oVOQ==
+X-Gm-Message-State: ACrzQf2OzR0Ez2anSrwtctHgYg0DkbXNPyMst9xWPLvCuQNQTA3ZQO2O
+	A0kG1SNKpcs1wMzcntobuOewVE5717E=
+X-Google-Smtp-Source: AMsMyM4OS7EMThF7ko/nAZh8IY58i6obgo+qX/hz59V072ae31+pgi4ni+7/MavUO8oaHn1GaA8cUw==
+X-Received: by 2002:a05:6870:1795:b0:136:88c4:8c8f with SMTP id r21-20020a056870179500b0013688c48c8fmr30807705oae.191.1666379647982;
+        Fri, 21 Oct 2022 12:14:07 -0700 (PDT)
 Received: from localhost.localdomain (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id e6-20020a056870d10600b0010d7242b623sm10675546oac.21.2022.10.21.12.14.05
+        by smtp.gmail.com with ESMTPSA id e6-20020a056870d10600b0010d7242b623sm10675546oac.21.2022.10.21.12.14.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 12:14:06 -0700 (PDT)
+        Fri, 21 Oct 2022 12:14:07 -0700 (PDT)
 From: Denis Kenzior <denkenz@gmail.com>
 To: iwd@lists.linux.dev
 Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 25/26] wiphy: Support more group management cipher suites
-Date: Fri, 21 Oct 2022 14:13:06 -0500
-Message-Id: <20221021191307.31492-25-denkenz@gmail.com>
+Subject: [PATCH 26/26] auto-t: Add tests for GMAC/GMAC-256/CMAC-256
+Date: Fri, 21 Oct 2022 14:13:07 -0500
+Message-Id: <20221021191307.31492-26-denkenz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20221021191307.31492-1-denkenz@gmail.com>
 References: <20221021191307.31492-1-denkenz@gmail.com>
@@ -56,48 +56,114 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 ---
- src/wiphy.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ autotests/testWPA2withMFP/connection_test.py  | 42 ++++++++++++++++---
+ autotests/testWPA2withMFP/hw.conf             |  4 +-
+ .../{ssidCCMP.conf => ssidWPA2.conf}          |  2 +-
+ 3 files changed, 40 insertions(+), 8 deletions(-)
+ rename autotests/testWPA2withMFP/{ssidCCMP.conf => ssidWPA2.conf} (88%)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 76f1ba7cfc04..bb83f814aa69 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -165,6 +165,15 @@ enum ie_rsn_cipher_suite wiphy_select_cipher(struct wiphy *wiphy, uint16_t mask)
- 	if (mask & IE_RSN_CIPHER_SUITE_TKIP)
- 		return IE_RSN_CIPHER_SUITE_TKIP;
+diff --git a/autotests/testWPA2withMFP/connection_test.py b/autotests/testWPA2withMFP/connection_test.py
+index 982b69e265d7..bdc9e96ac536 100644
+--- a/autotests/testWPA2withMFP/connection_test.py
++++ b/autotests/testWPA2withMFP/connection_test.py
+@@ -8,19 +8,18 @@ import iwd
+ from iwd import IWD
+ from iwd import PSKAgent
+ from iwd import NetworkType
++from hostapd import HostapdCLI
  
-+	if (mask & IE_RSN_CIPHER_SUITE_BIP_GMAC_256)
-+		return IE_RSN_CIPHER_SUITE_BIP_GMAC_256;
-+
-+	if (mask & IE_RSN_CIPHER_SUITE_BIP_CMAC_256)
-+		return IE_RSN_CIPHER_SUITE_BIP_CMAC_256;
-+
-+	if (mask & IE_RSN_CIPHER_SUITE_BIP_GMAC)
-+		return IE_RSN_CIPHER_SUITE_BIP_GMAC;
-+
- 	if (mask & IE_RSN_CIPHER_SUITE_BIP_CMAC)
- 		return IE_RSN_CIPHER_SUITE_BIP_CMAC;
+ class Test(unittest.TestCase):
  
-@@ -1253,6 +1262,18 @@ static void parse_supported_ciphers(struct wiphy *wiphy, const void *data,
- 			wiphy->supported_ciphers |=
- 				IE_RSN_CIPHER_SUITE_CCMP_256;
- 			break;
-+		case CRYPTO_CIPHER_BIP_GMAC:
-+			wiphy->supported_ciphers |=
-+				IE_RSN_CIPHER_SUITE_BIP_GMAC;
-+			break;
-+		case CRYPTO_CIPHER_BIP_GMAC_256:
-+			wiphy->supported_ciphers |=
-+				IE_RSN_CIPHER_SUITE_BIP_GMAC_256;
-+			break;
-+		case CRYPTO_CIPHER_BIP_CMAC_256:
-+			wiphy->supported_ciphers |=
-+				IE_RSN_CIPHER_SUITE_BIP_CMAC_256;
-+			break;
- 		default:	/* TODO: Support other ciphers */
- 			break;
- 		}
+-    def test_connection_success(self):
+-        wd = IWD()
+-
++    def validate_connection_success(self, wd):
+         psk_agent = PSKAgent("secret123")
+         wd.register_psk_agent(psk_agent)
+ 
+         devices = wd.list_devices(1)
+         device = devices[0]
+ 
+-        ordered_network = device.get_ordered_network('ssidCCMP')
++        ordered_network = device.get_ordered_network('ssidWPA2')
+ 
+         self.assertEqual(ordered_network.type, NetworkType.psk)
+ 
+@@ -39,13 +38,44 @@ class Test(unittest.TestCase):
+ 
+         wd.unregister_psk_agent(psk_agent)
+ 
++    def test_cmac(self):
++        self.hostapd.set_value('group_mgmt_cipher', 'AES-128-CMAC')
++        self.hostapd.reload()
++        self.hostapd.wait_for_event("AP-ENABLED")
++        self.validate_connection_success(self.wd)
++
++    def test_gmac(self):
++        self.hostapd.set_value('group_mgmt_cipher', 'BIP-128-GMAC')
++        self.hostapd.reload()
++        self.hostapd.wait_for_event("AP-ENABLED")
++        self.validate_connection_success(self.wd)
++
++    def test_gmac_256(self):
++        self.hostapd.set_value('group_mgmt_cipher', 'BIP-256-GMAC')
++        self.hostapd.reload()
++        self.hostapd.wait_for_event("AP-ENABLED")
++        self.validate_connection_success(self.wd)
++
++    def test_cmac_256(self):
++        self.hostapd.set_value('group_mgmt_cipher', 'BIP-256-CMAC')
++        self.hostapd.reload()
++        self.hostapd.wait_for_event("AP-ENABLED")
++        self.validate_connection_success(self.wd)
++
++    def setUp(self):
++        self.wd = IWD(True)
++
++    def tearDown(self):
++        self.wd.clear_storage()
++        self.wd = None
++
+     @classmethod
+     def setUpClass(cls):
+-        pass
++        cls.hostapd = HostapdCLI(config='ssidWPA2.conf')
+ 
+     @classmethod
+     def tearDownClass(cls):
+-        IWD.clear_storage()
++        pass
+ 
+ if __name__ == '__main__':
+     unittest.main(exit=True)
+diff --git a/autotests/testWPA2withMFP/hw.conf b/autotests/testWPA2withMFP/hw.conf
+index fad15b8823a3..edfe03f97e25 100644
+--- a/autotests/testWPA2withMFP/hw.conf
++++ b/autotests/testWPA2withMFP/hw.conf
+@@ -1,5 +1,7 @@
+ [SETUP]
+ num_radios=2
++start_iwd=0
+ 
+ [HOSTAPD]
+-rad0=ssidCCMP.conf
++rad0=ssidWPA2.conf
++
+diff --git a/autotests/testWPA2withMFP/ssidCCMP.conf b/autotests/testWPA2withMFP/ssidWPA2.conf
+similarity index 88%
+rename from autotests/testWPA2withMFP/ssidCCMP.conf
+rename to autotests/testWPA2withMFP/ssidWPA2.conf
+index c79f5e558021..908915d7cb02 100644
+--- a/autotests/testWPA2withMFP/ssidCCMP.conf
++++ b/autotests/testWPA2withMFP/ssidWPA2.conf
+@@ -1,6 +1,6 @@
+ hw_mode=g
+ channel=1
+-ssid=ssidCCMP
++ssid=ssidWPA2
+ 
+ wpa=2
+ wpa_pairwise=CCMP
 -- 
 2.35.1
 
