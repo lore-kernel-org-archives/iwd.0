@@ -1,49 +1,49 @@
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640973D60
-	for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 19:13:33 +0000 (UTC)
-Received: by mail-ot1-f44.google.com with SMTP id 101-20020a9d0bee000000b00661b54d945fso2357511oth.13
-        for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 12:13:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58673D60
+	for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 19:13:34 +0000 (UTC)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-12c8312131fso4748148fac.4
+        for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 12:13:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MBgi0EuoCm94wUm1zu6bmgYFnP7whyJrGGyjSUM8hyo=;
-        b=Or7YksSQNQXIRfyQHd4CJvTZZMPb77BUGUqXi5gTgi6Qyk/RiRLeogvplTqqp4436w
-         jU8K1hYLb/gIAHji0B3YR33VMfDBgSlTc01+LusLfq/kWlfR2btNPX+V1dZj1s7Rs1Yk
-         WgIzMC2fau2lhDOXx0yzgB9mN9OSKNUCbOmfjLq9azQGDohMtyodg4/yKkkXmHlOpgaK
-         gEj0ycBFBIMCUggnMzzypsXBzNdBCbOnjGtk0Nzb/2bI9h44mzrd5Ny6I3HFBL1z6Bi2
-         p0az95w91KrGHxyveaBi3lB8xboc5bt+wfF+kP6jO0Cyo6XWYiklHLu81EAfN/a3TdS5
-         5B1Q==
+        bh=vdhOA1IZN3STU6OVhP5pOMCm8qIM//dPS4X9+VoHzGA=;
+        b=ntjGofR4OoyVw4A4RNiWkDuuy09He8t+3103hOuooeNsOqozp6y+94LhCKurglVFkj
+         jrjREQlTTtnG31ijot5Il5mTBSfPlKUQYWiA+yVyCj53+yM0s3zcovkXjMEBzSasf35x
+         82oreCrXIU48EISgWMVbrZLtOvzeXOChgJfF5lKb7gjqELAzabJs7zps+Xn60ApDi0aK
+         zV8tiuzM9hKoZu3rEvoSJj2YGH0mdly9praeHNy6913O30FcfTlJIYN/d9/Q3iPQ7mIt
+         y4ggIjs95a/jBKU9raBbn/C36Il2xOZyCKNykGFSjkXqDQSo3frM+UkGZmbrTngICzXX
+         0DKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MBgi0EuoCm94wUm1zu6bmgYFnP7whyJrGGyjSUM8hyo=;
-        b=xT4j9Zswr5IYflEMlPOMnNHcoU4/RMRLcm6A8dEKjwC9HL9n8sI8GdQ8BUsDsiGNyi
-         Xq0JCm0C0HCf8dOEu0S99NwITAKWfirIEzenC0GmTbr/yd3ahGstBwht6Nzeg+H+S6TT
-         wqpGoE2/QZ+UCCVek4ht/ubJvletbARJR70cmZiGEunAXgLy2TGNDF/qjm8tKjWEfyPK
-         pjczBdfJGYYKfeHuZwZJA424T4I+4HjBVSMe5MTvATUR+L9xoOTCqqVSK1pgXir94Qyw
-         EuSC6o+Mn0JoYWa7k3zx6xZuSAY3KlFW5TMK/Ya8nzUqWOEy6uVd8uCgfl1yYWcpyZC9
-         p7xA==
-X-Gm-Message-State: ACrzQf0k1kx4xe9ZyUFoeIhZcrnlevUMzOrH/CNTMfunTga4I+nxXIdU
-	y0m9cpsXcfrZWoBrEklSzwb7HSyrI1E=
-X-Google-Smtp-Source: AMsMyM4arM9ng3ylC6b+zlygaaCH2O0STRs4sG4QdH8jmEP/fEOVQkKojITZpXNb40Hz02SkaVi6Vw==
-X-Received: by 2002:a9d:322:0:b0:661:b793:6fb1 with SMTP id 31-20020a9d0322000000b00661b7936fb1mr10680560otv.14.1666379611731;
-        Fri, 21 Oct 2022 12:13:31 -0700 (PDT)
+        bh=vdhOA1IZN3STU6OVhP5pOMCm8qIM//dPS4X9+VoHzGA=;
+        b=4INp8sQpp97fMC9nNllwaR1R5UK0fkCrBTh9/E2z9X+gikLHDj6XFMuXrvlW3RHN5r
+         7SJwdfOWjT7P7qtzet+AtcStcmp3rI0MESX/9gfvNn6pJeQlqr7UtcS7Smwz3mUcovi+
+         aq7BBZ7kffTdtjXAVxuJpQNjXw0biZbvJfK3tiH2yDTCNKSkibdOxWR4tduTKbKyGXLu
+         B254YRt0jjvrIkT+D/QXRaLKmGfXRtD481zQCJdYgpFUYPyzNgBIjzrWfNyDLX4DdGT/
+         +AvMqiGHWgyxppshsPpC2Mx1x6oYV3escDPnflu3FBv0Hh9VKt5FEUwZVXogrtoLE3yg
+         0m8Q==
+X-Gm-Message-State: ACrzQf1tt9V7pDwnzpovplK1LW6yo7nwPnLXoYTEUeZHKAnUmNV6IrM8
+	5cCQ9+pFvSRkTAlGLBPKHgi7/ANolNo=
+X-Google-Smtp-Source: AMsMyM4wfCMjnm/6nhXLZEB1HngSRuOhH617W7lqAJei6QvaZNur1EPlxmCxpuYiEAyb5Y7Nsid3JA==
+X-Received: by 2002:a05:6870:609c:b0:131:c972:818f with SMTP id t28-20020a056870609c00b00131c972818fmr13106072oae.2.1666379613490;
+        Fri, 21 Oct 2022 12:13:33 -0700 (PDT)
 Received: from localhost.localdomain (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id e6-20020a056870d10600b0010d7242b623sm10675546oac.21.2022.10.21.12.13.30
+        by smtp.gmail.com with ESMTPSA id e6-20020a056870d10600b0010d7242b623sm10675546oac.21.2022.10.21.12.13.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 12:13:31 -0700 (PDT)
+        Fri, 21 Oct 2022 12:13:32 -0700 (PDT)
 From: Denis Kenzior <denkenz@gmail.com>
 To: iwd@lists.linux.dev
 Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 04/26] ie: Simplify implementation
-Date: Fri, 21 Oct 2022 14:12:45 -0500
-Message-Id: <20221021191307.31492-4-denkenz@gmail.com>
+Subject: [PATCH 05/26] crypto: Add new cipher definitions
+Date: Fri, 21 Oct 2022 14:12:46 -0500
+Message-Id: <20221021191307.31492-5-denkenz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20221021191307.31492-1-denkenz@gmail.com>
 References: <20221021191307.31492-1-denkenz@gmail.com>
@@ -55,76 +55,50 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of copy-pasting the same basic operation (memcpy & assignment),
-use a goto and a common path instead.  This should also make it easier
-for the compiler to optimize this function.
 ---
- src/ie.c | 41 ++++++++++++++++++++---------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+ src/crypto.c | 8 ++++++++
+ src/crypto.h | 6 ++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/src/ie.c b/src/ie.c
-index 7159222a4f6c..8ceefc643615 100644
---- a/src/ie.c
-+++ b/src/ie.c
-@@ -885,38 +885,37 @@ int ie_parse_osen_from_data(const uint8_t *data, size_t len,
- static bool ie_build_cipher_suite(uint8_t *data, const uint8_t *oui,
- 					const enum ie_rsn_cipher_suite suite)
- {
-+	uint8_t selector;
-+
- 	switch (suite) {
- 	case IE_RSN_CIPHER_SUITE_USE_GROUP_CIPHER:
--		memcpy(data, oui, 3);
--		data[3] = 0;
--		return true;
-+		selector = 0;
-+		goto done;
- 	case IE_RSN_CIPHER_SUITE_WEP40:
--		memcpy(data, oui, 3);
--		data[3] = 1;
--		return true;
-+		selector = 1;
-+		goto done;
- 	case IE_RSN_CIPHER_SUITE_TKIP:
--		memcpy(data, oui, 3);
--		data[3] = 2;
--		return true;
-+		selector = 2;
-+		goto done;
- 	case IE_RSN_CIPHER_SUITE_CCMP:
--		memcpy(data, oui, 3);
--		data[3] = 4;
--		return true;
-+		selector = 4;
-+		goto done;
- 	case IE_RSN_CIPHER_SUITE_WEP104:
--		memcpy(data, oui, 3);
--		data[3] = 5;
--		return true;
-+		selector = 5;
-+		goto done;
- 	case IE_RSN_CIPHER_SUITE_BIP_CMAC:
--		memcpy(data, oui, 3);
--		data[3] = 6;
--		return true;
-+		selector = 6;
-+		goto done;
- 	case IE_RSN_CIPHER_SUITE_NO_GROUP_TRAFFIC:
--		memcpy(data, oui, 3);
--		data[3] = 7;
--		return true;
-+		selector = 7;
-+		goto done;
+diff --git a/src/crypto.c b/src/crypto.c
+index 89e315df6a36..840d9ee4dd5b 100644
+--- a/src/crypto.c
++++ b/src/crypto.c
+@@ -500,9 +500,17 @@ int crypto_cipher_key_len(enum crypto_cipher cipher)
+ 	case CRYPTO_CIPHER_TKIP:
+ 		return 32;
+ 	case CRYPTO_CIPHER_CCMP:
++	case CRYPTO_CIPHER_GCMP:
+ 		return 16;
++	case CRYPTO_CIPHER_CCMP_256:
++	case CRYPTO_CIPHER_GCMP_256:
++		return 32;
+ 	case CRYPTO_CIPHER_BIP_CMAC:
++	case CRYPTO_CIPHER_BIP_GMAC:
+ 		return 16;
++	case CRYPTO_CIPHER_BIP_CMAC_256:
++	case CRYPTO_CIPHER_BIP_GMAC_256:
++		return 32;
  	}
  
- 	return false;
-+done:
-+	memcpy(data, oui, 3);
-+	data[3] = selector;
-+	return true;
- }
+ 	return 0;
+diff --git a/src/crypto.h b/src/crypto.h
+index b2cd8839aa77..ed430abb00d8 100644
+--- a/src/crypto.h
++++ b/src/crypto.h
+@@ -31,6 +31,12 @@ enum crypto_cipher {
+ 	CRYPTO_CIPHER_TKIP = 0x000fac02,
+ 	CRYPTO_CIPHER_CCMP = 0x000fac04,
+ 	CRYPTO_CIPHER_BIP_CMAC = 0x000fac06,
++	CRYPTO_CIPHER_GCMP = 0x000fac08,
++	CRYPTO_CIPHER_GCMP_256 = 0x000fac09,
++	CRYPTO_CIPHER_CCMP_256 = 0x000fac0a,
++	CRYPTO_CIPHER_BIP_GMAC = 0x000fac0b,
++	CRYPTO_CIPHER_BIP_GMAC_256 = 0x000fac0c,
++	CRYPTO_CIPHER_BIP_CMAC_256 = 0x000fac0d,
+ };
  
- #define RETURN_AKM(data, oui, id)		\
+ enum crypto_akm {
 -- 
 2.35.1
 
