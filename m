@@ -1,49 +1,49 @@
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A294D612D
-	for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 19:14:06 +0000 (UTC)
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-13b23e29e36so4011293fac.8
-        for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 12:14:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B676AA0
+	for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 19:14:07 +0000 (UTC)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-1324e7a1284so4714090fac.10
+        for <iwd@lists.linux.dev>; Fri, 21 Oct 2022 12:14:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WO6O2qBsqi+7phB5hT93+ISZeY3elaHD4eYUVyWGL/k=;
-        b=c6xx9KK2aR/7fpUroBd+wq1JFxK4B0J9wyD3W4Fh1YdVip2UJCD6yim7MLbZh8wC3c
-         8Dl9vgO7nmt8rKewy/snbRLOfXZKqkx4juj1xmC/Ry1ZtcgaQXMhSLmFcbiivWrCTT9G
-         7QCTyIKQe4Ffex8/uKkAa4nJQyy5ts8Z5v5j5VtT+NCgRstVKxJCsjS2JhZWQ4carbti
-         w9XQoXc92JfS6iQr3VFd38Fb68i1hbtc0hdBZZIQ3Mfmk50hoeEuxr3GwWzMYM953mby
-         6ztmzrQoAnxPfq3S5PIF8wV/kpp/ppBpWSPhc6xBl2M67ujYD5zdnwSOW7sCX2QVrNrE
-         bFAg==
+        bh=j65mOG+qaztQKHrnBzciwpQiF/Uq0W5eKoVH0mT3nh4=;
+        b=T8Tz0lR+HmoUubUTc/xgdukPOCAkd6vcel+CKtmQemwdlFZCf2RgBZxt5Y5+Vu5wSu
+         XQ+Dlaqbmi6fCK9nGACd6zeTEYPmGY03Floi7AHCHr1cRIuDICd9vmZXTwhr0FvdHpjT
+         Oo4KReqBRL7810pNBnEyjUO0D3MPts266AHfRZgiz9vc9adZCzXAjs50JPu4xPlce23F
+         qhqP3UFTSRBfRK1aQa/kCMEk68iEQNzkZxPJhv7kh18RMvdWtlU7cI0cK9cH9bbGzRRi
+         9Vf1ZpOv0bQ42OGhMZL7drvU2dGvyEkqj17DJY1RUnJBDIvnrfkjVrTXAyJ9XamWccG8
+         K9MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WO6O2qBsqi+7phB5hT93+ISZeY3elaHD4eYUVyWGL/k=;
-        b=oLk4sAyjtpC+KPIbzSWOIZrs5Cgszq5WgeeJ8ci1gPYmJLaeZL2iUIdeTBv4gdAr0n
-         PYxV0lqr7N029HVnR3XhnhFg2GjfOgpIxhL6y4GAtKgC8gU5pjKbTddO9s0az6AosKX4
-         Co6OuxlsXQWnIH2Zk70bYhJfBNATQwVuV2N67PcGDHMoMvbHHxmJQo1iPsDQQpVyYLgB
-         fqnH9ym+i4boqVs2snRBdx5+JIOZm689X9nPi2QcynhbRc7miWsU5RQj623MYLWetBmN
-         T5+BLnCxgr3nI4sSh/ffhMNe1oEAk+n0QfKZY0V46uLb4pTdXyYXFNpsc3u04yJcf4pW
-         6vQw==
-X-Gm-Message-State: ACrzQf1CB5d5mZl754+L7REDMVwh1a9zXWreIqA2X4dYjmdfyxrsoLwO
-	Gtvcr4Qi7t0Qr1zvgLPRy/bbBVJ58Z4=
-X-Google-Smtp-Source: AMsMyM5f4CIbWZN5AFBPUNYlCokvbn/bnDlHOH4KFIHUg8Bhu6iJLK6SE/4StTB5P/vQcXqURf2AhQ==
-X-Received: by 2002:a05:6870:58a:b0:136:3535:c7a8 with SMTP id m10-20020a056870058a00b001363535c7a8mr13260023oap.156.1666379645187;
-        Fri, 21 Oct 2022 12:14:05 -0700 (PDT)
+        bh=j65mOG+qaztQKHrnBzciwpQiF/Uq0W5eKoVH0mT3nh4=;
+        b=WUzxaOyswWpXogTAZws1B8yFKhbjcI8Fw2JWUaICh66VkuDRjcBVDmtZj+OOyF/jBJ
+         IjwhH3Q7LScho+2WTqxaDFN8NN0uCU3HxvA1yLE3DHpivdiQSVNVegO47LUvJdiMTh3z
+         PthcpnjOW57s82TB0waefX+jGdY/W5EIGJet0Bk4iKCrrWFoOaZCLlG/0WXf85EEwUdl
+         sqiVVubfdqKGvbLxmGliVFsqJBT4hjHNFiZ1iZ1Q6w9shLzWlkZvb5Xoa2UgBWSQFAgD
+         OCD+77YywntermXFphzrVVDXrh3UZJYt/VVUPwr2MhMQ0lWsqPjx8WUAmAdYs7ZFC/Ry
+         p32w==
+X-Gm-Message-State: ACrzQf3P6RQEfpI/QXFT3NkamBqqCyiQToqfw+YyTOm6WlGvmc8Y4DUn
+	CGAT9yO3PN4viQQqtcO+uppyVR6bSVk=
+X-Google-Smtp-Source: AMsMyM4i2iwNYH2qEYry3JARUgsRMXaom3GVHoLbNWerbop3xAsFIdHlRmyPWKF752/NV11/c1JtCA==
+X-Received: by 2002:a05:6870:c092:b0:132:a01f:7c31 with SMTP id c18-20020a056870c09200b00132a01f7c31mr13685642oad.56.1666379646748;
+        Fri, 21 Oct 2022 12:14:06 -0700 (PDT)
 Received: from localhost.localdomain (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id e6-20020a056870d10600b0010d7242b623sm10675546oac.21.2022.10.21.12.14.03
+        by smtp.gmail.com with ESMTPSA id e6-20020a056870d10600b0010d7242b623sm10675546oac.21.2022.10.21.12.14.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 12:14:04 -0700 (PDT)
+        Fri, 21 Oct 2022 12:14:06 -0700 (PDT)
 From: Denis Kenzior <denkenz@gmail.com>
 To: iwd@lists.linux.dev
 Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 24/26] netdev: Support more IGTK cipher suites
-Date: Fri, 21 Oct 2022 14:13:05 -0500
-Message-Id: <20221021191307.31492-24-denkenz@gmail.com>
+Subject: [PATCH 25/26] wiphy: Support more group management cipher suites
+Date: Fri, 21 Oct 2022 14:13:06 -0500
+Message-Id: <20221021191307.31492-25-denkenz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20221021191307.31492-1-denkenz@gmail.com>
 References: <20221021191307.31492-1-denkenz@gmail.com>
@@ -56,34 +56,48 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 ---
- src/netdev.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ src/wiphy.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 7b8948604347..636c02dea51a 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -1674,7 +1674,7 @@ static void netdev_set_igtk(struct handshake_state *hs, uint16_t key_index,
- {
- 	struct netdev_handshake_state *nhs =
- 		l_container_of(hs, struct netdev_handshake_state, super);
--	uint8_t igtk_buf[16];
-+	uint8_t igtk_buf[32];
- 	struct netdev *netdev = nhs->netdev;
- 	struct l_genl_msg *msg;
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 76f1ba7cfc04..bb83f814aa69 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -165,6 +165,15 @@ enum ie_rsn_cipher_suite wiphy_select_cipher(struct wiphy *wiphy, uint16_t mask)
+ 	if (mask & IE_RSN_CIPHER_SUITE_TKIP)
+ 		return IE_RSN_CIPHER_SUITE_TKIP;
  
-@@ -1690,7 +1690,10 @@ static void netdev_set_igtk(struct handshake_state *hs, uint16_t key_index,
++	if (mask & IE_RSN_CIPHER_SUITE_BIP_GMAC_256)
++		return IE_RSN_CIPHER_SUITE_BIP_GMAC_256;
++
++	if (mask & IE_RSN_CIPHER_SUITE_BIP_CMAC_256)
++		return IE_RSN_CIPHER_SUITE_BIP_CMAC_256;
++
++	if (mask & IE_RSN_CIPHER_SUITE_BIP_GMAC)
++		return IE_RSN_CIPHER_SUITE_BIP_GMAC;
++
+ 	if (mask & IE_RSN_CIPHER_SUITE_BIP_CMAC)
+ 		return IE_RSN_CIPHER_SUITE_BIP_CMAC;
  
- 	switch (cipher) {
- 	case CRYPTO_CIPHER_BIP_CMAC:
--		memcpy(igtk_buf, igtk, 16);
-+	case CRYPTO_CIPHER_BIP_GMAC:
-+	case CRYPTO_CIPHER_BIP_GMAC_256:
-+	case CRYPTO_CIPHER_BIP_CMAC_256:
-+		memcpy(igtk_buf, igtk, igtk_len);
- 		break;
- 	default:
- 		l_error("Unexpected cipher: %x", cipher);
+@@ -1253,6 +1262,18 @@ static void parse_supported_ciphers(struct wiphy *wiphy, const void *data,
+ 			wiphy->supported_ciphers |=
+ 				IE_RSN_CIPHER_SUITE_CCMP_256;
+ 			break;
++		case CRYPTO_CIPHER_BIP_GMAC:
++			wiphy->supported_ciphers |=
++				IE_RSN_CIPHER_SUITE_BIP_GMAC;
++			break;
++		case CRYPTO_CIPHER_BIP_GMAC_256:
++			wiphy->supported_ciphers |=
++				IE_RSN_CIPHER_SUITE_BIP_GMAC_256;
++			break;
++		case CRYPTO_CIPHER_BIP_CMAC_256:
++			wiphy->supported_ciphers |=
++				IE_RSN_CIPHER_SUITE_BIP_CMAC_256;
++			break;
+ 		default:	/* TODO: Support other ciphers */
+ 			break;
+ 		}
 -- 
 2.35.1
 
