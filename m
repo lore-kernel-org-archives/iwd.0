@@ -1,45 +1,45 @@
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FBABAD23
-	for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 19:55:14 +0000 (UTC)
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-13c2cfd1126so2815134fac.10
-        for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 12:55:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A34AD23
+	for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 20:00:00 +0000 (UTC)
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-13bd19c3b68so11004528fac.7
+        for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 13:00:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=e6+kgJG8sAg893qHTZVnoxFVmVhy3WUm4/iibUbVreE=;
-        b=FPqGRiSnvlddqp2U3sflaJLdbp8iHZvw5aJckH1VjQKL+s9FmA/+XJp2nVmGPvg+XW
-         gZh5XMJqxwm7mLkYpm0BwtH9ljKEqm+gAG8NZ1thSB8htYFiVirBNiMf6S7v3ppNCjf8
-         QyzVSWVi8lG6HUFA/IEGMLdSco5s3dIKKY+BNZkpSkOGIEl/i9OwTjaiERrpE9nZSifz
-         /L9HBPOmW11zcxAC0ierNARo65NOJJ/0/AFuuwPu8wNPOSzIrsvS1nmzw9iUMUvXAvBw
-         8tDJaW1NTWou40U8cizhp90vNMLIEmFGxN/5geq/irHUE3MSX6VglkBaRJi4y5TB5sMQ
-         HA6Q==
+        bh=WW54wRNDG2q86ugGGt34vbHZBtc0JZfUiVvafLMxzbI=;
+        b=RsmYFH4Qb0NisS9qTRrcQH3WKB6NT/hmUkel+Z0dDtYBHA/pJ/tHIrDaZgTKhD9/3F
+         fxa9VDT9qhBfy3vznXv+VO3ppMHpHK4d30StKfydL9UvmKoT6mGOz3qfs00zWIaDyHkQ
+         QRQ/MdDNmLUgoxFUFnkNvEKJknh/mZ5u+lA6lytHM13uW7SX+Q4SFfbof8wesc2iDgaM
+         xBQGntXH6/PLpz+5M5oKZVA/RdMF8knMbPH4+p8KDmPH7tNALbkV3rrwzwR/4MRhBF2X
+         2sUohL8Cpv4YtpJ4bDe97V/NYH/KkB068BrHSwtx6XWncQzkC/txygnBFfWflxrxVx1y
+         xAcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e6+kgJG8sAg893qHTZVnoxFVmVhy3WUm4/iibUbVreE=;
-        b=ZzYuyEjGuTC5WMMWAWYErrtt6lIY1t5ElJYFCqFK74lRnKH3pk6XM3HYHq3BmHWgI8
-         chxaceEd4iRVM4WxfjrHBVlc64wccsyTTGi0V5ZXG+8f+YiEgMDQfAt7D319ylggALF6
-         dTTGAg4Vc7RNP0zqluldXX5OJt2IamYBuRBvOBEtODsKIKu3kb0MAUMhkofcZTS4vVcD
-         Q31xa9h5d0j0JMSrVeF80NpUrrNHUSO8VyiKLMJd5S/VOsjyvXz43cMg0g5HurKxgIk7
-         drpSecQITQEy/zCPi6suHp30tAxDRlP4SWt+TaZUVpZFI8R3ugpDFyEmOLioFrWcucti
-         hDMg==
-X-Gm-Message-State: ACrzQf34IS0bIkyHml2n7Lpn84mOTMd5yI/+C3pw5B6L7PM6n4uAswXI
-	dF5KyiNlIALeggX/QTL+vKvOeMBPjCw=
-X-Google-Smtp-Source: AMsMyM7/aSx//XgMYfRv3BJoGtrBA6dX/7zPqCHH25/DpGhU+00Roggyt/BcfRyQbyFArb9YE/Fdlw==
-X-Received: by 2002:a05:6870:51d:b0:136:26d3:4ee5 with SMTP id j29-20020a056870051d00b0013626d34ee5mr3361845oao.11.1666814113693;
-        Wed, 26 Oct 2022 12:55:13 -0700 (PDT)
+        bh=WW54wRNDG2q86ugGGt34vbHZBtc0JZfUiVvafLMxzbI=;
+        b=hkA0NP0/VbdJOqM0QxD0tigH+DzZc7yNnHxi8AIIHYVVfIM3p46XltYrFsGYgDbllR
+         LFZhXNhpiGdQ87QXZspMi3Y5jVgveOm0+90mLjcd91Ah+b3s/p14qHQJoHR9iKPdF6E+
+         rYwPCrAK/Z1IXhaIDa7DXAv8fDD6NLoByzq7ze3f/Pgmkbjfle+CMEoMB5Ltzg/1tFzz
+         DdEupDfLjY7/iZ3jMXfZQ+BcR71yybioQZvDGl1zKRi5tUGIJBDJY8D3bW+oIhbUj5ZG
+         qJp1nzWXmN91iFiKRIU2S8q5QbRXCLze1wf9anEJm6B04iWl++kHXoNeVN74Ol2KriNr
+         N3UQ==
+X-Gm-Message-State: ACrzQf04o1Iv/yPEWvhjHBdCu3gCjc+0iKRK88fi93Ebt6+g81r/acyw
+	7LFL2YW3Oquv1yLNSJy2Um+jGb0Hfz8=
+X-Google-Smtp-Source: AMsMyM4Jzz7BCDTXFArN0sWKbOCxyLi31y5fk7bwh4kLViv2v2CfPUe81B5k8sebwHQ2OQl3kSZ+ew==
+X-Received: by 2002:a05:6870:d0c8:b0:13b:7dd3:307d with SMTP id k8-20020a056870d0c800b0013b7dd3307dmr3313363oaa.92.1666814399905;
+        Wed, 26 Oct 2022 12:59:59 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id h24-20020aca1818000000b003546fada8f6sm2392167oih.12.2022.10.26.12.55.12
+        by smtp.googlemail.com with ESMTPSA id p13-20020a056870568d00b0013b8b3710bfsm3615449oao.13.2022.10.26.12.59.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Oct 2022 12:55:13 -0700 (PDT)
-Message-ID: <34d2913e-26e7-b425-2b33-80fa18f169c7@gmail.com>
-Date: Wed, 26 Oct 2022 14:55:12 -0500
+        Wed, 26 Oct 2022 12:59:59 -0700 (PDT)
+Message-ID: <d523993d-0e30-e1eb-b8bb-3299b45c7d98@gmail.com>
+Date: Wed, 26 Oct 2022 14:59:57 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,34 +48,53 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH 1/5] eapol: choose key descriptor version in AP mode
+Subject: Re: [PATCH] monitor: allow parsing pcaps without -F option
 Content-Language: en-US
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20221026185656.489888-1-prestwoj@gmail.com>
+References: <20221025160356.217578-1-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221026185656.489888-1-prestwoj@gmail.com>
+In-Reply-To: <20221025160356.217578-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 10/26/22 13:56, James Prestwood wrote:
-> The key descriptor version was hard coded to HMAC_SHA1_AES which
-> is correct when using IE_RSN_AKM_SUITE_PSK + CCMP. ap.c hard
-> codes the PSK AKM but still uses wiphy to select the cipher. In
-> theory there could be hardware that only supports TKIP which
-> would then make IWD non-compliant since a different key descriptor
-> version should be used with PSK + TKIP (HMAC_MD5_ARC4).
-> 
-> Now use a helper to sort out which key descriptor should be used
-> given the AKM and cipher suite.
-> ---
->   src/eapol.c | 16 ++++++++++++----
->   1 file changed, 12 insertions(+), 4 deletions(-)
-> 
+On 10/25/22 11:03, James Prestwood wrote:
+> The -F option is undocumented but allows you to pass a nl80211
+> family ID so iwmon doesn't ignore messages which don't match the
+> systems nl80211 family ID (i.e. pcaps from other systems).
 
-All applied, thanks.
+So should we remove -F option then as well?
+
+> 
+> This is somewhat of a pain to use since its unclear what the other
+> system's family ID actually is until you run it though something
+> like wireshark. Instead iwmon can ignore the family ID when in
+> read mode which makes reading other systems pcap files automatic.
+> ---
+>   monitor/main.c  | 2 +-
+>   monitor/nlmon.c | 6 ++++--
+>   monitor/nlmon.h | 2 +-
+>   3 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/monitor/main.c b/monitor/main.c
+> index f0b16bbf..30aa06d2 100644
+> --- a/monitor/main.c
+> +++ b/monitor/main.c
+
+<snip>
+
+> @@ -7261,6 +7262,7 @@ struct nlmon *nlmon_create(uint16_t id)
+>   
+>   	nlmon->id = id;
+>   	nlmon->req_list = l_queue_new();
+> +	nlmon->read = true;
+
+did you intend read = read_only; here?
+
+>   
+>   	return nlmon;
+>   }
 
 Regards,
 -Denis
-
