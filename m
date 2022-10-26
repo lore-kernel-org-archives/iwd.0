@@ -1,49 +1,49 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03CF0747E
-	for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 18:57:01 +0000 (UTC)
-Received: by mail-pl1-f169.google.com with SMTP id d24so15079905pls.4
-        for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 11:57:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8FE2F2F
+	for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 18:57:02 +0000 (UTC)
+Received: by mail-pf1-f182.google.com with SMTP id m6so16379125pfb.0
+        for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 11:57:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OIgRqGArK5B+/w0o2+geS6XuqRgSUy3VsKX7mWlL48g=;
-        b=SQ/neGTPsjVcNzCOxobeX3iNnbvQLSJ6vNjxCmSZoEqHbwalGAVUgm30dHj94Ujubj
-         3iFhP9kn8+DQkbCUhaCp434eFxxVd6jtDK+16TGtnO1iggXw+jHtveButA94B45H05Po
-         0p7YVSVmJ5iST5+dhWmd9OLkBROiB422vMf99rvykyaQHGAONg+1iLEJV4lze7GRhpSf
-         rRHi34qMYq6/FTLNXxqRdUlNYaPqFACbKn3C6+3jC6NC2LB6eZlsD2C0qjb56ygc1Zb4
-         qgZpscq40DSEwgReL+JCh+JByQrShD7zef/HXki9hKc9EEm2oqHypchAStzLzstWWbCG
-         hAtA==
+        bh=D/If4m1GxJTjgCioRpfOOS4Ke1Jj27FV+xWMcQP9x3c=;
+        b=dzOpyGRiJGJD6WIJ/FUQgqqLcaqolYWGueSMwcWno6SMEePgBY0BvxPOx3QU+ow/E3
+         076KvhxV7Yx0o6ic4Jf24w+3tsTfat50kcP2vTdeBJO35HURT1i6lE5fofHnWEBj0NOc
+         afkM9bzQPQvv9UtDbYjBLdlH5xGATaXM2jSVgJbT5KAP0IIn/LBjCZmbqmFR+MbcV6nD
+         y5IQB7SLixABetHDPcR41YOBxIwGqJ2RTnanLHgB/aorgn4goLvA0huCoh4uvBrWBD5z
+         7mmF5axt3PlB9lUP+jKOtPh4t9TnlacIjprKf22FGVObCPMnLCMDN19ENgD4CektxJ4Q
+         Ah3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OIgRqGArK5B+/w0o2+geS6XuqRgSUy3VsKX7mWlL48g=;
-        b=4/PYL+xdSWyGnqTJB7gmvbMEULmh5raQHn+ynZHQN+Uel91pQdeAHabZndk44dWjmD
-         p2NZAAHgzUhWXO5tIBta9P/JFfg3EVeHsWqq00oVRfWQ0HDIahq/g26PeRbZl101sExo
-         wgpd8QzSjbd3TQ5CkZXmxPO8zvGcXjvjuuusTda9OV7hbddHCp9rqFkWxaUB9lPxW9oo
-         U/LZZ2UvyY4h3bgvYTmF/uSKg6uauei5DOj3Ira9O18NJDjiO7FI+0yhvd9jcUVr7Umi
-         ONn19SJXQSRMkGMjK/uKnlOxOlrdCVCp01+6y5/JUtWqTZLif2AKqVTLHvxoipFd9N8U
-         UUFw==
-X-Gm-Message-State: ACrzQf2/5QKgmOBi9BI8ZICqUk22YZrzFe/ClCB3wmBYNXlxA0TM8oeU
-	G/e2rXmDrHiyt2fzyeI4ML+x6/2s0gQ=
-X-Google-Smtp-Source: AMsMyM76KBFckKLqSWr/K+k2mMvuH5SnKU2gJbIlo1FXEoFePz5Oyqwy//ae7W5IdD4jno+j63Tv+w==
-X-Received: by 2002:a17:903:2c9:b0:182:c500:d93d with SMTP id s9-20020a17090302c900b00182c500d93dmr46618554plk.44.1666810621316;
-        Wed, 26 Oct 2022 11:57:01 -0700 (PDT)
+        bh=D/If4m1GxJTjgCioRpfOOS4Ke1Jj27FV+xWMcQP9x3c=;
+        b=eyF6bF4EPmTtrz1PXfNir2H28sYA4R+dcBDgHLmXUclsK7Qxv4YqS8pnSrJCA7JhqX
+         i5f+MJT4za+eTx3HBqomYQHyLwi53L1IMxoYSsBn3ul+L5jc6dfLo62ZU6e9HgUZgfGi
+         A0mtsBO3SthdabwNvhEvr9b2nqUv4BK+KeURXC/krtY7X3X3EbsfEWme0RsPw0ScW/ZH
+         2F5RUksToobCwU6wy2FlUlf7JxHdSr1eDFsbBZYgcuQGybVfn9V1IQgWXJYy5QP3gJFX
+         WkezfYbFWdTIQ0C0BuCOFgMtFyb6PMBLtNNtPGN45PiNZ+gsejUb7l9bN76B1xogL75a
+         3WYg==
+X-Gm-Message-State: ACrzQf2tssQx7SRSK8chspaXgdI15VfuhRQooNU7qjo41AUVGzzcGYGP
+	JuGsB6dYDrzwvWQ6n7Ht31OmoE7DdOU=
+X-Google-Smtp-Source: AMsMyM5uzKzDhOq2e0024LDUQvzWRwGITgyXVsuxjmbF2Gu3/VkCVTixADdCNTdd0QkGtLqUXyxl8w==
+X-Received: by 2002:a05:6a00:1304:b0:555:6d3f:1223 with SMTP id j4-20020a056a00130400b005556d3f1223mr46175903pfu.60.1666810622234;
+        Wed, 26 Oct 2022 11:57:02 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id h19-20020a170902f7d300b001869efb722csm3209420plw.215.2022.10.26.11.57.00
+        by smtp.gmail.com with ESMTPSA id h19-20020a170902f7d300b001869efb722csm3209420plw.215.2022.10.26.11.57.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Oct 2022 11:57:00 -0700 (PDT)
+        Wed, 26 Oct 2022 11:57:01 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/5] auto-t: allow printing devices in AP mode
-Date: Wed, 26 Oct 2022 11:56:54 -0700
-Message-Id: <20221026185656.489888-3-prestwoj@gmail.com>
+Subject: [PATCH 4/5] unit: test-arc4: test RC4 both directions
+Date: Wed, 26 Oct 2022 11:56:55 -0700
+Message-Id: <20221026185656.489888-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221026185656.489888-1-prestwoj@gmail.com>
 References: <20221026185656.489888-1-prestwoj@gmail.com>
@@ -55,40 +55,24 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The __str__ function assumed station mode which throws an exception
-if the device is in AP mode. Fix this as well as print out the mode
-the device is in.
+Tests that the data both encrypts and decrypts.
 ---
- autotests/util/iwd.py | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ unit/test-arc4.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index a9e2f2f5..9e96382a 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -690,14 +690,17 @@ class Device(IWDDBusAbstract):
-         return self._device_provisioning.stop()
+diff --git a/unit/test-arc4.c b/unit/test-arc4.c
+index bfc5009c..a9e0ef1d 100644
+--- a/unit/test-arc4.c
++++ b/unit/test-arc4.c
+@@ -92,6 +92,8 @@ static void arc4_skip_test(const void *data)
  
-     def __str__(self, prefix = ''):
--        return prefix + 'Device: ' + self.device_path + '\n'\
-+        s = prefix + 'Device: ' + self.device_path + '\n'\
-                + prefix + '\tName:\t\t' + self.name + '\n'\
--               + prefix + '\tAddress:\t' + self.address + '\n'\
--               + prefix + '\tState:\t\t' + str(self.state) + '\n'\
-+               + prefix + '\tAddress:\t' + self.address + '\n' \
-                + prefix + '\tPowered:\t' + str(self.powered) + '\n'\
--               + prefix + '\tConnected net:\t' + str(self.connected_network) +\
--                                                                            '\n'
-+               + prefix + '\tMode:\t\t' + self._properties['Mode'] + '\n'
+ 	assert(arc4_skip(test->key, 16, test->offset, buf, sizeof(buf), buf));
+ 	assert(!memcmp(buf, test->result, sizeof(buf)));
++	assert(arc4_skip(test->key, 16, test->offset, buf, sizeof(buf), buf));
++	assert(l_memeqzero(buf, 16));
+ }
  
-+        if self._properties['Mode'] == 'station':
-+            s += prefix + '\tState:\t\t' + str(self.state) + '\n'\
-+               + prefix + '\tConnected net:\t' + str(self.connected_network) + '\n'
-+
-+        return s
- 
- class Network(IWDDBusAbstract):
-     '''Class represents a network object: net.connman.iwd.Network'''
+ int main(int argc, char *argv[])
 -- 
 2.34.3
 
