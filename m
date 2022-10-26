@@ -1,49 +1,52 @@
 Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACCF1C36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BD0259C
 	for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 20:46:02 +0000 (UTC)
-Received: by mail-pf1-f171.google.com with SMTP id y13so12114811pfp.7
+Received: by mail-pf1-f171.google.com with SMTP id g62so12642560pfb.10
         for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 13:46:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tLW+zrLWt5QZwEfyUpfGrj+Uj1rEjGVGzf56CSd2AZY=;
-        b=T4nz3UN4UWDbJyhWC3kjArR18QYfAV/5m4LaZynmn7COCkyJI05yAqg8IRWKrlbTM4
-         o/W/xhlWBxpuD+d4QdsSL4l+mU9ND+1pcnOmdsW0zi9HhAY73pMMXjj55ZI7H7HDV0aX
-         gCRyIDp9pXqc9peYxbroqsxQ2L7LQUJV7wHmmUDAbKYNE127lyc9buAioC4bsbkXUeLu
-         VzG/vXExu1YD6OIo9os7Dny4DoAJZggkH7Lovbjl3DAt/1YtwyaTdxwAKkKI3+wxH+mZ
-         UZJEpRpQhLzMrwSEBtqpTS1t87HnuxlyomCIl1FObaJSZfgvoYUl+sLRbv5bE5R/66s6
-         GUUA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8lUBE4OWfO/bpkhLFVtTt/Kqn+0VZ46llClhPgULhaU=;
+        b=Hu+oZmdhczRXg7usvAOXIVqBmEWuFq2UibgYlg2x4ca7qxURVDvBhrGSzMOotXKmdq
+         Lv9ONX1PerzNhCul5+u7ZfJZr3z7f3IgRMx+HgVYbF57lRU4JR0QCmzog+CW/QnymxDP
+         sFUSe9AdLGHlmx5ROKbyAAljcblbDyEI/KtOvR6NSJv8z7qGdB8lv0lM13Wcw2onWs4n
+         iWlAcee8dTdDvELKTt0V+hMtfWe67taCIriV7BYgmiwveJaWe4YbTw+FHs+tZuVY1WCj
+         sn/UMp4WdzB2VqAoZJWu0gWRHi8TLektj3aI9m1Fj/ABG42DEGL4mKHYDu3JkQF5LHLW
+         hCaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tLW+zrLWt5QZwEfyUpfGrj+Uj1rEjGVGzf56CSd2AZY=;
-        b=wxk9ruuSZY5VRXj/+Nt40zCQzw6YC/bJcjgGx4tsLotR+1dJV1vR/P21jo0FbSUGuS
-         pKMneF1KNYuHiIHoSyrRRL4XVV0bMHltWbehff8yxJ+RzRawyLq2Pqf9DkoWUM2H483C
-         nJSixTdBy+uSiBt5vP53JwlP81NOBN9kwf51mVysN6RxCw+cdzl8FpHxxNkWIJzWMsd6
-         Y+jXwP6zlZMEaGqITrC4kdTNIViEjDxbgBHqDtOw9zF6RDa3eBg78IbHCntSMoawJIUD
-         qFQldTj+huW8G1hD3nsxG/yaT2z1sEF51dNCYw3uTW7Jk3mxlceMu/IGRWlVR4PJNmHK
-         HpnQ==
-X-Gm-Message-State: ACrzQf0skgd9tI3/RhVJK0ARqnW8ZeanHIRCWiKAc+jNHefgKu/gEVag
-	46ia/+bAkFEjqb8DfSksEek6WJ37Nsk=
-X-Google-Smtp-Source: AMsMyM4zdcA/PHgWk5pHucyzq4M8AncoDZw+7FWEsYOvYabQgllrPwJlsPgm9lHGPKBFUmJRHiALnw==
-X-Received: by 2002:a65:6e89:0:b0:43c:e3d8:49f1 with SMTP id bm9-20020a656e89000000b0043ce3d849f1mr39080149pgb.315.1666817161365;
-        Wed, 26 Oct 2022 13:46:01 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8lUBE4OWfO/bpkhLFVtTt/Kqn+0VZ46llClhPgULhaU=;
+        b=St0kCnLRZNduKaj8BW0UjRf2Y+aVcGbmUmkZhSNUJYw4qx45/eDnU/SPNJAVZLcygi
+         4QYB3JYA0AK3eE5koLSU7g2gkjH0RoEUlU9C4CWUuvfd60c+x5jO/m2yYSMmlCbNDVm6
+         rCIZtnRAQvQUvgzDwV+gbtl42d4NtgG9sacVyszGRQAQFJ2kmztbAfWhLyzOz3FB8YWC
+         2bxO1gFln/ove7aLHF0iNZDL8kItcnjhtFDFCvwnfxoP/jIZ/9u2nX2dtaJQ+flRk6vE
+         k6lOi+Qiz2F2mug92gixl+klqK5/DSnZxbP3Wdhf41QeQlBN2+kFf2W7oFfF6TELmwhT
+         Lk9w==
+X-Gm-Message-State: ACrzQf3pDeFnLSZ8bYzeVwtCMBPpLwtTzjrHmA9bm3xqhmvW4jJ3BZUG
+	ezqMKgmFhKJ6r38oGPsDGwAVhh5AAys=
+X-Google-Smtp-Source: AMsMyM7VwZlx1wePCdWNPwvThccQjz8ah/6FnCRPD5+2sWnO4WpaU6rzwqc7PbPxQz+gKlZ7YHGyBA==
+X-Received: by 2002:a63:8b41:0:b0:461:7bb7:bbea with SMTP id j62-20020a638b41000000b004617bb7bbeamr39309485pge.0.1666817162032;
+        Wed, 26 Oct 2022 13:46:02 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id i27-20020a056a00005b00b0056203db46ffsm3510588pfk.172.2022.10.26.13.46.00
+        by smtp.gmail.com with ESMTPSA id i27-20020a056a00005b00b0056203db46ffsm3510588pfk.172.2022.10.26.13.46.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Oct 2022 13:46:00 -0700 (PDT)
+        Wed, 26 Oct 2022 13:46:01 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/3] monitor: pass config to nlmon_create
-Date: Wed, 26 Oct 2022 13:45:57 -0700
-Message-Id: <20221026204559.502432-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/3] monitor: allow parsing pcaps without -F option
+Date: Wed, 26 Oct 2022 13:45:58 -0700
+Message-Id: <20221026204559.502432-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20221026204559.502432-1-prestwoj@gmail.com>
+References: <20221026204559.502432-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -52,105 +55,73 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Expand nlmon_create to be useful for both pcaps and monitoring. Doing
-this also lets iwmon filter pcaps based on --no-ies,rtnl,scan etc
-flags since they are part of the config.
+The -F option is undocumented but allows you to pass a nl80211
+family ID so iwmon doesn't ignore messages which don't match the
+systems nl80211 family ID (i.e. pcaps from other systems).
+
+This is somewhat of a pain to use since its unclear what the other
+system's family ID actually is until you run it though something
+like wireshark. Instead iwmon can ignore the family ID when in
+read mode which makes reading other systems pcap files automatic.
 ---
- monitor/main.c  |  8 +++++---
- monitor/nlmon.c | 15 +++++++--------
- monitor/nlmon.h |  2 +-
- 3 files changed, 13 insertions(+), 12 deletions(-)
+ monitor/main.c  | 1 +
+ monitor/nlmon.c | 4 +++-
+ monitor/nlmon.h | 1 +
+ 3 files changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/monitor/main.c b/monitor/main.c
-index f0b16bbf..50b3fd27 100644
+index 50b3fd27..0cbab179 100644
 --- a/monitor/main.c
 +++ b/monitor/main.c
-@@ -569,7 +569,8 @@ done:
- 	return exit_status;
- }
- 
--static int process_pcap(struct pcap *pcap, uint16_t id)
-+static int process_pcap(struct pcap *pcap, uint16_t id,
-+			const struct nlmon_config *config)
- {
- 	struct nlmon *nlmon = NULL;
- 	struct timeval tv;
-@@ -586,7 +587,7 @@ static int process_pcap(struct pcap *pcap, uint16_t id)
- 		return EXIT_FAILURE;
- 	}
- 
--	nlmon = nlmon_create(id);
-+	nlmon = nlmon_create(id, config);
- 
- 	while (pcap_read(pcap, &tv, buf, snaplen, &len, &real_len)) {
- 		uint16_t arphrd_type;
-@@ -797,7 +798,8 @@ int main(int argc, char *argv[])
- 			fprintf(stderr, "Invalid packet format\n");
- 			exit_status = EXIT_FAILURE;
- 		} else
--			exit_status = process_pcap(pcap, nl80211_family);
-+			exit_status = process_pcap(pcap, nl80211_family,
-+							&config);
- 
- 		pcap_close(pcap);
- 
+@@ -710,6 +710,7 @@ int main(int argc, char *argv[])
+ 		switch (opt) {
+ 		case 'r':
+ 			reader_path = optarg;
++			config.read_only = true;
+ 			break;
+ 		case 'w':
+ 			writer_path = optarg;
 diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 69e86ce3..b58bef05 100644
+index b58bef05..d786cc33 100644
 --- a/monitor/nlmon.c
 +++ b/monitor/nlmon.c
-@@ -7253,7 +7253,7 @@ static void nlmon_message(struct nlmon *nlmon, const struct timeval *tv,
+@@ -104,6 +104,7 @@ struct nlmon {
+ 	bool nowiphy;
+ 	bool noscan;
+ 	bool noies;
++	bool read;
+ };
+ 
+ struct nlmon_req {
+@@ -7202,7 +7203,7 @@ static void nlmon_message(struct nlmon *nlmon, const struct timeval *tv,
+ 		return;
  	}
- }
  
--struct nlmon *nlmon_create(uint16_t id)
-+struct nlmon *nlmon_create(uint16_t id, const struct nlmon_config *config)
- {
- 	struct nlmon *nlmon;
- 
-@@ -7261,6 +7261,10 @@ struct nlmon *nlmon_create(uint16_t id)
- 
- 	nlmon->id = id;
- 	nlmon->req_list = l_queue_new();
-+	nlmon->nortnl = config->nortnl;
-+	nlmon->nowiphy = config->nowiphy;
-+	nlmon->noscan = config->noscan;
-+	nlmon->noies = config->noies;
+-	if (nlmsg->nlmsg_type != nlmon->id) {
++	if (!nlmon->read && nlmsg->nlmsg_type != nlmon->id) {
+ 		if (nlmsg->nlmsg_type == GENL_ID_CTRL)
+ 			store_message(nlmon, tv, nlmsg);
+ 		return;
+@@ -7265,6 +7266,7 @@ struct nlmon *nlmon_create(uint16_t id, const struct nlmon_config *config)
+ 	nlmon->nowiphy = config->nowiphy;
+ 	nlmon->noscan = config->noscan;
+ 	nlmon->noies = config->noies;
++	nlmon->read = config->read_only;
  
  	return nlmon;
  }
-@@ -8449,17 +8453,12 @@ struct nlmon *nlmon_open(const char *ifname, uint16_t id, const char *pathname,
- 	} else
- 		pcap = NULL;
- 
--	nlmon = l_new(struct nlmon, 1);
- 
--	nlmon->id = id;
-+	nlmon = nlmon_create(id, config);
-+
- 	nlmon->io = io;
- 	nlmon->pae_io = pae_io;
--	nlmon->req_list = l_queue_new();
- 	nlmon->pcap = pcap;
--	nlmon->nortnl = config->nortnl;
--	nlmon->nowiphy = config->nowiphy;
--	nlmon->noscan = config->noscan;
--	nlmon->noies = config->noies;
- 
- 	l_io_set_read_handler(nlmon->io, nlmon_receive, nlmon, NULL);
- 	l_io_set_read_handler(nlmon->pae_io, pae_receive, nlmon, NULL);
 diff --git a/monitor/nlmon.h b/monitor/nlmon.h
-index ab038fdf..d1092c11 100644
+index d1092c11..96958c25 100644
 --- a/monitor/nlmon.h
 +++ b/monitor/nlmon.h
-@@ -36,7 +36,7 @@ struct nlmon *nlmon_open(const char *ifname, uint16_t id, const char *pathname,
- 				const struct nlmon_config *config);
- void nlmon_close(struct nlmon *nlmon);
+@@ -30,6 +30,7 @@ struct nlmon_config {
+ 	bool nowiphy;
+ 	bool noscan;
+ 	bool noies;
++	bool read_only;
+ };
  
--struct nlmon *nlmon_create(uint16_t id);
-+struct nlmon *nlmon_create(uint16_t id, const struct nlmon_config *config);
- void nlmon_destroy(struct nlmon *nlmon);
- void nlmon_print_rtnl(struct nlmon *nlmon, const struct timeval *tv,
- 					const void *data, uint32_t size);
+ struct nlmon *nlmon_open(const char *ifname, uint16_t id, const char *pathname,
 -- 
 2.34.3
 
