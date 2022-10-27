@@ -1,73 +1,87 @@
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D302568
-	for <iwd@lists.linux.dev>; Thu, 27 Oct 2022 14:41:13 +0000 (UTC)
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-13ba9a4430cso2252098fac.11
-        for <iwd@lists.linux.dev>; Thu, 27 Oct 2022 07:41:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134C4D501
+	for <iwd@lists.linux.dev>; Thu, 27 Oct 2022 18:18:44 +0000 (UTC)
+Received: by mail-pf1-f180.google.com with SMTP id v28so2237720pfi.12
+        for <iwd@lists.linux.dev>; Thu, 27 Oct 2022 11:18:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JtHP8m7yuxDwbmjhSpjEdrs1VaEMRkaXAq9NdiznNgI=;
-        b=oWmjd8bPjFj6Ah40lMoFvR8ogcgUQPcRkBiWUuFgFrJ382kpN4vgnTlMYnQmJIVp7V
-         bumhVL58sHZ3y/T25Dvv4kXf8b6UUmxQVeKgYAuDyL2ExKALMvB6KgxxWdJhNGI9ba9H
-         8J/jDhD4xTO1YCWu9g2J5EY5/6rv5supDPaCgHQO4n+Op/ZpvBLYJjr7yFvzE11+q50m
-         hYR0ANqwGKETxRB0bsjNAMlJYG9tx0AU1yv2uwvNsV+22qf5GLf5tPgBx32zmB7Ca0i5
-         vbRF/gu1wsWjcijwgSL7lH+zTJ3Xi9DCZjLkw8VlTxxPMpwPCod8/dZ6+olV+oh0sAsu
-         5sjA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=j9vyij384y8mI1Zkkqi7JBGTGnMAxKNRZblhXnSuYAo=;
+        b=Yonh1PETEhKKH6j3r9K3yiN28FvdMj5h0BSiaJf13Hu8E+8qLCUdyjA1HST2z5d3c4
+         9Z3DhJAPZCcgVOSf936dnk3wGMlU+9hhWZj7WPB+JFhx7NtfX6B/O+tKT4D8uL+x/fat
+         j/O7NtoZ/EKx93AjEU6EnsaJgymsu2moZe8fagNV6nLHUBEgGJdL49m9RkFATxAOxj6/
+         W9nu/BA/K7GE4OsCJm/uU3k5F0Eeow+AguJRelvtxZMYZvMPE2DDISGIj/CjnVR1G9Wr
+         v312fhwhNSmFCaLMs41eeuBHakOZ0B5ukawiWv/2D6HZMp7MuISnQrOf0NJo8gNZtrmj
+         EUYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JtHP8m7yuxDwbmjhSpjEdrs1VaEMRkaXAq9NdiznNgI=;
-        b=rHnsdpSmNwWSu4O/YYEAjOrR+XenoZBI7Kf4NXImH/K0T8oCYiWeRBHpzO4z2MBEHZ
-         UrjBRX8aNYBr9aaHTH5VPIbdlgu+XvyHUZkHl6yM9IOzpF/5B8fD0ugxDG/IfDmZj0W9
-         b9jUYnKjfBY7o0DnlUTSM8AeR/Hw/QTM6c4k3YsTx/J8baCAtW8gvsg3oT294ZsFNOi8
-         pVcfvtF2chXHOh18vvzMW17ZTnFUsAWmogQNSIDXBE7RAUYjoSIOK+uQ29UlyMUMPQmx
-         UKBSHLHTzIGXwNnF143m9KXw6Rc/w25MLVEwyLragjDGadotjBCWBuy1W366zSSSB2Pw
-         qQGw==
-X-Gm-Message-State: ACrzQf33Ks4yRq8YtSOtJUO6JrX1S/ZiQq4X9ktKum7f8/EsnPek9LyK
-	vGXhFAbZh3fITP52LAl7KeAiybwT2QM=
-X-Google-Smtp-Source: AMsMyM7WTda745K7FC5mXhWW7jcNE0R4JdPyQ45NrM1v/iwjn7siRtQNo+iMvMc8HB1cnxdVJQZOFQ==
-X-Received: by 2002:a05:6870:312a:b0:132:9c83:353b with SMTP id v42-20020a056870312a00b001329c83353bmr5546785oaa.65.1666881673107;
-        Thu, 27 Oct 2022 07:41:13 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id g2-20020a9d6c42000000b0066aba96addbsm548791otq.81.2022.10.27.07.41.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Oct 2022 07:41:12 -0700 (PDT)
-Message-ID: <136bef49-cf40-7078-9d59-e2bc2da21c2c@gmail.com>
-Date: Thu, 27 Oct 2022 09:41:09 -0500
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j9vyij384y8mI1Zkkqi7JBGTGnMAxKNRZblhXnSuYAo=;
+        b=x0dGr438UCuvg6kQn8WRJMJvvqZob0GUmfFnOawEsA0ChyGXXprJmsghAHrtVtKZz5
+         JBKOkpNbu2CtZ8jT8SOyyq0Op5rQKUu/InwIJsRLL6tmdAEDBh1hqVlJ2HYqdJrgrQim
+         CEKvy/A6HV2B0wKDWh0mzMm6dB4W0jYqIflouD9OEQy6LzEPQUnonWkVfeEFmg0qLhST
+         Yhyl/TOS0DzlpY9JSdJZyHH/3Dy52bJJ4ddvgDwQRQdt9wtaT/ZVH8KwSMnuurPDYdhu
+         5e2wFzMM5uGotc/db5RFA9SfVxQ1MMvKaRw4RgxieqpRGBHDtMnrcb5dJ+EndxmlF6cj
+         zTIw==
+X-Gm-Message-State: ACrzQf2PJkn0KQ462b6rwvqzsqMW+G3Q+0ZV9HvHqJnVOWGIoGuKlqhl
+	v9fzmxC+z7mzqRssvyftOB9z1xc80ZE=
+X-Google-Smtp-Source: AMsMyM614RBNhpoUHoqDEz/YyKyYudiLXX3pGfzz2hlGD/iHN/egnLjD5AS5jMPSxo0QhZ5KhosMeQ==
+X-Received: by 2002:a63:6b88:0:b0:46a:ff3c:b64a with SMTP id g130-20020a636b88000000b0046aff3cb64amr42857427pgc.196.1666894724171;
+        Thu, 27 Oct 2022 11:18:44 -0700 (PDT)
+Received: from jprestwo-xps.none ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id x190-20020a6231c7000000b00563ce1905f4sm1490048pfx.5.2022.10.27.11.18.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Oct 2022 11:18:43 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] monitor: put nortnl check into nlmon_print_rtnl
+Date: Thu, 27 Oct 2022 11:18:42 -0700
+Message-Id: <20221027181842.593176-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 1/2] hwsim: add additional ciphers to disable list
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20221026215350.506918-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221026215350.506918-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Doing this allows --nortnl to work when reading pcaps.
+---
+ monitor/nlmon.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-On 10/26/22 16:53, James Prestwood wrote:
-> Allows these ciphers to be disabled when creating radios.
-> ---
->   tools/hwsim.c | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-
-Both applied, thanks.
-
-Regards,
--Denis
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index d786cc33..9694cfd1 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -8089,6 +8089,9 @@ void nlmon_print_rtnl(struct nlmon *nlmon, const struct timeval *tv,
+ 	int64_t aligned_size = NLMSG_ALIGN(size);
+ 	const struct nlmsghdr *nlmsg;
+ 
++	if (nlmon->nortnl)
++		return;
++
+ 	update_time_offset(tv);
+ 
+ 	for (nlmsg = data; NLMSG_OK(nlmsg, aligned_size);
+@@ -8207,9 +8210,7 @@ static bool nlmon_receive(struct l_io *io, void *user_data)
+ 		case NETLINK_ROUTE:
+ 			store_netlink(nlmon, tv, proto_type, nlmsg);
+ 
+-			if (!nlmon->nortnl)
+-				nlmon_print_rtnl(nlmon, tv, nlmsg,
+-							nlmsg->nlmsg_len);
++			nlmon_print_rtnl(nlmon, tv, nlmsg, nlmsg->nlmsg_len);
+ 			break;
+ 		case NETLINK_GENERIC:
+ 			nlmon_message(nlmon, tv, tp, nlmsg);
+-- 
+2.34.3
 
