@@ -1,133 +1,73 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABD9259C
-	for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 21:53:55 +0000 (UTC)
-Received: by mail-pj1-f54.google.com with SMTP id l22-20020a17090a3f1600b00212fbbcfb78so4161562pjc.3
-        for <iwd@lists.linux.dev>; Wed, 26 Oct 2022 14:53:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D302568
+	for <iwd@lists.linux.dev>; Thu, 27 Oct 2022 14:41:13 +0000 (UTC)
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-13ba9a4430cso2252098fac.11
+        for <iwd@lists.linux.dev>; Thu, 27 Oct 2022 07:41:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7st9qW31FDf+ggx8gFdUjDguopM1epMHnV4qlWoruaM=;
-        b=QIkJLm2yfOT6YAbcuZ0S+SC+uFc4w2atEmFgfJaFGWgnZsHG9EzsuDJSpZPGSdmEi6
-         FSFxtwzsvug969PHVxO83C0DQn7fYmhTjkUEVb6SjxLI2bM+1gIJNGQQtVRmOEVMmFb1
-         opFY9ggNdMPDH/LS+oqeDiVLiBt41vsvpvaCE+LRtqkoJRdePeh8M60Pm9Yt5YJtBUOs
-         7SAtSnRCE/xL5HDC3jF9h0dfiJPROXQhTi/LfTQpNd9e6LC1Wy3FVUKBdPy9IW+dzIKr
-         qaquS0Jxim2qgl/56mMD8lJpvWvsjdEhDXgtqlMU1VTWSkgcaoaC+DyAs1bREsQYn4BH
-         Q12g==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JtHP8m7yuxDwbmjhSpjEdrs1VaEMRkaXAq9NdiznNgI=;
+        b=oWmjd8bPjFj6Ah40lMoFvR8ogcgUQPcRkBiWUuFgFrJ382kpN4vgnTlMYnQmJIVp7V
+         bumhVL58sHZ3y/T25Dvv4kXf8b6UUmxQVeKgYAuDyL2ExKALMvB6KgxxWdJhNGI9ba9H
+         8J/jDhD4xTO1YCWu9g2J5EY5/6rv5supDPaCgHQO4n+Op/ZpvBLYJjr7yFvzE11+q50m
+         hYR0ANqwGKETxRB0bsjNAMlJYG9tx0AU1yv2uwvNsV+22qf5GLf5tPgBx32zmB7Ca0i5
+         vbRF/gu1wsWjcijwgSL7lH+zTJ3Xi9DCZjLkw8VlTxxPMpwPCod8/dZ6+olV+oh0sAsu
+         5sjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7st9qW31FDf+ggx8gFdUjDguopM1epMHnV4qlWoruaM=;
-        b=T/6v4uOnGQOOaildeLv4Lx9fR/k8Oci7MsQjvJUC9KVSoe8pqMXyK51QPnV69Yj9Bt
-         a7c0HNGaWMxI7vHZX4g8JEp9YXMIj2eJUgTNIa83wSnVEi1nXI6kSNom3ufd0xeVrQsy
-         0kHDbBrunf8d41BW2ekPX6wAP3QCIAQISYu1rkVvnALhLTbjAUgwNARch7H4cnD2VZy5
-         WbnkloHZmnT/EcQblQVETxPUHThh6F0QQSVn2WpKjS9w0FgLwxHHYWyoDAaaVkZGc5NF
-         U1CxX/C0cc1k6u+DVq1fHYw5q8t72ybirQBLpldEp7UVwW8Ey0zN73VBvmLyXWm8RGah
-         7S6g==
-X-Gm-Message-State: ACrzQf3AzczQp85BK+fqhrhgPiAaJ1kKBra8K827y17ugiI+vLgEhLYG
-	lMJ7Is0Lz6vuoDvNdwPkhhhPBa5E+Y8=
-X-Google-Smtp-Source: AMsMyM4JOq/wMM98WZ9vOt3iz0D6DsK87Cayvl9Geb/Drpb+IndieDuwuhAYMttgAWxCZ6/+vxD2uw==
-X-Received: by 2002:a17:902:d512:b0:181:f1f4:fcb4 with SMTP id b18-20020a170902d51200b00181f1f4fcb4mr46577018plg.102.1666821234890;
-        Wed, 26 Oct 2022 14:53:54 -0700 (PDT)
-Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id d20-20020a170902b71400b0017b264a2d4asm3372471pls.44.2022.10.26.14.53.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Oct 2022 14:53:54 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] auto-t: test AP mode using TKIP
-Date: Wed, 26 Oct 2022 14:53:50 -0700
-Message-Id: <20221026215350.506918-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20221026215350.506918-1-prestwoj@gmail.com>
-References: <20221026215350.506918-1-prestwoj@gmail.com>
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JtHP8m7yuxDwbmjhSpjEdrs1VaEMRkaXAq9NdiznNgI=;
+        b=rHnsdpSmNwWSu4O/YYEAjOrR+XenoZBI7Kf4NXImH/K0T8oCYiWeRBHpzO4z2MBEHZ
+         UrjBRX8aNYBr9aaHTH5VPIbdlgu+XvyHUZkHl6yM9IOzpF/5B8fD0ugxDG/IfDmZj0W9
+         b9jUYnKjfBY7o0DnlUTSM8AeR/Hw/QTM6c4k3YsTx/J8baCAtW8gvsg3oT294ZsFNOi8
+         pVcfvtF2chXHOh18vvzMW17ZTnFUsAWmogQNSIDXBE7RAUYjoSIOK+uQ29UlyMUMPQmx
+         UKBSHLHTzIGXwNnF143m9KXw6Rc/w25MLVEwyLragjDGadotjBCWBuy1W366zSSSB2Pw
+         qQGw==
+X-Gm-Message-State: ACrzQf33Ks4yRq8YtSOtJUO6JrX1S/ZiQq4X9ktKum7f8/EsnPek9LyK
+	vGXhFAbZh3fITP52LAl7KeAiybwT2QM=
+X-Google-Smtp-Source: AMsMyM7WTda745K7FC5mXhWW7jcNE0R4JdPyQ45NrM1v/iwjn7siRtQNo+iMvMc8HB1cnxdVJQZOFQ==
+X-Received: by 2002:a05:6870:312a:b0:132:9c83:353b with SMTP id v42-20020a056870312a00b001329c83353bmr5546785oaa.65.1666881673107;
+        Thu, 27 Oct 2022 07:41:13 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id g2-20020a9d6c42000000b0066aba96addbsm548791otq.81.2022.10.27.07.41.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Oct 2022 07:41:12 -0700 (PDT)
+Message-ID: <136bef49-cf40-7078-9d59-e2bc2da21c2c@gmail.com>
+Date: Thu, 27 Oct 2022 09:41:09 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 1/2] hwsim: add additional ciphers to disable list
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20221026215350.506918-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20221026215350.506918-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This limits all supported ciphers to TKIP and verifies the AP
-starts and can authenticate clients.
----
- .../testAP-no-support/connection_test.py      | 31 +++++++++++++++++--
- autotests/testAP-no-support/hw.conf           |  7 +++--
- 2 files changed, 33 insertions(+), 5 deletions(-)
+Hi James,
 
-diff --git a/autotests/testAP-no-support/connection_test.py b/autotests/testAP-no-support/connection_test.py
-index 1bbc0bde..9e5dccbb 100644
---- a/autotests/testAP-no-support/connection_test.py
-+++ b/autotests/testAP-no-support/connection_test.py
-@@ -5,17 +5,42 @@ import sys
- 
- sys.path.append('../util')
- import iwd
--from iwd import IWD
-+from iwd import IWD, NetworkType, PSKAgent
- 
- class Test(unittest.TestCase):
--    def test_connection_success(self):
--        wd = IWD()
-+    def test_no_ap_mode(self):
-+        wd = IWD(True)
- 
-         dev = wd.list_devices(1)[0]
- 
-         with self.assertRaises(iwd.NotSupportedEx):
-             dev.start_ap('TestAP2', 'Password2')
- 
-+    def test_only_tkip_support(self):
-+        wd = IWD(True)
-+
-+        devices = wd.list_devices(2)
-+
-+        dev_sta = devices[0]
-+        dev_ap = devices[1]
-+
-+        dev_ap.start_ap('TestAP2', 'Password2')
-+
-+        ordered_network = dev_sta.get_ordered_network('TestAP2')
-+
-+        if ordered_network.type != NetworkType.psk:
-+            raise Exception("Network type mismatch")
-+
-+        psk_agent = PSKAgent('Password2')
-+        wd.register_psk_agent(psk_agent)
-+
-+        ordered_network.network_object.connect()
-+
-+        condition = 'obj.state == DeviceState.connected'
-+        wd.wait_for_object_condition(dev_sta, condition)
-+
-+        wd.unregister_psk_agent(psk_agent)
-+
-     @classmethod
-     def setUpClass(cls):
-         pass
-diff --git a/autotests/testAP-no-support/hw.conf b/autotests/testAP-no-support/hw.conf
-index 9df3b349..06a9d7c2 100644
---- a/autotests/testAP-no-support/hw.conf
-+++ b/autotests/testAP-no-support/hw.conf
-@@ -1,6 +1,9 @@
- [SETUP]
--num_radios=1
--radio_confs=rad0
-+num_radios=2
-+start_iwd=0
- 
- [rad0]
- iftype_disable=ap
-+
-+[rad1]
-+cipher_disable=ccmp,bip_cmac,gcmp,gcmp_256,ccmp_256,bip_gmac.bip_gmac_256,bip_cmac_256
--- 
-2.34.3
+On 10/26/22 16:53, James Prestwood wrote:
+> Allows these ciphers to be disabled when creating radios.
+> ---
+>   tools/hwsim.c | 8 +++++++-
+>   1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+
+Both applied, thanks.
+
+Regards,
+-Denis
 
