@@ -1,39 +1,39 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E0D7E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F912F29
 	for <iwd@lists.linux.dev>; Tue,  1 Nov 2022 20:18:05 +0000 (UTC)
-Received: by mail-pl1-f170.google.com with SMTP id v17so11592398plo.1
+Received: by mail-pj1-f53.google.com with SMTP id r61-20020a17090a43c300b00212f4e9cccdso28751pjg.5
         for <iwd@lists.linux.dev>; Tue, 01 Nov 2022 13:18:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1UEcUJlR2NFd3ZJzzkmtPSmop46MuCFADfvl0SGPai0=;
-        b=OQlCI2w/ivziSLAImmk2EipRbkqpzpbdppQAJFxMTqTmy3urANipOJH+YUpGEygYJA
-         aD2uNSKzhEJ/gpy/1OdXYpo7vTuq3XD3dlsQfAXe98SQv+DDumBmCcTEKXqwcVDv4TQ2
-         5TwC16QCEv9CYMOXdDtth+TSRUX20Ma+/u2fmfWDmPvz4HVN7tLHRXcpUXheqtoERVGr
-         H3lbm/JSZrZVMY4DgcGBjzkjDzC6/QI2WvV4SRU13eHmeEcYWGMfuZ6SyJqQfsSZvFyT
-         GNjYKWV7Er9Ey0Tpdf/YqzhWSM76WICb7pV5+0bk/uVS0IRu50gKs9xNfSG+wHgWJ6t+
-         lsyg==
+        bh=2zyWsO69TtCZ4q7JEd0HyoJwfnBzszoXMTkRuGBLKzk=;
+        b=QiT6NBIEODijUVuRhJi9yNN6QeaiPvERu+F1ENv4rRHlrgO8gzmdeAxQeNw7gGwn+G
+         bQ5XENFS2HUga9KUm+5K8nLKKkadnoRiSRsQx6aMYJ+T4545qaWfe+Dk+HsLSB5SmXYp
+         +ZjTXWZJSTS8g/99Q1CtEbTIIfCb3dMmB4GGdP2SfEevalj27BahTPccA3tAHuy4qTQ8
+         xBdTiIGbMppO0ICeykrdZ+kQQrXlhvTRr0mbyUm1b+w/Qqiv3XWI6HwYfDZCAHWiHLg9
+         LAcPqwrfYwZjp8jb3ZZrGWQ3JnqIteqiQnvmyDoivz5VBVXTn3FfBkHFrr6jp8+RYByQ
+         Pq5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1UEcUJlR2NFd3ZJzzkmtPSmop46MuCFADfvl0SGPai0=;
-        b=3llqpUZM5mwQbbnQtcdDKrFS78MNCk3ZF1yhAjng1bTL3+PeI5pvWjCFmA7kUwLHfh
-         Es87x0hChAReYnxdoWbdlLKL0nvitwBmH/yxzVDXM3cnAthSy3VbSVkB1u7IDhvKD0m+
-         r6X+mLY7xy2OPrRwtaf87IwpxdGMeuIqkEAmAlIlWin5JP3j7nBxYjeZmrd9jeFFN7fC
-         cBfoIxKgFBtiP6+6VrOOJxyBYBTTFZLnmwNKWBci5OcAsgjh3ZM37tYKHH7smaRfvvek
-         3HNxrBindqLBJKU3h1nO9ga5wLnh9PMaSuVQ75YhvnXr8f+vQbdJ3VgwBdrObBoET54b
-         LR0g==
-X-Gm-Message-State: ACrzQf1DHEN0vOx/3uIVvJn8x6IPWHVSUIMfxB86g7NwACtetcCfw0Oa
-	+dLE9GCMOADI5CxewyisoJC0ofyHSXU=
-X-Google-Smtp-Source: AMsMyM6qLDq0jG/Zti1Ij5SUqZbgh9dBKPLShHpIf+K0EDvUa5+JJm4v6wVyoI2G4CoNjG6Rz8au+w==
-X-Received: by 2002:a17:902:c40d:b0:186:ffe6:24cc with SMTP id k13-20020a170902c40d00b00186ffe624ccmr22089417plk.133.1667333884463;
-        Tue, 01 Nov 2022 13:18:04 -0700 (PDT)
+        bh=2zyWsO69TtCZ4q7JEd0HyoJwfnBzszoXMTkRuGBLKzk=;
+        b=0zE8l2KhEIbV+U8U/C6nx2U9Z6v0HBw45dvhn9TAiHXVMHVlezMpymccp+K2CnPWkN
+         MXBPgzmWcIQzIn8+4a8DD9leCjRADXP/TNHSfTUHlVMJLQoUkdmoTF0GY1F0LMJAnupJ
+         z3NHj7tCElnhDH15S5qli19lBetR4Fe3nXGrqzxbrRkhaJ3WxLscK5oeOj/tbfERZC9L
+         lQoKRemz3g7ACmgNQPJCUokNM1s+MedODyjG0TJ+UBIuxclr682enJ1ybpEyclxsXieG
+         F9J09m4QalzEMpCQHIiMvlwXZ+D/hXlDVdpoLlg2lg8tzJMRJaK359JoFSEEopzyrLBg
+         cIzw==
+X-Gm-Message-State: ACrzQf2/U2hWQlvj7AhFSw71wSTrtCyVRnFRZJXDUxMY5HuE7ynsqf8N
+	3YYmfIp46j6CxkOez+8ZoX8OOJimkLU=
+X-Google-Smtp-Source: AMsMyM55yVM45w4/vrx4JGkmxAJhYdThR6b7LfolGXI4sA8FsjeKiSy7QYKfOVGZBJpfsR53izvoQQ==
+X-Received: by 2002:a17:902:7689:b0:187:48d:d9be with SMTP id m9-20020a170902768900b00187048dd9bemr781226pll.102.1667333885069;
+        Tue, 01 Nov 2022 13:18:05 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.160.234])
         by smtp.gmail.com with ESMTPSA id z15-20020a170903018f00b00180a7ff78ccsm6781681plg.126.2022.11.01.13.18.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
@@ -41,9 +41,9 @@ Received: from jprestwo-xps.none ([50.39.160.234])
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 16/17] netdev: parse michael MIC failure message
-Date: Tue,  1 Nov 2022 13:17:46 -0700
-Message-Id: <20221101201747.143379-16-prestwoj@gmail.com>
+Subject: [PATCH 17/17] auto-t: add AP test for all pairwise/group cipher combos
+Date: Tue,  1 Nov 2022 13:17:47 -0700
+Message-Id: <20221101201747.143379-17-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221101201747.143379-1-prestwoj@gmail.com>
 References: <20221101201747.143379-1-prestwoj@gmail.com>
@@ -55,47 +55,78 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This event indicates a security issue. The proper handling would be
-to rekey but for now at least provide some information to the user.
+Iterates through every possible cipher combination and verifies the
+AP can authenticate the clients.
 ---
- src/netdev.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ autotests/testAP/connection_test.py | 33 ++++++++++++++++++++++++-----
+ 1 file changed, 28 insertions(+), 5 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 23bbbcf6..ced87191 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -5224,6 +5224,20 @@ static void netdev_channel_switch_event(struct l_genl_msg *msg,
- 				&netdev->frequency, netdev->user_data);
- }
+diff --git a/autotests/testAP/connection_test.py b/autotests/testAP/connection_test.py
+index dff415e7..297a8aa2 100644
+--- a/autotests/testAP/connection_test.py
++++ b/autotests/testAP/connection_test.py
+@@ -1,6 +1,7 @@
+ #! /usr/bin/python3
  
-+static void netdev_michael_mic_failure(struct l_genl_msg *msg,
-+					struct netdev *netdev)
-+{
-+	uint8_t idx;
-+	uint32_t type;
-+
-+	if (nl80211_parse_attrs(msg, NL80211_ATTR_KEY_IDX, &idx,
-+				NL80211_ATTR_KEY_TYPE, &type,
-+				NL80211_ATTR_UNSPEC) < 0)
-+		return;
-+
-+	l_debug("ifindex=%u key_idx=%u type=%u", netdev->index, idx, type);
-+}
-+
- static void netdev_mlme_notify(struct l_genl_msg *msg, void *user_data)
- {
- 	struct netdev *netdev = NULL;
-@@ -5274,6 +5288,9 @@ static void netdev_mlme_notify(struct l_genl_msg *msg, void *user_data)
- 	case NL80211_CMD_DEL_STATION:
- 		netdev_station_event(msg, netdev, false);
- 		break;
-+	case NL80211_CMD_MICHAEL_MIC_FAILURE:
-+		netdev_michael_mic_failure(msg, netdev);
-+		break;
- 	}
- }
+ import unittest
++import os
  
+ from iwd import IWD
+ from config import ctx
+@@ -8,6 +9,8 @@ from validation import validate, client_connect
+ 
+ class Test(unittest.TestCase):
+     def test_connection_success(self):
++        IWD.copy_to_storage('TestAP1.psk')
++
+         wd = IWD(True)
+ 
+         dev1, dev2 = wd.list_devices(2)
+@@ -22,6 +25,8 @@ class Test(unittest.TestCase):
+         client_connect(wd, dev1, 'TestAP1')
+ 
+     def test_client_start_ap(self):
++        IWD.copy_to_storage('TestAP1.psk')
++
+         wd = IWD(True)
+ 
+         dev1, dev2 = wd.list_devices(2)
+@@ -39,12 +44,30 @@ class Test(unittest.TestCase):
+ 
+         validate(wd, dev2, dev1, 'TestAP2', 'Password2')
+ 
+-    @classmethod
+-    def setUpClass(cls):
+-        IWD.copy_to_storage('TestAP1.psk')
++    def test_ciphers(self):
++        ciphers = ['TKIP', 'CCMP', 'GCMP', 'CCMP-256', 'GCMP-256']
++
++        for pairwise in ciphers:
++            for group in ciphers:
++                IWD.copy_to_ap('TestAP2.ap')
++                os.system('echo "PairwiseCiphers=%s" >> /tmp/iwd/ap/TestAP2.ap' % pairwise)
++                os.system('echo "GroupCipher=%s" >> /tmp/iwd/ap/TestAP2.ap' % group)
++
++                wd = IWD(True)
++
++                dev1, dev2 = wd.list_devices(2)
++
++                dev1.start_ap('TestAP2')
++
++                try:
++                    validate(wd, dev2, dev1, 'TestAP2', 'Password2', ip_checks=False)
++                except:
++                    raise Exception("Failed with pairwise=%s group=%s" % (pairwise, group))
++                finally:
++                    IWD.clear_storage()
++                    del wd
+ 
+-    @classmethod
+-    def tearDownClass(cls):
++    def tearDown(self):
+         IWD.clear_storage()
+ 
+ if __name__ == '__main__':
 -- 
 2.34.3
 
