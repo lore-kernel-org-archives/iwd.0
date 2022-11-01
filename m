@@ -1,49 +1,49 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935371EA11
-	for <iwd@lists.linux.dev>; Tue,  1 Nov 2022 20:17:58 +0000 (UTC)
-Received: by mail-pf1-f173.google.com with SMTP id v28so14310585pfi.12
-        for <iwd@lists.linux.dev>; Tue, 01 Nov 2022 13:17:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0B62F29
+	for <iwd@lists.linux.dev>; Tue,  1 Nov 2022 20:17:59 +0000 (UTC)
+Received: by mail-pf1-f172.google.com with SMTP id 192so14494399pfx.5
+        for <iwd@lists.linux.dev>; Tue, 01 Nov 2022 13:17:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZehA54EXLoFpuihBQqE/s3qSP5Wr2j1HNX08mqpwWi8=;
-        b=jyrcetSLIXPrMMhNnTjF6n1+G0Ai5mkpqSeGKdbinCRKDPImTNVTFGKMJSc485avEv
-         gfoUhMrjnRRK9Is4V8ny/YW39lP/2EeM67V+rk/Z7tz09cass9OU2um2bsbn+SitQzMW
-         DQsO/lShOvXwx9wHhvOMnY+Tv92hgrherR71psIpk5PRDCr4DFObXS0lg98OI9sZRknk
-         s0IRqDX8Vxx3e6K9uB0N31xLpiNgFQq5NyunmnB74JmnN1FWI8mnPN5EawljMaBvOeWo
-         qaKFlAhPr6bc6RAU1d26EemU8IYnpJPNUgObRC8KX2iSyAln8/zaDXeJCl8edtY66hk/
-         ndDg==
+        bh=EEfGkuCQYYxcGbbfjR6N6mc6MQeYVXrumfh75c4m1EE=;
+        b=fxIU+z0eUWksYM0oUib8xvEoEj1bqX4jOOG/y2iNyYSAZ/RT9ysUQwvDluCro1Bzk/
+         YGm5OXrgbDNjjqMTQc0XBOM6pH9rNXqBOwuq7aWxzMXkpiPyilZI01gAA/COmbb7bKK7
+         nci1AbxWFbf4Kp+3ZFEU63cnEhs3tiatZFmBmGcUQYK4QbvAjBL6a3azXm/0eEIjsa0o
+         46TTeAZAz2T1QBX/xVshKkXRD7DC0tDca+M1K+LVkFD0XpNrnyQQesNFbqsjiw0yp+cP
+         X52iNt9IkIDRJ/tCNLoKsfLjVYyI5xt4TQZlSo8ny5879QeF+wqid0J6ZrP2+lKi+Bf4
+         odkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZehA54EXLoFpuihBQqE/s3qSP5Wr2j1HNX08mqpwWi8=;
-        b=xa/A24+0ZWLrRPxdQ+u1A2Cf+kj4ylUrES0vgvDPdK78lkGr4ofT9oRXDrvYIbqmZW
-         vyuHXQsSRGBDXsAF2GcFlUyECcVVAT7MPJH+Y6GR14unadMdDaAo0GG5/WF5KQjkcbCl
-         mQKpqQIOHp76XqD7DjieApw/oFMuULzUk7df0Cv8pRFs5SSbAoX9qtINEmImZ39B2743
-         ESkImNCvtls6pxCyC84nE6Rgk13+FlP1hoYqSHJAmMajvWNzEIRNaCFSKeLCTaujM309
-         jtfuUgq2XShPNdNDd8ldjyIacyw68VJJJdxoPD4xX+0pUBNIse0aylphr1ZoCG2xeFWQ
-         mJew==
-X-Gm-Message-State: ACrzQf2MYrlNt0YhZ06kHcVN87goR7n4o6bkPcCoacQH5OLhEiH+caUN
-	IPkThqC2zHwOy4bmjIb8UmiFWj916Uc=
-X-Google-Smtp-Source: AMsMyM6HUpdHUzczlzYe6DauywLkO+kSA89+08n6aOXQuV6IcZuob69iOGNrlxriXtpkfh2CfO5CfA==
-X-Received: by 2002:aa7:8750:0:b0:56c:318a:f811 with SMTP id g16-20020aa78750000000b0056c318af811mr21172640pfo.14.1667333877911;
-        Tue, 01 Nov 2022 13:17:57 -0700 (PDT)
+        bh=EEfGkuCQYYxcGbbfjR6N6mc6MQeYVXrumfh75c4m1EE=;
+        b=2BSQQlZn8RO8EBsSbAS0czR3Jnctb7aL0B72pKxH/sXzhK9G72QxiCbA+etzRUSYzf
+         9Y03qwrJiOHeFscRn/CMgnTydHXfVQjLTb4SV1u1g0FQ/U5zU2WXFi9hsln50XvjzOvU
+         ALN0hcyKjsjj+Z1ynsO2eFQdAyxAotqnY0Jr8Ny9YfoghsooLDp9wi1OHWCVLaACN659
+         JHLNLF7GyDU1QQb9sFG/dJGl0xfSeSgHOZVuT/LGsz0CxFH1qHyx2Z4TJY7hnEmopW1b
+         N5SBMtWNJd4Ye5gdCox56iglqP0NHOcmx9dKHbNQaGTntqJoi9b+eUS/V1uWsTwUQ6dX
+         5IFw==
+X-Gm-Message-State: ACrzQf0ZSm4ej8iA1zulsiN+rjhFGcktPVKegGNfYlsD+ddg5TKfyNSQ
+	HLr3RGELPdX8Z3mgha9Yx8/dDMaUiQ4=
+X-Google-Smtp-Source: AMsMyM52PptedxG6oW8/0WnMimK0vWK3vs7Ib6aejKzE0oCyx1IPGRw2VL4LjYt1a6HZNYJfky4vww==
+X-Received: by 2002:aa7:814a:0:b0:56c:c538:f100 with SMTP id d10-20020aa7814a000000b0056cc538f100mr191300pfn.58.1667333878682;
+        Tue, 01 Nov 2022 13:17:58 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id z15-20020a170903018f00b00180a7ff78ccsm6781681plg.126.2022.11.01.13.17.57
+        by smtp.gmail.com with ESMTPSA id z15-20020a170903018f00b00180a7ff78ccsm6781681plg.126.2022.11.01.13.17.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Nov 2022 13:17:57 -0700 (PDT)
+        Tue, 01 Nov 2022 13:17:58 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 06/17] ap: add frequency to AP interface
-Date: Tue,  1 Nov 2022 13:17:36 -0700
-Message-Id: <20221101201747.143379-6-prestwoj@gmail.com>
+Subject: [PATCH 07/17] client: show frequency with ap show
+Date: Tue,  1 Nov 2022 13:17:37 -0700
+Message-Id: <20221101201747.143379-7-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221101201747.143379-1-prestwoj@gmail.com>
 References: <20221101201747.143379-1-prestwoj@gmail.com>
@@ -56,57 +56,57 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 ---
- src/ap.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ client/ap.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/src/ap.c b/src/ap.c
-index 834fa089..baf90c1b 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -3676,6 +3676,9 @@ static void ap_if_event_func(enum ap_event_type type, const void *event_data,
- 		l_dbus_property_changed(dbus_get_bus(),
- 					netdev_get_path(ap_if->netdev),
- 					IWD_AP_INTERFACE, "Name");
-+		l_dbus_property_changed(dbus_get_bus(),
-+					netdev_get_path(ap_if->netdev),
-+					IWD_AP_INTERFACE, "Frequency");
+diff --git a/client/ap.c b/client/ap.c
+index b8849a1b..4ce727de 100644
+--- a/client/ap.c
++++ b/client/ap.c
+@@ -36,6 +36,7 @@ struct ap {
+ 	bool started;
+ 	char *name;
+ 	bool scanning;
++	uint32_t freq;
+ };
  
- 		l_rtnl_set_linkmode_and_operstate(rtnl,
- 					netdev_get_ifindex(ap_if->netdev),
-@@ -4026,6 +4029,24 @@ static bool ap_dbus_property_get_scanning(struct l_dbus *dbus,
- 	return true;
+ static void *ap_create(void)
+@@ -126,10 +127,35 @@ static const char *get_scanning_tostr(const void *data)
+ 	return ap->scanning ? "yes" : "no";
  }
  
-+static bool ap_dbus_property_get_freq(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
++static void update_freq(void *data, struct l_dbus_message_iter *variant)
 +{
-+	struct ap_if_data *ap_if = user_data;
-+	uint32_t freq;
++	struct ap *ap = data;
++	uint32_t value;
 +
-+	if (!ap_if->ap || !ap_if->ap->started)
-+		return false;
++	if (!l_dbus_message_iter_get_variant(variant, "u", &value)) {
++		ap->freq = 0;
 +
-+	freq = band_channel_to_freq(ap_if->ap->channel, BAND_FREQ_2_4_GHZ);
++		return;
++	}
 +
-+	l_dbus_message_builder_append_basic(builder, 'u', &freq);
-+
-+	return true;
++	ap->freq = value;
 +}
 +
- static void ap_setup_interface(struct l_dbus_interface *interface)
- {
- 	l_dbus_interface_method(interface, "Start", 0, ap_dbus_start, "",
-@@ -4045,6 +4066,8 @@ static void ap_setup_interface(struct l_dbus_interface *interface)
- 					ap_dbus_property_get_name, NULL);
- 	l_dbus_interface_property(interface, "Scanning", 0, "b",
- 					ap_dbus_property_get_scanning, NULL);
-+	l_dbus_interface_property(interface, "Frequency", 0, "u",
-+					ap_dbus_property_get_freq, NULL);
- }
++static const char *get_freq_tostr(const void *data)
++{
++	const struct ap *ap = data;
++	static char str[5];
++
++	sprintf(str, "%u", ap->freq);
++
++	return str;
++}
++
+ static const struct proxy_interface_property ap_properties[] = {
+ 	{ "Started",  "b", update_started,  get_started_tostr },
+ 	{ "Name",     "s", update_name, get_name_tostr },
+ 	{ "Scanning", "b", update_scanning, get_scanning_tostr },
++	{ "Frequency", "u", update_freq, get_freq_tostr },
+ 	{ }
+ };
  
- static void ap_destroy_interface(void *user_data)
 -- 
 2.34.3
 
