@@ -1,75 +1,113 @@
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFCE7B
-	for <iwd@lists.linux.dev>; Tue,  1 Nov 2022 20:53:47 +0000 (UTC)
-Received: by mail-oo1-f45.google.com with SMTP id g15-20020a4a894f000000b0047f8e899623so2226385ooi.5
-        for <iwd@lists.linux.dev>; Tue, 01 Nov 2022 13:53:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07B77B
+	for <iwd@lists.linux.dev>; Tue,  1 Nov 2022 20:54:37 +0000 (UTC)
+Received: by mail-pl1-f171.google.com with SMTP id c24so14683195pls.9
+        for <iwd@lists.linux.dev>; Tue, 01 Nov 2022 13:54:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dTUOXZqkcpvTe2r5DlPQ8XLqPYW46xJ2bifprmfj3wA=;
-        b=F4Wf7n/qNVSuaVCQyz14dGXWkkyAhqm7dC6dVWOF2sXkI+xkIqDmXzioMFdgLk2tFC
-         D+H2U3pUTQsEGZeAUqf9J+85xt4e4DYvB5fuBQy5IvjbcMkzjN+NrMlisgh5L4oEA3GI
-         7jIgttZgDpa75clXbjAWGhQgIvFHZeh4jZfStBnG+8GPQ5HO8m/AIDKqIBf9eXB/tVaf
-         /qRk/3nBpcU+HwkeGrvyzuK/Ix6+2/lHlZkztTy+mZd9UHyCuOQa1cay8eM7sdZkvzJV
-         sxUW/bs5eaVk4jqctuAcRxBITTf0Pum02pXFW+otXhTCCv0r8kv2npgGVgHaTKdJIVl5
-         mMvA==
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:to:from:subject:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qr++oEPEKMgxj5Ei3SvWAGcP7Tdf1gW+RtjzNceviRw=;
+        b=mkxWNf3G0N+2A6wW6BsdBhR8rlamDWl1o2KEzIHtvbOIO4mramqS8SjfwjDESSTgXS
+         HxJTZ/ZQa8y3jUo7CAQeC7bsBmXf48d0BzCvq1IptuNnvMudoWmOEe9i1pKlAUbkSMVH
+         QunX5wjmyuFSmuqlwrIXr7XR/MAeLqb5PLuQAeS3lsdeh/pP0ejgs4RYnEIIPPAk/wqg
+         LwUIZneBPlkyvRLnNDbgM7jpBId+aeqCTd2QhfGbCWj/4CvTHTtIAKATDUDgkos3qxfJ
+         qdFTVAshYytTY6yPZogGtw/dYnrVEzCGAmiknVI6hZ2BwMZFZ3paQX+OpNQGKsvfU4zl
+         +kwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dTUOXZqkcpvTe2r5DlPQ8XLqPYW46xJ2bifprmfj3wA=;
-        b=k3ZI0Py1Gg6eK/uwtRNVWlp17MFsOuM/DKT8rd3Ihbv1nnnr+DIVEN5afP5fMaNi3/
-         ftLJE9THeBtcNxNtHhXo1HuSzQiXozDaetO7pdukp9SMBEx/koRTnH5dwMo1OWcA6BV8
-         9V6AaBPuPbSws7SIiHH/7ku7jTX3Su+9F1mbvzyN1zXrmG0yEkVGB7nAzj4hCJo9Sqja
-         wRyNLR/iX8zXedvZPv6N6Tsi2rq3fr19BF/7sM9rMlLgFvnf9IfvVld9Yjd0Jeb+J1cb
-         F1664TfPDwhzxNPfobQWsyWXXkJBEDDuSQEUYe3P7bh8WCPFEhmlsOlwvm2gpYxwjHeK
-         IXQg==
-X-Gm-Message-State: ACrzQf0uLSAoiZrFrbWxwhb8ojzpjyduDHkDhuDPL1/OSeGAZHMaevmR
-	yvADCz0chmVpo+gSWsip2j4=
-X-Google-Smtp-Source: AMsMyM4wLPpAQRGfjtBt73mjImWlT3049Ea8rpNrlE0aca37LypwYwSI16qYMJd/lJsRDX9wNvPtEg==
-X-Received: by 2002:a4a:a30b:0:b0:49b:de15:f29b with SMTP id q11-20020a4aa30b000000b0049bde15f29bmr3903931ool.52.1667336026384;
-        Tue, 01 Nov 2022 13:53:46 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id cy14-20020a056830698e00b0066c7414029bsm228968otb.66.2022.11.01.13.53.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Nov 2022 13:53:45 -0700 (PDT)
-Message-ID: <42236ea5-8e5a-936d-8426-9ef406f9ee3e@gmail.com>
-Date: Tue, 1 Nov 2022 15:53:42 -0500
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Qr++oEPEKMgxj5Ei3SvWAGcP7Tdf1gW+RtjzNceviRw=;
+        b=hW+qdfJ78CKYA5KqnwCQegytZs8LmniwGztZ7U84ov4+srfofLlq3Vjf1Y/Hg01tIg
+         fiGsybFvezTEnuJfEskI2TGt0P15GKQaEPRLgM+8QLyGA6e7FXhX/rif7ZCNqG6aEUJb
+         bkkKqNEZVN1OjSCeq8hG8NI1swh302EkKl/sctUJg4LT8WrUEEsXMEgPqKFgMkEx4krQ
+         /R56DJTiav2pOYU+Ob50KRN0RUhdJYP7df1l+nZ+hFW9vlCwh4rD1FmOCUgVodtvTiJo
+         ThGuBx2RCpkiincT5mWAitoSYcIs47e1+6HUjE3oQ4s8cKgARxr8oAWEJLTzTlfJbSJr
+         O5bw==
+X-Gm-Message-State: ACrzQf2re+nUVDECPd/FeEquTisuwJCZvPTRe8pRXSYtHmIHueHsVerg
+	PpE1IuRO8FOoVLGD+MVe/AGj61TuTKc=
+X-Google-Smtp-Source: AMsMyM7I+30MTwjCxWpf+zZol+m2VIEXeKiFAHOnrT6AxnNxHNuWqrD9n2IlU0FRyBaguphmM1COZA==
+X-Received: by 2002:a17:90a:df91:b0:213:8a69:c504 with SMTP id p17-20020a17090adf9100b002138a69c504mr27705152pjv.82.1667336077311;
+        Tue, 01 Nov 2022 13:54:37 -0700 (PDT)
+Received: from [192.168.254.15] ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id ja1-20020a170902efc100b00186b86ed450sm6795268plb.156.2022.11.01.13.54.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Nov 2022 13:54:37 -0700 (PDT)
+Message-ID: <66b9f15578d9f7112e532a7174268b02b629360f.camel@gmail.com>
+Subject: Re: MulticastDNS for all connections
+From: James Prestwood <prestwoj@gmail.com>
+To: Andrea Pappacoda <andrea@pappacoda.it>, iwd@lists.linux.dev
+Date: Tue, 01 Nov 2022 13:54:36 -0700
+In-Reply-To: <A4TIKR.5DC9OCNE90W6@pappacoda.it>
+References: <A4TIKR.5DC9OCNE90W6@pappacoda.it>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 13/17] netdev: add more info to key setting debug messages
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20221101201747.143379-1-prestwoj@gmail.com>
- <20221101201747.143379-13-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221101201747.143379-13-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi James,
+On Sat, 2022-10-29 at 17:16 +0200, Andrea Pappacoda wrote:
+> Hi all!
+> 
+> I have a question regarding the usage of iwd, specifically about the 
+> MulticastDNS option. Is it possible to enable it for all the
+> networks?
+> 
+> The iwd.network(5) manual page mentions that one can enable 
+> MulticastDNS for a particular network, but it also says that "The
+> group 
+> [Network] contains general network settings and any network specific 
+> overrides for global defaults defined in the main iwd configuration 
+> file.". Unfortunately though, setting MulticastDNS=true in 
+> /etc/iwd/main.conf does not lead to my desired result.
+> 
+> I'm not using neither systemd-networkd, ConnMan nor NetworkManager.
+> 
+> If this is not the most appropriate place where to discuss about 
+> feature requests, feel free to redirect me to the right place :)
+> 
+> Thanks!
 
-On 11/1/22 15:17, James Prestwood wrote:
-> Specify that the ifindex is being printed and print the key ID
-> as well.
-> ---
->   src/netdev.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+First, I don't know much about mDNS :) but anyways...
+
+Currently the MulticastDNS option is only per-network, but systemd-
+resolved has a global setting itself according to the docs [1].
+
+But I actually wonder if event setting MulticastDNS in IWD is doing
+anything:
+
+"Multicast DNS will be enabled on a link only if the per-link and the
+global setting is on."
+
+This would imply you need to set /etc/systemd/resolved.conf with
+MulticastDNS=true to even use mDNS at all? Or maybe you have already
+done this? And I see the problem, per-link settings are only in
+systemd-networkd, which you don't use...
+
+Like I said, I don't know much about mDNS but would a global option
+'break' networks which don't support mDNS? Are you frequently
+connecting to many networks and needed to add this option to the
+profile each time?
+
+The fact that this depends on setting systemd-resolved's global option
+and the per-link option I would say this really should stay in systemd-
+* itself. The IWD setting is kinda useless without the global option
+anyways. Plus systemd-networkd is much more flexible, you can match
+based on all kinds of things where IWD is very rigid (global or per-
+network).
+
+[1] https://www.freedesktop.org/software/systemd/man/resolved.conf.html
+> 
+> 
 > 
 
-Patch 13 and 14 applied, thanks.
-
-Regards,
--Denis
 
