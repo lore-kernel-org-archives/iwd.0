@@ -1,49 +1,49 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E6B21D42
-	for <iwd@lists.linux.dev>; Tue,  1 Nov 2022 20:18:01 +0000 (UTC)
-Received: by mail-pg1-f170.google.com with SMTP id f9so14401699pgj.2
-        for <iwd@lists.linux.dev>; Tue, 01 Nov 2022 13:18:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4F17E
+	for <iwd@lists.linux.dev>; Tue,  1 Nov 2022 20:18:03 +0000 (UTC)
+Received: by mail-pj1-f47.google.com with SMTP id l22-20020a17090a3f1600b00212fbbcfb78so39030pjc.3
+        for <iwd@lists.linux.dev>; Tue, 01 Nov 2022 13:18:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=58dB+qVRHEvq+U/Mvya6dUNz1H4AZw05my/Hpz5EGXI=;
-        b=WLo0N6w4gnTodw4jab5xlJf+voHzJpn/etj8roc9AN/Wwz18hw1eZEodoQMCV/xL/B
-         2M95m6eVqO5BEcDUePCpzfgkw/EpNfTGmcXyfhT7+5AvVlbyGhrugWKZu5m58hp/yovz
-         A0S8FrpiOlJ1NcelT2spsYgjfHetZBfdNxYwy/S8cp+9/S+pA337fB45soFMUpO5FI7G
-         uWs2zSbNcAHeV+Mp0vlGU25CDnQLM1Y9owLc171TE1Aq/ECBtxWAaHTfIg8prd7rM2GP
-         /5d8vzuaygbjQtidn4KBrA1QXrnyuxSoiq+a4KljfzUPoEAjgkQU5R2xB1co/EtfDgMC
-         N1EQ==
+        bh=HZNJqVzNqIeHRpSHGVfGGecu6wCe6Sy58TzyuQNckpk=;
+        b=IaIPFNGrYXKYMB2k/YVwQ85R3DJSRrz1tQljzVju4yNhk9eYeUyPpCtcLaAyUUfgVs
+         sGvlTG7VVlx8v7NZGltPq00UnwltLnrpJp4cnQgV7GXrvB8HFTlbu1PtCuH/Fbk+rBce
+         QynLxVsXLGWbrPI17QehOxoRJ95+lDWT30WH/aVePRkB4E1rFX5KhhZjS9SkNCzF6tgq
+         pXsXw9lZoZkT8i1kJ4mpuqUAqrUMVgTNU2maRUyy18V+H2Z70wemZXZha7UfkpAZd59G
+         zu2hwdGQkQwgqUXpmBP7OG0DSEUzQZONL/SxNtmQ9mVFETujYjKmgsqUMrLis3oBLVLk
+         Fx0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=58dB+qVRHEvq+U/Mvya6dUNz1H4AZw05my/Hpz5EGXI=;
-        b=JxBRwTZIxS/5i9hpchiZHUZM5mAQxHtOiONdro5u4tawuxDAXvLcn/RloC/lqWEN1u
-         gLO7sB8FWaAkkxEmWTQqrvIBTyPO2uw4SjExj5StRuH9Z+i9c+Akfs4zwp+uST+t9iFy
-         EriwdK55SZf8pwvdAcIfaV7gk/2w4CvI+2ZF+zspD6/xOmvsJgefoUQiz/W9wswj/gA0
-         QlO2shTGn0ACo/anPzofhW3KoHs+lM0TQ5z3y3XBegNEDVacbQFMH9V59u8lNBGbBkfT
-         pBXreeIsXaBVCx1NQGXAyiys1cQi9zv3vfsdBzGwg27u10AScdGXZHupziJt90IWgV/y
-         jhAw==
-X-Gm-Message-State: ACrzQf38fHLX0kHxVLVIPW2OmjfoBs9245hLUhJRzY40cldcvW4n6yue
-	vHLDiJGJdchO20N165Q8lKxj7Sr+0K4=
-X-Google-Smtp-Source: AMsMyM4ZsUs3f1WXGsnDi8JBwU6/rV7/UXqLEzJkhixxtO2KqF9a22FOBwhC41o9pyS4dhoo2oPHdw==
-X-Received: by 2002:a63:1861:0:b0:462:4961:9a8f with SMTP id 33-20020a631861000000b0046249619a8fmr18845334pgy.372.1667333881118;
-        Tue, 01 Nov 2022 13:18:01 -0700 (PDT)
+        bh=HZNJqVzNqIeHRpSHGVfGGecu6wCe6Sy58TzyuQNckpk=;
+        b=5bHM3/J5u2hesanp4a0CXsPLjTUurmbT6RJc7pPqvcCJlU9iHk9kKyDaeax31xyOU0
+         bDgff9igfSK0Mhnuw0qgIgd9OsP3SkplTcZZBaP3atKdkt4EWXI9LmIneAJg7fPnbArr
+         BBXtE9X/55i49n4N5CWFCF6nxjvY6dSb/b5NJ4gWMkhQmBUN3NdUd/agFFXH83qW2KdR
+         RjkBcQhQCl5YTnrdNUgXmAIRJkBXGZTaOAcL2OmqHZ6Q2ReysrQnfCOvqAhvM5Xwn9bo
+         V+nK0PEZky/Yos0KgcyH/2p8rKADgBUaOl9iwPzeip/A4m00RO8hMkOovtgp0rUNl348
+         s6+A==
+X-Gm-Message-State: ACrzQf18mkGzujkM0bPF2ORVLz69MwQDflvbyp9xDexjSVd94/oadXBc
+	HiZqRfi2jJ4Fyc0N2EJsuuqqJUe3mlE=
+X-Google-Smtp-Source: AMsMyM5DyhwflzaR/I5rB7Ga5Ysao85XP5VCWlSmJ2WznOebW7qUmeEuahdaUj0H7syJgOHyMiykFg==
+X-Received: by 2002:a17:903:50b:b0:187:11e:5f1f with SMTP id jn11-20020a170903050b00b00187011e5f1fmr21533143plb.41.1667333882647;
+        Tue, 01 Nov 2022 13:18:02 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id z15-20020a170903018f00b00180a7ff78ccsm6781681plg.126.2022.11.01.13.18.00
+        by smtp.gmail.com with ESMTPSA id z15-20020a170903018f00b00180a7ff78ccsm6781681plg.126.2022.11.01.13.18.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Nov 2022 13:18:00 -0700 (PDT)
+        Tue, 01 Nov 2022 13:18:02 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 11/17] auto-t: test AP fails to start with unsupported ciphers
-Date: Tue,  1 Nov 2022 13:17:41 -0700
-Message-Id: <20221101201747.143379-11-prestwoj@gmail.com>
+Subject: [PATCH 13/17] netdev: add more info to key setting debug messages
+Date: Tue,  1 Nov 2022 13:17:43 -0700
+Message-Id: <20221101201747.143379-13-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221101201747.143379-1-prestwoj@gmail.com>
 References: <20221101201747.143379-1-prestwoj@gmail.com>
@@ -55,48 +55,43 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the profile lists unsupported ciphers it should fail to start with
-NotSupported.
+Specify that the ifindex is being printed and print the key ID
+as well.
 ---
- autotests/testAP-no-support/TestAP2.ap         |  3 +++
- autotests/testAP-no-support/connection_test.py | 12 +++++++++++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
- create mode 100644 autotests/testAP-no-support/TestAP2.ap
+ src/netdev.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/autotests/testAP-no-support/TestAP2.ap b/autotests/testAP-no-support/TestAP2.ap
-new file mode 100644
-index 00000000..32a242ea
---- /dev/null
-+++ b/autotests/testAP-no-support/TestAP2.ap
-@@ -0,0 +1,3 @@
-+[Security]
-+Passphrase=secret123
-+PairwiseCiphers=CCMP
-diff --git a/autotests/testAP-no-support/connection_test.py b/autotests/testAP-no-support/connection_test.py
-index 9e5dccbb..e4cb40b5 100644
---- a/autotests/testAP-no-support/connection_test.py
-+++ b/autotests/testAP-no-support/connection_test.py
-@@ -41,9 +41,19 @@ class Test(unittest.TestCase):
+diff --git a/src/netdev.c b/src/netdev.c
+index 22288c67..59e73608 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1635,7 +1635,7 @@ static void netdev_set_gtk(struct handshake_state *hs, uint16_t key_index,
  
-         wd.unregister_psk_agent(psk_agent)
+ 	nhs->gtk_installed = false;
  
-+    def test_no_ccmp_support(self):
-+        wd = IWD(True)
-+
-+        dev = wd.list_devices(2)[1]
-+
-+        # Should fail to start since the radio doesn't support CCMP but the
-+        # profile only lists CCMP as allowed.
-+        with self.assertRaises(iwd.NotSupportedEx):
-+            dev.start_ap('TestAP2')
-+
-     @classmethod
-     def setUpClass(cls):
--        pass
-+        IWD.copy_to_ap('TestAP2.ap')
+-	l_debug("%d", netdev->index);
++	l_debug("ifindex=%d key_idx=%u", netdev->index, key_index);
  
-     @classmethod
-     def tearDownClass(cls):
+ 	if (crypto_cipher_key_len(cipher) != gtk_len) {
+ 		l_error("Unexpected key length: %d", gtk_len);
+@@ -1680,7 +1680,7 @@ static void netdev_set_igtk(struct handshake_state *hs, uint16_t key_index,
+ 
+ 	nhs->igtk_installed = false;
+ 
+-	l_debug("%d", netdev->index);
++	l_debug("ifindex=%d key_idx=%u", netdev->index, key_index);
+ 
+ 	if (crypto_cipher_key_len(cipher) != igtk_len) {
+ 		l_error("Unexpected key length: %d", igtk_len);
+@@ -2054,7 +2054,7 @@ static void netdev_set_tk(struct handshake_state *hs, uint8_t key_index,
+ 		return;
+ 	}
+ 
+-	l_debug("%d", netdev->index);
++	l_debug("ifindex=%d key_idx=%u", netdev->index, key_index);
+ 
+ 	err = -ENOENT;
+ 	if (!netdev_copy_tk(tk_buf, tk, cipher, false))
 -- 
 2.34.3
 
