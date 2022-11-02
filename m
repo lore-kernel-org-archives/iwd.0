@@ -1,49 +1,49 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B6127702
-	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 20:53:42 +0000 (UTC)
-Received: by mail-pj1-f41.google.com with SMTP id q1-20020a17090a750100b002139ec1e999so3007048pjk.1
-        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 13:53:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2072770A
+	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 20:53:43 +0000 (UTC)
+Received: by mail-pf1-f175.google.com with SMTP id z26so4347805pff.1
+        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 13:53:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e8tLpd8iyFxeYQRa17NWWdw7BzwcHOdwMi5qT4vPnSk=;
-        b=jg8dxJcmVGqL3HxyawXbghOIqYuNQpvOjDlbUaLdqJPNqukZvaW0LTw6CLnLXAUZ3m
-         8rhKuuBSKMu/OnmAnW5BnOxqIl1XL73Va+1pjapzNxEsLdCk1yP9JYRoszGIg6fn08zH
-         ZXr1Mw6/my8P46Bxt4Il/myONGqK9z00aiilKFtQOk0zc2NfhOsXiGnkcq3qjGFoasrZ
-         TZ/vTF3WblBT2rN8svwn31W3sqdz65op7QtX60SNnSPZQFk38Zv1OPj7GziodtXpCF51
-         VS5ojL8jOS3XTQjg99+dOIuYB/3W+KRK9jimKw7jy/Xz0pB3AVIiYKlMuyd/hpP4P32h
-         rL7Q==
+        bh=YvB1DrUHh/GvKAhUP+CqVLQcsbSC2AW465JKkPFySTc=;
+        b=pDvZLUQFVyF/YuituGlId9H6jiNjPFbes82PXr9+xh3iFGAMG9LXvCYmgMHUAwQpBg
+         i2OPOBGREfnUsxXULkJDRDwuyw8vr3IiuHnynRq+LpN1jSdQuNtDCGp2UL6jrSjhPcfr
+         A2+fWXavje9oP7vEqDm00pRlSTW7RWBDmNbb3lO88lGoNRbnHvXuacc4y9ADdF/m9P7y
+         W3N3aWZZYh9b+mCmIRWJWUIniaMcQMTB1T+L2ujkmTFtDG5dbC0r5awUucMDDLNlbmwG
+         7NKaCm6Rj4IhVsGR2Ctl4pBZuanpsvORrktuu9umBnDbuSSvo0+U1mhNcAQ93IK4Xa3b
+         OC/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e8tLpd8iyFxeYQRa17NWWdw7BzwcHOdwMi5qT4vPnSk=;
-        b=BetgLEf8enfb9CSyVZmdJuvRUiZXt5xRN3s9Gb/Zr2x66sJtuoGX5m228zZZoL7J3I
-         d2flMMao0Z0EDIn/s8S0yTlwGhNPLSMvB0Rr2wg4DAkhm4qSN61j500WhxJiHqBtbkCc
-         nKiZtKTvE1NBQG33+kmT9ZGrJVu/A8m6PsZf1ymGvUZQiYaWdJyA6xq0NHF2jXv4JH35
-         S+zrjMcr0YAF+GAc5WRG0jAQ/boiYjZ8niUmVzk7Z0N3bIuXqupmlO65fPr10uW7Z7tF
-         8NjrH/HrUyp/WevzK19mdg3fjgO9K4izkcaSCZwuSgeFsp90JK9tFJ+4H7q5W6qJ9KLq
-         bXag==
-X-Gm-Message-State: ACrzQf3U5irWSqzC4vNgpTINF6JlCSi5lIeY9vltOMGE4Qgd+Owzs6W6
-	89Bk4nCuqcwUUC22i0JdOqMFNghK/xM=
-X-Google-Smtp-Source: AMsMyM7DOIi9YCTSTUTVhB69wfd4nIIPcF5AlxPxbjBu2v5lEmDnMEJJkEY6HwXGhA0rDGPgwgSjcw==
-X-Received: by 2002:a17:90b:1b05:b0:213:dc73:3084 with SMTP id nu5-20020a17090b1b0500b00213dc733084mr18555490pjb.13.1667422422260;
-        Wed, 02 Nov 2022 13:53:42 -0700 (PDT)
+        bh=YvB1DrUHh/GvKAhUP+CqVLQcsbSC2AW465JKkPFySTc=;
+        b=bCz9zg7pKQh85wLRtP2bEpBIGoO5hbZRmq+Zk8/THrTZgvXawqz+fbHiAE/QR3wDdQ
+         KSEK/dNQPjOO4i2T2S7dbC2uHJQB5LDBGRqYJyVUnrb8erY2x7lwb49vEj9W9AtiOOhW
+         dXIIpfKN17Mu/IkXw0JgM3tfi7OkneoFR8IM3PM9k97H69U0IpjWA7fMiYJzQiq14dSM
+         8lztaiZJUBKlsUWb6c/ajNOo6LlXn/grTQiVm8gadboOoWR0dsfsBwixzfkn4nuE8Rt1
+         bpyOhA0mML4r7xGkMpa5/b5z1j6EHFcvth+oxR3QIyxf3pHq7vbn2YYYigCZdvjX7oin
+         ZpVA==
+X-Gm-Message-State: ACrzQf2qqaq/kbOAjvOJGHE8h5SNSCiwCA8SOiRLB7Ivp/Yyh7vqJEMQ
+	kFVwxIGGm0gJrBLZZU9iYtaW6bzZg1U=
+X-Google-Smtp-Source: AMsMyM6GCIwBluZLsWeJPZcH1MQa4bE3hASAotE63EoYu43AM06xLLUopimkBzCPipWvDo1VrySnXA==
+X-Received: by 2002:a63:591c:0:b0:464:bb3b:d1ad with SMTP id n28-20020a63591c000000b00464bb3bd1admr23234759pgb.146.1667422423014;
+        Wed, 02 Nov 2022 13:53:43 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id q14-20020a170902a3ce00b00186c6d2e7e3sm8730755plb.26.2022.11.02.13.53.41
+        by smtp.gmail.com with ESMTPSA id q14-20020a170902a3ce00b00186c6d2e7e3sm8730755plb.26.2022.11.02.13.53.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 13:53:41 -0700 (PDT)
+        Wed, 02 Nov 2022 13:53:42 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 08/10] auto-t: add proper AccessPoint object class
-Date: Wed,  2 Nov 2022 13:53:25 -0700
-Message-Id: <20221102205327.268693-8-prestwoj@gmail.com>
+Subject: [PATCH v2 09/10] auto-t: test AP fails to start with unsupported ciphers
+Date: Wed,  2 Nov 2022 13:53:26 -0700
+Message-Id: <20221102205327.268693-9-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221102205327.268693-1-prestwoj@gmail.com>
 References: <20221102205327.268693-1-prestwoj@gmail.com>
@@ -55,153 +55,58 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The AP mode device APIs were hacked together and only able to start
-stop an AP. Now that the AP interface has more functionality its
-best to use the DBus class template to access the full AP interface
-capabilities.
+If the profile lists unsupported ciphers it should fail to start with
+NotSupported.
 ---
- autotests/util/iwd.py | 101 ++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 93 insertions(+), 8 deletions(-)
+ autotests/testAP-no-support/TestAP2.ap         |  3 +++
+ autotests/testAP-no-support/connection_test.py | 15 ++++++++++++++-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+ create mode 100644 autotests/testAP-no-support/TestAP2.ap
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 9e96382a..98b9ea1c 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -299,6 +299,69 @@ class DeviceProvisioning(IWDDBusAbstract):
-     def role(self):
-         return self._properties['Role']
+diff --git a/autotests/testAP-no-support/TestAP2.ap b/autotests/testAP-no-support/TestAP2.ap
+new file mode 100644
+index 00000000..32a242ea
+--- /dev/null
++++ b/autotests/testAP-no-support/TestAP2.ap
+@@ -0,0 +1,3 @@
++[Security]
++Passphrase=secret123
++PairwiseCiphers=CCMP
+diff --git a/autotests/testAP-no-support/connection_test.py b/autotests/testAP-no-support/connection_test.py
+index 9e5dccbb..d7a13f51 100644
+--- a/autotests/testAP-no-support/connection_test.py
++++ b/autotests/testAP-no-support/connection_test.py
+@@ -26,6 +26,9 @@ class Test(unittest.TestCase):
  
-+class AccessPointDevice(IWDDBusAbstract):
-+    '''
-+        Class represents net.connman.iwd.AccessPoint
-+    '''
-+    _iface_name = IWD_AP_INTERFACE
-+
-+    def start(self, ssid, psk):
-+        self._iface.Start(ssid, psk, reply_handler=self._success,
-+                                        error_handler=self._failure)
-+        self._wait_for_async_op()
-+
-+        IWD._wait_for_object_condition(self, 'obj.started == True')
-+
-+    def start_profile(self, ssid):
-+        self._iface.StartProfile(ssid, reply_handler=self._success,
-+                                        error_handler=self._failure)
-+        self._wait_for_async_op()
-+
-+        IWD._wait_for_object_condition(self, 'obj.started == True')
-+
-+    def stop(self):
-+        self._iface.Stop(reply_handler=self._success,
-+                            error_handler=self._failure)
-+        self._wait_for_async_op()
-+
-+        IWD._wait_for_object_condition(self, 'obj.started == False')
-+
-+    def scan(self):
-+        self._iface.Scan(reply_handler=self._success,
-+                                        error_handler=self._failure)
-+        self._wait_for_async_op()
-+
-+        IWD._wait_for_object_condition(self, 'obj.scanning == True')
-+        IWD._wait_for_object_condition(self, 'obj.scanning == False')
-+
-+    def get_ordered_networks(self):
-+        return self._iface.GetOrderedNetworks()
-+
-+    @property
-+    def started(self):
-+        return self._properties['Started']
-+
-+    @property
-+    def name(self):
-+        return self._properties['Name']
-+
-+    @property
-+    def scanning(self):
-+        return self._properties['Scanning']
-+
-+    @property
-+    def frequency(self):
-+        return self._properties['Frequency']
-+
-+    @property
-+    def pairwise_ciphers(self):
-+        return self._properties['PairwiseCiphers']
-+
-+    @property
-+    def group_cipher(self):
-+        return self._properties['GroupCipher']
-+
-+
- class Device(IWDDBusAbstract):
-     '''
-         Class represents a network device object: net.connman.iwd.Device
-@@ -312,6 +375,7 @@ class Device(IWDDBusAbstract):
-         self._station_props = None
-         self._station_debug_obj = None
-         self._dpp_obj = None
-+        self._ap_obj = None
+         dev_ap.start_ap('TestAP2', 'Password2')
  
-         IWDDBusAbstract.__init__(self, *args, **kwargs)
++        self.assertTrue(dev_ap.group_cipher == 'TKIP')
++        self.assertTrue(dev_ap.pairwise_ciphers == 'TKIP')
++
+         ordered_network = dev_sta.get_ordered_network('TestAP2')
  
-@@ -354,6 +418,17 @@ class Device(IWDDBusAbstract):
+         if ordered_network.type != NetworkType.psk:
+@@ -41,9 +44,19 @@ class Test(unittest.TestCase):
  
-         return self._station_debug_obj
+         wd.unregister_psk_agent(psk_agent)
  
-+    @property
-+    def _ap(self):
-+        if self._properties['Mode'] != 'ap':
-+            self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'ap')
++    def test_no_ccmp_support(self):
++        wd = IWD(True)
 +
-+        if self._ap_obj is None:
-+            self._ap_obj = AccessPointDevice(object_path=self._object_path,
-+                                                namespace=self._namespace)
++        dev = wd.list_devices(2)[1]
 +
-+        return self._ap_obj
++        # Should fail to start since the radio doesn't support CCMP but the
++        # profile only lists CCMP as allowed.
++        with self.assertRaises(iwd.NotSupportedEx):
++            dev.start_ap('TestAP2')
 +
-     def _station_properties(self):
-         if self._station_props is not None:
-             return self._station_props
-@@ -605,20 +680,30 @@ class Device(IWDDBusAbstract):
-         except Exception as e:
-             raise _convert_dbus_ex(e)
+     @classmethod
+     def setUpClass(cls):
+-        pass
++        IWD.copy_to_ap('TestAP2.ap')
  
--        self._ap_iface = dbus.Interface(self._bus.get_object(IWD_SERVICE,
--                                            self.device_path),
--                                            IWD_AP_INTERFACE)
-         if psk:
--            self._ap_iface.Start(ssid, psk, reply_handler=self._success,
--                                    error_handler=self._failure)
-+            self._ap.start(ssid, psk)
-         else:
--            self._ap_iface.StartProfile(ssid, reply_handler=self._success,
--                                    error_handler=self._failure)
--        self._wait_for_async_op()
-+            self._ap.start_profile(ssid)
- 
-     def stop_ap(self):
-         self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
- 
-+        IWD._wait_for_object_condition(self, "obj._properties['Mode'] == 'station'")
-+
-+    @property
-+    def group_cipher(self):
-+        if self._properties['Mode'] != 'ap':
-+            raise Exception('group_cipher only supported in AP mode')
-+
-+        return self._ap.group_cipher
-+
-+    @property
-+    def pairwise_ciphers(self):
-+        if self._properties['Mode'] != 'ap':
-+            raise Exception('pairwise_cipher only supported in AP mode')
-+
-+        return self._ap.pairwise_ciphers
-+
-     def connect_hidden_network(self, name):
-         '''Connect to a hidden network
-            Possible exception: BusyEx
+     @classmethod
+     def tearDownClass(cls):
 -- 
 2.34.3
 
