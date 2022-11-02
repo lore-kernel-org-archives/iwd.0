@@ -1,49 +1,49 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8002E27702
-	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 20:53:41 +0000 (UTC)
-Received: by mail-pl1-f179.google.com with SMTP id io19so17721785plb.8
-        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 13:53:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454F12770A
+	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 20:53:42 +0000 (UTC)
+Received: by mail-pl1-f181.google.com with SMTP id c2so17710262plz.11
+        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 13:53:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7/K6JZkLJtSnMW6gBVdZ02rslfrQETuyfaorVmLfvSg=;
-        b=affo3uwfQH/+SnZci+By4cjc/5BH0P1ki5+8+je1XQMdGJ495A9N0pHGAE5KX1rPW2
-         iVPU/y/YJFplRrbTc4AHwlDI4jC7W1b4UZze2ZEI9Xc5CIwlRj/qa+gEQGqGcFKJUI+5
-         +33p7FTWCwKS5sOIR677h5S4o6f4o01fiHKnALR2ZjdeuV4E9Ef1xjEHXe4Ix4BpVnWJ
-         A/O1x/FT5j0rz4T1XT68ZJoShbcIgCeSJzPvPFitbdsWUnD4zbGQZt/wFhMc9KqdJmqm
-         zHCKgcscaYk77BCeH3DrmKqT6Ev6JuizkLD/XVszoCE2wR6n3ePV9GBBJKe0mDdivCoI
-         sBgA==
+        bh=K5BVp7TOrkkbkapuyuqyANloReXrKYsVuuTSBHRDunE=;
+        b=Hr+Iql8xucMo1I/4zRn+5gWAxtcyfG6mcE8lMslKGppbtxC+HtkEtNOA9WlM+k4riH
+         6cdGPYJzaFrofzrThbU8keWqUIwV753f51W+vk+Iq3ETjrIuTktO6Z8P+EwqtDIsX47A
+         DpAuxBO512Q1MCuZ43rjIWpsWFY1zEZpV7rTgz73sr+8GTU9Hr0VsDtS3WtXCPwamfc7
+         0SAz1MVRLtL6S6VcW111KclqdtjGyVlH1M5qak9JL4cei+lC+yJV7vAg2yq+m53U9Tdg
+         WvVgbNGunAjQuK76hPo6w6eTXBm740fYeXOp5njUMb8n5yVlTfZDR2kWYp234MtcjFOf
+         2qGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7/K6JZkLJtSnMW6gBVdZ02rslfrQETuyfaorVmLfvSg=;
-        b=vUzElAozRkIwhdsN8uRrIcYHDQBO5SK3fcl/jwscaMPXwt7BkOgJLR8soJyn1b1ElV
-         FvTMPi9z7WO7Q3MsWVPwRf04+50ZIQ56Cx7ieqossy/S121qkZ5ramTiuz0gphV+I5Dr
-         AFEQDdy6kyy8jOsjNI6/bNHamExWxp7sUEEvBaDSCtmAQ58RS1KyKZ9dTbdeGTQfBEg+
-         Jc9Y1A+RVuA31zl4pBhrqoqRH/Dh0r92rzbT7opeKXR4J5etm1hTZN5b82z9A4OBoaLL
-         gF4fZPTZhRi2n1ncW1cHkAC2IsHWdaWwQ4ExnRk0DvY3n4GZzV3Wr5PibvFdroWFbvfJ
-         0Q4Q==
-X-Gm-Message-State: ACrzQf2KJylv4bzC7ZNpRIk98Lms0Bt6r/NvWd8RHL6g28KJbDGY0TdS
-	U3T7ChN2/XBBA2Lr+9R7CtpN2LuLD5k=
-X-Google-Smtp-Source: AMsMyM4HiezX6Vh5XXSE14NIQdo3OLiXg1zqW3DZgWBO8QVuIkneQyA+YUhbeLjFzCah0Ui7DAY7nA==
-X-Received: by 2002:a17:902:e803:b0:187:3a52:d262 with SMTP id u3-20020a170902e80300b001873a52d262mr9441912plg.85.1667422420803;
-        Wed, 02 Nov 2022 13:53:40 -0700 (PDT)
+        bh=K5BVp7TOrkkbkapuyuqyANloReXrKYsVuuTSBHRDunE=;
+        b=t1iZF63H0HLkxWoji3VNKXaU5WDqFkQpioqv9SEcPHJYES4g/vqQq1CPh9sBOCJ6fw
+         Mcpvrq+gcjP7dWALkqPCA5m25r/mu1QqpJKG5GgOpDieP0Bl9kMq/pB07nlaGENu1erG
+         D8VGYIg/gRHCpsD8bJyA0vsJ2ADgLthe5v69NKExADD0WZlOLbxaaSoGsf9VV8DWZtaR
+         B+lydcZjrai1Zo8VoDwKyavZZ9s31QFnl1bITifuWaZGd7EwCmhEA9G0tSoZwQ7kAATQ
+         DglIdeNR5yv9U1Ucn+yc7YRXuLBb13NpUGqJzYM60nR46kn+C6uxCy9bu6KoJytV8rCH
+         3N+A==
+X-Gm-Message-State: ACrzQf0mNgWwGPnHxJwhh74/TU2qdf3sCD6DX6JGH82yCc8j0YRHP0kj
+	526xCzhwCZ2vDBluPRFO0uWLWUfHRT0=
+X-Google-Smtp-Source: AMsMyM6Cigj/udWUChYvTt4zgOqAt6tvpWjPxg0ZwZnWBGjRtUiOghDuYBxiwb1J1xn68waFLmXo1w==
+X-Received: by 2002:a17:902:f691:b0:187:466a:8975 with SMTP id l17-20020a170902f69100b00187466a8975mr5556768plg.59.1667422421571;
+        Wed, 02 Nov 2022 13:53:41 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.160.234])
         by smtp.gmail.com with ESMTPSA id q14-20020a170902a3ce00b00186c6d2e7e3sm8730755plb.26.2022.11.02.13.53.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 13:53:40 -0700 (PDT)
+        Wed, 02 Nov 2022 13:53:41 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 06/10] ap: add PairwiseCiphers/GroupCipher to dbus interface
-Date: Wed,  2 Nov 2022 13:53:23 -0700
-Message-Id: <20221102205327.268693-6-prestwoj@gmail.com>
+Subject: [PATCH v2 07/10] client: add ap support for PairwiseCiphers/GroupCipher
+Date: Wed,  2 Nov 2022 13:53:24 -0700
+Message-Id: <20221102205327.268693-7-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221102205327.268693-1-prestwoj@gmail.com>
 References: <20221102205327.268693-1-prestwoj@gmail.com>
@@ -55,113 +55,104 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Expose these values on the DBus interface so clients can view them.
 ---
- src/ap.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
+ client/ap.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-diff --git a/src/ap.c b/src/ap.c
-index 341a1662..bd78d2b5 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -3154,6 +3154,25 @@ static enum ie_rsn_cipher_suite ap_string_to_cipher(const char *str)
- 		return 0;
+diff --git a/client/ap.c b/client/ap.c
+index 4ce727de..f444a12c 100644
+--- a/client/ap.c
++++ b/client/ap.c
+@@ -37,6 +37,8 @@ struct ap {
+ 	char *name;
+ 	bool scanning;
+ 	uint32_t freq;
++	char *pairwise;
++	char *group;
+ };
+ 
+ static void *ap_create(void)
+@@ -51,6 +53,12 @@ static void ap_destroy(void *data)
+ 	if (ap->name)
+ 		l_free(ap->name);
+ 
++	if (ap->pairwise)
++		l_free(ap->pairwise);
++
++	if (ap->group)
++		l_free(ap->group);
++
+ 	l_free(ap);
  }
  
-+static char *ap_ciphers_to_string(uint16_t ciphers)
+@@ -151,11 +159,67 @@ static const char *get_freq_tostr(const void *data)
+ 	return str;
+ }
+ 
++static void update_pairwise(void *data, struct l_dbus_message_iter *variant)
 +{
-+	uint16_t i;
-+	char **list = l_strv_new();
-+	char *ret;
++	struct ap *ap = data;
++	char *value;
 +
-+	for (i = 0; i < 16; i++) {
-+		if (!(ciphers & (1 << i)))
-+			continue;
++	if (ap->pairwise)
++		l_free(ap->pairwise);
 +
-+		list = l_strv_append(list,
-+					ie_rsn_cipher_suite_to_string(1 << i));
++	if (!l_dbus_message_iter_get_variant(variant, "s", &value)) {
++		ap->pairwise = NULL;
++
++		return;
 +	}
 +
-+	ret = l_strjoinv(list, ',');
-+	l_strv_free(list);
-+	return ret;
++	ap->pairwise = l_strdup(value);
 +}
 +
- static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
- 				bool *out_cck_rates)
- {
-@@ -3690,6 +3709,15 @@ static void ap_if_event_func(enum ap_event_type type, const void *event_data,
- 		l_dbus_property_changed(dbus_get_bus(),
- 					netdev_get_path(ap_if->netdev),
- 					IWD_AP_INTERFACE, "Name");
-+		l_dbus_property_changed(dbus_get_bus(),
-+					netdev_get_path(ap_if->netdev),
-+					IWD_AP_INTERFACE, "Frequency");
-+		l_dbus_property_changed(dbus_get_bus(),
-+					netdev_get_path(ap_if->netdev),
-+					IWD_AP_INTERFACE, "PairwiseCiphers");
-+		l_dbus_property_changed(dbus_get_bus(),
-+					netdev_get_path(ap_if->netdev),
-+					IWD_AP_INTERFACE, "GroupCipher");
- 
- 		l_rtnl_set_linkmode_and_operstate(rtnl,
- 					netdev_get_ifindex(ap_if->netdev),
-@@ -4061,6 +4089,44 @@ static bool ap_dbus_property_get_freq(struct l_dbus *dbus,
- 	return true;
- }
- 
-+static bool ap_dbus_property_get_pairwise(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
++static const char *get_pairwise_tostr(const void *data)
 +{
-+	struct ap_if_data *ap_if = user_data;
-+	char *list;
++	const struct ap *ap = data;
 +
-+	if (!ap_if->ap || !ap_if->ap->started)
-+		return false;
++	if (!ap->pairwise)
++		return "";
 +
-+	list = ap_ciphers_to_string(ap_if->ap->ciphers);
-+
-+	l_dbus_message_builder_append_basic(builder, 's', list);
-+	l_free(list);
-+
-+	return true;
++	return ap->pairwise;
 +}
 +
-+static bool ap_dbus_property_get_group(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
++static void update_group(void *data, struct l_dbus_message_iter *variant)
 +{
-+	struct ap_if_data *ap_if = user_data;
-+	char *cipher;
++	struct ap *ap = data;
++	char *value;
 +
-+	if (!ap_if->ap || !ap_if->ap->started)
-+		return false;
++	if (ap->group)
++		l_free(ap->group);
 +
-+	cipher = ap_ciphers_to_string(ap_if->ap->group_cipher);
++	if (!l_dbus_message_iter_get_variant(variant, "s", &value)) {
++		ap->group = NULL;
 +
-+	l_dbus_message_builder_append_basic(builder, 's', cipher);
-+	l_free(cipher);
++		return;
++	}
 +
-+	return true;
++	ap->group = l_strdup(value);
 +}
 +
- static void ap_setup_interface(struct l_dbus_interface *interface)
- {
- 	l_dbus_interface_method(interface, "Start", 0, ap_dbus_start, "",
-@@ -4082,6 +4148,10 @@ static void ap_setup_interface(struct l_dbus_interface *interface)
- 					ap_dbus_property_get_scanning, NULL);
- 	l_dbus_interface_property(interface, "Frequency", 0, "u",
- 					ap_dbus_property_get_freq, NULL);
-+	l_dbus_interface_property(interface, "PairwiseCiphers", 0, "s",
-+					ap_dbus_property_get_pairwise, NULL);
-+	l_dbus_interface_property(interface, "GroupCipher", 0, "s",
-+					ap_dbus_property_get_group, NULL);
- }
++static const char *get_group_tostr(const void *data)
++{
++	const struct ap *ap = data;
++
++	if (!ap->group)
++		return "";
++
++	return ap->group;
++}
++
+ static const struct proxy_interface_property ap_properties[] = {
+ 	{ "Started",  "b", update_started,  get_started_tostr },
+ 	{ "Name",     "s", update_name, get_name_tostr },
+ 	{ "Scanning", "b", update_scanning, get_scanning_tostr },
+ 	{ "Frequency", "u", update_freq, get_freq_tostr },
++	{ "PairwiseCiphers", "s", update_pairwise, get_pairwise_tostr },
++	{ "GroupCipher", "s", update_group, get_group_tostr },
+ 	{ }
+ };
  
- static void ap_destroy_interface(void *user_data)
 -- 
 2.34.3
 
