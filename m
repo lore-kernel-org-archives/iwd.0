@@ -1,49 +1,49 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2A02C9C
-	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 22:51:36 +0000 (UTC)
-Received: by mail-pj1-f42.google.com with SMTP id k5so10040868pjo.5
-        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 15:51:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B693E2C9C
+	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 22:51:37 +0000 (UTC)
+Received: by mail-pf1-f175.google.com with SMTP id 130so26427pfu.8
+        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 15:51:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+SgPJKR2WAcaoWEQeb3b2tErOAn7cQvPlu0P7SL7rgc=;
-        b=PPnnhroOTHdNaZ/sevSENSAVgV9LazrSjfs55uszNWs1fzzdVQrEIp7Btrzf+9/Ice
-         TsvvCvO/x9FsldOvmuBK/UP8Asi9HB6LenY/RlszMniVSyeIypnFJmtfrg38RFEXxfAZ
-         FsTFT3dhmxg+nDBn61v+Wqi3QyEkgRtAT7RZG2vpcqLHpPEUsUXqH80g5d3NkDFezjnZ
-         U5J3pFp+M/Y6H7jEeCjU9UaVHqr0MRBj79LHB3rDBvPqzmfIgOZK32s4+xIm4iVTkOyU
-         QGpqffuN3LSlQO4AIF2NpXkcZjZw/pPMy6IW5veyveORgkw44wz3q2MULLLyRbrQO+lP
-         Y2cQ==
+        bh=9uN6+aYGj6k7V4g/DCgsKy3i7CqFuahfEM74X3Yf0Sc=;
+        b=I0PBjgY0BfGjIfIkWT8AWdWyxZDOaFA5vYyON6e5jAp7Ro1p1aL1+XRnYmd44zd/rF
+         GlJE4jgWrx6a09OJdI6n6nlziEm3MrstXCKjVeWSWRSByYP8tL5fcoHhyzHxMDM/C9fd
+         tcKN+zwAx+IJHSfdDIRVFFBI5dE03y8yk3YYGRP68zbtE1CRo38qcWXjJ62DZ3c7xOpf
+         dnIEANeugTfghjarrjGTdPqSysp8aDGuvEEsx1GuIHstO2XLE2bSepMmvSN0uT1LkXfG
+         Kpme2wJbsKuf+jOOzd4XNXmQGK+RJ4k1C812/n2VOxRXp9lzLULmjsKtlIXqRK72vVaJ
+         VPwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+SgPJKR2WAcaoWEQeb3b2tErOAn7cQvPlu0P7SL7rgc=;
-        b=3jxkOGaLjb/6QK9sapCQpsc7FQN5fYmubqqwv7b5etR74nz1Zk4dyKvwNm5mb3+rsm
-         cR+QYNbVhwNPJQv8A4M9KhVyS6/oYnG5EapEOx0ubyWi9yAzZ2di5G91AIW1ns6oE9KG
-         k22rxN/A6hQwxDSHxPckJOmtTkiYibrmOWDzHiAzx/VZJ9KHR2nMDuXWYVhPgwH7izJP
-         GZcknDfRjJSuJM/fD7+fIb1k+nl1bdZJxHLVMqw5XVoLFb1lH5UFU7WkFNPeF7LrKXs0
-         yXqT3ANsd/gYshMvq8ZS2A+uykGjbVQnz0COKNNhcd5DVM9C5YK23uyVDq8FvR0bWydK
-         /rsA==
-X-Gm-Message-State: ACrzQf2VVAyzVNqEKDyTGXOUKr/g8VShnlOxq8nlmq1IWDGA6uRdTzKB
-	hXE/4nHENb9bdOHRSot8j9LPy8Ybl5E=
-X-Google-Smtp-Source: AMsMyM4ktphEsVGqiIW3LZKwV8m/FgXzGySyWcMEuGI2JqdGDFokih/WySYBAjeb+4neL8SI9ADz6Q==
-X-Received: by 2002:a17:90b:3c8a:b0:213:e48a:3ac5 with SMTP id pv10-20020a17090b3c8a00b00213e48a3ac5mr18870392pjb.48.1667429495171;
-        Wed, 02 Nov 2022 15:51:35 -0700 (PDT)
+        bh=9uN6+aYGj6k7V4g/DCgsKy3i7CqFuahfEM74X3Yf0Sc=;
+        b=CYsdRk98KR8MEfQgdMgNbwFGWtHyAr1q8x1vA5Q1uZdlvomnTCmIe3CoKaME4cpELj
+         aO7JG+rkvhoCn7jKG+7a/7U86QgIXsuKd+4MvMg8vn879yX9JgT1KZ1Y0KGVJUcg6K/T
+         Z8hSCntEzjMMeDEXsckV+BscnZaE+nRMwnK410+aFLoiJnCmzF+xUreeNIiZQhpQEfEl
+         +s2JzfgZAowkAb9jOd/OxzSi1HqDehpYsyMdskjkGh+4C549fHKsBj1bKidd/o1MN+m/
+         1tsEvhrvr5sC2Xuhzm7tZawI7Fax/nX97J2H/b/+DTMHR2t7VjkWUO9Imrb/l8iR/lp7
+         qjZg==
+X-Gm-Message-State: ACrzQf3PylWn12uLWXY8S/bwrrDgudPM2TcjIFXWSpfbeikf35rCdRyP
+	k9+Uv0yT6d8Ea+kFaXtzcvbGCLR4baE=
+X-Google-Smtp-Source: AMsMyM4KmazMbLPnL503yQscq/XHMDy0lD/Ug5j3Fuc70e6bvcRd+UWNC2ufvLUjSV+AaZPrd/cLLQ==
+X-Received: by 2002:a05:6a00:1822:b0:56b:f29d:cca1 with SMTP id y34-20020a056a00182200b0056bf29dcca1mr27724835pfa.65.1667429496504;
+        Wed, 02 Nov 2022 15:51:36 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id e18-20020a17090301d200b00186b945c0d1sm8920377plh.2.2022.11.02.15.51.33
+        by smtp.gmail.com with ESMTPSA id e18-20020a17090301d200b00186b945c0d1sm8920377plh.2.2022.11.02.15.51.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 15:51:34 -0700 (PDT)
+        Wed, 02 Nov 2022 15:51:35 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 02/11] ie: add group/pairwise lists of supported ciphers
-Date: Wed,  2 Nov 2022 15:51:07 -0700
-Message-Id: <20221102225116.297129-2-prestwoj@gmail.com>
+Subject: [PATCH v3 03/11] ap: add profile settings PairwiseCiphers/GroupCipher
+Date: Wed,  2 Nov 2022 15:51:08 -0700
+Message-Id: <20221102225116.297129-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221102225116.297129-1-prestwoj@gmail.com>
 References: <20221102225116.297129-1-prestwoj@gmail.com>
@@ -55,43 +55,139 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The validation of these ciphers for station is done when parsing
-the BSS RSNE but for AP mode there is no such validation and
-potentially any supported cipher could be chosen, even if its
-incompatible for the type of key.
+These can now be optionally provided in an AP profile and provide a
+way to limit what ciphers can be chosen. This still is dependent on
+what the hardware supports.
 ---
- src/ie.h | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ src/ap.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 83 insertions(+), 6 deletions(-)
 
-diff --git a/src/ie.h b/src/ie.h
-index 53311854..c9a6c783 100644
---- a/src/ie.h
-+++ b/src/ie.h
-@@ -401,6 +401,25 @@ static inline bool IE_CIPHER_IS_GCMP_CCMP(uint32_t cipher_suite)
- 				IE_RSN_CIPHER_SUITE_GCMP_256);
+diff --git a/src/ap.c b/src/ap.c
+index ba827728..44440191 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -3132,12 +3132,38 @@ static bool ap_load_psk(struct ap_state *ap, const struct l_settings *config)
+ 	return true;
  }
  
-+#define IE_GROUP_CIPHERS		\
-+(					\
-+	IE_RSN_CIPHER_SUITE_TKIP |	\
-+	IE_RSN_CIPHER_SUITE_CCMP |	\
-+	IE_RSN_CIPHER_SUITE_GCMP |	\
-+	IE_RSN_CIPHER_SUITE_GCMP_256 |	\
-+	IE_RSN_CIPHER_SUITE_CCMP_256	\
-+)
-+
 +/*
-+ * Since WEP is unsupported we can just use the group cipher list with
-+ * "Use group cipher" appended
++ * Note: only PTK/GTK ciphers are supported here since this is all these are
++ *       used for.
 + */
-+#define IE_PAIRWISE_CIPHERS			\
-+(						\
-+	IE_GROUP_CIPHERS |			\
-+	IE_RSN_CIPHER_SUITE_USE_GROUP_CIPHER	\
-+)
++static enum ie_rsn_cipher_suite ap_string_to_cipher(const char *str)
++{
++	if (!strcmp(str, "UseGroupCipher"))
++		return IE_RSN_CIPHER_SUITE_USE_GROUP_CIPHER;
++	else if (!strcmp(str, "TKIP"))
++		return IE_RSN_CIPHER_SUITE_TKIP;
++	else if (!strcmp(str, "CCMP-128") || !strcmp(str, "CCMP"))
++		return IE_RSN_CIPHER_SUITE_CCMP;
++	else if (!strcmp(str, "GCMP-128") || !strcmp(str, "GCMP"))
++		return IE_RSN_CIPHER_SUITE_GCMP;
++	else if (!strcmp(str, "GCMP-256"))
++		return IE_RSN_CIPHER_SUITE_GCMP_256;
++	else if (!strcmp(str, "CCMP-256"))
++		return IE_RSN_CIPHER_SUITE_CCMP_256;
++	else
++		return 0;
++}
 +
- #define IE_LEN(ie) \
- 	((ie) ? (ie)[1] + 2 : 0)
+ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
+ 				bool *out_cck_rates)
+ {
++	struct wiphy *wiphy = netdev_get_wiphy(ap->netdev);
+ 	size_t len;
+ 	L_AUTO_FREE_VAR(char *, strval) = NULL;
++	_auto_(l_strv_free) char **ciphers_str = NULL;
++	uint16_t cipher_mask;
+ 	int err;
++	int i;
+ 
+ 	strval = l_settings_get_string(config, "General", "SSID");
+ 	if (L_WARN_ON(!strval))
+@@ -3212,6 +3238,8 @@ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
+ 			l_error("AP [WSC].PrimaryDeviceType format unknown");
+ 			return -EINVAL;
+ 		}
++
++		l_free(l_steal_ptr(strval));
+ 	} else {
+ 		/* Make ourselves a WFA standard PC by default */
+ 		ap->wsc_primary_device_type.category = 1;
+@@ -3260,6 +3288,61 @@ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
+ 	} else
+ 		*out_cck_rates = true;
+ 
++	cipher_mask = wiphy_get_supported_ciphers(wiphy, IE_GROUP_CIPHERS);
++
++	/* If the config sets a group cipher use that directly */
++	strval = l_settings_get_string(config, "Security", "GroupCipher");
++	if (strval) {
++		enum ie_rsn_cipher_suite cipher = ap_string_to_cipher(strval);
++
++		if (!cipher || !(cipher & cipher_mask)) {
++			l_error("Unsupported or unknown group cipher %s",
++					strval);
++			return -ENOTSUP;
++		}
++
++		ap->group_cipher = cipher;
++		l_free(l_steal_ptr(strval));
++	} else {
++		/* No config override, use CCMP (or TKIP if not supported) */
++		if (cipher_mask & IE_RSN_CIPHER_SUITE_CCMP)
++			ap->group_cipher = IE_RSN_CIPHER_SUITE_CCMP;
++		else
++			ap->group_cipher = IE_RSN_CIPHER_SUITE_TKIP;
++	}
++
++	cipher_mask = wiphy_get_supported_ciphers(wiphy, IE_PAIRWISE_CIPHERS);
++
++	ciphers_str = l_settings_get_string_list(config, "Security",
++						"PairwiseCiphers", ',');
++	for (i = 0; ciphers_str && ciphers_str[i]; i++) {
++		enum ie_rsn_cipher_suite cipher =
++					ap_string_to_cipher(ciphers_str[i]);
++
++		/*
++		 * Constrain list to only values in both supported ciphers and
++		 * the cipher list provided.
++		 */
++		if (!cipher || !(cipher & cipher_mask)) {
++			l_error("Unsupported or unknown pairwise cipher %s",
++					ciphers_str[i]);
++			return -ENOTSUP;
++		}
++
++		ap->ciphers |= cipher;
++	}
++
++	if (!ap->ciphers) {
++		/*
++		 * Default behavior if no ciphers are specified, disable TKIP
++		 * for security if CCMP is available
++		 */
++		if (cipher_mask & IE_RSN_CIPHER_SUITE_CCMP)
++			cipher_mask &= ~IE_RSN_CIPHER_SUITE_TKIP;
++
++		ap->ciphers = cipher_mask;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -3302,12 +3385,6 @@ struct ap_state *ap_start(struct netdev *netdev, struct l_settings *config,
+ 
+ 	err = -EINVAL;
+ 
+-	/* TODO: Add all ciphers supported by wiphy */
+-	ap->ciphers = wiphy_select_cipher(wiphy, IE_RSN_CIPHER_SUITE_TKIP |
+-						IE_RSN_CIPHER_SUITE_CCMP);
+-	ap->group_cipher = wiphy_select_cipher(wiphy,
+-						IE_RSN_CIPHER_SUITE_TKIP |
+-						IE_RSN_CIPHER_SUITE_CCMP);
+ 	ap->beacon_interval = 100;
+ 	ap->networks = l_queue_new();
  
 -- 
 2.34.3
