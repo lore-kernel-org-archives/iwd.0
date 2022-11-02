@@ -1,103 +1,82 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7D27461
-	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 18:59:35 +0000 (UTC)
-Received: by mail-pj1-f51.google.com with SMTP id m6-20020a17090a5a4600b00212f8dffec9so2765308pji.0
-        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 11:59:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A07A7461
+	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 19:59:36 +0000 (UTC)
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-12c8312131fso21501430fac.4
+        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 12:59:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JZDviH/ckmoO5w+IOEXC4ehBoyXyN4K15igSSfif/J8=;
-        b=iCA0GT/z7cPoeZ7oMJEX8J71Z1chJiX8BwoWzoz42pJoy5jpKpPhrPNCIbW8b8w+0b
-         mV1SD7NGJINQmphLGnvkiyX5oHT7DchKi0xALqw3cBO3/05LkfQyjOOz9RHmh9EqKXZw
-         05fc8FAVaPRV4NK5xA0lT5eCUr53Uy+5s/Vc9ccGgbtRpJ0Rsm6gD0Fa811xbuI468Xt
-         tqJBv820OdqEcDgP38+SZVEV16lt/MaxC//byvC94lqChN+t5MdzLqCh8fNYAx9mbI7Y
-         lZ5MYb+tw7yCp7mtlYC4n0goCjEaXtJB5WsmZkEm8jcMQMAWq7DOe5C3yc4+jQ7FMwMD
-         8mNg==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i4u/TlA//isrN+000X7Ucl6Aua/yF0mn25GwBXdIu3w=;
+        b=nSe0PfZ2jj46W3YMQ4phSSnWitMRtJK8YSDGMEJlHk+Krw8Ca+BMT1ZHaxyjA0DIXi
+         bet1OdN+D6502/U0h4H5SO0m9lN7egKbDGlfCPGyYkPHISHDKZteqYiNd4744pKzlo3e
+         vrCTkGs3h9D2AP1YRs5k/Ptdr60lKy3L6WrVTAfhZEzWw1Ejkgac+bhv+DezbFVKPjdu
+         FGGHFfnNilBk6XkyaxzQbBm6X3TSmDvX+1+3ymxlso1f6z4ZGzGg6F/o+bBgr3YpcivT
+         EJH56MyuIxKStmetJLa6s4wG+MtJu+CYdfFFHC4xtwlrqetbXXjD154boVNPhqIGfRce
+         nYxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JZDviH/ckmoO5w+IOEXC4ehBoyXyN4K15igSSfif/J8=;
-        b=3Bf1cF+Q37C8RXW1nAvGRgy9pt2F54zfPOnwScpgs5y0fJbsuKMSkbxYSelF2Pt062
-         +II5QeM2rLsMMpZzXhzU0EWTpA19mUYjsjFMNsO3lPrehEMRgFxk27kea7/JeNxDUhAX
-         DSrR34YlyYbfdky1Xk413E+KzanOldxgWgx3r1JyzybL2lw+3pBt55wBjcaRUb4WO/p0
-         F53w64PE63m0vMHUiZ3XsbhoI3Tul9zTB8ILbl1LZ8yMsqxd2aUoWPRfAajvGcx/J8Y4
-         hxaHrKt6SeH/cdD/UoP4KI3mlP7MtS6lvF0y8vaGaC68NxKoajfU6nGIbXENya0iRolr
-         oDVw==
-X-Gm-Message-State: ACrzQf0mR5xTnPSycihWPMNIcsO8WgttwbVenV83V5P22KqZlhB07pjR
-	iUY0FUv0hSapXbkM/V4b0AcFep8to34=
-X-Google-Smtp-Source: AMsMyM4p/9ssj5RN0tCcR4YRjHoJREKv3uI64gVV0DHywtvtUYWhdHafDlEgMJ0egwN5IYRYs/Ha6A==
-X-Received: by 2002:a17:902:c2c4:b0:187:640:205c with SMTP id c4-20020a170902c2c400b001870640205cmr24825507pla.11.1667415575045;
-        Wed, 02 Nov 2022 11:59:35 -0700 (PDT)
-Received: from [192.168.254.15] ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id 41-20020a17090a0fac00b0020aacde1964sm1788828pjz.32.2022.11.02.11.59.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 11:59:34 -0700 (PDT)
-Message-ID: <df5432b7b11b385bd58e0c7a96bf2f7fb842c75b.camel@gmail.com>
-Subject: Re: [PATCH 1/2] client: fix spurious newlines in station show
-From: James Prestwood <prestwoj@gmail.com>
-To: eNV25 <env252525@gmail.com>, iwd@lists.linux.dev
-Date: Wed, 02 Nov 2022 11:59:33 -0700
-In-Reply-To: <20221102092156.71357-1-env252525@gmail.com>
-References: <20221102092156.71357-1-env252525@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i4u/TlA//isrN+000X7Ucl6Aua/yF0mn25GwBXdIu3w=;
+        b=hqD5GK/W7X9ziGomPP5I8ycIhqAl/2ztF3oD76PSb7Y6efyarxgMXCPFu9LIGOTe/h
+         8VwgNCpXvKXvW5BclrfdleDIhRu/mQTuMX+Cr4/1z8aQfPB77MV4sbeXRsqBks5gzoSH
+         CxmXqPFjgu0eM50wNl8dKzRPU8Tz5PiLDGzOocppuwsKXgK4ArwLlVMDACzJ5RibNeNe
+         V+0oonaDpkKHf/i6AFUOvj/jwJKYo1iQpUToUOPqL457qr2O6aMiLmlq/YpzQyo0yt/s
+         xpRN62oTRHDYKAAwc+R9HNH3jorX90xnRcQ1/pHxQVt7YedF1OEPHXATUrPXYzzDdJDX
+         sgJQ==
+X-Gm-Message-State: ACrzQf19VPVCgnhCYNmQx3XE0/AL5UHJKFPAli0XtctMwgYHvfDF/qOq
+	xohPGZBcqguAtv6gKGej/AtQN12YOR8=
+X-Google-Smtp-Source: AMsMyM7Xaz/Vst/xO9u4iTFyvcfqxcC75riVI98vNhyMJbiZtZGF3dgrqIOLzddey1+5E/brpw7wyQ==
+X-Received: by 2002:a05:6870:15d0:b0:13c:2aa5:d967 with SMTP id k16-20020a05687015d000b0013c2aa5d967mr15720747oad.143.1667419175919;
+        Wed, 02 Nov 2022 12:59:35 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id t3-20020a9d5903000000b0066c4ff0e5b5sm3945666oth.48.2022.11.02.12.59.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Nov 2022 12:59:35 -0700 (PDT)
+Message-ID: <ffc95d8d-78c5-7baf-c5be-0ed35e36895e@gmail.com>
+Date: Wed, 2 Nov 2022 14:59:28 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 1/2] client: fix spurious newlines in station show
+Content-Language: en-US
+To: eNV25 <env252525@gmail.com>, iwd@lists.linux.dev
+References: <20221102092156.71357-1-env252525@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20221102092156.71357-1-env252525@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2022-11-02 at 14:51 +0530, eNV25 wrote:
+Hi,
+
+On 11/2/22 04:21, eNV25 wrote:
 > This change removes duplicated calls to display_table_footer(), in
 > station show.
 > 
-> Before this change, the bug caused an extra newline to be output
-> every
+> Before this change, the bug caused an extra newline to be output every
 > time the table updated. This only occurred when the network was
 > disconnected.
 > 
->     $ iwctl
->     [iwd]# station wlan0 show
+>      $ iwctl
+>      [iwd]# station wlan0 show
 > 
 > ---
->  client/station.c | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
+>   client/station.c | 8 +-------
+>   1 file changed, 1 insertion(+), 7 deletions(-)
 > 
-> diff --git a/client/station.c b/client/station.c
-> index b070807b..1d958ef2 100644
-> --- a/client/station.c
-> +++ b/client/station.c
-> @@ -217,15 +217,9 @@ static void display_station(const char
-> *device_name,
->                         47, network_get_name(station-
-> >connected_network));
->  
->                 display_addresses(device_name);
-> -
-> -               /*
-> -                * If connected the diagnostic interface is
-> presumably up so
-> -                * don't add the table footer just yet.
-> -                */
-> -               return;
->         }
->  
-> -       display_table_footer();
-> +       /* The table footer is handled by cmd_show. */
->  }
->  
->  static void display_station_inline(const char *margin, const void
-> *data)
-
-LGTM, I noticed this happening but never spent the time to diagnose it.
-Thanks!
 
 
+Can I get a proper full name please?  I can't take this into the repo otherwise.
+
+Regards,
+-Denis
