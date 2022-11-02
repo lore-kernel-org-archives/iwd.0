@@ -1,78 +1,61 @@
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303207461
-	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 20:04:58 +0000 (UTC)
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-13c2cfd1126so21491996fac.10
-        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 13:04:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703D724F59
+	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 20:13:33 +0000 (UTC)
+Received: by mail-qt1-f170.google.com with SMTP id e15so45315qts.1
+        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 13:13:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Tz2SJ0XQFZvk/LCCdK4aNd3fehjY1K7tZTmeTvyiA6g=;
-        b=X8LPHqWaGlqrRBwSZo4+TLHQHEY3cdKJ8iy0kpgojJu5uu58tnQgllp3rfrTVUB1M+
-         mSNoyos6PypFX2vWvGYYJXSy3W4q3Iubb3g+kHYOXcjJ8738EK3Ev7lfTy8MY5IYxx9u
-         TwYi+O+Rfbvp0COJY80mdh98Nqr+PCbToa0xgxcku3XVpeNiX/fQn/Rd5U32ZHuSGWN5
-         uamvbMqUKWsetMToGWdBtp1EzMj1YimDNWnvkwQfXQlFNWE8BMBLRnBWTYcHpSE/G/XY
-         PpNdqDvZkz+XQZV+MtXc69y8VWsrA7mO0KP+DruHTflf/hkbUFMxB1ZTXi2KwF7s15/T
-         SaUA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=65gAdoNFwMruRDeUMnd4m+xnfKXKJ/SnKoa8/VnvxCY=;
+        b=H8lQisBY9jeKphgpnGmQpgcsVY8UxDJuyYPGhVDV5l+PZJcXxaQfHLg/xRloIRXn9x
+         uH/NWWRqn1JlYqqqHFFICRRUsgpQiBtOuDOgEwsoPQcnTmoj6f6fYGZNE/4wma5rYNHl
+         KrbYKT7WnTPCcD1TqUwYGgT1Jn6uo6jxx6SCZzoUp2Axz4xcodbsv+qKNfr2xxZeuU6x
+         Z9kZqnz0Rcau/TDvCl92jZYHqyS8ZPi64Ko7bYZF2I6gXsffhIDe1B6Xj198LCXpR6BD
+         10+EPdjxmgslm3W6DT9s8R4sFOpy5R36la4WhUzo70XuNcPLUb/84h5ZjGyMQm5YXr4b
+         1wbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tz2SJ0XQFZvk/LCCdK4aNd3fehjY1K7tZTmeTvyiA6g=;
-        b=Eg/owtKC1dhNoaJ//QBblMr8mnfMGndxrxGwKu06cxTaHLFvIz4T3EQNq7XZzC5go/
-         cBTvh2SDEzgW8Jkt2kocZHtMgFti16fg94DB2jLFM5a5UiNdJToBJFAMU1WiIk1TsQa+
-         ov53pi2uCUBjsFvLSrkreq5Ycyy4nWqUnE11hIIEOkMOwWrUToZqJYSmNvUBhqhJd7rz
-         hixvhYDDFSQ/qZmU1McVBJ7DUMZOBM3TGFm36QwQzvBUFRDiAkZhf/aKdGJLFI3Q1lTn
-         PEI5qWCLNsIrHYbPiUTPsoEFx5VyAz6MYIALXqs9GObbuqZMxXfesNbd5g1s/SRoW2Y5
-         9jNA==
-X-Gm-Message-State: ACrzQf2FX5DUTnJ57O6gG3Qk1yHWbUdj+64+w0Twdw1BZzc/qPP/AnZX
-	N5L64GhSE1fqJjRPYzurnS6zacDIFos=
-X-Google-Smtp-Source: AMsMyM7ApATpvLiPLUGAzjyLB1hnWP9yV9D+eXdeXknXyour4oZ7EGYIRjO1oPCi9rHilFrih10u6g==
-X-Received: by 2002:a05:6870:338c:b0:13a:f214:ff51 with SMTP id w12-20020a056870338c00b0013af214ff51mr15815675oae.123.1667419497289;
-        Wed, 02 Nov 2022 13:04:57 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id j45-20020a4a88b0000000b0048fb9b6dd70sm4813009ooa.0.2022.11.02.13.04.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Nov 2022 13:04:56 -0700 (PDT)
-Message-ID: <d99937d8-2c67-1ba2-474f-224949ba9277@gmail.com>
-Date: Wed, 2 Nov 2022 15:04:55 -0500
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=65gAdoNFwMruRDeUMnd4m+xnfKXKJ/SnKoa8/VnvxCY=;
+        b=D52fiKnzgufUWh80g/k1J0TIpc/7pCkXy+tI4CTyfLzorQjo8pJYzdn6wPB01xtfiO
+         mFzxoW9ekUcB8qDtb0dIs9KU47Fz5AxnonGazVhTw4paLYZzx/sR6aQ8/HEKDSTsv6kE
+         SruL11Ui3Y9v1vHbPAkH/aXrFOt9Zwc9DlTFeZDOyCZepKFWXA+p0iEa9y5DFpG/0R45
+         SqE1LHsdvZEA5AzMLFAGskja3cJC3KjeEiEcl0QptRZ51iQGc5p6uWPv++SDbUpTUYXc
+         T2/NZa2iyr2hkyWYv76EBXgr86z9wJAMhenSdCLuxI8GPb2MdshASoej9Gix4ghukInf
+         n0kw==
+X-Gm-Message-State: ACrzQf2xXjfHLmamqqLgczLF9+dDxtx3R88unU2qsQ/prsAPaGE+QetE
+	Php9CYcyxQOWGpGBpmNU5StUx1Axupf/7ONWnJQ=
+X-Google-Smtp-Source: AMsMyM4KPd5nfHKYB8ZJTVCsPK4dDvh3pWbbGkFnateUK3A91uMcp4DAZQLnzMJ7dFjjBwgMjLBmpe7PiY0/9ACW04U=
+X-Received: by 2002:ac8:57d0:0:b0:39c:f3a8:7c78 with SMTP id
+ w16-20020ac857d0000000b0039cf3a87c78mr21732286qta.470.1667420012372; Wed, 02
+ Nov 2022 13:13:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] json: update internal type definition to match JSMN
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20221102184600.230988-1-prestwoj@gmail.com>
- <99e42ccbadbba35899cb85d4dad7943983a587d0.camel@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <99e42ccbadbba35899cb85d4dad7943983a587d0.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20221102092156.71357-1-env252525@gmail.com> <ffc95d8d-78c5-7baf-c5be-0ed35e36895e@gmail.com>
+In-Reply-To: <ffc95d8d-78c5-7baf-c5be-0ed35e36895e@gmail.com>
+From: eNV25 <env252525@gmail.com>
+Date: Thu, 3 Nov 2022 01:43:19 +0530
+Message-ID: <CANpHdjDKekPD7fbR8nmfZpZD2J=R3acnJAzMo+RATED0aqjc+g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] client: fix spurious newlines in station show
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi James,
+On Thu, Nov 3, 2022 at 1:29 AM Denis Kenzior <denkenz@gmail.com> wrote:
+> Can I get a proper full name please?  I can't take this into the repo otherwise.
 
-On 11/2/22 13:50, James Prestwood wrote:
-> On Wed, 2022-11-02 at 11:46 -0700, James Prestwood wrote:
->> Fixes: ceda955ba7 ("shared: Update JSMN to latest version")
->> ---
->>   src/json.h | 8 ++++----
->>   1 file changed, 4 insertions(+), 4 deletions(-)
->>
-> 
-> Whoops, this should be 1 << 3. I can send v2 or just fix this up when
-> applying?
-> 
+My name is Neehar Vijay.
 
-I fixed this up and applied.
+Do I need to send a v2 patch with the name?
 
-Regards,
--Denis
+> Regards,
+> -Denis
