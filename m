@@ -1,61 +1,91 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703D724F59
-	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 20:13:33 +0000 (UTC)
-Received: by mail-qt1-f170.google.com with SMTP id e15so45315qts.1
-        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 13:13:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D942F36
+	for <iwd@lists.linux.dev>; Wed,  2 Nov 2022 20:23:55 +0000 (UTC)
+Received: by mail-pj1-f53.google.com with SMTP id d59-20020a17090a6f4100b00213202d77e1so3197033pjk.2
+        for <iwd@lists.linux.dev>; Wed, 02 Nov 2022 13:23:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=65gAdoNFwMruRDeUMnd4m+xnfKXKJ/SnKoa8/VnvxCY=;
-        b=H8lQisBY9jeKphgpnGmQpgcsVY8UxDJuyYPGhVDV5l+PZJcXxaQfHLg/xRloIRXn9x
-         uH/NWWRqn1JlYqqqHFFICRRUsgpQiBtOuDOgEwsoPQcnTmoj6f6fYGZNE/4wma5rYNHl
-         KrbYKT7WnTPCcD1TqUwYGgT1Jn6uo6jxx6SCZzoUp2Axz4xcodbsv+qKNfr2xxZeuU6x
-         Z9kZqnz0Rcau/TDvCl92jZYHqyS8ZPi64Ko7bYZF2I6gXsffhIDe1B6Xj198LCXpR6BD
-         10+EPdjxmgslm3W6DT9s8R4sFOpy5R36la4WhUzo70XuNcPLUb/84h5ZjGyMQm5YXr4b
-         1wbA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=D0Xu1j3/v1iVnHJHhvjA02lmslu221Pog/v2zCTo7rE=;
+        b=XRsG8Rer6uiH/I+C+w14YTme8P6hQndhU1jJj2stmKyZlK8u4yO6ffPodKHzOh2Nkn
+         4CSF1NTLuUj0PSxL3g2K54DKKP5edViul9do2gIZDdY2Plg0RKvGh8hAKugpnJpqC+Xg
+         mfcfbNXpQvK1vV8qLtF/Y3rN5uoGfB4ISD5mm6VLhRu/sFZjPWvxmQxmWffjDP0bW/or
+         iRuw3rArSBTedd3NBk8dBSjLHsvfv4aiTy/u01Jl/OmKYohPr7ZsVCqSIzdJZ4CbFd6b
+         WHCNlrMXPOtaubzC5nDH0R/tCImNJQBO5twTFqdCTn7zMFeqcgNScGy9RmnGxEmbA1Cb
+         cnoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=65gAdoNFwMruRDeUMnd4m+xnfKXKJ/SnKoa8/VnvxCY=;
-        b=D52fiKnzgufUWh80g/k1J0TIpc/7pCkXy+tI4CTyfLzorQjo8pJYzdn6wPB01xtfiO
-         mFzxoW9ekUcB8qDtb0dIs9KU47Fz5AxnonGazVhTw4paLYZzx/sR6aQ8/HEKDSTsv6kE
-         SruL11Ui3Y9v1vHbPAkH/aXrFOt9Zwc9DlTFeZDOyCZepKFWXA+p0iEa9y5DFpG/0R45
-         SqE1LHsdvZEA5AzMLFAGskja3cJC3KjeEiEcl0QptRZ51iQGc5p6uWPv++SDbUpTUYXc
-         T2/NZa2iyr2hkyWYv76EBXgr86z9wJAMhenSdCLuxI8GPb2MdshASoej9Gix4ghukInf
-         n0kw==
-X-Gm-Message-State: ACrzQf2xXjfHLmamqqLgczLF9+dDxtx3R88unU2qsQ/prsAPaGE+QetE
-	Php9CYcyxQOWGpGBpmNU5StUx1Axupf/7ONWnJQ=
-X-Google-Smtp-Source: AMsMyM4KPd5nfHKYB8ZJTVCsPK4dDvh3pWbbGkFnateUK3A91uMcp4DAZQLnzMJ7dFjjBwgMjLBmpe7PiY0/9ACW04U=
-X-Received: by 2002:ac8:57d0:0:b0:39c:f3a8:7c78 with SMTP id
- w16-20020ac857d0000000b0039cf3a87c78mr21732286qta.470.1667420012372; Wed, 02
- Nov 2022 13:13:32 -0700 (PDT)
+        bh=D0Xu1j3/v1iVnHJHhvjA02lmslu221Pog/v2zCTo7rE=;
+        b=MS5TK4cZsn0tqtwZmBSlF28e9GI4Re+A5F6DAj0dGWZH1nQNpTlUi9r1nlY5uIL+bZ
+         YHyD5Pn+JMWHAjEWbpWLm2UM2Md7JU4jwTsJqUBDTF4Lr3bff2EjEM51CtvCrY/SEmkK
+         Hjg5q2d4ISGzHfkv0DN9p1Gp/HPIUNUctBE8MQ5IxmCC/NWA+9jSQwDruj9kUE8/XBfY
+         Z/MixI0cp/OTkAzTnnWGc8NqjAyYSk+XGZf+yw6RSYM0WFfqkY9hbcv+x9JgMJyBLWI2
+         Gkacsz+HiBxhsDehRWVDDVRjFeLu8qeNtZHxhOXMD6nj2sngRg7vOrNGLawU0K5d0D73
+         enwQ==
+X-Gm-Message-State: ACrzQf1PtXBCP1O1JyNve5VTcXbfu9dG+XZi7gvoEyJT349HEuFkaBPZ
+	HsywgbBj9OhMZO6ko9dt0dwpC/Y7xXzekQ==
+X-Google-Smtp-Source: AMsMyM69mZOq+Bl51KrukCM3nidOkNVyZ007aIyUQQfhyRqf5kzWOHzPtxzVO9926+CjkCLFCiootw==
+X-Received: by 2002:a17:902:e74f:b0:186:a981:2334 with SMTP id p15-20020a170902e74f00b00186a9812334mr26096417plf.88.1667420634664;
+        Wed, 02 Nov 2022 13:23:54 -0700 (PDT)
+Received: from pvlnv.. ([2a09:bac1:36a0:80::242:2a])
+        by smtp.gmail.com with ESMTPSA id b9-20020a170902d50900b00174c235e1fdsm8752720plg.199.2022.11.02.13.23.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 13:23:54 -0700 (PDT)
+From: Neehar Vijay <env252525@gmail.com>
+To: iwd@lists.linux.dev
+Cc: Neehar Vijay <env252525@gmail.com>
+Subject: [PATCH v2 1/2] client: fix extra newlines in station show
+Date: Thu,  3 Nov 2022 01:52:57 +0530
+Message-Id: <20221102202258.289396-1-env252525@gmail.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221102092156.71357-1-env252525@gmail.com> <ffc95d8d-78c5-7baf-c5be-0ed35e36895e@gmail.com>
-In-Reply-To: <ffc95d8d-78c5-7baf-c5be-0ed35e36895e@gmail.com>
-From: eNV25 <env252525@gmail.com>
-Date: Thu, 3 Nov 2022 01:43:19 +0530
-Message-ID: <CANpHdjDKekPD7fbR8nmfZpZD2J=R3acnJAzMo+RATED0aqjc+g@mail.gmail.com>
-Subject: Re: [PATCH 1/2] client: fix spurious newlines in station show
-To: Denis Kenzior <denkenz@gmail.com>
-Cc: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 3, 2022 at 1:29 AM Denis Kenzior <denkenz@gmail.com> wrote:
-> Can I get a proper full name please?  I can't take this into the repo otherwise.
+This change removes duplicate calls to display_table_footer(), in
+station show.
 
-My name is Neehar Vijay.
+Before this change, the bug caused an extra newline to be output every
+time the table updated. This only occurred when the network was
+disconnected.
 
-Do I need to send a v2 patch with the name?
+    $ iwctl
+    [iwd]# station wlan0 show
+---
+ client/station.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-> Regards,
-> -Denis
+diff --git a/client/station.c b/client/station.c
+index b070807b..1d958ef2 100644
+--- a/client/station.c
++++ b/client/station.c
+@@ -217,15 +217,9 @@ static void display_station(const char *device_name,
+ 			47, network_get_name(station->connected_network));
+ 
+ 		display_addresses(device_name);
+-
+-		/*
+-		 * If connected the diagnostic interface is presumably up so
+-		 * don't add the table footer just yet.
+-		 */
+-		return;
+ 	}
+ 
+-	display_table_footer();
++	/* The table footer is handled by cmd_show. */
+ }
+ 
+ static void display_station_inline(const char *margin, const void *data)
+-- 
+2.38.1
+
