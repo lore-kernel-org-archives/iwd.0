@@ -1,100 +1,100 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2CB63C7
-	for <iwd@lists.linux.dev>; Thu,  3 Nov 2022 19:01:33 +0000 (UTC)
-Received: by mail-pf1-f180.google.com with SMTP id m6so2531718pfb.0
-        for <iwd@lists.linux.dev>; Thu, 03 Nov 2022 12:01:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A363163C7
+	for <iwd@lists.linux.dev>; Thu,  3 Nov 2022 19:21:30 +0000 (UTC)
+Received: by mail-oi1-f175.google.com with SMTP id r76so3004412oie.13
+        for <iwd@lists.linux.dev>; Thu, 03 Nov 2022 12:21:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1bN9YBv1P99FCBir1eL2eK5VO1E9NhJ119sf9RLp7dw=;
-        b=kngB2qd3hifHO55clnO/lRiVzR1MFPlwik8qQHPAX9n1N2edmaFG6TMjmb/ClK91JY
-         V7/lBoDDEhwd6zCz/VbVEia/4Geju/7mhCaXzgNhganloGkQPClhFtE/Z+fweQPR6RUz
-         fYa5Gd53WHXI8y6cs7OfWDc8Il97rIFdbFSWY7ZTxx8vXOVT70UMVdgvKEHf7V2BRNRX
-         vvd887NkRK5zIwfuGWneoRSQchGNgurKZDkdLiQoOLrhulRNOTmb+ax2uhlTwCZAQvaA
-         jFICjyzbLGOVYyOaQ8PXyD9aOvlA5WK4YkoBvcFx3u7bWVaU44whIgaEjUeSJoU/xAt6
-         pQYg==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oHnDBBqEWOb3x38eUaIW96zhLCjrId+NFGtNxzZFYoM=;
+        b=S+ljj73cj2ldYY4oBN3QFKY9RAo9EewOLftxCs4K9CVAzI9rgb6G1Y/k4mhNJXbS7i
+         pDRr5poMDzqIdV2yJ34hlH3EBC/IPC/oAfj8Rz08s5+OmsJOR6rDjH76mborOLFY1v+l
+         FSCmwNSyVFAT+kqirofzg9ymvVGWziS+/Izz6w+bUTFSC4Ue2euux4C0ux0g3/+BRtIH
+         XiNSMmnkMNirfbfemyDoXWhA4c8SOf1akvxMUT8BFxRY4bKjmzHI8DZjgiVWzySAU51+
+         mWPgQmDJbVzir4UJ1C+Fowdy4dNwZe5Xf1D29fvcTF7V2ed7IHd4PtkNKoUTD6ctpOgZ
+         gVRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1bN9YBv1P99FCBir1eL2eK5VO1E9NhJ119sf9RLp7dw=;
-        b=M3GQu/4/yqAKRPOyPs/fL5neWndJAOaEpDU9aM5Wxctp94f4GClM/M9eml6eRZZwMx
-         ZDMe3+7ertnkv5+PPlT0YnIpXw9o921GtzWarP28atNZmx7nXPRDZIof5QCC7EEvOPSF
-         6nfIF1RBsrJhXkinlUTJvPW9ehc7vKrEQYnA4IRadqm/U5dsT7pqhjXCLQRH4l7sC0Tm
-         wJCopmWEdbZ8T6spCtHEor+8J3WBTBKeU9/M4EQW3DgLGgab1d5z0joMbflhI1CzKUEk
-         b9bsNJqKD4QINZPy7LJdFZ4GMiDFTS2j4CRH2jpIOX7gtcATfDjOalKCAMDTYCCqEjjb
-         i31A==
-X-Gm-Message-State: ACrzQf09BQqJD/pBXH0fU6eIAEkkVt6QVwY/rRlsCf4xPl8VoV9GEPLm
-	at7dTnO6yPnMahD3CNdUgfIapArwPA8=
-X-Google-Smtp-Source: AMsMyM7loP+JN1gPeQHr2zKkd5311BcrM0h5B5cY2CY4j4iLs+0jSZTaUo9rJ3A6fPN6/zTVdU7z+w==
-X-Received: by 2002:a63:b4d:0:b0:454:d8b4:285 with SMTP id a13-20020a630b4d000000b00454d8b40285mr27548870pgl.410.1667502092586;
-        Thu, 03 Nov 2022 12:01:32 -0700 (PDT)
-Received: from [192.168.254.82] ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id i18-20020aa796f2000000b0053e468a78a8sm1072658pfq.158.2022.11.03.12.01.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 12:01:32 -0700 (PDT)
-Message-ID: <239fb4e91036371a8e1f9dfb93556cc3d97c902c.camel@gmail.com>
-Subject: Re: [PATCH 1/4] doc: document AP properties
- PairwiseCiphers/GroupCipher
-From: James Prestwood <prestwoj@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: iwd@lists.linux.dev
-Date: Thu, 03 Nov 2022 12:01:31 -0700
-In-Reply-To: <C39B9D23-000E-44A9-AFFC-3805CECAE5C9@holtmann.org>
-References: <20221103173057.381232-1-prestwoj@gmail.com>
-	 <C39B9D23-000E-44A9-AFFC-3805CECAE5C9@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oHnDBBqEWOb3x38eUaIW96zhLCjrId+NFGtNxzZFYoM=;
+        b=hPRa/bPV2TrUTFcH5x9Tz8n19DtixHBt0shNAsCLrNbu6cf2cr34O9zK1IeuEjDyoV
+         kAoMaVhQijXn3TLDQvTMvG1h6MuWv5FtAHX32dEwOHIIt6Z4doFnkuMCzs7Bpzw4Hvdr
+         AfWFBiv+dm7/i4AgtI5fdqBpNpfazwDHuUka+59s8GBQRrqE38mo6PPVdJznra+tiNpt
+         peEsVPCIQTQ2dLk2Dw7mV7tL7b7x9xc6gjm5mWhpN4uW1YrIwODvfXV3gA9zo9ytfO7E
+         +wSHIYvUqzLKzhnS1cq/Bafl0TPb2UWvjUMW8koSfjaqLiP+IxBJ/6AfE9dlbTxCAPKQ
+         N+Aw==
+X-Gm-Message-State: ACrzQf0S/UbHrWCeFJCdUXfBuuWhlMTZ4iDom8azrM6wMLpSBxN1h2S5
+	FCeqHO12F5MEl8Qepw6OTC8=
+X-Google-Smtp-Source: AMsMyM5HtOyxNADdwFIZi1C9Vt358+23vXBUy7yPENdo2HX8VERy+rmtZLWoeFwXV4/g8F7XXY0b3Q==
+X-Received: by 2002:a05:6808:2028:b0:35a:b62:7e87 with SMTP id q40-20020a056808202800b0035a0b627e87mr13126084oiw.264.1667503289706;
+        Thu, 03 Nov 2022 12:21:29 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id a11-20020a05680804cb00b00339befdfad0sm710382oie.50.2022.11.03.12.21.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Nov 2022 12:21:29 -0700 (PDT)
+Message-ID: <5aca9b77-5c66-7744-8e33-a0578b645408@gmail.com>
+Date: Thu, 3 Nov 2022 14:21:28 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 2/2] doc: document global MulticastDNS option
+Content-Language: en-US
+To: Andrea Pappacoda <andrea@pappacoda.it>, iwd@lists.linux.dev
+References: <20221103105639.8289-1-andrea@pappacoda.it>
+ <20221103105639.8289-2-andrea@pappacoda.it>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20221103105639.8289-2-andrea@pappacoda.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 2022-11-03 at 19:17 +0100, Marcel Holtmann wrote:
-> Hi James,
-> 
-> > ---
-> > doc/access-point-api.txt | 13 +++++++++++++
-> > 1 file changed, 13 insertions(+)
-> > 
-> > diff --git a/doc/access-point-api.txt b/doc/access-point-api.txt
-> > index 63e61d49..28e6437d 100644
-> > --- a/doc/access-point-api.txt
-> > +++ b/doc/access-point-api.txt
-> > @@ -71,3 +71,16 @@ Properties   boolean Started [readonly]
-> >                 uint32 Frequency [readonly, optional]
-> > 
-> >                         The frequency that the Access Point is
-> > operating on.
-> > +
-> > +               string PairwiseCiphers [readonly, optional]
-> > +
-> > +                       Comma separated list of pairwise ciphers
-> > the access
-> > +                       point supports. The same format as setting
-> > a list of
-> > +                       ciphers for an AP  profile, i.e. TKIP,
-> > CCMP-128,
-> > +                       GCMP-128, CCMP-256, GCMP-256 etc.
-> 
-> why not array{string} since that makes it a cleaner from an API point
-> of view.
+Hi Andrea,
 
-We could do this yes. The implemenation has already been merged but we
-could change this to an array easy enough.
-
+On 11/3/22 05:56, Andrea Pappacoda wrote:
+> Documents the new MulticastDNS global option, also adding some more
+> details regarding how and when systemd-resolved enables mDNS, and how
+> iwd handles it.
+> ---
+> See <https://lore.kernel.org/iwd/A4TIKR.5DC9OCNE90W6@pappacoda.it/T/>
+> for more context.
 > 
-> Regards
+>   doc/main.conf       |  6 ++++++
+>   src/iwd.config.rst  | 19 +++++++++++++++++++
+>   src/iwd.network.rst |  4 ++--
+>   3 files changed, 27 insertions(+), 2 deletions(-)
 > 
-> Marcel
-> 
+So overall I don't mind doing this if there's no other way, but I do wonder... 
+According to [1]:
 
+"The SetLinkLLMNR() method enables or disables LLMNR support on a specific 
+network interface. It takes a network interface index as well as a string that 
+may either be empty or one of "yes", "no" or "resolve". If empty, the 
+systemd-wide default LLMNR setting is used. If "yes", LLMNR is used for 
+resolution of single-label names and the local hostname is registered on all 
+local LANs for LLMNR resolution by peers. If "no", LLMNR is turned off fully on 
+this interface. If "resolve", LLMNR is only enabled for resolving names, but the 
+local hostname is not registered for other peers to use.
 
+Similarly, the SetLinkMulticastDNS() method enables or disables MulticastDNS 
+support on a specific interface. It takes the same parameters as SetLinkLLMNR() 
+described above."
+
+Right now, if no setting is provided, then we do not invoke 
+SetLinkMulticastDNS() at all.  If we were to send SetLinkMulticastDNS() with an 
+empty string, would it just apply the global resolved defaults?  In which case, 
+should we simply default to using an empty string if the setting isn't provided?
+
+[1] https://www.freedesktop.org/software/systemd/man/org.freedesktop.resolve1.html
+
+Regards,
+-Denis
