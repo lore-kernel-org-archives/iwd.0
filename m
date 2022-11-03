@@ -1,49 +1,49 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5F624F28
-	for <iwd@lists.linux.dev>; Thu,  3 Nov 2022 17:00:55 +0000 (UTC)
-Received: by mail-pg1-f180.google.com with SMTP id b62so2228335pgc.0
-        for <iwd@lists.linux.dev>; Thu, 03 Nov 2022 10:00:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8FB8465
+	for <iwd@lists.linux.dev>; Thu,  3 Nov 2022 17:00:56 +0000 (UTC)
+Received: by mail-pf1-f169.google.com with SMTP id i3so2162617pfc.11
+        for <iwd@lists.linux.dev>; Thu, 03 Nov 2022 10:00:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uuaLdpWzsIa65B9D+BQqDuU1vAJrEspEFUSJXgonnZ0=;
-        b=SZf4tnuHvsk63OIDCbt8zps0IZN0MgqjrC2GXMAhcZKOVJe+9oA5s9y+o4d39x/Abj
-         vvr/8QuAefOarafHGu1ewQuzoXLp69+mIuGdq+R7iHF3/3AZXhStzZQnpw/5Q5aLt4AS
-         kxuWKArrP0O82kF4JjO0uPBMbWULBnOt60X+qcAT0kCn0VXJEeShF5qykbzTKi6+C7Xn
-         L2l1qXo2FzajS0SMZut0SUfE0VlPNMMDxw+Dqb0yeXXmdpOD7pn3qfq9TnuFw8H/jUF4
-         PTBNozy+1p54hblAxwsFPOzNd7JyKRRhThjD+kRgCW1jxerjYk2/4M4E9PigZaAFB11G
-         Gw2w==
+        bh=jdB7I+XkRlGpC7TkkPgj49Yc/D3ExGTSZAYf7qlfNsE=;
+        b=lCN6arh4Gv1bNesyRLlCIe4C4VeH8GXnAmccp/SgpJLboEcAsiuCM6fKQNwzgM9UiE
+         j+4WktyMowfY13k+RXHOITjJKjNpWhslitdyWCQs9Xfu2SetElLHl8GYJeSqPYvD5o8d
+         lKRmNE9zYg0/Thn0FqINi26njPJT50F51Ju0n28yRiWXx6FVdp+zis6tqLypu8eeNRQ6
+         O1zMLUcpQsedCg24z3Y++wkH57cdT3aZqU2q4Kvc7aKdfIfhWr7tkL9RpZXP5JiBXxzq
+         uNqC7NEVTFZKxZeMI1kc/Dq4dj1Tlbw+qkZHFy8TVrygi10fZVY0H2HYmLYJT3EUVDud
+         8AMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uuaLdpWzsIa65B9D+BQqDuU1vAJrEspEFUSJXgonnZ0=;
-        b=LFCy6Um9dejjKyutZ2EUEw5Fh5vWpkNDEYs1A6Ghc3er6wP4A/3l94tdkf4VeJUc4j
-         +FFFeeFGyhDk6u0qWxRknEhuI3ULh4JeVZSSy369jBqwZ/SNp6EtzKmWN5LY58H+HhP9
-         d/QgxzpE8S1WSrUKH4q+kd9o8w6rou4UdfrnTNxlGHhs5R2UJRRayKGLL+MqzWCW5hGe
-         aFLeIWmykiAgK6Vy8AN0Ivl+81fwA56aoY29wDJ/zlOxjQw9KGXplo99rB7bw/xTVZji
-         Xrna0tqOyU28g4vjvdkuxbbiqJrNa3cL0twO27vDzmXkmHJWnmJ2Gbq2BPOTtjZ5U0BB
-         YZNg==
-X-Gm-Message-State: ACrzQf3BJ8pni/1Lr0DXvvp7B1Amr8vSIz2I1qn8DyBOaEvSWFmyYb4X
-	+NhNIVQGbcBghe0v92xMCRG8OMNtxzc=
-X-Google-Smtp-Source: AMsMyM5z5OW5DZ98MlNjmSy2kDvLly2cMYsHA1XkRrYtfxztQeQSp0Yhcoi3/tdSzvpKXDnTWSDDGQ==
-X-Received: by 2002:a63:fd57:0:b0:43c:9a42:74fb with SMTP id m23-20020a63fd57000000b0043c9a4274fbmr26541015pgj.174.1667494854684;
-        Thu, 03 Nov 2022 10:00:54 -0700 (PDT)
+        bh=jdB7I+XkRlGpC7TkkPgj49Yc/D3ExGTSZAYf7qlfNsE=;
+        b=vfj115TQ1O9bXJYffj8JdjhQxzYfOCwLW6iAPPaSNLPTHHOVGO1FneVzNwX44mHWiH
+         vp+ZJhDkUeqbbrpOyP+K3F7oqDTr+Sa4+3iZQBVLqPz2onRhoIo9lwsbn7uJVcsHRMyQ
+         wx5IS8yxsuKUhOAV+q7wylwQT7yVi495voeAiyYwyYP9AMY19F1xw1zeuVFgNvFAo4AE
+         ZBTivr330EOv40nkNMhXPMHcGditJlwA8475IZllbDjLB8z47ZtcoHAk+r+gax4ud0cN
+         cW7mDvF9Z9oir9r5Cgv2SOe2EDDcvY6h9j2vReoeYBgpENoG65l2nsjBGyA1i21pTnBX
+         Gy1w==
+X-Gm-Message-State: ACrzQf1OaVkvCmvgAIIuYJ8mGZAfcDz0QDxO5ZJ6yHpVUyy0qex1qfqK
+	jxtLw/7GX/maWr7XUZBrHdWrrlZkYes=
+X-Google-Smtp-Source: AMsMyM6T/rbnsjgWUCvisyS8MUaGAZS68d51wufjYmtq0ypswr0VRK46UH/YqYv7duCMe1uj5LhD4w==
+X-Received: by 2002:a63:f047:0:b0:46e:b1d4:2a68 with SMTP id s7-20020a63f047000000b0046eb1d42a68mr26567991pgj.496.1667494855555;
+        Thu, 03 Nov 2022 10:00:55 -0700 (PDT)
 Received: from jprestwo-xps.none ([50.39.160.234])
         by smtp.gmail.com with ESMTPSA id z3-20020a623303000000b0056c349f5c70sm995465pfz.79.2022.11.03.10.00.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 10:00:54 -0700 (PDT)
+        Thu, 03 Nov 2022 10:00:55 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/4] auto-t: iwd.py: allow certain APIs to be used in AP mode
-Date: Thu,  3 Nov 2022 10:00:49 -0700
-Message-Id: <20221103170050.379587-3-prestwoj@gmail.com>
+Subject: [PATCH 4/4] auto-t: add test for scanning in AP mode
+Date: Thu,  3 Nov 2022 10:00:50 -0700
+Message-Id: <20221103170050.379587-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221103170050.379587-1-prestwoj@gmail.com>
 References: <20221103170050.379587-1-prestwoj@gmail.com>
@@ -55,68 +55,37 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-AP mode implements a few DBus methods/properties which are named
-the same as station: Scan, Scanning, and GetOrderedNetworks. Allow
-the Device object to work with these in AP mode by calling the
-correct method if the Mode is 'ap'.
 ---
- autotests/util/iwd.py | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ autotests/testAP/scan_test.py | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+ create mode 100644 autotests/testAP/scan_test.py
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 98b9ea1c..5fa12444 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -521,13 +521,16 @@ class Device(IWDDBusAbstract):
-     def scanning(self):
-         '''
-         Reflects whether the device is currently scanning
--        for networks.  net.connman.iwd.Network objects are
--        updated when this property goes from true to false.
-+        for networks.  For station devices net.connman.iwd.Network
-+        objects are updated when this property goes from true to false
- 
-         @rtype: boolean
-         '''
--        props = self._station_properties()
--        return bool(props['Scanning'])
-+        if self._properties['Mode'] == 'station':
-+            props = self._station_properties()
-+            return bool(props['Scanning'])
-+        else:
-+            return bool(self._ap.scanning)
- 
-     @property
-     def autoconnect(self):
-@@ -544,12 +547,14 @@ class Device(IWDDBusAbstract):
-            Possible exception: BusyEx
-                                FailedEx
-         '''
--        self._iface.Scan(dbus_interface=IWD_STATION_INTERFACE,
-+        if self._properties['Mode'] == 'station':
-+            self._iface.Scan(dbus_interface=IWD_STATION_INTERFACE,
-                                reply_handler=self._success,
-                                error_handler=self._failure)
--
--        if wait:
--            self._wait_for_async_op()
-+            if wait:
-+                self._wait_for_async_op()
-+        else:
-+            self._ap.scan()
- 
-     def disconnect(self):
-         '''Disconnect from the network
-@@ -576,6 +581,9 @@ class Device(IWDDBusAbstract):
-            groups the maximum relative signal-strength is the
-            main sorting factor.
-         '''
-+        if self._properties['Mode'] == 'ap':
-+            return self._ap.get_ordered_networks()
+diff --git a/autotests/testAP/scan_test.py b/autotests/testAP/scan_test.py
+new file mode 100644
+index 00000000..0935912c
+--- /dev/null
++++ b/autotests/testAP/scan_test.py
+@@ -0,0 +1,20 @@
++#! /usr/bin/python3
 +
-         ordered_networks = []
-         if not full_scan:
-             for bus_obj in self._station.GetOrderedNetworks():
++import unittest
++
++from iwd import IWD
++
++class Test(unittest.TestCase):
++    def test_ap_scan(self):
++        wd = IWD(True)
++
++        dev = wd.list_devices(1)[0]
++
++        dev.start_ap('TestAP2', 'Password2')
++
++        dev.scan()
++
++        networks = dev.get_ordered_networks()
++
++        self.assertTrue(len(networks) == 1)
++        self.assertTrue(networks[0]['Name'] == 'TestAP1')
 -- 
 2.34.3
 
