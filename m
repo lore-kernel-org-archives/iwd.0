@@ -1,94 +1,146 @@
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B15179C9
-	for <iwd@lists.linux.dev>; Thu,  3 Nov 2022 22:05:34 +0000 (UTC)
-Received: by mail-pg1-f175.google.com with SMTP id f63so2859133pgc.2
-        for <iwd@lists.linux.dev>; Thu, 03 Nov 2022 15:05:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FB979F1
+	for <iwd@lists.linux.dev>; Fri,  4 Nov 2022 16:38:06 +0000 (UTC)
+Received: by mail-pl1-f175.google.com with SMTP id c2so5363977plz.11
+        for <iwd@lists.linux.dev>; Fri, 04 Nov 2022 09:38:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LVlRzO2wnOQ1w5t/vctHSdZFsvS958U/pimUkbBsSTY=;
-        b=h0NFyQXIY3rQIYW1m/ajTGCj7dc4w/tmvIOITJK2NtTRVeTfuJEuLaiviDtQ0ElqOx
-         6Dd3tpiY+XAAlAcQ+U7wf5FZ/08gLEkNSNiQZ6eq4rfVhjH9zl9V6pjOS5QJuYvVMWCo
-         rmzbq3zx+djA1wyXQSX5rzR7T1XaMVKZGJFgmWH1/jiLSewrgoXB6h9L517ERauvz6jC
-         Fgk1q2jSflUPpM3+C0U5x3NoI9bhzlGMVz85SNYzbiQOuQW7RwErJiMBLO90+a/Wot0j
-         IIbLSgiYxX4063Cp5OvZ7RRP0bnWz7bakyr12hFTePa9qc8ppERi+181+8w1rzPDBu9e
-         9S9w==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hMBkXGxqxAEP5TxsN1MnS0D2OblAGH7zCOQvv0ird10=;
+        b=GGMly5GTsHbrCNO9Pqgt0U1boDAeNj70XjIhR+8iGISrEgcPYbsMFXVyVnsQvjW3Lp
+         h76RuTNw4aBrd0/I9XIOtQ2uu1ajaJd0rc0V72i4hXdIvnG0b/x+KBEo2Dy2ylpZJ676
+         jOZEzjuFvdSa+BTETaRR9a1Kw4cHonlDtsLS5b7QSl9rbhjK7KIpLYpwLFs30tFrCKbe
+         ff/GTc0V4obMrNHBKGU54MEwF9bqKCGqSu6CNECLhl5dawV5LpBhfc0A6HM046adzSlL
+         P5c7qMDlvDuTEGdmToY4BycDxoTmtscHqSThMtF/JgF6gP1WpNBAjTdAMMKTgf5VbvGp
+         pCxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LVlRzO2wnOQ1w5t/vctHSdZFsvS958U/pimUkbBsSTY=;
-        b=rVwjav/ru9lUzTtxGitPbe6KBRNYXkKOj5ZwVCLQXoC4CI+qbAMguC4SczCkoRYMn8
-         G4JaucopKFsEca5Npt5p/cRJ8uJjsZvq+rvOmsgSeS9oAuvoVxheST/c9KQmkx9h9/Ha
-         /3usH+VNpvQHWZ0FXrRZkbMfpoWarWVGwoplLb8I/YUx+sMoJ6ECidcacmpaCvCwV8sC
-         hmJbq0q78dZp4TflVCrgNo3dGzI/RWEsn+JhEIk3p8DJGOkZFtfY7WF082u+UJxH4NLJ
-         hauSeADGAe67DJ6PIYP8NB0pKuvRv7KNRomaDbGybZlchY8HswXtaxBzQgxNV22tr69l
-         nqMA==
-X-Gm-Message-State: ACrzQf2aeMJebDv0cuJjdH0KLjIs+VZYRFpFI7AVRh4Yj6eIPylSQNc8
-	0J/4Usx/8DMkWFm/Xjn+7JQ=
-X-Google-Smtp-Source: AMsMyM4BQdKqD2if3rmZr+OZl0HYkuxFVQFbq12kHdbefazrtzUBrvjf+m0AlGAODCy5YdI4cc6VaQ==
-X-Received: by 2002:a05:6a02:186:b0:431:25fb:f1fe with SMTP id bj6-20020a056a02018600b0043125fbf1femr28480638pgb.130.1667513133760;
-        Thu, 03 Nov 2022 15:05:33 -0700 (PDT)
-Received: from [192.168.254.95] ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id y15-20020a17090322cf00b0017f74cab9eesm1152194plg.128.2022.11.03.15.05.33
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hMBkXGxqxAEP5TxsN1MnS0D2OblAGH7zCOQvv0ird10=;
+        b=QIrbIfLc998ewC5edN4hRshk++zjBZ03+PHbm6IUC7EJ54x17vZKuF7uI07a7V1S8O
+         rBUA7mVedjxOG2iM7R9pP6uiaK74l68ezITgkNunz3XKgFdCpDgzFodAUs9W01B5sXVF
+         BeUAQfqyi6nWpAIivgDHO4TaUZz0NBhJK9lQTTJD3ajqR/wCqOps5TFo4BX2wFIqTAKT
+         /2RbwAvnFclIg7eGkuQPiyH455icaMqbGCV9ZIm9LBRg1wSsGIympaIo5VupAX6SNqEK
+         WjP9QzQYWo2na+DCM6be1o3tmvSJJbWPhsB3sdOWivQ7U81FXBgQRc9j7h3SIBcAdolS
+         QGFg==
+X-Gm-Message-State: ACrzQf3hEHTfFVGfRo1NQS/0OiRdblozMOFQ1lUkijOx1x2yYZ/4vFPQ
+	ycGdrqEKQVLsE+gnTLieWXnmMjzjEFM=
+X-Google-Smtp-Source: AMsMyM6dy0LM4m1Fa/jQWIsomVstDzgHw/lQRcd2ksCO8yPg/NE05D+Y1rF83LAer9hsEVzbFUKghA==
+X-Received: by 2002:a17:902:f78c:b0:185:3d6a:7576 with SMTP id q12-20020a170902f78c00b001853d6a7576mr36230580pln.86.1667579885868;
+        Fri, 04 Nov 2022 09:38:05 -0700 (PDT)
+Received: from jprestwo-xps.none ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id 65-20020a620544000000b0056e15b7138esm2904741pff.157.2022.11.04.09.38.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 15:05:33 -0700 (PDT)
-Message-ID: <6aef1f2eb02d0e2d80451a207ef80f35001f7367.camel@gmail.com>
-Subject: Re: [PATCH 2/2] doc: document global MulticastDNS option
+        Fri, 04 Nov 2022 09:38:05 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
-To: Andrea Pappacoda <andrea@pappacoda.it>, Denis Kenzior <denkenz@gmail.com>
-Cc: iwd@lists.linux.dev
-Date: Thu, 03 Nov 2022 15:05:32 -0700
-In-Reply-To: <B2LSKR.D7EWT15BQHCU@pappacoda.it>
-References: <20221103105639.8289-1-andrea@pappacoda.it>
-	 <20221103105639.8289-2-andrea@pappacoda.it>
-	 <5aca9b77-5c66-7744-8e33-a0578b645408@gmail.com>
-	 <5TJSKR.MEMQ5IPV9F42@pappacoda.it> <B2LSKR.D7EWT15BQHCU@pappacoda.it>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/6] ap: update Scanning property when AP starts
+Date: Fri,  4 Nov 2022 09:37:55 -0700
+Message-Id: <20221104163800.451867-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2022-11-03 at 22:58 +0100, Andrea Pappacoda wrote:
-> Hi again,
-> 
-> Il giorno gio 3 nov 2022 alle 22:31:53 +01:00:00, Andrea Pappacoda 
-> <andrea@pappacoda.it> ha scritto:
-> > As far as I understand, when no link-specific value is provided on 
-> > the D-Bus interface, resolved sets LLMNR to "yes"[1] and mDNS to 
-> > "no"[2]. It is possible that I have misinterpreted the code though,
-> > so checking if this is actually the case could still be worth it.
-> 
-> Thinking about this more, I'm starting to see this as a bug in 
-> systemd-resolved. I've reported it on 
-> <https://github.com/systemd/systemd/issues/25252>.
-> 
-> For the time being, it may be better not to merge this.
+This wasn't being updated meaning the property is missing until a
+scan is issued over DBus.
 
-In addition the documentation about calling with an empty string
-doesn't appear to be true either. If I set main.conf:
+Rather than duplicate all the property changed calls they were all
+factored out into a helper function.
+---
+ src/ap.c | 55 +++++++++++++++++++++++++------------------------------
+ 1 file changed, 25 insertions(+), 30 deletions(-)
 
-[Network]
-MulticastDNS=
-
-
-And modify the logic to allow "" I both don't see +mDNS on my per-link
-setting, nor do I see any mDNS packets.
-
-So I guess we see what systemd says, I'll also comment on that bug
-report about the empty string issue. Maybe you could try this out as
-well to make sure I'm not crazy.
-
-Thanks,
-James
+diff --git a/src/ap.c b/src/ap.c
+index 9c82a545..665c1857 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -3672,6 +3672,28 @@ struct ap_if_data {
+ 	struct l_dbus_message *pending;
+ };
+ 
++static void ap_properties_changed(struct ap_if_data *ap_if)
++{
++	l_dbus_property_changed(dbus_get_bus(),
++				netdev_get_path(ap_if->netdev),
++				IWD_AP_INTERFACE, "Started");
++	l_dbus_property_changed(dbus_get_bus(),
++				netdev_get_path(ap_if->netdev),
++				IWD_AP_INTERFACE, "Name");
++	l_dbus_property_changed(dbus_get_bus(),
++				netdev_get_path(ap_if->netdev),
++				IWD_AP_INTERFACE, "Frequency");
++	l_dbus_property_changed(dbus_get_bus(),
++				netdev_get_path(ap_if->netdev),
++				IWD_AP_INTERFACE, "PairwiseCiphers");
++	l_dbus_property_changed(dbus_get_bus(),
++				netdev_get_path(ap_if->netdev),
++				IWD_AP_INTERFACE, "GroupCipher");
++	l_dbus_property_changed(dbus_get_bus(),
++				netdev_get_path(ap_if->netdev),
++				IWD_AP_INTERFACE, "Scanning");
++}
++
+ static void ap_if_event_func(enum ap_event_type type, const void *event_data,
+ 				void *user_data)
+ {
+@@ -3703,21 +3725,8 @@ static void ap_if_event_func(enum ap_event_type type, const void *event_data,
+ 
+ 		reply = l_dbus_message_new_method_return(ap_if->pending);
+ 		dbus_pending_reply(&ap_if->pending, reply);
+-		l_dbus_property_changed(dbus_get_bus(),
+-					netdev_get_path(ap_if->netdev),
+-					IWD_AP_INTERFACE, "Started");
+-		l_dbus_property_changed(dbus_get_bus(),
+-					netdev_get_path(ap_if->netdev),
+-					IWD_AP_INTERFACE, "Name");
+-		l_dbus_property_changed(dbus_get_bus(),
+-					netdev_get_path(ap_if->netdev),
+-					IWD_AP_INTERFACE, "Frequency");
+-		l_dbus_property_changed(dbus_get_bus(),
+-					netdev_get_path(ap_if->netdev),
+-					IWD_AP_INTERFACE, "PairwiseCiphers");
+-		l_dbus_property_changed(dbus_get_bus(),
+-					netdev_get_path(ap_if->netdev),
+-					IWD_AP_INTERFACE, "GroupCipher");
++
++		ap_properties_changed(ap_if);
+ 
+ 		l_rtnl_set_linkmode_and_operstate(rtnl,
+ 					netdev_get_ifindex(ap_if->netdev),
+@@ -3730,21 +3739,7 @@ static void ap_if_event_func(enum ap_event_type type, const void *event_data,
+ 						netdev_get_path(ap_if->netdev),
+ 						IWD_AP_DIAGNOSTIC_INTERFACE);
+ 
+-		l_dbus_property_changed(dbus_get_bus(),
+-					netdev_get_path(ap_if->netdev),
+-					IWD_AP_INTERFACE, "Started");
+-		l_dbus_property_changed(dbus_get_bus(),
+-					netdev_get_path(ap_if->netdev),
+-					IWD_AP_INTERFACE, "Name");
+-		l_dbus_property_changed(dbus_get_bus(),
+-					netdev_get_path(ap_if->netdev),
+-					IWD_AP_INTERFACE, "Frequency");
+-		l_dbus_property_changed(dbus_get_bus(),
+-					netdev_get_path(ap_if->netdev),
+-					IWD_AP_INTERFACE, "PairwiseCiphers");
+-		l_dbus_property_changed(dbus_get_bus(),
+-					netdev_get_path(ap_if->netdev),
+-					IWD_AP_INTERFACE, "GroupCipher");
++		ap_properties_changed(ap_if);
+ 
+ 		l_rtnl_set_linkmode_and_operstate(rtnl,
+ 					netdev_get_ifindex(ap_if->netdev),
+-- 
+2.34.3
 
