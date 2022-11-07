@@ -1,153 +1,85 @@
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB86C17C7
-	for <iwd@lists.linux.dev>; Mon,  7 Nov 2022 03:46:17 +0000 (UTC)
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-13b103a3e5dso11440370fac.2
-        for <iwd@lists.linux.dev>; Sun, 06 Nov 2022 19:46:17 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4BDCD531
+	for <iwd@lists.linux.dev>; Mon,  7 Nov 2022 15:54:07 +0000 (UTC)
+Received: by mail-yb1-f182.google.com with SMTP id z192so14173371yba.0
+        for <iwd@lists.linux.dev>; Mon, 07 Nov 2022 07:54:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hf4pt3VnsRebYQ1P1s11lCaJH/zVAe94KKBZw54G3R8=;
-        b=Yk246PD4ddnzb094EeTpCDupa8/xbwV4H5kKpxLNvIfc5a55KQwxBwmKFXbQAuCX/U
-         2SAyAUdxi1iO8+svaGAwhTgilFpYdRQkkW9Ap71orVR3eLeweWUGk1w65q90h2ZIqvHf
-         iWEdle3e7j6vHiFk1RIVMKt6l+SVUQMFJyrDc1RxcrUKcq6oyR9493uCoZIPj7fQoZvB
-         ObhO9+cItJr1N1eaD0C8yrPxSU5Ar8sjKcgJ3q/8gN0OFPw3NaMSzUOnTUP/DkFTe70k
-         TKhLnkBhLChWKswewO1goGAvv/iH64KPolEJFQAJM4ylgssQyKKRXtzU5sKup42rWFxJ
-         sHgw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=M94Lai8qv2f4db2Lnv+fALgnUkiI4qk8vZPRTYMQmEM=;
+        b=d1jllBfc7/Gp0ZSnA2vUUccfklX5LeRWfDvTHMy4t9EyoPzRlMLRsTBhjzS93MxIWx
+         wW8BQSvD0gw1HLgk+bt6b9TGrLmv9wbo+7nkjJpZtCsJxbKWsQRnNqBuEpLzsQpaqklb
+         6I3gfAxY7ZfzQ5HLdDy8/0DBaee8WZ4kQmE6qMHdal88ipr/5pxghYKufeU/RvOFTV2i
+         UhZsprd36RHGNJgFCN46oGOloTadBp/vaY73dTB7QWTGNwdNeK08sWEgILmkd9LtYJ/Z
+         uBu+d0Wyf7WvHwf0wkIeqUU6z4lJ+MCWUuhi+OcWdDPNogfjzAj/rgfCskupWWZkZIqe
+         kdtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hf4pt3VnsRebYQ1P1s11lCaJH/zVAe94KKBZw54G3R8=;
-        b=M856P1LhB+56E5Rn3aCyW20Ch+TQc3TWg/VKLlvvYcIYEig0N/HftI99nXBLAGV8WL
-         P3wM3CboDcfBGvo4ABTK43oXdPlIVeMbDmw+CNgMuO3ulOD+IoTRMQP5w4tpaw0ZOSLK
-         Ut+8HdUAIAZL3OfVKzsDwLe5usu5ooH5GYwQ5E8QMnRS8IG7gRO6ZL1gBp7rvYm9xgE7
-         2mBKUIFKAqqRcXhHO8tp1WSuADjJD9KsDl09vhUo4BDgeJrearqIB1xDBxlujromNIj0
-         BAIRu/EO+Wtm6Zetx0Y2wu+j1y/vK2Pn+YZQWOy6Q9Oz0B2/om4tZfuOmR98LLpZ3oN1
-         3SYQ==
-X-Gm-Message-State: ACrzQf1r3oXVlXGJtgkSbyHSS3ek4qQ/XEUqak3ByZ0TTtmK92xv/+4Y
-	WP06Q7Mz5kt9DLn9w16ceRM=
-X-Google-Smtp-Source: AMsMyM4eJFwargL+oAl+V5Pulq4cfyD3N9+hsZLjV7NRiH2IphZDoCxQbuy51H2z4x47GKS0NDdOCw==
-X-Received: by 2002:a05:6870:40d2:b0:136:9ebc:9350 with SMTP id l18-20020a05687040d200b001369ebc9350mr28655317oal.151.1667792776885;
-        Sun, 06 Nov 2022 19:46:16 -0800 (PST)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id s13-20020a056870610d00b0011f22e74d5fsm2558574oae.20.2022.11.06.19.46.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 06 Nov 2022 19:46:15 -0800 (PST)
-Message-ID: <4d50da71-40e3-f888-be79-b52fa8208e88@gmail.com>
-Date: Sun, 6 Nov 2022 21:46:13 -0600
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=M94Lai8qv2f4db2Lnv+fALgnUkiI4qk8vZPRTYMQmEM=;
+        b=PBmT9P592fjACqqrCGArA1/CGcA7QU0nNVPPkspFimSl40J+xSa0WPiNtZR29NUoLk
+         EZa2ytqbXmLFnjza7xJAILXFjO9FUcVhcsV3YU4tSbGErS1K9bjdOQXz85Y2PBQ/RSL8
+         bayD+z7XLNbRUT6PQD8XUsPatn1XzPIP/a0KkCXyllV/x7YmYm/jOl5tUUkC+KTa1DDO
+         g5cULqleCx1zDcpGu2g89qzKhD6kmfJTMn/Ell4dSyTm+JWEeSxWOJueMVHZPapAb78a
+         5ZM8Yg8zYNd3ZzR3x7ElfeKPbmpjnvt7YNX0QlogAoRdOKd0MkqRdjG/cd4V+bq47l7z
+         Sxpw==
+X-Gm-Message-State: ACrzQf3GYCRKQkTXRuOfKBUVMIZ92LZxBjZAR6WNYDL8YJtJSMoAeDxJ
+	F0iqSm24bl6nRcJndk3TZeozMbpZtwAKcstr5Wk=
+X-Google-Smtp-Source: AMsMyM4z7dFrKgP/AuzRLdH9KOIjXbsfabGGMtAQMeNadtZ/IjdDStYQ+Q0KHVOGVNNnTzYZU4IX9qvsEmyp/zf4bsQ=
+X-Received: by 2002:a25:ef43:0:b0:6cb:cc03:c47 with SMTP id
+ w3-20020a25ef43000000b006cbcc030c47mr50202726ybm.372.1667836446769; Mon, 07
+ Nov 2022 07:54:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: Sometimes RxBitrate of 1000 Kbit/s
-Content-Language: en-US
-To: =?UTF-8?Q?Patrick_H=c3=a4cker?= <pat_h@web.de>, iwd@lists.linux.dev
-References: <5893463.lOV4Wx5bFT@mmm>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <5893463.lOV4Wx5bFT@mmm>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CACvgo52+1i7iZ-vzqf1RUpZvMa3-EgaDoid=Y9dch4=d_dq-5Q@mail.gmail.com>
+ <772f09aa-fe9e-708e-2ec2-a89f8784d391@gmail.com> <CACvgo50aJHxkC-3E7OHDfjkyH5Rrp+Za+F-ATTCs8w-oX=dhcA@mail.gmail.com>
+ <afb76858-3db4-11c9-5d6b-d3cf6d451052@gmail.com>
+In-Reply-To: <afb76858-3db4-11c9-5d6b-d3cf6d451052@gmail.com>
+From: Emil Velikov <emil.l.velikov@gmail.com>
+Date: Mon, 7 Nov 2022 15:53:55 +0000
+Message-ID: <CACvgo53gsrbynh0e-YXL9nV+HJF=xiRuR2Cj38pYCeApbRRm4w@mail.gmail.com>
+Subject: Re: GCMP and other unknown ciphers
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Patrick,
+On Tue, 25 Oct 2022 at 16:32, Denis Kenzior <denkenz@gmail.com> wrote:
+>
+> Hi Emil,
+>
+>
+> >>>
+> >>> Was my analysis correct - is GCMP supported? Are there any plans on doing so?
+> >>
+> >> No real plans, patches are always welcome.
+> >>
+> > Do you have a rough estimate of how much work that might be -  are we
+> > talking about weeks or months? How does one get access to the 802.11
+> > spec these days?
+> >
+>
+> There is a patchset on the mailing list that implements all ciphers listed in
+> 802.11, including GCMP.  Only tested in a synthetic environment since none of my
+> commercial APs seem to support anything besides TKIP/CCMP.
+>
+I've tested it against a Netgear Nighthawk X10 with the following combinations:
 
-On 11/6/22 08:36, Patrick Häcker wrote:
-> Hello all,
-> 
-> from time to time my RxBitrate (sometimes the TxBitrate, too) goes down to
-> 1000 Kbit/s, whereas it otherwise is in the usual 5 to 6 digit range. This
-> seems to especially happen some time after waking up from standby (S3), maybe
-> also from hibernate (S4).
+WPA2 Personal (without SHA256)
+ - CCMP-128 (AES) + GCMP
+ - CCMP-256 only
+ - GCMP-256 only
 
-iwd doesn't do anything on sleep (it isn't even aware of sleep).  So it is up to 
-the kernel driver to do the right thing.  Maybe it isn't?  You'll have to ask 
-the kernel / driver / firmware people for your hardware.
+All of the above are working like a charm. I haven't tried any
+Enterprise combinations due to some unrelated hiccups on my test rig.
 
-> 
-> When it happens, wireless usage is super slow to non-existent.
-> 
-> Restarting iwd immediately solves the problem. I routinely also reloaded the
-> involved kernel modules, but I think this was unnecessary as I
-> skipped it the last few times and only restarted iwd and this was enough to
-> get it back to a working state.
-
-Killing iwd most likely power-cycles the card (since it brings the interface 
-down, or even destroys it completely), and probably reloads the firmware. 
-Removing the kernel modules probably doesn't matter.
-
-We have seen some reports where (for example iwlwifi) behavior can change 
-between kernel versions due to different firmware behavior.
-
-Some network managers (like NM) will explicitly IFDOWN wireless interfaces on 
-suspend and bring them up on resume.  This isn't cost free and we'd rather not 
-do this.
-
-<snip>
-
-> This is how it looks after restarting iwd:
-> # systemctl restart iwd
-> # iwctl station wlan0 show
->                                   Station: wlan0
-> --------------------------------------------------------------------------------
->    Settable  Property              Value
-> --------------------------------------------------------------------------------
->              Scanning              no
->              State                 connected
->              Connected network     *redacted*
->              IPv4 address          192.168.0.10
->              ConnectedBss          98:9b:cb:4b:b1:cd
->              Frequency             5180
->              Security              WPA3-Personal
->              RSSI                  -72 dBm
->              AverageRSSI           -72 dBm
->              RxMode                802.11n
->              RxMCS                 9
->              TxMode                802.11n
->              TxMCS                 3
->              TxBitrate             60000 Kbit/s
->              RxBitrate             60000 Kbit/s
->              ExpectedThroughput    31125 Kbit/s
-> 
-
-Some of these numbers seem suspect, but iwd has no influence on them.  RX/TX MCS 
-selection is done by the driver / firmware.  All iwd does is report what the 
-driver is telling it.
-
-<snip>
-
->  From https://iwd.wiki.kernel.org/debugging I would assume, that IWD_GENL_DEBUG
-> might the relevant environment variable, but I am really not sure.
-
-This isn't what you're looking for.  That variable is for debugging generic 
-netlink communication which we haven't needed to do in years.  We probably 
-should take this out completely.
-
-> I could obviously implement some kind of watchdog checking the output of iwctl
-> every some seconds and restarting iwd in case, but I would avoid that if there
-> is a cleaner solution available.
-
-You could try adding an ifdown / ifup for the wifi interface triggered by 
-suspend / resume (or rfkill) and see what happens?
-
-You can also try to run run iwmon in order to capture what is happening on the 
-nl80211 API level when entering / leaving suspend.  The driver people might be 
-interested in this information.
-
-> 
-> I think is problem started to occur some months ago. It might be related with
-> some kernel or iwd update some time ago. But due to the long time until
-> occuring, a sound bisect might take more than a week.
-
-I'd start with the kernel, it is hard for me to imagine what iwd might be doing 
-to trigger this.
-
-Regards,
--Denis
+Huge thanks for the amazing help
+Emil
