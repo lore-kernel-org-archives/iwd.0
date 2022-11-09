@@ -1,136 +1,119 @@
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9D217C2
-	for <iwd@lists.linux.dev>; Wed,  9 Nov 2022 16:42:39 +0000 (UTC)
-Received: by mail-oo1-f41.google.com with SMTP id x196-20020a4a41cd000000b0049f064d2591so997376ooa.11
-        for <iwd@lists.linux.dev>; Wed, 09 Nov 2022 08:42:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zWgboCrZgXZp9BlRmdCZojUqzssciD/lfpZOB3kEtto=;
-        b=XD5WLbD49Xr61dyJjKZXE8bgQ6SvRlF50T+WBs4kHJ+oQ0hjMAfLJiS3R9xjEjzLjM
-         Q916vHHwblra7Gr70/BgzyYNMpY8tKTpyJJfaiQRbcSSXhpHfXGff+sF1HABOHk5KcPI
-         dP/xa6cj3lX+nN/rEzNfRWANfAmccjempWVyp3/AyxlsUcUbkA486N3k4bBOO/C0Vn3h
-         YPzhEfEdOlh8irfzqGSnDU9p5fItaYiOq+a1bgkMP6OaMsjum40MoSdtVdYM7DEVNZne
-         p67Jal8mgwgm9QC4NQvVtelobd7voENtI3fCKrvStWby1d8HNx5P8FwA9+cxQbd3ncWK
-         jjLQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A052717C2
+	for <iwd@lists.linux.dev>; Wed,  9 Nov 2022 17:04:53 +0000 (UTC)
+Received: by mail-wm1-f41.google.com with SMTP id j5-20020a05600c410500b003cfa9c0ea76so1733127wmi.3
+        for <iwd@lists.linux.dev>; Wed, 09 Nov 2022 09:04:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zWgboCrZgXZp9BlRmdCZojUqzssciD/lfpZOB3kEtto=;
-        b=x8pV8B8GcoHIWxGg41NqSvisAxbL6Gc2JlhLCD8UmpFEcuCilj3ahZXKZ8StjZVxf2
-         tRhg20nTpHPtII9/8RMzv/x/Oc5J5u0T+ugtiUq/VCByV00a1bioh2buKfjr4HCvBboa
-         76IocOX/m1DRoAckLwke1TdU3ltIw/M7Bc5Pk8aKgAGtU9Zb7o15da1wzSjG05ttuR8Y
-         NqEuZIyxFczGp9NN0nSQcWNoMhPaYAGntaj6djysgSQF7uC2bxtVJ9YDSbMSl2XTvctN
-         hNCOqDqObVrF/emdiecV4C779HXEAINzJYVjjhMl3dU0zLE3C0vRztONztTm97irFy3N
-         qi/w==
-X-Gm-Message-State: ACrzQf1URmW6wRwS7DEsZCNNYyrF/HgITNaUZXe6hS4p4c3Um5696R/w
-	xRWP2vtoMIWaI0Pbfo6Jpe+NoAFl/U788Xog9tq/uMqIBIplgg==
-X-Google-Smtp-Source: AMsMyM7b7biMdF60jZ4E4Z977UZ1hnjEOR4R+evF4LrgE+BnxFMlL+YYdhgCMq/ilHVMA7XXAni4L/UqvMTyOZrfpmk=
-X-Received: by 2002:a4a:aeca:0:b0:480:2413:1edc with SMTP id
- v10-20020a4aaeca000000b0048024131edcmr25951072oon.96.1668012158725; Wed, 09
- Nov 2022 08:42:38 -0800 (PST)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e+9J3H7GVIUyAPHCdrk/KSjJCUieWgqmnIdcHUNwToU=;
+        b=26QXeX/ioMWLZGEFamGlMgPHTYUkn9yIlaN/LNFiBiVH09snuvPXDFxdM/5Fyjl+Ff
+         1w5t3v03lNRexmonLgaA9PnyITaYlT7lg8jychcB0Hk3sQGrYOMx7Gf6+JI4Ar+Kew9E
+         947RJ1eFMPweSN+PZP9F1F4Jmz5VVB1KcZ2xCFPLkuxyy7Bqj/PpGu6sQokCPZbmPanq
+         D6WzCD5Z/qQ1WHOKA7YpL1Yq+UUAXPQ2FFie9WVZJWBoWTikQ1zEekwL85bGcvv1cU8S
+         hSQDKlghjX3iqvonk4fBGRF3qArd188CkuxpaFI1KweSZU2HMx2F4AHP+nw0WJkUzlp3
+         +dzg==
+X-Gm-Message-State: ACrzQf3gt4oKQupkFPW9qSHYNbgHIUs0UG6bTFXjT7EVaWh1A3Do6j9T
+	eBqBu6WIcWooy4Mj0J7/IWWP8V4HndA=
+X-Google-Smtp-Source: AMsMyM5ZmfokkeBuu0U33ZoFPDWLMgNUaKzE137uVXMTtFn5/MioiWoK/6F0516HcicyE1RQy8lZBw==
+X-Received: by 2002:a05:600c:1614:b0:3cf:816e:4a69 with SMTP id m20-20020a05600c161400b003cf816e4a69mr30728215wmn.33.1668013491128;
+        Wed, 09 Nov 2022 09:04:51 -0800 (PST)
+Received: from localhost.localdomain ([82.213.230.158])
+        by smtp.gmail.com with ESMTPSA id z19-20020a7bc7d3000000b003c6deb5c1edsm2089909wmk.45.2022.11.09.09.04.50
+        for <iwd@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Nov 2022 09:04:50 -0800 (PST)
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+To: iwd@lists.linux.dev
+Subject: [PATCH 1/2] storage: Add TLS session cache file read/write utils
+Date: Wed,  9 Nov 2022 18:04:37 +0100
+Message-Id: <20221109170438.535300-1-andrew.zaborowski@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: Michael Johnson <mjohnson459@gmail.com>
-Date: Wed, 9 Nov 2022 16:42:27 +0000
-Message-ID: <CACsRnHU1WkovQrSUFH91haGf7rJJppfBwCxkVT9eXejVk_CJ1w@mail.gmail.com>
-Subject: Permanent disconnect when deauthenticated during a roam
-To: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hey all,
+Add storage_tls_session_cache_{load,sync} similar to
+storage_known_frequencies_{load,sync}.
+---
+ src/storage.c | 35 +++++++++++++++++++++++++++++++++++
+ src/storage.h |  3 +++
+ 2 files changed, 38 insertions(+)
 
-I've just had an issue with a client being permanently disconnected
-after a failed roam. iwd detects the disconnect and prints a message
-but doesn't seem to attempt to reconnect again. I don't see anything
-about blacklists mentioned either.
-Any idea why this isn't attempting to reconnect?
+diff --git a/src/storage.c b/src/storage.c
+index d6e478bd..b2c5ed48 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -53,6 +53,7 @@
+ #define STORAGE_FILE_MODE (S_IRUSR | S_IWUSR)
+ 
+ #define KNOWN_FREQ_FILENAME ".known_network.freq"
++#define TLS_CACHE_FILENAME ".tls-session-cache"
+ 
+ static char *storage_path = NULL;
+ static char *storage_hotspot_path = NULL;
+@@ -701,6 +702,40 @@ void storage_known_frequencies_sync(struct l_settings *known_freqs)
+ 	l_free(known_freq_file_path);
+ }
+ 
++struct l_settings *storage_tls_session_cache_load(void)
++{
++	_auto_(l_settings_free) struct l_settings *cache = l_settings_new();
++	_auto_(l_free) char *tls_cache_file_path =
++		storage_get_path("%s", TLS_CACHE_FILENAME);
++
++	if (unlikely(!l_settings_load_from_file(cache, tls_cache_file_path)))
++		return NULL;
++
++	return l_steal_ptr(cache);
++}
++
++void storage_tls_session_cache_sync(struct l_settings *cache)
++{
++	_auto_(l_free) char *tls_cache_file_path = NULL;
++	_auto_(l_free) char *data = NULL;
++	size_t len;
++
++	if (!cache)
++		return;
++
++	tls_cache_file_path = storage_get_path("%s", TLS_CACHE_FILENAME);
++	data = l_settings_to_data(cache, &len);
++
++	/*
++	 * Note this data contains cryptographic secrets.  write_file()
++	 * happens to set the right permissions on the file.
++	 *
++	 * TODO: consider encrypting with system_key.
++	 */
++	write_file(data, len, false, "%s", tls_cache_file_path);
++	explicit_bzero(data, len);
++}
++
+ bool storage_is_file(const char *filename)
+ {
+ 	char *path;
+diff --git a/src/storage.h b/src/storage.h
+index 6877fb65..fe6ddbf5 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -51,6 +51,9 @@ int storage_network_remove(enum security type, const char *ssid);
+ struct l_settings *storage_known_frequencies_load(void);
+ void storage_known_frequencies_sync(struct l_settings *known_freqs);
+ 
++struct l_settings *storage_tls_session_cache_load(void);
++void storage_tls_session_cache_sync(struct l_settings *cache);
++
+ int __storage_decrypt(struct l_settings *settings, const char *ssid,
+ 				bool *changed);
+ char *__storage_encrypt(const struct l_settings *settings, const char *ssid,
+-- 
+2.34.1
 
-```
-# Normal roam
-Nov 08 17:59:41.880934 p3-3478 iwd[426]:
-src/netdev.c:netdev_authenticate_event()
-Nov 08 17:59:41.881248 p3-3478 kernel: wlan0: send auth to
-ac:3a:67:5d:8b:2c (try 1/3)
-Nov 08 17:59:41.881324 p3-3478 kernel: wlan0: authenticated
-Nov 08 17:59:41.881374 p3-3478 iwd[426]:
-src/netdev.c:netdev_get_oci_cb() Obtained OCI: freq: 5560, width: 1,
-center1: 5560, center2: 0
-Nov 08 17:59:41.889035 p3-3478 kernel: wlan0: associate with
-ac:3a:67:5d:8b:2c (try 1/3)
-Nov 08 17:59:41.889232 p3-3478 kernel: wlan0: RX ReassocResp from
-ac:3a:67:5d:8b:2c (capab=0x1111 status=0 aid=10)
-Nov 08 17:59:41.892719 p3-3478 iwd[426]:
-src/netdev.c:netdev_mlme_notify() MLME notification Associate(38)
-Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_associate_event()
-Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_set_gtk() 5
-Nov 08 17:59:41.892719 p3-3478 iwd[426]:
-src/station.c:station_handshake_event() Setting keys
-Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_set_tk() 5
-Nov 08 17:59:41.892719 p3-3478 iwd[426]:
-src/netdev.c:netdev_mlme_notify() MLME notification Connect(46)
-Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_connect_event()
-Nov 08 17:59:41.893224 p3-3478 kernel: wlan0: associated
-Nov 08 17:59:41.893271 p3-3478 kernel: ath: EEPROM regdomain: 0x8348
-Nov 08 17:59:41.893307 p3-3478 kernel: ath: EEPROM indicates we should
-expect a country code
-Nov 08 17:59:41.893337 p3-3478 kernel: ath: doing EEPROM
-country->regdmn map search
-Nov 08 17:59:41.893363 p3-3478 kernel: ath: country maps to regdmn code: 0x3a
-Nov 08 17:59:41.893390 p3-3478 kernel: ath: Country alpha2 being used: US
-Nov 08 17:59:41.893416 p3-3478 kernel: ath: Regpair used: 0x3a
-Nov 08 17:59:41.893457 p3-3478 kernel: ath: regdomain 0x8348
-dynamically updated by country element
-Nov 08 17:59:41.893483 p3-3478 kernel: wlan0: deauthenticated from
-ac:3a:67:5d:8b:2c (Reason: 34=DISASSOC_LOW_ACK)
-Nov 08 17:59:41.895990 p3-3478 iwd[426]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-Nov 08 17:59:41.896099 p3-3478 iwd[426]:
-src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
-Nov 08 17:59:41.896099 p3-3478 iwd[426]:
-src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for
-(global) is US
-Nov 08 17:59:41.896099 p3-3478 iwd[426]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
-Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-src/netdev.c:netdev_deauthenticate_event()
-Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
-Nov 08 17:59:41.896282 p3-3478 iwd[426]: src/netdev.c:netdev_disconnect_event()
-Nov 08 17:59:41.896282 p3-3478 iwd[426]: Received Deauthentication
-event, reason: 34, from_ap: true
-Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-src/wiphy.c:wiphy_radio_work_done() Work item 493 done
-Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-src/station.c:station_disconnect_event() 5
-Nov 08 17:59:41.896282 p3-3478 iwd[426]: Unexpected disconnect event
-Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-Nov 08 17:59:41.896867 p3-3478 iwd[426]:
-src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
-Nov 08 17:59:41.896867 p3-3478 iwd[426]:
-src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for
-(global) is XX
-Nov 08 17:59:42.893123 p3-3478 iwd[426]:
-src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-# Doesn't reconnect and needs to be rebooted ...
-```
-
-Regards,
-Michael
