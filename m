@@ -1,163 +1,136 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE982F37
-	for <iwd@lists.linux.dev>; Mon,  7 Nov 2022 18:50:47 +0000 (UTC)
-Received: by mail-pg1-f172.google.com with SMTP id b62so11275872pgc.0
-        for <iwd@lists.linux.dev>; Mon, 07 Nov 2022 10:50:47 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9D217C2
+	for <iwd@lists.linux.dev>; Wed,  9 Nov 2022 16:42:39 +0000 (UTC)
+Received: by mail-oo1-f41.google.com with SMTP id x196-20020a4a41cd000000b0049f064d2591so997376ooa.11
+        for <iwd@lists.linux.dev>; Wed, 09 Nov 2022 08:42:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TrWTz/Wf7DnyYEZSQkL3/Hb+KipN/rlBfDdFjKB0oMI=;
-        b=otOh/w4sOi/ohLw4K0fI8I/yINALeozsP26+WJ4sSSFP6gRHTEMK6qeeLydHW34QVZ
-         91Gi9P+OpUS33UHQBa9BcizMEGfH3yQFtoLMICnn04MkeluXPEUG3VG+MlcQA+WtNOnI
-         1G+EPRfdtUYFGsntBApgSoK/CegtMHL4ldxlSahJMw1bMr9EUnycpqKaThKqcpaYUdf/
-         Cs3exU7YjNpaFJFSHehbK9JegH2PiNnyEToKfNrKiqQtISQkQpadn2VDp/sSCLdb6RMA
-         IWPm6zpMUihOrFTtxccWzIOsqD2J9R/LTz8xX7/1fG4B0cSrPN7soQvmkzzbahPIFEep
-         x08Q==
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zWgboCrZgXZp9BlRmdCZojUqzssciD/lfpZOB3kEtto=;
+        b=XD5WLbD49Xr61dyJjKZXE8bgQ6SvRlF50T+WBs4kHJ+oQ0hjMAfLJiS3R9xjEjzLjM
+         Q916vHHwblra7Gr70/BgzyYNMpY8tKTpyJJfaiQRbcSSXhpHfXGff+sF1HABOHk5KcPI
+         dP/xa6cj3lX+nN/rEzNfRWANfAmccjempWVyp3/AyxlsUcUbkA486N3k4bBOO/C0Vn3h
+         YPzhEfEdOlh8irfzqGSnDU9p5fItaYiOq+a1bgkMP6OaMsjum40MoSdtVdYM7DEVNZne
+         p67Jal8mgwgm9QC4NQvVtelobd7voENtI3fCKrvStWby1d8HNx5P8FwA9+cxQbd3ncWK
+         jjLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TrWTz/Wf7DnyYEZSQkL3/Hb+KipN/rlBfDdFjKB0oMI=;
-        b=IZ+m/GlPLp9+SEY/ln7GvVpN5WoPh8iesXijVsmA5MgnEAar/gq3JnVtCRdu1Alyqm
-         QYgIg0YxZmD/0KToPRmTEL/MtAl0e4fzg3lBMcNYFCj/buQcKYvRg2xzIVijID5W4vdF
-         0kdKHHO4RgSoOa1kXEhapg4O+ePluQGPYuixCpb6YasbHBywb3VHGvlid+sZNA7RK8pw
-         HWDbyxRuTJcFVdqWqU31Dmgn/3sEoaULJDlJeVzBnsxo63Mj6e07Am1CdLqSMN2GC/Ir
-         iRQyH6AYZAF7+Ex92nXulP0ar4/hY5gFtxitW7pCuTT5U1qUJYoFITxfV2twcvteZNo8
-         DiSA==
-X-Gm-Message-State: ACrzQf0O+zzgBarmYDFPXcAx+TxBaDs8oQ84oX1V/cCpsB1OnG4AXQWZ
-	sEb1XBKtUmSaVNI87HDEq2RNdLegNPQ=
-X-Google-Smtp-Source: AMsMyM7pW8wdxKk38MGJp2gswqCrOr9K3k0VG5ufMcGt9mSkwXNCyaNO4Dh7/sTYensPCxPz1X5SJg==
-X-Received: by 2002:a65:4ccc:0:b0:470:1a0a:a821 with SMTP id n12-20020a654ccc000000b004701a0aa821mr22387754pgt.447.1667847046965;
-        Mon, 07 Nov 2022 10:50:46 -0800 (PST)
-Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id d13-20020a170903230d00b00181e55d02dcsm5341530plh.139.2022.11.07.10.50.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Nov 2022 10:50:46 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] netdev: try catching buggy driver behavior to avoid hangs
-Date: Mon,  7 Nov 2022 10:49:44 -0800
-Message-Id: <20221107184944.675454-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zWgboCrZgXZp9BlRmdCZojUqzssciD/lfpZOB3kEtto=;
+        b=x8pV8B8GcoHIWxGg41NqSvisAxbL6Gc2JlhLCD8UmpFEcuCilj3ahZXKZ8StjZVxf2
+         tRhg20nTpHPtII9/8RMzv/x/Oc5J5u0T+ugtiUq/VCByV00a1bioh2buKfjr4HCvBboa
+         76IocOX/m1DRoAckLwke1TdU3ltIw/M7Bc5Pk8aKgAGtU9Zb7o15da1wzSjG05ttuR8Y
+         NqEuZIyxFczGp9NN0nSQcWNoMhPaYAGntaj6djysgSQF7uC2bxtVJ9YDSbMSl2XTvctN
+         hNCOqDqObVrF/emdiecV4C779HXEAINzJYVjjhMl3dU0zLE3C0vRztONztTm97irFy3N
+         qi/w==
+X-Gm-Message-State: ACrzQf1URmW6wRwS7DEsZCNNYyrF/HgITNaUZXe6hS4p4c3Um5696R/w
+	xRWP2vtoMIWaI0Pbfo6Jpe+NoAFl/U788Xog9tq/uMqIBIplgg==
+X-Google-Smtp-Source: AMsMyM7b7biMdF60jZ4E4Z977UZ1hnjEOR4R+evF4LrgE+BnxFMlL+YYdhgCMq/ilHVMA7XXAni4L/UqvMTyOZrfpmk=
+X-Received: by 2002:a4a:aeca:0:b0:480:2413:1edc with SMTP id
+ v10-20020a4aaeca000000b0048024131edcmr25951072oon.96.1668012158725; Wed, 09
+ Nov 2022 08:42:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Michael Johnson <mjohnson459@gmail.com>
+Date: Wed, 9 Nov 2022 16:42:27 +0000
+Message-ID: <CACsRnHU1WkovQrSUFH91haGf7rJJppfBwCxkVT9eXejVk_CJ1w@mail.gmail.com>
+Subject: Permanent disconnect when deauthenticated during a roam
+To: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-It was reported that IWD hangs during roaming due to the kernel never
-sending any expected events after authentication. This was likely
-due to buggy firmware but ultimately got IWD into an unrecoverable
-state waiting for an event which never came.
+Hey all,
 
-The only indication of this to userspace was a DEL_STATION event
-which happens after the successful authenticate event. Now IWD will
-watch for this and if the conditions are right IWD will fail the
-connection.
----
- src/netdev.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 61 insertions(+), 3 deletions(-)
+I've just had an issue with a client being permanently disconnected
+after a failed roam. iwd detects the disconnect and prints a message
+but doesn't seem to attempt to reconnect again. I don't see anything
+about blacklists mentioned either.
+Any idea why this isn't attempting to reconnect?
 
-diff --git a/src/netdev.c b/src/netdev.c
-index cda8d183..817b8737 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4933,13 +4933,12 @@ static void netdev_station_event(struct l_genl_msg *msg,
- 					struct netdev *netdev, bool added)
- {
- 	struct l_genl_attr attr;
-+	struct l_genl_attr nested;
- 	uint16_t type;
- 	uint16_t len;
- 	const void *data;
- 	const uint8_t *mac = NULL;
--
--	if (netdev_get_iftype(netdev) != NETDEV_IFTYPE_ADHOC)
--		return;
-+	uint32_t connected_time = 0;
- 
- 	if (!l_genl_attr_init(&attr, msg))
- 		return;
-@@ -4948,6 +4947,22 @@ static void netdev_station_event(struct l_genl_msg *msg,
- 		switch (type) {
- 		case NL80211_ATTR_MAC:
- 			mac = data;
-+			break;
-+		case NL80211_ATTR_STA_INFO:
-+			if (!l_genl_attr_recurse(&attr, &nested))
-+				continue;
-+
-+			while (l_genl_attr_next(&nested, &type, &len, &data)) {
-+				if (type != NL80211_STA_INFO_CONNECTED_TIME)
-+					continue;
-+
-+				if (len != 4)
-+					continue;
-+
-+				connected_time = l_get_u32(data);
-+				break;
-+			}
-+
- 			break;
- 		}
- 	}
-@@ -4958,6 +4973,49 @@ static void netdev_station_event(struct l_genl_msg *msg,
- 		return;
- 	}
- 
-+	/*
-+	 * Check in case buggy drivers never send the events we expect. This
-+	 * has been seen on iwlwifi where a 'connection loss' in the firmware
-+	 * results in no events after authentication. The only indication of
-+	 * failure we see is a DEL_STATION after the successful authenticate
-+	 * event.
-+	 *
-+	 * Any protocol using CMD_AUTHENTICATE/CMD_ASSOCIATE could end up in
-+	 * this situation:
-+	 *  - SAE, during auth or assoc
-+	 *  - FILS, during auth or assoc
-+	 *  - FT, during associate (since CMD_AUTH is not used)
-+	 *  - Reassociation, during assoc
-+	 *
-+	 * It should be noted that protocols such as SAE and OWE may reject
-+	 * authentication with the intent of retrying (status 77) which does
-+	 * result in a DEL_STATION event. In these cases the connection time is
-+	 * zero, and the event can be ignored.
-+	 *
-+	 * If the following conditions are met we can assume this is a buggy
-+	 * driver:
-+	 *  - Current handshake exists
-+	 *  - Handshake is not for an authenticator
-+	 *  - Connected time is non-zero
-+	 *  - The STA address matches our handshake authenticator address
-+	 *  - Currently running auth/assoc protocol (auth-proto, ft, or reassoc)
-+	 */
-+	if (netdev->handshake && !netdev->handshake->authenticator &&
-+			!added && connected_time &&
-+			!memcmp(mac, netdev->handshake->aa, 6) &&
-+			(netdev->ap || netdev->in_ft || netdev->in_reassoc)) {
-+		l_warn("Kernel never sent a connect event to indicate failure! "
-+			"This is a kernel bug and needs to be fixed");
-+		netdev_connect_failed(netdev, netdev->associated ?
-+					NETDEV_RESULT_ASSOCIATION_FAILED :
-+					NETDEV_RESULT_AUTHENTICATION_FAILED,
-+					MMPDU_STATUS_CODE_UNSPECIFIED);
-+		return;
-+	}
-+
-+	if (netdev_get_iftype(netdev) != NETDEV_IFTYPE_ADHOC)
-+		return;
-+
- 	WATCHLIST_NOTIFY(&netdev->station_watches,
- 			netdev_station_watch_func_t, netdev, mac, added);
- }
--- 
-2.34.3
+```
+# Normal roam
+Nov 08 17:59:41.880934 p3-3478 iwd[426]:
+src/netdev.c:netdev_authenticate_event()
+Nov 08 17:59:41.881248 p3-3478 kernel: wlan0: send auth to
+ac:3a:67:5d:8b:2c (try 1/3)
+Nov 08 17:59:41.881324 p3-3478 kernel: wlan0: authenticated
+Nov 08 17:59:41.881374 p3-3478 iwd[426]:
+src/netdev.c:netdev_get_oci_cb() Obtained OCI: freq: 5560, width: 1,
+center1: 5560, center2: 0
+Nov 08 17:59:41.889035 p3-3478 kernel: wlan0: associate with
+ac:3a:67:5d:8b:2c (try 1/3)
+Nov 08 17:59:41.889232 p3-3478 kernel: wlan0: RX ReassocResp from
+ac:3a:67:5d:8b:2c (capab=0x1111 status=0 aid=10)
+Nov 08 17:59:41.892719 p3-3478 iwd[426]:
+src/netdev.c:netdev_mlme_notify() MLME notification Associate(38)
+Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_associate_event()
+Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_set_gtk() 5
+Nov 08 17:59:41.892719 p3-3478 iwd[426]:
+src/station.c:station_handshake_event() Setting keys
+Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_set_tk() 5
+Nov 08 17:59:41.892719 p3-3478 iwd[426]:
+src/netdev.c:netdev_mlme_notify() MLME notification Connect(46)
+Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_connect_event()
+Nov 08 17:59:41.893224 p3-3478 kernel: wlan0: associated
+Nov 08 17:59:41.893271 p3-3478 kernel: ath: EEPROM regdomain: 0x8348
+Nov 08 17:59:41.893307 p3-3478 kernel: ath: EEPROM indicates we should
+expect a country code
+Nov 08 17:59:41.893337 p3-3478 kernel: ath: doing EEPROM
+country->regdmn map search
+Nov 08 17:59:41.893363 p3-3478 kernel: ath: country maps to regdmn code: 0x3a
+Nov 08 17:59:41.893390 p3-3478 kernel: ath: Country alpha2 being used: US
+Nov 08 17:59:41.893416 p3-3478 kernel: ath: Regpair used: 0x3a
+Nov 08 17:59:41.893457 p3-3478 kernel: ath: regdomain 0x8348
+dynamically updated by country element
+Nov 08 17:59:41.893483 p3-3478 kernel: wlan0: deauthenticated from
+ac:3a:67:5d:8b:2c (Reason: 34=DISASSOC_LOW_ACK)
+Nov 08 17:59:41.895990 p3-3478 iwd[426]:
+src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+Nov 08 17:59:41.896099 p3-3478 iwd[426]:
+src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
+Nov 08 17:59:41.896099 p3-3478 iwd[426]:
+src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for
+(global) is US
+Nov 08 17:59:41.896099 p3-3478 iwd[426]:
+src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
+Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
+Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+src/netdev.c:netdev_deauthenticate_event()
+Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
+Nov 08 17:59:41.896282 p3-3478 iwd[426]: src/netdev.c:netdev_disconnect_event()
+Nov 08 17:59:41.896282 p3-3478 iwd[426]: Received Deauthentication
+event, reason: 34, from_ap: true
+Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+src/wiphy.c:wiphy_radio_work_done() Work item 493 done
+Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+src/station.c:station_disconnect_event() 5
+Nov 08 17:59:41.896282 p3-3478 iwd[426]: Unexpected disconnect event
+Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+Nov 08 17:59:41.896867 p3-3478 iwd[426]:
+src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
+Nov 08 17:59:41.896867 p3-3478 iwd[426]:
+src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for
+(global) is XX
+Nov 08 17:59:42.893123 p3-3478 iwd[426]:
+src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+# Doesn't reconnect and needs to be rebooted ...
+```
 
+Regards,
+Michael
