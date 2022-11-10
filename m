@@ -1,173 +1,129 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BFBC290F
-	for <iwd@lists.linux.dev>; Wed,  9 Nov 2022 21:29:01 +0000 (UTC)
-Received: by mail-lf1-f48.google.com with SMTP id b3so28037013lfv.2
-        for <iwd@lists.linux.dev>; Wed, 09 Nov 2022 13:29:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fHuJz9i3KG+HkeFZ1vnWJ1ddO0XMWMLGLHhRP7GW2IY=;
-        b=VU9AF98tjXyZmGFTLWb+H7BKcGURio06kQeLsHbs80gRlgHvlxFPwUTx5Mxd2h82g7
-         oECijmSqC3GSDtryxc7GpERC9KrInGpZ3HsVs0PXvtTk8iHXAKOYwzU0CDE3wCspPQYP
-         TxGiXvm8MrQdNo06u/0Y70Nfg2aR/VEgCt6RFZmHX5vmPxoaqUXTzroicF3PnEVo6HCP
-         1NqLYkjkPsZwzJsPlRLyfbAlSGWGGPexSb3AjR8RwRE7Uv3oipTtGdGtEGSkIOQPdaX+
-         iMMpsBjxPCx6VGtI4+i1NgpH8U7lvV4eRdUTWVYzloeikPB+VZ4JSc1gyHNblRazzxXv
-         3/mA==
-X-Gm-Message-State: ACrzQf0UcE3aXqp4+arLIytT9jJpWJ80Mlmkvn6KIlyPL/8ESf/5wQge
-	4tUBdC80eBY6vswovVQHpPfjFS4Y4Ih/lw==
-X-Google-Smtp-Source: AMsMyM4LkNWf53x01q3APU49cFFXV1xvoXirVo9KBLZkAR/p81/t2i0X2H/kFt3elzdzBBERq1kt2g==
-X-Received: by 2002:ac2:4a76:0:b0:4a2:2210:f169 with SMTP id q22-20020ac24a76000000b004a22210f169mr892433lfp.317.1668029339319;
-        Wed, 09 Nov 2022 13:28:59 -0800 (PST)
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com. [209.85.167.53])
-        by smtp.gmail.com with ESMTPSA id bd17-20020a05651c169100b0027711348b33sm2353243ljb.139.2022.11.09.13.28.58
-        for <iwd@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Nov 2022 13:28:58 -0800 (PST)
-Received: by mail-lf1-f53.google.com with SMTP id j16so27973124lfe.12
-        for <iwd@lists.linux.dev>; Wed, 09 Nov 2022 13:28:58 -0800 (PST)
-X-Received: by 2002:ac2:5107:0:b0:4b2:3b2:555e with SMTP id
- q7-20020ac25107000000b004b203b2555emr7781557lfb.429.1668029338155; Wed, 09
- Nov 2022 13:28:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31F4362
+	for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 03:18:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1668050309; bh=Q/CBIk/TKoeRMaxdgUdr/oUQf6UILS9a3b/g4LwX1V8=;
+	h=X-UI-Sender-Class:From:To:Subject:Date:In-Reply-To:References;
+	b=tG1sAVe6uoqKwHAJQiXUs+Cxo/mS/5bQu0GfVl97qLhLgAVyI659Hy5hXr0sPC/nQ
+	 6DBqTFSP+skGK8rzFMxQIoR0S9k1wLrdIsMKMZBNAiWuv30p1z2XLfxF4aMA/b+kCu
+	 BCjJiDseHHFoS+1aVpDBIJbNR3o6eqn5GELxRAvM0oWysKEwkK8OPdAh6pMVeL3FWF
+	 S3JXyRofS/9oYn5JDs5r9sZkYuCeofvkQzmNHUl8w9joCCbohJ9sa6o8X5HJeyZjba
+	 /mjKP2Iy6SA1vCvHJlQXdlwVtoQhU4zDwSxti3d6qVfwyIDTqkBnNDXGabDUHHKw1p
+	 2N++V4GfnRaTg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from mmm.localnet ([2.205.106.179]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MSqXM-1oPhrm3bva-00UVnE; Thu, 10
+ Nov 2022 04:18:28 +0100
+From: Patrick =?ISO-8859-1?Q?H=E4cker?= <pat_h@web.de>
+To: iwd@lists.linux.dev, Denis Kenzior <denkenz@gmail.com>
+Subject: Re: Sometimes RxBitrate of 1000 Kbit/s
+Date: Thu, 10 Nov 2022 04:18:14 +0100
+Message-ID: <2259038.ElGaqSPkdT@mmm>
+In-Reply-To: <4d50da71-40e3-f888-be79-b52fa8208e88@gmail.com>
+References: <5893463.lOV4Wx5bFT@mmm> <4d50da71-40e3-f888-be79-b52fa8208e88@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221109170438.535300-1-andrew.zaborowski@intel.com>
- <20221109170438.535300-2-andrew.zaborowski@intel.com> <e7035cb1-17d0-22e5-3bfa-4e6515e2b4c9@gmail.com>
-In-Reply-To: <e7035cb1-17d0-22e5-3bfa-4e6515e2b4c9@gmail.com>
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Date: Wed, 9 Nov 2022 22:28:45 +0100
-X-Gmail-Original-Message-ID: <CAOq732Lhjow_iZyNHs9bn+j9q_yHsZDP7qX37pgWrzsUs+y=AA@mail.gmail.com>
-Message-ID: <CAOq732Lhjow_iZyNHs9bn+j9q_yHsZDP7qX37pgWrzsUs+y=AA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] eap-tls: Add session caching
-To: Denis Kenzior <denkenz@gmail.com>
-Cc: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="nextPart4754146.GXAFRqVoOG"; micalg="pgp-sha512"; protocol="application/pgp-signature"
+X-Provags-ID: V03:K1:r1rCgiEZ/0QNM9f+p+KTNCppXfmKskdurdhfY8JH0nyZ3+nJEBs
+ hvq4e1iGgExSVZ6To7+8ihOBpDSDZpAWVtcafqSe2DuL59NCPeoNnXyyNoeyddKByVIm3X4
+ BuVI9FBWJRK4Okz7qh0RTRwp+DJLdjlBHqcAlwePCPCVFHVivQFuLb1UK8zqlCpgluSyh98
+ m5Mhpb/RSMcKci6gipBoQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:UzSb9CVllI0=;mNFJeyWNYvueYFaUs6WbFp4SzC6
+ s/SZFTEBnV8M538U/bnvrFqGRvxjUIAAhayBFN97ce3DN6YJ4A3X4rcyOvbVw3tLBA2DoRX6e
+ gcA1X2f1HP+XjKAn3b1yjh7l9kgVoAPtgElh7S4EYMlQBZpMBqaEPv+OaaYYuAEzXAh4HL22s
+ KXYz6Xth+5JTJr5o6iDgmaGwcasvgd8VE04vIhzg/Z/sGs6PeZ50pMBv0odPUtbXVxLkot3fM
+ X/ErfeJ2c7VvUsOU+kIh9d0AMqUuO3drojJrrNi/PxzTbuG7vZ6i2qJ/rS5/LlNJ2d2wBbV9X
+ +9hH4w0kCuf0/Rlq6D9Tp0FOLmAjPNE1TfYwdiHn1EfBuUfiPI8qP8m8fP6OnSdNEoFP2kgP6
+ OHJlc9YOvkcOysPZW+AOfPHf0dRzd5y/A8op9w6Z2uBggW/+YxZjbBsXbZqk1JsV5Kt/d4G3F
+ WjgQhGC2EKyM13K+mgcdidhi418OJ3Q4Vw16OJKj72XGex7FwzZqcf0lp8ePjfaF1RtdXsr37
+ PrWIkV4ZKsEVR9TdOvNU13/Ng5vTzyD1HO2Z9WMIrQpooZNovbibTtZMH1Tw/ydJNDIILt6TI
+ XIx7QZzqAOME6EZ+PKrWDTjIBbQeiOgR7RmLpwmZozZfsf0i1SPGz41wsmu4QUSzqZBR6Zm+8
+ 5JQVes1LA3qqz82d/V3OIo5vj2DrGRnpXstJoTY8lAXDm0zES7s4U/pOMKUDKK15OcABDwh2H
+ k/0Xurd3QANfslw8XBQfPD0AEMC9Go8oh6N4u6RoPiPg8w6OkrgZcJqkBAxzW4Z5D3BB3Wp89
+ CD3yNVRzGONcHu9ANtCiSnLGuI12cBcK53pYZk8nofbfxjJY4IzD76sE0KeSPxptmR+Wab46m
+ w5aooIpTkpkSA+14qzlJWEqTz8essSa5nBWeqSrSMgrTYHY/9zhP9BnJTbUgU2/Y47z4CF57e
+ BjNQT/yQl1S5fT7iFgszFvgqH2A=
+
+--nextPart4754146.GXAFRqVoOG
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
+From: Patrick =?ISO-8859-1?Q?H=E4cker?= <pat_h@web.de>
+To: iwd@lists.linux.dev, Denis Kenzior <denkenz@gmail.com>
+Subject: Re: Sometimes RxBitrate of 1000 Kbit/s
+Date: Thu, 10 Nov 2022 04:18:14 +0100
+Message-ID: <2259038.ElGaqSPkdT@mmm>
+In-Reply-To: <4d50da71-40e3-f888-be79-b52fa8208e88@gmail.com>
+MIME-Version: 1.0
 
 Hi Denis,
 
-On Wed, 9 Nov 2022 at 21:45, Denis Kenzior <denkenz@gmail.com> wrote:
-> On 11/9/22 11:04, Andrew Zaborowski wrote:
-> > Use l_tls_set_session_cache() to enable session cache/resume in the
-> > TLS-based EAP methods.  Sessions for all 802.1x networks are stored in
-> > one file, /var/lib/iwd/.tls-session-cache, indexed by the EAP method
-> > name and authenticator's MAC/BSSID (handshake->aa) because that's
-> > ultimately what identifies the authenticator which will usually be the
-> > TLS server as also.  We may want to add the SSID to the index.  Multiple
-> > BSSes and even multiple ESSes (SSIDs) may be backed by a single
-> > authentication server but it's hard for us to know that.
->
-> But isn't the TLS session ultimately out to the RADIUS server?  So wouldn't the
-> session id be identical between the entire ESS/SSID?
+> iwd doesn't do anything on sleep (it isn't even aware of sleep).  So it =
+is
+> up to the kernel driver to do the right thing.  Maybe it isn't?  You'll
+> have to ask the kernel / driver / firmware people for your hardware.
+thanks a lot for the answer. I'll contact the kernel / driver / firmware p=
+eople
+for my hardware.
 
-So like I said it may be but we can't know this.  There may be no
-RADIUS server: looking at 802.1x everytime it mentions RADIUS it's an
-"example" AAA and also mentions Diameter.  But there may be no central
-AAA server in the first place.
+> Some network managers (like NM) will explicitly IFDOWN wireless interfac=
+es
+> on suspend and bring them up on resume.  This isn't cost free and we'd
+> rather not do this.
+Would it make sense to do this optionally if a new config option were
+explicitly set? Or do you think this is the wrong layer or wrong approach =
+to
+do so?
 
-For example 6.3.1 says: "The Authenticator and an Authentication
-Server can be co-located within the same system, allowing that system
-to perform the authentication function without the need for
-communication with an external server. However most port-based network
-access control applications use a separate Authentication Server, to
-allow centralized administration (...) throughout a network.", similar
-wording in other places.
+> You can also try to run run iwmon in order to capture what is happening =
+on
+> the nl80211 API level when entering / leaving suspend.  The driver peopl=
+e
+> might be interested in this information.
+I was monitoring with iwmon for the last days whenever the computer was in
+use, but so far the problem did not occur again (it occurs during normal
+operation, I just have the feeling that the probability is highest some
+minutes after waking up from suspend).
 
-And then multiple ESSes (different SSIDs) can use the same AAA but
-it's the same situation because we can't know for sure (unless the
-BSSID is the same)
+The only thing I got was a segfault from iwmon once, so it's now running w=
+ith
+valgrind. This is, however, probably an unrelated issue, if it should repe=
+at
+at all.
 
-I think indexing by BSSID should work well but can also change this to
-use just the SSID, or both.
+Thanks again
+Patrick
 
-> I also don't see the need
-> to store the EAP type here as well.
 
-Ok.
+--nextPart4754146.GXAFRqVoOG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
 
-> We can't have SSIDs with multiple EAP types.
+-----BEGIN PGP SIGNATURE-----
 
-I think some of the eduroam networks do support fallback EAP types but
-I guess the TLS cache may be independent of the EAP type.
+iQIzBAABCgAdFiEE8JojVI+cFX1k1E7YHGgu1+TJBeAFAmNsbXYACgkQHGgu1+TJ
+BeCK2Q/8C05/dI9+8stzD4q8QofjM67U0dW0Ny2BBpAVf/eGCreqjFGOXpVn8cfj
+937PPo/l5pd6VBVHFecmh9IJByrCwFP55xptVCZuV/DirUFsHXqTehYIiTQ5EQNl
+XdQ6kNo2zinYu4Xb+BaqOCGfQS9q2o3xmVK/5feYUkNkEfBNPuq0TdOTwf68AdDi
+FhvgwfaDZTIbNpj1mS9/oNiJ+F/fHewbSUf5J/WQJDi21yvY147SykYAmfvRneX0
+bqasiIMt5xgS5VaB2Rt/J2aQaWFSZcT7hdZMRXPNXLNXS7aPahTT1LNV4qlRPKbn
++T12EwBREFT3/TgS3uihCsZjgD/LEvv4pyS+pQ4KLAp6vX3w4kV/J5G+GCz9Z5hS
+jWqVTJxBnCwr/9lS2ZHA5y9mN52b17IMHZL0tUuBweVZ9D5ucg38zSF5YvujTrGK
+Vsux9xUOT+YNQ+NsNSZ8J7X9nxmD84uziI6JL0j4LVc3U1bM4jF5uUdCBq4QzOWQ
+eET3bG6eJHTGM+dhfcgAzrL7IBHTylu/gzBzSfMZmT4cxYtknmUvCripdcRHFOlv
+7yZgzDaM2KuvzmAYyb4FpJmmAYdTOPcaKh13BvaUcFBKQ6scCwIl5scRLUuRSSXS
+3EyZO+fI0LRc+HhHaagW1wyZTyhJZiHyeSE9DGaQFDHdUUfsAIs=
+=k4UM
+-----END PGP SIGNATURE-----
 
->
-> This does however bring up another point.  Shouldn't you clear out the cache
-> when a network is forgotten?
+--nextPart4754146.GXAFRqVoOG--
 
-Good point, if we include the SSID as the (or one of) primary keys we
-can drop entries related to that SSID.  Or we could expire old entries
-with time.
 
-> In which case, how do you reload the cache in the
-> EAP module?
 
-We don't need to notify the l_tls instances about the change.  They
-share one l_settings object but they only look at it at one time in
-the handshake and don't assume that the cache is unchanged between
-handshakes.
-
->
-> >
-> > eap_{get,set}_peer_id() API is added for eapol to set the identifier of
-> > the authenticator (or the supplicant if we're the authenticator, if
-> > there's ever a use case for that).
->
-> Okay
->
-> >
-> > eap-tls-common.c can't call storage_tls_session_cache_{load,sync}()
-> > directly because it's linked into ead and some unit tests without
-> > storage.c, so station.c sets pointers to the load & sync functions using
-> > the new eap_tls_set_session_cache_ops().
->
-> ead should probably start using storage.c anyway since that does profile
-> encryption and we ultimately want that inside ead as well.  But we can solve
-> this later.
->
-> > ---
-> >   src/eap-tls-common.c | 52 ++++++++++++++++++++++++++++++++++++++++++++
-> >   src/eap-tls-common.h |  6 +++++
-> >   src/eap.c            | 13 +++++++++++
-> >   src/eap.h            |  3 +++
-> >   src/eapol.c          |  4 ++++
-> >   src/station.c        |  6 +++++
-> >   6 files changed, 84 insertions(+)
-> >
->
-> <snip>
->
-> > @@ -633,6 +645,26 @@ static bool eap_tls_tunnel_init(struct eap_state *eap)
-> >       if (eap_tls->domain_mask)
-> >               l_tls_set_domain_mask(eap_tls->tunnel, eap_tls->domain_mask);
-> >
-> > +     if (!eap_tls_session_cache_load)
-> > +             goto start;
-> > +
-> > +     if (!eap_tls_session_cache) {
-> > +             eap_tls_session_cache = eap_tls_session_cache_load();
-> > +
-> > +             if (!eap_tls_session_cache) {
-> > +                     eap_tls_session_cache = l_settings_new();
-> > +                     l_debug("No session cache loaded, starting with an "
-> > +                             "empty cache");
-> > +             }
->
-> Can we run into a situation where we have two TLS sessions running with the same
-> cache entry and it is invalidated somehow?  Do we need to notify the other TLS
-> sessions somehow?
->
-> Perhaps if we're running a multi WLAN setup and both are connected to the same SSID?
-
-This should be fine, once a new session is ready it's immediately
-added to the cache and other instances can resume the same session
-even while it's active.  The spec says if the session is being
-removed, active instances that use it can keep going, only no new
-resumptions can happen.
-
-Best regards
