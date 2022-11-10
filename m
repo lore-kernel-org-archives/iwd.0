@@ -1,166 +1,163 @@
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C562625
-	for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 09:21:00 +0000 (UTC)
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-13bef14ea06so1564572fac.3
-        for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 01:21:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615572F23
+	for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 15:18:43 +0000 (UTC)
+Received: by mail-oi1-f174.google.com with SMTP id n205so2142749oib.1
+        for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 07:18:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iorv7NL5kgDpmhiS/KJus/gI0Bua9EVgA/KEruBzYf4=;
-        b=QQrSVpCxbCKfKQsCgWCtu5EN2mD9SH+ouC3ZrBJYsGVcVtTIw5F20K3fXpGVGL651L
-         7j+bsB87LMU36FGvAZXv7oYEXc4vsM5weUjesMiDztVk515XBXG4u2cNj7yImx0eTDTJ
-         HVvyhkeoBMwwCh2W5J9NOy2dENYO95xab2rbA3/wUZkpWLO6bofWktjoUiJAPBBKyHAs
-         7LHCYlDr/BTUz6gI5tf1LdmBnhiWDvBNrtwzWb5acdhAKnzbpLjaGepOFn0+8+yrYTtr
-         IoS1Czkcjie3aw3ilg2cX00izfVn9lEQevAhw3QNhRUbivR+wpkS6Wn0bTDv3oY8sk5C
-         alWA==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QD7m/YkdNViG79lyn2X/SRFUYFZml3ei7lvutyVr1iY=;
+        b=EEGZrENNeOGDon/mBOXCDLImSfBI9ZKoJXw8+HeRI/cg5P7P75F8mTLfhKrc2uzZlm
+         eb/T2Eo7orKm5VMbADOKhZqTFRQqj242FiqlhKlftZBLZG9RSC29TIZ0sIcxokbsVrrD
+         h+wzGuGWeHW3cYH3z92xCmBRY2ob21biY1Qwj33A37vtXcXuT73U6Oi69yFv8qlp8/h5
+         ZfnSsPYDDVpY/ykjc/6oeQqD/OAFfnx6ylj1zyWVfnlk788nUSVDd1El4uf6j5TK7LjZ
+         g5XI0KzwyB2Sf78BwXacGo33AOguHJCVy2Dnq30FWE19jb6LyU61CFuaUR4lo9+j+Tfo
+         hbkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iorv7NL5kgDpmhiS/KJus/gI0Bua9EVgA/KEruBzYf4=;
-        b=Lgn80UkWFMmJccELUQoASo7PnhSg2rRv7sk7F+k7IVAk5EvOKcpFoldvqMBNmV6Y3W
-         LSdE4IlH/G8licw3/JgzsppdenIkurKPYzsCOyj7QIBpTJiVnqY5oPFGGmiebSAFObe1
-         8T9kOctfh6KchCFAXzVN6RwhPWG5VKNgruPzvFPfig/MdT6CPdqil+XRDvhsDxTN7qDS
-         CtUet0925BbLFQh5bFrL6MRMMzMSIOtiDNkoYcnWL4aZSN6jUZkx91Lq0y1rY0rIbRU6
-         dfx50rjNG9l+RGEb3p6uWPMznNE5N9puPT1OpqW+KuiecA7nLOSidy7DJdQa0OK64rvM
-         DsPg==
-X-Gm-Message-State: ACrzQf2Nx1XvPqXVxhshG1lEM7I53IL//LzWJ8K2S0KFdQKcVNVv8073
-	ORluyJxfmm4LKlre9+rCuLoQvwd4z7u/vTbwq+KbH4pcDDk=
-X-Google-Smtp-Source: AMsMyM78b552twwh1PxfUpzVUzSFApMvxz5D8s2oyY0VY25jsQXVFnsLgkTuzYBLZJqVK8X+IPt7nwK0Ms80sMHneB0=
-X-Received: by 2002:a05:6870:5d91:b0:132:c8d7:c29f with SMTP id
- fu17-20020a0568705d9100b00132c8d7c29fmr1317601oab.7.1668072059151; Thu, 10
- Nov 2022 01:20:59 -0800 (PST)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QD7m/YkdNViG79lyn2X/SRFUYFZml3ei7lvutyVr1iY=;
+        b=m4eS9DLNouCJ9vbK9E5okwHGa/BaTouLSbYfRculkeMXIrDEI5uxFcWLb3DjyUHwlJ
+         UVLQ2vxS7NWukJoILBeEctwmqDtK49e+D9+zIKrfC31eeClGXlNqT5Gg+baFKN7RYH2B
+         3Wb7+1v2mH0XITpeqobCLg2d81itJf2fqb7zfzow004mtoUKVyT8Bm5NJ9KNvM7W3/2v
+         ylKqJaN6jXyNC0Y1pgxnIrJmzzv7UaEDJdpewI0Sd5yusayJvLADZ/uVYynWB0QFoSkZ
+         nFjMqWqlEwjcrbYSyMWiJyUqB+SdJqovQLcektkve1tagheVql30y99LdHp3SBzyE3aB
+         YJeA==
+X-Gm-Message-State: ACrzQf2cs1GkYU4ZSgPoeZMnBrGyPyZ23CeLNeig8oBb80RRvHlwJqyX
+	tQEzqjTxYTrpXByj1YTO72m7rpvn8v4=
+X-Google-Smtp-Source: AMsMyM4JvnV4Id4pcRw/aHOZ+rIC1ItvReC+bkdZElhmafXNpcKm5dJZZBSQa0EW9wN207PDArVEBQ==
+X-Received: by 2002:aca:1807:0:b0:35a:7a8:3a26 with SMTP id h7-20020aca1807000000b0035a07a83a26mr1512374oih.27.1668093522292;
+        Thu, 10 Nov 2022 07:18:42 -0800 (PST)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id be17-20020a056808219100b00353ef11d6c9sm5180669oib.19.2022.11.10.07.18.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Nov 2022 07:18:41 -0800 (PST)
+Message-ID: <7931ee49-c4fe-51b2-81c0-afc473c19fda@gmail.com>
+Date: Thu, 10 Nov 2022 09:18:40 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CACsRnHU1WkovQrSUFH91haGf7rJJppfBwCxkVT9eXejVk_CJ1w@mail.gmail.com>
- <e5a311c2-eb02-d31a-f9cf-b8101089018b@gmail.com>
-In-Reply-To: <e5a311c2-eb02-d31a-f9cf-b8101089018b@gmail.com>
-From: Michael Johnson <mjohnson459@gmail.com>
-Date: Thu, 10 Nov 2022 09:20:48 +0000
-Message-ID: <CACsRnHWoXyrmxvAaQg-5n3GOpokdk67rtDTuv=c7cTV8mgvazw@mail.gmail.com>
-Subject: Re: Permanent disconnect when deauthenticated during a roam
-To: Denis Kenzior <denkenz@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 2/2] eap-tls: Add session caching
+Content-Language: en-US
+To: Andrew Zaborowski <andrew.zaborowski@intel.com>
 Cc: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+References: <20221109170438.535300-1-andrew.zaborowski@intel.com>
+ <20221109170438.535300-2-andrew.zaborowski@intel.com>
+ <e7035cb1-17d0-22e5-3bfa-4e6515e2b4c9@gmail.com>
+ <CAOq732Lhjow_iZyNHs9bn+j9q_yHsZDP7qX37pgWrzsUs+y=AA@mail.gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <CAOq732Lhjow_iZyNHs9bn+j9q_yHsZDP7qX37pgWrzsUs+y=AA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thanks Denis,
+Hi Andrew,
 
-I'll give the patch a try. When you specify 1.30 does that mean this
-isn't likely to have an effect on 1.28?
+>> But isn't the TLS session ultimately out to the RADIUS server?  So wouldn't the
+>> session id be identical between the entire ESS/SSID?
+> 
+> So like I said it may be but we can't know this.  There may be no
+> RADIUS server: looking at 802.1x everytime it mentions RADIUS it's an
+> "example" AAA and also mentions Diameter.  But there may be no central
+> AAA server in the first place.
+> 
+> For example 6.3.1 says: "The Authenticator and an Authentication
+> Server can be co-located within the same system, allowing that system
+> to perform the authentication function without the need for
+> communication with an external server. However most port-based network
+> access control applications use a separate Authentication Server, to
+> allow centralized administration (...) throughout a network.", similar
+> wording in other places.
+> 
 
-Michael
+Right.  A centralized RADIUS server is the general case.
 
-On Wed, 9 Nov 2022 at 18:48, Denis Kenzior <denkenz@gmail.com> wrote:
->
-> Hi Michael,
->
-> On 11/9/22 10:42, Michael Johnson wrote:
-> > Hey all,
-> >
-> > I've just had an issue with a client being permanently disconnected
-> > after a failed roam. iwd detects the disconnect and prints a message
-> > but doesn't seem to attempt to reconnect again. I don't see anything
-> > about blacklists mentioned either.
-> > Any idea why this isn't attempting to reconnect?
->
-> Hmm, see if commit 8758cc89487b3 fixes this:
->
-> https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/src?id=8758cc89487b3304e4b96179a464fff3201e690d
->
-> >
-> > ```
-> > # Normal roam
-> > Nov 08 17:59:41.880934 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_authenticate_event()
-> > Nov 08 17:59:41.881248 p3-3478 kernel: wlan0: send auth to
-> > ac:3a:67:5d:8b:2c (try 1/3)
-> > Nov 08 17:59:41.881324 p3-3478 kernel: wlan0: authenticated
-> > Nov 08 17:59:41.881374 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_get_oci_cb() Obtained OCI: freq: 5560, width: 1,
-> > center1: 5560, center2: 0
-> > Nov 08 17:59:41.889035 p3-3478 kernel: wlan0: associate with
-> > ac:3a:67:5d:8b:2c (try 1/3)
-> > Nov 08 17:59:41.889232 p3-3478 kernel: wlan0: RX ReassocResp from
-> > ac:3a:67:5d:8b:2c (capab=0x1111 status=0 aid=10)
-> > Nov 08 17:59:41.892719 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_mlme_notify() MLME notification Associate(38)
-> > Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_associate_event()
-> > Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_set_gtk() 5
-> > Nov 08 17:59:41.892719 p3-3478 iwd[426]:
-> > src/station.c:station_handshake_event() Setting keys
-> > Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_set_tk() 5
-> > Nov 08 17:59:41.892719 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_mlme_notify() MLME notification Connect(46)
-> > Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_connect_event()
-> > Nov 08 17:59:41.893224 p3-3478 kernel: wlan0: associated
-> > Nov 08 17:59:41.893271 p3-3478 kernel: ath: EEPROM regdomain: 0x8348
-> > Nov 08 17:59:41.893307 p3-3478 kernel: ath: EEPROM indicates we should
-> > expect a country code
-> > Nov 08 17:59:41.893337 p3-3478 kernel: ath: doing EEPROM
-> > country->regdmn map search
-> > Nov 08 17:59:41.893363 p3-3478 kernel: ath: country maps to regdmn code: 0x3a
-> > Nov 08 17:59:41.893390 p3-3478 kernel: ath: Country alpha2 being used: US
-> > Nov 08 17:59:41.893416 p3-3478 kernel: ath: Regpair used: 0x3a
-> > Nov 08 17:59:41.893457 p3-3478 kernel: ath: regdomain 0x8348
-> > dynamically updated by country element
-> > Nov 08 17:59:41.893483 p3-3478 kernel: wlan0: deauthenticated from
-> > ac:3a:67:5d:8b:2c (Reason: 34=DISASSOC_LOW_ACK)
->
-> Looks like we deauthenticate very shortly after associated where the roam is
-> still in progress.
->
-> > Nov 08 17:59:41.895990 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-> > Nov 08 17:59:41.896099 p3-3478 iwd[426]:
-> > src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
-> > Nov 08 17:59:41.896099 p3-3478 iwd[426]:
-> > src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for
-> > (global) is US
-> > Nov 08 17:59:41.896099 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_deauthenticate_event()
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]: src/netdev.c:netdev_disconnect_event()
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]: Received Deauthentication
-> > event, reason: 34, from_ap: true
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-> > src/wiphy.c:wiphy_radio_work_done() Work item 493 done
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-> > src/station.c:station_disconnect_event() 5
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]: Unexpected disconnect event
->
-> And we erroneously think that such an event can't happen (in 1.30).
->
-> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-> > Nov 08 17:59:41.896867 p3-3478 iwd[426]:
-> > src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
-> > Nov 08 17:59:41.896867 p3-3478 iwd[426]:
-> > src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for
-> > (global) is XX
-> > Nov 08 17:59:42.893123 p3-3478 iwd[426]:
-> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-> > # Doesn't reconnect and needs to be rebooted ...
-> > ```
-> >
->
-> Regards,
-> -Denis
+> And then multiple ESSes (different SSIDs) can use the same AAA but
+> it's the same situation because we can't know for sure (unless the
+> BSSID is the same)
+
+Sure, but why even bring this up?  We can't know whether different SSIDs would 
+use the same RADIUS server.  But it is pretty much expected that a within an 
+ESS, the same RADIUS server is used.
+
+> 
+> I think indexing by BSSID should work well but can also change this to
+> use just the SSID, or both.
+
+Ultimately I don't see why we would want to limit this to just the BSSID?  Lets 
+say you logged into a WPA-Enterprise network on 'AP A'.  You suspend your laptop 
+and move within the building.  Resume and re-connect to 'AP B'.  There is a high 
+likelihood that AP A & B share the RADIUS server and thus the TLS session.
+
+But even if 'AP B' doesn't share the TLS session, what is the harm in trying? 
+Worst case the TLS server will reject our session ID and we'd have to start from 
+scratch.
+
+So if we index by
+	a) SSID -> there's a good chance that we can reuse the session across routers, 
+even if that fails in some cases
+	b) SSID + BSS -> We never try the session ID unless we have been connected to 
+the same BSS before.  In which case there's no advantage over PMK caching?
+
+<snip>
+
+>> We can't have SSIDs with multiple EAP types.
+> 
+> I think some of the eduroam networks do support fallback EAP types but
+> I guess the TLS cache may be independent of the EAP type.
+> 
+
+We also can't use multiple method types within our profile either.
+
+>>
+>> This does however bring up another point.  Shouldn't you clear out the cache
+>> when a network is forgotten?
+> 
+> Good point, if we include the SSID as the (or one of) primary keys we
+> can drop entries related to that SSID.  Or we could expire old entries
+> with time.
+
+I would think we need to explicitly drop anything related to the SSID of the 
+network we just removed via KnownNetworks.Forget()
+
+> 
+>> In which case, how do you reload the cache in the
+>> EAP module?
+> 
+> We don't need to notify the l_tls instances about the change.  They
+> share one l_settings object but they only look at it at one time in
+> the handshake and don't assume that the cache is unchanged between
+> handshakes.
+
+Yes, but how does eap remove the relevant entries from the cache?
+
+<snip>
+
+>>
+>> Can we run into a situation where we have two TLS sessions running with the same
+>> cache entry and it is invalidated somehow?  Do we need to notify the other TLS
+>> sessions somehow?
+>>
+>> Perhaps if we're running a multi WLAN setup and both are connected to the same SSID?
+> 
+> This should be fine, once a new session is ready it's immediately
+> added to the cache and other instances can resume the same session
+> even while it's active.  The spec says if the session is being
+> removed, active instances that use it can keep going, only no new
+> resumptions can happen.
+> 
+
+Ah, nice.  That makes this not a concern then.
+
+Regards,
+-Denis
