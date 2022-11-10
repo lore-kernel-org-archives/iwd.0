@@ -1,167 +1,121 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44291A612
-	for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 18:15:31 +0000 (UTC)
-Received: by mail-lf1-f49.google.com with SMTP id p8so4737669lfu.11
-        for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 10:15:31 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2643D382
+	for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 18:31:09 +0000 (UTC)
+Received: by mail-oi1-f178.google.com with SMTP id q186so2680464oia.9
+        for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 10:31:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zwIZdD+LKB6t4VL09YNcuJcPBOUzxcQfgO/4Q1d5euE=;
+        b=kSqX4/9pJl4sm+U5myNzNw7nmctHC3WLVwEyQCktmaUtNC9o4ahz7EjtC4kQz8lV5u
+         IGQFUplMa3eILsL41VCw3gh8VcnnX2q3fqMdZ/0l2kBavbZvxeJtBloVmTR15cLvvrzT
+         q0UpCKBSxMgWIx4PhOb2O84nDFz3zG7JzZmiejxHyxiXCeinV+FJfEBi0OuGZCwQX7l4
+         yvj578GmoeK2LrVD9M7FUl5i2q+bj5qW7CTtPyokF/bg7801PHz0wCTQ1uen3nnr/qF0
+         88Z5bVxJ7hB75C2032bSlVIBLSTIP0l362XI9VPBx2k+VbRNZmPd5m+zCFfeu96QraUF
+         14fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jEahLaAjZK5TGFw3EfAKCicB9ued91zDzXrzjvSk8VU=;
-        b=tGbZtnvuVTTF3lBJfuwl4pfvkehHbr+uy5tjs127HywG13yssUmB+wduicNbfxJtP3
-         bq9cRvR9MZTvsOigFB+HBp8D6RoG7r+AXWuUfTTtpHPwSKjrzsawCxhsvDqknPHl2kTJ
-         YnY1IuW8EWx0GGQyaKtN7FcbWumjvUvvdfyNAOkx5y8OrRdWJ7jAq6/nWwkz5wNc2lUR
-         PtziBj8bbfeWdFQIRKCIogyxeZj0tc0NaTCGCxXGsdcNEJxGDpv6d9yNG43y0e6DuZzz
-         QTIdF6SBMhm6Bq6qHqoQRJ5nSSuaCEnWO8GB6KKQaIyUGWl4j1ylZ4ZIzXzZzB0VtffV
-         9a5Q==
-X-Gm-Message-State: ACrzQf0Q0FOua7bJt8EJz9lRTpsYmZHmovhBr81Auci/otqEgBE0DU/X
-	E/XlQgMKEFJNlcu4v+8NQhgLsAsBuqJ4Bg==
-X-Google-Smtp-Source: AMsMyM5mmC0Q1HrZMa0+LVUX/Qi4aBacSiZwtOvY9ouTys2Kv34uOiE6qL28RKFDkqGBzVd9kc0ykw==
-X-Received: by 2002:a19:6a13:0:b0:4b1:753b:e66f with SMTP id u19-20020a196a13000000b004b1753be66fmr1748761lfu.276.1668104129336;
-        Thu, 10 Nov 2022 10:15:29 -0800 (PST)
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com. [209.85.167.41])
-        by smtp.gmail.com with ESMTPSA id f14-20020ac2508e000000b0049478cc4eb9sm2845214lfm.230.2022.11.10.10.15.27
-        for <iwd@lists.linux.dev>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zwIZdD+LKB6t4VL09YNcuJcPBOUzxcQfgO/4Q1d5euE=;
+        b=aDeJnWaXOX4+f/3FqS4VWc4eIrTHs6XRHTErt/fflB16F9mSMuwwr8g5vwOgXmlO7Q
+         vn+2AE4XcUMbBOw4PrOVgWpylmtW57CQQVWhT1d7znmPV9j53Hgv5S1+JRL9pP/0Sh+7
+         3dZewvAJxVBJXzL5IaoNZHJGaPTThEP95sGwNpjK6MbGJ8eOozbbpyaGTXuc1b3iME1m
+         xZNlR/HWwIsUed7KMovbcW7R84EQYMnkyYSfYeK6d86y8H0D3JdkAFfzQduQcuFjNDtF
+         yEhsCXkk9eBNWNTVC3Ugx6bmGSjE5oyX4BBOxjQtOVmpX6JkIfg+0M6V/PKnr2OmMiGy
+         AfVA==
+X-Gm-Message-State: ACrzQf33eKro6HhxrEeW694KvJ1WDR26xMIFDk39OEa5VRXoNyXfpfXZ
+	2dB13fKXW68Akz7dPwjp9cg=
+X-Google-Smtp-Source: AMsMyM75bnM8vd7yFpE8yzaUysY4Y0/rzRFWofog/4C+SysVQKdCKI15838sRltX9uLsQFgPdUVFeQ==
+X-Received: by 2002:aca:b957:0:b0:354:91e8:6983 with SMTP id j84-20020acab957000000b0035491e86983mr1776742oif.144.1668105068124;
+        Thu, 10 Nov 2022 10:31:08 -0800 (PST)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id s14-20020a4ac80e000000b0049eb2793516sm36989ooq.44.2022.11.10.10.31.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Nov 2022 10:15:28 -0800 (PST)
-Received: by mail-lf1-f41.google.com with SMTP id l12so4771776lfp.6
-        for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 10:15:27 -0800 (PST)
-X-Received: by 2002:ac2:5931:0:b0:4a2:6242:329f with SMTP id
- v17-20020ac25931000000b004a26242329fmr1723352lfi.197.1668104127042; Thu, 10
- Nov 2022 10:15:27 -0800 (PST)
+        Thu, 10 Nov 2022 10:31:07 -0800 (PST)
+Message-ID: <b5873dac-88c7-875d-9388-35d2c8359b68@gmail.com>
+Date: Thu, 10 Nov 2022 12:31:06 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221109170438.535300-1-andrew.zaborowski@intel.com>
- <20221109170438.535300-2-andrew.zaborowski@intel.com> <e7035cb1-17d0-22e5-3bfa-4e6515e2b4c9@gmail.com>
- <CAOq732Lhjow_iZyNHs9bn+j9q_yHsZDP7qX37pgWrzsUs+y=AA@mail.gmail.com> <7931ee49-c4fe-51b2-81c0-afc473c19fda@gmail.com>
-In-Reply-To: <7931ee49-c4fe-51b2-81c0-afc473c19fda@gmail.com>
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Date: Thu, 10 Nov 2022 19:15:14 +0100
-X-Gmail-Original-Message-ID: <CAOq732+gHv3qJfP7=fve0LN1VgH87S7qEyu2Q=NwfYFZggN-ZA@mail.gmail.com>
-Message-ID: <CAOq732+gHv3qJfP7=fve0LN1VgH87S7qEyu2Q=NwfYFZggN-ZA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
 Subject: Re: [PATCH 2/2] eap-tls: Add session caching
-To: Denis Kenzior <denkenz@gmail.com>
+Content-Language: en-US
+To: Andrew Zaborowski <andrew.zaborowski@intel.com>
 Cc: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+References: <20221109170438.535300-1-andrew.zaborowski@intel.com>
+ <20221109170438.535300-2-andrew.zaborowski@intel.com>
+ <e7035cb1-17d0-22e5-3bfa-4e6515e2b4c9@gmail.com>
+ <CAOq732Lhjow_iZyNHs9bn+j9q_yHsZDP7qX37pgWrzsUs+y=AA@mail.gmail.com>
+ <7931ee49-c4fe-51b2-81c0-afc473c19fda@gmail.com>
+ <CAOq732+gHv3qJfP7=fve0LN1VgH87S7qEyu2Q=NwfYFZggN-ZA@mail.gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <CAOq732+gHv3qJfP7=fve0LN1VgH87S7qEyu2Q=NwfYFZggN-ZA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 10 Nov 2022 at 16:18, Denis Kenzior <denkenz@gmail.com> wrote:
-> >> But isn't the TLS session ultimately out to the RADIUS server?  So wouldn't the
-> >> session id be identical between the entire ESS/SSID?
-> >
-> > So like I said it may be but we can't know this.  There may be no
-> > RADIUS server: looking at 802.1x everytime it mentions RADIUS it's an
-> > "example" AAA and also mentions Diameter.  But there may be no central
-> > AAA server in the first place.
-> >
-> > For example 6.3.1 says: "The Authenticator and an Authentication
-> > Server can be co-located within the same system, allowing that system
-> > to perform the authentication function without the need for
-> > communication with an external server. However most port-based network
-> > access control applications use a separate Authentication Server, to
-> > allow centralized administration (...) throughout a network.", similar
-> > wording in other places.
-> >
->
-> Right.  A centralized RADIUS server is the general case.
->
-> > And then multiple ESSes (different SSIDs) can use the same AAA but
-> > it's the same situation because we can't know for sure (unless the
-> > BSSID is the same)
->
-> Sure, but why even bring this up?  We can't know whether different SSIDs would
-> use the same RADIUS server.  But it is pretty much expected that a within an
-> ESS, the same RADIUS server is used.
+Hi Andrew,
 
-I don't have actual statistics but the other case ("co-located AA
-server") also exists so to me this question is similar in that IWD has
-no data to assume either option.
+<snip>
 
-But I'm fine just ignoring the co-located AA case if that's what we want to do.
+>> So if we index by
+>>          a) SSID -> there's a good chance that we can reuse the session across routers,
+>> even if that fails in some cases
+>>          b) SSID + BSS -> We never try the session ID unless we have been connected to
+>> the same BSS before.  In which case there's no advantage over PMK caching?
+> 
+> The flipside of this is:
+>     a) SSID -> since we only store one session so everytime we switch
+> BSSes we overwrite the cached session in the co-located AA case and
+> rarely see the benefit of the cache.
+>     b) BSSID -> we store one session for each BSS and after some number
+> of reconnects every next one is going to be fast.
+> 
 
->
-> >
-> > I think indexing by BSSID should work well but can also change this to
-> > use just the SSID, or both.
->
-> Ultimately I don't see why we would want to limit this to just the BSSID?  Lets
-> say you logged into a WPA-Enterprise network on 'AP A'.  You suspend your laptop
-> and move within the building.  Resume and re-connect to 'AP B'.  There is a high
-> likelihood that AP A & B share the RADIUS server and thus the TLS session.
->
-> But even if 'AP B' doesn't share the TLS session, what is the harm in trying?
-> Worst case the TLS server will reject our session ID and we'd have to start from
-> scratch.
->
-> So if we index by
->         a) SSID -> there's a good chance that we can reuse the session across routers,
-> even if that fails in some cases
->         b) SSID + BSS -> We never try the session ID unless we have been connected to
-> the same BSS before.  In which case there's no advantage over PMK caching?
+So for case b, I would argue PMK caching would be even better since we skip 
+8021x completely.  As I mentioned earlier, I would think that RADIUS server is 
+the 'general' case and we should optimize for that.  Maybe I'm wrong here, but 
+I've never seen a colocated option in any commercial APs.  It is always a RADIUS 
+server.
 
-The flipside of this is:
-   a) SSID -> since we only store one session so everytime we switch
-BSSes we overwrite the cached session in the co-located AA case and
-rarely see the benefit of the cache.
-   b) BSSID -> we store one session for each BSS and after some number
-of reconnects every next one is going to be fast.
+> That said the RFC-recommended session lifetime being only 24h makes
+> this less practical.  Since we can't know how long each server's
+> session lifetime is I wonder if IWD should set it to a higher value in
+> case we're lucky.
 
-That said the RFC-recommended session lifetime being only 24h makes
-this less practical.  Since we can't know how long each server's
-session lifetime is I wonder if IWD should set it to a higher value in
-case we're lucky.
+I'd just default to what the RFC recommends, but maybe we can add something to 
+the profile to make this configurable.
 
->
-> <snip>
->
-> >> We can't have SSIDs with multiple EAP types.
-> >
-> > I think some of the eduroam networks do support fallback EAP types but
-> > I guess the TLS cache may be independent of the EAP type.
-> >
->
-> We also can't use multiple method types within our profile either.
+<snip>
 
-Right, let me remove it from the group name.
+>> I would think we need to explicitly drop anything related to the SSID of the
+>> network we just removed via KnownNetworks.Forget()
+> 
+> Ok.  I don't believe we do this for known frequencies though.
+> 
 
-I put the full method name in there partly to make the contents of the
-file more self explanatory to somebody who happens to open it in vim.
+I think we do?  See known_networks_remove()
 
->
-> >>
-> >> This does however bring up another point.  Shouldn't you clear out the cache
-> >> when a network is forgotten?
-> >
-> > Good point, if we include the SSID as the (or one of) primary keys we
-> > can drop entries related to that SSID.  Or we could expire old entries
-> > with time.
->
-> I would think we need to explicitly drop anything related to the SSID of the
-> network we just removed via KnownNetworks.Forget()
+<snip>
 
-Ok.  I don't believe we do this for known frequencies though.
+>>
+>> Yes, but how does eap remove the relevant entries from the cache?
+> 
+> If we want to do this I'll probably move the cache singleton to
+> knownnetworks.c and drop the relevant group and not notify eap.
+> eap-tls-common.c would use something like
+> known_networks_get_tls_session_cache().
 
->
-> >
-> >> In which case, how do you reload the cache in the
-> >> EAP module?
-> >
-> > We don't need to notify the l_tls instances about the change.  They
-> > share one l_settings object but they only look at it at one time in
-> > the handshake and don't assume that the cache is unchanged between
-> > handshakes.
->
-> Yes, but how does eap remove the relevant entries from the cache?
+That might be the way to go then.
 
-If we want to do this I'll probably move the cache singleton to
-knownnetworks.c and drop the relevant group and not notify eap.
-eap-tls-common.c would use something like
-known_networks_get_tls_session_cache().
-
-Best regards
+Regards,
+-Denis
