@@ -1,129 +1,166 @@
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31F4362
-	for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 03:18:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1668050309; bh=Q/CBIk/TKoeRMaxdgUdr/oUQf6UILS9a3b/g4LwX1V8=;
-	h=X-UI-Sender-Class:From:To:Subject:Date:In-Reply-To:References;
-	b=tG1sAVe6uoqKwHAJQiXUs+Cxo/mS/5bQu0GfVl97qLhLgAVyI659Hy5hXr0sPC/nQ
-	 6DBqTFSP+skGK8rzFMxQIoR0S9k1wLrdIsMKMZBNAiWuv30p1z2XLfxF4aMA/b+kCu
-	 BCjJiDseHHFoS+1aVpDBIJbNR3o6eqn5GELxRAvM0oWysKEwkK8OPdAh6pMVeL3FWF
-	 S3JXyRofS/9oYn5JDs5r9sZkYuCeofvkQzmNHUl8w9joCCbohJ9sa6o8X5HJeyZjba
-	 /mjKP2Iy6SA1vCvHJlQXdlwVtoQhU4zDwSxti3d6qVfwyIDTqkBnNDXGabDUHHKw1p
-	 2N++V4GfnRaTg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from mmm.localnet ([2.205.106.179]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MSqXM-1oPhrm3bva-00UVnE; Thu, 10
- Nov 2022 04:18:28 +0100
-From: Patrick =?ISO-8859-1?Q?H=E4cker?= <pat_h@web.de>
-To: iwd@lists.linux.dev, Denis Kenzior <denkenz@gmail.com>
-Subject: Re: Sometimes RxBitrate of 1000 Kbit/s
-Date: Thu, 10 Nov 2022 04:18:14 +0100
-Message-ID: <2259038.ElGaqSPkdT@mmm>
-In-Reply-To: <4d50da71-40e3-f888-be79-b52fa8208e88@gmail.com>
-References: <5893463.lOV4Wx5bFT@mmm> <4d50da71-40e3-f888-be79-b52fa8208e88@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C562625
+	for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 09:21:00 +0000 (UTC)
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-13bef14ea06so1564572fac.3
+        for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 01:21:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=iorv7NL5kgDpmhiS/KJus/gI0Bua9EVgA/KEruBzYf4=;
+        b=QQrSVpCxbCKfKQsCgWCtu5EN2mD9SH+ouC3ZrBJYsGVcVtTIw5F20K3fXpGVGL651L
+         7j+bsB87LMU36FGvAZXv7oYEXc4vsM5weUjesMiDztVk515XBXG4u2cNj7yImx0eTDTJ
+         HVvyhkeoBMwwCh2W5J9NOy2dENYO95xab2rbA3/wUZkpWLO6bofWktjoUiJAPBBKyHAs
+         7LHCYlDr/BTUz6gI5tf1LdmBnhiWDvBNrtwzWb5acdhAKnzbpLjaGepOFn0+8+yrYTtr
+         IoS1Czkcjie3aw3ilg2cX00izfVn9lEQevAhw3QNhRUbivR+wpkS6Wn0bTDv3oY8sk5C
+         alWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iorv7NL5kgDpmhiS/KJus/gI0Bua9EVgA/KEruBzYf4=;
+        b=Lgn80UkWFMmJccELUQoASo7PnhSg2rRv7sk7F+k7IVAk5EvOKcpFoldvqMBNmV6Y3W
+         LSdE4IlH/G8licw3/JgzsppdenIkurKPYzsCOyj7QIBpTJiVnqY5oPFGGmiebSAFObe1
+         8T9kOctfh6KchCFAXzVN6RwhPWG5VKNgruPzvFPfig/MdT6CPdqil+XRDvhsDxTN7qDS
+         CtUet0925BbLFQh5bFrL6MRMMzMSIOtiDNkoYcnWL4aZSN6jUZkx91Lq0y1rY0rIbRU6
+         dfx50rjNG9l+RGEb3p6uWPMznNE5N9puPT1OpqW+KuiecA7nLOSidy7DJdQa0OK64rvM
+         DsPg==
+X-Gm-Message-State: ACrzQf2Nx1XvPqXVxhshG1lEM7I53IL//LzWJ8K2S0KFdQKcVNVv8073
+	ORluyJxfmm4LKlre9+rCuLoQvwd4z7u/vTbwq+KbH4pcDDk=
+X-Google-Smtp-Source: AMsMyM78b552twwh1PxfUpzVUzSFApMvxz5D8s2oyY0VY25jsQXVFnsLgkTuzYBLZJqVK8X+IPt7nwK0Ms80sMHneB0=
+X-Received: by 2002:a05:6870:5d91:b0:132:c8d7:c29f with SMTP id
+ fu17-20020a0568705d9100b00132c8d7c29fmr1317601oab.7.1668072059151; Thu, 10
+ Nov 2022 01:20:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart4754146.GXAFRqVoOG"; micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-Provags-ID: V03:K1:r1rCgiEZ/0QNM9f+p+KTNCppXfmKskdurdhfY8JH0nyZ3+nJEBs
- hvq4e1iGgExSVZ6To7+8ihOBpDSDZpAWVtcafqSe2DuL59NCPeoNnXyyNoeyddKByVIm3X4
- BuVI9FBWJRK4Okz7qh0RTRwp+DJLdjlBHqcAlwePCPCVFHVivQFuLb1UK8zqlCpgluSyh98
- m5Mhpb/RSMcKci6gipBoQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:UzSb9CVllI0=;mNFJeyWNYvueYFaUs6WbFp4SzC6
- s/SZFTEBnV8M538U/bnvrFqGRvxjUIAAhayBFN97ce3DN6YJ4A3X4rcyOvbVw3tLBA2DoRX6e
- gcA1X2f1HP+XjKAn3b1yjh7l9kgVoAPtgElh7S4EYMlQBZpMBqaEPv+OaaYYuAEzXAh4HL22s
- KXYz6Xth+5JTJr5o6iDgmaGwcasvgd8VE04vIhzg/Z/sGs6PeZ50pMBv0odPUtbXVxLkot3fM
- X/ErfeJ2c7VvUsOU+kIh9d0AMqUuO3drojJrrNi/PxzTbuG7vZ6i2qJ/rS5/LlNJ2d2wBbV9X
- +9hH4w0kCuf0/Rlq6D9Tp0FOLmAjPNE1TfYwdiHn1EfBuUfiPI8qP8m8fP6OnSdNEoFP2kgP6
- OHJlc9YOvkcOysPZW+AOfPHf0dRzd5y/A8op9w6Z2uBggW/+YxZjbBsXbZqk1JsV5Kt/d4G3F
- WjgQhGC2EKyM13K+mgcdidhi418OJ3Q4Vw16OJKj72XGex7FwzZqcf0lp8ePjfaF1RtdXsr37
- PrWIkV4ZKsEVR9TdOvNU13/Ng5vTzyD1HO2Z9WMIrQpooZNovbibTtZMH1Tw/ydJNDIILt6TI
- XIx7QZzqAOME6EZ+PKrWDTjIBbQeiOgR7RmLpwmZozZfsf0i1SPGz41wsmu4QUSzqZBR6Zm+8
- 5JQVes1LA3qqz82d/V3OIo5vj2DrGRnpXstJoTY8lAXDm0zES7s4U/pOMKUDKK15OcABDwh2H
- k/0Xurd3QANfslw8XBQfPD0AEMC9Go8oh6N4u6RoPiPg8w6OkrgZcJqkBAxzW4Z5D3BB3Wp89
- CD3yNVRzGONcHu9ANtCiSnLGuI12cBcK53pYZk8nofbfxjJY4IzD76sE0KeSPxptmR+Wab46m
- w5aooIpTkpkSA+14qzlJWEqTz8essSa5nBWeqSrSMgrTYHY/9zhP9BnJTbUgU2/Y47z4CF57e
- BjNQT/yQl1S5fT7iFgszFvgqH2A=
+References: <CACsRnHU1WkovQrSUFH91haGf7rJJppfBwCxkVT9eXejVk_CJ1w@mail.gmail.com>
+ <e5a311c2-eb02-d31a-f9cf-b8101089018b@gmail.com>
+In-Reply-To: <e5a311c2-eb02-d31a-f9cf-b8101089018b@gmail.com>
+From: Michael Johnson <mjohnson459@gmail.com>
+Date: Thu, 10 Nov 2022 09:20:48 +0000
+Message-ID: <CACsRnHWoXyrmxvAaQg-5n3GOpokdk67rtDTuv=c7cTV8mgvazw@mail.gmail.com>
+Subject: Re: Permanent disconnect when deauthenticated during a roam
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
---nextPart4754146.GXAFRqVoOG
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
-From: Patrick =?ISO-8859-1?Q?H=E4cker?= <pat_h@web.de>
-To: iwd@lists.linux.dev, Denis Kenzior <denkenz@gmail.com>
-Subject: Re: Sometimes RxBitrate of 1000 Kbit/s
-Date: Thu, 10 Nov 2022 04:18:14 +0100
-Message-ID: <2259038.ElGaqSPkdT@mmm>
-In-Reply-To: <4d50da71-40e3-f888-be79-b52fa8208e88@gmail.com>
-MIME-Version: 1.0
+Thanks Denis,
 
-Hi Denis,
+I'll give the patch a try. When you specify 1.30 does that mean this
+isn't likely to have an effect on 1.28?
 
-> iwd doesn't do anything on sleep (it isn't even aware of sleep).  So it =
-is
-> up to the kernel driver to do the right thing.  Maybe it isn't?  You'll
-> have to ask the kernel / driver / firmware people for your hardware.
-thanks a lot for the answer. I'll contact the kernel / driver / firmware p=
-eople
-for my hardware.
+Michael
 
-> Some network managers (like NM) will explicitly IFDOWN wireless interfac=
-es
-> on suspend and bring them up on resume.  This isn't cost free and we'd
-> rather not do this.
-Would it make sense to do this optionally if a new config option were
-explicitly set? Or do you think this is the wrong layer or wrong approach =
-to
-do so?
-
-> You can also try to run run iwmon in order to capture what is happening =
-on
-> the nl80211 API level when entering / leaving suspend.  The driver peopl=
-e
-> might be interested in this information.
-I was monitoring with iwmon for the last days whenever the computer was in
-use, but so far the problem did not occur again (it occurs during normal
-operation, I just have the feeling that the probability is highest some
-minutes after waking up from suspend).
-
-The only thing I got was a segfault from iwmon once, so it's now running w=
-ith
-valgrind. This is, however, probably an unrelated issue, if it should repe=
-at
-at all.
-
-Thanks again
-Patrick
-
-
---nextPart4754146.GXAFRqVoOG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE8JojVI+cFX1k1E7YHGgu1+TJBeAFAmNsbXYACgkQHGgu1+TJ
-BeCK2Q/8C05/dI9+8stzD4q8QofjM67U0dW0Ny2BBpAVf/eGCreqjFGOXpVn8cfj
-937PPo/l5pd6VBVHFecmh9IJByrCwFP55xptVCZuV/DirUFsHXqTehYIiTQ5EQNl
-XdQ6kNo2zinYu4Xb+BaqOCGfQS9q2o3xmVK/5feYUkNkEfBNPuq0TdOTwf68AdDi
-FhvgwfaDZTIbNpj1mS9/oNiJ+F/fHewbSUf5J/WQJDi21yvY147SykYAmfvRneX0
-bqasiIMt5xgS5VaB2Rt/J2aQaWFSZcT7hdZMRXPNXLNXS7aPahTT1LNV4qlRPKbn
-+T12EwBREFT3/TgS3uihCsZjgD/LEvv4pyS+pQ4KLAp6vX3w4kV/J5G+GCz9Z5hS
-jWqVTJxBnCwr/9lS2ZHA5y9mN52b17IMHZL0tUuBweVZ9D5ucg38zSF5YvujTrGK
-Vsux9xUOT+YNQ+NsNSZ8J7X9nxmD84uziI6JL0j4LVc3U1bM4jF5uUdCBq4QzOWQ
-eET3bG6eJHTGM+dhfcgAzrL7IBHTylu/gzBzSfMZmT4cxYtknmUvCripdcRHFOlv
-7yZgzDaM2KuvzmAYyb4FpJmmAYdTOPcaKh13BvaUcFBKQ6scCwIl5scRLUuRSSXS
-3EyZO+fI0LRc+HhHaagW1wyZTyhJZiHyeSE9DGaQFDHdUUfsAIs=
-=k4UM
------END PGP SIGNATURE-----
-
---nextPart4754146.GXAFRqVoOG--
-
-
-
+On Wed, 9 Nov 2022 at 18:48, Denis Kenzior <denkenz@gmail.com> wrote:
+>
+> Hi Michael,
+>
+> On 11/9/22 10:42, Michael Johnson wrote:
+> > Hey all,
+> >
+> > I've just had an issue with a client being permanently disconnected
+> > after a failed roam. iwd detects the disconnect and prints a message
+> > but doesn't seem to attempt to reconnect again. I don't see anything
+> > about blacklists mentioned either.
+> > Any idea why this isn't attempting to reconnect?
+>
+> Hmm, see if commit 8758cc89487b3 fixes this:
+>
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/src?id=8758cc89487b3304e4b96179a464fff3201e690d
+>
+> >
+> > ```
+> > # Normal roam
+> > Nov 08 17:59:41.880934 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_authenticate_event()
+> > Nov 08 17:59:41.881248 p3-3478 kernel: wlan0: send auth to
+> > ac:3a:67:5d:8b:2c (try 1/3)
+> > Nov 08 17:59:41.881324 p3-3478 kernel: wlan0: authenticated
+> > Nov 08 17:59:41.881374 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_get_oci_cb() Obtained OCI: freq: 5560, width: 1,
+> > center1: 5560, center2: 0
+> > Nov 08 17:59:41.889035 p3-3478 kernel: wlan0: associate with
+> > ac:3a:67:5d:8b:2c (try 1/3)
+> > Nov 08 17:59:41.889232 p3-3478 kernel: wlan0: RX ReassocResp from
+> > ac:3a:67:5d:8b:2c (capab=0x1111 status=0 aid=10)
+> > Nov 08 17:59:41.892719 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_mlme_notify() MLME notification Associate(38)
+> > Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_associate_event()
+> > Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_set_gtk() 5
+> > Nov 08 17:59:41.892719 p3-3478 iwd[426]:
+> > src/station.c:station_handshake_event() Setting keys
+> > Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_set_tk() 5
+> > Nov 08 17:59:41.892719 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_mlme_notify() MLME notification Connect(46)
+> > Nov 08 17:59:41.892719 p3-3478 iwd[426]: src/netdev.c:netdev_connect_event()
+> > Nov 08 17:59:41.893224 p3-3478 kernel: wlan0: associated
+> > Nov 08 17:59:41.893271 p3-3478 kernel: ath: EEPROM regdomain: 0x8348
+> > Nov 08 17:59:41.893307 p3-3478 kernel: ath: EEPROM indicates we should
+> > expect a country code
+> > Nov 08 17:59:41.893337 p3-3478 kernel: ath: doing EEPROM
+> > country->regdmn map search
+> > Nov 08 17:59:41.893363 p3-3478 kernel: ath: country maps to regdmn code: 0x3a
+> > Nov 08 17:59:41.893390 p3-3478 kernel: ath: Country alpha2 being used: US
+> > Nov 08 17:59:41.893416 p3-3478 kernel: ath: Regpair used: 0x3a
+> > Nov 08 17:59:41.893457 p3-3478 kernel: ath: regdomain 0x8348
+> > dynamically updated by country element
+> > Nov 08 17:59:41.893483 p3-3478 kernel: wlan0: deauthenticated from
+> > ac:3a:67:5d:8b:2c (Reason: 34=DISASSOC_LOW_ACK)
+>
+> Looks like we deauthenticate very shortly after associated where the roam is
+> still in progress.
+>
+> > Nov 08 17:59:41.895990 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+> > Nov 08 17:59:41.896099 p3-3478 iwd[426]:
+> > src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
+> > Nov 08 17:59:41.896099 p3-3478 iwd[426]:
+> > src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for
+> > (global) is US
+> > Nov 08 17:59:41.896099 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_deauthenticate_event()
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]: src/netdev.c:netdev_disconnect_event()
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]: Received Deauthentication
+> > event, reason: 34, from_ap: true
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+> > src/wiphy.c:wiphy_radio_work_done() Work item 493 done
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+> > src/station.c:station_disconnect_event() 5
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]: Unexpected disconnect event
+>
+> And we erroneously think that such an event can't happen (in 1.30).
+>
+> > Nov 08 17:59:41.896282 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+> > Nov 08 17:59:41.896867 p3-3478 iwd[426]:
+> > src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
+> > Nov 08 17:59:41.896867 p3-3478 iwd[426]:
+> > src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for
+> > (global) is XX
+> > Nov 08 17:59:42.893123 p3-3478 iwd[426]:
+> > src/netdev.c:netdev_link_notify() event 16 on ifindex 5
+> > # Doesn't reconnect and needs to be rebooted ...
+> > ```
+> >
+>
+> Regards,
+> -Denis
