@@ -1,121 +1,285 @@
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2643D382
-	for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 18:31:09 +0000 (UTC)
-Received: by mail-oi1-f178.google.com with SMTP id q186so2680464oia.9
-        for <iwd@lists.linux.dev>; Thu, 10 Nov 2022 10:31:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zwIZdD+LKB6t4VL09YNcuJcPBOUzxcQfgO/4Q1d5euE=;
-        b=kSqX4/9pJl4sm+U5myNzNw7nmctHC3WLVwEyQCktmaUtNC9o4ahz7EjtC4kQz8lV5u
-         IGQFUplMa3eILsL41VCw3gh8VcnnX2q3fqMdZ/0l2kBavbZvxeJtBloVmTR15cLvvrzT
-         q0UpCKBSxMgWIx4PhOb2O84nDFz3zG7JzZmiejxHyxiXCeinV+FJfEBi0OuGZCwQX7l4
-         yvj578GmoeK2LrVD9M7FUl5i2q+bj5qW7CTtPyokF/bg7801PHz0wCTQ1uen3nnr/qF0
-         88Z5bVxJ7hB75C2032bSlVIBLSTIP0l362XI9VPBx2k+VbRNZmPd5m+zCFfeu96QraUF
-         14fQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0330C7E
+	for <iwd@lists.linux.dev>; Sat, 12 Nov 2022 01:19:41 +0000 (UTC)
+Received: by mail-wm1-f41.google.com with SMTP id v124-20020a1cac82000000b003cf7a4ea2caso6560460wme.5
+        for <iwd@lists.linux.dev>; Fri, 11 Nov 2022 17:19:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zwIZdD+LKB6t4VL09YNcuJcPBOUzxcQfgO/4Q1d5euE=;
-        b=aDeJnWaXOX4+f/3FqS4VWc4eIrTHs6XRHTErt/fflB16F9mSMuwwr8g5vwOgXmlO7Q
-         vn+2AE4XcUMbBOw4PrOVgWpylmtW57CQQVWhT1d7znmPV9j53Hgv5S1+JRL9pP/0Sh+7
-         3dZewvAJxVBJXzL5IaoNZHJGaPTThEP95sGwNpjK6MbGJ8eOozbbpyaGTXuc1b3iME1m
-         xZNlR/HWwIsUed7KMovbcW7R84EQYMnkyYSfYeK6d86y8H0D3JdkAFfzQduQcuFjNDtF
-         yEhsCXkk9eBNWNTVC3Ugx6bmGSjE5oyX4BBOxjQtOVmpX6JkIfg+0M6V/PKnr2OmMiGy
-         AfVA==
-X-Gm-Message-State: ACrzQf33eKro6HhxrEeW694KvJ1WDR26xMIFDk39OEa5VRXoNyXfpfXZ
-	2dB13fKXW68Akz7dPwjp9cg=
-X-Google-Smtp-Source: AMsMyM75bnM8vd7yFpE8yzaUysY4Y0/rzRFWofog/4C+SysVQKdCKI15838sRltX9uLsQFgPdUVFeQ==
-X-Received: by 2002:aca:b957:0:b0:354:91e8:6983 with SMTP id j84-20020acab957000000b0035491e86983mr1776742oif.144.1668105068124;
-        Thu, 10 Nov 2022 10:31:08 -0800 (PST)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id s14-20020a4ac80e000000b0049eb2793516sm36989ooq.44.2022.11.10.10.31.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Nov 2022 10:31:07 -0800 (PST)
-Message-ID: <b5873dac-88c7-875d-9388-35d2c8359b68@gmail.com>
-Date: Thu, 10 Nov 2022 12:31:06 -0600
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rLV0MssQfnGqsclJUmpcakfwDi1LC/w3KlrS5GwbnZk=;
+        b=0gtYEI+SccP121DqgVQWYMJTJxw1qKeZhXcvbZwOAvPEPuw0+p1P8x9eUXSVNNOTXX
+         pMFW8b3YPTxzhzARlzrJpZ7S5UxTEhnvianvJgSHX2QP+bZvhYf5evIbTJS9hZlU1a8D
+         iXbBiiWGUedsxfqeHPd1qAkcI5yfubHIELxCD5kgIK+aOsz2xUjVGuQAWylEy3IsYxiB
+         IrKDdXi5guzVOw/xAUaqW/FrZ3w8UGylpfonezXSopsu2c0t3X6IiVys2cPKAzhc4bIy
+         MMywmVnJG6syfhzLmmTr1RNOrPUR8vVY46b7WRMs7OOXuMyOVh7S+d9+LqUa5pO2cy77
+         MVXA==
+X-Gm-Message-State: ANoB5pmWUjdzKjWqHpfTMYhbokuteuVpnH60fh8+Ala1J63JaU55w6oJ
+	4fTerFQiTw5EQxSVVyi4CXPLgVM5kbA=
+X-Google-Smtp-Source: AA0mqf6YsOKQ1zwWIRKSsmV7chXVOLmQXNkpgEmPdIjTcRiTQtpd7U3GK5OT5v8OCJVTs+kpD88buQ==
+X-Received: by 2002:a05:600c:4f53:b0:3cf:75db:c417 with SMTP id m19-20020a05600c4f5300b003cf75dbc417mr2630951wmq.109.1668215979391;
+        Fri, 11 Nov 2022 17:19:39 -0800 (PST)
+Received: from localhost.localdomain ([82.213.230.158])
+        by smtp.gmail.com with ESMTPSA id bi14-20020a05600c3d8e00b003b95ed78275sm4437734wmb.20.2022.11.11.17.19.37
+        for <iwd@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Nov 2022 17:19:38 -0800 (PST)
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+To: iwd@lists.linux.dev
+Subject: [PATCH 1/3] storage: Maintain the tls session cache object
+Date: Sat, 12 Nov 2022 02:19:27 +0100
+Message-Id: <20221112011929.785388-1-andrew.zaborowski@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 2/2] eap-tls: Add session caching
-Content-Language: en-US
-To: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Cc: iwd@lists.linux.dev
-References: <20221109170438.535300-1-andrew.zaborowski@intel.com>
- <20221109170438.535300-2-andrew.zaborowski@intel.com>
- <e7035cb1-17d0-22e5-3bfa-4e6515e2b4c9@gmail.com>
- <CAOq732Lhjow_iZyNHs9bn+j9q_yHsZDP7qX37pgWrzsUs+y=AA@mail.gmail.com>
- <7931ee49-c4fe-51b2-81c0-afc473c19fda@gmail.com>
- <CAOq732+gHv3qJfP7=fve0LN1VgH87S7qEyu2Q=NwfYFZggN-ZA@mail.gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CAOq732+gHv3qJfP7=fve0LN1VgH87S7qEyu2Q=NwfYFZggN-ZA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+Instead of only providing methods to load and save the TLS cache from/to
+file, keep the memory copy of the cache directly in storage.c since it
+doesn't fit anywhere else conceptually.  storage.c now only provides a
+getter for the cache object and the _sync method to be called by anyone
+who makes a change to the cache object.
 
-<snip>
+While the use case is for eap-tls-common.c to call these, the same cache
+object could be used if l_tls is used in another part of IWD.  Any
+sessions saved in relation to a specific network (ESS) should use group
+names ending in the storage_get_network_file_path encoding of the
+network's SSID+security type, so that storage.c can automatically drop
+these cache entries if the network is being forgotten.
 
->> So if we index by
->>          a) SSID -> there's a good chance that we can reuse the session across routers,
->> even if that fails in some cases
->>          b) SSID + BSS -> We never try the session ID unless we have been connected to
->> the same BSS before.  In which case there's no advantage over PMK caching?
-> 
-> The flipside of this is:
->     a) SSID -> since we only store one session so everytime we switch
-> BSSes we overwrite the cached session in the co-located AA case and
-> rarely see the benefit of the cache.
->     b) BSSID -> we store one session for each BSS and after some number
-> of reconnects every next one is going to be fast.
-> 
+Since the cache object needs to be freed when exiting, use
+storage_exit() for that.  However, since there was already a
+storage_init() and storage_exit() pair of functions, with storage_init
+called from main.c conditionally on whether systemd encryption was
+enabled, rename that storage_init() to storage_key_init() and declare an
+IWD_MODULE to hanadle the calling of the new storage_init() and
+storage_exit().  There's no warranty that those will be called before
+and after any other module's init/exit but they're not necessary for any
+functionality that other modules depend on.
+---
+ src/main.c    |  3 +-
+ src/storage.c | 92 ++++++++++++++++++++++++++++++++++++++++-----------
+ src/storage.h |  7 ++--
+ 3 files changed, 77 insertions(+), 25 deletions(-)
 
-So for case b, I would argue PMK caching would be even better since we skip 
-8021x completely.  As I mentioned earlier, I would think that RADIUS server is 
-the 'general' case and we should optimize for that.  Maybe I'm wrong here, but 
-I've never seen a colocated option in any commercial APs.  It is always a RADIUS 
-server.
+diff --git a/src/main.c b/src/main.c
+index a3d85535..3da4c7fe 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -451,7 +451,7 @@ static bool setup_system_key(void)
+ 		goto unmap;
+ 	}
+ 
+-	r = storage_init(key, st.st_size);
++	r = storage_key_init(key, st.st_size);
+ 	munlock(key, st.st_size);
+ 
+ unmap:
+@@ -600,7 +600,6 @@ int main(int argc, char *argv[])
+ 	exit_status = l_main_run_with_signal(signal_handler, NULL);
+ 
+ 	iwd_modules_exit();
+-	storage_exit();
+ 
+ failed_storage:
+ 	dbus_exit();
+diff --git a/src/storage.c b/src/storage.c
+index b2c5ed48..68814aae 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -46,6 +46,9 @@
+ 
+ #include "src/missing.h"
+ #include "src/common.h"
++#include "src/module.h"
++#include "src/scan.h"
++#include "src/knownnetworks.h"
+ #include "src/storage.h"
+ #include "src/crypto.h"
+ 
+@@ -53,12 +56,13 @@
+ #define STORAGE_FILE_MODE (S_IRUSR | S_IWUSR)
+ 
+ #define KNOWN_FREQ_FILENAME ".known_network.freq"
+-#define TLS_CACHE_FILENAME ".tls-session-cache"
++#define TLS_SESSION_CACHE_FILENAME ".tls-session-cache"
+ 
+ static char *storage_path = NULL;
+ static char *storage_hotspot_path = NULL;
+ static uint8_t system_key[32];
+ static bool system_key_set = false;
++static struct l_settings *tls_session_cache;
+ 
+ static int create_dirs(const char *filename)
+ {
+@@ -653,14 +657,40 @@ void storage_network_sync(enum security type, const char *ssid,
+ 	write_file(data, length, true, "%s", path);
+ }
+ 
++static void storage_network_remove_tls_sessions(const char *path)
++{
++	_auto_(l_strv_free) char **groups = NULL;
++	char **group;
++	size_t group_len;
++	size_t path_len;
++	bool changed = false;
++
++	if (!tls_session_cache)
++		return;
++
++	groups = l_settings_get_groups(tls_session_cache);
++	path_len = strlen(path);
++
++	for (group = groups; *group; group++)
++		if ((group_len = strlen(*group)) > path_len &&
++				!memcmp(*group + group_len - path_len, path,
++					path_len)) {
++			l_settings_remove_group(tls_session_cache, *group);
++			changed = true;
++		}
++
++	if (changed)
++		storage_tls_session_cache_sync();
++}
++
+ int storage_network_remove(enum security type, const char *ssid)
+ {
+-	char *path;
++	_auto_(l_free) char *path = storage_get_network_file_path(type, ssid);
+ 	int ret;
+ 
+-	path = storage_get_network_file_path(type, ssid);
+ 	ret = unlink(path);
+-	l_free(path);
++
++	storage_network_remove_tls_sessions(path);
+ 
+ 	return ret < 0 ? -errno : 0;
+ }
+@@ -702,29 +732,42 @@ void storage_known_frequencies_sync(struct l_settings *known_freqs)
+ 	l_free(known_freq_file_path);
+ }
+ 
+-struct l_settings *storage_tls_session_cache_load(void)
++struct l_settings *storage_tls_session_cache_get(void)
+ {
+-	_auto_(l_settings_free) struct l_settings *cache = l_settings_new();
+-	_auto_(l_free) char *tls_cache_file_path =
+-		storage_get_path("%s", TLS_CACHE_FILENAME);
++	_auto_(l_free) char *cache_file_path = NULL;
+ 
+-	if (unlikely(!l_settings_load_from_file(cache, tls_cache_file_path)))
+-		return NULL;
++	if (tls_session_cache)
++		return tls_session_cache;
+ 
+-	return l_steal_ptr(cache);
++	cache_file_path = storage_get_path("%s", TLS_SESSION_CACHE_FILENAME);
++	tls_session_cache = l_settings_new();
++
++	if (!l_settings_load_from_file(tls_session_cache, cache_file_path))
++		l_debug("No session cache loaded from %s, starting with an "
++			"empty cache", cache_file_path);
++
++	return tls_session_cache;
+ }
+ 
+-void storage_tls_session_cache_sync(struct l_settings *cache)
++void storage_tls_session_cache_sync(void)
+ {
+-	_auto_(l_free) char *tls_cache_file_path = NULL;
++	_auto_(l_free) char *cache_file_path = NULL;
++	_auto_(l_free) char *settings_data = NULL;
+ 	_auto_(l_free) char *data = NULL;
+ 	size_t len;
++	static const char comment[] =
++		"# External changes to this file are not tracked by IWD "
++		"and will be overwritten.\n\n";
++	static const size_t comment_len = L_ARRAY_SIZE(comment) - 1;
+ 
+-	if (!cache)
++	if (L_WARN_ON(!tls_session_cache))
+ 		return;
+ 
+-	tls_cache_file_path = storage_get_path("%s", TLS_CACHE_FILENAME);
+-	data = l_settings_to_data(cache, &len);
++	cache_file_path = storage_get_path("%s", TLS_SESSION_CACHE_FILENAME);
++	settings_data = l_settings_to_data(tls_session_cache, &len);
++	data = l_malloc(comment_len + len);
++	memcpy(data, comment, comment_len);
++	memcpy(data + comment_len, settings_data, len);
+ 
+ 	/*
+ 	 * Note this data contains cryptographic secrets.  write_file()
+@@ -732,7 +775,8 @@ void storage_tls_session_cache_sync(struct l_settings *cache)
+ 	 *
+ 	 * TODO: consider encrypting with system_key.
+ 	 */
+-	write_file(data, len, false, "%s", tls_cache_file_path);
++	write_file(data, comment_len + len, false, "%s", cache_file_path);
++	explicit_bzero(settings_data, len);
+ 	explicit_bzero(data, len);
+ }
+ 
+@@ -768,7 +812,7 @@ bool storage_is_file(const char *filename)
+  *	TK = HKDF-Extract(<zero>, IKM)
+  *	OKM = HKDF-Expand(TK, "System Key", 32)
+  */
+-bool storage_init(const uint8_t *key, size_t key_len)
++bool storage_key_init(const uint8_t *key, size_t key_len)
+ {
+ 	uint8_t tmp[32];
+ 
+@@ -786,10 +830,20 @@ bool storage_init(const uint8_t *key, size_t key_len)
+ 	return system_key_set;
+ }
+ 
+-void storage_exit(void)
++static int storage_init(void)
++{
++	return 0;
++}
++
++static void storage_exit(void)
+ {
+ 	if (system_key_set) {
+ 		explicit_bzero(system_key, sizeof(system_key));
+ 		munlock(system_key, sizeof(system_key));
+ 	}
++
++	l_settings_free(tls_session_cache);
++	tls_session_cache = NULL;
+ }
++
++IWD_MODULE(storage, storage_init, storage_exit)
+diff --git a/src/storage.h b/src/storage.h
+index fe6ddbf5..de41541e 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -51,8 +51,8 @@ int storage_network_remove(enum security type, const char *ssid);
+ struct l_settings *storage_known_frequencies_load(void);
+ void storage_known_frequencies_sync(struct l_settings *known_freqs);
+ 
+-struct l_settings *storage_tls_session_cache_load(void);
+-void storage_tls_session_cache_sync(struct l_settings *cache);
++struct l_settings *storage_tls_session_cache_get(void);
++void storage_tls_session_cache_sync(void);
+ 
+ int __storage_decrypt(struct l_settings *settings, const char *ssid,
+ 				bool *changed);
+@@ -61,5 +61,4 @@ char *__storage_encrypt(const struct l_settings *settings, const char *ssid,
+ bool storage_decrypt(struct l_settings *settings, const char *path,
+ 			const char *name);
+ 
+-bool storage_init(const uint8_t *key, size_t key_len);
+-void storage_exit(void);
++bool storage_key_init(const uint8_t *key, size_t key_len);
+-- 
+2.34.1
 
-> That said the RFC-recommended session lifetime being only 24h makes
-> this less practical.  Since we can't know how long each server's
-> session lifetime is I wonder if IWD should set it to a higher value in
-> case we're lucky.
-
-I'd just default to what the RFC recommends, but maybe we can add something to 
-the profile to make this configurable.
-
-<snip>
-
->> I would think we need to explicitly drop anything related to the SSID of the
->> network we just removed via KnownNetworks.Forget()
-> 
-> Ok.  I don't believe we do this for known frequencies though.
-> 
-
-I think we do?  See known_networks_remove()
-
-<snip>
-
->>
->> Yes, but how does eap remove the relevant entries from the cache?
-> 
-> If we want to do this I'll probably move the cache singleton to
-> knownnetworks.c and drop the relevant group and not notify eap.
-> eap-tls-common.c would use something like
-> known_networks_get_tls_session_cache().
-
-That might be the way to go then.
-
-Regards,
--Denis
