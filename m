@@ -1,45 +1,45 @@
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB01B79E2
-	for <iwd@lists.linux.dev>; Mon, 14 Nov 2022 17:20:41 +0000 (UTC)
-Received: by mail-oi1-f182.google.com with SMTP id h132so12099294oif.2
-        for <iwd@lists.linux.dev>; Mon, 14 Nov 2022 09:20:41 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7977879F3
+	for <iwd@lists.linux.dev>; Mon, 14 Nov 2022 17:57:50 +0000 (UTC)
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-13d9a3bb27aso13298901fac.11
+        for <iwd@lists.linux.dev>; Mon, 14 Nov 2022 09:57:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:cc:content-language
+         :references:to:subject:from:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=iFKImKpH9HnW/48c2VvY9FGBFFpj0mKNT7vnBAB7OMs=;
-        b=MV1QubdiCDCHqYNt5GvwPgESE2mXYbQHsyW+oRL8lC1Is842Cjw34t7m/1ilhc9EOt
-         TMojU3fKNrOZNFacKI+lthLuUhDZ3SGnwPjgm01aYKMEefe6RPqd0yknkFn0Ce4PMhzY
-         FZ7LrzJlu2Qzgob5lH5FmffPDc10LS+lR8ojRVaXzasqav9ie4uaqbbb6n4SaZ9bAWBT
-         SsWAkFPMH3Xgm4XLuBpD4xj7yoRlmNjPvXT2zcEDuZjQfAm27niytUKRfz3HPFXXuSL7
-         yc+HGHBXAeBdZAyP8wRusiyyYGCCS1mj97WMzWkjEISmmKTI0WBWQ7foyce+Xw0Cv0Iv
-         ahQg==
+        bh=eL4F9zjLE93O5bmwSn8hcXlfWVmJgcna6OfGB8ftrrI=;
+        b=mep5rrFn5y5uaOW0RohQPzdTK0BXhX86nsB0Sz58e8ictpo89jfIWBnmkWlkEehVps
+         3kSQkNKuHwLrvSJwLX4zp70zTGwKDG076f8oA0ezUZxAAz15XoBm0RN0GpcR+skm3YTo
+         2NH/Qz97n7cNsaOfL5RWrdnEUzqnDwWEQPg9y2y3Gjw76uK/0Ibkba020NEra/fjgt3f
+         yyKoJsARXlkU0sDvoYIoiKeI36Y9TNxcBTP6fC3toS6zsqX3zS9ouIGP+mTvJ3aVU+s8
+         hM/icwnqWJvc2Oia/vmQzilm2EOrYRikfyj3o84NgRRMy+4gvy4NWlT5PF2ROY4xNrAY
+         5Jjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:cc:content-language
+         :references:to:subject:from:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iFKImKpH9HnW/48c2VvY9FGBFFpj0mKNT7vnBAB7OMs=;
-        b=QZ21Ju3s7JJd9H1kMCb8K6KwKqAUQubl4SkCuRYXRz4mKS5SKRY9kNY6DU1Zh9274c
-         X+Ghk7DGTRF+AUTdVmwZOaq78KzwvYP34CFekNanPKT/S2PL2xl2fpSSBpeAU0reeYLw
-         ZXyrD4aogbcsVNyQlazdkWFKnDkRGSDA6z6lh6DxBNGU1/ReuZwW5kFZOtpXPQouGuW7
-         nH2LCeXWv86nQFgNlaT162Lpmvx1lpnY6b0P2d72QcMPtaT3gqNd3eRT18vxwN69MEoo
-         kzMnFc1dHOscR2y0An7OHeAtgMC4DSQJtQNRYUnUj7smhqM452JaC6RDyXV1ahsVSfDk
-         2lqg==
-X-Gm-Message-State: ANoB5pmoidoT9gVvQVTA7/xQUM5yw9605ACw/VOdVnxtPOLdWKaufOTt
-	tBcCmuQ7oai9V18NVT4TDUNHXHqhfmw=
-X-Google-Smtp-Source: AA0mqf71kWISFxguxtVlhYjML06OzQ217bv0YcLzzmcLAE4Jhvp/0ffpssiaSQ4rjKPDegtKRB1BEQ==
-X-Received: by 2002:a05:6808:208f:b0:35a:388c:7452 with SMTP id s15-20020a056808208f00b0035a388c7452mr6258035oiw.72.1668446440918;
-        Mon, 14 Nov 2022 09:20:40 -0800 (PST)
+        bh=eL4F9zjLE93O5bmwSn8hcXlfWVmJgcna6OfGB8ftrrI=;
+        b=hXefiHFHB8BG+LWQoBA5qnRTx/Wjcdv2Gl/R0yVBfzsNKXMeD8aHYN1KhLgcKAMVln
+         NZESdRkvPYzBVe1fMFKLSbIofkJ7GZfg2I84XM1T6eTBOm8lm+mLaEq9OdO6l9OshFGp
+         sNkIMYjA7Y3wtbFcsheXqwGa1uADsvV0EQpYj6Il8Lqj24l+/LiWtMYkVC6cmiEx/ZvX
+         gExl7BkFkIoJNrlQGY63tukIO5u4vuSEyF/aJe1ebyLTw4HJSqjRlUceDgLXu7y6vyRx
+         aCsCYPbsbN999mIURDo7J9GNYe1PEE8vCRXMc51WxcYf2b3rft60Gyxsewa2vPfFH+YS
+         f9ng==
+X-Gm-Message-State: ANoB5plemhy4zzh8m5YfN4ej9NTn99Qmw5D/T6D5D1ELd4ZCUhlQhG2k
+	IOk31UaYrSKj18OmY4VUPuhOag7fFGg=
+X-Google-Smtp-Source: AA0mqf47PvnErQvOuRc23KOM+DrMu0z/OzDF7c55sPqCsv0OCPLLYmaU7leq+9jMnxjEy+jErnFKuw==
+X-Received: by 2002:a05:6871:4683:b0:141:f416:a3bc with SMTP id ni3-20020a056871468300b00141f416a3bcmr912933oab.237.1668448669625;
+        Mon, 14 Nov 2022 09:57:49 -0800 (PST)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id s5-20020a4adb85000000b00499527def25sm3808846oou.47.2022.11.14.09.20.39
+        by smtp.googlemail.com with ESMTPSA id j21-20020a544815000000b0035aa617156bsm3857601oij.17.2022.11.14.09.57.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Nov 2022 09:20:40 -0800 (PST)
-Message-ID: <dae74530-3fa3-0507-1d53-928d8cbce757@gmail.com>
-Date: Mon, 14 Nov 2022 11:20:39 -0600
+        Mon, 14 Nov 2022 09:57:48 -0800 (PST)
+Message-ID: <93bde019-af0e-2aa3-be32-787febf85a3c@gmail.com>
+Date: Mon, 14 Nov 2022 11:57:45 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,39 +48,39 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: Scanning hangs up with Marvell wifi card
-Content-Language: en-US
-To: =?UTF-8?Q?Jonas_Dre=c3=9fler?= <verdre@v0yd.nl>, iwd@lists.linux.dev
-References: <1e372397-d06d-df32-dda3-d89a580a9ee7@v0yd.nl>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <1e372397-d06d-df32-dda3-d89a580a9ee7@v0yd.nl>
+Subject: Re: Scanning hangs up with Marvell wifi card
+To: =?UTF-8?Q?Jonas_Dre=c3=9fler?= <verdre@v0yd.nl>
+References: <1e372397-d06d-df32-dda3-d89a580a9ee7@v0yd.nl>
+ <dae74530-3fa3-0507-1d53-928d8cbce757@gmail.com>
+ <c8e794e9-c211-4b7d-5061-604842db7e3a@v0yd.nl>
+Content-Language: en-US
+Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+In-Reply-To: <c8e794e9-c211-4b7d-5061-604842db7e3a@v0yd.nl>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 Hi Jonas,
 
-On 11/14/22 10:18, Jonas Dreßler wrote:
-> Hi everyone,
+Note: Jonas sent this message off-list by mistake.  With permission I'm quoting 
+the original in my reply:
+
+> thanks for the quick reply, checking with iwmon was a good idea indeed, seems 
+> like the subsequent scan request fails with EBUSY:
 > 
-> iwd is having trouble scanning for me, it seems that any subsequent scan after
-> the first one never finishes. A quick round of debugging tells it's worked
-> around by adding at least 100ms of sleep before queuing the second scan with
-> station_dbus_scan_subset() here:
-> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/station.c#n3886
+> Response: Trigger Scan (0x21) len 4
+> Status: Device or resource busy (16)
+> 
+> I assume iwd would have to handle that and try again a bit later, or at least 
+> cancel the ongoing scan?
 > 
 
-If the hardware indeed has trouble with scans that are performed in rapid 
-succession, then your workaround will just address this one particular symptom. 
-  The scanning logic is quite complex and there are lots of scenarios that 
-trigger multiple scan requests one after another (periodic scans with lots of 
-known hidden networks for example).
+We only handle EBUSY in the context of another ongoing scan.  This can happen if 
+for example NM/iw/whatever triggers a scan request in a race with iwd.  So iwd 
+waits for a scan finished notification and re-tries.
 
-> I'm using a Marvell wifi card with fullmac driver that is known to have a ton of
-> issues, so I'm assuming it doesn't like seeing scan requests very quickly after
-> finishing a scan?
-
-No idea?  You might want to post logs or iwmon trace.  See 
-https://iwd.wiki.kernel.org/debugging
+The behavior you discovered (which I find quite bizarre, since there seems to be 
+no way to find out when to retry) will require separate special handling.
 
 Regards,
 -Denis
