@@ -1,143 +1,130 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D14847C
-	for <iwd@lists.linux.dev>; Mon, 14 Nov 2022 20:03:22 +0000 (UTC)
-Received: by mail-oi1-f174.google.com with SMTP id t62so12546880oib.12
-        for <iwd@lists.linux.dev>; Mon, 14 Nov 2022 12:03:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hSlBUHNeAeha+SOmvT33umGUMC+1Pg6rPE2pPNqjTpE=;
-        b=MqOcS59fbtU3RaqRUQRhAv8DXJoe0c+a1FbMsWJ99MM8KxxdCwmd/ikK1OFeXUX6x+
-         JrFfDAMv/1lkxIxPqOTqXzbDbj92nAmoQBb1kUYgWW5Xc0cAPf5tWWh1As4xkezGzyBd
-         kr8UYfLDXANhTF0mhAjAHpv2R52uInVhBV7h3IF9qxG3oyUYE6WugOkW+W7T4dMR/0qH
-         Yyc+BIwERZqjXfOSRtMaxDSfNPJtVrvRCQ2UVcWUTloTzh0ivYZayIxk81DF4Hog5EqQ
-         Dm/h3dQY3pn9HhBrjcdlwxaI7xBeP/B3XdWeFABt5Qif7x1GABd9FwDcCo4AqwG1jRuA
-         CVhQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353047C
+	for <iwd@lists.linux.dev>; Tue, 15 Nov 2022 01:30:06 +0000 (UTC)
+Received: by mail-lj1-f175.google.com with SMTP id d20so15620116ljc.12
+        for <iwd@lists.linux.dev>; Mon, 14 Nov 2022 17:30:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hSlBUHNeAeha+SOmvT33umGUMC+1Pg6rPE2pPNqjTpE=;
-        b=MfBDd9t1ppYY/01gTyCbpoEuyxnd38gQD84XpLyKehShivG+HaGsOJ8909R8qwI4yu
-         dcs3ymHNU/xaNTvHQAdgcci6tc+jRFHPLRtyVDkAvlSrUVuPeLSiOypPCeA4obg4tcS1
-         833WAXHXwY4Fs3I5tkF31totWi3JmQlUeDtpx876/mIl/uoilQSNRuWuv/+LLKGeBwUQ
-         MPlYU2LcwdDGpMTpHf4JG06iViZEjdfONXlENeG4KOAjmDBgDgit08HRSbEdVmTf3ug4
-         5AVVHlElvQUzpOhToHp1wpOM0MaYMK+ANOYcMtSO9HNM+FUAOiqTc0eONbaxatR8KsgK
-         QUqw==
-X-Gm-Message-State: ANoB5pmX5suVLrzQIwxv7UO+7gVKCEg766BdWHOE/y4CblLQctEocEqI
-	hj/wDfhwBmhRwnTdqK2uFhLwF3MYevs=
-X-Google-Smtp-Source: AA0mqf5Z/pxnfM5mAqA6dg4iXjMWVL1GzS17QBHxG/9zYaREWhlHYBQgIPsT15k2pk7vVGnGym68Ng==
-X-Received: by 2002:a05:6808:1294:b0:354:b300:16d5 with SMTP id a20-20020a056808129400b00354b30016d5mr6576857oiw.253.1668456201640;
-        Mon, 14 Nov 2022 12:03:21 -0800 (PST)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id l15-20020a05687014cf00b0013cd709659dsm5374547oab.52.2022.11.14.12.03.20
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jrgCULNU4JNas0FVKi6HrCPwTGFhrTZ95UY6KUxb67I=;
+        b=GDk/UCfHgtp9YfgeUVMXxmUt8aXNAqVnMl3SBXkV2Im3BOeOzZ1zjvFu0OUZ5xswCk
+         ak3bTUWYrIwxToyucDu5KE+MSAC57N8D+UUN4PUPITMrK6CijGRV3/0BxZnryYs+PQgN
+         lZSEYcWtYrjD0ipO0iGW4UpfyhAGZLG71Q5nf8KpdSODUkXzXHt4CX8wCpZDr2Wu7at3
+         rzzaejGz1YYwzeFGu6ge3dXp9529+ABXyK2TKmECwz8WXv1/KrB2+K9rQAgIknzk3cUA
+         qkofcabBoDSpF57vf24ZafTXaSwuuvw5r6WbKPq/e339mjATZzcvWoPIx9t3tip1zk7n
+         uXnQ==
+X-Gm-Message-State: ANoB5pm81bWEZmfmRRZEkS4VSsAClZBTAfaGLDwvBsnCLIovhCQ2KKv9
+	dHsQTxthYU6q+pO8mP/u4EoAkp1BEWVwmQ==
+X-Google-Smtp-Source: AA0mqf4LAtCX51QUGVCZwOyyL2ONmZ2lTSpXYtj0CApYUE2J7hjq8cfdqKJeollD0jOeHB1VuuQxHQ==
+X-Received: by 2002:a2e:8e27:0:b0:276:be89:5616 with SMTP id r7-20020a2e8e27000000b00276be895616mr4742922ljk.347.1668475803595;
+        Mon, 14 Nov 2022 17:30:03 -0800 (PST)
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com. [209.85.167.45])
+        by smtp.gmail.com with ESMTPSA id t21-20020a2e8e75000000b0027711dbd000sm2184765ljk.69.2022.11.14.17.30.02
+        for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Nov 2022 12:03:20 -0800 (PST)
-Message-ID: <a9af6470-6363-5362-f81d-0d612ab851da@gmail.com>
-Date: Mon, 14 Nov 2022 14:03:19 -0600
+        Mon, 14 Nov 2022 17:30:02 -0800 (PST)
+Received: by mail-lf1-f45.google.com with SMTP id p8so22186213lfu.11
+        for <iwd@lists.linux.dev>; Mon, 14 Nov 2022 17:30:02 -0800 (PST)
+X-Received: by 2002:a05:6512:3194:b0:4b4:981a:6f9d with SMTP id
+ i20-20020a056512319400b004b4981a6f9dmr2386539lfe.584.1668475802382; Mon, 14
+ Nov 2022 17:30:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
+References: <20221112011929.785388-1-andrew.zaborowski@intel.com> <a9af6470-6363-5362-f81d-0d612ab851da@gmail.com>
+In-Reply-To: <a9af6470-6363-5362-f81d-0d612ab851da@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Date: Tue, 15 Nov 2022 02:29:49 +0100
+X-Gmail-Original-Message-ID: <CAOq732L4CaibiV=7rtWLEW0Wk9wGycLnwKB8=39TnmNwwby4KQ@mail.gmail.com>
+Message-ID: <CAOq732L4CaibiV=7rtWLEW0Wk9wGycLnwKB8=39TnmNwwby4KQ@mail.gmail.com>
 Subject: Re: [PATCH 1/3] storage: Maintain the tls session cache object
-Content-Language: en-US
-To: Andrew Zaborowski <andrew.zaborowski@intel.com>, iwd@lists.linux.dev
-References: <20221112011929.785388-1-andrew.zaborowski@intel.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221112011929.785388-1-andrew.zaborowski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Andrew,
+Hi Denis,
 
-On 11/11/22 19:19, Andrew Zaborowski wrote:
-> Instead of only providing methods to load and save the TLS cache from/to
-> file, keep the memory copy of the cache directly in storage.c since it
-> doesn't fit anywhere else conceptually.  storage.c now only provides a
-> getter for the cache object and the _sync method to be called by anyone
-> who makes a change to the cache object.
-> 
+On Mon, 14 Nov 2022 at 21:03, Denis Kenzior <denkenz@gmail.com> wrote:
+> On 11/11/22 19:19, Andrew Zaborowski wrote:
+> > Any
+> > sessions saved in relation to a specific network (ESS) should use group
+> > names ending in the storage_get_network_file_path encoding of the
+> > network's SSID+security type, so that storage.c can automatically drop
+> > these cache entries if the network is being forgotten.
+>
+> It seems overkill to encode the full path into the group name.  Perhaps a
+> hex-encoded SSID is enough?
 
-So overall I'm fine with this approach, just two quick things:
+It would be nice to include the security type, how about using the
+file name without the rest of the path?
 
-> While the use case is for eap-tls-common.c to call these, the same cache
-> object could be used if l_tls is used in another part of IWD.  Any
-> sessions saved in relation to a specific network (ESS) should use group
-> names ending in the storage_get_network_file_path encoding of the
-> network's SSID+security type, so that storage.c can automatically drop
-> these cache entries if the network is being forgotten.
+>
+> >
+> > Since the cache object needs to be freed when exiting, use
+> > storage_exit() for that.  However, since there was already a
+> > storage_init() and storage_exit() pair of functions, with storage_init
+> > called from main.c conditionally on whether systemd encryption was
+> > enabled, rename that storage_init() to storage_key_init() and declare an
+> > IWD_MODULE to hanadle the calling of the new storage_init() and
+> > storage_exit().  There's no warranty that those will be called before
+> > and after any other module's init/exit but they're not necessary for any
+> > functionality that other modules depend on.
+>
+> While what you have proposed here works fine, I do find it a little strange that
+> storage_key_init() is being called before the modules were initialized (and thus
+> storage_init() was called).  There's also a strange case where storage_exit()
+> would not be called in case storage_key_init() failed, unlike the behavior now
+> in $HEAD.
 
-It seems overkill to encode the full path into the group name.  Perhaps a 
-hex-encoded SSID is enough?
+True.
 
-> 
-> Since the cache object needs to be freed when exiting, use
-> storage_exit() for that.  However, since there was already a
-> storage_init() and storage_exit() pair of functions, with storage_init
-> called from main.c conditionally on whether systemd encryption was
-> enabled, rename that storage_init() to storage_key_init() and declare an
-> IWD_MODULE to hanadle the calling of the new storage_init() and
-> storage_exit().  There's no warranty that those will be called before
-> and after any other module's init/exit but they're not necessary for any
-> functionality that other modules depend on.
+>
+> There seems to be no need for any of this at all since storage_init does
+> nothing?
 
-While what you have proposed here works fine, I do find it a little strange that 
-storage_key_init() is being called before the modules were initialized (and thus 
-storage_init() was called).  There's also a strange case where storage_exit() 
-would not be called in case storage_key_init() failed, unlike the behavior now 
-in $HEAD.
+Right, it mainly only to improve the naming.
 
-There seems to be no need for any of this at all since storage_init does 
-nothing?  It might be easier to just let storage remain special (not a module) 
-as it is now.
+> It might be easier to just let storage remain special (not a module)
+> as it is now.
 
-> ---
->   src/main.c    |  3 +-
->   src/storage.c | 92 ++++++++++++++++++++++++++++++++++++++++-----------
->   src/storage.h |  7 ++--
->   3 files changed, 77 insertions(+), 25 deletions(-)
-> 
+Ok.
 
-<snip>
+>
+> > ---
+> >   src/main.c    |  3 +-
+> >   src/storage.c | 92 ++++++++++++++++++++++++++++++++++++++++-----------
+> >   src/storage.h |  7 ++--
+> >   3 files changed, 77 insertions(+), 25 deletions(-)
+> >
+>
+> <snip>
+>
+> > +static void storage_network_remove_tls_sessions(const char *path)
+> > +{
+> > +     _auto_(l_strv_free) char **groups = NULL;
+> > +     char **group;
+> > +     size_t group_len;
+> > +     size_t path_len;
+> > +     bool changed = false;
+> > +
+> > +     if (!tls_session_cache)
+> > +             return;
+> > +
+> > +     groups = l_settings_get_groups(tls_session_cache);
+> > +     path_len = strlen(path);
+> > +
+> > +     for (group = groups; *group; group++)
+> > +             if ((group_len = strlen(*group)) > path_len &&
+>
+> Hmm, >= path_len?
 
-> +static void storage_network_remove_tls_sessions(const char *path)
-> +{
-> +	_auto_(l_strv_free) char **groups = NULL;
-> +	char **group;
-> +	size_t group_len;
-> +	size_t path_len;
-> +	bool changed = false;
-> +
-> +	if (!tls_session_cache)
-> +		return;
-> +
-> +	groups = l_settings_get_groups(tls_session_cache);
-> +	path_len = strlen(path);
-> +
-> +	for (group = groups; *group; group++)
-> +		if ((group_len = strlen(*group)) > path_len &&
+Ok, but using just the network's id as the group name wouldn't be a good idea.
 
-Hmm, >= path_len?
-
-> +				!memcmp(*group + group_len - path_len, path,
-> +					path_len)) {
-> +			l_settings_remove_group(tls_session_cache, *group);
-> +			changed = true;
-> +		}
-> +
-> +	if (changed)
-> +		storage_tls_session_cache_sync();
-> +}
-> +
-
-Regards,
--Denis
+Best regards
