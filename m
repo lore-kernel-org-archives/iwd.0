@@ -1,151 +1,197 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67502FAF
-	for <iwd@lists.linux.dev>; Thu, 17 Nov 2022 13:56:26 +0000 (UTC)
-Received: by mail-wr1-f53.google.com with SMTP id a14so3996920wru.5
-        for <iwd@lists.linux.dev>; Thu, 17 Nov 2022 05:56:26 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145916138
+	for <iwd@lists.linux.dev>; Thu, 17 Nov 2022 15:22:09 +0000 (UTC)
+Received: by mail-ej1-f44.google.com with SMTP id i10so5875642ejg.6
+        for <iwd@lists.linux.dev>; Thu, 17 Nov 2022 07:22:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pqrs.dk; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8+NdWNbVMLGBz/K9kgXPx3Fm1i9cBtslAtJH6I+y5g=;
+        b=bmi6L3JFMprB6/o4KIP/fZAIc1LC92RKHAtR63aVkpYejOpKfdxZa436u0WkGVUs8w
+         9vvnZN5T/vYZz64pXvrq/N1krTyZjZla4/knO0oFDno55+TUgL/27XvLFvnb65Jzjp5p
+         BxIcEPMEeD4MMk66fC3y6VNszvoQ+B9SiDba0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qTwiBLJ3P7Kgl3k56usPrldnCs5dP9tAFKPaLaOL6/Q=;
-        b=ObBr0o4azaRZbZ9+FUDFiYrPNzE93bazokILBEUxy44Z9GyfKMcrsAbX7/KcebGKaj
-         Bv6adTVBKbCLAw11TxbsrpWtjw41TGM876DJaRc4E3hk2Tua/OsUOf0/LlqMjMOeyBK9
-         u0G7WipT8h0D48cij6Z8nYwz6EaHdbfIeNo8ePM/bfp3TvsGzosnbATL83AZly9ZKVTx
-         gCujE3T2Q05mHgXHgPoYLNGtDozGvr6QE7nlIkyaXgY2Ne+gkQ5WoHN8WlYDXJioqiaf
-         fD9EmjuBWaLgj9wx+shIbMgcSL4vvioNx/LrSpzjRNOggtGiVW6ZQlu4nbI3utGQuQ3K
-         LdBw==
-X-Gm-Message-State: ANoB5pkDR3F8ORP1rbVNI6g2wVGJfrjb9BhKpOYrLTdegG2LU785dVXG
-	K3QD/2cy/tNRN2k1nYCSppz9p7UjRlg=
-X-Google-Smtp-Source: AA0mqf5N6P7hhUfop+gN+7Ht9/kp036w3RcvWrKIx0CLG9CEV5+3fMB6w5YPF/FoANsxRKZfF7IZfg==
-X-Received: by 2002:a5d:5957:0:b0:22e:3e9:ba15 with SMTP id e23-20020a5d5957000000b0022e03e9ba15mr1490146wri.180.1668693384352;
-        Thu, 17 Nov 2022 05:56:24 -0800 (PST)
-Received: from localhost.localdomain ([82.213.230.158])
-        by smtp.gmail.com with ESMTPSA id h5-20020a5d6885000000b002366b17ca8bsm1142632wru.108.2022.11.17.05.56.23
-        for <iwd@lists.linux.dev>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q8+NdWNbVMLGBz/K9kgXPx3Fm1i9cBtslAtJH6I+y5g=;
+        b=IleNNCNGAgXh84c5EhQUTdC+n1fdF5xWyPdRq5234UETt+8weJyK+1/kkuXSDJ/7Br
+         Q5NMTnswQ16N8sncBWvZ0JXRYeKqLwq+lo/xpjvMHascqKuy8e0YQVuDixVDmJeSXJrE
+         8bhPqFQUDyI9RR5EC0WIae5kapYNHPGP96RHKueV2YJCEIFIWWmK+vXRPQh6LKlrejce
+         laZIwRNe9Iom7LjQsRusxlyZuR/e1H6EV5HRFtvyLWHJtA6Jx59ZZBzRhsZ6tnWpcYba
+         zat6fcvbB6M+rdUuW5pU8PqtccL/RtJIhYx14HMkpbT60rN59LhpgvvLBJZ6hNB/HDzW
+         5NwQ==
+X-Gm-Message-State: ANoB5pkT8IbzD0/Cn5aSjgbcR9U0uS9k8xVDCZ5jMAysP1Xe5xUYTls1
+	A3tiRBpBpaczbg0ZPWgdqFOJ4CQY/zeTvA==
+X-Google-Smtp-Source: AA0mqf4zLUiEd2koQRxPIzGNQa10PzvHDN7pvWUawApT5aEbtLgcgfA3yw078X3e0HzLqq4ova9hWA==
+X-Received: by 2002:a17:907:77d6:b0:78d:e26f:bfd8 with SMTP id kz22-20020a17090777d600b0078de26fbfd8mr2565139ejc.482.1668698528135;
+        Thu, 17 Nov 2022 07:22:08 -0800 (PST)
+Received: from localhost.localdomain (80.71.142.18.ipv4.parknet.dk. [80.71.142.18])
+        by smtp.gmail.com with ESMTPSA id r16-20020a170906705000b00779cde476e4sm495892ejj.62.2022.11.17.07.22.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 05:56:23 -0800 (PST)
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+        Thu, 17 Nov 2022 07:22:07 -0800 (PST)
+From: =?UTF-8?q?Alvin=20=C5=A0ipraga?= <alvin@pqrs.dk>
 To: iwd@lists.linux.dev
-Subject: [PATCH 3/3] station, eapol: Set up eap-tls-common for session caching
-Date: Thu, 17 Nov 2022 14:56:10 +0100
-Message-Id: <20221117135610.1162965-3-andrew.zaborowski@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221117135610.1162965-1-andrew.zaborowski@intel.com>
-References: <20221117135610.1162965-1-andrew.zaborowski@intel.com>
+Cc: =?UTF-8?q?Alvin=20=C5=A0ipraga?= <alsi@bang-olufsen.dk>
+Subject: [PATCH] scan: make scan requests fail if trigger returns -EBUSY
+Date: Thu, 17 Nov 2022 16:21:55 +0100
+Message-Id: <20221117152155.2310412-1-alvin@pqrs.dk>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Use eap_set_peer_id() to set a string identifying the TLS server,
-currently the hex-encoded SSID of the network, to be used as group name
-and primary key in the session cache l_settings object.  Provide pointers
-to storage_eap_tls_cache_{load,sync} to eap-tls-common.c using
-eap_tls_set_session_cache_ops().  Listen to Known Network removed
-signals and call eap_tls_forget_peer() to have any session related to
-the network also dropped from the cache.
----
- src/eapol.c   |  6 ++++++
- src/station.c | 28 ++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+)
+From: Alvin Šipraga <alsi@bang-olufsen.dk>
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 4a1abd28..4d4e201d 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -2770,6 +2770,8 @@ void eapol_register(struct eapol_sm *sm)
- bool eapol_start(struct eapol_sm *sm)
- {
- 	if (sm->handshake->settings_8021x) {
-+		_auto_(l_free) char *network_id = NULL;
-+
- 		sm->eap = eap_new(eapol_eap_msg_cb, eapol_eap_complete_cb, sm);
+If a CMD_TRIGGER_SCAN request fails with -EBUSY, iwd currently assumes
+that a scan is ongoing on the underlying wdev and will retry the same
+command when that scan is complete. It gets notified of that completion
+via the scan_notify() function, and kicks the scan logic to try again.
+
+However, if there is another wdev on the same wiphy and that wdev has a
+scan request in flight, the kernel will also return -EBUSY. In other
+words, only one scan request per wiphy is permitted.
+
+As an example, the brcmfmac driver can create an AP interface on the
+same wiphy as the default station interface, and scans can be triggered
+on that AP interface.
+
+If -EBUSY is returned because another wdev is scanning, then iwd won't
+know when it can retry the original trigger request because the relevant
+netlink event will arrive on a different wdev. Indeed, if no scan
+context exists for that other wdev, then scan_notify will return early
+and the scan logic will stall indefinitely.
+
+From a user perspective, this leads to a situation where iwd reports
+over DBus that it is not scanning, but it never queues up another
+periodic scan. Or if a scan was explicitly requested over DBus and the
+trigger for that scan ended in an -EBUSY for the aforementioned reason,
+the DBus method call stall indefinitely.
+
+Since scan contexts are handled on a per-wdev basis, and since multiple
+wdevs may in principle share the same wiphy, solve the above problem by
+instead having the scan module simply propagate the -EBUSY error. In
+practice this will mean that scans may fail more often, in which case at
+least one default error message will be logged each time:
+
+iwd[1451]: Received error during CMD_TRIGGER_SCAN: Device or resource busy (16)
+
+It can be debated whether or not this message is needed: maybe the
+upper-layer may wish to implement its own retry logic instead. In the
+case of a periodic scan for example, a failure is met with ambivalence:
+no additional error is logged, and a new scan is simply scheduled
+according to the periodic scan interval. In other cases, a scan might be
+part of a DBus request to connect to a hidden network. Here, the error
+will be different:
+
+Failure to connect because the network wasn't found after scanning:
+
+    $ iwctl station wlan0 connect-hidden foobar
+    Object not found
+
+Failure to connect because another scan was active on the same wiphy:
+
+    $ iw dev uap0 scan >/dev/null &
+    $ iwctl station wlan0 connect-hidden foobar
+    Operation failed
+
+This is the trade-off made by this change in order not to complicate the
+scan context with lookup-by-wiphy and an internal retry mechanism, while
+still providing robustness and not stalling the scan logic of the
+daemon.
+
+Additionally, in the event of a failed scan trigger via the DBus scan
+method, do not automatically jumpstart the autoconnect logic, as this
+would not make sense.
+---
+ src/scan.c    | 22 ++++------------------
+ src/station.c |  2 +-
+ 2 files changed, 5 insertions(+), 19 deletions(-)
+
+diff --git a/src/scan.c b/src/scan.c
+index 5548914a12de..b487c342129d 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -229,12 +229,6 @@ static void scan_request_triggered(struct l_genl_msg *msg, void *userdata)
  
- 		if (!sm->eap)
-@@ -2785,6 +2787,10 @@ bool eapol_start(struct eapol_sm *sm)
+ 	err = l_genl_msg_get_error(msg);
+ 	if (err < 0) {
+-		/* Scan in progress, assume another scan is running */
+-		if (err == -EBUSY) {
+-			sc->state = SCAN_STATE_PASSIVE;
+-			return;
+-		}
+-
+ 		scan_request_failed(sc, sr, err);
  
- 		eap_set_key_material_func(sm->eap, eapol_eap_results_cb);
- 		eap_set_event_func(sm->eap, eapol_eap_event_cb);
-+
-+		network_id = l_util_hexstring(sm->handshake->ssid,
-+						sm->handshake->ssid_len);
-+		eap_set_peer_id(sm->eap, network_id);
- 	}
+ 		l_error("Received error during CMD_TRIGGER_SCAN: %s (%d)",
+@@ -2094,7 +2088,6 @@ static void scan_notify(struct l_genl_msg *msg, void *user_data)
+ 	{
+ 		struct scan_freq_set *freqs;
+ 		bool send_next = false;
+-		bool retry = false;
+ 		bool get_results = false;
  
- 	sm->started = true;
+ 		sc->state = SCAN_STATE_NOT_RUNNING;
+@@ -2138,24 +2131,17 @@ static void scan_notify(struct l_genl_msg *msg, void *user_data)
+ 
+ 			/*
+ 			 * Drop the ongoing scan if an external scan flushed
+-			 * our results.  Otherwise, try to retry the trigger
+-			 * request if it failed with an -EBUSY.
++			 * our results.
+ 			 */
+ 			if (sr && sr->started &&
+ 					scan_parse_flush_flag_from_msg(msg))
+ 				scan_finished(sc, -EAGAIN, NULL, NULL, sr);
+-			else
+-				retry = true;
+ 
+ 			sr = NULL;
+ 		}
+ 
+-		/*
+-		 * Send the next command of an ongoing request, or continue
+-		 * with a previously busy scan attempt due to an external
+-		 * scan.
+-		 */
+-		if (send_next || retry) {
++		/* Send the next command of an ongoing request */
++		if (send_next) {
+ 			struct scan_request *next = l_queue_peek_head(
+ 								sc->requests);
+ 
+@@ -2220,7 +2206,7 @@ static void scan_notify(struct l_genl_msg *msg, void *user_data)
+ 			 * we may be able to now queue our own scan although
+ 			 * the abort could also have been triggered by the
+ 			 * hardware or the driver because of another activity
+-			 * starting in which case we should just get an EBUSY.
++			 * starting in which case we should get an EBUSY.
+ 			 */
+ 			start_next_scan_request(&sr->work);
+ 		}
 diff --git a/src/station.c b/src/station.c
-index eab16eff..4aab7828 100644
+index eab16eff5afa..f12ca22a8648 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -60,6 +60,9 @@
- #include "src/sysfs.h"
- #include "src/band.h"
- #include "src/ft.h"
-+#include "src/eap.h"
-+#include "src/eap-tls-common.h"
-+#include "src/storage.h"
+@@ -3845,7 +3845,7 @@ static void station_dbus_scan_triggered(int err, void *user_data)
+ 			dbus_pending_reply(&station->scan_pending, reply);
+ 		}
  
- static struct l_queue *station_list;
- static uint32_t netdev_watch;
-@@ -69,6 +72,7 @@ static bool anqp_disabled;
- static bool supports_arp_evict_nocarrier;
- static bool supports_ndisc_evict_nocarrier;
- static struct watchlist event_watches;
-+static uint32_t known_networks_watch;
- 
- struct station {
- 	enum station_state state;
-@@ -5087,6 +5091,22 @@ static void station_netdev_watch(struct netdev *netdev,
+-		station_dbus_scan_done(station, true);
++		station_dbus_scan_done(station, false);
+ 		return;
  	}
- }
  
-+static void station_known_networks_changed(enum known_networks_event event,
-+						const struct network_info *info,
-+						void *user_data)
-+{
-+	_auto_(l_free) char *network_id = NULL;
-+
-+	if (event != KNOWN_NETWORKS_EVENT_REMOVED)
-+		return;
-+
-+	if (info->type != SECURITY_8021X)
-+		return;
-+
-+	network_id = l_util_hexstring(info->ssid, strlen(info->ssid));
-+	eap_tls_forget_peer(network_id);
-+}
-+
- static int station_init(void)
- {
- 	station_list = l_queue_new();
-@@ -5139,6 +5159,12 @@ static int station_init(void)
- 
- 	watchlist_init(&event_watches, NULL);
- 
-+	eap_tls_set_session_cache_ops(storage_eap_tls_cache_load,
-+					storage_eap_tls_cache_sync);
-+	known_networks_watch = known_networks_watch_add(
-+						station_known_networks_changed,
-+						NULL, NULL);
-+
- 	return 0;
- }
- 
-@@ -5154,6 +5180,8 @@ static void station_exit(void)
- 	l_queue_destroy(station_list, NULL);
- 	station_list = NULL;
- 	watchlist_destroy(&event_watches);
-+	known_networks_watch_remove(known_networks_watch);
-+	known_networks_watch = 0;
- }
- 
- IWD_MODULE(station, station_init, station_exit)
 -- 
-2.34.1
+2.37.3
 
