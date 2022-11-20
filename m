@@ -1,49 +1,52 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7928C20E0
-	for <iwd@lists.linux.dev>; Sun, 20 Nov 2022 16:10:09 +0000 (UTC)
-Received: by mail-pj1-f48.google.com with SMTP id w15-20020a17090a380f00b0021873113cb4so8803888pjb.0
-        for <iwd@lists.linux.dev>; Sun, 20 Nov 2022 08:10:09 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2AF20E0
+	for <iwd@lists.linux.dev>; Sun, 20 Nov 2022 16:10:28 +0000 (UTC)
+Received: by mail-pg1-f174.google.com with SMTP id 136so9154019pga.1
+        for <iwd@lists.linux.dev>; Sun, 20 Nov 2022 08:10:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E0CkKk99nML12zgyxoJbB54W8nnObcPPy00N6EH83KI=;
-        b=FEUbLYW0yAHa+k76FTlSAzYhPlysyHyHDMBSwKN6DbfcrkjPQuZYG4sysQDm4mSlz7
-         sl2aqdGDXcHat6rIjUOQgUhWnlxEDl3rK3rwyyB+v+keDZWpQ4F4qG/xSK9zYd72BpVl
-         S6ipdoMZ+4FrQ1v00UnO+lXJOVOeirKGgnjpxAdyoyxWptukZagphm6VgKz8seDXe1dJ
-         hD5nxpKJvRsYga/B+WtXeEBs1c0eQmVOFDjdZiNDs9JFlC9iE37GPg1dTXPRqs0RjTmY
-         7ARnzTyCPmccZNh0P+sPgHC73hX3rzisx9dwa+E4TYaX3zFx5j5F8cIe/cujmW2gU9CR
-         ntgw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gyrqbBFaYb8n2tx4TAOXPliAejbPtFUIErzvsl4Zgy0=;
+        b=F6DvoWzrNxB6CoYpVKca1NblzPWwFb5IMUPueGiz8nDVUoA4UKUhNw1gOPlia7sAPN
+         M5AQFoWwbazAlsswT2Jc+bnCgRQlSDcvJdVIBBqwBznINlBhlvFxTLbUXJA/d80vP7pt
+         FrV0zTsBw2zIjNMVN/jLmiSPygE353gBmcyBZlGVsMBFZ2GOW7Wa4U0zEEDFyVsFiOqe
+         gAyj9w5Mc/HcDjnAYZFlvlODLRsHFt1oz7XA9/RPPKho15pRProOLPMQLnIwzbPxSkHY
+         4LkeNwoghf5HgF9wMlnt3Uo+8myUCcsEL77g8fzEHnHcy5OikYsCeYg/cZxwa09N8LVV
+         /Bng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E0CkKk99nML12zgyxoJbB54W8nnObcPPy00N6EH83KI=;
-        b=wj5mcHQzqEgQe0+hHX80o9GYAx1dOCUlcjV5yLO46LZw6EydZRy47+ZG74vSmPNdQh
-         XmH34sq1Kv/AaeSOrElfjsKNT8o/hWQSN++C9KrUte73aGVlChrhpLeDXb/K91jT7hHM
-         MzUw4wVPCz8QhEGXVjS0E/L4dIOMfDZcIDUJmqnpga2AD5Z3LgQJVAbksgRD6RVUFUnc
-         FV7rzg9/2uayyhLAYw/uZ05C+veiRwkX6D5NniWQZTWGJkovb0dSheO9eeXjY9/hfLXq
-         +UVWyXN6b89dFJWqgj/OiMEW683DQnyWtOglu638/KggotnNhKfn3BETlGs9OZKxFPup
-         ogkQ==
-X-Gm-Message-State: ANoB5pm/RwDypTbmRDwnaJkcksajFwGbhO64fhO5RYu4uIdUHOudsvGk
-	/5yr4O6Yw0OOf/J2bmQF7vXxuAfSzaL7Mw==
-X-Google-Smtp-Source: AA0mqf4X4nh/ggdonHqV2qr3OifyPSIcWgIH1zW/vu5H9cp1s1nuZa0QlbaBivkqsFUboeJTmprS/A==
-X-Received: by 2002:a17:902:c14d:b0:188:f9e2:7d9c with SMTP id 13-20020a170902c14d00b00188f9e27d9cmr4007543plj.33.1668960608590;
-        Sun, 20 Nov 2022 08:10:08 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gyrqbBFaYb8n2tx4TAOXPliAejbPtFUIErzvsl4Zgy0=;
+        b=Y8LmGvgMTNYmXfTEj8bO4+ut8m/tlS7o/ec55Cz8KtQVCPv5SimfWF2AEcWGzMjX27
+         NWq7Th9jR4ganEttRBh+0bPOPg5Dmpxt+hpeZGocnm636VFYhvYVEv2699VPtfi/uS6p
+         rYZuaj6jbWxqQyDNOTmeKWGWuFtgVz5W2+H4eyM271Id/+bnG39KAx5O6vTkd+8h1WOa
+         6qIV9W6xv6AFPN/H2u1nA9mlPIxRR5rys5+kA1+vE5wE4LX9u89GrzUe6aA5CSuItzbT
+         x5PuVH3wUitun6ICVC/GD/tek/ijkyjbXvX66qXJ0ZXrOriVGzmmwXZYzJYzwTgy9X2K
+         cbuA==
+X-Gm-Message-State: ANoB5pnXgwcc6/oY7028PGF25+RXdzJ9iiyhVeMypGiJO05+ZlRHoMWu
+	QyRd0eHA0W6yx5zlLYdD5MN8S1QXaHJOtw==
+X-Google-Smtp-Source: AA0mqf4grhAXKPOMeFzYSSQ4JrsjCAMXPlmPAu87JI2bepCOkm0Bkpffn3A4AnN91fLNl18WyV/NGQ==
+X-Received: by 2002:a63:5b54:0:b0:476:c490:67e2 with SMTP id l20-20020a635b54000000b00476c49067e2mr1433013pgm.552.1668960628110;
+        Sun, 20 Nov 2022 08:10:28 -0800 (PST)
 Received: from localhost ([2a09:bac1:3680:80::1c5:81])
-        by smtp.gmail.com with UTF8SMTPSA id ds22-20020a17090b08d600b0021885b05660sm4869435pjb.24.2022.11.20.08.10.07
+        by smtp.gmail.com with UTF8SMTPSA id p4-20020a170902e74400b0018691ce1696sm7728380plf.131.2022.11.20.08.10.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 20 Nov 2022 08:10:08 -0800 (PST)
+        Sun, 20 Nov 2022 08:10:27 -0800 (PST)
 From: Neehar Vijay <env252525@gmail.com>
 To: iwd@lists.linux.dev
 Cc: Neehar Vijay <env252525@gmail.com>
-Subject: [PATCH 1/3] gitignore: add compile_commands.json
-Date: Sun, 20 Nov 2022 21:39:12 +0530
-Message-Id: <20221120160912.72307-1-env252525@gmail.com>
+Subject: [PATCH 2/3] gitignore: add .ccls-cache
+Date: Sun, 20 Nov 2022 21:39:15 +0530
+Message-Id: <20221120160912.72307-2-env252525@gmail.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20221120160912.72307-1-env252525@gmail.com>
+References: <20221120160912.72307-1-env252525@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -52,26 +55,23 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This file is a compilation command database used by clangd and ccls,
-and can be generated by tools like https://github.com/rizsotto/Bear.
-
-  $ bear -- make clean all
+This directory is used by ccls.
 ---
  .gitignore | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/.gitignore b/.gitignore
-index 61b3638d..f215701d 100644
+index f215701d..bc429883 100644
 --- a/.gitignore
 +++ b/.gitignore
 @@ -5,6 +5,7 @@
  .deps
  .dirstamp
  .cache
-+compile_commands.json
++.ccls-cache
+ compile_commands.json
  tags
  cscope.*
- Makefile
 -- 
 2.38.1
 
