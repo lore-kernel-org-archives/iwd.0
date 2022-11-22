@@ -1,90 +1,76 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2542520E0
-	for <iwd@lists.linux.dev>; Sun, 20 Nov 2022 16:10:49 +0000 (UTC)
-Received: by mail-pj1-f54.google.com with SMTP id b11so8496380pjp.2
-        for <iwd@lists.linux.dev>; Sun, 20 Nov 2022 08:10:49 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2D6107A1
+	for <iwd@lists.linux.dev>; Tue, 22 Nov 2022 17:33:53 +0000 (UTC)
+Received: by mail-oi1-f176.google.com with SMTP id s206so16586502oie.3
+        for <iwd@lists.linux.dev>; Tue, 22 Nov 2022 09:33:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yrZ3lDc9tO3ltkELdWLGHA2cuypljdkdASX4fBTpwSc=;
-        b=KrQqjrMwTlOppUksKGI2Hwk3dlWD7PX5b7e2m0MscOZuSWDBBbVif4Tk88KOaHj1Zc
-         pEwQgb/SFFHVUYuXsn7G+vVtbKS7RpLe/eBMLK5YCuaA7uqIgWfWUhAE9NSGES8pza7P
-         11obLOeVk0406W+j8FTz9j9RYkbbgn3Tw4K9b4HVb/DvmaZaR4OK21U0y4fxmTbGJ/Du
-         cfnM4/kyRgBw6jNrM4rVTHcy0K8GtWahvK4yQJPFTIXmcyo3BszKR7AXMpnS4apnGMyn
-         +hFjn+aiQWX6ayRyHr3w/XOHzUt0sHqkCT2xILKQuPf1d5wjpQVO5IwCfimDZCN+xD28
-         MqyQ==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S87zzWlrTtOOYHQ0yj5R/pd4cLXDw11h8F3waBqytEs=;
+        b=JFT5/qfSL7uWGVWyoBYKUJsQQYTlJ2I8sNob+5H48PNP9mONGeKMl/7tByfwSDobRh
+         DlwZGtU1wpcFtm5YO3jxtL5fu4WTTxXlnmW60de0qmKsZr5FEiqp+OHgcK9GKSONV4of
+         ZgpmKGWBRwjXbCP17P6joJfh+v99I6/dSXYYVXKJvZTG7OmUeNDqa/khuwrGeNFJkucV
+         pmLWjP6BJSDS9wlqQs3KRVOkP7TMRdyPVtqE77YTgqzCpBJVY0EvuyH9Eq/dfScJY1rF
+         CXzC1EulHK5L8jOuJuPsVrZ3G3YONDTVlIWy0JhYwD7Suby760BrQuDf5VE4Y3fzD3GR
+         J1uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yrZ3lDc9tO3ltkELdWLGHA2cuypljdkdASX4fBTpwSc=;
-        b=dLdeTbW+dxKJ3rr7suIi9q88vWesRdewChwIqDDzE4rFCrG2nH7VAeNDygukl/BLrP
-         OW1HmjFcPKwjDnQPVURscC5JWOezZpgkcygv7aCDK6IhnCWIQYxZpkl61RiZK92ID0SU
-         17ehppZHU40xMDG3ziaIdZHC6iQQJ5HsHNL4paS54GutnBVgTV2196WGcxRjsimC0sEG
-         WnyqcTO3dd/QC1GvzWYy97BW8LDLB2P7waAM8++VhNKiucyhM1cC2vDxHmngZQvi4A0I
-         JECDLBv6j4gTz5xsN7GN+a47cnoqGUL0SdlhD7tOSM1blYuPwrnHW96OaHZvSqRgwlxW
-         9rDA==
-X-Gm-Message-State: ANoB5pnwzo3V4q1rM/L1Hd2h3WKs//oY05RfehXYHCfZRH9vR+sCt98u
-	Wk0kkcU10pkq4BPfTldCJlzlpNv0yIHXOw==
-X-Google-Smtp-Source: AA0mqf5voU5iYPz/UyuqtgXlECeUz9mLs+pl4e5y6wFzCRXQ9zNc71zx5XtKJlG4R6u1N9Cdw3/ISA==
-X-Received: by 2002:a17:90b:4382:b0:20b:c375:575 with SMTP id in2-20020a17090b438200b0020bc3750575mr16290295pjb.174.1668960648362;
-        Sun, 20 Nov 2022 08:10:48 -0800 (PST)
-Received: from localhost ([2a09:bac1:3680:80::1c5:81])
-        by smtp.gmail.com with UTF8SMTPSA id 135-20020a62178d000000b0056ba6952e40sm6836455pfx.181.2022.11.20.08.10.46
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S87zzWlrTtOOYHQ0yj5R/pd4cLXDw11h8F3waBqytEs=;
+        b=dHZROlYapTcRUowiq4dJ/FWzfkOsfDq2n8I4ojBvJRT1ZpLks3gE+CfTt8rN5CyN5U
+         OiXjydwtPzYrU5AsZpuZOvQcL0BFZquOt0eCSWLMAe/eP6hUsBQlrmlbFQTbrnJzxgOe
+         h6UKzhy9v4jXXmZANEQc/ZOBeWk3KeRhFZx+T5fm7PxVSOVy39JHDPvBhzairvPnINGP
+         JjEcYFgH/kXcna60EcsulqG/LxHVrpLDj3HC+AHfcJrEQFCkXCflSIP87VJFDAI0YPxW
+         PYF2rA9+4uqECnzwwYk7Ed4VoLb4WEKOAaq6UI5mcFdwcqRo2LnlqkRT94/lBpXf23JP
+         qB1Q==
+X-Gm-Message-State: ANoB5pmblFhsu6P7JDtuNWxsOKkEbuXtJljxJHtJL1/whxp6d8HJsUvF
+	5AfSYCyVtuPm6WJRSaq5IZNMVUBOW4U=
+X-Google-Smtp-Source: AA0mqf7fO/3cjRyAeg867XHw5WyZNxr7MrjT8U7UcE0AX53oTCMHlMYlTixBTWrA2YNCMb3mc3SbeA==
+X-Received: by 2002:a05:6808:1aa9:b0:35a:3a99:5284 with SMTP id bm41-20020a0568081aa900b0035a3a995284mr2239410oib.68.1669138432406;
+        Tue, 22 Nov 2022 09:33:52 -0800 (PST)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id ca3-20020a056830610300b00661b46cc26bsm6382066otb.9.2022.11.22.09.33.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 20 Nov 2022 08:10:48 -0800 (PST)
-From: Neehar Vijay <env252525@gmail.com>
-To: iwd@lists.linux.dev
-Cc: Neehar Vijay <env252525@gmail.com>
-Subject: [PATCH 3/3] client: fix non-interactive mode in some cases
-Date: Sun, 20 Nov 2022 21:39:17 +0530
-Message-Id: <20221120160912.72307-3-env252525@gmail.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221120160912.72307-1-env252525@gmail.com>
-References: <20221120160912.72307-1-env252525@gmail.com>
+        Tue, 22 Nov 2022 09:33:51 -0800 (PST)
+Message-ID: <71543c23-b34c-9ca4-bd4e-144a0047aeb1@gmail.com>
+Date: Tue, 22 Nov 2022 11:20:59 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 1/3] gitignore: add compile_commands.json
+Content-Language: en-US
+To: Neehar Vijay <env252525@gmail.com>, iwd@lists.linux.dev
+References: <20221120160912.72307-1-env252525@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20221120160912.72307-1-env252525@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Before this change, I noticed that some non-interactive commands
-don't work,
+Hi Neehar,
 
-  $ iwctl version
+On 11/20/22 10:09, Neehar Vijay wrote:
+> This file is a compilation command database used by clangd and ccls,
+> and can be generated by tools like https://github.com/rizsotto/Bear.
+> 
+>    $ bear -- make clean all
+> ---
+>   .gitignore | 1 +
+>   1 file changed, 1 insertion(+)
+> 
 
-  $ iwctl help
+All applied, thanks.
 
-while other ones do.
-
-  $ iwctl station wlan0 show
-
-This seems to be a typo bug in the if clause checking for additional
-arguments.
----
- client/command.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/client/command.c b/client/command.c
-index dbd97703..84be680c 100644
---- a/client/command.c
-+++ b/client/command.c
-@@ -753,7 +753,7 @@ options_parsed:
- 	argv += optind;
- 	argc -= optind;
- 
--	if (argc < 2) {
-+	if (argc < 1) {
- 		interactive_mode = true;
- 		return false;
- 	}
--- 
-2.38.1
+Regards,
+-Denis
 
