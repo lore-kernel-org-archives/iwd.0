@@ -1,76 +1,56 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2D6107A1
-	for <iwd@lists.linux.dev>; Tue, 22 Nov 2022 17:33:53 +0000 (UTC)
-Received: by mail-oi1-f176.google.com with SMTP id s206so16586502oie.3
-        for <iwd@lists.linux.dev>; Tue, 22 Nov 2022 09:33:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23597E
+	for <iwd@lists.linux.dev>; Wed, 23 Nov 2022 15:32:22 +0000 (UTC)
+Received: by mail-vs1-f53.google.com with SMTP id d185so17825231vsd.0
+        for <iwd@lists.linux.dev>; Wed, 23 Nov 2022 07:32:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S87zzWlrTtOOYHQ0yj5R/pd4cLXDw11h8F3waBqytEs=;
-        b=JFT5/qfSL7uWGVWyoBYKUJsQQYTlJ2I8sNob+5H48PNP9mONGeKMl/7tByfwSDobRh
-         DlwZGtU1wpcFtm5YO3jxtL5fu4WTTxXlnmW60de0qmKsZr5FEiqp+OHgcK9GKSONV4of
-         ZgpmKGWBRwjXbCP17P6joJfh+v99I6/dSXYYVXKJvZTG7OmUeNDqa/khuwrGeNFJkucV
-         pmLWjP6BJSDS9wlqQs3KRVOkP7TMRdyPVtqE77YTgqzCpBJVY0EvuyH9Eq/dfScJY1rF
-         CXzC1EulHK5L8jOuJuPsVrZ3G3YONDTVlIWy0JhYwD7Suby760BrQuDf5VE4Y3fzD3GR
-         J1uw==
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YtEJnX9steO7xIw9cdGaWVKVhubFm/r2uW5dJNrTuYg=;
+        b=KaEXlLFnTyPviJY4WGAzkdVnfmCuMDJTixcftEC2R5KZU47jpkx69rqoqQFgapugOb
+         ltmvFjvoSvATxB9wt8DMpyBc1hju2B6juSnqAewuZz97XA0rzKOibM2Ry6z0AEFPhfm3
+         Q7VRpxeS+2DG/QPC/nsrXKR8mFUk47jvy6IfDdQ9H/GkFCncb64o96V6fLjprsLl2Fm+
+         CO6rIcqM5xEJiz1wk0OJP0Eo5mg47mygdAKAGobah2ny5V4H4sWej1oIeyd37u5XKaqC
+         AWpN3MQ34h1OE5tJG5G0tvIzJi733HcxRcyfbG0/UEhSxZ3gZe9P5Up9fpJTbCSyeVsQ
+         YSzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S87zzWlrTtOOYHQ0yj5R/pd4cLXDw11h8F3waBqytEs=;
-        b=dHZROlYapTcRUowiq4dJ/FWzfkOsfDq2n8I4ojBvJRT1ZpLks3gE+CfTt8rN5CyN5U
-         OiXjydwtPzYrU5AsZpuZOvQcL0BFZquOt0eCSWLMAe/eP6hUsBQlrmlbFQTbrnJzxgOe
-         h6UKzhy9v4jXXmZANEQc/ZOBeWk3KeRhFZx+T5fm7PxVSOVy39JHDPvBhzairvPnINGP
-         JjEcYFgH/kXcna60EcsulqG/LxHVrpLDj3HC+AHfcJrEQFCkXCflSIP87VJFDAI0YPxW
-         PYF2rA9+4uqECnzwwYk7Ed4VoLb4WEKOAaq6UI5mcFdwcqRo2LnlqkRT94/lBpXf23JP
-         qB1Q==
-X-Gm-Message-State: ANoB5pmblFhsu6P7JDtuNWxsOKkEbuXtJljxJHtJL1/whxp6d8HJsUvF
-	5AfSYCyVtuPm6WJRSaq5IZNMVUBOW4U=
-X-Google-Smtp-Source: AA0mqf7fO/3cjRyAeg867XHw5WyZNxr7MrjT8U7UcE0AX53oTCMHlMYlTixBTWrA2YNCMb3mc3SbeA==
-X-Received: by 2002:a05:6808:1aa9:b0:35a:3a99:5284 with SMTP id bm41-20020a0568081aa900b0035a3a995284mr2239410oib.68.1669138432406;
-        Tue, 22 Nov 2022 09:33:52 -0800 (PST)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id ca3-20020a056830610300b00661b46cc26bsm6382066otb.9.2022.11.22.09.33.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Nov 2022 09:33:51 -0800 (PST)
-Message-ID: <71543c23-b34c-9ca4-bd4e-144a0047aeb1@gmail.com>
-Date: Tue, 22 Nov 2022 11:20:59 -0600
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YtEJnX9steO7xIw9cdGaWVKVhubFm/r2uW5dJNrTuYg=;
+        b=1QFKhSVzZeNcrWDx6V6qZdCPY/XH/DAJtIUYY+e3tnetycLdpw3lpAklKF5GIc7snl
+         YGNCodx6m3iLHyaBfE+1V14NrLEthPslpMR92wxQpb109s2RWj5zh5kgyHvHa4G+e7Fm
+         q9roeqf0k1Hdv79P8X3XYakxiNhCRghO1yyM/5c8jAy9c+0/btTajLR5SfiQiH9JZfsM
+         xcYnjZpk5qmqsaZ3WHl85nbROtmJGcikXS1pTtBIcrAgLj6zAu0PuamopgmprF2M+W4Q
+         /5+uIPn+YL6eEE1wNS8lt4zSrDUxb7VpwU8ezaLjzNbvuIwKKlTBe4FcM103y40luP7O
+         S1cQ==
+X-Gm-Message-State: ANoB5pn93+gDnCp/qgiR0+1IiFg4vEMAFyQ8Ftm/Umw8DoK6VcVWID2G
+	sV65e0haK/VAacY6DeGrb5xi3+/ZLqgQ/zgMwPerrsZlftNcDg==
+X-Google-Smtp-Source: AA0mqf5AH89CngXfOFCRJpewHq3+uqQAQOtPVTJwmnRXuhwi7NGrhIvEtZWclXhZ1yXO+Qur6HHmQV8U0Uol2gFaPLw=
+X-Received: by 2002:a67:7c3:0:b0:392:ba81:9854 with SMTP id
+ 186-20020a6707c3000000b00392ba819854mr17423832vsh.51.1669217541530; Wed, 23
+ Nov 2022 07:32:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 1/3] gitignore: add compile_commands.json
-Content-Language: en-US
-To: Neehar Vijay <env252525@gmail.com>, iwd@lists.linux.dev
-References: <20221120160912.72307-1-env252525@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221120160912.72307-1-env252525@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Nikita Zlobin <nick87720z@gmail.com>
+Date: Wed, 23 Nov 2022 20:32:11 +0500
+Message-ID: <CAGaigJP9aDt3hiQOVbg4U_x-_6T1+FHbimEE1KLBD1mYumJPaQ@mail.gmail.com>
+Subject: DBus service startup doesn't work with regular DBus (PATCH)
+To: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Neehar,
+IWD dbus service file is usable via any dbus. However, command to
+start service is not set, which as far as I understand means it's
+hard-bound to systemd.
 
-On 11/20/22 10:09, Neehar Vijay wrote:
-> This file is a compilation command database used by clangd and ccls,
-> and can be generated by tools like https://github.com/rizsotto/Bear.
-> 
->    $ bear -- make clean all
-> ---
->   .gitignore | 1 +
->   1 file changed, 1 insertion(+)
-> 
+Simple change of Exec= line to meaningful value fixes the problem.
 
-All applied, thanks.
-
-Regards,
--Denis
-
+Patch URL: https://bugs.gentoo.org/attachment.cgi?id=819160
+Original discussion: https://bugs.gentoo.org/831631
