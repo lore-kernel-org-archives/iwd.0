@@ -1,56 +1,65 @@
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23597E
-	for <iwd@lists.linux.dev>; Wed, 23 Nov 2022 15:32:22 +0000 (UTC)
-Received: by mail-vs1-f53.google.com with SMTP id d185so17825231vsd.0
-        for <iwd@lists.linux.dev>; Wed, 23 Nov 2022 07:32:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE466112
+	for <iwd@lists.linux.dev>; Mon,  5 Dec 2022 16:19:56 +0000 (UTC)
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-3b5d9050e48so123638937b3.2
+        for <iwd@lists.linux.dev>; Mon, 05 Dec 2022 08:19:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=YtEJnX9steO7xIw9cdGaWVKVhubFm/r2uW5dJNrTuYg=;
-        b=KaEXlLFnTyPviJY4WGAzkdVnfmCuMDJTixcftEC2R5KZU47jpkx69rqoqQFgapugOb
-         ltmvFjvoSvATxB9wt8DMpyBc1hju2B6juSnqAewuZz97XA0rzKOibM2Ry6z0AEFPhfm3
-         Q7VRpxeS+2DG/QPC/nsrXKR8mFUk47jvy6IfDdQ9H/GkFCncb64o96V6fLjprsLl2Fm+
-         CO6rIcqM5xEJiz1wk0OJP0Eo5mg47mygdAKAGobah2ny5V4H4sWej1oIeyd37u5XKaqC
-         AWpN3MQ34h1OE5tJG5G0tvIzJi733HcxRcyfbG0/UEhSxZ3gZe9P5Up9fpJTbCSyeVsQ
-         YSzQ==
+        bh=9oqrMrNvuEgxe59D6AjtaeyWVaTWZ3wfXgcNhIECaz0=;
+        b=pkarLsGG6z4rpoBiHwpoIGaIJEkKs5WiahmBI1rhqLWNlA8q4OiKNh5k21ufnIk4cU
+         nwSECo8XsY3TC8CATZJRvhU6l7RRqb51YBkqwiKCyHNRpoKbZqC/2e84ZZnfd+OsLPCI
+         3Iu91ZKERI9ToUxZ7avUlXU1vjkwuCrKrot4rmP0vt8ThVrkYghAWMVxLu+iBygNwk2Y
+         Kb5fVatjGhk4UtcpzYsTgHX+6Yc+sX2xCCds1O2dmzcYnKbe/HGBBmJzul6CvfV8x5/1
+         raT/33EZ+EGxR8HNBlfb4ISr3hIZRAPksJ8B26bA54QcD6g+R2oT+b6qwYh4Du+2VbGZ
+         R2Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=YtEJnX9steO7xIw9cdGaWVKVhubFm/r2uW5dJNrTuYg=;
-        b=1QFKhSVzZeNcrWDx6V6qZdCPY/XH/DAJtIUYY+e3tnetycLdpw3lpAklKF5GIc7snl
-         YGNCodx6m3iLHyaBfE+1V14NrLEthPslpMR92wxQpb109s2RWj5zh5kgyHvHa4G+e7Fm
-         q9roeqf0k1Hdv79P8X3XYakxiNhCRghO1yyM/5c8jAy9c+0/btTajLR5SfiQiH9JZfsM
-         xcYnjZpk5qmqsaZ3WHl85nbROtmJGcikXS1pTtBIcrAgLj6zAu0PuamopgmprF2M+W4Q
-         /5+uIPn+YL6eEE1wNS8lt4zSrDUxb7VpwU8ezaLjzNbvuIwKKlTBe4FcM103y40luP7O
-         S1cQ==
-X-Gm-Message-State: ANoB5pn93+gDnCp/qgiR0+1IiFg4vEMAFyQ8Ftm/Umw8DoK6VcVWID2G
-	sV65e0haK/VAacY6DeGrb5xi3+/ZLqgQ/zgMwPerrsZlftNcDg==
-X-Google-Smtp-Source: AA0mqf5AH89CngXfOFCRJpewHq3+uqQAQOtPVTJwmnRXuhwi7NGrhIvEtZWclXhZ1yXO+Qur6HHmQV8U0Uol2gFaPLw=
-X-Received: by 2002:a67:7c3:0:b0:392:ba81:9854 with SMTP id
- 186-20020a6707c3000000b00392ba819854mr17423832vsh.51.1669217541530; Wed, 23
- Nov 2022 07:32:21 -0800 (PST)
+        bh=9oqrMrNvuEgxe59D6AjtaeyWVaTWZ3wfXgcNhIECaz0=;
+        b=10exHmvgMBZKROLHoRl7wpNkWoP09PX+dcodgOIiiWie1bIoDIJ4hqlyIzNdjtg3XI
+         myVtpI1xBP7o6LQ0piWVXKjz++Bg1CRiLN/nWandWRAAXTSAKGJ0NkWTPJHblfgK3iqL
+         ieV9rUs5CD/3Bhld8b8wmDkQiR/VldnMAm4ecCk78GE3mcwonsuTREAxtKCOaJN4Kq06
+         JqQcRUAQH/d3YNOk+1yO7oWkb7dFiSbbilXxiy84rNvlVjD2INlUpdqWYH3k1aaimCBb
+         zyx4yuMyvwckhUaC3DkU075clUcXno5uMkTKfDKW+vEeMq3mzEGiRenFooAzabZAIq3V
+         6RXw==
+X-Gm-Message-State: ANoB5plhCvL8lmAQ+Cx1J/somSAo3k5a6danuH7RsmXFuEAVfmy6f0Tl
+	TiBYHz7Kw9k8vyquJERozUNT5jpiIpQtnFfsQA+TWJhWUkM=
+X-Google-Smtp-Source: AA0mqf6ZJdxV2JWaTkHFEL4G3PhBXKgDRww0n+DOAun0ZBXevFENIanyp2EYOdZ1FRRPZnZ9aLDEEFSY0+gY9H1vyhU=
+X-Received: by 2002:a81:2501:0:b0:3cc:8ab:be2c with SMTP id
+ l1-20020a812501000000b003cc08abbe2cmr32185135ywl.205.1670257195475; Mon, 05
+ Dec 2022 08:19:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: Nikita Zlobin <nick87720z@gmail.com>
-Date: Wed, 23 Nov 2022 20:32:11 +0500
-Message-ID: <CAGaigJP9aDt3hiQOVbg4U_x-_6T1+FHbimEE1KLBD1mYumJPaQ@mail.gmail.com>
-Subject: DBus service startup doesn't work with regular DBus (PATCH)
+From: Emil Velikov <emil.l.velikov@gmail.com>
+Date: Mon, 5 Dec 2022 16:19:44 +0000
+Message-ID: <CACvgo51HZVDcmvHiaZK3XFJyp6LUGRFEM+G=5j1--av=XWni+w@mail.gmail.com>
+Subject: WPA3 SAE passphrase limitation
 To: iwd@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-IWD dbus service file is usable via any dbus. However, command to
-start service is not set, which as far as I understand means it's
-hard-bound to systemd.
+Greetings list,
 
-Simple change of Exec= line to meaningful value fixes the problem.
+I was playing around with a router using WPA3 Personal (only) +
+CCMP-128 (AES) and noticed something odd. Namely: the 8 character
+limitation imposed by WPA2 is enforced with WPA3/SAE.
 
-Patch URL: https://bugs.gentoo.org/attachment.cgi?id=819160
-Original discussion: https://bugs.gentoo.org/831631
+Whenever I try to use such a passphrase (via iwctl) I get an error
+"Argument format is invalid".
+
+I realise it's not the best practice but the exact same router just
+works with my Android Pixel phone.
+
+Would anyone be interested in fixing this bug? Alternatively any
+pointers where the validation happens would be appreciated.
+
+Thanks in advance,
+Emil
