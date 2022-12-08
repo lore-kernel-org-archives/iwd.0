@@ -1,73 +1,144 @@
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91370629
-	for <iwd@lists.linux.dev>; Thu,  8 Dec 2022 05:18:52 +0000 (UTC)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailout.nyi.internal (Postfix) with ESMTP id A9D175C00C1;
-	Thu,  8 Dec 2022 00:18:51 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Thu, 08 Dec 2022 00:18:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dustymabe.com;
-	 h=cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:sender:subject
-	:subject:to:to; s=fm2; t=1670476731; x=1670563131; bh=i88vq7SoCT
-	R0m2xKeHL9XBW/BsJ6O+7d113hntGUxXg=; b=gLHIkBd4Tz2Nqq/aAuIZtxYD3A
-	ZILyZb4W7mQFXP8Uee+k4gXtSVwy6W2A+YN1maZmdr3KTA0eZGT26sOy5QRm9fQX
-	y+SMbNPQ3uE6k9dXC3NMtN56DReUD9v39a0GLBt8Xmql5if5qL7p+etiDOh3FLuC
-	lCW8IyAZRxJYC23BElejyc1ScpvLtGOVmFa4tuwvyBdAMfjinBVAIrCxOmyn7/V5
-	XaaxdCu3dndbbSk/KNhj9DND5ePqr2ETNMepeiWKzklZ88ofJAZyMgMOF+lGp9/p
-	pP0t49F3SDhF3CbFpg8mG2asGSx3mtSdSLutbtaQ87rqpFwCu+WqTPFZXNOA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:content-transfer-encoding:content-type
-	:date:date:feedback-id:feedback-id:from:from:in-reply-to
-	:message-id:mime-version:reply-to:sender:subject:subject:to:to
-	:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1670476731; x=1670563131; bh=i88vq7SoCTR0m2xKeHL9XBW/BsJ6
-	O+7d113hntGUxXg=; b=lBUuYKsfssdbDt3/jDFatZXsCPFbKG4iBqwiUbRu3kwM
-	7OLJrM/hSzC57UmxEL72kSn2Np9BucPDyHEeuj6NgIt14pX0zBHhypcBcutIkF0P
-	S5EDGAStqzE2eCEXEU+lUljHq4MoHoa3LKI+qak/X2RD6n+u5YTO6/q5yL1IMaoh
-	igxC/WubbOfNckvdwedJoJvzCpbvn3rDfxcdTWrzXZ9vRsF1pZCOtZnExF6t+GEC
-	ZD3ykT1+QEWEwweeFyPIujz+WJxoYCedsZgIbBP5B/K8qv3ITq/dfalXv9Inesax
-	7ur1N6QzTEpE+t/pcSVSnhPu7bsz3FCti1woxhkb4A==
-X-ME-Sender: <xms:u3ORY6rL7QcjNdfQB5ogtaPVON4dxCnvqRDQkrKitNjuNngje1gFuA>
-    <xme:u3ORY4qP6HmNFXt8TN6Y5d7IN18uK-VHZAnF6MMLorIsXpZdrwzVfMMbrpxps-vli
-    JjMZ-h6kt-Tx2EyeyY>
-X-ME-Received: <xmr:u3ORY_Nxk89nlNtRQDfZ22IVMqkWRtQ2V9j2RMdCoSmZ7ZGNYQPy71Df3TAjmH3mFuK_>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudelgdekgecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecunecujfgurhepkfffgggfvffhufgtgfesthejredttd
-    efjeenucfhrhhomhepffhushhthicuofgrsggvuceoughushhthiesughushhthihmrggs
-    vgdrtghomheqnecuggftrfgrthhtvghrnhepgfelteegvefffeetgeefvdekjeeghfethf
-    ffveeutdefjeefteevkeeltdektdfhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghr
-    rghmpehmrghilhhfrhhomhepughushhthiesughushhthihmrggsvgdrtghomh
-X-ME-Proxy: <xmx:u3ORY55CD-U56c6yDu1TFVOgMRZ213q6nfwc1IySSt63SjhXZh9w3A>
-    <xmx:u3ORY54VRec0aZHcCGQZY7-ZxEHnnsHtCT5ChqiwCiqe2ZLlihgfkw>
-    <xmx:u3ORY5jEZPz-MygNc0xT19a-2d7zMMowvQpOcef_lC_QkHMyIr1Zzg>
-    <xmx:u3ORY2i6M-MPSEAOLyCSq_HzHIpIiDVcEvg6TNjJEpOrH204PToyaQ>
-Feedback-ID: i13394474:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 8 Dec 2022 00:18:51 -0500 (EST)
-Message-ID: <b9c60cd3-4c42-348e-589f-dafd7de5858a@dustymabe.com>
-Date: Thu, 8 Dec 2022 00:18:50 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2912F36
+	for <iwd@lists.linux.dev>; Thu,  8 Dec 2022 23:48:19 +0000 (UTC)
+Received: by mail-pg1-f169.google.com with SMTP id 82so2463218pgc.0
+        for <iwd@lists.linux.dev>; Thu, 08 Dec 2022 15:48:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=q0mxRbNDmIrYRHrsZ3PuQADH4hrk850BmhEjhwCS4ac=;
+        b=UqojndcLMnCPOqwH1LxZN6zwtOoQo42jm7Zl/t7ScVR5xr1A92uN+dAK/VQ4FTSwb6
+         +KPGdtyRC62HEAFHrwNy5NrQE3X4tVvQuguUw3VMFa2r9MWO8v79IKAyg5z4dhB/rCF4
+         sZ7Y3ugSIGt/QdoSg6Z4v/az1cfr2TETE9zTuyn7OKzSPcOa7zto9z+mgBg7+QidCums
+         sohpMJAjtaZ1Ekwzv2QlZ8MR7n459+0eTf+STJGkoeNcKjfnIkoM75CDT1B6wqcYjf8d
+         9rx/6bjhHd0/kUA44LsKnVnufksdQ5KTD0zOrNr4vfcSuaBNH8yQbK0G/Xb6q6vljLVL
+         jTbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q0mxRbNDmIrYRHrsZ3PuQADH4hrk850BmhEjhwCS4ac=;
+        b=KY83XpFI8C29bo0k6gTpwAP727NIuRac/JCSeWDJa/owMfyCSjMZnJwWhz6rbxwGVJ
+         ZPlJ6JzclSAgdiHzfpXPDa9eGvYhTCPMIEFnyKH8kA7Foh3ANtbyCTi0BFTym3kRCHnz
+         4B4Qmt+Bq1qpjymWoQWLsGGR31IY6a2Aq2ZNxZdcB7JIGPBTTNa3G2fPywj+AXEOJI8k
+         85XxqyvabNdCt6CGhdayI0UwwZp0vOlzzE9Bz/pb/KozCQxDzDmS9agGUB36HF+usyhB
+         /3zMTsZOztcjga5zNA6vhhv2q/SCbf71ifVH406d6Pd8zFyD3CizLxME085Xe7wq8YzI
+         VxqQ==
+X-Gm-Message-State: ANoB5pmg0YtRD0WTTeVbVjuYwxnGy7lYo9CYACxq56a4TSB/gxluXY9O
+	vizUEX71HwDkfaVVRBBwaqUDdupZIcw=
+X-Google-Smtp-Source: AA0mqf5BumJoLaS+gltFoiYR4YVhb7jZ8srNACw7xGUFSfZmwXxJhTl31ikMdLfAlthx21Qzfca71Q==
+X-Received: by 2002:aa7:804a:0:b0:566:94d0:8c83 with SMTP id y10-20020aa7804a000000b0056694d08c83mr3271589pfm.7.1670543298389;
+        Thu, 08 Dec 2022 15:48:18 -0800 (PST)
+Received: from jprestwo-xps.none ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id f67-20020a62db46000000b005767cb32fdasm41392pfg.188.2022.12.08.15.48.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Dec 2022 15:48:17 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/5] nl80211util: populate no-IR list parsing frequencies
+Date: Thu,  8 Dec 2022 15:48:08 -0800
+Message-Id: <20221208234812.778191-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-To: iwd@lists.linux.dev
-Content-Language: en-US
-From: Dusty Mabe <dusty@dustymabe.com>
-Subject: Any plans to implement 802.11g/n in AP mode?
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-I see the new 2.0 release (congrats!) came out recently (congrats). At this point
-are there any plans to support more recent 802.11g/n in AP mode? It's pretty much
-the only thing holding me back from switching out wpa_supplicant for IWD.
+In AP mode no-IR channels need to be known since they are effectively
+disabled with respect to AP operation. Parse these channels into a
+separate list.
+---
+ src/nl80211util.c | 11 ++++++++++-
+ src/nl80211util.h |  3 ++-
+ src/wiphy.c       |  6 ++++--
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-Thanks for the hard work!
-Dusty
+diff --git a/src/nl80211util.c b/src/nl80211util.c
+index da36d936..396c82c2 100644
+--- a/src/nl80211util.c
++++ b/src/nl80211util.c
+@@ -502,7 +502,8 @@ int nl80211_parse_chandef(struct l_genl_msg *msg, struct band_chandef *out)
+ 
+ int nl80211_parse_supported_frequencies(struct l_genl_attr *band_freqs,
+ 					struct scan_freq_set *supported_list,
+-					struct scan_freq_set *disabled_list)
++					struct scan_freq_set *disabled_list,
++					struct scan_freq_set *no_ir_list)
+ {
+ 	uint16_t type, len;
+ 	const void *data;
+@@ -515,6 +516,7 @@ int nl80211_parse_supported_frequencies(struct l_genl_attr *band_freqs,
+ 	while (l_genl_attr_next(&nested, NULL, NULL, NULL)) {
+ 		uint32_t freq = 0;
+ 		bool disabled = false;
++		bool no_ir = false;
+ 
+ 		if (!l_genl_attr_recurse(&nested, &attr))
+ 			continue;
+@@ -527,6 +529,9 @@ int nl80211_parse_supported_frequencies(struct l_genl_attr *band_freqs,
+ 			case NL80211_FREQUENCY_ATTR_DISABLED:
+ 				disabled = true;
+ 				break;
++			case NL80211_FREQUENCY_ATTR_NO_IR:
++				no_ir = true;
++				break;
+ 			}
+ 		}
+ 
+@@ -538,6 +543,10 @@ int nl80211_parse_supported_frequencies(struct l_genl_attr *band_freqs,
+ 
+ 		if (disabled && disabled_list)
+ 			scan_freq_set_add(disabled_list, freq);
++
++		if (no_ir && no_ir_list)
++			scan_freq_set_add(no_ir_list, freq);
++
+ 	}
+ 
+ 	return 0;
+diff --git a/src/nl80211util.h b/src/nl80211util.h
+index 44555a25..ce1df2cd 100644
+--- a/src/nl80211util.h
++++ b/src/nl80211util.h
+@@ -59,4 +59,5 @@ struct l_genl_msg *nl80211_build_cmd_frame(uint32_t ifindex,
+ int nl80211_parse_chandef(struct l_genl_msg *msg, struct band_chandef *out);
+ int nl80211_parse_supported_frequencies(struct l_genl_attr *band_freqs,
+ 					struct scan_freq_set *supported,
+-					struct scan_freq_set *disabled);
++					struct scan_freq_set *disabled,
++					struct scan_freq_set *no_ir);
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 10514572..4744e7f4 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -1514,7 +1514,8 @@ static void parse_supported_bands(struct wiphy *wiphy,
+ 			case NL80211_BAND_ATTR_FREQS:
+ 				nl80211_parse_supported_frequencies(&attr,
+ 							wiphy->supported_freqs,
+-							wiphy->disabled_freqs);
++							wiphy->disabled_freqs,
++							NULL);
+ 				break;
+ 
+ 			case NL80211_BAND_ATTR_RATES:
+@@ -1988,7 +1989,8 @@ static void wiphy_dump_callback(struct l_genl_msg *msg,
+ 				continue;
+ 
+ 			nl80211_parse_supported_frequencies(&attr, NULL,
+-							wiphy->pending_freqs);
++						wiphy->pending_freqs,
++						NULL);
+ 		}
+ 	}
+ }
+-- 
+2.34.3
+
