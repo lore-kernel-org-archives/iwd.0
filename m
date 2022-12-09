@@ -1,88 +1,82 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CB46FAB
-	for <iwd@lists.linux.dev>; Fri,  9 Dec 2022 19:39:37 +0000 (UTC)
-Received: by mail-pg1-f180.google.com with SMTP id r18so4187004pgr.12
-        for <iwd@lists.linux.dev>; Fri, 09 Dec 2022 11:39:37 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D033214
+	for <iwd@lists.linux.dev>; Fri,  9 Dec 2022 21:00:25 +0000 (UTC)
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-144bd860fdbso1246588fac.0
+        for <iwd@lists.linux.dev>; Fri, 09 Dec 2022 13:00:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JqeYpa7sv4P1GZ4qZMuySNH9P1etBW2vI4Y9N6iOExA=;
-        b=Z8S07qDpk7JgFPkFvvyJTjyC0cXqrGy1NQZ1YvRvPnFW386tJw7RI8kNOdHQbDII4j
-         +lKxJytRmxw8exkP+HvKyUiojhxI7t1++ttsymS9YS6hv3l4ubXvcMiCJ2FSJLbDZy/l
-         R2w7KUarvw/aHbPTM8N8btHCPYhqVd4YbQrdYPTHzHWEkUhUBlo4H962ufEsN4idwkkg
-         nqTJfdTxLYKVMJlXTFhIs4323hLIUTo0gIv6in2zB35BPORERXnvWJItr1eFz267GqVs
-         lTI0vIep2n+4Vgr+BN+t7ptqFdIYnjoNIrhuA4PZ7o2WewpakztnInNBk8Rk2F0WRdCr
-         uAEw==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KMI1AzAO+itkC9HukgnHA4oY+nEpoiZ5BuyAO09+7vo=;
+        b=iRsB6z0TkR4qtpp0ah8P3Urtt8gWfBjCptJLOMJxSOKAzEx0suG2wgok7gMP1JttTC
+         tbjy0HeSUxBTyJXjUC3c/XzdYL7rWK9TaccvLdvINvP9NB/bhjwlcWWoozu4/zM9AC1Z
+         QqM3rnITD+70/Xy+3eZMTglE7efXAkKkmagOWx3aRSaPeOgu5YVLTfge5cpbr2EU5pxz
+         L2WZMD0IDVFS9YvPnm24ildqZ4HfiR082Svh2J943HyFBQzD+fcgLzjFxFIkGFCqBZO8
+         t6MYfPHdZFHdgs73VCyOVhK62qNggK9IX4e/drCk93MhsaT3IJrZ85Wuk9Vkm1vj8gZR
+         SDHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JqeYpa7sv4P1GZ4qZMuySNH9P1etBW2vI4Y9N6iOExA=;
-        b=NCBzb0TkxIs1CmOQgEU1FDNhx52MGRSmqSrpTuuJEtSbZrWobUbgR9PU2wElvNFyQj
-         sdevUnesD/CnPbU48aKDh0XBZ7lkmSb/gNddi++MSK+50hIwge0DGgx7OrRp99CW8G65
-         N0Y0wa6ff1DOJFXZ4TFF7NbUdeqO25DNJdIpm5lUHwj/OQRuv0tBTucX7URBP7EApCp6
-         Wq1CDYHScQRdRC4JI1i4NUFChCVpO59hdEp+XXK3ENAKxy8V5+i7ALPV+oQ1ntmTGszS
-         tyeuh+lkZGf/X3etWhtx2CCIDgZz6LuWHRI+lJyQSaVecxvLG7XOeqUDg3uuT4Z1qIDr
-         hfOw==
-X-Gm-Message-State: ANoB5pnIWaWDdCrNCT1trMEbZkGORnNXo0eW8vb1WRUIEijzYZFuw/eB
-	p0yUOolUlPHFujYVZpT7p6nqLLQcQAA=
-X-Google-Smtp-Source: AA0mqf5/HZNnmUE4imv77WJkfddpCcGz3KHB/FTfybp3Nuds+Pw4YzPojj0+AoRlhlqehGNccrFiNg==
-X-Received: by 2002:a05:6a00:1c81:b0:577:8bae:29a7 with SMTP id y1-20020a056a001c8100b005778bae29a7mr6414804pfw.33.1670614776720;
-        Fri, 09 Dec 2022 11:39:36 -0800 (PST)
-Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id x28-20020aa78f1c000000b0056bc5ad4862sm1587638pfr.28.2022.12.09.11.39.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 11:39:35 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 4/4] doc: document 5GHz AP support
-Date: Fri,  9 Dec 2022 11:39:30 -0800
-Message-Id: <20221209193930.845238-4-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20221209193930.845238-1-prestwoj@gmail.com>
-References: <20221209193930.845238-1-prestwoj@gmail.com>
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KMI1AzAO+itkC9HukgnHA4oY+nEpoiZ5BuyAO09+7vo=;
+        b=RY3Wrl66ZzVI0N75VqDlR5Y3WnPDRCwsOefVVKwBj8vcdK5BHjOs2P/BArNypmhAmL
+         gUOebymSTlpyKx9iNpXa3fOvjElKKv9KM8twJilmI3IBP6uyHD7Ko4xI3yQ+yKrdYbEk
+         DdEWv+OiuNzcvPMSBsOEv22GecQcg7v8BYteGyyMoDLQ0Uusc00iSU6yI7TklXpsWvPw
+         zitc7JZw0or6BddD2TmJEOwvf1G9fNtwcdfstC3Dt0M//mLVEE+R7myYQa+hF5i+s20I
+         x8vDMYMkcRXHwcM2GIpCydRCpG+H5Hknt11M6ejU4HtLKJJHhPhN7vQ3hnpxLSPvFh/K
+         Wleg==
+X-Gm-Message-State: ANoB5pnxlClXVjJ3cx/SrijgCPCxoNqxu/+Y//UYNyEojgFkl5pVp4An
+	h3+YwB+whk16dFxoCbhbxi5SIfuGGys=
+X-Google-Smtp-Source: AA0mqf4qwp3xbzAnZq51HnRrVtICER2NvqPPvAvfMs9XLXaFQ8QPiPQAP2a72LfxfjzL83T7TAN4ZA==
+X-Received: by 2002:a05:6870:f216:b0:143:a049:19c8 with SMTP id t22-20020a056870f21600b00143a04919c8mr3775640oao.37.1670619624505;
+        Fri, 09 Dec 2022 13:00:24 -0800 (PST)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id i15-20020aca2b0f000000b00359ba124b07sm865520oik.36.2022.12.09.13.00.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Dec 2022 13:00:23 -0800 (PST)
+Message-ID: <029df79a-40b8-a994-7961-6f0de41dfb52@gmail.com>
+Date: Fri, 9 Dec 2022 15:00:19 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v3 1/4] wiphy: use enum band_freq with rates getter
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20221209193930.845238-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20221209193930.845238-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- src/iwd.ap.rst | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+Hi James,
 
-diff --git a/src/iwd.ap.rst b/src/iwd.ap.rst
-index 7b8844e7..823aba99 100644
---- a/src/iwd.ap.rst
-+++ b/src/iwd.ap.rst
-@@ -55,8 +55,17 @@ The group ``[General]`` contains general AP configuration.
-    * - Channel
-      - Channel number
- 
--       Optional channel number for the access point to operate on.  Only the
--       2.4GHz-band channels are currently allowed.
-+       Optional channel number for the access point to operate on. If omitted
-+       the channel will be chosen automatically. Channels greater than or equal
-+       to 36 will select the 5GHz band for the AP to operate on.
-+
-+       Note: Due to regulatory requirements the linux kernel does not allow or
-+       strictly limits 5GHz use in AP mode while in world roaming. These
-+       frequencies become available once the country is set, either via IWD's
-+       main.conf option ``[General].Country`` (see ``man iwd.config``) or
-+       externally (e.g. iw reg set <CC>). If you are having trouble using 5GHz
-+       ensure the country is set, and that the desired frequency/channel is
-+       unrestricted.
- 
- Network Authentication Settings
- -------------------------------
--- 
-2.34.3
+On 12/9/22 13:39, James Prestwood wrote:
+> wiphy_get_supported_rates expected an enum defined in the nl80211
+> header but the argument type was an unsigned int, not exactly
+> intuitive to anyone using the API. Since the nl80211 enum value
+> was only used in a switch statement it could just as well be IWD's
+> internal enum band_freq.
+> 
+> This also allows modules which do not reference nl80211.h to use
+> wiphy_get_supported_rates().
+> ---
+>   src/scan.c  | 2 +-
+>   src/wiphy.c | 9 +++++----
+>   src/wiphy.h | 4 +++-
+>   3 files changed, 9 insertions(+), 6 deletions(-)
+> 
+
+All applied, thanks.
+
+Regards,
+-Denis
 
