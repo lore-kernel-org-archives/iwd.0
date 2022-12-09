@@ -1,52 +1,49 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C6EA481
-	for <iwd@lists.linux.dev>; Thu,  8 Dec 2022 23:48:22 +0000 (UTC)
-Received: by mail-pf1-f172.google.com with SMTP id 21so2519017pfw.4
-        for <iwd@lists.linux.dev>; Thu, 08 Dec 2022 15:48:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E0263D2
+	for <iwd@lists.linux.dev>; Fri,  9 Dec 2022 18:23:52 +0000 (UTC)
+Received: by mail-pl1-f182.google.com with SMTP id d3so5719219plr.10
+        for <iwd@lists.linux.dev>; Fri, 09 Dec 2022 10:23:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MkWXHL9QpRN0P17qHhHjwOyYSxwizyQuhCSmiEKlic8=;
-        b=WIq0VtzNUtIvVPkmV7BO93UcyQLZPJtbtOcdnUDb6K7Qsd/NrJvRfUQURcMVuMkE0L
-         HuxIm9L8r+X4j8fgOBwnmjX0J13b3jfmmIqMba/S54ZQzykoAu4j0nfEpXYNpuEqQTnE
-         PF097UQroYeu6LqzVwe/nw6mwZ/0yeq1rnlB2S/vY4L+CW9KpE4S3taM3Wv9mXnsMxEl
-         FU3ibehUPNrtC5uTuGqt90bSy3aSjDR/ETarWy+86CXkXjnRG7HIVUs+U2sATZ+09BlJ
-         5JrJaxgHJ4figOuMPcMofp3LAZx7NfV5vK1BCPDWhsPEGbTvz3If12qdN3VEaMmGUU+U
-         7zNg==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wFdDBkNcJ7FMvuxzZpwR36JLJ6QHLaWElsNYLEHpDg4=;
+        b=g21smc7hCVsbqwB9DppwsfrofSGx4Lg6rO+9Vay9qfcsNkQNigmkFX9KuNHnoyWRhT
+         XddWRnhnucTbMxqjUvtBGe+ZBsnHRKNjWWXkguH4UbHkrb3qANplkryH1m4ZT2wdf6u7
+         ZxhlE7IUs1blaQql4E1FwcUssgwqSxigMUqaKtwwMehmr+kfWjUlSNf1UVCA/dtqvdz2
+         M89TEv8wIpiyKQCXNUQlpLHIUkyoz8x13sgz/gkYoDlX4dyqRVMFTcQ3VQx4zm23nuai
+         fEGlqG9Ed03AaOf44xBSnrxgGRcrTvquBtRLcCV49rXnE+n/IHmikwOH4VBhewiHKP9Z
+         ++Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MkWXHL9QpRN0P17qHhHjwOyYSxwizyQuhCSmiEKlic8=;
-        b=XSlLLUx2MAkBQp1MQS5vlsUdK3Z/K/DCcSkPYRhfvbpjO9FphAzfkt7oNJwvV0dq+a
-         eGaQKB3gqdAtgmh6moTLC1O5Aeuptct6ubg+plryPkVb2XjwQWyX3a5Nh3iQu752Ss9X
-         +MTe5390iOU2m7sODVSztS4CeTv/L8zG6WVRoQPeDFLkZgmLdtfaWudmIfNioq9a0XWH
-         KeN1OZ52cqID0Aixr1krkykniDJLbxkihq5PVS1Al9ShyHuKtf/rGbNnUzLa25N+lrH9
-         UIVc8Q6K0LCokzvNmo1MZ41mcdL8sY5NxWu/8FumAqqwAOizMdui547CLunIutzS9yOP
-         y9iQ==
-X-Gm-Message-State: ANoB5plExfvDaa9fUObX4+S1CPmogV6AXKEfyocZr6Oywg89hnrbPDcL
-	tGjmK3ZTqZqpPAriHG13NTXlLtd62Bs=
-X-Google-Smtp-Source: AA0mqf7R+XDaU6loTHJYJAt2BNvyMrP8K6imm184I2AFm0RrW/CL5QYT7rwlhvkDQpHjBIGY82A87Q==
-X-Received: by 2002:a62:ee14:0:b0:566:900d:6073 with SMTP id e20-20020a62ee14000000b00566900d6073mr3067726pfi.24.1670543301879;
-        Thu, 08 Dec 2022 15:48:21 -0800 (PST)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wFdDBkNcJ7FMvuxzZpwR36JLJ6QHLaWElsNYLEHpDg4=;
+        b=wo5QYTeQ1F3NUze/Krgr27lQloNkScpCbrKbnrmtg99yibJpcfHHF9Y/fLPSVuCTc1
+         5Mj+zqVfhq1S7tOEALgon42QtjvimVI5OJrkSkp16iXTHI9Ygs7iKWu21wJrAyhVoIWT
+         3pobh4o7FMnBN+ixU6hHzXmRmhoOgKf5IdssKmGnn90/bhXVrISoV2Pfw5RVckQ8co/Q
+         nICwTXnXt1Y6tvJXxFdW8MRbAynpqB2TZrHJaypbvQto+tKHRNoUXDcz+aN9a+ZgvEs6
+         aQkj+A+kxEYYDcH5kkMzNSTcA9MrKlo4Csty+bQ9v6hz73jdsfpZ6sPchBeDfs2k4NH4
+         orFw==
+X-Gm-Message-State: ANoB5pmWuiOJqzfSHiwWR6zgigCqmY0yf44YzQbNsnnuk+ZgAEAEIm00
+	K6+hPvjtdlnNwot9zNt8pKskYw2AzI0=
+X-Google-Smtp-Source: AA0mqf44PnXExEJDfm3LasT79A7NewTos2XgVTzBqANhq4VImRN46HXMvsXUVWfgX4hk19gNW7EFKQ==
+X-Received: by 2002:a17:903:2349:b0:189:9311:d1fc with SMTP id c9-20020a170903234900b001899311d1fcmr7976179plh.9.1670610231972;
+        Fri, 09 Dec 2022 10:23:51 -0800 (PST)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id f67-20020a62db46000000b005767cb32fdasm41392pfg.188.2022.12.08.15.48.21
+        by smtp.gmail.com with ESMTPSA id q14-20020a170902a3ce00b001897de9bae3sm1635790plb.204.2022.12.09.10.23.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Dec 2022 15:48:21 -0800 (PST)
+        Fri, 09 Dec 2022 10:23:51 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/5] doc: document new AP profile key: [General].Band
-Date: Thu,  8 Dec 2022 15:48:12 -0800
-Message-Id: <20221208234812.778191-5-prestwoj@gmail.com>
+Subject: [PATCH v2 1/4] wiphy: use enum band_freq with rates getter
+Date: Fri,  9 Dec 2022 10:23:44 -0800
+Message-Id: <20221209182347.838602-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20221208234812.778191-1-prestwoj@gmail.com>
-References: <20221208234812.778191-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -55,40 +52,84 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- src/iwd.ap.rst | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+wiphy_get_supported_rates expected an enum defined in the nl80211
+header but the argument type was an unsigned int, not exactly
+intuitive to anyone using the API. Since the nl80211 enum value
+was only used in a switch statement it could just as well be IWD's
+internal enum band_freq.
 
-diff --git a/src/iwd.ap.rst b/src/iwd.ap.rst
-index 7b8844e7..22d307e1 100644
---- a/src/iwd.ap.rst
-+++ b/src/iwd.ap.rst
-@@ -52,11 +52,23 @@ The group ``[General]`` contains general AP configuration.
-    :widths: 20 80
-    :align: left
+This also allows modules which do not reference nl80211.h to use
+wiphy_get_supported_rates().
+---
+ src/scan.c  | 2 +-
+ src/wiphy.c | 9 +++++----
+ src/wiphy.h | 4 +++-
+ 3 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/src/scan.c b/src/scan.c
+index ef222f66..5d2f2957 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -426,7 +426,7 @@ static struct l_genl_msg *scan_build_cmd(struct scan_context *sc,
+ 		 * rates we don't want to advertise support for 802.11b rates.
+ 		 */
+ 		if (L_WARN_ON(!(supported = wiphy_get_supported_rates(sc->wiphy,
+-							NL80211_BAND_2GHZ,
++							BAND_FREQ_2_4_GHZ,
+ 							&num_supported))))
+ 			goto done;
  
-+   * - Band
-+     - Frequency band
-+
-+       Band the access point will operate on. This is optional and if omitted
-+       the 2.4GHz band will be used. Value should be "2.4GHz" or "5GHz".
-+
-+       Note: Due to regulatory requirements the linux kernel does not allow or
-+       strictly limits 5GHz use in AP mode while in world roaming. These
-+       frequencies become available once the country is set, either via IWD's
-+       main.conf option ``[General].Country`` (see ``man iwd.config``) or
-+       externally (e.g. iw reg set <CC>).
-+
-    * - Channel
-      - Channel number
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 10514572..37e0cdb8 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -788,19 +788,20 @@ bool wiphy_supports_iftype(struct wiphy *wiphy, uint32_t iftype)
+ 	return wiphy->supported_iftypes & (1 << (iftype - 1));
+ }
  
--       Optional channel number for the access point to operate on.  Only the
--       2.4GHz-band channels are currently allowed.
-+       Optional channel number for the access point to operate on. If omitted
-+       the channel will be chosen automatically.
+-const uint8_t *wiphy_get_supported_rates(struct wiphy *wiphy, unsigned int band,
++const uint8_t *wiphy_get_supported_rates(struct wiphy *wiphy,
++						enum band_freq band,
+ 						unsigned int *out_num)
+ {
+ 	struct band *bandp;
  
- Network Authentication Settings
- -------------------------------
+ 	switch (band) {
+-	case NL80211_BAND_2GHZ:
++	case BAND_FREQ_2_4_GHZ:
+ 		bandp = wiphy->band_2g;
+ 		break;
+-	case NL80211_BAND_5GHZ:
++	case BAND_FREQ_5_GHZ:
+ 		bandp = wiphy->band_5g;
+ 		break;
+-	case NL80211_BAND_6GHZ:
++	case BAND_FREQ_6_GHZ:
+ 		bandp = wiphy->band_6g;
+ 		break;
+ 	default:
+diff --git a/src/wiphy.h b/src/wiphy.h
+index f8de7e0e..410105dd 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -29,6 +29,7 @@ struct scan_freq_set;
+ struct wiphy_radio_work_item;
+ struct ie_rsn_info;
+ enum security;
++enum band_freq;
+ 
+ typedef bool (*wiphy_radio_work_func_t)(struct wiphy_radio_work_item *item);
+ typedef void (*wiphy_radio_work_destroy_func_t)(
+@@ -112,7 +113,8 @@ uint8_t wiphy_get_max_num_ssids_per_scan(struct wiphy *wiphy);
+ uint16_t wiphy_get_max_scan_ie_len(struct wiphy *wiphy);
+ uint32_t wiphy_get_max_roc_duration(struct wiphy *wiphy);
+ bool wiphy_supports_iftype(struct wiphy *wiphy, uint32_t iftype);
+-const uint8_t *wiphy_get_supported_rates(struct wiphy *wiphy, unsigned int band,
++const uint8_t *wiphy_get_supported_rates(struct wiphy *wiphy,
++						enum band_freq band,
+ 						unsigned int *out_num);
+ bool wiphy_supports_adhoc_rsn(struct wiphy *wiphy);
+ bool wiphy_can_offchannel_tx(struct wiphy *wiphy);
 -- 
 2.34.3
 
