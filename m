@@ -1,122 +1,104 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DBD3212
-	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 17:22:56 +0000 (UTC)
-Received: by mail-pj1-f44.google.com with SMTP id t11-20020a17090a024b00b0021932afece4so550689pje.5
-        for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 09:22:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YGQChT+pbLRWK1oqD2tcGw4f+d9JxcgEy9uapmmsJR4=;
-        b=pZRwaaVEPwiDFvWSEfLRBOD3U8o3P7s4yVi8D/DuHX8mdcejqp3PAoY6B2bFlHy7RS
-         hcyAaNITLFYzjgE8fOBop+dyDF1Qbg4ZqzQKZSF+8qgQ4GWRvSneelOv4Jc+fnA8mwkS
-         aNfcCq/jUPJVES85HxxflMX4T0sfSy66vn9DzhKMEegIXWlNtSvlYYSt8ZQJFfgPBFSk
-         1S0qTQrSqsCegb1W7UfGrCfFf8RPecKpTtM+R4oaG+YVP4ZIVoYKF9J9ufMN4a1E8XI7
-         Ev8WU4QgjQOkOeKWdcKFB4vKTEWyrao8DccJ9A5GJOpPppWSkwM5OQUCj+zwKotLnspf
-         RsaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YGQChT+pbLRWK1oqD2tcGw4f+d9JxcgEy9uapmmsJR4=;
-        b=WOO16Nut96uV12QsPAZs2lobuTSP7NDpI2gLCMRtHYkg9NtB0fZP8dOEXVO++8X2Nq
-         LM18OU8GRDd5ebqebvkzb4fMjW3P+XuFf1WIuFcotCKhS/T8JBX0Zb6jNZ94TXo058hs
-         t9oxI7cu48aeDdVNb/9hDimEFctYGyPY1Dqo5TfH+wuK6zMnUG7IVrRSZUgHNgMSjzfr
-         g/5ofTsAXFOZMcVjzNpwOJrfUkbxlxBbDt6f1z2QcG0/VF21YV3uLk57dNkOfq/2E/C7
-         4M6mHUUO+UyXex0Jz/loq3Kag6aF1ANjauXvS46mXeiESM0Y0mID2H6fg4rxR1VGxGOX
-         2CIQ==
-X-Gm-Message-State: ANoB5pk3ZvIdSy1WclXK47i9cD0c9lCTU4+g0bMnOFx4d2aNf3c/hdYM
-	QRO07SEtuG1UTOruFGr41QniiW1EXQk=
-X-Google-Smtp-Source: AA0mqf4yntBVbDBHtdQJDAxdsHo9N42ObWCWYpQzh0dPMNPrCVyeHB27X6LiaxuNYXUYQX0ZbXvjeA==
-X-Received: by 2002:a17:902:d2cb:b0:188:8679:bb1e with SMTP id n11-20020a170902d2cb00b001888679bb1emr25112752plc.46.1670865775621;
-        Mon, 12 Dec 2022 09:22:55 -0800 (PST)
-Received: from [192.168.254.17] ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id w11-20020a170902ca0b00b001872999f58esm6600110pld.189.2022.12.12.09.22.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 09:22:55 -0800 (PST)
-Message-ID: <b4ad714bbd162b1f7bc3302c9585adf8811ac929.camel@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CE93212
+	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 17:52:53 +0000 (UTC)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.west.internal (Postfix) with ESMTP id 2B6603200921;
+	Mon, 12 Dec 2022 12:52:52 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Mon, 12 Dec 2022 12:52:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=airpost.net; h=
+	cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:sender:subject:subject:to:to; s=fm2; t=1670867571; x=
+	1670953971; bh=AAmX/n0cTV+N2ve9F0UmTv3Xu3jbdCQZHyeJGXnN7ls=; b=E
+	vvZjH8K5cjkAaen3lUfUrowd1enctUl7z+vpaR07cc6Scax6RTqgeB5+Eb7ugSUp
+	Lyb++2lKWvJjvgAqMW7Y/YMCxJ5EZGfen6Y2N3/f2r6CcyVQFRXRa0xvCkzdkLZD
+	kH6bF98+fNRenpaPiMEENc45D+oz+PmqQeZm/duO3nP+9cLtl1F+HjnfPXUu0Tz3
+	psJpcbwwkGWxfB/zE3lu5a770bJZzB3JSyw9BreHU+SNtT26ekzfa8brkYn4ld3T
+	Uf6adM0AnWJGhjtyDBfslJpvCjP94zDPQ5xURy9bbBVGAKHeLXbwVh6S3bGWgigQ
+	N8kjcBYVnU17oxF24G/+A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-transfer-encoding:content-type
+	:date:date:feedback-id:feedback-id:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm2; t=1670867571; x=1670953971; bh=A
+	AmX/n0cTV+N2ve9F0UmTv3Xu3jbdCQZHyeJGXnN7ls=; b=kCZZi3V7gGp7q1FOp
+	AzHUxylI8xHwJ6uyyGVkGLEvDdGq15Ryqn5byUV7RXRxzm6poHL3tS4pZSM3OImC
+	m23LQjNlPgDdu4lUgix/5g3ycaGEfafE/sLGAynKLto+8Y9d3rov3ZJYWMNGUMQw
+	Lv6/ul/nZYiJE8kPap0+AFrM+0TU+c2fvDlkSE7lznZJj3MqAqq8fzrQhp41E44O
+	q6I05Gi9XbYxni++NGJm+oyjL0bwZPG2w/XEDbH6iouCSz1UyP5kWSxomM9cPPMF
+	Z3opzDTVCHXCi7hqBBUXfrEkHFbkFCoY+gJBzyaiNj1Z1RqNp53iBbEtLmCJTR1Y
+	n0s4g==
+X-ME-Sender: <xms:c2qXY_U1xlkfbOaMltRFymebnX-znT2rAdqrTYHW6nep2rEh8k79XQ>
+    <xme:c2qXY3kzscmC5osco7c-imEf0tvLsZgYjQn5Pj0X61C1j--gGLSZD4B0Dr6tF36cJ
+    eYQq7MudIeNBcGX>
+X-ME-Received: <xmr:c2qXY7b4nW12u0LGb066p7005hHP_K4hv8CEXSR5zONbdXliPMrws-1hibEcHQo2>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdekgdekvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeeurhhunhho
+    ucffrghnthgrshcuoegurghnthgrshesrghirhhpohhsthdrnhgvtheqnecuggftrfgrth
+    htvghrnhepkeehfedvgedvtdefvdetjeeugefftdfhgffhgfethfffudffgeeuheejheet
+    uedtnecuffhomhgrihhnpehprghsthgvsghinhdrtghomhenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegurghnthgrshesrghirhhpohhsthdr
+    nhgvth
+X-ME-Proxy: <xmx:c2qXY6XVYfqUmU6H4wwaT0nKRnEzBr0arlovIIOzcKd6NlVL8sEwjA>
+    <xmx:c2qXY5n5-ccrAfpLPaKI5nLNgSvBx_1LxJSu9ghWwahPaul4TTExRg>
+    <xmx:c2qXY3dYoQPRoDcMbISygvEBFOggVPFv9anCbFHClIb0SOavli8dDg>
+    <xmx:c2qXY4s2cWN-FuGIXrVsrdTj6lapLf9H6EhKUVStPgzTa-dcGTZEeA>
+Feedback-ID: i1cfa4199:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 12 Dec 2022 12:52:51 -0500 (EST)
 Subject: Re: iwd release 1.30 onwards cannot find available networks
-From: James Prestwood <prestwoj@gmail.com>
-To: Bruno Dantas <dantas@airpost.net>, iwd@lists.linux.dev
-Date: Mon, 12 Dec 2022 09:22:54 -0800
-In-Reply-To: <b7ff5956-f571-d9d8-1f7b-f3025e2055ae@airpost.net>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
 References: <b7ff5956-f571-d9d8-1f7b-f3025e2055ae@airpost.net>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+ <b4ad714bbd162b1f7bc3302c9585adf8811ac929.camel@gmail.com>
+From: Bruno Dantas <dantas@airpost.net>
+Message-ID: <126d2f2b-07ef-fd22-7656-dcd21f3cece0@airpost.net>
+Date: Mon, 12 Dec 2022 12:52:53 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <b4ad714bbd162b1f7bc3302c9585adf8811ac929.camel@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Bruno,
+Hi, James.
 
-On Mon, 2022-12-12 at 11:54 -0500, Bruno Dantas wrote:
-> I was a happy iwd user through release 1.29. From 1.30 onwards
-> (including the latest version 2.0) I had to switch to wpa_supplicant
-> because in most (but, strangely, not all) locations where I go, iwd
-> fails to find any available networks ("sudo iwctl station wlan0 get-
-> networks" says "No networks available").
-> 
-> Today I finally got around to doing a git bisect to pinpoint the
-> regression. The bisect concluded with this:
-> 
-> dfcba7c83c60f1a99ecf6f1424e97bf89fcab38e is the first bad commit
-> commit dfcba7c83c60f1a99ecf6f1424e97bf89fcab38e
-> Author: James Prestwood <prestwoj@gmail.com>
-> Date:   Thu Aug 4 11:51:06 2022 -0700
-> 
->     wiphy: track GET_REG ID
->     
->     Keep track of the GET_REG call so it can be canceled if the wiphy
->     goes down.
-> 
->  src/wiphy.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+> Thanks for taking initiative and bisecting. But its puzzling how this
+> commit could have any effect. The only functional change is removing a
+> pending request when the wiphy goes down, so not related to anything
+> while the device is up/scanning.
 
-Thanks for taking initiative and bisecting. But its puzzling how this
-commit could have any effect. The only functional change is removing a
-pending request when the wiphy goes down, so not related to anything
-while the device is up/scanning.
+It was my first git bisect, so it is certainly possible that I made a mistake. Regardless, the regression definitely appeared in release 1.30 and I excluded a regression in ell.
 
-Just to be clear, you are making sure IWD scans prior to calling 'get-
-networks' right? i.e. station wlan0 scan?
+> Just to be clear, you are making sure IWD scans prior to calling 'get-
+> networks' right? i.e. station wlan0 scan?
 
-But assuming IWD is scanning (or trying) we need to see some debug logs
-for IWD, and best if you could also get an iwmon trace when IWD starts
-up and issues scans, and when you call get-networks. More info how to
-do that here:
+Yes, but the scan just hangs. I wait a full minute before interrupting the scan with Ctrl+c.
 
-https://iwd.wiki.kernel.org/debugging
+> But assuming IWD is scanning (or trying) we need to see some debug logs
+> for IWD, and best if you could also get an iwmon trace when IWD starts
+> up and issues scans, and when you call get-networks. More info how to
+> do that here:
 
-Btw, Alvin just sent a revert related to scanning [1]. I have't had a
-chance to really look at it but possibly related?
+No problem. When using latest iwd 2.0, then letting it scan for a minute before interrupting, then running get-networks, here is the iwmon trace:
+https://pastebin.com/h7gHrS2w
 
-[1]
-https://lore.kernel.org/iwd/20221212164250.3075444-1-alvin@pqrs.dk/T/#u
+And "iwd -d" output:
+https://pastebin.com/2y5hHfWa
+
+I don't see Alvin's patch in the git commit history yet. Once it's been committed, I can recompile iwd 2.0 and test it.
+
+Please let me know what you think of the iwmon and iwd debug output.
 
 Thanks,
-James
-
-> 
-> In case it's helpful, my machine is an X230 ThinkPad with coreboot,
-> linux kernel version 5.15.10, running Tiny Core Linux 13.1 x86_64. My
-> wireless card is Intel Dual Band Wireless-AC 7265. If you guys need any
-> more information, I'd love to help.
-> 
-> Please fix this regression if possible. I'd love to go back to using
-> iwd in the future.
-> 
-> Happy hacking!
-> Bruno "GNUser" Dantas
-> 
->  
-> 
-
-
+Bruno
