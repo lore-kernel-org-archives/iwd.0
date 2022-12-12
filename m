@@ -1,95 +1,93 @@
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDCE53B9
-	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 19:06:47 +0000 (UTC)
-Received: by mail-ot1-f45.google.com with SMTP id q18-20020a056830441200b006704633f258so7932174otv.0
-        for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 11:06:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+XX5DNEWWIphEX1MK8B8VL+RwpFYa9mB7Bn7QUStdww=;
-        b=Fs0DGUGqN4QB/uiTwizBO0MnmVHMrbNxXnXW98eCRbCEM3yS+o6D7QZ6UXELX4Tqu6
-         Pt800+EjPZtv1sBibApkYqkZ8PquxyoJVsbIotoymVOwvUhEHFLTmprS3MwB1t7gbWdV
-         x5AALo3m23sfO5hpJXmG5S/k9C/Rgg72vVZ0j7Cj+cOnXJTRb902xRH8Jls28TemXHaa
-         vste8lAAIgggzOn8ut50/5+Plb9HoJS7uwC2dpJ7qVQUfHQSEswkVDQBSqXs7pt0pJov
-         3L7k1bYuu5CgLBce0AOYXONWUtAsRxvFeMGcTrjsSda1yovLUfYZT7pw+4JSORHZKk42
-         4brQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+XX5DNEWWIphEX1MK8B8VL+RwpFYa9mB7Bn7QUStdww=;
-        b=tYxnjWU3IMA3FnxhVMuEp0V/8t6omUxIlRxPDtcEQYJTBGzd5iM51JCM7TPCO5iSUJ
-         yxsQh68FPCqKSShiISUXqjqo1oJs4doUg+C7/FyT9HGkT7ko15BytYp+TLHhoy+2tMlw
-         vawOzPF1Ip8oittMNzsGtSWGVVUeMWl69n3Ai+BjSmfE/+egp0BVgtbRGHOhnM7hAJzI
-         a8ijhIYIsTT2/YjdonVeNnyxH+KFCNv6QuRv0onZ+ISdoyhj7qD+Vfxt5i/XazPssHn1
-         w9K7p8RqS6ii5zZzQR+WrQHNGlz+pWJnO9fkH9adqyqpa7xXzW0Wfl3Eo5g1d+lQHKXJ
-         Epnw==
-X-Gm-Message-State: ANoB5pkLjeM++3dQbRdmXTpkkFRo45Z/Ifmr5Ei0cA8v3AgZ/5M49OiS
-	vx9D+Xop51r0OSJNH6+lrfg=
-X-Google-Smtp-Source: AA0mqf6GxCI9XeVIhdMDN69P50C1nx/lOW26sG1uPC0peSGdjmfSR0/PR7LItsp7ruhRwR01v+OdLA==
-X-Received: by 2002:a05:6830:1513:b0:670:8676:76ee with SMTP id k19-20020a056830151300b00670867676eemr5355276otp.36.1670872006638;
-        Mon, 12 Dec 2022 11:06:46 -0800 (PST)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id g3-20020a9d6203000000b006708a6274afsm273615otj.25.2022.12.12.11.06.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Dec 2022 11:06:45 -0800 (PST)
-Message-ID: <0df6f28d-4a77-dea2-dbf6-c83c6a25b8ae@gmail.com>
-Date: Mon, 12 Dec 2022 13:01:12 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D84553B9
+	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 19:27:35 +0000 (UTC)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 71C185C0166;
+	Mon, 12 Dec 2022 14:27:34 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Mon, 12 Dec 2022 14:27:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=airpost.net; h=
+	cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:sender:subject:subject:to:to; s=fm2; t=1670873254; x=
+	1670959654; bh=exWHAWwbYw1Bb1eFtcGCFsCsvBFkoqsMNHuVTDWR5g8=; b=V
+	LT0U9Owslwx50X9NbYuMBXffRQXvzccRA1BbRsIdCem9AbVHo5frmj77UqzSTIaF
+	tBETkl5cG76Te7mxmIPgqer3tO+mt/yAutrROhl+KOow1eTNRN4odRfuG8Plz6o0
+	Kdhdqg4OEg+hLUBOPX1Oqnr2kn0/jTdnXQA4spEqf2r2JjfhX7gunT8J0qj+OHdG
+	B7cO+z/5Y5CIBNcvkdzDczwL9jdg4Vom0H0g8Wnlnj7fN3XGZSNY0bZy1Zg2loFK
+	5QLsaDzyTs09frF2bU/mwnrme2hi2iGPYTZCptHyhAVOR2bh6InTv3BQyt5hXPeV
+	BEN40df6OFb580xtma8gg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-transfer-encoding:content-type
+	:date:date:feedback-id:feedback-id:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm2; t=1670873254; x=1670959654; bh=e
+	xWHAWwbYw1Bb1eFtcGCFsCsvBFkoqsMNHuVTDWR5g8=; b=A2g4klBAzER1ijLCE
+	7x5O6KLE+dAdOKmme95qg2kJ5eqXb7m4GzQJNR3Nd9XWwnn+rhOsylWFKqtpMC9B
+	pK6NQQUQwPCTm8aL1EoPC4hLeSeawk25zaybeTkrlPBd1cNTpR8bKa7A3CEOdUZK
+	MzG0wNZxR5CWIxnSzkiTa1x+o0Vqc9D5pTy9Fr1GAF90SzDuleFtaX9WK9rdMkc9
+	OEKnZl0Jjol+cKSPXU9wiOK123cQojIL1f9Weh3C3StO8YBht2A4+zsdtlbs57ZV
+	W5l6igDPww4RmYi25JFxCiaaGGBC5m16t+wmWS1SdpgSp2+HLKgKBxzQNF1xRBa7
+	bb5/w==
+X-ME-Sender: <xms:poCXY64h1V_md6FkNdmMoAQvdsV7dOrdHAnfTaJ--jJxghvyiJ6ktg>
+    <xme:poCXYz7HX4LUw8Ie5oaGR-__Li4Zo1iWfvXBcYq0UwOb2hRxgdbIyCNtf1_FmXU0V
+    T3YDPFKWb7UPShO>
+X-ME-Received: <xmr:poCXY5fhUfiWQEzMGW0v9lqgHOhEC8KBjP0KJaq67nvQv6Bdzl7b-nnkcpZxVCjq>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdekgddutdduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepuffvfhfhkffffgggjggtgfesthejredttdefjeenucfhrhhomhepuehruhhn
+    ohcuffgrnhhtrghsuceouggrnhhtrghssegrihhrphhoshhtrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeevhfffgfeuvdehhfehheehkeettdfgueehffdvvdejudelhfethefgleej
+    feeiveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    gurghnthgrshesrghirhhpohhsthdrnhgvth
+X-ME-Proxy: <xmx:poCXY3IjonkyXAXz3sxvsdCCO-g6TaZvpr6BWhgbEELM071jWpMswg>
+    <xmx:poCXY-JHPTtf4WlWDEmn1_u_F03oUN78PHCrdNr_SPRDlkZhp5ViFQ>
+    <xmx:poCXY4xD6wh1P21UDiC56xOPGGZfGDZA3jhDNxK0A_GAo1SYet_SNg>
+    <xmx:poCXYwhru2qMHxpITLNguCIEZgDJnSxzql6PzzGK4C-W0qQvwwXcJQ>
+Feedback-ID: i1cfa4199:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 12 Dec 2022 14:27:34 -0500 (EST)
+Subject: Re: iwd release 1.30 onwards cannot find available networks
+To: Denis Kenzior <denkenz@gmail.com>, James Prestwood <prestwoj@gmail.com>,
+ iwd@lists.linux.dev
+References: <b7ff5956-f571-d9d8-1f7b-f3025e2055ae@airpost.net>
+ <b4ad714bbd162b1f7bc3302c9585adf8811ac929.camel@gmail.com>
+ <126d2f2b-07ef-fd22-7656-dcd21f3cece0@airpost.net>
+ <0df6f28d-4a77-dea2-dbf6-c83c6a25b8ae@gmail.com>
+From: Bruno Dantas <dantas@airpost.net>
+Message-ID: <5056edba-fa23-b133-73ac-f8daa483cf23@airpost.net>
+Date: Mon, 12 Dec 2022 14:27:36 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: iwd release 1.30 onwards cannot find available networks
-Content-Language: en-US
-To: Bruno Dantas <dantas@airpost.net>, James Prestwood <prestwoj@gmail.com>,
- iwd@lists.linux.dev
-References: <b7ff5956-f571-d9d8-1f7b-f3025e2055ae@airpost.net>
- <b4ad714bbd162b1f7bc3302c9585adf8811ac929.camel@gmail.com>
- <126d2f2b-07ef-fd22-7656-dcd21f3cece0@airpost.net>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <126d2f2b-07ef-fd22-7656-dcd21f3cece0@airpost.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <0df6f28d-4a77-dea2-dbf6-c83c6a25b8ae@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Hi Bruno,
+Hi, Denis.
 
->> Just to be clear, you are making sure IWD scans prior to calling 'get-
->> networks' right? i.e. station wlan0 scan?
-> 
-> Yes, but the scan just hangs. I wait a full minute before interrupting the scan with Ctrl+c.
-> 
+> And can you elaborate what 'hangs' mean?  If there are no networks, then you should see a "No networks available" print or something similar.
 
-This doesn't make much sense.  get-networks doesn't scan, it just returns the 
-cached networks that iwd knows about.  If you want to scan, use 'station wlan0 
-scan'.
+By "hangs" I mean that when I run "station wlan0 scan", the command never returns. I work in a hospital office where there are _many_ wifi networks within range, including ones with strong signal. 
 
-And can you elaborate what 'hangs' mean?  If there are no networks, then you 
-should see a "No networks available" print or something similar.
+(iw is able to show me the available networks, and I can connect to them using wpa_supplicant. A different linux machine that uses NetworkManager with wpa_supplicant backend also shows me numerous networks. iwd--up to and including version 1.29--is also able to show me the available networks.)
 
->> But assuming IWD is scanning (or trying) we need to see some debug logs
->> for IWD, and best if you could also get an iwmon trace when IWD starts
->> up and issues scans, and when you call get-networks. More info how to
->> do that here:
-> 
-> No problem. When using latest iwd 2.0, then letting it scan for a minute before interrupting, then running get-networks, here is the iwmon trace:
-> https://pastebin.com/h7gHrS2w
-> 
-> And "iwd -d" output:
-> https://pastebin.com/2y5hHfWa
-> 
+> Can you run a few scans manually using 'station foo scan'?
 
-According to iwmon, there is nothing coming up in the scan results.
+First attempt never returns, as I mentioned above. Subsequent manual attempts, no matter how long I wait, all go like this:
 
-Can you run a few scans manually using 'station foo scan'?
+$ sudo iwctl station wlan0 scan
+Operation already in progress
 
-Regards,
--Denis
+Attempts to display networks using "station wlan0 get-networks" consistently results in "No networks available", which is not true.
+
+-Bruno
