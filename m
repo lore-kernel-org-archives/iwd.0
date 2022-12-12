@@ -1,86 +1,84 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1429746F
-	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 22:09:00 +0000 (UTC)
-Received: by mail-pl1-f173.google.com with SMTP id p24so13572283plw.1
-        for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 14:09:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A90746F
+	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 22:11:42 +0000 (UTC)
+Received: by mail-ot1-f46.google.com with SMTP id l8-20020a056830054800b006705fd35eceso8208874otb.12
+        for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 14:11:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kATEalScbkZvJKpTK7sG5qF8oWC+Zk2z8K6zZQVy3+g=;
-        b=jI9cl2WZPW+CtLiOwJSjCsC5ZME9uA+4iWKU2orp33ig67qolSrxpsq2y8tTCxClub
-         bHQuajX1boEKiXLoZ4aW5V+cnFXM6j6wbDVscA3FJfQCGedh6mGcsC6BqToNu9f1YsKI
-         YfIXRTGBx1y8Ix1BCWLfWs12tesYi2eY5OM9QFbfF7Eskl94F04clrommKcn2Ns7Gwpl
-         nX/Px8t482HwY+cLaxyz6K5Esm5Gz+jI6DEZ7+7m/eQf3DZWKa27fUkWupiMpcn+AxH3
-         YwCX6/9Jyi1OLkcMLBq6WJWKgSHl6/0E+ZoIi2bfg08ev40r49q/ZyktwUsH+6TQXsZn
-         GNFA==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SQBfnbzakIeh66TmU37heZGMZ00PQ+GJwqcnaqS01Jg=;
+        b=agtRaYycTgwojrzJ68UBC/KBb2LTbZBbsvzyEic0lLfygonwkKqrKhWDDNeqs+pFHb
+         FSDRWmfXDIxot4CGkVQASqnkdkJFhkIR/Dz8ZeJ/3aReCTkuT1N9D7HJM4C/ugkv4OiA
+         oQKEV9dYYUICZtEzojnaIWYtdX13jsk2ZQnNS+R1pzcqpFSlkrFMduIwAnJIM8ut65kh
+         OHftU9ru5vVTog9CIHrpE+e/sugvmln66AB2RSgrRRVfECI5HXn3Xz3MAs1fgrW7/d6O
+         hmXAF2w0g67OgV21ZLoEfDLhPMaCmCWaRUuwZr6U6UOl7lO+GGKPPaobc+9N3bjqg0IT
+         MLsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kATEalScbkZvJKpTK7sG5qF8oWC+Zk2z8K6zZQVy3+g=;
-        b=FAKA6wj+C/mt7G8KroYNuNbO6Qm4gNqQSPHLfpfxK0fqMF+Z2pibPPqPCAailyFaBL
-         cvc5t4XvDDqgzo4ogO0tnQq8huK571Cu8T6euuUPwA9iroH2a0ymCNosyc09iB8NIc8r
-         snB3T6T0UPZH3GF60OZsmKp4XouVwtq+mXTHIAUKbf2hiedrjKdRnI8gnExwmyrFk5dO
-         iqPmKpSyLkPw0cuEPylLFoyY5Jh43HfTnlRi7GrDifWmG8k7rTTc9FFQ8Xk5HZIMxkzh
-         z7l5lTm9Fv8jsTm7MJPqyMzFazQeUUGI/nUPL09+VIlRkQXLKFLXblQ8W5lQjtHgJFol
-         18eQ==
-X-Gm-Message-State: ANoB5pm5/TXUanPtbI6AJ7dA4sO3C7fVSdiAt/JNui05ICbnei8FGeiO
-	TH5l/GLTZin1Tjt6r7ODPenGTvN4hzo=
-X-Google-Smtp-Source: AA0mqf5ikQB4ty8nHlMiaYQ/yhlvVRmwjB7iD8Fj1PVvf7xeTrp3wUtpdb5O2gIKPoozj/vOVgqp8Q==
-X-Received: by 2002:a17:902:9349:b0:189:b0ff:e318 with SMTP id g9-20020a170902934900b00189b0ffe318mr17938380plp.1.1670882939874;
-        Mon, 12 Dec 2022 14:08:59 -0800 (PST)
-Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id q19-20020a170902f35300b001893efd3e03sm6884525ple.119.2022.12.12.14.08.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 14:08:59 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] scan: remove early supported check for 6ghz in wiphy watch
-Date: Mon, 12 Dec 2022 14:08:57 -0800
-Message-Id: <20221212220857.1284874-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SQBfnbzakIeh66TmU37heZGMZ00PQ+GJwqcnaqS01Jg=;
+        b=TycbKRlcmJ7+xtnYO7wb7tR8c6Louost1/YQlN7k5+cOIgQ9AqfZ7Y4MwDAxdkObzy
+         8GNXEY9LE/SicURiKSb4tQuzSnKWJdRXdTo3ftadgoSPBs+/wCh9qiI6FFsYnLJKt8ZJ
+         nIf6TAElj9HO6Blv75cVYbytYtHmUGx4kJUF8OhtrnCOs36MhdOJ7jr2PRor4V/DMaDU
+         wSYtBp0HbPcb8cQ+6JstT3mut6+gaQl9LjBqfQ1dct0/ssM9dWkzKjIadZc74m0IHrR4
+         RkIlYQutCsH6L3NLb8WpgSY2Se8EqfG1EL2wlS8nWMQFxp9gnx46z3ozUYClNuCUz49O
+         1pBA==
+X-Gm-Message-State: ANoB5plpDC9YsCEB4lDpk7qLHXdnENoq+m0UGxR3ir299d71EWsABrGK
+	+b+eoa9gx8fTIcv+p7IoMrw=
+X-Google-Smtp-Source: AA0mqf6ZUOwWktgG66swEwthjt8jgEOSYGXKvunncAeFKz+3d6U7TKQwrsawBkjFtOzQ/IpqMuY99w==
+X-Received: by 2002:a05:6830:6481:b0:66d:aba2:a8f0 with SMTP id ck1-20020a056830648100b0066daba2a8f0mr11825438otb.10.1670883102111;
+        Mon, 12 Dec 2022 14:11:42 -0800 (PST)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id v21-20020a9d7d15000000b0066c3bbe927esm461078otn.21.2022.12.12.14.11.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Dec 2022 14:11:41 -0800 (PST)
+Message-ID: <0bd53fcf-7367-46de-0567-e4e0fa8cca09@gmail.com>
+Date: Mon, 12 Dec 2022 16:00:21 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: iwd release 1.30 onwards cannot find available networks
+Content-Language: en-US
+To: Bruno Dantas <dantas@airpost.net>, James Prestwood <prestwoj@gmail.com>,
+ iwd@lists.linux.dev
+References: <b7ff5956-f571-d9d8-1f7b-f3025e2055ae@airpost.net>
+ <b4ad714bbd162b1f7bc3302c9585adf8811ac929.camel@gmail.com>
+ <126d2f2b-07ef-fd22-7656-dcd21f3cece0@airpost.net>
+ <0df6f28d-4a77-dea2-dbf6-c83c6a25b8ae@gmail.com>
+ <5056edba-fa23-b133-73ac-f8daa483cf23@airpost.net>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <5056edba-fa23-b133-73ac-f8daa483cf23@airpost.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-If the regdom updates during a periodic scan the results will be
-delayed until after the update in order to, potentially, add 6GHz
-frequencies since they may become available. The delayed results
-happen regardless of 6GHz support but scan_wiphy_watch() was
-returning early if 6GHz was not supported causing the scan request
-to never complete.
----
- src/scan.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+Hi Bruno,
 
-diff --git a/src/scan.c b/src/scan.c
-index 5d2f2957..f63b3ed2 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -1933,12 +1933,9 @@ static void scan_wiphy_watch(struct wiphy *wiphy,
- 	struct scan_freq_set *freqs_6ghz;
- 	struct scan_freq_set *allowed;
- 	bool allow_6g;
--	const struct scan_freq_set *supported =
--					wiphy_get_supported_freqs(wiphy);
- 
--	/* Only care about regulatory events, and if 6GHz capable */
--	if (event != WIPHY_STATE_WATCH_EVENT_REGDOM_DONE ||
--			!(scan_freq_set_get_bands(supported) & BAND_FREQ_6_GHZ))
-+	/* Only care about completed regulatory dumps */
-+	if (event != WIPHY_STATE_WATCH_EVENT_REGDOM_DONE)
- 		return;
- 
- 	if (!sc->sp.id)
--- 
-2.34.3
+On 12/12/22 13:27, Bruno Dantas wrote:
+> Hi, Denis.
+> 
+>> And can you elaborate what 'hangs' mean?  If there are no networks, then you should see a "No networks available" print or something similar.
+> 
+> By "hangs" I mean that when I run "station wlan0 scan", the command never returns. I work in a hospital office where there are _many_ wifi networks within range, including ones with strong signal.
 
+Gotcha.  Having a hang in 'station wlan0 scan' makes sense since it is an async 
+method.  The get-networks method is synchronous so it shouldn't ever 'hang'.
+
+Please try
+
+[PATCH] scan: remove early supported check for 6ghz in wiphy watch
+
+that James just sent and see if it fixes your issue.
+
+Regards,
+-Denis
