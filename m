@@ -1,82 +1,119 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D033214
-	for <iwd@lists.linux.dev>; Fri,  9 Dec 2022 21:00:25 +0000 (UTC)
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-144bd860fdbso1246588fac.0
-        for <iwd@lists.linux.dev>; Fri, 09 Dec 2022 13:00:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F201360
+	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 16:42:55 +0000 (UTC)
+Received: by mail-ed1-f48.google.com with SMTP id v8so13720631edi.3
+        for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 08:42:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KMI1AzAO+itkC9HukgnHA4oY+nEpoiZ5BuyAO09+7vo=;
-        b=iRsB6z0TkR4qtpp0ah8P3Urtt8gWfBjCptJLOMJxSOKAzEx0suG2wgok7gMP1JttTC
-         tbjy0HeSUxBTyJXjUC3c/XzdYL7rWK9TaccvLdvINvP9NB/bhjwlcWWoozu4/zM9AC1Z
-         QqM3rnITD+70/Xy+3eZMTglE7efXAkKkmagOWx3aRSaPeOgu5YVLTfge5cpbr2EU5pxz
-         L2WZMD0IDVFS9YvPnm24ildqZ4HfiR082Svh2J943HyFBQzD+fcgLzjFxFIkGFCqBZO8
-         t6MYfPHdZFHdgs73VCyOVhK62qNggK9IX4e/drCk93MhsaT3IJrZ85Wuk9Vkm1vj8gZR
-         SDHA==
+        d=pqrs.dk; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bq29Y2mHD4lnTpVIqu+VsnyFefvXWo9JkM2EM+uUM9s=;
+        b=UY+PrmILgCpa+Xa3xWI+uPbayzsDJwUklx7hSIt29EIh+XThwXqTiHNLWjOzWsmV3f
+         dlXG75RLHiyYcezmFxYYL1GUOao+YA3SLOQ9GmhKI7iaGO2nK9UnCnAqIlHCVmdY8mdd
+         1Kz+vA3pyx8LJ7ddJ9LIo9lDY4+pQb4FKC0D8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KMI1AzAO+itkC9HukgnHA4oY+nEpoiZ5BuyAO09+7vo=;
-        b=RY3Wrl66ZzVI0N75VqDlR5Y3WnPDRCwsOefVVKwBj8vcdK5BHjOs2P/BArNypmhAmL
-         gUOebymSTlpyKx9iNpXa3fOvjElKKv9KM8twJilmI3IBP6uyHD7Ko4xI3yQ+yKrdYbEk
-         DdEWv+OiuNzcvPMSBsOEv22GecQcg7v8BYteGyyMoDLQ0Uusc00iSU6yI7TklXpsWvPw
-         zitc7JZw0or6BddD2TmJEOwvf1G9fNtwcdfstC3Dt0M//mLVEE+R7myYQa+hF5i+s20I
-         x8vDMYMkcRXHwcM2GIpCydRCpG+H5Hknt11M6ejU4HtLKJJHhPhN7vQ3hnpxLSPvFh/K
-         Wleg==
-X-Gm-Message-State: ANoB5pnxlClXVjJ3cx/SrijgCPCxoNqxu/+Y//UYNyEojgFkl5pVp4An
-	h3+YwB+whk16dFxoCbhbxi5SIfuGGys=
-X-Google-Smtp-Source: AA0mqf4qwp3xbzAnZq51HnRrVtICER2NvqPPvAvfMs9XLXaFQ8QPiPQAP2a72LfxfjzL83T7TAN4ZA==
-X-Received: by 2002:a05:6870:f216:b0:143:a049:19c8 with SMTP id t22-20020a056870f21600b00143a04919c8mr3775640oao.37.1670619624505;
-        Fri, 09 Dec 2022 13:00:24 -0800 (PST)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id i15-20020aca2b0f000000b00359ba124b07sm865520oik.36.2022.12.09.13.00.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Dec 2022 13:00:23 -0800 (PST)
-Message-ID: <029df79a-40b8-a994-7961-6f0de41dfb52@gmail.com>
-Date: Fri, 9 Dec 2022 15:00:19 -0600
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bq29Y2mHD4lnTpVIqu+VsnyFefvXWo9JkM2EM+uUM9s=;
+        b=QC443XWMzNt//6hw6MSEhQA/1eKyMLCN2lSKLB/OshLO/5C4kXtd6I5wr6Q+HNedqD
+         XurnAkldSeOasuTt3RZKtyuQIbVwQqJTx9AiURuK4Zvw8ACuatEK/V6eu9OsWz9aGnXt
+         +11uCY/15QJT8oRvJcKNMq7ck345f25JH7285kGfOquojLI9eMQR8gh87mdWxSGYnU9m
+         +AFbvBZnQkoKfba5fcFKOa+QxjoCK8AX/QTRIZaQSfN1AsxoecLib5dJpsu4hSxQ7hku
+         oWHGe9xGIRIGzKMnXOPR6CM2HOh3+JOOHAaCpRVFccm5P4d7GxL3v0mPLAfJEq/BIVJT
+         hWdQ==
+X-Gm-Message-State: ANoB5pnEs8/uYNmrW9/FxVmSevUV1VDdJCPyd4hSXGw/K2w9n8V751tG
+	4bpUV3N5ZiceTOrkT2JP0InJPJ2GPcVlgasM
+X-Google-Smtp-Source: AA0mqf6bKhcvd6IiIN3OBO4KTOmrm1m1mDykYM7CGGBFGOEnkjmpzGsS4iEPqayPIR0d3m7QP1x/hw==
+X-Received: by 2002:a05:6402:1154:b0:462:16a2:a2e7 with SMTP id g20-20020a056402115400b0046216a2a2e7mr13917559edw.6.1670863374336;
+        Mon, 12 Dec 2022 08:42:54 -0800 (PST)
+Received: from localhost.localdomain ([193.89.194.60])
+        by smtp.gmail.com with ESMTPSA id l8-20020a056402344800b0045d74aa401fsm3935124edc.60.2022.12.12.08.42.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 08:42:53 -0800 (PST)
+From: =?UTF-8?q?Alvin=20=C5=A0ipraga?= <alvin@pqrs.dk>
+To: iwd@lists.linux.dev
+Cc: =?UTF-8?q?Alvin=20=C5=A0ipraga?= <alsi@bang-olufsen.dk>
+Subject: [PATCH] Revert "scan: Don't callback on SCAN_ABORTED"
+Date: Mon, 12 Dec 2022 17:42:50 +0100
+Message-Id: <20221212164250.3075444-1-alvin@pqrs.dk>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v3 1/4] wiphy: use enum band_freq with rates getter
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20221209193930.845238-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221209193930.845238-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+From: Alvin Šipraga <alsi@bang-olufsen.dk>
 
-On 12/9/22 13:39, James Prestwood wrote:
-> wiphy_get_supported_rates expected an enum defined in the nl80211
-> header but the argument type was an unsigned int, not exactly
-> intuitive to anyone using the API. Since the nl80211 enum value
-> was only used in a switch statement it could just as well be IWD's
-> internal enum band_freq.
-> 
-> This also allows modules which do not reference nl80211.h to use
-> wiphy_get_supported_rates().
-> ---
->   src/scan.c  | 2 +-
->   src/wiphy.c | 9 +++++----
->   src/wiphy.h | 4 +++-
->   3 files changed, 9 insertions(+), 6 deletions(-)
-> 
+This reverts commit 6051a1495227bbe7ba357f6995d4dbe4a4862331.
 
-All applied, thanks.
+The blamed commit argues that the periodic scan callback doesn't do
+anything useful in the event of an aborted scan, but this is not
+entirely true. In particular, the callback is responsible for resetting
+the station scanning state to false. Failure to do so means that the
+station scanning state remains true indefinitely if a periodic scan is
+aborted, and no further periodic scans can be performed by iwd.
+---
+ src/scan.c | 18 ++----------------
+ 1 file changed, 2 insertions(+), 16 deletions(-)
 
-Regards,
--Denis
+diff --git a/src/scan.c b/src/scan.c
+index 5d2f2957748a..dbc46a754d16 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -83,7 +83,6 @@ struct scan_request {
+ 	bool canceled : 1; /* Is scan_cancel being called on this request? */
+ 	bool passive:1; /* Active or Passive scan? */
+ 	bool started : 1; /* Has TRIGGER_SCAN succeeded at least once? */
+-	bool periodic : 1; /* Started as a periodic scan? */
+ 	/*
+ 	 * Set to true if the TRIGGER_SCAN command at the head of the 'cmds'
+ 	 * queue was acked by the kernel indicating that the scan request was
+@@ -997,7 +996,6 @@ static void scan_periodic_destroy(void *user_data)
+ static bool scan_periodic_queue(struct scan_context *sc)
+ {
+ 	struct scan_parameters params = {};
+-	struct scan_request *sr;
+ 
+ 	if (sc->sp.needs_active_scan && known_networks_has_hidden()) {
+ 		params.randomize_mac_addr_hint = true;
+@@ -1015,13 +1013,7 @@ static bool scan_periodic_queue(struct scan_context *sc)
+ 					scan_periodic_notify, sc,
+ 					scan_periodic_destroy);
+ 
+-	if (!sc->sp.id)
+-		return false;
+-
+-	sr = l_queue_peek_tail(sc->requests);
+-	sr->periodic = true;
+-
+-	return true;
++	return sc->sp.id != 0;
+ }
+ 
+ static bool scan_periodic_is_disabled(void)
+@@ -2242,13 +2234,7 @@ static void scan_notify(struct l_genl_msg *msg, void *user_data)
+ 
+ 		if (sr->triggered) {
+ 			sr->triggered = false;
+-
+-			/* If periodic scan, don't report the abort */
+-			if (sr->periodic) {
+-				l_queue_remove(sc->requests, sr);
+-				wiphy_radio_work_done(sc->wiphy, sr->work.id);
+-			} else
+-				scan_finished(sc, -ECANCELED, NULL, NULL, sr);
++			scan_finished(sc, -ECANCELED, NULL, NULL, sr);
+ 		} else if (wiphy_radio_work_is_running(sc->wiphy,
+ 							sr->work.id)) {
+ 			/*
+-- 
+2.37.3
 
