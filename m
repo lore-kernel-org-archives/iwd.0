@@ -1,87 +1,86 @@
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440446FD9
-	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 22:04:01 +0000 (UTC)
-Received: by mail-oi1-f177.google.com with SMTP id r11so12550283oie.13
-        for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 14:04:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1429746F
+	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 22:09:00 +0000 (UTC)
+Received: by mail-pl1-f173.google.com with SMTP id p24so13572283plw.1
+        for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 14:09:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gO+sxz7OR06QSVXFMz8v29W8VNf5fPHmeM3EOt667aA=;
-        b=NAQUDdlLJKLUbNhHnF9rqScb37MTrrm31OivLfQWWBOYjN3r0XilC8ues3vQL6vHcJ
-         jN3Zl6NIjAvR48A8ECOk0uAb1huPYug2R2c1ZuahZQIoZ3SiLy452Jl1/dI5LZ2VDDOz
-         reb27xq9gcNlSZ9kaQZSxD2zABIJg2dJ60F5TDNzQNV+ASZCvGH937Tv/EzB/zF2Hlb1
-         mrDJQRSYRcm2PvDfdjH3osVMHec+4SWVA1blEbsSjC7TWKFv1ascgEs4pAh9ipQgfWb5
-         q4N7X4ivqKyCwgn0x/E1mG1tMsq5od6RYhXsAmKp/uVps2k2COkkO3mFI/i1tJaoa7gq
-         sZOA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kATEalScbkZvJKpTK7sG5qF8oWC+Zk2z8K6zZQVy3+g=;
+        b=jI9cl2WZPW+CtLiOwJSjCsC5ZME9uA+4iWKU2orp33ig67qolSrxpsq2y8tTCxClub
+         bHQuajX1boEKiXLoZ4aW5V+cnFXM6j6wbDVscA3FJfQCGedh6mGcsC6BqToNu9f1YsKI
+         YfIXRTGBx1y8Ix1BCWLfWs12tesYi2eY5OM9QFbfF7Eskl94F04clrommKcn2Ns7Gwpl
+         nX/Px8t482HwY+cLaxyz6K5Esm5Gz+jI6DEZ7+7m/eQf3DZWKa27fUkWupiMpcn+AxH3
+         YwCX6/9Jyi1OLkcMLBq6WJWKgSHl6/0E+ZoIi2bfg08ev40r49q/ZyktwUsH+6TQXsZn
+         GNFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gO+sxz7OR06QSVXFMz8v29W8VNf5fPHmeM3EOt667aA=;
-        b=QEGZoAxGJV4nBsFFrGpFS3SdQQk9VV8qYT+uQqZo7zivj5kDQVuc98iOwO9QrfM5mr
-         CtO/wQiURhaf4h1vKIHsRY2RIOIRmhQOhAxD9NFV5FKLqxnHTF6JcaPpEPIn2zn6E7Sv
-         cPwCMV2Tm7pcf+/Aw0cnEuFEs2HetfUoxH3YXPiCjY10FyjNnSjU2z7T8FMfH6DM/yxS
-         v0IErr7g3+VOjMSQVQ86ajAfzzDjOKqtxQoXCQHbCbIoXuk1VC6EDlIkP14M9DiJH5Vv
-         0bSINkK/prImaIiLIE5KYyqHWU9UdwL12enZdWLxJddpeDq7K5cAI5D5U++u0LJSCDXO
-         KCGQ==
-X-Gm-Message-State: ANoB5pleuMqW6mt4LBpDtqB7AJJpuwJw/bhWSfMb3HdZ3I+9SB0frTwE
-	/vqvAyuYY6UArjyHwThIOEs=
-X-Google-Smtp-Source: AA0mqf4g3KbJ7Faua/iJgA0ESxePr1NrGc6Sh9faKrxiNbSgTHWR/BRVlnZjqgpBO2FBFd0emvTgAQ==
-X-Received: by 2002:a05:6808:692:b0:35b:7145:2bd5 with SMTP id k18-20020a056808069200b0035b71452bd5mr7891329oig.16.1670882640372;
-        Mon, 12 Dec 2022 14:04:00 -0800 (PST)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id n16-20020a0568080a1000b0035e7d07bf9dsm2431149oij.16.2022.12.12.14.03.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Dec 2022 14:03:59 -0800 (PST)
-Message-ID: <221263a6-0be4-3ca5-12b4-cbc3e5a65bcb@gmail.com>
-Date: Mon, 12 Dec 2022 15:55:42 -0600
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kATEalScbkZvJKpTK7sG5qF8oWC+Zk2z8K6zZQVy3+g=;
+        b=FAKA6wj+C/mt7G8KroYNuNbO6Qm4gNqQSPHLfpfxK0fqMF+Z2pibPPqPCAailyFaBL
+         cvc5t4XvDDqgzo4ogO0tnQq8huK571Cu8T6euuUPwA9iroH2a0ymCNosyc09iB8NIc8r
+         snB3T6T0UPZH3GF60OZsmKp4XouVwtq+mXTHIAUKbf2hiedrjKdRnI8gnExwmyrFk5dO
+         iqPmKpSyLkPw0cuEPylLFoyY5Jh43HfTnlRi7GrDifWmG8k7rTTc9FFQ8Xk5HZIMxkzh
+         z7l5lTm9Fv8jsTm7MJPqyMzFazQeUUGI/nUPL09+VIlRkQXLKFLXblQ8W5lQjtHgJFol
+         18eQ==
+X-Gm-Message-State: ANoB5pm5/TXUanPtbI6AJ7dA4sO3C7fVSdiAt/JNui05ICbnei8FGeiO
+	TH5l/GLTZin1Tjt6r7ODPenGTvN4hzo=
+X-Google-Smtp-Source: AA0mqf5ikQB4ty8nHlMiaYQ/yhlvVRmwjB7iD8Fj1PVvf7xeTrp3wUtpdb5O2gIKPoozj/vOVgqp8Q==
+X-Received: by 2002:a17:902:9349:b0:189:b0ff:e318 with SMTP id g9-20020a170902934900b00189b0ffe318mr17938380plp.1.1670882939874;
+        Mon, 12 Dec 2022 14:08:59 -0800 (PST)
+Received: from jprestwo-xps.none ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id q19-20020a170902f35300b001893efd3e03sm6884525ple.119.2022.12.12.14.08.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 14:08:59 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] scan: remove early supported check for 6ghz in wiphy watch
+Date: Mon, 12 Dec 2022 14:08:57 -0800
+Message-Id: <20221212220857.1284874-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] scan: call scan_finished() when periodic scans get
- aborted
-Content-Language: en-US
-To: =?UTF-8?Q?Alvin_=c5=a0ipraga?= <alvin@pqrs.dk>, iwd@lists.linux.dev
-Cc: =?UTF-8?Q?Alvin_=c5=a0ipraga?= <alsi@bang-olufsen.dk>
-References: <20221212211050.3109050-1-alvin@pqrs.dk>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221212211050.3109050-1-alvin@pqrs.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Alvin,
+If the regdom updates during a periodic scan the results will be
+delayed until after the update in order to, potentially, add 6GHz
+frequencies since they may become available. The delayed results
+happen regardless of 6GHz support but scan_wiphy_watch() was
+returning early if 6GHz was not supported causing the scan request
+to never complete.
+---
+ src/scan.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-On 12/12/22 15:10, Alvin Šipraga wrote:
-> From: Alvin Šipraga <alsi@bang-olufsen.dk>
-> 
-> The blamed commit argues that the periodic scan callback doesn't do
-> anything useful in the event of an aborted scan, but this is not
-> entirely true. In particular, the callback is responsible for re-arming
-> the periodic scan timer. Make sure to call scan_finished() so that iwd's
-> periodic scanning logic continues unabated even when a periodic scan is
-> aborted.
-> 
-> Also remove the periodic boolean member of struct scan_request, as it
-> serves no purpose anymore.
-> 
-> Fixes: 6051a1495227 ("scan: Don't callback on SCAN_ABORTED")
-> ---
->   src/scan.c | 18 ++----------------
->   1 file changed, 2 insertions(+), 16 deletions(-)
-> 
-
-Applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/scan.c b/src/scan.c
+index 5d2f2957..f63b3ed2 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -1933,12 +1933,9 @@ static void scan_wiphy_watch(struct wiphy *wiphy,
+ 	struct scan_freq_set *freqs_6ghz;
+ 	struct scan_freq_set *allowed;
+ 	bool allow_6g;
+-	const struct scan_freq_set *supported =
+-					wiphy_get_supported_freqs(wiphy);
+ 
+-	/* Only care about regulatory events, and if 6GHz capable */
+-	if (event != WIPHY_STATE_WATCH_EVENT_REGDOM_DONE ||
+-			!(scan_freq_set_get_bands(supported) & BAND_FREQ_6_GHZ))
++	/* Only care about completed regulatory dumps */
++	if (event != WIPHY_STATE_WATCH_EVENT_REGDOM_DONE)
+ 		return;
+ 
+ 	if (!sc->sp.id)
+-- 
+2.34.3
 
