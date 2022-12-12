@@ -1,101 +1,122 @@
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E668A2F58
-	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 20:55:32 +0000 (UTC)
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-1443a16b71cso9948460fac.13
-        for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 12:55:32 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30AD6FD9
+	for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 21:11:02 +0000 (UTC)
+Received: by mail-ej1-f51.google.com with SMTP id bj12so31443862ejb.13
+        for <iwd@lists.linux.dev>; Mon, 12 Dec 2022 13:11:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uhzwLGs2p2WAjBP8R3o29OOS9/SZS8mV6NEOA+3P0l0=;
-        b=QR87f9u7COwXAlS9LfNtPd7xQe333gNs8Ju9osO8FL7FR9CS3m+JqhG4flkzceC1P6
-         t/Wqf6Cx3j9qf+ZILljqRuI17i1tjSuv6xSnou0bFIqrDU2XX1dGs9klVaCnVUWV9Moc
-         RfLgGF8KGT1Aahm7NEvheyEK0Xx+7TB84iiRsFNLvIzXLjXBy1e8Eu/f2XjZY4ZIwhCY
-         p1zTFH3lo3nx1ng80oqRKLDI6Fsn0cO/XC0RtQD4OPQyQdv+/3hPFX2gSE6pJ3Q0gkKd
-         YighLUcOla3Tk9oew9UvDyXMGXB3aFVPgEHJtkseJQG4OtWrYfaHjDDDduCJ4VZ4SKHQ
-         nGdQ==
+        d=pqrs.dk; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=a6GQ+Iheg52iWwyH51o4TZPAjCIunfn1a1YnRB8c1Do=;
+        b=PYVKAteXWouKUZeAPvEzqRMKguNN1TBAsNLePjrv+W/E80xwB45VhjH7qsmOFhkfNk
+         OqCuEe3DuGICC2sVmrmbbA/AMi77401UiBzUOqJ6lvOOmBJ/ROi/2g8xOPl8XRNcU3Pj
+         rPlGsCMIKYQ6g2kLSpkqyRe29FdZvCVz7fvLs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uhzwLGs2p2WAjBP8R3o29OOS9/SZS8mV6NEOA+3P0l0=;
-        b=yPlJ/gx5XIkx5V4RH+tdP7ZUlf39Yoolm9HfWgKqTxfisICQBYO0yAL2u4cKfhGZoh
-         Ca+jZUHKw+SLhii9ijHv7NlqV1yJP6GCjFaER3FG9LPmRJztDTU8z8caq6mfL7/femIQ
-         2FQfm+DLLg7vaUc8qXG2YXabtUETBHSVi10CQqls1Jc5HVISAk902ZPFl9YWjXzAz5cb
-         Wjkrnk+m+Is+auQq7b3d3d2RNMBs5WEvbkOfzgcJTAZAiAGkOvIeUOBrZik/FJS+G6Ng
-         gBNPYbJ8vYMbQOqaNo0zFxHODyjFVctz57/U/QoN92LaTLl62lViewCPwI1X3OXl3IiD
-         L8IQ==
-X-Gm-Message-State: ANoB5pn9ZcrN3RJwgvc+mpYeVOFeDySbEYKwwaA7MUoZDrvYYa/4vDD8
-	6oFbWB0i2iY7GHap1Ad2UhU=
-X-Google-Smtp-Source: AA0mqf4RxL1AP63Tq27ZkiABVrbZS9h5qSJqwJjRdlXUF8ki0pr1DwrvDOU4xqZEZ8YDIz68yAmA6A==
-X-Received: by 2002:a05:6871:4504:b0:144:fffb:4190 with SMTP id nj4-20020a056871450400b00144fffb4190mr9389670oab.6.1670878531940;
-        Mon, 12 Dec 2022 12:55:31 -0800 (PST)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id j19-20020a056870021300b001446d5702b5sm393457oad.56.2022.12.12.12.55.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Dec 2022 12:55:31 -0800 (PST)
-Message-ID: <fe57337c-0b36-eb53-e03a-8fcd93a89332@gmail.com>
-Date: Mon, 12 Dec 2022 14:49:50 -0600
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a6GQ+Iheg52iWwyH51o4TZPAjCIunfn1a1YnRB8c1Do=;
+        b=vwRAfyU+ISxuDsXCEaAMuYKH+HC9QZn7PIBc0oRD94S1lHHsdgXJ0BdCXksip4wTkN
+         7yt3ZuPuoxGv4f1rdvyKT1meUDyaLIwq5n8WVUh3SKKVl8wHzt4bIkJI3cGzDEKPYts0
+         OQCODEmHMkWtF2D4QDo+8V3QlgzRQX99wj5dpyLI0xbaR+iFgtgBHhht4yNnbhEh+Qk2
+         keebaL3CiaE1nMMot390ZuVpYuvyeSY9tPM0ntELJpIi0Z8X2LDNm3mNX0X7ZqfgUU91
+         I8KBYMbpzApiuIBm5hVQ3QkIvC3KOJ7tcU+rMG8rNXSOLLe7hykzat919JnV8nHy4EhE
+         SStQ==
+X-Gm-Message-State: ANoB5pmWb4ts0GycplUqyO2xf1J5QGqMhWysBfErGj8HAJr0dZPA1+5K
+	ZE3tVcQs579++oGo0bUR4rA35QdCcKCRzXUK
+X-Google-Smtp-Source: AA0mqf6X9kT5wNHofHa00FC5zjdyrjollolPFJGKOZ2wBCrtFlwV2cOtUEs/r3uNt8d0TpyDO//aTw==
+X-Received: by 2002:a17:906:eda6:b0:7c0:d2b2:eb07 with SMTP id sa6-20020a170906eda600b007c0d2b2eb07mr13623992ejb.26.1670879460751;
+        Mon, 12 Dec 2022 13:11:00 -0800 (PST)
+Received: from localhost.localdomain (80.71.142.18.ipv4.parknet.dk. [80.71.142.18])
+        by smtp.gmail.com with ESMTPSA id u18-20020a1709061db200b007c16fdc93ddsm1827925ejh.81.2022.12.12.13.11.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 13:11:00 -0800 (PST)
+From: =?UTF-8?q?Alvin=20=C5=A0ipraga?= <alvin@pqrs.dk>
+To: iwd@lists.linux.dev
+Cc: =?UTF-8?q?Alvin=20=C5=A0ipraga?= <alsi@bang-olufsen.dk>
+Subject: [PATCH] scan: call scan_finished() when periodic scans get aborted
+Date: Mon, 12 Dec 2022 22:10:50 +0100
+Message-Id: <20221212211050.3109050-1-alvin@pqrs.dk>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] Revert "scan: Don't callback on SCAN_ABORTED"
-Content-Language: en-US
-To: =?UTF-8?Q?Alvin_=c5=a0ipraga?= <ALSI@bang-olufsen.dk>
-Cc: =?UTF-8?Q?Alvin_=c5=a0ipraga?= <alvin@pqrs.dk>,
- "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <20221212164250.3075444-1-alvin@pqrs.dk>
- <3fb7f5f1-04d8-8631-e7b5-70f27c963ac1@gmail.com>
- <20221212201815.6rma2xhoam2yja4c@bang-olufsen.dk>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221212201815.6rma2xhoam2yja4c@bang-olufsen.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Alvin,
+From: Alvin Šipraga <alsi@bang-olufsen.dk>
 
-> I can send v2 with a more explicit title than just revert? See below and
-> tell me your preference.
-> 
+The blamed commit argues that the periodic scan callback doesn't do
+anything useful in the event of an aborted scan, but this is not
+entirely true. In particular, the callback is responsible for re-arming
+the periodic scan timer. Make sure to call scan_finished() so that iwd's
+periodic scanning logic continues unabated even when a periodic scan is
+aborted.
 
-Reverting is fine, or just a new commit on top that calls scan_finished is also 
-fine.  Probably the latter is (slightly) more preferable.
+Also remove the periodic boolean member of struct scan_request, as it
+serves no purpose anymore.
 
->> But...
->>
->>> station scanning state remains true indefinitely if a periodic scan is
->>> aborted, and no further periodic scans can be performed by iwd.
->>
->> I don't see how the station->scanning being always 'true' would prevent us
->> starting a new scan?  station->scanning isn't used anywhere besides
->> reporting over D-Bus?  Maybe I'm missing something?
-> 
-> No, you are quite right. It was a misunderstanding on my part due to
-> nested callbacks (scan callback, and periodic scan callback).
-> 
-> The reason periodic scans get stuck is because the scan callback,
-> scan_periodic_notify(), doesn't get called. So it doesn't rearm the
-> periodic scan timer.
-> 
+Fixes: 6051a1495227 ("scan: Don't callback on SCAN_ABORTED")
+---
+ src/scan.c | 18 ++----------------
+ 1 file changed, 2 insertions(+), 16 deletions(-)
 
-Gotcha.  That makes sense now.
+diff --git a/src/scan.c b/src/scan.c
+index 5d2f2957748a..dbc46a754d16 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -83,7 +83,6 @@ struct scan_request {
+ 	bool canceled : 1; /* Is scan_cancel being called on this request? */
+ 	bool passive:1; /* Active or Passive scan? */
+ 	bool started : 1; /* Has TRIGGER_SCAN succeeded at least once? */
+-	bool periodic : 1; /* Started as a periodic scan? */
+ 	/*
+ 	 * Set to true if the TRIGGER_SCAN command at the head of the 'cmds'
+ 	 * queue was acked by the kernel indicating that the scan request was
+@@ -997,7 +996,6 @@ static void scan_periodic_destroy(void *user_data)
+ static bool scan_periodic_queue(struct scan_context *sc)
+ {
+ 	struct scan_parameters params = {};
+-	struct scan_request *sr;
+ 
+ 	if (sc->sp.needs_active_scan && known_networks_has_hidden()) {
+ 		params.randomize_mac_addr_hint = true;
+@@ -1015,13 +1013,7 @@ static bool scan_periodic_queue(struct scan_context *sc)
+ 					scan_periodic_notify, sc,
+ 					scan_periodic_destroy);
+ 
+-	if (!sc->sp.id)
+-		return false;
+-
+-	sr = l_queue_peek_tail(sc->requests);
+-	sr->periodic = true;
+-
+-	return true;
++	return sc->sp.id != 0;
+ }
+ 
+ static bool scan_periodic_is_disabled(void)
+@@ -2242,13 +2234,7 @@ static void scan_notify(struct l_genl_msg *msg, void *user_data)
+ 
+ 		if (sr->triggered) {
+ 			sr->triggered = false;
+-
+-			/* If periodic scan, don't report the abort */
+-			if (sr->periodic) {
+-				l_queue_remove(sc->requests, sr);
+-				wiphy_radio_work_done(sc->wiphy, sr->work.id);
+-			} else
+-				scan_finished(sc, -ECANCELED, NULL, NULL, sr);
++			scan_finished(sc, -ECANCELED, NULL, NULL, sr);
+ 		} else if (wiphy_radio_work_is_running(sc->wiphy,
+ 							sr->work.id)) {
+ 			/*
+-- 
+2.37.3
 
-> But outwardly - that is, with 'iwctl station wlan0 show' - one can see
-> that something is wrong, and that's because the periodic scan callback,
-> new_scan_results(), doesn't reset the station scanning state to
-> false. As you point out though, this is just cosmetic.
-> 
-
-Yep, we should fix that for sure.
-
-Regards,
--Denis
