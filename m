@@ -1,199 +1,81 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB86079EB
-	for <iwd@lists.linux.dev>; Tue, 13 Dec 2022 20:36:35 +0000 (UTC)
-Received: by mail-pj1-f49.google.com with SMTP id 3-20020a17090a098300b00219041dcbe9so4789020pjo.3
-        for <iwd@lists.linux.dev>; Tue, 13 Dec 2022 12:36:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KJXREFkvel0c4L4gtqez4v2nDnAVF4zkdtaZnt785yQ=;
-        b=OM1XurCUfMo884TEtPUYK2RtjkvkEZmVlVhrg+bmatdxEIHUOX4iJNzcI+x2SF8AVO
-         lVmO/wbpiuTnZduHHekspLD/r06a0gZDMaQ2F0I6+o31M+2KxwBNkStLYUWWHaPqUFGw
-         G6fpOcBNF4frdoX5WxK1l8Kw0QdcgVf9Bbb6xjlf86jfynufZZ/B1miBg5vbgAbiCimC
-         c/IR5FKcoqUpWbSdpH/sRS3QnxfZ+m+qlM9FeUApsSaNIxMT+3Gn1TDun99Vxa+k9xIc
-         V5qgu0dyySnjAO+e24BkCpaNME6ign7lTK2C3BOI6N9nosHtCdgZmH2bv5a0S7/FgMch
-         +pnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KJXREFkvel0c4L4gtqez4v2nDnAVF4zkdtaZnt785yQ=;
-        b=MaQzwoAAPOsucHq0uM7XYWcU1Ve/5I/7PxLWLSi3OhnyyLCqLM1VODv84xMkUHTuGy
-         aMWwTE5xc325YWF1sNGHtkM35A1xEk2I+TkS0NqrjTgLEiNPNL5bKPLdVHG/ICk0HttH
-         yW7h5ussm96vcJ7y7c/NogZY6/ntyfkNRluarsoa6mw4M1RYlBT0CTn1xj72S7Ws7kok
-         Yw5oP9ZGVwa/wFdHjWHDR2GS0l9RPhAEouXZae9yy/Kh6ecPso6qUIietw/xKm3dktja
-         LZIUSJLwbhBG7Bhk4IunoRHkLWIs6oZQ7/tZL4ZlMiNKJKPXhTLePUvMa7JFee3iWBHm
-         Qslg==
-X-Gm-Message-State: ANoB5pkv6hgmW/nzk10KiXBIWzgg/yVxjSHeWY8lA65bDypaEN1WeJek
-	CvflsMTelQPcLrKjVld07mLlYLRKtuQ=
-X-Google-Smtp-Source: AA0mqf7OCH7mu65azVkoh+cAchqyyld6EApR199bM1+NA2YNVUrRh1Yb8g9dSiGDuXWnFABm3dA6/g==
-X-Received: by 2002:a17:902:7fcc:b0:18f:15d2:308d with SMTP id t12-20020a1709027fcc00b0018f15d2308dmr12382262plb.42.1670963795195;
-        Tue, 13 Dec 2022 12:36:35 -0800 (PST)
-Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id v23-20020a1709028d9700b00189f69c1aa0sm272113plo.270.2022.12.13.12.36.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Dec 2022 12:36:34 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/7] wiphy: remove disabled_freqs and related dump code
-Date: Tue, 13 Dec 2022 12:36:24 -0800
-Message-Id: <20221213203624.1423277-7-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20221213203624.1423277-1-prestwoj@gmail.com>
-References: <20221213203624.1423277-1-prestwoj@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F702F2F
+	for <iwd@lists.linux.dev>; Tue, 13 Dec 2022 21:02:13 +0000 (UTC)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.nyi.internal (Postfix) with ESMTP id 2A4125C005A;
+	Tue, 13 Dec 2022 16:02:12 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Tue, 13 Dec 2022 16:02:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=airpost.net; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:sender:subject:subject:to:to; s=fm2; t=1670965332; x=
+	1671051732; bh=MKDjqNzyEnS3FTy9yUT/F9XGwBcO11cHtZA1BUo1UEw=; b=V
+	Rsylmtg6U/AYfOlzc1BZ1eogWhBdIS8qPTEKH5rMmxcEyoIg2vi0nZqsAxvQvKV7
+	2sSzl8DJurjkLITOWIvhUPVpg9Zux3ZYUCJoK5xcWKqe99ta+aYOK8e8Gk5nJpp/
+	149OwlwPojyTimjqTuejxWcwLbgtJG5F95Rjo01IxWPytF0bBvncpMLWy/JIS0QC
+	Q80GfqLbg2gcjqJmLVYRsbQGSDaVsSRAI/M9A2hSDKAzG73m7aBjEyfqJxs8aKlN
+	WmR88tb0lyZwtj8x6pf/cTKgwDzbnLXbS0rfObHFaBI+O1aivXEatiE04JcLRVg8
+	XqZ5UxDn6oUL5n5lj0H6g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1670965332; x=
+	1671051732; bh=MKDjqNzyEnS3FTy9yUT/F9XGwBcO11cHtZA1BUo1UEw=; b=L
+	/Eg3x6n+Unr4OooK5kZdbYqN62eXi+1YsRlxnRXNwmx7wyrfdZ5645vDaWcjAZMm
+	Cz/u0S28egVzjyBSalkgoUwFHy5VXBiyJoeTSbwA0CljsmFIngTMI2hriAJalNsJ
+	M11ef4nPkgtJNuxQLAmUBhl/vs5dh6TzwNumcjlKTeTiWTHCxq7wfC+xaCGo2sAM
+	cybc7LoCDoQ6VhQ9oBpeWQXl9TWFR7tn3qJGrGDdjBpbmZvJcl8NX8ZIjERd9Eh5
+	NEH/UmLiZaqkEzqFa6RWHHrLkZebEp4Xj4FscPtkfpD1Aq3uCu1uTL/xxl63fvpi
+	t2PPqlIyGjkMfzsB2vPjw==
+X-ME-Sender: <xms:U-iYY6owfph-Yo-MiOedyYg-sZvJdoEckVgjpELxTjECookPvudhlg>
+    <xme:U-iYY4qQId5xGa8CHWbrVaZ7J9_WI4ntT7WR7jFon2l-9XE8yY8_lYabp_amfZPAG
+    AxErbrP8x_YmPn_>
+X-ME-Received: <xmr:U-iYY_Pevp7HB9aFxeEwb-LfH5V6qIhlEU3S1aS-PET_EfcAldRSeB6dsoYiOVy6wS6sfA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfedugdejtdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefffggjfhggtgfguffvvefhkfesthhqmhdttderjeenucfhrhhomhepuehruhhn
+    ohcuffgrnhhtrghsuceouggrnhhtrghssegrihhrphhoshhtrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeejveefgfehiedtleevhfeigeevfeelteegieejueevhffgheefveetueeh
+    ledvfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    gurghnthgrshesrghirhhpohhsthdrnhgvth
+X-ME-Proxy: <xmx:U-iYY56repocRN8RTsbOdLVwm1qlWaiexSMXTjawn2tKQ7uRj0fm0A>
+    <xmx:U-iYY57KVnKMkgHnNfS_yINVe2fIvEQLvCkppMLJAiHCaw4SEOHzrQ>
+    <xmx:U-iYY5jVjPcYm7MfDnL6fZjYjq3TwPjhYPpl6rXSkPW2xVD_CpQZSw>
+    <xmx:VOiYY5FNqcycmRJKmJZtFkwkTHpeIvwleIvegDKmIi0xGlPCrTEhag>
+Feedback-ID: i1cfa4199:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 13 Dec 2022 16:02:11 -0500 (EST)
+Date: Tue, 13 Dec 2022 16:02:11 -0500
+User-Agent: K-9 Mail for Android
+In-Reply-To: <88c5f15eae4004d50f9862892c44156e813c4656.camel@gmail.com>
+References: <b7ff5956-f571-d9d8-1f7b-f3025e2055ae@airpost.net> <b4ad714bbd162b1f7bc3302c9585adf8811ac929.camel@gmail.com> <126d2f2b-07ef-fd22-7656-dcd21f3cece0@airpost.net> <0df6f28d-4a77-dea2-dbf6-c83c6a25b8ae@gmail.com> <5056edba-fa23-b133-73ac-f8daa483cf23@airpost.net> <20221212193846.ub2ahzpl5eu2ylnu@bang-olufsen.dk> <615ceb63-e041-1990-81fa-568181681aa7@airpost.net> <59639a626260a24147be730f9703e0d766bd5f1b.camel@gmail.com> <8705db73-b6e8-eea4-d2fd-271d1501c52d@airpost.net> <88c5f15eae4004d50f9862892c44156e813c4656.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: iwd release 1.30 onwards cannot find available networks
+To: James Prestwood <prestwoj@gmail.com>,=?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
+CC: Denis Kenzior <denkenz@gmail.com>,"iwd@lists.linux.dev" <iwd@lists.linux.dev>
+From: Bruno Dantas <dantas@airpost.net>
+Message-ID: <BA8B1EA6-CEB0-4F11-95C3-BF3F908D0649@airpost.net>
 
-The disabled_freqs list is being removed and replaced with a new
-list in the band object. This completely removes the need for
-the pending_freqs list as well since any regdom related dumps
-can just overwrite the existing frequency list.
----
- src/wiphy.c | 38 ++------------------------------------
- src/wiphy.h |  1 -
- 2 files changed, 2 insertions(+), 37 deletions(-)
+Thank you very much for that explanation, James=2E Makes total sense=2E
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index f5b7c05e..79dd2dff 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -105,8 +105,6 @@ struct wiphy {
- 	uint16_t supported_iftypes;
- 	uint16_t supported_ciphers;
- 	struct scan_freq_set *supported_freqs;
--	struct scan_freq_set *disabled_freqs;
--	struct scan_freq_set *pending_freqs;
- 	struct band *band_2g;
- 	struct band *band_5g;
- 	struct band *band_6g;
-@@ -345,7 +343,6 @@ static struct wiphy *wiphy_new(uint32_t id)
- 
- 	wiphy->id = id;
- 	wiphy->supported_freqs = scan_freq_set_new();
--	wiphy->disabled_freqs = scan_freq_set_new();
- 	watchlist_init(&wiphy->state_watches, NULL);
- 	wiphy->extended_capabilities[0] = IE_TYPE_EXTENDED_CAPABILITIES;
- 	wiphy->extended_capabilities[1] = EXT_CAP_LEN;
-@@ -393,7 +390,6 @@ static void wiphy_free(void *data)
- 	}
- 
- 	scan_freq_set_free(wiphy->supported_freqs);
--	scan_freq_set_free(wiphy->disabled_freqs);
- 	watchlist_destroy(&wiphy->state_watches);
- 	l_free(wiphy->model_str);
- 	l_free(wiphy->vendor_str);
-@@ -491,11 +487,6 @@ const struct scan_freq_set *wiphy_get_supported_freqs(
- 	return wiphy->supported_freqs;
- }
- 
--const struct scan_freq_set *wiphy_get_disabled_freqs(const struct wiphy *wiphy)
--{
--	return wiphy->disabled_freqs;
--}
--
- static struct band *wiphy_get_band(const struct wiphy *wiphy, enum band_freq band)
- {
- 	switch (band) {
-@@ -2051,9 +2042,6 @@ static void wiphy_dump_done(void *user_data)
- 
- 	if (wiphy) {
- 		wiphy->dump_id = 0;
--		scan_freq_set_free(wiphy->disabled_freqs);
--		wiphy->disabled_freqs = wiphy->pending_freqs;
--		wiphy->pending_freqs = NULL;
- 
- 		WATCHLIST_NOTIFY(&wiphy->state_watches,
- 				wiphy_state_watch_func_t, wiphy,
-@@ -2067,13 +2055,9 @@ static void wiphy_dump_done(void *user_data)
- 	for (e = l_queue_get_entries(wiphy_list); e; e = e->next) {
- 		wiphy = e->data;
- 
--		if (!wiphy->pending_freqs || wiphy->self_managed)
-+		if (wiphy->self_managed)
- 			continue;
- 
--		scan_freq_set_free(wiphy->disabled_freqs);
--		wiphy->disabled_freqs = wiphy->pending_freqs;
--		wiphy->pending_freqs = NULL;
--
- 		WATCHLIST_NOTIFY(&wiphy->state_watches,
- 				wiphy_state_watch_func_t, wiphy,
- 				WIPHY_STATE_WATCH_EVENT_REGDOM_DONE);
-@@ -2143,33 +2127,18 @@ static void wiphy_dump_callback(struct l_genl_msg *msg,
- 
- static bool wiphy_cancel_last_dump(struct wiphy *wiphy)
- {
--	const struct l_queue_entry *e;
- 	unsigned int id = 0;
- 
- 	/*
- 	 * Zero command ID to signal that wiphy_dump_done doesn't need to do
--	 * anything. For a self-managed wiphy just free/NULL pending_freqs. For
--	 * a global dump each wiphy needs to be checked and dealt with.
-+	 * anything.
- 	 */
- 	if (wiphy && wiphy->dump_id) {
- 		id = wiphy->dump_id;
- 		wiphy->dump_id = 0;
--
--		scan_freq_set_free(wiphy->pending_freqs);
--		wiphy->pending_freqs = NULL;
- 	} else if (!wiphy && wiphy_dump_id) {
- 		id = wiphy_dump_id;
- 		wiphy_dump_id = 0;
--
--		for (e = l_queue_get_entries(wiphy_list); e; e = e->next) {
--			struct wiphy *w = e->data;
--
--			if (!w->pending_freqs || w->self_managed)
--				continue;
--
--			scan_freq_set_free(w->pending_freqs);
--			w->pending_freqs = NULL;
--		}
- 	}
- 
- 	if (id) {
-@@ -2214,7 +2183,6 @@ static void wiphy_dump_after_regdom(struct wiphy *wiphy)
- 	/* Limited dump so just emit the event for this wiphy */
- 	if (wiphy) {
- 		wiphy->dump_id = id;
--		wiphy->pending_freqs = scan_freq_set_new();
- 
- 		if (no_start_event)
- 			return;
-@@ -2234,8 +2202,6 @@ static void wiphy_dump_after_regdom(struct wiphy *wiphy)
- 		if (w->self_managed)
- 			continue;
- 
--		w->pending_freqs = scan_freq_set_new();
--
- 		if (no_start_event)
- 			continue;
- 
-diff --git a/src/wiphy.h b/src/wiphy.h
-index 469ccdc8..09ddca65 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -99,7 +99,6 @@ const char *wiphy_get_path(struct wiphy *wiphy);
- uint32_t wiphy_get_supported_bands(struct wiphy *wiphy);
- const struct scan_freq_set *wiphy_get_supported_freqs(
- 						const struct wiphy *wiphy);
--const struct scan_freq_set *wiphy_get_disabled_freqs(const struct wiphy *wiphy);
- bool wiphy_check_frequency(const struct wiphy *wiphy, uint32_t freq,
- 				uint16_t flags);
- bool wiphy_check_band(const struct wiphy *wiphy, enum band_freq band,
--- 
-2.34.3
+I love iwd=2E Ad multos annos!
+
+Happy hacking,
+Bruno
+
+
 
