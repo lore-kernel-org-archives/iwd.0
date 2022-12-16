@@ -1,49 +1,49 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AF08BE6
-	for <iwd@lists.linux.dev>; Fri, 16 Dec 2022 21:27:49 +0000 (UTC)
-Received: by mail-pl1-f170.google.com with SMTP id m4so3560165pls.4
-        for <iwd@lists.linux.dev>; Fri, 16 Dec 2022 13:27:49 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E69C8BE4
+	for <iwd@lists.linux.dev>; Fri, 16 Dec 2022 21:27:50 +0000 (UTC)
+Received: by mail-pj1-f41.google.com with SMTP id e7-20020a17090a77c700b00216928a3917so7352274pjs.4
+        for <iwd@lists.linux.dev>; Fri, 16 Dec 2022 13:27:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MDEe1f6DOax2hSj/46o8i+xvls0SSIxpwlDKeHB+i6k=;
-        b=YAdsFLQHBUyz31q8zUCOb6AmXWTGyYfkZC8n2tMpG3Hw5g4VBQI7IU9so8SenbzFI/
-         RBuu1wtus6Pnv8286I3Uv2zCmL2HDcH72gzWlS06F3CMyH+TGJgAujzKqsZK5LesWi/k
-         Z/lnyyomU6BuVTn3y9biQ9ygtx1wbR9WSzDo9ZC3uQ4lHBXE0Kk9LVj8I8tx2kV/am3e
-         5OkQhoFKLu+NMuwn2HA5VxgZZ4RCwVYKKGkRMg2V1TxHVQTWRu6EsRsZWab3k77fabg4
-         7iP48SNJWbveI+BYuRWDJxFgwFuguzspTMKAao3ZQzl6ebhhHs/R5SP8JaTbrMuDNqTw
-         Orfw==
+        bh=60sk+vLRmwuqdeOu/v6s9kr3MLw6uSc9YqTFiCxIBcs=;
+        b=dDTLHSqREL4Jr9PkUh7OPF5Qzg1aieOK8aCZPO8CAnY6Vg20uTbuRZ3oSxRbNQd4zm
+         xfZ3YCdSas1/BhM/8CHuS7FCD8t8M5OhvJlaaWit72W6lOSNIjBY56siEC6O3xhXOY95
+         Tww7UmZJINJT0ccJs8cc03I2NdSoYTu3ERGEqlRQXfrOHaiF4s5j4KbAdxNTj0sXn5Zt
+         bW3/d/qrw/k0u1UrkbAcNT1GYLEG6hkXIGjYvHTNFJSWWmskecpfiU2u6p4AyQvLiK/u
+         3vECYYgjOySG8P7peAvsyDOaRFQeH9iJ/TwByOQWbZhbbCNqH6rFIz43brJOfBltR+A4
+         o8pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MDEe1f6DOax2hSj/46o8i+xvls0SSIxpwlDKeHB+i6k=;
-        b=vLszRgv6221hie8Su1BYnoDFRrhNra2PKYwBLnJ4Z/nLv3w6F5SkDUpx9ztFG6Augp
-         C+pkdUVjELg3mIOKbMVu5Psgp3xvZds0RA1thD6Fw+Q4tXvj0DlixpNHvABahVUjbJI3
-         go32uBQ8VvlRao2oa8lF3tqdeS7G/WsydVWQMgq7Y9DTvMgfuNfoQiTGgwIJrIcii7AX
-         p6DEDZ8EQHsXBLpdCRuOsqpH+Qx8REXTallbfHmXCFOxUndVGcLyFjv2u7quXUr5qWk3
-         mVKGXlTIqPymRD9i9NRhPqug6z/Ni6X+yzte5M4Ht3U5k0Fhe/dp10kQ/gtM7rXXawbT
-         j6iw==
-X-Gm-Message-State: ANoB5pnHHZTWpSRhwKU5GPfuxIfEvAvV6+YC34AWxT4tOj6y/gDtldci
-	D07deY1+ABB5uyDMxcVMAiwV2/zOtw0=
-X-Google-Smtp-Source: AA0mqf7n1nCCLQt7cv7AMhkszwaCP3XtW4KzBjVpZDA3yaUrGrzaTQdh4+sGVOd9YjfjO90K+D51Lg==
-X-Received: by 2002:a05:6a20:bc82:b0:ad:79bb:7487 with SMTP id fx2-20020a056a20bc8200b000ad79bb7487mr25182401pzb.50.1671226069094;
+        bh=60sk+vLRmwuqdeOu/v6s9kr3MLw6uSc9YqTFiCxIBcs=;
+        b=4C5X5KOcSSEYN0dgF6+7+ABur1teaWDI5B6FNjyyuIzi6FeDgb5plxCCYIROqaDBaU
+         JXPnMUovtG+EJnB0FhDIilDzNfVzTtD3DzB4QoqWp6eWYQRBfIGQvLGbYwhiCgJYuwp8
+         p91Baa5kqYNJ4zGhuRcXhZUpNFgVBOnCLl+gpbzfLnbx/vk4KvtjBUz4aJE0uCGBTy6u
+         271fT6BsUXcrN5ZaTphSVxCb7PU6Lo4UA2czaOM9sTmwi6c5kSHw7qFV+5eWuixzpN5r
+         Zm6tn5x3HJHSUIt0nv2snno1/1pd91g4ucoPvGqXykYGnJwMZOeedtZxdsvfx2BJLn65
+         IZ/Q==
+X-Gm-Message-State: ANoB5pnllckPg6zggVjTYqRVNgkN5ZvBa5EwQ06358XsQf/lINNwql90
+	TQClKp30X40/bQkr/OR67sclUfNEoGY=
+X-Google-Smtp-Source: AA0mqf4AauM4rgYRnrO0b5DNHoL5nmVtPbq2Y0AyHjK12WzMXbSiixRw85zs3eQUPS7fB0RSj7O0Pw==
+X-Received: by 2002:a17:90a:db04:b0:219:b936:6bd7 with SMTP id g4-20020a17090adb0400b00219b9366bd7mr34651051pjv.19.1671226069739;
         Fri, 16 Dec 2022 13:27:49 -0800 (PST)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id z189-20020a6333c6000000b004785e505bcdsm1905404pgz.51.2022.12.16.13.27.48
+        by smtp.gmail.com with ESMTPSA id z189-20020a6333c6000000b004785e505bcdsm1905404pgz.51.2022.12.16.13.27.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Dec 2022 13:27:48 -0800 (PST)
+        Fri, 16 Dec 2022 13:27:49 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 5/8] wiphy: add getter for frequency/band info
-Date: Fri, 16 Dec 2022 13:27:38 -0800
-Message-Id: <20221216212741.1833286-5-prestwoj@gmail.com>
+Subject: [PATCH v3 6/8] station: use wiphy_get_frequency_info
+Date: Fri, 16 Dec 2022 13:27:39 -0800
+Message-Id: <20221216212741.1833286-6-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221216212741.1833286-1-prestwoj@gmail.com>
 References: <20221216212741.1833286-1-prestwoj@gmail.com>
@@ -55,153 +55,71 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This adds two new APIs:
-
-wiphy_get_frequency_info(): Used to get information about a given
-frequency such as disabled/no-IR. This can also be used to check
-if the frequency is supported (NULL return is unsupported).
-
-wiphy_band_is_disabled(): Checks if a band is disabled. Note that
-an unsupported band will also return true. Checking support should
-be done with wiphy_get_supported_bands()
+Remove uses of supported/disabled scan_freq_set's and replace
+with the equivalent calls to wiphy_get_frequency_info() and
+wiphy_band_is_disabled().
 ---
- src/wiphy.c | 91 +++++++++++++++++++++++++++++++++++++----------------
- src/wiphy.h |  5 +++
- 2 files changed, 69 insertions(+), 27 deletions(-)
+ src/station.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index f3a2a039..714da9bc 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -496,6 +496,67 @@ const struct scan_freq_set *wiphy_get_disabled_freqs(const struct wiphy *wiphy)
- 	return wiphy->disabled_freqs;
- }
- 
-+static struct band *wiphy_get_band(const struct wiphy *wiphy, enum band_freq band)
-+{
-+	switch (band) {
-+	case BAND_FREQ_2_4_GHZ:
-+		return wiphy->band_2g;
-+	case BAND_FREQ_5_GHZ:
-+		return wiphy->band_5g;
-+	case BAND_FREQ_6_GHZ:
-+		return wiphy->band_6g;
-+	default:
-+		return NULL;
-+	}
-+}
-+
-+const struct band_freq_attrs *wiphy_get_frequency_info(
-+						const struct wiphy *wiphy,
-+						uint32_t freq)
-+{
-+	struct band_freq_attrs *attr;
-+	enum band_freq band;
-+	uint8_t channel;
-+	struct band *bandp;
-+
-+	channel = band_freq_to_channel(freq, &band);
-+	if (!channel)
-+		return NULL;
-+
-+	bandp = wiphy_get_band(wiphy, band);
-+	if (!bandp)
-+		return NULL;
-+
-+	attr = &bandp->freq_attrs[channel];
-+	if (!attr->supported)
-+		return NULL;
-+
-+	return attr;
-+}
-+
-+bool wiphy_band_is_disabled(const struct wiphy *wiphy, enum band_freq band)
-+{
-+	struct band_freq_attrs attr;
-+	unsigned int i;
-+	struct band *bandp;
-+
-+	bandp = wiphy_get_band(wiphy, band);
-+	if (!bandp)
-+		return true;
-+
-+	for (i = 0; i < bandp->freqs_len; i++) {
-+		attr = bandp->freq_attrs[i];
-+
-+		if (!attr.supported)
-+			continue;
-+
-+		if (!attr.disabled)
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
- bool wiphy_supports_probe_resp_offload(struct wiphy *wiphy)
+diff --git a/src/station.c b/src/station.c
+index 9a646934..bad067c8 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1407,8 +1407,6 @@ static int station_quick_scan_trigger(struct station *station)
  {
- 	return wiphy->ap_probe_resp_offload;
-@@ -819,21 +880,7 @@ const uint8_t *wiphy_get_supported_rates(struct wiphy *wiphy,
- 						enum band_freq band,
- 						unsigned int *out_num)
- {
--	struct band *bandp;
--
--	switch (band) {
--	case BAND_FREQ_2_4_GHZ:
--		bandp = wiphy->band_2g;
--		break;
--	case BAND_FREQ_5_GHZ:
--		bandp = wiphy->band_5g;
--		break;
--	case BAND_FREQ_6_GHZ:
--		bandp = wiphy->band_6g;
--		break;
--	default:
--		return NULL;
--	}
-+	struct band *bandp = wiphy_get_band(wiphy, band);
+ 	_auto_(scan_freq_set_free) struct scan_freq_set *known_freq_set = NULL;
+ 	bool known_6ghz;
+-	const struct scan_freq_set *disabled = wiphy_get_disabled_freqs(
+-								station->wiphy);
  
- 	if (!bandp)
- 		return NULL;
-@@ -891,19 +938,9 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
- 	if (band_freq_to_channel(bss->frequency, &band) == 0)
+ 	if (wiphy_regdom_is_updating(station->wiphy)) {
+ 		l_debug("regdom is updating, delaying quick scan");
+@@ -1430,9 +1428,11 @@ static int station_quick_scan_trigger(struct station *station)
+ 	 * this since its so limited, so return an error which will fall back to
+ 	 * full autoconnect.
+ 	 */
+-	if ((scan_freq_set_get_bands(disabled) & BAND_FREQ_6_GHZ) &&
+-				wiphy_country_is_unknown(station->wiphy) &&
+-				known_6ghz)
++	if (wiphy_get_supported_bands(station->wiphy) & BAND_FREQ_6_GHZ &&
++			wiphy_band_is_disabled(station->wiphy,
++						BAND_FREQ_6_GHZ) &&
++			wiphy_country_is_unknown(station->wiphy) &&
++			known_6ghz)
  		return -ENOTSUP;
  
--	switch (band) {
--	case BAND_FREQ_2_4_GHZ:
--		bandp = wiphy->band_2g;
--		break;
--	case BAND_FREQ_5_GHZ:
--		bandp = wiphy->band_5g;
--		break;
--	case BAND_FREQ_6_GHZ:
--		bandp = wiphy->band_6g;
--		break;
--	default:
-+	bandp = wiphy_get_band(wiphy, band);
-+	if (!bandp)
- 		return -ENOTSUP;
--	}
+ 	if (!wiphy_constrain_freq_set(station->wiphy, known_freq_set)) {
+@@ -1812,10 +1812,6 @@ static void parse_neighbor_report(struct station *station,
+ 	struct scan_freq_set *freq_set_md, *freq_set_no_md;
+ 	uint32_t current_freq = 0;
+ 	struct handshake_state *hs = netdev_get_handshake(station->netdev);
+-	const struct scan_freq_set *supported =
+-				wiphy_get_supported_freqs(station->wiphy);
+-	const struct scan_freq_set *disabled =
+-				wiphy_get_disabled_freqs(station->wiphy);
  
- 	ie_tlv_iter_init(&iter, ies, ies_len);
+ 	freq_set_md = scan_freq_set_new();
+ 	freq_set_no_md = scan_freq_set_new();
+@@ -1828,6 +1824,7 @@ static void parse_neighbor_report(struct station *station,
+ 		uint32_t freq;
+ 		enum band_freq band;
+ 		const uint8_t *cc = NULL;
++		const struct band_freq_attrs *attr;
  
-diff --git a/src/wiphy.h b/src/wiphy.h
-index 09dc4530..c1919b4c 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -102,6 +102,11 @@ const struct scan_freq_set *wiphy_get_supported_freqs(
- 						const struct wiphy *wiphy);
- const struct scan_freq_set *wiphy_get_disabled_freqs(const struct wiphy *wiphy);
+ 		if (ie_tlv_iter_get_tag(&iter) != IE_TYPE_NEIGHBOR_REPORT)
+ 			continue;
+@@ -1853,8 +1850,8 @@ static void parse_neighbor_report(struct station *station,
+ 			continue;
  
-+const struct band_freq_attrs *wiphy_get_frequency_info(
-+						const struct wiphy *wiphy,
-+						uint32_t freq);
-+bool wiphy_band_is_disabled(const struct wiphy *wiphy, enum band_freq band);
-+
- bool wiphy_supports_probe_resp_offload(struct wiphy *wiphy);
- bool wiphy_can_transition_disable(struct wiphy *wiphy);
- bool wiphy_can_offload(struct wiphy *wiphy);
+ 		/* Skip if frequency is not supported or disabled */
+-		if (!scan_freq_set_contains(supported, freq) ||
+-				scan_freq_set_contains(disabled, freq))
++		attr = wiphy_get_frequency_info(station->wiphy, freq);
++		if (!attr || attr->disabled)
+ 			continue;
+ 
+ 		if (!memcmp(info.addr,
 -- 
 2.34.3
 
