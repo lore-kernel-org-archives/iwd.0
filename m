@@ -1,78 +1,104 @@
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29BDBA24
-	for <iwd@lists.linux.dev>; Wed, 14 Dec 2022 22:26:32 +0000 (UTC)
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-1441d7d40c6so18604509fac.8
-        for <iwd@lists.linux.dev>; Wed, 14 Dec 2022 14:26:32 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF332119
+	for <iwd@lists.linux.dev>; Fri, 16 Dec 2022 17:26:20 +0000 (UTC)
+Received: by mail-pj1-f52.google.com with SMTP id u15-20020a17090a3fcf00b002191825cf02so3043280pjm.2
+        for <iwd@lists.linux.dev>; Fri, 16 Dec 2022 09:26:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NrLBBKCjjKph1GudXC/b6wuS/M6YaB7WDkLXrfJHegI=;
-        b=HB687up8XgFXTmUYe08xQWIzwFx95rbeO+QbSkLBTRLmc9sFKH/FeVM2V5WnWtCfkR
-         mYWw1br5si+HorQLCYFbEfAF4dEYJrJ9XuJQ5plwbzKspe1qwlWyLK7UQl3TmfMhlkig
-         /9m991Egf9XGMq5BCo2s1NeR2rSxqkPuDWicrIxwO8mjBDKvp34AXx1ncNcNgG7LKDwt
-         dec7ga5Q3R5l/5O2TPUDmKYKxGvTywI8Zd8vNURdks66vUyJ2ZWYHDnIgEIuHWm+BH9g
-         vOL54ZEP80J5LbIDISPo5ZX7hWa4qbulRCRAZ3gCLi73GZk/vDQ8m/jVbi2zRfNGu9Lm
-         xWqQ==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z8mQvfW4UcUupWINqwg26ZM0G6ITKW3l9EMP7M/v7XQ=;
+        b=O9jXDzhn08fQuvw5vNmhSp9w/gHiGlaGgSyZAxMYSlG5UqWtIG9EU4sS6XtSub1Yu6
+         T12DmQAuWd51BuoSyAtkWKnZF/VU0dag/zYIXW23ZDr9DR/+kwin8TXILvPXF5xyVvd2
+         44B2dd1s1/tcKyKbPlOqfPobOufY4IeMIXiE7VLbKKPPkFpDm4dhkEZiUraCzPCRgWIW
+         HafBI/Z62PlLsUVIfz/27+fpUQM4ETjund84i6/ZNgZN2FE4aff0aL7MHRnSu0wuxjNL
+         ++bfG1vyM09pK6iF8xcNR3ny8luUmLXyLxGyJyxVJ3jwGkar8D5ZlIOchaJMTjCvGxr0
+         8c1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NrLBBKCjjKph1GudXC/b6wuS/M6YaB7WDkLXrfJHegI=;
-        b=Q/u+8D82EVrnA0JeiLnYDlq4TymOQcKZiUJMZWJbzAuc48YOyYWCtJ9tfOwwB9Ux9+
-         pJmf2bTnwmby7zV37cYS3s/8w1hLfCd4+H+LkX1Gknc7nH5D0NUssUiFEzFEtE97JiO2
-         tseHQEJL7Cbwp7oCE05jFnc+hR/9uRYLWUqonouMakxVILPcrrYFe2Etx3LWyiWP7Vxf
-         J6/K2QbiseNP/hfPEwm6P8GBUdHj/dxVXAP0SxukcphprdiS4AKA8pymRax6whuoxanK
-         ZMumEV/L8/ypBaxNZ1LHgtqX7deMVP2GE8fWZPNTIgMvlxuntIt2qtIqNTzHj0IIQncO
-         4CVw==
-X-Gm-Message-State: ANoB5plv8WJJ7fFVYBWBcwBnac/upliM/1TIMQBtR20VhKYrOX+s8Z8f
-	laFO4FUILrB1mimNrtb/rYIY18OjwRg=
-X-Google-Smtp-Source: AA0mqf5jX0ncuxHoCjAzzysVIbXF4r9VFgbTqwh8pxO1wxQhEoFL5ay4zSSGVXOJonmOf+YZ/pN3ig==
-X-Received: by 2002:a05:6870:d990:b0:143:e045:7082 with SMTP id gn16-20020a056870d99000b00143e0457082mr13030390oab.58.1671056791972;
-        Wed, 14 Dec 2022 14:26:31 -0800 (PST)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id bc13-20020a056808170d00b003547a3401e6sm386237oib.43.2022.12.14.14.26.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Dec 2022 14:26:31 -0800 (PST)
-Message-ID: <c451633b-3d03-830a-0de4-2267a80db67b@gmail.com>
-Date: Wed, 14 Dec 2022 16:15:54 -0600
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z8mQvfW4UcUupWINqwg26ZM0G6ITKW3l9EMP7M/v7XQ=;
+        b=Xbo7YXT4fHgPr+JHyH7VHG/YQeth9n5ipdwhHkjAzM+kyq+mu3oCSAis7LM54/SB95
+         jDSsrvOErptU2OlJ1A6uCy0PCQuGU5IlOBBTG0YUVTuARt4cJb7bFfPSVXn33wVQ2pt1
+         o0Gp9beu+Ef3n/8XBN5pbNPmjlOCPNO74TC+IJiX1k8/QZmRheKmkTTOuW4MoOTF1smn
+         TTIlRJUzRJqlkJdxCltJ9dCBb1AgovVqZa6Sz3QxW5oY2acmC0jo+FjYvem5QehH1cHn
+         UxxyHypgSH2jnqAXt2xbROHkB4AqCP8LChiJ8ghqJ+CwagvxFXcPTKS55Mk4dgkIyfQb
+         s8NQ==
+X-Gm-Message-State: ANoB5pknbQARncoD3dBQrxmzSC1+wd4TuSs3BltNavQrxKIQ+dDOH7dO
+	xdKUzIYj+6AtbtoRILs90fQtBYsVe8I=
+X-Google-Smtp-Source: AA0mqf4VzQgbsGjpFcMfhXPuABx6n1qsXZqGI9EUqHfr2hnMqrSaBGAgmqkSnw+7RqdhaxBGHpkVQw==
+X-Received: by 2002:a17:902:74c5:b0:187:dc9:ef64 with SMTP id f5-20020a17090274c500b001870dc9ef64mr35485481plt.60.1671211579316;
+        Fri, 16 Dec 2022 09:26:19 -0800 (PST)
+Received: from jprestwo-xps.none ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id j5-20020a170902da8500b00188fdae6e0esm1913636plx.44.2022.12.16.09.26.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Dec 2022 09:26:18 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/8] band: introduce new method of tracking frequencies
+Date: Fri, 16 Dec 2022 09:25:59 -0800
+Message-Id: <20221216172606.1799396-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 1/3] ft: gate FT-over-DS with a wiphy work item
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20221214212658.1578576-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221214212658.1578576-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Currently the wiphy object keeps track of supported and disabled
+frequencies as two separate scan_freq_set's. This is very expensive
+and limiting since we have to add more sets in order to track
+additional frequency flags (no-IR, no-HT, no-HE etc).
 
-On 12/14/22 15:26, James Prestwood wrote:
-> Queue the FT action just like we do with FT Authenticate which makes
-> it able to be used the same way, i.e. call ft_action() then queue
-> the ft_associate work right away.
-> 
-> A timer was added to end the work item in case the target never
-> responds.
-> ---
->   src/ft.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++---------
->   1 file changed, 49 insertions(+), 9 deletions(-)
-> 
+Instead we can refactor how frequencies are stored. They will now
+be part of the band object and stored as a list of flag structures
+where each index corresponds to a channel
+---
+ src/band.c | 2 ++
+ src/band.h | 8 ++++++++
+ 2 files changed, 10 insertions(+)
 
-All applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/band.c b/src/band.c
+index 01166b62..d89b2a90 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -36,6 +36,8 @@ void band_free(struct band *band)
+ 	if (band->he_capabilities)
+ 		l_queue_destroy(band->he_capabilities, l_free);
+ 
++	l_free(band->freq_attrs);
++
+ 	l_free(band);
+ }
+ 
+diff --git a/src/band.h b/src/band.h
+index 9b307a77..da4c0ae5 100644
+--- a/src/band.h
++++ b/src/band.h
+@@ -55,8 +55,16 @@ struct band_he_capabilities {
+ 	uint8_t he_mcs_set[12];
+ };
+ 
++struct band_freq_attrs {
++	bool supported : 1;
++	bool disabled : 1;
++	bool no_ir : 1;
++} __attribute__ ((packed));
++
+ struct band {
+ 	enum band_freq freq;
++	struct band_freq_attrs *freq_attrs;
++	size_t freqs_len;
+ 	/* Each entry is type struct band_he_capabilities */
+ 	struct l_queue *he_capabilities;
+ 	uint8_t vht_mcs_set[8];
+-- 
+2.34.3
 
