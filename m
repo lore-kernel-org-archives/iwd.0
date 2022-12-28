@@ -1,49 +1,49 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3438A29A8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBFF96FBC
 	for <iwd@lists.linux.dev>; Wed, 28 Dec 2022 22:32:35 +0000 (UTC)
-Received: by mail-pj1-f45.google.com with SMTP id j8-20020a17090a3e0800b00225fdd5007fso7667003pjc.2
+Received: by mail-pl1-f175.google.com with SMTP id d3so17251699plr.10
         for <iwd@lists.linux.dev>; Wed, 28 Dec 2022 14:32:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ea9dtO9zu4IZZ60x5SgQ+4HmDnxFTaVZ4B6VOF67QwA=;
-        b=c36xFZHtMRJ8T3nz94k8QXB1MTJ3evLqighV2wcYNdHIexs6nA2YWvldeg7vMgLG6B
-         ZVcWjtTZ42Z8emeHeqD1u+i/W+nuyKXgIov5QxpVZaAT9rhgYXpq3F8s5TWFNfrYhknc
-         n/cghjNi1PZuj55Itqbt7qjhmJpadZX2vZNHOdkzuOuhmpdczynaEYHNfXrtpJ6mMp7b
-         p8WHyLTociFRhJrYRAkS1Q3kN/QWIfRLeEpMyZZzj8ciJxUHnmw7BUuJR57BGZ6q2W8X
-         7yRZLAG8SNwCcrHLHM2agWcvzKGEptdGAXGjFC+JdoFArbdewxL8oTj/cWAmNDdxB/Sy
-         Es4g==
+        bh=moFZXKdsfPgoJa4MjdjZ8x0fkJVSOcP3+f9jLjbciVM=;
+        b=WkmAPFyaVuCoR9w3pKnUfTl/9uMkkM1ymkRL9EPejMYsxpVa/J864OzhBPUsyzNUGr
+         2+kGYlrAFzn/lcOFhupdfBbvp1fPcyvyuYJYo2qEzp7I3N+rj/0PKPtb7cTiQ6CdVLAA
+         TbmJyGE/LkpqKBfnFMxpFI5Q/K91mxHuIfRixD+LiUJJLpJ2jCA3U4xiFD+KdAc/7BUx
+         MPoyq3uGhd0VVdfJ+yZYdZOD7AUkasWa2RRBE6c7gbsNQlMJ14aluUDs14K7/7mjyhiF
+         yYWAqbfP5yw27k/CeHZd7XYs14gCQVy03qqwJy+zZ/VvbAsq2r8bkThwSgC4W3SMaEZN
+         M+0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ea9dtO9zu4IZZ60x5SgQ+4HmDnxFTaVZ4B6VOF67QwA=;
-        b=D4xrsfW54Im8SrnZ/rwkG53sqO3PY9i2ZfgZzIGcUC6++nLNkwipiF+jBksi8TdTrG
-         CYjmp+2YrB+XK88cWwpto9YGESNnuIGUJi7NK5ovAl0Kc0R8KqzScx/QZPD6us9ab+UK
-         teyLFMG6BFBTlcdgwlY1+RqieM2gDb3IkkxDT25iS4cgSMdZTxmvqIuPaAB0UqNFR3m8
-         naFRS93OAE93Zc8JC4cLePk6esGW/yWNZWzcBUGdeV5ZgqdoW0cGTW7tXkodMXReEf86
-         FFGXMc27fW+AxY5/ESQU1yxGtKrTENtoHU/OwdIk5zS3sWRP1Zup6qCVwqPCRb7bcDoa
-         8flA==
-X-Gm-Message-State: AFqh2kp6OtU293JKfOi+JgXaNCsZfp4EoNe+xpbL3MNZNO+7XoklATqj
-	K8iYl5omNYqtFdwxjDJcAK/96RW/75E=
-X-Google-Smtp-Source: AMrXdXugFA7FcM9rI3IMQQ0q7x4TawAComyehS4vy6pfIh1mHB58Z4X6cN6QkkTIEO7HP2v81iyPiw==
-X-Received: by 2002:a17:902:9a0b:b0:189:d3dc:a9c4 with SMTP id v11-20020a1709029a0b00b00189d3dca9c4mr25313511plp.36.1672266754394;
-        Wed, 28 Dec 2022 14:32:34 -0800 (PST)
+        bh=moFZXKdsfPgoJa4MjdjZ8x0fkJVSOcP3+f9jLjbciVM=;
+        b=CQAFOdv4NLBzwsnJDGo+9KUwEXD1EqjxDFfgOBMh+HpsR1qZPgO8twldWBau/InOpI
+         U2CPaKahXEz2Tmdu9DUdswy3/WbUE8WAxaltnjpWi+D1uwypFJPquspW7B+tBixFFZIs
+         dgNigbIfc5VvB1E7PpIPPIxuBL8qIDJYJpl9zsXedJBLBIGzv9luqC17WuJgdGVhI7VY
+         g0lglmdxSoGWoRDZeODuUCXcWZSfWavpIR1Er7HfKQrYtrJ46B9W8t02OpPl48eWY2u7
+         GTilSWmF8QIYe2HJZ1pGr1SAbm+8tfxNLQqBI5dFkWUUfrEMPANMy3xt4SZre2YfK1NH
+         zL2A==
+X-Gm-Message-State: AFqh2ko5B29rYUcujX/EvajW7sZRc8MPnD7tBhuYn13SBJ+0aRmoBvN+
+	YwunTpJRRHa7p/JZ7X9G35lflvYstEw=
+X-Google-Smtp-Source: AMrXdXtWw5DxsZLghyAo2m00V892D4Iqa0l3n5JK679riKcLzoFsKxnXfAkSoMw+ku4eVQ8KVzBGKg==
+X-Received: by 2002:a17:903:200b:b0:192:467e:7379 with SMTP id s11-20020a170903200b00b00192467e7379mr23844155pla.49.1672266755092;
+        Wed, 28 Dec 2022 14:32:35 -0800 (PST)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id t8-20020a170902e84800b0017849a2b56asm11549544plg.46.2022.12.28.14.32.33
+        by smtp.gmail.com with ESMTPSA id t8-20020a170902e84800b0017849a2b56asm11549544plg.46.2022.12.28.14.32.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Dec 2022 14:32:33 -0800 (PST)
+        Wed, 28 Dec 2022 14:32:34 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 2/4] ap: include WMM parameter IE
-Date: Wed, 28 Dec 2022 14:32:29 -0800
-Message-Id: <20221228223231.2686276-2-prestwoj@gmail.com>
+Subject: [PATCH v3 3/4] ap: generate chandef for starting AP
+Date: Wed, 28 Dec 2022 14:32:30 -0800
+Message-Id: <20221228223231.2686276-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20221228223231.2686276-1-prestwoj@gmail.com>
 References: <20221228223231.2686276-1-prestwoj@gmail.com>
@@ -55,124 +55,92 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The WMM parameter IE is expected by the linux kernel for any AP
-supporting HT/VHT etc. IWD won't actually use WMM and its not
-clear exactly why the kernel uses this restriction, but regardless
-it must be included to support HT.
+To include HT support a chandef needs to be created for whatever
+frequency is being used. This allows IWD to provide a secondary
+channel to the kernel in the case of 40MHz operation. Now the AP
+will generate a chandef when starting based on the channel set
+in the user profile (or default).
+
+If HT is not supported the chandef width is set to 20MHz no-HT,
+otherwise band_freq_to_ht_chandef is used.
 ---
- src/ap.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+ src/ap.c | 38 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 34 insertions(+), 4 deletions(-)
+
+v3:
+ * Reordered this before the HT builders so the build wont
+   fail if applied incrementally.
 
 diff --git a/src/ap.c b/src/ap.c
-index 595c71c9..b505499d 100644
+index b505499d..a8c415d5 100644
 --- a/src/ap.c
 +++ b/src/ap.c
-@@ -111,6 +111,7 @@ struct ap_state {
- 	bool in_event : 1;
- 	bool free_pending : 1;
- 	bool scanning : 1;
-+	bool supports_ht : 1;
- };
+@@ -72,6 +72,7 @@ struct ap_state {
+ 	uint8_t psk[32];
+ 	enum band_freq band;
+ 	uint8_t channel;
++	struct band_chandef chandef;
+ 	uint8_t *authorized_macs;
+ 	unsigned int authorized_macs_num;
+ 	char wsc_name[33];
+@@ -2469,8 +2470,6 @@ static struct l_genl_msg *ap_build_cmd_start_ap(struct ap_state *ap)
+ 	uint32_t nl_akm = CRYPTO_AKM_PSK;
+ 	uint32_t wpa_version = NL80211_WPA_VERSION_2;
+ 	uint32_t auth_type = NL80211_AUTHTYPE_OPEN_SYSTEM;
+-	uint32_t ch_freq = band_channel_to_freq(ap->channel, ap->band);
+-	uint32_t ch_width = NL80211_CHAN_WIDTH_20;
+ 	unsigned int i;
  
- struct sta_state {
-@@ -834,6 +835,9 @@ static size_t ap_get_extra_ies_len(struct ap_state *ap,
+ 	static const uint8_t bcast_addr[6] = {
+@@ -2518,8 +2517,13 @@ static struct l_genl_msg *ap_build_cmd_start_ap(struct ap_state *ap)
+ 	l_genl_msg_append_attr(cmd, NL80211_ATTR_WPA_VERSIONS, 4, &wpa_version);
+ 	l_genl_msg_append_attr(cmd, NL80211_ATTR_AKM_SUITES, 4, &nl_akm);
+ 	l_genl_msg_append_attr(cmd, NL80211_ATTR_AUTH_TYPE, 4, &auth_type);
+-	l_genl_msg_append_attr(cmd, NL80211_ATTR_WIPHY_FREQ, 4, &ch_freq);
+-	l_genl_msg_append_attr(cmd, NL80211_ATTR_CHANNEL_WIDTH, 4, &ch_width);
++	l_genl_msg_append_attr(cmd, NL80211_ATTR_WIPHY_FREQ, 4,
++				&ap->chandef.frequency);
++	l_genl_msg_append_attr(cmd, NL80211_ATTR_CHANNEL_WIDTH, 4,
++				&ap->chandef.channel_width);
++	if (ap->chandef.center1_frequency)
++		l_genl_msg_append_attr(cmd, NL80211_ATTR_CENTER_FREQ1, 4,
++					&ap->chandef.center1_frequency);
  
- 	len += ap_get_wsc_ie_len(ap, type, client_frame, client_frame_len);
- 
-+	if (ap->supports_ht)
-+		len += 26;
+ 	if (wiphy_supports_probe_resp_offload(wiphy)) {
+ 		uint8_t probe_resp[head_len + tail_len];
+@@ -3255,6 +3259,32 @@ static bool ap_validate_band_channel(struct ap_state *ap)
+ 		l_error("AP frequency %u disabled or unsupported", freq);
+ 		return false;
+ 	}
 +
- 	if (ap->ops->get_extra_ies_len)
- 		len += ap->ops->get_extra_ies_len(type, client_frame,
- 							client_frame_len,
-@@ -842,6 +846,67 @@ static size_t ap_get_extra_ies_len(struct ap_state *ap,
- 	return len;
- }
- 
-+/* WMM Specification 2.2.2 WMM Parameter Element */
-+struct ap_wmm_ac_record {
-+#if defined(__LITTLE_ENDIAN_BITFIELD)
-+	uint8_t aifsn : 4;
-+	uint8_t acm : 1;
-+	uint8_t aci : 2;
-+	uint8_t reserved : 1;
-+	uint8_t ecw_min : 4;
-+	uint8_t ecw_max : 4;
-+#elif defined (__BIG_ENDIAN_BITFIELD)
-+	uint8_t reserved : 1;
-+	uint8_t aci : 2;
-+	uint8_t acm : 1;
-+	uint8_t aifsn : 4;
-+	uint8_t acw_max : 4;
-+	uint8_t acw_min : 4;
-+#else
-+#error "Please fix <asm/byteorder.h"
-+#endif
-+	__le16 txop_limit;
-+} __attribute__((packed));
++	if (ap->supports_ht) {
++		if (band_freq_to_ht_chandef(freq, attr, &ap->chandef) < 0) {
++			/*
++			 * This is unlikely ever to fail since there are no
++			 * 20Mhz restrictions, but just in case fall back to
++			 * non-HT.
++			 */
++			ap->supports_ht = false;
 +
-+static size_t ap_write_wmm_ies(struct ap_state *ap, uint8_t *out_buf)
-+{
-+	unsigned int i;
-+	struct wiphy *wiphy = netdev_get_wiphy(ap->netdev);
++			l_warn("AP could not find HT chandef for frequency %u"
++				" using 20Mhz no-HT", freq);
 +
-+	/*
-+	 * Linux kernel requires APs include WMM Information element if
-+	 * supporting HT/VHT/etc.
-+	 *
-+	 * The only value we can actually get from the kernel is UAPSD. The
-+	 * remaining values (AC parameter records) are made up or defaults
-+	 * defined in the WMM spec are used.
-+	 */
-+	*out_buf++ = IE_TYPE_VENDOR_SPECIFIC;
-+	*out_buf++ = 24;
-+	memcpy(out_buf, microsoft_oui, sizeof(microsoft_oui));
-+	out_buf += sizeof(microsoft_oui);
-+	*out_buf++ = 2; /* WMM OUI Type */
-+	*out_buf++ = 1; /* WMM Parameter subtype */
-+	*out_buf++ = 1; /* WMM Version */
-+	*out_buf++ = wiphy_supports_uapsd(wiphy) ? 1 << 7 : 0;
-+	*out_buf++ = 0; /* reserved */
-+
-+	for (i = 0; i < 4; i++) {
-+		struct ap_wmm_ac_record ac = { 0 };
-+
-+		ac.aifsn = 2;
-+		ac.acm = 0;
-+		ac.aci = i;
-+		ac.ecw_min = 1;
-+		ac.ecw_max = 15;
-+		l_put_le16(0, &ac.txop_limit);
-+
-+		memcpy(out_buf + (i * 4), &ac, sizeof(struct ap_wmm_ac_record));
++			goto no_ht;
++		}
++	} else {
++no_ht:
++		ap->chandef.frequency = freq;
++		ap->chandef.channel_width = BAND_CHANDEF_WIDTH_20NOHT;
 +	}
 +
-+	return 26;
-+}
++	l_debug("AP using frequency %u and channel width %s",
++			ap->chandef.frequency,
++			band_chandef_width_to_string(
++				ap->chandef.channel_width));
 +
- static size_t ap_write_extra_ies(struct ap_state *ap,
- 					enum mpdu_management_subtype type,
- 					const struct mmpdu_header *client_frame,
-@@ -853,6 +918,9 @@ static size_t ap_write_extra_ies(struct ap_state *ap,
- 	len += ap_write_wsc_ie(ap, type, client_frame, client_frame_len,
- 				out_buf + len);
+ 	return true;
+ }
  
-+	if (ap->supports_ht)
-+		len += ap_write_wmm_ies(ap, out_buf + len);
-+
- 	if (ap->ops->write_extra_ies)
- 		len += ap->ops->write_extra_ies(type,
- 						client_frame, client_frame_len,
-@@ -3255,6 +3323,9 @@ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
- 		ap->band = BAND_FREQ_2_4_GHZ;
- 	}
- 
-+	ap->supports_ht = wiphy_get_ht_capabilities(wiphy, ap->band,
-+							NULL) != NULL;
-+
- 	if (!ap_validate_band_channel(ap)) {
- 		l_error("AP Band and Channel combination invalid");
- 		return -EINVAL;
 -- 
 2.34.3
 
