@@ -1,49 +1,52 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7E86FAE
-	for <iwd@lists.linux.dev>; Wed, 28 Dec 2022 21:44:09 +0000 (UTC)
-Received: by mail-pf1-f172.google.com with SMTP id e21so1924730pfl.1
-        for <iwd@lists.linux.dev>; Wed, 28 Dec 2022 13:44:09 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6FE6FAE
+	for <iwd@lists.linux.dev>; Wed, 28 Dec 2022 21:44:10 +0000 (UTC)
+Received: by mail-pf1-f174.google.com with SMTP id z7so5817491pfq.13
+        for <iwd@lists.linux.dev>; Wed, 28 Dec 2022 13:44:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wLY0QEhQiyaU9M4O3JHJWYbovNtuGKBFMM6Ms1PAwBY=;
-        b=SK9TxtoeMAmRsQ35cT/l7YtPH62GCKcvBP6lSy1VBiNioB90BAoT3oHvDQQa0JLUrU
-         OaHBIN1nb9yOkbBdtccQTKOB731AK5lrm1jjEWF6g9OvTuC76yZKtahlZ5KnEf4/ii8C
-         XZw4WGTQesD2NdmeDkoqxYqH+tSaR2BJfX+lKlT4KVUhKgpR/TXT3nhhxmar0L6qn2Rt
-         ff2g4bYVrtq58dqiWV2H/nc4jliaTjfbuvwf3Qfq0c3GuH1iTrb4iQBODLBbaNuksjBX
-         rmpuKWfzNinDqdEywYIBu+kLCJ/H660dQhxd0xjNsqMOhD0NlLfupxsEmhKboIwFudiX
-         yKuw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pDjp2a34VLPVdioeq5pvirIQHvIfRItds4iqNSmrglE=;
+        b=ghtBZRUDXSML/IReSR5wIMbyvLEuxrRExavPoAyE7fP08NAPytGER9QvcypxvjsV2L
+         PzeSiHO3SNmzDJrwNoitL6t2KnvMtwQSfU4Z0fG66uez1D3IgW131Q3hbKUzuQimda2/
+         r9a40TIbHmsg4jOjx+A7FIqKPrKWAF0QARiOMLJy6NDTkuVEikB/MbTta98lonIWy3gP
+         kdK0d/t216dIe2pmN8kZU4An8u+ofM01HvZdjRtjoOoNve387MTwKRSyrWepU0CfgL1f
+         UXkils38+HyF/+UrjhyqxcnH/SoAqV37W3REMFqX8TXacWHfUUn3SRlOVhy5+3CaHNlf
+         yvRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wLY0QEhQiyaU9M4O3JHJWYbovNtuGKBFMM6Ms1PAwBY=;
-        b=78tpUrV1GKLzKnSCukuM/pCW2tFaZdZmdIwqRWtHOKU/qpdpNZYjmJlJZSMbi7demw
-         W0fE0IEKmrruvFyszQJleprtffEUlmIPXMhspyCs08YZfTQTBiwIsmVqgDYF2JHyhZ1w
-         m2L+T7lg6JkfGAdY6599Spb363UxwH3KhtcA/5ZYvibAgrya9yn4mOI9HzPGongcfcw5
-         vAW+cLbwSSqP9GEwrnGmv71Gxcsxjh562nBgnBQFFxWIkvQfy+K/LOtQ0QZ7NhSu1/s9
-         h6Zbl/vciDteCc4OVFmshw+o+j3Ecc/abpzGfdWQrFIIuFNl+4PObJ9I+Ui6cHF7xweD
-         LyQw==
-X-Gm-Message-State: AFqh2kqg1rTV64GSuYkPG2WRkYfEUrUJW6W1d9/L2XjHFXuzo/KjQdDu
-	ai/r7NNG5mnaiB6rTxoWfBSRiDKy8qw=
-X-Google-Smtp-Source: AMrXdXuoWJ9JPm/Ds85KEdYmL89E2IyDJVs8QgfbM7TNRQnk4dZfK2OuAhm9oPHI8UMjXl0/lwJj6w==
-X-Received: by 2002:a05:6a00:1f06:b0:581:366b:ca63 with SMTP id be6-20020a056a001f0600b00581366bca63mr9558349pfb.34.1672263848300;
-        Wed, 28 Dec 2022 13:44:08 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pDjp2a34VLPVdioeq5pvirIQHvIfRItds4iqNSmrglE=;
+        b=uzMtUMJYFKX0ELk4ODI7E/tSH1FAQixs2Q/DB4nDS1b5GxdUyWoIVtRkdF+b5ZQEkQ
+         IfKIL4ZjJV4OGubuN5Ti10Dl/XJOex9Zv/e4BHzWIknO4DZcnwL/dk1CPKq6tqIi2YXy
+         QiiOtAXnQsrMRp7qUQZQTegG9EY3+q8MLU7EwLhUKYgjsWtw/Qx6svv4t/P/3fsZ8iLK
+         2tMeCKaTSqskXtG+Gu0MwleucrB8iHexxv4Esunjw28nTBJqmr0QZTxi9dugg/lmH6pf
+         dxbxzvbMD6O45v97QUOhvrQce7QybfsFx4VKfVgwwp4DAQOaXhWmL2k9idj+snDDBSJL
+         48hw==
+X-Gm-Message-State: AFqh2kr757b4Vp/JwDn8NkknpSyB4bApaFbbndE1wcPseGDS6nUsHwsB
+	Dnw5ZPjVnBfAh8wSrU3nLMlaEGqg8ro=
+X-Google-Smtp-Source: AMrXdXtNm0vAmHo/jFTht/t014aaD5FgqjXCz7CgNg21iTUkZ3mq2d5THuhkQJtM+yuJksbhoVhu7A==
+X-Received: by 2002:a05:6a00:13a4:b0:57f:f7a4:511a with SMTP id t36-20020a056a0013a400b0057ff7a4511amr35119026pfg.2.1672263850020;
+        Wed, 28 Dec 2022 13:44:10 -0800 (PST)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id o3-20020aa79783000000b0057726bd7335sm5360103pfp.121.2022.12.28.13.44.07
+        by smtp.gmail.com with ESMTPSA id o3-20020aa79783000000b0057726bd7335sm5360103pfp.121.2022.12.28.13.44.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Dec 2022 13:44:07 -0800 (PST)
+        Wed, 28 Dec 2022 13:44:09 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/4] band: generate HT chandef from frequency
-Date: Wed, 28 Dec 2022 13:44:00 -0800
-Message-Id: <20221228214403.2682418-1-prestwoj@gmail.com>
+Subject: [PATCH v2 3/4] ap: build HT Capabilities/Operation elements
+Date: Wed, 28 Dec 2022 13:44:02 -0800
+Message-Id: <20221228214403.2682418-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20221228214403.2682418-1-prestwoj@gmail.com>
+References: <20221228214403.2682418-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -52,137 +55,178 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For AP mode its convenient for IWD to choose an appropriate
-channel definition rather than require the user provide very
-low level parameters such as channel width, center1 frequency
-etc. For now only HT is supported as VHT/HE etc. require
-additional secondary channel frequencies.
+If supported this will include the HT capabilities and HT
+operations elements in beacons/probes. Some shortcuts were taken
+here since not all the information is currently parsed from the
+hardware. Namely the HT operation element does not include the
+basic MCS set. Still, this will at least show stations that the
+AP is capable of more than just basic rates.
 
-The HT API tries to find an operating class using 40Mhz which
-complies with any hardware restrictions. If an operating class is
-found that is supported/not restricted it is marked as 'best' until
-a better one is found. In this case 'better' is a larger channel
-width. Since this is HT only 20mhz and 40mhz widths are checked.
+The builders themselves are structured similar to the basic rates
+builder where they build only the contents and return the length.
+The caller must set the type/length manually. This is to support
+the two use cases of using with an IE builder vs direct pointer.
 ---
- src/band.c | 87 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/band.h |  2 ++
- 2 files changed, 89 insertions(+)
+ src/ap.c | 104 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 104 insertions(+)
 
-v2:
- * Removed the non-HT API entirely since the caller can set the
-   chandef directly after validating the frequency
-
-diff --git a/src/band.c b/src/band.c
-index 53ce9495..c89762a9 100644
---- a/src/band.c
-+++ b/src/band.c
-@@ -1194,6 +1194,93 @@ int oci_from_chandef(const struct band_chandef *own, uint8_t oci[static 3])
- 	return -ENOENT;
+diff --git a/src/ap.c b/src/ap.c
+index b505499d..d9a81651 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -136,6 +136,9 @@ struct sta_state {
+ 	bool wsc_v2;
+ 	struct l_dhcp_lease *ip_alloc_lease;
+ 	bool ip_alloc_sent;
++
++	bool ht_support : 1;
++	bool ht_greenfield : 1;
+ };
+ 
+ struct ap_wsc_pbc_probe_record {
+@@ -929,6 +932,66 @@ static size_t ap_write_extra_ies(struct ap_state *ap,
+ 	return len;
  }
  
-+/* Find an HT chandef for the frequency */
-+int band_freq_to_ht_chandef(uint32_t freq, const struct band_freq_attrs *attr,
-+				struct band_chandef *chandef)
++static size_t ap_build_ht_capability(struct ap_state *ap, uint8_t *buf)
 +{
-+	enum band_freq band;
-+	enum band_chandef_width width;
-+	unsigned int i;
-+	const struct operating_class_info *best = NULL;
++	struct wiphy *wiphy = netdev_get_wiphy(ap->netdev);
++	size_t ht_capa_len;
++	const uint8_t *ht_capa = wiphy_get_ht_capabilities(wiphy, ap->band,
++								&ht_capa_len);
 +
-+	if (attr->disabled || !attr->supported)
-+		return -EINVAL;
++	memcpy(buf, ht_capa, ht_capa_len);
 +
-+	if (!band_freq_to_channel(freq, &band))
-+		return -EINVAL;
-+
-+	for (i = 0; i < L_ARRAY_SIZE(e4_operating_classes); i++) {
-+		const struct operating_class_info *info =
-+						&e4_operating_classes[i];
-+		enum band_chandef_width w;
-+
-+		if (e4_has_frequency(info, freq) < 0)
-+			continue;
-+
-+		/* Any restrictions for this channel width? */
-+		switch (info->channel_spacing) {
-+		case 20:
-+			w = BAND_CHANDEF_WIDTH_20;
-+			break;
-+		case 40:
-+			w = BAND_CHANDEF_WIDTH_40;
-+
-+			/* 6GHz remove the upper/lower 40mhz channel concept */
-+			if (band == BAND_FREQ_6_GHZ)
-+				break;
-+
-+			if (info->flags & PRIMARY_CHANNEL_UPPER &&
-+						attr->no_ht40_plus)
-+				continue;
-+
-+			if (info->flags & PRIMARY_CHANNEL_LOWER &&
-+						attr->no_ht40_minus)
-+				continue;
-+
-+			break;
-+		default:
-+			continue;
-+		}
-+
-+		if (!best || best->channel_spacing < info->channel_spacing) {
-+			best = info;
-+			width = w;
-+		}
-+	}
-+
-+	if (!best)
-+		return -ENOENT;
-+
-+	chandef->frequency = freq;
-+	chandef->channel_width = width;
-+
-+	/*
-+	 * Choose a secondary channel frequency:
-+	 * - 20mhz no secondary
-+	 * - 40mhz we can base the selection off the channel flags, either
-+	 *   higher or lower.
-+	 */
-+	switch (width) {
-+	case BAND_CHANDEF_WIDTH_20:
-+		return 0;
-+	case BAND_CHANDEF_WIDTH_40:
-+		if (band == BAND_FREQ_6_GHZ)
-+			return 0;
-+
-+		if (best->flags & PRIMARY_CHANNEL_UPPER)
-+			chandef->center1_frequency = freq - 10;
-+		else
-+			chandef->center1_frequency = freq + 10;
-+
-+		return 0;
-+	default:
-+		/* Should never happen */
-+		return -EINVAL;
-+	}
-+
-+	return 0;
++	return ht_capa_len;
 +}
 +
- uint8_t band_freq_to_channel(uint32_t freq, enum band_freq *out_band)
- {
- 	uint32_t channel = 0;
-diff --git a/src/band.h b/src/band.h
-index 0ae5f8c0..676c63d9 100644
---- a/src/band.h
-+++ b/src/band.h
-@@ -101,6 +101,8 @@ int band_estimate_nonht_rate(const struct band *band,
- 				const uint8_t *supported_rates,
- 				const uint8_t *ext_supported_rates,
- 				int32_t rssi, uint64_t *out_data_rate);
-+int band_freq_to_ht_chandef(uint32_t freq, const struct band_freq_attrs *attr,
-+				struct band_chandef *chandef);
++static size_t ap_build_ht_operation(struct ap_state *ap, uint8_t *buf)
++{
++	const struct l_queue_entry *e;
++	unsigned int non_ht = false;
++	unsigned int non_greenfield = false;
++
++	memset(buf, 0, 22);
++	*buf++ = ap->channel;
++
++	/*
++	 * If 40MHz set 'Secondary Channel Offset' (bits 0-1) to above/below
++	 * and set 'STA Channel Width' (bit 2) to indicate non-20Mhz.
++	 */
++	if (ap->chandef.channel_width == BAND_CHANDEF_WIDTH_20)
++		goto check_stas;
++	else if (ap->chandef.frequency < ap->chandef.center1_frequency)
++		*buf |= 1 & 0x3;
++	else
++		*buf |= 3 & 0x3;
++
++	*buf |= 1 << 2;
++
++check_stas:
++	for (e = l_queue_get_entries(ap->sta_states); e; e = e->next) {
++		struct sta_state *sta = e->data;
++
++		if (!sta->associated)
++			continue;
++
++		if (!sta->ht_support)
++			non_ht = true;
++		else if (!sta->ht_greenfield)
++			non_greenfield = true;
++	}
++
++	if (non_greenfield)
++		set_bit(buf, 10);
++
++	if (non_ht)
++		set_bit(buf, 12);
++
++	/*
++	 * TODO: Basic MCS set for all associated STAs
++	 */
++
++	return 22;
++}
++
+ /*
+  * Build a Beacon frame or a Probe Response frame's header and body until
+  * the TIM IE.  Except for the optional TIM IE which is inserted by the
+@@ -981,6 +1044,18 @@ static size_t ap_build_beacon_pr_head(struct ap_state *ap,
+ 	ie_tlv_builder_next(&builder, IE_TYPE_DSSS_PARAMETER_SET);
+ 	ie_tlv_builder_set_data(&builder, &ap->channel, 1);
  
- int oci_to_frequency(uint32_t operating_class, uint32_t channel);
++	if (ap->supports_ht) {
++		ie_tlv_builder_next(&builder, IE_TYPE_HT_CAPABILITIES);
++		len = ap_build_ht_capability(ap,
++					ie_tlv_builder_get_data(&builder));
++		ie_tlv_builder_set_length(&builder, len);
++
++		ie_tlv_builder_next(&builder, IE_TYPE_HT_OPERATION);
++		len = ap_build_ht_operation(ap,
++					ie_tlv_builder_get_data(&builder));
++		ie_tlv_builder_set_length(&builder, len);
++	}
++
+ 	ie_tlv_builder_finalize(&builder, &out_len);
+ 	return 36 + out_len;
+ }
+@@ -1639,6 +1714,18 @@ static uint32_t ap_assoc_resp(struct ap_state *ap, struct sta_state *sta,
+ 	resp->ies[ies_len++] = len;
+ 	ies_len += len;
  
++	if (ap->supports_ht) {
++		resp->ies[ies_len++] = IE_TYPE_HT_CAPABILITIES;
++		len = ap_build_ht_capability(ap, resp->ies + ies_len + 1);
++		resp->ies[ies_len++] = len;
++		ies_len += len;
++
++		resp->ies[ies_len++] = IE_TYPE_HT_OPERATION;
++		len = ap_build_ht_operation(ap, resp->ies + ies_len + 1);
++		resp->ies[ies_len++] = len;
++		ies_len += len;
++	}
++
+ 	ies_len += ap_write_extra_ies(ap, stype, req, req_len,
+ 					resp->ies + ies_len);
+ 
+@@ -1844,6 +1931,17 @@ static void ap_assoc_reassoc(struct sta_state *sta, bool reassoc,
+ 
+ 			fils_ip_req = true;
+ 			break;
++		case IE_TYPE_HT_CAPABILITIES:
++			if (ie_tlv_iter_get_length(&iter) != 26) {
++				err = MMPDU_REASON_CODE_INVALID_IE;
++				goto bad_frame;
++			}
++
++			if (test_bit(ie_tlv_iter_get_data(&iter), 4))
++				sta->ht_greenfield = true;
++
++			sta->ht_support = true;
++			break;
+ 		}
+ 
+ 	if (!rates || !ssid || (!wsc_data && !rsn) ||
+@@ -2687,6 +2785,9 @@ static void ap_handle_new_station(struct ap_state *ap, struct l_genl_msg *msg)
+ 
+ 	l_queue_push_tail(ap->sta_states, sta);
+ 
++	if (ap->supports_ht)
++		ap_update_beacon(ap);
++
+ 	msg = nl80211_build_set_station_unauthorized(
+ 					netdev_get_ifindex(ap->netdev), mac);
+ 
+@@ -3723,6 +3824,9 @@ bool ap_station_disconnect(struct ap_state *ap, const uint8_t *mac,
+ 	if (!sta)
+ 		return false;
+ 
++	if (ap->supports_ht)
++		ap_update_beacon(ap);
++
+ 	ap_del_station(sta, reason, false);
+ 	ap_sta_free(sta);
+ 	return true;
 -- 
 2.34.3
 
