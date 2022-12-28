@@ -1,92 +1,188 @@
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882142F43
-	for <iwd@lists.linux.dev>; Wed, 28 Dec 2022 21:15:39 +0000 (UTC)
-Received: by mail-ot1-f53.google.com with SMTP id x25-20020a056830115900b00670932eff32so10528172otq.3
-        for <iwd@lists.linux.dev>; Wed, 28 Dec 2022 13:15:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7E86FAE
+	for <iwd@lists.linux.dev>; Wed, 28 Dec 2022 21:44:09 +0000 (UTC)
+Received: by mail-pf1-f172.google.com with SMTP id e21so1924730pfl.1
+        for <iwd@lists.linux.dev>; Wed, 28 Dec 2022 13:44:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=floadjjL2GoxaCmDxkAoej+SDpCdlRLvHLRct4Lyi3M=;
-        b=OOfSQt5pAzhCCYV3nnfKtDs+qGoCjviaNc+fA9k4YeKdpO0UZS8R2oXu+VXKmP9EgM
-         SzoUZhwxCglJLkTSN0piyQ2eLcDy6reHCFW2RO/wwBlXOdl+sl1Cqqoc+NMxLQpVvYSC
-         sWlsRpE+7uFi0pxKRe4ysno1gObOIOasXfgwW4Tj/C1SjzaBl5WWDaZ/BrJWJTFXR34B
-         d8EECw0SLjhqLGuuiqwV3zwPerwLvQvxrP1Y2KUaWQzKHCz24fMDzwK4MBUNh2npsXw3
-         4br0lpsz8rE/1EzRZRbq1deRz5DkPTHyXmvgEyRocY/614tkvEz8aloEwVcgTYBE82RD
-         1koA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wLY0QEhQiyaU9M4O3JHJWYbovNtuGKBFMM6Ms1PAwBY=;
+        b=SK9TxtoeMAmRsQ35cT/l7YtPH62GCKcvBP6lSy1VBiNioB90BAoT3oHvDQQa0JLUrU
+         OaHBIN1nb9yOkbBdtccQTKOB731AK5lrm1jjEWF6g9OvTuC76yZKtahlZ5KnEf4/ii8C
+         XZw4WGTQesD2NdmeDkoqxYqH+tSaR2BJfX+lKlT4KVUhKgpR/TXT3nhhxmar0L6qn2Rt
+         ff2g4bYVrtq58dqiWV2H/nc4jliaTjfbuvwf3Qfq0c3GuH1iTrb4iQBODLBbaNuksjBX
+         rmpuKWfzNinDqdEywYIBu+kLCJ/H660dQhxd0xjNsqMOhD0NlLfupxsEmhKboIwFudiX
+         yKuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=floadjjL2GoxaCmDxkAoej+SDpCdlRLvHLRct4Lyi3M=;
-        b=Z/gSPLlNLhiybkAKuXSK6U2RGpe8j6iqOTWC7/5WJUfv+CqxWURwAK20YLpID3DYRw
-         gj7/DFMJz21sPaQ1kwl4GU2XG9R5dz8ei3QrnEqLuHQVEW9F1lxkvKbJqtQkj5cPivZS
-         6SRWDgG/VRFnRZOxu0LZrwUawVGIHmz2iI1a0uNwVB2TiGzLbtw+I1F4ojx5qE3JN4dQ
-         tCDXmEDs9d0rBk4whMfr8F6efvbhrRdTehqi/1P8Ss8hvVWSCY+fOikOvq01VIrlYH6D
-         ERLB/vdvPqg/WGcAUyBS0NAXsyUeHu/SYN3dQohLmfd8jvwerfQcPN/53F51VdfKVx5W
-         ua0w==
-X-Gm-Message-State: AFqh2kqYS7BCUXGkUEwvxOLPjY4z3CjF3qPScxCNEHiJfzZ9wCoXpWug
-	cIujoF894/ylUy5wTA0wqaA=
-X-Google-Smtp-Source: AMrXdXs/2aBcLwlmKsl/Gy62TTJjb/v0zIc/qBN/eOvXp57NXq2bo6momXoHX9MDo2bXf3hQOqNU1w==
-X-Received: by 2002:a9d:6e12:0:b0:678:2f17:77b3 with SMTP id e18-20020a9d6e12000000b006782f1777b3mr13182052otr.38.1672262138566;
-        Wed, 28 Dec 2022 13:15:38 -0800 (PST)
-Received: from [10.0.2.15] (216.106.68.145.reverse.socket.net. [216.106.68.145])
-        by smtp.googlemail.com with ESMTPSA id y7-20020a0568301d8700b00684074fbce6sm508606oti.54.2022.12.28.13.15.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Dec 2022 13:15:37 -0800 (PST)
-Message-ID: <c1ace2ab-2ffe-ab37-cd33-0f9f0d6c2807@gmail.com>
-Date: Wed, 28 Dec 2022 15:10:05 -0600
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wLY0QEhQiyaU9M4O3JHJWYbovNtuGKBFMM6Ms1PAwBY=;
+        b=78tpUrV1GKLzKnSCukuM/pCW2tFaZdZmdIwqRWtHOKU/qpdpNZYjmJlJZSMbi7demw
+         W0fE0IEKmrruvFyszQJleprtffEUlmIPXMhspyCs08YZfTQTBiwIsmVqgDYF2JHyhZ1w
+         m2L+T7lg6JkfGAdY6599Spb363UxwH3KhtcA/5ZYvibAgrya9yn4mOI9HzPGongcfcw5
+         vAW+cLbwSSqP9GEwrnGmv71Gxcsxjh562nBgnBQFFxWIkvQfy+K/LOtQ0QZ7NhSu1/s9
+         h6Zbl/vciDteCc4OVFmshw+o+j3Ecc/abpzGfdWQrFIIuFNl+4PObJ9I+Ui6cHF7xweD
+         LyQw==
+X-Gm-Message-State: AFqh2kqg1rTV64GSuYkPG2WRkYfEUrUJW6W1d9/L2XjHFXuzo/KjQdDu
+	ai/r7NNG5mnaiB6rTxoWfBSRiDKy8qw=
+X-Google-Smtp-Source: AMrXdXuoWJ9JPm/Ds85KEdYmL89E2IyDJVs8QgfbM7TNRQnk4dZfK2OuAhm9oPHI8UMjXl0/lwJj6w==
+X-Received: by 2002:a05:6a00:1f06:b0:581:366b:ca63 with SMTP id be6-20020a056a001f0600b00581366bca63mr9558349pfb.34.1672263848300;
+        Wed, 28 Dec 2022 13:44:08 -0800 (PST)
+Received: from jprestwo-xps.none ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id o3-20020aa79783000000b0057726bd7335sm5360103pfp.121.2022.12.28.13.44.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Dec 2022 13:44:07 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/4] band: generate HT chandef from frequency
+Date: Wed, 28 Dec 2022 13:44:00 -0800
+Message-Id: <20221228214403.2682418-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 05/10] band: add APIs to generate a chandef from frequency
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20221220214318.2041986-1-prestwoj@gmail.com>
- <20221220214318.2041986-5-prestwoj@gmail.com>
- <f1d0679d-a6df-f274-5c95-909a9a3ed383@gmail.com>
- <ca84d3ce71bf2f17360f63303bbca1b841eb36cc.camel@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <ca84d3ce71bf2f17360f63303bbca1b841eb36cc.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+For AP mode its convenient for IWD to choose an appropriate
+channel definition rather than require the user provide very
+low level parameters such as channel width, center1 frequency
+etc. For now only HT is supported as VHT/HE etc. require
+additional secondary channel frequencies.
 
-> We still need to support 20Mhz since there is this distinction between
-> 20MHz HT and 20Mhz no-HT. If only 20MHz HT is supported we should pick
-> that rather than the non-HT width.
+The HT API tries to find an operating class using 40Mhz which
+complies with any hardware restrictions. If an operating class is
+found that is supported/not restricted it is marked as 'best' until
+a better one is found. In this case 'better' is a larger channel
+width. Since this is HT only 20mhz and 40mhz widths are checked.
+---
+ src/band.c | 87 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/band.h |  2 ++
+ 2 files changed, 89 insertions(+)
 
-Hmm, but there's no difference in operating class between 20HT and 20NoHT.  So 
-this could be done post-factum, no?
+v2:
+ * Removed the non-HT API entirely since the caller can set the
+   chandef directly after validating the frequency
 
-> 
-> So ap.c just tries to pick the best chandef so in theory we could fall
-> back to non-HT and this wouldn't be totally unexpected (from the users
-> perspective). The problem is we would then need to disable HT in ap.c
-> if we fell back to non-HT.
+diff --git a/src/band.c b/src/band.c
+index 53ce9495..c89762a9 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -1194,6 +1194,93 @@ int oci_from_chandef(const struct band_chandef *own, uint8_t oci[static 3])
+ 	return -ENOENT;
+ }
+ 
++/* Find an HT chandef for the frequency */
++int band_freq_to_ht_chandef(uint32_t freq, const struct band_freq_attrs *attr,
++				struct band_chandef *chandef)
++{
++	enum band_freq band;
++	enum band_chandef_width width;
++	unsigned int i;
++	const struct operating_class_info *best = NULL;
++
++	if (attr->disabled || !attr->supported)
++		return -EINVAL;
++
++	if (!band_freq_to_channel(freq, &band))
++		return -EINVAL;
++
++	for (i = 0; i < L_ARRAY_SIZE(e4_operating_classes); i++) {
++		const struct operating_class_info *info =
++						&e4_operating_classes[i];
++		enum band_chandef_width w;
++
++		if (e4_has_frequency(info, freq) < 0)
++			continue;
++
++		/* Any restrictions for this channel width? */
++		switch (info->channel_spacing) {
++		case 20:
++			w = BAND_CHANDEF_WIDTH_20;
++			break;
++		case 40:
++			w = BAND_CHANDEF_WIDTH_40;
++
++			/* 6GHz remove the upper/lower 40mhz channel concept */
++			if (band == BAND_FREQ_6_GHZ)
++				break;
++
++			if (info->flags & PRIMARY_CHANNEL_UPPER &&
++						attr->no_ht40_plus)
++				continue;
++
++			if (info->flags & PRIMARY_CHANNEL_LOWER &&
++						attr->no_ht40_minus)
++				continue;
++
++			break;
++		default:
++			continue;
++		}
++
++		if (!best || best->channel_spacing < info->channel_spacing) {
++			best = info;
++			width = w;
++		}
++	}
++
++	if (!best)
++		return -ENOENT;
++
++	chandef->frequency = freq;
++	chandef->channel_width = width;
++
++	/*
++	 * Choose a secondary channel frequency:
++	 * - 20mhz no secondary
++	 * - 40mhz we can base the selection off the channel flags, either
++	 *   higher or lower.
++	 */
++	switch (width) {
++	case BAND_CHANDEF_WIDTH_20:
++		return 0;
++	case BAND_CHANDEF_WIDTH_40:
++		if (band == BAND_FREQ_6_GHZ)
++			return 0;
++
++		if (best->flags & PRIMARY_CHANNEL_UPPER)
++			chandef->center1_frequency = freq - 10;
++		else
++			chandef->center1_frequency = freq + 10;
++
++		return 0;
++	default:
++		/* Should never happen */
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ uint8_t band_freq_to_channel(uint32_t freq, enum band_freq *out_band)
+ {
+ 	uint32_t channel = 0;
+diff --git a/src/band.h b/src/band.h
+index 0ae5f8c0..676c63d9 100644
+--- a/src/band.h
++++ b/src/band.h
+@@ -101,6 +101,8 @@ int band_estimate_nonht_rate(const struct band *band,
+ 				const uint8_t *supported_rates,
+ 				const uint8_t *ext_supported_rates,
+ 				int32_t rssi, uint64_t *out_data_rate);
++int band_freq_to_ht_chandef(uint32_t freq, const struct band_freq_attrs *attr,
++				struct band_chandef *chandef);
+ 
+ int oci_to_frequency(uint32_t operating_class, uint32_t channel);
+ 
+-- 
+2.34.3
 
-Something like if ap->chandef.channel_width == 20HT && !ap->supports_ht -> set 
-channel_width appropriately.
-
-> 
-> Since I may just remove band_freq_to_chandef() entirely I might instead
-> keep the -ENOENT return and fall back inside ap.c itself. Then I don't
-> have to check chandef->channel_width after a successful return and we
-> know this will always return an HT chandef, or fail.
-> 
-
-Or do that.  Or pass in the ht capability to band_freq_to_chandef() and let it 
-figure it out.
-
-Regards,
--Denis
