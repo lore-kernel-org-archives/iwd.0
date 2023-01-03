@@ -1,103 +1,76 @@
-Received: from mail.nearlyone.de (mail.nearlyone.de [49.12.199.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A577C;
-	Mon,  2 Jan 2023 08:35:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CEA3FDB535;
-	Mon,  2 Jan 2023 09:35:54 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=monom.org; s=dkim;
-	t=1672648555; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=b0FipNdNlAGKhCuGCjYwAM/Sj6SxdKwX9fxoLU6Huf4=;
-	b=aDqFbjVxP4ncFf3ynqwfup8H/2BcMxEdeYxXXF4wc/aCc6xhBrFLCoXB7GnUvf2dTv2u9y
-	kBipS/ko64TtdU6X6hYeBmlQLkIgZSosuo7rse0JYXv4bGaHRrPO9dR1k2unEUgnln53PT
-	ObAnVLK1XeEpFEQlugJRpLIIrzV0LdECEVFW2cKIVLCLn6r69VpF16TyeOMxDDo+0+F+pC
-	uwYvvaXAUrPi223jCEthcYZkhFdSe40EFC40nhIX+VFfiUWBKueugbqKG6Cv/h/iLrD1WJ
-	LXSvoLFTb/rahG4PF7yGlQv8hqxEycVC+ZBeU4RZfQA4dzAHgTUlonIneKkw4g==
-Date: Mon, 2 Jan 2023 09:35:54 +0100
-From: Daniel Wagner <wagi@monom.org>
-To: Jade Lovelace <lists@jade.fyi>
-Cc: connman@lists.linux.dev, iwd@lists.linux.dev
-Subject: Re: bug: iwd KnownNetworks AutoConnect setting desynchronizes with
- connman's, breaking auto connect
-Message-ID: <20230102083554.nindhbg3b4edrgfo@beryllium.lan>
-References: <CAFA9we9QrpTmyzBewdiL4gKP52_G_j25NvR2pjpqzBXb2xPnzQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345178466
+	for <iwd@lists.linux.dev>; Tue,  3 Jan 2023 15:23:26 +0000 (UTC)
+Received: by mail-ot1-f41.google.com with SMTP id y18-20020a0568301d9200b0067082cd4679so19265369oti.4
+        for <iwd@lists.linux.dev>; Tue, 03 Jan 2023 07:23:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iF28CLKssbMz/kGa1VcuJRjSJ5SgeBXEZ5T75z3cqhY=;
+        b=ThTAVRTLapDJ+E9G85ps0/RSiSlB2FHRLNPyEEqEfgzLUzYnPfkxYs2SU90d/U8LeY
+         nObFX7QHJN1zB8ryrCXVYmWcelXgcUbk4TzChgTLeORWiubVOUGdteDtg9ZwhiAa1Fgr
+         Zzf+7I6a1xZsxti6FQu/2PBGmjw6WIxCJeIxtkTCJZikO3hoAP3tMNWbVG9LJSJn48tn
+         tqPIrPbp3Qvq7UEdU9tybH5Gx+mn66MGj18aRxOyr+RY5zG6uqRaKtzBeuwS3ULxkgOE
+         3n3y2sgS5pPROFT6+zUmVTrg3sU9u/FPQ3WfX4bc+LTNuVEZbFy3+t3t4WVH//lP2PeD
+         bMpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iF28CLKssbMz/kGa1VcuJRjSJ5SgeBXEZ5T75z3cqhY=;
+        b=1WrujEdcCnMEaVglaYzU/z1Y7GoZg+maN0BhZLYuguw694Gqc7o1rW+eLu8xTmlGxv
+         R5SQJr+DCN2k2fEiHhFBa2PsDAwVnHFxzkXoXoiJ4i19RYOvsGvORid1JsFhnt+IYmc6
+         9C+lQBjhRAVcoo5lAA3br7VRZtRsFGyI2+UXHgYsr58YJu/VV605O8sS2pY0prDSSKSB
+         4nHMF+Yp7HA1CxiNY95m+w8yjX/myWfSft1zgYHVjGsHq6JkwR2meWHFW3LhX2N7hEIA
+         la3o/UUGI4VQBMfB6QggK/aFxxWQwXeHIZh8gSjvDYxcIgH/9KgCKbRuJ5ltl7qo2VEU
+         VLhQ==
+X-Gm-Message-State: AFqh2kp8QQk8jTVbRnvAO2LvlZ+nFcir/OQc/Bfbh+rlXwzX38gCK7ca
+	wUowxJt9PuFRtPUoZEyscf4=
+X-Google-Smtp-Source: AMrXdXtjj0kxeBBAQrMEx8yr6DTlO9sJjp2QlZegP3tUnGB+5lhofL5Ndnar3HyUtnFAXnbJcDuAsA==
+X-Received: by 2002:a05:6830:904:b0:670:83e9:5b90 with SMTP id v4-20020a056830090400b0067083e95b90mr28044287ott.37.1672759405262;
+        Tue, 03 Jan 2023 07:23:25 -0800 (PST)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id d12-20020a0568301b6c00b006391adb6034sm14836757ote.72.2023.01.03.07.23.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Jan 2023 07:23:24 -0800 (PST)
+Message-ID: <fb0755cd-9348-297c-f110-03510b21dc5d@gmail.com>
+Date: Tue, 3 Jan 2023 09:19:48 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFA9we9QrpTmyzBewdiL4gKP52_G_j25NvR2pjpqzBXb2xPnzQ@mail.gmail.com>
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 1/4] wiphy: add wiphy_get_frequency_info_list
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20221230221216.2985011-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20221230221216.2985011-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 28, 2022 at 02:39:05PM +0100, Jade Lovelace wrote:
-> Hi,
-> 
-> I have been using connman with iwd recently and I've found that the
-> autoconnect doesn't seem to work consistently and I often have to
-> manually use connmanctl to reconnect to the network.
-> 
-> This manifests in a strange (to me) way: the network is seen in
-> connmanctl but not automatically connected to. I've glanced through
-> the Connman iwd plugin code and it's my understanding that the actual
-> automatic connection when the network reappears is done by iwd, and
-> the Connman plugin merely sends configurations to iwd.
+Hi James,
 
-Yes, this is correct. ConnMan disables the auto connect state machine for iwd.
+On 12/30/22 16:12, James Prestwood wrote:
+> Gets the entire list of frequency attributes advertised. This is
+> needed for AP mode to create a country IE which includes subband
+> triplet fields.
+> ---
+>   src/wiphy.c | 17 +++++++++++++++++
+>   src/wiphy.h |  5 +++++
+>   2 files changed, 22 insertions(+)
+> 
 
-> I can get the AutoConnect variable resynchronized by manually toggling
-> it with connmanctl. If I do this, when I put my machine to sleep and
-> open it back up, it will reconnect as expected, temporarily resolving
-> the issue. My assumption here is that iwd is turning AutoConnect off
-> for the network for some unknown reason, and connman is not accounting
-> for this change.
+All applied, thanks.
 
-ConnMan completle relies on iwd to do the right thing, so this question is more
-for the iwd developers. I don't think ConnMan should start fiddling with the
-AutoConnect settings after the initial configuration.
+Regards,
+-Denis
 
-> I am using connman-1.41 and iwd-2.0 on NixOS.
-> 
-> You can see that toggling in the below snippet:
-> 
-> ~ » busctl get-property net.connman.iwd
-> /net/connman/iwd/0000000000000000_psk net.connman.iwd.KnownNetwork
-> AutoConnect
-> b false
-> ^^^^^ ---- On connman startup, the iwd KnownNetwork has AutoConnect = false
-> 
-> ~ » connmanctl
-> connmanctl> services
-> *A  REDACTED1            wifi_abcdefabcdef_0000000000000000_managed_psk
-> 
-> connmanctl> services wifi_abcdefabcdef_0000000000000000_managed_psk
-> /net/connman/service/wifi_abcdefabcdef_0000000000000000_managed_psk
->   Type = wifi
->   Security = [ psk ]
->   State = idle
->   Strength = 55
->   Favorite = True
->   Immutable = False
->   AutoConnect = True
->   ^^^^^ ---- However, connman thinks it is true
->   Name = REDACTED1
-> 
-> connmanctl> config wifi_abcdefabcdef_0000000000000000_managed_psk
-> --autoconnect true
-> connmanctl> config wifi_abcdefabcdef_0000000000000000_managed_psk
-> --autoconnect false
-> connmanctl> config wifi_abcdefabcdef_0000000000000000_managed_psk
-> --autoconnect true
-> ^^^^^ ---- If we manually toggle it back and forth, it will get synced again
-> 
-> ~ » busctl get-property net.connman.iwd
-> /net/connman/iwd/0000000000000000_psk net.connman.iwd.KnownNetwork
-> AutoConnect
-> b true
-> 
-> Jade
-> 
