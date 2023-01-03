@@ -1,45 +1,45 @@
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345178466
-	for <iwd@lists.linux.dev>; Tue,  3 Jan 2023 15:23:26 +0000 (UTC)
-Received: by mail-ot1-f41.google.com with SMTP id y18-20020a0568301d9200b0067082cd4679so19265369oti.4
-        for <iwd@lists.linux.dev>; Tue, 03 Jan 2023 07:23:26 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5EA8466;
+	Tue,  3 Jan 2023 15:25:16 +0000 (UTC)
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-142b72a728fso37062113fac.9;
+        Tue, 03 Jan 2023 07:25:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=iF28CLKssbMz/kGa1VcuJRjSJ5SgeBXEZ5T75z3cqhY=;
-        b=ThTAVRTLapDJ+E9G85ps0/RSiSlB2FHRLNPyEEqEfgzLUzYnPfkxYs2SU90d/U8LeY
-         nObFX7QHJN1zB8ryrCXVYmWcelXgcUbk4TzChgTLeORWiubVOUGdteDtg9ZwhiAa1Fgr
-         Zzf+7I6a1xZsxti6FQu/2PBGmjw6WIxCJeIxtkTCJZikO3hoAP3tMNWbVG9LJSJn48tn
-         tqPIrPbp3Qvq7UEdU9tybH5Gx+mn66MGj18aRxOyr+RY5zG6uqRaKtzBeuwS3ULxkgOE
-         3n3y2sgS5pPROFT6+zUmVTrg3sU9u/FPQ3WfX4bc+LTNuVEZbFy3+t3t4WVH//lP2PeD
-         bMpg==
+        bh=m8lkxVki/W7gC22aErQEdTwKRDG9eA5n9qZIHlsFV14=;
+        b=VsbgwHQh8dm///cvj7H/41i+YUUZLkwZ1Ywap5AOvVw5cRNe7I20SKxy0llaZjwRGx
+         Gz5gVauyRomsOlcvMCoNllg8HerQMVRJ5LZnkC5pXHXceoCFpHlbiqGWeu/fB6yhRRgw
+         D7/rtCxOMaJrZIdNWefwhx4SU16N67y6sRkBII+AFok0w5Y7rtl4pk19Ty+65gNNza2d
+         wvcw6CkhhTk+Vd5EQx7AeVuJpNBdTHVndKIKBAwajUMkNwSvELHO86Z3AuVydh6F3z4T
+         lk+SJcNn/1T6WVMjbX2KvlljJWdXmF73RKm3Edrssth5Husw3/nUncX7XJ961yen2ePn
+         +Ijw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iF28CLKssbMz/kGa1VcuJRjSJ5SgeBXEZ5T75z3cqhY=;
-        b=1WrujEdcCnMEaVglaYzU/z1Y7GoZg+maN0BhZLYuguw694Gqc7o1rW+eLu8xTmlGxv
-         R5SQJr+DCN2k2fEiHhFBa2PsDAwVnHFxzkXoXoiJ4i19RYOvsGvORid1JsFhnt+IYmc6
-         9C+lQBjhRAVcoo5lAA3br7VRZtRsFGyI2+UXHgYsr58YJu/VV605O8sS2pY0prDSSKSB
-         4nHMF+Yp7HA1CxiNY95m+w8yjX/myWfSft1zgYHVjGsHq6JkwR2meWHFW3LhX2N7hEIA
-         la3o/UUGI4VQBMfB6QggK/aFxxWQwXeHIZh8gSjvDYxcIgH/9KgCKbRuJ5ltl7qo2VEU
-         VLhQ==
-X-Gm-Message-State: AFqh2kp8QQk8jTVbRnvAO2LvlZ+nFcir/OQc/Bfbh+rlXwzX38gCK7ca
-	wUowxJt9PuFRtPUoZEyscf4=
-X-Google-Smtp-Source: AMrXdXtjj0kxeBBAQrMEx8yr6DTlO9sJjp2QlZegP3tUnGB+5lhofL5Ndnar3HyUtnFAXnbJcDuAsA==
-X-Received: by 2002:a05:6830:904:b0:670:83e9:5b90 with SMTP id v4-20020a056830090400b0067083e95b90mr28044287ott.37.1672759405262;
-        Tue, 03 Jan 2023 07:23:25 -0800 (PST)
+        bh=m8lkxVki/W7gC22aErQEdTwKRDG9eA5n9qZIHlsFV14=;
+        b=xwdkgtRTbcK/Aq2MzVyYuuiYsz3pLLxnd+8U2zWUBgUDYcN6cdUDMc13VklEIM0AtI
+         2usILKLBDxyRuWQl3cAySpzlUFfnI5+Ta/GYFs8Q+3KdfBrNXBWdB+HxrPikuE9P210U
+         VcTZ7/cOwz2W9bdfzx6p96Ms0LfnLimTB6NiIjUHZUOz2VRhxriATQkKG+VM+boRRnaF
+         IB5ZMEvGekiA6xFB8yZkQhq189j2lMM7BaX8EgWhbaS6lYaYro2v5faFp6E5AK4fCnyt
+         HIjU3UQfRSKiq1hy+Dc4RXd9eIxFlHJXK6PiBC0J2BwozgjmjGTv2F1acrmKsAsjWcQI
+         BYMw==
+X-Gm-Message-State: AFqh2kqcGeL+tHzbRSaS2RiAgQ0qNTFNaqvyXRwnfI1Sy78JOVU+/BlH
+	1A/bnryv/Tv4qBUWiY/gSMgeHGlFPxE=
+X-Google-Smtp-Source: AMrXdXtKEzs2fAQEXvvgG9MHaF8fGEwkTxDthP1e4Up4nock+uGZVKuMGebeQFjE4DcFgNjYH5880A==
+X-Received: by 2002:a05:6870:4511:b0:150:bb6c:2798 with SMTP id e17-20020a056870451100b00150bb6c2798mr2763100oao.31.1672759515955;
+        Tue, 03 Jan 2023 07:25:15 -0800 (PST)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id d12-20020a0568301b6c00b006391adb6034sm14836757ote.72.2023.01.03.07.23.23
+        by smtp.googlemail.com with ESMTPSA id y25-20020a056870b01900b00144a3c526d9sm14385649oae.52.2023.01.03.07.25.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Jan 2023 07:23:24 -0800 (PST)
-Message-ID: <fb0755cd-9348-297c-f110-03510b21dc5d@gmail.com>
-Date: Tue, 3 Jan 2023 09:19:48 -0600
+        Tue, 03 Jan 2023 07:25:15 -0800 (PST)
+Message-ID: <cbf0c602-a854-bc24-a7ae-0eec05be86ec@gmail.com>
+Date: Tue, 3 Jan 2023 09:20:46 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,29 +48,28 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH 1/4] wiphy: add wiphy_get_frequency_info_list
+Subject: Re: bug: 802.1x configuration is not turned into an iwd KnownNetwork
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20221230221216.2985011-1-prestwoj@gmail.com>
+To: Daniel Wagner <wagi@monom.org>, Jade Lovelace <lists@jade.fyi>
+Cc: connman@lists.linux.dev, iwd@lists.linux.dev
+References: <CAFA9we_ArzwtDidQkEQTL-vEPC2GGnRTqZB7jbx=UZ-R1MkzoA@mail.gmail.com>
+ <20230102082941.rhlb4dfwzhkvmav7@beryllium.lan>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20221230221216.2985011-1-prestwoj@gmail.com>
+In-Reply-To: <20230102082941.rhlb4dfwzhkvmav7@beryllium.lan>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi James,
+Hi Daniel,
 
-On 12/30/22 16:12, James Prestwood wrote:
-> Gets the entire list of frequency attributes advertised. This is
-> needed for AP mode to create a country IE which includes subband
-> triplet fields.
-> ---
->   src/wiphy.c | 17 +++++++++++++++++
->   src/wiphy.h |  5 +++++
->   2 files changed, 22 insertions(+)
-> 
+> ConnMan interacts with iwd only via the D-Bus interface. I can't remember that
+> we added any code to do any provisioning in iwd (also a quick glance over the
+> iwd plugin code doesn't ring any bell). Also I couldn't find any API doc in iwd
+> which covers this topic. So I don't know if it is currently possible to
+> provision iwd via the D-Bus API.
 
-All applied, thanks.
+There's no way to provision 802.1x networks over D-Bus.  However, connman can 
+write provisioning files to iwd's storage dir (/var/lib/iwd typically) and iwd 
+will pick these up.  This is what the NM backend does.
 
 Regards,
 -Denis
-
