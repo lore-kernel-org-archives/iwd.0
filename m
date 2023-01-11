@@ -1,82 +1,80 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C14BD02
-	for <iwd@lists.linux.dev>; Wed, 11 Jan 2023 20:15:56 +0000 (UTC)
-Received: by mail-pj1-f45.google.com with SMTP id m7-20020a17090a730700b00225ebb9cd01so21237605pjk.3
-        for <iwd@lists.linux.dev>; Wed, 11 Jan 2023 12:15:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9E717EA
+	for <iwd@lists.linux.dev>; Wed, 11 Jan 2023 22:23:35 +0000 (UTC)
+Received: by mail-oi1-f179.google.com with SMTP id r130so13926347oih.2
+        for <iwd@lists.linux.dev>; Wed, 11 Jan 2023 14:23:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XOA1KJtJe0EYrXWOZX9o8wFbgdeUO4B/DZqAfRPT/Pw=;
-        b=eq/SFB7ZjLhoMbOum9o9kVAQU8htNtdvVOa0IW8ZiSWR/syGjEJHuc5fdut6/xG3+/
-         sHU6fw7fmj0mEizkTxAkRQsWbcDJRHTrRYtSzUPw0rYjINJYlFg+RJPMsvfzvO2C9Hjv
-         2zQAFxPmtH++43HfmMRf8U3OrD8k9MRf2O3eZb3U/qCAryvCltCQRpMw8KmoYCgX5/kC
-         Ud3CKjslOg2pG9gsLjYkvI69UawZ13+roKdCXK+mpvBEoHAxZ1E+IkQ72KHewhxDi7TX
-         QMP5oVRYJ5fZtNshgQsulsS97OZkco0kLjwEB/ln/Yy/4jbm5m5dCnAFoBVo3adaTc20
-         ROBQ==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MGEHTgMs2CsHrE1qz2GsQ3rtgnCmo9OFf9KFN1W511Q=;
+        b=e/8cmLzzH3mgNjuczsoTbNGZ8zyspAwGOohek8G/7Q/Ajfc5FYGGpRNV5jPpHKS3CS
+         4F2NEsTtqy1XCMr4ZU3qNAkJabJ1X7RegvEn1QwyehcvDM0aWgcIj5KZWe4JhWOZeNxp
+         gX+oHBUtIvrcNpmM9OTSe6AFz5FeRpcFMCP+NA4TGw3/RGswz3VZhlA8dk6gZfpPA3SL
+         41WMXYmy3qIN2bhtTmyAmLD2NgrrcyzUBWjiC+Qx9P5fingsZwSIWEMjMWxeUE4pw4Pp
+         zHyo3TpWyPTtgM5GwXhNF8Oz6wtIyUM2gqwuj04KKi1WHbShvVmNCMyEJPTOrEtmSQ22
+         6+Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XOA1KJtJe0EYrXWOZX9o8wFbgdeUO4B/DZqAfRPT/Pw=;
-        b=dQf2Bt9MS3zpsdv64FpZoD2wAZy55L12Wnf0TqYRU3jSMWC+fNR0azSR/MDQJGOXRq
-         KXoNqehzmRWd/2/USQXkGtaq9fvG/msZmcjickdjEq6WFDkodEfsCrd7RQqPwHzozBSe
-         faiwoKmseZD/utx/ypMS+vBqjrWUvIBFQsNjUG1unPq3y68YpQ5WoF9qr22T9OEeCtKT
-         x97bJa+GPnloco2nS09BMp7BG+81zybMAzbKuwNynJHebk1Z5+bIOQIeT0g2r8v273yy
-         7vXthWioHveJHoJkGinTirsgac8FQ9eLYoMkZVgCqyxZJ5W4idnSFuc44Scl7A8vvRrK
-         MKYw==
-X-Gm-Message-State: AFqh2kqudIggQYR413ybe/FazcQDSi9fhhSuGej3mdY/LpmA/VNjH+8N
-	pUcOTnGACC8Ey4PunPvRdxv69XY28yM=
-X-Google-Smtp-Source: AMrXdXuCkYw5AngWzbQzmMhL9vieRxZx+S8NQ47g4JLfnjBJqjY8Dwlu+81AADeBrAxoKcpE71G+TQ==
-X-Received: by 2002:a05:6a20:6901:b0:b5:c353:d97b with SMTP id q1-20020a056a20690100b000b5c353d97bmr17146053pzj.50.1673468156254;
-        Wed, 11 Jan 2023 12:15:56 -0800 (PST)
-Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id i6-20020aa796e6000000b005884d68d54fsm6733904pfq.1.2023.01.11.12.15.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 12:15:55 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 9/9] doc: Document RekeyTimeout for AP profiles
-Date: Wed, 11 Jan 2023 12:15:43 -0800
-Message-Id: <20230111201543.397692-9-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20230111201543.397692-1-prestwoj@gmail.com>
-References: <20230111201543.397692-1-prestwoj@gmail.com>
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MGEHTgMs2CsHrE1qz2GsQ3rtgnCmo9OFf9KFN1W511Q=;
+        b=NDgDzGvus5ust/3t94W8SHC17wwW+RHgjodOaase7W6ocmEM1B2+GoLNiY5DEoQbMw
+         8F+w1W4rPvhAI/qzMNjOlZXWlQFeo5bAJhvyYRyxrnVGhzj8iBIbikJR81HOhHd2G0Wa
+         U/fwnb4xvKQO2U9OR2qmngqaXabAVLwdqF+2mP6NXI9/pVvc7NB6TPebzeAF7W7K9JKu
+         flzWmuZZjTBb6lm80Q8ao4nOWOduBydd+5qD/9KO+pZXVkljrgp6bCmhyOfXkAWToihN
+         SMKO1dfGCbiuqJZtGEbI0wCx/nZQb4HONES4bb3kRljiaM0uwP7G9/lswsT9wdI7On6h
+         Fpfg==
+X-Gm-Message-State: AFqh2kogkOKtEL8zYsGaN7NYrdByflcBYw0AUN4EKChbF5ePQQkTLh90
+	BTuk8L+6aCgNTCUs0X8RofU=
+X-Google-Smtp-Source: AMrXdXvz7i8jubsjek4tCHGNCaWGs1hFPe2uvPBYh+Mws15GQGDCingvkqaRgDHRdXtRdCzBoObPPg==
+X-Received: by 2002:a05:6808:116:b0:35b:52b:9371 with SMTP id b22-20020a056808011600b0035b052b9371mr35474679oie.11.1673475814167;
+        Wed, 11 Jan 2023 14:23:34 -0800 (PST)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id u30-20020a056808151e00b0035bd65b776bsm7294706oiw.2.2023.01.11.14.23.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Jan 2023 14:23:32 -0800 (PST)
+Message-ID: <a1b23a20-d356-c674-80ad-d9c2d47a1f6f@gmail.com>
+Date: Wed, 11 Jan 2023 16:05:38 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 1/9] eapol: set secure on message 2/4 properly
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20230111201543.397692-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20230111201543.397692-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- src/iwd.ap.rst | 7 +++++++
- 1 file changed, 7 insertions(+)
+Hi James,
 
-diff --git a/src/iwd.ap.rst b/src/iwd.ap.rst
-index 823aba99..ce402f91 100644
---- a/src/iwd.ap.rst
-+++ b/src/iwd.ap.rst
-@@ -67,6 +67,13 @@ The group ``[General]`` contains general AP configuration.
-        ensure the country is set, and that the desired frequency/channel is
-        unrestricted.
- 
-+   * - RekeyTimeout
-+     - Timeout for PTK rekeys (seconds)
-+
-+       The time interval at which the AP starts a rekey for a given station. If
-+       not provided a default value of 600 seconds is used. A value of 0 will
-+       disable PTK rekeys completely.
-+
- Network Authentication Settings
- -------------------------------
- 
--- 
-2.34.3
+On 1/11/23 14:15, James Prestwood wrote:
+> The second handshake message was hard coded with the secure bit as
+> zero but for rekeys the secure bit should be set to 1. Fix this by
+> changing the 2/4 builder to take a boolean which will set the bit
+> properly.
+> 
+> It should be noted that hostapd doesn't check this bit so EAPoL
+> worked just fine, but IWD's checks are more strict.
+> ---
+>   src/eapol.c | 12 +++++++-----
+>   src/eapol.h |  3 ++-
+>   2 files changed, 9 insertions(+), 6 deletions(-)
+> 
+
+Patch 1 & 2 applied, thanks.
+
+Regards,
+-Denis
 
