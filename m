@@ -1,49 +1,49 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9150A92A
-	for <iwd@lists.linux.dev>; Wed, 11 Jan 2023 20:15:51 +0000 (UTC)
-Received: by mail-pf1-f173.google.com with SMTP id 200so6099545pfx.7
-        for <iwd@lists.linux.dev>; Wed, 11 Jan 2023 12:15:51 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911E5A93F
+	for <iwd@lists.linux.dev>; Wed, 11 Jan 2023 20:15:52 +0000 (UTC)
+Received: by mail-pf1-f179.google.com with SMTP id y5so12272385pfe.2
+        for <iwd@lists.linux.dev>; Wed, 11 Jan 2023 12:15:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E/5PfonUEwLvry0avI55HtYv4B5pUTSVS8msxgmwlNs=;
-        b=E/FlAStB9cH9tkARYrjsQK759y3FN6z9lXAiG5GOl4TmuO5ItoDfOoSoSlzbA/iPFo
-         vuHtlksujRyfz+al9KimbLemjFTNajv15mXwoq4yrCUgpyBl/O9FmVaA+GP0pJyZ4rfG
-         r0XWSRjrPJHt1Tcu/A45I99yzHNl5HssOBAtG/y10wJ807t0JGwh06GuheGwvchgslff
-         7pMe+UXznb+QC5s2ZtczTjSP3Sto8elgEeGl+T9BbXTofJvAxZnXY7fnkKmUSc4mFSPi
-         G9gNDbQJ3NNBPIWR2iSdk2aw07srqMD4mkMTcECwA2ywP46HV7FYEEXjvJHbYjjF0Caf
-         4nxw==
+        bh=5ZHkgmj/3JvSEaxBPaEKJm2kAF473q3CKZ7/Z8Kv2+c=;
+        b=QFuCPOCKHQZmU/OnALSY+0E2oRVAbVgc+4Xzlkrp/mG1U9KPXdEtwNPR98YkFmm5PP
+         xA9UDGN3iTu6roUTRU5T2utvctpKjlO3HdtG1r1rSNSl3z1OCGgGng8/rRi3PB+sf5v6
+         uTU/4Fok+c5yJpVRyEIuJpKI+Cl77pYj1FXJOkuIwsqtw0rKMl9/B58MpYgj/FuPtsE5
+         flt86Mnf43766L656LYO1Fl0DJm9jUAiREWSYzOXdCn+55MBWZQspJTsH8SvKYsQ8Xze
+         w0CxaHN8+kcSsT3D4NV4guVnfbEUHGCy1SbYF3CeWWPoUHBV8LmA8bd7j9qdFq5vjPou
+         wQ3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=E/5PfonUEwLvry0avI55HtYv4B5pUTSVS8msxgmwlNs=;
-        b=bZrMZlR6LhR/PUeaujHMMt7XIr7tGv21SJtwpLmvEmmSiBwZqDY5HKtjlKMUupfEzi
-         96oi/XDSrc9Ij3iIaRQJpBCwfAFsGczr+OCKghZhwyyFK4FnZ0r4Pf6ojAedosmNA0S1
-         xxp4Brbtqka0k0mSfDTry6xu8bNm1mf4Z4J/4LHTIovuyLWfhl1vpmRKCgqKChNiXmIt
-         n3fITWWZRWdaJSr8ykeQsFS4W5Idzhhe3BmB6JV9tYK3oFrx8kRgdcXT48hSZl1va666
-         6XwhZk71ZG0d3KzvVIKRZvTvrLw5buRkann+EU2M5neiRirW+a/CySikN8UpyygLBhDi
-         vg/w==
-X-Gm-Message-State: AFqh2kr7uBikH9vVnfAqsMp6wIFZ+XznJRcld0ZgAMtNxE8KkfZcjk9H
-	ldmlkqQ3JOCdZ20vedsWSSWXgxfc2/M=
-X-Google-Smtp-Source: AMrXdXscmRiPaagDjwP5vGCj4dJS1W0Sr+WqKeBHEvrzP1jH8fSEL0hf30RdcuhAp+4+44Q6Smn9uw==
-X-Received: by 2002:a05:6a00:27a5:b0:583:63eb:581e with SMTP id bd37-20020a056a0027a500b0058363eb581emr18766429pfb.18.1673468151072;
-        Wed, 11 Jan 2023 12:15:51 -0800 (PST)
+        bh=5ZHkgmj/3JvSEaxBPaEKJm2kAF473q3CKZ7/Z8Kv2+c=;
+        b=Rq6vi6c+v21WAAMzEzbwOtExKqvLR9+pnBD+HMIqLkEOzgpxC+yIdiM7QNA6zj/nQm
+         +J/kEs8pYfsjijtucUWqkLp+jTTkjyA4EHnpBZsZrhGy1Q8VmS55OR+Jed8xYoNpQnzO
+         KFnOOHaVXYsfgBLq+owkKuS7deznnXj/whVZqhi0Z7bwjt3bXsqjJ/5Umy7W5CkS77hk
+         ReofJdyPLY2Y9xvNLo70H0WhMH0+b1GzJCLJaUMYyg89zyxfmGkK4UHm6aEBue3b/V/K
+         jmxl9gJP0pFogQ2GFVr1gniEtcERGT3L0JI+Q7AeHQfCV+hXNKN9kFoMCKaHvAvQspyV
+         f0rw==
+X-Gm-Message-State: AFqh2kqGpzNJacehh48KXU14ZG5FFKsos7CyAOviH13IKiJKWDhEu9NV
+	sIiMZVWoM/WsEtqSi4Vc3+vrC+XEfgQ=
+X-Google-Smtp-Source: AMrXdXtZjQNvngDnQZYmoz2MFQNYRzpW8eoHi9sWIuvfQjpL7jQhl+qQ2zeDM63eqQ3YBWb0QQ+EPg==
+X-Received: by 2002:aa7:824d:0:b0:587:749c:c0d8 with SMTP id e13-20020aa7824d000000b00587749cc0d8mr12046482pfn.5.1673468152082;
+        Wed, 11 Jan 2023 12:15:52 -0800 (PST)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id i6-20020aa796e6000000b005884d68d54fsm6733904pfq.1.2023.01.11.12.15.50
+        by smtp.gmail.com with ESMTPSA id i6-20020aa796e6000000b005884d68d54fsm6733904pfq.1.2023.01.11.12.15.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 12:15:50 -0800 (PST)
+        Wed, 11 Jan 2023 12:15:51 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/9] eapol: implement rekey support for authenticator
-Date: Wed, 11 Jan 2023 12:15:37 -0800
-Message-Id: <20230111201543.397692-3-prestwoj@gmail.com>
+Subject: [PATCH 4/9] handshake: add event for rekey success
+Date: Wed, 11 Jan 2023 12:15:38 -0800
+Message-Id: <20230111201543.397692-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
 In-Reply-To: <20230111201543.397692-1-prestwoj@gmail.com>
 References: <20230111201543.397692-1-prestwoj@gmail.com>
@@ -55,68 +55,39 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The only changes required was to set the secure bit for message 1,
-reset the frame retry counter, and don't explicitly set ptk_complete
-to false
-
-Initiating a rekey can now be done by simply calling eapol_start().
+Rekeys for station mode don't need to know when complete since
+there is nothing to do once done. AP mode on the other hand needs
+to know if the rekey was successful in order to reset/set the next
+rekey timer.
 ---
- src/eapol.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ src/handshake.h | 1 +
+ src/station.c   | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 593daf41..d31116b6 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -1087,8 +1087,6 @@ static void eapol_send_ptk_1_of_4(struct eapol_sm *sm)
+diff --git a/src/handshake.h b/src/handshake.h
+index f2321634..863ffac7 100644
+--- a/src/handshake.h
++++ b/src/handshake.h
+@@ -60,6 +60,7 @@ enum handshake_event {
+ 	HANDSHAKE_EVENT_EAP_NOTIFY,
+ 	HANDSHAKE_EVENT_TRANSITION_DISABLE,
+ 	HANDSHAKE_EVENT_P2P_IP_REQUEST,
++	HANDSHAKE_EVENT_REKEY_COMPLETE,
+ };
  
- 	handshake_state_new_anonce(sm->handshake);
- 
--	sm->handshake->ptk_complete = false;
--
- 	sm->replay_counter++;
- 
- 	memset(ek, 0, EAPOL_FRAME_LEN(sm->mic_len));
-@@ -1112,6 +1110,11 @@ static void eapol_send_ptk_1_of_4(struct eapol_sm *sm)
- 
- 	eapol_key_data_append(ek, sm->mic_len, HANDSHAKE_KDE_PMKID, pmkid, 16);
- 
-+	if (sm->handshake->ptk_complete) {
-+		ek->secure = true;
-+		sm->rekey = true;
-+	}
-+
- 	ek->header.packet_len = L_CPU_TO_BE16(EAPOL_FRAME_LEN(sm->mic_len) +
- 				EAPOL_KEY_DATA_LEN(ek, sm->mic_len) - 4);
- 
-@@ -2129,7 +2132,8 @@ static void eapol_handle_ptk_4_of_4(struct eapol_sm *sm,
- 	 * This might be a retransmission, so accept but don't install
- 	 * the keys again.
- 	 */
--	if (!sm->handshake->ptk_complete)
-+	if (!sm->handshake->ptk_complete ||
-+				(sm->handshake->ptk_complete && sm->rekey))
- 		handshake_state_install_ptk(sm->handshake);
- 
- 	sm->handshake->ptk_complete = true;
-@@ -2483,6 +2487,8 @@ static void eapol_eap_complete_cb(enum eap_result result, void *user_data)
- 
- 		/* sm->mic_len will have been set in eapol_eap_results_cb */
- 
-+		sm->frame_retry = 0;
-+
- 		/* Kick off 4-Way Handshake */
- 		eapol_ptk_1_of_4_retry(NULL, sm);
- 	}
-@@ -2874,6 +2880,8 @@ bool eapol_start(struct eapol_sm *sm)
- 			if (L_WARN_ON(!sm->handshake->have_pmk))
- 				return false;
- 
-+			sm->frame_retry = 0;
-+
- 			/* Kick off handshake */
- 			eapol_ptk_1_of_4_retry(NULL, sm);
- 		}
+ typedef void (*handshake_event_func_t)(struct handshake_state *hs,
+diff --git a/src/station.c b/src/station.c
+index bad067c8..ad5ad724 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1015,6 +1015,7 @@ static void station_handshake_event(struct handshake_state *hs,
+ 	case HANDSHAKE_EVENT_SETTING_KEYS_FAILED:
+ 	case HANDSHAKE_EVENT_EAP_NOTIFY:
+ 	case HANDSHAKE_EVENT_P2P_IP_REQUEST:
++	case HANDSHAKE_EVENT_REKEY_COMPLETE:
+ 		/*
+ 		 * currently we don't care about any other events. The
+ 		 * netdev_connect_cb will notify us when the connection is
 -- 
 2.34.3
 
