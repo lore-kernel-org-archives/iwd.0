@@ -1,78 +1,121 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74ADEBD10
-	for <iwd@lists.linux.dev>; Wed, 11 Jan 2023 22:32:11 +0000 (UTC)
-Received: by mail-oi1-f176.google.com with SMTP id r130so13941544oih.2
-        for <iwd@lists.linux.dev>; Wed, 11 Jan 2023 14:32:11 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74EDC8476
+	for <iwd@lists.linux.dev>; Thu, 12 Jan 2023 19:32:19 +0000 (UTC)
+Received: by mail-pj1-f43.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so24683720pjj.2
+        for <iwd@lists.linux.dev>; Thu, 12 Jan 2023 11:32:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AzwJDkSiFwAO9ERhZk7urik0WdEjPBomb5Uyvcf5tjs=;
-        b=qlQTyCnYqHxDi4bo/sUQGdpEEyuXDrxmrXMsT1rtuOTgyIrZezebnNXNRJOPT1iPHA
-         Jb8g3Ay9eEekAPdsKgeMgKt6ef3XED18uxhIU+5pn6TlLKmo9Ev7JINV+t0bMbW22l5d
-         Bmh5VezbvwX9SITU6cwJzL3EhOSbzSylrsQuq3tB4B6CwZA+SBmTRiQSK18u35emSf0V
-         5n6pIZ35kFNj3YQSlLNw9fXGSZ2BL4gOTJnlW6yY2RoSFXBnD9bFXdqGXhRL7CChP6yA
-         AfekK77sBdkhKEv2D8h2x3p09zaOtoIKoK91fAtNycGfc4KjDgHsG1KhLNpr4/Vc5mj1
-         PyYg==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pk14Sm7rZWGqpTZdA3m4nIsIAFhlLNnm9DOjpAkMPco=;
+        b=GOTq3Iei1WrINqMjX8mkrsceJaziTAlIjmyELOb2gdbPC8AllunXksAe6TqyQ28L0h
+         rpBajycHzYFl2749W4zKM3jw/2pLz2Fj0YlAfIJcfZ3qrLiIWWVcHyB0umOSBpbzGA7x
+         Npgxhxcu2CkP+kKXsBPRWdwG+Rrt6TCPDzus/rvWrM8yhfwtRW2vTFNOybjR4s4QarYp
+         1OxYrDzA5W7ShVS7i0TgipaEhl8J4bZWj6/NM7hGNzSwwyjIE81KvhluPhpGneWVi7t0
+         2ByzhvpKCbnCc2edX1C5et+2iG+MYxpNy+8vyomDtQm1WGHSBvgvOPF8/GqXnyjQ0WhS
+         ciUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AzwJDkSiFwAO9ERhZk7urik0WdEjPBomb5Uyvcf5tjs=;
-        b=vObPglapdvwnra7UVMKxnmkh5CYOq4ybBsGKduh8Vlb+E24umn29nIruea8J+hG9YE
-         zpK4DUsWMC5WPRN+7jGJduoPfoFnLFlyP/b8rhxltvc5HQC0uzEpYEuRQCCadoLH43pt
-         4jOeTclwAa4r1ecQX0yzXzNfc1FAjTkFloBhV53bRSdPSBIRX/FjR5U21O8Y4cP9Xi69
-         aVc9I/ilk5Ta40A4kACaxPuJznOESAp6nXEYd0sxrcxkA5xR72rbWxxgF4bbCyaMPs04
-         tJvrKQM7gcoybPng9aUxHBF/wHcw0KYJkLrLRHz5UZrU+6BnnrZ7Px8wdmDUhS8FAUoY
-         2t8Q==
-X-Gm-Message-State: AFqh2kqm9s8DLJ69tclIMbKHqw32Lz0LLA1Z89LZwehgbSprR3cfX6cY
-	r1hwDDa+1sksWroGM6i8J19RLUUSYeo=
-X-Google-Smtp-Source: AMrXdXu2PoUeSRmwxluq0NfRgYZRdwjTadUbeJ7WZAfKztRWa7in2caBVW/jxOabNoy8Aq713YS0eQ==
-X-Received: by 2002:a05:6808:2095:b0:35e:7acb:603c with SMTP id s21-20020a056808209500b0035e7acb603cmr42095720oiw.27.1673476330533;
-        Wed, 11 Jan 2023 14:32:10 -0800 (PST)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id cp17-20020a056830661100b00670763270fcsm8309279otb.71.2023.01.11.14.32.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Jan 2023 14:32:09 -0800 (PST)
-Message-ID: <8c52cf9b-a4e0-2875-7dd5-12907fb1f496@gmail.com>
-Date: Wed, 11 Jan 2023 16:30:52 -0600
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pk14Sm7rZWGqpTZdA3m4nIsIAFhlLNnm9DOjpAkMPco=;
+        b=Ws9u1aqVP6odjFvREwKmCLHDdvOooIPCojJljjA9vGymv9tYOmHnb/qornuWTpR5Q7
+         Y5X+GG6SCeogC84ONTm4u6gHVUsOll3X5uQRhPow6XNTHHBN1gANzV0ZnhEkMxadshkR
+         Q5EsgYcpZWiNVsz9ul/U6O70UOoAsfgDlVP0S7OjTk14gCNcKn0eI280hGsovexW7D+F
+         e/4jJ46AL8mG/cCOGaO1jMZmiwJMFLPkRFq3AsoDDzABTvZYupCw7PI9hxPA7OME/Hal
+         jsqWvrl6evfIozx1M7/ONWy4J+F9x7K0/xULf7ndRxohkOgci4/V7dtNXTF2COOU6oDP
+         pbpw==
+X-Gm-Message-State: AFqh2kotDgXJEMoo4FHqH9HVGapkT0IoteCmrHi5gK3L2gZ1sNfDMUNJ
+	YYWLwbntUJm5gUDXcT5O25OEQQMKr/g=
+X-Google-Smtp-Source: AMrXdXtqC8JNL5yF7OnFZBwaYo/XtYaqibSE4psLmbGan7tOdpVmiCZS2vmUQbkXgoCI8e4LdYvmLw==
+X-Received: by 2002:a17:90a:7891:b0:228:f21b:a3ff with SMTP id x17-20020a17090a789100b00228f21ba3ffmr5514556pjk.42.1673551938604;
+        Thu, 12 Jan 2023 11:32:18 -0800 (PST)
+Received: from jprestwo-xps.none ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id qe12-20020a17090b4f8c00b00218fba260e2sm12732147pjb.43.2023.01.12.11.32.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jan 2023 11:32:18 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/4] eapol: implement rekey support for authenticator
+Date: Thu, 12 Jan 2023 11:32:09 -0800
+Message-Id: <20230112193212.568476-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 4/9] handshake: add event for rekey success
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20230111201543.397692-1-prestwoj@gmail.com>
- <20230111201543.397692-4-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20230111201543.397692-4-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+The only changes required was to set the secure bit for message 1,
+reset the frame retry counter, and change the 2/4 verifier to use
+the rekey flag rather than ptk_complete. This is because we must
+set ptk_complete false in order to detect retransmissions of the
+4/4 frame.
 
-On 1/11/23 14:15, James Prestwood wrote:
-> Rekeys for station mode don't need to know when complete since
-> there is nothing to do once done. AP mode on the other hand needs
-> to know if the rekey was successful in order to reset/set the next
-> rekey timer.
-> ---
->   src/handshake.h | 1 +
->   src/station.c   | 1 +
->   2 files changed, 2 insertions(+)
-> 
+Initiating a rekey can now be done by simply calling eapol_start().
+---
+ src/eapol.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-Patches 4-7 applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/eapol.c b/src/eapol.c
+index 22b2d5d1..2048a87d 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -1086,8 +1086,6 @@ static void eapol_send_ptk_1_of_4(struct eapol_sm *sm)
+ 
+ 	handshake_state_new_anonce(sm->handshake);
+ 
+-	sm->handshake->ptk_complete = false;
+-
+ 	sm->replay_counter++;
+ 
+ 	memset(ek, 0, EAPOL_FRAME_LEN(sm->mic_len));
+@@ -1111,6 +1109,12 @@ static void eapol_send_ptk_1_of_4(struct eapol_sm *sm)
+ 
+ 	eapol_key_data_append(ek, sm->mic_len, HANDSHAKE_KDE_PMKID, pmkid, 16);
+ 
++	if (sm->handshake->ptk_complete) {
++		ek->secure = true;
++		sm->rekey = true;
++		sm->handshake->ptk_complete = false;
++	}
++
+ 	ek->header.packet_len = L_CPU_TO_BE16(EAPOL_FRAME_LEN(sm->mic_len) +
+ 				EAPOL_KEY_DATA_LEN(ek, sm->mic_len) - 4);
+ 
+@@ -1589,7 +1593,7 @@ static void eapol_handle_ptk_2_of_4(struct eapol_sm *sm,
+ 
+ 	l_debug("ifindex=%u", sm->handshake->ifindex);
+ 
+-	if (!eapol_verify_ptk_2_of_4(ek, sm->handshake->ptk_complete))
++	if (!eapol_verify_ptk_2_of_4(ek, sm->rekey))
+ 		return;
+ 
+ 	if (L_BE64_TO_CPU(ek->key_replay_counter) != sm->replay_counter)
+@@ -2482,6 +2486,8 @@ static void eapol_eap_complete_cb(enum eap_result result, void *user_data)
+ 
+ 		/* sm->mic_len will have been set in eapol_eap_results_cb */
+ 
++		sm->frame_retry = 0;
++
+ 		/* Kick off 4-Way Handshake */
+ 		eapol_ptk_1_of_4_retry(NULL, sm);
+ 	}
+@@ -2873,6 +2879,8 @@ bool eapol_start(struct eapol_sm *sm)
+ 			if (L_WARN_ON(!sm->handshake->have_pmk))
+ 				return false;
+ 
++			sm->frame_retry = 0;
++
+ 			/* Kick off handshake */
+ 			eapol_ptk_1_of_4_retry(NULL, sm);
+ 		}
+-- 
+2.34.3
 
