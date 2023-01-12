@@ -1,49 +1,52 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74EDC8476
-	for <iwd@lists.linux.dev>; Thu, 12 Jan 2023 19:32:19 +0000 (UTC)
-Received: by mail-pj1-f43.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so24683720pjj.2
-        for <iwd@lists.linux.dev>; Thu, 12 Jan 2023 11:32:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB56F847C
+	for <iwd@lists.linux.dev>; Thu, 12 Jan 2023 19:32:20 +0000 (UTC)
+Received: by mail-pl1-f177.google.com with SMTP id d9so21212451pll.9
+        for <iwd@lists.linux.dev>; Thu, 12 Jan 2023 11:32:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pk14Sm7rZWGqpTZdA3m4nIsIAFhlLNnm9DOjpAkMPco=;
-        b=GOTq3Iei1WrINqMjX8mkrsceJaziTAlIjmyELOb2gdbPC8AllunXksAe6TqyQ28L0h
-         rpBajycHzYFl2749W4zKM3jw/2pLz2Fj0YlAfIJcfZ3qrLiIWWVcHyB0umOSBpbzGA7x
-         Npgxhxcu2CkP+kKXsBPRWdwG+Rrt6TCPDzus/rvWrM8yhfwtRW2vTFNOybjR4s4QarYp
-         1OxYrDzA5W7ShVS7i0TgipaEhl8J4bZWj6/NM7hGNzSwwyjIE81KvhluPhpGneWVi7t0
-         2ByzhvpKCbnCc2edX1C5et+2iG+MYxpNy+8vyomDtQm1WGHSBvgvOPF8/GqXnyjQ0WhS
-         ciUQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V2dMBLdp/cSDQSwvGWM5UwCjg5T9c7KTOFWtchu/kaQ=;
+        b=nx0sM8Jzv2hN4xvKyOfeDYioQSzb4P6PHCXeN6pnCZq45QxcYeJn2EAVIypAFWQCMx
+         EbJfbvSipL4ZyznMYLddX1KTA+tbiqYQ6hiSWyc6paHlGnW+MkaNgAQjzX02KPOrltYi
+         dzaIRoisH2X6KmptjZr8PWnok6yL1FnbX4DwluuBoMu+46bPQS2PgYAQJi/n5+I8YmY1
+         Bd2ydfvVW0CWVDcpGo5a0aQM9YP5h3I4W4pIzeD8zdZ5AN7a0+ulyvBKwqp20dqh7cYi
+         0oyJhZ+Ot2aTKGdOum96gMGZhBU3uZVfkCtsOm+X9O5hNIee188XGyM+zVfG4mdTzRDo
+         uhdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pk14Sm7rZWGqpTZdA3m4nIsIAFhlLNnm9DOjpAkMPco=;
-        b=Ws9u1aqVP6odjFvREwKmCLHDdvOooIPCojJljjA9vGymv9tYOmHnb/qornuWTpR5Q7
-         Y5X+GG6SCeogC84ONTm4u6gHVUsOll3X5uQRhPow6XNTHHBN1gANzV0ZnhEkMxadshkR
-         Q5EsgYcpZWiNVsz9ul/U6O70UOoAsfgDlVP0S7OjTk14gCNcKn0eI280hGsovexW7D+F
-         e/4jJ46AL8mG/cCOGaO1jMZmiwJMFLPkRFq3AsoDDzABTvZYupCw7PI9hxPA7OME/Hal
-         jsqWvrl6evfIozx1M7/ONWy4J+F9x7K0/xULf7ndRxohkOgci4/V7dtNXTF2COOU6oDP
-         pbpw==
-X-Gm-Message-State: AFqh2kotDgXJEMoo4FHqH9HVGapkT0IoteCmrHi5gK3L2gZ1sNfDMUNJ
-	YYWLwbntUJm5gUDXcT5O25OEQQMKr/g=
-X-Google-Smtp-Source: AMrXdXtqC8JNL5yF7OnFZBwaYo/XtYaqibSE4psLmbGan7tOdpVmiCZS2vmUQbkXgoCI8e4LdYvmLw==
-X-Received: by 2002:a17:90a:7891:b0:228:f21b:a3ff with SMTP id x17-20020a17090a789100b00228f21ba3ffmr5514556pjk.42.1673551938604;
-        Thu, 12 Jan 2023 11:32:18 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V2dMBLdp/cSDQSwvGWM5UwCjg5T9c7KTOFWtchu/kaQ=;
+        b=CX10oTeEbkKWd+CBadiwniB25BRiqdHj4cEuOrwaHqC7TMUz8IL2xu2C/JEybB6vP8
+         zff7aP2jee7Xgrl8Um0nGB1tWPoZOjvCzThvdaHtcuApsDZ9Uh9Qe0qHWjBCYPJYgB6R
+         bPywmVJROhgakbH0dUuYRRlmF+UlmjFuzf1GzAWUu8AIrelvPBv+mI3h9ySEVVBlW5Sh
+         ru+DJ7Pv3UhyuFR9iV6k5zDl5BduyO0M7O4/4ufK/w4ih8dFlwKh58bS4zDq1Z/2pMk8
+         d8L0SMpYKTdewy1nCLQGlzdMSRlo6vF0+INIg3nomBcKIlyceCIWwj2bMK90CuNfomAQ
+         eOkA==
+X-Gm-Message-State: AFqh2kqZPuyiQBTwF6rY2xzGg9BzZXI8crX6f7j1N6XCoE5diJp0zLu8
+	5CYqEpgVmZExJZBgh0iVbNkwmXpCfug=
+X-Google-Smtp-Source: AMrXdXvcYLN6tOrSwcjA/LLcIf8ZjSvd5zNdTFd3mp8TKCFKW9iG5cQU5HlwTuyYsQpa6yjZht+g9w==
+X-Received: by 2002:a17:90a:bb03:b0:225:a226:9fbb with SMTP id u3-20020a17090abb0300b00225a2269fbbmr76559765pjr.39.1673551939904;
+        Thu, 12 Jan 2023 11:32:19 -0800 (PST)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id qe12-20020a17090b4f8c00b00218fba260e2sm12732147pjb.43.2023.01.12.11.32.17
+        by smtp.gmail.com with ESMTPSA id qe12-20020a17090b4f8c00b00218fba260e2sm12732147pjb.43.2023.01.12.11.32.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 12 Jan 2023 11:32:18 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/4] eapol: implement rekey support for authenticator
-Date: Thu, 12 Jan 2023 11:32:09 -0800
-Message-Id: <20230112193212.568476-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/4] eapol: detect message 2/4 retransmits
+Date: Thu, 12 Jan 2023 11:32:10 -0800
+Message-Id: <20230112193212.568476-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
+In-Reply-To: <20230112193212.568476-1-prestwoj@gmail.com>
+References: <20230112193212.568476-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -52,70 +55,38 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The only changes required was to set the secure bit for message 1,
-reset the frame retry counter, and change the 2/4 verifier to use
-the rekey flag rather than ptk_complete. This is because we must
-set ptk_complete false in order to detect retransmissions of the
-4/4 frame.
-
-Initiating a rekey can now be done by simply calling eapol_start().
+If the authenticator has already set an snonce then the packet must
+be a retransmit. Handle this by sending 3/4 again but making sure
+to not reset the frame counter.
 ---
- src/eapol.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ src/eapol.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/src/eapol.c b/src/eapol.c
-index 22b2d5d1..2048a87d 100644
+index 2048a87d..c1ef8f90 100644
 --- a/src/eapol.c
 +++ b/src/eapol.c
-@@ -1086,8 +1086,6 @@ static void eapol_send_ptk_1_of_4(struct eapol_sm *sm)
+@@ -1645,12 +1645,18 @@ static void eapol_handle_ptk_2_of_4(struct eapol_sm *sm,
+ 		sm->handshake->support_ip_allocation = ip_req_kde != NULL;
+ 	}
  
- 	handshake_state_new_anonce(sm->handshake);
- 
--	sm->handshake->ptk_complete = false;
--
- 	sm->replay_counter++;
- 
- 	memset(ek, 0, EAPOL_FRAME_LEN(sm->mic_len));
-@@ -1111,6 +1109,12 @@ static void eapol_send_ptk_1_of_4(struct eapol_sm *sm)
- 
- 	eapol_key_data_append(ek, sm->mic_len, HANDSHAKE_KDE_PMKID, pmkid, 16);
- 
-+	if (sm->handshake->ptk_complete) {
-+		ek->secure = true;
-+		sm->rekey = true;
-+		sm->handshake->ptk_complete = false;
-+	}
-+
- 	ek->header.packet_len = L_CPU_TO_BE16(EAPOL_FRAME_LEN(sm->mic_len) +
- 				EAPOL_KEY_DATA_LEN(ek, sm->mic_len) - 4);
- 
-@@ -1589,7 +1593,7 @@ static void eapol_handle_ptk_2_of_4(struct eapol_sm *sm,
- 
- 	l_debug("ifindex=%u", sm->handshake->ifindex);
- 
--	if (!eapol_verify_ptk_2_of_4(ek, sm->handshake->ptk_complete))
-+	if (!eapol_verify_ptk_2_of_4(ek, sm->rekey))
- 		return;
- 
- 	if (L_BE64_TO_CPU(ek->key_replay_counter) != sm->replay_counter)
-@@ -2482,6 +2486,8 @@ static void eapol_eap_complete_cb(enum eap_result result, void *user_data)
- 
- 		/* sm->mic_len will have been set in eapol_eap_results_cb */
- 
++	/*
++	 * If the snonce is already set don't reset the retry counter as this
++	 * is a rekey. To be safe take the most recent snonce (in this frame)
++	 * in case the station created a new one.
++	 */
++	if (!sm->handshake->have_snonce)
 +		sm->frame_retry = 0;
 +
- 		/* Kick off 4-Way Handshake */
- 		eapol_ptk_1_of_4_retry(NULL, sm);
- 	}
-@@ -2873,6 +2879,8 @@ bool eapol_start(struct eapol_sm *sm)
- 			if (L_WARN_ON(!sm->handshake->have_pmk))
- 				return false;
+ 	memcpy(sm->handshake->snonce, ek->key_nonce,
+ 			sizeof(sm->handshake->snonce));
+ 	sm->handshake->have_snonce = true;
  
-+			sm->frame_retry = 0;
-+
- 			/* Kick off handshake */
- 			eapol_ptk_1_of_4_retry(NULL, sm);
- 		}
+-	sm->frame_retry = 0;
+-
+ 	eapol_ptk_3_of_4_retry(NULL, sm);
+ }
+ 
 -- 
 2.34.3
 
