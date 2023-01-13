@@ -1,83 +1,87 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAB3BA41
-	for <iwd@lists.linux.dev>; Fri, 13 Jan 2023 21:24:40 +0000 (UTC)
-Received: by mail-pg1-f170.google.com with SMTP id e10so15819471pgc.9
-        for <iwd@lists.linux.dev>; Fri, 13 Jan 2023 13:24:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE242BA57
+	for <iwd@lists.linux.dev>; Fri, 13 Jan 2023 23:17:17 +0000 (UTC)
+Received: by mail-oo1-f50.google.com with SMTP id r1-20020a4a3701000000b004f2b4f8200eso55962oor.7
+        for <iwd@lists.linux.dev>; Fri, 13 Jan 2023 15:17:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dw5B+8kuOkg3sIlnsl/1jWmXrytAfrKNEUyUIU+JY/c=;
-        b=l8lD6PyWrD/FyhJwV3KAPIvc6J9aZHDcDyewuC6BRWGHrEfLgscPehzmulsbzM2Q2+
-         52pGXSbXFKjeYM7ggRuc9zUT2UVaWJH7y4wO64OKf5l48OlNuyC8HWZ4qu7+6hLplwEW
-         1HAXgt6VuopWRU70ZkbBa+/XGx19a7/6RiTf/yi98HKzA9aL5deputuiHI+u0zo8zPJe
-         UVnSTjp6tNmtM+CLAeZAcBFstEL4rplFAv6cBPPFuhZ7AHgEAR9EUkjeKCw5shB9CG+P
-         1fx4byV6p7VUMWsutd6xJbNj/qX0XBvI6sdKO2QqZemG7n5n7jxXM9ySBfSXI8AjFDH/
-         k6Sw==
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gEQnYsihxhKfhq26rMRqEEd5+8TYh2cU/GGiq+Q8nQQ=;
+        b=Q+0nskCZ/Xm37SHnvDInadK1KmPoEdpcE+4WwByqN5zw9M2njVEH09gIOswoWhdwJ2
+         vnDOd2rltbYWcnt+VhQtNPGoEfUFnodzUwQC1mzwJLK+KL+m6U5MqJuABV2JqaluXA94
+         H+E+vBMFiH0lrAOjpXT9+I3glOUcNH6chyFfZcBWKyNdN91G+raT+lHfSK2Empipsefs
+         U71or1dRoz7rslRFnNKEEigqNi+zpuuzaSTOaShkNVuX/975i/RyCXw2WurafbvAPFqI
+         9+/Dklwj9STch5s7X7OT+nT4PnW+7II7j4OzH+vLHhlOcbAlwzXpsmTh4lwmtJAGZwbT
+         eIzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Dw5B+8kuOkg3sIlnsl/1jWmXrytAfrKNEUyUIU+JY/c=;
-        b=AUGYV91w/AbfV6qe/S09q0F29hElp1wEvYs1aiaZgCqhqIQV/us2GNpWCwnZrev1XN
-         RXfnF9jPf7FT3L1Ioysq6V4GNjU2Q9vQpwv4PrFoaxMmXmyWePVXAgbq+GsBCnDX4eYB
-         lpQjhE+ExdnBo6iAcmCPVy/oGMqoNpXtJRf29KEgj8TPbE4XIEo1I1s2LgX1jtSMIJ9x
-         qhs3lbyedP6eRSXMHhYDq3u4Xw3UStRPclf1Hb7C0SVZYimFrHxwd+aKK1vkt7+mjFVJ
-         jOu3AURaFlfoEf41Td0v6U9ZdW5Su6qZvUvB5PMyrjcf5DUsmB664NVaozDi23CBRn1m
-         zKiQ==
-X-Gm-Message-State: AFqh2koII4V6H9jXo7lWn/0mRQfyf73CSaAyhtQfohtDwyMiQLh+MdDx
-	7GoFn6t81Eoovg7GEOOq8rpOLc0nZp8=
-X-Google-Smtp-Source: AMrXdXv7qKwbZqqdvZghuUvECQgpfhkQy6sMOdE3zpxGS4/4Iq4+xPBIpoNLMmFueIx0S53cy1f0Hg==
-X-Received: by 2002:aa7:8599:0:b0:588:eac0:b05b with SMTP id w25-20020aa78599000000b00588eac0b05bmr17805892pfn.27.1673645079721;
-        Fri, 13 Jan 2023 13:24:39 -0800 (PST)
-Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id 66-20020a620645000000b0056d98e31439sm14562829pfg.140.2023.01.13.13.24.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jan 2023 13:24:39 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/3] station: cancel roam timer when FT starts
-Date: Fri, 13 Jan 2023 13:24:36 -0800
-Message-Id: <20230113212436.794519-3-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20230113212436.794519-1-prestwoj@gmail.com>
-References: <20230113212436.794519-1-prestwoj@gmail.com>
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gEQnYsihxhKfhq26rMRqEEd5+8TYh2cU/GGiq+Q8nQQ=;
+        b=FeVpuqZuihYWmyPW3cIHoRq4cLXeNW2aXcZ+RNgKrs3bhJTbPRdzDqQcJ/8o3BZxUw
+         t8NLkJlvaD4i/Ddhz+aeoZT4QgPlTlh8M9UTUE8PkGIuZYc3G76p/qK3QzTb3HjVUTKB
+         oXEWoebMnU1aGaH8UvvMfBjrEbWHbwhoHL9IF7GFNRPNEvcEToV1xDtBYoG3UtxSin4z
+         hu7N3Wfc8AAAEyoipYItFvABpO9e0s7UkCqrKrT+4UL4D+KR1tdOa4/xa+teVejJgniP
+         qKp7SkABv8DubHJ+Fo40+ElvOApiwXwutcTJ9lINA1y/6eAYoVnDMaktJeWmhEtUsnbw
+         mfng==
+X-Gm-Message-State: AFqh2kqa56U5ZuoUDLoGwKLhP5UBar7mTl8TJaQ4z1NWAM1zrDrBlgSf
+	jZkxspq1HPW1geliEQHJR+3lbD2glQ8=
+X-Google-Smtp-Source: AMrXdXupkEQMACYBSAWIQbJSXueLZHqMzXeru/PHbOB9GGKrjC4mYaY1j4Z3S9aidMwRF/GGaLbTCA==
+X-Received: by 2002:a4a:4b07:0:b0:4a0:23af:db58 with SMTP id q7-20020a4a4b07000000b004a023afdb58mr34794654ooa.7.1673651836746;
+        Fri, 13 Jan 2023 15:17:16 -0800 (PST)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id bc31-20020a056820169f00b0049f8b4b2095sm10356797oob.44.2023.01.13.15.17.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Jan 2023 15:17:15 -0800 (PST)
+Message-ID: <d748e42c-c2af-13e0-45db-6266862edbbc@gmail.com>
+Date: Fri, 13 Jan 2023 17:01:21 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v2 1/3] station: add checks to prevent multiple roam scans
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20230113212436.794519-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20230113212436.794519-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Past commits should address any potential problems of the timer
-firing during FT, but its still good practice to cancel the timer
-once it is no longer needed, i.e. once FT has started.
----
- src/station.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Hi James,
 
-diff --git a/src/station.c b/src/station.c
-index ed98a8d8..381065a2 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2299,6 +2299,11 @@ static bool station_fast_transition(struct station *station,
- 	vendor_ies = network_info_get_extra_ies(info, bss, &iov_elems);
- 	handshake_state_set_vendor_ies(hs, vendor_ies, iov_elems);
- 
-+	if (station->roam_trigger_timeout) {
-+		l_timeout_remove(station->roam_trigger_timeout);
-+		station->roam_trigger_timeout = NULL;
-+	}
-+
- 	/* Both ft_action/ft_authenticate will gate the associate work item */
- 	if ((hs->mde[4] & 1))
- 		ft_action(netdev_get_ifindex(station->netdev),
--- 
-2.34.3
+On 1/13/23 15:24, James Prestwood wrote:
+> Under the following conditions IWD can accidentally trigger a second
+> roam scan while one is already in progress:
+> 
+>   - A low RSSI condition is met. This starts the roam rearm timer.
+>   - A packet loss condition is met, which triggers a roam scan.
+>   - The roam rearm timer fires and starts another roam scan while
+>     also overwriting the first roam scan ID.
+>   - Then, if IWD gets disconnected the overwritten roam scan gets
+>     canceled, and the roam state is cleared which NULL's
+>     station->connected_network.
+>   - The initial roam scan results then come in with the assumption
+>     that IWD is still connected which results in a crash trying to
+>     reference station->connected_network.
+> 
+> This can be fixed by adding a station_cannot_roam check in the rearm
+> timer. If IWD is already doing a roam scan station->preparing_roam
+> should be set which will cause it to return true and stop any further
+> action.
+> 
+
+All applied, thanks.
+
+Regards,
+-Denis
 
