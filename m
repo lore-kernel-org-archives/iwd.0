@@ -1,52 +1,57 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E20D51C
-	for <iwd@lists.linux.dev>; Tue, 17 Jan 2023 18:03:47 +0000 (UTC)
-Received: by mail-pf1-f171.google.com with SMTP id x4so20011950pfj.1
-        for <iwd@lists.linux.dev>; Tue, 17 Jan 2023 10:03:47 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E28D52D
+	for <iwd@lists.linux.dev>; Tue, 17 Jan 2023 18:28:53 +0000 (UTC)
+Received: by mail-pj1-f45.google.com with SMTP id d8so2102140pjc.3
+        for <iwd@lists.linux.dev>; Tue, 17 Jan 2023 10:28:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:to:from:subject:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1Uybk6lh1CziSiyhw1rrh+WUMcgsznRvs0kmtzNF65M=;
-        b=PC7QMyz5U9j8Q+dGZ4jvii84zn6l8lOb6Vw9qJXWnE3uH3AuP75wR5MKDeBfckJyGB
-         idsvYIJnOz5rEI0xY64JDY0zJ7cKkr4twbzrJ7n3bSLCutFtzn5q9iuNnxvRBCcH3Lwe
-         SBwGW280BvRGAP6/kMX66Bw9zxqiNJIwWrCj80B+a7ctx/+ndCBNihvn5WV6C6cds81j
-         hFzxoEcOzVALhTGEe76kD692xpqz2reDGEnxXoX2nVezadTfHKCKJA0pSiQ3rIZNnzAc
-         YklRINOBzaQjghRYUJbDC2F1MrOFnAgJgzvSxOT5v4F20OhwqcK+SnBJG1P7j+Tq9+2o
-         F/DA==
+        bh=A8Px8HqP8puoU92DX6hHgozD7ezxYkMwrWwo7JrHwMM=;
+        b=ftiqw3X5FVVqzrRPmZmEiAa9m65l8m/AiklDDNGGspwT7pZWJeflY4/C+qKH/vIy0O
+         NxJAtkvKU+UnXJHQ6rNfsxToqQnxiyp+223vGJ3s0EMPDif9vMWH1UygActbqlKoEATo
+         eCe7qCxBxi3fbYLrWEwyi86QC7NeNqoliT4mKMciWqaJiyZShrX7qCjGQgb35Xg5xKA6
+         GGLuExNa2zVQfD2SrIrXyhZgbOgZ2yeMqfOOSQfeKBoTZCZfR2zeFhWDN4X+y6/HoYUJ
+         Sr9CNdzQA/3JQTjIP6bgNd4bSKWs1iPnr/skz0hOSCSmf0qPgyPIHZcGrVQRNSm633dJ
+         KYPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1Uybk6lh1CziSiyhw1rrh+WUMcgsznRvs0kmtzNF65M=;
-        b=EDdbXGQSNOHtnkHyBth9EV8nMCNnPx+/7/TdieIhxWEQtM2h21c3BEPRQQCSQjZzRH
-         Mmh0vxkiV/1HrzhDo6RlbSMCNGqcy5YvoEXz0P1y2ulRJu7FpQvGNv81KiED7t2c32Tt
-         +k/N+HwcWg9DI0x5kLxF2Ocfw8OL7x+djuOB5FcJU7Mef7WXz1ozRnhg6FBoTORq6F+B
-         t0pfXDPa32qaOA38WDYj2xzIriJrxprJt6/J02XP+nsI5QWSzxbRZ+vDORzymK0FcwyC
-         JZ/kpn6w7zGHRotOz1EJcg0A/ILXoabr4pfY61x4tj1ZkS+8o2giaM2DkC12WUAdUqCT
-         ZaRw==
-X-Gm-Message-State: AFqh2kocZGv5Vvrl2QywM7A3+rH5Mc+EedTtibJHe3NLxnhJ0Yh+svsQ
-	LaCdpXD4BGjRkmVXAFsGDQyIef5yPEw=
-X-Google-Smtp-Source: AMrXdXuWRouXbhLWjH7hdbUr1kQXTIVxuD9n1Pz8YuaFj/9hwR8z9jDvFD5u9QeKVX3Y6iKSS/fR0Q==
-X-Received: by 2002:aa7:90d7:0:b0:573:487d:e852 with SMTP id k23-20020aa790d7000000b00573487de852mr3335923pfk.4.1673978626617;
-        Tue, 17 Jan 2023 10:03:46 -0800 (PST)
-Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id d206-20020a621dd7000000b00589ed7ae132sm15235782pfd.13.2023.01.17.10.03.45
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=A8Px8HqP8puoU92DX6hHgozD7ezxYkMwrWwo7JrHwMM=;
+        b=KbhUlfKG33WuN2Wnpg6DlL/EZaWqkn6biNGFVnzTBFVDUeLILOWkOFTueczaL4ThCM
+         VSSShtcMPvWHP9pw1UQ+pU/qK700UHEvmQ1NWcmnuerWi0xYk5ZJC9bIMcKZvUFDxd0J
+         ANhIERNHzcslV3J8BymzFdIHheet6xYCQaWfpZhHZxAsPhcOT8wdkIr+ErxCfwL+ixib
+         9jsLafcb52dkSuBd9AqDBabBs6STfGPOrqEs9CRg4+GJPHQWD3vttrTRT2RmWxluqD7a
+         CNvEGFdG3isDTybM3ezWPLNOXZABcsMT6eC5wjAl8w0ux9+VR94AZIttJGfuS2oegXPS
+         9n7Q==
+X-Gm-Message-State: AFqh2koNkgdv71lHca0TF69Co1W3iLvJxphMlUTEPoCVcj16z6DJ8Mn8
+	zdRDz5BnMFbMhZ+9P/9YKVU=
+X-Google-Smtp-Source: AMrXdXvGcjJIBMQvkBV/g7kdLPv0JDjwfSr6CtUzjmi2NFV7B9hPIobFWngPJlQs1hO7ZO6eJ5QXCQ==
+X-Received: by 2002:a17:903:1315:b0:194:8bd7:3236 with SMTP id iy21-20020a170903131500b001948bd73236mr4486767plb.45.1673980133475;
+        Tue, 17 Jan 2023 10:28:53 -0800 (PST)
+Received: from [192.168.254.20] ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id x15-20020a170902ec8f00b001895d871c95sm21479386plg.70.2023.01.17.10.28.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 10:03:46 -0800 (PST)
+        Tue, 17 Jan 2023 10:28:52 -0800 (PST)
+Message-ID: <c14b6ea2528aa47ddb8e0266128d39848aba7fef.camel@gmail.com>
+Subject: Re: IWD AP is not working with NXP (88W8997/88Q9098),  START_AP
+ failed: -14
 From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] manager: handle -ENODEV special in interface callback
-Date: Tue, 17 Jan 2023 10:03:43 -0800
-Message-Id: <20230117180343.1451626-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20230117180343.1451626-1-prestwoj@gmail.com>
-References: <20230117180343.1451626-1-prestwoj@gmail.com>
+To: "Altous, Salahaldeen" <Salahaldeen.Altous@leica-camera.com>, 
+	"iwd@lists.linux.dev"
+	 <iwd@lists.linux.dev>
+Date: Tue, 17 Jan 2023 10:28:52 -0800
+In-Reply-To: <AM7PR01MB67244F63EBEAB9A65D965BEAADC69@AM7PR01MB6724.eurprd01.prod.exchangelabs.com>
+References: 
+	<AM7PR01MB672451F58D20BA27F874E4B2ADC19@AM7PR01MB6724.eurprd01.prod.exchangelabs.com>
+	 <AM7PR01MB67244F63EBEAB9A65D965BEAADC69@AM7PR01MB6724.eurprd01.prod.exchangelabs.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -55,40 +60,75 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If IWD ends up dumping wiphy's twice (because of NEW_WIPHY event
-soon after initial dump) it will also try and dump interfaces
-twice leading to multiple DEL_INTERFACE calls. The second attempt
-will fail with -ENODEV (since the interface was already deleted).
-Just silently fail with this case and let the other DEL_INTERFACE
-path handle the re-creation.
----
- src/manager.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Hi,
 
-diff --git a/src/manager.c b/src/manager.c
-index fed02777..f1aa59c7 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -320,13 +320,18 @@ static void manager_setup_cmd_done(void *user_data)
- static void manager_del_interface_cb(struct l_genl_msg *msg, void *user_data)
- {
- 	struct wiphy_setup_state *state = user_data;
-+	int err;
- 
- 	l_debug("");
- 
- 	if (state->aborted)
- 		return;
- 
--	if (l_genl_msg_get_error(msg) < 0) {
-+	err = l_genl_msg_get_error(msg);
-+
-+	if (err == -ENODEV)
-+		return;
-+	else if (err < 0) {
- 		l_error("DEL_INTERFACE failed: %s",
- 			strerror(-l_genl_msg_get_error(msg)));
- 		state->use_default = true;
--- 
-2.34.3
+On Tue, 2023-01-17 at 10:55 +0000, Altous, Salahaldeen wrote:
+> Hi all, 
+> 
+> I am testing now IWD-2.0 with an ublox module Jody-W377 (chipset NXP-
+> Q9098) and using the open-source driver from NXP (mwifiex),station mode
+> is working fine but I have problem with starting AP (CMD_RESP: cmd 0xb1
+> error, result=0x1; START_AP failed: -14). I have in the past used the
+> iwd with Qualcomm/Intel chipset with no problem. Does IWD support NXP-
+> Q9098?
+> attached you can find the log from iwd and iwctl
+
+I did a quick look around in that driver for -EFAULT (the error you're
+seeing) and nothing jumped out at me.
+
+I don't have any mwifiex hardware to try, but I don't see why it
+shouldn't work. Have you tried hostapd? If hostapd works, then we will
+need a iwmon log from both hostapd (working) and IWD (not working).
+Then we can compare what differs between the two.
+
+Thanks,
+James
+
+> 
+> can you please check what is the needed information from wlan driver
+> and is missing (not set) in mwifiex driver?
+> 
+> Also using 2 interfaces will fail when starting iwd and only one
+> interface will be listed with device list
+> # /usr/libexec/iwd -i mlan0 -i uap0 &
+> Wireless daemon version 1.12
+> station: Network configuration is disabled.
+> Wiphy: 0, Name: mwiphy0
+>           Permanent Address: 20:4e:f6:bb:0c:2f
+>           Bands: 2.4 GHz 5 GHz
+>           Ciphers: CCMP TKIP BIP
+>           Supported iftypes: station ap p2p-client p2p-go
+> Wiphy mwiphy0 will only use the default interface
+> 
+> [Note]
+> If only starting iwd with uap0 , uap0 can be listed
+> [iwd]# device list 
+>                                     Devices                            
+>        
+> -----------------------------------------------------------------------
+> ---------
+>   Name                  Address               Powered     Adapter    
+> Mode      
+> -----------------------------------------------------------------------
+> ---------
+>   uap0                  00:50:43:20:13:34     on          mwiphy0    
+> ap   
+> 
+> 
+> Best Regards,
+> Salahaldeen
+> 
+> --
+> Mit freundlichen Gruessen / kind regards
+> 
+> M.Sc Salahaldeen Altous
+> Senior Embedded Linux Developer
+> Leica Camera AG | Registergericht | District Court of Wetzlar: HRB966
+> Vorstand | Executive Board: Matthias Harsch (CEO) I Michael Grimm (CFO)
+> Aufsichtsratsvorsitzender | Chairman of the Supervisory Board: Dr.
+> Andreas Kaufmann
+> This message may contain confidential and privileged information. If it
+> has been sent to you in error, please notify the sender immediately by
+> replying to the message and please delete it from your computer. 
+
 
