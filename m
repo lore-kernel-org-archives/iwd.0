@@ -1,50 +1,41 @@
-Received: from out-128.mta0.migadu.com (out-128.mta0.migadu.com [91.218.175.128])
+Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0F3D53F
-	for <iwd@lists.linux.dev>; Tue, 17 Jan 2023 20:23:24 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=boula.in; s=key1;
-	t=1673986996;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2EI40R1vK6/ACyhyE6UKooMXu+Hkb01zqJl7D69sIs8=;
-	b=QZG7TGB4hTjF8FzZ+CNMN14OCtfJFCvtDZS6SLvUY1tmt8OluezdzPqMYs/tqpr+g6U/K2
-	uP+Ik6ATwf1WDCfc+LYOkTlobRsR2CJ225/1tJ6CrirMaWIPrHVWkDksu/ilmuL2jxMGu5
-	I0Xi4AZ7IT/sQi35X7iTEDvx6JrAuT+RtuOaz5Z1Ceydkw6TM/N3pUzYYWD3Yy6BCfqejc
-	cGZbsDqrNtmXVH9qPRFQX6YVHkZpOmascCEpOX0Kzwad+H9+1IR4jplr9c2JMnPzJwWkJL
-	NtetPmvr7sQGQFiitvPS7j6AyBFxu5ikg4mij9teA6Sixy29ucph1f/BYn1MWw==
-From: Kevin Boulain <kevin@boula.in>
-To: James Prestwood <prestwoj@gmail.com>
-Cc: iwd@lists.linux.dev
-Subject: Re: iwd fails to create device
-References: <2fec88f46974c051e5b4c277b50d2ae88c2fe5e5.camel@gmail.com>
-	<20230115155302.14317-1-kevin@boula.in>
-	<37fe77f33fe8eed72edde3e1d5ce1ca3509dc63d.camel@gmail.com>
-Date: Tue, 17 Jan 2023 21:23:10 +0100
-In-Reply-To: <37fe77f33fe8eed72edde3e1d5ce1ca3509dc63d.camel@gmail.com> (James
-	Prestwood's message of "Tue, 17 Jan 2023 10:30:29 -0800")
-Message-ID: <87pmbc29n5.fsf@boula.in>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AEC2F3A
+	for <iwd@lists.linux.dev>; Wed, 18 Jan 2023 13:17:01 +0000 (UTC)
+Date: Wed, 18 Jan 2023 13:16:43 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1674047812; x=1674307012;
+	bh=s4/Uhd1fg8WGVj4jjlfac5bY12d7ZTLSJKS1zEIqKVY=;
+	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=zBbZ6xx6qaI3jHOZTBUTovCDpfd2GY08vEyRzfLxlDaPUj+47sINtEiT7JjeD5Kk0
+	 8BgLHdPqYhvRB34Qn9oajlgkV6mRKvIMnezyLITEmGF8oWgkk6HqHuowvkyImCQS8O
+	 wwrwuHUh3aJKXqIzzIa1325WTP9mt39afinva6dzg2MiZE68zEWTYQOaSZqcNyAq+U
+	 U2n6fax9B02nNlkGSPje7opBAYAB0AP4Z/raZ5iI+2OEjCLssu/u1ml5HI4sN5QvuO
+	 g/wbW4b5yMEMDZ00E7W2G9Eos12dvzv20IHgOKrwphVn8bgfA8bqzyLTPk/keX3hYs
+	 UNHv3CO0OuZlQ==
+To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+From: Michael Yartys <michael.yartys@protonmail.com>
+Subject: ECDSA support
+Message-ID: <-H_hDnis_8eufaXJO7ObNd3y7Tys74ouHJg_A9OVHKpLIOMHWKBaayXV0QC0Ss61b5kZdOPQP5tIU0ySQF1XWgYc8zlQQ9qizmcGNw7JYf8=@protonmail.com>
+Feedback-ID: 6588689:user:proton
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hey James,
+Hi
 
-On 2023-01-17 at 10:30 -08, James Prestwood <prestwoj@gmail.com> wrote:
-> Would you be able to try the last two patches on the list? The archive
-> link is:
->
-> https://lore.kernel.org/iwd/20230117180343.1451626-1-prestwoj@gmail.com/T/#t
+I've been unable to connect to my university Eduroam network ever since the=
+y switched their certificates from RSA to ECDSA. As far as I know, iwd has =
+been working on getting ECDSA support into the kernel for a while now. What=
+'s the latest news on this? I would really prefer to ditch wpa_supplicant d=
+ue to the superior roaming functionality of iwd, which is really useful on =
+my FT-SAE home network.
 
-I'd say the results are pretty conclusive:
- - without the patches the issue appeared in 3 boots of 5,
- - with the patches I didn't encounter the issue after 10 boots.
-
-Thanks!
+Michael
