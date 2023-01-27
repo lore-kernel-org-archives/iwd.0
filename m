@@ -1,40 +1,49 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488AF23A8
-	for <iwd@lists.linux.dev>; Fri, 27 Jan 2023 12:31:53 +0000 (UTC)
-Received: by mail-wr1-f43.google.com with SMTP id m7so4825440wru.8
-        for <iwd@lists.linux.dev>; Fri, 27 Jan 2023 04:31:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590D933D5
+	for <iwd@lists.linux.dev>; Fri, 27 Jan 2023 17:29:34 +0000 (UTC)
+Received: by mail-pl1-f174.google.com with SMTP id k18so5711393pll.5
+        for <iwd@lists.linux.dev>; Fri, 27 Jan 2023 09:29:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QStyLIzvGJpCFst1sFL54vL2iCkgGWw8Eq0jLWty/bM=;
+        b=mi3TK/IOOTjqDr3UVKSiMnVJyCYbacHK5fxRDMuEsNJFpuZF9Q4wukGAiNKjtfawoa
+         u82ZyxAaciH9OtjInj8KPeD79Elpv7QBbnSd1s3iu5Dpmowd8J6I8rZyJPxeovuNYeB1
+         1eM38koygP2H+tSNVaLvJIOzZxAUmi4eNNk+3jfIaaQodJUctqZmVIt0CexE/4iOq7pN
+         G+T+t4VPG+GUeaYMHHIFd1wgBCgfML0b8XmjfCD+5QwvpRPBbBQZCaVg+2RflLjW11vv
+         XP3/Arq74JPYZHNEb9fwOUGEC/QIf+dzSb4RBldtHgLfQYGBYlTievn7h2C/8QfZShPA
+         KdMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wBKcInhzhWgNvBsCPeoQlhacGoaxH3tkuhYH3c7HItk=;
-        b=k9x2xvJjJ4JpxY/u/UT10L8ZTx4ftjvRdGjF6fGJDBPNkmBN9jqGwkst9s2Hi9UK2y
-         RqaRNl0DqGiAZOr2m3qbG2sUr4KrK0FUolqXa7x1TL/S+Gq5b4PotaxoRFgZ7ir8zWQW
-         JYhiXbSkx2dMR8JJN4mSevJONxmwWeENo2YZPG5L1bIqab1++MYdsNW5L/yBcuj+sH0b
-         OY1por/1wEpRTyTISps4nXuPlRUWljDreZfER3XgD+FTO8N4TLuaw49gFWCPheIfpJhT
-         3+UcWg3P7dI+7ab+5Anr0J28aP6FkbnOT66cEey604l1TLYBuuo1R/q48WJvVRmLdd5X
-         /upQ==
-X-Gm-Message-State: AO0yUKXdvjEd392ib7gYW61aYoVRYiX2mXuFT8x8SSA7mJEypji3ES+H
-	cPgLbo7+dWcB1VKsHqRixfcEoSCbzeY=
-X-Google-Smtp-Source: AK7set9HtNcBsC3Zfgx6qYctJUFlrF4dDU3p6F/YCwXlXH28Es9HWhvldR7auowlpjQFYKBrEVOzew==
-X-Received: by 2002:adf:b35e:0:b0:2bf:cab7:cc36 with SMTP id k30-20020adfb35e000000b002bfcab7cc36mr4166526wrd.23.1674822710868;
-        Fri, 27 Jan 2023 04:31:50 -0800 (PST)
-Received: from localhost.localdomain ([82.213.230.158])
-        by smtp.gmail.com with ESMTPSA id c7-20020adffb47000000b002ba2646fd30sm4472161wrs.36.2023.01.27.04.31.49
-        for <iwd@lists.linux.dev>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QStyLIzvGJpCFst1sFL54vL2iCkgGWw8Eq0jLWty/bM=;
+        b=I0OI4Vp0v04mvsEXQ2dB18GDp6McmpPuWC1pjUNGipIhNgToIRHsM5LapZZ92rPK+X
+         zFGS4QXfnIdcDPviYzjz7YlTs/HJ+O59QJdRgf/758WcDdtvvcXs3qQ51N9tk1vt2et1
+         c/bulf6C1Wh4/Tgh3wLt+ECCiSE3znYeJ2imfW8kf5jE6wHK9hIyU2UJI9xoiiJpTsc7
+         cQQTYcLnB5JyRjwxaWzr2a5P7FDRJeLduTlE8I7NHljk/LQn8JrkFGNMJgN6qTATDHnV
+         b0Svkx9shxY3uKYL0Fu/0LnqtR9kFx+pzr4H8Y4NX1G+AEBCDtweplzQajzlYg6ws9Vy
+         jzQg==
+X-Gm-Message-State: AFqh2kpHMHgqybVJlPs/ovkY4dNN3wtkD599HwH9PeYjfVgHniExgkT6
+	bw77D04nR5jVdlIMTEuTHw47CizsP6Y=
+X-Google-Smtp-Source: AMrXdXuopbwnM/76onTy8AySW4uSDInbfv78GGc7tAaKK8MGi3asMd02RZN7quUXNsZZ/rCqKyTO5Q==
+X-Received: by 2002:a05:6a20:b71b:b0:af:6f28:7c42 with SMTP id fg27-20020a056a20b71b00b000af6f287c42mr38083796pzb.62.1674840573461;
+        Fri, 27 Jan 2023 09:29:33 -0800 (PST)
+Received: from jprestwo-xps.none ([50.39.160.234])
+        by smtp.gmail.com with ESMTPSA id q19-20020a656853000000b004d09bbd023csm2583890pgt.88.2023.01.27.09.29.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jan 2023 04:31:49 -0800 (PST)
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+        Fri, 27 Jan 2023 09:29:32 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
-Subject: [PATCH 2/2] station: Add EnableEAPTLSCache bool setting
-Date: Fri, 27 Jan 2023 13:31:37 +0100
-Message-Id: <20230127123137.3274713-2-andrew.zaborowski@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230127123137.3274713-1-andrew.zaborowski@intel.com>
-References: <20230127123137.3274713-1-andrew.zaborowski@intel.com>
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] ap: correct extra IEs length calculation for WMM IE
+Date: Fri, 27 Jan 2023 09:29:30 -0800
+Message-Id: <20230127172930.2686333-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -43,42 +52,31 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Seeing that some authenticators can't seem to handle TLS session caching
-properly, guard the EAP-TLS-based methods session caching support behind
-a global [Network].EnableEAPTLSCache setting.  Defaults to false.
+The extra IE length for the WMM IE was being set to 26 which is
+the HT IE length, not WMM. Fix this and use the proper size for
+the WMM IE of 50 bytes.
 
-With the previous commit, authentication should succeed at least every
-other attempt.  I'd also expect that EAP-TLS is not usually affected
-because there's no phase2, unlike with EAP-PEAP/EAP-TTLS.
+This shouldn't have caused any problems prior as the tail length
+is always allocated with 256 or 512 extra bytes of headroom.
 ---
- src/station.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ src/ap.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/src/station.c b/src/station.c
-index 7f1a1e24..c92c0d96 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -5053,6 +5053,8 @@ static void station_known_networks_changed(enum known_networks_event event,
+diff --git a/src/ap.c b/src/ap.c
+index 10cc0f00..b51befe4 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -939,8 +939,9 @@ static size_t ap_get_extra_ies_len(struct ap_state *ap,
  
- static int station_init(void)
- {
-+	bool eap_tls_cache;
-+
- 	station_list = l_queue_new();
- 	netdev_watch = netdev_watch_add(station_netdev_watch, NULL, NULL);
- 	l_dbus_register_interface(dbus_get_bus(), IWD_STATION_INTERFACE,
-@@ -5103,6 +5105,11 @@ static int station_init(void)
+ 	len += ap_get_wsc_ie_len(ap, type, client_frame, client_frame_len);
  
- 	watchlist_init(&event_watches, NULL);
++	/* WMM IE length */
+ 	if (ap->supports_ht)
+-		len += 26;
++		len += 50;
  
-+	if (!l_settings_get_bool(iwd_get_config(), "Network",
-+				"EnableEAPTLSCache", &eap_tls_cache) ||
-+			!eap_tls_cache)
-+		return 0;
-+
- 	eap_tls_set_session_cache_ops(storage_eap_tls_cache_load,
- 					storage_eap_tls_cache_sync);
- 	known_networks_watch = known_networks_watch_add(
+ 	if (ap->ops->get_extra_ies_len)
+ 		len += ap->ops->get_extra_ies_len(type, client_frame,
 -- 
-2.34.1
+2.34.3
 
