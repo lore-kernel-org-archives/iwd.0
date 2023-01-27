@@ -1,78 +1,164 @@
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07A133D5
-	for <iwd@lists.linux.dev>; Fri, 27 Jan 2023 18:22:04 +0000 (UTC)
-Received: by mail-ot1-f43.google.com with SMTP id g21-20020a9d6495000000b0068bb336141dso570814otl.11
-        for <iwd@lists.linux.dev>; Fri, 27 Jan 2023 10:22:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DKu/oQ9GANKePvYx2DWifXKT3/629XCd3U9EKdhaxI0=;
-        b=FD1E7+VuP4VCz4WtnVXBmGk/QPqhLPvnasT4bYsE8l1gnl65gFvLRVzn9jDx1AmjhL
-         zeOKUkyqLf4VpaJarhhB01jOzgwRHsAL4twhZ0v1YpUaB76czgHGGN/n3ROPFuh3h4o+
-         8NUshTecrNyjnG+OrISf2T4M6GWFsf6NZCmKrGRAEQSiGLvvi+JcNQbqD0elgJjiBRdt
-         QeJcpyKIyzTktJ+6Rz2DR1zY8CP8phI2GzX/naddcwlNDBpI6Y/IDIHfcPfkgR/w2D3Y
-         62c2uIcBH0BRGp2OyLdWsKkcD/+NFc5cT8leIzQLuTCHOmehV41fAhCJ59Ad3Pu6+Tbe
-         4eEw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535F7522D
+	for <iwd@lists.linux.dev>; Fri, 27 Jan 2023 23:33:31 +0000 (UTC)
+Received: by mail-wr1-f53.google.com with SMTP id h12so6365133wrv.10
+        for <iwd@lists.linux.dev>; Fri, 27 Jan 2023 15:33:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DKu/oQ9GANKePvYx2DWifXKT3/629XCd3U9EKdhaxI0=;
-        b=ouLWbczJzFK5z8oBrFaEm4SpLI3DYBekN4PcM48myNteW+e/lskam1ypE66cFd3ToA
-         IkgBd92EFwUKfKfRBtZgNjqVRNVBTlIRHbioZcTkZ9YfakPTD74C1ljPYg2UqkJ9UNtB
-         SXDS7k8pijbuZdyyt4KlsDiCKLqGj/HsKKenC53B8RxropNWZcksiOv9VoHuVt8FvB/n
-         Kud1jxnkBImMmGu0d4K8OLzf2jkvgwVTzghjv7H1gplbAwe5t2zNHWeGx7mB+TprTRuM
-         DZiVgvU1pr0d27iu5cfajPyzuHxvDF5UTEwICj5J2A6F6aGtiMDjl7zUexUeyCo9cNTF
-         VeVg==
-X-Gm-Message-State: AO0yUKUfk/L55NW2S3VkaFEIHCx/b/X0VfrkGprBBRKSHPyEXnUjfGrO
-	q2xcxeOd2UJj7NjCXsODy5U=
-X-Google-Smtp-Source: AK7set96MEsBfqG+mFgZck3YhKxF7wmp/ka85HR9XfnqFo4gsIPP9xh6Vge3yHHU28IxywainNVqgg==
-X-Received: by 2002:a05:6830:6112:b0:68b:a678:6669 with SMTP id ca18-20020a056830611200b0068ba6786669mr1291924otb.37.1674843723859;
-        Fri, 27 Jan 2023 10:22:03 -0800 (PST)
-Received: from [192.168.1.29] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id cc12-20020a05683061cc00b0068abc8e786fsm1770279otb.10.2023.01.27.10.22.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Jan 2023 10:22:02 -0800 (PST)
-Message-ID: <377c04bf-1a7e-6aa7-041d-303fb39fcb1f@gmail.com>
-Date: Fri, 27 Jan 2023 12:22:01 -0600
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bPfvtTKefW9D5MTT7P2Peq9kdMmemkMTpd6pyj45djU=;
+        b=Q5SKQ45kE6gtd2XT/J+6Lr9wkOdt0I5xq/9OAR2c5MQMqQvAWBTenLysyfCFQOi6z4
+         xdNINyPmcgWjzPzn6nT71at0bWkE8LNUD0DHSR4Z1Czmy5cZkMjxOvWMXUUHlBOy7Of+
+         mqxQHswj9+Vt4++lielyUUmFw42grcG9ieG8EQclalI5LceS8RzgyEnM4rJ+P9YZfyOn
+         JNxN4gQDmm/LuqUeXBC27QM/9OCaz+WSEAeCjEyoONLn3VYnCntTGKb4E0TMDWAXa+8/
+         6Vnho1xVoY/r6AmMyX2hl0yZ5nl5ryf2/obk9d6etX+Lh6KDNO2tAzXvoCU2NYkPC/Nz
+         tJ4Q==
+X-Gm-Message-State: AO0yUKWi07dgXoZAks98a9Hx37WXJRhFiTCT5YMcEnQ2L3owmRvTZF47
+	qaMP35jJbGnykcEl5noj0zQGOs3qnZE=
+X-Google-Smtp-Source: AK7set9YbjH5CnuBDz8P6wuTJnaeo/KOShgmhgn7k0ZSZiSvX7nZlICmo5hDRFe/+A1uTxmeADOi5g==
+X-Received: by 2002:adf:e50c:0:b0:2bf:b33b:fb7a with SMTP id j12-20020adfe50c000000b002bfb33bfb7amr12009590wrm.25.1674862408726;
+        Fri, 27 Jan 2023 15:33:28 -0800 (PST)
+Received: from iss.ger.corp.intel.com ([82.213.230.158])
+        by smtp.gmail.com with ESMTPSA id m14-20020a5d6a0e000000b002bfd09f2ca6sm3216498wru.3.2023.01.27.15.33.27
+        for <iwd@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jan 2023 15:33:27 -0800 (PST)
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+To: iwd@lists.linux.dev
+Subject: [PATCH 1/2] eap-tls: Drop cached session when phase2 fails
+Date: Sat, 28 Jan 2023 00:33:22 +0100
+Message-Id: <20230127233323.3317642-1-andrew.zaborowski@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH] ap: correct extra IEs length calculation for WMM IE
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20230127172930.2686333-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20230127172930.2686333-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+If we have a TLS session cached from this attempt or a previous
+successful connection attempt but the overall EAP method fails, forget
+the session to improve the chances that authentication succeeds on the
+next attempt considering that some authenticators strangely allow
+resumption but can't handle it all the way to EAP method success.
+Logically the session resumption in the TLS layers on the server should
+be transparent to the EAP layers so I guess those may be failed
+attempts to further optimise phase 2 when the server thinks it can
+already trust the client.
+---
+ src/eap-tls-common.c | 52 +++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 47 insertions(+), 5 deletions(-)
 
-On 1/27/23 11:29, James Prestwood wrote:
-> The extra IE length for the WMM IE was being set to 26 which is
-> the HT IE length, not WMM. Fix this and use the proper size for
-> the WMM IE of 50 bytes.
-> 
-> This shouldn't have caused any problems prior as the tail length
-> is always allocated with 256 or 512 extra bytes of headroom.
-> ---
->   src/ap.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-
-Applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/eap-tls-common.c b/src/eap-tls-common.c
+index 784a57ee..e21e215b 100644
+--- a/src/eap-tls-common.c
++++ b/src/eap-tls-common.c
+@@ -115,6 +115,7 @@ struct eap_tls_state {
+ 
+ 	bool expecting_frag_ack:1;
+ 	bool tunnel_ready:1;
++	bool tls_session_resumed:1;
+ 
+ 	struct l_queue *ca_cert;
+ 	struct l_certchain *client_cert;
+@@ -129,8 +130,11 @@ static struct l_settings *eap_tls_session_cache;
+ static eap_tls_session_cache_load_func_t eap_tls_session_cache_load;
+ static eap_tls_session_cache_sync_func_t eap_tls_session_cache_sync;
+ 
+-static void __eap_tls_common_state_reset(struct eap_tls_state *eap_tls)
++static void __eap_tls_common_state_reset(struct eap_state *eap)
+ {
++	struct eap_tls_state *eap_tls = eap_get_data(eap);
++	const char *peer_id;
++
+ 	eap_tls->version_negotiated = EAP_TLS_VERSION_NOT_NEGOTIATED;
+ 	eap_tls->method_completed = false;
+ 	eap_tls->phase2_failed = false;
+@@ -145,6 +149,41 @@ static void __eap_tls_common_state_reset(struct eap_tls_state *eap_tls)
+ 	if (eap_tls->tunnel)
+ 		l_tls_reset(eap_tls->tunnel);
+ 
++	/*
++	 * Drop the TLS session cache for this peer if the overall EAP
++	 * method didn't succeed.
++	 *
++	 * Additionally if the session was cached previously, meaning
++	 * that we've had a successful authentication at least once before,
++	 * and we now used session resumption successfully and the method
++	 * failed, become suspicious of this server's TLS session
++	 * resumption support.  Some authenticators strangely allow
++	 * resumption but can't handle it all the way to EAP method
++	 * success.  This improves the chances that authentication
++	 * succeeds on the next attempt.
++	 *
++	 * Drop the cache even if we have no indication that the
++	 * method failed but it just didn't succeed, to handle cases like
++	 * the server getting stuck and a timout occuring at a higher
++	 * layer.  The risk is that we may occasionally flush the session
++	 * data when there was only a momentary radio issue, invalid
++	 * phase2 credentials or decision to abort.  Those are not hot
++	 * paths.
++	 *
++	 * Note: TLS errors before the ready callback are handled in l_tls.
++	 */
++	peer_id = eap_get_peer_id(eap);
++	if (peer_id && eap_tls_session_cache && !eap_method_is_success(eap) &&
++			l_settings_has_group(eap_tls_session_cache, peer_id)) {
++		eap_tls_forget_peer(peer_id);
++
++		if (eap_tls->tls_session_resumed)
++			l_warn("EAP: method did not finish after successful TLS"
++				" session resumption.");
++	}
++
++	eap_tls->tls_session_resumed = false;
++
+ 	eap_tls->tx_frag_offset = 0;
+ 	eap_tls->tx_frag_last_len = 0;
+ 
+@@ -187,7 +226,7 @@ bool eap_tls_common_state_reset(struct eap_state *eap)
+ {
+ 	struct eap_tls_state *eap_tls = eap_get_data(eap);
+ 
+-	__eap_tls_common_state_reset(eap_tls);
++	__eap_tls_common_state_reset(eap);
+ 
+ 	if (eap_tls->variant_ops->reset)
+ 		eap_tls->variant_ops->reset(eap_tls->variant_data);
+@@ -199,7 +238,7 @@ void eap_tls_common_state_free(struct eap_state *eap)
+ {
+ 	struct eap_tls_state *eap_tls = eap_get_data(eap);
+ 
+-	__eap_tls_common_state_reset(eap_tls);
++	__eap_tls_common_state_reset(eap);
+ 
+ 	eap_set_data(eap, NULL);
+ 
+@@ -244,7 +283,9 @@ static void eap_tls_tunnel_ready(const char *peer_identity, void *user_data)
+ {
+ 	struct eap_state *eap = user_data;
+ 	struct eap_tls_state *eap_tls = eap_get_data(eap);
+-	bool resumed = l_tls_get_session_resumed(eap_tls->tunnel);
++
++	eap_tls->tls_session_resumed =
++		l_tls_get_session_resumed(eap_tls->tunnel);
+ 
+ 	if (eap_tls->ca_cert && !peer_identity) {
+ 		l_error("%s: TLS did not verify AP identity",
+@@ -265,7 +306,8 @@ static void eap_tls_tunnel_ready(const char *peer_identity, void *user_data)
+ 	if (!eap_tls->variant_ops->tunnel_ready)
+ 		return;
+ 
+-	if (!eap_tls->variant_ops->tunnel_ready(eap, peer_identity, resumed))
++	if (!eap_tls->variant_ops->tunnel_ready(eap, peer_identity,
++						eap_tls->tls_session_resumed))
+ 		l_tls_close(eap_tls->tunnel);
+ }
+ 
+-- 
+2.34.1
 
