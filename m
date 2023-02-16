@@ -1,74 +1,72 @@
-Received: from mail-4321.protonmail.ch (mail-4321.protonmail.ch [185.70.43.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977964408
-	for <iwd@lists.linux.dev>; Sat, 11 Feb 2023 16:52:51 +0000 (UTC)
-Date: Sat, 11 Feb 2023 16:44:38 +0000
-Authentication-Results: mail-4321.protonmail.ch;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="JrvaoWfw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1676133889; x=1676393089;
-	bh=OaO2wZ5aAR/xzGNXBzOy4arghEqcrrc2/UHp5k/Ct/E=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=JrvaoWfwiPn/zXYn1ujQUVMfXZINhbmEXUF2drjUBpdOYNrr35zvpAtaIGJr7AdYz
-	 46WTJijMKbSX6LEM+P1CsyTJ+aSTkFLypCzB1xKXbpm/dMtTYJysqAYGtOSRdLDxuo
-	 ovAHH7gHlbs3VFu3tEBBdIUSYQ25pwSeFrbZNMuJEaWtXxgSuI7gA3ekiNfCLiEcef
-	 Otx5CMcgpJdZs/wNUGeUmIpPzb20ph/Uipc92/a65F36ze9giLK/Dqk+c6gVtlfX9z
-	 JlXQ1vFMwLDiJkC1IEGYnHSltm5Z8MkRoLh+pDKK6aeVmghwj72MHMWM5Sk/FqCvxX
-	 Rsoml2bhhDH8Q==
-To: Denis Kenzior <denkenz@gmail.com>
-From: Michael Yartys <michael.yartys@protonmail.com>
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-Subject: Re: ECDSA support
-Message-ID: <gxDpldx54cAZMd8uKyZg6GKlKGVRk2YRB0KixFuDqJlwmDeiQvW9ELIFFOlVXbNwbgHIbRlOt3sRXPAisAWzFCHB3Y0oPowSJiIbbBVO35s=@protonmail.com>
-In-Reply-To: <6ebeca95-8618-f398-6a4e-e1edf8d65883@gmail.com>
-References: <-H_hDnis_8eufaXJO7ObNd3y7Tys74ouHJg_A9OVHKpLIOMHWKBaayXV0QC0Ss61b5kZdOPQP5tIU0ySQF1XWgYc8zlQQ9qizmcGNw7JYf8=@protonmail.com> <6ebeca95-8618-f398-6a4e-e1edf8d65883@gmail.com>
-Feedback-ID: 6588689:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F53746E
+	for <iwd@lists.linux.dev>; Thu, 16 Feb 2023 14:45:08 +0000 (UTC)
+Received: by mail-yb1-f169.google.com with SMTP id b1so2419026ybn.2
+        for <iwd@lists.linux.dev>; Thu, 16 Feb 2023 06:45:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6oi+mNe9q7CCdMfhgzedEvFpmfrVluYT0lS/TbiG+Ng=;
+        b=AElqwVjy4pDzfHsLolYYES67u+dSUXrQadlPv7YDjv+lAc/zqlM+ZkXU81XrUdtp2m
+         V44gQv7DEHcocVhvhL59ZP6Wne5P+XbgvOzV/1xgcZa0h9Kvu8/lk63Da7NU836trDEF
+         /lJEuNcVzHqeSCyiO9+idsYsS5S5dvhT8NCZMZnIzYzIPdut/a6IfwRq9zBj5mqiuhCx
+         U0Pg3vHlxqXxmLW2agqEpy/+aoApEiuOcS0/WNKHKWnlK9iasulVe6P/NQXNYwzNf7z+
+         9yKEbwyWidAKVeAv8C7vJNNFJ+9XQCEcn57iRdmLdEMPyh+1Bj2KhV5VwTJC3rxAmZhk
+         V58w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6oi+mNe9q7CCdMfhgzedEvFpmfrVluYT0lS/TbiG+Ng=;
+        b=JGv0Nr9Me/6AtaBX+0zndIQ/4hejqOObAnlw5D1mlTvMDTyP66ayMa6WW6bp17t26o
+         oSHLsytV8Y29mnNR0GeFzUusjUb+ehVKJp1QhN/fDdVfnuBHcV4yQBhqvmCfLHBL+u+6
+         OhrYglITaU524OrrzmmBHL83lZXJ0/xduKpkoViyrfkzbxoB23X+a5KAjCETBYm8bnpd
+         xMzrdfI04TjX5pl2mfOYxb81jK4BUHwttUVGbNk83o9fKjRudPOqTPidaZfI7SaS5+vE
+         L2hog7Ll69HYWsh5K1aZOaPerzhqCJXqqcXctCESLlAW6MSCDcMjOQyMk+SC7p5o0H3X
+         8Wrw==
+X-Gm-Message-State: AO0yUKU8SNWRGM5IHhpa7xEjatdlIeU12AJ0Ju0dogtXjE1WkjMdMdMx
+	BWPRuqAtpMIZ/ifLebCDtu8UrHX2tala/oKCWrHb3/ZlSDQ=
+X-Google-Smtp-Source: AK7set9h/CfSYfkCeWthK7siCsF8IUQCWbuyHqmEYL01p2HN+YL+zcoVEW+j4saN8o9+cnqMIHCQ/26FqCkx9SN8DMk=
+X-Received: by 2002:a5b:688:0:b0:931:2b11:6584 with SMTP id
+ j8-20020a5b0688000000b009312b116584mr647642ybq.591.1676558707474; Thu, 16 Feb
+ 2023 06:45:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Emil Velikov <emil.l.velikov@gmail.com>
+Date: Thu, 16 Feb 2023 14:44:55 +0000
+Message-ID: <CACvgo50v+3j1Xshc3DCgSw=R9Xth=2EbjoHUZucdO5Av2t+L5g@mail.gmail.com>
+Subject: IWD does not autoconnect after S3, when moving between networks
+To: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Denis,
+Greetings team,
 
->=20
->=20
-> Hi Michael,
->=20
-> On 1/18/23 07:16, Michael Yartys wrote:
->=20
-> > Hi
-> >=20
-> > I've been unable to connect to my university Eduroam network ever since=
- they switched their certificates from RSA to ECDSA. As far as I know, iwd =
-has been working on getting ECDSA support into the kernel for a while now. =
-What's the latest news on this? I would really prefer to ditch wpa_supplica=
-nt due to the superior roaming functionality of iwd, which is really useful=
- on my FT-SAE home network.
->=20
->=20
-> ECDSA support is already in iwd, but it requires the following fix to the=
- kernel
-> which hasn't been upstreamed yet:
->=20
-> https://patchwork.kernel.org/project/keyrings/patch/20220826145119.9375-1=
--denkenz@gmail.com/
->=20
-> We've resent this twice now and there's crickets on the mailing list. If =
-others
-> want to nudge the upstream maintainers, be our guest :)
+I am seeing an off issue with iwd, where it fails to auto connect upon
+resume from S3. In particular:
 
-There's been no reply from the maintainers, so maybe it's worth trying to r=
-esend it again? Strange that they pretty much ignore it...
+ - Ensure device has saved profiles for Wifi A (eg. home) and B (eg. work)
+ - Connect to WIfi A, device is outside of Wifi B range
+ - Suspend device
+ - Go outside of Wifi A range and into Wifi B range
+ - Resume the device
+ - iwd does not autoconnect
+ - `iwctl station wlan0 show | grep Scanning` says "no"
 
->=20
-> Regards,
-> -Denis
 
-Michael
+Note: The issue is intermittent and I've been seeing it ever since I
+installed iwd in mid 2020
+
+Are there any commits which landed recently aiming to address issues
+like this? Is there some debug option that I can toggle to provide
+meaningful logs for the developers? Alternatively, do you have any
+pointers for code-paths I should start looking at initially?
+
+Thanks in advance,
+Emil
