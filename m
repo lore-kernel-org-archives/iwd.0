@@ -1,52 +1,49 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631D315AD
-	for <iwd@lists.linux.dev>; Fri, 24 Feb 2023 00:57:27 +0000 (UTC)
-Received: by mail-pj1-f45.google.com with SMTP id u10so14872185pjc.5
-        for <iwd@lists.linux.dev>; Thu, 23 Feb 2023 16:57:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9B7AD27
+	for <iwd@lists.linux.dev>; Fri, 24 Feb 2023 17:59:32 +0000 (UTC)
+Received: by mail-pj1-f54.google.com with SMTP id y15-20020a17090aa40f00b00237ad8ee3a0so9375pjp.2
+        for <iwd@lists.linux.dev>; Fri, 24 Feb 2023 09:59:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MgFT/vdNOaDQFJvkdBXnDmyRH1Hiym7DxY+6HmWGVr8=;
-        b=UIlTatzuh8dnfOOrKgv2fsDPL7DFoTsfNgLx2QQIlLHD4lEglstoUZ9IX51GvOU5vM
-         R8XpQAWHEDhIZvi2l2Gf1JN9wuBZaIBKxJhlFTeLyHUjnUjUhyot+1EcdmIJiUMUBnnP
-         AqJ+VbfV/dzjdiGp+IRACtrBse3u9uaYl1GzOVvVVxZT89+8JA3tZtKi3BNqaoMUQNQZ
-         bNPnTSNlJgPUYGxmdtDBJtZD/HNI++n4K4OJuL9+0jCgVuS6Ne9VvxJifWb2Vz/1NeZI
-         7rFga23CX54suOekRzML5jTV98FsRFheeby0pXjqqrtAjsKBeZq7jDYOImLb9xdNDILz
-         mv0Q==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dcyPgkjbrJA46GHAk3B0cirRJhIvXa0OXkJXC0LW0Cg=;
+        b=Uqr8pmIl5D4B6WGHBqQI09BNlARE5lm0C5H1OS5J0lwgZYsxpkg6jQDgkmeac7/4GO
+         KktfWuR9AQYzqGO4bcEZPcLrHfeFzBQ7zlpJyFGjt24IEPw5W8rOge60BWja1LfAiWQw
+         Q8/gjHC++ll/vjUPoxef95axOgJ6QxxL/nMr6eGCJujB31dA0obrcSebZknaG76kqjXv
+         fKpXu28QcQP1IBfia7X0o5TMVZ0ghu5z/UEylPqz4BASwaLRHdxfvf5n9AktgCUK/6hL
+         lf3SKJhBlw4hecmiIMR2IEnlgnHHelvRYYvSbKhg27KDp8kdPtSJE3If9d0ms8wx6WZe
+         THXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MgFT/vdNOaDQFJvkdBXnDmyRH1Hiym7DxY+6HmWGVr8=;
-        b=OoaRpkKO8rOeOaWLYp+MEyvDXZyITLDI2z58BmhK8iEIPdvYDnbX2CPv4PD0JyJ9xC
-         2TDCeTT1lubioNvcRsz9ATaY66dpPNdVD3Qf3SayWp1r6Nk5nnF/bnqabFsmzZMEMR1u
-         z1ZgGfbYpgOEsrYuNOp5E9O58Aj6l1uq1ROHLpv1qKyhStc4Z5K2ttKsA7c2fSbC6i+q
-         qzzBToSb5V7LXYSZEqJXjUDyPHiQVIhztvLr5D9GefpE357GthIVaG8f2uD691PDlz8Z
-         KE2hYtwtL9R/RXDlElkw4DTH5ZwG3NFOFhDUACUb4SQoAOK5MTGRUAvNdgucPkqcueQ8
-         0U4g==
-X-Gm-Message-State: AO0yUKWKG0NL1pUQQYKtdKBSYVFqJCmsXpDQ9AyDTZl/JAF2LOfWnBu0
-	Ld2tLFDYJEQqlR4qL7XDpRVKv1HObl0=
-X-Google-Smtp-Source: AK7set+810JaZFEICuQ/c+6dAq/D7guifx92RWVXjC2UYPaSoR6oALMy2JRzleeoVPcdmg7vJuOf7A==
-X-Received: by 2002:a05:6a20:728a:b0:cb:df6c:ba89 with SMTP id o10-20020a056a20728a00b000cbdf6cba89mr7252438pzk.8.1677200246569;
-        Thu, 23 Feb 2023 16:57:26 -0800 (PST)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dcyPgkjbrJA46GHAk3B0cirRJhIvXa0OXkJXC0LW0Cg=;
+        b=ITde03glbFhCWT/Np8DArWmVlDrfLmm/vCwud6bjCp31GrRrPe6gC44Zxi2xTh74sZ
+         O8qf5vEH+cQecO0oDKOM+wRWv0rYtXTEIDKF41wUwynmSSJ15Sxty8wLD2LZD21XFYYT
+         DV1XpLAiZfbM+c7STmf3JFGGL6X0DG5ZmaDtcf1tzAukiq6/vyyoHa8Zbxhg6L6YOZYj
+         5oC/Ng+KMdSUo/HjjUwyE8qieH7qJlMFNnuJBgtwNcILH5ZbxehroVQIzhVhCKU28N5u
+         YulKWyc6HDSRr8SS6NNOnp5oRwtabOIcdFktSfbkYkWxSsg1VSorPeo9OH4nMISqu1zz
+         KMtg==
+X-Gm-Message-State: AO0yUKUaEhoEzjMNjzeKWq4clX2bTKNsG5Ep+Li5SpqAdAUW0lHkhC75
+	h+csnO/EeX7vnkLfP59ZmLY8cE16Pqk=
+X-Google-Smtp-Source: AK7set9LTUUDVioCT7kxLpJv/HWiX1DEXroyYlkIXbGVB20JyF08bJdy99DBaKKvs+0x8RZKh8sqQg==
+X-Received: by 2002:a05:6a20:728e:b0:cc:a5d4:c334 with SMTP id o14-20020a056a20728e00b000cca5d4c334mr1086724pzk.10.1677261571347;
+        Fri, 24 Feb 2023 09:59:31 -0800 (PST)
 Received: from jprestwo-xps.none ([50.39.160.234])
-        by smtp.gmail.com with ESMTPSA id i15-20020a63bf4f000000b004fb95c8f63esm6801132pgo.44.2023.02.23.16.57.25
+        by smtp.gmail.com with ESMTPSA id x15-20020aa7918f000000b005a8f1d76d46sm8763749pfa.13.2023.02.24.09.59.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Feb 2023 16:57:26 -0800 (PST)
+        Fri, 24 Feb 2023 09:59:30 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] ap: add DisableHT setting
-Date: Thu, 23 Feb 2023 16:57:23 -0800
-Message-Id: <20230224005723.1411083-2-prestwoj@gmail.com>
+Subject: [PATCH 1/2] ap: check FULL_AP_CLIENT_STATE for NEW_STATION
+Date: Fri, 24 Feb 2023 09:59:27 -0800
+Message-Id: <20230224175928.1460558-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.3
-In-Reply-To: <20230224005723.1411083-1-prestwoj@gmail.com>
-References: <20230224005723.1411083-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -55,35 +52,47 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This allows the user to disable HT explicitly in the AP profile
+nl80211 has a check which returns -EINVAL for NEW_STATION if this
+feature is not enabled and the mask contains Authenticated/Associated
+flags.
 ---
- src/ap.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ src/ap.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
 diff --git a/src/ap.c b/src/ap.c
-index b51befe4..2867e1ab 100644
+index 2867e1ab..fee5a6c8 100644
 --- a/src/ap.c
 +++ b/src/ap.c
-@@ -3660,7 +3660,18 @@ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
- 		ap->band = BAND_FREQ_2_4_GHZ;
- 	}
+@@ -1643,19 +1643,22 @@ static struct l_genl_msg *ap_build_cmd_new_station(struct sta_state *sta)
+ {
+ 	struct l_genl_msg *msg;
+ 	uint32_t ifindex = netdev_get_ifindex(sta->ap->netdev);
+-	/*
+-	 * This should hopefully work both with and without
+-	 * NL80211_FEATURE_FULL_AP_CLIENT_STATE.
+-	 */
+ 	struct nl80211_sta_flag_update flags = {
+-		.mask = (1 << NL80211_STA_FLAG_AUTHENTICATED) |
+-			(1 << NL80211_STA_FLAG_ASSOCIATED) |
+-			(1 << NL80211_STA_FLAG_AUTHORIZED) |
++		.mask = (1 << NL80211_STA_FLAG_AUTHORIZED) |
+ 			(1 << NL80211_STA_FLAG_MFP),
+ 		.set = (1 << NL80211_STA_FLAG_AUTHENTICATED) |
+ 			(1 << NL80211_STA_FLAG_ASSOCIATED),
+ 	};
  
--	ap->supports_ht = wiphy_get_ht_capabilities(wiphy, ap->band,
-+	if (l_settings_has_key(config, "General", "DisableHT")) {
-+		bool boolval;
++	/*
++	 * Without this feature nl80211 rejects NEW_STATION if the mask contains
++	 * auth/assoc flags
++	 */
++	if (wiphy_has_feature(netdev_get_wiphy(sta->ap->netdev),
++				NL80211_FEATURE_FULL_AP_CLIENT_STATE))
++		flags.mask |= (1 << NL80211_STA_FLAG_ASSOCIATED) |
++				(1 << NL80211_STA_FLAG_AUTHENTICATED);
 +
-+		if (!l_settings_get_bool(config, "General", "DisableHT",
-+						&boolval)) {
-+			l_error("AP [General].DisableHT not a valid boolean");
-+			return -EINVAL;
-+		}
-+
-+		ap->supports_ht = !boolval;
-+	} else
-+		ap->supports_ht = wiphy_get_ht_capabilities(wiphy, ap->band,
- 							NULL) != NULL;
+ 	msg = l_genl_msg_new_sized(NL80211_CMD_NEW_STATION, 300);
  
- 	if (!ap_validate_band_channel(ap)) {
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &ifindex);
 -- 
 2.34.3
 
