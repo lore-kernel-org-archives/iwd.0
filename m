@@ -1,99 +1,123 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A9B28F2
-	for <iwd@lists.linux.dev>; Mon, 13 Mar 2023 15:29:15 +0000 (UTC)
-Received: by mail-oi1-f176.google.com with SMTP id bg11so9696902oib.5
-        for <iwd@lists.linux.dev>; Mon, 13 Mar 2023 08:29:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342082F45
+	for <iwd@lists.linux.dev>; Mon, 13 Mar 2023 16:56:13 +0000 (UTC)
+Received: by mail-pl1-f169.google.com with SMTP id p20so13632576plw.13
+        for <iwd@lists.linux.dev>; Mon, 13 Mar 2023 09:56:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678721354;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3DFNyVcKBG0SwNwh8Shz/fOmriu7sCjsLbRMVl4c1P4=;
-        b=Bj1Fz8qRRdlkH5K/NtM2gD4Ai16XACJbbwXnICzw/urxBQj7LX4QQHabJCx/qRVW5v
-         fGtDGhIgr0BMUBh9kIwjLUVmSpNg2Y5yb4BNsPIM1cjJWtHO/6Iz9LHWj2xN/jKOv3Bb
-         dNuvVMChWuECa+4t2rRD7B5OKdmnxgN0rFS2FaJv1BVAOav6pE1qLoUhGRMX8gNDUi2X
-         f90v35CbvtbBrK4Uj7sh72tGND1z4/t7xhfIEmm0YW2At2JEJ7KS7PBpwvhCVrs6B5Mg
-         oenJN+HoUf8qX+M0LpfjoMZ6N2cNbQQuyVKFLIWuN+9V5QzwUIamofbi0Pf3UXMnhkQ3
-         K8YQ==
+        d=gmail.com; s=20210112; t=1678726572;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:to:from:subject:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9E30T6h3Zc93hwRUC4dhm0VPrTWZgg7cPC2dxvZh43g=;
+        b=phuRBYqNOSCACD+mK9B/4m7ScBUXJ8OuD7n+IYcNLTj+jqdtwctb3Fx3UcGnfVXjDW
+         XzmVKSSlsCVqDqnL2oyS8gk2KemviTYsloSdjsd8/CTEbW/24ukyqKWrELSARFnqrHcS
+         +8CMf1yJKBrrV1LXFVUsLQJlRIM/7HqxdTGBD8qqOSAbJ9vKm32epNf8g4E2hEHQ8HDO
+         av2GbFuUVAZ775+L7mOfR/oPnQDolp+03EEX2q2/lpFmJUhKS7guoATMs9UMh/I8Tpbr
+         R0OUad7KfWKJfOgcCAhbuP6LVCLSpOq4EW3Rx5oArZcnJ/DGYB63a45OAOW1zDSFuqse
+         XWBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678721354;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3DFNyVcKBG0SwNwh8Shz/fOmriu7sCjsLbRMVl4c1P4=;
-        b=EFKgbAvP7RZL1DjZSMuVfJyCwINx0c0vV3XhjTuqAAL/jyZC3MnjCimQ+DoftpHFMv
-         LK36m/vnnSWjcNHG+lfzlI6p5xbToR4tgyDybfIhgltWmmsny5fjxLeZ/SFJxelWd9th
-         qL4Ufk2ZY1giaS33U03QnZMiMWvck+dha5ZJT49OV8OIgkBb5K9ffl8iTjRYQV1hRLRV
-         4Nzmp9sE65JYVO0YxScl9cztmLE8KViuDunQ9L7E7hwKrzwTKKNwur9s9ubyrFoobzv0
-         t058yxzp4bvvFWj23d3AS7lxLZDMOGvsfKCtoDfRrAA8TV2+FEiIZUWNYk5Tvl+HZB9o
-         toWQ==
-X-Gm-Message-State: AO0yUKUkqefUSnfSNG5eL7AqYwLofa6GRACw2oDz9XkOiiUvKcb2lOYc
-	CJZQqtFPC1DG9C9bDDFAdcA=
-X-Google-Smtp-Source: AK7set+9S3Ln5VwDIfKtJJOqajv5adXp8ZK+WRnUEE0PK6sJP7L+mAl8TiCyMPVm+PZnVqZHyFs+LQ==
-X-Received: by 2002:a54:4718:0:b0:35c:4ddb:b879 with SMTP id k24-20020a544718000000b0035c4ddbb879mr15928339oik.11.1678721354358;
-        Mon, 13 Mar 2023 08:29:14 -0700 (PDT)
-Received: from [192.168.1.10] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id ex25-20020a056808299900b0038440f0f63dsm3208888oib.37.2023.03.13.08.29.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Mar 2023 08:29:13 -0700 (PDT)
-Message-ID: <00c6a4a6-425d-aede-1e09-b85a56df081a@gmail.com>
-Date: Mon, 13 Mar 2023 10:29:11 -0500
+        d=1e100.net; s=20210112; t=1678726572;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9E30T6h3Zc93hwRUC4dhm0VPrTWZgg7cPC2dxvZh43g=;
+        b=5e3kdH0c/kw8HcR21V0h7jAC+Z7D2hCeJT4Q3xUtv9j7JmkBgM9A+kyfUUwIPzplfL
+         oC0LLwavlGygL/qPZb2Emj+0eXzMiDGHg2b6Gn6uO7pRAlrT9Mm+kActs2Pg93U0y5Bi
+         29JFuCMPKuxeNeuQF/witDpyvolRGvtSMrvMvoIZ8UzXC+sKfFwZIYzbUH0otvCvt1AB
+         aXgFTxyaODZgqE6pxZ9AjEjqAf+Sh+XinWhhqLNsSkJc3vk6Jcp0QZ7qjMQOsQ9AuTp+
+         LFMg7RmtmDCcH2JTklBrx071ofvk9/eRXsfp4KhrtmucNkrdcoFXi//jqfNFaRr4ab9z
+         v8+w==
+X-Gm-Message-State: AO0yUKVka6EBxgPGGnvE5aOV7QZXpyCCREdkRFzlCd61LUs45Uwse5JT
+	fLHMskLDwPjrY/YVMU+llGSPHDvVoV8=
+X-Google-Smtp-Source: AK7set9kt+GVROJU5AAbxaTtdhmvmfMz+dEhb7hHn56hDckryNiQV46WxlbhQDMFJk79MW8cR1cJ6w==
+X-Received: by 2002:a17:903:22cb:b0:1a0:6139:e9d6 with SMTP id y11-20020a17090322cb00b001a06139e9d6mr823667plg.53.1678726572547;
+        Mon, 13 Mar 2023 09:56:12 -0700 (PDT)
+Received: from [192.168.254.16] ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id z12-20020a630a4c000000b00478c48cf73csm4814996pgk.82.2023.03.13.09.56.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Mar 2023 09:56:12 -0700 (PDT)
+Message-ID: <e9d64559432a759066a00fa1d4bd753c517f8cd4.camel@gmail.com>
+Subject: Re: 40MHz Bandwidth in AP mode
+From: James Prestwood <prestwoj@gmail.com>
+To: Denis Kenzior <denkenz@gmail.com>, Alagu Sankar <alagusankar@gmail.com>,
+  iwd@lists.linux.dev
+Date: Mon, 13 Mar 2023 09:56:11 -0700
+In-Reply-To: <00c6a4a6-425d-aede-1e09-b85a56df081a@gmail.com>
+References: 
+	<CAH4auOnuK_dDemZRF4BMq3LPL6A5cmLfSgJKeFVKAYZUNGAk2w@mail.gmail.com>
+	 <CAH4auOnsUMnrBbfCPOh=vyvk2DnESz1YtDdpcD9fe_vzw3vbFg@mail.gmail.com>
+	 <00c6a4a6-425d-aede-1e09-b85a56df081a@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: 40MHz Bandwidth in AP mode
-To: Alagu Sankar <alagusankar@gmail.com>, iwd@lists.linux.dev
-References: <CAH4auOnuK_dDemZRF4BMq3LPL6A5cmLfSgJKeFVKAYZUNGAk2w@mail.gmail.com>
- <CAH4auOnsUMnrBbfCPOh=vyvk2DnESz1YtDdpcD9fe_vzw3vbFg@mail.gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CAH4auOnsUMnrBbfCPOh=vyvk2DnESz1YtDdpcD9fe_vzw3vbFg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Alagu,
-
-On 3/13/23 05:07, Alagu Sankar wrote:
-> Hi,
+On Mon, 2023-03-13 at 10:29 -0500, Denis Kenzior wrote:
+> Hi Alagu,
 > 
-> We are testing the iwd-2.3 version in AP mode for one of our
-> requirements.  When trying to configure the AP mode in Channel 36, it
-> was always selecting 20MHz.  The band_freq_to_ht_chandef() function is
-> supposed to select the best bandwidth. As we see, channel 36 is
-> configured as 40Mhz capable (operating_class 116).  Debugging this
-> further, we see that 40MHz spacing is rejected due to the following
-> condition
-> if (info->flags & PRIMARY_CHANNEL_UPPER && attr->no_ht40_plus)
->      continue;
-> if (info->flags & PRIMARY_CHANNEL_LOWER && attr->no_ht40_minus)
->      continue;
-> Channel 36 is configured as PRIMARY_CHANNEL_LOWER and the NL80211
-> attribute is indicating no_ht40_minus for this, but as per the
+> On 3/13/23 05:07, Alagu Sankar wrote:
+> > Hi,
+> > 
+> > We are testing the iwd-2.3 version in AP mode for one of our
+> > requirements.  When trying to configure the AP mode in Channel 36, it
+> > was always selecting 20MHz.  The band_freq_to_ht_chandef() function
+> > is
+> > supposed to select the best bandwidth. As we see, channel 36 is
+> > configured as 40Mhz capable (operating_class 116).  Debugging this
+> > further, we see that 40MHz spacing is rejected due to the following
+> > condition
+> > if (info->flags & PRIMARY_CHANNEL_UPPER && attr->no_ht40_plus)
+> >      continue;
+> > if (info->flags & PRIMARY_CHANNEL_LOWER && attr->no_ht40_minus)
+> >      continue;
+> > Channel 36 is configured as PRIMARY_CHANNEL_LOWER and the NL80211
+> > attribute is indicating no_ht40_minus for this, but as per the
+> 
+> So if NL80211 reports no_ht40_minus, we can't use this channel for
+> 40HT:
+> 
+> * @NL80211_FREQUENCY_ATTR_NO_HT40_MINUS: HT40- isn't possible with this
+>   *      channel as the control channel
+> 
+> > condition above, this is skipped. The check above seems incorrect.
+> 
+> Why do you say that?
+> 
+> Is the currently set regdom somehow restricting HT40 operation?  Does
+> setting 
+> the regdom country help?  Perhaps via [General].Country?  See man 5
+> iwd.config.
+> 
+> > Can you please let me know if 40MHz bandwidth is tested on AP mode?
+> > 
+> 
+> Yes, but things can always be tested better.  Our AP support is still
+> quite 
+> experimental.
 
-So if NL80211 reports no_ht40_minus, we can't use this channel for 40HT:
+Yes, AP mode certainly could use more testing but the adapters I have
+tested on have worked with 40MHz. 
 
-* @NL80211_FREQUENCY_ATTR_NO_HT40_MINUS: HT40- isn't possible with this
-  *      channel as the control channel
+As Denis said just because the operating class allows 40Mhz doesn't
+mean your wifi hardware or country allow that operation.
 
-> condition above, this is skipped. The check above seems incorrect.
+To tell 100% in your case you'd need to get an iwmon log of IWD
+starting up. This will get a full log of any channel restrictions, more
+info here: https://iwd.wiki.kernel.org/debugging
 
-Why do you say that?
+Thanks,
+James
 
-Is the currently set regdom somehow restricting HT40 operation?  Does setting 
-the regdom country help?  Perhaps via [General].Country?  See man 5 iwd.config.
-
-> Can you please let me know if 40MHz bandwidth is tested on AP mode?
+> 
+> Regards,
+> -Denis
 > 
 
-Yes, but things can always be tested better.  Our AP support is still quite 
-experimental.
 
-Regards,
--Denis
