@@ -1,95 +1,47 @@
-Received: from mta07-relay.cloud.vadesecure.com (mta07-relay.cloud.vadesecure.com [52.143.185.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DDE524D
-	for <iwd@lists.linux.dev>; Fri, 24 Mar 2023 09:50:27 +0000 (UTC)
-Received: from mail01.bodet.com (unknown [84.239.65.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mta07-relay.cloud.vadesecure.com (vceu4mtao01p) with ESMTPS id 4Pjch144Q8z98RS;
-	Fri, 24 Mar 2023 10:42:41 +0100 (CET)
-Received: from BODMAIL01.TREM.BOD (172.18.41.21) by BODMAIL02.TREM.BOD
- (172.18.41.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Fri, 24 Mar
- 2023 10:42:40 +0100
-Received: from BODMAIL01.TREM.BOD ([::1]) by BODMAIL01.TREM.BOD ([::1]) with
- mapi id 15.01.2507.021; Fri, 24 Mar 2023 10:42:41 +0100
-From: "clement.legoffic@kelio.com" <clement.legoffic@kelio.com>
-To: James Prestwood <prestwoj@gmail.com>, "iwd@lists.linux.dev"
-	<iwd@lists.linux.dev>
-Subject: RE: No Agent registered when calling Connect method
-Thread-Topic: No Agent registered when calling Connect method
-Thread-Index: Adldacp1InLt2OkRTGaUs9Qdi9TISAAaWDWAABgbJyA=
-Date: Fri, 24 Mar 2023 09:42:41 +0000
-Message-ID: <a187bab1a26a4adba9be33160de6def1@kelio.com>
-References: <a1840fea7c5e4233ac102e450e7ef873@kelio.com>
- <77b8a647caac0e132fdbdf7c8896baf0e37f65ba.camel@gmail.com>
-In-Reply-To: <77b8a647caac0e132fdbdf7c8896baf0e37f65ba.camel@gmail.com>
-Accept-Language: fr-FR, en-US
-Content-Language: fr-FR
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.18.114.37]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26546118
+	for <iwd@lists.linux.dev>; Fri, 24 Mar 2023 14:20:01 +0000 (UTC)
+Received: from smtpclient.apple (p4ff9fee6.dip0.t-ipconnect.de [79.249.254.230])
+	by mail.holtmann.org (Postfix) with ESMTPSA id A000DCECC7;
+	Fri, 24 Mar 2023 15:12:58 +0100 (CET)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-VRC-SPAM-STATUS: 0,-100,gggruggvucftvghtrhhoucdtuddrgedvhedrvdegiedgtdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuggftvedpqfgfvfenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufhtfffkfhgjihgtgfggsehtsghjtddttdejnecuhfhrohhmpedftghlvghmvghnthdrlhgvghhofhhfihgtsehkvghlihhordgtohhmfdcuoegtlhgvmhgvnhhtrdhlvghgohhffhhitgeskhgvlhhiohdrtghomheqnecuggftrfgrthhtvghrnhepkeetgfefleeifeetvddvkeegiedtudeivddtkeduiefgjeektefhheelgfeliedtnecuffhomhgrihhnpehifigurdhnvghtfihorhhkpdhkvghrnhgvlhdrohhrghenucfkphepkeegrddvfeelrdeihedrleejpddujedvrddukedruddugedrfeejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpohhuthdpmhgrgihmshhgshhiiigvpedutdegkeehjeeipdhinhgvthepkeegrddvfeelrdeihedrleejpdhhvghlohepmhgrihhltddurdgsohguvghtrdgtohhmpdhmrghilhhfrhhomheptghlvghmvghnthdrlhgvghhofhhfihgtsehkvghlihhordgtohhmpdhnsggprhgtphhtthhopedvpdhrtghpthhtohepphhrvghsthifohhjsehgmhgrihhlrdgtohhmpdhrtghpthhtohepihifugeslhhishhtshdrlhhinhhugidruggvvh
-X-VRC-SPAM-STATE: legit
-X-VRC-POLICY-STATUS: t=1,a=1,l=0
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.2\))
+Subject: Re: [PATCH] man: enclose referenced man page names in bold
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20230321161905.161909-1-nl6720@gmail.com>
+Date: Fri, 24 Mar 2023 15:12:58 +0100
+Cc: iwd@lists.linux.dev
+Content-Transfer-Encoding: 7bit
+Message-Id: <94DE8A03-1C36-424C-B5E2-A1A0DF2CA971@holtmann.org>
+References: <20230321161905.161909-1-nl6720@gmail.com>
+To: nl6720 <nl6720@gmail.com>
+X-Mailer: Apple Mail (2.3696.120.41.1.2)
 
-SGksDQoNClRoYW5rIHlvdSBmb3IgeW91ciBhbnN3ZXIgIQ0KDQo+IEhpLA0KPiANCj4gT24gVGh1
-LCAyMDIzLTAzLTIzIGF0IDA5OjUyICswMDAwLCBjbGVtZW50LmxlZ29mZmljQGtlbGlvLmNvbSB3
-cm90ZToNCj4gPiBIZWxsbywNCj4gPg0KPiA+IEkgd2FudCB0byBjb25uZWN0IHRvIGEgcHNrIG5l
-dHdvcmsgdXNpbmcgaXdkIEQtQlVTIGludGVyZmFjZS4NCj4gPiBJIGFtIHVzaW5nIElXRCB2ZXJz
-aW9uIDEuMjUgd2l0aCBzeXRlbWQuDQo+ID4gVG8gY2FsbCBELUJVUyBtZXRob2QgSSB1c2UgYnVz
-Y3RsLg0KPiANCj4gSSB0aGluayB1c2luZyBidXNjdGwgZm9yIGFuIGFnZW50IGlzIGxpa2VseSB0
-aGUgcHJvYmxlbS4gQW4gYWdlbnQgZm9yIElXRCBpcyBhDQo+IERCdXMgc2VydmljZSwgc28gaXQg
-bXVzdCBiZSBydW5uaW5nIGFuZCBhYmxlIHRvIGFjY2VwdCBpbmNvbWluZyByZXF1ZXN0cw0KPiBm
-b3IgcGFzc3BocmFzZS91c2VybmFtZXMgZXRjLg0KDQpPayBJIHVuZGVyc3RhbmQuDQoNCj4gDQo+
-ID4gTXkgYWN0aW9ucyBhcmUgOg0KPiA+DQo+ID4gU2NhbiBmb3IgbmV0d29ya3MgOg0KPiA+IGJ1
-c2N0bCBjYWxsIG5ldC5jb25ubWFuLml3ZCAvbmV0L2Nvbm5tYW4vaXdkLzAvNg0KPiA+IG5ldC5j
-b25ubWFuLml3ZC5TdGF0aW9uIFNjYW4NCj4gPg0KPiA+IFJlZ2lzdGVyIGFuIGFnZW50IDoNCj4g
-PiBidXNjdGwgY2FsbCBuZXQuY29ubm1hbi5pd2QgL25ldC9jb25ubWFuL2l3ZA0KPiA+IG5ldC5j
-b25ubWFuLml3ZC5BZ2VudE1hbmFnZXIgUmVnaXN0ZXJBZ2VudCBvIC90ZXN0L2FnZW50LzEyMzQN
-Cj4gPg0KPiA+IENhbGwgQ29ubmVjdCBtZXRob2QgbXkgb2JqZWN0IEludGVyZmFjZSBidXNjdGwg
-Y2FsbCBuZXQuY29ubm1hbi5pd2QNCj4gPiAvbmV0L2Nvbm5tYW4vaXdkLzAvNi9YeHh4eCBuZXQu
-Y29ubm1hbi5pd2QuTmV0d29yayBDb25uZWN0DQo+ID4NCj4gPiBCdXQgSSBnZXQgdGhlIGVycm9y
-IDoNCj4gPiBDYWxsIGZhaWxlZDogTm8gQWdlbnQgcmVnaXN0ZXJlZA0KPiA+DQo+ID4gU28gSSBy
-ZXN0YXJ0IGl3ZCBkZWFtb24gd2l0aCBkZWJ1ZyBvdXRwdXQgYW5kIHRyeSB0byBjb25uZWN0IHRv
-IG15DQo+ID4gbmV0d29yayB1c2luZyBpd2N0bCBpd2N0bCBzdGF0aW9uIHdsYW4wIGNvbm5lY3Qg
-U1NJRA0KPiA+DQo+ID4gSVdEIGRlYnVnIG91dHB1dCB3aXRoIHRoZSBpd2N0bCBjb21tYW5kIGlz
-IDoNCj4gPiBzcmMvYWdlbnQuYzphZ2VudF9yZWdpc3RlcigpIGFnZW50IHJlZ2lzdGVyIGNhbGxl
-ZA0KPiA+IHNyYy9hZ2VudC5jOmFnZW50X3JlZ2lzdGVyKCkgYWdlbnQgOjEuNzEgcGF0aCAvYWdl
-bnQvNDcxDQo+ID4gc3JjL25ldHdvcmsuYzpuZXR3b3JrX2Nvbm5lY3QoKQ0KPiA+IHNyYy9uZXR3
-b3JrLmM6bmV0d29ya19jb25uZWN0X3BzaygpIGFza19wYXNzcGhyYXNlOiB0cnVlDQo+ID4gc3Jj
-L2FnZW50LmM6YWdlbnRfcmVxdWVzdF9wYXNzcGhyYXNlKCkgYWdlbnQgMHhiOWNhOCBvd25lciA6
-MS43MSBwYXRoDQo+ID4gL2FnZW50LzQ3MQ0KPiA+IHNyYy9hZ2VudC5jOmFnZW50X3NlbmRfbmV4
-dF9yZXF1ZXN0KCkgc2VuZCByZXF1ZXN0IHRvIDoxLjcxIC9hZ2VudC80NzENCj4gPiBzcmMvYWdl
-bnQuYzphZ2VudF9yZWNlaXZlX3JlcGx5KCkgYWdlbnQgMHhiOWNhOCByZXF1ZXN0IGlkIDIyDQo+
-ID4gc3JjL25ldHdvcmsuYzpwYXNzcGhyYXNlX2NhbGxiYWNrKCkgcmVzdWx0IDANCj4gPg0KPiA+
-IEFuZCBJIGdldCBjb25uZWN0ZWQNCj4gPg0KPiA+IFdoZXJlYXMgdGhlIGRlYnVnIG91dHB1dCB1
-c2luZyB0aGUgRC1CVVMgQ2FsbCBpcyA6DQo+ID4gc3JjL2FnZW50LmM6YWdlbnRfcmVnaXN0ZXIo
-KSBhZ2VudCByZWdpc3RlciBjYWxsZWQNCj4gPiBzcmMvYWdlbnQuYzphZ2VudF9yZWdpc3Rlcigp
-IGFnZW50IDoxLjc4IHBhdGggL3Rlc3QvYWdlbnQvMTIzNA0KPiA+IHNyYy9hZ2VudC5jOmFnZW50
-X2Rpc2Nvbm5lY3QoKSBhZ2VudCA6MS43OCBkaXNjb25uZWN0ZWQNCj4gPiBzcmMvYWdlbnQuYzph
-Z2VudF9mcmVlKCkgYWdlbnQgZnJlZSAweGJiMWEwDQo+ID4gc3JjL25ldHdvcmsuYzpuZXR3b3Jr
-X2Nvbm5lY3QoKQ0KPiA+IHNyYy9uZXR3b3JrLmM6bmV0d29ya19jb25uZWN0X3BzaygpIGFza19w
-YXNzcGhyYXNlOiB0cnVlDQo+ID4NCj4gPiBBbmQgSSdtIG5vdCBhYmxlIHRvIGNvbm5lY3QgdG8g
-bXkgbmV0d29yay8NCj4gPg0KPiA+IFdlIGNhbiBvYnNlcnZlIHRoYXQgdGhlIGFnZW50IGRpc2Nv
-bm5lY3QgYmVmb3JlIHRoZSBuZXR3b3JrX2Nvbm5lY3QoKSwNCj4gPiBJcyBpdCBhIG5vcm1hbCBi
-ZWhhdmlvdXIgPw0KPiA+DQo+ID4gU28gbXkgcXVlc3Rpb24gaXMgaG93IHRvIHVzZSB0aGUgUmVn
-aXN0ZXJBZ2VudCBtZXRob2QgaW4gb3JkZXIgdG8NCj4gPiBjb25uZWN0IHRvIGEgcHNrIE5ldHdv
-cmsgd2l0aCBEQlVTID8NCj4gDQo+IElXRCBoYXMgYSBzaW1wbGUgYWdlbnQgc2VydmljZSB3cml0
-dGVuIGluIFB5dGhvbiBmb3IgcmVmZXJlbmNlOg0KPiBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1
-Yi9zY20vbmV0d29yay93aXJlbGVzcy9pd2QuZ2l0L3RyZWUvdGVzdC9zaW1wbGUtDQo+IGFnZW50
-DQoNCkkgaGF2ZSByZWFkIHRoaXMgY29kZSBidXQgbWF5YmUgbm90IHVuZGVyc3RhbmQgaXQuDQpE
-b2VzIEkgbmVlZCB0byBjcmVhdGUgbXkgb3duIEFnZW50ID8gV2ljaCByZXNwZWN0IHRoZSBkb2Mg
-YWdlbnQtYXBpIGhlcmUgOiANCmh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9uZXR3b3Jr
-L3dpcmVsZXNzL2l3ZC5naXQvdHJlZS9kb2MvYWdlbnQtYXBpLnR4dA0KDQpXaHkgY2FuJ3QgSSB1
-c2UgdGhlIElXRCBhZ2VudCB3aGljaCBpd2N0bCB1c2UgPw0KDQpUaGFua3MNCg0KPiANCj4gVGhh
-bmtzLA0KPiBKYW1lcw0KPiANCj4gPg0KPiA+IFRoYW5rcyBpbiBhZHZhbmNlDQo+ID4NCj4gPg0K
+Hi,
+
+> On Mar 21, 2023, at 17:19, nl6720 <nl6720@gmail.com> wrote:
+> 
+> Man page parsers will autolink appropriately formated man page
+> references. The most common format is to have the page name in bold
+> followed by the section number in brackets.
+> ---
+> src/iwd.ap.rst      |  8 ++++----
+> src/iwd.config.rst  |  4 ++--
+> src/iwd.debug.rst   |  2 +-
+> src/iwd.network.rst |  8 ++++----
+> src/iwd.rst         | 14 +++++++-------
+> 5 files changed, 18 insertions(+), 18 deletions(-)
+
+can you fix your git config and add real name info to the author
+information please.
+
+Regards
+
+Marcel
+
