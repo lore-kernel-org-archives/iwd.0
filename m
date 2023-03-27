@@ -1,169 +1,119 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mx02-out.cloud.vadesecure.com (mx02-out.cloud.vadesecure.com [109.197.246.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E77E807
+	for <iwd@lists.linux.dev>; Mon, 27 Mar 2023 07:24:27 +0000 (UTC)
+Received: from mail01.bodet.com (unknown [84.239.65.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1B16FA1
-	for <iwd@lists.linux.dev>; Fri, 24 Mar 2023 15:13:50 +0000 (UTC)
-Received: by mail-pl1-f175.google.com with SMTP id w4so2056107plg.9
-        for <iwd@lists.linux.dev>; Fri, 24 Mar 2023 08:13:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679670830;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WzMFwoFMV0XLsgbyX82n+CsQVxyIetfg8QircSyVpT0=;
-        b=fgnrqx/bEMSAZ+K2G8QE8IdpkMdgjjHZYhhozKoNqsn103Ys7BAjLwp1phnSksLHOV
-         r67xbeLFu+ShhpRuS0BykpLsCgwMJtZfNhmgQdsHfzRvDcm5/lTLsT8MJVRhcteouPkx
-         4AVdL9QacG3MTVmF2mR/klMK2YdaB/47fQGimfG6qVQB8cKYKBkO13wyw99IJVXd5f3L
-         epcNUemuVsh3LFCCeJ4WmEAYx59QIQ8amDG1qLsFgWKmMXR3PRI4z4R5hhlmlELstSN0
-         nqgp+XGWjrZat9AOdeukux3blhRGQCyc/7Wr8BJoYQRsP/EODeXcEWSCrghrS4VlXItt
-         s8og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679670830;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WzMFwoFMV0XLsgbyX82n+CsQVxyIetfg8QircSyVpT0=;
-        b=5/IlgmE60qkuBZBMC8uXRxrGbPVbrNdv7JJk4GshZmar5oAGXFVwQnBZJUhYjatmIm
-         jIs7aQc6eMVKgYJZ0iOpvIN16b7vXZWtneu4za6Kc/fGRkX0qWdkYGis/2ZqImL0OkJ1
-         x/IVhsvAzoRiWlFj8DE+CAgI2XrrSsL2iPzwCFoI/Ih+4wV+cDR8BIkkkqeDxkFRP3gS
-         uIylDX45UeDIsJSbqXJ7cMUF9/SwVN8ltoeDs/8aQ67J+fYmqAegyDgsqSEHdeRQRShC
-         L2rjSd+LKfE7d9ITZTmL+BnPYSeYi/7QWlokipS8Havoz0gdNpz7y1GC6dWzZ6IhkU12
-         hIgQ==
-X-Gm-Message-State: AAQBX9cZ8FAXaj5RNbxO5hhs3TE1qLLlf2twk4mSZJhPTacWuG7udJIi
-	xLJ+SJkh+nHmqZho7A1ryvo=
-X-Google-Smtp-Source: AKy350YnxmsFknOsOS0MXyrpfrvgxZVSueMTdbOWQgEat6LQd2aByoo4QqrdefW9Jnw3aE11+HjL+g==
-X-Received: by 2002:a17:90b:33c7:b0:23d:4ffc:43e with SMTP id lk7-20020a17090b33c700b0023d4ffc043emr2923062pjb.38.1679670829851;
-        Fri, 24 Mar 2023 08:13:49 -0700 (PDT)
-Received: from [192.168.254.13] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id f62-20020a17090a704400b00234afca2498sm21922pjk.28.2023.03.24.08.13.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Mar 2023 08:13:49 -0700 (PDT)
-Message-ID: <14aa2e7b806bed3b7f30889e5502ef90434ccfc4.camel@gmail.com>
-Subject: Re: No Agent registered when calling Connect method
-From: James Prestwood <prestwoj@gmail.com>
-To: "clement.legoffic@kelio.com" <clement.legoffic@kelio.com>, 
-	"iwd@lists.linux.dev"
-	 <iwd@lists.linux.dev>
-Date: Fri, 24 Mar 2023 08:13:49 -0700
-In-Reply-To: <a187bab1a26a4adba9be33160de6def1@kelio.com>
+	by mx02-out.cloud.vadesecure.com (vcfr1mtao02p) with ESMTPS id 4PlPJV2DrZz1rNL;
+	Mon, 27 Mar 2023 09:16:58 +0200 (CEST)
+Received: from BODMAIL01.TREM.BOD (172.18.41.21) by BODMAIL02.TREM.BOD
+ (172.18.41.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Mon, 27 Mar
+ 2023 09:16:57 +0200
+Received: from BODMAIL01.TREM.BOD ([::1]) by BODMAIL01.TREM.BOD ([::1]) with
+ mapi id 15.01.2507.021; Mon, 27 Mar 2023 09:16:57 +0200
+From: "clement.legoffic@kelio.com" <clement.legoffic@kelio.com>
+To: James Prestwood <prestwoj@gmail.com>, "iwd@lists.linux.dev"
+	<iwd@lists.linux.dev>
+Subject: RE: No Agent registered when calling Connect method
+Thread-Topic: No Agent registered when calling Connect method
+Thread-Index: Adldacp1InLt2OkRTGaUs9Qdi9TISAAaWDWAABgbJyAACdCmgACHQv9A
+Date: Mon, 27 Mar 2023 07:16:57 +0000
+Message-ID: <ad8d8d72899049dbb106ec49c2f69517@kelio.com>
 References: <a1840fea7c5e4233ac102e450e7ef873@kelio.com>
 	 <77b8a647caac0e132fdbdf7c8896baf0e37f65ba.camel@gmail.com>
 	 <a187bab1a26a4adba9be33160de6def1@kelio.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+ <14aa2e7b806bed3b7f30889e5502ef90434ccfc4.camel@gmail.com>
+In-Reply-To: <14aa2e7b806bed3b7f30889e5502ef90434ccfc4.camel@gmail.com>
+Accept-Language: fr-FR, en-US
+Content-Language: fr-FR
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.18.114.33]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-VRC-SPAM-STATUS: 0,-100,gggruggvucftvghtrhhoucdtuddrgedvhedrvdehuddguddukecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucggtfevpdfqfgfvnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffuthffkfhfjghitgfgggesthgsjhdttddtjeenucfhrhhomhepfdgtlhgvmhgvnhhtrdhlvghgohhffhhitgeskhgvlhhiohdrtghomhdfuceotghlvghmvghnthdrlhgvghhofhhfihgtsehkvghlihhordgtohhmqeenucggtffrrghtthgvrhhnpeektefgfeelieeftedvvdekgeeitdduiedvtdekudeigfejkeethfehlefgleeitdenucffohhmrghinhepihifugdrnhgvthifohhrkhdpkhgvrhhnvghlrdhorhhgnecukfhppeekgedrvdefledrieehrdeljedpudejvddrudekrdduudegrdeffeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphhouhhtpdhmrgigmhhsghhsihiivgepuddtgeekheejiedpihhnvghtpeekgedrvdefledrieehrdeljedphhgvlhhopehmrghilhdtuddrsghouggvthdrtghomhdpmhgrihhlfhhrohhmpegtlhgvmhgvnhhtrdhlvghgohhffhhitgeskhgvlhhiohdrtghomhdpnhgspghrtghpthhtohepvddprhgtphhtthhopehprhgvshhtfihojhesghhmrghilhdrtghomhdprhgtphhtthhopehifigusehlihhsthhsrdhlihhnuhigrdguvghv
+X-VRC-SPAM-STATE: legit
+X-VRC-POLICY-STATUS: t=1,a=1,l=0
 
-On Fri, 2023-03-24 at 09:42 +0000, clement.legoffic@kelio.com wrote:
-> Hi,
-> 
-> Thank you for your answer !
-> 
-> > Hi,
-> > 
-> > On Thu, 2023-03-23 at 09:52 +0000,
-> > clement.legoffic@kelio.com wrote:
-> > > Hello,
-> > > 
-> > > I want to connect to a psk network using iwd D-BUS interface.
-> > > I am using IWD version 1.25 with sytemd.
-> > > To call D-BUS method I use busctl.
-> > 
-> > I think using busctl for an agent is likely the problem. An agent
-> > for IWD is a
-> > DBus service, so it must be running and able to accept incoming
-> > requests
-> > for passphrase/usernames etc.
-> 
-> Ok I understand.
-> 
-> > 
-> > > My actions are :
-> > > 
-> > > Scan for networks :
-> > > busctl call net.connman.iwd /net/connman/iwd/0/6
-> > > net.connman.iwd.Station Scan
-> > > 
-> > > Register an agent :
-> > > busctl call net.connman.iwd /net/connman/iwd
-> > > net.connman.iwd.AgentManager RegisterAgent o /test/agent/1234
-> > > 
-> > > Call Connect method my object Interface busctl call
-> > > net.connman.iwd
-> > > /net/connman/iwd/0/6/Xxxxx net.connman.iwd.Network Connect
-> > > 
-> > > But I get the error :
-> > > Call failed: No Agent registered
-> > > 
-> > > So I restart iwd deamon with debug output and try to connect to
-> > > my
-> > > network using iwctl iwctl station wlan0 connect SSID
-> > > 
-> > > IWD debug output with the iwctl command is :
-> > > src/agent.c:agent_register() agent register called
-> > > src/agent.c:agent_register() agent :1.71 path /agent/471
-> > > src/network.c:network_connect()
-> > > src/network.c:network_connect_psk() ask_passphrase: true
-> > > src/agent.c:agent_request_passphrase() agent 0xb9ca8 owner :1.71
-> > > path
-> > > /agent/471
-> > > src/agent.c:agent_send_next_request() send request to :1.71
-> > > /agent/471
-> > > src/agent.c:agent_receive_reply() agent 0xb9ca8 request id 22
-> > > src/network.c:passphrase_callback() result 0
-> > > 
-> > > And I get connected
-> > > 
-> > > Whereas the debug output using the D-BUS Call is :
-> > > src/agent.c:agent_register() agent register called
-> > > src/agent.c:agent_register() agent :1.78 path /test/agent/1234
-> > > src/agent.c:agent_disconnect() agent :1.78 disconnected
-> > > src/agent.c:agent_free() agent free 0xbb1a0
-> > > src/network.c:network_connect()
-> > > src/network.c:network_connect_psk() ask_passphrase: true
-> > > 
-> > > And I'm not able to connect to my network/
-> > > 
-> > > We can observe that the agent disconnect before the
-> > > network_connect(),
-> > > Is it a normal behaviour ?
-> > > 
-> > > So my question is how to use the RegisterAgent method in order to
-> > > connect to a psk Network with DBUS ?
-> > 
-> > IWD has a simple agent service written in Python for reference:
-> > https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/test/simple
-> > -
-> > agent
-> 
-> I have read this code but maybe not understand it.
-> Does I need to create my own Agent ? Wich respect the doc agent-api
-> here : 
-> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/doc/agent-api.txt
-> 
-> Why can't I use the IWD agent which iwctl use ?
-
-You can use iwctl as the agent, and you already did this to connect
-above. What's the problem doing it this way?
-
-Thanks,
-Jame
-
-> 
-> Thanks
-> 
-> > 
-> > Thanks,
-> > James
-> > 
-> > > 
-> > > Thanks in advance
-> > > 
-> > > 
-
-
+SGksDQoNCj4gT24gRnJpLCAyMDIzLTAzLTI0IGF0IDA5OjQyICswMDAwLCBjbGVtZW50LmxlZ29m
+ZmljQGtlbGlvLmNvbSB3cm90ZToNCj4gPiBIaSwNCj4gPg0KPiA+IFRoYW5rIHlvdSBmb3IgeW91
+ciBhbnN3ZXIgIQ0KPiA+DQo+ID4gPiBIaSwNCj4gPiA+DQo+ID4gPiBPbiBUaHUsIDIwMjMtMDMt
+MjMgYXQgMDk6NTIgKzAwMDAsDQo+ID4gPiBjbGVtZW50LmxlZ29mZmljQGtlbGlvLmNvbSB3cm90
+ZToNCj4gPiA+ID4gSGVsbG8sDQo+ID4gPiA+DQo+ID4gPiA+IEkgd2FudCB0byBjb25uZWN0IHRv
+IGEgcHNrIG5ldHdvcmsgdXNpbmcgaXdkIEQtQlVTIGludGVyZmFjZS4NCj4gPiA+ID4gSSBhbSB1
+c2luZyBJV0QgdmVyc2lvbiAxLjI1IHdpdGggc3l0ZW1kLg0KPiA+ID4gPiBUbyBjYWxsIEQtQlVT
+IG1ldGhvZCBJIHVzZSBidXNjdGwuDQo+ID4gPg0KPiA+ID4gSSB0aGluayB1c2luZyBidXNjdGwg
+Zm9yIGFuIGFnZW50IGlzIGxpa2VseSB0aGUgcHJvYmxlbS4gQW4gYWdlbnQNCj4gPiA+IGZvciBJ
+V0QgaXMgYSBEQnVzIHNlcnZpY2UsIHNvIGl0IG11c3QgYmUgcnVubmluZyBhbmQgYWJsZSB0byBh
+Y2NlcHQNCj4gPiA+IGluY29taW5nIHJlcXVlc3RzIGZvciBwYXNzcGhyYXNlL3VzZXJuYW1lcyBl
+dGMuDQo+ID4NCj4gPiBPayBJIHVuZGVyc3RhbmQuDQo+ID4NCj4gPiA+DQo+ID4gPiA+IE15IGFj
+dGlvbnMgYXJlIDoNCj4gPiA+ID4NCj4gPiA+ID4gU2NhbiBmb3IgbmV0d29ya3MgOg0KPiA+ID4g
+PiBidXNjdGwgY2FsbCBuZXQuY29ubm1hbi5pd2QgL25ldC9jb25ubWFuL2l3ZC8wLzYNCj4gPiA+
+ID4gbmV0LmNvbm5tYW4uaXdkLlN0YXRpb24gU2Nhbg0KPiA+ID4gPg0KPiA+ID4gPiBSZWdpc3Rl
+ciBhbiBhZ2VudCA6DQo+ID4gPiA+IGJ1c2N0bCBjYWxsIG5ldC5jb25ubWFuLml3ZCAvbmV0L2Nv
+bm5tYW4vaXdkDQo+ID4gPiA+IG5ldC5jb25ubWFuLml3ZC5BZ2VudE1hbmFnZXIgUmVnaXN0ZXJB
+Z2VudCBvIC90ZXN0L2FnZW50LzEyMzQNCj4gPiA+ID4NCj4gPiA+ID4gQ2FsbCBDb25uZWN0IG1l
+dGhvZCBteSBvYmplY3QgSW50ZXJmYWNlIGJ1c2N0bCBjYWxsDQo+ID4gPiA+IG5ldC5jb25ubWFu
+Lml3ZCAvbmV0L2Nvbm5tYW4vaXdkLzAvNi9YeHh4eA0KPiBuZXQuY29ubm1hbi5pd2QuTmV0d29y
+aw0KPiA+ID4gPiBDb25uZWN0DQo+ID4gPiA+DQo+ID4gPiA+IEJ1dCBJIGdldCB0aGUgZXJyb3Ig
+Og0KPiA+ID4gPiBDYWxsIGZhaWxlZDogTm8gQWdlbnQgcmVnaXN0ZXJlZA0KPiA+ID4gPg0KPiA+
+ID4gPiBTbyBJIHJlc3RhcnQgaXdkIGRlYW1vbiB3aXRoIGRlYnVnIG91dHB1dCBhbmQgdHJ5IHRv
+IGNvbm5lY3QgdG8gbXkNCj4gPiA+ID4gbmV0d29yayB1c2luZyBpd2N0bCBpd2N0bCBzdGF0aW9u
+IHdsYW4wIGNvbm5lY3QgU1NJRA0KPiA+ID4gPg0KPiA+ID4gPiBJV0QgZGVidWcgb3V0cHV0IHdp
+dGggdGhlIGl3Y3RsIGNvbW1hbmQgaXMgOg0KPiA+ID4gPiBzcmMvYWdlbnQuYzphZ2VudF9yZWdp
+c3RlcigpIGFnZW50IHJlZ2lzdGVyIGNhbGxlZA0KPiA+ID4gPiBzcmMvYWdlbnQuYzphZ2VudF9y
+ZWdpc3RlcigpIGFnZW50IDoxLjcxIHBhdGggL2FnZW50LzQ3MQ0KPiA+ID4gPiBzcmMvbmV0d29y
+ay5jOm5ldHdvcmtfY29ubmVjdCgpDQo+ID4gPiA+IHNyYy9uZXR3b3JrLmM6bmV0d29ya19jb25u
+ZWN0X3BzaygpIGFza19wYXNzcGhyYXNlOiB0cnVlDQo+ID4gPiA+IHNyYy9hZ2VudC5jOmFnZW50
+X3JlcXVlc3RfcGFzc3BocmFzZSgpIGFnZW50IDB4YjljYTggb3duZXIgOjEuNzENCj4gPiA+ID4g
+cGF0aA0KPiA+ID4gPiAvYWdlbnQvNDcxDQo+ID4gPiA+IHNyYy9hZ2VudC5jOmFnZW50X3NlbmRf
+bmV4dF9yZXF1ZXN0KCkgc2VuZCByZXF1ZXN0IHRvIDoxLjcxDQo+ID4gPiA+IC9hZ2VudC80NzEN
+Cj4gPiA+ID4gc3JjL2FnZW50LmM6YWdlbnRfcmVjZWl2ZV9yZXBseSgpIGFnZW50IDB4YjljYTgg
+cmVxdWVzdCBpZCAyMg0KPiA+ID4gPiBzcmMvbmV0d29yay5jOnBhc3NwaHJhc2VfY2FsbGJhY2so
+KSByZXN1bHQgMA0KPiA+ID4gPg0KPiA+ID4gPiBBbmQgSSBnZXQgY29ubmVjdGVkDQo+ID4gPiA+
+DQo+ID4gPiA+IFdoZXJlYXMgdGhlIGRlYnVnIG91dHB1dCB1c2luZyB0aGUgRC1CVVMgQ2FsbCBp
+cyA6DQo+ID4gPiA+IHNyYy9hZ2VudC5jOmFnZW50X3JlZ2lzdGVyKCkgYWdlbnQgcmVnaXN0ZXIg
+Y2FsbGVkDQo+ID4gPiA+IHNyYy9hZ2VudC5jOmFnZW50X3JlZ2lzdGVyKCkgYWdlbnQgOjEuNzgg
+cGF0aCAvdGVzdC9hZ2VudC8xMjM0DQo+ID4gPiA+IHNyYy9hZ2VudC5jOmFnZW50X2Rpc2Nvbm5l
+Y3QoKSBhZ2VudCA6MS43OCBkaXNjb25uZWN0ZWQNCj4gPiA+ID4gc3JjL2FnZW50LmM6YWdlbnRf
+ZnJlZSgpIGFnZW50IGZyZWUgMHhiYjFhMA0KPiA+ID4gPiBzcmMvbmV0d29yay5jOm5ldHdvcmtf
+Y29ubmVjdCgpDQo+ID4gPiA+IHNyYy9uZXR3b3JrLmM6bmV0d29ya19jb25uZWN0X3BzaygpIGFz
+a19wYXNzcGhyYXNlOiB0cnVlDQo+ID4gPiA+DQo+ID4gPiA+IEFuZCBJJ20gbm90IGFibGUgdG8g
+Y29ubmVjdCB0byBteSBuZXR3b3JrLw0KPiA+ID4gPg0KPiA+ID4gPiBXZSBjYW4gb2JzZXJ2ZSB0
+aGF0IHRoZSBhZ2VudCBkaXNjb25uZWN0IGJlZm9yZSB0aGUNCj4gPiA+ID4gbmV0d29ya19jb25u
+ZWN0KCksIElzIGl0IGEgbm9ybWFsIGJlaGF2aW91ciA/DQo+ID4gPiA+DQo+ID4gPiA+IFNvIG15
+IHF1ZXN0aW9uIGlzIGhvdyB0byB1c2UgdGhlIFJlZ2lzdGVyQWdlbnQgbWV0aG9kIGluIG9yZGVy
+IHRvDQo+ID4gPiA+IGNvbm5lY3QgdG8gYSBwc2sgTmV0d29yayB3aXRoIERCVVMgPw0KPiA+ID4N
+Cj4gPiA+IElXRCBoYXMgYSBzaW1wbGUgYWdlbnQgc2VydmljZSB3cml0dGVuIGluIFB5dGhvbiBm
+b3IgcmVmZXJlbmNlOg0KPiA+ID4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL25ldHdv
+cmsvd2lyZWxlc3MvaXdkLmdpdC90cmVlL3Rlc3Qvc2kNCj4gPiA+IG1wbGUNCj4gPiA+IC0NCj4g
+PiA+IGFnZW50DQo+ID4NCj4gPiBJIGhhdmUgcmVhZCB0aGlzIGNvZGUgYnV0IG1heWJlIG5vdCB1
+bmRlcnN0YW5kIGl0Lg0KPiA+IERvZXMgSSBuZWVkIHRvIGNyZWF0ZSBteSBvd24gQWdlbnQgPyBX
+aWNoIHJlc3BlY3QgdGhlIGRvYyBhZ2VudC1hcGkNCj4gPiBoZXJlIDoNCj4gPiBodHRwczovL2dp
+dC5rZXJuZWwub3JnL3B1Yi9zY20vbmV0d29yay93aXJlbGVzcy9pd2QuZ2l0L3RyZWUvZG9jL2Fn
+ZW50DQo+ID4gLWFwaS50eHQNCj4gPg0KPiA+IFdoeSBjYW4ndCBJIHVzZSB0aGUgSVdEIGFnZW50
+IHdoaWNoIGl3Y3RsIHVzZSA/DQo+IA0KPiBZb3UgY2FuIHVzZSBpd2N0bCBhcyB0aGUgYWdlbnQs
+IGFuZCB5b3UgYWxyZWFkeSBkaWQgdGhpcyB0byBjb25uZWN0IGFib3ZlLg0KPiBXaGF0J3MgdGhl
+IHByb2JsZW0gZG9pbmcgaXQgdGhpcyB3YXk/DQoNCkFjdHVhbGx5IGl0IGlzIG5vdCBhIHByb2Js
+ZW0sIEkganVzdCB3YW50IHRvIG9ubHkgdXNlIHRoZSBJV0QgRC1CVVMgaW50ZXJmYWNlIGluIG9y
+ZGVyIHRvIGNvbm5lY3QgdG8gYSBXUEEyIE5ldHdvcmsuDQpNeSB1c2Ugb2YgaXdjdGwgaXMgaGVy
+ZSB0byBjb25maXJtIEl0IGNhbiB3b3Jrcy4NCkkgbmVlZCB0byByZWdpc3RlciBhIEFnZW50IGlu
+IG9yZGVyIHRvIGNhbGN1bGF0ZSB0aGUgUFNLIHRvIG1ha2UgdGhlIHNzaWQucHNrIGNvbmZpZyBm
+aWxlIGJ1dCBJIGNhbm5vdCBmaWd1cmUgb3V0IGhvdyBBZ2VudCByZWdpc3RlcmluZyB3b3Jrcy4N
+CldoYXQgSSB1bmRlcnN0YW5kIGluIHRoZSBweXRob24gZXhhbXBsZSBpcyB0aGF0IEkgc2hvdWxk
+IGNyZWF0ZSBteSBvd24gQWdlbnQsIHRoYXQgaW1wbGVtZW50cyB0aGUgc2FtZSBtZXRob2QgYW5k
+IHByb3BlcnRpZXMgZm9ybSB0aGUgZG9jdW1lbnRhdGlvbi4gDQpBbmQgc28gSSB3YXMgd29uZGVy
+aW5nIGlmIG9ubHkgZm9yIHRlc3QgcHVycG9zZXMgSSBjYW4gYmUgYWJsZSB0byB1c2UgdGhlIGl3
+Y3RsIEFnZW50IGluIG9yZGVyIHRvIGNvbm5lY3QgdG8gbXkgV1BBMiBuZXR3b3JrLg0KDQpUaGFu
+a3MsDQpDbMOpbWVudA0KDQo+IA0KPiBUaGFua3MsDQo+IEphbWUNCj4gDQo+ID4NCj4gPiBUaGFu
+a3MNCj4gPg0KPiA+ID4NCj4gPiA+IFRoYW5rcywNCj4gPiA+IEphbWVzDQo+ID4gPg0KPiA+ID4g
+Pg0KPiA+ID4gPiBUaGFua3MgaW4gYWR2YW5jZQ0KPiA+ID4gPg0KPiA+ID4gPg0KPiANCg0K
