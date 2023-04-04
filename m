@@ -1,49 +1,52 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59E0323B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151BCC95B
 	for <iwd@lists.linux.dev>; Tue,  4 Apr 2023 20:38:28 +0000 (UTC)
-Received: by mail-pj1-f51.google.com with SMTP id x15so31862640pjk.2
+Received: by mail-pj1-f44.google.com with SMTP id gp15-20020a17090adf0f00b0023d1bbd9f9eso37463324pjb.0
         for <iwd@lists.linux.dev>; Tue, 04 Apr 2023 13:38:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112; t=1680640708;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sRhiP0/BQ7wL9Z+MlCileSobMwYpkaVpr4UXSVoVO50=;
-        b=f/cif/ceyOF14eyE2rIpjISOJ8yBZVWk2zGbaInQJTp7J6QCOMzR8PxozBfsDR0P/n
-         14cakYXqmWHjDcCE4vhnguUcnRQ/mXH46ClGeD4L0bv4hB7BrHHCCH+NqlOIGHm4mIc8
-         BmjfsQNosuFnEdHcDFZXF2h3kLlquzu4/T5o5jQgtq/L8OaxDhAenHn4JxM+ec8kNbLz
-         bHrRkOKPLRQj//s5dx2u0iwzJlq+4lnbSH9z2+bBkpUp3FihhFEGCsbcIJarBuO00zkI
-         0CUgeH19wuIiLsrj7aWE/AmprmScmfKFVY72bPuW8juv0cuCrNdnj9pVdJWeBw4mo1Cd
-         RA0Q==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R+fQUxdO98mVYrscZjfO/OpmnjOz8X2JdwaI9cWElYE=;
+        b=V3PZda73Pcl3bw9+fogVxTanaV5JupSNBquu9bZS41b6IteBJwyf6gMxyM8GHgzDJt
+         BIBSWSlna2Si5Kk1Mrk85+B2WXudI7Qy7qEVFhmYFRGrDVKOiHshurt9qbS2RRWSKFcJ
+         FWR9YUGK2MXuOeHO/0UzHlpDTv2gT9P8UUVbReOxfe3L2I48I7jb3F7kach8ts3zQ81H
+         MQtDnEuPGwo9CSB2151SMGveXUapiuMEXNz4eg/5D9ZO8oeKMTEPjP4WFvRJeiV8NhJH
+         m6RtxY01aFh44pe89R0GJT3c/59aAWjDf3OJTDXQEU4muO+hvCqHwj1F5d8dlGzMfuq1
+         Yddw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112; t=1680640708;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sRhiP0/BQ7wL9Z+MlCileSobMwYpkaVpr4UXSVoVO50=;
-        b=NPqCe0uAKdwkiaNq6bzimX5A71cITdr0oZalKv7yfAO8qWmtKoghEB5gDX+XUh3CpM
-         uYzmV/mr2y1xrB134s4ec6YfLXLwCw40r/4OJckKDBRyJJ9yxKjs42gWvDv/2Mm0E9N5
-         e//cZeZW0Glx3Rszn17GRkJSvEKvTuOhtFqrI1Q5KBEm+JX7XxEq36cn3nMz8ZJwil8+
-         eicTZrYK9700Pq8z3JnOn5hesthr9fz2/H0wlyfNgefcUa8paPp/ZfFNDCFdDxb3Ff2b
-         Oeju771I0kFWt3EmDiQwdSNgyFmy6Z3ZSACrnrFy9kfcV6lzHqSnI7YLoiTmt8vyI01E
-         9s7Q==
-X-Gm-Message-State: AAQBX9f8c/jft7SqctrJH/NebA6zApYhRUdF3232TfcpFMh7PfLALwLM
-	vTmC2zYb4SBjdMyNak8wci3X9zY3g0wVrg==
-X-Google-Smtp-Source: AKy350Y1Dq6nWVsbc6FIq3zIc4kiy2hJjoL1Q8gSoebI9uL/vkZWJ5juiqGw7+uQBvfL/F5ltO8mSw==
-X-Received: by 2002:a17:90b:4ac7:b0:237:8417:d9e3 with SMTP id mh7-20020a17090b4ac700b002378417d9e3mr4166680pjb.15.1680640707837;
-        Tue, 04 Apr 2023 13:38:27 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R+fQUxdO98mVYrscZjfO/OpmnjOz8X2JdwaI9cWElYE=;
+        b=Dtl8Dha6v3VpCUuu/iPudcm2x7tgFP/dVUCCvnAAdmmBYlZ6MTMP8kSMxVLaitAJpK
+         ZfHNVDQyaPhGpQO1awy+sYP+u7R9zwwiDdnwxT3H7XLFqrAoyWlEFDFF01ypXXLYLwtP
+         nNSL5zLbE4IozgGEL+l8c1vM19Le7IDMcmoG5dZiGKK3lAxHzsapDma/QsWG0lV8prYb
+         7YGmlyYxTYXtEvkGHHD7Ct8k+IBzfzzrXYXFHdKEeH1ykMUQOWtpsMxMECUJwu9qncrq
+         LNrgWN5caSKUV8L4iYkhpcKfJbHf99UtsNj3k29FuD06I5ARd6BNySrhDtAx9j/AjkD0
+         wXfQ==
+X-Gm-Message-State: AAQBX9cFmyb+fKZRQX/fgpJzut3FyXvre5yWM9BlKgFGyitoEKFOW6Px
+	fbNCaObRCr71hBtS8Mr38WwULKBCy4OPag==
+X-Google-Smtp-Source: AKy350YdoX4teDPTscN3+pRRweTLwCrDVw/vgVjZ7qNZ/JVJTfLdGbpx2Hw+2OIWKt3GZpD0lF4c9g==
+X-Received: by 2002:a17:902:dad0:b0:1a1:da3c:605f with SMTP id q16-20020a170902dad000b001a1da3c605fmr4362730plx.58.1680640708286;
+        Tue, 04 Apr 2023 13:38:28 -0700 (PDT)
 Received: from localhost.localdomain ([50.39.172.77])
         by smtp.gmail.com with ESMTPSA id u1-20020a170902b28100b001a21cde3458sm8755417plr.90.2023.04.04.13.38.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Apr 2023 13:38:27 -0700 (PDT)
+        Tue, 04 Apr 2023 13:38:28 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] handshake: include additional sha256 AKMs for PMKID generation
-Date: Tue,  4 Apr 2023 13:38:22 -0700
-Message-Id: <20230404203823.384260-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] eapol: warn rather than reject invalid PMKID (for EAP)
+Date: Tue,  4 Apr 2023 13:38:23 -0700
+Message-Id: <20230404203823.384260-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230404203823.384260-1-prestwoj@gmail.com>
+References: <20230404203823.384260-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -52,48 +55,53 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The 802.11 spec defines what AKMs should use sha256 to derive the
-PMKID. Hostapd commit b6d3fd05e3 changed the PMKID derivation in
-accordance with 802.11-2020 which then breaks PMKID validation in
-IWD. This breaks FT-PSK/8021x AKMs in IWD if the AP uses this
-hostapd version.
+A recent hostapd change b6d3fd05e3 modified the PMKID derivation
+which breaks EAPoL if the FT-8021x AKM is used and the AP sends
+the PMKID KDE in message 1. This is because if the PMKID does not
+validate it kicks off EAP again to renegotiate a PMK, but ultimately
+the PMKID generation doesn't change so we end up in a loop until the
+handshake timeout.
 
-Updating IWD to use sha256 in these cases will now break backwards
-compatibility with *older* APs, but this will be worked around in
-future commits.
+The validation of the PMKID isn't really required since IWD doesn't
+support PMKSA, but we do it anyways if the KDE is included (why not
+right?). But now with this interoperability issue we have to work
+around APs incorrectly deriving the PMKID since its been in hostapd
+for quite some time and a guarantee there are APs in production with
+this issue.
+
+For FT-PSK there is no changes required since IWD already ignores
+a mismatch (see comment about zero/random PMKID). For FT-8021x
+IWD will now first check if EAP has been exchanged and in that
+case ignore the mismatch and print a warning.
 ---
- src/handshake.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ src/eapol.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/src/handshake.c b/src/handshake.c
-index 734e997c..e4c856bb 100644
---- a/src/handshake.c
-+++ b/src/handshake.c
-@@ -753,10 +753,23 @@ bool handshake_state_get_pmkid(struct handshake_state *s, uint8_t *out_pmkid)
- 	 * preauthentication, the AKM has not yet been negotiated. In this
- 	 * case, the HMAC-SHA1-128 based derivation is used for the PMKID
- 	 * calculation."
-+	 *
-+	 * 802.11-2020 Table 9-151 defines the hashing algorithm to use
-+	 * for various AKM's. SHA256 should be used for the following
-+	 * AKM's (for this API context):
-+	 *
-+	 * 00-0F-AC:3 (FT-8021X)
-+	 * 00-0F-AC:4 (FT-PSK)
-+	 * 00-0F-AC:5 (8021X-SHA256)
-+	 * 00-0F-AC:6 (PSK-SHA256)
-+	 *
-+	 * (Note SAE/FILS were left out as they generate their own PMKID)
- 	 */
+diff --git a/src/eapol.c b/src/eapol.c
+index 3d7d33e0..43f65b85 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -1237,11 +1237,17 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *sm,
+ 			/*
+ 			 * If the AP has a different PMKSA from ours and we
+ 			 * have means to create a new PMKSA through EAP then
+-			 * try that, otherwise give up.
++			 * try that, otherwise give up. If EAP has already been
++			 * exchanged its likely the AP is using an outdated
++			 * derivation, in this case continue with a warning.
+ 			 */
+ 			if (sm->eap) {
+-				__send_eapol_start(sm, unencrypted);
+-				return;
++				if (!sm->eap_exchanged) {
++					__send_eapol_start(sm, unencrypted);
++					return;
++				}
++
++				l_warn("AP may be using old PMKID derivation!");
+ 			}
  
- 	if (s->akm_suite & (IE_RSN_AKM_SUITE_8021X_SHA256 |
--			IE_RSN_AKM_SUITE_PSK_SHA256))
-+			IE_RSN_AKM_SUITE_PSK_SHA256 |
-+			IE_RSN_AKM_SUITE_FT_OVER_8021X |
-+			IE_RSN_AKM_SUITE_FT_USING_PSK))
- 		use_sha256 = true;
- 	else
- 		use_sha256 = false;
+ 			/*
 -- 
 2.25.1
 
