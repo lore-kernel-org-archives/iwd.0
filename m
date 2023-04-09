@@ -1,45 +1,45 @@
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F081185B
-	for <iwd@lists.linux.dev>; Sun,  9 Apr 2023 16:38:18 +0000 (UTC)
-Received: by mail-oi1-f170.google.com with SMTP id bf5so1985874oib.8
-        for <iwd@lists.linux.dev>; Sun, 09 Apr 2023 09:38:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED59185B
+	for <iwd@lists.linux.dev>; Sun,  9 Apr 2023 16:58:01 +0000 (UTC)
+Received: by mail-ot1-f41.google.com with SMTP id cp25-20020a056830661900b00693ce5a2f3eso1442130otb.8
+        for <iwd@lists.linux.dev>; Sun, 09 Apr 2023 09:58:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1681058298; x=1683650298;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=gmail.com; s=20210112; t=1681059480; x=1683651480;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ugz1lFkvNYN5pqOk/C8ckCaiuwJ1k+O3cV5ydtXIvvA=;
-        b=NXv73Ntt53NZb+OLZ/FndZq2+q6h+beyVUAVJQ9hGvJcTJzt44qiXYtacyZIA9ipdE
-         z/bPWFHG5S1Z/2XQ/RFa0/pfp9rwYeuDtaXqrBDTDsqjHqlu0yPbZMflWlC/4lWVE9T7
-         jMcIkwJdGlMRN2PGSDFrvAIYoph4RjIoJ1+keW519qCd/Nz9kokjMOKwgRy4pIo0HTbR
-         WFAICeCEb8tutsI8MbCXtVYnkPJiadWAIZP5JY3+jLmyrOlCo/tmnKVvWWyX6k/af725
-         rgXDU3ZEL0pAcymJIzaQeORMvIb1pleol5ah4prC9GLsn7vF5YBC6ES+Rn+L3Nnc2/Y+
-         K8Vw==
+        bh=iXYrAtK0FBSysnLvUWzSGoh53FDWYObl8pJWndGw5P4=;
+        b=YfXG2891ULOm34mNXQ40Gn4fsT6R4RlToLJS7Mzqi7e7w8rCITfH52SHg7HHN5P4Yz
+         e7Lxbpivecxha5TDrQ6+E00Qt4TZHc1qTQfdK2eU9ovHZh36g4/uwaDB5UiP8cJd4reV
+         OEY/euyKK0GV1Wksg+aJmjWVYPuXFpy74sZNV1ZyOS4DUlC+1UjUwVCWGNcAh6hbYfLS
+         mRevpQZC730VdNkPf4evDAmH6IfBt88Telee3zbv9x3AUH/XhzhyBPjpEloM33FAciYg
+         0Y5RSx2apXqfFHtnZMBZ0lWJbJAGNWBL2ShLgdh6DzKutK0ppYWh+htCSJ1DErMHSPR1
+         ZyRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681058298; x=1683650298;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=1e100.net; s=20210112; t=1681059480; x=1683651480;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ugz1lFkvNYN5pqOk/C8ckCaiuwJ1k+O3cV5ydtXIvvA=;
-        b=HxmxzRLoUlkufpOXGd/u8JwfWcxBII8FexoJzQ0XemBTHW3xKsf/cuRyS7FCWUDaTq
-         XTsAzloG5b3+KAP7KuV4+uQ8R+PfoYXS4fNzRKpEVfmHrAIzPm0fe2nn0o/ANPrDYMgx
-         mz9KIXpLj9itAXuAeGLszIHOF62tajFzuYHHmcTAzGWdkuvxHIEZICYWYk1GIqyIDwWA
-         +0ixNX4VPa1YBXaQm5ydD8mpvkovn7QKGKoRb1VRXq9HFSS/ZU+E7xNWhaygwCUID1q0
-         QPGp17XEN0lnXJpkTtdX4EuKWBh+shg5hzjh7rNR2k9UuAcu2HFTkqqiPuUKY+DjxYmv
-         ttww==
-X-Gm-Message-State: AAQBX9fGEZ07I5szn5k281on/oaIa01O6Y7y95tDE/0+5GBVOQmnG0K4
-	Z39KIilPEexwOKqd9Q1TgAI=
-X-Google-Smtp-Source: AKy350aQEuH1y2TxsxEBCqfwPlR+ukoxubgWNxllh5yyp5oZKE9MU3lQjFuSIwdX2f6w/2CfKfXWCA==
-X-Received: by 2002:a05:6808:2901:b0:383:f5f8:651f with SMTP id ev1-20020a056808290100b00383f5f8651fmr3248090oib.55.1681058298096;
-        Sun, 09 Apr 2023 09:38:18 -0700 (PDT)
+        bh=iXYrAtK0FBSysnLvUWzSGoh53FDWYObl8pJWndGw5P4=;
+        b=MY7jR7ruG+0ObZAIQidpgjzFOc52xNuDiVI5CkXUgpxzRlHMR6VzQWUr071U/ZrISB
+         +o3kMCHJv/VxdtLPiQXD8y75ZjVetVqkNVnkO7yX382jY1lBdr9raWBT1jNjh5SdplAX
+         oCy8/+GxTqq0WUinqZ9iePPwsVfS45a9llwCg3iFmmvC1C1koxjvaSnRbuEwOm5yI6lp
+         sgXcmQUfSKRtIwavBNIYx09ggaPjfOXdUWgeT95eOpqFEbf26i+RSLp1fBkIo0L6XXv7
+         sRdCKE622kMuaixiwI2E6mpiSj4Vf0wdkPCaVD0yWyFLmxlYCt+HzRExFcBxhpBgWVd0
+         l5Sg==
+X-Gm-Message-State: AAQBX9cEUqsTfAouAYqv6ye9TOqE7ErqcxPaFC4AJESwHxyF2U9XmYLn
+	hyPH3E5u5JOGsg6XIa7FQ6efsy6MAh5LNA==
+X-Google-Smtp-Source: AKy350alCk8kAAzBsk+Jigfvv7p/nYVEbL+WDxmh8PxX7P7o0wqKRzWdDgFbeL4cbjTStfzclDKCAA==
+X-Received: by 2002:a05:6830:22fc:b0:693:d7bf:dc26 with SMTP id t28-20020a05683022fc00b00693d7bfdc26mr4431626otc.6.1681059480244;
+        Sun, 09 Apr 2023 09:58:00 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id u10-20020a056808150a00b0037832f60518sm3560614oiw.14.2023.04.09.09.38.16
+        by smtp.googlemail.com with ESMTPSA id c6-20020a9d67c6000000b006a143873c6bsm3519510otn.50.2023.04.09.09.57.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Apr 2023 09:38:17 -0700 (PDT)
-Message-ID: <1b9f63f4-19ab-4e15-ccc6-29dc88722e4a@gmail.com>
-Date: Sun, 9 Apr 2023 11:36:48 -0500
+        Sun, 09 Apr 2023 09:57:59 -0700 (PDT)
+Message-ID: <9fcce33b-22ad-bb56-d5d3-724450b709b6@gmail.com>
+Date: Sun, 9 Apr 2023 11:47:27 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,34 +48,38 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH] band: fix HT40+/- checks when creating chandef
+Subject: Re: Initial choice of network should consider RSSI?
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-Cc: Alagu Sankar <alagusankar@gmail.com>
-References: <20230404155640.133794-1-prestwoj@gmail.com>
+To: Cedric Sodhi <ManDay@openmail.cc>, iwd@lists.linux.dev
+References: <ZDKinaeLzoAvaIb1@air>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20230404155640.133794-1-prestwoj@gmail.com>
+In-Reply-To: <ZDKinaeLzoAvaIb1@air>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi James,
+Hi Cedric,
 
-On 4/4/23 10:56, James Prestwood wrote:
-> The HT40+/- flags were reversed when checking against the 802.11
-> behavior flags.
+On 4/9/23 06:33, Cedric Sodhi wrote:
+> Hello,
 > 
-> HT40+ means the secondary channel is above (+) the primary channel
-> therefore corresponds to the PRIMARY_CHANNEL_LOWER behavior. And
-> the opposite for HT40-.
+> I have a permanent problem with IWD when multiple known networks (different SSIDs) are in range: With a large probably (although it is most likely just random, depending on when the beacons fire) IWD manages to connect to a network with an unusable low RSSI while better networks are available.
 > 
-> Reported-By: Alagu Sankar <alagusankar@gmail.com>
-> ---
->   src/band.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
+> I suspect there is currently no logic in place which would somehow work in favor of making a "good" choice? RoamThreshold, for example, doesn't seem to apply and InitialPeriodicScanInterval seems to have no effect either, given that the (initial) connection to the (bad) network happens immediately before InitialPeriodicScanInterval passed, and that choice does not seem to be revised even if the better network becomes visible within InitialPeriodicScanInterval.
 
-Applied, thanks.
+Periodic scans are attempted every N seconds, with exponentially increasing N if 
+no connectable network was found.  InitialPeriodicScanInterval simply sets the 
+initial timeout N.  It isn't that iwd scans constantly during that period.
+
+Once a periodic scan completes, and there's something to connect to, iwd 
+attempts to do so.  If there are multiple somethings to connect to, then iwd 
+prioritizes networks based on estimated throughput (this is where the RSSI is 
+taken into account) and which network was most recently used.  There are some 
+other factors.
+
+> 
+> Would it possible to either extend the meaning of InitialPeriodicScanInterval or introduce another option which would allow IWD to connect to a better, different SSID (thus not covered by roaming) within an initial period?
+If you have a more concrete proposal please share it.  And patches are always 
+welcome :)
 
 Regards,
 -Denis
-
