@@ -1,45 +1,45 @@
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED59185B
-	for <iwd@lists.linux.dev>; Sun,  9 Apr 2023 16:58:01 +0000 (UTC)
-Received: by mail-ot1-f41.google.com with SMTP id cp25-20020a056830661900b00693ce5a2f3eso1442130otb.8
-        for <iwd@lists.linux.dev>; Sun, 09 Apr 2023 09:58:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD692185B
+	for <iwd@lists.linux.dev>; Sun,  9 Apr 2023 17:24:13 +0000 (UTC)
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-1842eb46746so3695620fac.4
+        for <iwd@lists.linux.dev>; Sun, 09 Apr 2023 10:24:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1681059480; x=1683651480;
+        d=gmail.com; s=20210112; t=1681061053; x=1683653053;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=iXYrAtK0FBSysnLvUWzSGoh53FDWYObl8pJWndGw5P4=;
-        b=YfXG2891ULOm34mNXQ40Gn4fsT6R4RlToLJS7Mzqi7e7w8rCITfH52SHg7HHN5P4Yz
-         e7Lxbpivecxha5TDrQ6+E00Qt4TZHc1qTQfdK2eU9ovHZh36g4/uwaDB5UiP8cJd4reV
-         OEY/euyKK0GV1Wksg+aJmjWVYPuXFpy74sZNV1ZyOS4DUlC+1UjUwVCWGNcAh6hbYfLS
-         mRevpQZC730VdNkPf4evDAmH6IfBt88Telee3zbv9x3AUH/XhzhyBPjpEloM33FAciYg
-         0Y5RSx2apXqfFHtnZMBZ0lWJbJAGNWBL2ShLgdh6DzKutK0ppYWh+htCSJ1DErMHSPR1
-         ZyRA==
+        bh=jVfLuiLxtA2FtAbK75Y5o4f6jQvZ73US6qSVjIt9dtU=;
+        b=cYH2pNX/u9AhP8D4aIVPvxOux2lBCPg3UgUCkK+oQJrbNtrqPqRb2lO/49bgwAzVT1
+         BFeN+LkK6i9JNJLs8yDe1nb8TgdruZDQRnIva6L9tfP1bVo71IfSz2YewsdQcDJTbHMp
+         2JrlXYj+XDMv+nMkI/8eIL4uqFyx8bW6JR+IQn5KwNBU4wqes3WKrPY/GrkxVzoGiq9d
+         ow4LfcseEGsGG1yCdGgY3yZJ665E9WTDHoWA27+rUYfOHUouQOMwEG7Sn8KIvzxPzAel
+         kmWY641rug4RXL7et+4N41yYacpl6Ys3P5yFN81Jk10EjikLy/XIuBjmSk3XvLgY2VvX
+         4xTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681059480; x=1683651480;
+        d=1e100.net; s=20210112; t=1681061053; x=1683653053;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iXYrAtK0FBSysnLvUWzSGoh53FDWYObl8pJWndGw5P4=;
-        b=MY7jR7ruG+0ObZAIQidpgjzFOc52xNuDiVI5CkXUgpxzRlHMR6VzQWUr071U/ZrISB
-         +o3kMCHJv/VxdtLPiQXD8y75ZjVetVqkNVnkO7yX382jY1lBdr9raWBT1jNjh5SdplAX
-         oCy8/+GxTqq0WUinqZ9iePPwsVfS45a9llwCg3iFmmvC1C1koxjvaSnRbuEwOm5yI6lp
-         sgXcmQUfSKRtIwavBNIYx09ggaPjfOXdUWgeT95eOpqFEbf26i+RSLp1fBkIo0L6XXv7
-         sRdCKE622kMuaixiwI2E6mpiSj4Vf0wdkPCaVD0yWyFLmxlYCt+HzRExFcBxhpBgWVd0
-         l5Sg==
-X-Gm-Message-State: AAQBX9cEUqsTfAouAYqv6ye9TOqE7ErqcxPaFC4AJESwHxyF2U9XmYLn
-	hyPH3E5u5JOGsg6XIa7FQ6efsy6MAh5LNA==
-X-Google-Smtp-Source: AKy350alCk8kAAzBsk+Jigfvv7p/nYVEbL+WDxmh8PxX7P7o0wqKRzWdDgFbeL4cbjTStfzclDKCAA==
-X-Received: by 2002:a05:6830:22fc:b0:693:d7bf:dc26 with SMTP id t28-20020a05683022fc00b00693d7bfdc26mr4431626otc.6.1681059480244;
-        Sun, 09 Apr 2023 09:58:00 -0700 (PDT)
+        bh=jVfLuiLxtA2FtAbK75Y5o4f6jQvZ73US6qSVjIt9dtU=;
+        b=CJrx8pujDVcQKNjePWtoejoGANORlB0LKrMc7oJ84KmvadUCk4t3C+6UlFKXMzl6nf
+         y8FEjAUtPI977R1dgACu1nsKxgmJ64JkX0JLkP9m6mCL0vkqBCMO0aNT6it5yd+wyPgM
+         ZW1R0czZVrgIFumFXXPFr8gTIMLcujBAFNUy2t99wFbKB5jqV8nhc2AZ+Dxm/7R8SS6+
+         pJKH65oKzIKoqEgJA7NnCnhBHtqm2L3zMDOtZ0ubYsbSWyrSFu/R7bkkrYVNLCORTE3y
+         COfcfTSJhPS7KLfHoMkTQzu2BT4MFBPK7M590Zs6noG2n9TBCSDHoujnb1pmoT4k+LQj
+         p7/g==
+X-Gm-Message-State: AAQBX9fC4PeMF/OgyFXadQio0HxLhZbRq7sYevvzw93cnagw4AF6i/gD
+	uExsDgzvtOVkJFpzH1Sak1o=
+X-Google-Smtp-Source: AKy350Z807CbnuTILVVEcLxr5Nygb9Ly1eHPvmhZU0lZaMejpp5Hk/c0xgiHwnAn9dZ9LufNUkeMqA==
+X-Received: by 2002:a05:6870:568c:b0:177:ae97:c499 with SMTP id p12-20020a056870568c00b00177ae97c499mr2631843oao.33.1681061052924;
+        Sun, 09 Apr 2023 10:24:12 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id c6-20020a9d67c6000000b006a143873c6bsm3519510otn.50.2023.04.09.09.57.58
+        by smtp.googlemail.com with ESMTPSA id zq36-20020a0568718ea400b0017f647294f5sm3320119oab.16.2023.04.09.10.24.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Apr 2023 09:57:59 -0700 (PDT)
-Message-ID: <9fcce33b-22ad-bb56-d5d3-724450b709b6@gmail.com>
-Date: Sun, 9 Apr 2023 11:47:27 -0500
+        Sun, 09 Apr 2023 10:24:12 -0700 (PDT)
+Message-ID: <1d8a1939-93fe-12b6-5007-e6621dffa7f1@gmail.com>
+Date: Sun, 9 Apr 2023 12:21:02 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,38 +48,46 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: Initial choice of network should consider RSSI?
+Subject: Re: [PATCH 1/2] handshake: include additional sha256 AKMs for PMKID
+ generation
 Content-Language: en-US
-To: Cedric Sodhi <ManDay@openmail.cc>, iwd@lists.linux.dev
-References: <ZDKinaeLzoAvaIb1@air>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20230404203823.384260-1-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <ZDKinaeLzoAvaIb1@air>
+In-Reply-To: <20230404203823.384260-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Cedric,
+Hi James,
 
-On 4/9/23 06:33, Cedric Sodhi wrote:
-> Hello,
+On 4/4/23 15:38, James Prestwood wrote:
+> The 802.11 spec defines what AKMs should use sha256 to derive the
+> PMKID. Hostapd commit b6d3fd05e3 changed the PMKID derivation in
+> accordance with 802.11-2020 which then breaks PMKID validation in
+> IWD. This breaks FT-PSK/8021x AKMs in IWD if the AP uses this
+> hostapd version.
 > 
-> I have a permanent problem with IWD when multiple known networks (different SSIDs) are in range: With a large probably (although it is most likely just random, depending on when the beacons fire) IWD manages to connect to a network with an unusable low RSSI while better networks are available.
+> Updating IWD to use sha256 in these cases will now break backwards
+> compatibility with *older* APs, but this will be worked around in
+> future commits.
+> ---
+>   src/handshake.c | 15 ++++++++++++++-
+>   1 file changed, 14 insertions(+), 1 deletion(-)
 > 
-> I suspect there is currently no logic in place which would somehow work in favor of making a "good" choice? RoamThreshold, for example, doesn't seem to apply and InitialPeriodicScanInterval seems to have no effect either, given that the (initial) connection to the (bad) network happens immediately before InitialPeriodicScanInterval passed, and that choice does not seem to be revised even if the better network becomes visible within InitialPeriodicScanInterval.
 
-Periodic scans are attempted every N seconds, with exponentially increasing N if 
-no connectable network was found.  InitialPeriodicScanInterval simply sets the 
-initial timeout N.  It isn't that iwd scans constantly during that period.
+<snip>
 
-Once a periodic scan completes, and there's something to connect to, iwd 
-attempts to do so.  If there are multiple somethings to connect to, then iwd 
-prioritizes networks based on estimated throughput (this is where the RSSI is 
-taken into account) and which network was most recently used.  There are some 
-other factors.
+>   	if (s->akm_suite & (IE_RSN_AKM_SUITE_8021X_SHA256 |
+> -			IE_RSN_AKM_SUITE_PSK_SHA256))
+> +			IE_RSN_AKM_SUITE_PSK_SHA256 |
+> +			IE_RSN_AKM_SUITE_FT_OVER_8021X |
+> +			IE_RSN_AKM_SUITE_FT_USING_PSK))
 
-> 
-> Would it possible to either extend the meaning of InitialPeriodicScanInterval or introduce another option which would allow IWD to connect to a better, different SSID (thus not covered by roaming) within an initial period?
-If you have a more concrete proposal please share it.  And patches are always 
-welcome :)
+I don't see that the hostapd commit is actually adding FT_USING_PSK to use 
+sha256 generation? Only FT_OVER_8021X?  Is this a bug on their side?
+
+However, one consequence of this is that preauthentication is likely broken for 
+FT-over-8021x networks?  Do we even test this case?
 
 Regards,
 -Denis
