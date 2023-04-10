@@ -1,38 +1,38 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284C86FB4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F9F79D9
 	for <iwd@lists.linux.dev>; Mon, 10 Apr 2023 22:01:43 +0000 (UTC)
-Received: by mail-pj1-f53.google.com with SMTP id j8so4319343pjy.4
+Received: by mail-pj1-f51.google.com with SMTP id c3so6850846pjg.1
         for <iwd@lists.linux.dev>; Mon, 10 Apr 2023 15:01:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1681164102;
+        d=gmail.com; s=20210112; t=1681164103;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K0K8Lmj43PBGXMdgm/treQUpRe5ZPK6+q1fTDzraLa4=;
-        b=CYTm6U673Zsg1GHGXeDGKG/q7vNyiMzQB+nDzAVYtLt2ccIISBXg8nL4VjpOv3wa4d
-         1JMHdhldBSze7Pc9+yA/Yeyk7y6LFwU0x1i/RHKL8u/d0OZuARpfIuX/qB1IraOjyQeH
-         UYASJYmSFxXwEgvs6MFwxDRU0LrLgWIRe3yLVL1vi4p0PvNzylTS1t3bchFRpkoyIg/+
-         WTZ6/90KIZkgJ4CxocfonLX1HCqi6oc5sI9PE9KPTOSdUFtLoZQ2VWayr+KCrYM9Ib/R
-         Vsv8dyoCSEEiqkAv/60dQnsAtFag0vX6DXgv3eodQfbL3AP6dkXjnDOtiDpa6+lOWetE
-         yhtw==
+        bh=QNA9Oj0M6msydbKlLkZNs9CH8dYLnbdvvQuG+sEfTsk=;
+        b=QuZsius6JDa+LGnT7xkjJDIGQyQvOvKvY1dYhYjRMMHco91czeV8D+Kd9asawED3B9
+         2eBV1wxS/gixO1L5V3NSn/2awArfEfytAN5xpJKHKtwg1zs4sU1bnVjCpbTwPC+D54GN
+         v5tXIQAo1Jf+R2QIXQiWrxzwpzwQMWBCZbMANf71zWvPR4SI+Ll+35zZM5ebh/aN16fy
+         G6SfQPQzUm6q1pYejlCopBhZ7cPZcXvz3U62lpMXDJE8D0b3hp4NpZhU+jrRbOqjTMVM
+         fYOo30yUbH45eTSJxDIjHVhMvig0vHuSsuukOlaX9Dk4fYXdXMsC8OK3v7wgA6EzrlZt
+         6q2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681164102;
+        d=1e100.net; s=20210112; t=1681164103;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=K0K8Lmj43PBGXMdgm/treQUpRe5ZPK6+q1fTDzraLa4=;
-        b=3zdD1Iuk+ggNukIho8v1ghlj+/4hiPHWERxvzLM2V7EbpzpI1CNfRSOeYIyByfTW4+
-         QBw6g23/6tBxcUSYtysZDVuNefRTQNgJVrQhaAm1KwMqmmMpsn1Mp3B6cIKqEdruinUJ
-         /mORywx5vHYoVzf+VKkuD0i29uP8ZufBGEagLmoL3BfisWvcQSJBpdOP2nMleObXvgtG
-         c0inYgqZbZ4NwTpNjdExdX4+K1b1uqyVvQAsNsUQBYtgyH3x7sLDG5h9q907VOWw8o/8
-         wrDYKU6sSBmAOMBcfc6BoxEnRVPr3l8XOegCEn8IhqEHA7LB3BRWThV0xcymMKg70JVH
-         QdPg==
-X-Gm-Message-State: AAQBX9fAurCIc/m28f2pU8RvsKTsHn5UyaXkPDQ8/SwFN03EysOiqPmW
-	IkmpStmo1Ezi4Lmev8MvHQaRCodPw1SuGQ==
-X-Google-Smtp-Source: AKy350YuwPqsb17CyCJhbedEHn1VQ7BMXNNQ0r2y3G1ryjHslS6gIUolcsLluDpgQoIGH3DbVRxBVw==
-X-Received: by 2002:a17:903:2347:b0:1a6:413c:4a54 with SMTP id c7-20020a170903234700b001a6413c4a54mr5790505plh.1.1681164102412;
+        bh=QNA9Oj0M6msydbKlLkZNs9CH8dYLnbdvvQuG+sEfTsk=;
+        b=VrLKpaOsrLEllSIAtFUefzf+n7UADSJLyflB7aMmyC+OpszBM+C2FZ/CEzciPUQSGg
+         MXPDJbZXn7FAjzxJp7XaoHRsSJ8cFO1a2wb1pYY4wZcI1pSNsbKwtLrvwzn1EVNQJFA0
+         DrwhGmkcK4G2B+k2qzSqbiPuUK2fzV6zQQAS1OF9dZOrmBE8eCYu2vOwd01/4nDPJ+cG
+         7szaOs+QM2lXmK0MyY46vTDb8X50Haj7tJXO5w8XxY695p9LKEujXH5r0lua+kWC6pUp
+         D54jAR52DA8/WJvtGckMtcLYPOm7GTMazTwEbJ5wuGFwJoJ1ySghPMkGDdqVTzrurl3D
+         ieBQ==
+X-Gm-Message-State: AAQBX9cs2jJbc2cA0Ldgs/MyxjQTrGI2VEaL81ZA8R9ni30WxP6AKR0E
+	Hhk7dWxZy+M0koMCc3yvUcFXctxIwhCFhQ==
+X-Google-Smtp-Source: AKy350a9Ulc3W+tS+sfeViVT5lzrf10S9zbXk7BsNCRhxJwB0ci5TZ1xE1lVBzOcNdABJIs5B3GWZw==
+X-Received: by 2002:a17:902:cece:b0:1a1:e364:3452 with SMTP id d14-20020a170902cece00b001a1e3643452mr17780255plg.29.1681164102852;
         Mon, 10 Apr 2023 15:01:42 -0700 (PDT)
 Received: from localhost.localdomain ([50.39.172.77])
         by smtp.gmail.com with ESMTPSA id s18-20020a170902b19200b001a2806ae2f7sm8263372plr.83.2023.04.10.15.01.42
@@ -41,9 +41,9 @@ Received: from localhost.localdomain ([50.39.172.77])
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/9] handshake: include additional sha256 AKMs for PMKID generation
-Date: Mon, 10 Apr 2023 15:01:28 -0700
-Message-Id: <20230410220135.373872-3-prestwoj@gmail.com>
+Subject: [PATCH 3/9] crypto: add hmac_sha384 support for PMKID derivation
+Date: Mon, 10 Apr 2023 15:01:29 -0700
+Message-Id: <20230410220135.373872-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230410220135.373872-1-prestwoj@gmail.com>
 References: <20230410220135.373872-1-prestwoj@gmail.com>
@@ -55,48 +55,24 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The 802.11 spec defines what AKMs should use sha256 to derive the
-PMKID. Hostapd commit b6d3fd05e3 changed the PMKID derivation in
-accordance with 802.11-2020 which then breaks PMKID validation in
-IWD. This breaks FT-PSK/8021x AKMs in IWD if the AP uses this
-hostapd version.
-
-Updating IWD to use sha256 in these cases will now break backwards
-compatibility with *older* APs, but this will be worked around in
-future commits.
+SHA384 is required by several AKMs
 ---
- src/handshake.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ src/crypto.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/src/handshake.c b/src/handshake.c
-index 39a650c5..82e0c1c2 100644
---- a/src/handshake.c
-+++ b/src/handshake.c
-@@ -754,10 +754,23 @@ bool handshake_state_get_pmkid(struct handshake_state *s, uint8_t *out_pmkid)
- 	 * preauthentication, the AKM has not yet been negotiated. In this
- 	 * case, the HMAC-SHA1-128 based derivation is used for the PMKID
- 	 * calculation."
-+	 *
-+	 * 802.11-2020 Table 9-151 defines the hashing algorithm to use
-+	 * for various AKM's. SHA256 should be used for the following
-+	 * AKM's (for this API context):
-+	 *
-+	 * 00-0F-AC:3 (FT-8021X)
-+	 * 00-0F-AC:4 (FT-PSK)
-+	 * 00-0F-AC:5 (8021X-SHA256)
-+	 * 00-0F-AC:6 (PSK-SHA256)
-+	 *
-+	 * (Note SAE/FILS were left out as they generate their own PMKID)
- 	 */
- 
- 	if (s->akm_suite & (IE_RSN_AKM_SUITE_8021X_SHA256 |
--			IE_RSN_AKM_SUITE_PSK_SHA256))
-+			IE_RSN_AKM_SUITE_PSK_SHA256 |
-+			IE_RSN_AKM_SUITE_FT_OVER_8021X |
-+			IE_RSN_AKM_SUITE_FT_USING_PSK))
- 		sha = L_CHECKSUM_SHA256;
- 	else
- 		sha = L_CHECKSUM_SHA1;
+diff --git a/src/crypto.c b/src/crypto.c
+index f8aba7d8..6b8a7b1e 100644
+--- a/src/crypto.c
++++ b/src/crypto.c
+@@ -1132,6 +1132,8 @@ bool crypto_derive_pmkid(const uint8_t *pmk, size_t key_len,
+ 		return hmac_sha1(pmk, key_len, data, 20, out_pmkid, 16);
+ 	case L_CHECKSUM_SHA256:
+ 		return hmac_sha256(pmk, key_len, data, 20, out_pmkid, 16);
++	case L_CHECKSUM_SHA384:
++		return hmac_sha384(pmk, key_len, data, 20, out_pmkid, 16);
+ 	default:
+ 		l_error("Checksum type %u is not valid", checksum);
+ 		return false;
 -- 
 2.25.1
 
