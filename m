@@ -1,122 +1,112 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1255B3217
-	for <iwd@lists.linux.dev>; Mon, 10 Apr 2023 17:10:18 +0000 (UTC)
-Received: by mail-pj1-f45.google.com with SMTP id y11-20020a17090a600b00b0024693e96b58so3931754pji.1
-        for <iwd@lists.linux.dev>; Mon, 10 Apr 2023 10:10:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C9C3217
+	for <iwd@lists.linux.dev>; Mon, 10 Apr 2023 17:12:34 +0000 (UTC)
+Received: by mail-pj1-f49.google.com with SMTP id nh20-20020a17090b365400b0024496d637e1so10456996pjb.5
+        for <iwd@lists.linux.dev>; Mon, 10 Apr 2023 10:12:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1681146618;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=J21N4KqtnNZtiKXKsjGWvR9RlMtx3SNbP6bQmMX7cVM=;
-        b=TNhYB7wePuFZLDtXIeCsoy+KrLX80RQmNUkeuuosvX9InREJyvx4G52rKytpFmkrHQ
-         iZla4w2ygaYuR9fTia5cpu5z0KbUL9NXZqyRBY9W52u/VJwU6J0c03He3mM2AoTFx83q
-         6nmqi5hCk6Tm9A5OIZaCV7NLWkWSsh7jZoOnJlDvhXEGJu4PBVhU4jLeNUDmaS4vMYSO
-         LuA+AGz2sF5bDbB/JgNHr213iJGqyjMRgky3elHXYV9SYXas61+7PnpwHXvspjHoeqO1
-         Y1tOK5iY8vmd87eHaludDlUOEkw0IbMhQUhCFnUVujLDxx3SCsc2mNuIaUhbQTCm3D+E
-         yFgg==
+        d=gmail.com; s=20210112; t=1681146754;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=iG7YVwZXm2r+2ij5Ld6cYqf7GvKGPxiACjn+l56m/To=;
+        b=oWrhUz+H6Q0De4Ka8KLP8GvykW+Gtb0/1OF48BuDtv9t9Pd7vDTtSv8SV69tuYYyQq
+         /O5alxVPG3RAbnjWiPvQbnVSnQKD7NI4MBhUG1rzPjdaLI9QVOEBqtEr1W75rfP65i4f
+         NsHv1UZWzbyi2cy6emx0Qq6K1F1vpOTPtofSLBoz6K7vqdRpJVuV2euLa6OwSAl5yghc
+         7Waz++qaI6dMq4BTRH4sPqxeAvUEPPYkTemMky95GYOt+vWdtUKu/crbb2rR8K1rCfTe
+         jLz3aZuPV9mZiDqFRo202icqov+wYOafKWz78x4N+sSp8iml3V1jZduspfaQzrfqDsSh
+         9SIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681146618;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J21N4KqtnNZtiKXKsjGWvR9RlMtx3SNbP6bQmMX7cVM=;
-        b=dRS+Fs2eZc9L4npi1vEPpI7sVdm0muJAke20aYdBbsaIAMd4cJU/zw6IHMTLi/j2qH
-         EecdFUmuPUpn1GwROgt4jw1dqKWtpxhYRyVeoiP/Bnm3Vqxe3am8+UbezIt3G8WgV/kX
-         LXyd3BCgkZNs4fxWsD0KMeR3orye0rSsC2fkeJtRTjuqjj8Sw/9IfGq8KDVAny5ZPnMC
-         qJM2r4b6BDLNXifzsvvXNHiAdxVEAGO5rkK/mJ3AaSkTgBTfcNNpdQP2KO/IXs2Hx0Ph
-         QMEgGdkVZWJTwSKz2MrQ7KSPW6xqnMfFEGh1eiE0rgIfLISs82aU07jKp7RECODwtZXN
-         seRA==
-X-Gm-Message-State: AAQBX9f5ycOTND9HUyiuZ99gAXUcvpdcvC09LqfopyfEzx57PKfMyV7Q
-	Y2vUH0HRZnyE/zrmolfkm2S7SI2W4yq2jw==
-X-Google-Smtp-Source: AKy350ZcId0pp5KwC4W3oqbjfVY21uncduzjWypVz/+ibheCtKgKmOEvqptRbTKnfcq8k+bZ9kZs0g==
-X-Received: by 2002:a05:6a20:8b1f:b0:da:66f4:5ad9 with SMTP id l31-20020a056a208b1f00b000da66f45ad9mr8444732pzh.22.1681146618256;
-        Mon, 10 Apr 2023 10:10:18 -0700 (PDT)
-Received: from [192.168.254.76] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id k14-20020aa790ce000000b005abc0d426c4sm8093775pfk.54.2023.04.10.10.10.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Apr 2023 10:10:17 -0700 (PDT)
-Message-ID: <f3259b4c-e8e3-8542-247b-9d6bd0ad00af@gmail.com>
-Date: Mon, 10 Apr 2023 10:10:17 -0700
+        d=1e100.net; s=20210112; t=1681146754;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iG7YVwZXm2r+2ij5Ld6cYqf7GvKGPxiACjn+l56m/To=;
+        b=G+X0hdWBhutlI5/AJW05TBGnGOLPWYqKIUSyxPvWPpG4KlhLAZkFZA7eDw0Pg8lnGt
+         dSI3anSwwxAY3+7pMVvg4n8nzth5u0mXx3MNNgpbiuQ+SZ09qsTgKbXe4lWqOyrCIveI
+         xrpQqizPVLMtH5foBRxX8PKUYYtsqBcpcqXw71kxLjUI8FFm6wT7TiXhtOyoJT08/FNQ
+         EOd9kPEBROtURdYoB4vvD+ZSubq+WBSGlEG7EUGUkYaCCPsyjYuaC2IVG9It/QzcjS+T
+         0qx8IUWX08KLVt0DtGghor7JLOZE8K5SY+7i5Kz7YZnwsEEZEJICQBUKn+PjQWvf7pUa
+         wiLw==
+X-Gm-Message-State: AAQBX9dMaYjYp4E+fN+d1jWhtuuPheX2nI9v1NQuIcwuxzrZTF4IO7ch
+	yP0/4emt1qYMHUAGiakK5rbpTRf+uFr6+Q==
+X-Google-Smtp-Source: AKy350bL44co7OrbsI98rBoqWrSyfP47xbJ/s5zExwbZfJEdLvWHUYhgyG+MnAZaExQiQeAoVYZ8Cw==
+X-Received: by 2002:a17:902:da8a:b0:1a0:5524:eb8e with SMTP id j10-20020a170902da8a00b001a05524eb8emr16633097plx.68.1681146753932;
+        Mon, 10 Apr 2023 10:12:33 -0700 (PDT)
+Received: from localhost.localdomain ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id p4-20020a170902b08400b001a634e79af0sm3057928plr.283.2023.04.10.10.12.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Apr 2023 10:12:33 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] hwsim: properly cleanup rules queue
+Date: Mon, 10 Apr 2023 10:12:32 -0700
+Message-Id: <20230410171232.32739-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH 1/2] handshake: include additional sha256 AKMs for PMKID
- generation
-Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20230404203823.384260-1-prestwoj@gmail.com>
- <1d8a1939-93fe-12b6-5007-e6621dffa7f1@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <1d8a1939-93fe-12b6-5007-e6621dffa7f1@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Denis,
+After adding prefix matching the rule structure contained allocated
+memory which was not being cleaned up on exit if rules still
+remained in the list (removing the rule via DBus was done correctly)
+---
+ tools/hwsim.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-On 4/9/23 10:21 AM, Denis Kenzior wrote:
-> Hi James,
-> 
-> On 4/4/23 15:38, James Prestwood wrote:
->> The 802.11 spec defines what AKMs should use sha256 to derive the
->> PMKID. Hostapd commit b6d3fd05e3 changed the PMKID derivation in
->> accordance with 802.11-2020 which then breaks PMKID validation in
->> IWD. This breaks FT-PSK/8021x AKMs in IWD if the AP uses this
->> hostapd version.
->>
->> Updating IWD to use sha256 in these cases will now break backwards
->> compatibility with *older* APs, but this will be worked around in
->> future commits.
->> ---
->>   src/handshake.c | 15 ++++++++++++++-
->>   1 file changed, 14 insertions(+), 1 deletion(-)
->>
-> 
-> <snip>
-> 
->>       if (s->akm_suite & (IE_RSN_AKM_SUITE_8021X_SHA256 |
->> -            IE_RSN_AKM_SUITE_PSK_SHA256))
->> +            IE_RSN_AKM_SUITE_PSK_SHA256 |
->> +            IE_RSN_AKM_SUITE_FT_OVER_8021X |
->> +            IE_RSN_AKM_SUITE_FT_USING_PSK))
-> 
-> I don't see that the hostapd commit is actually adding FT_USING_PSK to 
-> use sha256 generation? Only FT_OVER_8021X?  Is this a bug on their side?
+diff --git a/tools/hwsim.c b/tools/hwsim.c
+index 7afbe4e7..47352ad4 100644
+--- a/tools/hwsim.c
++++ b/tools/hwsim.c
+@@ -2092,6 +2092,19 @@ static void setup_rule_manager_interface(struct l_dbus_interface *interface)
+ 				rule_add, "o", "", "path");
+ }
+ 
++static void destroy_rule(void *user_data)
++{
++	struct hwsim_rule *rule = user_data;
++
++	if (rule->prefix)
++		l_free(rule->prefix);
++
++	if (rule->match)
++		l_free(rule->match);
++
++	l_free(rule);
++}
++
+ static struct l_dbus_message *rule_remove(struct l_dbus *dbus,
+ 						struct l_dbus_message *message,
+ 						void *user_data)
+@@ -2102,13 +2115,8 @@ static struct l_dbus_message *rule_remove(struct l_dbus *dbus,
+ 	path = rule_get_path(rule);
+ 	l_queue_remove(rules, rule);
+ 
+-	if (rule->prefix)
+-		l_free(rule->prefix);
++	destroy_rule(rule);
+ 
+-	if (rule->match)
+-		l_free(rule->match);
+-
+-	l_free(rule);
+ 	l_dbus_unregister_object(dbus, path);
+ 
+ 	return l_dbus_message_new_method_return(message);
+@@ -3131,7 +3139,7 @@ int main(int argc, char *argv[])
+ 
+ 	l_dbus_destroy(dbus);
+ 	hwsim_radio_cache_cleanup();
+-	l_queue_destroy(rules, l_free);
++	l_queue_destroy(rules, destroy_rule);
+ 
+ 	l_netlink_destroy(rtnl);
+ 
+-- 
+2.25.1
 
-Ugh, yep looks like its a bug on their side, at least according to 
-12.7.1.6.3. There is another API rsn_pmkid(), which also doesn't include 
-FT_USING_PSK, but references the 2016 spec (which is ambiguous).
-
-Hostapd/wpa_supplicant get around this by not checking the PMKID KDE 
-unless enabled... :/
-
-So I think like you mentioned in patch 2 we just need to try both ways, 
-at least for these AKMs in question. So my idea would be to add these 
-AKMs to handshake_state_get_pmkid() (plus SHA384), then introduce 
-handshake_state_check_pmkid() which will try both (for use in eapol). 
-Sound good?
-
-> 
-> However, one consequence of this is that preauthentication is likely 
-> broken for FT-over-8021x networks?  Do we even test this case?
-
-I don't think we have this problem, 802.11 disallows preauthentication 
-for FT networks:
-
-"A STA shall not use preauthentication within the same mobility domain 
-if an AKM suite type for which the Authentication type column indicates 
-FT authentication"
-
-Thanks,
-James
-
-> 
-> Regards,
-> -Denis
