@@ -1,75 +1,130 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp161.vfemail.net (smtp161.vfemail.net [146.59.185.161])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63634185B
-	for <iwd@lists.linux.dev>; Sun,  9 Apr 2023 17:29:25 +0000 (UTC)
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-18436e0b673so2955422fac.0
-        for <iwd@lists.linux.dev>; Sun, 09 Apr 2023 10:29:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1681061364; x=1683653364;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HajUozQgO5fkUtNjYa1VN4K3l695dVm/OV1yA5q9ejI=;
-        b=E38qAiwGL9e10lr/EH3f05nd2EunmUYE3qMpBWo5sh12SvrWQzJShZmG51wKmG4q7u
-         WlwShgxl5bs0Y2c9/0dnFw1Cah9Z/rJIToqOgqN/KU++MKf9AJxeX8HVTfKDu4hciLQT
-         2XHfcTfVPYqgmD49GVYa/52PAdnxFuGV9LuqQ1UPDHfiS0B2eAST0VYzQ9tMEwcTJgTH
-         k8PcfyIOkS2zozOc7GvXvudUgUhG/vpFWEFYrbtlXGYVuWZxhe3G+QkCfxl8gaV4Lj+D
-         yZfd4aDIy8hY32FbJ1jeRYQ4r/KgxuY4vXNF1Wzr0AZrmZ/fDYHGxsTbq9OaXwnTY/0b
-         p2Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681061364; x=1683653364;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HajUozQgO5fkUtNjYa1VN4K3l695dVm/OV1yA5q9ejI=;
-        b=2DP8a70aWrINPI09W7kA5M1D8OdSaD1nh6OdAPoA3jWeFvA1n4ITzLveJbayqKe//C
-         lXrgldrmEgPB+tO8kEXlIjON1GSu9sdFK5STsvegl8C9c+OUKxq6Dq7fD1+WfswsXWEv
-         nuCOkfN+2hJ6XAETpJHGtk1jeRfPAHZbzHmDv+oW+dKyu4PxOPSP2qFUDP4hSYVX8OTO
-         Csdv/h1TO0sQ+6CFdJLE+i43E+Of+nUQikSVVLbQXa9DvCemqr3EyPnBbw4RN13OeCsr
-         9RLslcCVBJ3FfIgO1hLUgoxzyp2vh7ctaoqUZjWis5lw7yzqj+9tQ3sY8jiVlC5ItRC1
-         G3/g==
-X-Gm-Message-State: AAQBX9fgGH45rXsNgXhqIzC6C6k/HIviANkoXyvVon8rcYbYz/f2AiN2
-	te69vwRYK9NJ0tKSnEe+szmhmO9ghnqGgw==
-X-Google-Smtp-Source: AKy350YPpsP5am2AWJQKXfbfZbmvO3OVFL2nbOf/fZ9FrFR/MZY0JN9x2itCmG6kq5yC3eLzLWoWdw==
-X-Received: by 2002:a05:6870:a115:b0:172:6d0c:e98c with SMTP id m21-20020a056870a11500b001726d0ce98cmr3213961oae.29.1681061364494;
-        Sun, 09 Apr 2023 10:29:24 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id tr15-20020a0568718c0f00b001802d3e181fsm3337538oab.14.2023.04.09.10.29.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Apr 2023 10:29:23 -0700 (PDT)
-Message-ID: <504042cf-1704-a590-391c-009b500cf505@gmail.com>
-Date: Sun, 9 Apr 2023 12:23:52 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BBD23A8
+	for <iwd@lists.linux.dev>; Mon, 10 Apr 2023 06:04:28 +0000 (UTC)
+Received: (qmail 21736 invoked from network); 10 Apr 2023 06:04:26 +0000
+Received: from localhost (HELO nl101-3.vfemail.net) ()
+  by smtpout.vfemail.net with ESMTPS (ECDHE-RSA-AES256-GCM-SHA384 encrypted); 10 Apr 2023 06:04:26 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=simple; d=openmail.cc; h=date:from
+	:to:cc:subject:message-id:references:mime-version:content-type
+	:content-transfer-encoding:in-reply-to; s=2018; bh=Fb81Chk4/Qz1l
+	Xm5baKs4Iud/TbZMIFo7OBI3qNG5cE=; b=r2YHpQ2PCe+ID6Jk43OZRQKVtw0M0
+	2s6vkkH9Kfm4mwHGg3w/Y9lylXRz8/+K+1LaDxY75w2rZkbCx7U0SYcl0TKfpQRQ
+	MEdsSZBv6JtG3VV87WDaVBomr+mod/YyHJjDfkIfp8MpjPzv5fZTD9iqp66sUM22
+	Tk1vZYzwY14OPo=
+Received: (qmail 43401 invoked from network); 10 Apr 2023 06:04:26 -0000
+Received: by simscan 1.4.0 ppid: 43393, pid: 43397, t: 0.0991s
+         scanners:none
+Received: from unknown (HELO bmwxMDEudmZlbWFpbC5uZXQ=) (bWFuZGF5QG9wZW5tYWlsLmNj@MTkyLjE2OC4xLjE5Mg==)
+  by nl101.vfemail.net with ESMTPA; 10 Apr 2023 06:04:25 -0000
+Date: Mon, 10 Apr 2023 09:04:35 +0300
+From: Cedric Sodhi <ManDay@openmail.cc>
+To: James Prestwood <prestwoj@gmail.com>
+Cc: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+Subject: Re: Initial choice of network should consider RSSI?
+Message-ID: <ZDOm8xHuEXQ7l1EZ@air>
+References: <ZDKinaeLzoAvaIb1@air>
+ <9fcce33b-22ad-bb56-d5d3-724450b709b6@gmail.com>
+ <CAPv5Ue6KEZVxT2Mb15bBH_8n53abvJbu_+aCTHJgP9ODU3AT5Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 1/2] handshake: include additional sha256 AKMs for PMKID
- generation
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20230404203823.384260-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20230404203823.384260-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAPv5Ue6KEZVxT2Mb15bBH_8n53abvJbu_+aCTHJgP9ODU3AT5Q@mail.gmail.com>
 
-Hi James,
+Hello and thank you for the responses.
 
->   	if (s->akm_suite & (IE_RSN_AKM_SUITE_8021X_SHA256 |
-> -			IE_RSN_AKM_SUITE_PSK_SHA256))
-> +			IE_RSN_AKM_SUITE_PSK_SHA256 |
-> +			IE_RSN_AKM_SUITE_FT_OVER_8021X |
-> +			IE_RSN_AKM_SUITE_FT_USING_PSK))
->   		use_sha256 = true;
->   	else
->   		use_sha256 = false;
+Denis, perhaps I misunderstood something, my description wasn't clear or/and (most likely, after I looked at iwd -d), my diagnosis was wrong in the first place, but I thought that the problem was that iwd will connect to a network as soon as a network can be connected to and it will not _revise_ that decision (connect to a better network afterwards). That would become a problem if a "bad" network becomes known moments before the "good" network becomes known.
 
-Oh and we probably should extended this and crypto_derive_pmkid to use sha384.
+Looking at iwd -d, however, I get the following list, before it attempt to connect to BAD_NETWORK
 
-Regards,
--Denis
+src/station.c:station_add_seen_bss() Processing BSS '24:5a:4c:25:f4:71' with SSID: BAD_NETWORK, freq: 5220, rank: 736, strength: -7200, data_rate: 90.0
+src/station.c:station_add_seen_bss() Added new Network "BAD_NETWORK" security psk
+src/station.c:station_add_seen_bss() Processing BSS '68:72:51:48:72:c2' with SSID: GOOD_NETWORK, freq: 2412, rank: 492, strength: -5400, data_rate: 72.2
+src/station.c:station_add_seen_bss() Added new Network "GOOD_NETWORK" security psk
+src/station.c:station_add_seen_bss() Processing BSS '24:5a:4c:24:f4:71' with SSID: BAD_NETWORK, freq: 2462, rank: 472, strength: -7300, data_rate: 57.8
+src/station.c:station_add_seen_bss() Processing BSS 'cc:2d:21:5d:dd:95' with SSID: BAD_NETWORK3, freq: 5240, rank: 443, strength: -7600, data_rate: 65.0
+src/station.c:station_add_seen_bss() Added new Network "BAD_NETWORK3" security psk
+src/station.c:station_add_seen_bss() Processing BSS 'cc:2d:21:5d:dd:91' with SSID: BAD_NETWORK2, freq: 2417, rank: 197, strength: -7400, data_rate: 28.9
+src/station.c:station_add_seen_bss() Added new Network "BAD_NETWORK2" security psk
+src/station.c:station_add_seen_bss() Processing BSS '24:5a:4c:24:f4:73' with SSID: BAD_NETWORK, freq: 2462, rank: 90, strength: -8300, data_rate: 11.0
+src/station.c:station_add_seen_bss() Processing BSS 'd8:32:14:ee:a3:d1' with SSID: BAD_NETWORK2, freq: 2422, rank: 37, strength: -8500, data_rate: 5.5
+
+so from what you write James, I think the problem lies in the estimated data rate, given how it appears high on the network with bad RSSI.
+
+I suspect the recommended course of action at this point is just blacklist the station which seems to yield a "misleading high" data rate!
+
+Unless my assumption about how iwd doesn't "revise" network choices during an initial scan period is somehow valid or related to my probelem, I suppose this is an issue with the particular station then and has nothing to do with iwd's behaviour, so thanks for the help!
+
+Cedric
+
+On Sun, Apr 09, 2023 at 10:07:34AM -0700, James Prestwood wrote:
+>    Hi Cedric,
+> 
+>    On Sun, Apr 9, 2023, 9:58 AM Denis Kenzior <[1]denkenz@gmail.com> wrote:
+> 
+>      Hi Cedric,
+> 
+>      On 4/9/23 06:33, Cedric Sodhi wrote:
+>      > Hello,
+>      >
+>      > I have a permanent problem with IWD when multiple known networks
+>      (different SSIDs) are in range: With a large probably (although it is
+>      most likely just random, depending on when the beacons fire) IWD manages
+>      to connect to a network with an unusable low RSSI while better networks
+>      are available.
+>      >
+>      > I suspect there is currently no logic in place which would somehow
+>      work in favor of making a "good" choice? RoamThreshold, for example,
+>      doesn't seem to apply and InitialPeriodicScanInterval seems to have no
+>      effect either, given that the (initial) connection to the (bad) network
+>      happens immediately before InitialPeriodicScanInterval passed, and that
+>      choice does not seem to be revised even if the better network becomes
+>      visible within InitialPeriodicScanInterval.
+> 
+>      Periodic scans are attempted every N seconds, with exponentially
+>      increasing N if
+>      no connectable network was found.  InitialPeriodicScanInterval simply
+>      sets the
+>      initial timeout N.  It isn't that iwd scans constantly during that
+>      period.
+> 
+>      Once a periodic scan completes, and there's something to connect to, iwd
+>      attempts to do so.  If there are multiple somethings to connect to, then
+>      iwd
+>      prioritizes networks based on estimated throughput (this is where the
+>      RSSI is
+>      taken into account) and which network was most recently used.  There are
+>      some
+>      other factors.
+> 
+>      >
+>      > Would it possible to either extend the meaning of
+>      InitialPeriodicScanInterval or introduce another option which would
+>      allow IWD to connect to a better, different SSID (thus not covered by
+>      roaming) within an initial period?
+>      If you have a more concrete proposal please share it.  And patches are
+>      always
+>      welcome :)
+> 
+>    It would also be helpful to see the debug logs too see why IWD chose the
+>    network it did. This would answer questions I have like:
+>    Did the scan only see one network?
+>    What was the estimated data rate of both networks?
+>    How good/bad was the RSSI between the two networks in question?
+>    Thanks,
+>    James
+> 
+>      Regards,
+>      -Denis
+> 
+> References
+> 
+>    Visible links
+>    1. mailto:denkenz@gmail.com
