@@ -1,74 +1,98 @@
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E842F4A32
-	for <iwd@lists.linux.dev>; Sun, 16 Apr 2023 18:14:53 +0000 (UTC)
-Received: by mail-oi1-f170.google.com with SMTP id ec6so8602203oib.8
-        for <iwd@lists.linux.dev>; Sun, 16 Apr 2023 11:14:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 293CA29B0
+	for <iwd@lists.linux.dev>; Mon, 17 Apr 2023 18:55:04 +0000 (UTC)
+Received: by mail-qt1-f170.google.com with SMTP id fy11so1757751qtb.12
+        for <iwd@lists.linux.dev>; Mon, 17 Apr 2023 11:55:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681668893; x=1684260893;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pjzFuZKQthxsk/RSy9p8ZXdQiVZlJ5E6PMziSsoD57E=;
-        b=F95+8acHu6hUMtnWrtgPws95+DCI3F85FJsOAyzaU6vtq59GKP4koRcDbQma2SE5xo
-         QEsfRJ0jyUhPTqrH7slJO02yOlUwdDH+YMJAZrPcIRUVs6pJSho2hXDZA2X7+QIhxLoi
-         0dznOXT1y1s3PUS1/4Yz65IiKITlSHJgdatHMIfKR0NuwWU9h0jMdKq+yZn8xekAVVSw
-         +TwvWoXlhJV3IGaUgFGstHMnDdqRd8mz2HrWn0sMxzZXz8/N3WfRcb0HBIpFaRsT72bW
-         270+hsQUQEM0QwycZpgjPEpsrWtmh6LsrFajKiygykBGDQACqGJnRmp05WZY/hb1HhiU
-         OHig==
+        d=gmail.com; s=20221208; t=1681757703; x=1684349703;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=k/SqCLgIGI0Zp500hnhFpI2+sXE39r/wn28s+l0PZR0=;
+        b=aY6GO99rIKWeQzat3UjtxFmV7V7y7bk2yFLxB/AybTGzDvJoyEjhLmywajy551EAdO
+         hFZH81QwNfJSVwMHqoWaEihSJm/fZbN7aBSkZM2yIux0pT1r40yxPGCcILpfJwrzUyVx
+         bJGBNVFLWdpWWXAJ1HvCNgr31nK74NFqdGlprtcXZzIeeqCeOxJ4IRU1enSbOM/bmbM1
+         DUxNLH6aIo4hatVeF/gSBiPxF+OevQoWUPAKckJjq6CHPvbyho+IzLQYL4ZzHLtcbFcX
+         9sz6H9TNlTbu57c5r2ZJcaGf3ceszcucg50UQ7+pl+g7+FJu3KG2ECfJEkwgvkFLfHF0
+         +BVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681668893; x=1684260893;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pjzFuZKQthxsk/RSy9p8ZXdQiVZlJ5E6PMziSsoD57E=;
-        b=dSoj8XJLYjjoped0vvstOzLI9WioGDBGPxr2aTIBEopMzw9nh3Hj37uW+a6KdpqDxa
-         Q8XgmXkxy28YgLCGvCVq+AXA/oFqDfhihGgh+xsg3UKNv0W0DQsn09tv9ELPFwqAFIbc
-         McF5+RjrsSk87qUIXHgLRDzsxSl1W+0ngl/NoxeaSY9VFs/DCdzlMT5p6WcF+lz47ewe
-         jz2eSBCOW3QbLvMIGizI4Gd+d7H6k1odDkfDF0po+coJj8fg/J95sktLlpqdtoeG75Ae
-         9K7EgrEorGQ24kXJrf9VTEs1LD6xTFI8umf8lm/GvRqVk4N6KfudtfmEEUkA5uS2e5jH
-         IUxQ==
-X-Gm-Message-State: AAQBX9ec1ady+R8gxn2om1q6G6Ah3llBWT+zBAVXypcB7DidW57QlIFH
-	KtCMTDJGNS3Vo5tMrRPPCD5P1HaKKmNx3Q==
-X-Google-Smtp-Source: AKy350bMBTDCmEfjOW5S47N8CtB4IZ5xZRluEPueZXyVd2Y159cyV+tbDmOXL5BztA91LPUFPtZcAQ==
-X-Received: by 2002:a05:6808:4346:b0:386:c50a:c8fa with SMTP id dx6-20020a056808434600b00386c50ac8famr5373779oib.28.1681668893103;
-        Sun, 16 Apr 2023 11:14:53 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id y124-20020acae182000000b0038c35f512a2sm2965463oig.56.2023.04.16.11.14.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 16 Apr 2023 11:14:52 -0700 (PDT)
-Message-ID: <cace462f-5876-f7d8-6b36-9734a58c65d2@gmail.com>
-Date: Sun, 16 Apr 2023 13:01:32 -0500
+        d=1e100.net; s=20221208; t=1681757703; x=1684349703;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k/SqCLgIGI0Zp500hnhFpI2+sXE39r/wn28s+l0PZR0=;
+        b=RJl9jUaRWTTCAJveUhKe5Ts7Vfysl7Wt+6MeKr6VwtpHsVk2atS9WGBruc81j5+P0v
+         3qHaujcLBt6U93i+7/xoLPHTE30h5zEmGzfi+xEcXxiha1JJWINYvnWAwvdsns5XWnmt
+         kjTkUWipBbCFM9MJk+LRsZgj0wtAXG3BlFSamrX//px57hJxk/uvr0Mg5CQpBUesca1E
+         D+D+5fh8KkbJH2cG5zGZLPZYcq6TsjKI8oL44K8Cs2s30EgL425DuLs7dPe7O/SHCSA7
+         tEzFIl6ztwk8fe0UnpBRNiq5WaP5SFh/Cbpn0pXsrnFHYb6jDHkxQTGilTIzTitKkFAb
+         l/Yg==
+X-Gm-Message-State: AAQBX9fUzKB2oQb9CRb1azObbM0GD3PWWn+17bJhGfI1jEzZtZa3b8hL
+	O5+54pltP+IQCaqCR3+lsg1bucfqNqU=
+X-Google-Smtp-Source: AKy350Yx4/szd56iPImowJ0I5sPUb5U1i9RzyYbZqWSukwZAJmtTquHIDtBkH5kXuKfmBXtWUDriug==
+X-Received: by 2002:a05:622a:164e:b0:3e4:eb8f:8a7b with SMTP id y14-20020a05622a164e00b003e4eb8f8a7bmr29749809qtj.29.1681757702910;
+        Mon, 17 Apr 2023 11:55:02 -0700 (PDT)
+Received: from LOCLAP699.rst-01.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id m8-20020a05620a220800b007468b183a65sm3393300qkh.30.2023.04.17.11.55.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Apr 2023 11:55:02 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] station: delay roam until fully connected
+Date: Mon, 17 Apr 2023 11:54:57 -0700
+Message-Id: <20230417185457.1000642-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 7/9] common: add FT-8021X-SHA384 to AKM_IS_8021X
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20230410220135.373872-1-prestwoj@gmail.com>
- <20230410220135.373872-8-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20230410220135.373872-8-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+If DHCP/netconfig takes a long time to finish IWD could end up trying
+to roam to another BSS. This could happen if the signal strength is
+below the set threshold while connecting. Once authenticated to the
+AP IWD would get a CQM event and start a roam timer. If DHCP did not
+finish before that timer IWD would start a roam. IWD would not handle
+this well since a roam doesn't trigger DHCP to start and likely the
+network infrustructure would be very confused.
 
-On 4/10/23 17:01, James Prestwood wrote:
-> Without this the AKM shows up as WEP.
-> ---
->   src/common.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
+To fix this continue to delay the roam attempt until IWD reaches the
+connected state.
+---
+ src/station.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/station.c b/src/station.c
+index dfc23e24..18c37f9c 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2786,6 +2786,22 @@ static void station_roam_trigger_cb(struct l_timeout *timeout, void *user_data)
+ 	if (station_cannot_roam(station))
+ 		return;
+ 
++	/*
++	 * This is unlikely, but can still happen when network configuration is
++	 * enabled and DHCP is slow. If IWD connects to a BSS under the low RSSI
++	 * threshold it will immediately get a CQM event once connected (as far
++	 * as the kernel is concerned, NOT IWD's connected state). This starts
++	 * a 5 second timer and if DHCP has not completed by then IWD will
++	 * roam. Since this would likely confused the APs and IWD its best to
++	 * let DHCP complete i.e. wait until we are in a connected state.
++	 */
++	if (station->state != STATION_STATE_CONNECTED) {
++		l_debug("Tried to roam in unconnected state, will try "
++			"again in 5 seconds");
++		station_roam_timeout_rearm(station, 5);
++		return;
++	}
++
+ 	station_start_roam(station);
+ }
+ 
+-- 
+2.25.1
 
