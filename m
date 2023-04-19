@@ -1,48 +1,48 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9955FD2EA
-	for <iwd@lists.linux.dev>; Wed, 19 Apr 2023 20:23:09 +0000 (UTC)
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-63b52ad6311so347944b3a.2
-        for <iwd@lists.linux.dev>; Wed, 19 Apr 2023 13:23:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB2A33EC
+	for <iwd@lists.linux.dev>; Wed, 19 Apr 2023 20:30:39 +0000 (UTC)
+Received: by mail-qt1-f179.google.com with SMTP id fv6so503733qtb.9
+        for <iwd@lists.linux.dev>; Wed, 19 Apr 2023 13:30:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681935789; x=1684527789;
+        d=gmail.com; s=20221208; t=1681936238; x=1684528238;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wFCR3QE7PuN6z0mObj+wuLDO/nuloaTNAflpH9nnpUg=;
-        b=Jcgkssu/lJCxtmqETPcTzcv7Qsht2ymQjWRs/Qz5srBv2jl8MXTFcLlHpJOVHMFNEz
-         5OTIitLS/vNi1L35+ldtiHLQ+tnew6uYBNqHe+QB8A4+GVAdv0vBezpoKRFi7URAZebE
-         ZnjToJMLmnwC/S1WTKvGNb3XRMEQECfMIWU3R2/3HDCgFkK/SaAXlS4qF+m8Wc4REZkV
-         diG9rjDZRyAG7hvH2UsJV7uQhQ2i7PhxZbJSBC9kebGbSmecbTSkqPHIPpOcxsC77uPn
-         1Y7FyncC7kAdFNen0S+KVd9VkW57ZayQt2Bvvj+VxoQbBk/Xlo/eWTprbT37F/jhBbFy
-         sP5Q==
+        bh=B0WbjRONjI0sRaf3zPKiBScN0qcE4Ly8jjXPp0/txdw=;
+        b=WA/lFhBcEgxPSl/LTKpP7TE09z2By8vHwN1CFtg2lxoYnj4VbxP0ewcD6iJMpGsQAN
+         lHXWlRSP2kqhwN+QM270KYFMuAqCuSFhJ6kKelVw3w2Ruc2AZC8wLbg0fdhCpGUPMYyZ
+         NVfZ8WnpAYUQE/EI1oPQaDReU6HjdENvtIcNLBl1JbpIyb6Dzj8GI/8/jXrPGcHKpu4K
+         kIUG2g2bYuQLjwCNNKmzlGePAbXGEcmeD67bmndGgnjOpAcNzh5nFL4sSGyjYRr8TCvb
+         ni0U3CRYQjy53aULv2VEHvadwdtHmCOvlKkOQY59RgIG9drBt3utM2W1U66PJifveMuV
+         j3rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681935789; x=1684527789;
+        d=1e100.net; s=20221208; t=1681936238; x=1684528238;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wFCR3QE7PuN6z0mObj+wuLDO/nuloaTNAflpH9nnpUg=;
-        b=hADrJfqhzNZkSfgAYXCtBTXNmdVzMAPZReARKWWp3e4EXc0E4jTFE3IIvSv0GeCt5v
-         REzjTozE+pHUp+thGUGNF3tkhIHKZ7dwgmL8ezv7b0lWGWRJx1jcB+VOEUXmH3DTRdw9
-         Ne2aFtLeRX1lRXO6NSyzGkr4doq07htLjKGCMCvrKaKGNo8rsbPBijsLlkBBgRdFFwCd
-         CV2xbRdmZuKqid0K5RPUmVlDDC9PFEi3zpQKiUpKDTJdMkEDhrly3Bj8ox4sNTdKcxaC
-         mkEJf/0yM58hY28C9PcvEJrKk8FmjawxB9zpT4wz4Kf4K669kybeObGYvVWjo5RvGoYr
-         tvCg==
-X-Gm-Message-State: AAQBX9f4p6hi9McRLdBGT/vn+wJorb33ccNTeRV7MYtFm6Owbd2rkTyc
-	G2sx+AQm2EOp0PMCML8pWL9fRTWykws=
-X-Google-Smtp-Source: AKy350apaI1xVOTbd1Ks1KTFmqHR0vyAz0n/bCVJDd7zcZj7mK4EyODe7A85CAdK0SyDKddUumNDKQ==
-X-Received: by 2002:a05:6a00:14c2:b0:63d:4446:18ab with SMTP id w2-20020a056a0014c200b0063d444618abmr5926320pfu.23.1681935788631;
-        Wed, 19 Apr 2023 13:23:08 -0700 (PDT)
+        bh=B0WbjRONjI0sRaf3zPKiBScN0qcE4Ly8jjXPp0/txdw=;
+        b=Z9YzoVDnrX07kf+ghdR9bjW9leX66Ax5nNbTj4QNtfEv8d5/BR9sV13kjBJEVrjBKp
+         JoJpU4NRYGWUT+sQWNgjJh6fM4XxLGVjLPWzZgfWROWy7P69IeCcGTgqFpI8wSTOYtbJ
+         dwu/s1Ty3GPdD0CDKqHrDEtrnGKpueN/A2Hgc6OLUDsydbkwJwb54Y8td6FtInR37HOd
+         FvCBqKYZyOZ5dbc8MEO5zVSBqngA3w0uGohGBuEHh5LiROdfMOfQvFqwE1DNXdjSQfKh
+         VsYmUiEWB71lv5AZ9MgitvxcZdEDpmpGhtke6EABeuq3RndawBJmmcitEpL6vPr4LNCp
+         0lnA==
+X-Gm-Message-State: AAQBX9cZiPg3sJkZwNFgfEKWjZj+adFQ1Bij7ArmDcgBeAkHVcDP4n/L
+	tGIlukqzdki+crTTElsM/Ua+X/90z28=
+X-Google-Smtp-Source: AKy350YA1lBEdmPCdDkW7Ym5nSbl1JF0KBGzrCP1wG98uJe24iGqOWPk2aZxNbl8UQxgiVIKb0govA==
+X-Received: by 2002:a05:622a:1708:b0:3e4:e3cf:22d6 with SMTP id h8-20020a05622a170800b003e4e3cf22d6mr8150768qtk.54.1681936238300;
+        Wed, 19 Apr 2023 13:30:38 -0700 (PDT)
 Received: from LOCLAP699.rst-01.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id g22-20020aa78756000000b0063799398eaesm11266149pfo.51.2023.04.19.13.23.07
+        by smtp.gmail.com with ESMTPSA id i26-20020ac860da000000b003eddd355c37sm12923qtm.34.2023.04.19.13.30.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Apr 2023 13:23:08 -0700 (PDT)
+        Wed, 19 Apr 2023 13:30:37 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] ft: fix double free when disconnecting mid-FT
-Date: Wed, 19 Apr 2023 13:23:01 -0700
-Message-Id: <20230419202301.23194-1-prestwoj@gmail.com>
+Subject: [PATCH v2] ft: fix double free when disconnecting mid-FT
+Date: Wed, 19 Apr 2023 13:30:33 -0700
+Message-Id: <20230419203033.26365-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
@@ -96,15 +96,20 @@ iwd[488]: double free or corruption (fasttop)
  src/ft.c | 11 ++++++++++-
  1 file changed, 10 insertions(+), 1 deletion(-)
 
+v2:
+ * This was missing the check for the offchannel_id as well. If there is
+   not a current offchannel operation the info needs to be freed as
+   well (not only when info->parsed == true).
+
 diff --git a/src/ft.c b/src/ft.c
-index 8ae683a7..1fd5c09f 100644
+index 8ae683a7..e7794bf5 100644
 --- a/src/ft.c
 +++ b/src/ft.c
 @@ -1175,6 +1175,7 @@ static bool remove_ifindex(void *data, void *user_data)
  {
  	struct ft_info *info = data;
  	uint32_t ifindex = L_PTR_TO_UINT(user_data);
-+	bool need_free = info->parsed;
++	bool need_free = info->parsed || !info->offchannel_id;
  
  	if (info->ifindex != ifindex)
  		return false;
