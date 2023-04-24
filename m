@@ -1,92 +1,95 @@
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.nearlyone.de (mail.nearlyone.de [49.12.199.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50FD13D76
-	for <iwd@lists.linux.dev>; Sun, 23 Apr 2023 23:52:40 +0000 (UTC)
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-38e2740958aso1389409b6e.1
-        for <iwd@lists.linux.dev>; Sun, 23 Apr 2023 16:52:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682293959; x=1684885959;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qws63Or9AE04fPrz+6xgsioGA8f5qCay8N36ZdC6vO0=;
-        b=ZLFb+Q7wf++zbynlfFNBEZiDgziowJUW4GlLFwzpbaMYMNF6mJ/Ajs0lqH/0TnVhMx
-         5YUhItIn1315XknJ4/ZlhjWg/jtGY85fmSWeU8t4kmm8Q5uYdpqAe3w8Igeerly8374f
-         L7U2wn1Sgx/07Ws4y9YArZF0SFcq7IIATxRPhDqumSGo13zoKFxw4R7bKmSYFvBFzYGg
-         3ofV6cScusUt8cua1uD77EXbMmsJixmNs3L/rf9hz0lapvM1dspSe0fyOlB3dLtDwZMk
-         GQIZo49cVlksoBz5MRhAWt+RapzhF5nfsFoVJ6RRxrPIeEEtgSrzPuAUC02Gor8+mSpz
-         rhNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682293959; x=1684885959;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qws63Or9AE04fPrz+6xgsioGA8f5qCay8N36ZdC6vO0=;
-        b=cxx6Byppr0OafB9WAfItbtOW1n2gBWfN/qZKtktk7OTZS2hAouIV/6XVgzmihjbWDh
-         +zrQrqT5vE/I8e5yDR3hrlzcWUxUwwZmJ32ehGk6UMJylU+uKaaoOL3bNOJSuRXq/oES
-         JVkAntvLxKq5jtx5EY6bMn9aC6Ph04Q+5dGqrtcE1LGuLFHi0zbxab0WpB2kzS8dtgqm
-         W4Wfbv4kqsMvRg3WwNIQwO3bW7hglb5Bzgxa1O/8b0Y55E3gjYGh7hqBgcfnb6opygcL
-         PdbjUJ5T3mgD3cA7VZwmxX9Qe7B0JK3xw4XojJQQKUOt45kEufTmZuMYfJPQ3ECS55eW
-         PLEA==
-X-Gm-Message-State: AAQBX9ffQfL24nMqSHkqG4djVTkfu6FChH4wzEgTKtTvjwsaX5sD4lqP
-	BJ2CjLTNrDijbiLGkxAK5i4lpl49u0TyJw==
-X-Google-Smtp-Source: AKy350bPgOZUqAUYqW9Wf/FSLngE/PbqWRFgEzHhl3q/7r69C2igZZvPpM87XCQ4x2RZYjGrb9TTgw==
-X-Received: by 2002:a54:418c:0:b0:386:8f22:ef53 with SMTP id 12-20020a54418c000000b003868f22ef53mr6087866oiy.30.1682293959352;
-        Sun, 23 Apr 2023 16:52:39 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id u2-20020a05687036c200b00177c314a358sm3955312oak.22.2023.04.23.16.52.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 23 Apr 2023 16:52:38 -0700 (PDT)
-Message-ID: <a87b28e8-b4c3-a7ae-e01f-9e48731f7d78@gmail.com>
-Date: Sun, 23 Apr 2023 18:39:44 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B627C;
+	Mon, 24 Apr 2023 05:54:51 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C5B33DE350;
+	Mon, 24 Apr 2023 07:46:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=monom.org; s=dkim;
+	t=1682315196; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=+9P6QoOlDUQFIv5bvziiKeXI0iRiSG5cAa/wG7Oi254=;
+	b=GXSG7l7SNMLemWvpVP1YCFnRJBL5rUHRGHfWLIeoycY7dAuK/WkB2r1JKUstJoFHTKdCYw
+	NiRG4fgbSaLIwdzncssUxU8EGWzvBS/9WhKuud+XWQWqTlnZPv9+HYXIXgzOY0m5VE3WKp
+	rzhovQsBxT64poUu0aSFN6O940UgL2NMM2rAda/Jh5ZOyfiJPycRiRAxqBFGO0TNPhtpns
+	RQ3N84FjGb3Bzhl2mJiNA1/J9tjLRvVZ+8eeE7rKsLGf15JscTJHFHVC5jyVwLBIhLgfM6
+	A1NOxXgEgJpgdXOtgzqoaDOGlDhVPk0bEnyjG4WR5tIwe/mbQLigrY4I7mtueQ==
+Date: Mon, 24 Apr 2023 07:46:35 +0200
+From: Daniel Wagner <wagi@monom.org>
+To: daniel antoine <univac55@gmail.com>
+Cc: connman@lists.linux.dev, iwd@lists.linux.dev
+Subject: Re: commit IWD 8f0420c533ae6a49c4f2803afe32d5922a5236ad build error
+Message-ID: <zp2pcpoqip7qkqhzrgjd2v55yhfqfpv7qke63njyocpuphrgz7@vto2ce7jzm4g>
+References: <CA+iibzC0O-v+Rk+799=QYmzyAZo_3XcN1mfAsM-QtnA8zc6wpw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] station: delay roam until fully connected
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20230417185457.1000642-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20230417185457.1000642-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+iibzC0O-v+Rk+799=QYmzyAZo_3XcN1mfAsM-QtnA8zc6wpw@mail.gmail.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi James,
+Add iwd mailing list
 
-On 4/17/23 13:54, James Prestwood wrote:
-> If DHCP/netconfig takes a long time to finish IWD could end up trying
-> to roam to another BSS. This could happen if the signal strength is
-> below the set threshold while connecting. Once authenticated to the
-> AP IWD would get a CQM event and start a roam timer. If DHCP did not
-> finish before that timer IWD would start a roam. IWD would not handle
-> this well since a roam doesn't trigger DHCP to start and likely the
-> network infrustructure would be very confused.
-
-Typo here, 'infrustructure'.
-
+On Sat, Apr 22, 2023 at 05:03:00PM +0200, daniel antoine wrote:
+> I have tried to build iwd to the last commit "Allow building with
+> libedit instead readline". The Pkgfile seems to need the option
+> --enable-libedit to remove readline but it fails with
+>   CC       wired/dbus.o
+>   CCLD     ell/libell-internal.la
+>   CCLD     client/iwctl
+>   CCLD     src/iwd
+>   CCLD     wired/ead
+> /usr/bin/ld: client/command.o: in function `command_completion':
+> command.c:(.text+0x6cc): undefined reference to `rl_copy_text'
+> /usr/bin/ld: command.c:(.text+0x8b0): undefined reference to `rl_copy_text'
+> /usr/bin/ld: client/display.o: in function `save_input':
+> display.c:(.text+0x32): undefined reference to `rl_copy_text'
+> /usr/bin/ld: display.c:(.text+0x3a): undefined reference to `rl_save_prompt'
+> /usr/bin/ld: display.c:(.text+0x46): undefined reference to `rl_replace_line'
+> /usr/bin/ld: client/display.o: in function `display_text':
+> display.c:(.text+0x796): undefined reference to `rl_restore_prompt'
+> /usr/bin/ld: display.c:(.text+0x7a0): undefined reference to `rl_replace_line'
+> /usr/bin/ld: client/display.o: in function `display_completion_matches':
+> display.c:(.text+0x834): undefined reference to `rl_copy_text'
+> /usr/bin/ld: client/display.o: in function `timeout_callback':
+> display.c:(.text+0x9d0): undefined reference to `rl_restore_prompt'
+> /usr/bin/ld: display.c:(.text+0x9da): undefined reference to `rl_replace_line'
+> /usr/bin/ld: client/display.o: in function `display_table_footer':
+> display.c:(.text+0x11a6): undefined reference to `rl_restore_prompt'
+> /usr/bin/ld: display.c:(.text+0x11b1): undefined reference to `rl_replace_line'
+> /usr/bin/ld: client/display.o: in function `display_enable_cmd_prompt':
+> display.c:(.text+0x168e): undefined reference to `rl_save_prompt'
+> /usr/bin/ld: display.c:(.text+0x1698): undefined reference to
+> `rl_restore_prompt'
+> /usr/bin/ld: client/display.o: in function `display_agent_prompt':
+> display.c:(.text+0x177d): undefined reference to `rl_copy_text'
+> /usr/bin/ld: display.c:(.text+0x1797): undefined reference to `rl_replace_line'
+> /usr/bin/ld: display.c:(.text+0x17a5): undefined reference to
+> `rl_erase_empty_line'
+> /usr/bin/ld: client/display.o: in function `display_agent_prompt_release':
+> display.c:(.text+0x1889): undefined reference to `rl_copy_text'
+> /usr/bin/ld: display.c:(.text+0x18cd): undefined reference to
+> `rl_erase_empty_line'
+> /usr/bin/ld: display.c:(.text+0x18db): undefined reference to `rl_replace_line'
+> /usr/bin/ld: client/display.o: in function `display_init':
+> display.c:(.text+0x1a3e): undefined reference to `rl_erase_empty_line'
+> collect2: error: ld returned 1 exit status
+> make[1]: *** [Makefile:1895: client/iwctl] Error 1
+> make[1]: *** Waiting for unfinished jobs....
+> make: *** [Makefile:1595: all] Error 2
+> =======> ERROR: Building
+> '/usr/ports/perso/iwd/iwd1682174379x86_64.cards.tar.xz' failed.
 > 
-> To fix this continue to delay the roam attempt until IWD reaches the
-> connected state.
-
-I'm not convinced this is the right approach.  If the signal is bad enough that 
-DHCP is failing, then delaying the roam is probably the worst choice we can 
-make, no?
-
-I would think the better way to fix this would be to track netconfig state, and 
-if it never reached a fully configured state prior to roaming, reset & 
-reconfigure upon a successful "roam".  Note that since we haven't signaled 
-"connected" just yet, we're really still just in the "connecting" phase.
-
-> ---
->   src/station.c | 16 ++++++++++++++++
->   1 file changed, 16 insertions(+)
+> It looks like some readline commands are always taken in count
 > 
+> I have my Pkgfile and the compilation log
+> 
+> 
+> best regards
+> Dania
 
-Regards,
--Denis
+
+
