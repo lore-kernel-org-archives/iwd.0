@@ -1,109 +1,111 @@
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8147C
-	for <iwd@lists.linux.dev>; Mon, 24 Apr 2023 10:15:00 +0000 (UTC)
-Received: from smtpclient.apple (p5b3d2302.dip0.t-ipconnect.de [91.61.35.2])
-	by mail.holtmann.org (Postfix) with ESMTPSA id 100B8CECD8;
-	Mon, 24 Apr 2023 12:14:59 +0200 (CEST)
-Content-Type: text/plain;
-	charset=us-ascii
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1BB2108
+	for <iwd@lists.linux.dev>; Mon, 24 Apr 2023 13:24:19 +0000 (UTC)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-63b7588005fso3790856b3a.0
+        for <iwd@lists.linux.dev>; Mon, 24 Apr 2023 06:24:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682342659; x=1684934659;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OnkPyaZ9HgbqefdfgIBMtHBnpG2FWvHabhUNQQddqmo=;
+        b=Qc+N2VvGxFscvw2VowngX6Dx9Y5HsGkDStEC3qq/1e6f246yoXfQENysuuOS3lbLMX
+         HJ74ITIGkJnwa1Gb1GLkQ5fFH36GYChLNTSn3vQDdGOXEQBLXWVSExruxKNaHZ7H/MAH
+         1rlPMpmHMp/Aa1CsrqdersPstaOoiXfPGGCXesOID683xVC6+l7+ONShPHMQy4JtkWBW
+         qZnWCkDYLaRxUMkpu+0gslTARTsclnbcQTBPDDLzRTo+N8Tr5zFQ2dTmlDOc6A/UbVwX
+         1jKfhg3qVATi+uCYQ8GqIBDfvMNuERn1Yj+qDDJvDLaapgm17kbtQaZ5yrKvu+JhV1Wn
+         8yqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682342659; x=1684934659;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OnkPyaZ9HgbqefdfgIBMtHBnpG2FWvHabhUNQQddqmo=;
+        b=C7dtvn80GAIapPWjKoO3vtfN0W+rAdtYAQJZCB4iSgCnTQidZ1XaUy9OtmWAsR9gEL
+         0/5kmFAvKxQbnIrPEBP78Bqb5cSypEoiiasIq3OQfAla+dNqtFU+J/Y4NweTMGIvWSHt
+         Td9b6y3AtfM3BkBKqzLlfMQsSZ1Q3hmzJi5e5mu+RuShlHjqP7/ThW5YTDWlU1HIUmvT
+         fGxCNyqRYFAvBjpAtXBNSmRVfwQdcHKd0ojaScCPihh0JhJHJFUC3pPET1y7QDa2ZFrR
+         4wsnCOS9dcDaNXC8WcXjvbHkzXe0Npow5WyR8Ox5Yzfw/7VvSmEanS3l8QgzI78dvE8F
+         fJCA==
+X-Gm-Message-State: AAQBX9ciNMWcgHzZF4PqDKXRH+rgajbaeuychR3wqFuO2wFxPG6fBCxK
+	mWTC0h7MKZe5PXHUNu59uRj6OgtoH1+g4Q==
+X-Google-Smtp-Source: AKy350Z0plylkIKJF0A61hZ2kAKeNPfm2QSji4A4NYMx4bnU+uV10yVZ3w88yzjMidw6C2O/Gep4oQ==
+X-Received: by 2002:a05:6a00:21d4:b0:63b:5609:3bb5 with SMTP id t20-20020a056a0021d400b0063b56093bb5mr18196468pfj.18.1682342659342;
+        Mon, 24 Apr 2023 06:24:19 -0700 (PDT)
+Received: from [192.168.254.76] ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id s23-20020a62e717000000b005aa60d8545esm7473684pfh.61.2023.04.24.06.24.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Apr 2023 06:24:19 -0700 (PDT)
+Message-ID: <03f26ded-afd0-9e01-739f-5798ebcd90dc@gmail.com>
+Date: Mon, 24 Apr 2023 06:24:17 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.3\))
-Subject: Re: commit IWD 8f0420c533ae6a49c4f2803afe32d5922a5236ad build error
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <537606f4-9708-0bad-2144-d4809dfd7548@gmail.com>
-Date: Mon, 24 Apr 2023 12:14:58 +0200
-Cc: daniel antoine <univac55@gmail.com>,
- iwd@lists.linux.dev
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <914A101F-70E4-4FA0-80A9-CF3A28BE61D2@holtmann.org>
-References: <CA+iibzC0O-v+Rk+799=QYmzyAZo_3XcN1mfAsM-QtnA8zc6wpw@mail.gmail.com>
- <DE0B5BC4-B2D5-47FF-8D80-8FAEC8A65CA7@holtmann.org>
- <537606f4-9708-0bad-2144-d4809dfd7548@gmail.com>
-To: James Prestwood <prestwoj@gmail.com>
-X-Mailer: Apple Mail (2.3696.120.41.1.3)
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH] station: delay roam until fully connected
+Content-Language: en-US
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20230417185457.1000642-1-prestwoj@gmail.com>
+ <a87b28e8-b4c3-a7ae-e01f-9e48731f7d78@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <a87b28e8-b4c3-a7ae-e01f-9e48731f7d78@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Hi Denis,
 
->>> I have tried to build iwd to the last commit "Allow building with
->>> libedit instead readline". The Pkgfile seems to need the option
->>> --enable-libedit to remove readline but it fails with
->>>  CC       wired/dbus.o
->>>  CCLD     ell/libell-internal.la
->>>  CCLD     client/iwctl
->>>  CCLD     src/iwd
->>>  CCLD     wired/ead
->>> /usr/bin/ld: client/command.o: in function `command_completion':
->>> command.c:(.text+0x6cc): undefined reference to `rl_copy_text'
->>> /usr/bin/ld: command.c:(.text+0x8b0): undefined reference to =
-`rl_copy_text'
->>> /usr/bin/ld: client/display.o: in function `save_input':
->>> display.c:(.text+0x32): undefined reference to `rl_copy_text'
->>> /usr/bin/ld: display.c:(.text+0x3a): undefined reference to =
-`rl_save_prompt'
->>> /usr/bin/ld: display.c:(.text+0x46): undefined reference to =
-`rl_replace_line'
->>> /usr/bin/ld: client/display.o: in function `display_text':
->>> display.c:(.text+0x796): undefined reference to `rl_restore_prompt'
->>> /usr/bin/ld: display.c:(.text+0x7a0): undefined reference to =
-`rl_replace_line'
->>> /usr/bin/ld: client/display.o: in function =
-`display_completion_matches':
->>> display.c:(.text+0x834): undefined reference to `rl_copy_text'
->>> /usr/bin/ld: client/display.o: in function `timeout_callback':
->>> display.c:(.text+0x9d0): undefined reference to `rl_restore_prompt'
->>> /usr/bin/ld: display.c:(.text+0x9da): undefined reference to =
-`rl_replace_line'
->>> /usr/bin/ld: client/display.o: in function `display_table_footer':
->>> display.c:(.text+0x11a6): undefined reference to `rl_restore_prompt'
->>> /usr/bin/ld: display.c:(.text+0x11b1): undefined reference to =
-`rl_replace_line'
->>> /usr/bin/ld: client/display.o: in function =
-`display_enable_cmd_prompt':
->>> display.c:(.text+0x168e): undefined reference to `rl_save_prompt'
->>> /usr/bin/ld: display.c:(.text+0x1698): undefined reference to
->>> `rl_restore_prompt'
->>> /usr/bin/ld: client/display.o: in function `display_agent_prompt':
->>> display.c:(.text+0x177d): undefined reference to `rl_copy_text'
->>> /usr/bin/ld: display.c:(.text+0x1797): undefined reference to =
-`rl_replace_line'
->>> /usr/bin/ld: display.c:(.text+0x17a5): undefined reference to
->>> `rl_erase_empty_line'
->>> /usr/bin/ld: client/display.o: in function =
-`display_agent_prompt_release':
->>> display.c:(.text+0x1889): undefined reference to `rl_copy_text'
->>> /usr/bin/ld: display.c:(.text+0x18cd): undefined reference to
->>> `rl_erase_empty_line'
->>> /usr/bin/ld: display.c:(.text+0x18db): undefined reference to =
-`rl_replace_line'
->>> /usr/bin/ld: client/display.o: in function `display_init':
->>> display.c:(.text+0x1a3e): undefined reference to =
-`rl_erase_empty_line'
->>> collect2: error: ld returned 1 exit status
->>> make[1]: *** [Makefile:1895: client/iwctl] Error 1
->>> make[1]: *** Waiting for unfinished jobs....
->>> make: *** [Makefile:1595: all] Error 2
->>> =3D=3D=3D=3D=3D=3D=3D> ERROR: Building
->>> '/usr/ports/perso/iwd/iwd1682174379x86_64.cards.tar.xz' failed.
->>>=20
->>> It looks like some readline commands are always taken in count
->>>=20
->>> I have my Pkgfile and the compilation log
->> It does build for me just fine. What distro is this?
->> What does pkg-config --cflags --libs libedit show?
->=20
-> I'm seeing the same build problem, Ubuntu 20.04:
->=20
-> $ pkg-config --cflags --libs libedit
-> -I/usr/include/editline -ledit
+On 4/23/23 4:39 PM, Denis Kenzior wrote:
+> Hi James,
+> 
+> On 4/17/23 13:54, James Prestwood wrote:
+>> If DHCP/netconfig takes a long time to finish IWD could end up trying
+>> to roam to another BSS. This could happen if the signal strength is
+>> below the set threshold while connecting. Once authenticated to the
+>> AP IWD would get a CQM event and start a roam timer. If DHCP did not
+>> finish before that timer IWD would start a roam. IWD would not handle
+>> this well since a roam doesn't trigger DHCP to start and likely the
+>> network infrustructure would be very confused.
+> 
+> Typo here, 'infrustructure'.
+> 
+>>
+>> To fix this continue to delay the roam attempt until IWD reaches the
+>> connected state.
+> 
+> I'm not convinced this is the right approach.  If the signal is bad 
+> enough that DHCP is failing, then delaying the roam is probably the 
+> worst choice we can make, no?
 
-so Ubuntu seems to have libeditreadline-dev and maybe it has
-Its own pkg-config file for a library with the rl_ symbols.
+It may not be that the connection quality caused DHCP to take a while, 
+could be the backend just was slow and not responding quickly.
 
-Regards
+> 
+> I would think the better way to fix this would be to track netconfig 
+> state, and if it never reached a fully configured state prior to 
+> roaming, reset & reconfigure upon a successful "roam".  Note that since 
+> we haven't signaled "connected" just yet, we're really still just in the 
+> "connecting" phase.
 
-Marcel
+The question is if the AP infrastructure could handle this. For example 
+the worst case being if DHCP started and we roamed right in the 
+middle... That's why I thinking the safest option was to complete DHCP, 
+then roam. I never actually saw this behavior happening, just noticed 
+that IWD would get very confused if it did happen.
 
+Thanks,
+James
+
+> 
+>> ---
+>>   src/station.c | 16 ++++++++++++++++
+>>   1 file changed, 16 insertions(+)
+>>
+> 
+> Regards,
+> -Denis
