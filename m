@@ -1,149 +1,231 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D8533E5
-	for <iwd@lists.linux.dev>; Tue, 25 Apr 2023 20:57:07 +0000 (UTC)
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-74e3de79bf2so460715385a.2
-        for <iwd@lists.linux.dev>; Tue, 25 Apr 2023 13:57:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AE3A944
+	for <iwd@lists.linux.dev>; Tue, 25 Apr 2023 21:46:57 +0000 (UTC)
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-5ef6ddd0498so62962586d6.3
+        for <iwd@lists.linux.dev>; Tue, 25 Apr 2023 14:46:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682456226; x=1685048226;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZMd/TsWDWwz5sIh6CNeuw7jaEIAGpTxpYBcrbo4kZb4=;
-        b=O6r8d8/MR4HO4/fchAD8GgEjgaULHG60jMGR9I0yAc4AdDQxRdJpdVOD2b6dGfadtC
-         WKEu5QGDOLmnCN5z99IKT7s45otYCCGsLL/CzYdsGBV1NFw8XNBtN3MF9v7xADPvKeRw
-         aWtRlGo35heEYwLCsrj6toQBKVq5ag6nr8tB+WfIY8deTeHaVmwsGtuOEfSrH0LikQ2A
-         2vPE0rrK9wT5AfYP4vt3Vrr5In9kZw3RZA5RoDC/8pdddKbodQ8nYG2Y5keZXq6141oh
-         /b03pdfrsn+B0R7hT/wsKEkrXkhA13y4gcUu8N3JjmN8ikVRPyV9g6p/qOD40ygva26Q
-         cd0Q==
+        d=gmail.com; s=20221208; t=1682459216; x=1685051216;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Bn00VqhZLMv98GzShcQX9KGA9gSq8dpBuXIVYicfWYU=;
+        b=INvu22lS8r/K0qXV8okAD1mdM7c5cTSYbWa8q6VC9WYVxGPNn8SYFqmqN8gJMUuaV8
+         pGpEog4ncH/dxmiiyNK/EUjtC/Qbxc4QYKb4bOTaqQ0dwNyPwSZPIH+rzr2lTzxBZ4X+
+         c2WiCJVMhwiubYrFV+MKAO5XIBy016Opw0uVM3/rL5UDU6db9FoowTik6531ntHzOcMT
+         fJx8G2NtPhpNbxwikAnnPs+h+GJc+JuK3tB5Qern33ZSllLFqpT+Br/Xe6zCao06PtGM
+         RnohaxfaY3vi0WjoVqUsu1Jgi+v1dO6qKDgqXiPq/IlXVhUlzMewONOUMI12GWu7o7bM
+         JxqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682456226; x=1685048226;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZMd/TsWDWwz5sIh6CNeuw7jaEIAGpTxpYBcrbo4kZb4=;
-        b=D9hGGLXf2OvQiyNi8pJsfKti1z6wi2NuYFpDZlM+Qe7sJtxQuBCA1MzU76fV5QSWTp
-         rf7VHugB0hvX8nnVNtboJuZeVJcFHpTW1NSw95XlT49p+QvBGZh9UsfycKuSx1jRCTAj
-         4RadPE+Koq892xMd9PRkZUYjD3AWxbdMIZ6pFxtrq2vAmY2NJCpl9ZYAosCdO883Q79R
-         U5ONPA51mMa0IY9TFZa7GdBvcnyBIaA/c/OlY5U03uPO6rUnOYpesVwWa7PhwydvU8Pt
-         wlUYrPxWpGVu2SyDABE0tX1qEGlC2/XfZPrzj5jMpabKEgOU1kJq9suATt8o6kYIMBIu
-         AMSA==
-X-Gm-Message-State: AC+VfDzuB6Zfv5kwK9k1mu1Iy1qlItAo2OPU75qK0VTPR+TGWbrPs7Yz
-	kC6l2pWD6DeKfd3Rfg64S412r3E9yfU=
-X-Google-Smtp-Source: ACHHUZ6I6tHCD2jadaWKwt4hPc/dfJDO1GWKJCd8Hk5S6Z2VXf8aposDjrF2bka0hHrEe+/HvzknnQ==
-X-Received: by 2002:a05:6214:29e3:b0:616:5c8b:582 with SMTP id jv3-20020a05621429e300b006165c8b0582mr103334qvb.37.1682456226424;
-        Tue, 25 Apr 2023 13:57:06 -0700 (PDT)
-Received: from LOCLAP699.geodis-coppell.locus ([208.216.218.212])
-        by smtp.gmail.com with ESMTPSA id y17-20020a0ce051000000b005dd8b9345b9sm4347799qvk.81.2023.04.25.13.57.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Apr 2023 13:57:06 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] dpp: fix incorrect offchannel usage as configurator
-Date: Tue, 25 Apr 2023 13:57:00 -0700
-Message-Id: <20230425205700.36822-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20221208; t=1682459216; x=1685051216;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bn00VqhZLMv98GzShcQX9KGA9gSq8dpBuXIVYicfWYU=;
+        b=Gweb1QoQ/J6AmTB4Da9DuA3pV/TGepBc95oTSLjaOQxWPqx/rqDIRwgBMJKdWXhAIH
+         8yXNmp4VCEXp8HBphTgCOB8azZbZJhCs5awAaiYDSj6e+BhyoAPZV4MA3l9DYktFYPc8
+         Qs0ZNQfwWl+AkQ+dslJRRcgIIGtFsH0HnfgPBa6icAVBoAOYGZ41LUHTd505Siynb3jG
+         cjr31eziLEVBmG+HRQWQ/KXZ+7qnxjRZ+G0keMMcCJmCL4bxAIVQaGHE/olxF7nh3GwY
+         d/YBjgQLr3miROx9sGMPjGxLASxPVZMnXeUDWRuvQmYn7nbrUwvPBTUt1M8nDEmJlx62
+         IlBw==
+X-Gm-Message-State: AAQBX9d4qyAAWfr2T6B7GXR2tsc/GilyZ3R16pTV4TOL5SzuzFH9vwaJ
+	ik/N5kD2YWSCX/X9vDh95co=
+X-Google-Smtp-Source: AKy350bZ275VYcQxYQ3/8JFIrknj7j8j3nC2pNQRfsNiQ6MYvvHKZ2vTgPZJRjBlmQOzcmHEvUZdDw==
+X-Received: by 2002:a05:6214:e6b:b0:5f7:8b31:4548 with SMTP id jz11-20020a0562140e6b00b005f78b314548mr30270423qvb.4.1682459216132;
+        Tue, 25 Apr 2023 14:46:56 -0700 (PDT)
+Received: from [10.193.157.43] ([208.216.218.212])
+        by smtp.gmail.com with ESMTPSA id z6-20020a0cda86000000b005ef53081921sm4379953qvj.42.2023.04.25.14.46.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Apr 2023 14:46:55 -0700 (PDT)
+Message-ID: <b2be8a34-3624-b269-e253-6b76373807e0@gmail.com>
+Date: Tue, 25 Apr 2023 14:46:54 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+From: James Prestwood <prestwoj@gmail.com>
+Subject: Re: commit IWD 8f0420c533ae6a49c4f2803afe32d5922a5236ad build error
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: daniel antoine <univac55@gmail.com>, iwd@lists.linux.dev
+References: <CA+iibzC0O-v+Rk+799=QYmzyAZo_3XcN1mfAsM-QtnA8zc6wpw@mail.gmail.com>
+ <DE0B5BC4-B2D5-47FF-8D80-8FAEC8A65CA7@holtmann.org>
+ <537606f4-9708-0bad-2144-d4809dfd7548@gmail.com>
+ <914A101F-70E4-4FA0-80A9-CF3A28BE61D2@holtmann.org>
+Content-Language: en-US
+In-Reply-To: <914A101F-70E4-4FA0-80A9-CF3A28BE61D2@holtmann.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When acting as a configurator the enrollee can start on a different
-channel than IWD is connected to. IWD will begin the auth process
-on this channel but tell the enrollee to transition to the current
-channel after the auth request. Since a configurator must be
-connected (a requirement IWD enforces) we can assume a channel
-transition will always be to the currently connected channel. This
-allows us to simply cancel the offchannel request and wait for a
-response (rather than start another offchannel).
+Hi Marcel,
 
-Doing this improves the DPP performance and reduces the potential
-for a lost frame during the channel transition.
+On 4/24/23 3:14 AM, Marcel Holtmann wrote:
+> Hi James,
+> 
+>>>> I have tried to build iwd to the last commit "Allow building with
+>>>> libedit instead readline". The Pkgfile seems to need the option
+>>>> --enable-libedit to remove readline but it fails with
+>>>>   CC       wired/dbus.o
+>>>>   CCLD     ell/libell-internal.la
+>>>>   CCLD     client/iwctl
+>>>>   CCLD     src/iwd
+>>>>   CCLD     wired/ead
+>>>> /usr/bin/ld: client/command.o: in function `command_completion':
+>>>> command.c:(.text+0x6cc): undefined reference to `rl_copy_text'
+>>>> /usr/bin/ld: command.c:(.text+0x8b0): undefined reference to `rl_copy_text'
+>>>> /usr/bin/ld: client/display.o: in function `save_input':
+>>>> display.c:(.text+0x32): undefined reference to `rl_copy_text'
+>>>> /usr/bin/ld: display.c:(.text+0x3a): undefined reference to `rl_save_prompt'
+>>>> /usr/bin/ld: display.c:(.text+0x46): undefined reference to `rl_replace_line'
+>>>> /usr/bin/ld: client/display.o: in function `display_text':
+>>>> display.c:(.text+0x796): undefined reference to `rl_restore_prompt'
+>>>> /usr/bin/ld: display.c:(.text+0x7a0): undefined reference to `rl_replace_line'
+>>>> /usr/bin/ld: client/display.o: in function `display_completion_matches':
+>>>> display.c:(.text+0x834): undefined reference to `rl_copy_text'
+>>>> /usr/bin/ld: client/display.o: in function `timeout_callback':
+>>>> display.c:(.text+0x9d0): undefined reference to `rl_restore_prompt'
+>>>> /usr/bin/ld: display.c:(.text+0x9da): undefined reference to `rl_replace_line'
+>>>> /usr/bin/ld: client/display.o: in function `display_table_footer':
+>>>> display.c:(.text+0x11a6): undefined reference to `rl_restore_prompt'
+>>>> /usr/bin/ld: display.c:(.text+0x11b1): undefined reference to `rl_replace_line'
+>>>> /usr/bin/ld: client/display.o: in function `display_enable_cmd_prompt':
+>>>> display.c:(.text+0x168e): undefined reference to `rl_save_prompt'
+>>>> /usr/bin/ld: display.c:(.text+0x1698): undefined reference to
+>>>> `rl_restore_prompt'
+>>>> /usr/bin/ld: client/display.o: in function `display_agent_prompt':
+>>>> display.c:(.text+0x177d): undefined reference to `rl_copy_text'
+>>>> /usr/bin/ld: display.c:(.text+0x1797): undefined reference to `rl_replace_line'
+>>>> /usr/bin/ld: display.c:(.text+0x17a5): undefined reference to
+>>>> `rl_erase_empty_line'
+>>>> /usr/bin/ld: client/display.o: in function `display_agent_prompt_release':
+>>>> display.c:(.text+0x1889): undefined reference to `rl_copy_text'
+>>>> /usr/bin/ld: display.c:(.text+0x18cd): undefined reference to
+>>>> `rl_erase_empty_line'
+>>>> /usr/bin/ld: display.c:(.text+0x18db): undefined reference to `rl_replace_line'
+>>>> /usr/bin/ld: client/display.o: in function `display_init':
+>>>> display.c:(.text+0x1a3e): undefined reference to `rl_erase_empty_line'
+>>>> collect2: error: ld returned 1 exit status
+>>>> make[1]: *** [Makefile:1895: client/iwctl] Error 1
+>>>> make[1]: *** Waiting for unfinished jobs....
+>>>> make: *** [Makefile:1595: all] Error 2
+>>>> =======> ERROR: Building
+>>>> '/usr/ports/perso/iwd/iwd1682174379x86_64.cards.tar.xz' failed.
+>>>>
+>>>> It looks like some readline commands are always taken in count
+>>>>
+>>>> I have my Pkgfile and the compilation log
+>>> It does build for me just fine. What distro is this?
+>>> What does pkg-config --cflags --libs libedit show?
+>>
+>> I'm seeing the same build problem, Ubuntu 20.04:
+>>
+>> $ pkg-config --cflags --libs libedit
+>> -I/usr/include/editline -ledit
+> 
+> so Ubuntu seems to have libeditreadline-dev and maybe it has
+> Its own pkg-config file for a library with the rl_ symbols.
 
-This patch also addresses the comment that we should wait for the
-auth request ACK before canceling the offchannel. Now a flag is
-set and IWD will cancel the offchannel once the ACK is received.
----
- src/dpp.c | 36 +++++++++++++++++++++++++++++++-----
- 1 file changed, 31 insertions(+), 5 deletions(-)
+I see that Debian package, but Ubuntu doesn't have it (or my Ubuntu 
+distro doesn't). It does have libedit-dev which is what I installed. It 
+appears the libedit package just doesn't include ALL the rl_* symbols 
+that iwctl uses:
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 6abf539a..b1f4893e 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -147,6 +147,7 @@ struct dpp_sm {
- 
- 	bool mcast_support : 1;
- 	bool roc_started : 1;
-+	bool channel_switch : 1;
- };
- 
- static bool dpp_get_started(struct l_dbus *dbus,
-@@ -2032,6 +2033,7 @@ static void authenticate_response(struct dpp_sm *dpp, const uint8_t *from,
- 		return;
- 	}
- 
-+	dpp->channel_switch = false;
- 	dpp->current_freq = dpp->new_freq;
- 
- 	dpp_send_authenticate_confirm(dpp);
-@@ -2112,10 +2114,14 @@ static void dpp_handle_presence_announcement(struct dpp_sm *dpp,
- 		return;
- 
- 	/*
--	 * Should we wait for an ACK then go offchannel?
-+	 * Requested the peer to move to another channel for the remainder of
-+	 * the protocol. IWD's current logic prohibits a configurator from
-+	 * running while not connected, so we can assume here that the new
-+	 * frequency is the same of the connected BSS. Wait until an ACK is
-+	 * received for the auth request then cancel the offchannel request.
- 	 */
- 	if (dpp->current_freq != dpp->new_freq)
--		dpp_start_offchannel(dpp, dpp->new_freq);
-+		dpp->channel_switch = true;
- }
- 
- static void dpp_handle_frame(struct dpp_sm *dpp,
-@@ -2211,12 +2217,32 @@ static void dpp_mlme_notify(struct l_genl_msg *msg, void *user_data)
- 	if (dpp->state <= DPP_STATE_PRESENCE)
- 		return;
- 
-+
-+	if (dpp->frame_cookie != cookie)
-+		return;
-+
- 	/*
--	 * Only want to handle the no-ACK case. Re-transmitting an ACKed
--	 * frame likely wont do any good, at least in the case of DPP.
-+	 * Special handling for a channel transition when acting as a
-+	 * configurator. The auth request was sent offchannel so we need to
-+	 * wait for the ACK before going back to the connected channel.
- 	 */
--	if (dpp->frame_cookie != cookie || ack)
-+	if (dpp->channel_switch && ack) {
-+		if (dpp->offchannel_id) {
-+			offchannel_cancel(dpp->wdev_id, dpp->offchannel_id);
-+			dpp->offchannel_id = 0;
-+		}
-+
-+		dpp->channel_switch = false;
-+
- 		return;
-+	} else if (ack)
-+		/*
-+		 * Only want to handle the no-ACK case. Re-transmitting an ACKed
-+		 * frame likely wont do any good, at least in the case of DPP.
-+		 */
-+		return;
-+
-+
- 
- 	if (dpp->frame_retry > DPP_FRAME_MAX_RETRIES) {
- 		dpp_reset(dpp);
--- 
-2.25.1
+jprestwood@LOCLAP699:~/iwd$ objdump -TC 
+/lib/x86_64-linux-gnu/libedit.so.2 | grep rl_ | cut -d' ' -f17
+rl_getc_function
+rl_pre_input_hook
+rl_inhibit_completion
+rl_readline_name
+rl_redisplay
+rl_deprep_terminal
+rl_completer_quote_characters
+rl_completer_word_break_characters
+rl_filename_completion_desired
+rl_prep_terminal
+rl_free_line_state
+rl_set_keymap
+rl_newline
+rl_resize_terminal
+rl_callback_handler_remove
+_rl_qsort_string_compare
+rl_completion_word_break_hook
+rl_instream
+rl_basic_word_break_characters
+rl_forced_update_display
+rl_readline_version
+rl_kill_text
+rl_startup_hook
+rl_set_screen_size
+rl_point
+rl_special_prefixes
+rl_startup1_hook
+rl_get_previous_history
+rl_stuff_char
+rl_completion_entry_function
+rl_completion_display_matches_hook
+rl_did_startup_hook
+rl_generic_bind
+rl_set_keyboard_input_timeout
+rl_event_hook
+rl_callback_handler_install
+rl_parse_and_bind
+rl_line_buffer
+rl_linefunc
+rl_variable_bind
+rl_terminal_name
+rl_deprep_term_function
+rl_on_new_line
+rl_done
+rl_redisplay_function
+rl_prep_term_function
+rl_outstream
+rl_end
+rl_read_key
+rl_catch_sigwinch
+rl_catch_signals
+rl_insert
+rl_completion_append_character
+rl_attempted_completion_over
+rl_reset_after_signal
+rl_completion_query_items
+rl_reset_terminal
+rl_library_version
+rl_already_prompted
+rl_bind_key
+rl_completion_matches
+rl_callback_read_char
+rl_set_prompt
+rl_get_screen_size
+rl_cleanup_after_signal
+rl_bind_key_in_map
+rl_make_bare_keymap
+rl_prompt
+rl_read_init_file
+rl_insert_text
+rl_add_defun
+_rl_print_completions_horizontally
+rl_echo_signal_char
+rl_display_match_list
+rl_ignore_completion_duplicates
+rl_filename_completion_function
+rl_completion_type
+rl_attempted_completion_function
+rl_get_keymap
+rl_initialize
+_rl_abort_internal
+rl_complete
 
+Why this would be different on Fedora is beyond me, very weird.
+
+Thanks,
+James
+
+> 
+> Regards
+> 
+> Marcel
+> 
