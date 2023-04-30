@@ -1,45 +1,45 @@
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D8B3222
-	for <iwd@lists.linux.dev>; Sun, 30 Apr 2023 18:01:02 +0000 (UTC)
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6a5f21a0604so1374423a34.2
-        for <iwd@lists.linux.dev>; Sun, 30 Apr 2023 11:01:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C563222
+	for <iwd@lists.linux.dev>; Sun, 30 Apr 2023 18:07:52 +0000 (UTC)
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6a5febde157so673080a34.3
+        for <iwd@lists.linux.dev>; Sun, 30 Apr 2023 11:07:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682877661; x=1685469661;
+        d=gmail.com; s=20221208; t=1682878071; x=1685470071;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=hvDaHizuy44spn2SSDgFw0ub5UH2r12118oM+ZCypp4=;
-        b=DHEgyxFbpr7xLCyNhlSJOQas/iK1qXdKW65D3ch8XTXsX1FPobhJR3PW7wuOsLTTtv
-         UFgdckfFQFMQQ6/Kq5Gsm/Pl7ESEQv7ZZ33u+j/bp+BObJBz203CGImsIY5y4SP5GuaF
-         WBFxdELnRnPLfQaVsxsw/qbIPWMKQZZS4QRsGS3nTuPSHQamARlXQdTSpFDYQKNqQetW
-         OsRZCBiL5LKCf4URCxkUOwXYE3TX/j0/z9Mj5sjICekDwFouks530y1J+YO0iENzNReu
-         kUFJOllEevr6T9SUH/iRxxPv1Ff/lri2H66dtanHb0+HdbPfVAe+fk8HHj0YyA/FKDB3
-         wSYw==
+        bh=26gTyhDFxmLmcoIonHV0gg7iT57UV/0oj0E3Uon6Ahk=;
+        b=Fdyn3SzDUDW4BFdjyGO2EaT5UYjXkBJrAaQ/tNc16DSsU1d/r4lWpZKWDlIveng1iJ
+         rPn6rQ20W4mt5cbE4PXoEmidiEtJYn84QRlZrYPTqEMR1FI0LysPVe32W9kyTIRX1QsH
+         pariS29llKFbOrB15jPVQBKGMc/mtVagSpt0jkgrYMZsEt/+1jm7bLE/qUW0wFsl0ueM
+         P/EadEuem0d/0ZGZ2JuMVHn6evspbFhvhoEfgBDmK8/vVg9ZkorRC3ulGKl2AETqthXC
+         DYMg/BS4bPkr8bbW6hotmhtRy4chbDjDzBaOq7BfMPVgnczC9PPApsmVJodYa+sKXZTv
+         j7uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682877661; x=1685469661;
+        d=1e100.net; s=20221208; t=1682878071; x=1685470071;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hvDaHizuy44spn2SSDgFw0ub5UH2r12118oM+ZCypp4=;
-        b=hZPIQk2FXWhJuFoaLBaUp45/h9DGmAw05xzNR7K328CEGuZbDEL7jgt3JZRLu88/g9
-         NPlWBKM8YzBCzP4WLVgAL2yL/IzlrZAy7/fsZHiAnhqya7alPCGvweQ4Ro/OVcV0dmR0
-         U45VUqEEQdMOadpKAiWh3vPZlZcKKHmqJ2RE0LzsYQovnHB5+f1nOEH0RzETdzYBL5nf
-         WNVZiObQXGxoPlz0+XGmAE5/Xw9dtduCkiTgI5fg6lEHJKdVRScEP8JLjhhek1E8pK4+
-         aAvj118EeUY8HgNdVRv0BaSnd4slIlD//79Z2+h78/IeSisI5VzLA0zRvn+9nyGjStCT
-         DbCA==
-X-Gm-Message-State: AC+VfDyOtrZ6B6N5CY5TkDKbXabpfxmaiRBsEV0zS+CbNal/qnOurzSb
-	Zjfm7SN9uvKdztzifve2+M4=
-X-Google-Smtp-Source: ACHHUZ4HkFDKPcuEQwhRP4IJhaO57B+RtlEsfS7zc1zv6zjxm2p3E7b2KO0MiKekP1IcCm5OSNHlIg==
-X-Received: by 2002:a05:6830:1545:b0:6a4:44f0:c94a with SMTP id l5-20020a056830154500b006a444f0c94amr6042407otp.2.1682877661343;
-        Sun, 30 Apr 2023 11:01:01 -0700 (PDT)
+        bh=26gTyhDFxmLmcoIonHV0gg7iT57UV/0oj0E3Uon6Ahk=;
+        b=Rgv7OvL/bQtxaDXFEePP/j3wTq3/RiBqm+z5XqNXOl2CkCcIxpWJxz7wXicmogy8DN
+         9q4cZbSipeWvh9GgN0a0nyUUQIwoy5T3uTOjn0z/gKXHXFfwihCV8BW3kH87kSELQcRi
+         1OphC2UOPGIubMj/msyLL3rQ8b4HlSmewx4ZKSWTj/2tHar+65uspSrZjx4w4U1bwEqU
+         R3+WJlUORfOwsmWgF0srhNL57Mhym15lPGwNlq32NfaaTsGKFJKIevUbpOPCFlqK9nef
+         4HxrimGBMdqNjVuvvTpO/2s7Nzna5doo+BfxNKcD5Ur7YrgXuyi4O+AV9MnaerGPF17M
+         8pWw==
+X-Gm-Message-State: AC+VfDzC1fTJ0q7rvi7sdv6cB5nwV2xbNw0Oqa+G1V/Z3UWzslyZntDb
+	W9FBiRZbZIOZ6ptstYed+vMNwzR/aVeZkA==
+X-Google-Smtp-Source: ACHHUZ4dez5HrN4kPalHe3YtLj0dTM0LBb25Ck7EHs7+5j6q079WoEs42zQTr3K7UlVIVGb9GgpElg==
+X-Received: by 2002:a9d:6b98:0:b0:6a5:f147:5255 with SMTP id b24-20020a9d6b98000000b006a5f1475255mr6456202otq.6.1682878071419;
+        Sun, 30 Apr 2023 11:07:51 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id p7-20020a9d7447000000b006a4cceaf8ecsm11400731otk.48.2023.04.30.11.01.00
+        by smtp.googlemail.com with ESMTPSA id g24-20020a056830161800b006a205a8d5bdsm10807738otr.45.2023.04.30.11.07.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 30 Apr 2023 11:01:00 -0700 (PDT)
-Message-ID: <f347e9f6-d475-c37c-c223-1622f078dc9b@gmail.com>
-Date: Sun, 30 Apr 2023 13:00:27 -0500
+        Sun, 30 Apr 2023 11:07:50 -0700 (PDT)
+Message-ID: <ef0d61cf-5b09-f18e-d5e7-b6eb446acac4@gmail.com>
+Date: Sun, 30 Apr 2023 13:04:55 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,67 +48,40 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH v3] ft: fix double free when disconnecting mid-FT
+Subject: Re: [PATCH] dpp: fix incorrect offchannel usage as configurator
 Content-Language: en-US
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20230424134033.32916-1-prestwoj@gmail.com>
+References: <20230425205700.36822-1-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20230424134033.32916-1-prestwoj@gmail.com>
+In-Reply-To: <20230425205700.36822-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 4/24/23 08:40, James Prestwood wrote:
-> If IWD gets a disconnect during FT the roaming state will be
-> cleared, as well as any ft_info's during ft_clear_authentications.
-> This includes canceling the offchannel operation which also
-> destroys any pending ft_info's if !info->parsed. This causes a
-> double free afterwards. In addition the l_queue_remove inside the
-> foreach callback is not a safe operation either.
+On 4/25/23 15:57, James Prestwood wrote:
+> When acting as a configurator the enrollee can start on a different
+> channel than IWD is connected to. IWD will begin the auth process
+> on this channel but tell the enrollee to transition to the current
+> channel after the auth request. Since a configurator must be
+> connected (a requirement IWD enforces) we can assume a channel
+> transition will always be to the currently connected channel. This
+> allows us to simply cancel the offchannel request and wait for a
+> response (rather than start another offchannel).
 > 
-> To fix this don't remove the ft_info inside the offchannel
-> destroy callback. The info will get freed by ft_associate regardless
-> of the outcome (parsed or !parsed). This is also consistent with
-> how the onchannel logic works.
+> Doing this improves the DPP performance and reduces the potential
+> for a lost frame during the channel transition.
 > 
-> Log and crash backtrace below:
-> 
-> iwd[488]: src/station.c:station_try_next_transition() 5, target aa:46:8d:37:7c:87
-> iwd[488]: src/wiphy.c:wiphy_radio_work_insert() Inserting work item 16668
-> iwd[488]: src/wiphy.c:wiphy_radio_work_insert() Inserting work item 16669
-> iwd[488]: src/wiphy.c:wiphy_radio_work_done() Work item 16667 done
-> iwd[488]: src/wiphy.c:wiphy_radio_work_next() Starting work item 16668
-> iwd[488]: src/netdev.c:netdev_mlme_notify() MLME notification Remain on Channel(55)
-> iwd[488]: src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-> iwd[488]: src/netdev.c:netdev_link_notify() event 16 on ifindex 5
-> iwd[488]: src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
-> iwd[488]: src/netdev.c:netdev_deauthenticate_event()
-> iwd[488]: src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
-> iwd[488]: src/netdev.c:netdev_disconnect_event()
-> iwd[488]: Received Deauthentication event, reason: 6, from_ap: true
-> iwd[488]: src/station.c:station_disconnect_event() 5
-> iwd[488]: src/station.c:station_disassociated() 5
-> iwd[488]: src/station.c:station_reset_connection_state() 5
-> iwd[488]: src/station.c:station_roam_state_clear() 5
-> iwd[488]: double free or corruption (fasttop)
-> 
-> 5  0x0000555b3dbf44a4 in ft_info_destroy ()
-> 6  0x0000555b3dbf45b3 in remove_ifindex ()
-> 7  0x0000555b3dc4653c in l_queue_foreach_remove ()
-> 8  0x0000555b3dbd0dd1 in station_reset_connection_state ()
-> 9  0x0000555b3dbd37e5 in station_disassociated ()
-> 10 0x0000555b3dbc8bb8 in netdev_mlme_notify ()
-> 11 0x0000555b3dc4e80b in received_data ()
-> 12 0x0000555b3dc4b430 in io_callback ()
-> 13 0x0000555b3dc4a5ed in l_main_iterate ()
-> 14 0x0000555b3dc4a6bc in l_main_run ()
-> 15 0x0000555b3dc4a8e0 in l_main_run_with_signal ()
-> 16 0x0000555b3dbbe888 in main ()
+> This patch also addresses the comment that we should wait for the
+> auth request ACK before canceling the offchannel. Now a flag is
+> set and IWD will cancel the offchannel once the ACK is received.
 > ---
->   src/ft.c | 5 -----
->   1 file changed, 5 deletions(-)
+>   src/dpp.c | 36 +++++++++++++++++++++++++++++++-----
+>   1 file changed, 31 insertions(+), 5 deletions(-)
 > 
+
+I re-flowed the logic in this patch a little bit (dpp_mlme_notify).  Please 
+check that you agree / I didn't screw anything up.
 
 Applied, thanks.
 
