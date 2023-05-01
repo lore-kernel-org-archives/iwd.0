@@ -1,150 +1,156 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C49633D2
-	for <iwd@lists.linux.dev>; Mon,  1 May 2023 15:53:53 +0000 (UTC)
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7512da2d994so119240385a.2
-        for <iwd@lists.linux.dev>; Mon, 01 May 2023 08:53:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF678C05
+	for <iwd@lists.linux.dev>; Mon,  1 May 2023 22:06:10 +0000 (UTC)
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-61b6101a166so2543506d6.0
+        for <iwd@lists.linux.dev>; Mon, 01 May 2023 15:06:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682956432; x=1685548432;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nj+xhWM08DEz5cIta6ArPR8PvKg9hbZmA7ukOWUNYK0=;
-        b=KJ9VIhE1fh/4lxW3YbFZkjTeFtP1CAAXAXJ7qGPCqdQRZmkLuQV/A2x3dx7LPKsgMT
-         6LyneEmZHNkCDW9YK17yFpZyporUVih00w4RVWI2CO1f0lsPdREMk1pxxigxUcU8QDtE
-         mnIjNx9I1fgOHnEvVkxTcTlfxNa8PAlKr65lGrU6ojT7ub5Z5CNwypEVBeZxZCL4Ca5G
-         9CXL7tAq3t0h/GhLynmlpTVX55LpL5T/ZV2ib7gnnSTcNhPHgF10yqW3aOBGPPfGurny
-         izTuYDiZWy8XBVGSSEtBcU5RzxrL5GZNh3+Kb/OadMv+pqB6bo5BoqsT4UGqrUE8kPl5
-         SZyg==
+        d=gmail.com; s=20221208; t=1682978769; x=1685570769;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fGaSRVFoZIHRUupgA9yFRhhze1LGhEbdVs0BsR56Xxc=;
+        b=RZ0mmrA3YoSMnY+8OjzbZIjCFf2LCXfYOSD/fU4jqRYgV+8oKyhKYUHfixqkgHj0Wd
+         qcv3A8pGlJI4pdRW0H1PLl07YFAkg3BIusKnwsQ+PM6em30/bjEx7UpIU6FoMi0CImCR
+         3V7+DUxmFbgYnCHpokMnimq1tisp7DDsQaxTm/QFqx63LlHmPRe7F4WoWmA6qe4ePLhb
+         UGXDeDXlVaR+Xe/m6vL2ZfejNXXZ5hIM/cj6AoNOg0DFwSiaGo0WvCi8a1ZjQjmolRTj
+         YOjBjw4I9d/U9wWUxFPOms0LrSagj0npqnL3QxEBApJCHDlzY8e/1mmQM6swVs4a7L83
+         OzIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682956432; x=1685548432;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nj+xhWM08DEz5cIta6ArPR8PvKg9hbZmA7ukOWUNYK0=;
-        b=eAwp9D2Omcja5dWYB3abnQ9Z5ZoSG42TCpX6gm16uZFwTpslnoCw09zTShKd4uwWeV
-         TJsb/evz8438m6KApFgTC2ojpShyyk8cPaYHaBbsJRz2EU0+LZ188K9Q8MAXpclCN/kx
-         z5BmrhJNVPlFw/5IsP48WNxYzqCAUS2x/ss4ub0d8UJ4avxZYJU5xlg5UedBdQrFsbIL
-         9UzvsVlF59kqpGdQ/WX6v5KqlYTF4anwHjRxTZiCP0UdwNDbwD+hKCwVD+W2LmGRC78u
-         +fOD1b8TRd+9gkmAxHfpSGfAaveykaGTtHfwGjFO4PP+c8o37rnFGJmGuR1AjfCExVGm
-         I9Iw==
-X-Gm-Message-State: AC+VfDxTREHr+vjOar+KyNV74smkCYut7zT6YemthRRh6J8C8u7KU/yr
-	92k6e+Ca8PyE6A2AoCh0aMk=
-X-Google-Smtp-Source: ACHHUZ7BwXBVqhQSxGjrT4vxbiEbRaHvwO/Av2Na0IMmj4/uI3c6p3pYJdcxMHO12d8ueWVq6jlOkw==
-X-Received: by 2002:a05:6214:27e6:b0:5ad:13a6:b45b with SMTP id jt6-20020a05621427e600b005ad13a6b45bmr577461qvb.11.1682956431861;
-        Mon, 01 May 2023 08:53:51 -0700 (PDT)
-Received: from [10.193.157.43] ([208.216.218.212])
-        by smtp.gmail.com with ESMTPSA id o1-20020a05620a2a0100b007468765b411sm8950534qkp.45.2023.05.01.08.53.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 May 2023 08:53:51 -0700 (PDT)
-Message-ID: <f79812ac-205d-9cca-40a0-e7f4ca551738@gmail.com>
-Date: Mon, 1 May 2023 08:53:49 -0700
+        d=1e100.net; s=20221208; t=1682978769; x=1685570769;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fGaSRVFoZIHRUupgA9yFRhhze1LGhEbdVs0BsR56Xxc=;
+        b=H4pXPQtkWzyjEuPfuSSXWoKZb5CdeqpF5TrZty9Yw7OmMulrXKDM11G/V6hfs9esQz
+         HgjtFsL6uNRs2Wqm+UjfKu+rs3IhV+pYByqoHToOSE93gCFx/jkMAmFtbs8CojgaDYiW
+         YR6X2RhGGz96rwD5uELIMvUkQGXh21r6EAD5htSEKMZA8LOZahILaoGkgQtNssH6pLHk
+         VR3n7b51sSrY05a1csuhqkYx5vj5Z/vxRNn9xq5q9l9uU4v6JoLpLiHAvqkzKQ5vYn1W
+         7owGZ6PR5TNYvquJ+3V6ZlVQTiI9B5/Ho0Pk4YYLLX3qRtb1sQeGtU+JhWBWaPZJHh5c
+         nMDA==
+X-Gm-Message-State: AC+VfDwFP+Isi8XqKK7yJRfXPLV1vPWObV8B/6P44vPr2mcwHGfGqke5
+	Vn7z6lB6uQY/6UtH7pKFSebDiPFA9Dg=
+X-Google-Smtp-Source: ACHHUZ6Rz0dinB31ryEJ/jyEhs5KDrYuduKvAjGJR+31WRgghMlI6+i6CCGRox3xA7Pf45yw0C2HDA==
+X-Received: by 2002:a05:6214:130c:b0:5e9:429b:559f with SMTP id pn12-20020a056214130c00b005e9429b559fmr2515393qvb.13.1682978768979;
+        Mon, 01 May 2023 15:06:08 -0700 (PDT)
+Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id u17-20020a0ca711000000b0061a4a93eeadsm445184qva.127.2023.05.01.15.06.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 May 2023 15:06:08 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] station: fix reentrant FT wiphy radio work insertion
+Date: Mon,  1 May 2023 15:06:04 -0700
+Message-Id: <20230501220604.366100-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH] station: handle ROAMING state in disconnect event (again)
-Content-Language: en-US
-To: =?UTF-8?Q?Alvin_=c5=a0ipraga?= <ALSI@bang-olufsen.dk>
-Cc: =?UTF-8?Q?Alvin_=c5=a0ipraga?= <alvin@pqrs.dk>,
- "iwd@lists.linux.dev" <iwd@lists.linux.dev>,
- Dimitrios Karnikis <DIKA@bang-olufsen.dk>,
- Claudio Cabral <CLCA@bang-olufsen.dk>
-References: <20230403141927.235014-1-alvin@pqrs.dk>
- <c9b5a931-ac35-2755-c656-acd567c1505f@gmail.com>
- <bfvlzfzk2ov4gzgedn66pblygsbzx5znyfa6vg5b7rocqbnnmp@qdwzifi5ofmq>
- <nxr432iqvnvzmhkp5afjjt3oggkh5b3yydemd2litlaex2qud5@vus3zhhuo4a6>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <nxr432iqvnvzmhkp5afjjt3oggkh5b3yydemd2litlaex2qud5@vus3zhhuo4a6>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Alvin,
+The failure path for FT was inserting the same work item inside
+the 'do_work' callback. This caused duplicate work items to be
+inside the radio work queue, and upon destroy the ID would get
+zero'ed out. This caused a host of valgrind complaints when this
+behavior is triggered.
 
-On 4/30/23 3:22 AM, Alvin Šipraga wrote:
-> Hi again,
-> 
-> On Wed, Apr 05, 2023 at 09:12:20AM +0000, Alvin Šipraga wrote:
->> Hi James,
->>
->> On Mon, Apr 03, 2023 at 03:35:28PM -0700, James Prestwood wrote:
->>> Hi Alvin,
->>>
->>> On 4/3/23 07:19, Alvin Šipraga wrote:
->>>> From: Alvin Šipraga <alsi@bang-olufsen.dk>
->>>>
->>>> The blamed commit clobbered the non-FT (Reassociation) roaming case
->>>> in the disconnect event handler, causing iwd to potentially get stuck in
->>>> the ROAMING state after a failed reassociation during non-FT roaming.
->>>> Add it back.
->>>>
->>>> The subject is inspired by a previous commit which did the same thing,
->>>> but introduced before the new roaming states were added, namely commit
->>>> 8758cc89487b ("station: handle ROAMING state in disconnect event"). The
->>>> rationale here is the same.
->>>>
->>>> Fixes: edf556cc7bb9 ("station: add two new roaming states (FT/FW)")
->>>
->>> IIRC leaving out the old ROAMING state in this switch was actually done
->>> intentionally. This is because netdev_reassociate() takes a callback and any
->>> failures with the roam *should* show up in netdev_connect_event(), and in
->>> turn call the callback which then leads to the same station_disassociated()
->>> call. We wanted to avoid the potential of a disconnect event AND the connect
->>> callback both calling station_disassocated().
->>
->> Yes, that makes sense.
->>
->>>
->>> Do you happen to have an iwmon pcap/log of this behavior? If its a kernel
->>> bug and a CMD_CONNECT connect event never comes then we probably do need
->>> this patch, but maybe instead with an L_WARN_ON or a big debug print because
->>> it really shouldn't be happening.
->>
->> Yes, this will be our next direction of inquiry. Easter is coming up and the
->> issue is reproducible by colleagues who are on holiday. But I will follow up.
-> 
-> Just a short update on this. Currently we root-caused the failure to a bug where
-> the 2nd packet of the 4-Way Handshake gets silently dropped by the firmware we
-> are using and the vendor is looking into it. Until this is fixed we can't point
-> any fingers at IWD. I'll follow up once that is fixed. Thanks!
+This can be seen with slight modifiations to the FT test:
 
-So was IWD not handling this? We keep a timer for eapol, so if packet 
-2/4 was lost IWD should recover regardless. Even if its a FW bug IWD 
-shouldn't get stuck.
+src/station.c:station_try_next_transition() 9, target 12:00:00:00:00:02
+src/wiphy.c:wiphy_radio_work_insert() Inserting work item 6
+src/wiphy.c:wiphy_radio_work_insert() Inserting work item 7
+src/wiphy.c:wiphy_radio_work_done() Work item 5 done
+src/wiphy.c:wiphy_radio_work_next() Starting work item 6
+src/netdev.c:netdev_mlme_notify() MLME notification Remain on Channel(55)
+src/ft.c:ft_send_authenticate()
+src/netdev.c:netdev_mlme_notify() MLME notification Frame TX Status(60)
+src/netdev.c:netdev_mlme_notify() MLME notification Frame Wait Cancel(67)
+src/netdev.c:netdev_mlme_notify() MLME notification Cancel Remain on Channel(56)
+src/wiphy.c:wiphy_radio_work_done() Work item 6 done
 
-> 
-> Kind regards,
-> Alvin
-> 
->>
->> Thanks for the quick reply.
->>
->> Kind regards,
->> Alvin
->>
->>>
->>> Thanks,
->>>
->>> James
->>>
->>>> ---
->>>>    src/station.c | 1 +
->>>>    1 file changed, 1 insertion(+)
->>>>
->>>> diff --git a/src/station.c b/src/station.c
->>>> index d5650a2995a9..69f9be79880d 100644
->>>> --- a/src/station.c
->>>> +++ b/src/station.c
->>>> @@ -3201,6 +3201,7 @@ static void station_disconnect_event(struct station *station, void *event_data)
->>>>    					event_data, station);
->>>>    		return;
->>>>    	case STATION_STATE_CONNECTED:
->>>> +	case STATION_STATE_ROAMING:
->>>>    	case STATION_STATE_FT_ROAMING:
->>>>    	case STATION_STATE_FW_ROAMING:
->>>>    		station_disassociated(station);
+--- Work item 7 is 'station_ft_work_ready()' ---
+
+src/wiphy.c:wiphy_radio_work_next() Starting work item 7
+src/station.c:station_debug_event() StationDebug.Event(ft-roam-failed)
+src/station.c:station_try_next_transition() 9, target 12:00:00:00:00:03
+src/wiphy.c:wiphy_radio_work_insert() Inserting work item 8
+
+--- Here we insert work item 9, which is a duplicate of 7 ---
+
+src/wiphy.c:wiphy_radio_work_insert() Inserting work item 9
+src/wiphy.c:wiphy_radio_work_next() Starting work item 8
+src/netdev.c:netdev_mlme_notify() MLME notification Remain on Channel(55)
+src/ft.c:ft_send_authenticate()
+src/netdev.c:netdev_mlme_notify() MLME notification Frame TX Status(60)
+src/netdev.c:netdev_mlme_notify() MLME notification Frame Wait Cancel(67)
+src/netdev.c:netdev_mlme_notify() MLME notification Cancel Remain on Channel(56)
+src/wiphy.c:wiphy_radio_work_done() Work item 8 done
+
+--- And finally, the duplicated work item starts ---
+
+src/wiphy.c:wiphy_radio_work_next() Starting work item 0
+src/station.c:station_debug_event() StationDebug.Event(ft-roam-failed)
+src/station.c:station_roam_failed() 9
+src/station.c:station_roam_trigger_cb() 9
+---
+ src/station.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/src/station.c b/src/station.c
+index 0d8f7628..3c6e43ce 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -122,6 +122,7 @@ struct station {
+ 
+ 	uint32_t wiphy_watch;
+ 
++	struct l_idle *ft_idle;
+ 	struct wiphy_radio_work_item ft_work;
+ 
+ 	bool preparing_roam : 1;
+@@ -1739,6 +1740,11 @@ static void station_roam_state_clear(struct station *station)
+ 		station->roam_freqs = NULL;
+ 	}
+ 
++	if (station->ft_idle) {
++		l_idle_remove(station->ft_idle);
++		station->ft_idle = NULL;
++	}
++
+ 	l_queue_clear(station->roam_bss_list, l_free);
+ 
+ 	ft_clear_authentications(netdev_get_ifindex(station->netdev));
+@@ -2282,6 +2288,16 @@ static void station_preauthenticate_cb(struct netdev *netdev,
+ 
+ static void station_transition_start(struct station *station);
+ 
++static void station_transition_idle(struct l_idle *idle, void *user_data)
++{
++	struct station *station = user_data;
++
++	l_idle_remove(station->ft_idle);
++	station->ft_idle = NULL;
++
++	station_transition_start(station);
++}
++
+ static bool station_ft_work_ready(struct wiphy_radio_work_item *item)
+ {
+ 	struct station *station = l_container_of(item, struct station, ft_work);
+@@ -2300,7 +2316,8 @@ static bool station_ft_work_ready(struct wiphy_radio_work_item *item)
+ 	if (ret == -ENOENT) {
+ 		station_debug_event(station, "ft-roam-failed");
+ try_next:
+-		station_transition_start(station);
++		station->ft_idle = l_idle_create(station_transition_idle,
++							station, NULL);
+ 		return true;
+ 	} else if (ret < 0)
+ 		goto assoc_failed;
+-- 
+2.25.1
+
