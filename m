@@ -1,77 +1,55 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F87833E8
-	for <iwd@lists.linux.dev>; Tue,  2 May 2023 19:00:00 +0000 (UTC)
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7516d97a63aso228332985a.1
-        for <iwd@lists.linux.dev>; Tue, 02 May 2023 12:00:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683053999; x=1685645999;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JXnrqrJ+LOcq76P8sT+HALF5r6txP4K+F2+peVzXGjU=;
-        b=EGsLqz5ke7uqCtV1cNQy1R4jP4cjZD7xVqaVTCUsciUizlRB+XK99L4v6stnlIDzXb
-         iHwAUgW2LRBAU/bjzX0pV5lCFKdhMMfDoTVJ6MlRzupKbXVti8HWu31XuCDs8w3V9gfC
-         hzNT+v+I+ElRn3v2Xv8EBj0LOFVjGg+Uxqe6N/8XIkCSQH6TvISRITOEeymzVg1PtFW5
-         2pIXL+uO+YHlfGmTaZW6PF3VA1vxhaYGVfYVUPiDz8L55Jg9ogvLrzWB5YmQG1wkMbm4
-         yo+CQLif5Akro8VjP5p8T3NG5VtuDLO42OgZsz8tre/nTWR/NTdULtMOv81dlpNDmpW3
-         9gqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683053999; x=1685645999;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JXnrqrJ+LOcq76P8sT+HALF5r6txP4K+F2+peVzXGjU=;
-        b=cRBZwtXxVL0omW46yyDk9iOmEMNTEcn9H12PEvknB/eox3RdKVzBhIY/OjTmwN0ZNF
-         qcUVe9jq9S4hrI8Hcsfz6KO5rSbzPg6CyP8oVWjI4n07Z2gPixCcLc8dFu7M9z3Cs46r
-         rJ1dzFw4s2F6j2MrK65WoZUxlrXLuE9B4g1Rf2zzUsaFcYPY/noJVyAyJBqLiOIOdrU/
-         6Vr4M6DUe+QrDOTtmubEXjWvKa/c3q4RHHyVEgQb6VsLD5ltmNuLy7PLavdjUAJCnWyt
-         fPSAGb/a/prQdhCmowsOhMqCRXP41EzA1q4wrtr0FNh3KvQUS1yxmsCEaUt8UrSmuent
-         Gd6g==
-X-Gm-Message-State: AC+VfDzi8HMVQBr1Uvhix6NrmdeCMAP1ZOM9j4W2hoFdQlC7f+TMZ5Na
-	FmGzBUUBlcAjyseZ+5b8z/Ee4UIEdMc=
-X-Google-Smtp-Source: ACHHUZ4vC8ILoCqf/CNq7RJwWh9gajNgbl04fz4RYXRa4b+H3gIIJQFhL0OvmNloIqnZ3d9gZaiJVA==
-X-Received: by 2002:ac8:5a07:0:b0:3f2:18e8:c766 with SMTP id n7-20020ac85a07000000b003f218e8c766mr11481078qta.67.1683053999218;
-        Tue, 02 May 2023 11:59:59 -0700 (PDT)
-Received: from LOCLAP699.cardinalhealth-columbus.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id r84-20020a37a857000000b0074d8eb83321sm9923191qke.27.2023.05.02.11.59.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 May 2023 11:59:59 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] station: fix potential NULL access with forced roam
-Date: Tue,  2 May 2023 11:59:55 -0700
-Message-Id: <20230502185955.436081-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC465747F
+	for <iwd@lists.linux.dev>; Wed,  3 May 2023 10:15:47 +0000 (UTC)
+Received: from smtpclient.apple (p4fefc45b.dip0.t-ipconnect.de [79.239.196.91])
+	by mail.holtmann.org (Postfix) with ESMTPSA id 0328FCECE8;
+	Wed,  3 May 2023 12:07:06 +0200 (CEST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.3\))
+Subject: Re: commit IWD 8f0420c533ae6a49c4f2803afe32d5922a5236ad build error
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <4fb2f58e-8a05-93fa-de19-d61d9b4320ed@gmail.com>
+Date: Wed, 3 May 2023 12:07:06 +0200
+Cc: daniel antoine <univac55@gmail.com>,
+ iwd@lists.linux.dev
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <BD529D19-3091-44FA-8AFE-BE89445D9B13@holtmann.org>
+References: <CA+iibzC0O-v+Rk+799=QYmzyAZo_3XcN1mfAsM-QtnA8zc6wpw@mail.gmail.com>
+ <DE0B5BC4-B2D5-47FF-8D80-8FAEC8A65CA7@holtmann.org>
+ <537606f4-9708-0bad-2144-d4809dfd7548@gmail.com>
+ <914A101F-70E4-4FA0-80A9-CF3A28BE61D2@holtmann.org>
+ <b2be8a34-3624-b269-e253-6b76373807e0@gmail.com>
+ <CA+iibzAW33xScrgXCqMebr1t5AmpPG6xntsv+8z4cUjc8ih4uQ@mail.gmail.com>
+ <CA+iibzB2XA6xuQtMQRH3vcPiRtsb5bdDHRDQN5HNbvu2eQttJA@mail.gmail.com>
+ <CA+iibzCNBhsS3sCkuN4cdvWmLDokaVMoVS6r8Q2mcKKx1+mm-g@mail.gmail.com>
+ <4fb2f58e-8a05-93fa-de19-d61d9b4320ed@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>
+X-Mailer: Apple Mail (2.3696.120.41.1.3)
 
-If forcing a roam using developer mode IWD could become
-unconnected during the scan and result in a segfault when
-the network_get_security() is called.
----
- src/station.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi James,
 
-diff --git a/src/station.c b/src/station.c
-index be571083..9104ebf6 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2482,7 +2482,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 	uint16_t mdid;
- 	enum security orig_security, security;
- 
--	if (err) {
-+	if (err || !network) {
- 		station_roam_failed(station);
- 		return false;
- 	}
--- 
-2.25.1
+>> I have updated libedit to 20221030-3.1 et the compilation off iwd is =
+OK now
+>> may be you have to specify that the level of libedit must be
+>> 20221030-3.1 to build with libedit instead of readline
+>> I am sorry for the convenience the problem was on my side I was not =
+at
+>> the last level of libeditt
+>=20
+> No problem, I ran into the same thing :) Marcel, is there a way to do =
+a version check on libedit so configure can detect these unsupported =
+versions?
+
+I can check for version >=3D 3.1 when looking for libedit. Is that =
+enough?
+
+Regards
+
+Marcel
 
