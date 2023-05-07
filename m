@@ -1,83 +1,74 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F8CC133
-	for <iwd@lists.linux.dev>; Thu,  4 May 2023 21:52:55 +0000 (UTC)
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-61a35fdf61dso4969926d6.2
-        for <iwd@lists.linux.dev>; Thu, 04 May 2023 14:52:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE2C33D4
+	for <iwd@lists.linux.dev>; Sun,  7 May 2023 23:04:45 +0000 (UTC)
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6a5e2289965so2708196a34.3
+        for <iwd@lists.linux.dev>; Sun, 07 May 2023 16:04:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683237174; x=1685829174;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qVEzcMbtCFwrxQbeXo/PeVPLuMaklYLmcNuMwDsP/3I=;
-        b=FoMZ2dVq/18D3MPB98A9IjKft1sfjtfj4+JWokPgfxVf97Ofg1zgJkFC+USgXtW4eh
-         CBt5SsLuouKO58hT4DF9l4ziWkyafHKr/nKwBtpO7cJHH/pWT6+bpjubVrQAiano10d5
-         lMjBvNI7jbz1VhD9JmzEvr6EpfiIna0E8MMqqVZSm1USs4anvefxwDDu1VEyBmieZ/4I
-         q01+eS+2Uo9L+HsKbCO0CcS39i0ozomRNfpVMGckubLxYywyz+FP2BkXEj9CBz/ZjUW6
-         59IuBOOy33s58/ACVv+C513up7aFi28bAZI2Z+2p9OTcHAGX7nT0ZXAq869UXz5hXaoy
-         o9wQ==
+        d=gmail.com; s=20221208; t=1683500684; x=1686092684;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jsmtrp1L3wGtGjPlOpAwhVBXDRgAdkjWbmIsFfr0Jzk=;
+        b=poa74RhIupS3LSNdAcOHYN32lmOL5k4pCxFC9o+iG+sTK8Yz43Cbf8I7Az2Ia67Y71
+         4EoI8fSkqsXVxhvxCkmR5KbidIZjJZk7WZy7xZd7WEFfDbz41R7h34mSsQLZjRcw1ZGM
+         GaFHP70f99AkXadeC4qAVKYpbsjsmZc2H4lqvDrNug0+fCzJ9uzrjNYNupA0AW+Fe1zh
+         WehUt85OmtsyVOs2Dh3rzYF69iLDAbxL83pb3ymamA8IpW8GWgzKQ3nZVBlm4LYtDNBa
+         UOGa0HVXyGgkPDIzrYcQMWyaXOPiwcqisWuZ/hDHNbk8b7r3IEL9GVBruYZxtYGK5k8I
+         XkFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683237174; x=1685829174;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qVEzcMbtCFwrxQbeXo/PeVPLuMaklYLmcNuMwDsP/3I=;
-        b=KOU83LbYYezpb59e9L5oH5XH1slBsrTiu8OnAxyz9HsD1ndixHe/2+zHNDD7jO2QFT
-         /nfbH4ldt6EdyngiaQxII/oCbAPmcv5W8qixeAIeoALgzzgi6G+clW6jINRKTaNikWmR
-         do6nYyFoka08+XTPDv1+xZXPo/wi5pmuvK55UXNZJ2DIYv/h2R6anWdAT5EuIOByCQuX
-         L/w1t9R0GPu3xfY9Af4KVB0urwD/xRwzUiu4TDKbyhDoKrlVK1pfPbA54KUyNADp2Akz
-         a/983Tcg6WFa5Dn4niw0XRNFNvZqrndNv0sgE/HUJaSGGMTvxWT1DZ/+bKFuktac7Rpn
-         o2RQ==
-X-Gm-Message-State: AC+VfDwDKSSh+AesbmGeb+P5gAdHoMaVURX5SZTHKO4lynrmZY14ZNOM
-	VOs17LrlZmg/PmyTvUEg5Q9EWTpz/J0=
-X-Google-Smtp-Source: ACHHUZ4Ptfpt3hDZkl0hXnVlkMXA/MeQf+/lwbDohb7gSTmBMgT4rRLro7YfnyBNF5CIH0n6K2PluA==
-X-Received: by 2002:a05:6214:3009:b0:61b:65f9:c1e6 with SMTP id ke9-20020a056214300900b0061b65f9c1e6mr16641624qvb.17.1683237174135;
-        Thu, 04 May 2023 14:52:54 -0700 (PDT)
-Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id v9-20020a0cdd89000000b0061b5b399d1csm52262qvk.104.2023.05.04.14.52.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 May 2023 14:52:53 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] test-runner: fix __str__ for namespace processes
-Date: Thu,  4 May 2023 14:52:47 -0700
-Message-Id: <20230504215247.581443-3-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230504215247.581443-1-prestwoj@gmail.com>
-References: <20230504215247.581443-1-prestwoj@gmail.com>
+        d=1e100.net; s=20221208; t=1683500684; x=1686092684;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jsmtrp1L3wGtGjPlOpAwhVBXDRgAdkjWbmIsFfr0Jzk=;
+        b=Ir/c3EDoU35QimyB8Ar0LXdEVtPB1mtZ8JptHGHJ1VoFAPxqeS7d304itIqqEILXsT
+         Lwn1+65w9qIq8N6bBEuD5RE+f/91Qg0XQLxVEDXyezv2Bblz8DMd3etAq3zuz1fEyVNF
+         Vidq9fVVD0amExDRaGcRCdDc5Xa1grpH+Ll/8dmdV+yMy+lR03jRg1PYySRRFhZtF+KZ
+         2cLfvkBfYfNWsJ/TPGvxndz8EZT6l1qZsI867/evO0tJ0F8562sI+K5WXlvZZBTqoYEX
+         HONPdryWC3r+zS3UXHXbGgPIqrjwHtp4tyFmHwf9xz+oabVxUgTgAcLE3mAwBwEQLxp1
+         FmNg==
+X-Gm-Message-State: AC+VfDy7d4KU+XC/PJSw5tFKsXiNy9oLfdpk1mdWv/mommfOfgWKe9le
+	KVnbdt/I8MfNBUPQgP0Q+jZSoT4NSAg=
+X-Google-Smtp-Source: ACHHUZ6Nw5CaYwa7glTsB2h3Xrdmf34ZKhaVjFcYzpIVNhnM/V9JHcN/tGJR+KOQ5reVXKf0gtWmTA==
+X-Received: by 2002:a05:6808:b15:b0:389:92d6:18a1 with SMTP id s21-20020a0568080b1500b0038992d618a1mr4198613oij.24.1683500684051;
+        Sun, 07 May 2023 16:04:44 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id cv20-20020a056808261400b003923e412668sm5003344oib.50.2023.05.07.16.04.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 07 May 2023 16:04:42 -0700 (PDT)
+Message-ID: <1417ed78-7ddd-3725-63b6-34d2923122e8@gmail.com>
+Date: Sun, 7 May 2023 18:03:55 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH] client: avoid segfault in iwctl quit
+Content-Language: en-US
+To: Ronan Pigott <ronan@rjp.ie>, iwd@lists.linux.dev
+References: <20230502084831.60016-1-ronan@rjp.ie>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20230502084831.60016-1-ronan@rjp.ie>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When printing out a namespace the Process.get_all() call was
-returning all processes running, even those not in the namespace
-being printed. Modifying get_all() is tricky since its a class
-method (and used elsewhere for ALL processes) so instead filter
-the results to only show processes in the namespace being printed.
----
- tools/utils.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi Ronan,
 
-diff --git a/tools/utils.py b/tools/utils.py
-index d2e1c33b..48d5d219 100644
---- a/tools/utils.py
-+++ b/tools/utils.py
-@@ -529,7 +529,8 @@ class Namespace:
- 		ret = 'Namespace: %s\n' % self.name
- 		ret += 'Processes:\n'
- 		for p in Process.get_all():
--			ret += '\t%s' % str(p)
-+			if p.namespace == self.name:
-+				ret += '\t%s' % str(p)
- 
- 		ret += 'Radios:\n'
- 		if len(self.radios) > 0:
--- 
-2.25.1
+On 5/2/23 03:48, Ronan Pigott wrote:
+> iwctl quit (running quit non-interactively) isn't a useful command,
+> but it shouldn't segfault. Let's avoid calling readline functions if
+> we haven't initialized readline in this run.
+> ---
+>   client/display.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+
+Applied, thanks.
+
+Regards,
+-Denis
 
