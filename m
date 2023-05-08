@@ -1,45 +1,45 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FDD17D1
-	for <iwd@lists.linux.dev>; Mon,  8 May 2023 13:43:14 +0000 (UTC)
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1a50cb65c92so31329395ad.0
-        for <iwd@lists.linux.dev>; Mon, 08 May 2023 06:43:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B341361
+	for <iwd@lists.linux.dev>; Mon,  8 May 2023 13:49:38 +0000 (UTC)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-24e2bbec3d5so3233710a91.3
+        for <iwd@lists.linux.dev>; Mon, 08 May 2023 06:49:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683553394; x=1686145394;
+        d=gmail.com; s=20221208; t=1683553778; x=1686145778;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=2gov15n1gKUK8ESLWBMXUF09c+FVenZP+JZhil/4ZMQ=;
-        b=etU1+8ofvBohmAjDgdk/MBT/TwBWhxP/OyQigPjt2ulORtX2SMW9tIEcaKSIgbY7zk
-         szC8sAfXbWVoBA/68+TmRWqxnL4Xv7UJM3f/1EP72PVoTGUUuX/52pp9aSxrcvHYwgl+
-         Uo3uPnkjhN3a1wVkzi2Lu78BKR1o3Hg0v0yvwrdFSBnVHceqLY+oUekL61DXnV7AIrkS
-         Yg/a3j0M31tJHTjdal/l0EXOisCWAOtIon1k1nNR+YgaH7u40lFoKGXEdQF3J755+FjR
-         3mvJNzU59/TezBxOjmLUtaOr15/5VCOrE2jfScpu/eYqLjW5fBmLxg6pdkJIRySwTj3c
-         ifEQ==
+        bh=+qxasU3SNKYjPJb7hc73gmxmIM5M/FxuRxL1Y2u8Zgw=;
+        b=X8Gk/XUoFZznVJ7YT7ojbjt8eGFn50I4F+CkcauE9T2pPV9qcyaWbt7cnSLwUHpUZe
+         ZxeclnphI67wWiAzKp6UHKdyhs5iENPj0RSU6SaIZV5jFD20Bkc6gm3KjS742bQbkidu
+         /u+15KgBP4bzvYHtKKnMMqKtGCbDwK6g2coO9xwhvsClvjHCvDeLI5CuEeBza1XCfZMu
+         WlLXU4NNekMNEOIWD7cxrZW4Cz0HHZRSxraFxTTfXiWeBQ42aIfCM2fEiQeK591S+Z7L
+         P49j+Sk4fj8acaxR1EImMHkfxsahSEzvNRR9Zt/DSIsj5nfWOASvGR8oKrj15VoX08NA
+         ZjVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683553394; x=1686145394;
+        d=1e100.net; s=20221208; t=1683553778; x=1686145778;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2gov15n1gKUK8ESLWBMXUF09c+FVenZP+JZhil/4ZMQ=;
-        b=W0GsIWMCcyYy+6sNbnGpoiwoLUMopJl84G0qbfGuflZ/K34svQlqkQlEB5mkvpSd0N
-         DbfZOJNl7dyoQkEqlkLxGMEZzX5QZnFyQRBpjinc5a4OZuCGU7CeZdPDuVGnN00Oe0DY
-         CFTdMnVnco83Ah1maFAuIYo7Kn6Syd0wmgvd89wozBPrSk1yDT71aTkYaPAQMNUSewqm
-         47yQEfilibah7pZxarjlh2ZdtrzTPLPiSexut1V3tr4/BtCALmj04no9Zb4MTUKWCb37
-         o/R5Q/APrw8AvTOM8uOR/4ejd3aA7+npXidt2KtJGwgXkUAYICgQk3kwsn+I+8zLuV6x
-         roVQ==
-X-Gm-Message-State: AC+VfDy5jp0aHsAmKvwqTdIsgVXVulb0XkRx/1597hKnErftPaGhTa0I
-	ojCCASOXhigMEp1+AEAIUjBPQNAs494Bpg==
-X-Google-Smtp-Source: ACHHUZ76g9rBeFqFLYFswdkWBuSfYyItKxxuNRezi3bq9IAa/A91FHAb1WqmCN/Nx1jgHdXsk43vFQ==
-X-Received: by 2002:a17:902:b683:b0:1ac:3780:3a7f with SMTP id c3-20020a170902b68300b001ac37803a7fmr9544305pls.53.1683553393644;
-        Mon, 08 May 2023 06:43:13 -0700 (PDT)
+        bh=+qxasU3SNKYjPJb7hc73gmxmIM5M/FxuRxL1Y2u8Zgw=;
+        b=SUBmyoqfjHkk1E5kpPStKPOqOtsrgmIK6w754EosVNTOpwmlGrosCEmEfT/1bWebbI
+         Bpqe2rUfTpZim1yBzBGOFb5f689dJNbgk283lZPCV085yDhz2nC8ciSTzlhvlwrS4HzP
+         s6bfcEUHPZMKfei3bk5IrJer2KZ+4A7cu1nHHnfZt1hnYM+5DDpNaTnOtyfeH51O2FMz
+         EtzZyf1jcNjM8ScmPX6UQdqYxchx7YPQZF5+nuaEXM4BHxUUuRGbD5Te+C2nByWa4Pil
+         C7zzx8ikhCsOmMgqywAhS6I6IhyEg1WeG5I6V/neCtUbZGM1DvQMVpeOfyToi1Y1kWfR
+         S3pw==
+X-Gm-Message-State: AC+VfDyfm5fcMpc4TZerHHVxv+VYei0YftfOaQGlR3INbUhh2Zq+cFji
+	qJdtQo+smpeaW8mTIOAP2z+4Gm7PvZJxPA==
+X-Google-Smtp-Source: ACHHUZ5SSqTzYokbfKNrVbH96ID9/9ChlcZP46amZNMX+UhbmOt+Ajb7MnnkMehM79yj+DPnAgBHMg==
+X-Received: by 2002:a17:90a:8807:b0:249:842d:312f with SMTP id s7-20020a17090a880700b00249842d312fmr10695321pjn.4.1683553777943;
+        Mon, 08 May 2023 06:49:37 -0700 (PDT)
 Received: from [192.168.254.76] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id k19-20020a170902761300b001ac7c6fd129sm1997753pll.43.2023.05.08.06.43.13
+        by smtp.gmail.com with ESMTPSA id gl20-20020a17090b121400b0024749e7321bsm2389928pjb.6.2023.05.08.06.49.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 May 2023 06:43:13 -0700 (PDT)
-Message-ID: <39610c47-eaba-2299-9b03-5217355e8d47@gmail.com>
-Date: Mon, 8 May 2023 06:43:09 -0700
+        Mon, 08 May 2023 06:49:37 -0700 (PDT)
+Message-ID: <18798950-0bd5-e09a-3192-df0647a4ce71@gmail.com>
+Date: Mon, 8 May 2023 06:49:34 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,82 +48,59 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH 1/3] hwsim: remove 'optimization' sending to only known
- MACs
+Subject: Re: [PATCH] station: fix potential NULL access with forced roam
 Content-Language: en-US
 To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20230504215247.581443-1-prestwoj@gmail.com>
- <54ae38d6-cc94-9410-8121-44ece399b24c@gmail.com>
+References: <20230502185955.436081-1-prestwoj@gmail.com>
+ <94a9b440-eaaa-409c-7a6f-8bdf9d6bc976@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <54ae38d6-cc94-9410-8121-44ece399b24c@gmail.com>
+In-Reply-To: <94a9b440-eaaa-409c-7a6f-8bdf9d6bc976@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 Hi Denis,
 
-On 5/7/23 4:21 PM, Denis Kenzior wrote:
+On 5/7/23 4:10 PM, Denis Kenzior wrote:
 > Hi James,
 > 
-> On 5/4/23 16:52, James Prestwood wrote:
->> Based on the comment hwsim would only send frames to known MACs
->> which on its face seems reasonable. But in reality there shouldn't
->> ever be frames going to unknown MACs, at least not unknown to the
->> kernel. We can hit this case, though, when using network namespaces.
->> Each namespace is siloed and hwsim instances only know about radios
->> in that namespace.
-> 
-> First, can you explain what is the motivation behind this series?
-
-I'd like to enable hwsim to work with namespaces. First in order to test 
-the roam before netconfig changes. And maybe future tests would need this.
-
-> 
-> Second, if we're passing unicast frames, and the unicast frame is 
-> addressed to a radio in a different namespace, how does that radio get 
-> the frame?  We don't have it in our radio_info queue?
-
-The namespace bars hwsim from seeing radios in other namespaces via 
-GET_WIPHY. So yes, the radios are not in the radio_info queue. But since 
-the radios are on the same kernel any MAC the kernel knows about is 
-accepted when sending a frame, regardless of namespace.
-
-> 
-> The comment for the code you're taking out makes it clear that the 
-> intent is for unicast frames to be sent only only to the radio with the 
-> target receiver address.  And the optimization is simply about not 
-> sending frames to radios with addresses we know do not have the target 
-> address.
-> 
-> What you're doing here seems to indicate that our implementation (and 
-> the comment) is completely bogus.  And we can simply send any frame to 
-> any radio instance (once) and the frames will be forwarded 
-> automagically.  If so, then you might want to explain this better and 
-> fix the code to reflect this.
-
-Maybe I described this badly, but I was trying to make 2 points:
-
-  - Historically, before namespaces, hwsim should never be in a 
-situation where a frame is addressed to an unknown recipient. Hostapd 
-won't do this and IWD won't do this. So all that code was doing is 
-looping through the radios. Maybe there is some case I haven't thought 
-of, in which case the kernel would drop the frame anyways.
-
-  - Then with the introduction of namespaces we actually do hit this 
-case of having unknown destination addresses. Not because they are 
-bogus, but because hwsim simply cannot know about radios in other 
-namespaces.
-
-Thanks,
-James
-
-> 
->>
->> In order to support hwsim and namespaces, this restriction is
->> being removed.
+> On 5/2/23 13:59, James Prestwood wrote:
+>> If forcing a roam using developer mode IWD could become
+>> unconnected during the scan and result in a segfault when
+>> the network_get_security() is called.
 >> ---
->>   tools/hwsim.c | 33 ---------------------------------
->>   1 file changed, 33 deletions(-)
+>>   src/station.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
 >>
+> 
+> Do you have a backtrace?
+> 
+>> diff --git a/src/station.c b/src/station.c
+>> index be571083..9104ebf6 100644
+>> --- a/src/station.c
+>> +++ b/src/station.c
+>> @@ -2482,7 +2482,7 @@ static bool station_roam_scan_notify(int err, 
+>> struct l_queue *bss_list,
+> 
+> This seems suspicious.  Forced roam should be going via 
+> station_force_roam_scan_notify(), not via this callback.
+
+Yes true. I did see this crash here but maybe it was related to local 
+changes. I was roaming back and forth but your right, a forced roam 
+shouldn't ever hit this callback.
+
+I'll get back to you on this.
+
+> 
+>>       uint16_t mdid;
+>>       enum security orig_security, security;
+>> -    if (err) {
+>> +    if (err || !network) {
+>>           station_roam_failed(station);
+>>           return false;
+>>       }
+> 
+> And even then, isn't station->roam_scan_id canceled, so the callback 
+> shouldn't even be called in the first place?
 > 
 > Regards,
 > -Denis
