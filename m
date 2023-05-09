@@ -1,83 +1,80 @@
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8679C11188
-	for <iwd@lists.linux.dev>; Mon,  8 May 2023 19:08:42 +0000 (UTC)
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-1960539df06so1186294fac.1
-        for <iwd@lists.linux.dev>; Mon, 08 May 2023 12:08:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683572921; x=1686164921;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CSHpVcBoOkpjloljBAdlqRhISieKeT3YIizHxz7dIds=;
-        b=suuEKgv0LHnkybfoOyemQFVglFxJMGd0B+kJm5skk19P8Jak1GQ04TnPrbDJ70fttz
-         Z7UCOauJDUAuIcnOH4gp/nBZAByWYGmbQnTF9B4kz7L3igSd/+8RUlK+f1BdCiJRkj2g
-         3pTVUBKTeTXUT8qpGpaMPnDuU5GZlo6V1n8UBlMQr79/CwzDNsnHUqhpyqFxtHPyXA4q
-         lGDhpZ+8fGwfxFbJmiBiPAnulooq+XyA6u3o3ULnYGMsTNH70ASgrE2Zeer/iuQuXICR
-         tdJWaLLqbfKDq8C67e0zhIvNZjGMQlm4jAyjSgsAd/5N+mjCpJQcwFpUE/twSK5TJQMD
-         DnwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683572921; x=1686164921;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CSHpVcBoOkpjloljBAdlqRhISieKeT3YIizHxz7dIds=;
-        b=GY52dIr4JIgCOXPUbkZo3iWZZd9AeEcGyG+qIXgMXb7qLjpI5t2EdqY7BbMNnbO6XF
-         scunUfKrJCCgkpO9gcN8WCdKrhbZuTn3du3aAtIoMbAYE1I0Nc5XzqT+aYA0QALhdrmB
-         +ApHJALvKvOU9pI8WHf2VGiH9EofgEBBgOsWJSlr/XX7ithr+aWOxl86OGig93zU8px1
-         jIJqP7i/4P67VjUC5Avd76A0RWTt7IW1B93ePyhvXZSGY/5lAELk7dAN+f062W/g6MrI
-         4T3EG1zWLx/f7TVabvU+crc9THHvlHj4gTRfYWa+mKIsg/rLWyLc4QU2+ttUXDvUm3Q+
-         CtcQ==
-X-Gm-Message-State: AC+VfDwoO4PMbrdOOLfaVcYj9wznLvDkrF9ULlHI2zV6OtkWjpAtlsbf
-	oeo49i9xiyjvkTDzAdmW8fk=
-X-Google-Smtp-Source: ACHHUZ45UdSFCbPppKz4sMPz/wxbgxHb3syoqApFmbNnOvKnG7xySuol8I/K8zSxhb4hwnLOV9ouFw==
-X-Received: by 2002:a05:6870:e281:b0:18e:fb6e:1ae5 with SMTP id v1-20020a056870e28100b0018efb6e1ae5mr5717902oad.53.1683572921585;
-        Mon, 08 May 2023 12:08:41 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id q7-20020a056870730700b001777244e3f9sm5267191oal.8.2023.05.08.12.08.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 May 2023 12:08:40 -0700 (PDT)
-Message-ID: <865cf0a3-1be4-34cb-0535-e76cf43d6753@gmail.com>
-Date: Mon, 8 May 2023 14:01:09 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A14376
+	for <iwd@lists.linux.dev>; Tue,  9 May 2023 02:50:04 +0000 (UTC)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailout.west.internal (Postfix) with ESMTP id BF9343200906
+	for <iwd@lists.linux.dev>; Mon,  8 May 2023 22:50:03 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Mon, 08 May 2023 22:50:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mikesilva.com;
+	 h=cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:sender:subject:subject:to:to; s=fm3; t=1683600603; x=
+	1683687003; bh=9sDsEyynY0FuvwEIyeaolyAUpnawMDI7BzAqUwtpVoE=; b=k
+	g0A9dZ4DfWau/SfLRqWLxtOjQ/L58bpp1m821WGdRtyjNcByHiyruH7qKlt5w6wB
+	Y7/nyaDDA0h6YMU5XHWoD0CODpflcSNDjJ3e2Dc2JxJRVWU1dDhgrm+9B+b/IwpE
+	mX62MqseOfZwHirClytlhwYqAXwBuisdFpPPthF5SFe7UMuGP2pVXXIzNiAkq98S
+	P1Dqllt0lFq76IofQ5drwptw3autUgYUWGvLx8fJeJYrle4+MG3HNTarUPSmL+oJ
+	G+h0H6tbNbThXOQOCKn2FIdrTIY149ghq6cqxaewYO1ALikYmemp/vcY+moiuDpB
+	cDgwnJ2E6T77B1AGTgAJw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-transfer-encoding:content-type
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1683600603; x=1683687003; bh=9sDsEyynY0Fuv
+	wEIyeaolyAUpnawMDI7BzAqUwtpVoE=; b=e3hrz6Tz6fhGoAA9B4hc7drRY7dTp
+	ezl/WEFuoe+tI1M3AcPzOqqXB1Z64OHm4E6tcIv8wqRfGFiPwibWnxQ1zTCo/NVz
+	ETtGeoFuVMnOLTrZRH5TUWM/r8iXNiHrSMX5YkiqPIFJpBDLakkYggktJlzIVROd
+	Z1W8Y4M6QscLHBsNWBVokTrVUJUQ7LNU1iHP/S3XFXqFFeQpEvYAtVpvyhBYH1pN
+	C4/KApEddYgh6xz91Rh5dJXcbu/uuTi2T2k2rSmrCGBzNRcVQ1zp3Xcr1OEJY0xQ
+	E8whGH+fzjmU4Peh1g9hb7sgpsZGHLMM8vH3ykNa6ky9CcW0HygHvEhvQ==
+X-ME-Sender: <xms:27RZZDSiXyHh3umsPU3PwwJe3Yu0wexF0sMk878gcYr5ykFc37tO4Q>
+    <xme:27RZZEzkWAmaxKS13moL0vuLvvCIxkLogmrP3ls-ghl7BJWDxW-aF2uHDVCglITdz
+    F5nUYtzTjivRG3-Mdo>
+X-ME-Received: <xmr:27RZZI3UZS37pJrm_DMhU6KCTZQe_mAmhPbiS6qYtImtBD4EqXpfQJKxtCg6O366biPJHktUDL3tgnIDFfCVMGgMZiaIA37GflFjBeBGLQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeefledgiedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucenucfjughrpefhtgfgggfukfffvffosehtqhhmtd
+    hhtdejnecuhfhrohhmpefoihhkvgcuufhilhhvrgcuoehmihhkvgdrshhilhhvrgesmhhi
+    khgvshhilhhvrgdrtghomheqnecuggftrfgrthhtvghrnhephfehteekteejgeduledvje
+    eijefhtedtheeukeehveekkeefieelfeekudfgkeeinecuvehluhhsthgvrhfuihiivgep
+    tdenucfrrghrrghmpehmrghilhhfrhhomhepmhhikhgvrdhsihhlvhgrsehmihhkvghsih
+    hlvhgrrdgtohhm
+X-ME-Proxy: <xmx:27RZZDCaMU7YuzserZp9VmNx5GKfIjWYLwIzS4z494mlby4aXuiL_w>
+    <xmx:27RZZMiKKdyXWPKTp73x0a-y4PLG0zavTrok89yuplJy6xD_5v6O4g>
+    <xmx:27RZZHpjpvETBL_RMzGgbZOet8G4wxjx8_6yQi8FYDRQ1NCdrvqovQ>
+    <xmx:27RZZKfUAA1_-ETrRcjWBdmzjrUUr5veQBz8i6KGV35_rV4FEUo5sw>
+Feedback-ID: i3a5446d4:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA for
+ <iwd@lists.linux.dev>; Mon, 8 May 2023 22:50:02 -0400 (EDT)
+From: Mike Silva <mike.silva@mikesilva.com>
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 1/3] hwsim: remove 'optimization' sending to only known
- MACs
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20230504215247.581443-1-prestwoj@gmail.com>
- <54ae38d6-cc94-9410-8121-44ece399b24c@gmail.com>
- <39610c47-eaba-2299-9b03-5217355e8d47@gmail.com>
- <88f638ea-bb37-c417-3b1c-1d7151506911@gmail.com>
- <7fdc5d67-e740-d593-253b-564bdf92048f@gmail.com>
- <d2d0841b-62a0-c8df-924f-851df5f88203@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <d2d0841b-62a0-c8df-924f-851df5f88203@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.3\))
+Subject: powersave support
+Message-Id: <9EF567DC-15CC-40C0-9AF8-D69E27B81ACF@mikesilva.com>
+Date: Mon, 8 May 2023 19:50:01 -0700
+To: iwd@lists.linux.dev
+X-Mailer: Apple Mail (2.3696.120.41.1.3)
 
-Hi James,
+Does IWD support disabling/enabling WiFi powersave/power management?
 
-> 
-> Ok, actually I see your confusion now. Removing that block of code would send 
-> the frame to all *known* radios only... So this actually should not work, but it 
-> does.
+Perhaps, I=E2=80=99m failing in finding it in the documentation. It=E2=80=99=
+s possible to do this as needed with ifconfig, iwconfig, or =
+NetworkManager, or to permanently configure them to enable or disable it =
+at boot..=20
 
-Yep!  Exactly.
+If IWD doesn=E2=80=99t support this, it would be nice enhancement if IWD =
+could when managing the adapter/connection, as some drivers do a poor =
+job of handling powersave being on.
 
-> 
-> Its like the kernel is disregarding ATTR_RECEIVER_ADDR and just looking at the 
-> frame contents. Anyways, I'll investigate.
-> 
-
-Ok, great.
-
-Regards,
--Denis
+Thanks!=
