@@ -1,136 +1,134 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE06517FFC
-	for <iwd@lists.linux.dev>; Tue,  9 May 2023 16:12:50 +0000 (UTC)
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-64115eef620so43643886b3a.1
-        for <iwd@lists.linux.dev>; Tue, 09 May 2023 09:12:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683648770; x=1686240770;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=O0vd4IDEMKBo+nyTMqq2qV/qrqME10GywEng/OyaftQ=;
-        b=OfCog6p/quYwz8TqEZ8z52t/cRWhIOnYbbzovfuhBTGLnJ6t3J5jB52HuA64C6MhkY
-         hNXcTKewg5uaDVzoY6IjhNcCYcP6LbOojq8gDify7RMCU8GJmAqLuaCxdCtPgR2GDVlI
-         phpdtXE79QA4TVy8gVlkBaENSZ1/O4EToRUBgiOvDcpo6RnsGTDxGNSvFY2W6Q6xkd2G
-         s3aktwuXGYfAoH01lfXfKjWEXnbXO3z6C2rikdZKrcljb4pcDgX4E5wJJZujtoPEoYev
-         3RFvl1M7TpdihVguY84ShgV/LMB4pduk1iTvr0m1PjrimwGMkqy3e1nz7dHlLYrXqiu3
-         o3ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683648770; x=1686240770;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O0vd4IDEMKBo+nyTMqq2qV/qrqME10GywEng/OyaftQ=;
-        b=A51WGacbefHpvLtSGXnFr8jJWf32To4JeZSXaEYF7Ctqz2dBu4ou1Pj/7e5/2g3uMN
-         xDEPAaZoCppCkajQ75pQIksPbMHWi/3PFAMAYA0P2itKv1SRBfVNR+tKkgH82ghcLdQ+
-         yM9baYG+fFnZRlekZP6nLzr9zCk3KA13J8sYD83Xl6I1waYj/qGarvWxGFRIKxWAQqj6
-         zwV3jtihtI1s+fzKBsWTsJQJt8Bcv2nQkD77HqIL9fLuMriuH7cwbB9gkCAikdfdOyC9
-         SRap0S8QoEgkQkWq6eqdsK78Wqgfj+hDXgBSRj69Ib4kpmu4owG5iCFkmrQRudzGSNyc
-         6l8w==
-X-Gm-Message-State: AC+VfDzZPUORr/CqFtK/4pmGVRi1PgisHIvmSBQhI3bYeEJXD2bRwfx9
-	FUn1bq6PqWUOAz+o5NQo607GHzue8H3ZWQ==
-X-Google-Smtp-Source: ACHHUZ7S0Dj4auZzQ+JVzHsXyl0DuV7wora6yDmCot7TftyuNBM5ojREvi77A6fwgzUtV9hXAx8Snw==
-X-Received: by 2002:a17:902:e746:b0:1ac:4b76:29a1 with SMTP id p6-20020a170902e74600b001ac4b7629a1mr14415941plf.29.1683648770187;
-        Tue, 09 May 2023 09:12:50 -0700 (PDT)
-Received: from [192.168.254.76] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id j18-20020a170902da9200b001aaea7bdaa7sm1787178plx.50.2023.05.09.09.12.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 May 2023 09:12:49 -0700 (PDT)
-Message-ID: <c64e2e2d-50eb-6771-2c16-572c59f1a3d7@gmail.com>
-Date: Tue, 9 May 2023 09:12:49 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6067F18018
+	for <iwd@lists.linux.dev>; Tue,  9 May 2023 16:46:14 +0000 (UTC)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.west.internal (Postfix) with ESMTP id 786D03200930;
+	Tue,  9 May 2023 12:46:13 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Tue, 09 May 2023 12:46:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mikesilva.com;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:sender:subject:subject:to:to;
+	 s=fm3; t=1683650773; x=1683737173; bh=wpHjtM4oF8oBLUq2wuQBIqelw
+	ixh7LoqbXyKPv89myk=; b=Mqzy2iGD6KMfhXp47T48GL0QxYLpMFr3InY3tTn+o
+	psAK4BhXQSbta4skJyXAC+ufG13NK2O9do3Ag7PeHSIv29ZsLWDlH1tl56iO18Q4
+	+e8EbbYcutsFl5fNnry6Y5bftPUyJcNXAookBNx8CULT65699u2DWLAcqEQakGwb
+	nyekFwrW+zfh+hyvGlDvQ/CwmykZW6AHLCQa4nGiMhOwl9gXntAwUak4EqTDHNJr
+	lKKfBiSqX8YWEVb1sJY5Wc5WW2pUGegbQhnljw60f1DJNcvKkzBAgV5n6vo4m3ku
+	UmZ+ardasgmSNbab/+ETEjyb/i9/XZa98XtVXgmtuJ2hA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1683650773; x=1683737173; bh=wpHjtM4oF8oBLUq2wuQBIqelwixh7LoqbXy
+	KPv89myk=; b=WdQ/AUPHuGTMpwIbeQD1iNKP0RO6qFtss8XboyqKJmSlU9rZPTC
+	cWp2Ze2QY6RBhQZaTmpttIx/zvqMpxV1l43oupAWysXxGkiDtcxkSd4USlGSBRw2
+	H6TMq9/vQHCNm/QEx2SFkZ9hLBN7VJMtZswKIyheYmcn9eEyhqRn36Q0s0BzwOY0
+	rnnOOEU3NpJaPJrNMxtyFYWCcGTmALRKRv10oUzog4wiGHcIWfw4Ex3amoCjTc56
+	l+/s/74qAVxyCiXeJadpstHC6wpfBH+sYIkZcXm1ozwdroJ/N4yu0RiWDciGuPI3
+	sDeBM3jYkWzOsBCrJ+fth4f1gvAiumGKhcA==
+X-ME-Sender: <xms:1HhaZJ-V_2rzCAWtyZD4Fp2SMGGp9l741tqcFoVqHroTIrsZrIvKdg>
+    <xme:1HhaZNuqyUfrNUi0uXxhC6ulixaO0xwzuBV6-6pARzV3yyGvi7UuOjURMnG77kj60
+    _2WR6XU-UfIiCrznzg>
+X-ME-Received: <xmr:1HhaZHDZoiO0g9t7g4nJG0eIStQrTui6ZeY0U6ZRX2o4TS2ErqSyspclqiJftXoKhg1EqSIATx5Si0Y_OtUt4wWcpdsvTFh0iFHm2CPfwQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeeguddgfedtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurheptggguffhjgffvefgkfhfvffosehtqhhmtdhhtdejnecuhfhrohhmpefoihhk
+    vgcuufhilhhvrgcuoehmihhkvgdrshhilhhvrgesmhhikhgvshhilhhvrgdrtghomheqne
+    cuggftrfgrthhtvghrnhephedvheefkeejudfhvdeuveehteeuveffleehheeuteeffedv
+    teejvdetgeeivedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomhepmhhikhgvrdhsihhlvhgrsehmihhkvghsihhlvhgrrdgtohhm
+X-ME-Proxy: <xmx:1HhaZNeg1FOVI7HxotJ6JUU7uqXqdLo4EagbKeNjm_h_BZ67ZwjyKA>
+    <xmx:1HhaZONpga7P0m3wE9NK62LcciKDTSPSa_RHyXq2iE8MIxXdB6HWHQ>
+    <xmx:1HhaZPmjZoohWyWtCXK9v-kBdRuxRhR-Xer0IBqIQOlFWodQEWhDLg>
+    <xmx:1XhaZIW0h-JtahVx-HtlEeB1cjeGKrP_mybvkyiWYAmvNX5CNv4Azw>
+Feedback-ID: i3a5446d4:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 9 May 2023 12:46:12 -0400 (EDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.3\))
 Subject: Re: powersave support
-Content-Language: en-US
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Mike Silva <mike.silva@mikesilva.com>, iwd@lists.linux.dev
+From: Mike Silva <mike.silva@mikesilva.com>
+In-Reply-To: <f5ccf370-5197-c9a4-61b6-2a130c7242de@gmail.com>
+Date: Tue, 9 May 2023 09:46:11 -0700
+Cc: iwd@lists.linux.dev
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <65588442-8D0B-4F0C-AE0D-0C249202D556@mikesilva.com>
 References: <9EF567DC-15CC-40C0-9AF8-D69E27B81ACF@mikesilva.com>
  <f5ccf370-5197-c9a4-61b6-2a130c7242de@gmail.com>
- <4F32B57B-3517-46EA-97F6-2B5DC172B952@holtmann.org>
- <66b05814-cb78-40c7-929b-0e2ffa2027a6@gmail.com>
- <04BED22D-EBF1-47B8-AD51-01DCC2CA4138@holtmann.org>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <04BED22D-EBF1-47B8-AD51-01DCC2CA4138@holtmann.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: James Prestwood <prestwoj@gmail.com>
+X-Mailer: Apple Mail (2.3696.120.41.1.3)
 
-Hi Marcel,
 
-On 5/9/23 9:09 AM, Marcel Holtmann wrote:
-> Hi James,
-> 
->>>>> Does IWD support disabling/enabling WiFi powersave/power management?
->>>>
->>>> No, currently it doesn't.
->>>>
->>>>> Perhaps, I’m failing in finding it in the documentation. It’s possible to do this as needed with ifconfig, iwconfig, or NetworkManager, or to permanently configure them to enable or disable it at boot..
->>>>> If IWD doesn’t support this, it would be nice enhancement if IWD could when managing the adapter/connection, as some drivers do a poor job of handling powersave being on.
->>>>
->>>> Yes, I've recently seen instances of drivers handling this poorly. Are you envisioning something like these other tools, where power save is just toggled on/off?
->>>>
->>>> I think this could be done, and actually we do this manually every boot using iwconfig in the software stack I work with. The tricky part is PS is done per-interface and IWD doesn't have any concept of per-interface configurations.
->>> if anybody uses iwconfig, then the problem is already there. iwconfig
->>> is an WEXT tool and deprecated. The driver is broken.
->>
->> It doesn't have much to do with the tool, its just an NL80211 API to toggle power save. But yes, the driver is broken if it can't handle this properly... but this is the world we live in.
->>
->> The reason I'm interested though is because there is no nice way to disable power save "automatically" unless you use NetworkManager. Apart from hooking in a script to disable it with iw/iwconfig (which we currently do). An option in IWD would be convenient.
->>
->>>> Denis might have preferences on this? but my initial thoughts would be something like:
->>>>
->>>> [General.wlan0]
->>>> PowerSave={on,off}
->>> You can't tie anything to interface names. Then can change and are
->>> basically random names. The most you can do is tie it to the phy
->>> and its mode of operation.
->>
->> True, it would have to be per-phy. But this too has the same problem if its a hotplug device...
->>
->> We do have this concept of driver_flags already, for interface removal, but I'm not sure if power save is something that EVERYONE will want to disable for a given driver. Maybe it works for some use cases but not others.
-> 
-> we already have this:
-> 
-> enum driver_flag {
->          DEFAULT_IF = 0x1,
->          FORCE_PAE = 0x2,
-> };
-> 
-> struct driver_info {
->          const char *prefix;
->          unsigned int flags;
-> };
-> 
-> /*
->   * The out-of-tree rtl88x2bu crashes the kernel hard if default interface is
->   * destroyed.  It seems many other drivers are built from the same source code
->   * so we set the DEFAULT_IF flag for all of them.  Unfortunately there are
->   * in-tree drivers that also match these names and may be fine.
->   */
-> static const struct driver_info driver_infos[] = {
->          { "rtl81*",          DEFAULT_IF },
->          { "rtl87*",          DEFAULT_IF },
->          { "rtl88*",          DEFAULT_IF },
->          { "rtw_*",           DEFAULT_IF },
->          { "brcmfmac",        DEFAULT_IF },
->          { "bcmsdh_sdmmc",    DEFAULT_IF },
-> };
-> 
-> It is hardcoded and obviously awful as that, but you could add a flag
-> for power save mode. However I think this needs to move into a configuration
-> file somewhere that can match and flag drivers and/or hardware.
 
-Yeah, I'll see what I can come up with when I have some spare cycles.
+> On May 9, 2023, at 7:17 AM, James Prestwood <prestwoj@gmail.com> =
+wrote:
+>=20
+> Hi Mike,
 
-> 
-> Regards
-> 
-> Marcel
-> 
+Hello and thank you for your openness to my query, and understanding of =
+why I=E2=80=99m asking it.
+
+>=20
+> On 5/8/23 7:50 PM, Mike Silva wrote:
+>> Does IWD support disabling/enabling WiFi powersave/power management?
+>=20
+> No, currently it doesn't.
+>=20
+>> Perhaps, I=E2=80=99m failing in finding it in the documentation. =
+It=E2=80=99s possible to do this as needed with ifconfig, iwconfig, or =
+NetworkManager, or to permanently configure them to enable or disable it =
+at boot..
+>> If IWD doesn=E2=80=99t support this, it would be nice enhancement if =
+IWD could when managing the adapter/connection, as some drivers do a =
+poor job of handling powersave being on.
+>=20
+> Yes, I've recently seen instances of drivers handling this poorly. Are =
+you envisioning something like these other tools, where power save is =
+just toggled on/off?
+
+I am hoping more for something along the lines of how NetworkManager =
+allows one to both enable or disable powersave easily on demand =
+interactively, but also allows for a quite simple configuration which =
+would allow the user to set and persist their preference at boot and =
+when waking from sleep.=20
+
+If I=E2=80=99m happily allowing IWD to control every other aspect of the =
+adapter instantiating a connection, it seems natural I would also set =
+this in IWDs config, rather than looking to use one of these other tools =
+either on demand or via a boot script.
+
+>=20
+> I think this could be done, and actually we do this manually every =
+boot using iwconfig in the software stack I work with. The tricky part =
+is PS is done per-interface and IWD doesn't have any concept of =
+per-interface configurations.
+>=20
+> Denis might have preferences on this? but my initial thoughts would be =
+something like:
+>=20
+> [General.wlan0]
+> PowerSave=3D{on,off}
+
+That=E2=80=99s exactly what I was hoping to be able to set in iwd.config =
+or an iwd network configuration file. The analog of this pref in =
+NetworkManager handles boot and wake from sleep.
+
+>=20
+> Thanks,
+> James
+>=20
+>> Thanks!
+
