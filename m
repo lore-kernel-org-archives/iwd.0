@@ -1,94 +1,67 @@
-Received: from mta03-relay.cloud.vadesecure.com (mta03-relay.cloud.vadesecure.com [52.47.203.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A16D185E
-	for <iwd@lists.linux.dev>; Tue,  9 May 2023 14:47:20 +0000 (UTC)
-Received: from mail01.bodet.com (unknown [84.239.65.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mta03-relay.cloud.vadesecure.com (vceu2mtao01p) with ESMTPS id 4QG1692P31z1nvN;
-	Tue,  9 May 2023 16:40:17 +0200 (CEST)
-Received: from BODMAIL01.TREM.BOD (172.18.41.21) by BODMAIL02.TREM.BOD
- (172.18.41.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Tue, 9 May
- 2023 16:40:17 +0200
-Received: from BODMAIL01.TREM.BOD ([::1]) by BODMAIL01.TREM.BOD ([::1]) with
- mapi id 15.01.2507.023; Tue, 9 May 2023 16:40:16 +0200
-From: "clement.legoffic@kelio.com" <clement.legoffic@kelio.com>
-To: James Prestwood <prestwoj@gmail.com>, "iwd@lists.linux.dev"
-	<iwd@lists.linux.dev>
-Subject: RE: Object path last number
-Thread-Topic: Object path last number
-Thread-Index: AdmCeBsCe1PIWF8EQnOzLlTUibBLov//6rOA///ZMzCAAC55AP//2nwg
-Date: Tue, 9 May 2023 14:40:16 +0000
-Message-ID: <671256a4ba9b4d00bf25ed303953a515@kelio.com>
-References: <e1a347d59c344b928c1e9150048f9d87@kelio.com>
- <119648c7-318b-6ff3-1f04-02d6525c7059@gmail.com>
- <ad4b5d2f91e64ec7969262d0addd38bf@kelio.com>
- <a6870e4e-ed1c-980e-d551-322910e6ac50@gmail.com>
-In-Reply-To: <a6870e4e-ed1c-980e-d551-322910e6ac50@gmail.com>
-Accept-Language: fr-FR, en-US
-Content-Language: fr-FR
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.18.114.25]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1FA17FE6
+	for <iwd@lists.linux.dev>; Tue,  9 May 2023 14:55:03 +0000 (UTC)
+Received: from smtpclient.apple (p4fefc45b.dip0.t-ipconnect.de [79.239.196.91])
+	by mail.holtmann.org (Postfix) with ESMTPSA id 39EFCCECC7;
+	Tue,  9 May 2023 16:55:01 +0200 (CEST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-VRC-SPAM-STATUS: 0,-100,gggruggvucftvghtrhhoucdtuddrgedvhedrfeeguddgtdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuggftvedpqfgfvfenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufhtfffkfhgjihgtgfggsehtsghjtddttdejnecuhfhrohhmpedftghlvghmvghnthdrlhgvghhofhhfihgtsehkvghlihhordgtohhmfdcuoegtlhgvmhgvnhhtrdhlvghgohhffhhitgeskhgvlhhiohdrtghomheqnecuggftrfgrthhtvghrnhepffffgefggfdvheeileeuteetvdfhgedvvedtueelkeeiudeuhfeghefhleeiheffnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpihifugdrphihnecukfhppeekgedrvdefledrieehrdeljedpudejvddrudekrdduudegrddvheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphhouhhtpdhmrgigmhhsghhsihiivgepuddtgeekheejiedpihhnvghtpeekgedrvdefledrieehrdeljedphhgvlhhopehmrghilhdtuddrsghouggvthdrtghomhdpmhgrihhlfhhrohhmpegtlhgvmhgvnhhtrdhlvghgohhffhhitgeskhgvlhhiohdrtghomhdpnhgspghrtghpthhtohepvddprhgtphhtthhopehprhgvshhtfihojhesghhmrghilhdrtghomhdprhgtphhtthhopehifigusehlihhsthhsrdhlihhnuhigrdguvghv
-X-VRC-SPAM-STATE: legit
-X-VRC-POLICY-STATUS: t=1,a=1,l=0
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.3\))
+Subject: Re: powersave support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <f5ccf370-5197-c9a4-61b6-2a130c7242de@gmail.com>
+Date: Tue, 9 May 2023 16:55:00 +0200
+Cc: Mike Silva <mike.silva@mikesilva.com>,
+ iwd@lists.linux.dev
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4F32B57B-3517-46EA-97F6-2B5DC172B952@holtmann.org>
+References: <9EF567DC-15CC-40C0-9AF8-D69E27B81ACF@mikesilva.com>
+ <f5ccf370-5197-c9a4-61b6-2a130c7242de@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>
+X-Mailer: Apple Mail (2.3696.120.41.1.3)
 
-VGhhbmsgeW91ICENCg0KPiBIaSBDbGVtZW50LA0KPiANCj4gT24gNS85LzIzIDc6MTYgQU0sIGNs
-ZW1lbnQubGVnb2ZmaWNAa2VsaW8uY29tIHdyb3RlOg0KPiA+DQo+ID4gVGhhbmsgeW91IGZvciB5
-b3VyIHJlc3BvbnNlLg0KPiA+DQo+ID4+IEhpIENsZW1lbnQsDQo+ID4+DQo+ID4+IE9uIDUvOS8y
-MyA2OjE1IEFNLCBjbGVtZW50LmxlZ29mZmljQGtlbGlvLmNvbSB3cm90ZToNCj4gPj4+IEhpLA0K
-PiA+Pj4NCj4gPj4+IEkgYW0gdHJ5aW5nIHRvIGludGVyZmFjZSBhIGR5bmFtaWMgZGJ1cyBjbGll
-bnQgdG8gdGhlIElXRCBkYnVzDQo+ID4+PiBpbnRlcmZhY2UNCj4gPj4gZm9yIHNpbXBsZSBjb21t
-YW5kcyBzdWNoIGFzIEdldE9yZGVyZWROZXR3b3JrcygpIG9yIFNjYW4oKS4NCj4gPj4+IFRoZSB0
-aGluZyBpcyB0aGF0IHRoZSBvYmplY3QgcGF0aCBvZiB0aG9zZSBtZXRob2RzIHN0YXJ0cyB3aXRo
-DQo+ID4+ICIvbmV0L2Nvbm5tYW4vaXdkLyIgZm9sbG93ZWQgYnkgdGhlIHBoeSAoSSBvbmx5IGhh
-dmUgb25lIGludGVyZmFjZSBzbw0KPiA+PiBJIGd1ZXNzIGl0IHdpbGwgYmUgMCkgYW5kIHRoZW4g
-YSBudW1iZXIuDQo+ID4+PiBBcyBJIHdhbnQgdG8gYmUgZHluYW1pYyBJIHRyeSB0byByZXN0YXJ0
-IGl3ZCB0byB0cnkgdG8gb2JzZXJ2ZSBhDQo+ID4+PiBzcGVjaWZpYw0KPiA+PiBwYXR0ZXJuIGlu
-IHRoZSBsYXN0IG51bWJlciBvZiB0aGlzIG9iamVjdCBwYXRoLiBJIGhhdmUgb2JzZXJ2ZSB0aGF0
-DQo+ID4+IHRoaXMgbnVtYmVyIGlzIGluY3JlbWVudGVkIGJ5IG9uZSBhdCBlYWNoIHJlc3RhcnQg
-b2YgdGhlIGl3ZCBzZXJ2aWNlLg0KPiA+Pj4gQnV0IEkgc2F3IHRoaXMgbnVtYmVyIGp1bXBpbmcg
-IChieSA1IHNvbWV0aW1lcykuDQo+ID4+Pg0KPiA+Pj4gU28gSSB3YXMgd29uZGVyaW5nIElmIEkg
-d2FudCB0byBjYWxsIHRoZSBTY2FuIG1ldGhvZCwgaG93IGNhbiBJIGdldA0KPiA+Pj4gdGhlDQo+
-ID4+IGNvcnJlY3QgbnVtYmVyIGZvciB0aGUgb2JqZWN0IHBhdGggZHluYW1pY2FsbHkgPw0KPiA+
-Pg0KPiA+PiBUaGUgbGFzdCBudW1iZXIgaXMgYWN0dWFsbHkgdGhlIGludGVyZmFjZSBpbmRleCwg
-YnV0IHRoZSBwYXRoIGl0c2VsZg0KPiA+PiBpc24ndCBzb21ldGhpbmcgeW91IG5lZWQgdG8gd29y
-cnkgYWJvdXQgZGVyaXZpbmcgeW91cnNlbGYuIEluc3RlYWQNCj4gPj4geW91IGNhbiB1c2UgdGhl
-IG9yZy5mcmVlZGVza3RvcC5EQnVzLk9iamVjdE1hbmFnZXIgaW50ZXJmYWNlIGFuZA0KPiA+PiBH
-ZXRNYW5hZ2VkT2JqZWN0cygpIG1ldGhvZC4gVGhpcyByZXR1cm5zIGFsbCB0aGUgb2JqZWN0IHBh
-dGhzIGFuZA0KPiA+PiBpbnRlcmZhY2VzIGZvciBJV0QuDQo+ID4+DQo+ID4+IElmIHlvdXIgd29y
-a2luZyB3aXRoIFB5dGhvbiB5b3UgY2FuIGNoZWNrIG91dCBJV0QncyB0ZXN0IGZyYW1ld29yayBh
-cw0KPiA+PiBhDQo+ID4+IGd1aWRlOg0KPiA+PiBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9z
-Y20vbmV0d29yay93aXJlbGVzcy9pd2QuZ2l0L3RyZWUvYXV0b3Rlc3QNCj4gPj4gcy91dA0KPiA+
-PiBpbC9pd2QucHkjbjExNDMNCj4gPg0KPiA+IEkgYW0gd29ya2luZyB3aXRoIEMgYW5kIGdsaWIg
-YW5kIGhhdmVuJ3QgZm91bmQgdGhpcyBpbnRlcmZhY2UuIEkgdXNlIDEuMjYNCj4gdmVyc2lvbi4N
-Cj4gPiBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbmV0d29yay93aXJlbGVzcy9pd2Qu
-Z2l0L3RyZWUvYXV0b3Rlc3RzDQo+ID4gL3V0aWwvaXdkLnB5P2g9MS4yNiNuMTAzNCBUaGVyZSBp
-cyB0aGUgc2FtZSBjYWxsIGF0DQo+ID4gR2V0TWFuYWdlZE9iamVjdHMoKSBpbiAxLjI2IGJ1dCBJ
-IGNhbm5vdCBmaW5kIGFuIGVxdWl2YWxlbnQgbWV0aG9kIGluIEMuDQo+ID4NCj4gPiBCdXQgOg0K
-PiA+IEJ5IGNhbGxpbmcgSW50cm9zcGVjdCgpIG9uIGludGVyZmFjZQ0KPiA+IG9yZy5mcmVlZGVz
-a3RvcC5EQnVzLkludHJvc3BlY3RhYmxlKCkgKG9iamVjdCBpd2QvY29ubm1hbi9pd2QpIEkgaGF2
-ZQ0KPiBmb3VuZCB0aGF0IGl0IHJlcGxpZXMgbWUgd2l0aCBhbiBYTUwgdGhhdCBoYXZlIHRoZSAi
-dW5kZXIgbm9kZXMiIGF0IHRoZQ0KPiBlbmQgb2YgaXQgU28gYnkgaXRlcmF0aW5nIG9uIGl0IEkg
-d2lsbCBiZSBhYmxlIHRvIGdldCBhbGwgdGhlIG1hbmFnZWQgb2JqZWN0DQo+IGZyb20gaXdkLg0K
-PiA+IElzIHRoaXMgdGhlIG9ubHkgc29sdXRpb24gdXNpbmcgQyA/DQo+IA0KPiBZb3Ugc2hvdWxk
-bid0IG5lZWQgdG8gY2FsbCBJbnRyb3NwZWN0KCkuIFlvdSBjYW4ganVzdCBnZXQgdGhlIG9iamVj
-dCBtYW5hZ2VyDQo+IGludGVyZmFjZSB1bmRlciB0aGUgcm9vdCBwYXRoICcvJyBhbmQgdGhhdCBz
-aG91bGQgaGF2ZSB0aGUNCj4gR2V0TWFuYWdlZE9iamVjdHMoKSBtZXRob2QuIFdlIGRvIHRoaXMg
-aW4gaXdjdGwgdXNpbmcgRUxMLCBidXQgaXQgc2hvdWxkDQo+IGJlIHNvbWV3aGF0IHNpbWlsYXIg
-dG8gR0xpYjoNCj4gDQo+IGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9uZXR3b3JrL3dp
-cmVsZXNzL2l3ZC5naXQvdHJlZS9jbGllbnQvZGJ1cy0NCj4gcHJveHkuYyNuNzcwDQo+IA0KPiBU
-aGFua3MsDQo+IEphbWVzDQo+ID4NCj4gPiBDbMOpbWVudA0KPiA+DQo+ID4+DQo+ID4+IFRoYW5r
-cywNCj4gPj4gSmFtZXMNCj4gPj4NCj4gPj4+DQo+ID4+PiBUaGFua3MNCj4gPj4+DQo+ID4+PiBD
-bMOpbWVudA0KDQpDbMOpbWVudA0K
+Hi James,
+
+>> Does IWD support disabling/enabling WiFi powersave/power management?
+>=20
+> No, currently it doesn't.
+>=20
+>> Perhaps, I=E2=80=99m failing in finding it in the documentation. =
+It=E2=80=99s possible to do this as needed with ifconfig, iwconfig, or =
+NetworkManager, or to permanently configure them to enable or disable it =
+at boot..
+>> If IWD doesn=E2=80=99t support this, it would be nice enhancement if =
+IWD could when managing the adapter/connection, as some drivers do a =
+poor job of handling powersave being on.
+>=20
+> Yes, I've recently seen instances of drivers handling this poorly. Are =
+you envisioning something like these other tools, where power save is =
+just toggled on/off?
+>=20
+> I think this could be done, and actually we do this manually every =
+boot using iwconfig in the software stack I work with. The tricky part =
+is PS is done per-interface and IWD doesn't have any concept of =
+per-interface configurations.
+
+if anybody uses iwconfig, then the problem is already there. iwconfig
+is an WEXT tool and deprecated. The driver is broken.
+
+> Denis might have preferences on this? but my initial thoughts would be =
+something like:
+>=20
+> [General.wlan0]
+> PowerSave=3D{on,off}
+
+You can't tie anything to interface names. Then can change and are
+basically random names. The most you can do is tie it to the phy
+and its mode of operation.
+
+Regards
+
+Marcel
+
