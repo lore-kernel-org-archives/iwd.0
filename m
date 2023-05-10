@@ -1,49 +1,49 @@
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1B021CCD
-	for <iwd@lists.linux.dev>; Wed, 10 May 2023 20:42:04 +0000 (UTC)
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-50be0d835aaso13806986a12.3
-        for <iwd@lists.linux.dev>; Wed, 10 May 2023 13:42:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B2E21CC0
+	for <iwd@lists.linux.dev>; Wed, 10 May 2023 20:42:06 +0000 (UTC)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-50db91640d3so4010608a12.0
+        for <iwd@lists.linux.dev>; Wed, 10 May 2023 13:42:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683751323; x=1686343323;
+        d=gmail.com; s=20221208; t=1683751324; x=1686343324;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
         bh=rGLAkjNrRMLp3It5Tv8za4bbGAfw7sQQOVbYnmrRTis=;
-        b=nzKCzccq6Pu1Y3FShqV+Zc6WTUY5nZyFDKSqhP/Ye44H9yGfHVLP6c4zjHQUqTgjZU
-         AJGqNAUDq1ovAlllTEsYssE/Qr83axKgEhT7yBcAHlSb/2Fw9UyNk1Xx/wbhNob+9lid
-         1z+dKiDQkerDbFOcSmc1JSMP9ksDW3hJ4+Dzajbrqz0Py6921K9GetUN6zAYYCjFeHK2
-         uway+9Kz0H5LrepR9Iu0Xzm9v3NOslRApc9fFA9IGaISzfNTHz8MU28gRGKTABo9g2Zj
-         so5WmDf/x7W91QDiKlqYxybVbCx5Xp5KIrWuGe0YIej6JUjnItBUbBpMlSvOgmPGS3B9
-         THXw==
+        b=omtZH+FeMqAM04tcPCYAjpnP4fevgAgyp1DUmzICcvnmNmg8HgVfM9KYlRxvHUqQjB
+         CDK9sECQtOZ4vccSWllT6WturUqGm93vYgq0DnUY8gquJuFOpcfhF5Dh7rSgXCVUuifR
+         ddXM55Tv6lHV1YKKZoygOOadG5x35kPmfGwtyIXRqvLgI/tYMnowDjZkd/s89dyM852+
+         ilsYgBKWQkMv8VaZNpSdFXmwUywGrKhmezNsN3zqzSKZBvO/BQcGQku0PJGCykWjbX1y
+         iHfmIFdtjpIPoGB6eXYLpu7AQrC9WuFRm7SQoYjMgBl9mdSsMeyh22T2JCO7f1KZG+eg
+         bWyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683751323; x=1686343323;
+        d=1e100.net; s=20221208; t=1683751324; x=1686343324;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
         bh=rGLAkjNrRMLp3It5Tv8za4bbGAfw7sQQOVbYnmrRTis=;
-        b=QT21JCMXjQI/EKOrC0jV/Rpj1IIwkRxew+1miYKAiK28WYRXR0VVtTbXDvJEGHy9a3
-         oBCvknpzrAahd1K/N3yKUEW1cWGNQa0STvA8rylOibMBm/KB8tu3Ky3KANMSmzHUq+/x
-         atOcBvpQJsyZ9N20dJYoyGqVw/TS7K08Es9zh41KdlKGs/0W/QE0d/9MXYabrHxqqYgf
-         M2Jj1j2LY+a+Y+C18cjG7vMW39eS5pKKao3IKttkgyaNqwWDvlD5Jt1uYKMpDnCccLlj
-         2CO25zzBNb8FiOksmGu6U3SgYTITTZEOVx6MO0Gjzb05z2pzAGNP/YLpYgAlGHvp/TXV
-         aU5A==
-X-Gm-Message-State: AC+VfDy+7q0mzqVvyT5G+oQbPTuuGRwi3phvqxJHXfhuW+ehIL5mr3h/
-	By6QfP/iBWKbQ7LbfMGuZIIoGo6rzZ0=
-X-Google-Smtp-Source: ACHHUZ4xURUFr2zwFOP/Tn967xNnDT/V4Wuq3rAxYo2LGrZVi3x9a8WtlyxHIWTS3I46qVs1myZdEQ==
-X-Received: by 2002:a05:6402:28d:b0:506:fcd5:6159 with SMTP id l13-20020a056402028d00b00506fcd56159mr15784772edv.21.1683751322447;
-        Wed, 10 May 2023 13:42:02 -0700 (PDT)
+        b=Ob537bYOXDk1O0UdK9Aw3lj6d08QTM4oPjIn/nkiPZASXz1K7TOXqdpYPBuF2YOZ1n
+         6HqlPTb/yv5/qQCe81xFitiVrDWxuzCjPift81brPrM0BV7AQE/UC/oIAhld8pO/ARTV
+         ieJZpd+Spw4mQofnVs7P60nGfWRySr6Iyvv2pPgCkHiIKiAihV2Cu5du1EO0zABjcWlE
+         GZv54IPNHUITKmXGhVFBOD8RYjPQ/9c8QkBYQO37xcfCuLD2qAfrvrhxpLfIhYT4thxf
+         gF3uRvY5HWtezfBZztVXvK86GQv3BjtvMcyPHtt9kS/3BlNLTBF3/BQGFq4bcE7eD7uB
+         ecEQ==
+X-Gm-Message-State: AC+VfDz5roQyohwSw0MpSLfXeTjN6YW2xqO++8KXgcWe1GgfidGTOonX
+	UNFTvZwoSzVF0WuTzW+9/JWaFgTmDuk=
+X-Google-Smtp-Source: ACHHUZ7hEloQC+KNR3ehh1lWas2YixtU2Ukyap1C5KtkO4iKOoa7CdMOxKkpPP5T+idWLG7yy8e7LA==
+X-Received: by 2002:a05:6402:482:b0:50c:52d:7197 with SMTP id k2-20020a056402048200b0050c052d7197mr14072616edv.2.1683751324118;
+        Wed, 10 May 2023 13:42:04 -0700 (PDT)
 Received: from LOCLAP699.unipharma-middelburg.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id q22-20020a056402041600b004ad601533a3sm2237700edv.55.2023.05.10.13.42.00
+        by smtp.gmail.com with ESMTPSA id q22-20020a056402041600b004ad601533a3sm2237700edv.55.2023.05.10.13.42.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 May 2023 13:42:02 -0700 (PDT)
+        Wed, 10 May 2023 13:42:03 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/1] wiphy: fix regdom change wiphy dump logic
-Date: Wed, 10 May 2023 13:41:51 -0700
-Message-Id: <20230510204153.715304-2-prestwoj@gmail.com>
+Subject: [PATCH 1/2] wiphy: fix regdom change wiphy dump logic
+Date: Wed, 10 May 2023 13:41:52 -0700
+Message-Id: <20230510204153.715304-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230510204153.715304-1-prestwoj@gmail.com>
 References: <20230510204153.715304-1-prestwoj@gmail.com>
