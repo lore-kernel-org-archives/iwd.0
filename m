@@ -1,159 +1,175 @@
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CDB21CD7
-	for <iwd@lists.linux.dev>; Wed, 10 May 2023 20:42:06 +0000 (UTC)
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-50db7ec8188so4092678a12.2
-        for <iwd@lists.linux.dev>; Wed, 10 May 2023 13:42:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AD448C1C
+	for <iwd@lists.linux.dev>; Wed, 10 May 2023 20:43:53 +0000 (UTC)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-50b8d2eed3dso11810528a12.0
+        for <iwd@lists.linux.dev>; Wed, 10 May 2023 13:43:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683751326; x=1686343326;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fGaSRVFoZIHRUupgA9yFRhhze1LGhEbdVs0BsR56Xxc=;
-        b=pRQZZQp5y0yKRoYob4cw5nitUBEj/qikrWURqCn3PdFLAni4a023tMO99w5PMwpVFp
-         t+EhBhmSG4y88agYzQrTrNBzFC3nj2NbMmRadesEl+R9Di/4N+wFPrhltb/UhkxWxHnR
-         dybjOE1meHIx+i15idEHBOcoDjZm+r5D5ZX/bI3a9MSW88T7ddtZT5EEEQqSS+/2jIV4
-         hoV1V2K3SmGcvGPmDG6KTe/1/zilkDPko562Mz4huNJDwJWEb8lmIbwSFp2L4lV4P7rR
-         EPGj/hOmhQlQagwbylunDwUq+v7Mo5IWVAKpFVCaA0MhqT2rYnt+xfRcOmPUyQhXqK/a
-         bwQQ==
+        d=gmail.com; s=20221208; t=1683751431; x=1686343431;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lxgGZlXQK3l7vwCUTLtncrV7Fiqm3uOVLq2YYTFWs1E=;
+        b=BuHJ9wvgTH5hSpoIxbXMilp2J3bfxIgZv5TvXexMt/1FnwBrCH1JZHWYZY2g30NUJQ
+         Fj5svGULPsiExU43LHm5z6D54ybwcZDYk04uCI5DeBUfQm3Sgp+bdVf8Ydf0Cez5XGmK
+         dZ3CkHiiLvqLdwNZtz8iZYyy1GN6ivRNQdb4K8hIipcqQ0xQZ966y1WPE7QtieVEu00b
+         KGfOHbvtU6b63OFGck729GeXoULrzwwDRu+XLtMxygMPGFbv+nQ3P3F+oMjMe71tPpJ9
+         cow4+Ilo3n+RmUDeUy4ucvJVAYW+YBMn//GyoDauLsnlvX3y9ZcQhlCSutWGxPqejWRH
+         totw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683751326; x=1686343326;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fGaSRVFoZIHRUupgA9yFRhhze1LGhEbdVs0BsR56Xxc=;
-        b=RyaUlbu2ebN8pBcLyreKIClw9ECHs9W6ilPzIhyi9qVjVFe77hs8tlfjVbG1gYpcQR
-         yljyjlcEHMJA3EzbONmJmxKRwFSIDZIDXqsXr56CcUD8VYgLSWuNyYdL9q5kf+4uEUET
-         zo+E72eDSkN/hxsPWjK8pbIJHcRZtGOHgJo7gznwdfqn56aoiEFlHsCREsoqONj4EeAy
-         hUHnl7IoInc5fXOjgE02BZb+zVNi31C6N9O5sKvTbxneckNFlpH8pduYxhovK3wPMtv2
-         buMFlLj4Q3rDgmU0M6JJ5Sq2C8VoYC0NPx6s4wDuIzG5n5xnjakxp2ZOnreHo+pfJ3TT
-         INGA==
-X-Gm-Message-State: AC+VfDyAhxgCvegx6ogT5ZSjit26bwcrwlzt8OQq99DWQ3l473kCOstV
-	LwaX6ybcwdotQqj1xDR0VlQ4edQEgFw=
-X-Google-Smtp-Source: ACHHUZ5MO91eYd8kPE8lwoC0jPp8zriNgMqIBxDeVSBMqAr32yymT41h8K9Ll96W/HvqyyN1s+/boQ==
-X-Received: by 2002:a05:6402:b13:b0:50c:a8ca:3240 with SMTP id bm19-20020a0564020b1300b0050ca8ca3240mr15335131edb.24.1683751325828;
-        Wed, 10 May 2023 13:42:05 -0700 (PDT)
-Received: from LOCLAP699.unipharma-middelburg.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id q22-20020a056402041600b004ad601533a3sm2237700edv.55.2023.05.10.13.42.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 May 2023 13:42:05 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] station: fix reentrant FT wiphy radio work insertion
-Date: Wed, 10 May 2023 13:41:53 -0700
-Message-Id: <20230510204153.715304-4-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230510204153.715304-1-prestwoj@gmail.com>
-References: <20230510204153.715304-1-prestwoj@gmail.com>
+        d=1e100.net; s=20221208; t=1683751431; x=1686343431;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lxgGZlXQK3l7vwCUTLtncrV7Fiqm3uOVLq2YYTFWs1E=;
+        b=SAfSOW4S4sa7X28W+W0KAwKPEEhQh3xyprFunHxFYJ/k4bqmhKDs/IRK9ISxRpGTLK
+         bGctUsG6bllf5+9AgmoLaQdjtobutn4ZEZPNnpsdgYaduUv2OdmcLSsRoj6I13EH1XVr
+         YnHkpR3DggY3FVRqHDQP3USqduERNiOY307P1kxp3gPPny0o/1RL2P3GJj7TM7VQZt/A
+         Ro82Vt3kilxoab6+EO3QDOgGJmzdqaFKtYvyap39KT+wv9Df/kUItCGVOHJSYxs5yDeZ
+         jl4Uok9TACCzTPJdx/GemIelzOtLXmW9Uh82HAU6D6+Fk9/BWqDmYKam6xyiuR0EV0M1
+         hLqA==
+X-Gm-Message-State: AC+VfDwY4SL7MRphhTBDxRUon4vtXz0VOqUZhncshmgq3Al3p0x2Pytl
+	pH3Xw/1bdpMiRU3LlK2olpYDVrn0QFY=
+X-Google-Smtp-Source: ACHHUZ7TimMsdAbpm0H3DqxemdkIuAkhGHrNrlEVXRU2HF3wHvtYSeZ0Cu9HeaZ4/WwBIRWhxWo4Bg==
+X-Received: by 2002:a17:907:3fa5:b0:966:180f:d10c with SMTP id hr37-20020a1709073fa500b00966180fd10cmr17205407ejc.33.1683751430891;
+        Wed, 10 May 2023 13:43:50 -0700 (PDT)
+Received: from [10.102.4.150] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id mc27-20020a170906eb5b00b00966330021e9sm3069747ejb.47.2023.05.10.13.43.49
+        for <iwd@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 May 2023 13:43:50 -0700 (PDT)
+Message-ID: <c11eed5d-2824-bfbd-745f-5849d5acdfbb@gmail.com>
+Date: Wed, 10 May 2023 13:43:48 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH 0/1] Fix wiphy regdom logic
+Content-Language: en-US
+To: iwd@lists.linux.dev
+References: <20230510204153.715304-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20230510204153.715304-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The failure path for FT was inserting the same work item inside
-the 'do_work' callback. This caused duplicate work items to be
-inside the radio work queue, and upon destroy the ID would get
-zero'ed out. This caused a host of valgrind complaints when this
-behavior is triggered.
+Sorry, something got screwed up and included additional patches. Please 
+disregard.
 
-This can be seen with slight modifiations to the FT test:
-
-src/station.c:station_try_next_transition() 9, target 12:00:00:00:00:02
-src/wiphy.c:wiphy_radio_work_insert() Inserting work item 6
-src/wiphy.c:wiphy_radio_work_insert() Inserting work item 7
-src/wiphy.c:wiphy_radio_work_done() Work item 5 done
-src/wiphy.c:wiphy_radio_work_next() Starting work item 6
-src/netdev.c:netdev_mlme_notify() MLME notification Remain on Channel(55)
-src/ft.c:ft_send_authenticate()
-src/netdev.c:netdev_mlme_notify() MLME notification Frame TX Status(60)
-src/netdev.c:netdev_mlme_notify() MLME notification Frame Wait Cancel(67)
-src/netdev.c:netdev_mlme_notify() MLME notification Cancel Remain on Channel(56)
-src/wiphy.c:wiphy_radio_work_done() Work item 6 done
-
---- Work item 7 is 'station_ft_work_ready()' ---
-
-src/wiphy.c:wiphy_radio_work_next() Starting work item 7
-src/station.c:station_debug_event() StationDebug.Event(ft-roam-failed)
-src/station.c:station_try_next_transition() 9, target 12:00:00:00:00:03
-src/wiphy.c:wiphy_radio_work_insert() Inserting work item 8
-
---- Here we insert work item 9, which is a duplicate of 7 ---
-
-src/wiphy.c:wiphy_radio_work_insert() Inserting work item 9
-src/wiphy.c:wiphy_radio_work_next() Starting work item 8
-src/netdev.c:netdev_mlme_notify() MLME notification Remain on Channel(55)
-src/ft.c:ft_send_authenticate()
-src/netdev.c:netdev_mlme_notify() MLME notification Frame TX Status(60)
-src/netdev.c:netdev_mlme_notify() MLME notification Frame Wait Cancel(67)
-src/netdev.c:netdev_mlme_notify() MLME notification Cancel Remain on Channel(56)
-src/wiphy.c:wiphy_radio_work_done() Work item 8 done
-
---- And finally, the duplicated work item starts ---
-
-src/wiphy.c:wiphy_radio_work_next() Starting work item 0
-src/station.c:station_debug_event() StationDebug.Event(ft-roam-failed)
-src/station.c:station_roam_failed() 9
-src/station.c:station_roam_trigger_cb() 9
----
- src/station.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
-
-diff --git a/src/station.c b/src/station.c
-index 0d8f7628..3c6e43ce 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -122,6 +122,7 @@ struct station {
- 
- 	uint32_t wiphy_watch;
- 
-+	struct l_idle *ft_idle;
- 	struct wiphy_radio_work_item ft_work;
- 
- 	bool preparing_roam : 1;
-@@ -1739,6 +1740,11 @@ static void station_roam_state_clear(struct station *station)
- 		station->roam_freqs = NULL;
- 	}
- 
-+	if (station->ft_idle) {
-+		l_idle_remove(station->ft_idle);
-+		station->ft_idle = NULL;
-+	}
-+
- 	l_queue_clear(station->roam_bss_list, l_free);
- 
- 	ft_clear_authentications(netdev_get_ifindex(station->netdev));
-@@ -2282,6 +2288,16 @@ static void station_preauthenticate_cb(struct netdev *netdev,
- 
- static void station_transition_start(struct station *station);
- 
-+static void station_transition_idle(struct l_idle *idle, void *user_data)
-+{
-+	struct station *station = user_data;
-+
-+	l_idle_remove(station->ft_idle);
-+	station->ft_idle = NULL;
-+
-+	station_transition_start(station);
-+}
-+
- static bool station_ft_work_ready(struct wiphy_radio_work_item *item)
- {
- 	struct station *station = l_container_of(item, struct station, ft_work);
-@@ -2300,7 +2316,8 @@ static bool station_ft_work_ready(struct wiphy_radio_work_item *item)
- 	if (ret == -ENOENT) {
- 		station_debug_event(station, "ft-roam-failed");
- try_next:
--		station_transition_start(station);
-+		station->ft_idle = l_idle_create(station_transition_idle,
-+							station, NULL);
- 		return true;
- 	} else if (ret < 0)
- 		goto assoc_failed;
--- 
-2.25.1
-
+On 5/10/23 1:41 PM, James Prestwood wrote:
+> Below are some logs when this behavior was seen. IWD never
+> transitions out of the ft-roaming state due to the key setting
+> callbacks never being called. Its hard to know exactly what
+> messages were sent/received since its coming from iwmon but
+> netlink appears to completely lock up until a watchdog restarts
+> the IWD service.
+> 
+> After the patch was applied there were zero instances of this
+> behavior which seems to indicate the kernel is unable to handle
+> multiple GET_WIPHY calls.
+> 
+> May 10 00:11:54 iwd[336880]: src/station.c:station_try_next_transition() 14, target aa:46:8d:1c:16:e6
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_radio_work_insert() Inserting work item 14498
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_radio_work_insert() Inserting work item 14499
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_radio_work_done() Work item 14497 done
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_radio_work_next() Starting work item 14498
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification Remain on Channel(55)
+> May 10 00:11:54 iwd[336880]: src/ft.c:ft_send_authenticate()
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification Frame TX Status(60)
+> May 10 00:11:54 kernel: wlan0: disconnect from AP aa:46:8d:1c:17:25 for new assoc to aa:46:8d:1c:16:e6
+> May 10 00:11:54 locus[917]: State changed to roaming
+> May 10 00:11:54 locus[917]: Start 10000ms timeout waiting for connected/roaming
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_unicast_notify() Unicast notification Frame(59)
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification Cancel Remain on Channel(56)
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_radio_work_done() Work item 14498 done
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_radio_work_next() Starting work item 14499
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_cqm_rssi_update()
+> May 10 00:11:54 iwd[336880]: src/station.c:station_enter_state() Old State: connected, new state: ft-roaming
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification Frame Wait Cancel(67)
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_link_notify() event 16 on ifindex 14
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_deauthenticate_event()
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_disconnect_event()
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification New Station(19)
+> May 10 00:11:54 kernel: wlan0: associate with aa:46:8d:1c:16:e6 (try 1/3)
+> May 10 00:11:54 kernel: wlan0: RX ReassocResp from aa:46:8d:1c:16:e6 (capab=0x1511 status=0 aid=7)
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_link_notify() event 16 on ifindex 14
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for (global) is XX
+> May 10 00:11:54 systemd-networkd[393]: wlan0: Lost carrier
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification Associate(38)
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_associate_event()
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_set_gtk() ifindex=14 key_idx=2
+> May 10 00:11:54 iwd[336880]: src/station.c:station_handshake_event() Setting keys
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_set_tk() ifindex=14 key_idx=0
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_link_notify() event 16 on ifindex 14
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification Connect(46)
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_connect_event()
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_connect_event() aborting and ignore_connect_event not set, proceed
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_connect_event() expect_connect_failure not set, proceed
+> May 10 00:11:54 iwd[336880]: src/netdev.c:parse_request_ies()
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_connect_event() Request / Response IEs parsed
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_get_oci()
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_link_notify() event 16 on ifindex 14
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_link_notify() event 16 on ifindex 14
+> May 10 00:11:54 iwd[336880]: src/netdev.c:netdev_link_notify() event 16 on ifindex 14
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for (global) is US
+> May 10 00:11:54 iwd[336880]: src/wiphy.c:wiphy_cancel_last_dump() Canceling pending regdom wiphy dump (global)
+> May 10 00:11:54 kernel: wlan0: associated
+> May 10 00:11:54 kernel: ath: EEPROM regdomain: 0x8348
+> May 10 00:11:54 kernel: ath: EEPROM indicates we should expect a country code
+> May 10 00:11:54 kernel: ath: doing EEPROM country->regdmn map search
+> May 10 00:11:54 kernel: ath: country maps to regdmn code: 0x3a
+> May 10 00:11:54 kernel: ath: Country alpha2 being used: US
+> May 10 00:11:54 kernel: ath: Regpair used: 0x3a
+> May 10 00:11:54 kernel: ath: regdomain 0x8348 dynamically updated by country element
+> May 10 00:11:55 iwd[336880]: src/netdev.c:netdev_mlme_notify() MLME notification Notify CQM(64)
+> May 10 00:11:55 iwd[336880]: src/netdev.c:netdev_cqm_event() Signal change event (above=0 signal=-76)
+> 
+> --- Nothing here for 10 seconds, until the watchdog triggers ---
+> 
+> May 10 00:12:04 locus[917]: IWD watchdog triggered (reason=state)
+> May 10 00:12:04 iwd[336880]: Terminate
+> May 10 00:12:04 iwd[336880]: src/netdev.c:netdev_free() Freeing netdev wlan0[14]
+> May 10 00:12:04 iwd[336880]: src/device.c:device_free()
+> May 10 00:12:04 iwd[336880]: src/station.c:station_free()
+> May 10 00:12:04 iwd[336880]: src/netconfig.c:netconfig_destroy()
+> May 10 00:12:04 iwd[336880]: src/netconfig.c:netconfig_event_handler() l_netconfig event 2
+> May 10 00:12:04 iwd[336880]: src/netconfig-commit.c:netconfig_commit_print_addrs() removing address: 10.193.158.118
+> May 10 00:12:04 iwd[336880]: src/resolve.c:resolve_systemd_revert() ifindex: 14
+> May 10 00:12:04 systemd[1]: Stopping Wireless service...
+> 
+> The iwmon logs are lengthy, but I've included the bit where the
+> logs abruptly stop for 10 seconds until the watchdog kicks in.
+> Prior there was no key setting or anything connection related
+> after the connect event.
+> 
+> May 10 00:11:55:     Extended Capabilities: len 8
+> May 10 00:11:55:         Capability: bit  2: Extended channel switching
+> May 10 00:11:55:         Capability: bit 62: Opmode Notification
+> May 10 00:11:55:     Extended Capabilities Mask: 170 len 8
+> May 10 00:12:04:         04 00 00 00 00 00 00 40                          .......@
+> May 10 00:12:04:     VHT Capability Mask: 176 len 12
+> May 10 00:12:04:         f0 1f 80 33 ff ff 00 00 ff ff 00 00              ...3........
+> May 10 00:12:04:     MAC Address 00:0E:8E:A3:02:FE
+> May 10 00:12:04: > Result: New Wiphy (0x03) len 36 [multi]                     1683677515.942843
+> May 10 00:12:04:     Wiphy: 0 (0x00000000)
+> May 10 00:12:04:     Wiphy Name: phy0
+> May 10 00:12:04:     Generation: 1 (0x00000001)
+> May 10 00:12:04:     Max AP Assoc Station: 202 len 4
+> May 10 00:12:04:         20 00 00 00
+> 
+> James Prestwood (1):
+>    wiphy: fix regdom change wiphy dump logic
+> 
+>   src/wiphy.c | 103 +++++++++++++++++++++++++++-------------------------
+>   1 file changed, 54 insertions(+), 49 deletions(-)
+> 
