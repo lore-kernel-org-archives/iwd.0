@@ -1,189 +1,210 @@
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59D91800B
-	for <iwd@lists.linux.dev>; Tue,  9 May 2023 16:52:20 +0000 (UTC)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailout.west.internal (Postfix) with ESMTP id 100FC32003AC;
-	Tue,  9 May 2023 12:52:19 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Tue, 09 May 2023 12:52:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mikesilva.com;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:sender:subject:subject:to:to;
-	 s=fm3; t=1683651139; x=1683737539; bh=1zG8J/QuF0wPYBkvNooeS+BBG
-	TjOcHXD0QgMmJ3FQC8=; b=Ag7QXZv2DO1uX8RBpJDEu9oxUis7/GT8fZNhMk7q7
-	lK0GHmRLXw1i44TG9VilxXJSW25dPYD5h6UuiSNrmZl3m3TKYRFdeTFYimchvtzR
-	nVC6z/0afE0rfuAWavyneLjFdftxPrzJuDNO4d/RYYSU/KlC5PwE9qTJ8vgZvuax
-	kK67Ze+vHREfpcyI7Rt+YFBG92BboCWcu5+SZ9/0zVAtNvrrL2e1viqkvORiUEB6
-	H4aBWFPlEHTAED/mBvStVs8VKvcudaplbCh63Ka9QZU3cJBS2OKP9yrM0ZPtu4pj
-	1yXw4rwCtlHemfvhoAZ0RVhzt0ydrUqDm8ISN1d3twyzw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1683651139; x=1683737539; bh=1zG8J/QuF0wPYBkvNooeS+BBGTjOcHXD0Qg
-	MmJ3FQC8=; b=Y/s0D3zVbGQatt2HUcQurkM+EVlUc81s1wq5rgBIyY7jkJkTcoG
-	JKpbjkeaVCeTR0NlKZrVzh0MRxpLEHa8D0FQ5OKHwIAyiyKV7KrDQ2A7T2bhUlrl
-	K0jzvR63xCxTmJRaq69Sked1yuwSACl+OhS+P2y69h2LOLG5KXN8St6pXtmn/CbB
-	RtfLtN0hMEJ+isa7FO9A4osLXF9uo5pnHRAQJ7mbDUpvtNsuPaLOqXNw+7H18yX3
-	qf/60JEGceKSYZWNpY1wRH55TPs3GOAS2WySF6uKeDX623My50XyrIovDF7ZZnLT
-	CVzrW7zXQ/E4mZTRbfW7cZoZG4BUNm5EP9Q==
-X-ME-Sender: <xms:Q3paZGTxqED7tie9WwAmPyXOmwp36c8aFz2yGg3eVVd3aK2aaIxnxQ>
-    <xme:Q3paZLy79NjgyCRY-qx6bZQWIKy3eL86zP6KIgcligzyV4DXnyqJPj5Hlo6gItjHK
-    NoMLs-rXkBnMi5Okao>
-X-ME-Received: <xmr:Q3paZD0vj1HHCrVNjvaKxTjoXr7OcDKwOHncdFQ1i6tMNSQhFmAW3cPYtnnNW_wYNEEhKDKQtG8Kys30r7CeNzrWh6BysuMbxzKquML1lQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeeguddgfeduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurheptggguffhjgffvefgkfhfvffosehtqhhmtdhhtdejnecuhfhrohhmpefoihhk
-    vgcuufhilhhvrgcuoehmihhkvgdrshhilhhvrgesmhhikhgvshhilhhvrgdrtghomheqne
-    cuggftrfgrthhtvghrnhephedvheefkeejudfhvdeuveehteeuveffleehheeuteeffedv
-    teejvdetgeeivedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
-    hfrhhomhepmhhikhgvrdhsihhlvhgrsehmihhkvghsihhlvhgrrdgtohhm
-X-ME-Proxy: <xmx:Q3paZCBXhxVFvcdtwcFKVnk0lN9RX_3xpUo5eq9HCNbePdpYVdvpPQ>
-    <xmx:Q3paZPicqhAH4_rAxvhYQQaq1kK2RhCKmUp6_YhYPV76oC5mLerNBQ>
-    <xmx:Q3paZOpBMqdBjOK5wHeS9fEG5c0dZc7GIAxGgwjoOYWrliHB7g6bwg>
-    <xmx:Q3paZHYmhmhr1TJQ3vNHrHnGrATEhDSD7PJMsghaQfCyMhrOQd6tRQ>
-Feedback-ID: i3a5446d4:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 9 May 2023 12:52:18 -0400 (EDT)
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3CA463E
+	for <iwd@lists.linux.dev>; Wed, 10 May 2023 04:52:35 +0000 (UTC)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-52c6504974dso6127731a12.2
+        for <iwd@lists.linux.dev>; Tue, 09 May 2023 21:52:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683694355; x=1686286355;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h7bpyTM3yaUO7t/n7yVaG1xNP8QVsaR+3PLSrSa0pO0=;
+        b=qFukcJ9vhR3z4rnSpOPT/kcZ8r6YjPBZKI6t2IP4bdVWlzS7iRRcZXB74JfAZXlMKj
+         VZSC38TFg3i06/P11eBgObBq5iLLBf8hWXP26PSpub+L54+ndw13llKVuzjGCb4SnVTh
+         bAK6xgBnAlsx45KFthIJeMDj1zugt8mdx/JakDQsCcBoHPdyLZOGHds+mbPUAhMirKsM
+         i+FqVXitv8XRUSMrug1HDAojQTGMpDw/GGJhY4e0Hv6q/07tJn8TkRaqsIr3OoC+aM6P
+         qyViHvJWyYo11v/QQZ+E/8A7XqGfCirexGPI+b+2aQwcZhdnr/Tud4Bj+J/nXRBdtjlE
+         E5GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683694355; x=1686286355;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h7bpyTM3yaUO7t/n7yVaG1xNP8QVsaR+3PLSrSa0pO0=;
+        b=jmnd++YDXX2LFjHUGlpPDN5RrIYfUO4PmKhuTHiUQLt5mNQdiatsDGAkc/hMKoRCt3
+         lr/rmrGdF9eZ1CW3rlBI6pyZ0UwUdsRwp/IH7XJeYv2fDsvJepwCDARxwRnJKaWQ6uUz
+         I0vKOZP2kGYOcMgUqr3j8BRA6uNu7HKiAPjxDAA10qsNtiy4hd99phA4Ng7xa6q72w5w
+         0BK7NHJ905jxg0D2a7lpIoqsb34/UeEz9dcJMlKONfP6WHlUxayhy0zy0aGaIR6eTuCZ
+         kVlRWGmNWxrUYsLEbf/24ZGxuQQBw6MqtMa32CRpdiUgcdBqkpsuhrbA4+hyYMRtLkHg
+         srNg==
+X-Gm-Message-State: AC+VfDwtySk5SNDIBNRavuYtHGFi8NBmqpOLpA2E0DFYDJjlnlKD0nC4
+	LheK+uLI9aFCj0xzzrOvnJ2CeuOg3AcL7UdxR8nWh57u13xkeQ==
+X-Google-Smtp-Source: ACHHUZ6FMqFr0P2JiUvODIV6mYnutrNjhG8L/tE3+BXPgdJHvrkvDwVMVC0ZGYfG6kLP4NurTKt/eepwX0soTrXonuU=
+X-Received: by 2002:a17:902:a604:b0:1ac:b363:83b3 with SMTP id
+ u4-20020a170902a60400b001acb36383b3mr1005376plq.41.1683694355241; Tue, 09 May
+ 2023 21:52:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.3\))
-Subject: Re: powersave support
-From: Mike Silva <mike.silva@mikesilva.com>
-In-Reply-To: <04BED22D-EBF1-47B8-AD51-01DCC2CA4138@holtmann.org>
-Date: Tue, 9 May 2023 09:52:18 -0700
-Cc: James Prestwood <prestwoj@gmail.com>,
- iwd@lists.linux.dev
+MIME-Version: 1.0
+References: <CAG17S_OaL_VK9e-s=DbwwKOAdjX9jR_B9ogifs9Di1-VW=ksmQ@mail.gmail.com>
+ <152dff569b6fba0baadd7ac14673cf2a67c42eb4.camel@gmail.com>
+In-Reply-To: <152dff569b6fba0baadd7ac14673cf2a67c42eb4.camel@gmail.com>
+From: KeithG <ys3al35l@gmail.com>
+Date: Tue, 9 May 2023 23:52:24 -0500
+Message-ID: <CAG17S_OvMmYKJP==2bn-XoCtkUDC7b+sMRk+woeSN9Q_GR9PTw@mail.gmail.com>
+Subject: Re: iwd ap mode changed?
+To: James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <D9382E92-3CC8-48BD-BDB3-2F673F899B85@mikesilva.com>
-References: <9EF567DC-15CC-40C0-9AF8-D69E27B81ACF@mikesilva.com>
- <f5ccf370-5197-c9a4-61b6-2a130c7242de@gmail.com>
- <4F32B57B-3517-46EA-97F6-2B5DC172B952@holtmann.org>
- <66b05814-cb78-40c7-929b-0e2ffa2027a6@gmail.com>
- <04BED22D-EBF1-47B8-AD51-01DCC2CA4138@holtmann.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-X-Mailer: Apple Mail (2.3696.120.41.1.3)
+
+On Thu, Mar 2, 2023 at 10:15=E2=80=AFAM James Prestwood <prestwoj@gmail.com=
+> wrote:
+>
+> Hi Keith,
+>
+> On Tue, 2023-02-28 at 21:26 -0600, KeithG wrote:
+> > I am playing with ap mode and I previously used this page to set it
+> > up:
+> > https://iwd.wiki.kernel.org/ap_mode
+> > Now, when I use iwd 2.3, I get
+> > "Operation failed"
+> > when I use the iwctl ap start or start-profile command.
+> > when I revert to version 1.28, it starts to work again.  Is there a
+> > changed parameter in the main.conf or something that I do not have
+> > set
+> > right?
+>
+> Indeed AP mode has changed in recent releases to support HT. The logic
+> now tries to pick the highest channel width possible, and in theory
+> enable higher throughput.
+>
+> But perhaps some hardware doesn't like this, or the logic is wrong. For
+> the time being you can set this in the AP profile (with upstream IWD).
+>
+> [General]
+> DisableHT=3Dtrue
+>
+> But if you could also send an iwmon/debug log of the problem I can take
+> a look. Make sure you start iwmon before IWD starts so I can see the
+> advertised hardware capabilities.
+>
+> Thanks,
+> James
+>
+> >
+> > Keith
+> >
+>
+James,
+
+I am finally back on this. I have switched OSes. I was on Arch and am
+now on RPiOS.
+I built and installed iwd/ell for this os but on the same hardware
+(Rpi 3B+) and am having the same problem:
+root@runeaudio(rw):~# cat /etc/iwd/main.conf
+[General]
+EnableNetworkConfiguration=3Dtrue
+UseDefaultInterface=3Dtrue
+DisableHT=3Dtrue
+root@runeaudio(rw):~# cat /var/lib/iwd/ap/RuneAudioAP.ap
+[Security]
+Passphrase=3DRuneAudio
+[IPv4]
+Address=3D192.168.5.1
+Gateway=3D192.168.5.1
+Netmask=3D255.255.255.0
+DNSList=3D192.168.5.1
+root@runeaudio(rw):~# iwctl device list
+                                    Devices
+---------------------------------------------------------------------------=
+-----
+  Name                  Address               Powered     Adapter     Mode
+---------------------------------------------------------------------------=
+-----
+  wlan0                 b8:27:eb:xx:xx:xx    on          phy0        ap
+root@runeaudio(rw):~# iwctl ap wlan0 start-profile RuneAudioAP
+Operation failed
+When I try to start iwmon, I also get an error:
+root@runeaudio(rw):~# iwmon
+Wireless monitor ver 2.4
+Failed to create monitor interface nlmon: Unknown error -95
+
+In the journal, I get this when I try to start in AP mode:
+May 09 23:47:03 runeaudio iwd[1747]: Could not register frame watch
+type 0000: -114
+May 09 23:47:03 runeaudio iwd[1747]: Could not register frame watch
+type 0020: -114
+May 09 23:47:03 runeaudio iwd[1747]: Could not register frame watch
+type 0040: -114
+May 09 23:47:03 runeaudio iwd[1747]: Could not register frame watch
+type 00a0: -114
+May 09 23:47:03 runeaudio iwd[1747]: Could not register frame watch
+type 00b0: -114
+May 09 23:47:03 runeaudio iwd[1747]: Could not register frame watch
+type 00c0: -114
+May 09 23:47:03 runeaudio iwd[1747]: START_AP failed: -52
+
+when IWD starts, I get this in the journal:
+May 09 23:37:17 runeaudio iwd[1747]: No Diffie-Hellman support found,
+WPS will not be available
+May 09 23:37:17 runeaudio iwd[1747]: The following options are missing
+in the kernel:
+May 09 23:37:17 runeaudio iwd[1747]:         CONFIG_KEY_DH_OPERATIONS
+May 09 23:37:17 runeaudio iwd[1747]: Wireless daemon version 2.4
+May 09 23:37:17 runeaudio iwd[1747]: Loaded configuration from
+/etc/iwd/main.conf
+May 09 23:37:17 runeaudio iwd[1747]: Wiphy: 0, Name: phy0
+May 09 23:37:17 runeaudio iwd[1747]:         Permanent Address:
+b8:27:eb:52:cc:d0
+May 09 23:37:17 runeaudio iwd[1747]:         2.4Ghz Band:
+May 09 23:37:17 runeaudio iwd[1747]:                 Bitrates (non-HT):
+May 09 23:37:17 runeaudio iwd[1747]:                          1.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                          2.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                          5.5 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         11.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                          6.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                          9.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         12.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         18.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         24.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         36.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         48.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         54.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                 HT Capabilities:
+May 09 23:37:17 runeaudio iwd[1747]:                         HT40
+May 09 23:37:17 runeaudio iwd[1747]:                         Short GI for 2=
+0Mhz
+May 09 23:37:17 runeaudio iwd[1747]:                 HT RX MCS indexes:
+May 09 23:37:17 runeaudio iwd[1747]:                         0-7
+May 09 23:37:17 runeaudio iwd[1747]:         5Ghz Band:
+May 09 23:37:17 runeaudio iwd[1747]:                 Bitrates (non-HT):
+May 09 23:37:17 runeaudio iwd[1747]:                          6.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                          9.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         12.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         18.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         24.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         36.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         48.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                         54.0 Mbps
+May 09 23:37:17 runeaudio iwd[1747]:                 HT Capabilities:
+May 09 23:37:17 runeaudio iwd[1747]:                         HT40
+May 09 23:37:17 runeaudio iwd[1747]:                         Short GI for 2=
+0Mhz
+May 09 23:37:17 runeaudio iwd[1747]:                         Short GI for 4=
+0Mhz
+May 09 23:37:17 runeaudio iwd[1747]:                 HT RX MCS indexes:
+May 09 23:37:17 runeaudio iwd[1747]:                         0-7
+May 09 23:37:17 runeaudio iwd[1747]:                 VHT Capabilities:
+May 09 23:37:17 runeaudio iwd[1747]:                         Short GI for 8=
+0Mhz
+May 09 23:37:17 runeaudio iwd[1747]:                         Max RX
+MCS: 0-9 for NSS: 1
+May 09 23:37:17 runeaudio iwd[1747]:                         Max TX
+MCS: 0-9 for NSS: 1
+May 09 23:37:17 runeaudio iwd[1747]:         Ciphers: BIP-CMAC-128 CCMP-128=
+ TKIP
+May 09 23:37:17 runeaudio iwd[1747]:         Supported iftypes: ad-hoc
+station ap p2p-client p2p-go p2p-device
+May 09 23:37:17 runeaudio iwd[1747]: Wiphy phy0 will only use the
+default interface
+May 09 23:37:17 runeaudio iwd[1747]: Could not register frame watch
+type 00b0: -22
 
 
-
-> On May 9, 2023, at 9:09 AM, Marcel Holtmann <marcel@holtmann.org> =
-wrote:
->=20
-> Hi James,
->=20
->>>>> Does IWD support disabling/enabling WiFi powersave/power =
-management?
->>>>=20
->>>> No, currently it doesn't.
->>>>=20
->>>>> Perhaps, I=E2=80=99m failing in finding it in the documentation. =
-It=E2=80=99s possible to do this as needed with ifconfig, iwconfig, or =
-NetworkManager, or to permanently configure them to enable or disable it =
-at boot..
->>>>> If IWD doesn=E2=80=99t support this, it would be nice enhancement =
-if IWD could when managing the adapter/connection, as some drivers do a =
-poor job of handling powersave being on.
->>>>=20
->>>> Yes, I've recently seen instances of drivers handling this poorly. =
-Are you envisioning something like these other tools, where power save =
-is just toggled on/off?
->>>>=20
->>>> I think this could be done, and actually we do this manually every =
-boot using iwconfig in the software stack I work with. The tricky part =
-is PS is done per-interface and IWD doesn't have any concept of =
-per-interface configurations.
->>> if anybody uses iwconfig, then the problem is already there. =
-iwconfig
->>> is an WEXT tool and deprecated. The driver is broken.
->>=20
->> It doesn't have much to do with the tool, its just an NL80211 API to =
-toggle power save. But yes, the driver is broken if it can't handle this =
-properly... but this is the world we live in.
->>=20
->> The reason I'm interested though is because there is no nice way to =
-disable power save "automatically" unless you use NetworkManager. Apart =
-from hooking in a script to disable it with iw/iwconfig (which we =
-currently do). An option in IWD would be convenient.
->>=20
->>>> Denis might have preferences on this? but my initial thoughts would =
-be something like:
->>>>=20
->>>> [General.wlan0]
->>>> PowerSave=3D{on,off}
->>> You can't tie anything to interface names. Then can change and are
->>> basically random names. The most you can do is tie it to the phy
->>> and its mode of operation.
->>=20
->> True, it would have to be per-phy. But this too has the same problem =
-if its a hotplug device...
->>=20
->> We do have this concept of driver_flags already, for interface =
-removal, but I'm not sure if power save is something that EVERYONE will =
-want to disable for a given driver. Maybe it works for some use cases =
-but not others.
->=20
-> we already have this:
->=20
-> enum driver_flag {
->        DEFAULT_IF =3D 0x1,
->        FORCE_PAE =3D 0x2,
-> };
->=20
-> struct driver_info {
->        const char *prefix;
->        unsigned int flags;
-> };
->=20
-> /*
-> * The out-of-tree rtl88x2bu crashes the kernel hard if default =
-interface is
-> * destroyed.  It seems many other drivers are built from the same =
-source code
-> * so we set the DEFAULT_IF flag for all of them.  Unfortunately there =
-are
-> * in-tree drivers that also match these names and may be fine.
-> */
-> static const struct driver_info driver_infos[] =3D {
->        { "rtl81*",          DEFAULT_IF },
->        { "rtl87*",          DEFAULT_IF },
->        { "rtl88*",          DEFAULT_IF },
->        { "rtw_*",           DEFAULT_IF },
->        { "brcmfmac",        DEFAULT_IF },
->        { "bcmsdh_sdmmc",    DEFAULT_IF },
-> };
->=20
-
-This is precisely the =E2=80=98Murderers Row=E2=80=99 of bad actors I =
-was thinking of, with the addition that in recent times Mediatek =
-acquired some chipset IP from Realtek, from which they=E2=80=99ve now =
-derived a bunch of their own chipset variants, who all carry the =
-powersave issue forward. These chipsets are quite popular on laptops and =
-devices sold with Linux, precisely because they hit a sweet spot on =
-price/performance=E2=80=A6so long as you don=E2=80=99t want power save =
-handled nicely. :-)
-
-That said, judging by the activity in the Mediatek list, those folks are =
-actively interested in finding and cleaning up the technical debt =
-they=E2=80=99ve inherited.
-
-> It is hardcoded and obviously awful as that, but you could add a flag
-> for power save mode. However I think this needs to move into a =
-configuration
-> file somewhere that can match and flag drivers and/or hardware.
->=20
-> Regards
->=20
-> Marcel
->=20
-
+Keith
