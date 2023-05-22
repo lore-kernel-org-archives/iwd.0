@@ -1,85 +1,81 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A661B23D78
-	for <iwd@lists.linux.dev>; Thu, 18 May 2023 16:50:09 +0000 (UTC)
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-757942bd912so123164685a.2
-        for <iwd@lists.linux.dev>; Thu, 18 May 2023 09:50:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E08BE70
+	for <iwd@lists.linux.dev>; Mon, 22 May 2023 14:37:51 +0000 (UTC)
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-397eba8b82aso1028879b6e.0
+        for <iwd@lists.linux.dev>; Mon, 22 May 2023 07:37:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684428608; x=1687020608;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cMNDXCtv1dRZ3EhNXLekDDNKFmZKuaqafsL8saIA0xY=;
-        b=drqW9NiPQlLN7WPyO6BU5IDAv1EuBV27GrX9ahRXlwO4lIFR/IG5CaItaeCfIEdj0e
-         zJpdvrExNsAMSbhaCXnG9frcSgmBkve4UttJNaXU777X3LOZ9CT/Q77Rd/0+ps60o9TX
-         ES80Cv5B39coNu/Tu67AMa38c3TMEe13WYZaZ2NiSJ0FvZHOVovJLo/z/W2AOq97K6Mp
-         9aEYupjDM09/7QjvD5+IfpemofPMc1ERS5gQSCAnPV3r+qeIoU4995MVPf9e6Zf7ATjq
-         WESdeItk7C79XPk0s3rXkYwVwGNofszeepYckiQnpHRgCRK3O7ir3Kii7V0OLBZyX9EU
-         X/qQ==
+        d=gmail.com; s=20221208; t=1684766271; x=1687358271;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=txVMzR3ahZsJepevClt6qZDezAoXhqBR89x4pK475UQ=;
+        b=rhKk2ZpuAEUSAsFBud3VikDwAUstuR5oIEzzp+qp34R6QyLCp28Jk/NNuD3BfKJnNi
+         3GZOkRt5c54u5YDhGjdtSHF/6KCp5z3V2KDd9g9hvQM4vy9VY74qUsn6pMKddP1+TnzT
+         vk96zFvfbwi1KvFmHOjwS6gm5EnBgziVQQQbG00YuIeBmPIW+AH1o+LiDKAJHZw5TnVy
+         yTZ2kyl78TRphkDYFeb87o/Ol/HTqODql77RH0r2IOGGLe2sAmBFXTvG3HDxv4wy6Kul
+         qIMjTi0ygKVT9hWYpuyrwRJnRTyDVVpaO3M8D1VL7YvQS8DOW+Wddb1sSatTBVpiK+sn
+         Pazw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684428608; x=1687020608;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cMNDXCtv1dRZ3EhNXLekDDNKFmZKuaqafsL8saIA0xY=;
-        b=ifgUC1sxZ57lCWcL0XW2Q1fDQ01Hw/9KzuSJqFpbz23dl379no60epxF0TAGHnPAZ/
-         IyZrRMCt3Q/IlKSSiNHoDwFYcbhcID5L7I6R0sMjMsabxQUidGSS/JjcnVKe7uQA5tAa
-         0AzHggTkEU6ZFj1Km1hkn40zZMpVrUQdBESnmaKiL9Ls2oW7PH75bVBbIhYTMS53HZQ7
-         bkD+opFLGM3nGfsjmBuBZYuOUd3z8LAG8K3OPWbwN/ShmKgqGa+U8RpiYH5yVyxe9JL/
-         lhsEHYDlx5u+FxU1nZ0rGzVMfWfIV1BOdUZoUz4CryMs8+TfjuB86MknkQTbbctu+ArP
-         H5tg==
-X-Gm-Message-State: AC+VfDzFfSuaufck/myqrBYAw548Oyw9n+Wub8s+DfoCFvvG7UhJaBwK
-	6V0LIntZQ0dWPyITRq/wq5HyxiXl0/I=
-X-Google-Smtp-Source: ACHHUZ52PTirPzzIJ1025ZEWfCDNuzyFSZRnJxXPghkjsnoEbUSt1OtRyCWFELdVpCOeU3UF0Vlmlw==
-X-Received: by 2002:a05:622a:447:b0:3f5:1ff7:db72 with SMTP id o7-20020a05622a044700b003f51ff7db72mr550292qtx.22.1684428608369;
-        Thu, 18 May 2023 09:50:08 -0700 (PDT)
-Received: from LOCLAP699.cardinalhealth-columbus.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id cn13-20020a05622a248d00b003f3941ba4d9sm626112qtb.32.2023.05.18.09.50.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 May 2023 09:50:08 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 4/4] station: use wiphy_radio_work_reschedule in FT path
-Date: Thu, 18 May 2023 09:50:00 -0700
-Message-Id: <20230518165000.275611-4-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230518165000.275611-1-prestwoj@gmail.com>
-References: <20230518165000.275611-1-prestwoj@gmail.com>
+        d=1e100.net; s=20221208; t=1684766271; x=1687358271;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=txVMzR3ahZsJepevClt6qZDezAoXhqBR89x4pK475UQ=;
+        b=cCNWwLS7d9OCSx5k7Am3dCqtKYpkZteesinTjYX1BtQo2IrJlFEVMovrGMUhfSO6R9
+         e2Zs1BtnwIko3AhR+7tmsIhl/6j/vB+WCillE/BwKpBcm4a3K145ZyvJAVFQvxJp8gpu
+         UY4Ik3s7IFNeTNxv3hauXsv1GqG7v7HGQSOew4TEq/MZ+Tvm3jAWkminLSBRmdYUChxd
+         hbAW7zK2ey2/Aya/Td3RvUNk2nAxB24tEWSngz4B1Hv31So2OCp53eBi4XE3EEHRFb6i
+         lmWu8oy3qwVUAsMfNp1m4rqrdYdogH94aiVV2zpI3buYSZT2mPhWC/GbyMVaRkux4x4O
+         zziQ==
+X-Gm-Message-State: AC+VfDzQB1Irl0sLc7W8dIN6xBnTf/4RHbaMhIKfHMpdF74zsmTHgnWg
+	Vt7wHge8BTyW0SMccv67udA1tuPf1aY=
+X-Google-Smtp-Source: ACHHUZ7kPADt+SVFxc353BphTnlfdvP0ZTECMHfcaZIgunF623EoijOkbrog7KiAQ7IV+qmwfkYyNA==
+X-Received: by 2002:a05:6808:205:b0:38e:b92:dbc3 with SMTP id l5-20020a056808020500b0038e0b92dbc3mr5793347oie.49.1684766271052;
+        Mon, 22 May 2023 07:37:51 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id s205-20020acaa9d6000000b00397f453aae6sm2158736oie.38.2023.05.22.07.37.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 May 2023 07:37:50 -0700 (PDT)
+Message-ID: <3717a7d8-e9e8-2dad-c02b-cb66c4807df6@gmail.com>
+Date: Mon, 22 May 2023 09:37:49 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v3 1/4] auto-t: modify PSK-roam test to use FT failure
+ path
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20230518165000.275611-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20230518165000.275611-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-If FT fails the work item needs to be rescheduled rather than
-inserted.
----
- src/station.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Hi James,
 
-diff --git a/src/station.c b/src/station.c
-index be571083..f830ab7a 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2330,8 +2330,12 @@ static bool station_fast_transition(struct station *station,
- 	ft_authenticate(netdev_get_ifindex(station->netdev), bss);
- 
- done:
--	wiphy_radio_work_insert(station->wiphy, &station->ft_work,
--				WIPHY_WORK_PRIORITY_CONNECT, &ft_work_ops);
-+	if (station->ft_work.id)
-+		wiphy_radio_work_reschedule(station->wiphy, &station->ft_work);
-+	else
-+		wiphy_radio_work_insert(station->wiphy, &station->ft_work,
-+					WIPHY_WORK_PRIORITY_CONNECT,
-+					&ft_work_ops);
- 
- 	return true;
- }
--- 
-2.25.1
+On 5/18/23 11:49, James Prestwood wrote:
+> This adds another radio so IWD hits the FT failure path after
+> authentication to the first BSS fails. This causes a wiphy work
+> item to be rescheduled which previously was unsafe.
+> ---
+>   autotests/testPSK-roam/connection_test.py     | 13 ++++---
+>   autotests/testPSK-roam/failed_roam_test.py    | 33 ++++++++++------
+>   autotests/testPSK-roam/ft-psk-ccmp-3.conf     | 39 +++++++++++++++++++
+>   autotests/testPSK-roam/hw.conf                |  3 +-
+>   .../testPSK-roam/roam_ap_disconnect_test.py   |  4 +-
+>   5 files changed, 74 insertions(+), 18 deletions(-)
+>   create mode 100644 autotests/testPSK-roam/ft-psk-ccmp-3.conf
+> 
+
+All applied, thanks.
+
+Regards,
+-Denis
 
