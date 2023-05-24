@@ -1,119 +1,78 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mx02-out.cloud.vadesecure.com (mx02-out.cloud.vadesecure.com [109.197.246.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531ED29A0
+	for <iwd@lists.linux.dev>; Wed, 24 May 2023 07:21:07 +0000 (UTC)
+Received: from mail01.bodet.com (unknown [84.239.65.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F041C750
-	for <iwd@lists.linux.dev>; Tue, 23 May 2023 13:17:06 +0000 (UTC)
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2555076e505so2521306a91.0
-        for <iwd@lists.linux.dev>; Tue, 23 May 2023 06:17:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684847826; x=1687439826;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sWKcdG7xBquxS/VJlCZKc9TAMo1PeFGZHaSN0ZXrE8Q=;
-        b=djrOHNyYQRl6rXBkQKdyVu1cO2J8bzgxNn9/hVzMaU1MDBoGiH7Z8dFU6BT8JCDPKc
-         +1eVLFSfcxHwISN4yrdgYlE6PBQjtxl1LyrMf7i1i+wrbMPE4mTpfP9gY++iWKj3/wGT
-         blfzrsA1ipQVKvqtOcc7Hy8r0gHNDISQOPfXwtYRQzoZ3b+qlCPsgW0Ej3wMKRo5dX0T
-         uA6ux/rSvaJva5upmYXZJxiJo3iMWQyhNNBUEEeJUyrm5/Sd6LXVXyw5zKHDNvCMF/gJ
-         zGqn3SY2pxuMfX71ICmrUY7MGgVssb+SPQkcDZ/NIEA3jdDBxEzCPmpgQM9Lvyg1oyuP
-         t5IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684847826; x=1687439826;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sWKcdG7xBquxS/VJlCZKc9TAMo1PeFGZHaSN0ZXrE8Q=;
-        b=jDuRs8PO8fDa5R62n0TOYfnVX9+dxI2PB7lNFhqAR1EyAsDLEXqlUveT2NYWAc8ASC
-         YnJN8aRtjosMLI0yEiWFg9y462paMXDPaZZi7MfOr+urZdWJ9+qU6PX2Uoe81C4jhNss
-         mSnoBLYM2lYkella4Ct0VdU2SLbEw96wMY24dORodULTbY+CtzI+TywI3QVRW3mmI+l/
-         NVTDP6hPdZGQSjTD1pnROk0W6jniWw8YAWtKifMVQNE9njZeSlETolIQe4UyY+z4SznG
-         JxoT68gbSUtBAaum+gElTO8IyAEJo+4vdmON1n47drIAVMzqCS6o/t6B0mmjo71gxEwR
-         Xnbg==
-X-Gm-Message-State: AC+VfDw+TLdYlYkq9UA2b/RdZX5CQpkbX+hsgQpfMFqyGXk3g2LU/35m
-	lmWbv7E6K1oTGRHH0cM8M7QZ5Wwoj/Wzyw==
-X-Google-Smtp-Source: ACHHUZ7dJhAteD7CYmrh3Vv6jucMa/FXSynkcmiH7qXF9pbCycpJWkS7YtGW4bt+mFY8ve0FxZZipQ==
-X-Received: by 2002:a17:90a:e016:b0:255:614a:7fae with SMTP id u22-20020a17090ae01600b00255614a7faemr6109933pjy.20.1684847826284;
-        Tue, 23 May 2023 06:17:06 -0700 (PDT)
-Received: from [192.168.254.76] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id ft17-20020a17090b0f9100b00246f9725ffcsm5719189pjb.33.2023.05.23.06.17.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 May 2023 06:17:06 -0700 (PDT)
-Message-ID: <36865aa6-6eb4-2ba3-7a7d-fa028accdd8f@gmail.com>
-Date: Tue, 23 May 2023 06:17:05 -0700
+	by mx02-out.cloud.vadesecure.com (vcfr1mtao02p) with ESMTPS id 4QR2W91CJ5z1tyT
+	for <iwd@lists.linux.dev>; Wed, 24 May 2023 09:14:45 +0200 (CEST)
+Received: from BODMAIL01.TREM.BOD (172.18.41.21) by BODMAIL01.TREM.BOD
+ (172.18.41.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Wed, 24 May
+ 2023 09:14:44 +0200
+Received: from BODMAIL01.TREM.BOD ([::1]) by BODMAIL01.TREM.BOD ([::1]) with
+ mapi id 15.01.2507.023; Wed, 24 May 2023 09:14:44 +0200
+From: "clement.legoffic@kelio.com" <clement.legoffic@kelio.com>
+To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+Subject: Enable access-point feature
+Thread-Topic: Enable access-point feature
+Thread-Index: AdmODSCeApU4o9ZRRimQ/4/fVKRwIA==
+Date: Wed, 24 May 2023 07:14:43 +0000
+Message-ID: <cfee44d1ada44a0c85ab52bfcfba80c6@kelio.com>
+Accept-Language: fr-FR, en-US
+Content-Language: fr-FR
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.18.114.29]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.1
-Subject: Re: Unable to connect to a EAP-PEAP network
-Content-Language: en-US
-To: Florian Coste <florian.coste@nairwolf.net>, iwd@lists.linux.dev
-References: <43a3d110-4e6d-f50c-be66-3bf1d0499983@nairwolf.net>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <43a3d110-4e6d-f50c-be66-3bf1d0499983@nairwolf.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-VRC-SPAM-STATUS: 0,15,gggruggvucftvghtrhhoucdtuddrgedvhedrfeejgedgudduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucggtfevpdfqfgfvnecuuegrihhlohhuthemuceftddtnecuogfggedtkedqkeelucdludehmdenucfjughrpefhvffuthffkfhitgfgggesthhqjhdttddtudenucfhrhhomhepfdgtlhgvmhgvnhhtrdhlvghgohhffhhitgeskhgvlhhiohdrtghomhdfuceotghlvghmvghnthdrlhgvghhofhhfihgtsehkvghlihhordgtohhmqeenucggtffrrghtthgvrhhnpefgvdejieeuhfekveffhfetgeduheefvdefueefvedvjeffhffhieduffetieeitdenucfkphepkeegrddvfeelrdeihedrleejpddujedvrddukedruddugedrvdelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpohhuthdpmhgrgihmshhgshhiiigvpedutdegkeehjeeipdhinhgvthepkeegrddvfeelrdeihedrleejpdhhvghlohepmhgrihhltddurdgsohguvghtrdgtohhmpdhmrghilhhfrhhomheptghlvghmvghnthdrlhgvghhofhhfihgtsehkvghlihhordgtohhmpdhnsggprhgtphhtthhopedupdhrtghpthhtohepihifugeslhhishhtshdrlhhinhhugidruggvvh
+X-VRC-SPAM-STATE: legit
+X-VRC-POLICY-STATUS: t=1,a=1,l=0
 
-Hi Florian,
+Hello,
 
-On 5/23/23 5:50 AM, Florian Coste wrote:
-> Hello,
-> 
-> I'm trying to setup a wireless connection to a EAP-PEAP network. My 
-> company gave me this picture as the only documentation available, so I'm 
-> trying to replicate this NetworkManager GUI setting that you can find 
-> here: https://i.imgur.com/KB38bDr.png
-> 
-> Basically, it should be:
-> * Authentication EAP-PEAP
-> * No certificate
-> * Inner authentication: MSCAPV2
-> 
-> The SSID of the network I'm trying to connect is called "Company 
-> France", so I have a file located at "/var/lib/iwd/Company 
-> France.8021x". There is a space in the SSID but I belive it should not 
-> cause any issue as soon as the file name and the SSID is matching.
-> 
-> Here's the .8021x config file I'm using: 
-> https://iwd.wiki.kernel.org/networkconfigurationsettings#eap-peap_with_tunneled_eap-mschapv2
-> 
-> In case I made a mistake by copying/pasting the config, I've pushing 
-> what I'm using here: http://ix.io/4ww1
-> 
-> I'm launching iwd in debug mode and I see two issues I'm unable to 
-> understand.
-> 
-> First, when I'm writing the file, I have the following error: "Error 
-> loading /var/lib/iwd//Company France.8021x". Is there a typo somewhere, 
-> the log doesn't explain why the file couldn't be loaded. Here's the full 
-> log: http://ix.io/4wvU
+I develop a simple software to discuss with iwd using DBus to do simple tas=
+k such as Connect/Disconnect/Scan/Enable AP
+The fact is that, the iwd version brings by package manager is 1.26 and I c=
+annot get the Access Point API.
+So I have tried to compile a more recent version of IWD (the one tagged 2.4=
+)  and the access point API doesn't appear too.
+I didn't find any information if it is a feature only available using --ena=
+ble-FEATURE
+In the documentation it is said that it is an experimental feature, but I d=
+on't know how to activate it.
 
-If you're able to start a connection below the file must be ok now?
-
-> 
-> Second issue I have is when I'm trying to connect to this SSID. In the 
-> config file, I don't have username and password set, so iwd ask me them 
-> when I'm trying to connect.
-> 
-> Then I have this error: EAP negotiation stopped after the Identity 
-> exchange, this can happen when the EAP-Identity value is not what the 
-> authenticator expects
-
-Did you try uncommenting/setting the EAP-Identity? In the past other 
-users have noticed that some RADIUS servers require this to be set.
+So how to get this API available ?
 
 Thanks,
-James
 
-> 
-> You can find complete logs here: http://ix.io/4wvX
-> 
-> Could you help me to understand what's going on ? My first intution is I 
-> have a dubious typo in the 8021x file but I'm unable to find it.
-> 
-> Thanks for your help in advance.
-> 
-> 
+Cl=E9ment
+
+
+
+Ce message et toutes les pieces jointes (ci-apres le "message") sont etabli=
+s a l'intention exclusive de ses destinataires.
+Si vous recevez ce message par erreur, merci de le detruire et d'en avertir=
+ immediatement l'expediteur par e-mail.
+Toute utilisation de ce message non conforme a sa destination, toute diffus=
+ion ou toute publication, totale ou partielle, est interdite, sauf autorisa=
+tion expresse. Les communications sur Internet n'etant pas securisees, l'ex=
+pediteur informe qu'il ne peut accepter aucune responsabilite quant au cont=
+enu de ce message.
+This mail message and attachments (the "message") are solely intended for t=
+he addresses. It is confidential in nature.
+If you receive this message in error, please delete it and immediately noti=
+fy the sender by e-mail.
+Any use other than its intended purpose, dissemination or disclosure, eithe=
+r whole or partial, is prohibited except if formal approval is granted. As =
+communication on the Internet is not secure, the sender does not accept res=
+ponsibility for the content of this message.
