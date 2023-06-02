@@ -1,52 +1,49 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087C818C03
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA436258F
 	for <iwd@lists.linux.dev>; Fri,  2 Jun 2023 14:58:20 +0000 (UTC)
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2564dc37c3eso2652638a91.0
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5586f18e6c1so1064110eaf.2
         for <iwd@lists.linux.dev>; Fri, 02 Jun 2023 07:58:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685717900; x=1688309900;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1RgQTAg/ZCKH0Vg008clNOlFVKbZtFUtvy1kawtPmLs=;
-        b=iVNpl1dkd2Thtw0ZcGQbROO5h1Q7RCWKbCVwTGR6V6MAzS9H8gwApaJ3m8GB1CIUMb
-         Zz6gXl5UnERPJ5PkWDhS1+h+rtOD16qYyIt5N8EqVeQYJkyBKTmZtAV7Az4fbgI1sXF2
-         5nLPOmHhfZcJ+LPVbrOCDF83DyNUDulywkTvpmz7QqQqWJj+5nkVcuqn+mr/OBG4rkTr
-         ZIbikoUDQC+x9IcPP98UbX1rkYytTZIyLJ52nKlDt3ozyk6VJMz6jqDnaqE8s7nuInPT
-         orAsfrvOqHtSqWae+3MLARjH43/Pnz6S5QQ3LP3CkYApgSP9x6zEKOaja5o8K+AbuKE8
-         VSIQ==
+        d=gmail.com; s=20221208; t=1685717899; x=1688309899;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z8oGqJbMbiIirVeK/mEBfCC1e8l/Xmu9e55fUbS1yRo=;
+        b=lTVcTfs3lt+pi9jf8vkT7t936HF1ssWP/DXWa6kbOvPU8rG20Lsu5YwjDx3xU1e+Fa
+         /RCdCGEeby44XIcVQAmXBCZiyqaAg9YsJd7KmunKjxsXY0/2cRZl7/p9Y7/O1hvplwJF
+         uAxzvgZ2YT0DkALTx88ZolkJaRA+59DOovt/TWOHOuxhgCqK7WC8rTKkVZ/F5thCGfim
+         BG8iHeBxzBGXAbYQ9kZpOiYojdFWoIeFJLkSjzH43FeQeVAnDJ3GpDiXHeizIYHXb49J
+         YRUiTUOfIWbJ2umC1u5BmIWluse2VbSnNzG27fc2GtUum/gfQalQws/9Y4wZhTbk3cXa
+         f4uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685717900; x=1688309900;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1RgQTAg/ZCKH0Vg008clNOlFVKbZtFUtvy1kawtPmLs=;
-        b=U5qnalJYDx0Ya6X2M0k1i8htp/UXgyidXc8rS4emTdUuTRyqUNpHo8Qy1hXjheYABA
-         jqrPB2wVhmulT/mWfP7U71lhu7macdka2yi4T5c544DwOfuQk+yY65SpIRWFPQikk08g
-         YvQqagV9n+RJ+lgbyhEsWi/jqlJ61BN+YcqzQWY1Wq5cDoEZGB4nQd55q+8EMIQ9sz8z
-         APLMkuknQs6jjyPkoaj5bGkxYoT5HfC9OVCHOZHxR6jfWSrawVQ+nGpNAlTpsmKGXws/
-         vB4dzHJqIPrUiaZbdj6M8y1m8EkVVZURUmcGnaEMeLae4U9I1h48khoBy2kFVap824QT
-         CSZA==
-X-Gm-Message-State: AC+VfDw+DY4R9A6gdwgIlcy1XAG51wM7dwKPwpo+8INbLgGfKfUTSwkN
-	Lf9sBjYDEnvpLKraNbbwJSmK+8RhmmuFDKPu
-X-Google-Smtp-Source: ACHHUZ63s61+1P4/A8Uk4y6wPhSuxKIFV7l2tyM6sJNUdPQyHlYskTVr+vqMfVKYbWq/IBAcP3mEMw==
-X-Received: by 2002:a17:90a:b88e:b0:256:ae6c:fd1f with SMTP id o14-20020a17090ab88e00b00256ae6cfd1fmr2798pjr.20.1685717899989;
+        d=1e100.net; s=20221208; t=1685717899; x=1688309899;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z8oGqJbMbiIirVeK/mEBfCC1e8l/Xmu9e55fUbS1yRo=;
+        b=bujGmhdxPmAX1LXhsYVUORL3vkOeo5q7kSjJtQFy/f9viTc7DCfLmZyOsJ2D+eU3H5
+         cwdjyODXuA7dXXUhcb1scWBkxBJaI3T6OQnWQ92BvsLV4kIp+TIRLLAMLQeMJB0ALupa
+         7P0kA+XPVmjRE5H5OJdp4G8JN39yEehrkTtudp4RXLgDQlcVQZ61Vy529dG4GfuvOAoQ
+         igLAGXaA7boBjGJoj39ZPTNh6sVYdDLO5lKW2TwIYghBF1yYiNtbSjRkM6g7z0tOfOuS
+         KzK9+pDREQWYOurglQfusK+J2eEo+XinD980yt64rURbjloyniG6t6hMmRLEFCvzOmgh
+         yYCQ==
+X-Gm-Message-State: AC+VfDzkmN3hKeGlhPnDETmJF6DcP5cSVs0PIjiE8PWM+8r0uPEJARJL
+	IaTRDyJeEEqWemjoF2UiezTQ3ps/X4LvbvrK
+X-Google-Smtp-Source: ACHHUZ68hH6ZrLMAMJ/hwIYx2rJzne/g5sB/SoEgOVmK6U++vpmiZ9ZTcuN54apMOrg9dExlThRlqA==
+X-Received: by 2002:a05:6358:9184:b0:121:306b:4dfe with SMTP id j4-20020a056358918400b00121306b4dfemr6956849rwa.7.1685717899440;
         Fri, 02 Jun 2023 07:58:19 -0700 (PDT)
 Received: from localhost.localdomain (h134-215-217-184.bendor.broadband.dynamic.tds.net. [134.215.217.184])
-        by smtp.gmail.com with ESMTPSA id z23-20020a17090a609700b002563b38a2f7sm1389297pji.50.2023.06.02.07.58.19
+        by smtp.gmail.com with ESMTPSA id z23-20020a17090a609700b002563b38a2f7sm1389297pji.50.2023.06.02.07.58.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 02 Jun 2023 07:58:19 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] doc: document EnableHT option
-Date: Fri,  2 Jun 2023 07:58:12 -0700
-Message-Id: <20230602145812.22010-2-prestwoj@gmail.com>
+Subject: [PATCH 1/2] ap: Remove opt-out DisableHT for opt-in EnableHT
+Date: Fri,  2 Jun 2023 07:58:11 -0700
+Message-Id: <20230602145812.22010-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230602145812.22010-1-prestwoj@gmail.com>
-References: <20230602145812.22010-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -55,27 +52,57 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- src/iwd.ap.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+HT support was added to AP mode which was not widely tested
+across many different wireless adapters. The adapters tested
+did not seem to mind the channel width setting but recently
+several users have experienced AP mode breaking using the
+default/no configuration. Disabling HT works around the issue
+and allows AP mode to start in these cases.
 
-diff --git a/src/iwd.ap.rst b/src/iwd.ap.rst
-index 9ad002a2..2642e5df 100644
---- a/src/iwd.ap.rst
-+++ b/src/iwd.ap.rst
-@@ -73,10 +73,10 @@ The group ``[General]`` contains general AP configuration.
-        The time interval at which the AP starts a rekey for a given station. If
-        not provided a default value of 0 is used (rekeying is disabled).
+This deserves further investigation but its looking like more
+often than not users need to add DisableHT. This isn't so bad
+for AP profiles since the user has to create a profile anyways,
+but for the Start command its best if it "just works". To error
+on the side of caution DisableHT is being renamed to EnableHT
+making it opt-in rather than opt-out.
+---
+ src/ap.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/src/ap.c b/src/ap.c
+index 398e469a..7e6c868e 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -3668,19 +3668,22 @@ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
+ 		ap->band = BAND_FREQ_2_4_GHZ;
+ 	}
  
--   * - DisableHT
-+   * - EnableHT
-      - Boolean value
+-	if (l_settings_has_key(config, "General", "DisableHT")) {
++	if (l_settings_has_key(config, "General", "EnableHT")) {
+ 		bool boolval;
  
--       Explicitly disable HT capabilities for this AP.
-+       Enable HT capabilities for this AP.
+-		if (!l_settings_get_bool(config, "General", "DisableHT",
++		if (!l_settings_get_bool(config, "General", "EnableHT",
+ 						&boolval)) {
+-			l_error("AP [General].DisableHT not a valid boolean");
++			l_error("AP [General].EnableHT not a valid boolean");
+ 			return -EINVAL;
+ 		}
  
- Network Authentication Settings
- -------------------------------
+-		ap->supports_ht = !boolval;
+-	} else
+-		ap->supports_ht = wiphy_get_ht_capabilities(wiphy, ap->band,
+-							NULL) != NULL;
++		if (!wiphy_get_ht_capabilities(wiphy, ap->band, NULL)) {
++			l_error("AP hardware does not support HT");
++			return -EINVAL;
++		}
++
++		ap->supports_ht = boolval;
++	}
+ 
+ 	if (!ap_validate_band_channel(ap)) {
+ 		l_error("AP Band and Channel combination invalid");
 -- 
 2.25.1
 
