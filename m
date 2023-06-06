@@ -1,48 +1,48 @@
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA436258F
-	for <iwd@lists.linux.dev>; Fri,  2 Jun 2023 14:58:20 +0000 (UTC)
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5586f18e6c1so1064110eaf.2
-        for <iwd@lists.linux.dev>; Fri, 02 Jun 2023 07:58:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F3A37B97
+	for <iwd@lists.linux.dev>; Tue,  6 Jun 2023 15:04:21 +0000 (UTC)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1b02d0942caso29244565ad.1
+        for <iwd@lists.linux.dev>; Tue, 06 Jun 2023 08:04:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685717899; x=1688309899;
+        d=gmail.com; s=20221208; t=1686063861; x=1688655861;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=z8oGqJbMbiIirVeK/mEBfCC1e8l/Xmu9e55fUbS1yRo=;
-        b=lTVcTfs3lt+pi9jf8vkT7t936HF1ssWP/DXWa6kbOvPU8rG20Lsu5YwjDx3xU1e+Fa
-         /RCdCGEeby44XIcVQAmXBCZiyqaAg9YsJd7KmunKjxsXY0/2cRZl7/p9Y7/O1hvplwJF
-         uAxzvgZ2YT0DkALTx88ZolkJaRA+59DOovt/TWOHOuxhgCqK7WC8rTKkVZ/F5thCGfim
-         BG8iHeBxzBGXAbYQ9kZpOiYojdFWoIeFJLkSjzH43FeQeVAnDJ3GpDiXHeizIYHXb49J
-         YRUiTUOfIWbJ2umC1u5BmIWluse2VbSnNzG27fc2GtUum/gfQalQws/9Y4wZhTbk3cXa
-         f4uw==
+        bh=z8TC+CPgC4dPed1a/NhiXaPJZ23buV7TiH+dzb45uDM=;
+        b=NHxjGtouFnIHjoTN4lOCP5meqfHJPnC0HSW/8nRxxEkO9nVsEumN8ef0w5F/+dr1Q8
+         +SehXD+HOTKNxE1YT/DB3OZMDGB3PWMutjXzalhrqV1hnV7BtM0K1FAE2FC8is7i9FMt
+         4hX5qw/tdZygUZf672XVfZfmLfCqa+f2E4X+9m6w9UI0cxK+hp+06Wyzslj0jiP6THsF
+         FE55jEmbFAPJMbvuDGTkxTWaXOL6gQTTxSP5o7/x6xBNMBLDmoDI6v07ktJKATWfbqFr
+         d4dlKopK7YMUPX8Fk+a1A3eH8ZM88LDI9aYK5iqlLrGJIPtugFaSjtOKprbAbR8SYV2H
+         Rpmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685717899; x=1688309899;
+        d=1e100.net; s=20221208; t=1686063861; x=1688655861;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=z8oGqJbMbiIirVeK/mEBfCC1e8l/Xmu9e55fUbS1yRo=;
-        b=bujGmhdxPmAX1LXhsYVUORL3vkOeo5q7kSjJtQFy/f9viTc7DCfLmZyOsJ2D+eU3H5
-         cwdjyODXuA7dXXUhcb1scWBkxBJaI3T6OQnWQ92BvsLV4kIp+TIRLLAMLQeMJB0ALupa
-         7P0kA+XPVmjRE5H5OJdp4G8JN39yEehrkTtudp4RXLgDQlcVQZ61Vy529dG4GfuvOAoQ
-         igLAGXaA7boBjGJoj39ZPTNh6sVYdDLO5lKW2TwIYghBF1yYiNtbSjRkM6g7z0tOfOuS
-         KzK9+pDREQWYOurglQfusK+J2eEo+XinD980yt64rURbjloyniG6t6hMmRLEFCvzOmgh
-         yYCQ==
-X-Gm-Message-State: AC+VfDzkmN3hKeGlhPnDETmJF6DcP5cSVs0PIjiE8PWM+8r0uPEJARJL
-	IaTRDyJeEEqWemjoF2UiezTQ3ps/X4LvbvrK
-X-Google-Smtp-Source: ACHHUZ68hH6ZrLMAMJ/hwIYx2rJzne/g5sB/SoEgOVmK6U++vpmiZ9ZTcuN54apMOrg9dExlThRlqA==
-X-Received: by 2002:a05:6358:9184:b0:121:306b:4dfe with SMTP id j4-20020a056358918400b00121306b4dfemr6956849rwa.7.1685717899440;
-        Fri, 02 Jun 2023 07:58:19 -0700 (PDT)
-Received: from localhost.localdomain (h134-215-217-184.bendor.broadband.dynamic.tds.net. [134.215.217.184])
-        by smtp.gmail.com with ESMTPSA id z23-20020a17090a609700b002563b38a2f7sm1389297pji.50.2023.06.02.07.58.18
+        bh=z8TC+CPgC4dPed1a/NhiXaPJZ23buV7TiH+dzb45uDM=;
+        b=k3Z+uIpUv/XiUqGtf6miUPBDMYyvsI5Lbh5SpsVoGERCeQvna0uqp9VTF908nVtSc+
+         a3mQO7US+rx/ViG7jyHYz7BHOLUq/EQx3f+evFlMRQCxlKAt5WU3Qnrmb+7NOvUBD3BW
+         PNk0vcjqG2LrhG3EJZgbJtxYdlv/hslmP5pbTEQge0xfb7AUHq4bRFj64LNztRrVDVWH
+         vLNbngQl81xO/+dz4GbAIw9s+ezSaIWGSKOHJLicFEelTvpwxWAKH2X3fgZT2eS9VlKJ
+         qJx23wujh8oYgv5G8W/Qa0jgpyhKxzc1/5n/QS1L0ooc2B3G8YSwLEzTLhamkcbQ+eTb
+         +86A==
+X-Gm-Message-State: AC+VfDy1xNJsttACMMYMVFKEuHEzkX0dOX5RPGZLA4o0ZDBVmbfCu4x6
+	Z4KoNonqkPVwtuD/PVZIAafVbm8vodE=
+X-Google-Smtp-Source: ACHHUZ4VMr2NS8rweUDwEXRqxDsZ1n2wvB95IKhkl8G9/PoGTded1MlEA2irH9QoQhskSYrPHOYITw==
+X-Received: by 2002:a17:903:1208:b0:1b1:adb4:8fa8 with SMTP id l8-20020a170903120800b001b1adb48fa8mr1058517plh.39.1686063860919;
+        Tue, 06 Jun 2023 08:04:20 -0700 (PDT)
+Received: from localhost.localdomain ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id f11-20020a170902860b00b001b045c9abd2sm8641754plo.143.2023.06.06.08.04.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jun 2023 07:58:19 -0700 (PDT)
+        Tue, 06 Jun 2023 08:04:20 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] ap: Remove opt-out DisableHT for opt-in EnableHT
-Date: Fri,  2 Jun 2023 07:58:11 -0700
-Message-Id: <20230602145812.22010-1-prestwoj@gmail.com>
+Subject: [PATCH] ft: add debugging in __ft_rx_authenticate
+Date: Tue,  6 Jun 2023 08:04:16 -0700
+Message-Id: <20230606150416.115864-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
@@ -52,57 +52,42 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-HT support was added to AP mode which was not widely tested
-across many different wireless adapters. The adapters tested
-did not seem to mind the channel width setting but recently
-several users have experienced AP mode breaking using the
-default/no configuration. Disabling HT works around the issue
-and allows AP mode to start in these cases.
-
-This deserves further investigation but its looking like more
-often than not users need to add DisableHT. This isn't so bad
-for AP profiles since the user has to create a profile anyways,
-but for the Start command its best if it "just works". To error
-on the side of caution DisableHT is being renamed to EnableHT
-making it opt-in rather than opt-out.
+If there was some problem during the FT authenticate stage
+its nice to know more of what happened: whether the AP didn't
+respond, rejected the attempt, or sent an invalid frame/IEs.
 ---
- src/ap.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ src/ft.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/src/ap.c b/src/ap.c
-index 398e469a..7e6c868e 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -3668,19 +3668,22 @@ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
- 		ap->band = BAND_FREQ_2_4_GHZ;
- 	}
+diff --git a/src/ft.c b/src/ft.c
+index 62fb0ae5..e223484b 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -1000,14 +1000,21 @@ void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
  
--	if (l_settings_has_key(config, "General", "DisableHT")) {
-+	if (l_settings_has_key(config, "General", "EnableHT")) {
- 		bool boolval;
- 
--		if (!l_settings_get_bool(config, "General", "DisableHT",
-+		if (!l_settings_get_bool(config, "General", "EnableHT",
- 						&boolval)) {
--			l_error("AP [General].DisableHT not a valid boolean");
-+			l_error("AP [General].EnableHT not a valid boolean");
- 			return -EINVAL;
- 		}
- 
--		ap->supports_ht = !boolval;
--	} else
--		ap->supports_ht = wiphy_get_ht_capabilities(wiphy, ap->band,
--							NULL) != NULL;
-+		if (!wiphy_get_ht_capabilities(wiphy, ap->band, NULL)) {
-+			l_error("AP hardware does not support HT");
-+			return -EINVAL;
-+		}
-+
-+		ap->supports_ht = boolval;
+ 	if (!ft_parse_authentication_resp_frame(frame, frame_len,
+ 					info->spa, info->aa, info->aa, 2,
+-					&status, &ies, &ies_len))
++					&status, &ies, &ies_len)) {
++		l_debug("Could not parse auth response");
+ 		return;
 +	}
  
- 	if (!ap_validate_band_channel(ap)) {
- 		l_error("AP Band and Channel combination invalid");
+-	if (status != 0)
++	if (status != 0) {
++		l_debug("BSS "MAC" rejected FT auth with status=%u",
++				MAC_STR(info->aa), status);
+ 		goto cancel;
++	}
+ 
+-	if (!ft_parse_ies(info, hs, ies, ies_len))
++	if (!ft_parse_ies(info, hs, ies, ies_len)) {
++		l_debug("Could not parse auth response IEs");
+ 		goto cancel;
++	}
+ 
+ 	info->parsed = true;
+ 
 -- 
 2.25.1
 
