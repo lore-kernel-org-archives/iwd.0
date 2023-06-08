@@ -1,65 +1,49 @@
-Received: from esa1.midmark.iphmx.com (esa1.midmark.iphmx.com [68.232.141.191])
+Received: from esa2.midmark.iphmx.com (esa2.midmark.iphmx.com [68.232.137.251])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B4231EF7
-	for <iwd@lists.linux.dev>; Wed,  7 Jun 2023 12:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDA7947B
+	for <iwd@lists.linux.dev>; Thu,  8 Jun 2023 14:01:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=midmark.com; i=@midmark.com; q=dns/txt; s=key1;
-  t=1686139475; x=1717675475;
-  h=from:to:subject:date:message-id:references:in-reply-to:
+  t=1686232884; x=1717768884;
+  h=from:to:subject:date:message-id:
    content-transfer-encoding:mime-version;
-  bh=hf2JzKY2Xv+sTYUE+zOxK64qL3VCpNqvH5mQUtAQZr4=;
-  b=eQ6h/mKMKWRX540RJtwvPDMtP9p6MMbeeuzjxM4W+sSg4DyHPqnD/j5V
-   fL0KL63UZ2KUvkpqK58pYzPhAl/vtZwDx0RhYkVs+xBQsxntD2DdisV57
-   BvGkC2nG3uqn0OhX7UD4U0nopgUePDi/S0selOfuVx2LFEy58Pi2S3xzv
-   0=;
-X-IronPort-AV: E=Sophos;i="6.00,224,1681185600"; 
-   d="scan'208";a="73501023"
-Received: from mail-bn8nam12lp2170.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.170])
-  by ob1.midmark.iphmx.com with ESMTP; 07 Jun 2023 08:04:08 -0400
+  bh=cSIi/4dlBJmdRipsrBVZTkKL0sqbCbKaPiriAMyhojA=;
+  b=WO4xf6H+HPDvny3T2WP6Qlvx6wYgOWTZwKDMUsJmFo4XQGsqaMNb3WRu
+   bg0OgtfVsUzk3Jn3fcZ/8rebF+twwOPgTY0dUi1vJ/237Z6bStQ5B3ECc
+   Jd/Z2+cdbR7Qf3D9LjrSIrZZ4GO5YYHdY0CD0vG4EcKrcTY9fD1YmGNC4
+   w=;
+X-IronPort-AV: E=Sophos;i="6.00,226,1681185600"; 
+   d="scan'208";a="70152625"
+Received: from mail-mw2nam12lp2042.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.42])
+  by ob1.midmark.iphmx.com with ESMTP; 08 Jun 2023 10:01:15 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F5c2vDo6/gJjtqKTNtj/lyozpWa2eZyJ2CgsA+ngVZSKbB4RxMyMmigJ3dbsC/CwP5kVswjm1Zi8wMB0NK3ytFsIy1HkBb64tahu1oRGTpNMyflf4QhlKMEIcF5vnsapG4+LBcIh+jKwn1kWtyPpRgale4VkJhoOb/EnyWpk1Dq3fPlUgW/c5ZoAkh73od5VNU5iOzPbJCMZPJOSLFMkPCYLU7nq6PfmdJHGzH3L3/KqV6UIOsZT8QvX6TeUighUmleob/weY/LMJ9Lb1O2IEV3vqPfu8F9R3A6hm8pxIDdlDhiYdLkxnkbQyOoJ1XqaOYKlGk3G8VHTVGLybczhDw==
+ b=iNWtEJ0KzeGC6bENR4HZt73Yev9I3ucyCTX/HMLxaZ9xBcrA/aHwlXyeb0bKmeZXyMKstyR8tvFyO24Pk3oUhSz/No0zQYkL7dYRHnjC77H5g8Uue1ua2QcGkyGR0p6iqdWGWTKRmWvZV1566kZrzRKhbyrzy4ivOjN8n4odCcKVX1ugJVbZhs60Z9TcAQ9Z9d2TwAc+pWJGpED/tYFOnI6v1qCHjP9pZ6vFx3tngBoEfpPv3hfjHP4GyohiQWWz9UpyDXGzaJzBLOpfh7DKwJcwRg8287u9ovK1w5sviZfzzRa9hlBCbbRyU7l4fk9s+71Zo9nFbVJtxfATJI79pQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OU7FeQNDHyxAk0/mCqVAJ+rhZmnSHgjxesI0hLq5W4Q=;
- b=f13qDUcrZaK6db+b7mYQRYPFYOQ8ZMx1IsR/AOoR8OWm7f/1Qvujm5V/gVcoJHKlaYG2J2nleSw6d2ZPgYH1iU6rZ+onx/j+R4f+BEdTrC3B1I4fNzh9sxRqHIQaM7y6/6+3LXVfwPYIeAtIAYiJQkdNU7zLccrvtWC6P1JOtHUc0xc3lWucYeQrsqUqDwUnR5cwNtJpMVf7XLMGeaa2lhoTh2k4EL72a9YWjuWNadDG1vHfj+oZN4sWTn5WCiqFti+JZ7RQP/+pgNi2EryrmBo+3BIIGXYYy7afN1S34poSyR4+CORk49PV+UjkuLF5iCtzHskKAgXzJCABCAZztg==
+ bh=GnA7yZz55vODtuL+jmS7WdpS6XAKwtO4dZ5CUjU2tYA=;
+ b=Rv0uVZgRK6kdoYkdAYBI/CKXVNtQTF25In4sN2kpXKO7zRtdySfILmafTRsA9M5YmPDwso7rx3Pn0/fLTTVkF1uH7xGyXdmBugeznCOafi3/LfzjM7ObnO/SRlp53XVFdsDVC7SPSkNmCblJQfx+/7+9GrNS9L5jm/J5eYVUXBeKUYgrc4oyOuueNy6UtVbK/9LaADdUUZX009mh85j4D0etwetUM7KSPPEwQ54XffSCNnQcV5SIG29n04DA904sgBOmJPqKRmZO0++nUOltZScNAokh8+0/do5vVkdX4wqV+nzdM3lEnPGZ2I+wV1FztNTBou1GAjuEu3mnkqynFw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=midmark.com; dmarc=pass action=none header.from=midmark.com;
  dkim=pass header.d=midmark.com; arc=none
 Received: from BY3PR08MB7220.namprd08.prod.outlook.com (2603:10b6:a03:365::15)
- by PH0PR08MB6599.namprd08.prod.outlook.com (2603:10b6:510:43::13) with
+ by SN4PR0801MB7871.namprd08.prod.outlook.com (2603:10b6:806:1ee::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Wed, 7 Jun
- 2023 12:04:06 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.36; Thu, 8 Jun
+ 2023 14:01:11 +0000
 Received: from BY3PR08MB7220.namprd08.prod.outlook.com
  ([fe80::533b:41ab:1b5b:7710]) by BY3PR08MB7220.namprd08.prod.outlook.com
- ([fe80::533b:41ab:1b5b:7710%7]) with mapi id 15.20.6455.034; Wed, 7 Jun 2023
- 12:04:06 +0000
+ ([fe80::533b:41ab:1b5b:7710%7]) with mapi id 15.20.6455.034; Thu, 8 Jun 2023
+ 14:01:11 +0000
 From: Michael John <MJohn@midmark.com>
-To: James Prestwood <prestwoj@gmail.com>, "iwd@lists.linux.dev"
-	<iwd@lists.linux.dev>
-Subject: Re: issue using virtual interface with iwd
-Thread-Topic: issue using virtual interface with iwd
-Thread-Index:
- AQHZlIs8y9omM24b0kmI/1XiEYh7sa92DDeAgAAC/ACAAALUT4AABzsAgAApeXWAAAOaAIAAEzuBgAAJu4CAAQD+4YAABcXugAaQwQCAAUg5pw==
-Date: Wed, 7 Jun 2023 12:04:05 +0000
+To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+Subject: Bring up of AP fails on certain channels
+Thread-Topic: Bring up of AP fails on certain channels
+Thread-Index: AQHZmhFyDLlZeiSnFEKt5E31PIosMA==
+Date: Thu, 8 Jun 2023 14:01:10 +0000
 Message-ID:
- <BY3PR08MB7220054B5EC6EB85D17B6ACDAE53A@BY3PR08MB7220.namprd08.prod.outlook.com>
-References:
- <BY3PR08MB722000E74E402E1C188F35E9AE499@BY3PR08MB7220.namprd08.prod.outlook.com>
- <0e37cdc7-5d9e-f3b3-eb98-d549d9a69d6f@gmail.com>
- <17dd827c-a2de-b7ec-75de-99d0b17cf6f3@gmail.com>
- <BY3PR08MB7220AB646467DBCE1A4B7433AE499@BY3PR08MB7220.namprd08.prod.outlook.com>
- <eba9839e-55ab-d532-c52f-c58cac465ea1@gmail.com>
- <CO1PR08MB7221B49078929FDBB79773B7AE499@CO1PR08MB7221.namprd08.prod.outlook.com>
- <0909f3d3-3ce0-cbe7-48f2-9b37d5ca4bbb@gmail.com>
- <BY3PR08MB72206FB8F6C0F2A34729731BAE499@BY3PR08MB7220.namprd08.prod.outlook.com>
- <7c72c879-98c1-2df3-e676-540ee1463cc9@gmail.com>
- <BY3PR08MB7220F8324CED704A01BE5946AE4EA@BY3PR08MB7220.namprd08.prod.outlook.com>
- <BY3PR08MB72200F3BA8B1FC2C28C9C099AE4EA@BY3PR08MB7220.namprd08.prod.outlook.com>
- <696f641a-59ac-a476-a17f-a9ad43a524fb@gmail.com>
-In-Reply-To: <696f641a-59ac-a476-a17f-a9ad43a524fb@gmail.com>
+ <BY3PR08MB7220600D62E8C2FD1334253FAE50A@BY3PR08MB7220.namprd08.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -68,45 +52,45 @@ msip_labels:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=midmark.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY3PR08MB7220:EE_|PH0PR08MB6599:EE_
-x-ms-office365-filtering-correlation-id: 995ef015-c5e5-4318-c001-08db674f4ae0
+x-ms-traffictypediagnostic: BY3PR08MB7220:EE_|SN4PR0801MB7871:EE_
+x-ms-office365-filtering-correlation-id: d7604932-ee1c-4b82-b6a2-08db6828d084
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
 x-microsoft-antispam-message-info:
- TmMS7vz/UUgRV0ARIWPAtRNpQbt1+/Aq/xX1dWVaM1DhbS3W5zXV0Vu3BPsN2CF6FEc8PBpUy/SjqwyLXb7ojAO8YqRa4PyxQpOItaZbOmnu8i8CjmaKUl85iGNR8pylTuiGuoMedsMyGngXfcTncX7PfR5mMdXVydnM/WTaMtWYFMmi9fZ4BqnK62swFjLXlxTAQ7D4s5GFz/Zpa65vdIaBk0XgwfQV2TlyK5URsOtjGG7HL01JlFUanlgzU8xqzFsFXWQBsDmW47yqOybpDhXbef6buR86/njaFuOsccOiO5Yj8x//7YEaB9dahsnr/xMB9pKTMJrKIgm6eu5UuTrs+l1x6IvfwoGIWxkSpI8W0TLveLgjDoZNeRgkG5DAh3Rr9J8ynEJHI6Yqz1pm8A+un/Hi1y8iu89irGLry9Ov+EgqyrtbZUwrTHTyK05RBkVRZDFqawn4zgN9MbMhekD1EYTmnMSqfION7K1sFnsr80TGqX2XW9GgC4QaTw92Kw4n6Su0sTInxXHZRQYvVNeo9Qj60x2/mw47TYwyfFPbAxMBhkLqYLKR4AKWKDaGhjwCT1raba6gY3avaInMMia23bSzAwh8uijd+4QnAUY=
+ IbVf/jNUks/L2ElgYmIDcaYwJmWbHcfqcwPPZ/i6utm+rntDpTHI0pRbc3SnX9DUTzYyW/LfLSeyTPUu6NNGPwfveX8GhypLOS7Y5zUpTJwTJ1W6Ym+oFJAjbuqyDbogs3uUvvYgWoIoUJwaAWo4M3XPqF74GyOBNSmO6PFgZcY0DbykRmo2IfsUL3+AOgwO6wNqyPEPAsUKhNrzwS5uOoW3x3aHUQMT2yDYHms8QtC2VfFIUJsh0pbNHwYZZG8KY75RwOLUKDP6u4qiTm4L9mDq/wu1xcSH10Lw5JlOhKoNJRgdeSMtB56UietsvgKD6Mr8+SUgvnCOQ684mpJLrvEOHOPHn3T/xYp+QPav43JRhTLtX6MGGE/GJhAQzKXN+GHPbo0kukPcl5bmBY89AylYROitEQZF9rX+WUiWEwzLqtXPeDT+tDZLoUDwT9rk300Tl90RW3KiOxtDK2Vim1dprr6r98C4f/X50fl2QSPQNYrZJtbLY9tjqmjKtphUpCfVxWpB9fUpogD03xouvAh7QZaOAxNjsey2JNjb2kArSh24uuSwin76LCfeTCfEsrLytj8wts1Wnfz5jEoRM8qU6e2DxBW5PEI3jw0eiUhNU0dPPBerTrf9+ooyNqTB
 x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR08MB7220.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39850400004)(346002)(376002)(136003)(396003)(451199021)(55016003)(7696005)(110136005)(91956017)(478600001)(316002)(8676002)(8936002)(41300700001)(66446008)(76116006)(64756008)(38100700002)(66946007)(66476007)(122000001)(66556008)(186003)(966005)(71200400001)(83380400001)(26005)(6506007)(9686003)(86362001)(52536014)(5660300002)(38070700005)(2906002)(33656002);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR08MB7220.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(376002)(346002)(39850400004)(366004)(396003)(451199021)(91956017)(66946007)(8676002)(8936002)(5660300002)(52536014)(66446008)(66556008)(66476007)(64756008)(6916009)(76116006)(71200400001)(478600001)(41300700001)(316002)(7696005)(38100700002)(55016003)(122000001)(26005)(9686003)(6506007)(38070700005)(186003)(83380400001)(86362001)(33656002)(2906002);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?8/kOKGfJHYFEIAPzJGNMGGeQtaIbkniZuw8GgWRuIgLzrk66AMMgrFXjfP?=
- =?iso-8859-1?Q?w2haIzFksuHgmPBrRGm1Ci0bldR0cgHn22LNB3aEOjykGwbsRWtNu6fBT6?=
- =?iso-8859-1?Q?1Xo5XHOUF5TO8OurLSloEkKTm6RyfLChTQIdlPEUm+Oex68klRS1qxwJun?=
- =?iso-8859-1?Q?gz29dmYqqtJA10jR8uuF5/F5HazlUepzTs5XEAUbLNUI9qU2z2qjmw5wal?=
- =?iso-8859-1?Q?oML1pui9NNksvcpk75NRfYw+icvFttK3ZPLDxjNv29OkES2P/KVwvmAyCh?=
- =?iso-8859-1?Q?8z92yKhyri1lWveWuk76PtUryWBLaKmVK+VG0hmlwN0mpZhPunJUaHR6l4?=
- =?iso-8859-1?Q?PFga0kJv5UHlqzG8aUSp9XqZK6vNEvqKWjGaaDk10wPI/ydaf+tWqQv9hb?=
- =?iso-8859-1?Q?y9vj64MjiKYA6dQtta3M8ty9b5UirLJY8EpZyvjtH5Aybh3OQN+zy71wvM?=
- =?iso-8859-1?Q?gIzkQQd5lmkCFRIxOEfiMuKBpM5rRGPyrbhrLhbA5Y+YSAI4k34YQbZUzI?=
- =?iso-8859-1?Q?LItQaNem6UdXx7rx2Eoz5zgH3UfLagGjlzXCJJWFTkjuOkoXp58MYJAAIU?=
- =?iso-8859-1?Q?LqNlWr6aabmcE6ddYYEAX92uAJK0/y1FumPWBFWHmiVkaNOGopra5m2ao5?=
- =?iso-8859-1?Q?M34aDLanpRoLU6XvCvTkOvdPBCZInQQ4ZUFQfe2tPPV8hv1YXivhYi7+af?=
- =?iso-8859-1?Q?rOqOeve6wbBghUOr7uCQyDhzupHyuAICIAPUztvx6BXAGmDmHHkNo5qBFZ?=
- =?iso-8859-1?Q?Z1R4ZF0eBcgcfweCZUEzi8U28ZFPeHaksBZ9BEiyInybCNBh6QOXxn92jc?=
- =?iso-8859-1?Q?FuP91HKTSuiQSPE6PbfT3cKFl0tZbHVp2MDV/yol+UQ+8ax3umo6ljMw/S?=
- =?iso-8859-1?Q?mafh4ZxBVZNBUhr9zWE4aUf4rjfZhBvn2NDDzZahbMFLnRAI7nCbfY/DAr?=
- =?iso-8859-1?Q?2RPtgK491xfDNOQFxCTorrhwrqLgxV3sltcYKLmCxYBCNLHqcfj2UChRpe?=
- =?iso-8859-1?Q?MA+UHwLn/rr5XOKpPObK73gwG+s2EcLlcO0R9QVG8MhTGyV/o8y+U/234P?=
- =?iso-8859-1?Q?EMAkGZgjs89hc/8+Ow+ARCPTTUxYyTq23v1pL6mSuJupMuZf6N6vAi1rO4?=
- =?iso-8859-1?Q?Z3ue06HVnHD8CSL3DTyVHTVaJ9/Mnyar3OZmFcnjI+Vy22oBtdHfmUJMf2?=
- =?iso-8859-1?Q?ZDRF/357+fWxsiNIq5JbIrboQGNySJaTAaT1s6jqqWJOY4QmYnBFLnm/gi?=
- =?iso-8859-1?Q?OVUKdpEjPekOSbygGDGfjfJVCIgjwJEHbZUAewH00G/xZcK9NZ4UOWSAz0?=
- =?iso-8859-1?Q?eEMuhTZ1R0//ulOThiaznPW2zixxy6xohiacIsZzG3xQajj2wllVvwhmLZ?=
- =?iso-8859-1?Q?0SbLQR5y4xxM22xQdfZOZBjvVfzHufAqQ2EhrrtDs7J3BFYarDU72V7KFO?=
- =?iso-8859-1?Q?C3V+KnDaFcdDFwqQuJI15euSj+1yIpLXZPknXuNyAJWIFFgF5RrPAElYSD?=
- =?iso-8859-1?Q?vWmTRnFdWgqvWo2WoVRqbdtO2qyf3zE6mY+AEw3k0ePvD6/O3t9zljrqrY?=
- =?iso-8859-1?Q?9zSsimjqMPQpuh6D0Au2e3DPdlvhindTC8V4QutWWOzrm0XUiRXygkm5dd?=
- =?iso-8859-1?Q?/bWeqZRngsT2o=3D?=
+ =?iso-8859-1?Q?ptZjzy7P/EF8Td0vvY2yUuErjy/x5njC3CWchsvK8zh3j6Sz8lxDI3eHJ+?=
+ =?iso-8859-1?Q?KJWJgswLSi56ZUXZxUxj+fjU9JJ3LGCSqZgvm2d+SIzD0rhSmaQraeiiDI?=
+ =?iso-8859-1?Q?Og9Ljk+7dtIha9pO2buq39N8Egnx3rG3uAjSEY2S3A/S7XtvHdmkGbW7h5?=
+ =?iso-8859-1?Q?cvf8X4MoEdoH58F9TarpKdMv9jpiObEQrtS4li7L3ZbM5fxW56KgZQN7Xo?=
+ =?iso-8859-1?Q?t+v4SLvfUeCnnERjWaGZaywmwwI23bp3CPM3sNu1419w8EW78jSw0es7Pl?=
+ =?iso-8859-1?Q?3sFhcl7GYOLY2FclI2pDfQdNIDo9Li5DtV56BpcFBeOcSWxjVkMJ6OmT7M?=
+ =?iso-8859-1?Q?GfmZaAUJYE6+61LCTDwpOKN8255q6BziZp2AGVb5LklFow82YWrey6VhFo?=
+ =?iso-8859-1?Q?rFSM56+FJ6FSVpQb5+TlVQcBxgBErh7KsED8IwIlQ8V0ykYVTBVw75+zsM?=
+ =?iso-8859-1?Q?j0dn8V8N07a+D7bDj3uSic7XuvAGqD5SK2RMC23Q1KO8UMwla4NKaRXddJ?=
+ =?iso-8859-1?Q?zdxbPgLeR1MhhHCwayIe2da4Qy4eNZT1PTF+RwpZIVUKZP3LGvqoUmBA4o?=
+ =?iso-8859-1?Q?2UpN3Et2Ot2+9cWsfy3KeqYVwE1PB8UnM9ez5BQQb6inemjYLzWbk4fBKt?=
+ =?iso-8859-1?Q?86NjV8X3wPnx8UiV7IqPsyEZ5e1N5vTMlcfnKLwvW+dYC667V+tHsfYWQ7?=
+ =?iso-8859-1?Q?tphQaZXlaHXGSiyeqnKVrFZsYlDxEDLdKRsltzarEt1gJ6oA1g4OtVw+6v?=
+ =?iso-8859-1?Q?H/QEIKYuK7Kz8iTv1Wj3brbjVxwhpB7LMX4KCL7Yic38yWksN536wvUlbK?=
+ =?iso-8859-1?Q?DjzThYfY95t4kekGbqA1R72pgVRsPdBOvU7Mw9YlhqZ/G7+6+ZqsVNV8/E?=
+ =?iso-8859-1?Q?GoEcWkTb1xu+BgFCu1udiUHnfGPcuBLH+I37SC4hK6WXVq6EkO0kVkl7IB?=
+ =?iso-8859-1?Q?ng9oqp2xZfH7spSkXdhr+oDp0zIzlfQ3FV8W7i/ebEN6Ta4vDCHaG283f4?=
+ =?iso-8859-1?Q?E/8TA8fyONSpV1cmWewkEm7YtO7/lO++HrCnSalXoziUdjWzWN4EGRWvvo?=
+ =?iso-8859-1?Q?269nx/r8XEaGji0U2vYpUjtpDyGhB9JKfb1lDsCM4RVaW6UEtfAaS1XFDj?=
+ =?iso-8859-1?Q?uoKftYKEItelPcDnVTdll8gsYbC5BeVFJ4OGFFXZrlK8GEwsxJ460jhWBp?=
+ =?iso-8859-1?Q?mZhSvRe4kosxacQLLXtT67WaTsk23vqNVuF9UL3lcMJ4Sai6kuLYm1EsiB?=
+ =?iso-8859-1?Q?WZkbO7Sl+qkQs8KLMpkCyJNPmpn5njJ6/SZyTw3AWz1cQX1DPZVAiD/HW8?=
+ =?iso-8859-1?Q?Uli96nN19DyuHYXSohjBYFPKtf6d86inqBGY/3/eVCEabputfZUsguzst+?=
+ =?iso-8859-1?Q?3H6mtmPXmuIpESX1w6PNAn3WBVBNf2NqutnJeKtosJtzPm/ecbSO6zlVrA?=
+ =?iso-8859-1?Q?7h5MBWbDJhaa/5EavdsjkBF4WIqYYmmBVfg/g753vsHoBKaCQvQy1cSI3g?=
+ =?iso-8859-1?Q?SITOPDHNYdniXFypWTccMv3dBlw0cR/6+p+VohFVR+szsVBy3R+2bJhene?=
+ =?iso-8859-1?Q?lc2h0Yca3LZPnT1ryTTdvlJ3fL+DQDdtp+Yqn98nIiwmjS/aSDa023Jfif?=
+ =?iso-8859-1?Q?+QUhw5l6wqX70=3D?=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -118,61 +102,95 @@ MIME-Version: 1.0
 X-OriginatorOrg: midmark.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: BY3PR08MB7220.namprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 995ef015-c5e5-4318-c001-08db674f4ae0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2023 12:04:05.9314
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7604932-ee1c-4b82-b6a2-08db6828d084
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jun 2023 14:01:10.8842
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 3c2a020d-f343-4ca1-b6ef-91768380352f
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +Ewq4jvUbdotc57fshPuAujBYJqg0ivTQiZIyOPthbMllEFX6FQzGvBPcb8W5+aRZ3pvCAK1kebtBR5Fbwrlrg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR08MB6599
+X-MS-Exchange-CrossTenant-userprincipalname: sIBa9Km7pY5Z/DFVypYV1ytOyJgwHcXzYKcixUlf636lRCNhwehEGfa+pKUseUo8b3T2I/oNxsk/+VOH2iubww==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0801MB7871
 
-Hi James,
+Hello,
 
-> Hi Michael,
->
->>
->>
->> After looking through the commit history I see the DisableHT support was
->> added right after the 2.3 release. I've updated to 2.5 and retried and
->> was successful at getting the AP up.
->>
->> Thanks for your help James!
->
-> Great! To try and get this addressed better could you provide the
-> wireless hardware you are using?
->
->>
->> -Michael
-
-The wireless chipset is a NXP 88W8997/88PG823. It's part of a 60SOM from La=
-ird,
-believe its one of Laird's Sterling radio.
-
-~> cat /sys/class/net/wlan0/device/lrd/info
-
-Driver name : lrdmwl
-Chip type   : 88W8997-SDIO
-HW  version : 7
-FW  version : 5.5.43.5
-DRV version : 9.32.0.13
-OTP version : 2
-OTP num mac : 3
-Radio Type  : SU
-MAC address : c0:ee:40:64:4a:1c
-Region code : 0x10 (0x10)
-Country code: 'US' ('US')
-TX antenna  : 2
-RX antenna  : 2
-
-lrdmwl is the Laird wireless driver being used.
-
-For reference: this is the SOM:
-https://www.lairdconnect.com/system-on-module/microchip/60-series-som-wifi-=
-80211ac-and-bluetooth-51
+I'm trying to bring up an AP and ran into an issue where iwd
+will fail to do so. My AP profile is below and I'm trying
+to bring up the AP on channel 64 but iwd gives a failure.
+If I change the channel to 6 iwd is able to successfully
+able to bring the AP up. I'm curious to why it fails
+if the channel is 64? The reason I needed channel 64
+is because my radio requires the AP to be on the same
+channel as the STA when in AP+STA mode, and me test
+network  for the STA is on channel 64.
 
 
--Michael
+~> cat /var/lib/iwd/ap/470034.ap
+[Security]
+Passphrase=3Dmyphrase
+PairwiseCiphers=3DCCMP
+
+[General]
+DisableHT=3Dtrue
+Channel=3D64
+
+[IPv4]
+Address=3D10.42.0.1
+Netmask=3D255.255.255.0
+Gateway=3D10.42.0.255
+DNS=3D10.42.0.0
+IPRange=3D10.42.0.50,10.42.0.60
+
+
+~> iwctl ap wlan1 start-profile 470034
+Argument type is wrong
+
+~> iw dev
+phy#0
+        Interface wlan1
+                ifindex 6
+                wdev 0x3
+                addr c0:ee:40:64:4a:1d
+                type AP
+                txpower 23.00 dBm
+        Interface wlan0
+                ifindex 5
+                wdev 0x2
+                addr c0:ee:40:64:4a:1c
+                type managed
+                txpower 23.00 dBm
+
+
+~> journalctl --no-pager -u iwd --since -1m
+-- Logs begin at Thu 2023-06-08 12:39:15 UTC, end at Thu 2023-06-08 12:55:0=
+4 UTC. --
+Jun 08 12:55:00 V2470034 iwd[1229]: src/agent.c:agent_register() agent regi=
+ster called
+Jun 08 12:55:00 V2470034 iwd[1229]: src/agent.c:agent_register() agent :1.1=
+93 path /agent/2814
+Jun 08 12:55:00 V2470034 iwd[1229]: src/ap.c:ap_validate_band_channel() AP =
+using frequency 5320 and channel width 20MHz (no-HT)
+Jun 08 12:55:00 V2470034 iwd[1229]: src/ap.c:ap_get_gateway4_mac_cb() Error=
+: Operation not supported (95)
+Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 000=
+0: -114
+Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 002=
+0: -114
+Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 004=
+0: -114
+Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 00a=
+0: -114
+Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 00b=
+0: -114
+Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 00c=
+0: -114
+Jun 08 12:55:00 V2470034 iwd[1229]: START_AP failed: -22
+Jun 08 12:55:00 V2470034 iwd[1229]: src/agent.c:agent_disconnect() agent :1=
+.193 disconnected
+Jun 08 12:55:00 V2470034 iwd[1229]: src/agent.c:agent_free() agent free 0x1=
+d57d18
+
+Thanks,
+Michael
 CONFIDENTIALITY NOTICE: This message, including any attachments, contains c=
 onfidential information intended for a specific individual and purpose. If =
 you are not the intended recipient, you should delete this message and any =
