@@ -1,45 +1,45 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19504C2DA
-	for <iwd@lists.linux.dev>; Thu,  8 Jun 2023 15:34:56 +0000 (UTC)
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-75d4fb03100so65415285a.3
-        for <iwd@lists.linux.dev>; Thu, 08 Jun 2023 08:34:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C0823403
+	for <iwd@lists.linux.dev>; Fri,  9 Jun 2023 22:07:57 +0000 (UTC)
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6261a61b38cso16391336d6.1
+        for <iwd@lists.linux.dev>; Fri, 09 Jun 2023 15:07:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686238496; x=1688830496;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=gmail.com; s=20221208; t=1686348477; x=1688940477;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=WEroX+daGzySOjbxBOtAm/++OIuQCHGjXKYrKYuZIec=;
-        b=Z/q8Ws0lNqoIsnHjsf+vr6KVeWEnralR92ALWqXqzIOKGQNjKFr47tacklR46zBMf0
-         dxoyom4jvy45fk0z4l+FnbrzupCoI4ulYqAJkguCZ5IWqyGhx2E1Bnc0qAwnbiF1rlzf
-         wx7qE9f4VMSA9r6clfS7PQ//iAvttGGjNbymoxzHQBan+wG/1NtnD+n+ZTV00twe8Z1Y
-         6YrBuSkp61ACr7JDaUaa2ntQ1qY5Uex3n08GARaalQuSg7Zi5yopp4PB1eCk2xDxzxyk
-         UW6BHKGcAab+RGBvoiayUmPTDVvg3QJFOBRb2y7/t2NY1w3O5OzWqmqOsRxsY3SJ+z5L
-         Qerw==
+        bh=E1QG1d/ivXi0Q0ytZJVuNa0qMRB+ClG+t3/HS9nBQZY=;
+        b=Pt3ZAd6ACjxodXY+eb9hxzlJhltCCcTiOZGl90GMFJr3Rut/ZitNoKMJGbw38AMTgY
+         ebOtuSlDpVrU3Mr0Kc22LbZBYqL/A/ThylSrPZMkjGXqefRWdP0aiJtqk3czzTCEGRai
+         89N9regQoPbqvnbawdGI+1h9Q0fgainJ7GAS6g/X29lcPGdZfNdJQYbU3/2pQahtJpeC
+         TJYmTr/nkVh9s68GQf+7gUha3jG2NaxgDFj5t/EuUpQ/nqQNWxeqajBYJ09UB+EyIPRT
+         lWs+lW+AnQH7jYtIAdFrwo3qxpf1L5oY15Xr+T4qRJy1u4RAAw1xl/POunIOkU3XHkLm
+         rBww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686238496; x=1688830496;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20221208; t=1686348477; x=1688940477;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WEroX+daGzySOjbxBOtAm/++OIuQCHGjXKYrKYuZIec=;
-        b=hu30gEW4YWpVCSa/4rNLGwIJr3NMZKe6QBbTmcSzrq8fybgsddJdLWg7aG1I1Y547p
-         QDmeOh4o8xEOnFtrbkfI3G6b38KEsIlImD2PvgNHShUUpXsBnlZajZ9S3V4ZTEBE4u1H
-         zDWNlggzIpnFPBmcYMvUQO0Tin+FsWQDb8NoKAms562mASJBePxLksBJfuVWlhduPZ9a
-         cZT+CLwfxzK1UnfHR6wLXDE8I2PoJFNqhEB3CBgpy3JyV6/i5GNmsf7VfFbeNZ/ESYnn
-         PLAfzV7LN5qlEUW0Gr2erCp4zHgYDm8+tNp4D3KyVMBaZgT4lNytPynnGRJ/psaEqqTt
-         b4dg==
-X-Gm-Message-State: AC+VfDzgzVoBSDsUEKTIkXnX+us5JGqKQ3NvBVP6BRxxjYcEgFOeNvP6
-	JKiQgxsjTOqz7g6dyRQ5+TG3oOy+y9o=
-X-Google-Smtp-Source: ACHHUZ5JnrkFj0W+n8PMItKu/hZk+su4PlmOit4/WJM0yDEVvEgXvDhMigp2ErD6+SFD4oDQRFCpHg==
-X-Received: by 2002:a05:620a:24ca:b0:75d:ba43:bc6f with SMTP id m10-20020a05620a24ca00b0075dba43bc6fmr8157281qkn.8.1686238495652;
-        Thu, 08 Jun 2023 08:34:55 -0700 (PDT)
+        bh=E1QG1d/ivXi0Q0ytZJVuNa0qMRB+ClG+t3/HS9nBQZY=;
+        b=Z/o/QFwxm7My/pq3e14pHmoU3YYtq2yTl9SqRsHGdF6fyrwCt22E6/9uaOj6k99uzt
+         93NslPUMEZHEIaDXREF73wApKj7q7VzI2gDto/ztInh1D2uACKfdxeuj/duGkwNcxVUX
+         k8cx1nxMzTJLTvuBkxDvkKmNnj1R26aJh//yuao3Fd1FpU5V2xYDmPCHiorfLIzDMXJ7
+         Ztnp1BxUNjc6Uv1Vqz7gJDPKfRVY9+wyMLjQUZ9Ib+Q4nDjNo5nb7z4f1e/W1/9uCLEe
+         3wXRSgXvs3NmWwcUJBzYDrXWOgBI3/ub3Ak+UdgHfdqQDYEYSc4xZjFoPigg9Wfw2mSY
+         i1Iw==
+X-Gm-Message-State: AC+VfDzK+Isov4mkiqVR868JrL31dkuv3e+1Md5rRnJvZSdCP4ikypx5
+	Iw0QlHVy6+nh0YQycZk0ozZ4OMYkt1s=
+X-Google-Smtp-Source: ACHHUZ7emBbPQvwQUxiD47LLKWjcNJHwuBtrOhmJXlP9A4ZeEfU0C202L04/Ouyzr4/UF28BlMoBSg==
+X-Received: by 2002:a05:6214:250e:b0:626:3a98:95f with SMTP id gf14-20020a056214250e00b006263a98095fmr3526445qvb.65.1686348476716;
+        Fri, 09 Jun 2023 15:07:56 -0700 (PDT)
 Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id f6-20020a05620a12e600b0075785052e97sm390875qkl.95.2023.06.08.08.34.54
+        by smtp.gmail.com with ESMTPSA id w10-20020a0ce10a000000b006261c80d76dsm1436852qvk.71.2023.06.09.15.07.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jun 2023 08:34:55 -0700 (PDT)
-Message-ID: <970653a6-9fa6-e871-7ab4-3cb6943c86a1@gmail.com>
-Date: Thu, 8 Jun 2023 08:34:53 -0700
+        Fri, 09 Jun 2023 15:07:56 -0700 (PDT)
+Message-ID: <772f5654-5232-6aa1-5ef1-601585d408f0@gmail.com>
+Date: Fri, 9 Jun 2023 15:07:53 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,143 +48,121 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.2
-Subject: Re: Bring up of AP fails on certain channels
+Subject: Re: powersave support
 Content-Language: en-US
-To: Michael John <MJohn@midmark.com>,
- "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <BY3PR08MB7220600D62E8C2FD1334253FAE50A@BY3PR08MB7220.namprd08.prod.outlook.com>
- <826c0918-84ee-649d-2f4c-10c99e0e45a2@gmail.com>
- <BY3PR08MB72207A7A2387AD2D2908D805AE50A@BY3PR08MB7220.namprd08.prod.outlook.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Mike Silva <mike.silva@mikesilva.com>, iwd@lists.linux.dev
+References: <9EF567DC-15CC-40C0-9AF8-D69E27B81ACF@mikesilva.com>
+ <f5ccf370-5197-c9a4-61b6-2a130c7242de@gmail.com>
+ <4F32B57B-3517-46EA-97F6-2B5DC172B952@holtmann.org>
+ <66b05814-cb78-40c7-929b-0e2ffa2027a6@gmail.com>
+ <04BED22D-EBF1-47B8-AD51-01DCC2CA4138@holtmann.org>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <BY3PR08MB72207A7A2387AD2D2908D805AE50A@BY3PR08MB7220.namprd08.prod.outlook.com>
+In-Reply-To: <04BED22D-EBF1-47B8-AD51-01DCC2CA4138@holtmann.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 6/8/23 8:19 AM, Michael John wrote:
+Hi,
+
+On 5/9/23 9:09 AM, Marcel Holtmann wrote:
 > Hi James,
 > 
+>>>>> Does IWD support disabling/enabling WiFi powersave/power management?
+>>>>
+>>>> No, currently it doesn't.
+>>>>
+>>>>> Perhaps, I’m failing in finding it in the documentation. It’s possible to do this as needed with ifconfig, iwconfig, or NetworkManager, or to permanently configure them to enable or disable it at boot..
+>>>>> If IWD doesn’t support this, it would be nice enhancement if IWD could when managing the adapter/connection, as some drivers do a poor job of handling powersave being on.
+>>>>
+>>>> Yes, I've recently seen instances of drivers handling this poorly. Are you envisioning something like these other tools, where power save is just toggled on/off?
+>>>>
+>>>> I think this could be done, and actually we do this manually every boot using iwconfig in the software stack I work with. The tricky part is PS is done per-interface and IWD doesn't have any concept of per-interface configurations.
+>>> if anybody uses iwconfig, then the problem is already there. iwconfig
+>>> is an WEXT tool and deprecated. The driver is broken.
 >>
->> Hi Michael,
+>> It doesn't have much to do with the tool, its just an NL80211 API to toggle power save. But yes, the driver is broken if it can't handle this properly... but this is the world we live in.
 >>
->> On 6/8/23 7:01 AM, Michael John wrote:
->>> Hello,
->>>
->>> I'm trying to bring up an AP and ran into an issue where iwd
->>> will fail to do so. My AP profile is below and I'm trying
->>> to bring up the AP on channel 64 but iwd gives a failure.
->>> If I change the channel to 6 iwd is able to successfully
->>> able to bring the AP up. I'm curious to why it fails
->>> if the channel is 64? The reason I needed channel 64
->>> is because my radio requires the AP to be on the same
->>> channel as the STA when in AP+STA mode, and me test
->>> network  for the STA is on channel 64.
->>>
->>>
->>> ~> cat /var/lib/iwd/ap/470034.ap
->>> [Security]
->>> Passphrase=myphrase
->>> PairwiseCiphers=CCMP
->>>
->>> [General]
->>> DisableHT=true
->>> Channel=64
->>>
->>> [IPv4]
->>> Address=10.42.0.1
->>> Netmask=255.255.255.0
->>> Gateway=10.42.0.255
->>> DNS=10.42.0.0
->>> IPRange=10.42.0.50,10.42.0.60
->>>
->>>
->>> ~> iwctl ap wlan1 start-profile 470034
->>> Argument type is wrong
->>>
->>> ~> iw dev
->>> phy#0
->>>           Interface wlan1
->>>                   ifindex 6
->>>                   wdev 0x3
->>>                   addr c0:ee:40:64:4a:1d
->>>                   type AP
->>>                   txpower 23.00 dBm
->>>           Interface wlan0
->>>                   ifindex 5
->>>                   wdev 0x2
->>>                   addr c0:ee:40:64:4a:1c
->>>                   type managed
->>>                   txpower 23.00 dBm
->>>
->>>
->>> ~> journalctl --no-pager -u iwd --since -1m
->>> -- Logs begin at Thu 2023-06-08 12:39:15 UTC, end at Thu 2023-06-08 12:55:04 UTC. --
->>> Jun 08 12:55:00 V2470034 iwd[1229]: src/agent.c:agent_register() agent register called
->>> Jun 08 12:55:00 V2470034 iwd[1229]: src/agent.c:agent_register() agent :1.193 path /agent/2814
->>> Jun 08 12:55:00 V2470034 iwd[1229]: src/ap.c:ap_validate_band_channel() AP using frequency 5320 and channel width 20MHz (no-HT)
->>> Jun 08 12:55:00 V2470034 iwd[1229]: src/ap.c:ap_get_gateway4_mac_cb() Error: Operation not supported (95)
->>> Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 0000: -114
->>> Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 0020: -114
->>> Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 0040: -114
->>> Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 00a0: -114
->>> Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 00b0: -114
->>> Jun 08 12:55:00 V2470034 iwd[1229]: Could not register frame watch type 00c0: -114
->>> Jun 08 12:55:00 V2470034 iwd[1229]: START_AP failed: -22
->>> Jun 08 12:55:00 V2470034 iwd[1229]: src/agent.c:agent_disconnect() agent :1.193 disconnected
->>> Jun 08 12:55:00 V2470034 iwd[1229]: src/agent.c:agent_free() agent free 0x1d57d18
+>> The reason I'm interested though is because there is no nice way to disable power save "automatically" unless you use NetworkManager. Apart from hooking in a script to disable it with iw/iwconfig (which we currently do). An option in IWD would be convenient.
 >>
->> One thing to note about AP mode on 5GHz is there are many more legal
->> restrictions. You can check if 5320mhz (channel 64) has any restrictions
->> and look for the frequencies section:
+>>>> Denis might have preferences on this? but my initial thoughts would be something like:
+>>>>
+>>>> [General.wlan0]
+>>>> PowerSave={on,off}
+>>> You can't tie anything to interface names. Then can change and are
+>>> basically random names. The most you can do is tie it to the phy
+>>> and its mode of operation.
 >>
->> $ iw list
+>> True, it would have to be per-phy. But this too has the same problem if its a hotplug device...
 >>
->> Frequencies:
->>       * 5320 MHz [64] (22.0 dBm) (no IR, radar detection)
->>
->> For example in my case "no IR" means I cannot emit any radiation, which
->> prevents AP mode from working. It all depends on your hardware, but
->> sometimes you can simply set the regulatory domain to unlock those
->> frequencies. IWD can do this:
->>
->> # file: main.conf
->> [General]
->> Country=<CC>
->>
->> Or you can use:
->> $ iw reg set <CC>
->>
->> But in my case I'm using a 'self-managed' device (iwlwifi) which doesn't
->> allow setting the regulatory domain. For me, I would need to scan as an
->> AP first to get the regdom set, but IWD does not currently support this.
->>
->> Thanks,
->> James
+>> We do have this concept of driver_flags already, for interface removal, but I'm not sure if power save is something that EVERYONE will want to disable for a given driver. Maybe it works for some use cases but not others.
 > 
-> I appear to have the same restrictions.
+> we already have this:
 > 
-> For a network configuration is it possible to specify the BSS you want to
-> connect to?
-> For the network I'll join there are multiple APs available, it appears iwd is
-> selecting the best 5Ghz AP. Using the 'BandModifier5Ghz' option in my
-> config I'm able to give preference to 2.4GHz APs to partly avoid my issue, but
-> it would be convenient to specify a specific BSS so I could avoid one that
-> is on a channel that I have a restriction on.
+> enum driver_flag {
+>          DEFAULT_IF = 0x1,
+>          FORCE_PAE = 0x2,
+> };
+> 
+> struct driver_info {
+>          const char *prefix;
+>          unsigned int flags;
+> };
+> 
+> /*
+>   * The out-of-tree rtl88x2bu crashes the kernel hard if default interface is
+>   * destroyed.  It seems many other drivers are built from the same source code
+>   * so we set the DEFAULT_IF flag for all of them.  Unfortunately there are
+>   * in-tree drivers that also match these names and may be fine.
+>   */
+> static const struct driver_info driver_infos[] = {
+>          { "rtl81*",          DEFAULT_IF },
+>          { "rtl87*",          DEFAULT_IF },
+>          { "rtl88*",          DEFAULT_IF },
+>          { "rtw_*",           DEFAULT_IF },
+>          { "brcmfmac",        DEFAULT_IF },
+>          { "bcmsdh_sdmmc",    DEFAULT_IF },
+> };
+> 
+> It is hardcoded and obviously awful as that, but you could add a flag
+> for power save mode. However I think this needs to move into a configuration
+> file somewhere that can match and flag drivers and/or hardware.
 
-No, there isn't (apart from using debug/developer commands which aren't 
-meant to be used outside of a test environment). IWD aims to be as 
-minimal as possibly in terms of APIs/configuration so it will pick the 
-best BSS it sees fit.
+After looking into power save more I decided to revisit this sooner than 
+later. I initially thought you could get a persistent PS setting by a 
+script that runs at boot but the way IWD works deleting the default 
+interface actually blows away any PS setting because its tied to the 
+interface. So you would actually have to wait for IWD to start and 
+create interfaces, then set PS off, which is problematic if you don't 
+have a daemon monitoring IWD's state. It would be convenient for IWD to 
+set it once it creates the interface.
 
-I guess it depends on what your needing this for but for a consumer 
-device use-case relying on station+AP to be on the same channel is 
-fragile. For example, if the user's network only uses channels that are 
-restricted in AP mode.
+So now I'm trying to come up with a clean way of making driver quirks 
+like this configurable via main.conf. I think we should keep this static 
+list for known offenders and tack it onto the end of a dynamic list that 
+gets generated at runtime based on any driver quirks in main.conf
+
+The configuration format is where it gets kinda nasty. I'm thinking of 
+having a "DriverQuirks" group where each key corresponds to a driver 
+flag, and each value is a comma-separated list of glob matches:
+
+[DriverQuirks]
+DefaultInterface=rtl81*,rtl87*,rtl88*,brcmfmac
+PowerSaveOff=ath10k,iwlwifi,rl*
+ForcePae=drv1,drv2,etc
+
+One downside here is you may have duplicates between each quirk. Using 
+driver names as the keys would remove duplication, but loses the ability 
+to glob match since '*' is not a valid key character (maybe this is fine 
+though).
+
+I'm open to suggestions here. Trying to find a happy medium between 
+readability and parse-ability.
+
+Thanks,
+James
 
 > 
-> Thanks,
-> -Michael
+> Regards
 > 
->>>
->>> Thanks,
->>> Michael
-> CONFIDENTIALITY NOTICE: This message, including any attachments, contains confidential information intended for a specific individual and purpose. If you are not the intended recipient, you should delete this message and any disclosure, copying, or distribution of this message, or the taking of any action based on it, by you is strictly prohibited.
+> Marcel
+> 
