@@ -1,49 +1,49 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE806EAE2
-	for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 19:24:33 +0000 (UTC)
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-3f8cc042e2bso20376355e9.2
-        for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 12:24:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE23EAE6
+	for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 19:24:35 +0000 (UTC)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-307d58b3efbso6093294f8f.0
+        for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 12:24:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686857071; x=1689449071;
+        d=gmail.com; s=20221208; t=1686857073; x=1689449073;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PxAhFMqWOuukV1XGKm8q4b9h3kuq2uZ21xIx1btzfCs=;
-        b=Lh8W9j/mPPjiAMkg/caOpP3CUKWCRtkRetAfHpqjuyDx7qIkSVosVsSFTMtyGfXkDK
-         aR2E4Gqz9p2QWkj3yukJ52O9oy8erqi7vJiay9iQcqie9nnc1r37ehUOZAH5QclOLgRm
-         VHWeKphAZs278AJ3pD8FzbORRBXu6nWrN1aaEadV6qD4WSW9gS6oo5X/ANALHZs4PMWN
-         Ez5aMixNrJQyOwNVe14jD05/VWxG1ChBGWrriQjK/FHj4NXhMkgjc4N7bHTHuqD/M2HP
-         wgbqnttY9SkNRli407MP46vywMEBXgSdYh2kbNiJH2G77NNKhIwjXhI/irkDLEpuA1tm
-         rqKQ==
+        bh=0yCJ7vWHrnEqowV/OY8D3jMzm+pfTH9J9oDFxER61Uo=;
+        b=NOyFs9n0IzADM+nTW449gvawkbm/K/wMWhzGckMstL5a4Igp1s+J1cVKMJhGJrRITt
+         N+HZjnDDn5AkEANaKhC0bZLFo9sd0JMRKuo8p+wnSYaBclPmv6xu9h7sRlKgd+Fsl+E8
+         dspyMTaQlJuczFckFapH9qqXcnTsGhjOWTeTqh9NpiOtrvU7uYaFzYfy4RRal0kReUy4
+         AuwTUJJ43LTYjiI9jXsOlR1cgVlbNCq4Ug9MQgbZS1mBfjZ0ZtWvsIv8bUryaCFpMmp5
+         JHwVPj5DlIusXDeXIsGT1NbHWlHFLkFQDE6/7H7pZNK5/lYtYcWqZHSCIRM8qmB4RkEr
+         dAjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686857071; x=1689449071;
+        d=1e100.net; s=20221208; t=1686857073; x=1689449073;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PxAhFMqWOuukV1XGKm8q4b9h3kuq2uZ21xIx1btzfCs=;
-        b=jTCFhGpaCjNhLGVF2GtRc8ecpxFEurdgjNyKd8gBjcdrDtid6dItiV+t8yE46T0qjX
-         db5g7yFDhoAIh4PRZa+Rzwgn2WTh7mEPTxFf1mD7EDST+UZK9H9lsj7CC666nieToMeW
-         tbnrPEoZkLXd2jT8bI4PfakSB1q8z+O0slgiVSEcZpqlMbxnxMpFfYXFpSand1s6LPhT
-         p8rtm10vlIO9goKJvE4ux8VAbk2q/HuOySa+Pl8c8BgHTwxP1aiKnkapLLyMiWdo6Ue9
-         DZgBLdhmCELeZP8sZ2U3FL9UVnlPbiZdxVhF+BXtvNtGYD8xpj6o+dAoIErH7+Z/shJ4
-         ewcg==
-X-Gm-Message-State: AC+VfDzcjZNvmdDQx/bebVJcgJulPod9z2QQLtAoqvEhpOvCqrtk39sy
-	EJTGijg8/z/qQvtvKFOkcFX9TkfdesXlrA==
-X-Google-Smtp-Source: ACHHUZ59PPBTzVWs4hGbpW9iPxvt6f4kfXrVMYHncT518PvflfF5Xz/5aNbR1hLbEKBKXjdPcGSqPw==
-X-Received: by 2002:a05:600c:215:b0:3f5:ff24:27de with SMTP id 21-20020a05600c021500b003f5ff2427demr139783wmi.32.1686857071445;
-        Thu, 15 Jun 2023 12:24:31 -0700 (PDT)
+        bh=0yCJ7vWHrnEqowV/OY8D3jMzm+pfTH9J9oDFxER61Uo=;
+        b=Ty/5yo3hzdZ4gHnsLrUBfu4qa+nQ16Y6oMaYU3mK5Y8NKsOsFCUbkmYTuqVsYboC/6
+         BF9z5ChZUWAYNk9j8mGnDzG+X/fM/jJjpRNvSeYwpfoQJlkyPHWTesrPLp9WjR83SnQi
+         5905EeiKzXHbe4lKSu83IlVarK693WA23JFOJFf1Nz/bV73Rpig6sfM/7CeLIJf0CgoA
+         sAAA+tyKTZQqdg2zQiW3yG/HQ0WfREbMSNwyzP3YoVrhsS75oNXp3OLEhtk8oJr3E4Go
+         xXfn1aO4DS9uOl9PuFxIDdPCyPMW6hwGPLOY1cqxn0fTvBJV3I8UsbzFUTPYchsGl7oD
+         eo5Q==
+X-Gm-Message-State: AC+VfDzXqA27sySq0y+TwNZvFUR0Mx58AMR5+jrWAjcrHZ1U6toi6fMT
+	iFP2ppE+SMHznzwEILs/Kgsw6wohFQQEQg==
+X-Google-Smtp-Source: ACHHUZ4mtR23/B4bhWRIPdCSw8zHqjf++M9ZMlsWq+n2txVNI+23LtWbaFu0cKeE7FxNsZZ8zRn2Pw==
+X-Received: by 2002:a5d:5257:0:b0:309:3a1e:fc54 with SMTP id k23-20020a5d5257000000b003093a1efc54mr10980814wrc.7.1686857073250;
+        Thu, 15 Jun 2023 12:24:33 -0700 (PDT)
 Received: from LOCLAP699.dhl-toledo.locus ([195.55.200.178])
-        by smtp.gmail.com with ESMTPSA id 5-20020a05600c020500b003f6028a4c85sm28241wmi.16.2023.06.15.12.24.29
+        by smtp.gmail.com with ESMTPSA id 5-20020a05600c020500b003f6028a4c85sm28241wmi.16.2023.06.15.12.24.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jun 2023 12:24:31 -0700 (PDT)
+        Thu, 15 Jun 2023 12:24:32 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/7] wiphy: print driver flags on startup
-Date: Thu, 15 Jun 2023 12:24:14 -0700
-Message-Id: <20230615192415.1718516-6-prestwoj@gmail.com>
+Subject: [PATCH 7/7] doc: Document [DriverFlags].PowerSaveDisable
+Date: Thu, 15 Jun 2023 12:24:15 -0700
+Message-Id: <20230615192415.1718516-7-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230615192415.1718516-1-prestwoj@gmail.com>
 References: <20230615192415.1718516-1-prestwoj@gmail.com>
@@ -55,44 +55,25 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Similar to other basic information, print the driver flags so the
-user is informed what is set.
 ---
- src/wiphy.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ src/iwd.config.rst | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 2c09d47a..ebc91206 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -1333,6 +1333,27 @@ static void wiphy_print_basic_info(struct wiphy *wiphy)
- 		l_free(joined);
- 		l_strfreev(iftypes);
- 	}
-+
-+	if (wiphy->driver_flags) {
-+		char **flags = l_strv_new();
-+		char *joined;
-+
-+		if (wiphy->driver_flags & DEFAULT_IF)
-+			flags = l_strv_append(flags, "DefaultInterface");
-+
-+		if (wiphy->driver_flags & FORCE_PAE)
-+			flags = l_strv_append(flags, "ForcePae");
-+
-+		if (wiphy->driver_flags & POWER_SAVE_DISABLE)
-+			flags = l_strv_append(flags, "PowerSaveDisable");
-+
-+		joined = l_strjoinv(flags, ' ');
-+
-+		l_info("\tDriver Flags: %s", joined);
-+
-+		l_free(joined);
-+		l_strfreev(flags);
-+	}
- }
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 190f2c69..6b52b040 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -403,6 +403,10 @@ are buggy or just don't behave similar enough to the majority of other drivers.
+        not be used, and PAE will be used instead. Some drivers do not properly
+        support ControlPortOverNL80211 even though they advertise support for it.
  
- static void parse_supported_commands(struct wiphy *wiphy,
++   * - PowerSaveDisable
++     - Values: comma-separated list of drivers or glob matches
++
++       If a driver in user matches one in this list power save will be disabled.
+ 
+ SEE ALSO
+ ========
 -- 
 2.25.1
 
