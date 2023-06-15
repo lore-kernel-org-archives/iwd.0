@@ -1,49 +1,49 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC987EAE2
-	for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 19:24:31 +0000 (UTC)
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-3f8ca80e889so22041595e9.3
-        for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 12:24:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE806EAE2
+	for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 19:24:33 +0000 (UTC)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-3f8cc042e2bso20376355e9.2
+        for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 12:24:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686857070; x=1689449070;
+        d=gmail.com; s=20221208; t=1686857071; x=1689449071;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hi7fZU1eo33yQQz8F7uBWjlhP+8IboaQ9u+SI9ZiYTI=;
-        b=s0BLRgAFSD0hXEiLCLTyBR8ipvE8/j5Eqo0EBIClWwPj0ryHcb9MeywuIFiPGRNGM2
-         FlIcYJlNmAe7nB8TcbdD9mWEl3aphKTTn5fXOeorNkaiFBn+NPAL+4OJj5vR6s24Tb9H
-         FLiUfOJjEj3lLrSJurfiqR6CjdteVA13jOyH46E6F3Z63X6i2ZvndmatIj5hTWcz+q2t
-         dDNRg4erlo4R640c0ahyuScsxWZSqNmqsI4ZpTwwXcvvVEcQT1GQLeKA8k3b+LNA50B1
-         S/aAq9BP8P6Vj7eRZgxDVJJKY8jnvP/vuZb4t4YiQSubVCNbBEBJCOKALTTxFLNcWEkg
-         53BQ==
+        bh=PxAhFMqWOuukV1XGKm8q4b9h3kuq2uZ21xIx1btzfCs=;
+        b=Lh8W9j/mPPjiAMkg/caOpP3CUKWCRtkRetAfHpqjuyDx7qIkSVosVsSFTMtyGfXkDK
+         aR2E4Gqz9p2QWkj3yukJ52O9oy8erqi7vJiay9iQcqie9nnc1r37ehUOZAH5QclOLgRm
+         VHWeKphAZs278AJ3pD8FzbORRBXu6nWrN1aaEadV6qD4WSW9gS6oo5X/ANALHZs4PMWN
+         Ez5aMixNrJQyOwNVe14jD05/VWxG1ChBGWrriQjK/FHj4NXhMkgjc4N7bHTHuqD/M2HP
+         wgbqnttY9SkNRli407MP46vywMEBXgSdYh2kbNiJH2G77NNKhIwjXhI/irkDLEpuA1tm
+         rqKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686857070; x=1689449070;
+        d=1e100.net; s=20221208; t=1686857071; x=1689449071;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hi7fZU1eo33yQQz8F7uBWjlhP+8IboaQ9u+SI9ZiYTI=;
-        b=ZHBC3S/ybhAoJi+UiFah/arhqB8Xx5lI6bTqfY8Sgr3RMN4uQ4z2AJY9FQKL469o5+
-         5MdKoX00EMZ1xWuqp1Ny6/OrMqB1R9uWr9IV5zFrCfRC7cVvtOipiuXyai/pSNMFVb6h
-         6Je5wb5Rg9vQeMbhriiJMpkIS3wHRQAYiCAR5EvkrR5aZ+1jX1xQ1NHIpzT7Qaoj+fjg
-         ii28SGQC0wFjlJVw6DU8W+yrvbv4sezgX3wklHuDJAv2ChU6bC7wGVpmZozU15WXhpg5
-         XCr8kBGOUaDjGk3bWHXgjBOF5ZjentL295nAsdyJpQZizUBT1izMegAfGRySpCAc/S9R
-         x4Pw==
-X-Gm-Message-State: AC+VfDwodJ7jyUm5baQOF83/hFwt+m/Ny7xNUg08ENsSqgmUiEojpBCO
-	VPXJ58cK9tmGSkxsM3KbAu4cv7j2Bd3Keg==
-X-Google-Smtp-Source: ACHHUZ6Gpg+vdmB3jP2BHRl6K8x2gHot5YlERL4xCntzT0QGaZIxRs74OEAct7zpJqptj7eTf2u25Q==
-X-Received: by 2002:a05:600c:22c1:b0:3f8:afe:5c44 with SMTP id 1-20020a05600c22c100b003f80afe5c44mr165102wmg.12.1686857069563;
-        Thu, 15 Jun 2023 12:24:29 -0700 (PDT)
+        bh=PxAhFMqWOuukV1XGKm8q4b9h3kuq2uZ21xIx1btzfCs=;
+        b=jTCFhGpaCjNhLGVF2GtRc8ecpxFEurdgjNyKd8gBjcdrDtid6dItiV+t8yE46T0qjX
+         db5g7yFDhoAIh4PRZa+Rzwgn2WTh7mEPTxFf1mD7EDST+UZK9H9lsj7CC666nieToMeW
+         tbnrPEoZkLXd2jT8bI4PfakSB1q8z+O0slgiVSEcZpqlMbxnxMpFfYXFpSand1s6LPhT
+         p8rtm10vlIO9goKJvE4ux8VAbk2q/HuOySa+Pl8c8BgHTwxP1aiKnkapLLyMiWdo6Ue9
+         DZgBLdhmCELeZP8sZ2U3FL9UVnlPbiZdxVhF+BXtvNtGYD8xpj6o+dAoIErH7+Z/shJ4
+         ewcg==
+X-Gm-Message-State: AC+VfDzcjZNvmdDQx/bebVJcgJulPod9z2QQLtAoqvEhpOvCqrtk39sy
+	EJTGijg8/z/qQvtvKFOkcFX9TkfdesXlrA==
+X-Google-Smtp-Source: ACHHUZ59PPBTzVWs4hGbpW9iPxvt6f4kfXrVMYHncT518PvflfF5Xz/5aNbR1hLbEKBKXjdPcGSqPw==
+X-Received: by 2002:a05:600c:215:b0:3f5:ff24:27de with SMTP id 21-20020a05600c021500b003f5ff2427demr139783wmi.32.1686857071445;
+        Thu, 15 Jun 2023 12:24:31 -0700 (PDT)
 Received: from LOCLAP699.dhl-toledo.locus ([195.55.200.178])
-        by smtp.gmail.com with ESMTPSA id 5-20020a05600c020500b003f6028a4c85sm28241wmi.16.2023.06.15.12.24.28
+        by smtp.gmail.com with ESMTPSA id 5-20020a05600c020500b003f6028a4c85sm28241wmi.16.2023.06.15.12.24.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jun 2023 12:24:29 -0700 (PDT)
+        Thu, 15 Jun 2023 12:24:31 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/7] netdev: disable power save if required
-Date: Thu, 15 Jun 2023 12:24:13 -0700
-Message-Id: <20230615192415.1718516-5-prestwoj@gmail.com>
+Subject: [PATCH 6/7] wiphy: print driver flags on startup
+Date: Thu, 15 Jun 2023 12:24:14 -0700
+Message-Id: <20230615192415.1718516-6-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230615192415.1718516-1-prestwoj@gmail.com>
 References: <20230615192415.1718516-1-prestwoj@gmail.com>
@@ -55,120 +55,44 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Disable power save if the wiphy indicates its needed. Do this
-before issuing GET_LINK so the netdev doesn't signal its up until
-power save is disabled.
+Similar to other basic information, print the driver flags so the
+user is informed what is set.
 ---
- src/netdev.c | 80 +++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 66 insertions(+), 14 deletions(-)
+ src/wiphy.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 4ee17f3b..1b44944e 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -6212,6 +6212,65 @@ error:
- 	return NULL;
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 2c09d47a..ebc91206 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -1333,6 +1333,27 @@ static void wiphy_print_basic_info(struct wiphy *wiphy)
+ 		l_free(joined);
+ 		l_strfreev(iftypes);
+ 	}
++
++	if (wiphy->driver_flags) {
++		char **flags = l_strv_new();
++		char *joined;
++
++		if (wiphy->driver_flags & DEFAULT_IF)
++			flags = l_strv_append(flags, "DefaultInterface");
++
++		if (wiphy->driver_flags & FORCE_PAE)
++			flags = l_strv_append(flags, "ForcePae");
++
++		if (wiphy->driver_flags & POWER_SAVE_DISABLE)
++			flags = l_strv_append(flags, "PowerSaveDisable");
++
++		joined = l_strjoinv(flags, ' ');
++
++		l_info("\tDriver Flags: %s", joined);
++
++		l_free(joined);
++		l_strfreev(flags);
++	}
  }
  
-+static void netdev_get_link(uint32_t ifindex)
-+{
-+	struct ifinfomsg *rtmmsg;
-+	size_t bufsize;
-+
-+	/* Query interface flags */
-+	bufsize = NLMSG_ALIGN(sizeof(struct ifinfomsg));
-+	rtmmsg = l_malloc(bufsize);
-+	memset(rtmmsg, 0, bufsize);
-+
-+	rtmmsg->ifi_family = AF_UNSPEC;
-+	rtmmsg->ifi_index = ifindex;
-+
-+	l_netlink_send(rtnl, RTM_GETLINK, 0, rtmmsg, bufsize,
-+					netdev_getlink_cb, NULL, NULL);
-+
-+	l_free(rtmmsg);
-+}
-+
-+static void netdev_disable_ps_cb(struct l_genl_msg *msg, void *user_data)
-+{
-+	int err = l_genl_msg_get_error(msg);
-+	uint32_t ifindex = L_PTR_TO_UINT(user_data);
-+
-+	/* Can't do anything about it but inform the user */
-+	if (err < 0) {
-+		l_error("Failed to disable power save for ifindex %u (%s: %d)",
-+				ifindex, strerror(-err), err);
-+		return;
-+	}
-+
-+	l_debug("Disabled power save for ifindex %u", ifindex);
-+}
-+
-+static void netdev_disable_ps_destroy(void *user_data)
-+{
-+	uint32_t ifindex = L_PTR_TO_UINT(user_data);
-+
-+	netdev_get_link(ifindex);
-+}
-+
-+static bool netdev_disable_power_save(uint32_t ifindex)
-+{
-+	struct l_genl_msg *msg = l_genl_msg_new(NL80211_CMD_SET_POWER_SAVE);
-+	uint32_t disabled = NL80211_PS_DISABLED;
-+
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &ifindex);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_PS_STATE, 4, &disabled);
-+
-+	if (!l_genl_family_send(nl80211, msg, netdev_disable_ps_cb,
-+				L_UINT_TO_PTR(ifindex),
-+				netdev_disable_ps_destroy)) {
-+		l_error("Failed to send SET_POWER_SAVE (-EIO)");
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
- 					const uint8_t *set_mac)
- {
-@@ -6223,8 +6282,6 @@ struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
- 	uint32_t wiphy_id;
- 	struct netdev *netdev;
- 	struct wiphy *wiphy = NULL;
--	struct ifinfomsg *rtmmsg;
--	size_t bufsize;
- 	struct l_io *pae_io = NULL;
- 
- 	if (nl80211_parse_attrs(msg, NL80211_ATTR_IFINDEX, &ifindex,
-@@ -6283,20 +6340,15 @@ struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
- 	l_debug("Created interface %s[%d %" PRIx64 "]", netdev->name,
- 		netdev->index, netdev->wdev_id);
- 
--	/* Query interface flags */
--	bufsize = NLMSG_ALIGN(sizeof(struct ifinfomsg));
--	rtmmsg = l_malloc(bufsize);
--	memset(rtmmsg, 0, bufsize);
--
--	rtmmsg->ifi_family = AF_UNSPEC;
--	rtmmsg->ifi_index = ifindex;
--
--	l_netlink_send(rtnl, RTM_GETLINK, 0, rtmmsg, bufsize,
--					netdev_getlink_cb, NULL, NULL);
-+	netdev_setup_interface(netdev);
- 
--	l_free(rtmmsg);
-+	if (wiphy_disable_power_save(wiphy)) {
-+		/* Wait to issue GET_LINK until PS is disabled */
-+		if (netdev_disable_power_save(ifindex))
-+			return netdev;
-+	}
- 
--	netdev_setup_interface(netdev);
-+	netdev_get_link(ifindex);
- 
- 	return netdev;
- }
+ static void parse_supported_commands(struct wiphy *wiphy,
 -- 
 2.25.1
 
