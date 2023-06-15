@@ -1,49 +1,49 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A18EADD
-	for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 19:24:30 +0000 (UTC)
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-4f62cf9755eso11005128e87.1
-        for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 12:24:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC987EAE2
+	for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 19:24:31 +0000 (UTC)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-3f8ca80e889so22041595e9.3
+        for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 12:24:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686857068; x=1689449068;
+        d=gmail.com; s=20221208; t=1686857070; x=1689449070;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DpzGjz3SnXJ3mkGar/4yJDlsZpn6nugyqrpOCjaDC9Q=;
-        b=Nlaf/EJfvZ5iqebqmVGNq20b8E/vaCCE+k6QtSmdoXBSmRs2+IxJpYz+9UE+ybitP/
-         VJlgtndYixw6poizjkvQhoH5ZtiR3Q/RIgOtCxqlEx8GO7ieGVgfgYJt+aJwE9Zgbfbc
-         0nPHbqEEt1E02ednfqagdqsGyzhmXMDSyDupFoGEyb1Cy0l43h407JW0IQwDy/c4u+OF
-         0FTNZmoiareasmAZrNaQ4zqt3uUgObjlfiR21bxNJTFT7g+JA7UAgfev0PWt6OWXIOSL
-         DJD5MCgaeWEO4idsht/nAXOCzYtuYw8OksRRvQ3G40k+JTrCJxnT4GAJkYj+CuDxwSrt
-         IS6A==
+        bh=hi7fZU1eo33yQQz8F7uBWjlhP+8IboaQ9u+SI9ZiYTI=;
+        b=s0BLRgAFSD0hXEiLCLTyBR8ipvE8/j5Eqo0EBIClWwPj0ryHcb9MeywuIFiPGRNGM2
+         FlIcYJlNmAe7nB8TcbdD9mWEl3aphKTTn5fXOeorNkaiFBn+NPAL+4OJj5vR6s24Tb9H
+         FLiUfOJjEj3lLrSJurfiqR6CjdteVA13jOyH46E6F3Z63X6i2ZvndmatIj5hTWcz+q2t
+         dDNRg4erlo4R640c0ahyuScsxWZSqNmqsI4ZpTwwXcvvVEcQT1GQLeKA8k3b+LNA50B1
+         S/aAq9BP8P6Vj7eRZgxDVJJKY8jnvP/vuZb4t4YiQSubVCNbBEBJCOKALTTxFLNcWEkg
+         53BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686857068; x=1689449068;
+        d=1e100.net; s=20221208; t=1686857070; x=1689449070;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DpzGjz3SnXJ3mkGar/4yJDlsZpn6nugyqrpOCjaDC9Q=;
-        b=K035zxQ7sDCwjXd/7djMwKTq+g3Ugmy701BX12vxAaeUBRBdwsdwQuST6aK4DaVcJy
-         dXTcT04RgQmmVnvx+dWUNjCRIfbCu9HsTin6ElNw43X5IeffpLt+5GXkgoH0EqDNQ01z
-         tOJ24/ZLybI4idr3MmWQ3jxAJ6htKMueHUcjpcqGo9ZGZSIMFX4V36Ir3Z5tLjKCdXxa
-         d/c3Bl7LMAlzvssmIA6ZxIPoGmVO8T93cEzu3sepcDPbiEE/QunL0K9LsR7vM8PGWmwz
-         LvvYq0vsw9VH7NpCz2PB+azuxB/cDiLyNAITpcC8zKLSkuyV3o2by7u87lGQXhyC39Vg
-         5wFQ==
-X-Gm-Message-State: AC+VfDzVPvCX8s4rrnTCnvIJ8dsf1tuB0ykv5LabryHxlCVsjNIQ004C
-	XYrpoavlXMptgKp8SmjSlQx/5oajrUJHCQ==
-X-Google-Smtp-Source: ACHHUZ5DZ5z857ccmUtO2kmFiPEx5eyXj/ZFo6t0802WOxoDLGjO7khsojzKtWtRf+QcC2uh98jy2A==
-X-Received: by 2002:a19:5e57:0:b0:4f6:29cf:c0dd with SMTP id z23-20020a195e57000000b004f629cfc0ddmr6779607lfi.8.1686857067742;
-        Thu, 15 Jun 2023 12:24:27 -0700 (PDT)
+        bh=hi7fZU1eo33yQQz8F7uBWjlhP+8IboaQ9u+SI9ZiYTI=;
+        b=ZHBC3S/ybhAoJi+UiFah/arhqB8Xx5lI6bTqfY8Sgr3RMN4uQ4z2AJY9FQKL469o5+
+         5MdKoX00EMZ1xWuqp1Ny6/OrMqB1R9uWr9IV5zFrCfRC7cVvtOipiuXyai/pSNMFVb6h
+         6Je5wb5Rg9vQeMbhriiJMpkIS3wHRQAYiCAR5EvkrR5aZ+1jX1xQ1NHIpzT7Qaoj+fjg
+         ii28SGQC0wFjlJVw6DU8W+yrvbv4sezgX3wklHuDJAv2ChU6bC7wGVpmZozU15WXhpg5
+         XCr8kBGOUaDjGk3bWHXgjBOF5ZjentL295nAsdyJpQZizUBT1izMegAfGRySpCAc/S9R
+         x4Pw==
+X-Gm-Message-State: AC+VfDwodJ7jyUm5baQOF83/hFwt+m/Ny7xNUg08ENsSqgmUiEojpBCO
+	VPXJ58cK9tmGSkxsM3KbAu4cv7j2Bd3Keg==
+X-Google-Smtp-Source: ACHHUZ6Gpg+vdmB3jP2BHRl6K8x2gHot5YlERL4xCntzT0QGaZIxRs74OEAct7zpJqptj7eTf2u25Q==
+X-Received: by 2002:a05:600c:22c1:b0:3f8:afe:5c44 with SMTP id 1-20020a05600c22c100b003f80afe5c44mr165102wmg.12.1686857069563;
+        Thu, 15 Jun 2023 12:24:29 -0700 (PDT)
 Received: from LOCLAP699.dhl-toledo.locus ([195.55.200.178])
-        by smtp.gmail.com with ESMTPSA id 5-20020a05600c020500b003f6028a4c85sm28241wmi.16.2023.06.15.12.24.26
+        by smtp.gmail.com with ESMTPSA id 5-20020a05600c020500b003f6028a4c85sm28241wmi.16.2023.06.15.12.24.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jun 2023 12:24:27 -0700 (PDT)
+        Thu, 15 Jun 2023 12:24:29 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/7] wiphy: add [DriverFlags].PowerSaveDisable flag
-Date: Thu, 15 Jun 2023 12:24:12 -0700
-Message-Id: <20230615192415.1718516-4-prestwoj@gmail.com>
+Subject: [PATCH 5/7] netdev: disable power save if required
+Date: Thu, 15 Jun 2023 12:24:13 -0700
+Message-Id: <20230615192415.1718516-5-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230615192415.1718516-1-prestwoj@gmail.com>
 References: <20230615192415.1718516-1-prestwoj@gmail.com>
@@ -55,74 +55,120 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Certain drivers do not handle power save very well resulting in
-missed frames, firmware crashes, or other bad behavior. Its easy
-enough to disable power save via iw, iwconfig, etc but since IWD
-removes and creates the interface on startup it blows away any
-previous power save setting. The setting must be done *after* IWD
-creates the interface which can be done, but needs to be via some
-external daemon monitoring IWD's state. For minimal systems,
-e.g. without NetworkManager, it becomes difficult and annoying to
-persistently disable power save.
-
-For this reason a new driver flag POWER_SAVE_DISABLE is being
-added. This can then be referenced when creating the interfaces
-and if set, disable power save.
+Disable power save if the wiphy indicates its needed. Do this
+before issuing GET_LINK so the netdev doesn't signal its up until
+power save is disabled.
 ---
- src/wiphy.c | 13 +++++++++++++
- src/wiphy.h |  1 +
- 2 files changed, 14 insertions(+)
+ src/netdev.c | 80 +++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 66 insertions(+), 14 deletions(-)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 6f8f6826..2c09d47a 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -71,6 +71,7 @@ static unsigned int wiphy_dump_id;
- enum driver_flag {
- 	DEFAULT_IF = 0x1,
- 	FORCE_PAE = 0x2,
-+	POWER_SAVE_DISABLE = 0x4,
- };
- 
- struct driver_flag_name {
-@@ -101,6 +102,7 @@ static const struct driver_info driver_infos[] = {
- static const struct driver_flag_name driver_flag_names[] = {
- 	{ "DefaultInterface", DEFAULT_IF },
- 	{ "ForcePae",         FORCE_PAE },
-+	{ "PowerSaveDisable", POWER_SAVE_DISABLE },
- };
- 
- struct wiphy {
-@@ -723,6 +725,17 @@ bool wiphy_control_port_enabled(struct wiphy *wiphy)
- 	return enabled;
+diff --git a/src/netdev.c b/src/netdev.c
+index 4ee17f3b..1b44944e 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -6212,6 +6212,65 @@ error:
+ 	return NULL;
  }
  
-+bool wiphy_disable_power_save(struct wiphy *wiphy)
++static void netdev_get_link(uint32_t ifindex)
 +{
-+	if (wiphy->driver_flags & POWER_SAVE_DISABLE) {
-+		l_info("Disabling power save due to driver quirks: %s",
-+				wiphy_get_driver(wiphy));
-+		return true;
-+	}
++	struct ifinfomsg *rtmmsg;
++	size_t bufsize;
 +
-+	return false;
++	/* Query interface flags */
++	bufsize = NLMSG_ALIGN(sizeof(struct ifinfomsg));
++	rtmmsg = l_malloc(bufsize);
++	memset(rtmmsg, 0, bufsize);
++
++	rtmmsg->ifi_family = AF_UNSPEC;
++	rtmmsg->ifi_index = ifindex;
++
++	l_netlink_send(rtnl, RTM_GETLINK, 0, rtmmsg, bufsize,
++					netdev_getlink_cb, NULL, NULL);
++
++	l_free(rtmmsg);
 +}
 +
- const uint8_t *wiphy_get_permanent_address(struct wiphy *wiphy)
++static void netdev_disable_ps_cb(struct l_genl_msg *msg, void *user_data)
++{
++	int err = l_genl_msg_get_error(msg);
++	uint32_t ifindex = L_PTR_TO_UINT(user_data);
++
++	/* Can't do anything about it but inform the user */
++	if (err < 0) {
++		l_error("Failed to disable power save for ifindex %u (%s: %d)",
++				ifindex, strerror(-err), err);
++		return;
++	}
++
++	l_debug("Disabled power save for ifindex %u", ifindex);
++}
++
++static void netdev_disable_ps_destroy(void *user_data)
++{
++	uint32_t ifindex = L_PTR_TO_UINT(user_data);
++
++	netdev_get_link(ifindex);
++}
++
++static bool netdev_disable_power_save(uint32_t ifindex)
++{
++	struct l_genl_msg *msg = l_genl_msg_new(NL80211_CMD_SET_POWER_SAVE);
++	uint32_t disabled = NL80211_PS_DISABLED;
++
++	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &ifindex);
++	l_genl_msg_append_attr(msg, NL80211_ATTR_PS_STATE, 4, &disabled);
++
++	if (!l_genl_family_send(nl80211, msg, netdev_disable_ps_cb,
++				L_UINT_TO_PTR(ifindex),
++				netdev_disable_ps_destroy)) {
++		l_error("Failed to send SET_POWER_SAVE (-EIO)");
++		return false;
++	}
++
++	return true;
++}
++
+ struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
+ 					const uint8_t *set_mac)
  {
- 	return wiphy->permanent_addr;
-diff --git a/src/wiphy.h b/src/wiphy.h
-index f4f205ad..39837366 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -135,6 +135,7 @@ const char *wiphy_get_driver(struct wiphy *wiphy);
- const char *wiphy_get_name(struct wiphy *wiphy);
- bool wiphy_uses_default_if(struct wiphy *wiphy);
- bool wiphy_control_port_enabled(struct wiphy *wiphy);
-+bool wiphy_disable_power_save(struct wiphy *wiphy);
- const uint8_t *wiphy_get_permanent_address(struct wiphy *wiphy);
- const uint8_t *wiphy_get_extended_capabilities(struct wiphy *wiphy,
- 							uint32_t iftype);
+@@ -6223,8 +6282,6 @@ struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
+ 	uint32_t wiphy_id;
+ 	struct netdev *netdev;
+ 	struct wiphy *wiphy = NULL;
+-	struct ifinfomsg *rtmmsg;
+-	size_t bufsize;
+ 	struct l_io *pae_io = NULL;
+ 
+ 	if (nl80211_parse_attrs(msg, NL80211_ATTR_IFINDEX, &ifindex,
+@@ -6283,20 +6340,15 @@ struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
+ 	l_debug("Created interface %s[%d %" PRIx64 "]", netdev->name,
+ 		netdev->index, netdev->wdev_id);
+ 
+-	/* Query interface flags */
+-	bufsize = NLMSG_ALIGN(sizeof(struct ifinfomsg));
+-	rtmmsg = l_malloc(bufsize);
+-	memset(rtmmsg, 0, bufsize);
+-
+-	rtmmsg->ifi_family = AF_UNSPEC;
+-	rtmmsg->ifi_index = ifindex;
+-
+-	l_netlink_send(rtnl, RTM_GETLINK, 0, rtmmsg, bufsize,
+-					netdev_getlink_cb, NULL, NULL);
++	netdev_setup_interface(netdev);
+ 
+-	l_free(rtmmsg);
++	if (wiphy_disable_power_save(wiphy)) {
++		/* Wait to issue GET_LINK until PS is disabled */
++		if (netdev_disable_power_save(ifindex))
++			return netdev;
++	}
+ 
+-	netdev_setup_interface(netdev);
++	netdev_get_link(ifindex);
+ 
+ 	return netdev;
+ }
 -- 
 2.25.1
 
