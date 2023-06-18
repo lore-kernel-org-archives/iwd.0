@@ -1,79 +1,88 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE23EAE6
-	for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 19:24:35 +0000 (UTC)
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-307d58b3efbso6093294f8f.0
-        for <iwd@lists.linux.dev>; Thu, 15 Jun 2023 12:24:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603F63D74
+	for <iwd@lists.linux.dev>; Sun, 18 Jun 2023 19:07:38 +0000 (UTC)
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-1a98a7fdf3bso1883403fac.1
+        for <iwd@lists.linux.dev>; Sun, 18 Jun 2023 12:07:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686857073; x=1689449073;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0yCJ7vWHrnEqowV/OY8D3jMzm+pfTH9J9oDFxER61Uo=;
-        b=NOyFs9n0IzADM+nTW449gvawkbm/K/wMWhzGckMstL5a4Igp1s+J1cVKMJhGJrRITt
-         N+HZjnDDn5AkEANaKhC0bZLFo9sd0JMRKuo8p+wnSYaBclPmv6xu9h7sRlKgd+Fsl+E8
-         dspyMTaQlJuczFckFapH9qqXcnTsGhjOWTeTqh9NpiOtrvU7uYaFzYfy4RRal0kReUy4
-         AuwTUJJ43LTYjiI9jXsOlR1cgVlbNCq4Ug9MQgbZS1mBfjZ0ZtWvsIv8bUryaCFpMmp5
-         JHwVPj5DlIusXDeXIsGT1NbHWlHFLkFQDE6/7H7pZNK5/lYtYcWqZHSCIRM8qmB4RkEr
-         dAjQ==
+        d=gmail.com; s=20221208; t=1687115257; x=1689707257;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1i09HRK3SORuFee+yKvEcCVqnT5RygrXkWaf32eLtBQ=;
+        b=Aj2f2k+VfdEoqH8Bpi0DIE4bL9UPOdj128oFtlCH7kE9lYWnNLKppN4+6esGmgTgRg
+         8MtJpsDxFW3pvPIp1niDlx0ycCbhIpAdU4ePh2WbbbwnO+pGWDNAU6DRkfJKU+N4RI32
+         fhIh9ovledRklC/W62nmN79lJaB5dFUEV6YVQJJMpUoWuYNUD2H+P5T+3fa7o12blUge
+         hxWVslZqw9q0/Qeppokv1RUB96U676d6A6cxMQ4t+tpvBS3Job4VVTlPuuaLJP5Ro5OP
+         V49rDYeJQEXE0dID9Hbuy6hX0BquEujk1Z2KhfcSNjJBs+hOGM8opCrMofTNW8LT3mxX
+         4z8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686857073; x=1689449073;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0yCJ7vWHrnEqowV/OY8D3jMzm+pfTH9J9oDFxER61Uo=;
-        b=Ty/5yo3hzdZ4gHnsLrUBfu4qa+nQ16Y6oMaYU3mK5Y8NKsOsFCUbkmYTuqVsYboC/6
-         BF9z5ChZUWAYNk9j8mGnDzG+X/fM/jJjpRNvSeYwpfoQJlkyPHWTesrPLp9WjR83SnQi
-         5905EeiKzXHbe4lKSu83IlVarK693WA23JFOJFf1Nz/bV73Rpig6sfM/7CeLIJf0CgoA
-         sAAA+tyKTZQqdg2zQiW3yG/HQ0WfREbMSNwyzP3YoVrhsS75oNXp3OLEhtk8oJr3E4Go
-         xXfn1aO4DS9uOl9PuFxIDdPCyPMW6hwGPLOY1cqxn0fTvBJV3I8UsbzFUTPYchsGl7oD
-         eo5Q==
-X-Gm-Message-State: AC+VfDzXqA27sySq0y+TwNZvFUR0Mx58AMR5+jrWAjcrHZ1U6toi6fMT
-	iFP2ppE+SMHznzwEILs/Kgsw6wohFQQEQg==
-X-Google-Smtp-Source: ACHHUZ4mtR23/B4bhWRIPdCSw8zHqjf++M9ZMlsWq+n2txVNI+23LtWbaFu0cKeE7FxNsZZ8zRn2Pw==
-X-Received: by 2002:a5d:5257:0:b0:309:3a1e:fc54 with SMTP id k23-20020a5d5257000000b003093a1efc54mr10980814wrc.7.1686857073250;
-        Thu, 15 Jun 2023 12:24:33 -0700 (PDT)
-Received: from LOCLAP699.dhl-toledo.locus ([195.55.200.178])
-        by smtp.gmail.com with ESMTPSA id 5-20020a05600c020500b003f6028a4c85sm28241wmi.16.2023.06.15.12.24.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jun 2023 12:24:32 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/7] doc: Document [DriverFlags].PowerSaveDisable
-Date: Thu, 15 Jun 2023 12:24:15 -0700
-Message-Id: <20230615192415.1718516-7-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230615192415.1718516-1-prestwoj@gmail.com>
-References: <20230615192415.1718516-1-prestwoj@gmail.com>
+        d=1e100.net; s=20221208; t=1687115257; x=1689707257;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1i09HRK3SORuFee+yKvEcCVqnT5RygrXkWaf32eLtBQ=;
+        b=i/0JpUCODMi7fVeKTm3r1RN1rh1SJRC3I376xpPvTzJhZHNG16SYXzIAgkzqpYYzuf
+         RsP+JOH1+SVJwh5PITw70YWp1ydGQ0d4atnDc6zbOhAUSB52TmjdgoQqQyFaNih8Dyc6
+         tEYS4aJHxUwKbjbKQ5GRGLkXWMUDVWq9mfetjDws+Qry2t19Em7QRddeo2n6pamAD3Zg
+         63hPDyMLuAenv9N1Nd4kfY7SBaI3pNjrfqVL1ifIOdeV8bAn6VIM7WSHoNnvkg0eXw8i
+         jj8YoFbyrSidqqbhTvb0lICCWq4xX8mNqASbnZt3qeFt9C5fTOBxRfJg7vH+5Y5MSNtK
+         wuEw==
+X-Gm-Message-State: AC+VfDxDA1U98yWuw1prAueMlHaEO04hIlFF9zwHKzloCjLOWU10rXkJ
+	ptpeCLeo64h3kiDVIw4Mfp4=
+X-Google-Smtp-Source: ACHHUZ4B8n+r73bz0rZMGxogMTA5s1pSmWSfaL0WCxHwsiUvmRQ7bXMalEdIKhojNlQAUAne0dIKlQ==
+X-Received: by 2002:a05:6870:6186:b0:1a9:f6ba:138a with SMTP id a6-20020a056870618600b001a9f6ba138amr1911072oah.0.1687115257299;
+        Sun, 18 Jun 2023 12:07:37 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id s10-20020a05683004ca00b006add66c7d73sm8900526otd.27.2023.06.18.12.07.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 18 Jun 2023 12:07:36 -0700 (PDT)
+Message-ID: <746fada3-377e-8d26-fef9-2b635d208ac0@gmail.com>
+Date: Sun, 18 Jun 2023 14:03:02 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 2/7] wiphy: allow for user-defined driver flags
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20230615192415.1718516-1-prestwoj@gmail.com>
+ <20230615192415.1718516-2-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20230615192415.1718516-2-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- src/iwd.config.rst | 4 ++++
- 1 file changed, 4 insertions(+)
+Hi James,
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 190f2c69..6b52b040 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -403,6 +403,10 @@ are buggy or just don't behave similar enough to the majority of other drivers.
-        not be used, and PAE will be used instead. Some drivers do not properly
-        support ControlPortOverNL80211 even though they advertise support for it.
- 
-+   * - PowerSaveDisable
-+     - Values: comma-separated list of drivers or glob matches
-+
-+       If a driver in user matches one in this list power save will be disabled.
- 
- SEE ALSO
- ========
--- 
-2.25.1
+On 6/15/23 14:24, James Prestwood wrote:
+> The driver_infos list in wiphy.c is hard coded and, naturally,
+> not configurable from a user perspective. As drivers are updated
+> or added users may be left with their system being broken until the
+> driver is added, IWD released, and packaged.
+> 
+> This adds the ability to define driver flags inside main.conf under
+> the "DriverFlags" group. Keys in this group correspond to values in
 
+So I renamed this to "DriverQuirks" instead to be a little more future-proof.
+
+> enum driver_flag and values are a list of glob matches for specific
+> drivers:
+> 
+> [DriverFlags]
+> DefaultInterface=rtl81*,rtl87*,rtl88*,rtw_*,brcmfmac,bcmsdh_sdmmc
+> ForcePae=buggy_pae_*
+> ---
+>   src/wiphy.c | 31 +++++++++++++++++++++++++++++++
+>   1 file changed, 31 insertions(+)
+> 
+
+Patch 1-3 applied, thanks.
+
+Regards,
+-Denis
