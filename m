@@ -1,45 +1,45 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D85CC8FF
-	for <iwd@lists.linux.dev>; Mon, 19 Jun 2023 14:50:02 +0000 (UTC)
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-3f9e33a3d3fso36317621cf.1
-        for <iwd@lists.linux.dev>; Mon, 19 Jun 2023 07:50:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565F07477
+	for <iwd@lists.linux.dev>; Mon, 19 Jun 2023 14:54:08 +0000 (UTC)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-762092e1fb7so291730385a.1
+        for <iwd@lists.linux.dev>; Mon, 19 Jun 2023 07:54:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687186201; x=1689778201;
+        d=gmail.com; s=20221208; t=1687186447; x=1689778447;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=CZxzNOvPRrJMGqRs9Zi2NBX8dffKk0AcMmA+SgwTxh0=;
-        b=qTh2JtgiWjaAYOLhXJhGipclnDeOUjZ+jkzQ30bHczU5smdYzALg9VbnQ2SgnCvm/H
-         jAPQ6MxjxcN8Z9F+mJs6vB9p20D/KT0yUPBeMvS549EuqhKdAI3amV164LZXWygKnDAP
-         DUJOwRMYse9MjtSsRRHBaCGFvVPpbZ1cPWGNo98BhXz5VDeLZduvAzoswZpzKEo7tXTY
-         cXjjdMEpmpcKFlimTAeIFNchTF9GFrv5HQB7gBsscEECiti0dLyaLaKLrPX6aBJs08BY
-         meVxczW9oPAUWhW2u/byRylu0IVdoBHAVB2+i+8Rr4ezuAVHY0dcAcsD48sWg5Rml+NL
-         8rew==
+        bh=d4rf2zcyRgV1rCwkRBE1EAmZWDcYW6hN7Qy6njnuwH8=;
+        b=nSycCBo2UWIOwP6PvFwLOlSaeOK4H5dSUv2g+4KF+ecp5bvqZBgQ9K2DeGv1USJT+b
+         mNDI0hS2KwVy5qycypfIVKiri+i5lyNdly+7q24fY/KdAsX2EF4QEVMtpSUjknWaUgWJ
+         thzkQ+PiNDT5FqB5Gsl580zib9JZ7UD4MGr1Qi8z6WiE75p6r8fv3/9qkeqO3ACICFqi
+         ORsmqiR06WAk8nyvN84LGvKaggBIe+00TB83/cDeSYDKr17CGCpNT7/Mm66l3bzYxr7x
+         S/8T0039L544LfsEkJVLjgmY79ON7VXCHfOEuyFeAebXYyk7AiGa54gcnEE+Yky9rZsc
+         9SzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687186201; x=1689778201;
+        d=1e100.net; s=20221208; t=1687186447; x=1689778447;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CZxzNOvPRrJMGqRs9Zi2NBX8dffKk0AcMmA+SgwTxh0=;
-        b=cBWgUCb+8LTLkvYm1jJWx7E80sD00ihyN9ZEyl1dVLdmFhYij8Q6gJnfpBET335LkC
-         JqYAG2bU1ZpzV5uo2zXVJiuulyHLpJdLkTQQ8acyaSiDur7PRalG4ScRcMRAkuldGmp0
-         56N+LY6d3AQHdmkug1u7G0ivucu5qSDvy0awFkQrULovIDvNhkSvrTBL0OKiUYbefbLy
-         oM8m82yI55DD14Jyn2LAjgyH+DWkQX/lGfCDO9qfbA5hSPuK3zjDTE7K3sxI0H213xmC
-         Wds0IM8TIeb+HdEaat5liVSMorF4qovY1o2x20d5qWzEp5ASWXueI3yW6R1InAFcqMB2
-         e7ag==
-X-Gm-Message-State: AC+VfDzLocsZ0r80SoZ/EjMED+hIf7Hi83K6oCIpKeB7b/1u11AtLzy5
-	PKdKNjMpVc8ehDt8aaSt90s8kB/vUiY=
-X-Google-Smtp-Source: ACHHUZ65mhQmQEoSg946nqMcdz2l5qTHF43j4t6KsR9k6nYLdARphgtwF9/tAVvKwTwMd/cXPKelhA==
-X-Received: by 2002:a05:622a:120a:b0:3f3:91bd:a46d with SMTP id y10-20020a05622a120a00b003f391bda46dmr13367194qtx.8.1687186200924;
-        Mon, 19 Jun 2023 07:50:00 -0700 (PDT)
+        bh=d4rf2zcyRgV1rCwkRBE1EAmZWDcYW6hN7Qy6njnuwH8=;
+        b=BA3sUFtnqAeCjg8sFktqe739R7hun0Rs6bpNTK7NaZFwhHIhgL9Jt0lZq9NNcula0Q
+         2JHJ1OB6Vmcef7Nmlx3QjpnLdv55nPA7OF7PWTsSME2L80nIMFypEb/hcyGml5Q0YamZ
+         j0qtRrdh70Nii10kBHMx+AfYXLh7QDWnQp/c42rHdWaXeKYJA2Y6U+PDhA1Kn5xNcuL3
+         LWRDpVEZrYCTo4YrFKjgRTVNu8TUnU+l0prHsvoC5v+MtqBoYZPUJwTkRDpVbP0/0/fY
+         1EG5VNtF2i4Yelfy3+sseW5T/HEnjQSzzERmHtwfLPqhfP+kJHJUGZt+f89okPvFJSqD
+         vivg==
+X-Gm-Message-State: AC+VfDyOEBwI7fVLGxXQ0VIk2hH1NUBVM9mN5cn57/nrfYSohxduKciv
+	bNP+OpmmZsdkIbBmhYd/G8v8wAKFHBw=
+X-Google-Smtp-Source: ACHHUZ46+cXtPk83Ek9HmkbWB5Km75EfsFgppqLyn7G1usgwyHPWhddtm8Pw/wqsSFVTET8KaF05/w==
+X-Received: by 2002:a05:620a:4248:b0:75e:b8b2:864d with SMTP id w8-20020a05620a424800b0075eb8b2864dmr9867120qko.69.1687186447099;
+        Mon, 19 Jun 2023 07:54:07 -0700 (PDT)
 Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id f4-20020a05622a114400b003f4ed0ca698sm10958559qty.49.2023.06.19.07.49.59
+        by smtp.gmail.com with ESMTPSA id oo24-20020a05620a531800b0075d4d5617cdsm15506qkn.66.2023.06.19.07.54.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Jun 2023 07:50:00 -0700 (PDT)
-Message-ID: <f0558c33-1435-62cc-32f2-fe0673788531@gmail.com>
-Date: Mon, 19 Jun 2023 07:49:56 -0700
+        Mon, 19 Jun 2023 07:54:06 -0700 (PDT)
+Message-ID: <c4e78f5a-e11a-bc90-bcab-688c79f5bf23@gmail.com>
+Date: Mon, 19 Jun 2023 07:54:03 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,72 +48,93 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.2
-Subject: Re: [PATCH 4/7] wiphy: add [DriverFlags].PowerSaveDisable flag
+Subject: Re: [PATCH 5/7] netdev: disable power save if required
 Content-Language: en-US
 To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <20230615192415.1718516-1-prestwoj@gmail.com>
- <20230615192415.1718516-4-prestwoj@gmail.com>
- <a3621173-3b82-2954-2454-a3039dd985ef@gmail.com>
+ <20230615192415.1718516-5-prestwoj@gmail.com>
+ <8e99b15b-7730-3c25-7811-e1cef6f2d6e4@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <a3621173-3b82-2954-2454-a3039dd985ef@gmail.com>
+In-Reply-To: <8e99b15b-7730-3c25-7811-e1cef6f2d6e4@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 Hi Denis,
 
-On 6/18/23 12:07 PM, Denis Kenzior wrote:
+On 6/18/23 12:11 PM, Denis Kenzior wrote:
 > Hi James,
 > 
 > On 6/15/23 14:24, James Prestwood wrote:
->> Certain drivers do not handle power save very well resulting in
->> missed frames, firmware crashes, or other bad behavior. Its easy
->> enough to disable power save via iw, iwconfig, etc but since IWD
->> removes and creates the interface on startup it blows away any
->> previous power save setting. The setting must be done *after* IWD
->> creates the interface which can be done, but needs to be via some
->> external daemon monitoring IWD's state. For minimal systems,
->> e.g. without NetworkManager, it becomes difficult and annoying to
->> persistently disable power save.
->>
->> For this reason a new driver flag POWER_SAVE_DISABLE is being
->> added. This can then be referenced when creating the interfaces
->> and if set, disable power save.
+>> Disable power save if the wiphy indicates its needed. Do this
+>> before issuing GET_LINK so the netdev doesn't signal its up until
+>> power save is disabled.
 >> ---
->>   src/wiphy.c | 13 +++++++++++++
->>   src/wiphy.h |  1 +
->>   2 files changed, 14 insertions(+)
+>>   src/netdev.c | 80 +++++++++++++++++++++++++++++++++++++++++++---------
+>>   1 file changed, 66 insertions(+), 14 deletions(-)
 >>
 > 
 > <snip>
 > 
->> @@ -723,6 +725,17 @@ bool wiphy_control_port_enabled(struct wiphy *wiphy)
->>       return enabled;
->>   }
->> +bool wiphy_disable_power_save(struct wiphy *wiphy)
-> 
-> I named this wiphy_power_save_disabled to be consistent with 
-> wiphy_control_port_enabled()...
-> 
-> I went ahead and applied this, but I think we have to fix the behavior 
-> of this and wiphy_control_port_enabled().  Namely:
-> 
+>> +static void netdev_disable_ps_cb(struct l_genl_msg *msg, void 
+>> *user_data)
 >> +{
->> +    if (wiphy->driver_flags & POWER_SAVE_DISABLE) {
->> +        l_info("Disabling power save due to driver quirks: %s",
->> +                wiphy_get_driver(wiphy));
+>> +    int err = l_genl_msg_get_error(msg);
+>> +    uint32_t ifindex = L_PTR_TO_UINT(user_data);
+>> +
+>> +    /* Can't do anything about it but inform the user */
+>> +    if (err < 0) {
+>> +        l_error("Failed to disable power save for ifindex %u (%s: %d)",
+>> +                ifindex, strerror(-err), err);
+>> +        return;
+>> +    }
+>> +
+>> +    l_debug("Disabled power save for ifindex %u", ifindex);
+>> +}
+>> +
+>> +static void netdev_disable_ps_destroy(void *user_data)
+>> +{
+>> +    uint32_t ifindex = L_PTR_TO_UINT(user_data);
+>> +
+>> +    netdev_get_link(ifindex);
 > 
-> We shouldn't really use l_info here.  This method is meant more as a 
-> getter and might have other users in the future.  Same case with 
-> wiphy_control_port_enabled(), but that one is a little bit more complex 
-> to fix.
+> So why do we do this in the destroy callback?  What happens if this 
+> operation is canceled (maybe by hot-unplug?)
+> 
+>> +}
+>> +
+> 
+> <snip>
+> 
+>> -    l_free(rtmmsg);
+>> +    if (wiphy_disable_power_save(wiphy)) {
+>> +        /* Wait to issue GET_LINK until PS is disabled */
+>> +        if (netdev_disable_power_save(ifindex))
+> 
+> Should we be saving a command id here so we can cancel this operation in 
+> case of hot-unplug?
 
-Ok I can send a follow up patch. The only use for all these APIs is when 
-creating the netdev so we *should* only see it then but now that we 
-print these flags with wiphy_print_basic_info I'll just remove them 
-entirely.
+Yeah I can do this. My theory for not was if it was a hot-unplug the 
+cb/destroy were never accessing netdev directly, just the ifindex. But 
+an explicit cancel (for getlink too) is better.
 
 > 
-> Patches 4, 6 and 7 applied.
+> Ideally we should switch to using l_genl_family_new per netdev so that 
+> all the outstanding commands are auto-canceled, but this might require 
+> some care.
+
+That would actually be pretty nice, and remove that massive block of 
+cancels.
+
+> 
+>> +            return netdev;
+>> +    }
+>> -    netdev_setup_interface(netdev);
+>> +    netdev_get_link(ifindex);
+> 
+> We should be saving the command id here too, but as a separate fix.
+> 
+>>       return netdev;
+>>   }
 > 
 > Regards,
 > -Denis
