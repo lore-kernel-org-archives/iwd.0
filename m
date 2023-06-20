@@ -1,49 +1,49 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8040C2AB3F
-	for <iwd@lists.linux.dev>; Tue, 20 Jun 2023 17:25:43 +0000 (UTC)
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-3ff32b8e748so2304471cf.1
-        for <iwd@lists.linux.dev>; Tue, 20 Jun 2023 10:25:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C03C2AB53
+	for <iwd@lists.linux.dev>; Tue, 20 Jun 2023 17:25:44 +0000 (UTC)
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-62de5392c7bso33173866d6.2
+        for <iwd@lists.linux.dev>; Tue, 20 Jun 2023 10:25:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687281942; x=1689873942;
+        d=gmail.com; s=20221208; t=1687281943; x=1689873943;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=60shYAOTm0ZbeM2jDyypPAEU/LmdO7p7T11CsEnc3WE=;
-        b=riLU08Hpw+R1XS2aCiNCvwoCior3ic2ATfIS+0rrZcVjbrJIw/GyYiShV8Yeg3141j
-         3qmAPhKsdlte4cD4TJaZboC479iISfPGzW3vDwZo4B7Rpg/50bk8KQb/N2qRM3z6BCQh
-         uTg/sqNoxj7JhBdBc1l11f45szMWbn+EdbENPjD2orxNNQYYEBrOAa5VA5s6vCGAinbv
-         ToNOr9Kq6m6wTmZlDneOCVS1ATHKN90LlbbPivFV2Qnqc1ZsaNs4PgjOZIQD1fKsaYej
-         gtz7C0wDqBLcD0FEjY4EYpAwu3mq7QM7JbRAg3RIehdcxB/blIowhuKjAHs6rl3vtXp0
-         SfaA==
+        bh=VM/IO02ODlTyZhnSNKt9OS43tEFlN4s9sLIQhPn4UMM=;
+        b=jJ19Epx3TG0QWrv2LhQ1oyTi2x29pGt/DZKxG6/o2A/eXcQhMbegmnPTlKJ8Q/f1KN
+         95H3X6abiDbEjW9x6egL6GJZOS/RXihLDZCMxsjq7moO9rRpFUXN/kOO0fjGbPxnEKS/
+         7okUDM/YYj1YV7LklwkD3e3pZ7qjzIFL1gi6MokfYi0oRH6iCynLJZAYorCP+9XZsGKq
+         QRakHoV0m1UZ8/92q9XXDOFeG0tWPur4A2g5Y+fsJD55baDkcRHs3U9DzBbnagYu13jQ
+         nIr7XbOPxwKgzn/XAlx8d3jQcpZvAhENi8+mw8UaNwmkZpvY9HzjLZUXNO4OefZwyqvs
+         jkQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687281942; x=1689873942;
+        d=1e100.net; s=20221208; t=1687281943; x=1689873943;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=60shYAOTm0ZbeM2jDyypPAEU/LmdO7p7T11CsEnc3WE=;
-        b=VtvTK+pzywjkQtLG/p9uyFAfVcQ1JGPdUBkb1q3MUOQ+OPAbQdpeHL09dT7UMS6gJq
-         MxCbj89N0+4rzFkWthLtfUK+3DQAlrianj40cV58xbWek2H4sTZNSTgi46lINjM2Z9cg
-         6R6xNI0ee0O+5AO2j9YX83XE5T9xANEeqerpm7NrdVqIXAnfKTVbEliJtxL8w3UQxXvQ
-         WfZvzC7b6YOqfQ3hf3N/6BmcI2OWVpSMmrCwrjEjrF1B5nHo3U73zDKELMEt3MFqd7Ik
-         LWQRWHnKBSSJQCL+WPZjPnjvtZMZRN1Y3Y9mh/ptbSycD6IHWtoRlHLc3UpSBS/pNCcx
-         Hoog==
-X-Gm-Message-State: AC+VfDx8BuZtIFIb6P/apxBN58piQSBgb3u5HxyB/TgCDj9HcJ4GQz4J
-	3QuAmlsk4T956/RdqxsPbfSuvaVsi/JSxg==
-X-Google-Smtp-Source: ACHHUZ4FCX8GStDg+HJnDxUy5VdhYszIaoZlTwzD2waRjN/OK+eCYFgc48r+70/bkKlEvy2/9aQ7gw==
-X-Received: by 2002:a05:6214:21ec:b0:62f:f276:39fe with SMTP id p12-20020a05621421ec00b0062ff27639femr15839603qvj.15.1687281942157;
-        Tue, 20 Jun 2023 10:25:42 -0700 (PDT)
+        bh=VM/IO02ODlTyZhnSNKt9OS43tEFlN4s9sLIQhPn4UMM=;
+        b=braf2oWyDn687dospLIruCi76mQ/M5X1mRTkcFqqo9l5XWQo2zBhOWNWDpclEqzel5
+         z2dD0XfIKAMAejyPRK4P30FG8ylOT2W1eAcecElkcugSGzDfwhUgcbfyhVq8ASWPr0w1
+         GV4NMNJ/ufkFsyTsLuLFWdKn+lHG+P8LKNNlV4gdMy1ZmRIYR+N+0FKD9V3nZJB0Y/jD
+         yBCV31qqgPAu6mCi3ahzjfuBFSCUrdUnlU9T6LReuERJMDjtYDxzReJR4HVHDEdTDdtU
+         sqmR31ct0YnwJbqqUgyOmvZj6+hfOVrnIfTxyLXZCDwA7fXc9+WsCZ7bBI3zbJTwG/dW
+         ldxg==
+X-Gm-Message-State: AC+VfDxeSIWHRZYbBf4kCQBkjkto5hSfbNKX3n9AnW7Npo4gq1zWjofD
+	zkjrq0m3WIkWWjtgG3tygeuLc04L09D3Aw==
+X-Google-Smtp-Source: ACHHUZ59X+x2V9DX4EZDAH6iHw5TA4g6c0k/s00Cinm0Q32//jDQ4fRg056+LhKfVFDAETc6vFWTHQ==
+X-Received: by 2002:a05:6214:2a8f:b0:630:14e0:9827 with SMTP id jr15-20020a0562142a8f00b0063014e09827mr10004322qvb.28.1687281943236;
+        Tue, 20 Jun 2023 10:25:43 -0700 (PDT)
 Received: from LOCLAP699.rst-01.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id g8-20020a0cf088000000b006261e6a88c7sm1475913qvk.36.2023.06.20.10.25.41
+        by smtp.gmail.com with ESMTPSA id g8-20020a0cf088000000b006261e6a88c7sm1475913qvk.36.2023.06.20.10.25.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jun 2023 10:25:42 -0700 (PDT)
+        Tue, 20 Jun 2023 10:25:43 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/3 v2] handshake: split handshake_state_get_pmkid into separate APIs
-Date: Tue, 20 Jun 2023 10:25:32 -0700
-Message-Id: <20230620172533.727504-3-prestwoj@gmail.com>
+Subject: [PATCH 3/3 v2] handshake: handshake: add FT_OVER_8021X AKM for SHA256 PMKID derivation
+Date: Tue, 20 Jun 2023 10:25:33 -0700
+Message-Id: <20230620172533.727504-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230620172533.727504-1-prestwoj@gmail.com>
 References: <20230620172533.727504-1-prestwoj@gmail.com>
@@ -55,136 +55,71 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The PMKID derivation has gotten messy due to the spec
-updating/clarifying the hash size for the FT-8021X AKM. This
-has led to hostapd updating the derivation which leaves older
-hostapd versions using SHA1 and newer versions using SHA256.
+Hostapd commit b6d3fd05e3 changed the PMKID derivation in accordance
+with 802.11-2020 which then breaks PMKID validation in IWD. This
+breaks the FT-8021x AKM in IWD if the AP uses this hostapd version
+since the PMKID doesn't validate during EAPoL.
 
-To support this the checksum type is being fed to
-handshake_state_get_pmkid so the caller can decide what sha to
-use. In addition handshake_state_pmkid_matches is being added
-which uses get_pmkid() but handles sorting out the hash type
-automatically.
-
-This lets preauthentication use handshake_state_get_pmkid where
-there is the potential that a new PMKID is derived and eapol
-can use handshake_state_pmkid_matches which only derives the
-PMKID to compare against the peers.
+This updates the PMKID derivation to use the correct SHA hash for
+this AKM, and following patches will address backwards compatibility
+with older hostapd versions.
 ---
- src/eapol.c     |  7 +------
- src/handshake.c | 26 +++++++++++++++-----------
- src/handshake.h |  6 ++++--
- src/station.c   | 10 +++++++++-
- 4 files changed, 29 insertions(+), 20 deletions(-)
+ src/handshake.c | 34 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index f290f40a..6fb2f306 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -1234,12 +1234,7 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *sm,
- 		if (!found)
- 			goto error_unspecified;
- 	} else if (pmkid) {
--		uint8_t own_pmkid[16];
--
--		if (!handshake_state_get_pmkid(sm->handshake, own_pmkid))
--			goto error_unspecified;
--
--		if (l_secure_memcmp(pmkid, own_pmkid, 16)) {
-+		if (!handshake_state_pmkid_matches(sm->handshake, pmkid)) {
- 			l_debug("Authenticator sent a PMKID that didn't match");
- 
- 			/*
 diff --git a/src/handshake.c b/src/handshake.c
-index ac5bda51..46755841 100644
+index 46755841..6b93774a 100644
 --- a/src/handshake.c
 +++ b/src/handshake.c
-@@ -734,10 +734,9 @@ void handshake_state_set_pmkid(struct handshake_state *s, const uint8_t *pmkid)
- 	s->have_pmkid = true;
- }
+@@ -756,8 +756,26 @@ bool handshake_state_pmkid_matches(struct handshake_state *s,
+ 	uint8_t own_pmkid[16];
+ 	enum l_checksum_type sha;
  
--bool handshake_state_get_pmkid(struct handshake_state *s, uint8_t *out_pmkid)
-+bool handshake_state_get_pmkid(struct handshake_state *s, uint8_t *out_pmkid,
-+				enum l_checksum_type sha)
- {
--	enum l_checksum_type sha;
--
- 	/* SAE exports pmkid */
- 	if (s->have_pmkid) {
- 		memcpy(out_pmkid, s->pmkid, 16);
-@@ -747,13 +746,15 @@ bool handshake_state_get_pmkid(struct handshake_state *s, uint8_t *out_pmkid)
- 	if (!s->have_pmk)
- 		return false;
- 
--	/*
--	 * Note 802.11 section 11.6.1.3:
--	 * "When the PMKID is calculated for the PMKSA as part of RSN
--	 * preauthentication, the AKM has not yet been negotiated. In this
--	 * case, the HMAC-SHA1-128 based derivation is used for the PMKID
--	 * calculation."
--	 */
-+	return crypto_derive_pmkid(s->pmk, 32, s->spa, s->aa, out_pmkid,
-+					sha);
-+}
-+
-+bool handshake_state_pmkid_matches(struct handshake_state *s,
-+					const uint8_t *check)
-+{
-+	uint8_t own_pmkid[16];
-+	enum l_checksum_type sha;
- 
++	/*
++	 * 802.11-2020 Table 9-151 defines the hashing algorithm to use
++	 * for various AKM's. Note some AKMs are omitted here because they
++	 * export the PMKID individually (SAE/FILS/FT-PSK)
++	 *
++	 * SHA1:
++	 * 	00-0F-AC:1 (8021X)
++	 * 	00-0F-AC:2 (PSK)
++	 *
++	 * SHA256:
++	 * 	00-0F-AC:3 (FT-8021X)
++	 * 	00-0F-AC:5 (8021X-SHA256)
++	 * 	00-0F-AC:6 (PSK-SHA256)
++	 *
++	 * SHA384:
++	 * 	00-0F-AC:13 (FT-8021X-SHA384)
++	 */
  	if (s->akm_suite & (IE_RSN_AKM_SUITE_8021X_SHA256 |
- 			IE_RSN_AKM_SUITE_PSK_SHA256))
-@@ -761,7 +762,10 @@ bool handshake_state_get_pmkid(struct handshake_state *s, uint8_t *out_pmkid)
+-			IE_RSN_AKM_SUITE_PSK_SHA256))
++			IE_RSN_AKM_SUITE_PSK_SHA256 |
++			IE_RSN_AKM_SUITE_FT_OVER_8021X))
+ 		sha = L_CHECKSUM_SHA256;
  	else
  		sha = L_CHECKSUM_SHA1;
+@@ -765,7 +783,19 @@ bool handshake_state_pmkid_matches(struct handshake_state *s,
+ 	if (!handshake_state_get_pmkid(s, own_pmkid, sha))
+ 		return false;
  
--	return crypto_derive_pmkid(s->pmk, 32, s->spa, s->aa, out_pmkid, sha);
-+	if (!handshake_state_get_pmkid(s, own_pmkid, sha))
-+		return false;
+-	return l_secure_memcmp(own_pmkid, check, 16) == 0;
++	if (l_secure_memcmp(own_pmkid, check, 16)) {
++		if (s->akm_suite != IE_RSN_AKM_SUITE_FT_OVER_8021X)
++			return false;
 +
-+	return l_secure_memcmp(own_pmkid, check, 16) == 0;
++		l_debug("PMKID did not match, trying SHA1 derivation");
++
++		if (!handshake_state_get_pmkid(s, own_pmkid, L_CHECKSUM_SHA1))
++			return false;
++
++		return l_secure_memcmp(own_pmkid, check, 16) == 0;
++	}
++
++	return true;
  }
  
  void handshake_state_set_gtk(struct handshake_state *s, const uint8_t *key,
-diff --git a/src/handshake.h b/src/handshake.h
-index 863ffac7..7200c361 100644
---- a/src/handshake.h
-+++ b/src/handshake.h
-@@ -269,8 +269,10 @@ void handshake_state_install_igtk(struct handshake_state *s,
- void handshake_state_override_pairwise_cipher(struct handshake_state *s,
- 					enum ie_rsn_cipher_suite pairwise);
- 
--bool handshake_state_get_pmkid(struct handshake_state *s, uint8_t *out_pmkid);
--
-+bool handshake_state_get_pmkid(struct handshake_state *s, uint8_t *out_pmkid,
-+				enum l_checksum_type sha);
-+bool handshake_state_pmkid_matches(struct handshake_state *s,
-+					const uint8_t *check);
- bool handshake_decode_fte_key(struct handshake_state *s, const uint8_t *wrapped,
- 				size_t key_len, uint8_t *key_out);
- 
-diff --git a/src/station.c b/src/station.c
-index f830ab7a..2473de2a 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2236,7 +2236,15 @@ static void station_preauthenticate_cb(struct netdev *netdev,
- 					new_hs->supplicant_ie[1] + 2,
- 					&rsn_info);
- 
--		handshake_state_get_pmkid(new_hs, pmkid);
-+		/*
-+		 * IEEE 802.11 Section 12.7.1.3:
-+		 *
-+		 * "When the PMKID is calculated for the PMKSA as part of
-+		 * preauthentication, the AKM has not yet been negotiated.
-+		 * In this case, the HMAC-SHA-1 based derivation is used for
-+		 * the PMKID calculation."
-+		 */
-+		handshake_state_get_pmkid(new_hs, pmkid, L_CHECKSUM_SHA1);
- 
- 		rsn_info.num_pmkids = 1;
- 		rsn_info.pmkids = pmkid;
 -- 
 2.25.1
 
