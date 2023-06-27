@@ -1,45 +1,45 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3392C12B66
-	for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 14:29:46 +0000 (UTC)
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-635dbfa710dso19198446d6.0
-        for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 07:29:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D99C19501
+	for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 14:30:43 +0000 (UTC)
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-76714d3c3a7so30706885a.3
+        for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 07:30:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687876186; x=1690468186;
+        d=gmail.com; s=20221208; t=1687876242; x=1690468242;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=3AJ+GoYxigCqJBnSSdFX7cNLKwQxkPbj3yTJ4pdDrB4=;
-        b=j76fAhVgat5X8Nn01pm8KhbwihcwFGtwSFAoduoIYCf6CDcZkl9T/KEM0wK/SIxTdo
-         s3Rk+bsjsoJPl/f8hSApJEXZesZ7jfVhLxRaLS2qf4RKoYWtSew7akd4h8KZB8eVIs1E
-         5Nwcrw8iz6L5Nr9T63qBg7xAqFVNrHoROloE0DeIg/y2d+3bsWOIrkC3ViN76dYtFrmP
-         Knytae+3fJ0E7hLfTMyRPKRkfur/La2DKTDmUWNij1oYZq2pyTqBTvJhStX2GADA/8oh
-         ODKLf6IpGQnIF4hrwbYg+J8n+BuLkl1KApSZShR+373joFmRN/wTrCsuYev2tYZhMeuV
-         ZoDw==
+        bh=YRQQN3GA761LNfTEh2mcLS5SCrklG3auH/svqioHPxo=;
+        b=oesWwEWBEJPvr5ZMsSHI7Eu+oqQkb8dvemPwz6BCZMZ7J3HFJPxsJ8h+EHw6H38f7R
+         SCABQ5s575TdwLgrri0+YKTQ7Cm/wS4TXITaW4TrvJfaHxcz5gipkYC0cuVjLN+DOJ/v
+         83xgAR7/4dk9fE3qRPTKVqF7EjwAB/2hvIY+ns5OqpfIq7rs4pvoOVJLJp6WmM3QBXhX
+         RmJoY7M4C69+NV33SCbTPzfFteGMAabZx5C+TTz6ZO3EWYlN7B1qUSteiQ9JWP9TfrKy
+         zEAEOHsMCSxlEsFP33Wr8kcKcDJWG+oOkoDHL9i/boB+nGmq8vH4IEJoUiPoLS4MW6vq
+         56yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687876186; x=1690468186;
+        d=1e100.net; s=20221208; t=1687876242; x=1690468242;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3AJ+GoYxigCqJBnSSdFX7cNLKwQxkPbj3yTJ4pdDrB4=;
-        b=jzYJGQgYXgrCGrI2Y0w25YoSaSCXsBQbKkTABZq0gjEeGOUHarihBNu5A1PdZ6pwhm
-         69JQbOw1jeqOxvJ91K9FRVSYLxleWb0DMbCLr5JYVjtzauunTivIhdDZaljttP5rknRa
-         82q60Bva/0cWSKuUaL1XF1kDj2dXavbIFR4y+AQ9/hPmdmPJJzhJpMOfiynOLSgaQxQp
-         alY+/E2KaOUrurctSSBivQMdBM6fAicCNzWL5dzDEIwq9PdOa8bj17Dq2c8SksOFsW8X
-         PEnv3ZsXeXOvEeyLaHTau/fNLG+L3BlZUMaErxxfhDUspCfgRj+9dYWbbq6ThW9hflIA
-         uOcA==
-X-Gm-Message-State: AC+VfDzeh2X/1Yc/o8rD5zjsNJ8HnffoyjFtnTPH8a5wa/5pE2u/ymVH
-	J/9pyDKbnrtY5bH4IKQlPZbcAUum5mY=
-X-Google-Smtp-Source: ACHHUZ6phWbShc646dCvVi/Q0mv2MUdnVUdErWx/e1IUAH8eAYV/LvMG0EAhiaw6U78BSx3t6EP/Aw==
-X-Received: by 2002:ad4:5761:0:b0:62f:ff00:f8fa with SMTP id r1-20020ad45761000000b0062fff00f8famr44529144qvx.63.1687876185769;
-        Tue, 27 Jun 2023 07:29:45 -0700 (PDT)
+        bh=YRQQN3GA761LNfTEh2mcLS5SCrklG3auH/svqioHPxo=;
+        b=bfPLdkVIKwmzUHQQbAcMcEZwrbpK/ElJzTqG9073/9YIiCbqu5yLey4WWkE0+eWQcH
+         0wWEsZjpbbQ/xcpQ4LjjdcYCQxOngde1G458P0FEy+ewtgr11DNxgazDXOVnWPZ3IOzF
+         mkIz9xfVLpWhLOs9VQBGRF+c89nvjvM0CXQppIY+iGwN4+BWWqqu/ICyyx213cSHo6FW
+         fos6WHY3C/urymjn4Q9Fe0y3MoDuyz5DDqawuDfWAL0wdMHul/6qisPFivGE3+z9syER
+         v3VlOvKj7PiRl9xFzCBkboQ8xKNlmqtndMsgLY6PnOzZWG8rGoPSs/Myjit86Sd/oHcF
+         FCZQ==
+X-Gm-Message-State: AC+VfDyStFPWG08k1hKLEC0SU6SnqiCLgiG9lUVGKryvoII2ITLTcQ/x
+	7BVjT+QdEqmeO6x9omL/TC0=
+X-Google-Smtp-Source: ACHHUZ5wHxgu3hypmfjQ7iQpdoCfbVwS9FlXiG7DMfDMkz4qEWs8a+6Jw9oWjJ2KVviPJQJUAkLnZw==
+X-Received: by 2002:a37:ab1a:0:b0:765:48af:ded5 with SMTP id u26-20020a37ab1a000000b0076548afded5mr12906140qke.11.1687876242190;
+        Tue, 27 Jun 2023 07:30:42 -0700 (PDT)
 Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id ev14-20020a0562140a8e00b006301ec0d178sm4608612qvb.5.2023.06.27.07.29.44
+        by smtp.gmail.com with ESMTPSA id r15-20020a05620a03cf00b0074e0951c7e7sm4020200qkm.28.2023.06.27.07.30.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jun 2023 07:29:45 -0700 (PDT)
-Message-ID: <c341680a-01b6-cd2a-1826-ba868a02d4f3@gmail.com>
-Date: Tue, 27 Jun 2023 07:29:42 -0700
+        Tue, 27 Jun 2023 07:30:41 -0700 (PDT)
+Message-ID: <363127fe-f545-b09a-07ab-ce1334cf99b2@gmail.com>
+Date: Tue, 27 Jun 2023 07:30:38 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,87 +48,37 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.2
-Subject: Re: iwd forgets network
+Subject: Re: [PATCH 0/3 v2] PMKID changes
 Content-Language: en-US
-To: Martin Petzold <martin.petzold@tavla.de>, iwd@lists.linux.dev
-References: <7794c62a-56d2-d34a-06e9-0b17edb235f7@tavla.de>
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20230620172533.727504-1-prestwoj@gmail.com>
+ <061334b2-e4eb-dcf2-275d-fc604909c9cf@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <7794c62a-56d2-d34a-06e9-0b17edb235f7@tavla.de>
+In-Reply-To: <061334b2-e4eb-dcf2-275d-fc604909c9cf@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Martin,
+On 6/26/23 7:59 PM, Denis Kenzior wrote:
+> Hi James,
+> 
+> On 6/20/23 12:25, James Prestwood wrote:
+>> v2:
+>>   * Pass checksum type to handshake_state_get_pmkid
+>>   * Added back in comments regarding AKMs and SHA sizes
+>>   * Moved comment regarding preath/SHA1 into station.c
+>>     where SHA1 is passed directly
+>>   * The older discussion from past patchsets about preauthentication
+>>     was mostly left out as it pertains to when you choose preauth
+>>     as opposed to the SHA sizes that this patchset is about.
+>>
+> 
+> All applied.  I changed the wording of patch 3 description slightly 
+> since it referred to forthcoming patches that I assume are no longer 
+> needed.  Please make sure you're fine with the verbiage.
 
-On 6/27/23 12:58 AM, Martin Petzold wrote:
-> Hi,
-> 
-> I have a critical issue with iwd and kindly ask for feedback.
-> 
-> We have an embedded device (no desktop) running Debian bullseye with 
-> custom 5.10.52 kernel (NXP patches; own configuration).
-> 
-> We are using iwd 1.27-1~bpo11+1 from bullseye backports together with 
-> systemd from bullseye main.
-> 
-> We use a bind mount to move the iwd state to a separate partition, 
-> because we do rootfs upgrades and want to keep the state.
-> 
-> Yesterday and also once before our platform forgot a network (the *.psk 
-> file was gone). We did not call any command for this. As far as we can 
-> re-call we did not reboot the platform. Some time before this issue, we 
-> pulled the power of our router and the network was of course gone - back 
-> a few minutes later. I have no idea if this could be related or just 
-> co-incidence.
-
-The only way IWD removes a network profile is via "Forget()". You could 
-add a debug print inside src/storage.c:storage_network_remove() if you 
-were suspicious but I highly doubt that has anything to do with it.
-
-I would guess it more has something to do with the bind mount. Are you 
-sure nothing touched /system/var/lib/iwd ?
+Yep, LGTM
 
 > 
-> Here are our configuration files:
-> 
-> ########## /etc/systemd/network/20-wlan0.network
-> 
-> [Match]
-> Name=wlan0
-> 
-> [Network]
-> DHCP=yes
-> 
-> IgnoreCarrierLoss=3s
-> 
-> [DHCPv4]
-> RouteMetric=20
-> 
-> ########## /etc/iwd/main.conf
-> 
-> [General]
-> UseDefaultInterface=true
-> 
-> [Network]
-> NameResolvingService=systemd
-> 
-> ########## /usr/lib/systemd/system/var-lib-iwd.mount
-> 
-> [Unit]
-> Description=Mount IWD state
-> 
-> [Mount]
-> What=/system/var/lib/iwd
-> Where=/var/lib/iwd
-> Type=none
-> Options=bind
-> 
-> [Install]
-> WantedBy=local-fs.target
-> 
-> ##########
-> 
-> Thanks,
-> 
-> Martin
-> 
+> Regards,
+> -Denis
 > 
