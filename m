@@ -1,45 +1,45 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD26D1308A
-	for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 18:02:12 +0000 (UTC)
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6b74791c948so2449037a34.3
-        for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 11:02:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651001308A
+	for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 18:08:39 +0000 (UTC)
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-39e9d1bf835so3587226b6e.2
+        for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 11:08:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687888931; x=1690480931;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OLLsthZZvvtF0GUcRUtyY4NVCHUNENf5q4JQ48ko9Xc=;
-        b=LdrqpvI/ml8QXiibVjdMI5gOQvlR34tqn3oXpTHb3Xdsg1iDA/oQ+ZaiIr6HJnkx67
-         zvKSEZ795J3UrfzLFYB/vVPK/J8DOEzf67xHab5byS9lHDHB6a298u6lKEteI4uzf846
-         Ss2lNi3p8Y6xpm9de+DQ2AgMH5TNmJxDtWMFFrBNU0DYWcVLfuBTupd8qFrjaAsjo28p
-         umgm0F7iR49kRZOtROpldt4nw0rk9kA54s0WrGNbcfNjK3s1QrgCLfdrw3FkTYjQVuDC
-         mOkpmLbS1toszynLQDtiFdr1/y00uR+dDpTJvBLZjDrjusxlZPrgB18jSE5ibVoirBuV
-         sxCw==
+        d=gmail.com; s=20221208; t=1687889318; x=1690481318;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dQWV7Fvk9HK6KMnDMtcFHmc55E+EPm+NtgAIRUga3kg=;
+        b=sCnHAuM0n4Ceebguh28FERzP9SZH2JUlEC15Y97zpLumZq57G0wyPyuKt8ftUTmhR6
+         Zvo40EL6tV6SmesSIZwFVOtNsHwuorutcwfX63UIXKOYKVzuy0DNCByr5wbVfwGx3Get
+         Z8LeVrQsEKuQ70qWELzVxMwcTLcjLHLuRuojEqJ5i0u4b+X5anW2siSQuRpfVybhYohO
+         7jFlG6lgdO51ShWGhd6q3y5nKrMI+ycNNPdtL2h9C8h6oCAidPWUPIDAJvN8dWky0FiZ
+         69qzrVrQiYIL8Pj9U9y9FjYJGWXVlpS2Uyv71U2XMTONu3zxa5oMJNhCKlr7bCUQQ3Pk
+         EG5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687888931; x=1690480931;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1687889318; x=1690481318;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OLLsthZZvvtF0GUcRUtyY4NVCHUNENf5q4JQ48ko9Xc=;
-        b=XO2sYSX7ED6oQ9kvHuNYi4GaKorO7eICWq+3NrIzVrzq7/MmM5xg6ZU+/ZiRc30o/2
-         Z9GDMB2Tv3DVc2mAzpE/nUPSW8FzI0QqPxaSEd5XNt3z6FYJUvRfhusgAmdSgDhPkV0h
-         3ymY8Q0qZfyeyUQCyv9k33cmmdUtNgqHbjhM+7seyS0sipaW9V0Vz6NFL6u8gabZEsj0
-         qbFn11M0E79ONZG4M9C3kS/B1ULw/1JMacTG8OOggXQ9bm3OYmGCaEZ858RP/Uj6Zr+9
-         XxeLZnw8Frur7Fl8r4w73gmWWX8hZU+BjgPbyBsTYagf1qFSvYcIhEX2r9TVeCizlDf2
-         a+Ow==
-X-Gm-Message-State: AC+VfDzlPKkC7HFdLj+1wNPS6wb0uDkDkRm7A5vnp2XOhqmAYBxcJnr7
-	vidkmxadh8RQupiAIAUA5MhNJXx419k=
-X-Google-Smtp-Source: ACHHUZ54Ns2tlJ/pm/E0XEzXiHqChvPygwtGCM0a3Wq6esMpPf3jjP2BX3knf0dsJJbd1hWlP476Zg==
-X-Received: by 2002:a9d:7847:0:b0:6b6:ad29:7ac3 with SMTP id c7-20020a9d7847000000b006b6ad297ac3mr16305052otm.11.1687888931493;
-        Tue, 27 Jun 2023 11:02:11 -0700 (PDT)
+        bh=dQWV7Fvk9HK6KMnDMtcFHmc55E+EPm+NtgAIRUga3kg=;
+        b=eevgmyFOQJCmnMVtxV2PpPYfoapIalo3lX8CkXHqwrah2wjSgFJxVk2hERy3HCGVBm
+         xAvBFFQOP+qSVOK0qkFEDcZVZDn7GZbkQSnfXM/SFQ60QZLyYGXj8ycxrdjLAsF1GedA
+         yep0Se7EY77kkX0BACpfUBptWPtTc+o9YK4sxAVzI1WvWhRAdsJGX0+mlcAVExtuR3u2
+         Wt7uzHy4HZPIckoUbqrkigP3kEGNAKN5yuu/w+tFeOvoaGQJJhxMXcVkha0/C2cxeBYK
+         BThOwGWqvb3ddXcaWjLz1PXOnb7ndLnvERl+UVyWTaGKngXq8RXJRe0cgqesPWWI1ge+
+         anSA==
+X-Gm-Message-State: AC+VfDwqdYDdATol/k+SGo/3IRR2sZU+oqcP0TAS+w48xlOfF41Dd1aA
+	Gpcp9EMI0HrxbFLsjbFU+ewN2h1qwEQ=
+X-Google-Smtp-Source: ACHHUZ5nJlceT8ehZrfNxMmE08PVJCbt18del4Gg6/TXFPefNJpXadDSo3F/hfOzVDhDJmOmgUkknQ==
+X-Received: by 2002:a05:6808:2795:b0:39c:cd8b:61f5 with SMTP id es21-20020a056808279500b0039ccd8b61f5mr26036491oib.13.1687889318189;
+        Tue, 27 Jun 2023 11:08:38 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id v5-20020a05683011c500b006b867fa10eesm987274otq.74.2023.06.27.11.02.10
+        by smtp.googlemail.com with ESMTPSA id t18-20020a056808159200b003a1e7d8f38bsm1867179oiw.27.2023.06.27.11.08.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jun 2023 11:02:10 -0700 (PDT)
-Message-ID: <280831cf-933a-95b0-3889-ddca6ca544cc@gmail.com>
-Date: Tue, 27 Jun 2023 13:00:21 -0500
+        Tue, 27 Jun 2023 11:08:37 -0700 (PDT)
+Message-ID: <71f99f9f-03d7-cd08-6209-bfd12b84f137@gmail.com>
+Date: Tue, 27 Jun 2023 13:04:38 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,69 +48,31 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH 1/3] hwsim: remove 'optimization' sending to only known
- MACs
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20230504215247.581443-1-prestwoj@gmail.com>
- <54ae38d6-cc94-9410-8121-44ece399b24c@gmail.com>
- <39610c47-eaba-2299-9b03-5217355e8d47@gmail.com>
- <88f638ea-bb37-c417-3b1c-1d7151506911@gmail.com>
- <7fdc5d67-e740-d593-253b-564bdf92048f@gmail.com>
- <d2d0841b-62a0-c8df-924f-851df5f88203@gmail.com>
- <865cf0a3-1be4-34cb-0535-e76cf43d6753@gmail.com>
- <63162827-5b8b-3c70-7f6f-fc7b513f2b6d@gmail.com>
- <1742c6eb-bbd5-7883-5a72-53021a771ca6@gmail.com>
- <3790483a-442f-9602-03c9-b205376d9262@gmail.com>
+Subject: Re: iwd forgets network
 Content-Language: en-US
+To: James Tavares <jtavares@kvh.com>, Martin Petzold
+ <martin.petzold@tavla.de>, "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+References: <7794c62a-56d2-d34a-06e9-0b17edb235f7@tavla.de>
+ <61D86659-745B-4228-AC0D-216E5CA292D2@kvh.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <3790483a-442f-9602-03c9-b205376d9262@gmail.com>
+In-Reply-To: <61D86659-745B-4228-AC0D-216E5CA292D2@kvh.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 Hi James,
 
->> You can try to see whether HWSIM_CMD_ADD_MAC_ADDR works?  See commit 
->> 5cc58a9ecfa1 ("mac80211_hwsim: notify wmediumd of used MAC addresses")
-> 
-> I hadn't seen that before, but looking at it they don't expose that as an API, 
-> its only for internal use for scan address randomization and monitor interfaces 
-> (see mac80211_hwsim_config_mac_nl()).
-> 
+No top posting please :)
 
-It is used as an unsolicited event / notification.  Yeah I know, HWSIM_CMD_* 
-prefix is confusing ;)
+On 6/27/23 10:29, James Tavares wrote:
+> You mentioned a possible power loss in your testing. If iwd is not performing an fsync() after joining the network and writing the SSID configuration file, then there is a small window of time (between when the file is written and when the filesystem is next synced) when the file can easily go missing if power is lost.
 
-It looks like we should start using this since most of our autotests are forced 
-to include the following main.conf:
+That is a good point.  iwd inherited its filesystem utilities from oFono and at 
+the time ext3 was the favored filesystem.  The use of fsync was deemed 
+unnecessary at that time.  open/write/close/rename sequence was deemed to be 
+sufficient if I recall correctly.  It may be that this is no longer the case, at 
+least for the filesystem being used here.
 
-[Scan]
-DisableMacAddressRandomization=true
-
-Having support for the above event would allow us to get rid of this hack.
-
-<snip>
-
->>
->> Hmm, but radios are namespace independent.  They can only be added/removed via 
->> HWSIM_CMD_ADD/DEL_RADIO, no?  Since phys are moved wholesale across namespaces 
->> (you can't only move a given interface), you could assume that once a radio is 
->> created and populated, its interfaces do not change for the duration of the 
->> test, even if they're moved to a different namespace.
-> 
-> For testing yes this is probably fine. It may require some adaptation in hwsim 
-> to do it better from a test-runner perspective. Currently we just use ip to 
-> create/delete namespaces and move radios. It may make more sense to add this to 
-> hwsim so there is one path. Then at least when hwsim gets a DEL_WIPHY event it 
-
-It shouldn't matter really who invokes the namespace move.  hwsim would know 
-whether it is a hot-unplug or a namespace move by virtue of being the one who 
-triggers HWSIM_CMD_DEL_RADIO.
-
-> doesn't have to assume the radio was moved (I'm thinking if we ever added 
-> hotplug tests this could be important).
-
-We should add these, but the above still stands.  hwsim is the only thing in our 
-tests that triggers HWSIM_CMD_ADD_RADIO.
+If anyone knows what the current state of the art is, please let us know.
 
 Regards,
 -Denis
