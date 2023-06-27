@@ -1,194 +1,132 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-145.mimecast.com (us-smtp-delivery-145.mimecast.com [170.10.129.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0FB19501
-	for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 15:20:39 +0000 (UTC)
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-666683eb028so2376953b3a.0
-        for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 08:20:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687879239; x=1690471239;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YEGRkLvlt2iX551NsNL6IS8n94lBwwtrR+pGbZBe0rI=;
-        b=shZ7mpZ+Cgv6n4Nu/yc4RKWjA9lkDih2As4brkcPiey0/Gj8vmO30rXKT4GLT5omuT
-         C+k6GvWMl/iFrcoJxOFSeYh5e+PNHMIWfoqKNtpJ8W8UzvHwFBTlz+Z3yONyB2/LAiLV
-         9VRN4YbRwvuByUIFtd3JT3Qi/83KGrSMIDa/KSPtSC6AdrjAX9crruyoJpaMz3GtNKMj
-         sz9DL/cmHaUgc65AmMXjYj55Cg1xVtkuPVtvWIBMv1TJAFgBo12yVXGDlp2Z8USrpJSx
-         sd0sDUh4wAdn+sOcX4RgP0QZBi8jzo1NkwpU3qer7Janrogl5+2Cc96VdU9b8aNCdcdm
-         Zd2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687879239; x=1690471239;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YEGRkLvlt2iX551NsNL6IS8n94lBwwtrR+pGbZBe0rI=;
-        b=h6AxCMjUI3b7nNVgt+LIlMtgVKKYrJIaiOc5kMVcugnpvgraMimV1LckyjyDDZZju8
-         N/abn9+lhuBRvFXrVm8DBW+ZD8H6bIEyJSFfe/QfljdpxlWvax+4k7MJexSryqQ4C3lp
-         JXWvzDZcrLOAHRRVDimTpY09eN8Qh6QzVi7eQPQc2AhcQwAqf7a5c0ba71YgeQUh9Hk4
-         rGbBNQ30+fTfXPsvwJmW5WhWmxsfFVNk5kaoi2THNml4uqm95xRr/DIbQ1Zh31naHvqh
-         /mw372Xmx2oWBN7kSO0RG4gAqZtozb3hi5nrUDRmj8vDcVdkhoQ442qDkVdx7lOd6tGN
-         xqcw==
-X-Gm-Message-State: AC+VfDwhlEUqahqXa/MT4zmPeQRrpCAqS0mR/pUvaIg5q5LwVlIvJ/ko
-	CVQzWNJmU4i9kH4loecWSAA=
-X-Google-Smtp-Source: ACHHUZ6luxGmSF6j+M/mspfroiOoQXIu7kmHcG38MU/pXuoSY+eGOBh78uMsGP0sHBJmj36dmAEATA==
-X-Received: by 2002:a17:903:1205:b0:1b1:9d43:ad4c with SMTP id l5-20020a170903120500b001b19d43ad4cmr7944301plh.40.1687879238766;
-        Tue, 27 Jun 2023 08:20:38 -0700 (PDT)
-Received: from [192.168.254.84] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id o23-20020a170902779700b001b6740207d2sm721378pll.215.2023.06.27.08.20.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jun 2023 08:20:38 -0700 (PDT)
-Message-ID: <c89da10b-da9e-3503-05a4-299030ff5489@gmail.com>
-Date: Tue, 27 Jun 2023 08:20:37 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C79D16417
+	for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 15:30:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kvh.com; s=mimecast20180413;
+	t=1687879805;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JV+Fu7rexpGJ6Zr4bop9RD8J8WVp4eozFZaDKuk8OUc=;
+	b=fZk9+ZVe/b+Jwr+CjfYr2XcslyiSgGvrUwMOusnKA8EDOV1PZjjs29YibfMCoD3iSbe63Y
+	0XqMFziYZNTSVn3ZPxZlGxLGMNG5CJ64eohjXbvj61xHhuwddHR1fQV1DQgS4UJhqALFWy
+	x36I8PDi6EQLHyP6Im71sU6aFkkPjQg=
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com
+ (mail-bn7nam10lp2102.outbound.protection.outlook.com [104.47.70.102]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-321-DhhuTlOfMQWUu6TQlyEcrQ-1; Tue, 27 Jun 2023 11:29:43 -0400
+X-MC-Unique: DhhuTlOfMQWUu6TQlyEcrQ-1
+Received: from MN2PR07MB7167.namprd07.prod.outlook.com (2603:10b6:208:1a6::10)
+ by CH2PR07MB8186.namprd07.prod.outlook.com (2603:10b6:610:34::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Tue, 27 Jun
+ 2023 15:29:33 +0000
+Received: from MN2PR07MB7167.namprd07.prod.outlook.com
+ ([fe80::90b7:d2fe:d63b:f516]) by MN2PR07MB7167.namprd07.prod.outlook.com
+ ([fe80::90b7:d2fe:d63b:f516%7]) with mapi id 15.20.6521.024; Tue, 27 Jun 2023
+ 15:29:33 +0000
+From: James Tavares <jtavares@kvh.com>
+To: Martin Petzold <martin.petzold@tavla.de>, "iwd@lists.linux.dev"
+	<iwd@lists.linux.dev>
+Subject: Re: iwd forgets network
+Thread-Topic: iwd forgets network
+Thread-Index: AQHZqM5qeqGH4Ke8GkK+Sl/fa4SaYa+eg6wA
+Date: Tue, 27 Jun 2023 15:29:33 +0000
+Message-ID: <61D86659-745B-4228-AC0D-216E5CA292D2@kvh.com>
+References: <7794c62a-56d2-d34a-06e9-0b17edb235f7@tavla.de>
+In-Reply-To: <7794c62a-56d2-d34a-06e9-0b17edb235f7@tavla.de>
+Accept-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Microsoft-MacOutlook/16.72.23041401
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN2PR07MB7167:EE_|CH2PR07MB8186:EE_
+x-ms-office365-filtering-correlation-id: 4356497c-4273-4da5-2675-08db77234ed4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0
+x-microsoft-antispam-message-info: UsasdhctctJna9oySGStg8P/LtLQFWmtTWiY/X4AuxnwD2uNztrTr3k+MKgWc4qPMCLpT31DgaJ4gHEY5XYnJY9u9/GhooP8Eq8LkCW04VXi+/oYoKHQCbRewwuAodjESuCmf7js2OeYLBAfO5HcYkn1UiLFxOd95A0q+duCdQjFtlsDCdC79ck+Q3RoBJk66r42bCCLj3RopbMA+mcmd6OcS8dYrw1f4bTGPYSDNpHSKarfl94U+eNKChpPo/3kalkogu7QAW8egozWRTB8nC0psSAvET0dK8UavqkC46BEeUJnIM4JkL0XpJOAvFB4IOAJHb2h+uVTyOCxIh8z390OwGDr3DEO6ZT6hdvatErxq5EXzmp0dw6oNIrxQHab8xQf79960vUqrUkPNRWshQlUPgIeVvGbujDre4P36du5PKunmAjjQr0Dcu2RdrrLlcs4sNMIJZXnimerivd5V3eDMLPUnzbvOvAccCCvX3rvvBIzlLHTl4+JdOOIHP/a1bSH7/sO0YL4F8SGzGgFRti/m//9T3/JnzbrquE5UBIeLaQHCRHL71XHHucTfHRNMdNXIk1s8oIIDjxxrilduQwvmmZsQjSrJ+Jpx6s9Ps5QkSGJjHTZQMgvCacE+gqzk4R3WBk62MhCB4Ot4UfJ4Q==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR07MB7167.namprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39850400004)(376002)(346002)(136003)(396003)(366004)(451199021)(8676002)(64756008)(66446008)(66476007)(66556008)(66946007)(76116006)(8936002)(316002)(41300700001)(6512007)(6506007)(186003)(26005)(4744005)(110136005)(478600001)(6486002)(2616005)(71200400001)(7116003)(5660300002)(2906002)(38070700005)(122000001)(38100700002)(33656002)(36756003)(3480700007)(86362001)(66574015)(45980500001);DIR:OUT;SFP:1101
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Y1JZTjZUcU1wNWtvd3RYWGk4U3BEK0dUMzFFWDcyR3FOTTE0T3lscG1vOC9P?=
+ =?utf-8?B?QWlmZEd4b3M5NFJsZEZrRjZ1VE9YVTZBZjZwNVN3dUZwT2F5SmNMMHRKNEFT?=
+ =?utf-8?B?VURQSks5YVBuT3NsOXhMY1pya2IzSG56cDdVVmcvRUhxNndxa05VYytMVUg4?=
+ =?utf-8?B?QVVER1h4QmEwNkNwS3dVUGt6T3hDcCtiOEltMUlPcExsSTFqNUViQytEM1Z3?=
+ =?utf-8?B?RXIwZ0V0TXowMlZPRHQ4VWVubVVXV1RJWUlpMUY3dGpBbDl0Wm9rc2NoRXdD?=
+ =?utf-8?B?Tlk3MWQ0aDdQNlUxUXprUm9RQ2drd2lBdnhFaVVhYWxvblorKzBsd0pWS3FE?=
+ =?utf-8?B?cnFjcnRPM3FYbzRieW92Q0RLQTVwcFRtVGhmenVIUTFWZE9mNWwvNzhrdlJZ?=
+ =?utf-8?B?WGVDRmZuWWxrU0EyRGdPSjJXR3d4cXpMaTlTbjl6VlBreDQyMUlBWjhxQmQy?=
+ =?utf-8?B?SzNSNUJsSFp6ZVBRWTBTUFZrTGl0endHTU5zdmh6TFRoNTF6NSs0amQ3Vys1?=
+ =?utf-8?B?RmVNR0RwaXVrSDVzMFRTTklQNmNaamNEeWVIdUZNSk5jMG1UWU50UEpXeHRB?=
+ =?utf-8?B?dlNnSnV1TUN1Tms2Tms0RHdtWWdoNVNkWm0rbnRtNWFwL2RxM01PeWZLMk5Q?=
+ =?utf-8?B?eDlYODZqSmRNSWd4b203aS9wWDRXTzBSaGVEUmlpRTMyZWhkdGF1bExBU2tw?=
+ =?utf-8?B?NENXak1EYWRRaEswcDAzNExDSzFuL0V4K2JqQm1YUzE5RmlmeTFNMUExZEFV?=
+ =?utf-8?B?WHdab2RCYmxRU1NBZnF1OWxHU0NQZWVmbmhGUE5xWE50dHNTajhRUy8rQXpS?=
+ =?utf-8?B?d05NTW9YMEQ0dVg3d3RMdjdKM3JCNHZJU0I0TllHbHJyTUhjUkExZU4vemQw?=
+ =?utf-8?B?OXllNUVFQWExKzNrWklkTXhzYWxrNGFaNUVPaEVSY1VVWGl1NW9JMmZuVno1?=
+ =?utf-8?B?WWtpTFVob25KTFZ0eTNuV1JMcDQ1aHJNTEJxbnVhTDZpOGp4cXVoazJtUGJY?=
+ =?utf-8?B?QUM4TTh0VStkanRiVkNZSmVpeUo2MHFIYTk0Mm40NUQvV285VHA1Y0t2UGxp?=
+ =?utf-8?B?WjRuT29KODF0RkoxQThQS2JLbXVOM2tNdUpUYyttT2xXQ0dmV3JleDc3aFIz?=
+ =?utf-8?B?bTdlL1BmZGFiOWtzTEZCYUpaakZaaTJVc3pGVkx2bkdHNWpJbXlTbHlxTDVB?=
+ =?utf-8?B?cTBYL2pDbjViOEdKcm9HaGRRNWFVTmhqYnkxZEh2cHREbmM3WGljZmkzc1NG?=
+ =?utf-8?B?RVhvZDNrcmhwYlB6Zlp6WW0yZ2ZYZ0h1bExuYlRhRWd2Y0tNQTVuQlgrQVZJ?=
+ =?utf-8?B?eElwM2R2OVQ4bGd4SHU4UkVyRXRiaEdYTndkUTJKaENkVVo2WGc3UEJ2VVBl?=
+ =?utf-8?B?UDE1M3VJWXQvZUczbERweExLMmFYYlVIWVhuSzBkTkQ5OWo5bDhZeEZFRGY3?=
+ =?utf-8?B?SHZWaVIyZ0cwUVd6QzY0YWhMbnNYd3hnM0NDanNoUG5oSHZQSThLVWFkbVpD?=
+ =?utf-8?B?TjdQS0pySGtsa2VkUFNGSGhURU9EMmVYN0FFQTJBLzlJenlNYjdHVk9jckVB?=
+ =?utf-8?B?cVlzcWVncnQzOEpxZlE1M2xxWk5iODBDWGJXM2YzZlhJWEwybUlwdUlIbFBa?=
+ =?utf-8?B?VXFYUXc5SUxYUHAxMWt0aUVpQ0xINmhObHovMFVHNWtTZGMxR0J6aVlpYllF?=
+ =?utf-8?B?ckFwZ01STmxFVDQzOU5ZYmNiYWZ6MFV1UzF4NWV6SlN5ek52aDlKaW1Qb0hn?=
+ =?utf-8?B?VnJLMFc3bGoxQkk3RGFLVzFrcjlJNjZmdVVPbUwyaVBZY0J3ekY2WVBpSGNN?=
+ =?utf-8?B?UHJ2NW9sMzNETm5WOC9DSTlzeG9lZVN0OHVJUFFWbEdlWTFQb2tpeFAzTWxa?=
+ =?utf-8?B?OVFmbmZmazNmRHFnRFJCeUl3OTdLNUorMW5TUWxid2ZEcFl0UUoyTGVOM2FQ?=
+ =?utf-8?B?MjZsOE1uZnJ5WWtHcVRSWEQ5T0VuWFdtWXY3bTcwTlBCdlZBVHFvam1acmxi?=
+ =?utf-8?B?SFBrY2hIUTNiQTZXQ0NKdGNQU05IUzdOOGV0WXc0TjRncG42alJ5ZCs4aE5s?=
+ =?utf-8?B?S1d6dktIcEdiUUhUaEFMNVd3WUtiYUc2dVBVZnNORS96WU9OajFCTkRFemJw?=
+ =?utf-8?Q?ITby4ePSZvxv+7rBgy0/aMwFQ?=
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: iwd forgets network
+X-OriginatorOrg: kvh.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR07MB7167.namprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4356497c-4273-4da5-2675-08db77234ed4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jun 2023 15:29:33.2627
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 45c05af7-f354-4404-835d-8de3cef70ba7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 99E7sTSvNSZUt6JSuGWCjHbL4kvgeI9Ba7V+JJ0LXG7kEy6lQdX7mQFoc4uZdWArcx9cxICmlI2KJfcDerJdRg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR07MB8186
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kvh.com
 Content-Language: en-US
-To: Martin Petzold <martin.petzold@tavla.de>, iwd@lists.linux.dev
-References: <7794c62a-56d2-d34a-06e9-0b17edb235f7@tavla.de>
- <c341680a-01b6-cd2a-1826-ba868a02d4f3@gmail.com>
- <ca4ec1b7-b503-633c-bea8-dc2f3a8a50c3@tavla.de>
- <9182d9a0-4d77-fc23-ee46-cf995e0499e3@gmail.com>
- <f959d408-4476-6092-8ab1-880ccdc78e8e@tavla.de>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <f959d408-4476-6092-8ab1-880ccdc78e8e@tavla.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-ID: <C8E4B316D1E5664B96C9DF8E7F671085@namprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 
-Hi Martin,
+TWFydGluLA0KIA0KWW91IG1lbnRpb25lZCBhIHBvc3NpYmxlIHBvd2VyIGxvc3MgaW4geW91ciB0
+ZXN0aW5nLiBJZiBpd2QgaXMgbm90IHBlcmZvcm1pbmcgYW4gZnN5bmMoKSBhZnRlciBqb2luaW5n
+IHRoZSBuZXR3b3JrIGFuZCB3cml0aW5nIHRoZSBTU0lEIGNvbmZpZ3VyYXRpb24gZmlsZSwgdGhl
+biB0aGVyZSBpcyBhIHNtYWxsIHdpbmRvdyBvZiB0aW1lIChiZXR3ZWVuIHdoZW4gdGhlIGZpbGUg
+aXMgd3JpdHRlbiBhbmQgd2hlbiB0aGUgZmlsZXN5c3RlbSBpcyBuZXh0IHN5bmNlZCkgd2hlbiB0
+aGUgZmlsZSBjYW4gZWFzaWx5IGdvIG1pc3NpbmcgaWYgcG93ZXIgaXMgbG9zdC4NCiANCklmIHRo
+ZSBmaWxlIGlzIG5ld2x5IGNyZWF0ZWQsIHRoZW4gaXQgY291bGQgZGlzYXBwZWFyIGVudGlyZWx5
+IG9uIHBvd2VyIGxvc3MuIElmIHRoZSBmaWxlcyBjb250ZW50cyB3ZXJlIG92ZXJ3cml0dGVuLCB0
+aGVuIGl0IG1pZ2h0IHJldmVydCB0byB0aGUgb2xkIGNvbnRlbnRzIG9uIHBvd2VyIGxvc3MuDQog
+DQpQZXJoYXBzIHRoaXMgZXhwbGFpbnMgeW91ciBpc3N1ZS4gIEkgY2Fu4oCZdCB0ZWxsIHlvdSBo
+b3cgbWFueSB0aW1lcyBJIGhhdmUgYmVlbiBiaXR0ZW4gYnkgdGhpcyBpbiBlbWJlZGRlZCBMaW51
+eCBkZXNpZ25zLg0KIA0KR29vZCBsdWNrLA0KSmFtZXMNCg0K77u/T24gNi8yNy8yMywgNDowNyBB
+TSwgIk1hcnRpbiBQZXR6b2xkIiA8bWFydGluLnBldHpvbGRAdGF2bGEuZGUgPG1haWx0bzptYXJ0
+aW4ucGV0em9sZEB0YXZsYS5kZT4+IHdyb3RlOg0KDQoNClNvbWUgdGltZSBiZWZvcmUgdGhpcyBp
+c3N1ZSwgd2UNCnB1bGxlZCB0aGUgcG93ZXIgb2Ygb3VyIHJvdXRlciBhbmQgdGhlIG5ldHdvcmsg
+d2FzIG9mIGNvdXJzZSBnb25lIC0gYmFjaw0KYSBmZXcgbWludXRlcyBsYXRlci4gSSBoYXZlIG5v
+IGlkZWEgaWYgdGhpcyBjb3VsZCBiZSByZWxhdGVkIG9yIGp1c3QNCmNvLWluY2lkZW5jZS4NCg0K
+DQoNCg==
 
-On 6/27/23 8:15 AM, Martin Petzold wrote:
-> Hi James,
-> 
-> Am 27.06.23 um 17:04 schrieb James Prestwood:
->> Hi Martin,
->>
->> On 6/27/23 7:38 AM, Martin Petzold wrote:
->>> Hi James,
->>>
->>> Am 27.06.23 um 16:29 schrieb James Prestwood:
->>>> Hi Martin,
->>>>
->>>> On 6/27/23 12:58 AM, Martin Petzold wrote:
->>>>> Hi,
->>>>>
->>>>> I have a critical issue with iwd and kindly ask for feedback.
->>>>>
->>>>> We have an embedded device (no desktop) running Debian bullseye 
->>>>> with custom 5.10.52 kernel (NXP patches; own configuration).
->>>>>
->>>>> We are using iwd 1.27-1~bpo11+1 from bullseye backports together 
->>>>> with systemd from bullseye main.
->>>>>
->>>>> We use a bind mount to move the iwd state to a separate partition, 
->>>>> because we do rootfs upgrades and want to keep the state.
->>>>>
->>>>> Yesterday and also once before our platform forgot a network (the 
->>>>> *.psk file was gone). We did not call any command for this. As far 
->>>>> as we can re-call we did not reboot the platform. Some time before 
->>>>> this issue, we pulled the power of our router and the network was 
->>>>> of course gone - back a few minutes later. I have no idea if this 
->>>>> could be related or just co-incidence.
->>>>
->>>> The only way IWD removes a network profile is via "Forget()". You 
->>>> could add a debug print inside 
->>>> src/storage.c:storage_network_remove() if you were suspicious but I 
->>>> highly doubt that has anything to do with it.
->>>>
->>>> I would guess it more has something to do with the bind mount. Are 
->>>> you sure nothing touched /system/var/lib/iwd ?
->>>
->>> We first tried symlinks, but iwd does not accept symlinks for the 
->>> state directory. I think it does not work because of the directory 
->>> monitoring?
->>>
->>> Could it be possible that directory monitoring and bind mounts are in 
->>> conflict?
->>
->> I just tested this and IWD properly sees changes in a bind mounted 
->> directory, and then connect to the network who's profile I dropped 
->> into my bind mount.
->>
->> But, if I run with network manager which disables autoconnect I just 
->> see IWD scanning and never try to connect. Presumably because network 
->> manager is never informed of the new network via its own profile. Are 
->> you using NM by chance?
-> 
-> No, we have switched to systemd-networkd only (see configuration below). 
-> NetworkManager is not installed. We have our own custom debootstrap build.
-> 
-> The reason for using systemd-networkd is because of compatibility with 
-> systemd-timesyncd. We had a critical issue with RTC wakeup using ntp 
-> together with network manager. For that reason we also don't want to 
-> switch back to NetworkManager.
-> 
-> In general IWD ist working as expected. However, we just started 
-> intensive tests with network loss and re-connection. Then somehow the 
-> configuration was gone.
-
-Ok, I'd suggest adding additional debugging in storage.c and 
-knownnetworks.c. If you can reproduce the issue and see IWD either not 
-reacting to a new profile, deleting the profile, or something else I'd 
-be happy to take another look.
-
-Thanks,
-James
-
-> 
->>
->>>
->>> Does systemd somehow manipulate the state directory (as it sets the 
->>> environment variable $CONFIGURATION_DIRECTORY)?
->>>
->>>>
->>>>>
->>>>> Here are our configuration files:
->>>>>
->>>>> ########## /etc/systemd/network/20-wlan0.network
->>>>>
->>>>> [Match]
->>>>> Name=wlan0
->>>>>
->>>>> [Network]
->>>>> DHCP=yes
->>>>>
->>>>> IgnoreCarrierLoss=3s
->>>>>
->>>>> [DHCPv4]
->>>>> RouteMetric=20
->>>>>
->>>>> ########## /etc/iwd/main.conf
->>>>>
->>>>> [General]
->>>>> UseDefaultInterface=true
->>>>>
->>>>> [Network]
->>>>> NameResolvingService=systemd
->>>>>
->>>>> ########## /usr/lib/systemd/system/var-lib-iwd.mount
->>>>>
->>>>> [Unit]
->>>>> Description=Mount IWD state
->>>>>
->>>>> [Mount]
->>>>> What=/system/var/lib/iwd
->>>>> Where=/var/lib/iwd
->>>>> Type=none
->>>>> Options=bind
->>>>>
->>>>> [Install]
->>>>> WantedBy=local-fs.target
->>>>>
->>>>> ##########
->>>>>
->>>>> Thanks,
->>>>>
->>>>> Martin
->>>>>
->>>>>
