@@ -1,175 +1,136 @@
-Received: from mout-b-110.mailbox.org (mout-b-110.mailbox.org [195.10.208.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9691F19501
-	for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 15:15:07 +0000 (UTC)
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-110.mailbox.org (Postfix) with ESMTPS id 4Qr7Yg5M8zz9tcZ;
-	Tue, 27 Jun 2023 17:15:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1687878903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H2Rta249V47uYdFQ200XAmZwE0RW2hoLI/Y8MdP4ZCY=;
-	b=ETfL7lkC7sBNeSZDDE064aZ3v3RBchqrPkTMoLKlHhU69qbC3FXjQ/lH4XD0Aay3OQ4R7x
-	O1ZkFkefFhs4d4MNRDXZOGKp+RvrAeeFW2bpVNlFoYRzipxFQbs1G5+dIRb+e6/X/7Wgve
-	92mhuVm/GwYOvE1OnZzhRRgySdvvVWXa76jmxs7HkyYsPphXV3KID3BCAg7wzCuSZ5NzQN
-	ZteLubnzlOoLzXH4k/n0h9wmM+IzEMkvko2IlFa5QkGmUog1rcml6InDK1phA0n6qd4IMr
-	/yc0EccHYSoFrCvgQAPOo3qfvYTNxGQ2wXylNR88LnBrwfJlw2uFGDIZzudakA==
-Message-ID: <f959d408-4476-6092-8ab1-880ccdc78e8e@tavla.de>
-Date: Tue, 27 Jun 2023 17:15:02 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D747119501
+	for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 15:15:12 +0000 (UTC)
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3456fda4ed1so18024005ab.0
+        for <iwd@lists.linux.dev>; Tue, 27 Jun 2023 08:15:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687878912; x=1690470912;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cX8DG9qcX1n52C+q4rx0eHSIum4Maa1dyT/qoEOrmT4=;
+        b=khO3nlUqdFnZKzDv+wreTLW05RdXThDSi4P0R4k9NdT7te376sgxXesWxH1SEkkGXz
+         pIcAPHuBiHRe2q2UHfPH7OEX3VP4TlHKAAyi1cJDI54d/1bF+0mTRmbLBGvwAyfmgVA/
+         ExI2oMwz8jf65c9RUwIOoDXJ6/Lc2AOD/+3pff6f04Qq4aqVdvuknz9g4jYULFAFhIMv
+         cfLM/zm4cAnyzGYSuktkU6U26IeKmvOernqJLUEHl0/R1j5IIYa6o3QJoyp2HZyd3mVJ
+         H6+Y5//Xjchl6c7ou9t4rsWkEzBruRdztfaFx45S4iYxQwOJYNwlgmxDtYMDA04+b0Hj
+         sUwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687878912; x=1690470912;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cX8DG9qcX1n52C+q4rx0eHSIum4Maa1dyT/qoEOrmT4=;
+        b=anP1lFqrzb8SDKz4v4tOq2PNPvzA/6rvdTfppYPOjybbajl4PrPm9V6l0RyX7/UT/R
+         JaaXV8xhbSRNFEX43uS7Uy39ZyiJrBxS7B/2SjuBQM2MO0mMfFVWo0CzdZC8p5C1/BWZ
+         kqMc+FtzA4m5O3G8AbcceXKDkBjJPoRjeT1VBF9P4CEU8eRajjyJIMXphW1dQpL9AxDK
+         mYE5Xd7sTP/3eQyOaUXBT1XD5DUBB5YL3rJ3KIE8vpFQaHMrl+8lds2FR0ix7pbAJCTF
+         mW9wTxdkZkJU+sMHIoW5XYnVh0f6XDZc0Z+Q2gYV4/XjgF//OY5AxsjGOlK01Ti5dU5o
+         5k7Q==
+X-Gm-Message-State: AC+VfDyS3VEffS+l7WWZwwIf1/EbAXBXCk36WOJvmvGkRWxABB71LpmM
+	YMcWjtLaW0ePalun+y+iMFXpiOSymjU=
+X-Google-Smtp-Source: ACHHUZ4GvPdMcMbUyjxg+Jbl/moE0STxziKXGCRxwPpn42PYeqsZxexHM7e8Ao1uaQfwCPGx0NgzUw==
+X-Received: by 2002:a92:da02:0:b0:345:3378:4258 with SMTP id z2-20020a92da02000000b0034533784258mr10699049ilm.30.1687878911651;
+        Tue, 27 Jun 2023 08:15:11 -0700 (PDT)
+Received: from [192.168.254.84] ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id l10-20020a17090b078a00b00262d079720bsm5801771pjz.29.2023.06.27.08.15.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Jun 2023 08:15:11 -0700 (PDT)
+Message-ID: <3790483a-442f-9602-03c9-b205376d9262@gmail.com>
+Date: Tue, 27 Jun 2023 08:15:10 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: iwd forgets network
-Content-Language: en-GB
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <7794c62a-56d2-d34a-06e9-0b17edb235f7@tavla.de>
- <c341680a-01b6-cd2a-1826-ba868a02d4f3@gmail.com>
- <ca4ec1b7-b503-633c-bea8-dc2f3a8a50c3@tavla.de>
- <9182d9a0-4d77-fc23-ee46-cf995e0499e3@gmail.com>
-From: Martin Petzold <martin.petzold@tavla.de>
-Organization: TAVLA Technology GmbH
-In-Reply-To: <9182d9a0-4d77-fc23-ee46-cf995e0499e3@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH 1/3] hwsim: remove 'optimization' sending to only known
+ MACs
+Content-Language: en-US
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20230504215247.581443-1-prestwoj@gmail.com>
+ <54ae38d6-cc94-9410-8121-44ece399b24c@gmail.com>
+ <39610c47-eaba-2299-9b03-5217355e8d47@gmail.com>
+ <88f638ea-bb37-c417-3b1c-1d7151506911@gmail.com>
+ <7fdc5d67-e740-d593-253b-564bdf92048f@gmail.com>
+ <d2d0841b-62a0-c8df-924f-851df5f88203@gmail.com>
+ <865cf0a3-1be4-34cb-0535-e76cf43d6753@gmail.com>
+ <63162827-5b8b-3c70-7f6f-fc7b513f2b6d@gmail.com>
+ <1742c6eb-bbd5-7883-5a72-53021a771ca6@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <1742c6eb-bbd5-7883-5a72-53021a771ca6@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi James,
+Hi Denis,
 
-Am 27.06.23 um 17:04 schrieb James Prestwood:
-> Hi Martin,
->
-> On 6/27/23 7:38 AM, Martin Petzold wrote:
->> Hi James,
+On 6/26/23 7:31 PM, Denis Kenzior wrote:
+> Hi James,
+> 
+>> Just an update here. The reason hwsim was behaving like this was 
+>> because DEL_WIPHY isn't handled but DEL_INTERFACE is.
 >>
->> Am 27.06.23 um 16:29 schrieb James Prestwood:
->>> Hi Martin,
->>>
->>> On 6/27/23 12:58 AM, Martin Petzold wrote:
->>>> Hi,
->>>>
->>>> I have a critical issue with iwd and kindly ask for feedback.
->>>>
->>>> We have an embedded device (no desktop) running Debian bullseye 
->>>> with custom 5.10.52 kernel (NXP patches; own configuration).
->>>>
->>>> We are using iwd 1.27-1~bpo11+1 from bullseye backports together 
->>>> with systemd from bullseye main.
->>>>
->>>> We use a bind mount to move the iwd state to a separate partition, 
->>>> because we do rootfs upgrades and want to keep the state.
->>>>
->>>> Yesterday and also once before our platform forgot a network (the 
->>>> *.psk file was gone). We did not call any command for this. As far 
->>>> as we can re-call we did not reboot the platform. Some time before 
->>>> this issue, we pulled the power of our router and the network was 
->>>> of course gone - back a few minutes later. I have no idea if this 
->>>> could be related or just co-incidence.
->>>
->>> The only way IWD removes a network profile is via "Forget()". You 
->>> could add a debug print inside 
->>> src/storage.c:storage_network_remove() if you were suspicious but I 
->>> highly doubt that has anything to do with it.
->>>
->>> I would guess it more has something to do with the bind mount. Are 
->>> you sure nothing touched /system/var/lib/iwd ?
+> 
+> Funny.
+> 
+>> So when hwsim starts it dumps and tracks all the radios but when a 
+>> radio gets moved into another namespace only the interfaces get 
+>> cleaned up. Then a frame comes and hwsim won't find a matching 
+>> interface->addr to send the frame, and bail out. But when I removed 
+>> that block of code it wouldn't bail out and since the radios still 
+>> existed in the queue the frame could be sent out to all radios 
+>> including "removed" radios. Since the kernel doesn't care about 
+>> namespaces those "removed" radios still got the frames.
+> 
+> Ok, that makes sense now.
+> 
 >>
->> We first tried symlinks, but iwd does not accept symlinks for the 
->> state directory. I think it does not work because of the directory 
->> monitoring?
+>> So at least that's sorted out. How we want to support namespaces is 
+>> the question. A few options:
 >>
->> Could it be possible that directory monitoring and bind mounts are in 
->> conflict?
->
-> I just tested this and IWD properly sees changes in a bind mounted 
-> directory, and then connect to the network who's profile I dropped 
-> into my bind mount.
->
-> But, if I run with network manager which disables autoconnect I just 
-> see IWD scanning and never try to connect. Presumably because network 
-> manager is never informed of the new network via its own profile. Are 
-> you using NM by chance?
+>> - Peek into the frame at the destination address and use that as 
+>> ATTR_RECEIVER, but this won't work with address randomization for phys 
+>> outside of the root namespace. IMO this is probably fine for testing 
+>> purposes, if we know about it ahead of time.
+> 
+> You can try to see whether HWSIM_CMD_ADD_MAC_ADDR works?  See commit 
+> 5cc58a9ecfa1 ("mac80211_hwsim: notify wmediumd of used MAC addresses")
 
-No, we have switched to systemd-networkd only (see configuration below). 
-NetworkManager is not installed. We have our own custom debootstrap build.
+I hadn't seen that before, but looking at it they don't expose that as 
+an API, its only for internal use for scan address randomization and 
+monitor interfaces (see mac80211_hwsim_config_mac_nl()).
 
-The reason for using systemd-networkd is because of compatibility with 
-systemd-timesyncd. We had a critical issue with RTC wakeup using ntp 
-together with network manager. For that reason we also don't want to 
-switch back to NetworkManager.
-
-In general IWD ist working as expected. However, we just started 
-intensive tests with network loss and re-connection. Then somehow the 
-configuration was gone.
-
->
+> 
 >>
->> Does systemd somehow manipulate the state directory (as it sets the 
->> environment variable $CONFIGURATION_DIRECTORY)?
->>
->>>
->>>>
->>>> Here are our configuration files:
->>>>
->>>> ########## /etc/systemd/network/20-wlan0.network
->>>>
->>>> [Match]
->>>> Name=wlan0
->>>>
->>>> [Network]
->>>> DHCP=yes
->>>>
->>>> IgnoreCarrierLoss=3s
->>>>
->>>> [DHCPv4]
->>>> RouteMetric=20
->>>>
->>>> ########## /etc/iwd/main.conf
->>>>
->>>> [General]
->>>> UseDefaultInterface=true
->>>>
->>>> [Network]
->>>> NameResolvingService=systemd
->>>>
->>>> ########## /usr/lib/systemd/system/var-lib-iwd.mount
->>>>
->>>> [Unit]
->>>> Description=Mount IWD state
->>>>
->>>> [Mount]
->>>> What=/system/var/lib/iwd
->>>> Where=/var/lib/iwd
->>>> Type=none
->>>> Options=bind
->>>>
->>>> [Install]
->>>> WantedBy=local-fs.target
->>>>
->>>> ##########
->>>>
->>>> Thanks,
->>>>
->>>> Martin
->>>>
->>>>
--- 
-Martin Petzold (Inhaber & Geschäftsführer)
+>> - Add support to hwsim to move radios to other namespaces, and keep 
+>> track of those radios (similar to what we erroneously have today). 
+>> This is fragile though because you no longer can remove 
+>> radios/interfaces, nor do you know if they have been removed.
+> 
+> Hmm, but radios are namespace independent.  They can only be 
+> added/removed via HWSIM_CMD_ADD/DEL_RADIO, no?  Since phys are moved 
+> wholesale across namespaces (you can't only move a given interface), you 
+> could assume that once a radio is created and populated, its interfaces 
+> do not change for the duration of the test, even if they're moved to a 
+> different namespace.
 
-TAVLA Technology GmbH
-Im Dau 14
-50678 Köln
-Deutschland
+For testing yes this is probably fine. It may require some adaptation in 
+hwsim to do it better from a test-runner perspective. Currently we just 
+use ip to create/delete namespaces and move radios. It may make more 
+sense to add this to hwsim so there is one path. Then at least when 
+hwsim gets a DEL_WIPHY event it doesn't have to assume the radio was 
+moved (I'm thinking if we ever added hotplug tests this could be important).
 
-Telefon: +49 (0)221 / 3466 0885
-Mobil: +49 (0)179 / 9220154
-E-Mail: martin.petzold@tavla.de
+I'll pursue this path.
 
+
+> 
+> Or if the HWSIM_CMD_ADD_MAC_ADDR API works, that might make things even 
+> simpler.
+> 
+> Regards,
+> -Denis
