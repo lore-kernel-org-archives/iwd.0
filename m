@@ -1,45 +1,45 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11EC28F2
-	for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 14:54:28 +0000 (UTC)
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-565a8d9d832so441219eaf.1
-        for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 07:54:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCA7C2D9
+	for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 15:07:55 +0000 (UTC)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-1b03fb998c8so3014355fac.3
+        for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 08:07:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687964067; x=1690556067;
+        d=gmail.com; s=20221208; t=1687964874; x=1690556874;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=fs/ANQREV16BJT6OL+N6HjDCGG0j+2LyokbBlFMUbac=;
-        b=swMs7kopFozXnN1XWb4TV5FtcS0P/mfoShJ1y5q/lVvzQA2+AKuJv5CdR7M4aMxhZQ
-         d9eCVkK/kaCtY/SlSUQ/7+k/nWlIN+PTtK43ABm19s5y6qy9rtkPYiQyLfaCho1kxgPL
-         bDNt04iScNmN4D8CtnXX0K1ugUfPhgUmBPsyLgEBWJLteb6rqvXVFf9NwLfJQeEdx+4u
-         boSDgD0TB/s0xhUEeslHDXMB/YpSs0vGZY/ZE45RYgxVDYmzclGCFnC6K4wNVSgfrRhe
-         NzD1ntUxpxzM6UjRfz9Drrf+f+9Zi5QQ/X3UZgKjKRKmw2zf7wrw6OnGjE7MN3xi6F8H
-         5N/Q==
+        bh=tLNFKHgKRZJIRr4yM8Y6DygdumfhPxbm7+e5BSKKT80=;
+        b=e1lIjxnlp+Mr9l0JTgNDuukB6t3OsBKFPcT7qJRgbPsSFprh3JFYlIOaxB5cJfN1gR
+         W3OJEJv33k5sXY9eYZHxwzL9rtzxXOdiI1Djt+xrpwVVduWWkTba/d6Ft7LMir1egY4A
+         LMGJuhQyWT0UOZ1K+j8lAjkfZTRuJRc5+U3bOFId6NBs5vNQzFa/dc/eZmxRvG1zF2YW
+         NkGWYNM3OuoEcHklkIvgRQvweOpatnP9MVMZPGzynYdkrAR33XbW4k9wxxSgq74s6Doh
+         DIhAxEC1E8ZaZycPGE4TIfxUZ20iCmhgL+jTotyGg7fN9hU3THTaH5vJE5Ep7KA6COKs
+         wLPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687964067; x=1690556067;
+        d=1e100.net; s=20221208; t=1687964874; x=1690556874;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fs/ANQREV16BJT6OL+N6HjDCGG0j+2LyokbBlFMUbac=;
-        b=d5NA0wL80A/XUmUWXb87rrHQOQTOlGxu8a6EK9bpQfW3yA1xabvRdYK7/dXfNe/88t
-         JD47nTcypyx6wk6QeyoqdGaaGcDhGRNgCrCzFJstFztW34GxZe+bvaJo6x/C2kCEIRik
-         BzRCv0VX2/S4bJnezWh6k95tmN3to+VKKQBpbFrw4Puqy1Uu3JOquSMsEvwQcOa1qDlA
-         f6DOybHhh3jlfSxvZSvS9yK9SyeQHQio/84gHS6exb4MUHd3a7TGGVGEDaeJeP8JxGwL
-         oBxEKC2HtKjoa43IKZuSwaZC09xoTtT4gBSK93zGWIKxeJ7YSKWPN3vdhYoIjFsZP8Pt
-         ApJQ==
-X-Gm-Message-State: AC+VfDwy7sVux7g0LtPyDPyVpdJ6KMKXD7A4V0+T0zdhfTiHo9REYul+
-	gTUOfosEx95I05Zbm8F1EX0=
-X-Google-Smtp-Source: ACHHUZ5Garb2eqtjyKFB9qboxSbys5jCWQCww8H7qaReWhCx0O3DttjY6RQ/DUH/anKvKb/agHXUFg==
-X-Received: by 2002:a4a:e601:0:b0:563:2489:dfe6 with SMTP id f1-20020a4ae601000000b005632489dfe6mr9740360oot.5.1687964067687;
-        Wed, 28 Jun 2023 07:54:27 -0700 (PDT)
+        bh=tLNFKHgKRZJIRr4yM8Y6DygdumfhPxbm7+e5BSKKT80=;
+        b=ZUoe7fhFFLIDdYifvKYSELN2ocZvpdpOem93gpteuLg3bsgn40HI4L5ZeKM9KfBWO8
+         4kQj/IDaSaxDyI+vXEc3nap9Ceg9pSwJ/9twm4ZtdqiyZkIjh3CiNbupMwIFDleQWHKG
+         ZfKhX4RDb9eh/H8cBdh15xtnx7RLSSp4ecQepX3qIMdR36VIxOu7yYAQDzgyM8g/26JB
+         /lwqM5oNiZte3dNXKCHr5uLweVoFBX0i97G65s2rzwap36aOfXDvGz7pwqqa/S0KFCQB
+         9ayRdA80zCTlioPfEVBNQxF7YtCw5ZVeP7FccfAcZi/5ev31+ELN1SfjRfS6Kxh7mHjx
+         /7lw==
+X-Gm-Message-State: AC+VfDyQT7IDFreee7dnY+UH/kYXzkD7ViLUoupOdjNsJrHgKpRzZ6Zi
+	x9LPAFk+wgpGCCw630g+8Mw=
+X-Google-Smtp-Source: ACHHUZ4wF+d2fqmjJXHD8L81LfUkSAN112Y7haEs7pD/hrWhiCdB4l7dGgxLYzWWtsQen5Mv3D+pag==
+X-Received: by 2002:a05:6871:507:b0:1b0:372e:e2df with SMTP id s7-20020a056871050700b001b0372ee2dfmr8297700oal.40.1687964874448;
+        Wed, 28 Jun 2023 08:07:54 -0700 (PDT)
 Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id x9-20020a4ae789000000b00552502f3ae1sm4227231oov.39.2023.06.28.07.54.26
+        by smtp.googlemail.com with ESMTPSA id v18-20020a4ade92000000b005630547db40sm2167050oou.41.2023.06.28.08.07.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jun 2023 07:54:27 -0700 (PDT)
-Message-ID: <9afac4da-a9d7-7855-9702-1b7500dafca1@gmail.com>
-Date: Wed, 28 Jun 2023 09:54:25 -0500
+        Wed, 28 Jun 2023 08:07:54 -0700 (PDT)
+Message-ID: <303737c5-0191-378f-d164-5434ed0e3c40@gmail.com>
+Date: Wed, 28 Jun 2023 10:07:52 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -59,30 +59,32 @@ References: <7794c62a-56d2-d34a-06e9-0b17edb235f7@tavla.de>
  <85b9e54c-dea7-672e-ecad-9382c8f6a7e7@tavla.de>
  <9d7f0362-67af-bbc4-2cc0-d4f8da123cd3@gmail.com>
  <e6f29266-7a7d-1fcf-2ce9-e96efe75a13d@tavla.de>
+ <2f0cc99c-c547-1150-d667-8fd667be86ae@gmail.com>
+ <5448805b-253d-eeb6-33f2-881eb8be2157@tavla.de>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <e6f29266-7a7d-1fcf-2ce9-e96efe75a13d@tavla.de>
+In-Reply-To: <5448805b-253d-eeb6-33f2-881eb8be2157@tavla.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi Martin,
 
-> I have seen a more recent timestamp on the file. Also after reboot IWD seems to 
-> set the timestamp. Can you confirm that IWD periodically sets the timestamp? 
-> What is this for? How does it work? And can any write access (without user 
-> command) be disabled?
-
-iwd updates the profile's mtime using utimensat() any time a network is 
-successfully connected to.  This directly maps to:
-   string LastConnectedTime [readonly, optional]
-on the KnownNetwork interface.
-
-> 
-> As there seems to be some sort of write access, IMHO there may be a bug which 
-> causes the file to disappear. Maybe only with bind mounts, but also maybe not.
+> Unfortunately rename is not atomic across partitions. We have our own cache 
+> implementation and hat such issues with separate tmp partition - had to switch 
+> to same partition for temporary files as the storage.
 > 
 
-Not due to the mtime I hope?  The worst case should be that we might fail to 
-update it on a crash, but that's not something that really matters.
+The temporary file is created in the same directory, side-by-side with the final 
+path.  See
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/storage.c#n132
+
+
+> Still, it does not actually explain my issue.
+
+Are you mounting ext4 filesystem with non-default options by any chance?  We 
+follow advice given in [0], refer to the "Rename, fsync, and ponies" section. 
+Still, things may have changed since then.
+
+[0] https://lwn.net/Articles/327601/
 
 Regards,
 -Denis
