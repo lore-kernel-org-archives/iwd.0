@@ -1,45 +1,45 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8FAC8E3
-	for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 16:14:09 +0000 (UTC)
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-63588812c7aso514786d6.0
-        for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 09:14:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B84C2E0
+	for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 16:28:21 +0000 (UTC)
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6b867acbf6dso745378a34.0
+        for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 09:28:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687968848; x=1690560848;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+NzFW6mmX7+NGmHuB69JxYy9IjqkGMWOETPq9A4316g=;
-        b=pWCivGptxz1hnDyMGVfIlG2EA+n1KEPifqX9qv+Q5QAPIJgUB61JlXjUeorYxMeOlb
-         rxBy/x61M4AjY2Yu6kinfNkLEuWNJ13GP1eTCvj56InU3UU35tY/lNGwcihOO6aedCuZ
-         HASjG2jWZYdfHU2hnelIw8NbN3se9oRzvIndWZhv47W+xuyEAjjXlr9iiOjpzUnuQ30e
-         +7Z0ZOzbwNP4PEVwic8PdRTBefmgJjIfesBMxpy8dCkhcSdE2BAWrKYJzi9FqLzdjSSG
-         qEY6VEUHLOWjl45Pw+YoxwwlRnMiY0UPHdwGhwd5lzrk9KBQ17ttBu/79hKej+9uaOuK
-         QkqQ==
+        d=gmail.com; s=20221208; t=1687969701; x=1690561701;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uCb2Vb0sw1d9TmPcfXH1hgjTZMlLKeDGOqDDjRW5Mpg=;
+        b=g0EnFGidduMcz4cur4wPePjVp08LFmQIVh9EkUzEh9ipzvElJNTdVw12bQG5ZG0bn4
+         HNhQKMMREfqrhnfHqutFsCJ9KS3XTnDiQXWu3D/aq25q14822ovYBzNO3ogEiZBoUpZf
+         0dQAJqtKUD5ARKe8PonDZSmw/lvl0y9ohD0K1nlTqgH1SPfvr5M1IaN19h8+/95xs5TF
+         8T7Lh34U3eGFoMDywj9fy0plEqOk3drXmPRXvgzmJ9hdo8z7pacOKxZusrrtCgtHuNNl
+         PUG4Ae7xKBwGTl/5hPAo7S/s8QwqhkSympDIEfaUOUppIIYN6rs2XZYUx0SyaZZ+TI4A
+         VOCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687968848; x=1690560848;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1687969701; x=1690561701;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+NzFW6mmX7+NGmHuB69JxYy9IjqkGMWOETPq9A4316g=;
-        b=h3mJ+/j0GdUtzJPB2HO34DVK65n9ErADUHPmFPD8CFd5aYLIggXZZ0+Tc/p/kM+tz6
-         dKJg3X9jwZPDp6A//MgPJYCSeczP4xJqqi/VEjQ+H3h83uTp8bajA/Kl8snDuntucmqL
-         caWkG5hBevM2ZXNJRIJaPIoKrjFqN0wXmqAvtOGaqtkOxYRK3N5rBnbQ8JAZG8k3Ngt8
-         D1qG4MLr4ZDTioSxft6ytKvr31ruLWXy4o3qFUokliT4whjwQdvmCH1vh36KIw7tyR6N
-         9ORcH0y4vSQEV62dETNL1Y4CojXOaaMsZGeDFwhhfhVh53Gq7jDo4Rsy5Yu8+NiF0ibO
-         EHDA==
-X-Gm-Message-State: AC+VfDwN+Geq/8qaLWV3OQ8shLlQ5GwL3vpaFBr8pfym3TkqSpaOi9eR
-	sqWu+H2BNOPkTy0s/2lElps=
-X-Google-Smtp-Source: ACHHUZ5D9ncLbwL7cl6rbyMPcHnFLSY47zEGj02DbeGuoS4S2Ko0yMfo4mFiDLoa5Tst+W9HIh6Flg==
-X-Received: by 2002:a05:6214:501b:b0:635:e286:d4b with SMTP id jo27-20020a056214501b00b00635e2860d4bmr2389989qvb.18.1687968847977;
-        Wed, 28 Jun 2023 09:14:07 -0700 (PDT)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id x13-20020a05620a14ad00b00759554bbe48sm3299800qkj.4.2023.06.28.09.14.05
+        bh=uCb2Vb0sw1d9TmPcfXH1hgjTZMlLKeDGOqDDjRW5Mpg=;
+        b=DTmsmcFLOTlyXw5QuVTccQv4M6OFgExFVrGD/1O2dzE0JNAVqTjrc+s5oh9+/DQM2n
+         EUaTm5Zalo0m1d4hf3TVuQ7bzqI/AmfJiDyp9i6/kFI+6Q9lmKBrl4zIkXIkY+eQSF8X
+         webJp/L5N/rEQpgYuEk3HZEREd2BwbcrrOxl0eMkyOQQN02l0+DfEG5dKuvix/yFC6Y6
+         QYjqO9X4bftvsv4BVQ6IfWe1jikODVQA14NG8Zc+Axnq3ZfBM1h8KdU3eCT/m5HrHRk7
+         5HBeue3Uid3+3Sjt8UWzF1uu1dOrw8ZXO7yacK6HK1vGarqnBA/KfRm9pNyAuJp6fVLJ
+         C6xg==
+X-Gm-Message-State: AC+VfDzlKs0b+XuFI1c3A2ohhdII3RbpTSkMtdDXiyNSK79J9qmjOQGM
+	LjfvkfDcQ/qTMxdyabE90CM=
+X-Google-Smtp-Source: ACHHUZ7OcWTt22K6Zw3ExfiFAyEMeyuvOXgr3fI8PotD5XRF+JFr/5KL2V32h0kc7qQz2+Vw8GJXZg==
+X-Received: by 2002:a05:6830:18c6:b0:6b8:6979:3d4 with SMTP id v6-20020a05683018c600b006b8697903d4mr965754ote.19.1687969700881;
+        Wed, 28 Jun 2023 09:28:20 -0700 (PDT)
+Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id z15-20020a9d62cf000000b006b83a36c08bsm1981089otk.53.2023.06.28.09.28.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jun 2023 09:14:07 -0700 (PDT)
-Message-ID: <6795644d-1ce8-6937-d8b8-4318f2720289@gmail.com>
-Date: Wed, 28 Jun 2023 09:14:04 -0700
+        Wed, 28 Jun 2023 09:28:20 -0700 (PDT)
+Message-ID: <5b044364-7a3d-7be0-ff18-bcba656e6172@gmail.com>
+Date: Wed, 28 Jun 2023 11:25:57 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -47,11 +47,10 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
+ Thunderbird/102.12.0
 Subject: Re: [PATCH 1/3] hwsim: remove 'optimization' sending to only known
  MACs
-Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
 References: <20230504215247.581443-1-prestwoj@gmail.com>
  <54ae38d6-cc94-9410-8121-44ece399b24c@gmail.com>
  <39610c47-eaba-2299-9b03-5217355e8d47@gmail.com>
@@ -67,61 +66,35 @@ References: <20230504215247.581443-1-prestwoj@gmail.com>
  <2c35a14a-3ed7-fefb-5a78-fb29199f0fd4@gmail.com>
  <82ba7228-441f-ebf1-22d2-890b00c676e2@gmail.com>
  <7c2ca71d-5cba-c067-04bf-75a9341f3db6@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <7c2ca71d-5cba-c067-04bf-75a9341f3db6@gmail.com>
+ <6795644d-1ce8-6937-d8b8-4318f2720289@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <6795644d-1ce8-6937-d8b8-4318f2720289@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Denis,
+Hi James,
 
-On 6/28/23 8:40 AM, Denis Kenzior wrote:
-> Hi James,
-> 
+>>> Unfortunately once you move the radio into another namespace you lose any 
+>>> events associated with that radio, due to the PID of hwsim being associated 
+>>> with a distinct namespace (I think). So ADD/DEL_MAC_ADDR won't help here.
 >>
->> Unfortunately once you move the radio into another namespace you lose 
->> any events associated with that radio, due to the PID of hwsim being 
->> associated with a distinct namespace (I think). So ADD/DEL_MAC_ADDR 
->> won't help here.
+>> Which events though?  You should always be getting HWSIM_CMD_ events for _all_ 
+>> radios since only a single hwsim instance is registered, no? Aren't these all 
+>> you need for the purposes of sending packets to the right radio?
 > 
-> Which events though?  You should always be getting HWSIM_CMD_ events for 
-> _all_ radios since only a single hwsim instance is registered, no?  
-> Aren't these all you need for the purposes of sending packets to the 
-> right radio?
-
-ADD/DEL_MAC_ADDR, which don't come once the radio is moved to another 
-namespace (as far as I can tell with testing).
-
-I think it comes down to port ID:
-
-u32 _portid = READ_ONCE(data->wmediumd);
-...
-hwsim_unicast_netgroup(data, skb, _portid);
-
-One other potential (but much more complex) solution would be to use 
-multiple hwsim instances that communicate, making a sort of distributed 
-hwsim environment. I'm working on a similar concept which could 
-(partially) be upstreamed, at least the hwsim parts.
-
-We could provide hwsim a socket/FD to communicate with other hwsim 
-instances. hwsim would behave the same as it does now unless it receives 
-a frame which doesn't match to any known radios. In which case it send 
-that frame out to the external socket. It would also receive on that 
-socket, and pass the frame back to its local hwsim socket.
-
-I have it now where I just use the netlink protocol between hwsim 
-instances, so you can receive on the remote socket/FD and send that 
-directly back to the kernel for the local instance.
-
-This is similar enough that some of what I've done already could be 
-upstreamed and solve this namespace problem.
-
-Thanks,
-James
+> ADD/DEL_MAC_ADDR, which don't come once the radio is moved to another namespace 
+> (as far as I can tell with testing).
 > 
-> The NL80211 WIPHY events aren't really needed.  We only use these for 
-> informational purposes (only the name is used, I think?)  I guess we 
-> also use this information for the radio_ap_only() optimization we do, 
-> but we could probably solve this another way.
+> I think it comes down to port ID:
 > 
-> Regards,
-> -Denis
+> u32 _portid = READ_ONCE(data->wmediumd);
+> ...
+> hwsim_unicast_netgroup(data, skb, _portid);
+
+Then this may be a conversation you have to start on linux-wireless.  I would 
+have thought that there should only be a single wmediumd instance on a system 
+regardless of namespaces, but maybe I'm wrong here.
+
+Regards,
+-Denis
