@@ -1,92 +1,157 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-105.mailbox.org (mout-b-105.mailbox.org [195.10.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DA3C2F8
-	for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 14:49:42 +0000 (UTC)
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-565a8d74daeso398220eaf.1
-        for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 07:49:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687963781; x=1690555781;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tcrKvZ8Mnz4E66nW9NgNAr+V8RwWXJiujKhimnRuhZw=;
-        b=R9eEeHbYke+t8bpgsy5bEUJRmvAyWY2p8b8oPjphHw4nNCF9NwQNy655OP7LP2h8Dp
-         ubjhn2xjIdxLgHLynaUrQ8I+3ysOYpMLriBAYji7hgNuqCrha+GQRmCGczSckUapAn2J
-         TcJloDdNXLHfTM5okX/wQPbJbybbgcfwN12ApGp34nzGmuexL19EAd7+QHu/bURVfTlM
-         izCm71Td7Cc4YCzGFXc/yvyIE0CxpngJokX9aO2xFZR45VYi3SwKz9c/yqL+0EYU/Edd
-         QR1/dTJqjkYhQ6ZFB3dLyz2N4KvPFltTplb3e5xA0dc3rV2PCVPdv/1X2Stq0bjvjJVr
-         /lKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687963781; x=1690555781;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tcrKvZ8Mnz4E66nW9NgNAr+V8RwWXJiujKhimnRuhZw=;
-        b=ZXjGQuUJM7EYd4KfV/72Fvpa6x8q1KUQ2MpXOa6nd2f5wyYkFrpJuhGK3oOHDT8m9w
-         OwEIJm4RHht0WRskPDSMH+UprsSjEMevxAMGyJVmOwh2mHtBnDM+LjA6m7jkIacyV5SS
-         /D1YesQ7lK/tnhJznyJwG1crP8QvvOPi+1EhSx5IJsuCoj2QAyEXJzbXhwh/2IdSVfZ3
-         6xCZAVNiq3IBN0D/bG7URLc6B6K7o/CgassC3u8P6M0e+nemgPmDINIvetsi32Qg4nzJ
-         tlpLPr/h9qxBYy/rMCDoSPZaUtlMao6rEalwlbp0/GNtCrENsV9sy4ihuXIbnlxG5Ny8
-         mVlQ==
-X-Gm-Message-State: AC+VfDzdrDvh6uyLWzmmdbwl8Bi57G5U9X5Xa+IPG1nP6lKMwH+OSKM+
-	MC9u+71FvE+TGyEkMka87HRl96gXvC8=
-X-Google-Smtp-Source: ACHHUZ5BkuOVBR56f9q0Bqr+Twr1yx7sjXoRgUniDQ5de+eKW+9htC0Anp/aJKQCcIUBbx00WbeTlg==
-X-Received: by 2002:a4a:dd0d:0:b0:562:ff8a:75b7 with SMTP id m13-20020a4add0d000000b00562ff8a75b7mr1045471oou.3.1687963781539;
-        Wed, 28 Jun 2023 07:49:41 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id r2-20020a4ae5c2000000b0054fd51435efsm4325306oov.8.2023.06.28.07.49.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jun 2023 07:49:40 -0700 (PDT)
-Message-ID: <2c35a14a-3ed7-fefb-5a78-fb29199f0fd4@gmail.com>
-Date: Wed, 28 Jun 2023 09:49:39 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32AD828F2
+	for <iwd@lists.linux.dev>; Wed, 28 Jun 2023 14:52:15 +0000 (UTC)
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-105.mailbox.org (Postfix) with ESMTPS id 4Qrl0k2wSzz9vQ2;
+	Wed, 28 Jun 2023 16:52:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1687963926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fDoIz+fnqsoF6+je3rjj1c5rgiGjtjefG6g9ncjsMmk=;
+	b=jiNkal48UpXZxdQK0I/NjStTVHQDm+tNFWqT/ivuXrjPKgFi4/dyhoQMQDSW1dpoGUIdvo
+	2SqP+6xI0erO/7kkVo8vcozyL1vzx3P7P+iit/qDvLEniQ0XmBtDdRqKMtPqm9BI0QW+q/
+	UVaGnRl3gda6ir2cYGL1t+3edQis6sp5BOKygCdstjAsLMsBBkySirw8lMTOEz6YSbLdmE
+	H1bSa+NjE15XIx3iMgoK+JEmCYUjawmCwkUOrlxqeas7tSvubp4cyd4afjUS/Ff90Yz0dB
+	qBZF30VAb3QFjzfy4j/vvLw0IVLLueyTfO6DKkgDEdpEBRq2V31ejBjV6Y0uwg==
+Message-ID: <5448805b-253d-eeb6-33f2-881eb8be2157@tavla.de>
+Date: Wed, 28 Jun 2023 16:52:04 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH 1/3] hwsim: remove 'optimization' sending to only known
- MACs
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20230504215247.581443-1-prestwoj@gmail.com>
- <54ae38d6-cc94-9410-8121-44ece399b24c@gmail.com>
- <39610c47-eaba-2299-9b03-5217355e8d47@gmail.com>
- <88f638ea-bb37-c417-3b1c-1d7151506911@gmail.com>
- <7fdc5d67-e740-d593-253b-564bdf92048f@gmail.com>
- <d2d0841b-62a0-c8df-924f-851df5f88203@gmail.com>
- <865cf0a3-1be4-34cb-0535-e76cf43d6753@gmail.com>
- <63162827-5b8b-3c70-7f6f-fc7b513f2b6d@gmail.com>
- <1742c6eb-bbd5-7883-5a72-53021a771ca6@gmail.com>
- <3790483a-442f-9602-03c9-b205376d9262@gmail.com>
- <280831cf-933a-95b0-3889-ddca6ca544cc@gmail.com>
- <24a0ae5c-529b-a061-0fb4-0ba8a66fe76b@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <24a0ae5c-529b-a061-0fb4-0ba8a66fe76b@gmail.com>
+Subject: Re: iwd forgets network
+To: James Prestwood <prestwoj@gmail.com>
+Cc: James Tavares <jtavares@kvh.com>,
+ "iwd@lists.linux.dev" <iwd@lists.linux.dev>, denkenz@gmail.com
+References: <7794c62a-56d2-d34a-06e9-0b17edb235f7@tavla.de>
+ <61D86659-745B-4228-AC0D-216E5CA292D2@kvh.com>
+ <85b9e54c-dea7-672e-ecad-9382c8f6a7e7@tavla.de>
+ <9d7f0362-67af-bbc4-2cc0-d4f8da123cd3@gmail.com>
+ <e6f29266-7a7d-1fcf-2ce9-e96efe75a13d@tavla.de>
+ <2f0cc99c-c547-1150-d667-8fd667be86ae@gmail.com>
+Content-Language: en-GB
+From: Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
+In-Reply-To: <2f0cc99c-c547-1150-d667-8fd667be86ae@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 Hi James,
 
-> 
-> So one other caveat with this is that IWD creates its interface while inside the 
-> namespace. So we actually cannot track that. Only thing we could do is force the 
-> interface creation ahead of time, and make namespace'd iwd's use the default 
-> interface.
-> 
+Am 28.06.23 um 16:36 schrieb James Prestwood:
+> Hi Martin,
+>
+> On 6/27/23 10:56 PM, Martin Petzold wrote:
+>> Hi James,
+>>
+>> Am 27.06.23 um 19:06 schrieb James Prestwood:
+>>> Hi Martin,
+>>>
+>>> On 6/27/23 9:58 AM, Martin Petzold wrote:
+>>>> Hi James,
+>>>>
+>>>> Am 27.06.23 um 17:29 schrieb James Tavares:
+>>>>> Martin,
+>>>>> You mentioned a possible power loss in your testing. If iwd is not 
+>>>>> performing an fsync() after joining the network and writing the 
+>>>>> SSID configuration file, then there is a small window of time 
+>>>>> (between when the file is written and when the filesystem is next 
+>>>>> synced) when the file can easily go missing if power is lost.
+>>>>> If the file is newly created, then it could disappear entirely on 
+>>>>> power loss. If the files contents were overwritten, then it might 
+>>>>> revert to the old contents on power loss.
+>>>>> Perhaps this explains your issue.  I can’t tell you how many times 
+>>>>> I have been bitten by this in embedded Linux designs.
+>>>>
+>>>> Thanks, we have also experience with this. ext4 is quite a good 
+>>>> choice here. In general we feel safe. Also I was talking about 
+>>>> re-powering the router.
+>>>>
+>>>> Our device has seen a lot of power losses without any issue. But of 
+>>>> course it could be also something in this direction.
+>>>>
+>>>> However, this configuration file was existing since two or three 
+>>>> weeks at this place. And then gone.
+>>>>
+>>>> Does IWD change or write to the configuration files? Timestamps?
+>>>
+>>> IWD will create a config if you explicitly ask to connect to an 
+>>> unprovisioned network. The agent will ask for a passphrase and once 
+>>> the connection is successful it will create a new profile and write 
+>>> to disk.
+>>>
+>> I have seen a more recent timestamp on the file. Also after reboot 
+>> IWD seems to set the timestamp. Can you confirm that IWD periodically 
+>> sets the timestamp? What is this for? How does it work? And can any 
+>> write access (without user command) be disabled?
+>
+> Ah yes it will set the files mtime when connected to a network. This 
+> is done so we can connect to the most recently connected network after 
+> a reboot/shutdown.
+>
+> Currently no, there is no way to disable this.
+>
+>>
+>> As there seems to be some sort of write access, IMHO there may be a 
+>> bug which causes the file to disappear. Maybe only with bind mounts, 
+>> but also maybe not.
+>
+> IWD is careful to ensure the file doesn't get corrupted if something 
+> happens like a crash/power outage. We first write the file to /tmp, 
+> then call rename() once the entire file has been written. Maybe a very 
+> badly timed power outage could leave the file missing? I don't know 
+> enough about how rename() works.
 
-Yep.  Since iwd will have to handle multi-mode devices and multiple interfaces, 
-there's really not much we can do in the general case.  This is why we need to 
-pay attention to HWSIM_CMD_ADD_MAC_ADDR.
+Unfortunately rename is not atomic across partitions. We have our own 
+cache implementation and hat such issues with separate tmp partition - 
+had to switch to same partition for temporary files as the storage.
 
-Looking at that kernel commit again, it seems to already invoke 
-mac80211_hwsim_config_mac_nl() on add_interface and remove_interface.  So maybe 
-everything needed to handle interface creation/removal inside namespaces is 
-already there?  If not, then any missing event generation should be fixed in the 
-kernel.
+Still, it does not actually explain my issue.
 
-Regards,
--Denis
+>
+>>
+>> I am using ext4 file system on an eMMC.
+>>
+>> I have switched yesterday already to bullseye main IWD 1.14-3 now. 
+>> Because I also sometimes had issues with backported packages. The 
+>> problem has not occurred since then. However, I also only had two 
+>> incidences in a few weeks before.
+>>
+>>>>
+>>>> When does IWD decide to maybe (delete and) create the state directory?
+>>>
+>>> It should never delete the state directory. It will create it though 
+>>> if it doesn't exist.
+>>>
+>>>>
+>>>> Could it be a race-condition with the bind-mounts?
+>>>
+>>> I really have no idea. I've only ever tested bind mounts just today, 
+>>> and definitely no extensive long-running testing.
+>>>
+>>>>
+>>>> At the moment it is not easy for me to add debug code to the 
+>>>> source, as we use Debian packages and don't build these components 
+>>>> from source...
+>>>
+>>> Only other suggestion is to run strace on IWD and wait for it to 
+>>> happen. Then you could see if IWD made any suspicious syscalls. If 
+>>> not, its something external to IWD.
+>>>
+>>>>
+>>>> Thanks,
+>>>>
+>>>> Martin
+>>>>
+>>>
+>
