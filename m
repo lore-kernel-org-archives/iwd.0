@@ -1,45 +1,45 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E9A134DD
-	for <iwd@lists.linux.dev>; Mon, 10 Jul 2023 16:58:05 +0000 (UTC)
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-1b449890ef5so3542696fac.1
-        for <iwd@lists.linux.dev>; Mon, 10 Jul 2023 09:58:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38944107B4
+	for <iwd@lists.linux.dev>; Mon, 10 Jul 2023 17:13:38 +0000 (UTC)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-26586e824e7so1528447a91.3
+        for <iwd@lists.linux.dev>; Mon, 10 Jul 2023 10:13:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689008284; x=1691600284;
+        d=gmail.com; s=20221208; t=1689009217; x=1691601217;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Hz+XXRKLaQJMcOYdCTEXlVBNWKQG1HHf5qPo6OxFwmo=;
-        b=VXVRe9DW8YVvkmCp/WChoPNLW80oMdork8kAi5VasJmUuDXxM8ryE7B29FdlR2ZjyN
-         cC0GB0thGLgiDXGUK2sEhPL1L+XW0nBwueadbM6xjH3Niqq3pczOqB+GcAZ8YPtimEfO
-         QKLOVR98WvK93CxN3cAPMCSwgYWvZIyICeio3fpkV4TfrO3OgPtXsQ5W0Dh7tTIZvLva
-         0w9RpSz0h54Q8fmB+3cYjIGUZAJ7+zBu8ZSIhL/LKEy5pSKCbVHNFSfENqcQA+PBfP+W
-         lPOOiLHLFIZ8m4VtwKueuJAw7Rs+dHPWwG3PX3r6+C8NoGsggumaUM5oS3mPEmnfY75L
-         ETGA==
+        bh=E78+6MfO+pXRx2G6k7gMjKs0gYYtxpEoZzF17HJQurM=;
+        b=CqqEk06v1k+2o2c+ju+AARcSbnXTzl3zFJGwQNg6zLqN6gjTdB3/teFfk2/bAhhRdE
+         UkrFSm+/S43FSzo4XYa9B9FO8rM1yIVi1R5U3rZpo+MvLZMoDHtd5sOJVAj46GklKHGm
+         b8cRU6YTEk+/jFRhNGIgdvsaagaYrVsm/XQZiX2//+hNnMPy+DYa2cbUbUHN1GHeqHvB
+         dYW21/b9zc/KNfyeXh/UOeGW4K8d2MBkQLt/tznnDi6uMT/RneNNv+9MissdCILd159x
+         nMtPmwJVdVTWtLo5DE03WHz8g0ohCJjploqOoz34/7FyY6tNo5TTCoqZfZ1STcI6pukj
+         ZUAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689008284; x=1691600284;
+        d=1e100.net; s=20221208; t=1689009217; x=1691601217;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hz+XXRKLaQJMcOYdCTEXlVBNWKQG1HHf5qPo6OxFwmo=;
-        b=WY+Y+DP6/ETH2PbF6n1K/PNQBESa1NtQnOT/ued2kgChmaUjDTAISeo2e08L0ZBx7W
-         4BaH0WSC06bwoTh3ljgzdWBkObH3kcMo4H+7pkYQeYxFwTYf5WbYf2f1o3tzBovnJZms
-         J3c5wFsDI4sszGqWoRMsSJUp7dS+1zWic8Dm/B74e6I/hHCfsYk7mU4I2SWGP5sOaers
-         jvlaA4J6FSP3AVCVCyA2FXZx6W/JcWIfx2mpR7JqmE9ra/1guzmTbv5Mq5JnryOD/bbP
-         mqBdCYNK6+k7lnNfiP51gsAPJD/z4qz+HxWm+a4+KM+GjXgc5ZBaPmvtKBAeJ0if3xMX
-         v/yg==
-X-Gm-Message-State: ABy/qLYq4GE+5t9TPsWbLXCbtKF3dy4gbK4TXGLeI2KTIa4V0vbk/IF8
-	oA32o6uBQVVkCvjKXyVIA3k=
-X-Google-Smtp-Source: APBJJlGPhO5x6kao0WFQ530cSNIHJpkXkmvxvvZlp0vwj4ydzORluC2NgKgatJZGVbjdT4EUyIn1OA==
-X-Received: by 2002:a05:6870:6494:b0:1b0:25b4:4b7f with SMTP id cz20-20020a056870649400b001b025b44b7fmr15494702oab.27.1689008284313;
-        Mon, 10 Jul 2023 09:58:04 -0700 (PDT)
+        bh=E78+6MfO+pXRx2G6k7gMjKs0gYYtxpEoZzF17HJQurM=;
+        b=kFcUEDyLv1SVgYkBcoD7gjmH8XNx5r4v8HMAUWbvh9jShYDS7YCqCSHZnEtKu1V6uA
+         j6XIhzdNxm5jfCCO8nni8huIH2h3ujAdK6pcjdJSYN/if6dZ/zhkoxfmwe6mrOSpQ8S9
+         ErRGvOHvNAGy+IG/qA6dEB7RyvlqNwLnbtnaD5AwdZ907C2ky/g2MJPqcxbru7KxG2NW
+         sYamgnCgaaHbo83zEYm4LY3r6jIdEdgfRyB/u5wX47D0TH+zsJ5JWC2ZBeQqfPYbOIHI
+         iWAkwUFfHeuF4PSTkSOnagoxoWtFnDnEMYRW17UL2x2wES1W/Vgfe6dNFv4lNfNKnkDT
+         ueIA==
+X-Gm-Message-State: ABy/qLZ9R5Kq+fkjXh7ZZhWEjLCsd4x+BD2W3Y7zyXP8qhORnbUnAQhr
+	rhSUzIEiSfjUUR8sFLFSkIM=
+X-Google-Smtp-Source: APBJJlEQXlP5OX/a8o3ktBrP97/z6di4wv5yJo0EXHlnHioD1fViwYBKrE2dEYEHLv2rIYxl7aXoSw==
+X-Received: by 2002:a17:90a:bd96:b0:262:f047:3569 with SMTP id z22-20020a17090abd9600b00262f0473569mr10292973pjr.8.1689009217375;
+        Mon, 10 Jul 2023 10:13:37 -0700 (PDT)
 Received: from [192.168.254.40] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id dw16-20020a17090b095000b00260cce91d20sm177349pjb.33.2023.07.10.09.58.03
+        by smtp.gmail.com with ESMTPSA id gw10-20020a17090b0a4a00b00262fc84b931sm6516363pjb.44.2023.07.10.10.13.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jul 2023 09:58:03 -0700 (PDT)
-Message-ID: <f60b8582-a1c0-f8d0-abce-7f5813c3eb11@gmail.com>
-Date: Mon, 10 Jul 2023 09:58:03 -0700
+        Mon, 10 Jul 2023 10:13:36 -0700 (PDT)
+Message-ID: <1a248b20-c31d-d948-48ab-4221c416a0bf@gmail.com>
+Date: Mon, 10 Jul 2023 10:13:36 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -48,58 +48,82 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [RFC 2/5] dbus: remove iwd.h dependency
+Subject: Re: [RFC 0/5] Initial refactor for hwsim frame processing
 Content-Language: en-US
 To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <20230630191812.2884637-1-prestwoj@gmail.com>
- <20230630191812.2884637-3-prestwoj@gmail.com>
- <c54f0b24-b359-e51b-b30b-2175348348d6@gmail.com>
+ <12fbf71d-976d-fe2a-7326-547dab44b84a@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <c54f0b24-b359-e51b-b30b-2175348348d6@gmail.com>
+In-Reply-To: <12fbf71d-976d-fe2a-7326-547dab44b84a@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 Hi Denis,
 
-On 7/5/23 8:17 PM, Denis Kenzior wrote:
+On 7/5/23 9:36 PM, Denis Kenzior wrote:
 > Hi James,
 > 
 > On 6/30/23 14:18, James Prestwood wrote:
->> Require a compile time flag to set the service
->> ---
->>   Makefile.am |  1 +
->>   src/dbus.c  | 33 ++++++++++++++++-----------------
->>   2 files changed, 17 insertions(+), 17 deletions(-)
->>
->> diff --git a/Makefile.am b/Makefile.am
->> index 401d2ac5..2fb03aa9 100644
->> --- a/Makefile.am
->> +++ b/Makefile.am
->> @@ -268,6 +268,7 @@ src_iwd_SOURCES = src/main.c linux/nl80211.h 
->> src/iwd.h src/missing.h \
->>   src_iwd_LDADD = $(ell_ldadd) -ldl
->>   src_iwd_DEPENDENCIES = $(ell_dependencies)
->> +src_iwd_CFLAGS = -DDBUS_SERVICE=\"net.connman.iwd\"
+>> I wanted to put this out there just as an idea before I get too
+>> invested in extending it. The code itself needs cleanup (explained
+>> later) but I wanted some feedback on the general idea.
 > 
-> I'm not really a fan of doing it this way.
-> 
->> @@ -38,99 +37,99 @@ static dbus_agent_shutdown_func_t agent_shutdown;
->>   struct l_dbus_message *dbus_error_busy(struct l_dbus_message *msg)
->>   {
->> -    return l_dbus_message_new_error(msg, IWD_SERVICE ".InProgress",
->> +    return l_dbus_message_new_error(msg, DBUS_SERVICE ".InProgress",
->>                       "Operation already in progress");
-> 
-> I wonder if we can add this to ell instead.  We have almost the same 
-> code in oFono for example. And something very similar inside connman 
-> src/error.c.
-> 
-> Perhaps we can simply pull the name from l_dbus_name_acquire?  Our apps 
-> are unlikely to ever register more than a single service name on the 
-> bus?  Other ideas?
+> No real objection, but if you're moving 1kloc of code around, make sure 
+> that any moves are separated from overall refinements and other 
+> changes.  For example, if you're exporting API functions or structures 
+> for use in (newly created) modules, do that first.
 
-Since ofono and maybe others have the same code I can add these in ELL 
-and use the service name thats registered.
+Yep definitely.
+
+> 
+>>
+>> Eventually I'd like to extend this to support remote communication
+>> with multiple hwsim instances, e.g. via a multicast socket. As a
+>> starting point the rules code fit nicely as a frame processing
+>> module.
+> 
+> I assume you saw https://github.com/Raizo62/vwifi ?
+
+I had not seen that one, but its pretty close to what I'm looking for. 
+Still would need some specific modifications but its at least being 
+maintained somewhat. Definitely worth looking into.
+
+There is also a similar project, but its old and doesn't look 
+particularly finished:
+
+https://github.com/cmu-sei/welled
+
+> 
+>>
+>> Cleanup:
+>>   - Find solution for the IWD_MODULE_DEPENDS issue
+> 
+> Well, you need to put something into the section if you don't invoke 
+> IWD_MODULE_DEPENDS at least once.
+> 
+>>   - Add getters for radio/interface info objects, possibly
+>>     for hwsim_frame too rather than everything exposed in
+>>     hwsim.h.
+> 
+> That would be preferable.
+> 
+>>   - The hwsim_frame cleanup in rules needs to be changed. Prior
+>>     hwsim_frame_unref() would send tx_info but now this needs
+>>     to be handled in rules.c. Currently we peek into the refcount
+>>     and see if it will be destroyed on unref, and send tx_info
+>>     then.
+> 
+> Hmm, not sure I follow yet?
+
+Just minor details really, I need to just look at it closer once its in 
+a more finished state.
+
+> 
+> Also, iwd/tools/* is for executables that get built from single files.  
+> I guess we could relax that, but it may be better to have hwsim live in 
+> its own directory, similar to ead & iwmon.
+
+Ok that does make more sense.
 
 > 
 > Regards,
