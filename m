@@ -1,130 +1,109 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38944107B4
-	for <iwd@lists.linux.dev>; Mon, 10 Jul 2023 17:13:38 +0000 (UTC)
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-26586e824e7so1528447a91.3
-        for <iwd@lists.linux.dev>; Mon, 10 Jul 2023 10:13:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689009217; x=1691601217;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=E78+6MfO+pXRx2G6k7gMjKs0gYYtxpEoZzF17HJQurM=;
-        b=CqqEk06v1k+2o2c+ju+AARcSbnXTzl3zFJGwQNg6zLqN6gjTdB3/teFfk2/bAhhRdE
-         UkrFSm+/S43FSzo4XYa9B9FO8rM1yIVi1R5U3rZpo+MvLZMoDHtd5sOJVAj46GklKHGm
-         b8cRU6YTEk+/jFRhNGIgdvsaagaYrVsm/XQZiX2//+hNnMPy+DYa2cbUbUHN1GHeqHvB
-         dYW21/b9zc/KNfyeXh/UOeGW4K8d2MBkQLt/tznnDi6uMT/RneNNv+9MissdCILd159x
-         nMtPmwJVdVTWtLo5DE03WHz8g0ohCJjploqOoz34/7FyY6tNo5TTCoqZfZ1STcI6pukj
-         ZUAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689009217; x=1691601217;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E78+6MfO+pXRx2G6k7gMjKs0gYYtxpEoZzF17HJQurM=;
-        b=kFcUEDyLv1SVgYkBcoD7gjmH8XNx5r4v8HMAUWbvh9jShYDS7YCqCSHZnEtKu1V6uA
-         j6XIhzdNxm5jfCCO8nni8huIH2h3ujAdK6pcjdJSYN/if6dZ/zhkoxfmwe6mrOSpQ8S9
-         ErRGvOHvNAGy+IG/qA6dEB7RyvlqNwLnbtnaD5AwdZ907C2ky/g2MJPqcxbru7KxG2NW
-         sYamgnCgaaHbo83zEYm4LY3r6jIdEdgfRyB/u5wX47D0TH+zsJ5JWC2ZBeQqfPYbOIHI
-         iWAkwUFfHeuF4PSTkSOnagoxoWtFnDnEMYRW17UL2x2wES1W/Vgfe6dNFv4lNfNKnkDT
-         ueIA==
-X-Gm-Message-State: ABy/qLZ9R5Kq+fkjXh7ZZhWEjLCsd4x+BD2W3Y7zyXP8qhORnbUnAQhr
-	rhSUzIEiSfjUUR8sFLFSkIM=
-X-Google-Smtp-Source: APBJJlEQXlP5OX/a8o3ktBrP97/z6di4wv5yJo0EXHlnHioD1fViwYBKrE2dEYEHLv2rIYxl7aXoSw==
-X-Received: by 2002:a17:90a:bd96:b0:262:f047:3569 with SMTP id z22-20020a17090abd9600b00262f0473569mr10292973pjr.8.1689009217375;
-        Mon, 10 Jul 2023 10:13:37 -0700 (PDT)
-Received: from [192.168.254.40] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id gw10-20020a17090b0a4a00b00262fc84b931sm6516363pjb.44.2023.07.10.10.13.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jul 2023 10:13:36 -0700 (PDT)
-Message-ID: <1a248b20-c31d-d948-48ab-4221c416a0bf@gmail.com>
-Date: Mon, 10 Jul 2023 10:13:36 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6803FFE
+	for <iwd@lists.linux.dev>; Wed, 12 Jul 2023 11:18:52 +0000 (UTC)
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36CBDwGu005163;
+	Wed, 12 Jul 2023 11:17:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=V+V3TYWDoGD/njadRAxA/zdbsVCrf1osYjbzis/JC8Q=;
+ b=YoA/nMWOif9WYBMy34Vr+gROpvvUJKLK4X9O6Wml6oIs3YwKtz+7u/2Eu7ph0tLW2IR3
+ vbn3Cg/Hk7LBJL7wlAU0tKxhRvQbYGNVMvfURmjPfZeX/bvIGMpBpnhAa1P1LNg1tRuO
+ vnlCLsQQ8UhrS6Xbsqa7TdZDzskvC0raWF9nvPHbKOy1dD/CqE7a3C2CTyyvYQFGeIjm
+ OzeFjxWd6kgbgj/HBmVLkIZ9qlbsM+idjuABznH8/uhiyzOUjE6a1DGOgR1mEnVO+Xpj
+ af8E+X8DPm1nGE9D+gGIuC7mUbFo2rorZ/3+YRg/bUZFWKnmjpqpT9rEvSO6V/MJXUO5 hA== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rshyu91vv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jul 2023 11:17:44 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36CBHhKI013251
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jul 2023 11:17:43 GMT
+Received: from [10.231.195.204] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Wed, 12 Jul
+ 2023 04:17:41 -0700
+Message-ID: <a7e76f73-da60-57fd-6686-b26e5c342d87@quicinc.com>
+Date: Wed, 12 Jul 2023 19:17:37 +0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [RFC 0/5] Initial refactor for hwsim frame processing
+Subject: Re: [PATCH v3 3/3] owe: netdev: refactor to remove OWE as an
+ auth-proto
 Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20230630191812.2884637-1-prestwoj@gmail.com>
- <12fbf71d-976d-fe2a-7326-547dab44b84a@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <12fbf71d-976d-fe2a-7326-547dab44b84a@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: James Prestwood <prestwoj@gmail.com>, <iwd@lists.01.org>,
+        <iwd@lists.linux.dev>
+References: <20210903193544.13897-3-prestwoj@gmail.com>
+From: Wen Gong <quic_wgong@quicinc.com>
+In-Reply-To: <20210903193544.13897-3-prestwoj@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: c7IAWcZavOjTcYkp6hv8b7pUkcd4u668
+X-Proofpoint-ORIG-GUID: c7IAWcZavOjTcYkp6hv8b7pUkcd4u668
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-12_06,2023-07-11_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 bulkscore=0 spamscore=0 mlxlogscore=999 phishscore=0
+ clxscore=1011 mlxscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307120100
 
-Hi Denis,
+On 9/4/2021 3:35 AM, James Prestwood wrote:
+> ---
+...
+> +
+> +			case IE_TYPE_RSN:
+> +				if (!netdev->owe_sm)
+> +					continue;
+> +
+> +				if (ie_parse_rsne(&iter, &info) < 0) {
+> +					l_error("could not parse RSN IE");
+> +					goto error;
+> +				}
+> +
+> +				/*
+> +				 * RFC 8110 Section 4.2
+> +				 * An AP agreeing to do OWE MUST include the OWE AKM in
+> +				 * the RSN element portion of the 802.11 association
+> +				 * response.
+> +				 */
+Now it is happen connect to OWE AP fail with some APs, because the assoc 
+resp do not inclued RSNE.
+> +				if (info.akm_suites != IE_RSN_AKM_SUITE_OWE) {
+> +					l_error("OWE AKM not included");
+> +					goto deauth;
+> +				}
+> +
+> +				owe_akm_found = true;
+> +
+> +				break;
+> +			}
+> +		}
+> +
+> +		if (netdev->owe_sm) {
+> +			if (!owe_dh || !owe_akm_found) {
+> +				l_error("OWE DH element/RSN not found");
 
-On 7/5/23 9:36 PM, Denis Kenzior wrote:
-> Hi James,
-> 
-> On 6/30/23 14:18, James Prestwood wrote:
->> I wanted to put this out there just as an idea before I get too
->> invested in extending it. The code itself needs cleanup (explained
->> later) but I wanted some feedback on the general idea.
-> 
-> No real objection, but if you're moving 1kloc of code around, make sure 
-> that any moves are separated from overall refinements and other 
-> changes.  For example, if you're exporting API functions or structures 
-> for use in (newly created) modules, do that first.
+It failed here.
 
-Yep definitely.
+So is the check for owe_akm_found MUST added here if owe_dh is existed 
+in assoc resp?
 
-> 
->>
->> Eventually I'd like to extend this to support remote communication
->> with multiple hwsim instances, e.g. via a multicast socket. As a
->> starting point the rules code fit nicely as a frame processing
->> module.
-> 
-> I assume you saw https://github.com/Raizo62/vwifi ?
-
-I had not seen that one, but its pretty close to what I'm looking for. 
-Still would need some specific modifications but its at least being 
-maintained somewhat. Definitely worth looking into.
-
-There is also a similar project, but its old and doesn't look 
-particularly finished:
-
-https://github.com/cmu-sei/welled
-
-> 
->>
->> Cleanup:
->>   - Find solution for the IWD_MODULE_DEPENDS issue
-> 
-> Well, you need to put something into the section if you don't invoke 
-> IWD_MODULE_DEPENDS at least once.
-> 
->>   - Add getters for radio/interface info objects, possibly
->>     for hwsim_frame too rather than everything exposed in
->>     hwsim.h.
-> 
-> That would be preferable.
-> 
->>   - The hwsim_frame cleanup in rules needs to be changed. Prior
->>     hwsim_frame_unref() would send tx_info but now this needs
->>     to be handled in rules.c. Currently we peek into the refcount
->>     and see if it will be destroyed on unref, and send tx_info
->>     then.
-> 
-> Hmm, not sure I follow yet?
-
-Just minor details really, I need to just look at it closer once its in 
-a more finished state.
-
-> 
-> Also, iwd/tools/* is for executables that get built from single files.  
-> I guess we could relax that, but it may be better to have hwsim live in 
-> its own directory, similar to ead & iwmon.
-
-Ok that does make more sense.
-
-> 
-> Regards,
-> -Denis
+> +				goto error;
+>   			}
+...
