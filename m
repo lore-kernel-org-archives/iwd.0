@@ -1,114 +1,87 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E60246AD
-	for <iwd@lists.linux.dev>; Fri, 14 Jul 2023 03:51:16 +0000 (UTC)
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6b9bf1ed7feso46063a34.0
-        for <iwd@lists.linux.dev>; Thu, 13 Jul 2023 20:51:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689306675; x=1691898675;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GMKt+maqeivDJA05l2U0mdWg+VLC/yrUqUfKJVdU4p0=;
-        b=ATveFsbMj1eDfbjmNhI836KpLDv2ntc/GFTBRUDJHS0LloOPHIlVe2octCgvuz7Z1o
-         sLASMTT00WRKDeDuBYrBRNBOiDO/qUJn3nxvBDyIC+etxbXz2DPwPIllOaiFnQ2gKE5P
-         YVbjPy7BQjm0pRLkXlwKTtS733mSJIOY+36hfOQQpZa815GmkOyA1+zHeDbHqJkyCkqI
-         wHi4UrRDTzzWq1RNnldG+yvPPj7vlw8suFsGqanm/WsTx2h5W6yS046A2pkBkm6L9Ks4
-         VFJ7FR42aOfUfdjuEuWBjdkQsE2mgdNnhVIA72V+nwBHwxukTGz42AA6I+HdIcVKPbGo
-         oVDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689306675; x=1691898675;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GMKt+maqeivDJA05l2U0mdWg+VLC/yrUqUfKJVdU4p0=;
-        b=RcLvnuRIuOmwfn4c5f4bwOIdB4d6J83d+2j7TJeYC7WyfGLKFhe0+GmJtsgzwLD3kV
-         lMG53pGMrKxjPgkrGDBQvCL8NEePLtdae57+2DhvWmEWc0UzRwUFWLl55li3dIkrXc1f
-         44ZQulExXSk18FtcZi+2n1QUEY58UVihIF4Mfxi7nlQYwtj8rd35XvLB+xZq4uiEkgYw
-         wb0+33LfQDrT88ak2OZSC1GyMK+ExDDytARYRskLBenhKMYBZ7DreAz380+IjDoIO4WW
-         5NIdCsejSwXlK2I7+FX+tW6wVYYr4rk57VK3W8dg0K9vUSVk+uK+whTqDGQ4v2v+UF/D
-         SEow==
-X-Gm-Message-State: ABy/qLbLusE3NVR4ouw3H8CcqhmdEfEOAf1Iup/DycDKRzHTvlvbUZkl
-	rFh9F9eZ94W8oRIDKOetshI=
-X-Google-Smtp-Source: APBJJlFod5rcsIU/8TgBO07L7Xfj1/a52nZyseX6N/zpqgCEi4lOSEzVofMMF7tpEfEaEuIzykGxQQ==
-X-Received: by 2002:a05:6830:1494:b0:6b9:9e42:9319 with SMTP id s20-20020a056830149400b006b99e429319mr4179979otq.9.1689306675275;
-        Thu, 13 Jul 2023 20:51:15 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id r3-20020a05683001c300b006b4281cf424sm3486461ota.4.2023.07.13.20.51.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 20:51:14 -0700 (PDT)
-Message-ID: <5c6f96fa-dd84-df1a-7684-5692944fcb4e@gmail.com>
-Date: Thu, 13 Jul 2023 22:51:13 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D01D3D71
+	for <iwd@lists.linux.dev>; Fri, 14 Jul 2023 03:56:50 +0000 (UTC)
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36E3YkvE026270;
+	Fri, 14 Jul 2023 03:56:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=VRlMyZfs2nrV3tOK8hClD1LdGO2XMRyZSCsnPAL3IQQ=;
+ b=QSgHHHWh2/9jm1pCs/94ri94odAgBuKyJVuYRBEaD4VzkCr+TUUWKHbNFUwr3mv/SeFM
+ L/mC/8vuC1YGA9uVu41T4OfU3OpuIONEL5bnKR/SNR928zbA1Y+hEMA8f0iiPzDOQA3R
+ +zQpiA01VPY+JCzntmk29pxztY8jeCqIYF0nOkIjTVjf96l7+EX7s13fwQU7M5oyUfId
+ 0u6u16zQGvDX31tT63JHTCZYjye+ulpe/ITCovWasa+j0TWzkOVyQI6s8N7CFv1ePpfU
+ YDwNw3Kuwg9DJRusgNHY39PxR5VeAAAXjHt2togXTlN4vYeWc6U4pvER/7pSCLns/XAP nw== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rtpub8rs8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Jul 2023 03:56:43 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36E3ugrA012118
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Jul 2023 03:56:42 GMT
+Received: from [10.231.195.204] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Thu, 13 Jul
+ 2023 20:56:41 -0700
+Message-ID: <25dfa954-ffc3-a750-d880-8f9ed6a26384@quicinc.com>
+Date: Fri, 14 Jul 2023 11:56:38 +0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
 Subject: Re: [PATCH] netdev: relax requirement for OWE AKM in assoc reply
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-Cc: Wen Gong <quic_wgong@quicinc.com>
+To: Denis Kenzior <denkenz@gmail.com>, James Prestwood <prestwoj@gmail.com>,
+        <iwd@lists.linux.dev>
 References: <20230713144237.2977210-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20230713144237.2977210-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ <5c6f96fa-dd84-df1a-7684-5692944fcb4e@gmail.com>
+From: Wen Gong <quic_wgong@quicinc.com>
+In-Reply-To: <5c6f96fa-dd84-df1a-7684-5692944fcb4e@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: uW-DIr7uoOG5OKflCPGx5s5dQcV9ew9Q
+X-Proofpoint-GUID: uW-DIr7uoOG5OKflCPGx5s5dQcV9ew9Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-14_01,2023-07-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 spamscore=0 mlxlogscore=739 bulkscore=0 phishscore=0
+ suspectscore=0 adultscore=0 malwarescore=0 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307140035
 
-Hi James,
+On 7/14/2023 11:51 AM, Denis Kenzior wrote:
+> Hi James,
+>
+> On 7/13/23 09:42, James Prestwood wrote:
+>>
+...
+>
+> Looks fine to me.
+>
+> Wen, any chance you can test this patch so I can also add your Tested-By?
+>
+> Regards,
+> -Denis
+I have tested it before:
+Jul 11 20:32:32.646611 wd[1024]: src/netdev.c:netdev_mlme_notify() MLME 
+notification Connect(46)
+Jul 11 20:32:32.646611 wd[1024]: src/netdev.c:netdev_connect_event()
+Jul 11 20:32:32.646611 wd[1024]: not care OWE DH element/RSN not found
+Jul 11 20:32:32.681820 wd[1024]: src/station.c:station_connect_cb() 5, 
+result: 0
+Jul 11 20:32:32.681820 wd[1024]: src/station.c:station_connect_ok()
 
-On 7/13/23 09:42, James Prestwood wrote:
-> Some APs don't include the RSNE in the associate reply during
-> the OWE exchange. This causes IWD to be incompatible since it has
-> a hard requirement on the AKM being included.
-> 
-> This relaxes the requirement for the AKM and instead warns if it
-> is not included.
-> 
-> Below is an example of an association reply without the RSN element
-> 
-> IEEE 802.11 Association Response, Flags: ........
->       Type/Subtype: Association Response (0x0001)
->       Frame Control Field: 0x1000
->       .000 0000 0011 1100 = Duration: 60 microseconds
->       Receiver address: 64:c4:03:88:ff:26
->       Destination address: 64:c4:03:88:ff:26
->       Transmitter address: fc:34:97:2b:1b:48
->       Source address: fc:34:97:2b:1b:48
->       BSS Id: fc:34:97:2b:1b:48
->       .... .... .... 0000 = Fragment number: 0
->       0001 1100 1000 .... = Sequence number: 456
-> IEEE 802.11 wireless LAN
->       Fixed parameters (6 bytes)
->       Tagged parameters (196 bytes)
->           Tag: Supported Rates 6(B), 9, 12(B), 18, 24(B), 36, 48, 54, [Mbit/sec]
->           Tag: RM Enabled Capabilities (5 octets)
->           Tag: Extended Capabilities (11 octets)
->           Ext Tag: HE Capabilities (IEEE Std 802.11ax/D3.0)
->           Ext Tag: HE Operation (IEEE Std 802.11ax/D3.0)
->           Ext Tag: MU EDCA Parameter Set
->           Ext Tag: HE 6GHz Band Capabilities
->           Ext Tag: OWE Diffie-Hellman Parameter
->               Tag Number: Element ID Extension (255)
->               Ext Tag length: 51
->               Ext Tag Number: OWE Diffie-Hellman Parameter (32)
->               Group: 384-bit random ECP group (20)
->               Public Key: 14ba9d8abeb2ecd5d95e6c12491b16489d1bcc303e7a7fbd…
->           Tag: Vendor Specific: Broadcom
->           Tag: Vendor Specific: Microsoft Corp.: WMM/WME: Parameter Element
-> 
-> Reported-By: Wen Gong <quic_wgong@quicinc.com>
-> ---
->   src/netdev.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-
-Looks fine to me.
-
-Wen, any chance you can test this patch so I can also add your Tested-By?
-
-Regards,
--Denis
