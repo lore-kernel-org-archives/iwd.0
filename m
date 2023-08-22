@@ -1,226 +1,210 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87391CA14
-	for <iwd@lists.linux.dev>; Tue, 22 Aug 2023 15:29:41 +0000 (UTC)
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3a7d4030621so2795915b6e.3
-        for <iwd@lists.linux.dev>; Tue, 22 Aug 2023 08:29:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CFD1D31F
+	for <iwd@lists.linux.dev>; Tue, 22 Aug 2023 15:34:09 +0000 (UTC)
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-59209b12c50so28339617b3.0
+        for <iwd@lists.linux.dev>; Tue, 22 Aug 2023 08:34:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692718180; x=1693322980;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FaiQCf6vJ3cdWRNVf/xbx1j3AbvhsgUXvbvVHiZDFV0=;
-        b=rVzJNJyUOrAbCTJSdfnfI7DwQjSFSDStEtfiFFXb7POJOpYn8IaOLYCYUchvw0GdGP
-         oP2XLqKmIKcdZUmZ+WFuB8iEqQDH9+XrO0PAX4NtcyEHA2529jEPr84eCFiA4Mald2al
-         ey5slNrRTWgr0pA1cARwR62XMm0CpgNbtspsfhGOyclfJuhl6zKVzq+5UCIUgssNCZro
-         JTpb7BcFmdMMiabHUwPjLPTGK8tZgG2TAZazvXwRccVy7eZZ/Zeb2MAtJgJlJCQ+D0CA
-         KXNPyYQ76bJIef+Pe7IfbwSD/PJl5TEsMsiJCY8vStKIS3giJDXfbY5wCXuJfnvluKVb
-         jLsQ==
+        d=gmail.com; s=20221208; t=1692718448; x=1693323248;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+YRfSpJmY4Lbm0O5pnocvMEweW7fJmNbN9L39cYG7bM=;
+        b=PwtnSYlyq2TNTeq6mZ/wRHaX3gRIJqNfZV5OpqFT+Mw2c9GhEZLLLIhrEMQcCz0df2
+         aYbRyswnU53urV5VIHbNybrRly8Ey6tUEMiZwV3IZO1EvhRfp8lYZeXdURgJFMVe7I7q
+         8oCh5os1Pc3ZlVvN+wmHuS267boZvIv8+Zh9Ej9ITN6jsF9Wyhuc8HR4xgTjTPwh08Dr
+         TmAQSyln2G/iuxH3odYTyCT5lVD0oNP9RVynudq2XfG9AI1Pfkrrh2gGLHtu0wnZ2bdC
+         Pf0ZLiAu1tQ8qjp78SjekzjfCBtCd4dLq38nv1ySFazFte93htwUOBlqD6FYX6mdXFjZ
+         b4GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692718180; x=1693322980;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FaiQCf6vJ3cdWRNVf/xbx1j3AbvhsgUXvbvVHiZDFV0=;
-        b=ko5rs6FGMXBADeIe23KnlJU35CMW9Dv7VPVaICpRoVOPjrqaZs8tmFi2vxWa1gXOn9
-         hvBFFmJUhx2fwQADlugCwAfBpnNYaDd9a5WQRzt99FNrpi31K6Mpo4CsFbuvPk3I3o5t
-         pjJwZCfHs18xS82TkoAKmfr8obPkWe6hw8GLw9qs/Rcw75ENdmzjY5PxeReD6Swp5p1c
-         oMBKt2K1S+CD9+HbEuGdL7koavLsajErxXldFKCDwpl2Jsrv8HcdJ+KZY83L5ljD2+5b
-         SSgXY1mRhlbSH9Id9n5OKws2RuKAbMUX4VM9Yq8/kZvv594bxMxx6DJvgoLz3aF9B7DL
-         dB5Q==
-X-Gm-Message-State: AOJu0YwZGd/m5EWJgeXeEMi/ToPAQcxN2UeAMRFXLMhDwufZLfdIoJlj
-	Klrz2s1AUZBOy/MtwWe55zPFZWTV1JQ=
-X-Google-Smtp-Source: AGHT+IG2BlxHD/huoJxx5ZNQCHljQUlX9aQAtaW9l+WlA7r6i4HCh/AnE9mG4bPg590pcd0rG4azKg==
-X-Received: by 2002:a05:6358:c1d:b0:135:4c43:f4df with SMTP id f29-20020a0563580c1d00b001354c43f4dfmr5751935rwj.3.1692718180248;
-        Tue, 22 Aug 2023 08:29:40 -0700 (PDT)
-Received: from LOCLAP699.rst-01.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id j189-20020a816ec6000000b0058fafe95f98sm2108796ywc.114.2023.08.22.08.29.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Aug 2023 08:29:39 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] auto-t: add fallback to reassociate test
-Date: Tue, 22 Aug 2023 08:29:31 -0700
-Message-Id: <20230822152931.276136-4-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230822152931.276136-1-prestwoj@gmail.com>
-References: <20230822152931.276136-1-prestwoj@gmail.com>
+        d=1e100.net; s=20221208; t=1692718448; x=1693323248;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+YRfSpJmY4Lbm0O5pnocvMEweW7fJmNbN9L39cYG7bM=;
+        b=dzPtX8jq3zYI5XgplDHHaMc2XMeZgVZeWHHNGKjcRLcd3zLwZj3XtynFaU5tPQnj2d
+         R5y24ruRZUAkzZZlKhq5X/sBE/KljHm1PzqHWkDfV1JOTVIvSPCyrgOFNWaT4BBuFXUq
+         U0KAyCXTd4g6StEo5joll3FBcyodUyT2LGkgBNJlZ6Sa/7fryy9zOx+6dkcJuTkiZFMO
+         c5++Gteijh3URf0bBCyp1CVMgztSIW5uiMK7vAXaDqcqGqYrNq3liUrT/HNeq1SoKjli
+         BaOuTrxaErKyzhZSYHO4S7BtOQo+AgUrJfFivjSDFwCk9gDFX9oycziacZUCcAb9Sy1X
+         WVDA==
+X-Gm-Message-State: AOJu0YwFbRTEXgw01KtVsdBC65hOIDznd2GOmI5Wu7hdxyOIYkJyGEjo
+	RPqm5w6vC5nxeP7HSu2SstWZRc5hsc0=
+X-Google-Smtp-Source: AGHT+IGqdxj42Y+D1oXIdbkL4dsx8gJPvBTq1i+XHp6dCHbYK51dtkvisVXuItH988KgJndR1dOjsQ==
+X-Received: by 2002:a0d:d752:0:b0:58f:9cd8:9e4d with SMTP id z79-20020a0dd752000000b0058f9cd89e4dmr11202535ywd.46.1692718448233;
+        Tue, 22 Aug 2023 08:34:08 -0700 (PDT)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id x186-20020a0deec3000000b00586108dd8f5sm2830120ywe.18.2023.08.22.08.34.07
+        for <iwd@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Aug 2023 08:34:07 -0700 (PDT)
+Message-ID: <ec8444b0-de23-44c2-aafa-dda322a2dd8a@gmail.com>
+Date: Tue, 22 Aug 2023 08:34:07 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] ft: track FT auth/action response status
+Content-Language: en-US
+To: iwd@lists.linux.dev
+References: <20230822152931.276136-1-prestwoj@gmail.com>
+ <20230822152931.276136-2-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20230822152931.276136-2-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Tests that IWD falls back to reassociation if FT fails with
-status 53.
----
- autotests/testPSK-roam/failed_roam_test.py | 70 +++++++++++++++++++++-
- autotests/testPSK-roam/ft-psk-ccmp-1.conf  |  1 +
- autotests/testPSK-roam/ft-psk-ccmp-2.conf  |  1 +
- autotests/testPSK-roam/ft-psk-ccmp-3.conf  |  1 +
- 4 files changed, 70 insertions(+), 3 deletions(-)
 
-diff --git a/autotests/testPSK-roam/failed_roam_test.py b/autotests/testPSK-roam/failed_roam_test.py
-index eda2b4e2..74c10ffc 100644
---- a/autotests/testPSK-roam/failed_roam_test.py
-+++ b/autotests/testPSK-roam/failed_roam_test.py
-@@ -41,18 +41,22 @@ class Test(unittest.TestCase):
-         self.assertRaises(Exception, testutil.test_ifaces_connected,
-                           (prev.ifname, device.name, True, True))
- 
--
-     # FT-over-Air failure, should stay connected
-     def test_ft_over_air_failure(self):
-+        self.rule2.enabled = True
-+        self.rule3.enabled = True
-+
-         self.bss_hostapd[0].set_value('wpa_key_mgmt', 'FT-PSK')
-         self.bss_hostapd[0].set_value('ft_over_ds', '0')
-         self.bss_hostapd[0].reload()
-         self.bss_hostapd[0].wait_for_event("AP-ENABLED")
-+        self.bss_hostapd[0].set_value('ft_psk_generate_local', '1')
- 
-         self.bss_hostapd[1].set_value('wpa_key_mgmt', 'FT-PSK')
-         self.bss_hostapd[1].set_value('ft_over_ds', '0')
-         self.bss_hostapd[1].reload()
-         self.bss_hostapd[1].wait_for_event("AP-ENABLED")
-+        self.bss_hostapd[1].set_value('ft_psk_generate_local', '1')
- 
-         wd = IWD(True)
- 
-@@ -70,9 +74,60 @@ class Test(unittest.TestCase):
-         self.rule0.enabled = False
- 
-         # IWD should then try BSS 2, and succeed
-+        device.wait_for_event('ft-roam', timeout=60)
-         self.verify_roam(wd, device, self.bss_hostapd[0], self.bss_hostapd[2])
- 
-         self.bss_hostapd[2].deauthenticate(device.address)
-+
-+    # FT-over-Air failure, should stay connected
-+    def test_ft_over_air_fallback(self):
-+        self.rule_bss0.signal = -8000
-+        self.rule_bss0.enabled = True
-+        self.rule_bss1.signal = -7500
-+        self.rule_bss1.enabled = True
-+        self.rule_bss2.signal = -6000
-+        self.rule_bss2.enabled = True
-+
-+        self.bss_hostapd[0].set_value('wpa_key_mgmt', 'FT-PSK')
-+        self.bss_hostapd[0].set_value('ft_over_ds', '0')
-+        self.bss_hostapd[0].reload()
-+        self.bss_hostapd[0].wait_for_event("AP-ENABLED")
-+        self.bss_hostapd[0].set_value('ft_psk_generate_local', '1')
-+
-+        self.bss_hostapd[1].set_value('wpa_key_mgmt', 'FT-PSK')
-+        self.bss_hostapd[1].set_value('ft_over_ds', '0')
-+        self.bss_hostapd[1].reload()
-+        self.bss_hostapd[1].wait_for_event("AP-ENABLED")
-+        self.bss_hostapd[1].set_value('ft_psk_generate_local', '1')
-+
-+        # This will cause this BSS to reject any FT roams as its unable to
-+        # get keys from other APs
-+        self.bss_hostapd[2].set_value('ft_psk_generate_local', '0')
-+        self.bss_hostapd[2].reload()
-+
-+        wd = IWD(True)
-+
-+        device = wd.list_devices(1)[0]
-+
-+        self.connect(wd, device, self.bss_hostapd[0])
-+
-+        # IWD should connect, then attempt a roam to BSS 1, which should
-+        # fail and cause a fallback to reassociation
-+        device.wait_for_event('ft-fallback-to-reassoc', timeout=60)
-+
-+        self.assertTrue(device.state == DeviceState.connected)
-+
-+        self.verify_roam(wd, device, self.bss_hostapd[0], self.bss_hostapd[2])
-+
-+        # Trigger another roam
-+        self.rule_bss2.signal = -8000
-+
-+        device.wait_for_event('ft-roam', timeout=60)
-+
-+        # Ensure an FT roam back to a properly configured AP works.
-+        self.verify_roam(wd, device, self.bss_hostapd[2], self.bss_hostapd[1])
-+
-+        self.bss_hostapd[1].deauthenticate(device.address)
-         condition = 'obj.state == DeviceState.disconnected'
-         wd.wait_for_object_condition(device, condition)
- 
-@@ -85,6 +140,10 @@ class Test(unittest.TestCase):
-         self.rule0.enabled = False
-         self.rule1.enabled = False
-         self.rule2.enabled = False
-+        self.rule3.enabled = False
-+        self.rule_bss0.enabled = False
-+        self.rule_bss1.enabled = False
-+        self.rule_bss2.enabled = False
- 
-     @classmethod
-     def setUpClass(cls):
-@@ -116,13 +175,18 @@ class Test(unittest.TestCase):
-         cls.rule2 = hwsim.rules.create()
-         cls.rule2.source = hwsim.get_radio('rad0').addresses[0]
-         cls.rule2.signal = -8000
--        cls.rule2.enabled = True
- 
-         # Causes IWD to first prefer BSS 1 to roam, then BSS 2.
-         cls.rule3 = hwsim.rules.create()
-         cls.rule3.source = hwsim.get_radio('rad2').addresses[0]
-         cls.rule3.signal = -7000
--        cls.rule3.enabled = True
-+
-+        cls.rule_bss0 = hwsim.rules.create()
-+        cls.rule_bss0.source = hwsim.get_radio('rad0').addresses[0]
-+        cls.rule_bss1 = hwsim.rules.create()
-+        cls.rule_bss1.source = hwsim.get_radio('rad1').addresses[0]
-+        cls.rule_bss2 = hwsim.rules.create()
-+        cls.rule_bss2.source = hwsim.get_radio('rad2').addresses[0]
- 
-     @classmethod
-     def tearDownClass(cls):
-diff --git a/autotests/testPSK-roam/ft-psk-ccmp-1.conf b/autotests/testPSK-roam/ft-psk-ccmp-1.conf
-index 4a2ceba5..5647c49f 100644
---- a/autotests/testPSK-roam/ft-psk-ccmp-1.conf
-+++ b/autotests/testPSK-roam/ft-psk-ccmp-1.conf
-@@ -33,6 +33,7 @@ pmk_r1_push=0
- # case.  Only works with FT-PSK, otherwise brctl needs to be installed and
- # CONFIG_BRIDGE enabled in the kernel.
- ft_psk_generate_local=1
-+rkh_pull_timeout=50
- ft_over_ds=0
- ap_table_expiration_time=36000
- ap_table_max_size=10
-diff --git a/autotests/testPSK-roam/ft-psk-ccmp-2.conf b/autotests/testPSK-roam/ft-psk-ccmp-2.conf
-index a42e175d..7d4ad221 100644
---- a/autotests/testPSK-roam/ft-psk-ccmp-2.conf
-+++ b/autotests/testPSK-roam/ft-psk-ccmp-2.conf
-@@ -33,6 +33,7 @@ pmk_r1_push=0
- # case.  Only works with FT-PSK, otherwise brctl needs to be installed and
- # CONFIG_BRIDGE enabled in the kernel.
- ft_psk_generate_local=1
-+rkh_pull_timeout=50
- ft_over_ds=0
- ap_table_expiration_time=36000
- ap_table_max_size=10
-diff --git a/autotests/testPSK-roam/ft-psk-ccmp-3.conf b/autotests/testPSK-roam/ft-psk-ccmp-3.conf
-index a42e175d..7d4ad221 100644
---- a/autotests/testPSK-roam/ft-psk-ccmp-3.conf
-+++ b/autotests/testPSK-roam/ft-psk-ccmp-3.conf
-@@ -33,6 +33,7 @@ pmk_r1_push=0
- # case.  Only works with FT-PSK, otherwise brctl needs to be installed and
- # CONFIG_BRIDGE enabled in the kernel.
- ft_psk_generate_local=1
-+rkh_pull_timeout=50
- ft_over_ds=0
- ap_table_expiration_time=36000
- ap_table_max_size=10
--- 
-2.25.1
+On 8/22/23 8:29 AM, James Prestwood wrote:
+> Certain return codes, though failures, can indicate that the AP is
+> just confused or booting up and treating it as a full failure may
+> not be the best route.
+> 
+> For example in some production deployments if an AP is rebooted it
+> may take some time for neighboring APs to exchange keys for
+> current associations. If a client roams during that time it will
+> reject saying the PMKID is invalid.
+> 
+> Use the ft_associate call to relay this information to station to
+> handle it rather than acting like there was no response. For now
+> this is being hard coded to status=53, but more could be added,
+> or the status itself could be returned if there are other specific
+> status codes that need to be handled.
 
+This part is wrong, I instead made ft_associate return the status 
+directly, and station can sort out how it wants to proceed.
+
+> ---
+>   src/ft.c | 37 ++++++++++++++++++++++++++++---------
+>   1 file changed, 28 insertions(+), 9 deletions(-)
+> 
+> diff --git a/src/ft.c b/src/ft.c
+> index c51a1288..8dfc1cb7 100644
+> --- a/src/ft.c
+> +++ b/src/ft.c
+> @@ -58,6 +58,7 @@ struct ft_info {
+>   	uint32_t frequency;
+>   	uint32_t ds_frequency;
+>   	uint32_t offchannel_id;
+> +	uint16_t status;
+>   
+>   	struct l_timeout *timeout;
+>   	struct wiphy_radio_work_item work;
+> @@ -155,6 +156,7 @@ static bool ft_parse_authentication_resp_frame(const uint8_t *data, size_t len,
+>   	if (memcmp(data + 16, addr3, 6))
+>   		return false;
+>   
+> +
+>   	/* Check Authentication algorithm number is FT (2) */
+>   	if (l_get_le16(data + 24) != 2)
+>   		return false;
+> @@ -527,8 +529,6 @@ static int ft_over_ds_parse_action_response(const uint8_t *frame,
+>   		return -EINVAL;
+>   
+>   	status = l_get_le16(frame + 14);
+> -	if (status != 0)
+> -		return (int)status;
+>   
+>   	if (spa_out)
+>   		*spa_out = spa;
+> @@ -541,7 +541,7 @@ static int ft_over_ds_parse_action_response(const uint8_t *frame,
+>   		*ies_len = frame_len - 16;
+>   	}
+>   
+> -	return 0;
+> +	return (int)status;
+>   }
+>   
+>   int __ft_rx_associate(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
+> @@ -825,7 +825,7 @@ void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
+>   
+>   	ret = ft_over_ds_parse_action_response(frame, frame_len, &spa, &aa,
+>   						&ies, &ies_len);
+> -	if (ret != 0) {
+> +	if (ret < 0) {
+>   		l_debug("Could not parse action response");
+>   		return;
+>   	}
+> @@ -836,6 +836,14 @@ void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
+>   		return;
+>   	}
+>   
+> +	info->status = ret;
+> +
+> +	if (info->status != 0) {
+> +		l_debug("BSS "MAC" rejected FT action with status=%u",
+> +				MAC_STR(info->aa), info->status);
+> +		goto done;
+> +	}
+> +
+>   	if (!ft_parse_ies(info, hs, ies, ies_len)) {
+>   		l_debug("Could not parse action response IEs");
+>   		goto ft_error;
+> @@ -843,6 +851,7 @@ void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
+>   
+>   	info->parsed = true;
+>   
+> +done:
+>   	l_timeout_remove(info->timeout);
+>   	info->timeout = NULL;
+>   
+> @@ -872,6 +881,7 @@ static struct ft_info *ft_info_new(struct handshake_state *hs,
+>   						target_bss->rsne[1] + 2);
+>   
+>   	l_getrandom(info->snonce, 32);
+> +	info->status = 0xffff;
+>   
+>   	return info;
+>   }
+> @@ -998,7 +1008,6 @@ void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
+>   	struct netdev *netdev = netdev_find(ifindex);
+>   	struct handshake_state *hs = netdev_get_handshake(netdev);
+>   	struct ft_info *info;
+> -	uint16_t status;
+>   	const uint8_t *ies;
+>   	size_t ies_len;
+>   
+> @@ -1008,14 +1017,14 @@ void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
+>   
+>   	if (!ft_parse_authentication_resp_frame(frame, frame_len,
+>   					info->spa, info->aa, info->aa, 2,
+> -					&status, &ies, &ies_len)) {
+> +					&info->status, &ies, &ies_len)) {
+>   		l_debug("Could not parse auth response");
+>   		return;
+>   	}
+>   
+> -	if (status != 0) {
+> +	if (info->status != 0) {
+>   		l_debug("BSS "MAC" rejected FT auth with status=%u",
+> -				MAC_STR(info->aa), status);
+> +				MAC_STR(info->aa), info->status);
+>   		goto cancel;
+>   	}
+>   
+> @@ -1165,10 +1174,20 @@ int ft_associate(uint32_t ifindex, const uint8_t *addr)
+>   	 * attempt so clear out the entry so FT-over-Air can try again.
+>   	 */
+>   	if (!info->parsed) {
+> +		uint16_t status = info->status;
+> +
+>   		l_queue_remove(info_list, info);
+>   		ft_info_destroy(info);
+>   
+> -		return -ENOENT;
+> +		/*
+> +		 * The status may have been successful but the IEs were invalid,
+> +		 * treat this the same as no response.
+> +		 */
+> +		if (status == 0xffff || status == 0)
+> +			return -ENOENT;
+> +
+> +		/* If the AP rejected for some reason, relay this to station */
+> +		return (int)status;
+>   	}
+>   
+>   	ft_prepare_handshake(info, hs);
