@@ -1,65 +1,66 @@
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CFD1D31F
-	for <iwd@lists.linux.dev>; Tue, 22 Aug 2023 15:34:09 +0000 (UTC)
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-59209b12c50so28339617b3.0
-        for <iwd@lists.linux.dev>; Tue, 22 Aug 2023 08:34:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0447C111D
+	for <iwd@lists.linux.dev>; Sun, 27 Aug 2023 19:00:37 +0000 (UTC)
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6bda8559fddso1982215a34.1
+        for <iwd@lists.linux.dev>; Sun, 27 Aug 2023 12:00:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692718448; x=1693323248;
+        d=gmail.com; s=20221208; t=1693162837; x=1693767637;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+YRfSpJmY4Lbm0O5pnocvMEweW7fJmNbN9L39cYG7bM=;
-        b=PwtnSYlyq2TNTeq6mZ/wRHaX3gRIJqNfZV5OpqFT+Mw2c9GhEZLLLIhrEMQcCz0df2
-         aYbRyswnU53urV5VIHbNybrRly8Ey6tUEMiZwV3IZO1EvhRfp8lYZeXdURgJFMVe7I7q
-         8oCh5os1Pc3ZlVvN+wmHuS267boZvIv8+Zh9Ej9ITN6jsF9Wyhuc8HR4xgTjTPwh08Dr
-         TmAQSyln2G/iuxH3odYTyCT5lVD0oNP9RVynudq2XfG9AI1Pfkrrh2gGLHtu0wnZ2bdC
-         Pf0ZLiAu1tQ8qjp78SjekzjfCBtCd4dLq38nv1ySFazFte93htwUOBlqD6FYX6mdXFjZ
-         b4GA==
+        bh=AqGbIwlU5Lh/jy00zPPRhFEfVyW4UnyldzIS4cw/SPs=;
+        b=F293XaQaTSRBXziNfqvoS+ZrmWPsZG9Nqkf+IKCp4UrLtdydT3OYCsAGPr8Ubj8QQD
+         I5a6p9/p7PMWxTWbA5Nrb2NLMR2VDEZtXMnNwWzj93dGSNzkiV2yC8rMu+esdQ3Zupd1
+         OeGRTXUsdpSeAWVUI6M5MoKdkuEK9ePMfLBWbpQ1TcvjirvARUKdeJF+azhKT63qW60J
+         gPMOTFrWKdsex9a+EH9Xq2omioFHMjcJUJomdQQSragDp3PmH9sM2em6Kkq3vorIkkbn
+         RYR7UVO4m2BdRDHyMUQz3bGOk9LJQa0QEsRp+sktDXMV9lh/G96Ujj5pSZl1Dg6D+OlE
+         Uh9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692718448; x=1693323248;
+        d=1e100.net; s=20221208; t=1693162837; x=1693767637;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+YRfSpJmY4Lbm0O5pnocvMEweW7fJmNbN9L39cYG7bM=;
-        b=dzPtX8jq3zYI5XgplDHHaMc2XMeZgVZeWHHNGKjcRLcd3zLwZj3XtynFaU5tPQnj2d
-         R5y24ruRZUAkzZZlKhq5X/sBE/KljHm1PzqHWkDfV1JOTVIvSPCyrgOFNWaT4BBuFXUq
-         U0KAyCXTd4g6StEo5joll3FBcyodUyT2LGkgBNJlZ6Sa/7fryy9zOx+6dkcJuTkiZFMO
-         c5++Gteijh3URf0bBCyp1CVMgztSIW5uiMK7vAXaDqcqGqYrNq3liUrT/HNeq1SoKjli
-         BaOuTrxaErKyzhZSYHO4S7BtOQo+AgUrJfFivjSDFwCk9gDFX9oycziacZUCcAb9Sy1X
-         WVDA==
-X-Gm-Message-State: AOJu0YwFbRTEXgw01KtVsdBC65hOIDznd2GOmI5Wu7hdxyOIYkJyGEjo
-	RPqm5w6vC5nxeP7HSu2SstWZRc5hsc0=
-X-Google-Smtp-Source: AGHT+IGqdxj42Y+D1oXIdbkL4dsx8gJPvBTq1i+XHp6dCHbYK51dtkvisVXuItH988KgJndR1dOjsQ==
-X-Received: by 2002:a0d:d752:0:b0:58f:9cd8:9e4d with SMTP id z79-20020a0dd752000000b0058f9cd89e4dmr11202535ywd.46.1692718448233;
-        Tue, 22 Aug 2023 08:34:08 -0700 (PDT)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id x186-20020a0deec3000000b00586108dd8f5sm2830120ywe.18.2023.08.22.08.34.07
-        for <iwd@lists.linux.dev>
+        bh=AqGbIwlU5Lh/jy00zPPRhFEfVyW4UnyldzIS4cw/SPs=;
+        b=hvJTYl1hhSEX5JLg9VzCsB0jB5Qi8BmBc9fWIZVJNC0x7c0C3mkNkCKynJ2Ox5VDwS
+         03fDUSThjby46x0lbfEJ0y3lTZe7dsKEO9aX7wb/djYWRS1JpGV7OsFlh8KT1HpjblM0
+         Ac4O1xBJfJrnA81wUZ+NmYaqlaJPeWC5cKB2ZSL46UJ7LL4jlp4f1/f3Wvb8PqM9IT3w
+         cWFTYeEKCmL5Kl1vhXMEbc1oUqfd15hYu3VaFv7aAO5PTqucHB1DWfPJeZc+uAAcSY5e
+         lQ7narag/NyFZg1fWjWvof0aHIpiIysGaA/e6DRBoHWXBhzelNt6rDdo28yjPqKNx/JK
+         YPew==
+X-Gm-Message-State: AOJu0YwRIWZZCYpE9zg/Kruh9vCYEkBxt8/rikWz5PDpcqlLUWt7dcLF
+	n5jilWPjqW9NtpTl3e5laig=
+X-Google-Smtp-Source: AGHT+IGcnOSO6MNVMmzA1cBY8cIAIuBGUdEeH/3J4eGfed0lthT3mnjmRQ7sblwiItlAfh61XKg5hg==
+X-Received: by 2002:a05:6870:6489:b0:1b7:60a3:4104 with SMTP id cz9-20020a056870648900b001b760a34104mr10454148oab.13.1693162836646;
+        Sun, 27 Aug 2023 12:00:36 -0700 (PDT)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id ee24-20020a056870c81800b001b3d93884fdsm3358008oab.57.2023.08.27.12.00.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Aug 2023 08:34:07 -0700 (PDT)
-Message-ID: <ec8444b0-de23-44c2-aafa-dda322a2dd8a@gmail.com>
-Date: Tue, 22 Aug 2023 08:34:07 -0700
+        Sun, 27 Aug 2023 12:00:36 -0700 (PDT)
+Message-ID: <e7036c7e-30ea-4832-866c-2795babad145@gmail.com>
+Date: Sun, 27 Aug 2023 14:00:34 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
 Subject: Re: [PATCH 1/3] ft: track FT auth/action response status
 Content-Language: en-US
-To: iwd@lists.linux.dev
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
 References: <20230822152931.276136-1-prestwoj@gmail.com>
  <20230822152931.276136-2-prestwoj@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
 In-Reply-To: <20230822152931.276136-2-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+Hi James,
 
-On 8/22/23 8:29 AM, James Prestwood wrote:
+On 8/22/23 10:29, James Prestwood wrote:
 > Certain return codes, though failures, can indicate that the AP is
 > just confused or booting up and treating it as a full failure may
 > not be the best route.
@@ -75,8 +76,7 @@ On 8/22/23 8:29 AM, James Prestwood wrote:
 > or the status itself could be returned if there are other specific
 > status codes that need to be handled.
 
-This part is wrong, I instead made ft_associate return the status 
-directly, and station can sort out how it wants to proceed.
+Please update the description per reply to this thread.
 
 > ---
 >   src/ft.c | 37 ++++++++++++++++++++++++++++---------
@@ -91,6 +91,9 @@ directly, and station can sort out how it wants to proceed.
 >   	uint32_t ds_frequency;
 >   	uint32_t offchannel_id;
 > +	uint16_t status;
+
+Might want to indicate that this status is for the first step (authenticate/action)
+
 >   
 >   	struct l_timeout *timeout;
 >   	struct wiphy_radio_work_item work;
@@ -99,36 +102,15 @@ directly, and station can sort out how it wants to proceed.
 >   		return false;
 >   
 > +
+
+This is spurious?
+
 >   	/* Check Authentication algorithm number is FT (2) */
 >   	if (l_get_le16(data + 24) != 2)
 >   		return false;
-> @@ -527,8 +529,6 @@ static int ft_over_ds_parse_action_response(const uint8_t *frame,
->   		return -EINVAL;
->   
->   	status = l_get_le16(frame + 14);
-> -	if (status != 0)
-> -		return (int)status;
->   
->   	if (spa_out)
->   		*spa_out = spa;
-> @@ -541,7 +541,7 @@ static int ft_over_ds_parse_action_response(const uint8_t *frame,
->   		*ies_len = frame_len - 16;
->   	}
->   
-> -	return 0;
-> +	return (int)status;
->   }
->   
->   int __ft_rx_associate(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
-> @@ -825,7 +825,7 @@ void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
->   
->   	ret = ft_over_ds_parse_action_response(frame, frame_len, &spa, &aa,
->   						&ies, &ies_len);
-> -	if (ret != 0) {
-> +	if (ret < 0) {
->   		l_debug("Could not parse action response");
->   		return;
->   	}
+
+<snip>
+
 > @@ -836,6 +836,14 @@ void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
 >   		return;
 >   	}
@@ -144,6 +126,9 @@ directly, and station can sort out how it wants to proceed.
 >   	if (!ft_parse_ies(info, hs, ies, ies_len)) {
 >   		l_debug("Could not parse action response IEs");
 >   		goto ft_error;
+
+Should the status be set only once ft_parse_ies succeeded?
+
 > @@ -843,6 +851,7 @@ void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
 >   
 >   	info->parsed = true;
@@ -157,35 +142,15 @@ directly, and station can sort out how it wants to proceed.
 >   
 >   	l_getrandom(info->snonce, 32);
 > +	info->status = 0xffff;
+
+Why is this needed?
+
 >   
 >   	return info;
 >   }
-> @@ -998,7 +1008,6 @@ void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
->   	struct netdev *netdev = netdev_find(ifindex);
->   	struct handshake_state *hs = netdev_get_handshake(netdev);
->   	struct ft_info *info;
-> -	uint16_t status;
->   	const uint8_t *ies;
->   	size_t ies_len;
->   
-> @@ -1008,14 +1017,14 @@ void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
->   
->   	if (!ft_parse_authentication_resp_frame(frame, frame_len,
->   					info->spa, info->aa, info->aa, 2,
-> -					&status, &ies, &ies_len)) {
-> +					&info->status, &ies, &ies_len)) {
->   		l_debug("Could not parse auth response");
->   		return;
->   	}
->   
-> -	if (status != 0) {
-> +	if (info->status != 0) {
->   		l_debug("BSS "MAC" rejected FT auth with status=%u",
-> -				MAC_STR(info->aa), status);
-> +				MAC_STR(info->aa), info->status);
->   		goto cancel;
->   	}
->   
+
+<snip>
+
 > @@ -1165,10 +1174,20 @@ int ft_associate(uint32_t ifindex, const uint8_t *addr)
 >   	 * attempt so clear out the entry so FT-over-Air can try again.
 >   	 */
@@ -205,6 +170,13 @@ directly, and station can sort out how it wants to proceed.
 > +
 > +		/* If the AP rejected for some reason, relay this to station */
 > +		return (int)status;
+
+I think this entire step can be dropped if you make sure status == 0 is set only 
+if parsing succeeded.
+
 >   	}
 >   
 >   	ft_prepare_handshake(info, hs);
+
+Regards,
+-Denis
