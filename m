@@ -1,49 +1,49 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D36156D8
-	for <iwd@lists.linux.dev>; Tue, 29 Aug 2023 14:51:31 +0000 (UTC)
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1bdbf10333bso35203695ad.1
-        for <iwd@lists.linux.dev>; Tue, 29 Aug 2023 07:51:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBA428E7
+	for <iwd@lists.linux.dev>; Tue, 29 Aug 2023 14:51:32 +0000 (UTC)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1bc0d39b52cso27074695ad.2
+        for <iwd@lists.linux.dev>; Tue, 29 Aug 2023 07:51:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693320691; x=1693925491;
+        d=gmail.com; s=20221208; t=1693320692; x=1693925492;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YNiwhK9UuzONn/Y6YFYOopQok2XyPbVo/sEXkL9yRpg=;
-        b=XjcGodL7fhruw+zztY0xekuriqO6Erki4/dZQipjZjhRY+7sRlEcbrqDjLqEpPClBD
-         fqml9fMI0kjzwPSArFgviAfNeK4NCoacoWP2hROnvNV1oDH81bSnP3Pj+dT6rJGEz9+7
-         L/EeQBtrV6skctfskRniu3B5A75FmvbyYCEPe152WtyFb5mF2tbSufK+r+v3EH0ZeFuB
-         Af+YXKLeLnLAycLxolNJZmz1ALpVZcCjT+skdsRyfBAfUW7s592H++UDqejrb7TM7B++
-         BGZ2+W+nEjMc5MLJJBHSu44RmXXcvuct0faCGNp0NjQNCyWF1dKVj/AtS0cueP83DYwU
-         P+wA==
+        bh=4SmPT/s2ibH9frOxAvwVFHmqsR0LKIGPMhUHpZAkHwA=;
+        b=elkZBE3NmiWmQmb44aPgYrZRFz8SJazLsOpfQPdUEFAs838lXboYUJcXpFvfmxvgX4
+         9eQ2ClC2IZTYQc1auz6i1s+Yb1lnwVg3voOOiRxSCwjyYM+ERptEcbF8pQ0t69ywo0hd
+         +QkkvXrZYEHWjrSgFQGBnYjQQJWXfvpYDNfHb/Fxlj+ZZ2m4qjHksM2pa15VCU00DuUv
+         GfWoZ4jvVVca3zkbrfy6Xds7HQiku8F8JnYrW07Jv48NnYKwZtDCDjJJskEoa5e/p7Ef
+         UUIG72MEz/O+EMyQkOH/5wQt0Y6htufaAD2IQoEuFOewh1MGFi4Jdd2m2yegKHUeSBN/
+         vjYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693320691; x=1693925491;
+        d=1e100.net; s=20221208; t=1693320692; x=1693925492;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YNiwhK9UuzONn/Y6YFYOopQok2XyPbVo/sEXkL9yRpg=;
-        b=DsAbH1+qzW/ewJXsmYF70qTfOAbpmdpnuLmm911EtdWraH4323ly7ossj4kTPc0urq
-         Geq+OaD5r+9EFepWKqXFGi9gvzozRTm4w39x+IoeLcEftipirJdLT8FvHgIby6WfEd6p
-         LalcT+Xzgi68cok83NM0ngzZkFRLAlIT8VwNEr/MSugl93k43rlXDooz6az1D7WsVGOH
-         ipzotNcjrLmfFH6t3U/YQpMnb5tb4oaBpwiefH+p9eXB3MW1eXpWAMJy1cRwsdd7krtu
-         KPtGEw5Z6qAK9O5yoj7Q1XSMUrkNe3AwZOOezH0kJwDw/9JHIoC9Au9wyIVdUL3v5e5c
-         JraQ==
-X-Gm-Message-State: AOJu0Yyh3/KsERWP9ztOeImBfUcpbsCYkdDuVUX63Z5UZBKZCU5CbCr6
-	Hbz/h/kL9GSgGyQvPqSYYdFGgFDO+Hc=
-X-Google-Smtp-Source: AGHT+IHBB/a/yuoJcst+GTnYq/2UsLSbGz4PxE/Gmq2g3BWXp4DsiGzGHcFvQK311MejqMiFX/uZgQ==
-X-Received: by 2002:a17:902:b784:b0:1bf:8779:e045 with SMTP id e4-20020a170902b78400b001bf8779e045mr23847706pls.50.1693320691031;
-        Tue, 29 Aug 2023 07:51:31 -0700 (PDT)
+        bh=4SmPT/s2ibH9frOxAvwVFHmqsR0LKIGPMhUHpZAkHwA=;
+        b=lxm2VmUvSs3CoPWUY7E0HzDop+kWKVxJs798oeUbfpAe5gUYbpONKyOR+qbcQ12Nge
+         Px+kbta+I30HFDi1taauTTpIX9Y/eRaF9CpRa0sEM9pZBQFxUjM+K+fN9g94WQdYC1IJ
+         MI8wA8WeGQl5GvMYOTAOLXzoWE7ZK/zMTuOPhZmJLcGE/6T1JtyFcM4MA9rfeKSoUZW7
+         lrVcVtNqy1uJv9ptfb9X8VHZ4DMzo0tNUtanxHlPGOAVX1Ngms/FIx8b3UXpjOTy44EO
+         3ZiwG2S1Eqm069Ktqlyq1dVls8j7aNxnlIPVsmN5DVVPbRxGIpf9QICYIP/N4VlRWS/F
+         2KLw==
+X-Gm-Message-State: AOJu0Ywm3sMs5ssPdT1Y+fKnrRVyJbMgOBpDd3lN9lA2AbLK6EvQQQa+
+	xEbgG0L6KVIaYi4wX40pE9bqZr8bsjA=
+X-Google-Smtp-Source: AGHT+IGx3L2XfCU3Ip0MylPQsS9TcFMe5Ut/8SSqp1opsv4ZkkYpdnhts7JeVw8BKnxru0SktaOgWA==
+X-Received: by 2002:a17:903:244a:b0:1b5:561a:5ca9 with SMTP id l10-20020a170903244a00b001b5561a5ca9mr26265138pls.50.1693320692173;
+        Tue, 29 Aug 2023 07:51:32 -0700 (PDT)
 Received: from localhost.localdomain ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id d10-20020a170902654a00b001bc445e249asm9661283pln.124.2023.08.29.07.51.30
+        by smtp.gmail.com with ESMTPSA id d10-20020a170902654a00b001bc445e249asm9661283pln.124.2023.08.29.07.51.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Aug 2023 07:51:30 -0700 (PDT)
+        Tue, 29 Aug 2023 07:51:31 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/3] station: fall back to reassociation under certain FT failures
-Date: Tue, 29 Aug 2023 07:51:15 -0700
-Message-Id: <20230829145116.279949-2-prestwoj@gmail.com>
+Subject: [PATCH v2 3/3] auto-t: add fallback to reassociate test
+Date: Tue, 29 Aug 2023 07:51:16 -0700
+Message-Id: <20230829145116.279949-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230829145116.279949-1-prestwoj@gmail.com>
 References: <20230829145116.279949-1-prestwoj@gmail.com>
@@ -55,283 +55,184 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The auth/action status is now tracked in ft.c. If an AP rejects the
-FT attempt with "Invalid PMKID" we can now assume this AP is either
-mis-configured for FT or is lagging behind getting the proper keys
-from neighboring APs (e.g. was just rebooted).
-
-If we see this condition IWD can now fall back to reassociation in
-an attempt to still roam to the best candidate. The fallback decision
-is still rank based: if a BSS fails FT it is marked as such, its
-ranking is re-computed removing the FT factor and it is inserted back
-into the queue.
-
-The motivation behind this isn't necessarily to always force a roam,
-but instead to handle two cases where IWD can either make a bad roam
-decision or get 'stuck' and never roam:
-
-  1. If there is one good roam candidate and other bad ones. For
-     example say BSS A is experiencing this FT key pull issue:
-         Current BSS: -85dbm
-         BSS A:       -55dbm
-         BSS B:       -80dbm
-     The current logic would fail A, and roam to B. In this case
-     reassociation would have likely succeeded so it makes more sense
-     to reassociate to A as a fallback.
-
-  2. If there is only one candidate, but its failing FT. IWD will
-     never try anything other than FT and repeatedly fail.
-
-Both of the above have been seen on real network deployments and
-result in either poor performance (1) or eventually lead to a full
-disconnect due to never roaming (2).
 ---
- src/station.c | 124 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 80 insertions(+), 44 deletions(-)
+ autotests/testPSK-roam/failed_roam_test.py | 90 +++++++++++++++++++++-
+ autotests/testPSK-roam/ft-psk-ccmp-1.conf  |  1 +
+ autotests/testPSK-roam/ft-psk-ccmp-2.conf  |  1 +
+ autotests/testPSK-roam/ft-psk-ccmp-3.conf  |  1 +
+ 4 files changed, 90 insertions(+), 3 deletions(-)
 
-v2:
- * Rather than always falling back to reassociate recompute the
-   rank and insert into the queue. This allows IWD to try similarly
-   ranked BSS's with FT before falling back to reassociation.
-
-diff --git a/src/station.c b/src/station.c
-index 2473de2a..59191baa 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -73,6 +73,7 @@ static bool supports_arp_evict_nocarrier;
- static bool supports_ndisc_evict_nocarrier;
- static struct watchlist event_watches;
- static uint32_t known_networks_watch;
-+static const double RANK_FT_FACTOR = 1.3;
+diff --git a/autotests/testPSK-roam/failed_roam_test.py b/autotests/testPSK-roam/failed_roam_test.py
+index 8a3db662..09947705 100644
+--- a/autotests/testPSK-roam/failed_roam_test.py
++++ b/autotests/testPSK-roam/failed_roam_test.py
+@@ -41,9 +41,11 @@ class Test(unittest.TestCase):
+         self.assertRaises(Exception, testutil.test_ifaces_connected,
+                           (prev.ifname, device.name, True, True))
  
- struct station {
- 	enum station_state state;
-@@ -147,15 +148,49 @@ struct roam_bss {
- 	uint8_t addr[6];
- 	uint16_t rank;
- 	int32_t signal_strength;
-+	bool reassoc: 1;
- };
- 
--static struct roam_bss *roam_bss_from_scan_bss(const struct scan_bss *bss)
-+static bool station_can_fast_transition(struct handshake_state *hs,
-+					const struct scan_bss *bss)
-+{
-+	uint16_t mdid;
-+
-+	if (!hs->mde)
-+		return false;
-+
-+	if (ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
-+						&mdid, NULL, NULL) < 0)
-+		return false;
-+
-+	if (!(bss->mde_present && l_get_le16(bss->mde) == mdid))
-+		return false;
-+
-+	if (hs->supplicant_ie != NULL) {
-+		struct ie_rsn_info rsn_info;
-+
-+		if (!IE_AKM_IS_FT(hs->akm_suite))
-+			return false;
-+
-+		if (scan_bss_get_rsn_info(bss, &rsn_info) < 0)
-+			return false;
-+
-+		if (!IE_AKM_IS_FT(rsn_info.akm_suites))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+static struct roam_bss *roam_bss_from_scan_bss(struct handshake_state *hs,
-+						const struct scan_bss *bss)
- {
- 	struct roam_bss *rbss = l_new(struct roam_bss, 1);
- 
- 	memcpy(rbss->addr, bss->addr, 6);
- 	rbss->rank = bss->rank;
- 	rbss->signal_strength = bss->signal_strength;
-+	rbss->reassoc = !station_can_fast_transition(hs, bss);
- 
- 	return rbss;
- }
-@@ -1942,37 +1977,6 @@ static void station_early_neighbor_report_cb(struct netdev *netdev, int err,
- 				&station->roam_freqs);
- }
- 
--static bool station_can_fast_transition(struct handshake_state *hs,
--					struct scan_bss *bss)
--{
--	uint16_t mdid;
 -
--	if (!hs->mde)
--		return false;
--
--	if (ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
--						&mdid, NULL, NULL) < 0)
--		return false;
--
--	if (!(bss->mde_present && l_get_le16(bss->mde) == mdid))
--		return false;
--
--	if (hs->supplicant_ie != NULL) {
--		struct ie_rsn_info rsn_info;
--
--		if (!IE_AKM_IS_FT(hs->akm_suite))
--			return false;
--
--		if (scan_bss_get_rsn_info(bss, &rsn_info) < 0)
--			return false;
--
--		if (!IE_AKM_IS_FT(rsn_info.akm_suites))
--			return false;
--	}
--
--	return true;
--}
--
- static void station_disconnect_on_error_cb(struct netdev *netdev, bool success,
- 					void *user_data)
- {
-@@ -2169,10 +2173,14 @@ static int station_transition_reassociate(struct station *station,
- 	if (ret < 0)
- 		return ret;
- 
-+	l_debug("");
+     # FT-over-Air failure, should stay connected
+     def test_ft_over_air_failure(self):
++        self.rule2.enabled = True
++        self.rule3.enabled = True
 +
- 	station->connected_bss = bss;
- 	station->preparing_roam = false;
- 	station_enter_state(station, STATION_STATE_ROAMING);
+         wd = IWD(True)
  
-+	station_debug_event(station, "reassoc-roam");
+         device = wd.list_devices(1)[0]
+@@ -60,12 +62,85 @@ class Test(unittest.TestCase):
+         self.rule0.enabled = False
+ 
+         # IWD should then try BSS 2, and succeed
++        device.wait_for_event('ft-roam', timeout=60)
+         self.verify_roam(wd, device, self.bss_hostapd[0], self.bss_hostapd[2])
+ 
+         self.bss_hostapd[2].deauthenticate(device.address)
 +
- 	return 0;
- }
- 
-@@ -2264,19 +2272,43 @@ static void station_transition_start(struct station *station);
- static bool station_ft_work_ready(struct wiphy_radio_work_item *item)
- {
- 	struct station *station = l_container_of(item, struct station, ft_work);
--	struct roam_bss *rbss = l_queue_pop_head(station->roam_bss_list);
--	struct scan_bss *bss = network_bss_find_by_addr(
--					station->connected_network, rbss->addr);
-+	_auto_(l_free) struct roam_bss *rbss = l_queue_pop_head(
-+							station->roam_bss_list);
-+	struct scan_bss *bss;
- 	int ret;
- 
--	l_free(rbss);
--
- 	/* Very unlikely, but the BSS could have gone away */
-+	bss = network_bss_find_by_addr(station->connected_network, rbss->addr);
- 	if (!bss)
- 		goto try_next;
- 
- 	ret = ft_associate(netdev_get_ifindex(station->netdev), bss->addr);
--	if (ret == -ENOENT) {
-+	if (ret > 0) {
-+		if (ret != MMPDU_STATUS_CODE_INVALID_PMKID) {
-+			station_debug_event(station, "ft-roam-failed");
-+			goto try_next;
-+		}
++    # FT-over-Air failure with Invalid PMKID, should reassociate
++    def test_ft_over_air_fallback(self):
++        self.rule_bss0.signal = -8000
++        self.rule_bss0.enabled = True
++        self.rule_bss1.signal = -7500
++        self.rule_bss1.enabled = True
++        self.rule_bss2.signal = -6000
++        self.rule_bss2.enabled = True
 +
-+		/*
-+		 * Re-insert removing FT from the ranking. If the BSS is still
-+		 * the best reassociation will be used, otherwise we'll try
-+		 * more FT candidates that are better ranked
-+		 */
-+		rbss->rank /= RANK_FT_FACTOR;
-+		rbss->reassoc = true;
++        # This will cause this BSS to reject any FT roams as its unable to
++        # get keys from other APs
++        self.bss_hostapd[2].set_value('ft_psk_generate_local', '0')
++        self.bss_hostapd[2].reload()
 +
-+		l_debug("Re-inserting BSS "MAC" forcing reassociation, rank: %u",
-+					MAC_STR(rbss->addr), rbss->rank);
++        wd = IWD(True)
 +
-+		l_queue_insert(station->roam_bss_list, rbss,
-+				roam_bss_rank_compare, NULL);
++        device = wd.list_devices(1)[0]
 +
-+		station_debug_event(station, "ft-fallback-to-reassoc");
++        self.connect(wd, device, self.bss_hostapd[0])
 +
-+		station_transition_start(station);
-+		l_steal_ptr(rbss);
-+		return true;
-+	} else if (ret == -ENOENT) {
- 		station_debug_event(station, "ft-roam-failed");
- try_next:
- 		station_transition_start(station);
-@@ -2288,6 +2320,8 @@ try_next:
- 	station->preparing_roam = false;
- 	station_enter_state(station, STATION_STATE_FT_ROAMING);
- 
-+	station_debug_event(station, "ft-roam");
++        # IWD should connect, then attempt a roam to BSS 1, which should
++        # fail and cause a fallback to reassociation
++        device.wait_for_event('ft-fallback-to-reassoc', timeout=60)
++        device.wait_for_event('reassoc-roam', timeout=60)
 +
- 	return true;
++        self.verify_roam(wd, device, self.bss_hostapd[0], self.bss_hostapd[2])
++
++        # Trigger another roam
++        self.rule_bss2.signal = -8000
++
++        device.wait_for_event('ft-roam', timeout=60)
++
++        # Ensure an FT roam back to a properly configured AP works.
++        self.verify_roam(wd, device, self.bss_hostapd[2], self.bss_hostapd[1])
++
++        self.bss_hostapd[1].deauthenticate(device.address)
+         condition = 'obj.state == DeviceState.disconnected'
+         wd.wait_for_object_condition(device, condition)
  
- assoc_failed:
-@@ -2349,7 +2383,8 @@ done:
- }
++    # FT-over-Air failure with Invalid PMKID. The ranking is such that other
++    # FT candidates are available so it should FT elsewhere rather than
++    # retry with reassociation
++    def test_ft_over_air_fallback_retry_ft(self):
++        self.rule_bss0.signal = -8000
++        self.rule_bss0.enabled = True
++        self.rule_bss1.signal = -7300
++        self.rule_bss1.enabled = True
++        self.rule_bss2.signal = -7100
++        self.rule_bss2.enabled = True
++
++        # This will cause this BSS to reject any FT roams as its unable to
++        # get keys from other APs
++        self.bss_hostapd[2].set_value('ft_psk_generate_local', '0')
++        self.bss_hostapd[2].reload()
++
++        wd = IWD(True)
++
++        device = wd.list_devices(1)[0]
++
++        self.connect(wd, device, self.bss_hostapd[0])
++
++        # IWD should connect, then attempt a roam to BSS 1, which should
++        # fail and cause the rank to be re-computed. This shoudl then put
++        # bss 1 as the next candidate (since the FT factor is removed)
++        device.wait_for_event('ft-fallback-to-reassoc', timeout=60)
++        device.wait_for_event('ft-roam', timeout=60)
++
++        self.verify_roam(wd, device, self.bss_hostapd[0], self.bss_hostapd[1])
++
++        self.bss_hostapd[1].deauthenticate(device.address)
++        condition = 'obj.state == DeviceState.disconnected'
++        wd.wait_for_object_condition(device, condition)
++
++
+     def tearDown(self):
+         os.system('ip link set "' + self.bss_hostapd[0].ifname + '" down')
+         os.system('ip link set "' + self.bss_hostapd[1].ifname + '" down')
+@@ -75,6 +150,10 @@ class Test(unittest.TestCase):
+         self.rule0.enabled = False
+         self.rule1.enabled = False
+         self.rule2.enabled = False
++        self.rule3.enabled = False
++        self.rule_bss0.enabled = False
++        self.rule_bss1.enabled = False
++        self.rule_bss2.enabled = False
  
- static bool station_try_next_transition(struct station *station,
--					struct scan_bss *bss)
-+					struct scan_bss *bss,
-+					bool no_ft)
- {
- 	struct handshake_state *hs = netdev_get_handshake(station->netdev);
- 	struct network *connected = station->connected_network;
-@@ -2364,7 +2399,7 @@ static bool station_try_next_transition(struct station *station,
- 	station->ap_directed_roaming = false;
+         for hapd in self.bss_hostapd:
+             hapd.default()
+@@ -109,13 +188,18 @@ class Test(unittest.TestCase):
+         cls.rule2 = hwsim.rules.create()
+         cls.rule2.source = hwsim.get_radio('rad0').addresses[0]
+         cls.rule2.signal = -8000
+-        cls.rule2.enabled = True
  
- 	/* Can we use Fast Transition? */
--	if (station_can_fast_transition(hs, bss))
-+	if (station_can_fast_transition(hs, bss) && !no_ft)
- 		return station_fast_transition(station, bss);
+         # Causes IWD to first prefer BSS 1 to roam, then BSS 2.
+         cls.rule3 = hwsim.rules.create()
+         cls.rule3.source = hwsim.get_radio('rad2').addresses[0]
+         cls.rule3.signal = -7000
+-        cls.rule3.enabled = True
++
++        cls.rule_bss0 = hwsim.rules.create()
++        cls.rule_bss0.source = hwsim.get_radio('rad0').addresses[0]
++        cls.rule_bss1 = hwsim.rules.create()
++        cls.rule_bss1.source = hwsim.get_radio('rad1').addresses[0]
++        cls.rule_bss2 = hwsim.rules.create()
++        cls.rule_bss2.source = hwsim.get_radio('rad2').addresses[0]
  
- 	/* Non-FT transition */
-@@ -2425,7 +2460,8 @@ static void station_transition_start(struct station *station)
- 		struct scan_bss *bss = network_bss_find_by_addr(
- 					station->connected_network, rbss->addr);
- 
--		roaming = station_try_next_transition(station, bss);
-+		roaming = station_try_next_transition(station, bss,
-+							rbss->reassoc);
- 		if (roaming)
- 			break;
- 
-@@ -2490,7 +2526,6 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 	struct scan_bss *current_bss = station->connected_bss;
- 	struct scan_bss *bss;
- 	double cur_bss_rank = 0.0;
--	static const double RANK_FT_FACTOR = 1.3;
- 	uint16_t mdid;
- 	enum security orig_security, security;
- 
-@@ -2581,7 +2616,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 		 */
- 		station_update_roam_bss(station, bss);
- 
--		rbss = roam_bss_from_scan_bss(bss);
-+		rbss = roam_bss_from_scan_bss(hs, bss);
- 
- 		l_queue_insert(station->roam_bss_list, rbss,
- 				roam_bss_rank_compare, NULL);
-@@ -4584,6 +4619,7 @@ static bool station_force_roam_scan_notify(int err, struct l_queue *bss_list,
- {
- 	struct station_roam_data *data = user_data;
- 	struct station *station = data->station;
-+	struct handshake_state *hs = netdev_get_handshake(station->netdev);
- 	struct scan_bss *target;
- 	struct l_dbus_message *reply;
- 
-@@ -4603,7 +4639,7 @@ static bool station_force_roam_scan_notify(int err, struct l_queue *bss_list,
- 	/* The various roam routines expect this to be set from scanning */
- 	station->preparing_roam = true;
- 	l_queue_push_tail(station->roam_bss_list,
--				roam_bss_from_scan_bss(target));
-+				roam_bss_from_scan_bss(hs, target));
- 
- 	station_update_roam_bss(station, target);
- 
+     @classmethod
+     def tearDownClass(cls):
+diff --git a/autotests/testPSK-roam/ft-psk-ccmp-1.conf b/autotests/testPSK-roam/ft-psk-ccmp-1.conf
+index eec8805f..b46d1f27 100644
+--- a/autotests/testPSK-roam/ft-psk-ccmp-1.conf
++++ b/autotests/testPSK-roam/ft-psk-ccmp-1.conf
+@@ -33,6 +33,7 @@ pmk_r1_push=0
+ # case.  Only works with FT-PSK, otherwise brctl needs to be installed and
+ # CONFIG_BRIDGE enabled in the kernel.
+ ft_psk_generate_local=1
++rkh_pull_timeout=50
+ ft_over_ds=0
+ ap_table_expiration_time=36000
+ ap_table_max_size=10
+diff --git a/autotests/testPSK-roam/ft-psk-ccmp-2.conf b/autotests/testPSK-roam/ft-psk-ccmp-2.conf
+index 5992461f..3e215457 100644
+--- a/autotests/testPSK-roam/ft-psk-ccmp-2.conf
++++ b/autotests/testPSK-roam/ft-psk-ccmp-2.conf
+@@ -33,6 +33,7 @@ pmk_r1_push=0
+ # case.  Only works with FT-PSK, otherwise brctl needs to be installed and
+ # CONFIG_BRIDGE enabled in the kernel.
+ ft_psk_generate_local=1
++rkh_pull_timeout=50
+ ft_over_ds=0
+ ap_table_expiration_time=36000
+ ap_table_max_size=10
+diff --git a/autotests/testPSK-roam/ft-psk-ccmp-3.conf b/autotests/testPSK-roam/ft-psk-ccmp-3.conf
+index 5992461f..3e215457 100644
+--- a/autotests/testPSK-roam/ft-psk-ccmp-3.conf
++++ b/autotests/testPSK-roam/ft-psk-ccmp-3.conf
+@@ -33,6 +33,7 @@ pmk_r1_push=0
+ # case.  Only works with FT-PSK, otherwise brctl needs to be installed and
+ # CONFIG_BRIDGE enabled in the kernel.
+ ft_psk_generate_local=1
++rkh_pull_timeout=50
+ ft_over_ds=0
+ ap_table_expiration_time=36000
+ ap_table_max_size=10
 -- 
 2.25.1
 
