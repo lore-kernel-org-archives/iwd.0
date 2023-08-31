@@ -1,253 +1,199 @@
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995978F7D
-	for <iwd@lists.linux.dev>; Thu, 31 Aug 2023 11:40:20 +0000 (UTC)
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3a9b41ffe11so379760b6e.2
-        for <iwd@lists.linux.dev>; Thu, 31 Aug 2023 04:40:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F718C13
+	for <iwd@lists.linux.dev>; Thu, 31 Aug 2023 12:39:30 +0000 (UTC)
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-59254e181a2so9330217b3.1
+        for <iwd@lists.linux.dev>; Thu, 31 Aug 2023 05:39:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693482019; x=1694086819; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LKbUo4ly1KjL/ukEDzB412sK6qXxWhgDItASDHG4gls=;
-        b=nl8fyRn2p/dLyWgmGIX2op0WN7IBHa9i0PRWMgXseGHJSNQaaXJ5Qanj3h7YjxpV9R
-         JVExQQB/JdSEQYTRyOD9nL/yie3pEUH+9+4lcIyfS0tjGie1LG/6QzUZrLfv4K1yZuNC
-         xVdyoTxOtKVZMet4cNXi7O4MPGhZH7MlfVu8bzW5F1MIZxziTVjJ6duPyQ+QQdsZ+5aj
-         bS04fZYrECc10Ow7IYXszVydoSUesivoxj2UvQMvHec8SJkbbvS4ANUwrGSOpjLPeZOS
-         jexHekIxlIRLv1HLdJ5FlEkv47VKjdL0Y3zG+ULlU5i0XmL96fjr3sxXMfhAcZtlCg5C
-         i+/g==
+        d=gmail.com; s=20221208; t=1693485569; x=1694090369; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4GyF5Z2tT95ItPHRu72vUwbX6kkO12PgZ/NrhU6aHvc=;
+        b=gRSpxF07xDgc5ngs89N85A2mx5rKNK7vQYHyqqePavufoQsKN5VdiZc+/L6SN8zIAq
+         Ajecu4IuHlCLVgJAuphDy+1biM5S7DQxj9aMD5qGG+1dwQPMZlDq63FoWEYsoNfl11Zo
+         7g+kKPM2R1FjbHJiC/oaHKRB5VtJyE8dOELYGkPsIU8DvGJqg05f5FVl2M6RyQKVrUWi
+         gCV8Wgy+7BHw8ysA5yS0nLAqabMbKywpP+0ctH0ah4g14wAEroIPyuP4eYWBv3e5P/rV
+         pSfhLBb092RVyqumKFABoE9hTK1GBcFz5qOk8bZA8pEewiIh4oApQjL3Ql0dnr+RsBJX
+         DGdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693482019; x=1694086819;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LKbUo4ly1KjL/ukEDzB412sK6qXxWhgDItASDHG4gls=;
-        b=fQ4TdL5zKsLKixVe1pGzO2jR6UCaBhPqm4djpQ6vxr2jBOkxceLt4CJvxi1EE64suU
-         aNTz31fnTO4sXFMAP0ccfAEkQ+Dz8NI8TupKiSYLtmRPbiO8J1XE61SE0IyjOyDM3k+u
-         /hyibexpnF0AZH6yEd89QTIRaOpFzrw9h9wZGGHkhzCQcqxKpn7rI/3xCHSc/8eYh7bB
-         lALcHgirq9/FUCpTqbN9/pdvj5YBdtlcVfuJeJjzffpzUTGe/74Wsr7R3Kgf03EgkBsV
-         sWvw3IxMFEBzSgyIrALT0lOtTKhsLpHc6SliQ5WOg1d24q7mz1Wpll6AGS1FjoYaVfGK
-         XmSw==
-X-Gm-Message-State: AOJu0YyRGNcctI7WnkwaFtTbMABSeqgknecGeWuEo2U+ESdiX9sO33vL
-	MdtTIXzhDTDxEYu7W0gsZQY=
-X-Google-Smtp-Source: AGHT+IEb73NDL35n3mGLBKzIXafzgaZfTms21WBJWhuWY2oeNg5u//J3MWeCmoYD6VKi4E0SlLK7qg==
-X-Received: by 2002:a05:6808:1412:b0:3a3:6329:4cb7 with SMTP id w18-20020a056808141200b003a363294cb7mr5646599oiv.9.1693482019320;
-        Thu, 31 Aug 2023 04:40:19 -0700 (PDT)
-Received: from [192.168.254.82] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id n26-20020a638f1a000000b0055b61cd99a1sm1202563pgd.81.2023.08.31.04.40.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Aug 2023 04:40:19 -0700 (PDT)
-Message-ID: <d3e32c55-6b86-40f6-94b8-045656a66c0f@gmail.com>
-Date: Thu, 31 Aug 2023 04:40:17 -0700
+        d=1e100.net; s=20221208; t=1693485569; x=1694090369;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4GyF5Z2tT95ItPHRu72vUwbX6kkO12PgZ/NrhU6aHvc=;
+        b=Mw9TwhP0BnsXBVlCRrFm01LzMzsUI18Dl0SgATwNqLJe5LeQlkcHt3Y07YxNDNoGCG
+         djjXPlDobb5ECTrRp3J6K3ZyCH3wT9+sQMSUDfg3xkKBAptpZimio36vNXmpCy3x/bdZ
+         9R5eBeabBCNZdGvaCYvwTEAo/UcudF6wkzarrj6J90CZdf29YIbqDEnACbh1PyHeM2Ff
+         b4fHurxK++xuOe5HbtGPQDAuryemNmuwMfQzLr9Fn9IHxmcxGUGoim5pFPOpqIdStOHG
+         W3SN7bGa0Gza9eBYr/kmDxR06NkSAfr36Rej5Vc3HZi6tgEGNt6BP1QNeYLBcQz9qmkJ
+         txpw==
+X-Gm-Message-State: AOJu0YxaEds0bfB6aZMFj/tbdOTJKJSVLNtCwZlgGJyXIWNf0QL0DoJL
+	FnPF3VFMJVF/neGN2tTtFLcgPtgRTHU=
+X-Google-Smtp-Source: AGHT+IHRLn7NNTHLO8Nq6epPb9ODX8+q5Nt5IwsC2lnf8ZXqsub4rl1iHD5gacJdJCjHFJ12Tgs5fA==
+X-Received: by 2002:a81:6c52:0:b0:57a:5b6f:d41 with SMTP id h79-20020a816c52000000b0057a5b6f0d41mr5324758ywc.42.1693485568898;
+        Thu, 31 Aug 2023 05:39:28 -0700 (PDT)
+Received: from LOCLAP699.rst-01.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id p5-20020a0dcd05000000b0057a44e20fb8sm380308ywd.73.2023.08.31.05.39.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Aug 2023 05:39:28 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3 1/3] ft: track FT auth/action response status
+Date: Thu, 31 Aug 2023 05:39:22 -0700
+Message-Id: <20230831123924.531560-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/3] station: fall back to reassociation under certain
- FT failures
-Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20230829145116.279949-1-prestwoj@gmail.com>
- <20230829145116.279949-2-prestwoj@gmail.com>
- <14b92465-07b9-7f76-556f-0bd79dc2a6f7@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <14b92465-07b9-7f76-556f-0bd79dc2a6f7@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Denis,
+Certain return codes, though failures, can indicate that the AP is
+just confused or booting up and treating it as a full failure may
+not be the best route.
 
-On 8/30/23 7:34 PM, Denis Kenzior wrote:
-> Hi James,
-> 
-> On 8/29/23 09:51, James Prestwood wrote:
->> The auth/action status is now tracked in ft.c. If an AP rejects the
->> FT attempt with "Invalid PMKID" we can now assume this AP is either
->> mis-configured for FT or is lagging behind getting the proper keys
->> from neighboring APs (e.g. was just rebooted).
->>
->> If we see this condition IWD can now fall back to reassociation in
->> an attempt to still roam to the best candidate. The fallback decision
->> is still rank based: if a BSS fails FT it is marked as such, its
->> ranking is re-computed removing the FT factor and it is inserted back
->> into the queue.
->>
->> The motivation behind this isn't necessarily to always force a roam,
->> but instead to handle two cases where IWD can either make a bad roam
->> decision or get 'stuck' and never roam:
->>
->>    1. If there is one good roam candidate and other bad ones. For
->>       example say BSS A is experiencing this FT key pull issue:
->>           Current BSS: -85dbm
->>           BSS A:       -55dbm
->>           BSS B:       -80dbm
->>       The current logic would fail A, and roam to B. In this case
->>       reassociation would have likely succeeded so it makes more sense
->>       to reassociate to A as a fallback.
->>
->>    2. If there is only one candidate, but its failing FT. IWD will
->>       never try anything other than FT and repeatedly fail.
->>
->> Both of the above have been seen on real network deployments and
->> result in either poor performance (1) or eventually lead to a full
->> disconnect due to never roaming (2).
->> ---
->>   src/station.c | 124 ++++++++++++++++++++++++++++++++------------------
->>   1 file changed, 80 insertions(+), 44 deletions(-)
->>
->> v2:
->>   * Rather than always falling back to reassociate recompute the
->>     rank and insert into the queue. This allows IWD to try similarly
->>     ranked BSS's with FT before falling back to reassociation.
->>
-> 
-> <snip>
-> 
->> diff --git a/src/station.c b/src/station.c
->> index 2473de2a..59191baa 100644
->> --- a/src/station.c
->> +++ b/src/station.c
->> @@ -73,6 +73,7 @@ static bool supports_arp_evict_nocarrier;
->>   static bool supports_ndisc_evict_nocarrier;
->>   static struct watchlist event_watches;
->>   static uint32_t known_networks_watch;
->> +static const double RANK_FT_FACTOR = 1.3;
->>   struct station {
->>       enum station_state state;
->> @@ -147,15 +148,49 @@ struct roam_bss {
->>       uint8_t addr[6];
->>       uint16_t rank;
-> 
-> I'd store the original (non-FT factored rank here).  This lets you get 
-> rid of the double division which I think might be expensive on some 
-> platforms.
-> 
->>       int32_t signal_strength;
->> +    bool reassoc: 1;
-> 
-> I'd name this something like ft_failed.
-> 
->>   };
->> -static struct roam_bss *roam_bss_from_scan_bss(const struct scan_bss 
->> *bss)
-> 
-> <snip>
-> 
->> +static struct roam_bss *roam_bss_from_scan_bss(struct handshake_state 
->> *hs,
->> +                        const struct scan_bss *bss)
->>   {
->>       struct roam_bss *rbss = l_new(struct roam_bss, 1);
->>       memcpy(rbss->addr, bss->addr, 6);
->>       rbss->rank = bss->rank;
->>       rbss->signal_strength = bss->signal_strength;
->> +    rbss->reassoc = !station_can_fast_transition(hs, bss);
-> 
-> Why would you do this for every candidate up-front?  If the first one 
-> succeeds, no need to do this for the rest.  Also, strictly speaking the 
-> scan results might have changed in the meantime.  You should be checking 
-> this against the fresh bss obtained in station_transition_start.
-> 
->>       return rbss;
->>   }
-> 
-> <snip>
-> 
->> @@ -2264,19 +2272,43 @@ static void station_transition_start(struct 
->> station *station);
->>   static bool station_ft_work_ready(struct wiphy_radio_work_item *item)
->>   {
->>       struct station *station = l_container_of(item, struct station, 
->> ft_work);
->> -    struct roam_bss *rbss = l_queue_pop_head(station->roam_bss_list);
->> -    struct scan_bss *bss = network_bss_find_by_addr(
->> -                    station->connected_network, rbss->addr);
->> +    _auto_(l_free) struct roam_bss *rbss = l_queue_pop_head(
->> +                            station->roam_bss_list);
->> +    struct scan_bss *bss;
->>       int ret;
->> -    l_free(rbss);
->> -
->>       /* Very unlikely, but the BSS could have gone away */
->> +    bss = network_bss_find_by_addr(station->connected_network, 
->> rbss->addr);
->>       if (!bss)
->>           goto try_next;
->>       ret = ft_associate(netdev_get_ifindex(station->netdev), bss->addr);
->> -    if (ret == -ENOENT) {
-> 
-> Okay, but it feels like the resulting if statement is starting to become 
-> messy after these changes.  Maybe using a switch/case would be better?
+For example in some production deployments if an AP is rebooted it
+may take some time for neighboring APs to exchange keys for
+current associations. If a client roams during that time it will
+reject saying the PMKID is invalid.
 
-I'll see what I can do, but with both ret < 0 and ret > 0 checks things 
-don't immediately seem better with a case statement. Maybe I'll contain 
-this re-insert into its own function.
+Use the ft_associate call return to communicate the status (if any)
+that was in the auth/action response. If there was a parsing error
+or no response -ENOENT is still returned.
+---
+ src/ft.c | 37 ++++++++++++++++++++++++++-----------
+ 1 file changed, 26 insertions(+), 11 deletions(-)
 
-> 
->> +    if (ret > 0) {
->> +        if (ret != MMPDU_STATUS_CODE_INVALID_PMKID) {
->> +            station_debug_event(station, "ft-roam-failed");
->> +            goto try_next;
->> +        }
->> +
->> +        /*
->> +         * Re-insert removing FT from the ranking. If the BSS is still
->> +         * the best reassociation will be used, otherwise we'll try
->> +         * more FT candidates that are better ranked
->> +         */
->> +        rbss->rank /= RANK_FT_FACTOR;
->> +        rbss->reassoc = true;
-> 
-> Here's where saving the original rank would be better.  You can simply 
-> assign the original rank to the current one and avoid the division.
+v3:
+ * Reordered action parsing to not set IEs unless status == 0
 
-So this actually points something I overlooked. The rbss->rank does not 
-actually take into account FT. RANK_FT_FACTOR is added onto the 
-scan_bss->rank locally and only used to compare against the current BSS. 
-So actually if FT failed we would be ranking those BSS's lower than 
-other non-FT BSS's by dividing.
+diff --git a/src/ft.c b/src/ft.c
+index c51a1288..2cc611b8 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -58,13 +58,14 @@ struct ft_info {
+ 	uint32_t frequency;
+ 	uint32_t ds_frequency;
+ 	uint32_t offchannel_id;
++	/* Status of Authenticate/Action frame response, or error (< 0) */
++	int status;
+ 
+ 	struct l_timeout *timeout;
+ 	struct wiphy_radio_work_item work;
+ 
+ 	struct ie_ft_info ft_info;
+ 
+-	bool parsed : 1;
+ 	bool onchannel : 1;
+ };
+ 
+@@ -526,22 +527,23 @@ static int ft_over_ds_parse_action_response(const uint8_t *frame,
+ 	if (memcmp(spa, hdr->address_1, 6))
+ 		return -EINVAL;
+ 
+-	status = l_get_le16(frame + 14);
+-	if (status != 0)
+-		return (int)status;
+-
+ 	if (spa_out)
+ 		*spa_out = spa;
+ 
+ 	if (aa_out)
+ 		*aa_out = aa;
+ 
++	status = l_get_le16(frame + 14);
++	if (status != 0)
++		goto done;
++
+ 	if (ies_out && ies_len) {
+ 		*ies_out = frame + 16;
+ 		*ies_len = frame_len - 16;
+ 	}
+ 
+-	return 0;
++done:
++	return (int)status;
+ }
+ 
+ int __ft_rx_associate(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
+@@ -825,7 +827,7 @@ void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
+ 
+ 	ret = ft_over_ds_parse_action_response(frame, frame_len, &spa, &aa,
+ 						&ies, &ies_len);
+-	if (ret != 0) {
++	if (ret < 0) {
+ 		l_debug("Could not parse action response");
+ 		return;
+ 	}
+@@ -836,13 +838,22 @@ void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len)
+ 		return;
+ 	}
+ 
++
++	if (ret != 0) {
++		l_debug("BSS "MAC" rejected FT action with status=%u",
++				MAC_STR(info->aa), ret);
++		info->status = ret;
++		goto done;
++	}
++
+ 	if (!ft_parse_ies(info, hs, ies, ies_len)) {
+ 		l_debug("Could not parse action response IEs");
+ 		goto ft_error;
+ 	}
+ 
+-	info->parsed = true;
++	info->status = ret;
+ 
++done:
+ 	l_timeout_remove(info->timeout);
+ 	info->timeout = NULL;
+ 
+@@ -872,6 +883,7 @@ static struct ft_info *ft_info_new(struct handshake_state *hs,
+ 						target_bss->rsne[1] + 2);
+ 
+ 	l_getrandom(info->snonce, 32);
++	info->status = -ENOENT;
+ 
+ 	return info;
+ }
+@@ -1016,6 +1028,7 @@ void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
+ 	if (status != 0) {
+ 		l_debug("BSS "MAC" rejected FT auth with status=%u",
+ 				MAC_STR(info->aa), status);
++		info->status = status;
+ 		goto cancel;
+ 	}
+ 
+@@ -1024,7 +1037,7 @@ void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
+ 		goto cancel;
+ 	}
+ 
+-	info->parsed = true;
++	info->status = status;
+ 
+ cancel:
+ 	/*
+@@ -1164,11 +1177,13 @@ int ft_associate(uint32_t ifindex, const uint8_t *addr)
+ 	 * Either failed or no response. This may have been an FT-over-DS
+ 	 * attempt so clear out the entry so FT-over-Air can try again.
+ 	 */
+-	if (!info->parsed) {
++	if (info->status != 0) {
++		int status = info->status;
++
+ 		l_queue_remove(info_list, info);
+ 		ft_info_destroy(info);
+ 
+-		return -ENOENT;
++		return status;
+ 	}
+ 
+ 	ft_prepare_handshake(info, hs);
+-- 
+2.25.1
 
-So instead I think I need to store rbss->ft_rank and use both that and 
-rbss->rank for insertion:
-
-> 
->> +
->> +        l_debug("Re-inserting BSS "MAC" forcing reassociation, rank: 
->> %u",
->> +                    MAC_STR(rbss->addr), rbss->rank);
->> +
->> +        l_queue_insert(station->roam_bss_list, rbss,
->> +                roam_bss_rank_compare, NULL);
->> +
->> +        station_debug_event(station, "ft-fallback-to-reassoc");
->> +
->> +        station_transition_start(station);
->> +        l_steal_ptr(rbss);
->> +        return true;
->> +    } else if (ret == -ENOENT) {
->>           station_debug_event(station, "ft-roam-failed");
->>   try_next:
->>           station_transition_start(station);
-> 
-> <snip>
-> 
->> @@ -2490,7 +2526,6 @@ static bool station_roam_scan_notify(int err, 
->> struct l_queue *bss_list,
->>       struct scan_bss *current_bss = station->connected_bss;
->>       struct scan_bss *bss;
->>       double cur_bss_rank = 0.0;
->> -    static const double RANK_FT_FACTOR = 1.3;
-> 
-> You probably don't need to move this if you save the original rank.
-> 
->>       uint16_t mdid;
->>       enum security orig_security, security;
-> 
-> <snip>
-> 
-> Regards,
-> -Denis
