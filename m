@@ -1,78 +1,108 @@
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA09433E8
-	for <iwd@lists.linux.dev>; Fri, 15 Sep 2023 14:35:09 +0000 (UTC)
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-576918d0a42so1196109eaf.3
-        for <iwd@lists.linux.dev>; Fri, 15 Sep 2023 07:35:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B672230CE1
+	for <iwd@lists.linux.dev>; Fri, 15 Sep 2023 14:42:21 +0000 (UTC)
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-59b4ec8d9c1so23971677b3.0
+        for <iwd@lists.linux.dev>; Fri, 15 Sep 2023 07:42:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694788509; x=1695393309; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1694788940; x=1695393740; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Fx0ALe0dNb5PJpPqGKAyvY6EskK8hm7GLnf01Ijon1Y=;
-        b=GwUwjETfPIaR+1XOasRQ/e8HdVkCGiUiisTcYNsObo4MCKE1tfrvchAJJYDsiv2s0E
-         w65Tp82AxGu0txlJohfTwLz8niqPMpXnR69Crl0T+FVSJKx64S+KEmW3E6wv4UXhrst0
-         QW/+qjddRyOpLEHqb8eALTBG9/1irqAm+EVgcY/iJh1MebY4Vips+4b1Chm/cnY7WtTh
-         kh7SJXB2UsxV+6xHxKwg9nj10vLKHa7b59+cfLGe61WbMAfKc2e1SFQoxyLeeZh1OOel
-         59H5gSCko43c3tUqU0IA0iOIEPMsojaAiD9yBupXtcmJJrHaOs1cBJmfNH3PZ+A4I3hm
-         qysA==
+        bh=LgRdWJVK+rQ9hpiYGunZ9pIEpxo7FzTkDd+UHbEf1CY=;
+        b=LJabg+RZP7bw1fWWqGJNAPdgWZuzCBXKJ16qlytlDHeVtz3DE/U4sbMEsjaKqcFo5S
+         pn7Gy5laHBHsBwTrgt2UBzsUg/FN56vkNfldS88O6djC0mjIM7Q9pUNwG1wP0Q0OIxeL
+         fCb8pgBFO0mTas0rr5fzaFCiV0o9GrsWk+USi/qyTeIEKNaxl96u8rvQht50sWu02UKt
+         u9yLMmKDEmm2D9NVefE7scjj6v+DwOlZuMlS39wW8Qe37gvXXHYeRpNw/CJf69aWB2wr
+         SiWbNNa1vnwrj5ITtECmbydOFc1hQazdvrLBNZNti9yDKNI5finugOfCD/bcCXk/UsuU
+         BuXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694788509; x=1695393309;
+        d=1e100.net; s=20230601; t=1694788940; x=1695393740;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fx0ALe0dNb5PJpPqGKAyvY6EskK8hm7GLnf01Ijon1Y=;
-        b=nQ3A4fJ7CwG49RoKow6FWtJW5NEO6T7XtAyvbO76quTHB64/bVGFXkaSogpTK3XWmY
-         QYQjlfJErI+NS7VgqF7XaWe9qf2T2WX+enkuF/O86ez1Y4a88iUcYR2GRRlIFRlaweQx
-         sYM+g5a44dy2xTgiYxHnwFDLRMiHEQNsTAmU6WW4dUscLkyiLGMsn2gASVC3UgoL+0Zz
-         xZAL9FdIznyWURZZj60RLnREbTALtpWgGN+oCazWt6jrJBDlbCM125Foo195vEeDdKfT
-         StLR0FPREROzuVc8H3DJGm344df4r5c/GFulbRtUfOjQO6pvVMAfXQv+0le1mv+ICn18
-         WHJw==
-X-Gm-Message-State: AOJu0YwUGLfhhiGO0NcjmC2y38VFBzEq/vpHa6WUBjDlkUjrR44ZkLd4
-	9Ip9yISQpmif/NXza8t35aOlFz+he08=
-X-Google-Smtp-Source: AGHT+IFVKMuWBQNh1X5oAT6M9DUJ9I6ib6e43pQKqr6AG4MdaLVZHQ0HOL/kokNXN7uqmfdAVm7zPQ==
-X-Received: by 2002:a4a:3116:0:b0:56c:e856:8b2c with SMTP id k22-20020a4a3116000000b0056ce8568b2cmr1892776ooa.9.1694788508986;
-        Fri, 15 Sep 2023 07:35:08 -0700 (PDT)
-Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id u8-20020a4a9708000000b00573320e1241sm1819067ooi.14.2023.09.15.07.35.08
+        bh=LgRdWJVK+rQ9hpiYGunZ9pIEpxo7FzTkDd+UHbEf1CY=;
+        b=YtELmt+yqABekn2x/3YqjUg0juuyBU6pDcQjh68WGR0ErwWj6ir/H2CGVlubwSBRyg
+         wjVqZsZUVWZfv57gzAFSrrFqeKqB5UJaTyaUUOxjfVfWioj7s9jFEwDQ8XSKjiw7cr/T
+         lzNjF6S+WfxCyPipYwNF0ygeFN+8m2Dg/ujKQGCagEo1cEZh0WKw23yEDW6vZhGP7jj6
+         E0chfib09U3IhScnhngy03fQ8LzJtGm+7T6UV+KNK4RsXNXM14tik4XOPE6Pto+6b/E/
+         eT6IiZ/Yeo+dL+6UCLuFuC5aWHaEBwQnLmiNggmXZt3c58bKQU0Pw+ulcrypby5AJodQ
+         V8RA==
+X-Gm-Message-State: AOJu0YyvZ2kdF5D18ImLR0gCnglMBoybtREH7pNbq2OAKsodMoHnZg9l
+	5UGmqopamm22bSeJOmGSXxI=
+X-Google-Smtp-Source: AGHT+IGpz5qe17UMKClZ8WL/Sj6I/XSPZTaBgbgarSbtoDkRrBpe1c0jBWyrC8G4jrc22Y8H4FQKSg==
+X-Received: by 2002:a81:4f8d:0:b0:59b:f46d:a54 with SMTP id d135-20020a814f8d000000b0059bf46d0a54mr1838865ywb.14.1694788940499;
+        Fri, 15 Sep 2023 07:42:20 -0700 (PDT)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id o8-20020a817308000000b00594fff48796sm891576ywc.75.2023.09.15.07.42.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Sep 2023 07:35:08 -0700 (PDT)
-Message-ID: <449345bf-a1e2-b435-f855-7048ab0770e3@gmail.com>
-Date: Fri, 15 Sep 2023 09:35:07 -0500
+        Fri, 15 Sep 2023 07:42:19 -0700 (PDT)
+Message-ID: <8629e294-0550-436d-91b3-e0cf1c84f8e7@gmail.com>
+Date: Fri, 15 Sep 2023 07:42:17 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: Force use of 5GHz band
 Content-Language: en-US
-To: =?UTF-8?Q?Jonas_Gro=c3=9fe_Sundrup?= <cherti-iwd@letopolis.de>,
- James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+To: Denis Kenzior <denkenz@gmail.com>,
+ =?UTF-8?Q?Jonas_Gro=C3=9Fe_Sundrup?= <cherti-iwd@letopolis.de>,
+ iwd@lists.linux.dev
 References: <cfdbbdb5774c4db1c8d3ec7d1e09e70e340f075c.camel@grosse-sundrup.com>
  <34795e04-66e4-4359-a6b2-59b3f47eaf64@gmail.com>
  <d0b59d7ddf82006b6280e3b6652614d9ece09f7a.camel@grosse-sundrup.com>
  <6aac9366-36fd-474d-882e-1bcc940fb444@gmail.com>
  <ea23c922129d3c18c4affb0f0e4a737b7e2a03e5.camel@grosse-sundrup.com>
  <e74c1a50-b5bf-48eb-a53e-100d9706e7f5@gmail.com>
- <0d355152339b4e937910fb2440d1d3ace453514a.camel@grosse-sundrup.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <0d355152339b4e937910fb2440d1d3ace453514a.camel@grosse-sundrup.com>
+ <43d47533-a4a3-e3d5-8f17-30467475660a@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <43d47533-a4a3-e3d5-8f17-30467475660a@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Hi Denis,
 
-Hi Jonas,
+On 9/15/23 7:30 AM, Denis Kenzior wrote:
+> Hi James,
+> 
+> On 9/14/23 13:33, James Prestwood wrote:
+>>
+>> On 9/14/23 11:22 AM, Jonas Große Sundrup wrote:
+>>> On Thu, 2023-09-14 at 11:16 -0700, James Prestwood wrote:
+>>>> Yep that would do it.
+>>>
+>>> automatically quick scan upon start: https://p.nnev.de/12646
+>>>
+>>> explicit scan triggered via "station wifi scan":
+>>> https://p.nnev.de/12647
+>>>
+>>> anything insightful in there?
+>>
+>> A value of 1000 should definitely work... Are you sure the syntax is 
+>> right inside main.conf:
+> 
+> Careful about using high factors like this.  Right now the rank is 
+> computed using a double, but truncated to a uint32_t and clamped to 
+> USHRT_MAX / uint16_t.  This works fine, but the FT roaming calculation 
+> is a bit more careless.  Could lead to very funny results.
+
+I don't think FT uses that ranking factor, but either way yes some huge 
+factor like that shouldn't be needed.
 
 > 
-> (Feature Request: also accept "5GHz" as spelling, given that's the
-> correct unit spelling? 😅)
+> We may be better off introducing 2.4GHz factor and suggesting using a 
+> 0.0 multiplier to turn bands off.  Or add an explicit setting.
 
-Yeah we really should.  Too bad we somehow screwed up the capitalization in this 
-case and settings keys are case-sensitive.
+I actually was thinking this would be nice. We actually don't even run a 
+2.4ghz network at all so that would reduce extra scanning cycles, even 
+if just a couple seconds. I'll go ahead and add support for 0.0 factors 
+disabling the band, and add a 2.4 factor setting.
 
-Regards,
--Denis
+> 
+> Regards,
+> -Denis
+> 
