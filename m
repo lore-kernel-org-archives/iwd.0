@@ -1,49 +1,52 @@
 Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075F0347AB
-	for <iwd@lists.linux.dev>; Tue, 19 Sep 2023 16:59:26 +0000 (UTC)
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1bf7423ef3eso43969225ad.3
-        for <iwd@lists.linux.dev>; Tue, 19 Sep 2023 09:59:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28D8347B4
+	for <iwd@lists.linux.dev>; Tue, 19 Sep 2023 16:59:27 +0000 (UTC)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1c43166b7e5so41052685ad.3
+        for <iwd@lists.linux.dev>; Tue, 19 Sep 2023 09:59:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695142766; x=1695747566; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=N63+4dGwRwj8N7f/+hMABWds1ozcn674BhlsiLUpsS4=;
-        b=fXbnTQeYfZyrpqrpsd/BGM6v+ohyrTSzcnnx+uIEjqSpNMIjFXLZYcSxVnXVxor/ay
-         eWP/asWFYjDoUcfIz34L6Ml2FuAIKtqOFLI4CilmcX2twTglkvHuEpPRBsc2xoiUeEkL
-         CvY+0O1SYzHQrdiSUOgx4Vt4v+z4XYht0rNi5OZb2/du8djEN8NtABgr4XfaomTM2ifp
-         N7qMLRc5kldNuAOb34NZ3m9l0vueveh52Yhk5zdBjk+EfBJSn43EVWAOsFzeaoDwh8Nc
-         E+VNKh/SoeNCGcSHQil8EbLJ6bw5cXR9Yc9iQgx/sF7Ps/LX/8bYzwvrKxUBhoFL0rrP
-         SxHw==
+        d=gmail.com; s=20230601; t=1695142767; x=1695747567; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jhUGICV688qItYF76Q82MOfxXXk3cjDAABRYlHyBycY=;
+        b=TKP4PAEQPTnPTs/iwSnsJV7d2EpLCPh3JNqCglj1ANJUR7PsGRk5avfdAWtyLpWkLE
+         46oNAAn4V7tC+DvHwh46tPpynquSvV0+YQ0bSDFr+g1F8iHc4Dr7oZGH0j8Uy+0M7DWx
+         IHWlmmQ2W4AWkbHajyCSIIHxnP9dwiSltxmye7D1YXBDj1YbGTfZSfDydo5GzHd/ckm6
+         6Fg/2OutfvyCb0q6g9zS+n9NTu2j2mSQH8eLR03oh14RpmRAzEIqSTskv5UGnoWdfWkf
+         yudctJpXrqOTiezXnIUL/hzYY3oHfDlQ+NEoVJWdkrJttG5budxWieI/hVWr3L3shiYp
+         QdlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695142766; x=1695747566;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N63+4dGwRwj8N7f/+hMABWds1ozcn674BhlsiLUpsS4=;
-        b=sPR93D+ZMoglPfTdGeHQwHj3qzNH0WirRvd2Tacti4opRmwAvJihwjS6DtNMSklsUs
-         Or0GLnpvRRqWOVfvjpjMelECmNTIAdIiPKHdhR1kMpEXwyCn+02909v/zrzlPPR9a7gh
-         OytXVAIaK8olvzTB3ujBB6H8hOsa1PoXP8j7uuMz12bmTL+4RqUaR18VLRTubciKMOSY
-         coIGmHSYY0LqRch9yc8F94x8yQXQ+jWYE8TW4HGwbOnE6iwwtFpG0iOYzLFU9hhAwfG8
-         sEknKYUVNodr05FttnZd8TYjexCVBWEtaJia5VAzo81IhYmVfWj2sKTvpuLzhUzVV20e
-         WVGw==
-X-Gm-Message-State: AOJu0YyjdGB/sVyg1nTNQPxEZXQbtImuzf7Y2vAOC+g9DWn0vpsEG3Hm
-	gr3kd1iKUVcDEFqOJx8V6trhz334070=
-X-Google-Smtp-Source: AGHT+IEapyuB0/cs1C8S/1TyPG+7YXFZ4P/UvB7LEtS4WN6txN3Ff+ZpS7sH486QdbySu0AO3Hg27Q==
-X-Received: by 2002:a17:902:cec4:b0:1c4:21f3:4be9 with SMTP id d4-20020a170902cec400b001c421f34be9mr12444716plg.62.1695142766132;
+        d=1e100.net; s=20230601; t=1695142767; x=1695747567;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jhUGICV688qItYF76Q82MOfxXXk3cjDAABRYlHyBycY=;
+        b=H8KjBDkjev3fB+NrLaZmeeTTMD0A5DWkbev1SVpqPeiTJ+vGZFxnzUNyzJXTWgPqtu
+         LZLJY0IZsikRXVi+rNOq5+OAHr5K22jzg/P76cBumJyuqoaT11sosbEnXeJvVTpf0V/h
+         jQp9128lbJySsKBr+/0p6OIZ8mW1hTwzJ2+HzYmZaKgq1zAFoAP28xBqUl4iA2gxDtTJ
+         LIY+cjtphR49xGrb4JVGxgbwkWBHEXWeklN65CgLMV6bgzCi6TjMX6uTDMceBiKKgzHW
+         nl7xfM7sbyC1jblAoar5UMrZpz/iJqyxtNmKQtWv1PSJBAbj09XNZrNi4QaJ6VwDhm3d
+         fbSw==
+X-Gm-Message-State: AOJu0YymZ8FAA4L1dZto4yZc3nKWqYl0K5aG+8tGrTpBSdRV791Ob9p9
+	kzlVl80vCpeyslG1b8tX74wOx8xIIdU=
+X-Google-Smtp-Source: AGHT+IEF7nXgMqnDaQjM/SjoHdZBs9v2G4KZTFvLRJiTv6cFm00zPRWyMa3MLwZU1HsIBlyTRqkM6A==
+X-Received: by 2002:a17:902:e851:b0:1b8:8af0:416f with SMTP id t17-20020a170902e85100b001b88af0416fmr2642plg.1.1695142766933;
         Tue, 19 Sep 2023 09:59:26 -0700 (PDT)
 Received: from localhost.localdomain ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id e18-20020a17090301d200b001b8c689060dsm10323399plh.28.2023.09.19.09.59.25
+        by smtp.gmail.com with ESMTPSA id e18-20020a17090301d200b001b8c689060dsm10323399plh.28.2023.09.19.09.59.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 09:59:25 -0700 (PDT)
+        Tue, 19 Sep 2023 09:59:26 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] wiphy: fix wiphy_contrain_freq_set skipping last channel
-Date: Tue, 19 Sep 2023 09:59:22 -0700
-Message-Id: <20230919165923.1352279-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] unit: include frequency 7115 in test-band
+Date: Tue, 19 Sep 2023 09:59:23 -0700
+Message-Id: <20230919165923.1352279-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230919165923.1352279-1-prestwoj@gmail.com>
+References: <20230919165923.1352279-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -52,32 +55,24 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The loop iterating the frequency attributes list was not including
-the entire channel set since it was stopping at i < band->freqs_len.
-The freq_attrs array is allocated to include the last channel:
-
-band->freq_attrs = l_new(struct band_freq_attrs, num_channels + 1);
-band->freqs_len = num_channels;
-
-So instead the for loop should use i <= band->freqs_len. (I also
-changed this to start the loop at 1 since channel zero is invalid).
+The test was not including the last frequency in the 6ghz spectrum.
 ---
- src/wiphy.c | 2 +-
+ unit/test-band.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 77ed2acf..ccff701e 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -843,7 +843,7 @@ bool wiphy_constrain_freq_set(const struct wiphy *wiphy,
- 		if (!band)
- 			continue;
+diff --git a/unit/test-band.c b/unit/test-band.c
+index caddbcdd..e27531f7 100644
+--- a/unit/test-band.c
++++ b/unit/test-band.c
+@@ -644,7 +644,7 @@ static void test_6ghz_freqs(const void *data)
+ 	uint32_t i;
+ 	enum band_freq band;
  
--		for (i = 0; i < band->freqs_len; i++) {
-+		for (i = 1; i <= band->freqs_len; i++) {
- 			uint32_t freq;
- 
- 			if (!band->freq_attrs[i].supported)
+-	for (i = 5955; i < 7115; i += 20) {
++	for (i = 5955; i <= 7115; i += 20) {
+ 		assert(band_freq_to_channel(i, &band) != 0);
+ 		assert(band == BAND_FREQ_6_GHZ);
+ 	}
 -- 
 2.25.1
 
