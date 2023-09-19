@@ -1,78 +1,117 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28D8347B4
-	for <iwd@lists.linux.dev>; Tue, 19 Sep 2023 16:59:27 +0000 (UTC)
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1c43166b7e5so41052685ad.3
-        for <iwd@lists.linux.dev>; Tue, 19 Sep 2023 09:59:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE521747C
+	for <iwd@lists.linux.dev>; Tue, 19 Sep 2023 17:29:58 +0000 (UTC)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-577a98f78b2so4293758a12.3
+        for <iwd@lists.linux.dev>; Tue, 19 Sep 2023 10:29:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695142767; x=1695747567; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jhUGICV688qItYF76Q82MOfxXXk3cjDAABRYlHyBycY=;
-        b=TKP4PAEQPTnPTs/iwSnsJV7d2EpLCPh3JNqCglj1ANJUR7PsGRk5avfdAWtyLpWkLE
-         46oNAAn4V7tC+DvHwh46tPpynquSvV0+YQ0bSDFr+g1F8iHc4Dr7oZGH0j8Uy+0M7DWx
-         IHWlmmQ2W4AWkbHajyCSIIHxnP9dwiSltxmye7D1YXBDj1YbGTfZSfDydo5GzHd/ckm6
-         6Fg/2OutfvyCb0q6g9zS+n9NTu2j2mSQH8eLR03oh14RpmRAzEIqSTskv5UGnoWdfWkf
-         yudctJpXrqOTiezXnIUL/hzYY3oHfDlQ+NEoVJWdkrJttG5budxWieI/hVWr3L3shiYp
-         QdlA==
+        d=gmail.com; s=20230601; t=1695144598; x=1695749398; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q9pWK28ktYyM77owEuLeJKwGfxCmfhb1pjXKoU3wQy8=;
+        b=Y23KL7H4xQvv1z/9KmjsxzUP9JsvWilASJ95/N3qvIFZ9bycecmtntX11kp/s68BeZ
+         0mvOftChCrvRTQqltYlJs0wTqZa2cq7JBwqXrgTmmJtxEdlyNPAkrMb1sEwXcEzvpC2x
+         WkNLG0cBr1pd67acXQyDtd4JKI70eBV8NggeZsahTAsEOUX8tCYk3pBZEbehx8302kFS
+         U7VUHVoF1WU+vE6moPq4uWWnLU2R6pj0Ne1eX2dBgLMjnHJRgWHhyYWcflK208Beb4nE
+         ch22OqXQz5NBRgwE3Ylc2ljAgKcxG/uZv0wk5+HA6aD4J4LL+P0RALvk1as9X7eQxAiI
+         Kd8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695142767; x=1695747567;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jhUGICV688qItYF76Q82MOfxXXk3cjDAABRYlHyBycY=;
-        b=H8KjBDkjev3fB+NrLaZmeeTTMD0A5DWkbev1SVpqPeiTJ+vGZFxnzUNyzJXTWgPqtu
-         LZLJY0IZsikRXVi+rNOq5+OAHr5K22jzg/P76cBumJyuqoaT11sosbEnXeJvVTpf0V/h
-         jQp9128lbJySsKBr+/0p6OIZ8mW1hTwzJ2+HzYmZaKgq1zAFoAP28xBqUl4iA2gxDtTJ
-         LIY+cjtphR49xGrb4JVGxgbwkWBHEXWeklN65CgLMV6bgzCi6TjMX6uTDMceBiKKgzHW
-         nl7xfM7sbyC1jblAoar5UMrZpz/iJqyxtNmKQtWv1PSJBAbj09XNZrNi4QaJ6VwDhm3d
-         fbSw==
-X-Gm-Message-State: AOJu0YymZ8FAA4L1dZto4yZc3nKWqYl0K5aG+8tGrTpBSdRV791Ob9p9
-	kzlVl80vCpeyslG1b8tX74wOx8xIIdU=
-X-Google-Smtp-Source: AGHT+IEF7nXgMqnDaQjM/SjoHdZBs9v2G4KZTFvLRJiTv6cFm00zPRWyMa3MLwZU1HsIBlyTRqkM6A==
-X-Received: by 2002:a17:902:e851:b0:1b8:8af0:416f with SMTP id t17-20020a170902e85100b001b88af0416fmr2642plg.1.1695142766933;
-        Tue, 19 Sep 2023 09:59:26 -0700 (PDT)
-Received: from localhost.localdomain ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id e18-20020a17090301d200b001b8c689060dsm10323399plh.28.2023.09.19.09.59.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 09:59:26 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] unit: include frequency 7115 in test-band
-Date: Tue, 19 Sep 2023 09:59:23 -0700
-Message-Id: <20230919165923.1352279-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230919165923.1352279-1-prestwoj@gmail.com>
-References: <20230919165923.1352279-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1695144598; x=1695749398;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q9pWK28ktYyM77owEuLeJKwGfxCmfhb1pjXKoU3wQy8=;
+        b=rNFTMC5BuWKoYjy4XB8aNuBzUrZO0yr7Q+vl85wK7cTspXx9dpRQg6Kvodz4IcMsWP
+         sx3TNGrIsuHrtfyvdJTcGSOL+dAcHEZVlxkWqZvJ44byWsaqyBBxbxz5ACKCIawk/713
+         I9XhPo3jehUwbNL5hwy/sG2PlEboapCti5N5qSjgbnVPFwO2cS18q8SbHanHEpOKOfG8
+         jcTm56kHGHg7zaxEEAUiyA+KjysL3Ir32FYqYWTX40kb6+jwIiE5BOD6+VvfiHkvKPqA
+         vFkaMbhkY73V14kCAPS8L/fZux4BCSXBR7Q3DlMnP/5mt4Q9emnWp28kotCvo5PSfz8g
+         Itjg==
+X-Gm-Message-State: AOJu0YyxUEEmVNGsepqh5rp0Qk8J8Ykn23lbM74hYMj6CR0ZEvA9L57P
+	S3aRDzkShRXpkrJvvqVsJYA=
+X-Google-Smtp-Source: AGHT+IHmPcf8C8dLmmDrhehKrcnoBeDIqsTs5bM8BIQWhfnojIDkRRUP6SERu2otizB52prlbBtbSg==
+X-Received: by 2002:a17:90a:f292:b0:263:ebab:a152 with SMTP id fs18-20020a17090af29200b00263ebaba152mr387256pjb.19.1695144598176;
+        Tue, 19 Sep 2023 10:29:58 -0700 (PDT)
+Received: from [192.168.254.38] ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id 30-20020a17090a19de00b002694fee879csm11585852pjj.36.2023.09.19.10.29.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Sep 2023 10:29:57 -0700 (PDT)
+Message-ID: <21fba510-baf5-4719-8938-b1564c9d6654@gmail.com>
+Date: Tue, 19 Sep 2023 10:29:56 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Force use of 5GHz band
+Content-Language: en-US
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <cfdbbdb5774c4db1c8d3ec7d1e09e70e340f075c.camel@grosse-sundrup.com>
+ <34795e04-66e4-4359-a6b2-59b3f47eaf64@gmail.com>
+ <d0b59d7ddf82006b6280e3b6652614d9ece09f7a.camel@grosse-sundrup.com>
+ <6aac9366-36fd-474d-882e-1bcc940fb444@gmail.com>
+ <ea23c922129d3c18c4affb0f0e4a737b7e2a03e5.camel@grosse-sundrup.com>
+ <e74c1a50-b5bf-48eb-a53e-100d9706e7f5@gmail.com>
+ <43d47533-a4a3-e3d5-8f17-30467475660a@gmail.com>
+ <8629e294-0550-436d-91b3-e0cf1c84f8e7@gmail.com>
+ <42efcf9a-6aca-c728-ba9d-fe95a6066900@gmail.com>
+ <e144f8a4-82b2-4882-bf25-5fac6165b9af@gmail.com>
+ <a61e3a1d-9e97-89c1-d543-6b6ba9860146@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <a61e3a1d-9e97-89c1-d543-6b6ba9860146@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-The test was not including the last frequency in the 6ghz spectrum.
----
- unit/test-band.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/unit/test-band.c b/unit/test-band.c
-index caddbcdd..e27531f7 100644
---- a/unit/test-band.c
-+++ b/unit/test-band.c
-@@ -644,7 +644,7 @@ static void test_6ghz_freqs(const void *data)
- 	uint32_t i;
- 	enum band_freq band;
- 
--	for (i = 5955; i < 7115; i += 20) {
-+	for (i = 5955; i <= 7115; i += 20) {
- 		assert(band_freq_to_channel(i, &band) != 0);
- 		assert(band == BAND_FREQ_6_GHZ);
- 	}
--- 
-2.25.1
 
+On 9/16/23 8:18 AM, Denis Kenzior wrote:
+> Hi James,
+> 
+>>
+>> How would you prefer I do this? We've got quite a few modules using 
+>> scan APIs so I question if we want to filter the frequencies before 
+>> calling scan_*
+> 
+> We should be doing that already, no?  Any code that specifies scan 
+> frequencies in some way should be aware of wiphy band capability and 
+> regdom.
+> 
+>>
+>> If we filter in scan.c and call back as if the scan returned no 
+>> results we shouldn't need to touch anything except scan.c. The 
+>> downside is its a bit of 
+> 
+> I really rather not generate dummy/bogus callbacks.  That just pollutes 
+> debug logs and makes the code hard to follow.  Station would be most 
+> affected here since it breaks up the 2.4Ghz band scan quite a bit.
+> 
+> If 2.4 is turned off, it should just skip those requests entirely.
+> 
+>> wasted work doing this since we have to create requests and work items 
+>> for nothing, but the alternative of adding this specific logic to each 
+>> module using scan calls seems worse IMO, what do you think?
+>>
+> 
+> One thing to keep in mind is that some devices operate only on 2.4G.  
+> For example WSC/WPS might only perform push button operations on 2.4 GHz 
+> band and not 5G.  Might be similar with DPP?  So for compatibility 
+> reasons maybe this should be a station-only feature?
+
+Yeah, keeping it station only is good with me. Only part that gets nasty 
+are periodic scans. Since we scan the entire spectrum and specifying a 
+frequency list will break the 6GHz logic we have... So for this I'll 
+need to add support to split the scan request if explicit frequencies 
+are provided, since periodic scans will need to include a (potentially) 
+paired down list if the user disables them.
+
+This could end up being useful though if e.g. a quick scan includes a 
+6GHz channel and is able to scan it rather than falling back to a full scan.
+
+> 
+> Regards,
+> -Denis
+> 
