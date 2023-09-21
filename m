@@ -1,175 +1,118 @@
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2090.outbound.protection.outlook.com [40.107.7.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D3CBA26
-	for <iwd@lists.linux.dev>; Thu, 21 Sep 2023 14:23:12 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MmXCbXjaAWJISrARG2QI8PHhkKudMbo2YIiI1xw0tYZkw7LT54nh6+j+z/6Rc7NQdE4psZMqOzqFAmm9J4gcR+jJw1xg9bajR5KCsYrKn+SOLNXhReddOTHfho9Mm/HmTLOU6F4ApTycCGZXpx553wI0NqmKvnXFFSwbI4nVi4pdlzQrypgWxPnMGPME2Ycs7nN72ntRssS9J7Ee0W1FcjCHtqBJ8WelXvIUENbX2/AHznx6qMMQ8UZJgDRyy8JD3EpscQc1HhELNg/AZPQD4Nm+3tQPzpTj/1PSi0cWNVumg7BTx/rsNZsMwM98lokCv+2AD0I3L5oOftGT4Ya9GA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5f5QUOj/sa9waOZCVRc22bp5aNErFX7uqJbQvDD5GN8=;
- b=m/96SIP9iXKOxJxyeW4XGuOWKyKcb/uf154zfMbSXtvDoZwJTvD41YIXjJ7xhAhnH7ZyYrtd352Obw8dRheFM4+XGKqsKm2AidsqilxJZ+QYpxcl3rO6DZeJc3zL78jz28PGm5206vSEYi0ezaAJk3PvfIzaciucb6zASjH+a0tCAY7Zylowrf2u3SL3ppXHWupvfzQBi2jCHcaB7MGmPMoHechVsHegPG9fzAAGC8gx69NMAekhUwAW2Tq5jionSCq/wu5CZjyvcf4rq39q4e6PRECSTfSQEI0NW3wc2OxqBNVj6LVQOrPPZe6XcJo9THfNXfaZRjwxztoXJ52V6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bang-olufsen.dk; dmarc=pass action=none
- header.from=bang-olufsen.dk; dkim=pass header.d=bang-olufsen.dk; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bang-olufsen.dk;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5f5QUOj/sa9waOZCVRc22bp5aNErFX7uqJbQvDD5GN8=;
- b=GbIjbhOo+5psRF7lBwju/Lfvjs/zIVgEFYp/Cr4vSSpgXQjFyrNYg+3rIGswjkh2rXAS8BWlFPR9g+7/2H+PQrRc15H3qB7X+qA027TPeMKQOhEKxpSltcYCdpL3Z63fJmI9CYrNXTGUtTz3ayVr+tgHubn5E6vviikXtwlzl6M=
-Received: from AM5PR0301MB2516.eurprd03.prod.outlook.com (2603:10a6:203:9::7)
- by PAWPR03MB9857.eurprd03.prod.outlook.com (2603:10a6:102:2e4::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Thu, 21 Sep
- 2023 14:23:08 +0000
-Received: from AM5PR0301MB2516.eurprd03.prod.outlook.com
- ([fe80::999a:2fa9:f780:bf31]) by AM5PR0301MB2516.eurprd03.prod.outlook.com
- ([fe80::999a:2fa9:f780:bf31%12]) with mapi id 15.20.6813.017; Thu, 21 Sep
- 2023 14:23:08 +0000
-From: =?iso-8859-1?Q?Pedro_Andr=E9?= <PEDA@bang-olufsen.dk>
-To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-CC: =?iso-8859-1?Q?Pedro_Andr=E9?= <PEDA@bang-olufsen.dk>
-Subject: [PATCH] rank: add option to normalize using defined rate
-Thread-Topic: [PATCH] rank: add option to normalize using defined rate
-Thread-Index: AQHZ7Jck01Omh6Aox0SZX8e6GU2n0Q==
-Date: Thu, 21 Sep 2023 14:23:08 +0000
-Message-ID: <20230921142302.77637-1-peda@bang-olufsen.dk>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bang-olufsen.dk;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM5PR0301MB2516:EE_|PAWPR03MB9857:EE_
-x-ms-office365-filtering-correlation-id: 0016580f-a012-4c9e-4b31-08dbbaae476c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- jpWwK5KGkk9dtU06yKdLpdgtk/0YsUN0jGqFgQ1bWcOo/dIkmJ1g0MkQa7g9lhQnBwgn8HT2KlCUYhybSekSmiLEAarDso2r4dAiCkVQeQEGSGKXn5gPG/jNfUsJ3OR9HLw3j/ub3j8sHlx6QvJTomTOWZ9yQFZgrNUsleHLKQODj862y9UjcB21M14twYoF+8oIvMhQN7Jzy0WO6s6y4cR7cVevAfWyk5T7zIDu2+I+4tMlZbx2KvptBVSwl8KgZ4Vmz2FYoj2Uwbl6MAu0u7Oa6WNpmpdIlsvAU5nGwUOwPrul2IO4ouoNliA/51BznoCHavcwM4quJ7DP8VM8pes0i7jbTEyyVnC6HB0J1PGgSB08lSEQB+yZb68wy10ltXc/uhjg8kR+Bha7syP2So5TB5L3E0pOUh2Nmje0opHv6S3/Q6IRYh+tNXZ/By9BEC+wF2erz4sZUDS8F1RvAHAdiyThb6rk5JguP6fnvPsYEbU14qXVBgnhg1+ydPPsW4GkuVJJPvrQUUMqCk2g6rmpC9CizgsWNp4PuIwCMYmEK+usmOOGcVQp/P0t5zdEdQrgiLYjY2k/UbYo+2UYttLmMijKhFrvdqSO0EU6armDoid5uRLWpJGUa3MmXY58
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM5PR0301MB2516.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(376002)(396003)(136003)(39850400004)(186009)(451199024)(1800799009)(2906002)(6916009)(66946007)(64756008)(66446008)(66476007)(66556008)(76116006)(41300700001)(91956017)(316002)(4326008)(5660300002)(8676002)(8976002)(8936002)(66899024)(71200400001)(86362001)(36756003)(1076003)(83380400001)(26005)(2616005)(107886003)(122000001)(38100700002)(478600001)(38070700005)(6506007)(6486002)(6512007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?0bsNqEkOa5UE8qMjQcjEwE+x1ETpir9JcR7kT4mmoSuIMzCwtDd8IkufFK?=
- =?iso-8859-1?Q?RUvkoVS8kSzQk571LuBfkb10Im7PSUtuXro2K/nRZ4tE0SHIvNn0pGwaJX?=
- =?iso-8859-1?Q?6+VT68r9Xh+K9y4Zn66N6mRw0iDKUXtqM/uR+cD9V1zP0PaP+9HizAndYy?=
- =?iso-8859-1?Q?Y9cy9T5IIRSPw444mLgBWFdadlEMwMMOOwSkwf7eVNnCjrEmf+4no9Qcoh?=
- =?iso-8859-1?Q?AJg9FnsLWPwPlJTq/cHlydO/0esq4H6bjlyAyfMwy1LSAFx13kC1yiV6PX?=
- =?iso-8859-1?Q?SoPHfwpLpnoKDMaWGgEUDT8cpetw+VprHxrJ8JYLgbtHUbkE59Vp7VoqtE?=
- =?iso-8859-1?Q?61DDBMjXirkbT71tpkyaFqqNPok9+HKHcj7uC8naPNbDNl0jRdiYNKzWZf?=
- =?iso-8859-1?Q?rMiMvGhbvLgz8oU0nMHxs+sVSmHVz+CkHYa5P4PzAc9v/bayidTUbgPGM4?=
- =?iso-8859-1?Q?uuMNhMF/8i75RZMRcP8jv87QN54WyG3AbuC2JkJ1fnNucoxXYluDElrh8q?=
- =?iso-8859-1?Q?iF4lLtCbfhq065RC9Rfaw4swCtEK09H9nVqtzG35x5pHTVWuSuJs4G0xNg?=
- =?iso-8859-1?Q?x/oBiJ3OxDIjrtUXLtY38lOCYxaqY3XxWOH7LzYJYHavhaS24zwZdoKGZX?=
- =?iso-8859-1?Q?x7QzGerVQOnh0GETi6KyXnYV6VkWUSxhAgLyO4bu7jjE65oScyyin36ko0?=
- =?iso-8859-1?Q?KwbF3h9VIH8b4ttITmHfd/0H03Skv5bXxqQSx96NXZ4c/0PJQiwSzNNCL+?=
- =?iso-8859-1?Q?yRu3VivBvw2E2X9B7Hd8mDJu5oUbpWgyOwGLCENO+g47vgq3RCXdJxWD/J?=
- =?iso-8859-1?Q?FlF5rKjYsXs0/V7VeWRynEUNnwmwK8r5T0wxBxhrkkdGBFsMuyW2gYnSDH?=
- =?iso-8859-1?Q?WgDDCuy78sXJLFE41wl15wBvp6+uQU8rD2WlPgtn3ZEelOtdSjx1fUiC0Y?=
- =?iso-8859-1?Q?pmghDW05JoSJ5YnZlcD3VphK3U9D9sQ71u1QcmBwt9HNhGmMc8U6krdPeC?=
- =?iso-8859-1?Q?80k1Ijdu2nAtPcwWNx1Xgy2VFckYThzGPMokHJyrv07QmEvk3eK4sojhB1?=
- =?iso-8859-1?Q?52haq4hbB5oTf30dPR6CknXP+q3UUPk3S5CdnjssWlfET7tUKb6vji2cz1?=
- =?iso-8859-1?Q?molgv64gB1Dob+LiqH7VIp6eHBm8M7m0BgSvU0VRTfIUd7A4kY8ddHo2rY?=
- =?iso-8859-1?Q?QtwtQrp/7jt2tP5bmP0PixPkgA3Qn+sF5DQ+tx986Y0HUTVCvIN32I9/V9?=
- =?iso-8859-1?Q?F4PIRxKLKA9BqSze3RWFEI8zVTpivIqhaGFh0g0XK93TlS7CQpwGRAmG/W?=
- =?iso-8859-1?Q?sdS5LoH+cjBPwA+J9vEmUh3VMs+Qy8kFkPyiBzOmWu9oaCf9z2h6ytKQ1+?=
- =?iso-8859-1?Q?cFoOYxfrN50FV6lPFRmTUBENl+mJQIY0QUXvnydyv7nDbAOiCuX5fDxbBY?=
- =?iso-8859-1?Q?5PHAXdEgVHT6H/i3mlZ9PtPoqEyt6IWvdU4H87Gb/8b9VV/I8YDeKkV9er?=
- =?iso-8859-1?Q?9/6gQnzbpsgjyBx3T/huVD2VqamP/HbF1NV7fU/l1bpa41xU9CzaIA/h0E?=
- =?iso-8859-1?Q?DgfIi1n9lYFSTrGN0YPWla5yEatDYiKfeye08PlN4rFo/jjldtrJN915+0?=
- =?iso-8859-1?Q?CQBsQs87O6ODw1vmJapS/rLxSqQrthDbhlt8nps2NPvTGRye0AvhKpXg?=
- =?iso-8859-1?Q?=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF4820E7
+	for <iwd@lists.linux.dev>; Thu, 21 Sep 2023 14:50:07 +0000 (UTC)
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-d8162698f0dso1329819276.0
+        for <iwd@lists.linux.dev>; Thu, 21 Sep 2023 07:50:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695307807; x=1695912607; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yfv00mJfy+D4FNilbzqZ9MTp817LNFafVFym4Ghg+xY=;
+        b=ZzawjliA7OvinlKga6fldt0ulH0UvO7M4Bff2v+SzABGTr7RskOyEw5lEDwOzLHE8o
+         lp00bLHm2AZx+pBwgBXHmyTyk39aloDlqv+9LezR2BDXAwrb65vktOGuFON71v3INytf
+         LibkEKO+2dbXmjwNmuGeYj966lgCeuVhb69HifOyzOXkCGjjN6EIE8WhpFEPcQJOQPjD
+         /zwYMbdyaZRFCkcMC8551v17IaKE/ChqFy5V+hxlQJA/oFvtc6c0811/MZP68l1kd2ly
+         kR/272HKBVCdpT6g58e5NimiVbH97+Trpd80rOpsCI/xDUuB1GC8xLqNakfLS4IlLe/O
+         uoZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695307807; x=1695912607;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yfv00mJfy+D4FNilbzqZ9MTp817LNFafVFym4Ghg+xY=;
+        b=AZQhsBYNeNqKHrUpaPyAtdYoh3AA+BHG2eEpg2L+bDG9SW6D7ctSvmw2XFLrXmfi+z
+         Nye/c9OFQ1gClZhV+vJGUBlGwlGqs3spwISSpF3FwM0weswojO2Nbfnz1l7ltkgngWQa
+         63iOmPZHoa4erclLtSK8We1L490JaVaBB2p9RIzfvtQCyAFhUuNdzG34WV2UrEVjWG3H
+         7O9p2yXSeybkjsRJzGNgrb6FdQde0dsJtNlyMyNYhHxSMhYJW1KNky1tH5iTzQQPTK3g
+         dJCuWz+dG2OeNuoHA0oEGgaiKvutnfb/58e9GlPvT0nGLjQqYnlF/pls8j5074ZpamY5
+         5HVw==
+X-Gm-Message-State: AOJu0YyTU355d2SAr6hBeT1HHw2PeoO4QG52wg+/eDSZ7NZ1AcMkjwab
+	m6mX55eqORjOaFBxBOid4Sc6twq9j2o=
+X-Google-Smtp-Source: AGHT+IEBmnJg0KAOlvcgI3Zu9FqEtvQlZMGAbUuh5WvZ0i+Wge2plYUCfi+9V39hQwY/NKqKVnBvRw==
+X-Received: by 2002:a25:cf01:0:b0:d78:6f1:41b4 with SMTP id f1-20020a25cf01000000b00d7806f141b4mr6045075ybg.30.1695307806705;
+        Thu, 21 Sep 2023 07:50:06 -0700 (PDT)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id h13-20020a056902008d00b00d7497467d36sm350828ybs.45.2023.09.21.07.50.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Sep 2023 07:50:05 -0700 (PDT)
+Message-ID: <0aae89f9-0ca6-4748-9e69-b0413a15e90c@gmail.com>
+Date: Thu, 21 Sep 2023 07:50:02 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-OriginatorOrg: bang-olufsen.dk
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM5PR0301MB2516.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0016580f-a012-4c9e-4b31-08dbbaae476c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Sep 2023 14:23:08.8349
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 210d08b8-83f7-470a-bc96-381193ca14a1
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: A4pxTIaSnHEmkn+rZY73IUSKSzcXkQeoFgH8zAs/G7ysTEe2MsTuptEiXCNuvImYJ/D7UU7IWxUv1DNQjYEXtw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR03MB9857
+User-Agent: Mozilla Thunderbird
+Subject: Re: Force use of 5GHz band
+To: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
+Cc: =?UTF-8?Q?Jonas_Gro=C3=9Fe_Sundrup?= <cherti-iwd@letopolis.de>,
+ "iwd@lists.linux.dev" <iwd@lists.linux.dev>,
+ =?UTF-8?Q?Pedro_Andr=C3=A9?= <PEDA@bang-olufsen.dk>
+References: <cfdbbdb5774c4db1c8d3ec7d1e09e70e340f075c.camel@grosse-sundrup.com>
+ <34795e04-66e4-4359-a6b2-59b3f47eaf64@gmail.com>
+ <cmbwlnlbewbuiu4ricqyl3txilk6ybvvmoqyu3ljmui6imuzjw@rs2ug3nxl37w>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <cmbwlnlbewbuiu4ricqyl3txilk6ybvvmoqyu3ljmui6imuzjw@rs2ug3nxl37w>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-BSSID ranking relies on a quotient between the BSS data rate and
-theoretical max data rate. This makes it so that when two or more BSSes
-have the same SSID, the likelihood that higher frequency bands are
-ranked first is high given their increased data throughput.
-Such may not be ideal, for example, if one desires to connect to 2.4GHz
-by default (if possible).
+Hi Alvin,
 
-This tries to address such scenarios by introducing a new rank
-configuration option where a necessary data rate (in bits/s) can be
-provided. All BSSIDs that achieve or surpass this data rate will be
-ranked identically before applying any other rank factors. If no value
-is provided, the ranking process remains identical.
-By using this configuration value in conjunction with already existing
-ones, achieving a behaviour like preferring a certain band becomes more
-accessible while guaranteeing that the first-ranked BSSID still complies
-with minimal necessary data rate requirements.
----
- src/scan.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+On 9/21/23 7:21 AM, Alvin Šipraga wrote:
+> On Thu, Sep 14, 2023 at 11:06:18AM -0700, James Prestwood wrote:
+>> Hi Jonas,
+>>
+>> On 9/14/23 10:44 AM, Jonas Große Sundrup wrote:
+>>> Hi,
+>>>
+>>> is there a way to force iwd to use the 5GHz flavor of a specific wifi?
+>>> I am aware of BandModifier5GHz, but even with setting this to 1000 I
+>>> still end up on the 2.5GHz band. That band specifically, however, is
+>>> unfortunately suspect for some stability issues I'm facing and hence I
+>>> would like to force iwd onto the 5GHz band to see if the problems still
+>>> occur. That proves to be difficult, of course, if iwd is picking the
+>>> 2.5GHz band…
+>>>
+>>> Even though I do see that iwd probably has the better insight into band
+>>> stability from a signal-strength point of view, any chance of
+>>> overruling iwd's internal mechanisms here? (Or should I just crank up
+>>> BandModifier5GHz by a couple of magnitudes?)
+>>
+>> All we have now is BandModifier5GHz which is multiplied by the computed
+>> rank. The stock rank is based mainly on a data rate computation which is
+>> theoretical, but uses capabilities and signal strength to estimate.
+>>
+>> 1000 is pretty high, so essentially your 2.4GHz BSS's would need to have a
+>> rank 1000x larger than the 5Ghz ones. So either 5ghz is incredibly low
+>> signal, doesn't support HT/VHT, or maybe the IEs are malformed so the data
+>> rate isn't being computed correctly e.g. (defaulting to basic rates).
+> 
+> We had a request at the company to disable 2.4 GHz entirely as well, but I did
+> not want to completely disable it as some customers may not even have 5 GHz
+> infrastructure. My colleague Pedro drafted a patch which allows for the internal
+> BSS ranking to be normalized according to a required bitrate, so that 5 GHz
+> networks do not always out-compete 2.4 GHz networks. We found this worked well
+> together with the BandModifier option.
 
-diff --git a/src/scan.c b/src/scan.c
-index 5a972efb..16d533e4 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -55,6 +55,7 @@
- /* User configurable options */
- static double RANK_5G_FACTOR;
- static double RANK_6G_FACTOR;
-+static double RANK_NECESSARY_RATE;
- static uint32_t SCAN_MAX_INTERVAL;
- static uint32_t SCAN_INIT_INTERVAL;
-=20
-@@ -1625,14 +1626,15 @@ static void scan_bss_compute_rank(struct scan_bss *=
-bss)
- {
- 	static const double RANK_HIGH_UTILIZATION_FACTOR =3D 0.8;
- 	static const double RANK_LOW_UTILIZATION_FACTOR =3D 1.2;
-+	double data_rate;
- 	double rank;
- 	uint32_t irank;
--	/*
--	 * Maximum rate is 9607.8Mbps (HE)
--	 */
--	double max_rate =3D 9607800000;
-=20
--	rank =3D (double)bss->data_rate / max_rate * USHRT_MAX;
-+	data_rate =3D (double)bss->data_rate;
-+	if (data_rate > RANK_NECESSARY_RATE)
-+		data_rate =3D RANK_NECESSARY_RATE;
-+
-+	rank =3D data_rate / RANK_NECESSARY_RATE * USHRT_MAX;
-=20
- 	/* Prefer 5G networks over 2.4G and 6G */
- 	if (bss->frequency >=3D 4900 && bss->frequency < 5900)
-@@ -2363,6 +2365,14 @@ static int scan_init(void)
- 					&RANK_6G_FACTOR))
- 		RANK_6G_FACTOR =3D 1.0;
-=20
-+	/* Maximum rate is 9607.8Mbps (HE) */
-+	if (!l_settings_get_double(config, "Rank", "NecessaryRate",
-+				&RANK_NECESSARY_RATE))
-+		RANK_NECESSARY_RATE =3D 9607800000;
-+
-+	if (RANK_NECESSARY_RATE > 9607800000)
-+		RANK_NECESSARY_RATE =3D 9607800000;
-+
- 	if (!l_settings_get_uint(config, "Scan", "InitialPeriodicScanInterval",
- 					&SCAN_INIT_INTERVAL))
- 		SCAN_INIT_INTERVAL =3D 10;
---=20
-2.39.2
+Effectively yes this would work, though its not a guarantee to disable 
+2.4 (although the option isn't named as such so its not deceiving anyone).
+
+I personally don't take issue to adding such an option, but FWIW I'm 
+currently working on a way to explicitly disable a band entirely. This 
+is more complicated due to IWD's scanning logic but its better in that 
+it prevents IWD from scanning on those bands as well as connecting.
+
+Thanks,
+James
+
+> 
+> I have asked him to send the patch to the list, so please take a look. Might be
+> something of interest for upstream.
+> 
+> Kind regards,
+> Alvin
