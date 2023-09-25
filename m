@@ -1,49 +1,49 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8576ED304
-	for <iwd@lists.linux.dev>; Mon, 25 Sep 2023 18:54:43 +0000 (UTC)
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-59c04237bf2so91257157b3.0
-        for <iwd@lists.linux.dev>; Mon, 25 Sep 2023 11:54:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BC01C29A
+	for <iwd@lists.linux.dev>; Mon, 25 Sep 2023 18:54:44 +0000 (UTC)
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-59bf1dde73fso90727247b3.3
+        for <iwd@lists.linux.dev>; Mon, 25 Sep 2023 11:54:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695668082; x=1696272882; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1695668083; x=1696272883; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KDJU7SYD0amvWzwOGqGm/wTZR2ZpJVaE47M/yoVuMJk=;
-        b=CDfdC9HiMtyVYjde7/GejwOv4u/m9/nAQkzNROx3Lz+xN+ZEhezzs4P1pXpd3XMi9c
-         ZLE8s4b0p5hnT2/5gTGgoICE6uNqAD0wzC5ruYN7llHO6lQZ3na+P8Y3dCL5EsdMrS6R
-         NwA4TNxGTX63AJJRx39HedcYfW5YnnuiKjisFc71N3iFnSZbYTG9Y7hBu/hPyNfgMpVQ
-         ePSlfbcNWSynooaBp33lBmINxwuNUzXmO1LAl0rhHmTxbQHtkSs8pEBtB1SmVDftSU9o
-         xWqbk0I5KoR4IpxUAADjEROHohw6R6SOATb9Qp0Qc+XAPOQSRKBMr4zeRNW5IGq9kA0U
-         i1VA==
+        bh=gznMpBSuIGSoPLrozDk4KrZiUfnRaSfloj5Jc7inXDY=;
+        b=ZUVQPHJcuxTp3vWhxNydhCT/SCoLtVnF17JLYaT5wwZo0zhICbfjEw2xvEjOplhHUH
+         fSot6YjGXrAG/5XFZv0MUBc2i4UtMEC5pUOgOD9RNDFJaUovgc+H4z5ygoZESwPy6r5g
+         jRBXoHqOzlAZzgbz51vIcHwyLbWH7DnP/wgISIMuMZrD1b03JMJjMnpc335vxYlXf54U
+         F6GZ1axwnSTqMbf6tgrNe9P4cLY7yaSzozDZLf2LL8cq+4oJXZDde1cXBWtyNmEqjU0v
+         +Wz6iUIf0ajeW84BAplItz0b9H6BswOlttRtV8xyuTVPzwmFUM24GuKrMFqJBJkqWG3S
+         GL1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695668082; x=1696272882;
+        d=1e100.net; s=20230601; t=1695668083; x=1696272883;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KDJU7SYD0amvWzwOGqGm/wTZR2ZpJVaE47M/yoVuMJk=;
-        b=QoSeGqWP0KxlKn9shooAzjFrsvRdjIVjFyBMIge2o4kX9wfDade/7omZEwutYKjhcV
-         Viej+snPYG9hww03jTsoVsvKyXpt24pUUTOP/uMPenGnHtrzeyQnmUyWbOBGgKMCeyuV
-         3mJw1eAfOlsa9ihFOgYBAec1WP5I5OFIVlB19UKVLj+CYE+s67b9tUKcbwklahAT9+5l
-         y1e7m0sDX6vrGgLLZJt9HwjHPyfSzjx/7cUya/9811BDt/8Byok2ffQ/Y35gCxQ2B5Bw
-         YuaxUPZJiGq5QSMJuWuWbB3Y/lZweiM5utsZHfkJakosPj+z9avUIC5ODm0h5gYDO77i
-         iqwQ==
-X-Gm-Message-State: AOJu0YygGST58qA9HmvEbA/kDFXGFvMXzT6lSNPiQzTV5S3d/XTTyQdm
-	uGwLuURLqQl8xpvCojDHXPebnPPuGWQ=
-X-Google-Smtp-Source: AGHT+IH1Ov4/AHCtUMT6sJsN7JxJZDGDcPUNufhRmwAHmOhp8JUos6SO/p4qQqV86F2LhSiWJgzo+A==
-X-Received: by 2002:a0d:d4c6:0:b0:589:ca07:c963 with SMTP id w189-20020a0dd4c6000000b00589ca07c963mr7400187ywd.42.1695668082244;
-        Mon, 25 Sep 2023 11:54:42 -0700 (PDT)
+        bh=gznMpBSuIGSoPLrozDk4KrZiUfnRaSfloj5Jc7inXDY=;
+        b=El0Fhfu0kegOkbOVERZgPNs8TlxmzZmp4UGuX5MTOaPY+cYOehjcCBA68UaUXI/tz3
+         dnioWO10PdErzWJfUyofIm0e6X8ePzQ8TH7p9BUjyHYZAdbmmHtiZ9Em3fEgzScvY053
+         RfFRFJ0APaxhvk1kLS5O1b0+UvQUcaT0lDi2xnVp30Ra4CTJjZipn671fh91sSNkGeTZ
+         lZoD6wwGOsfpbLkA5gLGSp6TljjaELzTGIvOdJDLKYgO83wjZdji+atbOulz+8+x40hd
+         nH9PWYG/0cTAh1p65uU/P4oLTJNf7WuiOyJDFjrZFUuLsoC7ey7/Qb2jpMIejOKM2lpO
+         6bog==
+X-Gm-Message-State: AOJu0YwtLBKNjuq0b3TAhuVGCILss10azH+XXKahG3Zxt77HDYnZUKZJ
+	4pcPmlJ/WhyfwqUMm3AUiTWCYsmo2SQ=
+X-Google-Smtp-Source: AGHT+IGpNtDgpKBdKnku5zFb8/I0ybCona2ocXLuTKSiZrU99rjM90E1dIijpEtrj0QjV40TgMnl/w==
+X-Received: by 2002:a81:6dc2:0:b0:599:da80:e1eb with SMTP id i185-20020a816dc2000000b00599da80e1ebmr7993095ywc.24.1695668083337;
+        Mon, 25 Sep 2023 11:54:43 -0700 (PDT)
 Received: from LOCLAP699.rst-01.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id v134-20020a81488c000000b00570253fc3e5sm2518920ywa.105.2023.09.25.11.54.41
+        by smtp.gmail.com with ESMTPSA id v134-20020a81488c000000b00570253fc3e5sm2518920ywa.105.2023.09.25.11.54.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Sep 2023 11:54:42 -0700 (PDT)
+        Mon, 25 Sep 2023 11:54:43 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/8] scan: add scan_get_band_rank_modifier
-Date: Mon, 25 Sep 2023 11:54:17 -0700
-Message-Id: <20230925185422.2242494-3-prestwoj@gmail.com>
+Subject: [PATCH 4/8] wiphy: add wiphy_get_allowed_freqs
+Date: Mon, 25 Sep 2023 11:54:18 -0700
+Message-Id: <20230925185422.2242494-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230925185422.2242494-1-prestwoj@gmail.com>
 References: <20230925185422.2242494-1-prestwoj@gmail.com>
@@ -55,93 +55,56 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This exposes the [Rank].BandModifier* settings so other modules
-can use then. Doing this will allow user-disabling of certain
-bands by setting these modifier values to 0.0.
----
- src/scan.c | 41 ++++++++++++++++++++++++++++++-----------
- src/scan.h |  3 +++
- 2 files changed, 33 insertions(+), 11 deletions(-)
+This is more or less copied from scan_get_allowed_freqs but is
+going to be needed by station (basically just saves the need for
+station to do the same clone/constrain sequence itself).
 
-diff --git a/src/scan.c b/src/scan.c
-index 3979dc03..915e2875 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -2310,6 +2310,33 @@ bool scan_get_firmware_scan(uint64_t wdev_id, scan_notify_func_t notify,
- 	return true;
+One slight alteration is now a band mask can be passed in which
+provides more flexibility for additional filtering.
+---
+ src/wiphy.c | 15 +++++++++++++++
+ src/wiphy.h |  2 ++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/src/wiphy.c b/src/wiphy.c
+index ccff701e..dcd9e210 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -500,6 +500,21 @@ const struct scan_freq_set *wiphy_get_supported_freqs(
+ 	return wiphy->supported_freqs;
  }
  
-+double scan_get_band_rank_modifier(enum band_freq band)
++struct scan_freq_set *wiphy_get_allowed_freqs(const struct wiphy *wiphy,
++						uint32_t band_mask)
 +{
-+	const struct l_settings *config = iwd_get_config();
-+	double modifier;
-+	char *str;
++	struct scan_freq_set *allowed = scan_freq_set_clone(
++						wiphy->supported_freqs,
++						band_mask);
 +
-+	switch (band) {
-+	case BAND_FREQ_2_4_GHZ:
-+		str = "BandModifier2_4Ghz";
-+		break;
-+	case BAND_FREQ_5_GHZ:
-+		str = "BandModifier5Ghz";
-+		break;
-+	case BAND_FREQ_6_GHZ:
-+		str = "BandModifier6Ghz";
-+		break;
-+	default:
-+		l_warn("Unhandled band %u", band);
-+		return 0.0;
++	if (!wiphy_constrain_freq_set(wiphy, allowed)) {
++		scan_freq_set_free(allowed);
++		allowed = NULL;
 +	}
 +
-+	if (!l_settings_get_double(config, "Rank", str, &modifier))
-+		modifier = 1.0;
-+
-+	return modifier;
++	return allowed;
 +}
 +
- bool scan_wdev_add(uint64_t wdev_id)
+ static struct band *wiphy_get_band(const struct wiphy *wiphy, enum band_freq band)
  {
- 	struct scan_context *sc;
-@@ -2359,17 +2386,9 @@ static int scan_init(void)
+ 	switch (band) {
+diff --git a/src/wiphy.h b/src/wiphy.h
+index 9f24d171..cabb21c4 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -100,6 +100,8 @@ const char *wiphy_get_path(struct wiphy *wiphy);
+ uint32_t wiphy_get_supported_bands(struct wiphy *wiphy);
+ const struct scan_freq_set *wiphy_get_supported_freqs(
+ 						const struct wiphy *wiphy);
++struct scan_freq_set *wiphy_get_allowed_freqs(const struct wiphy *wiphy,
++						uint32_t band_mask);
  
- 	scan_contexts = l_queue_new();
- 
--	if (!l_settings_get_double(config, "Rank", "BandModifier2_4Ghz",
--					&RANK_2G_FACTOR))
--		RANK_2G_FACTOR = 1.0;
--
--	if (!l_settings_get_double(config, "Rank", "BandModifier5Ghz",
--					&RANK_5G_FACTOR))
--		RANK_5G_FACTOR = 1.0;
--
--	if (!l_settings_get_double(config, "Rank", "BandModifier6Ghz",
--					&RANK_6G_FACTOR))
--		RANK_6G_FACTOR = 1.0;
-+	RANK_2G_FACTOR = scan_get_band_rank_modifier(BAND_FREQ_2_4_GHZ);
-+	RANK_5G_FACTOR = scan_get_band_rank_modifier(BAND_FREQ_5_GHZ);
-+	RANK_6G_FACTOR = scan_get_band_rank_modifier(BAND_FREQ_6_GHZ);
- 
- 	if (!l_settings_get_uint(config, "Scan", "InitialPeriodicScanInterval",
- 					&SCAN_INIT_INTERVAL))
-diff --git a/src/scan.h b/src/scan.h
-index 0e06dabe..0db7752d 100644
---- a/src/scan.h
-+++ b/src/scan.h
-@@ -29,6 +29,7 @@ struct p2p_beacon;
- struct mmpdu_header;
- struct wiphy;
- enum security;
-+enum band_freq;
- 
- enum scan_state {
- 	SCAN_STATE_NOT_RUNNING,
-@@ -170,5 +171,7 @@ struct scan_bss *scan_bss_new_from_probe_req(const struct mmpdu_header *mpdu,
- 						size_t body_len,
- 						uint32_t frequency, int rssi);
- 
-+double scan_get_band_rank_modifier(enum band_freq band);
-+
- bool scan_wdev_add(uint64_t wdev_id);
- bool scan_wdev_remove(uint64_t wdev_id);
+ const struct band_freq_attrs *wiphy_get_frequency_info(
+ 						const struct wiphy *wiphy,
 -- 
 2.25.1
 
