@@ -1,61 +1,58 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A25528DCC
-	for <iwd@lists.linux.dev>; Wed, 27 Sep 2023 16:47:18 +0000 (UTC)
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-57d086365f7so1678059eaf.0
-        for <iwd@lists.linux.dev>; Wed, 27 Sep 2023 09:47:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7EF1BDE0
+	for <iwd@lists.linux.dev>; Wed, 27 Sep 2023 16:53:47 +0000 (UTC)
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-77574c2cffdso75246685a.0
+        for <iwd@lists.linux.dev>; Wed, 27 Sep 2023 09:53:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695833237; x=1696438037; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1695833626; x=1696438426; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=MuPN8xbig/g6vSupAJvwt/qpdw2p+8bW4HVVjexjyhM=;
-        b=EPf3TDiPmQi5GMsTJkgVFDUSajBBQCZvdsKF2tGyYaIhcquYo9EL+DOjHnq6YpEwbJ
-         ppTueOv0XOfsU9LdmbhjlcFm3LH4dRu+AkRIPz9dchloDJjU9E7YdNCDzo+9IS9QTnNU
-         KYWslKIiXXgAGE2hVQkZhwQlispW9i31K+I3amRpk3HUQmcWZp4xd3nzz8bomVe6ssqf
-         Mv56qi5QadlpXKJzhL3CqOs0xEEHFxCcyRYIA/wFeM0IhFNOqd8ZAqpHuy+2cqm/+S63
-         ef1TGojFF1M3v4l80pb0MvI0ZjcSq6FLfEu9NiO3nGCvNzdOvrm65bWnw0QpQ1hItz6Q
-         CqDg==
+        bh=PR8QM3GAf1dE0KT2mn4X2FIcA2Y+7H5pJ0uq/qDFhoA=;
+        b=ijMc7Ac7lM0QL3bSu7aQiUCDbFnG1o9HuiyLCmQNBrAMDd7LOUXIrXliJbxGoFyybg
+         zz56oTxlE9vK5ZdraSvVCNTh0b63Ryawt8cv6M6gYZoikJUHDHC3U6TREKrwGW8kYNlG
+         LSGrZFHETwa1PxZwJmWwCpZHXmScxl5KBPKrcCF0K/BfpV5FgSfFJHcr7EWOjzvUo+0w
+         rLjv1miXWH4MtW/0HnOYUXa/iRBJh5ZahetBItECBsku6FfXaOciu623HkJzf0F7tkDU
+         7t9CGUKKzIL705Du9ZLeqP6jJatrxiBFFyuJRTCXGj/fqtFmk5yQ55imtlIXGC2mrKbU
+         Wx/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695833237; x=1696438037;
+        d=1e100.net; s=20230601; t=1695833626; x=1696438426;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MuPN8xbig/g6vSupAJvwt/qpdw2p+8bW4HVVjexjyhM=;
-        b=MXKvbS0XOxS5j6f0lj9BZqB0YtItjlNY7Sws+wZ4NpUsdE+8dKASYop8AgNdmD2cGB
-         iCK+CdANTq1YEhAMuNmZeFx28G7A2cdXtA5xvR5JddvCak0AYbmGUM6jdpRdOe5p+Dr1
-         I4FvPpHUk9UBpWWlEWkK7WWFDafqD4doJmzxTXutqgq3efv0U098uybJthl+xPy1NiNA
-         1k5vKZZOkOFxSyDyjjX2EaCKlc6Dudc1HHZqwVJgcWZg+wMLq6gpHggsiGAtSO99qKzw
-         vbcFk90PPQCLLXwtKJmXwfL+3j+Uh/TGQTdX5wJJUQ2DqTIpKIOm0ELp/W3816iq+d7m
-         Ct7w==
-X-Gm-Message-State: AOJu0YzLKnp19hTUKq1vWADGrL3CA2EpZeyWAIFmfQjScCylpZdU9nY+
-	bimhSAYDu/pfFPlYZ1BHJK6IDU6vcYM=
-X-Google-Smtp-Source: AGHT+IHFm/2o8787hgRNtym+WUX2KK4vYPbsIqhLwN/RHOnkfyWYH8QJBOSIC4kA4u67EP1AHl1fXg==
-X-Received: by 2002:a4a:761d:0:b0:57d:e76d:c206 with SMTP id t29-20020a4a761d000000b0057de76dc206mr3028805ooc.1.1695833237476;
-        Wed, 27 Sep 2023 09:47:17 -0700 (PDT)
-Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id s124-20020a4a5182000000b00573f5173a57sm2815066ooa.23.2023.09.27.09.47.16
+        bh=PR8QM3GAf1dE0KT2mn4X2FIcA2Y+7H5pJ0uq/qDFhoA=;
+        b=ieXek1y1z3QOTrwreIPNxc8n2Dpz3JwK2fMx1eGtRFSJSoTJ2e7cHwCVsJR1GJ1oTs
+         hSLou5SCxo2ROP7m8DafM037yxk13nw7cEEP48D3/8KNChiMxjPCEdd75ewOoA3RF9bx
+         NbPE+ywey5x+/5OMtejv7k2fO/clczKXti7PHNaCh72Kom7pnRFDr0bDxyZIR9Shhp9R
+         tPB5YTFMS1rCtX/M8Jn67Ft2M7GNn4pqiguQoKi/h0CvHNZH09skkl4V23Ml+Sdl+c5I
+         sGvLfv9+IPyBmv7QqP+KbWuk7NqOetz/8M5TfBJigW/eU0bYZoU39CP3YDEmbx4vyOSJ
+         xh5Q==
+X-Gm-Message-State: AOJu0YwlGiVQbit6TMg/LRH5XtwoOXUCWFa6GTwAyFDibBoZpJCW6GrK
+	T7ZsAqnWRYI/7PwXQnyw2Ph3ZHD02TY=
+X-Google-Smtp-Source: AGHT+IGqSjKBt4dCnWtQgSe2ssUIr5yGEcoTkI70p+KE/syZH9u3LL3821v2HY4qLfAjJdzAFYBB2Q==
+X-Received: by 2002:a05:620a:e93:b0:76c:d2be:b7d with SMTP id w19-20020a05620a0e9300b0076cd2be0b7dmr1983672qkm.14.1695833626059;
+        Wed, 27 Sep 2023 09:53:46 -0700 (PDT)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id f12-20020a05620a12ec00b0076eee688a95sm5606903qkl.0.2023.09.27.09.53.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Sep 2023 09:47:16 -0700 (PDT)
-Message-ID: <ccaa868f-d803-24e8-733e-91c6d6d3b282@gmail.com>
-Date: Wed, 27 Sep 2023 11:47:15 -0500
+        Wed, 27 Sep 2023 09:53:45 -0700 (PDT)
+Message-ID: <87dba12f-bf3c-40dc-8bc7-00b34074fdcb@gmail.com>
+Date: Wed, 27 Sep 2023 09:53:43 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/2] handshake: include additional sha256 AKMs for PMKID
  generation
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>,
- Bryce Johnson <bryce@redpinelabs.com>
+To: Denis Kenzior <denkenz@gmail.com>, Bryce Johnson <bryce@redpinelabs.com>
 Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
 References: <20230404203823.384260-1-prestwoj@gmail.com>
- <1d8a1939-93fe-12b6-5007-e6621dffa7f1@gmail.com>
  <f3259b4c-e8e3-8542-247b-9d6bd0ad00af@gmail.com>
  <05e63c78-5373-520c-15db-aa42cecd95b0@gmail.com>
  <3855c8ce-c2de-d1f3-e5d8-8c93610e4b22@gmail.com>
@@ -71,36 +68,52 @@ References: <20230404203823.384260-1-prestwoj@gmail.com>
  <631dd09c-94e1-44bd-88a0-32ecd12f8221@gmail.com>
  <CADXxVSJhjpBk_FcQn_rfK6xB0viR1rRXSiiwr1tSFxi0EYnY_g@mail.gmail.com>
  <98464440-5567-40e7-aa26-504d9c474b53@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <98464440-5567-40e7-aa26-504d9c474b53@gmail.com>
+ <ccaa868f-d803-24e8-733e-91c6d6d3b282@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <ccaa868f-d803-24e8-733e-91c6d6d3b282@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Hi Denis,
 
-> I believe yes, it can skip SAE entirely using Open Authentication:
+On 9/27/23 9:47 AM, Denis Kenzior wrote:
+> Hi James,
 > 
-> 12.6.10.3
-> "If a STA in an infrastructure BSS has determined it has a valid PMKSA with an 
-> AP to which it is about to (re)associate, it performs Open System authentication 
-> to the AP"
+>> I believe yes, it can skip SAE entirely using Open Authentication:
+>>
+>> 12.6.10.3
+>> "If a STA in an infrastructure BSS has determined it has a valid PMKSA 
+>> with an AP to which it is about to (re)associate, it performs Open 
+>> System authentication to the AP"
+>>
+>> So in that regard its faster, your saving 2 messages essentially 
+>> (since open auth still requires a request/reply).
 > 
-> So in that regard its faster, your saving 2 messages essentially (since open 
-> auth still requires a request/reply).
+> My memory is fuzzy here now.  Aren't we skipping Authenticate frames and 
+> go straight to Reassociate?  Or is the kernel still sending an 
+> Authenticate frame as a result of netdev_reassociate?
 
-My memory is fuzzy here now.  Aren't we skipping Authenticate frames and go 
-straight to Reassociate?  Or is the kernel still sending an Authenticate frame 
-as a result of netdev_reassociate?
+Whether or not the kernel sends an auth is a separate question, as we've 
+seen it erroneously do before :) But it appears the spec still expects 
+an auth frame request/reply:
+
+"Upon receipt of a (Re)Association Request frame with one or more PMKIDs 
+following Open System authentication or (only in the case of a DMG AP) 
+if IEEE 802.11 authentication was not performed, an AP checks whether 
+its Authenticator has cached a PMKSA for the PMKIDs and whether the AKM 
+in the cached PMKSA matches the AKM in the (Re)Association Request"
 
 > 
-> But this all gets beat by FT anyways since you can skip the 4-way handshake. I 
-> think this was all considered when we decided whether or not to implement PMKSA, 
-> it just didn't seem worth it since FT exists and is superior.
+>>
+>> But this all gets beat by FT anyways since you can skip the 4-way 
+>> handshake. I think this was all considered when we decided whether or 
+>> not to implement PMKSA, it just didn't seem worth it since FT exists 
+>> and is superior.
+>>
 > 
-
-Agreed, but WPA3-Personal is less likely to support FT.  Also this is 
-potentially beneficial for non-roaming scenarios.  I.e. just reconnect after 
-sleep, etc.
-
-Regards,
--Denis
+> Agreed, but WPA3-Personal is less likely to support FT.  Also this is 
+> potentially beneficial for non-roaming scenarios.  I.e. just reconnect 
+> after sleep, etc.
+> 
+> Regards,
+> -Denis
