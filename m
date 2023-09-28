@@ -1,49 +1,49 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E47328B8
-	for <iwd@lists.linux.dev>; Thu, 28 Sep 2023 12:41:31 +0000 (UTC)
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1c451541f23so103761495ad.2
-        for <iwd@lists.linux.dev>; Thu, 28 Sep 2023 05:41:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBFE1374EE
+	for <iwd@lists.linux.dev>; Thu, 28 Sep 2023 12:41:32 +0000 (UTC)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1c3bd829b86so104121285ad.0
+        for <iwd@lists.linux.dev>; Thu, 28 Sep 2023 05:41:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695904891; x=1696509691; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1695904892; x=1696509692; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=USqwvpXESzvG8tqUOH7kTr8KSNigfK06yyXHTjF2Wpo=;
-        b=jB6CmRq2mPS61SfyjJwDqaVy30yUrpdNPecBpZANg0MmomBU5oNKOWSVdAjiA7tRJJ
-         qchO4eS9ocGqbd/aANJoejBn16v/zx4ifuknuCH7qXNThfZCvF2SSfKxQuQcvIgk+IpB
-         Q10JznfT6XhxTRGmSkiGl8YQI0XNuiVq2+I7kvkDb41JZH9w6NDGABlDXij/257DRB7X
-         evjePm8YhB7XyXLnl7B2KQxI1nh3NGzyfNsXXWEPcdFBAuM7eRdoDtNsCLwKDQTCI7HH
-         lI0xLEYBrYAO0a6B0Y7WJERZis6abz0Z5CernO3vEFJAm7fkzGMCBrFZTOYBtSihTHTq
-         qlkA==
+        bh=tCP5OJlr9budLtvEit5bo/WYeTF14cXms+AeuPeOOXE=;
+        b=Fv5UKP4unw7yOE5b8+1zAjeiFINa0xaFludDG1IttwCTkdFxfA+GGArDJoeUS8QhJj
+         RchP0OgD+kn7NOyJD0aFitjiK3rP6xIqDgmnITEsBaJVNIm2LTWtnWXGBSrZF2kbQYNJ
+         xcYs3H8UlGmDTG2NySHOv6ooxvphYaeUPxNdIB2DRq7OcLQ6vHPA/f2haFrS2syQbU0L
+         9oGpKttp7xlmG2jVaOgebcqTZJNTf9rwGyf4TTSB9OGtoqpZQICuujHTxfkaY/Huv/K/
+         WKhiTiJXB9H8/KPjCcO4Kj41FCaOXk97+t3Md9I14JJ8uKbq9uOsZnK5/i13N+aTsdF+
+         AZFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695904891; x=1696509691;
+        d=1e100.net; s=20230601; t=1695904892; x=1696509692;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=USqwvpXESzvG8tqUOH7kTr8KSNigfK06yyXHTjF2Wpo=;
-        b=IwlM8brjcGOiu+844UswaJbCzy18sE6WRrChdPJIjLQ983xzqo8sLM955+uUu1cIT+
-         T3fJ9ewLDq6wxZPeEcjN77hwuXmAxM/hElJL/5ksBtkMAYzGg1yaW6q0r3Pf3OwSiIeX
-         GYyI1II2yxG1mXVAbUdx8UH8qMX2qmaGB3yX8bnIvzYfeJJzB3lZmaF2aXIm2bomMOzZ
-         MjoXIVGq25A897wl3smbhWziqB288Qd0JgTgCIXa8N4y9pLp/wBxJDKWiF7kBv6Dainu
-         mkVEOmto1OKcjmOVfEyZVLJp0mXt8enTCt43E/J1avI6S5Jx8g/f2d0EfWQIJGDa15IH
-         aeug==
-X-Gm-Message-State: AOJu0YyxYh+K0J3gF1zVT7G1fvGmLyKsUoz+uwSSnAF69by9WF2hNM4E
-	L8xFpWCGCLQS9kDsfhvRYOziaCdXAKw=
-X-Google-Smtp-Source: AGHT+IE08JoKn6Soxv9WUYcSBRE0CW6CEeC5BGnA7eyiyiNfL9XEblyCB4gWXPhwt/Q55x2j0V2wWQ==
-X-Received: by 2002:a17:902:b282:b0:1c3:2ee6:380d with SMTP id u2-20020a170902b28200b001c32ee6380dmr1098591plr.48.1695904890938;
-        Thu, 28 Sep 2023 05:41:30 -0700 (PDT)
+        bh=tCP5OJlr9budLtvEit5bo/WYeTF14cXms+AeuPeOOXE=;
+        b=gJPir3CApunOrPxefKCV6gFYMpgyZfkV68o7c2Em/00J4sL/6T8s61Y+82DmGB1ukU
+         b7LXbzC+R17C2wtezTCGu4r7HnRLbOxyT23s62s5BisjN/yDOfAO7nfAwmnJSzQekc9b
+         BlxTcLn6bgP6+STS+KAETp9YICKB5VCxLbGGkQPoaVfmcJjuk4QkkoWJXFIM7pkJbh49
+         V5tkl/dV2oclC8eg/7Cx9o/JMSvEpuWPjfpKXIu0IS6WbZj3C+H/a/2OSM3hZ6aMR73x
+         ursFAP9btVyJCvw5pFeTaKZ/TITRICJvG9RYv4mH1SYsbndwl4jV+ZcOe3VMfBbUVe9L
+         xsGA==
+X-Gm-Message-State: AOJu0YylUZRysJ8CVDWyM8CiZnjMtfA8vm02XTHd7NnoV2YfwrTMUwXW
+	WTTPj2M3OBFk1/xe/6hrkUM8A0lTAJo=
+X-Google-Smtp-Source: AGHT+IGb2r/ZHAS08V2al6Z86ESEhQ7lsAnaMwAyPn3PVF9gupmZAkeL5Ii8MGGURzbxxKsukLz3JA==
+X-Received: by 2002:a17:902:7d92:b0:1c4:4c0f:8d91 with SMTP id a18-20020a1709027d9200b001c44c0f8d91mr1000555plm.69.1695904891936;
+        Thu, 28 Sep 2023 05:41:31 -0700 (PDT)
 Received: from localhost.localdomain ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id iw15-20020a170903044f00b001c5d09e9437sm14983105plb.25.2023.09.28.05.41.30
+        by smtp.gmail.com with ESMTPSA id iw15-20020a170903044f00b001c5d09e9437sm14983105plb.25.2023.09.28.05.41.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 05:41:30 -0700 (PDT)
+        Thu, 28 Sep 2023 05:41:31 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/4] scan: filter user-disabled bands for periodic scans.
-Date: Thu, 28 Sep 2023 05:41:26 -0700
-Message-Id: <20230928124128.3793788-2-prestwoj@gmail.com>
+Subject: [PATCH v2 4/4] doc: document disabling bands with a 0.0 modifier
+Date: Thu, 28 Sep 2023 05:41:28 -0700
+Message-Id: <20230928124128.3793788-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230928124128.3793788-1-prestwoj@gmail.com>
 References: <20230928124128.3793788-1-prestwoj@gmail.com>
@@ -55,79 +55,43 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To support user-disabled bands periodic scans need to specify a
-frequency list filtered by any bands that are disabled. This was
-needed in scan.c since periodic scans don't provide a frequency
-list in the scan request.
-
-If no bands are disabled the allowed freqs API should still
-result in the same scan behavior as if a frequency list is left
-out i.e. IWD just filters the frequencies as opposed to the kernel.
 ---
- src/scan.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ src/iwd.config.rst | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-v2:
- * Simplified how the freq set is built. Instead just clone based off
-   supported and the band mask. This retains any currently disabled
-   6ghz frequencies without having to create a new set and merge
-
-diff --git a/src/scan.c b/src/scan.c
-index e6c105c0..93047a6b 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -987,9 +987,43 @@ static void scan_periodic_destroy(void *user_data)
- 	sc->sp.id = 0;
- }
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 294e4c7b..be2fd18c 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -297,6 +297,9 @@ autoconnect purposes.
+        Increase or decrease the preference for 2.4GHz access points by
+        increasing or decreasing the value of this modifier.
  
-+static struct scan_freq_set *scan_periodic_get_freqs(struct scan_context *sc)
-+{
-+	uint32_t band_mask = 0;
-+	struct scan_freq_set *freqs;
-+	const struct scan_freq_set *supported =
-+					wiphy_get_supported_freqs(sc->wiphy);
++       A value of 0.0 will disable the 2.4GHz band and prevent scanning or
++       connecting on those frequencies.
 +
-+	if (RANK_2G_FACTOR)
-+		band_mask |= BAND_FREQ_2_4_GHZ;
-+	if (RANK_5G_FACTOR)
-+		band_mask |= BAND_FREQ_5_GHZ;
-+	if (RANK_6G_FACTOR)
-+		band_mask |= BAND_FREQ_6_GHZ;
-+
-+	freqs = scan_freq_set_clone(supported, band_mask);
-+	if (scan_freq_set_isempty(freqs)) {
-+		scan_freq_set_free(freqs);
-+		freqs = NULL;
-+	}
-+
-+	return freqs;
-+}
-+
- static bool scan_periodic_queue(struct scan_context *sc)
- {
- 	struct scan_parameters params = {};
-+	struct scan_freq_set *freqs = scan_periodic_get_freqs(sc);
-+
-+	/*
-+	 * If this happens its due to the user disabling all bands. This will
-+	 * cause IWD to never issue another periodic scan so warn the user of
-+	 * this.
-+	 */
-+	if (L_WARN_ON(!freqs))
-+		return false;
-+
-+	params.freqs = freqs;
+    * - BandModifier5Ghz
+      - Values: floating point value (default: **1.0**)
  
- 	if (sc->sp.needs_active_scan && known_networks_has_hidden()) {
- 		params.randomize_mac_addr_hint = true;
-@@ -1007,6 +1041,8 @@ static bool scan_periodic_queue(struct scan_context *sc)
- 					scan_periodic_notify, sc,
- 					scan_periodic_destroy);
+@@ -306,6 +309,9 @@ autoconnect purposes.
+        networks are highly RSSI sensitive, so it is still possible for IWD to
+        prefer 2.4Ghz APs in certain circumstances.
  
-+	scan_freq_set_free(freqs);
++       A value of 0.0 will disable the 5GHz band and prevent scanning or
++       connecting on those frequencies.
 +
- 	return sc->sp.id != 0;
- }
+    * - BandModifier6Ghz
+      - Values: floating point value (default: **1.0**)
+ 
+@@ -313,6 +319,9 @@ autoconnect purposes.
+        or decreasing the value of this modifier.  Since 6GHz networks are highly
+        RSSI sensitive, this gives an option to prefer 6GHz APs over 5GHz APs.
+ 
++       A value of 0.0 will disable the 6GHz band and prevent scanning or
++       connecting on those frequencies.
++
+ Scan
+ ----
  
 -- 
 2.25.1
