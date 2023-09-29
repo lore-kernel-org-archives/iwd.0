@@ -1,106 +1,144 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776EC521CD
-	for <iwd@lists.linux.dev>; Fri, 29 Sep 2023 16:20:03 +0000 (UTC)
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1c61acd1285so77263725ad.2
-        for <iwd@lists.linux.dev>; Fri, 29 Sep 2023 09:20:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E554521DA
+	for <iwd@lists.linux.dev>; Fri, 29 Sep 2023 16:23:57 +0000 (UTC)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-69335ddbe16so3871478b3a.1
+        for <iwd@lists.linux.dev>; Fri, 29 Sep 2023 09:23:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696004402; x=1696609202; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vX6DojQvEY5hi+VRYB+vpmiDg2V/5lxNzRmyiVThuTg=;
-        b=dt95b7KWw3y4g0p+l+QnWtq5DQIeNHDqYiDyszfM+eTQ3J48YHiipKy8eU+U4oaUIm
-         3/YHIdrzPqZKoFXwcUm/78AzIbgaP75tB8G8/H1ZqJt1NYwE5AzyNcu1T9YxBmkve50l
-         ZWKhx1lur7VmJDf4nw1K9AhFeekFIR/kI+JzzAJIrQjM3X5Uf7y3h8bMTSg24KuhWm/d
-         vK2TWDgWBlYuvXGsEC8IXZFEiGIZvx1QBxE5a6q/p6i05aHBC2XHLyckGDvtbRQYuaT3
-         Z96JM9Jmtl2DncdAddnFYNCt95bjX/XV84gXG6Oq4rJtWh88Bn6ld+SIGfjzvaOrDVdF
-         lUEA==
+        d=gmail.com; s=20230601; t=1696004637; x=1696609437; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iE46dpfhNvaWmneXoCyiCoTWRy4oJkadhDihYaFPYpU=;
+        b=eUwdZBm84nx/4xjqF9GPz1hutjksquOdzsw3PW4w7m1KTtTc4ooRlDYOQ9F9F5I0OF
+         BoNSJTex8zeKtPSxOLUGGAISbRGyRC2d3d+mzKDNchBGojKS2H66aOahyTCwh6MHXKow
+         EQL4U0aHcdAhwBAt5b887FQJnouMzSKK9YCCw4QWSN0acmyNSm2Or3/tLBduTvgVH7fv
+         Qnl0ebI8tu2f7tkwxQlB2hZw+Qbtwuvyeb1cIx2BKXPqqNr7RGMqA/WvAl2lrI/Fz6r2
+         q5jujLGzz4Lxn5J9/GszUbf0+t7Wx4g/H5trVCyAtcU1WWOxURebrMFjB7zsANEiM9yD
+         brzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696004402; x=1696609202;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vX6DojQvEY5hi+VRYB+vpmiDg2V/5lxNzRmyiVThuTg=;
-        b=XHof/TBIvf00dWnk95Md5YNt1sHCQeU1xCDhR0tnk6Mia4sIimC1nq/tyYsk6MsvRT
-         MuCXjqxoKthUx/dMq4IK1wD7SEhDk+X71B1e+YP1nzQrj5Iav9pGqyzDmTPhf8Rg+Gt6
-         2spYn6ThpVqACxMiCsg3EpNdkuFiiblW602cmENrchyUhvO59UIjxXK0m8qtkshiE6Ys
-         nirZo5NZ9zh0MdfnuuvphlPZAkGx0UwRi+lZRe7JYa1FZ1r0GTx250VxBQr+8+tbcF9k
-         4Unc+5//vnZsUnXfGepkXlZ6hO/p/PcwvmQHJL5sgv02JSsA6k16Q2us7Brc1bSwL95M
-         kqWg==
-X-Gm-Message-State: AOJu0YxgK27wkBbXGDjGDwz645q056noluYHuvaT1vE109THRYKA8yAG
-	QYSrigYsV06DeKiRS9KwYxAzwA7ycWI=
-X-Google-Smtp-Source: AGHT+IEe2SRMzz2ibeExRV3/O3BPG2mAoxVvRoue/Fd6vWTd19cLXKiq9/6vOPeTORe0zMCQBtf+Ww==
-X-Received: by 2002:a17:902:cec3:b0:1bd:a22a:d409 with SMTP id d3-20020a170902cec300b001bda22ad409mr5485776plg.40.1696004402399;
-        Fri, 29 Sep 2023 09:20:02 -0700 (PDT)
-Received: from localhost.localdomain ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id m1-20020a170902d18100b001b8b1f6619asm17223766plb.75.2023.09.29.09.20.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Sep 2023 09:20:02 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] wiphy: remove wiphy_get_allowed_freqs
-Date: Fri, 29 Sep 2023 09:19:59 -0700
-Message-Id: <20230929161959.3840935-3-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230929161959.3840935-1-prestwoj@gmail.com>
-References: <20230929161959.3840935-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1696004637; x=1696609437;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iE46dpfhNvaWmneXoCyiCoTWRy4oJkadhDihYaFPYpU=;
+        b=J6ARis8SwkIewdtk74suubTifKn3yXqFnJ1YEA8vRI/3CBlunAFK4Ix18pDe2tzhzy
+         HPot7gWmynbBkAuNt+FcriiYpnaJ+FxL0NNCekvtNPQQG+OpTHMcfNE/4ay/r3HFK0vu
+         Jjgfsa5LRkrIYnV7lrEceRC+Z3QjkaV0G99LXTBnLtE1201kS1lfNOvGK28vNPaD1UBI
+         rs6Q8r4rewiTXXRTU8nnIqiWEIxN/P/l9lBL12Es86NQasyu/H/CH5rX+RtcpbbAwura
+         BTsZgM+mSwtREFGzVluZkRju28hjXkT5KbSBbsAsK/tpRY1jFQS1YipXXdg/frs+pfOx
+         iiFg==
+X-Gm-Message-State: AOJu0YziIiGJrDcgW6I/+vv3cSZ8TO7gwCBGBAKxBccekbdBV/XcFOhw
+	XGxH8BLgES25D5NV+On7Qdg=
+X-Google-Smtp-Source: AGHT+IE1CiNYP/yIX7v/8kx/by/ZqGbr4K9BIXHnlkVXvJf2Ofl0AK9dB/D380Qgw7SsOgOLMgicOQ==
+X-Received: by 2002:a05:6a21:6da9:b0:14c:d5e9:14d5 with SMTP id wl41-20020a056a216da900b0014cd5e914d5mr5075503pzb.14.1696004637102;
+        Fri, 29 Sep 2023 09:23:57 -0700 (PDT)
+Received: from [192.168.254.82] ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id q26-20020a62ae1a000000b0068ffd4eb66dsm15146379pff.35.2023.09.29.09.23.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Sep 2023 09:23:56 -0700 (PDT)
+Message-ID: <73b79593-7fe2-4a5c-abd6-b25859d9d5b0@gmail.com>
+Date: Fri, 29 Sep 2023 09:23:52 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] station: support user-disabled bands
+Content-Language: en-US
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20230928124128.3793788-1-prestwoj@gmail.com>
+ <20230928124128.3793788-3-prestwoj@gmail.com>
+ <0e6036b3-09a1-ef34-85e3-dcd86a041b1e@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <0e6036b3-09a1-ef34-85e3-dcd86a041b1e@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-This was recently added but with the modifications to
-wiphy_band_is_disabled() its no longer needed.
----
- src/wiphy.c | 15 ---------------
- src/wiphy.h |  2 --
- 2 files changed, 17 deletions(-)
+Hi Denis,
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index fd22f013..7c93f999 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -500,21 +500,6 @@ const struct scan_freq_set *wiphy_get_supported_freqs(
- 	return wiphy->supported_freqs;
- }
- 
--struct scan_freq_set *wiphy_get_allowed_freqs(const struct wiphy *wiphy,
--						uint32_t band_mask)
--{
--	struct scan_freq_set *allowed = scan_freq_set_clone(
--						wiphy->supported_freqs,
--						band_mask);
--
--	if (!wiphy_constrain_freq_set(wiphy, allowed)) {
--		scan_freq_set_free(allowed);
--		allowed = NULL;
--	}
--
--	return allowed;
--}
--
- static struct band *wiphy_get_band(const struct wiphy *wiphy, enum band_freq band)
- {
- 	switch (band) {
-diff --git a/src/wiphy.h b/src/wiphy.h
-index d61516d5..7687dd25 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -100,8 +100,6 @@ const char *wiphy_get_path(struct wiphy *wiphy);
- uint32_t wiphy_get_supported_bands(struct wiphy *wiphy);
- const struct scan_freq_set *wiphy_get_supported_freqs(
- 						const struct wiphy *wiphy);
--struct scan_freq_set *wiphy_get_allowed_freqs(const struct wiphy *wiphy,
--						uint32_t band_mask);
- 
- const struct band_freq_attrs *wiphy_get_frequency_info(
- 						const struct wiphy *wiphy,
--- 
-2.25.1
+On 9/29/23 8:37 AM, Denis Kenzior wrote:
+> Hi James,
+> 
+> On 9/28/23 07:41, James Prestwood wrote:
+>> This adds support to allow users to disable entire bands, preventing
+>> scanning and connecting on those frequencies. If the
+>> [Rank].BandModifier* options are set to 0.0 it will imply those
+>> bands should not be used for scanning, connecting or roaming. This
+>> now applies to autoconnect, quick, hidden, roam, and dbus scans.
+>>
+>> This is a station only feature meaning other modules like RRM, DPP,
+>> WSC or P2P may still utilize those bands. Trying to limit bands in
+>> those modules may sometimes conflict with the spec which is why it
+>> was not added there. In addition modules like DPP/WSC are only used
+>> in limited capacity for connecting so there is little benefit gained
+>> to disallowing those bands.
+>> ---
+>>   src/station.c | 120 ++++++++++++++++++++++++++++++++++++++++----------
+>>   1 file changed, 97 insertions(+), 23 deletions(-)
+>>
+>> v2:
+>>   * Compute an allowed band mask in station_init rather than separate 
+>> bools
+>>   * Let all scan paths include frequencies which may be disabled but
+>>     supported. This opens up the potential for 6ghz to be unlocked, 
+>> and if
+>>     a frequency is disabled the kernel filters it anyways.
+>>   * Optimized the dbus scan subset creation. Clone the 5/6ghz sets based
+>>     on supported freqs rather than foreach.
+>>   * Added a warning after computing the subsets if none were created
+>>
+> 
+> I went ahead and applied this and 4/4.  Couple of comments:
+> 
+>> +static struct scan_freq_set *station_get_allowed_freqs(struct station 
+>> *station)
+>> +{
+>> +    const struct scan_freq_set *supported =
+>> +                wiphy_get_supported_freqs(station->wiphy);
+>> +    struct scan_freq_set *allowed = scan_freq_set_clone(supported,
+>> +                            allowed_bands);
+>> +
+>> +    if (scan_freq_set_isempty(allowed)) {
+>> +        scan_freq_set_free(allowed);
+>> +        allowed = NULL;
+>> +    }
+>> +
+>> +    return allowed;
+>> +}
+>> +
+> 
+> This is almost identical to the function in scan.c.  Maybe consider 
+> using a shared implementation?
+> 
+>> @@ -1440,9 +1457,14 @@ static int station_quick_scan_trigger(struct 
+>> station *station)
+>>               known_6ghz)
+>>           return -ENOTSUP;
+>> -    if (!wiphy_constrain_freq_set(station->wiphy, known_freq_set)) {
+>> +    allowed = station_get_allowed_freqs(station);
+>> +    if (L_WARN_ON(!allowed))
+>> +        return -ENOTSUP;
+> 
+> You have a lot of this handling sprinkled about.  I think this is fine, 
+> since someone can still disable the single band their hardware supports 
+> or something. But maybe its worth checking the really bizarre cases and 
+> fail initialization early?
+> 
+> Somewhere in station_init or scan_init?  Sanitize that at least a single 
+> band is enabled, or at least one of 2.4/5G if 6G is also enabled?
 
+Yeah I thought about that. If all bands are disabled IWD will still 
+start, but just hang since it can't do anything. But maybe it is best to 
+actually fail init, that would make it more clear since someone is 
+likely just checking systemctl to see why they don't have wifi.
+
+I'll send a follow up for this.
+
+> 
+> Regards,
+> -Denis
+> 
