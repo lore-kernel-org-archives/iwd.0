@@ -1,294 +1,182 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793A2374EB
-	for <iwd@lists.linux.dev>; Thu, 28 Sep 2023 12:41:32 +0000 (UTC)
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-68c576d35feso11431000b3a.2
-        for <iwd@lists.linux.dev>; Thu, 28 Sep 2023 05:41:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7392A18631
+	for <iwd@lists.linux.dev>; Fri, 29 Sep 2023 15:26:29 +0000 (UTC)
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-1dcdfeb7e44so6273157fac.0
+        for <iwd@lists.linux.dev>; Fri, 29 Sep 2023 08:26:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695904891; x=1696509691; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1TBti7/t+aGJLcMCcdxlyRovtfZ90qTdg6+WUx8k96I=;
-        b=M+WslJ68+f91xvJ2xF4uLTTVrgF0pirwQPmDetmG1tuj2ATBrIBsoYZ+0S07CWhreV
-         vT2sG04GQXtRvtFwKIpHQuCdpaiQbdirgGLMV00GmyYyUAAq4Qzq5R6V/Zq0qimwakHX
-         QXrdke8DP372ZY78rydCX9PKdm0jQk1e/0il+JuMvxw9QR4mOIG8IfdTQpKwR6+a6oeP
-         oEc2WDs1Q8xsSQeuOJV1dSHm/imzow/srYWlaVtw447lhV+znETQ00GQZpHdmA2hwBh+
-         W5ATdERfX1T7LDU1+bI6i12EwQuHM4SBpZVn6TAZ6RClnEpXDPqnneuLTvr92TNVxKpM
-         GbCg==
+        d=gmail.com; s=20230601; t=1696001188; x=1696605988; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZfAg4mEbJFqZCZMzBF0BxeV8+dCMc4T7YGpQgTbkxjE=;
+        b=i6myJVVVUAQoOm/KSrSqk65QOsRV7kz3dvja6sflGAAVmqpAftK2pvH5XwjeV3zm1O
+         BF+WtynvWQNg1ztEMH/p30IZ7kK2pJ5C+eE/qn4T5/04cnP8Xs8ujTG51nc4a+UHHo2y
+         zfIM1I7nf+x4lwe8lbIOUrNrknpI+JvPryBUFs/6hXr61hgNEbLETP5ZihabQZM69m0L
+         Nff0b7mGP1Gty4c6QOq5ZwGCs9Cz/izJhFhP+YSHFR/rOrS1FOy6sVwQtW8deivCrvpZ
+         sxwnN6etNuelehb0ycMpKHWzfV8TaH/OhelzgzYCAAH2BAhE9km1uNTa7Np1/SaC+wle
+         fNkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695904891; x=1696509691;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1TBti7/t+aGJLcMCcdxlyRovtfZ90qTdg6+WUx8k96I=;
-        b=gcCLqoU7lupRMJWM0fdEkAfwqEx/WMNvPfwbrmhgo0XR46xgL85Efb9Bp/03fz6AU7
-         BZ7DyyiEAIezjeNrt/T+fxv+XtYbg8Aq5JGIFinwu9yRfuWLw8UBj+2lD6dIBLIYDfI2
-         Dqu0XRtzTeaMYK6++wI81Eu7IaHcRXXeB89sd/0bUIr/iru3RHtY37b3SPdSoIr5YAKQ
-         k/Ei5/PBk6Od6aN/ojTk7wJ02Pi0n68iam+8QE/wC7/JU1e6DOkBfIh3i3GyHQemAF5Z
-         5yWhs88rfcXHJM2nL8KuDaiqBvzaztkKHBKwv8hOhcUj/scj8WTS02TF+iLccieKI8x5
-         4Mkw==
-X-Gm-Message-State: AOJu0YzYsgTPtR+fssiPkXBUCeH7Jm2C0nhhv48ILBvDgwRDCO5mZyzW
-	fbtbP7raJQAqdz9kVPaV/yiI/L3xopQ=
-X-Google-Smtp-Source: AGHT+IEwuqP5DQWlgDBMN1wkCA7NanTm8JIHRbn/4EyC1QiTweq7J3aL94U2eqL/bNfDc0/oTlwgig==
-X-Received: by 2002:a05:6a20:f3a4:b0:15e:9d1b:84bf with SMTP id qr36-20020a056a20f3a400b0015e9d1b84bfmr827218pzb.23.1695904891451;
-        Thu, 28 Sep 2023 05:41:31 -0700 (PDT)
-Received: from localhost.localdomain ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id iw15-20020a170903044f00b001c5d09e9437sm14983105plb.25.2023.09.28.05.41.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 05:41:31 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/4] station: support user-disabled bands
-Date: Thu, 28 Sep 2023 05:41:27 -0700
-Message-Id: <20230928124128.3793788-3-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230928124128.3793788-1-prestwoj@gmail.com>
-References: <20230928124128.3793788-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1696001188; x=1696605988;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZfAg4mEbJFqZCZMzBF0BxeV8+dCMc4T7YGpQgTbkxjE=;
+        b=s5DeA+wMzuKbmRh7pAV4u2AYFe2643yFJ0LM1k5aMRkwd6XmBo3IXVDFK6sjUFGTIB
+         5jrTq7X8CzmVaLOleHlcKr2rJmnQuWHuw0jilylodXOv608EQmho9irmlmKG5N0QfXOW
+         CQlHaV2xBhzo18MSpJPmONBDCmj2RfpxhOdu4Eseh56MawmgRgRkivnUqYwVCYP3ID3S
+         YBy/UAWMSt+8X6eXu4qcS2WNwsZ7U6Rvkm5nUH33+dQEDU1xsMe0kpgAK0KZ4PRGtCr/
+         2IpP4Ho+QgM1fFtG+CYV1Xp5k/bKNmrVjYt3K5OWXLhRLHuanKhSiHQwikLROv8DetwO
+         n+2w==
+X-Gm-Message-State: AOJu0YyDdsODnv8EKFCgRYaEM0ZMWWnWei8k/7sQuhXoUV6Erq2fm4tI
+	beKXuF5hGz/2ecZqiQtHYY0=
+X-Google-Smtp-Source: AGHT+IFtAgiCnxSx6cIid3ZjjVC3Gscm4NrE9SVrNW5lWTqP3f6hw30F3qpNTqQTGgryeXQPJKS0yA==
+X-Received: by 2002:a05:6870:9a20:b0:1d0:e372:6c2d with SMTP id fo32-20020a0568709a2000b001d0e3726c2dmr5126145oab.0.1696001188319;
+        Fri, 29 Sep 2023 08:26:28 -0700 (PDT)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id bb2-20020a056871b20200b001d4d7238a78sm3895135oac.54.2023.09.29.08.26.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Sep 2023 08:26:27 -0700 (PDT)
+Message-ID: <71493368-4cd9-aac4-c2cc-e8b712af223f@gmail.com>
+Date: Fri, 29 Sep 2023 10:26:26 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 1/4] scan: allow splitting of scans with defined
+ frequencies
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20230928124128.3793788-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20230928124128.3793788-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This adds support to allow users to disable entire bands, preventing
-scanning and connecting on those frequencies. If the
-[Rank].BandModifier* options are set to 0.0 it will imply those
-bands should not be used for scanning, connecting or roaming. This
-now applies to autoconnect, quick, hidden, roam, and dbus scans.
+Hi James,
 
-This is a station only feature meaning other modules like RRM, DPP,
-WSC or P2P may still utilize those bands. Trying to limit bands in
-those modules may sometimes conflict with the spec which is why it
-was not added there. In addition modules like DPP/WSC are only used
-in limited capacity for connecting so there is little benefit gained
-to disallowing those bands.
----
- src/station.c | 120 ++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 97 insertions(+), 23 deletions(-)
+On 9/28/23 07:41, James Prestwood wrote:
+> Currently the only way a scan can be split is if the request does
+> not specify any frequencies, implying the request should scan the
+> entire spectrum. This allows the scan logic to issue an extra
+> request if 6GHz becomes available during the 2.4 or 5GHz scans.
+> This restriction was somewhat arbitrary and done to let periodic
+> scans pick up 6GHz APs through a single scan request.
+> 
+> But now with the addition of allowing user-disabled bands
+> periodic scans will need to specify a frequency list in case a
+> given band has been disabled. This will break the scan splitting
+> code which is why this prep work is being done.
+> 
+> The main difference now is the original scan frequencies are
+> tracked with the scan request. The reason for this is so if a
+> request comes in with a limited set of 6GHz frequences IWD won't
+> end up scanning the full 6GHz spectrum later on.
+> ---
+>   src/scan.c | 56 +++++++++++++++++++++---------------------------------
+>   1 file changed, 22 insertions(+), 34 deletions(-)
+> 
+> v2:
+>   * Use _auto_ for allowed frequencies in scan_cmds_add()
+> 
 
-v2:
- * Compute an allowed band mask in station_init rather than separate bools
- * Let all scan paths include frequencies which may be disabled but
-   supported. This opens up the potential for 6ghz to be unlocked, and if
-   a frequency is disabled the kernel filters it anyways.
- * Optimized the dbus scan subset creation. Clone the 5/6ghz sets based
-   on supported freqs rather than foreach.
- * Added a warning after computing the subsets if none were created
+I went ahead and applied, but a quick comment:
 
-diff --git a/src/station.c b/src/station.c
-index 9e4ee69a..12823142 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -73,6 +73,7 @@ static bool supports_arp_evict_nocarrier;
- static bool supports_ndisc_evict_nocarrier;
- static struct watchlist event_watches;
- static uint32_t known_networks_watch;
-+static uint32_t allowed_bands;
- 
- struct station {
- 	enum station_state state;
-@@ -1326,6 +1327,21 @@ static bool station_needs_hidden_network_scan(struct station *station)
- 	return !l_queue_isempty(station->hidden_bss_list_sorted);
- }
- 
-+static struct scan_freq_set *station_get_allowed_freqs(struct station *station)
-+{
-+	const struct scan_freq_set *supported =
-+				wiphy_get_supported_freqs(station->wiphy);
-+	struct scan_freq_set *allowed = scan_freq_set_clone(supported,
-+							allowed_bands);
-+
-+	if (scan_freq_set_isempty(allowed)) {
-+		scan_freq_set_free(allowed);
-+		allowed = NULL;
-+	}
-+
-+	return allowed;
-+}
-+
- static uint32_t station_scan_trigger(struct station *station,
- 					struct scan_freq_set *freqs,
- 					scan_trigger_func_t triggered,
-@@ -1411,6 +1427,7 @@ static void station_quick_scan_destroy(void *userdata)
- static int station_quick_scan_trigger(struct station *station)
- {
- 	_auto_(scan_freq_set_free) struct scan_freq_set *known_freq_set = NULL;
-+	_auto_(scan_freq_set_free) struct scan_freq_set *allowed = NULL;
- 	bool known_6ghz;
- 
- 	if (wiphy_regdom_is_updating(station->wiphy)) {
-@@ -1440,9 +1457,14 @@ static int station_quick_scan_trigger(struct station *station)
- 			known_6ghz)
- 		return -ENOTSUP;
- 
--	if (!wiphy_constrain_freq_set(station->wiphy, known_freq_set)) {
-+	allowed = station_get_allowed_freqs(station);
-+	if (L_WARN_ON(!allowed))
-+		return -ENOTSUP;
-+
-+	scan_freq_set_constrain(known_freq_set, allowed);
-+
-+	if (scan_freq_set_isempty(known_freq_set))
- 		return -ENOTSUP;
--	}
- 
- 	station->quick_scan_id = station_scan_trigger(station,
- 						known_freq_set,
-@@ -2656,6 +2678,11 @@ static int station_roam_scan(struct station *station,
- 				struct scan_freq_set *freq_set)
- {
- 	struct scan_parameters params = { .freqs = freq_set, .flush = true };
-+	_auto_(scan_freq_set_free) struct scan_freq_set *allowed =
-+					station_get_allowed_freqs(station);
-+
-+	if (L_WARN_ON(!allowed))
-+		return -ENOTSUP;
- 
- 	l_debug("ifindex: %u", netdev_get_ifindex(station->netdev));
- 
-@@ -2666,8 +2693,14 @@ static int station_roam_scan(struct station *station,
- 		params.ssid_len = strlen(ssid);
- 	}
- 
--	if (!freq_set)
-+	if (!freq_set) {
- 		station->roam_scan_full = true;
-+		params.freqs = allowed;
-+	} else
-+		scan_freq_set_constrain(freq_set, allowed);
-+
-+	if (L_WARN_ON(scan_freq_set_isempty(params.freqs)))
-+		return -ENOTSUP;
- 
- 	station->roam_scan_id =
- 		scan_active_full(netdev_get_wdev_id(station->netdev), &params,
-@@ -3597,6 +3630,7 @@ static struct l_dbus_message *station_dbus_connect_hidden_network(
- 	};
- 	const char *ssid;
- 	struct network *network;
-+	_auto_(scan_freq_set_free) struct scan_freq_set *allowed = NULL;
- 
- 	l_debug("");
- 
-@@ -3647,6 +3681,11 @@ not_hidden:
- 		return dbus_error_not_hidden(message);
- 	}
- 
-+	allowed = station_get_allowed_freqs(station);
-+	if (L_WARN_ON(!allowed))
-+		return dbus_error_not_supported(message);
-+
-+	params.freqs = allowed;
- 	params.ssid = (const uint8_t *)ssid;
- 	params.ssid_len = strlen(ssid);
- 
-@@ -4268,39 +4307,67 @@ int station_hide_network(struct station *station, struct network *network)
- 	return 0;
- }
- 
--static void station_add_one_freq(uint32_t freq, void *user_data)
-+static void station_add_2_4ghz_freq(uint32_t freq, void *user_data)
- {
--	struct station *station = user_data;
-+	struct scan_freq_set *set = user_data;
- 
--	if (freq > 3000)
--		scan_freq_set_add(station->scan_freqs_order[1], freq);
--	else if (!scan_freq_set_contains(station->scan_freqs_order[0], freq))
--		scan_freq_set_add(station->scan_freqs_order[2], freq);
-+	/* exclude social channels added in initial scan request */
-+	if (freq < 3000 && freq != 2412 && freq != 2437 && freq != 2462)
-+		scan_freq_set_add(set, freq);
- }
- 
- static void station_fill_scan_freq_subsets(struct station *station)
- {
- 	const struct scan_freq_set *supported =
--		wiphy_get_supported_freqs(station->wiphy);
-+				wiphy_get_supported_freqs(station->wiphy);
-+	unsigned int subset_idx = 0;
- 
- 	/*
- 	 * Scan the 2.4GHz "social channels" first, 5GHz second, if supported,
- 	 * all other 2.4GHz channels last.  To be refined as needed.
- 	 */
--	station->scan_freqs_order[0] = scan_freq_set_new();
--	scan_freq_set_add(station->scan_freqs_order[0], 2412);
--	scan_freq_set_add(station->scan_freqs_order[0], 2437);
--	scan_freq_set_add(station->scan_freqs_order[0], 2462);
--
--	station->scan_freqs_order[1] = scan_freq_set_new();
--	station->scan_freqs_order[2] = scan_freq_set_new();
--	scan_freq_set_foreach(supported, station_add_one_freq, station);
--
--	if (scan_freq_set_isempty(station->scan_freqs_order[1])) {
--		scan_freq_set_free(station->scan_freqs_order[1]);
--		station->scan_freqs_order[1] = station->scan_freqs_order[2];
--		station->scan_freqs_order[2] = NULL;
-+	if (allowed_bands & BAND_FREQ_2_4_GHZ) {
-+		station->scan_freqs_order[subset_idx] = scan_freq_set_new();
-+		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2412);
-+		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2437);
-+		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2462);
-+		subset_idx++;
-+	}
-+
-+	/*
-+	 * TODO: It may might sense to split up 5 and 6ghz into separate subsets
-+	 *       since the channel set is so large.
-+	 */
-+	if (allowed_bands & (BAND_FREQ_5_GHZ | BAND_FREQ_6_GHZ)) {
-+		uint32_t mask = allowed_bands &
-+					(BAND_FREQ_5_GHZ | BAND_FREQ_6_GHZ);
-+		struct scan_freq_set *set = scan_freq_set_clone(supported,
-+								mask);
-+
-+		/* 5/6ghz didn't add any frequencies */
-+		if (scan_freq_set_isempty(set)) {
-+			scan_freq_set_free(set);
-+		} else
-+			station->scan_freqs_order[subset_idx++] = set;
- 	}
-+
-+	/* Add remaining 2.4ghz channels to subset */
-+	if (allowed_bands & BAND_FREQ_2_4_GHZ) {
-+		station->scan_freqs_order[subset_idx] = scan_freq_set_new();
-+		scan_freq_set_foreach(supported, station_add_2_4ghz_freq,
-+					station->scan_freqs_order[subset_idx]);
-+	}
-+
-+	/*
-+	 * This has the unintended consequence of allowing DBus scans to
-+	 * scan the entire spectrum rather than cause IWD to be completely
-+	 * non-functional. Rather than prevent DBus scans from working at all
-+	 * print a warning here.
-+	 */
-+	if (station->scan_freqs_order[0] == NULL)
-+		l_warn("All supported bands were disabled by user! IWD will not"
-+			" function as expected");
-+
- }
- 
- static void station_wiphy_watch(struct wiphy *wiphy,
-@@ -5194,6 +5261,13 @@ static int station_init(void)
- 						station_known_networks_changed,
- 						NULL, NULL);
- 
-+	if (scan_get_band_rank_modifier(BAND_FREQ_2_4_GHZ))
-+		allowed_bands |= BAND_FREQ_2_4_GHZ;
-+	if (scan_get_band_rank_modifier(BAND_FREQ_5_GHZ))
-+		allowed_bands |= BAND_FREQ_5_GHZ;
-+	if (scan_get_band_rank_modifier(BAND_FREQ_6_GHZ))
-+		allowed_bands |= BAND_FREQ_6_GHZ;
-+
- 	return 0;
- }
- 
--- 
-2.25.1
+> @@ -582,22 +571,28 @@ static void scan_cmds_add(struct scan_request *sr, struct scan_context *sc,
+>   				bool passive,
+>   				const struct scan_parameters *params)
+>   {
+> +	uint32_t bands = BAND_FREQ_2_4_GHZ | BAND_FREQ_5_GHZ | BAND_FREQ_6_GHZ;
+>   	unsigned int i;
+>   	struct scan_freq_set *subsets[2] = { 0 };
+> -	struct scan_freq_set *allowed = scan_get_allowed_freqs(sc);
+> +	_auto_(scan_freq_set_free) struct scan_freq_set *allowed =
+> +				wiphy_get_allowed_freqs(sc->wiphy, bands);
+>   	const struct scan_freq_set *supported =
+>   					wiphy_get_supported_freqs(sc->wiphy);
+>   
+>   	/*
+> -	 * If 6GHz is not possible, or already allowed, or the frequencies are
+> -	 * explicit don't break up the request.
+> +	 * No frequencies, just include the entire supported list and let the
+> +	 * kernel filter out any disabled frequencies
+>   	 */
+> +	if (!params->freqs)
+> +		sr->scan_freqs = scan_freq_set_clone(supported, bands);
+> +	else
+> +		sr->scan_freqs = scan_freq_set_clone(params->freqs, bands);
+> +
+> +	/* If 6GHz is not possible or already allowed don't split the request */
+>   	if (!(scan_freq_set_get_bands(supported) & BAND_FREQ_6_GHZ) ||
+> -			(scan_freq_set_get_bands(allowed) & BAND_FREQ_6_GHZ) ||
+> -			params->freqs) {
+> -		scan_freq_set_free(allowed);
+> +			(scan_freq_set_get_bands(allowed) & BAND_FREQ_6_GHZ)) {
+
+You're using allowed here for the sole purpose of checking whether 6G was 
+allowed by the regdom.  This is sort of an expensive operation and we should 
+really just have a getter for this.  Would make the code easier to understand as 
+well.
+
+Maybe consider using something like wiphy_band_is_disabled() instead?
+
+>   		scan_build_next_cmd(sr->cmds, sc, passive,
+> -						params, params->freqs);
+> +						params, sr->scan_freqs);
+>   		return;
+>   	}
+>   
+> @@ -613,10 +608,8 @@ static void scan_cmds_add(struct scan_request *sr, struct scan_context *sc,
+>   	 * extra 6GHz-only passive scan can be appended to this request
+>   	 * at that time.
+>   	 */
+> -	subsets[0] = scan_freq_set_clone(allowed, BAND_FREQ_2_4_GHZ);
+> -	subsets[1] = scan_freq_set_clone(allowed, BAND_FREQ_5_GHZ);
+> -
+> -	scan_freq_set_free(allowed);
+> +	subsets[0] = scan_freq_set_clone(sr->scan_freqs, BAND_FREQ_2_4_GHZ);
+> +	subsets[1] = scan_freq_set_clone(sr->scan_freqs, BAND_FREQ_5_GHZ);
+>   
+>   	for(i = 0; i < L_ARRAY_SIZE(subsets); i++) {
+>   		if (!scan_freq_set_isempty(subsets[i]))
+> @@ -1918,9 +1911,8 @@ static void scan_wiphy_watch(struct wiphy *wiphy,
+>   	struct scan_request *sr = NULL;
+>   	struct l_genl_msg *msg = NULL;
+>   	struct scan_parameters params = { 0 };
+> -	struct scan_freq_set *freqs_6ghz;
+>   	struct scan_freq_set *allowed;
+> -	bool allow_6g;
+> +	_auto_(scan_freq_set_free) struct scan_freq_set *freqs_6ghz = NULL;
+>   
+>   	/* Only care about completed regulatory dumps */
+>   	if (event != WIPHY_STATE_WATCH_EVENT_REGDOM_DONE)
+> @@ -1934,14 +1926,14 @@ static void scan_wiphy_watch(struct wiphy *wiphy,
+>   	if (!sr)
+>   		return;
+>   
+> -	allowed = scan_get_allowed_freqs(sc);
+> -	allow_6g = scan_freq_set_get_bands(allowed) & BAND_FREQ_6_GHZ;
+> +	allowed = wiphy_get_allowed_freqs(sc->wiphy, BAND_FREQ_6_GHZ);
+> +	freqs_6ghz = scan_freq_set_clone(sr->scan_freqs, BAND_FREQ_6_GHZ);
+
+Same situation here, you're not really using allowed / freqs_6ghz for anything.
+
+>   
+>   	/*
+>   	 * This update did not allow 6GHz, or the original request was
+>   	 * not expecting 6GHz. The periodic scan should now be ended.
+>   	 */
+> -	if (!allow_6g || !sr->split) {
+> +	if (!allowed || scan_freq_set_isempty(freqs_6ghz) || !sr->split) {
+>   		scan_get_results(sc, sr, sr->freqs_scanned);
+>   		goto free_allowed;
+>   	}
+
+Regards,
+-Denis
 
