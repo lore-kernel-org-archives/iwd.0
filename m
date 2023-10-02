@@ -1,91 +1,102 @@
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5CB1388
-	for <iwd@lists.linux.dev>; Sat, 30 Sep 2023 02:59:05 +0000 (UTC)
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3af6bd48093so1234801b6e.3
-        for <iwd@lists.linux.dev>; Fri, 29 Sep 2023 19:59:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305B2EAD4
+	for <iwd@lists.linux.dev>; Mon,  2 Oct 2023 11:32:18 +0000 (UTC)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-690d8c05784so13140528b3a.2
+        for <iwd@lists.linux.dev>; Mon, 02 Oct 2023 04:32:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696042745; x=1696647545; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RA7niQdF+guDCDqj2yzzeEz8UsWYX/hB1neIMmee2oM=;
-        b=TJ72sTUQk7bQsQOayKi42IQicbrAMnR7PkKgyjauoWZzJ+t8NmqoBFBD18r6tiPMLR
-         9lIVTKXpaoqmng4MbTkFZrRNzYpP84cCk4X/Q/ZxsRXOxsOzz02gAX5zzJ6FW4CVBmi4
-         7UQIHFrEfWGKKEzwvpW8ypZflUzsYr33IzTOQln3VwmbDhoJ8zP/fxoH0MfQbyxx/zTh
-         dlQK3XMTtNQ6wPMal5ToLgDn9PXjfdB5qxcN1C4x5rF2vsdYoAl7DM1YJoJklTirxMbn
-         9Dy8bz4Ri+LUNcN3P302Nqk6LKfHGN20NdBC0BOsSWK2sLOXmHI/PxHU3iTFQzAwe1gg
-         nTRQ==
+        d=gmail.com; s=20230601; t=1696246338; x=1696851138; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xX/iobfmey4exNB3kT6/Lf7fwyLVnqcq1DWTuZKDNvE=;
+        b=VD0iGSLYSBAR/4lXft6LKZF6vNSWqOv6BV5t9u0ZBpqAQcUdBIgwJd2gtUQSV6b8Rt
+         h2DeHKrjzbEhD5PkYH92h5VveYF2C9c/Lno0LJrBANdb07KmOC+Q4QfXY9H88g8PsQDh
+         L0qt3jU66+glh2JW67IFDv59W7MIq4JZ86iQeJzkiJkT8z2ATx6aiJkIzuUBqU6LgBaB
+         5ikofAb2D0CYvbPzb2wdV8LO1+B4MDDlZym5FJp3ly11CWQ+pcKQjiPhW2dQmpuPSDR/
+         MjKFl4Wcx/bzVhR84nRH6cGZCBbe7py7eQkOvXXy7Bs3QQf57W/qeAFVdRIZZiOgiWqa
+         JGng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696042745; x=1696647545;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RA7niQdF+guDCDqj2yzzeEz8UsWYX/hB1neIMmee2oM=;
-        b=MTvftw6sBUQc+UJwSETf564AQs9j0+VsE1nBjUwPj/gKunmMGVJVYj18insg8ujypW
-         0tMf0q2N2zYh5jFLXdn3hN9aATpXRPp3R1lxlqDRD454irY3FSxK4RJWb4zjSVSF+UZZ
-         jUS+hbCZLcUnmw+wV1QXmbqOMAWuMIU/jm3iu7d5pglOFabg7az/E+IJY9aFfLggu9Ty
-         twv2680lbC2s4Kd8B0soGTGRhTtgUMBOLaq6q4uSBWYZuJNmoqUfgHX0ihq5VLY+0Msg
-         Qloy8SDLKYIfCbneRNGF6q6wz2XYcGtB9WlJiXqVAkmL9mi/pC8l4vicfFem6W50N21S
-         6IOA==
-X-Gm-Message-State: AOJu0YweKwc4pHifT3sP7G1JrxpLwb196dknLPnv1jSfs0Ql6cDk4LGL
-	cMWJjfQdrsATh9wh5glZOIU=
-X-Google-Smtp-Source: AGHT+IH5wkyp8a6gC0xCifmZO8H5X/4MCGRIyDrBsM63sB7IMFdr0/ZYacGhG7uyh61ifupHje+Ulw==
-X-Received: by 2002:a05:6808:138a:b0:3ae:24bb:3816 with SMTP id c10-20020a056808138a00b003ae24bb3816mr7538605oiw.14.1696042744753;
-        Fri, 29 Sep 2023 19:59:04 -0700 (PDT)
-Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id l24-20020a056808021800b003ae5aecae24sm1402749oie.52.2023.09.29.19.59.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Sep 2023 19:59:04 -0700 (PDT)
-Message-ID: <b1b52ddf-9440-b9e5-fd3e-c15f39a2a631@gmail.com>
-Date: Fri, 29 Sep 2023 21:59:02 -0500
+        d=1e100.net; s=20230601; t=1696246338; x=1696851138;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xX/iobfmey4exNB3kT6/Lf7fwyLVnqcq1DWTuZKDNvE=;
+        b=juTlMBmxk4sseoEnOS+goN1VtH2rFWjoheoaRDqNMgg7NOAw0fllDy6ijfLDhNxCsJ
+         GqfQtPWm2dTPaRxJYEWsH/WURP6AKZfZDGAWtA6ECNgOCiZH8BIDCYZu0PJz5V54wX4J
+         VgQ9cRWu1pfMOi3BiHT9OSJmxQRfloa7/tWkyfiYGu6mHyb5Mp9sxOWf5yath2DGDLe6
+         q1wKBEf/QzN8GgrCSgB75TXcu+ztD7AjRT5i7s0DxtChNOseE6zjwrVk4P5mQ6Rx9vmA
+         dCVkkraJ2p8eJtBXg1tyPgkijar9+5LdfQN+4OMO6HH8FXMBeldQbdgpWdWs12bOBesl
+         +vvw==
+X-Gm-Message-State: AOJu0YzueKXkqwe+LHPA/IYqyChbXAGeQMBK6V6EZqylvs+feEh5SzX6
+	c1W1ifgPUbhtcTrNRBgdOOVf3kNKT8M=
+X-Google-Smtp-Source: AGHT+IFt8P2aG8HJxyvlmthTz50Qa1Wy9a9YZRMbKYIbgfxXeL/gwKSf/Nqkdf90wSJ71/iRxPxzuA==
+X-Received: by 2002:a05:6a20:5490:b0:161:5ea5:fc0b with SMTP id i16-20020a056a20549000b001615ea5fc0bmr11534243pzk.16.1696246338158;
+        Mon, 02 Oct 2023 04:32:18 -0700 (PDT)
+Received: from localhost.localdomain ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id b124-20020a633482000000b00563df2ba23bsm18833212pga.50.2023.10.02.04.32.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Oct 2023 04:32:17 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] station: check disabled band configuration in station_init
+Date: Mon,  2 Oct 2023 04:32:13 -0700
+Message-Id: <20231002113213.3852482-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 1/3] wiphy: make wiphy_band_is_disabled return more
- descriptive
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20230929161959.3840935-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20230929161959.3840935-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+For IWD to work correctly either 2.4GHz or 5GHz bands must be enabled
+(even for 6GHz to work). Check this and don't allow IWD to initialize
+if both 2.4 and 5GHz is disabled.
+---
+ src/station.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-On 9/29/23 11:19, James Prestwood wrote:
-> The function wiphy_band_is_disabled() return was a bit misleading
-> because if the band was not supported it would return true which
-> could be misunderstood as the band is supported, but disabled.
-> There was only one call site and because of this behavior
-> wiphy_band_is_disabled needed to be paired with checking if the
-> band was supported.
-> 
-> To be more descriptive to the called, wiphy_band_is_disabled() now
-> returns an int and if the band isn't supported -ENOTSUP will be
-> returned, otherwise true/false.
-
-Returning true/false and -errno isn't a pattern we use.  I changed this patch to 
-return -errno on error, 1 if disabled, and 0 otherwise.  Also fixed up patch 2 
-as a result.  Please double check that I didn't screw anything up.
-
-> ---
->   src/station.c | 4 +---
->   src/wiphy.c   | 4 ++--
->   src/wiphy.h   | 2 +-
->   3 files changed, 4 insertions(+), 6 deletions(-)
-> 
-
-
-All applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/station.c b/src/station.c
+index a34d8ce3..f24b9aca 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -5203,6 +5203,19 @@ static void station_known_networks_changed(enum known_networks_event event,
+ 
+ static int station_init(void)
+ {
++	if (scan_get_band_rank_modifier(BAND_FREQ_2_4_GHZ))
++		allowed_bands |= BAND_FREQ_2_4_GHZ;
++	if (scan_get_band_rank_modifier(BAND_FREQ_5_GHZ))
++		allowed_bands |= BAND_FREQ_5_GHZ;
++	if (scan_get_band_rank_modifier(BAND_FREQ_6_GHZ))
++		allowed_bands |= BAND_FREQ_6_GHZ;
++
++	if (!(allowed_bands & (BAND_FREQ_2_4_GHZ | BAND_FREQ_5_GHZ))) {
++		l_error("At least 2.4GHz and 5GHz bands must be enabled for "
++			"IWD to start, check [Rank].BandModifier* setting");
++		return -ENOTSUP;
++	}
++
+ 	station_list = l_queue_new();
+ 	netdev_watch = netdev_watch_add(station_netdev_watch, NULL, NULL);
+ 	l_dbus_register_interface(dbus_get_bus(), IWD_STATION_INTERFACE,
+@@ -5259,13 +5272,6 @@ static int station_init(void)
+ 						station_known_networks_changed,
+ 						NULL, NULL);
+ 
+-	if (scan_get_band_rank_modifier(BAND_FREQ_2_4_GHZ))
+-		allowed_bands |= BAND_FREQ_2_4_GHZ;
+-	if (scan_get_band_rank_modifier(BAND_FREQ_5_GHZ))
+-		allowed_bands |= BAND_FREQ_5_GHZ;
+-	if (scan_get_band_rank_modifier(BAND_FREQ_6_GHZ))
+-		allowed_bands |= BAND_FREQ_6_GHZ;
+-
+ 	return 0;
+ }
+ 
+-- 
+2.25.1
 
