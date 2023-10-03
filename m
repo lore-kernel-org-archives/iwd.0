@@ -1,102 +1,76 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305B2EAD4
-	for <iwd@lists.linux.dev>; Mon,  2 Oct 2023 11:32:18 +0000 (UTC)
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-690d8c05784so13140528b3a.2
-        for <iwd@lists.linux.dev>; Mon, 02 Oct 2023 04:32:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC95125102
+	for <iwd@lists.linux.dev>; Tue,  3 Oct 2023 16:33:28 +0000 (UTC)
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6c64c2c0f97so731917a34.3
+        for <iwd@lists.linux.dev>; Tue, 03 Oct 2023 09:33:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696246338; x=1696851138; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xX/iobfmey4exNB3kT6/Lf7fwyLVnqcq1DWTuZKDNvE=;
-        b=VD0iGSLYSBAR/4lXft6LKZF6vNSWqOv6BV5t9u0ZBpqAQcUdBIgwJd2gtUQSV6b8Rt
-         h2DeHKrjzbEhD5PkYH92h5VveYF2C9c/Lno0LJrBANdb07KmOC+Q4QfXY9H88g8PsQDh
-         L0qt3jU66+glh2JW67IFDv59W7MIq4JZ86iQeJzkiJkT8z2ATx6aiJkIzuUBqU6LgBaB
-         5ikofAb2D0CYvbPzb2wdV8LO1+B4MDDlZym5FJp3ly11CWQ+pcKQjiPhW2dQmpuPSDR/
-         MjKFl4Wcx/bzVhR84nRH6cGZCBbe7py7eQkOvXXy7Bs3QQf57W/qeAFVdRIZZiOgiWqa
-         JGng==
+        d=gmail.com; s=20230601; t=1696350807; x=1696955607; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rS2nlFocli+XCbMkEBp4TrAhFZmqM2sfsavF9DSUUvw=;
+        b=QaXX/Ip9HfKeQoqv0FzAb8TiZJnZQF95T8AVEGgk6PI4KRZUo4wV/lZWdYZPcLvJbj
+         1b7zcrmURCXzLF33MAhzt5JzAKdl7x4MzYicSkUXJlrIrYIijPutvjYGv/TF/QCubtwn
+         0P4DwHWJS8tOx85ukrPZXjffn1drv0XRUMY4728md+t5JQDZCJL4HEDQR4/77WvbpZOb
+         cSHo5H351iC7ZH5oYVixz5CnapfROHUVl8gf+PYlQAKJKycqxalxR37bPGPGgAj6uSQs
+         Rg1X3k3ynrEIUU4pPl3L/I0+8w0uzXr8tfeARcwYGuWhVWnjNGSCtnF/5LxGP6mYdtnU
+         UdOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696246338; x=1696851138;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xX/iobfmey4exNB3kT6/Lf7fwyLVnqcq1DWTuZKDNvE=;
-        b=juTlMBmxk4sseoEnOS+goN1VtH2rFWjoheoaRDqNMgg7NOAw0fllDy6ijfLDhNxCsJ
-         GqfQtPWm2dTPaRxJYEWsH/WURP6AKZfZDGAWtA6ECNgOCiZH8BIDCYZu0PJz5V54wX4J
-         VgQ9cRWu1pfMOi3BiHT9OSJmxQRfloa7/tWkyfiYGu6mHyb5Mp9sxOWf5yath2DGDLe6
-         q1wKBEf/QzN8GgrCSgB75TXcu+ztD7AjRT5i7s0DxtChNOseE6zjwrVk4P5mQ6Rx9vmA
-         dCVkkraJ2p8eJtBXg1tyPgkijar9+5LdfQN+4OMO6HH8FXMBeldQbdgpWdWs12bOBesl
-         +vvw==
-X-Gm-Message-State: AOJu0YzueKXkqwe+LHPA/IYqyChbXAGeQMBK6V6EZqylvs+feEh5SzX6
-	c1W1ifgPUbhtcTrNRBgdOOVf3kNKT8M=
-X-Google-Smtp-Source: AGHT+IFt8P2aG8HJxyvlmthTz50Qa1Wy9a9YZRMbKYIbgfxXeL/gwKSf/Nqkdf90wSJ71/iRxPxzuA==
-X-Received: by 2002:a05:6a20:5490:b0:161:5ea5:fc0b with SMTP id i16-20020a056a20549000b001615ea5fc0bmr11534243pzk.16.1696246338158;
-        Mon, 02 Oct 2023 04:32:18 -0700 (PDT)
-Received: from localhost.localdomain ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id b124-20020a633482000000b00563df2ba23bsm18833212pga.50.2023.10.02.04.32.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 04:32:17 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] station: check disabled band configuration in station_init
-Date: Mon,  2 Oct 2023 04:32:13 -0700
-Message-Id: <20231002113213.3852482-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1696350807; x=1696955607;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rS2nlFocli+XCbMkEBp4TrAhFZmqM2sfsavF9DSUUvw=;
+        b=PLt6YB9vb0tKaTGC3CXg+1ktoeui3eMEKoFCWN1ZCLLmKGGdpkaY3VpqZVzd+g3xg4
+         4sColScqQEzt4rXNJzGg9Xyx3g8FHdsrbzEvlVTEq0pg33kCEIUK6szezFW2qZNKg/DM
+         +m97/Khwcm3Suo758vW+LxrMpYCAagK5Nu4t+gGoz3UBnC1thOCAeKN31qi9lL7eJHtB
+         6DP7WXyv6YSY8J2VMhBM8S+SxERCO1uGO8Jd2ESLWvgkPp3de9ci9I+SU64jEYhjuWEg
+         7YGFvpmf1d2JsCIDWYGgdDAkBJHW3YqIeX54EjEAmNd4/SmA6/am+tXDDokZsbFW3QK2
+         d4Pw==
+X-Gm-Message-State: AOJu0YzE4MPmG7ynGPGi73fm5CBSjpQSOdDFv8UpEmtErVV/mdQxfkZb
+	h3FVDTDtoKYhNa6XfW2K1Sk=
+X-Google-Smtp-Source: AGHT+IF3LEdbXmUNBVg5uDgS6Qf3Lo/81KRPdybEKDdgvpReIMKZhHKZZjbhO2QYyhMSVut7jhHIEw==
+X-Received: by 2002:a05:6808:251:b0:3a4:6b13:b721 with SMTP id m17-20020a056808025100b003a46b13b721mr61688oie.46.1696350807635;
+        Tue, 03 Oct 2023 09:33:27 -0700 (PDT)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id s18-20020a056808009200b003af7bac7a8dsm221775oic.28.2023.10.03.09.33.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Oct 2023 09:33:27 -0700 (PDT)
+Message-ID: <0d30e339-f9a1-2957-6613-31a76c8c17e6@gmail.com>
+Date: Tue, 3 Oct 2023 11:33:23 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] station: check disabled band configuration in
+ station_init
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20231002113213.3852482-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20231002113213.3852482-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-For IWD to work correctly either 2.4GHz or 5GHz bands must be enabled
-(even for 6GHz to work). Check this and don't allow IWD to initialize
-if both 2.4 and 5GHz is disabled.
----
- src/station.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+Hi James,
 
-diff --git a/src/station.c b/src/station.c
-index a34d8ce3..f24b9aca 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -5203,6 +5203,19 @@ static void station_known_networks_changed(enum known_networks_event event,
- 
- static int station_init(void)
- {
-+	if (scan_get_band_rank_modifier(BAND_FREQ_2_4_GHZ))
-+		allowed_bands |= BAND_FREQ_2_4_GHZ;
-+	if (scan_get_band_rank_modifier(BAND_FREQ_5_GHZ))
-+		allowed_bands |= BAND_FREQ_5_GHZ;
-+	if (scan_get_band_rank_modifier(BAND_FREQ_6_GHZ))
-+		allowed_bands |= BAND_FREQ_6_GHZ;
-+
-+	if (!(allowed_bands & (BAND_FREQ_2_4_GHZ | BAND_FREQ_5_GHZ))) {
-+		l_error("At least 2.4GHz and 5GHz bands must be enabled for "
-+			"IWD to start, check [Rank].BandModifier* setting");
-+		return -ENOTSUP;
-+	}
-+
- 	station_list = l_queue_new();
- 	netdev_watch = netdev_watch_add(station_netdev_watch, NULL, NULL);
- 	l_dbus_register_interface(dbus_get_bus(), IWD_STATION_INTERFACE,
-@@ -5259,13 +5272,6 @@ static int station_init(void)
- 						station_known_networks_changed,
- 						NULL, NULL);
- 
--	if (scan_get_band_rank_modifier(BAND_FREQ_2_4_GHZ))
--		allowed_bands |= BAND_FREQ_2_4_GHZ;
--	if (scan_get_band_rank_modifier(BAND_FREQ_5_GHZ))
--		allowed_bands |= BAND_FREQ_5_GHZ;
--	if (scan_get_band_rank_modifier(BAND_FREQ_6_GHZ))
--		allowed_bands |= BAND_FREQ_6_GHZ;
--
- 	return 0;
- }
- 
--- 
-2.25.1
+On 10/2/23 06:32, James Prestwood wrote:
+> For IWD to work correctly either 2.4GHz or 5GHz bands must be enabled
+> (even for 6GHz to work). Check this and don't allow IWD to initialize
+> if both 2.4 and 5GHz is disabled.
+> ---
+>   src/station.c | 20 +++++++++++++-------
+>   1 file changed, 13 insertions(+), 7 deletions(-)
+> 
+
+Applied, thanks.
+
+Regards,
+-Denis
 
