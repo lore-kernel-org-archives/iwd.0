@@ -1,216 +1,168 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20847273F9
-	for <iwd@lists.linux.dev>; Fri,  6 Oct 2023 16:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DD81DFF9
+	for <iwd@lists.linux.dev>; Tue, 10 Oct 2023 13:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fUfh1wd7"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1c760b34d25so18067825ad.3
-        for <iwd@lists.linux.dev>; Fri, 06 Oct 2023 09:14:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CRZ9oL3i"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6969b391791so3891597b3a.3
+        for <iwd@lists.linux.dev>; Tue, 10 Oct 2023 06:57:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696608857; x=1697213657; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wHPJYHFyzYaLTCyQuGuxt7IiRfIhPhi6zjviNh9rYUg=;
-        b=fUfh1wd7Beg+Nxp1px/18C+/a2fanlcICNRdUlLbDhQSxI7LXMQWW2Km0sZFcI1Wc+
-         9ijOm217wPTygfyg19R4H5RkcmaHkloRAl66eDiNuowPM2UnYIZhG7yCK+/JWCQf6N31
-         t4JTxwTJHI/FHinlPjH4wKkolW8UUVTJ+BxkoiLnpMXvteb1Kb10Q3aa9mfqPMpDSb69
-         Pim94b7Ua2C94NSutVQ+97KhzsO8+jik4VIvcgxIx/rDCQ1+qrfB8jYcoSGSxqYpx3tE
-         yyMxry0Cl3K2jx7J3iusMSsQIHL7p2V/OUZ8hcyZ7e6udZY7WY8+10hNBDpim9/71uGM
-         JwWQ==
+        d=gmail.com; s=20230601; t=1696946227; x=1697551027; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wAUKOgvBnpbBryReM6CcnlI004rnlikb7s2SqBaWOt0=;
+        b=CRZ9oL3iUQZIlot2ZJOQgEh6OFQ6rc5RyLl/8Z2knPT3syfxP74XtiBTQKvwjpggUm
+         1/to17EVX/AuaYCc/edwYFrQHJDPd1ZWy/xyrzGS3uMXOogDT1RPIy3pvF3r6v72mA15
+         sZHYfnhoPsmqujr7x20Ek8Xy+WNnWbTAxT+Bxw2rAH7loypUH0ji9JKv8YPkPup7H31O
+         qLF7J8vx7yIxLAMPXA3rnrlYW6gxUtmqcUgNNvuQGz9edvdbnxZKTfco78IIYqprytox
+         Mg8QPK/4pZRIw6BAK3YuYXwiWrsQlvZ2Tc+L2KfWByDsH81pIG1Kvbsn+QchUw02LfB7
+         eVQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696608857; x=1697213657;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wHPJYHFyzYaLTCyQuGuxt7IiRfIhPhi6zjviNh9rYUg=;
-        b=uwt5x5pYflPwyLU5uQpxgFtSGYjkptSNBv4YT3PeR/0B4SMwGwFGYOctalOKls+52E
-         Z4UeaeGrmOpjdwbZWBzpEUc5XD49R1iYDRt+unFSAIwIazNrpVee6VgT4NCfFwdZuC8s
-         3+B95/iC+2AYfjX7+7YpH7GCh1FJnITJvrdSeNH5sHTDKxsm7hmS2GcNKgLBvB5sCLDm
-         7oAHGVfYHVjMYRlvZjhGzopmvWmSQRP2eXqtf6LeK7eX/UlvwwSJlGOqr69PeSVTA0s/
-         Ncd1NPgeBEskj5jeGIhKQt49nSNFlVkhJcEmC2KdRYggJl74M0JEL7cFIMrGzonEES1E
-         Ukaw==
-X-Gm-Message-State: AOJu0YzukuDgqKqccRs5mp+QhdZ0OeP/6j0oiggYnH5WLhciaUda79jU
-	HcnvPTynCuYRqrzYrP5Go1JoQSOI5ZY=
-X-Google-Smtp-Source: AGHT+IGiE14NCjUrNREywiRsZqqVz+QPuVT8mk6Pdd1htkQM85sZ6RWWypFqlTkyWUc6WJobsemEiw==
-X-Received: by 2002:a17:902:e550:b0:1b9:e937:9763 with SMTP id n16-20020a170902e55000b001b9e9379763mr10112687plf.12.1696608857215;
-        Fri, 06 Oct 2023 09:14:17 -0700 (PDT)
-Received: from [192.168.254.38] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id iw11-20020a170903044b00b001ab2b4105ddsm4085303plb.60.2023.10.06.09.14.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Oct 2023 09:14:16 -0700 (PDT)
-Message-ID: <c54e631d-5b39-4630-bb75-cf810839b1d4@gmail.com>
-Date: Fri, 6 Oct 2023 09:14:14 -0700
+        d=1e100.net; s=20230601; t=1696946227; x=1697551027;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wAUKOgvBnpbBryReM6CcnlI004rnlikb7s2SqBaWOt0=;
+        b=aRpE0wA+gmfgDeQiG9mHMeJMw+N5Ir5GEnY/ITAnUC53Va+prJwF4ZBQcZmTiw6tUI
+         5zlbW4SOsyYJeoHUR0pOySs1a921itZyzkKakPo/dTAe1ILMAu2CxzaW2KW6rO6hpvWy
+         6Sc4TiHL6n6rVeRvFYnzCnU3rID4EqlkcdUJhtBCozxRWTL/XnnzmRpVp9u6z9pDW8MS
+         /aMPi7o59CZNnXWlwoPaReg7YlUerCM/ArbLdZjFkRPmgQoIO/NQjXrpR3U4AXfRTxYc
+         4F7EyuWS+dXJHPnJBYYYtNoguzNjMIj2bP3q7ma2G8iRYjED5wKI05fkJOS8rNjosMaV
+         F3ig==
+X-Gm-Message-State: AOJu0YxeiM3cXQ+vbu6zwI7S3AALyfruzdT41Z+Jx95wtds44C3h3aoA
+	KDGsdT8orRS0Swz2h1LBnU8f3TNFg/A=
+X-Google-Smtp-Source: AGHT+IHbfslHodaOsiID4bOPm7LNzC6Jx8vGBAK4rjMUiWEgd7xNpV5cZMwN5PsKcDgg4g6i3MxEsA==
+X-Received: by 2002:a05:6a20:1584:b0:155:2359:e28c with SMTP id h4-20020a056a20158400b001552359e28cmr19198886pzj.9.1696946227337;
+        Tue, 10 Oct 2023 06:57:07 -0700 (PDT)
+Received: from localhost.localdomain ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id b10-20020a170903228a00b001b03a1a3151sm11830364plh.70.2023.10.10.06.57.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 06:57:07 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/4] unit: add to test-dpp to expose ASN1 point conversion bug
+Date: Tue, 10 Oct 2023 06:57:01 -0700
+Message-Id: <20231010135704.198723-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] RFC: PKEX support for DPP
-Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20231005123034.15802-1-prestwoj@gmail.com>
- <50060562-b877-e087-82a6-c526779c1038@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <50060562-b877-e087-82a6-c526779c1038@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Add a test to show the incorrect ASN1 conversion to and from points.
+This was due to the check if Y is odd/even being inverted which
+incorrectly prefixes the X coordinate with the wrong byte.
 
+The test itself was not fully correct because it was using compliant
+points rather than full points, and the spec contains the entire
+Y coordinate so the full point should be used.
 
-On 10/6/23 7:55 AM, Denis Kenzior wrote:
-> Hi James,
-> 
-> On 10/5/23 07:30, James Prestwood wrote:
->> PKEX is part of the WFA EasyConnect specification and is
->> an additional boostrapping method (like QR codes) for
->> exchanging public keys between a configurator and enrollee.
->>
->> PKEX operates over wifi and requires a key/code be exchanged
->> prior to the protocol. The key is used to encrypt the exchange
->> of the boostrapping information, then DPP authentication is
->> started immediately aftewards.
->>
->> This can be useful for devices which don't have the ability to
->> scan a QR code, or even as a more convenient way to share
->> wireless credentials if the PSK is very secure (i.e. not a
->> human readable string).
->>
->> This only documents the DBus API for now to get an idea of how
->> and where this module would live. The current plan is to keep
->> it in dpp.c. This module is getting rather large but all the
->> infrastructure exists for offchannel/frame callbacks and
->> state so it makes sense to keep it there. The plan is to add
->> some additional states to dpp for PKEX which would happen
->> prior to AUTHENTICATION and allow the PRESENCE state to be
->> skipped.
->>
-> 
-> Sounds good.
-> 
->> PKEX would be used via the two DBus APIs. PkexConfigure would
->> start listening and wait for an Enrollee to send a PKEX
->> exchange request. The enrollee would be started with PkexEnroll
->> and initiate the exchange. PKEX would proceed and once done
->> DPP Authentication would start using the boostrapping keys
->> exchanged.
-> 
-> I would really like to avoid camel case abbreviations in APIs.  Also, we 
-> like to use more easily understood terminology in our APIs whenever 
-> possible.  For example, SignalStrength not RSSI, SimpleConfiguration not 
-> WSC, etc.  Also, this is very different in feel compared to the rest of 
-> DeviceProvisioning Methods.
-> 
-> Perhaps this should be moved to its own interface, something like 
-> SharedCodeDeviceProvisioning.
+This patch also adds ASN1 conversions to validate that
+dpp_point_from_asn1 and dpp_point_to_asn1 work properly.
+---
+ unit/test-dpp.c | 44 +++++++++++++++++++++++++++++++-------------
+ 1 file changed, 31 insertions(+), 13 deletions(-)
 
-Sounds good.
+diff --git a/unit/test-dpp.c b/unit/test-dpp.c
+index 96175759..c782efba 100644
+--- a/unit/test-dpp.c
++++ b/unit/test-dpp.c
+@@ -162,11 +162,14 @@ static void test_bad_channels(const void *data)
+  * B.2 Test Vectors for DPP Authentication Using P-256 for
+  * Responder-only Authentication
+  */
+-const char *i_proto_public_bytes = "50a532ae2a07207276418d2fa630295d45569be425aa634f02014d00a7d1f61a";
+-const char *r_boot_public_bytes = "09c585a91b4df9fd25a045201885c39cc5cfae397ddaeda957dec57fa0e3503f";
++const char *i_proto_public_bytes = "50a532ae2a07207276418d2fa630295d45569be425aa634f02014d00a7d1f61a"
++				"e14f35a5a858bccad90d126c46594c49ef82655e78888e15a32d916ac2172491";
++const char *r_boot_public_bytes = "09c585a91b4df9fd25a045201885c39cc5cfae397ddaeda957dec57fa0e3503f"
++				"52bf05968198a2f92883e96a386d767579883302dbf292105c90a43694c2fd5c";
+ const char *r_boot_private_bytes = "54ce181a98525f217216f59b245f60e9df30ac7f6b26c939418cfc3c42d1afa0";
+ const char *r_proto_private_bytes = "f798ed2e19286f6a6efe210b1863badb99af2a14b497634dbfd2a97394fb5aa5";
+-const char *r_proto_public_bytes = "5e3fb3576884887f17c3203d8a3a6c2fac722ef0e2201b61ac73bc655c709a90";
++const char *r_proto_public_bytes = "5e3fb3576884887f17c3203d8a3a6c2fac722ef0e2201b61ac73bc655c709a90"
++				"2d4b030669fb9eff8b0a79fa7c1a172ac2a92c626256963f9274dc90682c81e5";
+ const char *k1_bytes = "3d832a02ed6d7fc1dc96d2eceab738cf01c0028eb256be33d5a21a720bfcf949";
+ const char *k2_bytes = "ca08bdeeef838ddf897a5f01f20bb93dc5a895cb86788ca8c00a7664899bc310";
+ const char *ke_bytes = "c8882a8ab30c878467822534138c704ede0ab1e873fe03b601a7908463fec87a";
+@@ -176,6 +179,8 @@ const char *i_nonce_bytes = "13f4602a16daeb69712263b9c46cba31";
+ const char *r_nonce_bytes = "3d0cfb011ca916d796f7029ff0b43393";
+ const char *i_auth_bytes = "787d1189b526448d2901e7f6c22775ce514fce52fc886c1e924f2fbb8d97b210";
+ const char *r_auth_bytes = "43509ef7137d8c2fbe66d802ae09dedd94d41b8cbfafb4954782014ff4a3f91c";
++const char *r_asn1 = "3039301306072a8648ce3d020106082a8648ce3d0301070322000209c585a91b"
++			"4df9fd25a045201885c39cc5cfae397ddaeda957dec57fa0e3503f";
+ 
+ #define HEX2BUF(s, buf, _len) { \
+ 	unsigned char *_tmp = l_util_from_hexstring(s, NULL); \
+@@ -192,7 +197,7 @@ const char *r_auth_bytes = "43509ef7137d8c2fbe66d802ae09dedd94d41b8cbfafb4954782
+ 
+ static void test_key_derivation(const void *data)
+ {
+-	uint64_t tmp[L_ECC_MAX_DIGITS];
++	uint64_t tmp[L_ECC_MAX_DIGITS * 2];
+ 	const struct l_ecc_curve *curve = l_ecc_curve_from_ike_group(19);
+ 	_auto_(l_ecc_point_free) struct l_ecc_point *i_proto_public = NULL;
+ 	_auto_(l_ecc_point_free) struct l_ecc_point *r_boot_public = NULL;
+@@ -201,6 +206,7 @@ static void test_key_derivation(const void *data)
+ 	_auto_(l_ecc_point_free) struct l_ecc_point *r_proto_public = NULL;
+ 	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *m = NULL;
+ 	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *n = NULL;
++	_auto_(l_ecc_point_free) struct l_ecc_point *from_asn1 = NULL;
+ 	uint64_t k1[L_ECC_MAX_DIGITS];
+ 	uint64_t k2[L_ECC_MAX_DIGITS];
+ 	uint64_t ke[L_ECC_MAX_DIGITS];
+@@ -208,23 +214,35 @@ static void test_key_derivation(const void *data)
+ 	uint8_t r_nonce[16];
+ 	uint64_t r_auth[L_ECC_MAX_DIGITS];
+ 	uint64_t i_auth[L_ECC_MAX_DIGITS];
++	_auto_(l_free) uint8_t *asn1 = NULL;
++	size_t asn1_len;
+ 
+-	HEX2BUF(i_proto_public_bytes, tmp, 32);
++	HEX2BUF(i_proto_public_bytes, tmp, 64);
+ 	i_proto_public = l_ecc_point_from_data(curve,
+-						L_ECC_POINT_TYPE_COMPLIANT,
+-						tmp, 32);
++						L_ECC_POINT_TYPE_FULL,
++						tmp, 64);
+ 	assert(i_proto_public);
+ 
+-	HEX2BUF(r_boot_public_bytes, tmp, 32);
++	HEX2BUF(r_boot_public_bytes, tmp, 64);
+ 	r_boot_public = l_ecc_point_from_data(curve,
+-						L_ECC_POINT_TYPE_COMPLIANT,
+-						tmp, 32);
++						L_ECC_POINT_TYPE_FULL,
++						tmp, 64);
+ 	assert(r_boot_public);
+ 
+-	HEX2BUF(r_proto_public_bytes, tmp, 32);
++	HEX2BUF(r_asn1, tmp, sizeof(tmp));
++	asn1 = dpp_point_to_asn1(r_boot_public, &asn1_len);
++
++	from_asn1 = dpp_point_from_asn1(asn1, asn1_len);
++
++	assert(l_ecc_points_are_equal(from_asn1, r_boot_public));
++
++	assert(asn1_len == 59);
++	assert(memcmp(tmp, asn1, asn1_len) == 0);
++
++	HEX2BUF(r_proto_public_bytes, tmp, 64);
+ 	r_proto_public = l_ecc_point_from_data(curve,
+-						L_ECC_POINT_TYPE_COMPLIANT,
+-						tmp, 32);
++						L_ECC_POINT_TYPE_FULL,
++						tmp, 64);
+ 	assert(r_proto_public);
+ 
+ 	HEX2BUF(r_boot_private_bytes, tmp, 32);
+-- 
+2.25.1
 
-> 
->>
->> For convenience/security the PKEX key could be specified in the
->> IWD provisioning file (part of the Security group). This would
-> 
-> Why don't you just make this the default and drop the dictionary 
-> parameters.
-> 
->> allow IWD to encrypt it and avoid the need for some other entity
->> to store the key in order to call PkexConfigure (e.g. if not
->> initiated by a human entering the key).
->> ---
->>   doc/device-provisioning-api.txt | 44 +++++++++++++++++++++++++++++++++
->>   1 file changed, 44 insertions(+)
->>
->> diff --git a/doc/device-provisioning-api.txt 
->> b/doc/device-provisioning-api.txt
->> index ac204f46..c8b2e4a5 100644
->> --- a/doc/device-provisioning-api.txt
->> +++ b/doc/device-provisioning-api.txt
->> @@ -57,6 +57,50 @@ Methods        string StartEnrollee()
->>                           net.connman.iwd.NotSupported
->>                           net.connman.iwd.Busy
->> +        PkexConfigure(dict args)
->> +            The 'args' dictionary (a{sv}) contains parameters for
->> +            the PKEX configurer. This can be empty or contain the
->> +            following dictionary members:
->> +
->> +            string Key - The PKEX key. This is required if not
->> +            specified in the network profile already.
->> +
->> +            string Identifier - The PKEX key identifier. This is
->> +            optional, but if used both the Configurer and enrollee
->> +            must use the same value. Can also be specified in the
->> +            network profile.
->> +
->> +            uint32_t Timeout - A timeout (in seconds) for
->> +            configuration. This is optional, but suggested to
->> +            prevent a device from indefinitely configuring
->> +            enrollees (if Stop() was never called).
-> 
-> I would pick something reasonable (or read it from the provisioning 
-> file) and drop this from the API entirely.
-> 
->> +
->> +            Possible errors:    net.connman.iwd.Busy
->> +                        net.connman.iwd.NotConnected
->> +                        net.connman.iwd.InvalidArguments
->> +                        net.connman.iwd.NotConfigured
->> +
->> +        PkexEnroll(dict args)
->> +            The 'args' dictionary (a{sv}) contains parameters for
->> +            the PKEX enrollee.
->> +
->> +            string Key - The PKEX key. This is required and must
->> +            match the configurer's key.
->> +
->> +            string Identifier - The PKEX key identifier. This is
->> +            optional, but if used both the Configurer and enrollee
-> 
-> "configurator"
-> 
->> +            must use the same value.
->> +
->> +            array(y) Address - The address of the PKEX listener. If
->> +            not specified a broadcast address is used.
-> 
-> array(y)?  Nack :)
-> 
->> +
->> +            array(u) Frequencies - A list of frequencies to
->> +            discover on. If not specified channel 2, 44, and 149
->> +            are used per the DPP spec.
-> 
-> Same here.
-> 
-> I would drop Address and Frequencies from this API.  No human is going 
-> to be entering these via a UI.
-
-The issue I foresee is trying to find configurators since they stay on 
-the current operating channel which likely isn't 2, 44, or 149 (I 
-suppose we could have them go offchannel, but I wanted to avoid that). 
-But I agree, its not something a human would know or want to type in.
-
-Enrollees could instead iterate all supported channels, but that would 
-take a while (200ms per channel per the spec, and actually the spec 
-wants 5 retries per channel but I wasn't planning on doing that). But 
-maybe this is the only way to do it in an automatic way.
-
-One idea I had was to have the enrollee scan first, iterate channels 
-from nearby APs, if nothing is found repeat. That would likely reduce 
-the number of frequencies significantly.
-
-> 
->> +
->> +            Possible errors:    net.connman.iwd.Busy
->> +                        net.connman.iwd.InvalidArguments
->> +
->>   Properties    boolean Started [readonly]
->>               True if DPP is currently active.
-> 
-> Regards,
-> -Denis
