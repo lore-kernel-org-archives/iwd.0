@@ -1,109 +1,86 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A55341BC
-	for <iwd@lists.linux.dev>; Tue, 10 Oct 2023 13:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B1133C0
+	for <iwd@lists.linux.dev>; Wed, 11 Oct 2023 15:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WeLre51z"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1c7373cff01so49302125ad.1
-        for <iwd@lists.linux.dev>; Tue, 10 Oct 2023 06:57:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZRHsT8zr"
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3ae65e8eb45so4796364b6e.1
+        for <iwd@lists.linux.dev>; Wed, 11 Oct 2023 08:24:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696946228; x=1697551028; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3pxCFOGBQ6k2XnK8vVNfmg3MqVePjRgbxQ5V2oT2ivg=;
-        b=WeLre51zz/bu2sX38d9UggcagQ0PzAredqFDeUVmbIdko1nZ+te+OUzbFB54cdW6jR
-         iM3WRwLVJnf9VQfaK8NKsx6JL+qUQ5dr0LqybaSMbvkhr4EbC5bMUJHoSlLgpJ9mBfj4
-         HpQOE4QPN2vswIHivDh/FvYl91ACsiZxnQ86FKsLH4XCoOol5ApdYMni3Th/Zq6Z7Cuv
-         FrPQo2wPzbsw1YkfIFfuydJhVDNtW7+ZLdIuzGxhU2AG9jcML3RxEwkCmXmuWc7u0kbu
-         +k+e6XE4rDXEiBYJ0e/nSfOKvYj4oRHmHNBOzN8UggglIrrwSMkE7x9fIaOQwnQI12kV
-         Osxg==
+        d=gmail.com; s=20230601; t=1697037848; x=1697642648; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eawZm7MU/z3EF7zMnwN8grFH0ewPiJig55sWlcJslc4=;
+        b=ZRHsT8zrR4DYRA7tRhEE3e2FDJKJJUYuUkXhBoCOIjP9O+o+l11MZ2RcG2E+VBDiAE
+         kdH0wDu3Dqc5wxjypjpsMAr9SScsPBYgrmpoMI2X3J4bTV0wqnQ6GAGA2mXdQiLdlviT
+         Tlm2FiBPEUD7gYYdNf3CjXxeHuMny1xFjIf5xGjZytwgYZdgQCsNAqUGZalSlzg/aQq6
+         JgEeM4PK8B/ffq1JHKCztLJR9Zz+xi1SgjK4GdO+t2ZJ2IZsqW5AP/i7+wR7YuxQof2H
+         YQZp37G3WIXmFtJHmRQk+dDdFhvJ92GjADzWvZmy6RmZGYXCQ8DpprWd3IibI83C58ri
+         onMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696946228; x=1697551028;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3pxCFOGBQ6k2XnK8vVNfmg3MqVePjRgbxQ5V2oT2ivg=;
-        b=xK/w7FM842qEMQY0FFcAsv966StyB3yIwJr50rXu1mN2rof78V4Q3a2q5sg9D+NYk0
-         oQENfzKgrcZSQTFcuDhfIku3DJ/XhM7euOpyTtgCGbWmLBlz38fRRCuGhFT926I5HoJ4
-         PTtDnBE9uYr6tyn5EG/SasxoX9q+7FxFnD4SrgLxifatyFnMycNqG/DoAa2vrb/fn5Ka
-         +/5mO8R8BOlOJNpO1KHE3re76kGDFtxNUA9Dgk6W29zY4EywvfLepAp0BS/Bncb1zLs0
-         Hkq7rLSeqwQo7t0BeEykdjfhqrAAJlCA77KqlFizkWYbgfAcfM4ehkBYcBp109aE/YZ0
-         85dQ==
-X-Gm-Message-State: AOJu0YwxrobzScZTvajwOF5Ha/31Vt1XhGJj3lsP5ilB+IqLikXoXBqu
-	efPcobt8cBr5x3aR5MkP7/4glwrq+hY=
-X-Google-Smtp-Source: AGHT+IG6ajOzM6sXlhH3DRmf5xAd+enlevQja1+k8Mj2ITEtNDzwe36aku4CTYh2T3KSylmOo4tvfA==
-X-Received: by 2002:a17:902:6505:b0:1c9:b57c:f269 with SMTP id b5-20020a170902650500b001c9b57cf269mr1781160plk.32.1696946228254;
-        Tue, 10 Oct 2023 06:57:08 -0700 (PDT)
-Received: from localhost.localdomain ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id b10-20020a170903228a00b001b03a1a3151sm11830364plh.70.2023.10.10.06.57.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 06:57:08 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/4] eap-pwd: fix usage of compressed points (after ELL is fixed)
-Date: Tue, 10 Oct 2023 06:57:03 -0700
-Message-Id: <20231010135704.198723-3-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231010135704.198723-1-prestwoj@gmail.com>
-References: <20231010135704.198723-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1697037848; x=1697642648;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eawZm7MU/z3EF7zMnwN8grFH0ewPiJig55sWlcJslc4=;
+        b=uU2mydkpXdThTslFF96aa8BYylXesb9pVqDdUggx0eQAY2wgiquIBY4zp+REqT7g2v
+         O3iFuteuSaoOuNjqb6Q6NIJISgY3poAeY8pRXNmBPyxLN3nTS033m/cZvCcKHWV1ogzb
+         Ht4SG0Z3Ncd4eJqK/NsHOBe3dM5KngdplDF4nayQbUodt3Gcs2pobbN4PkJUcC0UojKM
+         2JmZf933QvdIjmYhMYrI2Wd40CpcFftl3r6/F1ZkLB9258nTclXUxHM8HAM9m4HRyONJ
+         TXwpmnnT/O2ijIngcKM0MLQCXAi7rNpBunzKl7mmGohj99pjRR5fS3EHaBK5dd5rHqgd
+         0mKg==
+X-Gm-Message-State: AOJu0YydcugGsq+fIDiJcn6lIEmjYTz5NUKiouNGnYksyWQx1q4hipyN
+	PJXH41tphAzPVMtyEZgsM/w=
+X-Google-Smtp-Source: AGHT+IF8CB0wGFLVql6s2OhG5kmx5JHzsKJHGjzxp79EJJ3Yw/xTeAxS7Wk0uSEpvXcdejxmXvTq3w==
+X-Received: by 2002:a05:6808:f8c:b0:3a4:225f:a15b with SMTP id o12-20020a0568080f8c00b003a4225fa15bmr26898617oiw.31.1697037848626;
+        Wed, 11 Oct 2023 08:24:08 -0700 (PDT)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id s8-20020a05680810c800b003a9a2362f66sm164ois.16.2023.10.11.08.24.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Oct 2023 08:24:08 -0700 (PDT)
+Message-ID: <00639fc2-662c-4641-89c7-7696d88b610b@gmail.com>
+Date: Wed, 11 Oct 2023 10:24:07 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] unit: add to test-dpp to expose ASN1 point conversion
+ bug
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20231010135704.198723-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20231010135704.198723-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-EAP-PWD was incorrectly computing the PWE but due to the also
-incorrect logic in ELL the point converted correctly. This is
-being fixed, so both places need the reverse logic.
+Hi James,
 
-Also added a big comment explaining why this is, and how
-l_ecc_point_from_data behaves since its somewhat confusing since
-EAP-PWD expects the pwd-seed to be compared to the actual Y
-coordinate (which is handled automatically by ELL).
----
- src/eap-pwd.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+On 10/10/23 08:57, James Prestwood wrote:
+> Add a test to show the incorrect ASN1 conversion to and from points.
+> This was due to the check if Y is odd/even being inverted which
+> incorrectly prefixes the X coordinate with the wrong byte.
+> 
+> The test itself was not fully correct because it was using compliant
+> points rather than full points, and the spec contains the entire
+> Y coordinate so the full point should be used.
+> 
+> This patch also adds ASN1 conversions to validate that
+> dpp_point_from_asn1 and dpp_point_to_asn1 work properly.
+> ---
+>   unit/test-dpp.c | 44 +++++++++++++++++++++++++++++++-------------
+>   1 file changed, 31 insertions(+), 13 deletions(-)
+> 
 
-diff --git a/src/eap-pwd.c b/src/eap-pwd.c
-index cd6684e7..5aa51668 100644
---- a/src/eap-pwd.c
-+++ b/src/eap-pwd.c
-@@ -320,7 +320,27 @@ static void eap_pwd_handle_id(struct eap_state *eap,
- 				strlen("EAP-pwd Hunting And Pecking"),
- 				pwd_value, nbytes);
- 
--		if (!(pwd_seed[31] & 1))
-+		/*
-+		 * The RFC requires the point be solved unambiguously (since
-+		 * solving for Y results in two solutions). The correct Y value
-+		 * is chosen based on the LSB of the pwd-seed:
-+		 *
-+		 *     if (LSB(y) == LSB(pwd-seed))
-+		 *     then
-+		 *         PWE = (x, y)
-+		 *     else
-+		 *         PWE = (x, p-y)
-+		 *
-+		 * The ELL API (somewhat hidden from view here) automatically
-+		 * performs a subtraction (P - Y) when:
-+		 *     - Y is even and BIT1
-+		 *     - Y is odd and BIT0
-+		 *
-+		 * So we choose the point type which matches the parity of
-+		 * pwd-seed. This means a subtraction will be performed (P - Y)
-+		 * if the parity of pwd-seed and the computed Y do not match.
-+		 */
-+		if (pwd_seed[31] & 1)
- 			pwe = l_ecc_point_from_data(pwd->curve,
- 					L_ECC_POINT_TYPE_COMPRESSED_BIT1,
- 					pwd_value, nbytes);
--- 
-2.25.1
+All applied, thanks.
+
+Regards,
+-Denis
 
