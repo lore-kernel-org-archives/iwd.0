@@ -1,53 +1,53 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A553B7BD
-	for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 20:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD58E3CCFA
+	for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 20:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IJcnP39Q"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1c77449a6daso11802355ad.0
-        for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 13:02:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mrCK5tzt"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1c888b3a25aso11423395ad.0
+        for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 13:02:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697140933; x=1697745733; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1697140934; x=1697745734; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8PAYVwyyHw0vjdAKxptwWDRnv6J4jNgoZT/HKqZKxIA=;
-        b=IJcnP39Qc0jNytitYD+XYCG79S8hzDmefEbfNr2WX074AUWQ+V60lOUrdP/++ZYiI4
-         jAbmGEwfVV8zxSY9Ra7ZnFLTJYqR3JUHISmEAmZFRuMra+norNy5R0FAe51oqubTXiLR
-         yPEkCSBdKrH5QPAX0jmgyLDleguuQtMvgM7AKijz4ZJe4W0EDyiBlD83FX++DyEtdUZo
-         z8/zdmuHc5/ySIQ4/t5Uf5duHmTLfcNbrAGPEhiNWzTShZH/1q4oYuvwQR7luIJtbQf+
-         IkaYVK2vVliZ4rhqOu90KwbFUcAPAboxLqfdZ2dKdVBmtuheBAL809K0Yvz5s15dQUfw
-         3xWQ==
+        bh=FI6vQkbm1YleX32UbYwJAFA+9rTPUOIkcO9JSVeDk70=;
+        b=mrCK5tztqlkFhWXYdx4lBM3l4/YD/69CTB+BN1HbnAs4TWtvuUl0u7J10/YRJYPeB3
+         +Ho/PBIOYWOK1VwtVUFxdUjzzk4ko6XlFJUj6aUj6qeB1AUE6RRli1deCdCPi+n9n5X2
+         Fbo17rkjF2+IMTMIGet7RbGJdReifqLtTFmXGB2huDfqcyK441KRjJGyCsu1GoWGlzGi
+         s3c82bCzUa3tKF4g8gmLaXuqI1G/72An71q5mND03c4hFmmz/lqukEt5oV01KfYeP/bV
+         xLru3jhXd6kL56QV0vGxGicPTBfe9TxJOoBtwN5gjGj9S5LXOn2/PUoLXdKgm5TjwhTd
+         gGDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697140933; x=1697745733;
+        d=1e100.net; s=20230601; t=1697140934; x=1697745734;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8PAYVwyyHw0vjdAKxptwWDRnv6J4jNgoZT/HKqZKxIA=;
-        b=dmT7ooBUTpCmc0l0AUbM0WGb0feIBkx2gQQEzmjUb7/ywv66sX01801LvtGltpWH0s
-         4jBg0ca5tJXwPbtqGI4csSrOUHZFJceO43MpWIqIjTL3W/ydDB0B5M0tcdr/d3jvMBnn
-         ui0Ii2lAXPLpHKGA/EMWn5ld5iUYYhjw5z5YuObYXd2CmKrrkglLn0b6JFFf3AZap7ed
-         aOl+20Fn69jXlNG3vYO47kUyY3+hiG6JSz2UaW82EFKg5DSMtp0ctIT0RJBOugTPtqBa
-         /gqw/IJnZ0A9u4MqaZxrsN4J9zwECO2khu9gyTtagytZmyPbyC9a9oI/Ps34uudhZ5qY
-         /aZQ==
-X-Gm-Message-State: AOJu0YyX5pdaU3jIVXtf6iS563kVKgEpvSUrBSoHcqQWYbP1ytl8UbI4
-	6snV+1pco4jhMlSzBsvMM5JlPH8hjWE=
-X-Google-Smtp-Source: AGHT+IHkTdQFfsatNOD7IRJAT6hVVQSZvk/RcBA6YxGjamKNjZd1scg8Z4m9FFiORFaUu2c2CHxAug==
-X-Received: by 2002:a17:902:ea09:b0:1c5:d747:a124 with SMTP id s9-20020a170902ea0900b001c5d747a124mr32966528plg.9.1697140932981;
-        Thu, 12 Oct 2023 13:02:12 -0700 (PDT)
+        bh=FI6vQkbm1YleX32UbYwJAFA+9rTPUOIkcO9JSVeDk70=;
+        b=uzS8RBGkSvZTYY4iQr29IGv/kl0vEdWNIXClfT8MFmcbZCDcniC/Aq2e9kX3N4hcDa
+         4ogR48biQWDywGFKSgq3k1NzLsBxQCf5LnP2emk7+9N2JLUJcXuqvb81fq3+pPoJdjsk
+         mHyt9y/JUW44hOlgJuXlzUM81FAxVapuManle305ciUO8w1BQiZH0hfvmNJoVPcygmT5
+         bs2zvwoYHB/ThblYs62iWJ4+uO87g7uxFDWctwHBpGNuwKiLBbRFfmG2ngCKjMCn3n0v
+         kiFKi/hI41QfIe1Om0VdaNQk9NvYHKWmWaasAx/h0PoNarBYqbuZY4nmPKgsbxjLJoGe
+         dIwg==
+X-Gm-Message-State: AOJu0YxYAGGj5Vp0EFFwjiTEVb2bC+2arsx4kMvbMRWz6ZuZrGs6fzFz
+	qeBeYx99pZYtAVQGBRo4b8wl8ctt1Q0=
+X-Google-Smtp-Source: AGHT+IFOFEb5R0oz/IlviQQhHxBbPAhs2cd1wM4gkF5GJTtgWyNC4H2E8QsvqZMXIvx+mmbzFS0PWQ==
+X-Received: by 2002:a17:902:8544:b0:1b9:e972:134d with SMTP id d4-20020a170902854400b001b9e972134dmr18552602plo.3.1697140933706;
+        Thu, 12 Oct 2023 13:02:13 -0700 (PDT)
 Received: from localhost.localdomain (h67-204-152-76.bendor.broadband.dynamic.tds.net. [67.204.152.76])
-        by smtp.gmail.com with ESMTPSA id l4-20020a170902f68400b001c727d3ea6bsm2388057plg.74.2023.10.12.13.02.12
+        by smtp.gmail.com with ESMTPSA id l4-20020a170902f68400b001c727d3ea6bsm2388057plg.74.2023.10.12.13.02.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 13:02:12 -0700 (PDT)
+        Thu, 12 Oct 2023 13:02:13 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 20/21] auto-t: add APIs for PKEX
-Date: Thu, 12 Oct 2023 13:01:49 -0700
-Message-Id: <20231012200150.338401-21-prestwoj@gmail.com>
+Subject: [PATCH 21/21] auto-t: add DPP PKEX tests
+Date: Thu, 12 Oct 2023 13:01:50 -0700
+Message-Id: <20231012200150.338401-22-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231012200150.338401-1-prestwoj@gmail.com>
 References: <20231012200150.338401-1-prestwoj@gmail.com>
@@ -59,148 +59,190 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Also added some sanity checks to the existing DPP APIs to make
-sure started/role gets set correctly.
 ---
- autotests/util/iwd.py | 93 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 90 insertions(+), 3 deletions(-)
+ autotests/testDPP/hostapd.conf |   2 +-
+ autotests/testDPP/pkex_test.py | 150 +++++++++++++++++++++++++++++++++
+ autotests/testDPP/ssidCCMP.psk |   2 +
+ 3 files changed, 153 insertions(+), 1 deletion(-)
+ create mode 100644 autotests/testDPP/pkex_test.py
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 5fa12444..79490904 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -42,6 +42,7 @@ IWD_P2P_SERVICE_MANAGER_INTERFACE = 'net.connman.iwd.p2p.ServiceManager'
- IWD_P2P_WFD_INTERFACE =         'net.connman.iwd.p2p.Display'
- IWD_STATION_DEBUG_INTERFACE =   'net.connman.iwd.StationDebug'
- IWD_DPP_INTERFACE =             'net.connman.iwd.DeviceProvisioning'
-+IWD_DPP_PKEX_INTERFACE =        'net.connman.iwd.SharedCodeDeviceProvisioning'
+diff --git a/autotests/testDPP/hostapd.conf b/autotests/testDPP/hostapd.conf
+index 074e8228..3611933c 100644
+--- a/autotests/testDPP/hostapd.conf
++++ b/autotests/testDPP/hostapd.conf
+@@ -1,5 +1,5 @@
+ hw_mode=g
+-channel=1
++channel=6
+ ssid=ssidCCMP
  
- IWD_AGENT_MANAGER_PATH =        '/net/connman/iwd'
- IWD_TOP_LEVEL_PATH =            '/'
-@@ -299,6 +300,33 @@ class DeviceProvisioning(IWDDBusAbstract):
-     def role(self):
-         return self._properties['Role']
- 
-+class SharedCodeDeviceProvisioning(IWDDBusAbstract):
-+    _iface_name = IWD_DPP_PKEX_INTERFACE
+ wpa=2
+diff --git a/autotests/testDPP/pkex_test.py b/autotests/testDPP/pkex_test.py
+new file mode 100644
+index 00000000..e7f7ddb4
+--- /dev/null
++++ b/autotests/testDPP/pkex_test.py
+@@ -0,0 +1,150 @@
++#!/usr/bin/python3
 +
-+    def start_enrollee(self, key, identifier=None):
-+        args = {
-+            "Key": key
-+        }
++import unittest
++import sys
 +
-+        if identifier:
-+            args["Identifier"] = identifier
++sys.path.append('../util')
++from iwd import IWD
++from iwd import DeviceProvisioning
++from wpas import Wpas
++from hostapd import HostapdCLI
++from hwsim import Hwsim
++from config import ctx
 +
-+        return self._iface.StartEnrollee(args)
++class Test(unittest.TestCase):
++    def start_wpas_pkex(self, code, curve=None, **kwargs):
++        self.wpas.dpp_bootstrap_gen(type='pkex', curve=curve)
++        self.wpas.dpp_pkex_add(code=code, **kwargs)
++        if kwargs.get('role', 'configurator') == 'configurator':
++            self.wpas.dpp_configurator_create()
++            self.wpas.dpp_listen(2437)
 +
-+    def start_configurator(self):
-+        return self._iface.StartConfigurator()
++    def test_pkex_iwd_as_enrollee(self):
++        self.start_wpas_pkex('secret123', identifier="test")
 +
-+    def stop(self):
-+        self._iface.Stop()
++        self.device.dpp_pkex_enroll(key='secret123', identifier="test")
 +
-+    @property
-+    def started(self):
-+        return self._properties['Started']
++        self.wpas.wait_for_event("DPP-AUTH-SUCCESS")
 +
-+    @property
-+    def role(self):
-+        return self._properties['Role']
++    def test_pkex_iwd_as_enrollee_retransmit(self):
++        self.rule_reveal_req.enabled = True
 +
- class AccessPointDevice(IWDDBusAbstract):
-     '''
-         Class represents net.connman.iwd.AccessPoint
-@@ -375,6 +403,7 @@ class Device(IWDDBusAbstract):
-         self._station_props = None
-         self._station_debug_obj = None
-         self._dpp_obj = None
-+        self._sc_dpp_obj = None
-         self._ap_obj = None
- 
-         IWDDBusAbstract.__init__(self, *args, **kwargs)
-@@ -407,6 +436,17 @@ class Device(IWDDBusAbstract):
- 
-         return self._dpp_obj
- 
-+    @property
-+    def _sc_device_provisioning(self):
-+        if self._properties['Mode'] != 'station':
-+            self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
++        self.start_wpas_pkex('secret123', identifier="test")
 +
-+        if self._sc_dpp_obj is None:
-+            self._sc_dpp_obj = SharedCodeDeviceProvisioning(
-+                                            object_path=self._object_path,
-+                                            namespace=self._namespace)
-+        return self._sc_dpp_obj
++        self.device.dpp_pkex_enroll(key='secret123', identifier="test")
 +
-     @property
-     def _station_debug(self):
-         if self._properties['Mode'] != 'station':
-@@ -774,13 +814,60 @@ class Device(IWDDBusAbstract):
-         self._station_debug.wait_for_event(event, timeout)
- 
-     def dpp_start_enrollee(self):
--        return self._device_provisioning.start_enrollee()
-+        ret = self._device_provisioning.start_enrollee()
++        self.wpas.wait_for_event("DPP-AUTH-SUCCESS")
 +
-+        condition = 'obj.started == True'
-+        IWD._wait_for_object_condition(self._device_provisioning, condition)
-+        condition = 'obj.role == "enrollee"'
-+        IWD._wait_for_object_condition(self._device_provisioning, condition)
++    def test_pkex_unsupported_version(self):
++        self.start_wpas_pkex('secret123', identifier="test", version=2)
 +
-+        return ret
- 
-     def dpp_start_configurator(self, uri=None):
--        return self._device_provisioning.start_configurator(uri)
-+        ret = self._device_provisioning.start_configurator(uri)
++        self.device.dpp_pkex_enroll(key='secret123', identifier="test")
 +
-+        condition = 'obj.started == True'
-+        IWD._wait_for_object_condition(self._device_provisioning, condition)
-+        condition = 'obj.role == "configurator"'
-+        IWD._wait_for_object_condition(self._device_provisioning, condition)
++        with self.assertRaises(TimeoutError):
++            self.wpas.wait_for_event("DPP-AUTH-SUCCESS")
 +
-+        return ret
++    def test_pkex_iwd_as_configurator(self):
++        self.hapd.reload()
++        self.hapd.wait_for_event('AP-ENABLED')
 +
-+    def dpp_pkex_enroll(self, *args, **kwargs):
-+        ret = self._sc_device_provisioning.start_enrollee(*args, **kwargs)
++        IWD.copy_to_storage('ssidCCMP.psk')
++        self.device.autoconnect = True
 +
-+        condition = 'obj.started == True'
-+        IWD._wait_for_object_condition(self._sc_device_provisioning, condition)
-+        condition = 'obj.role == "enrollee"'
-+        IWD._wait_for_object_condition(self._sc_device_provisioning, condition)
++        condition = 'obj.state == DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
 +
-+        return ret
++        self.start_wpas_pkex('secret123', identifier="test", initiator=True, role='enrollee')
 +
-+    def dpp_pkex_configure(self):
-+        ret = self._sc_device_provisioning.start_configurator()
++        self.device.dpp_pkex_configure()
 +
-+        condition = 'obj.started == True'
-+        IWD._wait_for_object_condition(self._sc_device_provisioning, condition)
-+        condition = 'obj.role == "configurator"'
-+        IWD._wait_for_object_condition(self._sc_device_provisioning, condition)
++        self.wpas.wait_for_event("DPP-AUTH-SUCCESS")
++        self.wpas.wait_for_event("DPP-CONF-RECEIVED")
 +
-+        return ret
++    def test_pkex_iwd_as_configurator_retransmit(self):
++        self.rule_xchg_resp.enabled = True
++        self.rule_reveal_resp.enabled = True
++        self.hapd.reload()
++        self.hapd.wait_for_event('AP-ENABLED')
 +
-+    def dpp_pkex_stop(self):
-+        ret = self._sc_device_provisioning.stop()
++        IWD.copy_to_storage('ssidCCMP.psk')
++        self.device.autoconnect = True
 +
-+        condition = 'obj.started == False'
-+        IWD._wait_for_object_condition(self._sc_device_provisioning, condition)
++        condition = 'obj.state == DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
 +
-+        return ret
- 
-     def dpp_stop(self):
--        return self._device_provisioning.stop()
-+        ret = self._device_provisioning.stop()
++        self.start_wpas_pkex('secret123', identifier="test", initiator=True, role='enrollee')
 +
-+        condition = 'obj.started == False'
-+        IWD._wait_for_object_condition(self._device_provisioning, condition)
++        self.device.dpp_pkex_configure()
 +
-+        return ret
- 
-     def __str__(self, prefix = ''):
-         s = prefix + 'Device: ' + self.device_path + '\n'\
++        self.wpas.wait_for_event("DPP-AUTH-SUCCESS")
++        self.wpas.wait_for_event("DPP-CONF-RECEIVED")
++
++    def test_pkex_iwd_as_configurator_bad_group(self):
++        self.hapd.reload()
++        self.hapd.wait_for_event('AP-ENABLED')
++
++        IWD.copy_to_storage('ssidCCMP.psk')
++        self.device.autoconnect = True
++
++        condition = 'obj.state == DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
++
++        self.start_wpas_pkex('secret123', identifier="test", initiator=True, role='enrollee', curve='P-384')
++
++        self.device.dpp_pkex_configure()
++
++        self.wpas.wait_for_event(f"DPP-RX src={self.device.address} freq=2437 type=8")
++        self.wpas.wait_for_event("DPP-FAIL")
++
++    def setUp(self):
++        self.wpas = Wpas('wpas.conf')
++        self.wd = IWD(True)
++        self.device = self.wd.list_devices(1)[0]
++        self.hapd = HostapdCLI('hostapd.conf')
++        self.hapd.disable()
++        self.hwsim = Hwsim()
++
++        self.rule_xchg_resp = self.hwsim.rules.create()
++        self.rule_xchg_resp.prefix = 'd0'
++        self.rule_xchg_resp.match_offset = 24
++        self.rule_xchg_resp.match = '04 09 50 6f 9a 1a 01 08'
++        self.rule_xchg_resp.match_times = 1
++        self.rule_xchg_resp.drop = True
++
++        self.rule_reveal_resp = self.hwsim.rules.create()
++        self.rule_reveal_resp.prefix = 'd0'
++        self.rule_reveal_resp.match_offset = 24
++        self.rule_reveal_resp.match = '04 09 50 6f 9a 1a 01 0a'
++        self.rule_reveal_resp.match_times = 1
++        self.rule_reveal_resp.drop = True
++
++        self.rule_reveal_req = self.hwsim.rules.create()
++        self.rule_reveal_req.prefix = 'd0'
++        self.rule_reveal_req.match_offset = 24
++        self.rule_reveal_req.match = '04 09 50 6f 9a 1a 01 09'
++        self.rule_reveal_req.match_times = 1
++        self.rule_reveal_req.drop = True
++
++    def tearDown(self):
++        self.device.disconnect()
++        self.device.dpp_stop()
++        self.wpas.dpp_configurator_remove()
++        self.wpas.clean_up()
++
++        self.wd = None
++        self.device = None
++        self.wpas = None
++        self.hapd = None
++        self.rule_xchg_resp = None
++        IWD.clear_storage()
++
++    @classmethod
++    def setUpClass(cls):
++        pass
++
++    @classmethod
++    def tearDownClass(cls):
++        pass
++
++if __name__ == '__main__':
++    unittest.main(exit=True)
+\ No newline at end of file
+diff --git a/autotests/testDPP/ssidCCMP.psk b/autotests/testDPP/ssidCCMP.psk
+index abafdb66..156cbec6 100644
+--- a/autotests/testDPP/ssidCCMP.psk
++++ b/autotests/testDPP/ssidCCMP.psk
+@@ -1,2 +1,4 @@
+ [Security]
+ Passphrase=secret123
++DeviceProvisioningSharedCode=secret123
++DeviceProvisioningIdentifier=test
 -- 
 2.25.1
 
