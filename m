@@ -1,53 +1,53 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4413C6B0
-	for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 20:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BEEF3C6B1
+	for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 20:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UgIdT4Ul"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1c9b95943beso12148535ad.1
-        for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 13:02:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fe6vQyB0"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1c9bca1d96cso11655435ad.3
+        for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 13:02:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697140924; x=1697745724; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1697140925; x=1697745725; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2rvPDOc+1rLHUCoKJx1s6sX8mdBD7w+IcaesF6MY8tY=;
-        b=UgIdT4UlRYgao8tuaUY0Tm8bB7G2IOCkZ83p5ahPemtztYORTM+Ukk/6XLgUiOqecZ
-         eqfg4rX9z0CJLl42xRMGs/pPvxyDLXnX0F9vv89V5sX6EsQ6Ig6PdS0hb7dNjV66CAc3
-         ERrGCsY9oQdRXpOyOr1zH0+xpGGnf9wiQmzO0bbI+AobfyCgAO4E8/kc7W5Vva/1zZoC
-         2G60aZnL22l+3UX/yQAwYZ0Du+ICbYEHhtJde+Ttrnt/MYXX1ianus2MkQltXtsAaFcq
-         Kdhu0661N9QmQIf5Ur2EU9mXgOgNeaVJIXh3Xn4CA6UcH/Pc7ubhhf3ln5lshdalOeYm
-         FLUQ==
+        bh=JRAryhIyB2TW+isH4eRZQPeCxi6k0E1U6/E2eLVn3Jw=;
+        b=Fe6vQyB0VvRdUgIP6hPQ/tgqnzHPhg7ZcNCjnwGdhDMeKpv5fWB/58L2z3twNTGgH7
+         BRNrOBr1bX7SKfjGhmuEagtJRb1fcWrjIMBNYovQxiTETA8OOvljn4pkSRCLQkH4uXiE
+         BtJp49VfzM5bluYnQz5Vbrbbzt5USm+sg7Q2jyeyq41EENfsrR/1SwGT0nGGVwDND8T5
+         NQEf7Hn2Y2rwv7e7xzzsBGz4h+rlDXkUDZi0vp5Wmjl0TnQ/SxwTbCjJ6pgl0GqOzoUJ
+         EHlOCmLyVIyb5cgkgclGp9gN5XUKNVaxcfRQt1seoo1rjXWz7Yqr3yjMnpmeTJYnKLid
+         xUIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697140924; x=1697745724;
+        d=1e100.net; s=20230601; t=1697140925; x=1697745725;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2rvPDOc+1rLHUCoKJx1s6sX8mdBD7w+IcaesF6MY8tY=;
-        b=OCrW1MBwu9DpDpAEDP+qmWejgBloU5PcGyPS/BHNXEWAydsB7kzHx/QXR6nEEBJjCJ
-         1LjDZa59T0RsqX4ys9dmAcrYRO+S8QSjV57MvsgSuGvPAuP4UZCc6uyVN7HSnEYdzecq
-         zQnvdzArt52r1u2XmmsbVdGqTMGcUltntVqRoHfMZ8Z1gllCXqXiiRYoBP6uHcnKP1mW
-         bI8P/zyMgiLBBfDnPdIJVSPcpdpCZV+T5dJ7O1XJ37u4yJVXXZzuCnBuJ5hw/99d7Rn4
-         Tdyr3NYFPgp974BRwZqlrRu0gCDP/YbTfaC35/rnelo6v5b78M1x9aFqsubbM/Ag8hKh
-         beLg==
-X-Gm-Message-State: AOJu0YwUTVeKIQ9KPYX8R2TngtWlZ0VycInIrTSosmxAl8w9tc74/BoQ
-	liNnC+1B2qy59R6DOiSowFW58As6qAo=
-X-Google-Smtp-Source: AGHT+IHhlnIJ52+s4zXZOPKwaxNrjCo8LDR6JtBHBf7KWn3MpRqMYoP6e80gDF+57pBUX7ykvxPvhw==
-X-Received: by 2002:a17:902:ea0a:b0:1bb:598a:14e5 with SMTP id s10-20020a170902ea0a00b001bb598a14e5mr32702166plg.43.1697140923608;
-        Thu, 12 Oct 2023 13:02:03 -0700 (PDT)
+        bh=JRAryhIyB2TW+isH4eRZQPeCxi6k0E1U6/E2eLVn3Jw=;
+        b=xKtnoUmG2eBO8GdXJ+yU0wsRUDAK1gW0Rl/hqJ75jgr1YvNy3ysyAAk/iEa3vFKZFQ
+         BWkymkyNr9zRwnIuxKIkyiFdxjW+ddn7Mdfy0Dg7GKMN2VQoxwSjL073w97xuWkwuohn
+         91+8Kd8+pXyXICepNY/RTbt4JHZomtixYOnZgqcyz+z5v0Owdql5U5TkQIK+2JBtmzI/
+         7cfmzN2F+Sk7S+OdI45tI+GicTJbjfR3hmOuI7CaXPpxplhoPceacRPJ8gKSq9GQN3fU
+         TyV7v8Cu3ppWO2n1him314KXTLwkitJGlIRJEHP5r+adUiAMArLWwh9EoOJF4ytwY0E+
+         vlXA==
+X-Gm-Message-State: AOJu0YwUKOyZgHiMcDQk7fYiS1pAicPntH7ai2G928qS6k+MOcH08jVH
+	8dwyr4o3xfyInle+Jv3iBJ+/O3e/tRA=
+X-Google-Smtp-Source: AGHT+IH9pBQnX5YxdmPzS5r2ud3dJvd1LPBOSIclBStSOE8kSrZeX+2kXhnP56xibMYKsGh/T0BAqA==
+X-Received: by 2002:a17:902:9b8e:b0:1c6:2780:3adc with SMTP id y14-20020a1709029b8e00b001c627803adcmr19702037plp.24.1697140925238;
+        Thu, 12 Oct 2023 13:02:05 -0700 (PDT)
 Received: from localhost.localdomain (h67-204-152-76.bendor.broadband.dynamic.tds.net. [67.204.152.76])
-        by smtp.gmail.com with ESMTPSA id l4-20020a170902f68400b001c727d3ea6bsm2388057plg.74.2023.10.12.13.02.03
+        by smtp.gmail.com with ESMTPSA id l4-20020a170902f68400b001c727d3ea6bsm2388057plg.74.2023.10.12.13.02.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 13:02:03 -0700 (PDT)
+        Thu, 12 Oct 2023 13:02:04 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 08/21] dpp-util: allow mutual auth in dpp_derive_ke
-Date: Thu, 12 Oct 2023 13:01:37 -0700
-Message-Id: <20231012200150.338401-9-prestwoj@gmail.com>
+Subject: [PATCH 10/21] offchannel: add support to issue multiple offchannel requests
+Date: Thu, 12 Oct 2023 13:01:39 -0700
+Message-Id: <20231012200150.338401-11-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231012200150.338401-1-prestwoj@gmail.com>
 References: <20231012200150.338401-1-prestwoj@gmail.com>
@@ -59,86 +59,129 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The Ke derivation requires an additional "L.x" value when
-mutual authentication is used.
----
- src/dpp-util.c | 10 +++++++---
- src/dpp-util.h |  2 +-
- src/dpp.c      |  4 ++--
- 3 files changed, 10 insertions(+), 6 deletions(-)
+There was nothing which prevented this, but due to the behavior of
+some drivers multiple offchannel requests on the same channel
+resulted in the second request never starting and eventually timing
+out. This is because some drivers combine offchannel requests if
+they are on the same channel and this ultimately results in the
+netlink ACK coming after the ROC started event. This patch fixes
+some logic to allow for this case.
 
-diff --git a/src/dpp-util.c b/src/dpp-util.c
-index d3171d02..0406a4dc 100644
---- a/src/dpp-util.c
-+++ b/src/dpp-util.c
-@@ -681,12 +681,13 @@ free_n:
+The motivation to support this is so modules can start offchannel
+work items for short durations and wait for a response, if a frame
+is received the offchannel request can be canceled/restarted for
+a longer duration.
+
+This could also be done instead by using a long duration initially
+and an extra timer to cancel, but its more convenient if offchannel
+supports this natively. In addition, this driver quirk should be
+supported regardless (e.g. if two IWD modules happen to issue ROC's
+on the same channel).
+
+Furthermore, the offchannel module was only looking up requests by
+wdev_id which could result in the wrong request being found.
+Instead the request should be looked up by both wdev_id and cookie
+(when possible), or the ID in the case of canceling.
+---
+ src/offchannel.c | 55 ++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 48 insertions(+), 7 deletions(-)
+
+diff --git a/src/offchannel.c b/src/offchannel.c
+index b9cdc117..6a705092 100644
+--- a/src/offchannel.c
++++ b/src/offchannel.c
+@@ -54,15 +54,34 @@ struct offchannel_info {
+ 	bool needs_cancel : 1;
+ };
  
- bool dpp_derive_ke(const uint8_t *i_nonce, const uint8_t *r_nonce,
- 				struct l_ecc_scalar *m, struct l_ecc_scalar *n,
--				void *ke)
-+				struct l_ecc_point *l, void *ke)
- {
- 	uint8_t nonces[32 + 32];
- 	size_t nonce_len;
- 	uint64_t mx_bytes[L_ECC_MAX_DIGITS];
- 	uint64_t nx_bytes[L_ECC_MAX_DIGITS];
-+	uint64_t lx_bytes[L_ECC_MAX_DIGITS];
- 	uint64_t bk[L_ECC_MAX_DIGITS];
- 	ssize_t key_len;
- 	enum l_checksum_type sha;
-@@ -697,12 +698,15 @@ bool dpp_derive_ke(const uint8_t *i_nonce, const uint8_t *r_nonce,
- 	nonce_len = dpp_nonce_len_from_key_len(key_len);
- 	sha = dpp_sha_from_key_len(key_len);
- 
-+	if (l)
-+		l_ecc_point_get_x(l, lx_bytes, key_len * 2);
++struct match_data {
++	uint64_t wdev_id;
++	uint64_t cookie;
++};
 +
- 	memcpy(nonces, i_nonce, nonce_len);
- 	memcpy(nonces + nonce_len, r_nonce, nonce_len);
+ static struct l_genl_family *nl80211;
+ static struct l_queue *offchannel_list;
  
- 	/* bk = HKDF-Extract(I-nonce | R-nonce, M.x | N.x [ | L.x]) */
--	if (!hkdf_extract(sha, nonces, nonce_len * 2, 2, bk, mx_bytes,
--			key_len, nx_bytes, key_len))
-+	if (!hkdf_extract(sha, nonces, nonce_len * 2, 3, bk, mx_bytes,
-+			key_len, nx_bytes, key_len, lx_bytes, l ? key_len : 0))
- 		return false;
+-static bool match_wdev(const void *a, const void *user_data)
++static bool match_info(const void *a, const void *user_data)
++{
++	const struct match_data *match = user_data;
++	const struct offchannel_info *info = a;
++
++	if (match->wdev_id != info->wdev_id)
++		return false;
++
++	if (!match->cookie)
++		return true;
++
++	return match->cookie == info->roc_cookie;
++}
++
++static bool match_id(const void *a, const void *user_data)
+ {
++	const uint32_t *id = user_data;
+ 	const struct offchannel_info *info = a;
+-	const uint64_t *wdev_id = user_data;
  
- 	/* ke = HKDF-Expand(bk, "DPP Key", length) */
-diff --git a/src/dpp-util.h b/src/dpp-util.h
-index 050d66cc..96711c35 100644
---- a/src/dpp-util.h
-+++ b/src/dpp-util.h
-@@ -176,7 +176,7 @@ struct l_ecc_scalar *dpp_derive_k2(const struct l_ecc_point *i_proto_public,
- 				void *k2);
- bool dpp_derive_ke(const uint8_t *i_nonce, const uint8_t *r_nonce,
- 				struct l_ecc_scalar *m, struct l_ecc_scalar *n,
--				void *ke);
-+				struct l_ecc_point *l, void *ke);
+-	return info->wdev_id == *wdev_id;
++	return *id == info->work.id;
+ }
  
- uint8_t *dpp_point_to_asn1(const struct l_ecc_point *p, size_t *len_out);
- struct l_ecc_point *dpp_point_from_asn1(const uint8_t *asn1, size_t len);
-diff --git a/src/dpp.c b/src/dpp.c
-index bbb27ff1..fc3d5c4f 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -1807,7 +1807,7 @@ static void authenticate_request(struct dpp_sm *dpp, const uint8_t *from,
+ static void offchannel_cancel_roc(struct offchannel_info *info)
+@@ -191,7 +210,8 @@ void offchannel_cancel(uint64_t wdev_id, uint32_t id)
+ 	else if (ret == false)
+ 		goto work_done;
  
- 	l_getrandom(dpp->r_nonce, dpp->nonce_len);
- 
--	if (!dpp_derive_ke(dpp->i_nonce, dpp->r_nonce, m, n, dpp->ke))
-+	if (!dpp_derive_ke(dpp->i_nonce, dpp->r_nonce, m, n, NULL, dpp->ke))
- 		goto auth_request_failed;
- 
- 	if (!dpp_derive_r_auth(dpp->i_nonce, dpp->r_nonce, dpp->nonce_len,
-@@ -1983,7 +1983,7 @@ static void authenticate_response(struct dpp_sm *dpp, const uint8_t *from,
+-	info = l_queue_find(offchannel_list, match_wdev, &wdev_id);
++
++	info = l_queue_find(offchannel_list, match_id, &id);
+ 	if (!info)
  		return;
- 	}
  
--	if (!dpp_derive_ke(i_nonce, r_nonce, dpp->m, n, dpp->ke)) {
-+	if (!dpp_derive_ke(i_nonce, r_nonce, dpp->m, n, NULL, dpp->ke)) {
- 		l_debug("Failed to derive ke");
+@@ -246,6 +266,7 @@ work_done:
+ static void offchannel_mlme_notify(struct l_genl_msg *msg, void *user_data)
+ {
+ 	struct offchannel_info *info;
++	struct match_data match = {0};
+ 	uint64_t wdev_id;
+ 	uint64_t cookie;
+ 	uint8_t cmd;
+@@ -261,12 +282,32 @@ static void offchannel_mlme_notify(struct l_genl_msg *msg, void *user_data)
+ 					NL80211_ATTR_UNSPEC) < 0)
  		return;
- 	}
+ 
+-	info = l_queue_find(offchannel_list, match_wdev, &wdev_id);
++	match.wdev_id = wdev_id;
++	match.cookie = cookie;
++
++	info = l_queue_find(offchannel_list, match_info, &match);
++	if (!info) {
++		/* Try again without cookie */
++		match.cookie = 0;
++		info = l_queue_find(offchannel_list, match_info, &match);
++	}
++
+ 	if (!info)
+ 		return;
+ 
+-	/* ROC must have been started elsewhere, not by IWD */
+-	if (info->roc_cookie != cookie)
++	/*
++	 * If the cookie is zero this could be from the ACK callback coming out
++	 * of order which can happen when there is an ongoing offchannel request
++	 * that is canceled (but no ROC_CANCEL event yet) and another is issued
++	 * on the same frequency. Some drivers will combine these two requests
++	 * and the ACK ends up coming after the ROC started event.
++	 *
++	 * If the cookie is set but does not match, this ROC request came from
++	 * outside IWD.
++	 */
++	if (!info->roc_cookie) {
++		info->roc_cookie = cookie;
++	} else if (info->roc_cookie != cookie)
+ 		return;
+ 
+ 	switch (cmd) {
 -- 
 2.25.1
 
