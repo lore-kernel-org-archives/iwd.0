@@ -1,53 +1,53 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E053CCFA
-	for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 20:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D020D3B7BD
+	for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 20:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rts+yW+Q"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1c8a1541232so12412145ad.0
-        for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 13:02:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k0N6Kdz0"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1c9b7c234a7so12226745ad.3
+        for <iwd@lists.linux.dev>; Thu, 12 Oct 2023 13:02:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697140929; x=1697745729; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1697140930; x=1697745730; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k1mQNPSPsVlJe67kyZKXg3OtbokCYP4GCa9A0hj1t2U=;
-        b=Rts+yW+Q6lcQXeFRCuTxUkEd4cPzjeN5rty7b8tV2ni12+nSLPDKpo0Kk/Pm/wGRTe
-         hq26OXBv6Z7rhJW4WDiIBWeRTrgYqqaI27uymIahMD0K54v9FMWbHZuS81FT6Hvmcpap
-         UoJm+tS/R0adpC20uN5apDrAKf6eqkLQ7j3go/szXt7hUnA59Wn4yQwB6Any1xlJbDlQ
-         ZQ0DrYwm6yha8lXf3lGka6VWcTbZAOQvMylIZsvJebzseCO64zp6s4eLxLoB/buwoBol
-         LdQQUedTVksNghwXD3pCqbv89Ou8nU3TQ3yfXF34cmKgR2N9TZWNa2doibYmVeOSneU1
-         wQtA==
+        bh=ugoc02Q2FpoXZFBiQ5BqiLP0/t/38mCaTnl1KA/s1cs=;
+        b=k0N6Kdz0M2PKs1XJ3xMPvMLgUarGLmHALshnRNc0kIT0N36ugf1Zc3DukfpCC6w7lU
+         D5b95ebl03BAdTWkKpAuuiA2udUKhlGq2DRSRNfyPudNkSdcO22e0opwW2qpPGcB/BJ6
+         Le9AR5vnrmGiC49EmS+IxFJPteEXK1s/esS5eDTjzAEKjG1jLgAEtq6868l77U3K8x8n
+         5PMvbiFz6+4oEDBHfWIq3t+CA6rR3hugivjrYcMTRf0SNNwUe6rBZ6BvDuDn5kOZMCuS
+         +fcnQSg/btxJx3Z9a4edWjR/AmCyULQKIvHGsCfnErmT8K6esFX+yoA/s2lIl9jOtHoO
+         qe8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697140929; x=1697745729;
+        d=1e100.net; s=20230601; t=1697140930; x=1697745730;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=k1mQNPSPsVlJe67kyZKXg3OtbokCYP4GCa9A0hj1t2U=;
-        b=hRhfPm2aUbLfhOKutnYtvdFyQblCH13ZThP/iIrzX16C0sh17r6IY9l8li6MrUh3BE
-         aVhrTX9dBUSDSvs5SXYE+yf9ywkyAJd5cZAtH38vtEhTG7r9nzDJQXJPYkrwcs82FAZz
-         BoC7dAPnP9M6BR9qz9Lzi0EZ2xxzk3NbYObRfrKMLLmrAP0U9MJyhcauQcUkZ07DrNNo
-         q2KRllmRHDFT702aCCVnMnP+WHgPaBceZvsn20YurP9ge7hDlywa4cd41gaC7341z+9v
-         a80hMf1RzLqiK3dPo+ZXqHkEWmxbw3z3T7pBZYtdk3ybCjT5muYvZOcmcj5bhXdXcsAg
-         cZ9w==
-X-Gm-Message-State: AOJu0YwqzNwt989bpd6+wIWTV6wRsEXDgieP1Eu8x9hv+SqFXBMESODV
-	LK9hieln4BL/0CGpigKHdSeJDmXzDX8=
-X-Google-Smtp-Source: AGHT+IFbAobkMwiCu+AMjJw/ulbLO58hqTG7ciYHe66P2ZUzUTKDXXIqkmNXi3zmQQB9Gp26KIi2/Q==
-X-Received: by 2002:a17:903:228f:b0:1c7:1fbc:b9e7 with SMTP id b15-20020a170903228f00b001c71fbcb9e7mr29819218plh.43.1697140929160;
-        Thu, 12 Oct 2023 13:02:09 -0700 (PDT)
+        bh=ugoc02Q2FpoXZFBiQ5BqiLP0/t/38mCaTnl1KA/s1cs=;
+        b=OE7OHAl7/ATNgTpwkFCA9uNId/Kg3WyRbNz+E4EfHP4AxUnKZv2qgQoqWCwQUOsFmM
+         +aCv2FOPfnj0Y+PjW5/JJ8R0Ed9pucB6YHj59nOATTxgG+kerbl3V5Ww9qst+Mnv9HWc
+         bUXM/o31DAzY44cthndOzlqFIgK6wXNTICwA6CUnSb/WqaHb/4FVXaw7WKXFmy0Vpa8v
+         yOvYikJmsTKOZ0wNbdHFKq6UzavWjc4PB4KkBO0/zTNyA+95lQjQO6fm2OzJ1DH2brtP
+         J4r3LuqukT7FC6jKdszXcbuXRmg9/fdMvfaUW+ZTGZOmA0HUHrifzD5o4xUwLX/PDp0M
+         UABQ==
+X-Gm-Message-State: AOJu0Yw0ceF2is94dlV5ClG+7Zr9EYftLmviB2ZAFul7D+HKhHtj7fAS
+	QJIevD4ZXzTJCv1tR7hPERt1g7itc5E=
+X-Google-Smtp-Source: AGHT+IE3TAMMdDaXralKE4bKVopYGUw+RcAbv4dTpXE0o1UmanppAItmyqa0RzOTckTMPn0cSiZ/Dw==
+X-Received: by 2002:a17:903:2348:b0:1c5:fab7:70ac with SMTP id c8-20020a170903234800b001c5fab770acmr32698741plh.27.1697140930095;
+        Thu, 12 Oct 2023 13:02:10 -0700 (PDT)
 Received: from localhost.localdomain (h67-204-152-76.bendor.broadband.dynamic.tds.net. [67.204.152.76])
-        by smtp.gmail.com with ESMTPSA id l4-20020a170902f68400b001c727d3ea6bsm2388057plg.74.2023.10.12.13.02.08
+        by smtp.gmail.com with ESMTPSA id l4-20020a170902f68400b001c727d3ea6bsm2388057plg.74.2023.10.12.13.02.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 13:02:08 -0700 (PDT)
+        Thu, 12 Oct 2023 13:02:09 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 15/21] dpp: allow enrollee to be authentication initiator
-Date: Thu, 12 Oct 2023 13:01:44 -0700
-Message-Id: <20231012200150.338401-16-prestwoj@gmail.com>
+Subject: [PATCH 16/21] dbus: add SharedCodeDeviceProvisioning interface definition
+Date: Thu, 12 Oct 2023 13:01:45 -0700
+Message-Id: <20231012200150.338401-17-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231012200150.338401-1-prestwoj@gmail.com>
 References: <20231012200150.338401-1-prestwoj@gmail.com>
@@ -59,61 +59,22 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Until now IWD only supported enrollees as responders (configurators
-could do both). For PKEX it makes sense for the enrollee to be the
-initiator because configurators in the area are already on their
-operating channel and going off is inefficient. For PKEX, whoever
-initiates also initiates authentication so for this reason the
-authentication path is being opened up to allow enrollees to
-initiate.
 ---
- src/dpp.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ src/dbus.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index adfebff3..fb025ac3 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -1451,7 +1451,7 @@ static bool dpp_send_authenticate_request(struct dpp_sm *dpp)
- 	struct scan_bss *bss = station_get_connected_bss(station);
+diff --git a/src/dbus.h b/src/dbus.h
+index 00c2df57..cff64ae2 100644
+--- a/src/dbus.h
++++ b/src/dbus.h
+@@ -44,6 +44,7 @@
+ #define IWD_AP_DIAGNOSTIC_INTERFACE "net.connman.iwd.AccessPointDiagnostic"
+ #define IWD_STATION_DEBUG_INTERFACE "net.connman.iwd.StationDebug"
+ #define IWD_DPP_INTERFACE "net.connman.iwd.DeviceProvisioning"
++#define IWD_DPP_PKEX_INTERFACE "net.connman.iwd.SharedCodeDeviceProvisioning"
+ #define IWD_NETCONFIG_AGENT_INTERFACE \
+ 	"net.connman.iwd.NetworkConfigurationAgent"
  
- 	/* Got disconnected by the time the peer was discovered */
--	if (!bss) {
-+	if (dpp->role == DPP_CAPABILITY_CONFIGURATOR && !bss) {
- 		dpp_reset(dpp);
- 		return false;
- 	}
-@@ -1472,7 +1472,8 @@ static bool dpp_send_authenticate_request(struct dpp_sm *dpp)
- 				i_proto_key, dpp->key_len * 2);
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_PROTOCOL_VERSION, &version, 1);
- 
--	if (dpp->current_freq != bss->frequency) {
-+	if (dpp->role == DPP_CAPABILITY_CONFIGURATOR &&
-+					dpp->current_freq != bss->frequency) {
- 		uint8_t pair[2] = { 81,
- 				band_freq_to_channel(bss->frequency, NULL) };
- 
-@@ -1910,9 +1911,6 @@ static void authenticate_response(struct dpp_sm *dpp, const uint8_t *from,
- 	if (dpp->state != DPP_STATE_AUTHENTICATING)
- 		return;
- 
--	if (dpp->role != DPP_CAPABILITY_CONFIGURATOR)
--		return;
--
- 	if (!dpp->freqs)
- 		return;
- 
-@@ -2066,6 +2064,10 @@ static void authenticate_response(struct dpp_sm *dpp, const uint8_t *from,
- 	dpp->current_freq = dpp->new_freq;
- 
- 	dpp_send_authenticate_confirm(dpp);
-+
-+	if (dpp->role == DPP_CAPABILITY_ENROLLEE)
-+		dpp_configuration_start(dpp, from);
-+
- }
- 
- static void dpp_handle_presence_announcement(struct dpp_sm *dpp,
 -- 
 2.25.1
 
