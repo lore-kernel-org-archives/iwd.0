@@ -1,139 +1,141 @@
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from out-202.mta1.migadu.com (out-202.mta1.migadu.com [95.215.58.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157DFEDB
-	for <iwd@lists.linux.dev>; Sun, 15 Oct 2023 00:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF920107BE
+	for <iwd@lists.linux.dev>; Sun, 15 Oct 2023 19:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kazlauskas.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kazlauskas.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="dmLwgOCS"
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 83A623F63D
-	for <iwd@lists.linux.dev>; Sat, 14 Oct 2023 23:54:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1697327693;
-	bh=/9XwTWaZQ1jDbDWqn+ymw4VoAOWJabzb1X5Lqo8mlkg=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=dmLwgOCS8rZJsd19MUKb0Cjwm/tOT5mT6aQoIKPpQZHQaNolAiWn1c/ORtwNDEKgh
-	 91fyLuKFzzHT6Dxzdv9P4/LzmRNiKr7RrCUyhoJPoWX9Kmj3CLZQUhIa5Mo9cQ89IW
-	 j0mcpamxeC5c/ChZwxWrCDFUOBqC/koZBBNo86V3qrQmyu5RmUdtfRZQVL/FfTkzOB
-	 ArSsXxGOH/3fTw65IEGQkwYNC0G/Zs/otSCkpSDJhucDWiW4+cqm/KcV/in6khtQUi
-	 SScSupwNTpzkkNRDYIc3zVK99B57Dg67OLPo5SLdbJrN9ocQDMJcb0j6hHr6oQlvy/
-	 ZB2enEKTPLftQ==
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4077d3341efso5710835e9.1
-        for <iwd@lists.linux.dev>; Sat, 14 Oct 2023 16:54:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697327692; x=1697932492;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/9XwTWaZQ1jDbDWqn+ymw4VoAOWJabzb1X5Lqo8mlkg=;
-        b=JOLevhO6Gcxckvpcj53RHDS8krYoIjUOfWFzVvzPktW+YbAbDe0dxuJPMupxR3qhPO
-         SV9hVxQWIs297k6j5laqol8s5r46su4fGUD0XKIeCKFdrJQwW1L/JlkU995s9lBGUiE+
-         9YSxaAjcL3xHYjz7Pin89p+Yq5iiRw3aoDanOAisnlFtflcyUypCUcxrdx+po9GY6Ph9
-         sgr0F+x6pHz0nizFDlVHXf9h+hRN1NMlDpJKTJN1nJQxy9YauB2jJwRpTAzuppRSYLVV
-         focgAY0v2hSsPvufScWVnYKRdhgGVYJo/H34o+z6DposWY9zohtsyRPcvVOMqoVlXv5o
-         pmMg==
-X-Gm-Message-State: AOJu0Yww1ATcFsCZCGezy9bikqSNv43r1FJiEo5vcilpisTYwlhp3BOJ
-	qDYX6ICs7VXwm6kyImIDhhdAHI1PHb8fM9UxJQGrJwGcMDQ+H0vmiBoObmMs5Oeu0fvy5DYVmg2
-	daShAtO6+1OsHczqGn29Ot78ISuKfNsVxb5l//Uz6
-X-Received: by 2002:a1c:7c0a:0:b0:401:be5a:989 with SMTP id x10-20020a1c7c0a000000b00401be5a0989mr26900441wmc.23.1697327692215;
-        Sat, 14 Oct 2023 16:54:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFs1cx71yHUi+XGECqTRQkFA6ZLYMopn1I1aH8IsIndbIBsqqf1OPeK3GE570UBONMPtkAxag==
-X-Received: by 2002:a1c:7c0a:0:b0:401:be5a:989 with SMTP id x10-20020a1c7c0a000000b00401be5a0989mr26900431wmc.23.1697327691690;
-        Sat, 14 Oct 2023 16:54:51 -0700 (PDT)
-Received: from localhost ([2a01:4b00:85fd:d700:862e:f2d4:256b:89c8])
-        by smtp.gmail.com with ESMTPSA id w12-20020a05600c474c00b003fee6e170f9sm3085915wmo.45.2023.10.14.16.54.51
-        for <iwd@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Oct 2023 16:54:51 -0700 (PDT)
-From: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-To: iwd@lists.linux.dev
-Subject: [PATCH] eap-mschapv2: allow using on kernels without CRYPTO_MD4, and deprecate
-Date: Sun, 15 Oct 2023 00:54:45 +0100
-Message-Id: <20231014235445.167620-1-dimitri.ledkov@canonical.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=kazlauskas.me header.i=@kazlauskas.me header.b="k20OdzGX"
+Date: Sun, 15 Oct 2023 22:40:37 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kazlauskas.me;
+	s=key1; t=1697398840;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LMWHBCUrsous04Ih8RWcApr7McsF2cqw9VB4k4xhklk=;
+	b=k20OdzGXKJ9+fKf2UlvKDCTpFz3M6Fpws0YR26G+SLWf00BbTBo56U7NUvl/7UxL5peTFm
+	O93zKgoa1QBpIriV82v9pPTc2JX3Wwad5T9uVFnnofHxl/d7Bhgt4y+2fUpuW7IxBj50Kl
+	gNBKuUdUNr2PJsxHK91NGAheUxTgsq8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Simonas Kazlauskas <iwd.lists.linux.dev@kazlauskas.me>
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+Subject: Re: Is the data rate estimation for 5GHz channels overly pessimistic?
+Message-ID: <tkizdohkwpz4nfgjczdzltr7qhvjtcyyk6x3543dht2gmm7ssc@q7m4rq3r3sqx>
+References: <xxpypqwyk3gjrwjmpuvxqdlipkrb3fbw7augfey5ovr3lgbgul@2tbf6xw2uo3z>
+ <5780e1b2-8956-46bb-8116-b513cc564cea@gmail.com>
+ <5ff58310-c5ee-4694-821a-0c802cdedb89@gmail.com>
+ <bwuu4ra65fpfpenytgu5a6ftjpvyury4omx7ucy65cshorqskl@5ikhebki4wnk>
+ <05aedfe6-82ad-4e41-a9fa-e9f8a5619947@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="ndgvoicg47cxfhe3"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <05aedfe6-82ad-4e41-a9fa-e9f8a5619947@gmail.com>
+X-Migadu-Flow: FLOW_OUT
+
+
+--ndgvoicg47cxfhe3
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-Currently eap-mschapv2 does kernel MD4 check during init time, even
-though it is possible to use it with Password-Hash on kernels without
-MD4.
+Hey,
 
-Separately, mschapv2 is obsolete, deprecated, and removed even in
-Windows 11 22H2 [1][2]. Add an error message stating so encouraging
-migration to PEAP-TLS or EAP-TLS. Separately, warnings like these often
-don't work, thus likely need to remove this authentication method
-completely.
+Denis Kenzior wrote:
+>It may be we screwed something up with HE since hardware was still pretty 
+>rare when the feature was developed.  But we do treat RSSI values below -82 
+>as almost unusable.  Perhaps this needs to be tweaked for newer hardware.
+>
+>If you want to get your hands dirty, it should be fairly easy to 
+>modify unit/test-band.c to test what our estimate code does with your 
+>specific circumstances.
+>
+>The local HE capabilities can be found via 'iw phy', looking at what 
+>iwd prints at start, or using iwmon.  Similarly, remote capabilities 
+>can be sniffed using iwmon and running an iwd scan or 'iw scan 
+>trigger'.
+>
+>Me or James can walk you through all this if needed.
 
-IWD usage of MD4 was brought up on linux-crypto mailing list [3], upon
-my attempt to remove CRYPTO_MD4 from the kernel which is no longer used
-via crypto API by anything else.
+Thanks for offering. I have cracked open the file, and just started playing 
+around by adding a new `he_test_data` structure. Alas, I’m really hazy on what 
+I ought to be filing into the `capabilities` and `he_capabilities` fields. My 
+initial guess is something like this, based on one of the other tests around:
 
-It worries me that internet searches suggest that EDUROAM (a Wi-FI
-network spanning 106 territories) seems to still often use
-mschapv2. Thus dropping this support may leave millions of people
-without connectivity. Given how broken and isecure this authentication
-method has been since 2012, I hope that EDUROAM is migrating, or has
-migrated to P/EAP-TLS.
++/* 5GHz, 40MHz, MCS 11, NSS 1 */
++const struct he_test_data he_test_5_40mhz_mcs_5_nss_1 = {
++	.freq = BAND_FREQ_5_GHZ,
++	.rssi = -76,
++	.expected_rate = 275200000ULL,
++	.capabilities = {
++		.he_mcs_set = { HE_MCS_SET(MCS11, 1), MCS_UNSUP },
++		.he_phy_capa = { HE_PHY_CAPA(0x00) },
++		.iftypes = 1 << NETDEV_IFTYPE_STATION,
++	},
++	.he_capabilities = {
++		22, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
++		HE_PHY_CAPA(0x00), MCS_UNSUP, HE_MCS_SET(MCS11, 1)
++	},
++};
 
-[1] https://learn.microsoft.com/en-us/security-updates/securityadvisories/2012/2743314
-[2] https://learn.microsoft.com/en-us/windows/security/identity-protection/credential-guard/considerations-known-issues
-[3] https://lore.kernel.org/linux-crypto/2e52c8b4-e70a-453f-853a-1962c8167dfa@gmail.com/
----
- src/eap-mschapv2.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+This computes a rate of `25800000`, which I’m guessing corresponds to 
+25.8Mbps, perhaps? That’s fair I guess, since the only thing I really really 
+changed in there compared to the other tests is the `MCS11` (that’s supported 
+by AX201) and the `rssi`. There clearly are plenty of other fields that I 
+should be filling in here, I feel, if I wanted to accurately represent my 
+hardware.
 
-diff --git a/src/eap-mschapv2.c b/src/eap-mschapv2.c
-index ef0ce620a8..4f4739717a 100644
---- a/src/eap-mschapv2.c
-+++ b/src/eap-mschapv2.c
-@@ -437,6 +437,8 @@ static int eap_mschapv2_check_settings(struct l_settings *settings,
- 	int r = 0;
- 	size_t hash_len;
- 
-+	l_error("EAP_MSCHAPv2: Obsolete, please switch to P/EAP-TLS");
-+
- 	snprintf(setting, sizeof(setting), "%sIdentity", prefix);
- 	identity = l_settings_get_string(settings, "Security", setting);
- 
-@@ -479,8 +481,14 @@ static int eap_mschapv2_check_settings(struct l_settings *settings,
- 		}
- 
- 		return 0;
--	} else if (password)
-+	} else if (password) {
-+		if (!l_checksum_is_supported(L_CHECKSUM_MD4, false)) {
-+			l_warn("EAP_MSCHAPv2: Obsolete MD4 not found");
-+			l_warn("Please use Password-Hash instead of Password");
-+			return -EINVAL;
-+		}
- 		goto validate;
-+	}
- 
- 	secret = l_queue_find(secrets, eap_secret_info_match, setting2);
- 	if (!secret) {
-@@ -561,13 +569,6 @@ static struct eap_method eap_mschapv2 = {
- static int eap_mschapv2_init(void)
- {
- 	l_debug("");
--
--	if (!l_checksum_is_supported(L_CHECKSUM_MD4, false)) {
--		l_warn("EAP_MSCHAPv2 init: MD4 support not found, skipping");
--		l_warn("Ensure that CONFIG_CRYPTO_MD4 is enabled");
--		return -ENOTSUP;
--	}
--
- 	return eap_register_method(&eap_mschapv2);
- }
- 
--- 
-2.34.1
+I think I managed to grab the capabilities of both the AP and the client using 
+your instructions, but I’m really unclear on how to go from the output from 
+`iwmon` to fields in this struct. My best guess right now is to actually run 
+`iwd` under a gdb and place some breakpoints in the scanning code to extract 
+the capabilities. Would that make sense, or is there a better way to fill in 
+these fields?
 
+(As I’m writing this mail, I realize now that I probably want to somehow 
+specify NSS=2 for `2x2` MIMO…?)
+
+Another thing that confuses me a great deal is the fact that the scan results 
+with my APs don’t actually show any of the HE capabilities, only the HT and 
+VHT ones (see attached sample from the `iwmon` output.) I also tried scanning 
+an Android hotspot on a reasonably recent phone, and although the set of MCS 
+supported were different, the output still contains only HT and VHT 
+capabilities. I would love to attach my pcap here, but unfortunately I also 
+have no clue how to sanitize it, so I’m going to attach an excerpt from 
+`iwmon`’s output for the time being. Is this expected, or could this perhaps 
+be at least part of the problem I’m seeing? Is it possible that an AP could 
+not advertise HE capabilities at scan time, but for HE to still be used after 
+authentication occurs?
+
+Thank you,
+S.
+
+--ndgvoicg47cxfhe3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: attachment; filename=x
+
+/* 5GHz, 40MHz, MCS 11, NSS 1 */
+const struct he_test_data he_test_5_40mhz_mcs_5_nss_1 = {
+	.freq = BAND_FREQ_5_GHZ,
+	.rssi = -76,
+	.expected_rate = 275200000ULL,
+	.capabilities = {
+		.he_mcs_set = { HE_MCS_SET(MCS11, 1), MCS_UNSUP },
+		.he_phy_capa = { HE_PHY_CAPA(0x00) },
+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
+	},
+	.he_capabilities = {
+		22, IE_TYPE_HE_CAPABILITIES - 256, HE_MAC_CAPA,
+		HE_PHY_CAPA(0x00), MCS_UNSUP, HE_MCS_SET(MCS11, 1)
+	},
+};
+
+--ndgvoicg47cxfhe3--
