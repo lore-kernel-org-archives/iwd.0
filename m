@@ -1,49 +1,49 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23CB11F61D
-	for <iwd@lists.linux.dev>; Mon, 16 Oct 2023 18:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B68731A9F
+	for <iwd@lists.linux.dev>; Mon, 16 Oct 2023 18:23:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQMjA+sp"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-57ba5f05395so2971132eaf.1
-        for <iwd@lists.linux.dev>; Mon, 16 Oct 2023 11:21:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aCDfP8pE"
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3b2b1ae4c21so2264542b6e.0
+        for <iwd@lists.linux.dev>; Mon, 16 Oct 2023 11:23:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697480481; x=1698085281; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1697480591; x=1698085391; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=I1OStHQ5Z+2HpZCZtWbxkwxjJWfE9UlM3zstUHvwaKw=;
-        b=RQMjA+spDObf955dLX4T/5UJD0bI1c3B3wcxX4y/33I8jZB0esRQpkZF6wX3fWcK+R
-         33vwys5JxTVtgVjPjj+/1/IsCdHx9TAuECVzJdsJzbc/VIwalsmrWbAAJP4DDmEdEUN9
-         creLIEMbz+CymWQ7G62fUY1ZO6qkFvqh/CaRPhbst6fsBY0bHkNzqVgxTSxEZUbH1fLk
-         TdCzoxQ6ktkiwcobp7GvWPcjJKKpS79R9g3MXqWJUUwE+mnNplvuhbNDul8Zzm1Q2TTH
-         TCDfqNwiNIWycBsLQwkSd3uSQVEEr/axDQv+pVNT8ZLBLKMCNtnHu3HagYm95R8yHz8d
-         ZRSQ==
+        bh=VBDG/9Q4Cup5TJVwWJiZqhI9K78TTFSF9l2r+zPOxAc=;
+        b=aCDfP8pERZtmFRV48iX6dnWzf0qcKJLu9ntA6cjQR3S94el1Csgk5eV7TD0tgUsZ2c
+         aU+HdJCNLK1Y9/RoOXjjc3c9bpnk3GTTaZTVOajbAU1pHeRBAW/UpKzabQbXpqwo4wCq
+         hLzQ+otQdkBtw4glCQElfEaj6C9wkdsY+D2HC4QHI7OWtH5Duu58cUIlKvoCHfCO2EsY
+         53N8s+4emewIR2Cz8/w9gepNyTiGLiuMZzgsn8qFV1tDHQGssE/pxIzwTsFd5ZYg1U90
+         /qPUChfT+CEIrXig1afrBJ86IbXQFdPt38sLXAM9B8FYJsFGyQyL4afae9GyXDDpFDdz
+         1rsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697480481; x=1698085281;
+        d=1e100.net; s=20230601; t=1697480591; x=1698085391;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I1OStHQ5Z+2HpZCZtWbxkwxjJWfE9UlM3zstUHvwaKw=;
-        b=ehUm1doBm13QPVBP1olcgmLpxCBsbIYExfIka1U2MfZIQXHjy9XPBXcmaWm3n/Lnol
-         bpGCm5nmCyT/RFz93uLTmR6hk74djpewuVR3RWnBsfHsVIisoLx8iFLFjfa4uQuWv/fF
-         kP0vAyl1MWJGWGS/bcQPizqB6kS+x+DkKRK7+kPzMPDtg6aFAN5N2bkYUR96MlUzY8t8
-         T7fRAlqkbo/RZRzOy3B+hVZ0d+Vf87LldxFNZMk2bCzCzWv+YromuAUxRgOVSv/w+bQF
-         9jvKDZWH80hYM5Q5FWSEWKJDv1uWaCP2aE19+PVNjBWT7EXU/R9i+oaJUlR7PTicB5uZ
-         beWA==
-X-Gm-Message-State: AOJu0YzRirvvDT2YqSWlssPU2IAkxCA7nbT9WtlAwJdMkn9A4xa/6Kd5
-	2JiVSfKaW1MEwPwJ/v7RlWE=
-X-Google-Smtp-Source: AGHT+IEyGcExAm54rXb4ZpnXyr2eJGiEBW+VO6fefpvRmM0OfawWAiET2ZNpjDdJrdA1LoA+u9Oz2g==
-X-Received: by 2002:a4a:3009:0:b0:57b:92f2:1f64 with SMTP id q9-20020a4a3009000000b0057b92f21f64mr36688345oof.8.1697480481028;
-        Mon, 16 Oct 2023 11:21:21 -0700 (PDT)
+        bh=VBDG/9Q4Cup5TJVwWJiZqhI9K78TTFSF9l2r+zPOxAc=;
+        b=pr5cjt8VkhxSvoG7HFkOYOG+qhuk6/x7oyPYOMjOF0FltOCs2orIx9wN0cdTF7ht6k
+         /RvGw02TiV2FcwlMAxcCwnEY9d52jIwls750tK/rEyiNpJCUwtNIMqwncgGmHgVJ73Rr
+         bziUd5be/IluAfZvvFrFOk7WIcwVs6JCYhY3+tpPvHt297skoE7T5QzRw/BQ4tJCR1pQ
+         mvyKytbXPvrtDTW3xG9xvVZkx3mQHY9Bdw8TPfxAXRMV8/mkyffWUGvNJeYeZyA87Rg9
+         TgKEk9l2R7R4MB5Lw16SirH0K3xAqNsZcGwKWSBCjC8AtIi84hhqO3KPu0japhf2bDpU
+         iK2Q==
+X-Gm-Message-State: AOJu0YzZ34er2zj0N1C0srirCE+zVzgjQixhz2CR7TEjDy9mUFF7WsIt
+	j3icjbK3qqC9c0K61qbUIy9YNSY8OIA=
+X-Google-Smtp-Source: AGHT+IEab2zlfu7qv+nlQCtjlxyXUdyDu1UiQ+EcRCDRyhc67biqg8bM+sfd85NnpFPVbpy3jFvERA==
+X-Received: by 2002:a05:6808:1a22:b0:3ab:84f0:b49d with SMTP id bk34-20020a0568081a2200b003ab84f0b49dmr168891oib.3.1697480591796;
+        Mon, 16 Oct 2023 11:23:11 -0700 (PDT)
 Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id g18-20020a4ad312000000b00569c240e398sm1167241oos.30.2023.10.16.11.21.18
+        by smtp.googlemail.com with ESMTPSA id u15-20020a056808150f00b003ae12c14061sm1956923oiw.30.2023.10.16.11.23.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 11:21:19 -0700 (PDT)
-Message-ID: <e2bad492-31a0-4c92-b03f-beba292987fd@gmail.com>
-Date: Mon, 16 Oct 2023 13:21:14 -0500
+        Mon, 16 Oct 2023 11:23:11 -0700 (PDT)
+Message-ID: <1f8d6377-f528-456d-8323-9a4b2618062a@gmail.com>
+Date: Mon, 16 Oct 2023 13:23:10 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,27 +51,26 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] test: log correct function name
+Subject: Re: [PATCH] iwmon: print HE capabilities element
 Content-Language: en-US
-To: Sertonix <sertonix@posteo.net>, iwd@lists.linux.dev
-References: <CVMUXBOJCCQ3.3DY5I2CD7ES6U@sert-surfa-alpine>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20231016144248.33462-1-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CVMUXBOJCCQ3.3DY5I2CD7ES6U@sert-surfa-alpine>
+In-Reply-To: <20231016144248.33462-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Sertonix,
+Hi James,
 
-On 9/19/23 06:51, Sertonix wrote:
-> Matched the printed function name with the actuall function name.
+On 10/16/23 09:42, James Prestwood wrote:
+> Adds a handler for the HE capabilities element and reworks the way
+> the MCS/NSS support bits are printed.
 > 
-> The simple-agent test prints the function name to allow easier debugging.
-> 
-> One name was not set currectly (most likely through copy pasting).
-> 
+> Now if the MCS support is 3 (unsupported) it won't be printed. This
+> makes the logs a bit shorter to read.
 > ---
->   test/simple-agent | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   monitor/nlmon.c | 112 +++++++++++++++++++++++++++++++++++++-----------
+>   1 file changed, 86 insertions(+), 26 deletions(-)
 
 Applied, thanks.
 
