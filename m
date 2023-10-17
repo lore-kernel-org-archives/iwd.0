@@ -1,72 +1,89 @@
-Received: from out-192.mta1.migadu.com (out-192.mta1.migadu.com [95.215.58.192])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BD0358BB
-	for <iwd@lists.linux.dev>; Mon, 16 Oct 2023 20:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kazlauskas.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kazlauskas.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675534368F
+	for <iwd@lists.linux.dev>; Tue, 17 Oct 2023 15:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kazlauskas.me header.i=@kazlauskas.me header.b="xXNRF7qR"
-Date: Mon, 16 Oct 2023 23:20:33 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kazlauskas.me;
-	s=key1; t=1697487637;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hduW66cSMqH07Mhqhl4CNwyZTYJtf1m58GlIkQEjFFs=;
-	b=xXNRF7qRZVKhe6JU1lW1FQrt/A8lRg6q18u38+deHM1QJrBlAaDtlBI1Xc25vvlV3M/ucz
-	XZ3I1fskNqvDz4tTnGMEc3SjYWYkT/ZxJxq9X9W4lfmfdxrSGqgOVXPft6swPMsSrOKUhi
-	JootxkKEJs1YprKGjgnAWqeFMv4g3VE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Simonas Kazlauskas <iwd.lists.linux.dev@kazlauskas.me>
-To: James Prestwood <prestwoj@gmail.com>
-Cc: iwd@lists.linux.dev, Denis Kenzior <denkenz@gmail.com>
-Subject: Re: Is the data rate estimation for 5GHz channels overly pessimistic?
-Message-ID: <ncmtsi42vkdimzxsuktgfblp66agskivhuntdjlooyp7gglhgo@kwuxknllo527>
-References: <xxpypqwyk3gjrwjmpuvxqdlipkrb3fbw7augfey5ovr3lgbgul@2tbf6xw2uo3z>
- <5780e1b2-8956-46bb-8116-b513cc564cea@gmail.com>
- <5ff58310-c5ee-4694-821a-0c802cdedb89@gmail.com>
- <bwuu4ra65fpfpenytgu5a6ftjpvyury4omx7ucy65cshorqskl@5ikhebki4wnk>
- <05aedfe6-82ad-4e41-a9fa-e9f8a5619947@gmail.com>
- <tkizdohkwpz4nfgjczdzltr7qhvjtcyyk6x3543dht2gmm7ssc@q7m4rq3r3sqx>
- <f7ced477-6fa4-4efd-bf54-817b100041ef@gmail.com>
- <ccb68e07-e4a0-4e50-b7e2-2a2044d38487@gmail.com>
- <30b6dad4-64b2-41ca-8712-053cb1396eaf@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eR/ywpwz"
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-6c7b3adbeb6so4100426a34.0
+        for <iwd@lists.linux.dev>; Tue, 17 Oct 2023 08:18:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697555926; x=1698160726; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Z8lpJLl5em2zkSz+DYCG+nTKfC3a+GHpHXdApPnJ0Ro=;
+        b=eR/ywpwzI/LQRk4z6QIDObPDstrRhL7RXhFFRCpojVZ5U9WflyWGyH0bO/NqL9MCEB
+         FCaMPbyvZHLCuN0Acw3Og6XGTBCT2o6oFP6FOWsrdfzJAYSAXQKO9OxWMLrBT/vdqbmG
+         c43f61K5IwCR5WpgVobsnu6eEgl18rGtD8LUXSJ0b0cx5tA8b7KXjcdBtuYgb/BFqQzw
+         lsoYbI3vlI25swNoJOBr0ayRgppP72dHtysZNZPFg/FYwaOzYBEnKIOtOEjioK6RRfcQ
+         QsSmLM6YZKh16fE0VLyGgnJC0wb1S9DqDWQuk311WINEyuTJO4DovLhuXJO/7klNlj3J
+         55zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697555926; x=1698160726;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z8lpJLl5em2zkSz+DYCG+nTKfC3a+GHpHXdApPnJ0Ro=;
+        b=FXVgKLhCwYx6LN0CeuUEQzxT+LJOBBc/U1y308Rfga9/3HN+GGdDshulL+0lLsRlsx
+         JcEoWvHYF2bar7Nkw/o0bUFT+JokzMUFzwSz6HB4R4EodBfaryHwyykwYOMby3v/2FyT
+         uADzm4bSOtEiwCTbx35izMfi+2455htzP6+DMErSjq+6z9oNKFKFmYP9gR8w0Zz501GT
+         hhyyqIazAxHXb3v+7fO6de+6TvKV30Z2m8gSh8WeBgWi8Mc4msrbWpPKbDpYk/oLIxMf
+         IlI+00SqtlEY2YD56xvdJn04ugtH64Nhzzn5bpVjksjL1xkKOXm/Ma/xgfQrDu9Se+Nv
+         W7jQ==
+X-Gm-Message-State: AOJu0YxYj8Nud9MmxYYq9UY5Iz/bbboJN2HO41ChP0X7L9F6Kr/s8uoj
+	2HtkmNDahxYJVzvi1bHLGuiMXJFeSGQ=
+X-Google-Smtp-Source: AGHT+IErs4YARlGFqd26dE/f2WvMKNV9LDLnu7G4U2Cr8rBrbTxjBNXk7kA9xdBfoz6/1FxBctzf7Q==
+X-Received: by 2002:a05:6830:1e21:b0:6b8:9483:35ba with SMTP id t1-20020a0568301e2100b006b8948335bamr2719905otr.24.1697555926484;
+        Tue, 17 Oct 2023 08:18:46 -0700 (PDT)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id a9-20020a9d3e09000000b006c4727812fdsm294070otd.15.2023.10.17.08.18.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 08:18:45 -0700 (PDT)
+Message-ID: <b6d14d40-2225-4c83-a365-2925c76d951f@gmail.com>
+Date: Tue, 17 Oct 2023 10:18:43 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <30b6dad4-64b2-41ca-8712-053cb1396eaf@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/21] crypto: remove label from prf_plus, instead use
+ va_args
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20231012200150.338401-1-prestwoj@gmail.com>
+ <20231012200150.338401-2-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20231012200150.338401-2-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-James,
+Hi James,
 
-Thank you for implementing the display of HE capabilities in `iwmon` – these do 
-indeed show up in my scans now, false alert there.
+On 10/12/23 15:01, James Prestwood wrote:
+> The prf_plus API was a bit restrictive because it only took a
+> string label which isn't compatible with some specs (e.g. DPP
+> inputs to HKDF-Expand). In addition it took additional label
+> aruments which were appended to the HMAC call (and the
+> non-intuitive '\0' if there were extra arguments).
+> 
+> Instead the label argument has been removed and callers can pass
+> it in through va_args. This also lets the caller decided the length
+> and can include the '\0' or not, dependent on the spec the caller
+> is following.
+> ---
+>   src/crypto.c | 24 +++++++++---------------
+>   src/crypto.h |  2 +-
+>   src/erp.c    | 19 +++++++++++--------
+>   3 files changed, 21 insertions(+), 24 deletions(-)
+> 
 
-> HE Capabilities: len 34
->     HE supported channel width set: bit  1: 40MHz/80MHz supported (5GHz/6GHz)
->         Rx HE-MCS Map <= 80MHz 1 Streams: MCS 0-11 supported
->         Rx HE-MCS Map <= 80MHz 2 Streams: MCS 0-11 supported
->         Rx HE-MCS Map <= 80MHz 3 Streams: MCS 0-11 supported
->         Rx HE-MCS Map <= 80MHz 4 Streams: MCS 0-11 supported
->         Tx HE-MCS Map <= 80MHz 1 Streams: MCS 0-11 supported
->         Tx HE-MCS Map <= 80MHz 2 Streams: MCS 0-11 supported
->         Tx HE-MCS Map <= 80MHz 3 Streams: MCS 0-11 supported
->         Tx HE-MCS Map <= 80MHz 4 Streams: MCS 0-11 supported
->     0d 01 08 9a 40 10 04 60 48 88 1f 43 81 1c 11 08  ....@..`H..C....
->     00 aa ff aa ff 7b 1c c7 71 1c c7 71 1c c7 71 1c  .....{..q..q..q.
->     c7 71                                            .q             
+Applied, thanks.
 
-I’ve sent you and Denis both the pcap of the scan. I, unforunately, don’t think 
-I’ll be able to hack on the test and/or data rate investigation much further 
-before the weekend, but I’m happy to test out patches and such at any time.
+Regards,
+-Denis
 
-Thanks,
-S.
