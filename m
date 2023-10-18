@@ -1,109 +1,137 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D525C16427
-	for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 14:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C033D39D
+	for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 16:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+1rFDHK"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-66d0760cd20so58084696d6.0
-        for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 07:56:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697641003; x=1698245803; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ch4rvf43qx4f3hKaNy30zkNDLl1v+KZ4wwfvBUYathQ=;
-        b=C+1rFDHK4glQD5hZ77YM7ZTHTBMMtF1uRV09gYd3rPQgsNbrRemCwYc7kReYozGApF
-         ymt0m+Sas7R7dVGIj8tdOyZTleSM8X6OJu9HHzOKJbChCOHq9AIO4YtKOIOzJguc8rC1
-         QqYvUqltsB8YBxtwjjTcBWjkkrO4gfJ5bwjh6Bx6dpRhawD4Usf5T3Cu29DHJk6XJvuE
-         KBRwZXZRhywrSCTtqhSRscCLqeGsz8cfj0TNsaJmzJEzB+tD75Ao8GM5KHfVPbdCKT5r
-         n64KiQeZ2hjra6coA8eHAjZIc84/K72+b0Xl9yZRbTariYwAdd98MpCluCmT1V8T6qW4
-         LIIg==
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="jo+NUxdY"
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com [209.85.208.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 9A9603FA66
+	for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 16:28:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1697646534;
+	bh=ZJKykMJF3gq53c4EIjf8aZLnFe+FRyO9+LJCDFelrm4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=jo+NUxdY6yUNklrXhpA8/Vetw9qf8p71vZvUnvpgcuPx09/tUIDTubsVueWedR4a5
+	 yPXN7aik+SF4PcrRTJSHNASnLGAS753I3RA8GvZUt8N1xcQ4AKNLfFufpFIpYairM/
+	 lR9YuhfAP3m78+tJfUtQ8q8cGVQ38dexk/AmzvmrCgh1EX6wnMhOCqWB/337h3hgXM
+	 LTtm8uqal8V6o/nKNmGKuS3qWtI8+3EeKJnTicsBy4tfy0Kykr55hldfwNJWspXFIa
+	 BuZiMuNICybASWSo/3e+vRmVa9rxkB/bSSZ9Pv7eIRc7ykS3+KxOAqJRxU2OEnGR+4
+	 8912knPOeJ1jw==
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2c51e44a4dbso38047591fa.3
+        for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 09:28:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697641003; x=1698245803;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ch4rvf43qx4f3hKaNy30zkNDLl1v+KZ4wwfvBUYathQ=;
-        b=EP2txlVU001Ma0XSqWJZdx66VqejnTxyKn39jZ5qXdEwqTqPbaR0yHgkhPhzDA/jVF
-         HOk0+QxZLjKjV/eN32tUcyp+6c79fq3VQbWAGFR3edMlRr1D42ZGJjTPqkY8O6FbxsVT
-         7/pqBKVObjQTnIESOB7u5LeLSGjKo3PuSKB6yOxWj/CKj2zh02MHbF+O3a/LFpTSFnpU
-         BccPAvSYKghgHzsz3f8/P7RbUqodC3jlEU+aqo+8OaG4ZG/WJa/QZMOTNvjtQrlCrBCq
-         Z8+Ln8mzpbxUeFWTOFYgBi5MkfFDXNOqoWtFTW25fTwQRWMTiEwdT87wwqRGscZzKnkF
-         XKQA==
-X-Gm-Message-State: AOJu0Yyu8LBdhGQmNKUZeWsJXDP4a7jdsH9YVQsbS/z/2nqyXDpm1j36
-	C0fZO6PFyhUxg5bNzDSELWs=
-X-Google-Smtp-Source: AGHT+IHnWcnTLf4X6Vj5C+KVxiaNLli5JxjXjn0+P9qFBiH5c2wv5dQ5DHBHSYaEwg5UA8ukpfRbeg==
-X-Received: by 2002:a0c:b2cb:0:b0:66c:f988:20da with SMTP id d11-20020a0cb2cb000000b0066cf98820damr6216537qvf.28.1697641003409;
-        Wed, 18 Oct 2023 07:56:43 -0700 (PDT)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id u4-20020a0cf1c4000000b0066d1f118b7esm15980qvl.1.2023.10.18.07.56.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Oct 2023 07:56:41 -0700 (PDT)
-Message-ID: <222ec16a-6ee4-43a0-bb9d-17d258a0ba4f@gmail.com>
-Date: Wed, 18 Oct 2023 07:56:35 -0700
+        d=1e100.net; s=20230601; t=1697646533; x=1698251333;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZJKykMJF3gq53c4EIjf8aZLnFe+FRyO9+LJCDFelrm4=;
+        b=qIOOzwjYCNKtmm6hlvAYvGUhyadNvzNsBmcuz801Sdfh2cPpXkhGaqYLMFimIi5u8w
+         bjW4O3yyFyCGkY40O02/VWKTBFdRUVVqy91FHqmZ4vNm1ajbwFu6t9isLSngn7AkjFxY
+         A81jIHzCS6Nyi54nmICBeFeeAxFkXhiE1NAganDlwz1GgQZmQ/Mz8KtHafARUMPuS2KR
+         u83Yv4kjyq/NB2J0mHLfQuxC3q6cZ3ye6VajyT+nYMcD81krAhP4ArskBg85C03Fx+lM
+         XSz73+sljKhOLPMimgBXo6Y063m54ySCTLr8q4cwLUvT1KbDH6gfxENcT7PMFPQuBEb6
+         0XsQ==
+X-Gm-Message-State: AOJu0YyeaqP+LS9kMEEkcxned5OBsEVBEQJYASGPGyJCO3xx2BrbpC11
+	098PfBqJt5InHAm62a34U0ZC4OhjSxAkjc0eTHkkZ07a+HC4Lum8ZsCmZqp7ty48D2YI+d6nMJi
+	dMC7i52MDh7eTwY0OJST6SfD1sKahtgGyEI7g7+P4TsH38yVcfpX2WA==
+X-Received: by 2002:a2e:a994:0:b0:2c5:2d7:412 with SMTP id x20-20020a2ea994000000b002c502d70412mr4620043ljq.19.1697646533766;
+        Wed, 18 Oct 2023 09:28:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGisi12cAy8lhBT0EpIEOCWkHWz2zgHbQfeMOXlHawHtzzGPp0E2PZNHwvENjUa7Q5035cw3fuPW84WhmSysw4=
+X-Received: by 2002:a2e:a994:0:b0:2c5:2d7:412 with SMTP id x20-20020a2ea994000000b002c502d70412mr4620032ljq.19.1697646533329;
+ Wed, 18 Oct 2023 09:28:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] add AllowRoaming station property
-Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, =?UTF-8?Q?Pedro_Andr=C3=A9?=
- <PEDA@bang-olufsen.dk>, "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <20231018122534.33455-1-peda@bang-olufsen.dk>
- <8bef6b0a-8284-4889-bd23-b33e26b450f2@gmail.com>
- <76261973-a04e-488c-8fc0-a0f623c15af0@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <76261973-a04e-488c-8fc0-a0f623c15af0@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20231014235445.167620-1-dimitri.ledkov@canonical.com> <075d94c6-4ce3-4945-b765-71ad6285dd67@gmail.com>
+In-Reply-To: <075d94c6-4ce3-4945-b765-71ad6285dd67@gmail.com>
+From: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Date: Wed, 18 Oct 2023 17:28:17 +0100
+Message-ID: <CADWks+bdeDgAZKUs6wbdi3KjDHeONO7LkmjX_-9wT15m91PvPQ@mail.gmail.com>
+Subject: Re: [PATCH] eap-mschapv2: allow using on kernels without CRYPTO_MD4,
+ and deprecate
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Denis,
+On Mon, 16 Oct 2023, 20:46 Denis Kenzior, <denkenz@gmail.com> wrote:
+>
+> Hi Dimitri,
+>
+> On 10/14/23 18:54, Dimitri John Ledkov wrote:
+> > Currently eap-mschapv2 does kernel MD4 check during init time, even
+> > though it is possible to use it with Password-Hash on kernels without
+> > MD4.
+>
+> While this is true, I doubt many users actually use this setting.
 
-On 10/18/23 7:32 AM, Denis Kenzior wrote:
-> Hi James,
-> 
->>
->> LGTM, I actually needed something along these lines for dynamically 
->> disabling roaming e.g. during a software upgrade or some time when 
->> networking is critical. Just hadn't gotten to it yet.
-> 
-> I'm curious about the use cases.  What were your thoughts on how this 
-> should look like?
-> 
-> I imagine for things like firmware update you still have a set time 
-> limit in which this upgrade should happen?
 
-I wanted to remove the possibility that a roam could cause a network 
-timeout during an update. In a perfect world network queries should be 
-fault tolerant and retry, but in practice this isn't always the case. 
-And to be honest this is probably less of an issue than network 
-congestion/latency on the backend causing a problem.
+Ok. :-(
 
-I think any issues that could happen would be entirely related to the 
-infrastructure but nevertheless if avoiding a roam temporarily makes for 
-better reliability I'd vote to do it.
 
-For example one problem we see infrequently, but it does happen, is 
-complete loss of IP networking post roam. Disabling roams during an 
-update would at least get the update finished before this potentially 
-happens.
 
-> 
-> Right now I like Pedro's earlier proposal with the minimum throughput 
-> guidance. I think we can go further and calculate the roaming RSSI 
-> threshold based on the minimum throughput.  This would allow iwd to 
-> ignore roaming until that minimum throughput can no longer be delivered. >
-> If we need a bigger hammer, then we may want to consider using an 
-> implementation similar to how Modem.Lockdown was implemented in oFono.
+>
+> >
+> > Separately, mschapv2 is obsolete, deprecated, and removed even in
+> > Windows 11 22H2 [1][2]. Add an error message stating so encouraging
+> > migration to PEAP-TLS or EAP-TLS. Separately, warnings like these often
+> > don't work, thus likely need to remove this authentication method
+> > completely.
+>
+> Hmm, from this description I think you misunderstand how MSCHAPv2 is used.
+> Indeed, just using MSCHAPv2 as the outer authentication protocol in EAP is
+> broken.  However, nobody actually uses it this way.  In other words, while
+> EAP-MSCHAPv2 does exist, it isn't actually used.
+>
+> However, EAP-PEAP mandates the use of MSCHAPv2 as the inner authentication
+> method inside the outer TLS tunnel. "Migration to PEAP-TLS" already happened,
+> but that doesn't mean that MSCHAPv2 isn't used.
 
-I'll check that out.
 
-> 
+Sadness.
+
+But also how does the outer TLS tunnel help all the way? Remote site
+people sure, but do people enforce using outer TLS tunnels like
+internal inside the office network? As in can employees sniff each
+others traffic and still impersonate each other? Meaning this
+authentication method is still more or less a fig leaf.
+
+>
+> >
+> > IWD usage of MD4 was brought up on linux-crypto mailing list [3], upon
+> > my attempt to remove CRYPTO_MD4 from the kernel which is no longer used
+> > via crypto API by anything else.
+> >
+> > It worries me that internet searches suggest that EDUROAM (a Wi-FI
+> > network spanning 106 territories) seems to still often use
+> > mschapv2. Thus dropping this support may leave millions of people
+> > without connectivity. Given how broken and isecure this authentication
+> > method has been since 2012, I hope that EDUROAM is migrating, or has
+> > migrated to P/EAP-TLS.
+>
+> Yes, exactly.  See above. What this patch accomplishes is breaking EAP-PEAP
+> support in iwd :)
+
+Booo!
+
+Ok, I still want to drop md4 from the kernel though. Because the
+number of users that need this is small, and I would rather compile in
+static MD4 implementation in IWD than to carry a kernel config that
+builds and turns it all for all.
+
+It seems in Ubuntu we have never had SRU of IWD yet, and we build
+multiple kernels every two weeks, meaning on that basis alone
+compiling MD4 in IWD versus kernels will save energy costs.
+
+>
 > Regards,
 > -Denis
