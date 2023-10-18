@@ -1,49 +1,49 @@
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FEABE5B
-	for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 14:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A3637C8F
+	for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 14:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kzdEvixy"
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-6c49f781855so4520524a34.3
-        for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 07:20:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aejArGOf"
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3af5fd13004so4506373b6e.0
+        for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 07:32:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697638819; x=1698243619; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1697639559; x=1698244359; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=drMkCBRaXI+VUaksngL3GWKeZcO6TcZ2+QGeaRkFRhQ=;
-        b=kzdEvixy6WnKop49+fGFRN4qLOFPCi3ChvldT14+X7PoGBXS+LbYrNjZoOVVPnRhnj
-         yQETwRPggcf/wiaKom3TCGcaDalT7IbyZJiwk9lygYUyQa0UrP8QeLVL0IweLltiT+Gw
-         IZVwqW0T+lq3ZuVj8pql1mzbEjxw9hJ49LifW+tIIJtEkhdQIYnGg61032FT2QwE5b0x
-         wZtoCILECF2ByVESTHnEfnzQkjf5rQmXR8DPRmdof49pfiaKwCUJi5pdtN8CwnrpODFM
-         oO/otbTAw9PHXI3OBxmQejc5mfTYSLz9siIrxmwCn6uVa0CLUyfNEqowIsahS+67UsZp
-         QUlA==
+        bh=uT2SVZah6tuvSqGz5BQcbdspf13Fn7vLyyp5YDwTtx8=;
+        b=aejArGOfrXKbwT44435HgEcV/JvF+co7NNO0VCy85biwzA0xSj0JJyo4V1Iy5UCmKM
+         M8aVLDv5C46T4opGpbx0452jC8A9fs2MsXYKtzGO6bYP67PkzhVXkmpUoFi3geZB8nMM
+         kD1ZNgnkG13JqJIAqkg0aUN7EXPkEAKRO9LdLHusyNaTe8ssSCs+cEXz6RbBrSqIQ19Q
+         hmulO21LUF6jJ+q+ZSOXtxtF/FzRTGg9tJlUYmY7BjVQ3hXvlp5WBYgslD0pBom7Kfsf
+         Y1e6nOOiRdj3xZ9d+RsjwYIq/ZA9f6I0UO0piOdCkxH/9von2mieaeGq9+b0/ms8VUhD
+         iHMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697638819; x=1698243619;
+        d=1e100.net; s=20230601; t=1697639559; x=1698244359;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=drMkCBRaXI+VUaksngL3GWKeZcO6TcZ2+QGeaRkFRhQ=;
-        b=bbX4oFwRL756KobOGfSzf4BjdT8pgbj1bgvMgRmIJqihYOsvimJHJYFRQKWhAeAjgC
-         67uCfndQUKrOrsCyDMAa1QMOGPe3Cwp0vF5ePUQEZP+0f6onebtaBolzHp8FJCs5WV7N
-         goFZpeJMasNUzy5DIiUXE4E7FNOZuSdGHHaXNAemSFLcPc+UTsSvFuIHSbgunhQM5Y+8
-         ClMT8KRgKQVzIQtrb87XT70vpSHKCOptMfKtz4+UMtgw/wLAmRwPZtdyXb66Uyx9YQd1
-         4Hq4rnll9Qq0eAi1jAw2WuumBeK+sFgCQeA3deGR8Y9glXU3/GFSJuikla72tyz+ZljL
-         E24g==
-X-Gm-Message-State: AOJu0YxGVaUl4jA8xigl93DMZNM7op61fgKLNf6DXhuUxMH6v4vBvjVX
-	zE7IyRI4GvNiOFjw0DjcZ9w=
-X-Google-Smtp-Source: AGHT+IHHMy5d2SvCxbVgAU4b7qQIcIjjOEPUFY4unplJyqL2vs5rqkxql1MMeiW2sCuT7wNQmkbbPA==
-X-Received: by 2002:a9d:4d17:0:b0:6cd:9b6:5954 with SMTP id n23-20020a9d4d17000000b006cd09b65954mr978298otf.38.1697638819599;
-        Wed, 18 Oct 2023 07:20:19 -0700 (PDT)
+        bh=uT2SVZah6tuvSqGz5BQcbdspf13Fn7vLyyp5YDwTtx8=;
+        b=Y8yaDQLz50c5NiEiLB8qJlJxePYS+puwb2rpAOj5j2AamIznz7U/HagjIrLfYZeGJI
+         ntN9Ly2DycYzwJDD3sbgGY3GLYY3HDNfOBy9F+DQgGFP45KIbna3jhwqQasBwvdE8ac6
+         VS2Bwca3JbWhIdRupEA/cDyNQ1aqtquy704/g6Rcvr93ES3eFM2kFc832+hii0sKdjWO
+         Y+VY1x1BcbXfxEfTj8nmCPaBgent9o9IEqC+ONLy6Wvf04WwoN4a+zaxItS14L7RYqq9
+         7Q3NSC+mVH/TQWzWRHAOeknas7cRIJK/OLg3h7AnBxf7qRFXA+ulCfFmFVJiSMXuj+v7
+         QD6Q==
+X-Gm-Message-State: AOJu0YyyGdNODrEoxEASROuS6KNNq01ghoqxrxvbpC50SjHSniVy/5tO
+	AK0YQGd+V/bjyFXEW+BKKVo=
+X-Google-Smtp-Source: AGHT+IEp7rq1jBfKBdTnQ02DqRNDlo7DeGu+GquZwLNz230vIqnaOBCf+lE00d2DfTXgdhZYLkGMDw==
+X-Received: by 2002:a05:6808:1b2b:b0:3ab:83fe:e18f with SMTP id bx43-20020a0568081b2b00b003ab83fee18fmr6774741oib.35.1697639559158;
+        Wed, 18 Oct 2023 07:32:39 -0700 (PDT)
 Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id l24-20020a9d7a98000000b006cd0a56c406sm104585otn.60.2023.10.18.07.20.18
+        by smtp.googlemail.com with ESMTPSA id bf33-20020a056808192100b003b2f369a932sm46023oib.49.2023.10.18.07.32.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Oct 2023 07:20:18 -0700 (PDT)
-Message-ID: <cd9a73d3-8ed9-4c76-b44c-4c8af6250977@gmail.com>
-Date: Wed, 18 Oct 2023 09:20:17 -0500
+        Wed, 18 Oct 2023 07:32:38 -0700 (PDT)
+Message-ID: <76261973-a04e-488c-8fc0-a0f623c15af0@gmail.com>
+Date: Wed, 18 Oct 2023 09:32:37 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,80 +53,35 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] add AllowRoaming station property
 Content-Language: en-US
-To: =?UTF-8?Q?Pedro_Andr=C3=A9?= <PEDA@bang-olufsen.dk>,
- "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+To: James Prestwood <prestwoj@gmail.com>, =?UTF-8?Q?Pedro_Andr=C3=A9?=
+ <PEDA@bang-olufsen.dk>, "iwd@lists.linux.dev" <iwd@lists.linux.dev>
 References: <20231018122534.33455-1-peda@bang-olufsen.dk>
+ <8bef6b0a-8284-4889-bd23-b33e26b450f2@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20231018122534.33455-1-peda@bang-olufsen.dk>
+In-Reply-To: <8bef6b0a-8284-4889-bd23-b33e26b450f2@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Pedro,
+Hi James,
 
-On 10/18/23 07:27, Pedro André wrote:
-> From: Pedro Andre <peda@bang-olufsen.dk>
 > 
-> This adds an AllowRoaming property to the station struct that makes it
-> possible to indicate to the station/interface that it should not go
-> into roaming state (when set to false). This property defaults to true
-> (i.e. it defaults to the normal iwd behaviour that allows roaming).
-> 
+> LGTM, I actually needed something along these lines for dynamically disabling 
+> roaming e.g. during a software upgrade or some time when networking is critical. 
+> Just hadn't gotten to it yet.
 
-Is it possible for you to share the actual use case for this?  It would help to 
-understand what problem this is trying to solve.  One problem I see here is that 
-we might still want to honor AP directed roaming.
+I'm curious about the use cases.  What were your thoughts on how this should 
+look like?
 
-> ---
->   src/station.c | 40 ++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 40 insertions(+)
-> 
+I imagine for things like firmware update you still have a set time limit in 
+which this upgrade should happen?
 
-<snip>
+Right now I like Pedro's earlier proposal with the minimum throughput guidance. 
+I think we can go further and calculate the roaming RSSI threshold based on the 
+minimum throughput.  This would allow iwd to ignore roaming until that minimum 
+throughput can no longer be delivered.
 
-> +static struct l_dbus_message *station_property_set_allow_roaming(
-> +					struct l_dbus *dbus,
-> +					struct l_dbus_message *message,
-> +					struct l_dbus_message_iter *new_value,
-> +					l_dbus_property_complete_cb_t complete,
-> +					void *user_data)
-> +{
-> +	struct station *station = user_data;
-> +	bool roaming;
-> +
-> +	if (!l_dbus_message_iter_get_variant(new_value, "b", &roaming))
-> +		return dbus_error_invalid_args(message);
-> +
-> +	l_debug("Setting allow_roaming %s", roaming ? "true" : "false");
-> +
-> +	station->allow_roaming = roaming;
-
-So what happens if we're in the middle of a roam?
-
-Also, what happens if this is reset to true and our rssi is already below the 
-roam threshold?
-
-> +
-> +	return l_dbus_message_new_method_return(message);
-> +}
-> +
->   void station_foreach(station_foreach_func_t func, void *user_data)
->   {
->   	const struct l_queue_entry *entry;
-
-<snip>
-
-> @@ -4484,6 +4522,8 @@ static void station_setup_interface(struct l_dbus_interface *interface)
->   					station_property_get_scanning, NULL);
->   	l_dbus_interface_property(interface, "State", 0, "s",
->   					station_property_get_state, NULL);
-> +	l_dbus_interface_property(interface, "AllowRoaming", 0, "b",
-> +				station_property_get_allow_roaming, station_property_set_allow_roaming);
-
-doc/coding-style.txt, Section 'Background', paragraph 2.
-
-Also, there's missing documentation for this property.  And it seems to overlap 
-rather significantly with "DisableRoamingScan" setting.  What's the plan there? 
-And since we're adding a new API, can we at least add an auto test?
+If we need a bigger hammer, then we may want to consider using an implementation 
+similar to how Modem.Lockdown was implemented in oFono.
 
 Regards,
 -Denis
