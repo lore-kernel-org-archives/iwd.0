@@ -1,137 +1,112 @@
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C033D39D
-	for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 16:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF5481E
+	for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 02:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="jo+NUxdY"
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com [209.85.208.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 9A9603FA66
-	for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 16:28:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1697646534;
-	bh=ZJKykMJF3gq53c4EIjf8aZLnFe+FRyO9+LJCDFelrm4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=jo+NUxdY6yUNklrXhpA8/Vetw9qf8p71vZvUnvpgcuPx09/tUIDTubsVueWedR4a5
-	 yPXN7aik+SF4PcrRTJSHNASnLGAS753I3RA8GvZUt8N1xcQ4AKNLfFufpFIpYairM/
-	 lR9YuhfAP3m78+tJfUtQ8q8cGVQ38dexk/AmzvmrCgh1EX6wnMhOCqWB/337h3hgXM
-	 LTtm8uqal8V6o/nKNmGKuS3qWtI8+3EeKJnTicsBy4tfy0Kykr55hldfwNJWspXFIa
-	 BuZiMuNICybASWSo/3e+vRmVa9rxkB/bSSZ9Pv7eIRc7ykS3+KxOAqJRxU2OEnGR+4
-	 8912knPOeJ1jw==
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2c51e44a4dbso38047591fa.3
-        for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 09:28:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Brfz1Kbp"
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3b2f507c03cso350468b6e.2
+        for <iwd@lists.linux.dev>; Wed, 18 Oct 2023 19:54:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697684068; x=1698288868; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5XlO9AZ/Q+AXSY6AldjtSF/mpLcYBUc/PD17nxUXTcA=;
+        b=Brfz1KbphFHVpeAmtEqI8tVezmgt6aMpTJVrdFbsomLL+/ADvmSo3spECDQTcobwcp
+         crSji0Xby91lo7/bXkUyektsS8cq1D6drLHwxm9kn6SR6XiTe+Asuc/rMqB1CpIgctwX
+         W9Xn000WH8kEC16cE2s1z/mPohF22M0N55MNz4701tvtFDR0qbHjZX6CcueZCGEMMhke
+         OOtemwAxFiIUZwjrxDKmAma7X3iYGevx/UO6SgWuv4rW8bBq/CtpOMc7qY3YCyaG/ncN
+         LGuqgTcI9sPC8w7SXtBTN1jmc5kw4lOcbnIAgqxTwS50ctj1NgeeVw6G6zsvOkv2LfW9
+         ip5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697646533; x=1698251333;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZJKykMJF3gq53c4EIjf8aZLnFe+FRyO9+LJCDFelrm4=;
-        b=qIOOzwjYCNKtmm6hlvAYvGUhyadNvzNsBmcuz801Sdfh2cPpXkhGaqYLMFimIi5u8w
-         bjW4O3yyFyCGkY40O02/VWKTBFdRUVVqy91FHqmZ4vNm1ajbwFu6t9isLSngn7AkjFxY
-         A81jIHzCS6Nyi54nmICBeFeeAxFkXhiE1NAganDlwz1GgQZmQ/Mz8KtHafARUMPuS2KR
-         u83Yv4kjyq/NB2J0mHLfQuxC3q6cZ3ye6VajyT+nYMcD81krAhP4ArskBg85C03Fx+lM
-         XSz73+sljKhOLPMimgBXo6Y063m54ySCTLr8q4cwLUvT1KbDH6gfxENcT7PMFPQuBEb6
-         0XsQ==
-X-Gm-Message-State: AOJu0YyeaqP+LS9kMEEkcxned5OBsEVBEQJYASGPGyJCO3xx2BrbpC11
-	098PfBqJt5InHAm62a34U0ZC4OhjSxAkjc0eTHkkZ07a+HC4Lum8ZsCmZqp7ty48D2YI+d6nMJi
-	dMC7i52MDh7eTwY0OJST6SfD1sKahtgGyEI7g7+P4TsH38yVcfpX2WA==
-X-Received: by 2002:a2e:a994:0:b0:2c5:2d7:412 with SMTP id x20-20020a2ea994000000b002c502d70412mr4620043ljq.19.1697646533766;
-        Wed, 18 Oct 2023 09:28:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGisi12cAy8lhBT0EpIEOCWkHWz2zgHbQfeMOXlHawHtzzGPp0E2PZNHwvENjUa7Q5035cw3fuPW84WhmSysw4=
-X-Received: by 2002:a2e:a994:0:b0:2c5:2d7:412 with SMTP id x20-20020a2ea994000000b002c502d70412mr4620032ljq.19.1697646533329;
- Wed, 18 Oct 2023 09:28:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697684068; x=1698288868;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5XlO9AZ/Q+AXSY6AldjtSF/mpLcYBUc/PD17nxUXTcA=;
+        b=sZtp3ul+64+z3/maG2/+wmRgsAOym4t+wUdtP/Y2bQmlPnR7WaPLQK4Zh4VXt6zIwt
+         XC2hk0PQjpxPmYnDWxzIhZUu57QqudZavsh+aqp2dSc3ldIJzff+Vm2m2/H70BhAwOfm
+         maaJxlaQyfAsf8WfHjjynDePHkok4aRGjwJkoxhk5vc3xZrQVw4rvU0Vz2nFtMcCG9vK
+         fAShtJaJzGI9zzIer/cinJOiLTMUZQg18EGKYgKLleaNZxxGu9LuIfzej8XEiR+lx1Ex
+         BlSm5JwruE/x8kDXQNh3bk5hJ4sxzPFgSbVdAPovlu0OBzDlBZ9ZZIQYTzosTCR+g8vM
+         XYTw==
+X-Gm-Message-State: AOJu0Yyr0nMsEoT6rdhqcwZ9pkdGN1axS/hTxaxrMOALjZPIGhUHo1Pi
+	/A2Q/aTC8reW69Qzlo6uAq8=
+X-Google-Smtp-Source: AGHT+IERlx/6hK9eWVwz7yJ0/25+I+H2b92tkZmsGtrvPI+sdX/WLkpDzWip+xgtc7davq5MW1nYwQ==
+X-Received: by 2002:a05:6808:1306:b0:3a9:ea90:5901 with SMTP id y6-20020a056808130600b003a9ea905901mr1076038oiv.56.1697684068194;
+        Wed, 18 Oct 2023 19:54:28 -0700 (PDT)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id fa5-20020a0568082a4500b003af5d7d9f3bsm923056oib.4.2023.10.18.19.54.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Oct 2023 19:54:27 -0700 (PDT)
+Message-ID: <c29ea330-c84a-41a7-b5e0-ef44993736e2@gmail.com>
+Date: Wed, 18 Oct 2023 21:54:26 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231014235445.167620-1-dimitri.ledkov@canonical.com> <075d94c6-4ce3-4945-b765-71ad6285dd67@gmail.com>
-In-Reply-To: <075d94c6-4ce3-4945-b765-71ad6285dd67@gmail.com>
-From: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Date: Wed, 18 Oct 2023 17:28:17 +0100
-Message-ID: <CADWks+bdeDgAZKUs6wbdi3KjDHeONO7LkmjX_-9wT15m91PvPQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] eap-mschapv2: allow using on kernels without CRYPTO_MD4,
  and deprecate
-To: Denis Kenzior <denkenz@gmail.com>
+Content-Language: en-US
+To: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
 Cc: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+References: <20231014235445.167620-1-dimitri.ledkov@canonical.com>
+ <075d94c6-4ce3-4945-b765-71ad6285dd67@gmail.com>
+ <CADWks+bdeDgAZKUs6wbdi3KjDHeONO7LkmjX_-9wT15m91PvPQ@mail.gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <CADWks+bdeDgAZKUs6wbdi3KjDHeONO7LkmjX_-9wT15m91PvPQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 16 Oct 2023, 20:46 Denis Kenzior, <denkenz@gmail.com> wrote:
->
-> Hi Dimitri,
->
-> On 10/14/23 18:54, Dimitri John Ledkov wrote:
-> > Currently eap-mschapv2 does kernel MD4 check during init time, even
-> > though it is possible to use it with Password-Hash on kernels without
-> > MD4.
->
-> While this is true, I doubt many users actually use this setting.
+Hi Dimitri,
 
+> 
+> But also how does the outer TLS tunnel help all the way? Remote site
+> people sure, but do people enforce using outer TLS tunnels like
+> internal inside the office network? As in can employees sniff each
+> others traffic and still impersonate each other? Meaning this
+> authentication method is still more or less a fig leaf.
 
-Ok. :-(
+The outer TLS tunnel is mandatory for PEAP/TTLS and is very secure, assuming a 
+well configured system.  This means that the station (client) side has a CA 
+Certificate it can use to validate the AP.  If public CAs are being used, then 
+security can be further enhanced by using ServerDomainMask setting.
 
+Think of EAP-PEAP or EAP-TTLS as username/password authentication within HTTPS. 
+Its just that EAP-PEAP uses MSCHAPv2(MD4) or EAP-MD5 and EAP-TTLS uses 
+MSCHAP(DES)/ MSCHAPv2(MD4), CHAP(MD5), PAP(cleartext).
 
+How the network is configured at the AP is not really our problem.  There are 
+ways to separate all clients on the AP from each other via vlans, etc.
 
->
-> >
-> > Separately, mschapv2 is obsolete, deprecated, and removed even in
-> > Windows 11 22H2 [1][2]. Add an error message stating so encouraging
-> > migration to PEAP-TLS or EAP-TLS. Separately, warnings like these often
-> > don't work, thus likely need to remove this authentication method
-> > completely.
->
-> Hmm, from this description I think you misunderstand how MSCHAPv2 is used.
-> Indeed, just using MSCHAPv2 as the outer authentication protocol in EAP is
-> broken.  However, nobody actually uses it this way.  In other words, while
-> EAP-MSCHAPv2 does exist, it isn't actually used.
->
-> However, EAP-PEAP mandates the use of MSCHAPv2 as the inner authentication
-> method inside the outer TLS tunnel. "Migration to PEAP-TLS" already happened,
-> but that doesn't mean that MSCHAPv2 isn't used.
+>>
+>> Yes, exactly.  See above. What this patch accomplishes is breaking EAP-PEAP
+>> support in iwd :)
+> 
+> Booo!
+> 
+> Ok, I still want to drop md4 from the kernel though. Because the
+> number of users that need this is small, and I would rather compile in
+> static MD4 implementation in IWD than to carry a kernel config that
+> builds and turns it all for all.
 
+Well, you're going to keep coming back and making this argument for DES, MD4, 
+MD5, etc.  I don't think it makes sense for iwd to go down that path.  While 
+these crypto functions are old and insecure by themselves, they're still being 
+used in a secure way.
 
-Sadness.
+> 
+> It seems in Ubuntu we have never had SRU of IWD yet, and we build
+> multiple kernels every two weeks, meaning on that basis alone
+> compiling MD4 in IWD versus kernels will save energy costs.
 
-But also how does the outer TLS tunnel help all the way? Remote site
-people sure, but do people enforce using outer TLS tunnels like
-internal inside the office network? As in can employees sniff each
-others traffic and still impersonate each other? Meaning this
-authentication method is still more or less a fig leaf.
+Wasn't Ubuntu going to switch to iwd at some point?
 
->
-> >
-> > IWD usage of MD4 was brought up on linux-crypto mailing list [3], upon
-> > my attempt to remove CRYPTO_MD4 from the kernel which is no longer used
-> > via crypto API by anything else.
-> >
-> > It worries me that internet searches suggest that EDUROAM (a Wi-FI
-> > network spanning 106 territories) seems to still often use
-> > mschapv2. Thus dropping this support may leave millions of people
-> > without connectivity. Given how broken and isecure this authentication
-> > method has been since 2012, I hope that EDUROAM is migrating, or has
-> > migrated to P/EAP-TLS.
->
-> Yes, exactly.  See above. What this patch accomplishes is breaking EAP-PEAP
-> support in iwd :)
-
-Booo!
-
-Ok, I still want to drop md4 from the kernel though. Because the
-number of users that need this is small, and I would rather compile in
-static MD4 implementation in IWD than to carry a kernel config that
-builds and turns it all for all.
-
-It seems in Ubuntu we have never had SRU of IWD yet, and we build
-multiple kernels every two weeks, meaning on that basis alone
-compiling MD4 in IWD versus kernels will save energy costs.
-
->
-> Regards,
-> -Denis
+Regards,
+-Denis
