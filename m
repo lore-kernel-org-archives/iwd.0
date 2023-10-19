@@ -1,49 +1,49 @@
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88C72EAFF
-	for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 19:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C313CD16
+	for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 20:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ancn2yXa"
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-1e993765c1bso66984fac.3
-        for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 12:55:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NNC96TuR"
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5aa7172bafdso55424a12.1
+        for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 13:01:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697745342; x=1698350142; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1697745660; x=1698350460; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=OYuDHJh7kTG1rjiM2VfgQ4wkP3H8y/Mw8/VXb5uK3xs=;
-        b=Ancn2yXaCnKyWJsU9tcupG6t5iMJ+MPYfjPdWoJT122p0aSLuBqpIGmw8v4PIkztPk
-         2waQtXqoEGd3fycvKi1NDCYdL9F9lxFsrFV8pMqAiUHamxQtHH+wnQv2VASKXSdTDO3c
-         Lkcp8wEp5jqfs+dj7x7JpzaEMmrjqEQXZDuWhjdR+IWMViLRYySUcKha9rRiX/azzR1E
-         DpxKPKMW0Uz2H5lIPgaHSUQ7K8crgOxxwhMjeyjeeLweM7GFg2p4JSPSZ25O42YRCCtC
-         wsyBIv/L5KCHynuFSUKsaoUuKUBPn9rtO624Lk+JSbOm3NAgTWUwYtnwBuM05BpWFX0u
-         EzvA==
+        bh=ciW8u57qjwjmaGcILMwNfgwJ7wPlYedgdV4Qj/oZBlo=;
+        b=NNC96TuRC2kJj9yd13mVA+yMMguoMQKFtNoJjjslkPFjTDp/Fmy/WRTRzzawWDhFMQ
+         h64jHS7ksRC/gLgEGCe5+JXRVjtRz0L5Lxtnv7MxB94RuwAe/NkNJp6SkwMAX856Y/51
+         6c9hNBaxYgbUarOXLmgTtRkTmQQiGo2P2Espiro+HIuIs0rE0nEf6jcNzO+y9bsqNrpO
+         iQ4Z8pLIE2Rujty4R4PAKQ1+vyQHHtEHC1w0KdZmIt1vIlP8w8UP9byY1nY38hq4pgdG
+         /TFgwISdymJHHKM5MCSIH9d3NvKj7QnVr2MdgzkiFUdBgCaTFzyN470RZgP8l8YtOqQn
+         nrSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697745342; x=1698350142;
+        d=1e100.net; s=20230601; t=1697745660; x=1698350460;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OYuDHJh7kTG1rjiM2VfgQ4wkP3H8y/Mw8/VXb5uK3xs=;
-        b=U3UQvpFH7n3axPfONgD6Iyotmsw6IQCmmyPdUs99aQTRr0UxxdxamQzCWrKIP0rpwy
-         FnpiWmDIog7RdLjAoeCNB+XJmRLaFmXxAl8hZEOrGfqZ5k6pJDOD3VYBM1Nd+W2EK+Hk
-         aGXRTd6mCRCaP5meJW5mg109POlpO5vhpEHLUw86F2nMgwYN7Z7Vy2EdeR5dJfL2P5K8
-         558deQDZml1lS611hiaPwcK3HagXXxNrhyMxr/zCxxUGju+aYTZV/mGLpyORvSbKis3P
-         mUUtfqtveXU13d0g63iF0E6SGFKB1LtMUSUmbN581F2ucRBWbjwV57czKRBFDqc7rA5d
-         INkw==
-X-Gm-Message-State: AOJu0YwfiNne408pQbz9CYHI9g2VHOKVps949H6S2AOMeXl4PDUA60aJ
-	UtWMR0q0p09blJrfeHB7P7U=
-X-Google-Smtp-Source: AGHT+IEZB9tzINq2nibGdRfG0IfZrkttlxqoz2vTZY7+mtM74N1rBYLZO1hZRJTmYJt6TR9r2XtJgw==
-X-Received: by 2002:a05:6870:c18a:b0:1e9:c59b:a9ad with SMTP id h10-20020a056870c18a00b001e9c59ba9admr3387144oad.52.1697745341915;
-        Thu, 19 Oct 2023 12:55:41 -0700 (PDT)
-Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id h23-20020a9d3e57000000b006cd096949a5sm51641otg.16.2023.10.19.12.55.41
+        bh=ciW8u57qjwjmaGcILMwNfgwJ7wPlYedgdV4Qj/oZBlo=;
+        b=fKmoX01YqBd/rp0Tmn8/QrI1oKOJKvczuqOTRQFEpwTuAnvBgEvuP6l3Cg6xc7abkw
+         0hfMXPb6IO0rmKA5onmQ8PSCcRnZgn2V6XoXHEWb7ibbavqfT6rCUI74UtnZKdQe1Ujy
+         cwq5exj5/ntKsit38ZatUfBEOUAvNGyz5vsnAzPwIw3zH6u/MLc5IJ62q1WaGbK1TFqS
+         +mvXnza5RPeFjbWktBo8eURHZyXU5cHQkFcLI+lbNFKSt9G014yk1uKT153ZYQ5w7/Sd
+         8Q5VC1smpb8p43OFm3jbXtQTKT6ok4yUqceB06FPLcWqVhzDgJxS1PuabQ+WZm/I1uWQ
+         TnfA==
+X-Gm-Message-State: AOJu0YxZylefK2gPlH6Obwy7AwCWNcObTSEQVmx9+GXtX1lVMAB4f3s/
+	1fJPBguXlCb49KILz9NHTkA=
+X-Google-Smtp-Source: AGHT+IEJjNsOlmXI1uls83IxSMTLHndBV8HwPqJ91ydQlEr4UY944QH5WC+Tl03uYmWkrPdzrKYVWA==
+X-Received: by 2002:a17:90b:3b8c:b0:27d:3e90:9ee1 with SMTP id pc12-20020a17090b3b8c00b0027d3e909ee1mr3336452pjb.23.1697745659458;
+        Thu, 19 Oct 2023 13:00:59 -0700 (PDT)
+Received: from [192.168.254.82] ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id 29-20020a17090a1a5d00b002777001ee76sm2162709pjl.18.2023.10.19.13.00.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Oct 2023 12:55:41 -0700 (PDT)
-Message-ID: <dda44204-e322-4802-b1dc-a2a61de83a3d@gmail.com>
-Date: Thu, 19 Oct 2023 14:55:40 -0500
+        Thu, 19 Oct 2023 13:00:59 -0700 (PDT)
+Message-ID: <ae7b807f-fb7b-4437-9e00-bc4f64ad6047@gmail.com>
+Date: Thu, 19 Oct 2023 13:00:58 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,86 +51,109 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/21] offchannel: add support to issue multiple
- offchannel requests
+Subject: Re: [PATCH 11/21] doc: PKEX support for DPP
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <20231012200150.338401-1-prestwoj@gmail.com>
- <20231012200150.338401-11-prestwoj@gmail.com>
- <9182f9f2-4752-4737-bbf7-d308136d47fd@gmail.com>
- <78efd011-8851-43fe-b1b7-adf42a23ff68@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <78efd011-8851-43fe-b1b7-adf42a23ff68@gmail.com>
+ <20231012200150.338401-12-prestwoj@gmail.com>
+ <41078822-99da-466e-b612-91a8c223dbde@gmail.com>
+ <0dd4a4a5-95aa-49c1-be77-e640862c3f82@gmail.com>
+ <62d0c420-3bc5-45a8-80c6-c4c59db7ae2c@gmail.com>
+ <d69dd453-95b8-49b0-9419-3ee0c7c98fe1@gmail.com>
+ <a38fc175-3095-488d-a0ea-a70e7f148540@gmail.com>
+ <035c5cb1-d5be-4c4b-a6f5-8c0941926225@gmail.com>
+ <c8617f8d-0c7c-4e1c-ab0f-f356a121afe6@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <c8617f8d-0c7c-4e1c-ab0f-f356a121afe6@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Hi Denis,
+
+On 10/19/23 11:56 AM, Denis Kenzior wrote:
+> Hi James,
+> 
+>>
+>> I guess my question is really how you communicate this to the enrollee.
+>>
+>> The use case for a human user really comes down to not wanting to type 
+>> in a 64 character hex string :) So auto-generating a complex code 
+>> doesn't make much sense in this regard.
+> 
+> Who said anything about a 64 character hex?  I'm thinking more about a 
+> 10-12 character complex password like you see the web browser generate.  
+> However, I'm pretty sure we need the ability to generate the code every 
+> time:
+> 
+> "If both sides have a user interface, this technique can be used to 
+> bootstrap trust by exchanging bootstrapping information including the 
+> bootstrapping keys that are to be used for a DPP exchange requiring 
+> mutual authentication. This bootstrapping technique shall use a fresh 
+> code each time and the same code shall not be used with different Peers."
+> 
+> Correct me if I'm wrong, but PKEX is no different than regular DPP.  It 
+> simply uses a code instead of a QR code for establishing the initial 
+> trust channel (giving high degree of confidence to both parties that the 
+> exchanged public keys are trusted).  The more complex the code, the 
+> better the chance that the code can be trusted (i.e. it wasn't 
+> guessed).  It still inherits the same basic attributes, roles, etc.
+
+Yep, its purely a way to securely exchange bootstrapping keys.
 
 > 
-> So I'm not sure what exactly is going on here. I have yet to see this on actual 
-> hardware, but it happens in hwsim frequently. You are right that the offchannel 
-> module gates all the work items, and correctly waits for one to finish. So I was 
-> wrong that it needed "fixing" in that regard. Here are some logs with the ack 
-> coming out of order, maybe this is some UML scheduling thing, not sure:
 > 
-> src/dpp.c:dpp_start_pkex_enrollee() PKEX start enrollee (id=test)
-> src/wiphy.c:wiphy_radio_work_insert() Inserting work item 1
-> src/wiphy.c:wiphy_radio_work_next() Starting work item 1
-> src/offchannel.c:offchannel_work_ready() Issuing ROC
-> src/offchannel.c:offchannel_roc_cb() cookie=1
-> src/netdev.c:netdev_mlme_notify() MLME notification Remain on Channel(55)
-> src/offchannel.c:offchannel_mlme_notify() ROC notify, cookie=1
-> src/dpp.c:dpp_send_frame() Sending frame on frequency 2437
-> src/netdev.c:netdev_unicast_notify() Unicast notification Frame(59)
-> src/dpp.c:dpp_handle_pkex_exchange_request() PKEX exchange request 
-> 02:00:00:00:02:00
-> src/dpp.c:dpp_send_frame() Sending frame on frequency 2437
-> src/netdev.c:netdev_mlme_notify() MLME notification Frame TX Status(60)
-> src/netdev.c:netdev_unicast_notify() Unicast notification Frame(59)
-> src/dpp.c:dpp_handle_pkex_commit_reveal_request() PKEX commit-reveal request 
-> 02:00:00:00:02:00
-> src/dpp.c:dpp_send_frame() Sending frame on frequency 2437
-> src/netdev.c:netdev_mlme_notify() MLME notification Frame TX Status(60)
-> src/netdev.c:netdev_unicast_notify() Unicast notification Frame(59)
-> src/dpp.c:dpp_handle_pkex_exchange_response() PKEX response 02:00:00:00:03:00
+>>
+>> For a headless device auto-generation just won't work since the 
+>> password is baked into the image. I considered generating a single 
+>> bootstrapping key and 
 > 
-> # Got a response, so the prior offchannel work (1) was canceled, and a new item 
-> inserted (2)
-> 
-> src/wiphy.c:wiphy_radio_work_insert() Inserting work item 2
-> src/netdev.c:netdev_mlme_notify() MLME notification Cancel Remain on Channel(56)
+> Doesn't this run counter to what PKEX is about?
 
-So is this iwd sending a NL80211_CMD_CANCEL_REMAIN_ON_CHANNEL?  Should we also 
-wait for the ack of this one too?
+I don't think it runs counter, it just may not be _exactly_ what the 
+spec intended it to be used for. Using the same code isn't any different 
+than using the same PSK.
 
-> src/offchannel.c:offchannel_mlme_notify() ROC cancel, cookie=1
-> 
-> # Cancel ROC is correctly waited for before starting the next item
-> src/wiphy.c:wiphy_radio_work_done() Work item 1 done
-> src/wiphy.c:wiphy_radio_work_next() Starting work item 2
-> src/offchannel.c:offchannel_work_ready() Issuing ROC
-> src/netdev.c:netdev_mlme_notify() MLME notification Remain on Channel(55)
-
-This seems fishy?  What else is going offchannel?
+No matter what if your PSK or PKEX code gets compromised your stuck 
+re-configuring all your devices. I don't see an issue using a secure but 
+static PKEX code. Either way, this isn't really IWD's problem :)
 
 > 
-> # Then immediately we get a Remain on Channel event
-> src/offchannel.c:offchannel_mlme_notify() ROC notify, cookie=3
-> src/offchannel.c:offchannel_mlme_notify() ROC started prior to ACK, setting 
-> cookie 3
-> src/dpp.c:dpp_send_frame() Sending frame on frequency 2437
+>> bake that into the image (no PKEX) but I question the possibility of 
+>> offline 
 > 
-> # And finally the ack comes in
-> src/offchannel.c:offchannel_roc_cb() cookie=3
+> With a strong password, probably eons, unless quantum computing is 
+> involved.
+> 
+>> attacks. With PKEX the bootstrapping keys are changed upon each 
+>> protocol run so 
+> 
+> But you're still sharing a PSK in the end?  Why go through all this 
+> trouble?
 
-Yeah, why is the cookie 3?  Shouldn't it be 2?
+This is a more dynamic way of configuration and allows devices to show 
+up in a 'default' state and require zero manual configuration (for 
+specific wifi networks). When your talking about 10, 20, 100 devices, 
+manually configuring each one takes a lot of time. PKEX provided a 
+"hands-off" way of doing it assuming you have other devices in the area 
+with credentials.
 
 > 
-> I need to look at the kernel a bit more to see how this can happen, but apart 
-> from me removing some of the commit description I do think the patch is required 
-> to handle this case.
+>> I think there is forward secrecy there. Plus PKEX uses mutual 
+>> authentication to 
 > 
+> WPA3 has forward secrecy as well.  So what are you trying to achieve?
 
-Regards,
--Denis
+I was just comparing PKEX to using a static pre-shared bootstrapping key 
+and fudging it to look like a QR code was scanned. This isn't a good 
+idea, hence why I pursued PKEX.
 
+> 
+>> prevent someone from coming in and configuring the new devices who 
+>> shouldn't be.
+>>
+> 
+> The gold standard is still WPA-Enterprise with EAP-TLS.
+> 
+> Regards,
+> -Denis
+> 
