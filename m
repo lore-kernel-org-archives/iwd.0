@@ -1,49 +1,49 @@
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40F53E003
-	for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 21:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6043E00F
+	for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 21:47:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgjfsBep"
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-57bc2c2f13dso90263eaf.2
-        for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 14:47:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AFgXmOLi"
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-1e9c9d181d6so153548fac.0
+        for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 14:47:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697752036; x=1698356836; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1697752041; x=1698356841; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=PqlvKT37O1nR1ktKSi7mFu1IVYZymjL7A2t5GQRdDX8=;
-        b=XgjfsBep27FwfRCgy22FIH0EAqqIHD3qxx0Es41b5MZZQRPtP9x4k7kHZbnuFlE9Rg
-         PdAVYxgHU00Y29VtYXlYzhuqhmXKYx4vFP6kj6Tr25aID1Yti2bSiYlbu98Bza/ZbBuA
-         TWnCV5oIxnMLW1wCOHxmYQq8aViTT44/pRHr1pLOCMXV2aXnS/R4SHBmanJ1cgKGXErU
-         uDcJ43yGIddp1TVLpm/vqQnWo0LbN0TC+hmXERlC4U869V1osb32k9FSemful9+G04Ci
-         /NxeQzEKLFkfTnHPLXVAlhka5kpSBxiF0z7UE8Vd5+qDq5fXaqeJwN5tPjbXXiI59q2D
-         WdxQ==
+        bh=9iaYKki+95k5UBc63mKFTxQPVSYrTOrt8owQLStiHKA=;
+        b=AFgXmOLiVI6lcx43yFKnnE+yPNiBRnYpv7FM7Z1mNfG5aWomfYGa7/tANKd9n3EPCg
+         Hdqx99ua9mQPObml16NphwRvo6tronBZHYu07X9NGK76Uj///ZpmvK9eKXFM+t25nT4l
+         87srL/ZlLg6w+sb4l4Es7u1lsCgucNoz4yzxG/UzKVFCbfeNaCJue5u4uutOzLopOD/H
+         ExUlX7ucbrW/nbMMmKxtbrHvfMCXmWCWg1TiVtIs+X+P7v+kUE8wQUdb5kBIMeT5dve5
+         tzo/R01Id4Ncf20hq/hiU0fJXEL5O1YMm9Wuyn5IPMYug70EnvhAQNnNCIcmORy5henw
+         8wBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697752036; x=1698356836;
+        d=1e100.net; s=20230601; t=1697752041; x=1698356841;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PqlvKT37O1nR1ktKSi7mFu1IVYZymjL7A2t5GQRdDX8=;
-        b=aBI03OB3/YYXsKtZnrw245CokYWGONqugN5d4VLmogqtwwUN/W387NC9kIvtMXWJM9
-         6ReE2YVWi7X0wneX1CxbPJA7PitX/OIN/OSOZ3RdWRZ6exRTC/w3wUMUuQUTLqTS1KNy
-         09UILVdRoLvRSSMgKDZcNsUxWFysdrepZk+bi3PFYcrsCZ4P8l/kNL9xTS8idFDH7Xrl
-         usrF0USH3I4fzJyBql/a+Vz/Q+qmVhVUYrHHVzt1+YNQBR3xgFK9Wy7SqtCMnjsweRIS
-         7meHd7vuQZ2BmXj6o4LRlKXYCsaWKTnbA78SM9Yt+fQ1xDOyWyxCbNKFJmjZ6lxUc8RC
-         sUsQ==
-X-Gm-Message-State: AOJu0Yyzt+D0+mNl4eiBMdOh9SMnDn76Fu8G02hHJfbIfaWJMPYshMyR
-	mUdAFV6EJpfIWCsdOhPcB3c0maWMC/Q=
-X-Google-Smtp-Source: AGHT+IHDOeEZrBwkr0N1dv/0xfhF+qQnCEGn1J+Sj91lHuz1m9+27Dzl6LPd5cJxKW5MgIdugZnmoA==
-X-Received: by 2002:a05:6359:5e18:b0:164:8d78:258a with SMTP id pw24-20020a0563595e1800b001648d78258amr2894153rwb.20.1697752036552;
-        Thu, 19 Oct 2023 14:47:16 -0700 (PDT)
-Received: from [192.168.254.38] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id x26-20020aa79ada000000b006be5af77f06sm248857pfp.2.2023.10.19.14.47.16
+        bh=9iaYKki+95k5UBc63mKFTxQPVSYrTOrt8owQLStiHKA=;
+        b=cdb76RP9UEL0vBpjCTvvrw2hliitZNgoYnbwCiSwzpfBueNwGJMXBq9ClWcrdDsEaX
+         VhNdfAKsG+r194R8IoKUkQJCxcqMKL7wbnTdkxgkdFdCdJoMqQ1nCRCFhSr1629ZzGuE
+         SeDMwgtMO1qnjTTqPkmXxsqEY+DOhOrDGYkS4v3PYH2L9PkPj3cov4r3EOXtrx/VOhpy
+         pWu7VH/G/SrSJlqo3AyeiLt7kSLb4C3D15jJcq9sO0xHj4QFAZKPh7Lxi2eRQAtVTz0f
+         P67nfLYBHYHBq2h/8mgC3H00r5bEnH7Ib4v694SjRvh3NAoq981zELXPbmSU3NXT5dM9
+         MKPA==
+X-Gm-Message-State: AOJu0YyVoR/IVt/ugUlaTvXmt2xYBcueGoR4B8bggQWG4bYGLwXIJQY/
+	+J28/8zfDdscH100wOX3kVg=
+X-Google-Smtp-Source: AGHT+IGolwGLmxrrc0swf9kTpomYx0NZDXj80O37rtpxCvGiiatQgI9POSYZf8KoppLryAjiqtec5Q==
+X-Received: by 2002:a05:6870:1399:b0:1d6:65d1:7989 with SMTP id 25-20020a056870139900b001d665d17989mr131249oas.24.1697752041338;
+        Thu, 19 Oct 2023 14:47:21 -0700 (PDT)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id v2-20020a056870e28200b001cd1a628c40sm75819oad.52.2023.10.19.14.47.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Oct 2023 14:47:16 -0700 (PDT)
-Message-ID: <832c2b23-f009-494d-b497-b1c4075f3caf@gmail.com>
-Date: Thu, 19 Oct 2023 14:47:15 -0700
+        Thu, 19 Oct 2023 14:47:20 -0700 (PDT)
+Message-ID: <d4fdadd8-dc2b-47b0-b1ac-114abed91f39@gmail.com>
+Date: Thu, 19 Oct 2023 16:47:19 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,79 +51,49 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/21] offchannel: add support to issue multiple
- offchannel requests
+Subject: Re: [PATCH 11/21] doc: PKEX support for DPP
 Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
 References: <20231012200150.338401-1-prestwoj@gmail.com>
- <20231012200150.338401-11-prestwoj@gmail.com>
- <9182f9f2-4752-4737-bbf7-d308136d47fd@gmail.com>
- <78efd011-8851-43fe-b1b7-adf42a23ff68@gmail.com>
- <dda44204-e322-4802-b1dc-a2a61de83a3d@gmail.com>
- <6395c614-451b-42f5-8918-7fc3773c2134@gmail.com>
- <e5ddaedf-b334-4d53-bd88-eff92d250efe@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <e5ddaedf-b334-4d53-bd88-eff92d250efe@gmail.com>
+ <20231012200150.338401-12-prestwoj@gmail.com>
+ <41078822-99da-466e-b612-91a8c223dbde@gmail.com>
+ <0dd4a4a5-95aa-49c1-be77-e640862c3f82@gmail.com>
+ <62d0c420-3bc5-45a8-80c6-c4c59db7ae2c@gmail.com>
+ <d69dd453-95b8-49b0-9419-3ee0c7c98fe1@gmail.com>
+ <a38fc175-3095-488d-a0ea-a70e7f148540@gmail.com>
+ <035c5cb1-d5be-4c4b-a6f5-8c0941926225@gmail.com>
+ <c8617f8d-0c7c-4e1c-ab0f-f356a121afe6@gmail.com>
+ <ae7b807f-fb7b-4437-9e00-bc4f64ad6047@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <ae7b807f-fb7b-4437-9e00-bc4f64ad6047@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Denis,
+Hi James,
 
-On 10/19/23 2:42 PM, Denis Kenzior wrote:
-> Hi James,
-> 
->>
->> It wouldn't hurt, but I think we were always under the assuming that 
->> the ack would come before the event so I never bothered using a 
->> callback :)
->>
-> 
-> My memory is fuzzy now, but I think brcmfmac was very weird in this 
-> area.  Which might explain why offchannel code is written the way it is.
-
-I think Andrew sorted much of that out in frame-xchg, and I think there 
-are comments about similar behavior of acks arriving late. I can dig up 
-a brcmfmac card and play around with it.
-
-> 
 >>>
->>>> src/offchannel.c:offchannel_mlme_notify() ROC cancel, cookie=1
->>>>
->>>> # Cancel ROC is correctly waited for before starting the next item
->>>> src/wiphy.c:wiphy_radio_work_done() Work item 1 done
->>>> src/wiphy.c:wiphy_radio_work_next() Starting work item 2
->>>> src/offchannel.c:offchannel_work_ready() Issuing ROC
->>>> src/netdev.c:netdev_mlme_notify() MLME notification Remain on 
->>>> Channel(55)
->>>
->>> This seems fishy?  What else is going offchannel?
+>>> For a headless device auto-generation just won't work since the password is 
+>>> baked into the image. I considered generating a single bootstrapping key and 
 >>
->> No, this is the same event as below, just netdev printing it.
+>> Doesn't this run counter to what PKEX is about?
 > 
-> Ah, ok.
-> 
->>
->>>
->>>>
->>>> # Then immediately we get a Remain on Channel event
->>>> src/offchannel.c:offchannel_mlme_notify() ROC notify, cookie=3
->>>> src/offchannel.c:offchannel_mlme_notify() ROC started prior to ACK, 
->>>> setting cookie 3
->>>> src/dpp.c:dpp_send_frame() Sending frame on frequency 2437
->>>>
->>>> # And finally the ack comes in
->>>> src/offchannel.c:offchannel_roc_cb() cookie=3
->>>
->>> Yeah, why is the cookie 3?  Shouldn't it be 2?
->>
->> 2 is the work item, 3 is the cookie above.
-> 
-> Yeah, I get that.  But shouldn't the cookie from the kernel be 2 and not 
-> 3?  Or is the cookie also being incremented by CMD_FRAME?
+> I don't think it runs counter, it just may not be _exactly_ what the spec 
+> intended it to be used for. Using the same code isn't any different than using 
+> the same PSK.
 
-Oh I see, since it jumped from 1 to 3. I would need to verify, but I'd 
-guess yes the CMD_FRAME increments the same counter.
+I don't know if I'd agree...
+
+https://datatracker.ietf.org/doc/html/draft-harkins-pkex-05:
+"The only information exposed by an active attack is whether a
+       single guess of the password is correct or not."
 
 > 
-> Regards,
-> -Denis
+> No matter what if your PSK or PKEX code gets compromised your stuck 
+> re-configuring all your devices. I don't see an issue using a secure but static 
+> PKEX code. Either way, this isn't really IWD's problem :)
+
+Well, we have to design the API with the 'right' way of using it in mind.  I 
+don't think what you propose fits that.
+
+Regards,
+-Denis
