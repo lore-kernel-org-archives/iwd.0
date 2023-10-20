@@ -1,49 +1,49 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0461EA91
-	for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 16:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5045E208C2
+	for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 19:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U5CVjM+9"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-66d122f6294so6488976d6.0
-        for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 09:29:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bLToKDr1"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6b709048d8eso1014563b3a.2
+        for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 12:10:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697819374; x=1698424174; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=gmail.com; s=20230601; t=1697829009; x=1698433809; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:references:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=jOAlfVNuuU4JekMHxzrgp1RcyYH1vjtb8+m93aWwj4w=;
-        b=U5CVjM+97E9STJli0FWOgBVZmlBLJqHnaRQ10EYYL0n5XhKxkrHnqaWp8yjf1NyS6q
-         NlybFzyUC+C7CHFp6KJaW/H03oOGFHx9S5qtvMN/Z1fj9E492S8idIBFdnj2BZegUGOJ
-         6BT1gD6/7SLC9v4NkoORxdNj8cPL92w5wbDKS6rBAm3V+zVAjo/VD58VlelV0FH0Ty0P
-         loiIFklcQIv1zgM5nK020KM79Yp4Y+qXmVxtdcqkrmigUWP89w0w1OUVI59TNqxbduyR
-         uIgbNLNBUiyqKiF0+RL9IEfxbKXJvE2oBLkVWHl6uFJhJ3qIyVlPKdLZi1PNWBVoF9H1
-         ZTUg==
+        bh=2+FpgXQ78gFhOiFl2yCH0lpZRIQym93CEcUspHj7dTw=;
+        b=bLToKDr1Az7ErYli41iub1BYuhyq6WJ8IOweysCFKUHMovhpcAmkE78qJDy40azvaN
+         YKH/AFEGF7ateh8hbY/3gDLwnGUjK+6P6fjhbvqVfE0GtWNvKyzmAGgu0C1CwJih2TrS
+         07P05fjKO0XMVLpfoQFWPo8vl5JPQo9gFcziXaI9b/GoGaoZmKxR/hGny6oTOBPzsa9K
+         xEUzhB/R9pW2l+/Vc4z14ibwtJxfV4gab/iqBOawZAGxY+xSd18M4iwvAm7YXOfbOBGx
+         VQCAZw09CLm0Foazgr8pdWJNtsWQMiS/gx8Qeu+AgcIV4yqFcf/ul88qXEcYhL/CjN2x
+         +kbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697819374; x=1698424174;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20230601; t=1697829009; x=1698433809;
+        h=content-transfer-encoding:in-reply-to:references:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jOAlfVNuuU4JekMHxzrgp1RcyYH1vjtb8+m93aWwj4w=;
-        b=RMbaV7uABOqbvWQX9Eq/Ci259ap3bUWdGkjX58/ScaASwA7UrfTLOkiRQNtEZHIbXZ
-         fj/zo0dH50B4ysw1Z2FdLy1CSPsbeMByEW+VbWDuhzISlFr6pCTeLdBkwGrfGm6PY7Ug
-         A3Ek+KXYWA96d2AEVg8Rdiowh8AMxQwzCZb37sntwwT+s5FPYBeZ2zjoTjmg7mO3GTN8
-         YQpkP9j9J1HX2qKpj0nh6+5ek6q07QQd8SalrdeXr7m8mLKyoQdXBcsM539Yt8+TNnNo
-         AA933qGzQMmLB0D+10phaRbvxteMuiofJybyrMhxnzvHhoV08CfxhZDa450nYy+9UIq+
-         8vnA==
-X-Gm-Message-State: AOJu0YwKtJtfHhz01iI+TSjXo/AXQQqDe+OsFRBRbWQ8EkcXxT5G861c
-	c/TWouF07XQOERN0lPuZHw8=
-X-Google-Smtp-Source: AGHT+IGHJ4zHfr5qD5NSvT1sOfna7XiPHSpk/wV+z1VQ0i/WcvVCeMYEgdnLl6ul9Waq1Sj2emaZvA==
-X-Received: by 2002:a05:6214:d81:b0:66d:18ec:8e6f with SMTP id e1-20020a0562140d8100b0066d18ec8e6fmr2606169qve.39.1697819374060;
-        Fri, 20 Oct 2023 09:29:34 -0700 (PDT)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id oi1-20020a05621443c100b0066d0d3daa58sm795380qvb.24.2023.10.20.09.29.33
+        bh=2+FpgXQ78gFhOiFl2yCH0lpZRIQym93CEcUspHj7dTw=;
+        b=cvj29MC8nEcQHcx/P0HjVcfIm1vVFGnEhDEQ6vSR876cDJjwUlyWx23Tvq2NZjmt+B
+         rarFtlBH/99dMgy21zrA4bAKY5Myq6F+e2JKi39dlkEmRrqFTWPf280jrOTgw4W7A795
+         DWyNY/+oHvwajVksQm5Rj/i6zunkMdFmthYUQIFX6xImRH/lBp27BeXWjmKjX9e5p7pY
+         AdFozEwpqehytq1S2UDFjQjpr8+lwY7i1qWUkiJHxbtzN75GYUA7jI7zQ6f9VmhFJ2o4
+         DA22zUFG3dDPNLA0sALvfwGNZQpGoMGmXFq6ipb0a2u1dXHKNV65YaCwHC9KG8VhvoJO
+         kYyw==
+X-Gm-Message-State: AOJu0YwtRK7UHA/PJXyBxdnpYKj5G4SbYOAMit8+ddmvvGH6KYu2TFJi
+	MkPyXKC567a7wDMMBWGgvyfjlTUJB9U=
+X-Google-Smtp-Source: AGHT+IGttDkKM6m/l+BtYjqVTW/q3S/VT4KaHgifjqZblfsUgL3cRq/WatPfAi2CGeTredvBsR25EA==
+X-Received: by 2002:a05:6a20:1592:b0:12f:c0c1:d70 with SMTP id h18-20020a056a20159200b0012fc0c10d70mr3125851pzj.40.1697829009472;
+        Fri, 20 Oct 2023 12:10:09 -0700 (PDT)
+Received: from [192.168.254.82] ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id x1-20020aa78f01000000b00690ca67d429sm1890348pfr.100.2023.10.20.12.10.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Oct 2023 09:29:33 -0700 (PDT)
-Message-ID: <582d06b7-1bc7-4e4b-a0e3-c068cd22a975@gmail.com>
-Date: Fri, 20 Oct 2023 09:29:31 -0700
+        Fri, 20 Oct 2023 12:10:09 -0700 (PDT)
+Message-ID: <50663f9c-b0fb-48d7-ac9d-71b84de30ec2@gmail.com>
+Date: Fri, 20 Oct 2023 12:10:08 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,63 +51,108 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] add AllowRoaming station property
+Subject: Re: [PATCH 10/21] offchannel: add support to issue multiple
+ offchannel requests
 Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, =?UTF-8?Q?Pedro_Andr=C3=A9?=
- <PEDA@bang-olufsen.dk>, "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <20231018122534.33455-1-peda@bang-olufsen.dk>
- <cd9a73d3-8ed9-4c76-b44c-4c8af6250977@gmail.com>
- <b995959a-29a8-45cc-a785-065475a1d636@bang-olufsen.dk>
- <df0dd5a8-5171-497e-a764-5cfd32ed821e@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <df0dd5a8-5171-497e-a764-5cfd32ed821e@gmail.com>
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20231012200150.338401-1-prestwoj@gmail.com>
+ <20231012200150.338401-11-prestwoj@gmail.com>
+ <9182f9f2-4752-4737-bbf7-d308136d47fd@gmail.com>
+ <78efd011-8851-43fe-b1b7-adf42a23ff68@gmail.com>
+ <dda44204-e322-4802-b1dc-a2a61de83a3d@gmail.com>
+ <6395c614-451b-42f5-8918-7fc3773c2134@gmail.com>
+ <e5ddaedf-b334-4d53-bd88-eff92d250efe@gmail.com>
+ <832c2b23-f009-494d-b497-b1c4075f3caf@gmail.com>
+In-Reply-To: <832c2b23-f009-494d-b497-b1c4075f3caf@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Hi Denis,
 
-On 10/20/23 7:57 AM, Denis Kenzior wrote:
-> Hi Pedro,
+On 10/19/23 2:47 PM, James Prestwood wrote:
+> Hi Denis,
 > 
-> On 10/19/23 06:55, Pedro André wrote:
->> Hi Denis,
+> On 10/19/23 2:42 PM, Denis Kenzior wrote:
+>> Hi James,
 >>
->> First of all, thank you for your feedback.
+>>>
+>>> It wouldn't hurt, but I think we were always under the assuming that 
+>>> the ack would come before the event so I never bothered using a 
+>>> callback :)
+>>>
 >>
+>> My memory is fuzzy now, but I think brcmfmac was very weird in this 
+>> area.  Which might explain why offchannel code is written the way it is.
 > 
-> No worries, I'm a bit swamped these days so my responses are sometimes 
-> delayed. Just FYI.
+> I think Andrew sorted much of that out in frame-xchg, and I think there 
+> are comments about similar behavior of acks arriving late. I can dig up 
+> a brcmfmac card and play around with it.
 > 
 >>
->> There is a use case where a device can be connected to an infrastructure
->> AP and hosting its own AP. In this specific case it would be ideal to
->> disable roaming since swapping the infrastructure AP can lead to
->> instability on devices connected to the AP being hosted. In this case,
->> the device should act as if it is not able to roam, so I was under the
->> impression it would be OK to not honor AP directed roaming.
+>>>>
+>>>>> src/offchannel.c:offchannel_mlme_notify() ROC cancel, cookie=1
+>>>>>
+>>>>> # Cancel ROC is correctly waited for before starting the next item
+>>>>> src/wiphy.c:wiphy_radio_work_done() Work item 1 done
+>>>>> src/wiphy.c:wiphy_radio_work_next() Starting work item 2
+>>>>> src/offchannel.c:offchannel_work_ready() Issuing ROC
+>>>>> src/netdev.c:netdev_mlme_notify() MLME notification Remain on 
+>>>>> Channel(55)
+>>>>
+>>>> This seems fishy?  What else is going offchannel?
+>>>
+>>> No, this is the same event as below, just netdev printing it.
+>>
+>> Ah, ok.
+>>
+>>>
+>>>>
+>>>>>
+>>>>> # Then immediately we get a Remain on Channel event
+>>>>> src/offchannel.c:offchannel_mlme_notify() ROC notify, cookie=3
+>>>>> src/offchannel.c:offchannel_mlme_notify() ROC started prior to ACK, 
+>>>>> setting cookie 3
+>>>>> src/dpp.c:dpp_send_frame() Sending frame on frequency 2437
+>>>>>
+>>>>> # And finally the ack comes in
+>>>>> src/offchannel.c:offchannel_roc_cb() cookie=3
+>>>>
+>>>> Yeah, why is the cookie 3?  Shouldn't it be 2?
+>>>
+>>> 2 is the work item, 3 is the cookie above.
+>>
+>> Yeah, I get that.  But shouldn't the cookie from the kernel be 2 and 
+>> not 3?  Or is the cookie also being incremented by CMD_FRAME?
 > 
-> So AP directed roaming is a bit of a unicorn.  I haven't really seen it 
-> used in practice.  However, when it is enabled, it is usually pretty 
-> aggressive.  If you don't honor the roam request you will likely get 
-> disconnected.  Don't know if this impacts your design.
+> Oh I see, since it jumped from 1 to 3. I would need to verify, but I'd 
+> guess yes the CMD_FRAME increments the same counter.
 
-Just my two cents. I do see it used in our deployments, but the APs 
-never seem to set the "disassociation imminent" bits so IWD will still 
-decide if it should roam or not.
+Maybe this is a scheduling thing. I see in the kernel 
+(mac80211/offchannel.c) the next offchannel work gets started from 
+within the cancel call (ieee80211_cancel_roc).
 
-Btw hostapd has 3 separate CLI commands for transition management: 
-DISASSOC_IMMINENT, ESS_DISASSOC, and BSS_TM_REQ.
+list_for_each_entry_safe(roc, tmp, &local->roc_list, list) {
+	if (!roc->started)
+		break;
+	if (roc == found)
+		found = NULL;
+	ieee80211_roc_notify_destroy(roc);
+}
 
-The BSS_TM_REQ won't set the imminent bits unless additional options are 
-passed so it wouldn't surprise me if nearly all APs leave those bits 
-unset :)
+/* that really must not happen - it was started */
+WARN_ON(found);
 
-I think its very unclear what the intent is of the AP sending the 
-transition request. It likely sends identical frames regardless of the 
-circumstances whether its "I am a bit overloaded, please leave" or "I'm 
-shutting down leave immediately".
+ieee80211_start_next_roc(local);
+
+There is a &local->mtx lock at the beginning so I'd think that would 
+prevent anything from being shoved into roc_list, but maybe not? If IWD 
+is able to start another ROC before ieee80211_start_next_roc is called 
+that would explain it, but it seems unlikely, maybe only with UML.
 
 Thanks,
 James
-
-
+> 
+>>
+>> Regards,
+>> -Denis
