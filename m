@@ -1,226 +1,215 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9391BDDA
-	for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 13:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3552E1BDC5
+	for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 13:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YbNqgiVv"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-41cd4446cf5so4170531cf.3
-        for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 06:37:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OwHhY7nr"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6b36e1fcea0so722021b3a.1
+        for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 06:48:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697809078; x=1698413878; darn=lists.linux.dev;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=OvesDyRsZBMaI3zqdO/WHTFO9hVwXOwInyA3IPnihpg=;
-        b=YbNqgiVvyZuIX9T9vuiGJCIBb6kG9ghhrmDV/I0qKUsaYoJ2WA5AF2qfzHsKXD5rGa
-         +PfN759tujcux4Y3PSEbFO5LYZwmHKQSGuH0SY5ONDwlZ9S1mNtaGtIerN70bIfklp7/
-         X5N3SJlbHr4h7svQXaTikZSvd4vDDMqGcIi+/a8nx+NY5IUQusI9u4LpDQVHO28/LDdS
-         AJpy3pGWWU3Atn4bNMkhyu14HJndANizc8URjkCLbJB1s+Xc3eRfwQl2SRVFJMBbnuQc
-         ZTcYfQ7HVIAY43NG/Lz3UadvzgMzeqdT2wuaypsE8Tl4znK32juWXHaGjNB6DR/fXG6U
-         2Igg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697809078; x=1698413878;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+        d=gmail.com; s=20230601; t=1697809682; x=1698414482; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=OvesDyRsZBMaI3zqdO/WHTFO9hVwXOwInyA3IPnihpg=;
-        b=J8ih7a+32Pl+NL+gDoyOfUAkhIdfdwoIbf7oe5lMrN3T1IzI7eWZ+ZUdZDIR099v2e
-         HxM8aNQtqjRzEZV/utIeoZOaja8Ih9b606q3h+Nb21sUUnJUKcbW+AvN7IiLkJrRpUVc
-         8mLsFROUvsksUzAlcqTQ9k4CQwocMANc0lSOaqsNlf1b5jqfikZwErieUL8PMYB8/qqp
-         XRFY2MOfs6F9FxYKmlHZibQaTidUgDJoyYV6uWNH3WmjCn0i1GCmB4PUHukL9NYTX92s
-         WvLPMFKLKA1aQ8/3vb+bTtJGh6zxc5iKu8QS/1mPludn1fVkjfG10yIGOdZ+I1HApntM
-         cgAw==
-X-Gm-Message-State: AOJu0YzBwxPLtzPI4eNs9Libj7l/+LtiWqni+XiAe3B3eCy3hbzpQ6Cy
-	GpU9KSRqAZXTYnvKuIpj8LU3Z5l9Z5vQU56i0go53c5Mq5+/xQ==
-X-Google-Smtp-Source: AGHT+IHOiLhDPBIdL5uWKCATBskqA7yAAuSIZj+PS0nH5nxyGNzgGniqWgZXnKOcJti4MJnsTKcNuYSjLG1QsFZwHO8=
-X-Received: by 2002:ac8:5e0b:0:b0:417:b269:4689 with SMTP id
- h11-20020ac85e0b000000b00417b2694689mr1394617qtx.53.1697809077507; Fri, 20
- Oct 2023 06:37:57 -0700 (PDT)
+        bh=9jwcvPXDkNloHAxOTIl1lHW0ybxgi2yXY7gzPjRE7O0=;
+        b=OwHhY7nrMRpCY56ncqU68nGbmwOqBQYh9gLZytp2nOKCaKLlTARuL5vM/blLsYZFyY
+         eEEvqq0TMFnWTXTg1J6AiJ9n+4Gh8MMQXbS/1cHws7kI4RSo1Ms04IXOYnP7FhDfPMZ/
+         QDTbt88xf7xtCibnGWypW1uMtipE1NyrALrfxhFL+TrDKKM9XMw8TODtMVk3rYjSxzyE
+         7LZ5AhjOQS6lbDcHHEQNq+Ufl7rWRK2tkBIGo4oYLeu8c+v9blcjxbaHn8wqIHWRDa7B
+         wwUnZwvMh3eL4Gzjg13Lk7bMv60Et2pTWWFaU3z2pFWsAApkpaHFh9oS/rQiuA+4loln
+         iYaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697809682; x=1698414482;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9jwcvPXDkNloHAxOTIl1lHW0ybxgi2yXY7gzPjRE7O0=;
+        b=vR9gSDAw/3Zv3IpyVddcq48C7/QJSPx+CWD5yJazlt48XB6gZqA3Gw1l5NyLXNwQZL
+         HECOEDYv5t7TU8iLEKS6B5HJ39QyOHh6vMviNLCc7dZ1ddjL0mWsQFveufysMiUq9ybu
+         u5NRJrLX0/KUqUkzKDEw+yDbIOhTGEM2tZ9BN0nc4tq55Mh5v3Olu2zGEvo7hcjjsrua
+         nT3+LxBDtbekme1AZZimTnPHRucfEeZ1wg3LA2h4Y8cD4f8l4yjDlC9A+GmSEor6dV9d
+         LRSs+kh3Ozel/Q9gwGG2Ga40saJyueBZfn4bXPayW39mKJPeNDzhWgMeXz2EY9kljtXR
+         MPpw==
+X-Gm-Message-State: AOJu0YwKiiMni4IG8v+1arxSlYKUzeoP58Fr+be5CbGSBae4GbeNrxe3
+	w70c9TOdnjgJLaKPBagshNmHtkE8csQ=
+X-Google-Smtp-Source: AGHT+IH9oIJ2vrucxuH29Rh/R/9QEDkAq1B2zzZAfOr35U/LcgJwiQs2xyE0zXIsjH4VFyckfMoZlw==
+X-Received: by 2002:a05:6a20:2451:b0:161:3120:e888 with SMTP id t17-20020a056a20245100b001613120e888mr2046374pzc.46.1697809681946;
+        Fri, 20 Oct 2023 06:48:01 -0700 (PDT)
+Received: from [192.168.254.82] ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id g8-20020a63e608000000b0058d26647e45sm1462141pgh.54.2023.10.20.06.48.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Oct 2023 06:48:01 -0700 (PDT)
+Message-ID: <31c28e84-f3a7-4fb4-8ff3-a543c62bf2c2@gmail.com>
+Date: Fri, 20 Oct 2023 06:48:01 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: daniel antoine <univac55@gmail.com>
-Date: Fri, 20 Oct 2023 15:37:46 +0200
-Message-ID: <CA+iibzCp0HZwBsoGM7i4k8v86JJWoDC7UDrEMsnqOoezKLcnyg@mail.gmail.com>
-Subject: iwctl interactive mode error
-To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-Content-Type: multipart/mixed; boundary="000000000000f6630e060825fa6e"
+User-Agent: Mozilla Thunderbird
+Subject: Re: iwctl interactive mode error
+Content-Language: en-US
+To: daniel antoine <univac55@gmail.com>,
+ "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+References: <CA+iibzCp0HZwBsoGM7i4k8v86JJWoDC7UDrEMsnqOoezKLcnyg@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <CA+iibzCp0HZwBsoGM7i4k8v86JJWoDC7UDrEMsnqOoezKLcnyg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---000000000000f6630e060825fa6e
-Content-Type: text/plain; charset="UTF-8"
+Hi Daniel,
 
-Hi gents
+On 10/20/23 6:37 AM, daniel antoine wrote:
+> Hi gents
+> 
+> After compiling iwd at the last commit I have tried to see the status
+> of the network with the iwctl command. When I launch the command i
+> have thisantoine@grat-os1:~$ iwctl
+> 
+> Waiting for IWD to start...Waiting for IWD to start...[iwd]# [iwd]#
+> [iwd]# NetworkConfigurationEnabled: disabled
+> [iwd]# [iwd]# StateDirectory: /var/lib/iwd
+> [iwd]# [iwd]# Version: 2.8
+> [iwd]#
+> 
+> The prompt [iwd]# is repeated several times and when I try to enter a
+> command I got this message
+> Waiting for IWD to start...Waiting for IWD to start...[iwd]# [iwd]#
+> [iwd]# NetworkConfigurationEnabled: disabled
+> [iwd]# [iwd]# StateDirectory: /var/lib/iwd
+> [iwd]# [iwd]# Version: 2.8
+> [iwd]# station list
+> bck:sta
+> 
+> if I force the command it's worse
+> Waiting for IWD to start...Waiting for IWD to start...[iwd]# [iwd]#
+> [iwd]# NetworkConfigurationEnabled: disabled
+> [iwd]# [iwd]# StateDirectory: /var/lib/iwd
+> [iwd]# [iwd]# Version: 2.8
+> [iwd]# station list
+> [iwd]# s[iwd]# s                            Devices in Station Mode
+>                         *
+> [iwd]# s[iwd]# s----------------------------------------------------------------------------------------------------
+> [iwd]# s[iwd]# s  Name                  State            Scanning
+>           ing
+> [iwd]# s[iwd]# s------------------------------------------------------------------------------------------------
+> [iwd]# s[iwd]# s  wlan0                 connected
+> [iwd]# s[iwd]# s
+> [iwd]# s[iwd]# s[iwd]# s[iwd]# s stati[iwd]# stati
+> 
+> It looks like the tab is active all the time and tries to send
+> commands repeatedly . The screen is garbled and there is a click at
+> each tab
+> 
+> The result of a help command
+> [iwd]# helpd]# s[iwd]# s[iwd]# s stati[iwd]# stati
+> [iwd]# [iwd]#
+> [iwd]# [iwd]#                                iwctl version 2.8
+> [iwd]# [iwd]# --------------------------------------------------------------------------------
+> [iwd]# [iwd]#   Usage
+> [iwd]# [iwd]# --------------------------------------------------------------------------------
+> [iwd]# [iwd]#   iwctl [--options] [commands]
+> [iwd]# [iwd]#
+> [iwd]# [iwd]#                                Available options
+> [iwd]# [iwd]# --------------------------------------------------------------------------------
+> [iwd]# [iwd]#   Options                                             Description
+> [iwd]# [iwd]# --------------------------------------------------------------------------------
+> [iwd]# [iwd]#   --username
+> Provide username
+> [iwd]# [iwd]#   --password
+> Provide password
+> [iwd]# [iwd]#   --passphrase
+> Provide passphrase
+> [iwd]# [iwd]#   --dont-ask
+> Don't ask for missing
+>                                                credentials
+> [iwd]# [iwd]#   --help                                              Display help
+> [iwd]# [iwd]#
+> [iwd]# [iwd]#                                Available commands
+> [iwd]# [iwd]# --------------------------------------------------------------------------------
+> [iwd]# [iwd]#   Commands                                            Description
+> [iwd]# [iwd]# --------------------------------------------------------------------------------
+> [iwd]# [iwd]#
+> Adapters:
+> [iwd]# [iwd]#   adapter list
+> List adapters
+> [iwd]# [iwd]#   adapter <phy> show
+> Show adapter info
+> [iwd]# [iwd]#   adapter <phy> set-property <name> <value>           Set property
+> [iwd]# [iwd]#
+> Ad-Hoc:
+> [iwd]# [iwd]#   ad-hoc list
+> List devices in Ad-hoc mode
+> [iwd]# [iwd]#   ad-hoc <wlan> start <"network name"> <passphrase>
+> Start or join an existing
+> [iwd]# [iwd]#
+> Ad-Hoc network called "network
+> [iwd]# [iwd]#
+> name" with a passphrase
+> [iwd]# [iwd]#   ad-hoc <wlan> start_open <"network name">
+> Start or join an existing open
+> [iwd]# [iwd]#
+> Ad-Hoc network called "network
+> [iwd]# [iwd]#                                                       name"
+> [iwd]# [iwd]#   ad-hoc <wlan> stop
+> Leave an Ad-Hoc network
+> [iwd]# [iwd]#
+> Access Point:
+> [iwd]# [iwd]#   ap list
+> List devices in AP mode
+> [iwd]# [iwd]#   ap <wlan> start <"network name"> <passphrase>
+> Start an access point called
+> [iwd]# [iwd]#
+> "network name" with a
+> [iwd]# [iwd]#                                                       passphrase
+> [iwd]# [iwd]#   ap <wlan> start-profile <"network name">
+> Start an access point based on
+> [iwd]# [iwd]#                                                       a
+> disk profile
+> [iwd]# [iwd]#   ap <wlan> stop
+> Stop a started access point
+> [iwd]# [iwd]#   ap <wlan> show                                      Show AP info
+> [iwd]# [iwd]#   ap <wlan> scan
+> Start an AP scan
+> [iwd]# [iwd]#   ap <wlan> get-networks
+> Get network list after
+> [iwd]# [iwd]#                                                       scanning
+> [iwd]# [iwd]#
+> Devices:.......
+> 
+> I am able to launch the command in non interactive mode without problem
+> antoine@grat-os1:~$ iwctl ap list
+>                            Devices in Access Point Mode
+> --------------------------------------------------------------------------------
+>    Name                  Started
+> --------------------------------------------------------------------------------
+> No devices in access point mode available.
+> CY^E
+> antoine@grat-os1:~$ iwctl dpp list
+>                                DPP-capable Devices
+> --------------------------------------------------------------------------------
+>    Name
+> --------------------------------------------------------------------------------
+>    wlan0
+> ^T^XA\^E
+>   but there is strange characters at the end of the command display
+> 
+> There are no compilation errors. I send you my Pkgfile for iwd. I have
+> tried to test with version 2.7 and it's the same.
+> 
+> Libedit has been upgraded to version 20230828-3.1 I don't know if it
+> is related to.
 
-After compiling iwd at the last commit I have tried to see the status
-of the network with the iwctl command. When I launch the command i
-have thisantoine@grat-os1:~$ iwctl
+Could you try with libreadline? I never tested with libedit when it was 
+added, the packages were too old and didn't compile and I didn't bother 
+building from source since others said it worked. I've never seen such a 
+problem myself with libreadline.
 
-Waiting for IWD to start...Waiting for IWD to start...[iwd]# [iwd]#
-[iwd]# NetworkConfigurationEnabled: disabled
-[iwd]# [iwd]# StateDirectory: /var/lib/iwd
-[iwd]# [iwd]# Version: 2.8
-[iwd]#
-
-The prompt [iwd]# is repeated several times and when I try to enter a
-command I got this message
-Waiting for IWD to start...Waiting for IWD to start...[iwd]# [iwd]#
-[iwd]# NetworkConfigurationEnabled: disabled
-[iwd]# [iwd]# StateDirectory: /var/lib/iwd
-[iwd]# [iwd]# Version: 2.8
-[iwd]# station list
-bck:sta
-
-if I force the command it's worse
-Waiting for IWD to start...Waiting for IWD to start...[iwd]# [iwd]#
-[iwd]# NetworkConfigurationEnabled: disabled
-[iwd]# [iwd]# StateDirectory: /var/lib/iwd
-[iwd]# [iwd]# Version: 2.8
-[iwd]# station list
-[iwd]# s[iwd]# s                            Devices in Station Mode
-                       *
-[iwd]# s[iwd]# s----------------------------------------------------------------------------------------------------
-[iwd]# s[iwd]# s  Name                  State            Scanning
-         ing
-[iwd]# s[iwd]# s------------------------------------------------------------------------------------------------
-[iwd]# s[iwd]# s  wlan0                 connected
-[iwd]# s[iwd]# s
-[iwd]# s[iwd]# s[iwd]# s[iwd]# s stati[iwd]# stati
-
-It looks like the tab is active all the time and tries to send
-commands repeatedly . The screen is garbled and there is a click at
-each tab
-
-The result of a help command
-[iwd]# helpd]# s[iwd]# s[iwd]# s stati[iwd]# stati
-[iwd]# [iwd]#
-[iwd]# [iwd]#                                iwctl version 2.8
-[iwd]# [iwd]# --------------------------------------------------------------------------------
-[iwd]# [iwd]#   Usage
-[iwd]# [iwd]# --------------------------------------------------------------------------------
-[iwd]# [iwd]#   iwctl [--options] [commands]
-[iwd]# [iwd]#
-[iwd]# [iwd]#                                Available options
-[iwd]# [iwd]# --------------------------------------------------------------------------------
-[iwd]# [iwd]#   Options                                             Description
-[iwd]# [iwd]# --------------------------------------------------------------------------------
-[iwd]# [iwd]#   --username
-Provide username
-[iwd]# [iwd]#   --password
-Provide password
-[iwd]# [iwd]#   --passphrase
-Provide passphrase
-[iwd]# [iwd]#   --dont-ask
-Don't ask for missing
-                                              credentials
-[iwd]# [iwd]#   --help                                              Display help
-[iwd]# [iwd]#
-[iwd]# [iwd]#                                Available commands
-[iwd]# [iwd]# --------------------------------------------------------------------------------
-[iwd]# [iwd]#   Commands                                            Description
-[iwd]# [iwd]# --------------------------------------------------------------------------------
-[iwd]# [iwd]#
-Adapters:
-[iwd]# [iwd]#   adapter list
-List adapters
-[iwd]# [iwd]#   adapter <phy> show
-Show adapter info
-[iwd]# [iwd]#   adapter <phy> set-property <name> <value>           Set property
-[iwd]# [iwd]#
-Ad-Hoc:
-[iwd]# [iwd]#   ad-hoc list
-List devices in Ad-hoc mode
-[iwd]# [iwd]#   ad-hoc <wlan> start <"network name"> <passphrase>
-Start or join an existing
-[iwd]# [iwd]#
-Ad-Hoc network called "network
-[iwd]# [iwd]#
-name" with a passphrase
-[iwd]# [iwd]#   ad-hoc <wlan> start_open <"network name">
-Start or join an existing open
-[iwd]# [iwd]#
-Ad-Hoc network called "network
-[iwd]# [iwd]#                                                       name"
-[iwd]# [iwd]#   ad-hoc <wlan> stop
-Leave an Ad-Hoc network
-[iwd]# [iwd]#
-Access Point:
-[iwd]# [iwd]#   ap list
-List devices in AP mode
-[iwd]# [iwd]#   ap <wlan> start <"network name"> <passphrase>
-Start an access point called
-[iwd]# [iwd]#
-"network name" with a
-[iwd]# [iwd]#                                                       passphrase
-[iwd]# [iwd]#   ap <wlan> start-profile <"network name">
-Start an access point based on
-[iwd]# [iwd]#                                                       a
-disk profile
-[iwd]# [iwd]#   ap <wlan> stop
-Stop a started access point
-[iwd]# [iwd]#   ap <wlan> show                                      Show AP info
-[iwd]# [iwd]#   ap <wlan> scan
-Start an AP scan
-[iwd]# [iwd]#   ap <wlan> get-networks
-Get network list after
-[iwd]# [iwd]#                                                       scanning
-[iwd]# [iwd]#
-Devices:.......
-
-I am able to launch the command in non interactive mode without problem
-antoine@grat-os1:~$ iwctl ap list
-                          Devices in Access Point Mode
---------------------------------------------------------------------------------
-  Name                  Started
---------------------------------------------------------------------------------
-No devices in access point mode available.
-CY^E
-antoine@grat-os1:~$ iwctl dpp list
-                              DPP-capable Devices
---------------------------------------------------------------------------------
-  Name
---------------------------------------------------------------------------------
-  wlan0
-^T^XA\^E
- but there is strange characters at the end of the command display
-
-There are no compilation errors. I send you my Pkgfile for iwd. I have
-tried to test with version 2.7 and it's the same.
-
-Libedit has been upgraded to version 20230828-3.1 I don't know if it
-is related to.
-
-Best regards
-
-Daniel
-
---000000000000f6630e060825fa6e
-Content-Type: application/octet-stream; name=Pkgfile
-Content-Disposition: attachment; filename=Pkgfile
-Content-Transfer-Encoding: base64
-Content-ID: <f_lnyneprk0>
-X-Attachment-Id: f_lnyneprk0
-
-bWFrZWRlcGVuZHM9KGRidXMgcHl0aG9uLWRvY3V0aWxzIHJlYWRsaW5lKQoKZGVzY3JpcHRpb249
-IkludGVybmV0IFdpcmVsZXNzIERhZW1vbiIKdXJsPSJodHRwczovL2dpdC5rZXJuZWwub3JnL2Nn
-aXQvbmV0d29yay93aXJlbGVzcy9pd2QuZ2l0LyIKCnBhY2thZ2VyPSJZYW9saW51eCBUZWFtIgpt
-YWludGFpbmVyPSJEYW5pYSIKCm5hbWU9aXdkCnZlcnNpb249Mi44CgojTGFzdCBjb21taXQgb24g
-aXdkIHJlcG8KX2NvbW1pdDE9MmM3YmYyNzU2ZTJiOTE5MTE2MTVkYjlmZTA4Mjk3NjAxZDQ5M2M5
-OAoKI0xhc3QgY29tbWl0IG9uIGVsbCByZXBvCl9jb21taXQyPWViMTM5ZTIzYWJmMzVlYzhiZjky
-MmZjNjQwYWExMjkyODI2MjI1YTMKCnByZXBhcmUoKSB7CiAgZ2l0IGNsb25lIGh0dHBzOi8vZ2l0
-Lmtlcm5lbC5vcmcvcHViL3NjbS9saWJzL2VsbC9lbGwuZ2l0IGVsbAoKICBjZCBlbGwKICBnaXQg
-Y2hlY2tvdXQgJHtfY29tbWl0Mn0KCiAgY2QgLi4KCiAgZ2l0IGNsb25lIGh0dHBzOi8vZ2l0Lmtl
-cm5lbC5vcmcvcHViL3NjbS9uZXR3b3JrL3dpcmVsZXNzL2l3ZC5naXQgaXdkCgogIGNkIGl3ZAog
-IGdpdCBjaGVja291dCAke19jb21taXQxfQoKICBhdXRvcmVjb25mIC1maXYKfQoKYnVpbGQoKSB7
-CiAgY2QgaXdkCgogIC4vY29uZmlndXJlIC0tcHJlZml4PS91c3IgXAogICAgICAgICAgICAgIC0t
-c3lzY29uZmRpcj0vZXRjIFwKICAgICAgICAgICAgICAtLWxvY2Fsc3RhdGVkaXI9L3ZhciBcCiAg
-ICAgICAgICAgICAgLS1saWJleGVjZGlyPS91c3IvbGliL2l3ZCBcCiAgICAgICAgICAgICAgLS1l
-bmFibGUtd2lyZWQgXAogICAgICAgICAgICAgIC0tZW5hYmxlLW9mb25vIFwKICAgICAgICAgICAg
-ICAtLWVuYWJsZS1od3NpbSBcCiAgICAgICAgICAgICAgLS1lbmFibGUtbGliZWRpdCBcCiAgICAg
-ICAgICAgICAgLS1kaXNhYmxlLXRvb2xzCgogIG1ha2UKICBtYWtlIGluc3RhbGwgREVTVERJUj0k
-UEtHCgogIGluc3RhbGwgLWRtNzAwICRQS0cvdmFyL2xpYi9lYWQvCiAgaW5zdGFsbCAtZG03MDAg
-JFBLRy92YXIvbGliL2l3ZC8KfQo=
---000000000000f6630e060825fa6e--
+> 
+> Best regards
+> 
+> Daniel
