@@ -1,125 +1,91 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9D519440
-	for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 23:12:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0BC12E65
+	for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 12:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tcu+iVg9"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6ce31c4a653so152606a34.3
-        for <iwd@lists.linux.dev>; Thu, 19 Oct 2023 16:12:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SqqvTZ/6"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-66d122e0c85so4485226d6.3
+        for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 05:50:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697757132; x=1698361932; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ugIDM/pawBEvSJnf2qEJJftCkAoJCYGn8h4JgpjQZfs=;
-        b=Tcu+iVg9+ogLyDqgMdAqkrkPuypGvShIq2esdaZhbh7VZd81THfpLukQq2Y8ENRfx3
-         /AqoySi+x4fUJ8rw4wce9KZ7Tr4mOpDV1+kVMFBoDBXidCAJx37qg+NSWopWE6FPBLfo
-         JjQmmYrMSCDVOVUuMEnCstQX3TmfNRxdsk0ZqyKJlyS17CIHFKLLIuzLaFdBKK8GMK7d
-         Xl0T5BBTK5niy6ADqoxlh1ou97gS338UCEULy8obf+rLr2s2NpzEz+xwtanuddq4VL6G
-         9rZes3rKVmSfoKkZCiAiTHsDZRRXawDXm+MamGUVhOstbPc7coXP0fuCaBwX1W6EDC1S
-         E1tQ==
+        d=gmail.com; s=20230601; t=1697806228; x=1698411028; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zdMg8DaOZqIjpQ7D0LR5TehYcPHaUI8tuTl8BR/DkIs=;
+        b=SqqvTZ/67kX8KVQL9+yhQR1invar+liWf0SYjZV2tPwgeJ2Q1nFekLQ+M/8fi+28Jw
+         sFBYJ2sUvYQZUNkTllXaVG+3b7bYWP9RooN+NetTDTeOS5HvscDfsx92HVgLqz7xvka/
+         F/eH0q+9h78RpllH7VlAwL0GAHAaRGLxedSpBzaeNdSqhj5RLf15JAA/kbwVPZBx5EMR
+         4NTx6tNOwMFyUAu1SAtQrDN+AzCSYsed+aNTpqzxfaVydWKDoBMD9T8gtVHQdb7Trpt1
+         rKMfUKssPFxsDQd/TpXtJot+EEtVseKofqchZnGig8O20wJ7fDLwynVgUataXyDEkLnt
+         iUqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697757132; x=1698361932;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ugIDM/pawBEvSJnf2qEJJftCkAoJCYGn8h4JgpjQZfs=;
-        b=HBgTnfmTJ+pBWG4axrOAamUN/cT3+oVHSUwEml3PLBl3pMB7oVaELKS9g77QN4EoUL
-         2wBwEedmCMB9Z86BVbvQI7zM4F3121ci6L5ypR75aWXJL0nXKU/pyoO2tCufBKyLCDU9
-         L8XRHDM4FGc9gZP4TGJdDcDt6Dfa8BSZjt/ik+UqZSezGtlbGdXqYg3pFm/lqaigjfU0
-         94ooOLfbxyy981JUftqKdc9fXVO8MiojlNtDMDFf/JztWE1rqaWU/zn+QxflKD08d6Zp
-         Pm4vMstSyGER16jy1sG5ULxNgdSDbYc5MJr9loZUNgmU5tFQv/n8d3NNoYLcl29lCTBH
-         2PhQ==
-X-Gm-Message-State: AOJu0YxZSwW5129SLkqPFysj/E44hRjqXQbiULoc+X0mcnuvB8tyaCCK
-	RybWcIfe/f/9jleBN6HLcGgv2ZikxAI=
-X-Google-Smtp-Source: AGHT+IEDpwi72o5z+bYVd5xgAskq8S983X6qDzLpuSsZJSgojCns91JYCkbbD3e2z0DK3rbJjF+rnQ==
-X-Received: by 2002:a05:6830:4ba:b0:6cd:9b6:5954 with SMTP id l26-20020a05683004ba00b006cd09b65954mr183396otd.38.1697757131940;
-        Thu, 19 Oct 2023 16:12:11 -0700 (PDT)
-Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id d8-20020a056830004800b006cd09ba046fsm104563otp.61.2023.10.19.16.12.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Oct 2023 16:12:11 -0700 (PDT)
-Message-ID: <f812bdcd-219e-4e0d-8816-46015bd7cdab@gmail.com>
-Date: Thu, 19 Oct 2023 18:12:10 -0500
+        d=1e100.net; s=20230601; t=1697806228; x=1698411028;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zdMg8DaOZqIjpQ7D0LR5TehYcPHaUI8tuTl8BR/DkIs=;
+        b=Z7T0CcpOwRzjlyEjPkID9AVqtdwBRQs9BlRj7pKCsl+85e36TrKIaMPFmJlVcItROj
+         /PACTSvSZH6g6UIAwP0sloA02Qw+CfDPAblF6shxewPsvLa+GHT5DwGjKnBUKsWXj4ww
+         R4ke25z/rVEOeR4nK1rk2+c9dn6tzwi+pKIxphvHVoidKsAw1ny/AsQCmzd/GAZG3kqN
+         kX/SADcKWv8jmX0lTpdJzAgcWQM+72sGId5forZ3T0YZFy/wLZ9/uGw/hpqx8udF3sod
+         BpOp3iaXUzWZKAWx5F51M8S/+wOaMI8U7oDRasUSD0NB8gvE6sc8YfqDoXCboiqRgTzz
+         DCNg==
+X-Gm-Message-State: AOJu0YzD81AZ1GJr0JGoh2TTXqIb5ETP/rQiTOdq7r7dWjzZdwt2YjBj
+	EdbYM/eUYzAV/0rDJuHwYu+d/vUTEcc=
+X-Google-Smtp-Source: AGHT+IHjdzJy/XkEyRfTT7MvDGC9/PGdjKyx1aNDRNkC3qutdRlt+t3EoFtdsRzxxWzo0Ve+UTAYCA==
+X-Received: by 2002:a05:6214:21e3:b0:66d:15c3:62ca with SMTP id p3-20020a05621421e300b0066d15c362camr2259409qvj.24.1697806227739;
+        Fri, 20 Oct 2023 05:50:27 -0700 (PDT)
+Received: from LOCLAP699.rst-01.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id dw14-20020a0562140a0e00b0066d02f0af01sm657487qvb.72.2023.10.20.05.50.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Oct 2023 05:50:26 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] station: fix unintended netconfig_reset pre-roaming
+Date: Fri, 20 Oct 2023 05:50:21 -0700
+Message-Id: <20231020125021.107671-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/21] doc: PKEX support for DPP
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20231012200150.338401-1-prestwoj@gmail.com>
- <20231012200150.338401-12-prestwoj@gmail.com>
- <41078822-99da-466e-b612-91a8c223dbde@gmail.com>
- <0dd4a4a5-95aa-49c1-be77-e640862c3f82@gmail.com>
- <62d0c420-3bc5-45a8-80c6-c4c59db7ae2c@gmail.com>
- <d69dd453-95b8-49b0-9419-3ee0c7c98fe1@gmail.com>
- <a38fc175-3095-488d-a0ea-a70e7f148540@gmail.com>
- <035c5cb1-d5be-4c4b-a6f5-8c0941926225@gmail.com>
- <c8617f8d-0c7c-4e1c-ab0f-f356a121afe6@gmail.com>
- <ae7b807f-fb7b-4437-9e00-bc4f64ad6047@gmail.com>
- <d4fdadd8-dc2b-47b0-b1ac-114abed91f39@gmail.com>
- <7de9faab-5863-48f5-8de6-28e1b543d2b8@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <7de9faab-5863-48f5-8de6-28e1b543d2b8@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Commit 23f0f5717c did not correctly handle the reassociation
+case where the state is set from within station_try_next_transition.
+If IWD reassociates netconfig will get reset and DHCP will need to
+be done over again after the roam. Instead get the state ahead of
+station_try_next_transition.
+---
+ src/station.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> 
-> My comparison to the PSK is that there is no difference in guessing the PSK vs 
-> PKEX key. Both equally compromise you.
-> 
+diff --git a/src/station.c b/src/station.c
+index f24b9aca..e18847bc 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2470,6 +2470,7 @@ static void station_transition_start(struct station *station)
+ {
+ 	struct roam_bss *rbss;
+ 	bool roaming = false;
++	bool connected = (station->state == STATION_STATE_CONNECTED);
+ 
+ 	/*
+ 	 * For each failed attempt pop the BSS leaving the head of the queue
+@@ -2498,7 +2499,7 @@ static void station_transition_start(struct station *station)
+ 	 * still should roam in this case but need to restart netconfig once the
+ 	 * roam is finished.
+ 	 */
+-	if (station->netconfig && station->state != STATION_STATE_CONNECTED) {
++	if (station->netconfig && !connected) {
+ 		netconfig_reset(station->netconfig);
+ 		station->netconfig_after_roam = true;
+ 	}
+-- 
+2.25.1
 
-I'm with you :)
-
-> I'm not sure that quote specifically is mandating the PKEX exchange use a 
-> different password every time, just that an exchange will tell you _if_ you 
-> guessed the password correctly. But you are right that the DPP spec wants a 
-> different PW to be used each time.
-
-I'll need to do a bit more spelunking in the relevant specifications to see if 
-we have a bit more leeway, but ...
-
-The draft RFC is pretty explicit, it does not mandate 'every time', but close 
-enough:
-
-"Implementations SHALL maintain a counter of unsuccessful exchanges
-    for each password in order to defend against repeated active attacks
-    to determine the password.  This counter SHALL be set to zero when a
-    password is provisioned and incremented each time PKEX finishes
-    unsuccessfully for that password.  When the counter reaches a value
-    of five (5) the password SHALL be irretrievably removed from the
-    implementation."
-
-The DPP spec is a bit more permissive in that it says 'If both sides have a user 
-interface'.  But I think the intent is for the shared code to be regenerated on 
-each attempt.
-
-> 
-> "shall use a fresh code each time and the same code shall not be used with 
-> different Peers"
-> 
-> So we don't have to put it in the config file if you don't want to. 
-> Auto-generation just won't work for my purposes since I have no way of sharing 
-> that on a headless device, so if that's a must I'd have to do some thinking...
-
-Fair enough, lets explore whether we can provide this via some agent API.
-
-> 
-> I'm fine with it as an argument to the StartConfigurator API. An agent could 
-> work but we've also got the optional identifier to think about. I'd prefer to 
-> use the existing agent API for getting a passphrase rather than a new method.
-> 
-
-But the identifier is not supposed to be secret?
-
-Regards,
--Denis
