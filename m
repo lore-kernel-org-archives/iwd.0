@@ -1,91 +1,95 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0BC12E65
-	for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 12:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837B112E65
+	for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 12:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SqqvTZ/6"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-66d122e0c85so4485226d6.3
-        for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 05:50:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c3RonJce"
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-66d11fec9a5so4860256d6.1
+        for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 05:52:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697806228; x=1698411028; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zdMg8DaOZqIjpQ7D0LR5TehYcPHaUI8tuTl8BR/DkIs=;
-        b=SqqvTZ/67kX8KVQL9+yhQR1invar+liWf0SYjZV2tPwgeJ2Q1nFekLQ+M/8fi+28Jw
-         sFBYJ2sUvYQZUNkTllXaVG+3b7bYWP9RooN+NetTDTeOS5HvscDfsx92HVgLqz7xvka/
-         F/eH0q+9h78RpllH7VlAwL0GAHAaRGLxedSpBzaeNdSqhj5RLf15JAA/kbwVPZBx5EMR
-         4NTx6tNOwMFyUAu1SAtQrDN+AzCSYsed+aNTpqzxfaVydWKDoBMD9T8gtVHQdb7Trpt1
-         rKMfUKssPFxsDQd/TpXtJot+EEtVseKofqchZnGig8O20wJ7fDLwynVgUataXyDEkLnt
-         iUqg==
+        d=gmail.com; s=20230601; t=1697806339; x=1698411139; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Dnm4GM4OE7bd05TuSAU/Sbv4DI+nqzwohLuN00aFvgg=;
+        b=c3RonJceZbJsjEmxnCGLKXLdJokMJgTsJ+ngAfUS0XNtqH1PpOK+vhKuEX8dQcLNlh
+         WH2LsqtWReJdupDBemiowHj09IS5aNVclXfnywXGA54k+lDgxnVEw6k/QDW7AuU1vkOY
+         IUsYmxvloxVFFiZIxlKPDJfx2GCUQrO4q85QSYiY9WadLBUtYzKNMEjeNotXv29MtTpl
+         1KRKvGI4xhL7yezivOgpX/Pd/OOVr1QTr5bn3rSs3wnKwfTZ5AA+YVy2h1wbYXn8Eede
+         aSQF/Z0YYG7kt3yY6CRxxdr0bq4fdrGOv0YWhRYgFF/lfF5PUjM7ooKehFtxMLXu8/ce
+         pYNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697806228; x=1698411028;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zdMg8DaOZqIjpQ7D0LR5TehYcPHaUI8tuTl8BR/DkIs=;
-        b=Z7T0CcpOwRzjlyEjPkID9AVqtdwBRQs9BlRj7pKCsl+85e36TrKIaMPFmJlVcItROj
-         /PACTSvSZH6g6UIAwP0sloA02Qw+CfDPAblF6shxewPsvLa+GHT5DwGjKnBUKsWXj4ww
-         R4ke25z/rVEOeR4nK1rk2+c9dn6tzwi+pKIxphvHVoidKsAw1ny/AsQCmzd/GAZG3kqN
-         kX/SADcKWv8jmX0lTpdJzAgcWQM+72sGId5forZ3T0YZFy/wLZ9/uGw/hpqx8udF3sod
-         BpOp3iaXUzWZKAWx5F51M8S/+wOaMI8U7oDRasUSD0NB8gvE6sc8YfqDoXCboiqRgTzz
-         DCNg==
-X-Gm-Message-State: AOJu0YzD81AZ1GJr0JGoh2TTXqIb5ETP/rQiTOdq7r7dWjzZdwt2YjBj
-	EdbYM/eUYzAV/0rDJuHwYu+d/vUTEcc=
-X-Google-Smtp-Source: AGHT+IHjdzJy/XkEyRfTT7MvDGC9/PGdjKyx1aNDRNkC3qutdRlt+t3EoFtdsRzxxWzo0Ve+UTAYCA==
-X-Received: by 2002:a05:6214:21e3:b0:66d:15c3:62ca with SMTP id p3-20020a05621421e300b0066d15c362camr2259409qvj.24.1697806227739;
-        Fri, 20 Oct 2023 05:50:27 -0700 (PDT)
-Received: from LOCLAP699.rst-01.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id dw14-20020a0562140a0e00b0066d02f0af01sm657487qvb.72.2023.10.20.05.50.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 05:50:26 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] station: fix unintended netconfig_reset pre-roaming
-Date: Fri, 20 Oct 2023 05:50:21 -0700
-Message-Id: <20231020125021.107671-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1697806339; x=1698411139;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dnm4GM4OE7bd05TuSAU/Sbv4DI+nqzwohLuN00aFvgg=;
+        b=HB+6xACCabu8iFMmg28EPEJLpsfN0TaHHucPesNy4PXTvrQcfY62U47meyc5e+5PYl
+         H5fIetdli+adadpeouF3nC0b2vwMFBvKc25gZiQ4P1EVf7Sy6g19ODzAs9a8DOOHTHMZ
+         cEXB/pNU3rJW7Q9095jqp20mxhps3ouXJG2/4Io/AzIjz3hUbCIJAKpbbAeUl/WbOfXD
+         WVYzFhAEOZhphp7wjNVCbmhmEm7ZaNKKGs3rT3IeOOyXGW3JpTIMoDQ1Yshmi+33XkqE
+         ryOhkJf3oRf4Ov48i1vU9pbyBEQJMjdT5iKgiQld8xz8+YjPX9zMg8i2KPw1JVAT72bN
+         1Xhg==
+X-Gm-Message-State: AOJu0YznC/uyZ2dGIGK1DZg4SW/fYZnp5znWiV904PqFZKVwFYL27hsd
+	bN2jgWSn8RO5CMdpI/jUvgqi9VQ2K9o=
+X-Google-Smtp-Source: AGHT+IFbefJ9s133BQd6oQyhJjT0DvtIQasphN7fh1nSEBTeMCyDl9HY8UHWSS5eqyHFtfHPIg1Row==
+X-Received: by 2002:a0c:b458:0:b0:66d:3716:4e14 with SMTP id e24-20020a0cb458000000b0066d37164e14mr1646261qvf.4.1697806339126;
+        Fri, 20 Oct 2023 05:52:19 -0700 (PDT)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id dk9-20020a056214092900b0065b5306565esm648847qvb.112.2023.10.20.05.52.18
+        for <iwd@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Oct 2023 05:52:18 -0700 (PDT)
+Message-ID: <a8885dd9-eeff-4318-b7c9-5f54a3273913@gmail.com>
+Date: Fri, 20 Oct 2023 05:52:17 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] build: install iwd-decrypt-profile
+Content-Language: en-US
+To: iwd@lists.linux.dev
+References: <20231003192456.4038590-1-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20231003192456.4038590-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Commit 23f0f5717c did not correctly handle the reassociation
-case where the state is set from within station_try_next_transition.
-If IWD reassociates netconfig will get reset and DHCP will need to
-be done over again after the roam. Instead get the state ahead of
-station_try_next_transition.
----
- src/station.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Resending in case this got missed.
 
-diff --git a/src/station.c b/src/station.c
-index f24b9aca..e18847bc 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2470,6 +2470,7 @@ static void station_transition_start(struct station *station)
- {
- 	struct roam_bss *rbss;
- 	bool roaming = false;
-+	bool connected = (station->state == STATION_STATE_CONNECTED);
- 
- 	/*
- 	 * For each failed attempt pop the BSS leaving the head of the queue
-@@ -2498,7 +2499,7 @@ static void station_transition_start(struct station *station)
- 	 * still should roam in this case but need to restart netconfig once the
- 	 * roam is finished.
- 	 */
--	if (station->netconfig && station->state != STATION_STATE_CONNECTED) {
-+	if (station->netconfig && !connected) {
- 		netconfig_reset(station->netconfig);
- 		station->netconfig_after_roam = true;
- 	}
--- 
-2.25.1
-
+On 10/3/23 12:24 PM, James Prestwood wrote:
+> If profile encryption is enabled its not out of the question that
+> somebody might need to decrypt it. This isn't a problem building
+> from source but IWD as a package likely won't include the decrypt
+> tool unless its specifically copied out. Add iwd-decrypt-profile
+> to the list of installed programs like iwctl, iwmon, etc
+> 
+> This also fixes a minor bug in Makefile.am which was building both
+> iwd-profile-decrypt and probe-req if DAEMON was true. This should
+> be TOOLS.
+> ---
+>   Makefile.am | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index 2e962153..ebabcf1c 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -378,8 +378,9 @@ man_MANS += wired/ead.8
+>   endif
+>   endif
+>   
+> -if DAEMON
+> -noinst_PROGRAMS += tools/probe-req tools/iwd-decrypt-profile
+> +if TOOLS
+> +noinst_PROGRAMS += tools/probe-req
+> +bin_PROGRAMS += tools/iwd-decrypt-profile
+>   
+>   tools_probe_req_SOURCES = tools/probe-req.c src/mpdu.h src/mpdu.c \
+>   					src/ie.h src/ie.c \
