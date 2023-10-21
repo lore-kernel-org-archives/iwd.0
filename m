@@ -1,158 +1,158 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5045E208C2
-	for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 19:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783F87ED
+	for <iwd@lists.linux.dev>; Sat, 21 Oct 2023 00:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bLToKDr1"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6b709048d8eso1014563b3a.2
-        for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 12:10:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697829009; x=1698433809; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:references:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2+FpgXQ78gFhOiFl2yCH0lpZRIQym93CEcUspHj7dTw=;
-        b=bLToKDr1Az7ErYli41iub1BYuhyq6WJ8IOweysCFKUHMovhpcAmkE78qJDy40azvaN
-         YKH/AFEGF7ateh8hbY/3gDLwnGUjK+6P6fjhbvqVfE0GtWNvKyzmAGgu0C1CwJih2TrS
-         07P05fjKO0XMVLpfoQFWPo8vl5JPQo9gFcziXaI9b/GoGaoZmKxR/hGny6oTOBPzsa9K
-         xEUzhB/R9pW2l+/Vc4z14ibwtJxfV4gab/iqBOawZAGxY+xSd18M4iwvAm7YXOfbOBGx
-         VQCAZw09CLm0Foazgr8pdWJNtsWQMiS/gx8Qeu+AgcIV4yqFcf/ul88qXEcYhL/CjN2x
-         +kbw==
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="EsiAusmB"
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id C542F3F18D
+	for <iwd@lists.linux.dev>; Sat, 21 Oct 2023 00:34:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1697848445;
+	bh=ZJ84y0hScOEkj1h6JulZq4QlWt3lxMKLPqGXWjMLlyE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type;
+	b=EsiAusmBOQYCvz0Z91pp2Mtzv4cVjKyniqH7I7IMoJ1SsN9RyvcG/fY916Wsy3Ffc
+	 N0cdugURp9gElHN1tz9FuAnW8vg0LIwKD+qf+tn77SKxsy7SWmF7QVSrrIlCUryoCA
+	 W7Q6gzs515RdTGN4w/ITTjkHGPGURXQCOzZd5w4+i7B1M7Ipv334RhGMQxj2ZiuLxW
+	 xI3k18R1vCy7ICzi1KvmpWJHQWdGpY/eraExQKEI3wEvRb7kJQ/m4nXzbiiYb0UBlS
+	 bGYPlKPRT43Aa6zXeWfeBveAYNcvnsGlwjCf2m+rr9HouK5d69mYCiGLZCOX12v2T6
+	 b2n1Z7kExOxUQ==
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4084e4ce543so8265225e9.3
+        for <iwd@lists.linux.dev>; Fri, 20 Oct 2023 17:34:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697829009; x=1698433809;
-        h=content-transfer-encoding:in-reply-to:references:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1697848445; x=1698453245;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2+FpgXQ78gFhOiFl2yCH0lpZRIQym93CEcUspHj7dTw=;
-        b=cvj29MC8nEcQHcx/P0HjVcfIm1vVFGnEhDEQ6vSR876cDJjwUlyWx23Tvq2NZjmt+B
-         rarFtlBH/99dMgy21zrA4bAKY5Myq6F+e2JKi39dlkEmRrqFTWPf280jrOTgw4W7A795
-         DWyNY/+oHvwajVksQm5Rj/i6zunkMdFmthYUQIFX6xImRH/lBp27BeXWjmKjX9e5p7pY
-         AdFozEwpqehytq1S2UDFjQjpr8+lwY7i1qWUkiJHxbtzN75GYUA7jI7zQ6f9VmhFJ2o4
-         DA22zUFG3dDPNLA0sALvfwGNZQpGoMGmXFq6ipb0a2u1dXHKNV65YaCwHC9KG8VhvoJO
-         kYyw==
-X-Gm-Message-State: AOJu0YwtRK7UHA/PJXyBxdnpYKj5G4SbYOAMit8+ddmvvGH6KYu2TFJi
-	MkPyXKC567a7wDMMBWGgvyfjlTUJB9U=
-X-Google-Smtp-Source: AGHT+IGttDkKM6m/l+BtYjqVTW/q3S/VT4KaHgifjqZblfsUgL3cRq/WatPfAi2CGeTredvBsR25EA==
-X-Received: by 2002:a05:6a20:1592:b0:12f:c0c1:d70 with SMTP id h18-20020a056a20159200b0012fc0c10d70mr3125851pzj.40.1697829009472;
-        Fri, 20 Oct 2023 12:10:09 -0700 (PDT)
-Received: from [192.168.254.82] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id x1-20020aa78f01000000b00690ca67d429sm1890348pfr.100.2023.10.20.12.10.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Oct 2023 12:10:09 -0700 (PDT)
-Message-ID: <50663f9c-b0fb-48d7-ac9d-71b84de30ec2@gmail.com>
-Date: Fri, 20 Oct 2023 12:10:08 -0700
+        bh=ZJ84y0hScOEkj1h6JulZq4QlWt3lxMKLPqGXWjMLlyE=;
+        b=aH5AA4dzp1P7NWIJbWldgZYeWoSlrg/r7hqLsxR0VUkc0A5jX0hs5j9o0e9RlEQiNO
+         T6eJW+GU9+RgtXRFwOmM24ndOiHk8nHeN5gdFRKxQw7k+LnwERDHfxMoUytFGk6GDOje
+         5QxpIrb4LJ67MQ5LXFRV3+HVd+dbCE3XtmfB1Mdb7c6MHgEG23eKfcdZF8PL6tXiXIAg
+         BGcrJ0Y6/9WUxKbepYKs0oCBSPBb270IY1ACCVHb1By0mx6tTunVCKw9Lp+mIqL+mcO8
+         dlPfkrw+LZX4SO8ADErMJ0IhagozEHihyAq1N8xC1bCq2WdeafK76zTcMSntenUF1N1l
+         l13Q==
+X-Gm-Message-State: AOJu0Yx7u/uHayFJKI4aJlN5jqoKaaRTe+uBNkZxxn53Vcz96FUX2wdL
+	9pZ3tZ+aCwRTypMnayBDSRYY4TBZntmMvdDmDVM1TLsNoJDnVLpCKVGscXOkSrTzRaTcUoe4nJa
+	oMdsloykehNBLfzoTViWnuFveQpkVQAm2ZygFqG7uUPoFifHWZvt7gXu5
+X-Received: by 2002:a05:600c:138d:b0:3fe:dcd0:2e32 with SMTP id u13-20020a05600c138d00b003fedcd02e32mr2598075wmf.19.1697848444998;
+        Fri, 20 Oct 2023 17:34:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH1tlHk0OPE+ZtxVf1UUIMXP6SiBLpYc5EgM3Mwmnup3LaGEZ3TLtMEErjaw+lDrzK+Z4t7CF5tznmg312bo2U=
+X-Received: by 2002:a05:600c:138d:b0:3fe:dcd0:2e32 with SMTP id
+ u13-20020a05600c138d00b003fedcd02e32mr2598066wmf.19.1697848444674; Fri, 20
+ Oct 2023 17:34:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/21] offchannel: add support to issue multiple
- offchannel requests
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20231012200150.338401-1-prestwoj@gmail.com>
- <20231012200150.338401-11-prestwoj@gmail.com>
- <9182f9f2-4752-4737-bbf7-d308136d47fd@gmail.com>
- <78efd011-8851-43fe-b1b7-adf42a23ff68@gmail.com>
- <dda44204-e322-4802-b1dc-a2a61de83a3d@gmail.com>
- <6395c614-451b-42f5-8918-7fc3773c2134@gmail.com>
- <e5ddaedf-b334-4d53-bd88-eff92d250efe@gmail.com>
- <832c2b23-f009-494d-b497-b1c4075f3caf@gmail.com>
-In-Reply-To: <832c2b23-f009-494d-b497-b1c4075f3caf@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20231014235445.167620-1-dimitri.ledkov@canonical.com>
+ <075d94c6-4ce3-4945-b765-71ad6285dd67@gmail.com> <CADWks+bdeDgAZKUs6wbdi3KjDHeONO7LkmjX_-9wT15m91PvPQ@mail.gmail.com>
+ <c29ea330-c84a-41a7-b5e0-ef44993736e2@gmail.com>
+In-Reply-To: <c29ea330-c84a-41a7-b5e0-ef44993736e2@gmail.com>
+From: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Date: Sat, 21 Oct 2023 01:33:28 +0100
+Message-ID: <CADWks+au-HzFjSopfHYnpz3kUW1uOR7aEFTe_m0qHfVvJPcfFA@mail.gmail.com>
+Subject: Re: [PATCH] eap-mschapv2: allow using on kernels without CRYPTO_MD4,
+ and deprecate
+To: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Denis,
+On Thu, 19 Oct 2023 at 03:54, Denis Kenzior <denkenz@gmail.com> wrote:
+>
+> Hi Dimitri,
+>
+> >
+> > But also how does the outer TLS tunnel help all the way? Remote site
+> > people sure, but do people enforce using outer TLS tunnels like
+> > internal inside the office network? As in can employees sniff each
+> > others traffic and still impersonate each other? Meaning this
+> > authentication method is still more or less a fig leaf.
+>
+> The outer TLS tunnel is mandatory for PEAP/TTLS and is very secure, assuming a
+> well configured system.  This means that the station (client) side has a CA
+> Certificate it can use to validate the AP.  If public CAs are being used, then
+> security can be further enhanced by using ServerDomainMask setting.
+>
+> Think of EAP-PEAP or EAP-TTLS as username/password authentication within HTTPS.
+> Its just that EAP-PEAP uses MSCHAPv2(MD4) or EAP-MD5 and EAP-TTLS uses
+> MSCHAP(DES)/ MSCHAPv2(MD4), CHAP(MD5), PAP(cleartext).
+>
+> How the network is configured at the AP is not really our problem.  There are
+> ways to separate all clients on the AP from each other via vlans, etc.
+>
 
-On 10/19/23 2:47 PM, James Prestwood wrote:
-> Hi Denis,
-> 
-> On 10/19/23 2:42 PM, Denis Kenzior wrote:
->> Hi James,
->>
->>>
->>> It wouldn't hurt, but I think we were always under the assuming that 
->>> the ack would come before the event so I never bothered using a 
->>> callback :)
->>>
->>
->> My memory is fuzzy now, but I think brcmfmac was very weird in this 
->> area.  Which might explain why offchannel code is written the way it is.
-> 
-> I think Andrew sorted much of that out in frame-xchg, and I think there 
-> are comments about similar behavior of acks arriving late. I can dig up 
-> a brcmfmac card and play around with it.
-> 
->>
->>>>
->>>>> src/offchannel.c:offchannel_mlme_notify() ROC cancel, cookie=1
->>>>>
->>>>> # Cancel ROC is correctly waited for before starting the next item
->>>>> src/wiphy.c:wiphy_radio_work_done() Work item 1 done
->>>>> src/wiphy.c:wiphy_radio_work_next() Starting work item 2
->>>>> src/offchannel.c:offchannel_work_ready() Issuing ROC
->>>>> src/netdev.c:netdev_mlme_notify() MLME notification Remain on 
->>>>> Channel(55)
->>>>
->>>> This seems fishy?  What else is going offchannel?
->>>
->>> No, this is the same event as below, just netdev printing it.
->>
->> Ah, ok.
->>
->>>
->>>>
->>>>>
->>>>> # Then immediately we get a Remain on Channel event
->>>>> src/offchannel.c:offchannel_mlme_notify() ROC notify, cookie=3
->>>>> src/offchannel.c:offchannel_mlme_notify() ROC started prior to ACK, 
->>>>> setting cookie 3
->>>>> src/dpp.c:dpp_send_frame() Sending frame on frequency 2437
->>>>>
->>>>> # And finally the ack comes in
->>>>> src/offchannel.c:offchannel_roc_cb() cookie=3
->>>>
->>>> Yeah, why is the cookie 3?  Shouldn't it be 2?
->>>
->>> 2 is the work item, 3 is the cookie above.
->>
->> Yeah, I get that.  But shouldn't the cookie from the kernel be 2 and 
->> not 3?  Or is the cookie also being incremented by CMD_FRAME?
-> 
-> Oh I see, since it jumped from 1 to 3. I would need to verify, but I'd 
-> guess yes the CMD_FRAME increments the same counter.
+Ack.
 
-Maybe this is a scheduling thing. I see in the kernel 
-(mac80211/offchannel.c) the next offchannel work gets started from 
-within the cancel call (ieee80211_cancel_roc).
+> >>
+> >> Yes, exactly.  See above. What this patch accomplishes is breaking EAP-PEAP
+> >> support in iwd :)
+> >
+> > Booo!
+> >
+> > Ok, I still want to drop md4 from the kernel though. Because the
+> > number of users that need this is small, and I would rather compile in
+> > static MD4 implementation in IWD than to carry a kernel config that
+> > builds and turns it all for all.
+>
+> Well, you're going to keep coming back and making this argument for DES, MD4,
+> MD5, etc.
 
-list_for_each_entry_safe(roc, tmp, &local->roc_list, list) {
-	if (!roc->started)
-		break;
-	if (roc == found)
-		found = NULL;
-	ieee80211_roc_notify_destroy(roc);
-}
+YES! iwd is right to use crypto code that is in use and provided by
+the kernel. But it may not hold up removal of unused dead-code from
+the kernel. This is true for any API / Drivers that the kernel has.
+Even stuff like network-manager/wpa_supplicant is at the mercy of
+openssl legacy providers to be installed and/or enabled on the systems
+to get access to those things on regular systems.
 
-/* that really must not happen - it was started */
-WARN_ON(found);
+And all of these things are optional in the kernel, so IWD already
+cannot do this authentication method on any kernels that disable MD4.
+Which I will propose for the Ubuntu kernel to disable.
 
-ieee80211_start_next_roc(local);
+ > I don't think it makes sense for iwd to go down that path.  While
+> these crypto functions are old and insecure by themselves, they're still being
+> used in a secure way.
 
-There is a &local->mtx lock at the beginning so I'd think that would 
-prevent anything from being shoved into roc_list, but maybe not? If IWD 
-is able to start another ROC before ieee80211_start_next_roc is called 
-that would explain it, but it seems unlikely, maybe only with UML.
+The way IWD does it, potentially so, without verifying (or ability to
+verify) that the network is setup that way. And the exposure risk is
+high and different. Having md4 available in the crypto API allows for
+md4 to trivially be used in insecure ways.
 
-Thanks,
-James
-> 
->>
->> Regards,
->> -Denis
+The number of IWD users is far less than the total number of kernel
+installations. And even among IWD users / a number of networks out
+there, this authentication method is popular but with a limited number
+of users that is diminishing.
+
+>
+> >
+> > It seems in Ubuntu we have never had SRU of IWD yet, and we build
+> > multiple kernels every two weeks, meaning on that basis alone
+> > compiling MD4 in IWD versus kernels will save energy costs.
+>
+> Wasn't Ubuntu going to switch to iwd at some point?
+
+We did userstudy during peak covid pandemic to consider changing
+NetworkManager backend from wpa_supplicant to iwd, whilst keeping
+UX/UI/GUI/Configuration via NetworkManager and/or netplan.io
+
+The results and comments over here
+https://discourse.ubuntu.com/t/call-for-testing-improved-wifi-via-iwd/17795
+and also https://bugs.launchpad.net/ubuntu/+source/iwd
+
+There were improvements for many, but also connectivity regressions
+for some - most notably seemingly failing to configure and use
+eap-mschapv2 via NetworkManager GUI, or keep existing configuration
+working after the switch. I personally do not have eduroam access,
+thus cannot retest if this is now working on more recent releases of
+Ubuntu / NetworkManager / IWD or not.
+
+-- 
+okurrr,
+
+Dimitri
