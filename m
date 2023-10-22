@@ -1,29 +1,61 @@
-Received: from out-198.mta1.migadu.com (out-198.mta1.migadu.com [95.215.58.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBDAEAFD
-	for <iwd@lists.linux.dev>; Sat, 21 Oct 2023 23:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kazlauskas.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kazlauskas.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F38101F3
+	for <iwd@lists.linux.dev>; Sun, 22 Oct 2023 20:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kazlauskas.me header.i=@kazlauskas.me header.b="gN3ri4c6"
-Date: Sun, 22 Oct 2023 02:23:32 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kazlauskas.me;
-	s=key1; t=1697930615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OeAjWMi+0qYzJgXKodTow+OtxGMIREkA/UL3gRJ9BO0=;
-	b=gN3ri4c61wSMe+ejoSD6OSpIkkX9bADZqOlLzsxqoBd/0W8rvvYq5FaB0fTIgwCsVz+ARa
-	LItzcekR2hz60HzIvnM632UT2wdouEsLT+D1Moo4eJIhBN03wPUqCihR54EV/k1LLSA+Ei
-	QzOUlhcyheoTXrsVxA4PS3O/GLBmF0U=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Simonas Kazlauskas <iwd.lists.linux.dev@kazlauskas.me>
-To: James Prestwood <prestwoj@gmail.com>
-Cc: iwd@lists.linux.dev, Denis Kenzior <denkenz@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mud+z+4S"
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3b2e4107f47so2023187b6e.2
+        for <iwd@lists.linux.dev>; Sun, 22 Oct 2023 13:14:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698005669; x=1698610469; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O22o3Uay4htVQe/baghWRwSyWXXL0xkw+PtrBM+YtwI=;
+        b=mud+z+4SPI+T4V7K2mv3kqmJosUB+IENUP4OlDbLc8RhblMXHw3/JYWDVvtcnB9JFf
+         aSX4t5iN9Bdk81LftrtRuJmBxpSxfR0NuKUUEFaer4lXoKWcWPHTrowmLcefjopRxR7s
+         KDFuedDmqLxQEnjzK0HHSx85EibR6tsu0T2WDgHTlmsWmpZC7TfMR4CMGG42XBsUGETP
+         Wkh8smrjLRdM9cxLM8kWbc+U6E9BfW17W1rcrerFv1K+2PYZOXfRSzMzqWfobZ0CdiDw
+         Z2dIicuAopl2Os6A6wnAE3L/M8Fi+Ql31S1rRmO8QqxDIdBEe7iTXEAqmqnoodKUHwe7
+         8BOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698005669; x=1698610469;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O22o3Uay4htVQe/baghWRwSyWXXL0xkw+PtrBM+YtwI=;
+        b=cvR6z/fw44hV7aazahxhNsASaos1i0MOsUIrdD+jq068jzKVOtpQv7TCwHDzrZ1CfU
+         kpJBYh/GEv2FQR7CQYg+79tKt23H47Ag59gk+YA5VGgr7lswymDT+PQQ7nCt7SnQAMr6
+         YvzkI7Piv0NNW37DNc7NdUrwmbdQRFzVxlCYPBg6GANu5eNb6HQ6BwDhXiqVHgRWNpZd
+         k+uRF2OOgHfs4YWLidBiMqolP5arYwY7eD01OM9pt9/1iDBIM6rPHZcUtEil5fsFLUqZ
+         bIN1u9FUScLRQSpSF4102pOtlvEj6FWtNMKlOgJzlqlN7Eta4u7ElhvB5xm0BGT/+Iyg
+         YnbA==
+X-Gm-Message-State: AOJu0Yx8hNNHzS4dbIEI43oeHwB+P/+LNpu5pItoynPtw8FfZ0UGSuxB
+	CNG6tI09vY30p1salopDtNE=
+X-Google-Smtp-Source: AGHT+IEGQA7d3WpMSi6ai+73OxL5Nq7NDU3greY1IIePZqmgEzRK0U75L3ZpKBfjkT0HuQwEhWe5xA==
+X-Received: by 2002:a05:6808:f87:b0:3a7:2690:94e0 with SMTP id o7-20020a0568080f8700b003a7269094e0mr11107282oiw.4.1698005669230;
+        Sun, 22 Oct 2023 13:14:29 -0700 (PDT)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id bp18-20020a056808239200b003b2e2d134a5sm1181671oib.35.2023.10.22.13.14.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Oct 2023 13:14:28 -0700 (PDT)
+Message-ID: <29094eca-dcf8-4234-8afc-13d37db8450c@gmail.com>
+Date: Sun, 22 Oct 2023 15:14:27 -0500
+Precedence: bulk
+X-Mailing-List: iwd@lists.linux.dev
+List-Id: <iwd.lists.linux.dev>
+List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
+List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: Is the data rate estimation for 5GHz channels overly pessimistic?
-Message-ID: <sebayhpora5e5ispmp5nnjesihoewc74ohygd3orxp7k22ky4c@tt225sdpjrxm>
+Content-Language: en-US
+To: Simonas Kazlauskas <iwd.lists.linux.dev@kazlauskas.me>,
+ James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev
 References: <xxpypqwyk3gjrwjmpuvxqdlipkrb3fbw7augfey5ovr3lgbgul@2tbf6xw2uo3z>
  <5780e1b2-8956-46bb-8116-b513cc564cea@gmail.com>
  <5ff58310-c5ee-4694-821a-0c802cdedb89@gmail.com>
@@ -34,169 +66,88 @@ References: <xxpypqwyk3gjrwjmpuvxqdlipkrb3fbw7augfey5ovr3lgbgul@2tbf6xw2uo3z>
  <ccb68e07-e4a0-4e50-b7e2-2a2044d38487@gmail.com>
  <30b6dad4-64b2-41ca-8712-053cb1396eaf@gmail.com>
  <ncmtsi42vkdimzxsuktgfblp66agskivhuntdjlooyp7gglhgo@kwuxknllo527>
-Precedence: bulk
-X-Mailing-List: iwd@lists.linux.dev
-List-Id: <iwd.lists.linux.dev>
-List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
-List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="jbhmlqtn53gjecim"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ncmtsi42vkdimzxsuktgfblp66agskivhuntdjlooyp7gglhgo@kwuxknllo527>
-X-Migadu-Flow: FLOW_OUT
-
-
---jbhmlqtn53gjecim
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+ <sebayhpora5e5ispmp5nnjesihoewc74ohygd3orxp7k22ky4c@tt225sdpjrxm>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <sebayhpora5e5ispmp5nnjesihoewc74ohygd3orxp7k22ky4c@tt225sdpjrxm>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hey,
+Hi Simonas,
 
-I finally got around to figuring out the test specifications (I think.) At least 
-the test results I’m seeing are the same as the output from `iwd -d`.
+On 10/21/23 18:23, Simonas Kazlauskas wrote:
+> Hey,
+> 
+> I finally got around to figuring out the test specifications (I think.) At least 
+> the test results I’m seeing are the same as the output from `iwd -d`.
+> 
+> See the attached patch (feel free to merge it, or not to merge it – entirely up 
+> to you.)
 
-See the attached patch (feel free to merge it, or not to merge it – entirely up 
-to you.)
+Ok, I'll take a look during the week.
 
-72Mbps appears to be coming from the table for 80MHz rates (NSS=2 so 36MHz in 
-the table itself), but this *should* be a 40MHz ordeal. My APs are set up for 
-40MHz 5GHz channels and 160MHz 6GHz channels, but it seems like it might still 
-be sending capabilities that include 80MHz support…? Weird.
+> 
+> 72Mbps appears to be coming from the table for 80MHz rates (NSS=2 so 36MHz in 
+> the table itself), but this *should* be a 40MHz ordeal. My APs are set up for 
+> 40MHz 5GHz channels and 160MHz 6GHz channels, but it seems like it might still 
+> be sending capabilities that include 80MHz support…? Weird.
 
-[1]: https://semfionetworks.com/blog/mcs-table-updated-with-80211ax-data-rates/
+Probably does, but iwd should also be paying attention to the vht operations 
+field and taking into account that width=40.  This is why we pass in both VHT 
+Capabilities and VHT Operation elements:
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/wiphy.c#n1049
 
-Anyhow, besides the 80MHz weirdness, this all seems to ultimately come down to 
-the `ht_vht_he_base_rssi` table (as you both have pointed out in the very 
-beginning!) After the `width_adjust` in `band_he_rate` is applied, -76dBm is the 
-bare minimum for it to pick out even the lowest 36MHz rate from the 80MHz table. 
+> 
+> [1]: https://semfionetworks.com/blog/mcs-table-updated-with-80211ax-data-rates/
+> 
+> Anyhow, besides the 80MHz weirdness, this all seems to ultimately come down to 
+> the `ht_vht_he_base_rssi` table (as you both have pointed out in the very 
+> beginning!) After the `width_adjust` in `band_he_rate` is applied, -76dBm is the 
+> bare minimum for it to pick out even the lowest 36MHz rate from the 80MHz table.
+> Meanwhile in practice I’m getting MCS anywhere from 4 to 10 (seems to be fairly 
+> random regardless of the signal strength, which varies between -72dBm and -79dBm 
+> this particular evening.) The only caveat is that for very high MCS values (8, 
+> 9, 10), NSS appears to drop down to 1 (thus making them roughly equivalent to 
+> MCS 4-to-5).
 
-Meanwhile in practice I’m getting MCS anywhere from 4 to 10 (seems to be fairly 
-random regardless of the signal strength, which varies between -72dBm and -79dBm 
-this particular evening.) The only caveat is that for very high MCS values (8, 
-9, 10), NSS appears to drop down to 1 (thus making them roughly equivalent to 
-MCS 4-to-5).
+The values in this table are directly from 802.11.  Section 21.3.18.1 in 
+802.11-2020.  These are 'minimum input level sensitivity'.  Most hardware can do 
+better.  For example, here's what AX201 can do according to some HP spec sheet:
 
-I’m not sure if this stellar MCS behaviour is Ubiquiti’s doing something fancy, 
-or if its a result of those aforementioned thick walls, which *also* happen to 
-block out any interference from the neighbours as well (making my APs literally 
-the only transmitter in the 5GHz band devices bother noticing…) 
+https://h20195.www2.hp.com/v2/getpdf.aspx/c06986242.pdf
 
-I have no clue if there’s anything actionable here, but I’m happy to help with 
-testing the observed behaviour at various signal strengths if coming up with a 
-better `ht_vht_he_base_rssi` table is… on the table :)
+•802.11b, 1Mbps : -93.5dBm 30áximum
+•802.11b, 11Mbps : -84dBm 30áximum
+• 802.11a/g, 6Mbps : -86dBm maximum
+• 802.11a/g, 54Mbps : -72dBm maximum
+• 802.11n, MCS07 : -67dBm maximum
+• 802.11n, MCS15 : -64dBm maximum
+• 802.11ac, MCS0 : -84dBm maximum
+• 802.11ac, MCS9 : -59dBm maximum
+•802.11ax, MCS11(HT40): -59dBm maximum
+•802.11ax, MCS11(VHT160): -58.5dBm maximum
 
-Have a great weekend,
-S.
+Minimum for MCS9 (256 QAM 5/6) is -57, but the hardware can receive it at -59. 
+MCS7 (64 QAM 5/6) is -64, but the hardware can do it at -67.
 
-Simonas Kazlauskas wrote:
->James,
->
->Thank you for implementing the display of HE capabilities in `iwmon` – 
->these do indeed show up in my scans now, false alert there.
->
->>HE Capabilities: len 34
->>    HE supported channel width set: bit  1: 40MHz/80MHz supported (5GHz/6GHz)
->>        Rx HE-MCS Map <= 80MHz 1 Streams: MCS 0-11 supported
->>        Rx HE-MCS Map <= 80MHz 2 Streams: MCS 0-11 supported
->>        Rx HE-MCS Map <= 80MHz 3 Streams: MCS 0-11 supported
->>        Rx HE-MCS Map <= 80MHz 4 Streams: MCS 0-11 supported
->>        Tx HE-MCS Map <= 80MHz 1 Streams: MCS 0-11 supported
->>        Tx HE-MCS Map <= 80MHz 2 Streams: MCS 0-11 supported
->>        Tx HE-MCS Map <= 80MHz 3 Streams: MCS 0-11 supported
->>        Tx HE-MCS Map <= 80MHz 4 Streams: MCS 0-11 supported
->>    0d 01 08 9a 40 10 04 60 48 88 1f 43 81 1c 11 08  ....@..`H..C....
->>    00 aa ff aa ff 7b 1c c7 71 1c c7 71 1c c7 71 1c  .....{..q..q..q.
->>    c7 71                                            .q
->
->I’ve sent you and Denis both the pcap of the scan. I, unforunately, 
->don’t think I’ll be able to hack on the test and/or data rate 
->investigation much further before the weekend, but I’m happy to test 
->out patches and such at any time.
->
->Thanks,
->S.
+Also, there seems to be little penalty between HT40/VHT160 sensitivity at a 
+given MCS, at least for HE.  There's a 3 db penalty per width step in 802.11. 
+For example, 802.11 AX lists minimum sensitivity for HE MCS11 @ 40 Mhz(1024-QAM 
+5/6) as -49, but the hw can do it at -59, quite a difference.  For HE @ 160 Mhz 
+the difference is even bigger, -43 according to the spec, but -58.5 according to 
+the hardware.  As you can see, HE sensitivity estimate is largely out of whack 
+with stated specs.
 
---jbhmlqtn53gjecim
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: attachment;
-	filename="0001-test-band-HE-band-test-with-real-world-capabilities.patch"
-Content-Transfer-Encoding: 8bit
+A more realistic estimate for AX201 on HE might be to increase the sensitivity 
+by ~7 db and drop the 3 db 'width' penalty in band_ofdm_rate().  See if we get 
+closer?
 
-From 6961629e93d9e74f5760c5be00393459ad55c0b5 Mon Sep 17 00:00:00 2001
-From: Simonas Kazlauskas <git@kazlauskas.me>
-Date: Sun, 22 Oct 2023 00:46:38 +0300
-Subject: [PATCH] test-band: HE band test with real-world capabilities
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Another interesting this is that HT rates suffer a ~3db penalty for NSS=2 
+(MCS07/MCS15).  This is something we also don't take into account.
 
-I've been observing that the rate estimations in the real world usage
-end up being quite a bit different from the rates that end up being used
-after the association. In this commit I’m adding a test case with the
-capabilities from two physical devices, if only to demonstrate the
-how the rate estimation behaves in such circumstances.
----
- unit/test-band.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+Now the question is, how do we make sure iwd is estimating the HE rate if 
+available?  Also, how do we tweak the estimation logic with sensitivity numbers 
+(obtained from a spec sheet, or through experimentation) for specific hardware 
+being used.
 
-diff --git a/unit/test-band.c b/unit/test-band.c
-index e27531f7..fec09e61 100644
---- a/unit/test-band.c
-+++ b/unit/test-band.c
-@@ -294,7 +294,7 @@ struct he_test_data {
- 	/* Own capabilities */
- 	struct band_he_capabilities capabilities;
- 	/* Peer HE Capabilities IE */
--	uint8_t he_capabilities[31];
-+	uint8_t he_capabilities[36];
- 
- };
- 
-@@ -366,6 +366,31 @@ const struct he_test_data he_test_5_20mhz_mcs_7_nss_1 = {
- 	},
- };
- 
-+/* 5GHz, 40MHz With data from a real-world Unifi’s U6 Enterprise AP and a client
-+ * with the Intel AX201 card.
-+ */
-+const struct he_test_data he_test_5_40mhz_unifi_ap_and_ax201 = {
-+	.freq = BAND_FREQ_5_GHZ,
-+	.rssi = -76,
-+	// In practice seems to be more like 275_200_000ULL instead...
-+	.expected_rate = 72000000ULL,
-+	.capabilities = {
-+		.he_mcs_set = {
-+			HE_MCS_SET(MCS11, 2), HE_MCS_SET(MCS11, 1), MCS_UNSUP
-+		},
-+		.he_phy_capa = {
-+			0x0e, 0x3f, 0x0e, 0x09, 0xfd, 0x09, 0x8c, 0x16, 0x0f, 0xf0, 0x01
-+		},
-+		.iftypes = 1 << NETDEV_IFTYPE_STATION,
-+	},
-+	.he_capabilities = {
-+		0x22, IE_TYPE_HE_CAPABILITIES - 256,
-+		0x0d, 0x01, 0x08, 0x9a, 0x40, 0x10, 0x04, 0x60, 0x48, 0x88, 0x1f, 0x43,
-+		0x81, 0x1c, 0x11, 0x08, 0x00, 0xaa, 0xff, 0xaa, 0xff, 0x7b, 0x1c, 0xc7,
-+		0x71, 0x1c, 0xc7, 0x71, 0x1c, 0xc7, 0x71, 0x1c, 0xc7, 0x71,
-+	},
-+};
-+
- /* 5GHz, 80MHz, MCS 7, NSS 1 */
- const struct he_test_data he_test_5_80mhz_mcs_7_nss_1 = {
- 	.freq = BAND_FREQ_5_GHZ,
-@@ -698,6 +723,8 @@ int main(int argc, char *argv[])
- 					&he_all_mcs_unsupported);
- 	l_test_add("/band/HE/test/low RSSI", band_test_he,
- 					&he_test_5_low_rssi);
-+	l_test_add("/band/HE/test/5GHz/40MHz/Unifi+AX201", band_test_he,
-+					&he_test_5_40mhz_unifi_ap_and_ax201);
- 
- 	l_test_add("/band/oci2freq 1", test_oci2freq, &oci2freq_data_1);
- 	l_test_add("/band/oci2freq 2", test_oci2freq, &oci2freq_data_2);
--- 
-2.41.0
-
-
---jbhmlqtn53gjecim--
+Regards,
+-Denis
