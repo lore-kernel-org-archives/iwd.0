@@ -1,49 +1,49 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37E118E1B
-	for <iwd@lists.linux.dev>; Mon, 23 Oct 2023 12:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531C023DE
+	for <iwd@lists.linux.dev>; Mon, 23 Oct 2023 13:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YxwZLKB7"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-77896da2118so214472285a.1
-        for <iwd@lists.linux.dev>; Mon, 23 Oct 2023 05:35:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N6RTxJK7"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-41ccd38eaa5so27419731cf.0
+        for <iwd@lists.linux.dev>; Mon, 23 Oct 2023 06:49:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698064533; x=1698669333; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DftFWEaQCF4zgvn+4d828PCjIUz+FqOgkfMfFnvRMdE=;
-        b=YxwZLKB73BDd0qCS9u1Y4UGId7JEKB0zn58tvxk6o8KiE4NJlcGMU6IJernhoQqVen
-         yb9gWjMbqCBArLw/vkE8eJjR61VXbIY+DmAAb/GqaD++4WhTgDNRjDitiGplZ33gvfFe
-         wfBjPM47Opa1o3kslseLHoTWzmYEYnjxVCJJqakO5CSNd9MIm7j6uDHslO3I6sVWCNdu
-         yGEtGrsqOLgxlSTX6IcYQh++KuT9g17CvXlZFrxzT6yXwh3mNwUsbLIwCBhwsCytuhao
-         2hfWN0G9IINjYKVNdi0MVp2htuOMANcQk73+2spVd+QwzAeLD8qUztgpKB2muH3Eus1i
-         Au3Q==
+        d=gmail.com; s=20230601; t=1698068972; x=1698673772; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kC/v/QGsHcOvbcrbnLdvtbQflsPxst9PdIX55Th3s8k=;
+        b=N6RTxJK7TOix/9QUy+pE2ESgN/PuscBlOtfyaFHuR1VIjEx/mofATFNCLlVvJQXfn4
+         NhLzW5tjJ9gxbzLZUBfw7frcl0xUnbqL16G7B8sPFWBx9Yt/o7FJWSvcXR6rEFL/b6zJ
+         QVX47fBnWP1lJr+u32yVWrlEjbhSPrRv3tMeK1upfymLSNpsJF0bNZOugiD5qf977U8N
+         v6Kjy2IQmbNmP6iP+y9lMwwUaZUpYRP2PsDwpgqJzIcRb/2JVeQSn3gdaShFBXRlGyQb
+         x4uMc+g8AwZMVH8agl3Jond/lkJ4s4uFAjMsLsuA85vk0LRiByaHwcNSWgLkfcbcIDLD
+         HaGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698064533; x=1698669333;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1698068972; x=1698673772;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DftFWEaQCF4zgvn+4d828PCjIUz+FqOgkfMfFnvRMdE=;
-        b=dD56Bs4RmlpPDC1bOZ2cw6iajliJvAlhvEoDmYsmFaGufcFgdF6RXwUxF6xQDosBY3
-         3nm8KdusltlAOrNC52EhEm5NfyR0FRMmPFAESFtjwmeVyK0+DgWN5dCIylOHeTKlt9OT
-         MdHgbYD8vuWsqCChzIk3Rcp0v4ylhK3+ezyqQT6gQcB6mGGhEuWAebseLyMyALmi5Pdi
-         7ZtjVr8MtNZ3TZIc6oKU4Oqys3p23f/6d6MPr0wEUYj7fJQZL05FGf2rQLzzaXcumZ+F
-         E3LyXSoWx0zEmyguEl4Jlcy5t8WFh1CqMQ1qIVxssZaqhK91lXRM0wDoAFwNvdA/ERTK
-         +mSg==
-X-Gm-Message-State: AOJu0Ywms1uuiscWE8zdOffxH/wJfIwSgU3VCZ6p9vC5plP9Sa0LIQdg
-	rU5cyMVypl/zlGTDbq9anoIiajK4Fig=
-X-Google-Smtp-Source: AGHT+IHiGd9ZiY9d/vyNtRAiPCmmBJ59ybbDfvMV6FdJv6lXTg016ryVotxMZgJe7unU+ZipZrSnYQ==
-X-Received: by 2002:a05:6214:2524:b0:66d:4173:5ad1 with SMTP id gg4-20020a056214252400b0066d41735ad1mr11038224qvb.39.1698064533477;
-        Mon, 23 Oct 2023 05:35:33 -0700 (PDT)
+        bh=kC/v/QGsHcOvbcrbnLdvtbQflsPxst9PdIX55Th3s8k=;
+        b=rJtPCXip1PlKQ09owcEmjCZfBxoFQTU3ay8FtsEBmeelYJ68+nSt/jlBVHOeX8uvM1
+         imd9xZmCTimWsoNGxUGGXHKNPKaKZae7ag2UB/Dq1crVfulLAtTY0inLx29n1dKaSmPq
+         rrHeEkdK271ptdvqPAJU8r+ANvCsiKzGXhk0F55nHOjp/g3lT6r/dLQ7gwSqf7+XWHbD
+         L+QKxM/0RwltE68k6v5/7EGVEPUyskDR02xiSdUj7bhuC71ntep/AseqGU8EtX0WEvCP
+         IiSIHRT0A3atDEOTzVdKbG53yBy0sise9kE691SzPKudiOc7Ojqb1Qfk/UDYtuwxz5vz
+         uYQQ==
+X-Gm-Message-State: AOJu0YzXUUNRGBK491qq3wlKJcsXddMhhBcfjXl4nucvPesUkt7TR891
+	kUea6jIn8TXo7EcB5aISjZA=
+X-Google-Smtp-Source: AGHT+IEmoSh2HJAPvwV8w97bNLK0kTHWaLyp4X3H/SI6YI1eBmnFT/PfWyx60DDgB59BcqB0AEyWtA==
+X-Received: by 2002:a05:622a:58a:b0:407:c2e2:2a06 with SMTP id c10-20020a05622a058a00b00407c2e22a06mr17881830qtb.8.1698068971993;
+        Mon, 23 Oct 2023 06:49:31 -0700 (PDT)
 Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id pe1-20020a056214494100b0066d1d860cd1sm2846574qvb.19.2023.10.23.05.35.32
+        by smtp.gmail.com with ESMTPSA id k6-20020ac80746000000b004199f47ccdbsm2729462qth.51.2023.10.23.06.49.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Oct 2023 05:35:33 -0700 (PDT)
-Message-ID: <fed677e4-28f5-4ff7-8f3c-a436484f1bc5@gmail.com>
-Date: Mon, 23 Oct 2023 05:35:30 -0700
+        Mon, 23 Oct 2023 06:49:31 -0700 (PDT)
+Message-ID: <3a488d09-a66b-452c-99e4-a7521c80252c@gmail.com>
+Date: Mon, 23 Oct 2023 06:49:29 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,74 +51,48 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/21] dpp-util: add __DPP_STATUS_MAX
+Subject: Re: [PATCH 11/21] doc: PKEX support for DPP
+Content-Language: en-US
 To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <20231012200150.338401-1-prestwoj@gmail.com>
- <20231012200150.338401-14-prestwoj@gmail.com>
- <0b431079-40f8-4aa1-a82d-01c9a5bfbe5f@gmail.com>
-Content-Language: en-US
+ <20231012200150.338401-12-prestwoj@gmail.com>
+ <41078822-99da-466e-b612-91a8c223dbde@gmail.com>
+ <0dd4a4a5-95aa-49c1-be77-e640862c3f82@gmail.com>
+ <62d0c420-3bc5-45a8-80c6-c4c59db7ae2c@gmail.com>
+ <d69dd453-95b8-49b0-9419-3ee0c7c98fe1@gmail.com>
+ <a38fc175-3095-488d-a0ea-a70e7f148540@gmail.com>
+ <035c5cb1-d5be-4c4b-a6f5-8c0941926225@gmail.com>
+ <c8617f8d-0c7c-4e1c-ab0f-f356a121afe6@gmail.com>
+ <ae7b807f-fb7b-4437-9e00-bc4f64ad6047@gmail.com>
+ <d4fdadd8-dc2b-47b0-b1ac-114abed91f39@gmail.com>
+ <7de9faab-5863-48f5-8de6-28e1b543d2b8@gmail.com>
+ <f812bdcd-219e-4e0d-8816-46015bd7cdab@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <0b431079-40f8-4aa1-a82d-01c9a5bfbe5f@gmail.com>
+In-Reply-To: <f812bdcd-219e-4e0d-8816-46015bd7cdab@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 Hi Denis,
 
-On 10/19/23 8:16 AM, Denis Kenzior wrote:
-> Hi James,
 > 
-> On 10/12/23 15:01, James Prestwood wrote:
->> Nice for setting as an invalid status since STATUS_OK is
->> already zero.
-> 
-> But this enum comes directly from the spec?
-
-Not __DPP_STATUS_MAX obviously, but yes the other status' are all part 
-of the spec. Having an "invalid" enum value is just convenient since I 
-can check it by value instead of having to store an additional pointer 
-to check if the attribute was included:
-
-...
-case DPP_ATTR_STATUS:
-     status_ptr = data;
-     break;
-...
-
-if (!status_ptr)
-     goto fail;
-
-if (*status_ptr != DPP_STATUS_OK)
-     goto fail;
-
-This is how we do it elsewhere though so I can do it this way. To be 
-fair, its just an extra if :)
-
-> 
->> ---
->>   src/dpp-util.h | 1 +
->>   1 file changed, 1 insertion(+)
 >>
->> diff --git a/src/dpp-util.h b/src/dpp-util.h
->> index 6b00796e..61f1c859 100644
->> --- a/src/dpp-util.h
->> +++ b/src/dpp-util.h
->> @@ -71,6 +71,7 @@ enum dpp_status {
->>       DPP_STATUS_CSR_NEEDED,
->>       DPP_STATUS_CSR_BAD,
->>       DPP_STATUS_NEW_KEY_NEEDED,
->> +    __DPP_STATUS_MAX,
+>> I'm fine with it as an argument to the StartConfigurator API. An agent 
+>> could work but we've also got the optional identifier to think about. 
+>> I'd prefer to use the existing agent API for getting a passphrase 
+>> rather than a new method.
+>>
 > 
-> In general iwd/ell do not use such constructs since it makes handling of 
-> enums in switch/case statements a bit more painful.
+> But the identifier is not supposed to be secret?
 
-Thats fine, I can do it like the above pseudocode.
+No, the identifier is sent plaintext:
 
-Thanks,
-James
+"Optionally, a non-secret identifier for the code can be transmitted to 
+support the case where a PKEX implementation may be provisioned to 
+connect to a plurality of devices and needs to know which code to use to 
+process a received PKEX frame. If an optional code identifier is used, 
+it shall be a UTF-8 string not greater than eighty (80) octets that is 
+provisioned at the same time as the shared code."
 
-> 
->>   };
->>   enum dpp_attribute_type {
 > 
 > Regards,
 > -Denis
