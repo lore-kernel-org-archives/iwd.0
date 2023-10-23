@@ -1,231 +1,124 @@
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63223F50E
-	for <iwd@lists.linux.dev>; Mon, 23 Oct 2023 12:21:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37E118E1B
+	for <iwd@lists.linux.dev>; Mon, 23 Oct 2023 12:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NbZU1NKg"
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5845213c583so816119eaf.0
-        for <iwd@lists.linux.dev>; Mon, 23 Oct 2023 05:21:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YxwZLKB7"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-77896da2118so214472285a.1
+        for <iwd@lists.linux.dev>; Mon, 23 Oct 2023 05:35:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698063660; x=1698668460; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5k3SttIBDvoAWL4N5Z2kdWWlArLtumXFVRt+HiDeg7k=;
-        b=NbZU1NKg5j+QcGz4UGA2tHKuCopUahA0TjdgGfuJGcrHRqLd19cWbadzq1XD/H8O74
-         F2zVdFqIUUTbpr8AXTfvcknmqV2a8pJaEROnr1YohLN9Td1yb598QDJ78THoSbBZrAzI
-         6jy4k5WDAoRZy7U3VUqNgUOLackpaW2tRvwzZ0At3q5cBMx/st5i2Y00L3Y6vPrRPyk3
-         6I3CywKLawvAL6PInwmgOFGjm3Kkp0SzdEeLW+GHNKzQ5ZreI8Vj7K4U/6TuMOor17lM
-         VHRhU/eAIYEHBD+duXB+j5alUWrA1ZywQV7Qq5DbL2tUhijpDrlNVi/Gb/KjtqX5zZQf
-         AG3A==
+        d=gmail.com; s=20230601; t=1698064533; x=1698669333; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=DftFWEaQCF4zgvn+4d828PCjIUz+FqOgkfMfFnvRMdE=;
+        b=YxwZLKB73BDd0qCS9u1Y4UGId7JEKB0zn58tvxk6o8KiE4NJlcGMU6IJernhoQqVen
+         yb9gWjMbqCBArLw/vkE8eJjR61VXbIY+DmAAb/GqaD++4WhTgDNRjDitiGplZ33gvfFe
+         wfBjPM47Opa1o3kslseLHoTWzmYEYnjxVCJJqakO5CSNd9MIm7j6uDHslO3I6sVWCNdu
+         yGEtGrsqOLgxlSTX6IcYQh++KuT9g17CvXlZFrxzT6yXwh3mNwUsbLIwCBhwsCytuhao
+         2hfWN0G9IINjYKVNdi0MVp2htuOMANcQk73+2spVd+QwzAeLD8qUztgpKB2muH3Eus1i
+         Au3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698063660; x=1698668460;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5k3SttIBDvoAWL4N5Z2kdWWlArLtumXFVRt+HiDeg7k=;
-        b=hhdl8LWoxIJuY/TxACnxpnn3kubsyZ6KgCLAzAYtC5x+oyv78Vf+1J0m5EWiUtRiD6
-         +XdJ4cOcye0FFbXGRBpThYTBuERvom8p2f35tzZ6anAcBJQnaArNDLepv73U9WrDand6
-         yOHXr19fEWf9HAqhIsqyC+MqSSJEuquXOvoNAFySop2/zRbjQz+i/LIkp7lI3y8ib0a3
-         +P/3tAPlTuUwJoUFS4rnCbYB+02dtsyTNCSfon6eRTuuJAy3GGgqTmQky01fjdXltmha
-         VL7CiHS+zDMHwPpX0VG8bsusO8kCDSclFNlBxlby67WXgnp6sPLCcp+RLlXW6Ai/7J9D
-         dlWw==
-X-Gm-Message-State: AOJu0YzwfKqsGQTCT1vpimHwEaZifXJapniv+m6l0nX2Rj8rL9kdNP2T
-	ZG8i9LAMLKBVMgvyeU9Zpu3TeDliiIg=
-X-Google-Smtp-Source: AGHT+IEM4q8ckaJOaqJ37vqJImoEFL6gBj7LRQvieWotJ1pLu4Y9AR/ddJPtofDG+Xf/UGzI0fjLxA==
-X-Received: by 2002:a05:6359:c1c:b0:168:cd6e:f130 with SMTP id gn28-20020a0563590c1c00b00168cd6ef130mr5679509rwb.1.1698063660155;
-        Mon, 23 Oct 2023 05:21:00 -0700 (PDT)
-Received: from LOCLAP699.rst-01.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id g24-20020a37e218000000b007671b599cf5sm2665245qki.40.2023.10.23.05.20.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 05:20:59 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2] offchannel: handle out of order ACKs/events
-Date: Mon, 23 Oct 2023 05:20:54 -0700
-Message-Id: <20231023122054.34100-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1698064533; x=1698669333;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DftFWEaQCF4zgvn+4d828PCjIUz+FqOgkfMfFnvRMdE=;
+        b=dD56Bs4RmlpPDC1bOZ2cw6iajliJvAlhvEoDmYsmFaGufcFgdF6RXwUxF6xQDosBY3
+         3nm8KdusltlAOrNC52EhEm5NfyR0FRMmPFAESFtjwmeVyK0+DgWN5dCIylOHeTKlt9OT
+         MdHgbYD8vuWsqCChzIk3Rcp0v4ylhK3+ezyqQT6gQcB6mGGhEuWAebseLyMyALmi5Pdi
+         7ZtjVr8MtNZ3TZIc6oKU4Oqys3p23f/6d6MPr0wEUYj7fJQZL05FGf2rQLzzaXcumZ+F
+         E3LyXSoWx0zEmyguEl4Jlcy5t8WFh1CqMQ1qIVxssZaqhK91lXRM0wDoAFwNvdA/ERTK
+         +mSg==
+X-Gm-Message-State: AOJu0Ywms1uuiscWE8zdOffxH/wJfIwSgU3VCZ6p9vC5plP9Sa0LIQdg
+	rU5cyMVypl/zlGTDbq9anoIiajK4Fig=
+X-Google-Smtp-Source: AGHT+IHiGd9ZiY9d/vyNtRAiPCmmBJ59ybbDfvMV6FdJv6lXTg016ryVotxMZgJe7unU+ZipZrSnYQ==
+X-Received: by 2002:a05:6214:2524:b0:66d:4173:5ad1 with SMTP id gg4-20020a056214252400b0066d41735ad1mr11038224qvb.39.1698064533477;
+        Mon, 23 Oct 2023 05:35:33 -0700 (PDT)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id pe1-20020a056214494100b0066d1d860cd1sm2846574qvb.19.2023.10.23.05.35.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Oct 2023 05:35:33 -0700 (PDT)
+Message-ID: <fed677e4-28f5-4ff7-8f3c-a436484f1bc5@gmail.com>
+Date: Mon, 23 Oct 2023 05:35:30 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 13/21] dpp-util: add __DPP_STATUS_MAX
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20231012200150.338401-1-prestwoj@gmail.com>
+ <20231012200150.338401-14-prestwoj@gmail.com>
+ <0b431079-40f8-4aa1-a82d-01c9a5bfbe5f@gmail.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <0b431079-40f8-4aa1-a82d-01c9a5bfbe5f@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Its been seen (so far only in mac80211_hwsim + UML) where an
-offchannel requests ACK comes after the ROC started event. This
-causes the ROC started event to never call back to notify since
-info->roc_cookie is unset and it appears to be coming from an
-external process.
+Hi Denis,
 
-We can detect this situation in a few ways, first by looking up
-the offchannel info by both wdev and cookie. If found, continue
-as normal. If not lookup by only wdev and if there is still no
-roc_cookie set the cookie from the notify callback to a temporary
-'early_cookie' placeholder and return. This can be checked in
-the ACK and if it matches we know the ACK came out of order and
-the started event can be sent.
+On 10/19/23 8:16 AM, Denis Kenzior wrote:
+> Hi James,
+> 
+> On 10/12/23 15:01, James Prestwood wrote:
+>> Nice for setting as an invalid status since STATUS_OK is
+>> already zero.
+> 
+> But this enum comes directly from the spec?
 
-This also handles external process case. If we got a spurious
-notify event before the ACK, the ACK callback will fail to
-verify the early cookie, set roc_cookie correctly, and the expected
-ROC event will come and issue started. Since there should be at
-most one ROC session per wdev we can assume the temporary
-early_cookie won't be overwritten.
+Not __DPP_STATUS_MAX obviously, but yes the other status' are all part 
+of the spec. Having an "invalid" enum value is just convenient since I 
+can check it by value instead of having to store an additional pointer 
+to check if the attribute was included:
 
-Another minor change was made to the lookup on the cancel path.
-Instead of looking up by wdev, lookup by the ID itself. We
-shouldn't ever have more than one info per wdev in the queue but
-looking up the _exact_ info structure doesn't hurt in case things
-change in the future.
----
- src/offchannel.c | 73 ++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 65 insertions(+), 8 deletions(-)
+...
+case DPP_ATTR_STATUS:
+     status_ptr = data;
+     break;
+...
 
-v2:
- * Skip started if the event came early, and start in the ACK
- * Add check for roc_cookie && roc_cmd_id in notify event. This
-   verifies that we actually have a pending request, if not it
-   came externally.
- * Add 'early_cookie' placeholder to guard against the case of an
-   external event coming before the ACK. Prior, this would have
-   set roc_cookie to an incorrect cookie and called the started
-   callback prematurely.
+if (!status_ptr)
+     goto fail;
 
-diff --git a/src/offchannel.c b/src/offchannel.c
-index b9cdc117..98cbe560 100644
---- a/src/offchannel.c
-+++ b/src/offchannel.c
-@@ -43,6 +43,7 @@ struct offchannel_info {
- 
- 	uint32_t roc_cmd_id;
- 	uint64_t roc_cookie;
-+	uint64_t early_cookie;
- 
- 	offchannel_started_cb_t started;
- 	offchannel_destroy_cb_t destroy;
-@@ -54,15 +55,34 @@ struct offchannel_info {
- 	bool needs_cancel : 1;
- };
- 
-+struct match_data {
-+	uint64_t wdev_id;
-+	uint64_t cookie;
-+};
-+
- static struct l_genl_family *nl80211;
- static struct l_queue *offchannel_list;
- 
--static bool match_wdev(const void *a, const void *user_data)
-+static bool match_info(const void *a, const void *user_data)
- {
-+	const struct match_data *match = user_data;
- 	const struct offchannel_info *info = a;
--	const uint64_t *wdev_id = user_data;
- 
--	return info->wdev_id == *wdev_id;
-+	if (match->wdev_id != info->wdev_id)
-+		return false;
-+
-+	if (!match->cookie)
-+		return true;
-+
-+	return match->cookie == info->roc_cookie;
-+}
-+
-+static bool match_id(const void *a, const void *user_data)
-+{
-+	const uint32_t *id = user_data;
-+	const struct offchannel_info *info = a;
-+
-+	return *id == info->work.id;
- }
- 
- static void offchannel_cancel_roc(struct offchannel_info *info)
-@@ -98,9 +118,19 @@ static void offchannel_roc_cb(struct l_genl_msg *msg, void *user_data)
- 		goto work_done;
- 	}
- 
--	/* This request was cancelled, and ROC needs to be cancelled */
-+	/*
-+	 * If this request was cancelled prior to the request ever hitting the
-+	 * kernel, cancel now.
-+	 *
-+	 * If the ROC event came before the ACK, call back now since the
-+	 * callback was skipped in the notify event. There is the potential that
-+	 * an external process issued the ROC, but if the cookies don't match
-+	 * here we can be sure it wasn't for us.
-+	 */
- 	if (info->needs_cancel)
- 		offchannel_cancel_roc(info);
-+	else if (info->early_cookie == info->roc_cookie && info->started)
-+		info->started(info->user_data);
- 
- 	return;
- 
-@@ -191,7 +221,8 @@ void offchannel_cancel(uint64_t wdev_id, uint32_t id)
- 	else if (ret == false)
- 		goto work_done;
- 
--	info = l_queue_find(offchannel_list, match_wdev, &wdev_id);
-+
-+	info = l_queue_find(offchannel_list, match_id, &id);
- 	if (!info)
- 		return;
- 
-@@ -246,6 +277,7 @@ work_done:
- static void offchannel_mlme_notify(struct l_genl_msg *msg, void *user_data)
- {
- 	struct offchannel_info *info;
-+	struct match_data match = {0};
- 	uint64_t wdev_id;
- 	uint64_t cookie;
- 	uint8_t cmd;
-@@ -261,12 +293,37 @@ static void offchannel_mlme_notify(struct l_genl_msg *msg, void *user_data)
- 					NL80211_ATTR_UNSPEC) < 0)
- 		return;
- 
--	info = l_queue_find(offchannel_list, match_wdev, &wdev_id);
-+	match.wdev_id = wdev_id;
-+	match.cookie = cookie;
-+
-+	info = l_queue_find(offchannel_list, match_info, &match);
-+	if (!info) {
-+		/* Try again without cookie */
-+		match.cookie = 0;
-+		info = l_queue_find(offchannel_list, match_info, &match);
-+	}
-+
- 	if (!info)
- 		return;
- 
--	/* ROC must have been started elsewhere, not by IWD */
--	if (info->roc_cookie != cookie)
-+	/*
-+	 * If the cookie is zero and there is a pending ROC command there are
-+	 * two possibilities:
-+	 *   - The ACK callback came out of order. This has been seen in UML
-+	 *     when an offchannel request is canceled followed by another
-+	 *     request on the same channel. To handle this delay the started
-+	 *     callback until the ACK comes in when we can check the cookie.
-+	 *
-+	 *   - Event came from external process doing ROC. Checking the cookie
-+	 *     in the ACK lets us verify if this is the case.
-+	 *
-+	 * If the cookie is set but does not match, this ROC request came from
-+	 * outside IWD.
-+	 */
-+	if (!info->roc_cookie && info->roc_cmd_id) {
-+		info->early_cookie = cookie;
-+		return;
-+	} else if (info->roc_cookie != cookie)
- 		return;
- 
- 	switch (cmd) {
--- 
-2.25.1
+if (*status_ptr != DPP_STATUS_OK)
+     goto fail;
 
+This is how we do it elsewhere though so I can do it this way. To be 
+fair, its just an extra if :)
+
+> 
+>> ---
+>>   src/dpp-util.h | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/src/dpp-util.h b/src/dpp-util.h
+>> index 6b00796e..61f1c859 100644
+>> --- a/src/dpp-util.h
+>> +++ b/src/dpp-util.h
+>> @@ -71,6 +71,7 @@ enum dpp_status {
+>>       DPP_STATUS_CSR_NEEDED,
+>>       DPP_STATUS_CSR_BAD,
+>>       DPP_STATUS_NEW_KEY_NEEDED,
+>> +    __DPP_STATUS_MAX,
+> 
+> In general iwd/ell do not use such constructs since it makes handling of 
+> enums in switch/case statements a bit more painful.
+
+Thats fine, I can do it like the above pseudocode.
+
+Thanks,
+James
+
+> 
+>>   };
+>>   enum dpp_attribute_type {
+> 
+> Regards,
+> -Denis
