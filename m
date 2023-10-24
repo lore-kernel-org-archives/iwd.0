@@ -1,49 +1,49 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978D5374CB
-	for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 15:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079B4266AB
+	for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 15:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mEq4s6vu"
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6ce322b62aeso3004134a34.3
-        for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 08:32:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UvxFU5Th"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-77896da2118so299584785a.1
+        for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 08:40:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698161560; x=1698766360; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1698162059; x=1698766859; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=x6CR3hW9guPSL+YL/tdJY2JCx31XK+imzGPZ6W3df54=;
-        b=mEq4s6vuFeAbJMrAmrkHuAknCS6ph+gxOWEXAwJq7M5dzxisMKDNUhTTrBdP3mpN2u
-         TMZVYEQ+AbB44O79VMMqCY5IfsW8le2Oh5VQObZoquSe4JSmv8dD1qyXS70pXGq9qdnd
-         doMIF4Sk0I/1eNTuB1bRNhYJ8lKTAYEZbzoDTzGV0dJGhHMUuHR2HUg9vVjkULQApKrv
-         eCX8mQucYE+IWZNDJF+1Y2wnCbvGHKKHW3/YjRZvxtPH0zyXjulraavXoFv2gmbm4Nj8
-         Kg08Pw1+7BIj9UUIGzMUmpLLlRnThHTNZvdXPzUUKZWZiIM/ydaoPz7eoNmyTxpSeplY
-         8qWQ==
+        bh=v35ZIPmc8MkEl34tr1m1iZzYr1f58fXQnIx+Nkq6/A8=;
+        b=UvxFU5Thz3Z7MebFV6MsQEUHvOcL9sCkBzh/RH80uBn4+DbHcVhTO1uk2dfxpLeUw3
+         WL/qXTPD0raJbol1cpBKaQaeyAixbXdju9nW0rRawZBwb3Hsbd8mFgvIHLxqu1KimDQw
+         jlBrC+2Fi8fGUgmjgnggSYNlbHuxDx9BRGW75kGMx2RvUDWUfd1vVBjs2agNMpe6qZZx
+         Kp91UzHF9yYzhWsv1/r8UuyYX3JvAdybYblrgAP//ezjraeyd5PyxpXE4/Ij7xH1Wrjl
+         gFJrGKus/Rqg8iIP6T1PHd/Do7Jvpnx9ZkzHfMJ/21pWWUZ2G//d/Oy+ml/RbdS3jRCh
+         U3FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698161560; x=1698766360;
+        d=1e100.net; s=20230601; t=1698162059; x=1698766859;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x6CR3hW9guPSL+YL/tdJY2JCx31XK+imzGPZ6W3df54=;
-        b=Bs4TTV6/Bvw/1nAsQfoHl4EVMGA+FAz+cZC88kPkYhJbbCGacBDH5OVQ+UTaNgLN9V
-         KyoWni+fu7mrIKPaWO+R985VR1UiTp0VqjkdfVRYTzTfuBtqCzqwXxC6YrXXXnrg6AMQ
-         FjjdScdxqsQQwNR9q+YEbNDY+9EGyi3xm5Uf1HxamNFF7vDpGxp13v3SfOaIdDUic6KR
-         oK8dRFjwquVEEZwxHmttcHXX465cWEVGfQDz+zvSXDsX3CYymVt6+ErOXmiNjHw0TSYx
-         pwaQWSJMNRK0sogGumNEhcH5KmNtHuXCulAJ2KUyDRRUPCvdEO48vlm7XXYF7jTfq4qq
-         HWlA==
-X-Gm-Message-State: AOJu0YzvHSz81pw5bUNj/fbuwohJutwcq5P7XcmwEzbJiG3sR3AsG1Y6
-	japwXhhAzw20Nj2tn9ZNgNU=
-X-Google-Smtp-Source: AGHT+IH1iulxve21BYOuGXWwPfYEdbugEkEkLMEHxxvOcp8s9o+sMsN4ADNkwN4Pw2V124Rwrax2oA==
-X-Received: by 2002:a05:6830:4117:b0:6cd:8c8:1654 with SMTP id w23-20020a056830411700b006cd08c81654mr16507234ott.2.1698161560567;
-        Tue, 24 Oct 2023 08:32:40 -0700 (PDT)
-Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id t8-20020a9d66c8000000b006ce2fce83cbsm1901989otm.25.2023.10.24.08.32.39
+        bh=v35ZIPmc8MkEl34tr1m1iZzYr1f58fXQnIx+Nkq6/A8=;
+        b=DT6Yp3cXINfuDX34qA0mkqtZRXAM9cob1hOiZY/IhRdiiwudqgvuMLxw6vZHNUM+CD
+         t7FyXQV0OrPJgkSIu1qxo1tG1NQgVwQi7p9hEgQvbBTd7Jr38kkGzAZuefOM2g3tPWug
+         v+QGLGmiEDIR7ZSr8dvktqWw7OYvNozhCVbk+scspWfwW5RtyH/uGhACkUmaP9y1/knN
+         0JK1wqxjbpYI5pBfBgyN8wa0mYRgIdGma4sFU1XK6t5Wwf6ee4X2CyXs3lpRmI6GBPD5
+         CrbkAbW/ed4+qIZLi+blBwZmDeGaQiih0ym3PK7dwGVvz25aB1iGZqdRhD/LjPEx1Ona
+         gSKQ==
+X-Gm-Message-State: AOJu0YwGxVY5uMJ3Uw0hm78vRiuYTUyV+yO76POVmU85k4d8gC/TsbgI
+	Nnxo4WN+QE2x5DOthujNUJs=
+X-Google-Smtp-Source: AGHT+IG1KZeOmx3IHAPK7fVfUGNZNPt3BkN+hbbTtduY5p3mJv4vnO9BgykiPH6tw73bczPrbZ9Zgg==
+X-Received: by 2002:a0c:b254:0:b0:66d:138f:95df with SMTP id k20-20020a0cb254000000b0066d138f95dfmr12166232qve.56.1698162058854;
+        Tue, 24 Oct 2023 08:40:58 -0700 (PDT)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id s4-20020ad45004000000b0063f88855ef2sm3638557qvo.101.2023.10.24.08.40.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 08:32:40 -0700 (PDT)
-Message-ID: <1740def7-87b2-4d14-a6b1-c4522b9dcbf1@gmail.com>
-Date: Tue, 24 Oct 2023 10:32:37 -0500
+        Tue, 24 Oct 2023 08:40:58 -0700 (PDT)
+Message-ID: <71f5cd1f-ea9d-4e47-bc4b-eeb0a1ceb310@gmail.com>
+Date: Tue, 24 Oct 2023 08:40:56 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,7 +53,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: Is the data rate estimation for 5GHz channels overly pessimistic?
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>,
+To: Denis Kenzior <denkenz@gmail.com>,
  Simonas Kazlauskas <iwd.lists.linux.dev@kazlauskas.me>
 Cc: iwd@lists.linux.dev
 References: <xxpypqwyk3gjrwjmpuvxqdlipkrb3fbw7augfey5ovr3lgbgul@2tbf6xw2uo3z>
@@ -71,32 +71,52 @@ References: <xxpypqwyk3gjrwjmpuvxqdlipkrb3fbw7augfey5ovr3lgbgul@2tbf6xw2uo3z>
  <9e12bf94-aa83-4fe6-b045-8dab45b264ae@gmail.com>
  <3d2c3d76-e08c-4d71-8a72-7193dd51cbfc@gmail.com>
  <8a9039e3-1db3-459f-874b-e53d8dcdc16d@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <8a9039e3-1db3-459f-874b-e53d8dcdc16d@gmail.com>
+ <1740def7-87b2-4d14-a6b1-c4522b9dcbf1@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <1740def7-87b2-4d14-a6b1-c4522b9dcbf1@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi James,
 
+
+On 10/24/23 8:32 AM, Denis Kenzior wrote:
+> Hi James,
+> 
+>>>
+>>> They are not made up, they're direct from 802.11.  But again, they're 
+>>> the _minimum_ specified sensitivity.  Hardware typically does better.
 >>
->> They are not made up, they're direct from 802.11.  But again, they're the 
->> _minimum_ specified sensitivity.  Hardware typically does better.
+>> The rates/MCS table (ht_vht_rates) is from 802.11, but the mapping 
+>> from RSSI to MCS index's (ht_vht_he_base_rssi) is not. The spec just 
+>> has a formula for calculating the rate using a given MCS/channel 
+>> width. IWD just chooses what it thinks the MCS will be for a given RSSI.
 > 
-> The rates/MCS table (ht_vht_rates) is from 802.11, but the mapping from RSSI to 
-> MCS index's (ht_vht_he_base_rssi) is not. The spec just has a formula for 
-> calculating the rate using a given MCS/channel width. IWD just chooses what it 
-> thinks the MCS will be for a given RSSI.
+> Sheesh!  Everything is directly from 802.11.
+> 
+> 80211-2020.pdf, page 2835, Table 17-18.
+> 80211ax-2021.pdf, page 642, Table 27-51
 
-Sheesh!  Everything is directly from 802.11.
+Apparently wherever I got them from, got them from the spec. IIRC I 
+couldn't find such tables when I was doing this, and found something 
+online. Hence why I left this comment:
 
-80211-2020.pdf, page 2835, Table 17-18.
-80211ax-2021.pdf, page 642, Table 27-51
+  * Note: The values here are not based on anything from 802.11 but data
+  *       found elsewhere online (presumably from testing, we hope). The two
+  *       indexes for HE (MCS 11/12) are not based on any data, but just
+  *       increased by 3dB compared to the previous value. We consider 
+this good
+  *       enough for its purpose to estimate the date rate for network/BSS
+  *       preference.
+
+I suppose this can be removed now since they did in fact come from the spec.
 
 > 
-> I don't remember exactly where I got those values from but this seems to match:
+>>
+>> I don't remember exactly where I got those values from but this seems 
+>> to match:
+>>
 > 
-
-The spec?
-
-Regards,
--Denis
+> The spec?
+> 
+> Regards,
+> -Denis
