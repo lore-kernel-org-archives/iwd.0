@@ -1,122 +1,101 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079B4266AB
-	for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 15:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FB23CCF2
+	for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 22:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UvxFU5Th"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-77896da2118so299584785a.1
-        for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 08:40:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZ04UtJG"
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-5a8ee23f043so51700437b3.3
+        for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 15:27:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698162059; x=1698766859; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=v35ZIPmc8MkEl34tr1m1iZzYr1f58fXQnIx+Nkq6/A8=;
-        b=UvxFU5Thz3Z7MebFV6MsQEUHvOcL9sCkBzh/RH80uBn4+DbHcVhTO1uk2dfxpLeUw3
-         WL/qXTPD0raJbol1cpBKaQaeyAixbXdju9nW0rRawZBwb3Hsbd8mFgvIHLxqu1KimDQw
-         jlBrC+2Fi8fGUgmjgnggSYNlbHuxDx9BRGW75kGMx2RvUDWUfd1vVBjs2agNMpe6qZZx
-         Kp91UzHF9yYzhWsv1/r8UuyYX3JvAdybYblrgAP//ezjraeyd5PyxpXE4/Ij7xH1Wrjl
-         gFJrGKus/Rqg8iIP6T1PHd/Do7Jvpnx9ZkzHfMJ/21pWWUZ2G//d/Oy+ml/RbdS3jRCh
-         U3FA==
+        d=gmail.com; s=20230601; t=1698186424; x=1698791224; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ib7tFC9yKUMJX4F4TDTzgrtRp2do2w/UbsnjZsw7BUU=;
+        b=TZ04UtJGgOxJYB8ql0MxdaY9djtPrqoKc/XqGCOXOvpBbbiOqwn291Vjxsk3caadxg
+         fdL1Soj0rzypj8dGyvcFKVNRCNLAIUymX9x4+IAR25XWm9MF5fmNkZ80kJlBJOpbHXqn
+         ZUfhNlWgG7hPY0kBzR8cLKsNKsHhsZ4g2JZ9Cm4P7KrNiCvDw8cqJbnb7Q509WMaGCTA
+         1PUoyqXNum0ElsGZ/X2TNN8dirf/CLnEmAJhJtrCmFUBWhW0LEYQYNLyWkCY2tYpfRdy
+         q3b+btN3xFbic/wP/xCkfBwLcX4B6FNdkp0V42lVfNx/iN6Tx1jLypM96/NCcT6bFF6P
+         W7KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698162059; x=1698766859;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v35ZIPmc8MkEl34tr1m1iZzYr1f58fXQnIx+Nkq6/A8=;
-        b=DT6Yp3cXINfuDX34qA0mkqtZRXAM9cob1hOiZY/IhRdiiwudqgvuMLxw6vZHNUM+CD
-         t7FyXQV0OrPJgkSIu1qxo1tG1NQgVwQi7p9hEgQvbBTd7Jr38kkGzAZuefOM2g3tPWug
-         v+QGLGmiEDIR7ZSr8dvktqWw7OYvNozhCVbk+scspWfwW5RtyH/uGhACkUmaP9y1/knN
-         0JK1wqxjbpYI5pBfBgyN8wa0mYRgIdGma4sFU1XK6t5Wwf6ee4X2CyXs3lpRmI6GBPD5
-         CrbkAbW/ed4+qIZLi+blBwZmDeGaQiih0ym3PK7dwGVvz25aB1iGZqdRhD/LjPEx1Ona
-         gSKQ==
-X-Gm-Message-State: AOJu0YwGxVY5uMJ3Uw0hm78vRiuYTUyV+yO76POVmU85k4d8gC/TsbgI
-	Nnxo4WN+QE2x5DOthujNUJs=
-X-Google-Smtp-Source: AGHT+IG1KZeOmx3IHAPK7fVfUGNZNPt3BkN+hbbTtduY5p3mJv4vnO9BgykiPH6tw73bczPrbZ9Zgg==
-X-Received: by 2002:a0c:b254:0:b0:66d:138f:95df with SMTP id k20-20020a0cb254000000b0066d138f95dfmr12166232qve.56.1698162058854;
-        Tue, 24 Oct 2023 08:40:58 -0700 (PDT)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id s4-20020ad45004000000b0063f88855ef2sm3638557qvo.101.2023.10.24.08.40.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 08:40:58 -0700 (PDT)
-Message-ID: <71f5cd1f-ea9d-4e47-bc4b-eeb0a1ceb310@gmail.com>
-Date: Tue, 24 Oct 2023 08:40:56 -0700
+        d=1e100.net; s=20230601; t=1698186424; x=1698791224;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ib7tFC9yKUMJX4F4TDTzgrtRp2do2w/UbsnjZsw7BUU=;
+        b=Z0kRCRXgkP9U6bq9HYLLV8WFtbnomI2cpBIDP4jcaa+cl994OO8dmu1GT2hms1Hmkj
+         Q0HAVKTLnaKcESKfXXG0ys1D7dZvkNbDasntrAnuxDA0mTGxNcERtqOaS4TMGiQUUmxM
+         XEWad5heuPuDECmt2ODDWV6mcLwj5U00vJ/IoGWBPtOXfpXZ8vIDDc7AVtLyQ3n1x00n
+         3jNcXA+/WG8t1sAjTh61oa4uFZ2ZEcktG+W8wnKDia3zuyHLEK/62nLY2mDFXf8GDrbf
+         LLTsqLQc/3glagPJYW/kFW84sGHIRh6sBL09amYSHQBwfX3rjPgrHzgjiOwl5dE/Hse0
+         4WGw==
+X-Gm-Message-State: AOJu0YwII2IlA7Q4VG4tW0vGb3n487qf+JbRJKN2ZY5zV/h9AaN4vKHd
+	2pUcoBBUIgWwJ7XnMD5my3ppctMuwzt1cclhxpk=
+X-Google-Smtp-Source: AGHT+IFHS8sI8s14y/SVFoxFs3YcYT39J/zquaM3ePVPY07JVt7dwXh69FAn4SawmFwfKosJJUwgEu/jpPmqRT4BP+o=
+X-Received: by 2002:a0d:e291:0:b0:5a7:fbd5:8c1 with SMTP id
+ l139-20020a0de291000000b005a7fbd508c1mr13964726ywe.17.1698186424632; Tue, 24
+ Oct 2023 15:27:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Is the data rate estimation for 5GHz channels overly pessimistic?
-Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>,
- Simonas Kazlauskas <iwd.lists.linux.dev@kazlauskas.me>
+References: <20231014235445.167620-1-dimitri.ledkov@canonical.com>
+ <075d94c6-4ce3-4945-b765-71ad6285dd67@gmail.com> <CADWks+bdeDgAZKUs6wbdi3KjDHeONO7LkmjX_-9wT15m91PvPQ@mail.gmail.com>
+ <c29ea330-c84a-41a7-b5e0-ef44993736e2@gmail.com> <CADWks+au-HzFjSopfHYnpz3kUW1uOR7aEFTe_m0qHfVvJPcfFA@mail.gmail.com>
+In-Reply-To: <CADWks+au-HzFjSopfHYnpz3kUW1uOR7aEFTe_m0qHfVvJPcfFA@mail.gmail.com>
+From: Emil Velikov <emil.l.velikov@gmail.com>
+Date: Tue, 24 Oct 2023 23:26:53 +0100
+Message-ID: <CACvgo51cspY9BgZoKmPDKuOqJXmMZxfh1K2Wsvr4Kxs_ua2-Mw@mail.gmail.com>
+Subject: Re: [PATCH] eap-mschapv2: allow using on kernels without CRYPTO_MD4,
+ and deprecate
+To: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
 Cc: iwd@lists.linux.dev
-References: <xxpypqwyk3gjrwjmpuvxqdlipkrb3fbw7augfey5ovr3lgbgul@2tbf6xw2uo3z>
- <5780e1b2-8956-46bb-8116-b513cc564cea@gmail.com>
- <5ff58310-c5ee-4694-821a-0c802cdedb89@gmail.com>
- <bwuu4ra65fpfpenytgu5a6ftjpvyury4omx7ucy65cshorqskl@5ikhebki4wnk>
- <05aedfe6-82ad-4e41-a9fa-e9f8a5619947@gmail.com>
- <tkizdohkwpz4nfgjczdzltr7qhvjtcyyk6x3543dht2gmm7ssc@q7m4rq3r3sqx>
- <f7ced477-6fa4-4efd-bf54-817b100041ef@gmail.com>
- <ccb68e07-e4a0-4e50-b7e2-2a2044d38487@gmail.com>
- <30b6dad4-64b2-41ca-8712-053cb1396eaf@gmail.com>
- <ncmtsi42vkdimzxsuktgfblp66agskivhuntdjlooyp7gglhgo@kwuxknllo527>
- <sebayhpora5e5ispmp5nnjesihoewc74ohygd3orxp7k22ky4c@tt225sdpjrxm>
- <29094eca-dcf8-4234-8afc-13d37db8450c@gmail.com>
- <9e12bf94-aa83-4fe6-b045-8dab45b264ae@gmail.com>
- <3d2c3d76-e08c-4d71-8a72-7193dd51cbfc@gmail.com>
- <8a9039e3-1db3-459f-874b-e53d8dcdc16d@gmail.com>
- <1740def7-87b2-4d14-a6b1-c4522b9dcbf1@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <1740def7-87b2-4d14-a6b1-c4522b9dcbf1@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
 
+Hello Dmitry, all,
 
+On Sat, 21 Oct 2023 at 01:34, Dimitri John Ledkov
+<dimitri.ledkov@canonical.com> wrote:>
+> On Thu, 19 Oct 2023 at 03:54, Denis Kenzior <denkenz@gmail.com> wrote:
 
-On 10/24/23 8:32 AM, Denis Kenzior wrote:
-> Hi James,
-> 
->>>
->>> They are not made up, they're direct from 802.11.  But again, they're 
->>> the _minimum_ specified sensitivity.  Hardware typically does better.
->>
->> The rates/MCS table (ht_vht_rates) is from 802.11, but the mapping 
->> from RSSI to MCS index's (ht_vht_he_base_rssi) is not. The spec just 
->> has a formula for calculating the rate using a given MCS/channel 
->> width. IWD just chooses what it thinks the MCS will be for a given RSSI.
-> 
-> Sheesh!  Everything is directly from 802.11.
-> 
-> 80211-2020.pdf, page 2835, Table 17-18.
-> 80211ax-2021.pdf, page 642, Table 27-51
+> > Wasn't Ubuntu going to switch to iwd at some point?
+>
 
-Apparently wherever I got them from, got them from the spec. IIRC I 
-couldn't find such tables when I was doing this, and found something 
-online. Hence why I left this comment:
+Was interested in the same question, only to see the somewhat familiar
+struggles. Namely, we've battled similar dragons with the SteamDeck so
+I thought I'd share the tricks we used.
 
-  * Note: The values here are not based on anything from 802.11 but data
-  *       found elsewhere online (presumably from testing, we hope). The two
-  *       indexes for HE (MCS 11/12) are not based on any data, but just
-  *       increased by 3dB compared to the previous value. We consider 
-this good
-  *       enough for its purpose to estimate the date rate for network/BSS
-  *       preference.
+>... most notably seemingly failing to configure and use
+> eap-mschapv2 via NetworkManager GUI,
 
-I suppose this can be removed now since they did in fact come from the spec.
+My debugging over one years ago, indicated that NM was correctly
+creating the iwd profile for enterprisy networks, then attempting a
+connection _only_ if iwd would advertise it as KnownNetwork.
 
-> 
->>
->> I don't remember exactly where I got those values from but this seems 
->> to match:
->>
-> 
-> The spec?
-> 
-> Regards,
-> -Denis
+Which in itself is inherently racy with NM running multiple threads
+and communicating with iwd via d-bus. For use I removed that code, so
+that NM would issue a connect and if iwd fails with
+AlreadyProvisioned, it would then retry to connect with
+the-flag-I-do-no-remember-the-name-of flipped.
+
+There was an upstream NM merge request for that, although the
+maintainer added additional checking, which only increased the
+(re)connection delay without improving the success rate in our tests.
+
+> ... or keep existing configuration
+> working after the switch.
+
+The problematic cases we've observed had extra tokens from the
+wpa-supplicant based connection profiles. So you can try removing the
+following:
+mac-address interface-name permissions bssid
+
+In addition, we pruned all files in /var/lib/NetworkManager/
+
+HTH
+Emil
