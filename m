@@ -1,49 +1,49 @@
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811332C85D
-	for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 14:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3C334CCF
+	for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 14:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CBrmnOx6"
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-584042a01eeso2754931eaf.2
-        for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 07:26:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QQOTACiu"
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-581ed744114so1772472eaf.0
+        for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 07:40:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698157568; x=1698762368; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=gmail.com; s=20230601; t=1698158404; x=1698763204; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ihPPjpqCLG4dB/BLe7w91W9uOJBfPphLiiJ1mUa9RgM=;
-        b=CBrmnOx6Ybn3ejOWSHOuiyiGZraa8shQxAlZUcCZSImxCrD0dElBYnNSD+iygjcW3h
-         eUiJbPQQ/W9uNQ42XuMmPFk5BiRXQ6G5k+pgcSuggWqxcGCeqpeXVSidiJnRBfp/l1EK
-         MmJ2p9tXoOyA9nuDHCV3viBMMj99k1IAURntOfubQzVaiW67EDoxccAA2v0PQU1CZabP
-         XhPh+ot4i0NvW/vlDe3/TK9Jj5zEPmyOLSC0mgmdihnvBbMoELHZOJeYmUZAK/FRsfOy
-         UhnFDt/4BGyXGvMez8aWK1S2k5o0kSGVo4znsGQU2DwJRjzd/x+Xq2r60fAHl4SI8DCL
-         39Wg==
+        bh=2RVfnC0MCsDIFfQP9HhvY1WxiIH7/vUHwUrkZl1W80Q=;
+        b=QQOTACiu6SbLhuqX1uk5zEnULRucuRoBgBDX1qhXJ1DiwmGIL/vud0Fpk+l2nBmYH3
+         c60h9TKhK0YcQ4hgXMnYOb6EsS3ZVriv2wiOxN+A+XYh4F2AWqxhoTvXuf8mg+JK+Q7S
+         lipxG9QpG2splQM2Cog2PFArHDKM6MfE9YnqFkvurSb8WVhrAtxrl03AhO6jLoRHANTm
+         oJnKen1XwWL70W6bAC08uDGUK14Or81zK0en/8vzdoPIqC3jCxVul/4QXdydJVSLZf8+
+         E51yfiob3PYmqybiCvaQ/xr3MFX1PA8VeWX4frVzIZAM9PElFNS6acN2wyD+HVc3/3hx
+         tgrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698157568; x=1698762368;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=1e100.net; s=20230601; t=1698158404; x=1698763204;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ihPPjpqCLG4dB/BLe7w91W9uOJBfPphLiiJ1mUa9RgM=;
-        b=doGpC4/CqZ6fGH/j09hETFgxipAldEAvFVnwrf2HqAdG+3mLTVMNmBI8qqjJlzbKc4
-         H2xCKIMpS2da8B7PBEc5xJ8mH3aowfLbFoEssW9sexfTT2taIJuCHwb5TXU+pwyxR/SD
-         IM3lvh/T8TLU5C7lA8FznveSCKEzaDbV79veOHSBWGr0byT18uRqcByip/semhqsDaE/
-         WE8/O9q6XPPrylbxcgia6j8tg4lMpcEWzbzMCY/lGTyO0ezL26Nt9mbqiO+E/cdRimtR
-         myPZzHoA749+G4cVBWasP3fCT7KbLZqK1BfaY2fVuEKsrf2AjZC6gWAx8xkBBPBHgBw3
-         mGCQ==
-X-Gm-Message-State: AOJu0YxOviJq6jGFsER3sHtujOnKO38rLHln/RQsfTkeQxEfNseb78Wu
-	7rTCmn/qg5T0DSpU2nH1Umk=
-X-Google-Smtp-Source: AGHT+IEn/IK6tquq1lci5c1PJu2U1HcZ6HtEbcrpMBZBRIRnrN699azehRJM3qJl0lylRGmC6Ib2Bg==
-X-Received: by 2002:a05:6820:1aaa:b0:57b:6d88:4cb3 with SMTP id bt42-20020a0568201aaa00b0057b6d884cb3mr10830477oob.5.1698157568478;
-        Tue, 24 Oct 2023 07:26:08 -0700 (PDT)
+        bh=2RVfnC0MCsDIFfQP9HhvY1WxiIH7/vUHwUrkZl1W80Q=;
+        b=LXhzFzPT8swFH4MsI5G35QHt41tU56hj8D0cve0oN3oRopKECDdpsf2eTqYfmzqoAE
+         lGZSupoOlQdH/SCT8HMBTjtxZ1suQwP6QCUpatr2Vl0tZ6LJ/v4w6p0i1j9y9OjCLdqZ
+         PR9siALzFU/tFNs+2VruBABpuHOAvH5P/oAO9sQTki3seDgKt+8J3kidGR1YBYufsgXW
+         roCzQ5xNvGDSelkWvB5ptADwP2slpUQ1ANQ5lHiuBaMNWc7yfgclJb7/vksyDaNTV7ra
+         0OcSUzUhJi6TubP5SOTIrCFlD0Xsu0cc9hIwj+y4omF9NGdYjWGv5dpd0+1ugyYKEGUD
+         o7rA==
+X-Gm-Message-State: AOJu0Yy4RHw0FErZo2N11IgQKaSmtWAp2e/orTe3e/7vtnss6pNwQmDI
+	RHj7LOK6K3gJIDaJkCXt0/x7EAggw0M=
+X-Google-Smtp-Source: AGHT+IFgDfdFdcwMFH9HKBvggrlNi2W8/HCd8Cnc0WHajEkAkY+LxC7X2dMUN2o3si+nTPAVkJZWgA==
+X-Received: by 2002:a05:6820:8c4:b0:581:e819:cac6 with SMTP id bi4-20020a05682008c400b00581e819cac6mr10098488oob.9.1698158403911;
+        Tue, 24 Oct 2023 07:40:03 -0700 (PDT)
 Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 6-20020a544186000000b003af5f6e40d7sm1945180oiy.15.2023.10.24.07.26.07
+        by smtp.googlemail.com with ESMTPSA id r134-20020a4a378c000000b00582014b0138sm2059333oor.39.2023.10.24.07.40.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 07:26:07 -0700 (PDT)
-Message-ID: <3d2c3d76-e08c-4d71-8a72-7193dd51cbfc@gmail.com>
-Date: Tue, 24 Oct 2023 09:26:06 -0500
+        Tue, 24 Oct 2023 07:40:03 -0700 (PDT)
+Message-ID: <eb7d9b49-959b-4c86-9581-f0b76409c40c@gmail.com>
+Date: Tue, 24 Oct 2023 09:40:02 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,76 +51,54 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Is the data rate estimation for 5GHz channels overly pessimistic?
+Subject: Re: [PATCH 11/21] doc: PKEX support for DPP
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>,
- Simonas Kazlauskas <iwd.lists.linux.dev@kazlauskas.me>
-Cc: iwd@lists.linux.dev
-References: <xxpypqwyk3gjrwjmpuvxqdlipkrb3fbw7augfey5ovr3lgbgul@2tbf6xw2uo3z>
- <5780e1b2-8956-46bb-8116-b513cc564cea@gmail.com>
- <5ff58310-c5ee-4694-821a-0c802cdedb89@gmail.com>
- <bwuu4ra65fpfpenytgu5a6ftjpvyury4omx7ucy65cshorqskl@5ikhebki4wnk>
- <05aedfe6-82ad-4e41-a9fa-e9f8a5619947@gmail.com>
- <tkizdohkwpz4nfgjczdzltr7qhvjtcyyk6x3543dht2gmm7ssc@q7m4rq3r3sqx>
- <f7ced477-6fa4-4efd-bf54-817b100041ef@gmail.com>
- <ccb68e07-e4a0-4e50-b7e2-2a2044d38487@gmail.com>
- <30b6dad4-64b2-41ca-8712-053cb1396eaf@gmail.com>
- <ncmtsi42vkdimzxsuktgfblp66agskivhuntdjlooyp7gglhgo@kwuxknllo527>
- <sebayhpora5e5ispmp5nnjesihoewc74ohygd3orxp7k22ky4c@tt225sdpjrxm>
- <29094eca-dcf8-4234-8afc-13d37db8450c@gmail.com>
- <9e12bf94-aa83-4fe6-b045-8dab45b264ae@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20231012200150.338401-1-prestwoj@gmail.com>
+ <20231012200150.338401-12-prestwoj@gmail.com>
+ <41078822-99da-466e-b612-91a8c223dbde@gmail.com>
+ <0dd4a4a5-95aa-49c1-be77-e640862c3f82@gmail.com>
+ <62d0c420-3bc5-45a8-80c6-c4c59db7ae2c@gmail.com>
+ <d69dd453-95b8-49b0-9419-3ee0c7c98fe1@gmail.com>
+ <a38fc175-3095-488d-a0ea-a70e7f148540@gmail.com>
+ <035c5cb1-d5be-4c4b-a6f5-8c0941926225@gmail.com>
+ <c8617f8d-0c7c-4e1c-ab0f-f356a121afe6@gmail.com>
+ <ae7b807f-fb7b-4437-9e00-bc4f64ad6047@gmail.com>
+ <d4fdadd8-dc2b-47b0-b1ac-114abed91f39@gmail.com>
+ <7de9faab-5863-48f5-8de6-28e1b543d2b8@gmail.com>
+ <f812bdcd-219e-4e0d-8816-46015bd7cdab@gmail.com>
+ <3a488d09-a66b-452c-99e4-a7521c80252c@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <9e12bf94-aa83-4fe6-b045-8dab45b264ae@gmail.com>
+In-Reply-To: <3a488d09-a66b-452c-99e4-a7521c80252c@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 10/24/23 07:32, James Prestwood wrote:
-> Hi Denis/Simonas,
+On 10/23/23 08:49, James Prestwood wrote:
+> Hi Denis,
 > 
 >>
->> Now the question is, how do we make sure iwd is estimating the HE rate if 
->> available?  Also, how do we tweak the estimation logic with sensitivity 
->> numbers (obtained from a spec sheet, or through experimentation) for specific 
->> hardware being used.
+>>>
+>>> I'm fine with it as an argument to the StartConfigurator API. An agent could 
+>>> work but we've also got the optional identifier to think about. I'd prefer to 
+>>> use the existing agent API for getting a passphrase rather than a new method.
+>>>
+>>
+>> But the identifier is not supposed to be secret?
 > 
-> Trying to catalog different hardware performance and act on it for ranking is an 
-> impossible task :)
-
-We can actually have our own hwdb of sorts for this.  Hardware sensitivity is a 
-differentiator (think marketing), so should be fairly easy to find.  Also, it 
-doesn't have to be absolutely perfect, just reflect the hw capability a bit more 
-closely.
-
+> No, the identifier is sent plaintext:
 > 
-> The only simple solution I can think of would be to add a user-option for some 
-> threshold RSSI in the rate calculation. If set and the RSSI is below the lowest 
-> of ht_vht_he_base_rssi just use the last index (-82) (and maybe force a 20MHz 
-> channel width?). This would at least let the rate logic return _something_, 
-> albeit maybe not accurate. But again, those RSSI thresholds were sorta made up 
-> anyways :)
-
-They are not made up, they're direct from 802.11.  But again, they're the 
-_minimum_ specified sensitivity.  Hardware typically does better.
-
+> "Optionally, a non-secret identifier for the code can be transmitted to support 
+> the case where a PKEX implementation may be provisioned to connect to a 
+> plurality of devices and needs to know which code to use to process a received 
+> PKEX frame. If an optional code identifier is used, it shall be a UTF-8 string 
+> not greater than eighty (80) octets that is provisioned at the same time as the 
+> shared code."
 > 
-> So you could set:
-> [Rank].LowSignalRateThreshold=-90
-> 
-> Any RSSI between -82 and -90 would use -82 for the rank calculation. No idea how 
-> this would play out in practice, but its at least simple and not tied to any 
-> given hardware.
 
-No, I was more thinking about:
-/* Added to the rssi value prior to looking up in the ht_vht_he_base_rssi */
-SensitivityFudgeFactor=4
-/* Width penalty */
-SensitivityWidthPenalty=0 (3 today)
-/* NSS penalty */
-SensitivityNSSPenalty=3
-/* Same as SensitivityFudgeFactor, but for HE */
-SensitivityHEFudgeFactor=10
+Right.  Basically a unique identifier of some sort so a shared code can be 
+looked up from a set.
 
 Regards,
 -Denis
