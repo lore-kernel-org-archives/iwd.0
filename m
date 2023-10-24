@@ -1,49 +1,49 @@
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDFD1429A
-	for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 15:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978D5374CB
+	for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 15:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ICsl0MYB"
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-1e993765c1bso3110646fac.3
-        for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 08:29:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mEq4s6vu"
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6ce322b62aeso3004134a34.3
+        for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 08:32:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698161382; x=1698766182; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1698161560; x=1698766360; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=dDvJxz70a6dBTrno5PluH3OAotIBnpXAI3PJtPqWIZw=;
-        b=ICsl0MYBlRaVNYC3TauypAYTEcSJewve1T9dJbiuoqCzZhPNQMovyuWDDcEWF0GQRy
-         PCNMNyBXvQRg0drdXONxS5D+fI4cGXJG+/cHi0tybS6JqIIZ7k7DzqmJ2InDBDNtcZTs
-         tDBAevk89P9yHAGyGEZCUxGAclgW217r4eK0m082wMBY/VyG8yPVCuwXE3BPCOtieoHb
-         LF9eg4sp76F5hdRV7wzf9TJlfFcB9t3uZrwocR/EJ9IZoRMXhGYaS4BdlCn9+3ij+ASp
-         /Wdebp9piWiS3KQ3olQNmKVJAtm+SGIMTJudc+ZtGC0SrkoaaUgz2ZQJW4lWZAhxZbTR
-         Gg7A==
+        bh=x6CR3hW9guPSL+YL/tdJY2JCx31XK+imzGPZ6W3df54=;
+        b=mEq4s6vuFeAbJMrAmrkHuAknCS6ph+gxOWEXAwJq7M5dzxisMKDNUhTTrBdP3mpN2u
+         TMZVYEQ+AbB44O79VMMqCY5IfsW8le2Oh5VQObZoquSe4JSmv8dD1qyXS70pXGq9qdnd
+         doMIF4Sk0I/1eNTuB1bRNhYJ8lKTAYEZbzoDTzGV0dJGhHMUuHR2HUg9vVjkULQApKrv
+         eCX8mQucYE+IWZNDJF+1Y2wnCbvGHKKHW3/YjRZvxtPH0zyXjulraavXoFv2gmbm4Nj8
+         Kg08Pw1+7BIj9UUIGzMUmpLLlRnThHTNZvdXPzUUKZWZiIM/ydaoPz7eoNmyTxpSeplY
+         8qWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698161382; x=1698766182;
+        d=1e100.net; s=20230601; t=1698161560; x=1698766360;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dDvJxz70a6dBTrno5PluH3OAotIBnpXAI3PJtPqWIZw=;
-        b=bEWByZAN1pRRCakohISdQG7a1vWEWDAfGfSZyS+5LNyFAy4V1V1jVbyn+ebrl5/wr2
-         ogj8yBA023eH7q7d+QPk9umX3VzDUGNHCPmt347ORxo03siLOR40nCYfbI6CMEHbt5eo
-         eg5Sg+HZphm6173kZKeQakiRvSqkeNLRNpZHP4ybqHAVXQdPu2j+arHepKZpaYplT09g
-         i1mMqMMjzVEzehe+fD2cMkspGEVkQMvk5FNGwmrOZ0WafHfEF9OcakTph6fa3o/HBtc9
-         /GNvzai06IR742RX7kKl2dnuEoRKp3XJaZICXHmVPy0wDxJxk3TMddUnr94OXDl60zbK
-         w4gw==
-X-Gm-Message-State: AOJu0Yy9dcPAnx+HARdBswwm3bVcBgQc4v13VSZcQp753rNR1d3qMgvf
-	Hs4FTNrNhRrHuKl3hi4J5YE=
-X-Google-Smtp-Source: AGHT+IFPDdfZohHON2cp8+qvmm03HMFFtOXtnRWu5/EM4kjjiF8sJDXj3KGVwf9epjQJoTJ5gMZACQ==
-X-Received: by 2002:a05:6870:4d08:b0:1e9:68b5:d418 with SMTP id pn8-20020a0568704d0800b001e968b5d418mr15605690oab.34.1698161382599;
-        Tue, 24 Oct 2023 08:29:42 -0700 (PDT)
+        bh=x6CR3hW9guPSL+YL/tdJY2JCx31XK+imzGPZ6W3df54=;
+        b=Bs4TTV6/Bvw/1nAsQfoHl4EVMGA+FAz+cZC88kPkYhJbbCGacBDH5OVQ+UTaNgLN9V
+         KyoWni+fu7mrIKPaWO+R985VR1UiTp0VqjkdfVRYTzTfuBtqCzqwXxC6YrXXXnrg6AMQ
+         FjjdScdxqsQQwNR9q+YEbNDY+9EGyi3xm5Uf1HxamNFF7vDpGxp13v3SfOaIdDUic6KR
+         oK8dRFjwquVEEZwxHmttcHXX465cWEVGfQDz+zvSXDsX3CYymVt6+ErOXmiNjHw0TSYx
+         pwaQWSJMNRK0sogGumNEhcH5KmNtHuXCulAJ2KUyDRRUPCvdEO48vlm7XXYF7jTfq4qq
+         HWlA==
+X-Gm-Message-State: AOJu0YzvHSz81pw5bUNj/fbuwohJutwcq5P7XcmwEzbJiG3sR3AsG1Y6
+	japwXhhAzw20Nj2tn9ZNgNU=
+X-Google-Smtp-Source: AGHT+IH1iulxve21BYOuGXWwPfYEdbugEkEkLMEHxxvOcp8s9o+sMsN4ADNkwN4Pw2V124Rwrax2oA==
+X-Received: by 2002:a05:6830:4117:b0:6cd:8c8:1654 with SMTP id w23-20020a056830411700b006cd08c81654mr16507234ott.2.1698161560567;
+        Tue, 24 Oct 2023 08:32:40 -0700 (PDT)
 Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id h4-20020a056870a3c400b001dd17c5356dsm2171587oak.11.2023.10.24.08.29.41
+        by smtp.googlemail.com with ESMTPSA id t8-20020a9d66c8000000b006ce2fce83cbsm1901989otm.25.2023.10.24.08.32.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 08:29:41 -0700 (PDT)
-Message-ID: <5ec949dc-e714-438a-9f70-c59bb8f65fc1@gmail.com>
-Date: Tue, 24 Oct 2023 10:29:40 -0500
+        Tue, 24 Oct 2023 08:32:40 -0700 (PDT)
+Message-ID: <1740def7-87b2-4d14-a6b1-c4522b9dcbf1@gmail.com>
+Date: Tue, 24 Oct 2023 10:32:37 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,9 +53,14 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: Is the data rate estimation for 5GHz channels overly pessimistic?
 Content-Language: en-US
-To: Simonas Kazlauskas <iwd.lists.linux.dev@kazlauskas.me>
-Cc: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <05aedfe6-82ad-4e41-a9fa-e9f8a5619947@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>,
+ Simonas Kazlauskas <iwd.lists.linux.dev@kazlauskas.me>
+Cc: iwd@lists.linux.dev
+References: <xxpypqwyk3gjrwjmpuvxqdlipkrb3fbw7augfey5ovr3lgbgul@2tbf6xw2uo3z>
+ <5780e1b2-8956-46bb-8116-b513cc564cea@gmail.com>
+ <5ff58310-c5ee-4694-821a-0c802cdedb89@gmail.com>
+ <bwuu4ra65fpfpenytgu5a6ftjpvyury4omx7ucy65cshorqskl@5ikhebki4wnk>
+ <05aedfe6-82ad-4e41-a9fa-e9f8a5619947@gmail.com>
  <tkizdohkwpz4nfgjczdzltr7qhvjtcyyk6x3543dht2gmm7ssc@q7m4rq3r3sqx>
  <f7ced477-6fa4-4efd-bf54-817b100041ef@gmail.com>
  <ccb68e07-e4a0-4e50-b7e2-2a2044d38487@gmail.com>
@@ -65,73 +70,33 @@ References: <05aedfe6-82ad-4e41-a9fa-e9f8a5619947@gmail.com>
  <29094eca-dcf8-4234-8afc-13d37db8450c@gmail.com>
  <9e12bf94-aa83-4fe6-b045-8dab45b264ae@gmail.com>
  <3d2c3d76-e08c-4d71-8a72-7193dd51cbfc@gmail.com>
- <oo6afd4ygkvv47vthzqlvklqnm3gecjkkvhttrxlrmrqqb643t@6dzpfsigq6j6>
+ <8a9039e3-1db3-459f-874b-e53d8dcdc16d@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <oo6afd4ygkvv47vthzqlvklqnm3gecjkkvhttrxlrmrqqb643t@6dzpfsigq6j6>
+In-Reply-To: <8a9039e3-1db3-459f-874b-e53d8dcdc16d@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Simonas,
+Hi James,
 
-On 10/24/23 10:19, Simonas Kazlauskas wrote:
-> Denis Kenzior wrote:
->> On 10/24/23 07:32, James Prestwood wrote:
->>> So you could set:
->>> [Rank].LowSignalRateThreshold=-90
->>>
->>> Any RSSI between -82 and -90 would use -82 for the rank calculation. No idea 
->>> how this would play out in practice, but its at least simple and not tied to 
->>> any given hardware.
 >>
->> No, I was more thinking about:
->> /* Added to the rssi value prior to looking up in the ht_vht_he_base_rssi */
->> SensitivityFudgeFactor=4
->> /* Width penalty */
->> SensitivityWidthPenalty=0 (3 today)
->> /* NSS penalty */
->> SensitivityNSSPenalty=3
->> /* Same as SensitivityFudgeFactor, but for HE */
->> SensitivityHEFudgeFactor=10
+>> They are not made up, they're direct from 802.11.  But again, they're the 
+>> _minimum_ specified sensitivity.  Hardware typically does better.
 > 
-> My main worry then would be finding good defaults for these values. Ultimately, 
-> unless `iwd` ends up in a place where people install it and get a great 
-> experience in anything that involves ranking (roaming, initial association, 
-> etc.), the WiFi experience on Linux may have a hard time shaking off its stigma. 
-> If many has to modify some config variables to get a good experience, the 
-> experience will continue staying subpar for the large majority still. Although 
-> having the knobs will at least enable a minority to extract a reasonably good 
-> experience.
+> The rates/MCS table (ht_vht_rates) is from 802.11, but the mapping from RSSI to 
+> MCS index's (ht_vht_he_base_rssi) is not. The spec just has a formula for 
+> calculating the rate using a given MCS/channel width. IWD just chooses what it 
+> thinks the MCS will be for a given RSSI.
 
-Well, WiFi on Linux is plain terrible.  iwd tries to make it better, but 
-ultimately we're down to only two people.  There's only so much that can be 
-done.  The goal here was to describe the parameters we could use to 'tweak' the 
-current calculation.  These can then be stored per vid/pid/driver or whatever 
-and added onto over time.  If the parameters are not provided, then fall back to 
-the (very pessimistic) calculation we use now.  Still better than what we used 
-to have.
+Sheesh!  Everything is directly from 802.11.
+
+80211-2020.pdf, page 2835, Table 17-18.
+80211ax-2021.pdf, page 642, Table 27-51
 
 > 
-> What worries me in parituclar here is that if we tune these defaults too high 
-> (i.e. estimate rate better than it might end up being in practice) then we might 
-> end up associating with the AP that is too far away/weak to provide a 
-> serviceable connection.
-> 
-> I wonder if there’s any place in here for some dynamic component that would 
-> monitor how the NSS, MCS and other bandwidth affecting parameters behave for a 
-> given SSID/BSSID/etc. as the RSSI varies, and transparently learn these 
-> parameters throughout a… session (is that a term?) That way even if the 
-> estimation for the very first association is too pessimistic, `iwd` can do 
-> better when it needs to estimate again for e.g. a romaing decision or a new 
-> association after a sleep.
-> 
-> With such a scheme in place “training” IWD would also be pretty easy to explain 
-> to the users (walk around the area with your device connected to the network) if 
-> they encountered problems with a particular AP.
+> I don't remember exactly where I got those values from but this seems to match:
 > 
 
-Patches are always welcome.  ML isn't my area of expertise, so I can't really 
-help here.
+The spec?
 
 Regards,
 -Denis
-
