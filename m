@@ -1,49 +1,49 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531C023DE
-	for <iwd@lists.linux.dev>; Mon, 23 Oct 2023 13:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39217266C9
+	for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 12:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N6RTxJK7"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-41ccd38eaa5so27419731cf.0
-        for <iwd@lists.linux.dev>; Mon, 23 Oct 2023 06:49:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LiZTdDtf"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7789a4c01ddso296539285a.1
+        for <iwd@lists.linux.dev>; Tue, 24 Oct 2023 05:05:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698068972; x=1698673772; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1698149116; x=1698753916; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=kC/v/QGsHcOvbcrbnLdvtbQflsPxst9PdIX55Th3s8k=;
-        b=N6RTxJK7TOix/9QUy+pE2ESgN/PuscBlOtfyaFHuR1VIjEx/mofATFNCLlVvJQXfn4
-         NhLzW5tjJ9gxbzLZUBfw7frcl0xUnbqL16G7B8sPFWBx9Yt/o7FJWSvcXR6rEFL/b6zJ
-         QVX47fBnWP1lJr+u32yVWrlEjbhSPrRv3tMeK1upfymLSNpsJF0bNZOugiD5qf977U8N
-         v6Kjy2IQmbNmP6iP+y9lMwwUaZUpYRP2PsDwpgqJzIcRb/2JVeQSn3gdaShFBXRlGyQb
-         x4uMc+g8AwZMVH8agl3Jond/lkJ4s4uFAjMsLsuA85vk0LRiByaHwcNSWgLkfcbcIDLD
-         HaGw==
+        bh=JM64tcyKSQMefiZLW0aCbYrPXVE1pU881GTkHlvmXbs=;
+        b=LiZTdDtf2qcE2/JvpxwwnYwY040tip+Mvvc9D4y7/9Lo7hgKJiLzc09WWBv7S2rtkA
+         h90M5U6cBpruYNnD/ibfG+MRYpY9RsPx2WkyZidyK8y8KpbxvRpwXb3gz+JHrCpBsEkt
+         zUuA0r1mpApEYB+x1NjSoRVRj8kfOXqydBp4u012QSoyJId7ngpwipjiaM3InHgzcwfl
+         bh+ghlp2oUyFnI/Bab0QHQSV1LecNymne7592KASOTkCW09j1Ia3XB5uYytpJ0hjuSQF
+         Us4VfSQNuYMn5vxZGSjLyZ0x8wC4NosXLDf/nLd6t4xJKdVlc6q+r66LzU116DPTEKbb
+         PpmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698068972; x=1698673772;
+        d=1e100.net; s=20230601; t=1698149116; x=1698753916;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kC/v/QGsHcOvbcrbnLdvtbQflsPxst9PdIX55Th3s8k=;
-        b=rJtPCXip1PlKQ09owcEmjCZfBxoFQTU3ay8FtsEBmeelYJ68+nSt/jlBVHOeX8uvM1
-         imd9xZmCTimWsoNGxUGGXHKNPKaKZae7ag2UB/Dq1crVfulLAtTY0inLx29n1dKaSmPq
-         rrHeEkdK271ptdvqPAJU8r+ANvCsiKzGXhk0F55nHOjp/g3lT6r/dLQ7gwSqf7+XWHbD
-         L+QKxM/0RwltE68k6v5/7EGVEPUyskDR02xiSdUj7bhuC71ntep/AseqGU8EtX0WEvCP
-         IiSIHRT0A3atDEOTzVdKbG53yBy0sise9kE691SzPKudiOc7Ojqb1Qfk/UDYtuwxz5vz
-         uYQQ==
-X-Gm-Message-State: AOJu0YzXUUNRGBK491qq3wlKJcsXddMhhBcfjXl4nucvPesUkt7TR891
-	kUea6jIn8TXo7EcB5aISjZA=
-X-Google-Smtp-Source: AGHT+IEmoSh2HJAPvwV8w97bNLK0kTHWaLyp4X3H/SI6YI1eBmnFT/PfWyx60DDgB59BcqB0AEyWtA==
-X-Received: by 2002:a05:622a:58a:b0:407:c2e2:2a06 with SMTP id c10-20020a05622a058a00b00407c2e22a06mr17881830qtb.8.1698068971993;
-        Mon, 23 Oct 2023 06:49:31 -0700 (PDT)
+        bh=JM64tcyKSQMefiZLW0aCbYrPXVE1pU881GTkHlvmXbs=;
+        b=k8eGVnxTHvNL18UJGZ014P443kiIFbpO95UIq8Ao3YUuSqIFIk0nIU4HqIVGnE6YZ0
+         kVVlGPWLYL9bPn+Itg327DEgch78OApX0hG4d9AIUiC0aMh2cHDO6iCov4eo6FfV0Tri
+         dzWDeOUvxPgZepGvQN2d1vQ5dBnPRxJPgCwCImnSvnozl7q6v8xzTckUz4r1uzEvIb0N
+         NC+5tW2KrmIqkUh4FdPl3zjorSP/nXvvlc3Eceib4BLRZSfvu7xLzITcfByD9Y+P4Wri
+         5nOCT71VcJcAWcxpi7Y/yWc1YlAIFMqCwZ4DCK7K4C8QJDAnY/wK+Un1UKJ1bahjDQOj
+         7ZcQ==
+X-Gm-Message-State: AOJu0YwF1hIaVSR17/WazEAz2a11Co/7uCzbD4AgmqT2R+EtTRGnlz4z
+	PyDm4XgG5FRXL3FukD3fjWc=
+X-Google-Smtp-Source: AGHT+IEIuVjE+PMA8ftfnexd0SpsKGgc+tiapsfPQNM+BiA/qlLyIsF+hLmxNqUPsOIRR8tVMw+gGQ==
+X-Received: by 2002:a05:620a:2891:b0:778:a7a:bf03 with SMTP id j17-20020a05620a289100b007780a7abf03mr12756750qkp.42.1698149115918;
+        Tue, 24 Oct 2023 05:05:15 -0700 (PDT)
 Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id k6-20020ac80746000000b004199f47ccdbsm2729462qth.51.2023.10.23.06.49.30
+        by smtp.gmail.com with ESMTPSA id i5-20020a05620a074500b0077434d0f06esm1762938qki.52.2023.10.24.05.05.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Oct 2023 06:49:31 -0700 (PDT)
-Message-ID: <3a488d09-a66b-452c-99e4-a7521c80252c@gmail.com>
-Date: Mon, 23 Oct 2023 06:49:29 -0700
+        Tue, 24 Oct 2023 05:05:15 -0700 (PDT)
+Message-ID: <f5d4ec5f-a7c2-4dc5-853d-d65ae1b72c93@gmail.com>
+Date: Tue, 24 Oct 2023 05:05:13 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -70,9 +70,96 @@ References: <20231012200150.338401-1-prestwoj@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
 In-Reply-To: <f812bdcd-219e-4e0d-8816-46015bd7cdab@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 Hi Denis,
+
+On 10/19/23 4:12 PM, Denis Kenzior wrote:
+> Hi James,
+> 
+>>
+>> My comparison to the PSK is that there is no difference in guessing 
+>> the PSK vs PKEX key. Both equally compromise you.
+>>
+> 
+> I'm with you :)
+> 
+>> I'm not sure that quote specifically is mandating the PKEX exchange 
+>> use a different password every time, just that an exchange will tell 
+>> you _if_ you guessed the password correctly. But you are right that 
+>> the DPP spec wants a different PW to be used each time.
+> 
+> I'll need to do a bit more spelunking in the relevant specifications to 
+> see if we have a bit more leeway, but ...
+> 
+> The draft RFC is pretty explicit, it does not mandate 'every time', but 
+> close enough:
+> 
+> "Implementations SHALL maintain a counter of unsuccessful exchanges
+>     for each password in order to defend against repeated active attacks
+>     to determine the password.  This counter SHALL be set to zero when a
+>     password is provisioned and incremented each time PKEX finishes
+>     unsuccessfully for that password.  When the counter reaches a value
+>     of five (5) the password SHALL be irretrievably removed from the
+>     implementation."
+> 
+> The DPP spec is a bit more permissive in that it says 'If both sides 
+> have a user interface'.  But I think the intent is for the shared code 
+> to be regenerated on each attempt.
+> 
+>>
+>> "shall use a fresh code each time and the same code shall not be used 
+>> with different Peers"
+>>
+>> So we don't have to put it in the config file if you don't want to. 
+>> Auto-generation just won't work for my purposes since I have no way of 
+>> sharing that on a headless device, so if that's a must I'd have to do 
+>> some thinking...
+> 
+> Fair enough, lets explore whether we can provide this via some agent API.
+
+Reading more about the identifier being used to distinguish a "plurality 
+of devices" this is what I'm thinking as far as the agent interaction:
+
+It would make sense (on the configurator side) to query an agent _after_ 
+the enrollee sends the PKEX exchange request. That way the configurator 
+can look up the identifier/code, somewhat the same as RequestUserPassword.
+
+I don't see much benefit of using an agent in StartEnrollee(), and would 
+rather pass via the DBus arguments for simplicity. Adding an agent for 
+this doesn't really gain us anything, it just adds complexity. The 
+caller of the API can still change the code/id for each call it makes to 
+StartEnrollee() as it sees fit.
+
+So something like:
+
+StartConfigurator()
+     ... waits for PKEX exchange request ...
+     -> RX PKEX exchange request
+         if (id)
+             Agent.RequestUserPassword(id)
+         else
+             Agent.RequestPassphrase()
+
+(And if we want "SharedCode" Agent APIs, that's fine, these just fit the 
+need)
+
+The one caveat here is the timing since the PKEX exchange response must 
+come within 200ms, which isn't possible for a human user. A human 
+configurator would need to establish the code/id completely ahead of time.
+
+We could either:
+   - Handle this from within iwctl and expect other higher level 
+consumers of the API to do the same (when interacting with a human). 
+I.e. ask the user ahead of time, create an agent, the call 
+StartConfigurator().
+   - Allow an a{sv} argument to StartConfigurator() which can be used to 
+pre-load the dpp_sm with the code/id, or if empty query the agent.
+   - Or if we wanted to go off-spec and e.g. wait 30 seconds for a 
+response. But I'd rather not.
+
+Thanks,
+James
 
 > 
 >>
@@ -83,16 +170,6 @@ Hi Denis,
 >>
 > 
 > But the identifier is not supposed to be secret?
-
-No, the identifier is sent plaintext:
-
-"Optionally, a non-secret identifier for the code can be transmitted to 
-support the case where a PKEX implementation may be provisioned to 
-connect to a plurality of devices and needs to know which code to use to 
-process a received PKEX frame. If an optional code identifier is used, 
-it shall be a UTF-8 string not greater than eighty (80) octets that is 
-provisioned at the same time as the shared code."
-
 > 
 > Regards,
 > -Denis
