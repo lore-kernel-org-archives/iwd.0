@@ -1,53 +1,53 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34003CCFD
-	for <iwd@lists.linux.dev>; Thu, 26 Oct 2023 20:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B54B156CE
+	for <iwd@lists.linux.dev>; Thu, 26 Oct 2023 20:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ghO8hap4"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-777719639adso98222685a.3
-        for <iwd@lists.linux.dev>; Thu, 26 Oct 2023 13:27:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="joUGmER9"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-77774120c6eso99328185a.2
+        for <iwd@lists.linux.dev>; Thu, 26 Oct 2023 13:27:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698352036; x=1698956836; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1698352038; x=1698956838; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JFDJehJE104fBbEMsLTJPktVkCUJULKms/9kwKT+psg=;
-        b=ghO8hap45ygGNewBPmoMVcklUwTcCUq32EeiRkzx0ESwQjenpUpkaucaWYY8nbMzRZ
-         lXOEkLjb/11h0xOOuJUg4bj5yJbecQ9O6PwR81uvXkOiPIUx115vhlOlquW0N9gublNn
-         9J3BVb5V3IhsSQQihEaKKeYi+difN1LFq2LM8EryhsuJa79Mx7aL9UfFGkWYy0WZVTek
-         /YeMDVto5U7pJY3aRHq5eqoULxWBqK5Z62p3MORuFf9daHwyRxU3M06gg8FzAgoSxvEw
-         Mcp89hzvB0+E7wO1IB2bkFv/5lLnUkbXs0YAj1tyu0jfPhEUwM2o2OIyxoeK51aNP0SU
-         PzoQ==
+        bh=dC23NXL4BiynuBhMKrtU8WsgzA1WeIIudl3YwLneMEs=;
+        b=joUGmER9RniOOeKAU899BGSb6PFK3PfRUw4RLxZ7LS+1Bqh67ahq81ZPjqWdXT+/nr
+         al9xuQMPNY/S1wJ0FzYianQ5pfPY5NfitSGw0lAKNNQBVlkJA0JPI0yOnCUqbR+LDons
+         REDa4bITo9EK1z8mAgkezQZJlnA1L9hw638ofrPqOlAo7bTn6ybpRXnZAM+izt1U/fEI
+         HD0PtJsgA0+pNeVNlHkuWFW8yMiLgYTLxRSNrDBoY3urZ+wDi+rw61u3k38dvTCThHt8
+         /Ejf9kq8E5QyN+O2oIGfRy2v/8i6InO68P3LoiOPBQ2JkUX/79PzEqpER/II5I8+RifJ
+         eStg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698352036; x=1698956836;
+        d=1e100.net; s=20230601; t=1698352038; x=1698956838;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JFDJehJE104fBbEMsLTJPktVkCUJULKms/9kwKT+psg=;
-        b=qSZ0GxXEPIiQZ6XYXX2q1wmKk9JZSQ2kkqDap5/nr3OkYFpjeX4ND0M4G9ppodJHH/
-         jYo1lz5Qi7ahad7YxlsSRytXqvSNLo7M7JeJGUNHFg37C88ECiwK7CxPJQkkxBFSwmQO
-         xCrskJSuHxtn7ypukWjX9ZfmNdy3zyuX2mQ+dgliDPqppXlfwjamr9fcANAy7Pmvshb1
-         3qCquepyJ7PWCFl/rKJuFoZEt2U2tUfqVDdtSV1KrXo6u7eHOfMPFONHhz6FHx87Fzyb
-         0l/j8G5s7yFDnLqx93Yh2LTVCUmVZPcIOv+UP7SZwHKnO6P7pGTtOpsqJwJfkQhNqQob
-         /7KQ==
-X-Gm-Message-State: AOJu0YyykdnECPwFcUZlTuNitWln87Qp03aOF21DdFGmtUxLR2i/U8st
-	9MLB0UWljtZKnpsLXFjpq/+GNngEjOM=
-X-Google-Smtp-Source: AGHT+IHiFDFr089o6dSrAH9yQPiHIxSlO5DwneGUjKpyA98NNSF+WpWQT/GdlbTvnV+jrDU18Aa1MQ==
-X-Received: by 2002:a05:620a:280a:b0:777:b325:d02d with SMTP id f10-20020a05620a280a00b00777b325d02dmr513221qkp.33.1698352036407;
-        Thu, 26 Oct 2023 13:27:16 -0700 (PDT)
+        bh=dC23NXL4BiynuBhMKrtU8WsgzA1WeIIudl3YwLneMEs=;
+        b=WeG/4ULoVskBNFopOmuVJlQKURfjM4UbTcPyphfZYaNHNMR90iAsI5eLBTRj7gmlau
+         PG+0tId4V48/k+KT6XoAw81a/ttM6AVKDBY4aTHKAFIVcapHCXnWQrfyK7+1MG+CJ776
+         4s3ccMH1SJR/kDUCzM3MxwDANE29xzo3hhGdn6uIL/J2wAx2zq8C+5LEvUgi0zZIu7yM
+         Zjr+ECYvlnBdxXHN7gNmR7mPkX3bNh2kTFFVstyexMUbfNxpr+4KamdtPv6cCGo5h9uc
+         y/76HNQinExccK/7ctadxvCpi0QGm4Qw4HGzETeEEswHdvO5//MvvOu8f+0Hd7egx2H1
+         KDTg==
+X-Gm-Message-State: AOJu0YywkZ4l0Hi46mkC7DCCn4qbRsu6KfZHGa8y/ZPfLNTbYFgxjyj8
+	11JUyUL0DK7+mKJYGXv7fHdCEKJSCvU=
+X-Google-Smtp-Source: AGHT+IHnV6rPGThyrZDpzq6TX87XlB1Ga0FetpKHaD60pqi9gHTWa+33QBjvGEHmmUg2YY5Nn/l6BA==
+X-Received: by 2002:a05:620a:2890:b0:778:9be8:276c with SMTP id j16-20020a05620a289000b007789be8276cmr491977qkp.37.1698352037960;
+        Thu, 26 Oct 2023 13:27:17 -0700 (PDT)
 Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id r4-20020a05620a298400b007742c2ad7dfsm7303qkp.73.2023.10.26.13.27.15
+        by smtp.gmail.com with ESMTPSA id r4-20020a05620a298400b007742c2ad7dfsm7303qkp.73.2023.10.26.13.27.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 13:27:16 -0700 (PDT)
+        Thu, 26 Oct 2023 13:27:17 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 07/15] dpp: support mutual authentication
-Date: Thu, 26 Oct 2023 13:26:49 -0700
-Message-Id: <20231026202657.183591-8-prestwoj@gmail.com>
+Subject: [PATCH v2 08/15] unit: make test-dpp key derivation test more extendable
+Date: Thu, 26 Oct 2023 13:26:50 -0700
+Message-Id: <20231026202657.183591-9-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231026202657.183591-1-prestwoj@gmail.com>
 References: <20231026202657.183591-1-prestwoj@gmail.com>
@@ -59,154 +59,198 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This will be needed for PKEX support. It requires an additional
-value, L, be derived and used in some of the hashing functions.
+Use a new structure to hold key values so they can be changed for
+different test vectors while using the same test function.
 ---
- src/dpp.c | 41 ++++++++++++++++++++++++++++++++++-------
- 1 file changed, 34 insertions(+), 7 deletions(-)
+ unit/test-dpp.c | 104 +++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 68 insertions(+), 36 deletions(-)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 6fd37272..77af5669 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -151,6 +151,7 @@ struct dpp_sm {
- 	bool roc_started : 1;
- 	bool channel_switch : 1;
- 	bool station_autoconnecting : 1;
-+	bool mutual_auth : 1;
- };
+diff --git a/unit/test-dpp.c b/unit/test-dpp.c
+index c3f3731f..0cf60f0a 100644
+--- a/unit/test-dpp.c
++++ b/unit/test-dpp.c
+@@ -158,29 +158,59 @@ static void test_bad_channels(const void *data)
+ 		test_uri_parse(&bad_channels[i]);
+ }
  
- static bool dpp_get_started(struct l_dbus *dbus,
-@@ -1153,7 +1154,7 @@ static void dpp_handle_config_result_frame(struct dpp_sm *dpp,
- static void send_authenticate_response(struct dpp_sm *dpp)
++struct dpp_test_vector {
++	/* Initiator values */
++	const char *i_proto_public;
++	const char *i_proto_private;
++	const char *i_boot_public;
++	const char *i_boot_private;
++	const char *i_nonce;
++	const char *i_auth;
++	const char *i_asn1;
++
++	/* Responder values */
++	const char *r_proto_public;
++	const char *r_proto_private;
++	const char *r_boot_public;
++	const char *r_boot_private;
++	const char *r_nonce;
++	const char *r_auth;
++	const char *r_asn1;
++
++	const char *k1;
++	const char *k2;
++	const char *ke;
++	const char *mx;
++	const char *nx;
++};
++
+ /*
+  * B.2 Test Vectors for DPP Authentication Using P-256 for
+  * Responder-only Authentication
+  */
+-const char *i_proto_public_bytes = "50a532ae2a07207276418d2fa630295d45569be425aa634f02014d00a7d1f61a"
+-				"e14f35a5a858bccad90d126c46594c49ef82655e78888e15a32d916ac2172491";
+-const char *r_boot_public_bytes = "09c585a91b4df9fd25a045201885c39cc5cfae397ddaeda957dec57fa0e3503f"
+-				"52bf05968198a2f92883e96a386d767579883302dbf292105c90a43694c2fd5c";
+-const char *r_boot_private_bytes = "54ce181a98525f217216f59b245f60e9df30ac7f6b26c939418cfc3c42d1afa0";
+-const char *r_proto_private_bytes = "f798ed2e19286f6a6efe210b1863badb99af2a14b497634dbfd2a97394fb5aa5";
+-const char *r_proto_public_bytes = "5e3fb3576884887f17c3203d8a3a6c2fac722ef0e2201b61ac73bc655c709a90"
+-				"2d4b030669fb9eff8b0a79fa7c1a172ac2a92c626256963f9274dc90682c81e5";
+-const char *k1_bytes = "3d832a02ed6d7fc1dc96d2eceab738cf01c0028eb256be33d5a21a720bfcf949";
+-const char *k2_bytes = "ca08bdeeef838ddf897a5f01f20bb93dc5a895cb86788ca8c00a7664899bc310";
+-const char *ke_bytes = "c8882a8ab30c878467822534138c704ede0ab1e873fe03b601a7908463fec87a";
+-const char *mx_bytes = "dde2878117d69745be4f916a2dd14269d783d1d788c603bb8746beabbd1dbbbc";
+-const char *nx_bytes = "92118478b75c21c2c59340c842b5bce560a535f60bc37a75fe390d738c58d8e8";
+-const char *i_nonce_bytes = "13f4602a16daeb69712263b9c46cba31";
+-const char *r_nonce_bytes = "3d0cfb011ca916d796f7029ff0b43393";
+-const char *i_auth_bytes = "787d1189b526448d2901e7f6c22775ce514fce52fc886c1e924f2fbb8d97b210";
+-const char *r_auth_bytes = "43509ef7137d8c2fbe66d802ae09dedd94d41b8cbfafb4954782014ff4a3f91c";
+-const char *r_asn1 = "3039301306072a8648ce3d020106082a8648ce3d0301070322000209c585a91b"
+-			"4df9fd25a045201885c39cc5cfae397ddaeda957dec57fa0e3503f";
++static struct dpp_test_vector responder_only_p256 = {
++	.i_proto_public = "50a532ae2a07207276418d2fa630295d45569be425aa634f02014d00a7d1f61a"
++			"e14f35a5a858bccad90d126c46594c49ef82655e78888e15a32d916ac2172491",
++	.i_nonce = "13f4602a16daeb69712263b9c46cba31",
++	.i_auth = "787d1189b526448d2901e7f6c22775ce514fce52fc886c1e924f2fbb8d97b210",
++
++	.r_proto_public = "5e3fb3576884887f17c3203d8a3a6c2fac722ef0e2201b61ac73bc655c709a90"
++			"2d4b030669fb9eff8b0a79fa7c1a172ac2a92c626256963f9274dc90682c81e5",
++	.r_proto_private = "f798ed2e19286f6a6efe210b1863badb99af2a14b497634dbfd2a97394fb5aa5",
++	.r_boot_public = "09c585a91b4df9fd25a045201885c39cc5cfae397ddaeda957dec57fa0e3503f"
++			"52bf05968198a2f92883e96a386d767579883302dbf292105c90a43694c2fd5c",
++	.r_boot_private = "54ce181a98525f217216f59b245f60e9df30ac7f6b26c939418cfc3c42d1afa0",
++	.r_nonce = "3d0cfb011ca916d796f7029ff0b43393",
++	.r_auth = "43509ef7137d8c2fbe66d802ae09dedd94d41b8cbfafb4954782014ff4a3f91c",
++	.r_asn1 = "3039301306072a8648ce3d020106082a8648ce3d0301070322000209c585a91b"
++			"4df9fd25a045201885c39cc5cfae397ddaeda957dec57fa0e3503f",
++
++	.k1 = "3d832a02ed6d7fc1dc96d2eceab738cf01c0028eb256be33d5a21a720bfcf949",
++	.k2 = "ca08bdeeef838ddf897a5f01f20bb93dc5a895cb86788ca8c00a7664899bc310",
++	.ke = "c8882a8ab30c878467822534138c704ede0ab1e873fe03b601a7908463fec87a",
++	.mx = "dde2878117d69745be4f916a2dd14269d783d1d788c603bb8746beabbd1dbbbc",
++	.nx = "92118478b75c21c2c59340c842b5bce560a535f60bc37a75fe390d738c58d8e8",
++};
+ 
+ #define HEX2BUF(s, buf, _len) { \
+ 	size_t _len_out; \
+@@ -198,6 +228,8 @@ const char *r_asn1 = "3039301306072a8648ce3d020106082a8648ce3d0301070322000209c5
+ 
+ static void test_key_derivation(const void *data)
  {
- 	uint8_t hdr[32];
--	uint8_t attrs[256];
-+	uint8_t attrs[512];
- 	uint8_t *ptr = attrs;
- 	uint8_t status = DPP_STATUS_OK;
- 	uint64_t r_proto_key[L_ECC_MAX_DIGITS * 2];
-@@ -1174,6 +1175,9 @@ static void send_authenticate_response(struct dpp_sm *dpp)
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &status, 1);
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH,
- 				dpp->own_boot_hash, 32);
-+	if (dpp->mutual_auth)
-+		ptr += dpp_append_attr(ptr, DPP_ATTR_INITIATOR_BOOT_KEY_HASH,
-+				dpp->peer_boot_hash, 32);
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_RESPONDER_PROTOCOL_KEY,
- 				r_proto_key, dpp->key_len * 2);
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_PROTOCOL_VERSION, &version, 1);
-@@ -1227,6 +1231,7 @@ static void authenticate_confirm(struct dpp_sm *dpp, const uint8_t *from,
- 	const void *unwrap_key;
- 	const void *ad0 = body + 2;
- 	const void *ad1 = body + 8;
-+	struct l_ecc_point *bi = NULL;
- 
- 	if (dpp->state != DPP_STATE_AUTHENTICATING)
- 		return;
-@@ -1319,9 +1324,12 @@ static void authenticate_confirm(struct dpp_sm *dpp, const uint8_t *from,
- 		goto auth_confirm_failed;
- 	}
- 
-+	if (dpp->mutual_auth)
-+		bi = dpp->peer_boot_public;
++	const struct dpp_test_vector *vector = data;
 +
- 	dpp_derive_i_auth(dpp->r_nonce, dpp->i_nonce, dpp->nonce_len,
- 				dpp->own_proto_public, dpp->peer_proto_public,
--				dpp->boot_public, NULL, i_auth_check);
-+				dpp->boot_public, bi, i_auth_check);
+ 	uint64_t tmp[L_ECC_MAX_DIGITS * 2];
+ 	const struct l_ecc_curve *curve = l_ecc_curve_from_ike_group(19);
+ 	_auto_(l_ecc_point_free) struct l_ecc_point *i_proto_public = NULL;
+@@ -218,19 +250,19 @@ static void test_key_derivation(const void *data)
+ 	_auto_(l_free) uint8_t *asn1 = NULL;
+ 	size_t asn1_len;
  
- 	if (memcmp(i_auth, i_auth_check, i_auth_len)) {
- 		l_error("I-Auth did not verify");
-@@ -1638,6 +1646,8 @@ static void authenticate_request(struct dpp_sm *dpp, const uint8_t *from,
- 	_auto_(l_free) uint8_t *unwrapped = NULL;
- 	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *m = NULL;
- 	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *n = NULL;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *l = NULL;
-+	struct l_ecc_point *bi = NULL;
- 	uint64_t k1[L_ECC_MAX_DIGITS];
- 	const void *ad0 = body + 2;
- 	const void *ad1 = body + 8;
-@@ -1785,6 +1795,12 @@ static void authenticate_request(struct dpp_sm *dpp, const uint8_t *from,
+-	HEX2BUF(i_proto_public_bytes, tmp, 64);
++	HEX2BUF(vector->i_proto_public, tmp, 64);
+ 	i_proto_public = l_ecc_point_from_data(curve,
+ 						L_ECC_POINT_TYPE_FULL,
+ 						tmp, 64);
+ 	assert(i_proto_public);
  
- 	memcpy(dpp->i_nonce, i_nonce, i_nonce_len);
+-	HEX2BUF(r_boot_public_bytes, tmp, 64);
++	HEX2BUF(vector->r_boot_public, tmp, 64);
+ 	r_boot_public = l_ecc_point_from_data(curve,
+ 						L_ECC_POINT_TYPE_FULL,
+ 						tmp, 64);
+ 	assert(r_boot_public);
  
-+	if (dpp->mutual_auth) {
-+		l = dpp_derive_lr(dpp->boot_private, dpp->proto_private,
-+					dpp->peer_boot_public);
-+		bi = dpp->peer_boot_public;
-+	}
-+
- 	/* Derive keys k2, ke, and R-Auth for authentication response */
+-	HEX2BUF(r_asn1, tmp, sizeof(tmp));
++	HEX2BUF(vector->r_asn1, tmp, sizeof(tmp));
+ 	asn1 = dpp_point_to_asn1(r_boot_public, &asn1_len);
  
- 	n = dpp_derive_k2(dpp->peer_proto_public, dpp->proto_private, dpp->k2);
-@@ -1793,12 +1809,12 @@ static void authenticate_request(struct dpp_sm *dpp, const uint8_t *from,
+ 	from_asn1 = dpp_point_from_asn1(asn1, asn1_len);
+@@ -240,47 +272,47 @@ static void test_key_derivation(const void *data)
+ 	assert(asn1_len == 59);
+ 	assert(memcmp(tmp, asn1, asn1_len) == 0);
  
- 	l_getrandom(dpp->r_nonce, dpp->nonce_len);
+-	HEX2BUF(r_proto_public_bytes, tmp, 64);
++	HEX2BUF(vector->r_proto_public, tmp, 64);
+ 	r_proto_public = l_ecc_point_from_data(curve,
+ 						L_ECC_POINT_TYPE_FULL,
+ 						tmp, 64);
+ 	assert(r_proto_public);
  
--	if (!dpp_derive_ke(dpp->i_nonce, dpp->r_nonce, m, n, NULL, dpp->ke))
-+	if (!dpp_derive_ke(dpp->i_nonce, dpp->r_nonce, m, n, l, dpp->ke))
- 		goto auth_request_failed;
+-	HEX2BUF(r_boot_private_bytes, tmp, 32);
++	HEX2BUF(vector->r_boot_private, tmp, 32);
+ 	r_boot_private = l_ecc_scalar_new(curve, tmp, 32);
+ 	assert(r_boot_private);
  
- 	if (!dpp_derive_r_auth(dpp->i_nonce, dpp->r_nonce, dpp->nonce_len,
- 				dpp->peer_proto_public, dpp->own_proto_public,
--				NULL, dpp->boot_public, dpp->auth_tag))
-+				bi, dpp->boot_public, dpp->auth_tag))
- 		goto auth_request_failed;
+-	HEX2BUF(r_proto_private_bytes, tmp, 32);
++	HEX2BUF(vector->r_proto_private, tmp, 32);
+ 	r_proto_private = l_ecc_scalar_new(curve, tmp, 32);
+ 	assert(r_proto_private);
  
- 	memcpy(dpp->peer_addr, from, 6);
-@@ -1833,6 +1849,9 @@ static void dpp_send_authenticate_confirm(struct dpp_sm *dpp)
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &zero, 1);
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH,
- 					dpp->peer_boot_hash, 32);
-+	if (dpp->mutual_auth)
-+		ptr += dpp_append_attr(ptr, DPP_ATTR_INITIATOR_BOOT_KEY_HASH,
-+					dpp->own_boot_hash, 32);
+ 	m = dpp_derive_k1(i_proto_public, r_boot_private, k1);
+ 	assert(m);
  
- 	ptr += dpp_append_wrapped_data(hdr + 26, 6, attrs, ptr - attrs, ptr,
- 			sizeof(attrs), dpp->ke, dpp->key_len, 1,
-@@ -1865,6 +1884,8 @@ static void authenticate_response(struct dpp_sm *dpp, const uint8_t *from,
- 	const void *r_auth = NULL;
- 	_auto_(l_ecc_point_free) struct l_ecc_point *r_proto_key = NULL;
- 	_auto_(l_ecc_scalar_free) struct l_ecc_scalar *n = NULL;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *l = NULL;
-+	struct l_ecc_point *bi = NULL;
- 	const void *ad0 = body + 2;
- 	const void *ad1 = body + 8;
- 	uint64_t r_auth_derived[L_ECC_MAX_DIGITS];
-@@ -1969,7 +1990,13 @@ static void authenticate_response(struct dpp_sm *dpp, const uint8_t *from,
- 		return;
- 	}
+-	CHECK_FROM_STR(k1_bytes, k1, 32);
++	CHECK_FROM_STR(vector->k1, k1, 32);
+ 	l_ecc_scalar_get_data(m, tmp, sizeof(tmp));
+-	CHECK_FROM_STR(mx_bytes, tmp, 32);
++	CHECK_FROM_STR(vector->mx, tmp, 32);
  
--	if (!dpp_derive_ke(i_nonce, r_nonce, dpp->m, n, NULL, dpp->ke)) {
-+	if (dpp->mutual_auth) {
-+		l = dpp_derive_li(dpp->peer_boot_public, r_proto_key,
-+					dpp->boot_private);
-+		bi = dpp->boot_public;
-+	}
-+
-+	if (!dpp_derive_ke(i_nonce, r_nonce, dpp->m, n, l, dpp->ke)) {
- 		l_debug("Failed to derive ke");
- 		return;
- 	}
-@@ -2002,7 +2029,7 @@ static void authenticate_response(struct dpp_sm *dpp, const uint8_t *from,
- 	}
+ 	n = dpp_derive_k2(i_proto_public, r_proto_private, k2);
+ 	assert(n);
  
- 	if (!dpp_derive_r_auth(i_nonce, r_nonce, dpp->nonce_len,
--				dpp->own_proto_public, r_proto_key, NULL,
-+				dpp->own_proto_public, r_proto_key, bi,
- 				dpp->peer_boot_public, r_auth_derived)) {
- 		l_debug("Failed to derive r_auth");
- 		return;
-@@ -2015,7 +2042,7 @@ static void authenticate_response(struct dpp_sm *dpp, const uint8_t *from,
+-	CHECK_FROM_STR(k2_bytes, k2, 32);
++	CHECK_FROM_STR(vector->k2, k2, 32);
+ 	l_ecc_scalar_get_data(n, tmp, sizeof(tmp));
+-	CHECK_FROM_STR(nx_bytes, tmp, 32);
++	CHECK_FROM_STR(vector->nx, tmp, 32);
  
- 	if (!dpp_derive_i_auth(r_nonce, i_nonce, dpp->nonce_len,
- 				r_proto_key, dpp->own_proto_public,
--				dpp->peer_boot_public, NULL, dpp->auth_tag)) {
-+				dpp->peer_boot_public, bi, dpp->auth_tag)) {
- 		l_debug("Could not derive I-Auth");
- 		return;
- 	}
+-	HEX2BUF(i_nonce_bytes, i_nonce, 16);
+-	HEX2BUF(r_nonce_bytes, r_nonce, 16);
++	HEX2BUF(vector->i_nonce, i_nonce, 16);
++	HEX2BUF(vector->r_nonce, r_nonce, 16);
+ 	dpp_derive_ke(i_nonce, r_nonce, m, n, NULL, ke);
+ 
+-	CHECK_FROM_STR(ke_bytes, ke, 32);
++	CHECK_FROM_STR(vector->ke, ke, 32);
+ 
+ 	dpp_derive_r_auth(i_nonce, r_nonce, 16, i_proto_public, r_proto_public,
+ 				NULL, r_boot_public, r_auth);
+-	CHECK_FROM_STR(r_auth_bytes, r_auth, 32);
++	CHECK_FROM_STR(vector->r_auth, r_auth, 32);
+ 
+ 	dpp_derive_i_auth(r_nonce, i_nonce, 16, r_proto_public, i_proto_public,
+ 				r_boot_public, NULL, i_auth);
+-	CHECK_FROM_STR(i_auth_bytes, i_auth, 32);
++	CHECK_FROM_STR(vector->i_auth, i_auth, 32);
+ }
+ 
+ int main(int argc, char *argv[])
+@@ -289,8 +321,8 @@ int main(int argc, char *argv[])
+ 
+ 	if (l_checksum_is_supported(L_CHECKSUM_SHA256, true) &&
+ 						l_getrandom_is_supported())
+-		l_test_add("DPP test key derivation",
+-						test_key_derivation, NULL);
++		l_test_add("DPP test key derivation", test_key_derivation,
++						&responder_only_p256);
+ 
+ 	l_test_add("DPP URI parse", test_uri_parse, &all_values);
+ 	l_test_add("DPP URI no type", test_uri_parse, &no_type);
 -- 
 2.25.1
 
