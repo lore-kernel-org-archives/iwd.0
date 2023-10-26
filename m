@@ -1,53 +1,53 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30101156CE
-	for <iwd@lists.linux.dev>; Thu, 26 Oct 2023 20:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7973CCFD
+	for <iwd@lists.linux.dev>; Thu, 26 Oct 2023 20:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QRvz45wN"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-778ac9c898dso95148185a.0
-        for <iwd@lists.linux.dev>; Thu, 26 Oct 2023 13:27:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BSw+zGLK"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7788fb06997so102995685a.0
+        for <iwd@lists.linux.dev>; Thu, 26 Oct 2023 13:27:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698352032; x=1698956832; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1698352033; x=1698956833; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vspZ3063PT8rLCFF2eW8T+0lR8ve4BKekxoj2RMmcdU=;
-        b=QRvz45wN8S4fZ1FxdgqtafrF7CdkD66FWdG6Sdi/3uSTdsTr0YRJUKv1q8+cFghBfM
-         MPTcfpaqA8mkuo4kKhlfUnzQbqpesFOKC02s+thSdlhYgBykXn+gECIFNmDupOAjP7u6
-         M9viF+a7t1vc2QUHmeLX15Chd6aW9TUO24WwK+f7abkxNEoGYU9BzTzSc9AiVuz2huQo
-         q0Zk4nkuN1kBeVof05ilc09Axv+fP0eggLCtmNHVWibVJi+1BUyZCmqVXUBzo64kkHAj
-         KH3RGrZnhFNoBswcDlp7sUbN/6NcQ+ry3AES9cMkWAeTU8OGhMOmgoWOgsazcWPW777K
-         h0Fg==
+        bh=FSvt6ZDaBum2UHDFAGyA7QBLUBxP0Owt66+RsftU13Q=;
+        b=BSw+zGLKhbrCYxGHCz2F5UYHRvVXu6QpWXQO04lsUOQ7GgaDBrvypl6N3uOaeP7Sqo
+         pHt3spm81egbkBzZ6Hvu0fXzteTiuV2KDdsrztDV5x1EvHEYBPkb0fBGphuPFALFExmB
+         dFYPuEx4l6CZxzBJZX7WYsRlc0BSiLp8ZNWnsR9Z+OTvjeOgoTCOJ5LPyNCCDchLupZd
+         GRDAkMlbuynVymi01ByxO15MFxegdEtYVFnhnzmolUajppCpnOS5bJIaIC6zGwUCFtCq
+         2V+e6GEEyVqb19SgGBEfPkp1KAIT+Ud5epEO6+Gy4FkyAZUrrf5zzZpYbU3VpDru8feF
+         //4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698352032; x=1698956832;
+        d=1e100.net; s=20230601; t=1698352033; x=1698956833;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vspZ3063PT8rLCFF2eW8T+0lR8ve4BKekxoj2RMmcdU=;
-        b=H8DPGE72PeBHHdZTTtlzYXYN0swg7C2gbyYVZj6bFqx3g1OqLxnq8yCYwIS65OMYu3
-         OSXMHoDfc8v8OztDGzHXQlLb+4wezvpey/rKmM7VgOmrethsrRxjMw8VEf5U5syZgoxm
-         HggXK9XMk25kwiExI54iS3uGXwbITyvbQMJNHhUqH4hxxI49K5+V/JEkbgiP9QH8ODiR
-         Tp5KSKqcI7wDl0OGL8rzgSEVfXqg6VlynFn+qjGBLdbTayhFwdyGAtoUAZEufKuinDUe
-         eCBFniYu1ogkBBEpIV2+aXz4Dkt51wHk+iTgbgVJJLpAoxyy+avTlJOVQ9AFFU7IICZz
-         Jy/Q==
-X-Gm-Message-State: AOJu0YxM+m3xFpwugca149AXNT5X8cNaOrKttN4Tedo/gPIF/pcVJyJl
-	zNNJz34BnuxkjeC0Jt7IRpSL82oEnTo=
-X-Google-Smtp-Source: AGHT+IGalYTiBJfNrfYmplahbDOR0h0VLo4KW1odU7zT6b+NCTl2WtI37zhf+DiC8JDAbaoChtddMQ==
-X-Received: by 2002:a05:620a:2949:b0:76f:1318:d7d1 with SMTP id n9-20020a05620a294900b0076f1318d7d1mr379628qkp.75.1698352031927;
-        Thu, 26 Oct 2023 13:27:11 -0700 (PDT)
+        bh=FSvt6ZDaBum2UHDFAGyA7QBLUBxP0Owt66+RsftU13Q=;
+        b=DaBjQv/Ie66HNphIvxgKg+3IfgSBDljfttzYybtsYqth2viq3WcZgSZY4fBJgpZAQw
+         O7JbIqxkvoF+YWyn+QX9yZAjDevsSMoaVRSLPy21/sNddSVh4Q6DBMCXPxB0u7H31NFJ
+         noNTogSDHrhEiEwe6qaMBFMQAbZp3VC2gF0f9/Zns+qsGjpC2gYSC8Hiwf6ad29pvo2S
+         bvafwIZxsuzXdndbsr0XVMNByqBSW7R4+0HxtXBbVNNERIFME5le2oeo8vHHyLMsoB5p
+         CLWuauIZk7QTlqXT2xDRiDf4pQ8KLPkyc2vD/8vU0hglglXI2iTLI9J6AHwww+arSzRB
+         vs5Q==
+X-Gm-Message-State: AOJu0YwK7meyRruNuQ3WgSOHsOFx1Plv2q3sCb98d4o9DBe9zlDt/h2+
+	xfzEG5yLyYGKCqJsn3/eYPVYE2pxxcI=
+X-Google-Smtp-Source: AGHT+IGwDTogpnYgqDzXwi99oP30BnZJw7CjmRsDsDz4Mi3U3tVA0qO5T1rjoQUtFsLZ7e047IqEaw==
+X-Received: by 2002:a05:620a:2890:b0:774:17f5:471e with SMTP id j16-20020a05620a289000b0077417f5471emr486786qkp.46.1698352033346;
+        Thu, 26 Oct 2023 13:27:13 -0700 (PDT)
 Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id r4-20020a05620a298400b007742c2ad7dfsm7303qkp.73.2023.10.26.13.27.10
+        by smtp.gmail.com with ESMTPSA id r4-20020a05620a298400b007742c2ad7dfsm7303qkp.73.2023.10.26.13.27.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 13:27:11 -0700 (PDT)
+        Thu, 26 Oct 2023 13:27:13 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 04/15] dpp: make the protocol timeout more flexible
-Date: Thu, 26 Oct 2023 13:26:46 -0700
-Message-Id: <20231026202657.183591-5-prestwoj@gmail.com>
+Subject: [PATCH v2 05/15] dpp: fix config request header check
+Date: Thu, 26 Oct 2023 13:26:47 -0700
+Message-Id: <20231026202657.183591-6-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231026202657.183591-1-prestwoj@gmail.com>
 References: <20231026202657.183591-1-prestwoj@gmail.com>
@@ -59,65 +59,71 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Include a specific timeout value so different protocols can specify
-different timeouts. For example once the authentication timeout
-should not take very long (even 10 seconds seems excessive) but
-adding PKEX may warrant longer timeouts.
+The check for the header was incorrect according to the spec.
+Table 58 indicates that the "Query Response Info" should be set
+to 0x00 for the configuration request. The frame handler was
+expecting 0x7f which is the value for the config response frame.
 
-For example discovering a configurator IWD may want to wait several
-minutes before ending the discovery. Similarly running PKEX as a
-configurator we should put a hard limit on the time, but again
-minutes rather than 10 seconds.
+Unfortunately wpa_supplicant also gets this wrong and uses 0x7f
+in all cases which is likely why this value was set incorrectly
+in IWD. The issue is that IWD's config request is correct which
+means IWD<->IWD configuration is broken. (and wpa_supplicant as
+a configurator likely doesn't validate the config request).
+
+Fix this by checking both 0x7f and 0x00 to handle both
+supplicants.
 ---
- src/dpp.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ src/dpp.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/src/dpp.c b/src/dpp.c
-index edf5b797..dff0ecaf 100644
+index dff0ecaf..6fd37272 100644
 --- a/src/dpp.c
 +++ b/src/dpp.c
-@@ -56,6 +56,7 @@
- 
- #define DPP_FRAME_MAX_RETRIES 5
- #define DPP_FRAME_RETRY_TIMEOUT 1
-+#define DPP_AUTH_PROTO_TIMEOUT 10
- 
- static uint32_t netdev_watch;
- static struct l_genl_family *nl80211;
-@@ -488,12 +489,12 @@ static void dpp_protocol_timeout(struct l_timeout *timeout, void *user_data)
- 	dpp_reset(dpp);
+@@ -887,6 +887,21 @@ static void dpp_send_config_response(struct dpp_sm *dpp, uint8_t status)
+ 	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
  }
  
--static void dpp_reset_protocol_timer(struct dpp_sm *dpp)
-+static void dpp_reset_protocol_timer(struct dpp_sm *dpp, uint32_t time)
- {
- 	if (dpp->timeout)
--		l_timeout_modify(dpp->timeout, 10);
-+		l_timeout_modify(dpp->timeout, time);
- 	else
--		dpp->timeout = l_timeout_create(10, dpp_protocol_timeout,
-+		dpp->timeout = l_timeout_create(time, dpp_protocol_timeout,
- 						dpp, NULL);
- }
++static bool dpp_check_config_header(const uint8_t *ptr)
++{
++	/*
++	 * Table 58. General Format of DPP Configuration Request frame
++	 *
++	 * Unfortunately wpa_supplicant hard codes 0x7f as the Query Response
++	 * Info so we need to handle both cases.
++	 */
++	return ptr[0] != IE_TYPE_ADVERTISEMENT_PROTOCOL ||
++			ptr[1] != 0x08 ||
++			(ptr[2] != 0x7f || ptr[2] != 0x00) ||
++			ptr[3] != IE_TYPE_VENDOR_SPECIFIC ||
++			ptr[4] != 5;
++}
++
+ static void dpp_handle_config_request_frame(const struct mmpdu_header *frame,
+ 				const void *body, size_t body_len,
+ 				int rssi, void *user_data)
+@@ -904,8 +919,6 @@ static void dpp_handle_config_request_frame(const struct mmpdu_header *frame,
+ 	const uint8_t *e_nonce = NULL;
+ 	size_t wrapped_len = 0;
+ 	_auto_(l_free) uint8_t *unwrapped = NULL;
+-	uint8_t hdr_check[] = { IE_TYPE_ADVERTISEMENT_PROTOCOL, 0x08, 0x7f,
+-				IE_TYPE_VENDOR_SPECIFIC, 5 };
+ 	struct json_iter jsiter;
+ 	_auto_(l_free) char *tech = NULL;
+ 	_auto_(l_free) char *role = NULL;
+@@ -932,10 +945,10 @@ static void dpp_handle_config_request_frame(const struct mmpdu_header *frame,
  
-@@ -1316,7 +1317,7 @@ static void authenticate_confirm(struct dpp_sm *dpp, const uint8_t *from,
+ 	dpp->diag_token = *ptr++;
  
- 	l_debug("Authentication successful");
+-	if (memcmp(ptr, hdr_check, sizeof(hdr_check)))
++	if (!dpp_check_config_header(ptr))
+ 		return;
  
--	dpp_reset_protocol_timer(dpp);
-+	dpp_reset_protocol_timer(dpp, DPP_AUTH_PROTO_TIMEOUT);
+-	ptr += sizeof(hdr_check);
++	ptr += 5;
  
- 	if (dpp->role == DPP_CAPABILITY_ENROLLEE)
- 		dpp_configuration_start(dpp, from);
-@@ -1790,7 +1791,7 @@ static void authenticate_request(struct dpp_sm *dpp, const uint8_t *from,
- 	memcpy(dpp->peer_addr, from, 6);
- 
- 	dpp->state = DPP_STATE_AUTHENTICATING;
--	dpp_reset_protocol_timer(dpp);
-+	dpp_reset_protocol_timer(dpp, DPP_AUTH_PROTO_TIMEOUT);
- 
- 	/* Don't send if the frequency is changing */
- 	if (!dpp->new_freq)
+ 	if (memcmp(ptr, wifi_alliance_oui, sizeof(wifi_alliance_oui)))
+ 		return;
 -- 
 2.25.1
 
