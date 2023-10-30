@@ -1,208 +1,96 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E21513FE2
-	for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 11:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4366BF9E6
+	for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 13:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RxYhpwBl"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-66d134a019cso31452926d6.3
-        for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 04:56:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXefuXKd"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-41ccd38eaa5so36551301cf.0
+        for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 06:48:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698666972; x=1699271772; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=I2EsWXgIgmY5ZGNZVcIKTU41YQY+qsuJewdFxQvk8sU=;
-        b=RxYhpwBl/G7nhSpi+ZaS+i9r+jkGCafwqriXVXFPW5U/9XABwET8U1n2p2SfXd5rcM
-         Rb60UEIcC2nD8DflTCq5lNCY/EX+zVXCCx4nMZtYVK2wPq2uzHN1Z0arxaWky35yMWn6
-         RgG2cweeVpB6E0kIU0cmID1yFZEEMnD6mQwZglt0fB6ZbyQFaRIA13TYnc0ZCrAZpfYE
-         raLlCo8Ri3QchJB+C48hL4QNAN4U43zeeN++4gpoiwSZEwLMMnGb9Ap+ogXDh934dY7c
-         afsv4IK5ae46JTrZlN+RaEp96cOmcF7KzR2+eLuLc1yX2tbOCg5V7vJih1Cw1amSeAa1
-         cI9w==
+        d=gmail.com; s=20230601; t=1698673724; x=1699278524; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UMCxlwfN1TwbqEtAbFOnUzEcUArM+2VW/8atn2Lqf2k=;
+        b=WXefuXKdCk70QcLgr8/iBqPLONaP/BWG6P/9VROZGwCzPOiryskKyEaAZmnRDbOcNt
+         ipN6i93crpP7hbGKkPxSlXy2/eh3NN+FijXwqhB0Mpyw+LIH+9cmvPiHf58w/ZSNGvtt
+         9nOEo/775A6gauMImlzZdad2JlA9+jTuEdnRQKv+K6lud9LYLKiXbwY6A3RXUxiOdgqY
+         fnBWD17hA8w3GcnH/Gfd97gp5NOs9OkQ9dPrZc3dPZ4hn2frCWqzftJdbozuI9p74rOQ
+         q12fQuwm6wM4YztjrD4TIBYOrk2Rx+zt34OFKKzZ2+CQcSkzyQllgks7nRoe4f/oyWyF
+         eaLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698666972; x=1699271772;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I2EsWXgIgmY5ZGNZVcIKTU41YQY+qsuJewdFxQvk8sU=;
-        b=jsBtHvEJiFGeQTTBjQmbyjvkgyTWS+Lsnsvse2QM4y8IwHvJzE84CJa1SqIvt8Fhkd
-         1xVzpH1ZwlkUvKYdaEY3hdpY003aROvxI+QVpfuLGG71INemdfh2k5MHZ2ciJK7wkDxL
-         NpfNMelKprRjp5k8uMJ4QkEBh4dZufIGqaih23ruvgkNbnfts1LoN0SOnw3cdH0dlc+K
-         IcRQsfLDC68z1d4M0OQav54zoTPPijabXOtRx2XEow40/Ndx1X/II5GClhW8Wq7mtW8Y
-         bvC6CgdskV7OZMZutgIPr3eyQF8jyzqyPyfX5cKiNRNvCkaq5rr1dujB4hdz/wnvMDtf
-         +E6Q==
-X-Gm-Message-State: AOJu0Yxsy8QRU2X8KI5VgHMWZbYGguErunn5D8co5r63zQu3sYp2XFmb
-	pXr97xYa+ch1GNOVDruocOgdC95TFsU=
-X-Google-Smtp-Source: AGHT+IF8MZGew12OSZI11Lfe9dH8VaY+T/WGta4GB8O2TuG6sWfbvwPqASaqM1IJrcLEyX0cF3UeEg==
-X-Received: by 2002:a0c:f112:0:b0:66d:1b62:5c22 with SMTP id i18-20020a0cf112000000b0066d1b625c22mr8819699qvl.0.1698666971969;
-        Mon, 30 Oct 2023 04:56:11 -0700 (PDT)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id l15-20020ad44bcf000000b0065b2be40d58sm3327287qvw.25.2023.10.30.04.56.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 04:56:11 -0700 (PDT)
-Message-ID: <1a87a53c-e95a-40c4-a410-0929a29456cc@gmail.com>
-Date: Mon, 30 Oct 2023 04:56:09 -0700
+        d=1e100.net; s=20230601; t=1698673724; x=1699278524;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UMCxlwfN1TwbqEtAbFOnUzEcUArM+2VW/8atn2Lqf2k=;
+        b=UUSpOVaaoOilHHHw4BslLPv3BF6QU66Css+Z7DE/EPRs/A/TjCqNE9fCqojcKk7zyY
+         WjiT97X5UjvxCAd9wxrH4uJFuXMr6gVZXC4fDYoP1sqnM+SQ//sDb0kNb7HaLNgQwHlG
+         AvybMx8cCWp9+tfz92B9ZFEt0Bklxcw8gLuhcrUs4b0WfRe6ZOs4l6EVbwwdHGqqc9lR
+         huyUt6ISBSaaYLdU6acmoaEUAZYuMxmV5HXkJwwSuWtcw87l/ZlfcDiJ7lfklKEluzB5
+         mGq9J9TBfdoKIxwnrSi7cFKhj6fTW6zF47j5fypgiqkqHAMTvJzyRKP3GFLFf23RsXIS
+         Rneg==
+X-Gm-Message-State: AOJu0YzLccukfjUZ3xiCoLxR5W83wvQNQmKr2hKqxrPcwX1tstm3dos2
+	Q/hsHHrTNmw95ERd2lGyMp+SHDLrxII=
+X-Google-Smtp-Source: AGHT+IE4T/Scnba82+H83CVCjz5uyhMiLszwapXs/X3lanl7vlzOsRbe0dV2oTD037rA1128uQOG1g==
+X-Received: by 2002:ac8:5951:0:b0:412:1c5f:478b with SMTP id 17-20020ac85951000000b004121c5f478bmr13720071qtz.15.1698673723826;
+        Mon, 30 Oct 2023 06:48:43 -0700 (PDT)
+Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id c18-20020ac86612000000b004181aa90b46sm3419929qtp.89.2023.10.30.06.48.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 06:48:43 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 0/4] Packet/beacon loss roaming improvements
+Date: Mon, 30 Oct 2023 06:48:33 -0700
+Message-Id: <20231030134837.452957-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/15] doc: PKEX support for DPP
-Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20231026202657.183591-1-prestwoj@gmail.com>
- <20231026202657.183591-13-prestwoj@gmail.com>
- <35ca1bec-2ccb-4e23-8b98-f6dffa4675ac@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <35ca1bec-2ccb-4e23-8b98-f6dffa4675ac@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Denis,
+The rate limiting patch shouldn't be too controversial, but the
+forced roam on beacon loss may be so I wanted to provde some
+background. This behavior was only tested on ath10k, so I understand
+if we don't want to impose the same behavior for all drivers.
 
-On 10/29/23 3:27 PM, Denis Kenzior wrote:
-> Hi James,
-> 
-> On 10/26/23 15:26, James Prestwood wrote:
->> PKEX is part of the WFA EasyConnect specification and is
->> an additional boostrapping method (like QR codes) for
->> exchanging public keys between a configurator and enrollee.
->>
->> PKEX operates over wifi and requires a key/code be exchanged
->> prior to the protocol. The key is used to encrypt the exchange
->> of the boostrapping information, then DPP authentication is
->> started immediately aftewards.
->>
->> This can be useful for devices which don't have the ability to
->> scan a QR code, or even as a more convenient way to share
->> wireless credentials if the PSK is very secure (i.e. not a
->> human readable string).
->>
->> PKEX would be used via the three DBus APIs on a new interface
->> SharedCodeDeviceProvisioning.
->>
->> ConfigureEnrollee(a{sv}) will start a configurator with a
->> static shared code (optionally identifier) passed in with the
->> dictionary key.
->>
->> StartConfigurator(object agent_path) will start listening and
->> wait for an Enrollee to send a PKEX exchange request. Once
->> received the configurator will call out to an agent
->> (distinguished by 'agent_path') and request the code using the
->> identifier sent by the enrollee. If no identifier was sent the
->> protocol will fail. This method allows for configuring one of
->> several enrollees, assuming the agent has the ability to
->> look up the identifier.
->>
->> StartEnrollee(a{sv}) will start a PKEX enrollee. Enrollees will
->> begin iterating a channel list sending out PKEX exchange
->> requests and waiting for a configurator to respond.
->>
->> After the PKEX protocol is finished, DPP bootstrapping keys have
->> been exchanged and DPP Authentication will start, followed by
->> configuration.
->> ---
->>   doc/device-provisioning-api.txt | 67 +++++++++++++++++++++++++++++++++
->>   1 file changed, 67 insertions(+)
->>
-> 
-> Okay, though much of this should be in the API doc itself.
-> 
->> diff --git a/doc/device-provisioning-api.txt 
->> b/doc/device-provisioning-api.txt
->> index ac204f46..02856571 100644
->> --- a/doc/device-provisioning-api.txt
->> +++ b/doc/device-provisioning-api.txt
->> @@ -71,3 +71,70 @@ Properties    boolean Started [readonly]
->>               Indicates the DPP URI. This property is only available
->>               when Started is true.
->> +
->> +
->> +Interface    net.connman.iwd.SharedCodeDeviceProvisioning [Experimental]
->> +Object path    /net/connman/iwd/{phy0,phy1,...}/{1,2,...}
->> +
->> +        ConfigureEnrollee(a{sv})
->> +            Starts a DPP configurator using a shared code (and
->> +            optionally identifier) set in the dictionary argument.
->> +            Valid dictionary keys are:
->> +
->> +            {
->> +                Code: <The shared code to use>
->> +                Identifier: <Optional identifier>
->> +            }
-> 
-> You really need to specify the types of the entries.  Since you repeat 
-> this at least twice, this may need to be a separate section.
-> 
->> +
->> +            As with the DeviceProvisioning interface, configurators
->> +            must be currently connected to start.
->> +
->> +            Possible errors:    net.connman.iwd.Busy
->> +                        net.connman.iwd.NotConnected
->> +                        net.connman.InvalidArguments
->> +
->> +        StartConfigurator(object agent_path)
->> +            Start a shared code configurator using an agent to
->> +            obtain the shared code. This method is meant for an
->> +            automated use case where a configurator is capable of
->> +            configuring multiple enrollees, and distinguishing
->> +            between them by their identifier.
->> +
->> +            After starting the configurator will listen on channel.
->> +            Upon receiving an enrollees initial request it will
->> +            make an agent call (on 'agent_path') to obtain the
->> +            code associated with the enrollee.
->> +
->> +            As with the DeviceProvisioning interface, configurators
->> +            must be currently connected to start.
->> +
->> +            Possible errors:    net.connman.iwd.Busy
->> +                        net.connman.iwd.NotConnected
->> +                        net.connman.iwd.InvalidArguments
-> 
-> Where is the agent documentation?
+We were seeing beacon loss events not resulting in an immediate
+disconnnect (as I have always expected), still eventually but after
+plenty of time to roam. I initially added handling for
+beacon loss identical to packet loss (try and find a better BSS) but
+noticed that if IWD did not find a better candidate it resulted in a
+disconnect 100% of the time. I watched a client for a full day and
+whenever beacon loss events arrived they were followed by a
+disconnect within ~5-6 seconds if IWD did not roam. This led me to
+believe that at least on ath10k a beacon loss is still very much a
+sign that a disconnect is going to come, we just have a bit more time
+than other drivers. This was the motivation behind re-using/re-naming
+the 'ap_directed_roam' flag in order to force IWD off the BSS.
 
-I wanted to get your preference, I can add a separate agent API 
-specifically for shared code (RequestSharedCode), or we can piggy back 
-off (since its the same signature):
+Again, this is just one driver. Maybe other drivers can
+handle/recover from beacon loss. If we instead want to keep the
+behavior the same as packet loss I'm ok with that (I can keep the
+patch locally), or put the forced roam behavior behind a user
+option e.g. [Roam].ForceRoamOnBeaconLoss
 
-RequestUserPassword(object network, string user)
+James Prestwood (4):
+  station: rename ap_directed_roam to force_roam
+  station: start roam on beacon loss event
+  netdev: handle/send beacon loss event
+  station: rate limit packet loss roam scans
 
-Either way, I'll add more information about the agent interaction.
+ src/netdev.c  |  6 ++++-
+ src/netdev.h  |  1 +
+ src/station.c | 61 +++++++++++++++++++++++++++++++++++++++++++--------
+ 3 files changed, 58 insertions(+), 10 deletions(-)
 
-> 
->> +
->> +        StartEnrollee(a{sv})
->> +            Start a shared code enrollee using the Code and
->> +            optionally identifier passed in the dictionary argument.
->> +            As with the configurator, valid dictionary keys are:
->> +
->> +            {
->> +                Code: <The shared code to use>
->> +                Identifier: <Optional identifier>
->> +            }
->> +
->> +            As with the DeviceProvisioning interface, enrollees
->> +            must be disconnected in order to start.
->> +
->> +            Possible errors:    net.connman.iwd.Busy
->> +                        net.connman.iwd.InvalidArguments
->> +
->> +Properties    boolean Started [readonly]
->> +
->> +            True if shared code device provisioning is currently
->> +            active. (configurator or enrollee is started)
->> +
->> +        string Role [readonly, optional]
->> +
->> +            Indicates the DPP role. Possible values are "enrollee"
->> +            or "configurator". This property is only available when
->> +            Started is true.
-> 
-> Regards,
-> -Denis
+-- 
+2.25.1
+
