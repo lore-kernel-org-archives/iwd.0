@@ -1,49 +1,49 @@
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEFA12E5A
-	for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 14:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E5ED280
+	for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 15:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZhVLRnDI"
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-1e9bb3a0bfeso3000696fac.3
-        for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 07:48:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H8eiSZLi"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-1efabc436e4so1213816fac.1
+        for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 08:01:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698677333; x=1699282133; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1698678061; x=1699282861; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Qk2upu++9OQBfK8ZRAOPSlzAjjjHKA8Tqg1mfb668Jw=;
-        b=ZhVLRnDIKLOiKxeYb/Y5LGYldkl+DNMyL8zT5SABBmB40CaWDrvR6Q6Wxj5uiuK53l
-         12WhkwsRswX1e2K9blT2u5/8gPJDX+idO29vGy57XfbK/6rwZ2Q4S2rFy44guigNLTtb
-         hfxO2GuaaXBXwf4F98t0alJw02Q80XPWZCjQOaz8X3v/oe1gpEHj+j/ySMHmNFVhRoz2
-         zAc6RpoESF7X/fVxUUoUTssUzftR6ijdT1947G41+no17WiWno3+I09ohuDEWObvYssn
-         WnRmteZ6jXeGcmZ9fB1zhRXqNupeTW9fWvpEP4lob3Y/57kAA6y+BaMkksWFJdoXn7+w
-         knVw==
+        bh=OJBDLyEEldaqk4fcpHD9CL9xTia7nzelZrNlUCAQF0g=;
+        b=H8eiSZLif+S8esz8h0ePyU+5QSsmo68y8JFvpZzcUAM6TYE9o9E3TqSkzTJNPHUmeo
+         +Oh9s0qRwVd1Nxop3GnJlTzRRto4xg9D/E6RJMX+wL465DmuXG4he/345G/Au97jcpPJ
+         tC/G4J+pJ3lzDFSq8kRYu7n4ODwmozHIOdyOAIihb2srOw2Q7J4gxlGYFu4fk1A/QCeW
+         83mA21+KuS9SKkrQffGjcd4Pw2wkVWiI+f0E3VUlx8b3AOWi5kmhuC6+0QEjVMihXXYV
+         QjX/TksTs8n8H0GKS6RhMJmARSkwYgxmqd1I51ljyYs4LiQi94BHRMMiNhlTNgmfuR2U
+         H1tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698677333; x=1699282133;
+        d=1e100.net; s=20230601; t=1698678061; x=1699282861;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qk2upu++9OQBfK8ZRAOPSlzAjjjHKA8Tqg1mfb668Jw=;
-        b=UT01+5oJSdszxcNEG7oSdNUYECgJ3qyAnEtUXSJCSR1/WxR3E/ChrFTgfqyHb7Eq4W
-         PLHJF5m7o9QVFcYlMmL5JGvgNOwveSbjK1MhTd68UQogvCuY+PKZT0IAr4jMKrtZSLzR
-         CUlH54CzPk2QTlBOMdZpnwhuIxycfx0OsmkY6PB2IzO0Pps4wNr+XIvy6h08AGhvfcx1
-         F1KHzZlIX7SoToug90HABSumc5XK3K/OB0MWnjPJOzuZo0dw86N2np9H5WoemPYinzqN
-         MR/iwL4tvdYiUvFr4y6jp9fWVlXGkC79Yg6LnXkutK/B8JYVj02VOeI8wf6l0ANQbeXM
-         qQ6Q==
-X-Gm-Message-State: AOJu0Yx5DPpCtvbw2li4G6Bo7Mj4BPHf8ksIWdz7wgTxI0hwLvct/XLH
-	Za7PxsR33tUJtRu+USDz/ic=
-X-Google-Smtp-Source: AGHT+IEjZBHm8NX1wDaVZhSNY2Todq55ju+KudX+6ITrpAw8Z+9ouH5J+IklXAW6wqnjsStf8UjHHw==
-X-Received: by 2002:a05:6870:5cc6:b0:1e9:a248:b1b6 with SMTP id et6-20020a0568705cc600b001e9a248b1b6mr11803498oab.35.1698677332707;
-        Mon, 30 Oct 2023 07:48:52 -0700 (PDT)
+        bh=OJBDLyEEldaqk4fcpHD9CL9xTia7nzelZrNlUCAQF0g=;
+        b=vY0ZFF9znO2dbC+xadpnEjkGXfrmxKx/GwFEuQovWFTxFHP4hlvCWNEVcSskbyyR+Y
+         zApgKOUyMaLX+flGMIQUJlNoouCKytM9NLaDGMKYFDWOKnZ6L3v+DRA2QqmXk0QIWpYw
+         c/qX2DimsWBXQmDRBpqXhKGWl8Bu/DyMzcvTHXSvONS5wYi5NtOf3gD0s6MWbuNvmceb
+         nw997i+9RxHjnQlLT/TE0nNKHa81Twyy91IV0sRZqzDDvj5b5XvRLh45aS5IfBBE/CKF
+         MnLFTEhGegamocFwIMgk/vELiLZp2E2Ajie6omX4hSlrGdwT20RK1Dkw052oMuFSk1h4
+         kE5w==
+X-Gm-Message-State: AOJu0Yx/1r0W/IMCgVrkKyBGkG5XIcLsaXgLycKlbjKB4WlKTSaUYRrB
+	SYoohGR30jOSInjyRNDWS6W4GcvCwIk=
+X-Google-Smtp-Source: AGHT+IG055RR+FNAxm1TqdhAzEA9+mfZD8JRGlGhdSxfwj1pSx3G2MK3l9M7CIGTesIVe4WSfU/wYA==
+X-Received: by 2002:a05:6870:311c:b0:1e9:b550:c05a with SMTP id v28-20020a056870311c00b001e9b550c05amr11690656oaa.53.1698678060902;
+        Mon, 30 Oct 2023 08:01:00 -0700 (PDT)
 Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id w1-20020a056870854100b001e1076a668asm1604399oaj.36.2023.10.30.07.48.51
+        by smtp.googlemail.com with ESMTPSA id v18-20020a056870e49200b001e988bf0ab0sm1633776oag.3.2023.10.30.08.01.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 07:48:52 -0700 (PDT)
-Message-ID: <4e5fd484-94f6-4b41-bee2-f0b01e760fa2@gmail.com>
-Date: Mon, 30 Oct 2023 09:48:50 -0500
+        Mon, 30 Oct 2023 08:01:00 -0700 (PDT)
+Message-ID: <b5138012-c4aa-40bd-892e-5b578a29ade4@gmail.com>
+Date: Mon, 30 Oct 2023 10:00:59 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,91 +51,68 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] station: rate limit packet loss roam scans
+Subject: Re: [PATCH 0/4] Packet/beacon loss roaming improvements
 Content-Language: en-US
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
 References: <20231030134837.452957-1-prestwoj@gmail.com>
- <20231030134837.452957-5-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20231030134837.452957-5-prestwoj@gmail.com>
+In-Reply-To: <20231030134837.452957-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 10/30/23 08:48, James Prestwood wrote:
-> The packet loss handler puts a higher priority on roaming compared
-> to the low signal roam path. This is generally beneficial since this
-> event usually indicates some problem with the BSS and generally is
-> an indicator that a disconnect will follow sometime soon.
 > 
-> But by immediately issuing a scan we run the risk of causing many
-> successive scans if more packet loss events arrive following
-> the roam scans (and if no candidates are found). Logs provided
-> further.
-> 
-> To help with this handle the first event with priority and
-> immediately issue a roam scan. If another event comes in within a
-> certain timeframe (2 seconds) don't immediately scan, but instead
-> rearm the roam timer instead of issuing a scan. This also handles
-> the case of a low signal roam scan followed by a packet loss
-> event. Delaying the roam will at least provide some time for packets
-> to get out in between roam scans.
-> 
-> Logs were snipped to be less verbose, but this cycled happened
-> 5 times prior. In total 7 scans were issued in 5 seconds which may
-> very well have been the reason for the local disconnect:
-> 
-> Oct 27 16:23:46 src/station.c:station_roam_failed() 9
-> Oct 27 16:23:46 src/wiphy.c:wiphy_radio_work_done() Work item 29 done
-> Oct 27 16:23:47 src/netdev.c:netdev_mlme_notify() MLME notification Notify CQM(64)
-> Oct 27 16:23:47 src/station.c:station_packets_lost() Packets lost event: 10
-> Oct 27 16:23:47 src/station.c:station_roam_scan() ifindex: 9
-> Oct 27 16:23:47 src/wiphy.c:wiphy_radio_work_insert() Inserting work item 30
-> Oct 27 16:23:47 src/wiphy.c:wiphy_radio_work_next() Starting work item 30
-> Oct 27 16:23:47 src/station.c:station_start_roam() Using cached neighbor report for roam
-> Oct 27 16:23:47 src/scan.c:scan_notify() Scan notification Trigger Scan(33)
-> Oct 27 16:23:47 src/scan.c:scan_request_triggered() Active scan triggered for wdev a
-> Oct 27 16:23:47 src/scan.c:scan_notify() Scan notification New Scan Results(34)
-> Oct 27 16:23:47 src/netdev.c:netdev_link_notify() event 16 on ifindex 9
-> ... scan results ...
-> Oct 27 16:23:47 src/station.c:station_roam_failed() 9
-> Oct 27 16:23:47 src/wiphy.c:wiphy_radio_work_done() Work item 30 done
-> Oct 27 16:23:47 src/netdev.c:netdev_mlme_notify() MLME notification Notify CQM(64)
-> Oct 27 16:23:47 src/station.c:station_packets_lost() Packets lost event: 10
-> Oct 27 16:23:47 src/station.c:station_roam_scan() ifindex: 9
-> Oct 27 16:23:47 src/wiphy.c:wiphy_radio_work_insert() Inserting work item 31
-> Oct 27 16:23:47 src/wiphy.c:wiphy_radio_work_next() Starting work item 31
-> Oct 27 16:23:47 src/station.c:station_start_roam() Using cached neighbor report for roam
-> Oct 27 16:23:47 src/scan.c:scan_notify() Scan notification Trigger Scan(33)
-> Oct 27 16:23:47 src/scan.c:scan_request_triggered() Active scan triggered for wdev a
-> Oct 27 16:23:48 src/scan.c:scan_notify() Scan notification New Scan Results(34)
-> Oct 27 16:23:48 src/netdev.c:netdev_link_notify() event 16 on ifindex 9
-> ... scan results ...
-> Oct 27 16:23:48 src/station.c:station_roam_failed() 9
-> Oct 27 16:23:48 src/wiphy.c:wiphy_radio_work_done() Work item 31 done
-> Oct 27 16:23:48 src/netdev.c:netdev_mlme_notify() MLME notification Notify CQM(64)
-> Oct 27 16:23:48 src/station.c:station_packets_lost() Packets lost event: 10
-> Oct 27 16:23:48 src/station.c:station_roam_scan() ifindex: 9
-> Oct 27 16:23:48 src/wiphy.c:wiphy_radio_work_insert() Inserting work item 32
-> Oct 27 16:23:48 src/wiphy.c:wiphy_radio_work_next() Starting work item 32
-> Oct 27 16:23:48 src/station.c:station_start_roam() Using cached neighbor report for roam
-> Oct 27 16:23:48 src/scan.c:scan_notify() Scan notification Trigger Scan(33)
-> Oct 27 16:23:48 src/scan.c:scan_request_triggered() Active scan triggered for wdev a
-> Oct 27 16:23:49 src/netdev.c:netdev_link_notify() event 16 on ifindex 9
-> Oct 27 16:23:49 src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-> Oct 27 16:23:49 src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
-> Oct 27 16:23:49 src/netdev.c:netdev_deauthenticate_event()
-> Oct 27 16:23:49 src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
-> Oct 27 16:23:49 src/netdev.c:netdev_disconnect_event()
-> Oct 27 16:23:49 Received Deauthentication event, reason: 4, from_ap: false
-> ---
->   src/station.c | 28 +++++++++++++++++++++++++++-
->   1 file changed, 27 insertions(+), 1 deletion(-)
+> We were seeing beacon loss events not resulting in an immediate
+> disconnnect (as I have always expected), still eventually but after
+
+If I recall correctly, Lost Beacon is sent after several beacons in succession 
+were lost.  You are right that this could just be bad luck and doesn't actually 
+mean that no packets are getting through.  However, in practice mac80211 almost 
+always disconnected us soon after.  Didn't we test this pretty thoroughly?
+
+My memory is fuzzy here, but I seem to recall that power save has an effect on 
+how lost beacon events are treated by mac80211.  Maybe your recent power save 
+patches had an effect?
+
+> plenty of time to roam. I initially added handling for
+> beacon loss identical to packet loss (try and find a better BSS) but
+> noticed that if IWD did not find a better candidate it resulted in a
+> disconnect 100% of the time. I watched a client for a full day and
+> whenever beacon loss events arrived they were followed by a
+> disconnect within ~5-6 seconds if IWD did not roam. This led me to
+> believe that at least on ath10k a beacon loss is still very much a
+> sign that a disconnect is going to come, we just have a bit more time
+> than other drivers. This was the motivation behind re-using/re-naming
+> the 'ap_directed_roam' flag in order to force IWD off the BSS.
 > 
 
-Applied, thanks.
+ath10k is still a mac80211 driver, no?  Given that we did test Lost Beacon event 
+behavior before, I would like some more data points before being convinced it is 
+a driver behavior change.
+
+> Again, this is just one driver. Maybe other drivers can
+> handle/recover from beacon loss. If we instead want to keep the
+> behavior the same as packet loss I'm ok with that (I can keep the
+> patch locally), or put the forced roam behavior behind a user
+> option e.g. [Roam].ForceRoamOnBeaconLoss
+
+If this is a driver behavior quirk, then this belongs in src/wiphy.c 
+driver_infos table somehow.  I'd really rather not add a bazillion config 
+options that address the bug-of-the-day.
+
+> 
+> James Prestwood (4):
+>    station: rename ap_directed_roam to force_roam
+>    station: start roam on beacon loss event
+>    netdev: handle/send beacon loss event
+>    station: rate limit packet loss roam scans
+> 
+>   src/netdev.c  |  6 ++++-
+>   src/netdev.h  |  1 +
+>   src/station.c | 61 +++++++++++++++++++++++++++++++++++++++++++--------
+>   3 files changed, 58 insertions(+), 10 deletions(-)
+> 
 
 Regards,
 -Denis
-
