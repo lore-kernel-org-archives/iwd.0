@@ -1,49 +1,49 @@
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF09B33F9
-	for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 11:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E21513FE2
+	for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 11:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l5GP12mb"
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-d8a000f6a51so3547791276.3
-        for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 04:35:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RxYhpwBl"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-66d134a019cso31452926d6.3
+        for <iwd@lists.linux.dev>; Mon, 30 Oct 2023 04:56:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698665739; x=1699270539; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1698666972; x=1699271772; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=YXRNyFUcLb01fZvtVN28k6w8ynj1q49igAn04W6IbY8=;
-        b=l5GP12mbKfSJ7S5ZkHJSMQMGrsOCah37tbzgkpmLAcCBgQAhRlEFcPwbmLcTd2gNjN
-         +v2jnoETxnwNjnLuGNot9zNvuugFyp+B1Y5bs+W9zFL3CigegLWQ2yrc1U8L7bSYHCue
-         FFGbDfx78s/rg6r4AsAfZCrsWCX745BUEVXrEsOJroS0MQ9X/DcUjWN1h6WfNj7PUoD8
-         mWmqNP7COEUd4cPqPw8VBlz1mK8aRc0q4XssSadjHKe9ql8SAjg9H2n6l3KcR0qvwh3e
-         NALnFmno8O5UY1EE4padg/aQsIyNmxhknggL0pMJ4XV+evKLLcBSQPMbKUHer1LpsCBx
-         814A==
+        bh=I2EsWXgIgmY5ZGNZVcIKTU41YQY+qsuJewdFxQvk8sU=;
+        b=RxYhpwBl/G7nhSpi+ZaS+i9r+jkGCafwqriXVXFPW5U/9XABwET8U1n2p2SfXd5rcM
+         Rb60UEIcC2nD8DflTCq5lNCY/EX+zVXCCx4nMZtYVK2wPq2uzHN1Z0arxaWky35yMWn6
+         RgG2cweeVpB6E0kIU0cmID1yFZEEMnD6mQwZglt0fB6ZbyQFaRIA13TYnc0ZCrAZpfYE
+         raLlCo8Ri3QchJB+C48hL4QNAN4U43zeeN++4gpoiwSZEwLMMnGb9Ap+ogXDh934dY7c
+         afsv4IK5ae46JTrZlN+RaEp96cOmcF7KzR2+eLuLc1yX2tbOCg5V7vJih1Cw1amSeAa1
+         cI9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698665739; x=1699270539;
+        d=1e100.net; s=20230601; t=1698666972; x=1699271772;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YXRNyFUcLb01fZvtVN28k6w8ynj1q49igAn04W6IbY8=;
-        b=YtPgGoIhk4hGMp6vJ0b34pLYDzNsH4xsmy1cwqCID6kEwXF0ElPdYNv7vafwiObZHG
-         ExqE7Z4/Go9MaP+AcwxHvRM5MH2j3Y/Fm4bsxh54EfhaJ7Tywmcc62XcURqY6dJsBd0U
-         1iRsZ1yHh6nN7nKuU1yBFrxso7f4DGu2uc8NPVYIkosU2JqRknGPFffSmNlNwyOHstzN
-         I81TDgV1SygrjalrumZv+8C08g5XwqGsqFCfUCK4zL0a7lWnV09MfPY8IR+atMxaZTxa
-         40c9n+W2xUPHNTeCW9vF1UoSxQc+0qvrKlI3Iw6KEqgN4mytSHQ7FU77Y7/F1U7zwO1u
-         Lyzg==
-X-Gm-Message-State: AOJu0Yzgvu7nt9o/2tIS2aAhVC5w4tsoETK2vu/sw16KMf3m0GRtc+Gg
-	fGle4/OtdNmad6d3jJEdYK0=
-X-Google-Smtp-Source: AGHT+IHas+7PSzkyZw7lMD6l++2fjqrEr2JHZw8krR/TaqzI7JtgDCp0LYfyEODirytbKVKiYXkDzw==
-X-Received: by 2002:a25:fc12:0:b0:da0:4ba8:35fe with SMTP id v18-20020a25fc12000000b00da04ba835femr8583748ybd.60.1698665738781;
-        Mon, 30 Oct 2023 04:35:38 -0700 (PDT)
+        bh=I2EsWXgIgmY5ZGNZVcIKTU41YQY+qsuJewdFxQvk8sU=;
+        b=jsBtHvEJiFGeQTTBjQmbyjvkgyTWS+Lsnsvse2QM4y8IwHvJzE84CJa1SqIvt8Fhkd
+         1xVzpH1ZwlkUvKYdaEY3hdpY003aROvxI+QVpfuLGG71INemdfh2k5MHZ2ciJK7wkDxL
+         NpfNMelKprRjp5k8uMJ4QkEBh4dZufIGqaih23ruvgkNbnfts1LoN0SOnw3cdH0dlc+K
+         IcRQsfLDC68z1d4M0OQav54zoTPPijabXOtRx2XEow40/Ndx1X/II5GClhW8Wq7mtW8Y
+         bvC6CgdskV7OZMZutgIPr3eyQF8jyzqyPyfX5cKiNRNvCkaq5rr1dujB4hdz/wnvMDtf
+         +E6Q==
+X-Gm-Message-State: AOJu0Yxsy8QRU2X8KI5VgHMWZbYGguErunn5D8co5r63zQu3sYp2XFmb
+	pXr97xYa+ch1GNOVDruocOgdC95TFsU=
+X-Google-Smtp-Source: AGHT+IF8MZGew12OSZI11Lfe9dH8VaY+T/WGta4GB8O2TuG6sWfbvwPqASaqM1IJrcLEyX0cF3UeEg==
+X-Received: by 2002:a0c:f112:0:b0:66d:1b62:5c22 with SMTP id i18-20020a0cf112000000b0066d1b625c22mr8819699qvl.0.1698666971969;
+        Mon, 30 Oct 2023 04:56:11 -0700 (PDT)
 Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id t16-20020a05622a01d000b0041e211c5d0bsm3352269qtw.6.2023.10.30.04.35.37
+        by smtp.gmail.com with ESMTPSA id l15-20020ad44bcf000000b0065b2be40d58sm3327287qvw.25.2023.10.30.04.56.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 04:35:38 -0700 (PDT)
-Message-ID: <70cf034a-485c-4cdf-a042-39eb45fd190f@gmail.com>
-Date: Mon, 30 Oct 2023 04:35:34 -0700
+        Mon, 30 Oct 2023 04:56:11 -0700 (PDT)
+Message-ID: <1a87a53c-e95a-40c4-a410-0929a29456cc@gmail.com>
+Date: Mon, 30 Oct 2023 04:56:09 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,113 +51,158 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 02/15] dpp: remove connect/scanning and resume periodic
- scans after DPP
+Subject: Re: [PATCH v2 12/15] doc: PKEX support for DPP
 Content-Language: en-US
 To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <20231026202657.183591-1-prestwoj@gmail.com>
- <20231026202657.183591-3-prestwoj@gmail.com>
- <428501e8-9ad3-4b83-adb7-e60530e98270@gmail.com>
+ <20231026202657.183591-13-prestwoj@gmail.com>
+ <35ca1bec-2ccb-4e23-8b98-f6dffa4675ac@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <428501e8-9ad3-4b83-adb7-e60530e98270@gmail.com>
+In-Reply-To: <35ca1bec-2ccb-4e23-8b98-f6dffa4675ac@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 Hi Denis,
 
-On 10/29/23 3:04 PM, Denis Kenzior wrote:
+On 10/29/23 3:27 PM, Denis Kenzior wrote:
 > Hi James,
 > 
 > On 10/26/23 15:26, James Prestwood wrote:
->> When DPP is started periodic scans are stopped but never started
->> again. This means if DPP fails IWD will never resume autoconnecting
->> without some intervention.
+>> PKEX is part of the WFA EasyConnect specification and is
+>> an additional boostrapping method (like QR codes) for
+>> exchanging public keys between a configurator and enrollee.
 >>
-> 
-> Okay, but why are you not removing scan_periodic_stop() calls then?  If 
-> the intent is to use station_set_autoconnect, then do that.  And this 
-> probably requires a separate patch.
-
-One thing I overlooked here was the fact that offchannel requests are at 
-a higher priority than scanning, and since we "block" the work queue in 
-DPP they will resume afterwards.
-
-So these patches aren't very useful and instead I will remove 
-periodic_scan_stop calls (to retain the autoconnect state) and change 
-station_connect_network to be callable without a dbus message (to fix 
-the state problem).
-
-> 
->> This also removes the internal scanning/connecting logic from DPP
->> which was done for two reasons. First its unknown how long the
->> DPP protocol took and its safest to explicitly scan to find the
-> 
-> Isn't this being done by invoking scan_active?
-> 
->> target network/bss, and second the connect logic was flawed because
->> station will not transition into a CONNECTING state since
->> __station_connect_network shortcuts the state change. If DPP failed
-> 
-> Okay, so use station_connect_network?
-> 
->> station would never resume autoconnecting, and if the post-DPP
->> connection failed the state was set incorrectly so station would
->> also not resume autoconnecting.
+>> PKEX operates over wifi and requires a key/code be exchanged
+>> prior to the protocol. The key is used to encrypt the exchange
+>> of the boostrapping information, then DPP authentication is
+>> started immediately aftewards.
 >>
->> The downside of this is it takes slightly longer to connect after
->> DPP since IWD must scan, but the DPP logic is simplified and keeps
->> all connection logic in station.c where it belongs.
-> 
-> Well, the downside of this approach is that you're relying completely on 
-> autoconnect logic to pick the right network instead of having DPP 
-> connect to the network that was just configured.  So if autoconnect 
-> picks a different network you get results the user doesn't expect.
-
-Yeah, this too.
-
-> 
+>> This can be useful for devices which don't have the ability to
+>> scan a QR code, or even as a more convenient way to share
+>> wireless credentials if the PSK is very secure (i.e. not a
+>> human readable string).
+>>
+>> PKEX would be used via the three DBus APIs on a new interface
+>> SharedCodeDeviceProvisioning.
+>>
+>> ConfigureEnrollee(a{sv}) will start a configurator with a
+>> static shared code (optionally identifier) passed in with the
+>> dictionary key.
+>>
+>> StartConfigurator(object agent_path) will start listening and
+>> wait for an Enrollee to send a PKEX exchange request. Once
+>> received the configurator will call out to an agent
+>> (distinguished by 'agent_path') and request the code using the
+>> identifier sent by the enrollee. If no identifier was sent the
+>> protocol will fail. This method allows for configuring one of
+>> several enrollees, assuming the agent has the ability to
+>> look up the identifier.
+>>
+>> StartEnrollee(a{sv}) will start a PKEX enrollee. Enrollees will
+>> begin iterating a channel list sending out PKEX exchange
+>> requests and waiting for a configurator to respond.
+>>
+>> After the PKEX protocol is finished, DPP bootstrapping keys have
+>> been exchanged and DPP Authentication will start, followed by
+>> configuration.
 >> ---
->>   src/dpp.c | 76 ++++++++++++++++++++-----------------------------------
->>   1 file changed, 27 insertions(+), 49 deletions(-)
+>>   doc/device-provisioning-api.txt | 67 +++++++++++++++++++++++++++++++++
+>>   1 file changed, 67 insertions(+)
 >>
 > 
-> <snip>
+> Okay, though much of this should be in the API doc itself.
 > 
->> @@ -315,7 +313,17 @@ static void dpp_reset(struct dpp_sm *dpp)
->>           dpp->retry_timeout = NULL;
->>       }
->> +    /*
->> +     * Set station back to its original autoconnecting state if an
->> +     * enrollee and DPP failed
->> +     */
->> +    if (station && dpp->role == DPP_CAPABILITY_ENROLLEE &&
->> +            dpp->station_autoconnecting &&
->> +            dpp->state != DPP_STATE_SUCCESS)
->> +        station_set_autoconnect(station, true);
-> 
-> So what if autoconnect was false originally?
-> 
->> @@ -830,16 +805,9 @@ static void 
->> dpp_handle_config_response_frame(const struct mmpdu_header *frame,
->>       offchannel_cancel(dpp->wdev_id, dpp->offchannel_id);
->> -    if (network && bss)
->> -        __station_connect_network(station, network, bss);
->> -    else if (station) {
->> -        dpp->connect_scan_id = scan_active(dpp->wdev_id, NULL, 0,
->> -                        dpp_scan_triggered,
->> -                        dpp_scan_results, dpp,
->> -                        dpp_scan_destroy);
-> 
-> Likely this needs to be a filtered scan (with SSID) as opposed to wildcard >
->> -        if (dpp->connect_scan_id)
->> -            return;
->> -    }
->> +    dpp->state = DPP_STATE_SUCCESS;
+>> diff --git a/doc/device-provisioning-api.txt 
+>> b/doc/device-provisioning-api.txt
+>> index ac204f46..02856571 100644
+>> --- a/doc/device-provisioning-api.txt
+>> +++ b/doc/device-provisioning-api.txt
+>> @@ -71,3 +71,70 @@ Properties    boolean Started [readonly]
+>>               Indicates the DPP URI. This property is only available
+>>               when Started is true.
 >> +
->> +    station_set_autoconnect(station, true);
->>       dpp_reset(dpp);
->>   }
+>> +
+>> +Interface    net.connman.iwd.SharedCodeDeviceProvisioning [Experimental]
+>> +Object path    /net/connman/iwd/{phy0,phy1,...}/{1,2,...}
+>> +
+>> +        ConfigureEnrollee(a{sv})
+>> +            Starts a DPP configurator using a shared code (and
+>> +            optionally identifier) set in the dictionary argument.
+>> +            Valid dictionary keys are:
+>> +
+>> +            {
+>> +                Code: <The shared code to use>
+>> +                Identifier: <Optional identifier>
+>> +            }
+> 
+> You really need to specify the types of the entries.  Since you repeat 
+> this at least twice, this may need to be a separate section.
+> 
+>> +
+>> +            As with the DeviceProvisioning interface, configurators
+>> +            must be currently connected to start.
+>> +
+>> +            Possible errors:    net.connman.iwd.Busy
+>> +                        net.connman.iwd.NotConnected
+>> +                        net.connman.InvalidArguments
+>> +
+>> +        StartConfigurator(object agent_path)
+>> +            Start a shared code configurator using an agent to
+>> +            obtain the shared code. This method is meant for an
+>> +            automated use case where a configurator is capable of
+>> +            configuring multiple enrollees, and distinguishing
+>> +            between them by their identifier.
+>> +
+>> +            After starting the configurator will listen on channel.
+>> +            Upon receiving an enrollees initial request it will
+>> +            make an agent call (on 'agent_path') to obtain the
+>> +            code associated with the enrollee.
+>> +
+>> +            As with the DeviceProvisioning interface, configurators
+>> +            must be currently connected to start.
+>> +
+>> +            Possible errors:    net.connman.iwd.Busy
+>> +                        net.connman.iwd.NotConnected
+>> +                        net.connman.iwd.InvalidArguments
+> 
+> Where is the agent documentation?
+
+I wanted to get your preference, I can add a separate agent API 
+specifically for shared code (RequestSharedCode), or we can piggy back 
+off (since its the same signature):
+
+RequestUserPassword(object network, string user)
+
+Either way, I'll add more information about the agent interaction.
+
+> 
+>> +
+>> +        StartEnrollee(a{sv})
+>> +            Start a shared code enrollee using the Code and
+>> +            optionally identifier passed in the dictionary argument.
+>> +            As with the configurator, valid dictionary keys are:
+>> +
+>> +            {
+>> +                Code: <The shared code to use>
+>> +                Identifier: <Optional identifier>
+>> +            }
+>> +
+>> +            As with the DeviceProvisioning interface, enrollees
+>> +            must be disconnected in order to start.
+>> +
+>> +            Possible errors:    net.connman.iwd.Busy
+>> +                        net.connman.iwd.InvalidArguments
+>> +
+>> +Properties    boolean Started [readonly]
+>> +
+>> +            True if shared code device provisioning is currently
+>> +            active. (configurator or enrollee is started)
+>> +
+>> +        string Role [readonly, optional]
+>> +
+>> +            Indicates the DPP role. Possible values are "enrollee"
+>> +            or "configurator". This property is only available when
+>> +            Started is true.
 > 
 > Regards,
 > -Denis
-> 
