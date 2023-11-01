@@ -1,788 +1,212 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B073820332
-	for <iwd@lists.linux.dev>; Tue, 31 Oct 2023 18:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80FC43D74
+	for <iwd@lists.linux.dev>; Wed,  1 Nov 2023 12:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JeL00ADj"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7789cc5c8ccso11751585a.0
-        for <iwd@lists.linux.dev>; Tue, 31 Oct 2023 11:48:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TWpbleTI"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-41cb615c6fbso41323841cf.1
+        for <iwd@lists.linux.dev>; Wed, 01 Nov 2023 05:07:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698778089; x=1699382889; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GUZym1BOEGPM5UV9nE1+c01dkvpGGmKhausHLDpKdGc=;
-        b=JeL00ADjKZs0Xj3yht6alW34q8Az+f3jLRX+BHhcTnsmuRAJof00j2uVZFQYSLds7x
-         XOeC9t7b/mJAu/1l5xA7DXFwoxu+PRTUAub1sH6hl900umNzNKO0d23AMkol1dCiKnwN
-         UgwBasfxFEaXzXByBR37c6/Lo9OunOyb2r4DVB9dpM1RJLr4gU4sSK4wq9k8doW57hP/
-         ZW/2WuJOvpmJ/xkDhMn7ky3MhSO+mTG2Hb3tuJ49Fg4C6DP/aVIe+IdjttIkx+3qm62D
-         kSuGlaaO24QCzJuwQVAsgBVlRMKOHo404k0U2t5oWYHDZ1Vz6DuwQKtEf13mtRqIkTB6
-         ISJg==
+        d=gmail.com; s=20230601; t=1698840443; x=1699445243; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:references:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SoYnWCesEFDxiAcpVJeSc6w3aASSLOtBPKDP/yIuljg=;
+        b=TWpbleTImFinEZI880Hs6vZchVO7jY66+S1EQQU4KbJD4l8AQlsSOGAybzGylLrPYR
+         uok4YHNwHaDJ/qNSjCS3XsCVaLoAB7JF4aS2M7mWeR53RXXdqto7c0va+27lc/iHfTqN
+         ExKVLphitn3zWmHtOqu+S2oJRKszJVTugyKWsQOCxxEtXw1oDZ9XtH4dTDrfWJlwrR/A
+         18TSZ74VzaobxCEJRM6s1znVBvneEHgJnXClqV6pFfsrN0alWM3GA1MTpoGlWeCEg17i
+         j6AE8V9+HE5PPESqZcMxVhl8W1ehbxc1D/0lfyZA8tFH7SFcCFf+ixT8bLdOV2K1CcMr
+         /FIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698778089; x=1699382889;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GUZym1BOEGPM5UV9nE1+c01dkvpGGmKhausHLDpKdGc=;
-        b=DGTzitSFkXZ0x9VskKJoLpcvPnbve8lW0scL6XSvyoVetW0Xr1dSOzK7rpB/lvhKY1
-         O+1r6DhttmVMlZqKyf2l61YarLUL33zoWF3JoJTyTDdGHkgOTl5xNGFioe28akS63y0b
-         wVam+8gjphULoUZoSNlZ86PQjec/E3sPjqWSWcq8Y4OiFhTAe/HIzjpmb1QVp+NSvRwh
-         B7EXK/CkQz8+xTpGJdNSB+MMA0SS+Wiml2hb9R2rzlgI6DoBGFz/gsq0y/+aDrUFs3n3
-         Ob5tcAMZLXmZnUYgxQCvdNwz0SCrhDTHtgj+4htzVmETK02lOgIm7/DcZavRmeYWylEa
-         AZIA==
-X-Gm-Message-State: AOJu0Yy2nlSVxWdL90EeG20CbB/DiK2Y24/oEuKaNErMqmAYNaZwUYYi
-	imQ5LXmjqUZpijf/uZko1jSl19TKcXw=
-X-Google-Smtp-Source: AGHT+IEYm1wGQ3A8+7j29UD6XUuB/biqjWBvxl7aMmGE48dorucLSXQUs8a0OhPmm5ziW2mjLyoPkA==
-X-Received: by 2002:a05:620a:3905:b0:76c:ea67:38e4 with SMTP id qr5-20020a05620a390500b0076cea6738e4mr5836950qkn.12.1698778089384;
-        Tue, 31 Oct 2023 11:48:09 -0700 (PDT)
-Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id bj30-20020a05620a191e00b00774292e636dsm736351qkb.63.2023.10.31.11.48.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Oct 2023 11:48:09 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 9/9] dpp: initial version of PKEX configurator support
-Date: Tue, 31 Oct 2023 11:47:50 -0700
-Message-Id: <20231031184750.722404-10-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231031184750.722404-1-prestwoj@gmail.com>
-References: <20231031184750.722404-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1698840443; x=1699445243;
+        h=content-transfer-encoding:in-reply-to:references:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SoYnWCesEFDxiAcpVJeSc6w3aASSLOtBPKDP/yIuljg=;
+        b=NtiY4atFo2m5ErKfA2LTFtRytdrUZM9DMm9AXMviEyfgXQlMiJ4w4K4M3Illoisr1O
+         lKL5ownquu7QJWrmfuV0RfeTYW4/AqjKB3vbwviFoajRs9cpZaQxtjRkyxI9ZhZ9j9Y5
+         0/w7mwI1XjcFweEEMDz/6OI+2ydJgN3jYIB4e1WTWAJzx605Ah/Q7HqJZj71Eah1r4us
+         5Orcl/03v0WEzKCVpGsytQZU11Ap1D3xnf0VkcWlIr07UMJnVGkY4ug0XnqN/R2ilvk7
+         rTzukYx5pCdlhsyIlz98b7igFyIMlJFsLCwqoDudFvi5jo6GM6iesgMoSbVkVb3ugopw
+         B2mw==
+X-Gm-Message-State: AOJu0Yxy0Z1F9l24Bu5r9N0yKH6xT2HdLzcFB3QwsM+Gkt5lLh6Exjh0
+	rNKG4gNBsgq9l+Ryb5JBuGWQq7fFND4=
+X-Google-Smtp-Source: AGHT+IFWMMuC2aXg0UOWIont8i33Yr9a/0IFguLSncLM9CftaCxYRuevkJ1ysHY4Enyrn9b1OeOMPg==
+X-Received: by 2002:a05:622a:3d4:b0:41e:54bc:581e with SMTP id k20-20020a05622a03d400b0041e54bc581emr14390868qtx.57.1698840443016;
+        Wed, 01 Nov 2023 05:07:23 -0700 (PDT)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id ex10-20020a05622a518a00b004198f248e8dsm1343095qtb.76.2023.11.01.05.07.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Nov 2023 05:07:22 -0700 (PDT)
+Message-ID: <68d50637-4b8d-4690-bfac-e379e1044492@gmail.com>
+Date: Wed, 1 Nov 2023 05:07:20 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/4] Packet/beacon loss roaming improvements
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20231030134837.452957-1-prestwoj@gmail.com>
+ <b5138012-c4aa-40bd-892e-5b578a29ade4@gmail.com>
+ <0cf695c9-7abc-40e9-a6fa-fdd10589839b@gmail.com>
+ <fb8dfeeb-3f5d-49d2-8a4e-063b4933d905@gmail.com>
+ <70935a8f-1f38-4e9e-8d77-40179c2b31f3@gmail.com>
+In-Reply-To: <70935a8f-1f38-4e9e-8d77-40179c2b31f3@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-The PKEX configurator role is currently limited to being a responder.
-When started the configurator will listen on its current operating
-channel for a PKEX exchange request. Once received it and the
-encrypted key is properly decrypted it treats this peer as the
-enrollee and won't allow configurations from other peers unless
-PKEX is restarted. The configurator will encrypt and send its
-encrypted ephemeral key in the PKEX exchange response. The enrollee
-then sends its encrypted bootstrapping key (as commit-reveal request)
-then the same for the configurator (as commit-reveal response).
+Hi Denis,
 
-After this, PKEX authentication begins. The enrollee is expected to
-send the authenticate request, since its the initiator.
----
- src/dpp.c | 640 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 635 insertions(+), 5 deletions(-)
+On 10/30/23 10:37 AM, James Prestwood wrote:
+> Hi Denis,
+> 
+> On 10/30/23 10:05 AM, Denis Kenzior wrote:
+>> Hi James,
+>>
+>> On 10/30/23 10:37, James Prestwood wrote:
+>>> Hi Denis,
+>>>
+>>> On 10/30/23 8:00 AM, Denis Kenzior wrote:
+>>>> Hi James,
+>>>>
+>>>>>
+>>>>> We were seeing beacon loss events not resulting in an immediate
+>>>>> disconnnect (as I have always expected), still eventually but after
+>>>>
+>>>> If I recall correctly, Lost Beacon is sent after several beacons in 
+>>>> succession were lost.  You are right that this could just be bad 
+>>>> luck and doesn't actually mean that no packets are getting through. 
+>>>> However, in practice mac80211 almost always disconnected us soon 
+>>>> after.  Didn't we test this pretty thoroughly?
+>>>
+>>> Yes, it appears mac80211 by default waits for 7 missed beacons before 
+>>> sending the event. It then probes the AP (either nullfunc or probe 
+>>> request) so apparently the connection could be recovered if the AP 
+>>> responded. Unfortunately we don't get any notification in userspace 
+>>> if the AP responded or not...
+>>
+>> So this magic here?
+>> https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git/tree/net/mac80211/mlme.c#n3215
+> 
+> Yep
+> 
+>>
+>>>
+>>> I can't remember what hardware was tested. But there really wasn't a 
+>>> consistent way to test this. The testing involved me disabling 
+>>> roaming and walking away from the AP until I got disconnected. 
+>>> Sometimes this was due to beacon loss, sometimes the AP disconnected 
+>>> explicitly. But what I do remember is when beacon loss occurred, a 
+>>> local disconnect followed near immediately. This is why (I think) we 
+>>> thought there was no reason to handle this event.
+>>
+>> So what does your ath10k driver/hw do?  Does it send nullfuncs or 
+>> probe requests?
+> 
+> Based on the driver it sets REPORTS_TX_ACK_STATUS, so nullfunc. Which 
+> would add an extra second before disconnect by default (2 nullfuncs 
+> 500ms apart).
+> 
+>>
+>>>
+>>>>
+>>>> My memory is fuzzy here, but I seem to recall that power save has an 
+>>>> effect on how lost beacon events are treated by mac80211.  Maybe 
+>>>> your recent power save patches had an effect?
+>>>
+>>>  From what I can tell in mac80211 power save doesn't change handling. 
+>>> Its the driver that tells mac80211 of the beacon loss but maybe the 
+>>> driver (or firmware) could handle it differently depending on power 
+>>> save.
+>>>
+>>> When I was watching this device power save was disabled.
+>>
+>> Okay, fair enough.
+>>
+>>>> If this is a driver behavior quirk, then this belongs in src/wiphy.c 
+>>>> driver_infos table somehow.  I'd really rather not add a bazillion 
+>>>> config options that address the bug-of-the-day.
+>>>
+>>> Yeah, adding a driver specific quirk doesn't seem like the right route.
+>>>
+>>> I think for now there is no harm in trying to roam on beacon loss, 
+>>> basically the same handling as packet loss. If a disconnect comes 
+>>> immediately the scan would be canceled. Otherwise maybe we get lucky 
+>>> and be able to roam.
+>>
+>> So the problem is, we had the _exact_ same behavior you're proposing 
+>> here.  We took it out.  See commit:
+>> 836beb1276d1 ("station/wsc: remove beacon loss handling")
+>>
+>> So when we do that, alarm bells start going off.  Why did we get rid 
+>> of it if it was useful?
+> 
+> Huh, apparently it was handled previously. I really have no idea, 
+> apparently I thought something changed in the kernel. Maybe based on 
+> testing only certain hardware.
+> 
+> Looking back to kernel 5.3 (since 5.4+ was mentioned in that commit) I 
+> really don't see much difference either. This device was on 5.11, and 
+> again, not much different than current upstream in that regard.
+> 
+>>
+>> 7 consecutive lost beacons is actually a lot.  That's ~700ms with no 
+>> connection with default settings.  And you can maintain the connection 
+>> after that for another 5-6?  Something smells fishy.
+> 
+> According to the logs, yes. Looking back to the logs in the commit it 
+> was actually 4 seconds.
+> 
+> Still, I'm not sure how it could get that far without a second lost 
+> beacon event (e.g. miss beacons, but get a nullfunc reply, miss 7 more, 
+> nullfunc reply etc.). With a single event the longest it could get drug 
+> out would be 1.7 seconds (7 beacons + 2 nullfuncs) before either 
+> disconnecting or recovering but missing more beacons and generating an 
+> event, unless there is some other reason=4 failure path I'm missing.
+> 
+> 
+>> If the kernel has a hard limit after which it expects the connection 
+>> to be disconnected, we can start a timer for 2-4x that limit?  Looks 
+>> like kernel uses probe_wait_ms parameter for this with a default of 
+>> 500ms. Is your setup using the default values for beacon_loss_count 
+>> and probe_wait_ms?
+> 
+> Yep, everything is default as far as nl80211/driver options.
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 8b47be5c..e48d695b 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -164,6 +164,7 @@ struct dpp_sm {
- 	char *pkex_id;
- 	char *pkex_key;
- 	uint8_t pkex_version;
-+	struct l_ecc_point *peer_encr_key;
- 	struct l_ecc_point *pkex_m;
- 	/* Ephemeral key Y' or X' for enrollee or configurator */
- 	struct l_ecc_point *y_or_x;
-@@ -314,6 +315,26 @@ static void *dpp_serialize_iovec(struct iovec *iov, size_t iov_len,
- 	return ret;
- }
- 
-+static void dpp_free_pending_pkex_data(struct dpp_sm *dpp)
-+{
-+	if (dpp->agent && dpp->agent->pending_id) {
-+		l_dbus_cancel(dbus_get_bus(), dpp->agent->pending_id);
-+		dpp->agent->pending_id = 0;
-+	}
-+
-+	if (dpp->pkex_id) {
-+		l_free(dpp->pkex_id);
-+		dpp->pkex_id = NULL;
-+	}
-+
-+	if (dpp->peer_encr_key) {
-+		l_ecc_point_free(dpp->peer_encr_key);
-+		dpp->peer_encr_key = NULL;
-+	}
-+
-+	memset(dpp->peer_addr, 0, sizeof(dpp->peer_addr));
-+}
-+
- static void dpp_free_auth_data(struct dpp_sm *dpp)
- {
- 	if (dpp->own_proto_public) {
-@@ -431,10 +452,7 @@ static void dpp_reset(struct dpp_sm *dpp)
- 		dpp->pkex_key = NULL;
- 	}
- 
--	if (dpp->pkex_id) {
--		l_free(dpp->pkex_id);
--		dpp->pkex_id = NULL;
--	}
-+	dpp_free_pending_pkex_data(dpp);
- 
- 	dpp_free_auth_data(dpp);
- 
-@@ -1818,6 +1836,18 @@ static void dpp_offchannel_timeout(int error, void *user_data)
- 
- 	switch (dpp->state) {
- 	case DPP_STATE_PKEX_EXCHANGE:
-+		if (dpp->role != DPP_CAPABILITY_CONFIGURATOR || !dpp->agent)
-+			break;
-+
-+		/*
-+		 * We have a pending agent request but it did not arrive in
-+		 * time, we cant assume the enrollee will be waiting around
-+		 * for our response so cancel the request and continue waiting
-+		 * for another request
-+		 */
-+		if (dpp->agent->pending_id)
-+			dpp_free_pending_pkex_data(dpp);
-+		/* Fall through */
- 	case DPP_STATE_PRESENCE:
- 		break;
- 	case DPP_STATE_NOTHING:
-@@ -1905,7 +1935,8 @@ static void authenticate_request(struct dpp_sm *dpp, const uint8_t *from,
- 	if (util_is_broadcast_address(from))
- 		return;
- 
--	if (dpp->state != DPP_STATE_PRESENCE)
-+	if (dpp->state != DPP_STATE_PRESENCE &&
-+				dpp->state != DPP_STATE_AUTHENTICATING)
- 		return;
- 
- 	l_debug("authenticate request");
-@@ -2764,6 +2795,516 @@ failed:
- 	dpp_reset(dpp);
- }
- 
-+static void dpp_send_bad_group(struct dpp_sm *dpp, const uint8_t *addr)
-+{
-+	uint8_t hdr[32];
-+	uint8_t attrs[256];
-+	uint8_t *ptr = attrs;
-+	uint16_t group;
-+	uint8_t status = DPP_STATUS_BAD_GROUP;
-+	struct iovec iov[2];
-+	const uint8_t *own_mac = netdev_get_address(dpp->netdev);
-+
-+	l_put_le16(l_ecc_curve_get_ike_group(dpp->curve), &group);
-+
-+	iov[0].iov_len = dpp_build_header(own_mac, addr,
-+				DPP_FRAME_PKEX_XCHG_RESPONSE, hdr);
-+	iov[0].iov_base = hdr;
-+
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &status, 1);
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_PROTOCOL_VERSION,
-+				&dpp->pkex_version, 1);
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_FINITE_CYCLIC_GROUP, &group, 2);
-+
-+	iov[1].iov_base = attrs;
-+	iov[1].iov_len = ptr - attrs;
-+
-+	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
-+}
-+
-+static void dpp_send_bad_code(struct dpp_sm *dpp, const uint8_t *addr)
-+{
-+	uint8_t hdr[32];
-+	uint8_t attrs[256];
-+	uint8_t *ptr = attrs;
-+	uint8_t status = DPP_STATUS_BAD_CODE;
-+	struct iovec iov[2];
-+	const uint8_t *own_mac = netdev_get_address(dpp->netdev);
-+
-+	iov[0].iov_len = dpp_build_header(own_mac, addr,
-+				DPP_FRAME_PKEX_XCHG_RESPONSE, hdr);
-+	iov[0].iov_base = hdr;
-+
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &status, 1);
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_PROTOCOL_VERSION,
-+				&dpp->pkex_version, 1);
-+	if (dpp->pkex_id)
-+		ptr += dpp_append_attr(ptr, DPP_ATTR_CODE_IDENTIFIER,
-+					dpp->pkex_id, strlen(dpp->pkex_id));
-+
-+	iov[1].iov_base = attrs;
-+	iov[1].iov_len = ptr - attrs;
-+
-+	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
-+}
-+
-+static void dpp_send_pkex_exchange_response(struct dpp_sm *dpp,
-+						struct l_ecc_point *n)
-+{
-+	uint8_t hdr[32];
-+	uint8_t attrs[256];
-+	uint8_t *ptr = attrs;
-+	uint64_t n_data[L_ECC_MAX_DIGITS * 2];
-+	uint16_t group;
-+	uint8_t status = DPP_STATUS_OK;
-+	struct iovec iov[2];
-+	const uint8_t *own_mac = netdev_get_address(dpp->netdev);
-+
-+	l_put_le16(l_ecc_curve_get_ike_group(dpp->curve), &group);
-+
-+	iov[0].iov_len = dpp_build_header(own_mac, dpp->peer_addr,
-+				DPP_FRAME_PKEX_XCHG_RESPONSE, hdr);
-+	iov[0].iov_base = hdr;
-+
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &status, 1);
-+
-+	if (dpp->pkex_id)
-+		ptr += dpp_append_attr(ptr, DPP_ATTR_CODE_IDENTIFIER,
-+					dpp->pkex_id, strlen(dpp->pkex_id));
-+
-+	l_ecc_point_get_data(n, n_data, sizeof(n_data));
-+
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_ENCRYPTED_KEY,
-+				n_data, dpp->key_len * 2);
-+
-+	iov[1].iov_base = attrs;
-+	iov[1].iov_len = ptr - attrs;
-+
-+	dpp->state = DPP_STATE_PKEX_COMMIT_REVEAL;
-+
-+	dpp_pkex_property_changed_notify(dpp);
-+
-+	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
-+}
-+
-+static void dpp_process_pkex_exchange_request(struct dpp_sm *dpp,
-+						struct l_ecc_point *m)
-+{
-+	_auto_(l_ecc_point_free) struct l_ecc_point *n = NULL;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *qr = NULL;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *qi = NULL;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *k = NULL;
-+	const uint8_t *own_addr = netdev_get_address(dpp->netdev);
-+
-+	/* Qi = H(MAC-Initiator | [identifier | ] code) * Pi */
-+	qi = dpp_derive_qi(dpp->curve, dpp->pkex_key, dpp->pkex_id,
-+				dpp->peer_addr);
-+	if (!qi) {
-+		l_debug("could not derive Qi");
-+		return;
-+	}
-+
-+	/* X' = M - Qi */
-+	dpp->y_or_x = l_ecc_point_new(dpp->curve);
-+
-+	l_ecc_point_inverse(qi);
-+	l_ecc_point_add(dpp->y_or_x, m, qi);
-+
-+	/*
-+	 * "The resulting ephemeral key, denoted X’, is checked whether it is
-+	 * the point-at-infinity. If it is not valid, the protocol silently
-+	 * fails"
-+	 */
-+	if (l_ecc_point_is_infinity(dpp->y_or_x)) {
-+		l_debug("X' is at infinity, ignore message");
-+		dpp_reset(dpp);
-+		return;
-+	}
-+
-+	qr = dpp_derive_qr(dpp->curve, dpp->pkex_key, dpp->pkex_id, own_addr);
-+	if (!qr || l_ecc_point_is_infinity(qr)) {
-+		l_debug("Qr did not derive");
-+		l_ecc_point_free(dpp->y_or_x);
-+		dpp->y_or_x = NULL;
-+		goto bad_code;
-+	}
-+
-+	/*
-+	 * "The Responder then generates a random ephemeral keypair, y/Y,
-+	 * encrypts Y with Qr to obtain the result, denoted N."
-+	 */
-+	l_ecdh_generate_key_pair(dpp->curve, &dpp->pkex_private,
-+					&dpp->pkex_public);
-+
-+	/* N = Y + Qr */
-+	n = l_ecc_point_new(dpp->curve);
-+
-+	l_ecc_point_add(n, dpp->pkex_public, qr);
-+
-+	/* K = y * X' */
-+
-+	k = l_ecc_point_new(dpp->curve);
-+
-+	l_ecc_point_multiply(k, dpp->pkex_private, dpp->y_or_x);
-+
-+	/* z = HKDF(<>, info | M.x | N.x | code, K.x) */
-+	dpp_derive_z(dpp->peer_addr, own_addr, n, m, k, dpp->pkex_key,
-+				dpp->pkex_id, dpp->z, &dpp->z_len);
-+
-+	dpp_send_pkex_exchange_response(dpp, n);
-+
-+	return;
-+
-+bad_code:
-+	dpp_send_bad_code(dpp, dpp->peer_addr);
-+	return;
-+}
-+
-+static void dpp_pkex_agent_reply(struct l_dbus_message *message,
-+					void *user_data)
-+{
-+	struct dpp_sm *dpp = user_data;
-+	const char *error, *text;
-+	const char *code;
-+
-+	dpp->agent->pending_id = 0;
-+
-+	l_debug("SharedCodeAgent %s path %s replied", dpp->agent->owner,
-+			dpp->agent->path);
-+
-+	if (l_dbus_message_get_error(message, &error, &text)) {
-+		l_error("RequestSharedCode(%s) returned %s(\"%s\")",
-+				dpp->pkex_id, error, text);
-+		goto reset;
-+	}
-+
-+	if (!l_dbus_message_get_arguments(message, "s", &code)) {
-+		l_debug("Invalid arguments, check SharedCodeAgent!");
-+		goto reset;
-+	}
-+
-+	dpp->pkex_key = l_strdup(code);
-+	dpp_process_pkex_exchange_request(dpp, dpp->peer_encr_key);
-+
-+	return;
-+
-+reset:
-+	dpp_free_pending_pkex_data(dpp);
-+}
-+
-+static bool dpp_pkex_agent_request(struct dpp_sm *dpp)
-+{
-+	struct l_dbus_message *msg;
-+
-+	if (!dpp->agent)
-+		return false;
-+
-+	if (L_WARN_ON(dpp->agent->pending_id))
-+		return false;
-+
-+	msg = l_dbus_message_new_method_call(dbus_get_bus(),
-+						dpp->agent->owner,
-+						dpp->agent->path,
-+						IWD_SHARED_CODE_AGENT_INTERFACE,
-+						"RequestSharedCode");
-+	l_dbus_message_set_arguments(msg, "s", dpp->pkex_id);
-+
-+
-+	dpp->agent->pending_id = l_dbus_send_with_reply(dbus_get_bus(),
-+							msg,
-+							dpp_pkex_agent_reply,
-+							dpp, NULL);
-+	return dpp->agent->pending_id != 0;
-+}
-+
-+static void dpp_handle_pkex_exchange_request(struct dpp_sm *dpp,
-+					const uint8_t *from,
-+					const uint8_t *body, size_t body_len)
-+{
-+	struct dpp_attr_iter iter;
-+	enum dpp_attribute_type type;
-+	size_t len;
-+	const uint8_t *data;
-+	uint8_t version = 0;
-+	uint16_t group = 0;
-+	const char *id = NULL;
-+	size_t id_len = 0;
-+	const void *key = NULL;
-+	size_t key_len = 0;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *m = NULL;
-+
-+	l_debug("PKEX exchange request "MAC, MAC_STR(from));
-+
-+	if (dpp->state != DPP_STATE_PKEX_EXCHANGE)
-+		return;
-+
-+	if (dpp->role != DPP_CAPABILITY_CONFIGURATOR)
-+		return;
-+
-+	if (!l_memeqzero(dpp->peer_addr, 6)) {
-+		l_debug("Already configuring enrollee, ignoring");
-+		return;
-+	}
-+
-+	dpp_attr_iter_init(&iter, body + 8, body_len - 8);
-+
-+	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
-+		switch (type) {
-+		case DPP_ATTR_PROTOCOL_VERSION:
-+			if (len != 1)
-+				return;
-+
-+			version = l_get_u8(data);
-+			break;
-+		case DPP_ATTR_FINITE_CYCLIC_GROUP:
-+			if (len != 2)
-+				return;
-+
-+			group = l_get_le16(data);
-+			break;
-+		case DPP_ATTR_CODE_IDENTIFIER:
-+			id = (char *) data;
-+			id_len = len;
-+			break;
-+		case DPP_ATTR_ENCRYPTED_KEY:
-+			key = data;
-+			key_len = len;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	if (!key || !group) {
-+		l_debug("initiator did not provide group or key, ignoring");
-+		return;
-+	}
-+
-+	if (group != l_ecc_curve_get_ike_group(dpp->curve)) {
-+		l_debug("initiator is not using the same group");
-+		goto bad_group;
-+	}
-+
-+	/*
-+	 * If the group isn't the same the key length won't match, so check
-+	 * this here after we've determined the groups are equal
-+	 */
-+	if (key_len != dpp->key_len * 2) {
-+		l_debug("Unexpected encrypted key length");
-+		return;
-+	}
-+
-+	if (version && version != dpp->pkex_version) {
-+		l_debug("initiator is not using the same version, ignoring");
-+		return;
-+	}
-+
-+	if (dpp->pkex_id) {
-+		if (!id || !dpp_check_pkex_identifier(id) ||
-+					id_len != strlen(dpp->pkex_id) ||
-+					strncmp(dpp->pkex_id, id, id_len)) {
-+			l_debug("mismatch identifier, ignoring");
-+			return;
-+		}
-+	}
-+
-+	m = l_ecc_point_from_data(dpp->curve, L_ECC_POINT_TYPE_FULL,
-+					key, key_len);
-+	if (!m) {
-+		l_debug("could not parse key from initiator, ignoring");
-+		return;
-+	}
-+
-+	memcpy(dpp->peer_addr, from, 6);
-+
-+	if (!dpp->pkex_key) {
-+		if (!id) {
-+			l_debug("Configurator started with agent but enrollee "
-+				"sent no identifier, ignoring");
-+			return;
-+		}
-+
-+		dpp->pkex_id = l_strndup(id, id_len);
-+
-+		/* Need to obtain code from agent */
-+		if (!dpp_pkex_agent_request(dpp)) {
-+			l_debug("Failed to request code from agent!");
-+			dpp_free_pending_pkex_data(dpp);
-+			return;
-+		}
-+
-+		/* Save the encrypted key/identifier for the agent callback */
-+
-+		dpp->peer_encr_key = l_steal_ptr(m);
-+
-+		return;
-+	}
-+
-+	dpp_process_pkex_exchange_request(dpp, m);
-+
-+	return;
-+
-+bad_group:
-+	dpp_send_bad_group(dpp, from);
-+}
-+
-+static void dpp_send_commit_reveal_response(struct dpp_sm *dpp,
-+						const uint8_t *v, size_t v_len)
-+{
-+	uint8_t hdr[32];
-+	uint8_t attrs[256];
-+	uint8_t *ptr = attrs;
-+	uint8_t one = 1;
-+	struct iovec iov[2];
-+	const uint8_t *own_mac = netdev_get_address(dpp->netdev);
-+	uint8_t b_pub[L_ECC_POINT_MAX_BYTES];
-+	size_t b_len;
-+
-+	b_len = l_ecc_point_get_data(dpp->boot_public, b_pub, sizeof(b_pub));
-+
-+
-+	iov[0].iov_len = dpp_build_header(own_mac, dpp->peer_addr,
-+				DPP_FRAME_PKEX_COMMIT_REVEAL_RESPONSE, hdr);
-+	iov[0].iov_base = hdr;
-+
-+	ptr += dpp_append_wrapped_data(hdr + 26, 6, &one, 1, ptr,
-+			sizeof(attrs), dpp->z, dpp->z_len, 2,
-+			DPP_ATTR_BOOTSTRAPPING_KEY, b_len, b_pub,
-+			DPP_ATTR_RESPONDER_AUTH_TAG, v_len, v);
-+
-+	iov[1].iov_base = attrs;
-+	iov[1].iov_len = ptr - attrs;
-+
-+	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
-+}
-+
-+static void dpp_handle_pkex_commit_reveal_request(struct dpp_sm *dpp,
-+					const uint8_t *from,
-+					const uint8_t *body, size_t body_len)
-+{
-+	struct dpp_attr_iter iter;
-+	enum dpp_attribute_type type;
-+	size_t len;
-+	const uint8_t *data;
-+	const void *wrapped = NULL;
-+	size_t wrapped_len = 0;
-+	_auto_(l_free) uint8_t *unwrapped = NULL;
-+	size_t unwrapped_len;
-+	uint8_t zero = 0;
-+	const void *key = 0;
-+	size_t key_len = 0;
-+	const void *i_auth = NULL;
-+	size_t i_auth_len = 0;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *j = NULL;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *l = NULL;
-+	uint8_t u[L_ECC_SCALAR_MAX_BYTES];
-+	size_t u_len = 0;
-+	uint8_t v[L_ECC_SCALAR_MAX_BYTES];
-+	size_t v_len = 0;
-+	const uint8_t *own_addr = netdev_get_address(dpp->netdev);
-+
-+	l_debug("PKEX commit-reveal request "MAC, MAC_STR(from));
-+
-+	if (dpp->state != DPP_STATE_PKEX_COMMIT_REVEAL)
-+		return;
-+
-+	if (dpp->role != DPP_CAPABILITY_CONFIGURATOR)
-+		return;
-+
-+	dpp_attr_iter_init(&iter, body + 8, body_len - 8);
-+
-+	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
-+		switch (type) {
-+		case DPP_ATTR_WRAPPED_DATA:
-+			wrapped = data;
-+			wrapped_len = len;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	if (!wrapped) {
-+		l_debug("No wrapped data");
-+		return;
-+	}
-+
-+	unwrapped = dpp_unwrap_attr(body + 2, 6, &zero, 1, dpp->z, dpp->z_len,
-+					wrapped, wrapped_len, &unwrapped_len);
-+	if (!unwrapped) {
-+		l_debug("Failed to unwrap attributes");
-+		return;
-+	}
-+
-+	dpp_attr_iter_init(&iter, unwrapped, unwrapped_len);
-+
-+	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
-+		switch (type) {
-+		case DPP_ATTR_BOOTSTRAPPING_KEY:
-+			if (len != dpp->key_len * 2)
-+				return;
-+
-+			key = data;
-+			key_len = len;
-+			break;
-+		case DPP_ATTR_INITIATOR_AUTH_TAG:
-+			if (len != 32)
-+				return;
-+
-+			i_auth = data;
-+			i_auth_len = len;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	if (!key || !i_auth) {
-+		l_debug("missing attributes");
-+		return;
-+	}
-+
-+	dpp->peer_boot_public = l_ecc_point_from_data(dpp->curve,
-+					L_ECC_POINT_TYPE_FULL, key, key_len);
-+	if (!dpp->peer_boot_public) {
-+		l_debug("peers boostrapping key did not validate");
-+		goto failed;
-+	}
-+
-+	/* J' = y * A' */
-+	j = l_ecc_point_new(dpp->curve);
-+
-+	l_ecc_point_multiply(j, dpp->pkex_private, dpp->peer_boot_public);
-+
-+	dpp_derive_u(j, dpp->peer_addr, dpp->peer_boot_public, dpp->pkex_public,
-+			dpp->y_or_x, u, &u_len);
-+
-+	if (memcmp(u, i_auth, i_auth_len)) {
-+		l_debug("Initiator auth tag did not verify");
-+		goto failed;
-+	}
-+
-+	/* L' = x * B' */
-+	l = l_ecc_point_new(dpp->curve);
-+
-+	l_ecc_point_multiply(l, dpp->boot_private, dpp->y_or_x);
-+
-+	if (!dpp_derive_v(l, own_addr, dpp->boot_public, dpp->y_or_x,
-+				dpp->pkex_public, v, &v_len)) {
-+		l_debug("Failed to derive v");
-+		goto failed;
-+	}
-+
-+	dpp_send_commit_reveal_response(dpp, v, v_len);
-+
-+	dpp_pkex_start_authentication(dpp);
-+
-+	return;
-+
-+failed:
-+	dpp_reset(dpp);
-+}
-+
- static void dpp_handle_frame(struct dpp_sm *dpp,
- 				const struct mmpdu_header *frame,
- 				const void *body, size_t body_len)
-@@ -2806,6 +3347,14 @@ static void dpp_handle_frame(struct dpp_sm *dpp,
- 		dpp_handle_pkex_commit_reveal_response(dpp, frame->address_2,
- 							body, body_len);
- 		break;
-+	case DPP_FRAME_PKEX_VERSION1_XCHG_REQUST:
-+		dpp_handle_pkex_exchange_request(dpp, frame->address_2, body,
-+							body_len);
-+		break;
-+	case DPP_FRAME_PKEX_COMMIT_REVEAL_REQUEST:
-+		dpp_handle_pkex_commit_reveal_request(dpp, frame->address_2,
-+							body, body_len);
-+		break;
- 	default:
- 		l_debug("Unhandled DPP frame %u", *ptr);
- 		break;
-@@ -3508,6 +4057,83 @@ invalid_args:
- 	return dbus_error_invalid_args(message);
- }
- 
-+static struct l_dbus_message *dpp_start_pkex_configurator(struct dpp_sm *dpp,
-+					const char *key, const char *identifier,
-+					struct l_dbus_message *message)
-+{
-+	struct handshake_state *hs = netdev_get_handshake(dpp->netdev);
-+	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
-+	struct network *network = station_get_connected_network(station);
-+	struct scan_bss *bss = station_get_connected_bss(station);
-+	const struct l_settings *settings;
-+
-+	if (dpp->state != DPP_STATE_NOTHING)
-+		return dbus_error_busy(message);
-+
-+	if (!network || !bss)
-+		return dbus_error_not_connected(message);
-+
-+	settings = network_get_settings(network);
-+	if (!settings) {
-+		l_debug("No settings for network, is this a known network?");
-+		return dbus_error_not_configured(message);
-+	}
-+
-+	if (identifier)
-+		dpp->pkex_id = l_strdup(identifier);
-+
-+	if (key)
-+		dpp->pkex_key = l_strdup(key);
-+
-+	dpp->role = DPP_CAPABILITY_CONFIGURATOR;
-+	dpp->state = DPP_STATE_PKEX_EXCHANGE;
-+	dpp->current_freq = bss->frequency;
-+	dpp->pkex_version = 1;
-+	dpp->config = dpp_configuration_new(network_get_settings(network),
-+						network_get_ssid(network),
-+						hs->akm_suite);
-+
-+	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
-+	dpp_pkex_property_changed_notify(dpp);
-+
-+	if (dpp->pkex_key)
-+		l_debug("Starting PKEX configurator for single enrollee");
-+	else
-+		l_debug("Starting PKEX configurator with agent");
-+
-+	return l_dbus_message_new_method_return(message);
-+}
-+
-+static struct l_dbus_message *dpp_dbus_pkex_configure_enrollee(
-+						struct l_dbus *dbus,
-+						struct l_dbus_message *message,
-+						void *user_data)
-+{
-+	struct dpp_sm *dpp = user_data;
-+	const char *key;
-+	const char *id;
-+
-+	l_debug("");
-+
-+	if (!dpp_parse_pkex_args(message, &key, &id))
-+		return dbus_error_invalid_args(message);
-+
-+	return dpp_start_pkex_configurator(dpp, key, id, message);
-+}
-+
-+static struct l_dbus_message *dpp_dbus_pkex_start_configurator(
-+						struct l_dbus *dbus,
-+						struct l_dbus_message *message,
-+						void *user_data)
-+{
-+	struct dpp_sm *dpp = user_data;
-+
-+	if (!dpp->agent)
-+		return dbus_error_no_agent(message);
-+
-+	return dpp_start_pkex_configurator(dpp, NULL, NULL, message);
-+}
-+
- static void dpp_setup_interface(struct l_dbus_interface *interface)
- {
- 	l_dbus_interface_method(interface, "StartEnrollee", 0,
-@@ -3599,6 +4225,10 @@ static void dpp_setup_pkex_interface(struct l_dbus_interface *interface)
- 			dpp_dbus_pkex_unregister_agent, "", "");
- 	l_dbus_interface_method(interface, "StartEnrollee", 0,
- 			dpp_dbus_pkex_start_enrollee, "", "a{sv}", "args");
-+	l_dbus_interface_method(interface, "ConfigureEnrollee", 0,
-+			dpp_dbus_pkex_configure_enrollee, "", "a{sv}", "args");
-+	l_dbus_interface_method(interface, "StartConfigurator", 0,
-+			dpp_dbus_pkex_start_configurator, "", "");
- 	l_dbus_interface_method(interface, "Stop", 0, dpp_dbus_stop, "", "");
- 
- 	l_dbus_interface_property(interface, "Started", 0, "b",
--- 
-2.25.1
+I found an old thread I asked on linux-wireless back when I removed the 
+beacon loss handling [1]. Johannes explained that behavior did 
+apparently change in order to support power save (your memory was correct).
 
+I identified the behavior change with hwsim, and apparently took his 
+word when he said:
+
+"I'm pretty sure real hardware will behave just like hwsim here, albeit 
+perhaps a bit slower"
+
+And I never added "proper" testing of beacon loss, i.e. block several 
+beacons as opposed to just tearing down the AP. And this appears closer 
+to the behavior I'm seeing in reality (AP not going down, just dropping 
+beacons).
+
+So this is my bad, I didn't take into account the situation of beacons 
+being dropped but then being picked up again, or the nullfuncs/probes 
+coming back successfully.
+
+[1] 
+https://lore.kernel.org/linux-wireless/ada14dfad76b93d654606c3b397de059d968096b.camel@gmail.com/
+
+Thanks,
+James
+> 
+>>
+>> Regards,
+>> -Denis
