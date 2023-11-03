@@ -1,49 +1,49 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080658836
-	for <iwd@lists.linux.dev>; Fri,  3 Nov 2023 11:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074C814F9F
+	for <iwd@lists.linux.dev>; Fri,  3 Nov 2023 11:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tq/zBKlK"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-66d093265dfso10733266d6.3
-        for <iwd@lists.linux.dev>; Fri, 03 Nov 2023 04:24:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYgZgFhC"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7781b176131so106528585a.1
+        for <iwd@lists.linux.dev>; Fri, 03 Nov 2023 04:27:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699010697; x=1699615497; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1699010857; x=1699615657; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gV5zSqjPVZsFq4UCpEpdyEXjg8v3iIrgp7FG96EWHUk=;
-        b=Tq/zBKlKmi0qfxJd+RJ3hOmhYRFDteBYC1lMXwhoVUKGP/H1qF+2V6B4ZFHYmFeu+u
-         grhq23gUVbZOMetciz7cP4GSrno0qWcpzuqlIkI/3lK3YFVhFWRYDW6m7nb3xkc9MvIV
-         5WeLoJvWcCwTbQR6LaYjE/zM+gZ1kvR+HhBrydtXK1WzRobMOWsaj8M3fvrBg0I6OR+E
-         px/Bv/VYw1zPJpvLPWH6ITtwQXNPEXCe2GzS1Bp7cIiVCphqzFlLTzLQJTiCbdIz6DWF
-         ihKFbMAw4lI6VuNUQzCZaUNKrXIy1ozfqjZjCFG0lWcKRf6JrLgTK5EX7MTNBWbHsgkJ
-         4nnw==
+        bh=VxgZu7p2NnNKkL+pIQMmMSMq6gYi9+AI4o9zPEj2RLE=;
+        b=lYgZgFhCJiBvCDvS4J6dxHpraWHk0DYx7aOGPtZEMlgZr+A3qoa4X4a+iQm+ryVZ+q
+         eXN8GaKcjUPdYsXwr/qxpNLyIVLZ/kYM0dePzuvxHxtxwHjlL+yEKzfco+9lnvI//qlE
+         4xPUXRJrCB/PdpiOwgWrVBLsExwQuJFRFQ6GSW8/M7bSi/SP5yXCYn6Cc7s2Gcs4Cr0w
+         yCvM63xgxs/uKv2+XF/EvX6DJH2ch8ZfxStoPJZAsjkptgOvLV3HUE3E2Y90GMpzn+aH
+         VKPlAQuagz2hBuZfPP1CTud3jBR7OdHDzTobDL/nuU3UGTR8QjtwDXycNaEEj8dLLS/2
+         VXYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699010697; x=1699615497;
+        d=1e100.net; s=20230601; t=1699010857; x=1699615657;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gV5zSqjPVZsFq4UCpEpdyEXjg8v3iIrgp7FG96EWHUk=;
-        b=TXOyufzywksLx2e5vWFGXa3cYqXDNTV9IaLu5RyVAPskKDnoPL4DDs5D1mY86JxAqM
-         WzNZrToXn05jUmQaBRft/HtCY5RJpmfNaiO/0C4NOaO80IL4JSNmNACU2LQ7bLxQoZgH
-         /bmQRen3SntX+fCjDaW+P2mhwDEGVMc0pXZnOR1WyoUrVERaKtLYfKz4sMBGCsWxHhCW
-         hSQz2aMYrZyudT+TuCvjeqfzjTTI8qe1gpyMrEfAy02hyr8lCyAZ/JOAvWY8BuTaK0iU
-         Hvwy00T3/cuyFWZWP90wkDZlXVAlL4XJdB2RNy0lPlXmaxi42Uh1IM13U74SCA1sXY3+
-         mOsQ==
-X-Gm-Message-State: AOJu0Yy65PWerUOTVYVvtFPs04yNQXGQJMf79JthCwqSeyWPwQFaq6Ps
-	g4tD98CWk3CsOkbs8QjFX84=
-X-Google-Smtp-Source: AGHT+IE5cjdyUG33zIeTGOtZHbGufnrkiOH6HcsPrKf3NIHsGwLN/rxrAb+IH33XK7Az0Tv+Muh0QQ==
-X-Received: by 2002:a0c:aadd:0:b0:66f:ba6e:73e8 with SMTP id g29-20020a0caadd000000b0066fba6e73e8mr19480467qvb.41.1699010696611;
-        Fri, 03 Nov 2023 04:24:56 -0700 (PDT)
+        bh=VxgZu7p2NnNKkL+pIQMmMSMq6gYi9+AI4o9zPEj2RLE=;
+        b=juem5IgvlLNtSXHi0BXw7BFysJRT9HNaP5p7cuR2LHj0bKYRZAxVRHIZ91HYPXq1U1
+         1MDZgTuV72a5tjSjsGeh2vMvLxSK+FG1KbLe31nw/GCm6KGon06SEkl8nf+oxcWXQehq
+         Uo9nf6xYpYQyM9hvmWjDoy80ddsNm+DJtbP5jtairOcNka17Z94xOY4WRh909tDfzU2f
+         Y516uRXoJRm/0kdJo3QVb3LQTDSU7HzN0yN4LdslJryA1KKe+oe9REpnTe6i58Yo8Jty
+         Bfd584BsG6rznHVjGzkoKPqAhaafaUtkB4JTUfkEFmbuD6mqsrD/5p0NDO4eWoBJkkdv
+         Cx/A==
+X-Gm-Message-State: AOJu0YxHu7B32xB12ZXazWJT2bQSzFKqWovoRqHBNLV7z6WLJPmqiW9m
+	eNVh2RdlRaUf3MkEDiiXwpU=
+X-Google-Smtp-Source: AGHT+IGA8i1yqqt6iOL8+WAOGcu1ZFh6RC0C+X3wvUEyJZVn/6DnRYOlYfpG0KP6ZKveSg33dxpk0g==
+X-Received: by 2002:a05:620a:1337:b0:777:fec:5741 with SMTP id p23-20020a05620a133700b007770fec5741mr20252141qkj.33.1699010856856;
+        Fri, 03 Nov 2023 04:27:36 -0700 (PDT)
 Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id cu8-20020a05621417c800b0066d1e71e515sm642421qvb.113.2023.11.03.04.24.54
+        by smtp.gmail.com with ESMTPSA id 25-20020a05620a04d900b007756d233fbdsm640723qks.37.2023.11.03.04.27.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Nov 2023 04:24:56 -0700 (PDT)
-Message-ID: <0cbc142f-948f-4778-b5b3-7b9bd42e4393@gmail.com>
-Date: Fri, 3 Nov 2023 04:24:51 -0700
+        Fri, 03 Nov 2023 04:27:36 -0700 (PDT)
+Message-ID: <f82d0756-53a8-40aa-9ee7-0cee6f384640@gmail.com>
+Date: Fri, 3 Nov 2023 04:27:33 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,254 +51,78 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 6/9] doc: PKEX support for DPP
+Subject: Re: [PATCH v3 8/9] dpp: initial version of PKEX enrollee support
 Content-Language: en-US
 To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <20231031184750.722404-1-prestwoj@gmail.com>
- <20231031184750.722404-7-prestwoj@gmail.com>
- <3eb37cc3-431a-45cf-95d9-8b2386f75d0d@gmail.com>
+ <20231031184750.722404-9-prestwoj@gmail.com>
+ <1d8a3e83-defc-4f81-b85e-6ec0f59b4f18@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <3eb37cc3-431a-45cf-95d9-8b2386f75d0d@gmail.com>
+In-Reply-To: <1d8a3e83-defc-4f81-b85e-6ec0f59b4f18@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 Hi Denis,
 
-On 11/2/23 7:07 PM, Denis Kenzior wrote:
+On 11/2/23 7:12 PM, Denis Kenzior wrote:
 > Hi James,
 > 
 > On 10/31/23 13:47, James Prestwood wrote:
->> PKEX is part of the WFA EasyConnect specification and is
->> an additional boostrapping method (like QR codes) for
->> exchanging public keys between a configurator and enrollee.
+>> This is the initial support for PKEX enrollees acting as the
+>> initiator. A PKEX initiator starts the protocol by broadcasting
+>> the PKEX exchange request. This request contains a key encrypted
+>> with the pre-shared PKEX code. If accepted the peer sends back
+>> the exchange response with its own encrypted key. The enrollee
+>> decrypts this and performs some crypto/hashing in order to establish
+>> an ephemeral key used to encrypt its own boostrapping key. The
+>> boostrapping key is encrypted and sent to the peer in the PKEX
+>> commit-reveal request. The peer then does the same thing, encrypting
+>> its own bootstrapping key and sending to the initiator as the
+>> PKEX commit-reveal response.
 >>
->> PKEX operates over wifi and requires a key/code be exchanged
->> prior to the protocol. The key is used to encrypt the exchange
->> of the boostrapping information, then DPP authentication is
->> started immediately aftewards.
+>> After this, both peers have exchanged their boostrapping keys
+>> securely and can begin DPP authentication, then configuration.
 >>
->> This can be useful for devices which don't have the ability to
->> scan a QR code, or even as a more convenient way to share
->> wireless credentials if the PSK is very secure (i.e. not a
->> human readable string).
->>
->> PKEX would be used via the three DBus APIs on a new interface
->> SharedCodeDeviceProvisioning.
->>
->> ConfigureEnrollee(a{sv}) will start a configurator with a
->> static shared code (optionally identifier) passed in as the
->> argument to this method.
->>
->> StartEnrollee(a{sv}) will start a PKEX enrollee using a static
->> shared code (optionally identifier) passed as the argument to
->> the method.
->>
->> StartConfigurator() will start a PKEX configurator (should be
->> already registered) which will query an agent for an enrollees
->> shared code. Enrollees are distinguished by the identifier.
->>
->> After the PKEX protocol is finished, DPP bootstrapping keys have
->> been exchanged and DPP Authentication will start, followed by
->> configuration.
+>> For now the enrollee will only iterate the default channel list
+>> from the Easy Connect spec. Future upates will need to include some
+>> way of discovering non-default channel configurators, but the
+>> protocol needs to be ironed out first.
 >> ---
->>   doc/device-provisioning-api.txt | 149 ++++++++++++++++++++++++++++++++
->>   1 file changed, 149 insertions(+)
+>>   src/dpp.c | 765 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 761 insertions(+), 4 deletions(-)
 >>
->> diff --git a/doc/device-provisioning-api.txt 
->> b/doc/device-provisioning-api.txt
->> index ac204f46..3c6fc74e 100644
->> --- a/doc/device-provisioning-api.txt
->> +++ b/doc/device-provisioning-api.txt
->> @@ -71,3 +71,152 @@ Properties    boolean Started [readonly]
->>               Indicates the DPP URI. This property is only available
->>               when Started is true.
->> +
->> +
->> +Interface    net.connman.iwd.SharedCodeDeviceProvisioning [Experimental]
->> +Object path    /net/connman/iwd/{phy0,phy1,...}/{1,2,...}
->> +
->> +        ConfigureEnrollee(a{sv})
->> +
->> +            Starts a DPP configurator using a shared code (and
->> +            optionally identifier) set in the dictionary argument.
->> +            Valid dictionary keys are:
->> +
->> +            string Code
->> +                The shared code to use. The code used by both
->> +                parties (configurator and enrollee) must match.
->> +
->> +            string Identifier
->> +                An optional identifier. The identifier used by
->> +                both parties must match. Per the DPP spec the
->> +                identifier "shall be a UTF-8 string not greater
->> +                than eighty (80) octets"
->> +
->> +            As with the DeviceProvisioning interface, configurators
->> +            must be connected to the network they wish to configure
->> +            in order to start.
->> +
->> +            Once started a configurator (acting as a responder) will
->> +            listen on the currently connected channel for an
->> +            enrollee's initial exchange request which will kick off
->> +            the shared code bootstrapping protocol (PKEX). Once
->> +            completed DPP will start automatically. Only one
->> +            enrollee can be configured per call to
->> +            ConfigureEnrollee, i.e. once PKEX/DPP is has finished
 > 
-> "is has finished"?
-> 
->> +            (including failure) the configurator will stop.
->> +
->> +            The SharedCode methods have an eventual timeout and will
->> +            stop automatically after 2 minutes.
->> +
->> +            Possible errors:    net.connman.iwd.Busy
->> +                        net.connman.iwd.NotConnected
->> +                        net.connman.InvalidArguments
->> +
->> +        StartEnrollee(a{sv})
->> +
->> +            Starts a DPP enrollee using a shared code (and
->> +            optionally identifier) set in the dictionary argument
->> +            (described above in ConfigureEnrollee).
->> +
->> +            As with the device provisioning interface, enrollees
->> +            must be disconnected in order to start.
->> +
->> +            Once started an enrollee (acting as an initiator) will
->> +            iterate channels sending out broadcast exchange requests
->> +            waiting for a response from a configurator. A response
->> +            will kick off the shared code bootstrapping protocol
->> +            (PKEX), followed by DPP if successful. Once the
->> +            protocols have completed, or failed, the enrollee will
->> +            stop. If failed, StartEnrollee will need to be called
->> +            again to retry.
->> +
->> +            Possible errors:    net.connman.iwd.Busy
->> +                        net.connman.iwd.InvalidArguments
->> +
->> +        StartConfigurator()
-> 
-> You are missing return parameters for all of these methods.  Also seems 
-> like Stop() method isn't documented.
-> 
->> +
->> +            Start a shared code configurator using an agent to
->> +            obtain the shared code. This method is meant for an
->> +            automated use case where a configurator is capable of
->> +            configuring multiple enrollees, and distinguishing
->> +            between them by their identifier.
->> +
->> +            Prior to calling, a SharedCodeAgent must be registered
->> +            using RegisterSharedCodeAgent. Only a single agent can
->> +            be registered per SharedCodeInterface.
-> 
-> So the one thing to watch out for is that DPP interface can come and go, 
-> unlike the Manager interface.  Since StartConfigurator() has to be 
-> called for each protocol attempt, providing the agent as an argument 
-> might be be a nicer shortcut?  The API is marked experimental, so we can 
-> always change this.  You will probably know more once you try to 
-> implement the API.
+> Wish this came before the agent stuff :)
 
-I had that thought too but was just keeping things consistent. But I'm 
-fine removing the register APIs and just passing the path here.
+Yeah, I can reorder them. I did this really just to include some of the 
+cleanup functions that only made sense once the agent existed. But I can 
+leave them in this commit.
+
+I can also split the configurator patch into two, one implementing 
+ConfigureEnrollee() and the other StartConfigurator()
 
 > 
-> Also, it seems to me that StartConfigurator implies that the agent is 
-> active. If the agent goes away, StartConfigurator() should be aborted, no?
-
-Yes, probably not a bad idea.
-
+>> diff --git a/src/dpp.c b/src/dpp.c
+>> index 57024a26..8b47be5c 100644
+>> --- a/src/dpp.c
+>> +++ b/src/dpp.c
+>> @@ -53,10 +53,12 @@
+>>   #include "src/network.h"
+>>   #include "src/handshake.h"
+>>   #include "src/nl80211util.h"
+>> +#include "src/agent.h"
 > 
->> +
->> +            This method behaves nearly the same as ConfigureEnrollee
->> +            except upon receiving an enrollees first exchange
->> +            request the registered agent will be asked for the
->> +            shared code using the RequestSharedCode method.
->> +
->> +            Though the agent can provide shared codes for multiple
->> +            enrollees, this method will only configure a single
->> +            enrollee at a time. Once completed it will need to be
->> +            called again to configure additional enrollees.
->> +
->> +            Possible errors:    net.connman.iwd.Busy
->> +                        net.connman.iwd.NotConnected
->> +                        net.connman.iwd.NoAgent
->> +
->> +        void RegisterSharedCodeAgent(object path)
->> +
->> +            Register the agent object for servicing shared code
->> +            requests on the net.connman.iwd.SharedCodeAgent
->> +            interface. There may only be one agent registered at a
->> +            time per SharedCodeDeviceProvisioning interface.
->> +
->> +            Possible Errors:    [service].Error.InvalidArguments
->> +                        [service].Error.AlreadyExists
->> +
->> +        void UnregisterSharedCodeAgent()
->> +
->> +            Unregister an existing agent.
->> +
->> +            Possible Errors:    [service].Error.NotFound
->> +
->> +Properties    boolean Started [readonly]
->> +
->> +            True if shared code device provisioning is currently
->> +            active. (configurator or enrollee is started)
->> +
->> +        string Role [readonly, optional]
->> +
->> +            Indicates the DPP role. Possible values are "enrollee"
->> +            or "configurator". This property is only available when
->> +            Started is true.
->> +
->> +SharedCodeAgent hierarchy
->> +=========================
->> +
->> +Service        unique name
->> +Interface    net.connman.iwd.SharedCodeAgent [Experimental]
->> +Object path    freely definable
->> +
->> +Methods        void Release() [noreply]
->> +
->> +            This method gets called when the service daemon
->> +            unregisters the agent.
+> Why is this needed?
 > 
-> You don't actually call this method.
+>>   #define DPP_FRAME_MAX_RETRIES 5
+>>   #define DPP_FRAME_RETRY_TIMEOUT 1
+>>   #define DPP_AUTH_PROTO_TIMEOUT 10
+>> +#define DPP_PKEX_PROTO_TIMEOUT 120
+>>   static uint32_t netdev_watch;
+>>   static struct l_genl_family *nl80211;
 > 
->> +
->> +        string RequestSharedCode(object network, string identifier)
->> +
->> +            This method gets called when a shared code is requested
->> +            for a particular enrollee, distingushed by the
->> +            identifier. The shared code agent should lookup the
->> +            identifier and return the shared code, or return an
->> +            error if not found.
-> 
-> Looks like you don't actually call the agent with the network object?
-
-Yeah, this was a mistake, there should just be the one string argument.
-
-> 
->> +
->> +            Possible Errors:    [service].Error.Canceled
->> +                        [service].Error.NotFound
->> +
->> +        void Cancel(string reason) [noreply]
->> +
->> +            This method gets called to indicate that the agent
->> +            request failed before a reply was returned. The
->> +            argument will indicate why the request is being
->> +            cancelled and may be "user-canceled", "timed-out" or
->> +            "shutdown".
-> 
-> You don't call this method either.
->> +
->> +Examples    Requesting a shared code for an enrollee identified by "foo"
->> +
->> +            RequestSharedCode("foo") ==> "super_secret_code"
-> 
-> This signature incorrect as well?
+> I'll look at this in more detail once you send v4.
 > 
 > Regards,
 > -Denis
+> 
