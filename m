@@ -1,418 +1,74 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2274D328CF
-	for <iwd@lists.linux.dev>; Tue,  7 Nov 2023 17:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F2628E29
+	for <iwd@lists.linux.dev>; Tue,  7 Nov 2023 17:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJ/xfhUg"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-579de633419so71291747b3.3
-        for <iwd@lists.linux.dev>; Tue, 07 Nov 2023 09:06:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ibtVkaWJ"
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5a7dd65052aso73181567b3.0
+        for <iwd@lists.linux.dev>; Tue, 07 Nov 2023 09:53:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699376799; x=1699981599; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7xBGJyoXTq0MSbOdfze229fZHCiTaG0F2j8ENgmISQM=;
-        b=kJ/xfhUgTg8XMNvRX2PcnuldFACXS13k7YVVY217/YCOxWVA5J0V+i1GGeoBgELGmZ
-         rtfgeMCqBQvF5hMi2+I88qGcRkYD6rZ2A+fgNWSnVhvUBrCSJdFQK4zGrp2f+JqtywuF
-         Iw/W8VnKhpYsVVKqAwkvzMob/z6Vo89Osh/XTA87KnbJ5VQycL5If9z9lXHi2FD1PQ7Q
-         k406CGDYxHmnpzcGoYql6NMtCPIeroHYfbd6j6LIE6WFvRLhjwWT6x6PrESL7Id/Uuo/
-         Id6fEJpY89pegnb4gjr5zztITvTge4UvLwp1a85jvlOBYlhB6l5qzVxl0WSij6keAt+O
-         g+5w==
+        d=gmail.com; s=20230601; t=1699379618; x=1699984418; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dj+7va5BZYiVmjKh1EZyFBHIr4O4QV77+zrZ6oj68fQ=;
+        b=ibtVkaWJLBcl1Y2DDhcXfvKiX2j/+BDtL2fu5O21PUT8pVj7tCP3TQDWIYK03wvU7M
+         gSxaWktDu/5dbpcks1Xga4qV4rWUgFqB4ETHsegF2v3fLH7gtZUApNtPj55qoPVwMXBO
+         EZb62IS0+VVIe59bUC4l3iYPUqddX6XgrwG9q7oscOIzb+Pik/UtXfttW1ETRTyBiNCs
+         uoemWcqHf9r0Bypszask3oheO1uqW3JL2c5TrBP/7HLb0CRLgHFqyOAza8lbQ2j9Z91v
+         hMcXxLpCYjg/JQBlk03QGoEu0gX66X7UvMUmtBlcfbmTaiCsW/GQS7TH7ZMno/Yo0lLh
+         HCGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699376799; x=1699981599;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7xBGJyoXTq0MSbOdfze229fZHCiTaG0F2j8ENgmISQM=;
-        b=E8qEPb2qR+Gl7NBEN2ZTDqJuE5UVegPB4Q8fZdxnPHJhnRdlWsOR5m4TYpOYhYo1ZO
-         76myHQ9odunCHcjXIAB7MQdpo9QSHTrOKxXN6f+NRvM6XIBOWXnPJ1kOk98WOo1neMZQ
-         uh7jGweUCRalQ4gg92yYOIoMX0QGXr6mKLCS4HePwX8OA4x+G6WMo7OnhC2XFfMDvpvk
-         csuo5yj9idOzN9Q/rbmvk7jJWcG/CrmEm4jJlbkEEx8yuEyMN8TunM/xy24g2X166Kza
-         a/kVfUo+rT45Ddtx4J7I7DRPmIiHRBLRwn1gQ46aBC9j1KdX376xTGLNXul3Nup9Sy8J
-         2lNw==
-X-Gm-Message-State: AOJu0YxprnnJTFHdkkQBv5QEbtozRk3UtDS8hsijrKL/57toHYC6Qo9r
-	3d1yZTrO4wBgj9mD6LgifD3FvasVMOY=
-X-Google-Smtp-Source: AGHT+IEu1pDXVRuM8v8hCUUfXyeorlSvzlE4gepONyOR9uipj9M993Y/YXSjRrPwYp4UphvgX6E0SQ==
-X-Received: by 2002:a81:658b:0:b0:583:a3ab:b950 with SMTP id z133-20020a81658b000000b00583a3abb950mr35432ywb.50.1699376798953;
-        Tue, 07 Nov 2023 09:06:38 -0800 (PST)
-Received: from LOCLAP699.rst-07.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id z127-20020a814c85000000b005a7db2a0dddsm5790475ywa.3.2023.11.07.09.06.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 09:06:38 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 4/4] dpp: Add StartConfigurator, PKEX agent support
-Date: Tue,  7 Nov 2023 09:06:29 -0800
-Message-Id: <20231107170629.1831655-5-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231107170629.1831655-1-prestwoj@gmail.com>
-References: <20231107170629.1831655-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1699379618; x=1699984418;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dj+7va5BZYiVmjKh1EZyFBHIr4O4QV77+zrZ6oj68fQ=;
+        b=WKNaqeLpGbOw0FD1njIErugVuUDqI5tKmnoSj7Sf2/doEc3N1d5ijAAucbjAx/doVq
+         3/j32zQd95tytT2CKz171i5IOIaB5bhbr8lrE3nQ/+gLKUNhUdwlLNofBPt3XdwZXX+H
+         j1IELjgXeuL9GKXCfDOvGfFI1jMZdPTJ4Cfsf5fbIDS1lmuyTz6BJUe0Gfh3xUoDlAke
+         Owwq5p27/psO82EzQdqxf2aJwF09MGIlkxACYdZ/aRCcMtVfARo2Uuf134kP6FXezfRo
+         rzn3QsZvxqLs0npnaD0ZdcmxAhQSEQLnZtvVu79Kiv7ra+xj8Kgaf72iD83kYMrr5Z9I
+         N7Tw==
+X-Gm-Message-State: AOJu0Yzw9a1AY2nLMQbjKSKuJ31FR2MBmbiREvkWE0GQaG1VGGxo3Y7w
+	2LsBwzOqyX/OQslOXdqntaWc7jhO2W4=
+X-Google-Smtp-Source: AGHT+IFFIyo726cHoIXPSmTkvPqbmY3JIqhKC2lTgh1t0BGMvK6W6hkC0pI0sRLIQN2KNbGPuAQjGQ==
+X-Received: by 2002:a81:7896:0:b0:5b3:46f2:fbd3 with SMTP id t144-20020a817896000000b005b346f2fbd3mr13448626ywc.7.1699379617981;
+        Tue, 07 Nov 2023 09:53:37 -0800 (PST)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id d7-20020a0ddb07000000b005a7bf9749c8sm5840031ywe.4.2023.11.07.09.53.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Nov 2023 09:53:37 -0800 (PST)
+Message-ID: <6d5103a7-5bec-4526-9ba6-b7ca398c5d4a@gmail.com>
+Date: Tue, 7 Nov 2023 09:53:35 -0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: error with commit aff2d4d66f07ed0a1816122d26369ccfce348f90 pmksa:
+ Add skeleton
+Content-Language: en-US
+To: daniel antoine <univac55@gmail.com>, iwd@lists.linux.dev
+References: <CA+iibzAu1YwZV7e96cjP+xtn6A24ZCN1AiGW9-k35BWi=6wU_w@mail.gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <CA+iibzAu1YwZV7e96cjP+xtn6A24ZCN1AiGW9-k35BWi=6wU_w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Adds a configurator variant to be used along side an agent. When
-called the configurator will start and wait for an initial PKEX
-exchange message from an enrollee at which point it will request
-the code from an agent. This provides more flexibility for
-configurators that are capable of configuring multiple enrollees
-with different identifiers/codes.
+On 11/7/23 9:46 AM, daniel antoine wrote:
+> 
+> 
+> Hi
+> 
+> I try to compile with the last commits and the compilation failed on error
 
-Note that the timing requirements per the DPP spec still apply
-so this is not meant to be used with a human configurator but
-within an automated agent which does a quick lookup of potential
-identifiers/codes and can reply within the 200ms window.
----
- src/dpp.c | 228 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 226 insertions(+), 2 deletions(-)
+TLDR;
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 86361ba0..265fa971 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -82,6 +82,13 @@ enum dpp_capability {
- 	DPP_CAPABILITY_CONFIGURATOR = 0x02,
- };
- 
-+struct pkex_agent {
-+	char *owner;
-+	char *path;
-+	unsigned int disconnect_watch;
-+	uint32_t pending_id;
-+};
-+
- struct dpp_sm {
- 	struct netdev *netdev;
- 	char *uri;
-@@ -104,6 +111,8 @@ struct dpp_sm {
- 
- 	enum dpp_state state;
- 
-+	struct pkex_agent *agent;
-+
- 	/*
- 	 * List of frequencies to jump between. The presence of this list is
- 	 * also used to signify that a configurator is an initiator vs responder
-@@ -154,6 +163,7 @@ struct dpp_sm {
- 	char *pkex_id;
- 	char *pkex_key;
- 	uint8_t pkex_version;
-+	struct l_ecc_point *peer_encr_key;
- 	struct l_ecc_point *pkex_m;
- 	/* Ephemeral key Y' or X' for enrollee or configurator */
- 	struct l_ecc_point *y_or_x;
-@@ -317,6 +327,68 @@ static void dpp_free_pending_pkex_data(struct dpp_sm *dpp)
- 	}
- 
- 	memset(dpp->peer_addr, 0, sizeof(dpp->peer_addr));
-+
-+	if (dpp->peer_encr_key) {
-+		l_ecc_point_free(dpp->peer_encr_key);
-+		dpp->peer_encr_key = NULL;
-+	}
-+}
-+
-+static void pkex_agent_free(void *data)
-+{
-+	struct pkex_agent *agent = data;
-+
-+	l_free(agent->owner);
-+	l_free(agent->path);
-+	l_dbus_remove_watch(dbus_get_bus(), agent->disconnect_watch);
-+	l_free(agent);
-+}
-+
-+static void dpp_agent_cancel(struct dpp_sm *dpp)
-+{
-+	struct l_dbus_message *msg;
-+
-+	const char *reason = "shutdown";
-+
-+	msg = l_dbus_message_new_method_call(dbus_get_bus(),
-+						dpp->agent->owner,
-+						dpp->agent->path,
-+						IWD_SHARED_CODE_AGENT_INTERFACE,
-+						"Cancel");
-+	l_dbus_message_set_arguments(msg, "s", reason);
-+	l_dbus_message_set_no_reply(msg, true);
-+	l_dbus_send(dbus_get_bus(), msg);
-+}
-+
-+static void dpp_agent_release(struct dpp_sm *dpp)
-+{
-+	struct l_dbus_message *msg;
-+
-+	msg = l_dbus_message_new_method_call(dbus_get_bus(),
-+						dpp->agent->owner,
-+						dpp->agent->path,
-+						IWD_SHARED_CODE_AGENT_INTERFACE,
-+						"Release");
-+	l_dbus_message_set_no_reply(msg, true);
-+	l_dbus_send(dbus_get_bus(), msg);
-+}
-+
-+static void dpp_destroy_agent(struct dpp_sm *dpp)
-+{
-+	if (!dpp->agent)
-+		return;
-+
-+	if (dpp->agent->pending_id) {
-+		dpp_agent_cancel(dpp);
-+		l_dbus_cancel(dbus_get_bus(), dpp->agent->pending_id);
-+	}
-+
-+	dpp_agent_release(dpp);
-+
-+	l_debug("Released SharedCodeAgent on path %s", dpp->agent->path);
-+
-+	pkex_agent_free(dpp->agent);
-+	dpp->agent = NULL;
- }
- 
- static void dpp_free_auth_data(struct dpp_sm *dpp)
-@@ -415,6 +487,11 @@ static void dpp_reset(struct dpp_sm *dpp)
- 		dpp->retry_timeout = NULL;
- 	}
- 
-+	if (dpp->pkex_scan_id) {
-+		scan_cancel(dpp->wdev_id, dpp->pkex_scan_id);
-+		dpp->pkex_scan_id = 0;
-+	}
-+
- 	dpp->state = DPP_STATE_NOTHING;
- 	dpp->new_freq = 0;
- 	dpp->frame_retry = 0;
-@@ -431,6 +508,8 @@ static void dpp_reset(struct dpp_sm *dpp)
- 	explicit_bzero(dpp->z, dpp->key_len);
- 	explicit_bzero(dpp->u, dpp->u_len);
- 
-+	dpp_destroy_agent(dpp);
-+
- 	dpp_free_pending_pkex_data(dpp);
- 
- 	dpp_free_auth_data(dpp);
-@@ -458,6 +537,11 @@ static void dpp_free(struct dpp_sm *dpp)
- 		dpp->boot_private = NULL;
- 	}
- 
-+	if (dpp->agent) {
-+		pkex_agent_free(dpp->agent);
-+		dpp->agent = NULL;
-+	}
-+
- 	l_free(dpp);
- }
- 
-@@ -1800,6 +1884,18 @@ static void dpp_offchannel_timeout(int error, void *user_data)
- 
- 	switch (dpp->state) {
- 	case DPP_STATE_PKEX_EXCHANGE:
-+		if (dpp->role != DPP_CAPABILITY_CONFIGURATOR || !dpp->agent)
-+			break;
-+
-+		/*
-+		 * We have a pending agent request but it did not arrive in
-+		 * time, we cant assume the enrollee will be waiting around
-+		 * for our response so cancel the request and continue waiting
-+		 * for another request
-+		 */
-+		if (dpp->agent->pending_id)
-+			dpp_free_pending_pkex_data(dpp);
-+		/* Fall through */
- 	case DPP_STATE_PRESENCE:
- 		break;
- 	case DPP_STATE_NOTHING:
-@@ -2912,6 +3008,63 @@ bad_code:
- 	return;
- }
- 
-+static void dpp_pkex_agent_reply(struct l_dbus_message *message,
-+					void *user_data)
-+{
-+	struct dpp_sm *dpp = user_data;
-+	const char *error, *text;
-+	const char *code;
-+
-+	dpp->agent->pending_id = 0;
-+
-+	l_debug("SharedCodeAgent %s path %s replied", dpp->agent->owner,
-+			dpp->agent->path);
-+
-+	if (l_dbus_message_get_error(message, &error, &text)) {
-+		l_error("RequestSharedCode(%s) returned %s(\"%s\")",
-+				dpp->pkex_id, error, text);
-+		goto reset;
-+	}
-+
-+	if (!l_dbus_message_get_arguments(message, "s", &code)) {
-+		l_debug("Invalid arguments, check SharedCodeAgent!");
-+		goto reset;
-+	}
-+
-+	dpp->pkex_key = l_strdup(code);
-+	dpp_process_pkex_exchange_request(dpp, dpp->peer_encr_key);
-+
-+	return;
-+
-+reset:
-+	dpp_free_pending_pkex_data(dpp);
-+}
-+
-+static bool dpp_pkex_agent_request(struct dpp_sm *dpp)
-+{
-+	struct l_dbus_message *msg;
-+
-+	if (!dpp->agent)
-+		return false;
-+
-+	if (L_WARN_ON(dpp->agent->pending_id))
-+		return false;
-+
-+	msg = l_dbus_message_new_method_call(dbus_get_bus(),
-+						dpp->agent->owner,
-+						dpp->agent->path,
-+						IWD_SHARED_CODE_AGENT_INTERFACE,
-+						"RequestSharedCode");
-+	l_dbus_message_set_arguments(msg, "s", dpp->pkex_id);
-+
-+
-+	dpp->agent->pending_id = l_dbus_send_with_reply(dbus_get_bus(),
-+							msg,
-+							dpp_pkex_agent_reply,
-+							dpp, NULL);
-+	return dpp->agent->pending_id != 0;
-+}
-+
- static void dpp_handle_pkex_exchange_request(struct dpp_sm *dpp,
- 					const uint8_t *from,
- 					const uint8_t *body, size_t body_len)
-@@ -3012,6 +3165,29 @@ static void dpp_handle_pkex_exchange_request(struct dpp_sm *dpp,
- 
- 	memcpy(dpp->peer_addr, from, 6);
- 
-+	if (!dpp->pkex_key) {
-+		if (!id) {
-+			l_debug("Configurator started with agent but enrollee "
-+				"sent no identifier, ignoring");
-+			return;
-+		}
-+
-+		dpp->pkex_id = l_strndup(id, id_len);
-+
-+		/* Need to obtain code from agent */
-+		if (!dpp_pkex_agent_request(dpp)) {
-+			l_debug("Failed to request code from agent!");
-+			dpp_free_pending_pkex_data(dpp);
-+			return;
-+		}
-+
-+		/* Save the encrypted key/identifier for the agent callback */
-+
-+		dpp->peer_encr_key = l_steal_ptr(m);
-+
-+		return;
-+	}
-+
- 	dpp_process_pkex_exchange_request(dpp, m);
- 
- 	return;
-@@ -3931,8 +4107,34 @@ invalid_args:
- 	return dbus_error_invalid_args(message);
- }
- 
-+static void pkex_agent_disconnect(struct l_dbus *dbus, void *user_data)
-+{
-+	struct dpp_sm *dpp = user_data;
-+
-+	l_debug("SharedCodeAgent %s disconnected", dpp->agent->path);
-+
-+	dpp_reset(dpp);
-+}
-+
-+static void dpp_create_agent(struct dpp_sm *dpp, const char *path,
-+					struct l_dbus_message *message)
-+{
-+	const char *sender = l_dbus_message_get_sender(message);
-+
-+	dpp->agent = l_new(struct pkex_agent, 1);
-+	dpp->agent->owner = l_strdup(sender);
-+	dpp->agent->path = l_strdup(path);
-+	dpp->agent->disconnect_watch = l_dbus_add_disconnect_watch(dbus_get_bus(),
-+							sender,
-+							pkex_agent_disconnect,
-+							dpp, NULL);
-+
-+	l_debug("Registered a SharedCodeAgent on path %s", path);
-+}
-+
- static struct l_dbus_message *dpp_start_pkex_configurator(struct dpp_sm *dpp,
- 					const char *key, const char *identifier,
-+					const char *agent_path,
- 					struct l_dbus_message *message)
- {
- 	struct handshake_state *hs = netdev_get_handshake(dpp->netdev);
-@@ -3959,6 +4161,9 @@ static struct l_dbus_message *dpp_start_pkex_configurator(struct dpp_sm *dpp,
- 	if (key)
- 		dpp->pkex_key = l_strdup(key);
- 
-+	if (agent_path)
-+		dpp_create_agent(dpp, agent_path, message);
-+
- 	dpp->role = DPP_CAPABILITY_CONFIGURATOR;
- 	dpp->state = DPP_STATE_PKEX_EXCHANGE;
- 	dpp->current_freq = bss->frequency;
-@@ -3970,7 +4175,10 @@ static struct l_dbus_message *dpp_start_pkex_configurator(struct dpp_sm *dpp,
- 	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
- 	dpp_pkex_property_changed_notify(dpp);
- 
--	l_debug("Starting PKEX configurator for single enrollee");
-+	if (dpp->pkex_key)
-+		l_debug("Starting PKEX configurator for single enrollee");
-+	else
-+		l_debug("Starting PKEX configurator with agent");
- 
- 	return l_dbus_message_new_method_return(message);
- }
-@@ -3989,7 +4197,21 @@ static struct l_dbus_message *dpp_dbus_pkex_configure_enrollee(
- 	if (!dpp_parse_pkex_args(message, &key, &id))
- 		return dbus_error_invalid_args(message);
- 
--	return dpp_start_pkex_configurator(dpp, key, id, message);
-+	return dpp_start_pkex_configurator(dpp, key, id, NULL, message);
-+}
-+
-+static struct l_dbus_message *dpp_dbus_pkex_start_configurator(
-+						struct l_dbus *dbus,
-+						struct l_dbus_message *message,
-+						void *user_data)
-+{
-+	struct dpp_sm *dpp = user_data;
-+	const char *path;
-+
-+	if (!l_dbus_message_get_arguments(message, "o", &path))
-+		return dbus_error_invalid_args(message);
-+
-+	return dpp_start_pkex_configurator(dpp, NULL, NULL, path, message);
- }
- 
- static void dpp_setup_interface(struct l_dbus_interface *interface)
-@@ -4030,6 +4252,8 @@ static void dpp_setup_pkex_interface(struct l_dbus_interface *interface)
- 			dpp_dbus_pkex_stop, "", "");
- 	l_dbus_interface_method(interface, "ConfigureEnrollee", 0,
- 			dpp_dbus_pkex_configure_enrollee, "", "a{sv}", "args");
-+	l_dbus_interface_method(interface, "StartConfigurator", 0,
-+			dpp_dbus_pkex_start_configurator, "", "o", "path");
- 
- 	l_dbus_interface_property(interface, "Started", 0, "b",
- 			dpp_pkex_get_started, NULL);
--- 
-2.25.1
-
+Denis, looks like minheap.c/h wasn't added to ELL when you added the 
+pmksa skeleton.
