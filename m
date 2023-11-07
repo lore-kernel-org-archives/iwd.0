@@ -1,115 +1,82 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36063159C
-	for <iwd@lists.linux.dev>; Tue,  7 Nov 2023 15:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317BC168BC
+	for <iwd@lists.linux.dev>; Tue,  7 Nov 2023 17:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KpfH4MNZ"
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3b2e330033fso3466568b6e.3
-        for <iwd@lists.linux.dev>; Tue, 07 Nov 2023 07:45:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mL4GXW/a"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5a82c2eb50cso65173787b3.2
+        for <iwd@lists.linux.dev>; Tue, 07 Nov 2023 09:06:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699371930; x=1699976730; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=73vE/5/6/ZDKUdzzb9AjAJVNOAsEEiW0rRZJZ6NmzDo=;
-        b=KpfH4MNZ35vbA0WUIuQNczxvE2Dln/+YWCna0O1AKpfLBgKLhPFw6B4Po8oNlF/OXy
-         qiZRMUtFiJE0F5mZAynx5K4sh0fc69mk9OTSj5BXPqKqxrAvpJryQR2HtOz05/bdbfpy
-         omhiblnXUpskaWxp7sEjj1/GSCp3S4/Ub9376ROxKmIyDQTf8MXjkKhcMfGBIcNyRQy1
-         u5gQbtFHpcs6pWozpc8dO4WYsrs41E2U3M92dpXr2YvIcXzED0EWeGrDK9JDVv4Aeblk
-         tSXRLoRLf0Go7z5+XVCiM9E2O1lxsZSqdJj3vwy4Bjh9tC0bm+4z31TfnSuWKdnUQA4D
-         TrSA==
+        d=gmail.com; s=20230601; t=1699376794; x=1699981594; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=03+F6QUGBeeHFsyB0PO6qLm9CEVx00FdtKNyOdhb0xg=;
+        b=mL4GXW/aZ1bFPo9AoRsKDOoIJSLSYwRRWWGtpVosfqR6MYzXXIzwc+E4+aNew+fCpI
+         BXa6YkV7mnLoYmK0UIoQ4w+JZgjU9uYlGdYjdRlOf7FUw6OulFDIYh1VUbKgyktZsUcf
+         WvJ2fbirTJBsGzFpuwVRBNL4T+CuVm+YCcBxkjMo0GFT0g3j0j5oCPEbgyy7ITltgQTK
+         II9U4Xod45Q972JCccjZqdtUExyjvxpEHUw8JMpU/c638pOAkVz2f09r0SR+jZCQibDj
+         eHXeifAIRIfRHH8ayEbSxq2EfxCoiXQTZ0n7EFTZpKRnJZ1PZms7Pe4btCMQRmCJv277
+         4fow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699371930; x=1699976730;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=73vE/5/6/ZDKUdzzb9AjAJVNOAsEEiW0rRZJZ6NmzDo=;
-        b=n/DDQzD07TgnSQ7DUriRft2sWllY6PM5C1NZWIKw57w1Gxr45MQxsm5DBAWToGTg6c
-         0HlrZemFPWwjpvTUMX8eMrC5qpOCsUTjp1Hp0eJoqsXB4fW6Oau1WLnjJBVbqRDs2S2e
-         gRHurJiNnb29zAWxVM51ovaqeMKBra9nsmC+GVoXBy4of+bf/8HJksqFbH2bD5Dsxik+
-         JR45DnnWJZoUqBxdNELrv6Fpvqz0lB5H7MDr8SLsuVkE2cTp7M+ynN1rf7c+SHVwG9O2
-         PnCHMj4Nb9G0/ghR5qYJeBGsSO787k8n+GFEUPO8njJmVbKtIfo8MW8rO60t6cRYtbl6
-         wr+w==
-X-Gm-Message-State: AOJu0YwWm3/ZaWIhfj9h+dbq/x8mBz97A3LF2+BgCbEXLDTevN4yGj51
-	t9/osOv1tYd1kyRai13bG3k=
-X-Google-Smtp-Source: AGHT+IFRe1a0u40YwHzOGNyd3aT5lC0JjNtl94Lxkb+0DvbA5sqE7sqnAAnjRcAvJEiBp6/A1Oluzw==
-X-Received: by 2002:a05:6808:649:b0:3b2:db24:6384 with SMTP id z9-20020a056808064900b003b2db246384mr32680627oih.38.1699371929884;
-        Tue, 07 Nov 2023 07:45:29 -0800 (PST)
-Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id f13-20020a05680814cd00b003a78d196acasm1604361oiw.32.2023.11.07.07.45.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Nov 2023 07:45:29 -0800 (PST)
-Message-ID: <ced2eb2b-187f-4d4e-bffa-b1e8b46233ca@gmail.com>
-Date: Tue, 7 Nov 2023 09:45:27 -0600
+        d=1e100.net; s=20230601; t=1699376794; x=1699981594;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=03+F6QUGBeeHFsyB0PO6qLm9CEVx00FdtKNyOdhb0xg=;
+        b=wwzyzwGW/gsWWLx4SVzZXKRPBO+qbbzX2S+TATeJvcux0gT9m2jhONR5vfySsFlrSR
+         j3ef1qI/pSPt9S5W8zQstTragpGV9UB1go/N2Kk6izbhRXBOPOoT0rti30lwF2mPeGND
+         xYb0f2kZ/APlitQ5vPX3UM+ORc6PYeNU3oXxPfiMauVb50MgifuBTvvQkTR5sGqWO1FE
+         F05Gb5N1jSW+SdAyG7uXDddtMpu5SsFeiLCqGjQs5K9O43MuRhOIvkhwDeioNp4xxMGm
+         sfCmgKhBbD6kR01qr51RyetVUBSou5e0MZN0KuxYDIo2FUpEA+cyX6f4fHJeRO17QqB1
+         6Xmw==
+X-Gm-Message-State: AOJu0YypLXLPP2o5Wy//kjSUBaW+hAzOV79d5iJyeW58TAm5I2jdNuIE
+	jVqocisL24fdkK49/9JNygRi0xCcHm0=
+X-Google-Smtp-Source: AGHT+IGezKD+5YLsdsSmxW0twX3NEnHJKxxlJ2VKWV6WFZFWZepUqbphZ7rUu74EX9hfCvZM5pnRYQ==
+X-Received: by 2002:a0d:d744:0:b0:5a7:dbf4:6a1e with SMTP id z65-20020a0dd744000000b005a7dbf46a1emr10117199ywd.33.1699376793877;
+        Tue, 07 Nov 2023 09:06:33 -0800 (PST)
+Received: from LOCLAP699.rst-07.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id z127-20020a814c85000000b005a7db2a0dddsm5790475ywa.3.2023.11.07.09.06.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 09:06:33 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v4 0/4] DPP PKEX Changes
+Date: Tue,  7 Nov 2023 09:06:25 -0800
+Message-Id: <20231107170629.1831655-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] station: start roam on beacon loss event
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20231107141140.1706441-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20231107141140.1706441-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+v4:
+ * Fixed minor documentation issues
+ * Documented Stop()
+ * Removed Register/Unregister agent APIs, StartConfigurator
+   will now take the path directly and unregister upon PKEX/DPP
+   finishing.
+ * Reworked patches to be more sequential:
+       1. StartEnrollee()
+       2. ConfigureEnrollee()
+       3. StartConfigurator() (agent support)
 
-On 11/7/23 08:11, James Prestwood wrote:
-> Beacon loss handling was removed in the past because it was
-> determined that this even always resulted in a disconnect. This
-> was short sighted and not always true. The default kernel behavior
-> waits for 7 lost beacons before emitting this event, then sends
-> either a few nullfuncs or probe requests to the BSS to determine
-> if its really gone. If these come back successfully the connection
-> will remain alive. This can give IWD some time to roam in some
-> cases so we should be handling this event.
-> 
-> Since beacon loss indicates a very poor connection the roam scan
-> is delayed by a few seconds in order to give the kernel a chance
-> to send the nullfuncs/probes or receive more beacons. This may
-> result in a disconnect, but it would have happened anyways.
-> Attempting a roam mainly handles the case when the connection can
-> be maintained after beacon loss, but is still poor.
-> ---
->   src/netdev.h  |  1 +
->   src/station.c | 18 ++++++++++++++++++
->   2 files changed, 19 insertions(+)
-> 
-> v2:
->   * Delay the roam to give the kernel a chance to salvage the
->     connection
-> 
-> FYI, I did attempt to add back the beacon loss test without much
-> luck. Blocking beacons with hwsim did not result in a beacon loss
-> event which may have been one of the reasons it was removed in the
-> first place. Even blocking _all_ frames doesn't result in an event
-> but instead just a local disconnect.
+James Prestwood (4):
+  doc: PKEX support for DPP
+  dpp: initial version of PKEX enrollee support
+  dpp: initial version of PKEX configurator support
+  dpp: Add StartConfigurator, PKEX agent support
 
-Good info, thanks for doing this.  Guess we'll have to rely on manual testing 
-for this feature. :(
+ doc/device-provisioning-api.txt |  142 +++
+ src/dpp.c                       | 1658 +++++++++++++++++++++++++++++--
+ 2 files changed, 1726 insertions(+), 74 deletions(-)
 
-> 
-> After looking more into it I see that actually only a few drivers
-> even use ieee80211_beacon_loss/ieee80211_connection_loss:
-> 
-> iwlwifi,wl1251,intersil,mt76,wfx,ath10/11k,wcn36xx
-> 
-> Every other driver likely disconnects rather than attempts to
-> handle beacon loss. So probably for the majority of users this
-> actually didn't matter, but for these drivers it does make sense
-> to handle the event.
-> 
-
-All applied, thanks.
-
-Regards,
--Denis
+-- 
+2.25.1
 
