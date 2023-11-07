@@ -1,53 +1,53 @@
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072ED328BA
-	for <iwd@lists.linux.dev>; Tue,  7 Nov 2023 17:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2274D328CF
+	for <iwd@lists.linux.dev>; Tue,  7 Nov 2023 17:06:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8z1wEvU"
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-5a7af52ee31so69885557b3.2
-        for <iwd@lists.linux.dev>; Tue, 07 Nov 2023 09:06:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJ/xfhUg"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-579de633419so71291747b3.3
+        for <iwd@lists.linux.dev>; Tue, 07 Nov 2023 09:06:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699376798; x=1699981598; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1699376799; x=1699981599; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yti3rksEYxxgpIixPhuNQ+tSF0EdwsCqJ62LlD6CihQ=;
-        b=Q8z1wEvUspE3vth57cHn72ZGH8931O9S8keg+fK22ioY6rhQJkHMqNv0/E5JVYzzIu
-         TdkXNtTyewXbh89tGTYYyK2nlC2gaNfNioUEJuDlWhb3cA+UxzPxKx93kZKcZrU/+/mG
-         yQ+AtUyQH/w0JJ3zOXlBJHepcWkvh/gpgBr/4i4w9enfpbUJOYJiyxq1eGgIbdb4qcBM
-         NO/S+W2K5UFwdjUeAq3JYE12JQ0/CD+vYz9htKxSxa6P4/fIp3LnRQIQAvEvTF3I5Ucm
-         96AXrof/lK5tT2LyaRuGUg1dDx1ZdwukrvkTaDmX1WCdfqaj89KhOGKSJNDkMjiSCR5x
-         euiA==
+        bh=7xBGJyoXTq0MSbOdfze229fZHCiTaG0F2j8ENgmISQM=;
+        b=kJ/xfhUgTg8XMNvRX2PcnuldFACXS13k7YVVY217/YCOxWVA5J0V+i1GGeoBgELGmZ
+         rtfgeMCqBQvF5hMi2+I88qGcRkYD6rZ2A+fgNWSnVhvUBrCSJdFQK4zGrp2f+JqtywuF
+         Iw/W8VnKhpYsVVKqAwkvzMob/z6Vo89Osh/XTA87KnbJ5VQycL5If9z9lXHi2FD1PQ7Q
+         k406CGDYxHmnpzcGoYql6NMtCPIeroHYfbd6j6LIE6WFvRLhjwWT6x6PrESL7Id/Uuo/
+         Id6fEJpY89pegnb4gjr5zztITvTge4UvLwp1a85jvlOBYlhB6l5qzVxl0WSij6keAt+O
+         g+5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699376798; x=1699981598;
+        d=1e100.net; s=20230601; t=1699376799; x=1699981599;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yti3rksEYxxgpIixPhuNQ+tSF0EdwsCqJ62LlD6CihQ=;
-        b=I5SLdezL/8GiBbYjjO6waIIMSTv4CNdAcM32FeukIhOt37lvJ3BsDgIRyq62S9TClA
-         WH59Z0evJTHTjtaGCu2f4k3DfrEfYphM+eu7Z/XPXx7axa+QlbvrdVtiJE7aWB/g1cfv
-         nXTRWXQuy2+VFUAbF5ORal83qjujRHJu0YNTEcD8rljkG37/4WviPNodrLInN8BS3dh3
-         mq6PPcKjSzf26WYvgw848oktLtZhKagoB2E301tkjLG9giP3Sk40bV0qkMTA4PMImGjY
-         AijjSlU4OAsgpKzufr+sYqSStgLRYNhfVDHhlx0GKdt1h2BrEIeCILlLryW/JreqkmHC
-         nAmQ==
-X-Gm-Message-State: AOJu0YxpQFkLm+tMwCWzKlZJXGtOisY3TjJ+uV5l97rN2hOhVB4nh+hJ
-	BA53GuxfpA0oWjl7/HIRuBPtpyrHyHQ=
-X-Google-Smtp-Source: AGHT+IEzJhHy+OEh/fKrN0l/b/tCB6LIcSqdbO48MVGnUxPZX3HLR75KxuSsDyCIhj4ZZ7GNN2YxDA==
-X-Received: by 2002:a81:570c:0:b0:5a7:b942:c3fe with SMTP id l12-20020a81570c000000b005a7b942c3femr13313830ywb.16.1699376797633;
-        Tue, 07 Nov 2023 09:06:37 -0800 (PST)
+        bh=7xBGJyoXTq0MSbOdfze229fZHCiTaG0F2j8ENgmISQM=;
+        b=E8qEPb2qR+Gl7NBEN2ZTDqJuE5UVegPB4Q8fZdxnPHJhnRdlWsOR5m4TYpOYhYo1ZO
+         76myHQ9odunCHcjXIAB7MQdpo9QSHTrOKxXN6f+NRvM6XIBOWXnPJ1kOk98WOo1neMZQ
+         uh7jGweUCRalQ4gg92yYOIoMX0QGXr6mKLCS4HePwX8OA4x+G6WMo7OnhC2XFfMDvpvk
+         csuo5yj9idOzN9Q/rbmvk7jJWcG/CrmEm4jJlbkEEx8yuEyMN8TunM/xy24g2X166Kza
+         a/kVfUo+rT45Ddtx4J7I7DRPmIiHRBLRwn1gQ46aBC9j1KdX376xTGLNXul3Nup9Sy8J
+         2lNw==
+X-Gm-Message-State: AOJu0YxprnnJTFHdkkQBv5QEbtozRk3UtDS8hsijrKL/57toHYC6Qo9r
+	3d1yZTrO4wBgj9mD6LgifD3FvasVMOY=
+X-Google-Smtp-Source: AGHT+IEu1pDXVRuM8v8hCUUfXyeorlSvzlE4gepONyOR9uipj9M993Y/YXSjRrPwYp4UphvgX6E0SQ==
+X-Received: by 2002:a81:658b:0:b0:583:a3ab:b950 with SMTP id z133-20020a81658b000000b00583a3abb950mr35432ywb.50.1699376798953;
+        Tue, 07 Nov 2023 09:06:38 -0800 (PST)
 Received: from LOCLAP699.rst-07.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id z127-20020a814c85000000b005a7db2a0dddsm5790475ywa.3.2023.11.07.09.06.36
+        by smtp.gmail.com with ESMTPSA id z127-20020a814c85000000b005a7db2a0dddsm5790475ywa.3.2023.11.07.09.06.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 09:06:37 -0800 (PST)
+        Tue, 07 Nov 2023 09:06:38 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 3/4] dpp: initial version of PKEX configurator support
-Date: Tue,  7 Nov 2023 09:06:28 -0800
-Message-Id: <20231107170629.1831655-4-prestwoj@gmail.com>
+Subject: [PATCH v4 4/4] dpp: Add StartConfigurator, PKEX agent support
+Date: Tue,  7 Nov 2023 09:06:29 -0800
+Message-Id: <20231107170629.1831655-5-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231107170629.1831655-1-prestwoj@gmail.com>
 References: <20231107170629.1831655-1-prestwoj@gmail.com>
@@ -57,565 +57,359 @@ List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The PKEX configurator role is currently limited to being a responder.
-When started the configurator will listen on its current operating
-channel for a PKEX exchange request. Once received it and the
-encrypted key is properly decrypted it treats this peer as the
-enrollee and won't allow configurations from other peers unless
-PKEX is restarted. The configurator will encrypt and send its
-encrypted ephemeral key in the PKEX exchange response. The enrollee
-then sends its encrypted bootstrapping key (as commit-reveal request)
-then the same for the configurator (as commit-reveal response).
+Adds a configurator variant to be used along side an agent. When
+called the configurator will start and wait for an initial PKEX
+exchange message from an enrollee at which point it will request
+the code from an agent. This provides more flexibility for
+configurators that are capable of configuring multiple enrollees
+with different identifiers/codes.
 
-After this, PKEX authentication begins. The enrollee is expected to
-send the authenticate request, since its the initiator.
+Note that the timing requirements per the DPP spec still apply
+so this is not meant to be used with a human configurator but
+within an automated agent which does a quick lookup of potential
+identifiers/codes and can reply within the 200ms window.
 ---
- src/dpp.c | 504 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 503 insertions(+), 1 deletion(-)
+ src/dpp.c | 228 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 226 insertions(+), 2 deletions(-)
 
 diff --git a/src/dpp.c b/src/dpp.c
-index 4b1c1233..86361ba0 100644
+index 86361ba0..265fa971 100644
 --- a/src/dpp.c
 +++ b/src/dpp.c
-@@ -1887,7 +1887,8 @@ static void authenticate_request(struct dpp_sm *dpp, const uint8_t *from,
- 	if (util_is_broadcast_address(from))
- 		return;
+@@ -82,6 +82,13 @@ enum dpp_capability {
+ 	DPP_CAPABILITY_CONFIGURATOR = 0x02,
+ };
  
--	if (dpp->state != DPP_STATE_PRESENCE)
-+	if (dpp->state != DPP_STATE_PRESENCE &&
-+				dpp->state != DPP_STATE_AUTHENTICATING)
- 		return;
++struct pkex_agent {
++	char *owner;
++	char *path;
++	unsigned int disconnect_watch;
++	uint32_t pending_id;
++};
++
+ struct dpp_sm {
+ 	struct netdev *netdev;
+ 	char *uri;
+@@ -104,6 +111,8 @@ struct dpp_sm {
  
- 	l_debug("authenticate request");
-@@ -2746,6 +2747,436 @@ failed:
- 	dpp_reset(dpp);
+ 	enum dpp_state state;
+ 
++	struct pkex_agent *agent;
++
+ 	/*
+ 	 * List of frequencies to jump between. The presence of this list is
+ 	 * also used to signify that a configurator is an initiator vs responder
+@@ -154,6 +163,7 @@ struct dpp_sm {
+ 	char *pkex_id;
+ 	char *pkex_key;
+ 	uint8_t pkex_version;
++	struct l_ecc_point *peer_encr_key;
+ 	struct l_ecc_point *pkex_m;
+ 	/* Ephemeral key Y' or X' for enrollee or configurator */
+ 	struct l_ecc_point *y_or_x;
+@@ -317,6 +327,68 @@ static void dpp_free_pending_pkex_data(struct dpp_sm *dpp)
+ 	}
+ 
+ 	memset(dpp->peer_addr, 0, sizeof(dpp->peer_addr));
++
++	if (dpp->peer_encr_key) {
++		l_ecc_point_free(dpp->peer_encr_key);
++		dpp->peer_encr_key = NULL;
++	}
++}
++
++static void pkex_agent_free(void *data)
++{
++	struct pkex_agent *agent = data;
++
++	l_free(agent->owner);
++	l_free(agent->path);
++	l_dbus_remove_watch(dbus_get_bus(), agent->disconnect_watch);
++	l_free(agent);
++}
++
++static void dpp_agent_cancel(struct dpp_sm *dpp)
++{
++	struct l_dbus_message *msg;
++
++	const char *reason = "shutdown";
++
++	msg = l_dbus_message_new_method_call(dbus_get_bus(),
++						dpp->agent->owner,
++						dpp->agent->path,
++						IWD_SHARED_CODE_AGENT_INTERFACE,
++						"Cancel");
++	l_dbus_message_set_arguments(msg, "s", reason);
++	l_dbus_message_set_no_reply(msg, true);
++	l_dbus_send(dbus_get_bus(), msg);
++}
++
++static void dpp_agent_release(struct dpp_sm *dpp)
++{
++	struct l_dbus_message *msg;
++
++	msg = l_dbus_message_new_method_call(dbus_get_bus(),
++						dpp->agent->owner,
++						dpp->agent->path,
++						IWD_SHARED_CODE_AGENT_INTERFACE,
++						"Release");
++	l_dbus_message_set_no_reply(msg, true);
++	l_dbus_send(dbus_get_bus(), msg);
++}
++
++static void dpp_destroy_agent(struct dpp_sm *dpp)
++{
++	if (!dpp->agent)
++		return;
++
++	if (dpp->agent->pending_id) {
++		dpp_agent_cancel(dpp);
++		l_dbus_cancel(dbus_get_bus(), dpp->agent->pending_id);
++	}
++
++	dpp_agent_release(dpp);
++
++	l_debug("Released SharedCodeAgent on path %s", dpp->agent->path);
++
++	pkex_agent_free(dpp->agent);
++	dpp->agent = NULL;
  }
  
-+static void dpp_send_bad_group(struct dpp_sm *dpp, const uint8_t *addr)
-+{
-+	uint8_t hdr[32];
-+	uint8_t attrs[256];
-+	uint8_t *ptr = attrs;
-+	uint16_t group;
-+	uint8_t status = DPP_STATUS_BAD_GROUP;
-+	struct iovec iov[2];
-+	const uint8_t *own_mac = netdev_get_address(dpp->netdev);
-+
-+	l_put_le16(l_ecc_curve_get_ike_group(dpp->curve), &group);
-+
-+	iov[0].iov_len = dpp_build_header(own_mac, addr,
-+				DPP_FRAME_PKEX_XCHG_RESPONSE, hdr);
-+	iov[0].iov_base = hdr;
-+
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &status, 1);
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_PROTOCOL_VERSION,
-+				&dpp->pkex_version, 1);
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_FINITE_CYCLIC_GROUP, &group, 2);
-+
-+	iov[1].iov_base = attrs;
-+	iov[1].iov_len = ptr - attrs;
-+
-+	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
-+}
-+
-+static void dpp_send_bad_code(struct dpp_sm *dpp, const uint8_t *addr)
-+{
-+	uint8_t hdr[32];
-+	uint8_t attrs[256];
-+	uint8_t *ptr = attrs;
-+	uint8_t status = DPP_STATUS_BAD_CODE;
-+	struct iovec iov[2];
-+	const uint8_t *own_mac = netdev_get_address(dpp->netdev);
-+
-+	iov[0].iov_len = dpp_build_header(own_mac, addr,
-+				DPP_FRAME_PKEX_XCHG_RESPONSE, hdr);
-+	iov[0].iov_base = hdr;
-+
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &status, 1);
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_PROTOCOL_VERSION,
-+				&dpp->pkex_version, 1);
-+	if (dpp->pkex_id)
-+		ptr += dpp_append_attr(ptr, DPP_ATTR_CODE_IDENTIFIER,
-+					dpp->pkex_id, strlen(dpp->pkex_id));
-+
-+	iov[1].iov_base = attrs;
-+	iov[1].iov_len = ptr - attrs;
-+
-+	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
-+}
-+
-+static void dpp_send_pkex_exchange_response(struct dpp_sm *dpp,
-+						struct l_ecc_point *n)
-+{
-+	uint8_t hdr[32];
-+	uint8_t attrs[256];
-+	uint8_t *ptr = attrs;
-+	uint64_t n_data[L_ECC_MAX_DIGITS * 2];
-+	uint16_t group;
-+	uint8_t status = DPP_STATUS_OK;
-+	struct iovec iov[2];
-+	const uint8_t *own_mac = netdev_get_address(dpp->netdev);
-+
-+	l_put_le16(l_ecc_curve_get_ike_group(dpp->curve), &group);
-+
-+	iov[0].iov_len = dpp_build_header(own_mac, dpp->peer_addr,
-+				DPP_FRAME_PKEX_XCHG_RESPONSE, hdr);
-+	iov[0].iov_base = hdr;
-+
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &status, 1);
-+
-+	if (dpp->pkex_id)
-+		ptr += dpp_append_attr(ptr, DPP_ATTR_CODE_IDENTIFIER,
-+					dpp->pkex_id, strlen(dpp->pkex_id));
-+
-+	l_ecc_point_get_data(n, n_data, sizeof(n_data));
-+
-+	ptr += dpp_append_attr(ptr, DPP_ATTR_ENCRYPTED_KEY,
-+				n_data, dpp->key_len * 2);
-+
-+	iov[1].iov_base = attrs;
-+	iov[1].iov_len = ptr - attrs;
-+
-+	dpp->state = DPP_STATE_PKEX_COMMIT_REVEAL;
-+
-+	dpp_pkex_property_changed_notify(dpp);
-+
-+	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
-+}
-+
-+static void dpp_process_pkex_exchange_request(struct dpp_sm *dpp,
-+						struct l_ecc_point *m)
-+{
-+	_auto_(l_ecc_point_free) struct l_ecc_point *n = NULL;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *qr = NULL;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *qi = NULL;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *k = NULL;
-+	const uint8_t *own_addr = netdev_get_address(dpp->netdev);
-+
-+	/* Qi = H(MAC-Initiator | [identifier | ] code) * Pi */
-+	qi = dpp_derive_qi(dpp->curve, dpp->pkex_key, dpp->pkex_id,
-+				dpp->peer_addr);
-+	if (!qi) {
-+		l_debug("could not derive Qi");
-+		return;
+ static void dpp_free_auth_data(struct dpp_sm *dpp)
+@@ -415,6 +487,11 @@ static void dpp_reset(struct dpp_sm *dpp)
+ 		dpp->retry_timeout = NULL;
+ 	}
+ 
++	if (dpp->pkex_scan_id) {
++		scan_cancel(dpp->wdev_id, dpp->pkex_scan_id);
++		dpp->pkex_scan_id = 0;
 +	}
 +
-+	/* X' = M - Qi */
-+	dpp->y_or_x = l_ecc_point_new(dpp->curve);
+ 	dpp->state = DPP_STATE_NOTHING;
+ 	dpp->new_freq = 0;
+ 	dpp->frame_retry = 0;
+@@ -431,6 +508,8 @@ static void dpp_reset(struct dpp_sm *dpp)
+ 	explicit_bzero(dpp->z, dpp->key_len);
+ 	explicit_bzero(dpp->u, dpp->u_len);
+ 
++	dpp_destroy_agent(dpp);
 +
-+	l_ecc_point_inverse(qi);
-+	l_ecc_point_add(dpp->y_or_x, m, qi);
-+
-+	/*
-+	 * "The resulting ephemeral key, denoted X’, is checked whether it is
-+	 * the point-at-infinity. If it is not valid, the protocol silently
-+	 * fails"
-+	 */
-+	if (l_ecc_point_is_infinity(dpp->y_or_x)) {
-+		l_debug("X' is at infinity, ignore message");
-+		dpp_reset(dpp);
-+		return;
+ 	dpp_free_pending_pkex_data(dpp);
+ 
+ 	dpp_free_auth_data(dpp);
+@@ -458,6 +537,11 @@ static void dpp_free(struct dpp_sm *dpp)
+ 		dpp->boot_private = NULL;
+ 	}
+ 
++	if (dpp->agent) {
++		pkex_agent_free(dpp->agent);
++		dpp->agent = NULL;
 +	}
 +
-+	qr = dpp_derive_qr(dpp->curve, dpp->pkex_key, dpp->pkex_id, own_addr);
-+	if (!qr || l_ecc_point_is_infinity(qr)) {
-+		l_debug("Qr did not derive");
-+		l_ecc_point_free(dpp->y_or_x);
-+		dpp->y_or_x = NULL;
-+		goto bad_code;
+ 	l_free(dpp);
+ }
+ 
+@@ -1800,6 +1884,18 @@ static void dpp_offchannel_timeout(int error, void *user_data)
+ 
+ 	switch (dpp->state) {
+ 	case DPP_STATE_PKEX_EXCHANGE:
++		if (dpp->role != DPP_CAPABILITY_CONFIGURATOR || !dpp->agent)
++			break;
++
++		/*
++		 * We have a pending agent request but it did not arrive in
++		 * time, we cant assume the enrollee will be waiting around
++		 * for our response so cancel the request and continue waiting
++		 * for another request
++		 */
++		if (dpp->agent->pending_id)
++			dpp_free_pending_pkex_data(dpp);
++		/* Fall through */
+ 	case DPP_STATE_PRESENCE:
+ 		break;
+ 	case DPP_STATE_NOTHING:
+@@ -2912,6 +3008,63 @@ bad_code:
+ 	return;
+ }
+ 
++static void dpp_pkex_agent_reply(struct l_dbus_message *message,
++					void *user_data)
++{
++	struct dpp_sm *dpp = user_data;
++	const char *error, *text;
++	const char *code;
++
++	dpp->agent->pending_id = 0;
++
++	l_debug("SharedCodeAgent %s path %s replied", dpp->agent->owner,
++			dpp->agent->path);
++
++	if (l_dbus_message_get_error(message, &error, &text)) {
++		l_error("RequestSharedCode(%s) returned %s(\"%s\")",
++				dpp->pkex_id, error, text);
++		goto reset;
 +	}
 +
-+	/*
-+	 * "The Responder then generates a random ephemeral keypair, y/Y,
-+	 * encrypts Y with Qr to obtain the result, denoted N."
-+	 */
-+	l_ecdh_generate_key_pair(dpp->curve, &dpp->pkex_private,
-+					&dpp->pkex_public);
++	if (!l_dbus_message_get_arguments(message, "s", &code)) {
++		l_debug("Invalid arguments, check SharedCodeAgent!");
++		goto reset;
++	}
 +
-+	/* N = Y + Qr */
-+	n = l_ecc_point_new(dpp->curve);
-+
-+	l_ecc_point_add(n, dpp->pkex_public, qr);
-+
-+	/* K = y * X' */
-+
-+	k = l_ecc_point_new(dpp->curve);
-+
-+	l_ecc_point_multiply(k, dpp->pkex_private, dpp->y_or_x);
-+
-+	/* z = HKDF(<>, info | M.x | N.x | code, K.x) */
-+	dpp_derive_z(dpp->peer_addr, own_addr, n, m, k, dpp->pkex_key,
-+				dpp->pkex_id, dpp->z, &dpp->z_len);
-+
-+	dpp_send_pkex_exchange_response(dpp, n);
++	dpp->pkex_key = l_strdup(code);
++	dpp_process_pkex_exchange_request(dpp, dpp->peer_encr_key);
 +
 +	return;
 +
-+bad_code:
-+	dpp_send_bad_code(dpp, dpp->peer_addr);
-+	return;
++reset:
++	dpp_free_pending_pkex_data(dpp);
 +}
 +
-+static void dpp_handle_pkex_exchange_request(struct dpp_sm *dpp,
-+					const uint8_t *from,
-+					const uint8_t *body, size_t body_len)
++static bool dpp_pkex_agent_request(struct dpp_sm *dpp)
 +{
-+	struct dpp_attr_iter iter;
-+	enum dpp_attribute_type type;
-+	size_t len;
-+	const uint8_t *data;
-+	uint8_t version = 0;
-+	uint16_t group = 0;
-+	const char *id = NULL;
-+	size_t id_len = 0;
-+	const void *key = NULL;
-+	size_t key_len = 0;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *m = NULL;
++	struct l_dbus_message *msg;
 +
-+	l_debug("PKEX exchange request "MAC, MAC_STR(from));
++	if (!dpp->agent)
++		return false;
 +
-+	if (dpp->state != DPP_STATE_PKEX_EXCHANGE)
-+		return;
++	if (L_WARN_ON(dpp->agent->pending_id))
++		return false;
 +
-+	if (dpp->role != DPP_CAPABILITY_CONFIGURATOR)
-+		return;
++	msg = l_dbus_message_new_method_call(dbus_get_bus(),
++						dpp->agent->owner,
++						dpp->agent->path,
++						IWD_SHARED_CODE_AGENT_INTERFACE,
++						"RequestSharedCode");
++	l_dbus_message_set_arguments(msg, "s", dpp->pkex_id);
 +
-+	if (!l_memeqzero(dpp->peer_addr, 6)) {
-+		l_debug("Already configuring enrollee, ignoring");
-+		return;
-+	}
 +
-+	dpp_attr_iter_init(&iter, body + 8, body_len - 8);
++	dpp->agent->pending_id = l_dbus_send_with_reply(dbus_get_bus(),
++							msg,
++							dpp_pkex_agent_reply,
++							dpp, NULL);
++	return dpp->agent->pending_id != 0;
++}
 +
-+	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
-+		switch (type) {
-+		case DPP_ATTR_PROTOCOL_VERSION:
-+			if (len != 1)
-+				return;
-+
-+			version = l_get_u8(data);
-+			break;
-+		case DPP_ATTR_FINITE_CYCLIC_GROUP:
-+			if (len != 2)
-+				return;
-+
-+			group = l_get_le16(data);
-+			break;
-+		case DPP_ATTR_CODE_IDENTIFIER:
-+			id = (char *) data;
-+			id_len = len;
-+			break;
-+		case DPP_ATTR_ENCRYPTED_KEY:
-+			key = data;
-+			key_len = len;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	if (!key || !group) {
-+		l_debug("initiator did not provide group or key, ignoring");
-+		return;
-+	}
-+
-+	if (group != l_ecc_curve_get_ike_group(dpp->curve)) {
-+		l_debug("initiator is not using the same group");
-+		goto bad_group;
-+	}
-+
-+	/*
-+	 * If the group isn't the same the key length won't match, so check
-+	 * this here after we've determined the groups are equal
-+	 */
-+	if (key_len != dpp->key_len * 2) {
-+		l_debug("Unexpected encrypted key length");
-+		return;
-+	}
-+
-+	if (version && version != dpp->pkex_version) {
-+		l_debug("initiator is not using the same version, ignoring");
-+		return;
-+	}
-+
-+	if (dpp->pkex_id) {
-+		if (!id || !dpp_check_pkex_identifier(id) ||
-+					id_len != strlen(dpp->pkex_id) ||
-+					strncmp(dpp->pkex_id, id, id_len)) {
-+			l_debug("mismatch identifier, ignoring");
+ static void dpp_handle_pkex_exchange_request(struct dpp_sm *dpp,
+ 					const uint8_t *from,
+ 					const uint8_t *body, size_t body_len)
+@@ -3012,6 +3165,29 @@ static void dpp_handle_pkex_exchange_request(struct dpp_sm *dpp,
+ 
+ 	memcpy(dpp->peer_addr, from, 6);
+ 
++	if (!dpp->pkex_key) {
++		if (!id) {
++			l_debug("Configurator started with agent but enrollee "
++				"sent no identifier, ignoring");
 +			return;
 +		}
-+	}
 +
-+	m = l_ecc_point_from_data(dpp->curve, L_ECC_POINT_TYPE_FULL,
-+					key, key_len);
-+	if (!m) {
-+		l_debug("could not parse key from initiator, ignoring");
-+		return;
-+	}
++		dpp->pkex_id = l_strndup(id, id_len);
 +
-+	memcpy(dpp->peer_addr, from, 6);
-+
-+	dpp_process_pkex_exchange_request(dpp, m);
-+
-+	return;
-+
-+bad_group:
-+	dpp_send_bad_group(dpp, from);
-+}
-+
-+static void dpp_send_commit_reveal_response(struct dpp_sm *dpp,
-+						const uint8_t *v, size_t v_len)
-+{
-+	uint8_t hdr[32];
-+	uint8_t attrs[256];
-+	uint8_t *ptr = attrs;
-+	uint8_t one = 1;
-+	struct iovec iov[2];
-+	const uint8_t *own_mac = netdev_get_address(dpp->netdev);
-+	uint8_t b_pub[L_ECC_POINT_MAX_BYTES];
-+	size_t b_len;
-+
-+	b_len = l_ecc_point_get_data(dpp->boot_public, b_pub, sizeof(b_pub));
-+
-+
-+	iov[0].iov_len = dpp_build_header(own_mac, dpp->peer_addr,
-+				DPP_FRAME_PKEX_COMMIT_REVEAL_RESPONSE, hdr);
-+	iov[0].iov_base = hdr;
-+
-+	ptr += dpp_append_wrapped_data(hdr + 26, 6, &one, 1, ptr,
-+			sizeof(attrs), dpp->z, dpp->z_len, 2,
-+			DPP_ATTR_BOOTSTRAPPING_KEY, b_len, b_pub,
-+			DPP_ATTR_RESPONDER_AUTH_TAG, v_len, v);
-+
-+	iov[1].iov_base = attrs;
-+	iov[1].iov_len = ptr - attrs;
-+
-+	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
-+}
-+
-+static void dpp_handle_pkex_commit_reveal_request(struct dpp_sm *dpp,
-+					const uint8_t *from,
-+					const uint8_t *body, size_t body_len)
-+{
-+	struct dpp_attr_iter iter;
-+	enum dpp_attribute_type type;
-+	size_t len;
-+	const uint8_t *data;
-+	const void *wrapped = NULL;
-+	size_t wrapped_len = 0;
-+	_auto_(l_free) uint8_t *unwrapped = NULL;
-+	size_t unwrapped_len;
-+	uint8_t zero = 0;
-+	const void *key = 0;
-+	size_t key_len = 0;
-+	const void *i_auth = NULL;
-+	size_t i_auth_len = 0;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *j = NULL;
-+	_auto_(l_ecc_point_free) struct l_ecc_point *l = NULL;
-+	uint8_t u[L_ECC_SCALAR_MAX_BYTES];
-+	size_t u_len = 0;
-+	uint8_t v[L_ECC_SCALAR_MAX_BYTES];
-+	size_t v_len = 0;
-+	const uint8_t *own_addr = netdev_get_address(dpp->netdev);
-+
-+	l_debug("PKEX commit-reveal request "MAC, MAC_STR(from));
-+
-+	if (dpp->state != DPP_STATE_PKEX_COMMIT_REVEAL)
-+		return;
-+
-+	if (dpp->role != DPP_CAPABILITY_CONFIGURATOR)
-+		return;
-+
-+	dpp_attr_iter_init(&iter, body + 8, body_len - 8);
-+
-+	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
-+		switch (type) {
-+		case DPP_ATTR_WRAPPED_DATA:
-+			wrapped = data;
-+			wrapped_len = len;
-+			break;
-+		default:
-+			break;
++		/* Need to obtain code from agent */
++		if (!dpp_pkex_agent_request(dpp)) {
++			l_debug("Failed to request code from agent!");
++			dpp_free_pending_pkex_data(dpp);
++			return;
 +		}
-+	}
 +
-+	if (!wrapped) {
-+		l_debug("No wrapped data");
++		/* Save the encrypted key/identifier for the agent callback */
++
++		dpp->peer_encr_key = l_steal_ptr(m);
++
 +		return;
 +	}
 +
-+	unwrapped = dpp_unwrap_attr(body + 2, 6, &zero, 1, dpp->z, dpp->z_len,
-+					wrapped, wrapped_len, &unwrapped_len);
-+	if (!unwrapped) {
-+		l_debug("Failed to unwrap attributes");
-+		return;
-+	}
-+
-+	dpp_attr_iter_init(&iter, unwrapped, unwrapped_len);
-+
-+	while (dpp_attr_iter_next(&iter, &type, &len, &data)) {
-+		switch (type) {
-+		case DPP_ATTR_BOOTSTRAPPING_KEY:
-+			if (len != dpp->key_len * 2)
-+				return;
-+
-+			key = data;
-+			key_len = len;
-+			break;
-+		case DPP_ATTR_INITIATOR_AUTH_TAG:
-+			if (len != 32)
-+				return;
-+
-+			i_auth = data;
-+			i_auth_len = len;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	if (!key || !i_auth) {
-+		l_debug("missing attributes");
-+		return;
-+	}
-+
-+	dpp->peer_boot_public = l_ecc_point_from_data(dpp->curve,
-+					L_ECC_POINT_TYPE_FULL, key, key_len);
-+	if (!dpp->peer_boot_public) {
-+		l_debug("peers boostrapping key did not validate");
-+		goto failed;
-+	}
-+
-+	/* J' = y * A' */
-+	j = l_ecc_point_new(dpp->curve);
-+
-+	l_ecc_point_multiply(j, dpp->pkex_private, dpp->peer_boot_public);
-+
-+	dpp_derive_u(j, dpp->peer_addr, dpp->peer_boot_public, dpp->pkex_public,
-+			dpp->y_or_x, u, &u_len);
-+
-+	if (memcmp(u, i_auth, i_auth_len)) {
-+		l_debug("Initiator auth tag did not verify");
-+		goto failed;
-+	}
-+
-+	/* L' = x * B' */
-+	l = l_ecc_point_new(dpp->curve);
-+
-+	l_ecc_point_multiply(l, dpp->boot_private, dpp->y_or_x);
-+
-+	if (!dpp_derive_v(l, own_addr, dpp->boot_public, dpp->y_or_x,
-+				dpp->pkex_public, v, &v_len)) {
-+		l_debug("Failed to derive v");
-+		goto failed;
-+	}
-+
-+	dpp_send_commit_reveal_response(dpp, v, v_len);
-+
-+	dpp_pkex_start_authentication(dpp);
-+
-+	return;
-+
-+failed:
-+	dpp_reset(dpp);
-+}
-+
- static void dpp_handle_frame(struct dpp_sm *dpp,
- 				const struct mmpdu_header *frame,
- 				const void *body, size_t body_len)
-@@ -2788,6 +3219,14 @@ static void dpp_handle_frame(struct dpp_sm *dpp,
- 		dpp_handle_pkex_commit_reveal_response(dpp, frame->address_2,
- 							body, body_len);
- 		break;
-+	case DPP_FRAME_PKEX_VERSION1_XCHG_REQUST:
-+		dpp_handle_pkex_exchange_request(dpp, frame->address_2, body,
-+							body_len);
-+		break;
-+	case DPP_FRAME_PKEX_COMMIT_REVEAL_REQUEST:
-+		dpp_handle_pkex_commit_reveal_request(dpp, frame->address_2,
-+							body, body_len);
-+		break;
- 	default:
- 		l_debug("Unhandled DPP frame %u", *ptr);
- 		break;
-@@ -3492,6 +3931,67 @@ invalid_args:
+ 	dpp_process_pkex_exchange_request(dpp, m);
+ 
+ 	return;
+@@ -3931,8 +4107,34 @@ invalid_args:
  	return dbus_error_invalid_args(message);
  }
  
-+static struct l_dbus_message *dpp_start_pkex_configurator(struct dpp_sm *dpp,
-+					const char *key, const char *identifier,
-+					struct l_dbus_message *message)
++static void pkex_agent_disconnect(struct l_dbus *dbus, void *user_data)
 +{
-+	struct handshake_state *hs = netdev_get_handshake(dpp->netdev);
-+	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
-+	struct network *network = station_get_connected_network(station);
-+	struct scan_bss *bss = station_get_connected_bss(station);
-+	const struct l_settings *settings;
++	struct dpp_sm *dpp = user_data;
 +
-+	if (dpp->state != DPP_STATE_NOTHING)
-+		return dbus_error_busy(message);
++	l_debug("SharedCodeAgent %s disconnected", dpp->agent->path);
 +
-+	if (!network || !bss)
-+		return dbus_error_not_connected(message);
-+
-+	settings = network_get_settings(network);
-+	if (!settings) {
-+		l_debug("No settings for network, is this a known network?");
-+		return dbus_error_not_configured(message);
-+	}
-+
-+	if (identifier)
-+		dpp->pkex_id = l_strdup(identifier);
-+
-+	if (key)
-+		dpp->pkex_key = l_strdup(key);
-+
-+	dpp->role = DPP_CAPABILITY_CONFIGURATOR;
-+	dpp->state = DPP_STATE_PKEX_EXCHANGE;
-+	dpp->current_freq = bss->frequency;
-+	dpp->pkex_version = 1;
-+	dpp->config = dpp_configuration_new(network_get_settings(network),
-+						network_get_ssid(network),
-+						hs->akm_suite);
-+
-+	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
-+	dpp_pkex_property_changed_notify(dpp);
-+
-+	l_debug("Starting PKEX configurator for single enrollee");
-+
-+	return l_dbus_message_new_method_return(message);
++	dpp_reset(dpp);
 +}
 +
-+static struct l_dbus_message *dpp_dbus_pkex_configure_enrollee(
++static void dpp_create_agent(struct dpp_sm *dpp, const char *path,
++					struct l_dbus_message *message)
++{
++	const char *sender = l_dbus_message_get_sender(message);
++
++	dpp->agent = l_new(struct pkex_agent, 1);
++	dpp->agent->owner = l_strdup(sender);
++	dpp->agent->path = l_strdup(path);
++	dpp->agent->disconnect_watch = l_dbus_add_disconnect_watch(dbus_get_bus(),
++							sender,
++							pkex_agent_disconnect,
++							dpp, NULL);
++
++	l_debug("Registered a SharedCodeAgent on path %s", path);
++}
++
+ static struct l_dbus_message *dpp_start_pkex_configurator(struct dpp_sm *dpp,
+ 					const char *key, const char *identifier,
++					const char *agent_path,
+ 					struct l_dbus_message *message)
+ {
+ 	struct handshake_state *hs = netdev_get_handshake(dpp->netdev);
+@@ -3959,6 +4161,9 @@ static struct l_dbus_message *dpp_start_pkex_configurator(struct dpp_sm *dpp,
+ 	if (key)
+ 		dpp->pkex_key = l_strdup(key);
+ 
++	if (agent_path)
++		dpp_create_agent(dpp, agent_path, message);
++
+ 	dpp->role = DPP_CAPABILITY_CONFIGURATOR;
+ 	dpp->state = DPP_STATE_PKEX_EXCHANGE;
+ 	dpp->current_freq = bss->frequency;
+@@ -3970,7 +4175,10 @@ static struct l_dbus_message *dpp_start_pkex_configurator(struct dpp_sm *dpp,
+ 	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
+ 	dpp_pkex_property_changed_notify(dpp);
+ 
+-	l_debug("Starting PKEX configurator for single enrollee");
++	if (dpp->pkex_key)
++		l_debug("Starting PKEX configurator for single enrollee");
++	else
++		l_debug("Starting PKEX configurator with agent");
+ 
+ 	return l_dbus_message_new_method_return(message);
+ }
+@@ -3989,7 +4197,21 @@ static struct l_dbus_message *dpp_dbus_pkex_configure_enrollee(
+ 	if (!dpp_parse_pkex_args(message, &key, &id))
+ 		return dbus_error_invalid_args(message);
+ 
+-	return dpp_start_pkex_configurator(dpp, key, id, message);
++	return dpp_start_pkex_configurator(dpp, key, id, NULL, message);
++}
++
++static struct l_dbus_message *dpp_dbus_pkex_start_configurator(
 +						struct l_dbus *dbus,
 +						struct l_dbus_message *message,
 +						void *user_data)
 +{
 +	struct dpp_sm *dpp = user_data;
-+	const char *key;
-+	const char *id;
++	const char *path;
 +
-+	l_debug("");
-+
-+	if (!dpp_parse_pkex_args(message, &key, &id))
++	if (!l_dbus_message_get_arguments(message, "o", &path))
 +		return dbus_error_invalid_args(message);
 +
-+	return dpp_start_pkex_configurator(dpp, key, id, message);
-+}
-+
++	return dpp_start_pkex_configurator(dpp, NULL, NULL, path, message);
+ }
+ 
  static void dpp_setup_interface(struct l_dbus_interface *interface)
- {
- 	l_dbus_interface_method(interface, "StartEnrollee", 0,
-@@ -3528,6 +4028,8 @@ static void dpp_setup_pkex_interface(struct l_dbus_interface *interface)
- 			dpp_dbus_pkex_start_enrollee, "", "a{sv}", "args");
- 	l_dbus_interface_method(interface, "Stop", 0,
+@@ -4030,6 +4252,8 @@ static void dpp_setup_pkex_interface(struct l_dbus_interface *interface)
  			dpp_dbus_pkex_stop, "", "");
-+	l_dbus_interface_method(interface, "ConfigureEnrollee", 0,
-+			dpp_dbus_pkex_configure_enrollee, "", "a{sv}", "args");
+ 	l_dbus_interface_method(interface, "ConfigureEnrollee", 0,
+ 			dpp_dbus_pkex_configure_enrollee, "", "a{sv}", "args");
++	l_dbus_interface_method(interface, "StartConfigurator", 0,
++			dpp_dbus_pkex_start_configurator, "", "o", "path");
  
  	l_dbus_interface_property(interface, "Started", 0, "b",
  			dpp_pkex_get_started, NULL);
