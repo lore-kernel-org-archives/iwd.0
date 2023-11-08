@@ -1,87 +1,229 @@
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E965D3589D
-	for <iwd@lists.linux.dev>; Tue,  7 Nov 2023 18:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23529A4F
+	for <iwd@lists.linux.dev>; Wed,  8 Nov 2023 01:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rjp.ie
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjp.ie
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hO6HN0+V"
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-6ce291b5df9so3740247a34.2
-        for <iwd@lists.linux.dev>; Tue, 07 Nov 2023 10:16:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699380969; x=1699985769; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GtvAWFtc0qgZ1Qk4gnazN0v2UjsWYoXIPtXXHWHktwY=;
-        b=hO6HN0+VUcXIGXWG5kpC+ZVBV7rSYUw2FJ4kv1hi+ESu+nNVCArSc8aCSs50UgSV4E
-         vtblimpd/+d0nzynsSTTJiOA7MPv/8t6AklxK4+SgAGlbkFNe0XEEOVYPTY22yJbQFAr
-         Ca/5G4Ix0ezaYNCUcfaODKPi4zxuU0RKXHlsg6+pXh9L6HIy4uoudFLH9qFUoDISDzAq
-         fBOl6piZn+qCYrLQjHFUGMqJHdd9cB3a2Igh4tisGC8mAbT6pXHz5iYyebIIzd4XdPP3
-         5JKdKd2/CdMLWGPVG1c1JKaB2+knkrIzJ8pP6gtvirLYyuhckG2e9tLKRU320mwfIYPZ
-         /prA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699380969; x=1699985769;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GtvAWFtc0qgZ1Qk4gnazN0v2UjsWYoXIPtXXHWHktwY=;
-        b=qB43UpxQ19AiQS4DHfo7qAftllgcnIw3wN9xNI1Pkr4n3/b1hSq6meyZXllxKA8WW9
-         OfLQ2gQTtvbySk6XxxIILaDtZc4D6TSIg8ujsQblPj2IS6DDeybO6ImC4NaT1rzEAGuf
-         86SueANGTwRbojOrualSBJ4xx6A4o37E1ImcENt160UUtCByzuJJOBnMnyAAZ4PbkDDU
-         68bPtupshAtXjcdSxUx5/+R7go3+CRr5Kv8rHVzeeYYfzHseOM9qa16g8lQbZLsipdLF
-         OJfaGAI5Ws2kmDmGwDIxusnD8RQLH9vmPBI5g//Snspp6GuDcw9sAgIHVy7h2Dk1FmMX
-         mERg==
-X-Gm-Message-State: AOJu0Yzvx1mMgg98f2m1db//9oShPuzzYNoZ0puzNJkfiqDMppk1MQ6L
-	48d1uj2D+EWTnrfUAPcyk0M=
-X-Google-Smtp-Source: AGHT+IEr3mkh1rgjY2JmYzTxBowOt4qzJYkU5poP5TPT/u/hMm+/LZoQCWgjwm9U4h4LsWKRS5m4LQ==
-X-Received: by 2002:a05:6830:2646:b0:6d3:1e5a:d935 with SMTP id f6-20020a056830264600b006d31e5ad935mr22987652otu.11.1699380969064;
-        Tue, 07 Nov 2023 10:16:09 -0800 (PST)
-Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id g13-20020a9d6b0d000000b006ce32aac3e4sm1692932otp.48.2023.11.07.10.16.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Nov 2023 10:16:08 -0800 (PST)
-Message-ID: <2b2efe83-80c3-4452-ace2-dbf8cea3a561@gmail.com>
-Date: Tue, 7 Nov 2023 12:16:06 -0600
+	dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b="pjJVOo1J"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rjp.ie; s=key1;
+	t=1699407294;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rRPeS5jmj3/ANWQiKBtwTRSORPlucFS8dF5cXetTaTI=;
+	b=pjJVOo1JPyx62g5NCk+U2zeeEPUzQOBKn6+p7Zuq32ZQSj9VLx2zBEF56A6ZiGRlbhN5dC
+	v7JgUcQbT/hUpFCSxM/KmyL689V/Xm2ENjIPMmm9FFPNLc46HXtJekXHMietOGLckhyBZi
+	+UtkmLdt5gxh+OIaFUW/G03FPlThm14=
+From: Ronan Pigott <ronan@rjp.ie>
+To: iwd@lists.linux.dev
+Cc: Ronan Pigott <ronan@rjp.ie>
+Subject: [PATCH] tree-wide: correct the spelling Ghz -> GHz
+Date: Tue,  7 Nov 2023 18:33:54 -0700
+Message-ID: <20231108013445.59080-1-ronan@rjp.ie>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: error with commit aff2d4d66f07ed0a1816122d26369ccfce348f90 pmksa:
- Add skeleton
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, daniel antoine
- <univac55@gmail.com>, iwd@lists.linux.dev
-References: <CA+iibzAu1YwZV7e96cjP+xtn6A24ZCN1AiGW9-k35BWi=6wU_w@mail.gmail.com>
- <6d5103a7-5bec-4526-9ba6-b7ca398c5d4a@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <6d5103a7-5bec-4526-9ba6-b7ca398c5d4a@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi James,Daniel,
+This mispelling was present in the configuration, so I retained parsing
+of the legacy BandModifier*Ghz options for compatibility. Without this
+change anyone spelling GHz correctly in their configs would be very
+confused.
 
-On 11/7/23 11:53, James Prestwood wrote:
-> On 11/7/23 9:46 AM, daniel antoine wrote:
->>
->>
->> Hi
->>
->> I try to compile with the last commits and the compilation failed on error
-> 
-> TLDR;
-> 
-> Denis, looks like minheap.c/h wasn't added to ELL when you added the pmksa 
-> skeleton.
-> 
+---
+ TODO               |  2 +-
+ monitor/nlmon.c    |  2 +-
+ src/ap.c           |  4 ++--
+ src/iwd.config.rst | 10 +++++-----
+ src/scan.c         | 14 +++++++++-----
+ src/station.c      |  2 +-
+ src/wiphy.c        |  4 ++--
+ unit/test-band.c   |  4 ++--
+ 8 files changed, 23 insertions(+), 19 deletions(-)
 
-Whoops, that shouldn't have gone in yet :)
+diff --git a/TODO b/TODO
+index ac1cb683716f..b3a03bd6232d 100644
+--- a/TODO
++++ b/TODO
+@@ -286,7 +286,7 @@ Wireless daemon
+ - Support OCE mutually non-overlapping channels optimization.
+ 
+   OCE Section 3.10 mandates that the STA should scan channels 1, 6 and 11 in
+-  the 2.4Ghz band first, unless it expects to find an AP on a different
++  the 2.4GHz band first, unless it expects to find an AP on a different
+   channel.
+ 
+   Priority: Low
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index a4115a5b15f3..ed40264bacd6 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -2761,7 +2761,7 @@ static void print_wsc_configuration_error(unsigned int level, const char *label,
+ 		"Message timeout",
+ 		"Registration session timeout",
+ 		"Device Password Auth Failure",
+-		"60 Ghz channel not supported",
++		"60 GHz channel not supported",
+ 		"Public Key Hash Mismatch",
+ 	};
+ 
+diff --git a/src/ap.c b/src/ap.c
+index 398e469a1c43..577f25a71def 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -1202,7 +1202,7 @@ static size_t ap_build_country_ie(struct ap_state *ap, uint8_t *out_buf,
+ 	 * and use the same TX power. Any deviation from this results in a new
+ 	 * channel group.
+ 	 *
+-	 * TODO: 6Ghz requires operating triplets, not subband triplets.
++	 * TODO: 6GHz requires operating triplets, not subband triplets.
+ 	 */
+ 	for (i = 0; i < len; i++) {
+ 		const struct band_freq_attrs *attr = &list[i];
+@@ -3564,7 +3564,7 @@ static bool ap_validate_band_channel(struct ap_state *ap)
+ 	freq = band_channel_to_freq(ap->channel, ap->band);
+ 	if (!freq) {
+ 		l_error("AP invalid band (%s) and channel (%u) combination",
+-			(ap->band & BAND_FREQ_5_GHZ) ? "5Ghz" : "2.4GHz",
++			(ap->band & BAND_FREQ_5_GHZ) ? "5GHz" : "2.4GHz",
+ 			ap->channel);
+ 		return false;
+ 	}
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index be2fd18c48e9..d9c94e01c297 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -122,7 +122,7 @@ The group ``[General]`` contains general settings.
+      - Value: rssi dBm value, from -100 to 1, default: **-70**
+ 
+        This value can be used to control how aggressively **iwd** roams when
+-       connected to a 2.4Ghz access point.
++       connected to a 2.4GHz access point.
+ 
+    * - RoamThreshold5G
+      - Value: rssi dBm value, from -100 to 1, default: **-76**
+@@ -291,7 +291,7 @@ autoconnect purposes.
+    :widths: 20 80
+    :align: left
+ 
+-   * - BandModifier2_4Ghz
++   * - BandModifier2_4GHz
+      - Values: floating point value (default: **1.0**)
+ 
+        Increase or decrease the preference for 2.4GHz access points by
+@@ -300,19 +300,19 @@ autoconnect purposes.
+        A value of 0.0 will disable the 2.4GHz band and prevent scanning or
+        connecting on those frequencies.
+ 
+-   * - BandModifier5Ghz
++   * - BandModifier5GHz
+      - Values: floating point value (default: **1.0**)
+ 
+        Increase or decrease the preference for 5GHz access points by increasing
+        or decreasing the value of this modifier.  5GHz networks are already
+        preferred due to their increase throughput / data rate.  However, 5GHz
+        networks are highly RSSI sensitive, so it is still possible for IWD to
+-       prefer 2.4Ghz APs in certain circumstances.
++       prefer 2.4GHz APs in certain circumstances.
+ 
+        A value of 0.0 will disable the 5GHz band and prevent scanning or
+        connecting on those frequencies.
+ 
+-   * - BandModifier6Ghz
++   * - BandModifier6GHz
+      - Values: floating point value (default: **1.0**)
+ 
+        Increase or decrease the preference for 6GHz access points by increasing
+diff --git a/src/scan.c b/src/scan.c
+index 8cb39d7a1edb..5aa92a90661c 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -2333,24 +2333,28 @@ double scan_get_band_rank_modifier(enum band_freq band)
+ {
+ 	const struct l_settings *config = iwd_get_config();
+ 	double modifier;
+-	char *str;
++	char *str, *str_legacy;
+ 
+ 	switch (band) {
+ 	case BAND_FREQ_2_4_GHZ:
+-		str = "BandModifier2_4Ghz";
++		str = "BandModifier2_4GHz";
++		str_legacy = "BandModifier2_4Ghz";
+ 		break;
+ 	case BAND_FREQ_5_GHZ:
+-		str = "BandModifier5Ghz";
++		str = "BandModifier5GHz";
++		str_legacy = "BandModifier5Ghz";
+ 		break;
+ 	case BAND_FREQ_6_GHZ:
+-		str = "BandModifier6Ghz";
++		str = "BandModifier6GHz";
++		str_legacy = "BandModifier6Ghz";
+ 		break;
+ 	default:
+ 		l_warn("Unhandled band %u", band);
+ 		return 0.0;
+ 	}
+ 
+-	if (!l_settings_get_double(config, "Rank", str, &modifier))
++	if (!l_settings_get_double(config, "Rank", str, &modifier) &&
++		!l_settings_get_double(config, "Rank", str_legacy, &modifier))
+ 		modifier = 1.0;
+ 
+ 	return modifier;
+diff --git a/src/station.c b/src/station.c
+index ee229fc27d79..ff8a74661578 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -4435,7 +4435,7 @@ static void station_wiphy_watch(struct wiphy *wiphy,
+ 	/*
+ 	 * The only state that requires special handling is for
+ 	 * quick scans since the previous quick scan was delayed until
+-	 * the regulatory domain updated. Try again in case 6Ghz is now
++	 * the regulatory domain updated. Try again in case 6GHz is now
+ 	 * unlocked (unlikely), or advance to full autoconnect. Just in
+ 	 * case this update came during a quick scan, ignore it.
+ 	 */
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 776a10ee8b0b..570f54155717 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -1262,10 +1262,10 @@ static void wiphy_print_basic_info(struct wiphy *wiphy)
+ 	l_info("\tPermanent Address: "MAC, MAC_STR(wiphy->permanent_addr));
+ 
+ 	if (wiphy->band_2g)
+-		wiphy_print_band_info(wiphy->band_2g, "2.4Ghz Band");
++		wiphy_print_band_info(wiphy->band_2g, "2.4GHz Band");
+ 
+ 	if (wiphy->band_5g)
+-		wiphy_print_band_info(wiphy->band_5g, "5Ghz Band");
++		wiphy_print_band_info(wiphy->band_5g, "5GHz Band");
+ 
+ 	if (wiphy->band_6g)
+ 		wiphy_print_band_info(wiphy->band_6g, "6GHz Band");
+diff --git a/unit/test-band.c b/unit/test-band.c
+index e27531f79613..8140b2725efc 100644
+--- a/unit/test-band.c
++++ b/unit/test-band.c
+@@ -654,8 +654,8 @@ static void test_conversions(const void *data)
+ {
+ 	/*
+ 	 * Test a few invalid channels/frequencies that appear valid but are
+-	 * not in the E-4 table. The checks in band.c seem to cover 2.4Ghz and
+-	 * 6Ghz very well since there are no gaps, but the 5GHz band has some
++	 * not in the E-4 table. The checks in band.c seem to cover 2.4GHz and
++	 * 6GHz very well since there are no gaps, but the 5GHz band has some
+ 	 * segmentation.
+ 	 */
+ 
+-- 
+2.42.1
 
-I fixed this now via a force-push.
-
-Regards,
--Denis
