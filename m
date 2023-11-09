@@ -1,52 +1,52 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F134EC8
-	for <iwd@lists.linux.dev>; Thu,  9 Nov 2023 17:25:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4654CD2ED
+	for <iwd@lists.linux.dev>; Thu,  9 Nov 2023 18:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l50e4ln6"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6c34e87b571so1049311b3a.3
-        for <iwd@lists.linux.dev>; Thu, 09 Nov 2023 09:25:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SXleHWst"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-5afa5dbc378so14302217b3.0
+        for <iwd@lists.linux.dev>; Thu, 09 Nov 2023 10:49:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699550725; x=1700155525; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1699555775; x=1700160575; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wOXuh2XSirOrfLhzwWK02owvuoRe4FvcVlqafjNjriU=;
-        b=l50e4ln63j71J5MVnlQ7pIx9kvat0Ttiu3e9tVMV1j4vvX55GBxR7nFUbW/P95s1JC
-         xfNDNiszsxyZHr+aMDQLAhRohj69SxMIe5sJL7qVoDEJAjn5a91G37bC/CYD5ew9ere8
-         3XfsRiKHjETdU//WCDuscvauLCZXdEeCRqd8bqqY3yU6UinD3MeVcvEhODkPWgDAdjkt
-         bP9DO7NYgQfn7nvL3s6a7qregUDoRRxJjnAKyqzhRr4WlJWDC5oRUhOG3lpN4699ln8E
-         NzWaJQpRUWaC7F1Z/VlJqUT3TBxXdqhOLO0lXGkpy+ihgPwC9uTPeXKUPFRYu3yiGoy/
-         0Xaw==
+        bh=znOXvRN19Mh41YaCB70YY+N8penURKD+a3umAUTRSak=;
+        b=SXleHWstI0WdtYxrbEyiGRYZjPr8PQasKG/u+8cOH5oc7kw8mFebYwOcZ7micTcWKz
+         ZnelDcJOcm1A+xWfHsjlemXICW8UvKC9jAz7KeASwj/FncPDMjBuCY/UmRy7FOEj6eyl
+         yVt8mX9Mt4i7klU/ZVtOfbo3oE1gKD9kuNG/dtSgR61N/Nb5ofWqIk+hemaQtCbBMWSd
+         97sUjzPrLrkOP89lxvFlVI0veT+2ngwe2HkUfZu5H6GaOa6TRun8VCMjLJrCKIvXF6AS
+         h3y0vqlXoMhQjiqk5KN1KVYOl1/n7dblw6M6hdV36cyIszEJNe+KwcuQA3lDR6RVOmd3
+         VQOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699550725; x=1700155525;
+        d=1e100.net; s=20230601; t=1699555775; x=1700160575;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wOXuh2XSirOrfLhzwWK02owvuoRe4FvcVlqafjNjriU=;
-        b=kgkwEWdlJ83m/d8OIrURgUscHhdtK7qnJeys+edUGp2lmHhDLbHVzV61kouZzaZ0PK
-         fii5h84fCj5IRBOwhfZxWEDBtXoiUgGfUeIQzC4Qkn9Jy+qi8ghBmHnurmHurFvpkI16
-         zcozAoKlUJ/CSIXZw42qsXQT0A+4ZSNQ8zjUdgm0Cl+hBCRo83AM3ICAj/wh0GfSYNFC
-         jpbHmd+PLxhffMydWrgIOhRTpH6r2WjDkbi9fnb55tiO4INjJn1vkBztYCiarGVseR/G
-         xCRALNjPqsEBZzPk988b04ew66d8d+89r8qVMWGazXujRX9Hjy3qyjiQm/vzzlVvFMV7
-         PlHg==
-X-Gm-Message-State: AOJu0YxVG/ErUOsFeb28uyqSOmeEvy8kWw02Ug5B8jlhv4XrTT5wIC6/
-	WIMgN+Nnz3IFmmdOCoVlmUijZDR3XlI=
-X-Google-Smtp-Source: AGHT+IE/PMCf4KszMXForNazLlo8yxdklcK6zOTAhQ5+8JUY6c6rf2unoe3LGp/5yCwo0XJ6KWXylw==
-X-Received: by 2002:a05:6a00:3a2a:b0:6c3:41fd:3a3e with SMTP id fj42-20020a056a003a2a00b006c341fd3a3emr5276233pfb.27.1699550725535;
-        Thu, 09 Nov 2023 09:25:25 -0800 (PST)
-Received: from localhost.localdomain ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id u8-20020aa78388000000b0068fe5a5a566sm11301447pfm.142.2023.11.09.09.25.25
+        bh=znOXvRN19Mh41YaCB70YY+N8penURKD+a3umAUTRSak=;
+        b=hkWaJHEjhvwveBF2SUdEjQ7/VV/C2fbh/20ggIy5OWZjKHCYZW6ys+Ne2jCfVqQwOf
+         Hg7QbM4/EYUdS0ZFRxzmH71MZg65HyJgdWFnLRWZxpQ4Tc8jKRfcOCnLJWTGhn4DdaFV
+         30PALOifShoodpCYXCmKujyRdzbvPrO/GIAcauqdSg9E8SA16y0bO5xAkW0vMsoY2fZn
+         4owOs5c8lk4wBwMm7kkppo7bFf78u3Mi1DswEOwsNWeToqk8DXLs+hTw+/X6ao0NU6HH
+         6111EPfi22eTPzb3ClMp/rklM41uSIPAiRicIB9Hl31uh3xbaeLgzSikoRTNbgPhrwoT
+         miCA==
+X-Gm-Message-State: AOJu0YxOgG/jWXrzls/uT870aiBuOwifMfgkYaowN7h8oR0YM1AGc1Q+
+	Z3BLiqxE52L6egPEOG7YbVfh/76fDxk=
+X-Google-Smtp-Source: AGHT+IE4535LUN/AWsK2R6XA0Y0+1pY+sUh0C+2tlxk5d2EwGtCLAUZEjPOTgHPcieoyb0546j+YjA==
+X-Received: by 2002:a0d:d490:0:b0:5a8:1ffe:eb4e with SMTP id w138-20020a0dd490000000b005a81ffeeb4emr5989077ywd.34.1699555774972;
+        Thu, 09 Nov 2023 10:49:34 -0800 (PST)
+Received: from LOCLAP699.rst-07.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id en6-20020a05690c2b8600b0057a44e20fb8sm7961871ywb.73.2023.11.09.10.49.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 09:25:25 -0800 (PST)
+        Thu, 09 Nov 2023 10:49:34 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] dpp: fix removed dpp_reset in Stop()
-Date: Thu,  9 Nov 2023 09:25:22 -0800
-Message-Id: <20231109172522.37912-1-prestwoj@gmail.com>
+Subject: [PATCH 1/3] client: Add shared code DBus interface
+Date: Thu,  9 Nov 2023 10:49:24 -0800
+Message-Id: <20231109184926.52629-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
@@ -56,43 +56,31 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It seems in my patch reordering both stop methods lost the actual
-call to dpp_reset().
 ---
- src/dpp.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ client/dbus-proxy.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index a0c44eda..9501f3de 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -3961,9 +3961,13 @@ static struct l_dbus_message *dpp_dbus_stop(struct l_dbus *dbus,
- {
- 	struct dpp_sm *dpp = user_data;
+diff --git a/client/dbus-proxy.h b/client/dbus-proxy.h
+index 0b4fec43..cd1b2305 100644
+--- a/client/dbus-proxy.h
++++ b/client/dbus-proxy.h
+@@ -2,7 +2,7 @@
+  *
+  *  Wireless daemon for Linux
+  *
+- *  Copyright (C) 2017-2019  Intel Corporation. All rights reserved.
++ *  Copyright (C) 2017-2013  Intel Corporation. All rights reserved.
+  *
+  *  This library is free software; you can redistribute it and/or
+  *  modify it under the terms of the GNU Lesser General Public
+@@ -38,6 +38,8 @@ struct proxy_interface;
+ #define IWD_AP_DIAGNOSTIC_INTERFACE      "net.connman.iwd.AccessPointDiagnostic"
+ #define IWD_DAEMON_INTERFACE             "net.connman.iwd.Daemon"
+ #define IWD_DPP_INTERFACE                "net.connman.iwd.DeviceProvisioning"
++#define IWD_DPP_PKEX_INTERFACE \
++				"net.connman.iwd.SharedCodeDeviceProvisioning"
  
-+	l_debug("");
-+
- 	if (dpp->interface != DPP_INTERFACE_DPP)
- 		return dbus_error_not_found(message);
- 
-+	dpp_reset(dpp);
-+
- 	return l_dbus_message_new_method_return(message);
- }
- 
-@@ -4340,9 +4344,13 @@ static struct l_dbus_message *dpp_dbus_pkex_stop(struct l_dbus *dbus,
- {
- 	struct dpp_sm *dpp = user_data;
- 
-+	l_debug("");
-+
- 	if (dpp->interface != DPP_INTERFACE_PKEX)
- 		return dbus_error_not_found(message);
- 
-+	dpp_reset(dpp);
-+
- 	return l_dbus_message_new_method_return(message);
- }
+ typedef bool (*proxy_property_match_func_t) (const void *a, const void *b);
  
 -- 
 2.25.1
