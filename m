@@ -1,49 +1,49 @@
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E23F185A
-	for <iwd@lists.linux.dev>; Fri, 10 Nov 2023 02:31:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30557365
+	for <iwd@lists.linux.dev>; Fri, 10 Nov 2023 02:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CzpYVkVt"
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3b58d96a3bbso861597b6e.1
-        for <iwd@lists.linux.dev>; Thu, 09 Nov 2023 18:31:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gLbArp+R"
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6d31f3e8ca8so854271a34.0
+        for <iwd@lists.linux.dev>; Thu, 09 Nov 2023 18:39:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699583516; x=1700188316; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1699583949; x=1700188749; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=/P2VPT1Q4/AhcKsa/sG6/ZnhTr6vmoECoXiSjhnQqdM=;
-        b=CzpYVkVtg5nIBsYGsUzL25umHS6Dt2j9Jk/NeZyz3NUPk2zoSJLCDxau0oXvRPUWow
-         7aEHinMjZ9/CNWGQKtQhEcDDpaRGw41qgV0nGUeLjl2PL+vY9HF5Evi9KTigN4vZOKog
-         7w7cjmpdAnjLxNEqTurzE4j5WYaOFT/BEbFxJHoFJgBOnC43ZArkg/NKMdf0jMnGuBmw
-         Fj0aOV4TNyPAnty0GxV6/x32ME3YMTtxETo/rZQtCzWAFvy/IPa9HLkEtHSPSqgFZP6r
-         ZN43ydEMUNWEyPW91c+dexYLGaHS/bxY+G9wHUF5OeaTDCPb4WZ7kteIkkXU7hFGYenx
-         Y51Q==
+        bh=31U21mqW2P5eN7+B26kmJLED3qcXhs7i6ThOrA8lFmU=;
+        b=gLbArp+RVfheVBXw4+l4q5c/aOJbCpVE06XkQ3ENVxnUeUXCfK0g/rtc9F0zHgKZ2L
+         zSGFr6fFBFrzuJ4t3t6zHIkQROQu6SFI9sXk8U7kN7qUeRgITJ+90hUITy/RoDTuXMG1
+         rZeKQ1oXDsYvnN5HlHpUS34uSQmYYS36Jm61kM0/2//BJTQV1ZTCJZh+pwDC3qD4Yjon
+         HM5Pe4Gu2RY+r9ICB8Gak2+J1JxxKY++4JzH5zUDMTmGpWqCu8HWloeuk92EnXtsHzgF
+         Z6dkwIlSUomIA+/rfyBCpRooTVOjX1zXDSXS2WL4jQLVbxF49uimbh+rH3KBF+0ZHtVV
+         LcAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699583516; x=1700188316;
+        d=1e100.net; s=20230601; t=1699583949; x=1700188749;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/P2VPT1Q4/AhcKsa/sG6/ZnhTr6vmoECoXiSjhnQqdM=;
-        b=Yanu3D74tL7GhF4ffU1RQDYfhA6jRC2tEXWyyB0ntBc/nlv3/cZlCQwLqo1livu2Ur
-         3h21/xoVdqNIAdURhJSz66RfaiyhsKM+xXpN+fD0bmDzLVgWPH6cY43UpgC/I8fWT8Qm
-         2HssOxWpahwJl/NWJE5YuVygPU6nFTiN9nvRmZ4G0t0KdKAq/fZBSQXXum4IOmzDP84N
-         f82dxhkuo7sSvsF9aG59lNAw6I6PDxT+DY50ubJnFDkOftv3+QT1WzUJPa2h3G2vAQSg
-         k6RCkEd4Nfr2imgBAAfr/MaBMadRTAGQPYyFaCrlAdBU4J1P4MYttjSgzeTJBuUoCD6j
-         5MDQ==
-X-Gm-Message-State: AOJu0YyBd0Io32P7HP7ml0OuUO8XSCQSkkhJaFwTP+8QJ9yhx2vz8NVT
-	jZIotkx9Jj5jyhP9OFmtDMgoT74QASQ=
-X-Google-Smtp-Source: AGHT+IEza2mWq0sabIUviQE60iLzauSf7am1WKZTsn60zrBlff+Gh+mZa5ivBENXoc4dVrrx7i5S8Q==
-X-Received: by 2002:aca:2414:0:b0:3b2:e33c:ce27 with SMTP id n20-20020aca2414000000b003b2e33cce27mr3138416oic.2.1699583516565;
-        Thu, 09 Nov 2023 18:31:56 -0800 (PST)
+        bh=31U21mqW2P5eN7+B26kmJLED3qcXhs7i6ThOrA8lFmU=;
+        b=u/CWLlq7Gu04E7YZLJJkmXCzFL5BrKJDN2y5BKo913+YkO9zNhi3KlN3F8CQVXvbrx
+         6LEm8w1uj2MiWjkyaSlWuzEjQI9Jde0WGnyJxyH3orqizHMp5ckhJKvkE7M2gbbVyfWB
+         h1lmS7me0SPYMQa8GzL2bYQmwMU+WGNWXViq2B9YRZ0Q2vHxhqBP2eDwuwtaepr5+taz
+         io0K+co0dM4QrwzZlRIq2fsjipZMdvzdFTaKv+3HrxVv9aWOfb4jO8Y3eWn+xmY/4ucx
+         c62SLjP91FiP5OsU/P0xsUGfF6vM3bg4MLn4ij2RbMgyS6vfHfX8KRiapsbwkS8bRSqB
+         9qZw==
+X-Gm-Message-State: AOJu0Yw49lYPFicCGCGTEzucWdV8aKl2VxeeswNkehcmmPFFAt7kzNTX
+	DADfHoLhSirPp5ky/qzRgMQ=
+X-Google-Smtp-Source: AGHT+IHxfnHDLd+TPEBHaQZaTZkjtMMXLxi6FN+bkDSEQzpA1rKAR19oJ4axHX+onEEtVwuQeJGJAw==
+X-Received: by 2002:a9d:7606:0:b0:6b7:4a52:a33a with SMTP id k6-20020a9d7606000000b006b74a52a33amr6604877otl.14.1699583949116;
+        Thu, 09 Nov 2023 18:39:09 -0800 (PST)
 Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id m1-20020a0568080f0100b003af5d7d9f3bsm206416oiw.4.2023.11.09.18.31.55
+        by smtp.googlemail.com with ESMTPSA id dc11-20020a0568306b4b00b006b8b55297b5sm2471741otb.42.2023.11.09.18.39.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Nov 2023 18:31:56 -0800 (PST)
-Message-ID: <0df290a1-50ba-4906-b4ae-be2d4b2675be@gmail.com>
-Date: Thu, 9 Nov 2023 20:31:55 -0600
+        Thu, 09 Nov 2023 18:39:08 -0800 (PST)
+Message-ID: <68c1a1eb-02ea-44c7-8286-8f60f5a415b9@gmail.com>
+Date: Thu, 9 Nov 2023 20:39:07 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,114 +51,99 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] client: add client commands for shared code
- configuration
+Subject: Re: [PATCH 1/2] dpp: scan to pick up extra frequencies when enrolling
 Content-Language: en-US
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20231109184926.52629-1-prestwoj@gmail.com>
- <20231109184926.52629-3-prestwoj@gmail.com>
+References: <20231109195720.56352-1-prestwoj@gmail.com>
+ <20231109195720.56352-2-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20231109184926.52629-3-prestwoj@gmail.com>
+In-Reply-To: <20231109195720.56352-2-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 11/9/23 12:49, James Prestwood wrote:
-> The StartConfigurator() call was left out since there would be no
-> functional difference to the user in iwctl. Its expected that
-> human users of the shared code API provide the code/id ahead of
-> time, i.e. use ConfigureEnrollee/StartEnrollee.
+On 11/9/23 13:57, James Prestwood wrote:
+> The DPP-PKEX spec provides a very limited list of frequencies used
+> to discover configurators, only 3 on 2.4 and 5GHz bands. Since
+> configurators (at least in IWD's implementation) are only allowed
+> on the current operating frequency its very unlikely an enrollee
+> will find a configurator on these frequencies out of the entire
+> spectrum.
+> 
+> The spec does mention that the 3 default frequencies should be used
+> "In lieu of specific channel information obtained in a manner outside
+> the scope of this specification, ...". This allows the implementation
+> some flexibility in using a broader range of frequencies.
+> 
+> To increase the chances of finding a configurator shared code
+> enrollees will first issue a scan to determine what access points are
+> around, then iterate these frequencies. This is especially helpful
+> when the configurators are IWD-based since we know that they'll be
+> on the same channels as the APs in the area.
 > ---
->   Makefile.am       |   3 +-
->   client/dpp-pkex.c | 342 ++++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 344 insertions(+), 1 deletion(-)
->   create mode 100644 client/dpp-pkex.c
+>   src/dpp.c | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 93 insertions(+)
 > 
 
-<snip>
+Ok, sounds good to me.
 
-> diff --git a/client/dpp-pkex.c b/client/dpp-pkex.c
-> new file mode 100644
-> index 00000000..7a6934e1
-> --- /dev/null
-> +++ b/client/dpp-pkex.c
-> @@ -0,0 +1,342 @@
-> +/*
-> + *
-> + *  Wireless daemon for Linux
-> + *
-> + *  Copyright (C) 2023  Intel Corporation. All rights reserved.
-> + *
-
-This looks incorrect.  Copy-paste?
-
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-<snip>
-
-> +static enum cmd_status cmd_enroll_or_configure(const char *device_name,
-> +						char **argv, int argc,
-> +						const char *method)
+> @@ -3994,10 +4008,64 @@ static uint32_t *dpp_default_freqs(struct dpp_sm *dpp, size_t *out_len)
+>   	return freqs_out;
+>   }
+>   
+> +static bool dpp_pkex_scan_notify(int err, struct l_queue *bss_list,
+> +					const struct scan_freq_set *freqs,
+> +					void *user_data)
 > +{
-> +	struct l_dbus_message_builder *builder;
-> +	const struct proxy_interface *pkex;
-> +	const char *key;
-> +	const char *id = NULL;
+> +	struct dpp_sm *dpp = user_data;
+> +	const struct l_queue_entry *e;
+> +	_auto_(scan_freq_set_free) struct scan_freq_set *freq_set = NULL;
 > +
-> +	pkex = device_proxy_find(device_name, IWD_DPP_PKEX_INTERFACE);
-> +	if (!pkex) {
-> +		display("No pkex pkex on device: '%s'\n", device_name);
-> +		return CMD_STATUS_INVALID_VALUE;
+> +	if (err < 0) {
+> +		dpp_reset(dpp);
+> +		return false;
 > +	}
 > +
-> +	if (argc < 1)
-> +		return CMD_STATUS_INVALID_ARGS;
+> +	freq_set = scan_freq_set_new();
 > +
-> +	key = argv[0];
-> +
-> +	if (argc > 1)
-> +		id = argv[1];
-> +
-> +	builder = proxy_interface_new_builder(pkex, method);
-> +
-> +	l_dbus_message_builder_enter_array(builder, "{sv}");
-> +
-> +	append_dict_basic(builder, "Code", 's', key);
-> +
-> +	if (id)
-> +		append_dict_basic(builder, "Identifier", 's', id);
-> +
-> +	l_dbus_message_builder_leave_array(builder);
+> +	if (!bss_list || l_queue_isempty(bss_list)) {
+> +		dpp->freqs = dpp_default_freqs(dpp, &dpp->freqs_len);
 
-This can all be done as:
-
-l_dbus_message_set_arguments(msg, "a{sv}", 2,
-				"Code", "s", key,
-				"Identifier", "s", id);
+This can return NULL.
 
 > +
-> +	proxy_interface_method_call_from_builder(pkex, builder,
-> +						check_errors_method_callback);
-> +	l_dbus_message_builder_destroy(builder);
+> +		l_debug("No BSS's seen, using default frequency list");
+> +		goto start;
+> +	}
 > +
-> +	return CMD_STATUS_TRIGGERED;
+> +	for (e = l_queue_get_entries(bss_list); e; e = e->next) {
+> +		const struct scan_bss *bss = e->data;
+> +
+> +		scan_freq_set_add(freq_set, bss->frequency);
+> +	}
+> +
+> +	l_debug("Found %u frequencies to search for configurator",
+> +			l_queue_length(bss_list));
+> +
+> +	dpp->freqs = scan_freq_set_to_fixed_array(freq_set, &dpp->freqs_len);
+> +
+> +start:
+> +	dpp->current_freq = dpp->freqs[0];
+
+So you'd crash here.
+
+> +
+> +	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
+> +
+> +	l_debug("PKEX start enrollee (id=%s)", dpp->pkex_id ?: "unset");
+> +
+> +	dpp_start_offchannel(dpp, dpp->current_freq);
+> +
+> +	return false;
 > +}
 > +
 
 Regards,
 -Denis
+
