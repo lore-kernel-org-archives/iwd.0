@@ -1,49 +1,49 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919D8ED1
-	for <iwd@lists.linux.dev>; Fri, 10 Nov 2023 02:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BB51363
+	for <iwd@lists.linux.dev>; Fri, 10 Nov 2023 02:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bMdhDnpi"
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6cd0963c61cso879362a34.0
-        for <iwd@lists.linux.dev>; Thu, 09 Nov 2023 18:16:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O4NtHzTm"
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6ce2ee17cb5so850286a34.2
+        for <iwd@lists.linux.dev>; Thu, 09 Nov 2023 18:17:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699582611; x=1700187411; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1699582675; x=1700187475; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=bt5G11fqaZ/+DD+ItTWwrE0pljpf2ftqULRpsFa+7wM=;
-        b=bMdhDnpig2kIkS5wuvNYGJO2WshRdN6FFUHGxx4g3qyH4m0dJKjD9eJaSEhe91I1ZY
-         RCS0TC52TQaGmNXW2xlbK7nb21TAxlZEb9oaYuS28xuSsbTlXHD0ZQ+YtIa5G3Ihqp1A
-         Ru84ylKz3033AZPmkWyTlxoJbLAZt8Uu1CQ6mFopbZCILuV+o57TorpGRJuWU6WSMn/U
-         SJarY+wfoCaDi/RMXu3zRi1Ib9iOJE8gEsex2FRRD+qBtMj9D9d9/VHgn6EoA8OXTnaq
-         9T7ZyLShZele/71aOmvK+8Gck1/5uRfhC3Tch5AqyJBHCoNJwKc8uO3NYEZCS4xlJUfN
-         +dNw==
+        bh=XnazQ1OZd/9Lg2vw0lWieikeG/quatRa0Uh3RMPhL+k=;
+        b=O4NtHzTmyLKBY3wIqQ+XRYqSYUDdi83TVdA8eOCk9cPzqYinjjADKDLslslSQL8ljX
+         OZHdGB45eegAWapb3Nm1/9YCEfF2oAFflUx/k8FM/q2xXJVKbmdtA5vtI3QVIM7BR4m3
+         TsOKnB+9gkUs+mEsbJXoBA6WHj7ZUUB1k2Mq9+RN3sJdR9RmMphVjo/vDw2SptJ96mQX
+         PUdvQVKOBAaQQODHnFhr2cblVjFIiz6/iRCAW4/OXHJ53vRy250RMUfYk/novCl0LuPq
+         Bw5uw6V91BZF8xDtTU+zpZOf7lsWh8mO+qVu1eWSHEH4N2OpI5aM3AOtPmn/9npc5uLW
+         6tuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699582611; x=1700187411;
+        d=1e100.net; s=20230601; t=1699582675; x=1700187475;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bt5G11fqaZ/+DD+ItTWwrE0pljpf2ftqULRpsFa+7wM=;
-        b=w1dyWsSZhIBjCgD+p9AEvDxW0hEdCP6DIbBrEtwCcwN3o3/lkI8QtTrSrbOOnKm3Kl
-         CVCEG0YOQPmtbqwd/Xas2LQWs50lG0/psaP3i2qH/HXU6TehA/szz9Ass3PEQHnBPCGm
-         3JU3IZzlDlHu7hBRekEmkucJHG5zcKpgBSJJwQikRZCeIYYaZM71CfpYNP8dFfiy2iz2
-         tQpgyscjj8460qTBCOwaeGSrOSbIEyWDj5tE5JeEqga1q/taEtgDX38xxrIXD6fjNLG0
-         I0xBR1CtNng886WB/Hjc0BcldAQxYD9ImCnh5PD6W+0Bjfb06qy3+/gqBJA2aa3NWwTJ
-         eaZQ==
-X-Gm-Message-State: AOJu0YyoH0PzEW3xJrgCBESkueFcnGnV5nuVbJ204X1vLuLGEaQ3/hBi
-	2k+fJ89iSpKugAtHlzebLtE=
-X-Google-Smtp-Source: AGHT+IFqxoNZtDy8H8zkOoZr8AhqqKQG6M9j9UZ/id1zvmH8zkkS4G0Zt45pwemtUAgNM7j3Bms/9g==
-X-Received: by 2002:a9d:7b4e:0:b0:6b8:8f20:4cbc with SMTP id f14-20020a9d7b4e000000b006b88f204cbcmr6266277oto.13.1699582611404;
-        Thu, 09 Nov 2023 18:16:51 -0800 (PST)
+        bh=XnazQ1OZd/9Lg2vw0lWieikeG/quatRa0Uh3RMPhL+k=;
+        b=vyKkZru/c1eQaQ/V1P8LBp4QUD546yAfm+SZQRHX0ff0MAHxlNgypsb8JxVWUKm59b
+         96RGBim2gK8vXPCdTaxkS5iHdGeQC4Z2vEbxtD67C2XvcC7L4nCESzb+Z45QD2WxBxxa
+         0mPwY6xfL0r86CXQOophUbXoXgzMjV0RTPEVRDxryU6eZHpPYjqgrMNrj6DjSp/AH1cP
+         FDyO+V67msJpNBFQd5lWUBgPdlzyaE+/SnHAlBRB/4nuIeW48cVZtXVmypg6GVo+2ady
+         i/he3QhbpUiv1y93PRiTAZAwYtfebhkJcIbEEHpgR0UT9gtBNEnSxs6saXjXKIVwXM4B
+         yt8A==
+X-Gm-Message-State: AOJu0YzQh5JNRLj13W7/4iQcByZBgFf0wOji6P2X3cTYEZqsS/OAnFlB
+	7Sk+py2Q6LnS7kK9WkgIcxY1Ttf2GRY=
+X-Google-Smtp-Source: AGHT+IHreJN5tjGp2izsKOMICe+mbxF1OazbxpX/we5t3h7g6v0vViphspelfwbEC7o+uAVLM1FVrw==
+X-Received: by 2002:a05:6830:12c2:b0:6bf:1444:966d with SMTP id a2-20020a05683012c200b006bf1444966dmr6753207otq.1.1699582674865;
+        Thu, 09 Nov 2023 18:17:54 -0800 (PST)
 Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id t26-20020a05683022fa00b006ce2fce83cbsm2432173otc.25.2023.11.09.18.16.50
+        by smtp.googlemail.com with ESMTPSA id t26-20020a05683022fa00b006ce2fce83cbsm2432173otc.25.2023.11.09.18.17.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Nov 2023 18:16:50 -0800 (PST)
-Message-ID: <002d388a-1830-4955-9c9e-df2d405c269b@gmail.com>
-Date: Thu, 9 Nov 2023 20:16:48 -0600
+        Thu, 09 Nov 2023 18:17:54 -0800 (PST)
+Message-ID: <8d34f4e5-3c21-44b6-baf2-78420258bab8@gmail.com>
+Date: Thu, 9 Nov 2023 20:17:54 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,29 +51,38 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dpp: fix removed dpp_reset in Stop()
+Subject: Re: [PATCH 1/3] client: Add shared code DBus interface
 Content-Language: en-US
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20231109172522.37912-1-prestwoj@gmail.com>
+References: <20231109184926.52629-1-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20231109172522.37912-1-prestwoj@gmail.com>
+In-Reply-To: <20231109184926.52629-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 11/9/23 11:25, James Prestwood wrote:
-> It seems in my patch reordering both stop methods lost the actual
-> call to dpp_reset().
-
-In the future, lets use the Fixes: tag for commits like this.
-
+On 11/9/23 12:49, James Prestwood wrote:
 > ---
->   src/dpp.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
+>   client/dbus-proxy.h | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
 > 
+> diff --git a/client/dbus-proxy.h b/client/dbus-proxy.h
+> index 0b4fec43..cd1b2305 100644
+> --- a/client/dbus-proxy.h
+> +++ b/client/dbus-proxy.h
+> @@ -2,7 +2,7 @@
+>    *
+>    *  Wireless daemon for Linux
+>    *
+> - *  Copyright (C) 2017-2019  Intel Corporation. All rights reserved.
+> + *  Copyright (C) 2017-2013  Intel Corporation. All rights reserved.
 
-Applied, thanks.
+Uh?
+
+>    *
+>    *  This library is free software; you can redistribute it and/or
+>    *  modify it under the terms of the GNU Lesser General Public
 
 Regards,
 -Denis
