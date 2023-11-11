@@ -1,50 +1,49 @@
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E570820338
-	for <iwd@lists.linux.dev>; Fri, 10 Nov 2023 18:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0C319BBF
+	for <iwd@lists.linux.dev>; Sat, 11 Nov 2023 16:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BGK+N2X9"
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5842c251d7cso1210454eaf.1
-        for <iwd@lists.linux.dev>; Fri, 10 Nov 2023 10:19:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxnpoogy"
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6cf65093780so1756874a34.0
+        for <iwd@lists.linux.dev>; Sat, 11 Nov 2023 08:25:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699640370; x=1700245170; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=gmail.com; s=20230601; t=1699719921; x=1700324721; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gTByHM3PIsINt2H4Z8X2lN6AhscEfVkNaQgSLncj2cU=;
-        b=BGK+N2X9kDcUXVSC6Nrc0fypBMVPbrATQuqtr/BNeWnXYSUEj6RUQqZHCZ6iF9O2C4
-         UbHVO4k31qJoPpWSX9Mba0IRi9lSjlbH2QYtWBesyLzVDEYWMPTihE1565LwkVI1CZum
-         4nq0VOWK7cifHlMokNqZJKACBlp/lcneQH/rnrNOfexlY6WZZ3HX4bYmUR43okkcJGZs
-         ZSPytjdzRR7gUZgWr8zDkoQYy1esD/sV2Q5YVyqKslCglhYxZ/f/OELMV/31+2abqzuR
-         O2yxKDZK1bCezkwvCEWKOEgLjcQnG2QnTlhTlkDrgfq3RfLp4zhAShEtt6mpvB4RNH9J
-         isgA==
+        bh=05aLZ/bYEtyTIEeEft9TbVK5mvyP1bqSoX9r/Ds8wSs=;
+        b=mxnpoogyw1lgFjJ95mgK1MSrJ3MXkJSIbsV4QIvbUwXWgw/dz621exQn1C5RQWA8q+
+         vbfIExgBog4rsUhRZb8BusZ6e8eQIEwCYH10oRpOz/ATWY8KlZ6G0skxnHrLiWu5drYT
+         3OFjNLsmnJ8RL9VhWBk+hEK+IgIjEAh9IZCXg0VMeuWfa4oRcQPTXinhFISPABJWljpw
+         sYZSO0MeldKreQUuaQ0gdzjrncMsNaaNOd2ALbAYtGNiKja1Oyq4yFYj/xPkXxh0hzts
+         7OPLop700aIfx24khuBRcFazZZchW1tWhPrOWNZqwov5bt6sozqnrYJ9jNSJcOElnwnn
+         wPRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699640370; x=1700245170;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20230601; t=1699719921; x=1700324721;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gTByHM3PIsINt2H4Z8X2lN6AhscEfVkNaQgSLncj2cU=;
-        b=ec8eWHxzH2YQ80SB+Qm3+zrcK+WvXxBy77iydz3R48LSpHgtylIJp+sPBlDwZIp53o
-         3g72Y6FnMejIxYjP1Snh9cyD/Qczt4nhPOkFAo70zLSdSxQ84aAJ8KsEBtTdZJRxiAkf
-         3LAE/lxZOQz0H8LH+XfNSQDpwKHSmQVB2ocDL+VUoT0/F4vGmgR5eIKhUjMHyQbWtMNT
-         dvEJSgMuXSplXmkGOwHB/pghqUEyv81mUqdY8ZzFe34fhR6jxKTUvk1HiZ9Qzlo5rRjz
-         tG7aLNoQM9BERr++z5BmBCCS8qtpgkRchNNuEAXJ6J0dzokh+xoh1GxU6e324mxGKSFB
-         NzMA==
-X-Gm-Message-State: AOJu0YwCDTHImuDRVzIXJoEpmqQ+TKWDm13q1g/R/XDZb2rhHnx0hMsU
-	FPA07a/96b8vJTgqD5mD/7m89G2avUs=
-X-Google-Smtp-Source: AGHT+IHUmSOwyilWmbWKuvGFkImsIMk1C/y+qVAOhj7mri2XppzkEjVgZk3i6mS5sO8q83ub1P79Pg==
-X-Received: by 2002:a05:6358:7e04:b0:168:e4d0:a743 with SMTP id o4-20020a0563587e0400b00168e4d0a743mr9316530rwm.21.1699640369102;
-        Fri, 10 Nov 2023 10:19:29 -0800 (PST)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id l1-20020a05620a28c100b007749dc7881dsm2200qkp.48.2023.11.10.10.19.28
-        for <iwd@lists.linux.dev>
+        bh=05aLZ/bYEtyTIEeEft9TbVK5mvyP1bqSoX9r/Ds8wSs=;
+        b=R1Y8lNrxVDNUz1jVQUUDsR+mvzE2k64NXiOKaNPoHWs1HyRvM2vqFlGbbOATZj1R7r
+         X6i6cz5gpvpxmCg7SDNm6cqjF/8NfZS9N8X6P7esltWjLnBKTpZQSGpVRSbz3oqFEz2+
+         7a+6TQX50CwtIOXXOEQ7Q6WavlQ9cSujmRPhKPPfD4e4FxriEGPLD9jboWa3bbuA6fhU
+         Ec5+9HCw3yx0dQpM1Vg8ke+CnMBCPEi5w8wuJ2P/TZ5fw+3PjeC8WqtDNx3LxTUim4PG
+         g6OgNY9J10B5cD1d1YE+LKZMv912BqOP0dSLgGI8v9atkWamLyUSWr6en5EhP9xc3wGd
+         E8Gw==
+X-Gm-Message-State: AOJu0Yy5pPBYx4KRdnOivSycmfXfItReYZaaRMMnSl+9cwaCOu9pMDTB
+	hVnVyiKgJtuAsBolbhFk5is=
+X-Google-Smtp-Source: AGHT+IF+6k/Yl/I/0YBYRXaDZK4kfu9gaDMRDmEqMfN9SIOkM/38EDMO/4hjxor6VPiPUrrPJej3pA==
+X-Received: by 2002:a9d:755a:0:b0:6d6:4e53:c81b with SMTP id b26-20020a9d755a000000b006d64e53c81bmr2987722otl.8.1699719921493;
+        Sat, 11 Nov 2023 08:25:21 -0800 (PST)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id v13-20020a05683011cd00b006d2e04a55e8sm270020otq.14.2023.11.11.08.25.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Nov 2023 10:19:28 -0800 (PST)
-Message-ID: <2df078cc-dc9f-4feb-ac13-0789681b0b3e@gmail.com>
-Date: Fri, 10 Nov 2023 10:19:26 -0800
+        Sat, 11 Nov 2023 08:25:20 -0800 (PST)
+Message-ID: <cae87f8a-9b71-4ff6-9cb5-729e41c34c54@gmail.com>
+Date: Sat, 11 Nov 2023 10:25:16 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -52,24 +51,30 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] dpp: add station watch to DPP
+Subject: Re: [PATCH] client: display_completion_matches add 0-byte check
 Content-Language: en-US
-To: iwd@lists.linux.dev
-References: <20231110141620.80195-1-prestwoj@gmail.com>
- <20231110141620.80195-3-prestwoj@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20231110141620.80195-3-prestwoj@gmail.com>
+To: Finn Behrens <me@kloenk.de>, iwd@lists.linux.dev, secure@intel.com
+Cc: dev@leona.is
+References: <20231110101558.30639-1-me@kloenk.de>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20231110101558.30639-1-me@kloenk.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/10/23 6:16 AM, James Prestwood wrote:
-> DPP (both DPP and PKEX) run the risk of odd behavior if station
-> decides to change state. DPP is completely unaware of this and
-> best case would just result in a protocol failure, worst case
-> duplicate calls to __station_connect_network.
-> 
-> Add a station watch and stop DPP if station changes state during
-> the protocol.
+Hi Finn,
 
-Please hold off on merging this. It works in practice but isn't playing 
-nice with the autotests.
+On 11/10/23 04:15, Finn Behrens wrote:
+> Check that enough space for newline and 0-byte is left in line.
+> This fixes a buffer overflow on specific completion results.
+> 
+> Reported-By: Leona Maroni <dev@leona.is>
+> ---
+>   client/display.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+
+Applied, thanks.
+
+Regards,
+-Denis
+
