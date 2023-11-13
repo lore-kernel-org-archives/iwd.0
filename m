@@ -1,56 +1,53 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF9822EEE
-	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 17:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0275622309
+	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 18:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6H4gsT1"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-671357f0209so29733136d6.0
-        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 09:54:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TEJdB5qJ"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-671357f0209so29933866d6.0
+        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 10:28:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699898048; x=1700502848; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V6EjcynQLIN6eDclbce5RkriaZkHKhyZbdj7USndYfU=;
-        b=b6H4gsT1bC0RXRFTPkhUaURZVNdUYNzrhQIxLXJWOMf7zCxLhX9+igqtF8utAtgRLs
-         ppm6KtChUrTb8tUUNcUlN+uzEUt5GXUh9zoy4BoKDNeVP2IYHrc5xcDhnzAhjqR2wGYP
-         EdmPRyUR37PbLaKB/RKtS7vuvQe3ArYMAQMTZVutbjKlKdxzeKrFg9bvIdYXlzp37w+x
-         0igUR1mRwiQi3Lrq4u4fjA10zEVcmt4zALQjvbV1mbuxO0BrnGnaxD4nAf9jfAd9iMun
-         xbO9o6AFbu9e356Oha+l1achpTgj+vrLxisdJdoxhI2da0TbAvhT3UUM72oQf+VlyBG7
-         MF7w==
+        d=gmail.com; s=20230601; t=1699900087; x=1700504887; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6qEJmOEkljxkK/ENkxomQMbC6EA/aMDwSdvNH1Umlaw=;
+        b=TEJdB5qJg5UY+uEV0TLKwBDM54L0AW3VXA7i0434BzBYl0oMsWVZFstxKfpozkeKN4
+         ejC1JJwfl3fklsNP6Gz+d9xuaYNsQrxme9xQjzKJqDGjNQIgG9hDIR0LIqGGSJRdPm5k
+         hK6oAPvniWudVUQRtsJtfi2O5PRNzxLIvQzTFzQhE6VHj+o+t/lWGGkN0Q/ZIrNybwWn
+         Od6NJXDpdf5mSkpO8G3fKrSf39tIhf5iSokW5PY7lMHFWNRqjJ2jAzPDu9zc4NYa6bNi
+         Bz01hVi/mAKOy5BEo8iOBaqEGW3dlj16oTHk3PIcU714bLmv/N0svKqFdlfZzRkY0JRd
+         QMbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699898048; x=1700502848;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V6EjcynQLIN6eDclbce5RkriaZkHKhyZbdj7USndYfU=;
-        b=JqcNAeckT0vxInRrMYrA25wpAMiljvvjBJUxzI3wrwwtOTP6sYrP0a36toXpevoIV0
-         +NWyHouHxOMgAxtTctYr1sAlD/HAsYsQMIh4ak3OZH6Qh19S2maJQ4nvfcMyz01vDY5X
-         PdYH8r+3ltJjZKv9Fkgp3V+dg2sXGussrqId3cj8KYk91qarFlPHoXxunApjncljyDTt
-         d3YW/5V5xV44j+b48ny+kIAA28cJZIi09MiMVVrQqNKRt+yBpq3g8TktSWS4tC8j/pn6
-         7BwTJlH02xBII8Thv6SgN1RA9bPL/Vx41fZGNWgJjwiC0jLwAJt201hCJhvetpd7DKjs
-         oRMQ==
-X-Gm-Message-State: AOJu0YxpdYrkBiHtsyBmfaknauBaiF3BsXj+UbLJkLbdRPnxc/wGZclr
-	0z5vs/z27kNYTh8B49Sn8rEfFYQVY4g=
-X-Google-Smtp-Source: AGHT+IFyCpUO9r5VBQMq873CvjDYep/o0Hu/gg/ArwNhWUu46KEuwXc9x2VUqR11wS03dm7U/9XOdw==
-X-Received: by 2002:ad4:4e13:0:b0:658:65ed:7e8 with SMTP id dl19-20020ad44e13000000b0065865ed07e8mr6063114qvb.57.1699898048568;
-        Mon, 13 Nov 2023 09:54:08 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699900087; x=1700504887;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6qEJmOEkljxkK/ENkxomQMbC6EA/aMDwSdvNH1Umlaw=;
+        b=dta+mgq9pFsIqzrVI2uSTT8LCTeyfP4NDVpBl86YD30Ask39Bi5OC20nbooeDOTOfv
+         AKFJGFlx/jYtrr66iSKFAH3fuQc7sSBUPKuvA7yQHueOyXrpEAaf6Yss23PBK0zDkL3d
+         m4oz3v2yGVR9iDHTJ3a/e2qUa5fxdOx3m/PzPNmQO1KTb/AooIS3OWUS38yFrD+Q4kMs
+         1mh/5d4JslrDorZgDKvznNDfysxCOuhHmrT1iY+wFqiZpm7Ic2W7n0bljNPGdsnZzWWo
+         r7Df62h6OveiDKxbPi7BJzv1E890HlMpcHqTBVJNbXEZI7ALdPmmHgVSJA2BkC12Wad4
+         D0eQ==
+X-Gm-Message-State: AOJu0YwYrqJhitY7PlCrhy5y+paSrodtHzQHV4hojXKcysHCsV3Jrs0j
+	tDlb7ANqY0MT3yoI8L904S8h3fTMZ58=
+X-Google-Smtp-Source: AGHT+IHXNYi+iuPofDGoMgb4x58jBzcD+B/OkFQlZ/8LLRP7YduQIPruwZ+5jckt/ikZzkaxKuefEA==
+X-Received: by 2002:a0c:e7c4:0:b0:65b:765:254 with SMTP id c4-20020a0ce7c4000000b0065b07650254mr34823qvo.4.1699900087624;
+        Mon, 13 Nov 2023 10:28:07 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id n11-20020a05620a294b00b007756c0853a5sm2010975qkp.58.2023.11.13.09.54.07
+        by smtp.gmail.com with ESMTPSA id x13-20020a0cfe0d000000b006710660a548sm2240121qvr.27.2023.11.13.10.28.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Nov 2023 09:54:08 -0800 (PST)
+        Mon, 13 Nov 2023 10:28:07 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 4/4] dpp: scan to pick up extra frequencies when enrolling
-Date: Mon, 13 Nov 2023 09:54:01 -0800
-Message-Id: <20231113175401.343239-4-prestwoj@gmail.com>
+Subject: [PATCH] RFC: Support full profile sharing via DPP 3rd party attributes
+Date: Mon, 13 Nov 2023 10:28:00 -0800
+Message-Id: <20231113182800.344348-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231113175401.343239-1-prestwoj@gmail.com>
-References: <20231113175401.343239-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -59,164 +56,92 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The DPP-PKEX spec provides a very limited list of frequencies used
-to discover configurators, only 3 on 2.4 and 5GHz bands. Since
-configurators (at least in IWD's implementation) are only allowed
-on the current operating frequency its very unlikely an enrollee
-will find a configurator on these frequencies out of the entire
-spectrum.
+If an IWD profile contains network-specific settings which are
+required to utilize the network correctly configuring via DPP
+will not carry over those settings to the enrollee. The DPP
+configuration object only contains the SSID/PSK to connect and
+anything else set in the configurators profile is not included.
 
-The spec does mention that the 3 default frequencies should be used
-"In lieu of specific channel information obtained in a manner outside
-the scope of this specification, ...". This allows the implementation
-some flexibility in using a broader range of frequencies.
+This is likely something that the majority of users will not
+need (most networks don't need additional settings) but if the
+network does it would be convenient for the configurator to send
+over its exact configuration to the enrollee. This is useful for
+an automated use case where a configuration should be consistent
+across all devices.
 
-To increase the chances of finding a configurator shared code
-enrollees will first issue a scan to determine what access points are
-around, then iterate these frequencies. This is especially helpful
-when the configurators are IWD-based since we know that they'll be
-on the same channels as the APs in the area.
+DPP allows for arbitrary 3rd party attributes in the configuration
+object (section 4.5.2) which can be used to communicate additional
+settings.
+
+The plan is to define a new object within the overall
+configuration object who's keys are IWD profile groups and values
+are objects containing settings for those groups:
+
+{
+  "ssid": "my_ssid",
+  ... main configuration object ...
+
+  ... The IWD profile, converted to JSON ...
+  "/net/connman/iwd": {
+    "Network": {
+      "MutlicastDNS": "true"
+    },
+    "IPv4": {
+      "SendHostname": "true"
+    },
+    ... etc ...
+  }
+}
+
+The "/net/connman/iwd" object could then be parsed by the enrollee
+(potentially if the feature is enable in main.conf?) and set to
+the profile as it is now with the passphrase/psk.
+
+Several profile values don't apply here like MAC/IP address
+overrides. Mainly the settings that do matter would be:
+
+[IPv4].SendHostname
+[Network].MulticastDNS
+[Settings] (most values here, except AddressOverride)
+
+The other IPv4/v6 settings likely aren't useful since they
+pertain mostly to static configurations and are obtained from
+DHCP. The [Security] group would be omitted entirely since its
+already set by the main configuration and contains generated
+values like SAE-PT-Group's.
 ---
- src/dpp.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 88 insertions(+), 10 deletions(-)
+ src/iwd.network.rst | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index a95f93e2..41b7c70e 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -183,6 +183,7 @@ struct dpp_sm {
- 	size_t z_len;
- 	uint8_t u[L_ECC_SCALAR_MAX_BYTES];
- 	size_t u_len;
-+	uint32_t pkex_scan_id;
+diff --git a/src/iwd.network.rst b/src/iwd.network.rst
+index 719853fa..8f4e54f9 100644
+--- a/src/iwd.network.rst
++++ b/src/iwd.network.rst
+@@ -440,6 +440,25 @@ network configuration.
+        value obtained from the DHCPv6 server or via Router Advertisements.
  
- 	bool mcast_support : 1;
- 	bool roc_started : 1;
-@@ -508,6 +509,11 @@ static void dpp_reset(struct dpp_sm *dpp)
- 		dpp->retry_timeout = NULL;
- 	}
  
-+	if (dpp->pkex_scan_id) {
-+		scan_cancel(dpp->wdev_id, dpp->pkex_scan_id);
-+		dpp->pkex_scan_id = 0;
-+	}
++The group ``[DeviceProvisioning]`` contains settings for device provisioning
++credential sharing.
 +
- 	dpp->state = DPP_STATE_NOTHING;
- 	dpp->new_freq = 0;
- 	dpp->frame_retry = 0;
-@@ -4073,6 +4079,14 @@ static struct l_dbus_message *dpp_dbus_stop(struct l_dbus *dbus,
- 	return l_dbus_message_new_method_return(message);
- }
- 
-+static void dpp_pkex_scan_trigger(int err, void *user_data)
-+{
-+	struct dpp_sm *dpp = user_data;
++.. list-table::
++   :header-rows: 0
++   :stub-columns: 0
++   :widths: 20 80
++   :align: left
 +
-+	if (err < 0)
-+		dpp_reset(dpp);
-+}
++   * - ShareFullConfig
++     - Values: true, **false**
 +
- /*
-  * Section 5.6.1
-  * In lieu of specific channel information obtained in a manner outside
-@@ -4111,6 +4125,62 @@ static uint32_t *dpp_default_freqs(struct dpp_sm *dpp, size_t *out_len)
- 	return freqs_out;
- }
- 
-+static bool dpp_pkex_scan_notify(int err, struct l_queue *bss_list,
-+					const struct scan_freq_set *freqs,
-+					void *user_data)
-+{
-+	struct dpp_sm *dpp = user_data;
-+	const struct l_queue_entry *e;
-+	_auto_(scan_freq_set_free) struct scan_freq_set *freq_set = NULL;
++       When configuring an enrollee, include all additional network profile
++       settings except those that are device specific (e.g. MAC/IP address
++       overrides). This uses 3rd party attributes in the DPP configuration
++       response and will only be compatible with IWD-based enrollees that can
++       parse those attributes.
 +
-+	if (err < 0)
-+		goto failed;
 +
-+	freq_set = scan_freq_set_new();
-+
-+	if (!bss_list || l_queue_isempty(bss_list)) {
-+		dpp->freqs = dpp_default_freqs(dpp, &dpp->freqs_len);
-+		if (!dpp->freqs)
-+			goto failed;
-+
-+		l_debug("No BSS's seen, using default frequency list");
-+		goto start;
-+	}
-+
-+	for (e = l_queue_get_entries(bss_list); e; e = e->next) {
-+		const struct scan_bss *bss = e->data;
-+
-+		scan_freq_set_add(freq_set, bss->frequency);
-+	}
-+
-+	l_debug("Found %u frequencies to search for configurator",
-+			l_queue_length(bss_list));
-+
-+	dpp->freqs = scan_freq_set_to_fixed_array(freq_set, &dpp->freqs_len);
-+
-+start:
-+	dpp->current_freq = dpp->freqs[0];
-+
-+	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
-+
-+	l_debug("PKEX start enrollee (id=%s)", dpp->pkex_id ?: "unset");
-+
-+	dpp_start_offchannel(dpp, dpp->current_freq);
-+
-+	return false;
-+
-+failed:
-+	dpp_reset(dpp);
-+	return false;
-+}
-+
-+static void dpp_pkex_scan_destroy(void *user_data)
-+{
-+	struct dpp_sm *dpp = user_data;
-+
-+	dpp->pkex_scan_id = 0;
-+}
-+
- static bool dpp_start_pkex_enrollee(struct dpp_sm *dpp, const char *key,
- 				const char *identifier)
- {
-@@ -4156,17 +4226,25 @@ static bool dpp_start_pkex_enrollee(struct dpp_sm *dpp, const char *key,
- 
- 	dpp_property_changed_notify(dpp);
- 
--	dpp->freqs = dpp_default_freqs(dpp, &dpp->freqs_len);
--	if (!dpp->freqs)
--		goto failed;
--
--	dpp->current_freq = dpp->freqs[dpp->freqs_idx];
--
--	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
--
--	l_debug("PKEX start enrollee (id=%s)", dpp->pkex_id ?: "unset");
-+	/*
-+	 * The 'dpp_default_freqs' function returns the default frequencies
-+	 * outlined in section 5.6.1. For 2.4/5GHz this is only 3 frequencies
-+	 * which is unlikely to result in discovery of a configurator. The spec
-+	 * does allow frequencies to be "obtained in a manner outside the scope
-+	 * of this specification" which is what is being done here.
-+	 *
-+	 * This is mainly geared towards IWD-based configurators; banking on the
-+	 * fact that they are currently connected to nearby APs. Scanning lets
-+	 * us see nearby BSS's which should be the same frequencies as our
-+	 * target configurator.
-+	 */
-+	l_debug("Performing scan for frequencies to start PKEX");
- 
--	dpp_start_offchannel(dpp, dpp->current_freq);
-+	dpp->pkex_scan_id = scan_active(dpp->wdev_id, NULL, 0,
-+				dpp_pkex_scan_trigger, dpp_pkex_scan_notify,
-+				dpp, dpp_pkex_scan_destroy);
-+	if (!dpp->pkex_scan_id)
-+		goto failed;
- 
- 	return true;
+ Embedded PEMs
+ -------------
  
 -- 
 2.25.1
