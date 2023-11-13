@@ -1,185 +1,164 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5041D1F60A
-	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 13:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AD021116
+	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 14:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="moCBQ+aV"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1cc1ee2d8dfso39076405ad.3
-        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 05:10:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MnTRiIYo"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1ce28faa92dso7042075ad.2
+        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 06:32:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699881021; x=1700485821; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=l8b5j2+hl25zI1xyj14IcLxUHw2aRQURkM9DwVe9t70=;
-        b=moCBQ+aVhTimVFRgJ92wmz5dQV0UP9EbErVgAlgVtzrUVNY47eWnrFauhnMUfJaTJB
-         MlyA2FGaiVRVQigzs/jU9jwPWUwDb8m2NSB8RXbhprkQ6Y1q8RFA6QfiHfwlH5S4doXs
-         ig/EymHKQ2cuq0tBkDfyIUnkqayy6+m5yuZHbxzD5dYcnV2lsHoeGBvqWyhMPAXH32hc
-         drAYkEfHZf3EvxcqQ6X7IeKDIEF2UBftxADH9IZkot3Bbb5OjptDYKoPuzZZIGioElfG
-         kON9v9ZxMfJdrKdAI++K0j1vWBMs4ptfJ10auBJp7psIO6ewsL935cMvLBEysh71sNcU
-         U+Og==
+        d=gmail.com; s=20230601; t=1699885979; x=1700490779; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HshdV+YMSfhFmt4mGbkArqJLs+jj3+o35weYH0uag8k=;
+        b=MnTRiIYoy+IB2a/284nWVa8vWCj4KT9qi2/CzMVX8Xp99aY28MmYN/q5/zpuVe6DxV
+         4IDhtk0tpdtNIGnBgzCeh0sAhaXNkwb/ctdZzlPEQ1Hyb0sB9UMMK1AbrOhZiY3t5nbp
+         Dm7asr46h+j7mLo2GcHQnsKT7+S78sQnMR1zLDsKWFWTMdG2C4jpvzRPXykpxg3nkToH
+         Ud+OrXMBH2A7Axhy+q75DA6hj1QQSL5KCO8hzJCj7gXmnORJZtWFtzT9WfpR+n8ecOD8
+         pILtaj1T4n9j9gVBBX0K6dR8zcLy1earvPMx8/17W8+S/pcfCbSQVeohNEJ+8yC9uz2U
+         N9ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699881021; x=1700485821;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l8b5j2+hl25zI1xyj14IcLxUHw2aRQURkM9DwVe9t70=;
-        b=kIBdO5NiaMFZdq/sZ/srKSVJjAT2TUrJzDZJywfypVRoWhjyqETF7ivNPgPjcCnvST
-         eR0BQkXbfQoQUh7BTuPPWSP5f/NebfPc3r/XouPTP6Ue8ye5m2z+Ck0jWqXOnOzobCFo
-         9WdrPwuU20J5IM1Ar/gwg2E867WmTUK4raDPd+AR4GCAivWrxRtLoAV8MAGRQCOLaS5k
-         kCMFHr6EGQu6TOH38Yr1nN8DgbDeygQiavr/JGyeed/OhY+o4qJYT5mE+UqkyUhNJraU
-         +A/tWoVOkQzMqOWArcQ6WnL2bgGQ6h+55XgC7mFt9KiRkjEzIKWOHcZnxDiotuuQfTz0
-         Aj2A==
-X-Gm-Message-State: AOJu0Yxy+Y0BdFQiR/GrXg+b2FSeFKCLAxvtWAAsI/vquq6jFfNeYZSS
-	AODsAxp0uxCq9FjtgQ7ANq8=
-X-Google-Smtp-Source: AGHT+IHs1xzOKDXPprIdRyKMZYuQ0HyMCK0ZJ45sz8adyYawDC85o+E0QSyJRsf7fs0CmvKm+jt8VA==
-X-Received: by 2002:a17:902:d2d0:b0:1ce:8e4:111 with SMTP id n16-20020a170902d2d000b001ce08e40111mr8196141plc.27.1699881021454;
-        Mon, 13 Nov 2023 05:10:21 -0800 (PST)
-Received: from [192.168.254.82] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id j18-20020a170902c3d200b001c728609574sm4012613plj.6.2023.11.13.05.10.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Nov 2023 05:10:21 -0800 (PST)
-Message-ID: <4d8b889f-0b31-409b-93d1-7a06051adf9e@gmail.com>
-Date: Mon, 13 Nov 2023 05:10:20 -0800
+        d=1e100.net; s=20230601; t=1699885979; x=1700490779;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HshdV+YMSfhFmt4mGbkArqJLs+jj3+o35weYH0uag8k=;
+        b=Hw/5X8RB02ovFm24QsJCWXFAfKo+IwsjBJzbjKNr23FzoFp3yCwN7joWKXIvMzuFNA
+         veqDPkNv8+L5mipycPWJeu1hbnnw0PQ8B6uLQWHpRJt4m8NFxlIQHEgK+nueIWgFxen0
+         kHsjAYOmWxG5piXCTpkOIrXblzNlAFJrdPHpj9jBPONZyPOA+/l5VCmlmTs+ZmJQQIAw
+         67ud8fb/9413NCe5+olb4W9F+eh4ZpwiowbZ5Chpk3Cl6aPuGKwqj0sPU0JYWW8qInHm
+         s8md/g6BqZfVVZtijjjWF4vgeoA6jZrjMxkUBGarYLxWOZokxVcan0HfACIMNIvYf7gZ
+         QrnQ==
+X-Gm-Message-State: AOJu0YwsG0mrqKh0W2GhXN18XWYia+9x4ijOHMjSLB8n6Nc0rUSlbhMi
+	1tvomFZUz30I/1hX2e662ZpGiaXAUZM=
+X-Google-Smtp-Source: AGHT+IFRP6d9FdCnXJJRPpRnBt2hon3IW9JEMDCeUGs4Wde+Y6NDYJJkzklv4iteLT4DVQyPS+mKOA==
+X-Received: by 2002:a17:902:7407:b0:1c5:d8a3:8789 with SMTP id g7-20020a170902740700b001c5d8a38789mr5077055pll.4.1699885978838;
+        Mon, 13 Nov 2023 06:32:58 -0800 (PST)
+Received: from localhost.localdomain ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id b7-20020a170902d50700b001cc25cfec58sm4071496plg.226.2023.11.13.06.32.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Nov 2023 06:32:58 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] auto-t: make test timeout configurable
+Date: Mon, 13 Nov 2023 06:32:53 -0800
+Message-Id: <20231113143255.278191-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] station: handle ROAMING state in disconnect event (again)
-Content-Language: en-US
-To: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alvin@pqrs.dk>,
- "iwd@lists.linux.dev" <iwd@lists.linux.dev>,
- Dimitrios Karnikis <DIKA@bang-olufsen.dk>,
- Claudio Cabral <CLCA@bang-olufsen.dk>, =?UTF-8?Q?Pedro_Andr=C3=A9?=
- <PEDA@bang-olufsen.dk>, Johnny Kudahl <JOY@bang-olufsen.dk>,
- "achyut.hegde@nxp.com" <achyut.hegde@nxp.com>,
- "yuvraj.singh@nxp.com" <yuvraj.singh@nxp.com>
-References: <20230403141927.235014-1-alvin@pqrs.dk>
- <c9b5a931-ac35-2755-c656-acd567c1505f@gmail.com>
- <lrv3ytp7a6jvuupcu4pvx2w5jmud4yj6jxbk4imflcqeuosugo@vu7fco6auklk>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <lrv3ytp7a6jvuupcu4pvx2w5jmud4yj6jxbk4imflcqeuosugo@vu7fco6auklk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Alvin,
+With the addition of DPP PKEX autotests some of the timeouts are
+quite long and hit test-runners maximum timeouts. For UML we should
+allow this since time-travel lets us skip idle waits. Move the test
+timeout out of a global define and into the argument list so QEMU
+and UML can define it differently.
+---
+ tools/run-tests | 12 +++++-------
+ tools/runner.py |  7 +++++++
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
-On 11/13/23 4:46 AM, Alvin Šipraga wrote:
-> Hello again James,
-> 
-> I'm resurrecting this old thread because we are hitting another roaming related
-> issue and I am not sure whether the problem is in iwd or in the wireless
-> driver/fw. I hope you can help me with some log analysis.
-> 
-> On Mon, Apr 03, 2023 at 03:35:28PM -0700, James Prestwood wrote:
->> Hi Alvin,
->>
->> On 4/3/23 07:19, Alvin Šipraga wrote:
->>> From: Alvin Šipraga <alsi@bang-olufsen.dk>
->>>
->>> The blamed commit clobbered the non-FT (Reassociation) roaming case
->>> in the disconnect event handler, causing iwd to potentially get stuck in
->>> the ROAMING state after a failed reassociation during non-FT roaming.
->>> Add it back.
->>>
->>> The subject is inspired by a previous commit which did the same thing,
->>> but introduced before the new roaming states were added, namely commit
->>> 8758cc89487b ("station: handle ROAMING state in disconnect event"). The
->>> rationale here is the same.
->>>
->>> Fixes: edf556cc7bb9 ("station: add two new roaming states (FT/FW)")
-> 
-> The last update I gave was on a silently dropped frame in the firmware when
-> doing the 4-Way Handshake. This was fixed inside the vendor's firmware so there
-> is nothing further to discuss there. See below for the current issue we are facing.
-> 
->>
->> IIRC leaving out the old ROAMING state in this switch was actually done
->> intentionally. This is because netdev_reassociate() takes a callback and any
->> failures with the roam *should* show up in netdev_connect_event(), and in
->> turn call the callback which then leads to the same station_disassociated()
->> call. We wanted to avoid the potential of a disconnect event AND the connect
->> callback both calling station_disassocated().
-> 
-> OK, so this makes sense, but I think we are hitting an edge case in our test
-> setup which slips through this logic. Allow me to explain.
-> 
-> We have an automated test setup with two BSSes in the same ESS and programmable
-> attenuators used to simulate a low-RSSI event on the station. The sequence of
-> events below begins with the station connected to the first BSS (BSS0), and it
-> is expected that iwd will then direct the driver to associate to the second BSS
-> (BSS1). This is without FT roaming.
-> 
-> 1. iwd receives a CQM event and enters roaming state.
-> 
-> 2. iwd issues a CMD_CONNECT. The driver defines .auth and .assoc ops, not
->     .connect, so it takes the SME path in the kernel.
-> 
-> 3. Auth/Assoc are successful and BSS1 kicks off the 4-Way Handshake.
-> 
-> 4. After entering eapol_handle_ptk_3_of_4() iwd asynchronously installs the keys
->     with CMD_NEW_KEY and then deletes the EAPOL timeout.
-> 
-> 5. The group key gets installed successfully (CMD_NEW_KEY returns success).
-> 
-> 6. In the mean time however the station receives a Deauth or Deassoc (not clear
->     from our driver logs) and the driver sends this to iwd. In
->     netdev_disconnect_event() iwd then follows this path:
->      -> netdev_connect_free()
->        -> handshake_state_free()
->          -> netdev_handshake_state_free()
-> 	  -> netdev_handshake_state_cancel_all()
-> 	    -> l_genl_family_cancel(nl80211, nhs->pairwise_new_key_cmd_id);
-> 
->     Then, re: the original patch in this thread, iwd's station code ignores this
->     event, because the station state is ROAMING.
-> 
-> 7. The subsequent CMD_NEW_KEY then fails in the driver, but the above genl
->     callback is never invoked because it was cancelled.
+diff --git a/tools/run-tests b/tools/run-tests
+index 32c09723..11ad73c0 100755
+--- a/tools/run-tests
++++ b/tools/run-tests
+@@ -27,8 +27,6 @@ from utils import Process, Namespace, BarChart
+ config = None
+ intf_id = 0
+ 
+-TEST_MAX_TIMEOUT = 240
+-
+ dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+ 
+ def dbg(*s, **kwargs):
+@@ -52,7 +50,7 @@ def exit_vm():
+ 			p.kill()
+ 
+ 		if config.ctx and config.ctx.results:
+-			success = print_results(config.ctx.results)
++			success = print_results(config.ctx.results, int(config.ctx.args.timeout))
+ 
+ 			if config.ctx.args.result:
+ 				write_results(config.ctx.args.result, config.ctx.results)
+@@ -917,7 +915,7 @@ def post_test(ctx, to_copy):
+ 		except:
+ 			pass
+ 
+-def print_results(results):
++def print_results(results, max_timeout):
+ 	table = PrettyTable(['Test', colored('Passed', 'green'), colored('Failed', 'red'), \
+ 				colored('Skipped', 'cyan'), colored('Time', 'yellow')])
+ 
+@@ -928,7 +926,7 @@ def print_results(results):
+ 
+ 	for test, result in results.items():
+ 
+-		if result.time == TEST_MAX_TIMEOUT:
++		if result.time == max_timeout:
+ 			failed = "Timed out"
+ 			passed = "Timed out"
+ 		elif result.time == 0:
+@@ -975,7 +973,7 @@ def run_auto_tests(ctx, args):
+ 			p.start()
+ 			# Rather than time each subtest we just time the total but
+ 			# mutiply the default time by the number of tests being run.
+-			p.join(TEST_MAX_TIMEOUT * len(subtests))
++			p.join(int(args.timeout) * len(subtests))
+ 
+ 			if p.is_alive():
+ 				# Timeout
+@@ -983,7 +981,7 @@ def run_auto_tests(ctx, args):
+ 
+ 				ctx.results[os.path.basename(test)] = SimpleResult(run=0,
+ 								failures=0, errors=0,
+-								skipped=0, time=TEST_MAX_TIMEOUT)
++								skipped=0, time=int(args.timeout))
+ 			else:
+ 				ctx.results[os.path.basename(test)] = rqueue.get()
+ 
+diff --git a/tools/runner.py b/tools/runner.py
+index 004bf46d..03f44611 100644
+--- a/tools/runner.py
++++ b/tools/runner.py
+@@ -120,9 +120,12 @@ class RunnerCoreArgParse(ArgumentParser):
+ 				const=True,
+ 				action='store',
+ 				help='Use physical adapters for tests (passthrough)')
++
++		# Hidden options only meant to be passed to the kernel
+ 		self.add_argument('--testhome', help=SUPPRESS)
+ 		self.add_argument('--monitor-parent', help=SUPPRESS)
+ 		self.add_argument('--result-parent', help=SUPPRESS)
++		self.add_argument('--timeout', help=SUPPRESS)
+ 
+ 		# Prevent --autotest/--unittest from being used together
+ 		auto_unit_group = self.add_mutually_exclusive_group()
+@@ -385,6 +388,8 @@ class QemuRunner(RunnerAbstract):
+ 
+ 		self._prepare_outfiles()
+ 
++		self.args.timeout = 240
++
+ 		if args.hw:
+ 			if os.path.isfile(args.hw):
+ 				hw_conf = ConfigParser()
+@@ -543,6 +548,8 @@ class UmlRunner(RunnerAbstract):
+ 
+ 		self._prepare_outfiles()
+ 
++		self.args.timeout = 1000
++
+ 		kern_log = "ignore_loglevel" if "kernel" in args.verbose else "quiet"
+ 
+ 		cmd = [args.kernel, 'rootfstype=hostfs', 'ro', 'mem=256M', 'mac80211_hwsim.radios=0',
+-- 
+2.25.1
 
-Ok this does make sense to me. A disconnect from the AP could come in at 
-any point during reassociation (during the ROAMING state). I think we 
-assume the kernel handles this during the actual association step, i.e. 
-relays this in the connect event, but during eapol/key setting I think 
-your original patch holds some merit.
-
-Just so we have public record I've sanitized the logs you sent (removed 
-dates, hostnames, driver prints), and its clear that a disconnect at 
-this moment would trigger this "Unexpected disconnect" case:
-
-iwd[3589]: ../iwd-2.8/src/eapol.c:eapol_start()
-iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_link_notify() event 16 on 
-ifindex 8
-iwd[3589]: ../iwd-2.8/src/eapol.c:eapol_handle_ptk_1_of_4() ifindex=8
-iwd[3589]: ../iwd-2.8/src/eapol.c:eapol_handle_ptk_3_of_4() ifindex=8
-iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_set_gtk() ifindex=8 key_idx=1
-iwd[3589]: ../iwd-2.8/src/station.c:station_handshake_event() Setting keys
-iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_set_tk() ifindex=8 key_idx=0
-iwd[3589]: ../iwd-2.8/src/station.c:station_handshake_event() Setting keys
-iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_set_tk() ifindex=8 key_idx=0
-iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_new_group_key_cb() ifindex: 8, 
-err: 0
-iwd[3589]: ../iwd-2.8/src/netdev.c:try_handshake_complete() 
-ptk_installed: 0, gtk_installed: 1, igtk_installed: 1
-iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_mlme_notify() MLME 
-notification Disassociate(40)
-iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_mlme_notify() MLME 
-notification Disconnect(48)
-iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_disconnect_event()
-iwd[3589]: Received Deauthentication event, reason: 1, from_ap: true
-iwd[3589]: ../iwd-2.8/src/wiphy.c:wiphy_radio_work_done() Work item 15 done
-iwd[3589]: ../iwd-2.8/src/station.c:station_disconnect_event() 8
-iwd[3589]: Unexpected disconnect event
-
-So I'm thinking we should merge the original patch adding ROAMING to the 
-switch statement. Maybe Denis has some additional insight
-
-Thanks,
-James
