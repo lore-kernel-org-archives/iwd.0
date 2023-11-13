@@ -1,53 +1,53 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08045225DA
-	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 17:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF9822EEE
+	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 17:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S2z9EHVy"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-66d0f945893so39645286d6.1
-        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 09:54:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6H4gsT1"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-671357f0209so29733136d6.0
+        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 09:54:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699898047; x=1700502847; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1699898048; x=1700502848; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w0IaM11PGjpSMIA8LGJWDHa5sFHSD9xFTGQTRwr6uRk=;
-        b=S2z9EHVyUPhycm2PBjc+M9slto5aYjCSCoH9MNJMXKfl9joomiDPFdlWNX0y4bN97L
-         IZPAZHd5pgMsIiS44pHfWfPgOh/nxLc8E2IpHN9jwJiTOTSl5U7vTmeOpl9ZikcdH1LI
-         0S77O9zfU+nGJe/yuXBh/F7u22TVwgdvfpoxITBKT6HrOrbyOqHNUIO9IncZ+0MS52tO
-         7qCpiKi7BvqitpPjLhJnKgjAQpXWLVo2LBeH632XT4hsOrFMocPyKbAAeJ4HIAv3dfSr
-         Fag2p33EsmHyuXBh962nVMHJAkM2aRBJL1B8HE2nQMbGZCa4wqoOd/JTVQEm88PByEpf
-         L+2Q==
+        bh=V6EjcynQLIN6eDclbce5RkriaZkHKhyZbdj7USndYfU=;
+        b=b6H4gsT1bC0RXRFTPkhUaURZVNdUYNzrhQIxLXJWOMf7zCxLhX9+igqtF8utAtgRLs
+         ppm6KtChUrTb8tUUNcUlN+uzEUt5GXUh9zoy4BoKDNeVP2IYHrc5xcDhnzAhjqR2wGYP
+         EdmPRyUR37PbLaKB/RKtS7vuvQe3ArYMAQMTZVutbjKlKdxzeKrFg9bvIdYXlzp37w+x
+         0igUR1mRwiQi3Lrq4u4fjA10zEVcmt4zALQjvbV1mbuxO0BrnGnaxD4nAf9jfAd9iMun
+         xbO9o6AFbu9e356Oha+l1achpTgj+vrLxisdJdoxhI2da0TbAvhT3UUM72oQf+VlyBG7
+         MF7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699898047; x=1700502847;
+        d=1e100.net; s=20230601; t=1699898048; x=1700502848;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w0IaM11PGjpSMIA8LGJWDHa5sFHSD9xFTGQTRwr6uRk=;
-        b=CYKyk538u4YckeHuBJvfebbPDli1rtY5kwsNdBSqJ4WyRMutgJlEhTIvs+hfcrL03W
-         3e2xVJqwMQnwqyN1+wgBG81/vr7B1CrGf0qEgGGe5oaeGTA11f46arOEaZxkG7zfutVP
-         VNR5X58iqpGHHWCeTfXJQwMDL1RGhLItPrVHFOYx6b0ixXZio4Z/xmzlVySNLjIuu4d1
-         mYH1qKofD/gScGlvsdW8OnvfgR1c59510dtJOfoKMMTDs+k+f4lNo/VPARxEvXzz7Nwc
-         XYBkEBrTD52KpkYH5xFqbZv1hFlxfetksZne6TCUo1XHGMhZdvamu6DCobXVGL4Q30zZ
-         O0WA==
-X-Gm-Message-State: AOJu0Yz18LPTpVg9qH6c2MQ3P7RD99gcnlMzFxZuajaXYMmUXMI7NvOz
-	B2Vv59vvmym0yKzumVeE9yAmk+uZVEU=
-X-Google-Smtp-Source: AGHT+IETPEjT/wpN+SvFf/awgfOs+CrjCikJjpL3IPFArAIKcZT+c2z+1vu+lKq8xkgrcHVn1RNj6Q==
-X-Received: by 2002:ad4:4aea:0:b0:66d:13b5:ca16 with SMTP id cp10-20020ad44aea000000b0066d13b5ca16mr304583qvb.27.1699898047478;
-        Mon, 13 Nov 2023 09:54:07 -0800 (PST)
+        bh=V6EjcynQLIN6eDclbce5RkriaZkHKhyZbdj7USndYfU=;
+        b=JqcNAeckT0vxInRrMYrA25wpAMiljvvjBJUxzI3wrwwtOTP6sYrP0a36toXpevoIV0
+         +NWyHouHxOMgAxtTctYr1sAlD/HAsYsQMIh4ak3OZH6Qh19S2maJQ4nvfcMyz01vDY5X
+         PdYH8r+3ltJjZKv9Fkgp3V+dg2sXGussrqId3cj8KYk91qarFlPHoXxunApjncljyDTt
+         d3YW/5V5xV44j+b48ny+kIAA28cJZIi09MiMVVrQqNKRt+yBpq3g8TktSWS4tC8j/pn6
+         7BwTJlH02xBII8Thv6SgN1RA9bPL/Vx41fZGNWgJjwiC0jLwAJt201hCJhvetpd7DKjs
+         oRMQ==
+X-Gm-Message-State: AOJu0YxpdYrkBiHtsyBmfaknauBaiF3BsXj+UbLJkLbdRPnxc/wGZclr
+	0z5vs/z27kNYTh8B49Sn8rEfFYQVY4g=
+X-Google-Smtp-Source: AGHT+IFyCpUO9r5VBQMq873CvjDYep/o0Hu/gg/ArwNhWUu46KEuwXc9x2VUqR11wS03dm7U/9XOdw==
+X-Received: by 2002:ad4:4e13:0:b0:658:65ed:7e8 with SMTP id dl19-20020ad44e13000000b0065865ed07e8mr6063114qvb.57.1699898048568;
+        Mon, 13 Nov 2023 09:54:08 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id n11-20020a05620a294b00b007756c0853a5sm2010975qkp.58.2023.11.13.09.54.06
+        by smtp.gmail.com with ESMTPSA id n11-20020a05620a294b00b007756c0853a5sm2010975qkp.58.2023.11.13.09.54.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Nov 2023 09:54:07 -0800 (PST)
+        Mon, 13 Nov 2023 09:54:08 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 3/4] dpp: fix fragile scan/connecting logic
-Date: Mon, 13 Nov 2023 09:54:00 -0800
-Message-Id: <20231113175401.343239-3-prestwoj@gmail.com>
+Subject: [PATCH v3 4/4] dpp: scan to pick up extra frequencies when enrolling
+Date: Mon, 13 Nov 2023 09:54:01 -0800
+Message-Id: <20231113175401.343239-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231113175401.343239-1-prestwoj@gmail.com>
 References: <20231113175401.343239-1-prestwoj@gmail.com>
@@ -59,105 +59,165 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The post-DPP connection was never done quite right due to station's
-state being unknown. The state is now tracked in DPP by a previous
-patch but the scan path in DPP is still wrong.
+The DPP-PKEX spec provides a very limited list of frequencies used
+to discover configurators, only 3 on 2.4 and 5GHz bands. Since
+configurators (at least in IWD's implementation) are only allowed
+on the current operating frequency its very unlikely an enrollee
+will find a configurator on these frequencies out of the entire
+spectrum.
 
-It relies on station autoconnect logic which has the potential to
-connect to a different network than what was configured with DPP.
-Its unlikely but still could happen in theory. In addition the scan
-was not selectively filtering results by the SSID that DPP
-configured.
+The spec does mention that the 3 default frequencies should be used
+"In lieu of specific channel information obtained in a manner outside
+the scope of this specification, ...". This allows the implementation
+some flexibility in using a broader range of frequencies.
 
-This fixes the above problems by first filtering the scan by the
-SSID. Then setting the scan results into station without triggering
-autoconnect. And finally using network_autoconnect() directly
-instead of relying on station to choose the SSID.
+To increase the chances of finding a configurator shared code
+enrollees will first issue a scan to determine what access points are
+around, then iterate these frequencies. This is especially helpful
+when the configurators are IWD-based since we know that they'll be
+on the same channels as the APs in the area.
 ---
- src/dpp.c | 44 +++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 41 insertions(+), 3 deletions(-)
+ src/dpp.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 88 insertions(+), 10 deletions(-)
 
 diff --git a/src/dpp.c b/src/dpp.c
-index 06ae2929..a95f93e2 100644
+index a95f93e2..41b7c70e 100644
 --- a/src/dpp.c
 +++ b/src/dpp.c
-@@ -853,13 +853,42 @@ static bool dpp_scan_results(int err, struct l_queue *bss_list,
- {
- 	struct dpp_sm *dpp = userdata;
- 	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
-+	struct scan_bss *bss;
-+	char ssid[33];
-+	struct network *network;
+@@ -183,6 +183,7 @@ struct dpp_sm {
+ 	size_t z_len;
+ 	uint8_t u[L_ECC_SCALAR_MAX_BYTES];
+ 	size_t u_len;
++	uint32_t pkex_scan_id;
  
- 	if (err < 0)
--		return false;
-+		goto reset;
-+
-+	if (!bss_list || l_queue_length(bss_list) == 0)
-+		goto reset;
-+
-+	/*
-+	 * The station watch _should_ detect this and reset, which cancels the
-+	 * scan. But just in case...
-+	 */
-+	if (L_WARN_ON(station_get_connected_network(station)))
-+		goto reset;
-+
-+	/* Purely for grabbing the SSID */
-+	bss = l_queue_peek_head(bss_list);
+ 	bool mcast_support : 1;
+ 	bool roc_started : 1;
+@@ -508,6 +509,11 @@ static void dpp_reset(struct dpp_sm *dpp)
+ 		dpp->retry_timeout = NULL;
+ 	}
  
--	station_set_scan_results(station, bss_list, freqs, true);
-+	memcpy(ssid, bss->ssid, bss->ssid_len);
-+	ssid[bss->ssid_len] = '\0';
++	if (dpp->pkex_scan_id) {
++		scan_cancel(dpp->wdev_id, dpp->pkex_scan_id);
++		dpp->pkex_scan_id = 0;
++	}
 +
-+	station_set_scan_results(station, bss_list, freqs, false);
-+
-+	network = station_network_find(station, ssid, SECURITY_PSK);
-+
-+	dpp_reset(dpp);
-+
-+	bss = network_bss_select(network, true);
-+	network_autoconnect(network, bss);
- 
- 	return true;
-+
-+reset:
-+	return false;
+ 	dpp->state = DPP_STATE_NOTHING;
+ 	dpp->new_freq = 0;
+ 	dpp->frame_retry = 0;
+@@ -4073,6 +4079,14 @@ static struct l_dbus_message *dpp_dbus_stop(struct l_dbus *dbus,
+ 	return l_dbus_message_new_method_return(message);
  }
  
- static void dpp_scan_destroy(void *userdata)
-@@ -898,6 +927,7 @@ static void dpp_handle_config_response_frame(const struct mmpdu_header *frame,
- 	struct network *network = NULL;
- 	struct scan_bss *bss = NULL;
- 	char ssid[33];
-+	size_t ssid_len;
++static void dpp_pkex_scan_trigger(int err, void *user_data)
++{
++	struct dpp_sm *dpp = user_data;
++
++	if (err < 0)
++		dpp_reset(dpp);
++}
++
+ /*
+  * Section 5.6.1
+  * In lieu of specific channel information obtained in a manner outside
+@@ -4111,6 +4125,62 @@ static uint32_t *dpp_default_freqs(struct dpp_sm *dpp, size_t *out_len)
+ 	return freqs_out;
+ }
  
- 	if (dpp->state != DPP_STATE_CONFIGURING)
- 		return;
-@@ -1027,6 +1057,7 @@ static void dpp_handle_config_response_frame(const struct mmpdu_header *frame,
- 	 */
- 	if (station) {
- 		memcpy(ssid, config->ssid, config->ssid_len);
-+		ssid_len = config->ssid_len;
- 		ssid[config->ssid_len] = '\0';
++static bool dpp_pkex_scan_notify(int err, struct l_queue *bss_list,
++					const struct scan_freq_set *freqs,
++					void *user_data)
++{
++	struct dpp_sm *dpp = user_data;
++	const struct l_queue_entry *e;
++	_auto_(scan_freq_set_free) struct scan_freq_set *freq_set = NULL;
++
++	if (err < 0)
++		goto failed;
++
++	freq_set = scan_freq_set_new();
++
++	if (!bss_list || l_queue_isempty(bss_list)) {
++		dpp->freqs = dpp_default_freqs(dpp, &dpp->freqs_len);
++		if (!dpp->freqs)
++			goto failed;
++
++		l_debug("No BSS's seen, using default frequency list");
++		goto start;
++	}
++
++	for (e = l_queue_get_entries(bss_list); e; e = e->next) {
++		const struct scan_bss *bss = e->data;
++
++		scan_freq_set_add(freq_set, bss->frequency);
++	}
++
++	l_debug("Found %u frequencies to search for configurator",
++			l_queue_length(bss_list));
++
++	dpp->freqs = scan_freq_set_to_fixed_array(freq_set, &dpp->freqs_len);
++
++start:
++	dpp->current_freq = dpp->freqs[0];
++
++	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
++
++	l_debug("PKEX start enrollee (id=%s)", dpp->pkex_id ?: "unset");
++
++	dpp_start_offchannel(dpp, dpp->current_freq);
++
++	return false;
++
++failed:
++	dpp_reset(dpp);
++	return false;
++}
++
++static void dpp_pkex_scan_destroy(void *user_data)
++{
++	struct dpp_sm *dpp = user_data;
++
++	dpp->pkex_scan_id = 0;
++}
++
+ static bool dpp_start_pkex_enrollee(struct dpp_sm *dpp, const char *key,
+ 				const char *identifier)
+ {
+@@ -4156,17 +4226,25 @@ static bool dpp_start_pkex_enrollee(struct dpp_sm *dpp, const char *key,
  
- 		network = station_network_find(station, ssid, SECURITY_PSK);
-@@ -1045,7 +1076,14 @@ static void dpp_handle_config_response_frame(const struct mmpdu_header *frame,
- 		__station_connect_network(station, network, bss,
- 						STATION_STATE_CONNECTING);
- 	else if (station) {
--		dpp->connect_scan_id = scan_active(dpp->wdev_id, NULL, 0,
-+		struct scan_parameters params = {0};
-+
-+		params.ssid = (void *) ssid;
-+		params.ssid_len = ssid_len;
-+
-+		l_debug("Scanning for %s", ssid);
-+
-+		dpp->connect_scan_id = scan_active_full(dpp->wdev_id, &params,
- 						dpp_scan_triggered,
- 						dpp_scan_results, dpp,
- 						dpp_scan_destroy);
+ 	dpp_property_changed_notify(dpp);
+ 
+-	dpp->freqs = dpp_default_freqs(dpp, &dpp->freqs_len);
+-	if (!dpp->freqs)
+-		goto failed;
+-
+-	dpp->current_freq = dpp->freqs[dpp->freqs_idx];
+-
+-	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
+-
+-	l_debug("PKEX start enrollee (id=%s)", dpp->pkex_id ?: "unset");
++	/*
++	 * The 'dpp_default_freqs' function returns the default frequencies
++	 * outlined in section 5.6.1. For 2.4/5GHz this is only 3 frequencies
++	 * which is unlikely to result in discovery of a configurator. The spec
++	 * does allow frequencies to be "obtained in a manner outside the scope
++	 * of this specification" which is what is being done here.
++	 *
++	 * This is mainly geared towards IWD-based configurators; banking on the
++	 * fact that they are currently connected to nearby APs. Scanning lets
++	 * us see nearby BSS's which should be the same frequencies as our
++	 * target configurator.
++	 */
++	l_debug("Performing scan for frequencies to start PKEX");
+ 
+-	dpp_start_offchannel(dpp, dpp->current_freq);
++	dpp->pkex_scan_id = scan_active(dpp->wdev_id, NULL, 0,
++				dpp_pkex_scan_trigger, dpp_pkex_scan_notify,
++				dpp, dpp_pkex_scan_destroy);
++	if (!dpp->pkex_scan_id)
++		goto failed;
+ 
+ 	return true;
+ 
 -- 
 2.25.1
 
