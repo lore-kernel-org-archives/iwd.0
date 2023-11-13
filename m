@@ -1,49 +1,49 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9663921358
-	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 15:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE63219F3
+	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 15:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHJWCE0I"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-777745f1541so299706185a.0
-        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 07:29:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IufX7VBw"
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-586f68b78ddso2616614eaf.2
+        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 07:38:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699889360; x=1700494160; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1699889892; x=1700494692; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=PW8jffskswKRXosmBMcBSz8CaqPd9Anvxv6bkb8t1DE=;
-        b=IHJWCE0IR8DJV3UYB5ykoGxzXy+OVfZQ6zZlTSmPSFCw9jQ1JZMVLmmPKg4vBG/1I+
-         UasoYnYniGoJV+vKtwCp8FG58EJSesUWONouJj/LHdkDPdbEQjjYBYxyFkST14v/B+vr
-         mRd01qPxddajParB24+f01Au7Gj4fXrESir9xSmp/A7lxHe5Kb+xjBu8KJ+YLAD5HJSE
-         6egixvJKqseLgAmL80RrjUUui45THC8H7BQbnoCTRC1/9b9pfKRbl1ubW8sBvZJT6jPx
-         0UoiYLOU2QO3nUPVhXz1fJ8nHUTaj/5AmwbqNYOU3Ekwt+kIwxPU95eJbFMe9Q71/OY1
-         03Lw==
+        bh=U+OfcckTAZN5M6hPLerZRcbvioCSXV0jZVIoFChkF1g=;
+        b=IufX7VBwQRDSENLb8IA9IVE13ZbEdG4g1M96RbSCeqqOvSflQCHIqUtlA7VkocGjcF
+         D1om5VEqrIIMkrhea/lxr4tCtHl+WZRZ7r0VDwcuZZKZJCcfarlUC7zVbdm8XMbUiLdH
+         t38+va87UAubQ9aMf0qy2qs63k9YSrU4EWymPl0dfNIugGp8nSmkrOhlAZ3DjU+ooOYA
+         yKJdjBzVKmFOuIU/m1I1hR1xjhvN+j1EgWRiGGcsdANijbnzySmYABURcbiOIrS7wx26
+         uDo639836egR5k+X+3EmIAF472yBWoMqlsVZEEPyRU3WAiELdFxDcRWhxkHsiBnKC1Mp
+         4hGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699889360; x=1700494160;
+        d=1e100.net; s=20230601; t=1699889892; x=1700494692;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PW8jffskswKRXosmBMcBSz8CaqPd9Anvxv6bkb8t1DE=;
-        b=sgTICtvSMtzoDwiOKnYJhJefgO/N35ZuuBIxIgz2qed8jWSNu7wss2jdMTpRuF86Af
-         I5vB7lHc3qAUs2wa8mk6h1EJnaDW5O4yNj5FvclX+KtSu/pVwyDCoQ6vT21mOuAvw3+Z
-         QoDCPz6ug0+tMy77pVms9owpWxsiF+1k6oa+KgsEM4ahVmI4QOBf8pWvrjDKkaD7eDZy
-         4LUJLvamWlGxRYtZTHZqY8NCOM6dsROA3dso1stLcFQDG/Z4OjrPCZL5bLOI2Z8gHab7
-         mx3iNvfGNJ95Q9psfMsmo0G43exs4+d7FJmD/1ZJw3vTIWUASFghhVPKMpTJ5X3I7edJ
-         XcGw==
-X-Gm-Message-State: AOJu0Yy+Hsoja3XynQnEVn7QeOlmukS9pRxZFQY60z5U505DXBa2a5Ym
-	dM1UOASpHg/BAAY27ISd4jI=
-X-Google-Smtp-Source: AGHT+IGIsyp4EAWyk1/MrJA97n8pdJqEAEzpS2/zIezIlEOT1HVPhJ+QgSioh2GME5FVUURM+apO2g==
-X-Received: by 2002:ad4:5a4e:0:b0:671:cc80:c59d with SMTP id ej14-20020ad45a4e000000b00671cc80c59dmr6825653qvb.0.1699889360326;
-        Mon, 13 Nov 2023 07:29:20 -0800 (PST)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id r6-20020ad45226000000b0065d0dcc28e3sm2124293qvq.73.2023.11.13.07.29.16
+        bh=U+OfcckTAZN5M6hPLerZRcbvioCSXV0jZVIoFChkF1g=;
+        b=SMOQ1TP89KVMgopxi6S8262SqYNHzdzGlnd49ofGThaEcu4k9HXAUATw7zYIf0Z7NZ
+         xFjZv9Xlak4Tg7TzID5BpP9lnbOWMrOSXcPEuXaTcFYlY4NPCzEuny8bKFJ6z59QzgJY
+         HORbNCG/yAWl1f6U1Vt0mkvBHwgPF32iJGjqt3axbn9Jd8Up5J1fXTAXfbVOeiIyIyCT
+         iwjcsCAPLqFPG1HlW4oeH9vB1FO4MhKF00++S99zBvDrfRZKV1I97ThlrhWGntU4RUY+
+         uqwugf4Qpu1uucvSkiUisPgyUrvhWlnmcD33ciPXD7glhwn3vd2vhF32iLrDrG5Lny1n
+         OhJw==
+X-Gm-Message-State: AOJu0YyTD72lDSTuYY6Jj8JC8bAN/ucJYPAVmjoqud95aMglDCEiVX7w
+	ruOVqAa04wzAf/Gwp6F5oBk=
+X-Google-Smtp-Source: AGHT+IFaiQJ0Cnf6TGhKo0qtuV8x/3Wm9ZMieEMu3e0R8ISMtQIYFg9D4tYzLPbg7FT5+ZLIywWPiA==
+X-Received: by 2002:a4a:3056:0:b0:582:99ae:ca47 with SMTP id z22-20020a4a3056000000b0058299aeca47mr5751327ooz.3.1699889891839;
+        Mon, 13 Nov 2023 07:38:11 -0800 (PST)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id v8-20020a4a8c48000000b00581df2cb1e6sm1005803ooj.32.2023.11.13.07.38.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Nov 2023 07:29:19 -0800 (PST)
-Message-ID: <068ee7ac-298a-4bab-971f-e4c797dbdd4b@gmail.com>
-Date: Mon, 13 Nov 2023 07:29:14 -0800
+        Mon, 13 Nov 2023 07:38:11 -0800 (PST)
+Message-ID: <92eb9b97-5602-4194-a884-b7a97a440e69@gmail.com>
+Date: Mon, 13 Nov 2023 09:38:09 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,7 +53,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] station: handle ROAMING state in disconnect event (again)
 Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, =?UTF-8?Q?Alvin_=C5=A0ipraga?=
+To: James Prestwood <prestwoj@gmail.com>, =?UTF-8?Q?Alvin_=C5=A0ipraga?=
  <ALSI@bang-olufsen.dk>
 Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alvin@pqrs.dk>,
  "iwd@lists.linux.dev" <iwd@lists.linux.dev>,
@@ -67,50 +67,55 @@ References: <20230403141927.235014-1-alvin@pqrs.dk>
  <lrv3ytp7a6jvuupcu4pvx2w5jmud4yj6jxbk4imflcqeuosugo@vu7fco6auklk>
  <4d8b889f-0b31-409b-93d1-7a06051adf9e@gmail.com>
  <b4e0927f-b319-48a4-b300-1b319b1c7185@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <b4e0927f-b319-48a4-b300-1b319b1c7185@gmail.com>
+ <068ee7ac-298a-4bab-971f-e4c797dbdd4b@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <068ee7ac-298a-4bab-971f-e4c797dbdd4b@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Denis,
+Hi James, Alvin,
 
-On 11/13/23 7:26 AM, Denis Kenzior wrote:
-> Hi James,
+On 11/13/23 09:29, James Prestwood wrote:
+> Hi Denis,
 > 
+> On 11/13/23 7:26 AM, Denis Kenzior wrote:
+>> Hi James,
 >>
->> Ok this does make sense to me. A disconnect from the AP could come in 
->> at any point during reassociation (during the ROAMING state). I think 
->> we assume the kernel handles this during the actual association step, 
->> i.e. relays this in the connect event, but during eapol/key setting I 
->> think your original patch holds some merit.
+>>>
+>>> Ok this does make sense to me. A disconnect from the AP could come in at any 
+>>> point during reassociation (during the ROAMING state). I think we assume the 
+>>> kernel handles this during the actual association step, i.e. relays this in 
+>>> the connect event, but during eapol/key setting I think your original patch 
+>>> holds some merit.
+>>>
+>>> Just so we have public record I've sanitized the logs you sent (removed 
+>>> dates, hostnames, driver prints), and its clear that a disconnect at this 
+>>> moment would trigger this "Unexpected disconnect" case:
+>>>
+>>> iwd[3589]: ../iwd-2.8/src/eapol.c:eapol_start()
+>>> iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_link_notify() event 16 on ifindex 8
+>>> iwd[3589]: ../iwd-2.8/src/eapol.c:eapol_handle_ptk_1_of_4() ifindex=8
+>>> iwd[3589]: ../iwd-2.8/src/eapol.c:eapol_handle_ptk_3_of_4() ifindex=8
+>>> iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_set_gtk() ifindex=8 key_idx=1
+>>> iwd[3589]: ../iwd-2.8/src/station.c:station_handshake_event() Setting keys
+>>> iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_set_tk() ifindex=8 key_idx=0
+>>> iwd[3589]: ../iwd-2.8/src/station.c:station_handshake_event() Setting keys
+>>> iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_set_tk() ifindex=8 key_idx=0
 >>
->> Just so we have public record I've sanitized the logs you sent 
->> (removed dates, hostnames, driver prints), and its clear that a 
->> disconnect at this moment would trigger this "Unexpected disconnect" 
->> case:
->>
->> iwd[3589]: ../iwd-2.8/src/eapol.c:eapol_start()
->> iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_link_notify() event 16 on 
->> ifindex 8
->> iwd[3589]: ../iwd-2.8/src/eapol.c:eapol_handle_ptk_1_of_4() ifindex=8
->> iwd[3589]: ../iwd-2.8/src/eapol.c:eapol_handle_ptk_3_of_4() ifindex=8
->> iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_set_gtk() ifindex=8 key_idx=1
->> iwd[3589]: ../iwd-2.8/src/station.c:station_handshake_event() Setting 
->> keys
->> iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_set_tk() ifindex=8 key_idx=0
->> iwd[3589]: ../iwd-2.8/src/station.c:station_handshake_event() Setting 
->> keys
->> iwd[3589]: ../iwd-2.8/src/netdev.c:netdev_set_tk() ifindex=8 key_idx=0
+>> Why is set_tk being called twice?  Or is this a copy-paste artifact?
 > 
-> Why is set_tk being called twice?  Or is this a copy-paste artifact?
-
-Hmm, good question. I didn't notice that but its called 2x in the logs 
-Alvin sent me. Alvin, was it a copy-paste error on your side? If not 
-something weird is going on.
-
-Thanks,
-James
-
+> Hmm, good question. I didn't notice that but its called 2x in the logs Alvin 
+> sent me. Alvin, was it a copy-paste error on your side? If not something weird 
+> is going on.
 > 
-> Regards,
-> -Denis
+
+We're generating the Setting keys event twice.  I don't really understand how 
+this can happen, honestly.  I hope this is an artifact of some sort.
+
+Anyhow, I think overall the patch approach is incorrect.  When we are roaming, 
+we expect the callback provided to netdev_reassociate() to be invoked on any 
+error.  So the real fix is in netdev.c somewhere.
+
+Regards,
+-Denis
+
