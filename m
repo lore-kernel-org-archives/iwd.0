@@ -1,81 +1,98 @@
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25A1219F2
-	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 15:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80ABE225DA
+	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 17:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYyYo/nH"
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-58a0d0cdcc1so2049803eaf.1
-        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 07:48:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O/3RQsAU"
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-da41acaea52so4816328276.3
+        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 09:54:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699890496; x=1700495296; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vvuh2VaBLbU8IQZzc/JV17iA/e04w8lzHkeJB4C237c=;
-        b=lYyYo/nHfMrcH54BhVrGm+t3mP4d3FBL8b8K7ltPWh2vDb2tOxlfiFIoW5Wk5IWwre
-         Uv88HyXrd7mnf+JbdqoHkwmFcfgOAuqIVaZJihxVqZnJ80uZY1AiHyv83vCkv8j8ITjN
-         tQFvAFceLMeNgN0LwelzJZMan0s6439XozmBp94pB4oF0tYg7HKfDydvnZlCjX86sME0
-         C/DmjcD8QH/8IPcKOmC9e+RxKME2T/gUCJs/ekQk6H+up5fIi9dzOl0wjTT/XU3d7/sv
-         v3yiLiGr2obxd/bhh3y4Kjlwngjs6vcml2hpgAXPI6uF54GDwrR+N2fjMKZhjrqln++h
-         Cyxg==
+        d=gmail.com; s=20230601; t=1699898045; x=1700502845; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=a9rzj5KgQbojzFaVaUUb2D0xstnDA8MFfkO7zVZAkBY=;
+        b=O/3RQsAU7RZH2UW2Ft1XrplfziDmw8yj1auXJjMRp3Bol7C9Die4Cq9CxY5NrRY2YR
+         M42iwh2reFj03Xvj0KhByijdwu2MtV3g7j4wvpx7zDUObsTZd1iSlG9YFhbKFaSxn2pn
+         GflJWsjyEwpbpBCtUaPn8GUpOgwQqJzKiX4NEvzZdiVRRO6y24O5h4lxyOSjJsy5rqPk
+         n6gT+ydVGFkCzG0w6/xXYP1j4orK1IOVONG/yjr3DTk5gVTtuT0E/SYC+ud14W8pl5Gb
+         tAs9sG8R7I4BoOiPd5EajYhRNB9vEL2ILbnTZAq1QLIYQjMg3MZ0y2T+y0dLEExF1XgU
+         hXTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699890496; x=1700495296;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vvuh2VaBLbU8IQZzc/JV17iA/e04w8lzHkeJB4C237c=;
-        b=DEayqI8pU83SYWojMqXbp8MUWvXAyQSsVqJlnQTlVU/j98CghB3WBmHgGdWBR5mjTq
-         0kqUfX0YgBriFYqQx1fEMRgyBVOhvJc5cJrUNg651iaGAe33dWUqIcp2cXls8EGjBTfQ
-         JRFwkFIQ/9YRkNQnkYeT8UQP38XXbHAGrXlpSLE21D5zqmMPm/Fcb772/12W2vXAY9WS
-         8WE8DuovtwO3p5ZRGFh5fTkY58Fk/XAw+ECbdqPDdDxD93NKxeDmIxWlLFe9Yd6rA/FZ
-         3hMXGvO8nYImMJ4L4atN3OejdFx5q+pyvI5jd6FBCwsKvaG72JTCE3J2LNKt+4SMi09/
-         3OaA==
-X-Gm-Message-State: AOJu0YyvaBrS/+r3EESxHFZCOtOgRU15illFckH0CYwdFhhkp1rJP6/s
-	fIbc1EmKKIM35sLxuqTeYps=
-X-Google-Smtp-Source: AGHT+IEAActKhf1if7Ol4yLrdvgnoiQ8+fntmeKM768FvP5YFLe8NVOISYF3R/Ps2pNws3ijaZQytw==
-X-Received: by 2002:a4a:3910:0:b0:57b:63a6:306d with SMTP id m16-20020a4a3910000000b0057b63a6306dmr7370575ooa.6.1699890495978;
-        Mon, 13 Nov 2023 07:48:15 -0800 (PST)
-Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id u5-20020a4a8c05000000b005840b5783a1sm999485ooj.43.2023.11.13.07.48.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Nov 2023 07:48:15 -0800 (PST)
-Message-ID: <e4bcf71d-e8de-451d-955b-2d248c0d6cbb@gmail.com>
-Date: Mon, 13 Nov 2023 09:48:14 -0600
+        d=1e100.net; s=20230601; t=1699898045; x=1700502845;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a9rzj5KgQbojzFaVaUUb2D0xstnDA8MFfkO7zVZAkBY=;
+        b=NSCtkeF5nmPSJwqvZX6b3PuGwSt/bu4mUnL5h4R+ez55eL6QA6WuQepnim9elzVXIs
+         /p0GekauGdzuUo0MWUVo+kPk0Yvylfwx+IWr92SLjgAarHdVerxvqb+jEMjNCGEBIoRP
+         Y82rYLxokrMhZxei65eM93oDTe5nUMIy+EX161/83oLJdCl+Lj4qGApx8cXbjGnJABa1
+         sY1fRmEUrnt6ftNVGANE8susW3IQBRJivqWin+soZmUb4Ucvf5M4wxp1ss2uC0A5wwTm
+         SxVUgE8U6kcK6/FjRcNLQd7Bc9L9QRSxW1JxjMo9wFwVsTD0rlcWGLdYxTqQCvTEUPYy
+         5KUA==
+X-Gm-Message-State: AOJu0YwdDzBQ5MHcZPtQ5Oe8p3dGGSmIpxfgnMHuULrwEXtzTIThl9al
+	jWTCmagkki2NEYCXk1ocNVwYw6weqc8=
+X-Google-Smtp-Source: AGHT+IFyn+pfEq7Ad5UUKvZ5BpFoRB83pp7Mk86vpoYsPJSjlJiGm4ynLLEh8T96TLN9BM/U0Hq58w==
+X-Received: by 2002:a25:6891:0:b0:daf:7468:459 with SMTP id d139-20020a256891000000b00daf74680459mr5128802ybc.3.1699898045250;
+        Mon, 13 Nov 2023 09:54:05 -0800 (PST)
+Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id n11-20020a05620a294b00b007756c0853a5sm2010975qkp.58.2023.11.13.09.54.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Nov 2023 09:54:05 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3 1/4] dpp: remove duplicate connected network check
+Date: Mon, 13 Nov 2023 09:53:58 -0800
+Message-Id: <20231113175401.343239-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] auto-t: make test timeout configurable
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20231113143255.278191-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20231113143255.278191-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+---
+ src/dpp.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-On 11/13/23 08:32, James Prestwood wrote:
-> With the addition of DPP PKEX autotests some of the timeouts are
-> quite long and hit test-runners maximum timeouts. For UML we should
-> allow this since time-travel lets us skip idle waits. Move the test
-> timeout out of a global define and into the argument list so QEMU
-> and UML can define it differently.
-> ---
->   tools/run-tests | 12 +++++-------
->   tools/runner.py |  7 +++++++
->   2 files changed, 12 insertions(+), 7 deletions(-)
-> 
+v3:
+ * Just removed the extra check. Requiring DISCONNECTED is a bit
+   strict since its ok if station is in an autoconnecting state
+   (just as long as it doesn't actually connect)
 
-All applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/dpp.c b/src/dpp.c
+index 23010a05..3a740916 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -4001,14 +4001,8 @@ static uint32_t *dpp_default_freqs(struct dpp_sm *dpp, size_t *out_len)
+ static bool dpp_start_pkex_enrollee(struct dpp_sm *dpp, const char *key,
+ 				const char *identifier)
+ {
+-	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
+ 	_auto_(l_ecc_point_free) struct l_ecc_point *qi = NULL;
+ 
+-	if (station && station_get_connected_network(station)) {
+-		l_debug("Already connected, disconnect before enrolling");
+-		return false;
+-	}
+-
+ 	if (identifier)
+ 		dpp->pkex_id = l_strdup(identifier);
+ 
+@@ -4120,7 +4114,7 @@ static struct l_dbus_message *dpp_dbus_pkex_start_enrollee(struct l_dbus *dbus,
+ 				dpp->interface != DPP_INTERFACE_UNBOUND)
+ 		return dbus_error_busy(message);
+ 
+-	if (station_get_connected_network(station))
++	if (station && station_get_connected_network(station))
+ 		return dbus_error_busy(message);
+ 
+ 	if (!dpp_parse_pkex_args(message, &key, &id))
+-- 
+2.25.1
 
