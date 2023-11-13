@@ -1,53 +1,53 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF79522EE1
-	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 17:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08045225DA
+	for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 17:54:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PYupAM1j"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-675b844adc7so27444556d6.0
-        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 09:54:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S2z9EHVy"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-66d0f945893so39645286d6.1
+        for <iwd@lists.linux.dev>; Mon, 13 Nov 2023 09:54:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699898046; x=1700502846; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1699898047; x=1700502847; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dINIBTWCK8O656hXGWZUpI4caiHQQa5+aoX/2ie34dc=;
-        b=PYupAM1joD+4jQ+jTvyFaSSQjtPqUXJlsXlk9Cpg1mrX/ruj+BUvlbjAJBeDjFDWdn
-         I0nbUYpNHtOobXBQQvf17s80PELPAEvlrrFhDvvajw9APG51l2J4MSDyzxd3btDQf1Ua
-         oEp/cP+LxfUUGrY++q0bPypkhRPoQkVGiVN7qqTOJs++prJub1vxk0zywVieu0bo0wdP
-         PjFMdQ96utiDgWHGS5/NM5YOjqMZ69xQ/5d1EEyQIp3RLXdXAgFuZSYmm1TnWbwIMbPD
-         3sYUi064GG/51bqK3C/EByWZqD6Fxoi6AS2rraz+akzQ2dieuTmobPDSTpof3WIWzGPR
-         Efgw==
+        bh=w0IaM11PGjpSMIA8LGJWDHa5sFHSD9xFTGQTRwr6uRk=;
+        b=S2z9EHVyUPhycm2PBjc+M9slto5aYjCSCoH9MNJMXKfl9joomiDPFdlWNX0y4bN97L
+         IZPAZHd5pgMsIiS44pHfWfPgOh/nxLc8E2IpHN9jwJiTOTSl5U7vTmeOpl9ZikcdH1LI
+         0S77O9zfU+nGJe/yuXBh/F7u22TVwgdvfpoxITBKT6HrOrbyOqHNUIO9IncZ+0MS52tO
+         7qCpiKi7BvqitpPjLhJnKgjAQpXWLVo2LBeH632XT4hsOrFMocPyKbAAeJ4HIAv3dfSr
+         Fag2p33EsmHyuXBh962nVMHJAkM2aRBJL1B8HE2nQMbGZCa4wqoOd/JTVQEm88PByEpf
+         L+2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699898046; x=1700502846;
+        d=1e100.net; s=20230601; t=1699898047; x=1700502847;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dINIBTWCK8O656hXGWZUpI4caiHQQa5+aoX/2ie34dc=;
-        b=ism2T4Sl/UGQkzMpdOvZVC+ocstuVhC83bbJB/4D5qFsV4eGJBsGxgO4ASBq+j5kwK
-         wKgjmwKdEHKYpuiu0WLF57t3f3GTsKWlPG5ByVBkjsQUjuu7lXx/XumXN6TNuQRpdGGM
-         uVmFguMqrGmGC1B3FJzIKfeQOdCaJ8lh1rPhkZbPanuT6oWHSLkBsAms+b9Zfw3mSok3
-         Pxk2n8grVwwEuvGexs1vLMi2PTi/bz2C3MYjB+eJGKQ3wrsL+NA1eK9gt8Q4ynTJqLYU
-         5szUiNS7FmPqgR5r/zTtaMdzlUDsLu985Dfg1yXDztVGi9ta7f5LZiflsKrrwaZahbo4
-         IODw==
-X-Gm-Message-State: AOJu0YzKAHOe5Lj4ng7nvxa4547ZcUrs42kpASNPCyVuHzBM6Gb4fMtZ
-	Xq0jk+mIas02zb7BBK6aHDnihRRXj08=
-X-Google-Smtp-Source: AGHT+IEyjpq82zd4pZvLcGpGtbMu4RcQN4/F5zUe3i1z5xFhRMgK/MVlG8OF/oyGapJ1JqVM5gRp3w==
-X-Received: by 2002:a05:6214:2304:b0:66d:6311:f91f with SMTP id gc4-20020a056214230400b0066d6311f91fmr9044446qvb.45.1699898046379;
-        Mon, 13 Nov 2023 09:54:06 -0800 (PST)
+        bh=w0IaM11PGjpSMIA8LGJWDHa5sFHSD9xFTGQTRwr6uRk=;
+        b=CYKyk538u4YckeHuBJvfebbPDli1rtY5kwsNdBSqJ4WyRMutgJlEhTIvs+hfcrL03W
+         3e2xVJqwMQnwqyN1+wgBG81/vr7B1CrGf0qEgGGe5oaeGTA11f46arOEaZxkG7zfutVP
+         VNR5X58iqpGHHWCeTfXJQwMDL1RGhLItPrVHFOYx6b0ixXZio4Z/xmzlVySNLjIuu4d1
+         mYH1qKofD/gScGlvsdW8OnvfgR1c59510dtJOfoKMMTDs+k+f4lNo/VPARxEvXzz7Nwc
+         XYBkEBrTD52KpkYH5xFqbZv1hFlxfetksZne6TCUo1XHGMhZdvamu6DCobXVGL4Q30zZ
+         O0WA==
+X-Gm-Message-State: AOJu0Yz18LPTpVg9qH6c2MQ3P7RD99gcnlMzFxZuajaXYMmUXMI7NvOz
+	B2Vv59vvmym0yKzumVeE9yAmk+uZVEU=
+X-Google-Smtp-Source: AGHT+IETPEjT/wpN+SvFf/awgfOs+CrjCikJjpL3IPFArAIKcZT+c2z+1vu+lKq8xkgrcHVn1RNj6Q==
+X-Received: by 2002:ad4:4aea:0:b0:66d:13b5:ca16 with SMTP id cp10-20020ad44aea000000b0066d13b5ca16mr304583qvb.27.1699898047478;
+        Mon, 13 Nov 2023 09:54:07 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id n11-20020a05620a294b00b007756c0853a5sm2010975qkp.58.2023.11.13.09.54.05
+        by smtp.gmail.com with ESMTPSA id n11-20020a05620a294b00b007756c0853a5sm2010975qkp.58.2023.11.13.09.54.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Nov 2023 09:54:06 -0800 (PST)
+        Mon, 13 Nov 2023 09:54:07 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 2/4] dpp: add station watch to DPP
-Date: Mon, 13 Nov 2023 09:53:59 -0800
-Message-Id: <20231113175401.343239-2-prestwoj@gmail.com>
+Subject: [PATCH v3 3/4] dpp: fix fragile scan/connecting logic
+Date: Mon, 13 Nov 2023 09:54:00 -0800
+Message-Id: <20231113175401.343239-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231113175401.343239-1-prestwoj@gmail.com>
 References: <20231113175401.343239-1-prestwoj@gmail.com>
@@ -59,144 +59,105 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-DPP (both DPP and PKEX) run the risk of odd behavior if station
-decides to change state. DPP is completely unaware of this and
-best case would just result in a protocol failure, worst case
-duplicate calls to __station_connect_network.
+The post-DPP connection was never done quite right due to station's
+state being unknown. The state is now tracked in DPP by a previous
+patch but the scan path in DPP is still wrong.
 
-Add a station watch and stop DPP if station changes state during
-the protocol.
+It relies on station autoconnect logic which has the potential to
+connect to a different network than what was configured with DPP.
+Its unlikely but still could happen in theory. In addition the scan
+was not selectively filtering results by the SSID that DPP
+configured.
+
+This fixes the above problems by first filtering the scan by the
+SSID. Then setting the scan results into station without triggering
+autoconnect. And finally using network_autoconnect() directly
+instead of relying on station to choose the SSID.
 ---
- src/dpp.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
-
-v3:
- * Allow autoconnect states while enrolling. Its probably unlikely
-   that a state change would happen but going between DISCONNECTED,
-   AUTOCONNECT_QUICK, and AUTOCONNECT_FULL won't cause any issues
-   while enrolling.
+ src/dpp.c | 44 +++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 41 insertions(+), 3 deletions(-)
 
 diff --git a/src/dpp.c b/src/dpp.c
-index 3a740916..06ae2929 100644
+index 06ae2929..a95f93e2 100644
 --- a/src/dpp.c
 +++ b/src/dpp.c
-@@ -100,6 +100,7 @@ struct dpp_sm {
- 	char *uri;
- 	uint8_t role;
- 	int refcount;
-+	uint32_t station_watch;
- 
- 	uint64_t wdev_id;
- 
-@@ -536,6 +537,8 @@ static void dpp_reset(struct dpp_sm *dpp)
- 
- static void dpp_free(struct dpp_sm *dpp)
+@@ -853,13 +853,42 @@ static bool dpp_scan_results(int err, struct l_queue *bss_list,
  {
-+	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
-+
- 	dpp_reset(dpp);
+ 	struct dpp_sm *dpp = userdata;
+ 	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
++	struct scan_bss *bss;
++	char ssid[33];
++	struct network *network;
  
- 	if (dpp->own_asn1) {
-@@ -553,6 +556,13 @@ static void dpp_free(struct dpp_sm *dpp)
- 		dpp->boot_private = NULL;
- 	}
- 
-+	/*
-+	 * Since this is called when the netdev goes down, station may already
-+	 * be gone in which case the state watch will automatically go away.
-+	 */
-+	if (station)
-+		station_remove_state_watch(station, dpp->station_watch);
+ 	if (err < 0)
+-		return false;
++		goto reset;
 +
- 	l_free(dpp);
- }
- 
-@@ -3608,6 +3618,67 @@ static void dpp_frame_watch(struct dpp_sm *dpp, uint16_t frame_type,
- 					L_UINT_TO_PTR(frame_type), NULL);
- }
- 
-+/*
-+ * Station is unaware of DPP's state so we need to handle a few cases here so
-+ * weird stuff doesn't happen:
-+ *
-+ *   - While configuring we should stay connected, a disconnection/roam should
-+ *     stop DPP since it would fail regardless due to the hardware going idle
-+ *     or changing channels since configurators assume all comms will be
-+ *     on-channel.
-+ *   - While enrolling we should stay disconnected. If station connects during
-+ *     enrolling it would cause 2x calls to __station_connect_network after
-+ *     DPP finishes.
-+ *
-+ * Other conditions shouldn't ever happen i.e. configuring and going into a
-+ * connecting state or enrolling and going to a disconnected/roaming state.
-+ */
-+static void dpp_station_state_watch(enum station_state state, void *user_data)
-+{
-+	struct dpp_sm *dpp = user_data;
-+
-+	switch (state) {
-+	case STATION_STATE_DISCONNECTED:
-+	case STATION_STATE_DISCONNECTING:
-+	case STATION_STATE_ROAMING:
-+	case STATION_STATE_FT_ROAMING:
-+	case STATION_STATE_FW_ROAMING:
-+		if (L_WARN_ON(dpp->role == DPP_CAPABILITY_ENROLLEE))
-+			dpp_reset(dpp);
-+
-+		if (dpp->role == DPP_CAPABILITY_CONFIGURATOR) {
-+			l_debug("Disconnected while configuring, stopping DPP");
-+			dpp_reset(dpp);
-+		}
-+
-+		break;
-+	case STATION_STATE_CONNECTING:
-+	case STATION_STATE_CONNECTED:
-+	case STATION_STATE_CONNECTING_AUTO:
-+		if (L_WARN_ON(dpp->role == DPP_CAPABILITY_CONFIGURATOR))
-+			dpp_reset(dpp);
-+
-+		if (dpp->role == DPP_CAPABILITY_ENROLLEE) {
-+			l_debug("Connecting while enrolling, stopping DPP");
-+			dpp_reset(dpp);
-+		}
-+
-+		break;
++	if (!bss_list || l_queue_length(bss_list) == 0)
++		goto reset;
 +
 +	/*
-+	 * Autoconnect states are fine for enrollees. This makes it nicer for
-+	 * the user since they don't need to explicity Disconnect() to disable
-+	 * autoconnect, then re-enable it if DPP fails.
++	 * The station watch _should_ detect this and reset, which cancels the
++	 * scan. But just in case...
 +	 */
-+	case STATION_STATE_AUTOCONNECT_FULL:
-+	case STATION_STATE_AUTOCONNECT_QUICK:
-+		if (L_WARN_ON(dpp->role == DPP_CAPABILITY_CONFIGURATOR))
-+			dpp_reset(dpp);
++	if (L_WARN_ON(station_get_connected_network(station)))
++		goto reset;
 +
-+		break;
-+	}
-+}
-+
- static void dpp_create(struct netdev *netdev)
- {
- 	struct l_dbus *dbus = dbus_get_bus();
-@@ -3615,6 +3686,7 @@ static void dpp_create(struct netdev *netdev)
- 	uint8_t dpp_conf_response_prefix[] = { 0x04, 0x0b };
- 	uint8_t dpp_conf_request_prefix[] = { 0x04, 0x0a };
- 	uint64_t wdev_id = netdev_get_wdev_id(netdev);
-+	struct station *station = station_find(netdev_get_ifindex(netdev));
++	/* Purely for grabbing the SSID */
++	bss = l_queue_peek_head(bss_list);
  
- 	dpp->netdev = netdev;
- 	dpp->state = DPP_STATE_NOTHING;
-@@ -3660,6 +3732,9 @@ static void dpp_create(struct netdev *netdev)
- 				sizeof(dpp_conf_request_prefix),
- 				dpp_handle_config_request_frame, dpp, NULL);
- 
-+	dpp->station_watch = station_add_state_watch(station,
-+					dpp_station_state_watch, dpp, NULL);
+-	station_set_scan_results(station, bss_list, freqs, true);
++	memcpy(ssid, bss->ssid, bss->ssid_len);
++	ssid[bss->ssid_len] = '\0';
 +
- 	l_queue_push_tail(dpp_list, dpp);
++	station_set_scan_results(station, bss_list, freqs, false);
++
++	network = station_network_find(station, ssid, SECURITY_PSK);
++
++	dpp_reset(dpp);
++
++	bss = network_bss_select(network, true);
++	network_autoconnect(network, bss);
+ 
+ 	return true;
++
++reset:
++	return false;
  }
  
+ static void dpp_scan_destroy(void *userdata)
+@@ -898,6 +927,7 @@ static void dpp_handle_config_response_frame(const struct mmpdu_header *frame,
+ 	struct network *network = NULL;
+ 	struct scan_bss *bss = NULL;
+ 	char ssid[33];
++	size_t ssid_len;
+ 
+ 	if (dpp->state != DPP_STATE_CONFIGURING)
+ 		return;
+@@ -1027,6 +1057,7 @@ static void dpp_handle_config_response_frame(const struct mmpdu_header *frame,
+ 	 */
+ 	if (station) {
+ 		memcpy(ssid, config->ssid, config->ssid_len);
++		ssid_len = config->ssid_len;
+ 		ssid[config->ssid_len] = '\0';
+ 
+ 		network = station_network_find(station, ssid, SECURITY_PSK);
+@@ -1045,7 +1076,14 @@ static void dpp_handle_config_response_frame(const struct mmpdu_header *frame,
+ 		__station_connect_network(station, network, bss,
+ 						STATION_STATE_CONNECTING);
+ 	else if (station) {
+-		dpp->connect_scan_id = scan_active(dpp->wdev_id, NULL, 0,
++		struct scan_parameters params = {0};
++
++		params.ssid = (void *) ssid;
++		params.ssid_len = ssid_len;
++
++		l_debug("Scanning for %s", ssid);
++
++		dpp->connect_scan_id = scan_active_full(dpp->wdev_id, &params,
+ 						dpp_scan_triggered,
+ 						dpp_scan_results, dpp,
+ 						dpp_scan_destroy);
 -- 
 2.25.1
 
