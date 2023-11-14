@@ -1,49 +1,49 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80612C18F
-	for <iwd@lists.linux.dev>; Tue, 14 Nov 2023 17:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B918735EF0
+	for <iwd@lists.linux.dev>; Tue, 14 Nov 2023 20:09:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UeMEH32e"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-77bcbc14899so269548585a.1
-        for <iwd@lists.linux.dev>; Tue, 14 Nov 2023 09:39:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j3afjw/H"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3b3f938331fso77184b6e.1
+        for <iwd@lists.linux.dev>; Tue, 14 Nov 2023 12:09:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699983550; x=1700588350; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1699992563; x=1700597363; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=biflnm0/tB6oVZIwXHCeBF9Ow+KXiRG6M0c54wS4tQY=;
-        b=UeMEH32eET+VX3nCymlTrAbCYw8f6hQ5hD+hfNfTkT54bPEriwe9eHDeGHWYVM+hGx
-         gr90FFE2Lh0Ow4BkLBdQjC5tDh7kEgWrPW4C6KICfiz0kEK3uapNJD2p97nXP9y8uQit
-         TsRxQUFJKI+fAXu7B1EtqsUtaix/Kg63TV62xnIHkJ1oXtuCGNwUhBsvpk6s1Gjh2UVu
-         61hSFbCyBn2syu8Cg6odKCelHJG9AXdcglS6vvkWPa2pD2cBMD28nOWYl6J6FROH3mjP
-         tV6HhdSzx7JNfcsU3/m1zOTg3r6KWyZ2lNFVSelINz3x84RE3MgpVJEW7cC+kkC/iWRL
-         JRZw==
+        bh=+5bHgEVBd8XhB75NTf47IgJhceWfbIXZvWz+S+GVEyw=;
+        b=j3afjw/HdfLC5TsXPKHu4rZZWH8WS7CJkW5C0FabJesT4fUPy7chN6Jy1DNdUlTBqu
+         sZv6sMEfktMV8Nc6gFHdAF5afUx0K7sMHHr0pe5hQl6m8itltSNEE5Ek3TDbKEULZhNd
+         TXgIQiBmKnHdnl0P0O2V82yPCJcOutsaua7ocMHu7CRlVem78pP5UrHG9iAOGifo5R8R
+         FEK7u4RS9WsYwI3khqR9kzFvJd0lLTZ7CRonNoXGQDk84TpaROmPO9wn6JcfOEu1VSpp
+         KMz0/gc6iiYZ0BI4oiX8w6/8CByqgBWADX+FWCWVCQejw8tsB4NYow+ax6OQhrriDThy
+         mRmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699983550; x=1700588350;
+        d=1e100.net; s=20230601; t=1699992563; x=1700597363;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=biflnm0/tB6oVZIwXHCeBF9Ow+KXiRG6M0c54wS4tQY=;
-        b=prDM1XD4GoZeUXs7tn7hoz3DOV7P4g6jCRbNMeqWQZ1Brf+4caH2Zaks1BSJygjA6G
-         D5EJYh+58ytI8ieabQQqMFf4VkbsYFSlj/nWFC+IGVR0aRJLJtjXysjxrN5BHGAc6ehV
-         g9GBCfi/tq8RIfh0L407sbkFGIl6QT7GFmTCxGKLLt/HewECf4pBXmhcD6ENGgT63+h6
-         1ditTyIZML7BubHGlOCo9obG4L7j94tPWfEw2MRivlyylrxlMcDt3XQxJnZuGDUmMuTM
-         NslbZoOo4sIWIBzyKjpNBJBRvCw4bnW6CyCMyY5y+fdSnEwECpq3UDqTkruYi6U80dGA
-         QK+Q==
-X-Gm-Message-State: AOJu0YwjMIZXh99bV1TA7jDHfDN3RCpUiG9ad/JzjfvAHOUxgj1wB864
-	pPb/aNuvvv7MyK9/AnT+sJo2w20LpBw=
-X-Google-Smtp-Source: AGHT+IGUgWVsMXZWTjIs8bJaBu0SMw5RVdALlr3NVHP45Vijg1gt8vNAfgrO+XVH+I2wedO0hGKoWQ==
-X-Received: by 2002:a0c:fd43:0:b0:671:fcd3:1cc2 with SMTP id j3-20020a0cfd43000000b00671fcd31cc2mr2667152qvs.65.1699983550611;
-        Tue, 14 Nov 2023 09:39:10 -0800 (PST)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id dl15-20020ad44e0f000000b006709b9f0a72sm3051942qvb.22.2023.11.14.09.39.09
+        bh=+5bHgEVBd8XhB75NTf47IgJhceWfbIXZvWz+S+GVEyw=;
+        b=dXcRSenKosT4HBu6Dk+RXw+racGIeWf6b1LlqpyXNWWXG0AP5EjtHK+XjXBVrlrl0Q
+         rHSozAFYiGJ+atXvpd1kV4MVOCI3BdCI0qHcTGO/n91GP8qL0vn+dRiU1CecNeLJJ7fv
+         vYlJiXOZGWpJEFpNq4drg0JBBwz+CDCLbNmnFQnVtXbJeUllVMTuzrg7IkvhB+f6lzUk
+         s9BT3MwOV2utVw+Tlq3MLPxI6STyLys1ESXesYfdYjDuMwrYLZpJ5hY5aPvWIddP89Fo
+         tARKQHCKMoT1F4NEolYpbv7N10/KR2h5WDgIXo8F1S4rXRZ63/foBmy7DWNue6gd3uBb
+         t6ig==
+X-Gm-Message-State: AOJu0Yzr3r5XtXnqzommc6lk4QbWxQlt9HTLGJPfwB9bOJcMjNyWwgRc
+	X+Aza7U+05/ImopsgwZelNI=
+X-Google-Smtp-Source: AGHT+IHVcRUi5fcIS6RM+fkY/+jd3fc8or51m2USPZp+uTsvPCXUSuP1gUxkPqBCSlCBq/JyB2chNA==
+X-Received: by 2002:a05:6808:a03:b0:3b2:f335:63dc with SMTP id n3-20020a0568080a0300b003b2f33563dcmr1598331oij.23.1699992563676;
+        Tue, 14 Nov 2023 12:09:23 -0800 (PST)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id l5-20020a056808020500b003b2f3fb081csm1230325oie.51.2023.11.14.12.09.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Nov 2023 09:39:10 -0800 (PST)
-Message-ID: <a9b81f8e-a0d4-4b1d-9afb-a33cf9d27767@gmail.com>
-Date: Tue, 14 Nov 2023 09:39:08 -0800
+        Tue, 14 Nov 2023 12:09:23 -0800 (PST)
+Message-ID: <890f50a6-ab69-4081-973b-17559ac23c1a@gmail.com>
+Date: Tue, 14 Nov 2023 14:09:22 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -53,37 +53,46 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 11/11] netdev: disambiguate between disconnection types
 Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
 References: <20231114171455.1108856-1-denkenz@gmail.com>
  <20231114171455.1108856-11-denkenz@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20231114171455.1108856-11-denkenz@gmail.com>
+ <a9b81f8e-a0d4-4b1d-9afb-a33cf9d27767@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <a9b81f8e-a0d4-4b1d-9afb-a33cf9d27767@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Denis,
+Hi James,
 
-On 11/14/23 9:14 AM, Denis Kenzior wrote:
-> There are generally three scenarios where iwd generates a disconnection
-> command to the kernel:
->    1. Error conditions stemming from a connection related event.  For
->       example if SAE/FT/FILS authentication fails during Authenticate or
->       Associate steps and the kernel doesn't disconnect properly.
->    2. Deauthentication after the connection has been established and not
->       related to a connection attempt in progress.  For example, SA Query
->       processing that triggers an disconnect.
->    3. Disconnects that are triggered due to a handshake failure or if
->       setting keys resulting from the handshake fails.  These disconnects
->       can be triggered as a result of a pending connection or when a
->       connection has been established (e.g. due to rekeying).
+On 11/14/23 11:39, James Prestwood wrote:
+> Hi Denis,
 > 
-> Distinguish between 1 and 2/3 by having the disconnect procedure take
-> different paths.  For now there are no functional changes since all
-> paths end up in netdev_connect_failed(), but this will change in the
-> future.
+> On 11/14/23 9:14 AM, Denis Kenzior wrote:
+>> There are generally three scenarios where iwd generates a disconnection
+>> command to the kernel:
+>>    1. Error conditions stemming from a connection related event.  For
+>>       example if SAE/FT/FILS authentication fails during Authenticate or
+>>       Associate steps and the kernel doesn't disconnect properly.
+>>    2. Deauthentication after the connection has been established and not
+>>       related to a connection attempt in progress.  For example, SA Query
+>>       processing that triggers an disconnect.
+>>    3. Disconnects that are triggered due to a handshake failure or if
+>>       setting keys resulting from the handshake fails.  These disconnects
+>>       can be triggered as a result of a pending connection or when a
+>>       connection has been established (e.g. due to rekeying).
+>>
+>> Distinguish between 1 and 2/3 by having the disconnect procedure take
+>> different paths.  For now there are no functional changes since all
+>> paths end up in netdev_connect_failed(), but this will change in the
+>> future.
+> 
+> I'm guessing the future changes would be to handle a CMD_DISCONNECT event via 
+> the connect callback?
 
-I'm guessing the future changes would be to handle a CMD_DISCONNECT 
-event via the connect callback?
+Possibly.  Have not made up my mind completely yet, but we do it both ways right 
+now and we need to stick to one.  Wanted to get the easy stuff out of the way 
+first.  Any comments or should I push this out?
 
-Thanks,
-James
+Regards,
+-Denis
+
