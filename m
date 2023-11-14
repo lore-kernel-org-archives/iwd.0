@@ -1,288 +1,89 @@
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F30241774
-	for <iwd@lists.linux.dev>; Tue, 14 Nov 2023 17:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80612C18F
+	for <iwd@lists.linux.dev>; Tue, 14 Nov 2023 17:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bZ61WrSD"
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-1f0f94943d9so2849559fac.2
-        for <iwd@lists.linux.dev>; Tue, 14 Nov 2023 09:15:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UeMEH32e"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-77bcbc14899so269548585a.1
+        for <iwd@lists.linux.dev>; Tue, 14 Nov 2023 09:39:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699982159; x=1700586959; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2JE9D/wJvfTFJClqf7iFSfHGDUGfkLxXL48h1pslhSE=;
-        b=bZ61WrSD4D6SVDlFG2ZdRjDIEW6vb3XvY/3YMAH5X9nsJDOVCHyYAlk/4CRk+YFs9D
-         2vqM9FPQSyjSRP3qjbhXQoNzgUe6cSRiMhM/f9QsBBJy6BdhpIPLXaOn5GdLu+Ng0mCj
-         YEW7LKb6Tju4DF2WVegwHNr7eEsNmXatrkqjjA0qplAFBaNytEMCcGAte4Cv/zDu7M86
-         ITnw83sdx8JHCsHW/7Kvn82IpArJsIx63kC7XOyfwNKXxY36VZtqrpDnwMeDHnrgbqeB
-         HvvZmR1VQ4ARfpJ1G8WM1b9M/qJkJDVpCYZWhr7cQ955arvQYIB63JTm/wGtK9nZygkx
-         U3vA==
+        d=gmail.com; s=20230601; t=1699983550; x=1700588350; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=biflnm0/tB6oVZIwXHCeBF9Ow+KXiRG6M0c54wS4tQY=;
+        b=UeMEH32eET+VX3nCymlTrAbCYw8f6hQ5hD+hfNfTkT54bPEriwe9eHDeGHWYVM+hGx
+         gr90FFE2Lh0Ow4BkLBdQjC5tDh7kEgWrPW4C6KICfiz0kEK3uapNJD2p97nXP9y8uQit
+         TsRxQUFJKI+fAXu7B1EtqsUtaix/Kg63TV62xnIHkJ1oXtuCGNwUhBsvpk6s1Gjh2UVu
+         61hSFbCyBn2syu8Cg6odKCelHJG9AXdcglS6vvkWPa2pD2cBMD28nOWYl6J6FROH3mjP
+         tV6HhdSzx7JNfcsU3/m1zOTg3r6KWyZ2lNFVSelINz3x84RE3MgpVJEW7cC+kkC/iWRL
+         JRZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699982159; x=1700586959;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2JE9D/wJvfTFJClqf7iFSfHGDUGfkLxXL48h1pslhSE=;
-        b=uzZh1pdi6jDLsL746GH9tEhQuKk/48IOa+s+3uBMTeTX+Y8BJnnOPSKeU2L8Ftigq0
-         FWEFL+fbpx8sMxektiR6UlskPs4ENDPHywLtUTZ9AdnIfHivijyfNeBr4HIpFa9m9BIF
-         fxO/3Pw8SNUoHiNH9OhYZIoFr0ZNzKZ/4xAKiOFGns+MhchlOegIlvARpvMacLkCN8RK
-         n5/aw17TjEJdUNUy42HSppZwdmY4f296DBCmmYgrO6KLfq1tI/d5PttS1rayHZYheRd0
-         9S20YUQ6L5k0MoDxlozqGIfK8OxElWa7Hf90psbKB6XfpUu4a4uApSkre+ZN2QEtTxoj
-         nRxQ==
-X-Gm-Message-State: AOJu0YythXsxxA7lRALWw1lqXQiLnctMrFkQK/Zliz3W6BW03/5Kj0BA
-	L9MyEMW1mtEEF5tMTJherB88Dpqb24A=
-X-Google-Smtp-Source: AGHT+IGA3jfEBI2h2h2wFwKAwSRcNoF1oXlR/n3X/PJIW1TCP6Tj9rvG8YKBS4UPKSRIKOFUC+9quw==
-X-Received: by 2002:a05:6870:eca1:b0:1e9:bc79:9fa6 with SMTP id eo33-20020a056870eca100b001e9bc799fa6mr10560461oab.50.1699982158761;
-        Tue, 14 Nov 2023 09:15:58 -0800 (PST)
-Received: from localhost.localdomain (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id o4-20020a05687072c400b001e9a253afa3sm1429647oak.49.2023.11.14.09.15.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 09:15:58 -0800 (PST)
-From: Denis Kenzior <denkenz@gmail.com>
-To: iwd@lists.linux.dev
-Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 11/11] netdev: disambiguate between disconnection types
-Date: Tue, 14 Nov 2023 11:14:34 -0600
-Message-ID: <20231114171455.1108856-11-denkenz@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231114171455.1108856-1-denkenz@gmail.com>
-References: <20231114171455.1108856-1-denkenz@gmail.com>
+        d=1e100.net; s=20230601; t=1699983550; x=1700588350;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=biflnm0/tB6oVZIwXHCeBF9Ow+KXiRG6M0c54wS4tQY=;
+        b=prDM1XD4GoZeUXs7tn7hoz3DOV7P4g6jCRbNMeqWQZ1Brf+4caH2Zaks1BSJygjA6G
+         D5EJYh+58ytI8ieabQQqMFf4VkbsYFSlj/nWFC+IGVR0aRJLJtjXysjxrN5BHGAc6ehV
+         g9GBCfi/tq8RIfh0L407sbkFGIl6QT7GFmTCxGKLLt/HewECf4pBXmhcD6ENGgT63+h6
+         1ditTyIZML7BubHGlOCo9obG4L7j94tPWfEw2MRivlyylrxlMcDt3XQxJnZuGDUmMuTM
+         NslbZoOo4sIWIBzyKjpNBJBRvCw4bnW6CyCMyY5y+fdSnEwECpq3UDqTkruYi6U80dGA
+         QK+Q==
+X-Gm-Message-State: AOJu0YwjMIZXh99bV1TA7jDHfDN3RCpUiG9ad/JzjfvAHOUxgj1wB864
+	pPb/aNuvvv7MyK9/AnT+sJo2w20LpBw=
+X-Google-Smtp-Source: AGHT+IGUgWVsMXZWTjIs8bJaBu0SMw5RVdALlr3NVHP45Vijg1gt8vNAfgrO+XVH+I2wedO0hGKoWQ==
+X-Received: by 2002:a0c:fd43:0:b0:671:fcd3:1cc2 with SMTP id j3-20020a0cfd43000000b00671fcd31cc2mr2667152qvs.65.1699983550611;
+        Tue, 14 Nov 2023 09:39:10 -0800 (PST)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id dl15-20020ad44e0f000000b006709b9f0a72sm3051942qvb.22.2023.11.14.09.39.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Nov 2023 09:39:10 -0800 (PST)
+Message-ID: <a9b81f8e-a0d4-4b1d-9afb-a33cf9d27767@gmail.com>
+Date: Tue, 14 Nov 2023 09:39:08 -0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 11/11] netdev: disambiguate between disconnection types
+Content-Language: en-US
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20231114171455.1108856-1-denkenz@gmail.com>
+ <20231114171455.1108856-11-denkenz@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20231114171455.1108856-11-denkenz@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-There are generally three scenarios where iwd generates a disconnection
-command to the kernel:
-  1. Error conditions stemming from a connection related event.  For
-     example if SAE/FT/FILS authentication fails during Authenticate or
-     Associate steps and the kernel doesn't disconnect properly.
-  2. Deauthentication after the connection has been established and not
-     related to a connection attempt in progress.  For example, SA Query
-     processing that triggers an disconnect.
-  3. Disconnects that are triggered due to a handshake failure or if
-     setting keys resulting from the handshake fails.  These disconnects
-     can be triggered as a result of a pending connection or when a
-     connection has been established (e.g. due to rekeying).
+Hi Denis,
 
-Distinguish between 1 and 2/3 by having the disconnect procedure take
-different paths.  For now there are no functional changes since all
-paths end up in netdev_connect_failed(), but this will change in the
-future.
----
- src/netdev.c | 126 +++++++++++++++++++++++++++++++--------------------
- 1 file changed, 76 insertions(+), 50 deletions(-)
+On 11/14/23 9:14 AM, Denis Kenzior wrote:
+> There are generally three scenarios where iwd generates a disconnection
+> command to the kernel:
+>    1. Error conditions stemming from a connection related event.  For
+>       example if SAE/FT/FILS authentication fails during Authenticate or
+>       Associate steps and the kernel doesn't disconnect properly.
+>    2. Deauthentication after the connection has been established and not
+>       related to a connection attempt in progress.  For example, SA Query
+>       processing that triggers an disconnect.
+>    3. Disconnects that are triggered due to a handshake failure or if
+>       setting keys resulting from the handshake fails.  These disconnects
+>       can be triggered as a result of a pending connection or when a
+>       connection has been established (e.g. due to rekeying).
+> 
+> Distinguish between 1 and 2/3 by having the disconnect procedure take
+> different paths.  For now there are no functional changes since all
+> paths end up in netdev_connect_failed(), but this will change in the
+> future.
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 418626d72579..d0ce0aaad5e7 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -858,7 +858,7 @@ static void netdev_connect_failed(struct netdev *netdev,
- 	}
- }
- 
--static void netdev_disconnect_cb(struct l_genl_msg *msg, void *user_data)
-+static void netdev_connect_failed_cb(struct l_genl_msg *msg, void *user_data)
- {
- 	struct netdev *netdev = user_data;
- 
-@@ -866,6 +866,63 @@ static void netdev_disconnect_cb(struct l_genl_msg *msg, void *user_data)
- 	netdev_connect_failed(netdev, netdev->result, netdev->last_code);
- }
- 
-+static void netdev_send_and_fail_connection(struct netdev *netdev,
-+						enum netdev_result result,
-+						uint16_t status_code,
-+						struct l_genl_msg *msg)
-+{
-+	netdev->result = result;
-+	netdev->last_code = status_code;
-+
-+	netdev->disconnect_cmd_id =
-+		l_genl_family_send(nl80211, msg, netdev_connect_failed_cb,
-+					netdev, NULL);
-+}
-+
-+static void netdev_disconnect_and_fail_connection(struct netdev *netdev,
-+						enum netdev_result result,
-+						uint16_t status_code)
-+{
-+	struct l_genl_msg *msg = nl80211_build_disconnect(netdev->index,
-+						MMPDU_REASON_CODE_UNSPECIFIED);
-+
-+	netdev_send_and_fail_connection(netdev, result, status_code, msg);
-+}
-+
-+static void netdev_deauth_and_fail_connection(struct netdev *netdev,
-+						enum netdev_result result,
-+						uint16_t status_code)
-+{
-+	struct l_genl_msg *msg = nl80211_build_deauthenticate(netdev->index,
-+						netdev->handshake->aa,
-+						MMPDU_REASON_CODE_UNSPECIFIED);
-+
-+	netdev_send_and_fail_connection(netdev, result, status_code, msg);
-+}
-+
-+static void netdev_disconnect_sme_cb(struct l_genl_msg *msg, void *user_data)
-+{
-+	struct netdev *netdev = user_data;
-+
-+	netdev->disconnect_cmd_id = 0;
-+	netdev_connect_failed(netdev, netdev->result, netdev->last_code);
-+}
-+
-+static void netdev_disconnect_by_sme(struct netdev *netdev,
-+					enum netdev_result result,
-+					uint16_t reason_code)
-+{
-+	struct l_genl_msg *msg = nl80211_build_disconnect(netdev->index,
-+								reason_code);
-+
-+	netdev->result = result;
-+	netdev->last_code = reason_code;
-+
-+	netdev->disconnect_cmd_id = l_genl_family_send(nl80211, msg,
-+						netdev_disconnect_sme_cb,
-+						netdev, NULL);
-+}
-+
- static void netdev_free(void *data)
- {
- 	struct netdev *netdev = data;
-@@ -1388,11 +1445,9 @@ static void netdev_setting_keys_failed(struct netdev_handshake_state *nhs,
- 			return;
- 		}
- 
--		msg = nl80211_build_disconnect(netdev->index,
--						MMPDU_REASON_CODE_UNSPECIFIED);
--		netdev->disconnect_cmd_id = l_genl_family_send(nl80211, msg,
--							netdev_disconnect_cb,
--							netdev, NULL);
-+		netdev_disconnect_by_sme(netdev,
-+					NETDEV_RESULT_KEY_SETTING_FAILED,
-+					MMPDU_REASON_CODE_UNSPECIFIED);
- 		break;
- 	case NL80211_IFTYPE_AP:
- 		if (err == -ENETDOWN)
-@@ -1407,7 +1462,6 @@ static void netdev_setting_keys_failed(struct netdev_handshake_state *nhs,
- 		break;
- 	}
- 
--	netdev->result = NETDEV_RESULT_KEY_SETTING_FAILED;
- 	handshake_event(&nhs->super, HANDSHAKE_EVENT_SETTING_KEYS_FAILED, &err);
- }
- 
-@@ -2118,16 +2172,11 @@ void netdev_handshake_failed(struct handshake_state *hs, uint16_t reason_code)
- 
- 	netdev->sm = NULL;
- 
--	netdev->result = NETDEV_RESULT_HANDSHAKE_FAILED;
--	netdev->last_code = reason_code;
--
- 	switch (netdev->type) {
- 	case NL80211_IFTYPE_STATION:
- 	case NL80211_IFTYPE_P2P_CLIENT:
--		msg = nl80211_build_disconnect(netdev->index, reason_code);
--		netdev->disconnect_cmd_id = l_genl_family_send(nl80211, msg,
--							netdev_disconnect_cb,
--							netdev, NULL);
-+		netdev_disconnect_by_sme(netdev, NETDEV_RESULT_HANDSHAKE_FAILED,
-+						reason_code);
- 		break;
- 	case NL80211_IFTYPE_AP:
- 	case NL80211_IFTYPE_P2P_GO:
-@@ -2842,14 +2891,9 @@ error:
- 	return;
- 
- deauth:
--	netdev->result = NETDEV_RESULT_ASSOCIATION_FAILED;
--	netdev->last_code = MMPDU_STATUS_CODE_UNSPECIFIED;
--	msg = nl80211_build_disconnect(netdev->index,
--						MMPDU_REASON_CODE_UNSPECIFIED);
--	netdev->disconnect_cmd_id = l_genl_family_send(nl80211,
--							msg,
--							netdev_disconnect_cb,
--							netdev, NULL);
-+	netdev_disconnect_and_fail_connection(netdev,
-+					NETDEV_RESULT_ASSOCIATION_FAILED,
-+					MMPDU_STATUS_CODE_UNSPECIFIED);
- }
- 
- static struct l_genl_msg *netdev_build_cmd_associate_common(
-@@ -2890,19 +2934,12 @@ static void netdev_cmd_ft_reassociate_cb(struct l_genl_msg *msg,
- 
- 	netdev->connect_cmd_id = 0;
- 
--	if (l_genl_msg_get_error(msg) < 0) {
--		struct l_genl_msg *cmd_deauth;
-+	if (l_genl_msg_get_error(msg) >= 0)
-+		return;
- 
--		netdev->result = NETDEV_RESULT_ASSOCIATION_FAILED;
--		netdev->last_code = MMPDU_STATUS_CODE_UNSPECIFIED;
--		cmd_deauth = nl80211_build_deauthenticate(netdev->index,
--						netdev->handshake->aa,
--						MMPDU_REASON_CODE_UNSPECIFIED);
--		netdev->disconnect_cmd_id = l_genl_family_send(nl80211,
--							cmd_deauth,
--							netdev_disconnect_cb,
--							netdev, NULL);
--	}
-+	netdev_deauth_and_fail_connection(netdev,
-+					NETDEV_RESULT_ASSOCIATION_FAILED,
-+					MMPDU_STATUS_CODE_UNSPECIFIED);
- }
- 
- static bool kernel_will_retry_auth(uint16_t status_code,
-@@ -3027,17 +3064,9 @@ static void netdev_authenticate_event(struct l_genl_msg *msg,
- 		 * to keep retrying, tell it to stop
- 		 */
- 		if (retry) {
--			struct l_genl_msg *cmd_deauth;
--
--			netdev->result = NETDEV_RESULT_ASSOCIATION_FAILED;
--			netdev->last_code = MMPDU_STATUS_CODE_UNSPECIFIED;
--			cmd_deauth = nl80211_build_deauthenticate(netdev->index,
--						netdev->handshake->aa,
--						MMPDU_REASON_CODE_UNSPECIFIED);
--			netdev->disconnect_cmd_id = l_genl_family_send(nl80211,
--							cmd_deauth,
--							netdev_disconnect_cb,
--							netdev, NULL);
-+			netdev_deauth_and_fail_connection(netdev,
-+					NETDEV_RESULT_ASSOCIATION_FAILED,
-+					MMPDU_STATUS_CODE_UNSPECIFIED);
- 			return;
- 		}
- 	}
-@@ -4545,17 +4574,14 @@ static void netdev_sa_query_timeout(struct l_timeout *timeout,
- 		void *user_data)
- {
- 	struct netdev *netdev = user_data;
--	struct l_genl_msg *msg;
- 
- 	l_info("SA Query timed out, connection is invalid.  Disconnecting...");
- 
- 	l_timeout_remove(netdev->sa_query_timeout);
- 	netdev->sa_query_timeout = NULL;
- 
--	msg = nl80211_build_disconnect(netdev->index,
--			MMPDU_REASON_CODE_PREV_AUTH_NOT_VALID);
--	netdev->disconnect_cmd_id = l_genl_family_send(nl80211, msg,
--			netdev_disconnect_cb, netdev, NULL);
-+	netdev_disconnect_by_sme(netdev, NETDEV_RESULT_ABORTED,
-+					MMPDU_REASON_CODE_PREV_AUTH_NOT_VALID);
- }
- 
- static void netdev_sa_query_req_cb(struct l_genl_msg *msg, void *user_data)
--- 
-2.42.0
+I'm guessing the future changes would be to handle a CMD_DISCONNECT 
+event via the connect callback?
 
+Thanks,
+James
