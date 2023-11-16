@@ -1,49 +1,49 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8975E328CA
-	for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 15:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE3430677
+	for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 15:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="laD3MLIK"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-77a453eb01cso54129285a.0
-        for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 07:49:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k/zqNT6q"
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5872b8323faso456215eaf.1
+        for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 07:51:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700149749; x=1700754549; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=L94GBMljSXS6TG2BPcg2exOQXkEe6dx+KJlnpuFmVJM=;
-        b=laD3MLIKl0pP2oHtAXeLbC1OfROf2ztGOXoZiACKyjTqdD4pfLFMREW5x8n0Jd8VMS
-         R0OmMH25NDqyJ8QG0cYJEoY5Z9XtRRh9aeVnWPkWWy5nmU8mnXzQb96hytXSYYBI6Zd3
-         AQVmw3hNxbKnXyMrNvfm3c/ss1FdStyMLhvl7LDvn0DbEVKGQ6BDiJRW2wJx/Aynhb8r
-         SWD3Zpsq1UDuKnbLt4YU/QLVkchbeg6sYaYO2000V3d30OgLdvdAkZR7YrJZfzSXE8c0
-         Mi158TVu52opQvqG1ktwWXAoBK1DfmDorOBrMxq/HlKbCSJoWaIc4rLSjI+0I4uugO43
-         dWRg==
+        d=gmail.com; s=20230601; t=1700149864; x=1700754664; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FVpMnurLoAMDWkonM6+vBwwM3uWZ0RmRQYpgytCtN+M=;
+        b=k/zqNT6qFiD8jAo9vACyQgH7w4STuaZtLUOWdswzkkpx3de867upXokSC4YFpF4gsQ
+         cp3jmC6HwspUwboVapTG6v46CzBQl2Zx6zEnONeWHQGMH/vRdI64yXAhLbSY0+glo49A
+         u87R5AzPBIL7lhsp/StNdfrnr/u0+5k3fr2XSXBMY+zZycezmSZc9FmN6ObrCP+JPyuY
+         DxTwuINhYL/cGw8nKD3iOeFYisktC1K1N7gVupJgSST8iOXkALBkmafRVCAWwgEzFLN+
+         SDdtB0PAulLs6Tq9gmprr16xVGBJlg1vr5Bp65pNHWKF+wlm90hG0gdE1PhI+94TyI4w
+         S2SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700149749; x=1700754549;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1700149864; x=1700754664;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L94GBMljSXS6TG2BPcg2exOQXkEe6dx+KJlnpuFmVJM=;
-        b=CI36uPMwGY0D6hqO/ikqa3UT9Yq8IPiK3ApH0UmbF4WeAw65eLyUd+ykiC7t7g6x1o
-         QR8TSQqFgzXC5dMmWGjn4KVfVMg/Ii+eUmBmXi4ClvFREGA7JWnEobw8oZMcSgr392B8
-         PeKHHE7nhpBJ0h6pGaTa6zxkOisk2E3TlRyT73FNfpzj/IOrgmt6H/BnYuvzIFdmLGUW
-         WeS8OFcfqPrOKAKptQ6TzGfmChwjPvKb0ePz6hQC99Y31lZRSy89qn+pRGTGUIclCx8x
-         765YoWIPXI81pulDpOrt0oZdssOVUzcxZzTeq647gblXYzD2h11NQo/M6zlVbyfQZm8j
-         Ualg==
-X-Gm-Message-State: AOJu0YwiDOUsgl2JpAUiH1+qXI0jS/aFJAFDRdmsbroDgl6lhLZSvf+z
-	yi093A3b6vYvJAJ4hhkIijQ=
-X-Google-Smtp-Source: AGHT+IGhHNNFlz6UHUgWeb5HybYk1ZswRaBkGNSqI2jNfrg4KrNswO2TDda5J+RuNYuP6C2f4N1+yw==
-X-Received: by 2002:a05:620a:9c2:b0:778:8b8a:37e with SMTP id y2-20020a05620a09c200b007788b8a037emr8895553qky.21.1700149749323;
-        Thu, 16 Nov 2023 07:49:09 -0800 (PST)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id u3-20020a05620a022300b0076f19b9e96fsm4350676qkm.107.2023.11.16.07.49.08
+        bh=FVpMnurLoAMDWkonM6+vBwwM3uWZ0RmRQYpgytCtN+M=;
+        b=wzHZ9Z7wI1Ibm3CNNpFlXASuqOczTC0uXHUFEQXFVFVI0AwDbqLeMx3L+Wou9lBTHD
+         fmc/R5kx0aSJhPmh2bYng5HDTW3XxO38Xa1N+GG20/MZ/28JQBemLRZd3yLtLGsRMHvT
+         p06AiLKmc64+anlN6AekhY+DwO+l3Ky3XGH0m4ocrx+rfH3QNlAP6y2ulbxNOfJclQtM
+         ODcXrZSHLFQ5NxV1aaX14iuTfGBVgDLxSlieKg/Eg29pzcbhS93VwdTIBSTIAxQm+4k9
+         7kQnHxG9FS+22tV1N/riuu41JxE20/uxE+PvY0V/l9Fl7jlgyDdVmhY/4huZewUAaKYb
+         1Dgg==
+X-Gm-Message-State: AOJu0YzCFhRG2jeCG/Q/Ecimp0W5rwVEw9nOdqRmf7XJINBqFtMj8fqL
+	KNiShxIk0OlB1IiIn2TanXOV4hqXa8A=
+X-Google-Smtp-Source: AGHT+IGJmnId/2bd1zhOZOq9tumggSRGRyTbpurTfg0KjA725FMZYfCwFAkrSEn4yif8U6Hf+cwoUQ==
+X-Received: by 2002:a4a:ea0f:0:b0:587:2b3c:e11f with SMTP id x15-20020a4aea0f000000b005872b3ce11fmr18267681ood.0.1700149864117;
+        Thu, 16 Nov 2023 07:51:04 -0800 (PST)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id a2-20020a4ad5c2000000b00586d187ed06sm1089648oot.48.2023.11.16.07.51.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Nov 2023 07:49:09 -0800 (PST)
-Message-ID: <73c2acb7-dcaa-4498-8eb4-4fa21923d7fd@gmail.com>
-Date: Thu, 16 Nov 2023 07:49:06 -0800
+        Thu, 16 Nov 2023 07:51:03 -0800 (PST)
+Message-ID: <210c60de-f02c-4ba4-bb66-17c54a2f0f29@gmail.com>
+Date: Thu, 16 Nov 2023 09:51:01 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,77 +51,47 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] RFC: Support full profile sharing via DPP 3rd party
- attributes
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20231113182800.344348-1-prestwoj@gmail.com>
- <fcb4e7bf-7947-4db0-aac7-990aff70542f@gmail.com>
+Subject: Re: [PATCH 2/2] dpp: check for non-utf8 SSID's in scan results
 Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <fcb4e7bf-7947-4db0-aac7-990aff70542f@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20231116154439.33880-1-prestwoj@gmail.com>
+ <20231116154439.33880-2-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20231116154439.33880-2-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Denis,
+Hi James,
 
-On 11/16/23 07:29, Denis Kenzior wrote:
-> Hi James,
->
-> On 11/13/23 12:28, James Prestwood wrote:
->> If an IWD profile contains network-specific settings which are
->> required to utilize the network correctly configuring via DPP
->> will not carry over those settings to the enrollee. The DPP
->> configuration object only contains the SSID/PSK to connect and
->> anything else set in the configurators profile is not included.
->>
->> This is likely something that the majority of users will not
->> need (most networks don't need additional settings) but if the
->> network does it would be convenient for the configurator to send
->> over its exact configuration to the enrollee. This is useful for
->> an automated use case where a configuration should be consistent
->> across all devices.
->>
->> DPP allows for arbitrary 3rd party attributes in the configuration
->> object (section 4.5.2) which can be used to communicate additional
->> settings.
->>
->> The plan is to define a new object within the overall
->> configuration object who's keys are IWD profile groups and values
->> are objects containing settings for those groups:
->>
->> {
->>    "ssid": "my_ssid",
->>    ... main configuration object ...
->>
->>    ... The IWD profile, converted to JSON ...
->>    "/net/connman/iwd": {
->>      "Network": {
->>        "MutlicastDNS": "true"
->>      },
->>      "IPv4": {
->>        "SendHostname": "true"
->>      },
->>      ... etc ...
->>    }
->> }
->>
->> The "/net/connman/iwd" object could then be parsed by the enrollee
->> (potentially if the feature is enable in main.conf?) and set to
->> the profile as it is now with the passphrase/psk.
->>
->> Several profile values don't apply here like MAC/IP address
->> overrides. Mainly the settings that do matter would be:
->>
->> [IPv4].SendHostname
->
-> Yeah I can see this one since this might be a network-wide DHCP server 
-> quirk...
+On 11/16/23 09:44, James Prestwood wrote:
+> In theory this shouldn't be possible because the configuration object
+> validates that the SSID is utf-8. But it doesn't hurt to check
+> especially since we can't control what the kernel sends us.
+> ---
+>   src/dpp.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/src/dpp.c b/src/dpp.c
+> index 18b2a7c6..8da79603 100644
+> --- a/src/dpp.c
+> +++ b/src/dpp.c
+> @@ -884,6 +884,9 @@ static bool dpp_scan_results(int err, struct l_queue *bss_list,
+>   	/* Purely for grabbing the SSID */
+>   	bss = l_queue_peek_head(bss_list);
+>   
+> +	if (L_WARN_ON(!util_ssid_is_utf8(bss->ssid_len, bss->ssid)))
+> +		goto reset;
+> +
 
-To be completely honest SendHostname is all I actually needed. I was 
-trying to make it more generic and allow any setting but it certainly 
-simplifies the implementation if we just pick individual settings we want.
+This still seems brittle.  You have the validated SSID from the DPP session, 
+shouldn't you be storing that and using it to filter the scan results?  There's 
+no guarantee that a filtered active scan is going to return only the SSID you 
+asked for (lets say a misbehaving or malicious AP), so assuming that the first 
+BSS in the scan results list is the SSID you want isn't really guaranteed.
 
-Thanks,
+>   	memcpy(ssid, bss->ssid, bss->ssid_len);
+>   	ssid[bss->ssid_len] = '\0';
+>   
 
-James
-
+Regards,
+-Denis
