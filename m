@@ -1,105 +1,81 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA09FBE8
-	for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 15:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DB463A4
+	for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 18:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TVDFl+XL"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-779fb118fe4so53359585a.2
-        for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 07:52:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4w+QzK4"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-41c157bbd30so6869351cf.0
+        for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 10:45:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700149977; x=1700754777; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aC78INwO0nQzGwGva/t72cmweJs/oDOBjjwez6dRvYg=;
-        b=TVDFl+XLd57XznC+mIPe1Tq2ng1mf7KH9xv9XKIdhR8rfk0Mckw3c4q+HqK7KCCMSM
-         OHs28Eyva00SztiOiCX5kb5MNSMzBndJQBiwxi0Ef1u5hFlYgy3QulOPOhObnJ2OeQyE
-         QBxeNtpgq/W/CrJPi0w5XQSM0T5N3sXWHIE3Bbi/ztrJmw86Rvs6xqqEnkNlIW6qdNEQ
-         kFmNOWHkRpaRwQ5AKc1RqAsKotVnNf+hA92UN5qX8nPKRpZke5Sv4IpBCL7eznSfl9rX
-         LgTra1Z51wYOEJIl6+/OktgzOt9oPDIJCU7YXi/FTsZN5gFK4e+RX59a2GO2mMG6uGsD
-         FykA==
+        d=gmail.com; s=20230601; t=1700160307; x=1700765107; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MIMhsRX5I6Zmn3n6vGAdEXdvE08DpBxwEnnneJtPlQM=;
+        b=c4w+QzK4qfR97ah1i1SRypWx9tI3sM9Y1ZKzvuB+pIGAU4loCCNfpg+XfwDC8Ib9Wn
+         0imq3b3OKj+lqybdgrxOwCsqd9YCabRIJaoJWAZVFjtY5cXWpDmoosZoASZgujrXSlba
+         wz2+I72G4Je6+yo/fhPF4g+mOlw4faTKLPvbD8ikBFiG0tgmB1I29fYyuQ9QlIgLXDsK
+         pvyE6ju3gFoTlIgUfzODBu+CTeP04Hk8i23hWQ5504DM92ciBOp/7xzW2zKCxBj2raym
+         ruomVNWoscinJtSjSPNaI+5axgcRczPhyd3BwigUSgoO4C5uUJ2QF7p95RVmjg4n7F9F
+         WfEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700149977; x=1700754777;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aC78INwO0nQzGwGva/t72cmweJs/oDOBjjwez6dRvYg=;
-        b=QlBvA8dYaY+u6jStM0qSuGAZ2UDLgq1rQyR8YrMFDRYJkOTJqMGX3SOyxx1posszu4
-         TjMyCSLReNKfUw9rnlEcfaMO76MY20bsrTvtM6Dxu+6yA7YB9yaoX4rKn0jV492waAaN
-         ZRjyeMf+STXVHE5XFjGzaG+aIQHMB//NVp7hHWJlZ51lFPHyCrtBbz4Jzisw67PLMmgg
-         5Cp8wyBYX8V8qEoWkVi6NUjSHkEUyWUrEuNQTNYdP/Fwg0s4wwYsF68NjrZAsWdkhI4a
-         Z/r76seIY43EWdL+yEA0SMzDsui7s4txy2IZHapT/12a06oIAmam3whUs9gp7U2kdVae
-         xjjw==
-X-Gm-Message-State: AOJu0YyrilTu6Da67E1KWeOOOUho6t0EIzCZ/taHV/3vQ/id7q8+A+/c
-	BnOkvkCR73zHSDhA+ZlezLGei7CQmkc=
-X-Google-Smtp-Source: AGHT+IH0pKU5IjriFLVt3T1jTTVAwuL6eZMzXPaJDQNCSyYkRAUMyif3jczoBLnCYMqe51iCoPokoQ==
-X-Received: by 2002:a05:620a:2a07:b0:779:dbe5:cd84 with SMTP id o7-20020a05620a2a0700b00779dbe5cd84mr10294872qkp.36.1700149976787;
-        Thu, 16 Nov 2023 07:52:56 -0800 (PST)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id az36-20020a05620a172400b0077580becd52sm4347302qkb.103.2023.11.16.07.52.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Nov 2023 07:52:56 -0800 (PST)
-Message-ID: <957e1fdd-6573-4d01-a3aa-04caaca4352d@gmail.com>
-Date: Thu, 16 Nov 2023 07:52:54 -0800
+        d=1e100.net; s=20230601; t=1700160307; x=1700765107;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MIMhsRX5I6Zmn3n6vGAdEXdvE08DpBxwEnnneJtPlQM=;
+        b=feWKmzv9wVinaANSaGA0kjIPvgaPBih4087ilH2RjuKhBUmQpD3LGHJkgMmrcTM1QS
+         Aq7qcGnbtva83mTJiUrVi90eOSJHhlmMcJVwpaYk+ET633bQDW9r35R3Shctngi7rShr
+         jUe7QVbJamk0ob9X1xJZ0B9JxgK+BC1+m2nhoIZVhWj3LpaXYNGY2qApnKbP/DpJpThc
+         AyzKJha2ogiJ6vYWB4UwG19xjsFV9Fh6JpqHZM/faLm3aHa4qHvX5C8BNPAuEk/Y+Ey8
+         VIegKnOEi0rv0KE8JF1Qx8+/7vSxDGxMF79/GNZ/eUR5QJ8ZS3oQN92tKq/bYHjznR8E
+         y92w==
+X-Gm-Message-State: AOJu0YxIRtWcZjJnpUtXLkTwY90cmPr14pEz+oPLjRcF0S8GuvDxk+tK
+	jIbQRQl175vgiUCBXj0y/aAA6KglvJc=
+X-Google-Smtp-Source: AGHT+IHf80TYDy+TV3DrZa+t9NK+y3c/10AT72E0E7cm5LZ1o8KXfnLdNVgNWYDoZzn5/UWEdacQmA==
+X-Received: by 2002:ac8:5d05:0:b0:417:bd2c:2683 with SMTP id f5-20020ac85d05000000b00417bd2c2683mr12758875qtx.19.1700160306503;
+        Thu, 16 Nov 2023 10:45:06 -0800 (PST)
+Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id b7-20020ac84f07000000b004196d75d79csm4533261qte.46.2023.11.16.10.45.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Nov 2023 10:45:06 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/3] dpp-util: store SSID as string, not raw buffer
+Date: Thu, 16 Nov 2023 10:44:57 -0800
+Message-Id: <20231116184459.292601-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] dpp: check for non-utf8 SSID's in scan results
-Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20231116154439.33880-1-prestwoj@gmail.com>
- <20231116154439.33880-2-prestwoj@gmail.com>
- <210c60de-f02c-4ba4-bb66-17c54a2f0f29@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <210c60de-f02c-4ba4-bb66-17c54a2f0f29@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Denis,
+Nearly every use of the ssid member first has to memcpy it to a
+buffer and NULL terminate. Instead just store the ssid as a
+string when creating/parsing from JSON.
+---
+ src/dpp-util.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 11/16/23 07:51, Denis Kenzior wrote:
-> Hi James,
->
-> On 11/16/23 09:44, James Prestwood wrote:
->> In theory this shouldn't be possible because the configuration object
->> validates that the SSID is utf-8. But it doesn't hurt to check
->> especially since we can't control what the kernel sends us.
->> ---
->>   src/dpp.c | 3 +++
->>   1 file changed, 3 insertions(+)
->>
->> diff --git a/src/dpp.c b/src/dpp.c
->> index 18b2a7c6..8da79603 100644
->> --- a/src/dpp.c
->> +++ b/src/dpp.c
->> @@ -884,6 +884,9 @@ static bool dpp_scan_results(int err, struct 
->> l_queue *bss_list,
->>       /* Purely for grabbing the SSID */
->>       bss = l_queue_peek_head(bss_list);
->>   +    if (L_WARN_ON(!util_ssid_is_utf8(bss->ssid_len, bss->ssid)))
->> +        goto reset;
->> +
->
-> This still seems brittle.  You have the validated SSID from the DPP 
-> session, shouldn't you be storing that and using it to filter the scan 
-> results?  There's no guarantee that a filtered active scan is going to 
-> return only the SSID you asked for (lets say a misbehaving or 
-> malicious AP), so assuming that the first BSS in the scan results list 
-> is the SSID you want isn't really guaranteed.
+diff --git a/src/dpp-util.h b/src/dpp-util.h
+index b5fc029c..222ba053 100644
+--- a/src/dpp-util.h
++++ b/src/dpp-util.h
+@@ -112,7 +112,7 @@ enum dpp_attribute_type {
+ };
+ 
+ struct dpp_configuration {
+-	uint8_t ssid[32];
++	char ssid[33];
+ 	size_t ssid_len;
+ 	uint32_t akm_suites;
+ 	char *passphrase;
+-- 
+2.34.1
 
-Sure I can do that. I was banking on the kernel filtering, but we can be 
-100% sure and just store the SSID in the dpp_sm.
-
->
->>       memcpy(ssid, bss->ssid, bss->ssid_len);
->>       ssid[bss->ssid_len] = '\0';
->
-> Regards,
-> -Denis
