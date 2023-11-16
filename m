@@ -1,50 +1,49 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B913DBA5
-	for <iwd@lists.linux.dev>; Wed, 15 Nov 2023 19:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E053030CEA
+	for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 15:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eAKR6reT"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6d2efe8c43eso566914a34.0
-        for <iwd@lists.linux.dev>; Wed, 15 Nov 2023 11:07:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gJqn9Q4A"
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-1e9bb3a0bfeso443760fac.3
+        for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 07:19:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700075255; x=1700680055; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1700147944; x=1700752744; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+84BtoJ1wV3z8vgnrIEhdNXShCC5shZBCi99RfuEt9s=;
-        b=eAKR6reT2ZOIkC50lF220wpd2UaqCFm5QL9zTN44C0fez+npnwq4Pq/xFfL5HVBg4R
-         YEXRic4FUSrZzudK7ceykS5rj2TZ6E5kRmvAPcf7InOEh8UdzcDwt3PlLNFGqDaeU0kz
-         3Tov4P3tgbZ9Ip00/7RnOtnzd983OuV1QYxijQ06CWNaY08JLAo2L++kkBUNdLAKIJnO
-         GabgVD4QwOhkKNmKD5KI2dvWFvD1vLh53IXPd3OM0GKe83xVPaoDDSvOfYX5WlZQdM3r
-         8kklL+JQN5PsPS+8Li8LuqMuTV3juUyHNqACraGJ5zvMVZfrdjjq6GwxPLywbsJC/I0r
-         D6Mw==
+        bh=ArS26YBkJjtF56HtuHOh7yORZlC0Hp8Gnv35JrulLLo=;
+        b=gJqn9Q4AXIs5UlBVkeHKPziPdITht69yv8m6HAqVlBRVnT+UwrPLwa/lZ1W/0oMVsv
+         ep8Krn6bn6yn48bAQ1HgRvAuDDcIP5SmNlfX/iEegmGZoHQKKEzXe4FJAZaoc2Nm/txB
+         pNlukCgK1aRUOk8ad4zIDz5Cm/wTqyCvEp0d4c8IxSZzlR7YkQLVZMkTnkLIY8GpKli3
+         93K9MIWJlkVtKc751V+JpfocT6x11AK62HreqAKIsfqootHJcafhZfU2qsw9ZGlqllSl
+         qi+WvS7swmYR81vQbBL6uWN49AWdKYXzLAtktq2A/jeswBIPXtnvtd4tJQomHoLAfDl4
+         eXYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700075255; x=1700680055;
+        d=1e100.net; s=20230601; t=1700147944; x=1700752744;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+84BtoJ1wV3z8vgnrIEhdNXShCC5shZBCi99RfuEt9s=;
-        b=MlvsahsmAculfdlVsEkGuf/jsfK1WuHGi5Ie1NRvCa/2a7fhnICdhlTlQa5NrLyIS8
-         TUVhpl/229Hj9keVKbANIUVmGTFKy76OGAK5AX9E0CMIRvrrad+nXvFCNG+HWHFsv79t
-         5XMkk/iyl9Ilyo6W78RA08XmUE5QA5yX6/vQfwjaTlA6qbQBi2KwFELzHSv5+GCO5pDi
-         pzG4GmcILmst7Bmypd8HZLDRSzhFdTzazQEpyRetSxLTg6TV3+KlZQA9WFENzo6vubNE
-         Pfp99nC+ipumyn9ALhSmREeB0IB7L1GtfyaQcPZl7u9KjWG+SE17rhBFDQUNGhL9mGNq
-         DrCA==
-X-Gm-Message-State: AOJu0YzQU7caiU/PpmRcE5wEM1DcwG1dCiT9w28LZ5M5KHnChFFk0b7f
-	sGpA5zahcrolfg4GoNHpND+6lNTXyDU=
-X-Google-Smtp-Source: AGHT+IEsJvG7h03AWWR2TlcB/U08ji13kYMFFZMe+KTRmQgXX8Q/lipJ0ZPpbODjz4GNw58BPmZxiw==
-X-Received: by 2002:a05:6870:242a:b0:1e9:b0d6:81fa with SMTP id n42-20020a056870242a00b001e9b0d681famr3201029oap.21.1700075255272;
-        Wed, 15 Nov 2023 11:07:35 -0800 (PST)
+        bh=ArS26YBkJjtF56HtuHOh7yORZlC0Hp8Gnv35JrulLLo=;
+        b=thwdNZgrIGi6T3Kcm/oPDHw2+1rDQESZBWmlxlU2zIkRGpbz5cJSSP6wp7uyqfrILv
+         KBjbNQEBAUdhPYKSa84U88t4ClaZLCrkTxuLolQcnkJoMFzbey1fj+q8rPHsCAfGFLk8
+         g7nv1Flz6YwKcKKU2RAk43oVavY4fcOggO1VpuxDUcMsLj4eLFLB51et+HffY/IWz27W
+         RCrG5IiqFvgWx7wb6OqGRj5zGk3iQpZAgjN9BFf3MoENRwzqxTIaPxkPBy+ZEJfCvpuW
+         c1oU8ONOt0wFx6/HeCCCN7kkFHajOmjNaPESHkgQsj+zugc6t8ruwdjAIHlFRxNVd43k
+         qMxQ==
+X-Gm-Message-State: AOJu0Yy0zswyq+t3O1pg1fVs+IpvodSWUcoCf/JsVRH8A+HirOF8C5Cv
+	2ylRja5JgWnKLSGO7A9niCR3Ir3rWx4=
+X-Google-Smtp-Source: AGHT+IF0SSAfH5idaIG+vUjibL+uYZvILgLY4DHs4rdbRjKK3u1NmZjfdAy1KAna79d4e7HpLbFWwQ==
+X-Received: by 2002:a05:6870:d07:b0:1ef:b16f:d294 with SMTP id mk7-20020a0568700d0700b001efb16fd294mr19497861oab.38.1700147943785;
+        Thu, 16 Nov 2023 07:19:03 -0800 (PST)
 Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id y4-20020a056870a34400b001e9ce1b5e8fsm1852832oak.15.2023.11.15.11.07.34
-        for <iwd@lists.linux.dev>
+        by smtp.googlemail.com with ESMTPSA id y22-20020a056870725600b001ea4324364csm2168799oaf.12.2023.11.16.07.19.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Nov 2023 11:07:34 -0800 (PST)
-Message-ID: <246db269-f53e-41c2-9784-19fefc596a2a@gmail.com>
-Date: Wed, 15 Nov 2023 13:07:34 -0600
+        Thu, 16 Nov 2023 07:19:03 -0800 (PST)
+Message-ID: <805ef134-6b99-4f5e-aad8-be5cff7de444@gmail.com>
+Date: Thu, 16 Nov 2023 09:18:58 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -52,42 +51,96 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] netdev: Remove improper use of netdev_connect_failed
+Subject: Re: [PATCH v3 3/4] dpp: fix fragile scan/connecting logic
 Content-Language: en-US
-To: iwd@lists.linux.dev
-References: <20231115000547.1139157-1-denkenz@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20231113175401.343239-1-prestwoj@gmail.com>
+ <20231113175401.343239-3-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20231115000547.1139157-1-denkenz@gmail.com>
+In-Reply-To: <20231113175401.343239-3-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/14/23 18:05, Denis Kenzior wrote:
-> When a roam event is received, iwd generates a firmware scan request and
-> notifies its event filter of the ROAMING condition.  In cases where the
-> firmware scan could not be started successfully, netdev_connect_failed
-> is invoked.  This is not a correct use of netev_connect_failed since it
-> doesn't actually disconnect the underlying netdev and the reflected
-> state becomes de-synchronized from the underlying kernel device.
+Hi James,
+
+On 11/13/23 11:54, James Prestwood wrote:
+> The post-DPP connection was never done quite right due to station's
+> state being unknown. The state is now tracked in DPP by a previous
+> patch but the scan path in DPP is still wrong.
 > 
-> The firmware scan request could currently fail for two reasons:
->    1. nl80211 genl socket is in a bad state, or
->    2. the scan context does not exist
+> It relies on station autoconnect logic which has the potential to
+> connect to a different network than what was configured with DPP.
+> Its unlikely but still could happen in theory. In addition the scan
+> was not selectively filtering results by the SSID that DPP
+> configured.
 > 
-> Since both reasons are highly unlikely, simply use L_WARN instead.
-> 
-> The other two cases where netdev_connect_failed is used could only occur
-> if the kernel message is invalid.  The message is ignored in that case
-> and a warning is printed.
-> 
-> The situation described above also exists in netdev_get_fw_scan_cb. If
-> the scan could not be completed successfully, there's not much iwd can
-> do to recover.  Have iwd remain in roaming state and print an error.
+> This fixes the above problems by first filtering the scan by the
+> SSID. Then setting the scan results into station without triggering
+> autoconnect. And finally using network_autoconnect() directly
+> instead of relying on station to choose the SSID.
 > ---
->   src/netdev.c | 35 +++++++++++------------------------
->   1 file changed, 11 insertions(+), 24 deletions(-)
+>   src/dpp.c | 44 +++++++++++++++++++++++++++++++++++++++++---
+>   1 file changed, 41 insertions(+), 3 deletions(-)
 > 
 
-All applied.
+All 4 applied, but one comment:
+
+> diff --git a/src/dpp.c b/src/dpp.c
+> index 06ae2929..a95f93e2 100644
+> --- a/src/dpp.c
+> +++ b/src/dpp.c
+> @@ -853,13 +853,42 @@ static bool dpp_scan_results(int err, struct l_queue *bss_list,
+>   {
+>   	struct dpp_sm *dpp = userdata;
+>   	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
+> +	struct scan_bss *bss;
+> +	char ssid[33];
+> +	struct network *network;
+>   
+>   	if (err < 0)
+> -		return false;
+> +		goto reset;
+> +
+> +	if (!bss_list || l_queue_length(bss_list) == 0)
+> +		goto reset;
+> +
+> +	/*
+> +	 * The station watch _should_ detect this and reset, which cancels the
+> +	 * scan. But just in case...
+> +	 */
+> +	if (L_WARN_ON(station_get_connected_network(station)))
+> +		goto reset;
+> +
+> +	/* Purely for grabbing the SSID */
+> +	bss = l_queue_peek_head(bss_list);
+>   
+> -	station_set_scan_results(station, bss_list, freqs, true);
+> +	memcpy(ssid, bss->ssid, bss->ssid_len);
+> +	ssid[bss->ssid_len] = '\0';
+
+Are you sure this SSID is UTF8? station_set_scan_results will filter any SSIDs 
+that are not.
+
+> +
+> +	station_set_scan_results(station, bss_list, freqs, false);
+> +
+> +	network = station_network_find(station, ssid, SECURITY_PSK);
+
+And so this can fail.
+
+> +
+> +	dpp_reset(dpp);
+> +
+> +	bss = network_bss_select(network, true);
+> +	network_autoconnect(network, bss);
+>   
+>   	return true;
+> +
+> +reset:
+> +	return false;
+>   }
+>   
+>   static void dpp_scan_destroy(void *userdata)
 
 Regards,
 -Denis
