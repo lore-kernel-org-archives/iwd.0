@@ -1,49 +1,49 @@
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E053030CEA
-	for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 15:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A9833061
+	for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 15:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gJqn9Q4A"
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-1e9bb3a0bfeso443760fac.3
-        for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 07:19:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lda3zix3"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-1f4a9dd83d6so483657fac.0
+        for <iwd@lists.linux.dev>; Thu, 16 Nov 2023 07:30:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700147944; x=1700752744; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1700148602; x=1700753402; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ArS26YBkJjtF56HtuHOh7yORZlC0Hp8Gnv35JrulLLo=;
-        b=gJqn9Q4AXIs5UlBVkeHKPziPdITht69yv8m6HAqVlBRVnT+UwrPLwa/lZ1W/0oMVsv
-         ep8Krn6bn6yn48bAQ1HgRvAuDDcIP5SmNlfX/iEegmGZoHQKKEzXe4FJAZaoc2Nm/txB
-         pNlukCgK1aRUOk8ad4zIDz5Cm/wTqyCvEp0d4c8IxSZzlR7YkQLVZMkTnkLIY8GpKli3
-         93K9MIWJlkVtKc751V+JpfocT6x11AK62HreqAKIsfqootHJcafhZfU2qsw9ZGlqllSl
-         qi+WvS7swmYR81vQbBL6uWN49AWdKYXzLAtktq2A/jeswBIPXtnvtd4tJQomHoLAfDl4
-         eXYA==
+        bh=cyAHcRfjo/kpgktiiYNctgFuw2vSYipPxbc+Ua9Xtx0=;
+        b=lda3zix333zu4dofR9wrVn/U9+qAebDWe+eAGDPAXmiZjY0BjfmegjM6P21hAj3kWC
+         FSNlrGjUqDejJwbtWRuk4Ft8fBJm5agwFsM+qSvFboEzmyCA9+u6tvAaEDcSoraCsHrv
+         NXUEDWNYIjxISZxSgbiv93AYJDuAElMteOrWsJVnOTDL9QMtKgTn3wC5/iza0M7f9XQX
+         lw15A0Ha7vvszZOAADE3P27OUjx+tGrBwIJsdDguoWcAvPubQ3cB4zVPaTg0Bwf2dDJs
+         m0MNKXIJ6kdFKKhSZC2/PAQAEB8sqosj0E2TFJn/6HZuxt+Yv8gazutqxJDwVEzXvCr9
+         n09Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700147944; x=1700752744;
+        d=1e100.net; s=20230601; t=1700148602; x=1700753402;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ArS26YBkJjtF56HtuHOh7yORZlC0Hp8Gnv35JrulLLo=;
-        b=thwdNZgrIGi6T3Kcm/oPDHw2+1rDQESZBWmlxlU2zIkRGpbz5cJSSP6wp7uyqfrILv
-         KBjbNQEBAUdhPYKSa84U88t4ClaZLCrkTxuLolQcnkJoMFzbey1fj+q8rPHsCAfGFLk8
-         g7nv1Flz6YwKcKKU2RAk43oVavY4fcOggO1VpuxDUcMsLj4eLFLB51et+HffY/IWz27W
-         RCrG5IiqFvgWx7wb6OqGRj5zGk3iQpZAgjN9BFf3MoENRwzqxTIaPxkPBy+ZEJfCvpuW
-         c1oU8ONOt0wFx6/HeCCCN7kkFHajOmjNaPESHkgQsj+zugc6t8ruwdjAIHlFRxNVd43k
-         qMxQ==
-X-Gm-Message-State: AOJu0Yy0zswyq+t3O1pg1fVs+IpvodSWUcoCf/JsVRH8A+HirOF8C5Cv
-	2ylRja5JgWnKLSGO7A9niCR3Ir3rWx4=
-X-Google-Smtp-Source: AGHT+IF0SSAfH5idaIG+vUjibL+uYZvILgLY4DHs4rdbRjKK3u1NmZjfdAy1KAna79d4e7HpLbFWwQ==
-X-Received: by 2002:a05:6870:d07:b0:1ef:b16f:d294 with SMTP id mk7-20020a0568700d0700b001efb16fd294mr19497861oab.38.1700147943785;
-        Thu, 16 Nov 2023 07:19:03 -0800 (PST)
+        bh=cyAHcRfjo/kpgktiiYNctgFuw2vSYipPxbc+Ua9Xtx0=;
+        b=sxG9jNfTaYk582d0G33TpvZow8MDxQxoGFVGpGlbDUInO1OBZgKKdiM7liafOhWxgN
+         /mh5Rt5oNPrsTa+OWGfBt+IZwe2qVddnsZKxtEQCfj/ylfRgRWVkr210FKcTD4LHQt5/
+         U0IaR31I22q6kNIyqP5oA01dwB1Pgg3IdlzcDyBjosLum27CClFEQgJUHRU8yX9ProTb
+         HmWnNJCGxep5a+bHxJF04RT/NvFa0U7vyZVF8VNNVFXmAqYxT4LZwCaSxqd1vbpMd4kl
+         3I754oNkq+7VRKHUyqSXl037wbTcil3A1Bw0WsBx3mexjoQQYNCr9vSDtxhRXEiqLYYL
+         mAMw==
+X-Gm-Message-State: AOJu0Yzv6yTGiZCRzHin6Hpfkpp6GZCiO9AyQOSyxF+XebhXIweGF6eD
+	3N8+f8FjR/6FNguSpbT5DvkiqyfnPIM=
+X-Google-Smtp-Source: AGHT+IFgdCcKrLN+GfwX4gMuZgVszPvKr7F6kt8jSaaD8WiXjyq8GmChZuTc367eWwFbS+4IBHfmWg==
+X-Received: by 2002:a05:6870:c49:b0:1ef:9f6c:3df1 with SMTP id lf9-20020a0568700c4900b001ef9f6c3df1mr19906968oab.14.1700148601908;
+        Thu, 16 Nov 2023 07:30:01 -0800 (PST)
 Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id y22-20020a056870725600b001ea4324364csm2168799oaf.12.2023.11.16.07.19.02
+        by smtp.googlemail.com with ESMTPSA id g8-20020a9d6488000000b006b8b55297b5sm946367otl.42.2023.11.16.07.30.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Nov 2023 07:19:03 -0800 (PST)
-Message-ID: <805ef134-6b99-4f5e-aad8-be5cff7de444@gmail.com>
-Date: Thu, 16 Nov 2023 09:18:58 -0600
+        Thu, 16 Nov 2023 07:30:01 -0800 (PST)
+Message-ID: <fcb4e7bf-7947-4db0-aac7-990aff70542f@gmail.com>
+Date: Thu, 16 Nov 2023 09:29:58 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,97 +51,77 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/4] dpp: fix fragile scan/connecting logic
+Subject: Re: [PATCH] RFC: Support full profile sharing via DPP 3rd party
+ attributes
 Content-Language: en-US
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20231113175401.343239-1-prestwoj@gmail.com>
- <20231113175401.343239-3-prestwoj@gmail.com>
+References: <20231113182800.344348-1-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20231113175401.343239-3-prestwoj@gmail.com>
+In-Reply-To: <20231113182800.344348-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 11/13/23 11:54, James Prestwood wrote:
-> The post-DPP connection was never done quite right due to station's
-> state being unknown. The state is now tracked in DPP by a previous
-> patch but the scan path in DPP is still wrong.
+On 11/13/23 12:28, James Prestwood wrote:
+> If an IWD profile contains network-specific settings which are
+> required to utilize the network correctly configuring via DPP
+> will not carry over those settings to the enrollee. The DPP
+> configuration object only contains the SSID/PSK to connect and
+> anything else set in the configurators profile is not included.
 > 
-> It relies on station autoconnect logic which has the potential to
-> connect to a different network than what was configured with DPP.
-> Its unlikely but still could happen in theory. In addition the scan
-> was not selectively filtering results by the SSID that DPP
-> configured.
+> This is likely something that the majority of users will not
+> need (most networks don't need additional settings) but if the
+> network does it would be convenient for the configurator to send
+> over its exact configuration to the enrollee. This is useful for
+> an automated use case where a configuration should be consistent
+> across all devices.
 > 
-> This fixes the above problems by first filtering the scan by the
-> SSID. Then setting the scan results into station without triggering
-> autoconnect. And finally using network_autoconnect() directly
-> instead of relying on station to choose the SSID.
-> ---
->   src/dpp.c | 44 +++++++++++++++++++++++++++++++++++++++++---
->   1 file changed, 41 insertions(+), 3 deletions(-)
+> DPP allows for arbitrary 3rd party attributes in the configuration
+> object (section 4.5.2) which can be used to communicate additional
+> settings.
 > 
+> The plan is to define a new object within the overall
+> configuration object who's keys are IWD profile groups and values
+> are objects containing settings for those groups:
+> 
+> {
+>    "ssid": "my_ssid",
+>    ... main configuration object ...
+> 
+>    ... The IWD profile, converted to JSON ...
+>    "/net/connman/iwd": {
+>      "Network": {
+>        "MutlicastDNS": "true"
+>      },
+>      "IPv4": {
+>        "SendHostname": "true"
+>      },
+>      ... etc ...
+>    }
+> }
+> 
+> The "/net/connman/iwd" object could then be parsed by the enrollee
+> (potentially if the feature is enable in main.conf?) and set to
+> the profile as it is now with the passphrase/psk.
+> 
+> Several profile values don't apply here like MAC/IP address
+> overrides. Mainly the settings that do matter would be:
+> 
+> [IPv4].SendHostname
 
-All 4 applied, but one comment:
+Yeah I can see this one since this might be a network-wide DHCP server quirk...
 
-> diff --git a/src/dpp.c b/src/dpp.c
-> index 06ae2929..a95f93e2 100644
-> --- a/src/dpp.c
-> +++ b/src/dpp.c
-> @@ -853,13 +853,42 @@ static bool dpp_scan_results(int err, struct l_queue *bss_list,
->   {
->   	struct dpp_sm *dpp = userdata;
->   	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
-> +	struct scan_bss *bss;
-> +	char ssid[33];
-> +	struct network *network;
->   
->   	if (err < 0)
-> -		return false;
-> +		goto reset;
-> +
-> +	if (!bss_list || l_queue_length(bss_list) == 0)
-> +		goto reset;
-> +
-> +	/*
-> +	 * The station watch _should_ detect this and reset, which cancels the
-> +	 * scan. But just in case...
-> +	 */
-> +	if (L_WARN_ON(station_get_connected_network(station)))
-> +		goto reset;
-> +
-> +	/* Purely for grabbing the SSID */
-> +	bss = l_queue_peek_head(bss_list);
->   
-> -	station_set_scan_results(station, bss_list, freqs, true);
-> +	memcpy(ssid, bss->ssid, bss->ssid_len);
-> +	ssid[bss->ssid_len] = '\0';
+> [Network].MulticastDNS
 
-Are you sure this SSID is UTF8? station_set_scan_results will filter any SSIDs 
-that are not.
+But why would you want this one?
 
-> +
-> +	station_set_scan_results(station, bss_list, freqs, false);
-> +
-> +	network = station_network_find(station, ssid, SECURITY_PSK);
+> [Settings] (most values here, except AddressOverride)
 
-And so this can fail.
+What settings do you want from here besides Hidden?  Transition disable settings 
+would be automagically restored as soon as the transition network is connected to.
 
-> +
-> +	dpp_reset(dpp);
-> +
-> +	bss = network_bss_select(network, true);
-> +	network_autoconnect(network, bss);
->   
->   	return true;
-> +
-> +reset:
-> +	return false;
->   }
->   
->   static void dpp_scan_destroy(void *userdata)
+You may want to drop the IPv4/Network hierarchy and make these more generic.
 
 Regards,
 -Denis
-
