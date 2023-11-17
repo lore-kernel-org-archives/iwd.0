@@ -1,77 +1,75 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107B437147
-	for <iwd@lists.linux.dev>; Fri, 17 Nov 2023 19:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D178137162
+	for <iwd@lists.linux.dev>; Fri, 17 Nov 2023 20:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mlHdwIm/"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-677f974b72bso4167156d6.3
-        for <iwd@lists.linux.dev>; Fri, 17 Nov 2023 11:48:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KqBv0TK2"
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6cd09f51fe0so1457617a34.1
+        for <iwd@lists.linux.dev>; Fri, 17 Nov 2023 12:13:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700250481; x=1700855281; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SlnQaSgcVtzF3mkDr2A2TmW+UcHDdm67QrWrT0kOyGE=;
-        b=mlHdwIm/hF7l/Lkmc43ea1qLHUK/5pfLe+pcgVUHvYG4ZQajPI21JpzjYH6yMf/MOQ
-         4z17a8rDU7D5K9+yVnuLldfXPWw774MBGf4vSxhxkiMU3lRMKoomXuMYoTHLlq5eHqez
-         c1GhGdWxmNRsWwRWZYQcPXDNt9E6IMdEtwD9WEfOOg/i65SYaD0+quZWQ8Rx08n4oc1L
-         ga+wJXbuRxrRN5TtzHLwKC/uSQL8IGYtoPWuSQSEfofO9AnKUroX7tJC7KclwCRJ7miS
-         kV79KG1YTzIlGMRuzmkNZKEK0zbs9w759KLEpELDmPEhFhYMiPvhFXAPdA6tptw7UHB3
-         eiTg==
+        d=gmail.com; s=20230601; t=1700252027; x=1700856827; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mi+YRg4tut1Xy/poEXQKpRCNyY++McucYAR0Rn7Styo=;
+        b=KqBv0TK2JKVoD6Ai7gKeo6Hdra/nSEPCWlynryjXxZkuswVpiDjkFHwrEn4hu9+hyb
+         +GpmaLh642dOg/4u+2Rc1z08ks/Xb53acjvqJdeAAAJ7R62j0C7sbInVxoWGcB3FkzVe
+         2shpwjC9jBzbxzCAVzazwBZ9TzSt1LgAgfl4RLM3egc9ALz9OHwHM0/6VB/CppSCwBak
+         ga4pN7WMfPzHCRQPOTXcsgt7dJ16gQb6WcxxsA8mI4ZZiHX85cet/mrWPg5IPxzGHJ2o
+         tr32eSOd5zXQbrgRjUZb99nTfBGST6F1xFy05EVAv3JYHrnwyREozeu52vQbblZRxrP8
+         5qsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700250481; x=1700855281;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SlnQaSgcVtzF3mkDr2A2TmW+UcHDdm67QrWrT0kOyGE=;
-        b=Hn5WraWZKUH6/JZjURYvvoV833kww/kFX16kTLUQKR9C6AgnaF3PrmGq4Ahx3Jbxkm
-         w0ZN8x9ZcCfu+Y0j0+NX2+I/FJhm6pTzz7cmQHOz+zIeRjGjxVVPOYY5hw03VT9Zquor
-         CQsidEaQWxAYDZMSqBuvPWom59DMFtZXnwCgc7ZaFdx8YVaLmdaIR2V3rk1nAu4eV/m9
-         swpCpMJ4YdGE9tiPRVjX31NNzOgatPxUzBc0oMkqTwE0k3xPMoHdF8w/RNwy5K1VNED3
-         vj9zeUqiYWGxjGbUS8gJRrRNgkBeNRb7pK5TdN5htfdcqP5Qj7p4LWp68gQ2sHIsWJWA
-         KL0g==
-X-Gm-Message-State: AOJu0YyBCfzqqfS3qoRPYvLJEZzdufkRqyKIr/DoEgEK7PEwMGjX/tj9
-	QaAuQE2fEM3+eK/+DlgXHCEkJZUetBo=
-X-Google-Smtp-Source: AGHT+IETih+KtUnQqNcgId9q7M2jK6CPtwaLkMBRCo2kK+hoiriO4CYE95BxbwSVG4dLx1AMi0A+cw==
-X-Received: by 2002:a05:6214:5016:b0:66d:10fd:4abb with SMTP id jo22-20020a056214501600b0066d10fd4abbmr139746qvb.16.1700250481476;
-        Fri, 17 Nov 2023 11:48:01 -0800 (PST)
-Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id kh5-20020a056214514500b0064906cfe430sm862154qvb.135.2023.11.17.11.47.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Nov 2023 11:48:00 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] dbus: add SharedCodeAgent interface to iwd-dbus.conf
-Date: Fri, 17 Nov 2023 11:47:50 -0800
-Message-Id: <20231117194750.90786-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1700252027; x=1700856827;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mi+YRg4tut1Xy/poEXQKpRCNyY++McucYAR0Rn7Styo=;
+        b=Ce5xZ0GD1jtTQZI8XlYiJzgwSGN5DKIFJzFHkGPG1IoOCLqcl5KW2l9w3yecz0ZOdn
+         o/vaeFGlfe1GJ3l6IAodUhE/zcasrCuOrLYbKQAgPBA1JaSjSLIB9JSHsY7eZj0wLLGo
+         N5Sg97j4xoZ8cHJCshrgzvM12Bvkm3v63HlRCtCmrkPlq4sxx1f+OGfj8rRMXM5PKB5c
+         IlqZEbZNKfhHmqphioWZQEmUYgSFnH6YvFwMMEdKNDjo4X5ns+utp7OickiCBsyPT52S
+         0BM+I9WlTcKjdS7Z96VedzYjVBVkWODl0BisPzkbU44/EhsRMOUv5fY82yE8Bu5kv+Am
+         8xAA==
+X-Gm-Message-State: AOJu0YwnGUV+t2ZyBEZtsRsxqi/4TPizgq19h69bk1axxqs6JQ63vJ2J
+	F40Q6FkT8A02g/KXMmdfn+4vJZmfMhc=
+X-Google-Smtp-Source: AGHT+IEJE2K7C6u2/pX1hffkBqjp12fZhnj8sewHE+GqX5cjU4dqMPtCO3tVVXpUj3uxzx968DZOCA==
+X-Received: by 2002:a9d:6f14:0:b0:6bc:de95:a639 with SMTP id n20-20020a9d6f14000000b006bcde95a639mr299565otq.16.1700252026896;
+        Fri, 17 Nov 2023 12:13:46 -0800 (PST)
+Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id n8-20020a056830320800b006ce325bc75csm353570ott.6.2023.11.17.12.13.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Nov 2023 12:13:46 -0800 (PST)
+Message-ID: <d0f40a51-771e-438f-9fd2-27225f777aaa@gmail.com>
+Date: Fri, 17 Nov 2023 14:13:45 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dbus: add SharedCodeAgent interface to iwd-dbus.conf
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20231117194750.90786-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20231117194750.90786-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- src/iwd-dbus.conf | 1 +
- 1 file changed, 1 insertion(+)
+Hi James,
 
-diff --git a/src/iwd-dbus.conf b/src/iwd-dbus.conf
-index 7fc2e68c..f2509ebc 100644
---- a/src/iwd-dbus.conf
-+++ b/src/iwd-dbus.conf
-@@ -12,6 +12,7 @@
-     <allow send_destination="net.connman.iwd"/>
-     <allow send_interface="net.connman.iwd.Agent"/>
-     <allow send_interface="net.connman.iwd.SignalLevelAgent"/>
-+    <allow send_interface="net.connman.iwd.SharedCodeAgent"/>
-   </policy>
- 
-   <policy group="wheel">
--- 
-2.34.1
+On 11/17/23 13:47, James Prestwood wrote:
+> ---
+>   src/iwd-dbus.conf | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+
+Applied, thanks.
+
+Regards,
+-Denis
 
