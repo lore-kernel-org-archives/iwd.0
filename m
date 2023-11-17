@@ -1,53 +1,56 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF41199BE
-	for <iwd@lists.linux.dev>; Fri, 17 Nov 2023 16:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA393033E
+	for <iwd@lists.linux.dev>; Fri, 17 Nov 2023 16:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6vAGL1r"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6b87c1edfd5so1905487b3a.1
-        for <iwd@lists.linux.dev>; Fri, 17 Nov 2023 08:00:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QxYzFB8D"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6c32a20d5dbso1980336b3a.1
+        for <iwd@lists.linux.dev>; Fri, 17 Nov 2023 08:00:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700236819; x=1700841619; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mtNOcEi79z6ov2hxbQs/Z/E2q8GhWiBJHOFdAqxhEmc=;
-        b=A6vAGL1rw+w5WIN8qBoWK9ShTPZkIBitF/bhp61GpYmYW5t/2nX9UY5Oh5kMTe6Itf
-         SNMjMoE7zp7uBOJ2uTq4ygYN5txpsOENflbGRShNzQCTUa0j/h1gTwgd9h23y5AAVvyY
-         FhttBOscV+8SF90ENIaVatNIJPgh5kPlEueBcyw9ODRFSLhaI03oxEeFLQFw9POP/cI1
-         a2jTrFPrGafuKOWOx9e2SpDlfMCST+BGBRcd3fjLXmrpK/115bdrh2q5mHX4weUFprjZ
-         6lm25gcm4Pno6etfrZnfTK4KVi9dZXKUpSC/aq+fyuKcJHpzrQ5aiwwYJPkthfFl2H5Q
-         c3kA==
+        d=gmail.com; s=20230601; t=1700236821; x=1700841621; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3srW7WtWJoYPnRcjk5XubzsXgiqAXdE+waCWGZwmu2I=;
+        b=QxYzFB8DVAgC5+uUHl8VR+E+6w6M002o7Iqm0bO+lmbL+Of0fRkJMyMOpx57MM54Fx
+         adYr/4b3SWs7q8FVfDLuNgVh1kbxiQ8OweNZM5A2oqlKoCpg8LzVPLrwTQ6wQ7JzmL17
+         /XJczWAGADQmgMWCK8mEIM5g2omzXNJB+N8C+a4C8+gkEcFKaM8MuIsxarFzoi1sbsnA
+         Sf3QcTSYeG05ZAn2wwFk2Mp3WqOKULmYpM0ed6CNnOEynqXl0hhxiktkhK0FgyO8h2c3
+         nuy9j+ndOcve4OONvsGzk4fIsPD8fXQSMBKiFT/rhECCwOmyPXTJpWn2yoTzpCbD+7gC
+         xxbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700236819; x=1700841619;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mtNOcEi79z6ov2hxbQs/Z/E2q8GhWiBJHOFdAqxhEmc=;
-        b=WWRn5wSx7zy4/C+j7YOOr37E5rngoZeTykSYeEVTS8qi1iwnD166O0hwalYyE7FU3U
-         FWDelVm8APIASkTMuEMLhVQXTr6aiuWQNOqcdE9BrR8YDgdyN4HzmqEHSQWjngM07Dom
-         dMIOpFYZ8q53XWUcbyY7lJ6YUKp52yZ0cZ17CUQOqI63HN8pT8Y6O3wlDNTAKz+UKmNu
-         9buGNpmyJ65RFOqIsVh6ebR4xczhislzkCPRHLYskhWkU3zegr3Q8YwK7j9s0pBUSZ6P
-         etyWEZWCx5J4weGQkVbAuVVol/Fr5WldLfcCg/Vop1zz4Wtcofcw2YHlN3yk66YM1UEe
-         SVjg==
-X-Gm-Message-State: AOJu0YwLwGe20ZhdyUjQnPg32L+Diu7YgXTXbIWDtKN1M+z/KAM18yhm
-	icJbBVwCVLnbkteitx5gNrm/856apGZnFQ==
-X-Google-Smtp-Source: AGHT+IHS5j1Enbe8ODzoLObBt2D5hkmB5Ah2AE3qR+d7JuVQ9e/0WBOJyhMgltPzGWqf0jLuPfLAww==
-X-Received: by 2002:aa7:8895:0:b0:6cb:42de:24e0 with SMTP id z21-20020aa78895000000b006cb42de24e0mr267785pfe.28.1700236819341;
-        Fri, 17 Nov 2023 08:00:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700236821; x=1700841621;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3srW7WtWJoYPnRcjk5XubzsXgiqAXdE+waCWGZwmu2I=;
+        b=dZkhS2hqRxjFRPGo+7qmfNoxAaUoV4XMUlC2EHyEd3B2hYnaYjA+5MZ+G58Rkc5I+X
+         zxdMgLqb428lX+AGse4uc4C5YbIEhA4/5c1Ow83ABbyGkVMBXSEc9Vt13IKN6DI8CLrn
+         rglVF9LgkL6OM+wUiA2vtmtBnGPrBfKu1ZcsZmdy1PZ+bbm3LBIv70u90zrIUwEv/xIz
+         LSuvqXQE6oxyZ3n16HaJYVpfvwYDavwCuMyL4IPUxhz0m+KMQ9v1fS+wYlkYpM4PKRQP
+         OvXMe0+Lgw2RtyqVjjgQvSi6Z/IMDj9ax7AxkWY/3gTbRO5X3LAYg/RyJT4sVnrjtBiH
+         WthQ==
+X-Gm-Message-State: AOJu0YxXvhF1o9r4qnI2MGzAJXnKVRwKl+SMvysBEieQsLsmAJM2j9u2
+	lDD8Xw7JgRgI/xDRbpmjJggeZ8bHjZnk9Q==
+X-Google-Smtp-Source: AGHT+IGUX4UC4EEbzdrgQA1RuIJIrjXY1AthFOhgzKLThVKilRIDHrzH+mFr5jIKOoRjaPhb9jMZpw==
+X-Received: by 2002:a05:6a20:1592:b0:187:c184:58d0 with SMTP id h18-20020a056a20159200b00187c18458d0mr5635107pzj.46.1700236820715;
+        Fri, 17 Nov 2023 08:00:20 -0800 (PST)
 Received: from LOCLAP699.. ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id i14-20020aa787ce000000b00688c733fe92sm1559431pfo.215.2023.11.17.08.00.18
+        by smtp.gmail.com with ESMTPSA id i14-20020aa787ce000000b00688c733fe92sm1559431pfo.215.2023.11.17.08.00.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Nov 2023 08:00:18 -0800 (PST)
+        Fri, 17 Nov 2023 08:00:19 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] dpp: fail early if multicast frame registration is unsupported
-Date: Fri, 17 Nov 2023 08:00:15 -0800
-Message-Id: <20231117160016.81253-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] doc: document additional NotSupported shared code return
+Date: Fri, 17 Nov 2023 08:00:16 -0800
+Message-Id: <20231117160016.81253-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231117160016.81253-1-prestwoj@gmail.com>
+References: <20231117160016.81253-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -56,30 +59,29 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is done already for DPP, do the same for PKEX. Few drivers
-(ath9k upstream, ath10k/11k in progress) support this which is
-unfortunate but since a configurator will not work without this
-capability its best to fail early.
 ---
- src/dpp.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ doc/device-provisioning-api.txt | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 0064187b..c7cd4bb3 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -4362,6 +4362,12 @@ static struct l_dbus_message *dpp_start_pkex_configurator(struct dpp_sm *dpp,
- 				dpp->interface != DPP_INTERFACE_UNBOUND)
- 		return dbus_error_busy(message);
+diff --git a/doc/device-provisioning-api.txt b/doc/device-provisioning-api.txt
+index 9994aef5..6cf16fb8 100644
+--- a/doc/device-provisioning-api.txt
++++ b/doc/device-provisioning-api.txt
+@@ -109,6 +109,7 @@ Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}
+ 			Possible errors:	net.connman.iwd.Busy
+ 						net.connman.iwd.NotConnected
+ 						net.connman.InvalidArguments
++						net.connman.NotSupported
  
-+	if (!dpp->mcast_support) {
-+		l_debug("Multicast frame registration not supported, cannot "
-+			"start a configurator");
-+		return dbus_error_not_supported(message);
-+	}
-+
- 	if (!network || !bss)
- 		return dbus_error_not_connected(message);
+ 		void StartEnrollee(a{sv})
+ 
+@@ -156,6 +157,7 @@ Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}
+ 			Possible errors:	net.connman.iwd.Busy
+ 						net.connman.iwd.NotConnected
+ 						net.connman.iwd.NoAgent
++						net.connman.iwd.NotSupported
+ 
+ 		Stop()
  
 -- 
 2.34.1
