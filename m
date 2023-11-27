@@ -1,124 +1,163 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2191879
-	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 05:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nPh3y8/x"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6d81580d696so901881a34.2
-        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 21:00:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701061246; x=1701666046; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mV4Hwfvcsf+EDasYAX1WaIf9Mimt0FqGog/rd7MxQ1k=;
-        b=nPh3y8/xFK6hPH4j1KnU1+nhA4c8y6OSDkLtCrTPCNZaG8iXxECFoA27VwHDeA68zs
-         vNcDfCti+kefbIpw8mFweuhLGnxO5HxFmKS38auikFP9JZnxayr1xP3uqaIXSE9uMvlw
-         luilWw6zKo49YS6Vn+Td10/SLGu6xs8SfWkhpjXXhJknrGhiR5TAc7zo+BQ/0B7wgZSz
-         qfqln5tBTWZX+N1kJUXAPtW1oWsdsFxGnvkJW8vAZS6QFofbqtmwuwM1LHIL2/cxiV+D
-         ePIrTLo7yJVoJDZyAjpHFvQfMetPm3RkJJmp/69NakO80aiwnNvlshufiUeVqpCSiMzU
-         kJtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701061246; x=1701666046;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mV4Hwfvcsf+EDasYAX1WaIf9Mimt0FqGog/rd7MxQ1k=;
-        b=WmhejDuE5bv/GeWw3fDiIKwLEKexYqlT/jzxY2vJdSn08ItDAOUyJHv4o6Ovnnzpcv
-         eKw34DAl5Z/HYJuZSkaEHse660sCuI10wyfov1B6CqKnqe7nTrwowkuZ2i/Dw1NwFvI5
-         mNJ2DvbNJD1mjsq2VbJXMdqijaYPrrjn3uAyiNlHBy5k7EBCvDHhjew8y0qTNSZ6sF6S
-         8y4JNA3UzXu1BygoX9NTvNZFRpau+uQqZM1XO60dkVc680P+vizw11oXKQqeFqvP3/bs
-         RdOZY+CUVDFerAXcXr5O4tfBRhymqoUlnqNF8gOLlUeMbmKRGnT/I5W541vG8pgw9Hl+
-         rvyw==
-X-Gm-Message-State: AOJu0YxgqmWvWXEkJCs7/6vn9xYDtECqR2Phy8tzD6RKiDe/DmajMV5d
-	uNG1JRv2NXARAEAc9I3TYvjNsdRps9k=
-X-Google-Smtp-Source: AGHT+IHNuuZRAuoazWIqc8QxXRSEClk+fpcosNyu9NPDdhKkRltPpv6K8/gLZQMGl/UHCHe3hs58oQ==
-X-Received: by 2002:a05:6871:e7c9:b0:1fa:306f:60d with SMTP id qc9-20020a056871e7c900b001fa306f060dmr7378009oac.4.1701061245945;
-        Sun, 26 Nov 2023 21:00:45 -0800 (PST)
-Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id qh14-20020a056870bf0e00b001eb79fedbb1sm2117718oab.17.2023.11.26.21.00.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Nov 2023 21:00:45 -0800 (PST)
-Message-ID: <8212f44e-d7f1-4b5c-9ffb-043a01b4d16b@gmail.com>
-Date: Sun, 26 Nov 2023 23:00:44 -0600
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC4BDDA6
+	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 10:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=holtmann.org
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from smtpclient.apple (p4fefc822.dip0.t-ipconnect.de [79.239.200.34])
+	by mail.holtmann.org (Postfix) with ESMTPSA id E08F8CECC8;
+	Mon, 27 Nov 2023 11:26:08 +0100 (CET)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: roaming issues on a residential LAN with multiple APs
-Content-Language: en-US
-To: Daniel Barter <danielbarter@gmail.com>
-Cc: iwd@lists.linux.dev
-References: <CAJODeCBYQ3bwRjZjZoZ+AX+QG84U=VO_UEoa0AuWmFAqxunn4Q@mail.gmail.com>
- <0331a3f5-7d04-49d0-b569-3e5fa5b4514d@gmail.com>
- <CAJODeCDu-85P54m16FanJftz2mC-fVGN-PXrwk4q+yS8n6mwFQ@mail.gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CAJODeCDu-85P54m16FanJftz2mC-fVGN-PXrwk4q+yS8n6mwFQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.200.91.1.1\))
+Subject: Re: IWD 2.9 Does Not Compile against Linux-4.9.212 and/or GLibC-2.28
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <268d40b9-63a8-4aad-9f02-e9765325ec72@gmail.com>
+Date: Mon, 27 Nov 2023 11:25:58 +0100
+Cc: Grant Erickson <gerickson@nuovations.com>,
+ iwd@lists.linux.dev
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <18D5E5F4-0D14-48E5-B218-C1B3C27A82B2@holtmann.org>
+References: <29B7EAE3-2BBD-43CA-B2E7-28CE588EE7A2@nuovations.com>
+ <268d40b9-63a8-4aad-9f02-e9765325ec72@gmail.com>
+To: Denis Kenzior <denkenz@gmail.com>
+X-Mailer: Apple Mail (2.3774.200.91.1.1)
 
-Hi Daniel,
+Hi Denis,
 
-On 11/25/23 18:32, Daniel Barter wrote:
-> here are my logs:
-> https://gist.github.com/danielbarter/65ddf6aee78546a0e8f9e2d3af65308c
-> 
-> notice that this is a mix of iwd 2.4 (my distro default) and iwd 2.8.
-> 
-> Default roaming thresholds are in the 70s right? I am getting down to
-> -90dBm without a roam happening.
+>>       CC       client/known-networks.o
+>>     ${BuildRoot}/third_party/iwd/iwd-2.9/client/known-networks.c:27: =
+warning: "_XOPEN_SOURCE" redefined
+>>        27 | #define _XOPEN_SOURCE
+>=20
+> libreadline adds -D_XOPEN_SOURCE to the gcc command line.  Somehow =
+newer GCC versions deal with this transparently and don't raise an =
+error.  Maybe try
+>=20
+> #ifndef _XOPEN_SOURCE
+> #define _XOPEN_SOURCE
+> #endif
+>=20
+> in client/known-networks.c and report back?  I can't duplicate this on =
+my end.
 
-Default thresholds are -70 db for 2.4 Ghz and -76 for 5Ghz.
+that is a really odd one, since client/known-networks.c does this =
+correctly.
 
-I'm not seeing any CQM events in your log, except for this one:
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
-Nov 24 16:34:15 jasper iwd[768]: src/netdev.c:netdev_mlme_notify() MLME 
-notification Notify CQM(64)
-Nov 24 16:34:15 jasper iwd[768]: src/netdev.c:netdev_cqm_event() Beacon lost event
-Nov 24 16:34:15 jasper iwd[768]: src/netdev.c:netdev_mlme_notify() MLME 
-notification Notify CQM(64)
-Nov 24 16:34:15 jasper iwd[768]: src/netdev.c:netdev_cqm_event() Beacon lost event
-Nov 24 16:34:15 jasper iwd[768]: src/netdev.c:netdev_link_notify() event 16 on 
-ifindex 3
-Nov 24 16:34:15 jasper iwd[768]: src/netdev.c:netdev_mlme_notify() MLME 
-notification Del Station(20)
-Nov 24 16:34:15 jasper iwd[768]: src/netdev.c:netdev_mlme_notify() MLME 
-notification Deauthenticate(39)
-Nov 24 16:34:15 jasper iwd[768]: src/netdev.c:netdev_deauthenticate_event()
-Nov 24 16:34:15 jasper iwd[768]: src/netdev.c:netdev_mlme_notify() MLME 
-notification Disconnect(48)
-Nov 24 16:34:15 jasper iwd[768]: src/netdev.c:netdev_disconnect_event()
-Nov 24 16:34:15 jasper iwd[768]: Received Deauthentication event, reason: 4, 
-from_ap: false
-Nov 24 16:34:15 jasper iwd[768]: src/station.c:station_disconnect_event() 3
-Nov 24 16:34:15 jasper iwd[768]: src/station.c:station_disassociated() 3
-Nov 24 16:34:15 jasper iwd[768]: src/station.c:station_reset_connection_state() 3
-Nov 24 16:34:15 jasper iwd[768]: src/station.c:station_roam_state_clear() 3
-Nov 24 16:34:15 jasper iwd[768]: src/station.c:station_enter_state() Old State: 
-connected, new state: disconnected
+#define _XOPEN_SOURCE
+#include <time.h>
+#include <ell/ell.h>
 
-Basically a lost-beacon event comes in (twice for some reason) and we're 
-disconnected almost instantly after that.  There's no other CQM events that 
-would indicate low signal strength where iwd can actually take some action.  Try 
-setting a more aggressive roam threshold and see if that helps?  man 5 
-iwd.config, RoamThreshold and RoamThreshold5G.
+#include "client/command.h=E2=80=9D
 
-> 
-> kernel version is 6.6.0.
-> 
+So unless something weird ended up in config.h or your CFLAGS, this is =
+impossible.
 
-It could also be the kernel folks made some change that broke this. For example, 
-this looks to be touching the general area:
+And yes, thank you readline :(
 
-https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git/commit/?id=37c20b2effe987b806c8de6d12978e4ffeff026f
+# pkg-config --cflags readline
+-D_DEFAULT_SOURCE -D_XOPEN_SOURCE=3D600
 
-Try reverting or using a version prior to that commit?
+That is so stupid.
 
-Regards,
--Denis
+The fun part is actually if I take #define _XOPEN_SOURCE out of the =
+file, it fails for me.
+
+gcc -DHAVE_CONFIG_H -I.      -fvisibility=3Dhidden =
+-DUNITDIR=3D\""./unit/"\" -DCERTDIR=3D\""./unit/"\" -DHAVE_PKCS8_SUPPORT =
+-Wall -fsigned-char -fno-exceptions -Werror -Wextra =
+-Wno-unused-parameter -Wno-missing-field-initializers =
+-Wdeclaration-after-statement -Wmissing-declarations -Wredundant-decls =
+-Wformat -Wformat-security -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 =
+-g -fno-PIE -MT client/known-networks.o -MD -MP -MF $depbase.Tpo -c -o =
+client/known-networks.o client/known-networks.c &&\
+mv -f $depbase.Tpo $depbase.Po
+client/known-networks.c: In function =E2=80=98format_iso8601=E2=80=99:
+client/known-networks.c:57:9: error: implicit declaration of function =
+=E2=80=98strptime=E2=80=99; did you mean =E2=80=98strftime=E2=80=99? =
+[-Werror=3Dimplicit-function-declaration]
+   57 |         strptime(time_str, "%FT%TZ", &tm);
+      |         ^~~~~~~~
+      |         strftime
+
+So while my pkg-config shows it, it never ends up in the CFLAGS in the =
+end. Maybe some autoconf tools version cleans this up. Or they started =
+to use --cflags-only-I for pkg-config.
+
+These kind of CFLAGS really don=E2=80=99t belong into pkg-config since =
+the manpage of strptime is clear on how to use it.
+
+SYNOPSIS
+       #define _XOPEN_SOURCE       /* See feature_test_macros(7) */
+       #include <time.h>
+
+       char *strptime(const char *restrict s, const char *restrict =
+format,
+                      struct tm *restrict tm);
+
+Actually this can't be the problem and I now remember that I run into =
+this issue before. Our Makefile.am does this:
+
+if LIBEDIT
+client_cflags =3D $(LIBEDIT_CFLAGS)
+client_ldadd =3D $(LIBEDIT_LIBS)
+else
+client_cflags =3D
+client_ldadd =3D $(READLINE_LIBS)
+endif
+
+I ended up not using $(READLINE_CFLAGS) because of this stupidity of =
+readline. How the duplicate definition of _XOPEN_SOURCE ended up in the =
+build is unclear now. Certainly, not with a vanilla upstream iwd.
+
+>>           |
+>>     <command-line>: note: this is the location of the previous =
+definition
+>>     ${BuildRoot}/third_party/iwd/iwd-2.9/client/display.c: In =
+function =E2=80=98display_init=E2=80=99:
+>>     ${BuildRoot}/third_party/iwd/iwd-2.9/client/display.c:949:44: =
+warning: assignment to =E2=80=98void (*)(void)=E2=80=99 from =
+incompatible pointer type =E2=80=98void (*)(char **, int,  int)=E2=80=99 =
+[-Wincompatible-pointer-types]
+>>       949 |         rl_completion_display_matches_hook =3D =
+display_completion_matches;
+>>           |                                            ^
+>=20
+> This one is trickier since the signature of the function we provide is =
+correct according to libreadline documentation.  What version of =
+readline are you using?
+
+And another readline mess. So besides its stupid move to GPLv3, it is =
+also causing all sorts of fun issues for people.
+
+I did add a --enable-libedit option to use libedit instead of readline, =
+but due to our tricks with the refresh of iwctl, that doesn=E2=80=99t =
+seem to fully work as expected. You could give that a try to get iwctl =
+compiled (and worst case use the non-interactive mode). Same as =
+--disable-client which will just not build iwctl at all.
+
+However long-term (or maybe even short-term now) is to get rid of =
+readline. License wise and programmatically it is causing tiny issues =
+that just add up for no real gain.
+
+I wrote my own command line editing that integrates as shell client and =
+would be native to iwd. It is missing tab-completion and won=E2=80=99t =
+work with our refresh tricks. Or I need to try to integrate linenoise =
+since that is self-contained.
+
+Not that I needed more convincing that readline is a problem child, but =
+the arguments against using it keep piling up.
+
+Regards
+
+Marcel
+
