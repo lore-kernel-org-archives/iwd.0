@@ -1,53 +1,53 @@
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDA91FBC
-	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 02:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27ED20F7
+	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 02:54:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKzht73D"
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-1fa20395185so878075fac.3
-        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 18:54:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9G+reqI"
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-1fa2b8f7f27so750647fac.0
+        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 18:54:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701053650; x=1701658450; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1701053652; x=1701658452; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EXxyGLc7j7CR85/9rJLh7fxxwQry4P9sd221GusiwY8=;
-        b=mKzht73Dp4SCMlDCjToSdYEfM8UppRnIRKUzSpbCtzAnIzQrucA1w+7Q2nnoWtagAi
-         5IjCTlUGKT5zXWoCV6DhzRf0AWGBp4VHwa72Z8KnO2Qq7z0d5o0rrcPkyyDHFoS2mnfV
-         Fb77E+90Zqvc/QmBVJMEbJi15dq6+EimgXvJ/DZ5smGVQOwVwsdN9vSpEfxnTUVR4rh/
-         oFqYxJGDsys+dvvABavDrp2rbSs/8gmrs+JoWggJMVoO5Q8DyG1jG/zPboLLKSe1PWCv
-         SNZ8RjifbiZqQkvV+Gcq04jo27AH4L2jPbAzKgPoSET/l5zJ0kMCZJzmkRTey1ZUzXcr
-         tD2A==
+        bh=Fz4VnnTexZBkuMES1PABrkFOftLFTnXgT69sxsL4e0I=;
+        b=X9G+reqI8Ntgy50p/s6nxuuSJYQhsDbxHHjcvwHk5VA5V6nk4BodcrD4mKbCsq3vBj
+         FC0FoNuSVTeguEKfXVBM56ubXXHKNgTBYmkI3GO8x9tIAqM06MLSFC1/hbXqNLTxTk+O
+         c2/8Jpa0SjejEd9xYjHhKA7Y9gLiF2PTFctk34b/Ol+USD1FBR8N9zjrVWP5uDZCSPnW
+         3DSiNI67pWYzvFeudNrSJ+HNS2LbkL9GqWtGTpScv9Y7L4342Qoj7tFPKV03BQm9l7gi
+         xfgM/hTphpSVHXEUtNznrJp7coGf3kvm5M7xHIHSFMhtFkfm2ACK+FskW+UkTRjw+gG+
+         h1nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701053650; x=1701658450;
+        d=1e100.net; s=20230601; t=1701053652; x=1701658452;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EXxyGLc7j7CR85/9rJLh7fxxwQry4P9sd221GusiwY8=;
-        b=WDphtUfPD4UGUSqI7rdOIYby0V8Ri9A1ADSG6q+ZdZuP7hJ/UpCDkbd8Dg0kW/M6NM
-         p/bhhTWJyOqS06Mt2j2EqJqYDImR4yk96pnj7sXW5vWGDGvP0GTXH135Rdw3KmH8F2k7
-         zn9B+hDsgQH2Sz0lhoVlYQCqVMgHWq3WdzFK/az8MQnVHhq1AtoYmW+G6f5+p7+3JD2D
-         m8y6erO9RDW/9HzYyr3HicF/ol/LdBebpCcT9BoRnsN3snucP04pBV/fP97ycxcm3V16
-         6WeGUMCczJk2udQ5NXOhUazq+p+62h35PpikMHBFGnhyGjL0Dp7ysHqLGlVhCqgWRm7G
-         NGgg==
-X-Gm-Message-State: AOJu0YxrYHvHXLRkAPMihImZv1PcvvKXPBElKd8EVG3JrPLhXPJH/bV1
-	gFrKu6GqQ+LskzbN8CMiXpn/dE1hYoE=
-X-Google-Smtp-Source: AGHT+IFGa6EIzVb3pDFIyOFAMaWC1VseYSX2DYZo0MYgHiG8WMOgCi1kLX/b8c34g4FAvgFClP4gkA==
-X-Received: by 2002:a05:6870:9f8b:b0:1e9:ce72:35e0 with SMTP id xm11-20020a0568709f8b00b001e9ce7235e0mr15659314oab.0.1701053650245;
-        Sun, 26 Nov 2023 18:54:10 -0800 (PST)
+        bh=Fz4VnnTexZBkuMES1PABrkFOftLFTnXgT69sxsL4e0I=;
+        b=Tc8ntd1yDPHLfAwHEpSJVYd7mVhk8jNyXGSJJhA8XLlCGVrnhVT9+AT4VZ7XE/K5D9
+         +nFD6LAq4iuoGLblqbvTTDQ5A2lbPgtnAkC4PCNrX/wP1K25SMgC0AjlNEcb95CndaRn
+         3ocNBlMYZpFflbJ9HMKMyCVZPFpfSEMkBjnmV0gtSbLjrSNCehvnPV7RfPybgHi6V53K
+         uaWXVZ624i6GQ4aKQeRrJJWwTAlE8Yjo4WFEGGMrrVFv7TDE+ec42mlINZ0jG+mmhoTx
+         X/Tb0lml7u+DoGVO+woHvE/3RECMaTbzWYkh9sc5A54fF/NN/xeeLlGoZSt/n23IJVOO
+         eBlQ==
+X-Gm-Message-State: AOJu0YzSRAb0WrvvB7am5CrVqsmgeODzxPgoMoGzJh64bcCvKkS/6DRn
+	BteXafdWjMkF7SBtq73HeIDOXmkZdLs=
+X-Google-Smtp-Source: AGHT+IGA2x/GecXQE1GsjP7sa2EX7glN8FtMQzPetJclnkMRT2XKSrReSnVe7vQ4JZ9gOj/XYaBlfA==
+X-Received: by 2002:a05:6870:46a7:b0:1fa:1355:da45 with SMTP id a39-20020a05687046a700b001fa1355da45mr11391864oap.11.1701053651788;
+        Sun, 26 Nov 2023 18:54:11 -0800 (PST)
 Received: from localhost.localdomain (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id ti3-20020a056871890300b001f9e3731545sm1818846oab.11.2023.11.26.18.54.09
+        by smtp.gmail.com with ESMTPSA id ti3-20020a056871890300b001f9e3731545sm1818846oab.11.2023.11.26.18.54.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Nov 2023 18:54:09 -0800 (PST)
+        Sun, 26 Nov 2023 18:54:11 -0800 (PST)
 From: Denis Kenzior <denkenz@gmail.com>
 To: iwd@lists.linux.dev
 Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 3/6] netdev: Don't duplicate vendor_ies
-Date: Sun, 26 Nov 2023 20:53:00 -0600
-Message-ID: <20231127025320.1310543-3-denkenz@gmail.com>
+Subject: [PATCH 5/6] netdev: Fix buffer overflow with 32 character ssids
+Date: Sun, 26 Nov 2023 20:53:02 -0600
+Message-ID: <20231127025320.1310543-5-denkenz@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231127025320.1310543-1-denkenz@gmail.com>
 References: <20231127025320.1310543-1-denkenz@gmail.com>
@@ -59,38 +59,66 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-vendor_ies stored in handshake_state are already added as part of
-netdev_populate_common_ies(), which is already invoked by
-netdev_build_cmd_connect().
+ssid is declared as a 32 byte field in handshake_state, hence using it
+as a string which is assumed to be nul-terminated will fail for SSIDs
+that are 32 bytes long.
 
-Normally vendor_ies is NULL for OWE connections, so no IEs are
-duplicated as a result.
+Fixes: 1f1478285725 ("wiphy: add _generate_address_from_ssid")
+Fixes: 5a1b1184fca6 ("netdev: support per-network MAC addresses")
 ---
- src/netdev.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ src/netdev.c | 3 ++-
+ src/wiphy.c  | 5 +++--
+ src/wiphy.h  | 3 ++-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/src/netdev.c b/src/netdev.c
-index 1c032b32acdc..e7b502b1c3ba 100644
+index 03f9a77324db..9e6e1c6fb82e 100644
 --- a/src/netdev.c
 +++ b/src/netdev.c
-@@ -2561,16 +2561,11 @@ static void netdev_cmd_connect_cb(struct l_genl_msg *msg, void *user_data)
+@@ -3527,7 +3527,8 @@ static int netdev_start_powered_mac_change(struct netdev *netdev)
+ 	/* No address set in handshake, use per-network MAC generation */
+ 	if (l_memeqzero(netdev->handshake->spa, ETH_ALEN))
+ 		wiphy_generate_address_from_ssid(netdev->wiphy,
+-					(const char *)netdev->handshake->ssid,
++					netdev->handshake->ssid,
++					netdev->handshake->ssid_len,
+ 					new_addr);
+ 	else
+ 		memcpy(new_addr, netdev->handshake->spa, ETH_ALEN);
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 570f54155717..766df348754f 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -796,12 +796,13 @@ void wiphy_generate_random_address(struct wiphy *wiphy, uint8_t addr[static 6])
+ 	wiphy_address_constrain(wiphy, addr);
+ }
  
- static bool netdev_retry_owe(struct netdev *netdev)
+-void wiphy_generate_address_from_ssid(struct wiphy *wiphy, const char *ssid,
++void wiphy_generate_address_from_ssid(struct wiphy *wiphy,
++					const uint8_t *ssid, size_t ssid_len,
+ 					uint8_t addr[static 6])
  {
--	struct iovec iov;
--
- 	if (!owe_next_group(netdev->owe_sm))
- 		return false;
+ 	struct l_checksum *sha = l_checksum_new(L_CHECKSUM_SHA256);
  
--	iov.iov_base = netdev->handshake->vendor_ies;
--	iov.iov_len = netdev->handshake->vendor_ies_len;
--
- 	netdev->connect_cmd = netdev_build_cmd_connect(netdev,
--					netdev->handshake, NULL, &iov, 1);
-+					netdev->handshake, NULL, NULL, 0);
+-	l_checksum_update(sha, ssid, strlen(ssid));
++	l_checksum_update(sha, ssid, ssid_len);
+ 	l_checksum_update(sha, wiphy->permanent_addr,
+ 				sizeof(wiphy->permanent_addr));
+ 	l_checksum_get_digest(sha, addr, mac_randomize_bytes);
+diff --git a/src/wiphy.h b/src/wiphy.h
+index 999d0c57a926..bc82a00721e7 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -146,7 +146,8 @@ const uint8_t *wiphy_get_ht_capabilities(const struct wiphy *wiphy,
+ 						enum band_freq band,
+ 						size_t *size);
+ void wiphy_generate_random_address(struct wiphy *wiphy, uint8_t addr[static 6]);
+-void wiphy_generate_address_from_ssid(struct wiphy *wiphy, const char *ssid,
++void wiphy_generate_address_from_ssid(struct wiphy *wiphy,
++					const uint8_t *ssid, size_t ssid_len,
+ 					uint8_t addr[static 6]);
  
- 	netdev->connect_cmd_id = l_genl_family_send(nl80211,
- 						netdev->connect_cmd,
+ int wiphy_estimate_data_rate(struct wiphy *wiphy,
 -- 
 2.42.0
 
