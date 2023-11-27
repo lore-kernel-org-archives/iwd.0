@@ -1,136 +1,96 @@
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A31D2101
-	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 02:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A0F20E0
+	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 03:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AUDClRXL"
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-1fa235f8026so981570fac.3
-        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 18:54:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d57yKAi4"
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6d7ed2c143eso2565807a34.3
+        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 19:21:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701053652; x=1701658452; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hKDgGHMrWORPgBvpnyVLaY7eQykmoBEiF76/XPWnxp8=;
-        b=AUDClRXLix6vhdbTk049vlqvyqsI3jouv7ROgFKGAm2Pnv0TB6+tYEwOk/LyfFdKFU
-         6EaYTkTnDF1lZL98MXNj57qmqxIZgKhI+JqS5TBaZhVsSNdHSYzq9OGcUCkZ/RB7lBEx
-         OBNZtQZui9cj3jKmRJhmrr/1oona52w2iy7aXOWWzV770p2twTXO7iIA5ed7sav+CTRI
-         TRIO9eY7QTJmZ4DW2u2huH190tji7junBdqgdEcB2RB59OKbA2M6/1tPjqDxFJ/l8AM/
-         HtOIK+m1p/g+sUXKzybELy1QbV/C0xaX/QjVnIKY4+y7TlbpH41wO+XdYM7yUmkEBJXp
-         4uhQ==
+        d=gmail.com; s=20230601; t=1701055277; x=1701660077; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z7PHrc6hwq2B5m4fnvyOmgdSuJI+kiBZQV/FYmlAF70=;
+        b=d57yKAi4SA2+mnwXHs0jjvCyvt+61NuWcYPjn6k5z4om1ur7tjBwzHyY8+Sxh405ez
+         +PgVSVXrz4It107Jde2IATwD9hH6Lt9yciN6RoYce5yV1SJrixNc3zChG9ywLCk0mBsp
+         g/CuQEdxfUhCbhOZlDJXKt2C5y3UMvLnBjiPM3Laeu+3VDwHu52VaPp3XUEXzpFBp/Wd
+         qCGbNorsmI1GW6IApK+jrxyc2byczv9m0O6GAjIKRfc449WQQot2NxWT2DBOELzOxE/K
+         GbLI8KKeDiP9RefBVpgrgdoPY/Km1YFXrbO3KY3P6ZwHdFx+NrmHSziBR1MPrCMR3KEh
+         ca4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701053652; x=1701658452;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hKDgGHMrWORPgBvpnyVLaY7eQykmoBEiF76/XPWnxp8=;
-        b=plIuZtuqVuZZ+j3X2A3JerpAF+DShW4KzUIIJaqupwxyCR73EysruwDeNor3gnjQfo
-         tq/0J1Tf+5SVsXAgqZkI3pAGdTFPCB38f8B4/qsk+twRhc37j3NpXMSmvczbygMvMjRk
-         aMqgdMsNWthhjl/eOUM5Ft6o1AlujRq5M4MjkjRfjAaOdVDn7WHJZdJGhbXVcCmI5rNH
-         hR0XREOv95tgcvDlqX1H+/sHqvFe5WerexhYb3sM5NDhaIvgBGPH/n8k+c2RW43SOTCO
-         TmaloClTqywu17yGFGa1KIliaAY7XdrB8nY6GddFOG8bFizwGn78Gzcrp1MBhDH+QUyi
-         6gIA==
-X-Gm-Message-State: AOJu0YzWnBUFbfz0s8gQOyD2ek8CIwMK9/MikLFXRkpcnCfQ32SHEHDa
-	+rzsznvjOFaLpfvLEypeUXAIER0KQlM=
-X-Google-Smtp-Source: AGHT+IF2S72t3jkGTz6WB+Uys68KN/mZt+LEo306zvCxxscmNAJXp1fNSQVpZRKcIMohTLyzyA3lYA==
-X-Received: by 2002:a05:6870:15c5:b0:1fa:3486:258a with SMTP id k5-20020a05687015c500b001fa3486258amr6385807oad.18.1701053652388;
-        Sun, 26 Nov 2023 18:54:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701055277; x=1701660077;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z7PHrc6hwq2B5m4fnvyOmgdSuJI+kiBZQV/FYmlAF70=;
+        b=qECYQHZ3+d/5OzU3Y5LpFWc715N4WSEvx57W5G0LhKujPQ0H4fR6LC5CgxF8nI5Pl0
+         V9a4qqEazpNqlkLsXjI3N4rgKWo41H/9JoU+x6M00swDtEUjju6GL13FlfWxnJZYlwMB
+         0ylfcoeHXJfYNvGjnEYfJfgmdsLNMiP+u3hvFvnQWTccsK0YDavFq7DBT4wsDlI7Ge8X
+         CFyxboGTOTz8f0UOK2Zh4vqd9i7cgq4C3LtNgpIbGwSptkPP2DLWgQAbci0XMxXqo2ok
+         9GA7fgHE0nqw4G4XxBQ56n+CIuSPQXRX4aptLl2eC/AnMEKGOEx+4aCD9WzMFJJ5D4NK
+         ekEw==
+X-Gm-Message-State: AOJu0YzOGzx6d0ubJQwBfPFN0TTx6rZncN6vq7LMy4x15HRtz/Z+xYJ6
+	LOUMs/dsQNJ7lyemFX7JXkhU+La/0sg=
+X-Google-Smtp-Source: AGHT+IGrvTv/3YlzLbos4a0uRBbZnhOMzJDrAV/pNUWiXzPapmu7DUiY0OdeG6RTSrP+tHdDXxAnbw==
+X-Received: by 2002:a05:6870:164b:b0:1fa:2bbf:a500 with SMTP id c11-20020a056870164b00b001fa2bbfa500mr6909531oae.24.1701055277451;
+        Sun, 26 Nov 2023 19:21:17 -0800 (PST)
 Received: from localhost.localdomain (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id ti3-20020a056871890300b001f9e3731545sm1818846oab.11.2023.11.26.18.54.11
+        by smtp.gmail.com with ESMTPSA id lm24-20020a0568703d9800b001fa24002089sm1077123oab.30.2023.11.26.19.21.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Nov 2023 18:54:12 -0800 (PST)
+        Sun, 26 Nov 2023 19:21:17 -0800 (PST)
 From: Denis Kenzior <denkenz@gmail.com>
-To: iwd@lists.linux.dev
+To: gerickson@nuovations.com,
+	iwd@lists.linux.dev
 Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 6/6] erp: Fix buffer overflow for 32 byte SSIDs
-Date: Sun, 26 Nov 2023 20:53:03 -0600
-Message-ID: <20231127025320.1310543-6-denkenz@gmail.com>
+Subject: [PATCH] adhoc: Fix compilation on old systems
+Date: Sun, 26 Nov 2023 21:19:55 -0600
+Message-ID: <20231127032029.1316478-1-denkenz@gmail.com>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231127025320.1310543-1-denkenz@gmail.com>
-References: <20231127025320.1310543-1-denkenz@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-ssid is declared as a 32 byte field in handshake_state, hence using it
-as a string which is assumed to be nul-terminated will fail for SSIDs
-that are 32 bytes long.
-
-Fixes: d938d362b212 ("erp: ERP implementation and key cache move")
-Fixes: 433373fe28a4 ("eapol: cache ERP keys on EAP success")
+  CC       src/adhoc.o
+In file included from src/adhoc.c:28:0:
+/usr/include/linux/if.h:234:19: error: field ‘ifru_addr’ has incomplete type
+   struct sockaddr ifru_addr;
+                   ^
+/usr/include/linux/if.h:235:19: error: field ‘ifru_dstaddr’ has incomplete type
+   struct sockaddr ifru_dstaddr;
+                   ^
+/usr/include/linux/if.h:236:19: error: field ‘ifru_broadaddr’ has incomplete type
+   struct sockaddr ifru_broadaddr;
+                   ^
+/usr/include/linux/if.h:237:19: error: field ‘ifru_netmask’ has incomplete type
+   struct sockaddr ifru_netmask;
+                   ^
+/usr/include/linux/if.h:238:20: error: field ‘ifru_hwaddr’ has incomplete type
+   struct  sockaddr ifru_hwaddr;
+                    ^
 ---
- src/eapol.c |  2 +-
- src/erp.c   | 10 ++++++++--
- src/erp.h   |  2 +-
- 3 files changed, 10 insertions(+), 4 deletions(-)
+ src/adhoc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 6fb2f3068f0b..3d7b3d38fbcd 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -2531,7 +2531,7 @@ static void eapol_eap_results_cb(const uint8_t *msk_data, size_t msk_len,
- 	if (sm->handshake->support_fils && emsk_data && session_id)
- 		erp_cache_add(eap_get_identity(sm->eap), session_id,
- 				session_len, emsk_data, emsk_len,
--				(const char *)sm->handshake->ssid);
-+				sm->handshake->ssid, sm->handshake->ssid_len);
+diff --git a/src/adhoc.c b/src/adhoc.c
+index 2b15f2bd4236..e787dab17ce4 100644
+--- a/src/adhoc.c
++++ b/src/adhoc.c
+@@ -25,6 +25,7 @@
+ #endif
  
- 	return;
+ #include <linux/rtnetlink.h>
++#include <sys/socket.h>
+ #include <linux/if.h>
  
-diff --git a/src/erp.c b/src/erp.c
-index 2729cfc874b4..859233465e8b 100644
---- a/src/erp.c
-+++ b/src/erp.c
-@@ -160,13 +160,19 @@ static void erp_cache_entry_destroy(void *data)
- 
- void erp_cache_add(const char *id, const void *session_id,
- 			size_t session_len, const void *emsk, size_t emsk_len,
--			const char *ssid)
-+			const uint8_t *ssid, size_t ssid_len)
- {
- 	struct erp_cache_entry *entry;
- 
- 	if (!unlikely(id || session_id || emsk))
- 		return;
- 
-+	if (!util_ssid_is_utf8(ssid_len, ssid))
-+		return;
-+
-+	if (util_ssid_is_hidden(ssid_len, ssid))
-+		return;
-+
- 	entry = l_new(struct erp_cache_entry, 1);
- 
- 	entry->id = l_strdup(id);
-@@ -174,7 +180,7 @@ void erp_cache_add(const char *id, const void *session_id,
- 	entry->emsk_len = emsk_len;
- 	entry->session_id = l_memdup(session_id, session_len);
- 	entry->session_len = session_len;
--	entry->ssid = l_strdup(ssid);
-+	entry->ssid = l_strndup((char *) ssid, ssid_len);
- 	entry->expire_time = l_time_offset(l_time_now(),
- 					ERP_DEFAULT_KEY_LIFETIME_US);
- 
-diff --git a/src/erp.h b/src/erp.h
-index d2c9da9624a8..e844aa8ebf90 100644
---- a/src/erp.h
-+++ b/src/erp.h
-@@ -43,7 +43,7 @@ const void *erp_get_rmsk(struct erp_state *erp, size_t *rmsk_len);
- 
- void erp_cache_add(const char *id, const void *session_id, size_t session_len,
- 			const void *emsk, size_t emsk_len,
--			const char *ssid);
-+			const uint8_t *ssid, size_t ssid_len);
- 
- void erp_cache_remove(const char *id);
- 
+ #include <ell/ell.h>
 -- 
 2.42.0
 
