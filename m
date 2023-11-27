@@ -1,116 +1,205 @@
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C4720F5
-	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 03:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E37010F8
+	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 04:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c6rybEAn"
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3b837d974ecso2373408b6e.2
-        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 19:25:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ibeCx3YR"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6d81fbfe7aaso493561a34.1
+        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 20:40:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701055502; x=1701660302; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WuzswIaHHHeAFYeJPKuj0qiUaaP6wtiovEgPaVJX1yE=;
-        b=c6rybEAnfMdHq4o5B8e5/9J6G9UQ0DqaIUXBtR8WFfrFlNG/rkWJwQMTYJrSyQ8RKz
-         YIrjVpsAOk6XWPqTC9Kc/DfTTpyTs2SRp8vZ2EKgStiG77gXoIfu/TtkOVmFW17WWUi9
-         aJPGZNpSdegkeFPaTIInXkqZRY4u7v3DK5LPChyJ2iV1azLI45Ctbg4X6vb0TDReJqwL
-         oTjsPFkeASrdFEuLB1q5EVS1fd9uoqpacZ81AlFHTu5MnzxG4cdObiIxfEntwlorhVZV
-         ELfMLrPIsN7Vm4+Pc/4RAFF8J3AtUeB16hNbVIzB8UCiqN2WOXReS1RtKF5TSzn0ueWl
-         RWfw==
+        d=gmail.com; s=20230601; t=1701060012; x=1701664812; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kOTUEgUpIUa3xSXsm+qBrM9i2hQEQ7mS1G0rrydGMY4=;
+        b=ibeCx3YRFdCWnbkE0gC70a1H+1+0rJH1WrFKOfP2ZOGsVBdsQfM8dRRN25tXorhW3j
+         Ak0FjRo+ieyEe3N9ZOHPvB27CVceXCSYBJP6HfvAtOkVcNwRxee742Ykph8V8gvTEPF7
+         Rf7nrAvQvFJRODG2Im2XBiXHrxjPf7jei1z/Wb+2acTnsl5SfrXAS69bq/I8R4hwB9+t
+         axmAQwS2RAR1EhCc+Zswh+XhDUtPtmntOyfbg5zngWVpG4aFld51v/wngb7SQXFD7pIm
+         /34ZhyJsIEKk7RUGuou9B5XOqjSR/WL1Swc2NhJlFnjkRp4RTsgDk5C07QMv07u9LcqS
+         7uzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701055502; x=1701660302;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WuzswIaHHHeAFYeJPKuj0qiUaaP6wtiovEgPaVJX1yE=;
-        b=wz/bRHvMYNfUNPeEGf9tVGVfr0TSGn86SxNvrLbHlnPjvaezswnehWvHrd6lPDDSZd
-         kxIaRpGMs/9zZRXYPBJe+MQlk76IIDXeC/rU1K++3LlRBw4+J3/woBgBrho0HglOOsbM
-         9ozlrHwHaCRKkaklHNXLg0m48RofQJKmPC02t62OVZ6+e4TeBBvBmCzySnXfXThUvrph
-         zfaZkzqPE7st5Bc4Vcw5uW9Q1FgqPXvfQdJMdEqhSot9/Vz4Hqi9MPBDAWb1TnJceLJK
-         xHdXB+U0owUBcL2h2rYRZpJuMkUihHPjnqwcFA8c46v3ya2LSRBpNazOotAwca84nESn
-         TIow==
-X-Gm-Message-State: AOJu0YxfRd33Z+gBsrWiSfKLB7/PSgSEy7q18w1QM5tcA57yMQmrB5xR
-	zaE/dIxtxDsBG0TeZB3A6BzeJj/rvok=
-X-Google-Smtp-Source: AGHT+IHgA8FrH666Q3CkYCpxz5kB6hdcmdPJb0UcDRIq/LIm2368QNwBs2YnHdoi/lO1c93Jt/Yl/g==
-X-Received: by 2002:a05:6871:806:b0:1f9:e965:191d with SMTP id q6-20020a056871080600b001f9e965191dmr12072434oap.56.1701055502149;
-        Sun, 26 Nov 2023 19:25:02 -0800 (PST)
-Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id hm9-20020a0568701b8900b001fa51768610sm298584oab.34.2023.11.26.19.25.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Nov 2023 19:25:01 -0800 (PST)
-Message-ID: <268d40b9-63a8-4aad-9f02-e9765325ec72@gmail.com>
-Date: Sun, 26 Nov 2023 21:25:00 -0600
+        d=1e100.net; s=20230601; t=1701060012; x=1701664812;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kOTUEgUpIUa3xSXsm+qBrM9i2hQEQ7mS1G0rrydGMY4=;
+        b=azA0iAtJOgPI0er00DlO28g+1QqbntfNOiT4f5LlAl/GmBjLkww9E2rBhXu73g/b0i
+         mJUdgJG5BzPwLPgAvFpio4RDwFzV/unxr3BRm1tTPbUbfa10R6o/GRn/zapdUesK1lm2
+         I81setrBMLdXBJPRfAnxQ5dNRQDKpaT+tDv7JWCzin94xdgWIEziZFIuNqzTkKIFUgX2
+         X3C79vZbdS22FrJrfOPQCV8IRZGfM+7WMO2mTb41CsN2d0RpGLVtZNcrB26urz97uuhX
+         3x03RJq3h290EaqUzaTC5zmVg5Gd2x9E9hJvZMt//swQy3Ov7dtDpKZni7evpVFLTBLI
+         z+GA==
+X-Gm-Message-State: AOJu0YzdsTFH+krvWP33fnUrYm9wa+a2R3CH16FKE7lnP4O18QRf0aPV
+	MtlcPpThOthYACSAk+I6p9Rbk+Wn/jw=
+X-Google-Smtp-Source: AGHT+IF4Csbew0DtREwn5tdNnt+vWfKZ+L4lYHZR+VsMkyMt+QnRsC14+04SSdP4coqc/qU2v3JMFg==
+X-Received: by 2002:a05:6870:3c0c:b0:1fa:692:f37e with SMTP id gk12-20020a0568703c0c00b001fa0692f37emr13465042oab.57.1701060012326;
+        Sun, 26 Nov 2023 20:40:12 -0800 (PST)
+Received: from localhost.localdomain (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.gmail.com with ESMTPSA id nq6-20020a056871378600b001f5d5930e85sm2110558oac.33.2023.11.26.20.40.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Nov 2023 20:40:11 -0800 (PST)
+From: Denis Kenzior <denkenz@gmail.com>
+To: iwd@lists.linux.dev
+Cc: Denis Kenzior <denkenz@gmail.com>
+Subject: [PATCH v2 1/6] ie: Move AKM suite converter from netdev
+Date: Sun, 26 Nov 2023 22:38:41 -0600
+Message-ID: <20231127043924.1328538-1-denkenz@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: IWD 2.9 Does Not Compile against Linux-4.9.212 and/or GLibC-2.28
-Content-Language: en-US
-To: Grant Erickson <gerickson@nuovations.com>, iwd@lists.linux.dev
-Cc: Marcel Holtmann <marcel@holtmann.org>
-References: <29B7EAE3-2BBD-43CA-B2E7-28CE588EE7A2@nuovations.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <29B7EAE3-2BBD-43CA-B2E7-28CE588EE7A2@nuovations.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Grant,
+It is more logical to host this function inside ie.c than netdev.c.
+Particularly since ie_rsn_cipher_suite_to_cipher is already present in
+ie.c.
+---
+ src/ie.c     | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ src/ie.h     |  2 ++
+ src/netdev.c | 47 +----------------------------------------------
+ 3 files changed, 49 insertions(+), 46 deletions(-)
 
->        CC       client/known-networks.o
->      ${BuildRoot}/third_party/iwd/iwd-2.9/client/known-networks.c:27: warning: "_XOPEN_SOURCE" redefined
->         27 | #define _XOPEN_SOURCE
+diff --git a/src/ie.c b/src/ie.c
+index 6b08ce180a87..a51724aa74c8 100644
+--- a/src/ie.c
++++ b/src/ie.c
+@@ -481,6 +481,52 @@ const char *ie_rsn_cipher_suite_to_string(enum ie_rsn_cipher_suite suite)
+ 	return NULL;
+ }
+ 
++uint32_t ie_rsn_akm_suite_to_akm(enum ie_rsn_akm_suite akm)
++{
++	switch (akm) {
++	case IE_RSN_AKM_SUITE_8021X:
++		return CRYPTO_AKM_8021X;
++	case IE_RSN_AKM_SUITE_PSK:
++		return CRYPTO_AKM_PSK;
++	case IE_RSN_AKM_SUITE_FT_OVER_8021X:
++		return CRYPTO_AKM_FT_OVER_8021X;
++	case IE_RSN_AKM_SUITE_FT_USING_PSK:
++		return CRYPTO_AKM_FT_USING_PSK;
++	case IE_RSN_AKM_SUITE_8021X_SHA256:
++		return CRYPTO_AKM_8021X_SHA256;
++	case IE_RSN_AKM_SUITE_PSK_SHA256:
++		return CRYPTO_AKM_PSK_SHA256;
++	case IE_RSN_AKM_SUITE_TDLS:
++		return CRYPTO_AKM_TDLS;
++	case IE_RSN_AKM_SUITE_SAE_SHA256:
++		return CRYPTO_AKM_SAE_SHA256;
++	case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
++		return CRYPTO_AKM_FT_OVER_SAE_SHA256;
++	case IE_RSN_AKM_SUITE_AP_PEER_KEY_SHA256:
++		return CRYPTO_AKM_AP_PEER_KEY_SHA256;
++	case IE_RSN_AKM_SUITE_8021X_SUITE_B_SHA256:
++		return CRYPTO_AKM_8021X_SUITE_B_SHA256;
++	case IE_RSN_AKM_SUITE_8021X_SUITE_B_SHA384:
++		return CRYPTO_AKM_8021X_SUITE_B_SHA384;
++	case IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384:
++		return CRYPTO_AKM_FT_OVER_8021X_SHA384;
++	case IE_RSN_AKM_SUITE_FILS_SHA256:
++		return CRYPTO_AKM_FILS_SHA256;
++	case IE_RSN_AKM_SUITE_FILS_SHA384:
++		return CRYPTO_AKM_FILS_SHA384;
++	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
++		return CRYPTO_AKM_FT_OVER_FILS_SHA256;
++	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
++		return CRYPTO_AKM_FT_OVER_FILS_SHA384;
++	case IE_RSN_AKM_SUITE_OWE:
++		return CRYPTO_AKM_OWE;
++	case IE_RSN_AKM_SUITE_OSEN:
++		return CRYPTO_AKM_OSEN;
++	}
++
++	return 0;
++}
++
+ /* 802.11, Section 8.4.2.27.2 */
+ static bool ie_parse_cipher_suite(const uint8_t *data,
+ 					enum ie_rsn_cipher_suite *out)
+diff --git a/src/ie.h b/src/ie.h
+index c9a6c78324d6..9ada64bf3bd7 100644
+--- a/src/ie.h
++++ b/src/ie.h
+@@ -621,6 +621,8 @@ unsigned char *ie_tlv_builder_finalize(struct ie_tlv_builder *builder,
+ uint32_t ie_rsn_cipher_suite_to_cipher(enum ie_rsn_cipher_suite suite);
+ const char *ie_rsn_cipher_suite_to_string(enum ie_rsn_cipher_suite suite);
+ 
++uint32_t ie_rsn_akm_suite_to_akm(enum ie_rsn_akm_suite akm);
++
+ int ie_parse_rsne(struct ie_tlv_iter *iter, struct ie_rsn_info *info);
+ int ie_parse_rsne_from_data(const uint8_t *data, size_t len,
+ 				struct ie_rsn_info *info);
+diff --git a/src/netdev.c b/src/netdev.c
+index f23ca59ea1cb..7b951a6a4797 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2445,51 +2445,6 @@ static void netdev_driver_connected(struct netdev *netdev)
+ 		eapol_register(netdev->sm);
+ }
+ 
+-static unsigned int ie_rsn_akm_suite_to_nl80211(enum ie_rsn_akm_suite akm)
+-{
+-	switch (akm) {
+-	case IE_RSN_AKM_SUITE_8021X:
+-		return CRYPTO_AKM_8021X;
+-	case IE_RSN_AKM_SUITE_PSK:
+-		return CRYPTO_AKM_PSK;
+-	case IE_RSN_AKM_SUITE_FT_OVER_8021X:
+-		return CRYPTO_AKM_FT_OVER_8021X;
+-	case IE_RSN_AKM_SUITE_FT_USING_PSK:
+-		return CRYPTO_AKM_FT_USING_PSK;
+-	case IE_RSN_AKM_SUITE_8021X_SHA256:
+-		return CRYPTO_AKM_8021X_SHA256;
+-	case IE_RSN_AKM_SUITE_PSK_SHA256:
+-		return CRYPTO_AKM_PSK_SHA256;
+-	case IE_RSN_AKM_SUITE_TDLS:
+-		return CRYPTO_AKM_TDLS;
+-	case IE_RSN_AKM_SUITE_SAE_SHA256:
+-		return CRYPTO_AKM_SAE_SHA256;
+-	case IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256:
+-		return CRYPTO_AKM_FT_OVER_SAE_SHA256;
+-	case IE_RSN_AKM_SUITE_AP_PEER_KEY_SHA256:
+-		return CRYPTO_AKM_AP_PEER_KEY_SHA256;
+-	case IE_RSN_AKM_SUITE_8021X_SUITE_B_SHA256:
+-		return CRYPTO_AKM_8021X_SUITE_B_SHA256;
+-	case IE_RSN_AKM_SUITE_8021X_SUITE_B_SHA384:
+-		return CRYPTO_AKM_8021X_SUITE_B_SHA384;
+-	case IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384:
+-		return CRYPTO_AKM_FT_OVER_8021X_SHA384;
+-	case IE_RSN_AKM_SUITE_FILS_SHA256:
+-		return CRYPTO_AKM_FILS_SHA256;
+-	case IE_RSN_AKM_SUITE_FILS_SHA384:
+-		return CRYPTO_AKM_FILS_SHA384;
+-	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
+-		return CRYPTO_AKM_FT_OVER_FILS_SHA256;
+-	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
+-		return CRYPTO_AKM_FT_OVER_FILS_SHA384;
+-	case IE_RSN_AKM_SUITE_OWE:
+-		return CRYPTO_AKM_OWE;
+-	case IE_RSN_AKM_SUITE_OSEN:
+-		return CRYPTO_AKM_OSEN;
+-	}
+-
+-	return 0;
+-}
+ 
+ static void netdev_append_nl80211_rsn_attributes(struct l_genl_msg *msg,
+ 						struct handshake_state *hs)
+@@ -2514,7 +2469,7 @@ static void netdev_append_nl80211_rsn_attributes(struct l_genl_msg *msg,
+ 		l_genl_msg_append_attr(msg, NL80211_ATTR_USE_MFP, 4, &use_mfp);
+ 	}
+ 
+-	nl_akm = ie_rsn_akm_suite_to_nl80211(hs->akm_suite);
++	nl_akm = ie_rsn_akm_suite_to_akm(hs->akm_suite);
+ 	L_WARN_ON(!nl_akm);
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_AKM_SUITES, 4, &nl_akm);
+ 
+-- 
+2.42.0
 
-libreadline adds -D_XOPEN_SOURCE to the gcc command line.  Somehow newer GCC 
-versions deal with this transparently and don't raise an error.  Maybe try
-
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE
-#endif
-
-in client/known-networks.c and report back?  I can't duplicate this on my end.
-
->            |
->      <command-line>: note: this is the location of the previous definition
->      ${BuildRoot}/third_party/iwd/iwd-2.9/client/display.c: In function ‘display_init’:
->      ${BuildRoot}/third_party/iwd/iwd-2.9/client/display.c:949:44: warning: assignment to ‘void (*)(void)’ from incompatible pointer type ‘void (*)(char **, int,  int)’ [-Wincompatible-pointer-types]
->        949 |         rl_completion_display_matches_hook = display_completion_matches;
->            |                                            ^
-
-This one is trickier since the signature of the function we provide is correct 
-according to libreadline documentation.  What version of readline are you using?
-
->        CC       src/adhoc.o
->        CC       src/sae.o
->      In file included from ${BuildRoot}/third_party/iwd/iwd-2.9/src/adhoc.c:28:
->      ${BuildRoot}/results/${PRODUCT}/arm/gnu-toolchain/12.3.1/release/third_party/linux/linux-dey/include/linux/if.h:234:34: error: field ‘ifru_addr’ has incomplete type
->        234 |                 struct  sockaddr ifru_addr;
->            |                                  ^~~~~~~~~
->      ${BuildRoot}/results/${PRODUCT}/arm/gnu-toolchain/12.3.1/release/third_party/linux/linux-dey/include/linux/if.h:235:34: error: field ‘ifru_dstaddr’ has incomplete type
->        235 |                 struct  sockaddr ifru_dstaddr;
->            |                                  ^~~~~~~~~~~~
->      ${BuildRoot}/results/${PRODUCT}/arm/gnu-toolchain/12.3.1/release/third_party/linux/linux-dey/include/linux/if.h:236:34: error: field ‘ifru_broadaddr’ has incomplete type
->        236 |                 struct  sockaddr ifru_broadaddr;
->            |                                  ^~~~~~~~~~~~~~
->      ${BuildRoot}/results/${PRODUCT}/arm/gnu-toolchain/12.3.1/release/third_party/linux/linux-dey/include/linux/if.h:237:34: error: field ‘ifru_netmask’ has incomplete type
->        237 |                 struct  sockaddr ifru_netmask;
->            |                                  ^~~~~~~~~~~~
->      ${BuildRoot}/results/${PRODUCT}/arm/gnu-toolchain/12.3.1/release/third_party/linux/linux-dey/include/linux/if.h:238:34: error: field ‘ifru_hwaddr’ has incomplete type
->        238 |                 struct  sockaddr ifru_hwaddr;
->            |                                  ^~~~~~~~~~~
->      make[2]: *** [Makefile:2539: src/adhoc.o] Error 1
->      make[2]: *** Waiting for unfinished jobs....
->      make[1]: *** [Makefile:1713: all] Error 2
->      make[1]: Leaving directory '${BuildRoot}/third_party/iwd/.build/Makefile/${PRODUCT}/arm/gnu-toolchain/12.3.1/release'
->      make: *** [Makefile:110: build] Error 2
-
-This should be fixed by the patch I just sent out.
-
-Regards,
--Denis
