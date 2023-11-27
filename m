@@ -1,53 +1,53 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEEE51C38
-	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 02:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE891FD2
+	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 02:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jh9cD8cG"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6d7e6df999fso2420359a34.1
-        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 18:54:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AzIdZ9+0"
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-1fa48ad4e99so310722fac.3
+        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 18:54:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701053649; x=1701658449; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1701053651; x=1701658451; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FfHHDyb4tRLAYb0iJOZcpiUtWFE/ruaAKATQxemdK5U=;
-        b=Jh9cD8cGFBg60AeB+wlBOHVWMHnZT+zDEBi14+dz8kvzya5j3QnfqbrC5cIvnl6Oj2
-         Y6tIlVO9qtCG5DxEMRmTYg/Wa9jzAx/bTCjiCB9XDeu1x2A57GlG00C1/TJIZf4Zv6qT
-         E6N3mBwpmmUa1omRkmzGynfrb+AEZqoWGQP5fSC8LiLJ9Q53Kg/oTulWsiXs06Ef8DFJ
-         PSkYOLbtliBArvfwBvQDJYY4aK6gcveYRwi0g+/2tQocYJ4Hi/G2uXoQS+9tNLRIeyfc
-         A+SMFc5Oseb8tjX3lYSG7zOuOgPDygYpxjYuisGBodt2UbeOfTpYmVtOOTtIxwFyh6fd
-         Id1w==
+        bh=rWYMheTM/ZJX7EY/T+aPkHmPK3FmlL40bmmZ7iRpg9Q=;
+        b=AzIdZ9+037fnyT8C6Pn8tSeNdaEB5IZbWPq58hJVi2VAWRJKdRZOYeC5Yhs7XPri7R
+         bp/SPGxlwK0HJH1oIqbcrO3stWP9o2S4WoHoYCdpkQG1/WVPr6iGC5HoxI7PJVGuQvLM
+         yPVt5Kyvf+Y0ZSUK/MOfV8hdHfUpuBEmel8KWvPwM8fTP4qsd3LnVNoJ4UxZNazu6odu
+         Pf3d+vDSDPPY184tdGfHzpaMbU4T/ssKvUSUj462JBENqgFgzFAdw0S2PjqegvyVuykT
+         yesMk/ijcaWJGV0ZHefRLc3tqeTj0LzSxPjKBqUpC+5cOSvVauV6ViUD+tekmHM01d8u
+         VC+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701053649; x=1701658449;
+        d=1e100.net; s=20230601; t=1701053651; x=1701658451;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FfHHDyb4tRLAYb0iJOZcpiUtWFE/ruaAKATQxemdK5U=;
-        b=DhQojb9VopmQgfa+ttwmTyJ/UQ+P4lFMnh0rPA6F3h3BjojQ8O0H/2whYvtRXCPtJZ
-         3AsV1vydILSNTIl9YfulNSfHsH2FEvuo/esm8amYF9vc/Iu6gEH2e0ZXYJEDhxd/tWXD
-         lPz2HvQ8pSipG5EVd/O44rvRo5ggo/By3dqOCY/8lA+0aET2fjqs3bFNecEkmDcHWLpu
-         tvtgQ274c3TAcztVsRVJvBuuraBeauFAyxsdidtG/KXOTTGqnsjKKJtf0f3i18SyvsII
-         nJyMW57VH52fqPxw7cpzH1b8lfuSTvHAMVtX9cmMhUEPrZmZCrOxD0NDONhdEI32IYrx
-         FGVg==
-X-Gm-Message-State: AOJu0YxWEYBTnTI1VPBOJVscEWL4r4Y6STw8X7cRipninAjg+Zz9vQIf
-	nMIRYQSZR8hVcCfTOoQSMgGEBbLzpYE=
-X-Google-Smtp-Source: AGHT+IG4mVJE/cv5LHTvOGW3m2rnwoo975nSfV214Y1P8TLNRgkS7Nn/XLNRlSfnutz6+RzCvIOliQ==
-X-Received: by 2002:a05:6870:7252:b0:1fa:8d3:34ea with SMTP id y18-20020a056870725200b001fa08d334eamr11115333oaf.58.1701053649498;
-        Sun, 26 Nov 2023 18:54:09 -0800 (PST)
+        bh=rWYMheTM/ZJX7EY/T+aPkHmPK3FmlL40bmmZ7iRpg9Q=;
+        b=QkzstqwD4uZciNDlj3qpDG4j8bGR5GzkQRF0Z8yGKBN8nSq1t3xNKgPwYE/QLmVw0Z
+         H+EHJ8vMRXeNXz8j2vSNfuEw/o5pfwQQ3uK7PwLr3AUt8WArb79nE+wtDqdcWylxk8gy
+         kJUf5ELQy+xc2dlhRnphjm5xpzpH2F4qncmKtTZgLJ1QBscyFyuNvJ/AgdLcLNtvmWq3
+         6SLbU4RMD5S/PthJVZadu5VCotDghPZMG4aExJfOu/ihikMxkekvRLoh+1b1i5FacM8M
+         j1kzvhYiEYf7V6BNlHRZNDc9XTgbqdtU2X1rJ8mKLBRlkgtb+GorWHscrgBUjFdOe0i2
+         UT6g==
+X-Gm-Message-State: AOJu0Yz1DCrpxPOiIjhz4YtoUgB52yZPLfHrqZoQYLQn0GbmbGl3iL4I
+	6dk5ishaKoYGtmrYs9tVbvThAZRhMxM=
+X-Google-Smtp-Source: AGHT+IF6ALdEMXBYoeJ7CIdHufJywPi/IufSa7Prm6dEraQzJwnXm0HtasGrF4WkX325yQQF9bOmpQ==
+X-Received: by 2002:a05:6870:6b8c:b0:1fa:56f:42cd with SMTP id ms12-20020a0568706b8c00b001fa056f42cdmr12523931oab.25.1701053650941;
+        Sun, 26 Nov 2023 18:54:10 -0800 (PST)
 Received: from localhost.localdomain (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id ti3-20020a056871890300b001f9e3731545sm1818846oab.11.2023.11.26.18.54.08
+        by smtp.gmail.com with ESMTPSA id ti3-20020a056871890300b001f9e3731545sm1818846oab.11.2023.11.26.18.54.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Nov 2023 18:54:09 -0800 (PST)
+        Sun, 26 Nov 2023 18:54:10 -0800 (PST)
 From: Denis Kenzior <denkenz@gmail.com>
 To: iwd@lists.linux.dev
 Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 2/6] nl80211util: Move nl80211_append_rsn_attributes
-Date: Sun, 26 Nov 2023 20:52:59 -0600
-Message-ID: <20231127025320.1310543-2-denkenz@gmail.com>
+Subject: [PATCH 4/6] netdev: Do not leak l_genl_msg on error
+Date: Sun, 26 Nov 2023 20:53:01 -0600
+Message-ID: <20231127025320.1310543-4-denkenz@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231127025320.1310543-1-denkenz@gmail.com>
 References: <20231127025320.1310543-1-denkenz@gmail.com>
@@ -59,167 +59,50 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- Makefile.am       |  1 +
- src/netdev.c      | 43 ++-----------------------------------------
- src/nl80211util.c | 40 ++++++++++++++++++++++++++++++++++++++++
- src/nl80211util.h |  4 ++++
- 4 files changed, 47 insertions(+), 41 deletions(-)
+In netdev_retry_owe, if l_gen_family_send fails, the connect_cmd is
+never freed or reset.  Fix that.
 
-diff --git a/Makefile.am b/Makefile.am
-index d0247faf7ed5..5ed6ab37164b 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -407,6 +407,7 @@ tools_hwsim_SOURCES = tools/hwsim.c src/mpdu.h \
- 					src/storage.h src/storage.c \
- 					src/common.h src/common.c \
- 					src/band.h src/band.c \
-+					src/ie.h src/ie.c \
- 					src/crypto.h src/crypto.c
- tools_hwsim_LDADD = $(ell_ldadd)
- 
+While here, use a stack variable instead of netdev member, since the use
+of such a member is unnecessary and confusing.
+---
+ src/netdev.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
 diff --git a/src/netdev.c b/src/netdev.c
-index 7b951a6a4797..1c032b32acdc 100644
+index e7b502b1c3ba..03f9a77324db 100644
 --- a/src/netdev.c
 +++ b/src/netdev.c
-@@ -2445,45 +2445,6 @@ static void netdev_driver_connected(struct netdev *netdev)
- 		eapol_register(netdev->sm);
+@@ -2561,10 +2561,12 @@ static void netdev_cmd_connect_cb(struct l_genl_msg *msg, void *user_data)
+ 
+ static bool netdev_retry_owe(struct netdev *netdev)
+ {
++	struct l_genl_msg *connect_cmd;
++
+ 	if (!owe_next_group(netdev->owe_sm))
+ 		return false;
+ 
+-	netdev->connect_cmd = netdev_build_cmd_connect(netdev,
++	connect_cmd = netdev_build_cmd_connect(netdev,
+ 					netdev->handshake, NULL, NULL, 0);
+ 
+ 	netdev->connect_cmd_id = l_genl_family_send(nl80211,
+@@ -2572,12 +2574,11 @@ static bool netdev_retry_owe(struct netdev *netdev)
+ 						netdev_cmd_connect_cb, netdev,
+ 						NULL);
+ 
+-	if (!netdev->connect_cmd_id)
+-		return false;
+-
+-	netdev->connect_cmd = NULL;
++	if (netdev->connect_cmd_id > 0)
++		return true;
+ 
+-	return true;
++	l_genl_msg_unref(connect_cmd);
++	return false;
  }
  
--
--static void netdev_append_nl80211_rsn_attributes(struct l_genl_msg *msg,
--						struct handshake_state *hs)
--{
--	uint32_t nl_cipher;
--	uint32_t nl_akm;
--	uint32_t wpa_version;
--
--	nl_cipher = ie_rsn_cipher_suite_to_cipher(hs->pairwise_cipher);
--	L_WARN_ON(!nl_cipher);
--	l_genl_msg_append_attr(msg, NL80211_ATTR_CIPHER_SUITES_PAIRWISE,
--					4, &nl_cipher);
--
--	nl_cipher = ie_rsn_cipher_suite_to_cipher(hs->group_cipher);
--	L_WARN_ON(!nl_cipher);
--	l_genl_msg_append_attr(msg, NL80211_ATTR_CIPHER_SUITE_GROUP,
--					4, &nl_cipher);
--
--	if (hs->mfp) {
--		uint32_t use_mfp = NL80211_MFP_REQUIRED;
--
--		l_genl_msg_append_attr(msg, NL80211_ATTR_USE_MFP, 4, &use_mfp);
--	}
--
--	nl_akm = ie_rsn_akm_suite_to_akm(hs->akm_suite);
--	L_WARN_ON(!nl_akm);
--	l_genl_msg_append_attr(msg, NL80211_ATTR_AKM_SUITES, 4, &nl_akm);
--
--	if (IE_AKM_IS_SAE(hs->akm_suite))
--		wpa_version = NL80211_WPA_VERSION_3;
--	else if (hs->wpa_ie)
--		wpa_version = NL80211_WPA_VERSION_1;
--	else
--		wpa_version = NL80211_WPA_VERSION_2;
--
--	l_genl_msg_append_attr(msg, NL80211_ATTR_WPA_VERSIONS,
--						4, &wpa_version);
--}
--
- static struct l_genl_msg *netdev_build_cmd_connect(struct netdev *netdev,
- 						struct handshake_state *hs,
- 						const uint8_t *prev_bssid,
-@@ -2540,7 +2501,7 @@ static struct l_genl_msg *netdev_build_cmd_connect(struct netdev *netdev,
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_SOCKET_OWNER, 0, NULL);
- 
- 	if (is_rsn) {
--		netdev_append_nl80211_rsn_attributes(msg, hs);
-+		nl80211_append_rsn_attributes(msg, hs);
- 		c_iov = iov_ie_append(iov, n_iov, c_iov, hs->supplicant_ie);
- 	}
- 
-@@ -2888,7 +2849,7 @@ static struct l_genl_msg *netdev_build_cmd_associate_common(
- 	l_genl_msg_append_attr(msg, NL80211_ATTR_SOCKET_OWNER, 0, NULL);
- 
- 	if (is_rsn)
--		netdev_append_nl80211_rsn_attributes(msg, hs);
-+		nl80211_append_rsn_attributes(msg, hs);
- 
- 	if (is_rsn || hs->settings_8021x) {
- 		l_genl_msg_append_attr(msg, NL80211_ATTR_CONTROL_PORT,
-diff --git a/src/nl80211util.c b/src/nl80211util.c
-index ef69cc718e04..0f45c9051330 100644
---- a/src/nl80211util.c
-+++ b/src/nl80211util.c
-@@ -32,6 +32,8 @@
- 
- #include "src/nl80211util.h"
- #include "src/band.h"
-+#include "src/ie.h"
-+#include "src/handshake.h"
- #include "src/util.h"
- 
- typedef bool (*attr_handler)(const void *data, uint16_t len, void *o);
-@@ -687,3 +689,41 @@ int nl80211_parse_supported_frequencies(struct l_genl_attr *band_freqs,
- 
- 	return 0;
- }
-+
-+void nl80211_append_rsn_attributes(struct l_genl_msg *msg,
-+						struct handshake_state *hs)
-+{
-+	uint32_t nl_cipher;
-+	uint32_t nl_akm;
-+	uint32_t wpa_version;
-+
-+	nl_cipher = ie_rsn_cipher_suite_to_cipher(hs->pairwise_cipher);
-+	L_WARN_ON(!nl_cipher);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_CIPHER_SUITES_PAIRWISE,
-+					4, &nl_cipher);
-+
-+	nl_cipher = ie_rsn_cipher_suite_to_cipher(hs->group_cipher);
-+	L_WARN_ON(!nl_cipher);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_CIPHER_SUITE_GROUP,
-+					4, &nl_cipher);
-+
-+	if (hs->mfp) {
-+		uint32_t use_mfp = NL80211_MFP_REQUIRED;
-+
-+		l_genl_msg_append_attr(msg, NL80211_ATTR_USE_MFP, 4, &use_mfp);
-+	}
-+
-+	nl_akm = ie_rsn_akm_suite_to_akm(hs->akm_suite);
-+	L_WARN_ON(!nl_akm);
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_AKM_SUITES, 4, &nl_akm);
-+
-+	if (IE_AKM_IS_SAE(hs->akm_suite))
-+		wpa_version = NL80211_WPA_VERSION_3;
-+	else if (hs->wpa_ie)
-+		wpa_version = NL80211_WPA_VERSION_1;
-+	else
-+		wpa_version = NL80211_WPA_VERSION_2;
-+
-+	l_genl_msg_append_attr(msg, NL80211_ATTR_WPA_VERSIONS,
-+						4, &wpa_version);
-+}
-diff --git a/src/nl80211util.h b/src/nl80211util.h
-index 9f8ae17aeaa4..6f7b9eabbc27 100644
---- a/src/nl80211util.h
-+++ b/src/nl80211util.h
-@@ -25,6 +25,7 @@
- struct band_chandef;
- struct scan_freq_set;
- struct band_freq_attrs;
-+struct handshake_state;
- 
- int nl80211_parse_attrs(struct l_genl_msg *msg, int tag, ...);
- 
-@@ -90,3 +91,6 @@ int nl80211_parse_supported_frequencies(struct l_genl_attr *band_freqs,
- 					struct scan_freq_set *supported_list,
- 					struct band_freq_attrs *list,
- 					size_t num_channels);
-+
-+void nl80211_append_rsn_attributes(struct l_genl_msg *msg,
-+						struct handshake_state *hs);
+ static void netdev_connect_event(struct l_genl_msg *msg, struct netdev *netdev)
 -- 
 2.42.0
 
