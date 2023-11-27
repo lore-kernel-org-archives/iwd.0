@@ -1,96 +1,116 @@
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A0F20E0
-	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 03:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C4720F5
+	for <iwd@lists.linux.dev>; Mon, 27 Nov 2023 03:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d57yKAi4"
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6d7ed2c143eso2565807a34.3
-        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 19:21:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c6rybEAn"
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3b837d974ecso2373408b6e.2
+        for <iwd@lists.linux.dev>; Sun, 26 Nov 2023 19:25:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701055277; x=1701660077; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=z7PHrc6hwq2B5m4fnvyOmgdSuJI+kiBZQV/FYmlAF70=;
-        b=d57yKAi4SA2+mnwXHs0jjvCyvt+61NuWcYPjn6k5z4om1ur7tjBwzHyY8+Sxh405ez
-         +PgVSVXrz4It107Jde2IATwD9hH6Lt9yciN6RoYce5yV1SJrixNc3zChG9ywLCk0mBsp
-         g/CuQEdxfUhCbhOZlDJXKt2C5y3UMvLnBjiPM3Laeu+3VDwHu52VaPp3XUEXzpFBp/Wd
-         qCGbNorsmI1GW6IApK+jrxyc2byczv9m0O6GAjIKRfc449WQQot2NxWT2DBOELzOxE/K
-         GbLI8KKeDiP9RefBVpgrgdoPY/Km1YFXrbO3KY3P6ZwHdFx+NrmHSziBR1MPrCMR3KEh
-         ca4Q==
+        d=gmail.com; s=20230601; t=1701055502; x=1701660302; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WuzswIaHHHeAFYeJPKuj0qiUaaP6wtiovEgPaVJX1yE=;
+        b=c6rybEAnfMdHq4o5B8e5/9J6G9UQ0DqaIUXBtR8WFfrFlNG/rkWJwQMTYJrSyQ8RKz
+         YIrjVpsAOk6XWPqTC9Kc/DfTTpyTs2SRp8vZ2EKgStiG77gXoIfu/TtkOVmFW17WWUi9
+         aJPGZNpSdegkeFPaTIInXkqZRY4u7v3DK5LPChyJ2iV1azLI45Ctbg4X6vb0TDReJqwL
+         oTjsPFkeASrdFEuLB1q5EVS1fd9uoqpacZ81AlFHTu5MnzxG4cdObiIxfEntwlorhVZV
+         ELfMLrPIsN7Vm4+Pc/4RAFF8J3AtUeB16hNbVIzB8UCiqN2WOXReS1RtKF5TSzn0ueWl
+         RWfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701055277; x=1701660077;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=z7PHrc6hwq2B5m4fnvyOmgdSuJI+kiBZQV/FYmlAF70=;
-        b=qECYQHZ3+d/5OzU3Y5LpFWc715N4WSEvx57W5G0LhKujPQ0H4fR6LC5CgxF8nI5Pl0
-         V9a4qqEazpNqlkLsXjI3N4rgKWo41H/9JoU+x6M00swDtEUjju6GL13FlfWxnJZYlwMB
-         0ylfcoeHXJfYNvGjnEYfJfgmdsLNMiP+u3hvFvnQWTccsK0YDavFq7DBT4wsDlI7Ge8X
-         CFyxboGTOTz8f0UOK2Zh4vqd9i7cgq4C3LtNgpIbGwSptkPP2DLWgQAbci0XMxXqo2ok
-         9GA7fgHE0nqw4G4XxBQ56n+CIuSPQXRX4aptLl2eC/AnMEKGOEx+4aCD9WzMFJJ5D4NK
-         ekEw==
-X-Gm-Message-State: AOJu0YzOGzx6d0ubJQwBfPFN0TTx6rZncN6vq7LMy4x15HRtz/Z+xYJ6
-	LOUMs/dsQNJ7lyemFX7JXkhU+La/0sg=
-X-Google-Smtp-Source: AGHT+IGrvTv/3YlzLbos4a0uRBbZnhOMzJDrAV/pNUWiXzPapmu7DUiY0OdeG6RTSrP+tHdDXxAnbw==
-X-Received: by 2002:a05:6870:164b:b0:1fa:2bbf:a500 with SMTP id c11-20020a056870164b00b001fa2bbfa500mr6909531oae.24.1701055277451;
-        Sun, 26 Nov 2023 19:21:17 -0800 (PST)
-Received: from localhost.localdomain (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id lm24-20020a0568703d9800b001fa24002089sm1077123oab.30.2023.11.26.19.21.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Nov 2023 19:21:17 -0800 (PST)
-From: Denis Kenzior <denkenz@gmail.com>
-To: gerickson@nuovations.com,
-	iwd@lists.linux.dev
-Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH] adhoc: Fix compilation on old systems
-Date: Sun, 26 Nov 2023 21:19:55 -0600
-Message-ID: <20231127032029.1316478-1-denkenz@gmail.com>
-X-Mailer: git-send-email 2.42.0
+        d=1e100.net; s=20230601; t=1701055502; x=1701660302;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WuzswIaHHHeAFYeJPKuj0qiUaaP6wtiovEgPaVJX1yE=;
+        b=wz/bRHvMYNfUNPeEGf9tVGVfr0TSGn86SxNvrLbHlnPjvaezswnehWvHrd6lPDDSZd
+         kxIaRpGMs/9zZRXYPBJe+MQlk76IIDXeC/rU1K++3LlRBw4+J3/woBgBrho0HglOOsbM
+         9ozlrHwHaCRKkaklHNXLg0m48RofQJKmPC02t62OVZ6+e4TeBBvBmCzySnXfXThUvrph
+         zfaZkzqPE7st5Bc4Vcw5uW9Q1FgqPXvfQdJMdEqhSot9/Vz4Hqi9MPBDAWb1TnJceLJK
+         xHdXB+U0owUBcL2h2rYRZpJuMkUihHPjnqwcFA8c46v3ya2LSRBpNazOotAwca84nESn
+         TIow==
+X-Gm-Message-State: AOJu0YxfRd33Z+gBsrWiSfKLB7/PSgSEy7q18w1QM5tcA57yMQmrB5xR
+	zaE/dIxtxDsBG0TeZB3A6BzeJj/rvok=
+X-Google-Smtp-Source: AGHT+IHgA8FrH666Q3CkYCpxz5kB6hdcmdPJb0UcDRIq/LIm2368QNwBs2YnHdoi/lO1c93Jt/Yl/g==
+X-Received: by 2002:a05:6871:806:b0:1f9:e965:191d with SMTP id q6-20020a056871080600b001f9e965191dmr12072434oap.56.1701055502149;
+        Sun, 26 Nov 2023 19:25:02 -0800 (PST)
+Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id hm9-20020a0568701b8900b001fa51768610sm298584oab.34.2023.11.26.19.25.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 26 Nov 2023 19:25:01 -0800 (PST)
+Message-ID: <268d40b9-63a8-4aad-9f02-e9765325ec72@gmail.com>
+Date: Sun, 26 Nov 2023 21:25:00 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: IWD 2.9 Does Not Compile against Linux-4.9.212 and/or GLibC-2.28
+Content-Language: en-US
+To: Grant Erickson <gerickson@nuovations.com>, iwd@lists.linux.dev
+Cc: Marcel Holtmann <marcel@holtmann.org>
+References: <29B7EAE3-2BBD-43CA-B2E7-28CE588EE7A2@nuovations.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <29B7EAE3-2BBD-43CA-B2E7-28CE588EE7A2@nuovations.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-  CC       src/adhoc.o
-In file included from src/adhoc.c:28:0:
-/usr/include/linux/if.h:234:19: error: field ‘ifru_addr’ has incomplete type
-   struct sockaddr ifru_addr;
-                   ^
-/usr/include/linux/if.h:235:19: error: field ‘ifru_dstaddr’ has incomplete type
-   struct sockaddr ifru_dstaddr;
-                   ^
-/usr/include/linux/if.h:236:19: error: field ‘ifru_broadaddr’ has incomplete type
-   struct sockaddr ifru_broadaddr;
-                   ^
-/usr/include/linux/if.h:237:19: error: field ‘ifru_netmask’ has incomplete type
-   struct sockaddr ifru_netmask;
-                   ^
-/usr/include/linux/if.h:238:20: error: field ‘ifru_hwaddr’ has incomplete type
-   struct  sockaddr ifru_hwaddr;
-                    ^
----
- src/adhoc.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi Grant,
 
-diff --git a/src/adhoc.c b/src/adhoc.c
-index 2b15f2bd4236..e787dab17ce4 100644
---- a/src/adhoc.c
-+++ b/src/adhoc.c
-@@ -25,6 +25,7 @@
- #endif
- 
- #include <linux/rtnetlink.h>
-+#include <sys/socket.h>
- #include <linux/if.h>
- 
- #include <ell/ell.h>
--- 
-2.42.0
+>        CC       client/known-networks.o
+>      ${BuildRoot}/third_party/iwd/iwd-2.9/client/known-networks.c:27: warning: "_XOPEN_SOURCE" redefined
+>         27 | #define _XOPEN_SOURCE
 
+libreadline adds -D_XOPEN_SOURCE to the gcc command line.  Somehow newer GCC 
+versions deal with this transparently and don't raise an error.  Maybe try
+
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE
+#endif
+
+in client/known-networks.c and report back?  I can't duplicate this on my end.
+
+>            |
+>      <command-line>: note: this is the location of the previous definition
+>      ${BuildRoot}/third_party/iwd/iwd-2.9/client/display.c: In function ‘display_init’:
+>      ${BuildRoot}/third_party/iwd/iwd-2.9/client/display.c:949:44: warning: assignment to ‘void (*)(void)’ from incompatible pointer type ‘void (*)(char **, int,  int)’ [-Wincompatible-pointer-types]
+>        949 |         rl_completion_display_matches_hook = display_completion_matches;
+>            |                                            ^
+
+This one is trickier since the signature of the function we provide is correct 
+according to libreadline documentation.  What version of readline are you using?
+
+>        CC       src/adhoc.o
+>        CC       src/sae.o
+>      In file included from ${BuildRoot}/third_party/iwd/iwd-2.9/src/adhoc.c:28:
+>      ${BuildRoot}/results/${PRODUCT}/arm/gnu-toolchain/12.3.1/release/third_party/linux/linux-dey/include/linux/if.h:234:34: error: field ‘ifru_addr’ has incomplete type
+>        234 |                 struct  sockaddr ifru_addr;
+>            |                                  ^~~~~~~~~
+>      ${BuildRoot}/results/${PRODUCT}/arm/gnu-toolchain/12.3.1/release/third_party/linux/linux-dey/include/linux/if.h:235:34: error: field ‘ifru_dstaddr’ has incomplete type
+>        235 |                 struct  sockaddr ifru_dstaddr;
+>            |                                  ^~~~~~~~~~~~
+>      ${BuildRoot}/results/${PRODUCT}/arm/gnu-toolchain/12.3.1/release/third_party/linux/linux-dey/include/linux/if.h:236:34: error: field ‘ifru_broadaddr’ has incomplete type
+>        236 |                 struct  sockaddr ifru_broadaddr;
+>            |                                  ^~~~~~~~~~~~~~
+>      ${BuildRoot}/results/${PRODUCT}/arm/gnu-toolchain/12.3.1/release/third_party/linux/linux-dey/include/linux/if.h:237:34: error: field ‘ifru_netmask’ has incomplete type
+>        237 |                 struct  sockaddr ifru_netmask;
+>            |                                  ^~~~~~~~~~~~
+>      ${BuildRoot}/results/${PRODUCT}/arm/gnu-toolchain/12.3.1/release/third_party/linux/linux-dey/include/linux/if.h:238:34: error: field ‘ifru_hwaddr’ has incomplete type
+>        238 |                 struct  sockaddr ifru_hwaddr;
+>            |                                  ^~~~~~~~~~~
+>      make[2]: *** [Makefile:2539: src/adhoc.o] Error 1
+>      make[2]: *** Waiting for unfinished jobs....
+>      make[1]: *** [Makefile:1713: all] Error 2
+>      make[1]: Leaving directory '${BuildRoot}/third_party/iwd/.build/Makefile/${PRODUCT}/arm/gnu-toolchain/12.3.1/release'
+>      make: *** [Makefile:110: build] Error 2
+
+This should be fixed by the patch I just sent out.
+
+Regards,
+-Denis
