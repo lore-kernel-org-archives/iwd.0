@@ -1,53 +1,56 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E2B5F1D8
-	for <iwd@lists.linux.dev>; Tue,  5 Dec 2023 15:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1BD5F1F0
+	for <iwd@lists.linux.dev>; Tue,  5 Dec 2023 15:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/tM+3+z"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-67a9b393f53so15366646d6.0
-        for <iwd@lists.linux.dev>; Tue, 05 Dec 2023 07:46:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VaGboaGr"
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-58ceabd7cdeso3501686eaf.3
+        for <iwd@lists.linux.dev>; Tue, 05 Dec 2023 07:46:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701791214; x=1702396014; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8m+HV8zJEKGuNGrOene7oRzTO4rBmRSywZwjO7i4ppk=;
-        b=I/tM+3+zFTzD2Ly4hdTh0CJeBad/KsdsGSW+ANjhO9vZuNitnDZESKMqXvuZthWJ5/
-         Apt7qNzNmofimyp/vNXvlnyZSQbGLWi/z+v1RXIcM9j+DH93FDnIH7Jz5JqJp8Ha5WyS
-         lGZovxlPm1RHHnnAdZiuG8Ho5IaYDw/5pV/Y4BomzWSYfvskAo7sjF7XDU4IRynX12xx
-         IUgskszcqkipgYGJnAAxFjgxgYu/iMCG8Caa1QKCbmpqFJ46d1/wazufFkhyRqGy5lr8
-         e24PGhb88YUdWdEkUQA4AR2Toi7mPaFV00Z0+iDTBBOZ0tZ8tNlDsJB4vsTVRf7aS8uw
-         r3cQ==
+        d=gmail.com; s=20230601; t=1701791215; x=1702396015; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z5sYOH7EK86gdZlBKFuGUGGBNmbTPUNMQuZN0UpGjRs=;
+        b=VaGboaGr2Ns+lpNXct5fF/X2ikDmPMlAa7Ehk2h7VH/pGQBB+soqVCtCfUS/Y9RmdN
+         FtoxX/zZun6MTC8NjUYhwctO8NlXfbZ7jf2FEROIZbx3AtYPdcicZb/AjA+kBTfOZgxP
+         zHjWZP8DDVGpTHw6L9KSGLXpHE2HDPs/f1pP9iNMAWw9YvJFoleBzFG941hS88v6szxn
+         tzEgVkMFbmHAwppO+7SEZLuJWfbHtpeUUB39WdVM4ZfaLRRxzv2unseLZ0bHDh1RJmEz
+         aWzFo6nbKgaicQAwuMI5dW626HwDVXTxruSjWbRy3+tLsXFIPMY9mMGZeE9Sz9WdQPCy
+         ds3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701791214; x=1702396014;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8m+HV8zJEKGuNGrOene7oRzTO4rBmRSywZwjO7i4ppk=;
-        b=PbfYtb0dAnEVWe3HxEPVEPfIDTXngCXWki4kAet6vPU3uzbLXuwY9q0L7tWyJUmLNX
-         IK7/IwPNCddpbnueMW37EVXXdYajpOCEjkWzo0MFXA7N5S+klNu6CWbm/nMtSrns4Bi0
-         r4sOCfggP11tWUhYfg/ZTm1J+8rQCFyS5dCZgOlClyc1sN/brYwzjkygz+I/UtZCTzFN
-         wwoSUc6pldt9daeMxSXZTa2ynJ+Zufqi9ZQgYA4+Q92cIOu4vLXVHZJfPYe7u4QSU68Z
-         9zWD1l+fTgcExdX1046qEYyUhazdIE5mc1h5LI+rdhsdgD0ryvgokTaQliWB3onRBP8F
-         MVkA==
-X-Gm-Message-State: AOJu0YyUqWMhPQALz8tECx9yiFkPyEXx7gHySRiMfRQ4e3mWvTfyyBYw
-	okqb+4uz18++alYFylfcicM64ERjw+o=
-X-Google-Smtp-Source: AGHT+IGjOtVPh4Bj1KhqJWMAuATirBflDkDV5E7K/wSkkFkwTJ1o8bUotCwr4bfzhuoW8tRpWRNqLQ==
-X-Received: by 2002:a05:6214:584a:b0:67a:a721:ec06 with SMTP id ml10-20020a056214584a00b0067aa721ec06mr1219894qvb.74.1701791214401;
-        Tue, 05 Dec 2023 07:46:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701791215; x=1702396015;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z5sYOH7EK86gdZlBKFuGUGGBNmbTPUNMQuZN0UpGjRs=;
+        b=a+fYQA7JTKAKqE5V4wd/O0f2aNsXQJKcmbDFVJXpccVVFP6GqeprxTIvwZFBnPs7K7
+         sQIQ5cRO7eFPKsuBBzc/R7Xthdiu9TlWSW6kFljP2sihxvWGwO3iuEOgn8z9i47418zQ
+         2yWK6rGPzLplaupIS59Oc9N0nVSUgW5U7p718Y5xPDV1fHcD/yp5LgQmD7ZGTjddlrF5
+         kNDcMZZy0VuoOY7wZWQVGrdQX7zVI7/ZkZNCx+hOTrTko8jCjZuXaetl0nZd0tnlFLxM
+         buFRrGLeCe+NScyPlh//U8UmudMZjqfwgDqoEBU937zfLsr7Uogb5sjM7rVZC4QkOGEu
+         OhIg==
+X-Gm-Message-State: AOJu0YxQ3vF/GgC0mqxCX9xjc80Dldb5GX/gEhClWNu0NppTNAWXwIp/
+	U228JLpRcLB0TmLMSaj3xZ9NTOBbAEE=
+X-Google-Smtp-Source: AGHT+IETh1qqvUn3mgn66qdfQBv6d8NC2zEMSw+LGYUSXZt9CjiqxkCzMkWIr+RxbZmT4CxSZ7yDUw==
+X-Received: by 2002:a05:6358:108:b0:170:17eb:1e4 with SMTP id f8-20020a056358010800b0017017eb01e4mr3666288rwa.39.1701791215600;
+        Tue, 05 Dec 2023 07:46:55 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id kr3-20020a0562142b8300b0067aad395037sm3177567qvb.60.2023.12.05.07.46.53
+        by smtp.gmail.com with ESMTPSA id kr3-20020a0562142b8300b0067aad395037sm3177567qvb.60.2023.12.05.07.46.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 07:46:54 -0800 (PST)
+        Tue, 05 Dec 2023 07:46:55 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 01/10] scan: parse password identifier/exclusive bits
-Date: Tue,  5 Dec 2023 07:46:38 -0800
-Message-Id: <20231205154647.1778389-1-prestwoj@gmail.com>
+Subject: [PATCH 02/10] network: pass scan_bss into network_load_psk
+Date: Tue,  5 Dec 2023 07:46:39 -0800
+Message-Id: <20231205154647.1778389-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231205154647.1778389-1-prestwoj@gmail.com>
+References: <20231205154647.1778389-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -56,58 +59,120 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-These bits are used to communicate to the station that SAE password
-identifiers are used or required.
+For adding SAE password identifiers the capability bits need to be
+verified when loading the identifier from the profile. Pass the
+BSS object in to network_load_psk rather than the 'need_passphrase'
+boolean.
 ---
- src/scan.c | 20 +++++++++++++++++---
- src/scan.h |  2 ++
- 2 files changed, 19 insertions(+), 3 deletions(-)
+ src/network.c | 60 +++++++++++++++++++++++++--------------------------
+ 1 file changed, 30 insertions(+), 30 deletions(-)
 
-diff --git a/src/scan.c b/src/scan.c
-index 5aa92a90..f48ffdef 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -1404,10 +1404,24 @@ static bool scan_parse_bss_information_elements(struct scan_bss *bss,
- 			 * Currently only Proxy ARP bit (12) is checked, and if
- 			 * not found, this is not a fatal error.
- 			 */
--			if (iter.len < 2)
--				break;
-+			if (iter.len >= 2)
-+				bss->proxy_arp = test_bit(iter.data, 12);
-+
-+			/*
-+			 * 802.11-2020 Table 9-153
-+			 *
-+			 * The spec merely mentions the "exclusive" bit and
-+			 * doesn't enforce a requirement to check it anywhere.
-+			 * But if set it would indicate the AP will only accept
-+			 * auths when a password ID is used so store this in
-+			 * order to fail early if no ID is set.
-+			 */
-+			if (iter.len >= 11) {
-+				bss->sae_pw_id_used = test_bit(iter.data, 81);
-+				bss->sae_pw_id_exclusive =
-+							test_bit(iter.data, 82);
-+			}
+diff --git a/src/network.c b/src/network.c
+index f203834c..79f964b2 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -594,8 +594,34 @@ generate:
+ 	return -EIO;
+ }
  
--			bss->proxy_arp = test_bit(iter.data, 12);
- 		}
+-static int network_load_psk(struct network *network, bool need_passphrase)
++static inline bool __bss_is_sae(const struct scan_bss *bss,
++						const struct ie_rsn_info *rsn)
+ {
++	if (rsn->akm_suites & IE_RSN_AKM_SUITE_SAE_SHA256)
++		return true;
++
++	return false;
++}
++
++static bool bss_is_sae(const struct scan_bss *bss)
++{
++	struct ie_rsn_info rsn;
++
++	memset(&rsn, 0, sizeof(rsn));
++	scan_bss_get_rsn_info(bss, &rsn);
++
++	return __bss_is_sae(bss, &rsn);
++}
++
++static int network_load_psk(struct network *network, struct scan_bss *bss)
++{
++	/*
++	 * A legacy psk file may only contain the PreSharedKey entry. For SAE
++	 * networks the raw Passphrase is required. So in this case where
++	 * the psk is found but no Passphrase, we ask the agent.  The psk file
++	 * will then be re-written to contain the raw passphrase.
++	 */
++	bool is_sae = bss_is_sae(bss);
+ 	const char *ssid = network_get_ssid(network);
+ 	enum security security = network_get_security(network);
+ 	size_t psk_len;
+@@ -616,7 +642,7 @@ static int network_load_psk(struct network *network, bool need_passphrase)
  	}
  
-diff --git a/src/scan.h b/src/scan.h
-index 0db7752d..65caf41c 100644
---- a/src/scan.h
-+++ b/src/scan.h
-@@ -88,6 +88,8 @@ struct scan_bss {
- 	uint8_t cost_level : 3;
- 	uint8_t cost_flags : 4;
- 	bool dpp_configurator : 1;
-+	bool sae_pw_id_used : 1;
-+	bool sae_pw_id_exclusive : 1;
- };
+ 	/* PSK can be generated from the passphrase but not the other way */
+-	if (!psk || need_passphrase) {
++	if (!psk || is_sae) {
+ 		if (!passphrase)
+ 			return -ENOKEY;
  
- struct scan_parameters {
+@@ -778,25 +804,6 @@ bool network_get_force_default_owe_group(struct network *network)
+ 	return network->force_default_owe_group;
+ }
+ 
+-static inline bool __bss_is_sae(const struct scan_bss *bss,
+-						const struct ie_rsn_info *rsn)
+-{
+-	if (rsn->akm_suites & IE_RSN_AKM_SUITE_SAE_SHA256)
+-		return true;
+-
+-	return false;
+-}
+-
+-static bool bss_is_sae(const struct scan_bss *bss)
+-{
+-	struct ie_rsn_info rsn;
+-
+-	memset(&rsn, 0, sizeof(rsn));
+-	scan_bss_get_rsn_info(bss, &rsn);
+-
+-	return __bss_is_sae(bss, &rsn);
+-}
+-
+ int network_can_connect_bss(struct network *network, const struct scan_bss *bss)
+ {
+ 	struct station *station = network->station;
+@@ -959,7 +966,7 @@ int network_autoconnect(struct network *network, struct scan_bss *bss)
+ 
+ 	switch (security) {
+ 	case SECURITY_PSK:
+-		ret = network_load_psk(network, bss_is_sae(bss));
++		ret = network_load_psk(network, bss);
+ 		if (ret < 0)
+ 			goto close_settings;
+ 
+@@ -1285,20 +1292,13 @@ static struct l_dbus_message *network_connect_psk(struct network *network,
+ 					struct l_dbus_message *message)
+ {
+ 	struct station *station = network->station;
+-	/*
+-	 * A legacy psk file may only contain the PreSharedKey entry. For SAE
+-	 * networks the raw Passphrase is required. So in this case where
+-	 * the psk is found but no Passphrase, we ask the agent.  The psk file
+-	 * will then be re-written to contain the raw passphrase.
+-	 */
+-	bool need_passphrase = bss_is_sae(bss);
+ 
+ 	if (!network_settings_load(network)) {
+ 		network->settings = l_settings_new();
+ 		network->ask_passphrase = true;
+ 	} else if (!network->ask_passphrase)
+ 		network->ask_passphrase =
+-			network_load_psk(network, need_passphrase) < 0;
++			network_load_psk(network, bss) < 0;
+ 
+ 	l_debug("ask_passphrase: %s",
+ 		network->ask_passphrase ? "true" : "false");
 -- 
 2.34.1
 
