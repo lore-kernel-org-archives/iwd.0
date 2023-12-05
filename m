@@ -1,86 +1,99 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E185F1FA
-	for <iwd@lists.linux.dev>; Tue,  5 Dec 2023 15:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451E25F1FA
+	for <iwd@lists.linux.dev>; Tue,  5 Dec 2023 15:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IcqQ5kWO"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-67ad032559fso9920096d6.2
-        for <iwd@lists.linux.dev>; Tue, 05 Dec 2023 07:47:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ee4E+ehA"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-77bcbc14899so392757185a.1
+        for <iwd@lists.linux.dev>; Tue, 05 Dec 2023 07:48:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701791227; x=1702396027; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NXnYUofkCp1atA9uXGJyCH9I7mrbJ+/QubCgFZHo8jc=;
-        b=IcqQ5kWOUBeuyY/5wP743CvQRdZubD7A3VSHLBnhb9C6u+scMPlW7C8KX5IbqgpCB6
-         OXCiBx+6MyPptfWB3S1qqpIJ8MxbMNf0Nu9StkVjm8uNYSlzPw/fdUV8/27Cafll059e
-         tLh9O4ywsNB+MOsJ98rB5PZbdXFA58UMZuCqDIpiRNRoI3dHRtT+nRR1+1elJ/kBlZLo
-         jIX1hXzQqSWQ8e0KjktNDHVTuY3M8Ziw9nuHHCzbpJ7my8fNzThDC3sD1mzgTnBXMXkC
-         oEYwBqAARd2pM7wDWpvhzvHzTOOqx0zDb3LWJBdgd1lct7v4xu5D3qVmq6MmxkBb9x7j
-         H8lg==
+        d=gmail.com; s=20230601; t=1701791285; x=1702396085; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:references:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eBoPGCc4fQWs83LbNhtf8dWcgIG/KT68gZN15DaBzvw=;
+        b=Ee4E+ehAiJV5jXk0FFnRya9X6Q0vgdgmzmBXdMKmeAyKzfpy1/6Da98k0LNQdfCNS4
+         j4IWI6gah9YSzbTTDtIRMULTAnb4Is79U/uAqpte5gyGAcEEctY0Q+ndb+r9GbJpyc15
+         uOMMP0nuFudnqoj7OqaOqUp7WfaRhsbilN8Ng2Qo6x0QLWturr1WvE6LfQc8/eVIAkiQ
+         21CjEKd2yRDTfjz8aE0nNNaAzCxHMw8QBVdKmDIU8nrV/OMJdCzSIggVCSeVyIvM8I9S
+         u+/xKVHJU38AxwAn7Bh+aSV3DCwz9GxkZhrs0bWK54pgSMEqMgNMBJOTTtqi8Zn0s4te
+         eB5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701791227; x=1702396027;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NXnYUofkCp1atA9uXGJyCH9I7mrbJ+/QubCgFZHo8jc=;
-        b=Z9921lh7TGy+n6+ou/x6a5KyAaThOnrSpYhc2UdbzX+/gMjClz85KQYbsvHqwP5rNW
-         yRVa/+PnT2bXRsTpa6Pd/2dn1NvKkp29AT6r33wZjcTf1ea+MvqvC8j1bWnCWJReQFD9
-         PiB3/3vjf3t5RbMpUpPteKaTN9aI2dDAjb8v7SbEKHc4kMNuh2A4/+8OLjZ8BnpmklPH
-         6DD05E47zqCUO41J+bQrB60D9nldkZf0LgjmHPnJc6yWzlvsrGZmKmqB2bgcyWsc8Gpn
-         GynUI/ewWHeYMGrRqzw1TgnaM9IzNhRsMO5iarnd5M3lceymwZkENocvV0gSOUrUR9ay
-         28Gg==
-X-Gm-Message-State: AOJu0Yw/xvULqmukZTkqqte8KZ0OkkFiyQrENzZHLYxniu3oS5OKtE4b
-	8vRdbqxQ17ghra7NZ40pdgZD8TpwYEA=
-X-Google-Smtp-Source: AGHT+IGkkIyFwuC/5jNfnEZXyXCt6T+1dalkxR7630hivi8mOrv/MJ3IQpj+3/S3scLMIQM5o2V3kg==
-X-Received: by 2002:a05:6214:5ed4:b0:67a:8f8c:885c with SMTP id mn20-20020a0562145ed400b0067a8f8c885cmr1334791qvb.56.1701791227027;
-        Tue, 05 Dec 2023 07:47:07 -0800 (PST)
-Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id kr3-20020a0562142b8300b0067aad395037sm3177567qvb.60.2023.12.05.07.47.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 07:47:06 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 10/10] auto-t: throw exception if executable is missing
-Date: Tue,  5 Dec 2023 07:46:47 -0800
-Message-Id: <20231205154647.1778389-10-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231205154647.1778389-1-prestwoj@gmail.com>
-References: <20231205154647.1778389-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1701791285; x=1702396085;
+        h=content-transfer-encoding:in-reply-to:references:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eBoPGCc4fQWs83LbNhtf8dWcgIG/KT68gZN15DaBzvw=;
+        b=TOFm0jrcisk/V+QO8KsLRLtigtqHKAmEGUwWHlyknr23v72IKXZb821kAq9+F96JV9
+         SulloMhMpuTFBimkj8yE3/B10wBN9pzyx8piQdhRsq+6m54oHGfq8lAYLJaJpLngjtmD
+         93/eqerF0/vZNlVS6xRE3u9KKG6lpmkzzifXAfQeJJk+ojf07V78m2IaGgkOklXox72F
+         l/oFtAJz6C4Bb9lDh/DtT08pv1zxjKs6q/YRg0kzCgPb9G0T4O4jjIgms1quP/1RyX2I
+         d7rdDdOPrY8JgbfCC9uK60UKMwuTi/6smB3SobAYZi3GyTxMNTDCMD+BFrjbu0x85qKi
+         zfzw==
+X-Gm-Message-State: AOJu0YwsotHuj6LDshpffj7LZU7auSJghAYsMpY/R4hPlTZ6GwSa9V1d
+	PJOCqb2S03k8VIDtR0YMSS0W4JNCqzY=
+X-Google-Smtp-Source: AGHT+IEbnIBmalPItb2wdK0nwAJSBF3Rkx38hHZTvfLME38MvVYMaJfEk9pfcctANXTb+hWOCpHpuQ==
+X-Received: by 2002:a05:620a:1996:b0:77f:1773:1163 with SMTP id bm22-20020a05620a199600b0077f17731163mr1774565qkb.81.1701791285214;
+        Tue, 05 Dec 2023 07:48:05 -0800 (PST)
+Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id c7-20020a05620a134700b0077eff6eece8sm3135764qkl.62.2023.12.05.07.48.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Dec 2023 07:48:05 -0800 (PST)
+Message-ID: <a61d267d-774a-430e-adc6-5fb1f5075860@gmail.com>
+Date: Tue, 5 Dec 2023 07:48:03 -0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: SAE password identifiers?
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+To: Ronan Pigott <ronan@rjp.ie>, iwd@lists.linux.dev
+References: <e3bb952a9c0550a945f002b1dc5c596e370d600d@rjp.ie>
+ <38a83f9c-6ac6-4862-99b1-128d811a63e5@gmail.com>
+In-Reply-To: <38a83f9c-6ac6-4862-99b1-128d811a63e5@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Certain tests may require external processes to work
-(e.g. testNetconfig) and if missing the test will just hang until
-the maximum test timeout. Check in start_process if the exe
-actually exists and if not throw an exception.
----
- tools/utils.py | 3 +++
- 1 file changed, 3 insertions(+)
+Hi Ronan,
 
-diff --git a/tools/utils.py b/tools/utils.py
-index a07c3183..8219542e 100644
---- a/tools/utils.py
-+++ b/tools/utils.py
-@@ -34,6 +34,9 @@ class Process(subprocess.Popen):
- 
- 		logfile = args[0]
- 
-+		if not shutil.which(args[0]):
-+			raise Exception("%s is not found on system" % args[0])
-+
- 		if Process.is_verbose(args[0], log=False):
- 			self.verbose = True
- 
--- 
-2.34.1
+On 12/4/23 06:40, James Prestwood wrote:
+> Hi Ronan,
+>
+> On 12/4/23 01:56, Ronan Pigott wrote:
+>> Hi,
+>>
+>> I was looking at WPA3 recently which includes a specification of the 
+>> "WIFI:" URI
+>> scheme. I was interseted in creating iwd .network configurations from 
+>> these URI
+>> but afaict iwd is missing support for SAE password identifiers, which 
+>> may appear
+>> in the URI. Is iwd capable of connecting to these networks? If so, 
+>> how can it be
+>> specified in the config?
+>
+> No currently there is no support for password identifiers in IWD's SAE 
+> implementation. It appears to be somewhat simple to add, an extra IE 
+> in the SAE exchange and adding the identifier to the PWE hashing.
 
+I went ahead and added password identifier support (patches on the 
+list). I've tested this with hostapd directly but if you have an actual 
+production device that supports password identifiers it would be nice to 
+validate this actually works.
+
+Thanks,
+
+James
+
+>
+>>
+>> Thanks,
+>> Ronan
+>>
