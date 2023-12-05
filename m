@@ -1,81 +1,113 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD41F28E16
-	for <iwd@lists.linux.dev>; Mon,  4 Dec 2023 14:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E2B5F1D8
+	for <iwd@lists.linux.dev>; Tue,  5 Dec 2023 15:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OR58q2DN"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-67ac4fc7217so8525096d6.0
-        for <iwd@lists.linux.dev>; Mon, 04 Dec 2023 06:40:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/tM+3+z"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-67a9b393f53so15366646d6.0
+        for <iwd@lists.linux.dev>; Tue, 05 Dec 2023 07:46:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701700827; x=1702305627; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6t28JuFdimqfuw5IrXCYZDm4xgOCZo92KnC9MU8gSKI=;
-        b=OR58q2DNbmWYKpD/hZ5GdFb0sQL3KMmAlXZdXMT3v6Dam5326ag09otQ4LZNLRrdjm
-         YBb1ZAVJAS6CyCtOEH48vKIBVhqG+tuomTClLZuNYzhNdQNISIPEN297UC22QIhDrEoI
-         7QPFxdG/CUt6CrmX6vtEh2nzol8jkh9EOSjK6bgIXoEbDsueGaXIo5z3Qmo58QOh/tcW
-         g1e4wr28bEYsqj6kEVNvRbkWN9UauPcxMoaW45tVACxFnwd1qsZFVlPbEXSLglHLuxqF
-         ebTlPy816Yp8IpMGDCcN0MwKxw+4nktsQ1D2gRzyKFF7eCjn9iyI3+RhVFQHdODRazWT
-         C9wA==
+        d=gmail.com; s=20230601; t=1701791214; x=1702396014; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8m+HV8zJEKGuNGrOene7oRzTO4rBmRSywZwjO7i4ppk=;
+        b=I/tM+3+zFTzD2Ly4hdTh0CJeBad/KsdsGSW+ANjhO9vZuNitnDZESKMqXvuZthWJ5/
+         Apt7qNzNmofimyp/vNXvlnyZSQbGLWi/z+v1RXIcM9j+DH93FDnIH7Jz5JqJp8Ha5WyS
+         lGZovxlPm1RHHnnAdZiuG8Ho5IaYDw/5pV/Y4BomzWSYfvskAo7sjF7XDU4IRynX12xx
+         IUgskszcqkipgYGJnAAxFjgxgYu/iMCG8Caa1QKCbmpqFJ46d1/wazufFkhyRqGy5lr8
+         e24PGhb88YUdWdEkUQA4AR2Toi7mPaFV00Z0+iDTBBOZ0tZ8tNlDsJB4vsTVRf7aS8uw
+         r3cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701700827; x=1702305627;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6t28JuFdimqfuw5IrXCYZDm4xgOCZo92KnC9MU8gSKI=;
-        b=kJt0YUqFw/WC3vmCT7o0dZq1kQx8a9z1SM2MDzQ3dkH0wDa8rPFoQM8SHRg277PL91
-         auH92bstDgV53FXqBhUMgwjjtr0X3I3/ne1yJIilrtJfkyU0jGtJ+G73XtT6j4lFwjD2
-         M4ZHHlSQLrwMvI7pVUCGDnlqyX+DQvqm7tbyMFm2D9UKUTqr8bVzk3hxOZWcCzl1KUMr
-         gQun5wkP4jE1DILSQ7qvHNBsYaGOKi7hH5Rnct8UXw+UjJvIlNBl/h4i0m5A1jvnXHkj
-         xXBkDZm3nrD3pKAv82KgWYcNb/eRpxNlmNwoj1zT53VI72G8NnTgRlMvPY8H7dUdt7t+
-         rZGw==
-X-Gm-Message-State: AOJu0YzMMb3jAbJiqFt8mBfxJGYJP+ex4JRGs5LSnyJGLu0F1I5upkkV
-	9h3g0H0BBZwLRbYZHVGui4Z+ZPN6Sb0=
-X-Google-Smtp-Source: AGHT+IGs0GDwKZxLmR1/6qseXzB9ThskIjs2asjSOYGEykyp/8i+TU/3HDztwEyFHaELwBVc2xXabw==
-X-Received: by 2002:a05:6214:1fd0:b0:66d:1ae6:2a5a with SMTP id jh16-20020a0562141fd000b0066d1ae62a5amr4460872qvb.7.1701700827542;
-        Mon, 04 Dec 2023 06:40:27 -0800 (PST)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id t26-20020a0cb71a000000b0067a49af5ccfsm1576461qvd.119.2023.12.04.06.40.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Dec 2023 06:40:27 -0800 (PST)
-Message-ID: <38a83f9c-6ac6-4862-99b1-128d811a63e5@gmail.com>
-Date: Mon, 4 Dec 2023 06:40:24 -0800
+        d=1e100.net; s=20230601; t=1701791214; x=1702396014;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8m+HV8zJEKGuNGrOene7oRzTO4rBmRSywZwjO7i4ppk=;
+        b=PbfYtb0dAnEVWe3HxEPVEPfIDTXngCXWki4kAet6vPU3uzbLXuwY9q0L7tWyJUmLNX
+         IK7/IwPNCddpbnueMW37EVXXdYajpOCEjkWzo0MFXA7N5S+klNu6CWbm/nMtSrns4Bi0
+         r4sOCfggP11tWUhYfg/ZTm1J+8rQCFyS5dCZgOlClyc1sN/brYwzjkygz+I/UtZCTzFN
+         wwoSUc6pldt9daeMxSXZTa2ynJ+Zufqi9ZQgYA4+Q92cIOu4vLXVHZJfPYe7u4QSU68Z
+         9zWD1l+fTgcExdX1046qEYyUhazdIE5mc1h5LI+rdhsdgD0ryvgokTaQliWB3onRBP8F
+         MVkA==
+X-Gm-Message-State: AOJu0YyUqWMhPQALz8tECx9yiFkPyEXx7gHySRiMfRQ4e3mWvTfyyBYw
+	okqb+4uz18++alYFylfcicM64ERjw+o=
+X-Google-Smtp-Source: AGHT+IGjOtVPh4Bj1KhqJWMAuATirBflDkDV5E7K/wSkkFkwTJ1o8bUotCwr4bfzhuoW8tRpWRNqLQ==
+X-Received: by 2002:a05:6214:584a:b0:67a:a721:ec06 with SMTP id ml10-20020a056214584a00b0067aa721ec06mr1219894qvb.74.1701791214401;
+        Tue, 05 Dec 2023 07:46:54 -0800 (PST)
+Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id kr3-20020a0562142b8300b0067aad395037sm3177567qvb.60.2023.12.05.07.46.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 07:46:54 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 01/10] scan: parse password identifier/exclusive bits
+Date: Tue,  5 Dec 2023 07:46:38 -0800
+Message-Id: <20231205154647.1778389-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: SAE password identifiers?
-Content-Language: en-US
-To: Ronan Pigott <ronan@rjp.ie>, iwd@lists.linux.dev
-References: <e3bb952a9c0550a945f002b1dc5c596e370d600d@rjp.ie>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <e3bb952a9c0550a945f002b1dc5c596e370d600d@rjp.ie>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Ronan,
+These bits are used to communicate to the station that SAE password
+identifiers are used or required.
+---
+ src/scan.c | 20 +++++++++++++++++---
+ src/scan.h |  2 ++
+ 2 files changed, 19 insertions(+), 3 deletions(-)
 
-On 12/4/23 01:56, Ronan Pigott wrote:
-> Hi,
->
-> I was looking at WPA3 recently which includes a specification of the "WIFI:" URI
-> scheme. I was interseted in creating iwd .network configurations from these URI
-> but afaict iwd is missing support for SAE password identifiers, which may appear
-> in the URI. Is iwd capable of connecting to these networks? If so, how can it be
-> specified in the config?
+diff --git a/src/scan.c b/src/scan.c
+index 5aa92a90..f48ffdef 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -1404,10 +1404,24 @@ static bool scan_parse_bss_information_elements(struct scan_bss *bss,
+ 			 * Currently only Proxy ARP bit (12) is checked, and if
+ 			 * not found, this is not a fatal error.
+ 			 */
+-			if (iter.len < 2)
+-				break;
++			if (iter.len >= 2)
++				bss->proxy_arp = test_bit(iter.data, 12);
++
++			/*
++			 * 802.11-2020 Table 9-153
++			 *
++			 * The spec merely mentions the "exclusive" bit and
++			 * doesn't enforce a requirement to check it anywhere.
++			 * But if set it would indicate the AP will only accept
++			 * auths when a password ID is used so store this in
++			 * order to fail early if no ID is set.
++			 */
++			if (iter.len >= 11) {
++				bss->sae_pw_id_used = test_bit(iter.data, 81);
++				bss->sae_pw_id_exclusive =
++							test_bit(iter.data, 82);
++			}
+ 
+-			bss->proxy_arp = test_bit(iter.data, 12);
+ 		}
+ 	}
+ 
+diff --git a/src/scan.h b/src/scan.h
+index 0db7752d..65caf41c 100644
+--- a/src/scan.h
++++ b/src/scan.h
+@@ -88,6 +88,8 @@ struct scan_bss {
+ 	uint8_t cost_level : 3;
+ 	uint8_t cost_flags : 4;
+ 	bool dpp_configurator : 1;
++	bool sae_pw_id_used : 1;
++	bool sae_pw_id_exclusive : 1;
+ };
+ 
+ struct scan_parameters {
+-- 
+2.34.1
 
-No currently there is no support for password identifiers in IWD's SAE 
-implementation. It appears to be somewhat simple to add, an extra IE in 
-the SAE exchange and adding the identifier to the PWE hashing.
-
->
-> Thanks,
-> Ronan
->
