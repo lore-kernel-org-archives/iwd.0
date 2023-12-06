@@ -1,53 +1,53 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A83B6EB72
-	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 20:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9302D47F5B
+	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 20:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eNNSxxhi"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6ce94f62806so192523b3a.1
-        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 12:18:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fXw+aJ1d"
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-5c6734e0c22so127796a12.0
+        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 12:18:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1701893889; x=1702498689; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WAY4bt0O+virkaMM/crr7PzAI4YN/UAAgk6iGrGxQ+4=;
-        b=eNNSxxhie5cxzcbPy6iwgOIsNR4zO1QE/v4bxbUhDBGfKICP6ZxIOlqTb2CRobxnAf
-         Yb0yqVDXDfO8z9SoIWCDx5E23vPXxpDQE8OFDhvAxVgguGFiWzgBslpCj8kiUxVlcJmB
-         8iylr+ra4KYFnoieUtIpSpVWjG8rUtg+g5ggG2o8PmHG/W1uHQp13dZIW9p42MD7xoXh
-         lUNMd+JujP261WceMR1vU02mUNFJRoGY5Lcd0+8SWhN5645IDSigt8dIFqxNF6nfb+Ak
-         S2WZM0TtCBE/5nd4y+3R6UKNMjOCJ157ULsh96tkzG4ILy5PFl4lousOUe/VLvyl4Lj6
-         r+6w==
+        bh=iDqoM7QjlNAhdyKyErUpySXKYYw4XfwYgeohnydEEw8=;
+        b=fXw+aJ1dzQ+YC+sC2rVheVHzYzv5BND9WqlqGboTDig05qm93yVZM+ZifvADvjbEjp
+         L8+PvQJYWUv84MLIbZab0btYQ2snpUo8UmKJqTof3VqMIi1iVg5sr5IJnaFhGopNPfLq
+         QpwtoHbFjSx4q3XhhXY2MLxTD6cxZeE9bjSvZE9qsV0CCdyQ2NBpyaKUqVccZUS/M2Gp
+         AVqEFxTP1IayIoTbV1v7RJY0GgFX8diQo/+3EkUlftVt3gjfjM6vfqabXFJj5duPg9Ku
+         0q42d6n83MXfyMi+ayLH1dAM7qleHgbC7GIGCiS2NA+PVjOhIjfaAoh6puQM2gAtj043
+         5oAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1701893889; x=1702498689;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WAY4bt0O+virkaMM/crr7PzAI4YN/UAAgk6iGrGxQ+4=;
-        b=Y22gVfKbp7M2wN3EybBuUwHValx5krVAsW1jAxiJktdexJeR1nPv7JMFBs3d8HKXLD
-         6YN82xq4BZdaXO1jIn1xIib00Jukv4kgL3KtlTr1qLQjuWINoL8CjsqDromUQS3rejnU
-         awwURdhP98I0yys43FzJi+1bnzTXnhesfOK06yh9cAmJTgf7Te4PfKpcR6I2t3iFGFss
-         J8bIc4y2Onrpe+1vM5iqH1WiwovVZvy7qTqT8Eld4Fcn7FesDReC9LRFa84E+eTg+hUi
-         9a7LlhHrb7HEu42mmFGr3FVVabHbp2F2Z5IxwRtSxsCOU+tWF/5HuE2lUOBsBY+Jf2zd
-         hPpA==
-X-Gm-Message-State: AOJu0YzHswCN6mM88EAYQC48FS9L/IMUmJ7Bzlytq8EaDGkRPbXQq29E
-	zHNFWRMlaeXc6WH4BP1UskCIsBPYCUyosA==
-X-Google-Smtp-Source: AGHT+IHKtLBb+4rjuubyIkSN9WjdFKOwexf6sHpu0eiiSbJj79drnZw5/zRw5Ayker52psUSkUJsNw==
-X-Received: by 2002:a05:6a20:7d8d:b0:18f:f637:99d1 with SMTP id v13-20020a056a207d8d00b0018ff63799d1mr445126pzj.57.1701893889076;
+        bh=iDqoM7QjlNAhdyKyErUpySXKYYw4XfwYgeohnydEEw8=;
+        b=wM520JpqEVNAqtGNttSBV9qtP5YluzlJVbt4P/intHl35q/jFypNdwpwMJ4kfn7qxE
+         vt0YlYedw4wv9+DtlK2bIBPuAE91nDTjYx+Ugsafy1g6VPLlpZsSHaCdKz0l+tJlySBG
+         LJVWMJFNeeojFpji0C0XynTsN82LjEeTik9yJq1Uzj9kpfdMigMO7uOwT/9kyjBMv3+p
+         Q68QMy7dNDTP+tF7dlpkMqPI7Qoh3LrD20hnpcvExSpspR/ICbhCnEjub4tx/+RNVI4m
+         WBDBy5mcKLQ1ypAx78Ds1NpPlnzWnHc6ksqq+XwzsTtgq06nnmGz1k7YwIVsmsZ4wpkn
+         iBaQ==
+X-Gm-Message-State: AOJu0Yy2buiHEbn4CReLlfbiaq0vp+wLOsKykUBS6PnU453/jbuwFUkv
+	K/AE33DHlIKZ2B0067Vr65ibCmZI7p3iqg==
+X-Google-Smtp-Source: AGHT+IGDLlcYOQGzwu2GQswsQyzAYKex4c38+R+RPCbzmLzHH+EKkN0BK0oAFeBOys1kvfHmT3g5TQ==
+X-Received: by 2002:a05:6a21:149a:b0:187:b14f:a2a with SMTP id od26-20020a056a21149a00b00187b14f0a2amr1149556pzb.20.1701893889548;
         Wed, 06 Dec 2023 12:18:09 -0800 (PST)
 Received: from LOCLAP699.. ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id by40-20020a056a0205a800b005c2185be2basm243168pgb.54.2023.12.06.12.18.08
+        by smtp.gmail.com with ESMTPSA id by40-20020a056a0205a800b005c2185be2basm243168pgb.54.2023.12.06.12.18.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 12:18:08 -0800 (PST)
+        Wed, 06 Dec 2023 12:18:09 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 04/13] handshake: add setters for authenticator/supplicant_fte
-Date: Wed,  6 Dec 2023 12:17:53 -0800
-Message-Id: <20231206201802.2139649-4-prestwoj@gmail.com>
+Subject: [PATCH v3 05/13] handshake: use authenticator_fte instead of 'fte'
+Date: Wed,  6 Dec 2023 12:17:54 -0800
+Message-Id: <20231206201802.2139649-5-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231206201802.2139649-1-prestwoj@gmail.com>
 References: <20231206201802.2139649-1-prestwoj@gmail.com>
@@ -59,73 +59,89 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In general only the authenticator FTE is used/validated but with
-some FT refactoring coming there needs to be a way to build the
-supplicants FTE into the handshake object. Because of this there
-needs to be separate FTE buffers for both the authenticator and
-supplicant.
 ---
- src/handshake.c | 14 ++++++++++++++
- src/handshake.h |  7 +++++++
- 2 files changed, 21 insertions(+)
+ src/eapol.c     | 5 +++--
+ src/fils.c      | 2 +-
+ src/ft.c        | 2 +-
+ src/handshake.c | 2 +-
+ src/netdev.c    | 2 +-
+ 5 files changed, 7 insertions(+), 6 deletions(-)
 
+diff --git a/src/eapol.c b/src/eapol.c
+index 3d7b3d38..bad4bbb7 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -1299,7 +1299,8 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *sm,
+ 		ies_len = ies[1] + 2;
+ 
+ 		ies_len += append_ie(ies + ies_len, sm->handshake->mde);
+-		ies_len += append_ie(ies + ies_len, sm->handshake->fte);
++		ies_len += append_ie(ies + ies_len,
++					sm->handshake->authenticator_fte);
+ 	} else {
+ 		ies_len = append_ie(ies, own_ie);
+ 	}
+@@ -1795,7 +1796,7 @@ static void eapol_handle_ptk_3_of_4(struct eapol_sm *sm,
+ 		if (eapol_ie_matches(decrypted_key_data,
+ 					decrypted_key_data_size,
+ 					IE_TYPE_FAST_BSS_TRANSITION,
+-					hs->fte) < 0)
++					hs->authenticator_fte) < 0)
+ 			goto error_ie_different;
+ 	}
+ 
+diff --git a/src/fils.c b/src/fils.c
+index c3337352..f876e7e5 100644
+--- a/src/fils.c
++++ b/src/fils.c
+@@ -445,7 +445,7 @@ static int fils_rx_authenticate(struct auth_proto *driver, const uint8_t *frame,
+ 					kck_len, &ft_info) < 0)
+ 			goto invalid_ies;
+ 
+-		handshake_state_set_fte(fils->hs, fte);
++		handshake_state_set_authenticator_fte(fils->hs, fte);
+ 		handshake_state_set_kh_ids(fils->hs, ft_info.r0khid,
+ 							ft_info.r0khid_len,
+ 							ft_info.r1khid);
+diff --git a/src/ft.c b/src/ft.c
+index 2cc611b8..43399828 100644
+--- a/src/ft.c
++++ b/src/ft.c
+@@ -922,7 +922,7 @@ static void ft_prepare_handshake(struct ft_info *info,
+ 
+ 	memcpy(hs->snonce, info->snonce, sizeof(hs->snonce));
+ 
+-	handshake_state_set_fte(hs, info->fte);
++	handshake_state_set_authenticator_fte(hs, info->fte);
+ 
+ 	handshake_state_set_anonce(hs, info->ft_info.anonce);
+ 
 diff --git a/src/handshake.c b/src/handshake.c
-index 1c5ed2c9..f35da9b1 100644
+index f35da9b1..ad8533f4 100644
 --- a/src/handshake.c
 +++ b/src/handshake.c
-@@ -123,6 +123,8 @@ void handshake_state_free(struct handshake_state *s)
- 	l_free(s->supplicant_rsnxe);
- 	l_free(s->mde);
- 	l_free(s->fte);
-+	l_free(s->authenticator_fte);
-+	l_free(s->supplicant_fte);
- 	l_free(s->fils_ip_req_ie);
- 	l_free(s->fils_ip_resp_ie);
- 	l_free(s->vendor_ies);
-@@ -313,6 +315,18 @@ void handshake_state_set_fte(struct handshake_state *s, const uint8_t *fte)
- 	replace_ie(&s->fte, fte);
- }
+@@ -528,7 +528,7 @@ bool handshake_state_derive_ptk(struct handshake_state *s)
+ 				IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256 |
+ 				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 |
+ 				IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384)) &&
+-			(!s->mde || !s->fte))
++			(!s->mde || !s->authenticator_fte))
+ 		return false;
  
-+void handshake_state_set_authenticator_fte(struct handshake_state *s,
-+						const uint8_t *fte)
-+{
-+	replace_ie(&s->authenticator_fte, fte);
-+}
-+
-+void handshake_state_set_supplicant_fte(struct handshake_state *s,
-+						const uint8_t *fte)
-+{
-+	replace_ie(&s->supplicant_fte, fte);
-+}
-+
- void handshake_state_set_vendor_ies(struct handshake_state *s,
- 					const struct iovec *iov,
- 					size_t n_iovs)
-diff --git a/src/handshake.h b/src/handshake.h
-index 815eb44f..e6344048 100644
---- a/src/handshake.h
-+++ b/src/handshake.h
-@@ -104,6 +104,8 @@ struct handshake_state {
- 	uint8_t *supplicant_rsnxe;
- 	uint8_t *mde;
- 	uint8_t *fte;
-+	uint8_t *authenticator_fte;
-+	uint8_t *supplicant_fte;
- 	uint8_t *vendor_ies;
- 	size_t vendor_ies_len;
- 	enum ie_rsn_cipher_suite pairwise_cipher;
-@@ -215,6 +217,11 @@ void handshake_state_set_ssid(struct handshake_state *s,
- void handshake_state_set_mde(struct handshake_state *s,
- 					const uint8_t *mde);
- void handshake_state_set_fte(struct handshake_state *s, const uint8_t *fte);
-+void handshake_state_set_authenticator_fte(struct handshake_state *s,
-+						const uint8_t *fte);
-+void handshake_state_set_supplicant_fte(struct handshake_state *s,
-+						const uint8_t *fte);
-+
- void handshake_state_set_vendor_ies(struct handshake_state *s,
- 					const struct iovec *iov,
- 					size_t n_iovs);
+ 	s->ptk_complete = false;
+diff --git a/src/netdev.c b/src/netdev.c
+index f2e887b4..b9dc930e 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2777,7 +2777,7 @@ process_resp_ies:
+ 			 */
+ 			if (ie_parse_fast_bss_transition_from_data(fte,
+ 					fte[1] + 2, kck_len, &ft_info) >= 0) {
+-				handshake_state_set_fte(hs, fte);
++				handshake_state_set_authenticator_fte(hs, fte);
+ 				handshake_state_set_kh_ids(hs,
+ 							ft_info.r0khid,
+ 							ft_info.r0khid_len,
 -- 
 2.34.1
 
