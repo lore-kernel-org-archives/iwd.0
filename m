@@ -1,49 +1,49 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3011548CEE
-	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 16:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12B647778
+	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 17:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SFJKVxDG"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-67a934a5b7eso44216d6.3
-        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 08:49:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dfLrYRn2"
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6d9ac148ca3so1879220a34.0
+        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 09:00:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701881349; x=1702486149; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1701882032; x=1702486832; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=yhV4x6FAzwAr36UjdqAZHYaTT7li/3itgp1J5cI/tI4=;
-        b=SFJKVxDGUg2B8Jic2BfhITkzItCe1J3noy0n96QDWbuapa1j7BEgqVo//mROCz864C
-         HHZ07+DHI94gUBNluJNtflewnVwJFnwG0OIZ49TYvPpq4rxRa3iQ+J5nDabcSE8/S1au
-         g+oGmq5qfsujiMMZ1GjjM6V6IMkl1cqQcnAXdOnM4ids3n+rvUoKmV0AZLOsdKEtcEA9
-         IDJeU6wGHDq0P8/NHgJgXnC9zE9q7/jaN54MWWEZV8wqIAe3M3BJZXmwgNmOSanHQxxS
-         Q89ovF2hCS4JnHB54RmEyPUK/cnQQxdQidqsIDrAXCjxWgQWyKKmwN0mIfQjABxKr5iV
-         YMzg==
+        bh=Ng++ZwWNV8ouhh/GOKQy8cNN4JDR9cCRH0k8Lggh/X0=;
+        b=dfLrYRn2SJtVT4t3pgISls1o+pYZuEKojDuJ9QfiL8RRelKxhYYIqBXKIM3QMM1qUm
+         ryksi4P9LqOJuG7d703BhWmKZU2k7pOurHhUns7FHwPGxUshcho0UAqEOYaOGxu9dzvM
+         c5dvUhc8jIz4YbEUiN1CsXY190Z50k3JAficiD/cYiAH+MuWyauLc5qCbVD4lEjE78XP
+         dKbxqZEUg/YfhlZ42qCw8xWdDyqM5dYA0e94ewVzv+GRT203EgT434OxU4pJaVTld+XA
+         CDFNCpAfxQTdjfU0ZQNkV4Cj00DZEu6pvy0P99pCkfIRX7fbE4zNJg7h7WSl1t3jm9EQ
+         aGkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701881349; x=1702486149;
+        d=1e100.net; s=20230601; t=1701882032; x=1702486832;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yhV4x6FAzwAr36UjdqAZHYaTT7li/3itgp1J5cI/tI4=;
-        b=ALHIofrY3aJT3jdTliSlMhBGPwUWW8K+z2EP46z79edzfwUT0ebKHg+Y+LrRK5zaKI
-         hVZ9JviAlDSlcyWGuQAsIbhHLxGeEH/RSkAzvkXDFRXBkM2ahYnjx5JUj3RBMqW0QGDq
-         pZ7Tvlnp2BVBGiUlWw0RfsJSRnv3QrEWVtd2iUcS8NTxMMOe5gmh6T9FEsTeiQinmca5
-         rxGu66z/sHnKIfGGYvAbryXH58QPWWI3FMRme5mWFN6Ac8UsESDMt4mAFdDWPkfpEkQo
-         ErvKXX9vi4CHRBZ0CyBDoYAHvMNpP6XQwhGuaAgYxTQ67WjMBZNCAV/0Aqi+EOYEar1R
-         yyMA==
-X-Gm-Message-State: AOJu0Yx4yUTTDujCbMTMs/YNYtqgAJAdjuC+T7Yvi0M/osVMgcdld1XA
-	lV9/5zsBqORHFO4w75tcSF4=
-X-Google-Smtp-Source: AGHT+IErkp6tCQKx7QhtDqnRqNO9x//GB433UpdyUdDrZw4SAaP/R9vfHNEJNhgBXq7tn8ZzErGfhg==
-X-Received: by 2002:a05:6214:580a:b0:67a:6041:6f94 with SMTP id mk10-20020a056214580a00b0067a60416f94mr1213404qvb.24.1701881348941;
-        Wed, 06 Dec 2023 08:49:08 -0800 (PST)
-Received: from [10.102.4.159] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id n13-20020a056214008d00b0067a11a3be11sm107958qvr.61.2023.12.06.08.49.08
+        bh=Ng++ZwWNV8ouhh/GOKQy8cNN4JDR9cCRH0k8Lggh/X0=;
+        b=FQtUrZciEAJvAnp7UJy2wPpRZ/v+9LmPWuE8SUBgL17UTj1dMXToWup6thetfUTd1y
+         M1Qw1qNHXuikPaIbBTZsAXCpmgRoK2pDWGCQFNQE6i4W/KS3k/5XHiwPuAxfwaMc/iiu
+         ohtpUVh/SJZC7QtL/avrVO3vU0lAQOsMaaM/1GNze/2enokb0O5Hl4HyD4nFhV7MafVU
+         TqsM/LNVi9pjmXfoltktF74nldy2lAiecxpf2oFEIM6f3zLuAksJvADaabIl5B7MFjU3
+         6F2MBRRlxCU0+edoxv1HFKe0tchV07OjXy6+jXrV7zJlH1HnGW4Uk3JCD9mFjkIQaRlD
+         v4bw==
+X-Gm-Message-State: AOJu0Yyt02pf1bOQz+ZRWVLZpyPBKfhIvYGZjFYyJe5ealVrBA8ze4K/
+	jF1furkyOjvy1tHwimabjYxtGS2q5/k=
+X-Google-Smtp-Source: AGHT+IHEyMkAIFoENqVORTQ9ylhtmj65fruQKgSlYqinZYhboB2nzZgqHof6RavLZskL/KcjJhKiIA==
+X-Received: by 2002:a05:6871:430c:b0:1fa:dae2:8406 with SMTP id lu12-20020a056871430c00b001fadae28406mr1429509oab.0.1701882032606;
+        Wed, 06 Dec 2023 09:00:32 -0800 (PST)
+Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id dx47-20020a05687076af00b001faf9c803ecsm49061oab.50.2023.12.06.09.00.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Dec 2023 08:49:08 -0800 (PST)
-Message-ID: <33f261dd-5dbb-4c5f-9943-0cbadc2773a6@gmail.com>
-Date: Wed, 6 Dec 2023 08:49:07 -0800
+        Wed, 06 Dec 2023 09:00:32 -0800 (PST)
+Message-ID: <2a454f5d-be76-46b5-959d-29104100b3aa@gmail.com>
+Date: Wed, 6 Dec 2023 11:00:31 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,90 +51,28 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/9] netdev: add netdev_ft_reassociate
+Subject: Re: [PATCH 01/10] scan: parse password identifier/exclusive bits
 Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20231206150708.2080336-1-prestwoj@gmail.com>
- <20231206150708.2080336-7-prestwoj@gmail.com>
- <054746c2-f399-4c2c-b041-b76e7a34ada7@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <054746c2-f399-4c2c-b041-b76e7a34ada7@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20231205154647.1778389-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20231205154647.1778389-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
+Hi James,
 
-On 12/6/23 08:40, Denis Kenzior wrote:
-> Hi James,
->
-> On 12/6/23 09:07, James Prestwood wrote:
->> Essentially exposes (and renames) netdev_ft_tx_associate in order to
->> be called similarly to netdev_reassociate/netdev_connect where a
->> connect callback can be provided. This will fix the current bug where
->> if association times out during FT IWD will hang and never transition
->> to disconnected.
->>
->
-> I like it!
->
-> Nitpick below...
->
->> This also removes the calling of the FT_ROAMED event and instead just
->> calls the connect callback (since its now set). This unifies the
->> callback path for reassociation and FT roaming.
->> ---
->>   src/netdev.c | 44 ++++++++++++++++++++++++++------------------
->>   src/netdev.h |  5 +++++
->>   2 files changed, 31 insertions(+), 18 deletions(-)
->>
->
-> <snip>
->
->> diff --git a/src/netdev.c b/src/netdev.c
->> index f2e887b4..7d52ffea 100644
->> --- a/src/netdev.c
->> +++ b/src/netdev.c
->> @@ -1409,16 +1409,14 @@ static void netdev_connect_ok(struct netdev 
->> *netdev)
->>               scan_bss_free(netdev->fw_roam_bss);
->>             netdev->fw_roam_bss = NULL;
->> -    } else if (netdev->in_ft) {
->> -        if (netdev->event_filter)
->> -            netdev->event_filter(netdev, NETDEV_EVENT_FT_ROAMED,
->> -                        NULL, netdev->user_data);
->> -        netdev->in_ft = false;
->>       } else if (netdev->connect_cb) {
->>           netdev->connect_cb(netdev, NETDEV_RESULT_OK, NULL,
->>                       netdev->user_data);
->>           netdev->connect_cb = NULL;
->> -    }
->> +        netdev->in_ft = false;
->> +        netdev->in_reassoc = false;
->
-> Why do we set in_reassoc to false here?  Shouldn't it be taken care of 
-> already by the associate_event?
-I did this out of an abundance of caution. But yes I see we set it to 
-false if !netdev->ap && !netdev->in_ft, so I can remove this.
->
->> +    } else
->> +        l_warn("Connection event without a connect callback!");
->>         netdev_rssi_polling_update(netdev);
->
-> <snip>
->
->> @@ -6256,7 +6265,6 @@ static int netdev_init(void)
->>       __eapol_set_install_pmk_func(netdev_set_pmk);
->>         __ft_set_tx_frame_func(netdev_tx_ft_frame);
->> -    __ft_set_tx_associate_func(netdev_ft_tx_associate);
->
-> This part probably belongs in the next patch or even patch 8.
+On 12/5/23 09:46, James Prestwood wrote:
+> These bits are used to communicate to the station that SAE password
+> identifiers are used or required.
+> ---
+>   src/scan.c | 20 +++++++++++++++++---
+>   src/scan.h |  2 ++
+>   2 files changed, 19 insertions(+), 3 deletions(-)
+> 
 
-The problem is I removed the function so gcc will warn/break the build.
+I applied patches 1, 2, 3, 5, 8 and 9.
 
->
->>         unicast_watch = l_genl_add_unicast_watch(genl, 
->> NL80211_GENL_NAME,
->>                           netdev_unicast_notify,
->
-> Regards,
-> -Denis
->
+Regards,
+-Denis
+
