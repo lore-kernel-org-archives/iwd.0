@@ -1,53 +1,56 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA4130FB9
-	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 15:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881C53EA88
+	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 15:07:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BqBCHife"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-77f335002cfso24231985a.3
-        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 07:07:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UpFoQJtl"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-77d6f853ba0so75265985a.0
+        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 07:07:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701875233; x=1702480033; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eo7LoRiyFHZnQYNRaVHQRhA860PQqGkYSjurFGA2CJ4=;
-        b=BqBCHifeXcqyndb8VU9hoIGdDOUMnliZ8WzyhEcPfYvwmplINoAdxn8GgqV0Vj914X
-         ODBlMdKOQZJIcVZDkgNIgK+uCYhr13xj8nF8oh7+T+pv2V++6xBi9ZHSC8oOdKI4t1jr
-         cPT7iuuLD3/cFIlv4RP/reXzFsU/ZQzoCgM3d488EeP/KGQJDOUB9ckRzF3J2+7xUk7s
-         p5z+uKxDmlDrKFOPu0oEJlcv18V0rXyWrdLLnxhqehWi1KgfxVS8gOEt6S1ypEPse3YD
-         wHH/6YIs2JaK88G26TnE1gZhqZ0Tf/lDchJjhQzLiTWry3c0FNV2VJK7jNpgtqsVQV3E
-         AZMw==
+        d=gmail.com; s=20230601; t=1701875234; x=1702480034; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+xwFQUTrHOLX7y/IAk/sto27WOQCKLdXHLGZNIDFn+M=;
+        b=UpFoQJtl1MLZ2AM5jy+eVbTnxi7/atX61r4Qg9tB6YDXj2oVgL9ScdzOWQkZD2LFwa
+         89ODQY9aGjddLoU04b+vPxoKNkFxGPnMdtXU6nvAIFKenksIfytD0bj1eT91LMFGPqM4
+         kafzflac4ejRok5WqfaoE5SQX1i5cKey6bicKkmC3yxFWW4OOtvnSPFJYnoncrJju3YU
+         4Q3i68FQ//CZljXuTjsvUTTWhILPEzANLRBdmDTd6goRla8DX3TFZYtN7iD6Xmftn8No
+         HybPScbxVjeIU3WGP+Qucpf+AifFR3BenS/AVtfjRy7w+/UsjC2n9dmf1xrugG/2zIsp
+         UvMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701875233; x=1702480033;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eo7LoRiyFHZnQYNRaVHQRhA860PQqGkYSjurFGA2CJ4=;
-        b=dPK4GHKmCBeFSNFGH4Bv4TMo5PlnpFGtHmNBRSJ1WjBBAzDdPC8pdoOa+NIdnpKtfy
-         78/vADivwVIJU9d6KS4IP5MvB9Lr+pNzB0Rz321omSryevG09JGK6284xR307iLM4fxL
-         OCw05c1uHqjk1peRkYd0Wbtylwce3P6kKoGrUC6UX/OlriyunXERRL7yjqYAHiNux1Mm
-         fHmuuKOnGtJsInO4NGQedEuddTAFckar6/V+JHyEZUumaRPHRViY+aywojW+8SNzRt4P
-         lLfhLTGp7H90SyCMfyl+1gJi3QiI7s8TCcEH6BsTVQoVIRMbujVV9FYITHO3K3SCgqUC
-         pQcQ==
-X-Gm-Message-State: AOJu0YxQRjntF2M6kZFD1yOVvsmWPnbDimeSK/KlpiB0EKrV5h/c9sow
-	sJuZPOXW4Le6OsItTZ/RrIUVoKY1Sjk=
-X-Google-Smtp-Source: AGHT+IH9LzBF6yvrdNUPVyH4i27FnCnxA8lxxDIiHJjxwMJ9M7CueO4giQlpP8yuXkA4V+xxJI8n9Q==
-X-Received: by 2002:a05:620a:4589:b0:77e:fba3:a23a with SMTP id bp9-20020a05620a458900b0077efba3a23amr994491qkb.148.1701875232895;
-        Wed, 06 Dec 2023 07:07:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701875234; x=1702480034;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+xwFQUTrHOLX7y/IAk/sto27WOQCKLdXHLGZNIDFn+M=;
+        b=GmY5ADodBzeY2GwHsQC35yznYXkchCQujRqDzjcwybdjcQbd9LYGUggja5NB94jLhk
+         nBbK4huCg7bfuNWH2peLrom/OMpevwDNgAzp9ORHoh9uO5ShGQE5eEP4vzLhiKASwFzo
+         +Dr+L+gszJw6LcCrJ4TV4c6hRGiEZnFI9aE2iOO/Gyb6NutqIcH1BJw6PrPOrO4BNiO4
+         JqBcrIDApIxzjorG1bjU3b3mttfTQFPw/Oyf/T7QbV46jw4JHjCfQYqsGVOmaGyill5T
+         ZhFlXasNm1YsILfHpzH5VzCEkNhLyhKqYnAN5NNB1Yy3KFJH3H6x5/twBhq4l85CUg3q
+         wIYA==
+X-Gm-Message-State: AOJu0YyjVzQY6lgiwrVJzdn+7V50XI2zClAKVNXRFBL7sxRMgee4wn+h
+	+0Auwwru0zO1wNt61StpoMx0N8bHB5c=
+X-Google-Smtp-Source: AGHT+IEwo4k6J4bKIEe9qx9L/TIGF/qO8dAkSFVeH976a7oxMC6OdlIYnFDILDUexltuXoEIXvoMkA==
+X-Received: by 2002:a05:620a:4387:b0:77f:be1:7fe7 with SMTP id a7-20020a05620a438700b0077f0be17fe7mr1516676qkp.45.1701875234183;
+        Wed, 06 Dec 2023 07:07:14 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id vy22-20020a05620a491600b0077d66277e9asm11506qkn.116.2023.12.06.07.07.11
+        by smtp.gmail.com with ESMTPSA id vy22-20020a05620a491600b0077d66277e9asm11506qkn.116.2023.12.06.07.07.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 07:07:12 -0800 (PST)
+        Wed, 06 Dec 2023 07:07:13 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 0/9] Reassoc/FT roaming unification
-Date: Wed,  6 Dec 2023 07:06:59 -0800
-Message-Id: <20231206150708.2080336-1-prestwoj@gmail.com>
+Subject: [PATCH v2 1/9] auto-t: add explicit stop() to IWD class
+Date: Wed,  6 Dec 2023 07:07:00 -0800
+Message-Id: <20231206150708.2080336-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231206150708.2080336-1-prestwoj@gmail.com>
+References: <20231206150708.2080336-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -56,39 +59,28 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Intead of adding a layer of abstraction through ft.c I instead just
-added netdev_ft_reassociate. I chose not to reuse netdev_reassociate
-due to its handling of soft/fullmac cards, new vs existing handshake
-object, and its use of CMD_CONNECT vs CMD_ASSOCIATE. The added logic
-seemed too complex.
+If tests end in an unknown state it is sometimes required that IWD
+be stopped manually in order for future tests to run. Add a stop()
+method so test tearDown() methods can explicitly stop IWD.
+---
+ autotests/util/iwd.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Side note, we probably need to look into abandoning CMD_CONNECT for
-reassociation as the kernel _still_ sends an Authenticate frame when
-it shouldn't. Maybe at that point we could merge netdev_ft_reassociate
-and netdev_reassociate, but for now this patch set fixes the issue at
-hand.
-
-James Prestwood (9):
-  auto-t: add explicit stop() to IWD class
-  auto-t: add association timeout test
-  auto-t: only call set_value for changed values in default()
-  ft: add FTE/RSNE building to ft_prepare_handshake
-  ft: add ft_handshake_setup
-  netdev: add netdev_ft_reassociate
-  station: use netdev_ft_reassociate
-  ft: remove ft_associate and helpers
-  netdev: station: remove NETDEV_EVENT_FT_ROAMED
-
- autotests/testPSK-roam/failed_roam_test.py |  56 ++++--
- autotests/util/hostapd.py                  |   9 +-
- autotests/util/iwd.py                      |   4 +
- src/ft.c                                   | 222 ++++++++-------------
- src/ft.h                                   |   4 +-
- src/netdev.c                               |  44 ++--
- src/netdev.h                               |   6 +-
- src/station.c                              |  20 +-
- 8 files changed, 183 insertions(+), 182 deletions(-)
-
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 3f200beb..b1a57cab 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -1363,6 +1363,10 @@ class IWD(AsyncOpAbstract):
+ 
+         self.psk_agents = []
+ 
++    def stop(self):
++        if self.namespace.is_process_running('iwd'):
++            self._iwd_proc.kill()
++
+     def __del__(self):
+         for agent in self.psk_agents:
+             self.unregister_psk_agent(agent)
 -- 
 2.34.1
 
