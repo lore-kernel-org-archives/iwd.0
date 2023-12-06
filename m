@@ -1,53 +1,53 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DF06F604
-	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 20:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E836F61F
+	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 20:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0x0oEEK"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d048c171d6so1453085ad.1
-        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 12:18:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CIW+8r0I"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d0c94397c0so1253345ad.2
+        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 12:18:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1701893892; x=1702498692; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RyQGXto/GxzHzfAsGHjVXz/14qfSbn0f8ejMzfWWMqs=;
-        b=Q0x0oEEKaPnGu2QtDNQjXLNyz6TT3UWIVwXQ8AbAbQIWpdbWfGUNqptYj44Nb2bEhf
-         wioT6P8dBWBqqsHVRUixWa5/4Nvw4feq7WClE+oNP6WHT8NiGjyEamu5o4MO1pgQNj/m
-         KQcJNqZGbSf9xEpUf9Ei62boK6NhwGx6tMKlRqg3cllk5begpOLwWUAWCkvHE3umUCj6
-         Boeo1UJOBI/fdC45Y/qLA1gTpRq/DvCRkR5804SKwe433Ibc0GrFwPTwUHQ4c+lx0ZMK
-         CnFPXZg3hDe1vJRHsS4o/SThbYpat40YLrTAW6/a7nRvZsR229LYUncqIbRhCRMSWhQJ
-         Enow==
+        bh=N8ajSUum+U4KJg54/Nve5xodtgkJ4Z3hifVFPGvmfaM=;
+        b=CIW+8r0IgC3+uJ+VZDxtWkWSN6LQrtM8kXxib0lOlCE0Xu4LWvJkIwLDWn6nrYcekx
+         Qpv0+8/YGvPJlUckzThzV5JZ9rnx6Le/11XNfNgJVuPYjP8uFB7XDEqkgDmqQaGzPWn2
+         S87RLHkxkHL/KqgrODJrZfrILiAm1GPtIthMyoj3NkqLFqplO7N9fCHYu2fB/OLwPDgO
+         1KOjFjCyPthMkkpFFJx5i/8WkcDXAXYTGs+uOXWZH6g9VcIixaSiCZfTi/TrvgBQhWIq
+         GV3Oe9sBu57NzWav2MPMAfIhFZuRLDGzWjwOKTfeQaphmulF8v8rsHeN0vC64qnraDcC
+         15QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1701893892; x=1702498692;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RyQGXto/GxzHzfAsGHjVXz/14qfSbn0f8ejMzfWWMqs=;
-        b=WDPBwjcWrvZZuL82VJvyvDhVyRWZlGnrqZcBNU7VJuCc48K4gsLF2Ab4VWPQWdaMIq
-         4eZawgycoSVr+J/z/+ch9JbX/hBlY8UMBp+XZQbQGIlsZkfm2vQVLCbe5n8xNcfiKIdB
-         6QPyHvI953uwDDUMOWZg+AaZUGZvE+vFw1Eg2SZsg9ADya6tBW7RVgf7X4g3QrN0e1Nw
-         6108FZnynqxttzhNQJoSkmIdZRnMtCnRpuVmQoNTXulF9DtH+80zCePXh+5PENcvMscd
-         TuH29fruxtGW4dN6wtYlKKdUjEHLL2gVNhE6mFqIJ1FuMj3xJHpM/iviK6D9WopeKr00
-         ZK3A==
-X-Gm-Message-State: AOJu0YwmHIrQP9C30GXrJFzrus6VaUdnp1sCReaow+qIQIFhDQYDZOOT
-	pi7GNM1LnjdILGTXYIp4aJTC+fJS07LOZg==
-X-Google-Smtp-Source: AGHT+IGNme2hqmsGmSEUA9ayod4/Y7pU4T52Blx7CeJ2c1z9/ayBSYw3ZOKwsfj6dsRMSMoLeNhpIg==
-X-Received: by 2002:a17:903:483:b0:1d0:60cc:7ebb with SMTP id jj3-20020a170903048300b001d060cc7ebbmr1405718plb.25.1701893891971;
-        Wed, 06 Dec 2023 12:18:11 -0800 (PST)
+        bh=N8ajSUum+U4KJg54/Nve5xodtgkJ4Z3hifVFPGvmfaM=;
+        b=f43Q4z3N24tA9ugZsAzIYkiRpUBd5GBqAi0HzWKhJgaeTnxVb7YMDSX+K/zVdzwM9i
+         EZI+IhC3c1LQv7qgt+cgwZG4Bd8lH4nNuzc4ZeiHX6lxwxw3ynIbLtPQ1qfWCXM8jPts
+         lTTd1nYZ3a6l4o/ox6D7VHB0fkcwVabvna3BRptgeK+ljvLMLNVMTJL9CYs/dnkabDnl
+         HHqCQcPapx2scyqP9kRaEaj8jay9RKu7S+Da9i2vn7XWvf2pEJ9ILrhjv1uSeHQ8wfEA
+         +y0e+tuhD8g7Z2VnHx9idBtzu/YWbdl2BTrc92yW2lxtKsIA436YpF4bwfN+nkMmfjDt
+         PrHw==
+X-Gm-Message-State: AOJu0YwK0MbDMI20DdPw1Wy44bp1f/wpcliqhbhjYEeKuYQlFk+QTBUP
+	NUKvvdokYXSWYnBHFdfpXRxD6FJKVeQrzA==
+X-Google-Smtp-Source: AGHT+IHO25WLCOPkudPcvChAt+JUiMSr41SYbmGel6D9gB38DesTHIDEBuJa8KP3JoJZSxsSFCifZw==
+X-Received: by 2002:a17:902:c94b:b0:1d0:6ffd:ae11 with SMTP id i11-20020a170902c94b00b001d06ffdae11mr1687058pla.120.1701893892455;
+        Wed, 06 Dec 2023 12:18:12 -0800 (PST)
 Received: from LOCLAP699.. ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id by40-20020a056a0205a800b005c2185be2basm243168pgb.54.2023.12.06.12.18.11
+        by smtp.gmail.com with ESMTPSA id by40-20020a056a0205a800b005c2185be2basm243168pgb.54.2023.12.06.12.18.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 12:18:11 -0800 (PST)
+        Wed, 06 Dec 2023 12:18:12 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 09/13] ft: add ft_handshake_setup
-Date: Wed,  6 Dec 2023 12:17:58 -0800
-Message-Id: <20231206201802.2139649-9-prestwoj@gmail.com>
+Subject: [PATCH v3 10/13] netdev: add netdev_ft_reassociate
+Date: Wed,  6 Dec 2023 12:17:59 -0800
+Message-Id: <20231206201802.2139649-10-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231206201802.2139649-1-prestwoj@gmail.com>
 References: <20231206201802.2139649-1-prestwoj@gmail.com>
@@ -59,80 +59,132 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This will be called from station after FT-authentication has
-finished. It sets up the handshake object to perform reassociation.
+Essentially exposes (and renames) netdev_ft_tx_associate in order to
+be called similarly to netdev_reassociate/netdev_connect where a
+connect callback can be provided. This will fix the current bug where
+if association times out during FT IWD will hang and never transition
+to disconnected.
 
-This is essentially a copy-paste of ft_associate without sending
-the actual frame.
+This also removes the calling of the FT_ROAMED event and instead just
+calls the connect callback (since its now set). This unifies the
+callback path for reassociation and FT roaming.
 ---
- src/ft.c | 40 ++++++++++++++++++++++++++++++++++++++++
- src/ft.h |  2 ++
- 2 files changed, 42 insertions(+)
+ src/netdev.c | 43 +++++++++++++++++++++++++------------------
+ src/netdev.h |  5 +++++
+ 2 files changed, 30 insertions(+), 18 deletions(-)
 
-diff --git a/src/ft.c b/src/ft.c
-index d3b9234a..c612a433 100644
---- a/src/ft.c
-+++ b/src/ft.c
-@@ -1276,6 +1276,46 @@ int ft_associate(uint32_t ifindex, const uint8_t *addr)
- 	return ret;
+diff --git a/src/netdev.c b/src/netdev.c
+index b9dc930e..522baf7a 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1409,16 +1409,13 @@ static void netdev_connect_ok(struct netdev *netdev)
+ 			scan_bss_free(netdev->fw_roam_bss);
+ 
+ 		netdev->fw_roam_bss = NULL;
+-	} else if (netdev->in_ft) {
+-		if (netdev->event_filter)
+-			netdev->event_filter(netdev, NETDEV_EVENT_FT_ROAMED,
+-						NULL, netdev->user_data);
+-		netdev->in_ft = false;
+ 	} else if (netdev->connect_cb) {
+ 		netdev->connect_cb(netdev, NETDEV_RESULT_OK, NULL,
+ 					netdev->user_data);
+ 		netdev->connect_cb = NULL;
+-	}
++		netdev->in_ft = false;
++	} else
++		l_warn("Connection event without a connect callback!");
+ 
+ 	netdev_rssi_polling_update(netdev);
+ 
+@@ -4205,13 +4202,14 @@ static int netdev_tx_ft_frame(uint32_t ifindex, uint16_t frame_type,
+ 	return 0;
  }
  
-+int ft_handshake_setup(uint32_t ifindex, const uint8_t *target)
-+{
-+	struct netdev *netdev = netdev_find(ifindex);
-+	struct handshake_state *hs = netdev_get_handshake(netdev);
-+	struct ft_info *info;
-+	int ret = 0;
-+
-+	info = ft_info_find(ifindex, target);
-+	if (!info)
-+		return -ENOENT;
-+
-+	/*
-+	 * Either failed or no response. This may have been an FT-over-DS
-+	 * attempt so clear out the entry so FT-over-Air can try again.
-+	 */
-+	if (info->status != 0) {
-+		int status = info->status;
-+
-+		l_queue_remove(info_list, info);
-+		ft_info_destroy(info);
-+
-+		return status;
-+	}
-+
-+	/*
-+	 * This shouldn't ever fail:
-+	 *  - supplicant_ie has already been validated long ago
-+	 *  - l_checksum_* shouldn't fail since we presumable have kernel
-+	 *    support, how else could we have made it this far.
-+	 * But just in case...
-+	 */
-+	if (L_WARN_ON(!ft_prepare_handshake(info, hs)))
-+		ret = -EINVAL;
-+
-+	/* After this no previous auths will be valid */
-+	ft_clear_authentications(ifindex);
-+
-+	return ret;
-+}
-+
- static bool remove_ifindex(void *data, void *user_data)
+-static int netdev_ft_tx_associate(uint32_t ifindex, uint32_t freq,
+-					const uint8_t *prev_bssid,
+-					struct iovec *ft_iov, size_t n_ft_iov)
++int netdev_ft_reassociate(struct netdev *netdev,
++				const struct scan_bss *target_bss,
++				const struct scan_bss *orig_bss,
++				netdev_event_func_t event_filter,
++				netdev_connect_cb_t cb, void *user_data)
  {
- 	struct ft_info *info = data;
-diff --git a/src/ft.h b/src/ft.h
-index 51bbe3bc..23d0136e 100644
---- a/src/ft.h
-+++ b/src/ft.h
-@@ -39,6 +39,8 @@ void __ft_rx_action(uint32_t ifindex, const uint8_t *frame, size_t frame_len);
- void __ft_rx_authenticate(uint32_t ifindex, const uint8_t *frame,
- 				size_t frame_len);
+-	struct netdev *netdev = netdev_find(ifindex);
+-	struct netdev_handshake_state *nhs;
+ 	struct handshake_state *hs = netdev->handshake;
++	struct netdev_handshake_state *nhs;
+ 	struct l_genl_msg *msg;
+ 	struct iovec iov[64];
+ 	unsigned int n_iov = L_ARRAY_SIZE(iov);
+@@ -4223,11 +4221,14 @@ static int netdev_ft_tx_associate(uint32_t ifindex, uint32_t freq,
+ 	 * At this point there is no going back with FT so reset all the flags
+ 	 * needed to associate with a new BSS.
+ 	 */
+-	netdev->frequency = freq;
++	netdev->frequency = target_bss->frequency;
+ 	netdev->handshake->active_tk_index = 0;
+ 	netdev->associated = false;
+ 	netdev->operational = false;
+ 	netdev->in_ft = true;
++	netdev->event_filter = event_filter;
++	netdev->connect_cb = cb;
++	netdev->user_data = user_data;
  
-+int ft_handshake_setup(uint32_t ifindex, const uint8_t *target);
+ 	/*
+ 	 * Cancel commands that could be running because of EAPoL activity
+@@ -4271,15 +4272,22 @@ static int netdev_ft_tx_associate(uint32_t ifindex, uint32_t freq,
+ 
+ 	c_iov = netdev_populate_common_ies(netdev, hs, msg, iov, n_iov, c_iov);
+ 
+-	if (!L_WARN_ON(n_iov - c_iov < n_ft_iov)) {
+-		memcpy(iov + c_iov, ft_iov, sizeof(*ft_iov) * n_ft_iov);
+-		c_iov += n_ft_iov;
+-	}
++	if (hs->supplicant_ie)
++		c_iov = iov_ie_append(iov, n_iov, c_iov, hs->supplicant_ie,
++					IE_LEN(hs->supplicant_ie));
 +
- void ft_clear_authentications(uint32_t ifindex);
- int ft_action(uint32_t ifindex, uint32_t freq, const struct scan_bss *target);
- int ft_associate(uint32_t ifindex, const uint8_t *addr);
++	if (hs->supplicant_fte)
++		c_iov = iov_ie_append(iov, n_iov, c_iov, hs->supplicant_fte,
++					IE_LEN(hs->supplicant_fte));
++
++	if (hs->mde)
++		c_iov = iov_ie_append(iov, n_iov, c_iov, hs->mde,
++					IE_LEN(hs->mde));
+ 
+ 	mpdu_sort_ies(subtype, iov, c_iov);
+ 
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_PREV_BSSID, ETH_ALEN,
+-				prev_bssid);
++				orig_bss->addr);
+ 	l_genl_msg_append_attrv(msg, NL80211_ATTR_IE, iov, c_iov);
+ 
+ 	netdev->connect_cmd_id = l_genl_family_send(nl80211, msg,
+@@ -6256,7 +6264,6 @@ static int netdev_init(void)
+ 	__eapol_set_install_pmk_func(netdev_set_pmk);
+ 
+ 	__ft_set_tx_frame_func(netdev_tx_ft_frame);
+-	__ft_set_tx_associate_func(netdev_ft_tx_associate);
+ 
+ 	unicast_watch = l_genl_add_unicast_watch(genl, NL80211_GENL_NAME,
+ 						netdev_unicast_notify,
+diff --git a/src/netdev.h b/src/netdev.h
+index 03d1b6e9..fb31b571 100644
+--- a/src/netdev.h
++++ b/src/netdev.h
+@@ -165,6 +165,11 @@ int netdev_reassociate(struct netdev *netdev,
+ 			struct handshake_state *hs,
+ 			netdev_event_func_t event_filter,
+ 			netdev_connect_cb_t cb, void *user_data);
++int netdev_ft_reassociate(struct netdev *netdev,
++				const struct scan_bss *target_bss,
++				const struct scan_bss *orig_bss,
++				netdev_event_func_t event_filter,
++				netdev_connect_cb_t cb, void *user_data);
+ 
+ int netdev_preauthenticate(struct netdev *netdev,
+ 				const struct scan_bss *target_bss,
 -- 
 2.34.1
 
