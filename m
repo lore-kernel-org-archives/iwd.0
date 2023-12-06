@@ -1,53 +1,53 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D601A30FB9
-	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 15:07:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76D43EA88
+	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 15:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5rGVepU"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-77d63b733e4so428417185a.2
-        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 07:07:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZM5Lg1I"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-77f320ca2d5so35644885a.1
+        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 07:07:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701875235; x=1702480035; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1701875236; x=1702480036; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eVHMO7Otc6oGvuT5BowEFRQ4zTPllN713Scz6cm8/k0=;
-        b=Y5rGVepU5lSXRVXvg/j07Itxw6eTGCJ+x5Fzsz+hS7cLDczxzFQ7lhoHpz9dgq0NP9
-         cOy461W1S5DYIZvHqJ4wB00aKTCa7s9Hay6BdKt4GSLiPjfm1HGN3Ru24uDJRLbnbFau
-         GojHjdQ2PEDwadZZXO0gKNK59C8KZo/nmiI2yp6AMboL7lQaVIGmMsgUlOROP35GfYPY
-         nmaVZQ6TpFJhdFtRTsqUSNra2iYfJwPO8qcQ+SLyEweP8usam2RC9j0Dd0uwMD2xjL+W
-         ajiLa4jd+Z22gC8+xGa/iwB9G/NEl0wKOTqsjr6vA9CMuuS1ILlzzqjRisKOG+tfvXOT
-         rS5Q==
+        bh=Rj82y449AvkdKesQQUHyj+VdUVbSc8ccNljz1Eh1eO4=;
+        b=NZM5Lg1Ikx18TcK6N3S0nRbkSSRwa63JiulDZMDx4HAw/MofhuzLc51WqtveprYFow
+         cqGVKCn0Xy49opABTtz3QOl8fCI3hqdqnFnEs4ita1MaISBN8HM/243oIj6iujWlO0Lb
+         NtwXV1N9BCJFx9IsP8l2qEhOTdqix+PvNxBBsWKnshHHlx8/prRqH2bKHsX40MZD4GgA
+         JMIniKYcfk563IFbdNkn1JkBIPnTepHGCNHQLnhZOzFlCsJyf2TegFg7SXdtoZndHvsz
+         9CfRZAFlwxGOXVxXqwzOxb/E53BI7FjDEe+oCYeqaTwhvtb/Iz3yaXXoebNJZFLGJV5c
+         ytDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701875235; x=1702480035;
+        d=1e100.net; s=20230601; t=1701875236; x=1702480036;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eVHMO7Otc6oGvuT5BowEFRQ4zTPllN713Scz6cm8/k0=;
-        b=BOLWy6+dR9W6ddL5qLd13LLyvF85dRWCoY0Idbe5uC2ej5VcCFd6rMh5W4wqqMCZoa
-         1bJP3x7QNjt8PawpQlvIMgzK+30IePvzILaPGOMWpGk45knPgLYAwOboz4kQlXoOUDdW
-         XKxIiCOU146h83tWvUwuHNeX4mccG2fJu3IKR5gtSeVAGmBltTScg2siFtg2cLvIZdlQ
-         yXC5f4KQJK0EcAnPKg6NMpNpUb/kaRrwWnpENObBVgwOZzpMVGZtiBS7O3K7pzxLgHra
-         j/PMgdzfNZvWpabk5fxgbVTy1ufy1n0xbrmi9J2OsH6ewgpH907AopBMoR1Edy6V5aKN
-         i70g==
-X-Gm-Message-State: AOJu0YxWfPs2qQksEZ1j5bayiCi7Ez8p5bCTw0e4gddA9SyHbjMQpCCz
-	Uu154ci3cdhpKc+661fQwhMJPN18J3o=
-X-Google-Smtp-Source: AGHT+IG97jT1BV8Hp7eAX7uHhkXWK7sdusvQFHTK+eobQXbM2Tye7Jg3xkus8a7wAfoCQ1d5Jr5QqA==
-X-Received: by 2002:a05:620a:8e82:b0:77f:38c:f03 with SMTP id rf2-20020a05620a8e8200b0077f038c0f03mr928629qkn.120.1701875235436;
-        Wed, 06 Dec 2023 07:07:15 -0800 (PST)
+        bh=Rj82y449AvkdKesQQUHyj+VdUVbSc8ccNljz1Eh1eO4=;
+        b=iVCruRnQkgN2Tjtq4WaZgwlGjI1HHXhuQqAyg+hchgutN4HMu1/uhZWCaI6/Ypy+/3
+         UGJUpq3BNl+2A6sWd/uNei/fupW4zDnX8ihMJ4c9bGpo9l1AUBeEpN3YAa24g381qsXp
+         HYz/TdA/AwmyxnQrLJjHhZeZ6p5DoVaqAxyw38wb2IfQZMghTl5oXJF8lEKpmw0qCiwv
+         sYS5kLbUnQeKSRPzDg0kbCGsS+Gk8IpxuftxLjesTEY+iYy/SFhuiRla5/oNtGvfGq1u
+         Xx88gG8jeb179TZnaDCUkV2vqLd0upVM1CxrNoajB9tDPtqBtyfYuIdYf+YUojCcZcFm
+         M+0A==
+X-Gm-Message-State: AOJu0Yx4Ee0DDMtgWbtQmYid4SfXgQjD/fASeFGxNcnAo13TVJ/vXGvi
+	NR2Ux03deWrtmC+P6Xfly3Ka2PHBSYI=
+X-Google-Smtp-Source: AGHT+IFGXqrnOeKqyJ3yCJckvocrKsb0gM30Oxyynn0CiAx4Bp3STF3eSH3RxfQ/qVzdiG+/OksoAg==
+X-Received: by 2002:a05:620a:11ba:b0:77f:2d0b:4dbb with SMTP id c26-20020a05620a11ba00b0077f2d0b4dbbmr1382410qkk.32.1701875236570;
+        Wed, 06 Dec 2023 07:07:16 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id vy22-20020a05620a491600b0077d66277e9asm11506qkn.116.2023.12.06.07.07.14
+        by smtp.gmail.com with ESMTPSA id vy22-20020a05620a491600b0077d66277e9asm11506qkn.116.2023.12.06.07.07.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 07:07:15 -0800 (PST)
+        Wed, 06 Dec 2023 07:07:16 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/9] auto-t: add association timeout test
-Date: Wed,  6 Dec 2023 07:07:01 -0800
-Message-Id: <20231206150708.2080336-3-prestwoj@gmail.com>
+Subject: [PATCH v2 3/9] auto-t: only call set_value for changed values in default()
+Date: Wed,  6 Dec 2023 07:07:02 -0800
+Message-Id: <20231206150708.2080336-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231206150708.2080336-1-prestwoj@gmail.com>
 References: <20231206150708.2080336-1-prestwoj@gmail.com>
@@ -59,153 +59,49 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This tests ensures IWD disconnects after receiving an association
-timeout event. This exposes a current bug where IWD does not
-transition to disconnected after an association timeout when
-FT-roaming.
+The default() method was added for convenience but was extending the
+test times significantly when the hostapd config was lengthy. This
+was because it called set_value for every value regardless if it
+had changed. Instead store the current configuration and in default()
+only reset values that differ.
 ---
- autotests/testPSK-roam/failed_roam_test.py | 56 +++++++++++++++-------
- 1 file changed, 38 insertions(+), 18 deletions(-)
+ autotests/util/hostapd.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/autotests/testPSK-roam/failed_roam_test.py b/autotests/testPSK-roam/failed_roam_test.py
-index 90f07f6b..d42002d4 100644
---- a/autotests/testPSK-roam/failed_roam_test.py
-+++ b/autotests/testPSK-roam/failed_roam_test.py
-@@ -46,11 +46,9 @@ class Test(unittest.TestCase):
-         self.rule2.enabled = True
-         self.rule3.enabled = True
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index 1b1bc399..cee08092 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -75,6 +75,8 @@ class HostapdCLI(object):
+         if self._default_config.get('vendor_elements', None) == None:
+             self._default_config['vendor_elements'] = ''
  
--        wd = IWD(True)
-+        device = self.wd.list_devices(1)[0]
- 
--        device = wd.list_devices(1)[0]
--
--        self.connect(wd, device, self.bss_hostapd[0])
-+        self.connect(self.wd, device, self.bss_hostapd[0])
- 
-         self.rule0.enabled = True
- 
-@@ -63,10 +61,25 @@ class Test(unittest.TestCase):
- 
-         # IWD should then try BSS 2, and succeed
-         device.wait_for_event('ft-roam', timeout=60)
--        self.verify_roam(wd, device, self.bss_hostapd[0], self.bss_hostapd[2])
-+        self.verify_roam(self.wd, device, self.bss_hostapd[0], self.bss_hostapd[2])
- 
-         self.bss_hostapd[2].deauthenticate(device.address)
- 
-+    # Tests that an associate even should cause a disconnect
-+    def test_ft_over_air_assoc_timeout(self):
-+        self.rule2.enabled = True
-+        self.rule3.enabled = True
-+        self.assoc_rule.enabled = True
++        self._current_config = self._default_config.copy()
 +
-+        device = self.wd.list_devices(1)[0]
+         if not self.interface:
+             raise Exception('config %s not found' % config)
+ 
+@@ -170,6 +172,8 @@ class HostapdCLI(object):
+         if self._default_config.get(key, None) == None:
+             raise Exception("Untracked setting '%s'! Please set default in hostapd config" % key)
+ 
++        self._current_config[key] = value
 +
-+        self.connect(self.wd, device, self.bss_hostapd[0])
-+
-+        device.wait_for_event('ft-roam', timeout=60)
-+
-+        condition = 'obj.state == DeviceState.disconnected'
-+        self.wd.wait_for_object_condition(device, condition)
-+
-     # FT-over-Air failure with Invalid PMKID, should reassociate
-     def test_ft_over_air_fallback(self):
-         self.rule_bss0.signal = -8000
-@@ -81,18 +94,16 @@ class Test(unittest.TestCase):
-         self.bss_hostapd[2].set_value('ft_psk_generate_local', '0')
-         self.bss_hostapd[2].reload()
+         cmd = self.cmdline + ['set', key, value]
+         ctx.start_process(cmd).wait()
  
--        wd = IWD(True)
-+        device = self.wd.list_devices(1)[0]
+@@ -200,7 +204,10 @@ class HostapdCLI(object):
  
--        device = wd.list_devices(1)[0]
--
--        self.connect(wd, device, self.bss_hostapd[0])
-+        self.connect(self.wd, device, self.bss_hostapd[0])
+     def default(self):
+         for k, v in self._default_config.items():
+-            self.set_value(k, v)
++            # Only bother setting the value if it differs
++            if self._current_config[k] != v:
++                self.set_value(k, v)
++                self._current_config[k] = v
  
-         # IWD should connect, then attempt a roam to BSS 1, which should
-         # fail and cause a fallback to reassociation
-         device.wait_for_event('ft-fallback-to-reassoc', timeout=60)
-         device.wait_for_event('reassoc-roam', timeout=60)
+         self.reload()
  
--        self.verify_roam(wd, device, self.bss_hostapd[0], self.bss_hostapd[2])
-+        self.verify_roam(self.wd, device, self.bss_hostapd[0], self.bss_hostapd[2])
- 
-         # Trigger another roam
-         self.rule_bss2.signal = -8000
-@@ -100,11 +111,11 @@ class Test(unittest.TestCase):
-         device.wait_for_event('ft-roam', timeout=60)
- 
-         # Ensure an FT roam back to a properly configured AP works.
--        self.verify_roam(wd, device, self.bss_hostapd[2], self.bss_hostapd[1])
-+        self.verify_roam(self.wd, device, self.bss_hostapd[2], self.bss_hostapd[1])
- 
-         self.bss_hostapd[1].deauthenticate(device.address)
-         condition = 'obj.state == DeviceState.disconnected'
--        wd.wait_for_object_condition(device, condition)
-+        self.wd.wait_for_object_condition(device, condition)
- 
-     # FT-over-Air failure with Invalid PMKID. The ranking is such that other
-     # FT candidates are available so it should FT elsewhere rather than
-@@ -122,11 +133,9 @@ class Test(unittest.TestCase):
-         self.bss_hostapd[2].set_value('ft_psk_generate_local', '0')
-         self.bss_hostapd[2].reload()
- 
--        wd = IWD(True)
-+        device = self.wd.list_devices(1)[0]
- 
--        device = wd.list_devices(1)[0]
--
--        self.connect(wd, device, self.bss_hostapd[0])
-+        self.connect(self.wd, device, self.bss_hostapd[0])
- 
-         # IWD should connect, then attempt a roam to BSS 1, which should
-         # fail and cause the rank to be re-computed. This should then put
-@@ -134,12 +143,14 @@ class Test(unittest.TestCase):
-         device.wait_for_event('ft-fallback-to-reassoc', timeout=60)
-         device.wait_for_event('ft-roam', timeout=60)
- 
--        self.verify_roam(wd, device, self.bss_hostapd[0], self.bss_hostapd[1])
-+        self.verify_roam(self.wd, device, self.bss_hostapd[0], self.bss_hostapd[1])
- 
-         self.bss_hostapd[1].deauthenticate(device.address)
-         condition = 'obj.state == DeviceState.disconnected'
--        wd.wait_for_object_condition(device, condition)
-+        self.wd.wait_for_object_condition(device, condition)
- 
-+    def setUp(self):
-+        self.wd = IWD(True)
- 
-     def tearDown(self):
-         os.system('ip link set "' + self.bss_hostapd[0].ifname + '" down')
-@@ -154,10 +165,14 @@ class Test(unittest.TestCase):
-         self.rule_bss0.enabled = False
-         self.rule_bss1.enabled = False
-         self.rule_bss2.enabled = False
-+        self.assoc_rule.enabled = False
- 
-         for hapd in self.bss_hostapd:
-             hapd.default()
- 
-+        self.wd.stop()
-+        self.wd = None
-+
-     @classmethod
-     def setUpClass(cls):
-         hwsim = Hwsim()
-@@ -178,6 +193,11 @@ class Test(unittest.TestCase):
-         cls.rule0.prefix = 'b0'
-         cls.rule0.drop = True
- 
-+        # Drop Associate frames
-+        cls.assoc_rule = hwsim.rules.create()
-+        cls.assoc_rule.prefix = '20'
-+        cls.assoc_rule.drop = True
-+
-         # Drop Action frames
-         cls.rule1 = hwsim.rules.create()
-         cls.rule1.bidirectional = True
 -- 
 2.34.1
 
