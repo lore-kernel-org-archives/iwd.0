@@ -1,53 +1,56 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487413D0D4
-	for <iwd@lists.linux.dev>; Thu,  7 Dec 2023 13:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B1740BFE
+	for <iwd@lists.linux.dev>; Thu,  7 Dec 2023 13:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VM/EhwLK"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-67adac40221so6081106d6.2
-        for <iwd@lists.linux.dev>; Thu, 07 Dec 2023 05:48:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kMKDvyn3"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-67ad277a06bso5399706d6.1
+        for <iwd@lists.linux.dev>; Thu, 07 Dec 2023 05:48:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701956908; x=1702561708; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=F3GWSRK6t4Zwb1f5hIoO2a4ez1XYNJe9ar6hpMqUBI4=;
-        b=VM/EhwLKYrXG1ATeWsfP4LO4TtKrVf+CI/oogwGXg4ISC8zkXw2p88EbS4sPJ29DCm
-         GERVoDGsGNRBaNqhTwKvZFnx2MFGnqtwZRZH4FxQB01BjBtJ+vb+HkPpYzbE0KTMejUU
-         4UcpKZ2x07kPQzdMjk1d+2pBfMcGrXmeihPhnp3ADJYJCcZqWVkFU63gFriGCbAs1IHk
-         IeEk5BCBpc2KzN7hSxPoT89ZcrsobRkLMEaST3tcf0Xy6bw10/XZ95U/SVdfp65YjnAZ
-         pdMOvqSCasqgRRADVi9RITV+hXD43kc+ek1+XhGoM4+8/GY9+Wrtgo4Y4F7g++o0G0B7
-         05aQ==
+        d=gmail.com; s=20230601; t=1701956910; x=1702561710; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MchMnUEFHg8V+CfcUQwkcGFR/Y4dtyM6OUBpfJFWAUs=;
+        b=kMKDvyn3VNSqJXEiPc+2mDs2B7i6qqvlkg+ivcK+7FZYQyyjc5eqeGKPKqQB5LULfV
+         lhCliV+UOJoIyfTEzQd9oNPNhu5hA2ct+9ulvLxkVpA5A7zJJvhcdQhqTF4AWw7XEDXA
+         K9dQstYbdweiiHHCz0AmHcwGOg26rj9NALzTpz5kUUeWgI/Apa4nEdjP0tmmMKQR9jch
+         Ga+V2aU9vBaj51oToTOFApEVY6y+lanw4+fe93GM6zaWyI6ETYbIQSB4Rkl5y4F9HtR9
+         tcOicxdTkywxTL4PoY3xRUsXbzjAFDxtTiS28xz5gVLPnmJe6guGpaqcIxLBpAwJBkvJ
+         gSXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701956908; x=1702561708;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F3GWSRK6t4Zwb1f5hIoO2a4ez1XYNJe9ar6hpMqUBI4=;
-        b=YI83aef9ShUjirdZsACpChe8btqAqqg+Jp5DhgnbILIwCHlCSlotcOc6/wg9nWAAjg
-         zYi+qsFo1jvTSXzbQ4YyeUIoYgbpwHg3nha56mBuPPiA4J4Kdjp+WjBr3ZSqHRBeasK3
-         qv5iF4hIPubnWkP+ML8/MS84JFYNuVVh1bVF8ekogBY9dnuy89Zh2+/Flp8rd6/U0Uve
-         TyrWli2DozjDU8a91Pmvu1pro5G7lf5yB0mj0o9V2/R0mqwx2muEH7cqZc0JIbyYzE3H
-         Esyb5UYMTluHgDR2jbhfbmFbPaU4k57BBcve0XYZdqrljsnkOjuI1vTbOTV/fUg6+4Ko
-         wgUA==
-X-Gm-Message-State: AOJu0Yz+4O/wac45e6KJTD8ZV9uP/Nj+EyAWqneJD+G+FspzdiDwMJb0
-	NJEfaJvXtBykvu/zOExiIvM402zGDOw=
-X-Google-Smtp-Source: AGHT+IFkXEgyDpFVOyzmh5EnzrajhvH7I+UDU4QR4Q839DbBjG5w7LBfRsESYsjrRKi+Se0hIzylHA==
-X-Received: by 2002:ad4:4e06:0:b0:67a:e40d:316d with SMTP id dl6-20020ad44e06000000b0067ae40d316dmr2794688qvb.101.1701956908611;
-        Thu, 07 Dec 2023 05:48:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701956910; x=1702561710;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MchMnUEFHg8V+CfcUQwkcGFR/Y4dtyM6OUBpfJFWAUs=;
+        b=ggd3v21E70q7RRkdMC+vVdM8aSH0NXuuf1PPIiGMJfDJ4fmNLUFO4pxm/NwBNApSH5
+         RDwBedtTeXySVCbpc7kAm+Xtt5EpnaH6UvSCi8jCxoDtgGTlpd2HNYL15OmBz1VxfEqS
+         JQ5PlqODboNmfnEAOY+eJHqvEvhvYsMoj7o8S9uPnEpZmHaWuzBZMEIOEgnzAuPIWuej
+         zdMur3KevAN3Pt41wWPCECdaUPffK3D303Zj9Og0dANiD2RZwIb4s0IAb/H4A5kYrOG8
+         CAIGRGTH/FD6whsL23Uli7wywTZ13AE5CsFIm0+Mp7CEYxZ+yliTXwoGxL8uJrnpJClg
+         gxgw==
+X-Gm-Message-State: AOJu0YydXNbhM5bo75xqmN2Ywj3BcQis+TRr1Ks3qItIgssdfSJEbGWy
+	gQJUcpeDbuEMIOXcJ/9dUmUHl97I0Kw=
+X-Google-Smtp-Source: AGHT+IGI/nbByczHuEe9ueHEqm49gSoF3fgu4ybsmfif45hCEFj9L3BRPb5ZAS0omLRZ5V6wqOzUPA==
+X-Received: by 2002:a05:6214:5482:b0:67c:1818:7966 with SMTP id lg2-20020a056214548200b0067c18187966mr2282647qvb.46.1701956910555;
+        Thu, 07 Dec 2023 05:48:30 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id w18-20020a0cef92000000b0067a27108513sm496494qvr.67.2023.12.07.05.48.27
+        by smtp.gmail.com with ESMTPSA id w18-20020a0cef92000000b0067a27108513sm496494qvr.67.2023.12.07.05.48.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 05:48:28 -0800 (PST)
+        Thu, 07 Dec 2023 05:48:30 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/4] network: add support for SAE password identifiers
-Date: Thu,  7 Dec 2023 05:48:19 -0800
-Message-Id: <20231207134822.2458827-1-prestwoj@gmail.com>
+Subject: [PATCH v2 3/4] auto-t: add H2E password identifier test
+Date: Thu,  7 Dec 2023 05:48:21 -0800
+Message-Id: <20231207134822.2458827-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231207134822.2458827-1-prestwoj@gmail.com>
+References: <20231207134822.2458827-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -56,128 +59,114 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Adds a new network profile setting [Security].PasswordIdentifier.
-When set (and the BSS enables SAE password identifiers) the network
-and handshake object will read this and use it for the SAE
-exchange.
+In order to support identifiers the test profiles needed to be
+reworked due to hostapd allowing multiple password entires. You
+cannot just call set_value() with a new entry as the old ones
+still exist. Instead use a unique password for the identifier and
+non-identifier use cases.
 
-Loading the PSK will fail if there is no password identifier set
-and the BSS sets the "exclusive" bit. If a password identifier is
-set and the BSS doesn't indicate support the setting will be ignored
-(with a debug print).
+After adding this test the failure_test started failing due to
+hostapd not starting up. This was due to the group being unsupported
+but oddly only when hostapd was reloaded (running the test
+individually worked). To fix this the group number was changed to 21
+which hostapd does support but IWD does not.
 ---
- src/network.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 48 insertions(+), 1 deletion(-)
+ autotests/testSAE/autoconnect_test.py         | 20 +++++++++++++------
+ autotests/testSAE/failure_test.py             |  2 +-
+ autotests/testSAE/ssidSAE.conf                |  3 ++-
+ .../{ssidSAE.psk => ssidSAE.psk.default}      |  0
+ autotests/testSAE/ssidSAE.psk.identifier      |  3 +++
+ 5 files changed, 20 insertions(+), 8 deletions(-)
+ rename autotests/testSAE/{ssidSAE.psk => ssidSAE.psk.default} (100%)
+ create mode 100644 autotests/testSAE/ssidSAE.psk.identifier
 
-diff --git a/src/network.c b/src/network.c
-index 79f964b2..70a5434b 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -70,6 +70,7 @@ struct network {
- 	struct network_info *info;
- 	unsigned char *psk;
- 	char *passphrase;
-+	char *password_identifier;
- 	struct l_ecc_point *sae_pt_19; /* SAE PT for Group 19 */
- 	struct l_ecc_point *sae_pt_20; /* SAE PT for Group 20 */
- 	unsigned int agent_request;
-@@ -124,6 +125,13 @@ static void network_reset_passphrase(struct network *network)
- 		network->passphrase = NULL;
- 	}
+diff --git a/autotests/testSAE/autoconnect_test.py b/autotests/testSAE/autoconnect_test.py
+index cba59274..4ce3b845 100644
+--- a/autotests/testSAE/autoconnect_test.py
++++ b/autotests/testSAE/autoconnect_test.py
+@@ -35,12 +35,23 @@ class Test(unittest.TestCase):
+         wd.wait_for_object_condition(ordered_network.network_object, condition)
  
-+	if (network->password_identifier) {
-+		explicit_bzero(network->password_identifier,
-+				strlen(network->password_identifier));
-+		l_free(network->password_identifier);
-+		network->password_identifier = NULL;
-+	}
+     def test_SAE(self):
++        IWD.copy_to_storage("ssidSAE.psk.default", name="ssidSAE.psk")
+         self.hostapd.wait_for_event("AP-ENABLED")
+ 
+         wd = IWD(True)
+         self.validate_connection(wd)
+ 
+     def test_SAE_H2E(self):
++        IWD.copy_to_storage("ssidSAE.psk.default", name="ssidSAE.psk")
++        self.hostapd.set_value('sae_pwe', '1')
++        self.hostapd.set_value('sae_groups', '20')
++        self.hostapd.reload()
++        self.hostapd.wait_for_event("AP-ENABLED")
++        wd = IWD(True)
++        self.validate_connection(wd)
 +
- 	if (network->sae_pt_19) {
- 		l_ecc_point_free(network->sae_pt_19);
- 		network->sae_pt_19 = NULL;
-@@ -317,7 +325,8 @@ static struct l_ecc_point *network_generate_sae_pt(struct network *network,
- 	l_debug("Generating PT for Group %u", group);
++    def test_SAE_H2E_password_identifier(self):
++        IWD.copy_to_storage("ssidSAE.psk.identifier", name="ssidSAE.psk")
+         self.hostapd.set_value('sae_pwe', '1')
+         self.hostapd.set_value('sae_groups', '20')
+         self.hostapd.reload()
+@@ -51,15 +62,12 @@ class Test(unittest.TestCase):
+     def setUp(self):
+         self.hostapd.default()
  
- 	pt = crypto_derive_sae_pt_ecc(group, network->ssid,
--						network->passphrase, NULL);
-+						network->passphrase,
-+						network->password_identifier);
- 	if (!pt)
- 		l_warn("SAE PT generation for Group %u failed", group);
- 
-@@ -462,6 +471,10 @@ static int network_set_handshake_secrets_psk(struct network *network,
- 
- 		handshake_state_set_passphrase(hs, network->passphrase);
- 
-+		if (network->password_identifier)
-+			handshake_state_set_password_identifier(hs,
-+						network->password_identifier);
++    def tearDown(self):
++        IWD.clear_storage()
 +
- 		if (ie_rsnxe_capable(hs->authenticator_rsnxe,
- 							IE_RSNX_SAE_H2E)) {
- 			l_debug("Authenticator is SAE H2E capable");
-@@ -631,6 +644,9 @@ static int network_load_psk(struct network *network, struct scan_bss *bss)
- 	_auto_(l_free) char *passphrase =
- 			l_settings_get_string(network->settings,
- 						"Security", "Passphrase");
-+	_auto_(l_free) char *password_id =
-+			l_settings_get_string(network->settings, "Security",
-+						"PasswordIdentifier");
- 	_auto_(l_free) char *path =
- 		storage_get_network_file_path(security, ssid);
+     @classmethod
+     def setUpClass(cls):
+         cls.hostapd = HostapdCLI(config='ssidSAE.conf')
+-        IWD.copy_to_storage('ssidSAE.psk')
+-        pass
+-
+-    @classmethod
+-    def tearDownClass(cls):
+-        IWD.clear_storage()
  
-@@ -641,6 +657,31 @@ static int network_load_psk(struct network *network, struct scan_bss *bss)
- 		psk_len = 0;
- 	}
+ if __name__ == '__main__':
+     unittest.main(exit=True)
+diff --git a/autotests/testSAE/failure_test.py b/autotests/testSAE/failure_test.py
+index 2aac3a07..aa4d14b9 100644
+--- a/autotests/testSAE/failure_test.py
++++ b/autotests/testSAE/failure_test.py
+@@ -37,7 +37,7 @@ class Test(unittest.TestCase):
+         self.validate_connection(wd, 'InvalidSecret')
  
-+	if (is_sae) {
-+		/*
-+		 * Fail if:
-+		 *   - the BSS exclusively uses password IDs and the profile
-+		 *     does not have one set.
-+		 *   - the BSS does not use password IDs and the profile has
-+		 *     one set.
-+		 *
-+		 * In theory you could have a network with a mix of BSS's that
-+		 * use IDs and those that don't, but this is a strange
-+		 * configuration (arguably broken).
-+		 */
-+		if (bss->sae_pw_id_exclusive && !password_id) {
-+			l_error("[Security].PasswordIdentifier is not set but "
-+				"BSS requires SAE password identifiers");
-+			return -ENOKEY;
-+		}
-+
-+		if (!bss->sae_pw_id_used && password_id) {
-+			l_debug("[Security].PasswordIdentifier set but BSS "
-+				"does not not use password identifiers");
-+			return -ENOKEY;
-+		}
-+	}
-+
- 	/* PSK can be generated from the passphrase but not the other way */
- 	if (!psk || is_sae) {
- 		if (!passphrase)
-@@ -655,6 +696,7 @@ static int network_load_psk(struct network *network, struct scan_bss *bss)
- 	network_reset_passphrase(network);
- 	network_reset_psk(network);
- 	network->passphrase = l_steal_ptr(passphrase);
-+	network->password_identifier = l_steal_ptr(password_id);
+     def test_no_supported_groups(self):
+-        self.hostapd.set_value('sae_groups', '1')
++        self.hostapd.set_value('sae_groups', '21')
+         self.hostapd.reload()
  
- 	if (network_settings_load_pt_ecc(network, path,
- 						19, &network->sae_pt_19) > 0)
-@@ -726,6 +768,11 @@ static void network_settings_save(struct network *network,
- 		l_settings_set_string(settings, "Security", "Passphrase",
- 					network->passphrase);
- 
-+	if (network->password_identifier)
-+		l_settings_set_string(settings, "Security",
-+					"PasswordIdentifier",
-+					network->password_identifier);
-+
- 	if (network->sae_pt_19)
- 		network_settings_save_sae_pt_ecc(settings, network->sae_pt_19);
- 
+         wd = IWD(True)
+diff --git a/autotests/testSAE/ssidSAE.conf b/autotests/testSAE/ssidSAE.conf
+index 41f46cad..f5ce537d 100644
+--- a/autotests/testSAE/ssidSAE.conf
++++ b/autotests/testSAE/ssidSAE.conf
+@@ -5,7 +5,8 @@ ssid=ssidSAE
+ wpa=2
+ wpa_key_mgmt=SAE
+ wpa_pairwise=CCMP
+-sae_password=secret123|mac=ff:ff:ff:ff:ff:ff
++sae_password=secret123
++sae_password=withidentifier|id=myidentifier
+ sae_groups=19
+ ieee80211w=2
+ sae_pwe=0
+diff --git a/autotests/testSAE/ssidSAE.psk b/autotests/testSAE/ssidSAE.psk.default
+similarity index 100%
+rename from autotests/testSAE/ssidSAE.psk
+rename to autotests/testSAE/ssidSAE.psk.default
+diff --git a/autotests/testSAE/ssidSAE.psk.identifier b/autotests/testSAE/ssidSAE.psk.identifier
+new file mode 100644
+index 00000000..3664063a
+--- /dev/null
++++ b/autotests/testSAE/ssidSAE.psk.identifier
+@@ -0,0 +1,3 @@
++[Security]
++Passphrase=withidentifier
++PasswordIdentifier=myidentifier
 -- 
 2.34.1
 
