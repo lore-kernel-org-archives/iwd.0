@@ -1,56 +1,56 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DCE36F631
-	for <iwd@lists.linux.dev>; Wed,  6 Dec 2023 20:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68464405DD
+	for <iwd@lists.linux.dev>; Thu,  7 Dec 2023 13:48:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KkIm8NO/"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ce33234fd7so213568b3a.0
-        for <iwd@lists.linux.dev>; Wed, 06 Dec 2023 12:18:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GsMNPLWT"
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-db54611b920so949825276.3
+        for <iwd@lists.linux.dev>; Thu, 07 Dec 2023 05:48:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701893895; x=1702498695; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1701956910; x=1702561710; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9mxJF5StbFHgA8xLY14uDOHYGQjLyG4VM1xi5k1s7+c=;
-        b=KkIm8NO/49i/xQPnflGowsBcj2PrMREgIGj195/jlS2B7JH3qqQWg863xMAtPoTn3T
-         q36dmKehKpKFgZLyh0NlCgFwmaQogZRW/YSw2vOwWahstI17gpKqUjs6xEmGGvbMMQSX
-         6II+nLbyX6vX2YXP/F62SpsJlszWb84dbZ7wpaivFAy6YFhSdMSImf2bkjuU41qirUcK
-         nplyyQnOo4tgKowummtnH7Gt+9/JI3Nac3dqKD3QxBkpPZgF7ylU58SvOQNeVyWIWMdN
-         IjKzdvB8/l89gJ2LHKLXhBsdW2/S2WJuSuKsg0CZ70KULE8qHyRgk4Ms7+AudOJdOull
-         y+PA==
+        bh=LSxwELDo2cZzRWz6CJL7kDZoymdNmGBPXvNerdokW04=;
+        b=GsMNPLWTft1SLaDPN0q6Xq11qt0/Gkjs3eiL6OuYMLOZikoGPIJVSylD7mJANfmWRm
+         Jt5t+K+zkG08QcDJZmPg9Vu7TNylaNRkhL5hPsa0N5gpj03u26KNtWN5ZpYe2n0a5j7o
+         hAiiuvOg9q0lcX//xdIi82FF+a1mBLw2vN0pXuFGlX4G0SiHENGfKKR6j53WTki4RQg/
+         hQCngBClaCvZ76oboRFFtSnKRk6YzcVeww2SrztXyl13r3bYSK0ykSLLNgPX/3bQrvEs
+         bk0ITLc3hYzIKbFvttWxsIHuTV3IDd7wS9EZMZxofLm9aKVjJ7GPzbZGl1COIW9oWIiL
+         ckhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701893895; x=1702498695;
+        d=1e100.net; s=20230601; t=1701956910; x=1702561710;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9mxJF5StbFHgA8xLY14uDOHYGQjLyG4VM1xi5k1s7+c=;
-        b=hbBeYPL37prGTxCqZA3Ge9eiWP73cqlTx9bswo1KOoiAJLpgsyJF5816Wfnj3/0UDe
-         L4upBBXpfE/V0QehCqfmxE3L+xfVrqgyVS95WNw0RiVvITp4V90RFrxfsMzCsqZcsaw+
-         ab1m1qJ3Q6l29pXPL4reoyz3wdLmZcJCCOa6CoJ/2T8Jdufoe5Vwcsxoa/o+XUKxsTVy
-         1CDoCWCWDTf8FV5sw+uaIkd0PYrKyoYfs7DiDdVTNCRqNjVO3Wo7lYLvdy4y3B5/Q7Fp
-         xU9n2ONhSGZUrKBxVFawYx6yS+0uiLoCzkL9+XEqnq2HoLyTsLECugNSpMkbdwtTBFro
-         N+Yg==
-X-Gm-Message-State: AOJu0YxWUUOUGbJVDWDsCJjwqZilNNmi7IpJuwTxlh+WLh2w4p234pPX
-	auXPBBucNMZFROh9K5EyQ6TmjcW0CFeO6g==
-X-Google-Smtp-Source: AGHT+IEZSRP+Lokp6uvZoJH6qNarKQp7TOJruDN9PZ4GbrliKiSseBmlz3FTEA6rAHbZGCT9mUIQzQ==
-X-Received: by 2002:a05:6a00:2d25:b0:6cd:a145:6703 with SMTP id fa37-20020a056a002d2500b006cda1456703mr1208722pfb.2.1701893894699;
-        Wed, 06 Dec 2023 12:18:14 -0800 (PST)
-Received: from LOCLAP699.. ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id by40-20020a056a0205a800b005c2185be2basm243168pgb.54.2023.12.06.12.18.13
+        bh=LSxwELDo2cZzRWz6CJL7kDZoymdNmGBPXvNerdokW04=;
+        b=Amh6tqeqAqNwwaAFHTLbS5i3I+Gehxbd0J3do/Mdw5veGqp6vUjdDCBbVvilIpns+Z
+         d/UP4g1B+pSuraT4H3t+6QzJrSLrjnmnh2RVVoEMEEGo3W5ksw+a9UxsjdRXSqftUl1n
+         5/VRbDL/6mjDZ0npbImnwuuR7ZSKekii1Q9Oe5mo143A0Gna9Yh+EJHzS21pTFEgZwi4
+         0kQe7qTHFJaUMYOXw/ua7z1UnAcgnRqhBMPpDu3r6Ly7CqmCfl+1G0nfUdM29fgTRk9C
+         XNZYGumwNYHo4hxdGDr7xYIOlayk3bzhjfXTG/uTIE3zssOAqMZYjapRoMlkNpmFy5ab
+         kdIQ==
+X-Gm-Message-State: AOJu0Yz9tAAar2D8fH5vhiTS3MO0AglVsF0CQAH34ckMaVxoxeNhFAhm
+	WB/D4wwIH5u/Dfo+UlcTREFM+OcKc0Y=
+X-Google-Smtp-Source: AGHT+IF4pJeEyzwyNpHh9igz6bHtmWyFfAacZB5nXkCfiWIvH6tgak43uF6C9846cs0dIDc7gkyHMw==
+X-Received: by 2002:a05:6902:52b:b0:db7:dacf:2f1b with SMTP id y11-20020a056902052b00b00db7dacf2f1bmr2308173ybs.98.1701956909644;
+        Thu, 07 Dec 2023 05:48:29 -0800 (PST)
+Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
+        by smtp.gmail.com with ESMTPSA id w18-20020a0cef92000000b0067a27108513sm496494qvr.67.2023.12.07.05.48.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 12:18:14 -0800 (PST)
+        Thu, 07 Dec 2023 05:48:29 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 13/13] netdev: station: remove NETDEV_EVENT_FT_ROAMED
-Date: Wed,  6 Dec 2023 12:18:02 -0800
-Message-Id: <20231206201802.2139649-13-prestwoj@gmail.com>
+Subject: [PATCH v2 2/4] doc: document [Security].PasswordIdentifier
+Date: Thu,  7 Dec 2023 05:48:20 -0800
+Message-Id: <20231207134822.2458827-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231206201802.2139649-1-prestwoj@gmail.com>
-References: <20231206201802.2139649-1-prestwoj@gmail.com>
+In-Reply-To: <20231207134822.2458827-1-prestwoj@gmail.com>
+References: <20231207134822.2458827-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -59,42 +59,27 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The notification for roaming success/failure is now handled with
-the connect callback.
 ---
- src/netdev.h  | 1 -
- src/station.c | 6 ------
- 2 files changed, 7 deletions(-)
+ src/iwd.network.rst | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/netdev.h b/src/netdev.h
-index fb31b571..d87f09f4 100644
---- a/src/netdev.h
-+++ b/src/netdev.h
-@@ -50,7 +50,6 @@ enum netdev_event {
- 	NETDEV_EVENT_RSSI_THRESHOLD_HIGH,
- 	NETDEV_EVENT_RSSI_LEVEL_NOTIFY,
- 	NETDEV_EVENT_PACKET_LOSS_NOTIFY,
--	NETDEV_EVENT_FT_ROAMED,
- 	NETDEV_EVENT_BEACON_LOSS_NOTIFY,
- };
+diff --git a/src/iwd.network.rst b/src/iwd.network.rst
+index 719853fa..734dcfa1 100644
+--- a/src/iwd.network.rst
++++ b/src/iwd.network.rst
+@@ -199,6 +199,12 @@ connect to that network.
+        required if the *PreSharedKey* is not provided.  If not provided in
+        settings, the agent will be asked for the passphrase at connection
+        time.
++   * - PasswordIdentifier
++     - string
++
++       An identifer string to be used with the passphrase. This is used for
++       WPA3-Personal (SAE) networks if the security has enabled password
++       identifiers for clients.
+    * - PreSharedKey
+      - 64 character hex string
  
-diff --git a/src/station.c b/src/station.c
-index 52d87c84..73de26bb 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3444,12 +3444,6 @@ static void station_netdev_event(struct netdev *netdev, enum netdev_event event,
- 	case NETDEV_EVENT_PACKET_LOSS_NOTIFY:
- 		station_packets_lost(station, l_get_u32(event_data));
- 		break;
--	case NETDEV_EVENT_FT_ROAMED:
--		if (L_WARN_ON(station->state != STATION_STATE_FT_ROAMING))
--			return;
--
--		station_roamed(station);
--		break;
- 	case NETDEV_EVENT_BEACON_LOSS_NOTIFY:
- 		station_beacon_lost(station);
- 		break;
 -- 
 2.34.1
 
