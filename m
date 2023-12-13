@@ -1,49 +1,49 @@
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C521D52D
-	for <iwd@lists.linux.dev>; Wed, 13 Dec 2023 16:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6845A2D604
+	for <iwd@lists.linux.dev>; Wed, 13 Dec 2023 16:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MTYypAko"
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3ba04b9b103so3013023b6e.0
-        for <iwd@lists.linux.dev>; Wed, 13 Dec 2023 08:06:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PE0BiyfS"
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5910b21896eso2065249eaf.0
+        for <iwd@lists.linux.dev>; Wed, 13 Dec 2023 08:14:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702483616; x=1703088416; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1702484096; x=1703088896; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=F8QJjX1LOBPphoIwT8mLQG5e0T600AtMgNMSzkG8z/w=;
-        b=MTYypAkoy6jK+4HGawii+uIOwBTo6HNc/VrxsrNezsoUxyLe6HRQn4+V+2vk0nffh/
-         ODpdEEiX26Mh3g07qPprnmVURrFCKVnI6SBbFMBa2X1UDMdx8BLkBjTDnIDC156d6N3G
-         XDo9+I1qfGcffQxJPnZmN5wN1oQl7XIGA5oEsXSjPNfZ06AxHMfAcCrrY3Ao5G6wXb4g
-         oi6H/1pDkKaktQSgYsR3oNY87qbKmdZSBMHHiEMITSIhbPgUso5UBO8wj4ZMjJ0+x5HF
-         2MaUSUn81Dd+EDM7qAJM3VtS8RVw23qxTn1gxqzdUoLyTyHKDt3KIxl+7hojFd/zM1ay
-         6RMQ==
+        bh=ADhdmUcfuMtlEaspoSK23BfB3z+DjYGkVm8O43TPwLs=;
+        b=PE0BiyfSHul2rgFsAn+i6pBumkoEjUxZWhsAQwE0JExlAuNfjj/tjjX8P7QvWnoL0H
+         2qN3Dhz/hScWmdI4asb9q/g2Gkd18fUOHA9wYEa7A51yf/+HNc8uMGjVFF58eT17JlTo
+         vbSykxjkguHC3ysaL2XHrkBOfc+3zdE7CSZ1nJzsu5HkevUVSUnHbqhZWexQmptc4Qbr
+         /X5JmPct5RMoNefb7oqVaViyfIYIZwvO5Ls4K+7ftTax+YW51nYFHhcteBnWZgKWuLol
+         Mf3UVSgI648496VBotdQ3+Y2cjT/oOJgQ+WG4RRLRVCozZpLc4jdRXCJdnYKHdDBrjsF
+         stGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702483616; x=1703088416;
+        d=1e100.net; s=20230601; t=1702484096; x=1703088896;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F8QJjX1LOBPphoIwT8mLQG5e0T600AtMgNMSzkG8z/w=;
-        b=Q9+Zfd7Eofpn9R5an7w2PsD79p6RdeJ4hmjRWGCBU3Xc2xUIf34Tn3NBN9G2pFri/G
-         5K2XIScRmFvWQHXhkq9jWkhBkmQanYeq+eaVj78xWToQKjZpdy+MuGDWoN6alOwFJ9EZ
-         7PN3/5VseTHzpPv/0qmw01CxC0BYaCQHdef61+ENzEN7yRdO+HDNDjSmhfWUtKSISe/r
-         9EuirtsJ8XShOtRl3ifN+Vg61K2sDqoJW5Szglmeg90tZnvdXAE1N52QBMX1z9F0WmLv
-         iXup6qXJskXDH1TXEbSPY8Zi7YyaQ3WWz+NMrmddk5M14Y1rjS3XmwhIwk5rssPD59dP
-         KIqQ==
-X-Gm-Message-State: AOJu0YxjW2gfk+8hhjg+vkN4TDgw9Iw5HnwGLYC1NxV6XNIhalUrogO/
-	2v2lzKn7K6/D0bHCQq9IuorEjrF50TI=
-X-Google-Smtp-Source: AGHT+IFZ2bGPEA3D4pGposLxno6Lw5uMh8z59hFXaxwq75YyTHambOvWnsyn/BUybbt7IPIZNQx6Aw==
-X-Received: by 2002:a05:6808:1642:b0:3b9:efe8:b9f0 with SMTP id az2-20020a056808164200b003b9efe8b9f0mr10647595oib.55.1702483616049;
-        Wed, 13 Dec 2023 08:06:56 -0800 (PST)
+        bh=ADhdmUcfuMtlEaspoSK23BfB3z+DjYGkVm8O43TPwLs=;
+        b=Cm/7SgpcgS4YMLTzWU3FAfmPO+7PujqqTMLqFlPcGp5zfH3ad2CqXViSb7ePLvSi9x
+         sfXCxgB4TjvVUQQUTDJ29Qkqz1p/qGq150VsH59b/ccDpGS91glrE879kENxJzfwWnBv
+         YtEb2vvAEJs/gMJ9KP7qfgmy5YrLJOWYaf8DWOPoZmKSz2y+4DIjumV7ZvynYBAfV/zJ
+         5ukfiMhDtixhnW4aAw3rd4c1h6jtUNyAu+yzJwwqWgxRK7DeqriohAubTKhmNFdDu3ly
+         1GTYKUp+FNBxdtfqMpQaXP32lYamFb5TfPrQ5hnxSGToE//7FBKABttag6xWlZzhbBJX
+         gpgQ==
+X-Gm-Message-State: AOJu0YzYV+myVw4ZVxF5X3QDB5Akaj2LjuCF3lBSj5cdnyAQlb+O58ff
+	QXmDSZ7V9w3lL4JjRBY2OsE=
+X-Google-Smtp-Source: AGHT+IFAGtFNSUAJFsY5tR20xohAtAIktsAJiwrL9cF9gpdWJRxy5hxpD/r4O2hoENJOyC4FfvZMwg==
+X-Received: by 2002:a05:6820:1ac9:b0:590:87c5:2b0c with SMTP id bu9-20020a0568201ac900b0059087c52b0cmr5757575oob.7.1702484096525;
+        Wed, 13 Dec 2023 08:14:56 -0800 (PST)
 Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id e9-20020a05680809a900b003b8b1a4fbf9sm3009191oig.31.2023.12.13.08.06.55
+        by smtp.googlemail.com with ESMTPSA id r124-20020a4a4e82000000b0058cbbf9b4e4sm3099633ooa.48.2023.12.13.08.14.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 08:06:55 -0800 (PST)
-Message-ID: <5aa0f369-b5c1-44b4-a54c-f7e25d5fd506@gmail.com>
-Date: Wed, 13 Dec 2023 10:06:55 -0600
+        Wed, 13 Dec 2023 08:14:56 -0800 (PST)
+Message-ID: <706a7157-9d37-472c-b610-7f0a2c3a69f7@gmail.com>
+Date: Wed, 13 Dec 2023 10:14:55 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,28 +51,27 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] auto-t: fix SignalAgent Release arguments
+Subject: Re: [PATCH v3 01/13] auto-t: add explicit stop() to IWD class
 Content-Language: en-US
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20231211194120.64625-1-prestwoj@gmail.com>
+References: <20231206201802.2139649-1-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20231211194120.64625-1-prestwoj@gmail.com>
+In-Reply-To: <20231206201802.2139649-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 12/11/23 13:41, James Prestwood wrote:
-> The path for IWD to call this doesn't ever happen in autotests
-> but during debugging of the DPP agent it was noticed that the
-> DBus signature was incorrect and would always result in an error
-> when calling from IWD.
+On 12/6/23 14:17, James Prestwood wrote:
+> If tests end in an unknown state it is sometimes required that IWD
+> be stopped manually in order for future tests to run. Add a stop()
+> method so test tearDown() methods can explicitly stop IWD.
 > ---
->   autotests/util/iwd.py | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+>   autotests/util/iwd.py | 4 ++++
+>   1 file changed, 4 insertions(+)
 > 
 
-Applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
