@@ -1,97 +1,116 @@
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9820537898
-	for <iwd@lists.linux.dev>; Tue, 19 Dec 2023 17:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739C537D06
+	for <iwd@lists.linux.dev>; Tue, 19 Dec 2023 18:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QnUrsq4C"
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6dba3438499so423395a34.3
-        for <iwd@lists.linux.dev>; Tue, 19 Dec 2023 09:49:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iB3pvJ//"
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3ba084395d9so3372304b6e.0
+        for <iwd@lists.linux.dev>; Tue, 19 Dec 2023 10:08:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703008177; x=1703612977; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SeAU4yxCKG3wOsi6aZvvpaZgOCQGt/3Oi3Ak27U4h+A=;
-        b=QnUrsq4CfMme80gNm2C9IquIigTSlEz3uBFDKHNMtStozdP8P2Iy4/8KCSSM1hqUwp
-         DHIXk9vGO8YrAmScuA2V0KbTFsdf+TP9QvycJsbB9Kv0OsttNN9B6BkeI7Qg9GJEEgz2
-         bPemvjQNiLYdFYzLwOJGEyg2BNYw0QAdXfmd7+uuLte/dxskWWNhvZfdaJTXQziuhpTS
-         uGTbsVqNMV3tiiq7gC0vfgSxycwFuo5rrHLmLOgSbZg9QpqLwQLyD8gI7nmEGjV8KK5I
-         019Rgx54KEZWMOCTY9HvWhzBBGC0RiiyyKKEUB0MoP9QtVzQZ+fRK1zxzdgUrOB+lTRF
-         iOYw==
+        d=gmail.com; s=20230601; t=1703009309; x=1703614109; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aiApK1YSInACtcDzvMZY/WjaeNQq3mzQCB0iF5xGVkE=;
+        b=iB3pvJ//Z0J9GneXJ8nuhwvhALUEDMiui2dT5U6MqZnc692oRx6ODeGpLPvelkAWY+
+         DlshAeZB0ipsLBv5krntM78oIutqpzaPBJSCDyKmjg9yeET1ydxhXm2sGUY3z/U5VmyX
+         rpUryElUONcFXtralKKW6BFTxogWwOcPuuZOow6te667A4slIQ0W+Bfi3hd8dYwx76kY
+         dcSoXEbXsstMEwXrF0OpfS30rKwU0pZZKlUUZoZ5b1VsZJv5eOu/flhZrmY+At2IgYjN
+         wgSWZrIX4zfVPGyjs15sQuQVeTr3AE+0NoSSevfpNWmae0iuHzLP3CcFX8AehdYaYmx2
+         f2oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703008177; x=1703612977;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SeAU4yxCKG3wOsi6aZvvpaZgOCQGt/3Oi3Ak27U4h+A=;
-        b=H1Aj+BiJAgiulIj9fRbTJpkGHX149/kQLDZAlRfkzSab5/I4lZZtkM6P8do686MPBG
-         WAp8INWndOEVjw462FbtYNlFiq4vDLMpqRyU6Fat0DElHNrRfw0im3+IZQMsmXCz9CX6
-         KMZ4MTisRQLrjqNQWVAVmiY7QAcNst1pZjKoupb+Q+qRK6vjIdvWuhC52savz1/JkcBM
-         AGjPCq/NLt9OjUVbjIA3vr9F7I1Lu6Jq+ks13nV6SWJfX6Pr8XgkRoNdLLCzfGlheU3O
-         vEjGssULGKBOkuT+Ge5kvMg48QcbxRq4sFk6ksu2oqD0LkoXi/Cj0LGv9bXN1aD9Ttmr
-         rzEg==
-X-Gm-Message-State: AOJu0Yxj0Vpd/qKGwdAySPKhOARK+c1WOirqCC9K4AI0jn/vG5841SNc
-	oAr6Hs1FOr8dP2Ra0PNg/CQ=
-X-Google-Smtp-Source: AGHT+IHCbs1dWN9q5eJ3f/qgHhlY6q6hseZRlb6S9xpmJej4aW5ahROUtSSMtDivV9YVAVaPbAKIcg==
-X-Received: by 2002:a05:6830:1b73:b0:6db:a7a4:2524 with SMTP id d19-20020a0568301b7300b006dba7a42524mr417438ote.30.1703008177588;
-        Tue, 19 Dec 2023 09:49:37 -0800 (PST)
-Received: from [10.175.247.41] ([50.222.209.222])
-        by smtp.gmail.com with ESMTPSA id l17-20020a0568301d7100b006d8786f3510sm5042963oti.57.2023.12.19.09.49.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 09:49:37 -0800 (PST)
-Message-ID: <2b3f455d-b265-471d-85eb-65202dcaf84d@gmail.com>
-Date: Tue, 19 Dec 2023 09:49:35 -0800
+        d=1e100.net; s=20230601; t=1703009309; x=1703614109;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aiApK1YSInACtcDzvMZY/WjaeNQq3mzQCB0iF5xGVkE=;
+        b=Mg62vT4kH/I5sutNwthOGTOZdWfKvif4pVXe05cURzM/5MzuCtVKhpovEVP3mkmAvE
+         0U3afSv2D6VWEsHhz0bIFTpRkWumLrk//pBZOyBhWST1qicDa/oehHupzQbNTh+nhbVs
+         IAsSKoYEOmQVsCHuiJ7pm0CkyHna9N1kM6ScPoZ0UnwgW8SlmI5svs777FObEEQPR8sZ
+         IemwVDJLI9Hxb4GiCJrI6YnOyU0Mhnc18WzGFrkM3mhyEGlob2d6N95+mOQ7m6KW9y+8
+         a0iQEdTijTTR4mQTc+kGzEBcP1n1ovFkRj9rG+YqiwhVAJiZfmY/YO1LT16jp//rxloC
+         EExw==
+X-Gm-Message-State: AOJu0Yx3OHe6kPDabW7MiQ+Oyxd/lQ6sHmo7p/JoK57xkpOiWPJCpPWs
+	X743Fv9mfdo8tJIzaxstr1qjdfRFKYI=
+X-Google-Smtp-Source: AGHT+IECJfnN22zvp2TvRGqNoVavm5EYFt5hi5CzihDXGTW2rIPCBMQDGxMLC8h86solERsYizcb5Q==
+X-Received: by 2002:a05:6808:218a:b0:3b9:e64c:dfc9 with SMTP id be10-20020a056808218a00b003b9e64cdfc9mr22984962oib.22.1703009309212;
+        Tue, 19 Dec 2023 10:08:29 -0800 (PST)
+Received: from LOCLAP699.barrett-olive-branch.locus ([50.222.209.222])
+        by smtp.gmail.com with ESMTPSA id z25-20020a056808049900b003ba322fa9a8sm2095130oid.43.2023.12.19.10.08.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 10:08:29 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3 1/4] knownnetworks: Add UPDATED event
+Date: Tue, 19 Dec 2023 10:08:23 -0800
+Message-Id: <20231219180826.201540-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] knownnetworks: network: support updating known
- network settings
-Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20231218141250.202157-1-prestwoj@gmail.com>
- <6ac609fa-0540-479e-8ab3-387b0cab24cb@gmail.com>
- <ee339749-46cd-4927-a3fc-ff80924a5f70@gmail.com>
- <f2d94ed6-0902-4dcd-bc7a-b7c58e7e61e3@gmail.com>
- <4ab32218-16a7-4d15-a792-3aed887a91b5@gmail.com>
- <0072dc90-2e28-4f12-9980-b32a693ef8a3@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <0072dc90-2e28-4f12-9980-b32a693ef8a3@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+If a known network is modified on disk known networks does not have
+any way of notifying other modules. This will be needed to support a
+corner case in DPP if a profile exists but is overwritten after DPP
+configuration. Add this event to known networks and handle it in
+network.c (though nothing needs to be done in that case).
+---
+ src/knownnetworks.c | 4 ++++
+ src/knownnetworks.h | 1 +
+ src/network.c       | 2 ++
+ 3 files changed, 7 insertions(+)
 
-On 12/19/23 9:46 AM, Denis Kenzior wrote:
-> Hi James,
->
->>>
->>> Okay, then this patch in particular is not needed?
->>
->> Its at least partially needed, if a known network already exists 
->> prior to DPP and its overwritten there is no callback. So we may not 
->> need to actually touch network->settings at all as I thought. Just 
->> emit an UPDATED event when the 
->
-> Okay, then just do that.
->
->> profile changes. DPP can then call network_autoconnect and the 
->> settings _should_ be re-loaded unless I'm forgetting some instance 
->> where network->settings can persist, but I don't think it can.
->
-> network->settings is only created/opened when a connection is attempted.
-Yeah, I think what caused most of my confusion was because DPP was using 
-network_set_passphrase/psk which will create an empty settings object if 
-the load fails (i.e. no profile). This then prevented 
-network_autoconnect() from opening the settings (since it thought they 
-already existed). So now the DPP change just syncs the profile and 
-doesn't touch the network object which lets network_autoconnect() deal 
-with loading, as it should.
->
-> Regards,
-> -Denis
+v3:
+ * Removed bulk of this change, just emit UPDATED to let DPP know the
+   profile was seen by knownnetworks
+
+diff --git a/src/knownnetworks.c b/src/knownnetworks.c
+index d4d50a6f..04ce74ec 100644
+--- a/src/knownnetworks.c
++++ b/src/knownnetworks.c
+@@ -468,6 +468,10 @@ void known_network_update(struct network_info *network,
+ 	known_network_set_autoconnect(network, new->is_autoconnectable);
+ 
+ 	memcpy(&network->config, new, sizeof(struct network_config));
++
++	WATCHLIST_NOTIFY(&known_network_watches,
++				known_networks_watch_func_t,
++				KNOWN_NETWORKS_EVENT_UPDATED, network);
+ }
+ 
+ bool known_networks_foreach(known_networks_foreach_func_t function,
+diff --git a/src/knownnetworks.h b/src/knownnetworks.h
+index 0a5c9e25..e8ffac0b 100644
+--- a/src/knownnetworks.h
++++ b/src/knownnetworks.h
+@@ -35,6 +35,7 @@ struct network_info;
+ enum known_networks_event {
+ 	KNOWN_NETWORKS_EVENT_ADDED,
+ 	KNOWN_NETWORKS_EVENT_REMOVED,
++	KNOWN_NETWORKS_EVENT_UPDATED,
+ };
+ 
+ struct network_info_ops {
+diff --git a/src/network.c b/src/network.c
+index 3918ae08..4723334e 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -2033,6 +2033,8 @@ static void known_networks_changed(enum known_networks_event event,
+ 	case KNOWN_NETWORKS_EVENT_REMOVED:
+ 		station_foreach(emit_known_network_removed, (void *) info);
+ 		break;
++	case KNOWN_NETWORKS_EVENT_UPDATED:
++		break;
+ 	}
+ }
+ 
+-- 
+2.34.1
+
