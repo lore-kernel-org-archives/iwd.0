@@ -1,49 +1,49 @@
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757F739AC2
-	for <iwd@lists.linux.dev>; Tue, 19 Dec 2023 17:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9820537898
+	for <iwd@lists.linux.dev>; Tue, 19 Dec 2023 17:49:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zd4UJJAE"
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-35f7589ea1fso17469235ab.1
-        for <iwd@lists.linux.dev>; Tue, 19 Dec 2023 09:46:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QnUrsq4C"
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6dba3438499so423395a34.3
+        for <iwd@lists.linux.dev>; Tue, 19 Dec 2023 09:49:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703007969; x=1703612769; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1703008177; x=1703612977; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=wun9617v6OW1+TQGVbgI4rjyFkOpVdZPLsEasAB8FB4=;
-        b=Zd4UJJAEIhd7NwICWpfAck94YSFmEPPTTkn6r90Hen1c9KlPnNaOvwPKJvoBnbVgDA
-         uJERktOr8kP0ehvWyoaDVLf6oT6+noFD48DTA4kuuozHx8LpAuw5Kgt3v7lGA3iQg8oA
-         Ifg3pTeACQkRD8AMZHzg00VVgW8P9furIUdTMkgg3QeD/fX/EqfoYUw5s5aKOTFn+bZk
-         rPTF8oB6l62b7gOiK8LhVLV3RrO4BGmw6q+SmInQJpSvlBMi9Waz+KvxBM3o0fRmOzv6
-         yfRInfSwaw51fvS2Pt3YNT97Q/8kE0Y+PyPHqGqCYz8T2QvWFRYSZzuWWiL5YD6kKLPW
-         79aQ==
+        bh=SeAU4yxCKG3wOsi6aZvvpaZgOCQGt/3Oi3Ak27U4h+A=;
+        b=QnUrsq4CfMme80gNm2C9IquIigTSlEz3uBFDKHNMtStozdP8P2Iy4/8KCSSM1hqUwp
+         DHIXk9vGO8YrAmScuA2V0KbTFsdf+TP9QvycJsbB9Kv0OsttNN9B6BkeI7Qg9GJEEgz2
+         bPemvjQNiLYdFYzLwOJGEyg2BNYw0QAdXfmd7+uuLte/dxskWWNhvZfdaJTXQziuhpTS
+         uGTbsVqNMV3tiiq7gC0vfgSxycwFuo5rrHLmLOgSbZg9QpqLwQLyD8gI7nmEGjV8KK5I
+         019Rgx54KEZWMOCTY9HvWhzBBGC0RiiyyKKEUB0MoP9QtVzQZ+fRK1zxzdgUrOB+lTRF
+         iOYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703007969; x=1703612769;
+        d=1e100.net; s=20230601; t=1703008177; x=1703612977;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wun9617v6OW1+TQGVbgI4rjyFkOpVdZPLsEasAB8FB4=;
-        b=QZRe3xEjkk9R8Pw0Bh+kqJDO7LlBsY1/5UeX9bLTk7dIcSWQ7kjCY4EtG08Ld1J4m9
-         Xdm3IaV9jjesX45q70FFOYYvVsKkYtyvCTj2dx9KIPbk9dfRj/3Toga7cgfn10/ieYNP
-         khA69Qj26IQ8UR5qyOAKZ2EzYjtc03P2+dr9t/bcvVn3IxARPypmc/m5/M8IrCKUEUMn
-         joCRpUCeMw3ubVTCCyJ5IZIvg9pIJETA4igI0H4Der6qsPCanxI1/ZyzvYq98giMige/
-         l3fZ9vVmHHmC+X1fvtDNXe5KQ/Br8eOGGizwB1B0HTGBjtP2nmDq70FCqksU9TBlQYfR
-         dcvQ==
-X-Gm-Message-State: AOJu0Yx7ieZls1eXXpxeExpSASn74xO99LTbk4EUSo+SYs1Pgzw9qpuz
-	aueuKjiFtYmGvqvDnAdqQVvemuN2Hsc=
-X-Google-Smtp-Source: AGHT+IHwQ3Altg5ijf9VlkGm5a5jY0G3XWNDZ3cjy3PKWgGb5mRBP9mKaUXvIUFY3YuTgcTKF6tu2Q==
-X-Received: by 2002:a05:6e02:18c7:b0:35d:a349:ccef with SMTP id s7-20020a056e0218c700b0035da349ccefmr23660279ilu.22.1703007969483;
-        Tue, 19 Dec 2023 09:46:09 -0800 (PST)
-Received: from [172.16.49.130] ([136.33.23.24])
-        by smtp.googlemail.com with ESMTPSA id dn14-20020a056638090e00b004665e8a0608sm1557228jab.137.2023.12.19.09.46.08
+        bh=SeAU4yxCKG3wOsi6aZvvpaZgOCQGt/3Oi3Ak27U4h+A=;
+        b=H1Aj+BiJAgiulIj9fRbTJpkGHX149/kQLDZAlRfkzSab5/I4lZZtkM6P8do686MPBG
+         WAp8INWndOEVjw462FbtYNlFiq4vDLMpqRyU6Fat0DElHNrRfw0im3+IZQMsmXCz9CX6
+         KMZ4MTisRQLrjqNQWVAVmiY7QAcNst1pZjKoupb+Q+qRK6vjIdvWuhC52savz1/JkcBM
+         AGjPCq/NLt9OjUVbjIA3vr9F7I1Lu6Jq+ks13nV6SWJfX6Pr8XgkRoNdLLCzfGlheU3O
+         vEjGssULGKBOkuT+Ge5kvMg48QcbxRq4sFk6ksu2oqD0LkoXi/Cj0LGv9bXN1aD9Ttmr
+         rzEg==
+X-Gm-Message-State: AOJu0Yxj0Vpd/qKGwdAySPKhOARK+c1WOirqCC9K4AI0jn/vG5841SNc
+	oAr6Hs1FOr8dP2Ra0PNg/CQ=
+X-Google-Smtp-Source: AGHT+IHCbs1dWN9q5eJ3f/qgHhlY6q6hseZRlb6S9xpmJej4aW5ahROUtSSMtDivV9YVAVaPbAKIcg==
+X-Received: by 2002:a05:6830:1b73:b0:6db:a7a4:2524 with SMTP id d19-20020a0568301b7300b006dba7a42524mr417438ote.30.1703008177588;
+        Tue, 19 Dec 2023 09:49:37 -0800 (PST)
+Received: from [10.175.247.41] ([50.222.209.222])
+        by smtp.gmail.com with ESMTPSA id l17-20020a0568301d7100b006d8786f3510sm5042963oti.57.2023.12.19.09.49.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 09:46:09 -0800 (PST)
-Message-ID: <0072dc90-2e28-4f12-9980-b32a693ef8a3@gmail.com>
-Date: Tue, 19 Dec 2023 11:46:07 -0600
+        Tue, 19 Dec 2023 09:49:37 -0800 (PST)
+Message-ID: <2b3f455d-b265-471d-85eb-65202dcaf84d@gmail.com>
+Date: Tue, 19 Dec 2023 09:49:35 -0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -54,33 +54,44 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2 1/4] knownnetworks: network: support updating known
  network settings
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <20231218141250.202157-1-prestwoj@gmail.com>
  <6ac609fa-0540-479e-8ab3-387b0cab24cb@gmail.com>
  <ee339749-46cd-4927-a3fc-ff80924a5f70@gmail.com>
  <f2d94ed6-0902-4dcd-bc7a-b7c58e7e61e3@gmail.com>
  <4ab32218-16a7-4d15-a792-3aed887a91b5@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <4ab32218-16a7-4d15-a792-3aed887a91b5@gmail.com>
+ <0072dc90-2e28-4f12-9980-b32a693ef8a3@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <0072dc90-2e28-4f12-9980-b32a693ef8a3@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi James,
 
+On 12/19/23 9:46 AM, Denis Kenzior wrote:
+> Hi James,
+>
+>>>
+>>> Okay, then this patch in particular is not needed?
 >>
->> Okay, then this patch in particular is not needed?
-> 
-> Its at least partially needed, if a known network already exists prior to DPP 
-> and its overwritten there is no callback. So we may not need to actually touch 
-> network->settings at all as I thought. Just emit an UPDATED event when the 
-
-Okay, then just do that.
-
-> profile changes. DPP can then call network_autoconnect and the settings _should_ 
-> be re-loaded unless I'm forgetting some instance where network->settings can 
-> persist, but I don't think it can.
-
-network->settings is only created/opened when a connection is attempted.
-
-Regards,
--Denis
+>> Its at least partially needed, if a known network already exists 
+>> prior to DPP and its overwritten there is no callback. So we may not 
+>> need to actually touch network->settings at all as I thought. Just 
+>> emit an UPDATED event when the 
+>
+> Okay, then just do that.
+>
+>> profile changes. DPP can then call network_autoconnect and the 
+>> settings _should_ be re-loaded unless I'm forgetting some instance 
+>> where network->settings can persist, but I don't think it can.
+>
+> network->settings is only created/opened when a connection is attempted.
+Yeah, I think what caused most of my confusion was because DPP was using 
+network_set_passphrase/psk which will create an empty settings object if 
+the load fails (i.e. no profile). This then prevented 
+network_autoconnect() from opening the settings (since it thought they 
+already existed). So now the DPP change just syncs the profile and 
+doesn't touch the network object which lets network_autoconnect() deal 
+with loading, as it should.
+>
+> Regards,
+> -Denis
