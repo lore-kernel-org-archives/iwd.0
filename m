@@ -1,53 +1,53 @@
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D363825560
-	for <iwd@lists.linux.dev>; Wed, 20 Dec 2023 13:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681D225541
+	for <iwd@lists.linux.dev>; Wed, 20 Dec 2023 13:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMEuJujf"
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3b9f111c114so3820025b6e.1
-        for <iwd@lists.linux.dev>; Wed, 20 Dec 2023 05:12:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y1IAxffI"
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3ba1be5ad0aso3828330b6e.0
+        for <iwd@lists.linux.dev>; Wed, 20 Dec 2023 05:12:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703077930; x=1703682730; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1703077931; x=1703682731; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=p0r8COS43hybrdlcLSa48QXn75TJOVSuKgZDRTr3WWM=;
-        b=hMEuJujfKcavHFpq/mW3ZItl/vdeDkmtpV1Utd2TWUrSVBs/rrCwz2OiG+az/s8yHY
-         bIzpKm2JXAkzfHXEvGJ0VG8lpj4LY/KLty0l5urHBca5THEK7D2+bFsWOpva5tz+/voK
-         KZ2YfIMyCP9G8gYkmwVrXibVW4L++sQi7/08nQa6vqBMeq5LWTOA/Ra7F36RXSUrFLE6
-         9J1AIBePrhwB/xNinHP6miyMgSmMqwZkDiCbHykfDF4PCTwegwppH2xEGxAr/82tDLRK
-         FHmPeV2qC5/fVtqbJ1JqIWAdBJiS1SKMqpHcwFegti5is8LlhElrkMxcSQ6NCN7aCSaV
-         Mt1Q==
+        bh=okalQclEjrZbYfXcH/b2xNsErvaxrMNmJdqBPJuStic=;
+        b=Y1IAxffIS0w/a2eNTmXXQSzHFtvvPMngOe/w7tW5fFFK6M9SdaRf/sO0SjUyieWIfq
+         fYoZfMMzFd31ZzfK7tGyopeUZ0ffl5ozVdbrt7wt2WSQ8MKyvZR1Jnf8eJO0yhHBf5fW
+         sIRAqmZihPBJFTCtR0TVidVDLAFNVj4SjUCL2t6qHB6m50KPfMhkTGV9oIZvH8LVbWVG
+         VlpJ82RfwqXqkpAg4ze9hUdOhOLLgNI5QDhStziXhv8Pm512WQBwyoZYl88FfCrYuhRV
+         ITv8Ax6YMsdLkJxgZBSt9oqI0J5YW0XVChywfkEL4Sq4ck539HfrdP86TTl1sY61+Rjo
+         WLAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703077930; x=1703682730;
+        d=1e100.net; s=20230601; t=1703077931; x=1703682731;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=p0r8COS43hybrdlcLSa48QXn75TJOVSuKgZDRTr3WWM=;
-        b=qGYotZujzRYUIL06vCnp+JFmAgrw26YoRsXa+RZDo1WHeMnriYPYG5ZV0PW2iYk5O2
-         +nW7bkghQRJAVigQt4tNRTLsL5//vPTEt+aFkQCfUgIygZE2moycnaTwb0mYy8mzq3sp
-         WeUzo7awwJ1OeVFXTX6au8/Tb0QVPVWDyDvpkI8fPNpwkkuBlzTJdNyt0jxcswCTNA1Y
-         jvA+NiIxwz1GRrl0j/1tRILIIQhKHBTD/8E3/KkJ99WfTrsqO8U2jZuMwIqChzrCemWb
-         O//COtw9xdXcyLGiKg9VtZsfrqAd4md2Y/SjtyuErjufeHUvtinOMVjGZ5a9w1KBZw4W
-         Gukw==
-X-Gm-Message-State: AOJu0Yy4TB6WKBFNQ3AB0y8vJEKn+VX0CpIM+yBUgMEAPeYmnCflm07i
-	940ycL7tCYMrUW8pnNEqC4dd10qRjZ0=
-X-Google-Smtp-Source: AGHT+IEnHsXZlP7tGbC6JgqRQZWYzDpmcqwafcU1dTdJ+GutUYauSFatgqAtwtsVJ2FXt3qSIenuSg==
-X-Received: by 2002:a05:6808:3cf:b0:3b8:b063:5d8e with SMTP id o15-20020a05680803cf00b003b8b0635d8emr19467748oie.117.1703077930517;
-        Wed, 20 Dec 2023 05:12:10 -0800 (PST)
+        bh=okalQclEjrZbYfXcH/b2xNsErvaxrMNmJdqBPJuStic=;
+        b=h6i75RWwqHaL7BZhwXMaMUK8ENN9E3mmtYKMqiUK4+8txr3x+HSeqpKpPnnU6uc35d
+         asoqyd/nkI9fusVlo274/lR9I4OiOF0A4u4V5aGP1zr+oTJYcn1l1m4y2ijikI1ECvwA
+         Uf2xmcXHA6Dw989w7QI3B3Ir5QtQ8HjoHX+n3ZCAWZzhaYFjFsCAk1lIreHdnv2bfS5/
+         38XVW42JJyGWxDNdESDh3kFejxHHZomaxSchWOSmsbFF1XT9XxOpSQJ94EW8R6V2WpAq
+         DgS8QzoCTa7h7KTvVSZMeRqjRq2SEPQpV8iwPNJ4Sboe1+buamWUOlT1eEaqJH+5xzH8
+         GexA==
+X-Gm-Message-State: AOJu0YwJcNZ96yfqLIYXo4M6Ydd2uw2iFCDTCMc3r00Ty69tx+6k+jXw
+	o6qJT6RMZQaA08Kod+h6F67NAOGGSYM=
+X-Google-Smtp-Source: AGHT+IH8JeXjWy5INETsynjepva6lo7F5L1O1viJ+53vMs+VrwULjJsLXNRW9vyUkmCWaCjzwIMEVg==
+X-Received: by 2002:a05:6808:2227:b0:3bb:6a4d:deaf with SMTP id bd39-20020a056808222700b003bb6a4ddeafmr2105445oib.83.1703077931344;
+        Wed, 20 Dec 2023 05:12:11 -0800 (PST)
 Received: from LOCLAP699.barrett-olive-branch.locus ([50.222.209.222])
-        by smtp.gmail.com with ESMTPSA id j15-20020aca170f000000b003ba3a9c553esm2109591oii.30.2023.12.20.05.12.09
+        by smtp.gmail.com with ESMTPSA id j15-20020aca170f000000b003ba3a9c553esm2109591oii.30.2023.12.20.05.12.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 05:12:09 -0800 (PST)
+        Wed, 20 Dec 2023 05:12:11 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/7] known_network: rename known_network_add_frequency
-Date: Wed, 20 Dec 2023 05:11:54 -0800
-Message-Id: <20231220131200.267489-2-prestwoj@gmail.com>
+Subject: [PATCH 2/7] knownnetworks: add known_network_add_connected_frequency
+Date: Wed, 20 Dec 2023 05:11:55 -0800
+Message-Id: <20231220131200.267489-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231220131200.267489-1-prestwoj@gmail.com>
 References: <20231220131200.267489-1-prestwoj@gmail.com>
@@ -59,75 +59,134 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Rename to known_network_add_seen_frequency. This prepares to
-differentiate between tracking frequencies based on a BSS being
-seen versus being connected to. When a BSS has been connected to
-that frequency should be preferred when roaming/quick scanning.
+This should be called when BSS is connected/roamed to which will
+insert the frequency ahead of entries which were only seen in scan
+results.
+
+Providing this and the 'seen' variant sets up the frequency list
+into two adjacent sections:
+  [Most recently used]...[Most recently seen]
+
+Doing this will allow scanning to be more optimized and limit the
+number of frequencies while prefering BSS's that have been connected
+to prior.
+
+Note that this list format is not synced to the file system.
+Frequencies will be synced in the order of this list but not
+containing the 'connected' bit. When IWD restarts this information
+will be lost, but the list is still sorted on disk in a better state
+than it was prior.
 ---
- src/knownnetworks.c | 3 ++-
- src/knownnetworks.h | 3 ++-
- src/network.c       | 6 +++---
- 3 files changed, 7 insertions(+), 5 deletions(-)
+ src/knownnetworks.c | 59 ++++++++++++++++++++++++++++++++++++++++++++-
+ src/knownnetworks.h |  3 +++
+ 2 files changed, 61 insertions(+), 1 deletion(-)
 
 diff --git a/src/knownnetworks.c b/src/knownnetworks.c
-index 04ce74ec..eac6c66b 100644
+index eac6c66b..e44109fd 100644
 --- a/src/knownnetworks.c
 +++ b/src/knownnetworks.c
-@@ -566,7 +566,8 @@ static bool known_frequency_match(const void *a, const void *b)
+@@ -562,15 +562,70 @@ static bool known_frequency_match(const void *a, const void *b)
+ 	return known_freq->frequency == *frequency;
+ }
+ 
++static int known_frequency_compare(const void *a, const void *b,
++					void *user_data)
++{
++	const struct known_frequency *ka = a;
++
++	/*
++	 * Only meant to be used to insert 'seen' frequencies. Any existing
++	 * entry that has 'connected' set should preceed an entry that was
++	 * only seen.
++	 */
++	if (ka->connected)
++		return -1;
++
++	/*
++	 * Otherwise, insert immediately after the last 'connected' entry,
++	 * i.e. the most recently seen
++	 */
++	return 1;
++}
++
+ /*
   * Adds a frequency to the 'known' set of frequencies that this network
-  * operates on.  The list is sorted according to most-recently seen
+- * operates on.  The list is sorted according to most-recently seen
++ * operates on. Frequencies added here will follow frequencies which have been
++ * connected to and inserted according to most-recently seen
   */
--int known_network_add_frequency(struct network_info *info, uint32_t frequency)
-+int known_network_add_seen_frequency(struct network_info *info,
-+					uint32_t frequency)
+ int known_network_add_seen_frequency(struct network_info *info,
+ 					uint32_t frequency)
  {
  	struct known_frequency *known_freq;
  
++	if (!info->known_frequencies)
++		info->known_frequencies = l_queue_new();
++
++	known_freq = l_queue_find(info->known_frequencies,
++					known_frequency_match, &frequency);
++	/*
++	 * If no match, create a new one.
++	 * If connected to frequency before leave that entry in place
++	 */
++	if (!known_freq) {
++		known_freq = l_new(struct known_frequency, 1);
++		known_freq->frequency = frequency;
++	} else if (known_freq->connected)
++		return 0;
++
++	l_queue_remove(info->known_frequencies, known_freq);
++
++	/* insert the entry immediately after the last 'connected' entry */
++	l_queue_insert(info->known_frequencies, known_freq,
++			known_frequency_compare, NULL);
++
++	return 0;
++}
++
++/*
++ * Adds a frequency to the known set of frequencies that this network operates
++ * on. Frequencies added here are assumed to be most recently used and inserted
++ * at the head of the queue.
++ */
++int known_network_add_connected_frequency(struct network_info *info,
++						uint32_t frequency)
++{
++	struct known_frequency *known_freq;
++
+ 	if (!info->known_frequencies)
+ 		info->known_frequencies = l_queue_new();
+ 
+@@ -581,6 +636,8 @@ int known_network_add_seen_frequency(struct network_info *info,
+ 		known_freq->frequency = frequency;
+ 	}
+ 
++	known_freq->connected = true;
++
+ 	l_queue_push_head(info->known_frequencies, known_freq);
+ 
+ 	return 0;
 diff --git a/src/knownnetworks.h b/src/knownnetworks.h
-index e8ffac0b..d404b161 100644
+index d404b161..644e713f 100644
 --- a/src/knownnetworks.h
 +++ b/src/knownnetworks.h
-@@ -114,7 +114,8 @@ struct network_info *known_networks_find(const char *ssid,
+@@ -96,6 +96,7 @@ typedef void (*known_networks_destroy_func_t)(void *user_data);
  
- struct scan_freq_set *known_networks_get_recent_frequencies(
+ struct known_frequency {
+ 	uint32_t frequency;
++	bool connected : 1;
+ };
+ 
+ void __network_config_parse(const struct l_settings *settings,
+@@ -116,6 +117,8 @@ struct scan_freq_set *known_networks_get_recent_frequencies(
  						uint8_t num_networks_tosearch);
--int known_network_add_frequency(struct network_info *info, uint32_t frequency);
-+int known_network_add_seen_frequency(struct network_info *info,
+ int known_network_add_seen_frequency(struct network_info *info,
+ 					uint32_t frequency);
++int known_network_add_connected_frequency(struct network_info *info,
 +					uint32_t frequency);
  void known_network_frequency_sync(struct network_info *info);
  
  uint32_t known_networks_watch_add(known_networks_watch_func_t func,
-diff --git a/src/network.c b/src/network.c
-index 4723334e..3e8770bc 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -807,7 +807,7 @@ static void add_known_frequency(void *data, void *user_data)
- 	struct scan_bss *bss = data;
- 	struct network_info *info = user_data;
- 
--	known_network_add_frequency(info, bss->frequency);
-+	known_network_add_seen_frequency(info, bss->frequency);
- }
- 
- void network_set_info(struct network *network, struct network_info *info)
-@@ -1094,7 +1094,7 @@ bool network_bss_add(struct network *network, struct scan_bss *bss)
- 		return false;
- 
- 	if (network->info)
--		known_network_add_frequency(network->info, bss->frequency);
-+		known_network_add_seen_frequency(network->info, bss->frequency);
- 
- 	/* Done if BSS is not HS20 or we already have network_info set */
- 	if (!bss->hs20_capable)
-@@ -1131,7 +1131,7 @@ bool network_bss_update(struct network *network, struct scan_bss *bss)
- 
- 	/* Sync frequency for already known networks */
- 	if (network->info) {
--		known_network_add_frequency(network->info, bss->frequency);
-+		known_network_add_seen_frequency(network->info, bss->frequency);
- 		known_network_frequency_sync(network->info);
- 	}
- 
 -- 
 2.34.1
 
