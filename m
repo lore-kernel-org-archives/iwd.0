@@ -1,56 +1,53 @@
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812092554B
-	for <iwd@lists.linux.dev>; Wed, 20 Dec 2023 13:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FE225752
+	for <iwd@lists.linux.dev>; Wed, 20 Dec 2023 13:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hAzf1LSc"
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3ba46a19689so4576167b6e.3
-        for <iwd@lists.linux.dev>; Wed, 20 Dec 2023 05:12:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fo1I8PNc"
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3bb6ed2b913so529096b6e.2
+        for <iwd@lists.linux.dev>; Wed, 20 Dec 2023 05:15:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703077935; x=1703682735; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XXM9fDGsJhcvLM2r6QHQn6cB2B8VNSaSk3keVtia3zo=;
-        b=hAzf1LScxUDuzvv401xdD5u2ekxHIMGhMDg+cSJHUq1HbCgR76ZzfqCPFvG858oJc2
-         oN6sPMwjpa5EW9gtsHv4E/tY8uSZpc2R842sLJ7P4uk2/HKxsTzN6N+eSPk6oK81rw/q
-         EHhOmu3AyjcZxkXTe3Xxxu4cqIsWWRRhUCOQ6PL5pcUgp0eVSSckEVyt0lEiPmv+W52z
-         muozqKcqpN8xXlM/Jou7+DSmJyhifnaAtjC1ydPFS81ytjdxj8JaEHwKSdxnJwwjV7qL
-         VPJNk4SqOj73wf5QiIIRHfD6n2oYDZqaR3Dl3u523xN3XfnnpVSoKcKZUvey9kCt21cI
-         Km/w==
+        d=gmail.com; s=20230601; t=1703078112; x=1703682912; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0R64pEBzdlh+5LwtZ54IZaHpQJGU09o1WLlkirc0ISs=;
+        b=Fo1I8PNcRldQlGFqdflrAAGC+cWjYMpkM+wj8GtaXidkrdRoVBw46Zd+PJJtwzAkQc
+         1tzcPwKggMEPCfvg5OTxSERKmtjVbsJ+cpK6TNJ6U6NMP5QVp1Mgxbcj8Vkp498M3yQp
+         DFj8HsIVxVYG9u9gd+gTtNrxmAdBYXKr+JIHZVOkaVM65sv51XmjjyzClNFIVMFD/OvW
+         lGaHGdxe/PNU2FeuKKnsKkx+0V9Gt1WHF5+/TJlTjNQkKxuUMQWzbN4Wt/VWOK5hMvDr
+         bir7IDImxgmDDVMuJ2njF7VAB8VIHnISHDhCc37VmwDVZAcCgap/w7heDybg/DR3BRxB
+         0niw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703077935; x=1703682735;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XXM9fDGsJhcvLM2r6QHQn6cB2B8VNSaSk3keVtia3zo=;
-        b=D3rZRUORKwxo7qwZfq6rpi5YIltlCH96bC4IFisUXf9RjDiWDELqGU1eUToTgxWUe6
-         quRJ8TCgnnZUVi7GYabpiRstgohUhU2erID6svq0IepxQf5nRf8YewtQsYY9j+VMu7F/
-         uGJrRVWvUhpYSEAVVJGbVPESZZggPxSaCBvsQprF5s5a2OFnNlJEUma/13I8QHyy7xuO
-         b5C8wMC7atOQjgNUzFDt5JJEHGM//avtmn05OCJ7LCkM24nbqNwrYSwKjoabyY6OzCF7
-         Td6Tj2EZOFqigZ3Yaw7AlYUvG5T3hzCzfM1ympt7FrI6Jqaoh1LBSU9sGtUdwO6dzE62
-         vZ1Q==
-X-Gm-Message-State: AOJu0YwPxoQHoQZoGXR9otQdZcNoiHy/2iUmtIYVIV/k9ivxfYYogLAr
-	tfbPeXoccJ0bprhy4Cq0w7D1tx/yrVk=
-X-Google-Smtp-Source: AGHT+IFFmeBbA9zk+tGcOX0KHvjnZvmCHb73NLfdWNY4X/NZU7nBvRjB8WMOByruKUtirGqD583U1g==
-X-Received: by 2002:a05:6808:22a4:b0:3b8:44e3:dfda with SMTP id bo36-20020a05680822a400b003b844e3dfdamr23558857oib.3.1703077935464;
-        Wed, 20 Dec 2023 05:12:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703078112; x=1703682912;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0R64pEBzdlh+5LwtZ54IZaHpQJGU09o1WLlkirc0ISs=;
+        b=hE8WKvZEGVlncICAM04H0+F9gjf+I5kHdFKvmIsoOI86p8bZ0zl3Fmroi5gVHJq7mt
+         a8EXFwhnHpQ1lfZ9eCXqvJJ5lRRHI4znK02iekW0ErYvakIMYN5SI3cgtH7+kMdwRGQ0
+         fiDdSVKYcMPJzIMkWEbt5Gs7YkCHLPhXTLcJBB8NBe9c+BGyzJAjvZcVslazVbFRYpmT
+         PCJKosuH6ca8xSOEWJBCuYu5VzAMyvzXtu7osDKD/r6XzcpcgGEB/onjG2dJImYsMyvO
+         QFblrSUKpk3qyE+ovL7fvYRvWfJbXHCphsLwRsK5bL8OmhoeZceJCVaJQ48s7TUPEzIz
+         e46A==
+X-Gm-Message-State: AOJu0Yytv87/EAJmKKOJ3VMPfsatDaHn+tYEurWdkrn2mJqPvGjxozB0
+	XlYLcJhCyfeD72sE6GX/vzUPbnJlwvk=
+X-Google-Smtp-Source: AGHT+IGWWrQciDjMOlM0v1Uvvuzogrr/Nh3pcS+8gYXwcj+NKjgpbe5jwHMf6DweNMMf1HxMkbUSRw==
+X-Received: by 2002:a05:6808:2e8c:b0:3bb:6e0f:4e6a with SMTP id gt12-20020a0568082e8c00b003bb6e0f4e6amr1871906oib.103.1703078112440;
+        Wed, 20 Dec 2023 05:15:12 -0800 (PST)
 Received: from LOCLAP699.barrett-olive-branch.locus ([50.222.209.222])
-        by smtp.gmail.com with ESMTPSA id j15-20020aca170f000000b003ba3a9c553esm2109591oii.30.2023.12.20.05.12.14
+        by smtp.gmail.com with ESMTPSA id cc7-20020a056808324700b003ba4d1225e6sm1467456oib.45.2023.12.20.05.15.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 05:12:15 -0800 (PST)
+        Wed, 20 Dec 2023 05:15:12 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/7] knownnetworks: limit 5 recent frequencies per network
-Date: Wed, 20 Dec 2023 05:12:00 -0800
-Message-Id: <20231220131200.267489-8-prestwoj@gmail.com>
+Subject: [PATCH] knownnetworks: limit 5 recent frequencies per network
+Date: Wed, 20 Dec 2023 05:15:09 -0800
+Message-Id: <20231220131509.267549-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231220131200.267489-1-prestwoj@gmail.com>
-References: <20231220131200.267489-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -70,6 +67,9 @@ somewhat confident that this will result in a BSS to connect to.
 ---
  src/knownnetworks.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
+
+ - Whoops, this did not make it into the original patch set:
+   "Reduce and optimize quick/roam scan frequencies"
 
 diff --git a/src/knownnetworks.c b/src/knownnetworks.c
 index e44109fd..ecdd79a1 100644
