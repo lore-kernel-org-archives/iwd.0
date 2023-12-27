@@ -1,53 +1,53 @@
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0817E46BF
-	for <iwd@lists.linux.dev>; Wed, 27 Dec 2023 06:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B1B4C9F
+	for <iwd@lists.linux.dev>; Wed, 27 Dec 2023 06:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EJalIaFp"
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-20389f2780fso4210934fac.2
-        for <iwd@lists.linux.dev>; Tue, 26 Dec 2023 22:10:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AYQLRzf5"
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-204e1203a22so74918fac.1
+        for <iwd@lists.linux.dev>; Tue, 26 Dec 2023 22:10:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1703657443; x=1704262243; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rG9LkBoL9ME55EULuhkRZC+KHE7gMJYNaTaCrK3SS+g=;
-        b=EJalIaFpEgZp/qFM7jWzhTSGiPKovQXTIUm1H5o5wWpSPu2D8ld/zV48EurcRwM9Fp
-         ry4QURFePfjWIW75bQJ5uci63xKu8fDgLU2qIKMm8DHl+pVzUZKO5zx1N2jE5/EMfSnn
-         xtFF/ywDWc6rHWviCUvzWbWH1XpszoUhSNQTKewTHdUrotDPZbNjGoW+RDpaJHka9gsY
-         JIs30g98+KruP5+QKDn3k3eBiPdNA/8nnCwhIpDe+MQQX3LvEJepAp9tMw0B+/VcWRiE
-         Wvlw1/bN9LZYn7MEhK8t/WzVjRHIu/witxPP1baM/fPR2aiLmeZyAwGW3hbm1GWOHwRd
-         q4qw==
+        bh=R5Se5BGCQUSsT2Yvzo8uqyBZrNXRRIs2rsNO8xOD9no=;
+        b=AYQLRzf54S0iBAt0iLfp8s1WSaUcscfOYIfuLZMMD3vvmJ3J+y+BocNUSbw/cg8b5t
+         f3UX9mNFA1HkYEL65gZ8rXra3GrA70LtyNn87vmjkTMVMK5hJN2w488AGkY9Cy611y+E
+         5sqyDrrmGXQlqAUxyZ/Xu9W4XU4feYyriTKnxD62DZC6LLAnMcyHR8YMuGSCxXcoo1He
+         Xx44ad0LceUIpHLgzpXaom3IRbTp2trq2hNR5tkWY94Hu4oKtKYwg9/EiUai9A2iIg99
+         ffvA6sZp5Kz5dRJcY2MAMi0Sib2f5iaXk2QWW/FlS1TET4XqPhGbfaWkAF8aH7wPoWzU
+         RC0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1703657443; x=1704262243;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rG9LkBoL9ME55EULuhkRZC+KHE7gMJYNaTaCrK3SS+g=;
-        b=L/jVon7hdqY/bj7Zbsl3OzKqqW6plRLFsDq16jfTxtpOAzvhG4enUHe3uBXfF7vMCw
-         VrkAO2kFaaPsmhlmwQSnAkEcRkjTKlNdAWngdLDmq457q6KXRPNbgqKmmbA5SuA1foTI
-         CXiXlqtych1fon++8heamiOYj5ptR+bA49v6x0QVvS4iGD3U6xuryyWVTod9LnOd9r2b
-         txb/X8b5ps0UDWFhGOU80CPF3wUVGu9Fqi0L1gQr3E4jElLOWS0o/mBoEEknPwXDjoyE
-         Qg40k7+BWUsE6QAm/NLZCQ07bfyXj+OteVP9Ll2UegzfTbPs93ezc9UqduQxCMbJudLo
-         +l+w==
-X-Gm-Message-State: AOJu0Ywc5xCJ1y8EuG5Iu/bnn7v/f+mrsgnktMPSwW7qzbFonTHYBOng
-	N0yH1bGQG5mMRWMnbk7yNuj5HP+hilI=
-X-Google-Smtp-Source: AGHT+IEdUGH53XpSTpwp4NVy/A6jTPzybcwoBYzi+gLXcUWSwEy80v3gmMX+C8CwylDv9d/IOMyZrQ==
-X-Received: by 2002:a05:6870:910c:b0:203:adc9:ca3d with SMTP id o12-20020a056870910c00b00203adc9ca3dmr10986404oae.98.1703657442759;
-        Tue, 26 Dec 2023 22:10:42 -0800 (PST)
+        bh=R5Se5BGCQUSsT2Yvzo8uqyBZrNXRRIs2rsNO8xOD9no=;
+        b=JSKEfCbIHEPo6X3CUahRYkEZfymVSxTz/WfOAcFlne7Un5vtS8yvCpk4WildS6fSyN
+         Xr1yJngF/lJw1rcR8XgKLKTCzwfHE6+MxS4bzKjIfplsjOO79WqmR0tzhRnKJ/vvxXNX
+         8CFa6vqwF0R8ARAl+165fL3ydjdH+no5MtY5qyWki8iiVNrQFgMcSmx8fWDHBKWYGEnj
+         5yHYJqCSjSZD+/MGvOegTyZSufzz+6zQRPT0GODHCdpEYzZXmSuGgDwSMli7jMO0nFIf
+         az/rET1/i27poLSICXURXDzQ9sOEQqR95wnHYFzHdlEYIgeglj+4eYYbYWO4mUZvl2jv
+         LO7A==
+X-Gm-Message-State: AOJu0YzBbm3es44XdQ431e02NnX5LyvZG/33QH74drMTrJoEw/wTWRTc
+	Cte1VDTfpNt5910AIvCufLj9nDyXt3Q=
+X-Google-Smtp-Source: AGHT+IFA1/yTqpSG776Fhs5KJSY1nDRYJsbZhiSKEguZ04sUGt4W5a2NO8qDs44YZ2SwHVCqVXvw7Q==
+X-Received: by 2002:a05:6870:2192:b0:203:dfdc:a80a with SMTP id l18-20020a056870219200b00203dfdca80amr7084754oae.112.1703657443337;
+        Tue, 26 Dec 2023 22:10:43 -0800 (PST)
 Received: from localhost.localdomain (216.106.68.145.reverse.socket.net. [216.106.68.145])
         by smtp.gmail.com with ESMTPSA id vs7-20020a056871a10700b002032bb7895fsm3048841oab.55.2023.12.26.22.10.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Dec 2023 22:10:42 -0800 (PST)
+        Tue, 26 Dec 2023 22:10:43 -0800 (PST)
 From: Denis Kenzior <denkenz@gmail.com>
 To: iwd@lists.linux.dev
 Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 4/5] monitor: Move iwmon reading logic into main.c
-Date: Wed, 27 Dec 2023 00:09:49 -0600
-Message-ID: <20231227060954.103572-4-denkenz@gmail.com>
+Subject: [PATCH 5/5] RFC: Initial iwtrace utility
+Date: Wed, 27 Dec 2023 00:09:50 -0600
+Message-ID: <20231227060954.103572-5-denkenz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231227060954.103572-1-denkenz@gmail.com>
 References: <20231227060954.103572-1-denkenz@gmail.com>
@@ -59,465 +59,543 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To support multiple nlmon sources, move the logic that reads from iwmon
-device into main.c instead of nlmon.  nlmon.c now becomes agnostic of
-how the packets are actually obtained.  Packets are fed in via
-high-level APIs such as nlmon_print_rtnl, nlmon_print_genl,
-nlmon_print_pae.
+eBPF based tracing, similar to iwmon.  This is meant as an alternative
+to the nlmon based netlink tracing and can be used on kernels where
+nlmon might not be available.
 ---
- monitor/main.c  | 175 ++++++++++++++++++++++++++++++++++++++++++++++--
- monitor/nlmon.c | 165 +--------------------------------------------
- monitor/nlmon.h |   2 +-
- 3 files changed, 174 insertions(+), 168 deletions(-)
+ Makefile.am           |  46 ++++++---
+ configure.ac          |  11 +++
+ monitor/iwtrace.bpf.c | 194 +++++++++++++++++++++++++++++++++++++
+ monitor/iwtrace.c     | 218 ++++++++++++++++++++++++++++++++++++++++++
+ monitor/iwtrace.h     |  12 +++
+ 5 files changed, 466 insertions(+), 15 deletions(-)
+ create mode 100644 monitor/iwtrace.bpf.c
+ create mode 100644 monitor/iwtrace.c
+ create mode 100644 monitor/iwtrace.h
 
-diff --git a/monitor/main.c b/monitor/main.c
-index 0c5f0670c706..e9384e1b884f 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -32,10 +32,13 @@
- #include <string.h>
- #include <getopt.h>
- #include <signal.h>
-+#include <arpa/inet.h>
- #include <sys/socket.h>
- #include <linux/genetlink.h>
- #include <linux/rtnetlink.h>
- #include <linux/if_arp.h>
-+#include <linux/filter.h>
-+#include <sys/ioctl.h>
- #include <ell/ell.h>
+diff --git a/Makefile.am b/Makefile.am
+index 5ed6ab37164b..601db513d1e3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -327,23 +327,39 @@ endif
+ endif
  
- #ifndef ARPHRD_NETLINK
-@@ -68,11 +71,160 @@ static struct nlmon_config config;
- #define NLMON_TYPE "nlmon"
- #define NLMON_LEN  5
+ if MONITOR
++MONITOR_SOURCES = linux/nl80211.h \
++				monitor/nlmon.h monitor/nlmon.c \
++				monitor/pcap.h monitor/pcap.c \
++				monitor/display.h monitor/display.c \
++				src/ie.h src/ie.c \
++				src/wscutil.h src/wscutil.c \
++				src/mpdu.h src/mpdu.c \
++				src/util.h src/util.c \
++				src/crypto.h src/crypto.c \
++				src/watchlist.h src/watchlist.c \
++				src/eapolutil.h src/eapolutil.c \
++				src/nl80211cmd.h src/nl80211cmd.c \
++				src/p2putil.c src/p2putil.h \
++				src/anqputil.h src/anqputil.c \
++				src/band.h src/band.c
+ bin_PROGRAMS += monitor/iwmon
  
-+static bool nlmon_receive(struct l_io *io, void *user_data)
+-monitor_iwmon_SOURCES = monitor/main.c linux/nl80211.h \
+-					monitor/nlmon.h monitor/nlmon.c \
+-					monitor/pcap.h monitor/pcap.c \
+-					monitor/display.h monitor/display.c \
+-					src/ie.h src/ie.c \
+-					src/wscutil.h src/wscutil.c \
+-					src/mpdu.h src/mpdu.c \
+-					src/util.h src/util.c \
+-					src/crypto.h src/crypto.c \
+-					src/watchlist.h src/watchlist.c \
+-					src/eapolutil.h src/eapolutil.c \
+-					src/nl80211cmd.h src/nl80211cmd.c \
+-					src/p2putil.c src/p2putil.h \
+-					src/anqputil.h src/anqputil.c \
+-					src/band.h src/band.c
++if BPF
++bin_PROGRAMS += monitor/iwtrace
++
++monitor/iwtrace.bpf.o: monitor/iwtrace.bpf.c
++	clang -g -O2 -target bpf -c monitor/iwtrace.bpf.c -o monitor/iwtrace.tmp.bpf.o
++	bpftool gen object monitor/iwtrace.bpf.o monitor/iwtrace.tmp.bpf.o
++
++monitor/iwtrace.skel.h: monitor/iwtrace.bpf.o
++	bpftool gen skeleton monitor/iwtrace.bpf.o > monitor/iwtrace.skel.h
++
++monitor_iwtrace_SOURCES = monitor/iwtrace.c monitor/iwtrace.h \
++				monitor/iwtrace.skel.h $(MONITOR_SOURCES)
++monitor_iwtrace_LDADD = $(ell_ldadd) $(LIBBPF_LIBS)
++endif
++
++monitor_iwmon_SOURCES = monitor/main.c $(MONITOR_SOURCES)
+ monitor_iwmon_LDADD = $(ell_ldadd)
+ 
+ if MANUAL_PAGES
+diff --git a/configure.ac b/configure.ac
+index d84e035c2f5f..bb7bfedcf80f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -200,6 +200,17 @@ AC_ARG_ENABLE([monitor], AS_HELP_STRING([--disable-monitor],
+ 					[enable_monitor=${enableval}])
+ AM_CONDITIONAL(MONITOR, test "${enable_monitor}" != "no")
+ 
++AC_ARG_ENABLE([bpf], AS_HELP_STRING([--disable-bpf],
++				[don't enable bpf based tracing]),
++					[enable_bpf=${enableval}])
++if (test "${enable_bpf}" != "no"); then
++	PKG_CHECK_MODULES(LIBBPF, libbpf, dummy=yes,
++			AC_MSG_ERROR(libbpf is required))
++	AC_SUBST(LIBBPF_CFLAGS)
++	AC_SUBST(LIBBPF_LIBS)
++fi
++AM_CONDITIONAL(BPF, test "${enable_bpf}" != "no")
++
+ AC_ARG_ENABLE([dbus-policy], AS_HELP_STRING([--disable-dbus-policy],
+ 				[don't install D-Bus system policy files]),
+ 					[enable_dbus_policy=${enableval}])
+diff --git a/monitor/iwtrace.bpf.c b/monitor/iwtrace.bpf.c
+new file mode 100644
+index 000000000000..251b54fc2a41
+--- /dev/null
++++ b/monitor/iwtrace.bpf.c
+@@ -0,0 +1,194 @@
++/*
++ * Embedded Linux library
++ * Copyright (C) 2023  Cruise, LLC
++ *
++ * SPDX-License-Identifier: GPL-2.0-only
++ */
++
++#include <stdint.h>
++#include <string.h>
++#include <linux/types.h>
++#include <linux/bpf.h>
++#include <linux/netlink.h>
++#include <bpf/bpf_helpers.h>
++#include <bpf/bpf_tracing.h>
++#include <bpf/bpf_core_read.h>
++#include "iwtrace.h"
++
++char LICENSE[] SEC("license") = "GPL";
++
++struct sock;
++struct netlink_ext_ack;
++
++struct {
++	__uint(type, BPF_MAP_TYPE_RINGBUF);
++	__uint(max_entries, 256 * 1024);
++} rb SEC(".maps");
++
++struct sock {
++	uint16_t sk_protocol;
++};
++
++struct sk_buff {
++	unsigned int len, data_len;
++	unsigned char *data;
++	struct net_device *dev;
++	union {
++		struct sock		*sk;
++		int			ip_defrag_offset;
++	};
++};
++
++struct capture_256 {
++	struct metadata meta;
++	uint8_t packet[256 - sizeof(struct metadata)];
++} __attribute__ ((packed));
++
++struct capture_1k {
++	struct metadata meta;
++	uint8_t packet[1024 - sizeof(struct metadata)];
++} __attribute__ ((packed));
++
++struct capture_4k {
++	struct metadata meta;
++	uint8_t packet[4096 - sizeof(struct metadata)];
++} __attribute__ ((packed));
++
++struct capture_8k {
++	struct metadata meta;
++	uint8_t packet[8192 - sizeof(struct metadata)];
++} __attribute__ ((packed));
++
++struct capture_16k {
++	struct metadata meta;
++	uint8_t packet[16384];
++} __attribute__ ((packed));
++
++static void metadata_fill(struct metadata *meta, const struct sk_buff *skb)
 +{
-+	struct nlmon *nlmon = user_data;
-+	struct msghdr msg;
-+	struct sockaddr_ll sll;
-+	struct iovec iov;
-+	struct cmsghdr *cmsg;
-+	struct timeval copy_tv;
-+	const struct timeval *tv = NULL;
-+	uint16_t proto_type;
-+	unsigned char buf[8192];
-+	unsigned char control[32];
-+	ssize_t bytes_read;
-+	int fd;
++	struct sock *sk = __builtin_preserve_access_index(skb->sk);
 +
-+	fd = l_io_get_fd(io);
-+	if (fd < 0)
-+		return false;
++	meta->timestamp = bpf_ktime_get_boot_ns();
++	meta->len = __builtin_preserve_access_index(skb->len);
++	meta->protocol = __builtin_preserve_access_index(sk->sk_protocol);
++}
 +
-+	memset(&sll, 0, sizeof(sll));
++static int capture_common(const struct sk_buff *skb)
++{
++	uint16_t len = __builtin_preserve_access_index(skb->len);
++	const void *data = __builtin_preserve_access_index(skb->data);
 +
-+	memset(&iov, 0, sizeof(iov));
-+	iov.iov_base = buf;
-+	iov.iov_len = sizeof(buf);
++	/*
++	 * bpf_ringbuf_reserve is currently limited to a known constant
++	 * value, and cannot handle values that are not constant (even if
++	 * bounded).  bpf_ringbuf_output might be suitable, but no metadata
++	 * could be prepended if that is used.  Another alternative is to use
++	 * a perf buffer, but it is per-CPU and might result in packets being
++	 * processed out of order.  We trick the validator by using several
++	 * well known structure sizes (256/1k/4k/8k/16k) in order to save on
++	 * memory space, but the resultant program is larger than it would be
++	 * if dynamic sizing was supported.
++	 */
++	if (len <= 256 - sizeof(struct metadata)) {
++		struct capture_256 *c256 = bpf_ringbuf_reserve(&rb,
++					sizeof(struct capture_256), 0);
 +
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_name = &sll;
-+	msg.msg_namelen = sizeof(sll);
-+	msg.msg_iov = &iov;
-+	msg.msg_iovlen = 1;
-+	msg.msg_control = control;
-+	msg.msg_controllen = sizeof(control);
++		if (!c256)
++			return 0;
 +
-+	bytes_read = recvmsg(fd, &msg, 0);
-+	if (bytes_read < 0) {
-+		if (errno != EAGAIN && errno != EINTR)
-+			return false;
++		metadata_fill(&c256->meta, skb);
 +
-+		return true;
++		if (bpf_probe_read_kernel(c256->packet, len, data) < 0)
++			bpf_ringbuf_discard(c256, BPF_RB_NO_WAKEUP);
++		else
++			bpf_ringbuf_submit(c256, 0);
++
++		return 0;
 +	}
 +
-+	if (sll.sll_hatype != ARPHRD_NETLINK)
-+		return true;
++	if (len <= sizeof(struct capture_1k) - sizeof(struct metadata)) {
++		struct capture_1k *c1k = bpf_ringbuf_reserve(&rb,
++						sizeof(struct capture_1k), 0);
 +
-+	proto_type = ntohs(sll.sll_protocol);
++		if (!c1k)
++			return 0;
 +
-+	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg;
-+				cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-+		if (cmsg->cmsg_level == SOL_SOCKET &&
-+					cmsg->cmsg_type == SCM_TIMESTAMP) {
-+			memcpy(&copy_tv, CMSG_DATA(cmsg), sizeof(copy_tv));
-+			tv = &copy_tv;
-+		}
++		metadata_fill(&c1k->meta, skb);
++
++		if (bpf_probe_read_kernel(c1k->packet, len, data) < 0)
++			bpf_ringbuf_discard(c1k, BPF_RB_NO_WAKEUP);
++		else
++			bpf_ringbuf_submit(c1k, 0);
++
++		return 0;
 +	}
 +
-+	switch (proto_type) {
++	if (len <= sizeof(struct capture_4k) - sizeof(struct metadata)) {
++		struct capture_4k *c4k = bpf_ringbuf_reserve(&rb,
++						sizeof(struct capture_4k), 0);
++
++		if (!c4k)
++			return 0;
++
++		metadata_fill(&c4k->meta, skb);
++
++		if (bpf_probe_read_kernel(c4k->packet, len, data) < 0)
++			bpf_ringbuf_discard(c4k, BPF_RB_NO_WAKEUP);
++		else
++			bpf_ringbuf_submit(c4k, 0);
++
++		return 0;
++	}
++
++	if (len <= sizeof(struct capture_8k) - sizeof(struct metadata)) {
++		struct capture_8k *c8k = bpf_ringbuf_reserve(&rb,
++						sizeof(struct capture_8k), 0);
++
++		if (!c8k)
++			return 0;
++
++		metadata_fill(&c8k->meta, skb);
++
++		if (bpf_probe_read_kernel(c8k->packet, len, data) < 0)
++			bpf_ringbuf_discard(c8k, BPF_RB_NO_WAKEUP);
++		else
++			bpf_ringbuf_submit(c8k, 0);
++
++		return 0;
++	}
++
++	/* 16384 is the largest packet size for genl currently */
++	if (len <= 16384) {
++		struct capture_16k *c16k = bpf_ringbuf_reserve(&rb,
++						sizeof(struct capture_16k), 0);
++
++		if (!c16k)
++			return 0;
++
++		metadata_fill(&c16k->meta, skb);
++
++		if (bpf_probe_read_kernel(c16k->packet, len, data) < 0)
++			bpf_ringbuf_discard(c16k, BPF_RB_NO_WAKEUP);
++		else
++			bpf_ringbuf_submit(c16k, 0);
++
++		return 0;
++	}
++
++	return 0;
++}
++
++SEC("fentry/__netlink_sendskb")
++int BPF_PROG(trace___netlink_sendskb, struct sock *sk, struct sk_buff *skb)
++{
++	return capture_common(skb);
++}
++
++SEC("fentry/netlink_rcv_skb")
++int BPF_PROG(trace_netlink_rcv_skb, struct sk_buff *skb,
++					int (*cb)(struct sk_buff *,
++                                                   struct nlmsghdr *,
++                                                   struct netlink_ext_ack *))
++{
++	return capture_common(skb);
++}
+diff --git a/monitor/iwtrace.c b/monitor/iwtrace.c
+new file mode 100644
+index 000000000000..ceff71753463
+--- /dev/null
++++ b/monitor/iwtrace.c
+@@ -0,0 +1,218 @@
++/*
++ * Copyright (C) 2023  Cruise, LLC
++ *
++ * SPDX-License-Identifier: LGPL-2.1-or-later
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++#include <argp.h>
++#include <signal.h>
++#include <stdio.h>
++#include <time.h>
++#include <inttypes.h>
++#include <arpa/inet.h>
++#include <sys/resource.h>
++#include <bpf/libbpf.h>
++#include <linux/rtnetlink.h>
++#include "iwtrace.h"
++#include "iwtrace.skel.h"
++#include "monitor/nlmon.h"
++#include "monitor/pcap.h"
++#include "monitor/display.h"
++
++#include <ell/ell.h>
++
++static struct iwtrace_bpf *skel;
++static struct ring_buffer *rb;
++static struct l_io *io;
++static struct l_genl *genl;
++static struct nlmon_config config;
++static const char *writer_path;
++static struct nlmon *nlmon;
++
++#ifndef ARPHRD_NETLINK
++#define ARPHRD_NETLINK	824
++#endif
++
++static int libbpf_print_fn(enum libbpf_print_level level,
++				const char *format, va_list args)
++{
++	return vfprintf(stderr, format, args);
++}
++
++static int handle_packet(void *ctx, void *data, size_t size)
++{
++	struct metadata *meta = data;
++	struct timeval tv;
++
++	data += sizeof(struct metadata);
++
++	tv.tv_sec = meta->timestamp / L_NSEC_PER_SEC;
++	tv.tv_usec = (meta->timestamp % L_NSEC_PER_SEC) / L_NSEC_PER_USEC;
++
++	switch (meta->protocol) {
 +	case NETLINK_ROUTE:
-+		nlmon_print_rtnl(nlmon, tv, iov.iov_base, bytes_read);
++		nlmon_print_rtnl(nlmon, &tv, data, meta->len);
 +		break;
 +	case NETLINK_GENERIC:
-+		nlmon_print_genl(nlmon, tv, iov.iov_base, bytes_read);
++		nlmon_print_genl(nlmon, &tv, data, meta->len);
 +		break;
 +	}
++
++	return 0;
++}
++
++static bool ringbuf_receive(struct l_io *io, void *user_data)
++{
++	ring_buffer__poll(rb, 0);
 +
 +	return true;
 +}
 +
-+/*
-+ * BPF filter to match skb->dev->type == 824 (ARPHRD_NETLINK) and
-+ * either match skb->protocol == 0x0000 (NETLINK_ROUTE) or match
-+ * skb->protocol == 0x0010 (NETLINK_GENERIC).
-+ */
-+static struct sock_filter mon_filter[] = {
-+	{ 0x28,  0,  0, 0xfffff01c },	/* ldh #hatype		*/
-+	{ 0x15,  0,  3, 0x00000338 },	/* jne #824, drop	*/
-+	{ 0x28,  0,  0, 0xfffff000 },	/* ldh #proto		*/
-+	{ 0x15,  2,  0, 0000000000 },	/* jeq #0x0000, pass	*/
-+	{ 0x15,  1,  0, 0x00000010 },	/* jeq #0x0010, pass	*/
-+	{ 0x06,  0,  0, 0000000000 },	/* drop: ret #0		*/
-+	{ 0x06,  0,  0, 0xffffffff },	/* pass: ret #-1	*/
-+};
-+
-+static const struct sock_fprog mon_fprog = { .len = 7, .filter = mon_filter };
-+
-+static struct l_io *open_packet(const char *name)
++static void nl80211_appeared(const struct l_genl_family_info *info,
++					void *user_data)
 +{
-+	struct l_io *io;
-+	struct sockaddr_ll sll;
-+	struct packet_mreq mr;
-+	struct ifreq ifr;
-+	int fd, opt = 1;
++	int err;
 +
-+	fd = socket(PF_PACKET, SOCK_RAW | SOCK_CLOEXEC | SOCK_NONBLOCK, 0);
-+	if (fd < 0) {
-+		perror("Failed to create packet socket");
-+		return NULL;
-+	}
-+
-+	strncpy(ifr.ifr_name, name, IFNAMSIZ - 1);
-+
-+	if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) {
-+		perror("Failed to get monitor index");
-+		close(fd);
-+		return NULL;
-+	}
-+
-+	memset(&sll, 0, sizeof(sll));
-+	sll.sll_family = AF_PACKET;
-+	sll.sll_protocol = htons(ETH_P_ALL);
-+	sll.sll_ifindex = ifr.ifr_ifindex;
-+
-+	if (bind(fd, (struct sockaddr *) &sll, sizeof(sll)) < 0) {
-+		perror("Failed to bind packet socket");
-+		close(fd);
-+		return NULL;
-+	}
-+
-+	memset(&mr, 0, sizeof(mr));
-+	mr.mr_ifindex = ifr.ifr_ifindex;
-+	mr.mr_type = PACKET_MR_ALLMULTI;
-+
-+	if (setsockopt(fd, SOL_PACKET, PACKET_ADD_MEMBERSHIP,
-+						&mr, sizeof(mr)) < 0) {
-+		perror("Failed to enable all multicast");
-+		close(fd);
-+		return NULL;
-+	}
-+
-+	if (setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER,
-+					&mon_fprog, sizeof(mon_fprog)) < 0) {
-+		perror("Failed to enable monitor filter");
-+		close(fd);
-+		return NULL;
-+	}
-+
-+	if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMP, &opt, sizeof(opt)) < 0) {
-+		perror("Failed to enable monitor timestamps");
-+		close(fd);
-+		return NULL;
-+	}
-+
-+	io = l_io_new(fd);
-+
-+	l_io_set_close_on_destroy(io, true);
-+
-+	return io;
-+}
-+
- struct iwmon_interface {
- 	char *ifname;
- 	bool exists;
- 	struct l_netlink *rtnl;
- 	struct l_netlink *genl;
-+	struct l_io *io;
- };
- 
- static struct iwmon_interface monitor_interface = { };
-@@ -109,11 +261,23 @@ static void genl_parse(uint16_t type, const void *data, uint32_t len,
- 	if (id == 0)
- 		return;
- 
--	if (!strcmp(name, NL80211_GENL_NAME)) {
--		nlmon = nlmon_open(ifname, id, writer_path, &config);
--		if (!nlmon)
--			l_main_quit();
--	}
-+	if (strcmp(name, NL80211_GENL_NAME))
-+		return;
-+
-+	monitor_interface.io = open_packet(ifname);
-+	if (!monitor_interface.io)
++	err = iwtrace_bpf__attach(skel);
++	if (err) {
++		fprintf(stderr, "Unable to attach eBPF program\n");
 +		goto failed;
++	}
 +
-+	nlmon = nlmon_open(id, writer_path, &config);
++	rb = ring_buffer__new(bpf_map__fd(skel->maps.rb),
++					handle_packet, NULL, NULL);
++	if (!rb) {
++		fprintf(stderr, "Failed to create ringbuffer\n");
++		goto failed;
++	}
++
++	nlmon = nlmon_open(l_genl_family_info_get_id(info),
++						writer_path, &config);
 +	if (!nlmon)
 +		goto failed;
 +
-+	l_io_set_read_handler(monitor_interface.io, nlmon_receive, nlmon, NULL);
++	io = l_io_new(bpf_map__fd(skel->maps.rb));
++	l_io_set_close_on_destroy(io, false);
++	l_io_set_read_handler(io, ringbuf_receive, NULL, NULL);
 +
 +	return;
-+
 +failed:
 +	l_main_quit();
- }
- 
- static void genl_notify(uint16_t type, const void *data,
-@@ -790,6 +954,7 @@ int main(int argc, char *argv[])
- 
- 	exit_status = l_main_run_with_signal(signal_handler, NULL);
- 
-+	l_io_destroy(monitor_interface.io);
- 	l_netlink_destroy(monitor_interface.rtnl);
- 	l_netlink_destroy(monitor_interface.genl);
- 	l_free(monitor_interface.ifname);
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 72cd8ca7a05c..5e88cdf1355e 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -96,7 +96,6 @@ enum msg_type {
- 
- struct nlmon {
- 	uint16_t id;
--	struct l_io *io;
- 	struct l_io *pae_io;
- 	struct l_queue *req_list;
- 	struct pcap *pcap;
-@@ -8185,154 +8184,6 @@ void nlmon_print_genl(struct nlmon *nlmon, const struct timeval *tv,
- 	}
- }
- 
--static bool nlmon_receive(struct l_io *io, void *user_data)
--{
--	struct nlmon *nlmon = user_data;
--	struct msghdr msg;
--	struct sockaddr_ll sll;
--	struct iovec iov;
--	struct cmsghdr *cmsg;
--	struct timeval copy_tv;
--	const struct timeval *tv = NULL;
--	uint16_t proto_type;
--	unsigned char buf[8192];
--	unsigned char control[32];
--	ssize_t bytes_read;
--	int fd;
--
--	fd = l_io_get_fd(io);
--	if (fd < 0)
--		return false;
--
--	memset(&sll, 0, sizeof(sll));
--
--	memset(&iov, 0, sizeof(iov));
--	iov.iov_base = buf;
--	iov.iov_len = sizeof(buf);
--
--	memset(&msg, 0, sizeof(msg));
--	msg.msg_name = &sll;
--	msg.msg_namelen = sizeof(sll);
--	msg.msg_iov = &iov;
--	msg.msg_iovlen = 1;
--	msg.msg_control = control;
--	msg.msg_controllen = sizeof(control);
--
--	bytes_read = recvmsg(fd, &msg, 0);
--	if (bytes_read < 0) {
--		if (errno != EAGAIN && errno != EINTR)
--			return false;
--
--		return true;
--	}
--
--	if (sll.sll_hatype != ARPHRD_NETLINK)
--		return true;
--
--	proto_type = ntohs(sll.sll_protocol);
--
--	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg;
--				cmsg = CMSG_NXTHDR(&msg, cmsg)) {
--		if (cmsg->cmsg_level == SOL_SOCKET &&
--					cmsg->cmsg_type == SCM_TIMESTAMP) {
--			memcpy(&copy_tv, CMSG_DATA(cmsg), sizeof(copy_tv));
--			tv = &copy_tv;
--		}
--	}
--
--	switch (proto_type) {
--	case NETLINK_ROUTE:
--		nlmon_print_rtnl(nlmon, tv, iov.iov_base, bytes_read);
--		break;
--	case NETLINK_GENERIC:
--		nlmon_print_genl(nlmon, tv, iov.iov_base, bytes_read);
--		break;
--	}
--
--	return true;
--}
--
--/*
-- * BPF filter to match skb->dev->type == 824 (ARPHRD_NETLINK) and
-- * either match skb->protocol == 0x0000 (NETLINK_ROUTE) or match
-- * skb->protocol == 0x0010 (NETLINK_GENERIC).
-- */
--static struct sock_filter mon_filter[] = {
--	{ 0x28,  0,  0, 0xfffff01c },	/* ldh #hatype		*/
--	{ 0x15,  0,  3, 0x00000338 },	/* jne #824, drop	*/
--	{ 0x28,  0,  0, 0xfffff000 },	/* ldh #proto		*/
--	{ 0x15,  2,  0, 0000000000 },	/* jeq #0x0000, pass	*/
--	{ 0x15,  1,  0, 0x00000010 },	/* jeq #0x0010, pass	*/
--	{ 0x06,  0,  0, 0000000000 },	/* drop: ret #0		*/
--	{ 0x06,  0,  0, 0xffffffff },	/* pass: ret #-1	*/
--};
--
--static const struct sock_fprog mon_fprog = { .len = 7, .filter = mon_filter };
--
--static struct l_io *open_packet(const char *name)
--{
--	struct l_io *io;
--	struct sockaddr_ll sll;
--	struct packet_mreq mr;
--	struct ifreq ifr;
--	int fd, opt = 1;
--
--	fd = socket(PF_PACKET, SOCK_RAW | SOCK_CLOEXEC | SOCK_NONBLOCK, 0);
--	if (fd < 0) {
--		perror("Failed to create packet socket");
--		return NULL;
--	}
--
--	strncpy(ifr.ifr_name, name, IFNAMSIZ - 1);
--
--	if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) {
--		perror("Failed to get monitor index");
--		close(fd);
--		return NULL;
--	}
--
--	memset(&sll, 0, sizeof(sll));
--	sll.sll_family = AF_PACKET;
--	sll.sll_protocol = htons(ETH_P_ALL);
--	sll.sll_ifindex = ifr.ifr_ifindex;
--
--	if (bind(fd, (struct sockaddr *) &sll, sizeof(sll)) < 0) {
--		perror("Failed to bind packet socket");
--		close(fd);
--		return NULL;
--	}
--
--	memset(&mr, 0, sizeof(mr));
--	mr.mr_ifindex = ifr.ifr_ifindex;
--	mr.mr_type = PACKET_MR_ALLMULTI;
--
--	if (setsockopt(fd, SOL_PACKET, PACKET_ADD_MEMBERSHIP,
--						&mr, sizeof(mr)) < 0) {
--		perror("Failed to enable all multicast");
--		close(fd);
--		return NULL;
--	}
--
--	if (setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER,
--					&mon_fprog, sizeof(mon_fprog)) < 0) {
--		perror("Failed to enable monitor filter");
--		close(fd);
--		return NULL;
--	}
--
--	if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMP, &opt, sizeof(opt)) < 0) {
--		perror("Failed to enable monitor timestamps");
--		close(fd);
--		return NULL;
--	}
--
--	io = l_io_new(fd);
--
--	l_io_set_close_on_destroy(io, true);
--
--	return io;
--}
--
- void nlmon_print_pae(struct nlmon *nlmon, const struct timeval *tv,
- 					uint8_t type, int index,
- 					const void *data, uint32_t size)
-@@ -8460,28 +8311,21 @@ static struct l_io *open_pae(void)
- 	return io;
- }
- 
--struct nlmon *nlmon_open(const char *ifname, uint16_t id, const char *pathname,
-+struct nlmon *nlmon_open(uint16_t id, const char *pathname,
- 				const struct nlmon_config *config)
- {
- 	struct nlmon *nlmon;
--	struct l_io *io, *pae_io;
-+	struct l_io *pae_io;
- 	struct pcap *pcap;
- 
--	io = open_packet(ifname);
--	if (!io)
--		return NULL;
--
- 	pae_io = open_pae();
--	if (!pae_io) {
--		l_io_destroy(io);
-+	if (!pae_io)
- 		return NULL;
--	}
- 
- 	if (pathname) {
- 		pcap = pcap_create(pathname);
- 		if (!pcap) {
- 			l_io_destroy(pae_io);
--			l_io_destroy(io);
- 			return NULL;
- 		}
- 	} else
-@@ -8490,11 +8334,9 @@ struct nlmon *nlmon_open(const char *ifname, uint16_t id, const char *pathname,
- 
- 	nlmon = nlmon_create(id, config);
- 
--	nlmon->io = io;
- 	nlmon->pae_io = pae_io;
- 	nlmon->pcap = pcap;
- 
--	l_io_set_read_handler(nlmon->io, nlmon_receive, nlmon, NULL);
- 	l_io_set_read_handler(nlmon->pae_io, pae_receive, nlmon, NULL);
- 
- 	wlan_iface_list = l_hashmap_new();
-@@ -8507,7 +8349,6 @@ void nlmon_close(struct nlmon *nlmon)
- 	if (!nlmon)
- 		return;
- 
--	l_io_destroy(nlmon->io);
- 	l_io_destroy(nlmon->pae_io);
- 	l_queue_destroy(nlmon->req_list, nlmon_req_free);
- 
-diff --git a/monitor/nlmon.h b/monitor/nlmon.h
-index 96958c25b2ba..bb1a7c58bd45 100644
---- a/monitor/nlmon.h
-+++ b/monitor/nlmon.h
-@@ -33,7 +33,7 @@ struct nlmon_config {
- 	bool read_only;
- };
- 
--struct nlmon *nlmon_open(const char *ifname, uint16_t id, const char *pathname,
-+struct nlmon *nlmon_open(uint16_t id, const char *pathname,
- 				const struct nlmon_config *config);
- void nlmon_close(struct nlmon *nlmon);
- 
++}
++
++static void signal_handler(uint32_t signo, void *user_data)
++{
++	switch (signo) {
++	case SIGINT:
++	case SIGTERM:
++		l_main_quit();
++		break;
++	}
++}
++
++static void usage(void)
++{
++	printf("iwtrace - Wireless monitor using eBPF\n"
++		"Usage:\n");
++	printf("\tiwtrace [options]\n");
++	printf("Options:\n"
++		"\t-w, --write <file>     Write netlink PCAP trace file\n"
++		"\t-n, --nortnl           Don't show RTNL output\n"
++		"\t-y, --nowiphy          Don't show 'New Wiphy' output\n"
++		"\t-s, --noscan           Don't show scan result output\n"
++		"\t-e, --noies            Don't show IEs except SSID\n"
++		"\t-h, --help             Show help options\n");
++}
++
++static const struct option main_options[] = {
++	{ "write",     required_argument, NULL, 'w' },
++	{ "nortnl",    no_argument,       NULL, 'n' },
++	{ "nowiphy",   no_argument,       NULL, 'y' },
++	{ "noscan",    no_argument,       NULL, 's' },
++	{ "noies",     no_argument,       NULL, 'e' },
++	{ "version",   no_argument,       NULL, 'v' },
++	{ "help",      no_argument,       NULL, 'h' },
++	{ }
++};
++
++int main(int argc, char *argv[])
++{
++	int exit_status = EXIT_FAILURE;
++
++	for (;;) {
++		int opt;
++
++		opt = getopt_long(argc, argv, "w:nvhyse",
++						main_options, NULL);
++		if (opt < 0)
++			break;
++
++		switch (opt) {
++		case 'w':
++			writer_path = optarg;
++			break;
++		case 'n':
++			config.nortnl = true;
++			break;
++		case 'y':
++			config.nowiphy = true;
++			break;
++		case 's':
++			config.noscan = true;
++			break;
++		case 'e':
++			config.noies = true;
++			break;
++		case 'v':
++			printf("%s\n", VERSION);
++			return EXIT_SUCCESS;
++		case 'h':
++			usage();
++			return EXIT_SUCCESS;
++		default:
++			return EXIT_FAILURE;
++		}
++	}
++
++	if (argc - optind > 0) {
++		fprintf(stderr, "Invalid command line parameters\n");
++		return EXIT_FAILURE;
++	}
++
++	libbpf_set_print(libbpf_print_fn);
++
++	skel = iwtrace_bpf__open_and_load();
++	if (!skel)
++		return EXIT_FAILURE;
++
++	fprintf(stdout, "Wireless monitor (eBPF) ver %s\n", VERSION);
++
++	if (!l_main_init())
++		goto init_failed;
++
++	genl = l_genl_new();
++	if (!genl) {
++		fprintf(stderr, "Failed to open generic netlink socket\n");
++		goto genl_failed;
++	}
++
++	l_genl_request_family(genl, "nl80211", nl80211_appeared, NULL, NULL);
++	exit_status = l_main_run_with_signal(signal_handler, NULL);
++
++	l_genl_unref(genl);
++	nlmon_close(nlmon);
++	l_io_destroy(io);
++	ring_buffer__free(rb);
++
++genl_failed:
++	l_main_exit();
++init_failed:
++	iwtrace_bpf__destroy(skel);
++
++	return exit_status;
++}
+diff --git a/monitor/iwtrace.h b/monitor/iwtrace.h
+new file mode 100644
+index 000000000000..0df95f2ea989
+--- /dev/null
++++ b/monitor/iwtrace.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause) */
++/* Copyright (c) 2020 Facebook */
++#ifndef __BOOTSTRAP_H
++#define __BOOTSTRAP_H
++
++struct metadata {
++	uint64_t timestamp;
++	uint16_t len;
++	uint16_t protocol;
++} __attribute__ ((packed));
++
++#endif /* __BOOTSTRAP_H */
 -- 
 2.43.0
 
