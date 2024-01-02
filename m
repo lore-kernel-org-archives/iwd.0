@@ -1,49 +1,26 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E99911704
-	for <iwd@lists.linux.dev>; Tue,  2 Jan 2024 13:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: from relaygw4-8.mclink.it (relaygw4-8.mclink.it [213.21.178.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E3010955
+	for <iwd@lists.linux.dev>; Tue,  2 Jan 2024 14:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mclink.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mclink.it
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mPyWp2Ck"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-28c7e30c83fso2689740a91.1
-        for <iwd@lists.linux.dev>; Tue, 02 Jan 2024 05:30:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704202231; x=1704807031; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DWLiWWigH6wnpGXZQL7rVB2GEDDjyun5p8q0HQjeQTE=;
-        b=mPyWp2CkXQKkEwp99JsjEGYvFiu3gUP/Q4iGk1xoqzoO9JdRYAZl+CECdZR6EoRNUw
-         PXFAtAHfSxOXObGQvxbwTVOqOqeqNHjlZ6ybOSp6QhuZS5C/sWgfNb/Br77zx+W29mmQ
-         G+mNyU+Ady+m7x0mcdDAZ2dcdgu3nHP5bmGkcyJs5RXzEbe/rA8KPNotTO7VNeW1c2oj
-         cKl75qR5C7Sdrb6vyooVyZQZkye8+Vn0jNMEgQyTPCXBHeZpUkPs08XFHZq1skaQ42Ey
-         gvv/+nqiWNQkXwIoc38POJ3sh3VQ57IRGL6G1NSLj2q/PEcaw76hWMAiof7b6++7GftD
-         hhJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704202231; x=1704807031;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DWLiWWigH6wnpGXZQL7rVB2GEDDjyun5p8q0HQjeQTE=;
-        b=VDkvnAE0GHCZWLAHYbL9LCANislMCX5Av4S+RHA93il1wHhC4dnAV53heU4WO/hoMN
-         QBgf3pRPyqgHXCZtYdICLuf6TEMJHM+aOq7Mcp2xY7IKCnRANRLJ3fBdXVQmkEz0m6w5
-         f7W7Fc10q7rcGQQvtoKrCNnKv+ABi2epKr5T6n1vlMYGMC4OCNkuQcp1VgqFIQuEucCb
-         OC0Bd26MbiCtUsVGWuMHjBm1poyGFUdl5JSnUJSJ1lBZUTsk5o89ANfFhITsNIOdAX3z
-         8tD/52D2oEBzpIczyX4ELJ9ujuJXctDgnWyflY+Q7shWbQFsetp/FWSshOWakJZ90glu
-         7anQ==
-X-Gm-Message-State: AOJu0YznN3XKPWTJYChM4dNw15HpAI8j7fSxlv+SogCQaYmRerq5zwz/
-	Oxo2E5E3Ne0i6eSz5Zy8O+E=
-X-Google-Smtp-Source: AGHT+IEHObyN7UTPxevIYupUZVRajqaCR7j5oh/GjBruIieuJqaHrhbrAs5wHesF/48N/Y3vHjAaxg==
-X-Received: by 2002:a17:90a:bf04:b0:28a:ec60:ed8b with SMTP id c4-20020a17090abf0400b0028aec60ed8bmr4819146pjs.86.1704202231390;
-        Tue, 02 Jan 2024 05:30:31 -0800 (PST)
-Received: from [192.168.254.82] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id h12-20020a17090aea8c00b0028c89298d36sm12415438pjz.27.2024.01.02.05.30.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jan 2024 05:30:31 -0800 (PST)
-Message-ID: <f787daac-e8c7-4cf1-9405-c3b13a8e164e@gmail.com>
-Date: Tue, 2 Jan 2024 05:30:30 -0800
+	dkim=pass (1024-bit key) header.d=mclink.it header.i=@mclink.it header.b="Gnztqzcr"
+Received: from [172.24.30.44] (HELO cgp-esgout01-rm.mail.irds.it)
+  by relaygw4-8.mclink.it (CommuniGate Pro SMTP 6.0.6)
+  with ESMTPS id 242116102 for iwd@lists.linux.dev; Tue, 02 Jan 2024 15:07:49 +0100
+X-Envelope-From: <mc5686@mclink.it>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mclink.it; s=mail;
+	t=1704204464; bh=MDSLaQMTHKn3rP1xqfS3sqrh9AtFql080lIfPpEvMGs=;
+	h=Date:Subject:To:References:From:In-Reply-To;
+	b=GnztqzcrolNDrZtnj/xWs4ENeMyO4QtaZo1JXtqr5hlKc7rlwsu5IwIwwxava8FdC
+	 HlbyjObbw3gcUpQ1xBFWnIUY059oF7WH6q6glFLJzGvOn3h7XrYZvV1xr22ZUmjDG0
+	 YCx2h8xhkDlYVpI1oirqXIrB37FR5XzPGL26GoP8=
+Received: from [192.168.7.12] (host-79-56-220-30.retail.telecomitalia.it [79.56.220.30])
+	(Authenticated sender: mc5686)
+	by cgp-esgout01-rm.mail.irds.it (Postfix) with ESMTPA id 8CA6D41ACC;
+	Tue,  2 Jan 2024 15:07:44 +0100 (CET)
+Message-ID: <2aaed79f-9fae-4750-8e85-994a48a45da1@mclink.it>
+Date: Tue, 2 Jan 2024 15:07:44 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,555 +28,115 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/5] RFC: Initial iwtrace utility
+Subject: Re: Setup help request
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <5b97b06f-5047-4a1e-958d-27a6185ba504@mclink.it>
+ <a345fe93-149b-46d6-bc00-ac35bb302858@gmail.com>
+ <f477c1f4-4585-4b76-95a6-d0d31532e401@mclink.it>
+ <b3c259af-ee4f-488c-ad81-a734302fc6d6@gmail.com>
 Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20231227060954.103572-1-denkenz@gmail.com>
- <20231227060954.103572-5-denkenz@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20231227060954.103572-5-denkenz@gmail.com>
+From: Mauro Condarelli <mc5686@mclink.it>
+In-Reply-To: <b3c259af-ee4f-488c-ad81-a734302fc6d6@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Irideos-Libra-ESVA-Information: Please contact Irideos for more information
+X-Irideos-Libra-ESVA-ID: 8CA6D41ACC.A4AF2
+X-Irideos-Libra-ESVA: No virus found
+X-Irideos-Libra-ESVA-From: mc5686@mclink.it
+X-Irideos-Libra-ESVA-Watermark: 1704809264.87943@lgjdRPt27jUzx7gd9hXYXw
 
-Hi Denis,
+Thanks James,
+comments inline below.
 
-On 12/26/23 10:09 PM, Denis Kenzior wrote:
-> eBPF based tracing, similar to iwmon.  This is meant as an alternative
-> to the nlmon based netlink tracing and can be used on kernels where
-> nlmon might not be available.
-All looks good to me. This seems like a nice utility if the support is 
-more widespread than nlmon.
-> ---
->   Makefile.am           |  46 ++++++---
->   configure.ac          |  11 +++
->   monitor/iwtrace.bpf.c | 194 +++++++++++++++++++++++++++++++++++++
->   monitor/iwtrace.c     | 218 ++++++++++++++++++++++++++++++++++++++++++
->   monitor/iwtrace.h     |  12 +++
->   5 files changed, 466 insertions(+), 15 deletions(-)
->   create mode 100644 monitor/iwtrace.bpf.c
->   create mode 100644 monitor/iwtrace.c
->   create mode 100644 monitor/iwtrace.h
+On 1/2/24 14:01, James Prestwood wrote:
+> Hi Mauro,
 >
-> diff --git a/Makefile.am b/Makefile.am
-> index 5ed6ab37164b..601db513d1e3 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -327,23 +327,39 @@ endif
->   endif
->   
->   if MONITOR
-> +MONITOR_SOURCES = linux/nl80211.h \
-> +				monitor/nlmon.h monitor/nlmon.c \
-> +				monitor/pcap.h monitor/pcap.c \
-> +				monitor/display.h monitor/display.c \
-> +				src/ie.h src/ie.c \
-> +				src/wscutil.h src/wscutil.c \
-> +				src/mpdu.h src/mpdu.c \
-> +				src/util.h src/util.c \
-> +				src/crypto.h src/crypto.c \
-> +				src/watchlist.h src/watchlist.c \
-> +				src/eapolutil.h src/eapolutil.c \
-> +				src/nl80211cmd.h src/nl80211cmd.c \
-> +				src/p2putil.c src/p2putil.h \
-> +				src/anqputil.h src/anqputil.c \
-> +				src/band.h src/band.c
->   bin_PROGRAMS += monitor/iwmon
->   
-> -monitor_iwmon_SOURCES = monitor/main.c linux/nl80211.h \
-> -					monitor/nlmon.h monitor/nlmon.c \
-> -					monitor/pcap.h monitor/pcap.c \
-> -					monitor/display.h monitor/display.c \
-> -					src/ie.h src/ie.c \
-> -					src/wscutil.h src/wscutil.c \
-> -					src/mpdu.h src/mpdu.c \
-> -					src/util.h src/util.c \
-> -					src/crypto.h src/crypto.c \
-> -					src/watchlist.h src/watchlist.c \
-> -					src/eapolutil.h src/eapolutil.c \
-> -					src/nl80211cmd.h src/nl80211cmd.c \
-> -					src/p2putil.c src/p2putil.h \
-> -					src/anqputil.h src/anqputil.c \
-> -					src/band.h src/band.c
-> +if BPF
-> +bin_PROGRAMS += monitor/iwtrace
-> +
-> +monitor/iwtrace.bpf.o: monitor/iwtrace.bpf.c
-> +	clang -g -O2 -target bpf -c monitor/iwtrace.bpf.c -o monitor/iwtrace.tmp.bpf.o
-> +	bpftool gen object monitor/iwtrace.bpf.o monitor/iwtrace.tmp.bpf.o
-> +
-> +monitor/iwtrace.skel.h: monitor/iwtrace.bpf.o
-> +	bpftool gen skeleton monitor/iwtrace.bpf.o > monitor/iwtrace.skel.h
-> +
-> +monitor_iwtrace_SOURCES = monitor/iwtrace.c monitor/iwtrace.h \
-> +				monitor/iwtrace.skel.h $(MONITOR_SOURCES)
-> +monitor_iwtrace_LDADD = $(ell_ldadd) $(LIBBPF_LIBS)
-> +endif
-> +
-> +monitor_iwmon_SOURCES = monitor/main.c $(MONITOR_SOURCES)
->   monitor_iwmon_LDADD = $(ell_ldadd)
->   
->   if MANUAL_PAGES
-> diff --git a/configure.ac b/configure.ac
-> index d84e035c2f5f..bb7bfedcf80f 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -200,6 +200,17 @@ AC_ARG_ENABLE([monitor], AS_HELP_STRING([--disable-monitor],
->   					[enable_monitor=${enableval}])
->   AM_CONDITIONAL(MONITOR, test "${enable_monitor}" != "no")
->   
-> +AC_ARG_ENABLE([bpf], AS_HELP_STRING([--disable-bpf],
-> +				[don't enable bpf based tracing]),
-> +					[enable_bpf=${enableval}])
-> +if (test "${enable_bpf}" != "no"); then
-> +	PKG_CHECK_MODULES(LIBBPF, libbpf, dummy=yes,
-> +			AC_MSG_ERROR(libbpf is required))
-> +	AC_SUBST(LIBBPF_CFLAGS)
-> +	AC_SUBST(LIBBPF_LIBS)
-> +fi
-> +AM_CONDITIONAL(BPF, test "${enable_bpf}" != "no")
-> +
->   AC_ARG_ENABLE([dbus-policy], AS_HELP_STRING([--disable-dbus-policy],
->   				[don't install D-Bus system policy files]),
->   					[enable_dbus_policy=${enableval}])
-> diff --git a/monitor/iwtrace.bpf.c b/monitor/iwtrace.bpf.c
-> new file mode 100644
-> index 000000000000..251b54fc2a41
-> --- /dev/null
-> +++ b/monitor/iwtrace.bpf.c
-> @@ -0,0 +1,194 @@
-> +/*
-> + * Embedded Linux library
-> + * Copyright (C) 2023  Cruise, LLC
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-only
-> + */
-> +
-> +#include <stdint.h>
-> +#include <string.h>
-> +#include <linux/types.h>
-> +#include <linux/bpf.h>
-> +#include <linux/netlink.h>
-> +#include <bpf/bpf_helpers.h>
-> +#include <bpf/bpf_tracing.h>
-> +#include <bpf/bpf_core_read.h>
-> +#include "iwtrace.h"
-> +
-> +char LICENSE[] SEC("license") = "GPL";
-> +
-> +struct sock;
-> +struct netlink_ext_ack;
-> +
-> +struct {
-> +	__uint(type, BPF_MAP_TYPE_RINGBUF);
-> +	__uint(max_entries, 256 * 1024);
-> +} rb SEC(".maps");
-> +
-> +struct sock {
-> +	uint16_t sk_protocol;
-> +};
-> +
-> +struct sk_buff {
-> +	unsigned int len, data_len;
-> +	unsigned char *data;
-> +	struct net_device *dev;
-> +	union {
-> +		struct sock		*sk;
-> +		int			ip_defrag_offset;
-> +	};
-> +};
-> +
-> +struct capture_256 {
-> +	struct metadata meta;
-> +	uint8_t packet[256 - sizeof(struct metadata)];
-> +} __attribute__ ((packed));
-> +
-> +struct capture_1k {
-> +	struct metadata meta;
-> +	uint8_t packet[1024 - sizeof(struct metadata)];
-> +} __attribute__ ((packed));
-> +
-> +struct capture_4k {
-> +	struct metadata meta;
-> +	uint8_t packet[4096 - sizeof(struct metadata)];
-> +} __attribute__ ((packed));
-> +
-> +struct capture_8k {
-> +	struct metadata meta;
-> +	uint8_t packet[8192 - sizeof(struct metadata)];
-> +} __attribute__ ((packed));
-> +
-> +struct capture_16k {
-> +	struct metadata meta;
-> +	uint8_t packet[16384];
-> +} __attribute__ ((packed));
-> +
-> +static void metadata_fill(struct metadata *meta, const struct sk_buff *skb)
-> +{
-> +	struct sock *sk = __builtin_preserve_access_index(skb->sk);
-> +
-> +	meta->timestamp = bpf_ktime_get_boot_ns();
-> +	meta->len = __builtin_preserve_access_index(skb->len);
-> +	meta->protocol = __builtin_preserve_access_index(sk->sk_protocol);
-> +}
-> +
-> +static int capture_common(const struct sk_buff *skb)
-> +{
-> +	uint16_t len = __builtin_preserve_access_index(skb->len);
-> +	const void *data = __builtin_preserve_access_index(skb->data);
-> +
-> +	/*
-> +	 * bpf_ringbuf_reserve is currently limited to a known constant
-> +	 * value, and cannot handle values that are not constant (even if
-> +	 * bounded).  bpf_ringbuf_output might be suitable, but no metadata
-> +	 * could be prepended if that is used.  Another alternative is to use
-> +	 * a perf buffer, but it is per-CPU and might result in packets being
-> +	 * processed out of order.  We trick the validator by using several
-> +	 * well known structure sizes (256/1k/4k/8k/16k) in order to save on
-> +	 * memory space, but the resultant program is larger than it would be
-> +	 * if dynamic sizing was supported.
-> +	 */
-> +	if (len <= 256 - sizeof(struct metadata)) {
-> +		struct capture_256 *c256 = bpf_ringbuf_reserve(&rb,
-> +					sizeof(struct capture_256), 0);
-> +
-> +		if (!c256)
-> +			return 0;
-> +
-> +		metadata_fill(&c256->meta, skb);
-> +
-> +		if (bpf_probe_read_kernel(c256->packet, len, data) < 0)
-> +			bpf_ringbuf_discard(c256, BPF_RB_NO_WAKEUP);
-> +		else
-> +			bpf_ringbuf_submit(c256, 0);
-> +
-> +		return 0;
-> +	}
-> +
-> +	if (len <= sizeof(struct capture_1k) - sizeof(struct metadata)) {
-> +		struct capture_1k *c1k = bpf_ringbuf_reserve(&rb,
-> +						sizeof(struct capture_1k), 0);
-> +
-> +		if (!c1k)
-> +			return 0;
-> +
-> +		metadata_fill(&c1k->meta, skb);
-> +
-> +		if (bpf_probe_read_kernel(c1k->packet, len, data) < 0)
-> +			bpf_ringbuf_discard(c1k, BPF_RB_NO_WAKEUP);
-> +		else
-> +			bpf_ringbuf_submit(c1k, 0);
-> +
-> +		return 0;
-> +	}
-> +
-> +	if (len <= sizeof(struct capture_4k) - sizeof(struct metadata)) {
-> +		struct capture_4k *c4k = bpf_ringbuf_reserve(&rb,
-> +						sizeof(struct capture_4k), 0);
-> +
-> +		if (!c4k)
-> +			return 0;
-> +
-> +		metadata_fill(&c4k->meta, skb);
-> +
-> +		if (bpf_probe_read_kernel(c4k->packet, len, data) < 0)
-> +			bpf_ringbuf_discard(c4k, BPF_RB_NO_WAKEUP);
-> +		else
-> +			bpf_ringbuf_submit(c4k, 0);
-> +
-> +		return 0;
-> +	}
-> +
-> +	if (len <= sizeof(struct capture_8k) - sizeof(struct metadata)) {
-> +		struct capture_8k *c8k = bpf_ringbuf_reserve(&rb,
-> +						sizeof(struct capture_8k), 0);
-> +
-> +		if (!c8k)
-> +			return 0;
-> +
-> +		metadata_fill(&c8k->meta, skb);
-> +
-> +		if (bpf_probe_read_kernel(c8k->packet, len, data) < 0)
-> +			bpf_ringbuf_discard(c8k, BPF_RB_NO_WAKEUP);
-> +		else
-> +			bpf_ringbuf_submit(c8k, 0);
-> +
-> +		return 0;
-> +	}
-> +
-> +	/* 16384 is the largest packet size for genl currently */
-> +	if (len <= 16384) {
-> +		struct capture_16k *c16k = bpf_ringbuf_reserve(&rb,
-> +						sizeof(struct capture_16k), 0);
-> +
-> +		if (!c16k)
-> +			return 0;
-> +
-> +		metadata_fill(&c16k->meta, skb);
-> +
-> +		if (bpf_probe_read_kernel(c16k->packet, len, data) < 0)
-> +			bpf_ringbuf_discard(c16k, BPF_RB_NO_WAKEUP);
-> +		else
-> +			bpf_ringbuf_submit(c16k, 0);
-> +
-> +		return 0;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +SEC("fentry/__netlink_sendskb")
-> +int BPF_PROG(trace___netlink_sendskb, struct sock *sk, struct sk_buff *skb)
-> +{
-> +	return capture_common(skb);
-> +}
-> +
-> +SEC("fentry/netlink_rcv_skb")
-> +int BPF_PROG(trace_netlink_rcv_skb, struct sk_buff *skb,
-> +					int (*cb)(struct sk_buff *,
-> +                                                   struct nlmsghdr *,
-> +                                                   struct netlink_ext_ack *))
-> +{
-> +	return capture_common(skb);
-> +}
-> diff --git a/monitor/iwtrace.c b/monitor/iwtrace.c
-> new file mode 100644
-> index 000000000000..ceff71753463
-> --- /dev/null
-> +++ b/monitor/iwtrace.c
-> @@ -0,0 +1,218 @@
-> +/*
-> + * Copyright (C) 2023  Cruise, LLC
-> + *
-> + * SPDX-License-Identifier: LGPL-2.1-or-later
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#define _GNU_SOURCE
-> +#include <argp.h>
-> +#include <signal.h>
-> +#include <stdio.h>
-> +#include <time.h>
-> +#include <inttypes.h>
-> +#include <arpa/inet.h>
-> +#include <sys/resource.h>
-> +#include <bpf/libbpf.h>
-> +#include <linux/rtnetlink.h>
-> +#include "iwtrace.h"
-> +#include "iwtrace.skel.h"
-> +#include "monitor/nlmon.h"
-> +#include "monitor/pcap.h"
-> +#include "monitor/display.h"
-> +
-> +#include <ell/ell.h>
-> +
-> +static struct iwtrace_bpf *skel;
-> +static struct ring_buffer *rb;
-> +static struct l_io *io;
-> +static struct l_genl *genl;
-> +static struct nlmon_config config;
-> +static const char *writer_path;
-> +static struct nlmon *nlmon;
-> +
-> +#ifndef ARPHRD_NETLINK
-> +#define ARPHRD_NETLINK	824
-> +#endif
-> +
-> +static int libbpf_print_fn(enum libbpf_print_level level,
-> +				const char *format, va_list args)
-> +{
-> +	return vfprintf(stderr, format, args);
-> +}
-> +
-> +static int handle_packet(void *ctx, void *data, size_t size)
-> +{
-> +	struct metadata *meta = data;
-> +	struct timeval tv;
-> +
-> +	data += sizeof(struct metadata);
-> +
-> +	tv.tv_sec = meta->timestamp / L_NSEC_PER_SEC;
-> +	tv.tv_usec = (meta->timestamp % L_NSEC_PER_SEC) / L_NSEC_PER_USEC;
-> +
-> +	switch (meta->protocol) {
-> +	case NETLINK_ROUTE:
-> +		nlmon_print_rtnl(nlmon, &tv, data, meta->len);
-> +		break;
-> +	case NETLINK_GENERIC:
-> +		nlmon_print_genl(nlmon, &tv, data, meta->len);
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static bool ringbuf_receive(struct l_io *io, void *user_data)
-> +{
-> +	ring_buffer__poll(rb, 0);
-> +
-> +	return true;
-> +}
-> +
-> +static void nl80211_appeared(const struct l_genl_family_info *info,
-> +					void *user_data)
-> +{
-> +	int err;
-> +
-> +	err = iwtrace_bpf__attach(skel);
-> +	if (err) {
-> +		fprintf(stderr, "Unable to attach eBPF program\n");
-> +		goto failed;
-> +	}
-> +
-> +	rb = ring_buffer__new(bpf_map__fd(skel->maps.rb),
-> +					handle_packet, NULL, NULL);
-> +	if (!rb) {
-> +		fprintf(stderr, "Failed to create ringbuffer\n");
-> +		goto failed;
-> +	}
-> +
-> +	nlmon = nlmon_open(l_genl_family_info_get_id(info),
-> +						writer_path, &config);
-> +	if (!nlmon)
-> +		goto failed;
-> +
-> +	io = l_io_new(bpf_map__fd(skel->maps.rb));
-> +	l_io_set_close_on_destroy(io, false);
-> +	l_io_set_read_handler(io, ringbuf_receive, NULL, NULL);
-> +
-> +	return;
-> +failed:
-> +	l_main_quit();
-> +}
-> +
-> +static void signal_handler(uint32_t signo, void *user_data)
-> +{
-> +	switch (signo) {
-> +	case SIGINT:
-> +	case SIGTERM:
-> +		l_main_quit();
-> +		break;
-> +	}
-> +}
-> +
-> +static void usage(void)
-> +{
-> +	printf("iwtrace - Wireless monitor using eBPF\n"
-> +		"Usage:\n");
-> +	printf("\tiwtrace [options]\n");
-> +	printf("Options:\n"
-> +		"\t-w, --write <file>     Write netlink PCAP trace file\n"
-> +		"\t-n, --nortnl           Don't show RTNL output\n"
-> +		"\t-y, --nowiphy          Don't show 'New Wiphy' output\n"
-> +		"\t-s, --noscan           Don't show scan result output\n"
-> +		"\t-e, --noies            Don't show IEs except SSID\n"
-> +		"\t-h, --help             Show help options\n");
-> +}
-> +
-> +static const struct option main_options[] = {
-> +	{ "write",     required_argument, NULL, 'w' },
-> +	{ "nortnl",    no_argument,       NULL, 'n' },
-> +	{ "nowiphy",   no_argument,       NULL, 'y' },
-> +	{ "noscan",    no_argument,       NULL, 's' },
-> +	{ "noies",     no_argument,       NULL, 'e' },
-> +	{ "version",   no_argument,       NULL, 'v' },
-> +	{ "help",      no_argument,       NULL, 'h' },
-> +	{ }
-> +};
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	int exit_status = EXIT_FAILURE;
-> +
-> +	for (;;) {
-> +		int opt;
-> +
-> +		opt = getopt_long(argc, argv, "w:nvhyse",
-> +						main_options, NULL);
-> +		if (opt < 0)
-> +			break;
-> +
-> +		switch (opt) {
-> +		case 'w':
-> +			writer_path = optarg;
-> +			break;
-> +		case 'n':
-> +			config.nortnl = true;
-> +			break;
-> +		case 'y':
-> +			config.nowiphy = true;
-> +			break;
-> +		case 's':
-> +			config.noscan = true;
-> +			break;
-> +		case 'e':
-> +			config.noies = true;
-> +			break;
-> +		case 'v':
-> +			printf("%s\n", VERSION);
-> +			return EXIT_SUCCESS;
-> +		case 'h':
-> +			usage();
-> +			return EXIT_SUCCESS;
-> +		default:
-> +			return EXIT_FAILURE;
-> +		}
-> +	}
-> +
-> +	if (argc - optind > 0) {
-> +		fprintf(stderr, "Invalid command line parameters\n");
-> +		return EXIT_FAILURE;
-> +	}
-> +
-> +	libbpf_set_print(libbpf_print_fn);
-> +
-> +	skel = iwtrace_bpf__open_and_load();
-> +	if (!skel)
-> +		return EXIT_FAILURE;
-> +
-> +	fprintf(stdout, "Wireless monitor (eBPF) ver %s\n", VERSION);
-> +
-> +	if (!l_main_init())
-> +		goto init_failed;
-> +
-> +	genl = l_genl_new();
-> +	if (!genl) {
-> +		fprintf(stderr, "Failed to open generic netlink socket\n");
-> +		goto genl_failed;
-> +	}
-> +
-> +	l_genl_request_family(genl, "nl80211", nl80211_appeared, NULL, NULL);
-> +	exit_status = l_main_run_with_signal(signal_handler, NULL);
-> +
-> +	l_genl_unref(genl);
-> +	nlmon_close(nlmon);
-> +	l_io_destroy(io);
-> +	ring_buffer__free(rb);
-> +
-> +genl_failed:
-> +	l_main_exit();
-> +init_failed:
-> +	iwtrace_bpf__destroy(skel);
-> +
-> +	return exit_status;
-> +}
-> diff --git a/monitor/iwtrace.h b/monitor/iwtrace.h
-> new file mode 100644
-> index 000000000000..0df95f2ea989
-> --- /dev/null
-> +++ b/monitor/iwtrace.h
-> @@ -0,0 +1,12 @@
-> +/* SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause) */
-> +/* Copyright (c) 2020 Facebook */
-> +#ifndef __BOOTSTRAP_H
-> +#define __BOOTSTRAP_H
-> +
-> +struct metadata {
-> +	uint64_t timestamp;
-> +	uint16_t len;
-> +	uint16_t protocol;
-> +} __attribute__ ((packed));
-> +
-> +#endif /* __BOOTSTRAP_H */
+> On 1/1/24 4:34 PM, Mauro Condarelli wrote:
+>> Hi James,
+>> Thanks for the fast reply.
+>>
+>> Comments inline below.
+>>
+>> On 1/2/24 00:03, James Prestwood wrote:
+>>> Hi Mauro,
+>>>
+>>> On 1/1/24 11:26 AM, Mauro Condarelli wrote:
+>>>> Hi,
+>>>> I just installed `IWD version 2.3` on a small MiniPC (Beelink, if it matters) sporting a
+>>>> `Intel Corporation Wireless 3165 (rev 81)` PCI Wireless adapter.
+>>>> O.S. is a fairly up-to-date "Debian GNU/Linux 12 (bookworm)"
+>>>> Installation was done via standard Debian package (`apt install iwd`)
+>>>> ======8<----------- SNIP
+>> I used the following script to reproducibly start IWD and friends:
+>> ---------------------------------
+>> root@lxd:~# cat ./start_iwd.sh
+>> #!/bin/bash
+>>
+>> /usr/libexec/iwd -d >/tmp/iwd.log 2>&1 &
+>> IWD_PID=$!
+>>
+>> sleep 5
+>> iwctl device list
+>> iwctl device wlan0 set-property Mode ap
+>> iwctl ap wlan0 start-profile beelink
+>> iwctl ap wlan0 show
+>>
+>> iwmon --write /tmp/iwmon.pcap >/tmp/iwmon.log 2>&1 &
+>> IWMON_PID=$!
+>>
+>> mc
+>>
+>> kill $IWMON_PID
+>> kill $IWD_PID
+>> ---------------------------------
+>>
+>> While shell was active I:
+>> - opened Fritz! `WLAN` app
+>>   - it took ~30s to see a `beelink` network apparently spanning several channels
+>> - tried to connect from my desktop
+>>   - it did see a `beelink` AP a long time (>2m) after `WLAN` app saw it.
+>>   - it tried several times to connect.
+>>   - it never succeeded.
+>>   - it didn't even ask for a passphrase.
+>> - tried to connect using my Android Phone (the ssame running `WLAN`.
+>>   - it never saw a `beelink` AP to attempt connection.
+>>
+>> I attach all logs I took.
+>> I changed password to "temp-password" so it can be shared as needed.
+>
+> I think there is more going on but for starters it appears whatever app your using to scan is sending an invalid probe request frame. This causes IWD to ignore it which seems like the reason you cant even see the AP in the scans. I've attached a patch you can test, but I'm not sure this is something we can really upstream since its out of spec. The concerning IE is Extended capabilities, this is something IWD actually uses and parses, so the fact there is a duplicate and each one is different makes it impossible to know which one we should use. The probe request is including multiple entries for "Extended Capabilities" and "FILS Request Parameters (tag 258)". With the patch applied, and some other modifications to iwmon you can see two entries for these IEs:
+>
+>                     Extended Capabilities: len 10
+>                         Capability: bit  2: Extended channel switching
+>                         Capability: bit 17: WNM-Sleep mode
+>                         Capability: bit 19: BSS transition
+>                         Capability: bit 25: SSID list
+>                         Capability: bit 46: WNM- Notification
+>                         Capability: bit 62: Opmode Notification
+>                         04 00 0a 02 00 40 00 40 80 01                    .....@.@..
+>                     Tag 258: len 2
+>                         00 12                                            ..
+>                     Extended Capabilities: len 10
+>                         Capability: bit 17: WNM-Sleep mode
+>                         Capability: bit 19: BSS transition
+>                         Capability: bit 25: SSID list
+>                         Capability: bit 46: WNM- Notification
+>                         00 00 0a 02 00 40 00 00 00 01                    .....@....
+>                     Tag 258: len 2
+>                         00 ff
+>
+> If this patch doesn't resolve the issue could you re-run the test and start iwmon at the very beginning, prior to starting IWD?
+I'll do it ASAP, but it will take a bit of time since I'll have to compile from sources (I installed from standard Debian package).
+
+Notice I'm not using anything "strange" for scans:
+- normal Debian Sid Network Manager applet from desktop (which sees "beelink")
+- normal Android phone `WiFi` Settings from phone (MIUI 12.0.3 on POCOPHONE F1, if relevant) (does *not* see "beelink")
+Both are working as expected with several other Access Points.
+It seems (to my limited insight) unlikely they're sending invalid probe requests.
+
+>>>>
+>>>> ======8<----------- SNIP
+>>>>
+Thanks
+Mauro
+
