@@ -1,49 +1,49 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCB51548E
-	for <iwd@lists.linux.dev>; Tue,  2 Jan 2024 17:02:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0148C15AC7
+	for <iwd@lists.linux.dev>; Tue,  2 Jan 2024 17:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ggG9030X"
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-204ec50010eso2638046fac.3
-        for <iwd@lists.linux.dev>; Tue, 02 Jan 2024 09:02:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fVznpgFp"
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3bbd1e9c5f7so3645758b6e.3
+        for <iwd@lists.linux.dev>; Tue, 02 Jan 2024 09:10:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704214971; x=1704819771; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1704215417; x=1704820217; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=TuImeVMmSB8WihCPA1V2f9o9WqoaBX9Vk+c4IELpuwQ=;
-        b=ggG9030XLqbhD/9T1vndH8P4NGVYl/hj0htQop193n4FdNXaZPjY50zf9/7ZcuQAhL
-         6U5wO6la8DY8tAzDfXj3KcuPf+T6uMtNrubyLm5dFSP7ry4Z+Kto4mTz+Gm++hcayXq1
-         rGL3mavSeIDkmpxic9ysuCj9Fqth1ENc5BO8+nz6VNdLirtga/9NOSIqtQN2LHpw6jKA
-         tSB1nCsDjVGcLuD0DuffhGSF+RLEjZLdgu8FqEUeeSozhzktzk5Jna79F8VpOq1vWXU2
-         NZ0cjhMnEAPzCR6BIuq7oRdmDrppFgFN6G4aw5vV/o6VEO4rOlpy4OhWCXXewpfh3ZJn
-         /e1A==
+        bh=xOqM8U4mgc/5qLT0W1X+5q3TgSK7frwy2RYaa9H0OHQ=;
+        b=fVznpgFpO6WsMpfs42vaXDQp2jsuAuKGF7Bs0flVgCA/DfaC1mo4BEfFVqzMvMLj2y
+         S6cDWRTW9dQSBVfmH/ALZj7pkcxQXrFpb2j9w0uMvwlVQvCqO8PBrfcG6Ql7wxlrdCnY
+         KUT8IuiymkZyiaqrXKHcYqG0uhDWqd6Dm8RaVvP94K+HbGWG6xHsQWuTJCiXzTHh52t6
+         IpdCAFum7c6RgaIWw9tRLo3ORQ2LJ4/TdlsPwz3QiDF7GXFlc2WjScLtWs229xU9MZBz
+         ixWuhedP4kC9JeclgdlbS3sFSuTiug2FmaKpioPhhDQmNDzxj2SHFpnLWLj6aVIQey+3
+         UDFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704214971; x=1704819771;
+        d=1e100.net; s=20230601; t=1704215417; x=1704820217;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TuImeVMmSB8WihCPA1V2f9o9WqoaBX9Vk+c4IELpuwQ=;
-        b=FbNMIanMK0df0fdDcJ1HBEA7RXX3nktVbpVnlYJC2N0mOd1AlqjzDpRulryWp1EXvm
-         V5+To9/lTJfVDH3Mjo2MdidYBk1E+5Ije2BPp7OK7EIe44KCi6d9nO6XnpIXsQSnSaAw
-         /efXyZYAVJ8TwaQq6Fv+dT71jaP4IeDn+EjSjcUWOL2O6gaAfQymBODm4nCrdTcve+2m
-         HMGoyC/UmTfcTabtvxFHjYeDy7iCzkuNsV7S94JrAOHJK7I8VWurCqiy8lUEo3JNjjKl
-         u4VI25+ZKojqrGftc34Z5/z+aXmcy5A2PlyV3B2xixOOKe9zaEZ6L7rhXjp1fPGaUYOn
-         TJXA==
-X-Gm-Message-State: AOJu0Ywo7ElotT9RKJoKa1oFfXQLw/n/qSa1dHajPDbx8Fuik4R+TGyg
-	NkatG0sLYL2zgA7ejrC5BD2XAy/oR1Y=
-X-Google-Smtp-Source: AGHT+IH83XsAWMs5zEEhaJK8kd92KVtLWk3eE7V1/8UfmLWXkyAYUqaprbvXzbHofcwIZpLlZ+RXJg==
-X-Received: by 2002:a05:6870:f114:b0:203:acfe:20e5 with SMTP id k20-20020a056870f11400b00203acfe20e5mr17282616oac.4.1704214971502;
-        Tue, 02 Jan 2024 09:02:51 -0800 (PST)
+        bh=xOqM8U4mgc/5qLT0W1X+5q3TgSK7frwy2RYaa9H0OHQ=;
+        b=C9ql0BP5LQ+nGtQcz6XU6Xobs/7Radtvs/hPwhlY5wWan6LqqdzaKm3QIhXX5boxQB
+         YZp53jkABE0dBFLteeCukxUO0OlZ5qLPf79tntvIk6Y0kQ1KiB2ZZRgRlp8/+U/oodAm
+         i6bsRWrFEN9FhTfil1+sxEBN2A/5Z1YMaDeewsfU2/TQcCR6nkWfODGAf67z/ypGWUa5
+         R4zzQuQ427qcULD5X7y36FaQZvSlPzqInKVW5NfBvujOQQvtXPhPceT0nbZcGZiSwcFm
+         cgqx9gJtVv3rRLfnAv5L8ww+2PHSjYn0bWyYRkJodgSjcfGsW52RsretsjfH/cze1tEX
+         IzbQ==
+X-Gm-Message-State: AOJu0YwKADrESuOxfsnX43dAaVe9/f4ZA/v1Vyqwf2U+9LiZtb0RQeq1
+	E9+iCtGUKXrK691Tbz2vaQ0=
+X-Google-Smtp-Source: AGHT+IF89VQfuRSm+aGIUR9bBdKhILO/rJHfBkY/qVgsaAxNBJm6cGgPIVsJGhHzFKZLzpEb24BZmQ==
+X-Received: by 2002:a9d:7f0f:0:b0:6db:e15d:4238 with SMTP id j15-20020a9d7f0f000000b006dbe15d4238mr8451286otq.70.1704215417010;
+        Tue, 02 Jan 2024 09:10:17 -0800 (PST)
 Received: from [172.16.49.130] (216.106.68.145.reverse.socket.net. [216.106.68.145])
-        by smtp.googlemail.com with ESMTPSA id pp19-20020a0568709d1300b0020472215893sm4363632oab.31.2024.01.02.09.02.50
+        by smtp.googlemail.com with ESMTPSA id k15-20020a056830168f00b006dbde059c81sm3010672otr.70.2024.01.02.09.10.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jan 2024 09:02:51 -0800 (PST)
-Message-ID: <d2a47435-2b51-489b-8d58-721591b5a73a@gmail.com>
-Date: Tue, 2 Jan 2024 11:02:50 -0600
+        Tue, 02 Jan 2024 09:10:16 -0800 (PST)
+Message-ID: <dadf5399-4c77-4b99-b2a4-3ed2f18c7bde@gmail.com>
+Date: Tue, 2 Jan 2024 11:10:15 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,27 +51,41 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] monitor: indicate if the MPDU was invalid
+Subject: Re: Setup help request
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240102130355.17660-1-prestwoj@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>, Mauro Condarelli
+ <mc5686@mclink.it>, iwd@lists.linux.dev
+References: <5b97b06f-5047-4a1e-958d-27a6185ba504@mclink.it>
+ <a345fe93-149b-46d6-bc00-ac35bb302858@gmail.com>
+ <f477c1f4-4585-4b76-95a6-d0d31532e401@mclink.it>
+ <b3c259af-ee4f-488c-ad81-a734302fc6d6@gmail.com>
+ <2aaed79f-9fae-4750-8e85-994a48a45da1@mclink.it>
+ <bf00447d-9817-4bd9-ba67-149356d6ecd6@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240102130355.17660-1-prestwoj@gmail.com>
+In-Reply-To: <bf00447d-9817-4bd9-ba67-149356d6ecd6@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 1/2/24 07:03, James Prestwood wrote:
-> If the frame was not parsed as an MPDU indicate this in iwmon. This
-> also adds handling to print probe requests.
-> ---
->   monitor/nlmon.c | 43 ++++++++++++++++++++++++++++++++++---------
->   1 file changed, 34 insertions(+), 9 deletions(-)
 > 
+> I'll need to look more at the spec to determine if this is "illegal" (for lack 
+> of a better term) to duplicate these IEs. There are some IEs that we allow 
+> duplicates of (which you can see in that patch). With a simple search I cant 
+> find anything in the spec that disallows duplicates specifically, but we have 
+> this comment in IWD:
+> 
+> "Tag found, make sure no duplicates present unless allowed"
+> 
+> Denis, any idea where that comes from off the top of your head?
 
-Applied, thanks.
+802.11 allows some IEs to be duplicated.  For example, see verbiage in 
+802.11-2020 Section 9.3.2 dealing with Beacons:
+
+"One or more Multiple BSSID elements are present if"...
+"One or more Emergency Alert Identifier elements are present if"...
+"One or more Emergency Alert Identifier elements are present if"...
+"One or more Vendor Specific elements are optionally present. These..."
 
 Regards,
 -Denis
-
