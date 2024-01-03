@@ -1,53 +1,53 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E771C6BC
-	for <iwd@lists.linux.dev>; Wed,  3 Jan 2024 18:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE49D1C6AE
+	for <iwd@lists.linux.dev>; Wed,  3 Jan 2024 18:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RaLcLnS9"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7818ab57d7dso410562685a.2
-        for <iwd@lists.linux.dev>; Wed, 03 Jan 2024 10:47:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jY2Dh1wZ"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-78109a21144so870041785a.0
+        for <iwd@lists.linux.dev>; Wed, 03 Jan 2024 10:47:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704307620; x=1704912420; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1704307621; x=1704912421; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=498VsVdajc3ch3Mu/qKE96ri+I/+iWfSAVzJ64kLtgY=;
-        b=RaLcLnS9u7NUEJ0rxrRcc+tNoIu2xhsXA3VyoYwZwFN88hV911bXCy7otKR01tlQkj
-         rZzg/kDul9dfq5mInM4MLJxSoElBH97n+Uucuwwsrb4EWudHGWYF8FsIJHGNJsPxJaxm
-         RrbwnCVOH531+oyeJd5TfGKx9aNVKjk/mSn2mtqX55Ay/gGetTi8xS5u+Y3NuzKh60Yv
-         tZ9h31wdT0W9UrjQ3xuCahegbEfoZ4iUvM6CuUy0u+1GJHCLVsVNnSN1qDalO48iAfSE
-         ZoGMsNUXSkK2ALB+wKsK98Sl7BYfm9WWEIx880cp2AZi6mw+9wNkkWvY1LXRZtGVDIql
-         c/Hw==
+        bh=ClWw0PW0rEcg5naiCSnI54wGpoVumWsibWgdEU3XJqA=;
+        b=jY2Dh1wZBQh04Z9gsXoovCueiFfxygVxpGF+HV/PStbm6Fu8pBgKmPzmD3KZe/7pdT
+         lsAld2YRlL+Uh/1wqb2P+72LMosvfV30aCg8xeEE+JfCRmtH5TkONXX0+/Kh2I6/L1GG
+         IWD0pta06mftQuDUqmjDVk6FJSBrY1+2Q3MDO+AQOsmOfovG+3TNpiaSEX/jxG1sNSeq
+         Rwk4r6wBMw4iNjIf2eQ7dyNtDwhD9f9W+SFIDL3B6qx4sJhFg2d6Z1K1IButTGZZQYyq
+         JgaQicsY8vcEYu+Mp7AfFsO6qyDJHTSzz2JeDsVTW+3QhNl4Oz03fg0IOCuLCVzgHoi8
+         oT+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704307620; x=1704912420;
+        d=1e100.net; s=20230601; t=1704307621; x=1704912421;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=498VsVdajc3ch3Mu/qKE96ri+I/+iWfSAVzJ64kLtgY=;
-        b=jZB/FCdXD4KWCMHOwaofmrR6D4EJSW/3rKtcokUDqUuLCZ+AIn+h7zPZRjQY9Z2vsj
-         9JJiaYsggdUTKR7Qlo+x5/LgpNxS72S6NpsK27R4awCO/hsA5M50s+drQqea8nsC4OP1
-         9esyISJqWdPg2TjYoz7yNhtysNh0KERvaDLujxt8c7QBzQCRyhvxVvr2WCgdA9hhso22
-         4pBaox9jeZrymEYkM/l8oeT8bYpIC4lVcTwTqD7D6Q1kE/85Do68yXJGHGSF58apuiNz
-         zzm3YTGXYfe2qGopAVHi9pGw8lyemBs2RUoIepseCH0HgykC+wadbNMOVv7PaI6dAzTX
-         qF5Q==
-X-Gm-Message-State: AOJu0Ywev9Hll9Mi3nA8qRyRQFq7RAVYh2yJ44CmOyesTf+Jwq4xOibd
-	gUNWOB2YKs7INv8OLckCsFGQqRVW64QDSw==
-X-Google-Smtp-Source: AGHT+IH+kkMkps3us0n0VAwLWIk1/Epvn9w3K7C6m2yPH8Pqw4o93zDl/OtgOPDoXNVxhlsEOcBo8Q==
-X-Received: by 2002:ae9:f10b:0:b0:781:5549:d12e with SMTP id k11-20020ae9f10b000000b007815549d12emr14079209qkg.3.1704307620124;
-        Wed, 03 Jan 2024 10:47:00 -0800 (PST)
+        bh=ClWw0PW0rEcg5naiCSnI54wGpoVumWsibWgdEU3XJqA=;
+        b=ubxaT3Zrr1ubSd2ZjWu1Hy/iuaiUqUCzmCbXXB6Oq0dDcN0kfHBAU4+UVIkQ0/F1Hd
+         7qqiLO4CNLn5y/mbpG7pKsCLrm9LaS3yP1zCzhEFNOevDnetrKRNG+WfmpZRE1ZGVgKc
+         IChZiUB1Cl18yzvn8gegIce+5RBLioCEXjCU8r4E0+aCd81Sk2dZQoUvGFc0AcHBUoRE
+         bsMYX2Q1Gua4wG3X78HXtIRNB9uxr7t5Q9TXJEXNGekaZkosbhaE/B+vTUMQ9HI0cbib
+         rOf+hvHGYccmQPxwY7qeD1THsroTZDxxDsv37xBy4X/7p6sMQjdOV5het4+T3DxoznLi
+         nKKg==
+X-Gm-Message-State: AOJu0Yxcrr6s6mSrBZxlhTndJ1udvatmNuMf94HbRHazmyi6DQ+BDfGe
+	mPKVauPdmbljLKYtSlS9PQFAX0i+wEpugA==
+X-Google-Smtp-Source: AGHT+IGXnvSPMEuiv+jNvrQXU5UfAJl1s/flI80pkLzTKx6LK6+eEa+lAGtr78qnohSRNMwglXbeaA==
+X-Received: by 2002:a05:620a:2808:b0:781:dd78:5260 with SMTP id f8-20020a05620a280800b00781dd785260mr3074251qkp.138.1704307621561;
+        Wed, 03 Jan 2024 10:47:01 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id o21-20020a05620a22d500b00781a147e444sm3693370qki.92.2024.01.03.10.46.59
+        by smtp.gmail.com with ESMTPSA id o21-20020a05620a22d500b00781a147e444sm3693370qki.92.2024.01.03.10.47.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 10:46:59 -0800 (PST)
+        Wed, 03 Jan 2024 10:47:00 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/8] station: add debug events for internal states
-Date: Wed,  3 Jan 2024 10:46:34 -0800
-Message-Id: <20240103184638.533221-4-prestwoj@gmail.com>
+Subject: [PATCH 5/8] auto-t: update roam test to use new debug events
+Date: Wed,  3 Jan 2024 10:46:35 -0800
+Message-Id: <20240103184638.533221-5-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240103184638.533221-1-prestwoj@gmail.com>
 References: <20240103184638.533221-1-prestwoj@gmail.com>
@@ -59,48 +59,58 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This gives the tests a lot more fine-tune control to wait for
-specific state transitions rather than only what is exposed over
-DBus.
-
-The additional events for "ft-roam" and "reassoc-roam" were removed
-since these are now covered by the more generic state change events
-("ft-roaming" and "roaming" respectively).
 ---
- src/station.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ autotests/testPSK-roam/failed_roam_test.py | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 8f310ec8..79f25d73 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1556,6 +1556,8 @@ static void station_enter_state(struct station *station,
- 			station_state_to_string(station->state),
- 			station_state_to_string(state));
+diff --git a/autotests/testPSK-roam/failed_roam_test.py b/autotests/testPSK-roam/failed_roam_test.py
+index d42002d4..ccdec2c6 100644
+--- a/autotests/testPSK-roam/failed_roam_test.py
++++ b/autotests/testPSK-roam/failed_roam_test.py
+@@ -60,7 +60,7 @@ class Test(unittest.TestCase):
+         self.rule0.enabled = False
  
-+	station_debug_event(station, station_state_to_string(state));
-+
- 	disconnected = !station_is_busy(station);
+         # IWD should then try BSS 2, and succeed
+-        device.wait_for_event('ft-roam', timeout=60)
++        device.wait_for_event('ft-roaming', timeout=60)
+         self.verify_roam(self.wd, device, self.bss_hostapd[0], self.bss_hostapd[2])
  
- 	if ((disconnected && state > STATION_STATE_AUTOCONNECT_FULL) ||
-@@ -2222,8 +2224,6 @@ static int station_transition_reassociate(struct station *station,
- 	station->preparing_roam = false;
- 	station_enter_state(station, STATION_STATE_ROAMING);
+         self.bss_hostapd[2].deauthenticate(device.address)
+@@ -75,7 +75,7 @@ class Test(unittest.TestCase):
  
--	station_debug_event(station, "reassoc-roam");
--
- 	return 0;
- }
+         self.connect(self.wd, device, self.bss_hostapd[0])
  
-@@ -2366,8 +2366,6 @@ try_next:
- 		station->preparing_roam = false;
- 		station_enter_state(station, STATION_STATE_FT_ROAMING);
+-        device.wait_for_event('ft-roam', timeout=60)
++        device.wait_for_event('ft-roaming', timeout=60)
  
--		station_debug_event(station, "ft-roam");
--
- 		break;
- 	case -EINVAL:
- 		/*
+         condition = 'obj.state == DeviceState.disconnected'
+         self.wd.wait_for_object_condition(device, condition)
+@@ -101,14 +101,14 @@ class Test(unittest.TestCase):
+         # IWD should connect, then attempt a roam to BSS 1, which should
+         # fail and cause a fallback to reassociation
+         device.wait_for_event('ft-fallback-to-reassoc', timeout=60)
+-        device.wait_for_event('reassoc-roam', timeout=60)
++        device.wait_for_event('roaming', timeout=60)
+ 
+         self.verify_roam(self.wd, device, self.bss_hostapd[0], self.bss_hostapd[2])
+ 
+         # Trigger another roam
+         self.rule_bss2.signal = -8000
+ 
+-        device.wait_for_event('ft-roam', timeout=60)
++        device.wait_for_event('ft-roaming', timeout=60)
+ 
+         # Ensure an FT roam back to a properly configured AP works.
+         self.verify_roam(self.wd, device, self.bss_hostapd[2], self.bss_hostapd[1])
+@@ -141,7 +141,7 @@ class Test(unittest.TestCase):
+         # fail and cause the rank to be re-computed. This should then put
+         # bss 1 as the next candidate (since the FT factor is removed)
+         device.wait_for_event('ft-fallback-to-reassoc', timeout=60)
+-        device.wait_for_event('ft-roam', timeout=60)
++        device.wait_for_event('ft-roaming', timeout=60)
+ 
+         self.verify_roam(self.wd, device, self.bss_hostapd[0], self.bss_hostapd[1])
+ 
 -- 
 2.34.1
 
