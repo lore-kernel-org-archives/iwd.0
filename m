@@ -1,49 +1,49 @@
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE02C28E13
-	for <iwd@lists.linux.dev>; Thu,  4 Jan 2024 18:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B5C28DC6
+	for <iwd@lists.linux.dev>; Thu,  4 Jan 2024 18:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TE6TXloy"
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5961bfe0f35so290581eaf.1
-        for <iwd@lists.linux.dev>; Thu, 04 Jan 2024 10:14:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aW0+M0IH"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-59446cd46e9so337344eaf.3
+        for <iwd@lists.linux.dev>; Thu, 04 Jan 2024 10:17:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704392052; x=1704996852; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=gmail.com; s=20230601; t=1704392273; x=1704997073; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=cT0chuAMB32ZVyqkGCtvjwQ0Z7my5C7qFPXow00uaZk=;
-        b=TE6TXloyBiketE01h7q68svofqvUfeYNnU3rT0QbkpmE2ydMpyVXqhGmC+CY1oXTxS
-         h7LuavvNMkh6bhkjEscoiUBn9XyWYxpUfgynEozidbb7tbPWKluBQptqgWXCGgotwsme
-         vecTp1swx9fMYaSHAR7bGW+zVHxBXpb5EbqmkwlGEW/NNH9eJM01PovSclxRPPOR02D4
-         AiteVVZPcpMeJrjvaVwbQRsgSaThpvQvt3wmrzh+OCAx1Ieivp6YNuw7zDn0FH7FPG2d
-         u6yFobB+NUfWi/TA/G2eCqNSPE7LpHDLap9bLL3OTopIx705PKHBa1lPVEPB+LKRXCc2
-         TD6A==
+        bh=cM6lU3G3LLqObeDYv8sVUQxoFzIwECJGUprFViuY72w=;
+        b=aW0+M0IH7TbfsMezsI/3aAvPKEFsoI+LT7t3zFoLCRIEIv2YlFDpzi/s7bB0GtI+5R
+         NLn691Jd+9Et7HdYbn39nkx5yiQnMVXA66kBDDo3fvS4qZGrRMAZmPoeR5J/dVYEe6Ju
+         PIU8iCMxGmmPsSLLGkM0yU0Co1pVQTkBpQFWJjySJVKerWEyZdFkBZrdrqBrxAn0D7VE
+         WlFY8CbhIyX3TwNnisEd/yUI50nv+4sjAypfP4oYDQJa+axJoeSHlZTAm4/PuIFEWLFk
+         UHbYzwxJcMXnfAp+PEqqmTgxpvAMpeV4B6Djcb1QY41Hf4rLPzVD2PdXr9ISaRspVW0y
+         ZaVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704392052; x=1704996852;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20230601; t=1704392273; x=1704997073;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cT0chuAMB32ZVyqkGCtvjwQ0Z7my5C7qFPXow00uaZk=;
-        b=Rm0dEBO0eltYuxspZiOg4LPA8ZuNEamX6k3TOj1X0Y0mqlW9X2DqYtwVj447Brx4/9
-         tDHLEu2d9CQwGUFEcb93Xrd5v+s+Ogj9mYp2RHMnQvDbVrlhyElz5971v2lZyLGocRtY
-         nu6xEPO9QabUkD3/lgq3/9HdEOzRUEdiEdg0YN5rSK99juuxMlbY0/KaIvPhzRf4BPeU
-         CdfIRJcnh0AMAHPDXavXFpdBPPrFGcbP/E0TJwqmQvd4cx7OzXyEUXjbqfQgoMm2wch9
-         D/E4/gg4js1LdRl9UJsE0kkor3jISoatT//zD58AxntgDvt7emW/yle/FpuSe2eQCnSp
-         +yGw==
-X-Gm-Message-State: AOJu0Yxy0gFTT0Nxz7XilhT5+8M4qnnw4KRFpA48T8t0jIhy74wrV9PJ
-	I/S3GPWKUaMg4RBtzW7vPc0=
-X-Google-Smtp-Source: AGHT+IF36w+8rgQfOp7WzJ8ZszuBFYd9ycO2PMFzD87qMUfkmEMs5xgrwiNrW0cFmzY3PF6GGc5u/w==
-X-Received: by 2002:a4a:1d47:0:b0:594:bb06:fcc8 with SMTP id 68-20020a4a1d47000000b00594bb06fcc8mr361058oog.5.1704392051825;
-        Thu, 04 Jan 2024 10:14:11 -0800 (PST)
+        bh=cM6lU3G3LLqObeDYv8sVUQxoFzIwECJGUprFViuY72w=;
+        b=jak4vS7EvMhYRRBIyKSkqcvaxXHwrHa0xPfIxl6hX99i4D6MlF2swsVIpn3bQaZIVe
+         JvA9az4Bj1x1UGxIttAWtghxczxnS/mioPWyCIuoqTtWmQ7aNAbrvPDSeYbEeW5SDmdx
+         HHSIm+z++oSgqP+WY4RZA/VmTrsOaAqMpRWsLq82OW9w/Dbr7UPEVAQavEayMPRtQkAG
+         SXR/0PcNz9Duqq+o7B91nluO0ZVbbzeRc1Wi4osugNRD95/sBi9QoygQIaWKs+fdSjd+
+         gx0o7IfnakDnQwKhhSumPhAZOhriWKoDsXg9I9CxP9C+T8rT00BKFe8Msh3R232VQdFF
+         4IPQ==
+X-Gm-Message-State: AOJu0YxyyvY6QX7iK5uowhIPeuyfUdv4xxcW3aLMVx3fSHcEZAfEwy/q
+	2e3WOnk+7rETUNQ72nKw5hHGE+V7qO8=
+X-Google-Smtp-Source: AGHT+IHxnMdjxErYW1GvxOd2ThyMuper7VQDvuOP9gBMe5mJZnUym7+1tJnozlwyMGhHTcK0H3F5QQ==
+X-Received: by 2002:a4a:9893:0:b0:596:312b:6950 with SMTP id a19-20020a4a9893000000b00596312b6950mr145917ooj.5.1704392273131;
+        Thu, 04 Jan 2024 10:17:53 -0800 (PST)
 Received: from [172.16.49.130] (216.106.68.145.reverse.socket.net. [216.106.68.145])
-        by smtp.googlemail.com with ESMTPSA id 123-20020a4a0381000000b0058df21de4fasm5406194ooi.10.2024.01.04.10.14.11
+        by smtp.googlemail.com with ESMTPSA id o185-20020a4a44c2000000b005954c783f46sm2188877ooa.20.2024.01.04.10.17.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 10:14:11 -0800 (PST)
-Message-ID: <9196b264-5f4c-4830-88eb-b273c39489ad@gmail.com>
-Date: Thu, 4 Jan 2024 12:14:10 -0600
+        Thu, 04 Jan 2024 10:17:52 -0800 (PST)
+Message-ID: <4dcbc730-034a-4e3d-afb6-992cbc03a8ac@gmail.com>
+Date: Thu, 4 Jan 2024 12:17:51 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,148 +51,74 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/8] station: add handling for new NETCONFIG state
+Subject: Re: [PATCH] scan: limit COLOCATED_6GHZ flag to 6ghz devices
 Content-Language: en-US
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240103184638.533221-1-prestwoj@gmail.com>
- <20240103184638.533221-3-prestwoj@gmail.com>
+Cc: Keith G <ys3al35l@gmail.com>
+References: <20240103125638.243820-1-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240103184638.533221-3-prestwoj@gmail.com>
+In-Reply-To: <20240103125638.243820-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 1/3/24 12:46, James Prestwood wrote:
-> There was an unhandled corner case if netconfig was running and
-> multiple roam conditions happened in sequence, all before netconfig
-> had completed. A single roam before netconfig was already handled
-> (23f0f5717c) but this did not take into account any additional roam
-> conditions.
+On 1/3/24 06:56, James Prestwood wrote:
+> It was seen that this flag seems to cause issues when in AP mode on
+> brcmfmac devices (e.g. the raspberry Pi 3). When in AP mode an a
 
-So if netconfig hasn't completed, we're in the 'connecting' state.  Any 
-subsequent roams should still be treated as if we are in 'connecting' state. 
-Are we transitioning from connecting -> roaming at the D-Bus API level? We 
-shouldn't be.
+Seriously?  Why would this flag do anything for non-6E devices?
 
-Another weirdness is that I think we're sending the d-bus reply after connecting 
-to the AP, but before netconfig runs.
+> scan is issued clients will disconnect. After testing this behavior
+> was isolated to the use of the COLOCATED_6GHZ flag.
+> 
+> Besides working around the problem on this specific hardware the
+> patch itself makes sense as a non-6GHz capable device shouldn't use
+> this flag anyways.
+
+I guess if you're super paranoid and don't trust the kernel to do the right thing...
 
 > 
-> If IWD is in this state, having started netconfig, then roamed, and
-> again restarted netconfig it is still in a roaming state which will
-> prevent any further roams. IWD will remain "stuck" on the current
-> BSS until netconfig completes or gets disconnected.
-
-Makes sense, since roaming means netconfig isn't really doing anything.
-
+> As stated in the patch comment, this isn't really a catch all
+> workaround since the flag is still used for devices supporting 6GHz.
+> If additional hardware exhibits this behavior we may need additional
+> changes like a hardware blacklist or an explicit option to disable
+> the flag.
 > 
-> To fix this a new internal station state was added (no changes to
-> the DBus API) to distinguish between a purely WiFi connecting state
-> (STATION_STATE_CONNECTING/AUTO) and netconfig
-> (STATION_STATE_NETCONFIG). This allows IWD roam as needed if
-> netconfig is still running.
-
-Okay, but how would you distinguish between connecting -> netconfig and 
-netconfig->roaming->netconfig?
-
-> 
-> The change is mainly just adding STATION_STATE_NETCONFIG anywhere
-> that STATION_STATE_CONNECTING is to maintain the same behavior,
-> except within the netconfig event handler. In this case we should
-> never get here without being in either a NETCONFIG or ROAMING
-> state.
-> 
-> For some background this scenario happens if the DHCP server goes
-> down for an extended period, e.g. if its being upgraded/serviced.
+> Reported-By: Keith G <ys3al35l@gmail.com>
 > ---
->   src/station.c | 23 +++++++++++++++++------
->   1 file changed, 17 insertions(+), 6 deletions(-)
+>   src/scan.c | 15 ++++++++++++++-
+>   1 file changed, 14 insertions(+), 1 deletion(-)
 > 
-> diff --git a/src/station.c b/src/station.c
-> index 57d22e91..8f310ec8 100644
-> --- a/src/station.c
-> +++ b/src/station.c
-> @@ -1768,6 +1768,7 @@ static void station_reset_connection_state(struct station *station)
->   	if (station->state == STATION_STATE_CONNECTED ||
->   			station->state == STATION_STATE_CONNECTING ||
->   			station->state == STATION_STATE_CONNECTING_AUTO ||
-> +			station->state == STATION_STATE_NETCONFIG ||
->   			station_is_roaming(station))
->   		network_disconnected(network);
->   }
-> @@ -2043,8 +2044,9 @@ static void station_netconfig_event_handler(enum netconfig_event event,
->   			dbus_pending_reply(&station->connect_pending, reply);
->   		}
+> diff --git a/src/scan.c b/src/scan.c
+> index f48ffdef..8c6fdc08 100644
+> --- a/src/scan.c
+> +++ b/src/scan.c
+> @@ -394,7 +394,20 @@ static struct l_genl_msg *scan_build_cmd(struct scan_context *sc,
+>   	if (params->ap_scan)
+>   		flags |= NL80211_SCAN_FLAG_AP;
 >   
-> -		if (L_IN_SET(station->state, STATION_STATE_CONNECTING,
-> -				STATION_STATE_CONNECTING_AUTO))
-> +		if (L_IN_SET(station->state, STATION_STATE_NETCONFIG,
-> +				STATION_STATE_ROAMING, STATION_STATE_FT_ROAMING,
-> +				STATION_STATE_FW_ROAMING))
+> -	flags |= NL80211_SCAN_FLAG_COLOCATED_6GHZ;
+> +	/*
+> +	 * TODO: This flag appears to cause some undesired behavior on brcmfmac
+> +	 *       when the device is in AP mode, or has a secondary AP interface
+> +	 *       running, causing clients to disconnect when a scan is issued.
+> +	 *
+> +	 *       Only using this flag for 6GHz capable devices will limit this
+> +	 *       behavior to only 6GHz devices and in reality makes sense
+> +	 *       because a non-6GHz device shouldn't use this flag anyways. If
+> +	 *       more issues still are seen related to this we may need an
+> +	 *       explicit workaround, either brcmfmac-specific or a disable
+> +	 *       option.
+> +	 */
 
-I understand why NETCONFIG state is in the set, but why the others?
+I'd just drop this comment entirely if you still think this is needed.
 
->   			network_connect_failed(station->connected_network,
->   						false);
+> +	if (wiphy_band_is_disabled(sc->wiphy, BAND_FREQ_6_GHZ) != -ENOTSUP)
+> +		flags |= NL80211_SCAN_FLAG_COLOCATED_6GHZ;
 >   
-> @@ -2070,9 +2072,14 @@ static bool netconfig_after_roam(struct station *station)
->   					network_get_settings(network)))
->   		return false;
->   
-> -	return netconfig_configure(station->netconfig,
-> +	if (L_WARN_ON(!netconfig_configure(station->netconfig,
->   					station_netconfig_event_handler,
-> -					station);
-> +					station)))
-
-You already have an L_WARN_ON in the single call site of netconfig_after_roam?
-
-> +		return false;
-> +
-> +	station_enter_state(station, STATION_STATE_NETCONFIG);
-> +
-> +	return true;
->   }
->   
->   static void station_roamed(struct station *station)
-> @@ -3255,6 +3262,8 @@ static void station_connect_ok(struct station *station)
->   						station_netconfig_event_handler,
->   						station)))
->   			return;
-> +
-> +		station_enter_state(station, STATION_STATE_NETCONFIG);
->   	} else
->   		station_enter_state(station, STATION_STATE_CONNECTED);
->   }
-> @@ -4067,7 +4076,8 @@ static struct l_dbus_message *station_dbus_scan(struct l_dbus *dbus,
->   		return dbus_error_busy(message);
->   
->   	if (station->state == STATION_STATE_CONNECTING ||
-> -			station->state == STATION_STATE_CONNECTING_AUTO)
-> +			station->state == STATION_STATE_CONNECTING_AUTO ||
-> +			station->state == STATION_STATE_NETCONFIG)
-
-Might as well use L_IN_SET here
-
->   		return dbus_error_busy(message);
->   
->   	station->dbus_scan_subset_idx = 0;
-> @@ -5025,7 +5035,8 @@ static struct l_dbus_message *station_debug_scan(struct l_dbus *dbus,
->   		return dbus_error_busy(message);
->   
->   	if (station->state == STATION_STATE_CONNECTING ||
-> -			station->state == STATION_STATE_CONNECTING_AUTO)
-> +			station->state == STATION_STATE_CONNECTING_AUTO ||
-> +			station->state == STATION_STATE_NETCONFIG)
-
-Also, shouldn't this also cover the roaming states?  And do we still need this 
-check given wiphy_work?  Does netconfig use wiphy work to make sure nothing 
-tries to scan or go off-channel?
-
->   		return dbus_error_busy(message);
->   
->   	if (!l_dbus_message_get_arguments(message, "aq", &iter))
+>   	if (flags)
+>   		l_genl_msg_append_attr(msg, NL80211_ATTR_SCAN_FLAGS, 4, &flags);
 
 Regards,
 -Denis
