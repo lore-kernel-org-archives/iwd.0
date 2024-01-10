@@ -1,49 +1,28 @@
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9E1523C
-	for <iwd@lists.linux.dev>; Wed, 10 Jan 2024 04:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2025256
+	for <iwd@lists.linux.dev>; Wed, 10 Jan 2024 11:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDecSzRN"
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5955a4a9b23so2090774eaf.1
-        for <iwd@lists.linux.dev>; Tue, 09 Jan 2024 20:14:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704860081; x=1705464881; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nGx1XKW+Um1U5McYf+GxuMDKirKb8oU9RQbx23QzXI4=;
-        b=QDecSzRNIUyHvaYOdmzONuy869PB2XorFY5fKD0q2m/WkcF/rvJ9+Huxvjm2Kie8SH
-         OkLY2zJPsbnXCoRO1taAKUTGnu/GVO70/Wi1b3g11RSRsNSMCQ7Z2g7bvsAjXwRo68Ww
-         AR1k/Bp89T/wFszEj6Ux9eeUyy2hsOz5SBzWQiOJSqsRUyS6eTLyOHoSKYwaNAyZDJxB
-         puvLeusUNgK1Pdbx7GBzqdJBOTpegY554qwLeVBG9di513kZF+kGOJ75WVKN2PEHLuAD
-         VgEYdHni7AwP2Su2LV98OV9Q5OliK5x1AGIdksMiWTHAs4YjMV+zoshWKkJnB54WUhSO
-         oqVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704860081; x=1705464881;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nGx1XKW+Um1U5McYf+GxuMDKirKb8oU9RQbx23QzXI4=;
-        b=saGwhY4AXXI7aBKiFn+iUj4oFft6Pmy1PLN+GRZW1krU0eBkNdKwLao6JXRZJLYCSS
-         BoopT0QLm/Y/+ONT6yGw7YwEq/DZuEeeoPP+KZ4mBdURmLudgoV7IUlNtYDqTFhfZA3S
-         AKmaHiQmcer7EkmzC2HeRfoR/nLxd/gZYdSZXkgoBT+0NWrvpFZ2aIlelEHtEKj9YVMn
-         xGPMi/5Sg/FV15tbJJHxJsRR8HNt4AsnXXwmytDZx5huF1hKBynvF00HfjQ5edy5TJo/
-         K/KYBY8b9p4bEzBcGu02I57mKigRHmF1g+bE8V9YpASbDuspdlDb2Kc3wHQPL+t84IbG
-         z6dQ==
-X-Gm-Message-State: AOJu0Yx7K6DcoudqC/PUppZMpWq15zk1rwSzdmOtvGtJisl75qWL/AP5
-	TQ3S2WVyKeFUfU2W6f2Lleo=
-X-Google-Smtp-Source: AGHT+IEFwFfY4mGipmrR88NePklnraBC0mF3T0gtMTzosknjEpe03ljH8LxxtuUqYx+yMzP9sSnNxQ==
-X-Received: by 2002:a05:6820:161f:b0:596:3126:306d with SMTP id bb31-20020a056820161f00b005963126306dmr477382oob.7.1704860081042;
-        Tue, 09 Jan 2024 20:14:41 -0800 (PST)
-Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id g6-20020a4a5b06000000b005960376cc37sm682088oob.16.2024.01.09.20.14.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jan 2024 20:14:40 -0800 (PST)
-Message-ID: <f4d9e6cf-f7e4-49b9-adbf-92dbc006812a@gmail.com>
-Date: Tue, 9 Jan 2024 22:14:39 -0600
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b="uIYiAh1I"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
+	t=1704886389; x=1705491189; i=fiona.klute@gmx.de;
+	bh=FmlyElvnMJZasSTCHXno0h9uVlyBtTGyiRrmh/UIFBs=;
+	h=X-UI-Sender-Class:Date:Subject:To:References:From:In-Reply-To;
+	b=uIYiAh1IKvr2cwVKT9afemPYQ+6aYUiFpkOUNhTlQVJIcLa+Mn7VQtQAMJvJ9+YG
+	 nKD6kRtQND/orrlDQQZPjbOpbY2QBGkFXHg7rg3cG7f7xDSrUeGDFx2hPk2AMSXoj
+	 0xX0EvJRjcs+UJPUh0YqViBjKNd6rAZw1WaU/WhpTSCyL/PV2drnyGMY93F5B0wrh
+	 xKvz13LR2kqj73GRwL1H/9VaEx9dtO2LHk3k+S6qAYPw55E/iBwi9X0kZKQcZiBFE
+	 QVMxl+3ZuJ29//fxyLaWU2S4lRSLh+OrB4Xv5VR/N/rcuafdjYJ3EP0YvyzLxQCxq
+	 6G4k9xrZkpXeOdfBIQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.7.2] ([85.22.23.182]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1M7Jza-1rFrK525fg-007jJk; Wed, 10
+ Jan 2024 12:33:09 +0100
+Message-ID: <755dc5bf-1ac7-4eeb-ab16-8ded3aa6a25f@gmx.de>
+Date: Wed, 10 Jan 2024 12:33:08 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -51,216 +30,136 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: iwd 2.12 - Received error during CMD_TRIGGER_SCAN: Invalid
- argument (22)
-Content-Language: en-US
-To: Robert Nelson <robertcnelson@gmail.com>, iwd@lists.linux.dev
-References: <CAOCHtYj9OjZGQ=G139i=KRRcxpFD-1=GSvUPmFYaqSvFz0NwJg@mail.gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CAOCHtYj9OjZGQ=G139i=KRRcxpFD-1=GSvUPmFYaqSvFz0NwJg@mail.gmail.com>
+Subject: Re: [PATCH] Log falling back from SAE to WPA2
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20240109095926.1541238-1-fiona.klute@gmx.de>
+ <214422a4-25bc-4676-8a4a-8bf8d67c7ab9@gmail.com>
+Content-Language: de-DE, en-US
+From: Fiona Klute <fiona.klute@gmx.de>
+Autocrypt: addr=fiona.klute@gmx.de; keydata=
+ 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
+In-Reply-To: <214422a4-25bc-4676-8a4a-8bf8d67c7ab9@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:D9+osict9pH9XcFVM9fsHOxsGhkD4S0/xxv8rEEITuxqyAXjx+B
+ ZhU6X5DsjJnJWVL1u5qd9ZbCtwyC1uYHJyhgRnniPjgCkbbWxBfY/Fi3Vo/TQ5g0ekTlDVu
+ vVjw8/kLhBKK2J6HwLc0WNT5x3E8u1CsbIAQ22rjxVeRI0gXye3riRPy9deT48p1Y+cVyQv
+ nAoxjYadNGW5X57buZPFw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:o2zZI9ll5MY=;LaKtR8EwhFNeGFa4nt2/PK7sK3j
+ 6tR3ag5ktvZM7M2+9C2TVKd4GflrrZPWOyw8JYcfyyhR92Gzw3xHgr3Eu00vGQwPzVNWSBp08
+ G3JOXGYLaJMU44f4HiXeN2Neg5k31vNv/0db9EaAmJrmfMPCkq2oVya8K1dBG1bRBsU1g4PeF
+ KtKEmXZvDmuAdxUiaQFkp8oNrm+0TYRr6+4aBLEfaWHBRihLHNz0j1NdA5w/h4cS6D7HeMrkT
+ sQStRlQuwcNmHgUZ3+0fJPRdhChsmhA6P2x29EQ8y6VBhQn0FFvl/vIRyb8HiKfIUdPpq6H2B
+ J4P9N1ncqqsLqghyl6z7I8TpgafWBUCMPyLvS/o6Gb6O434sGkQHoghXCjcFO9GI2ssV5MzU3
+ JpIc4mU7FXm5LMH13H0w2F5GF45cdVUjFkPAoJfH51JIx1TiVLDVe3ulnqMbSUoYIbtivRmn3
+ rRHuDcIyjrsxS1RGkn6dOR34VvpH6e7L/rqruEpzGng0MMpMb46eLqSgXgoji+sOrVm3SwKQL
+ q9rmzyoK0eZPuVe7yuRn/wYRsNhfExnfsl/NVGCTb61D1ZZDJpFj4qmVTa4XanLxSIL+mkQWO
+ pdO2yILA92Vb5iqcXrIF+kPLzrQhNkzcBJ69+YhXupig9DZUoKXhGAOZ6WB16YsE/NZqDomRz
+ fN0qrhXwxCDG0rKhheRaLvVZX8UVzJ2EZij9QbkpUjVoPzleEquCxIW/IhPditmybTGqMcb1w
+ TdB9s0tSmKt/9/P18itShWVysgMef1Ua/Ihz/hCVNwugW9oSYhFOxUUopLpHXk1uQr5W2I6GR
+ uoVK8WW8Kx3Gxv2GkOBes+kudIvuE6dKK1pDp7KIyQeVqjqiha/cOmkFGukkykaxkOqUmlOWT
+ W2NpGqsEjKKKUq8zDmVtTPSqx5wg2iagxC/UdVh4yTvRYpLIaIjP8ztLgJQVbzRws8qpSgdf9
+ qV7FAnQAJfrKCHrz20O8rJW0WiE=
 
-Hi Robert,
+Hi Denis,
 
-On 1/9/24 15:37, Robert Nelson wrote:
-> Hi iwd Developers,
-> 
-> For BeagleBoard.org devices I've been looking to move us to iwd vs
-> wpa_supplicant, and have been fighting an CMD_TRIGGER_SCAN error on
-> bootup, so devices don't auto connect to WiFI once configured.
-> 
-> Our main stack is Debian 12.x (Bookworm) with backports of libell-dev
-> and iwd on a 5.10.x based vendor kernel (well my 5.10.x)
-> 
-> https://packages.debian.org/sid/libell-dev
-> https://packages.debian.org/source/sid/iwd
-> 
-> ```
-> debian@42-am335x-bbbw:~$ dpkg --list | grep libell
-> ii  libell0:armhf
-> 0.61-1bbbio0~bookworm+20231207          armhf        Embedded Linux
-> library
-> debian@42-am335x-bbbw:~$ dpkg --list | grep iwd
-> ii  iwd
-> 2.12-1bbbio0~bookworm+20240103          armhf        wireless daemon
-> for Linux
-> ```
-> 
+thanks for accepting the patch!
 
-That looks okay...
+Am 10.01.24 um 04:33 schrieb Denis Kenzior:
+> Interesting.=C2=A0 Last time I checked only the quantenna driver used th=
+is
+> feature and it wasn't very common.=C2=A0 If it isn't a secret, what card=
+ /
+> driver do you have?
 
-> Normally on bootup iwd will report:
-> 
-> ```
-> Jan 09 15:10:41 41-am335x-bbbw iwd[360]: D-Bus disconnected, quitting...
-> Jan 09 15:10:41 41-am335x-bbbw iwd[360]: Removing scan context for wdev 2
-> Jan 09 15:10:41 41-am335x-bbbw iwd[360]: Terminate
-> Jan 09 15:10:41 41-am335x-bbbw systemd[1]: Stopping iwd.service -
-> Wireless service...
-> Jan 09 15:10:42 41-am335x-bbbw iwd[360]: Removing scan context for wdev 3
-> Jan 09 15:10:42 41-am335x-bbbw systemd[1]: iwd.service: Deactivated
-> successfully.
-> Jan 09 15:10:42 41-am335x-bbbw systemd[1]: Stopped iwd.service -
-> Wireless service.
-> Jan 09 15:10:44 41-am335x-bbbw systemd[1]: Starting iwd.service -
-> Wireless service...
-> Jan 09 15:10:47 41-am335x-bbbw iwd[363]: Wireless daemon version 2.12
-> Jan 09 15:10:47 41-am335x-bbbw iwd[363]: Loaded configuration from
-> /etc/iwd/main.conf
-> Jan 09 15:10:47 41-am335x-bbbw systemd[1]: Started iwd.service -
-> Wireless service.
-> Jan 09 15:10:47 41-am335x-bbbw iwd[363]: station: Network
-> configuration is disabled.
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]: Wiphy: 0, Name: phy0
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:         Permanent Address:
-> 5c:31:3e:e2:24:6a
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:         2.4GHz Band:
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                 Bitrates (non-HT):
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                          1.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                          2.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                          5.5 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         11.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                          6.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                          9.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         12.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         18.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         24.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         36.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         48.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         54.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                 HT Capabilities:
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         HT20
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         Short
-> GI for 20Mhz
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                 HT RX MCS indexes:
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         0-15
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:         5GHz Band:
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                 Bitrates (non-HT):
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                          6.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                          9.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         12.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         18.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         24.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         36.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         48.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         54.0 Mbps
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                 HT Capabilities:
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         HT40
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         Short
-> GI for 20Mhz
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         Short
-> GI for 40Mhz
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                 HT RX MCS indexes:
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:                         0-7
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:         Ciphers: CCMP-128 TKIP
-> Jan 09 15:11:14 41-am335x-bbbw iwd[363]:         Supported iftypes:
-> station ap p2p-client p2p-go p2p-device
-> Jan 09 15:11:16 41-am335x-bbbw iwd[363]: connect event timed out, reason=3
-> Jan 09 15:11:16 41-am335x-bbbw iwd[363]: connect event timed out, reason=3
-> Jan 09 15:11:17 41-am335x-bbbw iwd[363]: connect event timed out, reason=3
-> Jan 09 15:11:18 41-am335x-bbbw iwd[363]: connect event timed out, reason=3
-> Jan 09 15:11:18 41-am335x-bbbw iwd[363]: connect event timed out, reason=2
+It's the RTL8723CS chip used in Pinephone, the rtl8723cs driver
+unfortunately still isn't in mainline. You can find it in the staging
+directory of megi's tree:
+https://codeberg.org/megi/linux/src/commit/f45c45abc5325682d06cb51c06aba1f=
+817fba462/drivers/staging/rtl8723cs
 
-enum nl80211_timeout_reason {
-         NL80211_TIMEOUT_UNSPECIFIED,
-         NL80211_TIMEOUT_SCAN,
-         NL80211_TIMEOUT_AUTH,
-         NL80211_TIMEOUT_ASSOC,
-};
+I suspect getting the chip properly supported in mainline would be the
+best way to get SAE working. If you have hints on how to get involved in
+that I'm curious, so far my wireless driver experience is limited to
+"add USB ID for a new device with already supported chip". ;-)
 
-So either AUTH or ASSOC.
+> There's currently no way to force WPA3-only in iwd.=C2=A0 Either configu=
+re
+> the AP to be WPA3 only, or have the AP enforce transition-disable bit.
+> But this typically requires iwd to connect at least once with WPA3.=C2=
+=A0 See
+> 'TransitionDisable' and 'DisabledTransitionModes' in man 5 iwd.network
 
-> Jan 09 15:11:18 41-am335x-bbbw iwd[363]: Received error during
-> CMD_TRIGGER_SCAN: Invalid argument (22)
-> Jan 09 15:11:28 41-am335x-bbbw iwd[363]: Received error during
-> CMD_TRIGGER_SCAN: Invalid argument (22)
-> Jan 09 15:11:48 41-am335x-bbbw iwd[363]: Received error during
-> CMD_TRIGGER_SCAN: Invalid argument (22)
-> ```
-> 
+Good point, it should be a task for NetworkManager to make that clear to
+the user (and possibly set those options, if the user wants to enforce
+WPA3-only).
 
-And that's a pretty strange error as well.  Any chance you can trace the kernel 
-to see what exactly it doesn't like?
+>> ---
+>> =C2=A0 src/wiphy.c | 6 +++++-
+>> =C2=A0 1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/src/wiphy.c b/src/wiphy.c
+>> index 766df348..5530e9c6 100644
+>> --- a/src/wiphy.c
+>> +++ b/src/wiphy.c
+>> @@ -248,6 +248,8 @@ static bool wiphy_can_connect_sae(struct wiphy
+>> *wiphy)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * TODO: No=
+ support for CMD_EXTERNAL_AUTH yet.
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 l_debug("Unsupported: %s ne=
+eds CMD_EXTERNAL_AUTH for SAE",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wip=
+hy->driver_str);
+>
+> I flipped this around and made this statement an l_warn to make it
+> clearer that this is an iwd limitation.
 
-> What's weird, if i login over serial and restart, sometimes it just works..
-> 
-> ```
-> Jan 09 14:58:11 42-am335x-bbbw iwd[362]: Received error during
-> CMD_TRIGGER_SCAN: Invalid argument (22)
-> Jan 09 15:03:11 42-am335x-bbbw iwd[362]: Received error during
-> CMD_TRIGGER_SCAN: Invalid argument (22)
-> Jan 09 15:07:58 42-am335x-bbbw sudo[676]:   debian : TTY=ttyS0 ;
-> PWD=/home/debian ; USER=root ; COMMAND=/usr/bin/systemctl restart
-> iwd.service
-> Jan 09 15:08:19 42-am335x-bbbw sudo[720]:   debian : TTY=ttyS0 ;
-> PWD=/home/debian ; USER=root ; COMMAND=/usr/bin/systemctl restart
-> iwd.service
-> Jan 09 15:24:44 42-am335x-bbbw sudo[1246]:   debian : TTY=ttyS0 ;
-> PWD=/home/debian/lab ; USER=root ; COMMAND=/usr/bin/nano
-> /etc/iwd/main.conf
-> Jan 09 15:25:01 42-am335x-bbbw systemd[1]: Starting iwd.service -
-> Wireless service...
-> Jan 09 15:25:04 42-am335x-bbbw iwd[363]: Wireless daemon version 2.12
-> Jan 09 15:25:04 42-am335x-bbbw iwd[363]: Loaded configuration from
-> /etc/iwd/main.conf
-> Jan 09 15:25:04 42-am335x-bbbw systemd[1]: Started iwd.service -
-> Wireless service.
-> Jan 09 15:25:04 42-am335x-bbbw iwd[363]: station: Network
-> configuration is disabled.
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]: Wiphy: 0, Name: phy0
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:         Permanent Address:
-> 5c:31:3e:e3:bb:e4
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:         2.4GHz Band:
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                 Bitrates (non-HT):
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                          1.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                          2.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                          5.5 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         11.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                          6.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                          9.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         12.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         18.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         24.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         36.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         48.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         54.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                 HT Capabilities:
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         HT20
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         Short
-> GI for 20Mhz
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                 HT RX MCS indexes:
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         0-15
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:         5GHz Band:
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                 Bitrates (non-HT):
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                          6.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                          9.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         12.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         18.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         24.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         36.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         48.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         54.0 Mbps
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                 HT Capabilities:
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         HT40
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         Short
-> GI for 20Mhz
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         Short
-> GI for 40Mhz
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                 HT RX MCS indexes:
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:                         0-7
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:         Ciphers: CCMP-128 TKIP
-> Jan 09 15:25:30 42-am335x-bbbw iwd[363]:         Supported iftypes:
-> station ap p2p-client p2p-go p2p-device
-> Jan 09 15:25:32 42-am335x-bbbw iwd[363]: hardware_rekey not supported
-> ```
+Makes sense. :-)
 
-What iwd does on startup is deletes and re-creates the wifi netdev.  Some 
-drivers might not really like that and a race condition is a good theory if iwd 
-works fine on subsequent runs.  You can try adding [DriverQuirks] to 
-/etc/iwd/main.conf and add your driver to the DefaultInterface list.  That 
-should prevent iwd from trying to re-create the netdev.  See man 5 iwd.config 
-for more details.  Maybe this helps?
+Best regards,
+Fiona
 
-Regards,
--Denis
