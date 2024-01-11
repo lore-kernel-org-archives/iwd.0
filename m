@@ -1,90 +1,152 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD544C3C8
-	for <iwd@lists.linux.dev>; Wed, 10 Jan 2024 17:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC13D18023
+	for <iwd@lists.linux.dev>; Thu, 11 Jan 2024 13:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFg5sVbS"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5988e377264so807608eaf.3
-        for <iwd@lists.linux.dev>; Wed, 10 Jan 2024 09:10:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JgWz+FTK"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-67f8d9fe99fso34156616d6.2
+        for <iwd@lists.linux.dev>; Thu, 11 Jan 2024 05:51:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704906644; x=1705511444; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vZZ1inw7s9jpN1sVUmTm38D2d2y+zk1NaYdMlKj5i58=;
-        b=UFg5sVbSJIuSO9fXpkb+eotwzU8jOpB1vU82TukA/de1TzJOy8uZthl4l/gMpi6eOs
-         K3PkIGbYdS7/xC7LEujhiBKulKOFRlTQB+Ei8Cmd24XmSeAh4TJWgRNjx+OnUvPn6mdg
-         7PClp8ag9jTjbTdCH8nmX90VDWJjVJbq/LJbwgScxjx8H5KulI0ym/0jgzVOK7X4s3zQ
-         spzapUuejRpaTP0ZJRIppZzsomQZlN+XL/tZ0HdHjynbwTc89VbniJMW6zPrk8WeiUgR
-         miC63DU2qGq6Cl9u4lRe3R5v/Jnf4GFQH3pA3xowTR+idDH0C62xBQ1Xxdzw+eTn4+LG
-         4sVw==
+        d=gmail.com; s=20230601; t=1704981102; x=1705585902; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZKdq3JmbEzFdUjEX9ihL8iiYEEc02J9KhL7JuxuYVtk=;
+        b=JgWz+FTKGFDHTGXNi/xNaWmaNUmZBujKk32hAcZWI9E7DekIvl3bAJN6jyxqcwXY7A
+         UirsB8veprpOUfghlOaYO4XEqkZHGUEADjB8bEBYKmsBcHjY+9BYio6Z58/FKeMpNrQs
+         7CTFUwHs1Z2Wai2fHKWJckdlEnAis5qw2rqslqbz46tM7dED1cRcROcd6JsSFp7E1Fj1
+         L+IqOU2erLT9zqpB199QrW9D9nxvJYgq8oWzP4UokZWyPI7xfIjQ1a93Eea9RdY0QD6Q
+         X2JfQCzRXTCe53TBlUHnJkg7P/bS1nETpstrnkzqKNCHGTxfOXCCZ1a3aDgLcpLpE/4v
+         xWMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704906644; x=1705511444;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vZZ1inw7s9jpN1sVUmTm38D2d2y+zk1NaYdMlKj5i58=;
-        b=DTXy5cQ9TT9QrswqemBs1uRaM0yeU397QmSIDocAcI7P9BEgQTz6mRFKWhuxLp/FXf
-         L4qfBHU+VolhLFPl4cKpWXKo/0LlvACBCjfibe2p9oAROiYIxgd11At2hV2RVHPwxyf1
-         lF1QNH8PJAdTGTXGKTiDytYrt5yB/gCrL6un+0GmyPbM9J+MGF4dMZndJxCEhjS8CvVx
-         OYiOLAfX59dUootzkgbF4KFMBPOQyi8UX6vaVU3cYq6o0SBb5Ax8gyUf8C1YQn/qgzKf
-         uXQ2D6azJ3Ub2242Lhay++jFF3ateSdGGDNH1iRI7RysC3x94Av+uZN/oM3oztpEAJA0
-         QNDg==
-X-Gm-Message-State: AOJu0YykNQuT53k+g/LCiPBRZeisN4Vog5lLtjDUdb/2iX3kXY5Y/NaI
-	KyhM3XlkdOm2ExWq2ZU+mo5ZQj2+SnE=
-X-Google-Smtp-Source: AGHT+IF/WUBqpwZbSsRwwp1xCsUOifNc5sCcXD5n/Zerfv7EJlyhTAFNeWe+Q4sISOjgCQr9EMwAqg==
-X-Received: by 2002:a4a:91d9:0:b0:593:e58a:9bd1 with SMTP id e25-20020a4a91d9000000b00593e58a9bd1mr1376134ooh.12.1704906644442;
-        Wed, 10 Jan 2024 09:10:44 -0800 (PST)
-Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id f203-20020a4a58d4000000b005987aeff34bsm820942oob.1.2024.01.10.09.10.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 09:10:44 -0800 (PST)
-Message-ID: <da2a29f9-54ad-4faf-8e9c-1fce457f68ca@gmail.com>
-Date: Wed, 10 Jan 2024 11:10:43 -0600
+        d=1e100.net; s=20230601; t=1704981102; x=1705585902;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZKdq3JmbEzFdUjEX9ihL8iiYEEc02J9KhL7JuxuYVtk=;
+        b=IOS2xFoPhlALhVVac4So/gNGqhld7Wz/5115CIbv3RCxNOlKd/xvZqKVu+wKbsQDHU
+         fUv34jgohaNhSHXAh86K8jGPzxTaXCTnLHixagJld1jgYkalGWgyvH0rHnigpJAG7J81
+         6wkjRUipRhJOjjA/52ntvGfjhessBL/OvrpWc+grSy2o8DAoHx3YzJWq4lysfbbviESM
+         7/av+HsTOkNFdbh8vOHLP7cL5UYa58vZeEbjYWHsw9LzaqW7JlVtCWTK5adv6IHxOhE/
+         XeV1x5W53ldiZ67yd3QdRvfMAWco9e0qqXxLAQCSSFEwJXA7nvCfw+arZ3ZlGV6tZF8+
+         OU0Q==
+X-Gm-Message-State: AOJu0YyuoKY5brq3mASlmq1XepiJNLWrRhgwf1UP98IjBJaoHwYIke1i
+	iyN0m4zNz30sDALCxmg/wGgpc5o3kFc=
+X-Google-Smtp-Source: AGHT+IH/v74KZG0i3V6vqFuEBKute4nhcToO5NVlKaIj3HEhR9Dnvm5DEhzF68wf+7xn6vRl225tvg==
+X-Received: by 2002:ad4:5943:0:b0:681:3157:3cbf with SMTP id eo3-20020ad45943000000b0068131573cbfmr1068191qvb.46.1704981102268;
+        Thu, 11 Jan 2024 05:51:42 -0800 (PST)
+Received: from LOCLAP699.rst-02.locus (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id ml18-20020a056214585200b0067f319b1b21sm309470qvb.24.2024.01.11.05.51.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jan 2024 05:51:41 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] auto-t: add netconfig timeout test
+Date: Thu, 11 Jan 2024 05:51:37 -0800
+Message-Id: <20240111135137.1431023-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Log falling back from SAE to WPA2
-Content-Language: en-US
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Fiona Klute <fiona.klute@gmx.de>, iwd@lists.linux.dev
-References: <20240109095926.1541238-1-fiona.klute@gmx.de>
- <214422a4-25bc-4676-8a4a-8bf8d67c7ab9@gmail.com>
- <BD87F517-7D4C-48AA-BB73-D18C9AE6322C@holtmann.org>
- <44da90d8-88c4-4a92-9114-0ed875e86cc7@gmail.com>
- <C50971A2-BFDF-4A5B-9027-FC32462AFB88@holtmann.org>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <C50971A2-BFDF-4A5B-9027-FC32462AFB88@holtmann.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Marcel,
+Tests that netconfig eventually times out and that IWD disconnects
+---
+ autotests/testNetconfig/autoconnect.psk |  2 +
+ autotests/testNetconfig/timeout_test.py | 65 +++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+)
+ create mode 100644 autotests/testNetconfig/autoconnect.psk
+ create mode 100644 autotests/testNetconfig/timeout_test.py
 
-On 1/10/24 11:05, Marcel Holtmann wrote:
-> Hi Denis,
-> 
->>>>> I've had connections to a WPA3-Personal only network fail with no log
->>>>> message from iwd, and eventually figured out to was because the driver
->>>>> would've required using CMD_EXTERNAL_AUTH. With the added log messages
->>>>> the reason becomes obvious.
->>>>
->>>> Interesting.  Last time I checked only the quantenna driver used this feature and it wasn't very common.  If it isn't a secret, what card / driver do you have?
->>> according to Arend on an email thread with the Apple WiFi support, he hinted that Broadcom with their devices/firmware opted for the CMD_EXTERNAL_AUTH option while the Cypress/Infineon devices with their firmware (like Raspberry Pi) are using the SAE offload feature.
->>
->> Yeah I saw that as well.  I don't have any Cypress devices.  AFAIK Raspberry Pi uses brcmfmac + firmware that supports SAE authentication in CMD_CONNECT, not CMD_EXTERNAL_AUTH.  Someone who knows better please correct me.
-> 
-> I got the impression that Apple M1/M2/M3 Macs (or even their Intel Macs) would be using CMD_EXTERNAL_AUTH, but details are unclear. Does wpa_supplicant actually supports it?
+Note: this requires a fix in ELL
+https://lore.kernel.org/ell/20240111133331.1423853-1-prestwoj@gmail.com/T/#u
 
-Seems that way:
+diff --git a/autotests/testNetconfig/autoconnect.psk b/autotests/testNetconfig/autoconnect.psk
+new file mode 100644
+index 00000000..c28936bf
+--- /dev/null
++++ b/autotests/testNetconfig/autoconnect.psk
+@@ -0,0 +1,2 @@
++[IPv4]
++SendHostname=true
+diff --git a/autotests/testNetconfig/timeout_test.py b/autotests/testNetconfig/timeout_test.py
+new file mode 100644
+index 00000000..099e8597
+--- /dev/null
++++ b/autotests/testNetconfig/timeout_test.py
+@@ -0,0 +1,65 @@
++import unittest
++import sys
++import os
++
++sys.path.append('../util')
++from iwd import IWD
++from iwd import PSKAgent
++from iwd import NetworkType
++
++class Test(unittest.TestCase):
++
++    def test_netconfig_timeout(self):
++        IWD.copy_to_storage('autoconnect.psk', name='ap-ns1.psk')
++
++        wd = IWD(True)
++
++        psk_agent = PSKAgent("secret123")
++        wd.register_psk_agent(psk_agent)
++
++        devices = wd.list_devices(1)
++        device = devices[0]
++
++        ordered_network = device.get_ordered_network('ap-ns1')
++
++        self.assertEqual(ordered_network.type, NetworkType.psk)
++
++        condition = 'not obj.connected'
++        wd.wait_for_object_condition(ordered_network.network_object, condition)
++
++        ordered_network.network_object.connect()
++
++        condition = 'obj.state == DeviceState.connecting'
++        wd.wait_for_object_condition(device, condition)
++
++        device.wait_for_event("connecting (netconfig)")
++
++        # Netconfig should fail, and IWD should disconnect
++        from_condition = 'obj.state == DeviceState.connecting'
++        to_condition = 'obj.state == DeviceState.disconnecting'
++        wd.wait_for_object_change(device, from_condition, to_condition, max_wait=150)
++
++        # Autoconnect should then try again
++        condition = 'obj.state == DeviceState.connecting'
++        wd.wait_for_object_condition(device, condition)
++
++        device.wait_for_event("connecting (netconfig)")
++
++        device.disconnect()
++        condition = 'obj.state == DeviceState.disconnected'
++        wd.wait_for_object_condition(device, condition)
++
++    @classmethod
++    def setUpClass(cls):
++        cls.orig_path = os.environ['PATH']
++        os.environ['PATH'] = '/tmp/test-bin:' + os.environ['PATH']
++        IWD.copy_to_storage('resolvconf', '/tmp/test-bin')
++
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
++        os.system('rm -rf /tmp/radvd.conf /tmp/resolvconf.log /tmp/test-bin')
++        os.environ['PATH'] = cls.orig_path
++
++if __name__ == '__main__':
++    unittest.main(exit=True)
+\ No newline at end of file
+-- 
+2.34.1
 
-https://w1.fi/cgit/hostap/commit/?id=5ff39c1380d9dea794c5102c0b6d11d1b1e23ad0
-
-Regards,
--Denis
