@@ -1,61 +1,37 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610A9249E2
-	for <iwd@lists.linux.dev>; Thu, 18 Jan 2024 12:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AAF3222
+	for <iwd@lists.linux.dev>; Fri, 19 Jan 2024 14:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705580296; cv=none; b=S634uVrBTYlWxJiwKIWK3uZf+lSycJrLfm3g/SJ0D99ElutnrqKqkI6V7ZNedpjuD+qe6jI70IcaXCWt7MQ3wdDllI8jnojVKKi1aBSTrQucwkw51CZaTKyG7qo7qrpRs4oWuCkYN1ap3/Wh0yCUOVdqcaZdS3NyqNjAm48hjBY=
+	t=1705674551; cv=none; b=EDts9OWCNZuPkDDm+6JUqtqQgHpuAUMmOFOAHO2LxaxBn5f6QpAqGQNodM3N3skpHk7G2qftEC0+20Bptu2uzRsO24iafhA9DvL2YlTcsYXftI4drVGEk32xbIylJWkjmWaVFmfZpVXoxfdlXatbSG2yoygfW1De9QzJDeIRGh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705580296; c=relaxed/simple;
-	bh=yZRkbG32spl0vBcQjWkMckK28iVrC/p53FF8Z4VfCHU=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=rn09rHD+9pxngSZJHkIUCPnfyfq4qNJiX4pk2HyYU2U0OssLWp2Ja1EegcUf7PRyUaAaLM0m3dx0GeCuWir3JlPekNquutW5uQDoCMfxYN+KatUtF8rcbXicKxhgKu8FY9Rb4YxuFzw7rfCZ8uePTehj9p++WoV38cJwqWlS9pA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Db7xyywy; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1705674551; c=relaxed/simple;
+	bh=Bp9JjDnutAeOoHmg/dioph0DJg/BtJbdU0QDHLJVIIg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=iZTLb/4R4yV50r7z4UuDK+1+q2Q808sa5rFGfpzuwbQzK1YHaXfwcAoBYrN2WBCukLeOkncYwq2y8yZhqUsVg9Oh4ZXl8OhO4m9rXPYpfgfBwxTVZMZXtWeiB4cOgOgrNUjcfZR4eTx/SNUoGSNlt+C10t+7lIgrWlLo1hC67i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ASfD2UzN; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Db7xyywy"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-68174a6a8a8so15275886d6.2
-        for <iwd@lists.linux.dev>; Thu, 18 Jan 2024 04:18:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705580294; x=1706185094; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UFbVtjU3VGEY6f7W7RM00GgjCI3yTWYOFU8nSg4IM7M=;
-        b=Db7xyywylGD5jzendJcim5FhZrWOqV8W/v4xVkrIZjJ38wkavOylgdRgxyzTvyajGD
-         yNKFkMlrUcMVHmoBAO0PlB2beZ2sIRZoLplvoAi1dJyMItijAwTjd2o7FQ+b/nrng6ZZ
-         aVXpgdAD8MHG/W9qiK/f/qoWwqPTbMHQe47NzkkPYE41fIs0a+4KmFOVAQA4EXuw981a
-         ZjeOG6JJH/YvY7PYj4HEMQnQ+5dyQdkgd2yA2//EXFRrPReS8YssFt4DT8QNsP5A+pet
-         0ndphgN5ZrYHAzKR5cTtGfTWs56o8VnqdC245vaJdwGjtg94edvqQpz9MURnW/eeifiA
-         eXJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705580294; x=1706185094;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UFbVtjU3VGEY6f7W7RM00GgjCI3yTWYOFU8nSg4IM7M=;
-        b=Nc3UKdi6Y7gF7TRJItj4IEYEVtvwhVm8DJwicxCL8EIt4r6PR4aIJr5MP0po7LeaW3
-         m1RQqe4LKAfaD9m1o7Um0JY/OEogsdS6F1CSyQ49qqdjdfreBMskZfMCVdr/6VahhxCR
-         uSxXLH6/fLoGsSc8F0wwvT/TBSiGITRK52qVx3c0DVjCHK3GLeNnO1egJpmq/qxGYPEQ
-         ooERsmo2+D30vEnwqGw8vrcnY8zCl61op0cjUZGXK7bxvxKdiaD5Us04tHb+ZV3o5ABb
-         ss8npeoxJ+Od2DVJ2Ky6H2CkMpvO5tdpe7EiaCoftRMHyB3im/rjKMl7xugBcMLBtq0S
-         4F4g==
-X-Gm-Message-State: AOJu0YxTulazwrPQ193gN4lIqPTS88Ywap3xDGBdpojpOyEwwfri7wbG
-	s4dSryQFuZb1CFoiakRMFj6KmNezUQivZnTVGoBqW9WHl40cwCUE
-X-Google-Smtp-Source: AGHT+IEvE9gQjJboplblbMiHoqY5A63TBLBcVIMaRNgV2Ngvz7LWiR9QX3IvVRTy/b6HJRef06F+Lg==
-X-Received: by 2002:a05:6214:4008:b0:681:7a1e:e36c with SMTP id kd8-20020a056214400800b006817a1ee36cmr590999qvb.72.1705580294154;
-        Thu, 18 Jan 2024 04:18:14 -0800 (PST)
-Received: from [10.102.4.150] (50-78-19-50-static.hfc.comcastbusiness.net. [50.78.19.50])
-        by smtp.gmail.com with ESMTPSA id g16-20020ad45110000000b0067f839f073csm5848442qvp.40.2024.01.18.04.18.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jan 2024 04:18:13 -0800 (PST)
-Message-ID: <ef97ec13-8f6c-4198-bf19-ff50a3e596f1@gmail.com>
-Date: Thu, 18 Jan 2024 04:18:10 -0800
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ASfD2UzN"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3ED4A6000F;
+	Fri, 19 Jan 2024 14:29:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1705674540;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tleXooxhRb6DEbVzVfGjyACPhNI2jOsh0MIm8PLfOEQ=;
+	b=ASfD2UzNwBqm0DfX9D2FLKDrt5pOlYLdrw4ThTX/4QWAedIlH4pL0uJYGdrkZIe24kTTs/
+	n6Pco0miLaxuy3hNrhpGtILpUwfXHMpEk38qGCz4aBVuONV9t4JJSOJLMyiAOuKO5rGNGZ
+	nS7b5BowDwjwPSxa+1WgyWjZ/1P+mlVYdKIW9oOE+YLjpj5Tcevd6nFtrHvTM0A7dhVwxL
+	MxwtqIT+h1vAHc6jwIqVXSmVUYrvcPY2tFo3d5LYbPijBSwoSsvqVBYupRfb6RuRpXGphV
+	HXJDb0ZmMUGyisVGEpgwa28iTKHM/1uayZ/8s8337wac/MmPmQd0/IgUisDtYQ==
+Message-ID: <edd63888-bf1f-440f-98d1-3fc33fc2b609@bootlin.com>
+Date: Fri, 19 Jan 2024 15:28:59 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -63,37 +39,182 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: How to Autoconnect Two WiFi Cards?
-To: Fabian Herb <fabian.herb@xtonomy.ai>
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <DFBE16E1-468A-4292-9056-D7ED6AA0CB4E@xtonomy.ai>
- <e3e82ef7-941c-4dbb-9f1b-2d1579a12f74@gmail.com>
- <D88835CF-16B7-4658-8852-65C4C3767E9C@xtonomy.ai>
+Subject: Re: Iwd: unable to start AP with NXP 88W9098 chipset
+From: Joao Marcos Costa <joaomarcos.costa@bootlin.com>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+Cc: gregory.clement@bootlin.com, Salahaldeen.Altous@leica-camera.com
+References: <6c9b05a2-7474-4eed-bb74-6f5de1d433ba@bootlin.com>
+ <c11d1310-a0ca-46a2-b08e-d1e35351826a@gmail.com>
+ <8c484950-c99d-47c0-b048-5a447cffd719@bootlin.com>
 Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <D88835CF-16B7-4658-8852-65C4C3767E9C@xtonomy.ai>
+Organization: Bootlin
+In-Reply-To: <8c484950-c99d-47c0-b048-5a447cffd719@bootlin.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: joaomarcos.costa@bootlin.com
 
-On 1/18/24 3:51 AM, Fabian Herb wrote:
+Hello James,
+
+On 12/22/23 16:36, Joao Marcos Costa wrote:
 > Hello James,
 >
->> Without implementing a new feature with per-phy profiles about the only thing you could do would be:
+> Thanks for such a quick reply!
+>
+
+[...]
+
+
+> I updated it to v2.9 and indeed it works. For documentation's sake:
+>
+> This is my /etc/iwd/main.conf:
+>
+>    [General]
+>    EnableNetworkConfiguration=true
+>    Country=FR
+>    UseDefaultInterface=true
+>
+>    [Network]
+>
+>    [Scan]
+>    DisablePeriodicScan=true
+>
+> and this is my /var/lib/iwd/ap/test.ap:
+>
+>    [General]
+>    DisableHT=true
+>    Channel=10
+>
+>    [Security]
+>    Passphrase=password123
+>
+>    [IPv4]
+>    Address=192.168.250.1
+>    Gateway=192.168.250.1
+>    Netmask=255.255.255.0
+>    DNSList=8.8.8.8
+>
+
+[...]
+
+
+>> When helping  Salahaldeen in the original thread I remember that 
+>> hardware being extremely flaky. It would start sometimes and not 
+>> others, and if it failed once it would need a full reboot to get it 
+>> working again. Even with hostapd if I used an option it didn't like 
+>> it required a full reboot to get it going again.
 >>
->>   - Create a network namespace (e.g. ns0)
-> Thanks! I’ll look into that idea. At a first glance it looks quite cumbersome though. Maybe this could be done with LXC or Docker...
-Yeah I actually hesitated to even suggest it :) Though once you've done 
-it its not _that_ bad. We do this in our autotests framework to simulate 
-networks, and run multiple instances of IWD. You may be able to do it 
-with a container as well.
+>> IIRC there was also some success on one of the interfaces but not the 
+>> others. If you could provide some IWD debug logs too that would be 
+>> great, and might as well show the hostapd configuration that works as 
+>> well.
 >
->> What exactly are you trying to accomplish by connecting to separate SSID’s?
-> That’s for redundancy. The machine is moving around quite a bit, so there’s lots of roaming. Reception can be bad in some areas. And with two WiFi connections and 802.11r Fast Transition if possible, I hope to get network interruptions close to zero. Redundancy itself is done on application level.
-So this very same thing is being added in WiFi 7, called Multi-Link 
-Operation (MLO). It doesn't help you now as IWD doesn't have any logic 
-for it but just putting it out there (and maybe AP support is also 
-needed). They've been working on this feature in the kernel for quite 
-some time now.
+> I kept trying with muap0 interface, which worked fine.
 >
-> Best regards,
-> Fabian
+> Just in case, here's my hostapd.conf:
+>
+>    # the interface used by the AP
+>    interface=muap0
+>    # "g" simply means 2.4GHz band
+>    hw_mode=g
+>    # the channel to use
+>    channel=10
+>    # limit the frequencies used to those allowed in the country
+>    ieee80211d=1
+>    # the country code
+>    country_code=FR
+>    # 802.11n support
+>    ieee80211n=1
+>    # QoS support, also required for full speed on 802.11n/ac/ax
+>    wmm_enabled=1
+>
+>    # the name of the AP
+>    ssid=test
+>
+>    # 1=wpa, 2=wep, 3=both
+>    auth_algs=1
+>    # WPA2 only
+>    wpa=2
+>    wpa_key_mgmt=WPA-PSK
+>    rsn_pairwise=CCMP
+>    wpa_passphrase=password123
+
+
+Would you remember if you faced performance issues with this 
+hardware/driver?
+
+I'm using iwd v2.9 with the same main.conf and *.ap (except for the IP 
+addresses) as before, and this is what I get with iperf3:
+
+iperf3 -c 10.0.24.1
+Connecting to host 10.0.24.1, port 5201
+[  5] local 10.0.24.102 port 46170 connected to 10.0.24.1 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec   768 KBytes  6.29 Mbits/sec    0   45.2 KBytes
+[  5]   1.00-2.00   sec   512 KBytes  4.19 Mbits/sec    0   46.7 KBytes
+[  5]   2.00-3.00   sec   640 KBytes  5.24 Mbits/sec    0   49.5 KBytes
+[  5]   3.00-4.00   sec   384 KBytes  3.14 Mbits/sec    0   53.7 KBytes
+[  5]   4.00-5.00   sec   384 KBytes  3.15 Mbits/sec    0   53.7 KBytes
+[  5]   5.00-6.00   sec   512 KBytes  4.19 Mbits/sec    0   53.7 KBytes
+[  5]   6.00-7.00   sec   256 KBytes  2.10 Mbits/sec    0   53.7 KBytes
+[  5]   7.00-8.00   sec   512 KBytes  4.19 Mbits/sec    0   53.7 KBytes
+[  5]   8.00-9.00   sec   512 KBytes  4.19 Mbits/sec    0   53.7 KBytes
+[  5]   9.00-10.00  sec   768 KBytes  6.29 Mbits/sec    0   74.9 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec  5.12 MBytes  4.30 Mbits/sec 0             sender
+[  5]   0.00-10.05  sec  4.77 MBytes  3.98 Mbits/sec                  
+receiver
+
+iperf Done.
+
+On the other hand, with hostapd (using the same hostapd.conf as before), 
+I'm getting considerably better results:
+
+Connecting to host 192.168.0.1, port 5201
+[  5] local 192.168.0.2 port 44490 connected to 192.168.0.1 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  12.1 MBytes   102 Mbits/sec    0    447 KBytes
+[  5]   1.00-2.00   sec  9.12 MBytes  76.5 Mbits/sec    0    472 KBytes
+[  5]   2.00-3.00   sec  9.50 MBytes  79.8 Mbits/sec    0    551 KBytes
+[  5]   3.00-4.00   sec  9.75 MBytes  81.7 Mbits/sec    0    611 KBytes
+[  5]   4.00-5.00   sec  10.4 MBytes  87.0 Mbits/sec    0    626 KBytes
+[  5]   5.00-6.00   sec  10.1 MBytes  85.0 Mbits/sec    0    626 KBytes
+[  5]   6.00-7.00   sec  11.5 MBytes  96.5 Mbits/sec    0    626 KBytes
+[  5]   7.00-8.00   sec  10.1 MBytes  84.9 Mbits/sec    0    626 KBytes
+[  5]   8.00-9.00   sec  12.8 MBytes   107 Mbits/sec    0    701 KBytes
+[  5]   9.00-10.00  sec  11.6 MBytes  97.4 Mbits/sec    0    747 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec   107 MBytes  89.7 Mbits/sec 0             sender
+[  5]   0.00-10.02  sec   104 MBytes  86.9 Mbits/sec                  
+receiver
+
+iperf Done.
+
+
+I tried removing 'DisableHT', but that raises some issues on the driver:
+
+| CMD_RESP: cmd 0xb0 error, result=0x1
+| IOCTL failed: 000000006106683e id=0x20000, sub_id=0x2000c action=1, 
+status_code=0x1
+
+or:
+
+No matching method found
+Failed to retrieve I[  610.756333] Block woal_cfg80211_set_power_mgmt in 
+abnormal driver state
+WD dbus objects, quitting...
+
+
+Could you please give me some insights on why we need DisableHT for it 
+to work?
+
+Would you have any suggestions on how to approach this performance gap?
+
+
+Thanks once more!
+
+-- 
+Best regards,
+João Marcos Costa
+
