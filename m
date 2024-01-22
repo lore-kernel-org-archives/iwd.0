@@ -1,58 +1,58 @@
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3F33BB22
-	for <iwd@lists.linux.dev>; Mon, 22 Jan 2024 12:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9990C46443
+	for <iwd@lists.linux.dev>; Mon, 22 Jan 2024 15:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705926099; cv=none; b=hARg5uBOGWG7FpHTUolLPyLsbMNw6J7TLZ/nk4qABfUWuQeLTDrHmK4M9FkqB/dl3JfsstccUFaiWpUhLMpFmbzpNsvgut67v09Wb77cuESpRx4p3ZC1mCzIIoOISDA0uWSXYoNByTx9+bTh1Mh/WQeU46/2yg6SsvG8bd8rf+c=
+	t=1705935710; cv=none; b=SbHfPQx4/ztvdpDuWyUErJe3E99ezyMW+z+ZOer3k7aNMBJFUzgvKEXF98kttmlTc5vmy3gDGrpIYkDpYFyXismd6XqTAEUhXyBbX7Oy/mFeDTUFo41phuKECpOt9Jcserk1BiGyDGerto0EnfzkthOTTI0Ub3Rgm0t7CNQ7GZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705926099; c=relaxed/simple;
-	bh=94RW5vGh+Y05a9JEZRuhvx8i5914OfmdIzbPK/EzFnw=;
+	s=arc-20240116; t=1705935710; c=relaxed/simple;
+	bh=t7JwQce5MD0vMfmJ+fze8nBxiTAORlCY80AvJ8umyJs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=r/vbVNU+1kA5Iqg/oN36Gpe5n6nFmjwXBb60SOo7tcJtd3sfKo4RaCcnnx1f2v8Jt2XgkrqNSUF1d5hPTPftMnA8EY9oXOkIdtBMC4hWgWaPZ2JdXshGxeKzQSDp9tuC0+HBxURz9LXe8xQ8W85WNs9EE0pqz8dc1Q+z17wxcUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kVcsU8Dl; arc=none smtp.client-ip=209.85.161.46
+	 In-Reply-To:Content-Type; b=oGUpz84WBJ7eon/YzSmBFVE9RdGCK4Nvt2qF+KTO70qIVIOIzO62Gv6Mm3O0ILQJvtYXWh8PbR2yb+BQbsGEGAtWXtSDxtKtJ3bFfmCGJrb9yR3IbL8HObYxRFWA3hO6plg9meq2N7P1+yR7jkG7dVh4WIfz//5e84JTGen9UW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MCyrtoFD; arc=none smtp.client-ip=209.85.210.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kVcsU8Dl"
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-598ee012192so1318310eaf.1
-        for <iwd@lists.linux.dev>; Mon, 22 Jan 2024 04:21:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MCyrtoFD"
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6ddf388ca74so1646684a34.0
+        for <iwd@lists.linux.dev>; Mon, 22 Jan 2024 07:01:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705926097; x=1706530897; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QNOeO9N9D//sNoWGBh7vnV2EBunYHSqzHZEmghLqh3A=;
-        b=kVcsU8DlIudcccjrDJSqK6EVRkJbm6e6oJ/ty++aGB5EuXyAMU53xnuHxI23CAK5xl
-         gj75Wm0HhFJwt/uyekM10x/IVldS+mDpejEaMuCB2A1kcrVEAZP7ylM/Ayg7Yghzl+hp
-         o4VSn7afqZU8rQmdYvZSW/Ex83zv/upmPzlnwyBPUtOfNM+7v3LE9M8cgZCGUmbLIv9X
-         MHfazpfap07Qy6t4CLoCPvhddhUemcNgsev/MPptQiAtxbnd3/eKo2QeLbQq6UZQ1Oim
-         rt0G1J67Qh/uw6y8wJ1c2GRtt3J+ruJ4dbh+ySZMGxCp/Tj8rUwHExJ4jtqkkxTgjdhB
-         vyNg==
+        d=gmail.com; s=20230601; t=1705935708; x=1706540508; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BcsT7Hm7eVsg1asJjffpSCI4HASMHSe4zH4r/fpkybU=;
+        b=MCyrtoFDdNNl4KyAZHrIpaQf1jwx1vcCbaNImzZq0sh+ZpC5rXB0+Qvtk+hf3UgzI8
+         csuG80Cf/2E5F9pa4lLk9vPoNx0ZIzDdZ1vfvcdv2JG+Jx20m4Z0IrH7h+XqjBjz83/Y
+         Oyi3QNaAvjVH6oj1bu/ReEIhkcqOLtNMOhuaXIzVV8zFDgFOQNdsCcMGH1uVDvNpTL3u
+         u1BvEcxPtaHtRtJkepzuqLvv4erupA+iBuv45m98YTbkmQ60o+sZcgDn+TU899N8Vmyd
+         QjMH2ohFwb/ILl7yYk7JlD1Cr6kSbPij/7csn+QAMb2Xqt6NvKwkzuRrxQDxWresZRLn
+         g03w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705926097; x=1706530897;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1705935708; x=1706540508;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QNOeO9N9D//sNoWGBh7vnV2EBunYHSqzHZEmghLqh3A=;
-        b=ukpRNWrExv1q2Q877RO/kuvON0xlR7oFFUTwkZ/oIzlb4I6U2K7YqiSbbCjs7XDr5+
-         AHS+8XW0iqJEuIY9UxbbYeYMnQ/gBkOKfDT1Je5fnxReaFgMGE+79aCkMwt8zF63crSv
-         YP3SgEGCkDH/+P8fJNb71EZgiofYawVRt/LnI1h7xKfU2C7rh71EvOtx/0fcytNUiB10
-         T3ySb/lxx/AiVIGKzTxravT4DR2POVEG0UI8yc+Buc6zD/ELUws5Tlnp5PH8p2uHtapb
-         JfnayRHBn0UjODmnbi0KfpOJbV8O98xsKnzN3uJXCoAT7Q0yKW6+g8llawETrNF4CTmS
-         0i/Q==
-X-Gm-Message-State: AOJu0Yw+ltkPfVUDz9z2gsbLvxhORiLUNGTZfDNvEmSmG185U3yVC0xX
-	/0jModkOELjWkAjdoPXBP9CVaRBnzTHCVaamBSKktBZbi2nmbnot
-X-Google-Smtp-Source: AGHT+IFPueoMjUtiJNYU2lm0ngRxxohoOp36l0ga/6hLhZtGSmnu6ojfgifoOpnm1q5l/x9OYq1WkQ==
-X-Received: by 2002:a05:6358:419d:b0:175:ea27:a375 with SMTP id w29-20020a056358419d00b00175ea27a375mr1692875rwc.60.1705926096866;
-        Mon, 22 Jan 2024 04:21:36 -0800 (PST)
-Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id kv2-20020a056214534200b00681896c0483sm2354343qvb.114.2024.01.22.04.21.35
+        bh=BcsT7Hm7eVsg1asJjffpSCI4HASMHSe4zH4r/fpkybU=;
+        b=TTtumXD6kfsDfcJ3NnADDb82qrQvmLh+3dRGjCcnLcCjLYP0Jt31OG0YavkFWKhckz
+         E9clea4L7V1o7TPLg/fv19jufppPDwfl3IF3qaqJhQ0+/4YenvMHVldJ6zk5juNuG8vN
+         vvzzHegXeiLdHqOHIIp9kxAg7w5H3l/wU5rjsiAhmXjS1nIB2jCvYNGf3XG/hqXqkU9t
+         ub9Z8BYZXElyFSqNawM9cy+q9wBJ+hLcIg39THiPpvhwKqfsZeQ8cAiTIvQGx9q4c2lV
+         gOqOHC8PobYAPaAJJXefESbGWXfmgR4iqCLmctzs9w5RVODkdwBVvJfMEZdcLe3jxz9F
+         /05Q==
+X-Gm-Message-State: AOJu0YzHWpV7CHLV9CMLiGRMX8H17A8AxnII/GJ7dbh9/9IBx5y0kK5O
+	8/qwvSnpSFmZUgdHRnHHN8m6vGJ7RpO3xQU/0+eolvTCb/SHHrb9
+X-Google-Smtp-Source: AGHT+IHeXvVRBQ6+rdR+o1q2/PIylbK+2fS0jg5qU9TjigG5jS0hpbQumpkrR3eVkBw4MNz3YagCBA==
+X-Received: by 2002:a05:6830:1d63:b0:6dc:65b7:2b05 with SMTP id l3-20020a0568301d6300b006dc65b72b05mr3578887oti.47.1705935708495;
+        Mon, 22 Jan 2024 07:01:48 -0800 (PST)
+Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id bt14-20020a05683039ce00b006ddbfc37c87sm1712232otb.49.2024.01.22.07.01.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jan 2024 04:21:36 -0800 (PST)
-Message-ID: <e1a35af8-0c7c-450b-9d96-fa8987e4c0d4@gmail.com>
-Date: Mon, 22 Jan 2024 04:21:33 -0800
+        Mon, 22 Jan 2024 07:01:48 -0800 (PST)
+Message-ID: <3aaec29e-7b05-4a2f-b92b-40fbdffa860e@gmail.com>
+Date: Mon, 22 Jan 2024 09:01:46 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,43 +61,27 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: Making udhcpc get a new lease when iwd connects to a network
-To: =?UTF-8?Q?Rafael_=C3=81vila_de_Esp=C3=ADndola?= <rafael@espindo.la>,
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>,
+ =?UTF-8?Q?Rafael_=C3=81vila_de_Esp=C3=ADndola?= <rafael@espindo.la>,
  iwd@lists.linux.dev
 References: <87h6j670ye.fsf@espindo.la>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <87h6j670ye.fsf@espindo.la>
+ <e1a35af8-0c7c-450b-9d96-fa8987e4c0d4@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <e1a35af8-0c7c-450b-9d96-fa8987e4c0d4@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Rafael,
+Hi James, Rafael,
 
-On 1/21/24 2:53 PM, Rafael Ávila de Espíndola wrote:
-> Hi,
->
-> I know that iwd has a builtin dhcp client, but I am using it in alpine
-> linux and would like to use the same dhcp client with both wired and
-> wireless interfaces. The default client in alpine is udhcpc.
->
-> As far as I can tell, the impedance mismatch between udhcpc and iwd is
-> that udhcpc expect commands via unix signals and iwd send property
-> changes via dbus.
->
-> I wrote a bit of glue code and posted it to
-> https://codeberg.org/espindola/iwd2udhcpc. It works, at least on my
-> laptop, but I am wondering if anyone knows of a simpler way.
+> 
+> I think the intended way is for the DHCP daemon to listen for the interface to 
+> set carrier up (from RTNL). This is how systemd-networkd does it, and AFAIK 
 
-I think the intended way is for the DHCP daemon to listen for the 
-interface to set carrier up (from RTNL). This is how systemd-networkd 
-does it, and AFAIK dhcpd. I'm surprised udhcpd doesn't although I 
-suspect since its heavily stripped down they leave it up to some other 
-entity to tell it to start.
+Refer to https://docs.kernel.org/networking/operstates.html for an explanation 
+of how this is supposed to work.  The kernel will signal NO_CARRIER any time the 
+wlan interface is not associated and IF_UP once the interface is fully connected.
 
-Listening for IWD's connected state is effectively the same thing. One 
-thing to keep in mind is you don't want to start DHCP again when 
-transitioning from roaming->connected.
+Regards,
+-Denis
 
->
-> Thanks,
-> Rafael
->
