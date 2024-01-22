@@ -1,58 +1,58 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9990C46443
-	for <iwd@lists.linux.dev>; Mon, 22 Jan 2024 15:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0417E768
+	for <iwd@lists.linux.dev>; Mon, 22 Jan 2024 15:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705935710; cv=none; b=SbHfPQx4/ztvdpDuWyUErJe3E99ezyMW+z+ZOer3k7aNMBJFUzgvKEXF98kttmlTc5vmy3gDGrpIYkDpYFyXismd6XqTAEUhXyBbX7Oy/mFeDTUFo41phuKECpOt9Jcserk1BiGyDGerto0EnfzkthOTTI0Ub3Rgm0t7CNQ7GZ0=
+	t=1705936206; cv=none; b=aLV54O777cGCzSKE+382w+nbJx4+UQ8kEvyrRZ9JpmBxkgpg9+VGxALS0PeqEzcY1A/hJPo2FhyEKy8B8s5Cx4Njok11KOOnG1hZ7qfTbuM/REAIGCLH47vfAYW4WyZqWlfvHA4bIHJlETBBdGzIdqlS6b4Cx8C02GfCrnHUgyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705935710; c=relaxed/simple;
-	bh=t7JwQce5MD0vMfmJ+fze8nBxiTAORlCY80AvJ8umyJs=;
+	s=arc-20240116; t=1705936206; c=relaxed/simple;
+	bh=M4DFseToxCC/KWMZ5hOuqZdqpljuSdQBpWnU4Fa/+6U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=oGUpz84WBJ7eon/YzSmBFVE9RdGCK4Nvt2qF+KTO70qIVIOIzO62Gv6Mm3O0ILQJvtYXWh8PbR2yb+BQbsGEGAtWXtSDxtKtJ3bFfmCGJrb9yR3IbL8HObYxRFWA3hO6plg9meq2N7P1+yR7jkG7dVh4WIfz//5e84JTGen9UW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MCyrtoFD; arc=none smtp.client-ip=209.85.210.51
+	 In-Reply-To:Content-Type; b=S1FyN0T7FH9SpyJPEtX23hqfnZQzbgcBifnGRgrSvzuj+AUyuzY0h5xrwaFWcQyXQBd0FInOq8mBYhTXhZ1kBC68V2UX2LTkEOC6qUfX4cvSMAgemqU2UvGA7lZRnvjFJlFFyMR0Z3tCtGvPAGdQYsVXNzQVYrde9wKhnxMj5gM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nsyE74DM; arc=none smtp.client-ip=209.85.167.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MCyrtoFD"
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6ddf388ca74so1646684a34.0
-        for <iwd@lists.linux.dev>; Mon, 22 Jan 2024 07:01:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsyE74DM"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3bd6581bc66so2599619b6e.1
+        for <iwd@lists.linux.dev>; Mon, 22 Jan 2024 07:10:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705935708; x=1706540508; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1705936204; x=1706541004; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=BcsT7Hm7eVsg1asJjffpSCI4HASMHSe4zH4r/fpkybU=;
-        b=MCyrtoFDdNNl4KyAZHrIpaQf1jwx1vcCbaNImzZq0sh+ZpC5rXB0+Qvtk+hf3UgzI8
-         csuG80Cf/2E5F9pa4lLk9vPoNx0ZIzDdZ1vfvcdv2JG+Jx20m4Z0IrH7h+XqjBjz83/Y
-         Oyi3QNaAvjVH6oj1bu/ReEIhkcqOLtNMOhuaXIzVV8zFDgFOQNdsCcMGH1uVDvNpTL3u
-         u1BvEcxPtaHtRtJkepzuqLvv4erupA+iBuv45m98YTbkmQ60o+sZcgDn+TU899N8Vmyd
-         QjMH2ohFwb/ILl7yYk7JlD1Cr6kSbPij/7csn+QAMb2Xqt6NvKwkzuRrxQDxWresZRLn
-         g03w==
+        bh=tte9jBUI3Nl2kfa7woXZyG6jJpdFEK10oIGhFiAVt6Q=;
+        b=nsyE74DMFGJP/p8zKQHck/3nSmpJ2PR9bit+7jXCIHBDCjIfdyz6ylmOEs3P6xQcco
+         cw3QLTREF0EC95d/BSm+lNua+UwYgEKT3fTAJ4SXUbjFXb0YtjkI7iXNJ7M2rnGfo+CK
+         vkKj4YLX21K2aS7VE5h4DmeeTaywKUfTj/OtNeseUeJMDpjAhUx+u47TosZ+ow0R8n4L
+         My5AKlM/8TYT+CPc5VDmjvPUgIHn0rtP0Hb3kj1mDI6pnz63hvuwAoc7LmR9v8DidwV0
+         ySEHEcivWWSyWiLNzZlB+HmuDs83ULpQpK1KEHCGcg52KxLuxnLN9s1MTTXJIa4SPBr2
+         BQFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705935708; x=1706540508;
+        d=1e100.net; s=20230601; t=1705936204; x=1706541004;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BcsT7Hm7eVsg1asJjffpSCI4HASMHSe4zH4r/fpkybU=;
-        b=TTtumXD6kfsDfcJ3NnADDb82qrQvmLh+3dRGjCcnLcCjLYP0Jt31OG0YavkFWKhckz
-         E9clea4L7V1o7TPLg/fv19jufppPDwfl3IF3qaqJhQ0+/4YenvMHVldJ6zk5juNuG8vN
-         vvzzHegXeiLdHqOHIIp9kxAg7w5H3l/wU5rjsiAhmXjS1nIB2jCvYNGf3XG/hqXqkU9t
-         ub9Z8BYZXElyFSqNawM9cy+q9wBJ+hLcIg39THiPpvhwKqfsZeQ8cAiTIvQGx9q4c2lV
-         gOqOHC8PobYAPaAJJXefESbGWXfmgR4iqCLmctzs9w5RVODkdwBVvJfMEZdcLe3jxz9F
-         /05Q==
-X-Gm-Message-State: AOJu0YzHWpV7CHLV9CMLiGRMX8H17A8AxnII/GJ7dbh9/9IBx5y0kK5O
-	8/qwvSnpSFmZUgdHRnHHN8m6vGJ7RpO3xQU/0+eolvTCb/SHHrb9
-X-Google-Smtp-Source: AGHT+IHeXvVRBQ6+rdR+o1q2/PIylbK+2fS0jg5qU9TjigG5jS0hpbQumpkrR3eVkBw4MNz3YagCBA==
-X-Received: by 2002:a05:6830:1d63:b0:6dc:65b7:2b05 with SMTP id l3-20020a0568301d6300b006dc65b72b05mr3578887oti.47.1705935708495;
-        Mon, 22 Jan 2024 07:01:48 -0800 (PST)
+        bh=tte9jBUI3Nl2kfa7woXZyG6jJpdFEK10oIGhFiAVt6Q=;
+        b=KErgGM7YritSIvsHsyQ9zH/gHzxzJ6/PfA98lSUDdqjJarF0Gmu/k9Ti2uaX0kxOE7
+         wQk/nqHkU+ntWWsJEhcCj4VZdOqfak91O40SRU2uDhpW1tsG0lxzNYdVyFvJR9iWiJcc
+         NqK7+U+g2svssJnoyHrvgbJjtlCuNL6Lv2UCuyWhwe4TJGj/WP8Z1iHw/Yc6r2RcfbTK
+         0eW7kqLe2j+HbMwxrwQjDmQQeV+QAnJoB2qVZ+PE+rnEsHDBPBRpID1Kjnr7H4VjhBh0
+         XglBhpSJ7pUvN4cVqSEtZ4d/AVKyW7dxQZ51dUZyyLVdqUy6mYNBQM8Y8k2lSFGq9xUx
+         l/uA==
+X-Gm-Message-State: AOJu0Ywzvs0KR2UYUARWJPEN16chi647M9Cv0FYY8Bzjd7R/EJoqIdMB
+	XFUTh7mZRHRsquVB9zzUI0QGhZvx6+MpNR7JlK39oXRaJOiUWyot4lHCWuA8
+X-Google-Smtp-Source: AGHT+IGNH28hKTHMZb4FjWRMhwmhecVKGW5Pd2QJm9vjiXTy6eIQKMhmIrhvSpgHPS/9sBfU39bmhg==
+X-Received: by 2002:a05:6808:3a09:b0:3bd:9091:6576 with SMTP id gr9-20020a0568083a0900b003bd90916576mr7413214oib.58.1705936204510;
+        Mon, 22 Jan 2024 07:10:04 -0800 (PST)
 Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id bt14-20020a05683039ce00b006ddbfc37c87sm1712232otb.49.2024.01.22.07.01.47
+        by smtp.googlemail.com with ESMTPSA id n26-20020a05680803ba00b003bd8a7953a5sm1751925oie.19.2024.01.22.07.10.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jan 2024 07:01:48 -0800 (PST)
-Message-ID: <3aaec29e-7b05-4a2f-b92b-40fbdffa860e@gmail.com>
-Date: Mon, 22 Jan 2024 09:01:46 -0600
+        Mon, 22 Jan 2024 07:10:04 -0800 (PST)
+Message-ID: <ca3f8c89-d11f-4017-b76e-eb30101d2e78@gmail.com>
+Date: Mon, 22 Jan 2024 09:10:03 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -60,28 +60,55 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Making udhcpc get a new lease when iwd connects to a network
+Subject: Re: test failure with LTO still present
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>,
- =?UTF-8?Q?Rafael_=C3=81vila_de_Esp=C3=ADndola?= <rafael@espindo.la>,
- iwd@lists.linux.dev
-References: <87h6j670ye.fsf@espindo.la>
- <e1a35af8-0c7c-450b-9d96-fa8987e4c0d4@gmail.com>
+To: Andreas Radke <andyrtr@archlinux.org>, iwd@lists.linux.dev
+References: <20240122104541.74f1a697@workstation64.local>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <e1a35af8-0c7c-450b-9d96-fa8987e4c0d4@gmail.com>
+In-Reply-To: <20240122104541.74f1a697@workstation64.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi James, Rafael,
+Hi Andreas,
 
+On 1/22/24 03:45, Andreas Radke wrote:
+> When building the Arch Linux package with lto enabled we are still
+> getting this old failure here:
 > 
-> I think the intended way is for the DHCP daemon to listen for the interface to 
-> set carrier up (from RTNL). This is how systemd-networkd does it, and AFAIK 
+> PASS: unit/test-eap-sim
+>    CC       unit/test-sae.o
+>    CCLD     unit/test-sae
+> /usr/bin/ld: /tmp/cc7oo1S0.ltrans0.ltrans.o: in function `sae_choose_next_group':
+> /usr/src/debug/iwd/iwd-2.13/src/sae.c:153:(.text+0xb9b): undefined reference to `__wrap_l_ecc_supported_ike_groups'
+> /usr/bin/ld: /tmp/cc7oo1S0.ltrans0.ltrans.o: in function `sae_rx_authenticate':
+> /usr/src/debug/iwd/iwd-2.13/src/sae.c:197:(.text+0x2e21): undefined reference to `__wrap_l_ecc_supported_ike_groups'
+> /usr/bin/ld: /tmp/cc7oo1S0.ltrans0.ltrans.o: in function `handshake_state_free':
+> /usr/src/debug/iwd/iwd-2.13/src/handshake.c:49:(.text+0x3455): undefined reference to `__wrap_l_ecc_supported_ike_groups'
+> /usr/bin/ld: /tmp/cc7oo1S0.ltrans0.ltrans.o:/usr/src/debug/iwd/iwd-2.13/src/handshake.c:49:(.text+0x3491): undefined reference to `__wrap_l_ecc_supported_ike_groups'
+> collect2: error: ld returned 1 exit status
+> make[3]: *** [Makefile:2279: unit/test-sae] Error 1
+> make[2]: *** [Makefile:3016: check-TESTS] Error 2
+> make[1]: *** [Makefile:3366: check-am] Error 2
+> make: *** [Makefile:3368: check] Error 2
+> 
+> 
+> This seems to be the same error reported to the iwd list here:
+> https://lore.kernel.org/iwd/c4b50311-84ab-236a-e3cd-49371a9d7eb4@gmail.com/T/#mbe4525effbbcde51a291ece026da1a25ecbfcbc4
+> 
+> and also Debian and Gentoo seems to be affected as well:
+> https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1015432
+> https://bugs.gentoo.org/877755
+> 
+> Is there any way to solve this other than to disable lto?
+> 
 
-Refer to https://docs.kernel.org/networking/operstates.html for an explanation 
-of how this is supposed to work.  The kernel will signal NO_CARRIER any time the 
-wlan interface is not associated and IF_UP once the interface is fully connected.
+We hack into and overload ell's l_ecc_supported_ike_groups() for the purposes of 
+this test.  This solution is non-invasive to ell and works great on non-LTO 
+builds, but doesn't work with LTO.  Short of introducing private methods into 
+ell for overriding default behavior, I'm not sure what the solution is.
+
+[1] https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/ecc.c#n98
+[2] https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/unit/test-sae.c#n41
 
 Regards,
 -Denis
-
