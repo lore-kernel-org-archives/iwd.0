@@ -1,58 +1,58 @@
-Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBE912AAED
-	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 18:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669F1130E5A
+	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 18:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706120489; cv=none; b=MyWgEHibZvrrdoJC0i5C7iQkJRL7eZJKg0LDkCO75OZplItJwv58BTRn2JRAZDEIUk6Ehrt8oMVzZKpYcVZKQ5QsoNE4LuQ50djLH2acZy01yr18aaj591QCwymo8gTP4NaafSuU7pU2u0f0KpV9bMVFSgbozS1aNDte5WTg900=
+	t=1706121239; cv=none; b=AxoAiW/zmG+cbgLKbShyxoJDy6slqDrJdMi3kv3BxdWAATs7LvSyFtlXyOdAXeeSW0nG4J9RmfsGsnADJwPWDBZqXjG7CnN5Yl+Sm6240/ivclHkL/7/aM2s2ZEO051yKdQkv6rqQWwT7k18bP/xSLSXB51VM+MvISI7hEQ7W0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706120489; c=relaxed/simple;
-	bh=h33rBbAoWwxJIcf2/Tu1HZ7aZDInC9JXAAmf5G7Onfs=;
+	s=arc-20240116; t=1706121239; c=relaxed/simple;
+	bh=AY3KhY6cjSWxv5hwbrjnked+Mtoua47xLZh88Yw9t3A=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=E4rrk478SYHxlmIjp8Ivmh3XaoyxNCmxD51ob1C/LrorJhxX+WVg/LjEvVbUdHzGy6c3VHAlUfm8Kom9lUQgUduGcFhMsgdcF3hcqGAOloAzls347qfhvr8OYCZ8hQGn7SWc4rPy+hpHqqhUKnsA46yLaoz/1/9qvDoGe5nD2xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H7HSZ6yl; arc=none smtp.client-ip=209.85.161.54
+	 In-Reply-To:Content-Type; b=lG4p3lJSD8wRSf9k83Cfjoje7hy9D/V4VH1aYCscNYnaIYK+En330lgm0pKKLdXUd0dVE7SWa1qD1AOy93n9WXL8FmvRdPnYOf6qwKDRekvLPDtS8qLITDmlkDAIgfJR17MGoaBBKAwjMddwID1QIeNFKUz5XN2n9VuoU764H1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XVQpDMJ+; arc=none smtp.client-ip=209.85.222.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H7HSZ6yl"
-Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5999f3f6ce9so1777138eaf.0
-        for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 10:21:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XVQpDMJ+"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7833b6bb41bso496413685a.3
+        for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 10:33:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706120487; x=1706725287; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1706121237; x=1706726037; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=YC2zjdExBgCvUK024A+n3DFZNO5s4XO2aR5qjhDDUxE=;
-        b=H7HSZ6ylZuGmp5TbSEh+g74qXUfVxcor0yow6IdvqzTdHROBey/cJpHeJMXsBAO7eh
-         Q42nc9UCtBoOsqui49LyFfr2SIAdQTLe4YFvGTzdxYvJ0iBxpGkeUCql8DYgCj4YFLHP
-         5Poa8ITUUcn3YiYA3Ip6tVYFninhJ4g+V+EfLUkFUPmNL1Cp3BtQk2GTEODLG/X729yo
-         xMReS2w4rWQWf7MEGLryoNp612ghsVjpjMbRviDmY6rMKbMKRk6VnPS56knLzXTrq/Z1
-         fJsKuUeAw3IBzH6GC334JWx+NiCXjTrODykWnZIh3rYbWQfPt/eeTpubuKTHKJIsga3m
-         FHzw==
+        bh=Fq3VlIGTf+y3iXdkPONB9PwPZKX02VHUOcJFJY1RN8s=;
+        b=XVQpDMJ+wv0mmc3r/XY3k0eU4dQO+/6LvXWPvskBUm6hshQ6TLabUjDTnqw8vgkkbn
+         LJ2N221WIvWskFqmkJMCprwmqaSxucfUjWhSGMEHiq3rb4UWOx6CqpN8ZDqsst52D77E
+         NMBPE0u/LX1rGT+WkGpMHl/ABwgkWm23aKBQsO8W6oqjku7g/REnEezS6zuqwRctn3sb
+         R4E2bO1p/KxUWftONhERxRlXwBaCsvrOi+zzU4rTx/n3uB8ckWAoWT4FFYF+UtsSwnp9
+         eENTXmb+G24OsA8HGVMqqm2s9DBimcMoTjIMxMwDjxrAGZLoybr7NJJ0L8U1mbvjDKI9
+         SloA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706120487; x=1706725287;
+        d=1e100.net; s=20230601; t=1706121237; x=1706726037;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YC2zjdExBgCvUK024A+n3DFZNO5s4XO2aR5qjhDDUxE=;
-        b=JqgZgvlkONoNqP/4JnJLIaZzK/8ZQ1UHOlRwegA03u8b38ig6xbajyFEq3JT7FiZ+P
-         F6o8J5xEkLaml8gXBky+ajVxxRadZ/Hd3Z77YgWAgyzxKHYZ1s0VPF4xxe7sr+zcqQux
-         moBnc/4ncfl4Hk6dg65y/Q6mXY07mucUhz1hrFpVxZ7ncJlAO7G9GwKXjupOuK26zj/m
-         nAu6BG5+UQBe5G9x6YnWnE4S+zi8RRRQ3wci67bVCfZzKknxAy19sSshCy71oLno6+s4
-         DOf7faDAT7dkp2FI5CegIUY72DrDbaXxCL4clHpEtXoaWSDTypvy82/uxsH/w6QsHoUc
-         zvFw==
-X-Gm-Message-State: AOJu0YymO66GWw9PvEzuhzGYRVLgrcssNpXE/H3WUazyAWfHFDJQc++A
-	BJcua54BbK/cEkdw0OPpi+NW1bSyjt0WBURz/TvmxB3heI0Su1hs
-X-Google-Smtp-Source: AGHT+IGtyF4BtopWHVuVZ9t0aRfL3HRmTXRDzP7BGc4x/9fuEifCk8kDQt7BPriOO+inOKwYIfdjbQ==
-X-Received: by 2002:a4a:de0f:0:b0:599:6199:eecb with SMTP id y15-20020a4ade0f000000b005996199eecbmr1790293oot.14.1706120486874;
-        Wed, 24 Jan 2024 10:21:26 -0800 (PST)
-Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id h5-20020a4aa285000000b0059610f4de98sm62110ool.41.2024.01.24.10.21.26
+        bh=Fq3VlIGTf+y3iXdkPONB9PwPZKX02VHUOcJFJY1RN8s=;
+        b=ShkDtFf0UtBBd2d1dA2iG0UB/t0u9xoz3XjjBh9QH/Zx6cO73Qyhhnp9HJFt6vV7o6
+         Dk0MW2tTfseqKO3/B/0TovkUbhMHEpuUa/GwlyP7LTNX+ikdTlYaR+0u2QOaykjOJOkf
+         1lZEHEfrkBnocYQbQe4EvQEDn4yevP/htAGQDgkWGdVKTyyEyog8TkFz5CV2kbkqTa3p
+         bQ3pYcxZF7RWm9I4qqVBFtzDmODbTymBR0BjaaEbYopXAXtKO2m/f5BD0+3F9FXeTF/q
+         RG+/KYqnXPFVekCurN9bB2Bijlvys+2bVkWft/kLDu6+Xpmn8p252IQGRib70h5cPh7X
+         gMAw==
+X-Gm-Message-State: AOJu0YyQu1ZdJ9JI45VDweTTsbGA01yCjkVFgmQrh4WBYadWPDDVOkA/
+	GuTAbcmsl8szUMdmilyfFE+roRlJlZo9RUKWyuRqRLU4hacaQCxov8KFyemoOeQ=
+X-Google-Smtp-Source: AGHT+IFPBzLaTFLe36hDKvBmZD7aptm9TQf9szRRAnopgqTh8SY/zOTmQYhGrSq1NneT92iuj2io2Q==
+X-Received: by 2002:a05:620a:d81:b0:783:48b1:7b71 with SMTP id q1-20020a05620a0d8100b0078348b17b71mr11240480qkl.9.1706121237359;
+        Wed, 24 Jan 2024 10:33:57 -0800 (PST)
+Received: from [10.102.4.159] ([208.195.13.130])
+        by smtp.gmail.com with ESMTPSA id x21-20020a05620a0ed500b0078322355fb7sm4281842qkm.20.2024.01.24.10.33.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 10:21:26 -0800 (PST)
-Message-ID: <36a3aa8a-ac08-44e7-91f7-73e094e69552@gmail.com>
-Date: Wed, 24 Jan 2024 12:21:25 -0600
+        Wed, 24 Jan 2024 10:33:57 -0800 (PST)
+Message-ID: <ac057182-4b8e-44ef-ac32-9b039d13e45f@gmail.com>
+Date: Wed, 24 Jan 2024 10:33:55 -0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -60,91 +60,76 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/4] station: knownnetworks: limit quick scans to 5
- freqs per network
+Subject: Re: [PATCH v2 2/4] knownnetworks: sort known frequencies by BSS rank
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <20240124134001.20453-1-prestwoj@gmail.com>
- <20240124134001.20453-3-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240124134001.20453-3-prestwoj@gmail.com>
+ <20240124134001.20453-2-prestwoj@gmail.com>
+ <703a48ba-41f8-4104-bb1d-6b017ae76e15@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <703a48ba-41f8-4104-bb1d-6b017ae76e15@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Hi Denis,
 
-On 1/24/24 07:40, James Prestwood wrote:
-> In very large network deployments there could be a vast amount of APs
-> which could create a large known frequency list after some time once
-> all the APs are seen in scan results. This then increases the quick
-> scan time significantly, in the very worst case (but unlikely) just
-> as long as a full scan.
-> 
-> To help with this support in knownnetworks was added to limit the
-> number of frequencies per network. Station will now only get 5
-> recent frequencies per network making the maximum frequencies 25
-> in the worst case (~2.5s scan).
-> 
-> The magic values are now defines, and the recent roam frequencies
-> was also changed to use this define as well.
+On 1/24/24 10:10 AM, Denis Kenzior wrote:
+> Hi James,
+>
+> On 1/24/24 07:39, James Prestwood wrote:
+>> Currently a quick scan uses the entire known frequency list so
+>> ordering really doesn't matter but improvements will be made here
+>> to make quick scans "quicker" for large network deployments (with
+>> many known frequencies).
+>>
+>> To prepare for this the known frequency list has been changed to
+>> be sorted by BSS rank rather than most recently seen. This makes
+>> a lot more sense because IWD should prefer to scan frequencies
+>> that had higher ranked BSS's, not just frequencies that were scanned
+>> last on the most recent scan.
+>
+> Interesting.  I definitely agree with the argument for treating 
+> frequencies with higher-ranked candidates as preferred, but I'm not 
+> sure that directly basing the frequency preference on the bss rank is 
+> the right thing to do.  A client might start right under an AP, 
+> ranking it quite high, but then rapidly move away where no APs exist 
+> on this frequency.  So you end up always scanning the original AP's 
+> frequency.  Some sort of temporal rank decay would be needed?
+Yeah, I see your point...
+>
+> Perhaps an easier way to accomplish this would be to add known 
+> frequencies in reverse bss->rank sorted order.  That way last seen 
+> frequency with best ranked BSS would be first?
 
-Yep, I like it.
+I'm not sure I understand, how would this be any different than just 
+reversing the list I already have? Or are you saying sort by both rank 
+and last seen? Essentially have the list segmented into chunks of 
+frequencies found with prior scans:
 
-> ---
->   src/knownnetworks.c |  9 ++++++---
->   src/knownnetworks.h |  3 ++-
->   src/station.c       | 10 ++++++++--
->   3 files changed, 16 insertions(+), 6 deletions(-)
-> 
-> diff --git a/src/knownnetworks.c b/src/knownnetworks.c
-> index 6e549e02..fe0fce09 100644
-> --- a/src/knownnetworks.c
-> +++ b/src/knownnetworks.c
-> @@ -518,7 +518,8 @@ struct network_info *known_networks_find(const char *ssid,
->   }
->   
->   struct scan_freq_set *known_networks_get_recent_frequencies(
-> -						uint8_t num_networks_tosearch)
-> +						uint8_t num_networks_tosearch,
-> +						uint8_t freqs_per_network)
->   {
->   	/*
->   	 * This search function assumes that the known networks are always
-> @@ -530,7 +531,7 @@ struct scan_freq_set *known_networks_get_recent_frequencies(
->   	const struct l_queue_entry *freq_entry;
->   	struct scan_freq_set *set;
->   
-> -	if (!num_networks_tosearch)
-> +	if (!num_networks_tosearch || !freqs_per_network)
->   		return NULL;
->   
->   	set = scan_freq_set_new();
-> @@ -540,10 +541,12 @@ struct scan_freq_set *known_networks_get_recent_frequencies(
->   				network_entry = network_entry->next,
->   						num_networks_tosearch--) {
->   		const struct network_info *network = network_entry->data;
-> +		uint8_t freqs_found = 0;
->   
->   		for (freq_entry = l_queue_get_entries(
->   						network->known_frequencies);
-> -				freq_entry; freq_entry = freq_entry->next) {
-> +				freq_entry && freqs_found < freqs_per_network;
-> +				freq_entry = freq_entry->next, freqs_found++) {
+[Last Scan] [N - 1] [N - 2] [ etc ]
 
-This is getting a bit unreadable.  Maybe a while loop makes this look better?
+And if a duplicate is found, move it to the front, sorted by rank?
 
-freq_entry = l_queue_get_entries();
-
-while (freq_entry && freqs_found < freq_per_network) {
-	...
-	freqs_found += 1;
-	freq_entry = freq_entry->next;
-}
-
->   			const struct known_frequency *known_freq =
->   							freq_entry->data;
->   
-
-Regards,
--Denis
-
+>
+> Do note however that the quick scan approach is really meant for 
+> smallish networks, to cut down scanning time when moving between Home 
+> / Office location for example.  It works surprisingly well, but might 
+> not be appropriate for rapid roaming in a large network.
+Exactly, e.g. with 50 APs (assuming you've seen them all) a "quick" scan 
+takes 5 seconds.
+>
+>>
+>> As far as the disk sync goes the ranking is not included, but
+>> ordering is. This really isn't a limitation because when IWD starts
+>> up there isn't any guarantee its in the same physical location so
+>> old scan ranks are likely not valid anymore. The first set of scans
+>> will begin replacing the frequencies loaded from disk.
+>> ---
+>>   src/knownnetworks.c | 16 ++++++++++++++--
+>>   src/knownnetworks.h |  1 +
+>>   2 files changed, 15 insertions(+), 2 deletions(-)
+>>
+>
+> Regards,
+> -Denis
+>
