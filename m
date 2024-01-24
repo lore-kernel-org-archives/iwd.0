@@ -1,58 +1,37 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B309650A69
-	for <iwd@lists.linux.dev>; Tue, 23 Jan 2024 16:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87CF418C01
+	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 10:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706026514; cv=none; b=arwTRae2SN8cUxr2m/tN+35MssnP0CQgRCxcw7amyVPPvWr6HP2CBydLgzifGmdOfeBTUSGkxswAFVRJlGaOhWGBR517eucJfz5PTTMLXO+Em+UckIq27PJW7mxPVc4D0DBzmE37Pd5q07hJSIlPk/AtiMkpg2F1g++Rl8AcSjA=
+	t=1706091510; cv=none; b=FQw+bcTrm5qj5uDhxGIZKAux23I5ZT3FXrHBZfidZAFVOFLNvcdpFk0sBm75i1jkhmf+iroO/aw9An2DJyl8F7WCc6qme2TwrLlI4N8AHb81KqHY1J1+P9WUNK7/Yabx7nphxVZODQC036peHFrpoortra3kvyZ+G3GJnGlZBVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706026514; c=relaxed/simple;
-	bh=JXFBgrzkekOX1uyMXAg0/Raa+g8J9oT7A3K3NOsc8UE=;
+	s=arc-20240116; t=1706091510; c=relaxed/simple;
+	bh=gVeIkSdpQBPdio/ErIBkyJwUgW9Fi7B7Yvx4YytTAJw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BW2+0lhZ0LVU+93YP9qWqU2nAhW5RDC3XooZ7Nf4I0Nl7bGp/M5AX4pD4PPIXnSYzTQAaJmciJkC77LSnHwkp0NdbxcsmF3anYkPZJAzc7eCwjUsRcRFut1zv+EycMnG6GHhkGHPvLwMqWhJDdRdJG98kaBczY0lJo5ocK6YBtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YAhAzuNc; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=QoR+EUeXJuRMR5BlAxbO8mHk9BASBOq1fNZMVBDt0jZkkh7RUTkp2sMP5u3GVdvgC+gE1n/9wJCrxcS+ohFgYOR/0kfc4/9qeLVaVMo7ONlBAnZtGglbBLHdQtzVvrDkiWiP+8WjVyL7GOHY9H6XdIu3jZghe4/G8+af0OASSFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aOjhj0Az; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YAhAzuNc"
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3bd6581bc66so3398682b6e.1
-        for <iwd@lists.linux.dev>; Tue, 23 Jan 2024 08:15:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706026512; x=1706631312; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FVaLxF4NX4esaJzJ0KaPvo76+0EOc0EhYFvs7R/Ko84=;
-        b=YAhAzuNcYQ7/wpk28XgmaHO9xDrVHBPRoRFkiMIv8biFmzIAFSGFz+3EBGOxB7tTmE
-         ffMkyT+XaWL9O9UjwyoR+vLcgQydTka+GAND74Gs8bJsCRzJXo1UlWU0BKxBqhCwKbu2
-         r0F4ZUvPkBBjAtNGTP8/kBGWL4y5ZozngXDt+AsVo6wUDHYcCxCfZLBynJ8RmQ5IH5tq
-         my3ogz1cI7XYbBZR/BWFb5EQ73V5y2n5YJYHrAns/Pyct24K+z0xwE/8PYGoMaR5FQrE
-         C9Vf0tJbvPWI7csv9t7SlflAhhLQIiUMo3sorwAM47L+bi2LlASbwLFw5A0AyorsvDk1
-         cw0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706026512; x=1706631312;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FVaLxF4NX4esaJzJ0KaPvo76+0EOc0EhYFvs7R/Ko84=;
-        b=Iq9E/pWGfvqdorktA/Yw/SS2KWw2fCdaKbvPDn5jsxHJr19b7Q1+dur4jwLc+vvoGt
-         wigkvJJtP7ewMIia+EuV2PTPk6MoXLF7ZwNCXmwKTrbGV6cpnjXkIpDOFNwBwyySMSYO
-         GZlZcwXudlpPlaIqbZ5fN/hWkakeXYtoO5b1e4Zi3uSCen+hryhxbvqdOi+J3ZPvAGLK
-         nSGpSUu7s2up66pH/+4LTuXSL7wPo1aWyFYB6mg5onKbIdlo1FWeYxoMNoeK1jFS1/FQ
-         KfOrsrPESRwmV0LHyRN9jp6AVQ4UoslnyvgKoL/h+bhCJcVo5m0fZX/5NBr5flJpcwv7
-         Jh9Q==
-X-Gm-Message-State: AOJu0Yzkc7ySW+Tn2GBDndMmCXGJlT77fiYGfWAVuxpjh+HQmY2c10Tg
-	nGSYzzrqb3/9adJhULYrarY9SLYr43FPM7wNJy0D2d7wStwbzlxD
-X-Google-Smtp-Source: AGHT+IGjCPPji93nvoVXRDdMzeLkGmqe4hR46VcmG/+ie9LK7pWj4tPOjMqG048MPEt26JMYj+/Bww==
-X-Received: by 2002:a54:480c:0:b0:3bd:726d:33b5 with SMTP id j12-20020a54480c000000b003bd726d33b5mr97132oij.63.1706026511651;
-        Tue, 23 Jan 2024 08:15:11 -0800 (PST)
-Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id n26-20020a05680803ba00b003bd8a7953a5sm2218685oie.19.2024.01.23.08.15.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 08:15:11 -0800 (PST)
-Message-ID: <69a80bff-f587-48da-a14e-8897586c93e9@gmail.com>
-Date: Tue, 23 Jan 2024 10:15:10 -0600
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aOjhj0Az"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 19038E0003;
+	Wed, 24 Jan 2024 10:18:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706091505;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G/9ymQtPQSi+EclGQCJzQslybH0Lcm8HoJav9tZmdjA=;
+	b=aOjhj0Az0EdO+DQ97PennyHeL1IZKAZ3/F1pMuIrPJ5bGn7yPKifs2yPIRBAL8Nat1cWZo
+	bixldvMUkKJ4HhA+OS8nfW1SQKv5Cyvd0CpF3+hUD3pEqdGKrWJl5VvsM5QNV9Lpopua+4
+	sFeAtsMxG+eDtXYLhHn5FVfmojkpyDxLSN3crLU/j6GDAyvbkFHR4HCJUTg8tTnIElYvBz
+	nemVmUDS0KiEBNoTmn0qeUGFDf2I5T8FunucJnCG6AkykYfsCnzh++s9ThGpZwr5XG1yIl
+	bosdt+grtkVDuFoiICOz8acg+CinmwRlROSfxRxFpATbg3SQg0BVGmphtJdMbQ==
+Message-ID: <46d06d59-3695-4062-aebe-7e124fa67446@bootlin.com>
+Date: Wed, 24 Jan 2024 11:18:24 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -60,47 +39,80 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: How to Autoconnect Two WiFi Cards?
-Content-Language: en-US
-To: Fabian Herb <fabian.herb@xtonomy.ai>, James Prestwood <prestwoj@gmail.com>
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <DFBE16E1-468A-4292-9056-D7ED6AA0CB4E@xtonomy.ai>
- <e3e82ef7-941c-4dbb-9f1b-2d1579a12f74@gmail.com>
- <D88835CF-16B7-4658-8852-65C4C3767E9C@xtonomy.ai>
- <ef97ec13-8f6c-4198-bf19-ff50a3e596f1@gmail.com>
- <E8931256-9BC5-4563-8A26-6A346560F34A@xtonomy.ai>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <E8931256-9BC5-4563-8A26-6A346560F34A@xtonomy.ai>
+Subject: Re: Iwd: unable to start AP with NXP 88W9098 chipset
+Content-Language: en-US, fr
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+Cc: gregory.clement@bootlin.com
+References: <6c9b05a2-7474-4eed-bb74-6f5de1d433ba@bootlin.com>
+ <c11d1310-a0ca-46a2-b08e-d1e35351826a@gmail.com>
+ <8c484950-c99d-47c0-b048-5a447cffd719@bootlin.com>
+ <edd63888-bf1f-440f-98d1-3fc33fc2b609@bootlin.com>
+ <2f3e11c6-bcf8-43fc-82a1-afe836d37a2d@gmail.com>
+From: Joao Marcos Costa <joaomarcos.costa@bootlin.com>
+Organization: Bootlin
+In-Reply-To: <2f3e11c6-bcf8-43fc-82a1-afe836d37a2d@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: joaomarcos.costa@bootlin.com
 
-Hi Fabian,
+Hi James,
 
-> 
-> I’m starting to think that it might be easier to add a feature to iwd that does what I want :). But I’m still a bit lost in the source code.
+On 1/19/24 18:44, James Prestwood wrote:
 
-Can you elaborate on what you're trying to accomplish?
+[...]
 
-Do you want iwd to connect to two SSIDs?  Two different BSSes within the same 
-SSID?  Something else?
+>
+> Prior to me adding HT (high throughput) IWD's AP mode was just using 
+> basic rates, so very slow. I added HT support, but apparently not all 
+> drivers were happy about it. So DisableHT removes the extra stuff that 
+> allows it to work with this specific driver, but at the cost of 
+> performance.
+>
+> I'm not really in a position to devote a lot of time to AP mode at the 
+> moment. I know we've gotten a lot of inquiries about it recently but 
+> to be completely honest if your intent is to run a full fledged access 
+> point hostapd is really the tool to use. I'd love to get IWD up to the 
+> same level of quality and support as hostapd but its a massive 
+> undertaking. Not only that but out of tree driver support is something 
+> very hard to get right. Hostapd has been around long enough and is the 
+> de-factor software for APs that hardware vendors have added their 
+> quirks here and there, IWD doesn't have that luxury.
+>
+> Thanks,
+>
+> James
 
-I do like the idea of having iwd support multiple wifi cards out of the box. 
-Right now we do so, but it isn't terribly useful, e.g. both phys will happily 
-connect to the same SSID on the same frequency.
+Thanks for this insight. I'll keep DisableHT for my tests, then.
 
-Having the ability for iwd to natively support connecting to multiple APs with 
-multiple cards would be nice.  Then we can use something like mptcp to run 
-multiple flows for redundancy / throughput.  Shouldn't be all that hard to have 
-something working, mostly a matter of updating autoconnect logic to take 
-multi-phy scenario into account.
+However, there's still something I don't quite understand. I'm trying to 
+set up this AP:
 
-Obligatory: patches are always welcome :)
+[General]
+DisableHT=true
+Channel=36
 
-> 
-> Yes, WiFi 7 is certainly interesting. You can already buy WiFi-7-capable hardware now. UniFi promises MLO support to be available in February with a firmware update for example.
+[Security]
+Passphrase=***********
 
-MLO only works to the same AP though, just different band.  You mentioned using 
-a different SSID earlier?
+[IPv4]
+Address=10.0.5.1
+Gateway=10.0.5.1
+Netmask=255.255.255.0
+IPRange=10.0.5.100,10.0.5.110
 
-Regards,
--Denis
+
+but I keep getting this error:
+
+# iwctl ap muap0 start-profile smarc5GHz
+Argument type is wrong
+
+AFAIK, 5GHz band supports up to Channel=37. Is this supported by iwd?
+
+
+Thanks!
+
+
+-- 
+Best regards,
+João Marcos Costa
+
