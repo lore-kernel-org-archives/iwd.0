@@ -1,61 +1,65 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962C9199BA
-	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 13:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D459E199BA
+	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 13:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706103610; cv=none; b=tOLTyVpkRofAuBa4MR24f+c1kA7IxmXi8jFZhRiNRj5gPTQnCYwbYuGRA2CsnkRJRVMDit2/qIa68EEhyVxPShT+81kcZ6f91VI3x7MKhUEbR+COg/jUK0jVC5d1uqddutH+71k/9bNg7wugmP4/+aJf4RiWO2EHxyn0uifzkiA=
+	t=1706103612; cv=none; b=VLsLeQrWuyB9mRU5IBEoLb71oaibD7s4IiKml52FHmEhDJcvxkRXKzXVJxMhzNa/06FSDju1XpkUKRSzvAQHve5sUlfXkzIK/wojdrjjbEpA2f6ue+lPmPafjuTCYfOAeh5rrgfrYwmBN7wPmFhHOck3iRdB/La3R9pU6CjrQJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706103610; c=relaxed/simple;
-	bh=24D0PZsLFp59/l8YDmrcqW7GUUDopAe9DjMqaRG7X2s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MKFgZX4WDS8Y8baWNlCLJBRqNRBZYgDnqtXA2LYeSdw0dvqHIsd0G/EBaL8nyzyyZ2DjoRNz3DkPE7VY/QEO15WBlUnFukm9COOOUAaTGNnpE1u5BF5G8azDlCG4FA879RW067iRA+NDAPOcEp/ENdcO+SUOifqZrOdW2de6bTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=glyMnatJ; arc=none smtp.client-ip=209.85.128.173
+	s=arc-20240116; t=1706103612; c=relaxed/simple;
+	bh=b2hyvLV4lCyvBDqXs8ONm+gukrkbS04d+igpwc055/U=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=JFoRwnSu+ZGzUJt8w1cQalEBCo0pbOOTJcKl+wQe9XgwHit4wOijBtoWDn8ArGs7TjSsHiil3gbauxgezxAdZIdpYJIabsf9CqPl2fCxia8/1f8tYdn0zF8e91cySeKlbMroN7Nem0i9vO9vEG9Y6x9muPixUIQhAdDznn8X850=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VEYHpccO; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="glyMnatJ"
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6029e069e08so6184237b3.0
-        for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 05:40:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VEYHpccO"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6853f6ff6e1so27587566d6.2
+        for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 05:40:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706103607; x=1706708407; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=95FKrAx90CxilkJ/M6gv4d89ixqRa0ufMbtb7PAA2WI=;
-        b=glyMnatJjNnKr0yoY+V//S5tVIRNQlLro/wd6crK4x9GHDC/Q3/OrfXjvF7eHmDwX0
-         hgFMuCQgsc+915aFO1XlezlL4Yopy8v5zq8GsCyaeNOBFzgYX32vQNB0LDloAHK8vtr2
-         V0bvPG1EBoX+fshU+QPNjyt9MK5EsIpKi8bKRS0FiB0u5M1Bkm9vnfWoo7Hziezm9Idy
-         fCA2Cz3d7LSoKO+CLzXTHGDUte56NvsgEce7jGo2/d7+JnNgwduwonxFs036ijY6bNnp
-         l4zO3FO+/KysQDT4ILZAuYPb0fZkczsL7bZGeBNN+NubyS3fyJvqabkXKb39chqVx0lk
-         pgDA==
+        d=gmail.com; s=20230601; t=1706103609; x=1706708409; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lepWR7JYPDHeydw5l0Odqk7+dLy/r9WpLDTU/O1ZBcU=;
+        b=VEYHpccOmrvdDDw5eohMcCl5UUS7vzcalq3/aCJU8D/fU0FA6dL1yUxq19PwclEwCR
+         DJ48rG6mtrDbEuD5qA3krtKrEFw4aCMHIF0jrbD0FL+Y8S0/8LQcInn3isCa2W1Qsz2V
+         l6DzPZO0ModNNyFsPtP9/GbW8PMSM1bAjV7gx6qCAMRNz/owQtzUiJZAAOdLr+U2v8fh
+         3QsNXpJYwZEjboh7NWQm3Q4SZnudEmY+cm0gaQF4KdPfm754mIrpfLyzqiO8xwYPMI0x
+         bx7avlmWrq4iHF47aSyGBvBOarzHhAP0X2kAk3v2RsP6zaCXj/JZyE+rKhnTnAy6KklK
+         +Q1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706103607; x=1706708407;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=95FKrAx90CxilkJ/M6gv4d89ixqRa0ufMbtb7PAA2WI=;
-        b=iXQZhfy6v69xkNPMarKjhffzNARQ/LlGgnbVS7flQSoJ0k5R7JZK+vPLPTcIFBSHuv
-         VvtuglJIGrwBg7Mqo3WRcn/7rib3GZuRtFbSxTjDveSjjbyCTmWUOp7tPzYGsaybLYmK
-         pm/Gt+MexwtM+v+evpKbTkWRuQ9+IQoTI+Cbjc3A2mEdbGADOl1ydjM8Wvq2rdCI2NwU
-         jbVzTggjo+0Rf+8orP3bJnZevt7fxgJlBNN0ZUFn8xK6KP5MFaa+cLYBpSTqCXFEDbku
-         ABOEgQ5KL43OHhKCjVlb/+iJYWJAOWCRnyoC/j+iQcscpMIjz9o7HVyZLY87aArZXcvQ
-         f52w==
-X-Gm-Message-State: AOJu0YyfoKZ9tUUhutRZ9ighssE3k30pcKXLBXOOgUsiswvKeXPwDlqp
-	gcM2M3MBTokyWvXp17waHUMq1vN0DSBEe9ZlHrROqP7+0XriwAqHK/ppqLXldyg=
-X-Google-Smtp-Source: AGHT+IFFtOGbwocTyk+5xqrQbT1OzfVpB26cpCurlKVptA9IzLzbkEfsh5irosgxHwyJ205vJLnSdA==
-X-Received: by 2002:a05:6902:514:b0:dc2:2fa0:aad8 with SMTP id x20-20020a056902051400b00dc22fa0aad8mr604856ybs.106.1706103607256;
-        Wed, 24 Jan 2024 05:40:07 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706103609; x=1706708409;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lepWR7JYPDHeydw5l0Odqk7+dLy/r9WpLDTU/O1ZBcU=;
+        b=c9HeyBlQZjaHQF108cSCvszytsRlM97y/qEBzaZSr7DfKNvT9Fr1d14FkLIzl/yjPv
+         OW3dxhYcA/KlcNcfgonuxXyTe0634zd6zkRd4LuYdYQdfxdsu+BJnxMYoATZgAbq2UwV
+         y0CwDidvC11jeORLpHEGCF3xlQ15he9XLWvM3nIuwDsyPkq93zsNA8aTuh3lh2+g6bsJ
+         MpnubxHN/rK8XaESC8gB679qhpj+S8Y9Bk6BxJbGaqtiPIqCCaeCqJHeLZ20aFhcbNp/
+         y3cNxoDBo9A7hxWD9lbNVOb9RV9L+QE5T6tZ29xTWZ619EMhkdRci4UYULt+4qTCx0ay
+         u7Rw==
+X-Gm-Message-State: AOJu0YxwpuoyCqw4KiHBPbGX9nr7NuQL9diJZk7iiCfm/9jGgaZqVift
+	RI78bSoN53kdn7O9S5K7NYIP007QgvGA50Hv5du4kF59efIUVjV4KItNPuHcj2E=
+X-Google-Smtp-Source: AGHT+IEFld+sAzpu+5Qxle5lq2+D/AzjToek6V3w2nLHhlYjlg7FNFnlcKUhyq4a5xDCWIwjr+GFlw==
+X-Received: by 2002:ad4:5b85:0:b0:686:abae:eb69 with SMTP id 5-20020ad45b85000000b00686abaeeb69mr1736924qvp.130.1706103609269;
+        Wed, 24 Jan 2024 05:40:09 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id ly4-20020a0562145c0400b0068688a2964asm3470456qvb.113.2024.01.24.05.40.06
+        by smtp.gmail.com with ESMTPSA id ly4-20020a0562145c0400b0068688a2964asm3470456qvb.113.2024.01.24.05.40.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 05:40:06 -0800 (PST)
+        Wed, 24 Jan 2024 05:40:08 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/4] knownnetworks: pass scan_bss to known_network_add_frequency
-Date: Wed, 24 Jan 2024 05:39:58 -0800
-Message-Id: <20240124134001.20453-1-prestwoj@gmail.com>
+Subject: [PATCH v2 3/4] station: knownnetworks: limit quick scans to 5 freqs per network
+Date: Wed, 24 Jan 2024 05:40:00 -0800
+Message-Id: <20240124134001.20453-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240124134001.20453-1-prestwoj@gmail.com>
+References: <20240124134001.20453-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -64,84 +68,111 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This prepares to store known frequencies sorted by BSS rank.
+In very large network deployments there could be a vast amount of APs
+which could create a large known frequency list after some time once
+all the APs are seen in scan results. This then increases the quick
+scan time significantly, in the very worst case (but unlikely) just
+as long as a full scan.
+
+To help with this support in knownnetworks was added to limit the
+number of frequencies per network. Station will now only get 5
+recent frequencies per network making the maximum frequencies 25
+in the worst case (~2.5s scan).
+
+The magic values are now defines, and the recent roam frequencies
+was also changed to use this define as well.
 ---
- src/knownnetworks.c | 6 +++---
- src/knownnetworks.h | 3 ++-
- src/network.c       | 6 +++---
- 3 files changed, 8 insertions(+), 7 deletions(-)
+ src/knownnetworks.c |  9 ++++++---
+ src/knownnetworks.h |  3 ++-
+ src/station.c       | 10 ++++++++--
+ 3 files changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/src/knownnetworks.c b/src/knownnetworks.c
-index 04ce74ec..f6284fdc 100644
+index 6e549e02..fe0fce09 100644
 --- a/src/knownnetworks.c
 +++ b/src/knownnetworks.c
-@@ -566,7 +566,7 @@ static bool known_frequency_match(const void *a, const void *b)
-  * Adds a frequency to the 'known' set of frequencies that this network
-  * operates on.  The list is sorted according to most-recently seen
-  */
--int known_network_add_frequency(struct network_info *info, uint32_t frequency)
-+int known_network_add_frequency(struct network_info *info, struct scan_bss *bss)
+@@ -518,7 +518,8 @@ struct network_info *known_networks_find(const char *ssid,
+ }
+ 
+ struct scan_freq_set *known_networks_get_recent_frequencies(
+-						uint8_t num_networks_tosearch)
++						uint8_t num_networks_tosearch,
++						uint8_t freqs_per_network)
  {
- 	struct known_frequency *known_freq;
+ 	/*
+ 	 * This search function assumes that the known networks are always
+@@ -530,7 +531,7 @@ struct scan_freq_set *known_networks_get_recent_frequencies(
+ 	const struct l_queue_entry *freq_entry;
+ 	struct scan_freq_set *set;
  
-@@ -574,10 +574,10 @@ int known_network_add_frequency(struct network_info *info, uint32_t frequency)
- 		info->known_frequencies = l_queue_new();
+-	if (!num_networks_tosearch)
++	if (!num_networks_tosearch || !freqs_per_network)
+ 		return NULL;
  
- 	known_freq = l_queue_remove_if(info->known_frequencies,
--					known_frequency_match, &frequency);
-+					known_frequency_match, &bss->frequency);
- 	if (!known_freq) {
- 		known_freq = l_new(struct known_frequency, 1);
--		known_freq->frequency = frequency;
-+		known_freq->frequency = bss->frequency;
- 	}
+ 	set = scan_freq_set_new();
+@@ -540,10 +541,12 @@ struct scan_freq_set *known_networks_get_recent_frequencies(
+ 				network_entry = network_entry->next,
+ 						num_networks_tosearch--) {
+ 		const struct network_info *network = network_entry->data;
++		uint8_t freqs_found = 0;
  
- 	l_queue_push_head(info->known_frequencies, known_freq);
+ 		for (freq_entry = l_queue_get_entries(
+ 						network->known_frequencies);
+-				freq_entry; freq_entry = freq_entry->next) {
++				freq_entry && freqs_found < freqs_per_network;
++				freq_entry = freq_entry->next, freqs_found++) {
+ 			const struct known_frequency *known_freq =
+ 							freq_entry->data;
+ 
 diff --git a/src/knownnetworks.h b/src/knownnetworks.h
-index e8ffac0b..9f81e308 100644
+index 36106501..108f334e 100644
 --- a/src/knownnetworks.h
 +++ b/src/knownnetworks.h
 @@ -114,7 +114,8 @@ struct network_info *known_networks_find(const char *ssid,
+ 						enum security security);
  
  struct scan_freq_set *known_networks_get_recent_frequencies(
- 						uint8_t num_networks_tosearch);
--int known_network_add_frequency(struct network_info *info, uint32_t frequency);
-+int known_network_add_frequency(struct network_info *info,
-+				struct scan_bss *bss);
+-						uint8_t num_networks_tosearch);
++						uint8_t num_networks_tosearch,
++						uint8_t freqs_per_network);
+ int known_network_add_frequency(struct network_info *info,
+ 				struct scan_bss *bss);
  void known_network_frequency_sync(struct network_info *info);
+diff --git a/src/station.c b/src/station.c
+index a6442d3e..1b34b956 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -64,6 +64,9 @@
+ #include "src/eap-tls-common.h"
+ #include "src/storage.h"
  
- uint32_t known_networks_watch_add(known_networks_watch_func_t func,
-diff --git a/src/network.c b/src/network.c
-index 4723334e..81315746 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -807,7 +807,7 @@ static void add_known_frequency(void *data, void *user_data)
- 	struct scan_bss *bss = data;
- 	struct network_info *info = user_data;
- 
--	known_network_add_frequency(info, bss->frequency);
-+	known_network_add_frequency(info, bss);
- }
- 
- void network_set_info(struct network *network, struct network_info *info)
-@@ -1094,7 +1094,7 @@ bool network_bss_add(struct network *network, struct scan_bss *bss)
- 		return false;
- 
- 	if (network->info)
--		known_network_add_frequency(network->info, bss->frequency);
-+		known_network_add_frequency(network->info, bss);
- 
- 	/* Done if BSS is not HS20 or we already have network_info set */
- 	if (!bss->hs20_capable)
-@@ -1131,7 +1131,7 @@ bool network_bss_update(struct network *network, struct scan_bss *bss)
- 
- 	/* Sync frequency for already known networks */
- 	if (network->info) {
--		known_network_add_frequency(network->info, bss->frequency);
-+		known_network_add_frequency(network->info, bss);
- 		known_network_frequency_sync(network->info);
++#define STATION_RECENT_NETWORK_LIMIT	5
++#define STATION_RECENT_FREQS_LIMIT	5
++
+ static struct l_queue *station_list;
+ static uint32_t netdev_watch;
+ static uint32_t mfp_setting;
+@@ -1434,7 +1437,9 @@ static int station_quick_scan_trigger(struct station *station)
+ 		return -EAGAIN;
  	}
  
+-	known_freq_set = known_networks_get_recent_frequencies(5);
++	known_freq_set = known_networks_get_recent_frequencies(
++						STATION_RECENT_NETWORK_LIMIT,
++						STATION_RECENT_FREQS_LIMIT);
+ 	if (!known_freq_set)
+ 		return -ENODATA;
+ 
+@@ -2757,7 +2762,8 @@ static int station_roam_scan_known_freqs(struct station *station)
+ 	const struct network_info *info = network_get_info(
+ 						station->connected_network);
+ 	struct scan_freq_set *freqs = network_info_get_roam_frequencies(info,
+-					station->connected_bss->frequency, 5);
++					station->connected_bss->frequency,
++					STATION_RECENT_FREQS_LIMIT);
+ 	int r = -ENODATA;
+ 
+ 	if (!freqs)
 -- 
 2.34.1
 
