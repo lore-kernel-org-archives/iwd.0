@@ -1,62 +1,62 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D459E199BA
-	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 13:40:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B026660BB3
+	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 13:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706103612; cv=none; b=VLsLeQrWuyB9mRU5IBEoLb71oaibD7s4IiKml52FHmEhDJcvxkRXKzXVJxMhzNa/06FSDju1XpkUKRSzvAQHve5sUlfXkzIK/wojdrjjbEpA2f6ue+lPmPafjuTCYfOAeh5rrgfrYwmBN7wPmFhHOck3iRdB/La3R9pU6CjrQJ4=
+	t=1706103613; cv=none; b=MBdj003rRbgZBKAVHUZvg2AelZ5+/sb1SmdLnyNfY+y88mcromkCYJvUitejzO+/3FwL7HkmlVVda5ms9aoRzQzuGJfND3/xlirGIuk7zX/wWkTACzoKEFY3JKZHI4AuOMBy7MWgZwE0LH8z7FCFtoaK9VUyMHMMS2WMEwtgLxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706103612; c=relaxed/simple;
-	bh=b2hyvLV4lCyvBDqXs8ONm+gukrkbS04d+igpwc055/U=;
+	s=arc-20240116; t=1706103613; c=relaxed/simple;
+	bh=qVUe8BPZnq+dT6elRok0k5v/vnyX0lzsZGhFvdSGGcA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JFoRwnSu+ZGzUJt8w1cQalEBCo0pbOOTJcKl+wQe9XgwHit4wOijBtoWDn8ArGs7TjSsHiil3gbauxgezxAdZIdpYJIabsf9CqPl2fCxia8/1f8tYdn0zF8e91cySeKlbMroN7Nem0i9vO9vEG9Y6x9muPixUIQhAdDznn8X850=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VEYHpccO; arc=none smtp.client-ip=209.85.219.48
+	 MIME-Version; b=kLQx+QU2SET+t4yMKAZoSloPYd55ixpDO04A3pOyPRXJ7c1J92L8yukY0Vyi+M/lQvjGSLiz1cHOa0BrweHW+71BKz6dh77txybWbjnd2aaWPcguhtuDzzdXJWMVIEYEw90C+SenR6Mm7CnwPXHaAy2xojxVp46V8KU447XAGyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rq4Cmk1Q; arc=none smtp.client-ip=209.85.128.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VEYHpccO"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6853f6ff6e1so27587566d6.2
-        for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 05:40:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rq4Cmk1Q"
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-5ffd5620247so36703397b3.0
+        for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 05:40:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706103609; x=1706708409; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1706103610; x=1706708410; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lepWR7JYPDHeydw5l0Odqk7+dLy/r9WpLDTU/O1ZBcU=;
-        b=VEYHpccOmrvdDDw5eohMcCl5UUS7vzcalq3/aCJU8D/fU0FA6dL1yUxq19PwclEwCR
-         DJ48rG6mtrDbEuD5qA3krtKrEFw4aCMHIF0jrbD0FL+Y8S0/8LQcInn3isCa2W1Qsz2V
-         l6DzPZO0ModNNyFsPtP9/GbW8PMSM1bAjV7gx6qCAMRNz/owQtzUiJZAAOdLr+U2v8fh
-         3QsNXpJYwZEjboh7NWQm3Q4SZnudEmY+cm0gaQF4KdPfm754mIrpfLyzqiO8xwYPMI0x
-         bx7avlmWrq4iHF47aSyGBvBOarzHhAP0X2kAk3v2RsP6zaCXj/JZyE+rKhnTnAy6KklK
-         +Q1g==
+        bh=yjhxB13PubYFTi/ivDF1ihuXnkM9cVlu0OUeGQW96W8=;
+        b=Rq4Cmk1Q09cNSxy3NOVs/WJlW7ppoPX3yz/1jZkSKzSKjvC15ob5+UQU0sHR79UP6P
+         cAm8NVOZ+QP92i1q18amhrXgJtvIHTXQ/Nx6jEwagJUJf2OaCj064nZYuotp/WzhNaMy
+         KOYfXyDXbVZ56/AtZ+MFPio3fSnllziIyUawDg0f5Ce+hzBpN2zHsPlaVWxOySZCllI6
+         NWsXTeSVRe6DgkeFhLaf4MMT+JSXmRB+LzrkgoKJnoglv5IGZCoU4RNLgUFWCVvCpg4N
+         NLxp4IoipRlB6veQzsGUlpFegpND2KKIdq6VIoaPypOwBlw5pQyZqBNTAeacW9VAo1/b
+         CVHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706103609; x=1706708409;
+        d=1e100.net; s=20230601; t=1706103610; x=1706708410;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lepWR7JYPDHeydw5l0Odqk7+dLy/r9WpLDTU/O1ZBcU=;
-        b=c9HeyBlQZjaHQF108cSCvszytsRlM97y/qEBzaZSr7DfKNvT9Fr1d14FkLIzl/yjPv
-         OW3dxhYcA/KlcNcfgonuxXyTe0634zd6zkRd4LuYdYQdfxdsu+BJnxMYoATZgAbq2UwV
-         y0CwDidvC11jeORLpHEGCF3xlQ15he9XLWvM3nIuwDsyPkq93zsNA8aTuh3lh2+g6bsJ
-         MpnubxHN/rK8XaESC8gB679qhpj+S8Y9Bk6BxJbGaqtiPIqCCaeCqJHeLZ20aFhcbNp/
-         y3cNxoDBo9A7hxWD9lbNVOb9RV9L+QE5T6tZ29xTWZ619EMhkdRci4UYULt+4qTCx0ay
-         u7Rw==
-X-Gm-Message-State: AOJu0YxwpuoyCqw4KiHBPbGX9nr7NuQL9diJZk7iiCfm/9jGgaZqVift
-	RI78bSoN53kdn7O9S5K7NYIP007QgvGA50Hv5du4kF59efIUVjV4KItNPuHcj2E=
-X-Google-Smtp-Source: AGHT+IEFld+sAzpu+5Qxle5lq2+D/AzjToek6V3w2nLHhlYjlg7FNFnlcKUhyq4a5xDCWIwjr+GFlw==
-X-Received: by 2002:ad4:5b85:0:b0:686:abae:eb69 with SMTP id 5-20020ad45b85000000b00686abaeeb69mr1736924qvp.130.1706103609269;
-        Wed, 24 Jan 2024 05:40:09 -0800 (PST)
+        bh=yjhxB13PubYFTi/ivDF1ihuXnkM9cVlu0OUeGQW96W8=;
+        b=lz7oeQgEXabihnHjw7PuVmrtyu69HTdZ92+veIJ+QRWe690hK5/qRxGyC9RqbGsPfK
+         WqJqXluiIcTmEn1gcXCTyfDko4SyFikNlRaPeALAnNL/wYIF/yBpvCgvII0507Dt1fa7
+         2AcclkKHk9YCtE2YRaa4c0olnEJqapNejuweaLFLplV03bc+swDMMwXgpCgyC5ZbqfnG
+         i20ngQbw/fS63jH1/LCGbJ0g6JI0G2u6S8W/RoFEVsH7KWDESup2vDRe21F1zrAVOCmc
+         fwWSElhXYpYxERYzvz8XStpQ4F0dIxklgxET63hKgmVZEoZsb373m4mCw0OS7tY7EKv0
+         y52Q==
+X-Gm-Message-State: AOJu0YwsmSNIE3uktx83Y0NAXDv34ntNwZ9585wChfLJ6pZ4VXsU3eaL
+	DrImkIMBEfKNZyPGAbsTBM86ZxGNHJfT4rBnhkTb5Eb+zmsUtWxzM+dJCrFJpBo=
+X-Google-Smtp-Source: AGHT+IGzDLf+908YuqDm4eBohrNfZwgYBQUCTBQZgiHJU0HO8y8cHuXDCCqo+fx7IMBZf+lm+segww==
+X-Received: by 2002:a25:84c4:0:b0:dbd:bf0d:d97f with SMTP id x4-20020a2584c4000000b00dbdbf0dd97fmr653063ybm.126.1706103610297;
+        Wed, 24 Jan 2024 05:40:10 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id ly4-20020a0562145c0400b0068688a2964asm3470456qvb.113.2024.01.24.05.40.08
+        by smtp.gmail.com with ESMTPSA id ly4-20020a0562145c0400b0068688a2964asm3470456qvb.113.2024.01.24.05.40.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 05:40:08 -0800 (PST)
+        Wed, 24 Jan 2024 05:40:10 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/4] station: knownnetworks: limit quick scans to 5 freqs per network
-Date: Wed, 24 Jan 2024 05:40:00 -0800
-Message-Id: <20240124134001.20453-3-prestwoj@gmail.com>
+Subject: [PATCH v2 4/4] auto-t: add test for known frequency sorting/maximum
+Date: Wed, 24 Jan 2024 05:40:01 -0800
+Message-Id: <20240124134001.20453-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240124134001.20453-1-prestwoj@gmail.com>
 References: <20240124134001.20453-1-prestwoj@gmail.com>
@@ -68,111 +68,202 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In very large network deployments there could be a vast amount of APs
-which could create a large known frequency list after some time once
-all the APs are seen in scan results. This then increases the quick
-scan time significantly, in the very worst case (but unlikely) just
-as long as a full scan.
+Modify the existing frequency test to check that the ordering
+lines up with the ranking of the BSS.
 
-To help with this support in knownnetworks was added to limit the
-number of frequencies per network. Station will now only get 5
-recent frequencies per network making the maximum frequencies 25
-in the worst case (~2.5s scan).
-
-The magic values are now defines, and the recent roam frequencies
-was also changed to use this define as well.
+Add a test to check that quick scans limit the number of known
+frequencies.
 ---
- src/knownnetworks.c |  9 ++++++---
- src/knownnetworks.h |  3 ++-
- src/station.c       | 10 ++++++++--
- 3 files changed, 16 insertions(+), 6 deletions(-)
+ autotests/testKnownNetworks/frequency_test.py | 110 ++++++++++++++++--
+ autotests/testKnownNetworks/hw.conf           |   1 +
+ 2 files changed, 102 insertions(+), 9 deletions(-)
 
-diff --git a/src/knownnetworks.c b/src/knownnetworks.c
-index 6e549e02..fe0fce09 100644
---- a/src/knownnetworks.c
-+++ b/src/knownnetworks.c
-@@ -518,7 +518,8 @@ struct network_info *known_networks_find(const char *ssid,
- }
+diff --git a/autotests/testKnownNetworks/frequency_test.py b/autotests/testKnownNetworks/frequency_test.py
+index 83e51c06..c2fd1290 100644
+--- a/autotests/testKnownNetworks/frequency_test.py
++++ b/autotests/testKnownNetworks/frequency_test.py
+@@ -4,17 +4,15 @@ import unittest
+ import sys
  
- struct scan_freq_set *known_networks_get_recent_frequencies(
--						uint8_t num_networks_tosearch)
-+						uint8_t num_networks_tosearch,
-+						uint8_t freqs_per_network)
- {
- 	/*
- 	 * This search function assumes that the known networks are always
-@@ -530,7 +531,7 @@ struct scan_freq_set *known_networks_get_recent_frequencies(
- 	const struct l_queue_entry *freq_entry;
- 	struct scan_freq_set *set;
+ sys.path.append('../util')
+-import iwd
+ from iwd import IWD
+ from iwd import PSKAgent
+-from iwd import NetworkType
+-import testutil
++from hwsim import Hwsim
+ import os
+ from configparser import ConfigParser
  
--	if (!num_networks_tosearch)
-+	if (!num_networks_tosearch || !freqs_per_network)
- 		return NULL;
+ class Test(unittest.TestCase):
+     def connect_network(self, wd, device, network):
+-        ordered_network = device.get_ordered_network(network)
++        ordered_network = device.get_ordered_network(network, full_scan=True)
  
- 	set = scan_freq_set_new();
-@@ -540,10 +541,12 @@ struct scan_freq_set *known_networks_get_recent_frequencies(
- 				network_entry = network_entry->next,
- 						num_networks_tosearch--) {
- 		const struct network_info *network = network_entry->data;
-+		uint8_t freqs_found = 0;
+         condition = 'not obj.connected'
+         wd.wait_for_object_condition(ordered_network.network_object, condition)
+@@ -30,7 +28,7 @@ class Test(unittest.TestCase):
+         wd.wait_for_object_condition(ordered_network.network_object, condition)
  
- 		for (freq_entry = l_queue_get_entries(
- 						network->known_frequencies);
--				freq_entry; freq_entry = freq_entry->next) {
-+				freq_entry && freqs_found < freqs_per_network;
-+				freq_entry = freq_entry->next, freqs_found++) {
- 			const struct known_frequency *known_freq =
- 							freq_entry->data;
+     def test_connection_success(self):
+-        wd = IWD(True, '/tmp')
++        wd = self.wd
  
-diff --git a/src/knownnetworks.h b/src/knownnetworks.h
-index 36106501..108f334e 100644
---- a/src/knownnetworks.h
-+++ b/src/knownnetworks.h
-@@ -114,7 +114,8 @@ struct network_info *known_networks_find(const char *ssid,
- 						enum security security);
+         psk_agent = PSKAgent("secret123")
+         wd.register_psk_agent(psk_agent)
+@@ -38,6 +36,11 @@ class Test(unittest.TestCase):
+         devices = wd.list_devices(1)
+         device = devices[0]
  
- struct scan_freq_set *known_networks_get_recent_frequencies(
--						uint8_t num_networks_tosearch);
-+						uint8_t num_networks_tosearch,
-+						uint8_t freqs_per_network);
- int known_network_add_frequency(struct network_info *info,
- 				struct scan_bss *bss);
- void known_network_frequency_sync(struct network_info *info);
-diff --git a/src/station.c b/src/station.c
-index a6442d3e..1b34b956 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -64,6 +64,9 @@
- #include "src/eap-tls-common.h"
- #include "src/storage.h"
- 
-+#define STATION_RECENT_NETWORK_LIMIT	5
-+#define STATION_RECENT_FREQS_LIMIT	5
 +
- static struct l_queue *station_list;
- static uint32_t netdev_watch;
- static uint32_t mfp_setting;
-@@ -1434,7 +1437,9 @@ static int station_quick_scan_trigger(struct station *station)
- 		return -EAGAIN;
- 	}
++        # Set the signals so that the 2.4GHz ranking will be higher
++        self.ssidccmp_2g_rule.signal = -2000
++        self.ssidccmp_5g_rule.signal = -8000
++
+         #
+         # Connect to the PSK network, then Hotspot so IWD creates 2 entries in
+         # the known frequency file.
+@@ -75,8 +78,10 @@ class Test(unittest.TestCase):
+         #
+         self.assertIsNotNone(psk_freqs)
+         self.assertIsNotNone(psk_uuid)
+-        self.assertIn('5180', psk_freqs)
+-        self.assertIn('2412', psk_freqs)
++
++        # The 2.4GHz frequency should come first, as it was ranked higher
++        self.assertEqual('2412', psk_freqs[0])
++        self.assertEqual('5180', psk_freqs[1])
  
--	known_freq_set = known_networks_get_recent_frequencies(5);
-+	known_freq_set = known_networks_get_recent_frequencies(
-+						STATION_RECENT_NETWORK_LIMIT,
-+						STATION_RECENT_FREQS_LIMIT);
- 	if (!known_freq_set)
- 		return -ENODATA;
+         self.assertIsNotNone(hs20_freqs)
+         self.assertIsNotNone(hs20_uuid)
+@@ -92,6 +97,10 @@ class Test(unittest.TestCase):
+         psk_agent = PSKAgent("secret123")
+         wd.register_psk_agent(psk_agent)
  
-@@ -2757,7 +2762,8 @@ static int station_roam_scan_known_freqs(struct station *station)
- 	const struct network_info *info = network_get_info(
- 						station->connected_network);
- 	struct scan_freq_set *freqs = network_info_get_roam_frequencies(info,
--					station->connected_bss->frequency, 5);
-+					station->connected_bss->frequency,
-+					STATION_RECENT_FREQS_LIMIT);
- 	int r = -ENODATA;
++        # Now set the signals so that the 5GHz ranking will be higher
++        self.ssidccmp_2g_rule.signal = -8000
++        self.ssidccmp_5g_rule.signal = -2000
++
+         #
+         # Reconnect, this should generate a completely new UUID since we
+         # previously forgot the network.
+@@ -120,8 +129,78 @@ class Test(unittest.TestCase):
+         self.assertIsNotNone(psk_freqs)
+         self.assertIsNotNone(psk_uuid2)
+         self.assertNotEqual(psk_uuid, psk_uuid2)
+-        self.assertIn('5180', psk_freqs)
+-        self.assertIn('2412', psk_freqs)
++        # Now the 5GHz frequency should be first
++        self.assertEqual('5180', psk_freqs[0])
++        self.assertEqual('2412', psk_freqs[1])
++
++    def test_maximum_frequencies(self):
++        psk_agent = PSKAgent("secret123")
++        self.wd.register_psk_agent(psk_agent)
++
++        devices = self.wd.list_devices(1)
++        device = devices[0]
++
++        # Connect and generate a known frequencies file
++        self.connect_network(self.wd, device, 'ssidCCMP')
++
++        self.wd.unregister_psk_agent(psk_agent)
++
++        #
++        # Rewrite the known frequencies file to move the valid network
++        # frequencies to the end, past the maximum for a quick scan
++        #
++        config = ConfigParser()
++        config.read('/tmp/iwd/.known_network.freq')
++        for s in config.sections():
++            if os.path.basename(config[s]['name']) == 'ssidCCMP.psk':
++                config.set(s, 'list', "2417 2422 2427 2432 2437 2442 2447 2452 2457 2462 2467 2472 2484 2412 5180")
++                break
++
++        self.wd.stop()
++
++        with open('/tmp/iwd/.known_network.freq', 'w') as f:
++            config.write(f)
++
++        self.wd = IWD(True)
++
++        devices = self.wd.list_devices(1)
++        device = devices[0]
++
++        device.autoconnect = True
++
++        device.wait_for_event("autoconnect_quick")
++
++        condition = "obj.scanning == True"
++        self.wd.wait_for_object_condition(device, condition)
++
++        condition = "obj.scanning == False"
++        self.wd.wait_for_object_condition(device, condition)
++
++        #
++        # Check that the quick scan didn't return any results
++        #
++        with self.assertRaises(Exception):
++            device.get_ordered_network("ssidCCMP", scan_if_needed=False)
++
++        device.wait_for_event("autoconnect_full")
++
++        condition = "obj.scanning == True"
++        self.wd.wait_for_object_condition(device, condition)
++
++        condition = "obj.scanning == False"
++        self.wd.wait_for_object_condition(device, condition)
++
++        #
++        # The full scan should now see the network
++        #
++        device.get_ordered_network("ssidCCMP", scan_if_needed=False)
++
++    def setUp(self):
++        self.wd = IWD(True)
++
++    def tearDown(self):
++        self.wd.stop()
++        self.wd = None
  
- 	if (!freqs)
+     @classmethod
+     def setUpClass(cls):
+@@ -129,10 +208,23 @@ class Test(unittest.TestCase):
+         conf = '[General]\nDisableANQP=0\n'
+         os.system('echo "%s" > /tmp/main.conf' % conf)
+ 
++        hwsim = Hwsim()
++
++        cls.ssidccmp_2g_rule = hwsim.rules.create()
++        cls.ssidccmp_2g_rule.source = hwsim.get_radio('rad1').addresses[0]
++        cls.ssidccmp_2g_rule.enabled = True
++
++        cls.ssidccmp_5g_rule = hwsim.rules.create()
++        cls.ssidccmp_5g_rule.source = hwsim.get_radio('rad2').addresses[0]
++        cls.ssidccmp_5g_rule.enabled = True
++
+     @classmethod
+     def tearDownClass(cls):
+         IWD.clear_storage()
+         os.remove('/tmp/main.conf')
+ 
++        cls.ssidccmp_2g_rule.remove()
++        cls.ssidccmp_5g_rule.remove()
++
+ if __name__ == '__main__':
+     unittest.main(exit=True)
+diff --git a/autotests/testKnownNetworks/hw.conf b/autotests/testKnownNetworks/hw.conf
+index 8a7ef73a..f68b63a5 100644
+--- a/autotests/testKnownNetworks/hw.conf
++++ b/autotests/testKnownNetworks/hw.conf
+@@ -2,6 +2,7 @@
+ num_radios=5
+ start_iwd=0
+ reg_domain=US
++hwsim_medium=yes
+ 
+ [HOSTAPD]
+ rad0=ssidNew.conf
 -- 
 2.34.1
 
