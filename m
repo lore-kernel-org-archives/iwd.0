@@ -1,58 +1,58 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254257CF18
-	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 16:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050997E76A
+	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 18:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706113125; cv=none; b=RMrQyewZQhZBScSzbE4+jgdIfljaPFFsciqg3h318Yq9hPlpWqkFErszz03aU4yqTVf/QrkBHLDZ99Y0Q7bD2YGJBSRMjXuZLQyFLp1YM8DvP0qU2PehCqnmv+ZDZoSvc8VslliUmW0zSQABPv7f2q+NxkP0/hVJgmrs9AtZDWU=
+	t=1706119842; cv=none; b=HJc9RWtpuEho7xsUhrhaB+w9Yv9vYWvL3aN8aCRrzWGgQW1nqiR7mB0obzhpTdCCRC6PH58TGs54ThGI5KfGmsDEYCk44MhSRg47Hslsme7KoiAlg1Pg8Eeyl9NgDBYktw80RKuP358khJrk867YePxHR6Rf7DZQm8WoBqk5WhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706113125; c=relaxed/simple;
-	bh=KxhtKZJu7CTh3kCJDsZg0NZEmQ9cNVFpeV++rXamQJo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FtTQ8duTiP6MYUXDHZZjvqp81KS3zD435cpgrU/AuEGz/7ZUT+nLso8mxJaqqFzFyAVRAhFzY5mVJbPjEcOJBTIMc0s8ExkIw17WCB4rqjs2zMpFS0l5Eep9bCMTManAs1TuA3looMsiHhJCe315iY6Nyh9FinesdOpIogXk1L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ckgxZR6r; arc=none smtp.client-ip=209.85.167.174
+	s=arc-20240116; t=1706119842; c=relaxed/simple;
+	bh=lmskdss01kNpW8pxZwk5UasuuGoPQg/qFsXaYLTE7Zs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=FgA0Nj8Tc/hcJSQvBhl8h4J3r9+Y49XVHyPEJGjy5s+360Pt8/w7MigCIyKY/2YDwp8BvJvvnj28kByFrTwF2reLSLAx29lT/juRgUUtOB7YAnbtCDURTywdmMJBAkQ0jpGqgIc2ly5coEvVrUfQiIaxdk45eNwQlTxhXs2IkIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HeasuAgM; arc=none smtp.client-ip=209.85.210.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ckgxZR6r"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3bda4bd14e2so4354752b6e.2
-        for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 08:18:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HeasuAgM"
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6de83f5a004so3987103a34.1
+        for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 10:10:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706113123; x=1706717923; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=gmail.com; s=20230601; t=1706119840; x=1706724640; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=nOHqj1MsEqRCajS/bu8f8X6QA23ZVK3DxcrKy2sXvI0=;
-        b=ckgxZR6rdzFf3YsqhtZeDTCoekBGYYhv/J8PSWdehToUP1wQ80WHQUwId0vzVPJxv+
-         3SWbEeA1vKXGIpOEvYxnH3kSpbRMTJKpQSw+SLwavb0eAQXIu4OHOes8httSjKuu+QNI
-         Sec1qR1/cOjMqOLMQoCNPFPylU1K91QOa7Fk8AOZd4FxgwTIIOJcZ21QX8eBM53I0kxZ
-         8ooJZUgT5lfjRxTYRTf0UOZPiA32tDdLpeWPuHl+jf0xsrERoFGw9aH8WOt2Fz3pX+QO
-         95lXrl98lnanH9acJ5+wIkT/Tifs3MWAXCTrLI36DsOp4/Uk5f/OFEoH9uSXw2Uq0EUP
-         f4tA==
+        bh=e8r78UOi7H3W7vXLv0f2CiPOviIkLHxwmvF5hBszHks=;
+        b=HeasuAgMNMt/e6TT3J2/4+YHOtXG4Q3OEaGhoQqus9Y4OIoMMjInZ8ZDj1ulft3s2/
+         PymKO+OlpCYm4bfEjUV0bbzHHG/NPqZZsHYPVikekY44yodcUoxODGLtQ2/u8zTAItX2
+         R7NvkLyQYAvduPpA3x0yFUo8MmK7Onov8gTGwU16hlKQ3Fh3x5IPWOBrMg/sLbtTQTSC
+         GX1qKlbvlZhCXbBwXJRqZ2iEN2ZFJVv/CnRwbSttPJYmx6MUg6Oj7dTNWZ14KNWD5JtT
+         IlZmpm1Ufo1vHIYVRbRWUOcfF4sE4vbl730GGZvUIt8OzPuXKpHV9GwJT984mANGpx6I
+         C1wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706113123; x=1706717923;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=1e100.net; s=20230601; t=1706119840; x=1706724640;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nOHqj1MsEqRCajS/bu8f8X6QA23ZVK3DxcrKy2sXvI0=;
-        b=uxXt7UyGyqgPas7REw8LdYoOg9+SkAzOhe50xIBfn1OEZykg4dDpbU5fMDMQqdI+qH
-         vXKtB1/CkzNfhBu2inMAfe0Osu8Abhan4C9yLRfgUjjBMuOjNFBTq25jV4SCdWUA7LQR
-         gqw26Ztiv4PomOasZgt2JdhCRU8s9Yka9VbyQLwFYZBR7atvUP75GJSdPM8R1d7hnV6e
-         383murnRtWrbA1942pVH4aJJdVsn6UQIYMZqfw5zxaKm5at8yicVVg4xfto1Eljg9naB
-         Asv496Y48oO8a1LbvMyB5b6T7F7FFslou0Gwd4nLhgtWZZczUk80FrflAfwxA49qrytO
-         WGxA==
-X-Gm-Message-State: AOJu0YwHTRo8GOfGkb/pOknVN8TNTIMjnCEO5QVi9goT0gnb+9xL4Iao
-	u7qriC/MpM+Fibg8VYG0rvjn0ssFMoTTKKvV+SpCUa8M9yvXDyu5ajQCeN14
-X-Google-Smtp-Source: AGHT+IE+nfcD4OqLfR1OcL3e6AUg1SZ46cBinf8kqsGdYeBd68Qvn3Mi7OCEHsHmsNF3dRAJjfNMIg==
-X-Received: by 2002:a05:6808:1899:b0:3bd:cbf6:c02e with SMTP id bi25-20020a056808189900b003bdcbf6c02emr2207002oib.15.1706113123161;
-        Wed, 24 Jan 2024 08:18:43 -0800 (PST)
+        bh=e8r78UOi7H3W7vXLv0f2CiPOviIkLHxwmvF5hBszHks=;
+        b=BQxUmC+04bzg3ac1b/eYumgIWHfBgTQym3W8xXQvesDT+b0Q1I0WnddFVwwx8byRtA
+         1b3C9MQIITmH/mtXHY/f7BbI14WNh0ctczF3CoraQLhomKzVKxJGhjW25Kd1IS4IZFxO
+         FOyWWln7fPDqJ5lS3IpPwQkfvTMgTvHayA7MPTYNegliqxAZsZ7nvGVLx/C/JDeO3INR
+         8xM3WOoc/VS45dcuPNiehESE4jydUXXmOYHCcsGs1jHQLikvPV8IdpDON8Dx/7rybMd0
+         ivP7akSBP713RLk8AWDE2qqb8uNrExFSqwy+aEQeouUWY+18iHXoC3YgClDdM9bzkFOE
+         Lw8w==
+X-Gm-Message-State: AOJu0YwtM1qnEfgeIPqsnb7VmjdAfBlWJXHoT2kdjjVwF21e87a69bxT
+	TOzEmiIiKYKA1cOybbN9YTScDyy6/TLJpuRODUMzSX3edqbSJY3H
+X-Google-Smtp-Source: AGHT+IGHKPOsgH+sQ3LFI6A7+jutUeJ4BdehbJTp+QrEMMc0iCQBm/vYhZ0Qtbf6x4LbRs0o4vA3GQ==
+X-Received: by 2002:a05:6870:e2ca:b0:210:b081:7bbe with SMTP id w10-20020a056870e2ca00b00210b0817bbemr3865900oad.75.1706119839609;
+        Wed, 24 Jan 2024 10:10:39 -0800 (PST)
 Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id bw11-20020a056808244b00b003bd9d23123asm2569917oib.46.2024.01.24.08.18.42
+        by smtp.googlemail.com with ESMTPSA id i31-20020a056830451f00b006dba1ec37ffsm2676069otv.11.2024.01.24.10.10.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 08:18:42 -0800 (PST)
-Message-ID: <0bae4724-6d12-4e5e-9f6a-37f5e93ba40a@gmail.com>
-Date: Wed, 24 Jan 2024 10:18:41 -0600
+        Wed, 24 Jan 2024 10:10:39 -0800 (PST)
+Message-ID: <703a48ba-41f8-4104-bb1d-6b017ae76e15@gmail.com>
+Date: Wed, 24 Jan 2024 12:10:38 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -60,63 +60,58 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: How to Autoconnect Two WiFi Cards?
+Subject: Re: [PATCH v2 2/4] knownnetworks: sort known frequencies by BSS rank
 Content-Language: en-US
-To: Fabian Herb <fabian.herb@xtonomy.ai>
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <DFBE16E1-468A-4292-9056-D7ED6AA0CB4E@xtonomy.ai>
- <e3e82ef7-941c-4dbb-9f1b-2d1579a12f74@gmail.com>
- <D88835CF-16B7-4658-8852-65C4C3767E9C@xtonomy.ai>
- <ef97ec13-8f6c-4198-bf19-ff50a3e596f1@gmail.com>
- <E8931256-9BC5-4563-8A26-6A346560F34A@xtonomy.ai>
- <69a80bff-f587-48da-a14e-8897586c93e9@gmail.com>
- <FAC36784-F498-481A-BD35-D3F24269EBD5@xtonomy.ai>
- <d3ccf10a-72a8-43b8-8f1c-b5e2a76214ac@gmail.com>
- <A3545185-22E7-4491-AD80-FFF9FEDCB8F1@xtonomy.ai>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240124134001.20453-1-prestwoj@gmail.com>
+ <20240124134001.20453-2-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <A3545185-22E7-4491-AD80-FFF9FEDCB8F1@xtonomy.ai>
+In-Reply-To: <20240124134001.20453-2-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Fabian,
+Hi James,
 
-On 1/24/24 10:07, Fabian Herb wrote:
-> Hi Denis,
+On 1/24/24 07:39, James Prestwood wrote:
+> Currently a quick scan uses the entire known frequency list so
+> ordering really doesn't matter but improvements will be made here
+> to make quick scans "quicker" for large network deployments (with
+> many known frequencies).
 > 
->>   - When considering a network, first check whether a network with the same SSID/security type is being connected to by other stations managed by iwd
->>   - This should be easy to do by looping of the station_list and checking connected_network / connected_bss members of struct station.
->>   - If the networks match, just skip it and continue on to the next autoconnect target.
->>   - This should result in each station object connecting to a different SSID. Once latched onto the SSID, station will try to roam only within that network.
+> To prepare for this the known frequency list has been changed to
+> be sorted by BSS rank rather than most recently seen. This makes
+> a lot more sense because IWD should prefer to scan frequencies
+> that had higher ranked BSS's, not just frequencies that were scanned
+> last on the most recent scan.
+
+Interesting.  I definitely agree with the argument for treating frequencies with 
+higher-ranked candidates as preferred, but I'm not sure that directly basing the 
+frequency preference on the bss rank is the right thing to do.  A client might 
+start right under an AP, ranking it quite high, but then rapidly move away where 
+no APs exist on this frequency.  So you end up always scanning the original AP's 
+frequency.  Some sort of temporal rank decay would be needed?
+
+Perhaps an easier way to accomplish this would be to add known frequencies in 
+reverse bss->rank sorted order.  That way last seen frequency with best ranked 
+BSS would be first?
+
+Do note however that the quick scan approach is really meant for smallish 
+networks, to cut down scanning time when moving between Home / Office location 
+for example.  It works surprisingly well, but might not be appropriate for rapid 
+roaming in a large network.
+
 > 
-> Thanks for the hint! But wouldn’t that mean that it’s basically random which interface connects to which SSID? Right now I’m configuring IPs and routing via systemd-networkd for each
-
-Yes, but if your cards are identical, does it matter?  If your cards have 
-asymmetric capabilities, things are a bit trickier, but that would be the realm 
-of defining a policy iwd can follow.
-
-  interface, and that would stop working if the two interfaces are connected the 
-wrong way
-
-Make your policy smarter.  For example, have it consider the SSID instead of the 
-interface name?
-
-around. The approach also screams for race conditions :D.
-Not really.  There would be corner cases of course, for example if there's only 
-a single SSID to connect to the second card will never connect.
-
+> As far as the disk sync goes the ranking is not included, but
+> ordering is. This really isn't a limitation because when IWD starts
+> up there isn't any guarantee its in the same physical location so
+> old scan ranks are likely not valid anymore. The first set of scans
+> will begin replacing the frequencies loaded from disk.
+> ---
+>   src/knownnetworks.c | 16 ++++++++++++++--
+>   src/knownnetworks.h |  1 +
+>   2 files changed, 15 insertions(+), 2 deletions(-)
 > 
-> I was thinking about something like this:
-> - Add a configuration option to the network file format which holds an interface name
-
-interface names are made up by iwd itself, and are not static across things like 
-hardware hotplug/unplug.  Yes you can beat iwd into honoring the name coming in 
-from the kernel, or with some care, from udev renaming, but even those are not 
-guaranteed to be static.  What you really want to take into account is the 
-underlying hardware capabilities.
-
-> - When iterating the list of networks to autoconnect to, skip the entries for which the interface name is set AND it does not match the current interface.
-
-Yeah, NM does something similar.  But see above.
 
 Regards,
 -Denis
+
