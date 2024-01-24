@@ -1,148 +1,154 @@
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DEU01-FR2-obe.outbound.protection.outlook.com (mail-fr2deu01on2051.outbound.protection.outlook.com [40.107.135.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CDA64AA8
-	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 12:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706099382; cv=none; b=asl5QmQoJQTfpw1YiySk6hXDPiOxSKj0tV2wwMN+Hx3I6BGwg2u6+dFT7bS9T3LwxBQud+Ixz23JLCnKG7c3O1EtRVCVDT9tdmqnnLtJtJOyMqAI7udI1m7BNU7ZwZdI+HeOSP4921E0l4YkVvoiNX8C3Crvnfl54d1Bs9QJziA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706099382; c=relaxed/simple;
-	bh=3uaEU0uPFwNvbfmaBsuUrYOEYONxYMHjcnRmgnQw8mU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o++POuNZAshLBICEwfXrWxc4/pLjq0WhAXj4VzoKlFmiZRnXLkviO6CXCEAC8BFcUYipBcTVxbbt/yWgIYSO4ybua/unDB7oelxfmTk+uGqhveH84XszwGqz+bt8jM8J6MmelL3Kx/boLGwZ4HpoDFzqgqCvNpaGfS+kEmkvkyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fv9xTpC9; arc=none smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fv9xTpC9"
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6dddfdc3244so3874217a34.1
-        for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 04:29:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706099379; x=1706704179; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pWukRaVL2h90kPk/BAdYIltOGC9+YcP4aqS1z6qqdKU=;
-        b=Fv9xTpC9a4i9Jw9R8fOAzEZeilnhxWImUOZINIbeCJHSzKzCc+7cD+B0XdNrTzP6QC
-         4oxZsovXDUeQ0/k3bxS1DrUGHBsLdoJcBvMFDRRVFnCcudZfSKaDvXswJ6ZaJoBaMjia
-         vFA0M4agWw0Rc127frIA9ocwG+dRowWaH5HlLTOkej+VtISQ3K+bsir0i8fzgAUQhjIk
-         Mvp9to+7mxnUcN81boAUGtcDijiJ049BSfUmELTmGwpt8uh7Z8+nD5Oy/zbuvF6ebax9
-         f5MLVGsRVRDcx1D26/28/IM8WJmsyFDRptl1c2uWdYtXLTJ7ZytxfaSpZjy7A2rpIHtV
-         rk1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706099379; x=1706704179;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pWukRaVL2h90kPk/BAdYIltOGC9+YcP4aqS1z6qqdKU=;
-        b=lTFKJcSRLVo7wGNYHqRr696sEj592UrMcTBHB1VCxjsBKc39ckJzlfUSeegsIBBWbd
-         LpAoc//ESDYynSeYoBROXlUE0JVhYS6+2d8IXjh7LtHx5NBYU1kNP1kUKFoEUwc0Aotr
-         fEq+NO75LcIu8A/Qx9txCKJm31maSwNyYGaMkBe95kIuKj3YZwJoDo+SMMoQhQ1BbeWx
-         WIjpvmZMw/lxZc5NZwe0on44XiZBfRB6PHPCA6Jy8BfRhtM2Vve+TixfyKKmbWJ28Hwc
-         GzANGxJgwy4Mm53q8m1ZmgxJaeKuNTs/aw0JDbBLR+AsOR6Jhf3SYFE0PZUlGdFrIp8b
-         eGrQ==
-X-Gm-Message-State: AOJu0YzoFiwdnnW42MGQJ74Sa0DzAh59E+wruu2ggRZTAGGl9hOJ1xgZ
-	j1yIEO0STGbb55Od6ZTisyXcb2Q6ERe8TelF137pyqtAihiU7Xd6hUgrFaDbFWs=
-X-Google-Smtp-Source: AGHT+IFE5cW1tD2YgwVAdxzFsDDh6zUaSdepwLRzCosUOBXrKqmtU2kb03GmqM9O5CdFGh4WQ5j2vQ==
-X-Received: by 2002:a05:6358:94a0:b0:176:4b1a:8364 with SMTP id i32-20020a05635894a000b001764b1a8364mr4675918rwb.21.1706099379558;
-        Wed, 24 Jan 2024 04:29:39 -0800 (PST)
-Received: from [192.168.254.83] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id v7-20020a62a507000000b006dbd17f833asm7785540pfm.0.2024.01.24.04.29.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 04:29:39 -0800 (PST)
-Message-ID: <fc3962d4-dc38-443b-b8d0-df3e57bc591d@gmail.com>
-Date: Wed, 24 Jan 2024 04:29:37 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2537A70B
+	for <iwd@lists.linux.dev>; Wed, 24 Jan 2024 12:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.135.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706099680; cv=fail; b=exF2Hhy4hy5dBq9uKXX8WdcEW9TgR8tyvLLNBACILk5d9xtOnEeGhEwUqDIuw7Bx6GsRokRkXHqoqnnRMOJNJl7s1Mce1mRk/zyn1gh3UFHkPHwDEzRRsCQB4v1zOx+0eirhohjsSXbD3VEXpiq8OmexnSgMuKhPyPLdaa9V+KA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706099680; c=relaxed/simple;
+	bh=dcF4ey+QKN9GubUJmMT0QmdMAjdy33WvqFbiOWYei/s=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Wkrjf6cFM4G2K/aaXXgWKRJyK+ybRVbRDE+iPS3hKT7gICj+345oBCSPIbMIKUwODHx9TFoS+m51DL8dsu6hVqTKBT6wIVfF73HP+m8LAyEfF4oWEHXv/Ksghvzwp6ERBZv3EXHO/rszN66v7L+8bvs+Htq65vsrA1FoySYw2fc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xtonomy.ai; spf=pass smtp.mailfrom=xtonomy.ai; arc=fail smtp.client-ip=40.107.135.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xtonomy.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xtonomy.ai
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Lq55xbI9pP16FHOERxNx2aMdio5th3fCxJIAOw9ZV+djt5u5wSFujGidWk1Iv56pXhqL+RzXne30PX0Sj1eXV2iWvpmfc22TTddk9hzcLzqBLvwphjnoDQOtBaiNg8fbQ59vU1oCaWfv4i/URjl1ItrDfIQ2iAw/Qjye6jksbsoPkV5QpM20J7apwcQCsOA4Xs5C8HP8KK3yvny1wkcj6ekLs+YED0Le+es6nOI4SLQSTMUniAPlIM11m/AWf02J/Srj5V4wFekfffoAkw0qOmvjFW0JrRmcvjsUtX2ivA07WCRqYNJGDdffZHGGgpRhr8MVxcFeoY4TL6SCaAV+Nw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dcF4ey+QKN9GubUJmMT0QmdMAjdy33WvqFbiOWYei/s=;
+ b=HOSsJnGfZDYPKpcypSy65gUrVj0HQO8/tNcdrbZHHUkGNeHXLUKv/fKPwq5H5T790IXryJ8+iG+KHX1cAO7lKKpPseOUFx8sbSA7SFpOPsk9beN5EtBCJyXSFwuWUlOo8J7XCP0mqPG0op526KGLcB5T5a4DqyQvUmTKVdn942Bpkc0QipfazwDe1hNFrBw61hBZVflqiwsJdldkymEK25WsqTwwLViKwUxdE31riwZkjSjM2m6XFEobw6iVFgLva9DY01qNQkeVyhLeBYzvn5+FpxgRzOn5v+nTN1xpK0SlSVn0bM0sKg4VyVYyY7sD2LZHag6wbVqDa+gnhWiOmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=xtonomy.ai; dmarc=pass action=none header.from=xtonomy.ai;
+ dkim=pass header.d=xtonomy.ai; arc=none
+Received: from FR0P281MB1770.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:86::14)
+ by BEZP281MB3011.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:76::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Wed, 24 Jan
+ 2024 12:34:35 +0000
+Received: from FR0P281MB1770.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::6c28:ef1a:1ffe:3470]) by FR0P281MB1770.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::6c28:ef1a:1ffe:3470%7]) with mapi id 15.20.7228.022; Wed, 24 Jan 2024
+ 12:34:35 +0000
+From: Fabian Herb <fabian.herb@xtonomy.ai>
+To: Denis Kenzior <denkenz@gmail.com>
+CC: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+Subject: Re: How to Autoconnect Two WiFi Cards?
+Thread-Topic: How to Autoconnect Two WiFi Cards?
+Thread-Index:
+ AQHaSJvVxoxLEKp250CbS4FBMLx42LDcreqAgALKKwCAAAeAAIAH8ZIAgAAsTQCAAVSnAA==
+Date: Wed, 24 Jan 2024 12:34:34 +0000
+Message-ID: <FAC36784-F498-481A-BD35-D3F24269EBD5@xtonomy.ai>
+References: <DFBE16E1-468A-4292-9056-D7ED6AA0CB4E@xtonomy.ai>
+ <e3e82ef7-941c-4dbb-9f1b-2d1579a12f74@gmail.com>
+ <D88835CF-16B7-4658-8852-65C4C3767E9C@xtonomy.ai>
+ <ef97ec13-8f6c-4198-bf19-ff50a3e596f1@gmail.com>
+ <E8931256-9BC5-4563-8A26-6A346560F34A@xtonomy.ai>
+ <69a80bff-f587-48da-a14e-8897586c93e9@gmail.com>
+In-Reply-To: <69a80bff-f587-48da-a14e-8897586c93e9@gmail.com>
+Accept-Language: de-DE, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=xtonomy.ai;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: FR0P281MB1770:EE_|BEZP281MB3011:EE_
+x-ms-office365-filtering-correlation-id: a7bfdc32-4d79-47b3-32fa-08dc1cd8d27a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ mEXPGlFHlIIZPFRbgc1zsSFNqFxKEaZT7dQ0WVMYeVl3qXe0J9vuLqnzFbiRRMBbT554D6NkYkUP4rJfwJUZC5vsna0RsY5G7SuipywcsEWJ6OoDgEoUCzdTRQTIfv037+tHO654f263w9cEmjKiwE87bxQlF5TzrMTutu08gpbUgRbzN0KVDvngB/BvB+g81C4KsNcNIS2OYGIGgiYHvMTdd8VbgpbSirRroR4KZxOxaolHqyYaZCrGvyvjph6u4yuGjI9DUSYDeCyCATFJGrbkhVqPgzvLn9k4N0YJ1ID1bvB76rtf9AGx0RpRKCGJ8bNeST4yKT3zG1BZGkVKNI1rh5AFLJfj8E5/oJb1bIxQOTzS3jPH9hBkYBaNN2lgBnd0xhPIV3PJhkRxH7ka80W9RahbsTgw4wpZow38CfQ2Fxs7e3WB+ObOdPMl+CBjN8A6WDzWKbDIVADyI5j1yYsqm+MTbOKFoxf/01ytquX93Pw9Q7D7jYsHCBh3H6tAZneOJhFML26awIgLGkCOhwGwDVfgLLn7M4E7HhRW7bPxcob+soT1BCvPH7BlnPhh5eFESdKF+7NOyJGI3EsO6IztuIFWeVLVqxFNK0td5nlAoTy8EET8nLdA3t++cpmJZ2A8MBEZq41M7hsA9M8g9Q==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FR0P281MB1770.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(6029001)(396003)(42606007)(366004)(376002)(136003)(39830400003)(346002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(6506007)(5660300002)(44832011)(71200400001)(6486002)(966005)(478600001)(83380400001)(8936002)(316002)(6916009)(2906002)(66446008)(64756008)(66556008)(66946007)(2616005)(4326008)(8676002)(76116006)(66476007)(26005)(38100700002)(122000001)(6512007)(33656002)(41300700001)(36756003)(86362001)(38070700009)(66899024)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?SnZ6ejRDZFdCclBZVkxRQk15K1Jmc3pqd0pYNGQxeE9hTlN1OGNOK1hIdVU4?=
+ =?utf-8?B?Sjh3UUZodysvRUMyQmxmaFdjcXljV0FlcTFmU2NScUpIL3pvcUhOU0NtdDNa?=
+ =?utf-8?B?NTVmc0VkSkFqdG9QL3ZHZi9yWnZpakNpeTVWQ0ZTb29qTy81SDBZUHg3T2dK?=
+ =?utf-8?B?UFlrT21ZM29uRFFaaFp4SVRzQ3RRVHRKQk5sODBkSzhQUHNmS0xaRkV4dXVm?=
+ =?utf-8?B?djAwQWx2ZElkOExGVWRRYmRVYS9hTXM0blZjenM0RjcrampMVjhZREpYUmZ6?=
+ =?utf-8?B?K2tpZ1JJbEV2bmxONkRrM05nV0pVa2VtNmJwenFnSjFKbFNNZWdrQzVRSmVi?=
+ =?utf-8?B?RnErQnEyMDR6SVVMdW1WbXFuSWV5NHRvcDA5bFV3eXJoYUdRSFhnMDZrSnhk?=
+ =?utf-8?B?V1dxMFRqTlVVL2p3WkdoVHc0amlpR3Z5KzMzSWNpZHhsVWQ1MUR5OEpYcEp0?=
+ =?utf-8?B?cDl5cWJyMytWUFhaT2tSdGZoNnV6VzZsL24vNUYwQitZaEJtNDdod0VzTHdV?=
+ =?utf-8?B?a0t2TGMwSG9iSEF4TGZORmI3blZPNUs2RUtwU1lJVFF2VzJadk5ZdnRSN2lC?=
+ =?utf-8?B?RmlEY1dPaG1rNnJDT1hCbzZnVDU5d2tEVHRmNG1NNnNZMXdLZjRjTU15OG9a?=
+ =?utf-8?B?T1Qra1hhTUxIcElUeldXcUxlR0NxZ01scmUxVGE4bldZbTRhT0FJT3FNQUt2?=
+ =?utf-8?B?ZTl0Z3pTelptYUNoUFdWTldtcUVPQUZTb0R4Tm9uNStRT3NFZmloSkNaZ0E4?=
+ =?utf-8?B?VVVSbHo5Q0hvMFBzWkhTVndIMzlQam80ZjZRdEJISWFLWm9JU3hKbDJraFFn?=
+ =?utf-8?B?cXhpK3lsSWtxbmN4Mk1rZnV5TmhPNDdRNDVJNkszY2lGU3l2aktGRHZ4bGhC?=
+ =?utf-8?B?RUppMWdQTFNudlFIMklTZ0N2SjNVWHZnMUwyaWN3Qi83YUd5aUZSNlZTdFg3?=
+ =?utf-8?B?VGthU3I4M2JYbDNlUkQyWWlPWVdRZm9YZmlmZWJrTnhzSU1yNGdYMFI0S0la?=
+ =?utf-8?B?ZXZrb0VqZ3M1bmNGWmlvTWlSM0RreXpPZjlKTGx3OGR6ZWt2cmFHaGVYRS9k?=
+ =?utf-8?B?SmVQN0VWaXNZalFXN0N4NHJuSmx0SFp2UUNnQlNJcG56UmE4UCs2dGpiSlhB?=
+ =?utf-8?B?clJTWkNNbGdkL1lnYnpZYm0wYmU1VHEvR0E1elpxY0s0TmszYnNkeHQvMkVu?=
+ =?utf-8?B?RkNxTThLcEN1NjhSQklIcW44cjdSUHU4cTVZZjdoVUhXYSsrRTV5emoyZTlB?=
+ =?utf-8?B?WkljaERtZWZPdW0vazlJUkluYUt1RTVKTE80MGo0YUNoS0I2N0N2K3pCTHJG?=
+ =?utf-8?B?WGhzbmowRkpUaDREOXNFcmRPOE1lTWg2U0pZN2dybWlid0piMjFWT0FSWWxj?=
+ =?utf-8?B?UlQzdmNxcW5jSVdEb1ROMUNvV2xrK0J5TjBGUERhNFlaZmtGTVJ5SFcvazMx?=
+ =?utf-8?B?UUxtRVhCK1ZYb3ZBNWhDOElXU1VTOTgrcDZSYUJMTjRXcit1Znk5eS90OWxX?=
+ =?utf-8?B?ZllCUGRwazVUVEJNNzEwWm5YdG9vN0c0K0cvMWFJMzIyQ1M0UXIwQndhSFFQ?=
+ =?utf-8?B?a3JtSWV3Wlpyckt4T3dTR3kxWHBVY1pGYnN1YWdvOXFZeWhIbjBpZUF4WEYr?=
+ =?utf-8?B?UFFsMW1nNHNldUFidnppWGh6RmYvd2o5cDJOVnlwVVNnajJ5RlVES0pHdHlY?=
+ =?utf-8?B?N2o4TFphVlZQS3YrMEw1cGZuaXFLcXdFTE5yQ09TcG9kS24ySmZDUHpQejNz?=
+ =?utf-8?B?aU5kT2Jxek5aZUlVM0xWRTJBamJROGxGOG9RYno5VHo2RFA0NXhSR2REM3BT?=
+ =?utf-8?B?azJHNGZhUlc0Sk5POFNIMXFJQWJMM202RnhOcDRjcXN2aXRhWnBpQXVNNjBO?=
+ =?utf-8?B?bGxzVW1LS3VUSG1DMVlMbXJIUENCZzlDa0VtMzdQRC9NZ29vdjFWODkyL0tz?=
+ =?utf-8?B?UzlGRUtFdDZLNG96cHpYVStZNFVqUWVoRGxoL1hOUWdJTkJoYTN5WVFHL0RL?=
+ =?utf-8?B?NERBdHl6Y1RMdVByMFo0SzlqU0liWG5WNnNYclpuYnl5emsrWGpkd2JBdCsy?=
+ =?utf-8?B?Qk54MEV0NzRGMGpXUHlUNTd4SFhNYUl3SjRjZWJ0NkJuOHd6RWVDSEVUalRQ?=
+ =?utf-8?B?Ymo4RGJLc0orRDY3aE01UzhDNzNtMjVRSVFiZU1jQ0JxbGhHQUw3RFIwdmZQ?=
+ =?utf-8?B?M0E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F089B8BCFD1E01478CE7C92FC313764C@DEUP281.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Iwd: unable to start AP with NXP 88W9098 chipset
-To: Joao Marcos Costa <joaomarcos.costa@bootlin.com>, iwd@lists.linux.dev
-Cc: gregory.clement@bootlin.com
-References: <6c9b05a2-7474-4eed-bb74-6f5de1d433ba@bootlin.com>
- <c11d1310-a0ca-46a2-b08e-d1e35351826a@gmail.com>
- <8c484950-c99d-47c0-b048-5a447cffd719@bootlin.com>
- <edd63888-bf1f-440f-98d1-3fc33fc2b609@bootlin.com>
- <2f3e11c6-bcf8-43fc-82a1-afe836d37a2d@gmail.com>
- <46d06d59-3695-4062-aebe-7e124fa67446@bootlin.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <46d06d59-3695-4062-aebe-7e124fa67446@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: xtonomy.ai
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: FR0P281MB1770.DEUP281.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7bfdc32-4d79-47b3-32fa-08dc1cd8d27a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jan 2024 12:34:34.8821
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3ec14d57-ef7b-4273-9e83-d36ba70a79fc
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 887e20gndTYFquaR24R2pV5wQ511RnETZHCz0HF9/2tkHcOwzkah+VwdNkwt73XuaRkU9iyQoSwERdG2+7/aWg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BEZP281MB3011
 
-Hi Joao,
-
-On 1/24/24 2:18 AM, Joao Marcos Costa wrote:
-> Hi James,
->
-> On 1/19/24 18:44, James Prestwood wrote:
->
-> [...]
->
->>
->> Prior to me adding HT (high throughput) IWD's AP mode was just using 
->> basic rates, so very slow. I added HT support, but apparently not all 
->> drivers were happy about it. So DisableHT removes the extra stuff 
->> that allows it to work with this specific driver, but at the cost of 
->> performance.
->>
->> I'm not really in a position to devote a lot of time to AP mode at 
->> the moment. I know we've gotten a lot of inquiries about it recently 
->> but to be completely honest if your intent is to run a full fledged 
->> access point hostapd is really the tool to use. I'd love to get IWD 
->> up to the same level of quality and support as hostapd but its a 
->> massive undertaking. Not only that but out of tree driver support is 
->> something very hard to get right. Hostapd has been around long enough 
->> and is the de-factor software for APs that hardware vendors have 
->> added their quirks here and there, IWD doesn't have that luxury.
->>
->> Thanks,
->>
->> James
->
-> Thanks for this insight. I'll keep DisableHT for my tests, then.
->
-> However, there's still something I don't quite understand. I'm trying 
-> to set up this AP:
->
-> [General]
-> DisableHT=true
-> Channel=36
->
-> [Security]
-> Passphrase=***********
->
-> [IPv4]
-> Address=10.0.5.1
-> Gateway=10.0.5.1
-> Netmask=255.255.255.0
-> IPRange=10.0.5.100,10.0.5.110
->
->
-> but I keep getting this error:
->
-> # iwctl ap muap0 start-profile smarc5GHz
-> Argument type is wrong
->
-> AFAIK, 5GHz band supports up to Channel=37. Is this supported by iwd?
-
-Could be a regulatory domain issue. Try setting:
-
-[General]
-
-Country=<alpha2>
-
-For whatever country your in:
-
-https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-
->
->
-> Thanks!
->
->
+SGVsbG8gRGVuaXMsDQoNCj4gDQo+PiBJ4oCZbSBzdGFydGluZyB0byB0aGluayB0aGF0IGl0IG1p
+Z2h0IGJlIGVhc2llciB0byBhZGQgYSBmZWF0dXJlIHRvIGl3ZCB0aGF0IGRvZXMgd2hhdCBJIHdh
+bnQgOikuIEJ1dCBJ4oCZbSBzdGlsbCBhIGJpdCBsb3N0IGluIHRoZSBzb3VyY2UgY29kZS4NCj4g
+DQo+IENhbiB5b3UgZWxhYm9yYXRlIG9uIHdoYXQgeW91J3JlIHRyeWluZyB0byBhY2NvbXBsaXNo
+Pw0KPiANCj4gRG8geW91IHdhbnQgaXdkIHRvIGNvbm5lY3QgdG8gdHdvIFNTSURzPyAgVHdvIGRp
+ZmZlcmVudCBCU1NlcyB3aXRoaW4gdGhlIHNhbWUgU1NJRD8gIFNvbWV0aGluZyBlbHNlPw0KDQpJ
+IHdhbnQgZWFjaCBXaUZpIGNhcmQgdG8gY29ubmVjdCB0byBhIGRpZmZlcmVudCBTU0lEIChlYWNo
+IGNvbnNpc3Rpbmcgb2YgbXVsdGlwbGUgQlNTSURzKS4gSWRlYWxseSBJIHdhbnQgdG8gYWRkIGFu
+IGVudHJ5IHRvIGVhY2ggbmV0d29yayBmaWxlIHRvIGxpbWl0IGl0IHRvIGEgY2VydGFpbiBpbnRl
+cmZhY2UuIE1heWJlIGV2ZW4gYmV0dGVyLCBidXQgbGVzcyBnZW5lcmFsOiBJZiBJIGNvdWxkIGxp
+bWl0IHRoZSBmcmVxdWVuY3kgYmFuZCBvZiBlYWNoIGludGVyZmFjZSwgSSBjb3VsZCBzYXZlIGEg
+Yml0IG9mIHRpbWUgZHVyaW5nIGNoYW5uZWwgc2NhbnMuDQoNCkJ1dCBJIGNvdWxkbuKAmXQgZmlu
+ZCB0aGUgc3BvdCBpbiB0aGUgY29kZSB3aGVyZSBzdWNoIGEgZGVjaXNpb24gd291bGQgYmUgbWFk
+ZS4gU28gaW5zdGVhZCwgSSBhZGRlZCBhIGNvbW1hbmQgbGluZSBvcHRpb24gZm9yIHRoZSBELUJ1
+cyBuYW1lIGl3ZCByZWdpc3RlcnMgYXMsIHNvIEkgY291bGQgcnVuIHR3byBpbnN0YW5jZXMgb2Yg
+aXdkLCBlYWNoIGhhbmRsaW5nIGEgZGlmZmVyZW50IHBoeS4gV0lQIGlzIGhlcmU6IGh0dHBzOi8v
+Z2l0aHViLmNvbS9jbWRyZi9pd2QvdHJlZS9kYnVzLW5hbWUtb3B0aW9uLiBJdOKAmXMgbm90IGZp
+bmlzaGVkLCBhbmQgSeKAmW0gbm90IGV2ZW4gc3VyZSBpdCB3b3VsZCB3b3JrIGluIHRoZSBlbmQg
+b3IgaWYgdGhlcmUgYXJlIG1vcmUgY2xhc2hlcyBiZXR3ZWVuIHR3byBpd2QgaW5zdGFuY2VzLg0K
+DQo+IE1MTyBvbmx5IHdvcmtzIHRvIHRoZSBzYW1lIEFQIHRob3VnaCwganVzdCBkaWZmZXJlbnQg
+YmFuZC4gIFlvdSBtZW50aW9uZWQgdXNpbmcgYSBkaWZmZXJlbnQgU1NJRCBlYXJsaWVyPw0KDQpV
+c2luZyBtdWx0aXBsZSBTU0lEcyBhbmQgZG9pbmcgdGhlIHJlZHVuZGFuY3kgb24gYXBwbGljYXRp
+b24gbGV2ZWwgaXMgb25seSBkb25lIG91dCBvZiBuZWNlc3NpdHkuIEnigJlkIGhhcHBpbHkgdXNl
+IE1MTyBpZiBpdCBkb2VzIHdoYXQgSSBuZWVkIGluc3RlYWQuIEJ1dCB5ZXMsIGFmdGVyIHJlYWRp
+bmcgYSBiaXQgZnVydGhlciwgSSBhbHNvIG5vdGljZWQgdGhhdCBpdCBvbmx5IHdvcmtzIG9uIGEg
+c2luZ2xlIEFQLiBXYWl0aW5nIGZvciBXaUZpIDggdGhlbuKApg0KDQpCZXN0IHJlZ2FyZHMsDQpG
+YWJpYW4=
