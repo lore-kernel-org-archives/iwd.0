@@ -1,153 +1,179 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EFB224E8
-	for <iwd@lists.linux.dev>; Thu, 25 Jan 2024 15:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8F22230C
+	for <iwd@lists.linux.dev>; Fri, 26 Jan 2024 20:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706197203; cv=none; b=Yf4hQR8qaG46xdeQiiIWenhc5MtKZdWqKpljQ1CjpkooEinZelN0i4tI4hs7juU5fEYDB6c8UA6Vtmknk+UbuU8VKqrmiJgWe++IXFYIojCy9+h5geQfAHNATkE56ORAumV3GspKU3tUZRlXvbZ2EWrWl5ffo7JS7qP+y0Tafjs=
+	t=1706300570; cv=none; b=V8T4NqNRJLKkN9J5fmyiYsJ6f1b/X8LKk9OdwKbDwJHTtOEuMOGXOtqICj9c+2HJ1YDtwkFIjA65NJDTD0Ciyam3lhD1NecSQS8vhfyX8RdhJjbxiSUvgYKecU14yP4CwJmWKvKEf70Bz2HHe4IVDn6RyBC9QzD/7VLDYU3q0Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706197203; c=relaxed/simple;
-	bh=O8TDU2/QDBWbbRvuAjAjRXO4coZNrFWSiT7NO1cm+o0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=u2oUYHORjsfuuX0iqgtb7kgLb9p58+uugKIglDhqP19lz3NHbAXiMTbU9zDfhp/d+0Ivo1prkLuDcq9TTLywRcCwyBWHxfNTyUdZLw9BLIXL7lW34w7Ci83zxkI6ghgIuBpxfxV6pvIIDU9iZafwANP7WhkDFTD8bGL1aYjfUqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V8fMHtDh; arc=none smtp.client-ip=209.85.210.42
+	s=arc-20240116; t=1706300570; c=relaxed/simple;
+	bh=AD1z9g6vaGTmslQEoP3TO6zF+quFZu1Lrkz2VMibbGE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mGCdUkM/Et0ju8x1lnfVLEvPtC2m1gOXLmrfjpc5IQu9zygF3ViOv8jWDOISf0ShwDmrGrHPlWJDr/rfxLMYXQY9WXPyIwRyn+UXln4PQKVfuIc33O5lJ3BNNANvH5HBjGrrEuIPwKmZPnEM8mT7bULssQfUrvcK7eCoRPKHNxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=krAdW7X9; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V8fMHtDh"
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6ddef319fabso4478303a34.1
-        for <iwd@lists.linux.dev>; Thu, 25 Jan 2024 07:40:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="krAdW7X9"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-42a75ec56dcso7789051cf.0
+        for <iwd@lists.linux.dev>; Fri, 26 Jan 2024 12:22:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706197201; x=1706802001; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=x40vXZDXY4H2oSBq/UspAstlQhxApdSnBM8R6Ng3Teg=;
-        b=V8fMHtDhnRuAwPPD8sf6lFScrUSFmWdaDp2gCzEMD+lx18ZQRW3UxpRhqMEUEjZF1p
-         72QtMtfRda38Nmh5Ws7czPyBR6LapCtgYpXiyfrVFi5k6nILckbplFajwYR9HW6RJziI
-         C96cDnVcVRDIjF/8aNG63UC1bnw00UFdHMMRgnvghpAvd5E4yHWVONozL8jC71h9/4wT
-         BvTZ/hwIuWL5ktd6TVEvTjQxrBnqF/SeySPRzVv6TBDNZMGwwFQV1B7PO5zUJD0OsN4w
-         686oOBAh48BLbZacdJatz/3uLc5OtY4u7gYD9zny9BZb7WRSTsBhQGUyJNIOZ/AcyQ+U
-         7xUA==
+        d=gmail.com; s=20230601; t=1706300567; x=1706905367; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YPBb4mCw/R1ghl4eJw9QnLwDTvV7rYUlLLOC/s2r03U=;
+        b=krAdW7X9mrhGijJYXk4xRW3RiMWNXpr//RcLo4VTjzoNvu/viezZe6I2NxWYj7mNpb
+         PkSPGvIM6sqhhdS1K+YEc36lnMOn2ujaf/FJAWrmPhrXKjAQwveApcUMcR0hYPpnbZDf
+         cFZK2PZE+BoAlXlU4IbBC/s/mbqG3mwa/owtgu0Z0WnF1v7pRfZ4wdP7UEvsXug4R45k
+         WUmoPBflX8HJq9a2RzewsNnNnOnHqO9QkUyzTTYQQonq8Xi/5T6Y709SqRYTQca03yPw
+         L1ZgzPkSLPyHurgx3rd7+ywevMmEyy0OKhI6rQNSygV01Nkvk+xCWvkf/o19cTmKfW2h
+         4iWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706197201; x=1706802001;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x40vXZDXY4H2oSBq/UspAstlQhxApdSnBM8R6Ng3Teg=;
-        b=VAhlgNDh7O2LuraAHUSkcgFIDu4JEZnMt51yvMypaMdf2hfs9d0RtpYVHbhO1vwdVp
-         bPx0xDZz69q0d58cx1d5CehMS57qIi+gDbymiw9KR2BlbYwD64nOYdo/FNJh9qvaizCF
-         ciWT2b3/8xUV5BjJHant32pJ8x4eAio88KY19sIuPLQrXVxHo16Zw1SefJRIbj+IWlfJ
-         BqeDnFwUHBaEQLKHyanPMRcVWoC6iPNdi48UVm7k5Xwn2IVOclH8LaIULKY25hVEZLEF
-         BvHsRQ17nTs5YE7AFrJ3SZwNzZ1faFo2TvMUbCTFUGlfBEimMrAdlhWvJ8IwkJg/vzkE
-         QM9Q==
-X-Gm-Message-State: AOJu0YxQuSNhY8epjWQd0p2+y+Y35WbGVPV9IrqeKqGj+tx3+ZOvlNSW
-	+y6f8m1xy3BWlGXPAcpaJX/pDkjG5Wj288eZlpVlT8kqv7H1MKpSecpWUoSR
-X-Google-Smtp-Source: AGHT+IFfdhd0v2XOZF6fVdCJ3q8+y485JEKg8+gnXg3EKoCDq+5XuhYcpaXPmb9RwjvwUi+0aUNQjQ==
-X-Received: by 2002:a05:6870:9e86:b0:210:e860:c4fa with SMTP id pu6-20020a0568709e8600b00210e860c4famr1115515oab.32.1706197201087;
-        Thu, 25 Jan 2024 07:40:01 -0800 (PST)
-Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id vs16-20020a056871a11000b0021498a0d1bfsm1176860oab.28.2024.01.25.07.40.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jan 2024 07:40:00 -0800 (PST)
-Message-ID: <88c1268b-014d-48d1-b924-22555228cb91@gmail.com>
-Date: Thu, 25 Jan 2024 09:39:59 -0600
+        d=1e100.net; s=20230601; t=1706300567; x=1706905367;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YPBb4mCw/R1ghl4eJw9QnLwDTvV7rYUlLLOC/s2r03U=;
+        b=lhvGxrlehEnte8EVwovL+7BDhy8h6/98fYGrHO91WSd5t3Cboj0EAmCvkTk/yi4LA4
+         zDGzuslvcjVQU0mKhCIMnTKLnUqXSRQiOe8mKwK+hUGmwHwDrSMci54UDukjPnixxOOD
+         wfmNUiu6GiwNl0k12lKirZW1ZTXeq+jdQgs7g+pfoO9EHFGZU58CgMdyiKwF5U10Jzq7
+         +275xpnue2p3CzY63aByWyP3lJouVhltsnTaGXIzuEhYfmb7f38Z/MVFzA/Z1ks4K7+r
+         Pu3UKRLa0+sfDX5LFCJeXw/7XDkQhrdf9Bb+HkOuNPe6yA47yVIsnbVB/73iSHlNygBy
+         qFUw==
+X-Gm-Message-State: AOJu0YxK0HuKkcOQ36RlZKk32OnJ3qa0fElfYMTuHveFt0mciDaJk6B7
+	ghj5lfWAsjpw0z8Ee0U/bNvxNbXjRWEOTjNxDghTr6YP9N48qdRjjpU8YIxcsRo=
+X-Google-Smtp-Source: AGHT+IFFOekxIQo5NLmKjcp6Qfd6UJ1cj0hkSu5Oi0GY555t6McTKV3GGs5vDgO5Juj+si8z0ZxPLQ==
+X-Received: by 2002:a05:622a:196:b0:42a:39ac:84e2 with SMTP id s22-20020a05622a019600b0042a39ac84e2mr454738qtw.10.1706300567611;
+        Fri, 26 Jan 2024 12:22:47 -0800 (PST)
+Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
+        by smtp.gmail.com with ESMTPSA id fe3-20020a05622a4d4300b0042a25f3950esm826463qtb.75.2024.01.26.12.22.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jan 2024 12:22:47 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3 1/4] network: add network_update_known_frequencies
+Date: Fri, 26 Jan 2024 12:22:40 -0800
+Message-Id: <20240126202243.91947-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/4] knownnetworks: sort known frequencies by BSS rank
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240124134001.20453-1-prestwoj@gmail.com>
- <20240124134001.20453-2-prestwoj@gmail.com>
- <703a48ba-41f8-4104-bb1d-6b017ae76e15@gmail.com>
- <ac057182-4b8e-44ef-ac32-9b039d13e45f@gmail.com>
- <8015796a-e94f-44bc-a01d-0339b1a156a2@gmail.com>
- <edaa845f-5e5a-47c4-90da-820c294637e4@gmail.com>
- <3eaadb6e-53ff-443f-a638-ae091482a74f@gmail.com>
- <63932e26-03c1-4f32-8596-32fb23bf5567@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <63932e26-03c1-4f32-8596-32fb23bf5567@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi James,
+In order to support an ordered list of known frequencies the list
+should be in order of last seen BSS frequencies with the highest
+ranked ones first. To accomplish this without adding a lot of
+complexity the frequencies can be pushed into the list as long as
+they are pushed in reverse rank order (lowest rank first, highest
+last). This ensures that very high ranked BSS's will always get
+superseded by subsequent scans if not seen.
 
-On 1/25/24 07:21, James Prestwood wrote:
-> Hi Denis,
-> 
-> On 1/24/24 11:06 AM, Denis Kenzior wrote:
->> Hi James,
->>
->> On 1/24/24 12:55, James Prestwood wrote:
->>>
->>> On 1/24/24 10:44 AM, Denis Kenzior wrote:
->>>> Hi James,
->>>>
->>>>>> Perhaps an easier way to accomplish this would be to add known frequencies 
->>>>>> in reverse bss->rank sorted order.  That way last seen frequency with best 
->>>>>> ranked BSS would be first?
->>>>>
->>>>> I'm not sure I understand, how would this be any different than just reversing
->>>>
->>>> Well, right now we maintain the least recently seen frequency list in a very 
->>>> simple way:
->>>>
->>>> - When scan results become available
->>>>     - Walk the result list (which is sorted by bss_rank?)
->>>>     - Add each result's frequency to the frequency cache
->>>>         - Remove any matching entry in the cache
->>>>         - Add it to head
->>>>
->>>> Since the result list is sorted, the top entry in the frequency cache is the 
->>>> least ranked.  This doesn't matter for small networks since there would only 
->>>> be a couple results.
->>>>
->>>> What we should do is to add the frequencies to the frequency cache in 
->>>> reverse order.  That way the highest ranked bss is at the top of the 
->>>> frequency cache.
-> 
-> Ok I understand what your getting at now, but providing the list in reverse 
-> order is somewhat problematic. The majority of additions are going to be from 
-> station's can results, via network_bss_add(). We _could_ reverse the BSS list in 
-> station but that seems like an expensive operation for each scan, and I really 
+This adds a new network API to update the known frequency list
+based on the current newtork->bss_list. This assumes that station
+always wipes the BSS list on scans and populates with only fresh
+BSS entries. After the scan this API can be called and it will
+reverse the list, then add each frequency.
+---
+ src/network.c | 40 ++++++++++++++++++++++++++++------------
+ src/network.h |  2 ++
+ 2 files changed, 30 insertions(+), 12 deletions(-)
 
-Nah, it is a trivial operation.  In fact, l_queue_reverse() already exists.
+v4:
+ * Added an API to do the insertion once all the BSS's have been added
+   to the network object.
+ * I'm also ok adding something to ELL like:
+   l_queue_new_reverse(list);
 
-What you can also do is remove the known frequency update from network_bss_add() 
-and have station manage it explicitly.  You can then do all sorts of fancy 
-things in station_set_scan_results().  Couple of examples.
+   The current reverse is in-place, so I cant really use it unless I
+   wanted to reverse twice to get it back to decending order.
 
-example 1
-   - allocate array of l_queue_size(new_bss_list) pairs: [network, frequency]
-   - After calling station_add_seen_bss, jot down network/frequency into the array
-   - Run another loop after to add the frequencies in reverse bss rank order
+diff --git a/src/network.c b/src/network.c
+index 4723334e..287e2be0 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -802,21 +802,13 @@ const struct network_info *network_get_info(const struct network *network)
+ 	return network->info;
+ }
+ 
+-static void add_known_frequency(void *data, void *user_data)
+-{
+-	struct scan_bss *bss = data;
+-	struct network_info *info = user_data;
+-
+-	known_network_add_frequency(info, bss->frequency);
+-}
+-
+ void network_set_info(struct network *network, struct network_info *info)
+ {
+ 	if (info) {
+ 		network->info = info;
+ 		network->info->seen_count++;
+ 
+-		l_queue_foreach(network->bss_list, add_known_frequency, info);
++		network_update_known_frequencies(network);
+ 	} else {
+ 		network->info->seen_count--;
+ 		network->info = NULL;
+@@ -1087,15 +1079,39 @@ static bool match_hotspot_network(const struct network_info *info,
+ 	return true;
+ }
+ 
++bool network_update_known_frequencies(struct network *network)
++{
++	const struct l_queue_entry *e;
++	struct l_queue *reversed;
++
++	if (!network->info)
++		return false;
++
++	reversed = l_queue_new();
++
++	for (e = l_queue_get_entries(network->bss_list); e; e = e->next) {
++		struct scan_bss *bss = e->data;
++
++		l_queue_push_head(reversed, bss);
++	}
++
++	for (e = l_queue_get_entries(reversed); e; e = e->next) {
++		struct scan_bss *bss = e->data;
++
++		known_network_add_frequency(network->info, bss->frequency);
++	}
++
++	l_queue_destroy(reversed, NULL);
++
++	return true;
++}
++
+ bool network_bss_add(struct network *network, struct scan_bss *bss)
+ {
+ 	if (!l_queue_insert(network->bss_list, bss, scan_bss_rank_compare,
+ 									NULL))
+ 		return false;
+ 
+-	if (network->info)
+-		known_network_add_frequency(network->info, bss->frequency);
+-
+ 	/* Done if BSS is not HS20 or we already have network_info set */
+ 	if (!bss->hs20_capable)
+ 		return true;
+diff --git a/src/network.h b/src/network.h
+index f29649f7..ea619f3f 100644
+--- a/src/network.h
++++ b/src/network.h
+@@ -61,6 +61,8 @@ void network_set_info(struct network *network, struct network_info *info);
+ void network_set_force_default_owe_group(struct network *network);
+ bool network_get_force_default_owe_group(struct network *network);
+ 
++bool network_update_known_frequencies(struct network *network);
++
+ int network_can_connect_bss(struct network *network,
+ 						const struct scan_bss *bss);
+ int network_autoconnect(struct network *network, struct scan_bss *bss);
+-- 
+2.34.1
 
-example 2:
-   - Allocate array of l_queue_size(new_bss_list) struct scan_bss pointers
-   - run qsort and sort the entries however you want (say by bss->time_stamp)
-
-> don't want to muck with that code. The only somewhat simple place to reverse the 
-> list is when a known network is added. But again its expensive.
-> 
-> To avoid refactoring elsewhere, I think the only way would be to timestamp 
-> entries (based on bss->time_stamp) and sort by both rank and timestamp. We could 
-> also limit the list to e.g. 5 values if we wanted to avoid storing a ton of 
-> u64's in memory.
-> 
-
-See above.  I'm really not sure that sorting by timestamp AND rank will do 
-anything.  If the driver does things properly then it will report 
-NL80211_BSS_LAST_SEEN_BOOTTIME value, so all entries will have a unique time_stamp.
-
-Another thing I thought of is that we probably should be updating the known 
-frequency list based on any neighbor reports we obtain.  Just in case we get 
-disconnected for whatever reason before we attempt to roam.
-
-Regards,
--Denis
