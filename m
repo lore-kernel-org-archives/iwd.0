@@ -1,65 +1,25 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2002260B
-	for <iwd@lists.linux.dev>; Fri, 26 Jan 2024 20:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F765A79C
+	for <iwd@lists.linux.dev>; Fri, 26 Jan 2024 23:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.132.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706300573; cv=none; b=rPjvoh2PRyoQRby/7gEQDnGRiPRVR+VbCYrCjAdtO0ABK/nOklBStbrT8bovQvC3bBNSr5OeaEC3RlDE2kN4/pTrCY5Mmya9DRm8obdZOE+v3Td+YfyaHSJIFaXC8XQ685EZXW/EasO/WEXAwGyOkTwIauWNhmBWqgM6wN16qrk=
+	t=1706311279; cv=none; b=HepqyQ6wyqTNtUY3mQOeR3j46q1MFyYbt7cyAQ/25h/TDlkLXWbSFCVrnEJH3bijqPz6+b41IXCiX7qklbwS0k+I69JTzg6y1XTJaka2Hrcl5QeakAjz4w57HheYxpvfUE4V20prTgdybBQtNZ4JxyopVFMIJWqYqYtTDwRDOhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706300573; c=relaxed/simple;
-	bh=qVUe8BPZnq+dT6elRok0k5v/vnyX0lzsZGhFvdSGGcA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pFmFw/+YaGwLP8mpKOIYB//yZ7rFly0Etn8dolqoTtw0unHr7oLWf1fOqlhG825gALzZrfAvFFCM/pfZAot2GYOcJpDx5OzYjcd8eyTD3HYEmIK4a/aPO00AHqb1MbR36xZz3+VkfMjOuZ/HA9rYZr07iOl27hJS3C7Ia8T4GkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nmnTQ909; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nmnTQ909"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4299f424e55so3930911cf.1
-        for <iwd@lists.linux.dev>; Fri, 26 Jan 2024 12:22:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706300571; x=1706905371; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yjhxB13PubYFTi/ivDF1ihuXnkM9cVlu0OUeGQW96W8=;
-        b=nmnTQ909yEJvfuMnLBorgAt52wmGYbpdRmKJNyHeNOvyLE2Kye9bt9rKY4kHUhwfeD
-         wAxFSgjJybEYuCFOqbVyvvZ9gafXn08WbEqTJTU04xHuV4P1kDW9Y/P9mdeHYpD2U5SV
-         ktdpZ1bYWQ/5ZPgRqgJhP0+Q5A/sTNGtUFbT1dVzEuW4A7PxKF86Lul5M/NQftsOVeHL
-         n0bf9jPC1JhwzoAaLlTfK6Q0p4pC75y4iKrSgqru2dX1SoHvWmWibktxSw396y5F5MuY
-         ynaLER5BPeBXhhTkzKR2gEgZJimxa9w73WGvQQo7tbt5jI20+JXPRyffOpZP3fvjveTx
-         8m9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706300571; x=1706905371;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yjhxB13PubYFTi/ivDF1ihuXnkM9cVlu0OUeGQW96W8=;
-        b=OLzOiF+8L8EG+kX37MBFmeU+m+Dvyw1vHQJ9qj5nwzKVtT4naj2cQ2SEeN0GWw2cOQ
-         5GfhMdVZn3vWlXGImKBzlfifkov0IoDARiUREdtjNStvIx4f6jMf2Plw+3s0KfNATGvq
-         2P2+Fpsq/w9MkqqkRz6cr4sft7fRcCuGENRsYDwtbHXxlYhVs/cgdnQeuh10rweaTTtk
-         Y4jm925Aod9smDK9DsjN1eksy0oxyiGg5Dq5r5bV2z9hhRRcqHZiCmgi9hwfl7Vpm7Rk
-         rLwhhN0Fr6HYpq8iydR20LhzFT83Or+8iu5JHMwbLXhUb4bYRlXDVRylMKU0M0mwiSeG
-         /ZAQ==
-X-Gm-Message-State: AOJu0YyYWCQym48cmOGx5oeGPjfLNYbjmFq3XJEF+C4n49PIVrBKIbRS
-	83kCs4AG4iTxLvPPAqQRVKQf9b2lneyVPc1nOCWk1T8G51nonusH25enwXdjgEE=
-X-Google-Smtp-Source: AGHT+IEfd04Y9WKoV49chnmX0kyTJPTHfgg7zuNnz8ACPdasIF7xwXaITaU6+ccLLudcF0DY7dkwjQ==
-X-Received: by 2002:a05:622a:1b26:b0:42a:205a:fdeb with SMTP id bb38-20020a05622a1b2600b0042a205afdebmr378591qtb.85.1706300570743;
-        Fri, 26 Jan 2024 12:22:50 -0800 (PST)
-Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id fe3-20020a05622a4d4300b0042a25f3950esm826463qtb.75.2024.01.26.12.22.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jan 2024 12:22:50 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
+	s=arc-20240116; t=1706311279; c=relaxed/simple;
+	bh=5IuQh8Sb0vrGFuYwB2rWjsFYBSNcsGaGP0aa2Py7Mcc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=nk0p31W/Q2IbkQ2hCDWwD6r0QcU2mLx6jf12/cnc8LmI0bVIDgIdkU3H+O4aPGuMEQfukifGhO0L9ZCzyyZ5vs8MKdShOuagcNUSdlr1x+qh6QGBXkHqGBrfuJ4cVd/CMvAAcyhB1v+D1igD7z4EtFAPX3P3a+0gusRNAvBmv3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org; spf=pass smtp.mailfrom=holtmann.org; arc=none smtp.client-ip=212.227.132.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=holtmann.org
+Received: from fedora.. (p5b3d2756.dip0.t-ipconnect.de [91.61.39.86])
+	by mail.holtmann.org (Postfix) with ESMTPSA id 438E8CECCE
+	for <iwd@lists.linux.dev>; Sat, 27 Jan 2024 00:13:42 +0100 (CET)
+From: Marcel Holtmann <marcel@holtmann.org>
 To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 4/4] auto-t: add test for known frequency sorting/maximum
-Date: Fri, 26 Jan 2024 12:22:43 -0800
-Message-Id: <20240126202243.91947-4-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240126202243.91947-1-prestwoj@gmail.com>
-References: <20240126202243.91947-1-prestwoj@gmail.com>
+Subject: [RFC] udev: Add module for checking interface renaming actions
+Date: Sat, 27 Jan 2024 00:13:39 +0100
+Message-ID: <20240126231339.10388-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -68,202 +28,315 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Modify the existing frequency test to check that the ordering
-lines up with the ranking of the BSS.
-
-Add a test to check that quick scans limit the number of known
-frequencies.
 ---
- autotests/testKnownNetworks/frequency_test.py | 110 ++++++++++++++++--
- autotests/testKnownNetworks/hw.conf           |   1 +
- 2 files changed, 102 insertions(+), 9 deletions(-)
+ Makefile.am |   1 +
+ src/udev.c  | 285 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 286 insertions(+)
+ create mode 100644 src/udev.c
 
-diff --git a/autotests/testKnownNetworks/frequency_test.py b/autotests/testKnownNetworks/frequency_test.py
-index 83e51c06..c2fd1290 100644
---- a/autotests/testKnownNetworks/frequency_test.py
-+++ b/autotests/testKnownNetworks/frequency_test.py
-@@ -4,17 +4,15 @@ import unittest
- import sys
+diff --git a/Makefile.am b/Makefile.am
+index 5ed6ab37164b..0a875dcef1a7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -265,6 +265,7 @@ src_iwd_SOURCES = src/main.c linux/nl80211.h src/iwd.h src/missing.h \
+ 					src/dpp-util.h src/dpp-util.c \
+ 					src/json.h src/json.c \
+ 					src/dpp.c \
++					src/udev.c \
+ 					$(eap_sources) \
+ 					$(builtin_sources)
  
- sys.path.append('../util')
--import iwd
- from iwd import IWD
- from iwd import PSKAgent
--from iwd import NetworkType
--import testutil
-+from hwsim import Hwsim
- import os
- from configparser import ConfigParser
- 
- class Test(unittest.TestCase):
-     def connect_network(self, wd, device, network):
--        ordered_network = device.get_ordered_network(network)
-+        ordered_network = device.get_ordered_network(network, full_scan=True)
- 
-         condition = 'not obj.connected'
-         wd.wait_for_object_condition(ordered_network.network_object, condition)
-@@ -30,7 +28,7 @@ class Test(unittest.TestCase):
-         wd.wait_for_object_condition(ordered_network.network_object, condition)
- 
-     def test_connection_success(self):
--        wd = IWD(True, '/tmp')
-+        wd = self.wd
- 
-         psk_agent = PSKAgent("secret123")
-         wd.register_psk_agent(psk_agent)
-@@ -38,6 +36,11 @@ class Test(unittest.TestCase):
-         devices = wd.list_devices(1)
-         device = devices[0]
- 
+diff --git a/src/udev.c b/src/udev.c
+new file mode 100644
+index 000000000000..8baf47246be7
+--- /dev/null
++++ b/src/udev.c
+@@ -0,0 +1,285 @@
++/*
++ *
++ *  Wireless daemon for Linux
++ *
++ *  Copyright (C) 2024  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+        # Set the signals so that the 2.4GHz ranking will be higher
-+        self.ssidccmp_2g_rule.signal = -2000
-+        self.ssidccmp_5g_rule.signal = -8000
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-         #
-         # Connect to the PSK network, then Hotspot so IWD creates 2 entries in
-         # the known frequency file.
-@@ -75,8 +78,10 @@ class Test(unittest.TestCase):
-         #
-         self.assertIsNotNone(psk_freqs)
-         self.assertIsNotNone(psk_uuid)
--        self.assertIn('5180', psk_freqs)
--        self.assertIn('2412', psk_freqs)
++#include <errno.h>
++#include <unistd.h>
++#include <sys/socket.h>
++#include <linux/netlink.h>
++#include <linux/filter.h>
++#include <ell/ell.h>
 +
-+        # The 2.4GHz frequency should come first, as it was ranked higher
-+        self.assertEqual('2412', psk_freqs[0])
-+        self.assertEqual('5180', psk_freqs[1])
- 
-         self.assertIsNotNone(hs20_freqs)
-         self.assertIsNotNone(hs20_uuid)
-@@ -92,6 +97,10 @@ class Test(unittest.TestCase):
-         psk_agent = PSKAgent("secret123")
-         wd.register_psk_agent(psk_agent)
- 
-+        # Now set the signals so that the 5GHz ranking will be higher
-+        self.ssidccmp_2g_rule.signal = -8000
-+        self.ssidccmp_5g_rule.signal = -2000
++#include "src/module.h"
 +
-         #
-         # Reconnect, this should generate a completely new UUID since we
-         # previously forgot the network.
-@@ -120,8 +129,78 @@ class Test(unittest.TestCase):
-         self.assertIsNotNone(psk_freqs)
-         self.assertIsNotNone(psk_uuid2)
-         self.assertNotEqual(psk_uuid, psk_uuid2)
--        self.assertIn('5180', psk_freqs)
--        self.assertIn('2412', psk_freqs)
-+        # Now the 5GHz frequency should be first
-+        self.assertEqual('5180', psk_freqs[0])
-+        self.assertEqual('2412', psk_freqs[1])
++static void receive_props(const void *buf, uint32_t len)
++{
++	const char *action = NULL;
++	const char *interface = NULL;
++	const char *ifindex = NULL;
 +
-+    def test_maximum_frequencies(self):
-+        psk_agent = PSKAgent("secret123")
-+        self.wd.register_psk_agent(psk_agent)
++	while (len > 0) {
++		const char *s = buf;
++		size_t l = strlen(s);
++		const char *t;
 +
-+        devices = self.wd.list_devices(1)
-+        device = devices[0]
++		if (l < 2)
++			break;
 +
-+        # Connect and generate a known frequencies file
-+        self.connect_network(self.wd, device, 'ssidCCMP')
++		t = strchr(s, '=');
++		if (t) {
++			size_t p = t - s;
 +
-+        self.wd.unregister_psk_agent(psk_agent)
++			if (!strncmp(s, "ACTION", p))
++				action = t + 1;
++			else if (!strncmp(s, "INTERFACE", p))
++				interface = t + 1;
++			else if (!strncmp(s, "IFINDEX", p))
++				ifindex = t + 1;
++		}
 +
-+        #
-+        # Rewrite the known frequencies file to move the valid network
-+        # frequencies to the end, past the maximum for a quick scan
-+        #
-+        config = ConfigParser()
-+        config.read('/tmp/iwd/.known_network.freq')
-+        for s in config.sections():
-+            if os.path.basename(config[s]['name']) == 'ssidCCMP.psk':
-+                config.set(s, 'list', "2417 2422 2427 2432 2437 2442 2447 2452 2457 2462 2467 2472 2484 2412 5180")
-+                break
++		buf += l + 1;
++		len -= l + 1;
++	}
 +
-+        self.wd.stop()
++	if (action && !strcmp(action, "add"))
++		l_info("udev interface=%s ifindex=%s", interface, ifindex);
++}
 +
-+        with open('/tmp/iwd/.known_network.freq', 'w') as f:
-+            config.write(f)
++static struct l_io *udev_io;
 +
-+        self.wd = IWD(True)
++static int create_socket(uint32_t *pid)
++{
++	struct sockaddr_nl addr;
++	socklen_t addrlen = sizeof(addr);
++	int fd, pktinfo = 1;
 +
-+        devices = self.wd.list_devices(1)
-+        device = devices[0]
++	fd = socket(PF_NETLINK, SOCK_RAW | SOCK_CLOEXEC | SOCK_NONBLOCK,
++						NETLINK_KOBJECT_UEVENT);
++	if (fd < 0)
++		return -1;
 +
-+        device.autoconnect = True
++	memset(&addr, 0, sizeof(addr));
++	addr.nl_family = AF_NETLINK;
 +
-+        device.wait_for_event("autoconnect_quick")
++	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		close(fd);
++		return -1;
++	}
 +
-+        condition = "obj.scanning == True"
-+        self.wd.wait_for_object_condition(device, condition)
++	if (getsockname(fd, (struct sockaddr *) &addr, &addrlen) < 0) {
++		close(fd);
++		return -1;
++	}
 +
-+        condition = "obj.scanning == False"
-+        self.wd.wait_for_object_condition(device, condition)
++	if (setsockopt(fd, SOL_NETLINK, NETLINK_PKTINFO,
++					&pktinfo, sizeof(pktinfo)) < 0) {
++		close(fd);
++		return -1;
++	}
 +
-+        #
-+        # Check that the quick scan didn't return any results
-+        #
-+        with self.assertRaises(Exception):
-+            device.get_ordered_network("ssidCCMP", scan_if_needed=False)
++	if (pid)
++		*pid = addr.nl_pid;
 +
-+        device.wait_for_event("autoconnect_full")
++	return fd;
++}
 +
-+        condition = "obj.scanning == True"
-+        self.wd.wait_for_object_condition(device, condition)
++static struct sock_filter subsys_filter[] = {
++	{ 0x20,  0,  0, 0x00000008 },	/* ldw #magic	*/
++	{ 0x15,  0,  3, 0xfeedcafe },	/* jne #feedcafe, drop	*/
++	{ 0x20,  0,  0, 0x00000018 },	/* ldw #subsys_hash	*/
++	{ 0x15,  0,  1, 0xa74d3cc8 },	/* jne #net, drop	*/
++	{ 0x06,  0,  0, 0xffffffff },	/* keep: ret #-1	*/
++	{ 0x06,  0,  0, 0000000000 },	/* drop: ret #0		*/
++};
 +
-+        condition = "obj.scanning == False"
-+        self.wd.wait_for_object_condition(device, condition)
++static const struct sock_fprog subsys_fprog = { .len = 6,
++						.filter = subsys_filter };
 +
-+        #
-+        # The full scan should now see the network
-+        #
-+        device.get_ordered_network("ssidCCMP", scan_if_needed=False)
++static bool attach_filter(struct l_io *io)
++{
++	int fd;
 +
-+    def setUp(self):
-+        self.wd = IWD(True)
++	fd = l_io_get_fd(io);
++	if (fd < 0)
++		return false;
 +
-+    def tearDown(self):
-+        self.wd.stop()
-+        self.wd = None
- 
-     @classmethod
-     def setUpClass(cls):
-@@ -129,10 +208,23 @@ class Test(unittest.TestCase):
-         conf = '[General]\nDisableANQP=0\n'
-         os.system('echo "%s" > /tmp/main.conf' % conf)
- 
-+        hwsim = Hwsim()
++	if (setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER,
++				&subsys_fprog, sizeof(subsys_fprog)) < 0)
++		return false;
 +
-+        cls.ssidccmp_2g_rule = hwsim.rules.create()
-+        cls.ssidccmp_2g_rule.source = hwsim.get_radio('rad1').addresses[0]
-+        cls.ssidccmp_2g_rule.enabled = True
++	return true;
++}
 +
-+        cls.ssidccmp_5g_rule = hwsim.rules.create()
-+        cls.ssidccmp_5g_rule.source = hwsim.get_radio('rad2').addresses[0]
-+        cls.ssidccmp_5g_rule.enabled = True
++static bool add_membership(struct l_io *io, uint32_t group)
++{
++	int fd, value = group;
 +
-     @classmethod
-     def tearDownClass(cls):
-         IWD.clear_storage()
-         os.remove('/tmp/main.conf')
- 
-+        cls.ssidccmp_2g_rule.remove()
-+        cls.ssidccmp_5g_rule.remove()
++	fd = l_io_get_fd(io);
++	if (fd < 0)
++		return false;
 +
- if __name__ == '__main__':
-     unittest.main(exit=True)
-diff --git a/autotests/testKnownNetworks/hw.conf b/autotests/testKnownNetworks/hw.conf
-index 8a7ef73a..f68b63a5 100644
---- a/autotests/testKnownNetworks/hw.conf
-+++ b/autotests/testKnownNetworks/hw.conf
-@@ -2,6 +2,7 @@
- num_radios=5
- start_iwd=0
- reg_domain=US
-+hwsim_medium=yes
- 
- [HOSTAPD]
- rad0=ssidNew.conf
++	if (setsockopt(fd, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP,
++						&value, sizeof(value)) < 0)
++		return false;
++
++	return true;
++}
++
++static bool drop_membership(struct l_io *io, uint32_t group)
++{
++	int fd, value = group;
++
++	fd = l_io_get_fd(io);
++	if (fd < 0)
++		return false;
++
++	if (setsockopt(fd, SOL_NETLINK, NETLINK_DROP_MEMBERSHIP,
++						&value, sizeof(value)) < 0)
++		return false;
++
++	return true;
++}
++
++static const uint8_t LIBUDEV_PREFIX[8] = { "libudev" };
++static uint32_t LIBUDEV_MAGIC = 0xfeedcafe;
++
++struct udev_hdr {
++	char prefix[8];
++	uint32_t magic;
++	uint32_t hdr_size;
++	uint32_t props_off;
++	uint32_t props_len;
++	uint32_t flt_subsys_hash;
++	uint32_t flt_devtype_hash;
++	uint32_t flt_tag_bloom_hi;
++	uint32_t flt_tag_bloom_lo;
++};
++
++static void receive_msg(const void *buf, uint32_t len)
++{
++	const struct udev_hdr *hdr = buf;
++
++	if (len < sizeof(struct udev_hdr))
++		return;
++
++	if (memcmp(hdr->prefix, LIBUDEV_PREFIX, 8))
++		return;
++
++	if (L_BE32_TO_CPU(hdr->magic) != LIBUDEV_MAGIC)
++		return;
++
++	if (hdr->hdr_size > len)
++		return;
++
++	if (hdr->props_off + hdr->props_len != len)
++		return;
++
++	receive_props(buf + hdr->props_off, hdr->props_len);
++}
++
++enum {
++	GROUP_NONE,
++	GROUP_KERNEL,
++	GROUP_UDEV,
++};
++
++static bool can_read_data(struct l_io *io, void *user_data)
++{
++	struct cmsghdr *cmsg;
++	struct msghdr msg;
++	struct iovec iov;
++	unsigned char buffer[4096];
++	unsigned char control[32];
++	uint32_t group = GROUP_NONE;
++	ssize_t len;
++	int fd;
++
++	memset(buffer, 0, sizeof(buffer));
++	memset(control, 0, sizeof(control));
++
++	fd = l_io_get_fd(io);
++
++	iov.iov_base = buffer;
++	iov.iov_len = sizeof(buffer);
++
++	memset(&msg, 0, sizeof(msg));
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++	msg.msg_control = control;
++	msg.msg_controllen = sizeof(control);
++
++	len = recvmsg(fd, &msg, 0);
++	if (len < 0)
++		return false;
++
++	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
++					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++		struct nl_pktinfo *pktinfo;
++
++		if (cmsg->cmsg_level != SOL_NETLINK)
++			continue;
++
++		if (cmsg->cmsg_type != NETLINK_PKTINFO)
++			continue;
++
++		pktinfo = (void *) CMSG_DATA(cmsg);
++		group = pktinfo->group;
++	}
++
++	if (group == GROUP_UDEV)
++		receive_msg(buffer, len);
++
++	return true;
++}
++
++static int udev_init(void)
++{
++	int fd;
++
++	l_debug("");
++
++	fd = create_socket(NULL);
++	if (fd < 0)
++		return -EIO;
++
++	udev_io = l_io_new(fd);
++	l_io_set_close_on_destroy(udev_io, true);
++	l_io_set_read_handler(udev_io, can_read_data, NULL, NULL);
++	attach_filter(udev_io);
++	add_membership(udev_io, GROUP_UDEV);
++
++	return 0;
++}
++
++static void udev_exit(void)
++{
++	l_debug("");
++
++	drop_membership(udev_io, GROUP_UDEV);
++	l_io_destroy(udev_io);
++}
++
++IWD_MODULE(udev, udev_init, udev_exit);
++IWD_MODULE_DEPENDS(udev, netdev);
 -- 
-2.34.1
+2.43.0
 
