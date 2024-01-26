@@ -1,61 +1,65 @@
 Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8F22230C
-	for <iwd@lists.linux.dev>; Fri, 26 Jan 2024 20:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3C22260B
+	for <iwd@lists.linux.dev>; Fri, 26 Jan 2024 20:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706300570; cv=none; b=V8T4NqNRJLKkN9J5fmyiYsJ6f1b/X8LKk9OdwKbDwJHTtOEuMOGXOtqICj9c+2HJ1YDtwkFIjA65NJDTD0Ciyam3lhD1NecSQS8vhfyX8RdhJjbxiSUvgYKecU14yP4CwJmWKvKEf70Bz2HHe4IVDn6RyBC9QzD/7VLDYU3q0Xw=
+	t=1706300571; cv=none; b=EK+iz2J1ZXqcBRdDErgn1Kne21hyxGseRHU6u6/DHwM/K9VG0fZCjPs6rl/1EZr6mCFs9+CUOGnRmJ7dx6dOKN0YoS+8DmS8tjrUwtYRC9J1ubHCDaqdwQbp007+PDZG1JO8asB9Oxebjl5jcp3+L5u/K8BWFNSbz94FHGxcO/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706300570; c=relaxed/simple;
-	bh=AD1z9g6vaGTmslQEoP3TO6zF+quFZu1Lrkz2VMibbGE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mGCdUkM/Et0ju8x1lnfVLEvPtC2m1gOXLmrfjpc5IQu9zygF3ViOv8jWDOISf0ShwDmrGrHPlWJDr/rfxLMYXQY9WXPyIwRyn+UXln4PQKVfuIc33O5lJ3BNNANvH5HBjGrrEuIPwKmZPnEM8mT7bULssQfUrvcK7eCoRPKHNxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=krAdW7X9; arc=none smtp.client-ip=209.85.160.171
+	s=arc-20240116; t=1706300571; c=relaxed/simple;
+	bh=W4iMwkE9iQ02GeuGwH8BAo68hrjmStDaoPV5BDUIwu8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=d/BFsQXSc71LbUQDXW6PnARJDXqCPTNbXGO8fsqW77hVyTBxNq6QtxT1VyOiJp/DM0z31FwA/8c1KY6sc4PDp/N2zBksQqG14okRcNQZ+pnqFIQzU5LIbakWJcB+r8h7vQVmELjyQGtWsXM7URu/oLViekz53/YkKhDseAVKNRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RVxysvV8; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="krAdW7X9"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-42a75ec56dcso7789051cf.0
-        for <iwd@lists.linux.dev>; Fri, 26 Jan 2024 12:22:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RVxysvV8"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4298b23abffso6753501cf.0
+        for <iwd@lists.linux.dev>; Fri, 26 Jan 2024 12:22:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706300567; x=1706905367; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YPBb4mCw/R1ghl4eJw9QnLwDTvV7rYUlLLOC/s2r03U=;
-        b=krAdW7X9mrhGijJYXk4xRW3RiMWNXpr//RcLo4VTjzoNvu/viezZe6I2NxWYj7mNpb
-         PkSPGvIM6sqhhdS1K+YEc36lnMOn2ujaf/FJAWrmPhrXKjAQwveApcUMcR0hYPpnbZDf
-         cFZK2PZE+BoAlXlU4IbBC/s/mbqG3mwa/owtgu0Z0WnF1v7pRfZ4wdP7UEvsXug4R45k
-         WUmoPBflX8HJq9a2RzewsNnNnOnHqO9QkUyzTTYQQonq8Xi/5T6Y709SqRYTQca03yPw
-         L1ZgzPkSLPyHurgx3rd7+ywevMmEyy0OKhI6rQNSygV01Nkvk+xCWvkf/o19cTmKfW2h
-         4iWg==
+        d=gmail.com; s=20230601; t=1706300569; x=1706905369; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Xs3+rSdiYsZ+AL1JTeDJXl9LKEZVoBz4NKzp2eGlKfc=;
+        b=RVxysvV8rkI1kF4fz/QKo9ApkC9VTcTV0wNu/Fq7yaRokFXOLttQgOmfu4g7i1i7vb
+         p1nOhU19z/ZZQ72r6W0qiuRWsMIpFdKaK/ND5tFaneboxt9xzBT58oe/fmhM1EfvQKAK
+         RB3iz198yPWn2vtVxEvQQyPu5u9qNm39Q5o6a0AjfYIzDEupH+dffe9r0Md4B6CscP9O
+         zIuWrcdxFRdqUhZ+us73rWJb3OXVzlXoE/N81lbuMWE2+K4LJGKL83DaWtH7iah5TTeF
+         SnuFLRsgH+NWqButy79Yuyep4hlmLK3ZdtqsFOY3srnbeAdW/ACc491fn12AOi0ISR3d
+         JR/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706300567; x=1706905367;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YPBb4mCw/R1ghl4eJw9QnLwDTvV7rYUlLLOC/s2r03U=;
-        b=lhvGxrlehEnte8EVwovL+7BDhy8h6/98fYGrHO91WSd5t3Cboj0EAmCvkTk/yi4LA4
-         zDGzuslvcjVQU0mKhCIMnTKLnUqXSRQiOe8mKwK+hUGmwHwDrSMci54UDukjPnixxOOD
-         wfmNUiu6GiwNl0k12lKirZW1ZTXeq+jdQgs7g+pfoO9EHFGZU58CgMdyiKwF5U10Jzq7
-         +275xpnue2p3CzY63aByWyP3lJouVhltsnTaGXIzuEhYfmb7f38Z/MVFzA/Z1ks4K7+r
-         Pu3UKRLa0+sfDX5LFCJeXw/7XDkQhrdf9Bb+HkOuNPe6yA47yVIsnbVB/73iSHlNygBy
-         qFUw==
-X-Gm-Message-State: AOJu0YxK0HuKkcOQ36RlZKk32OnJ3qa0fElfYMTuHveFt0mciDaJk6B7
-	ghj5lfWAsjpw0z8Ee0U/bNvxNbXjRWEOTjNxDghTr6YP9N48qdRjjpU8YIxcsRo=
-X-Google-Smtp-Source: AGHT+IFFOekxIQo5NLmKjcp6Qfd6UJ1cj0hkSu5Oi0GY555t6McTKV3GGs5vDgO5Juj+si8z0ZxPLQ==
-X-Received: by 2002:a05:622a:196:b0:42a:39ac:84e2 with SMTP id s22-20020a05622a019600b0042a39ac84e2mr454738qtw.10.1706300567611;
-        Fri, 26 Jan 2024 12:22:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706300569; x=1706905369;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Xs3+rSdiYsZ+AL1JTeDJXl9LKEZVoBz4NKzp2eGlKfc=;
+        b=Y6zS2HkzfMbfp34D1Cbnnha09w9Y9J8ptCNuMHTtYTaBWOywddSOdzppIHZRhfNzgj
+         vzN+OQCsFMkoDBWmy7vm4oafHfl1uGBbneP0iYI/8vhZW3oUSKU54cqZwt/8Ra5CEzWa
+         uycdH4VYZTYTYb4lVEwEAUvOKvQ/255agL4iJ90O3bY8BrehQBLD1YM8qVbn84Iwj2Bb
+         LdV3Rb8kqXZHF81Y7M1mJ8tAtPmfzjXelcmDmiGt2RrefWU5UIrjmPTXZGKNEgbA197a
+         COdWQprPgmxfCnnMSPPaq5viigcAU0E0DC3M9VDQVnlGOPUFsa3QySkAeHysqA9pQyjY
+         ftuw==
+X-Gm-Message-State: AOJu0YyPv9aaDMtf50AM5Y7DTM3EnFZxozoUQm7IncnPzWO5OZ83+MzE
+	Y8YyB89qyhfPn8WuKbW0/Htv84viSL5Yg5qFBbSUEeDTGgbmuDXruBT0mVznDpU=
+X-Google-Smtp-Source: AGHT+IGpzN+WPE/FQSzk29et12yV9hj3OkK2c/6nySvjhLm9sOLUVhgyQYMbCPYaVc0C7ZGWjukr8w==
+X-Received: by 2002:a05:622a:100e:b0:42a:75ab:ff09 with SMTP id d14-20020a05622a100e00b0042a75abff09mr413667qte.74.1706300568669;
+        Fri, 26 Jan 2024 12:22:48 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id fe3-20020a05622a4d4300b0042a25f3950esm826463qtb.75.2024.01.26.12.22.46
+        by smtp.gmail.com with ESMTPSA id fe3-20020a05622a4d4300b0042a25f3950esm826463qtb.75.2024.01.26.12.22.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jan 2024 12:22:47 -0800 (PST)
+        Fri, 26 Jan 2024 12:22:48 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 1/4] network: add network_update_known_frequencies
-Date: Fri, 26 Jan 2024 12:22:40 -0800
-Message-Id: <20240126202243.91947-1-prestwoj@gmail.com>
+Subject: [PATCH v3 2/4] station: use network_update_known_frequencies
+Date: Fri, 26 Jan 2024 12:22:41 -0800
+Message-Id: <20240126202243.91947-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240126202243.91947-1-prestwoj@gmail.com>
+References: <20240126202243.91947-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -64,116 +68,44 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In order to support an ordered list of known frequencies the list
-should be in order of last seen BSS frequencies with the highest
-ranked ones first. To accomplish this without adding a lot of
-complexity the frequencies can be pushed into the list as long as
-they are pushed in reverse rank order (lowest rank first, highest
-last). This ensures that very high ranked BSS's will always get
-superseded by subsequent scans if not seen.
-
-This adds a new network API to update the known frequency list
-based on the current newtork->bss_list. This assumes that station
-always wipes the BSS list on scans and populates with only fresh
-BSS entries. After the scan this API can be called and it will
-reverse the list, then add each frequency.
+Updates each network with its new, most current, set of BSS's
+for the different types of scans: dbus/autoconnect, hidden, and
+OWE.
 ---
- src/network.c | 40 ++++++++++++++++++++++++++++------------
- src/network.h |  2 ++
- 2 files changed, 30 insertions(+), 12 deletions(-)
+ src/station.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-v4:
- * Added an API to do the insertion once all the BSS's have been added
-   to the network object.
- * I'm also ok adding something to ELL like:
-   l_queue_new_reverse(list);
-
-   The current reverse is in-place, so I cant really use it unless I
-   wanted to reverse twice to get it back to decending order.
-
-diff --git a/src/network.c b/src/network.c
-index 4723334e..287e2be0 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -802,21 +802,13 @@ const struct network_info *network_get_info(const struct network *network)
- 	return network->info;
- }
+diff --git a/src/station.c b/src/station.c
+index a6442d3e..b186c505 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -350,6 +350,8 @@ static bool process_network(const void *key, void *data, void *user_data)
+ 		l_queue_insert(station->networks_sorted, network,
+ 				network_rank_compare, NULL);
  
--static void add_known_frequency(void *data, void *user_data)
--{
--	struct scan_bss *bss = data;
--	struct network_info *info = user_data;
--
--	known_network_add_frequency(info, bss->frequency);
--}
--
- void network_set_info(struct network *network, struct network_info *info)
- {
- 	if (info) {
- 		network->info = info;
- 		network->info->seen_count++;
- 
--		l_queue_foreach(network->bss_list, add_known_frequency, info);
 +		network_update_known_frequencies(network);
- 	} else {
- 		network->info->seen_count--;
- 		network->info = NULL;
-@@ -1087,15 +1079,39 @@ static bool match_hotspot_network(const struct network_info *info,
- 	return true;
- }
- 
-+bool network_update_known_frequencies(struct network *network)
-+{
-+	const struct l_queue_entry *e;
-+	struct l_queue *reversed;
 +
-+	if (!network->info)
-+		return false;
-+
-+	reversed = l_queue_new();
-+
-+	for (e = l_queue_get_entries(network->bss_list); e; e = e->next) {
-+		struct scan_bss *bss = e->data;
-+
-+		l_queue_push_head(reversed, bss);
-+	}
-+
-+	for (e = l_queue_get_entries(reversed); e; e = e->next) {
-+		struct scan_bss *bss = e->data;
-+
-+		known_network_add_frequency(network->info, bss->frequency);
-+	}
-+
-+	l_queue_destroy(reversed, NULL);
-+
-+	return true;
-+}
-+
- bool network_bss_add(struct network *network, struct scan_bss *bss)
- {
- 	if (!l_queue_insert(network->bss_list, bss, scan_bss_rank_compare,
- 									NULL))
  		return false;
+ 	}
  
--	if (network->info)
--		known_network_add_frequency(network->info, bss->frequency);
--
- 	/* Done if BSS is not HS20 or we already have network_info set */
- 	if (!bss->hs20_capable)
- 		return true;
-diff --git a/src/network.h b/src/network.h
-index f29649f7..ea619f3f 100644
---- a/src/network.h
-+++ b/src/network.h
-@@ -61,6 +61,8 @@ void network_set_info(struct network *network, struct network_info *info);
- void network_set_force_default_owe_group(struct network *network);
- bool network_get_force_default_owe_group(struct network *network);
+@@ -799,6 +801,8 @@ free:
+ 		scan_bss_free(bss);
+ 	}
  
-+bool network_update_known_frequencies(struct network *network);
++	network_update_known_frequencies(network);
 +
- int network_can_connect_bss(struct network *network,
- 						const struct scan_bss *bss);
- int network_autoconnect(struct network *network, struct scan_bss *bss);
+ 	l_queue_destroy(bss_list, NULL);
+ 
+ done:
+@@ -3684,6 +3688,8 @@ next:
+ 		return true;
+ 	}
+ 
++	network_update_known_frequencies(network_psk ?: network_open);
++
+ 	error = network_connect_new_hidden_network(network_psk ?: network_open,
+ 							msg);
+ 
 -- 
 2.34.1
 
