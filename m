@@ -1,100 +1,84 @@
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E709B7AE51
-	for <iwd@lists.linux.dev>; Tue, 30 Jan 2024 19:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5344369E00
+	for <iwd@lists.linux.dev>; Tue, 30 Jan 2024 19:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706642040; cv=none; b=YqrOQ2QpQDf/KBViPvdeOa6rG1n6jBVpa54Eb9oxWggk2QENTYnJlsU3ptYtHJaCXWuI8Teu5oROQ/eSW63ILm8Uk7qfPIdUA/1urV35MELZfMJYjqKweFUaPSiR5yXBXU88aCQdqoNXLpc5/gSw6GCVv/oCZH2buryIr03Rm54=
+	t=1706644749; cv=none; b=lzfSddcdmMAm6wGR4dSWpNQyNhmYmQMzvq0K8PQgmh6nKP0AwtkU4+y8PjwvQRTV9BNeA8wZlnJ62UgW9R5QkfnBIMBcII+iUNVEBvq3jh8opCogtEC+OskHA2zJrcEFQK7n/E2KURiwYsC5XD3gcbKWvGp8bYn1tuGJiBCdA+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706642040; c=relaxed/simple;
-	bh=6FsYX5KHNRoQfEX4V29Y4TDRa6uJ2CLUjzATSgxG664=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=e3/JJLKULB3wXfUEcY6fi3M7vTTx2A/bRpgshjP2LvVVUEIfHudEHtbcEjklaezEBw1fwFO5j5DqBLls9rr2X+SFsPx0uskHMaxN5x6cX4K4gX+PBHzBnmXPRV1e6TY4meRDE6/SFOexIiweQIgij5svckT1ygsBcrqwDMs57cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mFvi+bvh; arc=none smtp.client-ip=209.85.210.47
+	s=arc-20240116; t=1706644749; c=relaxed/simple;
+	bh=fpOVDd1MjQr8i1S1pqJpZpfVi1snYNYbmER65WsW444=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=nQ7KjXsymOOrKRgswH+kCMRO97HTtHIREiIq9o/HJWkKQppHS4VosVj5WYD+15gK/Nwn06l67uKT96gbMhwHpNesZY9VO4jSQbYWmHZIo2P1R97vE2b0QvQHGLxTOAMY4F+YUdjRP/4aA3/HwlGcBGaVrjEbUPx38U0aJ/Itlwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFQmuk3k; arc=none smtp.client-ip=209.85.210.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFvi+bvh"
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6e13cfc0b2fso632485a34.2
-        for <iwd@lists.linux.dev>; Tue, 30 Jan 2024 11:13:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFQmuk3k"
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6e1214ae9d4so1515743a34.3
+        for <iwd@lists.linux.dev>; Tue, 30 Jan 2024 11:59:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706642037; x=1707246837; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ml3VHPJO2cHtZQNGsrjvaqiHyx9RM3d7ziJFuj3XSlU=;
-        b=mFvi+bvhf6bEZAHvdK598ZiXG4Q3wiKXVTem+qId0wzu4b+nLjtlygHxpuhOrYusbj
-         4WSRECUTeENUSR1Yb1EuFqN2JtaNKzf/gqC0XPfD02jZNiUCmZnT/YRP2XbnlINgLOpB
-         44TZL6jwLWjWaYlhap9WvAQmJ+nesjZEw3PpFPIpMMXP3VGqWsBOYP0aVLqcAxqk9YaL
-         loP6CfysAVzs/1INJHKifCvETd46KqxEUY6su1B2G7sWPNzSKwzIPtSZYCYJ5miBBDR2
-         5PCArRCmDpuMguLOkhCB0XO9VCFKaKfD3Q7A70nh4Ht8BSm9yC821zJVe7dQ8jtZZBpK
-         PDeA==
+        d=gmail.com; s=20230601; t=1706644747; x=1707249547; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+9LIBguMNC3GUf9kpBsG5IQxt+Gx1t3l3giZktBLQCM=;
+        b=LFQmuk3kn3BikIbuHrZforiNXqXLbXpCjHnhIQT1n4TBLNAb9fr+b0/RJuRn1g4buF
+         bUTnBUlVZeuPgJuPbPkKl5tPTJb9UyJkbep3pX136rTrBciYMp3bKM/lXpIrI84RULhS
+         pFPK/e6mlznv7nexGDzctdKBEYuOCYr55RZnd/8xYnMiHUAHGa9GHltTXZpwJTd126IK
+         /+aZl17KBuT+c1mBOdRIwmYsh/WrovLsjnKjV5qQCWwCvp0t9KHApU1+2jTtc2SBV3e3
+         JOniJkGtzqb2hl23kOur0MiS+B8w8Rkkhb+MKW2qb+o3w7raaGGahzVe3JposIjl1PlV
+         19tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706642037; x=1707246837;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ml3VHPJO2cHtZQNGsrjvaqiHyx9RM3d7ziJFuj3XSlU=;
-        b=TX8j0FWRQSua68wNykW+TEuao6HKGnHfP7jnbaBLlRJp2I+5NRbDOFsD46xUwMSYjV
-         GgeA4KYUFS2fHi4GbhULMWvn2pOKsuktQbyK45pT8NqqR9O9a8BBhYdWF8A5e6lEiILd
-         Bfk8xUm7I2UCZxquN9fyTuxVGDUowhn5Tqyl1K83CR6ik4nR2ks1X+GdOfRJhqtpqbYv
-         IJqioatXT4vyrCUp24SF6mQ93VzN+zgSUZyySlwtoywePXQnSihCn0nFDswtJ30jo0yl
-         WHsHRBftHCwWl3qiI5mhbgmVcIOa4YZw3R0xSyOsr6m8/IY8KEkzqgd2aQ3IEfJ3mZpH
-         S6qg==
-X-Gm-Message-State: AOJu0YzfbCS3KDv9ocZ6XLQreiU3CiFJmr0k4G6A9ZbvRt9LCwP6lL1i
-	QoKj9TtBztfwfztQbrx8yxB0TDuJYC/qwQd5eRtN22sUffEqhFBEZJ3EGJX/nnM=
-X-Google-Smtp-Source: AGHT+IHDtLYghACeF+k1mAk6WgrjskAPOdIwh2w1zzMvVMNir6B6/mLZOI3HGxGlbSlXId8oZNMBww==
-X-Received: by 2002:a9d:664b:0:b0:6e0:ead6:5206 with SMTP id q11-20020a9d664b000000b006e0ead65206mr8506350otm.29.1706642037541;
-        Tue, 30 Jan 2024 11:13:57 -0800 (PST)
-Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id ie7-20020a05622a698700b00427fabefe3bsm4716110qtb.52.2024.01.30.11.13.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 11:13:57 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] station: reverse roam scan results for sorted known frequencies
-Date: Tue, 30 Jan 2024 11:13:52 -0800
-Message-Id: <20240130191352.85852-3-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240130191352.85852-1-prestwoj@gmail.com>
-References: <20240130191352.85852-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1706644747; x=1707249547;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+9LIBguMNC3GUf9kpBsG5IQxt+Gx1t3l3giZktBLQCM=;
+        b=BG2L9h0YX2jFeCzEarnyTPfY7wGoZVjFD3XMtIef6vQOpO8cvVl9Tqak6nWlRQz3pN
+         9XP9L5HlChX1jNKHfdZlWAFQ6Rzm+2lbgie8C0CGCngnDsA/IxDXIZ5REZIRysHVKnAg
+         X/zSf9b9rLWj6Ny/m9C8GbcNNcpTeUp28jv8KKuyFKvMnCot0cIAYl2TUng29o/UfrLd
+         23mHfGIXmPjRQr22hZpoe89/3R52Vjp88wgGGfstJbqfomAAYr9M4ooQUj0eki8xvk86
+         LCfoh/aBWN9831M3z/iq4dlFjG6lCuIortYP7G2s/WU5z5yJ+c8QSpl+3aNRH1nFCIwd
+         voPg==
+X-Gm-Message-State: AOJu0YwGFlQALCAIYgd3WLkcI2LZC9hYmmhF9ev//HeDRjQ1L6cI8r6X
+	8XFqRWBHbou54UBO2TdE/XVEdxNnh2OGlYgWgMY/BScb7PxPQGrc
+X-Google-Smtp-Source: AGHT+IFIyy56Ymu2HF0QOSeU/5NjRrNKVJdVmrweW51hpjpMWS41Tq8Sh0KzPK7ZyhyZ0jr6kCHxPQ==
+X-Received: by 2002:a05:6830:1408:b0:6dc:87c2:1cad with SMTP id v8-20020a056830140800b006dc87c21cadmr8353116otp.12.1706644747366;
+        Tue, 30 Jan 2024 11:59:07 -0800 (PST)
+Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id h13-20020a9d6f8d000000b006e117753d29sm1651682otq.69.2024.01.30.11.59.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jan 2024 11:59:07 -0800 (PST)
+Message-ID: <feaaade0-9553-4d98-ab23-3e76a218ae1a@gmail.com>
+Date: Tue, 30 Jan 2024 13:59:05 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] netdev: fix setting a uint8_t with l_get_le16
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240130191352.85852-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240130191352.85852-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The known frequency list is now a sorted list and the roam scan
-results were not complying with this new requirement. The fix is
-easy though since the iteration order of the scan results does
-not matter (the roam candidates are inserted by rank). To fix
-the known frequencies order we can simply reverse the scan results
-list before iterating it.
----
- src/station.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi James,
 
-diff --git a/src/station.c b/src/station.c
-index 8a5f4e18..ea505ca2 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2636,6 +2636,12 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 		util_address_to_string(current_bss->addr),
- 		util_ssid_to_utf8(current_bss->ssid_len, current_bss->ssid));
- 
-+	/*
-+	 * Reverse now so the known frequency list gets updated in the correct
-+	 * order (via network_bss_update).
-+	 */
-+	l_queue_reverse(bss_list);
-+
- 	while ((bss = l_queue_pop_head(bss_list))) {
- 		double rank;
- 		uint32_t kbps100 = DIV_ROUND_CLOSEST(bss->data_rate, 100000);
--- 
-2.34.1
+On 1/30/24 13:13, James Prestwood wrote:
+> ---
+>   src/netdev.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+
+All applied, thanks.
+
+Regards,
+-Denis
 
