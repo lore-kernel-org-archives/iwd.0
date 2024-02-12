@@ -1,91 +1,76 @@
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9037B3F4
-	for <iwd@lists.linux.dev>; Tue, 30 Jan 2024 20:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B324CDE0
+	for <iwd@lists.linux.dev>; Mon, 12 Feb 2024 18:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706644855; cv=none; b=FWBaAD3uz1ve7BNiW1vYHRpB6Uw6hxL1AaP0XzYn9+K7VZx6NiwfZgvPsnM68cZPWngen43YX4mKXNZMDZlQva5qQTMH0Xngvyom/azeE4/IW0hGDQDgFa99cBZ13kS0yz5/gOc4oNYhv8rSbOjsNiS3c/t8N6HkUB3EFOGWBQI=
+	t=1707763686; cv=none; b=RFc+KRbxXW+OvImO9oMBuI0Ml9LUI+x5NG/3gYlRNjXrKdM4r4hH2zNoOlswOm7ypeXQMbTjNV8n4isSNF0QhNIAuFhMOnPpdGOBjpHNqJpD+/1J1c1O06jSCJGMCUexrd/dQZ+ACwzsYErSGh46r+1KMQFMQkpA0HiwlJ3uAC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706644855; c=relaxed/simple;
-	bh=/E1+Unk6UNcE4irKbul4xB/dYwszBnVMVKZDkYlNwzo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Ci3/LHoteaiiutW94iPjL9T3mdgi48izcVKkG7vERJLi0AR9CadAFTh9B6+J6W+UX11xX9MYwEoPZ37CTJwA2GDr4HqV1Q5Fd6xjzoIrIba8gu5nQh0/oLTdusJIch3AdtR4sZGbUpTHZ3OXotDsP6tVypZBGLfq/mzcRa87NJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dpHTCC6o; arc=none smtp.client-ip=209.85.160.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707763686; c=relaxed/simple;
+	bh=CARarsnlMNGlDd3YpNPVxb7K6LTia5S1RaovZuCKa2A=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=VahVWe6kDpDVJFsYoRyKK0p2KIddvkvZnwIhIRZsaRs9gqbduhF8AeyCKGRNi4qltE9udrxTxXsWVFozuzw8ozy4BQkZowRLWAA2UeH4W2ot2Wez4dx3q20XpgRwFa/F6UDAXpblNtR7DXt6sOag2vEM2Au6nXbmADdG3XgoN+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=craftyguy.net; spf=pass smtp.mailfrom=craftyguy.net; dkim=pass (2048-bit key) header.d=craftyguy.net header.i=@craftyguy.net header.b=AcjI7nME; arc=none smtp.client-ip=80.241.56.161
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=craftyguy.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=craftyguy.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dpHTCC6o"
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-21533959f03so2519039fac.0
-        for <iwd@lists.linux.dev>; Tue, 30 Jan 2024 12:00:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706644853; x=1707249653; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0wNiqjBCHIw6BtVSId10Ku7BzvpezAlEiEaqFwV4P9Y=;
-        b=dpHTCC6om3Dqq4G2k0moMsRrdQDR0yqTc69+chbruENx+IjcDr3NVJpxwTWyZiVv3p
-         8dmdzJ79vhtQ7RGkdZi79+DigrZbtPciaDNy1jZj+EQ2nDVQJgOTXue9JL1Oy8E2YimF
-         +DDXwVY3+CHifBUCHicweZqh0SzEn/uZUJTqpG7PNknrJbG99FoWT13yuKeRgGcNniDr
-         tL6z8rJLxZffmENftdLv0uJE/zmsb2qPHvXS4XySOf+hHZ9caE5QQCFlK3csQWX4fJx2
-         fc5DfYy7BjViw+kDdIbZ5Sp1Kq2KfdyI0hHukuPQVKHq+fF+yt1axmvPHBYzoSDGEdUs
-         TunA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706644853; x=1707249653;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0wNiqjBCHIw6BtVSId10Ku7BzvpezAlEiEaqFwV4P9Y=;
-        b=INS5c8c6B0yNyV49FW5b6EbvnEmSRLP/OPhXvOzFGwf+DscxXhtpUjfMCG0GqArPzA
-         2VhTcFGYYvV7SLDtGAjpns+M2Wv1DU5YB+RCmqv8lC8UZemLvFBCCEp8nZEkOtCJLu1b
-         CkPpbdaj0IXC2a8XdfdRcnt/6vd+so8rb2RBie+bpm4gJ4KBT1JsJsbPju+fh1frcsPJ
-         KMWnUQP08rZ6rwfwz8ZKoopiasz8T11eROwr+byoFY2Z217WQDxaKb7q1DAkA68hhjVW
-         ztDwyA0Dle4Nr5MEelTpT5TuI2wxMpTnPI+h7KXeqglBRajWs3ozh98tDjjy+umv+jp7
-         IwyA==
-X-Gm-Message-State: AOJu0YyNn69zSN0CSOoy0fuUJ/1utX/KBiOVEJNlVdEzqBPezbHx9Lab
-	tvds0kD75pqs8PAhpRSDA6hAyw7EiPw2Gfs1cJ9QDYsyJTDXr+tOLqzP4/yf
-X-Google-Smtp-Source: AGHT+IF3zC707VcpBzHYhhiIlKJFxKdJt5pUGPB+Kwz5vRlf8YtRswA9Wpt5/WCl2yfFLJkekw3/zA==
-X-Received: by 2002:a05:6871:7a2:b0:215:3392:c020 with SMTP id o34-20020a05687107a200b002153392c020mr6544369oap.6.1706644853052;
-        Tue, 30 Jan 2024 12:00:53 -0800 (PST)
-Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id pw43-20020a0568713b2b00b002186834b911sm1763124oac.8.2024.01.30.12.00.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jan 2024 12:00:52 -0800 (PST)
-Message-ID: <c8776be3-5f5b-4855-8081-59c0f972d6e5@gmail.com>
-Date: Tue, 30 Jan 2024 14:00:51 -0600
+	dkim=pass (2048-bit key) header.d=craftyguy.net header.i=@craftyguy.net header.b="AcjI7nME"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4TYYP42ZCnz9svR;
+	Mon, 12 Feb 2024 19:47:52 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=craftyguy.net;
+	s=MBO0001; t=1707763672;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BmtP6gwFEgelpe+Pf/jQojBeCOXllucZ8lkSJhrOkCA=;
+	b=AcjI7nMEP04BbEotyKdBBO4GoPCCXVckhMUFikCEuBH5yQbp4jncsYOBMXxwhKzhHUukUy
+	99Hl+hm9KGRXEVK1LoR08A1J+o2HnxMKANp8pBSGqght7OldOxVzQPGLd3gmrHti1DkXKw
+	1gZclORIpxmNH0x09xq5zaq0ShgUrwOs5Si9NTUwJkXIJdY3jt0S6rS/9SBunMLXjCulPG
+	+rTzenWLLToLSJApW1bZr+lvwuVPawVylqGrIbCTgEvZr2hs3ymSThu123V+LNv4xjYP7V
+	Ht41CgnXndmLCUflp07p63tqP5b4Vj6MfRjddWF6HZ5b0KYqSo6+Q2DOd3QRWg==
+From: Clayton Craft <clayton@craftyguy.net>
+To: iwd@lists.linux.dev
+Subject: [PATCH] wiphy: include libgen.h to fix implicit def. with musl libc
+Date: Mon, 12 Feb 2024 10:47:47 -0800
+Message-ID: <20240212184747.30422-1-clayton@craftyguy.net>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] netconfig: limit DHCPv4 attempts to avoid extended
- netconfig times
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240130175038.77908-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240130175038.77908-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4TYYP42ZCnz9svR
 
-Hi James,
+This fixes a runtime segfault with musl libc and GCC13. musl dropped a
+basename prototype[1] in string.h, causing GCC to define it implicitly
+with the wrong function signature. The correct basename definition based
+on how wiphy uses it is in libgen.h.
 
-On 1/30/24 11:50, James Prestwood wrote:
-> ELL now has a setting to limit the number of DHCP attempts. This
-> will now be set in IWD and if reached will result in a failure
-> event, and in turn a disconnect.
-> 
-> IWD will set a maximum of 4 retries which should keep the maximum
-> DHCP time to ~60 seconds roughly.
-> ---
->   src/netconfig.c | 9 +++++++--
->   1 file changed, 7 insertions(+), 2 deletions(-)
-> 
+For context, see:
+https://gitlab.alpinelinux.org/alpine/aports/-/issues/15622
 
-All applied, thanks.
+1. https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+---
+ src/wiphy.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Regards,
--Denis
+diff --git a/src/wiphy.c b/src/wiphy.c
+index 3258b761..9d9c6c22 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -33,6 +33,7 @@
+ #include <unistd.h>
+ #include <string.h>
+ #include <limits.h>
++#include <libgen.h>
+ 
+ #include <ell/ell.h>
+ 
+-- 
+2.43.1
 
