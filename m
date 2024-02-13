@@ -1,88 +1,88 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4342960B89
-	for <iwd@lists.linux.dev>; Tue, 13 Feb 2024 18:09:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C2C61685
+	for <iwd@lists.linux.dev>; Tue, 13 Feb 2024 23:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707847749; cv=none; b=WA+VLF5/S99j3/LFBQr2zTahuy5EOyLvfsdVIiEkFadPwzy/HIFkQA/qWz5PgeEyYkElvSoFtXi/n68d15oLPYR4em6pcOesvn/LiRk+sLAUBB+M8XIuNgnrX5TRzUdyN3YXaG6lp/KhQdJvLt++eOHx254oHl8Lmp9n+hQjtpM=
+	t=1707865264; cv=none; b=WRtIRKtmza2ZMFNP/hglk1daWBrvsTlXYXIRsJfMqZ1r2vIbEkDM4Hw6wVbUpEdbXDQGvvglJNj1KxyvVg8Thuo6sHkkV5gqxu3i6BoTInWYKQpCdyQiZaVf1Zg873c5KBn2yU6HV7p6PduoGt02XEt/H2ZwcbKS6R2k5ub4tc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707847749; c=relaxed/simple;
-	bh=qJIJ8eZa3iNbrFJMuRWrAyPOSIWIKmkP9tzEd7+03ms=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=M5eajkKR5Zv+ja52YXkZG9Ttv5N7UUPGNKDhjvjlst5epYYSU1d7il26kWWP6Fnb4BIWUtVdFLtgqeOHZHcpaqSX7DfHKyvnXXlIxfk2pg9pC+Qb40/rX8Nd7q9w0eEQLrxDwUmzfb3GxDjt12tPon8t2xrLlQv+ReYIdN/5gEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WaRlaH0K; arc=none smtp.client-ip=209.85.219.52
+	s=arc-20240116; t=1707865264; c=relaxed/simple;
+	bh=zd7VudMnF2Hk2OJss83LHir4SEtWMWmSCZW0MAD1cG4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=VU9vbHdSyO7taowt/DD5TiWkiVPt9Y5ovOVd5yyJG2WWyKX4CcXs57JsXTGui+ZDSzF56+gZIn7f+D8QUdsnDOMWYYDXvJOXyFWk5lRwMKY+cPT8GWTHPAM5os7Rul8bUiq4mJuM9eC4Ch0rj3gQlPvBzyP9mf+QTp8mqZw+ZVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ar+FV52m; arc=none smtp.client-ip=209.85.167.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WaRlaH0K"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-68c4673eff5so22594946d6.1
-        for <iwd@lists.linux.dev>; Tue, 13 Feb 2024 10:09:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ar+FV52m"
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3c0485fc8b8so623715b6e.3
+        for <iwd@lists.linux.dev>; Tue, 13 Feb 2024 15:01:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707847747; x=1708452547; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3/zYnWPWa8+rIdJA2Fhi7gU5m9F9jlb+RNCQTj1oPu8=;
-        b=WaRlaH0Ko/oZxkPN8Wej1nYUp9pz3lhwv68ZOh6jc3xtLtqa5SgSxLwL6ObqDDpGrS
-         wxmJeb0hKkqTHT8XLLDff2hjAKnD607EKcgn2eT3zst5nfy/Je82vjrTxDJNETbn2QGa
-         mJNdQUvNBh08GrT7lFBPVX0p7w3OBfP1qBjdCGy3iWPIJy1852B68jobr66lrpV6dJOj
-         Eg2mqH6TuyOOypFzfVkTqHUpXL+2OiRUln0mtlo+hnF7i0ckLZWEbLPnp7+hOEMcO1e6
-         fiPOgF20vsA+REl+sNpJ1E1zXBF8hKBeASZO14gg1gZJynf4KDWcYzzEsbzOLMM48UcQ
-         JCyw==
+        d=gmail.com; s=20230601; t=1707865262; x=1708470062; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BrFmkeVzwXdHDHyIFh7Qbdj/Mhn+pvLb15rbFGRb514=;
+        b=Ar+FV52mAml4TUYrADHP5IxoA7ZM6nJWvdJ2kAsRu7TYqRpjftmH2zScFgjhsAfVlo
+         mH/iApACY/AjTiQfQuw+cqDCsETeZSAkSYspKZa7SZA1zvIvJtGKG1tXu88PfcV5Zxfz
+         X/qRk12OC+v3niSZspjbGKGAz5zLEM9nViAKsO6lwCuKB7h9G6eing014W96qOQ6SOlz
+         t1pXFpTaqyIiBKB6GyZDBfecVESmztHdftXeipb2MT6cz2qpT0Ysgg+9z63QoeNPxQW6
+         CCX20UPpdaMkF5zh6PoBJ9Iv9m+EcbxnLbhXGq78buGltcJACOMH7/CxuuN7khcMyWmE
+         fCJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707847747; x=1708452547;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3/zYnWPWa8+rIdJA2Fhi7gU5m9F9jlb+RNCQTj1oPu8=;
-        b=Bxf7GorEhsaax0Ao4Hcit/JDUeTf3xXQTYFUQwqcxk/Hw48c9MPm6Fx6nkKvKEYVP7
-         FlM9T/w/ouK1VRX7puL1O4gtxxer4tQBkcON5omSooIoOh490FBl+fxO/dFHga/8lFhf
-         RoDyLkwWrn9b4owZcAbH/Z/is34MMmg5ujo32N/5yOmVuHsYl41JsHy4rtCywOOEMwU8
-         tb3BajHE4sniLcn1iQ536UFhFwWoWDumDAVtNojJPAG4GjvEb6vg2G2yGNyoIl1IRzWW
-         0EygWcgzmfYMGWtgmFXUkWwk/Jt93r5Rx0HppsW/vNAym5EvZULV/l7P0FpxBvpY3alA
-         E91A==
-X-Gm-Message-State: AOJu0Yx+uHx9V79H+i92kq7c74pT93z47BnWKfuH4ZgOoo/FS87AlP6g
-	OMr19o6/WqMy3DFL2vWCchTbWBSrP54p4+ccOJieC9fAeU3ClZ0nB/nEqyblzBU=
-X-Google-Smtp-Source: AGHT+IHwD+8Y283Dd1ALt6yvdLKRObN467MRt/H3hrZ2ZK6ByLjhtCbk79kX5xIyIVS/fpV+wVj6UQ==
-X-Received: by 2002:a05:6214:d49:b0:68c:c3f7:618e with SMTP id 9-20020a0562140d4900b0068cc3f7618emr297771qvr.19.1707847746881;
-        Tue, 13 Feb 2024 10:09:06 -0800 (PST)
-Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id nf7-20020a0562143b8700b0068caa42dbf3sm1461670qvb.91.2024.02.13.10.09.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 10:09:06 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] netdev: use reason code from netdev_deauthenticate_event
-Date: Tue, 13 Feb 2024 10:09:02 -0800
-Message-Id: <20240213180902.850693-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1707865262; x=1708470062;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BrFmkeVzwXdHDHyIFh7Qbdj/Mhn+pvLb15rbFGRb514=;
+        b=UHMZO0Jet+4R0nHboIOsMYv+Vw/FBoMW2E323lQmnUYePGmBBiibM0cXqF5x+D/rmR
+         fJp+Idp80oEWlsE94hf+GrcbLlRHSheyr2Oz193BxM2tUmGyidV9NHSKEfBcqWCLQmkJ
+         gKBEtWenpB9aKTLJ6d0vHgo6fYul/f0gTUwXB+6DDTMUWea5MW1iNNirfWXp6M7mg+y0
+         3s7Aw2DHbZD6j/F0V7Bd7e8cKYSlVIJ8O1cpm/j/5fCpiJuoJqlmDiMk5z4BvMT7g4M7
+         wHdaZA5byYK404FmHpY+J7RFFPHACJO5Mfb/rOG+sUsTOH+q5kd2wvLhNYgv4bmMDrc4
+         KEDw==
+X-Forwarded-Encrypted: i=1; AJvYcCU26RaagcZpyWlG3VrUJhjrbcZE+d/1z5YW7/bQfzrwq8hRl9iK454KnBJZyi1W3f7dbqVALS2CkdKg7PaOHqmHQSDx
+X-Gm-Message-State: AOJu0Yx8KUSYyMOqKbnZdfV2oTuBL8vGNR2qDsJavFU46RhsCSbb3VjY
+	yxBgbp75Dd2R/mMYliNm3Y8GbyQ0NYYThhqFnm8foCxGny5ImYbxuqMJak9u
+X-Google-Smtp-Source: AGHT+IGVwJBGf+coqsi5YPvjAdZMfewa1cVEw4WoAkmhIkFZ3muASi8AEhILuwgECY3axrywkig6xw==
+X-Received: by 2002:a05:6808:199c:b0:3c0:34de:423a with SMTP id bj28-20020a056808199c00b003c034de423amr1055333oib.11.1707865262165;
+        Tue, 13 Feb 2024 15:01:02 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWwahNCUVU2evTLtq7c+4M3ee+lJO95VE5SMvDtDpj9iEw5hJpwZmxsNEB2H+c+axFj+E6ESXE/29p1BnKuZkJRYfhK
+Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id ct1-20020a056808360100b003be30a718e3sm603518oib.44.2024.02.13.15.01.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Feb 2024 15:01:01 -0800 (PST)
+Message-ID: <7b4fe1ee-da96-48bd-b871-a546b117020c@gmail.com>
+Date: Tue, 13 Feb 2024 17:01:00 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] netdev: use reason code from netdev_deauthenticate_event
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240213180902.850693-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240213180902.850693-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The reason code was not being passed to netdev_connect_failed as
-it should have been.
----
- src/netdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi James,
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 2b3925dc..48fb15df 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -1375,7 +1375,7 @@ static void netdev_deauthenticate_event(struct l_genl_msg *msg,
- 			MAC_STR(hdr->address_3), reason_code);
- 
- 	netdev_connect_failed(netdev, NETDEV_RESULT_AUTHENTICATION_FAILED,
--					MMPDU_STATUS_CODE_UNSPECIFIED);
-+					reason_code);
- }
- 
- static void netdev_operstate_cb(int error, uint16_t type,
--- 
-2.34.1
+On 2/13/24 12:09, James Prestwood wrote:
+> The reason code was not being passed to netdev_connect_failed as
+> it should have been.
+> ---
+>   src/netdev.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+
+Applied, thanks.
+
+Regards,
+-Denis
 
