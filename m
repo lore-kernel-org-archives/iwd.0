@@ -1,65 +1,61 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2B913A87B
-	for <iwd@lists.linux.dev>; Wed, 14 Feb 2024 19:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FECE5C905
+	for <iwd@lists.linux.dev>; Wed, 14 Feb 2024 19:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707939030; cv=none; b=WXuq/bESv9nNr9+rI0EV5nPMzZCjce98s8o6NEbGf4kSzDl3f1K9m5WyCMgPt5gOnzNyfgbYDQtiLEBULu+cBdTVNK5PLzSizdAORoFqGlg8dI0QeuwEF7WMFKvfOJtNjWVQQP4VK/1Q0ul19QmpNkPFQjc93nj9BRo5plrHH/k=
+	t=1707939534; cv=none; b=o7JEU5EulCNdp2CN9/B9jY6HDxAULb8au7G3q3FMfARF/+zoQTz01SOYSuP/rggZDj4f7j+tBgNDQM/5Ucenw+5VuzUm/JY1U8luLWo26p0TYlMUL4aUE0PrQKPGm0yJA6gHtEJdFfUtxGnRfzm5iFYOFLxRcU0rmy1u/SjmzBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707939030; c=relaxed/simple;
-	bh=fpUhQHTVJUBTgZ8QWi8W0NEhG+GeVRD2i6J7xVV1Uvo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XzFMjR6okIV8hk0p/uOiOrT/X5vYfgjI3Pf6aK7uk3+AkK2lrT8AaZc5OWXGCeDuqfxH2/QXCj4u+inYxA3a1Yf3utREV2aPknjHAcEnafUx5Om5hc8ZEYpE5ySpn47ZshGyECnGgCaeyq36Xn9hF3XWa5uy1ALC6HfvCbevqno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GWs/NGGX; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1707939534; c=relaxed/simple;
+	bh=dXVMtJYtqVf/KVtLWeITgyWS5XxpljPMwtDczMBGV+o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DcGlrG7t8TYDfQbdJStsjmeCgVdetKLuIkZmdWYx1I02VA+OTVAxL9BB6Yrzio8OHbPY/ypwY76ha+bLynOiOJkHLo1SxaiqbyTUudMzgTRGnVL7hE6cIxVVqiZRJ1WPNJE/l/ZOiXg68c5tVQkNDdnh6I61StF4pZFs8gvZCXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J8391RCB; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GWs/NGGX"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d934c8f8f7so713765ad.2
-        for <iwd@lists.linux.dev>; Wed, 14 Feb 2024 11:30:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J8391RCB"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5d3912c9a83so108536a12.3
+        for <iwd@lists.linux.dev>; Wed, 14 Feb 2024 11:38:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707939028; x=1708543828; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7RafitYr2Dj70DrmLktgtfBmI71dyspbC8oqI5KIOGU=;
-        b=GWs/NGGXkyYn/ei8tFx7VVJKynIFgM2xpsYgReIl7hDZT0zPLKYwJxtyqCfAD9eXH9
-         O+J3w58AIKHt4paDJSHmRofrHFP4NnWrmI0ATbBCFgNfn+VpNLZMPHYJovLv6A56HAZi
-         dr/dSfBUCBpMmJcyhY5EAIAn0eBNYCfD4OYpLHmL7pKjLePE0+O31pLiWXVRMPTVQsLO
-         5CeK+B6FhKeOB30on/miMbR+GuIyPLnz7kdXMMTYV1P4AWSxUsoCl5PE69pY9DMaIeHI
-         HFUw0lwKG6kEQIxDhbk2TBHCpvI4KAqb8uSoJ6tHiRikubDwKL7Q5W8oXMUBDH/7Ge+J
-         AMtg==
+        d=gmail.com; s=20230601; t=1707939531; x=1708544331; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cf30CwGE7zCljuL0ETkdjSXR31gkK7fLe0jQSlAoadI=;
+        b=J8391RCBDdM4m4D+Mp1wgYbjhBTxPqcRrjZVDO7ZYyRajvTHtL40UKtZNY0nZLv7vD
+         aNEl4Qblf0rgDH3kJXBSnT01jFJnedBlTczuM0ie+nQ5l6ZxKWfe+z6LFW36T610XJyQ
+         uZ22/HDak/ykicHJ603wu5jw7TPocuUP/NzoK/65VrvGJ4MvFKdB4j5njjI5RqXgzhEN
+         +/GpF8Hwwx9vp82TkcXQwj1NJLP2t9zZdYSWmzBXi7nLfT8BwJ5USf1t9it2ah5dIapm
+         xiA+cLQVoSk8R+Ji/wYBKY8ZA9CsqUUwZnKHpF0bXQCLM70scqpQzR0yIZyxuSbwr7oW
+         L5jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707939028; x=1708543828;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7RafitYr2Dj70DrmLktgtfBmI71dyspbC8oqI5KIOGU=;
-        b=kgSbT0fG5Omua6oqZqkr8lbTwntsQC7zIFa0Z7MI5HPcZ8aXhDzEI0LDgaNSYxslu9
-         biY4KL+tnKSUR9FA5BfP61OjYrwrm2s0TeLupCS8ihB0EDYjrVdfTECHro+xsWPJD7Pz
-         MW0Ko60QO5pn1iId8FBx0UGim05btu3oeaPCb7XtXaLMPMvzlFQ7ypX485Z7fmXxJUcT
-         0miGfljb0UT0V9zSU1Yddoqfl0yAUMr4+RIo4gwbBGYtGDLZykZ7Rpo+eJauUvj2nypg
-         m/ZeqEpUQ83nqYtn0gGQ/nby39xRMwgelP87ov74igtWvgkbS4uromS68vlm0L1DtUWJ
-         /x8g==
-X-Gm-Message-State: AOJu0YyV9oq3ufNTxdfPUKtEmK5nF4ls3fwW45Mqtyh1JT2+N8+v8Ud6
-	w3Q/THJZGOVDlMX8dBrxUodnNt7IZ8izEjDpC54PsN90aDkaR+tk80bPXLPiPpQ=
-X-Google-Smtp-Source: AGHT+IGu28xbQYfUgv4Qkrh3YB8q/c2sc+zyqW+wl15YdoVbRIVlV2EoxHgNkrNfw6NIScyB+jE1Zw==
-X-Received: by 2002:a17:902:7c15:b0:1d7:147d:6a1d with SMTP id x21-20020a1709027c1500b001d7147d6a1dmr3162942pll.55.1707939027786;
-        Wed, 14 Feb 2024 11:30:27 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707939531; x=1708544331;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cf30CwGE7zCljuL0ETkdjSXR31gkK7fLe0jQSlAoadI=;
+        b=TaPhyjD6jRUzP813hI4WTAlHjWvCIYAGJDhRhfJ8zt1aJZYp5uETHLDOVvhxHZeO7S
+         oLxQDzajmEITKekMZs4AMmEwom4X94cYxLhQMFnJbogSkZ6lTfv+9ShN+TAfaqVvmqOa
+         xFhmzE6g0YUdZgxvAHhiGFTck5AB5MwcH9GQUHpb7O3/BhI3pAPvSd6J2Z9qJpIgqueQ
+         2FSAVJfpjCvvdYGt3gb2Sb0sKpOKN7ySCmkQD0TjAIxDa7h4IkStdm97+rCu+AkvkiiU
+         aG6Ah0tN4wF0t8TGHMC5Y2FFEAf2P97H1mfr9cDpsLwt84dwSF8OUfX9ABxTQhc0X6iE
+         WB6g==
+X-Gm-Message-State: AOJu0YyCZydA7Ui50tVhCoXvS6EtnGFOlNbJ3ggH1vHe9tYbN6cvDB4P
+	NVOr/IYSjo++orGhYZ9rTZSs/aG18JmjCat4H8Kq5gfNBWd9a1DjGoi1q8PHunI=
+X-Google-Smtp-Source: AGHT+IEqF7dP2fCc5D3VCiMOfdw/FIU+hOX2wsK2KSA8ZvoIduJVF7qiBi61+vaDeFW8jOmJSUeaXw==
+X-Received: by 2002:a17:902:bb8d:b0:1d9:c86c:39c2 with SMTP id m13-20020a170902bb8d00b001d9c86c39c2mr3443083pls.14.1707939531454;
+        Wed, 14 Feb 2024 11:38:51 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id e21-20020a170902d39500b001d8e5a3be8asm4028120pld.259.2024.02.14.11.30.26
+        by smtp.gmail.com with ESMTPSA id v2-20020a170902d08200b001db53ccb856sm1761606plv.108.2024.02.14.11.38.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 11:30:27 -0800 (PST)
+        Wed, 14 Feb 2024 11:38:51 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] auto-t: timestamp log files in test-runner
-Date: Wed, 14 Feb 2024 11:30:21 -0800
-Message-Id: <20240214193021.963130-2-prestwoj@gmail.com>
+Subject: [RFC 0/5] Using l_notice for low level IWD state information
+Date: Wed, 14 Feb 2024 11:37:38 -0800
+Message-Id: <20240214193743.963349-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240214193021.963130-1-prestwoj@gmail.com>
-References: <20240214193021.963130-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -68,37 +64,93 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The log files become much more useful when there are timestamps
-associated with each log.
----
- tools/utils.py | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Lots is explained in the commit description but being able to run
+tooling over IWD logs would be very useful to gather statistics on
+how IWD is behaving with respect to connections, roaming, or whatever
+else is desired. With these patches I've written a tool that monitors
+only the NOTICE log level in the journal and spits out much more
+concise information about IWD, for example running it against one of
+the FT autotests:
 
-diff --git a/tools/utils.py b/tools/utils.py
-index 8219542e..5984fc69 100644
---- a/tools/utils.py
-+++ b/tools/utils.py
-@@ -6,6 +6,7 @@ import traceback
- import shutil
- import dbus
- 
-+from datetime import datetime
- from gi.repository import GLib
- from weakref import WeakValueDictionary
- from re import fullmatch
-@@ -125,7 +126,11 @@ class Process(subprocess.Popen):
- 	@staticmethod
- 	def _write_io(instance, data, stdout=True):
- 		for f in instance.write_fds:
--			f.write(data)
-+			for c in data:
-+				f.write(c)
-+				if c == '\n':
-+					stamp = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S.%f")
-+					f.write(stamp + ': ')
- 
- 			# Write out a separator so multiple process calls per
- 			# test are easer to read.
+ connecting to TestFT (12:00:00:00:00:01) signal: -80 load: 127/255
+ connected
+     No scan issued to connect
+     Connected SSID: TestFT
+     Connected BSS: 12:00:00:00:00:01
+     Connecting time: 0ms
+ initiating roam to 12:00:00:00:00:02 signal: -30 load: 127/255
+ failed to ft-roam to BSS 12:00:00:00:00:02 reason: association-timeout
+ disconnected
+     Time connected: 5739ms
+ connecting to TestFT (12:00:00:00:00:01) signal: -80 load: 127/255
+ connected
+     Scan time: 5320ms
+     Connected SSID: TestFT
+     Connected BSS: 12:00:00:00:00:01
+     Connecting time: 0ms
+     Time disconnected: 5320ms
+ initiating roam to 12:00:00:00:00:02 signal: -30 load: 127/255
+ failed to ft-roam to 12:00:00:00:00:02 reason: authentication timeout
+ initiating roam to 12:00:00:00:00:03 signal: -70 load: 127/255
+ FT roamed
+     Scan time: 12752ms
+     Connected SSID: TestFT
+     Connected BSS: 12:00:00:00:00:03
+     Connecting time: 230ms
+ disconnected
+     Time connected: 1ms
+ connecting to TestFT (12:00:00:00:00:01) signal: -80 load: 127/255
+ connected
+     Scan time: 5318ms
+     Connected SSID: TestFT
+     Connected BSS: 12:00:00:00:00:01
+     Connecting time: 0ms
+ initiating roam to 12:00:00:00:00:03 signal: -60 load: 127/255
+ failed to ft-roam to 12:00:00:00:00:03 status: 53
+ initiating roam to 12:00:00:00:00:03 signal: -60 load: 127/255
+ roamed
+     Scan time: 12758ms
+     Connected SSID: TestFT
+     Connected BSS: 12:00:00:00:00:03
+     Connecting time: 210ms
+ initiating roam to 12:00:00:00:00:02 signal: -75 load: 127/255
+ FT roamed
+     Scan time: 12759ms
+     Connected SSID: TestFT
+     Connected BSS: 12:00:00:00:00:02
+     Connecting time: 10ms
+ disconnected
+     Time connected: 1ms
+ connecting to TestFT (12:00:00:00:00:01) signal: -80 load: 127/255
+ connected
+     Scan time: 5318ms
+     Connected SSID: TestFT
+     Connected BSS: 12:00:00:00:00:01
+     Connecting time: 0ms
+ initiating roam to 12:00:00:00:00:03 signal: -71 load: 127/255
+ failed to ft-roam to 12:00:00:00:00:03 status: 53
+ initiating roam to 12:00:00:00:00:02 signal: -73 load: 127/255
+ FT roamed
+     Scan time: 12752ms
+     Connected SSID: TestFT
+     Connected BSS: 12:00:00:00:00:02
+     Connecting time: 220ms
+ disconnected
+     Time connected: 1ms
+
+James Prestwood (5):
+  main: add runtime flag for setting the logger
+  station: use l_notice for station_debug_event, allow arguments
+  station: add additional station_debug_event's
+  netdev: add notice events for connection timeouts
+  doc: document use of l_log APIs
+
+ doc/coding-style.txt | 24 ++++++++++++++++++++
+ src/main.c           | 14 ++++++++++--
+ src/netdev.c         |  6 ++---
+ src/station.c        | 52 ++++++++++++++++++++++++++++++++------------
+ 4 files changed, 77 insertions(+), 19 deletions(-)
+
 -- 
 2.34.1
 
