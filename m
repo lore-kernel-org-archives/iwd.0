@@ -1,61 +1,65 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED2712D76E
-	for <iwd@lists.linux.dev>; Wed, 14 Feb 2024 19:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2B913A87B
+	for <iwd@lists.linux.dev>; Wed, 14 Feb 2024 19:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707939028; cv=none; b=PEfTTp7Qvl0kGPm+t04yB2bbeJa6QC/xG432pTzV5mowTEQNKiscB4g5hdJkdDPR0ru6IL6kpIOPGAgwNLRGlCky6FttJi32UsjGTZeczUzirzgrCpTemG5dLpoLyjc1bFqv6+rrndqtuF8aX8KWtYJ2ilF5RzBofRahj4NHKrI=
+	t=1707939030; cv=none; b=WXuq/bESv9nNr9+rI0EV5nPMzZCjce98s8o6NEbGf4kSzDl3f1K9m5WyCMgPt5gOnzNyfgbYDQtiLEBULu+cBdTVNK5PLzSizdAORoFqGlg8dI0QeuwEF7WMFKvfOJtNjWVQQP4VK/1Q0ul19QmpNkPFQjc93nj9BRo5plrHH/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707939028; c=relaxed/simple;
-	bh=dwQbPdnc1FNTeX+J9KjgqKHbfWmrO57tWH3a1XkdmfQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DEnhDmP3phQHQFNVHNbryecgIl0izsaIQ5WamEV62YjPV1S4dYpAM42R324rPuHTb6smVVLMubA6i2xF3lcx+4VZ4cVjZ7/4oYSVrGj7Gx4TPd2bGf3l3JBkokaWDqSua/bynugyNPaDnYbaCxPHjII9w4pddq9H3JCOR4IbNpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sux8NFl1; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1707939030; c=relaxed/simple;
+	bh=fpUhQHTVJUBTgZ8QWi8W0NEhG+GeVRD2i6J7xVV1Uvo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=XzFMjR6okIV8hk0p/uOiOrT/X5vYfgjI3Pf6aK7uk3+AkK2lrT8AaZc5OWXGCeDuqfxH2/QXCj4u+inYxA3a1Yf3utREV2aPknjHAcEnafUx5Om5hc8ZEYpE5ySpn47ZshGyECnGgCaeyq36Xn9hF3XWa5uy1ALC6HfvCbevqno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GWs/NGGX; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sux8NFl1"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d944e8f367so905665ad.0
-        for <iwd@lists.linux.dev>; Wed, 14 Feb 2024 11:30:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GWs/NGGX"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d934c8f8f7so713765ad.2
+        for <iwd@lists.linux.dev>; Wed, 14 Feb 2024 11:30:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707939026; x=1708543826; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AplTx8lk3ahbEDq1TvxC/vGihZ2iHC2LpbAOxobz3ZY=;
-        b=Sux8NFl11PTrkIii9894B2CArDI/xI7hWNZUHwFxbybq/Y7P5wigVEmLoT9pcWO7nJ
-         agksPUuIdyKg/wVgh+JTyhZfmann1+JDBW52Ng6z9bbGr29HiMBSr5KYNB3btP9AdS3P
-         p8a7UtH3DHcVLjjhtIZZ/MrXmjN816Zk22ZMgaP9wYGAd9prZYT/sHLpybZxTmjEfxC1
-         2ZxCmZrMM1n68XSIJM/KKIhAnnUbLc9irqWUVEJhmwkBCbiFXPrEhbXxy9RrfYiwS9Ub
-         JXvxl1gBHDmpKGroAS7KYafzDXb839HM2B5B20od5CCHC7ZmjEEotwKRGCV31/O0eTuX
-         CLjA==
+        d=gmail.com; s=20230601; t=1707939028; x=1708543828; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7RafitYr2Dj70DrmLktgtfBmI71dyspbC8oqI5KIOGU=;
+        b=GWs/NGGXkyYn/ei8tFx7VVJKynIFgM2xpsYgReIl7hDZT0zPLKYwJxtyqCfAD9eXH9
+         O+J3w58AIKHt4paDJSHmRofrHFP4NnWrmI0ATbBCFgNfn+VpNLZMPHYJovLv6A56HAZi
+         dr/dSfBUCBpMmJcyhY5EAIAn0eBNYCfD4OYpLHmL7pKjLePE0+O31pLiWXVRMPTVQsLO
+         5CeK+B6FhKeOB30on/miMbR+GuIyPLnz7kdXMMTYV1P4AWSxUsoCl5PE69pY9DMaIeHI
+         HFUw0lwKG6kEQIxDhbk2TBHCpvI4KAqb8uSoJ6tHiRikubDwKL7Q5W8oXMUBDH/7Ge+J
+         AMtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707939026; x=1708543826;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AplTx8lk3ahbEDq1TvxC/vGihZ2iHC2LpbAOxobz3ZY=;
-        b=fAkVhcvgI7vY3a7NV0Z/FRvWkcCeFoRzLaw1N/iUsynRhpDKN4Qz6jOl3RTcSy4wWR
-         Pmqy49In5pqWtUOMOh5lTPYd53T5RojVwH6Jx9DbSP7Apb2eyMvvLVPtOl5auhW6dtUG
-         eDKu9LWZennsllAdTuVrwl6InH4aGTbMECTbBM7/Nc4i3GghyKxFxPqJS6m8BXQE0gsd
-         txpY3/i5YcYVYD03TdUkZ2XihXEpLxz9NDRz9b3vzVkbf3H1TsPqUCDxe40z4swQVaAi
-         cTF6A3qv4jcszcxAR9vrDq0aVfXl2GvqZbK1fLtGAqhSDY64e8MgRzzITPYR0Yy0Smrb
-         Jx3A==
-X-Gm-Message-State: AOJu0YxZLnGFM4/X54YQ4dCYQXBWFbvAatj6hX7OsunLJ9HrbVA3nD6p
-	vYjy/hZ6akVkeThX/0KPljJXYHD7wzBSGiiEBUXjjEF90SL/dD8NX2mfG+tM5Wc=
-X-Google-Smtp-Source: AGHT+IFBaiQGeLEOY8GykQVTSSqh5jcLxy79GrlYK81IhJxw+Ogvm0ecJDHgDn9UZKILcIOdj5sBaw==
-X-Received: by 2002:a17:903:230e:b0:1d9:2369:d0f8 with SMTP id d14-20020a170903230e00b001d92369d0f8mr4288203plh.9.1707939026317;
-        Wed, 14 Feb 2024 11:30:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707939028; x=1708543828;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7RafitYr2Dj70DrmLktgtfBmI71dyspbC8oqI5KIOGU=;
+        b=kgSbT0fG5Omua6oqZqkr8lbTwntsQC7zIFa0Z7MI5HPcZ8aXhDzEI0LDgaNSYxslu9
+         biY4KL+tnKSUR9FA5BfP61OjYrwrm2s0TeLupCS8ihB0EDYjrVdfTECHro+xsWPJD7Pz
+         MW0Ko60QO5pn1iId8FBx0UGim05btu3oeaPCb7XtXaLMPMvzlFQ7ypX485Z7fmXxJUcT
+         0miGfljb0UT0V9zSU1Yddoqfl0yAUMr4+RIo4gwbBGYtGDLZykZ7Rpo+eJauUvj2nypg
+         m/ZeqEpUQ83nqYtn0gGQ/nby39xRMwgelP87ov74igtWvgkbS4uromS68vlm0L1DtUWJ
+         /x8g==
+X-Gm-Message-State: AOJu0YyV9oq3ufNTxdfPUKtEmK5nF4ls3fwW45Mqtyh1JT2+N8+v8Ud6
+	w3Q/THJZGOVDlMX8dBrxUodnNt7IZ8izEjDpC54PsN90aDkaR+tk80bPXLPiPpQ=
+X-Google-Smtp-Source: AGHT+IGu28xbQYfUgv4Qkrh3YB8q/c2sc+zyqW+wl15YdoVbRIVlV2EoxHgNkrNfw6NIScyB+jE1Zw==
+X-Received: by 2002:a17:902:7c15:b0:1d7:147d:6a1d with SMTP id x21-20020a1709027c1500b001d7147d6a1dmr3162942pll.55.1707939027786;
+        Wed, 14 Feb 2024 11:30:27 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id e21-20020a170902d39500b001d8e5a3be8asm4028120pld.259.2024.02.14.11.30.24
+        by smtp.gmail.com with ESMTPSA id e21-20020a170902d39500b001d8e5a3be8asm4028120pld.259.2024.02.14.11.30.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 11:30:25 -0800 (PST)
+        Wed, 14 Feb 2024 11:30:27 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] auto-t: fix failed_roam_test to pass when run on its own
-Date: Wed, 14 Feb 2024 11:30:20 -0800
-Message-Id: <20240214193021.963130-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] auto-t: timestamp log files in test-runner
+Date: Wed, 14 Feb 2024 11:30:21 -0800
+Message-Id: <20240214193021.963130-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240214193021.963130-1-prestwoj@gmail.com>
+References: <20240214193021.963130-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -64,26 +68,37 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When running this test with others the hostapd neighbors are already
-grouped which lets the test pass. On its own this does not happen
-and it fails.
+The log files become much more useful when there are timestamps
+associated with each log.
 ---
- autotests/testPSK-roam/failed_roam_test.py | 2 ++
- 1 file changed, 2 insertions(+)
+ tools/utils.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/autotests/testPSK-roam/failed_roam_test.py b/autotests/testPSK-roam/failed_roam_test.py
-index 12e439f6..8cce8bb5 100644
---- a/autotests/testPSK-roam/failed_roam_test.py
-+++ b/autotests/testPSK-roam/failed_roam_test.py
-@@ -221,6 +221,8 @@ class Test(unittest.TestCase):
-         cls.rule_bss2 = hwsim.rules.create()
-         cls.rule_bss2.source = hwsim.get_radio('rad2').addresses[0]
+diff --git a/tools/utils.py b/tools/utils.py
+index 8219542e..5984fc69 100644
+--- a/tools/utils.py
++++ b/tools/utils.py
+@@ -6,6 +6,7 @@ import traceback
+ import shutil
+ import dbus
  
-+        HostapdCLI.group_neighbors(*cls.bss_hostapd)
-+
-     @classmethod
-     def tearDownClass(cls):
-         IWD.clear_storage()
++from datetime import datetime
+ from gi.repository import GLib
+ from weakref import WeakValueDictionary
+ from re import fullmatch
+@@ -125,7 +126,11 @@ class Process(subprocess.Popen):
+ 	@staticmethod
+ 	def _write_io(instance, data, stdout=True):
+ 		for f in instance.write_fds:
+-			f.write(data)
++			for c in data:
++				f.write(c)
++				if c == '\n':
++					stamp = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S.%f")
++					f.write(stamp + ': ')
+ 
+ 			# Write out a separator so multiple process calls per
+ 			# test are easer to read.
 -- 
 2.34.1
 
