@@ -1,62 +1,62 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB78914D441
-	for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 15:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 443B814AD33
+	for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 15:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708615504; cv=none; b=Yw2DOkiwcmIjr4nS8R68CEZ9rWNjGTlELBRoBH6whY5VOauQgS7HlzYaeYl8hYcaOqhYr1/YAY0PGSdGZf8Yb7HlC8xasn48ZIejvqTEy0DrF8Q1GCIuEgIFwemEvRxDrgcaCQMYZMsXNsHb0wrP+BRmj0uTO4kbohIm7uHD1dE=
+	t=1708615505; cv=none; b=rn27RbjT68A88sIs4KZfrYISs8aSl21XmKcaERTeiWexT2+/DKZ9dbe1ZohniS9jCaP/e9NJJMJ2SMx3cEtD6wzSYKZQdrutrt0+fnfbZdCH1qg2okma6gfdFNcVZM4MLTXEiU3P4tvooXoDz3pD1txWThCLCgIP/NCDauOKvqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708615504; c=relaxed/simple;
-	bh=fpUhQHTVJUBTgZ8QWi8W0NEhG+GeVRD2i6J7xVV1Uvo=;
+	s=arc-20240116; t=1708615505; c=relaxed/simple;
+	bh=JyNsKP+I/qB+DgwNWT+XvdAENmrt3cBG7GNT1NzO0rM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nNAKbTaEcriDKeRWUc8d8UUBMlQbeXjh6NGaM5Ad8TZ9iHP8kVQo+rr5njULzbu44miDyUFBnYGGg6KKL9uQmH/8wHPqx4jBe5wEIzDYkS4BbR/ueD4+krSEFzYyJiFAlJxepz0IECCzcQcYky1gR7m7z7Rrwe5Xm/V2nJ8C4C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DhtgZFW+; arc=none smtp.client-ip=209.85.214.171
+	 MIME-Version; b=oLDfowkRFFFRPGbA5hqph3llaglYYFPbAqZj92pcnTRKxmEI6n3OO5RePyvXAt7EZeLs03CVgl2UuSVPLrcluIiqmOA1kKQz+udEf8YBD/ebuPH6ZwlnfwWX3Zshu3p6c66d9lZgTHBITpofGCNhLB+pPG9TQXgxuavllXRxNBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YbnP5kGE; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DhtgZFW+"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d71cb97937so79627795ad.3
-        for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 07:25:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YbnP5kGE"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d932f6ccfaso67460765ad.1
+        for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 07:25:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708615502; x=1709220302; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1708615503; x=1709220303; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7RafitYr2Dj70DrmLktgtfBmI71dyspbC8oqI5KIOGU=;
-        b=DhtgZFW+bvaOh9ZPjbmlec1A3FlSjMHpAHSwVWznw0Cmkbf18JDBZvJu7c1nRh6mgC
-         NE0R9K7VrkGmJmgLTmDP2MZfU/uSlOzJPny8WqGrfInADnBsuuBaLX06lczQsH7CoBT9
-         PGJKq7wVjrySQ0SlQkFumBw+RjhdK2lDTooVSGE+NreRgOJ/bVpUM2sToSpLJln/9Dov
-         edpDpVuNcTL9KJCbvlhcEK0+ri7OoGgBojWTlnTo6Y32jkOPkJAuEOLiFCPITeSxKtEn
-         WyZYqyX/KP5e4gbR++G4N1Ly7RPqI53qjjftTvbbzAWpi5aZD3z4Bbhef0e/erwnfeoK
-         ojiw==
+        bh=qxoAzV9F1JlwiHJUV26mJsU1NDAasvYRAeNf4MhWL68=;
+        b=YbnP5kGEuKEgGFpx22iEv80kKev10cLZgmbpbc8gMO26wfrAy5C8fJraCTdUKRkHc3
+         R5MNsYJPzRxEgHUPaxrSASk7EQiIVdNQeCkym+oKBIFzS7mESHqfSw8pFreRz8Dn8T+U
+         pqsCNIMqBZ5aNVt6dmGAr2LbLqiubH5uOUIRpx9mz2hb/nLoNakd5D5MeTbg01Wu0CK/
+         w65p5TIFmUNwK0p5OFumE8zObaSlR/9SECQxfeL4AGrLaa15L5osKlFVZp1sDxL+JUux
+         b8m2xkHIWgVNC9g4yg1QqVoAgQMWiJxGefV6+T6fV8gTO0/aCLAHxCLqpWHdqafLtjs3
+         YAxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708615502; x=1709220302;
+        d=1e100.net; s=20230601; t=1708615503; x=1709220303;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7RafitYr2Dj70DrmLktgtfBmI71dyspbC8oqI5KIOGU=;
-        b=tW7Rx4f+snGbIYi4psmneBpexYxkZbyuAjVWglgHymrLN/hr/cYmoMGm+Gl2GKwQ2P
-         sDPRYVwYEEgoNE2Pe1kotJXAmLCfVev5RfO2n7E/SgtmaSmbH1zchk6axvb4TtkJPvpH
-         BGjXJFQ8R+g7O/apLxhqLocnxQ+VHQOas+7MoB3kOKZUvdemSnSQYW6l93cfgrc0pF9p
-         jlA8wNrRdfaiSV5hk7fc9chEaqpuxUyoFgXap/m3QM+SD5YMB1jQGt+JCWDK+YOOtKu0
-         iLx6caercEI3kQKSmt/Oe2jvaucvenRZCiKiPVdurUYM6/5CMhn6Rv56gJC4wLNsArdc
-         gpJQ==
-X-Gm-Message-State: AOJu0YwsPrAgtHC66E3eHnHEnJ1BwvMzWxnDe++jgjBCvW3Z4v3imgKM
-	c6zAxZECI8AdmBEk5DPxY8AAdJe1pb5Gs92wDB4FrLDjOXIQR60siOuzbCEF
-X-Google-Smtp-Source: AGHT+IH7EkNXXH0ZOvf6MedksWSx8arbHS+aMzwEmtsjdyIGfr3KCXpCBPv2L3miHpXg7SJHedlc1Q==
-X-Received: by 2002:a17:903:124c:b0:1db:65a3:e184 with SMTP id u12-20020a170903124c00b001db65a3e184mr22597267plh.4.1708615501787;
-        Thu, 22 Feb 2024 07:25:01 -0800 (PST)
+        bh=qxoAzV9F1JlwiHJUV26mJsU1NDAasvYRAeNf4MhWL68=;
+        b=Z49H5a5MgwWOHzxuUJPeEFZu6f+5aVRuAp6Gml4AGtlnIdizuJ/q2hS5YisDvB7Mmt
+         EQTyjHxdlwylCC2xm4DjSqT8DgzIh00F94sF+T1MckiwQ+R/Pklr4CYxeDXnAd4ecEtu
+         3BJoWwJSeqHZmIy89AELeiFqJ8lqaetZBDrYz23DiEOafirWK2c4GDm39k7z5T2+8BK5
+         Oi1RP0FhthAVzlYCh4X+xUoTyK8dTLjLcWOn21JUPwy4Hc8Xj7VKx3WwZqlDiyuSdLup
+         z9gzsaSDnaXtv7zodzVQA1QZdDs0ZPavzDV+8yL+2ZBI1kvytykAKK8+r8sjwUUfL16p
+         sh/g==
+X-Gm-Message-State: AOJu0Yz+eSq9b0dmvSTmLY0WwAZ8LY+JSlX2zoMAifsLIgaBjJjv2srT
+	HLqidtZnfrzJrEU8d5PV4faVU3uCehRVZI6qGdTTXhA8jIP+de943JuYQCKc
+X-Google-Smtp-Source: AGHT+IHx/HZLeWtBp82jlNYXn7l2FbEOxMx4Nnx2y2mmBErqyvpaGvtvoQrXSQ126QUvJN31iE7qaQ==
+X-Received: by 2002:a17:902:eccf:b0:1db:f513:28cf with SMTP id a15-20020a170902eccf00b001dbf51328cfmr14951285plh.23.1708615503195;
+        Thu, 22 Feb 2024 07:25:03 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id jd20-20020a170903261400b001d94a3f3987sm10044873plb.184.2024.02.22.07.25.00
+        by smtp.gmail.com with ESMTPSA id jd20-20020a170903261400b001d94a3f3987sm10044873plb.184.2024.02.22.07.25.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Feb 2024 07:25:01 -0800 (PST)
+        Thu, 22 Feb 2024 07:25:02 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/7] auto-t: timestamp log files in test-runner
-Date: Thu, 22 Feb 2024 07:24:46 -0800
-Message-Id: <20240222152451.1541682-2-prestwoj@gmail.com>
+Subject: [PATCH 3/7] main: add runtime flag for setting the logger
+Date: Thu, 22 Feb 2024 07:24:47 -0800
+Message-Id: <20240222152451.1541682-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240222152451.1541682-1-prestwoj@gmail.com>
 References: <20240222152451.1541682-1-prestwoj@gmail.com>
@@ -68,37 +68,66 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The log files become much more useful when there are timestamps
-associated with each log.
+The --logger,-l flag can now be used to specify the logger type.
+Unset (default) will set log output to stderr as it is today. The
+other valid options are "syslog" and "journal".
 ---
- tools/utils.py | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ src/main.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/tools/utils.py b/tools/utils.py
-index 8219542e..5984fc69 100644
---- a/tools/utils.py
-+++ b/tools/utils.py
-@@ -6,6 +6,7 @@ import traceback
- import shutil
- import dbus
+diff --git a/src/main.c b/src/main.c
+index 3ce8340f..acbfdc0c 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -63,6 +63,7 @@ static const char *nointerfaces;
+ static const char *phys;
+ static const char *nophys;
+ static const char *debugopt;
++static const char *logger;
+ static bool developeropt;
+ static bool terminating;
+ static bool nl80211_complete;
+@@ -164,6 +165,7 @@ static const struct option main_options[] = {
+ 	{ "nointerfaces", required_argument, NULL, 'I' },
+ 	{ "phys",         required_argument, NULL, 'p' },
+ 	{ "nophys",       required_argument, NULL, 'P' },
++	{ "logger",       required_argument, NULL, 'l' },
+ 	{ "debug",        optional_argument, NULL, 'd' },
+ 	{ "help",         no_argument,       NULL, 'h' },
+ 	{ }
+@@ -474,7 +476,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
  
-+from datetime import datetime
- from gi.repository import GLib
- from weakref import WeakValueDictionary
- from re import fullmatch
-@@ -125,7 +126,11 @@ class Process(subprocess.Popen):
- 	@staticmethod
- 	def _write_io(instance, data, stdout=True):
- 		for f in instance.write_fds:
--			f.write(data)
-+			for c in data:
-+				f.write(c)
-+				if c == '\n':
-+					stamp = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S.%f")
-+					f.write(stamp + ': ')
+-		opt = getopt_long(argc, argv, "Ei:I:p:P:d::vh",
++		opt = getopt_long(argc, argv, "Ei:I:p:P:d::vhl:",
+ 							main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -503,6 +505,9 @@ int main(int argc, char *argv[])
+ 			else
+ 				debugopt = "*";
+ 			break;
++		case 'l':
++			logger = optarg;
++			break;
+ 		case 'v':
+ 			printf("%s\n", VERSION);
+ 			return EXIT_SUCCESS;
+@@ -519,7 +524,12 @@ int main(int argc, char *argv[])
+ 		return EXIT_FAILURE;
+ 	}
  
- 			# Write out a separator so multiple process calls per
- 			# test are easer to read.
+-	l_log_set_stderr();
++	if (logger && !strcmp(logger, "syslog"))
++		l_log_set_syslog();
++	else if (logger && !strcmp(logger, "journal"))
++		l_log_set_journal();
++	else
++		l_log_set_stderr();
+ 
+ 	if (check_crypto() < 0)
+ 		return EXIT_FAILURE;
 -- 
 2.34.1
 
