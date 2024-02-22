@@ -1,62 +1,62 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5BE14C5B1
-	for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 15:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD26148FE6
+	for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 15:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708615508; cv=none; b=PDfJ8wDfdhVW9XK3L7DspQjs94Uj3vMt4p3eY6vUb6mSlHiqZBPGhWV5Fa9sW+phLimW0g+t7cJ3CuKJzj63GrbDz8uairFvO0UBJBIpE0eLmOU4fP3RIIgFKUh+BGciIh+agpQLhjkig5jI7f6VnPgMY+A+rt5pC9pdWrirMLw=
+	t=1708615510; cv=none; b=pcIe1Y8KixEv7dZ0fk6ieXDATX962cvWYXSzTeZTbFVIRafRahKoWoyJom3pNMZYapmOO56JBZD2iynuVSc8S2RfKbDJ3HER3ULwlkQ+Hx74YYKHUDq1wNqo/fsBjzuVS1ZmGFMDyK1W2nnGi7j+FFlM9+BQlNfh1ds63rz8pwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708615508; c=relaxed/simple;
-	bh=Z61jTqYf3mrqIoBl4vwh0fodGPv+kblLyeNMBdac2vQ=;
+	s=arc-20240116; t=1708615510; c=relaxed/simple;
+	bh=W0bZObP3tVFXeX9n82rV3ag9yqIcamebywg3CMtpTQs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CKfFrHUUjRcL3iYyUKN9+a9As8QxxR13dm9AHJG7v4L1f/qVcqAMibIQlwO5DiqUJdq3/BE0K33xL/2NxJ2CVBPG+zjcngePhdtulBX/sGUuD7XUMy6Y8ZwYNSfE8yD1WZvCaI8jNrkte0zJ3/IV2ERDxvKQRN+cjC04KP0xTjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cWkJb/cX; arc=none smtp.client-ip=209.85.215.182
+	 MIME-Version; b=tSwTHHNGkrOE3Cq3UF1SwOuEvijABhG9pYjOGir+R0m+cZZadeYNyKk0USL2rwb0syr54wQflL58pv2seHV591DZEh6h4sY1jTi/g2xucRQJlt5+E8k/ujB+Wo4YDO43Xdkopk23gCQ5CXiE5Ew9XQKn5NoAqqcrZiRvqUEyR4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GzHDvnv1; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cWkJb/cX"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5dca1efad59so7231548a12.2
-        for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 07:25:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GzHDvnv1"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d731314e67so58362745ad.1
+        for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 07:25:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708615506; x=1709220306; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1708615507; x=1709220307; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+RxDxZNcWgZxObjqXsUDIT4GiaFdU7jw+jB2BudVupQ=;
-        b=cWkJb/cXf57O6iP6hY3Gt1nSB97RWNOJe4tWWS/DFJDoozHnNC57w+DAv1JgKs4Ar1
-         Sw9hWCwaRYi8ksPetVY8ceoPOFfTwIaizJ3QpzXfQAcAJuOWsDuTSbXcEYvEjRoatba+
-         MQgm3o3i/QOMHkNh8ZsZ8iYRszELP9NDNnkm3mgnC/wfDVhwZVZIZzvOVPUqSIQ/xr1e
-         O27XPJShj7eeQQRX2f3FQ6WTkL4jgnJ1d/CODtpkGfMizqKAOWXZqGkeWtec0h0xOSSM
-         /9IETZVpfg0VQePFq7IEZQOzSrFeRC5omCAGcfcy6BNXmz32ZHysHM1nznke4Hf1WCpN
-         szpA==
+        bh=D4nImlvJnivfs9V0+/iuGxuAV9smyFbHtiNjuzhjiog=;
+        b=GzHDvnv1D2ouL+6vzOd5I8nUUVWQag4rbqPUzeZXZpsHhn06ntHvaYE77S/+YlCBES
+         8Y3OM/Q4KrIyYjL7P+F3KJFj+ewgzQNM4l4gNxConpdHj9Fz1RFPlbA2KaBa44dLWuMa
+         5bp3FtzJ7crjzavyJ/jcgWm6zt0FVW5IjYgn2naqAe/JvE9AL7mpp5YiuSQj4AQ9h/So
+         XqNmtLV75DoVYA9uD+K72T/mJbApBxTLwyrzzqxTlG3wJx49Mc40p+/wFEVDHoCT57/U
+         gclLZ495oISJ3KdCzcHJgAPujMC6Lc1GxsSOjNmVbVzLSq3rAlYU3eiU+cFKQKouacn/
+         bzvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708615506; x=1709220306;
+        d=1e100.net; s=20230601; t=1708615507; x=1709220307;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+RxDxZNcWgZxObjqXsUDIT4GiaFdU7jw+jB2BudVupQ=;
-        b=KyHU9TgWUKEE0DAMxiFkAy44mhhEwdQyFmVx+TS7O5KqgMUbNSLH2lvS79L4TPJ7Vc
-         Ho8g657lqh+Pb6rWL24HzEXtlmg3WvRfDdIVvWA9kO9jqmdvNKbpaXxsZsUMR4NOaz23
-         zToFWixqK/ntYH1MINrffD41c2r85q23dPjHFt2fB8HJsZQ7ywOgt0BfwSmZLA8af7s8
-         5Z/GSwyzGhVEJiFmaxFobFAsLv9lB4b7kRrJfsSf5hxRna3wZQ2MkAUBRca/IM6VztZq
-         kSLL6pVHFPg5n5+iyMKtoegi/O9DCfGdvcCIYzAS8zJ9MIMkE4MWVmHD9hDQZutYgKGH
-         1Hug==
-X-Gm-Message-State: AOJu0YxLryNC9FenG6TaDsBsiO2MvCDP/3+MOB41lp1HMit/BFBYpx7q
-	NqKg51EyxEpvq20rVyRbz8e2WTF+ljczGus8vrbjQyEmrHiF3tybL8nfOR2H
-X-Google-Smtp-Source: AGHT+IHo1bksQWoljLl3/SrYEuRKS47T0XOeWj8UJ5hubtnyBvr/syezsHAEgZusj3Dd+jY1sDo4bQ==
-X-Received: by 2002:a05:6a21:164e:b0:19e:a1a2:4c53 with SMTP id no14-20020a056a21164e00b0019ea1a24c53mr2360557pzb.1.1708615506097;
-        Thu, 22 Feb 2024 07:25:06 -0800 (PST)
+        bh=D4nImlvJnivfs9V0+/iuGxuAV9smyFbHtiNjuzhjiog=;
+        b=iG6cEAwjh3//fgpu3y2/yC0ZvUzryJRVDNAOc22Gpv0l5KmQvpBmh17IlAzUq5lseR
+         TgLiZwRZjlfTAg/ewm+2YcagXfXLwfQmfyKfVmvzfpgiijhujyaGJAk6Tgw/v/XSEBQz
+         wKDyEZsQj3hr9zVC+fmbXO0q90Z38MTqMah3CPFKlxY6t+/wLIfj3rA1XtQhfqz35qRn
+         Pc6S4y89ASqpmXGWVcf5MXJEzQG6lOqpcwkfbR9foZqoGQqM/sr5Uu4VTB3cmy2970cX
+         LExcaLRWjqogm1tLU7U7sECZ0U/YA1J1m1EYCqHMKrO3zNBx7QsaQ6zbQ5AhO+G5r0aI
+         Kb9g==
+X-Gm-Message-State: AOJu0Yy6IakHuO4U43my2PIdgk15QKDDyFVmF027QCYfG46L6viGwBFo
+	f4ory12JJL6K3UNIvMzrVFWc53oYC82V1clhVK3kg6EhBjl0bozSPFhTUF6k
+X-Google-Smtp-Source: AGHT+IFbm9FTsr2sL0MH543nYtSsBwodqT5WtQglAgtHdjDqaKeKLsmXBvPrK47IN7X04Ryi3yYI5A==
+X-Received: by 2002:a17:903:24c:b0:1db:63aa:6d33 with SMTP id j12-20020a170903024c00b001db63aa6d33mr23526546plh.4.1708615507561;
+        Thu, 22 Feb 2024 07:25:07 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id jd20-20020a170903261400b001d94a3f3987sm10044873plb.184.2024.02.22.07.25.04
+        by smtp.gmail.com with ESMTPSA id jd20-20020a170903261400b001d94a3f3987sm10044873plb.184.2024.02.22.07.25.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Feb 2024 07:25:05 -0800 (PST)
+        Thu, 22 Feb 2024 07:25:07 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/7] doc: document use of l_log APIs
-Date: Thu, 22 Feb 2024 07:24:49 -0800
-Message-Id: <20240222152451.1541682-5-prestwoj@gmail.com>
+Subject: [PATCH 6/7] station: use iwd_notice for state/event information
+Date: Thu, 22 Feb 2024 07:24:50 -0800
+Message-Id: <20240222152451.1541682-6-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240222152451.1541682-1-prestwoj@gmail.com>
 References: <20240222152451.1541682-1-prestwoj@gmail.com>
@@ -68,38 +68,130 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With the introduction of l_notice in IWD some guidelines need to be
-set for l_info, l_warn, l_error, l_debug and l_notice.
----
- doc/coding-style.txt | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+For anyone debugging or trying to identify network infrastructure
+problems the IWD DBus API isn't all that useful and ultimately
+requires going through debug logs to figure out exactly what
+happened. Having a concise set of debug logs containing only
+relavent information would be very useful. In addition, having
+some kind of syntax for these logs to be parsed by tooling could
+automate these tasks.
 
-diff --git a/doc/coding-style.txt b/doc/coding-style.txt
-index bf0535c5..882de026 100644
---- a/doc/coding-style.txt
-+++ b/doc/coding-style.txt
-@@ -317,6 +317,21 @@ Functions that are static should not be forward-declared.  The only exception
- to this rule is if a circular dependency condition exists, and the forward
- declaration cannot be avoided.
+This is being done, starting with station, by using iwd_notice
+which internally uses l_notice. The use of the notice log level
+(5) in IWD will be strictly for the type of messages described
+above.
+---
+ src/station.c | 34 +++++++++++++++++++++++++++-------
+ 1 file changed, 27 insertions(+), 7 deletions(-)
+
+diff --git a/src/station.c b/src/station.c
+index ea505ca2..8817637b 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1561,9 +1561,9 @@ static void station_enter_state(struct station *station,
+ 	bool disconnected;
+ 	int ret;
  
-+M18: Use appropriate logging levels
-+===================================
-+An appropriate log level should be used depending on the type of message
-+being logged. Logging is done using the l_log APIs in ELL:
+-	l_debug("Old State: %s, new state: %s",
+-			station_state_to_string(station->state),
+-			station_state_to_string(state));
++	iwd_notice(IWD_NOTICE_STATE, "old: %s, new: %s",
++					station_state_to_string(station->state),
++					station_state_to_string(state));
+ 
+ 	station_debug_event(station, station_state_to_string(state));
+ 
+@@ -2352,12 +2352,16 @@ static bool station_ft_work_ready(struct wiphy_radio_work_item *item)
+ 				roam_bss_rank_compare, NULL);
+ 
+ 		station_debug_event(station, "ft-fallback-to-reassoc");
++		iwd_notice(IWD_NOTICE_FT_ROAM_FAILED, "status: %d",
++					MMPDU_STATUS_CODE_INVALID_PMKID);
+ 
+ 		station_transition_start(station);
+ 		l_steal_ptr(rbss);
+ 		break;
+ 	case -ENOENT:
+ 		station_debug_event(station, "ft-roam-failed");
++		iwd_notice(IWD_NOTICE_FT_ROAM_FAILED,
++				"status: authentication timeout");
+ try_next:
+ 		station_transition_start(station);
+ 		break;
+@@ -2384,8 +2388,10 @@ disassociate:
+ 		station_disassociated(station);
+ 		break;
+ 	default:
+-		if (ret > 0)
++		if (ret > 0) {
++			iwd_notice(IWD_NOTICE_FT_ROAM_FAILED, "status: %d", ret);
+ 			goto try_next;
++		}
+ 
+ 		station_roam_failed(station);
+ 		break;
+@@ -2457,8 +2463,10 @@ static bool station_try_next_transition(struct station *station,
+ 	struct handshake_state *new_hs;
+ 	struct ie_rsn_info cur_rsne, target_rsne;
+ 
+-	l_debug("%u, target %s", netdev_get_ifindex(station->netdev),
+-			util_address_to_string(bss->addr));
++	iwd_notice(IWD_NOTICE_ROAM_INFO, "bss: "MAC", signal: %d, load: %d/255",
++					MAC_STR(bss->addr),
++					bss->signal_strength / 100,
++					bss->utilization);
+ 
+ 	/* Reset AP roam flag, at this point the roaming behaves the same */
+ 	station->ap_directed_roaming = false;
+@@ -2561,6 +2569,7 @@ static void station_roam_scan_triggered(int err, void *user_data)
+ 	}
+ 
+ 	station_debug_event(station, "roam-scan-triggered");
++	iwd_notice(IWD_NOTICE_ROAM_SCAN);
+ 
+ 	/*
+ 	 * Do not update the Scanning property as we won't be updating the
+@@ -3159,6 +3168,8 @@ static bool station_retry_owe_default_group(struct station *station)
+ static bool station_retry_with_reason(struct station *station,
+ 					uint16_t reason_code)
+ {
++	iwd_notice(IWD_NOTICE_CONNECT_FAILED, "reason: %u", reason_code);
 +
-+l_error   An unexpected condition ocurred. These are generally fatal to the
-+          current connection/protocol that is running but not generally to IWD's
-+          overall operation.
-+l_warn    An unexpected, but non-fatal condition ocurred
-+l_notice  Should not be used directly. This log level is reserved for special
-+          event type notifications which is handled by iwd_notice().
-+l_info    Information that is expected during normal operation. l_info's use
-+          should be very limited so non-debug logs are concise
-+l_debug   General debugging. These can be used relatively freely but should
-+          provide some piece of useful information.
+ 	/*
+ 	 * We don't want to cause a retry and blacklist if the password was
+ 	 * incorrect. Otherwise we would just continue to fail.
+@@ -3209,6 +3220,8 @@ static bool station_retry_with_status(struct station *station,
+ 	else
+ 		blacklist_add_bss(station->connected_bss->addr);
  
- O1: Shorten the name
- ====================
++	iwd_notice(IWD_NOTICE_CONNECT_FAILED, "status: %u", status_code);
++
+ 	return station_try_next_bss(station);
+ }
+ 
+@@ -3369,6 +3382,8 @@ static void station_disconnect_event(struct station *station, void *event_data)
+ 	case STATION_STATE_FT_ROAMING:
+ 	case STATION_STATE_FW_ROAMING:
+ 	case STATION_STATE_NETCONFIG:
++		iwd_notice(IWD_NOTICE_DISCONNECT_INFO, "reason: %u",
++					l_get_u16(event_data));
+ 		station_disassociated(station);
+ 		return;
+ 	default:
+@@ -3508,7 +3523,12 @@ int __station_connect_network(struct station *station, struct network *network,
+ 		return r;
+ 	}
+ 
+-	l_debug("connecting to BSS "MAC, MAC_STR(bss->addr));
++	iwd_notice(IWD_NOTICE_CONNECT_INFO, "ssid: %s, bss: "MAC", "
++					"signal: %d, load: %d/255",
++					network_get_ssid(network),
++					MAC_STR(bss->addr),
++					bss->signal_strength / 100,
++					bss->utilization);
+ 
+ 	station->connected_bss = bss;
+ 	station->connected_network = network;
 -- 
 2.34.1
 
