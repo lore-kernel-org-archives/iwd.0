@@ -1,114 +1,87 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247D914C5B7
-	for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 15:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60331482E9
+	for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 15:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708615511; cv=none; b=BFRvuxtZif9NXVI4SFIQurbsE1QgBrKAUH/2gysRP8TwzZnhyOBW/wpOHbNN9V7RmKbOsLrbOT+WktjUwNsjsG0ZriZ1tJd8ekfIEq3mgau2nAlnQfBzeIpL8ORaTpAL/QxQVGhUwzPuQDP7HlSM/2RlU9VK7yLLVv//HEAhN1M=
+	t=1708615626; cv=none; b=bPCf3UQjZ64fUOYNBPxnTflmZ1XlAjS9+w5PAGx3QgTz5p969rlN5xC9PeUB4ma6iDQ4fYTa19I28ZE+IIAdhTDGtKyvAoU+WD9WixSl8nsynE1svhYk86lNZPJWl8nxP+T2Zy7mYGo606GP+OjfK+/b6EOwraDD7dPRQ9cpO/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708615511; c=relaxed/simple;
-	bh=OPTjDuDsRK7620EYtq3/5CDRjuN0n7CJU5rBzGMT2JA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kfQqYgu9vx9fVYLQGRAD3RXvYaJ+y87jab59t0vjRK0JPzelRP5UziYrGJHpPtlF8i4Wi3Xw6EIheTlCtCIvnLbXzgm+LlxoxTvE6Xgtb8tMzKu3AcVY+oGu3YDWYvsIMszs8KJoQEWSVDTgT7duXtAkR/xo951UxGWasV/Mods=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FbdlhEZG; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1708615626; c=relaxed/simple;
+	bh=YPhGy4U4xE7HQZLAjWw1Bu2TY8L18HrUgps7uZwkhxs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=rnmWde86cw8JajXa1WIiOKv9Df+xJKqb+0l/RA40Vaha7aPDJ7SgP9cl8Yfp7esjCdPcLSAWt5z54BflZcZpkhCuu78yRAM1kmMx+b9MDsZj8mlt8bjX9AhQAzfIyMUksCute6chzQNHIMBliac25NMd/TuwE3YcMzI33+YPdAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D1HOjUcI; arc=none smtp.client-ip=209.85.167.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FbdlhEZG"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d7232dcb3eso49160885ad.2
-        for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 07:25:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D1HOjUcI"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3c0d59a219dso4893853b6e.0
+        for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 07:27:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708615509; x=1709220309; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JypMPKGmXYBsDH+kYyFeMEQU9sI1BHdfLWt+nnqgLz0=;
-        b=FbdlhEZGAkjIUih/NOlGREyHs+IXdHjpkktY8HEu01sFnTop08E3jsRa5mLTEBiPWS
-         +lcgzaWw9GE9NSUBSNgSes0l1ajvbn+/hJLYlIRuEOVWwAIiCwBZC7m2at3+BHpGVmaE
-         P54nA0mdVlaGrXpc9q9fnmcDs5VvmFiFvRV+q28r7Hij90A0qj6cxb9WbsAUTjLi0j3Q
-         YO0zhfCfU5KDB9tWlnl0eeTpq+3uebyOfh/jKDoDMx5Jy3qBdshEW0HCNOdJfL20feFZ
-         /Hmcr0E4ZwQ03/+m6A7AKS50TyVLmmAX5a0bnOzxO1UtS4wCzlVm8Vevm/9FLhyTsah4
-         sgQA==
+        d=gmail.com; s=20230601; t=1708615624; x=1709220424; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vKapbjmk8whoR8k60itumfxWkEJzu5N3M4fY2lF8+08=;
+        b=D1HOjUcIKavI0EPWPygvvip4yd45m460Qm2qp9+bI36B1GDrAmFT83f9sVWg4trrMT
+         /PdBfsBm+ggBWXepStjf62jRWH7Uzwr5/wgGVdrr/v17ecBFq3Xkyn3xGnClyW7tTp+u
+         YXiRC0MtCaJChrX0faJtNLuJqPg/qTbaK8A1THXlaHpXpNOqPMC6hgLruIjOJkYxzdn7
+         V3sisV1Z78W8g0m3bXvc5sXSvtFU8vdnvuNwRZHnhs0e/D36oBZX14TWBltPTkFuxmn9
+         RWFycwcSRF5yVAm5kkkwdgfVn8W2DsqjyMQ+HncYnd5iWG/2ZxSPQtgXMFL/r491DRMf
+         +KbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708615509; x=1709220309;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JypMPKGmXYBsDH+kYyFeMEQU9sI1BHdfLWt+nnqgLz0=;
-        b=EJu+Xq2srOBu+fTufOaiJVAcIe88GxQiqIb5Ll+1K6sUzWA53G1EAgdbW/56jxXGq7
-         tpnJ85MhuZkcqI9xou1fiVjCJhsLsMw4JRfAPZhJax435YIy3LwpPjSZRH4NydnpnFq8
-         ITj0t3DFsiZ9eS6QHa0Pa+pfZXO6W+cSG4VP1xBdufhvLTLd21vUwgRURiP0A3a1YaNM
-         hqU7ET9XFZaNaU9LKX7f+lZVt4KX2u8fIf1ammTcOMnHA5lLNDqmQkHJnfDJ+dLdzcmI
-         dOhax+eJF5zFXvePjYRdZJRXfVuauOKDXKOtOsoN6Up7RqGfApec37tHUI+KeYPoCLOv
-         9oww==
-X-Gm-Message-State: AOJu0Yxv5LrGYzx0qsc+RbAuFnGCeAkp4cZ737/BEgTfxsxNWKe9HKIi
-	63JsqkMPyik8hu9vpIdzAjORiS9QqSpAGA77tteQ/JjCt71yr+51IWDcwyQS
-X-Google-Smtp-Source: AGHT+IGIC45DWrRJsqvdscCMDaKiWyj+jR8pt4UeIvNNezrt56NilewpKlvjzDn7HHi++bBSPG/s4Q==
-X-Received: by 2002:a17:902:7243:b0:1dc:49ab:98b0 with SMTP id c3-20020a170902724300b001dc49ab98b0mr2004720pll.35.1708615509260;
-        Thu, 22 Feb 2024 07:25:09 -0800 (PST)
-Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id jd20-20020a170903261400b001d94a3f3987sm10044873plb.184.2024.02.22.07.25.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Feb 2024 07:25:08 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/7] netdev: add notice events for connection timeouts
-Date: Thu, 22 Feb 2024 07:24:51 -0800
-Message-Id: <20240222152451.1541682-7-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240222152451.1541682-1-prestwoj@gmail.com>
-References: <20240222152451.1541682-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1708615624; x=1709220424;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vKapbjmk8whoR8k60itumfxWkEJzu5N3M4fY2lF8+08=;
+        b=VqqTysF8nwu2RZhPSusfWDEVcXx7mTE/XBWxiOOWejJdEesF2yg21OGjHRTZtYMXqh
+         d07iLihqec7m8s6BIitGrXCHjH+9c6qDdwfhfhHPxA9fUsGD0qZOJDT8E3R4Bb4p3XXF
+         ACBMOM2uARbn0hb/+ZTCAXQmN+9gWYIRjli+Z1W+IFqiO4E/JgLho/F6g/u61RmREqrZ
+         M6qmeS9Lves/CbcfIcyx/csV4W+4E/gpRRs3qqPLXpfMVumGSJcGSf3503JouXV71V0I
+         ZJ7RDRR0Gu9wnXf+pvacbRlZLdt7bVnVmHpNmoMBn4YIkiRTC6/Qya4kd8ptc/U+J7bk
+         YxTw==
+X-Gm-Message-State: AOJu0Yy5KuXuvHdmF0Xe6m1h9+4HxwToePzk4bD3F/rLBvrsQp18TCez
+	M4QhfKBprg3bOvZb8Nfic4dvB5N7Hq06ywOvGqPHbxhQl7oIAWNrqCwr8P98
+X-Google-Smtp-Source: AGHT+IErqbVyW8G50VGv6T4jfl7qsHc/zM+5qBNOclOdoH7xOv2hIsN1XeG5IzJ/eOsN0D4LejoNJQ==
+X-Received: by 2002:a05:6808:f11:b0:3c1:4aa8:895f with SMTP id m17-20020a0568080f1100b003c14aa8895fmr17764652oiw.3.1708615623802;
+        Thu, 22 Feb 2024 07:27:03 -0800 (PST)
+Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id bd14-20020a056808220e00b003c18039f8bbsm158400oib.54.2024.02.22.07.27.03
+        for <iwd@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Feb 2024 07:27:03 -0800 (PST)
+Message-ID: <d5015f0b-fb62-4ebd-a088-a39a4f9f4171@gmail.com>
+Date: Thu, 22 Feb 2024 09:27:02 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] wiphy: Remove basename() use
+Content-Language: en-US
+To: iwd@lists.linux.dev
+References: <20240214205523.1109159-1-denkenz@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240214205523.1109159-1-denkenz@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The information specific to auth/assoc/connect timeouts isn't
-communicated to station so emit the notice events within netdev.
-We could communicate this to station by adding separate netdev
-events, but this does not seem worth it for this use case as
-these notice events aren't strictly limited to station.
----
- src/netdev.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+On 2/14/24 14:55, Denis Kenzior wrote:
+> basename use is considered harmful.  There are two versions of
+> basename (see man 3 basename for details).  The more intuitive version,
+> which is currently being used inside wiphy.c, is not supported by musl
+> libc implementation.  Use of the libgen version is not preferred, so
+> drop use of basename entirely.  Since wiphy.c is the only call site of
+> basename() inside iwd, open code the required logic.
+> ---
+>   src/wiphy.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 48fb15df..8a7ff092 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -2639,7 +2639,8 @@ static void netdev_connect_event(struct l_genl_msg *msg, struct netdev *netdev)
- 	}
- 
- 	if (timeout) {
--		l_warn("connect event timed out, reason=%u", timeout_reason);
-+		iwd_notice(IWD_NOTICE_CONNECT_TIMEOUT, "reason: %u",
-+				timeout_reason);
- 		goto error;
- 	}
- 
-@@ -2931,7 +2932,7 @@ static void netdev_authenticate_event(struct l_genl_msg *msg,
- 	while (l_genl_attr_next(&attr, &type, &len, &data)) {
- 		switch (type) {
- 		case NL80211_ATTR_TIMED_OUT:
--			l_warn("authentication event timed out");
-+			iwd_notice(IWD_NOTICE_AUTH_TIMEOUT);
- 
- 			if (auth_proto_auth_timeout(netdev->ap))
- 				return;
-@@ -3032,7 +3033,7 @@ static void netdev_associate_event(struct l_genl_msg *msg,
- 	while (l_genl_attr_next(&attr, &type, &len, &data)) {
- 		switch (type) {
- 		case NL80211_ATTR_TIMED_OUT:
--			l_warn("association timed out");
-+			iwd_notice(IWD_NOTICE_ASSOC_TIMEOUT);
- 
- 			if (auth_proto_assoc_timeout(netdev->ap))
- 				return;
--- 
-2.34.1
+Applied.
+
 
