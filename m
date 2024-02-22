@@ -1,59 +1,59 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9F314C5B4
-	for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 15:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C965E14F9F6
+	for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 16:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708615840; cv=none; b=ci0KpI1MSQUnDmjvCwp3i26EKL1/DXwq2D1VweD8psGoSqQ6LqkSIxM7AiIqfFuZaELyfeTjayMP32csrxJ8fE+3Px2O4dTzcGw41uJmrgE1tkjbuCxrdbW6KIGsE2QCwS4obLoUfuNVLTGLqtqlkDH7AhtuwSdGoO0NCKOb+84=
+	t=1708618570; cv=none; b=J7ARmMZfvDZZZmhu/RyaJAekHfBeTLYhW5rjkmpq59Bq51ZfIJFHwf450EkVBGxwSlo96ngbvl7TFHQYx3h+aeT0dyIIhMTdtVEY8GmZcx10flv6AbGFH9QakuGoxNyarPYvSJXNmU/7xGz2b9HL85y2fvIB2H428mKu+5veuz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708615840; c=relaxed/simple;
-	bh=TrhHO6iYrrl3gJOVM0Ry00utYDuI+TQQts+cb0xHHxo=;
+	s=arc-20240116; t=1708618570; c=relaxed/simple;
+	bh=fLj4U+5tlqxonJUNUk9Qp4fdMUy1h8naXGf0MmbK0PA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=fBCJRWTSnO/AH8bpHXui+Ozk+0qlr4Cyps04QEtAQy9IvdVROSR8fThMuC2RCLHsT2nCqdxjGWxk+wWe0Xqd79+C927aju+4EXbpNqfq3NHpKPzMcJ3bH15fwkIVeryf4CreKa5kzC4cAsMeMMEzSKAPL4ALt+Fu0Vb7kxW08hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dbJ6kISj; arc=none smtp.client-ip=209.85.210.46
+	 In-Reply-To:Content-Type; b=jzIPBnxocF2MLG/aO+HNbq/b1p01Y7UPgkoeiT1bnJi7Kabuv9md/fycXwVU/hIabYA0Mc+oiX0msQy0/xHGbiaCnQTWYm/XXZ37Jc9glbnZGOLCY9K/B5rM0Rz8JgHVB6LuzLpgeGoZh0eGocMUSDdJ7V6sJtKJNgAsKLT6Y2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dzbnecgv; arc=none smtp.client-ip=209.85.160.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dbJ6kISj"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6e125818649so908111a34.1
-        for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 07:30:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dzbnecgv"
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-2185d368211so1017887fac.3
+        for <iwd@lists.linux.dev>; Thu, 22 Feb 2024 08:16:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708615837; x=1709220637; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1708618568; x=1709223368; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+oiNDKvnyjfqsfNQMLoZ1o2vhgWF5A1sVDVQZcgC660=;
-        b=dbJ6kISjox68NRlCIxG60t2kU/PJPKjtdhwZA7nfazbORdK6qOgc0/5BtpvIe9wAPj
-         MtbMsgIIM1SDH0GRNr8X7FG0PZkKh5r16vhnkuk/MZ3ftlLizN1Gzvt4SG571n3bz38z
-         WQBBlh+MetT7LH5G7IhHntIZQYPLmmHAGW1hKyOPe8u1uo0xF8CYbzLVt2OmeS4eLa4W
-         tgXRSlCRVZLRzIffTkZzfKIlvBF0pCy5WwCmA1WjvaabCfdwlE8gpO+INEpiYOmx97s3
-         DqFzwT6/O53fpq3iy/dvD//oaMgrYU4D5tst9evkofKAPgucMTboq7ZopI4PpwCmmlcP
-         dW6w==
+        bh=n0OfMHHP5ULAr/QusxCuWrlxz9qKE39/gbMzWeXr2ZI=;
+        b=DzbnecgvE84xc9fpSWQ+osiBDJl8oGmGyf6yiv01rAnFJ4DCW7vBMqCbxTs1EHhdb+
+         UA3xuSj1kESF3AvAi8cl5tRiujwEQ5b9Mmqf16Zd8jvwzCRAU/93JR/dgcphYFsYVcGp
+         LdecqdNpaqS6Lg1QGYYN7854/CWbCYzdxn9lpBTtr57/VXIZdpMGbUQOhqVWV2v+RciA
+         WwrnL0goihyrUpAHTT2iSf6fLohIXMWlVVI3QQNMU21dgA/v4rxFBRO64rDB/6pBLPqP
+         36Gt7Cvp6OReCspnQVkt/Znj1JMT5lql3aPst/9RDynrt67Swi3lLFY8t9QbDQvhpu3R
+         KOqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708615837; x=1709220637;
+        d=1e100.net; s=20230601; t=1708618568; x=1709223368;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+oiNDKvnyjfqsfNQMLoZ1o2vhgWF5A1sVDVQZcgC660=;
-        b=HXAV3hRgW16AzRr0v8uchqZYNm8bSbNeDcCBso7biUWGdZrsclg/ekXdPT/MQdfShd
-         gl4qRwSIY/MkgoUH3gWlrYf4AYBr2KKTOf8HDX5hxCkIT5ShkHaepyCAhdotoRFz7yB+
-         lw02Bxq7OIiAqX2a9CsrllDEVIc+p/NgO+tvRM9L4frGYEgNYxfN8UxwAPkn7BXMfIXS
-         K74dEVHQlI8GXS9VYKgx9eTFDM02k73UJmx0LuWpJR7SIMH1xMHNjbm7K9pJcab2ByVx
-         WOzcnJzgIFYQ9zd8uOcVlwnhBZghrC0HGgWkyzXYcf1cmOW3myG8dABQ3yQq3MiH8+iA
-         nJmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUA6JPsOaRgfOlVvidevkidnf/fZrlC+R6iGtbejh328p1MpwonxUsxw4NnHXpJaet3VGP9WeVTmHN3b0aoZGOHnHFo
-X-Gm-Message-State: AOJu0YwBMSILc5zyB4t2e0mYy7RJFVrbCE1lnv7foLK2FqCphvVctf0F
-	pb3/mB0U1JQL6ubAGYHyysbwzrrMjYIVBiu0d4wm9vkHCK1qD7oT
-X-Google-Smtp-Source: AGHT+IHyiC7bdodcyJoFLhIRO3h9g7k4NSHgsFdjZTgimUj/YXY2/jkYKKB8q3yjc0b76btpT659pA==
-X-Received: by 2002:a9d:7e96:0:b0:6e4:3e94:d706 with SMTP id m22-20020a9d7e96000000b006e43e94d706mr17213830otp.2.1708615836923;
-        Thu, 22 Feb 2024 07:30:36 -0800 (PST)
+        bh=n0OfMHHP5ULAr/QusxCuWrlxz9qKE39/gbMzWeXr2ZI=;
+        b=BFG/dmrYpLArdsP1uMrVJZTO0D5khWFaF0aK6FPOVJs7lCbskQGPv1j2CUdNPORJu1
+         v7JWe0nwe8JiAEreuDVNVQUk6oK72QjjXVJURaIeRiIusJ+VjxbokCUOX4Gvndq9nSYX
+         S94qLiMG08NUFzptWj3pco4LohIxjrQOyZhWw9K8UmXYdy9VhUla5vcomIc6RbzYCxdF
+         vU5qHYXb+KJUiv4TC7UJVoRY/XAHm2bdP39AII1/+fmDJf6K9sJGX9pEvOCPzpvs6PLr
+         iykyAM646I4q3u1u1I5sJyMq9vfXId5ob5wrH6U4yI/5WudPFIv2z7mJp2xdchgvlCqz
+         8YlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXT4nZuGxmpJ4V3j0Z+QAT6uRXA/R1GSW2JXqpj+r5+SiELe7YPFc2rqSaeMBs1EgxkHxRo9HENAJAmelFr+KMfX8yi
+X-Gm-Message-State: AOJu0YyEmBZmxxABcRWGnZPld7ujjompiYNs5FzxJYmOBZtL+kSXaKUB
+	W8RjYvRABuVCB7X90yNaexbwNS2Ue1qv0lAOqfqfk+hYOiTq2QRJ
+X-Google-Smtp-Source: AGHT+IE7OIuoYY13oTyDSoYvKrnBcPv4FUG877ARBZo/kMuYj/WbsEAyK/1ALGKd9LF5MomYn0GKRA==
+X-Received: by 2002:a05:6870:b4a5:b0:21e:7a82:3feb with SMTP id y37-20020a056870b4a500b0021e7a823febmr19905686oap.33.1708618567705;
+        Thu, 22 Feb 2024 08:16:07 -0800 (PST)
 Received: from [172.16.49.130] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id m20-20020a9d6454000000b006e34506c5e5sm2050463otl.57.2024.02.22.07.30.36
+        by smtp.googlemail.com with ESMTPSA id nz6-20020a056871758600b0021ed5ee3c77sm2127292oac.16.2024.02.22.08.16.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Feb 2024 07:30:36 -0800 (PST)
-Message-ID: <86d4712e-8072-45d5-8385-c225ea9309e6@gmail.com>
-Date: Thu, 22 Feb 2024 09:30:35 -0600
+        Thu, 22 Feb 2024 08:16:06 -0800 (PST)
+Message-ID: <7a8d7491-95a5-4823-b749-79198a04f24e@gmail.com>
+Date: Thu, 22 Feb 2024 10:16:05 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,28 +61,28 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] auto-t: fix failed_roam_test to pass when run on its
- own
+Subject: Re: [PATCH 3/7] main: add runtime flag for setting the logger
 Content-Language: en-US
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240214193021.963130-1-prestwoj@gmail.com>
+References: <20240222152451.1541682-1-prestwoj@gmail.com>
+ <20240222152451.1541682-3-prestwoj@gmail.com>
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240214193021.963130-1-prestwoj@gmail.com>
+In-Reply-To: <20240222152451.1541682-3-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 2/14/24 13:30, James Prestwood wrote:
-> When running this test with others the hostapd neighbors are already
-> grouped which lets the test pass. On its own this does not happen
-> and it fails.
+On 2/22/24 09:24, James Prestwood wrote:
+> The --logger,-l flag can now be used to specify the logger type.
+> Unset (default) will set log output to stderr as it is today. The
+> other valid options are "syslog" and "journal".
 > ---
->   autotests/testPSK-roam/failed_roam_test.py | 2 ++
->   1 file changed, 2 insertions(+)
+>   src/main.c | 14 ++++++++++++--
+>   1 file changed, 12 insertions(+), 2 deletions(-)
 > 
 
-Both applied, thanks.
+Patches 3-7 applied.  1-2 should have been applied using an earlier series.
 
 Regards,
 -Denis
