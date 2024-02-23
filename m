@@ -1,112 +1,147 @@
-Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+Received: from mx0a-003ede02.pphosted.com (mx0a-003ede02.pphosted.com [205.220.169.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D61E14C587
-	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 19:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.77.79.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5CE1448F3
+	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 20:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.169.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708717054; cv=none; b=oSmZ8yAp8Pt6ewEr7aMIBu95D/EJ9mmlSmHLnF64fuMZLXnUFl/BnT4IUA1q79vNxfUU/acEC/+As1tvBQjL2TLmXUu2inyNWRbza0kU2cbj5KefGg/SztiPOW31lEOVNOFvaf8nJPY5yPhb4tEhr8eF5XD8XK45AQkHzg/fwrs=
+	t=1708718996; cv=none; b=fkK4221+fUzB39XztzB0ONVrloSs8+0QbJk3W6nzHSPoRKAkat5SpYRkHieQElRG0DaVZEi24MFNA+KG5ZItT5Mbn6ytA19fw3rDSQVh+3orWHE6hfjgXjHXE+mBzU1Lk3SAMWV5medSC0vZA0cttSfth35BhQxWcu9IIqFmCUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708717054; c=relaxed/simple;
-	bh=LoOiWwXujuprBi/FEgb6j2XRQKfTHQKu5qo5ozcdCVw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ltS3tmFDw5WhTWRiZVnT7mJSuk+eenbGSCUC/pNt9DCA86eTOj13A3or/t7NZem54Gpbzr+N9dBJ+JM1mYtU1Qo7S/511gtMLJqvZ4dfYVwW8pKOFPlT+7EIXnH+1aqKwAhNOSN49YnQ5lz5GJ98skBg6GoEkzQv5pJczwwOkTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yartys.no; spf=pass smtp.mailfrom=yartys.no; dkim=pass (2048-bit key) header.d=yartys.no header.i=@yartys.no header.b=QH7nyXZc; arc=none smtp.client-ip=51.77.79.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yartys.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yartys.no
+	s=arc-20240116; t=1708718996; c=relaxed/simple;
+	bh=aB+1x8kHo0qZHmme1SovSn76FJUNT63KhsYzKbZF5lI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aIbT96wBfGAobiHy5PWP5XLzxQyCi+26zfvDTjWg2hJCFmKzkTnkJy/4MGbiwmBGizNK/345p+PC1g/bQAwhwz3nu3GqLohDPlILWV9YXnpPsXnxyVQywtbRFbZwBt3KI1laIC1g1cuERYT0ji/nKqR6iiU+tkyd/Rb+bK6r8U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=getcruise.com; spf=pass smtp.mailfrom=getcruise.com; dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b=lmARDWIU; dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b=pX8q9LaX; arc=none smtp.client-ip=205.220.169.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=getcruise.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=getcruise.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yartys.no header.i=@yartys.no header.b="QH7nyXZc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yartys.no;
-	s=protonmail2; t=1708717038; x=1708976238;
-	bh=LoOiWwXujuprBi/FEgb6j2XRQKfTHQKu5qo5ozcdCVw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=QH7nyXZc2bnyZW+W7eZswR6zLm5LOa678aPb5bR1Sg5ISx0NjhK6j4rF/lklDxG1a
-	 +0DWSshvUIJaQX1rrb2i4QK/EmtBu0kgI0ou4hB8I5t/junsCUJ05tsktt+vvJ/2C6
-	 yXdEvRvWkAW2thmHmF0EsJsBcdp3UBfNDXvfuiDRRB3Q+1m7dFJu459xf6HXnSg1H4
-	 kAfB2dhpX3vw1Nrgji1f/TDO6SCCUAinNmTL2PON4XJqv+aWedHjPluma0hPFtVrv/
-	 q491IYjbV6r8vklCIpV3mOFbXhFZKzN6Qp9EBDwa/rTM7+TQ9TRZ6olhw8yurGxp72
-	 OJsy6pCCNIW8Q==
-Date: Fri, 23 Feb 2024 19:37:11 +0000
-To: Denis Kenzior <denkenz@gmail.com>
-From: Michael Yartys <mail@yartys.no>
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-Subject: Re: Unable to connect to eduroam
-Message-ID: <oNiRr7aqwSLhickml0qZlRg5tAZ_r_d5KphKztkhii6KjSMvQ0-pYjNo-8NujElHLPJoc9ho9v8X3zD71jQ6O5pdzdTXqFF1T0x2dBQ9Oc0=@yartys.no>
-In-Reply-To: <c935faa9-b90e-472a-917b-4cfd64c9d7f3@gmail.com>
-References: <njvxKaPo_CBxsQGaNSRHj8xOSxzk1_j_K-minIe4GCKUMB1qxJT8nPk9SGmfqg7Aepm_5dO7FEofYIYP1g15R9V5dJ0F8bN6O4VthSjzu1g=@yartys.no> <c935faa9-b90e-472a-917b-4cfd64c9d7f3@gmail.com>
-Feedback-ID: 77365699:user:proton
+	dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b="lmARDWIU";
+	dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b="pX8q9LaX"
+Received: from pps.filterd (m0286614.ppops.net [127.0.0.1])
+	by mx0b-003ede02.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41NF0n9b022144
+	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 12:09:53 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=getcruise.com;
+	 h=from:to:cc:subject:date:message-id:mime-version:content-type;
+	 s=ppemail; bh=kXyQ3T/H2EmORuNE/PYnhMrrc4OBs1jxJd6F9Z8i74o=; b=l
+	mARDWIUZ3aKEyEDGrfeC1QTKwLwj4dIEO0wFnNKU3bgC9MIOdNwOxRPvdckg55bD
+	Q2mnhlj2V/qo8hFUV+MEcla7QUW0AeWQJYuOGE/hJZRibsymW3QjTxASKnqtLD5l
+	tKfka43QsWUBrB/4v958AAvQo5THR4h9Oxh9+P5eQIxt4ORBI1Ejk9aqz9H5KkXX
+	/XVQcET5RaIVPwbfX5U9wVc8EkybD0+C1oOay25g3YTvHUxKQ81jPEQh8kGMfGkw
+	QkQ2CrfsT1yDRVpdj9a41pNGafosw7ULhbeBs8WnjyormEAJ2jcEqNKlwRArWH/Z
+	kR16yuTyXPqaX70+fbwgQ==
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+	by mx0b-003ede02.pphosted.com (PPS) with ESMTPS id 3wd565kc20-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 12:09:53 -0800 (PST)
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1dc6e067b22so5607915ad.3
+        for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 12:09:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=getcruise.com; s=google; t=1708718992; x=1709323792; darn=lists.linux.dev;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kXyQ3T/H2EmORuNE/PYnhMrrc4OBs1jxJd6F9Z8i74o=;
+        b=pX8q9LaX+E+q4aXyViGXchL245s2zWCfqOmNHyOJ0Q0cMbsRNIIKoEwfm/SHb6Jl2/
+         gSZvrdxrMXS5KP8zJiNItg6/5hCNOq44KJ4fP+2pPamUebJxLzv84HcZmXsJONFAHIW/
+         Nm9JxgAMt1OsZwlko44tAB15D0dVO+LVj12+Lbkb4VBM4XmI8hrFlDnUeqDHZ5bN7kox
+         PoZP47EhvBVBkWR3oxz+F6DdWMzku2lWd73vU6FFW3AB2Jg7sTOYO4uoNXyuA6KIy8HG
+         zrNO2YNkNIPo9LgGOHUgI0VfdoLbsINypttxBCl3r/lb3oHlU/dh57BJ4sTzTfKAuCWe
+         mqrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708718992; x=1709323792;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kXyQ3T/H2EmORuNE/PYnhMrrc4OBs1jxJd6F9Z8i74o=;
+        b=pxRhVkgYvA5ZGDhMJLRSwV315A57dePDxvP6tx08I/VTSx52BpsAyehVrNfRxfQoza
+         p9DQS31Cgurj1XicBmRirzAhi7ApyWCbddO8AFRcJG5UEm4tiIHUkI2koGgpJWCHjnIO
+         cWMPfoq40sP2TWEminh3rjEZeY4AJQ9QTNaYHDYCgj5ft1a3QVXX08i+zO6DmKLhWTyP
+         Vki651TJJmA6fkGDMtDxnAfxmSJQoW5aoyXC+rK15sF5NM+UlaL8I7SL8ndtobvvFiIM
+         a7PCjegCbMvmcbth7GhMpwEuaoOlLSQOkM5kbxRVdJgKVLZeW9DhI7T1qUgzrItkHrD5
+         ntwQ==
+X-Gm-Message-State: AOJu0YzyzZYzzndH3CUF5nXyPHW2X41Cn5NslL7fYGXTP9HZlXsvP1bT
+	Hu/Eegl5YXyQzf6M4FxxGWPmbHNbcVCSoHeP9rEoKkFkQkFc4LDmnmZ/AAh73bRPHMa5ID+eHCN
+	sE6nNNph42x8z0XmHuXJap6vZjphN06yQoMA/jd8u0SihBM5IncYjFMkhEsqe327U1YxT6UZF+2
+	5N/8m42GPCqq09pcm70Z7V6Ywobtls/zMM5m/mjtjw4rSWgpQ=
+X-Received: by 2002:a17:902:d491:b0:1db:e78e:b395 with SMTP id c17-20020a170902d49100b001dbe78eb395mr1029185plg.34.1708718992420;
+        Fri, 23 Feb 2024 12:09:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFsbEYjAsHxGFRySEaGJTrGgxlinJuaGaHR7K/SMQXxnrx4rrVY8YX5L7eJci1Bw2Q4L2589Q==
+X-Received: by 2002:a17:902:d491:b0:1db:e78e:b395 with SMTP id c17-20020a170902d49100b001dbe78eb395mr1029165plg.34.1708718992062;
+        Fri, 23 Feb 2024 12:09:52 -0800 (PST)
+Received: from BPHKDV2-DT.corp.robot.car ([199.73.127.2])
+        by smtp.gmail.com with ESMTPSA id b17-20020a170902ed1100b001dba356b96esm12019730pld.306.2024.02.23.12.09.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Feb 2024 12:09:51 -0800 (PST)
+From: Ram Subramanian <ram.subramanian@getcruise.com>
+To: iwd@lists.linux.dev
+Cc: Ram Subramanian <ram.subramanian@getcruise.com>
+Subject: [PATCH v2 1/3] station: add channel number to diagnostics message
+Date: Fri, 23 Feb 2024 12:09:07 -0800
+Message-ID: <20240223200944.1343893-1-ram.subramanian@getcruise.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="US-ASCII"
+X-Proofpoint-GUID: Ykr3QgCPYPeQbPji4DrZdykXi8_qxyEC
+X-Proofpoint-ORIG-GUID: Ykr3QgCPYPeQbPji4DrZdykXi8_qxyEC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-23_06,2024-02-23_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ mlxlogscore=999 lowpriorityscore=0 phishscore=0 adultscore=0 spamscore=0
+ suspectscore=0 impostorscore=0 malwarescore=0 priorityscore=1501
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2402230149
 
-Hi Denis,
-=20
->=20
-> Hi Michael,
->=20
-> > I'm sure these certificates are correct because I was able to roll back=
- to a working build on Fedora Silverblue to keep connecting to the network.=
- Unfortunately, I was dumb enough to forget to pin/freeze that working buil=
-d to prevent it from being replaced by new versions as I continually update=
-d the system.
->=20
->=20
-> Do you have any clue what changes you made to the working build? iwd hasn=
-'t
-> touched certificate bits for a number of releases now.
+As a small convenience to the user.
+---
+ src/station.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Just to be clear, I didn't build anything myself, I just updated my system =
-as you would on a day to day basis. My guess is that a new kernel version c=
-ame along that messed something up.
+diff --git a/src/station.c b/src/station.c
+index ea505ca2..33b1f5e8 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -4702,12 +4702,16 @@ static void station_get_diagnostic_cb(
+ 	struct l_dbus_message *reply;
+ 	struct l_dbus_message_builder *builder;
+ 	struct handshake_state *hs = netdev_get_handshake(station->netdev);
++	uint16_t channel_num;
+ 
+ 	if (!info) {
+ 		reply = dbus_error_aborted(station->get_station_pending);
+ 		goto done;
+ 	}
+ 
++	channel_num = band_freq_to_channel(station->connected_bss->frequency,
++						NULL);
++
+ 	reply = l_dbus_message_new_method_return(station->get_station_pending);
+ 
+ 	builder = l_dbus_message_builder_new(reply);
+@@ -4718,6 +4722,10 @@ static void station_get_diagnostic_cb(
+ 					util_address_to_string(info->addr));
+ 	dbus_append_dict_basic(builder, "Frequency", 'u',
+ 				&station->connected_bss->frequency);
++
++	if (channel_num != 0)
++		dbus_append_dict_basic(builder, "Channel", 'q', &channel_num);
++
+ 	dbus_append_dict_basic(builder, "Security", 's',
+ 				diagnostic_akm_suite_to_security(hs->akm_suite,
+ 								hs->wpa_ie));
+-- 
+2.43.2
 
->=20
-> > I searched a bit around and found that some other folks had experienced=
- the same issue on Arch: https://bbs.archlinux.org/viewtopic.php?id=3D29192=
-1
-> >=20
-> > That thread links to another thread about the deprecation of SHA-1 in t=
-he kernel: https://bbs.archlinux.org/viewtopic.php?id=3D292208
->=20
->=20
-> Someone should complain to the linux-crypto folks for breaking uapis and =
-have
-> that change reverted.
->=20
-> > rochus from the first thread was able to connect to their eduroam netwo=
-rk when they tried a kernel with the offending commit reverted. Now, I know=
- very little about certificates, but no certificates in my cert chain are S=
-HA-1 signed, are they? Could this still be related to the issue I'm experie=
-ncing?
->=20
->=20
-> I can't dump the second certificate for some reason, but the first has:
-> [denkenz@archdev ell]$ openssl x509 -in cert2.pem -text
-> ...
-> Signature Algorithm: ecdsa-with-SHA256
->=20
-> Do you have CONFIG_ECDSA=3Dy in your kernel?
->=20
-> [denkenz@archdev ell]$ zless /proc/config.gz | grep ECDSA
-> CONFIG_CRYPTO_ECDSA=3Dy
-> CONFIG_MODULE_SIG_KEY_TYPE_ECDSA=3Dy
 
-This is my config. As you can see, the first variable is set to yes, but th=
-e second one is not set.
+-- 
 
-michael@localhost:~$ cat /usr/lib/modules/6.7.5-200.fc39.x86_64/config | gr=
-ep ECDSA
-CONFIG_CRYPTO_ECDSA=3Dy
-# CONFIG_MODULE_SIG_KEY_TYPE_ECDSA is not set
 
->=20
-> Regards,
-> -Denis
-
-Michael
+*Confidentiality Note:* We care about protecting our proprietary 
+information, confidential material, and trade secrets. This message may 
+contain some or all of those things. Cruise will suffer material harm if 
+anyone other than the intended recipient disseminates or takes any action 
+based on this message. If you have received this message (including any 
+attachments) in error, please delete it immediately and notify the sender 
+promptly.
