@@ -1,160 +1,106 @@
-Received: from mail-4022.proton.ch (mail-4022.proton.ch [185.70.40.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C848180BE3
-	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 14:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2F541C76
+	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 15:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708698347; cv=none; b=I0nf7qtHuhWwpZPsm236S5G+ARScEGa23IaZPSRPQTB/REZ/t9LbVV5onaI3DWycchYlhVGLRls9+9/xzmcqy5aDZ6Cnso0LnvkEJ7cYyanHj9r10g/4+c5CHDP55syEG3SJaw1MuadcSQ3oaZU/QTSrgV8EaAn0DCjunzTeyjk=
+	t=1708700544; cv=none; b=S0qEFY8QCdRd2ohANPgRUgWxCir1TCY94RuatC1KU919NMyNtCsmRdPzdoQAO+lPmUb/aW57oVWoT3TaWZ+d0XFWbcS0ze19smya2fMfc+x8ET3l5FwYrLN7ZU+tIyaCWmhjs/1bwcJTT12SdVn9dqVx+6400P0AP0CZ2zYdWFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708698347; c=relaxed/simple;
-	bh=mMy+BDFWjYtc3Vxbb+nI60L2ZL5jgcYyegeAK7NIAN0=;
-	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=l76T0K9PiPgPE6flWGzbyVz8D/P1+gsOliQXt2CMt7vceI73bspwdGI9kOUQbkoJfK/nemLUBBShrQDTR01FRT9x5rFpwMO5fSxC+wkxh4vikhhhSkpSa6f5Xm6eWfIzMG9b38zhKy4PUiL1huC1hpUMvtkRWNn69nVyQsu/XkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yartys.no; spf=pass smtp.mailfrom=yartys.no; dkim=pass (2048-bit key) header.d=yartys.no header.i=@yartys.no header.b=L9zB5mVD; arc=none smtp.client-ip=185.70.40.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yartys.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yartys.no
+	s=arc-20240116; t=1708700544; c=relaxed/simple;
+	bh=0RfnV6b8JvfPiCH9X4jWbLOaWInrjHBJSKkGLwlN48U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=VldVewY9bCf1XFWB5CyTJo8FXjWdWeVNt8mpN6NChTowu1NPlLN3qRpEGGyOwcr0JkYGpimRn8DmGzHGTiPNbMT/Ao9liV3e8x3htghXZLUUyaBeEDsKi+nWVDDk/GGYiYMPR5842MfoFZodN6LM3TON2CwzVKNRCcXv8j5ryuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S7OEvH2Y; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yartys.no header.i=@yartys.no header.b="L9zB5mVD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yartys.no;
-	s=protonmail2; t=1708698341; x=1708957541;
-	bh=mMy+BDFWjYtc3Vxbb+nI60L2ZL5jgcYyegeAK7NIAN0=;
-	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=L9zB5mVDSdA6DDqecfutuHI4bFFfPlyT0eA8s7ElmCFmNq2uMSrOpNApDXsRIRTjv
-	 37F/fY6LCKJlkj2celYTi2KAxCZaLvkB+3MmKM2REgmehUoWBKajnlOfwDCik2iBR+
-	 NwjZBDTXUI/Ayu0V/HDSgxLAO1Y9wVC3Qm+1nIZoRBkBg3ZSnlZe/YdP4OjLn9rOfv
-	 STISVNuSZXmzIe0hmKWnm1J9LSL6iq8WYfRtR+otFYZZvG3KdXvSRSqy2Ani6SPAuj
-	 kcp6qsSIfstrr3zB2QwGiWkn5wuOaw//Miqy6bsKoHPYVD48FD3B5uWcCH5BboGssh
-	 ue0JM/E18KUIg==
-Date: Fri, 23 Feb 2024 14:25:32 +0000
-To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-From: Michael Yartys <mail@yartys.no>
-Subject: Unable to connect to eduroam
-Message-ID: <njvxKaPo_CBxsQGaNSRHj8xOSxzk1_j_K-minIe4GCKUMB1qxJT8nPk9SGmfqg7Aepm_5dO7FEofYIYP1g15R9V5dJ0F8bN6O4VthSjzu1g=@yartys.no>
-Feedback-ID: 77365699:user:proton
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S7OEvH2Y"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6e46b5e7c43so238829b3a.2
+        for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 07:02:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708700542; x=1709305342; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=C0SjSjPJIUi9hLPvr7xSMP95qGyTfY6Yy/cH8Mj5ut4=;
+        b=S7OEvH2YyNhUrZzbGPdPlMwZikMsdgGBF9EatxBPuS1/NbVXf0q7Xj5XD7GNwIdI3D
+         lYUwCSsk+xlAwdpsFfRXz+l81k+a7nc4PpZ9eRgA5Pih1Dds5toN8Tp71U+3TaVBXXpW
+         8/Ue2eRalM1IJ9tsuJijFN41dpkM24UeJHmYC3acQ458GuMkMgxxLl17i/u2mZ/a9b+U
+         iAcxLuO995/ygkW7vDj9kbBJRahDTlathJeFr9y/RiZEHn07+Umtip1fSzN8pw+kDHxX
+         2ZcnnjYfkRUpCuKAeDliuZOW54xoS/Hqw7Ww6wogkW89q2279z5P5bBHT5rOPlVKAF0C
+         AqIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708700542; x=1709305342;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C0SjSjPJIUi9hLPvr7xSMP95qGyTfY6Yy/cH8Mj5ut4=;
+        b=NQOdZn5WyfWnntfH02UDbvJ3Htzs282fTHfnbJLJq8ek1li7vZc2hFTEq3Us/t9Jy8
+         jHEPxE3amQNDBkRdZhXvxTk3FGCRDovQrp9H+4/67lWbjmHuid2w0ttXNqg3uXbm/VSm
+         Ms2eElI2vJ6ZmCoS6Gbp2173OnhxEvhJx6kwAyxNdStKQ6g+6wBWrcigvD1DQBuWCZIe
+         jd0shvj/Hfr1drcpSNFH081GmNf45zDlDE00FVuowJDrApjLTUsZJ3dpXkiCpMZ0nzwh
+         a01Aqf33ZPeLkojszDWKwXFsel0ZMdITgiSuHLIZWOMP4jmRlxwAaCqvKaN29QfWqgML
+         OOOg==
+X-Forwarded-Encrypted: i=1; AJvYcCVyKr7I65O1Gy26iL4j+cEE6uwZcwONKIVzbGTzg1YbhrD0drxgApag0luOfdqR94YgYcpqcpkIXkR3AQwJoiKR1kXk
+X-Gm-Message-State: AOJu0Yzs4IleT2GNJX67PutuHa024CjyNz6dNq2IE6cHuU74ax4zYwJV
+	7jie0cnGZawmllLoc58U7iHD9JbWZC1sRB4zZNUW4pNfc/2euFyPka8XoVkE
+X-Google-Smtp-Source: AGHT+IGZ8Xp0qFhabvOeoWI+lq5yInNZdlZ5cp0qOjE6RP87KuPXs1LQPDj1ZDcV1bSqIF3l3FEVaQ==
+X-Received: by 2002:a17:90a:8c05:b0:299:21ef:6b5a with SMTP id a5-20020a17090a8c0500b0029921ef6b5amr66665pjo.24.1708700541375;
+        Fri, 23 Feb 2024 07:02:21 -0800 (PST)
+Received: from [192.168.254.87] ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id f14-20020a17090aa78e00b00299947ed2efsm1546292pjq.2.2024.02.23.07.02.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Feb 2024 07:02:20 -0800 (PST)
+Message-ID: <495f9bd9-b0af-4e9c-b9b7-99f1b4d544fc@gmail.com>
+Date: Fri, 23 Feb 2024 07:02:19 -0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Unable to connect to eduroam
+To: Michael Yartys <mail@yartys.no>, "iwd@lists.linux.dev"
+ <iwd@lists.linux.dev>
+References: <njvxKaPo_CBxsQGaNSRHj8xOSxzk1_j_K-minIe4GCKUMB1qxJT8nPk9SGmfqg7Aepm_5dO7FEofYIYP1g15R9V5dJ0F8bN6O4VthSjzu1g=@yartys.no>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <njvxKaPo_CBxsQGaNSRHj8xOSxzk1_j_K-minIe4GCKUMB1qxJT8nPk9SGmfqg7Aepm_5dO7FEofYIYP1g15R9V5dJ0F8bN6O4VthSjzu1g=@yartys.no>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi
+HI Michael,
 
-I'm running iwd 2.14 on Fedora 39 Silverblue with kernel version 6.7.5-200.=
-fc39.x86_64, and I've been having issues for the last two weeks or so conne=
-cting to my university eduroam network. What happens is that I get an inter=
-nal error that causes the connection attempt to fail with eapFail. Here's t=
-he log output with TLS debugging enabled:
+On 2/23/24 6:25 AM, Michael Yartys wrote:
+> Hi
+>
+> I'm running iwd 2.14 on Fedora 39 Silverblue with kernel version 6.7.5-200.fc39.x86_64, and I've been having issues for the last two weeks or so connecting to my university eduroam network. What happens is that I get an internal error that causes the connection attempt to fail with eapFail. Here's the log output with TLS debugging enabled:
+<snip>
+>
+>
+> I'm sure these certificates are correct because I was able to roll back to a working build on Fedora Silverblue to keep connecting to the network. Unfortunately, I was dumb enough to forget to pin/freeze that working build to prevent it from being replaced by new versions as I continually updated the system.
+>
+> I searched a bit around and found that some other folks had experienced the same issue on Arch: https://bbs.archlinux.org/viewtopic.php?id=291921
+>
+> That thread links to another thread about the deprecation of SHA-1 in the kernel: https://bbs.archlinux.org/viewtopic.php?id=292208
+>
+> rochus from the first thread was able to connect to their eduroam network when they tried a kernel with the offending commit reverted. Now, I know very little about certificates, but no certificates in my cert chain are SHA-1 signed, are they? Could this still be related to the issue I'm experiencing?
 
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_tx_handshake:1244 Sending a =
-TLS_CLIENT_HELLO of 140 bytes
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: l_tls_start:3610 New state TLS_H=
-ANDSHAKE_WAIT_HELLO
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_handle_handshake:3074 Handli=
-ng a TLS_SERVER_HELLO of 45 bytes
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_handle_server_hello:2419 Neg=
-otiated TLS 1.2
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_handle_server_hello:2455 Neg=
-otiated TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_handle_server_hello:2466 Neg=
-otiated CompressionMethod.null
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_handle_server_hello:2492 New=
- state TLS_HANDSHAKE_WAIT_CERTIFICATE
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_handle_handshake:3074 Handli=
-ng a TLS_CERTIFICATE of 2126 bytes
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_handle_certificate:2562 Peer=
- certchain written to /tmp/iwd-tls-debug-server-cert.pem
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_handle_certificate:2673 Disc=
-onnect desc=3Dinternal_error local-desc=3Dclose_notify reason=3DCan't l_key=
-_get_info for peer public key
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_send_alert:1175 Sending a Fa=
-tal Alert: internal_error
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: tls_reset_handshake:195 New stat=
-e TLS_HANDSHAKE_WAIT_START
-Feb 23 14:35:55 localhost iwd[1233]: TTLS: Tunnel has disconnected with ale=
-rt: internal_error
-Feb 23 14:35:56 localhost iwd[1233]: EAP completed with eapFail
-Feb 23 14:35:56 localhost iwd[1233]: TTLS: tls_reset_handshake:195 New stat=
-e TLS_HANDSHAKE_WAIT_START
-Feb 23 14:35:56 localhost iwd[1233]: TTLS: tls_reset_handshake:195 New stat=
-e TLS_HANDSHAKE_WAIT_START
-Feb 23 14:35:56 localhost iwd[1233]: 4-Way handshake failed for ifindex: 4,=
- reason: 23
+Yep it appears the issue is a lack of SHA1 in the kernel.
 
+I'm not that familiar with TLS but based on the code RSA certs use 
+PKCS1, which requires SHA1 (someone correct me if I'm wrong).
 
-Here is the associated dumped peer certchain:
+The kernel apparently removed this... they did (or are doing) the same 
+thing for MD5. I guess we need to roll our own.
 
------BEGIN CERTIFICATE-----
-MIIExDCCBGugAwIBAgIRAM+MIw8HuugW44b38b8768QwCgYIKoZIzj0EAwIwRDEL
-MAkGA1UEBhMCTkwxGTAXBgNVBAoTEEdFQU5UIFZlcmVuaWdpbmcxGjAYBgNVBAMT
-EUdFQU5UIE9WIEVDQyBDQSA0MB4XDTI0MDIwNjAwMDAwMFoXDTI1MDIwNTIzNTk1
-OVowWTELMAkGA1UEBhMCTk8xDTALBgNVBAgTBE9zbG8xHTAbBgNVBAoTFFVuaXZl
-cnNpdGV0ZXQgaSBPc2xvMRwwGgYDVQQDExNyYWRpdXMtZWR1MDEudWlvLm5vMFkw
-EwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExF7Q2VsO6h0fciizxw+/4ptSYFo6gnUy
-8hHvw766pf2B/fWKgG8BBXR2refZHibmSh3kF3tibYH4t4HULJp4xqOCAycwggMj
-MB8GA1UdIwQYMBaAFO20oDNqGwiRtr36QZK9mqurY/RTMB0GA1UdDgQWBBTSHfh9
-sY1lBcBLdLbTT+9zurmgLTAOBgNVHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAd
-BgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwSQYDVR0gBEIwQDA0BgsrBgEE
-AbIxAQICTzAlMCMGCCsGAQUFBwIBFhdodHRwczovL3NlY3RpZ28uY29tL0NQUzAI
-BgZngQwBAgIwPwYDVR0fBDgwNjA0oDKgMIYuaHR0cDovL0dFQU5ULmNybC5zZWN0
-aWdvLmNvbS9HRUFOVE9WRUNDQ0E0LmNybDB1BggrBgEFBQcBAQRpMGcwOgYIKwYB
-BQUHMAKGLmh0dHA6Ly9HRUFOVC5jcnQuc2VjdGlnby5jb20vR0VBTlRPVkVDQ0NB
-NC5jcnQwKQYIKwYBBQUHMAGGHWh0dHA6Ly9HRUFOVC5vY3NwLnNlY3RpZ28uY29t
-MIIBfwYKKwYBBAHWeQIEAgSCAW8EggFrAWkAdwDPEVbu1S58r/OHW9lpLpvpGnFn
-SrAX7KwB0lt3zsw7CAAAAY191L4wAAAEAwBIMEYCIQC6zqKLAVShWFlASZuktoGx
-eddmBUZ5CR5gQxpjo01AIwIhANDuD6ZGlQeMi1wPMMrT+6nLL+JSb41/C2e+0CEj
-ZUU/AHUAouMK5EXvva2bfjjtR2d3U9eCW4SU1yteGyzEuVCkR+cAAAGNfdS+8gAA
-BAMARjBEAiAbl1nI5yax0AtxqxGrUud42ZdtNihV1mJZsoFESkGMJwIgSldsoiAw
-qh5bZOCwGU74cOGA4MUmHtOzYsmH1GsK8g4AdwBOdaMnXJoQwzhbbNTfP1LrHfDg
-jhuNacCx+mSxYpo53wAAAY191L5aAAAEAwBIMEYCIQDe23Hd8H0j3rpBcAMuOrj1
-HO3DV8/irDdOtwsNWCFawAIhAK8Xrlq12GIfmyGfAATLb2qKfiAYpjxjU32zkrlS
-zAWPMB4GA1UdEQQXMBWCE3JhZGl1cy1lZHUwMS51aW8ubm8wCgYIKoZIzj0EAwID
-RwAwRAIgGbiOSzrozjf9HDKDQKcGPPVSlMz8CPE72GDkNn2adygCIGozGfF38Yqb
-f01HpBCMJ2D/3F54kLeWevwEiecMULn1
------END CERTIFICATE-----
------BEGIN CERTIFICATE-----
-MIIDeTCCAv+gAwIBAgIRAOuOgRlxKfSvZO+BSi9QzukwCgYIKoZIzj0EAwMwgYgx
-CzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpOZXcgSmVyc2V5MRQwEgYDVQQHEwtKZXJz
-ZXkgQ2l0eTEeMBwGA1UEChMVVGhlIFVTRVJUUlVTVCBOZXR3b3JrMS4wLAYDVQQD
-EyVVU0VSVHJ1c3QgRUNDIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTIwMDIx
-ODAwMDAwMFoXDTMzMDUwMTIzNTk1OVowRDELMAkGA1UEBhMCTkwxGTAXBgNVBAoT
-EEdFQU5UIFZlcmVuaWdpbmcxGjAYBgNVBAMTEUdFQU5UIE9WIEVDQyBDQSA0MFkw
-EwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXYkvGrfrMs2IwdI5+IwpEwPh+igW/BOW
-etmOwP/ZIXC8fNeC3/ZYPAAMyRpFS0v3/c55FDTE2xbOUZ5zeVZYQqOCAYswggGH
-MB8GA1UdIwQYMBaAFDrhCYbUzxnClnZ0SXbc4DXGY2OaMB0GA1UdDgQWBBTttKAz
-ahsIkba9+kGSvZqrq2P0UzAOBgNVHQ8BAf8EBAMCAYYwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwOAYDVR0gBDEwLzAt
-BgRVHSAAMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFAG
-A1UdHwRJMEcwRaBDoEGGP2h0dHA6Ly9jcmwudXNlcnRydXN0LmNvbS9VU0VSVHJ1
-c3RFQ0NDZXJ0aWZpY2F0aW9uQXV0aG9yaXR5LmNybDB2BggrBgEFBQcBAQRqMGgw
-PwYIKwYBBQUHMAKGM2h0dHA6Ly9jcnQudXNlcnRydXN0LmNvbS9VU0VSVHJ1c3RF
-Q0NBZGRUcnVzdENBLmNydDAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNlcnRy
-dXN0LmNvbTAKBggqhkjOPQQDAwNoADBlAjAfs9nsM0qaJGVu6DpWVy4qojiOpwV1
-h/MWZ5GJxy6CKv3+RMB3STkaFh0+Hifbk24CMQDRf/ujXAQ1b4nFpZGaSIKldygc
-dCDAxbAd9tlxcN/+J534CJDblzd/40REzGWwS5k=3D
------END CERTIFICATE-----
+Thanks,
 
+James
 
-I'm sure these certificates are correct because I was able to roll back to =
-a working build on Fedora Silverblue to keep connecting to the network. Unf=
-ortunately, I was dumb enough to forget to pin/freeze that working build to=
- prevent it from being replaced by new versions as I continually updated th=
-e system.
-
-I searched a bit around and found that some other folks had experienced the=
- same issue on Arch: https://bbs.archlinux.org/viewtopic.php?id=3D291921
-
-That thread links to another thread about the deprecation of SHA-1 in the k=
-ernel: https://bbs.archlinux.org/viewtopic.php?id=3D292208
-
-rochus from the first thread was able to connect to their eduroam network w=
-hen they tried a kernel with the offending commit reverted. Now, I know ver=
-y little about certificates, but no certificates in my cert chain are SHA-1=
- signed, are they? Could this still be related to the issue I'm experiencin=
-g?
-
-
-Michael
+>
+>
+> Michael
+>
