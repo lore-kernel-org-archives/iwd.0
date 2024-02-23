@@ -1,92 +1,91 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4317.proton.ch (mail-4317.proton.ch [185.70.43.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6218146E76
-	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 20:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BFE14CAA2
+	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 22:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708720000; cv=none; b=KhZzLvy7xcpyR8u7oxjw4bxznH1ltHpTp4YqeMjQuimPuXW5amhQCd5NuRsUQLLHFYWxXzIBuzQc+vXmK6TJNfwy9cwHp79ouWJJD3TGpHEQv82QeAH7BsD8XFJeagrSxatqP0jJ6QIb1EpeG9It+9GgIRuvUxdxi+PjMg7WmD8=
+	t=1708726168; cv=none; b=T71nYy1CNfw6PoLn6DrEF9E7tgO3g9okmtXusTcwY8Kw0Tu7VFcX8MiAuWGHsP4HfqPV82q1LnVmh5lCfhl25ctbM9fut/Vavn1vHy9qdNAWheDqro5E+VGmcU4bZYdTtKkQbzXSPuDKRRsS2+4x/mcq6ZLbnnBtV7b0ybnqlfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708720000; c=relaxed/simple;
-	bh=ohLr1YDArVPCn9JfyncHNU05p9m3pvljlsYiDvqH5ms=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BWfuk1Hpl8lxogcN9R777UgXwP5Q9RBU5S29c7e/4GEYv8g3u8UM7v1muQPr10mL8rjtHuns3ws5xJRsSC2L1jyfu9Li75Oo57Esd2lNjhOQ7X7yGMTwuj/Ld+ZXnDsCnbEMHCRW50nqSHLBQWi+d6bqYcdVGCQ1f+O3wLI2xWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z4C6fpt0; arc=none smtp.client-ip=209.85.160.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708726168; c=relaxed/simple;
+	bh=OIt0AffPydRisuBx2qASe52GJn/LAM7XnXZsHauYCkw=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MrpHeS7ihtmS6cH3m8PUb58z4g/kZJWYsC3iR3MdTcmq7pG8Zf3NJOQSteFkXRbCHAYs1ebJcrLPFjjlIkXORnjO3oJlj62YJSveFpk+IIWHVsW9gMEDMHHMWQ7zq/g6ozwaNXcReYIMxkccYGgBh3T9Jg5s4yNwQuD5KR5GnJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yartys.no; spf=pass smtp.mailfrom=yartys.no; dkim=pass (2048-bit key) header.d=yartys.no header.i=@yartys.no header.b=JrfV7P2l; arc=none smtp.client-ip=185.70.43.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yartys.no
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yartys.no
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z4C6fpt0"
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-214c940145bso378924fac.1
-        for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 12:26:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708719998; x=1709324798; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fOLmbJQv+0UQzzb4bpMtp0T0k1gV74b98soVSUV0530=;
-        b=Z4C6fpt0ClFtXuewe1S/rmb5NYj19P6uduEBUioaDmE8I+SaOLY1/Ep2/UyzhPMoca
-         KA7/S5SBdduUDerP8SNulZHNiGCT79j3N/u022zBXipTeG30+NMeu0SISC5QP6VWFZZ0
-         2gcOe5dQz5Qanhn0Y1eKJ4iqiz5wFfVSvaYfCTltez0A7sYnvNXW+LPiY4FdXyTRy12H
-         qdhdR4pGlfp6V8N6GVZB7GoP7Kz/oTUxGrwZ0LmzPgyA01/JGl4RSobVZmby1/Me/fib
-         dUvwXWwwLHshu6J4VcG+zeUF06oo7UqAKzpWWX9ioIBi7NuVSk/jwbJ7G2qabxIMn+OO
-         hbdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708719998; x=1709324798;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fOLmbJQv+0UQzzb4bpMtp0T0k1gV74b98soVSUV0530=;
-        b=Iy08o7AZHFaFVGqdWVrq2Oz5MH1aUSI6WE9b6s64u/ny9kRQY/vG1BjgF3rTQL3EsC
-         NPlVLDrZegFdKVpxhdFo/DnCmLmNAgTlyhupaAFJnS1zfGuEtoHo+Jva33xni1BHLBBj
-         aBXsiOQ0N5G+U5jZ//UyYcaU6uIWp6YLJuGNretiwcwOFuCGpWYcJkN3VS4Mi27XCy7Z
-         JAbzPVqn8CCqWoXIpk8G1JMtK6JH2rwICfm6AT4zlZc1ywJQqJsHHsgVoyH0fPs9jePg
-         +Bik3+BAupi5QFj8QPU3atHqAWbqp2YpawK0HRFJlRP8gN9PoWKPvFeqrF/U0x4wXLpJ
-         wCIg==
-X-Gm-Message-State: AOJu0YyWYUOyH0FMzYBa4a+3ZmdwwfYnR7XuoCgAodrRXhTvzOUEQ8x+
-	d+oNEX7AaFfgdp0wC7Vea8cZEvTKM4mOzjHlJ9OmgWNBG0tzPo/bSpjiBTgU
-X-Google-Smtp-Source: AGHT+IFa1ddU9wrQCe1Mo9kKzO2CT0Z9uwSkziuXMQhaMJWxW3RYGKQaCk+V+oLtx2D7YvHf9f3kGw==
-X-Received: by 2002:a05:6871:4d3:b0:21e:9b56:737f with SMTP id n19-20020a05687104d300b0021e9b56737fmr988748oai.19.1708719997800;
-        Fri, 23 Feb 2024 12:26:37 -0800 (PST)
-Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id ds21-20020a0568705b1500b00219e6770b34sm3675659oab.24.2024.02.23.12.26.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Feb 2024 12:26:37 -0800 (PST)
-Message-ID: <f411612a-3d8c-47c8-abc1-41dda98e7732@gmail.com>
-Date: Fri, 23 Feb 2024 14:26:36 -0600
+	dkim=pass (2048-bit key) header.d=yartys.no header.i=@yartys.no header.b="JrfV7P2l"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yartys.no;
+	s=protonmail2; t=1708726156; x=1708985356;
+	bh=OIt0AffPydRisuBx2qASe52GJn/LAM7XnXZsHauYCkw=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=JrfV7P2l7PpzXa/RgxdileLahhLCB6ddPwfIRqL0mu1vX+LyzV1ao/uQTVkba1DVi
+	 y+oEtm7fmISOxnrhLbm2ofDbJLolcjHb99m70g5/OGo3kjf7k0bIWnd5RMrK+AWtJp
+	 l7OexL1/sfFO4UvsQ/ziQeau/ckVX+Ykybj8Hnp5KQJkTUq2DlENjinRIRejm1o3gN
+	 TopVnwKG3BgPtAS1ueybXUmHD6JopS5RzSe2jXUrjlRwIrWavZnWjTpKKgY5svCzBS
+	 RyGdIV9L/P0PtOh4Dv16G7Z0/3qx35sqNvqN4kZ/4esto9TFY0gYtVP0X/YgGvbnxZ
+	 HOGbv6MpL2ICA==
+Date: Fri, 23 Feb 2024 22:09:06 +0000
+To: Denis Kenzior <denkenz@gmail.com>
+From: Michael Yartys <mail@yartys.no>
+Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+Subject: Re: Unable to connect to eduroam
+Message-ID: <ghq_OJQ1so1_7JGCGGTtn5Go_9tm_ZbROdd1umG7CzQ5G95vXzLCzCfWCbGjO4IBU2ZKzM1dmSUOCrKlsPhuDMbTVcJivxvPOXHBYPU6IyM=@yartys.no>
+In-Reply-To: <f411612a-3d8c-47c8-abc1-41dda98e7732@gmail.com>
+References: <njvxKaPo_CBxsQGaNSRHj8xOSxzk1_j_K-minIe4GCKUMB1qxJT8nPk9SGmfqg7Aepm_5dO7FEofYIYP1g15R9V5dJ0F8bN6O4VthSjzu1g=@yartys.no> <c935faa9-b90e-472a-917b-4cfd64c9d7f3@gmail.com> <oNiRr7aqwSLhickml0qZlRg5tAZ_r_d5KphKztkhii6KjSMvQ0-pYjNo-8NujElHLPJoc9ho9v8X3zD71jQ6O5pdzdTXqFF1T0x2dBQ9Oc0=@yartys.no> <f411612a-3d8c-47c8-abc1-41dda98e7732@gmail.com>
+Feedback-ID: 77365699:user:proton
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Unable to connect to eduroam
-Content-Language: en-US
-To: Michael Yartys <mail@yartys.no>
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <njvxKaPo_CBxsQGaNSRHj8xOSxzk1_j_K-minIe4GCKUMB1qxJT8nPk9SGmfqg7Aepm_5dO7FEofYIYP1g15R9V5dJ0F8bN6O4VthSjzu1g=@yartys.no>
- <c935faa9-b90e-472a-917b-4cfd64c9d7f3@gmail.com>
- <oNiRr7aqwSLhickml0qZlRg5tAZ_r_d5KphKztkhii6KjSMvQ0-pYjNo-8NujElHLPJoc9ho9v8X3zD71jQ6O5pdzdTXqFF1T0x2dBQ9Oc0=@yartys.no>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <oNiRr7aqwSLhickml0qZlRg5tAZ_r_d5KphKztkhii6KjSMvQ0-pYjNo-8NujElHLPJoc9ho9v8X3zD71jQ6O5pdzdTXqFF1T0x2dBQ9Oc0=@yartys.no>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
-> 
-> This is my config. As you can see, the first variable is set to yes, but the second one is not set.
+Hi Denis
 
-Okay, CONFIG_CRYPTO_ECDSA should be enough.  I can't dump out one of the two 
-certificates you have.  Do you have the CA certificate?  If so you can try running
+>=20
+> > This is my config. As you can see, the first variable is set to yes, bu=
+t the second one is not set.
+>=20
+>=20
+> Okay, CONFIG_CRYPTO_ECDSA should be enough. I can't dump out one of the t=
+wo
+> certificates you have. Do you have the CA certificate? If so you can try =
+running
+>=20
+> ell.git/tools/certchain-verify <ca file> <certchain file>
+>=20
+>=20
+> and see what happens. If your only change was a kernel upgrade, then I wo=
+uld
+> suspect sha1 removal as the culprit. Boot to an earlier kernel and see?
 
-	ell.git/tools/certchain-verify <ca file> <certchain file>
+As far as I understand, this would be the CA certificate, right? https://ed=
+uroam.no/connect/download/?idp=3D297;profile=3D430;os=3Dx-pem
 
-and see what happens.  If your only change was a kernel upgrade, then I would 
-suspect sha1 removal as the culprit.  Boot to an earlier kernel and see?
+I tried to compile ell, but I've run into some issues. Do you have a compil=
+ed certchain-verify on hand? I could give it a try if you send it to me (by=
+ link or whatever works).
 
-If it does turn out to be sha1 deprecation, then this is a bug report for your 
-distro and upstream kernel folks.  They need to stop breaking uapis.  SHA1 
-signatures, while no longer secure, are still widespread.
+I took a look at the kernel changelog and found out that version 6.7 remove=
+d sha1 support (just search for "crypto: pkcs7 - remove sha1 support"): htt=
+ps://cdn.kernel.org/pub/linux/kernel/v6.x/ChangeLog-6.7
 
-Regards,
--Denis
+I'll try to downgrade to version 6.6.14 and give it a try on Monday when I'=
+m back at the uni.
+
+>=20
+> If it does turn out to be sha1 deprecation, then this is a bug report for=
+ your
+> distro and upstream kernel folks. They need to stop breaking uapis. SHA1
+> signatures, while no longer secure, are still widespread.
+>=20
+> Regards,
+> -Denis
+
+Michael
