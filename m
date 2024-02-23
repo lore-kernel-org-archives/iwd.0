@@ -1,81 +1,81 @@
 Received: from mx0a-003ede02.pphosted.com (mx0a-003ede02.pphosted.com [205.220.169.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231271F176
-	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 20:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1DF1448F9
+	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 20:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.169.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708718997; cv=none; b=BjhH2Nbat+6ZQ8IXC08hWh9Io4nMWIEgYir5x3yFg1JNz3sKXppYMxTABjGatc4Eet6GrNc5lIJKduN47cDXzXlofecPMRpgeU0YKVk4wzF3+1GIztNQS/yWrA2H5QoghHt/vSo3JZ8O6eKutvHAUoxoNfV0mZ9AaVsV2h1cCt8=
+	t=1708718999; cv=none; b=WQcM9Eb6jsZzl3n9vckJim7QVhroOKIVaEq10l5UdlpydP9367FQ30HNFShh+j0UXXCA/ANElDu0J141e5nPLya66gfxKwaXl4CNS1eX9mwyzduvtQIv1Wxld68e8wSUl87h0YAE+eLtFG6SJrEFfcDJ7T0XrCauIYYeVD7x2Us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708718997; c=relaxed/simple;
-	bh=YMwlKu5pcV9IgkHBa7BXpVmtVFGijQkB/LQp8Qlai8U=;
+	s=arc-20240116; t=1708718999; c=relaxed/simple;
+	bh=woeo2RuIrzLBVm+zYXAqHl+FAzjCe9pL+3QNrvncyWs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c2Mzoe/3vwkhsgP82t6RjXDqpz01CFmetd7iQU3TRVXynmigKjF5wJJTQiRsyIq5M8usVSzRKjS7heflO8RyDraNt1jrhh3Wu3qnkyVWCnzMPmtyGhDomxjb4MtUFD9T0HRm4TxJUvLwG2KnC0v9ZjgY2g7aVG+KtW6c2Tla4oM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=getcruise.com; spf=pass smtp.mailfrom=getcruise.com; dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b=YSYXEvOe; dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b=jmpGV//A; arc=none smtp.client-ip=205.220.169.153
+	 MIME-Version:Content-Type; b=MT7m0Ki46TMY2nTZA9hd84A4aveOTyFH+H9rU4Pb+KwaGDVBgq5aiOVmEwI72f8e0pkvuGvClXh9qI1CYag43XuH3TUbZ2NPtaFNaUeDiOjSQhsF7t42UywZEu/hbnaiImrw9a/TtLsO443QOhAOQFHi8JS05K2fdsCNDPvBlbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=getcruise.com; spf=pass smtp.mailfrom=getcruise.com; dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b=OhjkAXF1; dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b=eNFuA0qO; arc=none smtp.client-ip=205.220.169.153
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=getcruise.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=getcruise.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b="YSYXEvOe";
-	dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b="jmpGV//A"
-Received: from pps.filterd (m0286614.ppops.net [127.0.0.1])
-	by mx0b-003ede02.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41NFpkZT004935
-	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 12:09:55 -0800
+	dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b="OhjkAXF1";
+	dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b="eNFuA0qO"
+Received: from pps.filterd (m0286617.ppops.net [127.0.0.1])
+	by mx0b-003ede02.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41NChQlv031335
+	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 12:09:57 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=getcruise.com;
 	 h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-type; s=ppemail; bh=F0iLyfDmPkZBlAoxsLIy2q
-	xBHslPYa/SqcNUwB0Ys3M=; b=YSYXEvOeHQO3bNn5vZqAa77XMYugPxhcXKjQBM
-	f0+dzk9Lz4AJA1wEQKv5RdOZjRrzrpP4I4ita0TOIHqLQKeRJO7kSU7saaSlomtJ
-	BIte40rghYwxZ2XMNQXhpYei3l7UB65c0+tyNmiOKcAVREPD1rbSRV/ljR/FvaYw
-	XQBAwQoFLoGpfWGS1XdycxMW/45g/XLGUR7eGW3xuW/zBTF7qpud5mfy/VyhFUrc
-	98LBAL7tTay3syBJLeCt9BppzqsKBzScwgwmAkBVXHr/SEkuGwwSZSgU2MW/U63M
-	uECfGdgg8TTQeSvpJCkFZ3E/VXD0g/hplcG7E1ixGtyJrSrg==
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	by mx0b-003ede02.pphosted.com (PPS) with ESMTPS id 3wd565kc23-1
+	:mime-version:content-type; s=ppemail; bh=banAqEH4AumsXhxjQiBCzD
+	2dMU26eauaRZHnld+5CPk=; b=OhjkAXF1V5pNk5QN5LchVbojcI6Kk6MxjXXONN
+	omrm3Yvui37gEdG+1tBmZ38QZP+p8DBKvSvVZVqcarsZzOEDXQSSBYGjZq6G3vs+
+	sefyTpQWor8KBCahSwRvm+L+F1ny295S0/wqYB8tFXze9gmL/7O/vJXwTkI8u9sE
+	FyvN7AFqMAKXastjQogIy/7Qm5Bn9SLUgTvq6eXTgwUfCASdZhPiJ8lYb17soM/5
+	6sw13vTT9mNf/N2ZjV/F6r185Zu8IT8djefeunMW432yA7NJO4Nv5xEYmWEcaTUI
+	r40jvAlzWSwH2SeWKZzFJWT2ysE71ZLxXxX8M42GhBk0MiAw==
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	by mx0b-003ede02.pphosted.com (PPS) with ESMTPS id 3wd564bcff-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 12:09:55 -0800 (PST)
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1dbcbfff988so13090835ad.1
-        for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 12:09:55 -0800 (PST)
+	for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 12:09:56 -0800 (PST)
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-6e4c6240704so442784b3a.0
+        for <iwd@lists.linux.dev>; Fri, 23 Feb 2024 12:09:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=getcruise.com; s=google; t=1708718994; x=1709323794; darn=lists.linux.dev;
+        d=getcruise.com; s=google; t=1708718995; x=1709323795; darn=lists.linux.dev;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=F0iLyfDmPkZBlAoxsLIy2qxBHslPYa/SqcNUwB0Ys3M=;
-        b=jmpGV//Ab1FUHMiN5/iZNR2er66TU5t5/PNSuxNiwzBWeJ/KF4nX1K4zGQgUaaQzba
-         04Md/r5k7BCTtra2uQzWRzcqiIA6MqqHmKNPk78mM6t5MhUuaJw7S4MfSxCyT0qrgnvi
-         gFNExTolDKyhHPWXpj4cjUcLJ5xgFb//cqzcJooVpaKV4SDLX1hjGbFazQdpHqD/VOiT
-         V6KZ1daXbqYEK2i5I9PiJD2y/hwj2fSPXtYZ7RTd/GmEjwQXbtkqUxWVNXFClf4uBrjp
-         bad2oGOpU3DyW9TtjXvt4xUHhRxTn1VHGtOuEdAF93AHXRRVeIz3jrUey8AqeYSxCBYr
-         tniA==
+        bh=banAqEH4AumsXhxjQiBCzD2dMU26eauaRZHnld+5CPk=;
+        b=eNFuA0qOqT+AhxK4kd8W/f7gxKsE7wN8V83nFzKmJQXZblHuCVqONHZlYTwNhuzYhT
+         3V1M61mB1jfMf2KDyhXY1vLFnaq8GZ/0qF9WVcDXB2xAXjwT8gzetfqqXa2d1nUXzgZN
+         KN0fjT1L34Mj3dYHH9/A9ievKOvcULmIiK0W2rE+g0B/3LCvjZWGQTY7/HtAKpvoxNp0
+         E4gVtpQGcrpo0YR2uRtYAPZE9qqJcdb6pyUJZq0mdZUDGhI/8KDEsJCWoQ/HVcKnhop4
+         h+OsR5kAylVjN84fZcyGVsa3rEaaBG3kt5/CbmHeA2msMj9m91/sTuSxyD+6Kx/6ZqXm
+         du3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708718994; x=1709323794;
+        d=1e100.net; s=20230601; t=1708718996; x=1709323796;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F0iLyfDmPkZBlAoxsLIy2qxBHslPYa/SqcNUwB0Ys3M=;
-        b=j4thazj5fa8ImfS817LQdjaw8ocyZ99OzXFx2C3na+tl2LwOlnR+7lh4HHqCdf2Phb
-         gCihkBEZkUDYGDrbr68+rV+Nzm3E5jHDKB1d6yY48IimpWH3ynBw3MqNOQkFrv9nLa+V
-         DH4yEJ3kpphu/nXqgWyyy/Dh/h4BCXECUzmZKw0DkNE7XT1diw2g8NNBrFjqUupKotUi
-         9K/69y//WN9avLKp53SSN63z8a6hZBMrDfXiQ3Gp2Iqy3gy/QaQbLwaeyIb/XyL30jw2
-         9dGfOk1fnFXLo86foO9Zed9i6PqNtLe4v1PBcMvmYUUyEfb96+1nN8Pmtu6eqJescZiN
-         4ZFw==
-X-Gm-Message-State: AOJu0Yw0ULTXJHrnesxEHckqSiFLf6NjtsixADMze10Kb1WfBdLkU6bN
-	sMXHQttyKo/H/IoKChB2h+Ntsk1GyW2eFgLOsSfSMmLw6ecKmGnWbDSomcIwxpl23EFWGGjpRye
-	bXBCOZeklTBon0B7USc8gzMFxfnGuJliDw7F5GXPSo9j9yMVEoPMG1FaIkoY/H3ZGhHHlLsyEAw
-	3SEfmhLjWp+/J8Hm4kSONSZIR9AG1sMNVKNR/guhb+lMp9hAk=
-X-Received: by 2002:a17:902:6b83:b0:1db:d843:7246 with SMTP id p3-20020a1709026b8300b001dbd8437246mr916587plk.51.1708718994193;
-        Fri, 23 Feb 2024 12:09:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGbKbDqHLiVSd4eHF3zN80EMgTJ4Lq4RZ6tGQps+BcTSnU0enXX8zHs4xHYJ7/LlDy/aTWLjg==
-X-Received: by 2002:a17:902:6b83:b0:1db:d843:7246 with SMTP id p3-20020a1709026b8300b001dbd8437246mr916570plk.51.1708718993800;
-        Fri, 23 Feb 2024 12:09:53 -0800 (PST)
+        bh=banAqEH4AumsXhxjQiBCzD2dMU26eauaRZHnld+5CPk=;
+        b=sPKgevIQ1Vm91QQ6S7ocUPcFMJqnHT75xnGgG8H8YgPM+ziS7Z9PGqUlQ8Ah9c3KTc
+         XG3rtAyOK4CP/rPtMLCqNOuH09KEaUDrA3moixsKgbcLtB+wGOwErzL8b7D4pQWTNodb
+         QUoMz2OGDRmrSjzOUMw/neWAgdQQC7thHElL25FehKEFk6ETpojgP5qmlYsdX7EBCKsX
+         Kn5vZzLyyaY21S1nBgpEuuXzaNcTZ0SHKyVG8Z6LtCoBNxI0nq7VzHWxzyRvZWuBpx1K
+         XxKR+yGoFs+v8PM3zTJQlAMLa5yoCxAR0Zh+cZZAJDEt0XFFbNr0USP6eUs+aoAvLdg/
+         14ag==
+X-Gm-Message-State: AOJu0YziIR9PD+irJOL9Z1lAPMKnETB+V02JVrxB87d+9I+duRY4usS0
+	jnhFHONdIAtH750r+WoXqyfVDCvqRTmblONajAFF3eSR0XI6yzflN/9uJpBe5aKI4sQxprXuX8U
+	zvo0hCfV/14VtEOg5Tk5ilm7UxeM97Jqe1DnFKAkkx3dHTi96pxIXlIOtXVUI4PXl65TsZnqmb9
+	89pFG05rCmGpoxAlNAPuUNxuayPz5S9HuFT13k2wtkRsGt7Ig=
+X-Received: by 2002:a17:902:d3c6:b0:1dc:1e4f:9b3f with SMTP id w6-20020a170902d3c600b001dc1e4f9b3fmr923981plb.24.1708718995779;
+        Fri, 23 Feb 2024 12:09:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEf/mTINhysvuFcH8RdC7q8LqAD2U/YZ39NcAttEx4ahqQ+FfllCW3r93t0+lmQwWgzaQINVA==
+X-Received: by 2002:a17:902:d3c6:b0:1dc:1e4f:9b3f with SMTP id w6-20020a170902d3c600b001dc1e4f9b3fmr923954plb.24.1708718995347;
+        Fri, 23 Feb 2024 12:09:55 -0800 (PST)
 Received: from BPHKDV2-DT.corp.robot.car ([199.73.127.2])
-        by smtp.gmail.com with ESMTPSA id b17-20020a170902ed1100b001dba356b96esm12019730pld.306.2024.02.23.12.09.53
+        by smtp.gmail.com with ESMTPSA id b17-20020a170902ed1100b001dba356b96esm12019730pld.306.2024.02.23.12.09.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Feb 2024 12:09:53 -0800 (PST)
+        Fri, 23 Feb 2024 12:09:55 -0800 (PST)
 From: Ram Subramanian <ram.subramanian@getcruise.com>
 To: iwd@lists.linux.dev
 Cc: Ram Subramanian <ram.subramanian@getcruise.com>
-Subject: [PATCH v2 2/3] client: report channel if present in diag message
-Date: Fri, 23 Feb 2024 12:09:08 -0800
-Message-ID: <20240223200944.1343893-2-ram.subramanian@getcruise.com>
+Subject: [PATCH v2 3/3] doc: document channel field in station diagnostics
+Date: Fri, 23 Feb 2024 12:09:09 -0800
+Message-ID: <20240223200944.1343893-3-ram.subramanian@getcruise.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240223200944.1343893-1-ram.subramanian@getcruise.com>
 References: <20240223200944.1343893-1-ram.subramanian@getcruise.com>
@@ -86,56 +86,34 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
-X-Proofpoint-GUID: 4HF3e-jzbAlHz1ggWzG5aZQsz0ntl_ZJ
-X-Proofpoint-ORIG-GUID: 4HF3e-jzbAlHz1ggWzG5aZQsz0ntl_ZJ
+X-Proofpoint-GUID: jZDhCcYmCOcB2IRKMslIVYIJhrmm2UmK
+X-Proofpoint-ORIG-GUID: jZDhCcYmCOcB2IRKMslIVYIJhrmm2UmK
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-02-23_06,2024-02-23_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- mlxlogscore=999 lowpriorityscore=0 phishscore=0 adultscore=0 spamscore=0
- suspectscore=0 impostorscore=0 malwarescore=0 priorityscore=1501
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2402120000 definitions=main-2402230149
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ adultscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 spamscore=0
+ mlxscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2402230148
 
 ---
- client/diagnostic.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ doc/station-diagnostic-api.txt | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/client/diagnostic.c b/client/diagnostic.c
-index 6360b7e2..e1bd9784 100644
---- a/client/diagnostic.c
-+++ b/client/diagnostic.c
-@@ -93,6 +93,7 @@ static const struct diagnostic_dict_mapping diagnostic_mapping[] = {
- 	{ "RxMCS", 'y' },
- 	{ "TxMCS", 'y' },
- 	{ "Frequency", 'u' },
-+	{ "Channel", 'q' },
- 	{ "Security", 's' },
- 	{ NULL }
- };
-@@ -109,6 +110,7 @@ void diagnostic_display(struct l_dbus_message_iter *dict,
- 	while (l_dbus_message_iter_next_entry(dict, &key, &variant)) {
- 		const char *s_value;
- 		uint32_t u_value;
-+		uint16_t q_value;
- 		int16_t n_value;
- 		uint8_t y_value;
- 		int bytes;
-@@ -145,6 +147,14 @@ void diagnostic_display(struct l_dbus_message_iter *dict,
- 			bytes = sprintf(display_text, "%u", u_value);
- 			break;
+diff --git a/doc/station-diagnostic-api.txt b/doc/station-diagnostic-api.txt
+index f6e099b5..77651366 100644
+--- a/doc/station-diagnostic-api.txt
++++ b/doc/station-diagnostic-api.txt
+@@ -23,6 +23,8 @@ Methods		dict GetDiagnostics()
  
-+		case 'q':
-+			if (!l_dbus_message_iter_get_variant(&variant, "q",
-+							&q_value))
-+				goto parse_error;
+ 			Frequency - Frequency of currently connected BSS.
+ 
++			Channel - The WLAN channel number of currently connected BSS.
 +
-+			bytes = sprintf(display_text, "%u", q_value);
-+			break;
-+
- 		case 'n':
- 			if (!l_dbus_message_iter_get_variant(&variant, "n",
- 							&n_value))
+ 			Security - The chosen security for the connection.
+ 
+ 			RSSI [optional] - The RSSI of the currently connected BSS.
 -- 
 2.43.2
 
