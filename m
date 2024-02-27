@@ -1,65 +1,61 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83233D387
-	for <iwd@lists.linux.dev>; Tue, 27 Feb 2024 18:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1D4148317
+	for <iwd@lists.linux.dev>; Tue, 27 Feb 2024 19:35:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709058878; cv=none; b=u5fL/3y2CnF4R6RvqOisooFh5Hg8Cs6hGnDatqnGgb0L/pzsg6/a9uFno165TvlavsQ0oPljfyF+nAaifPqDNiukTjDo6mTENyX67LEB7oPyOyIiOa5chj0DtT3CD66UnKnck/6QUilgrkQClZ8ao99SN0oQyLabgaxXeVDQuFY=
+	t=1709062529; cv=none; b=AqsWl/KH6XPE+Z/Dl1CwooEVIYyRGkPV7+6PWQ7AtK/aaTxeshUVv6hLFBHS0Y1gS6jCw+oi+lY4PTN+Oz/O6WqWEVsH7ZyPfoR+jS7Okgj5FP9Hewu9gqcrBL115vUN/CQOh6GOUReZYlkAtOibtHT/scYFC6lvDAOcCYjvNX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709058878; c=relaxed/simple;
-	bh=u4/CapjLYiKQXd7+rGdv+iSe17B8CmqHvNF5qDElwMM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CZ2K786zQC58cwI2Oyf0wKOWvbUumPGjw6KXZ52/azL58pQfIbmdbzWXIbUdQCcFOC0mF0Ygxh0XE0RrLWT8zuEYN278aNavobZXorPXMnnIXRKNhSgdSG8KfAY16i3crWOvQfSNjz5Yc9lWWVqyyD4CqdzP4Mxf79d6ldiN1NI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LnvfNYKR; arc=none smtp.client-ip=209.85.160.174
+	s=arc-20240116; t=1709062529; c=relaxed/simple;
+	bh=VkaocnOJlD2CsHvejPg2tFASfPJ7UmurfT4QLitdfsI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a2pADqs56vZ7Pvna4PdnMkp/Ym1GRmKu3zq46MbB1V3RJVcoGw2vBKNU/5MTvPj0FxK9osD6cCBq7+G8UVRmtrReq4liFML7a9qIbQTvM9oYet0yiJgprQ/mxojdinWSd/113HBlAjqPY54dxHqY/10r3McZadCNfWIRxEVxHAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mn3tPx9h; arc=none smtp.client-ip=209.85.222.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LnvfNYKR"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-429de32dad9so30311211cf.2
-        for <iwd@lists.linux.dev>; Tue, 27 Feb 2024 10:34:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mn3tPx9h"
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-7da6e831958so936662241.0
+        for <iwd@lists.linux.dev>; Tue, 27 Feb 2024 11:35:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709058875; x=1709663675; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rg2PNCZPcwjXqnwYpcqy+L+PMJ8eAB5YOS7ZXv6a7Ys=;
-        b=LnvfNYKRhRV5U0UGEkCoygyoDQ4qm1fBqxjthHT0pIDXyMX3PrWaez+i5+rIaGU2a/
-         ouTYL8Wgb7lHnt51u0ihbJVfdieMuOKds91rgShsOsuExRBe8xbkXkMwfFgJnjwtNPtA
-         57vpW2WiHF3A2P9lR1BoJcDl1jbOVoQck/8kDgmgVtazbG2p/AwHRlKSHNCBaRL4fiLD
-         RrmaxlUxKo6haX4TBjZM27+6j29Xvds1GODwhAOolopPxOlekP+XjyffFD4bCe1ukgOL
-         nILbxBPdhByVIG5qPOmph99LWMwwSDDvt3bhXCsoR9dYLArfZNc7cu1PJmtHPcENw2G2
-         oHVg==
+        d=gmail.com; s=20230601; t=1709062525; x=1709667325; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cYGzuyxj3uSOAYsTan3w5fhXx7VNiNxX9GYZZ1OGDTs=;
+        b=Mn3tPx9h496hWxyY/2n/0CsVma9DAhCojwKMzMJvNsTQTAWBE3p/Z83ZNa+52u5CqV
+         7WS/tlcOga8OBqtjew46XT4DAHiPotGR+NHWeeqjjt5GCLbV23YW2Ej17OMGbwefmh3c
+         qfOe7TIZQTR62xkR0ytBvFp1QfkGgwnrwkBH5txLrx220v6M9yOvYh7+tUdg2Dn/Babj
+         pY0sIbkmzsE0n/QucB+r0ixWWj5q2V6TW8671r2abhi4nfI6dV3fUUjdsf2/pKwBMQ5c
+         CmQ29eazeib8QqyAGUzxTn3AkxObTonkCw9dXVzSBf+KuNYvMEWc3ELP9ZsiB5lwPq8U
+         ms/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709058875; x=1709663675;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Rg2PNCZPcwjXqnwYpcqy+L+PMJ8eAB5YOS7ZXv6a7Ys=;
-        b=Eby7HAJx9w6O34pidqmh2Z+b8s0zx3IDP66lsZJB4JO0MhKSENvFpgl3AgDIc2xW0l
-         4QZFNwlPNwQ25BKn+NkYAJjNIv+WzYZUnnwwPHtviBa71pLPZaA4AlPkcIOTYJ0Gmeme
-         0jxbn2noT0vAcuiDuW2/4QMqTDhNQ79Jk2g9vZv7ZEXe1FE5/Y73ltXHdR0eN4hwQlMw
-         q8cL4OkZ0akvThKZXIC45dCdCjAztmiEh6s9rMmLY2WpwGfkgbU+fcyKShoGufCUV9PK
-         jCP0a+fXMgHJ0sfQyw3U84S+HpiPUBJ+uYd1mJxWdZu5hGSa7W/JihFjjwo0iO+1g8dm
-         CKoQ==
-X-Gm-Message-State: AOJu0Yycw5yM2eqK/hvT4gR9Mzf3yedDYKa8j+LIYExdhhTid//OS4ks
-	KvDqj2tas47ThmsPZiiaOWGbOZxBdoSVWAZTHljHgURYwlx2WVJtxOIxV7RH
-X-Google-Smtp-Source: AGHT+IHP4b9lUB6zmZ7BsffWpou7BEK3o/FkoVHEdiphX0ct+7g+TOG5wUoh9ArUty5GAg6vDQHzKQ==
-X-Received: by 2002:ac8:5f11:0:b0:42e:5f6d:8f2d with SMTP id x17-20020ac85f11000000b0042e5f6d8f2dmr11956245qta.54.1709058875441;
-        Tue, 27 Feb 2024 10:34:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709062525; x=1709667325;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cYGzuyxj3uSOAYsTan3w5fhXx7VNiNxX9GYZZ1OGDTs=;
+        b=CC1dR++Jt8p/H8coJTnlElgohjIVHkmspWezLgMy0cPb7DoRgfnwJxelr1lTNTUqpq
+         6wB/jvOMKakMje64Kb3TzQ2Tg2Vwf4oaQih0eowso//YTJ5V1JjVTjue+HKgDfK2Tz5E
+         veFPrtuvqzQfHWcaArjpvaMEgeBQ/Jr3t6ncOHXGLMXHlJIDFkOm3ES1vLL4+iD9uFf8
+         IQUbL0Y83F6+L7S9NjeY6bXnheAPxQWES0rs9JR9oy4MgOXV6g4JBRP65zFYV6KLjUkt
+         pl7UwT8wkiJXugaEp0+P2XkdWJC1QcTYZZllD6/xCGG01dpgsuUp4qmdVJlseuPgy35a
+         uUlA==
+X-Gm-Message-State: AOJu0YxRYUd0Uj/wZ2PlrkFsHf2KACseLIyBpF414gf7+W4c6G+KtdAe
+	PVZe1Ay4KYvpU+SEY9yNg7W8RWnkQM+wcmIG/J8FxKjycf8nbbm5mMh4EzP/
+X-Google-Smtp-Source: AGHT+IFSnL+0OB1/NkSUHybibs4ceXC5mD70w19LJtzL0VOsoakJ2DVXf4LjW+oAy+lpqjhmD+0p5A==
+X-Received: by 2002:a05:6102:3239:b0:472:5c3e:caf4 with SMTP id x25-20020a056102323900b004725c3ecaf4mr1821819vsf.27.1709062525104;
+        Tue, 27 Feb 2024 11:35:25 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id jy2-20020a05622a818200b0042e3468a98csm3819617qtb.4.2024.02.27.10.34.34
+        by smtp.gmail.com with ESMTPSA id jy2-20020a05622a818200b0042e3468a98csm3866239qtb.4.2024.02.27.11.35.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 10:34:35 -0800 (PST)
+        Tue, 27 Feb 2024 11:35:24 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 11/11] auto-t: add OWE test for auto default group
-Date: Tue, 27 Feb 2024 10:34:05 -0800
-Message-Id: <20240227183405.257206-11-prestwoj@gmail.com>
+Subject: [PATCH 1/2] unit: fix memory leak in test-dpp
+Date: Tue, 27 Feb 2024 11:35:20 -0800
+Message-Id: <20240227193521.304643-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240227183405.257206-1-prestwoj@gmail.com>
-References: <20240227183405.257206-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -69,53 +65,24 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 ---
- autotests/testOWE/connection_test.py | 33 ++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ unit/test-dpp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/autotests/testOWE/connection_test.py b/autotests/testOWE/connection_test.py
-index 1fdc990a..58e6560f 100644
---- a/autotests/testOWE/connection_test.py
-+++ b/autotests/testOWE/connection_test.py
-@@ -64,6 +64,39 @@ class Test(unittest.TestCase):
-         self.assertRaises(Exception, testutil.test_ifaces_connected,
-                           (hapd0.ifname, device.name, True, True))
+diff --git a/unit/test-dpp.c b/unit/test-dpp.c
+index 781d494a..0a4fd01f 100644
+--- a/unit/test-dpp.c
++++ b/unit/test-dpp.c
+@@ -331,8 +331,10 @@ static void test_key_derivation(const void *data)
  
-+    def test_auto_default_group(self):
-+        wd = IWD()
-+        hapd = HostapdCLI(config='ssidOWE-1.conf')
-+
-+        devices = wd.list_devices(1)
-+        device = devices[0]
-+
-+        device.get_ordered_network('ssidOWE')
-+
-+        device.connect_bssid(hapd.bssid)
-+
-+        condition = 'obj.state == DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        # Should have rejected group 20, but still connected on 19
-+        self.assertEqual(device.event_ocurred("ecc-group-rejected"), True)
-+
-+        testutil.test_iface_operstate()
-+        testutil.test_ifaces_connected(device.name, hapd.ifname)
-+
-+        device.disconnect()
-+
-+        device.connect_bssid(hapd.bssid)
-+
-+        condition = 'obj.state == DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        # IWD should have used the default group, no rejection
-+        self.assertEqual(device.event_ocurred("ecc-group-rejected"), False)
-+
-+        testutil.test_iface_operstate()
-+        testutil.test_ifaces_connected(device.name, hapd.ifname)
-+
-     @classmethod
-     def setUpClass(cls):
-         pass
+ 	if (vector->i_asn1) {
+ 		HEX2BUF(vector->i_asn1, tmp, sizeof(tmp));
++		l_free(asn1);
+ 		asn1 = dpp_point_to_asn1(i_boot_public, &asn1_len);
+ 
++		l_free(from_asn1);
+ 		from_asn1 = dpp_point_from_asn1(asn1, asn1_len);
+ 
+ 		assert(l_ecc_points_are_equal(from_asn1, i_boot_public));
 -- 
 2.34.1
 
