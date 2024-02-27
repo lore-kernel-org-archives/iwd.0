@@ -1,62 +1,62 @@
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BAD347A2
-	for <iwd@lists.linux.dev>; Tue, 27 Feb 2024 18:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4AF3C099
+	for <iwd@lists.linux.dev>; Tue, 27 Feb 2024 18:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709058866; cv=none; b=U0tVPJsUaThPITVI/YQF5f4FrFInGmdUVsaMPSYmjR49c17L/W4DFdi4eoVG4FdOOUwgqyBnGfQp8cwWaTLpOlpBtHJigICLVIZJvwIdgw/e9gs57OtNm0h7zEmO6YEbbWTFdrUANLPj1ErwEVhs45eM4BMUNOaxvpq46iVZ5zw=
+	t=1709058867; cv=none; b=Lg/KJbTTH4L/GLbNmylW5PUwXxCl9D4VKvWSelwnaRcEtccdqJu3LV6xW/Nx95yxADFMikEqVu96QtCUG6KgEhM+/flhmnHzj0j33k9t8UJqd9qwwmltA0QwPupiH+ys+k+XBvnOAVwt6adZO8zsQYufS5n/cPlWlbXTyiPy9mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709058866; c=relaxed/simple;
-	bh=o2WNaPzck4pqs87X6Vtb2X56M1AZculVkJcBK6c0/Bg=;
+	s=arc-20240116; t=1709058867; c=relaxed/simple;
+	bh=AaVfMNKyR+s1giFbgO5pAWXl7LBq/1L5RzICdGECOoQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hucE+1pYfE24vTBzkgKsm4B4LUlBuBG/RssSHl6FMVOG3mc+hJKnddGMjuo7EXGAEP5YR0Whs+KElLkwRzIqd1GrEMkEaiSWMgABsu53xgJRbpD6KxmjneS1272CwxhH55IW8+J8ZaJUsOcWW/iAbYmHoAhJxUg4HVXW3wkp2aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iMnRpGaA; arc=none smtp.client-ip=209.85.210.41
+	 MIME-Version; b=S6+AP2Ad7fR7CbyQPrmvg8SID3PH0oN6n3SZnG60ZjsXG30pWKHRJNUX67qt+SJQQ0IH8XjLYqTPldyKkUUN4WescKx8Yz4rcezTCI5gifEIAPl/uagddnhYaNRyIlHrpoZlUGHT4oNj5xOfqD9cWDkcZKLITTDWdFwo7PGoJCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jEVJuxXi; arc=none smtp.client-ip=209.85.160.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iMnRpGaA"
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6e4a0e80d14so1590424a34.1
-        for <iwd@lists.linux.dev>; Tue, 27 Feb 2024 10:34:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEVJuxXi"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-42a029c8e62so38180241cf.1
+        for <iwd@lists.linux.dev>; Tue, 27 Feb 2024 10:34:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709058863; x=1709663663; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1709058865; x=1709663665; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lbHRKyzdYm5SvdYRcF/nKX9DPDQckGXqLXSOZ+K1s5c=;
-        b=iMnRpGaAigr2SFjmYzb4MH7qTQ40bUjAJ0w2/G/nP9wRV1X5jF0DbwdwyMEDFk552T
-         NuOC228rlVBwJvuF90tVuf1vjsCEnG0wQcLQmEKaYReI5KbLamUQIPeVIHW27gsH91Cp
-         w8KTeIyYFM7+A+GkB7aayYZQLq8YvxE9GDpDgQWJ2bQCRrq8ND2ujWH1Hvt3q61GlwXS
-         79KFnra3hC4KFCfT24PGb907WBDpfZ/1ZIxh8LTVvRCMqw7oLGDOH6KlV4RTjXOzAaD4
-         CKTIkgzVgmYbjhD52z+J8I4J0XYXoOa0m40jyePMHai7xfXVFSsx3yUfZs8LY06QPalM
-         SQlQ==
+        bh=1SjwUwRTCIfwybhBNg6EVCAHTsl8oY/SqeIVyBvpxtc=;
+        b=jEVJuxXixRrgkX8P8GmHeNW4VNyQdI2S087zSePSm5lEnIJMqDqOKIcIvtwdPh39Fq
+         feevULx0Vbcih9wF7/anCMF1ZTRDgbed+mI94qcgtWvsDbIU7DgoltwvL1W1g00oOmV/
+         DenXuaUqWrE8ZPOZ7fZPmEZzO6/+Z1oCpeFDZ3QvTzvM0vsQZmh56r/XiNMl0yjzsX7+
+         4wgdDYqDBH/T/pTl5e3YqZmjr7V97txa9u2ns7xkybVdgA34ZBa+UOLBR3An9Lo+UFx/
+         A9naNP6jvxYbYD61VMJ+/jjT1zksW823e4R41xS2gPf0tgOKNnMzN+GiJVzd9KUx5dkn
+         8fYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709058863; x=1709663663;
+        d=1e100.net; s=20230601; t=1709058865; x=1709663665;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lbHRKyzdYm5SvdYRcF/nKX9DPDQckGXqLXSOZ+K1s5c=;
-        b=xCLdFKJhjhyMMo2pHSKl3a2TC6j0W3EKrfMy+R4LuXWY9dd/VD0NkJC68BSvgBYnJM
-         bC6wuihi4f0XzLZHE4SE78FsgQ0w+299CgkE7Ew6s/aMcWnC54mP1YxLMJkQL9RNPYQX
-         YwTS9OijTma3Bi+/dmU7V95WBtJ2j07yyxIZ1thJl2zqHTQw/8zDnDimuJibGSOUsrh7
-         kAL3VIv+61Yi4YJ0gBVCoDOt0vC5NPX9+cGElsU4lhVWBAP/h7y/LeBLkyf5JnHc9IlD
-         nDyoKxrz5WKlRC92gbCTquWymyguPZDDOn+fcIb8uw2h+N/ARYXgCsF3GTupZiHjM3Ue
-         nDog==
-X-Gm-Message-State: AOJu0Yw0b14AujgqJQFd937yb4CIHUJub3CVc9U9/cjoHZFxGikBOeom
-	uXZebN90FD0s3UGjcnss33Zer8Woy4Aw5h+TSFmcmBSSOFawFpkhhKUZAktJ
-X-Google-Smtp-Source: AGHT+IEH5eB24UCzLvFO2iDvxDDg441kZLb7/B/dDEJ4NYFkEe6ApB8tSj5sNnD00sxjvtZaQmtKww==
-X-Received: by 2002:a9d:6c43:0:b0:6e1:13a2:3948 with SMTP id g3-20020a9d6c43000000b006e113a23948mr11089154otq.5.1709058863383;
-        Tue, 27 Feb 2024 10:34:23 -0800 (PST)
+        bh=1SjwUwRTCIfwybhBNg6EVCAHTsl8oY/SqeIVyBvpxtc=;
+        b=LiG9T9LnRlTeddsg9769li8DwqMvNe77v3/lMlyOF91PQm32DC/jzEdp+iwizZEBa3
+         BZ0abz1E/tAR5smDRB8lm74gd/800d0n1MxdAMk7layA28Z1mhTr0l1iWgyQXo7GrCnL
+         RvjdKdpyX6vbiQFEcz0KPrkfpHD8l/r68F8SuD0e5LPdxdsfdZTcFf/rnxA/sNo01ygL
+         l3EluRzHKIlJfJJLwMzZyLL1Wm9pVyCdlwEspwWiFnoY3fL+nATLDQhZWxh18a+/QFTc
+         nQQHpuEIBVBfqnvSLcHC3lHPsboIZ9/PDTxctkGgfe17v+yKjsbllZsCP8WqkgRiEE3M
+         riSQ==
+X-Gm-Message-State: AOJu0YzuaGaGNgAohjWcXnu65vHaRetNfK+CuPqhqTVL2UAmhw2dIPfy
+	sNViCRH1jKMIn9GxgrtOOjyz8vaoIVmxB2mQ7jXXC9oHIaHSsUkjxnc2+Bjp
+X-Google-Smtp-Source: AGHT+IGVc2datESiwDsDtHHIqBjdejxcYgtlbpg4aOwoAGcBaGAuR/GAP39FQEzTZD+REm0yT0r38w==
+X-Received: by 2002:a05:622a:216:b0:42e:7fd7:c68b with SMTP id b22-20020a05622a021600b0042e7fd7c68bmr8482965qtx.44.1709058864621;
+        Tue, 27 Feb 2024 10:34:24 -0800 (PST)
 Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id jy2-20020a05622a818200b0042e3468a98csm3819617qtb.4.2024.02.27.10.34.22
+        by smtp.gmail.com with ESMTPSA id jy2-20020a05622a818200b0042e3468a98csm3819617qtb.4.2024.02.27.10.34.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 10:34:22 -0800 (PST)
+        Tue, 27 Feb 2024 10:34:24 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 02/11] knownnetworks: add option to force a default ECC group
-Date: Tue, 27 Feb 2024 10:33:56 -0800
-Message-Id: <20240227183405.257206-2-prestwoj@gmail.com>
+Subject: [PATCH 03/11] network: retain default ECC group for OWE after setting
+Date: Tue, 27 Feb 2024 10:33:57 -0800
+Message-Id: <20240227183405.257206-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240227183405.257206-1-prestwoj@gmail.com>
 References: <20240227183405.257206-1-prestwoj@gmail.com>
@@ -68,76 +68,131 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This adds the option [Settings].UseDefaultEccGroup which allows a
-network profile to specify the behavior when using an ECC-based
-protocol. If unset (default) IWD will learn the behavior of the
-network for the lifetime of its process.
+There is special handling for buggy OWE APs which set a network flag
+to use the default OWE group. Utilize the more persistent setting
+within known-networks as well as the network object (in case there
+is no profile).
 
-Many APs do not support group 20 which IWD tries first by default.
-This leads to an initial failure followed by a retry using group 19.
-This option will allow the user to configure IWD to use group 19
-first or learn the network capabilities, if the authentication fails
-with group 20 IWD will always use group 19 for the process lifetime.
+This also renames the get/set APIs to be generic to ECC groups rather
+than only OWE.
 ---
- src/knownnetworks.c | 11 +++++++++++
- src/knownnetworks.h |  8 ++++++++
- 2 files changed, 19 insertions(+)
+ src/network.c | 38 +++++++++++++++++++++++++++++++-------
+ src/network.h |  4 ++--
+ src/station.c |  4 ++--
+ 3 files changed, 35 insertions(+), 11 deletions(-)
 
-diff --git a/src/knownnetworks.c b/src/knownnetworks.c
-index fc810057..6f65d2b3 100644
---- a/src/knownnetworks.c
-+++ b/src/knownnetworks.c
-@@ -123,6 +123,17 @@ void __network_config_parse(const struct l_settings *settings,
+diff --git a/src/network.c b/src/network.c
+index 287e2be0..a0a89e63 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -89,7 +89,7 @@ struct network {
+ 	bool provisioning_hidden:1;
+ 	uint8_t transition_disable; /* Temporary cache until info is set */
+ 	bool have_transition_disable:1;
+-	bool force_default_owe_group:1;
++	bool force_default_ecc_group:1;
+ 	int rank;
+ 	/* Holds DBus Connect() message if it comes in before ANQP finishes */
+ 	struct l_dbus_message *connect_after_anqp;
+@@ -271,8 +271,12 @@ struct network *network_create(struct station *station, const char *ssid,
+ 	network->security = security;
  
- 		l_strfreev(modes);
+ 	network->info = known_networks_find(ssid, security);
+-	if (network->info)
++	if (network->info) {
+ 		network->info->seen_count++;
++		if (network->info->config.ecc_group ==
++						KNOWN_NETWORK_ECC_GROUP_DEFAULT)
++			network->force_default_ecc_group = true;
++	}
+ 
+ 	network->bss_list = l_queue_new();
+ 	network->blacklist = l_queue_new();
+@@ -553,7 +557,7 @@ int network_handshake_setup(struct network *network, struct scan_bss *bss,
  	}
-+
-+	if (l_settings_has_key(settings, NET_USE_DEFAULT_ECC_GROUP)) {
-+		if (l_settings_get_bool(settings,
-+					NET_USE_DEFAULT_ECC_GROUP, &b)) {
-+			config->ecc_group = b ? KNOWN_NETWORK_ECC_GROUP_DEFAULT
-+					: KNOWN_NETWORK_ECC_GROUP_MOST_SECURE;
-+		} else
-+			l_warn("[%s].%s is not a boolean value",
-+					NET_USE_DEFAULT_ECC_GROUP);
-+	} else
-+		config->ecc_group = KNOWN_NETWORK_ECC_GROUP_AUTO;
+ 
+ 	if (hs->akm_suite == IE_RSN_AKM_SUITE_OWE)
+-		hs->force_default_owe_group = network->force_default_owe_group;
++		hs->force_default_owe_group = network->force_default_ecc_group;
+ 
+ 	/*
+ 	 * The randomization options in the provisioning file are dependent on
+@@ -818,14 +822,34 @@ void network_set_info(struct network *network, struct network_info *info)
+ 					IWD_NETWORK_INTERFACE, "KnownNetwork");
  }
  
- void __network_info_init(struct network_info *info,
-diff --git a/src/knownnetworks.h b/src/knownnetworks.h
-index 741d42ed..c81bd9aa 100644
---- a/src/knownnetworks.h
-+++ b/src/knownnetworks.h
-@@ -27,6 +27,7 @@
- #define NET_ADDRESS_OVERRIDE SETTINGS, "AddressOverride"
- #define NET_TRANSITION_DISABLE SETTINGS, "TransitionDisable"
- #define NET_TRANSITION_DISABLE_MODES SETTINGS, "DisabledTransitionModes"
-+#define NET_USE_DEFAULT_ECC_GROUP SETTINGS, "UseDefaultEccGroup"
- 
- enum security;
- struct scan_freq_set;
-@@ -38,6 +39,12 @@ enum known_networks_event {
- 	KNOWN_NETWORKS_EVENT_UPDATED,
- };
- 
-+enum known_network_ecc_group {
-+	KNOWN_NETWORK_ECC_GROUP_AUTO = 0,
-+	KNOWN_NETWORK_ECC_GROUP_DEFAULT,
-+	KNOWN_NETWORK_ECC_GROUP_MOST_SECURE,
-+};
+-void network_set_force_default_owe_group(struct network *network)
++void network_set_force_default_ecc_group(struct network *network)
+ {
+-	network->force_default_owe_group = true;
++	/* No network info, likely a failed OWE connection */
++	if (!network->info) {
++		network->force_default_ecc_group = true;
++		return;
++	}
 +
- struct network_info_ops {
- 	struct l_settings *(*open)(struct network_info *info);
- 	int (*touch)(struct network_info *info);
-@@ -72,6 +79,7 @@ struct network_config {
- 	uint8_t sta_addr[6];
- 	bool have_transition_disable : 1;
- 	uint8_t transition_disable;
-+	enum known_network_ecc_group ecc_group;
- };
++	/* Profile explicitly wants to try the most secure group */
++	if (network->info->config.ecc_group ==
++					KNOWN_NETWORK_ECC_GROUP_MOST_SECURE)
++		return;
++
++	l_debug("Forcing default group for %s", network->ssid);
++
++	network->force_default_ecc_group = true;
++	network->info->config.ecc_group = KNOWN_NETWORK_ECC_GROUP_DEFAULT;
+ }
  
- struct network_info {
+-bool network_get_force_default_owe_group(struct network *network)
++bool network_get_force_default_ecc_group(struct network *network)
+ {
+-	return network->force_default_owe_group;
++	if (!network->info)
++		return network->force_default_ecc_group;
++
++	if (network->info->config.ecc_group == KNOWN_NETWORK_ECC_GROUP_DEFAULT)
++		return true;
++
++	return false;
+ }
+ 
+ int network_can_connect_bss(struct network *network, const struct scan_bss *bss)
+diff --git a/src/network.h b/src/network.h
+index ea619f3f..17dfcca8 100644
+--- a/src/network.h
++++ b/src/network.h
+@@ -58,8 +58,8 @@ void network_sync_settings(struct network *network);
+ 
+ const struct network_info *network_get_info(const struct network *network);
+ void network_set_info(struct network *network, struct network_info *info);
+-void network_set_force_default_owe_group(struct network *network);
+-bool network_get_force_default_owe_group(struct network *network);
++void network_set_force_default_ecc_group(struct network *network);
++bool network_get_force_default_ecc_group(struct network *network);
+ 
+ bool network_update_known_frequencies(struct network *network);
+ 
+diff --git a/src/station.c b/src/station.c
+index 8817637b..3712d5bb 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3152,7 +3152,7 @@ static bool station_retry_owe_default_group(struct station *station)
+ 		return false;
+ 
+ 	/* If we already forced group 19, allow the BSS to be blacklisted */
+-	if (network_get_force_default_owe_group(station->connected_network))
++	if (network_get_force_default_ecc_group(station->connected_network))
+ 		return false;
+ 
+ 	l_warn("Failed to connect to OWE BSS "MAC" possibly because the AP is "
+@@ -3160,7 +3160,7 @@ static bool station_retry_owe_default_group(struct station *station)
+ 		"Retrying with group 19 as a workaround",
+ 		MAC_STR(station->connected_bss->addr));
+ 
+-	network_set_force_default_owe_group(station->connected_network);
++	network_set_force_default_ecc_group(station->connected_network);
+ 
+ 	return true;
+ }
 -- 
 2.34.1
 
