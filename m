@@ -1,119 +1,127 @@
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8290F15E5A8
-	for <iwd@lists.linux.dev>; Wed, 28 Feb 2024 17:47:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B5222F1E
+	for <iwd@lists.linux.dev>; Wed, 28 Feb 2024 17:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709142472; cv=none; b=U+6oRFaNRusif+3AFDfmtBsb4xJ4+jPnn+x5kNcwR4EYJzrGwBnNB2WG6cidxG4QLQs5yHjk8wWVOrXVtHTSt/BfdJdi0lP9YN/GmQ61z5EDum+yURrTbBQt1ebz+XEbG5KBYVPYPp+Zy5BeRfb+gw+nYwKe/62BPmozeFiJ1Ag=
+	t=1709142678; cv=none; b=Mj3pMt2di9dLAcyvRl72jxI5YO4bs0/zW4mTh8qk1D1vS/NZsb9MymgY7R803clK9mHfRJbxV/sepZTLvEfJox0Xrbaw5/x4uj6ZE/IotC96DDTj8zegWL2kGApKejfNAZrgXjIIwRqlqg997WPgm00cF0od5G6D7sKezbAGHQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709142472; c=relaxed/simple;
-	bh=4Yb25NGMARrQFs0xiWkQl7FY0yvFTAAoAyKJfXnfkeg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aiay1zkYOwzto4G471sWnILdOiRChntxviGag+BLGMkFLl0yKXrrsvHtCJL/5usNFkO5NBBnmFGSuKMirPiPIf4oRCncBhzoFJn2HtxDQif/LXbnUxiaK0NQMwOhWr7TFeudYD/sRadeL9T3SCvAfXjcU2YZLy2ncPbc2vtnTCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RIIzxuql; arc=none smtp.client-ip=209.85.221.175
+	s=arc-20240116; t=1709142678; c=relaxed/simple;
+	bh=CHRR69H1FXToKoghnexKiCWr++TN+v2XGQkE3F0adDQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Nqzge3r3A952ph3Qu8R6j1GFNR1v9WMZTyxUyn8aMw3L1DDCdT5GX8rKZ0lYOCao+YZo29jcYCnXnGpxG23O8hNECdKuxYVB7rzpiXVZ4GRx7JmBw6LZmAvdxzsekkTZORfyRtQID48lpSFt/CSss+OLN/IAMqLcFYHAJdX6yOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hx7Sb9kn; arc=none smtp.client-ip=209.85.210.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RIIzxuql"
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-4d33d049cbaso285447e0c.0
-        for <iwd@lists.linux.dev>; Wed, 28 Feb 2024 09:47:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hx7Sb9kn"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6ddf26eba3cso4410022a34.0
+        for <iwd@lists.linux.dev>; Wed, 28 Feb 2024 09:51:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709142469; x=1709747269; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jk3+gXj7X+WhF2Xp7C93vLRjCHHdn8oCGIybBYv41/Y=;
-        b=RIIzxuqlWTKSN1+pffzcryFPiYp99rG0bf3e3q4pDppjtcLtfUFo5bq6F1uLwX3vyw
-         As3RpyGL8jDRDQAOvDeLloLKtNI9RM70ERB8AjRA0qF0+Cv9S6iB1uSqqkv2boxfPiH9
-         e9xXPupVNj+bfJIfqbehjykhpo+Ygq3tYHkXafDvKEXIl47Ag6cca+YODrhkSJ1z+TOF
-         VN0nG7ovVVpYaGT4L8IlIynLD+CMa4ZCRsTHcqlXxDF3DjmsvHFlnjHeDXJo4TP/9tQM
-         S9bgHLdFMQ1GV/KBkhebzHA1gJ04hnDKpqQR49IGL3FaHQhbG29dOrTyDuAEuZmDxHXO
-         cgfA==
+        d=gmail.com; s=20230601; t=1709142676; x=1709747476; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9sK2d1nF+qqjmf4rgYVPeeP0n9UGzjM3p41x2xOxUWo=;
+        b=Hx7Sb9knWbi4zwet2DabnpkZeumFGFeUG99kx0WIFVVwQpU++J0rgYggY1x8vSQOCw
+         mMyITfX11tjlOsGdUelc6j+essoqo+h6j452/QlV9jgSggBSJUVDriojiKaER6DP3uYJ
+         N5cLOJcAWIDotS6J4zxpaGDILver2xoV/zNve1Dw+siY3+9mGyUC0SFZw6KR9dwgbZMZ
+         homkDn8QXYzlerPyJwVogU+hky1pWZUNXj7U4NuZpc+js/N+snDnCBttxJ7VRM9et0sG
+         /ZB8mI4zE9Q+VpYWOPfQerHCNXXH+852mJmbyt2lIJK+eRKPVFhz8CVqgMgOeH9knmMB
+         eU7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709142469; x=1709747269;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jk3+gXj7X+WhF2Xp7C93vLRjCHHdn8oCGIybBYv41/Y=;
-        b=Cy+mfTGYR8ArkVuDswd34p24Qg+NOan+ZkwvWI4aUnmbc+A0XRY/9fe8Ja7eiDVxDg
-         StBWRLr4+e0pnXINnZbsfsEJ66HnwzsMN8Ir/+6vbrM3s13S86eKsXM2zk3L4h8dedvT
-         XU4ckV5klJUKWYvcP3cYao6TCwVoiIarpXQfO6UGJvwL3/D6W2KxMrvHZUyQr7VG8n7w
-         BUDm+io4mqGMoy2Pm1zHwzGYWwpH0zn6+5/vLG4F/BvjfaV2AX44hQWFvWNsbHnAzNtC
-         JIOE79Oq2bj1DUY1DLNIATDswKW5QX4JWgz3JAt9to4SEy1WK2e7qYnLw9duJtsrWS14
-         Kcyw==
-X-Gm-Message-State: AOJu0YzndWY6NWrHNs0/iTsEqaVJUBYF4spQiTdbodXkC0VTNCNQdWGk
-	ETTYsW1Obe7ohyOluodYM105hb+clhgEHJ+uN4OSvjZ4HK1R0hq5YZ91JMbg
-X-Google-Smtp-Source: AGHT+IHaYBbVX78botknCvfwnloasWuyFeTCjr1s2tp4TVEplpMxNlXgn3BSGorL4jI3Bi+uCmsZxQ==
-X-Received: by 2002:a1f:e443:0:b0:4c0:2d32:612f with SMTP id b64-20020a1fe443000000b004c02d32612fmr222425vkh.15.1709142468680;
-        Wed, 28 Feb 2024 09:47:48 -0800 (PST)
-Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id k12-20020ac8074c000000b0042c70c153f6sm4702559qth.91.2024.02.28.09.47.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 09:47:48 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] auto-t: add ability to reserve radios not for IWD/hostapd/etc
-Date: Wed, 28 Feb 2024 09:47:43 -0800
-Message-Id: <20240228174743.1237719-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1709142676; x=1709747476;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9sK2d1nF+qqjmf4rgYVPeeP0n9UGzjM3p41x2xOxUWo=;
+        b=Usstly+O7puXInUj3yQUp6thLtNzpeB5orKLdUZro/Ovl6Z67RlR4UCo9ruWpNtk2X
+         mrp54aGKr252xVJyiG/m26Za/RTS4ENbdU8OQLiUyzAAjoRwMYW5LsUC3JMlvMTZ9KqS
+         qrEOu9WOLBLmEeR9LmOhdZzIFUcG/Qha5PbEPmTo4zh7sMtu6/pZMPM5+HoW8JuxRBvk
+         kiDGUP7IhLrOTFaLkkA0GcR6CrwGGbrcTdLgw3vkC9exlJa18+o9cBgPm7HVQ0hy0Ung
+         EpnIlM2S+jfboTxnQwL+6whX6L4tZrb0v60dcrTvu30SYw7haCLGxaF1j7cWlw7ykIFX
+         nGCA==
+X-Forwarded-Encrypted: i=1; AJvYcCWq8h54dCH4J2GOpEe6Y46O5c6aYkgkD0E1cahzFDzhdpDBRKdwNH1diugK7dZT6s3+1u1tHQryTEqncecFlJvFT8IR
+X-Gm-Message-State: AOJu0YxuAc6pEl9F6cq4S0UhuK9ebM2ANOq5UkMiEQXOUAa4uaIkfFg6
+	002djhhl2n1/69jHqs1hpgHcpr3cl4o0MxxbPQUXJzoP2hD3zxr5
+X-Google-Smtp-Source: AGHT+IFUKpHYwYf3TX2k9jMZ1I9X3Z6zVnBC7YKjivUI9vHihITClsQ6wNqo13zPMC5gAkfkl27RIQ==
+X-Received: by 2002:a9d:4d8a:0:b0:6e4:9eaf:939a with SMTP id u10-20020a9d4d8a000000b006e49eaf939amr273692otk.4.1709142676121;
+        Wed, 28 Feb 2024 09:51:16 -0800 (PST)
+Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id ew10-20020a0568303d8a00b006e43f8eac57sm1977617otb.50.2024.02.28.09.51.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Feb 2024 09:51:15 -0800 (PST)
+Message-ID: <83a1b6b2-3b34-4172-bacd-25dc78d7a1e2@gmail.com>
+Date: Wed, 28 Feb 2024 11:51:15 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] auto-t: fix netconfig to handle resolvconf values out
+ of order
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240228163616.1231620-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240228163616.1231620-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-If the test needs to do something very specific it may be useful to
-prevent IWD from managing all the radios. This can now be done
-by setting a "reserve" option in the radio settings. The value of
-this should be something other than iwd, hostapd, or wpa_supplicant.
+Hi James,
 
-For example:
+On 2/28/24 10:36, James Prestwood wrote:
+> The slaac_test was one that would occationally fail, but very rarely,
+> due to the resolvconf log values appearing in an unexpected order.
+> 
+> This appears to be related to a typo in netconfig-commit which would
+> not set netconfig-domains and instead set dns_list. This was fixed
+> with a pending patch:
+> 
+> https://lore.kernel.org/iwd/20240227204242.1509980-1-denkenz@gmail.com/T/#u
+> 
+> But applying this now leads to testNetconfig failing slaac_test
+> 100% of the time.
+> 
+> I'm not familiar enough with resolveconf to know if this test change
+> is ok, but based on the test behavior the expected log and disk logs
+> are the same, just in the incorrect order. I'm not sure if this the
+> log order is deterministic so instead the check now iterates the
+> expected log and verifies each value appears once in the resolvconf
+> log.
+> 
+> Here is an example of the expected vs disk logs after running the
+> test:
+> 
+> Expected:
+> 
+> -a wlan1.dns
+> nameserver 192.168.1.2
+> nameserver 3ffe:501:ffff:100::10
+> nameserver 3ffe:501:ffff:100::50
+> -a wlan1.domain
+> search test1
+> search test2
+> 
+> Resolvconf log:
+> 
+> -a wlan1.domain
+> search test1
+> search test2
+> -a wlan1.dns
+> nameserver 192.168.1.2
+> nameserver 3ffe:501:ffff:100::10
+> nameserver 3ffe:501:ffff:100::50
+> ---
+>   autotests/testNetconfig/slaac_test.py | 21 ++++++++++++++-------
+>   1 file changed, 14 insertions(+), 7 deletions(-)
+> 
 
-[rad1]
-reserve=false
----
- tools/run-tests | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Applied, thanks.
 
-diff --git a/tools/run-tests b/tools/run-tests
-index 11ad73c0..fdd0b989 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -73,10 +73,10 @@ class Interface:
- 		Process(['ip', 'link', 'set', self.name, state], namespace=self.ns.name).wait()
- 
- class Radio:
--	def __init__(self, name, default_ns):
-+	def __init__(self, name, default_ns, used_by='iwd'):
- 		self.name = name
- 		# hostapd will reset this if this radio is used by it
--		self.use = 'iwd'
-+		self.use = used_by
- 		self.interface = None
- 		self.ns = default_ns
- 
-@@ -131,15 +131,18 @@ class VirtualRadio(Radio):
- 
- 		self.hwsim = config.hwsim.Hwsim()
- 
-+		used_by = 'iwd'
-+
- 		if cfg:
- 			self.disable_iftype = cfg.get('iftype_disable', None)
- 			self.disable_cipher = cfg.get('cipher_disable', None)
-+			used_by = cfg.get('reserve', 'iwd')
- 
- 		self._radio = self.hwsim.radios.create(name, p2p_device=True,
- 					iftype_disable=self.disable_iftype,
- 					cipher_disable=self.disable_cipher)
- 
--		super().__init__(self._radio.name, default_ns)
-+		super().__init__(self._radio.name, default_ns, used_by)
- 
- 	def __del__(self):
- 		super().__del__()
--- 
-2.34.1
+Regards,
+-Denis
 
