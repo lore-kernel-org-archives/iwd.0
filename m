@@ -1,142 +1,147 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3831220DC8
-	for <iwd@lists.linux.dev>; Wed, 28 Feb 2024 06:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17BD73501
+	for <iwd@lists.linux.dev>; Wed, 28 Feb 2024 12:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709101595; cv=none; b=Qm877lu2p+pZnER7qhoH2AR42DlTr3hc5iSiNAumXSVMbdv+XuUepPKPFLnrDZpIzBe5MHKIXPS60LfD7d8y0oFf5Bm5FVuMx1cd5K5+eU3NdgC64h1g9ArKYlwciv+3G+hK6OCGpk8UIv6NZb7/kb6OyO2vhYJ03OnEyMEGEAI=
+	t=1709124025; cv=none; b=bI5obTO78Zyi2VX5UwaKykc1Jh9vGxxjahlPvWBD9aVVrEmAdhpJ4TsuWNQPOfpOSpYjGXTHYqODe/cOocXDlc0u26HHcroQA1CST7c0W9nNbKllL8VXwBe3HGd2WTksQFdej4mh85M+pOKeOR+byUWALohuHclvdggUYGxCQuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709101595; c=relaxed/simple;
-	bh=fZ5cFxAy1tMLCzSRXexPtimiPLZO+1RML0azjDx1Xag=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=p2K0RwMh0xxojM39PEYJS7EeZLV/MAZTlC6P8JGH5uyeebfeGC7QFtoMwOSZORLPXG0j9jYz8rVxAlD42wPzROsosnFJjDOCsl0/RW1f6Ej/QG+DJ404NZlMltlziP+33WcgxjD6z0Tb6XyBSmMh9SO+phKpQ7KaPulTZOlZwdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.224] (ip5f5aedb1.dynamic.kabel-deutschland.de [95.90.237.177])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8F58B61E5FE04;
-	Wed, 28 Feb 2024 07:26:23 +0100 (CET)
-Message-ID: <259df0b0-4961-4818-8342-e87117074048@molgen.mpg.de>
-Date: Wed, 28 Feb 2024 07:26:24 +0100
+	s=arc-20240116; t=1709124025; c=relaxed/simple;
+	bh=ypTRP8gTpueuVrlSjauMUnq3CPzcwAE0lYkjqAhGydE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BXfEzTx+kQBPhL6QDcZC64sUCdewIj+A+5/nmLB30iznhVQq+JuV1D7t/ND3kIqYbq4LKbgJv+TpueLxW4xY65rp0/6KsbXXzNSdOW0UziWoJS0ECcS0u0iLVOekPpq8cmTPJ2dsyjzAZToh3uRKekQLocQ7ZWTHp+Fbcyo+e6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kgU0BqW4; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kgU0BqW4"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-787c900af02so63671885a.1
+        for <iwd@lists.linux.dev>; Wed, 28 Feb 2024 04:40:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709124022; x=1709728822; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=d4WwcXiEXMb4/emcfeqW0euFLUsyLDDQMKBKRirc2PM=;
+        b=kgU0BqW4zGKZfu4jW79K3K8FI8ziQlqLe0ZIS7OZFRwWEwrmmNRaC+BnLCt4WaH08v
+         A51/aibCGcvPh+OJPgxoLHBPW2s+zQZXnhe7MytEIyMTV46m/PXk05DivHbXzWn0r6aK
+         aFjlnBUly3vWlYVp7H8LYAyypZxsvu2SK/WzaWsKrCiU538bNGv09f0UDTXnpsJpCjgJ
+         aESQozctRClacRzR5y0pcmlo/fWUyOij1lieeSJiqD0/GXpQRjSCc9zRv5FgJ4e8FvQM
+         yTyfy6Jo0klwjtn7LMC0fJ48uikmlCttaOnGA3BFMRGkHqXIf10mnAyXINtZ44mkTOLe
+         xeRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709124022; x=1709728822;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d4WwcXiEXMb4/emcfeqW0euFLUsyLDDQMKBKRirc2PM=;
+        b=lyrzr/RUjM8SWdPQJQJBu82XWPx+/7wufrYJhYKbYb4oXLVLaRHc4RMOmxe8eldxu8
+         /No8F3FxeCzA1akw7q5LnXv5Bc1RUn7e2DJH8zbkkYf5dryOg7FytfdCxs7jrEqwi2s2
+         //sfRXxS2Co3WRLs30himXKqjWFfcJoPESy3+jfl2Z7cQWOVOgcGXU3Z+M5+wuk2Wg/r
+         fWebQQX0Tune25OWiOcnFEH3G0BgIBGqBJu8UuCyukO4H4TZpAZAGeGNHR/fk3WF26xA
+         4BZ4n27c7h1m9FPyPdkQco5clmlz2rbyr3s7EZkxBUqaJxD7sM53UTWuVmbytenKQIfu
+         FsAw==
+X-Gm-Message-State: AOJu0YynzKkQjGIM+5FqHP7oF8o5xjPR/MHHT0qFxnOk7kY2kerrdo4O
+	0NBW/bV3SWx8slZ6TW0hkiIW7fT+5vj/uuTU0D6eryGbpuE00VQ8uhfAJjW6
+X-Google-Smtp-Source: AGHT+IEhuXZlN+9ryLi6h6jFAjzJh4No4pcsC8b6s8edKzG8/LKotkw5JrA53p7lysBomkY++H7b4g==
+X-Received: by 2002:a05:620a:44d6:b0:787:ee7c:569a with SMTP id y22-20020a05620a44d600b00787ee7c569amr3583290qkp.16.1709124022429;
+        Wed, 28 Feb 2024 04:40:22 -0800 (PST)
+Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
+        by smtp.gmail.com with ESMTPSA id f15-20020a05620a15af00b007874c78435bsm4532218qkk.112.2024.02.28.04.40.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 04:40:22 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] RFC: auto-t: fix netconfig to handle resolvconf values out of order
+Date: Wed, 28 Feb 2024 04:40:18 -0800
+Message-Id: <20240228124018.334892-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] eap-wsc: Silence static analysis
-To: Denis Kenzior <denkenz@gmail.com>
-References: <20240227212521.1510693-1-denkenz@gmail.com>
-Content-Language: en-US
-Cc: iwd@lists.linux.dev
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240227212521.1510693-1-denkenz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Dear Denis,
+The slaac_test was one that would occationally fail, but very rarely,
+due to the resolvconf log values appearing in an unexpected order.
 
+This appears to be related to a typo in netconfig-commit which would
+not set netconfig-domains and instead set dns_list. This was fixed
+with a pending patch:
 
-Thank you for your patch.
+https://lore.kernel.org/iwd/20240227204242.1509980-1-denkenz@gmail.com/T/#u
 
-Am 27.02.24 um 22:25 schrieb Denis Kenzior:
-> static analysis complains that authenticator is used uninitialized.
-> This isn't strictly true as memory region is reserved for the
-> authenticator using the contents of the passed in structure.  This
-> region is then overwritten once the authenticator is actually computed
-> by authenticator_put().  Silence this warning by explicitly setting
-> authenticator bytes to 0.
+But applying this now leads to testNetconfig failing slaac_test
+100% of the time.
 
-Too bad. Out of curiosity. What static analyzer is this?
+I'm not familiar enough with resolveconf to know if this test change
+is ok, but based on the test behavior the expected log and disk logs
+are the same, just in the incorrect order. I'm not sure if this the
+log order is deterministic so instead the check now iterates the
+expected log and verifies each value appears once in the resolvconf
+log.
 
-For the commit message summary, I would be more specific. Maybe:
+Here is an example of the expected vs disk logs after running the
+test:
 
-Zero authenticator bytes to fix static analysis warning
+Expected:
 
-> ---
->   src/eap-wsc.c | 17 +++++++++++++++++
->   1 file changed, 17 insertions(+)
-> 
-> diff --git a/src/eap-wsc.c b/src/eap-wsc.c
-> index 65a97da4ee5e..789a20f032b9 100644
-> --- a/src/eap-wsc.c
-> +++ b/src/eap-wsc.c
-> @@ -695,6 +695,8 @@ static void eap_wsc_send_m5(struct eap_state *eap,
->   	size_t encrypted_len;
->   	bool r;
->   
-> +	memset(m5.authenticator, 0, sizeof(m5.authenticator));
-> +
->   	memcpy(m5es.e_snonce1, wsc->local_snonce1, sizeof(wsc->local_snonce1));
->   	pdu = wsc_build_m5_encrypted_settings(&m5es, &pdu_len);
->   	explicit_bzero(m5es.e_snonce1, sizeof(wsc->local_snonce1));
-> @@ -797,6 +799,8 @@ static void eap_wsc_send_m3(struct eap_state *eap,
->   	uint8_t *pdu;
->   	size_t pdu_len;
->   
-> +	memset(m3.authenticator, 0, sizeof(m3.authenticator));
-> +
->   	len = strlen(wsc->device_password);
->   
->   	/* WSC 2.0.5, Section 7.4:
-> @@ -975,6 +979,8 @@ static void eap_wsc_r_send_m8(struct eap_state *eap,
->   	unsigned int auth_types =
->   		wsc->m1->auth_type_flags & wsc->m2->auth_type_flags;
->   
-> +	memset(m8.authenticator, 0, sizeof(m8.authenticator));
-> +
->   	if (auth_types & WSC_AUTHENTICATION_TYPE_OPEN)
->   		memcpy(&creds[creds_cnt++], &wsc->open_cred,
->   			sizeof(struct wsc_credential));
-> @@ -1022,6 +1028,9 @@ static void eap_wsc_r_handle_m7(struct eap_state *eap,
->   	struct wsc_m7_encrypted_settings m7es;
->   	enum wsc_configuration_error error = WSC_CONFIGURATION_ERROR_NO_ERROR;
->   
-> +	memset(m7es.authenticator, 0, sizeof(m7es.authenticator));
-> +	memset(m7.authenticator, 0, sizeof(m7.authenticator));
-> +
->   	/* Spec unclear what to do here, see comments in eap_wsc_send_nack */
->   	if (wsc_parse_m7(pdu, len, &m7, &encrypted) != 0)
->   		goto send_nack;
-> @@ -1084,6 +1093,9 @@ static void eap_wsc_r_send_m6(struct eap_state *eap,
->   	size_t encrypted_len;
->   	bool r;
->   
-> +	memset(m6es.authenticator, 0, sizeof(m6es.authenticator));
-> +	memset(m6.authenticator, 0, sizeof(m6.authenticator));
-> +
->   	memcpy(m6es.r_snonce2, wsc->local_snonce2, sizeof(wsc->local_snonce2));
->   	pdu = wsc_build_m6_encrypted_settings(&m6es, &pdu_len);
->   	explicit_bzero(m6es.r_snonce2, sizeof(wsc->local_snonce2));
-> @@ -1123,6 +1135,8 @@ static void eap_wsc_r_handle_m5(struct eap_state *eap,
->   	struct wsc_m5_encrypted_settings m5es;
->   	enum wsc_configuration_error error = WSC_CONFIGURATION_ERROR_NO_ERROR;
->   
-> +	memset(m5es.authenticator, 0, sizeof(m5es.authenticator));
-> +
->   	/* Spec unclear what to do here, see comments in eap_wsc_send_nack */
->   	if (wsc_parse_m5(pdu, len, &m5, &encrypted) != 0)
->   		goto send_nack;
-> @@ -1188,6 +1202,9 @@ static void eap_wsc_r_send_m4(struct eap_state *eap,
->   	size_t len_half1;
->   	struct iovec iov[4];
->   
-> +	memset(m4es.authenticator, 0, sizeof(m4es.authenticator));
-> +	memset(m4.authenticator, 0, sizeof(m4.authenticator));
-> +
->   	memcpy(m4es.r_snonce1, wsc->local_snonce1, sizeof(wsc->local_snonce1));
->   	pdu = wsc_build_m4_encrypted_settings(&m4es, &pdu_len);
->   	explicit_bzero(m4es.r_snonce1, sizeof(wsc->local_snonce1));
+-a wlan1.dns
+nameserver 192.168.1.2
+nameserver 3ffe:501:ffff:100::10
+nameserver 3ffe:501:ffff:100::50
+-a wlan1.domain
+search test1
+search test2
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Resolvconf log:
 
+-a wlan1.domain
+search test1
+search test2
+-a wlan1.dns
+nameserver 192.168.1.2
+nameserver 3ffe:501:ffff:100::10
+nameserver 3ffe:501:ffff:100::50
+---
+ autotests/testNetconfig/slaac_test.py | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
-Kind regards,
+diff --git a/autotests/testNetconfig/slaac_test.py b/autotests/testNetconfig/slaac_test.py
+index 26ae0e46..5aeb730e 100644
+--- a/autotests/testNetconfig/slaac_test.py
++++ b/autotests/testNetconfig/slaac_test.py
+@@ -81,14 +81,21 @@ class Test(unittest.TestCase):
+         self.assertEqual(expected_routes6, set(testutil.get_routes6(ifname)))
+ 
+         rclog = open('/tmp/resolvconf.log', 'r')
+-        entries = rclog.readlines()
++        entries = [l.strip() for l in rclog.readlines()[-7:]]
+         rclog.close()
+-        expected_rclog = ['-a %s.dns\n' % (ifname,), 'nameserver 192.168.1.2\n',
+-                'nameserver 3ffe:501:ffff:100::10\n', 'nameserver 3ffe:501:ffff:100::50\n',
+-                '-a %s.domain\n' % (ifname,), 'search test1\n', 'search test2\n']
+-        # Every resolvconf -a run overwrites the previous settings.  Check the last seven lines
+-        # of our log since we care about the end result here.
+-        self.assertEqual(expected_rclog, entries[-7:])
++        expected_rclog = [
++            '-a %s.dns' % (ifname,),
++            'nameserver 192.168.1.2',
++            'nameserver 3ffe:501:ffff:100::10',
++            'nameserver 3ffe:501:ffff:100::50',
++            '-a %s.domain' % (ifname,),
++            'search test1',
++            'search test2'
++        ]
++
++        for line in expected_rclog:
++            self.assertIn(line, entries)
++            expected_rclog.remove(line)
+ 
+         device.disconnect()
+         condition = 'not obj.connected'
+-- 
+2.34.1
 
-Paul
